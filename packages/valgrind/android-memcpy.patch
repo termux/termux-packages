@@ -1,0 +1,39 @@
+When we link against clang's builtin library
+(LDFLAGS+=" $($CC print-libgcc-file-name)") we get errors like:
+
+    errors.o ../coregrind/libcoregrind-arm-linux.a ../VEX/libvex-arm-linux.a -lgcc ../coregrind/libgcc-sup-arm-linux.a 
+    ld: error: duplicate symbol: __aeabi_memcpy
+    >>> defined at aeabi_memcpy.S.o:(__aeabi_memcpy) in archive /home/builder/.termux-build/_cache/android-r23b-api-24-v5/lib64/clang/12.0.8/lib/linux/libclang_rt.builtins-arm-android.a
+    >>> defined at m_main.c:2602 (/home/builder/.termux-build/valgrind/src/coregrind/m_main.c:2602)
+    >>>            libnolto_coregrind_arm_linux_a-m_main.o:(.text+0x5A1C) in archive ../coregrind/libcoregrind-arm-linux.a
+
+Hopefully it is fine to remove these overrides now.
+
+--- ./coregrind/m_main.c.orig	2022-01-02 12:15:07.892429627 +0100
++++ ./coregrind/m_main.c	2022-01-02 12:24:20.961799164 +0100
+@@ -2595,25 +2595,6 @@
+         || defined(VGPV_mips32_linux_android) \
+         || defined(VGPV_arm64_linux_android))
+ 
+-/* Replace __aeabi_memcpy* functions with vgPlain_memcpy. */
+-void *__aeabi_memcpy(void *dest, const void *src, SizeT n);
+-void *__aeabi_memcpy(void *dest, const void *src, SizeT n)
+-{
+-    return VG_(memcpy)(dest, src, n);
+-}
+-
+-void *__aeabi_memcpy4(void *dest, const void *src, SizeT n);
+-void *__aeabi_memcpy4(void *dest, const void *src, SizeT n)
+-{
+-    return VG_(memcpy)(dest, src, n);
+-}
+-
+-void *__aeabi_memcpy8(void *dest, const void *src, SizeT n);
+-void *__aeabi_memcpy8(void *dest, const void *src, SizeT n)
+-{
+-    return VG_(memcpy)(dest, src, n);
+-}
+-
+ /* Replace __aeabi_memclr* functions with vgPlain_memset. */
+ void *__aeabi_memclr(void *dest, SizeT n);
+ void *__aeabi_memclr(void *dest, SizeT n)
