@@ -248,9 +248,9 @@ termux_step_create_debscripts() {
 	echo 'Running "npm ci --no-optional --production" in $TERMUX_PREFIX/opt/emscripten ...'
 	npm ci --no-optional --production
 	else
-	echo 'Running "npm install" in $TERMUX_PREFIX/opt/emscripten ...'
+	echo 'Running "npm install --no-optional --production" in $TERMUX_PREFIX/opt/emscripten ...'
 	rm package-lock.json
-	npm install
+	npm install --no-optional --production
 	fi
 	else
 	echo 'Warning: npm is not installed! Emscripten may not work properly without installing node modules!' >&2
