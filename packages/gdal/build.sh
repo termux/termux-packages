@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="LICENSE.TXT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.3.2
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://download.osgeo.org/gdal/${TERMUX_PKG_VERSION}/gdal-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=630e34141cf398c3078d7d8f08bb44e804c65bbf09807b3610dcbfbc37115cc3
 TERMUX_PKG_DEPENDS="libc++, openjpeg, libcurl, libtiff, libpng, proj, libiconv, libsqlite, libgeos, libspatialite, libexpat, postgresql, netcdf-c"
@@ -17,3 +17,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-spatialite=$TERMUX_PREFIX
 --with-expat=$TERMUX_PREFIX
 "
+
+termux_step_pre_configure() {
+	LDFLAGS+=" $($CC -print-libgcc-file-name)"
+}
