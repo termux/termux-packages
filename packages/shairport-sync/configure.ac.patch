@@ -1,0 +1,19 @@
+--- a/configure.ac
++++ b/configure.ac
+@@ -3,7 +3,7 @@
+ 
+ AC_PREREQ([2.50])
+ AC_INIT([shairport-sync], [3.1.2rc0], [mikebrady@eircom.net])
+-AM_INIT_AUTOMAKE
++AM_INIT_AUTOMAKE([subdir-objects])
+ AC_CONFIG_SRCDIR([shairport.c])
+ AC_CONFIG_HEADERS([config.h])
+ 
+@@ -274,7 +274,6 @@
+ AC_ARG_WITH(convolution, [  --with-convolution = choose audio DSP convolution support], [
+   AC_MSG_RESULT(>>Including convolution support)
+   HAS_CONVOLUTION=1
+-  AM_INIT_AUTOMAKE([subdir-objects])
+   AC_DEFINE([CONFIG_CONVOLUTION], 1, [Needed by the compiler.])
+   AC_CHECK_LIB([sndfile], [sf_open], , AC_MSG_ERROR(Convolution support requires the sndfile library!))], )
+ AM_CONDITIONAL([USE_CONVOLUTION], [test "x$HAS_CONVOLUTION" = "x1"])
