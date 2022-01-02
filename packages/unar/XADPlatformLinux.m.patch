@@ -1,0 +1,12 @@
+--- a/XADPlatformLinux.m
++++ b/XADPlatformLinux.m
+@@ -25,6 +25,9 @@
+ #import <unistd.h>
+ #import <sys/stat.h>
+ #import <sys/time.h>
++#if defined __ANDROID__ && __ANDROID_API__ < 26
++#import "sys_time.c"
++#endif
+ 
+ 
+ 
