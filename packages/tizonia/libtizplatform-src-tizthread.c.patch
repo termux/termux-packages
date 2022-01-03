@@ -1,0 +1,13 @@
+--- a/libtizplatform/src/tizthread.c
++++ b/libtizplatform/src/tizthread.c
+@@ -46,6 +46,10 @@
+ #define TIZ_LOG_CATEGORY_NAME "tiz.platform.thread"
+ #endif
+ 
++#ifdef __ANDROID__
++#undef PTHREAD_STACK_MIN
++#endif
++
+ #ifndef PTHREAD_STACK_MIN
+ #define PTHREAD_STACK_MIN \
+   (2 * 1024 * 1024) /* Currently, this is the minimum \
