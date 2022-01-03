@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Emscripten: An LLVM-to-WebAssembly Compiler"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@truboxl"
 TERMUX_PKG_VERSION=3.0.1
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/emscripten-core/emscripten.git
 TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
@@ -235,12 +235,23 @@ termux_step_make_install() {
 }
 
 termux_step_create_debscripts() {
+	# emscripten's package-lock.json is generated with nodejs v12.13.0
+	# which comes with npm v6 which used lockfile version 1
+	# which isn't compatible with lockfile version 2 used in npm v7 and v8
 	cat <<- EOF > postinst
-	#!$TERMUX_PREFIX/bin/sh
+	#!$TERMUX_PREFIX/bin/bash
 	if [ -n "\$(command -v npm)" ]; then
-	echo 'Running "npm ci --no-optional --production" in $TERMUX_PREFIX/opt/emscripten ...'
 	cd "$TERMUX_PREFIX/opt/emscripten"
+	NPM_VERSION=\$(npm --version)
+	NPM_MAJOR_VERSION=\${NPM_VERSION:0:1}
+	if [ 6 = \$NPM_MAJOR_VERSION ]; then
+	echo 'Running "npm ci --no-optional --production" in $TERMUX_PREFIX/opt/emscripten ...'
 	npm ci --no-optional --production
+	else
+	echo 'Running "npm install --no-optional --production" in $TERMUX_PREFIX/opt/emscripten ...'
+	rm package-lock.json
+	npm install --no-optional --production
+	fi
 	else
 	echo 'Warning: npm is not installed! Emscripten may not work properly without installing node modules!' >&2
 	fi
