@@ -1,13 +1,11 @@
 TERMUX_PKG_HOMEPAGE=https://sites.google.com/site/broguegame/
-TERMUX_PKG_DESCRIPTION="Roguelike dungeon crawling game"
+TERMUX_PKG_DESCRIPTION="Roguelike dungeon crawling game (community edition)"
 TERMUX_PKG_LICENSE="AGPL-V3"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.7.5
-TERMUX_PKG_REVISION=4
-TERMUX_PKG_SRCURL=https://github.com/termux/distfiles/releases/download/2021.01.04/brogue-${TERMUX_PKG_VERSION}-linux-amd64.tbz2
-TERMUX_PKG_SHA256=a74ff18139564c597d047cfb167f74ab1963dd8608b6fb2e034e7635d6170444
+TERMUX_PKG_VERSION=1.10.1
+TERMUX_PKG_SRCURL=https://github.com/tmewett/BrogueCE/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=3e0425b3f1b59afe98a92c0282aa4dd7e8964b53f7cab969fcf437701a04c5fa
 TERMUX_PKG_DEPENDS="ncurses"
-TERMUX_PKG_EXTRA_MAKE_ARGS="curses"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_GROUPS="games"
 
