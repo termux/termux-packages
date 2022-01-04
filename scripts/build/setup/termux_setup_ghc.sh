@@ -32,7 +32,8 @@ termux_setup_ghc() {
 
 		rm -Rf "$TERMUX_GHC_TEMP_FOLDER"
 	else
-		if [ "$(dpkg-query -W -f '${db:Status-Status}\n' ghc 2>/dev/null)" != "installed" ]; then
+		if [[ "$(dpkg --version 2>/dev/null)" && "$(dpkg-query -W -f '${db:Status-Status}\n' ghc 2>/dev/null)" != "installed" ]] ||
+                   [[ "$(pacman -V 2>/dev/null)" && ! "$(pacman -Q ghc 2>/dev/null)" ]]; then
 			echo "Package 'ghc' is not installed."
 			exit 1
 		fi
