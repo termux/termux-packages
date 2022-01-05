@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A library of general-purpose, non-graphical Objective C 
 TERMUX_PKG_LICENSE="GPL-2.0, LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.28.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=http://ftp.gnustep.org/pub/gnustep/core/gnustep-base-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=c7d7c6e64ac5f5d0a4d5c4369170fc24ed503209e91935eb0e2979d1601039ed
 TERMUX_PKG_DEPENDS="gnustep-make, libc++, libffi, libgmp, libgnutls, libiconv, libicu, libxml2, libxslt, zlib"
