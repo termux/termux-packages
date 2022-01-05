@@ -1,0 +1,11 @@
+--- a/src/jsmods/core.c
++++ b/src/jsmods/core.c
+@@ -719,7 +719,7 @@
+ 		if (!res) res = (char *) gf_opts_get_key("General", "iOSDocumentsDir");
+ #else
+ 		if (!res) res = getenv("HOME");
+-		if (!res) res = "/home/";
++		if (!res) res = "@TERMUX_HOME@/";
+ #endif
+ 		return JS_NewString(ctx, res);
+ 

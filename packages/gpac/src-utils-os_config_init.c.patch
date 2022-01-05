@@ -1,0 +1,39 @@
+--- a/src/utils/os_config_init.c
++++ b/src/utils/os_config_init.c
+@@ -383,22 +383,15 @@
+ 		return 0;
+ 	}
+ 	/*installed or symlink on system, user user home directory*/
+-	if (!strnicmp(app_path, "/usr/", 5) || !strnicmp(app_path, "/opt/", 5)) {
++	if (!strnicmp(app_path, "@TERMUX_PREFIX@/", strlen("@TERMUX_PREFIX@") + 1)) {
+ 		if (path_type==GF_PATH_SHARE) {
+ 			/*look in possible install dirs ...*/
+-			if (check_file_exists("gui/gui.bt", "/usr/share/gpac", file_path)) return 1;
+-			if (check_file_exists("gui/gui.bt", "/usr/local/share/gpac", file_path)) return 1;
+-			if (check_file_exists("gui/gui.bt", "/opt/share/gpac", file_path)) return 1;
+-			if (check_file_exists("gui/gui.bt", "/opt/local/share/gpac", file_path)) return 1;
++			if (check_file_exists("gui/gui.bt", "@TERMUX_PREFIX@/share/gpac", file_path)) return 1;
++			if (check_file_exists("gui/gui.bt", "@TERMUX_PREFIX@/local/share/gpac", file_path)) return 1;
+ 		} else if (path_type==GF_PATH_MODULES) {
+ 			/*look in possible install dirs ...*/
+-			if (check_file_exists(TEST_MODULE, "/usr/lib64/gpac", file_path)) return 1;
+-			if (check_file_exists(TEST_MODULE, "/usr/lib/gpac", file_path)) return 1;
+-			if (check_file_exists(TEST_MODULE, "/usr/local/lib/gpac", file_path)) return 1;
+-			if (check_file_exists(TEST_MODULE, "/opt/lib/gpac", file_path)) return 1;
+-			if (check_file_exists(TEST_MODULE, "/opt/local/lib/gpac", file_path)) return 1;
+-			if (check_file_exists(TEST_MODULE, "/usr/lib/x86_64-linux-gnu/gpac", file_path)) return 1;
+-			if (check_file_exists(TEST_MODULE, "/usr/lib/i386-linux-gnu/gpac", file_path)) return 1;
++			if (check_file_exists(TEST_MODULE, "@TERMUX_PREFIX@/lib/gpac", file_path)) return 1;
++			if (check_file_exists(TEST_MODULE, "@TERMUX_PREFIX@/local/lib/gpac", file_path)) return 1;
+ 		}
+ 	}
+ 
+@@ -615,7 +608,7 @@
+ 	strcpy(szPath, "/system/fonts/");
+ #else
+ 	//scan all /usr/share/fonts, not just /usr/share/fonts/truetype/ which does not exist in some distrros
+-	strcpy(szPath, "/usr/share/fonts/");
++	strcpy(szPath, "@TERMUX_PREFIX@/share/fonts/");
+ #endif
+ 	gf_cfg_set_key(cfg, "core", "font-dirs", szPath);
+ 
