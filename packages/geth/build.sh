@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://geth.ethereum.org/
 TERMUX_PKG_DESCRIPTION="Go implementation of the Ethereum protocol"
 TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
-TERMUX_PKG_VERSION=1.10.14
+TERMUX_PKG_VERSION=1.10.15
 TERMUX_PKG_SRCURL=https://github.com/ethereum/go-ethereum/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=cf1089e0316bf7b7705a43099b140d10eb5e556849d4dd9c7db101cda55e76e4
+TERMUX_PKG_SHA256=0c03bdf88fc01053fee8d73e3acc9579354b8c3c2333b544b800040dcd414963
 TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make() {
