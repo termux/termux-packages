@@ -1,0 +1,18 @@
+--- a/compiler/make.build.c
++++ b/compiler/make.build.c
+@@ -128,6 +128,15 @@
+     #include <pthread.h>
+ 
+     #define MC_HAVE_JOBCTL_IPC 1
++  #elif defined(__ANDROID__)
++    #include <linux/sem.h>
++    #define semid_ds semid64_ds
++int semctl(int, int, int, ...);
++int semget(key_t, int, int);
++int semop(int, struct sembuf *, size_t);
++
++    #define MC_USE_SYSV_SEMAPHORE 1
++    #define MC_HAVE_JOBCTL_IPC 1
+   #elif defined(MR_HAVE_SYS_SEM_H)
+     #include <sys/sem.h>
+ 
