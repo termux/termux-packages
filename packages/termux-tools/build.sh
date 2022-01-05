@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://termux.com/
 TERMUX_PKG_DESCRIPTION="Basic system tools for Termux"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.154
+TERMUX_PKG_VERSION=0.155
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_ESSENTIAL=true
@@ -26,7 +26,7 @@ TERMUX_PKG_RECOMMENDS="ed, dos2unix, inetutils, net-tools, patch, unzip"
 termux_step_make_install() {
 	# Remove LD_LIBRARY_PATH from environment to avoid conflicting
 	# with system libraries that system binaries may link against:
-	for tool in df getprop logcat mount ping ping6 ip pm settings top umount cmd; do
+	for tool in df getprop logcat mount ping ping6 pm settings top umount cmd; do
 		WRAPPER_FILE=$TERMUX_PREFIX/bin/$tool
 		echo '#!/bin/sh' > $WRAPPER_FILE
 		echo 'unset LD_LIBRARY_PATH LD_PRELOAD' >> $WRAPPER_FILE
