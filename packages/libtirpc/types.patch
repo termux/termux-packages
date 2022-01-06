@@ -7,8 +7,8 @@ diff -uNr libtirpc-1.2.6/src/xdr.c libtirpc-1.2.6.mod/src/xdr.c
  
 -typedef quad_t          longlong_t;     /* ANSI long long type */
 -typedef u_quad_t        u_longlong_t;   /* ANSI unsigned long long type */
-+typedef int64_t          longlong_t;     /* ANSI long long type */
-+typedef uint64_t         u_longlong_t;   /* ANSI unsigned long long type */
++typedef long long          longlong_t;     /* ANSI long long type */
++typedef unsigned long long u_longlong_t;   /* ANSI unsigned long long type */
  
  /*
   * constants specific to the xdr "protocol"
@@ -35,10 +35,10 @@ diff -uNr libtirpc-1.2.6/tirpc/rpc/xdr.h libtirpc-1.2.6.mod/tirpc/rpc/xdr.h
 -extern bool_t	xdr_u_hyper(XDR *, u_quad_t *);
 -extern bool_t	xdr_longlong_t(XDR *, quad_t *);
 -extern bool_t	xdr_u_longlong_t(XDR *, u_quad_t *);
-+extern bool_t	xdr_hyper(XDR *, int64_t *);
-+extern bool_t	xdr_u_hyper(XDR *, uint64_t *);
-+extern bool_t	xdr_longlong_t(XDR *, int64_t *);
-+extern bool_t	xdr_u_longlong_t(XDR *, uint64_t *);
++extern bool_t	xdr_hyper(XDR *, long long *);
++extern bool_t	xdr_u_hyper(XDR *, unsigned long long *);
++extern bool_t	xdr_longlong_t(XDR *, long long *);
++extern bool_t	xdr_u_longlong_t(XDR *, unsigned long long *);
  extern u_long	xdr_sizeof(xdrproc_t, void *);
  #ifdef __cplusplus
  }
