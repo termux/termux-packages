@@ -1,0 +1,11 @@
+--- a/3rd/bee.lua/bee/thread/spinlock.h
++++ b/3rd/bee.lua/bee/thread/spinlock.h
+@@ -8,7 +8,7 @@
+ #elif defined(__x86_64__)
+     #include <immintrin.h>
+     namespace bee { inline void cpu_relax() { _mm_pause(); }}
+-#elif defined(__aarch64__)
++#elif defined(__aarch64__) || defined(__ARM_ARCH_7A__)
+     namespace bee { inline void cpu_relax() { asm volatile("yield" ::: "memory"); }}
+ #else
+     #error unsupport platform

@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Sumneko Lua Language Server coded in Lua"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="MrAdityaAlok <dev.aditya.alok@gmail.com>"
 TERMUX_PKG_VERSION=2.4.7
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/sumneko/lua-language-server.git
 TERMUX_PKG_GIT_BRANCH="${TERMUX_PKG_VERSION}"
 TERMUX_PKG_BUILD_DEPENDS="libandroid-spawn"
@@ -11,7 +12,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 
 # no cpu_relax support present for these archs.
 # https://github.com/actboy168/bee.lua/blob/32f65b92739fa236d87fc1b2e7617470d47f0355/bee/thread/spinlock.h#L14
-TERMUX_PKG_BLACKLISTED_ARCHES="arm,i686"
+TERMUX_PKG_BLACKLISTED_ARCHES="i686"
 
 _patch() {
 	if [ "${TERMUX_ON_DEVICE_BUILD}" = true ]; then
