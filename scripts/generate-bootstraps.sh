@@ -325,6 +325,7 @@ for package_arch in "${TERMUX_ARCHITECTURES[@]}"; do
 	pull_package sed
 	pull_package tar
 	pull_package termux-exec
+	pull_package termux-keyring
 	pull_package termux-tools
 	pull_package util-linux
 	pull_package xz-utils
