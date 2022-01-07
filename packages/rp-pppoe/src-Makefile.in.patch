@@ -1,0 +1,53 @@
+--- a/src/Makefile.in
++++ b/src/Makefile.in
+@@ -50,11 +50,11 @@
+ @LIC_MAKEFILE_INCLUDE@
+ 
+ # Kernel-mode plugin gets installed here.
+-PLUGIN_DIR=/etc/ppp/plugins
++PLUGIN_DIR=@TERMUX_PREFIX@/etc/ppp/plugins
+ PLUGIN_PATH=$(PLUGIN_DIR)/rp-pppoe.so
+ 
+ # Configuration file paths
+-PPPOESERVER_PPPD_OPTIONS=/etc/ppp/pppoe-server-options
++PPPOESERVER_PPPD_OPTIONS=@TERMUX_PREFIX@/etc/ppp/pppoe-server-options
+ 
+ PATHS='-DPPPOE_PATH="$(PPPOE_PATH)"' '-DPPPD_PATH="$(PPPD_PATH)"' \
+ 	'-DPLUGIN_PATH="$(PLUGIN_PATH)"' \
+@@ -188,16 +188,16 @@
+ 	$(install) -m 644 ../man/pppoe-setup.8 $(DESTDIR)$(mandir)/man8
+ 	-mkdir -p $(DESTDIR)$(mandir)/man5
+ 	$(install) -m 644 ../man/pppoe.conf.5 $(DESTDIR)$(mandir)/man5
+-	-mkdir -p $(DESTDIR)/etc/ppp
++	-mkdir -p $(DESTDIR)@TERMUX_PREFIX@/etc/ppp
+ 	-mkdir -p $(DESTDIR)$(PLUGIN_DIR)
+ 	-echo "# Directory created by rp-pppoe for kernel-mode plugin" > $(DESTDIR)$(PLUGIN_DIR)/README
+ 	if test -r rp-pppoe.so; then $(install) -m 755 rp-pppoe.so $(DESTDIR)$(PLUGIN_DIR); fi
+ 	@for i in pppoe.conf firewall-standalone firewall-masq ; do \
+-		if [ ! -f $(DESTDIR)/etc/ppp/$$i ] ; then \
+-			$(install) -m 644 ../configs/$$i $(DESTDIR)/etc/ppp ; \
++		if [ ! -f $(DESTDIR)@TERMUX_PREFIX@/etc/ppp/$$i ] ; then \
++			$(install) -m 644 ../configs/$$i $(DESTDIR)@TERMUX_PREFIX@/etc/ppp ; \
+ 		else \
+-			echo "NOT overwriting existing $(DESTDIR)/etc/ppp/$$i" ;\
+-			$(install) -m 644 ../configs/$$i $(DESTDIR)/etc/ppp/$$i-$(RP_VERSION) ;\
++			echo "NOT overwriting existing $(DESTDIR)@TERMUX_PREFIX@/etc/ppp/$$i" ;\
++			$(install) -m 644 ../configs/$$i $(DESTDIR)@TERMUX_PREFIX@/etc/ppp/$$i-$(RP_VERSION) ;\
+ 		fi ;\
+ 	done
+ 	@if [ ! -f $(DESTDIR)$(PPPOESERVER_PPPD_OPTIONS) ] ; then \
+@@ -206,12 +206,12 @@
+ 		echo "NOT overwriting existing $(DESTDIR)$(PPPOESERVER_PPPD_OPTIONS)"; \
+ 		$(install) -m 644 ../configs/pppoe-server-options $(DESTDIR)$(PPPOESERVER_PPPD_OPTIONS)-example ; \
+ 	fi
+-	@if [ -f /etc/redhat-release ] ; then \
++	@if false ; then \
+ 		echo "Looks like a Red Hat system; installing $(DESTDIR)/etc/rc.d/init.d/pppoe" ; \
+ 		mkdir -p $(DESTDIR)/etc/rc.d/init.d ;\
+ 		$(install) -m 755 ../scripts/pppoe-init $(DESTDIR)/etc/rc.d/init.d/pppoe ; \
+ 	fi
+-	@if [ -f /etc/SuSE-release ] ; then \
++	@if false ; then \
+ 		echo "Looks like a SuSE Linux system; installing $(DESTDIR)/etc/rc.d/init.d/pppoe" ; \
+ 		mkdir -p $(DESTDIR)/etc/rc.d/init.d ;\
+ 		$(install) -m 755 ../scripts/pppoe-init-suse $(DESTDIR)/etc/rc.d/init.d/pppoe ; \
