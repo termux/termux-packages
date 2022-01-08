@@ -1,46 +1,20 @@
---- lua-language-server/make.lua	2021-10-22 15:07:23.591055667 +0530
-+++ lua-language-server-patch/make.lua	2021-10-27 20:41:28.435106500 +0530
-@@ -2,7 +2,10 @@
- local platform = require 'bee.platform'
- local exe      = platform.OS == 'Windows' and ".exe" or ""
- 
--lm.bindir = "bin/"..platform.OS
-+lm.bindir = "bin/Android"
-+
-+lm.flags = "@FLAGS@"
-+lm.ldflags = "@LDFLAGS@"
+--- b/make.lua	2022-01-08 12:10:22.532679720 +0530
++++ a/make.lua	2022-01-08 12:05:20.922679835 +0530
+@@ -6,6 +6,9 @@
  
  lm.EXE_DIR = ""
- lm:import "3rd/bee.lua/make.lua"
-@@ -42,29 +45,7 @@
-     output = lm.bindir.."/main.lua",
+ 
++lm.flags = "@FLAGS@"
++lm.ldflags = "@LDFLAGS@"
++
+ if platform.OS == 'macOS' then
+     if lm.platform == nil then
+     elseif lm.platform == "darwin-arm64" then
+@@ -132,6 +135,5 @@
  }
  
--lm:build "bee-test" {
--    lm.bindir.."/lua-language-server"..exe, "3rd/bee.lua/test/test.lua",
--    pool = "console",
--    deps = {
--        "lua-language-server",
--        "copy_bootstrap",
--    },
--    windows = {
--        deps = {
--            "copy_vcrt"
--        }
--    }
--}
--
--lm:build 'unit-test' {
--    lm.bindir.."/lua-language-server"..exe, 'test.lua',
--    pool = "console",
--    deps = {
--        "bee-test",
--    }
--}
--
  lm:default {
 -    "bee-test",
 -    "unit-test",
-+    "lua-language-server",
-+    "copy_bootstrap",
++    "all",
  }
