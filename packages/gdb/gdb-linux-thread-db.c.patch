@@ -1,0 +1,33 @@
+--- a/gdb/linux-thread-db.c
++++ b/gdb/linux-thread-db.c
+@@ -640,7 +640,9 @@
+   /* Check td_ta_thr_iter passed consistent arguments.  */
+   CHECK (th != NULL);
+   CHECK (arg == (void *) tdb_testinfo);
++#ifndef __ANDROID__
+   CHECK (th->th_ta_p == tdb_testinfo->info->thread_agent);
++#endif
+ 
+   LOG (" %s", core_addr_to_string_nz ((CORE_ADDR) th->th_unique));
+ 
+@@ -650,9 +652,12 @@
+ 
+   LOG (" => %d", ti.ti_lid);
+ 
++#ifndef __ANDROID__
+   CHECK (ti.ti_ta_p == th->th_ta_p);
++#endif
+   CHECK (ti.ti_tid == (thread_t) th->th_unique);
+ 
++#ifndef __ANDROID__
+   /* Check td_ta_map_lwp2thr.  */
+   td_thrhandle_t th2;
+   memset (&th2, 23, sizeof (td_thrhandle_t));
+@@ -671,6 +676,7 @@
+ 
+       CHECK (memcmp (th, &th2, sizeof (td_thrhandle_t)) == 0);
+     }
++#endif
+ 
+   /* Attempt TLS access.  Assuming errno is TLS, this calls
+      thread_db_get_thread_local_address, which in turn calls
