@@ -4,7 +4,7 @@ termux_step_get_dependencies() {
 		termux_get_repo_files
 
 		# When doing build on device, ensure that apt lists are up-to-date.
-		[ "$TERMUX_ON_DEVICE_BUILD" = "true" ] && apt update
+		[ "$TERMUX_ON_DEVICE_BUILD" = "true" ] && (apt update 2>/dev/null || pacman -Sy)
 
 		# Download dependencies
 		while read PKG PKG_DIR; do
@@ -15,7 +15,7 @@ termux_step_get_dependencies() {
 			fi
 			# llvm doesn't build if ndk-sysroot is installed:
 			if [ "$PKG" = "ndk-sysroot" ]; then continue; fi
-			read DEP_ARCH DEP_VERSION <<< $(termux_extract_dep_info $PKG "${PKG_DIR}")
+			read DEP_ARCH DEP_VERSION DEP_VERSION_PAC <<< $(termux_extract_dep_info $PKG "${PKG_DIR}")
 
 			if [ ! "$TERMUX_QUIET_BUILD" = true ]; then
 				echo "Downloading dependency $PKG@$DEP_VERSION if necessary..."
@@ -27,7 +27,7 @@ termux_step_get_dependencies() {
 				fi
 			fi
 
-			if ! termux_download_deb $PKG $DEP_ARCH $DEP_VERSION; then
+			if ! termux_download_deb_pac $PKG $DEP_ARCH $DEP_VERSION $DEP_VERSION_PAC; then
 				echo "Download of $PKG@$DEP_VERSION from $TERMUX_REPO_URL failed, building instead"
 				TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh -I --format $TERMUX_PACKAGE_FORMAT "${PKG_DIR}"
 				continue

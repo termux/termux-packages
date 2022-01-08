@@ -96,8 +96,8 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_handle_buildarch.sh"
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_extract_dep_info.sh"
 
 # Function that downloads a .deb (using the termux_download function)
-# shellcheck source=scripts/build/termux_download_deb.sh
-source "$TERMUX_SCRIPTDIR/scripts/build/termux_download_deb.sh"
+# shellcheck source=scripts/build/termux_download_deb_pac.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/termux_download_deb_pac.sh"
 
 # Script to download InRelease, verify it's signature and then download Packages.xz by hash
 # shellcheck source=scripts/build/termux_get_repo_files.sh

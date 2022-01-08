@@ -1,10 +1,11 @@
-termux_download_deb() {
+termux_download_deb_pac() {
 	local PACKAGE=$1
 	local PACKAGE_ARCH=$2
 	local VERSION=$3
+	local VERSION_PACMAN=$4
 
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
-		apt install -y "${PACKAGE}=${VERSION}"
+		apt install -y "${PACKAGE}=${VERSION}" 2>/dev/null || pacman -S "${PACKAGE}=${VERSION_PACMAN}" --needed --noconfirm
 		return "$?"
 	fi
 
