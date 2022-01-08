@@ -47,6 +47,8 @@ termux_setup_gn() {
 			echo
 			echo "  pkg install gn"
 			echo
+			echo "  pacman -S gn"
+			echo
 			exit 1
 		fi
 	fi

@@ -31,6 +31,8 @@ termux_setup_golang() {
 			echo
 			echo "  pkg install golang"
 			echo
+			echo "  pacman -S golang"
+			echo
 			echo "or build it from source with"
 			echo
 			echo "  ./build-package.sh golang"

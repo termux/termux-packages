@@ -30,6 +30,8 @@ termux_setup_ninja() {
 			echo
 			echo "  pkg install ninja"
 			echo
+			echo "  pacman -S ninja"
+			echo
 			echo "or build it from source with"
 			echo
 			echo "  ./build-package.sh ninja"

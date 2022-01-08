@@ -32,6 +32,8 @@ termux_setup_cmake() {
 			echo
 			echo "  pkg install cmake"
 			echo
+			echo "  pacman -S cmake"
+			echo
 			exit 1
 		fi
 	fi

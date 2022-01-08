@@ -13,6 +13,8 @@ termux_setup_rust() {
 			echo
 			echo "  pkg install rust"
 			echo
+			echo "  pacman -S rust"
+			echo
 			echo "or build it from source with"
 			echo
 			echo "  ./build-package.sh rust"
