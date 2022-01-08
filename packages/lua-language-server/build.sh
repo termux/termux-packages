@@ -57,7 +57,7 @@ termux_step_make_install() {
 		else
 			TMPPATH=\$(mktemp -d "${TERMUX_PREFIX}/tmp/${TERMUX_PKG_NAME}.XXXX")
 
-			exec ${INSTALL_DIR}/bin/Android/${TERMUX_PKG_NAME} \\
+			exec ${INSTALL_DIR}/bin/${TERMUX_PKG_NAME} \\
 				--logpath="\${TMPPATH}/log" \\
 				--metapath="\${TMPPATH}/meta" \\
 				"\${@}"
@@ -67,9 +67,9 @@ termux_step_make_install() {
 
 	chmod 744 "${TERMUX_PREFIX}/bin/${TERMUX_PKG_NAME}"
 
-	install -Dm744 -t "${INSTALL_DIR}"/bin/Android ./bin/Android/"${TERMUX_PKG_NAME}"
+	install -Dm744 -t "${INSTALL_DIR}"/bin ./bin/"${TERMUX_PKG_NAME}"
 	install -Dm644 -t "${INSTALL_DIR}" ./{main,debugger}.lua
-	install -Dm644 -t "${INSTALL_DIR}"/bin/Android ./bin/Android/main.lua
+	install -Dm644 -t "${INSTALL_DIR}"/bin ./bin/main.lua
 
 	cp -r ./script ./meta ./locale "${INSTALL_DIR}"
 }
