@@ -1,0 +1,38 @@
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -437,7 +437,7 @@
+ 		scheme/posix/packages.scm scheme/srfi/packages.scm \
+ 		$(usual-files) build/initial.debug build/build-usual-image
+ 	$(srcdir)/build/build-usual-image $(srcdir) \
+-		"`(cd $(srcdir) && pwd)`/scheme" "`pwd`/c" '$(IMAGE)' './$(VM)' \
++		"`(cd $(srcdir) && pwd)`/scheme" "`pwd`/c" '$(IMAGE)' '$(VM)' \
+ 		'$(INITIAL)-$(BIT_SUFFIX)'
+ 
+ # --------------------
+@@ -479,7 +479,7 @@
+ # build and install the image
+ 	rm -f '/tmp/$(IMAGE)'
+ 	$(srcdir)/build/build-usual-image $(srcdir) "$(SHARE)" "$(LIB)" \
+-		"/tmp/$(IMAGE)" "./$(VM)" "$(INITIAL)-$(BIT_SUFFIX)"
++		"/tmp/$(IMAGE)" "$(VM)" "$(INITIAL)-$(BIT_SUFFIX)"
+ 	$(INSTALL_DATA) /tmp/$(IMAGE) $(DESTDIR)$(LIB)
+ 	rm /tmp/$(IMAGE)
+ # install the man pages
+@@ -628,7 +628,7 @@
+ 		echo ',open test-suites';				\
+ 		echo '(define-test-suite all-tests (compiler-tests base-tests big-tests tcp-sockets-tests tconc-queue-tests transport-link-cell-tests tlc-table-tests tlc-table-weak-tests tlc-table-string-tests os-time-tests sort-tests misc-tests env-tests r6rs-tests cml-tests srfi-tests posix-tests ffi-tests))'; \
+ 		echo '(run-test-suite all-tests)'			\
+-	) | ./$(VM) -i $(IMAGE) $(BIG_HEAP)
++	) | $(VM) -i $(IMAGE) $(BIG_HEAP)
+ 
+ # --------------------
+ # Rules from here on down are not essential for the basic installation
+@@ -885,7 +885,7 @@
+ 			   (usual-resumer (lambda (args) \
+ 					    (command-processor #f args))) \
+ 			   \"foo\")" \
+-	| ./$(VM) -i scheme/debug/mini.image -a batch
++	| $(VM) -i scheme/debug/mini.image -a batch
+ 
+ 
+ # --------------------
