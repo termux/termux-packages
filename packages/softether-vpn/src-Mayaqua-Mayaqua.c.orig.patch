@@ -1,0 +1,25 @@
+--- a/src/Mayaqua/Mayaqua.c
++++ b/src/Mayaqua/Mayaqua.c
+@@ -620,11 +620,11 @@
+ 		UINT64 now = SystemTime64();
+ 		IO *o;
+ 
+-		MakeDir("/tmp");
++		MakeDir("@TERMUX_PREFIX@/tmp");
+ 
+ 		Format(tmp2, sizeof(tmp2), "%I64u", now);
+ 
+-		Format(tmp, sizeof(tmp), "/tmp/.%s", tmp2);
++		Format(tmp, sizeof(tmp), "@TERMUX_PREFIX@/tmp/.%s", tmp2);
+ 
+ 		o = FileCreate(tmp);
+ 		if (o == NULL)
+@@ -632,7 +632,7 @@
+ 			o = FileOpen(tmp, false);
+ 			if (o == NULL)
+ 			{
+-				Print("Unable to use /tmp.\n\n");
++				Print("Unable to use @TERMUX_PREFIX@/tmp.\n\n");
+ 				exit(0);
+ 			}
+ 		}
