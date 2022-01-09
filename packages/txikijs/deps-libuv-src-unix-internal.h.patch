@@ -1,0 +1,11 @@
+--- a/deps/libuv/src/unix/internal.h
++++ b/deps/libuv/src/unix/internal.h
+@@ -79,7 +79,7 @@
+ # define UV__PATH_MAX 8192
+ #endif
+ 
+-#if defined(__ANDROID__)
++#if defined(__ANDROID__) && __ANDROID_API__ < 16
+ int uv__pthread_sigmask(int how, const sigset_t* set, sigset_t* oset);
+ # ifdef pthread_sigmask
+ # undef pthread_sigmask

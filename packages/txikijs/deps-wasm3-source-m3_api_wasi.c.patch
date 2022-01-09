@@ -1,0 +1,18 @@
+--- a/deps/wasm3/source/m3_api_wasi.c
++++ b/deps/wasm3/source/m3_api_wasi.c
+@@ -672,6 +672,7 @@
+     while (1) {
+         ssize_t retlen = 0;
+ 
++#if !defined __ANDROID__ || __ANDROID_API__ >= 28
+ #if defined(__wasi__) || defined(__APPLE__) || defined(__ANDROID_API__) || defined(__OpenBSD__) || defined(__EMSCRIPTEN__)
+         size_t reqlen = M3_MIN (buf_len, 256);
+ #   if defined(__APPLE__) && (TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR)
+@@ -685,6 +686,7 @@
+         if (RtlGenRandom(buf, buf_len) == TRUE) {
+             m3ApiReturn(__WASI_ERRNO_SUCCESS);
+         }
++#endif
+ #else
+         m3ApiReturn(__WASI_ERRNO_NOSYS);
+ #endif
