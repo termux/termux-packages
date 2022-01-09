@@ -15,6 +15,9 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DTESTS=OFF
 "
 
+# https://github.com/gnustep/libobjc2/issues/199
+TERMUX_PKG_CONFLICTS="libblocksruntime"
+
 termux_step_post_get_source() {
 	mv robin-map-${_ROBIN_MAP_COMMIT}/* third_party/robin-map/
 }
