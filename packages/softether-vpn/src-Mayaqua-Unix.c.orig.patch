@@ -1,0 +1,25 @@
+--- a/src/Mayaqua/Unix.c
++++ b/src/Mayaqua/Unix.c
+@@ -298,7 +298,7 @@
+ 	char *vm_str_list = "Hypervisor detected,VMware Virtual Platform,VMware Virtual USB,qemu,xen,paravirtualized,virtual hd,virtualhd,virtual pc,virtualpc,kvm,oracle vm,oraclevm,parallels,xvm,bochs";
+ 
+ #ifdef	UNIX_LINUX
+-	t = UnixExec("/bin/dmesg");
++	t = UnixExec("@TERMUX_PREFIX@/bin/dmesg");
+ 
+ 	if (t != NULL)
+ 	{
+@@ -363,11 +363,11 @@
+ 		// Mac OS X
+ 		if (b)
+ 		{
+-			UnixExecSilent("/usr/sbin/sysctl -w net.inet.ipsec.esp_port=4500");
++			UnixExecSilent("@TERMUX_PREFIX@/bin/sysctl -w net.inet.ipsec.esp_port=4500");
+ 		}
+ 		else
+ 		{
+-			UnixExecSilent("/usr/sbin/sysctl -w net.inet.ipsec.esp_port=4501");
++			UnixExecSilent("@TERMUX_PREFIX@/bin/sysctl -w net.inet.ipsec.esp_port=4501");
+ 		}
+ 	}
+ }
