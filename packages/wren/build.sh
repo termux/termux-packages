@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Small, fast, class-based concurrent scripting language i
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.4.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/wren-lang/wren-cli/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=fafdc5d6615114d40de3956cd3a255e8737dadf8bd758b48bac00db61563cb4c
 TERMUX_PKG_AUTO_UPDATE=true
