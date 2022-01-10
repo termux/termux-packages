@@ -9,8 +9,6 @@ TERMUX_PKG_BUILD_DEPENDS="libandroid-spawn"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
-TERMUX_PKG_BLACKLISTED_ARCHES="i686"
-
 _patch_on_device() {
 	if [ "${TERMUX_ON_DEVICE_BUILD}" = true ]; then
 		current_dir=$(pwd)
