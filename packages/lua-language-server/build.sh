@@ -3,13 +3,12 @@ TERMUX_PKG_DESCRIPTION="Sumneko Lua Language Server coded in Lua"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="MrAdityaAlok <dev.aditya.alok@gmail.com>"
 TERMUX_PKG_VERSION=2.5.6
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_GIT_BRANCH="${TERMUX_PKG_VERSION}"
 TERMUX_PKG_SRCURL="https://github.com/sumneko/lua-language-server.git"
 TERMUX_PKG_BUILD_DEPENDS="libandroid-spawn"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_BUILD_IN_SRC=true
-
-TERMUX_PKG_BLACKLISTED_ARCHES="i686"
 
 _patch_on_device() {
 	if [ "${TERMUX_ON_DEVICE_BUILD}" = true ]; then
