@@ -1,0 +1,29 @@
+--- a/gdk/gdk_interprocess.c
++++ b/gdk/gdk_interprocess.c
+@@ -19,14 +19,26 @@
+ 
+ #include <sys/types.h>
+ #include <sys/ipc.h>
++#ifndef __ANDROID__
+ #include <sys/shm.h>
++#else
++#include <linux/shm.h>
++#endif
+ #include <sys/wait.h>
+ #include <unistd.h>
+ #include <sys/mman.h>
+ #include <sys/stat.h>
+ #include <fcntl.h>
+ #include <sched.h>
++#ifndef __ANDROID__
+ #include <sys/sem.h>
++#else
++#include <linux/sem.h>
++#define semid_ds semid64_ds
++int semctl(int, int, int, ...);
++int semget(key_t, int, int);
++int semop(int, struct sembuf *, size_t);
++#endif
+ #include <time.h>
+ 
+ static ATOMIC_TYPE interprocess_unique_id = ATOMIC_VAR_INIT(1);
