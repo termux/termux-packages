@@ -1,0 +1,21 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -3,7 +3,7 @@
+ cmake_minimum_required(VERSION 2.8)
+ 
+ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+-set(CMAKE_C_FLAGS "--std=c89 -Wall -pedantic -DUSE_GETOPT")
++set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --std=c89 -Wall -pedantic -DUSE_GETOPT")
+ 
+ configure_file(csolrc csolrc COPYONLY)
+ file(COPY games DESTINATION .)
+@@ -22,6 +22,6 @@
+ target_link_libraries(csol ${CURSES_LIBRARIES})
+ 
+ install(TARGETS csol DESTINATION bin COMPONENT binaries)
+-install(FILES "${CMAKE_BINARY_DIR}/csolrc" DESTINATION /etc/xdg/csol COMPONENT config)
+-install(DIRECTORY "${CMAKE_BINARY_DIR}/themes" DESTINATION /etc/xdg/csol COMPONENT config)
+-install(DIRECTORY "${CMAKE_BINARY_DIR}/games" DESTINATION /etc/xdg/csol COMPONENT config)
++install(FILES "${CMAKE_BINARY_DIR}/csolrc" DESTINATION @TERMUX_PREFIX@/etc/xdg/csol COMPONENT config)
++install(DIRECTORY "${CMAKE_BINARY_DIR}/themes" DESTINATION @TERMUX_PREFIX@/etc/xdg/csol COMPONENT config)
++install(DIRECTORY "${CMAKE_BINARY_DIR}/games" DESTINATION @TERMUX_PREFIX@/etc/xdg/csol COMPONENT config)
