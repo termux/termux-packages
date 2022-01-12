@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="OpenLDAP server"
 TERMUX_PKG_LICENSE="OpenLDAP"
 TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=2.5.4
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=ftp://ftp.openldap.org/pub/OpenLDAP/openldap-release/openldap-$TERMUX_PKG_VERSION.tgz
 TERMUX_PKG_SHA256=61c03c078d70cd859e504fa9555d7d52426eed4b29e6a39e828afc213e4fb356
 TERMUX_PKG_DEPENDS="libsasl, libuuid, openssl"
@@ -28,4 +28,12 @@ termux_step_pre_configure() {
 
 termux_step_make_install() {
 	make STRIP="" install
+
+	local slot=${TERMUX_PKG_VERSION%.*}
+	for lib in lber ldap; do
+		local target=lib${lib}-${slot}.so
+		if [ -e $TERMUX_PREFIX/lib/${target} ]; then
+			ln -sf ${target} $TERMUX_PREFIX/lib/lib${lib}.so
+		fi
+	done
 }
