@@ -1,0 +1,31 @@
+--- a/runtime/kphp-backtrace.cpp
++++ b/runtime/kphp-backtrace.cpp
+@@ -5,7 +5,9 @@
+ #include "runtime/kphp-backtrace.h"
+ 
+ #include <cxxabi.h>
++#ifndef __ANDROID__
+ #include <execinfo.h>
++#endif
+ 
+ #include "common/fast-backtrace.h"
+ #include "common/wrappers/string_view.h"
+@@ -14,6 +16,10 @@
+ 
+ std::forward_list<char **> KphpBacktrace::last_used_symbols_;
+ 
++#ifdef __ANDROID__
++KphpBacktrace::KphpBacktrace(void **, int32_t) noexcept {
++}
++#else
+ KphpBacktrace::KphpBacktrace(void **raw_backtrace, int32_t size) noexcept {
+   dl::CriticalSectionGuard signal_critical_section;
+   if ((symbols_begin_ = backtrace_symbols(raw_backtrace, size))) {
+@@ -21,6 +27,7 @@
+     last_used_symbols_.emplace_front(symbols_begin_);
+   }
+ }
++#endif
+ 
+ void KphpBacktrace::clear() noexcept {
+   dl::CriticalSectionGuard signal_critical_section;

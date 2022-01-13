@@ -1,0 +1,44 @@
+--- a/common/server/signals.cpp
++++ b/common/server/signals.cpp
+@@ -7,7 +7,9 @@
+ #include <cerrno>
+ #include <cstdlib>
+ #include <cstring>
++#ifndef __ANDROID__
+ #include <execinfo.h>
++#endif
+ #include <fcntl.h>
+ #include <pthread.h>
+ #include <unistd.h>
+@@ -42,9 +44,12 @@
+ }
+ 
+ extra_debug_handler_t extra_debug_handler;
++#ifndef __ANDROID__
+ static volatile int double_print_backtrace_guard;
++#endif
+ 
+ void print_backtrace() {
++#ifndef __ANDROID__
+   if (double_print_backtrace_guard) {
+     kwrite(STDERR_FILENO, "\n---Ignoring recursive print backtrace---\n", 42);
+     return;
+@@ -65,6 +70,7 @@
+     extra_debug_handler = nullptr;
+     debug_handler();
+   }
++#endif /* __ANDROID__ */
+ }
+ 
+ static pthread_t debug_main_pthread_id;
+@@ -224,6 +230,10 @@
+ }
+ 
+ 
++#ifdef __ANDROID__
++#define valloc(size) memalign(sysconf(_SC_PAGESIZE),size)
++#endif
++
+ void set_debug_handlers() {
+   stack_t stack;
+   int res = sigaltstack(nullptr, &stack);

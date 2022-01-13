@@ -1,0 +1,31 @@
+--- a/runtime/php_assert.cpp
++++ b/runtime/php_assert.cpp
+@@ -12,7 +12,9 @@
+ #include <csignal>
+ #include <ctime>
+ #include <cxxabi.h>
++#ifndef __ANDROID__
+ #include <execinfo.h>
++#endif
+ #include <unistd.h>
+ #include <sys/wait.h>
+ 
+@@ -46,6 +48,10 @@
+   return &__start_run_scheduler_section <= address && address <= &__stop_run_scheduler_section;
+ };
+ 
++#ifdef __ANDROID__
++static void print_demangled_adresses(void **, int, int, bool) {
++}
++#else
+ static void print_demangled_adresses(void **buffer, int nptrs, int num_shift, bool allow_gdb) {
+   if (php_warning_level == 1) {
+     for (int i = 0; i < nptrs; i++) {
+@@ -87,6 +93,7 @@
+     }
+   }
+ }
++#endif /* __ANDROID__ */
+ 
+ static void php_warning_impl(bool out_of_memory, int error_type, char const *message, va_list args) {
+   if (php_warning_level == 0 || php_disable_warnings) {

@@ -1,0 +1,54 @@
+--- a/common/dl-utils-lite.cpp
++++ b/common/dl-utils-lite.cpp
+@@ -7,7 +7,9 @@
+ #include <array>
+ #include <cassert>
+ #include <cinttypes>
++#ifndef __ANDROID__
+ #include <execinfo.h>
++#endif
+ #include <fcntl.h>
+ #include <limits>
+ #include <stdarg.h>
+@@ -23,6 +25,7 @@
+ #include "common/stats/provider.h"
+ #include "common/wrappers/pathname.h"
+ 
++#ifndef __ANDROID__
+ #if DL_DEBUG_MEM >= 1
+ #  define MEM_POS  {\
+   void *buffer[64]; \
+@@ -34,6 +37,9 @@
+ #else
+ #  define MEM_POS
+ #endif
++#else /* __ANDROID__ */
++#  define MEM_POS
++#endif
+ 
+ static std::array<char, 1024> assert_message{{0}};
+ 
+@@ -44,16 +50,23 @@
+   return static_cast<double>(T.tv_sec) + static_cast<double>(T.tv_nsec) * 1e-9;
+ }
+ 
++#ifdef __ANDROID__
++void dl_print_backtrace(void **, int) {
++}
++#else
+ void dl_print_backtrace(void **trace, int trace_size) {
+   write (2, "\n------- Stack Backtrace -------\n", 33);
+   backtrace_symbols_fd (trace, trace_size, 2);
+   write (2, "-------------------------------\n", 32);
+ }
++#endif
+ 
+ void dl_print_backtrace() {
++#ifndef __ANDROID__
+   void *buffer[64];
+   int nptrs = backtrace (buffer, 64);
+   dl_print_backtrace(buffer, nptrs);
++#endif
+ }
+ 
+ void dl_print_backtrace_gdb() {

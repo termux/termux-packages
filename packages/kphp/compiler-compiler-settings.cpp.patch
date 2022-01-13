@@ -1,0 +1,11 @@
+--- a/compiler/compiler-settings.cpp
++++ b/compiler/compiler-settings.cpp
+@@ -127,7 +127,7 @@
+ 
+ void append_curl(std::string &cxx_flags, std::string &ld_flags) noexcept {
+   if (!contains_lib(ld_flags, "curl")) {
+-#if defined(__APPLE__)
++#if defined(__APPLE__) || defined(__ANDROID__)
+     static_cast<void>(cxx_flags);
+     ld_flags += " -lcurl";
+ #else

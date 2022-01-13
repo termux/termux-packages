@@ -1,0 +1,44 @@
+--- a/server/php-runner.cpp
++++ b/server/php-runner.cpp
+@@ -9,11 +9,17 @@
+ #include <cstdlib>
+ #include <cstring>
+ #include <exception>
++#ifndef __ANDROID__
+ #include <execinfo.h>
++#endif
+ #include <sys/mman.h>
+ #include <sys/time.h>
+ #include <unistd.h>
+ 
++#ifdef __ANDROID__
++#define valloc(size) memalign(sysconf(_SC_PAGESIZE),size)
++#endif
++
+ #include "common/fast-backtrace.h"
+ #include "common/kernel-version.h"
+ #include "common/kprintf.h"
+@@ -518,7 +524,11 @@
+   print_prologue(cur_time);
+ 
+   void *trace[64];
++#ifndef __ANDROID__
+   const int trace_size = backtrace(trace, 64);
++#else
++  const int trace_size = 0;
++#endif
+ 
+   void *addr = info->si_addr;
+   if (PHPScriptBase::is_running && PHPScriptBase::current_script->is_protected(static_cast<char *>(addr))) {
+@@ -549,7 +559,11 @@
+ void sigabrt_handler(int) {
+   const int64_t cur_time = time(nullptr);
+   void *trace[64];
++#ifndef __ANDROID__
+   const int trace_size = backtrace(trace, 64);
++#else
++  const int trace_size = 0;
++#endif
+   vk::string_view msg{dl_get_assert_message()};
+   if (msg.empty()) {
+     msg = "SIGABRT terminating program";
