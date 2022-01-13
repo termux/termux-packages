@@ -1,0 +1,20 @@
+--- a/common/crc32c_aarch64.cpp
++++ b/common/crc32c_aarch64.cpp
+@@ -25,7 +25,7 @@
+ 
+ static uint32_t aarch64_native_crc(const void *buffer, long int len,
+                                    uint32_t crc) {
+-  const uint8_t *p = buffer;
++  const uint8_t *p = (const uint8_t *)buffer;
+   int64_t length = len;
+ 
+   while ((length -= sizeof(uint64_t)) >= 0) {
+@@ -98,7 +98,7 @@
+   // k2=CRC(x^(SEGMENTBYTES*8))
+   const poly64_t k0 = 0x8d96551c, k1 = 0xbd6f81f8, k2 = 0xdcb17aa4;
+ 
+-  const uint8_t *p = buf;
++  const uint8_t *p = (const uint8_t *)buf;
+ 
+   while (length >= KBYTES) {
+     crc0 = crc;

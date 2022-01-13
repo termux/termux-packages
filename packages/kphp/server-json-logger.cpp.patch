@@ -1,0 +1,29 @@
+--- a/server/json-logger.cpp
++++ b/server/json-logger.cpp
+@@ -4,7 +4,9 @@
+ 
+ #include <cstring>
+ #include <cinttypes>
++#ifndef __ANDROID__
+ #include <execinfo.h>
++#endif
+ #include <fcntl.h>
+ #include <unistd.h>
+ 
+@@ -241,11 +243,16 @@
+   json_out_it->finish_json_and_flush(json_log_fd_);
+ }
+ 
++#ifdef __ANDROID__
++void JsonLogger::write_log_with_backtrace(vk::string_view, int) noexcept {
++}
++#else
+ void JsonLogger::write_log_with_backtrace(vk::string_view message, int type) noexcept {
+   std::array<void *, 64> trace{};
+   const int trace_size = backtrace(trace.data(), trace.size());
+   write_log(message, type, time(nullptr), trace.data(), trace_size, true);
+ }
++#endif
+ 
+ void JsonLogger::write_stack_overflow_log(int type) noexcept {
+   std::array<void *, 64> trace{};

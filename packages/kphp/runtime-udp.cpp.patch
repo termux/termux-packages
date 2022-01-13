@@ -1,0 +1,14 @@
+--- a/runtime/udp.cpp
++++ b/runtime/udp.cpp
+@@ -8,6 +8,11 @@
+ #include <poll.h>
+ #include <sys/socket.h>
+ 
++#ifdef __ANDROID__
++#include <netinet/in.h>
++#include <netinet/in6.h>
++#endif
++
+ #include "common/resolver.h"
+ 
+ #include "runtime/critical_section.h"

@@ -1,0 +1,15 @@
+--- a/cmake/init-compilation-flags.cmake
++++ b/cmake/init-compilation-flags.cmake
+@@ -80,9 +80,11 @@
+ if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
+     add_compile_options(-march=sandybridge -fno-common)
+     add_link_options(-fno-common)
++elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64")
++    add_compile_options(-march=armv8-a+crc+aes)
+ endif()
+ 
+-add_compile_options(-Werror -Wall -Wextra -Wunused-function -Wfloat-conversion -Wno-sign-compare
++add_compile_options(-Wall -Wextra -Wunused-function -Wfloat-conversion -Wno-sign-compare
+                     -Wuninitialized -Wno-redundant-move -Wno-missing-field-initializers)
+ 
+ if(NOT APPLE)

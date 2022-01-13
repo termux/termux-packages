@@ -1,0 +1,33 @@
+--- a/common/fast-backtrace.cpp
++++ b/common/fast-backtrace.cpp
+@@ -6,12 +6,19 @@
+ 
+ #include <algorithm>
+ #include <cassert>
++#ifndef __ANDROID__
+ #include <execinfo.h>
++#endif
+ 
+ #include "common/sanitizer.h"
+ 
+ char *stack_end;
+ 
++#ifdef __ANDROID__
++int fast_backtrace (void **, int) {
++  return 0;
++}
++#else
+ #if defined(__aarch64__) || defined(__APPLE__)
+ int fast_backtrace (void **buffer, int size) {
+   return backtrace(buffer, size);
+@@ -52,8 +59,9 @@
+ #else
+ #error "Unsupported arch"
+ #endif
++#endif /* __ANDROID__ */
+ 
+-#if defined(__APPLE__)
++#if defined(__APPLE__) || defined(__ANDROID__)
+ int fast_backtrace_without_recursions(void **, int) noexcept {
+   return 0;
+ }

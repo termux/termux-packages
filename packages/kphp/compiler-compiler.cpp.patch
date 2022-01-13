@@ -1,0 +1,11 @@
+--- a/compiler/compiler.cpp
++++ b/compiler/compiler.cpp
+@@ -119,7 +119,7 @@
+     std::string dest_path = G->settings().dest_dir.get();
+ 
+     std::stringstream ss;
+-    ss << "/tmp/" << std::hex << vk::std_hash(dest_path) << "_kphp_temp_lock";
++    ss << "@TERMUX_PREFIX@/tmp/" << std::hex << vk::std_hash(dest_path) << "_kphp_temp_lock";
+     locked_filename_ = ss.str();
+ 
+     fd_ = open(locked_filename_.c_str(), O_RDWR | O_CREAT, 0666);

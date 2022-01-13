@@ -1,0 +1,14 @@
+--- a/runtime/openssl.cpp
++++ b/runtime/openssl.cpp
+@@ -21,6 +21,11 @@
+ #include <sys/time.h>
+ #include <unistd.h>
+ 
++#ifdef __ANDROID__
++#include <netinet/in.h>
++#include <netinet/in6.h>
++#endif
++
+ #include "common/crc32.h"
+ #include "common/resolver.h"
+ #include "common/smart_ptrs/unique_ptr_with_delete_function.h"
