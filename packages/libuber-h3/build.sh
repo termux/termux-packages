@@ -1,0 +1,8 @@
+TERMUX_PKG_HOMEPAGE=https://h3geo.org/
+TERMUX_PKG_DESCRIPTION="A hexagonal hierarchical geospatial indexing system"
+TERMUX_PKG_LICENSE="Apache-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=3.7.2
+TERMUX_PKG_SRCURL=https://github.com/uber/h3/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=803a7fbbeb01f1f65cae9398bda9579a0529e7bafffc6e0e0a6d81a71b305629
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DBUILD_SHARED_LIBS=ON"
