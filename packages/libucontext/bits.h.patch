@@ -1,0 +1,53 @@
+--- a/arch/common/include/libucontext/bits.h
++++ b/arch/common/include/libucontext/bits.h
+@@ -3,6 +3,50 @@
+ 
+ #ifndef FREESTANDING
+ 
++#ifdef __ANDROID__
++
++#if defined __i386__
++# undef REG_GS
++# undef REG_FS
++# undef REG_ES
++# undef REG_DS
++# undef REG_EDI
++# undef REG_ESI
++# undef REG_EBP
++# undef REG_ESP
++# undef REG_EBX
++# undef REG_EDX
++# undef REG_ECX
++# undef REG_EAX
++# undef REG_EIP
++#elif defined __x86_64__
++# undef REG_R8
++# undef REG_R9
++# undef REG_R10
++# undef REG_R11
++# undef REG_R12
++# undef REG_R13
++# undef REG_R14
++# undef REG_R15
++# undef REG_RDI
++# undef REG_RSI
++# undef REG_RBP
++# undef REG_RBX
++# undef REG_RDX
++# undef REG_RAX
++# undef REG_RCX
++# undef REG_RSP
++# undef REG_RIP
++# undef REG_EFL
++# undef REG_CSGSFS
++# undef REG_ERR
++# undef REG_TRAPNO
++# undef REG_OLDMASK
++# undef REG_CR2
++#endif
++
++#endif /* __ANDROID__ */
++
+ #include <ucontext.h>
+ 
+ typedef greg_t libucontext_greg_t;
