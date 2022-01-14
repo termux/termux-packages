@@ -24,11 +24,14 @@ termux_setup_golang() {
 
 		( cd "$TERMUX_COMMON_CACHEDIR"; tar xf "$TERMUX_BUILDGO_TAR"; mv go "$TERMUX_BUILDGO_FOLDER"; rm "$TERMUX_BUILDGO_TAR" )
 	else
-		if [ "$(dpkg-query -W -f '${db:Status-Status}\n' golang 2>/dev/null)" != "installed" ]; then
+		if [[ "$(dpkg --version 2>/dev/null)" && "$(dpkg-query -W -f '${db:Status-Status}\n' golang 2>/dev/null)" != "installed" ]] ||
+                   [[ "$(pacman -V 2>/dev/null)" && ! "$(pacman -Q golang 2>/dev/null)" ]]; then
 			echo "Package 'golang' is not installed."
 			echo "You can install it with"
 			echo
 			echo "  pkg install golang"
+			echo
+			echo "  pacman -S golang"
 			echo
 			echo "or build it from source with"
 			echo

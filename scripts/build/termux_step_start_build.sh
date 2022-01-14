@@ -25,6 +25,18 @@ termux_step_start_build() {
 		# "0" is the default revision, so only include it if the upstream versions contains "-" itself
 		TERMUX_PKG_FULLVERSION+="-$TERMUX_PKG_REVISION"
 	fi
+	# full format version for pacman
+	local TERMUX_PKG_VERSION_EDITED=${TERMUX_PKG_VERSION//-/.}
+	local INCORRECT_SYMBOLS=$(echo $TERMUX_PKG_VERSION_EDITED | grep -o '[0-9][a-z]')
+	if [ -n "$INCORRECT_SYMBOLS" ]; then
+		local TERMUX_PKG_VERSION_EDITED=${TERMUX_PKG_VERSION_EDITED//${INCORRECT_SYMBOLS:0:1}${INCORRECT_SYMBOLS:1:1}/${INCORRECT_SYMBOLS:0:1}.${INCORRECT_SYMBOLS:1:1}}
+	fi
+	TERMUX_PKG_FULLVERSION_FOR_PACMAN="${TERMUX_PKG_VERSION_EDITED}"
+	if [ -n "$TERMUX_PKG_REVISION" ]; then
+		TERMUX_PKG_FULLVERSION_FOR_PACMAN+="-${TERMUX_PKG_REVISION}"
+	else
+		TERMUX_PKG_FULLVERSION_FOR_PACMAN+="-0"
+	fi
 
 	if [ "$TERMUX_DEBUG_BUILD" = "true" ]; then
 		if [ "$TERMUX_PKG_HAS_DEBUG" = "true" ]; then
@@ -43,7 +55,8 @@ termux_step_start_build() {
 			echo "$TERMUX_PKG_NAME@$TERMUX_PKG_FULLVERSION built - skipping (rm $TERMUX_BUILT_PACKAGES_DIRECTORY/$TERMUX_PKG_NAME to force rebuild)"
 			exit 0
 		elif [ "$TERMUX_ON_DEVICE_BUILD" = "true" ] &&
-			[ "$(dpkg-query -W -f '${db:Status-Status} ${Version}\n' "$TERMUX_PKG_NAME" 2>/dev/null)" = "installed $TERMUX_PKG_FULLVERSION" ]; then
+			([ "$(dpkg-query -W -f '${db:Status-Status} ${Version}\n' "$TERMUX_PKG_NAME" 2>/dev/null)" = "installed $TERMUX_PKG_FULLVERSION" ] ||
+			 [ "$(pacman -Q $TERMUX_PKG_NAME 2>/dev/null)" = "$TERMUX_PKG_NAME $TERMUX_PKG_FULLVERSION_FOR_PACMAN" ]); then
 			echo "$TERMUX_PKG_NAME@$TERMUX_PKG_FULLVERSION installed - skipping"
 			exit 0
 		fi

@@ -25,11 +25,14 @@ termux_setup_cmake() {
 
 		export PATH=$TERMUX_CMAKE_FOLDER/bin:$PATH
 	else
-		if [ "$(dpkg-query -W -f '${db:Status-Status}\n' cmake 2>/dev/null)" != "installed" ]; then
+		if [[ "$(dpkg --version 2>/dev/null)" && "$(dpkg-query -W -f '${db:Status-Status}\n' cmake 2>/dev/null)" != "installed" ]] ||
+                   [[ "$(pacman -V 2>/dev/null)" && ! "$(pacman -Q cmake 2>/dev/null)" ]]; then
 			echo "Package 'cmake' is not installed."
 			echo "You can install it with"
 			echo
 			echo "  pkg install cmake"
+			echo
+			echo "  pacman -S cmake"
 			echo
 			exit 1
 		fi

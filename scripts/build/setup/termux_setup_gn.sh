@@ -40,11 +40,14 @@ termux_setup_gn() {
 		fi
 		export PATH=$GN_FOLDER/out:$PATH
 	else
-		if [ "$(dpkg-query -W -f '${db:Status-Status}\n' gn 2>/dev/null)" != "installed" ]; then
+		if [[ "$(dpkg --version 2>/dev/null)" && "$(dpkg-query -W -f '${db:Status-Status}\n' gn 2>/dev/null)" != "installed" ]] ||
+                   [[ "$(pacman -V 2>/dev/null)" && ! "$(pacman -Q gn 2>/dev/null)" ]]; then
 			echo "Package 'gn' is not installed."
 			echo "You can install it with"
 			echo
 			echo "  pkg install gn"
+			echo
+			echo "  pacman -S gn"
 			echo
 			exit 1
 		fi

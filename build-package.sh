@@ -96,8 +96,8 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_handle_buildarch.sh"
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_extract_dep_info.sh"
 
 # Function that downloads a .deb (using the termux_download function)
-# shellcheck source=scripts/build/termux_download_deb.sh
-source "$TERMUX_SCRIPTDIR/scripts/build/termux_download_deb.sh"
+# shellcheck source=scripts/build/termux_download_deb_pac.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/termux_download_deb_pac.sh"
 
 # Script to download InRelease, verify it's signature and then download Packages.xz by hash
 # shellcheck source=scripts/build/termux_get_repo_files.sh
@@ -269,7 +269,7 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_finish_build.sh"
 if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
 	# For on device builds cross compiling is not supported.
 	# Target architecture must be same as for environment used currently.
-	TERMUX_ARCH=$(dpkg --print-architecture)
+	TERMUX_ARCH=$(dpkg --print-architecture 2>/dev/null || pacman-conf | grep Architecture | sed 's/Architecture = //g')
 	export TERMUX_ARCH
 fi
 

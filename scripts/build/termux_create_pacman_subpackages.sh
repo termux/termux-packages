@@ -67,24 +67,11 @@ termux_create_pacman_subpackages() {
 			TERMUX_SUBPKG_DEPENDS+=", $TERMUX_PKG_DEPENDS"
 		fi
 
-		# Version view revisions.
-		local TERMUX_PKG_VERSION_EDITED=${TERMUX_PKG_VERSION//-/.}
-		local INCORRECT_SYMBOLS=$(echo $TERMUX_PKG_VERSION_EDITED | grep -o '[0-9][a-z]')
-		if [ -n "$INCORRECT_SYMBOLS" ]; then
-			local TERMUX_PKG_VERSION_EDITED=${TERMUX_PKG_VERSION_EDITED//${INCORRECT_SYMBOLS:0:1}${INCORRECT_SYMBOLS:1:1}/${INCORRECT_SYMBOLS:0:1}.${INCORRECT_SYMBOLS:1:1}}
-		fi
-		local TERMUX_PKG_FULLVERSION="${TERMUX_PKG_VERSION_EDITED}"
-		if [ -n "$TERMUX_PKG_REVISION" ]; then
-			TERMUX_PKG_FULLVERSION+="-${TERMUX_PKG_REVISION}"
-		else
-			TERMUX_PKG_FULLVERSION+="-0"
-		fi
-
 		# Package metadata.
 		{
 			echo "pkgname = $SUB_PKG_NAME"
 			echo "pkgbase = $TERMUX_PKG_NAME"
-			echo "pkgver = $TERMUX_PKG_FULLVERSION"
+			echo "pkgver = $TERMUX_PKG_FULLVERSION_FOR_PACMAN"
 			echo "pkgdesc = $(echo "$TERMUX_SUBPKG_DESCRIPTION" | tr '\n' ' ')"
 			echo "url = $TERMUX_PKG_HOMEPAGE"
 			echo "builddate = $BUILD_DATE"
@@ -122,7 +109,7 @@ termux_create_pacman_subpackages() {
 			echo "format = 2"
 			echo "pkgname = $SUB_PKG_NAME"
 			echo "pkgbase = $TERMUX_PKG_NAME"
-			echo "pkgver = $TERMUX_PKG_FULLVERSION"
+			echo "pkgver = $TERMUX_PKG_FULLVERSION_FOR_PACMAN"
 			echo "pkgarch = $SUB_PKG_ARCH"
 			echo "packager = $TERMUX_PKG_MAINTAINER"
 			echo "builddate = $BUILD_DATE"
@@ -163,7 +150,7 @@ termux_create_pacman_subpackages() {
 		esac
 
 		# Create the actual .pkg file:
-		local TERMUX_SUBPKG_PACMAN_FILE=$TERMUX_OUTPUT_DIR/${SUB_PKG_NAME}${DEBUG}-${TERMUX_PKG_FULLVERSION}-${SUB_PKG_ARCH}.pkg.tar.${PKG_FORMAT}
+		local TERMUX_SUBPKG_PACMAN_FILE=$TERMUX_OUTPUT_DIR/${SUB_PKG_NAME}${DEBUG}-${TERMUX_PKG_FULLVERSION_FOR_PACMAN}-${SUB_PKG_ARCH}.pkg.tar.${PKG_FORMAT}
 		shopt -s dotglob globstar
 		printf '%s\0' **/* | bsdtar -cnf - --format=mtree \
 			--options='!all,use-set,type,uid,gid,mode,time,size,md5,sha256,link' \
