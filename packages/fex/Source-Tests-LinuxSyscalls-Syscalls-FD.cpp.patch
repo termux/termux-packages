@@ -1,0 +1,46 @@
+--- a/Source/Tests/LinuxSyscalls/Syscalls/FD.cpp
++++ b/Source/Tests/LinuxSyscalls/Syscalls/FD.cpp
+@@ -257,11 +257,13 @@
+       SYSCALL_ERRNO();
+     });
+ 
++#if !defined(__ANDROID__) || __ANDROID_API__ >= 30
+     REGISTER_SYSCALL_IMPL_PASS(memfd_create, [](FEXCore::Core::CpuStateFrame *Frame, const char *name, uint32_t flags) -> uint64_t {
+       // Flags don't need remapped
+       uint64_t Result = ::memfd_create(name, flags);
+       SYSCALL_ERRNO();
+     });
++#endif
+ 
+     REGISTER_SYSCALL_IMPL(statx, [](FEXCore::Core::CpuStateFrame *Frame, int dirfd, const char *pathname, int flags, uint32_t mask, struct statx *statxbuf) -> uint64_t {
+       // Flags don't need remapped
+@@ -269,6 +271,7 @@
+       SYSCALL_ERRNO();
+     });
+ 
++#ifndef __ANDROID__
+     REGISTER_SYSCALL_IMPL_PASS(name_to_handle_at, [](FEXCore::Core::CpuStateFrame *Frame, int dirfd, const char *pathname, struct file_handle *handle, int *mount_id, int flags) -> uint64_t {
+       // Flags don't need remapped
+       uint64_t Result = ::name_to_handle_at(dirfd, pathname, handle, mount_id, flags);
+@@ -280,6 +283,7 @@
+       uint64_t Result = ::open_by_handle_at(mount_fd, handle, flags);
+       SYSCALL_ERRNO();
+     });
++#endif
+ 
+     REGISTER_SYSCALL_IMPL_PASS(eventfd2, [](FEXCore::Core::CpuStateFrame *Frame, unsigned int count, int flags) -> uint64_t {
+       // Flags don't need remapped
+@@ -287,11 +291,13 @@
+       SYSCALL_ERRNO();
+     });
+ 
++#if !defined(__ANDROID__) || __ANDROID_API__ >= 26
+     REGISTER_SYSCALL_IMPL_PASS(copy_file_range, [](FEXCore::Core::CpuStateFrame *Frame, int fd_in, loff_t *off_in, int fd_out, loff_t *off_out, size_t len, unsigned int flags) -> uint64_t {
+       // Flags don't need remapped
+       uint64_t Result = ::copy_file_range(fd_in, off_in, fd_out, off_out, len, flags);
+       SYSCALL_ERRNO();
+     });
++#endif
+ 
+     if (Handler->IsHostKernelVersionAtLeast(5, 3, 0)) {
+       REGISTER_SYSCALL_IMPL_PASS(pidfd_open, [](FEXCore::Core::CpuStateFrame *Frame, pid_t pid, unsigned int flags) -> uint64_t {

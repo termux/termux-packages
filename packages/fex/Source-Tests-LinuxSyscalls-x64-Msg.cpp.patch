@@ -1,0 +1,20 @@
+--- a/Source/Tests/LinuxSyscalls/x64/Msg.cpp
++++ b/Source/Tests/LinuxSyscalls/x64/Msg.cpp
+@@ -7,12 +7,16 @@
+ #include "Tests/LinuxSyscalls/Syscalls.h"
+ #include "Tests/LinuxSyscalls/x64/Syscalls.h"
+ 
+-#include <mqueue.h>
++#include <linux/mqueue.h>
+ #include <stddef.h>
+ #include <stdint.h>
+ #include <syscall.h>
+ #include <unistd.h>
+ 
++#ifdef __ANDROID__
++typedef int mqd_t;
++#endif
++
+ namespace FEXCore::Core {
+   struct CpuStateFrame;
+ }

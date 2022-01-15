@@ -1,0 +1,27 @@
+--- a/Source/Tests/LinuxSyscalls/x32/FD.cpp
++++ b/Source/Tests/LinuxSyscalls/x32/FD.cpp
+@@ -17,7 +17,7 @@
+ #include <FEXCore/Utils/MathUtils.h>
+ 
+ #include <algorithm>
+-#include <bits/types/struct_iovec.h>
++#include <linux/uio.h>
+ #include <cstdint>
+ #include <fcntl.h>
+ #include <limits>
+@@ -988,6 +988,7 @@
+       SYSCALL_ERRNO();
+     });
+ 
++#if !defined(__ANDROID__) || __ANDROID_API__ >= 26
+     REGISTER_SYSCALL_IMPL_X32(sync_file_range, [](FEXCore::Core::CpuStateFrame *Frame,
+       int fd,
+       uint32_t offset_low,
+@@ -1007,6 +1008,7 @@
+       uint64_t Result = ::sync_file_range(fd, Offset, Len, flags);
+       SYSCALL_ERRNO();
+     });
++#endif
+ 
+     REGISTER_SYSCALL_IMPL_X32(fallocate, [](FEXCore::Core::CpuStateFrame *Frame,
+       int fd,

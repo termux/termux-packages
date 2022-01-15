@@ -1,0 +1,20 @@
+--- a/Source/Tests/LinuxSyscalls/Syscalls/Semaphore.cpp
++++ b/Source/Tests/LinuxSyscalls/Syscalls/Semaphore.cpp
+@@ -10,14 +10,16 @@
+ 
+ #include <sys/types.h>
+ #include <sys/ipc.h>
+-#include <sys/sem.h>
++#include <linux/sem.h>
+ 
+ namespace FEX::HLE {
+   void RegisterSemaphore() {
++#if !defined(__ANDROID__) || __ANDROID_API__ >= 26
+     REGISTER_SYSCALL_IMPL_PASS(semget, [](FEXCore::Core::CpuStateFrame *Frame, key_t key, int nsems, int semflg) -> uint64_t {
+       uint64_t Result = ::semget(key, nsems, semflg);
+       SYSCALL_ERRNO();
+     });
++#endif
+ 
+   }
+ }

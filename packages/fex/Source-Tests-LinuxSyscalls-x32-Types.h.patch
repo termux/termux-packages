@@ -1,0 +1,55 @@
+--- a/Source/Tests/LinuxSyscalls/x32/Types.h
++++ b/Source/Tests/LinuxSyscalls/x32/Types.h
+@@ -12,23 +12,25 @@
+ #include <linux/types.h>
+ #include <asm/ipcbuf.h>
+ #include <asm/shmbuf.h>
+-#include <bits/types/stack_t.h>
++#include <asm-generic/signal.h>
+ #include <cstdint>
+ #include <cstring>
+ #include <fcntl.h>
+ #include <limits>
+ #include <sys/ipc.h>
+-#include <mqueue.h>
++#include <linux/mqueue.h>
+ #include <signal.h>
+ #include <sys/msg.h>
+ #include <sys/resource.h>
+-#include <sys/sem.h>
++#include <linux/sem.h>
++#define semid_ds semid64_ds
+ #include <sys/shm.h>
+ #include <sys/socket.h>
+ #include <sys/stat.h>
+ #include <sys/statfs.h>
+ #include <sys/time.h>
+ #include <sys/times.h>
++#include <linux/timex.h>
+ #include <sys/uio.h>
+ #include <time.h>
+ #include <type_traits>
+@@ -387,10 +389,13 @@
+   uint32_t st_blksize;
+   uint32_t st_blocks;  /* Number 512-byte blocks allocated. */
+   uint32_t st_atime_;
++#undef st_atime_nsec
+   uint32_t st_atime_nsec;
+   uint32_t st_mtime_;
++#undef st_mtime_nsec
+   uint32_t st_mtime_nsec;
+   uint32_t st_ctime_;
++#undef st_ctime_nsec
+   uint32_t st_ctime_nsec;
+   uint32_t __unused4;
+   uint32_t __unused5;
+@@ -1164,9 +1169,6 @@
+ static_assert(std::is_trivial<sigval32>::value, "Needs to be trivial");
+ static_assert(sizeof(sigval32) == 4, "Incorrect size");
+ 
+-constexpr size_t SIGEV_MAX_SIZE = 64;
+-constexpr size_t SIGEV_PAD_SIZE = (SIGEV_MAX_SIZE - (sizeof(int32_t) * 2 + sizeof(sigval32))) / sizeof(int32_t);
+-
+ struct
+ FEX_ANNOTATE("fex-match")
+ sigevent32 {
