@@ -1,0 +1,15 @@
+--- a/Source/Tests/LinuxSyscalls/Syscalls/Info.cpp
++++ b/Source/Tests/LinuxSyscalls/Syscalls/Info.cpp
+@@ -63,10 +63,12 @@
+       SYSCALL_ERRNO();
+     });
+ 
++#if !defined(__ANDROID__) || __ANDROID_API__ >= 28
+     REGISTER_SYSCALL_IMPL_PASS(getrandom, [](FEXCore::Core::CpuStateFrame *Frame, void *buf, size_t buflen, unsigned int flags) -> uint64_t {
+       uint64_t Result = ::getrandom(buf, buflen, flags);
+       SYSCALL_ERRNO();
+     });
++#endif
+ 
+     REGISTER_SYSCALL_IMPL_PASS(capget, [](FEXCore::Core::CpuStateFrame *Frame, cap_user_header_t hdrp, cap_user_data_t datap) -> uint64_t {
+       uint64_t Result = ::syscall(SYSCALL_DEF(capget), hdrp, datap);

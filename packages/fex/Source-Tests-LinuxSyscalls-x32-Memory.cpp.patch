@@ -1,0 +1,15 @@
+--- a/Source/Tests/LinuxSyscalls/x32/Memory.cpp
++++ b/Source/Tests/LinuxSyscalls/x32/Memory.cpp
+@@ -83,10 +83,12 @@
+         mremap(old_address, old_size, new_size, flags, new_address));
+     });
+ 
++#if !defined(__ANDROID__) || __ANDROID_API__ >= 30
+     REGISTER_SYSCALL_IMPL_X32(mlockall, [](FEXCore::Core::CpuStateFrame *Frame, int flags) -> uint64_t {
+       uint64_t Result = ::mlock2(reinterpret_cast<void*>(0x1'0000), 0x1'0000'0000ULL - 0x1'0000, flags);
+       SYSCALL_ERRNO();
+     });
++#endif
+ 
+     REGISTER_SYSCALL_IMPL_X32(munlockall, [](FEXCore::Core::CpuStateFrame *Frame) -> uint64_t {
+       uint64_t Result = ::munlock(reinterpret_cast<void*>(0x1'0000), 0x1'0000'0000ULL - 0x1'0000);

@@ -1,0 +1,20 @@
+--- a/Source/Tests/LinuxSyscalls/x32/Msg.cpp
++++ b/Source/Tests/LinuxSyscalls/x32/Msg.cpp
+@@ -10,12 +10,16 @@
+ 
+ #include "Tests/LinuxSyscalls/x64/Syscalls.h"
+ 
+-#include <mqueue.h>
++#include <linux/mqueue.h>
+ #include <stdint.h>
+ #include <syscall.h>
+ #include <time.h>
+ #include <unistd.h>
+ 
++#ifdef __ANDROID__
++typedef int mqd_t;
++#endif
++
+ ARG_TO_STR(FEX::HLE::x32::compat_ptr<FEX::HLE::x32::mq_attr32>, "%lx")
+ ARG_TO_STR(FEX::HLE::x32::compat_ptr<FEX::HLE::x32::sigevent32>, "%lx")
+ 

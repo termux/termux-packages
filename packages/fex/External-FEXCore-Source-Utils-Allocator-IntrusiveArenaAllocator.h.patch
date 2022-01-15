@@ -1,0 +1,19 @@
+--- a/External/FEXCore/Source/Utils/Allocator/IntrusiveArenaAllocator.h
++++ b/External/FEXCore/Source/Utils/Allocator/IntrusiveArenaAllocator.h
+@@ -7,10 +7,15 @@
+ 
+ #include <bitset>
+ #include <cstddef>
+-#include <memory_resource>
++#include <experimental/list>
++#include <experimental/memory_resource>
+ #include <mutex>
+ #include <vector>
+ 
++namespace std {
++  namespace pmr = experimental::pmr;
++}
++
+ namespace Alloc {
+   class ForwardOnlyIntrusiveArenaAllocator final : public std::pmr::memory_resource {
+   public:

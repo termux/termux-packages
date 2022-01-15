@@ -1,0 +1,11 @@
+--- a/Source/Tests/LinuxSyscalls/Syscalls/Thread.cpp
++++ b/Source/Tests/LinuxSyscalls/Syscalls/Thread.cpp
+@@ -465,7 +465,7 @@
+     });
+ 
+     REGISTER_SYSCALL_IMPL_PASS(prlimit64, [](FEXCore::Core::CpuStateFrame *Frame, pid_t pid, int resource, const struct rlimit *new_limit, struct rlimit *old_limit) -> uint64_t {
+-      uint64_t Result = ::prlimit(pid, (enum __rlimit_resource)(resource), new_limit, old_limit);
++      uint64_t Result = ::prlimit(pid, resource, new_limit, old_limit);
+       SYSCALL_ERRNO();
+     });
+ 
