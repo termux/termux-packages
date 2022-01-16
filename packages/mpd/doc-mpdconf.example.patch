@@ -1,6 +1,5 @@
-diff -uNr MPD-0.22.4/doc/mpdconf.example MPD-0.22.4.mod/doc/mpdconf.example
---- MPD-0.22.4/doc/mpdconf.example	2021-01-21 16:21:20.000000000 +0000
-+++ MPD-0.22.4.mod/doc/mpdconf.example	2021-02-05 22:27:44.874583026 +0000
+--- ./doc/mpdconf.example.orig	2021-12-01 20:00:00.000000000 +0100
++++ ./doc/mpdconf.example	2022-01-16 19:35:05.557761058 +0100
 @@ -10,14 +10,14 @@
  # be disabled and audio files will only be accepted over ipc socket (using
  # file:// protocol) or streaming files over an accepted protocol.
@@ -24,23 +23,25 @@ diff -uNr MPD-0.22.4/doc/mpdconf.example MPD-0.22.4.mod/doc/mpdconf.example
  #
 -#db_file			"~/.mpd/database"
 +db_file			"~/.mpd/database"
- #
+ 
  # These settings are the locations for the daemon log files for the daemon.
- # These logs are great for troubleshooting, depending on your log_level
-@@ -34,25 +34,25 @@
- # The special value "syslog" makes MPD use the local syslog daemon. This
- # setting defaults to logging to syslog.
+ #
+@@ -35,7 +35,7 @@
+ # If you use systemd, do not configure a log_file.  With systemd, MPD
+ # defaults to the systemd journal, which is fine.
  #
 -#log_file			"~/.mpd/log"
 +log_file			"~/.mpd/log"
- #
+ 
  # This setting sets the location of the file which stores the process ID
  # for use of mpd --kill and some init scripts. This setting is disabled by
- # default and the pid file will not be stored.
+@@ -43,19 +43,19 @@
+ #
+ # If you use systemd, do not configure a pid_file.
  #
 -#pid_file			"~/.mpd/pid"
 +pid_file			"~/.mpd/pid"
- #
+ 
  # This setting sets the location of the file which contains information about
  # most variables to get MPD back into the same general shape it was in before
  # it was brought down. This setting is disabled by default and the server
@@ -57,7 +58,7 @@ diff -uNr MPD-0.22.4/doc/mpdconf.example MPD-0.22.4.mod/doc/mpdconf.example
  #
  ###############################################################################
  
-@@ -77,17 +77,18 @@
+@@ -80,17 +80,18 @@
  # should be paid if this is assigned to anything other than the default, any.
  # This setting can deny access to control of the daemon. Not effective if
  # systemd socket activiation is in use.
@@ -69,7 +70,7 @@ diff -uNr MPD-0.22.4/doc/mpdconf.example MPD-0.22.4.mod/doc/mpdconf.example
  #
  # And for Unix Socket
 -#bind_to_address		"~/.mpd/socket"
-+bind_to_address		"@TERMUX_PREFIX@/var/run/mpd.socket"
++bind_to_address		"/data/data/com.termux/files/usr/var/run/mpd.socket"
  #
  # This setting is the TCP port that is desired for the daemon to get assigned
 -# to.
@@ -80,7 +81,7 @@ diff -uNr MPD-0.22.4/doc/mpdconf.example MPD-0.22.4.mod/doc/mpdconf.example
  #
  # Suppress all messages below the given threshold.  Use "verbose" for
  # troubleshooting. Available setting arguments are "notice", "info", "verbose",
-@@ -132,12 +133,12 @@
+@@ -135,12 +136,12 @@
  # If this setting is set to "yes", MPD will discover audio files by following
  # symbolic links outside of the configured music_directory.
  #
@@ -95,7 +96,7 @@ diff -uNr MPD-0.22.4/doc/mpdconf.example MPD-0.22.4.mod/doc/mpdconf.example
  #
  ###############################################################################
  
-@@ -210,28 +211,6 @@
+@@ -213,28 +214,6 @@
  # blocks. Setting this block is optional, though the server will only attempt
  # autodetection for one sound card.
  #
@@ -124,7 +125,7 @@ diff -uNr MPD-0.22.4/doc/mpdconf.example MPD-0.22.4.mod/doc/mpdconf.example
  #
  # An example of a shout output (for streaming to Icecast):
  #
-@@ -262,7 +241,8 @@
+@@ -265,7 +244,8 @@
  #	type		"recorder"
  #	name		"My recorder"
  #	encoder		"vorbis"		# optional, vorbis or lame
@@ -134,7 +135,7 @@ diff -uNr MPD-0.22.4/doc/mpdconf.example MPD-0.22.4.mod/doc/mpdconf.example
  ##	quality		"5.0"			# do not define if bitrate is defined
  #	bitrate		"128"			# do not define if quality is defined
  #	format		"44100:16:1"
-@@ -292,55 +272,31 @@
+@@ -295,55 +275,31 @@
  ##	media_role	"media_role"		#optional
  #}
  #
@@ -204,7 +205,7 @@ diff -uNr MPD-0.22.4/doc/mpdconf.example MPD-0.22.4.mod/doc/mpdconf.example
 +audio_output {
 +        type            "fifo"
 +        name            "ncmpcpp visualizer"
-+        path            "@TERMUX_PREFIX@/var/run/mpd.fifo"
++        path            "/data/data/com.termux/files/usr/var/run/mpd.fifo"
 +        format          "44100:16:2"
 +	enabled		"no"
 +}
