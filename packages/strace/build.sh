@@ -8,10 +8,7 @@ TERMUX_PKG_SHA256=dc7db230ff3e57c249830ba94acab2b862da1fcaac55417e9b85041a833ca2
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libdw"
 
-# Without st_cv_m32_mpers=no the build fails if gawk is installed.
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
-st_cv_m32_mpers=no
---enable-mpers=no
 --with-libdw
 "
 
@@ -19,6 +16,11 @@ st_cv_m32_mpers=no
 TERMUX_PKG_RM_AFTER_INSTALL="bin/strace-graph"
 
 termux_step_pre_configure() {
-	autoreconf # for configure.ac in 5.11fix.patch
+	if [ "$TERMUX_ARCH" = "arm" ] || [ "$TERMUX_ARCH" = "i686" ] || [ "$TERMUX_ARCH" = "x86_64" ]; then
+		# Without st_cv_m32_mpers=no the build fails if gawk is installed.
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" st_cv_m32_mpers=no"
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-mpers=no"
+	fi
+	autoreconf # for configure.ac in configure-find-armv7-cc.patch
 	CPPFLAGS+=" -Dfputs_unlocked=fputs"
 }
