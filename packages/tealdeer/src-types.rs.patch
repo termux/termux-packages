@@ -1,0 +1,19 @@
+--- a/src/types.rs
++++ b/src/types.rs
+@@ -43,7 +43,7 @@
+ }
+ 
+ impl PlatformType {
+-    #[cfg(target_os = "linux")]
++    #[cfg(any(target_os = "linux", target_os = "android"))]
+     pub fn current() -> Self {
+         Self::Linux
+     }
+@@ -66,6 +66,7 @@
+ 
+     #[cfg(not(any(
+         target_os = "linux",
++        target_os = "android",
+         target_os = "macos",
+         target_os = "freebsd",
+         target_os = "netbsd",
