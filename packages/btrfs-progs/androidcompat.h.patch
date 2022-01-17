@@ -1,0 +1,25 @@
+--- a/androidcompat.h
++++ b/androidcompat.h
+@@ -0,0 +1,22 @@
++#ifndef __ANDROID_H__
++#define __ANDROID_H__
++
++#ifdef __ANDROID__
++
++#define pthread_cancel(thread) pthread_kill((thread), SIGUSR1)
++#define pthread_setcancelstate(state, oldstate) (0)
++#define pthread_setcanceltype(type, oldtype) (0)
++
++#define PTHREAD_CANCEL_ENABLE 0
++#define PTHREAD_CANCEL_DISABLE 1
++
++#define PTHREAD_CANCEL_DEFERRED 0
++#define PTHREAD_CANCEL_ASYNCHRONOUS 1
++
++#define PTHREAD_CANCELED ((void *)-1)
++
++#define pthread_tryjoin_np(thread, retval) pthread_join((thread), (retval))
++
++#endif /* __ANDROID__ */
++
++#endif /* __ANDROID_H__ */
