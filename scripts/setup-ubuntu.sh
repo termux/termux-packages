@@ -202,6 +202,9 @@ PACKAGES+=" aspell"
 # Needed by package kphp.
 PACKAGES+=" python3-jsonschema"
 
+# Needed by proxmark3/proxmark3-git
+PACKAGES+=" gcc-arm-none-eabi"
+
 # Do not require sudo if already running as root.
 if [ "$(id -u)" = "0" ]; then
 	SUDO=""
