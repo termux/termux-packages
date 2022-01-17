@@ -1,0 +1,11 @@
+--- a/src/video-display.cc
++++ b/src/video-display.cc
+@@ -152,7 +152,7 @@
+ 
+     // Find the first video stream
+     AVCodecParameters *codec_parameters = nullptr;
+-    AVCodec *av_codec = nullptr;
++    const AVCodec *av_codec = nullptr;
+     for (int i = 0; i < (int)format_context_->nb_streams; ++i) {
+         codec_parameters = format_context_->streams[i]->codecpar;
+         av_codec = avcodec_find_decoder(codec_parameters->codec_id);
