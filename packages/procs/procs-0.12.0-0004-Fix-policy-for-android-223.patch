@@ -1,0 +1,53 @@
+From 0ee37bf3292dd25ffabb7bd4f8634d656123bc95 Mon Sep 17 00:00:00 2001
+From: dalance <dalance@gmail.com>
+Date: Tue, 18 Jan 2022 19:46:40 +0900
+Subject: [PATCH 4/4] Fix policy for android #223
+
+---
+ src/columns/policy.rs | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
+
+diff --git a/src/columns/policy.rs b/src/columns/policy.rs
+index cd935bd..dc066df 100644
+--- a/src/columns/policy.rs
++++ b/src/columns/policy.rs
+@@ -25,7 +25,7 @@ impl Policy {
+     }
+ }
+ 
+-#[cfg(any(target_os = "linux", target_os = "android"))]
++#[cfg(target_os = "linux")]
+ impl Column for Policy {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let fmt_content = match proc.curr_proc.stat().policy.map(|x| x as i32) {
+@@ -45,6 +45,27 @@ impl Column for Policy {
+     column_default!(String);
+ }
+ 
++#[cfg(target_os = "android")]
++impl Column for Policy {
++    fn add(&mut self, proc: &ProcessInfo) {
++        let fmt_content = match proc.curr_proc.stat().policy.map(|x| x as i32) {
++            Some(libc::SCHED_NORMAL) => String::from("N"),
++            Some(libc::SCHED_FIFO) => String::from("FF"),
++            Some(libc::SCHED_RR) => String::from("RR"),
++            Some(libc::SCHED_BATCH) => String::from("B"),
++            Some(libc::SCHED_IDLE) => String::from("IDL"),
++            Some(libc::SCHED_DEADLINE) => String::from("D"),
++            _ => String::from(""),
++        };
++        let raw_content = fmt_content.clone();
++
++        self.fmt_contents.insert(proc.pid, fmt_content);
++        self.raw_contents.insert(proc.pid, raw_content);
++    }
++
++    column_default!(String);
++}
++
+ #[cfg_attr(tarpaulin, skip)]
+ #[cfg(target_os = "macos")]
+ impl Column for Policy {
+-- 
+2.33.0
+
