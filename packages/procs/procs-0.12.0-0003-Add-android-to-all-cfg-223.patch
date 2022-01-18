@@ -1,0 +1,856 @@
+From 94d9a3f3b39403841a74fc1b10173c0b8d37d817 Mon Sep 17 00:00:00 2001
+From: dalance <dalance@gmail.com>
+Date: Tue, 18 Jan 2022 19:33:59 +0900
+Subject: [PATCH 3/4] Add android to all cfg #223
+
+---
+ Cargo.toml                  |  8 +-------
+ src/columns.rs              |  4 +---
+ src/columns/command.rs      |  2 +-
+ src/columns/context_sw.rs   |  2 +-
+ src/columns/cpu_time.rs     |  2 +-
+ src/columns/docker.rs       |  6 +++---
+ src/columns/elapsed_time.rs | 12 ++++++------
+ src/columns/gid.rs          |  2 +-
+ src/columns/gid_real.rs     |  2 +-
+ src/columns/gid_saved.rs    |  2 +-
+ src/columns/group.rs        |  2 +-
+ src/columns/group_real.rs   |  2 +-
+ src/columns/group_saved.rs  |  2 +-
+ src/columns/maj_flt.rs      |  2 +-
+ src/columns/min_flt.rs      |  2 +-
+ src/columns/nice.rs         |  2 +-
+ src/columns/pgid.rs         |  2 +-
+ src/columns/pid.rs          |  4 ++--
+ src/columns/policy.rs       |  2 +-
+ src/columns/priority.rs     |  2 +-
+ src/columns/read_bytes.rs   |  2 +-
+ src/columns/session.rs      |  2 +-
+ src/columns/start_time.rs   | 12 ++++++------
+ src/columns/state.rs        |  2 +-
+ src/columns/tcp_port.rs     | 14 +++++++-------
+ src/columns/threads.rs      |  2 +-
+ src/columns/tree.rs         |  2 +-
+ src/columns/tty.rs          |  2 +-
+ src/columns/udp_port.rs     | 14 +++++++-------
+ src/columns/uid.rs          |  2 +-
+ src/columns/uid_real.rs     |  2 +-
+ src/columns/uid_saved.rs    |  2 +-
+ src/columns/usage_cpu.rs    |  2 +-
+ src/columns/usage_mem.rs    |  6 +++---
+ src/columns/user.rs         |  2 +-
+ src/columns/user_real.rs    |  2 +-
+ src/columns/user_saved.rs   |  2 +-
+ src/columns/vm_hwm.rs       |  2 +-
+ src/columns/vm_peak.rs      |  2 +-
+ src/columns/vm_pin.rs       |  2 +-
+ src/columns/vm_rss.rs       |  2 +-
+ src/columns/vm_size.rs      |  2 +-
+ src/columns/vm_swap.rs      |  2 +-
+ src/columns/write_bytes.rs  |  2 +-
+ src/process.rs              |  4 ++--
+ src/view.rs                 |  4 ++--
+ 46 files changed, 75 insertions(+), 83 deletions(-)
+
+diff --git a/Cargo.toml b/Cargo.toml
+index 3d0972d..cd29e52 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -53,13 +53,7 @@ termbg        = "0.3.0"
+ toml          = "0.5"
+ unicode-width = "0.1"
+ 
+-[target.'cfg(target_os = "linux")'.dependencies]
+-pager         = "0.16"
+-procfs        = "0.12.0"
+-users         = "0.11"
+-which         = "4"
+-
+-[target.'cfg(target_os = "android")'.dependencies]
++[target.'cfg(any(target_os = "linux", target_os = "android"))'.dependencies]
+ pager         = "0.16"
+ procfs        = "0.12.0"
+ users         = "0.11"
+diff --git a/src/columns.rs b/src/columns.rs
+index e724a4f..a3b44f8 100644
+--- a/src/columns.rs
++++ b/src/columns.rs
+@@ -1,6 +1,4 @@
+-#[cfg(target_os = "linux")]
+-include!("./columns/os_linux.rs");
+-#[cfg(target_os = "android")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ include!("./columns/os_linux.rs");
+ #[cfg(target_os = "macos")]
+ include!("./columns/os_macos.rs");
+diff --git a/src/columns/command.rs b/src/columns/command.rs
+index 3ff140d..d7dc7c2 100644
+--- a/src/columns/command.rs
++++ b/src/columns/command.rs
+@@ -25,7 +25,7 @@ impl Command {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for Command {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let fmt_content = if let Ok(cmd) = &proc.curr_proc.cmdline() {
+diff --git a/src/columns/context_sw.rs b/src/columns/context_sw.rs
+index 7f90546..820c9cb 100644
+--- a/src/columns/context_sw.rs
++++ b/src/columns/context_sw.rs
+@@ -26,7 +26,7 @@ impl ContextSw {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for ContextSw {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let (fmt_content, raw_content) = if let Some(ref status) = proc.curr_status {
+diff --git a/src/columns/cpu_time.rs b/src/columns/cpu_time.rs
+index 1e3bce7..7f2409d 100644
+--- a/src/columns/cpu_time.rs
++++ b/src/columns/cpu_time.rs
+@@ -25,7 +25,7 @@ impl CpuTime {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for CpuTime {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let time_sec = (proc.curr_proc.stat().utime + proc.curr_proc.stat().stime)
+diff --git a/src/columns/docker.rs b/src/columns/docker.rs
+index b06e84b..4ff276b 100644
+--- a/src/columns/docker.rs
++++ b/src/columns/docker.rs
+@@ -10,14 +10,14 @@ pub struct Docker {
+     fmt_contents: HashMap<i32, String>,
+     raw_contents: HashMap<i32, String>,
+     width: usize,
+-    #[cfg(target_os = "linux")]
++    #[cfg(any(target_os = "linux", target_os = "android"))]
+     containers: HashMap<String, String>,
+     #[cfg(target_os = "macos")]
+     containers: HashMap<i32, String>,
+     available: bool,
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Docker {
+     pub fn new(header: Option<String>, path: &str) -> Self {
+         let header = header.unwrap_or_else(|| String::from("Docker"));
+@@ -88,7 +88,7 @@ impl Docker {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for Docker {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let fmt_content = if let Ok(cgroups) = proc.curr_proc.cgroups() {
+diff --git a/src/columns/elapsed_time.rs b/src/columns/elapsed_time.rs
+index 5543116..161c7ad 100644
+--- a/src/columns/elapsed_time.rs
++++ b/src/columns/elapsed_time.rs
+@@ -2,15 +2,15 @@ use crate::process::ProcessInfo;
+ use crate::{column_default, Column};
+ #[cfg(not(target_os = "windows"))]
+ use chrono::offset::TimeZone;
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ use chrono::DateTime;
+ use chrono::{Duration, Local};
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ use lazy_static::lazy_static;
+ use std::cmp;
+ use std::collections::HashMap;
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ lazy_static! {
+     static ref TICKS_PER_SECOND: i64 = procfs::ticks_per_second().unwrap();
+ }
+@@ -21,7 +21,7 @@ pub struct ElapsedTime {
+     fmt_contents: HashMap<i32, String>,
+     raw_contents: HashMap<i32, Duration>,
+     width: usize,
+-    #[cfg(target_os = "linux")]
++    #[cfg(any(target_os = "linux", target_os = "android"))]
+     boot_time: DateTime<Local>,
+ }
+ 
+@@ -35,7 +35,7 @@ impl ElapsedTime {
+             width: 0,
+             header,
+             unit,
+-            #[cfg(target_os = "linux")]
++            #[cfg(any(target_os = "linux", target_os = "android"))]
+             boot_time: procfs::boot_time().unwrap_or_else(|_| Local.timestamp(0, 0)),
+         }
+     }
+@@ -64,7 +64,7 @@ fn format_duration(duration: Duration) -> String {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for ElapsedTime {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let starttime = proc.curr_proc.stat().starttime;
+diff --git a/src/columns/gid.rs b/src/columns/gid.rs
+index e64e6b7..4f39f88 100644
+--- a/src/columns/gid.rs
++++ b/src/columns/gid.rs
+@@ -30,7 +30,7 @@ impl Gid {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for Gid {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let (fmt_content, raw_content) = if let Some(ref status) = proc.curr_status {
+diff --git a/src/columns/gid_real.rs b/src/columns/gid_real.rs
+index dc24f5d..9517925 100644
+--- a/src/columns/gid_real.rs
++++ b/src/columns/gid_real.rs
+@@ -25,7 +25,7 @@ impl GidReal {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for GidReal {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let (fmt_content, raw_content) = if let Some(ref status) = proc.curr_status {
+diff --git a/src/columns/gid_saved.rs b/src/columns/gid_saved.rs
+index 2d5d3f9..f1ff346 100644
+--- a/src/columns/gid_saved.rs
++++ b/src/columns/gid_saved.rs
+@@ -25,7 +25,7 @@ impl GidSaved {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for GidSaved {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let (fmt_content, raw_content) = if let Some(ref status) = proc.curr_status {
+diff --git a/src/columns/group.rs b/src/columns/group.rs
+index 383bcb8..cb2f855 100644
+--- a/src/columns/group.rs
++++ b/src/columns/group.rs
+@@ -30,7 +30,7 @@ impl Group {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for Group {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let fmt_content = if let Some(ref status) = proc.curr_status {
+diff --git a/src/columns/group_real.rs b/src/columns/group_real.rs
+index 36b1da8..9f43e40 100644
+--- a/src/columns/group_real.rs
++++ b/src/columns/group_real.rs
+@@ -25,7 +25,7 @@ impl GroupReal {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for GroupReal {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let fmt_content = if let Some(ref status) = proc.curr_status {
+diff --git a/src/columns/group_saved.rs b/src/columns/group_saved.rs
+index d2f071e..63fe2be 100644
+--- a/src/columns/group_saved.rs
++++ b/src/columns/group_saved.rs
+@@ -25,7 +25,7 @@ impl GroupSaved {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for GroupSaved {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let fmt_content = if let Some(ref status) = proc.curr_status {
+diff --git a/src/columns/maj_flt.rs b/src/columns/maj_flt.rs
+index ccbc9b7..f9f9f0a 100644
+--- a/src/columns/maj_flt.rs
++++ b/src/columns/maj_flt.rs
+@@ -25,7 +25,7 @@ impl MajFlt {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for MajFlt {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let raw_content = proc.curr_proc.stat().majflt;
+diff --git a/src/columns/min_flt.rs b/src/columns/min_flt.rs
+index 7894b7b..d022c95 100644
+--- a/src/columns/min_flt.rs
++++ b/src/columns/min_flt.rs
+@@ -25,7 +25,7 @@ impl MinFlt {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for MinFlt {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let raw_content = proc.curr_proc.stat().minflt;
+diff --git a/src/columns/nice.rs b/src/columns/nice.rs
+index 5cdc6db..05bca20 100644
+--- a/src/columns/nice.rs
++++ b/src/columns/nice.rs
+@@ -25,7 +25,7 @@ impl Nice {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for Nice {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let raw_content = proc.curr_proc.stat().nice;
+diff --git a/src/columns/pgid.rs b/src/columns/pgid.rs
+index 9b6e6a0..290d651 100644
+--- a/src/columns/pgid.rs
++++ b/src/columns/pgid.rs
+@@ -25,7 +25,7 @@ impl Pgid {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for Pgid {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let raw_content = proc.curr_proc.stat().pgrp;
+diff --git a/src/columns/pid.rs b/src/columns/pid.rs
+index c4efebc..3e5dfa6 100644
+--- a/src/columns/pid.rs
++++ b/src/columns/pid.rs
+@@ -25,7 +25,7 @@ impl Pid {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for Pid {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let raw_content = proc.pid;
+@@ -41,7 +41,7 @@ impl Column for Pid {
+     column_default!(i32);
+ }
+ 
+-#[cfg(not(target_os = "linux"))]
++#[cfg(not(any(target_os = "linux", target_os = "android")))]
+ impl Column for Pid {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let raw_content = proc.pid;
+diff --git a/src/columns/policy.rs b/src/columns/policy.rs
+index 046a75a..cd935bd 100644
+--- a/src/columns/policy.rs
++++ b/src/columns/policy.rs
+@@ -25,7 +25,7 @@ impl Policy {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for Policy {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let fmt_content = match proc.curr_proc.stat().policy.map(|x| x as i32) {
+diff --git a/src/columns/priority.rs b/src/columns/priority.rs
+index 009b77f..d56d2e5 100644
+--- a/src/columns/priority.rs
++++ b/src/columns/priority.rs
+@@ -25,7 +25,7 @@ impl Priority {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for Priority {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let raw_content = proc.curr_proc.stat().priority;
+diff --git a/src/columns/read_bytes.rs b/src/columns/read_bytes.rs
+index 8e8b732..9dc536d 100644
+--- a/src/columns/read_bytes.rs
++++ b/src/columns/read_bytes.rs
+@@ -26,7 +26,7 @@ impl ReadBytes {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for ReadBytes {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let (fmt_content, raw_content) = if proc.curr_io.is_some() && proc.prev_io.is_some() {
+diff --git a/src/columns/session.rs b/src/columns/session.rs
+index ee1ee88..041cd82 100644
+--- a/src/columns/session.rs
++++ b/src/columns/session.rs
+@@ -25,7 +25,7 @@ impl Session {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for Session {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let raw_content = proc.curr_proc.stat().session;
+diff --git a/src/columns/start_time.rs b/src/columns/start_time.rs
+index 6151e03..af27e2a 100644
+--- a/src/columns/start_time.rs
++++ b/src/columns/start_time.rs
+@@ -2,15 +2,15 @@ use crate::process::ProcessInfo;
+ use crate::{column_default, Column};
+ #[cfg(not(target_os = "windows"))]
+ use chrono::offset::TimeZone;
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ use chrono::Duration;
+ use chrono::{DateTime, Local};
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ use lazy_static::lazy_static;
+ use std::cmp;
+ use std::collections::HashMap;
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ lazy_static! {
+     static ref TICKS_PER_SECOND: i64 = procfs::ticks_per_second().unwrap();
+ }
+@@ -21,7 +21,7 @@ pub struct StartTime {
+     fmt_contents: HashMap<i32, String>,
+     raw_contents: HashMap<i32, DateTime<Local>>,
+     width: usize,
+-    #[cfg(target_os = "linux")]
++    #[cfg(any(target_os = "linux", target_os = "android"))]
+     boot_time: DateTime<Local>,
+ }
+ 
+@@ -35,13 +35,13 @@ impl StartTime {
+             width: 0,
+             header,
+             unit,
+-            #[cfg(target_os = "linux")]
++            #[cfg(any(target_os = "linux", target_os = "android"))]
+             boot_time: procfs::boot_time().unwrap_or_else(|_| Local.timestamp(0, 0)),
+         }
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for StartTime {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let starttime = proc.curr_proc.stat().starttime;
+diff --git a/src/columns/state.rs b/src/columns/state.rs
+index c43d9f4..25d3d93 100644
+--- a/src/columns/state.rs
++++ b/src/columns/state.rs
+@@ -25,7 +25,7 @@ impl State {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for State {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let fmt_content = format!("{}", proc.curr_proc.stat().state);
+diff --git a/src/columns/tcp_port.rs b/src/columns/tcp_port.rs
+index a183b2e..a33df64 100644
+--- a/src/columns/tcp_port.rs
++++ b/src/columns/tcp_port.rs
+@@ -2,9 +2,9 @@ use crate::process::ProcessInfo;
+ use crate::Column;
+ #[cfg(target_os = "macos")]
+ use libproc::libproc::net_info::TcpSIState;
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ use procfs::net::{TcpNetEntry, TcpState};
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ use procfs::process::FDTarget;
+ use std::cmp;
+ use std::collections::HashMap;
+@@ -15,9 +15,9 @@ pub struct TcpPort {
+     fmt_contents: HashMap<i32, String>,
+     raw_contents: HashMap<i32, String>,
+     width: usize,
+-    #[cfg(target_os = "linux")]
++    #[cfg(any(target_os = "linux", target_os = "android"))]
+     tcp_entry: Vec<TcpNetEntry>,
+-    #[cfg(target_os = "linux")]
++    #[cfg(any(target_os = "linux", target_os = "android"))]
+     tcp6_entry: Vec<TcpNetEntry>,
+ }
+ 
+@@ -31,15 +31,15 @@ impl TcpPort {
+             width: 0,
+             header,
+             unit,
+-            #[cfg(target_os = "linux")]
++            #[cfg(any(target_os = "linux", target_os = "android"))]
+             tcp_entry: procfs::net::tcp().unwrap_or_default(),
+-            #[cfg(target_os = "linux")]
++            #[cfg(any(target_os = "linux", target_os = "android"))]
+             tcp6_entry: procfs::net::tcp6().unwrap_or_default(),
+         }
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for TcpPort {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let fmt_content = if let Ok(fds) = proc.curr_proc.fd() {
+diff --git a/src/columns/threads.rs b/src/columns/threads.rs
+index e905a62..762e2b7 100644
+--- a/src/columns/threads.rs
++++ b/src/columns/threads.rs
+@@ -25,7 +25,7 @@ impl Threads {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for Threads {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let raw_content = proc.curr_proc.stat().num_threads;
+diff --git a/src/columns/tree.rs b/src/columns/tree.rs
+index dd71418..3beffcd 100644
+--- a/src/columns/tree.rs
++++ b/src/columns/tree.rs
+@@ -209,7 +209,7 @@ impl Column for Tree {
+ }
+ 
+ #[cfg(test)]
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ mod tests {
+     use super::*;
+     use crate::process::ProcessTask;
+diff --git a/src/columns/tty.rs b/src/columns/tty.rs
+index d883fa8..0871127 100644
+--- a/src/columns/tty.rs
++++ b/src/columns/tty.rs
+@@ -25,7 +25,7 @@ impl Tty {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for Tty {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let (major, minor) = proc.curr_proc.stat().tty_nr();
+diff --git a/src/columns/udp_port.rs b/src/columns/udp_port.rs
+index ea5d0bc..5a74a5e 100644
+--- a/src/columns/udp_port.rs
++++ b/src/columns/udp_port.rs
+@@ -1,8 +1,8 @@
+ use crate::process::ProcessInfo;
+ use crate::Column;
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ use procfs::net::UdpNetEntry;
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ use procfs::process::FDTarget;
+ use std::cmp;
+ use std::collections::HashMap;
+@@ -13,9 +13,9 @@ pub struct UdpPort {
+     fmt_contents: HashMap<i32, String>,
+     raw_contents: HashMap<i32, String>,
+     width: usize,
+-    #[cfg(target_os = "linux")]
++    #[cfg(any(target_os = "linux", target_os = "android"))]
+     udp_entry: Vec<UdpNetEntry>,
+-    #[cfg(target_os = "linux")]
++    #[cfg(any(target_os = "linux", target_os = "android"))]
+     udp6_entry: Vec<UdpNetEntry>,
+ }
+ 
+@@ -29,15 +29,15 @@ impl UdpPort {
+             width: 0,
+             header,
+             unit,
+-            #[cfg(target_os = "linux")]
++            #[cfg(any(target_os = "linux", target_os = "android"))]
+             udp_entry: procfs::net::udp().unwrap_or_default(),
+-            #[cfg(target_os = "linux")]
++            #[cfg(any(target_os = "linux", target_os = "android"))]
+             udp6_entry: procfs::net::udp6().unwrap_or_default(),
+         }
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for UdpPort {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let fmt_content = if let Ok(fds) = proc.curr_proc.fd() {
+diff --git a/src/columns/uid.rs b/src/columns/uid.rs
+index 0a32acf..910848a 100644
+--- a/src/columns/uid.rs
++++ b/src/columns/uid.rs
+@@ -30,7 +30,7 @@ impl Uid {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for Uid {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let (fmt_content, raw_content) = if let Some(ref status) = proc.curr_status {
+diff --git a/src/columns/uid_real.rs b/src/columns/uid_real.rs
+index aa835c3..2aa0ddd 100644
+--- a/src/columns/uid_real.rs
++++ b/src/columns/uid_real.rs
+@@ -25,7 +25,7 @@ impl UidReal {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for UidReal {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let (fmt_content, raw_content) = if let Some(ref status) = proc.curr_status {
+diff --git a/src/columns/uid_saved.rs b/src/columns/uid_saved.rs
+index 3e2c2a9..2de19d9 100644
+--- a/src/columns/uid_saved.rs
++++ b/src/columns/uid_saved.rs
+@@ -25,7 +25,7 @@ impl UidSaved {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for UidSaved {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let (fmt_content, raw_content) = if let Some(ref status) = proc.curr_status {
+diff --git a/src/columns/usage_cpu.rs b/src/columns/usage_cpu.rs
+index 1198cbc..3507f23 100644
+--- a/src/columns/usage_cpu.rs
++++ b/src/columns/usage_cpu.rs
+@@ -25,7 +25,7 @@ impl UsageCpu {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for UsageCpu {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let curr_time = proc.curr_proc.stat().utime + proc.curr_proc.stat().stime;
+diff --git a/src/columns/usage_mem.rs b/src/columns/usage_mem.rs
+index a643c2a..4e44c3d 100644
+--- a/src/columns/usage_mem.rs
++++ b/src/columns/usage_mem.rs
+@@ -1,6 +1,6 @@
+ use crate::process::ProcessInfo;
+ use crate::{column_default, Column};
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ use procfs::Meminfo;
+ use std::cmp;
+ use std::collections::HashMap;
+@@ -34,7 +34,7 @@ impl UsageMem {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ fn get_mem_total() -> u64 {
+     let meminfo = Meminfo::new();
+     if let Ok(meminfo) = meminfo {
+@@ -77,7 +77,7 @@ fn get_mem_total() -> u64 {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for UsageMem {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let usage =
+diff --git a/src/columns/user.rs b/src/columns/user.rs
+index be8968f..fc60faa 100644
+--- a/src/columns/user.rs
++++ b/src/columns/user.rs
+@@ -30,7 +30,7 @@ impl User {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for User {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let user = users::get_user_by_uid(proc.curr_proc.owner());
+diff --git a/src/columns/user_real.rs b/src/columns/user_real.rs
+index 5f1a482..69b581b 100644
+--- a/src/columns/user_real.rs
++++ b/src/columns/user_real.rs
+@@ -25,7 +25,7 @@ impl UserReal {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for UserReal {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let fmt_content = if let Some(ref status) = proc.curr_status {
+diff --git a/src/columns/user_saved.rs b/src/columns/user_saved.rs
+index 2c21f10..395f4ff 100644
+--- a/src/columns/user_saved.rs
++++ b/src/columns/user_saved.rs
+@@ -25,7 +25,7 @@ impl UserSaved {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for UserSaved {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let fmt_content = if let Some(ref status) = proc.curr_status {
+diff --git a/src/columns/vm_hwm.rs b/src/columns/vm_hwm.rs
+index c4ab36c..3240c86 100644
+--- a/src/columns/vm_hwm.rs
++++ b/src/columns/vm_hwm.rs
+@@ -26,7 +26,7 @@ impl VmHwm {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for VmHwm {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let (raw_content, fmt_content) = if let Some(ref curr_status) = proc.curr_status {
+diff --git a/src/columns/vm_peak.rs b/src/columns/vm_peak.rs
+index ef92370..b9cfe16 100644
+--- a/src/columns/vm_peak.rs
++++ b/src/columns/vm_peak.rs
+@@ -26,7 +26,7 @@ impl VmPeak {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for VmPeak {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let (raw_content, fmt_content) = if let Some(ref curr_status) = proc.curr_status {
+diff --git a/src/columns/vm_pin.rs b/src/columns/vm_pin.rs
+index 00f35cd..6454935 100644
+--- a/src/columns/vm_pin.rs
++++ b/src/columns/vm_pin.rs
+@@ -26,7 +26,7 @@ impl VmPin {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for VmPin {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let (raw_content, fmt_content) = if let Some(ref curr_status) = proc.curr_status {
+diff --git a/src/columns/vm_rss.rs b/src/columns/vm_rss.rs
+index 268be40..1f4ebf8 100644
+--- a/src/columns/vm_rss.rs
++++ b/src/columns/vm_rss.rs
+@@ -26,7 +26,7 @@ impl VmRss {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for VmRss {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let raw_content = proc.curr_proc.stat().rss_bytes().unwrap_or(0) as u64;
+diff --git a/src/columns/vm_size.rs b/src/columns/vm_size.rs
+index 17328f2..15c5069 100644
+--- a/src/columns/vm_size.rs
++++ b/src/columns/vm_size.rs
+@@ -26,7 +26,7 @@ impl VmSize {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for VmSize {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let raw_content = proc.curr_proc.stat().vsize;
+diff --git a/src/columns/vm_swap.rs b/src/columns/vm_swap.rs
+index 4f33bb2..f43ddae 100644
+--- a/src/columns/vm_swap.rs
++++ b/src/columns/vm_swap.rs
+@@ -26,7 +26,7 @@ impl VmSwap {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for VmSwap {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let (raw_content, fmt_content) = if let Some(ref curr_status) = proc.curr_status {
+diff --git a/src/columns/write_bytes.rs b/src/columns/write_bytes.rs
+index 76be426..d97c4ee 100644
+--- a/src/columns/write_bytes.rs
++++ b/src/columns/write_bytes.rs
+@@ -26,7 +26,7 @@ impl WriteBytes {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Column for WriteBytes {
+     fn add(&mut self, proc: &ProcessInfo) {
+         let (fmt_content, raw_content) = if proc.curr_io.is_some() && proc.prev_io.is_some() {
+diff --git a/src/process.rs b/src/process.rs
+index 97b2323..51b933a 100644
+--- a/src/process.rs
++++ b/src/process.rs
+@@ -1,11 +1,11 @@
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ pub mod linux;
+ #[cfg(target_os = "macos")]
+ pub mod macos;
+ #[cfg(target_os = "windows")]
+ pub mod windows;
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ pub use self::linux::*;
+ #[cfg(target_os = "macos")]
+ pub use self::macos::*;
+diff --git a/src/view.rs b/src/view.rs
+index 91fdbfa..5dbc28b 100644
+--- a/src/view.rs
++++ b/src/view.rs
+@@ -537,7 +537,7 @@ impl View {
+         }
+     }
+ 
+-    #[cfg(not(any(target_os = "windows", target_os = "linux")))]
++    #[cfg(not(any(target_os = "windows", any(target_os = "linux", target_os = "android"))))]
+     fn pager(config: &Config) {
+         if let Some(ref pager) = config.pager.command {
+             Pager::with_pager(&pager).setup();
+@@ -548,7 +548,7 @@ impl View {
+         }
+     }
+ 
+-    #[cfg(target_os = "linux")]
++    #[cfg(any(target_os = "linux", target_os = "android"))]
+     fn pager(config: &Config) {
+         if let Some(ref pager) = config.pager.command {
+             Pager::with_pager(&pager)
+-- 
+2.33.0
+
