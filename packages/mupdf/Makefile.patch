@@ -1,7 +1,20 @@
 diff -uNr mupdf-1.18.0-source/Makefile mupdf-1.18.0-source.mod/Makefile
 --- mupdf-1.18.0-source/Makefile	2020-10-07 13:35:03.000000000 +0300
 +++ mupdf-1.18.0-source.mod/Makefile	2021-08-05 19:47:26.364131551 +0300
-@@ -66,6 +66,14 @@
+@@ -48,6 +48,7 @@
+   QUIET_CXX = @ echo "    CXX $@" ;
+   QUIET_GEN = @ echo "    GEN $@" ;
+   QUIET_LINK = @ echo "    LINK $@" ;
++  QUIET_LINK_FOR_BUILD = @ echo "    LINK_FOR_BUILD $@" ;
+   QUIET_RM = @ echo "    RM $@" ;
+   QUIET_TAGS = @ echo "    TAGS $@" ;
+   QUIET_WINDRES = @ echo "    WINDRES $@" ;
+@@ -62,10 +63,19 @@
+   RANLIB_CMD = $(QUIET_RANLIB) $(RANLIB) $@
+ endif
+ LINK_CMD = $(QUIET_LINK) $(MKTGTDIR) ; $(CC) $(LDFLAGS) -o $@ $^ $(LIBS)
++LINK_FOR_BUILD_CMD = $(QUIET_LINK_FOR_BUILD) $(MKTGTDIR) ; $(CC_FOR_BUILD) -o $@ $^
+ TAGS_CMD = $(QUIET_TAGS) ctags -R --c-kinds=+p
  WINDRES_CMD = $(QUIET_WINDRES) $(MKTGTDIR) ; $(WINDRES) $< $@
  OBJCOPY_CMD = $(QUIET_OBJCOPY) $(MKTGTDIR) ; $(LD) -r -b binary -z noexecstack -o $@ $<
  
@@ -16,6 +29,15 @@ diff -uNr mupdf-1.18.0-source/Makefile mupdf-1.18.0-source.mod/Makefile
  # --- Rules ---
  
  $(OUT)/%.a :
+@@ -73,7 +81,7 @@
+ 	$(RANLIB_CMD)
+ 
+ $(OUT)/%.exe: %.c
+-	$(LINK_CMD)
++	$(LINK_FOR_BUILD_CMD)
+ 
+ $(OUT)/%.$(SO):
+ 	$(LINK_CMD) $(LIB_LDFLAGS) $(THIRD_LIBS) $(LIBCRYPTO_LIBS)
 @@ -321,7 +329,7 @@
  $(OUT)/example: docs/examples/example.c $(MUPDF_LIB) $(THIRD_LIB)
  	$(LINK_CMD) $(CFLAGS) $(THIRD_LIBS)

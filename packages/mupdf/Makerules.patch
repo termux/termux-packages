@@ -1,7 +1,17 @@
 diff -uNr mupdf-1.15.0-source/Makerules mupdf-1.15.0-source.mod/Makerules
 --- mupdf-1.15.0-source/Makerules	2019-05-06 14:53:09.000000000 +0300
 +++ mupdf-1.15.0-source.mod/Makerules	2019-07-01 02:08:28.604522907 +0300
-@@ -134,7 +134,7 @@
+@@ -116,7 +116,8 @@
+   RANLIB = xcrun ranlib
+ 
+ else ifeq ($(OS),Linux)
+-  HAVE_OBJCOPY := yes
++  #HAVE_OBJCOPY := yes
++  HAVE_OBJCOPY := no
+ 
+   ifeq ($(shell pkg-config --exists freetype2 && echo yes),yes)
+ 	SYS_FREETYPE_CFLAGS := $(shell pkg-config --cflags freetype2)
+@@ -186,7 +187,7 @@
    HAVE_PTHREAD := yes
    ifeq ($(HAVE_PTHREAD),yes)
  	PTHREAD_CFLAGS :=
