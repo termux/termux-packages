@@ -1,0 +1,229 @@
+From 42587384662d31d76b3fe953853ef2b59928df8f Mon Sep 17 00:00:00 2001
+From: "bradley.jarvis" <brad@pocketinnovations.com.au>
+Date: Wed, 11 Aug 2021 21:21:33 +1000
+Subject: [PATCH] Fix ffmpeg deprecated avcodec_get_context_defaults
+
+Fix build against latest ffmpeg after removal of deprecated avcodec_get_context_defaults()
+
+Resolves issue #97
+
+Part-of: <https://gitlab.freedesktop.org/gstreamer/gst-libav/-/merge_requests/139>
+---
+ ext/libav/gstavauddec.c | 16 ++++------------
+ ext/libav/gstavaudenc.c | 25 +++++++++----------------
+ ext/libav/gstavviddec.c | 16 ++++------------
+ ext/libav/gstavvidenc.c | 14 +++++---------
+ 4 files changed, 22 insertions(+), 49 deletions(-)
+
+diff --git a/ext/libav/gstavauddec.c b/ext/libav/gstavauddec.c
+index baf7aa5..4ce6a1f 100644
+--- a/ext/libav/gstavauddec.c
++++ b/ext/libav/gstavauddec.c
+@@ -169,11 +169,7 @@ gst_ffmpegauddec_finalize (GObject * object)
+ 
+   av_frame_free (&ffmpegdec->frame);
+ 
+-  if (ffmpegdec->context != NULL) {
+-    gst_ffmpeg_avcodec_close (ffmpegdec->context);
+-    av_free (ffmpegdec->context);
+-    ffmpegdec->context = NULL;
+-  }
++  avcodec_free_context (&ffmpegdec->context);
+ 
+   G_OBJECT_CLASS (parent_class)->finalize (object);
+ }
+@@ -193,14 +189,10 @@ gst_ffmpegauddec_close (GstFFMpegAudDec * ffmpegdec, gboolean reset)
+   gst_ffmpeg_avcodec_close (ffmpegdec->context);
+   ffmpegdec->opened = FALSE;
+ 
+-  if (ffmpegdec->context->extradata) {
+-    av_free (ffmpegdec->context->extradata);
+-    ffmpegdec->context->extradata = NULL;
+-  }
++  av_freep (&ffmpegdec->context->extradata);
+ 
+   if (reset) {
+-    if (avcodec_get_context_defaults3 (ffmpegdec->context,
+-            oclass->in_plugin) < 0) {
++    if (gst_ffmpeg_avcodec_open (ffmpegdec->context, oclass->in_plugin) < 0) {
+       GST_DEBUG_OBJECT (ffmpegdec, "Failed to set context defaults");
+       return FALSE;
+     }
+@@ -220,7 +212,7 @@ gst_ffmpegauddec_start (GstAudioDecoder * decoder)
+ 
+   GST_OBJECT_LOCK (ffmpegdec);
+   gst_ffmpeg_avcodec_close (ffmpegdec->context);
+-  if (avcodec_get_context_defaults3 (ffmpegdec->context, oclass->in_plugin) < 0) {
++  if (gst_ffmpeg_avcodec_open (ffmpegdec->context, oclass->in_plugin) < 0) {
+     GST_DEBUG_OBJECT (ffmpegdec, "Failed to set context defaults");
+     GST_OBJECT_UNLOCK (ffmpegdec);
+     return FALSE;
+diff --git a/ext/libav/gstavaudenc.c b/ext/libav/gstavaudenc.c
+index 3ff6432..87edaeb 100644
+--- a/ext/libav/gstavaudenc.c
++++ b/ext/libav/gstavaudenc.c
+@@ -175,10 +175,8 @@ gst_ffmpegaudenc_finalize (GObject * object)
+ 
+   /* clean up remaining allocated data */
+   av_frame_free (&ffmpegaudenc->frame);
+-  gst_ffmpeg_avcodec_close (ffmpegaudenc->context);
+-  gst_ffmpeg_avcodec_close (ffmpegaudenc->refcontext);
+-  av_free (ffmpegaudenc->context);
+-  av_free (ffmpegaudenc->refcontext);
++  avcodec_free_context (&ffmpegaudenc->context);
++  avcodec_free_context (&ffmpegaudenc->refcontext);
+ 
+   G_OBJECT_CLASS (parent_class)->finalize (object);
+ }
+@@ -194,8 +192,7 @@ gst_ffmpegaudenc_start (GstAudioEncoder * encoder)
+   ffmpegaudenc->need_reopen = FALSE;
+ 
+   gst_ffmpeg_avcodec_close (ffmpegaudenc->context);
+-  if (avcodec_get_context_defaults3 (ffmpegaudenc->context,
+-          oclass->in_plugin) < 0) {
++  if (gst_ffmpeg_avcodec_open (ffmpegaudenc->context, oclass->in_plugin) < 0) {
+     GST_DEBUG_OBJECT (ffmpegaudenc, "Failed to set context defaults");
+     return FALSE;
+   }
+@@ -243,8 +240,7 @@ gst_ffmpegaudenc_set_format (GstAudioEncoder * encoder, GstAudioInfo * info)
+   if (ffmpegaudenc->opened) {
+     gst_ffmpeg_avcodec_close (ffmpegaudenc->context);
+     ffmpegaudenc->opened = FALSE;
+-    if (avcodec_get_context_defaults3 (ffmpegaudenc->context,
+-            oclass->in_plugin) < 0) {
++    if (gst_ffmpeg_avcodec_open (ffmpegaudenc->context, oclass->in_plugin) < 0) {
+       GST_DEBUG_OBJECT (ffmpegaudenc, "Failed to set context defaults");
+       return FALSE;
+     }
+@@ -289,8 +285,7 @@ gst_ffmpegaudenc_set_format (GstAudioEncoder * encoder, GstAudioInfo * info)
+     gst_ffmpeg_avcodec_close (ffmpegaudenc->context);
+     GST_DEBUG_OBJECT (ffmpegaudenc, "avenc_%s: Failed to open FFMPEG codec",
+         oclass->in_plugin->name);
+-    if (avcodec_get_context_defaults3 (ffmpegaudenc->context,
+-            oclass->in_plugin) < 0)
++    if (gst_ffmpeg_avcodec_open (ffmpegaudenc->context, oclass->in_plugin) < 0)
+       GST_DEBUG_OBJECT (ffmpegaudenc, "Failed to set context defaults");
+ 
+     if ((oclass->in_plugin->capabilities & AV_CODEC_CAP_EXPERIMENTAL) &&
+@@ -314,8 +309,7 @@ gst_ffmpegaudenc_set_format (GstAudioEncoder * encoder, GstAudioInfo * info)
+     gst_caps_unref (allowed_caps);
+     gst_ffmpeg_avcodec_close (ffmpegaudenc->context);
+     GST_DEBUG ("Unsupported codec - no caps found");
+-    if (avcodec_get_context_defaults3 (ffmpegaudenc->context,
+-            oclass->in_plugin) < 0)
++    if (gst_ffmpeg_avcodec_open (ffmpegaudenc->context, oclass->in_plugin) < 0)
+       GST_DEBUG_OBJECT (ffmpegaudenc, "Failed to set context defaults");
+     return FALSE;
+   }
+@@ -333,8 +327,7 @@ gst_ffmpegaudenc_set_format (GstAudioEncoder * encoder, GstAudioInfo * info)
+           icaps)) {
+     gst_ffmpeg_avcodec_close (ffmpegaudenc->context);
+     gst_caps_unref (icaps);
+-    if (avcodec_get_context_defaults3 (ffmpegaudenc->context,
+-            oclass->in_plugin) < 0)
++    if (gst_ffmpeg_avcodec_open (ffmpegaudenc->context, oclass->in_plugin) < 0)
+       GST_DEBUG_OBJECT (ffmpegaudenc, "Failed to set context defaults");
+     return FALSE;
+   }
+@@ -403,8 +396,8 @@ buffer_info_free (void *opaque, guint8 * data)
+     gst_buffer_unmap (info->buffer, &info->map);
+     gst_buffer_unref (info->buffer);
+   } else {
+-    av_free (info->ext_data);
+-    av_free (info->ext_data_array);
++    av_freep (&info->ext_data);
++    av_freep (&info->ext_data_array);
+   }
+   g_slice_free (BufferInfo, info);
+ }
+diff --git a/ext/libav/gstavviddec.c b/ext/libav/gstavviddec.c
+index a14b6df..c8f7a7d 100644
+--- a/ext/libav/gstavviddec.c
++++ b/ext/libav/gstavviddec.c
+@@ -341,11 +341,7 @@ gst_ffmpegviddec_finalize (GObject * object)
+ 
+   av_frame_free (&ffmpegdec->picture);
+ 
+-  if (ffmpegdec->context != NULL) {
+-    gst_ffmpeg_avcodec_close (ffmpegdec->context);
+-    av_free (ffmpegdec->context);
+-    ffmpegdec->context = NULL;
+-  }
++  avcodec_free_context (&ffmpegdec->context);
+ 
+   G_OBJECT_CLASS (parent_class)->finalize (object);
+ }
+@@ -395,13 +391,9 @@ gst_ffmpegviddec_close (GstFFMpegVidDec * ffmpegdec, gboolean reset)
+ 
+   gst_buffer_replace (&ffmpegdec->palette, NULL);
+ 
+-  if (ffmpegdec->context->extradata) {
+-    av_free (ffmpegdec->context->extradata);
+-    ffmpegdec->context->extradata = NULL;
+-  }
++  av_freep (&ffmpegdec->context->extradata);
+   if (reset) {
+-    if (avcodec_get_context_defaults3 (ffmpegdec->context,
+-            oclass->in_plugin) < 0) {
++    if (gst_ffmpeg_avcodec_open (ffmpegdec->context, oclass->in_plugin) < 0) {
+       GST_DEBUG_OBJECT (ffmpegdec, "Failed to set context defaults");
+       return FALSE;
+     }
+@@ -2087,7 +2079,7 @@ gst_ffmpegviddec_start (GstVideoDecoder * decoder)
+ 
+   GST_OBJECT_LOCK (ffmpegdec);
+   gst_ffmpeg_avcodec_close (ffmpegdec->context);
+-  if (avcodec_get_context_defaults3 (ffmpegdec->context, oclass->in_plugin) < 0) {
++  if (gst_ffmpeg_avcodec_open (ffmpegdec->context, oclass->in_plugin) < 0) {
+     GST_DEBUG_OBJECT (ffmpegdec, "Failed to set context defaults");
+     GST_OBJECT_UNLOCK (ffmpegdec);
+     return FALSE;
+diff --git a/ext/libav/gstavvidenc.c b/ext/libav/gstavvidenc.c
+index 0468d88..b17ff68 100644
+--- a/ext/libav/gstavvidenc.c
++++ b/ext/libav/gstavvidenc.c
+@@ -222,10 +222,8 @@ gst_ffmpegvidenc_finalize (GObject * object)
+ 
+   /* clean up remaining allocated data */
+   av_frame_free (&ffmpegenc->picture);
+-  gst_ffmpeg_avcodec_close (ffmpegenc->context);
+-  gst_ffmpeg_avcodec_close (ffmpegenc->refcontext);
+-  av_free (ffmpegenc->context);
+-  av_free (ffmpegenc->refcontext);
++  avcodec_free_context (&ffmpegenc->context);
++  avcodec_free_context (&ffmpegenc->refcontext);
+ 
+   G_OBJECT_CLASS (parent_class)->finalize (object);
+ }
+@@ -249,8 +247,7 @@ gst_ffmpegvidenc_set_format (GstVideoEncoder * encoder,
+   if (ffmpegenc->opened) {
+     gst_ffmpeg_avcodec_close (ffmpegenc->context);
+     ffmpegenc->opened = FALSE;
+-    if (avcodec_get_context_defaults3 (ffmpegenc->context,
+-            oclass->in_plugin) < 0) {
++    if (gst_ffmpeg_avcodec_open (ffmpegenc->context, oclass->in_plugin) < 0) {
+       GST_DEBUG_OBJECT (ffmpegenc, "Failed to set context defaults");
+       return FALSE;
+     }
+@@ -455,8 +452,7 @@ bad_input_fmt:
+ close_codec:
+   {
+     gst_ffmpeg_avcodec_close (ffmpegenc->context);
+-    if (avcodec_get_context_defaults3 (ffmpegenc->context,
+-            oclass->in_plugin) < 0)
++    if (gst_ffmpeg_avcodec_open (ffmpegenc->context, oclass->in_plugin) < 0)
+       GST_DEBUG_OBJECT (ffmpegenc, "Failed to set context defaults");
+     goto cleanup_stats_in;
+   }
+@@ -897,7 +893,7 @@ gst_ffmpegvidenc_start (GstVideoEncoder * encoder)
+ 
+   /* close old session */
+   gst_ffmpeg_avcodec_close (ffmpegenc->context);
+-  if (avcodec_get_context_defaults3 (ffmpegenc->context, oclass->in_plugin) < 0) {
++  if (gst_ffmpeg_avcodec_open (ffmpegenc->context, oclass->in_plugin) < 0) {
+     GST_DEBUG_OBJECT (ffmpegenc, "Failed to set context defaults");
+     return FALSE;
+   }
+-- 
+GitLab
+
