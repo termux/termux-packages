@@ -189,6 +189,9 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
+	# https://github.com/emscripten-core/emscripten/pull/15840
+	sed -e "s|-git||" -i "$TERMUX_PKG_SRCDIR/emscripten-version.txt"
+
 	# skip using Makefile which does host npm install
 	rm -fr "$TERMUX_PREFIX/opt/emscripten"
 	./tools/install.py "$TERMUX_PREFIX/opt/emscripten"
