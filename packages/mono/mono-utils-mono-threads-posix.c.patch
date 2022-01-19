@@ -1,0 +1,13 @@
+--- a/mono/utils/mono-threads-posix.c
++++ b/mono/utils/mono-threads-posix.c
+@@ -32,9 +32,7 @@
+ 
+ #include <errno.h>
+ 
+-#if defined(HOST_ANDROID) && !defined(TARGET_ARM64) && !defined(TARGET_AMD64)
+-#define USE_TKILL_ON_ANDROID 1
+-#endif
++#undef USE_TKILL_ON_ANDROID
+ 
+ #ifdef USE_TKILL_ON_ANDROID
+ extern int tkill (pid_t tid, int signal);
