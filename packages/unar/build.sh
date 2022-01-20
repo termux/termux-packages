@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Command line tools for archive and file unarchiving and 
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=()
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_VERSION+=(1.10.7)
 TERMUX_PKG_VERSION+=(1.1)
 TERMUX_PKG_SRCURL=(https://github.com/MacPaw/XADMaster/archive/v${TERMUX_PKG_VERSION}/XADMaster-${TERMUX_PKG_VERSION}.tar.gz
