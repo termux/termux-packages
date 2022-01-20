@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/Dreamacro/clash
 TERMUX_PKG_DESCRIPTION="A rule-based tunnel in Go."
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Philipp Schmitt <philipp@schmitt.co>"
-TERMUX_PKG_VERSION=1.8.0
+TERMUX_PKG_VERSION=1.9.0
 TERMUX_PKG_SRCURL="https://github.com/Dreamacro/clash/archive/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=e1bae0ba88a0e2ba36702f95fe95fdc8fee58db4751b5b108ea600563c36a972
+TERMUX_PKG_SHA256=a276b1e7247e847fe44fe336a67bdecbb442748a1e7fa01d9c1ce0d52f9168ef
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
