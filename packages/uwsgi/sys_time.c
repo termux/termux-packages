@@ -34,21 +34,21 @@
 
 #pragma GCC visibility push(hidden)
 
-int timespec_from_timeval(struct timespec ts, const struct timeval tv) {
+int timespec_from_timeval(struct timespec* ts, const struct timeval tv) {
   // Whole seconds can just be copied.
-  ts.tv_sec = tv.tv_sec;
+  ts->tv_sec = tv.tv_sec;
 
   // But we might overflow when converting microseconds to nanoseconds.
   if (tv.tv_usec >= 1000000 || tv.tv_usec < 0) {
     return 0;
   }
-  ts.tv_nsec = tv.tv_usec * 1000;
+  ts->tv_nsec = tv.tv_usec * 1000;
   return 1;
 }
 
 int futimes(int fd, const struct timeval tv[2]) {
   struct timespec ts[2];
-  if (tv && (!timespec_from_timeval(ts[0], tv[0]) || !timespec_from_timeval(ts[1], tv[1]))) {
+  if (tv && (!timespec_from_timeval(&ts[0], tv[0]) || !timespec_from_timeval(&ts[1], tv[1]))) {
     errno = EINVAL;
     return -1;
   }
