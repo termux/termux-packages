@@ -7,6 +7,7 @@ TERMUX_PKG_VERSION=2021.04.22
 TERMUX_PKG_SRCURL=https://github.com/mevdschee/2048.c.git
 TERMUX_PKG_GIT_BRANCH=main
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_GROUPS="games"
 
 termux_step_post_get_source() {
 	git fetch --unshallow
