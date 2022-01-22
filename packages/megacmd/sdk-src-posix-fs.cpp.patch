@@ -5,7 +5,7 @@
  #endif
  
 -#ifdef __ANDROID__
-+#ifdef __ANDROID_NO_TERMUX__
++#if defined __ANDROID__ && !defined __TERMUX__
  #include <jni.h>
  extern JavaVM *MEGAjvm;
  #endif
@@ -14,7 +14,7 @@
  void PosixFileSystemAccess::statsid(string *id) const
  {
 -#ifdef __ANDROID__
-+#ifdef __ANDROID_NO_TERMUX__
++#if defined __ANDROID__ && !defined __TERMUX__
      if (!MEGAjvm)
      {
          LOG_err << "No JVM found";
