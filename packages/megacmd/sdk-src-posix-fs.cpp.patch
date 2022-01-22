@@ -1,0 +1,20 @@
+--- a/sdk/src/posix/fs.cpp
++++ b/sdk/src/posix/fs.cpp
+@@ -30,7 +30,7 @@
+ #include "mega/osx/osxutils.h"
+ #endif
+ 
+-#ifdef __ANDROID__
++#ifdef __ANDROID_NO_TERMUX__
+ #include <jni.h>
+ extern JavaVM *MEGAjvm;
+ #endif
+@@ -1530,7 +1530,7 @@
+ 
+ void PosixFileSystemAccess::statsid(string *id) const
+ {
+-#ifdef __ANDROID__
++#ifdef __ANDROID_NO_TERMUX__
+     if (!MEGAjvm)
+     {
+         LOG_err << "No JVM found";
