@@ -1,7 +1,6 @@
-diff -uNr mupdf-1.18.0-source/Makefile mupdf-1.18.0-source.mod/Makefile
---- mupdf-1.18.0-source/Makefile	2020-10-07 13:35:03.000000000 +0300
-+++ mupdf-1.18.0-source.mod/Makefile	2021-08-05 19:47:26.364131551 +0300
-@@ -48,6 +48,7 @@
+--- a/Makefile
++++ b/Makefile
+@@ -45,6 +45,7 @@
    QUIET_CXX = @ echo "    CXX $@" ;
    QUIET_GEN = @ echo "    GEN $@" ;
    QUIET_LINK = @ echo "    LINK $@" ;
@@ -9,27 +8,15 @@ diff -uNr mupdf-1.18.0-source/Makefile mupdf-1.18.0-source.mod/Makefile
    QUIET_RM = @ echo "    RM $@" ;
    QUIET_TAGS = @ echo "    TAGS $@" ;
    QUIET_WINDRES = @ echo "    WINDRES $@" ;
-@@ -62,10 +63,19 @@
+@@ -61,6 +62,7 @@
    RANLIB_CMD = $(QUIET_RANLIB) $(RANLIB) $@
  endif
  LINK_CMD = $(QUIET_LINK) $(MKTGTDIR) ; $(CC) $(LDFLAGS) -o $@ $^ $(LIBS)
 +LINK_FOR_BUILD_CMD = $(QUIET_LINK_FOR_BUILD) $(MKTGTDIR) ; $(CC_FOR_BUILD) -o $@ $^
- TAGS_CMD = $(QUIET_TAGS) ctags -R --c-kinds=+p
+ TAGS_CMD = $(QUIET_TAGS) ctags -R --c-kinds=+p --exclude=platform/python --exclude=platform/c++
  WINDRES_CMD = $(QUIET_WINDRES) $(MKTGTDIR) ; $(WINDRES) $< $@
  OBJCOPY_CMD = $(QUIET_OBJCOPY) $(MKTGTDIR) ; $(LD) -r -b binary -z noexecstack -o $@ $<
- 
-+ifeq ($(shared),yes)
-+LINK_CMD = $(QUIET_LINK) $(MKTGTDIR) ; $(CC) $(LDFLAGS) -o $@ \
-+	$(filter-out %.$(SO),$^) \
-+	$(sort $(patsubst %,-L%,$(dir $(filter %.$(SO),$^)))) \
-+	$(patsubst lib%.$(SO),-l%,$(notdir $(filter %.$(SO),$^))) \
-+	$(LIBS)
-+endif
-+
- # --- Rules ---
- 
- $(OUT)/%.a :
-@@ -73,7 +81,7 @@
+@@ -82,7 +84,7 @@
  	$(RANLIB_CMD)
  
  $(OUT)/%.exe: %.c
@@ -38,7 +25,7 @@ diff -uNr mupdf-1.18.0-source/Makefile mupdf-1.18.0-source.mod/Makefile
  
  $(OUT)/%.$(SO):
  	$(LINK_CMD) $(LIB_LDFLAGS) $(THIRD_LIBS) $(LIBCRYPTO_LIBS)
-@@ -321,7 +329,7 @@
+@@ -362,7 +364,7 @@
  $(OUT)/example: docs/examples/example.c $(MUPDF_LIB) $(THIRD_LIB)
  	$(LINK_CMD) $(CFLAGS) $(THIRD_LIBS)
  $(OUT)/multi-threaded: docs/examples/multi-threaded.c $(MUPDF_LIB) $(THIRD_LIB)
@@ -47,7 +34,7 @@ diff -uNr mupdf-1.18.0-source/Makefile mupdf-1.18.0-source.mod/Makefile
  
  # --- Update version string header ---
  
-@@ -355,7 +363,7 @@
+@@ -396,7 +398,7 @@
  tools: $(TOOL_APPS)
  apps: $(TOOL_APPS) $(VIEW_APPS)
  
@@ -56,12 +43,12 @@ diff -uNr mupdf-1.18.0-source/Makefile mupdf-1.18.0-source.mod/Makefile
  	install -d $(DESTDIR)$(incdir)/mupdf
  	install -d $(DESTDIR)$(incdir)/mupdf/fitz
  	install -d $(DESTDIR)$(incdir)/mupdf/pdf
-@@ -367,7 +375,7 @@
- 	install -m 644 $(INSTALL_LIBS) $(DESTDIR)$(libdir)
+@@ -410,7 +412,7 @@
+ endif
  
  	install -d $(DESTDIR)$(bindir)
--	install -m 755 $(TOOL_APPS) $(VIEW_APPS) $(DESTDIR)$(bindir)
-+	install -m 755 $(TOOL_APPS) $(DESTDIR)$(bindir)
+-	install -m 755 $(LIBS_TO_INSTALL_IN_BIN) $(TOOL_APPS) $(VIEW_APPS) $(DESTDIR)$(bindir)
++	install -m 755 $(LIBS_TO_INSTALL_IN_BIN) $(TOOL_APPS) $(DESTDIR)$(bindir)
  
  	install -d $(DESTDIR)$(mandir)/man1
  	install -m 644 docs/man/*.1 $(DESTDIR)$(mandir)/man1
