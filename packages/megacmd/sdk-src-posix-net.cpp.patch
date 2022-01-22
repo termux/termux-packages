@@ -1,0 +1,29 @@
+--- a/sdk/src/posix/net.cpp
++++ b/sdk/src/posix/net.cpp
+@@ -23,7 +23,7 @@
+ #include "mega/posix/meganet.h"
+ #include "mega/logging.h"
+ 
+-#if defined(__ANDROID__) && ARES_VERSION >= 0x010F00
++#if defined(__ANDROID_NO_TERMUX__) && ARES_VERSION >= 0x010F00
+ #include <jni.h>
+ extern JavaVM *MEGAjvm;
+ #endif
+@@ -288,7 +288,7 @@
+         ares_library_init(ARES_LIB_INIT_ALL);
+     }
+ 
+-#if defined(__ANDROID__) && ARES_VERSION >= 0x010F00
++#if defined(__ANDROID_NO_TERMUX__) && ARES_VERSION >= 0x010F00
+     initialize_android();
+ #endif
+ 
+@@ -2852,7 +2852,7 @@
+     return (DNS_CACHE_EXPIRES && (Waiter::ds - ipv6timestamp) >= DNS_CACHE_TIMEOUT_DS);
+ }
+ 
+-#if defined(__ANDROID__) && ARES_VERSION >= 0x010F00
++#if defined(__ANDROID_NO_TERMUX__) && ARES_VERSION >= 0x010F00
+ void CurlHttpIO::initialize_android()
+ {
+     if (!MEGAjvm)
