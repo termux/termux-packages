@@ -1,17 +1,21 @@
 TERMUX_PKG_HOMEPAGE=https://www.openssl.org/
 TERMUX_PKG_DESCRIPTION="Library implementing the SSL and TLS protocols as well as general purpose cryptography functions"
-TERMUX_PKG_LICENSE="Apache-2.0"
+TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.0.1
+TERMUX_PKG_VERSION=1.1.1m
 TERMUX_PKG_SRCURL=https://www.openssl.org/source/openssl-${TERMUX_PKG_VERSION/\~/-}.tar.gz
-TERMUX_PKG_SHA256=c311ad853353bce796edad01a862c50a8a587f62e7e2100ef465ab53ec9b06d1
+TERMUX_PKG_SHA256=f89199be8b23ca45fc7cb9f1d8d3ee67312318286ad030f5316aca6462db6c96
 TERMUX_PKG_DEPENDS="ca-certificates, zlib"
 TERMUX_PKG_CONFFILES="etc/tls/openssl.cnf"
-TERMUX_PKG_RM_AFTER_INSTALL="bin/c_rehash etc/ssl/misc"
+TERMUX_PKG_RM_AFTER_INSTALL="bin/c_rehash etc/"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_CONFLICTS="libcurl (<< 7.61.0-1)"
-TERMUX_PKG_BREAKS="openssl-tool (<< 1.1.1b-1), openssl-dev"
-TERMUX_PKG_REPLACES="openssl-tool (<< 1.1.1b-1), openssl-dev"
+TERMUX_PKG_BREAKS="openssl (<< 1.1.1m)"
+TERMUX_PKG_REPLACES="openssl (<< 1.1.1m)"
+
+termux_step_pre_configure() {
+	test -d $TERMUX_PREFIX/include/openssl && mv $TERMUX_PREFIX/include/openssl{,.tmp} || :
+}
 
 termux_step_configure() {
 	# Certain packages are not safe to build on device because their
@@ -22,18 +26,21 @@ termux_step_configure() {
 
 	CFLAGS+=" -DNO_SYSLOG"
 	if [ $TERMUX_ARCH = arm ]; then
-		ASLAGS+=" -fno-integrated-as"
+		CFLAGS+=" -fno-integrated-as"
 	fi
 
 	perl -p -i -e "s@TERMUX_CFLAGS@$CFLAGS@g" Configure
-	rm -Rf $TERMUX_PREFIX/lib/libcrypto.* $TERMUX_PREFIX/lib/libssl.*
 	test $TERMUX_ARCH = "arm" && TERMUX_OPENSSL_PLATFORM="android-arm"
 	test $TERMUX_ARCH = "aarch64" && TERMUX_OPENSSL_PLATFORM="android-arm64"
 	test $TERMUX_ARCH = "i686" && TERMUX_OPENSSL_PLATFORM="android-x86"
 	test $TERMUX_ARCH = "x86_64" && TERMUX_OPENSSL_PLATFORM="android-x86_64"
+
+	install -m755 -d $TERMUX_PREFIX/lib/openssl-1.1
+
 	./Configure $TERMUX_OPENSSL_PLATFORM \
 		--prefix=$TERMUX_PREFIX \
 		--openssldir=$TERMUX_PREFIX/etc/tls \
+		--libdir=$TERMUX_PREFIX/lib/openssl-1.1 \
 		shared \
 		zlib-dynamic \
 		no-ssl \
@@ -55,8 +62,15 @@ termux_step_make_install() {
 
 	cp apps/openssl.cnf $TERMUX_PREFIX/etc/tls/openssl.cnf
 
-	sed "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
-		$TERMUX_PKG_BUILDER_DIR/add-trusted-certificate \
-		> $TERMUX_PREFIX/bin/add-trusted-certificate
-	chmod 700 $TERMUX_PREFIX/bin/add-trusted-certificate
+	install -m755 -d $TERMUX_PREFIX/include/openssl-1.1
+	mv $TERMUX_PREFIX/include/openssl $TERMUX_PREFIX/include/openssl-1.1/
+	mv $TERMUX_PREFIX/bin/openssl $TERMUX_PREFIX/bin/openssl-1.1
+}
+
+termux_step_post_make_install() {
+	test -d $TERMUX_PREFIX/include/openssl.tmp && mv $TERMUX_PREFIX/include/openssl{.tmp,} || :
+}
+
+termux_step_post_massage() {
+	rm -rf include/openssl
 }
