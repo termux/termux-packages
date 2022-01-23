@@ -9,6 +9,7 @@ TERMUX_PKG_SHA256=c15e750ef7c6df595fb5f2ce10cac0fee2353649600e6919ad08ae8871e494
 TERMUX_PKG_DEPENDS="dbus, glib, libandroid-glob, libcap, libdaemon, libevent, libexpat"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--enable-compat-libdns_sd
 --enable-dbus
 --disable-gdbm
 --disable-gtk3
@@ -23,4 +24,8 @@ ac_cv_func_chroot=no
 termux_step_pre_configure() {
 	autoreconf -fi
 	LDFLAGS+=" -landroid-glob"
+}
+
+termux_step_post_make_install() {
+	ln -sf avahi-compat-libdns_sd/dns_sd.h $TERMUX_PREFIX/include/dns_sd.h
 }
