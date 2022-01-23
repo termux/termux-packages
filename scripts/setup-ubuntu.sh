@@ -108,7 +108,8 @@ PACKAGES+=" composer"
 
 # Needed by package rust.
 PACKAGES+=" libssl-dev" # Needed to build Rust
-PACKAGES+=" clang-10"
+PACKAGES+=" clang-12"
+PACKAGES+=" llvm-12" # rust 1.58.1 requires llvm >= 12
 
 # Needed for package smalltalk.
 PACKAGES+=" libsigsegv-dev"
