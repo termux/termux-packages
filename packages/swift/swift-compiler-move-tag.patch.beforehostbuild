@@ -1,0 +1,87 @@
+diff --git a/swift/lib/IRGen/MetadataRequest.cpp b/swift/lib/IRGen/MetadataRequest.cpp
+index 0a83d8bb6ec..57af3ee003a 100644
+--- a/swift/lib/IRGen/MetadataRequest.cpp
++++ b/swift/lib/IRGen/MetadataRequest.cpp
+@@ -2677,9 +2677,16 @@ emitMetadataAccessByMangledName(IRGenFunction &IGF, CanType type,
+   unsigned mangledStringSize;
+   std::tie(mangledString, mangledStringSize) =
+     IGM.getTypeRef(type, CanGenericSignature(), MangledTypeRefRole::Metadata);
+-  
+-  assert(mangledStringSize < 0x80000000u
+-         && "2GB of mangled name ought to be enough for anyone");
++
++  // Android AArch64 reserves the top byte of the address for memory tagging
++  // since Android 11, so only use the bottom 23 bits to store this size
++  // and the 24th bit to signal that there is a size.
++  if (IGM.Triple.isAndroid() && IGM.Triple.getArch() == llvm::Triple::aarch64)
++    assert(mangledStringSize < 0x00800001u &&
++           "8MB of mangled name ought to be enough for Android AArch64");
++  else
++    assert(mangledStringSize < 0x80000000u &&
++           "2GB of mangled name ought to be enough for anyone");
+   
+   // Get or create the cache variable if necessary.
+   auto cache = IGM.getAddrOfTypeMetadataDemanglingCacheVariable(type,
+@@ -2749,6 +2756,21 @@ emitMetadataAccessByMangledName(IRGenFunction &IGF, CanType type,
+     auto contBB = subIGF.createBasicBlock("");
+     llvm::Value *comparison = subIGF.Builder.CreateICmpSLT(load,
+                                       llvm::ConstantInt::get(IGM.Int64Ty, 0));
++
++    // Check if the 24th bit is set on Android AArch64 and only instantiate the
++    // type metadata if it is, as otherwise it might be negative only because
++    // of the memory tag on Android.
++    if (IGM.Triple.isAndroid() &&
++        IGM.Triple.getArch() == llvm::Triple::aarch64) {
++
++      auto getBitAfterAndroidTag = subIGF.Builder.CreateAnd(
++        load, llvm::ConstantInt::get(IGM.Int64Ty, 0x0080000000000000));
++      auto checkNotAndroidTag = subIGF.Builder.CreateICmpNE(
++        getBitAfterAndroidTag, llvm::ConstantInt::get(IGM.Int64Ty, 0));
++
++      comparison = subIGF.Builder.CreateAnd(comparison, checkNotAndroidTag);
++    }
++
+     comparison = subIGF.Builder.CreateExpect(comparison,
+                                        llvm::ConstantInt::get(IGM.Int1Ty, 0));
+     subIGF.Builder.CreateCondBr(comparison, isUnfilledBB, contBB);
+diff --git a/swift/lib/IRGen/SwiftTargetInfo.cpp b/swift/lib/IRGen/SwiftTargetInfo.cpp
+--- a/swift/lib/IRGen/SwiftTargetInfo.cpp
++++ b/swift/lib/IRGen/SwiftTargetInfo.cpp
+@@ -36,8 +36,12 @@ static void setToMask(SpareBitVector &bits, unsigned size, uint64_t mask) {
+ /// Configures target-specific information for arm64 platforms.
+ static void configureARM64(IRGenModule &IGM, const llvm::Triple &triple,
+                            SwiftTargetInfo &target) {
+-  setToMask(target.PointerSpareBits, 64,
+-            SWIFT_ABI_ARM64_SWIFT_SPARE_BITS_MASK);
++  if (triple.isAndroid())
++    setToMask(target.PointerSpareBits, 64,
++              SWIFT_ABI_ANDROID_ARM64_SWIFT_SPARE_BITS_MASK);
++  else
++    setToMask(target.PointerSpareBits, 64,
++              SWIFT_ABI_ARM64_SWIFT_SPARE_BITS_MASK);
+   setToMask(target.ObjCPointerReservedBits, 64,
+             SWIFT_ABI_ARM64_OBJC_RESERVED_BITS_MASK);
+   setToMask(target.IsObjCPointerBit, 64, SWIFT_ABI_ARM64_IS_OBJC_BIT);
+diff --git a/swift/stdlib/public/SwiftShims/System.h b/swift/stdlib/public/SwiftShims/System.h
+index 8fe54f6bda..a70acfd7be 100644
+--- a/swift/stdlib/public/SwiftShims/System.h
++++ b/swift/stdlib/public/SwiftShims/System.h
+@@ -152,10 +152,18 @@
+ /// Darwin reserves the low 4GB of address space.
+ #define SWIFT_ABI_DARWIN_ARM64_LEAST_VALID_POINTER 0x100000000ULL
+ 
++// Android AArch64 reserves the top byte for pointer tagging since Android 11,
++// so shift this tag to the second byte.
++#define SWIFT_ABI_ANDROID_ARM64_SWIFT_SPARE_BITS_MASK 0x00F0000000000007ULL
++
++#if defined(__ANDROID__) && defined(__aarch64__)
++#define SWIFT_ABI_ARM64_SWIFT_SPARE_BITS_MASK SWIFT_ABI_ANDROID_ARM64_SWIFT_SPARE_BITS_MASK
++#else
+ // TBI guarantees the top byte of pointers is unused, but ARMv8.5-A
+ // claims the bottom four bits of that for memory tagging.
+ // Heap objects are eight-byte aligned.
+ #define SWIFT_ABI_ARM64_SWIFT_SPARE_BITS_MASK 0xF000000000000007ULL
++#endif
+ 
+ // Objective-C reserves just the high bit for tagged pointers.
+ #define SWIFT_ABI_ARM64_OBJC_RESERVED_BITS_MASK 0x8000000000000000ULL

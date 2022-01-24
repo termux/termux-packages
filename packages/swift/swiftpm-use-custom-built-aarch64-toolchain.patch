@@ -1,0 +1,97 @@
+diff --git a/sourcekit-lsp/Utilities/build-script-helper.py b/sourcekit-lsp/Utilities/build-script-helper.py
+--- a/sourcekit-lsp/Utilities/build-script-helper.py
++++ b/sourcekit-lsp/Utilities/build-script-helper.py
+@@ -93,6 +93,10 @@
+ 
+ def handle_invocation(swift_exec, args):
+   swiftpm_args = get_swiftpm_options(args)
++  if args.cross_compile_host and re.match('android-aarch64', args.cross_compile_host):
++    swiftpm_exec = os.path.join(os.path.realpath(os.getenv("SWIFT_BINDIR")), "swift")
++  else:
++    swiftpm_exec = swift_exec
+ 
+   env = os.environ
+   # Set the toolchain used in tests at runtime
+@@ -120,7 +124,7 @@
+   env['SWIFT_EXEC'] = '%sc' % (swift_exec)
+ 
+   if args.action == 'build':
+-    swiftpm('build', swift_exec, swiftpm_args, env)
++    swiftpm('build', swiftpm_exec, swiftpm_args, env)
+   elif args.action == 'test':
+     if not args.skip_long_tests:
+       env['SOURCEKIT_LSP_ENABLE_LONG_TESTS'] = '1'
+@@ -135,9 +139,9 @@
+     test_args += ['--parallel']
+     swiftpm('test', swift_exec, test_args, env)
+   elif args.action == 'install':
+-    bin_path = swiftpm_bin_path(swift_exec, swiftpm_args, env)
++    bin_path = swiftpm_bin_path(swiftpm_exec, swiftpm_args, env)
+     swiftpm_args += ['-Xswiftc', '-no-toolchain-stdlib-rpath']
+-    swiftpm('build', swift_exec, swiftpm_args, env)
++    swiftpm('build', swiftpm_exec, swiftpm_args, env)
+     install(bin_path, args.install_prefixes if not None else [args.toolchain], args.toolchain)
+   else:
+     assert False, 'unknown action \'{}\''.format(args.action)
+diff --git a/swift-driver/Utilities/build-script-helper.py b/swift-driver/Utilities/build-script-helper.py
+--- a/swift-driver/Utilities/build-script-helper.py
++++ b/swift-driver/Utilities/build-script-helper.py
+@@ -166,6 +167,10 @@
+   toolchain_bin = os.path.join(args.toolchain, 'bin')
+   swift_exec = os.path.join(toolchain_bin, 'swift')
+   swiftc_exec = os.path.join(toolchain_bin, 'swiftc')
++  if args.cross_compile_hosts and re.match('android-aarch64', args.cross_compile_hosts[0]):
++    swiftpm_exec = os.path.join(os.path.realpath(os.getenv("SWIFT_BINDIR")), "swift")
++  else:
++    swiftpm_exec = swift_exec
+ 
+   # Platform-specific targets for which we must build swift-driver
+   if args.cross_compile_hosts:
+@@ -190,7 +194,7 @@
+ 
+   if args.action == 'build':
+     if args.cross_compile_hosts and not re.match('-macosx', args.cross_compile_hosts[0]):
+-      swiftpm('build', swift_exec, swiftpm_args, env)
++      swiftpm('build', swiftpm_exec, swiftpm_args, env)
+     else:
+       build_using_cmake(args, toolchain_bin, args.build_path, targets)
+ 
+@@ -216,8 +220,8 @@
+       build_using_cmake(args, toolchain_bin, args.build_path, targets)
+       install(args, args.build_path, targets)
+     else:
+-      bin_path = swiftpm_bin_path(swift_exec, swiftpm_args, env)
+-      swiftpm('build', swift_exec, swiftpm_args, env)
++      bin_path = swiftpm_bin_path(swiftpm_exec, swiftpm_args, env)
++      swiftpm('build', swiftpm_exec, swiftpm_args, env)
+       non_darwin_install(args, bin_path)
+   else:
+     assert False, 'unknown action \'{}\''.format(args.action)
+diff --git a/swiftpm/Utilities/bootstrap b/swiftpm/Utilities/bootstrap
+index 6ae084e9..379d1738 100755
+--- a/swiftpm/Utilities/bootstrap
++++ b/swiftpm/Utilities/bootstrap
+@@ -211,8 +211,9 @@ def parse_build_args(args):
+     args.bootstrap_dir = os.path.join(args.target_dir, "bootstrap")
+     args.conf = 'release' if args.release else 'debug'
+     args.bin_dir = os.path.join(args.target_dir, args.conf)
+-    args.bootstrap = not args.skip_cmake_bootstrap or \
+-                     not os.path.exists(os.path.join(os.path.split(args.swiftc_path)[0], "swift-build"))
++    args.bootstrap = not args.skip_cmake_bootstrap or \
++                    (not (args.cross_compile_hosts and re.match('android-aarch64', args.cross_compile_hosts)) and \
++                     not os.path.exists(os.path.join(os.path.split(args.swiftc_path)[0], "swift-build")))
+ 
+ def parse_test_args(args):
+     """Parses and cleans arguments necessary for the test action."""
+@@ -622,7 +623,10 @@ def build_swiftpm_with_swiftpm(args, integrated_swift_driver):
+         swiftpm_args.append(os.path.join(args.bootstrap_dir, "bin/swift-build"))
+     else:
+         note("Building SwiftPM (with a prebuilt swift-build)")
+-        swiftpm_args.append(os.path.join(os.path.split(args.swiftc_path)[0], "swift-build"))
++        if args.cross_compile_hosts and re.match('android-aarch64', args.cross_compile_hosts):
++            swiftpm_args.append(os.path.join(os.path.realpath(os.getenv("SWIFT_BINDIR")), "swift-build"))
++        else:
++            swiftpm_args.append(os.path.join(os.path.split(args.swiftc_path)[0], "swift-build"))
+ 
+     swiftpm_args.append("--disable-sandbox")
+ 
