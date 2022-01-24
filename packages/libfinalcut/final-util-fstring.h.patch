@@ -1,0 +1,18 @@
+--- a/final/util/fstring.h
++++ b/final/util/fstring.h
+@@ -227,9 +227,15 @@
+     FString& setNumber (lDouble, int = getPrecision<lDouble>());
+ 
+     template <typename NumT>
++#ifndef __ANDROID__
+     FString& setFormatedNumber (NumT, char = nl_langinfo(THOUSEP)[0]);
+     FString& setFormatedNumber (sInt64, char = nl_langinfo(THOUSEP)[0]);
+     FString& setFormatedNumber (uInt64, char = nl_langinfo(THOUSEP)[0]);
++#else
++    FString& setFormatedNumber (NumT, char = '\0');
++    FString& setFormatedNumber (sInt64, char = '\0');
++    FString& setFormatedNumber (uInt64, char = '\0');
++#endif
+ 
+     const FString& insert (const FString&, int);
+     const FString& insert (const FString&, std::size_t);

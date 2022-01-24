@@ -1,0 +1,37 @@
+--- a/final/output/tty/ftermlinux.h
++++ b/final/output/tty/ftermlinux.h
+@@ -45,12 +45,16 @@
+     #endif
+   #endif
+ 
++  #ifndef __ANDROID__
+   #if defined(__x86_64__) || defined(__i386) || defined(ARM_ISA_SYSCTL)
+     #define ISA_SYSCTL_SUPPORT
+     #include <sys/io.h>
+   #endif  // defined(__x86_64__) || defined(__i386) || defined(ARM_ISA_SYSCTL)
+ 
+   #include <sys/kd.h>
++  #else /* __ANDROID__ */
++  #include <linux/kd.h>
++  #endif
+ #endif  // defined(__linux__)
+ 
+ #include <sys/ioctl.h>
+@@ -237,13 +241,17 @@
+ #if defined(__linux__)
+     bool                 vga_font{};
+     bool                 new_font{};
++#ifndef __ANDROID__
+     bool                 has_saved_palette{};
++#endif
+     int                  framebuffer_bpp{-1};
+     CursorStyle          linux_console_cursor_style{};
+     console_font_op      screen_font{};
+     unimapdesc           screen_unicode_map{};
++#ifndef __ANDROID__
+     ColorMap             saved_color_map{};
+     ColorMap             cmap{};
++#endif
+     KeyMap               key_map{};
+     ModifierKey          mod_key{};
+ #endif  // defined(__linux__)
