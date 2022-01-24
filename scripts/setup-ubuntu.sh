@@ -112,9 +112,6 @@ PACKAGES+=" llvm-12-dev"
 PACKAGES+=" llvm-12-tools"
 PACKAGES+=" clang-12"
 
-# Formerly needed by package rust. Not sure if needed by other packages.
-PACKAGES+=" clang-10"
-
 # Needed for package smalltalk.
 PACKAGES+=" libsigsegv-dev"
 PACKAGES+=" zip"
@@ -130,6 +127,7 @@ PACKAGES+=" zlib1g-dev:i386"
 
 # For swift.
 PACKAGES+=" lld"
+PACKAGES+=" patchelf"
 
 # Needed by wrk.
 PACKAGES+=" luajit"
