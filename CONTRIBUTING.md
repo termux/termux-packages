@@ -249,13 +249,13 @@ request with new package. Pay attention to things listed below.
    These paths do not exist in Termux and have been replaced by prefixed
    equivalents. Termux installation prefix is
    ```
-   /data/data/com.termux/files/usr
+   /data/data/com.rmux/files/usr
    ```
    and can be considered as virtual rootfs.
 
    Home directory is stored outside of prefix:
    ```
-   /data/data/com.termux/files/home
+   /data/data/com.rmux/files/home
    ```
 
    Don't hardcode home and prefix, use shortcuts `@TERMUX_HOME@` and
