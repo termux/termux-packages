@@ -1,0 +1,14 @@
+--- ./services.cc.orig	2022-01-26 14:02:23.951928988 +0530
++++ ./services.cc	2022-01-26 14:03:01.921928973 +0530
+@@ -133,9 +133,9 @@
+   ratio_format = 0;
+ 
+   if (nmap_fetchfile(filename, sizeof(filename), "nmap-services") != 1) {
+-    error("Unable to find nmap-services!  Resorting to /etc/services");
++    error("Unable to find nmap-services!  Resorting to @TERMUX_PREFIX@/etc/services");
+ #ifndef WIN32
+-    strcpy(filename, "/etc/services");
++    strcpy(filename, "@TERMUX_PREFIX@/etc/services");
+ #else
+     int len = GetSystemDirectory(filename, 480);	//	be safe
+     if(!len)
