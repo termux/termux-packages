@@ -1,0 +1,22 @@
+--- ./ncat/ncat_main.c.orig	2022-01-26 14:12:51.857352439 +0530
++++ ./ncat/ncat_main.c	2022-01-26 14:12:54.947352437 +0530
+@@ -588,7 +588,7 @@
+ "      --vsock                Use vsock sockets only\n"
+ #endif
+ "  -C, --crlf                 Use CRLF for EOL sequence\n"
+-"  -c, --sh-exec <command>    Executes the given command via /bin/sh\n"
++"  -c, --sh-exec <command>    Executes the given command via @TERMUX_PREFIX@/bin/sh\n"
+ "  -e, --exec <command>       Executes the given command\n"
+ #ifdef HAVE_LUA
+ "      --lua-exec <filename>  Executes the given Lua script\n"
+@@ -1043,8 +1043,8 @@
+ 
+ #ifndef WIN32
+     /* See if the shell is executable before we get deep into this */
+-    if (o.execmode == EXEC_SHELL && access("/bin/sh", X_OK) == -1)
+-        bye("/bin/sh is not executable, so `-c' won't work.");
++    if (o.execmode == EXEC_SHELL && access("@TERMUX_PREFIX@/bin/sh", X_OK) == -1)
++        bye("@TERMUX_PREFIX@/bin/sh is not executable, so `-c' won't work.");
+ #endif
+ 
+     if (targetaddrs->addr.storage.ss_family != AF_UNSPEC) {
