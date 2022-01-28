@@ -1,0 +1,11 @@
+--- a/tools/db_bench_tool.cc
++++ b/tools/db_bench_tool.cc
+@@ -6442,7 +6442,7 @@
+       // Pick a Iterator to use
+       size_t db_idx_to_use =
+           (db_.db == nullptr)
+-              ? (size_t{thread->rand.Next()} % multi_dbs_.size())
++              ? (size_t{static_cast<size_t>(thread->rand.Next())} % multi_dbs_.size())
+               : 0;
+       std::unique_ptr<Iterator> single_iter;
+       Iterator* iter_to_use;
