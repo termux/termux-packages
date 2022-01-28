@@ -1,0 +1,13 @@
+--- a/utilities/transactions/lock/range/range_tree/lib/portability/toku_time.h
++++ b/utilities/transactions/lock/range/range_tree/lib/portability/toku_time.h
+@@ -131,6 +131,10 @@
+   uint64_t result;
+   __asm __volatile__("mrs %[rt], cntvct_el0" : [ rt ] "=r"(result));
+   return result;
++#elif defined(__arm__)
++  uint32_t lo, hi;
++  __asm__ __volatile__("mrrc p15, 1, %0, %1, c14" : "=r"(lo), "=r"(hi));
++  return (uint64_t)hi << 32 | lo;
+ #elif defined(__powerpc__)
+   return __ppc_get_timebase();
+ #elif defined(__s390x__)
