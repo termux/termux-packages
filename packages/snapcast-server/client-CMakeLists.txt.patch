@@ -1,0 +1,29 @@
+--- a/client/CMakeLists.txt
++++ b/client/CMakeLists.txt
+@@ -33,7 +33,7 @@
+ elseif (WIN32)
+     list(APPEND CLIENT_SOURCES player/wasapi_player.cpp)
+     list(APPEND CLIENT_LIBRARIES wsock32 ws2_32 avrt ksuser iphlpapi)
+-elseif(NOT ANDROID)
++elseif(TRUE)
+     # Avahi
+     if (AVAHI_FOUND)
+         list(APPEND CLIENT_SOURCES browseZeroConf/browse_avahi.cpp)
+@@ -55,7 +55,7 @@
+     endif (PULSE_FOUND)
+ endif (MACOSX)
+ 
+-if (ANDROID)
++if (FALSE)
+     list(APPEND CLIENT_LIBRARIES oboe::oboe)
+     list(APPEND CLIENT_LIBRARIES boost::boost)
+     list(APPEND CLIENT_LIBRARIES flac::flac)
+@@ -100,7 +100,7 @@
+ endif()
+ 
+ include_directories(${CLIENT_INCLUDE})
+-if (ANDROID)
++if (FALSE)
+     add_executable(libsnapclient.so ${CLIENT_SOURCES})
+     target_link_libraries(libsnapclient.so ${CLIENT_LIBRARIES} log OpenSLES)
+ else()
