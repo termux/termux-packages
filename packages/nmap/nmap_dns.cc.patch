@@ -1,0 +1,23 @@
+--- ./nmap_dns.cc.orig	2022-01-26 13:52:53.711929205 +0530
++++ ./nmap_dns.cc	2022-01-26 13:54:22.651929171 +0530
+@@ -948,9 +948,9 @@
+   char fmt[32];
+   char ipaddr[INET6_ADDRSTRLEN+1];
+ 
+-  fp = fopen("/etc/resolv.conf", "r");
++  fp = fopen("@TERMUX_PREFIX@/etc/resolv.conf", "r");
+   if (fp == NULL) {
+-    if (firstrun) gh_perror("mass_dns: warning: Unable to open /etc/resolv.conf. Try using --system-dns or specify valid servers with --dns-servers");
++    if (firstrun) gh_perror("mass_dns: warning: Unable to open @TERMUX_PREFIX@/etc/resolv.conf. Try using --system-dns or specify valid servers with --dns-servers");
+     return;
+   }
+ 
+@@ -1031,7 +1031,7 @@
+   parse_etchosts(tpbuf);
+ 
+ #else
+-  parse_etchosts("/etc/hosts");
++  parse_etchosts("@TERMUX_PREFIX@/etc/hosts");
+ #endif // WIN32
+ }
+ 
