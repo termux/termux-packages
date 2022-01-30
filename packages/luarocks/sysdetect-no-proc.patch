@@ -1,9 +1,12 @@
---- ./src/luarocks/core/sysdetect.lua~	2019-06-06 21:46:21.000000000 +0200
-+++ ./src/luarocks/core/sysdetect.lua	2022-01-30 15:04:29.507292068 +0100
-@@ -139,59 +139,7 @@
-    local system = e_osabi[hdr.osabi]
-    local endian = hdr.endian
-    
+--- ./src/luarocks/core/sysdetect.lua.orig	2022-01-30 15:20:11.835200454 +0100
++++ ./src/luarocks/core/sysdetect.lua	2022-01-30 15:21:17.085262684 +0100
+@@ -136,62 +136,7 @@
+ end
+ 
+ local function detect_elf_system(fd, hdr, sections)
+-   local system = e_osabi[hdr.osabi]
+-   local endian = hdr.endian
+-
 -   if system == "sysv" then
 -      local abitag = sections[".note.ABI-tag"]
 -      if abitag then
@@ -19,7 +22,7 @@
 -      elseif sections[".note.openbsd.ident"] then
 -         return "openbsd"
 -      end
--      
+-
 -      local gnu_version_r = sections[".gnu.version_r"]
 -      if gnu_version_r then
 -
@@ -35,7 +38,7 @@
 -
 -            fd:seek("set", dynstr + vn_file)
 -            local libname = fd:read(64):gsub("%z.*", "")
--            
+-
 -            if hdr.e_type == 0x03 and libname == "libroot.so" then
 -               return "haiku"
 -            elseif libname:match("linux") then
@@ -55,7 +58,7 @@
 -         end
 -      end
 -   end
--   
+-
 -   return system
 +   return "linux"
  end
