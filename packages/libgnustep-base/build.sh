@@ -39,14 +39,14 @@ ac_cv_func_setpgrp_void=yes
 termux_step_pre_configure() {
 	local bin="$TERMUX_PKG_BUILDDIR/bin"
 	mkdir -p "$bin"
-	local sh="$(which sh)"
+	local sh="$(command -v sh)"
 	for cmd in CPP CC CXX; do
 		local wrapper="$bin/$(basename $(eval echo \${$cmd}))"
 		cat > "$wrapper" <<-EOF
 			#!${sh}
 			unset LD_PRELOAD
 			unset LD_LIBRARY_PATH
-			exec $(which $(eval echo \${$cmd})) "\$@"
+			exec $(command -v $(eval echo \${$cmd})) "\$@"
 		EOF
 		chmod 0700 "$wrapper"
 	done

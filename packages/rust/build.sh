@@ -23,8 +23,8 @@ termux_step_configure() {
 	rustup install $BOOTSTRAP_VERSION
 	rustup default $BOOTSTRAP_VERSION-x86_64-unknown-linux-gnu
 	export PATH=$HOME/.rustup/toolchains/$BOOTSTRAP_VERSION-x86_64-unknown-linux-gnu/bin:$PATH
-	local RUSTC=$(which rustc)
-	local CARGO=$(which cargo)
+	local RUSTC=$(command -v rustc)
+	local CARGO=$(command -v cargo)
 
 	sed "s%\\@TERMUX_PREFIX\\@%$TERMUX_PREFIX%g" \
 		$TERMUX_PKG_BUILDER_DIR/config.toml \

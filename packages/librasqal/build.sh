@@ -11,7 +11,7 @@ TERMUX_PKG_BUILD_DEPENDS="libxml2"
 
 termux_step_pre_configure() {
 	local bin="$TERMUX_PKG_BUILDDIR/bin"
-	local sh="$(which sh)"
+	local sh="$(command -v sh)"
 	mkdir -p "$bin"
 	for p in pcre xml2; do
 		local conf="$bin/${p}-config"

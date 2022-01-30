@@ -30,9 +30,9 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DENABLE_SPELL=OFF
 -DENABLE_TESTS=OFF
 -DSTRICT=ON
--DMSGFMT_EXECUTABLE=$(which msgfmt)
--DMSGMERGE_EXECUTABLE=$(which msgmerge)
--DXGETTEXT_EXECUTABLE=$(which xgettext)
+-DMSGFMT_EXECUTABLE=$(command -v msgfmt)
+-DMSGMERGE_EXECUTABLE=$(command -v msgmerge)
+-DXGETTEXT_EXECUTABLE=$(command -v xgettext)
 "
 
 termux_step_pre_configure() {

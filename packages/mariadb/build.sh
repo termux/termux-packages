@@ -12,11 +12,11 @@ TERMUX_PKG_REPLACES="mariadb-dev"
 TERMUX_PKG_SERVICE_SCRIPT=("mysqld" "exec mysqld --basedir=$TERMUX_PREFIX --datadir=$TERMUX_PREFIX/var/lib/mysql 2>&1")
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
--DBISON_EXECUTABLE=$(which bison)
--DGETCONF=$(which getconf)
+-DBISON_EXECUTABLE=$(command -v bison)
+-DGETCONF=$(command -v getconf)
 -DBUILD_CONFIG=mysql_release
--DCAT_EXECUTABLE=$(which cat)
--DGIT_EXECUTABLE=$(which git)
+-DCAT_EXECUTABLE=$(command -v cat)
+-DGIT_EXECUTABLE=$(command -v git)
 -DGSSAPI_FOUND=NO
 -DGRN_WITH_LZ4=yes
 -DENABLED_LOCAL_INFILE=ON

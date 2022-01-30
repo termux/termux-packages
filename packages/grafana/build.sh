@@ -16,7 +16,7 @@ termux_step_pre_configure() {
 	mv build $bin/_build
 	local goexec=$bin/go_$(go env GOOS)_$(go env GOARCH)_exec
 	cat > $goexec <<-EOF
-		#!$(which sh)
+		#!$(command -v sh)
 		shift
 		exec $bin/_build -goos=$GOOS -goarch=$GOARCH "\$@"
 		EOF
@@ -24,7 +24,7 @@ termux_step_pre_configure() {
 
 	local yarn=$bin/yarn
 	cat > $yarn <<-EOF
-		#!$(which sh)
+		#!$(command -v sh)
 		exec sh $TERMUX_PREFIX/bin/yarn "\$@"
 		EOF
 	chmod 0755 $yarn
