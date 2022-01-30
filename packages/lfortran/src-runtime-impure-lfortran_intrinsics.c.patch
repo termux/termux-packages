@@ -1,0 +1,18 @@
+--- a/src/runtime/impure/lfortran_intrinsics.c
++++ b/src/runtime/impure/lfortran_intrinsics.c
+@@ -5,6 +5,15 @@
+ #include <complex.h>
+ #include <string.h>
+ 
++#if defined __ANDROID__ && __ANDROID_API__ < 26
++#include "s_clog.c"
++#undef MANT_DIG
++#undef MAX_EXP
++#undef MIN_EXP
++#include "s_clogf.c"
++#include "s_cpowf.c"
++#endif
++
+ struct _lfortran_complex {
+     float re, im;
+ };

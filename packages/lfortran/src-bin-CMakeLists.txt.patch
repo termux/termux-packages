@@ -1,0 +1,29 @@
+--- a/src/bin/CMakeLists.txt
++++ b/src/bin/CMakeLists.txt
+@@ -1,7 +1,7 @@
+ add_executable(lfortran lfortran.cpp)
+ target_include_directories(lfortran PRIVATE "tpl")
+ target_link_libraries(lfortran lfortran_lib)
+-if (UNIX AND NOT APPLE)
++if (FALSE)
+     # This is sometimes needed to fix link errors for CLI11
+     target_link_libraries(lfortran stdc++fs)
+ endif()
+@@ -42,7 +42,7 @@
+     macro(LFORTRAN_COMPILE_RUNTIME name dir)
+         add_custom_command(
+             OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/../runtime/${name}.mod
+-            COMMAND ${CMAKE_CURRENT_BINARY_DIR}/lfortran
++            COMMAND lfortran
+             ARGS --backend=cpp -c ${CMAKE_CURRENT_SOURCE_DIR}/../runtime/${dir}/${name}.f90 -o ${name}.o
+             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/../runtime
+             DEPENDS lfortran ${CMAKE_CURRENT_SOURCE_DIR}/../runtime/${dir}/${name}.f90 ${ARGN}
+@@ -134,7 +134,7 @@
+ 
+ add_executable(cpptranslate cpptranslate.cpp)
+ target_link_libraries(cpptranslate lfortran_lib)
+-if (UNIX AND NOT APPLE)
++if (FALSE)
+     # This is sometimes needed to fix link errors for CLI11
+     target_link_libraries(cpptranslate stdc++fs)
+ endif()
