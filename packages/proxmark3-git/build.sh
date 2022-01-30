@@ -6,7 +6,7 @@ _COMMIT=2d1a1dc03489aef4f03d0be5b789680f40921bc3
 TERMUX_PKG_VERSION="2022.01.05-${_COMMIT:0:8}"
 TERMUX_PKG_SRCURL="https://github.com/RfidResearchGroup/proxmark3/archive/2d1a1dc03489aef4f03d0be5b789680f40921bc3.tar.gz"
 TERMUX_PKG_SHA256="1c9c87b719d430d604654bfeda86eac7614aa223f19a35ff99860c05a0d73bb7"
-TERMUX_PKG_DEPENDS="libbz2, libc++, readline"
+TERMUX_PKG_DEPENDS="libbz2, libc++, readline, binutils"
 TERMUX_PKG_BUILD_IN_SRC="true"
 TERMUX_PKG_BLACKLISTED_ARCHES="i686, x86_64"
 
