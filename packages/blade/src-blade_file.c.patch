@@ -1,0 +1,18 @@
+--- a/src/blade_file.c
++++ b/src/blade_file.c
+@@ -23,6 +23,15 @@
+ #endif /* ifdef HAVE_SYS_TIME_H */
+ #include <time.h>
+ 
++#ifdef __ANDROID__
++#undef st_atimespec
++#define st_atimespec st_atim
++#undef st_mtimespec
++#define st_mtimespec st_mtim
++#undef st_ctimespec
++#define st_ctimespec st_ctim
++#endif
++
+ #ifdef _WIN32
+ 
+ /* Symbolic links aren't really a 'thing' on Windows, so just use plain-old

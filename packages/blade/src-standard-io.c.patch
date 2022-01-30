@@ -1,0 +1,28 @@
+--- a/src/standard/io.c
++++ b/src/standard/io.c
+@@ -54,8 +54,10 @@
+   dict_add_entry(vm, dict, NUMBER_VAL(1), NUMBER_VAL(raw_attr.c_oflag));
+   dict_add_entry(vm, dict, NUMBER_VAL(2), NUMBER_VAL(raw_attr.c_cflag));
+   dict_add_entry(vm, dict, NUMBER_VAL(3), NUMBER_VAL(raw_attr.c_lflag));
++#ifndef __ANDROID__
+   dict_add_entry(vm, dict, NUMBER_VAL(4), NUMBER_VAL(raw_attr.c_ispeed));
+   dict_add_entry(vm, dict, NUMBER_VAL(5), NUMBER_VAL(raw_attr.c_ospeed));
++#endif
+ 
+   RETURN_OBJ(dict);
+ #else
+@@ -125,12 +127,14 @@
+   if (dict_get_entry(dict, NUMBER_VAL(3), &iflag)) {
+     raw.c_lflag = (long) AS_NUMBER(lflag);
+   }
++#ifndef __ANDROID__
+   if (dict_get_entry(dict, NUMBER_VAL(4), &iflag)) {
+     raw.c_ispeed = (long) AS_NUMBER(ispeed);
+   }
+   if (dict_get_entry(dict, NUMBER_VAL(5), &iflag)) {
+     raw.c_ospeed = (long) AS_NUMBER(ospeed);
+   }
++#endif
+ 
+   set_attr_was_called = true;
+ 
