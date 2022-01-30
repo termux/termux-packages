@@ -1,0 +1,12 @@
+--- a/core/src/Kokkos_Macros.hpp
++++ b/core/src/Kokkos_Macros.hpp
+@@ -576,7 +576,9 @@
+ #if (defined(KOKKOS_COMPILER_GNU) || defined(KOKKOS_COMPILER_CLANG) ||  \
+      defined(KOKKOS_COMPILER_INTEL) || defined(KOKKOS_COMPILER_PGI)) && \
+     !defined(_WIN32)
++#if !defined __ANDROID__ || __ANDROID_API__ >= 33
+ #define KOKKOS_IMPL_ENABLE_STACKTRACE
++#endif
+ #define KOKKOS_IMPL_ENABLE_CXXABI
+ #endif
+ 
