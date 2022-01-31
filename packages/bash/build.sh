@@ -57,7 +57,7 @@ termux_step_pre_configure() {
 	for PATCH_NUM in $(seq -f '%03g' ${_PATCH_VERSION}); do
 		PATCHFILE=$TERMUX_PKG_CACHEDIR/bash_patch_${PATCH_NUM}.patch
 		termux_download \
-			"https://mirrors.kernel.org/gnu/bash/bash-${_MAIN_VERSION}.${_PATCH_VERSION}-patches/bash${_MAIN_VERSION/./}-$PATCH_NUM" \
+			"https://mirrors.kernel.org/gnu/bash/bash-${_MAIN_VERSION}.${_PATCH_VERSION}-patches/bash${_MAIN_VERSION/./}-0${_PATCH_VERSION}" \
 			$PATCHFILE \
 			${PATCH_CHECKSUMS[$PATCH_NUM]}
 		patch -p0 -i $PATCHFILE
