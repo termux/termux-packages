@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://emscripten.org
 TERMUX_PKG_DESCRIPTION="Emscripten: An LLVM-to-WebAssembly Compiler"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@truboxl"
-TERMUX_PKG_VERSION=3.1.1
+TERMUX_PKG_VERSION=3.1.2
 TERMUX_PKG_SRCURL=https://github.com/emscripten-core/emscripten.git
 TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
@@ -61,13 +61,13 @@ opt/emscripten/LICENSE
 
 # https://github.com/emscripten-core/emscripten/issues/11362
 # can switch to stable LLVM to save space once above is fixed
-LLVM_COMMIT=50fb44eebb0397f9b5f45a44239d6b53faf07c3b
-LLVM_TGZ_SHA256=9b1488782a936861e345335c770b11d074af61d604cab8cc06b66227f3f5ffa2
+LLVM_COMMIT=782c0dd1a1c235afb09a34e7da4a1267ead14765
+LLVM_TGZ_SHA256=241f12c4275c77a4300095f8a65cf05b781b2dc88c171385dc87f61648b0a610
 
 # https://github.com/emscripten-core/emscripten/issues/12252
 # upstream says better bundle the right binaryen revision for now
-BINARYEN_COMMIT=1ef8f1f2c3fcecc6906e8fd40184f3e81b2d1838
-BINARYEN_TGZ_SHA256=d6dc0aa3c65e6a2a6f5230f45067749d3ca688c5a4b01dfd8f595efde1971c6b
+BINARYEN_COMMIT=c918679ec50d4a404bd06244e79691651bdee95b
+BINARYEN_TGZ_SHA256=434cfcfe7c40853b4f4134de34596eed2d986c263d8cea345fcb74d2dc428485
 
 # https://github.com/emscripten-core/emsdk/blob/main/emsdk.py
 # https://chromium.googlesource.com/emscripten-releases/+/refs/heads/main/src/build.py
