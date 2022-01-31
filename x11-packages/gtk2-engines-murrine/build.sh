@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://download.gnome.org/sources/murrine/
 TERMUX_PKG_DESCRIPTION="Gtk +-2.0 theme engine based on cairo"
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_MAINTAINER="Yisus7u7 <jesuspixel5@gmail.com>"
+TERMUX_PKG_MAINTAINER="Yisus7u7 <yisus7u7v@gmail.com>"
 TERMUX_PKG_VERSION=0.98.2
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=http://deb.debian.org/debian/pool/main/g/gtk2-engines-murrine/gtk2-engines-murrine_${TERMUX_PKG_VERSION}.orig.tar.xz

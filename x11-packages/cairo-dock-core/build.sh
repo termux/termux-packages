@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://glx-dock.org/
 TERMUX_PKG_DESCRIPTION="Cairo-Dock is a simple and avanzed dock for linux desktop."
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_MAINTAINER="Yisus7u7 <jesuspixel5@gmail.com>"
+TERMUX_PKG_MAINTAINER="Yisus7u7 <yisus7u7v@gmail.com>"
 TERMUX_PKG_VERSION=3.4.1
 _COMMIT=6c569e67a2a366e7634224a0133ede51755629cb
 TERMUX_PKG_REVISION=3

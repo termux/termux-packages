@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://docs.xfce.org/xfce/thunar/archive
 TERMUX_PKG_DESCRIPTION="This plugin allows one to extract and create archive from inside the Thunar file manager."
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Yisus7u7 <jesuspixel5@gmail.com>"
+TERMUX_PKG_MAINTAINER="Yisus7u7 <yisus7u7v@gmail.com>"
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_VERSION=0.4.0
 TERMUX_PKG_SRCURL=http://deb.debian.org/debian/pool/main/t/thunar-archive-plugin/thunar-archive-plugin_${TERMUX_PKG_VERSION}.orig.tar.bz2

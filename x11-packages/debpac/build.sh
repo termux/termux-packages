@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/ThiBsc/debpac
 TERMUX_PKG_DESCRIPTION="A Debian package creator assistant"
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_MAINTAINER="Yisus7u7 <jesuspixel5@gmail.com>"
+TERMUX_PKG_MAINTAINER="Yisus7u7 <yisus7u7v@gmail.com>"
 TERMUX_PKG_VERSION=1.7
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/ThiBsc/debpac/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"

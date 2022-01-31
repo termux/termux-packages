@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://docs.xfce.org/panel-plugins/xfce4-eyes-plugin/start
 TERMUX_PKG_DESCRIPTION="This plugin adds eyes to the Xfce panel which follow your cursor, similar to the xeyes program."
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Yisus7u7 <jesuspixel5@gmail.com>"
+TERMUX_PKG_MAINTAINER="Yisus7u7 <yisus7u7v@gmail.com>"
 TERMUX_PKG_VERSION=4.5.1
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://archive.xfce.org/src/panel-plugins/xfce4-eyes-plugin/4.5/xfce4-eyes-plugin-${TERMUX_PKG_VERSION}.tar.bz2

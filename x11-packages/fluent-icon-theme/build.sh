@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/vinceliuice/Fluent-icon-theme
 TERMUX_PKG_DESCRIPTION="Fluent icon theme for linux desktops"
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_MAINTAINER="@Yisus7u7 <jesuspixel5@gmail.com>"
+TERMUX_PKG_MAINTAINER="@Yisus7u7 <yisus7u7v@gmail.com>"
 TERMUX_PKG_VERSION=2021.10.07
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/vinceliuice/Fluent-icon-theme/archive/${TERMUX_PKG_VERSION//./-}.tar.gz

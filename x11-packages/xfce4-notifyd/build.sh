@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://docs.xfce.org/apps/notifyd/start
 TERMUX_PKG_DESCRIPTION="simple, visually-appealing notification daemon for Xfce"
 TERMUX_PKG_LICENSE="LGPL-2.1"
-TERMUX_PKG_MAINTAINER="Yisus7u7 <jesuspixel5@gmail.com>"
+TERMUX_PKG_MAINTAINER="Yisus7u7 <yisus7u7v@gmail.com>"
 TERMUX_PKG_VERSION=0.6.2
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL="http://deb.debian.org/debian/pool/main/x/xfce4-notifyd/xfce4-notifyd_${TERMUX_PKG_VERSION}.orig.tar.bz2"

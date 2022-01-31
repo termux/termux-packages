@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://wkhtmltopdf.org/
 TERMUX_PKG_DESCRIPTION="wkhtmltopdf and wkhtmltoimage are command line tools to render HTML into PDF and various image formats using the QT Webkit rendering engine."
 TERMUX_PKG_LICENSE="LGPL-3.0"
-TERMUX_PKG_MAINTAINER="Yisus7u7 <jesuspixel5@gmail.com>"
+TERMUX_PKG_MAINTAINER="Yisus7u7 <yisus7u7v@gmail.com>"
 TERMUX_PKG_VERSION=0.12.6
 TERMUX_PKG_SRCURL=https://github.com/wkhtmltopdf/wkhtmltopdf/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=adcced78492e7366d940c66a1327a85d3ae8c45190f486f545fdaa84cac662f0

@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://docs.xfce.org/apps/screenshooter/start
 TERMUX_PKG_DESCRIPTION="The Xfce4-screenshooter is an application that can be used to take snapshots of your desktop screen."
 TERMUX_PKG_LICENSE="LGPL-2.1"
-TERMUX_PKG_MAINTAINER="Yisus7u7 <jesuspixel5@gmail.com>"
+TERMUX_PKG_MAINTAINER="Yisus7u7 <yisus7u7v@gmail.com>"
 TERMUX_PKG_VERSION=1.9.9
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://archive.xfce.org/src/apps/xfce4-screenshooter/1.9/xfce4-screenshooter-${TERMUX_PKG_VERSION}.tar.bz2
