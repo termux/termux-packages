@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://point-at-infinity.org/seccure/
 TERMUX_PKG_DESCRIPTION="SECCURE Elliptic Curve Crypto Utility for Reliable Encryption"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.5
 TERMUX_PKG_REVISION=7
 TERMUX_PKG_SRCURL=http://point-at-infinity.org/seccure/seccure-$TERMUX_PKG_VERSION.tar.gz

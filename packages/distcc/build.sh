@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://distcc.org/
 TERMUX_PKG_DESCRIPTION="Distributed C/C++ compiler."
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.4
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/distcc/distcc/releases/download/v$TERMUX_PKG_VERSION/distcc-$TERMUX_PKG_VERSION.tar.gz

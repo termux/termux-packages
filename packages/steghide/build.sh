@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://steghide.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="Embeds a message in a file by replacing some of the least significant bits"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.5.1
 TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/steghide/steghide-$TERMUX_PKG_VERSION.tar.gz

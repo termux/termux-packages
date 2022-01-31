@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://e-x-a.org/codecrypt/
 TERMUX_PKG_DESCRIPTION="The post-quantum cryptography tool"
 TERMUX_PKG_LICENSE="LGPL-3.0"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.8
 TERMUX_PKG_REVISION=8
 TERMUX_PKG_SRCURL=https://github.com/exaexa/codecrypt/archive/v$TERMUX_PKG_VERSION.tar.gz
