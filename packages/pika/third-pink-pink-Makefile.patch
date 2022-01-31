@@ -1,0 +1,20 @@
+--- a/third/pink/pink/Makefile
++++ b/third/pink/pink/Makefile
+@@ -1,7 +1,5 @@
+ CLEAN_FILES = # deliberately empty, so we can append below.
+-CXX=g++
+-LDFLAGS= -lpthread -lrt
+-CXXFLAGS= -g -std=c++11 -fno-builtin-memcmp -msse -msse4.2 -pipe -fPIC
++CXXFLAGS+= -std=c++11 -fno-builtin-memcmp -pipe -fPIC $(CPPFLAGS)
+ PROFILING_FLAGS=-pg
+ ARFLAGS = rs
+ OPT=
+@@ -27,7 +25,7 @@ endif
+ # don't treat warnings as errors
+ ifeq ($(DEBUG_LEVEL),0)
+ DISABLE_WARNING_AS_ERROR=1
+-OPT += -O2 -fno-omit-frame-pointer -DNDEBUG
++OPT += -Oz -fno-omit-frame-pointer -DNDEBUG
+ else
+ $(warning Warning: Compiling in debug mode. Don't use the resulting binary in production)
+ OPT += -O0 -D__XDEBUG__ $(PROFILING_FLAGS)

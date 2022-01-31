@@ -1,15 +1,35 @@
-diff -uNr luarocks-3.1.3/src/luarocks/deps.lua luarocks-3.1.3.mod/src/luarocks/deps.lua
---- luarocks-3.1.3/src/luarocks/deps.lua	2019-06-06 22:46:21.000000000 +0300
-+++ luarocks-3.1.3.mod/src/luarocks/deps.lua	2020-10-01 16:39:18.541558016 +0300
-@@ -532,34 +532,9 @@
+--- ./src/luarocks/deps.lua.orig	2022-01-30 15:13:10.381305292 +0100
++++ ./src/luarocks/deps.lua	2022-01-30 15:18:36.705100349 +0100
+@@ -695,52 +695,13 @@
  end
  
- function deps.check_lua(vars)
--   local incdir_found = true
--   if (not vars.LUA_INCDIR) and vars.LUA_DIR then
--      vars.LUA_INCDIR = find_lua_incdir(vars.LUA_DIR, cfg.lua_version, cfg.luajit_version)
--      incdir_found = (vars.LUA_INCDIR ~= nil)
+ function deps.check_lua_incdir(vars)
+-   local ljv = util.get_luajit_version()
+-
+-   if vars.LUA_INCDIR then
+-      return lua_h_exists(vars.LUA_INCDIR, cfg.lua_version)
 -   end
+-
+-   if vars.LUA_DIR then
+-      vars.LUA_INCDIR = find_lua_incdir(vars.LUA_DIR, cfg.lua_version, ljv)
+-      if vars.LUA_INCDIR then
+-         return true
+-      end
+-   end
+-
+-   return nil, "Failed finding Lua header files. You may need to install them or configure LUA_INCDIR.", "dependency"
++   vars.LUA_INCDIR = "@TERMUX_PREFIX@/include/lua5.3"
++   return true
+ end
+ 
+ function deps.check_lua_libdir(vars)
+-   local fs = require("luarocks.fs")
+-   local ljv = util.get_luajit_version()
+-
+-   if vars.LUA_LIBDIR and vars.LUALIB and fs.exists(dir.path(vars.LUA_LIBDIR, vars.LUALIB)) then
+-      return true
+-   end
+-
 -   local shortv = cfg.lua_version:gsub("%.", "")
 -   local libnames = {
 -      "lua" .. cfg.lua_version,
@@ -18,24 +38,22 @@ diff -uNr luarocks-3.1.3/src/luarocks/deps.lua luarocks-3.1.3.mod/src/luarocks/d
 -      "lua-" .. shortv,
 -      "lua",
 -   }
--   if cfg.luajit_version then
+-   if ljv then
 -      table.insert(libnames, 1, "luajit-" .. cfg.lua_version)
 -   end
 -   local cache = {}
--   for _, libname in ipairs(libnames) do
--      local ok = check_external_dependency("LUA", { library = libname }, vars, "build", cache)
--      if ok then
+-   local save_LUA_INCDIR = vars.LUA_INCDIR
+-   local ok = check_external_dependency("LUA", { library = libnames }, vars, "build", cache)
+-   vars.LUA_INCDIR = save_LUA_INCDIR
+-   if ok then
+-      if fs.exists(dir.path(vars.LUA_LIBDIR, vars.LUA_LIBDIR_FILE)) then
 -         vars.LUALIB = vars.LUA_LIBDIR_FILE
--         return true
 -      end
--   end
--   if not incdir_found then
--      return nil, "Failed finding Lua header files. You may need to install them or configure LUA_INCDIR.", "dependency"
+-      return true
 -   end
 -   return nil, "Failed finding Lua library. You may need to configure LUA_LIBDIR.", "dependency"
-+   vars.LUA_INCDIR = "@TERMUX_PREFIX@/include/lua5.3"
 +   vars.LUALIB = "lua5.3"
 +   return true
  end
  
- local valid_deps_modes = {
+ function deps.get_deps_mode(args)

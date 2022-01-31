@@ -16,7 +16,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_pre_configure() {
 	termux_setup_zig
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
-		-DZIG_EXECUTABLE=$(which zig)
+		-DZIG_EXECUTABLE=$(command -v zig)
 		-DZIG_TARGET_TRIPLE=$ZIG_TARGET_NAME
 		"
 	LDFLAGS+=" -landroid-spawn -lncursesw -lxml2 -lz"

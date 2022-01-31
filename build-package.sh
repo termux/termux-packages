@@ -386,10 +386,6 @@ if [ "${TERMUX_INSTALL_DEPS-false}" = "true" ]; then
 		gpg --import "$TERMUX_SCRIPTDIR/packages/termux-keyring/termux-autobuilds.gpg"
 		gpg --no-tty --command-file <(echo -e "trust\n5\ny")  --edit-key CC72CF8BA7DBFA0182877D045A897D96E57CF20C
 	}
-	gpg --list-keys 3B6B548ADE5EA3BDD33CEEF045F2964132545795 > /dev/null 2>&1 || {
-		gpg --import "$TERMUX_SCRIPTDIR/packages/termux-keyring/xeffyr.gpg"
-		gpg --no-tty --command-file <(echo -e "trust\n5\ny")  --edit-key 3B6B548ADE5EA3BDD33CEEF045F2964132545795
-	}
 fi
 
 for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do

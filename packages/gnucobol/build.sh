@@ -19,7 +19,7 @@ termux_step_pre_configure() {
 	export COB_HAS_64_BIT_POINTER="${lp64}"
 
 	local bin="$TERMUX_PKG_BUILDDIR/bin"
-	local sh="$(which sh)"
+	local sh="$(command -v sh)"
 	mkdir -p "$bin"
 	for p in xml2; do
 		local conf="$bin/${p}-config"

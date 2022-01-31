@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://pandoc.org/
 TERMUX_PKG_DESCRIPTION="Universal markup converter"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.16.1
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_BUILD_IN_SRC=true

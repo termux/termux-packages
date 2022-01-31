@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.gnu.org/software/shtool/
 TERMUX_PKG_DESCRIPTION="compilation of small but very stable and portable shell scripts into a single shell tool"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.0.8
 TERMUX_PKG_REVISION=9
 TERMUX_PKG_SRCURL=http://mirrors.kernel.org/gnu/shtool/shtool-$TERMUX_PKG_VERSION.tar.gz

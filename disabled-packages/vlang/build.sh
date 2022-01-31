@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/vlang/v
 TERMUX_PKG_DESCRIPTION="Simple, fast, safe, compiled language for developing maintainable software"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.2.2
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/vlang/v/archive/$TERMUX_PKG_VERSION.tar.gz

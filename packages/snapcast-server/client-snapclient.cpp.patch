@@ -1,0 +1,11 @@
+--- a/client/snapclient.cpp
++++ b/client/snapclient.cpp
+@@ -312,7 +312,7 @@
+         std::unique_ptr<Daemon> daemon;
+         if (daemonOption->is_set())
+         {
+-            string pidFile = "/var/run/snapclient/pid";
++            string pidFile = "@TERMUX_PREFIX@/var/run/snapclient/pid";
+             if (settings.instance != 1)
+                 pidFile += "." + cpt::to_string(settings.instance);
+             string user;

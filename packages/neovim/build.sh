@@ -12,12 +12,12 @@ TERMUX_PKG_HOSTBUILD=true
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DENABLE_JEMALLOC=OFF
--DGETTEXT_MSGFMT_EXECUTABLE=$(which msgfmt)
--DGETTEXT_MSGMERGE_EXECUTABLE=$(which msgmerge)
+-DGETTEXT_MSGFMT_EXECUTABLE=$(command -v msgfmt)
+-DGETTEXT_MSGMERGE_EXECUTABLE=$(command -v msgmerge)
 -DGPERF_PRG=$TERMUX_PKG_HOSTBUILD_DIR/deps/usr/bin/gperf
 -DLUA_PRG=$TERMUX_PKG_HOSTBUILD_DIR/deps/usr/bin/luajit
--DPKG_CONFIG_EXECUTABLE=$(which pkg-config)
--DXGETTEXT_PRG=$(which xgettext)
+-DPKG_CONFIG_EXECUTABLE=$(command -v pkg-config)
+-DXGETTEXT_PRG=$(command -v xgettext)
 -DLUAJIT_INCLUDE_DIR=$TERMUX_PREFIX/include/luajit-2.1
 "
 TERMUX_PKG_CONFFILES="share/nvim/sysinit.vim"
@@ -32,7 +32,7 @@ _patch_luv() {
 termux_step_host_build() {
 	termux_setup_cmake
 
-	TERMUX_ORIGINAL_CMAKE=$(which cmake)
+	TERMUX_ORIGINAL_CMAKE=$(command -v cmake)
 	if [ ! -f "$TERMUX_ORIGINAL_CMAKE.orig" ]; then
 		mv "$TERMUX_ORIGINAL_CMAKE" "$TERMUX_ORIGINAL_CMAKE.orig"
 	fi

@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.inf.puc-rio.br/~roberto/lpeg
 TERMUX_PKG_DESCRIPTION="Pattern-matching library for Lua 5.3"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.0.2
 TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=http://www.inf.puc-rio.br/~roberto/lpeg/lpeg-$TERMUX_PKG_VERSION.tar.gz

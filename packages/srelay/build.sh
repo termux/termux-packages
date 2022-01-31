@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://sourceforge.net/projects/socks-relay
 TERMUX_PKG_DESCRIPTION="A Free SOCKS proxy server"
 TERMUX_PKG_LICENSE="BSD"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.4.8p3
 TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/sourceforge/socks-relay/srelay-${TERMUX_PKG_VERSION}.tar.gz

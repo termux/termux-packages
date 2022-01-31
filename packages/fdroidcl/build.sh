@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/mvdan/fdroidcl
 TERMUX_PKG_DESCRIPTION="F-Droid client"
 TERMUX_PKG_LICENSE="BSD"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.5.0
 TERMUX_PKG_REVISION=7
 TERMUX_PKG_SRCURL=https://github.com/mvdan/fdroidcl/archive/v$TERMUX_PKG_VERSION.tar.gz

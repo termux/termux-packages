@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://fph.altervista.org/prog/bastet.html
 TERMUX_PKG_DESCRIPTION="Tetris clone with 'bastard' block-choosing AI"
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.43.2
 TERMUX_PKG_REVISION=8
 TERMUX_PKG_SRCURL=https://github.com/fph/bastet/archive/$TERMUX_PKG_VERSION.tar.gz

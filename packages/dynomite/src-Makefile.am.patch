@@ -1,0 +1,32 @@
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -10,7 +10,6 @@
+ AM_CPPFLAGS += -I $(top_srcdir)/src/event
+ AM_CPPFLAGS += -I $(top_srcdir)/src/entropy
+ AM_CPPFLAGS += -I $(top_srcdir)/src/seedsprovider
+-AM_CPPFLAGS += -I $(top_srcdir)/contrib/yaml-0.1.4/include
+ 
+ AM_CFLAGS = -Wall -Wshadow
+ AM_CFLAGS += -Wpointer-arith
+@@ -77,8 +76,8 @@
+ dynomite_LDADD += $(top_builddir)/src/proto/libproto.a
+ dynomite_LDADD += $(top_builddir)/src/event/libevent.a
+ dynomite_LDADD += $(top_builddir)/src/entropy/libentropy.a
+-dynomite_LDADD +=  $(top_builddir)/src/seedsprovider/libseedsprovider.a -lresolv
+-dynomite_LDADD += $(top_builddir)/contrib/yaml-0.1.4/src/.libs/libyaml.a
++dynomite_LDADD +=  $(top_builddir)/src/seedsprovider/libseedsprovider.a
++dynomite_LDADD += -lyaml
+ 
+ 
+ 
+@@ -128,8 +127,8 @@
+ dynomite_test_LDADD += $(top_builddir)/src/proto/libproto.a
+ dynomite_test_LDADD += $(top_builddir)/src/event/libevent.a
+ dynomite_test_LDADD += $(top_builddir)/src/entropy/libentropy.a
+-dynomite_test_LDADD +=  $(top_builddir)/src/seedsprovider/libseedsprovider.a -lresolv
+-dynomite_test_LDADD += $(top_builddir)/contrib/yaml-0.1.4/src/.libs/libyaml.a
++dynomite_test_LDADD +=  $(top_builddir)/src/seedsprovider/libseedsprovider.a
++dynomite_test_LDADD += -lyaml
+ 
+ if OS_BSD
+ dynomite_SOURCES +=                                               \

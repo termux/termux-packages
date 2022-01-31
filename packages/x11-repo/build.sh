@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/termux/x11-packages
 TERMUX_PKG_DESCRIPTION="Package repository containing X11 programs and libraries"
 TERMUX_PKG_LICENSE="Apache-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=8.0
 TERMUX_PKG_DEPENDS="termux-keyring"
 TERMUX_PKG_SKIP_SRC_EXTRACT=true

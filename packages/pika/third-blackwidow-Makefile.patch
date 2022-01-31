@@ -1,0 +1,29 @@
+--- a/third/blackwidow/Makefile
++++ b/third/blackwidow/Makefile
+@@ -1,7 +1,5 @@
+ CLEAN_FILES = # deliberately empty, so we can append below.
+-CXX=g++
+-LDFLAGS= -lpthread -lrt
+-CXXFLAGS= -g -std=c++11 -fno-builtin-memcmp -msse -msse4.2 -pipe -fPIC
++CXXFLAGS+= -std=c++11 -fno-builtin-memcmp -pipe -fPIC -fno-rtti $(CPPFLAGS)
+ PROFILING_FLAGS=-pg
+ ARFLAGS = rs
+ OPT=
+@@ -18,7 +16,7 @@
+ # don't treat warnings as errors
+ ifeq ($(DEBUG_LEVEL),0)
+ DISABLE_WARNING_AS_ERROR=1
+-OPT += -O2 -fno-omit-frame-pointer -DNDEBUG
++OPT += -Oz -fno-omit-frame-pointer -DNDEBUG
+ else
+ $(warning Warning: Compiling in debug mode. Don't use the resulting binary in production)
+ OPT += -O0 $(PROFILING_FLAGS)
+@@ -91,7 +89,7 @@
+   WARNING_FLAGS += -Werror
+ endif
+ 
+-CXXFLAGS += $(WARNING_FLAGS) -I. -I./include -I$(ROCKSDB_INCLUDE_DIR) -I$(ROCKSDB_PATH) -I$(SLASH_INCLUDE_DIR) $(OPT)
++CXXFLAGS += $(WARNING_FLAGS) -I. -I./include -I$(SLASH_INCLUDE_DIR) $(OPT)
+ 
+ date := $(shell date +%F)
+ git_sha := $(shell git rev-parse HEAD 2>/dev/null)

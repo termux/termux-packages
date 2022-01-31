@@ -11,7 +11,7 @@ TERMUX_PKG_BREAKS="libcue-dev"
 TERMUX_PKG_REPLACES="libcue-dev"
 # To avoid picking up cross-compiled flex and bison:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
--DBISON_EXECUTABLE=$(which bison)
--DFLEX_EXECUTABLE=$(which flex)
+-DBISON_EXECUTABLE=$(command -v bison)
+-DFLEX_EXECUTABLE=$(command -v flex)
 -DBUILD_SHARED_LIBS=ON
 "

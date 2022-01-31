@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/enscript/
 TERMUX_PKG_DESCRIPTION="Enscript converts ASCII text files to PostScript, HTML, RTF, ANSI and overstrikes"
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.6.6
 TERMUX_PKG_REVISION=11
 TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/enscript/enscript-$TERMUX_PKG_VERSION.tar.gz
