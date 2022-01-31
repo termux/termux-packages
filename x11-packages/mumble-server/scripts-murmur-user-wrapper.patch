@@ -1,0 +1,40 @@
+--- a/scripts/murmur-user-wrapper
++++ b/scripts/murmur-user-wrapper
+@@ -6,7 +6,7 @@
+ # Mumble source tree or at <https://www.mumble.info/LICENSE>.
+ 
+ DIR=$HOME/murmur
+-SYSDIR=/usr/share/doc/mumble-server/examples
++SYSDIR=@TERMUX_PREFIX@/share/doc/mumble-server/examples
+ 
+ if [ $UID == 0 ] || [ $EUID == 0 ]; then
+   echo "You should never run this script as root. If you want a system-wide install, see "
+@@ -44,7 +44,7 @@
+ DBUSFILE=$DIR/.dbus.sh
+ 
+ if [ $DO_KILL == 1 ]; then
+-	if pkill -U $UID -u $EUID -o -x -f "/usr/sbin/murmurd -ini $DIR/murmur.ini"; then
++	if pkill -U $UID -u $EUID -o -x -f "@TERMUX_PREFIX@/bin/murmurd -ini $DIR/murmur.ini"; then
+ 		echo "Termination signal sent"
+ 	else
+ 		echo "Murmur process not found; not terminated"
+@@ -82,11 +82,11 @@
+ 
+ if [ "X$SETPW" != "X" ]; then
+ 	echo "Setting superuser password to \"$SETPW\""
+-	/usr/sbin/murmurd -ini $DIR/murmur.ini -supw $SETPW
++	@TERMUX_PREFIX@/bin/murmurd -ini $DIR/murmur.ini -supw $SETPW
+ 	exit 0
+ fi
+ 
+-PID=$(pgrep -U $UID -u $EUID -o -x -f "/usr/sbin/murmurd -ini $DIR/murmur.ini")
++PID=$(pgrep -U $UID -u $EUID -o -x -f "@TERMUX_PREFIX@/bin/murmurd -ini $DIR/murmur.ini")
+ 
+ if [ $DO_STATUS == 1 ]; then
+ 	if [ "X$PID" != "X" ]; then
+@@ -117,4 +117,4 @@
+ fi
+ 
+ echo "Starting Murmur"
+-exec /usr/sbin/murmurd -ini $DIR/murmur.ini
++exec @TERMUX_PREFIX@/bin/murmurd -ini $DIR/murmur.ini
