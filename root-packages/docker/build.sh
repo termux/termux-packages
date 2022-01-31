@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # remember to update DOCKER_GITCOMMIT inside termux_step_make()
 # bellow when upgrading to a new version
 TERMUX_PKG_VERSION=20.10.2
+TERMUX_PKG_REVISION=1
 LIBNETWORK_COMMIT=448016ef11309bd67541dcf4d72f1f5b7de94862
 TERMUX_PKG_SRCURL=(https://github.com/moby/moby/archive/v${TERMUX_PKG_VERSION}.tar.gz
                    https://github.com/docker/cli/archive/v${TERMUX_PKG_VERSION}.tar.gz
@@ -48,6 +49,7 @@ termux_step_get_source() {
 termux_step_make() {
 	# setup go build environment
 	termux_setup_golang
+	export GO111MODULE=auto
 
 	# BUILD DOCKERD DAEMON
 	echo -n "Building dockerd daemon..."
