@@ -49,11 +49,15 @@ termux_step_pre_configure() {
 	PATCH_CHECKSUMS[010]=a2c8d7b2704eeceff7b1503b7ad9500ea1cb6e9393faebdb3acd2afdd7aeae2a
 	PATCH_CHECKSUMS[011]=58191f164934200746f48459a05bca34d1aec1180b08ca2deeee3bb29622027b
 	PATCH_CHECKSUMS[012]=10f189c8367c4a15c7392e7bf70d0ff6953f78c9b312ed7622303a779273ab98
+        PATCH_CHECKSUMS[013]=c7acb66df435d284304c16ca83a5265f9edd9368612095b01a733d45c77ed5ad
+        PATCH_CHECKSUMS[014]=6a4ee0c81b437b96279a792c1efcec4ba56f009195a318083db6b53b096f83d0
+        PATCH_CHECKSUMS[015]=1b37692ef1f6cc3dcec246773443276066e6b1379868f8c14e01f4dfd4df80f0
+        PATCH_CHECKSUMS[016]=8899144f76a5db1fb41a89ed881c9f19add95728dd71db324f772ef225c5384f
 
 	for PATCH_NUM in $(seq -f '%03g' ${_PATCH_VERSION}); do
 		PATCHFILE=$TERMUX_PKG_CACHEDIR/bash_patch_${PATCH_NUM}.patch
 		termux_download \
-			"https://mirrors.kernel.org/gnu/bash/bash-${_MAIN_VERSION}-patches/bash${_MAIN_VERSION/./}-$PATCH_NUM" \
+			"https://mirrors.kernel.org/gnu/bash/bash-${_MAIN_VERSION}.${_PATCH_VERSION}-patches/bash${_MAIN_VERSION/./}-$PATCH_NUM" \
 			$PATCHFILE \
 			${PATCH_CHECKSUMS[$PATCH_NUM]}
 		patch -p0 -i $PATCHFILE
