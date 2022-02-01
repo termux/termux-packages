@@ -1,0 +1,20 @@
+--- a/common/platform/unix/SysLibrary.cpp
++++ b/common/platform/unix/SysLibrary.cpp
+@@ -54,7 +54,7 @@
+ 
+ 
+ #define MAX_LIBRARY_NAME_LENGTH 250
+-#define LIBARY_NAME_BUFFER_LENGTH (MAX_LIBRARY_NAME_LENGTH + sizeof("/usr/lib/lib") + sizeof(ORX_SHARED_LIBRARY_EXT))
++#define LIBARY_NAME_BUFFER_LENGTH (MAX_LIBRARY_NAME_LENGTH + sizeof("@TERMUX_PREFIX@/lib/lib") + sizeof(ORX_SHARED_LIBRARY_EXT))
+ 
+ SysLibrary::SysLibrary()
+ {
+@@ -91,7 +91,7 @@
+     // if not found, then try from /usr/lib
+     if (libraryHandle == NULL)
+     {
+-        sprintf(nameBuffer, "/usr/lib/lib%s%s", name, ORX_SHARED_LIBRARY_EXT);
++        sprintf(nameBuffer, "@TERMUX_PREFIX@/lib/lib%s%s", name, ORX_SHARED_LIBRARY_EXT);
+         libraryHandle = dlopen(nameBuffer, RTLD_LAZY);
+         // still can't find it?
+         if (libraryHandle == NULL)

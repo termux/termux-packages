@@ -1,0 +1,29 @@
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -1460,7 +1460,7 @@
+                        -I$(build_interpreter_platform_dir)
+ 
+ librexx_la_LIBADD = @ORX_LIBADD_LIBRARY@
+-librexx_la_LDFLAGS = $(VERSION_INFO) @ORX_LDFLAGS_PACKAGE@
++librexx_la_LDFLAGS = $(VERSION_INFO) @ORX_LDFLAGS_PACKAGE@ $(DLDFLAGS) -l:librexxapi.so
+ 
+ #################### rxapi ##########################
+ # Sources for rxapi
+@@ -1617,7 +1617,7 @@
+ # Extra libraries for librexxutil.so (maybe)
+ #
+ librexxutil_la_LIBADD = @ORX_LIBADD_LIBRARY@
+-librexxutil_la_LDFLAGS = $(VERSION_INFO) @ORX_LDFLAGS_LIBRARY@
++librexxutil_la_LDFLAGS = $(VERSION_INFO) @ORX_LDFLAGS_LIBRARY@ $(DLDFLAGS) -l:librexx.so -l:librexxapi.so
+ 
+ #################### librxmath.so ################
+ #
+@@ -1702,7 +1702,7 @@
+ # Extra libraries for libhostemu.so (maybe)
+ #
+ libhostemu_la_LIBADD = @ORX_LIBADD_LIBRARY@
+-libhostemu_la_LDFLAGS = $(VERSION_INFO) @ORX_LDFLAGS_LIBRARY@
++libhostemu_la_LDFLAGS = $(VERSION_INFO) @ORX_LDFLAGS_LIBRARY@ $(DLDFLAGS) -l:librexx.so -l:librexxapi.so
+ 
+ #################### librxunixsys.so ################
+ #
