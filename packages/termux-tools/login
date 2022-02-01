@@ -23,6 +23,9 @@ else
 	done
 fi
 
+# for the correct operation of scripts that work with the package manager
+export TERMUX_MAIN_PACKAGE_FORMAT="@TERMUX_PACKAGE_FORMAT@"
+
 if [ -f @TERMUX_PREFIX@/lib/libtermux-exec.so ]; then
 	export LD_PRELOAD=@TERMUX_PREFIX@/lib/libtermux-exec.so
 	$SHELL -c "coreutils --coreutils-prog=true" > /dev/null 2>&1 || unset LD_PRELOAD

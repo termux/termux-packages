@@ -1,7 +1,5 @@
 #!/bin/bash
 
-TERMUX_PACKAGE_FORMAT="@TERMUX_PACKAGE_FORMAT@"
-
 if [ "$#" != "0" ]; then
 	echo 'usage: termux-info'
 	echo 'Provides information about Termux, and the current system. Helpful for debugging.'
@@ -14,9 +12,9 @@ updates() {
 	if [ "$(id -u)" = "0" ]; then
 		echo "Running as root. Cannot check package updates."
 	else
-		if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ]; then
+		if [ "$TERMUX_MAIN_PACKAGE_FORMAT" = "pacman" ]; then
 			pacman -Sy >/dev/null 2>&1
-			updatable=$(pacman -Qeu)
+			updatable=$(pacman -Qu)
 		else
 			apt update >/dev/null 2>&1
 			updatable=$(apt list --upgradable 2>/dev/null | tail -n +2)
@@ -86,7 +84,7 @@ fi
 
 output+="Packages CPU architecture:
 $(
-	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ]; then
+	if [ "$TERMUX_MAIN_PACKAGE_FORMAT" = "pacman" ]; then
 		pacman-conf | grep Architecture | sed 's/Architecture = //g'
 	else
 		dpkg --print-architecture
@@ -94,7 +92,7 @@ $(
 )
 Subscribed repositories:
 $(
-	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ]; then
+	if [ "$TERMUX_MAIN_PACKAGE_FORMAT" = "pacman" ]; then
 		repo_subscriptions_pacman
 	else
 		repo_subscriptions_apt
