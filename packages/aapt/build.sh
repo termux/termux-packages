@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 _TAG_VERSION=7.1.2
 _TAG_REVISION=33
 TERMUX_PKG_VERSION=${_TAG_VERSION}.${_TAG_REVISION}
-TERMUX_PKG_REVISION=16
+TERMUX_PKG_REVISION=17
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="libc++, libexpat, libpng, libzopfli, zlib"
@@ -16,6 +16,8 @@ termux_step_pre_configure() {
 	if $TERMUX_ON_DEVICE_BUILD; then
 		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
 	fi
+
+	termux_setup_protobuf
 }
 
 termux_step_make_install() {
@@ -291,6 +293,39 @@ termux_step_make_install() {
 		-lm -lz -lpng -lexpat \
 		-pie \
 		-o $TERMUX_PREFIX/bin/aapt
+
+
+	# Build aapt2:
+	AAPT2_TARFILE=$TERMUX_PKG_CACHEDIR/aapt2_${_TAGNAME}.tar.gz
+	test ! -f $AAPT2_TARFILE && termux_download \
+		"https://android.googlesource.com/platform/frameworks/base/+archive/android-$_TAGNAME/tools/aapt2.tar.gz" \
+		$AAPT2_TARFILE \
+		SKIP_CHECKSUM
+	mkdir $TERMUX_PKG_SRCDIR/aapt2
+	cd $TERMUX_PKG_SRCDIR/aapt2
+	tar xf $AAPT2_TARFILE
+	sed -i 's:proto/frameworks/base/tools/aapt2/::g' proto/ProtoHelpers.h
+	protoc --cpp_out=. Format.proto
+	$CXX $CXXFLAGS $CPPFLAGS $LDFLAGS \
+		-std=c++11 \
+		-include memory \
+		-DANDROID_SMP=1 \
+		-DNDEBUG=1 \
+		-DHAVE_ENDIAN_H=1 -DHAVE_POSIX_FILEMAP=1 -DHAVE_OFF64_T=1 -DHAVE_SYS_SOCKET_H=1 -DHAVE_PTHREADS=1 \
+		-isystem $AOSP_INCLUDE_DIR \
+		-I. \
+		$(find . -name '*.cpp' -a ! -name '*_test.cpp') \
+		Format.pb.cc \
+		-landroid-base \
+		-landroid-cutils \
+		-landroid-utils \
+		-landroid-fw \
+		-landroid-ziparchive \
+		-llog \
+		-lm -lz -lpng -lexpat \
+		-lprotobuf \
+		-pie \
+		-o $TERMUX_PREFIX/bin/aapt2
 
 
 
