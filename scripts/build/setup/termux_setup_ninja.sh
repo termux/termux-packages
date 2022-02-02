@@ -23,8 +23,8 @@ termux_setup_ninja() {
 		local NINJA_PKG_VERSION=$(bash -c ". $TERMUX_SCRIPTDIR/packages/ninja/build.sh; echo \$TERMUX_PKG_VERSION")
 		if ([ ! -e "$TERMUX_BUILT_PACKAGES_DIRECTORY/ninja" ] ||
 		    [ "$(cat "$TERMUX_BUILT_PACKAGES_DIRECTORY/ninja")" != "$NINJA_PKG_VERSION" ]) &&
-		   ([[ "$(dpkg --version 2>/dev/null)" && "$(dpkg-query -W -f '${db:Status-Status}\n' ninja 2>/dev/null)" != "installed" ]] ||
-		    [[ "$(pacman -V 2>/dev/null)" && ! "$(pacman -Q ninja 2>/dev/null)" ]]); then
+		   ([[ "$TERMUX_MAIN_PACKAGE_FORMAT" = "debian" && "$(dpkg-query -W -f '${db:Status-Status}\n' ninja 2>/dev/null)" != "installed" ]] ||
+		    [[ "$TERMUX_MAIN_PACKAGE_FORMAT" = "pacman" && ! "$(pacman -Q ninja 2>/dev/null)" ]]); then
 			echo "Package 'ninja' is not installed."
 			echo "You can install it with"
 			echo
