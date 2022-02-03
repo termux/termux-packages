@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://www.mirbsd.org/jupp.htm
+TERMUX_PKG_HOMEPAGE=http://www.mirbsd.org/jupp.htm
 TERMUX_PKG_DESCRIPTION="User friendly full screen text editor"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

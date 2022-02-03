@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://mega.nz/
+TERMUX_PKG_HOMEPAGE=https://mega.io/
 TERMUX_PKG_DESCRIPTION="Provides non UI access to MEGA services"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
