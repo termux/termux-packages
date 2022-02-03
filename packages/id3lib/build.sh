@@ -16,7 +16,7 @@ termux_step_pre_configure() {
 	_ID3LIB_MAJOR=$(awk -F= '/^ID3LIB_MAJOR_/ { print $2 }' configure.in)
 	_ID3LIB_MINOR=$(awk -F= '/^ID3LIB_MINOR_/ { print $2 }' configure.in)
 
-        aclocal
+	aclocal
 	automake --add-missing
 	autoreconf -fi
 }
