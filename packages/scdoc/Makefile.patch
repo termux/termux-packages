@@ -1,0 +1,60 @@
+--- ./Makefile.orig	2022-02-03 18:20:50.006850878 +0530
++++ ./Makefile	2022-02-03 18:21:34.996850861 +0530
+@@ -1,14 +1,14 @@
+ VERSION=1.11.2
+ CFLAGS?=-g
+ MAINFLAGS:=-DVERSION='"$(VERSION)"' -Wall -Wextra -Werror -Wno-unused-parameter
+-LDFLAGS+=-static
++LDFLAGS+=
+ INCLUDE+=-Iinclude
+ PREFIX?=/usr/local
+ BINDIR?=$(PREFIX)/bin
+ MANDIR?=$(PREFIX)/share/man
+ PCDIR?=$(PREFIX)/share/pkgconfig
+-OUTDIR=.build
+-HOST_SCDOC=./scdoc
++OUTDIR?=.build
++HOST_SCDOC?=$(OUTDIR)/scdoc
+ .DEFAULT_GOAL=all
+ 
+ OBJECTS=\
+@@ -26,29 +26,29 @@
+ 	@mkdir -p $(OUTDIR)
+ 	$(CC) -std=c99 -pedantic -c -o $@ $(CFLAGS) $(MAINFLAGS) $(INCLUDE) $<
+ 
+-scdoc: $(OBJECTS)
++$(OUTDIR)/scdoc: $(OBJECTS)
+ 	$(CC) $(LDFLAGS) -o $@ $^
+ 
+-scdoc.1: scdoc.1.scd $(HOST_SCDOC)
++$(OUTDIR)/scdoc.1: scdoc.1.scd $(HOST_SCDOC)
+ 	$(HOST_SCDOC) < $< > $@
+ 
+-scdoc.5: scdoc.5.scd $(HOST_SCDOC)
++$(OUTDIR)/scdoc.5: scdoc.5.scd $(HOST_SCDOC)
+ 	$(HOST_SCDOC) < $< > $@
+ 
+-scdoc.pc: scdoc.pc.in
++$(OUTDIR)/scdoc.pc: scdoc.pc.in
+ 	sed -e 's:@prefix@:$(PREFIX):g' -e 's:@version@:$(VERSION):g' < $< > $@
+ 
+-all: scdoc scdoc.1 scdoc.5 scdoc.pc
++all: $(OUTDIR)/scdoc $(OUTDIR)/scdoc.1 $(OUTDIR)/scdoc.5 $(OUTDIR)/scdoc.pc
+ 
+ clean:
+-	rm -rf $(OUTDIR) scdoc scdoc.1 scdoc.5 scdoc.pc
++	rm -rf $(OUTDIR)
+ 
+ install: all
+ 	mkdir -p $(DESTDIR)/$(BINDIR) $(DESTDIR)/$(MANDIR)/man1 $(DESTDIR)/$(MANDIR)/man5 $(DESTDIR)/$(PCDIR)
+-	install -m755 scdoc $(DESTDIR)/$(BINDIR)/scdoc
+-	install -m644 scdoc.1 $(DESTDIR)/$(MANDIR)/man1/scdoc.1
+-	install -m644 scdoc.5 $(DESTDIR)/$(MANDIR)/man5/scdoc.5
+-	install -m644 scdoc.pc $(DESTDIR)/$(PCDIR)/scdoc.pc
++	install -m755 $(OUTDIR)/scdoc $(DESTDIR)/$(BINDIR)/scdoc
++	install -m644 $(OUTDIR)/scdoc.1 $(DESTDIR)/$(MANDIR)/man1/scdoc.1
++	install -m644 $(OUTDIR)/scdoc.5 $(DESTDIR)/$(MANDIR)/man5/scdoc.5
++	install -m644 $(OUTDIR)/scdoc.pc $(DESTDIR)/$(PCDIR)/scdoc.pc
+ 
+ uninstall:
+ 	rm -f $(DESTDIR)/$(BINDIR)/scdoc
