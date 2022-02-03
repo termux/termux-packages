@@ -132,9 +132,6 @@ PACKAGES+=" patchelf"
 # Needed by wrk.
 PACKAGES+=" luajit"
 
-# Needed by gitea.
-PACKAGES+=" npm"
-
 # Needed by libduktape
 PACKAGES+=" bc"
 
@@ -222,32 +219,13 @@ fi
 $SUDO dpkg --add-architecture i386
 $SUDO apt-get -yq update
 
-# Newer Python versions for host builds
-if dpkg --compare-versions $(lsb_release -rs) lt 21.04; then
-	$SUDO add-apt-repository -y ppa:deadsnakes/ppa
-	INSTALL_NEW_PIP3=true
-	PACKAGES+=" python3.10-distutils"
-else
-	INSTALL_NEW_PIP3=false
-fi
-
 $SUDO env DEBIAN_FRONTEND=noninteractive \
 	apt-get install -yq --no-install-recommends $PACKAGES
-
-if $INSTALL_NEW_PIP3; then
-	curl -L --output /tmp/get-pip.py https://bootstrap.pypa.io/pip/get-pip.py
-	$SUDO python3.10 /tmp/get-pip.py
-	rm -f /tmp/get-pip.py
-fi
 
 # Pip for python2.
 curl -L --output /tmp/py2-get-pip.py https://bootstrap.pypa.io/pip/2.7/get-pip.py
 $SUDO python2 /tmp/py2-get-pip.py
 rm -f /tmp/py2-get-pip.py
-
-# Install Nodejs. Needed by Gitea.
-curl -fsSL https://deb.nodesource.com/setup_lts.x | $SUDO bash -
-$SUDO apt install -y nodejs
 
 $SUDO locale-gen --purge en_US.UTF-8
 echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US:en"\n' | $SUDO tee -a /etc/default/locale
