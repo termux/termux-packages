@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="X virtual framebuffer"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.20.11
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/xserver/xorg-server-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=914c796e3ffabe1af48071d40ccc85e92117c97a9082ed1df29e4d64e3c34c49
 
@@ -54,7 +54,13 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-sha1=libcrypto
 --with-fontrootdir=${TERMUX_PREFIX}/share/fonts
 --with-xkb-path=${TERMUX_PREFIX}/share/X11/xkb
-LIBS=-landroid-shmem"
+LIBS=-landroid-shmem
+"
+
+TERMUX_PKG_RM_AFTER_INSTALL="
+share/X11/xkb/compiled
+share/man/man1/Xserver.1
+"
 
 termux_step_pre_configure() {
 	CFLAGS+=" -DFNDELAY=O_NDELAY"
@@ -63,10 +69,6 @@ termux_step_pre_configure() {
 	if [ "$TERMUX_DEBUG_BUILD" = "true" ]; then
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-debug"
 	fi
-}
-
-termux_step_post_make_install() {
-	rm -f "${TERMUX_PREFIX}/usr/share/X11/xkb/compiled"
 }
 
 ## The following is required for package 'tigervnc'.
