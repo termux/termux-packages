@@ -1,0 +1,21 @@
+--- a/tiledb/sm/misc/constants.cc
++++ b/tiledb/sm/misc/constants.cc
+@@ -643,6 +643,7 @@
+  * inspired by
+  * https://github.com/golang/go/blob/f0e940ebc985661f54d31c8d9ba31a553b87041b/src/crypto/x509/root_linux.go
+  */
++#ifndef __ANDROID__
+ const std::array<std::string, 6> cert_files_linux = {
+     "/etc/ssl/certs/ca-certificates.crt",  // Debian/Ubuntu/Gentoo etc.
+     "/etc/pki/tls/certs/ca-bundle.crt",    // Fedora/RHEL 6
+@@ -650,6 +651,10 @@
+     "/etc/pki/tls/cacert.pem",             // OpenELEC
+     "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem",  // CentOS/RHEL 7
+     "/etc/ssl/cert.pem"                                   // Alpine Linux
++#else /* __ANDROID__ */
++const std::array<std::string, 1> cert_files_linux = {
++    "@TERMUX_PREFIX@/etc/tls/cert.pem"
++#endif
+ };
+ #endif
+ 
