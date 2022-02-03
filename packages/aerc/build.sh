@@ -1,11 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://aerc-mail.org/
-TERMUX_PKG_DESCRIPTION="An email client that runs in your terminal"
+TERMUX_PKG_DESCRIPTION="A pretty good email client"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.5.2
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://git.sr.ht/~sircmpwn/aerc/archive/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=dec6560c1359d1d56124a85692e877e319036f0312ce9b7a31f9828f99b92c61
+TERMUX_PKG_VERSION=0.7.1
+TERMUX_PKG_SRCURL=https://git.sr.ht/~rjarry/aerc/archive/${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=e149236623c103c8526b1f872b4e630e67f15be98ac604c0ea0186054dbef0cc
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
