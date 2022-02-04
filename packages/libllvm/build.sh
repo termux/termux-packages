@@ -21,7 +21,7 @@ TERMUX_PKG_REPLACES="gcc, libclang, libclang-dev, libllvm-dev"
 TERMUX_PKG_GROUPS="base-devel"
 # See http://llvm.org/docs/CMake.html:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
--DPYTHON_EXECUTABLE=$(which python3)
+-DPYTHON_EXECUTABLE=$(command -v python3)
 -DLLVM_ENABLE_PIC=ON
 -DLLVM_ENABLE_PROJECTS=clang;clang-tools-extra;compiler-rt;lld;lldb;openmp;polly
 -DLLVM_ENABLE_LIBEDIT=OFF
@@ -43,7 +43,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DSPHINX_WARNINGS_AS_ERRORS=OFF
 -DLLVM_TARGETS_TO_BUILD=all
 -DLLVM_EXPERIMENTAL_TARGETS_TO_BUILD=AVR;RISCV
--DPERL_EXECUTABLE=$(which perl)
+-DPERL_EXECUTABLE=$(command -v perl)
 -DLLVM_ENABLE_FFI=ON
 "
 

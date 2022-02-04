@@ -134,16 +134,26 @@ jobs:
 
         if [ -f ./built_packages.txt ]; then
           ./scripts/lint-packages.sh $(cat ./built_packages.txt | awk '{print "packages/"$1"/build.sh"}')
-          ./scripts/run-docker.sh ./build-package.sh -o ./debs -I -a ${{ matrix.target_arch }} $(cat ./built_packages.txt)
+          ./scripts/run-docker.sh ./build-package.sh -I -a ${{ matrix.target_arch }} $(cat ./built_packages.txt)
         fi
 
-        test -d ./termux-packages/debs && mv ./termux-packages/debs/* ./debs/
+        mkdir -p debs
+        test -d termux-packages/output && mv termux-packages/output/* ./output/
+
         # Put package lists into directory with *.deb files so they will be transferred to
         # upload job.
         test -f ./built_packages.txt && mv ./built_packages.txt ./debs/
         test -f ./built_subpackages.txt && cat ./built_subpackages.txt >> ./debs/built_packages.txt \
           && rm ./built_subpackages.txt
         test -f ./deleted_packages.txt && mv ./deleted_packages.txt ./debs/
+
+        # Move only debs from built_packages into debs/ folder before
+        # creating an archive.
+        while read -r pkg; do
+          # Match both $pkg.deb and $pkg-static.deb.
+          find output \( -name "$pkg_*.deb" -o -name "$pkg-static_*.deb" \) -type f -print0 | xargs -0r mv -t debs/
+        done < <(cat ./debs/built_packages.txt)
+
         # Files containing certain symbols (e.g. ":") will cause failure in actions/upload-artifact.
         # Archiving *.deb files in a tarball to avoid issues with uploading.
         tar cf artifacts/debs-${{ matrix.target_arch }}-${{ github.sha }}.tar debs

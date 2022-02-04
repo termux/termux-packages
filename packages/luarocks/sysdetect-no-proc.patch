@@ -1,0 +1,66 @@
+--- ./src/luarocks/core/sysdetect.lua.orig	2022-01-30 15:20:11.835200454 +0100
++++ ./src/luarocks/core/sysdetect.lua	2022-01-30 15:21:17.085262684 +0100
+@@ -136,62 +136,7 @@
+ end
+ 
+ local function detect_elf_system(fd, hdr, sections)
+-   local system = e_osabi[hdr.osabi]
+-   local endian = hdr.endian
+-
+-   if system == "sysv" then
+-      local abitag = sections[".note.ABI-tag"]
+-      if abitag then
+-         if abitag.namedata == "GNU" and abitag.type == 1
+-           and abitag.descdata:sub(0, 4) == "\0\0\0\0" then
+-            return "linux"
+-         end
+-      elseif sections[".SUNW_version"]
+-        or sections[".SUNW_signature"] then
+-         return "solaris"
+-      elseif sections[".note.netbsd.ident"] then
+-         return "netbsd"
+-      elseif sections[".note.openbsd.ident"] then
+-         return "openbsd"
+-      end
+-
+-      local gnu_version_r = sections[".gnu.version_r"]
+-      if gnu_version_r then
+-
+-         local dynstr = sections[".dynstr"].sh_offset
+-
+-         local idx = 0
+-         for _ = 0, gnu_version_r.sh_info - 1 do
+-            fd:seek("set", gnu_version_r.sh_offset + idx)
+-            assert(read(fd, 2, endian)) -- vn_version
+-            local vn_cnt = read(fd, 2, endian)
+-            local vn_file = read(fd, 4, endian)
+-            local vn_next = read(fd, 2, endian)
+-
+-            fd:seek("set", dynstr + vn_file)
+-            local libname = fd:read(64):gsub("%z.*", "")
+-
+-            if hdr.e_type == 0x03 and libname == "libroot.so" then
+-               return "haiku"
+-            elseif libname:match("linux") then
+-               return "linux"
+-            end
+-
+-            idx = idx + (vn_next * (vn_cnt + 1))
+-         end
+-      end
+-
+-      local procfile = io.open("/proc/sys/kernel/ostype")
+-      if procfile then
+-         local version = procfile:read(6)
+-         procfile:close()
+-         if version == "Linux\n" then
+-            return "linux"
+-         end
+-      end
+-   end
+-
+-   return system
++   return "linux"
+ end
+ 
+ local function read_elf_header(fd)

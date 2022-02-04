@@ -1,0 +1,13 @@
+--- a/agent/mibgroup/ip-mib/data_access/ipaddress_linux.c
++++ b/agent/mibgroup/ip-mib/data_access/ipaddress_linux.c
+@@ -21,6 +21,10 @@
+ #include <sys/ioctl.h>
+ #include <sys/stat.h>
+ 
++#ifdef __ANDROID__
++typedef unsigned long ulong;
++#endif
++
+ netsnmp_feature_require(prefix_info);
+ netsnmp_feature_require(find_prefix_info);
+ 

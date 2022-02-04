@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://ant.apache.org/
+TERMUX_PKG_HOMEPAGE=https://ant.apache.org/
 TERMUX_PKG_DESCRIPTION="Java based build tool like make"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

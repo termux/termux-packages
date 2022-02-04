@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://gitlab.com/surfraw/Surfraw
 TERMUX_PKG_DESCRIPTION="Shell Users' Revolutionary Front Rage Against the Web"
 TERMUX_PKG_LICENSE="Public Domain"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.3.0
 TERMUX_PKG_REVISION=10
 TERMUX_PKG_SRCURL=https://gitlab.com/surfraw/Surfraw/-/archive/surfraw-${TERMUX_PKG_VERSION}/Surfraw-surfraw-${TERMUX_PKG_VERSION}.tar.gz

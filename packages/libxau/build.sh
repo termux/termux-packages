@@ -2,7 +2,7 @@
 TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="X11 authorisation library"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.0.9
 TERMUX_PKG_REVISION=9
 TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/lib/libXau-${TERMUX_PKG_VERSION}.tar.bz2

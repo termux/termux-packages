@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://gitlab.com/opennota/findimagedupes
 TERMUX_PKG_DESCRIPTION="Find visually similar or duplicate images"
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.20190114
 TERMUX_PKG_REVISION=9
 _COMMIT=237ed2ef4bbb91c79eee0f5ee84a1adad9c014ff

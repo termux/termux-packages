@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/muesli/duf
 TERMUX_PKG_DESCRIPTION="Disk usage/free utility"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Krishna kanhaiya @kcubeterm"
-TERMUX_PKG_VERSION=0.7.0
+TERMUX_PKG_VERSION=0.8.0
 TERMUX_PKG_SRCURL=https://github.com/muesli/duf/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=6f70fd0f0d51bfcfe20b8acc8c3a52573fc1ceed44ce97dbbb9d470bbe4467dc
+TERMUX_PKG_SHA256=6b483e68ec783821d07f03cb85629832b8c6f302a7d1bca25af142f891381e8b
 TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make() {

@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://developer.gnome.org/libsecret/
+TERMUX_PKG_HOMEPAGE=https://gitlab.gnome.org/GNOME/libsecret
 TERMUX_PKG_DESCRIPTION="A GObject-based library for accessing the Secret Service API"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@suhan-paradkar"

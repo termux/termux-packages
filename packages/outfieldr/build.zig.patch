@@ -1,0 +1,11 @@
+--- a/build.zig
++++ b/build.zig
+@@ -24,6 +24,8 @@
+     const exe = b.addExecutable("tldr", "src/main.zig");
+     exe.setTarget(target);
+     exe.setBuildMode(mode);
++    exe.addLibPath("@TERMUX_PREFIX@/lib");
++    exe.linkSystemLibraryName("c++_shared");
+     exe.install();
+     exe.setOutputDir("bin");
+     exe.addOptions("build_options", options);

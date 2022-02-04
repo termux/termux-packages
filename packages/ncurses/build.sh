@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Library for text-based user interfaces in a terminal-ind
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=(6.3
-		    9.26
+		    9.30
 		    15
 		    0.20.3
 		    0.9.0)
@@ -13,7 +13,7 @@ TERMUX_PKG_SRCURL=(https://ftp.gnu.org/gnu/ncurses/ncurses-${TERMUX_PKG_VERSION[
 		   https://github.com/kovidgoyal/kitty/archive/v${TERMUX_PKG_VERSION[3]}.tar.gz
 		   https://github.com/alacritty/alacritty/archive/refs/tags/v${TERMUX_PKG_VERSION[4]}.tar.gz)
 TERMUX_PKG_SHA256=(97fc51ac2b085d4cde31ef4d2c3122c21abc217e9090a43a30fc5ec21684e059
-		   643116b9a25d29ad29f4890131796d42e6d2d21312282a613ef66c80c5b8c98b
+		   fe1c93d12f385876457a989fc3ae05c0915d2692efc59289d0f70fabe5b44d2d
 		   3ae9ebef28aad081c6c11351f086776e2fd9547563b2f900732b41c376bec05a
 		   7048cc0e6c17fe5ef3fbac18125dbd5f05d6c628838f004b8e2ad3546fb77d85
 		   6d3aaac9e0477f903563b6fb26e089118407cdbfe952a1e2ffbf4e971b7062b3)

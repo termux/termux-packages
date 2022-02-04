@@ -26,8 +26,8 @@ termux_step_configure () {
 			-e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
 			-e "s|@TERMUX_HOST_PLATFORM@|$TERMUX_HOST_PLATFORM|g" \
 			-e "s|@RUST_TARGET_TRIPLE@|$CARGO_TARGET_NAME|g" \
-			-e "s|@CARGO@|$(which cargo)|g" \
-			-e "s|@RUSTC@|$(which rustc)|g" > $TERMUX_PKG_BUILDDIR/config.toml
+			-e "s|@CARGO@|$(command -v cargo)|g" \
+			-e "s|@RUSTC@|$(command -v rustc)|g" > $TERMUX_PKG_BUILDDIR/config.toml
 
 	export X86_64_UNKNOWN_LINUX_GNU_OPENSSL_LIB_DIR=/usr/lib/x86_64-linux-gnu
 	export X86_64_UNKNOWN_LINUX_GNU_OPENSSL_INCLUDE_DIR=/usr/include

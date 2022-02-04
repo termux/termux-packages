@@ -1,0 +1,11 @@
+--- a/agent/mibgroup/host/data_access/swinst_apt.c
++++ b/agent/mibgroup/host/data_access/swinst_apt.c
+@@ -42,7 +42,7 @@
+ void
+ netsnmp_swinst_arch_init(void)
+ {
+-    strlcpy(pkg_directory, "/var/lib/dpkg/info", sizeof(pkg_directory));
++    strlcpy(pkg_directory, "@TERMUX_PREFIX@/var/lib/dpkg/info", sizeof(pkg_directory));
+     snprintf(apt_fmt, SNMP_MAXBUF, "%%%d[^#]#%%%d[^#]#%%%d[^#]#%%%d[^#]#%%%d[^#]#%%%d[^#]#%%%ds",
+ 	SNMP_MAXBUF-1, SNMP_MAXBUF-1, SNMP_MAXBUF-1, SNMP_MAXBUF-1,
+ 	SNMP_MAXBUF-1, SNMP_MAXBUF-1, SNMP_MAXBUF-1);

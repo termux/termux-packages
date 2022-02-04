@@ -21,15 +21,15 @@ termux_step_pre_configure() {
 	mkdir -p $_WRAPPER_BIN
 	_WRAPPER_AR=$_WRAPPER_BIN/$TERMUX_HOST_PLATFORM-ar
 	cat > $_WRAPPER_AR <<-EOF
-		#!$(which sh)
-		exec $(which $AR) "\$@"
+		#!$(command -v sh)
+		exec $(command -v $AR) "\$@"
 	EOF
 	chmod 0700 $_WRAPPER_AR
 
 	for cmd in llc opt; do
 		local wrapper="$_WRAPPER_BIN/$cmd"
 		cat > "$wrapper" <<-EOF
-			#!$(which sh)
+			#!$(command -v sh)
 			exec /usr/lib/llvm-10/bin/${cmd} "\$@"
 		EOF
 		chmod 0700 "$wrapper"

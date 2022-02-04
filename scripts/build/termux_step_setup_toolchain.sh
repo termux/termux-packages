@@ -163,7 +163,7 @@ termux_setup_standalone_toolchain() {
 	# Create a pkg-config wrapper. We use path to host pkg-config to
 	# avoid picking up a cross-compiled pkg-config later on.
 	local _HOST_PKGCONFIG
-	_HOST_PKGCONFIG=$(which pkg-config)
+	_HOST_PKGCONFIG=$(command -v pkg-config)
 	mkdir -p "$PKG_CONFIG_LIBDIR"
 	cat > $_TERMUX_TOOLCHAIN_TMPDIR/bin/pkg-config <<-HERE
 		#!/bin/sh

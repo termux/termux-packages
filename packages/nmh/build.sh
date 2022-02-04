@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.nongnu.org/nmh/
 TERMUX_PKG_DESCRIPTION="Powerful electronic mail handling system"
 TERMUX_PKG_LICENSE="BSD"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.7.1
 TERMUX_PKG_REVISION=7
 TERMUX_PKG_SRCURL=http://download.savannah.nongnu.org/releases/nmh/nmh-$TERMUX_PKG_VERSION.tar.gz

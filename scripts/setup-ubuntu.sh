@@ -108,6 +108,11 @@ PACKAGES+=" composer"
 
 # Needed by package rust.
 PACKAGES+=" libssl-dev" # Needed to build Rust
+PACKAGES+=" llvm-12-dev"
+PACKAGES+=" llvm-12-tools"
+PACKAGES+=" clang-12"
+
+# Formerly needed by package rust. Not sure if needed by other packages.
 PACKAGES+=" clang-10"
 
 # Needed for package smalltalk.

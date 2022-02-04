@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/beanshell/beanshell
 TERMUX_PKG_DESCRIPTION="Small, free, embeddable, source level Java interpreter with object based scripting language features written in Java"
 TERMUX_PKG_LICENSE="Apache-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.1.0
 TERMUX_PKG_SRCURL=https://github.com/beanshell/beanshell/releases/download/$TERMUX_PKG_VERSION/bsh-$TERMUX_PKG_VERSION.jar
 TERMUX_PKG_SHA256=e9a68515dd69d54a648c4497875264a874f6c69ff52d0ddaf4be2204f0f18652

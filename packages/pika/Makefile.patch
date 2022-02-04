@@ -1,0 +1,59 @@
+--- a/Makefile
++++ b/Makefile
+@@ -1,7 +1,5 @@
+ CLEAN_FILES = # deliberately empty, so we can append below.
+-CXX=g++
+-PLATFORM_LDFLAGS= -lpthread -lrt
+-PLATFORM_CXXFLAGS= -std=c++11 -fno-builtin-memcmp -msse -msse4.2 
++PLATFORM_CXXFLAGS= -std=c++11 -fno-builtin-memcmp $(CPPFLAGS)
+ PROFILING_FLAGS=-pg
+ OPT=
+ LDFLAGS += -Wl,-rpath=$(RPATH)
+@@ -27,7 +25,7 @@
+ 
+ # compile with -O2 if debug level is not 2
+ ifneq ($(DEBUG_LEVEL), 2)
+-OPT += -O2 -fno-omit-frame-pointer
++OPT += -Oz -fno-omit-frame-pointer
+ # if we're compiling for release, compile without debug code (-DNDEBUG) and
+ # don't treat warnings as errors
+ OPT += -DNDEBUG
+@@ -89,9 +87,7 @@
+ INCLUDE_PATH = -I. \
+ 							 -I$(SLASH_PATH) \
+ 							 -I$(PINK_PATH) \
+-							 -I$(BLACKWIDOW_PATH)/include \
+-							 -I$(ROCKSDB_PATH) \
+-							 -I$(ROCKSDB_PATH)/include \
++							 -I$(BLACKWIDOW_PATH)/include
+ 
+ ifeq ($(360),1)
+ INCLUDE_PATH += -I$(GLOG_PATH)/src
+@@ -100,8 +96,7 @@
+ LIB_PATH = -L./ \
+ 					 -L$(SLASH_PATH)/slash/lib \
+ 					 -L$(PINK_PATH)/pink/lib \
+-					 -L$(BLACKWIDOW_PATH)/lib \
+-					 -L$(ROCKSDB_PATH)        \
++					 -L$(BLACKWIDOW_PATH)/lib
+ 
+ ifeq ($(360),1)
+ LIB_PATH += -L$(GLOG_PATH)/.libs
+@@ -111,7 +106,7 @@
+ 			 		 -lpink$(DEBUG_SUFFIX) \
+ 			 		 -lslash$(DEBUG_SUFFIX) \
+ 					 -lblackwidow$(DEBUG_SUFFIX) \
+-					 -lrocksdb$(DEBUG_SUFFIX) \
++					 -lrocksdb \
+ 					 -lglog \
+ 					 -lprotobuf \
+ 
+@@ -210,7 +205,7 @@
+ 
+ dbg: $(BINARY)
+ 
+-$(BINARY): $(SLASH) $(PINK) $(ROCKSDB) $(BLACKWIDOW) $(GLOG) $(PROTOOBJECTS) $(LIBOBJECTS)
++$(BINARY): $(SLASH) $(PINK) $(BLACKWIDOW) $(PROTOOBJECTS) $(LIBOBJECTS)
+ 	$(AM_V_at)rm -f $@
+ 	$(AM_V_at)$(AM_LINK)
+ 	$(AM_V_at)rm -rf $(OUTPUT)

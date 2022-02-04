@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/bettio/AtomVM
 TERMUX_PKG_DESCRIPTION="The minimal Erlang VM implementation"
 TERMUX_PKG_LICENSE="LGPL-2.1"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=82624fbf68ad8a0c8815456adbd33de98e4901ea
 TERMUX_PKG_VERSION=0.git${_COMMIT:0:8}
 TERMUX_PKG_REVISION=7

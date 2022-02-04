@@ -15,7 +15,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 
 termux_step_pre_configure() {
 	local bin="$TERMUX_PKG_BUILDDIR/bin"
-	local sh="$(which sh)"
+	local sh="$(command -v sh)"
 	mkdir -p "$bin"
 	for p in curl icu xml2 xslt; do
 		local conf="$bin/${p}-config"
