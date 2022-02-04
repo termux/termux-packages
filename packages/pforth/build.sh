@@ -2,39 +2,47 @@ TERMUX_PKG_HOMEPAGE=http://www.softsynth.com/pforth/
 TERMUX_PKG_DESCRIPTION="Portable Forth in C"
 TERMUX_PKG_LICENSE="Public Domain"
 TERMUX_PKG_MAINTAINER="@termux"
-_COMMIT=ee8dc9e9e0f59b8e38dec3732caefe9f3af2b431
-TERMUX_PKG_VERSION=20180513
-TERMUX_PKG_REVISION=1
+_COMMIT=1aa4eb4976630fdb6882bb3aacb97aa09f69571e
+TERMUX_PKG_VERSION=20211129
 TERMUX_PKG_SRCURL=https://github.com/philburk/pforth/archive/${_COMMIT}.zip
-TERMUX_PKG_SHA256=3cf472bb944aa53b0eb0b93d021c8c2c0eff18dd2e3e54daddaf4af342e441ea
+TERMUX_PKG_SHA256=f06e5142d37c203a706057b303db18494919069583414731e2578ac374c01f61
 TERMUX_PKG_HOSTBUILD=true
-
-termux_step_post_configure() {
-	# Avoid caching the host build as it differs between arches
-	# and is quite fast here anyway:
-	rm -Rf $TERMUX_PKG_HOSTBUILD_DIR
-}
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_host_build() {
-	local M32=""
+	termux_setup_cmake
+
+	cp -a $TERMUX_PKG_SRCDIR/* .
+
+	mkdir -p 32bit
+	# Add -Wno-shift-count-overflow to ignore:
+	# /home/builder/.termux-build/pforth/src/csrc/pf_save.c:223:34: error: right shift count >= width of type [-Werror=shift-count-overflow
+	#   223 |         *addr++ = (uint8_t) (data>>56);
+	#       |                                  ^~
+	CC="gcc -m32" CFLAGS="-Wno-shift-count-overflow" cmake .
+	make
+	install -m700 fth/pforth 32bit/
+	install -m600 csrc/pfdicdat.h 32bit/
+
+	rm -rf CMakeCache.txt CMakeFiles
+
+	mkdir -p 64bit
+	cmake .
+	make
+	install -m700 fth/pforth 64bit/
+	install -m600 csrc/pfdicdat.h 64bit/
+}
+
+termux_step_post_configure() {
 	if [ $TERMUX_ARCH_BITS = "32" ]; then
-		M32="-m32"
+		local folder=32bit
+	else
+		local folder=64bit
 	fi
-	cp -Rf $TERMUX_PKG_SRCDIR/* .
-	cd build/unix
-	CC="gcc $M32" make pfdicdat.h
-	CC="gcc $M32" make all
+	cp $TERMUX_PKG_HOSTBUILD_DIR/$folder/pforth fth/
+	cp $TERMUX_PKG_HOSTBUILD_DIR/$folder/pfdicdat.h csrc/
 }
 
-termux_step_pre_configure() {
-	for file in pfdicdat.h pforth; do
-		cp $TERMUX_PKG_HOSTBUILD_DIR/build/unix/$file $TERMUX_PKG_SRCDIR/build/unix/$file
-		touch -d "next hour" $TERMUX_PKG_SRCDIR/build/unix/$file
-	done
-
-	export TERMUX_PKG_BUILDDIR=$TERMUX_PKG_SRCDIR/build/unix
-	export CC="$CC $CFLAGS $LDFLAGS"
-}
 termux_step_make_install() {
-	cp $TERMUX_PKG_BUILDDIR/pforth_standalone $TERMUX_PREFIX/bin/pforth
+	install -m700 fth/pforth_standalone $TERMUX_PREFIX/bin/pforth
 }
