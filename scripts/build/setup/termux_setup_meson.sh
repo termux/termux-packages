@@ -18,12 +18,6 @@ termux_setup_meson() {
 			"$MESON_TAR_FILE" \
 			5add789c953d984b500858b2851ee3d7add0460cf1a6f852f0a721af17384e13
 		tar xf "$MESON_TAR_FILE" -C "$TERMUX_PKG_TMPDIR"
-		# Avoid meson stripping away DT_RUNPATH, see
-		# (https://github.com/NetBSD/pkgsrc/commit/2fb2c013715a6374b4e2d1f8e9f2143e827f0f64
-		# and https://github.com/mesonbuild/meson/issues/314):
-		perl -p -i -e 's/self.fix_rpathtype_entry\(new_rpath, DT_RUNPATH\)//' \
-			$MESON_TMP_FOLDER/mesonbuild/scripts/depfixer.py
-
 		mv "$MESON_TMP_FOLDER" "$MESON_FOLDER"
 	fi
 	TERMUX_MESON="$MESON_FOLDER/meson.py"
