@@ -8,6 +8,7 @@ TERMUX_PKG_SHA256=00859aa13a772eddf7822225f4b46ee0d39afbe071d32778da4d99984081f7
 TERMUX_PKG_BREAKS="valgrind-dev"
 TERMUX_PKG_REPLACES="valgrind-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-tmpdir=$TERMUX_PREFIX/tmp"
+TERMUX_PKG_BLACKLISTED_ARCHES=x86_64
 
 termux_step_pre_configure() {
 	CFLAGS=${CFLAGS/-fstack-protector-strong/}
