@@ -193,3 +193,30 @@ local aapt2_sources_cpp="
 	cmd/Util.cpp
 	Main.cpp
 "
+
+# aidl
+local libaidl_sources_cpp="
+	aidl.cpp
+	aidl_language.cpp
+	ast_cpp.cpp
+	ast_java.cpp
+	code_writer.cpp
+	generate_cpp.cpp
+	generate_java.cpp
+	generate_java_binder.cpp
+	import_resolver.cpp
+	line_reader.cpp
+	io_delegate.cpp
+	options.cpp
+	type_cpp.cpp
+	type_java.cpp
+	type_namespace.cpp
+"
+libaidl_sources_cpp+="
+	lex.yy.c
+	aidl_language_y.tab.cc
+"
+local aidl_sources_cpp="
+	$libaidl_sources_cpp
+	main_java.cpp
+"
