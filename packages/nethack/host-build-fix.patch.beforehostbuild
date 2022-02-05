@@ -1,0 +1,35 @@
+commit 1cb5dc04605daa45f1c6a647c17442ed7ff2fe4e
+Author: nhmall <nhmall@nethack.org>
+Date:   Tue Jan 4 08:24:08 2022 -0500
+
+    work around ubuntu 20.10 build issue
+    
+    NetHack was trying to suppress warn_unused_result
+    in include/tradstdc.h, by defining warn_unused_result
+    to an empty string. That began causing a build error
+    in a system-supplied header file cdefs.h
+    when using 20.10 ubuntu impish.
+    
+    Try skipping that in tradstdc.h for any linux, unless
+    the NetHack build defines GCC_URWARN to force it into
+    play.
+
+diff --git a/include/tradstdc.h b/include/tradstdc.h
+index 09decb4b15ee..8c33d55e0ae9 100644
+--- a/include/tradstdc.h
++++ b/include/tradstdc.h
+@@ -405,12 +405,14 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
+ #if __GNUC__ >= 3
+ #define UNUSED __attribute__((unused))
+ #define NORETURN __attribute__((noreturn))
++#if !defined(__linux__) || defined(GCC_URWARN)
+ /* disable gcc's __attribute__((__warn_unused_result__)) since explicitly
+    discarding the result by casting to (void) is not accepted as a 'use' */
+ #define __warn_unused_result__ /*empty*/
+ #define warn_unused_result /*empty*/
+ #endif
+ #endif
++#endif
+ 
+ #ifndef PRINTF_F
+ #define PRINTF_F(f, v)
