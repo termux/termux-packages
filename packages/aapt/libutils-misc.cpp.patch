@@ -1,0 +1,29 @@
+--- a/core/libutils/misc.cpp
++++ b/core/libutils/misc.cpp
+@@ -23,7 +23,7 @@
+ #include <utils/Log.h>
+ #include <utils/Vector.h>
+ 
+-#if defined(__ANDROID__)
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ #include <dlfcn.h>
+ #include <vndksupport/linker.h>
+ #endif
+@@ -68,7 +68,7 @@
+ #endif
+ }
+ 
+-#if defined(__ANDROID__)
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ void (*get_report_sysprop_change_func())() {
+     void (*func)() = nullptr;
+     void* handle = android_load_sphal_library("libutils.so", RTLD_NOW);
+@@ -83,7 +83,7 @@
+ void report_sysprop_change() {
+     do_report_sysprop_change();
+ 
+-#if defined(__ANDROID__)
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+     // libutils.so is double loaded; from the default namespace and from the
+     // 'sphal' namespace. Redirect the sysprop change event to the other instance
+     // of libutils.so loaded in the 'sphal' namespace so that listeners attached
