@@ -374,10 +374,6 @@ unset -f _show_usage
 if [ "${TERMUX_INSTALL_DEPS-false}" = "true" ]; then
 	# Setup PGP keys for verifying integrity of dependencies.
 	# Keys are obtained from our keyring package.
-	gpg --list-keys 2218893D3F679BEFC421FD976700B77E6D8D0AE7 > /dev/null 2>&1 || {
-		gpg --import "$TERMUX_SCRIPTDIR/packages/termux-keyring/fornwall.gpg"
-		gpg --no-tty --command-file <(echo -e "trust\n5\ny")  --edit-key 2218893D3F679BEFC421FD976700B77E6D8D0AE7
-	}
 	gpg --list-keys 2C7F29AE97891F6419A9E2CDB0076E490B71616B > /dev/null 2>&1 || {
 		gpg --import "$TERMUX_SCRIPTDIR/packages/termux-keyring/grimler.gpg"
 		gpg --no-tty --command-file <(echo -e "trust\n5\ny")  --edit-key 2C7F29AE97891F6419A9E2CDB0076E490B71616B

@@ -2,8 +2,8 @@ TERMUX_PKG_HOMEPAGE=https://github.com/denoland/rusty_v8
 TERMUX_PKG_DESCRIPTION="High quality Rust bindings to V8's C++ API"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-_COMMIT=2fdcc0c629f5c6c2f251dec4a0f2cb370814dd26
-TERMUX_PKG_VERSION=2022.01.13
+_COMMIT=8b90dfd2f4fcbbaefd2c4d2be220d94a00a3ebba
+TERMUX_PKG_VERSION=2022.02.02
 TERMUX_PKG_SRCURL=https://github.com/denoland/rusty_v8.git
 TERMUX_PKG_GIT_BRANCH=main
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -11,7 +11,7 @@ TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686, x86_64"
 
 termux_step_post_get_source() {
-	git fetch --unshallow
+	git fetch --unshallow || true
 	git checkout $_COMMIT
 
 	local version="$(git log -1 --format=%cs | sed 's/-/./g')"

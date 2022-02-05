@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://gnunet.org
+TERMUX_PKG_HOMEPAGE=https://gnunet.org
 TERMUX_PKG_DESCRIPTION="A framework for secure peer-to-peer networking"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

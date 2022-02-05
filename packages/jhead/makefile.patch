@@ -1,0 +1,23 @@
+--- ../makefile.orig	2022-02-04 07:15:35.023914372 +0000
++++ ./makefile	2022-02-04 07:16:53.153727804 +0000
+@@ -3,9 +3,9 @@
+ #--------------------------------
+ OBJ=.
+ SRC=.
+-CPPFLAGS:=$(shell dpkg-buildflags --get CPPFLAGS)
+-CFLAGS:=$(shell dpkg-buildflags --get CFLAGS)
+-LDFLAGS:=$(shell dpkg-buildflags --get LDFLAGS)
++CPPFLAGS?=$(shell dpkg-buildflags --get CPPFLAGS)
++CFLAGS?=$(shell dpkg-buildflags --get CFLAGS)
++LDFLAGS?=$(shell dpkg-buildflags --get LDFLAGS)
+ 
+ all: jhead
+ 
+@@ -22,4 +22,6 @@
+ 	rm -f $(objs) jhead
+ 
+ install:
+-	cp jhead ${DESTDIR}/usr/bin/
++	install -Dm700 jhead ${DESTDIR}$(PREFIX)/bin/
++	mkdir -p ${DESTDIR}$(PREFIX)/share/man/man1/
++	install -m600 jhead.1 ${DESTDIR}$(PREFIX)/share/man/man1/

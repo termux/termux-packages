@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://www.codesink.org/mimetic_mime_library.html
+TERMUX_PKG_HOMEPAGE=https://www.codesink.org/mimetic_mime_library.html
 TERMUX_PKG_DESCRIPTION="A C++ Email library (MIME)"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
