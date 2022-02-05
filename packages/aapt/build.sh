@@ -8,15 +8,18 @@ TERMUX_PKG_VERSION=${_TAG_VERSION}.${_TAG_REVISION}
 TERMUX_PKG_SRCURL=(https://android.googlesource.com/platform/frameworks/base
                    https://android.googlesource.com/platform/system/core
                    https://android.googlesource.com/platform/build
-                   https://android.googlesource.com/platform/external/safe-iop)
+                   https://android.googlesource.com/platform/external/safe-iop
+                   https://android.googlesource.com/platform/system/tools/aidl)
 TERMUX_PKG_GIT_BRANCH=android-${_TAG_VERSION}_r${_TAG_REVISION}
 TERMUX_PKG_SHA256=(SKIP_CHECKSUM
+                   SKIP_CHECKSUM
                    SKIP_CHECKSUM
                    SKIP_CHECKSUM
                    SKIP_CHECKSUM)
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="libc++, libexpat, libpng, libzopfli, zlib"
+TERMUX_PKG_HOSTBUILD=true
 
 termux_step_post_get_source() {
 	# FIXME: We would like to enable checksums when downloading
@@ -41,6 +44,23 @@ termux_step_post_get_source() {
 	mv zopfli-zopfli-$ZOPFLI_VER zopfli
 }
 
+termux_step_host_build() {
+	_PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/_prefix
+
+	# Need bison that understands --header=[FILE] option.
+	local BISON_BUILD_SH=$TERMUX_SCRIPTDIR/packages/bison/build.sh
+	local BISON_SRCURL=$(bash -c ". $BISON_BUILD_SH; echo \$TERMUX_PKG_SRCURL")
+	local BISON_SHA256=$(bash -c ". $BISON_BUILD_SH; echo \$TERMUX_PKG_SHA256")
+	local BISON_TARFILE=$TERMUX_PKG_CACHEDIR/$(basename $BISON_SRCURL)
+	termux_download $BISON_SRCURL $BISON_TARFILE $BISON_SHA256
+	mkdir -p bison
+	cd bison
+	tar xf $BISON_TARFILE --strip-components=1
+	./configure --prefix=$_PREFIX_FOR_BUILD
+	make -j $TERMUX_MAKE_PROCESSES
+	make install
+}
+
 termux_step_pre_configure() {
 	# Certain packages are not safe to build on device because their
 	# build.sh script deletes specific files in $TERMUX_PREFIX.
@@ -49,6 +69,8 @@ termux_step_pre_configure() {
 	fi
 
 	termux_setup_protobuf
+
+	export PATH=$_PREFIX_FOR_BUILD/bin:$PATH
 
 	CFLAGS+=" -fPIC"
 	CXXFLAGS+=" -fPIC"
@@ -76,6 +98,7 @@ termux_step_make() {
 	local AAPT_SRCDIR=$TERMUX_PKG_SRCDIR/base/tools/aapt
 	local AAPT2_SRCDIR=$TERMUX_PKG_SRCDIR/base/tools/aapt2
 	local ZIPALIGN_SRCDIR=$TERMUX_PKG_SRCDIR/build/tools/zipalign
+	local AIDL_SRCDIR=$TERMUX_PKG_SRCDIR/aidl
 
 	# Build libcutils:
 	cd $LIBCUTILS_SRCDIR
@@ -212,13 +235,32 @@ termux_step_make() {
 		-lzopfli \
 		-lz \
 		-o $_TMP_BINDIR/zipalign
+
+	# Build aidl:
+	cd $AIDL_SRCDIR
+	flex aidl_language_l.ll
+	bison --header=aidl_language_y.h aidl_language_y.yy
+	cat >> aidl_language_y.h <<-EOF
+		typedef union yy::parser::value_type YYSTYPE;
+		typedef yy::parser::location_type YYLTYPE;
+	EOF
+	local AIDL_CPPFLAGS="$CPPFLAGS \
+		-I. \
+		-I$LIBBASE_SRCDIR/include"
+	for f in $aidl_sources_cpp; do
+		$CXX $CXXFLAGS $AIDL_CPPFLAGS $f -c
+	done
+	$CXX $CXXFLAGS *.o $LDFLAGS \
+		-landroid-base \
+		-llog \
+		-o $_TMP_BINDIR/aidl
 }
 
 termux_step_make_install() {
 	install -Dm600 -t $TERMUX_PREFIX/lib \
 		$_TMP_LIBDIR/libandroid-{cutils,utils,base,ziparchive,fw}.so
 	install -Dm700 -t $TERMUX_PREFIX/bin \
-		$_TMP_BINDIR/{aapt,aapt2,zipalign}
+		$_TMP_BINDIR/{aapt,aapt2,zipalign,aidl}
 
 	# Create an android.jar with AndroidManifest.xml and resources.arsc:
 	cd $TERMUX_PKG_TMPDIR
