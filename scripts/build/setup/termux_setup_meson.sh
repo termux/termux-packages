@@ -52,6 +52,9 @@ termux_setup_meson() {
 	echo "[properties]" >> $TERMUX_MESON_CROSSFILE
 	echo "needs_exe_wrapper = true" >> $TERMUX_MESON_CROSSFILE
 
+	echo '' >> $TERMUX_MESON_CROSSFILE
+	echo "[built-in options]" >> $TERMUX_MESON_CROSSFILE
+
 	echo -n "c_args = [" >> $TERMUX_MESON_CROSSFILE
 	local word first=true
 	for word in $CFLAGS $CPPFLAGS; do
