@@ -1,0 +1,22 @@
+--- a/base/tools/aapt2/util/Util.cpp
++++ b/base/tools/aapt2/util/Util.cpp
+@@ -23,7 +23,6 @@
+ 
+ #include "android-base/stringprintf.h"
+ #include "androidfw/StringPiece.h"
+-#include "build/version.h"
+ 
+ #include "text/Unicode.h"
+ #include "text/Utf8Iterator.h"
+@@ -214,10 +213,7 @@
+   // Update minor version whenever a feature or flag is added.
+   static const char* const sMinorVersion = "19";
+ 
+-  // The build id of aapt2 binary.
+-  static const std::string sBuildId = android::build::GetBuildNumber();
+-
+-  return android::base::StringPrintf("%s.%s-%s", sMajorVersion, sMinorVersion, sBuildId.c_str());
++  return android::base::StringPrintf("%s.%s", sMajorVersion, sMinorVersion);
+ }
+ 
+ static size_t ConsumeDigits(const char* start, const char* end) {
