@@ -38,7 +38,7 @@ termux_step_make_install() {
 
 termux_step_post_make_install() {
 	cd "$TERMUX_PREFIX"/share/man/man1
-	mv -f lua.1 lua5.4.4
-	mv -f luac.1 luac5.4.4
+	mv -f lua.1 lua5.4.1
+	mv -f luac.1 luac5.4.1
 	export AR="$OLDAR"
 }
