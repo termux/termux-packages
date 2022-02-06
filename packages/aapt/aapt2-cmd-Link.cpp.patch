@@ -1,0 +1,36 @@
+--- a/base/tools/aapt2/cmd/Link.cpp
++++ b/base/tools/aapt2/cmd/Link.cpp
+@@ -88,6 +88,10 @@
+   std::vector<std::string> javadoc_annotations;
+   Maybe<std::string> private_symbols;
+ 
++  bool proguard_conditional_keep_rules = false;
++  bool proguard_minimal_keep_rules = false;
++  bool no_proguard_location_reference = false;
++
+   // Optimizations/features.
+   bool no_auto_version = false;
+   bool no_version_vectors = false;
+@@ -1872,6 +1876,12 @@
+           .OptionalFlag("--proguard-main-dex",
+                         "Output file for generated Proguard rules for the main dex.",
+                         &options.generate_main_dex_proguard_rules_path)
++          .OptionalSwitch("--proguard-conditional-keep-rules",
++                          "Ignored for compatibility",
++                          &options.proguard_conditional_keep_rules)
++          .OptionalSwitch("--proguard-minimal-keep-rules",
++                          "Ignored for compatibility",
++                          &options.proguard_minimal_keep_rules)
+           .OptionalSwitch("--no-auto-version",
+                           "Disables automatic style and layout SDK versioning.",
+                           &options.no_auto_version)
+@@ -1933,6 +1943,9 @@
+                           "Generates R.java without the final modifier. This is implied when\n"
+                           "--static-lib is specified.",
+                           &options.generate_non_final_ids)
++          .OptionalSwitch("--no-proguard-location-reference",
++                          "Ignored for compatibility",
++                          &options.no_proguard_location_reference)
+           .OptionalFlag("--stable-ids", "File containing a list of name to ID mapping.",
+                         &stable_id_file_path)
+           .OptionalFlag("--emit-ids",

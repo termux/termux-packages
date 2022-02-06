@@ -1,0 +1,19 @@
+--- a/base/tools/aapt2/cmd/Compile.cpp
++++ b/base/tools/aapt2/cmd/Compile.cpp
+@@ -113,6 +113,7 @@
+   bool pseudolocalize = false;
+   bool no_png_crunch = false;
+   bool legacy_mode = false;
++  bool source_path = false;
+   bool verbose = false;
+ };
+ 
+@@ -658,6 +659,8 @@
+           .OptionalSwitch("--no-crunch", "Disables PNG processing", &options.no_png_crunch)
+           .OptionalSwitch("--legacy", "Treat errors that used to be valid in AAPT as warnings",
+                           &options.legacy_mode)
++          .OptionalSwitch("--source-path", "Ignored for compatibility",
++                          &options.source_path)
+           .OptionalSwitch("-v", "Enables verbose logging", &verbose);
+   if (!flags.Parse("aapt2 compile", args, &std::cerr)) {
+     return 1;
