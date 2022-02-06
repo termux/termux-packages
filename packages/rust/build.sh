@@ -126,7 +126,8 @@ termux_step_make_install() {
 	$TERMUX_PKG_SRCDIR/x.py install --stage 1 std --target wasm32-unknown-unknown
 	$TERMUX_PKG_SRCDIR/x.py dist rustc-dev --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME --target wasm32-unknown-unknown
 	tar xvf build/dist/rustc-dev-$TERMUX_PKG_VERSION-$CARGO_TARGET_NAME.tar.gz
-	./rustc-dev-$TERMUX_PKG_VERSION-$CARGO_TARGET_NAME/install.sh --prefix=$TERMUX_PREFIX
+	./rustc-dev-$TERMUX_PKG_VERSION-$CARGO_TARGET_NAME/install.sh \
+		--destdir=$TERMUX_PKG_MASSAGEDIR --prefix=$TERMUX_PREFIX
 
 	cd "$TERMUX_PREFIX/lib"
 	rm -f libc.so libdl.so
@@ -136,10 +137,11 @@ termux_step_make_install() {
 	mv $TERMUX_PREFIX/lib/liblzma.so.tmp $TERMUX_PREFIX/lib/liblzma.so.$LZMA_VERSION
 	mv $TERMUX_PREFIX/lib/liblzma.a.tmp $TERMUX_PREFIX/lib/liblzma.a || true
 
+	cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib"
 	ln -sf rustlib/$CARGO_TARGET_NAME/lib/*.so .
-	ln -sf $TERMUX_PREFIX/bin/lld $TERMUX_PREFIX/bin/rust-lld
+	ln -sf lld $TERMUX_PREFIX/bin/rust-lld
 
-	cd "$TERMUX_PREFIX/lib/rustlib"
+	cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/rustlib"
 	rm -rf components \
 		install.log \
 		uninstall.sh \
