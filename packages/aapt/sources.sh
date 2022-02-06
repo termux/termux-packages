@@ -1,47 +1,44 @@
 
 # libcutils
-local libcutils_nonwindows_sources_cpp="
-	android_get_control_file.cpp
+local libcutils_sockets_nonwindows_sources="
+	socket_inaddr_any_server_unix.cpp
+	socket_local_client_unix.cpp
+	socket_local_server_unix.cpp
+	socket_network_client_unix.cpp
 	sockets_unix.cpp
 "
-local libcutils_sources_cpp="
-	$libcutils_nonwindows_sources_cpp
-	fs_config.cpp
-	sched_policy.cpp
+local libcutils_sockets_sources="
+	$libcutils_sockets_nonwindows_sources
 	sockets.cpp
 "
-local libcutils_nonwindows_sources_c="
-	fs.c
-	multiuser.c
-	socket_inaddr_any_server_unix.c
-	socket_local_client_unix.c
-	socket_local_server_unix.c
-	socket_network_client_unix.c
-	str_parms.c
+local libcutils_nonwindows_sources="
+	fs.cpp
+	hashmap.cpp
+	multiuser.cpp
+	str_parms.cpp
 "
-libcutils_nonwindows_sources_c+="
-	ashmem-host.c
-	trace-host.c
+libcutils_nonwindows_sources+="
+	ashmem-host.cpp
+	fs_config.cpp
+	trace-host.cpp
 "
-local libcutils_sources_c="
-	$libcutils_nonwindows_sources_c
-	config_utils.c
-	canned_fs_config.c
-	hashmap.c
-	iosched_policy.c
-	load_file.c
-	native_handle.c
-	open_memstream.c
-	record_stream.c
-	strdup16to8.c
-	strdup8to16.c
+local libcutils_sources="
+	$libcutils_sockets_sources
+	$libcutils_nonwindows_sources
+	config_utils.cpp
+	canned_fs_config.cpp
+	iosched_policy.cpp
+	load_file.cpp
+	native_handle.cpp
+	properties.cpp
+	record_stream.cpp
 	strlcpy.c
-	threads.c
+	threads.cpp
 "
 
 # libutils
-#CallStack.cpp
 local libutils_sources="
+	Errors.cpp
 	FileMap.cpp
 	JenkinsHash.cpp
 	NativeHandle.cpp
@@ -49,7 +46,6 @@ local libutils_sources="
 	PropertyMap.cpp
 	RefBase.cpp
 	SharedBuffer.cpp
-	Static.cpp
 	StopWatch.cpp
 	String8.cpp
 	String16.cpp
@@ -66,16 +62,23 @@ local libutils_sources="
 # libbase
 local libbase_linux_sources="
 	errors_unix.cpp
-	chrono_utils.cpp
 "
 local libbase_sources="
 	$libbase_linux_sources
+	abi_compatibility.cpp
+	chrono_utils.cpp
+	cmsg.cpp
 	file.cpp
+	liblog_symbols.cpp
 	logging.cpp
+	mapped_file.cpp
+	parsebool.cpp
 	parsenetaddress.cpp
-	quick_exit.cpp
+	process.cpp
+	properties.cpp
 	stringprintf.cpp
 	strings.cpp
+	threads.cpp
 	test_utils.cpp
 "
 
@@ -95,10 +98,14 @@ local androidfw_sources="
 	AssetManager2.cpp
 	AttributeResolution.cpp
 	ChunkIterator.cpp
+	ConfigDescription.cpp
+	Idmap.cpp
 	LoadedArsc.cpp
+	Locale.cpp
 	LocaleData.cpp
 	misc.cpp
 	ObbFile.cpp
+	PosixUtils.cpp
 	ResourceTypes.cpp
 	ResourceUtils.cpp
 	StreamingZipInflater.cpp
@@ -109,12 +116,13 @@ local androidfw_sources="
 "
 
 # aapt2
-local libaapt2_sources_proto="
+local libaapt2_proto="
+	Configuration.proto
 	Resources.proto
 	ResourcesInternal.proto
 "
-local libaapt2_sources_cpp="
-	${libaapt2_sources_proto//.proto/.pb.cc}
+local libaapt2_sources="
+	${libaapt2_proto//.proto/.pb.cc}
 	compile/IdAssigner.cpp
 	compile/InlineXmlFormatParser.cpp
 	compile/NinePatch.cpp
@@ -125,52 +133,56 @@ local libaapt2_sources_cpp="
 	compile/Pseudolocalizer.cpp
 	compile/XmlIdCollector.cpp
 	configuration/ConfigurationParser.cpp
+	dump/DumpManifest.cpp
 	filter/AbiFilter.cpp
 	filter/ConfigFilter.cpp
-	flatten/Archive.cpp
-	flatten/TableFlattener.cpp
-	flatten/XmlFlattener.cpp
-	io/BigBufferStreams.cpp
+	format/Archive.cpp
+	format/Container.cpp
+	format/binary/BinaryResourceParser.cpp
+	format/binary/ResChunkPullParser.cpp
+	format/binary/TableFlattener.cpp
+	format/binary/XmlFlattener.cpp
+	format/proto/ProtoDeserialize.cpp
+	format/proto/ProtoSerialize.cpp
+	io/BigBufferStream.cpp
 	io/File.cpp
-	io/FileInputStream.cpp
+	io/FileStream.cpp
 	io/FileSystem.cpp
-	io/StringInputStream.cpp
+	io/StringStream.cpp
 	io/Util.cpp
 	io/ZipArchive.cpp
 	link/AutoVersioner.cpp
 	link/ManifestFixer.cpp
+	link/NoDefaultResourceRemover.cpp
 	link/ProductFilter.cpp
 	link/PrivateAttributeMover.cpp
 	link/ReferenceLinker.cpp
+	link/ResourceExcluder.cpp
 	link/TableMerger.cpp
 	link/XmlCompatVersioner.cpp
 	link/XmlNamespaceRemover.cpp
 	link/XmlReferenceLinker.cpp
+	optimize/MultiApkGenerator.cpp
 	optimize/ResourceDeduper.cpp
+	optimize/ResourceFilter.cpp
+	optimize/ResourcePathShortener.cpp
 	optimize/VersionCollapser.cpp
 	process/SymbolTable.cpp
-	proto/ProtoHelpers.cpp
-	proto/TableProtoDeserializer.cpp
-	proto/TableProtoSerializer.cpp
 	split/TableSplitter.cpp
+	text/Printer.cpp
 	text/Unicode.cpp
 	text/Utf8Iterator.cpp
-	unflatten/BinaryResourceParser.cpp
-	unflatten/ResChunkPullParser.cpp
 	util/BigBuffer.cpp
 	util/Files.cpp
 	util/Util.cpp
-	ConfigDescription.cpp
 	Debug.cpp
 	DominatorTree.cpp
-	Flags.cpp
 	java/AnnotationProcessor.cpp
 	java/ClassDefinition.cpp
 	java/JavaClassGenerator.cpp
 	java/ManifestClassGenerator.cpp
 	java/ProguardRules.cpp
 	LoadedApk.cpp
-	Locale.cpp
 	Resource.cpp
 	ResourceParser.cpp
 	ResourceTable.cpp
@@ -178,45 +190,57 @@ local libaapt2_sources_cpp="
 	ResourceValues.cpp
 	SdkConstants.cpp
 	StringPool.cpp
+	trace/TraceBuffer.cpp
 	xml/XmlActionExecutor.cpp
 	xml/XmlDom.cpp
 	xml/XmlPullParser.cpp
 	xml/XmlUtil.cpp
 "
-local aapt2_sources_cpp="
-	$libaapt2_sources_cpp
+local aapt2_tool_sources="
+	cmd/Command.cpp
 	cmd/Compile.cpp
+	cmd/Convert.cpp
 	cmd/Diff.cpp
 	cmd/Dump.cpp
 	cmd/Link.cpp
 	cmd/Optimize.cpp
 	cmd/Util.cpp
+"
+local aapt2_sources="
+	$libaapt2_sources
+	$aapt2_tool_sources
 	Main.cpp
 "
 
 # aidl
-local libaidl_sources_cpp="
+local libaidl_sources="
 	aidl.cpp
+	aidl_checkapi.cpp
+	aidl_const_expressions.cpp
 	aidl_language.cpp
+	aidl_typenames.cpp
+	aidl_to_cpp.cpp
+	aidl_to_java.cpp
+	aidl_to_ndk.cpp
 	ast_cpp.cpp
 	ast_java.cpp
 	code_writer.cpp
 	generate_cpp.cpp
+	aidl_to_cpp_common.cpp
+	generate_ndk.cpp
 	generate_java.cpp
 	generate_java_binder.cpp
+	generate_aidl_mappings.cpp
 	import_resolver.cpp
 	line_reader.cpp
 	io_delegate.cpp
 	options.cpp
-	type_cpp.cpp
-	type_java.cpp
-	type_namespace.cpp
 "
-libaidl_sources_cpp+="
+libaidl_sources+="
 	lex.yy.c
 	aidl_language_y.tab.cc
 "
-local aidl_sources_cpp="
-	$libaidl_sources_cpp
-	main_java.cpp
+local aidl_sources="
+	$libaidl_sources
+	main.cpp
 "

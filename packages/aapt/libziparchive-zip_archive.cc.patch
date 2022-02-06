@@ -1,0 +1,38 @@
+--- a/core/libziparchive/zip_archive.cc
++++ b/core/libziparchive/zip_archive.cc
+@@ -38,7 +38,7 @@
+ #define lseek64 lseek
+ #endif
+ 
+-#if defined(__BIONIC__)
++#if defined(__BIONIC__) && __ANDROID_API__ >= 29
+ #include <android/fdsan.h>
+ #endif
+ 
+@@ -155,7 +155,7 @@
+   return 0;
+ }
+ 
+-#if defined(__BIONIC__)
++#if defined(__BIONIC__) && __ANDROID_API__ >= 29
+ uint64_t GetOwnerTag(const ZipArchive* archive) {
+   return android_fdsan_create_owner_tag(ANDROID_FDSAN_OWNER_TYPE_ZIPARCHIVE,
+                                         reinterpret_cast<uint64_t>(archive));
+@@ -171,7 +171,7 @@
+       num_entries(0),
+       hash_table_size(0),
+       hash_table(nullptr) {
+-#if defined(__BIONIC__)
++#if defined(__BIONIC__) && __ANDROID_API__ >= 29
+   if (assume_ownership) {
+     CHECK(mapped_zip.HasFd());
+     android_fdsan_exchange_owner_tag(mapped_zip.GetFileDescriptor(), 0, GetOwnerTag(this));
+@@ -191,7 +191,7 @@
+ 
+ ZipArchive::~ZipArchive() {
+   if (close_file && mapped_zip.GetFileDescriptor() >= 0) {
+-#if defined(__BIONIC__)
++#if defined(__BIONIC__) && __ANDROID_API__ >= 29
+     android_fdsan_close_with_tag(mapped_zip.GetFileDescriptor(), GetOwnerTag(this));
+ #else
+     close(mapped_zip.GetFileDescriptor());

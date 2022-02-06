@@ -2,17 +2,15 @@ TERMUX_PKG_HOMEPAGE=https://elinux.org/Android_aapt
 TERMUX_PKG_DESCRIPTION="Android Asset Packaging Tool"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-_TAG_VERSION=8.1.0
-_TAG_REVISION=81
+_TAG_VERSION=11.0.0
+_TAG_REVISION=48
 TERMUX_PKG_VERSION=${_TAG_VERSION}.${_TAG_REVISION}
 TERMUX_PKG_SRCURL=(https://android.googlesource.com/platform/frameworks/base
                    https://android.googlesource.com/platform/system/core
                    https://android.googlesource.com/platform/build
-                   https://android.googlesource.com/platform/external/safe-iop
                    https://android.googlesource.com/platform/system/tools/aidl)
 TERMUX_PKG_GIT_BRANCH=android-${_TAG_VERSION}_r${_TAG_REVISION}
 TERMUX_PKG_SHA256=(SKIP_CHECKSUM
-                   SKIP_CHECKSUM
                    SKIP_CHECKSUM
                    SKIP_CHECKSUM
                    SKIP_CHECKSUM)
@@ -30,6 +28,10 @@ termux_step_post_get_source() {
 		git clone --depth 1 --single-branch \
 			--branch $TERMUX_PKG_GIT_BRANCH \
 			${TERMUX_PKG_SRCURL[$i]}
+	done
+
+	for f in base/tools/aapt2/*.proto; do
+		sed -i 's:frameworks/base/tools/aapt2/::' $f
 	done
 
 	# Get zopfli source:
@@ -73,7 +75,8 @@ termux_step_pre_configure() {
 	export PATH=$_PREFIX_FOR_BUILD/bin:$PATH
 
 	CFLAGS+=" -fPIC"
-	CXXFLAGS+=" -fPIC"
+	CXXFLAGS+=" -fPIC -std=c++17"
+	CPPFLAGS+=" -D__ANDROID_SDK_VERSION__=__ANDROID_API__"
 
 	_TMP_LIBDIR=$TERMUX_PKG_SRCDIR/_lib
 	rm -rf $_TMP_LIBDIR
@@ -82,7 +85,7 @@ termux_step_pre_configure() {
 	rm -rf $_TMP_BINDIR
 	mkdir -p $_TMP_BINDIR
 
-	LDFLAGS+=" -L$_TMP_LIBDIR"
+	LDFLAGS+=" -llog -L$_TMP_LIBDIR"
 }
 
 termux_step_make() {
@@ -91,103 +94,74 @@ termux_step_make() {
 	local CORE_INCDIR=$TERMUX_PKG_SRCDIR/core/include
 	local LIBBASE_SRCDIR=$TERMUX_PKG_SRCDIR/core/base
 	local LIBCUTILS_SRCDIR=$TERMUX_PKG_SRCDIR/core/libcutils
-	local SAFE_IOP_SRCDIR=$TERMUX_PKG_SRCDIR/safe-iop
 	local LIBUTILS_SRCDIR=$TERMUX_PKG_SRCDIR/core/libutils
 	local LIBZIPARCHIVE_SRCDIR=$TERMUX_PKG_SRCDIR/core/libziparchive
 	local ANDROIDFW_SRCDIR=$TERMUX_PKG_SRCDIR/base/libs/androidfw
 	local AAPT_SRCDIR=$TERMUX_PKG_SRCDIR/base/tools/aapt
+	local LIBIDMAP2_POLICIES_INCDIR=$TERMUX_PKG_SRCDIR/base/cmds/idmap2/libidmap2_policies/include
 	local AAPT2_SRCDIR=$TERMUX_PKG_SRCDIR/base/tools/aapt2
 	local ZIPALIGN_SRCDIR=$TERMUX_PKG_SRCDIR/build/tools/zipalign
 	local AIDL_SRCDIR=$TERMUX_PKG_SRCDIR/aidl
 
+	CPPFLAGS+=" -I. -I./include -I$LIBBASE_SRCDIR/include -I$CORE_INCDIR"
+
 	# Build libcutils:
 	cd $LIBCUTILS_SRCDIR
-	local LIBCUTILS_CPPFLAGS="$CPPFLAGS \
-		-I. \
-		-I./include \
-		-I$CORE_INCDIR"
-	for f in $libcutils_sources_cpp; do
-		$CXX $CXXFLAGS $LIBCUTILS_CPPFLAGS $f -c
-	done
-	for f in $libcutils_sources_c; do
-		$CC $CFLAGS $LIBCUTILS_CPPFLAGS -Dchar16_t=uint16_t $f -c
+	for f in $libcutils_sources; do
+		$CXX $CXXFLAGS $CPPFLAGS $f -c
 	done
 	$CC $CFLAGS *.o -shared $LDFLAGS \
-		-llog \
 		-o $_TMP_LIBDIR/libandroid-cutils.so
 
 	# Build libutils:
 	cd $LIBUTILS_SRCDIR
-	$CC $CFLAGS $CPPFLAGS -I$SAFE_IOP_SRCDIR/include \
-		$SAFE_IOP_SRCDIR/src/safe_iop.c -c -o safe_iop.o
-	local LIBUTILS_CPPFLAGS="$CPPFLAGS \
-		-I. \
-		-I$SAFE_IOP_SRCDIR/include \
-		-I$CORE_INCDIR"
 	for f in $libutils_sources; do
-		$CXX $CXXFLAGS $LIBUTILS_CPPFLAGS $f -c
+		$CXX $CXXFLAGS $CPPFLAGS $f -c
 	done
 	$CXX $CXXFLAGS *.o -shared $LDFLAGS \
 		-landroid-cutils \
-		-llog \
 		-o $_TMP_LIBDIR/libandroid-utils.so
 
 	# Build libbase:
 	cd $LIBBASE_SRCDIR
-	local LIBBASE_CPPFLAGS="$CPPFLAGS \
-		-I./include \
-		-I$CORE_INCDIR"
 	for f in $libbase_sources; do
-		$CXX $CXXFLAGS $LIBBASE_CPPFLAGS $f -c
+		$CXX $CXXFLAGS $CPPFLAGS $f -c
 	done
 	$CXX $CXXFLAGS *.o -shared $LDFLAGS \
-		-llog \
 		-o $_TMP_LIBDIR/libandroid-base.so
 
 	# Build libziparchive:
 	cd $LIBZIPARCHIVE_SRCDIR
-	local LIBZIPARCHIVE_CPPFLAGS="$CPPFLAGS \
-		-I./include \
-		-I$LIBBASE_SRCDIR/include \
-		-I$CORE_INCDIR"
 	for f in $libziparchive_sources; do
-		$CXX $CXXFLAGS $LIBZIPARCHIVE_CPPFLAGS $f -c
+		$CXX $CXXFLAGS $CPPFLAGS $f -c
 	done
 	$CXX $CXXFLAGS *.o -shared $LDFLAGS \
 		-landroid-base \
-		-llog \
+		-lz \
 		-o $_TMP_LIBDIR/libandroid-ziparchive.so
+
+	CPPFLAGS+=" -I$LIBZIPARCHIVE_SRCDIR/include"
 
 	# Build libandroidfw:
 	cd $ANDROIDFW_SRCDIR
-	local ANDROIDFW_CPPFLAGS="$CPPFLAGS \
-		-I./include \
-		-I$LIBBASE_SRCDIR/include \
-		-I$LIBZIPARCHIVE_SRCDIR/include \
-		-I$CORE_INCDIR"
 	for f in $androidfw_sources; do
-		$CXX $CXXFLAGS $ANDROIDFW_CPPFLAGS $f -c
+		$CXX $CXXFLAGS $CPPFLAGS $f -c
 	done
 	$CXX $CXXFLAGS *.o -shared $LDFLAGS \
 		-landroid-base \
 		-landroid-ziparchive \
-		-llog \
 		-o $_TMP_LIBDIR/libandroid-fw.so
+
+	CPPFLAGS+=" -I$ANDROIDFW_SRCDIR/include"
 
 	# Build aapt:
 	cd $AAPT_SRCDIR
-	local AAPT_CPPFLAGS="$CPPFLAGS \
-		-I./include \
-		-I$LIBBASE_SRCDIR/include \
-		-I$ANDROIDFW_SRCDIR/include \
-		-I$CORE_INCDIR"
 	for f in *.cpp; do
-		$CXX $CXXFLAGS $AAPT_CPPFLAGS $f -c
+		$CXX $CXXFLAGS $CPPFLAGS $f -c
 	done
 	$CXX $CXXFLAGS *.o $LDFLAGS \
 		-landroid-fw \
 		-landroid-utils \
-		-llog \
 		-lexpat \
 		-lpng \
 		-lz \
@@ -195,25 +169,18 @@ termux_step_make() {
 
 	# Build aapt2:
 	cd $AAPT2_SRCDIR
-	local AAPT2_CPPFLAGS="$CPPFLAGS \
-		-I. \
-		-I./include \
-		-I$LIBBASE_SRCDIR/include \
-		-I$LIBZIPARCHIVE_SRCDIR/include \
-		-I$ANDROIDFW_SRCDIR/include \
-		-I$CORE_INCDIR"
-	for f in $libaapt2_sources_proto; do
+	for f in $libaapt2_proto; do
 		protoc --cpp_out=. $f
 	done
-	for f in $aapt2_sources_cpp; do
-		$CXX $CXXFLAGS $AAPT2_CPPFLAGS $f -c -o ${f%.*}.o
+	for f in $aapt2_sources; do
+		$CXX $CXXFLAGS $CPPFLAGS -I$LIBIDMAP2_POLICIES_INCDIR \
+			$f -c -o ${f%.*}.o
 	done
-	$CXX $CXXFLAGS *.o */*.o $LDFLAGS \
+	$CXX $CXXFLAGS $(find . -name '*.o') $LDFLAGS \
 		-landroid-base \
 		-landroid-fw \
 		-landroid-utils \
 		-landroid-ziparchive \
-		-llog \
 		-lexpat \
 		-lpng \
 		-lprotobuf \
@@ -221,17 +188,12 @@ termux_step_make() {
 
 	# Build zipalign:
 	cd $ZIPALIGN_SRCDIR
-	local ZIPALIGN_CPPFLAGS="$CPPFLAGS \
-		-I$TERMUX_PKG_SRCDIR/zopfli/src \
-		-I$ANDROIDFW_SRCDIR/include \
-		-I$CORE_INCDIR"
 	for f in *.cpp; do
-		$CXX $CXXFLAGS $ZIPALIGN_CPPFLAGS $f -c
+		$CXX $CXXFLAGS $CPPFLAGS -I$TERMUX_PKG_SRCDIR/zopfli/src $f -c
 	done
 	$CXX $CXXFLAGS *.o $LDFLAGS \
-		-landroid-fw \
 		-landroid-utils \
-		-llog \
+		-landroid-ziparchive \
 		-lzopfli \
 		-lz \
 		-o $_TMP_BINDIR/zipalign
@@ -244,15 +206,11 @@ termux_step_make() {
 		typedef union yy::parser::value_type YYSTYPE;
 		typedef yy::parser::location_type YYLTYPE;
 	EOF
-	local AIDL_CPPFLAGS="$CPPFLAGS \
-		-I. \
-		-I$LIBBASE_SRCDIR/include"
-	for f in $aidl_sources_cpp; do
-		$CXX $CXXFLAGS $AIDL_CPPFLAGS $f -c
+	for f in $aidl_sources; do
+		$CXX $CXXFLAGS $CPPFLAGS $f -c
 	done
 	$CXX $CXXFLAGS *.o $LDFLAGS \
 		-landroid-base \
-		-llog \
 		-o $_TMP_BINDIR/aidl
 }
 
