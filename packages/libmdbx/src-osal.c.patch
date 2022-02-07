@@ -1,0 +1,11 @@
+--- a/src/osal.c
++++ b/src/osal.c
+@@ -1292,7 +1292,7 @@
+   mounted = setmntent("/proc/mounts", "r");
+ #endif /* Linux */
+   if (!mounted)
+-    mounted = setmntent("/etc/mtab", "r");
++    mounted = setmntent("@TERMUX_PREFIX@/etc/mtab", "r");
+   if (mounted) {
+     const struct mntent *ent;
+ #if defined(_BSD_SOURCE) || defined(_SVID_SOURCE) || defined(__BIONIC__) ||    \
