@@ -18,7 +18,7 @@
  struct thread_data_t {
      thread_func_t   entryFunction;
      void*           userData;
-@@ -131,7 +131,7 @@
+@@ -133,7 +133,7 @@
      pthread_attr_init(&attr);
      pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
  
@@ -27,7 +27,7 @@
      if (threadPriority != PRIORITY_DEFAULT || threadName != NULL) {
          // Now that the pthread_t has a method to find the associated
          // android_thread_id_t (pid) from pthread_t, it would be possible to avoid
-@@ -175,7 +175,7 @@
+@@ -177,7 +177,7 @@
      return 1;
  }
  
@@ -36,7 +36,7 @@
  static pthread_t android_thread_id_t_to_pthread(android_thread_id_t thread)
  {
      return (pthread_t) thread;
-@@ -301,7 +301,7 @@
+@@ -303,7 +303,7 @@
      gCreateThreadFn = func;
  }
  
@@ -45,7 +45,7 @@
  int androidSetThreadPriority(pid_t tid, int pri)
  {
      int rc = 0;
-@@ -843,7 +843,7 @@
+@@ -845,7 +845,7 @@
      return mRunning;
  }
  
