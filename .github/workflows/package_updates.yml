@@ -1,0 +1,27 @@
+name: Package updates
+
+on:
+  schedule:
+    - cron:  '0 */6 * * *'
+  workflow_dispatch:
+
+jobs:
+  update-packages:
+    if: github.repository == 'termux/termux-packages'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.GH_API_KEY }}
+    - name: Process package updates
+      env:
+        GITHUB_API_TOKEN: ${{ secrets.GH_API_KEY }}
+        BUILD_PACKAGES: "true"
+        GIT_COMMIT_PACKAGES: "true"
+        GIT_PUSH_PACKAGES: "true"
+      run: |
+        git config --global user.name "Termux Github Actions"
+        git config --global user.email "contact@termux.com"
+        bash ./scripts/bin/update-packages
