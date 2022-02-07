@@ -1,0 +1,17 @@
+--- a/karaoke/play_linux.go
++++ b/karaoke/play_linux.go
+@@ -9,12 +9,12 @@
+ )
+ 
+ const (
+-	soundfontPath = "/usr/share/sounds/sf2/FluidR3_GM.sf2"
++	soundfontPath = "@TERMUX_PREFIX@/share/soundfonts/FluidR3_GM.sf2"
+ )
+ 
+ // Play takes a given .midi file and plays it.
+ func Play(localmid string) error {
+-	cmd := exec.Command(fluidsynthBinary, "-a", "alsa", "-m", "alsa_seq", "-l", "-i", soundfontPath, localmid)
++	cmd := exec.Command(fluidsynthBinary, "-a", "pulseaudio", "-l", "-i", soundfontPath, localmid)
+ 	if out, err := cmd.CombinedOutput(); err != nil {
+ 		return fmt.Errorf("running `%s %s` failed: %s, %v", cmd.Path, strings.Join(cmd.Args, " "), out, err)
+ 	}
