@@ -41,9 +41,9 @@ local libutils_sources="
 	Errors.cpp
 	FileMap.cpp
 	JenkinsHash.cpp
+	LightRefBase.cpp
 	NativeHandle.cpp
 	Printer.cpp
-	PropertyMap.cpp
 	RefBase.cpp
 	SharedBuffer.cpp
 	StopWatch.cpp
@@ -69,7 +69,6 @@ local libbase_sources="
 	chrono_utils.cpp
 	cmsg.cpp
 	file.cpp
-	liblog_symbols.cpp
 	logging.cpp
 	mapped_file.cpp
 	parsebool.cpp
@@ -86,7 +85,12 @@ local libbase_sources="
 local libziparchive_sources="
 	zip_archive.cc
 	zip_archive_stream_entry.cc
+	zip_cd_entry_map.cc
+	zip_error.cpp
 	zip_writer.cc
+"
+libziparchive_sources+="
+	incfs_support/signal_handling.cpp
 "
 
 # androidfw
@@ -96,6 +100,7 @@ local androidfw_sources="
 	AssetDir.cpp
 	AssetManager.cpp
 	AssetManager2.cpp
+	AssetsProvider.cpp
 	AttributeResolution.cpp
 	ChunkIterator.cpp
 	ConfigDescription.cpp
@@ -195,6 +200,7 @@ local libaapt2_sources="
 	xml/XmlDom.cpp
 	xml/XmlPullParser.cpp
 	xml/XmlUtil.cpp
+	ValueTransformer.cpp
 "
 local aapt2_tool_sources="
 	cmd/Command.cpp
@@ -214,27 +220,35 @@ local aapt2_sources="
 
 # aidl
 local libaidl_sources="
-	aidl.cpp
 	aidl_checkapi.cpp
 	aidl_const_expressions.cpp
+	aidl_dumpapi.cpp
 	aidl_language.cpp
-	aidl_typenames.cpp
+	aidl_to_cpp_common.cpp
 	aidl_to_cpp.cpp
 	aidl_to_java.cpp
 	aidl_to_ndk.cpp
+	aidl_to_rust.cpp
+	aidl_typenames.cpp
+	aidl.cpp
 	ast_cpp.cpp
 	ast_java.cpp
 	code_writer.cpp
-	generate_cpp.cpp
-	aidl_to_cpp_common.cpp
-	generate_ndk.cpp
-	generate_java.cpp
-	generate_java_binder.cpp
+	comments.cpp
+	diagnostics.cpp
 	generate_aidl_mappings.cpp
+	generate_cpp.cpp
+	generate_java_binder.cpp
+	generate_java.cpp
+	generate_ndk.cpp
+	generate_rust.cpp
 	import_resolver.cpp
-	line_reader.cpp
 	io_delegate.cpp
+	line_reader.cpp
+	location.cpp
+	logging.cpp
 	options.cpp
+	parser.cpp
 "
 libaidl_sources+="
 	lex.yy.c
