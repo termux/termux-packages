@@ -1,0 +1,17 @@
+--- a/mk/libtranscript.in
++++ b/mk/libtranscript.in
+@@ -87,10 +87,10 @@
+ 		-rpath $(libdir)
+ 
+ src/modules/ascii.la:src/modules/ascii.lo src/libtranscript.la
+-	$(SILENTLDLT) $(LIBTOOL) $(SILENCELT) --mode=link --tag=CC $(CC) -shared -module -avoid-version -shrext .ltc $(CFLAGS) $(LDFLAGS) -o $@ src/modules/ascii.lo $(LDLIBS) -rpath $(libdir)/transcript1
++	$(SILENTLDLT) $(LIBTOOL) $(SILENCELT) --mode=link --tag=CC $(CC) -shared -module -avoid-version -shrext .ltc $(CFLAGS) $(LDFLAGS) -o $@ src/modules/ascii.lo $(LDLIBS) -Lsrc/.libs -ltranscript -rpath $(libdir)/transcript1
+ src/modules/unicode.la:src/modules/unicode_gb18030.lo src/modules/unicode_utf7.lo src/modules/unicode.lo src/libtranscript.la
+-	$(SILENTLDLT) $(LIBTOOL) $(SILENCELT) --mode=link --tag=CC $(CC) -shared -module -avoid-version -shrext .ltc $(CFLAGS) $(LDFLAGS) -o $@ src/modules/unicode_gb18030.lo src/modules/unicode_utf7.lo src/modules/unicode.lo $(LDLIBS) -rpath $(libdir)/transcript1
++	$(SILENTLDLT) $(LIBTOOL) $(SILENCELT) --mode=link --tag=CC $(CC) -shared -module -avoid-version -shrext .ltc $(CFLAGS) $(LDFLAGS) -o $@ src/modules/unicode_gb18030.lo src/modules/unicode_utf7.lo src/modules/unicode.lo $(LDLIBS) -Lsrc/.libs -ltranscript -rpath $(libdir)/transcript1
+ src/modules/iso2022.la:src/modules/iso2022.lo src/libtranscript.la
+-	$(SILENTLDLT) $(LIBTOOL) $(SILENCELT) --mode=link --tag=CC $(CC) -shared -module -avoid-version -shrext .ltc $(CFLAGS) $(LDFLAGS) -o $@ src/modules/iso2022.lo $(LDLIBS) -rpath $(libdir)/transcript1
++	$(SILENTLDLT) $(LIBTOOL) $(SILENCELT) --mode=link --tag=CC $(CC) -shared -module -avoid-version -shrext .ltc $(CFLAGS) $(LDFLAGS) -o $@ src/modules/iso2022.lo $(LDLIBS) -Lsrc/.libs -ltranscript -rpath $(libdir)/transcript1
+ src/modules/euctw.la:src/modules/euctw.lo src/libtranscript.la
+-	$(SILENTLDLT) $(LIBTOOL) $(SILENCELT) --mode=link --tag=CC $(CC) -shared -module -avoid-version -shrext .ltc $(CFLAGS) $(LDFLAGS) -o $@ src/modules/euctw.lo $(LDLIBS) -rpath $(libdir)/transcript1
++	$(SILENTLDLT) $(LIBTOOL) $(SILENCELT) --mode=link --tag=CC $(CC) -shared -module -avoid-version -shrext .ltc $(CFLAGS) $(LDFLAGS) -o $@ src/modules/euctw.lo $(LDLIBS) -Lsrc/.libs -ltranscript -rpath $(libdir)/transcript1
