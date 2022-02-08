@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://github.com/go-delve/delve
 TERMUX_PKG_DESCRIPTION="A debugger for the Go programming language"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Krishna kanhaiya @kcubeterm"
-TERMUX_PKG_VERSION=1.8.0
+TERMUX_PKG_VERSION=1.8.1
 TERMUX_PKG_DEPENDS="golang, git"
 TERMUX_PKG_SRCURL=https://github.com/go-delve/delve/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=086106a4776fa155bf20c37d27b9caed55255be6359c7f0bda1893d3adbb614e
+TERMUX_PKG_SHA256=e5b2ec78add2a167e1fdc11e3e189dec1bbed2cd9b6e99b3d79c0630b4b83e37
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
 
