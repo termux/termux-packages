@@ -1,0 +1,13 @@
+https://github.com/boostorg/process/issues/235
+
+--- a/boost/process/detail/posix/executor.hpp
++++ b/boost/process/detail/posix/executor.hpp
+@@ -153,7 +153,7 @@
+     {
+         //I am the child
+         const auto len = std::strlen(msg);
+-        int data[2] = {ec.value(), len + 1};
++        int data[2] = {ec.value(), static_cast<int>(len + 1)};
+ 
+         ::write(_pipe_sink, &data[0], sizeof(int) * 2);
+         ::write(_pipe_sink, msg, len);
