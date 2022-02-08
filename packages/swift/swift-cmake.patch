@@ -1,3 +1,49 @@
+diff --git a/llvm-project/clang/runtime/CMakeLists.txt b/llvm-project/clang/runtime/CMakeLists.txt
+index 61b1c60bf590..5b0d10a67699 100644
+--- a/llvm-project/clang/runtime/CMakeLists.txt
++++ b/llvm-project/clang/runtime/CMakeLists.txt
+@@ -75,6 +75,7 @@ if(LLVM_BUILD_EXTERNAL_COMPILER_RT AND EXISTS ${COMPILER_RT_SRC_ROOT}/)
+     CMAKE_ARGS ${CLANG_COMPILER_RT_CMAKE_ARGS}
+                -DCMAKE_C_COMPILER=${LLVM_RUNTIME_OUTPUT_INTDIR}/clang
+                -DCMAKE_CXX_COMPILER=${LLVM_RUNTIME_OUTPUT_INTDIR}/clang++
++               -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY
+                -DCMAKE_ASM_COMPILER=${LLVM_RUNTIME_OUTPUT_INTDIR}/clang
+                -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+                -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
+@@ -84,6 +85,7 @@ if(LLVM_BUILD_EXTERNAL_COMPILER_RT AND EXISTS ${COMPILER_RT_SRC_ROOT}/)
+                -DCOMPILER_RT_EXEC_OUTPUT_DIR=${LLVM_RUNTIME_OUTPUT_INTDIR}
+                -DCOMPILER_RT_INSTALL_PATH:STRING=lib${LLVM_LIBDIR_SUFFIX}/clang/${CLANG_VERSION}
+                -DCOMPILER_RT_INCLUDE_TESTS=${LLVM_INCLUDE_TESTS}
++               -DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON
+                -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+                -DLLVM_LIBDIR_SUFFIX=${LLVM_LIBDIR_SUFFIX}
+                -DLLVM_RUNTIME_OUTPUT_INTDIR=${LLVM_RUNTIME_OUTPUT_INTDIR}
+diff --git a/llvm-project/clang/tools/IndexStore/CMakeLists.txt b/llvm-project/clang/tools/IndexStore/CMakeLists.txt
+index 1bcfc0734785..ddb77c91b22d 100644
+--- a/llvm-project/clang/tools/IndexStore/CMakeLists.txt
++++ b/llvm-project/clang/tools/IndexStore/CMakeLists.txt
+@@ -65,7 +65,7 @@ if (LLVM_INSTALL_TOOLCHAIN_ONLY)
+   endif()
+ endif()
+ 
+-set(INDEXSTORE_HEADERS_INSTALL_DESTINATION "local/include")
++set(INDEXSTORE_HEADERS_INSTALL_DESTINATION "include")
+ 
+ install(DIRECTORY ../../include/indexstore
+   COMPONENT IndexStore
+diff --git a/llvm-project/compiler-rt/cmake/Modules/HandleCompilerRT.cmake b/llvm-project/compiler-rt/cmake/Modules/HandleCompilerRT.cmake
+index ac9e0871489d..b495cbfb5c2e 100644
+--- a/llvm-project/compiler-rt/cmake/Modules/HandleCompilerRT.cmake
++++ b/llvm-project/compiler-rt/cmake/Modules/HandleCompilerRT.cmake
+@@ -31,7 +31,7 @@ function(find_compiler_rt_library name target variable)
+     # If the cache variable is not defined, invoke clang and then 
+     # set it with cache_compiler_rt_library.
+     set(CLANG_COMMAND ${CMAKE_CXX_COMPILER} ${SANITIZER_COMMON_FLAGS}
+-        "--rtlib=compiler-rt" "-print-libgcc-file-name")
++        "--rtlib=compiler-rt" "-print-libgcc-file-name" "-resource-dir=$ENV{PREFIX}/lib/clang/$ENV{TERMUX_CLANG_VERSION}/")
+     if(target)
+       list(APPEND CLANG_COMMAND "--target=${target}")
+     endif()
 diff --git a/swift/CMakeLists.txt b/swift/CMakeLists.txt
 index b7503ecdd6..c643c2c9a5 100644
 --- a/swift/CMakeLists.txt
@@ -21,6 +67,38 @@ index b7503ecdd6..c643c2c9a5 100644
    include(Libdispatch)
  endif()
  
+diff --git a/swift/cmake/modules/AddSwift.cmake b/swift/cmake/modules/AddSwift.cmake
+index a448bcb23c4..0ddbac17a52 100644
+--- a/swift/cmake/modules/AddSwift.cmake
++++ b/swift/cmake/modules/AddSwift.cmake
+@@ -706,7 +706,7 @@
+   elseif(${LIBSWIFT_BUILD_MODE} STREQUAL "CROSSCOMPILE")
+     set(sdk_option "-sdk" "${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_ARCH_${SWIFT_HOST_VARIANT_ARCH}_PATH}")
+     get_filename_component(swift_exec_bin_dir ${ALS_SWIFT_EXEC} DIRECTORY)
+-    set(sdk_option ${sdk_option} "-resource-dir" "${swift_exec_bin_dir}/../lib/swift")
++    set(sdk_option ${sdk_option} "-resource-dir" "${SWIFT_BINARY_DIR}/lib/swift")
+   endif()
+   get_versioned_target_triple(target ${SWIFT_HOST_VARIANT_SDK}
+       ${SWIFT_HOST_VARIANT_ARCH} "${deployment_version}")
+@@ -758,6 +758,9 @@
+   add_library(${name} STATIC ${all_obj_files})
+   set_target_properties(${name} PROPERTIES LINKER_LANGUAGE CXX)
+   set_property(GLOBAL APPEND PROPERTY SWIFT_BUILDTREE_EXPORTS ${name})
++  if(${LIBSWIFT_BUILD_MODE} STREQUAL "CROSSCOMPILE")
++    add_dependencies(${name} swift-stdlib-android-${SWIFT_HOST_VARIANT_ARCH})
++  endif()
+ endfunction()
+ 
+ macro(add_swift_tool_subdirectory name)
+@@ -922,7 +923,7 @@ function(add_swift_host_tool executable)
+       # installed host toolchain.
+       get_filename_component(swift_bin_dir ${SWIFT_EXEC_FOR_LIBSWIFT} DIRECTORY)
+       get_filename_component(swift_dir ${swift_bin_dir} DIRECTORY)
+-      set(host_lib_dir "${swift_dir}/lib/swift/${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_LIB_SUBDIR}")
++      set(host_lib_dir "${SWIFT_BINARY_DIR}/lib/swift/${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_LIB_SUBDIR}")
+ 
+       target_link_libraries(${executable} PRIVATE ${swiftrt})
+       target_link_libraries(${executable} PRIVATE "swiftCore")
 diff --git a/swift/localization/CMakeLists.txt b/swift/localization/CMakeLists.txt
 index 07a3585a66c..461a98b6856 100644
 --- a/swift/localization/CMakeLists.txt
@@ -35,6 +113,19 @@ index 07a3585a66c..461a98b6856 100644
    PATTERN "*.yaml"
  )
 +endif()
+diff --git a/swift/stdlib/cmake/modules/SwiftSource.cmake b/swift/stdlib/cmake/modules/SwiftSource.cmake
+index 4bc312f7f89..d71f6408d9f 100644
+--- a/swift/stdlib/cmake/modules/SwiftSource.cmake
++++ b/swift/stdlib/cmake/modules/SwiftSource.cmake
+@@ -708,7 +708,7 @@ function(_compile_swift_files
+   endif()
+ 
+   set(swift_compiler_tool_dep)
+-  if(SWIFT_INCLUDE_TOOLS)
++  if(SWIFT_INCLUDE_TOOLS AND NOT ${LIBSWIFT_BUILD_MODE} STREQUAL "CROSSCOMPILE")
+     # Depend on the binary itself, in addition to the symlink.
+     set(swift_compiler_tool_dep "swift-frontend${target_suffix}")
+   endif()
 diff --git a/swift/stdlib/public/Concurrency/CMakeLists.txt b/swift/stdlib/public/Concurrency/CMakeLists.txt
 index 3313f56c8a6..59804ff6228 100644
 --- a/swift/stdlib/public/Concurrency/CMakeLists.txt
@@ -48,8 +139,8 @@ index 3313f56c8a6..59804ff6228 100644
 +    #list(APPEND swift_concurrency_link_libraries
 +    #  dispatch)
    endif()
- endif()
- 
+ elseif("${SWIFT_CONCURRENCY_GLOBAL_EXECUTOR}" STREQUAL "singlethreaded" OR
+        "${SWIFT_CONCURRENCY_GLOBAL_EXECUTOR}" STREQUAL "hooked")
 @@ -120,6 +120,7 @@ add_swift_target_library(swift_Concurrency ${SWIFT_STDLIB_LIBRARY_BUILD_TYPES} I
    SWIFT_MODULE_DEPENDS_WINDOWS CRT
  
@@ -59,42 +150,18 @@ index 3313f56c8a6..59804ff6228 100644
    C_COMPILE_FLAGS
      -Dswift_Concurrency_EXPORTS ${SWIFT_RUNTIME_CONCURRENCY_C_FLAGS}
 diff --git a/swift/stdlib/public/Platform/CMakeLists.txt b/swift/stdlib/public/Platform/CMakeLists.txt
-index 8ded40c5791..c811000b1d1 100644
+index f958d4ce899..ac6d7248606 100644
 --- a/swift/stdlib/public/Platform/CMakeLists.txt
 +++ b/swift/stdlib/public/Platform/CMakeLists.txt
-@@ -97,6 +97,7 @@ foreach(sdk ${SWIFT_SDKS})
-         OUTPUT "${glibc_modulemap_out}"
-         FLAGS
-             "-DCMAKE_SDK=${sdk}"
-+            "-DTERMUX_INCLUDE_PATH=${SWIFT_ANDROID_NATIVE_SYSROOT}/usr/include"
-             "-DGLIBC_INCLUDE_PATH=${SWIFT_SDK_${sdk}_ARCH_${arch}_LIBC_INCLUDE_DIRECTORY}"
-             "-DGLIBC_ARCH_INCLUDE_PATH=${SWIFT_SDK_${sdk}_ARCH_${arch}_LIBC_ARCHITECTURE_INCLUDE_DIRECTORY}")
- 
-@@ -106,18 +107,19 @@ foreach(sdk ${SWIFT_SDKS})
-     # with its own native sysroot, create a native modulemap without a sysroot
-     # prefix. This is the one we'll install instead.
-     if(NOT "${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_ARCH_${arch}_PATH}" STREQUAL "/" AND
--       NOT (${sdk} STREQUAL ANDROID AND NOT "${SWIFT_ANDROID_NATIVE_SYSROOT}" STREQUAL ""))
-+       (${sdk} STREQUAL ANDROID AND NOT "${SWIFT_ANDROID_NATIVE_SYSROOT}" STREQUAL ""))
-       set(glibc_sysroot_relative_modulemap_out "${module_dir}/sysroot-relative-modulemaps/glibc.modulemap")
- 
--      string(REPLACE "${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_ARCH_${arch}_PATH}"
--        "" absolute_libc_include_path "${SWIFT_SDK_${sdk}_ARCH_${arch}_LIBC_INCLUDE_DIRECTORY}")
--      string(REPLACE "${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_ARCH_${arch}_PATH}"
--        "" absolute_libc_arch_include_path ${SWIFT_SDK_${sdk}_ARCH_${arch}_LIBC_ARCHITECTURE_INCLUDE_DIRECTORY})
-+      string(REPLACE "${SWIFT_SDK_${sdk}_ARCH_${arch}_PATH}/usr"
-+        "${SWIFT_ANDROID_NATIVE_SYSROOT}/usr" absolute_libc_include_path "${SWIFT_SDK_${sdk}_ARCH_${arch}_LIBC_INCLUDE_DIRECTORY}")
-+      string(REPLACE "${SWIFT_SDK_${sdk}_ARCH_${arch}_PATH}/usr"
-+        "${SWIFT_ANDROID_NATIVE_SYSROOT}/usr" absolute_libc_arch_include_path ${SWIFT_SDK_${sdk}_ARCH_${arch}_LIBC_ARCHITECTURE_INCLUDE_DIRECTORY})
- 
-       handle_gyb_source_single(glibc_modulemap_native_target
-         SOURCE "${glibc_modulemap_source}"
-         OUTPUT "${glibc_sysroot_relative_modulemap_out}"
-         FLAGS "-DCMAKE_SDK=${sdk}"
-+              "-DTERMUX_INCLUDE_PATH=${SWIFT_ANDROID_NATIVE_SYSROOT}/usr/include"
-               "-DGLIBC_INCLUDE_PATH=${absolute_libc_include_path}"
-               "-DGLIBC_ARCH_INCLUDE_PATH=${absolute_libc_arch_include_path}")
- 
+@@ -92,7 +92,7 @@ add_swift_target_library(swiftGlibc ${SWIFT_STDLIB_LIBRARY_BUILD_TYPES} IS_SDK_O
+       ${SWIFT_RUNTIME_SWIFT_COMPILE_FLAGS}
+       ${SWIFT_STANDARD_LIBRARY_SWIFT_FLAGS}
+       ${swift_platform_compile_flags}
+-    LINK_FLAGS "${SWIFT_RUNTIME_SWIFT_LINK_FLAGS}"
++    LINK_FLAGS "${SWIFT_RUNTIME_SWIFT_LINK_FLAGS};-landroid-posix-semaphore"
+     TARGET_SDKS "${swiftGlibc_target_sdks}"
+     INSTALL_IN_COMPONENT sdk-overlay
+     DEPENDS glibc_modulemap)
 diff --git a/swift/stdlib/public/SwiftShims/CMakeLists.txt b/swift/stdlib/public/SwiftShims/CMakeLists.txt
 index 23ac72bcda5..23aecfc9bc5 100644
 --- a/swift/stdlib/public/SwiftShims/CMakeLists.txt
@@ -152,3 +219,37 @@ index 42dda212164..2338df9072a 100644
  target_link_libraries(libSwiftSyntaxParser PRIVATE
    swiftParse)
  set_target_properties(libSwiftSyntaxParser
+diff --git a/swift-corelibs-xctest/CMakeLists.txt b/swift-corelibs-xctest/CMakeLists.txt
+index 531e7c0..589930f 100644
+--- a/swift-corelibs-xctest/CMakeLists.txt
++++ b/swift-corelibs-xctest/CMakeLists.txt
+@@ -58,6 +58,7 @@ if(NOT CMAKE_SYSTEM_NAME STREQUAL Darwin)
+     Foundation)
+   if(NOT CMAKE_SYSTEM_NAME STREQUAL Windows)
+     target_link_options(XCTest PRIVATE "SHELL:-no-toolchain-stdlib-rpath")
++    set_target_properties(XCTest PROPERTIES INSTALL_RPATH "$ORIGIN")
+   endif()
+ endif()
+ set_target_properties(XCTest PROPERTIES
+diff --git a/swift-crypto/Sources/CCryptoBoringSSL/CMakeLists.txt b/swift-crypto/Sources/CCryptoBoringSSL/CMakeLists.txt
+index 1a890d6..639126c 100644
+--- a/swift-crypto/Sources/CCryptoBoringSSL/CMakeLists.txt
++++ b/swift-crypto/Sources/CCryptoBoringSSL/CMakeLists.txt
+@@ -337,7 +337,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL Darwin AND CMAKE_SYSTEM_PROCESSOR MATCHES "amd64|x
+     crypto/fipsmodule/vpaes-x86_64.mac.x86_64.S
+     crypto/fipsmodule/x86_64-mont.mac.x86_64.S
+     crypto/fipsmodule/x86_64-mont5.mac.x86_64.S)
+-elseif(CMAKE_SYSTEM_NAME STREQUAL Linux AND CMAKE_SYSTEM_PROCESSOR MATCHES "amd64|x86_64")
++elseif(CMAKE_SYSTEM_NAME MATCHES "Linux|Android" AND CMAKE_SYSTEM_PROCESSOR MATCHES "amd64|x86_64")
+   target_sources(CCryptoBoringSSL PRIVATE
+     crypto/chacha/chacha-x86_64.linux.x86_64.S
+     crypto/cipher_extra/aes128gcmsiv-x86_64.linux.x86_64.S
+@@ -368,7 +368,7 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL Darwin AND CMAKE_SYSTEM_PROCESSOR MATCHES "arm
+     crypto/fipsmodule/sha256-armv8.ios.aarch64.S
+     crypto/fipsmodule/sha512-armv8.ios.aarch64.S
+     crypto/fipsmodule/vpaes-armv8.ios.aarch64.S)
+-elseif(CMAKE_SYSTEM_NAME STREQUAL Linux AND CMAKE_SYSTEM_PROCESSOR MATCHES "arm64|aarch64")
++elseif(CMAKE_SYSTEM_NAME MATCHES "Linux|Android" AND CMAKE_SYSTEM_PROCESSOR MATCHES "arm64|aarch64")
+   target_sources(CCryptoBoringSSL PRIVATE
+     crypto/chacha/chacha-armv8.linux.aarch64.S
+     crypto/fipsmodule/aesv8-armx64.linux.aarch64.S

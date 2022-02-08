@@ -2,15 +2,6 @@ diff --git a/swift/utils/build-script-impl b/swift/utils/build-script-impl
 index b1d060328bc..218c9215260 100755
 --- a/swift/utils/build-script-impl
 +++ b/swift/utils/build-script-impl
-@@ -1060,7 +1064,7 @@ function get_host_install_destdir() {
-             # This assumes that all hosts are merged to the lipo.
-             local host_install_destdir="${INSTALL_DESTDIR}"
-         else
--            local host_install_destdir="${INSTALL_DESTDIR}/${host}"
-+            local host_install_destdir="${INSTALL_DESTDIR}"
-         fi
-     else
-         local host_install_destdir="${INSTALL_DESTDIR}"
 @@ -1652,6 +1688,13 @@ for host in "${ALL_HOSTS[@]}"; do
                          -DLLVM_NATIVE_BUILD=$(build_directory "${LOCAL_HOST}" llvm)
                      )
@@ -26,9 +17,9 @@ index b1d060328bc..218c9215260 100755
  
                  ;;
 @@ -1854,6 +1854,9 @@ for host in "${ALL_HOSTS[@]}"; do
-                     cmake_options=(
                          "${cmake_options[@]}"
                          -DLLVM_TABLEGEN=$(build_directory "${LOCAL_HOST}" llvm)/bin/llvm-tblgen
+                         -DSWIFT_INCLUDE_TEST_BINARIES:BOOL=FALSE
 +                        -DCMAKE_FIND_ROOT_PATH:PATH="${CROSS_COMPILE_DEPS_PATH}"
 +                        -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER
 +                        -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY

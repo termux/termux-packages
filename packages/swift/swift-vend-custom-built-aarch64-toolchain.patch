@@ -30,9 +30,22 @@ diff --git a/sourcekit-lsp/Utilities/build-script-helper.py b/sourcekit-lsp/Util
      swiftpm_args += ['-Xswiftc', '-no-toolchain-stdlib-rpath']
 -    swiftpm('build', swift_exec, swiftpm_args, env)
 +    swiftpm('build', swiftpm_exec, swiftpm_args, env)
-     install(bin_path, args.install_prefixes if not None else [args.toolchain], args.toolchain)
-   else:
-     assert False, 'unknown action \'{}\''.format(args.action)
+ 
+     if not args.install_prefixes:
+       args.install_prefixes = [args.toolchain]
+diff --git a/swift/utils/swift_build_support/swift_build_support/products/product.py b/swift/utils/swift_build_support/swift_build_support/products/product.py
+index 575fa374ad..3554577f92 100644
+--- a/swift/utils/swift_build_support/swift_build_support/products/product.py
++++ b/swift/utils/swift_build_support/swift_build_support/products/product.py
+@@ -202,7 +202,7 @@ class Product(object):
+             if self.is_darwin_host(host_target):
+                 install_destdir = self.host_install_destdir(host_target)
+             else:
+-                install_destdir = os.path.join(install_destdir, self.args.host_target)
++                return os.path.join(os.path.dirname(self.build_dir), "swift-%s" % self.args.host_target)
+         return targets.toolchain_path(install_destdir,
+                                       self.args.install_prefix)
+ 
 diff --git a/swift-driver/Utilities/build-script-helper.py b/swift-driver/Utilities/build-script-helper.py
 --- a/swift-driver/Utilities/build-script-helper.py
 +++ b/swift-driver/Utilities/build-script-helper.py

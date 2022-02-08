@@ -21,9 +21,9 @@ index fc037d6fb44..443b5e766c1 100644
 --- a/swift/utils/swift_build_support/swift_build_support/host_specific_configuration.py
 +++ b/swift/utils/swift_build_support/swift_build_support/host_specific_configuration.py
 @@ -15,6 +15,7 @@ import sys
- import sys
  from argparse import ArgumentError
  
+ from . import compiler_stage
 +from .cmake import CMakeOptions
  from .targets import StdlibDeploymentTarget
  
@@ -42,9 +42,9 @@ index b11313fab87..fe2e8982300 100644
 --- a/swift/utils/swift_build_support/swift_build_support/products/cmark.py
 +++ b/swift/utils/swift_build_support/swift_build_support/products/cmark.py
 @@ -12,6 +12,8 @@
- # ----------------------------------------------------------------------------
  
  from . import cmake_product
+ from . import earlyswiftdriver
 +from ..host_specific_configuration \
 +    import HostSpecificConfiguration
  
@@ -90,7 +90,7 @@ index 05966defe28..133761ba91d 100644
 -        options += '-DCMAKE_SYSTEM_PROCESSOR=%s ' % (args.android_arch if not
 -                                                     args.android_arch == 'armv7'
 -                                                     else 'armv7-a')
--        options += '-DCMAKE_ANDROID_STANDALONE_TOOLCHAIN:PATH=%s' % (args.android_ndk)
+-        options += '-DCMAKE_ANDROID_NDK:PATH=%s' % (args.android_ndk)
 +        options = cmake.CMakeOptions()
 +        options.define('CMAKE_SYSTEM_NAME', 'Android')
 +        options.define('CMAKE_SYSTEM_VERSION' , args.android_api_level)
