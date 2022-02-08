@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A private, secure, untraceable, decentralised digital cu
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.17.3.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/monero-project/monero.git
 TERMUX_PKG_DEPENDS="boost, libprotobuf, libzmq, openssl, readline, unbound"
 
