@@ -1,9 +1,0 @@
-TERMUX_PKG_HOMEPAGE=https://google.github.io/googletest/
-TERMUX_PKG_DESCRIPTION="Google Testing and Mocking Framework"
-TERMUX_PKG_LICENSE="BSD 3-Clause"
-TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.11.0
-TERMUX_PKG_SRCURL=https://github.com/google/googletest/archive/refs/tags/release-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=b4870bf121ff7795ba20d20bcdd8627b8e088f2d1dab299a031c1034eddc93d5
-TERMUX_PKG_DEPENDS="libc++"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DBUILD_SHARED_LIBS=ON"
