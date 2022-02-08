@@ -1,0 +1,37 @@
+https://github.com/arvidn/libtorrent/commit/feb911a19c8a66bf13915973649d3a4f5d729f12
+
+--- a/include/libtorrent/aux_/allocating_handler.hpp
++++ b/include/libtorrent/aux_/allocating_handler.hpp
+@@ -77,11 +77,11 @@ namespace libtorrent { namespace aux {
+ 	constexpr std::size_t openssl_write_cost = 0;
+ #endif
+ 
+-	constexpr std::size_t read_handler_max_size = tracking + debug_read_iter + openssl_read_cost + 102 + 8 * sizeof(void*);
+-	constexpr std::size_t write_handler_max_size = tracking + debug_write_iter + openssl_write_cost + 102 + 8 * sizeof(void*);
+-	constexpr std::size_t udp_handler_max_size = tracking + debug_tick + 144 + 8 * sizeof(void*);
+-	constexpr std::size_t utp_handler_max_size = tracking + debug_tick + 168 + 8 * sizeof(void*);
+-	constexpr std::size_t tick_handler_max_size = tracking + debug_tick + 160;
++	constexpr std::size_t read_handler_max_size = tracking + debug_read_iter + openssl_read_cost + 102 + 9 * sizeof(void*);
++	constexpr std::size_t write_handler_max_size = tracking + debug_write_iter + openssl_write_cost + 102 + 9 * sizeof(void*);
++	constexpr std::size_t udp_handler_max_size = tracking + debug_tick + 144 + 9 * sizeof(void*);
++	constexpr std::size_t utp_handler_max_size = tracking + debug_tick + 168 + 9 * sizeof(void*);
++	constexpr std::size_t tick_handler_max_size = tracking + debug_tick + 168;
+ 	constexpr std::size_t abort_handler_max_size = tracking + debug_tick + 104;
+ 	constexpr std::size_t submit_handler_max_size = tracking + debug_tick + 104;
+ 	constexpr std::size_t deferred_handler_max_size = tracking + debug_tick + 112;
+@@ -124,12 +124,12 @@ namespace libtorrent { namespace aux {
+ #endif
+ 	constexpr std::size_t write_handler_max_size = tracking + debug_write_iter + openssl_write_cost + fuzzer_write_cost + 168;
+ 	constexpr std::size_t read_handler_max_size = tracking + debug_read_iter + openssl_read_cost + fuzzer_read_cost + 168;
+-	constexpr std::size_t udp_handler_max_size = tracking + 160;
+-	constexpr std::size_t utp_handler_max_size = tracking + 184;
++	constexpr std::size_t udp_handler_max_size = tracking + 168;
++	constexpr std::size_t utp_handler_max_size = tracking + 192;
+ 	constexpr std::size_t abort_handler_max_size = tracking + 72;
+ 	constexpr std::size_t submit_handler_max_size = tracking + 72;
+ 	constexpr std::size_t deferred_handler_max_size = tracking + 80;
+-	constexpr std::size_t tick_handler_max_size = tracking + 128;
++	constexpr std::size_t tick_handler_max_size = tracking + 136;
+ #endif
+ 
+ 	enum HandlerName
