@@ -1,11 +1,50 @@
---- ./etc/config.sh/mpi.orig	2021-09-11 07:17:25.881541148 +0000
-+++ ./etc/config.sh/mpi	2021-09-11 07:18:36.067863881 +0000
-@@ -77,7 +77,7 @@
-         _foamAddLibAuto "$MPI_ARCH_PATH"
-     else
-         # Slight hack: strip off 'lib' to get prefix directory
--        libDir=$(mpicc --showme:link | sed -e 's/.*-L\([^ ]*\).*/\1/')
-+        libDir="@TERMUX_PREFIX@/lib"
+--- ./etc/config.sh/mpi.orig	2022-02-08 17:18:49.360222292 +0100
++++ ./etc/config.sh/mpi	2022-02-08 17:24:23.473198797 +0100
+@@ -107,18 +107,18 @@
+     if [ -z "$MPI_ARCH_PATH" ] && _foamFoundCmd="$(command -v orte-info)"
+     then
+         # prefix
+-        _foamFoundDir="$("$_foamFoundCmd" --path prefix --parsable | sed -e 's#^path:[^:]*:##')"
++        _foamFoundDir=@TERMUX_PREFIX@
  
-         export MPI_ARCH_PATH="${libDir%/*}"  # prefix from libdir
-         _foamAddLib "$libDir"
+         if [ -d "$_foamFoundDir" ]
+         then
+             MPI_ARCH_PATH="${_foamFoundDir}"
+ 
+             # libdir
+-            _foamFoundDir="$("$_foamFoundCmd" --path libdir --parsable | sed -e 's#^path:[^:]*:##')"
++            _foamFoundDir=@TERMUX_PREFIX@/lib
+             if [ -d "$_foamFoundDir" ]
+             then
+                 _foamAddLib "$_foamFoundDir"
+-            elif [ "$MPI_ARCH_PATH" != /usr ]
++            elif [ "$MPI_ARCH_PATH" != @TERMUX_PREFIX@ ]
+             then
+                 _foamAddLibAuto "$MPI_ARCH_PATH"
+             fi
+@@ -127,9 +127,9 @@
+ 
+     # Use <mpicc> to get the link information and (slight hack)
+     # strip off 'lib' to get the prefix directory
+-    if [ -z "$MPI_ARCH_PATH" ] && _foamFoundCmd="$(command -v mpicc)"
++    if [ -z "$MPI_ARCH_PATH" ]
+     then
+-        _foamFoundDir="$("$_foamFoundCmd" --showme:link | sed -e 's#.*-L\([^ ]*\).*#\1#')"
++        _foamFoundDir=@TERMUX_PREFIX@/lib
+ 
+         MPI_ARCH_PATH="${_foamFoundDir%/*}"  # Prefix from libdir
+         _foamAddLib "$_foamFoundDir"
+@@ -137,10 +137,10 @@
+ 
+     # Last resort (worse hack):
+     # Use <orterun> to get ../path/bin/orterun and infer prefix, libdir
+-    if [ -z "$MPI_ARCH_PATH" ] && _foamFoundCmd="$(command -v orterun)"
++    if [ -z "$MPI_ARCH_PATH" ]
+     then
+-        _foamFoundDir="${_foamFoundCmd%/*}"  # The bin dir
+-        MPI_ARCH_PATH="${_foamFoundDir%/*}"  # The prefix dir
++        _foamFoundDir=@TERMUX_PREFIX@/bin  # The bin dir
++        MPI_ARCH_PATH=@TERMUX_PREFIX@  # The prefix dir
+ 
+         _foamAddLibAuto "$MPI_ARCH_PATH"
+     fi
