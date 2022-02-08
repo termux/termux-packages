@@ -1,8 +1,22 @@
+From 7b2256f97b59192046eab312838f467def880605
+Date: Sun, 9 Jan 2022 21:45:13 +0530
+Subject: [PATCH] [android] Move the string and other tags in pointers to the
+ second byte because Android enabled memory tagging
+
+Starting with Android 11, AArch64 placed a tag in the top byte of pointers to
+allocations, which has been slowly rolling out to more devices and collides
+with Swift's tags. Moving these tags to the second byte works around this
+problem.
+---
+ lib/IRGen/MetadataRequest.cpp         | 28 ++++++++++--
+ lib/IRGen/SwiftTargetInfo.cpp         | 15 +++++--
+ stdlib/public/SwiftShims/System.h     |  9 ++++
+
 diff --git a/swift/lib/IRGen/MetadataRequest.cpp b/swift/lib/IRGen/MetadataRequest.cpp
-index 0a83d8bb6ec..57af3ee003a 100644
+index 370b5bab779e2..d96e7b0d0f576 100644
 --- a/swift/lib/IRGen/MetadataRequest.cpp
 +++ b/swift/lib/IRGen/MetadataRequest.cpp
-@@ -2677,9 +2677,16 @@ emitMetadataAccessByMangledName(IRGenFunction &IGF, CanType type,
+@@ -2681,9 +2681,16 @@ emitMetadataAccessByMangledName(IRGenFunction &IGF, CanType type,
    unsigned mangledStringSize;
    std::tie(mangledString, mangledStringSize) =
      IGM.getTypeRef(type, CanGenericSignature(), MangledTypeRefRole::Metadata);
@@ -22,7 +36,7 @@ index 0a83d8bb6ec..57af3ee003a 100644
    
    // Get or create the cache variable if necessary.
    auto cache = IGM.getAddrOfTypeMetadataDemanglingCacheVariable(type,
-@@ -2749,6 +2756,21 @@ emitMetadataAccessByMangledName(IRGenFunction &IGF, CanType type,
+@@ -2753,6 +2760,21 @@ emitMetadataAccessByMangledName(IRGenFunction &IGF, CanType type,
      auto contBB = subIGF.createBasicBlock("");
      llvm::Value *comparison = subIGF.Builder.CreateICmpSLT(load,
                                        llvm::ConstantInt::get(IGM.Int64Ty, 0));
@@ -45,34 +59,43 @@ index 0a83d8bb6ec..57af3ee003a 100644
                                         llvm::ConstantInt::get(IGM.Int1Ty, 0));
      subIGF.Builder.CreateCondBr(comparison, isUnfilledBB, contBB);
 diff --git a/swift/lib/IRGen/SwiftTargetInfo.cpp b/swift/lib/IRGen/SwiftTargetInfo.cpp
+index 97b70d6d75c0a..b2b2e70d3434e 100644
 --- a/swift/lib/IRGen/SwiftTargetInfo.cpp
 +++ b/swift/lib/IRGen/SwiftTargetInfo.cpp
-@@ -36,8 +36,12 @@ static void setToMask(SpareBitVector &bits, unsigned size, uint64_t mask) {
+@@ -36,10 +36,17 @@ static void setToMask(SpareBitVector &bits, unsigned size, uint64_t mask) {
  /// Configures target-specific information for arm64 platforms.
  static void configureARM64(IRGenModule &IGM, const llvm::Triple &triple,
                             SwiftTargetInfo &target) {
 -  setToMask(target.PointerSpareBits, 64,
 -            SWIFT_ABI_ARM64_SWIFT_SPARE_BITS_MASK);
-+  if (triple.isAndroid())
+-  setToMask(target.ObjCPointerReservedBits, 64,
+-            SWIFT_ABI_ARM64_OBJC_RESERVED_BITS_MASK);
++  if (triple.isAndroid()) {
 +    setToMask(target.PointerSpareBits, 64,
 +              SWIFT_ABI_ANDROID_ARM64_SWIFT_SPARE_BITS_MASK);
-+  else
++    setToMask(target.ObjCPointerReservedBits, 64,
++              SWIFT_ABI_ANDROID_ARM64_OBJC_RESERVED_BITS_MASK);
++  } else {
 +    setToMask(target.PointerSpareBits, 64,
 +              SWIFT_ABI_ARM64_SWIFT_SPARE_BITS_MASK);
-   setToMask(target.ObjCPointerReservedBits, 64,
-             SWIFT_ABI_ARM64_OBJC_RESERVED_BITS_MASK);
++    setToMask(target.ObjCPointerReservedBits, 64,
++              SWIFT_ABI_ARM64_OBJC_RESERVED_BITS_MASK);
++  }
    setToMask(target.IsObjCPointerBit, 64, SWIFT_ABI_ARM64_IS_OBJC_BIT);
+ 
+   if (triple.isOSDarwin()) {
 diff --git a/swift/stdlib/public/SwiftShims/System.h b/swift/stdlib/public/SwiftShims/System.h
-index 8fe54f6bda..a70acfd7be 100644
+index 978ec41f1eafb..7ec3961fa0fc3 100644
 --- a/swift/stdlib/public/SwiftShims/System.h
 +++ b/swift/stdlib/public/SwiftShims/System.h
-@@ -152,10 +152,18 @@
+@@ -152,10 +152,19 @@
  /// Darwin reserves the low 4GB of address space.
  #define SWIFT_ABI_DARWIN_ARM64_LEAST_VALID_POINTER 0x100000000ULL
  
 +// Android AArch64 reserves the top byte for pointer tagging since Android 11,
-+// so shift this tag to the second byte.
++// so shift the spare bits tag to the second byte and zero the ObjC tag.
 +#define SWIFT_ABI_ANDROID_ARM64_SWIFT_SPARE_BITS_MASK 0x00F0000000000007ULL
++#define SWIFT_ABI_ANDROID_ARM64_OBJC_RESERVED_BITS_MASK 0x0000000000000000ULL
 +
 +#if defined(__ANDROID__) && defined(__aarch64__)
 +#define SWIFT_ABI_ARM64_SWIFT_SPARE_BITS_MASK SWIFT_ABI_ANDROID_ARM64_SWIFT_SPARE_BITS_MASK

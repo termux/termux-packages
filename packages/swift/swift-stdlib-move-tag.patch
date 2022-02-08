@@ -1,9 +1,34 @@
+From 7b2256f97b59192046eab312838f467def880605
+Date: Sun, 9 Jan 2022 21:45:13 +0530
+Subject: [PATCH] [android] Move the string and other tags in pointers to the
+ second byte because Android enabled memory tagging
+
+Starting with Android 11, AArch64 placed a tag in the top byte of pointers to
+allocations, which has been slowly rolling out to more devices and collides
+with Swift's tags. Moving these tags to the second byte works around this
+problem.
+---
+ stdlib/public/SwiftShims/HeapObject.h | 10 +++++
+ stdlib/public/core/KeyPath.swift      | 10 +++++
+ stdlib/public/core/SmallString.swift  |  9 ++++
+ stdlib/public/core/StringObject.swift | 64 ++++++++++++++++++++++++++-
+ stdlib/public/runtime/HeapObject.cpp  |  5 +++
+
 diff --git a/swift/stdlib/public/SwiftShims/HeapObject.h b/swift/stdlib/public/SwiftShims/HeapObject.h
-index 5e165fd3d4..978f1b2293 100644
+index 3933b0b8d40e2..f45e8774951b3 100644
 --- a/swift/stdlib/public/SwiftShims/HeapObject.h
 +++ b/swift/stdlib/public/SwiftShims/HeapObject.h
-@@ -161,8 +161,13 @@ static_assert(alignof(HeapObject) == alignof(void*),
+@@ -157,12 +157,22 @@ static_assert(alignof(HeapObject) == alignof(void*),
+ #endif
+ #define _swift_abi_SwiftSpareBitsMask                                          \
+   (__swift_uintptr_t) SWIFT_ABI_ARM64_SWIFT_SPARE_BITS_MASK
++#if defined(__ANDROID__)
++#define _swift_abi_ObjCReservedBitsMask                                        \
++  (__swift_uintptr_t) SWIFT_ABI_ANDROID_ARM64_OBJC_RESERVED_BITS_MASK
++#else
+ #define _swift_abi_ObjCReservedBitsMask                                        \
    (__swift_uintptr_t) SWIFT_ABI_ARM64_OBJC_RESERVED_BITS_MASK
++#endif
  #define _swift_abi_ObjCReservedLowBits                                         \
    (unsigned) SWIFT_ABI_ARM64_OBJC_NUM_RESERVED_LOW_BITS
 +#if defined(__ANDROID__)
@@ -16,57 +41,30 @@ index 5e165fd3d4..978f1b2293 100644
  
  #elif defined(__powerpc64__)
  
-diff --git a/swift/stdlib/public/core/Builtin.swift b/swift/stdlib/public/core/Builtin.swift
-index 8a7bb33243..65be72766e 100644
---- a/swift/stdlib/public/core/Builtin.swift
-+++ b/swift/stdlib/public/core/Builtin.swift
-@@ -397,7 +397,13 @@ internal var _objectPointerIsObjCBit: UInt {
- #else
- @inlinable
- internal var _objectPointerIsObjCBit: UInt {
--  @inline(__always) get { return 0x4000_0000_0000_0000 }
-+  @inline(__always) get {
-+#if os(Android) && arch(arm64)
-+    return 0x0040_0000_0000_0000
-+#else
-+    return 0x4000_0000_0000_0000
-+#endif
-+  }
- }
- #endif
- 
 diff --git a/swift/stdlib/public/core/KeyPath.swift b/swift/stdlib/public/core/KeyPath.swift
-index 2d8f039742..3501f31c83 100644
+index 2d8f03974253b..3501f31c83a9e 100644
 --- a/swift/stdlib/public/core/KeyPath.swift
 +++ b/swift/stdlib/public/core/KeyPath.swift
-@@ -1764,7 +1764,12 @@ internal struct KeyPathBuffer {
+@@ -1764,7 +1764,7 @@ internal struct KeyPathBuffer {
      internal mutating func pushRaw(size: Int, alignment: Int)
          -> UnsafeMutableRawBufferPointer {
        var baseAddress = buffer.baseAddress.unsafelyUnwrapped
-+#if os(Android) && arch(arm64)
-+      // Android AArch64 may tag the first byte so remove it before checking alignment.
-+      var misalign = (0x00FF_FFFF_FFFF_FFFF & Int(bitPattern: baseAddress)) % alignment
-+#else
-       var misalign = Int(bitPattern: baseAddress) % alignment
-+#endif
+-      var misalign = Int(bitPattern: baseAddress) % alignment
++      var misalign = Int(bitPattern: baseAddress) & (alignment - 1)
        if misalign != 0 {
          misalign = alignment - misalign
          baseAddress = baseAddress.advanced(by: misalign)
-@@ -3242,7 +3247,12 @@ internal struct InstantiateKeyPathBuffer: KeyPathPatternVisitor {
+@@ -3242,7 +3242,7 @@ internal struct InstantiateKeyPathBuffer: KeyPathPatternVisitor {
    ) {
      let alignment = MemoryLayout<T>.alignment
      var baseAddress = destData.baseAddress.unsafelyUnwrapped
-+#if os(Android) && arch(arm64)
-+    // Android AArch64 may tag the first byte so remove it before checking alignment.
-+    var misalign = (0x00FF_FFFF_FFFF_FFFF & Int(bitPattern: baseAddress)) % alignment
-+#else
-     var misalign = Int(bitPattern: baseAddress) % alignment
-+#endif
+-    var misalign = Int(bitPattern: baseAddress) % alignment
++    var misalign = Int(bitPattern: baseAddress) & (alignment - 1)
      if misalign != 0 {
        misalign = alignment - misalign
        baseAddress = baseAddress.advanced(by: misalign)
 diff --git a/swift/stdlib/public/core/SmallString.swift b/swift/stdlib/public/core/SmallString.swift
-index df46b4e8bf..ac0969b570 100644
+index df46b4e8bf449..ac0969b57041e 100644
 --- a/swift/stdlib/public/core/SmallString.swift
 +++ b/swift/stdlib/public/core/SmallString.swift
 @@ -23,6 +23,9 @@
@@ -101,7 +99,7 @@ index df46b4e8bf..ac0969b570 100644
    }
  
 diff --git a/swift/stdlib/public/core/StringObject.swift b/swift/stdlib/public/core/StringObject.swift
-index b087e87f51..93f243ddd9 100644
+index b087e87f51eb7..88ff7fbf08980 100644
 --- a/swift/stdlib/public/core/StringObject.swift
 +++ b/swift/stdlib/public/core/StringObject.swift
 @@ -56,6 +56,11 @@
@@ -178,19 +176,7 @@ index b087e87f51..93f243ddd9 100644
    }
  
    // Discriminator for large, mortal (i.e. managed), swift-native strings
-@@ -381,7 +409,11 @@ extension _StringObject.Nibbles {
-   internal static func largeMortal() -> UInt64 { return 0x0000_0000_0000_0000 }
- 
-   internal static func largeCocoa(providesFastUTF8: Bool) -> UInt64 {
-+#if os(Android) && arch(arm64)
-+    return providesFastUTF8 ? 0x0040_0000_0000_0000 : 0x0050_0000_0000_0000
-+#else
-     return providesFastUTF8 ? 0x4000_0000_0000_0000 : 0x5000_0000_0000_0000
-+#endif
-   }
- }
- 
-@@ -397,7 +429,11 @@ extension _StringObject {
+@@ -397,7 +425,11 @@ extension _StringObject {
  
    @inlinable @inline(__always)
    internal var isImmortal: Bool {
@@ -202,7 +188,7 @@ index b087e87f51..93f243ddd9 100644
    }
  
    @inlinable @inline(__always)
-@@ -405,7 +441,11 @@ extension _StringObject {
+@@ -405,7 +437,11 @@ extension _StringObject {
  
    @inlinable @inline(__always)
    internal var isSmall: Bool {
@@ -214,7 +200,7 @@ index b087e87f51..93f243ddd9 100644
    }
  
    @inlinable @inline(__always)
-@@ -419,7 +459,11 @@ extension _StringObject {
+@@ -419,7 +455,11 @@ extension _StringObject {
    //     - Non-Cocoa shared strings
    @inlinable @inline(__always)
    internal var providesFastUTF8: Bool {
@@ -226,7 +212,7 @@ index b087e87f51..93f243ddd9 100644
    }
  
    @inlinable @inline(__always)
-@@ -429,16 +473,26 @@ extension _StringObject {
+@@ -429,16 +469,26 @@ extension _StringObject {
    // conforms to `_AbstractStringStorage`
    @inline(__always)
    internal var hasStorage: Bool {
@@ -253,7 +239,7 @@ index b087e87f51..93f243ddd9 100644
      let result = bits & 0x2000_0000_0000_0000 != 0
      _internalInvariant(!result || hasStorage, "native storage needs storage")
      return result
-@@ -466,7 +520,11 @@ extension _StringObject {
+@@ -466,7 +516,11 @@ extension _StringObject {
    @inline(__always)
    internal var largeIsCocoa: Bool {
      _internalInvariant(isLarge)
@@ -265,7 +251,7 @@ index b087e87f51..93f243ddd9 100644
    }
  
    // Whether this string is in one of our fastest representations:
-@@ -535,7 +593,11 @@ extension _StringObject {
+@@ -535,7 +589,11 @@ extension _StringObject {
  
    @inlinable
    internal static func getSmallCount(fromRaw x: UInt64) -> Int {
@@ -277,7 +263,7 @@ index b087e87f51..93f243ddd9 100644
    }
  
    @inlinable @inline(__always)
-@@ -546,7 +608,11 @@ extension _StringObject {
+@@ -546,7 +604,11 @@ extension _StringObject {
  
    @inlinable
    internal static func getSmallIsASCII(fromRaw x: UInt64) -> Bool {
@@ -290,7 +276,7 @@ index b087e87f51..93f243ddd9 100644
    @inlinable @inline(__always)
    internal var smallIsASCII: Bool {
 diff --git a/swift/stdlib/public/runtime/HeapObject.cpp b/swift/stdlib/public/runtime/HeapObject.cpp
-index 0a27620622..69b4350f7d 100644
+index 7f6f6ddbdaee1..d1ab476740acd 100644
 --- a/swift/stdlib/public/runtime/HeapObject.cpp
 +++ b/swift/stdlib/public/runtime/HeapObject.cpp
 @@ -66,6 +66,10 @@ static inline bool isValidPointerForNativeRetain(const void *p) {
@@ -300,7 +286,7 @@ index 0a27620622..69b4350f7d 100644
 +#elif defined(__ANDROID__) && defined(__aarch64__)
 +  // Check the top of the second byte instead, since Android AArch64 reserves
 +  // the top byte for its own pointer tagging since Android 11.
-+  return (intptr_t)p << 8 > 0;
++  return (intptr_t)((uintptr_t)p << 8) > 0;
  #elif defined(__x86_64__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM64) || defined(__s390x__) || (defined(__powerpc64__) && defined(__LITTLE_ENDIAN__))
    // On these platforms, except s390x, the upper half of address space is reserved for the
    // kernel, so we can assume that pointer values in this range are invalid.

@@ -1,22 +1,8 @@
-From 652c51f7c8fb1a90bcec89b060ae923b974c8332
-Date: Thu, 15 Apr 2021 02:27:15 +0530
-Subject: [PATCH] [build] Allow cross-compiling build-script products for
- non-Darwin hosts too
-
-To that end, move the --cross-compile-deps-path flag from build-script-impl to a
-publicly documented build-script flag and use it for build-script products'
-library dependencies too. Generate a SPM destination JSON file that can be used
-both for cross-compiling these build-script products and by users for their own
-Swift packages.
-
-Also, make using a prebuilt toolchain explicit and pass an install prefix in to
-swift-driver.
-
 diff --git a/swift/utils/build_swift/build_swift/driver_arguments.py b/swift/utils/build_swift/build_swift/driver_arguments.py
-index 850c30dce3d86..fcd2f52f349be 100644
+index cf2b19a4d7b44..1c153688146d6 100644
 --- a/swift/utils/build_swift/build_swift/driver_arguments.py
 +++ b/swift/utils/build_swift/build_swift/driver_arguments.py
-@@ -558,6 +558,11 @@ def create_argument_parser():
+@@ -563,6 +563,11 @@ def create_argument_parser():
             help='A space separated list of targets to cross-compile host '
                  'Swift tools for. Can be used multiple times.')
  
@@ -29,10 +15,10 @@ index 850c30dce3d86..fcd2f52f349be 100644
             type=argparse.ShellSplitType(),
             default=None,
 diff --git a/swift/utils/build_swift/tests/expected_options.py b/swift/utils/build_swift/tests/expected_options.py
-index bc0041beea192..fa15ca93bb897 100644
+index 31e9a637e982f..e4a748119518d 100644
 --- a/swift/utils/build_swift/tests/expected_options.py
 +++ b/swift/utils/build_swift/tests/expected_options.py
-@@ -128,6 +128,7 @@
+@@ -131,6 +131,7 @@
      'cmark_build_variant': 'Debug',
      'compiler_vendor': defaults.COMPILER_VENDOR,
      'coverage_db': None,
@@ -40,7 +26,7 @@ index bc0041beea192..fa15ca93bb897 100644
      'cross_compile_hosts': [],
      'darwin_deployment_version_ios':
          defaults.DARWIN_DEPLOYMENT_VERSION_IOS,
-@@ -673,6 +674,7 @@ class BuildScriptImplOption(_BaseOption):
+@@ -694,6 +695,7 @@ class BuildScriptImplOption(_BaseOption):
      PathOption('--clang-profile-instr-use'),
      PathOption('--cmake'),
      PathOption('--coverage-db'),
@@ -49,10 +35,10 @@ index bc0041beea192..fa15ca93bb897 100644
      PathOption('--host-cxx'),
      PathOption('--host-libtool'),
 diff --git a/swift/utils/swift_build_support/swift_build_support/build_script_invocation.py b/swift/utils/swift_build_support/swift_build_support/build_script_invocation.py
-index fb1237dd6d6..be697fda761 100644
+index 0b127d46c4890..0e9908b72989b 100644
 --- a/swift/utils/swift_build_support/swift_build_support/build_script_invocation.py
 +++ b/swift/utils/swift_build_support/swift_build_support/build_script_invocation.py
-@@ -181,6 +181,10 @@ class BuildScriptInvocation(object):
+@@ -181,6 +181,10 @@ def convert_to_impl_arguments(self):
          if args.cross_compile_hosts:
              impl_args += [
                  "--cross-compile-hosts", " ".join(args.cross_compile_hosts)]
@@ -63,28 +49,98 @@ index fb1237dd6d6..be697fda761 100644
  
          if args.test_paths:
              impl_args += ["--test-paths", " ".join(args.test_paths)]
-@@ -666,9 +670,14 @@ class BuildScriptInvocation(object):
-         # Core Lipo...
-         self._execute_merged_host_lipo_core_action()
+@@ -664,12 +668,14 @@ def execute(self):
+                 self._execute_impl(pipeline, all_hosts, perform_epilogue_opts)
+             else:
+                 assert(index != last_impl_index)
+-                # Once we have performed our last impl pipeline, we no longer
+-                # support cross compilation.
+-                #
+-                # This just maintains current behavior.
+                 if index > last_impl_index:
+-                    self._execute(pipeline, [self.args.host_target])
++                    non_darwin_cross_compile_hostnames = [
++                        target for target in self.args.cross_compile_hosts if not
++                        StdlibDeploymentTarget.get_target_for_name(
++                            target).platform.is_darwin
++                    ]
++                    self._execute(pipeline, [self.args.host_target] +
++                                  non_darwin_cross_compile_hostnames)
+                 else:
+                     self._execute(pipeline, all_host_names)
  
-+        non_darwin_cross_compile_hostnames = [
-+            target for target in self.args.cross_compile_hosts if not
-+            StdlibDeploymentTarget.get_target_for_name(target).platform.is_darwin]
-         # Non-build-script-impl products...
--        # Note: currently only supports building for the host.
--        for host_target in [self.args.host_target]:
-+        # Note: currently only supports cross-compiling for non-Darwin hosts.
-+        for host_target in [self.args.host_target] + non_darwin_cross_compile_hostnames:
+@@ -727,6 +733,8 @@ def _execute_impl(self, pipeline, all_hosts, should_run_epilogue_operations):
+ 
+     def _execute(self, pipeline, all_host_names):
+         for host_target in all_host_names:
 +            if self.args.skip_local_build and host_target == self.args.host_target:
 +                continue
-             for product_class in product_classes:
-                 if product_class.is_build_script_impl_product():
-                     continue
+             for product_class in pipeline:
+                 # Execute clean, build, test, install
+                 self.execute_product_build_steps(product_class, host_target)
+diff --git a/swift/utils/swift_build_support/swift_build_support/products/benchmarks.py b/swift/utils/swift_build_support/swift_build_support/products/benchmarks.py
+index df3134ecb4194..0ec3f4c897e28 100644
+--- a/swift/utils/swift_build_support/swift_build_support/products/benchmarks.py
++++ b/swift/utils/swift_build_support/swift_build_support/products/benchmarks.py
+@@ -104,9 +104,7 @@ def _get_toolchain_path(host_target, product, args):
+     # this logic initially was inside run_build_script_helper
+     # and was factored out so it can be used in testing as well
+ 
+-    toolchain_path = swiftpm.SwiftPM.get_install_destdir(args,
+-                                                         host_target,
+-                                                         product.build_dir)
++    toolchain_path = product.host_install_destdir(host_target)
+     if platform.system() == 'Darwin':
+         # The prefix is an absolute path, so concatenate without os.path.
+         toolchain_path += \
+diff --git a/swift/utils/swift_build_support/swift_build_support/products/indexstoredb.py b/swift/utils/swift_build_support/swift_build_support/products/indexstoredb.py
+index 28838a443e8dd..af187e9e612ce 100644
+--- a/swift/utils/swift_build_support/swift_build_support/products/indexstoredb.py
++++ b/swift/utils/swift_build_support/swift_build_support/products/indexstoredb.py
+@@ -80,13 +80,8 @@ def run_build_script_helper(action, host_target, product, args,
+     script_path = os.path.join(
+         product.source_dir, 'Utilities', 'build-script-helper.py')
+ 
+-    install_destdir = args.install_destdir
+-    if swiftpm.SwiftPM.has_cross_compile_hosts(args):
+-        install_destdir = swiftpm.SwiftPM.get_install_destdir(args,
+-                                                              host_target,
+-                                                              product.build_dir)
+-    toolchain_path = targets.toolchain_path(install_destdir,
+-                                            args.install_prefix)
++    install_destdir = product.host_install_destdir(host_target)
++    toolchain_path = product.native_toolchain_path(host_target)
+     is_release = product.is_release()
+     configuration = 'release' if is_release else 'debug'
+     helper_cmd = [
+@@ -110,4 +105,22 @@ def run_build_script_helper(action, host_target, product, args,
+     elif args.enable_tsan:
+         helper_cmd.extend(['--sanitize', 'thread'])
+ 
++    if not product.is_darwin_host(
++            host_target) and product.is_cross_compile_target(host_target):
++        helper_cmd.extend(['--cross-compile-host', host_target])
++        build_toolchain_path = install_destdir + args.install_prefix
++        resource_dir = '%s/lib/swift' % build_toolchain_path
++        helper_cmd += [
++            '--cross-compile-config',
++            targets.StdlibDeploymentTarget.get_target_for_name(host_target).platform
++            .swiftpm_config(args, output_dir=build_toolchain_path,
++                            swift_toolchain=toolchain_path,
++                            resource_path=resource_dir)
++        ]
++
++    if action == 'install' and product.product_name() == "sourcekitlsp":
++        helper_cmd.extend([
++            '--prefix', install_destdir + args.install_prefix
++        ])
++
+     shell.call(helper_cmd)
 diff --git a/swift/utils/swift_build_support/swift_build_support/products/product.py b/swift/utils/swift_build_support/swift_build_support/products/product.py
-index fd202b8cf1738..741353f15ce45 100644
+index 405f479546171..2f02322ba1d92 100644
 --- a/swift/utils/swift_build_support/swift_build_support/products/product.py
 +++ b/swift/utils/swift_build_support/swift_build_support/products/product.py
-@@ -195,15 +195,17 @@ def install_toolchain_path(self, host_target):
+@@ -195,18 +195,23 @@ def install_toolchain_path(self, host_target):
          """toolchain_path() -> string
  
          Returns the path to the toolchain that is being created as part of this
@@ -98,45 +154,69 @@ index fd202b8cf1738..741353f15ce45 100644
          if self.args.cross_compile_hosts:
 -            build_root = os.path.dirname(self.build_dir)
 -            install_destdir = '%s/intermediate-install/%s' % (build_root, host_target)
-+            if targets.StdlibDeploymentTarget.get_target_for_name(
-+                    host_target).platform.is_darwin:
-+                build_root = os.path.dirname(self.build_dir)
-+                install_destdir = '%s/intermediate-install/%s' % (build_root,
-+                                                                  host_target)
++            if self.is_darwin_host(host_target):
++                install_destdir = self.host_install_destdir(host_target)
 +            else:
 +                install_destdir = os.path.join(install_destdir, self.args.host_target)
          return targets.toolchain_path(install_destdir,
                                        self.args.install_prefix)
  
++    def native_toolchain_path(self, host_target):
++        if self.args.native_swift_tools_path is not None:
++            return os.path.split(self.args.native_swift_tools_path)[0]
++        else:
++            return self.install_toolchain_path(host_target)
++
+     def is_darwin_host(self, host_target):
+         return host_target.startswith("macosx") or \
+             host_target.startswith("iphone") or \
+diff --git a/swift/utils/swift_build_support/swift_build_support/products/skstresstester.py b/swift/utils/swift_build_support/swift_build_support/products/skstresstester.py
+index 5e753a5624b8f..ea673f0bde5d2 100644
+--- a/swift/utils/swift_build_support/swift_build_support/products/skstresstester.py
++++ b/swift/utils/swift_build_support/swift_build_support/products/skstresstester.py
+@@ -100,9 +100,7 @@ def should_install(self, host_target):
+         return self.args.install_skstresstester
+ 
+     def install(self, host_target):
+-        install_destdir = swiftpm.SwiftPM.get_install_destdir(self.args,
+-                                                              host_target,
+-                                                              self.build_dir)
++        install_destdir = self.host_install_destdir(host_target)
+         install_prefix = install_destdir + self.args.install_prefix
+         self.run_build_script_helper('install', host_target, [
+             '--prefix', install_prefix
 diff --git a/swift/utils/swift_build_support/swift_build_support/products/swiftdriver.py b/swift/utils/swift_build_support/swift_build_support/products/swiftdriver.py
-index 3bd5755de35be..c30b032886d0a 100644
+index 3bd5755de35be..a3f04b08c0157 100644
 --- a/swift/utils/swift_build_support/swift_build_support/products/swiftdriver.py
 +++ b/swift/utils/swift_build_support/swift_build_support/products/swiftdriver.py
-@@ -91,8 +91,10 @@ def run_build_script_helper(action, host_target, product, args):
-         install_destdir = swiftpm.SwiftPM.get_install_destdir(args,
-                                                               host_target,
-                                                               product.build_dir)
+@@ -86,13 +86,8 @@ def run_build_script_helper(action, host_target, product, args):
+     script_path = os.path.join(
+         product.source_dir, 'Utilities', 'build-script-helper.py')
+ 
+-    install_destdir = args.install_destdir
+-    if swiftpm.SwiftPM.has_cross_compile_hosts(args):
+-        install_destdir = swiftpm.SwiftPM.get_install_destdir(args,
+-                                                              host_target,
+-                                                              product.build_dir)
 -    toolchain_path = targets.toolchain_path(install_destdir,
 -                                            args.install_prefix)
-+    if args.native_swift_tools_path is not None:
-+        toolchain_path = os.path.split(args.native_swift_tools_path)[0]
-+    else:
-+        toolchain_path = product.install_toolchain_path(host_target)
++    install_destdir = product.host_install_destdir(host_target)
++    toolchain_path = product.native_toolchain_path(host_target)
  
      # Pass Dispatch directory down if we built it
      dispatch_build_dir = os.path.join(
-@@ -134,7 +136,29 @@ def run_build_script_helper(action, host_target, product, args):
-         helper_cmd += [
-             '--lit-test-dir', lit_test_dir
+@@ -134,10 +129,26 @@ def run_build_script_helper(action, host_target, product, args):
          ]
-+    # Pass Cross compile host info
-+    if swiftpm.SwiftPM.has_cross_compile_hosts(args):
-+        if targets.StdlibDeploymentTarget.get_target_for_name(
-+                host_target).platform.is_darwin:
+     # Pass Cross compile host info
+     if swiftpm.SwiftPM.has_cross_compile_hosts(args):
+-        helper_cmd += ['--cross-compile-hosts']
+-        for cross_compile_host in args.cross_compile_hosts:
+-            helper_cmd += [cross_compile_host]
++        if product.is_darwin_host(host_target):
 +            helper_cmd += ['--cross-compile-hosts']
 +            for cross_compile_host in args.cross_compile_hosts:
 +                helper_cmd += [cross_compile_host]
-+        elif host_target != args.host_target:
++        elif product.is_cross_compile_target(host_target):
 +            helper_cmd += ['--cross-compile-hosts', host_target]
 +            build_toolchain_path = install_destdir + args.install_prefix
 +            resource_dir = '%s/lib/swift' % build_toolchain_path
@@ -156,7 +236,7 @@ index 3bd5755de35be..c30b032886d0a 100644
 +
      shell.call(helper_cmd)
 diff --git a/swift/utils/swift_build_support/swift_build_support/products/swiftpm.py b/swift/utils/swift_build_support/swift_build_support/products/swiftpm.py
-index 4a97f377ef408..47a893a98ca16 100644
+index 4a97f377ef408..57047a439c31d 100644
 --- a/swift/utils/swift_build_support/swift_build_support/products/swiftpm.py
 +++ b/swift/utils/swift_build_support/swift_build_support/products/swiftpm.py
 @@ -23,6 +23,7 @@
@@ -167,36 +247,32 @@ index 4a97f377ef408..47a893a98ca16 100644
  
  
  class SwiftPM(product.Product):
-@@ -44,7 +45,11 @@ def should_build(self, host_target):
+@@ -44,7 +45,8 @@ def should_build(self, host_target):
      def run_bootstrap_script(self, action, host_target, additional_params=[]):
          script_path = os.path.join(
              self.source_dir, 'Utilities', 'bootstrap')
 -        toolchain_path = self.install_toolchain_path(host_target)
 +
-+        if self.args.native_swift_tools_path is not None:
-+            toolchain_path = os.path.split(self.args.native_swift_tools_path)[0]
-+        else:
-+            toolchain_path = self.install_toolchain_path(host_target)
++        toolchain_path = self.native_toolchain_path(host_target)
          swiftc = os.path.join(toolchain_path, "bin", "swiftc")
  
          # FIXME: We require llbuild build directory in order to build. Is
-@@ -92,9 +97,23 @@ def run_bootstrap_script(self, action, host_target, additional_params=[]):
+@@ -92,9 +94,22 @@ def run_bootstrap_script(self, action, host_target, additional_params=[]):
  
          # Pass Cross compile host info
          if self.has_cross_compile_hosts(self.args):
 -            helper_cmd += ['--cross-compile-hosts']
 -            for cross_compile_host in self.args.cross_compile_hosts:
 -                helper_cmd += [cross_compile_host]
-+            if StdlibDeploymentTarget.get_target_for_name(
-+                    host_target).platform.is_darwin:
++            if self.is_darwin_host(host_target):
 +                helper_cmd += ['--cross-compile-hosts']
 +                for cross_compile_host in self.args.cross_compile_hosts:
 +                    helper_cmd += [cross_compile_host]
-+            elif host_target != self.args.host_target:
++            elif self.is_cross_compile_target(host_target):
 +                helper_cmd += ['--cross-compile-hosts', host_target,
 +                               '--skip-cmake-bootstrap']
-+                build_toolchain_path = self.get_install_destdir(
-+                    self.args, host_target, self.build_dir) + self.args.install_prefix
++                build_toolchain_path = self.host_install_destdir(
++                    host_target) + self.args.install_prefix
 +                resource_dir = '%s/lib/swift' % build_toolchain_path
 +                helper_cmd += [
 +                    '--cross-compile-config',
@@ -207,24 +283,28 @@ index 4a97f377ef408..47a893a98ca16 100644
  
          helper_cmd.extend(additional_params)
  
-@@ -126,8 +145,13 @@ def has_cross_compile_hosts(self, args):
-     def get_install_destdir(self, args, host_target, build_dir):
-         install_destdir = args.install_destdir
-         if self.has_cross_compile_hosts(args):
+@@ -122,18 +137,8 @@ def should_install(self, host_target):
+     def has_cross_compile_hosts(self, args):
+         return args.cross_compile_hosts
+ 
+-    @classmethod
+-    def get_install_destdir(self, args, host_target, build_dir):
+-        install_destdir = args.install_destdir
+-        if self.has_cross_compile_hosts(args):
 -            build_root = os.path.dirname(build_dir)
 -            install_destdir = '%s/intermediate-install/%s' % (build_root, host_target)
-+            if StdlibDeploymentTarget.get_target_for_name(
-+                    host_target).platform.is_darwin:
-+                build_root = os.path.dirname(build_dir)
-+                install_destdir = '%s/intermediate-install/%s' % (
-+                                  build_root, host_target)
-+            else:
-+                install_destdir = os.path.join(install_destdir, host_target)
-         return install_destdir
- 
+-        return install_destdir
+-
      def install(self, host_target):
+-        install_destdir = self.get_install_destdir(self.args,
+-                                                   host_target,
+-                                                   self.build_dir)
++        install_destdir = self.host_install_destdir(host_target)
+         install_prefix = install_destdir + self.args.install_prefix
+ 
+         self.run_bootstrap_script('install', host_target, [
 diff --git a/swift/utils/swift_build_support/swift_build_support/targets.py b/swift/utils/swift_build_support/swift_build_support/targets.py
-index 34364458ec736..b6cedb3908f48 100644
+index 05966defe2861..c5a86651bb869 100644
 --- a/swift/utils/swift_build_support/swift_build_support/targets.py
 +++ b/swift/utils/swift_build_support/swift_build_support/targets.py
 @@ -80,6 +80,13 @@ def cmake_options(self, args):
@@ -251,7 +331,7 @@ index 34364458ec736..b6cedb3908f48 100644
  
          flags += '-sdk %s/sysroot ' % (android_toolchain_path)
          flags += '-tools-directory %s/bin' % (android_toolchain_path)
-@@ -171,6 +177,46 @@ def cmake_options(self, args):
+@@ -171,6 +177,42 @@ def cmake_options(self, args):
          options += '-DCMAKE_ANDROID_NDK:PATH=%s' % (args.android_ndk)
          return options
  
@@ -263,11 +343,13 @@ index 34364458ec736..b6cedb3908f48 100644
 +        config_file = '%s/swiftpm-android-%s.json' % (output_dir, args.android_arch)
 +
 +        if os.path.exists(config_file):
++            print("Using existing config at %s" % config_file)
 +            return config_file
 +
 +        spm_json = '{\n'
 +        spm_json += '  "version": 1,\n'
-+        spm_json += '  "target": "%s-unknown-linux-android",\n' % args.android_arch
++        spm_json += '  "target": "%s-unknown-linux-android%s",\n' % (
++                    args.android_arch, args.android_api_level)
 +        spm_json += '  "toolchain-bin-dir": "%s/bin",\n' % swift_toolchain
 +        spm_json += '  "sdk": "%s/sysroot",\n' % self.ndk_toolchain_path(args)
 +
@@ -279,13 +361,7 @@ index 34364458ec736..b6cedb3908f48 100644
 +        spm_json += '    "-tools-directory", "%s/bin",\n' % (
 +                    self.ndk_toolchain_path(args))
 +        spm_json += '    "-Xcc", "-I%s/usr/include",\n' % args.cross_compile_deps_path
-+        spm_json += '    "-L%s/usr/lib",\n' % args.cross_compile_deps_path
-+        spm_json += '    "-L%s/lib/gcc/%s-linux-android%s/%s.x/%s"\n' % (
-+                    self.ndk_toolchain_path(args),
-+                    args.android_arch if not args.android_arch == 'armv7' else 'arm',
-+                    '' if not args.android_arch == 'armv7' else 'eabi',
-+                    args.android_ndk_gcc_version,
-+                    '' if not args.android_arch == 'armv7' else 'armv7-a')
++        spm_json += '    "-L%s/usr/lib"\n' % args.cross_compile_deps_path
 +        spm_json += '  ],\n'
 +
 +        spm_json += '  "extra-cpp-flags": [ "-lstdc++" ]\n'
