@@ -89,25 +89,24 @@
 +
 +include $(DEFAULT_RULES)/c
 +include $(DEFAULT_RULES)/c++
-diff -u -r ../rules.orig/General/Clang/c ./wmake/rules/General/Clang/c
---- ../rules.orig/General/Clang/c	2020-07-04 14:14:17.914357166 +0200
-+++ ./wmake/rules/General/Clang/c	2020-07-04 15:29:10.867438565 +0200
+--- ./wmake/rules/General/Clang/c.orig	2022-02-08 17:30:19.869452605 +0100
++++ ./wmake/rules/General/Clang/c	2022-02-08 17:31:31.762700333 +0100
 @@ -1,6 +1,6 @@
  SUFFIXES += .c
  
--cc          = clang
-+cc          = @TERMUX_COMPILER_PREFIX@-clang
+-cc          = clang$(COMPILER_VERSION)
++cc          = @TERMUX_COMPILER_PREFIX@-clang$(COMPILER_VERSION)
  
  cARCH       =
  cDBUG       =
-diff -u -r ../rules.orig/General/Clang/c++ ./wmake/rules/General/Clang/c++
---- ../rules.orig/General/Clang/c++	2020-07-04 14:14:17.914357166 +0200
-+++ ./wmake/rules/General/Clang/c++	2020-07-04 15:29:10.870773563 +0200
-@@ -1,6 +1,6 @@
+--- ./wmake/rules/General/Clang/c++.orig	2022-02-08 17:30:19.869452605 +0100
++++ ./wmake/rules/General/Clang/c++	2022-02-08 17:31:16.646051743 +0100
+@@ -1,7 +1,7 @@
+ #------------------------------------------------------------------------------
  SUFFIXES += .C .cc .cpp .cxx
  
--CC          = clang++ -std=c++11
-+CC          = @TERMUX_COMPILER_PREFIX@-clang++
+-CC          = clang++$(COMPILER_VERSION) -std=c++14
++CC          = @TERMUX_COMPILER_PREFIX@-clang++$(COMPILER_VERSION) -std=c++14
  
  c++ARCH     =
  c++DBUG     =
