@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A feature complete C++ bittorrent implementation focusin
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.0.5
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/arvidn/libtorrent/releases/download/v${TERMUX_PKG_VERSION}/libtorrent-rasterbar-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=e965c2e53170c61c0db3a2d898a61769cb7acd541bbf157cbbef97a185930ea5
 TERMUX_PKG_DEPENDS="boost, openssl, python"
