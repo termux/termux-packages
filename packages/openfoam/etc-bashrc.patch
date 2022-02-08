@@ -1,15 +1,15 @@
---- ./etc/bashrc.orig	2021-12-01 03:15:49.000000000 +0100
-+++ ./etc/bashrc	2021-12-01 03:15:49.000000000 +0100
-@@ -68,7 +68,7 @@
- # [WM_COMPILER] - Compiler:
- # = Gcc | Clang | Icc | Icx | Cray | Amd | Arm | Pgi | Fujitsu |
+--- ./etc/bashrc.orig	2021-12-20 19:57:43.000000000 +0100
++++ ./etc/bashrc	2022-02-08 17:16:21.817030684 +0100
+@@ -69,7 +69,7 @@
+ # = Gcc | Clang | Icc | Icx | Amd | Arm | Cray | Fujitsu |
  #   Gcc<digits> | Clang<digits>
+ #   [Not well tested: Pgi | Nvidia]
 -export WM_COMPILER=Gcc
 +export WM_COMPILER=Clang
  
  # [WM_PRECISION_OPTION] - Floating-point precision:
  # = DP | SP | SPDP
-@@ -112,8 +112,8 @@
+@@ -114,8 +114,8 @@
  # --
  projectDir="${BASH_SOURCE:-${ZSH_NAME:+$0}}";
  [ -n "$projectDir" ] && projectDir="$(\cd $(dirname $projectDir)/.. && \pwd -L)" ||\
@@ -20,21 +20,21 @@
  # projectDir="/usr/local/OpenFOAM/OpenFOAM-$WM_PROJECT_VERSION"
  ################################################################################
  # Or optionally hard-coded (eg, with autoconfig)
-@@ -162,7 +162,7 @@
+@@ -164,7 +164,7 @@
  
  # Capture values of old directories to be cleaned from PATH, LD_LIBRARY_PATH
  foamOldDirs="$WM_PROJECT_DIR $WM_THIRD_PARTY_DIR \
--    $HOME/$WM_PROJECT/$USER $FOAM_USER_APPBIN $FOAM_USER_LIBBIN \
-+    $HOME/$WM_PROJECT/termux $FOAM_USER_APPBIN $FOAM_USER_LIBBIN \
+-    $HOME/$WM_PROJECT/${USER:-user} $FOAM_USER_APPBIN $FOAM_USER_LIBBIN \
++    $HOME/$WM_PROJECT/${USER:-termux} $FOAM_USER_APPBIN $FOAM_USER_LIBBIN \
      $WM_PROJECT_SITE $FOAM_SITE_APPBIN $FOAM_SITE_LIBBIN \
      $FOAM_MODULE_APPBIN $FOAM_MODULE_LIBBIN"
  
-@@ -170,7 +170,7 @@
+@@ -172,7 +172,7 @@
  export WM_PROJECT_DIR="$projectDir"
  
  # [WM_PROJECT_USER_DIR] - Location of user files
--export WM_PROJECT_USER_DIR="$HOME/$WM_PROJECT/$USER-$WM_PROJECT_VERSION"
-+export WM_PROJECT_USER_DIR="$HOME/$WM_PROJECT/termux-$WM_PROJECT_VERSION"
+-export WM_PROJECT_USER_DIR="$HOME/$WM_PROJECT/${USER:-user}-$WM_PROJECT_VERSION"
++export WM_PROJECT_USER_DIR="$HOME/$WM_PROJECT/${USER:-termux}-$WM_PROJECT_VERSION"
  
  # [WM_PROJECT_SITE] - Location of site-specific (group) files
  # Default (unset) implies WM_PROJECT_DIR/site

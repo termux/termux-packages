@@ -1,22 +1,20 @@
---- ./src/OpenFOAM/db/IOstreams/IOstreams/Istream.C.orig	2021-12-01 03:15:50.000000000 +0100
-+++ ./src/OpenFOAM/db/IOstreams/IOstreams/Istream.C	2021-12-01 03:15:50.000000000 +0100
-@@ -141,7 +141,8 @@
+--- ./src/OpenFOAM/db/IOstreams/IOstreams/Istream.C.orig	2022-02-08 17:25:26.649794083 +0100
++++ ./src/OpenFOAM/db/IOstreams/IOstreams/Istream.C	2022-02-08 17:28:57.869549414 +0100
+@@ -137,7 +137,7 @@
              << "Expected a '" << token::END_LIST
              << "' while reading " << funcName
              << ", found " << delimiter.info()
--            << " at stream position " << tellg(this) << nl
-+            << " at stream position "
-+            << static_cast<uint64_t>(tellg(this)) << nl
+-            << " at stream position " << stream_tellg(this) << nl
++            << " at stream position " << static_cast<uint64_t>(stream_tellg(this)) << nl
              << exit(FatalIOError);
      }
  
-@@ -182,7 +183,8 @@
+@@ -178,7 +178,7 @@
              << "' or a '" << token::END_BLOCK
              << "' while reading " << funcName
              << ", found " << delimiter.info()
--            << " at stream position " << tellg(this) << nl
-+            << " at stream position "
-+            << static_cast<uint64_t>(tellg(this)) << nl
+-            << " at stream position " << stream_tellg(this) << nl
++            << " at stream position " << static_cast<uint64_t>(stream_tellg(this)) << nl
              << exit(FatalIOError);
  
          return '\0';
