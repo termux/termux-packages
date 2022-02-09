@@ -3,7 +3,6 @@ TERMUX_PKG_DESCRIPTION="An in-process SQL OLAP database management system"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.3.2
-TERMUX_PKG_GIT_BRANCH=v$TERMUX_PKG_VERSION
 # we clone to retain the .git directory, to ensure the version in the built executable is correctly populated
 TERMUX_PKG_SRCURL=https://github.com/duckdb/duckdb.git
 TERMUX_PKG_DEPENDS="libc++"
