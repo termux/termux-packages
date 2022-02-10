@@ -9,10 +9,10 @@ TERMUX_PKG_DEPENDS="man,play-audio"
 
 termux_step_make_install() {
 	mkdir -p $TERMUX_PREFIX/opt/predict
-	mv default/ $TERMUX_PREFIX/opt/predict/
+	cp -r default/ $TERMUX_PREFIX/opt/predict/
 	mv predict $TERMUX_PREFIX/opt/predict
-	mv vocalizer/ $TERMUX_PREFIX/opt/predict/
-	mv docs/ $TERMUX_PREFIX/opt/predict/
+	cp -r vocalizer/ $TERMUX_PREFIX/opt/predict/
+	cp -r docs/ $TERMUX_PREFIX/opt/predict/
 	mv kepupdate $TERMUX_PREFIX/opt/predict
 	rm $TERMUX_PREFIX/bin/kepupdate
 	ln -s $TERMUX_PREFIX/opt/predict/kepupdate $TERMUX_PREFIX/bin/
