@@ -7,7 +7,7 @@ TERMUX_PKG_SRCURL=https://www.qsl.net/kd2bd/predict-${TERMUX_PKG_VERSION}-termux
 TERMUX_PKG_SHA256=b5e454c13818a4c2dcb1e2146352f41d806a76cfa85410cb5e93d02a458f60a9
 TERMUX_PKG_DEPENDS="man,play-audio"
 
-termux_step_post_configure() {
+termux_step_post_make_install() {
 	mkdir -p $TERMUX_PREFIX/opt/predict
 	mv default $TERMUX_PREFIX/opt/predict
 	mv predict $TERMUX_PREFIX/opt/predict
