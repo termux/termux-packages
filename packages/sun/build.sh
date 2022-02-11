@@ -19,6 +19,6 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm700 -t $TERMUX_PREFIX/bin \
-		${TERMUX_PKG_BUILDDIR}/src/github.com/basbossink/sun/sun
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin \
+	        src/github.com/basbossink/sun/sun
 }
