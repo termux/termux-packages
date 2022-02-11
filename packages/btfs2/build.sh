@@ -20,5 +20,6 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -m700 cmd/btfs/btfs $TERMUX_PREFIX/bin/btfs2
+	install -m700 cmd/btfs/btfs \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/btfs2
 }
