@@ -13,11 +13,16 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm700 -t $TERMUX_PREFIX/bin target/${CARGO_TARGET_NAME}/release/xh
-	ln -sf $TERMUX_PREFIX/bin/xh{,s}
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin \
+		target/${CARGO_TARGET_NAME}/release/xh
+	ln -sf $TERMUX_PREFIX/bin/xh $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/xhs
 
-	install -Dm600 doc/xh.1 "${TERMUX_PREFIX}"/share/man/man1/xh.1
-	install -Dm644 completions/xh.bash "${TERMUX_PREFIX}"/share/bash-completion/completions/xh.bash
-	install -Dm644 completions/_xh "${TERMUX_PREFIX}"/share/zsh/site-functions/_xh
-	install -Dm644 completions/xh.fish "${TERMUX_PREFIX}"/share/fish/vendor_completions.d/xh.fish
+	mkdir -p "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}"/share/man/man1
+	mkdir -p "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}"/share/bash-completion/completions
+	mkdir -p "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}"/share/zsh/site-functions
+	mkdir -p "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}"/share/fish/vendor_completions.d
+	install -Dm600 -t "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}"/share/man/man1/ doc/xh.1
+	install -Dm644 -t "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}"/share/bash-completion/completions/ completions/xh.bash
+	install -Dm644 -t "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}"/share/zsh/site-functions/ completions/_xh
+	install -Dm644 -t "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}"/share/fish/vendor_completions.d/ completions/xh.fish
 }
