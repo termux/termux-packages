@@ -29,5 +29,5 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm700 xpup $TERMUX_PREFIX/bin/
+	install -Dm700 xpup $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/
 }
