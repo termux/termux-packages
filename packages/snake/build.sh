@@ -10,10 +10,10 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_GROUPS="games"
 
 termux_step_make_install() {
-	install -Dm755 -t $TERMUX_PREFIX/bin/ snake
+	install -Dm755 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/ snake
 }
 
 termux_step_install_license() {
-	install -Dm644 -t $TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME/ \
+	install -Dm644 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME/ \
 		$TERMUX_PKG_BUILDER_DIR/LICENSE
 }
