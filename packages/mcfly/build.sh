@@ -25,8 +25,10 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm700 -t $TERMUX_PREFIX/bin target/${CARGO_TARGET_NAME}/release/mcfly
-	install -Dm600 -t $TERMUX_PREFIX/share/mcfly mcfly.{fi,z}sh
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin \
+		target/${CARGO_TARGET_NAME}/release/mcfly
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/mcfly \
+		mcfly.{fi,z}sh
 }
 
 termux_step_create_debscripts() {
