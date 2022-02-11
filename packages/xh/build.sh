@@ -13,6 +13,7 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm700 -t $TERMUX_PREFIX/bin target/${CARGO_TARGET_NAME}/release/xh
-	ln -sf $TERMUX_PREFIX/bin/xh{,s}
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin \
+		target/${CARGO_TARGET_NAME}/release/xh
+	ln -sf xh $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/xhs
 }
