@@ -25,6 +25,7 @@ termux_step_make() {
 
 termux_step_make_install() {
 	for f in $_HCL_TOOLS; do
-		install -Dm700 -t $TERMUX_PREFIX/bin $GOPATH/bin/*/$f
+		install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin \
+			$GOPATH/bin/*/$f
 	done
 }
