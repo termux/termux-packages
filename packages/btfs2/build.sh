@@ -33,6 +33,7 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm700 -t $TERMUX_PREFIX/bin $TERMUX_PKG_SRCDIR/cmd/btfs/btfs
-	ln -sfT btfs $TERMUX_PREFIX/bin/btfs2
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin \
+		cmd/btfs/btfs
+	ln -sfT btfs $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/btfs2
 }
