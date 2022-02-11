@@ -43,6 +43,10 @@
 #define SEM_NSEMS_MAX 256
 #endif // !SEM_NSEMS_MAX
 
+#ifndef PREFIX
+#define PREFIX "/data/data/com.termux/files/usr"
+#endif
+
 static __inline__ char *__strchrnul(const char *s, int c)
 {
     c = (unsigned char)c;
@@ -78,7 +82,7 @@ static char *__sem_mapname(const char *name, char *buf)
         errno = ENAMETOOLONG;
         return 0;
     }
-    memcpy(buf, "/data/data/com.termux/files/usr/tmp/sem.", 40);
+    memcpy(buf, PREFIX"/tmp/sem.", 40);
     memcpy(buf+40, name, p-name+1);
     return buf;
 }

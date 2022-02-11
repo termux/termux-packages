@@ -7,7 +7,8 @@ TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
-	$CC $CFLAGS $CPPFLAGS -I$TERMUX_PKG_BUILDER_DIR -c $TERMUX_PKG_BUILDER_DIR/semaphore.c
+	$CC $CFLAGS $CPPFLAGS -DPREFIX="\"$TERMUX_PREFIX\"" \
+		-c $TERMUX_PKG_BUILDER_DIR/semaphore.c
 	$CC $LDFLAGS -shared semaphore.o -o libandroid-posix-semaphore.so
 	$AR rcu libandroid-posix-semaphore.a semaphore.o
 	cp -f $TERMUX_PKG_BUILDER_DIR/LICENSE $TERMUX_PKG_SRCDIR/
