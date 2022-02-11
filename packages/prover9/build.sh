@@ -10,5 +10,5 @@ TERMUX_PKG_EXTRA_MAKE_ARGS="-e all"
 TERMUX_MAKE_PROCESSES=1
 
 termux_step_make_install() {
-	install -Dm700 -t $TERMUX_PREFIX/bin bin/*
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin bin/*
 }
