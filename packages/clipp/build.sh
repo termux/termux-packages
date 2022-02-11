@@ -10,5 +10,6 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
 termux_step_make_install() {
-	install -Dm600 -t $TERMUX_PREFIX/include include/clipp.h
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include \
+		include/clipp.h
 }
