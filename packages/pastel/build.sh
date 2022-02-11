@@ -14,17 +14,20 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
-	SHELL_COMPLETIONS_DIR=$TERMUX_PKG_BUILDDIR/completions cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
+	SHELL_COMPLETIONS_DIR=$TERMUX_PKG_BUILDDIR/completions cargo build \
+		--jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME \
+		--release
 }
 
 termux_step_make_install() {
-	install -Dm755 -t $TERMUX_PREFIX/bin target/${CARGO_TARGET_NAME}/release/pastel
+	install -Dm755 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin \
+		target/${CARGO_TARGET_NAME}/release/pastel
 
 	# Install completions
 	install -Dm600 $TERMUX_PKG_BUILDDIR/completions/_pastel \
-		$TERMUX_PREFIX/share/zsh/site-functions/_pastel
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/zsh/site-functions/_pastel
 	install -Dm600 $TERMUX_PKG_BUILDDIR/completions/pastel.bash \
-		$TERMUX_PREFIX/share/bash-completion/completions/pastel.bash
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/bash-completion/completions/pastel.bash
 	install -Dm600 $TERMUX_PKG_BUILDDIR/completions/pastel.fish \
-		$TERMUX_PREFIX/share/fish/vendor_completions.d/pastel.fish
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/fish/vendor_completions.d/pastel.fish
 }
