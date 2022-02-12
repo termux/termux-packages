@@ -2,11 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://github.com/kpet/clvk
 TERMUX_PKG_DESCRIPTION="Experimental implementation of OpenCL on Vulkan"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.0.20211121
-_COMMIT=d8d02aac8ac3e9256e75f3143214777cc3a162e9
+TERMUX_PKG_VERSION=0.0.20220210
+_COMMIT=bc9398b486243517c8a4a75dfd517c4146a831c1
 TERMUX_PKG_SRCURL=https://github.com/kpet/clvk.git
 TERMUX_PKG_GIT_BRANCH=master
-TERMUX_PKG_BUILD_DEPENDS="vulkan-loader-android"
+TERMUX_PKG_BUILD_DEPENDS="vulkan-loader-android, vulkan-headers"
 TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_SUGGESTS="ocl-icd"
 TERMUX_PKG_HOSTBUILD=true
@@ -22,7 +22,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 # Sticking with NDK should expose more Vulkan limitations in Android (like below)
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
 -DCLVK_VULKAN_IMPLEMENTATION=custom
--DVulkan_INCLUDE_DIRS=$TERMUX_PKG_SRCDIR/external/Vulkan-Headers/include
+-DVulkan_INCLUDE_DIRS=$TERMUX_PREFIX/include
 -DVulkan_LIBRARIES=vulkan
 "
 
