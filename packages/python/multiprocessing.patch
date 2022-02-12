@@ -1,0 +1,140 @@
+diff -uNr Python-3.10.1/Lib/multiprocessing/heap.py Python-3.10.1.mod/Lib/multiprocessing/heap.py
+--- Python-3.10.1/Lib/multiprocessing/heap.py      2022-02-07 11:51:46.427116300 +0800
++++ Python-3.10.1.mod/Lib/multiprocessing/heap.py  2022-02-07 11:52:48.432577700 +0800
+@@ -70,7 +70,7 @@
+         """
+ 
+         if sys.platform == 'linux':
+-            _dir_candidates = ['/dev/shm']
++            _dir_candidates = []
+         else:
+             _dir_candidates = []
+ 
+
+diff -uNr Python-3.10.1/Modules/_multiprocessing/multiprocessing.c Python-3.10.1.mod/Modules/_multiprocessing/multiprocessing.c
+--- Python-3.10.1/Modules/_multiprocessing/multiprocessing.c        2021-12-07 02:23:39.000000000 +0800
++++ Python-3.10.1.mod/Modules/_multiprocessing/multiprocessing.c    2022-02-10 03:05:11.249248300 +0800
+@@ -172,7 +172,7 @@
+     _MULTIPROCESSING_RECV_METHODDEF
+     _MULTIPROCESSING_SEND_METHODDEF
+ #endif
+-#if !defined(POSIX_SEMAPHORES_NOT_ENABLED) && !defined(__ANDROID__)
++#if !defined(POSIX_SEMAPHORES_NOT_ENABLED)
+     _MULTIPROCESSING_SEM_UNLINK_METHODDEF
+ #endif
+     {NULL}
+
+diff -uNr Python-3.10.1/Modules/_multiprocessing/posixshmem.c Python-3.10.1.mod/Modules/_multiprocessing/posixshmem.c
+--- Python-3.10.1/Modules/_multiprocessing/posixshmem.c     2021-12-07 02:23:39.000000000 +0800
++++ Python-3.10.1.mod/Modules/_multiprocessing/posixshmem.c 2022-02-10 01:37:03.547649100 +0800
+@@ -11,6 +11,9 @@
+ #include <sys/mman.h>
+ #endif
+ 
++int shm_open(const char *, int, mode_t);
++int shm_unlink(const char *);
++
+ /*[clinic input]
+ module _posixshmem
+ [clinic start generated code]*/
+
+diff -uNr Python-3.10.1/Modules/_multiprocessing/posix-shm-extension.c Python-3.10.1.mod/Modules/_multiprocessing/posix-shm-extension.c
+--- Python-3.10.1/Modules/_multiprocessing/posix-shm-extension.c        1970-01-01 08:00:00.000000000 +0800
++++ Python-3.10.1.mod/Modules/_multiprocessing/posix-shm-extension.c    2022-02-12 13:25:30.306949200 +0800
+@@ -0,0 +1,76 @@
++/* This file is a port of posix shared memory for Python3 on Termux Android, 
++   based on musl-libc which is licensed under the following standard MIT 
++   license. The ported files are listed as following.
++
++   File(s): src/mman/shm_open.c
++
++   Copyright © 2005-2020 Rich Felker, et al.
++
++   Permission is hereby granted, free of charge, to any person obtaining
++   a copy of this software and associated documentation files (the
++   "Software"), to deal in the Software without restriction, including
++   without limitation the rights to use, copy, modify, merge, publish,
++   distribute, sublicense, and/or sell copies of the Software, and to
++   permit persons to whom the Software is furnished to do so, subject to
++   the following conditions:
++
++   The above copyright notice and this permission notice shall be
++   included in all copies or substantial portions of the Software.
++
++   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
++   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
++   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
++   IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
++   CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
++   TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
++   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
++ */
++
++#include <fcntl.h>     // open()
++#include <string.h>    // strlen(), memcpy()
++#include <errno.h>     // errno
++#include <limits.h>    // NAME_MAX
++#include <unistd.h>    // unlink()
++
++#define SHM_PREFIX "@TERMUX_PREFIX@/tmp/shm."
++
++static __inline__ char *__strchrnul(const char *s, int c)
++{
++    c = (unsigned char)c;
++    if (!c) return (char *)s + strlen(s);
++    for (; *s && *(unsigned char *)s != c; s++);
++    return (char *)s;
++}
++
++static char *__shm_mapname(const char *name, char *buf)
++{
++    char *p;
++    while (*name == '/') name++;
++    if (*(p = __strchrnul(name, '/')) || p==name ||
++        (p-name <= 2 && name[0]=='.' && p[-1]=='.')) {
++        errno = EINVAL;
++        return 0;
++    }
++    if (p-name > NAME_MAX-4) {
++        errno = ENAMETOOLONG;
++        return 0;
++    }
++    memcpy(buf, SHM_PREFIX, strlen(SHM_PREFIX));
++    memcpy(buf+strlen(SHM_PREFIX), name, p-name+1);
++    return buf;
++}
++
++int shm_open(const char *name, int flag, mode_t mode)
++{
++    char buf[NAME_MAX+strlen(SHM_PREFIX)+1];
++    if (!(name = __shm_mapname(name, buf))) return -1;
++    int fd = open(name, flag|O_NOFOLLOW|O_CLOEXEC|O_NONBLOCK, mode);
++    return fd;
++}
++
++int shm_unlink(const char *name)
++{
++    char buf[NAME_MAX+strlen(SHM_PREFIX)+1];
++    if (!(name = __shm_mapname(name, buf))) return -1;
++    return unlink(name);
++}
+
+diff -uNr Python-3.10.1/setup.py Python-3.10.1.mod/setup.py
+--- Python-3.10.1/setup.py      2021-12-07 02:23:39.000000000 +0800
++++ Python-3.10.1.mod/setup.py  2022-02-10 17:26:38.314970000 +0800
+@@ -1846,12 +1846,14 @@
+                 sysconfig.get_config_var('POSIX_SEMAPHORES_NOT_ENABLED')):
+                 multiprocessing_srcs.append('_multiprocessing/semaphore.c')
+         self.add(Extension('_multiprocessing', multiprocessing_srcs,
++                           libraries=["android-posix-semaphore"],
+                            include_dirs=["Modules/_multiprocessing"]))
+ 
+         if (not MS_WINDOWS and
+            sysconfig.get_config_var('HAVE_SHM_OPEN') and
+            sysconfig.get_config_var('HAVE_SHM_UNLINK')):
+-            posixshmem_srcs = ['_multiprocessing/posixshmem.c']
++            posixshmem_srcs = ['_multiprocessing/posixshmem.c', 
++                               '_multiprocessing/posix-shm-extension.c']
+             libs = []
+             if sysconfig.get_config_var('SHM_NEEDS_LIBRT'):
+                 # need to link with librt to get shm_open()
