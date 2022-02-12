@@ -27,3 +27,10 @@ termux_step_pre_configure() {
 
 	autoreconf -fi
 }
+
+termux_step_post_massage() {
+	termux_download https://github.com/Lzhiyong/termux-ndk/raw/902f483485b4/patches/align_fix.py \
+		$TERMUX_PKG_CACHEDIR/align_fix.py \
+		83579beef5f0899300b2f1cb7cfad25c3ee2c90089f9b7eb83ce7472d0e730bd
+	python3 $TERMUX_PKG_CACHEDIR/align_fix.py bin/valgrind
+}
