@@ -1,0 +1,25 @@
+--- a/src/libtsduck/base/system/tsThread.cpp
++++ b/src/libtsduck/base/system/tsThread.cpp
+@@ -114,7 +114,7 @@
+ {
+ #if defined(TS_WINDOWS)
+     ::SwitchToThread();
+-#elif defined(TS_MAC) || defined(_GLIBCXX_USE_SCHED_YIELD)
++#elif defined(TS_MAC) || defined(_GLIBCXX_USE_SCHED_YIELD) || defined(__ANDROID__)
+     ::sched_yield();
+ #else
+     ::pthread_yield();
+@@ -254,11 +254,13 @@
+         return false;
+     }
+ 
++#if !defined __ANDROID__ || __ANDROID_API__ >= 28
+     // Use explicit scheduling attributes, do not inherit them from the current thread.
+     if (::pthread_attr_setinheritsched(&attr, PTHREAD_EXPLICIT_SCHED) != 0) {
+         ::pthread_attr_destroy(&attr);
+         return false;
+     }
++#endif
+ 
+     // Create the thread
+     if (::pthread_create(&_pthread, &attr, Thread::ThreadProc, this) != 0) {

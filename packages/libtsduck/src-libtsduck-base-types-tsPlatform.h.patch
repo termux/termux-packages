@@ -1,0 +1,16 @@
+--- a/src/libtsduck/base/types/tsPlatform.h
++++ b/src/libtsduck/base/types/tsPlatform.h
+@@ -1356,9 +1356,13 @@
+ #else
+     // Extract the type of the second parameter of ::ioctl().
+     // It is "unsigned long" on most Linux systems but "int" on Alpine Linux.
++#ifndef __ANDROID__
+     template<typename T>
+     T request_param_type(int (*ioctl_syscall)(int, T, ...));
+     typedef decltype(request_param_type(&::ioctl)) ioctl_request_t;
++#else
++    typedef int ioctl_request_t;
++#endif
+ #endif
+ }
+ 

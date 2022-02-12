@@ -1,0 +1,48 @@
+--- a/Makefile.inc
++++ b/Makefile.inc
+@@ -164,9 +164,9 @@
+ 
+ # Enforce English locale by default in all commands for predictible output.
+ 
+-export LANGUAGE = en_US.UTF-8
+-export LC_ALL = en_US.UTF-8
+-export LANG = en_US.UTF-8
++export LANGUAGE = C.UTF-8
++export LC_ALL = C.UTF-8
++export LANG = C.UTF-8
+ 
+ # Operating system, architecture, host name.
+ 
+@@ -212,12 +212,12 @@
+     $(if $(LINUXBREW),$(if $(HOMEBREW_PREFIX),,$(error LINUXBREW is defined but not HOMEBREW_PREFIX)))
+     ALTDEVROOT := $(if $(HOMEBREW_PREFIX),$(HOMEBREW_PREFIX),$(if $(wildcard /opt/homebrew/bin),/opt/homebrew,/usr/local))
+ else
+-    ALTDEVROOT := /usr
++    ALTDEVROOT := @TERMUX_PREFIX@
+ endif
+ 
+ # Locate system directories.
+ 
+-USELIB64  := $(if $(findstring linux-x86_64,$(LOCAL_OS)-$(MAIN_ARCH)),$(if $(LINUXBREW),,$(if $(wildcard /usr/lib64/libc.so*),true)))
++USELIB64  :=
+ SYSPREFIX ?= $(if $(MACOS)$(LINUXBREW),$(ALTDEVROOT),/usr)
+ USRLIBDIR ?= $(if $(USELIB64),$(SYSPREFIX)/lib64,$(SYSPREFIX)/lib)
+ ETCDIR    ?= $(if $(subst /usr,,$(SYSPREFIX)),$(SYSPREFIX)/etc,/etc)
+@@ -399,7 +399,7 @@
+ # Always use maximal or even paranoid warning mode.
+ # With clang, the option -Weverything turns everything on. There is no such option with GCC.
+ 
+-CXXFLAGS_WARNINGS = -Werror
++CXXFLAGS_WARNINGS =
+ ifneq ($(USE_LLVM),)
+     CXXFLAGS_WARNINGS += -Weverything -Wno-c++98-compat-pedantic
+     ifneq ($(MACOS),)
+@@ -468,7 +468,7 @@
+ 
+ # External libraries
+ 
+-LDLIBS += -lstdc++ -lpthread $(if $(MACOS),,-lrt) -lm
++LDLIBS += -lm
+ 
+ # Global compilation flags.
+ # Additional flags can be passed on the "make" command line using xxFLAGS_EXTRA.
