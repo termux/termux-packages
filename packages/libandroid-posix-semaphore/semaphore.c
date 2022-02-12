@@ -46,6 +46,7 @@
 #ifndef PREFIX
 #define PREFIX "/data/data/com.termux/files/usr"
 #endif
+#define SEM_PREFIX PREFIX"/tmp/sem."
 
 static __inline__ char *__strchrnul(const char *s, int c)
 {
@@ -82,8 +83,8 @@ static char *__sem_mapname(const char *name, char *buf)
         errno = ENAMETOOLONG;
         return 0;
     }
-    memcpy(buf, PREFIX"/tmp/sem.", 40);
-    memcpy(buf+40, name, p-name+1);
+    memcpy(buf, SEM_PREFIX, strlen(SEM_PREFIX));
+    memcpy(buf+strlen(SEM_PREFIX), name, p-name+1);
     return buf;
 }
 
@@ -96,7 +97,7 @@ sem_t *sem_open(const char *name, int flags, ...)
     sem_t newsem;
     void *map;
     struct stat st;
-    char buf[NAME_MAX+41];
+    char buf[NAME_MAX+strlen(SEM_PREFIX)+1];
 
     if (!(name = __sem_mapname(name, buf)))
         return SEM_FAILED;
@@ -242,7 +243,7 @@ int sem_close(sem_t *sem)
 
 int sem_unlink(const char *name)
 {
-    char buf[NAME_MAX+41];
+    char buf[NAME_MAX+strlen(SEM_PREFIX)+1];
     if (!(name = __sem_mapname(name, buf))) return -1;
     return unlink(name);
 }
