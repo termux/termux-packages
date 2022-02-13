@@ -23,7 +23,7 @@ termux_step_post_configure() {
 
 termux_step_make_install() {
 	install -Dm700 "$TERMUX_PKG_BUILDDIR"/src/AtomVM \
-		"$TERMUX_PREFIX"/bin/AtomVM
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/bin/AtomVM
 	install -Dm700 "$TERMUX_PKG_BUILDDIR"/tools/packbeam/PackBEAM \
-		"$TERMUX_PREFIX"/bin/PackBEAM
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/bin/PackBEAM
 }

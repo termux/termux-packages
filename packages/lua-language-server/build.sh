@@ -43,9 +43,10 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	local INSTALL_DIR="${TERMUX_PREFIX}/lib/${TERMUX_PKG_NAME}"
+	local INSTALL_DIR="$TERMUX_PKG_MASSAGEDIR/${TERMUX_PREFIX}/lib/${TERMUX_PKG_NAME}"
+	mkdir -p $INSTALL_DIR
 
-	cat >"${TERMUX_PREFIX}/bin/${TERMUX_PKG_NAME}" <<-EOF
+	cat >"$TERMUX_PKG_MASSAGEDIR/${TERMUX_PREFIX}/bin/${TERMUX_PKG_NAME}" <<-EOF
 		#!${TERMUX_PREFIX}/bin/bash
 
 		# After action of termux-elf-cleaner lua-language-server's binary(ELF) is unable to
@@ -63,7 +64,7 @@ termux_step_make_install() {
 
 	EOF
 
-	chmod 744 "${TERMUX_PREFIX}/bin/${TERMUX_PKG_NAME}"
+	chmod 744 "$TERMUX_PKG_MASSAGEDIR/${TERMUX_PREFIX}/bin/${TERMUX_PKG_NAME}"
 
 	install -Dm744 -t "${INSTALL_DIR}"/bin ./bin/"${TERMUX_PKG_NAME}"
 	install -Dm644 -t "${INSTALL_DIR}" ./{main,debugger}.lua

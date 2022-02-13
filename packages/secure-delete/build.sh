@@ -13,6 +13,7 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	make install INSTALL_DIR="$TERMUX_PREFIX/bin"
-	install -Dm600 -t "$TERMUX_PREFIX"/share/man/man1 sfill.1 smem.1 srm.1 sswap.1
+	make install INSTALL_DIR="$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin"
+	install -Dm600 -t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/man/man1 \
+		sfill.1 smem.1 srm.1 sswap.1
 }

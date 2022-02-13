@@ -22,10 +22,10 @@ termux_step_make_install() {
 
 	local LANGS="de_DE de_AT de_CH"
 	for l in ${LANGS}; do
-		install -Dm644 -t "${TERMUX_PREFIX}/lib/aspell-0.60/" \
+		install -Dm644 -t "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/lib/aspell-0.60/" \
 			${l}.alias ${l}.dat ${l}_affix.dat ${l}.multi ${l}.rws
 	done
-	echo "add de_DE.multi" > "${TERMUX_PREFIX}/lib/aspell-0.60/deutsch.alias"
-	echo "add de_DE.multi" > "${TERMUX_PREFIX}/lib/aspell-0.60/german.alias"
-	echo "add de_CH.multi" > "${TERMUX_PREFIX}/lib/aspell-0.60/swiss.alias"
+	echo "add de_DE.multi" > "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/lib/aspell-0.60/deutsch.alias"
+	echo "add de_DE.multi" > "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/lib/aspell-0.60/german.alias"
+	echo "add de_CH.multi" > "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/lib/aspell-0.60/swiss.alias"
 }

@@ -14,11 +14,12 @@ termux_step_make() {
 	(
 		unset GOOS GOARCH CGO_LDFLAGS
 		unset CC CXX CFLAGS CXXFLAGS LDFLAGS
-		go run ./cmd/gen-docs --man-page --doc-path $TERMUX_PREFIX/share/man/man1/
+		go run ./cmd/gen-docs --man-page --doc-path \
+			$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man1/
 	)
 	export GOPATH=$TERMUX_PKG_BUILDDIR
 	mkdir -p "$GOPATH"/src/github.com/cli/
-	mkdir -p "$TERMUX_PREFIX"/share/doc/gh
+
 	cp -a "$TERMUX_PKG_SRCDIR" "$GOPATH"/src/github.com/cli/cli
 	cd "$GOPATH"/src/github.com/cli/cli/cmd/gh
 	go get -d -v
@@ -26,6 +27,8 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm700 -t "$TERMUX_PREFIX"/bin "$GOPATH"/src/github.com/cli/cli/cmd/gh/gh
-	install -Dm600 -t "$TERMUX_PREFIX"/share/doc/gh/ "$TERMUX_PKG_SRCDIR"/docs/*
+	install -Dm700 -t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/bin \
+		"$GOPATH"/src/github.com/cli/cli/cmd/gh/gh
+	install -Dm600 -t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/doc/gh/ \
+		"$TERMUX_PKG_SRCDIR"/docs/*
 }

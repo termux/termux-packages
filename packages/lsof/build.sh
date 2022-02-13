@@ -15,10 +15,13 @@ termux_step_configure() {
 }
 
 termux_step_make_install() {
-	install -Dm700 -t $TERMUX_PREFIX/bin/ lsof
-	install -Dm600 Lsof.8 $TERMUX_PREFIX/share/man/man8/lsof.8
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man8
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/ lsof
+	install -Dm600 Lsof.8 \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man8/lsof.8
 }
 
 termux_step_install_license() {
-	install -Dm600 -t $TERMUX_PREFIX/share/doc/lsof $TERMUX_PKG_BUILDER_DIR/license.txt
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/doc/lsof \
+		$TERMUX_PKG_BUILDER_DIR/license.txt
 }

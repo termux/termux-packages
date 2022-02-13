@@ -1,0 +1,15 @@
+--- ./Make.Rules.orig	2021-11-08 20:40:49.867747737 +0000
++++ ./Make.Rules	2021-11-08 20:41:49.984463608 +0000
+@@ -63,10 +63,10 @@
+ KERNEL_HEADERS := $(topdir)/libcap/include/uapi
+ LIBCAP_INCLUDES = -I$(KERNEL_HEADERS) -I$(topdir)/libcap/include
+ DEFINES := -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
+-SYSTEM_HEADERS = /usr/include
++SYSTEM_HEADERS = @TERMUX_PREFIX@/include
+ 
+ SUDO := sudo
+-CC := $(CROSS_COMPILE)gcc
++CC ?= $(CROSS_COMPILE)gcc
+ LD := $(CC) -Wl,-x -shared
+ AR := $(CROSS_COMPILE)ar
+ RANLIB := $(CROSS_COMPILE)ranlib

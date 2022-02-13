@@ -68,6 +68,7 @@ share/emacs/${TERMUX_PKG_VERSION}/etc/refcards
 share/emacs/${TERMUX_PKG_VERSION}/etc/tutorials/TUTORIAL.*
 share/icons
 share/man/man1/grep-changelog.1.gz
+lib/systemd/user/emacs.service
 "
 
 # Remove ctags from the emacs package to prevent conflicting with
@@ -86,10 +87,6 @@ termux_step_post_get_source() {
 	# XXX: We have to start with new host build each time
 	#      to avoid build error when cross compiling.
 	rm -Rf $TERMUX_PKG_HOSTBUILD_DIR
-
-	# Termux only use info pages for emacs. Remove the info directory
-	# to get a clean Info directory file dir.
-	rm -Rf $TERMUX_PREFIX/share/info
 }
 
 termux_step_host_build() {
@@ -113,8 +110,9 @@ termux_step_post_configure() {
 }
 
 termux_step_post_make_install() {
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/emacs/site-lisp
 	install -Dm600 $TERMUX_PKG_BUILDER_DIR/site-start.el \
-		$TERMUX_PREFIX/share/emacs/site-lisp/site-start.el
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/emacs/site-lisp/site-start.el
 }
 
 termux_step_create_debscripts() {

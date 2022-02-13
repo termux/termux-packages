@@ -16,9 +16,3 @@ termux_step_make() {
 		LDFLAGS="$LDFLAGS" \
 		OBJS="file.o tree.o unix.o html.o xml.o json.o hash.o color.o strverscmp.o"
 }
-
-termux_step_make_install() {
-	make install \
-		prefix="$TERMUX_PREFIX" \
-		MANDIR="$TERMUX_PREFIX/share/man/man1"
-}

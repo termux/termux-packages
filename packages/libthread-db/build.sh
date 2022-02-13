@@ -18,7 +18,10 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm600 -t $TERMUX_PREFIX/include "$TERMUX_PKG_SRCDIR/thread_db.h"
-	install -Dm600 -t $TERMUX_PREFIX/lib "$TERMUX_PKG_BUILDDIR/libthread_db.so"
-	ln -sf $TERMUX_PREFIX/lib/libthread_db.so $TERMUX_PREFIX/lib/libthread_db.so.1
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include \
+		"$TERMUX_PKG_SRCDIR/thread_db.h"
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib \
+		"$TERMUX_PKG_BUILDDIR/libthread_db.so"
+	ln -sf $TERMUX_PREFIX/lib/libthread_db.so \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/libthread_db.so.1
 }

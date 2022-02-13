@@ -23,7 +23,7 @@ TERMUX_PKG_SKIP_SRC_EXTRACT=true
 
 termux_step_post_make_install() {
 	cp -fv "$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libvulkan.so" \
-		"$TERMUX_PREFIX/lib/libvulkan.so"
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/libvulkan.so"
 }
 
 termux_step_create_debscripts() {

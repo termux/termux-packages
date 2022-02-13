@@ -32,9 +32,9 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_make_install() {
-	mkdir -p $TERMUX_PREFIX/lib/pkgconfig
-	cp readline.pc $TERMUX_PREFIX/lib/pkgconfig/
+	install -Dm600 readline.pc \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/pkgconfig/
 
-	mkdir -p $TERMUX_PREFIX/etc
-	cp $TERMUX_PKG_BUILDER_DIR/inputrc $TERMUX_PREFIX/etc/
+	install -Dm600 $TERMUX_PKG_BUILDER_DIR/inputrc \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/
 }

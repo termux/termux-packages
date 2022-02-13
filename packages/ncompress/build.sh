@@ -9,7 +9,7 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {
-	mkdir -p "$TERMUX_PREFIX"/share/man/man1/
-	install -Dm700 compress "$TERMUX_PREFIX"/bin/
-	install -Dm600 compress.1 "$TERMUX_PREFIX"/share/man/man1/
+	mkdir -p "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/man/man1/
+	install -Dm700 compress "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/bin/
+	install -Dm600 compress.1 "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/man/man1/
 }

@@ -57,7 +57,7 @@ termux_step_post_configure() {
 	$CC $CPPFLAGS $CFLAGS -c sys_sem.c
 	rm -f libsys_sem.a
 	$AR cru libsys_sem.a sys_sem.o
-	local lib=$TERMUX_PREFIX/lib/mercury/lib
+	local lib=$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/mercury/lib
 	install -Dm600 -t $lib libsys_sem.a
 	sed -i -e 's:^\(LINKER_POST_FLAGS=.*\)"$:\1 '"$lib"'/libsys_sem.a":g' \
 		$TERMUX_PKG_SRCDIR/scripts/ml

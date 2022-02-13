@@ -14,7 +14,6 @@ termux_step_make() {
 
 	export GOPATH=$TERMUX_PKG_BUILDDIR
 	mkdir -p "$GOPATH"/src/github.com/txthinking
-	mkdir -p "$TERMUX_PREFIX"/share/doc/brook
 	cp -a "$TERMUX_PKG_SRCDIR" "$GOPATH"/src/github.com/txthinking/brook
 	cd "$GOPATH"/src/github.com/txthinking/brook/cli/brook
 	go get -d -v
@@ -22,6 +21,7 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm700 -t "$TERMUX_PREFIX"/bin "$GOPATH"/src/github.com/txthinking/brook/cli/brook/brook
-	cp -r "$TERMUX_PKG_SRCDIR"/docs/* "$TERMUX_PREFIX"/share/doc/brook
+        mkdir -p "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/doc/brook
+	install -Dm700 -t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/bin "$GOPATH"/src/github.com/txthinking/brook/cli/brook/brook
+	cp -r "$TERMUX_PKG_SRCDIR"/docs/* "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/doc/brook/
 }

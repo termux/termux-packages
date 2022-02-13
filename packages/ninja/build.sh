@@ -28,5 +28,5 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	cp ninja $TERMUX_PREFIX/bin
+	cp ninja $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin
 }

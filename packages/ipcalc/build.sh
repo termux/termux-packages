@@ -6,8 +6,8 @@ TERMUX_PKG_DEPENDS="perl"
 TERMUX_PKG_VERSION=0.41
 TERMUX_PKG_SRCURL=http://jodies.de/ipcalc-archive/ipcalc-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=dda9c571ce3369e5b6b06e92790434b54bec1f2b03f1c9df054c0988aa4e2e8a
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {
-  cp $TERMUX_PKG_SRCDIR/ipcalc $TERMUX_PREFIX/bin/
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/ ipcalc
 }
-

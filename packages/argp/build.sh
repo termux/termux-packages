@@ -9,6 +9,6 @@ TERMUX_PKG_SHA256=dec79694da1319acd2238ce95df57f3680fea2482096e483323fddf3d818d8
 TERMUX_PKG_NO_STATICSPLIT=true
 
 termux_step_post_make_install() {
-	cp libargp.a $TERMUX_PREFIX/lib
-	cp $TERMUX_PKG_SRCDIR/argp.h $TERMUX_PREFIX/include
+	install -Dm600 libargp.a $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib
+	install -Dm600 $TERMUX_PKG_SRCDIR/argp.h $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include
 }

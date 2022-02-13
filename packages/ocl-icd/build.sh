@@ -27,5 +27,6 @@ termux_step_post_make_install() {
 	else
 		echo "/vendor/lib/libOpenCL.so" > "$TERMUX_PKG_TMPDIR/android.icd"
 	fi
-	install -Dm644 "$TERMUX_PKG_TMPDIR/android.icd" "$TERMUX_PREFIX/etc/OpenCL/vendors/android.icd"
+	install -Dm644 "$TERMUX_PKG_TMPDIR/android.icd" \
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/OpenCL/vendors/android.icd"
 }

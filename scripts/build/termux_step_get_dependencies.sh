@@ -34,8 +34,7 @@ termux_step_get_dependencies() {
 
 			if ! termux_download_deb_pac $PKG $DEP_ARCH $DEP_VERSION $DEP_VERSION_PAC; then
 				echo "Download of $PKG@$DEP_VERSION from $TERMUX_REPO_URL failed, building instead"
-				TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh -I --format $TERMUX_PACKAGE_FORMAT "${PKG_DIR}"
-				continue
+				TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh -I -o $TERMUX_COMMON_CACHEDIR-$DEP_ARCH --format $TERMUX_PACKAGE_FORMAT "${PKG_DIR}"
 			fi
 			if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 				if [ ! "$TERMUX_QUIET_BUILD" = true ]; then

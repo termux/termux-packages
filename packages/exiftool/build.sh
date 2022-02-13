@@ -10,9 +10,10 @@ TERMUX_PKG_DEPENDS="perl"
 termux_step_make_install() {
 	local current_perl_version=$(. $TERMUX_SCRIPTDIR/packages/perl/build.sh; echo $TERMUX_PKG_VERSION)
 
-	install -Dm700 "$TERMUX_PKG_SRCDIR"/exiftool "$TERMUX_PREFIX"/bin/exiftool
+	install -Dm700 "$TERMUX_PKG_SRCDIR"/exiftool \
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/bin/exiftool
 	find "$TERMUX_PKG_SRCDIR"/lib -name "*.pod" -delete
-	mkdir -p "$TERMUX_PREFIX/lib/perl5/site_perl/$current_perl_version"
-	rm -rf "$TERMUX_PREFIX/lib/perl5/site_perl/${current_perl_version}"/{Image,File}
-	cp -a "$TERMUX_PKG_SRCDIR"/lib/{Image,File} "$TERMUX_PREFIX/lib/perl5/site_perl/${current_perl_version}/"
+	mkdir -p "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/perl5/site_perl/$current_perl_version"
+	cp -a "$TERMUX_PKG_SRCDIR"/lib/{Image,File} \
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/perl5/site_perl/${current_perl_version}/"
 }

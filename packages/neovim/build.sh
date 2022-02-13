@@ -63,9 +63,9 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_make_install() {
-	local _CONFIG_DIR=$TERMUX_PREFIX/share/nvim
+	local _CONFIG_DIR=$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/nvim
 	mkdir -p $_CONFIG_DIR
-	cp $TERMUX_PKG_BUILDER_DIR/sysinit.vim $_CONFIG_DIR/
+	install -Dm600 $TERMUX_PKG_BUILDER_DIR/sysinit.vim $_CONFIG_DIR/
 }
 
 termux_step_create_debscripts() {

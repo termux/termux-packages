@@ -39,11 +39,15 @@ termux_step_pre_configure() {
 }
 
 termux_step_make_install() {
-	make install
-	make uninstall # remove possible remains to get fresh timestamps
-	make install
+	local RBCONFIG=$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/ruby/${TERMUX_PKG_VERSION:0:3}.0/${TERMUX_HOST_PLATFORM}/rbconfig.rb
+	if [ "$TERMUX_ON_DEVICE_BUILD" = true ]; then
+		TERMUX_PKG_EXTRA_MAKE_ARGS+=" DESTDIR=$TERMUX_PKG_MASSAGEDIR"
+	else
+		make $TERMUX_PKG_EXTRA_MAKE_ARGS install
+		make $TERMUX_PKG_EXTRA_MAKE_ARGS uninstall # remove possible remains to get fresh timestamps
+	fi
 
-	local RBCONFIG=$TERMUX_PREFIX/lib/ruby/${TERMUX_PKG_VERSION:0:3}.0/${TERMUX_HOST_PLATFORM}/rbconfig.rb
+	make $TERMUX_PKG_EXTRA_MAKE_ARGS install
 
 	# Fix absolute paths to executables:
 	perl -p -i -e 's/^.*CONFIG\["INSTALL"\].*$/  CONFIG["INSTALL"] = "install -c"/' $RBCONFIG

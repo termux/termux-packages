@@ -40,3 +40,8 @@ PACKAGES+=" valac"
 apt update
 apt dist-upgrade -y
 apt install -y $PACKAGES
+
+PYTHON_PACKAGES=""
+PYTHON_PACKAGES+=" sphinx==1.8.5"		# Needed for libllvm doc build. Newer version fails with "unexpected indentation" errors
+
+pip install $PYTHON_PACKAGES
