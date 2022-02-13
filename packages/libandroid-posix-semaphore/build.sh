@@ -15,6 +15,8 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm600 libandroid-posix-semaphore.a $TERMUX_PREFIX/lib/libandroid-posix-semaphore.a
-	install -Dm600 libandroid-posix-semaphore.so $TERMUX_PREFIX/lib/libandroid-posix-semaphore.so
+	install -Dm600 libandroid-posix-semaphore.a \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/libandroid-posix-semaphore.a
+	install -Dm600 libandroid-posix-semaphore.so \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/libandroid-posix-semaphore.so
 }
