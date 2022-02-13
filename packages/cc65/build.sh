@@ -14,6 +14,11 @@ termux_step_host_build() {
     make
 }
 
+termux_step_pre_configure() {
+	# hostbuild step have to be run everytime currently
+	rm -Rf $TERMUX_PKG_HOSTBUILD_DIR
+}
+
 termux_step_make() {
     make clean -C src
     make bin
