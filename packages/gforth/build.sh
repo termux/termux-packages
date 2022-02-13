@@ -33,7 +33,7 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
-	PATH=$_PREFIX_FOR_BUILD/bin:$PATH
+	PATH=$TERMUX_PKG_HOSTBUILD_DIR/prefix/bin:$PATH
 }
 
 termux_step_post_configure() {
