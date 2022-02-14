@@ -2,12 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://openethereum.github.io
 TERMUX_PKG_DESCRIPTION="Lightweight Ethereum Client"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.3.0-rc.10
+TERMUX_PKG_VERSION=3.3.3
 TERMUX_PKG_SRCURL=https://github.com/openethereum/openethereum/archive/v${TERMUX_PKG_VERSION}.zip
-TERMUX_PKG_SHA256=1d3715c291757aaaf422c2739f6f67776148d3219976a40b6123243aa7c033a5
+TERMUX_PKG_SHA256=e62f2f825ca895a12b18b07af6ff8472417516a3644c0ca6401d88e741332b7e
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_RUST_VERSION=1.45
 
 termux_step_configure() {
 	termux_setup_cmake
@@ -52,9 +52,24 @@ termux_step_configure() {
 	cargo clean
 	export NDK_HOME=$NDK
 	RUSTFLAGS+=" -C link-args=-lc++"
+	: "${CARGO_HOME:=$HOME/.cargo}"
+	export CARGO_HOME
+
+	if [ "$TERMUX_ARCH" = "x86_64" ]; then
+		local libdir=target/$CARGO_TARGET_NAME/release/deps
+		mkdir -p $libdir
+		pushd $libdir
+		local libgcc="$($CC -print-libgcc-file-name)"
+		echo "INPUT($libgcc -l:libunwind.a)" > libgcc.so
+		popd
+	fi
 }
 
 termux_step_make() {
+	cargo fetch --target $CARGO_TARGET_NAME
+	patch --silent -p1 \
+		-d $CARGO_HOME/registry/src/github.com-*/parity-rocksdb-sys-0.5.6/rocksdb \
+		< $TERMUX_PKG_BUILDER_DIR/parity-rocksdb-sys-0.5.6-mutex.diff
 	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release --features final
 	for applet in evmbin ethstore-cli ethkey-cli; do
 		cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release -p $applet
