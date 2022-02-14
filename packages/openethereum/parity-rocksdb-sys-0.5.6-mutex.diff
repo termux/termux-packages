@@ -1,0 +1,25 @@
+https://github.com/cockroachdb/rocksdb/commit/92572072dc46c1c35191ca529f860fe219007fd0
+
+From 139500df49ff6009d5098fa8e2cc0dc4e97e7c5a Mon Sep 17 00:00:00 2001
+From: Raphael 'kena' Poss <knz@thaumogen.net>
+Date: Wed, 1 Apr 2020 10:46:13 +0200
+Subject: [PATCH] util/channel.h: remove an invalid const specifier
+
+This error was found by Clang 10.
+---
+ util/channel.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/util/channel.h b/util/channel.h
+index 0225482c00c..2eaf02d0ccd 100644
+--- a/util/channel.h
++++ b/util/channel.h
+@@ -31,7 +31,7 @@ class channel {
+     return buffer_.empty() && eof_;
+   }
+ 
+-  size_t size() const {
++  size_t size() {
+     std::lock_guard<std::mutex> lk(lock_);
+     return buffer_.size();
+   }
