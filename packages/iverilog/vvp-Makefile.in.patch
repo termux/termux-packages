@@ -1,0 +1,22 @@
+--- a/vvp/Makefile.in
++++ b/vvp/Makefile.in
+@@ -32,8 +32,8 @@
+ includedir = @includedir@
+ 
+ # For a cross compile these defines will need to be set accordingly.
+-HOSTCC = @CC@
+-HOSTCFLAGS = @WARNING_FLAGS@ @WARNING_FLAGS_CC@ @CFLAGS@
++HOSTCC = gcc
++HOSTCFLAGS = @WARNING_FLAGS@ @WARNING_FLAGS_CC@
+ 
+ BUILDCC = @CC_FOR_BUILD@
+ BUILDEXT = @BUILD_EXEEXT@
+@@ -130,7 +130,7 @@
+ 	mv $*.d dep/$*.d
+ 
+ tables.cc: $(srcdir)/draw_tt.c
+-	$(CC) $(CFLAGS) -o draw_tt$(BUILDEXT) $(srcdir)/draw_tt.c
++	$(BUILDCC) $(CFLAGS_FOR_BUILD) -o draw_tt$(BUILDEXT) $(srcdir)/draw_tt.c
+ 	./draw_tt$(BUILDEXT) > tables.cc
+ 	rm draw_tt$(BUILDEXT)
+ 
