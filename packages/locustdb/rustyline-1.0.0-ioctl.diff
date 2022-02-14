@@ -1,0 +1,15 @@
+--- a/src/tty/unix.rs
++++ b/src/tty/unix.rs
+@@ -23,10 +23,10 @@
+ #[cfg(any(target_os = "macos", target_os = "freebsd"))]
+ const TIOCGWINSZ: libc::c_ulong = 0x40087468;
+ 
+-#[cfg(any(all(target_os = "linux", target_env = "gnu"), target_os = "android"))]
++#[cfg(all(target_os = "linux", target_env = "gnu"))]
+ const TIOCGWINSZ: libc::c_ulong = 0x5413;
+ 
+-#[cfg(all(target_os = "linux", target_env = "musl"))]
++#[cfg(any(all(target_os = "linux", target_env = "musl"), target_os = "android"))]
+ const TIOCGWINSZ: libc::c_int = 0x5413;
+ 
+ /// Try to get the number of columns in the current terminal,
