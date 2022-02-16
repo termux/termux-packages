@@ -63,7 +63,11 @@ termux_step_host_build() {
 	termux_setup_cmake
 	termux_setup_ninja
 
-	cmake -G Ninja -DLLVM_ENABLE_PROJECTS='clang;flang;lldb;mlir' $TERMUX_PKG_SRCDIR/llvm
+	cmake -G Ninja \
+		-DLLVM_ENABLE_PROJECTS='clang;flang;lldb;mlir' \
+		-DLLVM_PARALLEL_LINK_JOBS=1 \
+		-DLLVM_USE_LINKER=lld \
+		$TERMUX_PKG_SRCDIR/llvm
 	ninja -j1 clang-tblgen lldb-tblgen llvm-tblgen \
 		mlir-tblgen mlir-linalg-ods-gen mlir-linalg-ods-yaml-gen f18
 }
