@@ -26,14 +26,6 @@ termux_step_pre_configure() {
 	else
 		export LIB_PATH="${TERMUX_PREFIX}/lib:/system/lib64"
 	fi
-
-	# Force generation of manpages
-	rm \
-		$TERMUX_PKG_SRCDIR/binutils/doc/*.1 \
-		$TERMUX_PKG_SRCDIR/binutils/doc/cxxfilt.man \
-		$TERMUX_PKG_SRCDIR/gas/doc/as.1 \
-		$TERMUX_PKG_SRCDIR/ld/ld.1 \
-		$TERMUX_PKG_SRCDIR/gprof/gprof.1
 }
 
 termux_step_post_make_install() {
