@@ -1,0 +1,14 @@
+--- a/lib/host/wasi/linux.h
++++ b/lib/host/wasi/linux.h
+@@ -312,7 +312,11 @@
+   }
+ }
+ 
++#if !defined __ANDROID__ || defined __aarch64__ || defined __x86_64__
+ inline constexpr __wasi_filetype_t fromFileType(mode_t Mode) noexcept {
++#else
++inline constexpr __wasi_filetype_t fromFileType(unsigned int Mode) noexcept {
++#endif
+   switch (Mode & S_IFMT) {
+   case S_IFBLK:
+     return __WASI_FILETYPE_BLOCK_DEVICE;

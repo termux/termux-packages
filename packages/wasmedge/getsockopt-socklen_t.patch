@@ -1,0 +1,75 @@
+For 32-bit Android `socklen_t` is defined as `int32_t`.
+
+--- a/include/host/wasi/environ.h
++++ b/include/host/wasi/environ.h
+@@ -964,7 +964,7 @@
+ 
+   WasiExpect<void> sockGetOpt(__wasi_fd_t Fd, int32_t Level, int32_t Name,
+                               void *FlagPtr,
+-                              uint32_t *FlagSizePtr) const noexcept {
++                              socklen_t *FlagSizePtr) const noexcept {
+     auto Node = getNodeOrNull(Fd);
+     if (unlikely(!Node)) {
+       return WasiUnexpect(__WASI_ERRNO_BADF);
+--- a/include/host/wasi/inode.h
++++ b/include/host/wasi/inode.h
+@@ -540,7 +540,7 @@
+   WasiExpect<void> sockShutdown(__wasi_sdflags_t SdFlags) const noexcept;
+ 
+   WasiExpect<void> sockGetOpt(int32_t Level, int32_t Name, void *FlagPtr,
+-                              uint32_t *FlagSizePtr) const noexcept;
++                              socklen_t *FlagSizePtr) const noexcept;
+   WasiExpect<void> sockSetOpt(int32_t Level, int32_t Name, void *FlagPtr,
+                               uint32_t FlagSizePtr) const noexcept;
+ 
+--- a/include/host/wasi/vinode.h
++++ b/include/host/wasi/vinode.h
+@@ -603,7 +603,7 @@
+   }
+ 
+   WasiExpect<void> sockGetOpt(int32_t Level, int32_t OptName, void *FlagPtr,
+-                              uint32_t *FlagSizePtr) const noexcept {
++                              socklen_t *FlagSizePtr) const noexcept {
+     return Node.sockGetOpt(Level, OptName, FlagPtr, FlagSizePtr);
+   }
+   WasiExpect<void> sockSetOpt(int32_t Level, int32_t OptName, void *FlagPtr,
+--- a/include/host/wasi/wasifunc.h
++++ b/include/host/wasi/wasifunc.h
+@@ -455,7 +455,7 @@
+ 
+   Expect<uint32_t> body(Runtime::Instance::MemoryInstance *MemInst, int32_t Fd,
+                         int32_t Level, int32_t Name, uint32_t FlagPtr,
+-                        uint32_t FlagSizePtr);
++                        socklen_t FlagSizePtr);
+ };
+ 
+ class WasiSockSetOpt : public Wasi<WasiSockSetOpt> {
+--- a/lib/host/wasi/inode-linux.cpp
++++ b/lib/host/wasi/inode-linux.cpp
+@@ -1060,7 +1060,7 @@
+ 
+ WasiExpect<void> INode::sockGetOpt(int32_t Level, int32_t OptName,
+                                    void *FlagPtr,
+-                                   uint32_t *FlagSizePtr) const noexcept {
++                                   socklen_t *FlagSizePtr) const noexcept {
+   auto SysLevel = toSockOptLevel(static_cast<__wasi_sock_opt_level_t>(Level));
+   auto SysOptName = toSockOptSoName(static_cast<__wasi_sock_opt_so_t>(OptName));
+   if (OptName == __WASI_SOCK_OPT_SO_ERROR) {
+--- a/lib/host/wasi/wasifunc.cpp
++++ b/lib/host/wasi/wasifunc.cpp
+@@ -1854,13 +1854,13 @@
+ Expect<uint32_t>
+ WasiSockGetOpt::body(Runtime::Instance::MemoryInstance *MemInst, int32_t Fd,
+                      int32_t Level, int32_t Name, uint32_t FlagPtr,
+-                     uint32_t FlagSizePtr) {
++                     socklen_t FlagSizePtr) {
+ 
+   if (MemInst == nullptr) {
+     return __WASI_ERRNO_FAULT;
+   }
+ 
+-  uint32_t *InnerFlagSizePtr = MemInst->getPointer<uint32_t *>(FlagSizePtr);
++  socklen_t *InnerFlagSizePtr = MemInst->getPointer<socklen_t *>(FlagSizePtr);
+   if (InnerFlagSizePtr == nullptr) {
+     return __WASI_ERRNO_FAULT;
+   }
