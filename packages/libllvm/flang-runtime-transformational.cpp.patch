@@ -2,13 +2,13 @@ diff --git a/flang/runtime/transformational.cpp b/flang/runtime/transformational
 index 46cf2ec9b..5fe2d8a1c 100644
 --- a/flang/runtime/transformational.cpp
 +++ b/flang/runtime/transformational.cpp
-@@ -184,7 +184,7 @@ void RTNAME(CshiftVector)(Descriptor &result, const Descriptor &source,
+@@ -183,7 +183,7 @@ void RTNAME(CshiftVector)(Descriptor &result, const Descriptor &source,
    SubscriptValue lb{sourceDim.LowerBound()};
    for (SubscriptValue j{0}; j < extent; ++j) {
      SubscriptValue resultAt{1 + j};
 -    SubscriptValue sourceAt{lb + (j + shift) % extent};
 +    SubscriptValue sourceAt{lb + (j + static_cast<SubscriptValue>(shift)) % extent};
-     if (sourceAt < lb) {
+     if (sourceAt < 0) {
        sourceAt += extent;
      }
 @@ -282,7 +282,7 @@ void RTNAME(EoshiftVector)(Descriptor &result, const Descriptor &source,
