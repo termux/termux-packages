@@ -21,6 +21,7 @@ TERMUX_PKG_REPLACES="gcc, libclang, libclang-dev, libllvm-dev"
 TERMUX_PKG_GROUPS="base-devel"
 # See http://llvm.org/docs/CMake.html:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DCMAKE_BUILD_TYPE=Release
 -DPYTHON_EXECUTABLE=$(command -v python3)
 -DLLVM_ENABLE_PIC=ON
 -DLLVM_ENABLE_PROJECTS=clang;clang-tools-extra;compiler-rt;flang;lld;lldb;openmp;polly
@@ -49,6 +50,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 # Host Build arguments to avoid OOM
 TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="
+-DCMAKE_BUILD_TYPE=Release
 -DLLVM_ENABLE_PROJECTS=clang;flang;lldb;mlir
 -DLLVM_PARALLEL_LINK_JOBS=1
 -DLLVM_PARALLEL_COMPILE_JOBS=1
