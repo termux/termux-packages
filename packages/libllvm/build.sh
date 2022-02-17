@@ -47,6 +47,13 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLLVM_ENABLE_FFI=ON
 -DFLANG_INCLUDE_TESTS=OFF
 "
+# Host Build arguments to avoid OOM
+TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="
+-DLLVM_ENABLE_PROJECTS=clang;flang;lldb;mlir
+-DLLVM_PARALLEL_LINK_JOBS=1
+-DLLVM_PARALLEL_COMPILE_JOBS=1
+-DLLVM_USE_LINKER=lld
+"
 
 if [ "$TERMUX_ARCH_BITS" == "32" ]; then
 	# Do not set _FILE_OFFSET_BITS=64
@@ -63,12 +70,9 @@ termux_step_host_build() {
 	termux_setup_cmake
 	termux_setup_ninja
 
-	cmake -G Ninja \
-		-DLLVM_ENABLE_PROJECTS='clang;flang;lldb;mlir' \
-		-DLLVM_PARALLEL_LINK_JOBS=1 \
-		-DLLVM_USE_LINKER=lld \
+	cmake -G Ninja ${TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS} \
 		$TERMUX_PKG_SRCDIR/llvm
-	ninja -j1 clang-tblgen lldb-tblgen llvm-tblgen \
+	ninja clang-tblgen lldb-tblgen llvm-tblgen \
 		mlir-tblgen mlir-linalg-ods-gen mlir-linalg-ods-yaml-gen f18
 }
 
@@ -91,7 +95,9 @@ termux_step_pre_configure() {
 		termux_error_exit "Invalid arch: $TERMUX_ARCH"
 	fi
 	# see CMakeLists.txt and tools/clang/CMakeLists.txt
+	# Reduce targets to build to save time
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_TARGET_ARCH=$LLVM_TARGET_ARCH"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_TARGETS_TO_BUILD=$LLVM_TARGET_ARCH"
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_HOST_TRIPLE=$LLVM_DEFAULT_TARGET_TRIPLE"
 	export TERMUX_SRCDIR_SAVE=$TERMUX_PKG_SRCDIR
 	TERMUX_PKG_SRCDIR=$TERMUX_PKG_SRCDIR/llvm
