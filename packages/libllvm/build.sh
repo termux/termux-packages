@@ -126,6 +126,7 @@ termux_step_post_make_install() {
 
 	cp docs/man/* $TERMUX_PREFIX/share/man/man1
 	cp tools/clang/docs/man/clang.1 $TERMUX_PREFIX/share/man/man1
+	cp tools/flang/docs/man/flang.1 $TERMUX_PREFIX/share/man/man1
 	cd $TERMUX_PREFIX/bin
 
 	for tool in clang clang++ cc c++ cpp gcc g++ ${TERMUX_HOST_PLATFORM}-{clang,clang++,gcc,g++,cpp}; do
