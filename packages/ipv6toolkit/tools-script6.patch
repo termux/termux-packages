@@ -1,0 +1,29 @@
+--- a/tools/script6
++++ b/tools/script6
+@@ -101,7 +101,7 @@
+ 
+ 
+ sub ParseConfigFile{
+-	$configfile="/etc/ipv6toolkit.conf";
++	$configfile="@TERMUX_PREFIX@/etc/ipv6toolkit.conf";
+ 
+ 	open FILE, "$configfile" or die $!;
+ 
+@@ -145,7 +145,7 @@
+ 		$wwwclient_hdr=" -S --max-redirect 0 -q --timeout=10 ";
+ 	}
+ 	elsif($wwwclient=~ m/^\s*$/){
+-		print "ERROR: 'WWW-client' option not set in configuration file (/etc/ipv6toolkit.conf).\n";
++		print "ERROR: 'WWW-client' option not set in configuration file (@TERMUX_PREFIX@/etc/ipv6toolkit.conf).\n";
+ 		exit(1);
+ 	}
+ 	else{
+@@ -7586,7 +7586,7 @@
+ 	}
+ }
+ elsif($ARGV[0] eq "get-dns6-rev-batch" || $ARGV[0] eq "get-dns6-rev-batch"){
+-	$resolverfile="/etc/resolv.conf";
++	$resolverfile="@TERMUX_PREFIX@/etc/resolv.conf";
+ 	
+ 	if($#ARGV == 0){
+ 		open FILE, "$resolverfile" or die $!;
