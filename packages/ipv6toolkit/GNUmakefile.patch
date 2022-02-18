@@ -1,0 +1,31 @@
+--- a/GNUmakefile
++++ b/GNUmakefile
+@@ -18,7 +18,7 @@
+ # typically employed by package developers.
+ 
+ 
+-CC= gcc
++CC?= gcc
+ CFLAGS+= -Wall -Wno-address-of-packed-member -Wno-missing-braces
+ LDFLAGS+= -lpcap -lm
+ 
+@@ -35,16 +35,16 @@
+ 	endif
+ else
+ 	ifndef MANPREFIX
+-		MANPREFIX=/usr/share
++		MANPREFIX=$(PREFIX)
+ 	endif
+ endif
+ 
+ 
+-ETCPATH= $(DESTDIR)/etc
++ETCPATH= $(DESTDIR)$(PREFIX)/etc
+ MANPATH= $(DESTDIR)$(MANPREFIX)/man
+ DATAPATH= $(DESTDIR)$(PREFIX)/share/ipv6toolkit
+ BINPATH= $(DESTDIR)$(PREFIX)/bin
+-SBINPATH= $(DESTDIR)$(PREFIX)/sbin
++SBINPATH= $(DESTDIR)$(PREFIX)/bin
+ SRCPATH= tools
+ 
+ 
