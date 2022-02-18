@@ -14,6 +14,7 @@ lib/libFortranParser.a
 lib/libFortranSemantics.a
 lib/libFIROptimizer.a
 lib/libFortranRuntime.a
+share/man/man1/flang.1.gz
 "
 TERMUX_SUBPKG_DESCRIPTION="Fortran language frontend for LLVM"
 TERMUX_SUBPKG_DEPENDS="libuuid (>> 1.0.3-4)"

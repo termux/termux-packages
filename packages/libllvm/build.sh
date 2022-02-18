@@ -118,9 +118,9 @@ termux_step_post_configure() {
 
 termux_step_post_make_install() {
 	if [ "$TERMUX_CMAKE_BUILD" = Ninja ]; then
-		ninja docs-llvm-man docs-clang-man
+		ninja docs-llvm-man docs-clang-man docs-flang-man
 	else
-		make docs-llvm-man docs-clang-man
+		make docs-llvm-man docs-clang-man docs-flang-man
 	fi
 
 	cp docs/man/* $TERMUX_PREFIX/share/man/man1
