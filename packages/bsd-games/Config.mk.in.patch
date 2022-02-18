@@ -1,0 +1,22 @@
+--- a/Config.mk.in
++++ b/Config.mk.in
+@@ -7,8 +7,8 @@
+ RANLIB		:= @RANLIB@
+ INSTALL		:= @INSTALL@
+ INSTALL_DATA	:= ${INSTALL} -m 644
+-INSTALL_PROGRAM	:= ${INSTALL} -m 755 -s
+-INSTALL_SCORE	:= ${INSTALL} -m 664 -g users /dev/null
++INSTALL_PROGRAM	:= ${INSTALL} -m 755
++INSTALL_SCORE	:= ${INSTALL} -m 664 /dev/null
+ 
+ ################ Destination #########################################
+ 
+@@ -17,7 +17,7 @@
+ datadir		:= @datadir@
+ mandir		:= @mandir@
+ man6dir		:= @man6dir@
+-scoredir	:= @localstatedir@/${name}
++scoredir	:= @prefix@@localstatedir@/${name}
+ TMPDIR		:= @TMPDIR@
+ builddir	:= @builddir@/${name}
+ O		:= .o/
