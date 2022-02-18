@@ -86,7 +86,7 @@ termux_step_host_build() {
 	TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS+=" -DLLVM_TARGETS_TO_BUILD=$LLVM_TARGET_ARCH"
 	cmake -G Ninja ${TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS} \
 		$TERMUX_PKG_SRCDIR/llvm
-	ninja clang-tblgen lldb-tblgen llvm-tblgen \
+	ninja -j $TERMUX_MAKE_PROCESSES clang-tblgen lldb-tblgen llvm-tblgen \
 		mlir-tblgen mlir-linalg-ods-gen mlir-linalg-ods-yaml-gen f18
 }
 
