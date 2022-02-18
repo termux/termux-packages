@@ -1,0 +1,23 @@
+--- a/src/libtsduck/Makefile
++++ b/src/libtsduck/Makefile
+@@ -128,7 +128,7 @@
+ $(SHARED_LIBTSDUCK): $(OBJS)
+ 	@echo '  [DTAPI] $(if $(DTAPI_OBJECT),using $(DTAPI_OBJECT),no DTAPI available)'; \
+ 	echo '  [LD] $@'; \
+-	$(CXX) $(CXXFLAGS) $(SOFLAGS) $^ $(LIBTSDUCK_LDLIBS) $(LDLIBS_EXTRA) $(LDLIBS) -shared -o $@
++	$(CXX) $(CXXFLAGS) $(SOFLAGS) $(LDFLAGS) $^ $(LIBTSDUCK_LDLIBS) $(LDLIBS_EXTRA) $(LDLIBS) -shared -o $@
+ 
+ # The static library is build differently. There are four specific categories:
+ # tables, descriptors, charsets and plugins. These classes use self-registration
+@@ -187,11 +187,8 @@
+ 	+@$(call F_RECURSE,config python java)
+ 
+ install-devel: $(STATIC_LIBTSDUCK) tsduck.h
+-	rm -rf $(SYSROOT)$(SYSPREFIX)/include/tsduck
+ 	install -d -m 755 $(SYSROOT)$(USRLIBDIR) $(SYSROOT)$(SYSPREFIX)/include/tsduck
+ 	install -m 644 $(STATIC_LIBTSDUCK) $(SYSROOT)$(USRLIBDIR)
+ 	install -m 644 $(addsuffix /*.h,$(PUBLIC_INCLUDES)) $(SYSROOT)$(SYSPREFIX)/include/tsduck
+-	$(if $(NOTELETEXT),rm -f $(SYSROOT)$(SYSPREFIX)/include/tsduck/tsTeletextDemux.h)
+-	$(if $(NOTELETEXT),rm -f $(SYSROOT)$(SYSPREFIX)/include/tsduck/tsTeletextPlugin.h)
+ 	$(if $(NOTELETEXT),$(SED) -i -e '/TeletextDemux/d' -e '/TeletextPlugin/d' $(SYSROOT)$(SYSPREFIX)/include/tsduck/tsduck.h)
+ 	+@$(call F_RECURSE,config python java)

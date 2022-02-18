@@ -273,7 +273,10 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_finish_build.sh"
 if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
 	# For on device builds cross compiling is not supported.
 	# Target architecture must be same as for environment used currently.
-	TERMUX_ARCH=$(dpkg --print-architecture 2>/dev/null || pacman-conf | grep Architecture | sed 's/Architecture = //g')
+	case "$TERMUX_MAIN_PACKAGE_FORMAT" in
+		"debian") TERMUX_ARCH=$(dpkg --print-architecture);;
+		"pacman") TERMUX_ARCH=$(pacman-conf | grep Architecture | sed 's/Architecture = //g');;
+	esac
 	export TERMUX_ARCH
 fi
 

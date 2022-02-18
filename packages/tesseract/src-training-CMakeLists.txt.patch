@@ -1,11 +1,11 @@
---- ../src-training-CMakeLists.txt.orig	2021-11-09 10:38:49.403732886 +0100
-+++ ./src/training/CMakeLists.txt	2021-11-09 10:38:18.379641180 +0100
-@@ -211,7 +211,7 @@
- if (SW_BUILD)
- target_link_libraries       (unicharset_training PUBLIC common_training org.sw.demo.unicode.icu.i18n)
- else()
--target_link_libraries       (unicharset_training PUBLIC common_training ${ICU_LINK_LIBRARIES})
-+target_link_libraries       (unicharset_training PUBLIC common_training ${ICU_LINK_LIBRARIES} libandroid-glob.so)
- endif()
- target_include_directories  (unicharset_training PUBLIC unicharset ${CMAKE_CURRENT_BINARY_DIR})
- generate_export_header      (unicharset_training EXPORT_MACRO_NAME TESS_UNICHARSET_TRAINING_API)
+--- ./src/training/CMakeLists.txt.orig	2022-02-16 20:32:23.235233044 +0000
++++ ./src/training/CMakeLists.txt	2022-02-16 20:34:18.595048181 +0000
+@@ -252,7 +252,7 @@
+                                                        PkgConfig::ICU)
+     else()
+       target_link_libraries(unicharset_training PUBLIC common_training
+-                                                       ${ICU_LINK_LIBRARIES})
++                                                       ${ICU_LINK_LIBRARIES} libandroid-glob.so)
+     endif()
+   endif()
+   target_include_directories(unicharset_training

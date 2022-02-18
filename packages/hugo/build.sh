@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://gohugo.io/
 TERMUX_PKG_DESCRIPTION="A fast and flexible static site generator"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.92.1
+TERMUX_PKG_VERSION=0.92.2
 TERMUX_PKG_SRCURL=https://github.com/gohugoio/hugo/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=ac698634f62f397ea0df5bfcbb4ba523743aa5a0f52c06aef9b261224d173883
+TERMUX_PKG_SHA256=00d61205f426587dcfc4e2844a6f9fb451c825b828c00f0b46e3d0930c132751
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libc++"
 
@@ -33,10 +33,12 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	mkdir -p $TERMUX_PREFIX/share/{bash-completion/completions,man/man1}
+	mkdir -p $TERMUX_PREFIX/share/{bash-completion/completions,zsh/site-functions,fish/vendor_completions.d,man/man1}
 
-	$TERMUX_PKG_BUILDDIR/hugo gen autocomplete \
-		--completionfile=$TERMUX_PREFIX/share/bash-completion/completions/hugo
+	$TERMUX_PKG_BUILDDIR/hugo completion bash > $TERMUX_PREFIX/share/bash-completion/completions/hugo
+	$TERMUX_PKG_BUILDDIR/hugo completion zsh > $TERMUX_PREFIX/share/zsh/site-functions/_hugo
+	$TERMUX_PKG_BUILDDIR/hugo completion fish > $TERMUX_PREFIX/share/fish/vendor_completions.d/hugo.fish
+
 	$TERMUX_PKG_BUILDDIR/hugo gen man \
 		--dir=$TERMUX_PREFIX/share/man/man1/
 }

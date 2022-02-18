@@ -35,7 +35,7 @@ fi
 	fi
 
 	if [ -d "$TERMUX_TOPDIR" ]; then
-		chmod +w -R "$TERMUX_TOPDIR"
+		chmod +w -R "$TERMUX_TOPDIR" || true
 	fi
 
 	if $TERMUX_ON_DEVICE_BUILD; then

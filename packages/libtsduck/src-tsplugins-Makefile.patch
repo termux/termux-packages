@@ -1,0 +1,10 @@
+--- a/src/tsplugins/Makefile
++++ b/src/tsplugins/Makefile
+@@ -48,7 +48,6 @@
+ install: install-tools install-devel
+ install-tools: $(SHLIBS)
+ 	install -d -m 755 $(SYSROOT)$(USRLIBDIR)/tsduck
+-	$(if $(NO_TSPLUGINS),rm -rf $(addsuffix $(SO_SUFFIX),$(addprefix $(SYSROOT)$(USRLIBDIR)/tsduck/,$(NO_TSPLUGINS)),))
+ 	$(if $(MACOS),rm -rf $(SYSROOT)$(USRLIBDIR)/tsduck/*.so,)
+ 	install -m 644 $(SHLIBS) $(SYSROOT)$(USRLIBDIR)/tsduck
+ install-devel:

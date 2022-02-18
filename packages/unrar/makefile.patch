@@ -1,7 +1,6 @@
-diff -u -r ../unrar/makefile ./makefile
---- ../unrar/makefile	2017-11-22 06:53:39.000000000 +0000
-+++ ./makefile	2018-03-12 10:30:16.141557520 +0000
-@@ -2,14 +2,14 @@
+--- ./makefile.orig	2021-05-25 19:02:31.081243251 +0000
++++ ./makefile	2021-05-25 19:02:50.741677177 +0000
+@@ -2,14 +2,13 @@
  # Makefile for UNIX - unrar
  
  # Linux using GCC
@@ -19,7 +18,24 @@ diff -u -r ../unrar/makefile ./makefile
 +STRIP?=strip
 +AR?=ar
 +LDFLAGS?=-pthread
-+DESTDIR=$(PREFIX)
  
  # Linux using LCC
  #CXX=lcc
+@@ -161,14 +160,14 @@
+ 	$(AR) rcs libunrar.a $(OBJECTS) $(LIB_OBJ)
+ 
+ install-unrar:
+-			install -D unrar $(DESTDIR)/bin/unrar
++			install -D unrar $(DESTDIR)$(PREFIX)/bin/unrar
+ 
+ uninstall-unrar:
+ 			rm -f $(DESTDIR)/bin/unrar
+ 
+ install-lib:
+-		install libunrar.so $(DESTDIR)/lib
+-		install libunrar.a $(DESTDIR)/lib
++		install libunrar.so $(DESTDIR)$(PREFIX)/lib
++		install libunrar.a $(DESTDIR)$(PREFIX)/lib
+ 
+ uninstall-lib:
+ 		rm -f $(DESTDIR)/lib/libunrar.so

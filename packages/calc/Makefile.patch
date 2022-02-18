@@ -1,0 +1,158 @@
+--- ../calc-2.14.0.14/Makefile	2021-12-28 04:09:44.000000000 +0100
++++ ./Makefile	2022-02-13 08:21:45.500630887 +0100
+@@ -136,7 +136,7 @@
+ #
+ #	PREFIX= /usr/local
+ #
+-PREFIX= /usr/local
++PREFIX ?= /usr/local
+ #PREFIX= /usr
+ #PREFIX= /usr/global
+ 
+@@ -779,8 +779,8 @@
+ #endif	/* end of skip for non-Gnu makefiles */
+ 
+ # default INCDIR for non-macOS
+-INCDIR= /usr/include
+-#INCDIR= ${PREFIX}/include
++#INCDIR= /usr/include
++INCDIR= ${PREFIX}/include
+ #INCDIR= /dev/env/DJDIR/include
+ 
+ #if 0	/* start of skip for non-Gnu makefiles */
+@@ -846,8 +846,8 @@
+ #endif	/* end of skip for non-Gnu makefiles */
+ 
+ # default BINDIR for non-macOS
+-BINDIR= /usr/bin
+-#BINDIR= ${PREFIX}/bin
++#BINDIR= /usr/bin
++BINDIR= ${PREFIX}/bin
+ #BINDIR= /dev/env/DJDIR/bin
+ 
+ #if 0	/* start of skip for non-Gnu makefiles */
+@@ -864,8 +864,8 @@
+ #endif	/* end of skip for non-Gnu makefiles */
+ 
+ # default LIBDIR for non-macOS
+-LIBDIR= /usr/lib
+-#LIBDIR= ${PREFIX}/lib
++#LIBDIR= /usr/lib
++LIBDIR= ${PREFIX}/lib
+ #LIBDIR= /dev/env/DJDIR/lib
+ 
+ #if 0	/* start of skip for non-Gnu makefiles */
+@@ -882,8 +882,8 @@
+ #endif	/* end of skip for non-Gnu makefiles */
+ 
+ # default CALC_SHAREDIR for non-macOS
+-CALC_SHAREDIR= /usr/share/calc
+-#CALC_SHAREDIR= ${PREFIX}/lib/calc
++#CALC_SHAREDIR= /usr/share/calc
++CALC_SHAREDIR= ${PREFIX}/lib/calc
+ #CALC_SHAREDIR= /dev/env/DJDIR/share/calc
+ 
+ #if 0	/* start of skip for non-Gnu makefiles */
+@@ -925,7 +925,7 @@
+ CUSTOMCALDIR= ${CALC_SHAREDIR}/custom
+ CUSTOMHELPDIR= ${CALC_SHAREDIR}/custhelp
+ CUSTOMINCDIR= ${CALC_INCDIR}/custom
+-SCRIPTDIR= ${BINDIR}/cscript
++SCRIPTDIR= ${CALC_SHAREDIR}/cscript
+ 
+ # T - top level directory under which calc will be installed
+ #
+@@ -967,7 +967,7 @@
+ #
+ # If in doubt, use T=
+ #
+-T=
++T=${DESTDIR}
+ 
+ # where man section 1 pages are installed
+ #
+@@ -991,7 +991,7 @@
+ else
+ #
+ #endif	/* end of skip for non-Gnu makefiles */
+-MANDIR= /usr/share/man/man1
++MANDIR= ${PREFIX}/share/man/man1
+ #if 0	/* start of skip for non-Gnu makefiles */
+ #
+ endif
+@@ -1144,14 +1144,14 @@
+ #READLINE_LIB=
+ #READLINE_EXTRAS=
+ #
+-READLINE_LIB= -lreadline
+-READLINE_EXTRAS= -lhistory -lncurses
++#READLINE_LIB= -lreadline
++#READLINE_EXTRAS= -lhistory -lncurses
+ #
+ #READLINE_LIB= -L/usr/gnu/lib -lreadline
+ #READLINE_EXTRAS= -lhistory -lncurses
+ #
+-#READLINE_LIB= -L${PREFIX}/lib -lreadline
+-#READLINE_EXTRAS= -lhistory -lncurses
++READLINE_LIB= -L${PREFIX}/lib -lreadline
++READLINE_EXTRAS= -lhistory -lncurses
+ #
+ # For Apple OS X: install fink from http://fink.sourceforge.net
+ #		  and then do a 'fink install readline' and then use:
+@@ -1168,9 +1168,9 @@
+ #READLINE_LIB= -L${PREFIX}/opt/readline/lib -lreadline
+ #READLINE_EXTRAS= -lhistory -lncurses
+ #
+-READLINE_INCLUDE=
++#READLINE_INCLUDE=
+ #READLINE_INCLUDE= -I/usr/gnu/include
+-#READLINE_INCLUDE= -I${PREFIX}/include
++READLINE_INCLUDE= -I${PREFIX}/include
+ 
+ #if 0   /* start of skip for non-Gnu makefiles */
+ #
+@@ -1227,7 +1227,7 @@
+ # a *.a link library.  Set RANLIB to the utility that performs this
+ # action.  Set RANLIB to : if your system does not need such a utility.
+ #
+-RANLIB=ranlib
++RANLIB?=ranlib
+ #RANLIB=:
+ 
+ # Normally certain files depend on the Makefile.  If the Makefile is
+@@ -1306,7 +1306,7 @@
+ 
+ # standard utilities used during make
+ #
+-AR= ar
++AR?= ar
+ AWK= awk
+ CAT= cat
+ CHMOD= chmod
+@@ -1321,7 +1321,7 @@
+ GREP= egrep
+ HOSTNAME= hostname
+ LANG= C
+-LDCONFIG= ldconfig
++LDCONFIG=
+ LN= ln
+ LS= ls
+ MAKE= make
+@@ -1508,7 +1508,7 @@
+ BLD_TYPE= calc-dynamic-only
+ #
+ CC_SHARE= -fPIC
+-DEFAULT_LIB_INSTALL_PATH= ${PWD}:/lib:/usr/lib:${LIBDIR}:${PREFIX}/lib
++DEFAULT_LIB_INSTALL_PATH= ${PWD}:${LIBDIR}:${PREFIX}/lib
+ LD_SHARE= "-Wl,-rpath,${DEFAULT_LIB_INSTALL_PATH}" \
+     "-Wl,-rpath-link,${DEFAULT_LIB_INSTALL_PATH}"
+ LIBCALC_SHLIB= -shared "-Wl,-soname,libcalc${LIB_EXT_VERSION}"
+@@ -1548,7 +1548,7 @@
+ CCMISC=
+ #
+ LCC= gcc
+-CC= ${PURIFY} ${LCC} ${CCWERR}
++CC?= ${PURIFY} ${LCC} ${CCWERR}
+ #
+ endif
+ 

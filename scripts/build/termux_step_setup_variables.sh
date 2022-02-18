@@ -1,5 +1,5 @@
 termux_step_setup_variables() {
-	: "${TERMUX_PACKAGE_FORMAT:="debian"}" # debian, pacman
+	: "${TERMUX_PACKAGE_FORMAT:="$(([ -n "$TERMUX_MAIN_PACKAGE_FORMAT" ] && echo "$TERMUX_MAIN_PACKAGE_FORMAT") || echo "debian")"}" # debian, pacman
 	: "${TERMUX_ARCH:="aarch64"}" # arm, aarch64, i686 or x86_64.
 	: "${TERMUX_OUTPUT_DIR:="${TERMUX_SCRIPTDIR}/output"}"
 	: "${TERMUX_DEBUG_BUILD:="false"}"

@@ -18,6 +18,14 @@ termux_setup_meson() {
 			"$MESON_TAR_FILE" \
 			feb2cefb325b437dbf36146df7c6b87688ddff0b0205caa31dc64055c6da410c
 		tar xf "$MESON_TAR_FILE" -C "$TERMUX_PKG_TMPDIR"
+		if [ "$MESON_VERSION" = "0.61.1" ]; then
+			local MESON_0_61_1_GTKDOC_PATCH_FILE=$TERMUX_PKG_TMPDIR/meson-0.61.1-gtkdoc.patch
+			termux_download \
+				"https://github.com/mesonbuild/meson/pull/9841/commits/a5c479cebfcc9c909631df404fb127e4270260a3.diff" \
+				"$MESON_0_61_1_GTKDOC_PATCH_FILE" \
+				1fbcbe899e99264823dc4ef380271b71a022eda261472f15fd2b241d55b33dcd
+			patch --silent -p1 -d "$MESON_TMP_FOLDER" < "$MESON_0_61_1_GTKDOC_PATCH_FILE"
+		fi
 		mv "$MESON_TMP_FOLDER" "$MESON_FOLDER"
 	fi
 	TERMUX_MESON="$MESON_FOLDER/meson.py"

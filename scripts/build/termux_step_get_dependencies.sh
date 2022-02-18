@@ -4,7 +4,12 @@ termux_step_get_dependencies() {
 		termux_get_repo_files
 
 		# When doing build on device, ensure that apt lists are up-to-date.
-		[ "$TERMUX_ON_DEVICE_BUILD" = "true" ] && (apt update 2>/dev/null || pacman -Sy)
+		if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
+			case "$TERMUX_MAIN_PACKAGE_FORMAT" in
+				"debian") apt update;;
+				"pacman") pacman -Sy;;
+			esac
+		fi
 
 		# Download dependencies
 		while read PKG PKG_DIR; do

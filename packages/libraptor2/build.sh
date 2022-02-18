@@ -21,7 +21,7 @@ termux_step_pre_configure() {
 		local conf="$bin/${p}-config"
 		cat > "$conf" <<-EOF
 			#!${sh}
-			exec sh "$TERMUX_PREFIX/${p}-config" "\$@"
+			exec sh "$TERMUX_PREFIX/bin/${p}-config" "\$@"
 		EOF
 		chmod 0700 "$conf"
 	done

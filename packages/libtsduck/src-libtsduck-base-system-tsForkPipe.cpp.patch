@@ -1,0 +1,11 @@
+--- a/src/libtsduck/base/system/tsForkPipe.cpp
++++ b/src/libtsduck/base/system/tsForkPipe.cpp
+@@ -451,7 +451,7 @@
+ 
+         // Execute the command if there was no prior error.
+         if (message == nullptr) {
+-            ::execl("/bin/sh", "/bin/sh", "-c", command.toUTF8().c_str(), nullptr);
++            ::execl("@TERMUX_PREFIX@/bin/sh", "@TERMUX_PREFIX@/bin/sh", "-c", command.toUTF8().c_str(), nullptr);
+             // Should not return, so this is an error if we get there.
+             error = errno;
+             message = "exec error";

@@ -3,11 +3,11 @@ TERMUX_PKG_DESCRIPTION="An improved version of sc, a spreadsheet calculator"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.8.2
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/andmarti1424/sc-im/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=7f00c98601e7f7709431fb4cbb83707c87016a3b015d48e5a7c2f018eff4b7f7
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="libandroid-support, libandroid-wordexp, libzip, ncurses"
+TERMUX_PKG_DEPENDS="libandroid-support, libandroid-wordexp, liblua51, libxls, libxlsxwriter, libxml2, libzip, ncurses"
 TERMUX_PKG_SUGGESTS="gnuplot"
 TERMUX_PKG_BUILD_IN_SRC=true
 
