@@ -42,6 +42,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLLVM_ENABLE_SPHINX=ON
 -DSPHINX_OUTPUT_MAN=ON
 -DSPHINX_WARNINGS_AS_ERRORS=OFF
+-DLLVM_TARGETS_TO_BUILD=all
 -DLLVM_EXPERIMENTAL_TARGETS_TO_BUILD=AVR;RISCV
 -DPERL_EXECUTABLE=$(command -v perl)
 -DLLVM_ENABLE_FFI=ON
@@ -53,7 +54,6 @@ TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="
 -DCMAKE_BUILD_TYPE=Release
 -DLLVM_ENABLE_PROJECTS=clang;flang;lldb;mlir
 -DLLVM_PARALLEL_LINK_JOBS=1
--DLLVM_PARALLEL_COMPILE_JOBS=1
 -DLLVM_USE_LINKER=lld
 "
 
@@ -72,18 +72,6 @@ termux_step_host_build() {
 	termux_setup_cmake
 	termux_setup_ninja
 
-	# Reduce targets to build to save time
-	export LLVM_TARGET_ARCH
-	if [ $TERMUX_ARCH = "arm" ]; then
-		LLVM_TARGET_ARCH=ARM
-	elif [ $TERMUX_ARCH = "aarch64" ]; then
-		LLVM_TARGET_ARCH=AArch64
-	elif [ $TERMUX_ARCH = "i686" ] || [ $TERMUX_ARCH = "x86_64" ]; then
-		LLVM_TARGET_ARCH=X86
-	else
-		termux_error_exit "Invalid arch: $TERMUX_ARCH"
-	fi
-	TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS+=" -DLLVM_TARGETS_TO_BUILD=$LLVM_TARGET_ARCH"
 	cmake -G Ninja ${TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS} \
 		$TERMUX_PKG_SRCDIR/llvm
 	ninja -j $TERMUX_MAKE_PROCESSES clang-tblgen lldb-tblgen llvm-tblgen \
@@ -98,9 +86,18 @@ termux_step_pre_configure() {
 	# Add unknown vendor, otherwise it screws with the default LLVM triple
 	# detection.
 	export LLVM_DEFAULT_TARGET_TRIPLE=${CCTERMUX_HOST_PLATFORM/-/-unknown-}
+	export LLVM_TARGET_ARCH
+	if [ $TERMUX_ARCH = "arm" ]; then
+		LLVM_TARGET_ARCH=ARM
+	elif [ $TERMUX_ARCH = "aarch64" ]; then
+		LLVM_TARGET_ARCH=AArch64
+	elif [ $TERMUX_ARCH = "i686" ] || [ $TERMUX_ARCH = "x86_64" ]; then
+		LLVM_TARGET_ARCH=X86
+	else
+		termux_error_exit "Invalid arch: $TERMUX_ARCH"
+	fi
 	# see CMakeLists.txt and tools/clang/CMakeLists.txt
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_TARGET_ARCH=$LLVM_TARGET_ARCH"
-	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_TARGETS_TO_BUILD=$LLVM_TARGET_ARCH"
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_HOST_TRIPLE=$LLVM_DEFAULT_TARGET_TRIPLE"
 	export TERMUX_SRCDIR_SAVE=$TERMUX_PKG_SRCDIR
 	TERMUX_PKG_SRCDIR=$TERMUX_PKG_SRCDIR/llvm
