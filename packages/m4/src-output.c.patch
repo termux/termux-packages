@@ -1,0 +1,15 @@
+--- a/src/output.c
++++ b/src/output.c
+@@ -423,8 +423,12 @@
+ 
+   /* Check if we are exceeding the maximum amount of buffer memory.  */
+ 
++#if defined __ANDROID__ && !defined __LP64__
++  if (0)
++#else
+   if (total_buffer_size - output_diversion->size + wanted_size
+       > MAXIMUM_TOTAL_SIZE)
++#endif
+     {
+       int selected_used;
+       char *selected_buffer;
