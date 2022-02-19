@@ -1,0 +1,15 @@
+--- a/common/platform/others.go
++++ b/common/platform/others.go
+@@ -31,9 +31,9 @@
+ 	defPath := filepath.Join(assetPath, file)
+ 	for _, p := range []string{
+ 		defPath,
+-		filepath.Join("/usr/local/share/v2ray/", file),
+-		filepath.Join("/usr/share/v2ray/", file),
+-		filepath.Join("/opt/share/v2ray/", file),
++		filepath.Join("@TERMUX_PREFIX@/local/share/v2ray/", file),
++		filepath.Join("@TERMUX_PREFIX@/share/v2ray/", file),
++		filepath.Join("@TERMUX_PREFIX@/opt/v2ray/share/", file),
+ 	} {
+ 		if _, err := os.Stat(p); err != nil && errors.Is(err, fs.ErrNotExist) {
+ 			continue

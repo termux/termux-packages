@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A command-line deletion tool focused on safety, ergonomi
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.13.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/nivekuil/rip.git
 TERMUX_PKG_GIT_BRANCH="${TERMUX_PKG_VERSION}"
 TERMUX_PKG_BUILD_IN_SRC=true
