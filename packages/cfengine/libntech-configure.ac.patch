@@ -1,0 +1,13 @@
+--- ./libntech/configure.ac.orig	2022-02-16 15:23:38.630146433 +0530
++++ ./libntech/configure.ac	2022-02-16 15:24:51.014566664 +0530
+@@ -385,10 +385,6 @@
+     #endif
+     ]])],[AC_MSG_RESULT(OK)],[AC_MSG_ERROR(This release of CFEngine requires OpenSSL >= 0.9.7)])
+ 
+-    if test "x$ac_cv_lib_crypto_RSA_generate_key_ex" = "xyes" ; then
+-       AC_DEFINE(OPENSSL_NO_DEPRECATED, 1, [Define if non deprecated API is available.])
+-    fi
+-
+     if test "x$ac_cv_lib_crypto_RSA_generate_key_ex" = "xno" && \
+        test "x$ac_cv_lib_crypto_RSA_generate_key" = "xno" ; then
+        AC_MSG_ERROR(Cannot find OpenSSL)
