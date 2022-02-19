@@ -27,6 +27,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLLVM_ENABLE_PROJECTS=clang;clang-tools-extra;compiler-rt;flang;lld;lldb;openmp;polly
 -DLLVM_ENABLE_LIBEDIT=OFF
 -DLLVM_INCLUDE_TESTS=OFF
+-DLLVM_INCLUDE_EXAMPLES=OFF
+-DLLVM_INCLUDE_BENCHMARKS=OFF
 -DCLANG_DEFAULT_CXX_STDLIB=libc++
 -DCLANG_DEFAULT_LINKER=lld
 -DCLANG_INCLUDE_TESTS=OFF
@@ -119,14 +121,13 @@ termux_step_post_configure() {
 
 termux_step_post_make_install() {
 	if [ "$TERMUX_CMAKE_BUILD" = Ninja ]; then
-		ninja docs-llvm-man docs-clang-man docs-flang-man
+		ninja docs-llvm-man docs-clang-man
 	else
-		make docs-llvm-man docs-clang-man docs-flang-man
+		make docs-llvm-man docs-clang-man
 	fi
 
 	cp docs/man/* $TERMUX_PREFIX/share/man/man1
 	cp tools/clang/docs/man/clang.1 $TERMUX_PREFIX/share/man/man1
-	cp tools/flang/docs/man/flang.1 $TERMUX_PREFIX/share/man/man1
 	cd $TERMUX_PREFIX/bin
 
 	for tool in clang clang++ cc c++ cpp gcc g++ ${TERMUX_HOST_PLATFORM}-{clang,clang++,gcc,g++,cpp}; do
