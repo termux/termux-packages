@@ -8,15 +8,34 @@ TERMUX_PKG_SHA256=94bb003fd05b604a174a686c40286fef460bc06616a7d273c387a54a07576e
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="openssl, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_BLACKLISTED_ARCHES="x86_64"
 
 termux_step_pre_configure() {
+	# CARGO_TARGET_NAME is not set before termux_setup_rust
+	local _CARGO_TARGET_NAME
+	if [ $TERMUX_ARCH = "arm" ]; then
+		_CARGO_TARGET_NAME=armv7-linux-androideabi
+	else
+		_CARGO_TARGET_NAME=$TERMUX_ARCH-linux-android
+	fi
+	local _CARGO_TARGET_LIBDIR=target/$_CARGO_TARGET_NAME/release/deps
+	mkdir -p $_CARGO_TARGET_LIBDIR
+
 	if [ $TERMUX_ARCH = "i686" ]; then
 		RUSTFLAGS+=" -C link-arg=-latomic"
+	elif [ $TERMUX_ARCH = "x86_64" ]; then
+		pushd $_CARGO_TARGET_LIBDIR
+		local libgcc="$($CC -print-libgcc-file-name)"
+		echo "INPUT($libgcc -l:libunwind.a)" > libgcc.so
+		popd
 	fi
 
 	mv $TERMUX_PREFIX/lib/libz.so.1{,.tmp}
 	mv $TERMUX_PREFIX/lib/libz.so{,.tmp}
+
+	ln -sfT $(readlink -f $TERMUX_PREFIX/lib/libz.so.1.tmp) \
+		$_CARGO_TARGET_LIBDIR/libz.so.1
+	ln -sfT $(readlink -f $TERMUX_PREFIX/lib/libz.so.tmp) \
+		$_CARGO_TARGET_LIBDIR/libz.so
 }
 
 termux_step_post_make_install() {
