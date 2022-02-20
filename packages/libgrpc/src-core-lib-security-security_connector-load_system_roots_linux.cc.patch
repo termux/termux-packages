@@ -1,0 +1,17 @@
+--- a/src/core/lib/security/security_connector/load_system_roots_linux.cc
++++ b/src/core/lib/security/security_connector/load_system_roots_linux.cc
+@@ -52,12 +52,9 @@
+ namespace {
+ 
+ const char* kLinuxCertFiles[] = {
+-    "/etc/ssl/certs/ca-certificates.crt", "/etc/pki/tls/certs/ca-bundle.crt",
+-    "/etc/ssl/ca-bundle.pem", "/etc/pki/tls/cacert.pem",
+-    "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem"};
++    "@TERMUX_PREFIX@/etc/tls/cert.pem"};
+ const char* kLinuxCertDirectories[] = {
+-    "/etc/ssl/certs", "/system/etc/security/cacerts", "/usr/local/share/certs",
+-    "/etc/pki/tls/certs", "/etc/openssl/certs"};
++    "@TERMUX_PREFIX@/etc/tls/certs"};
+ 
+ grpc_slice GetSystemRootCerts() {
+   grpc_slice valid_bundle_slice = grpc_empty_slice();
