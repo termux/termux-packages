@@ -2,11 +2,11 @@ TERMUX_PKG_HOMEPAGE="https://www.aircrack-ng.org/"
 TERMUX_PKG_DESCRIPTION="WiFi security auditing tools suite"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Marlin Sööse <marlin.soose@laro.se>"
-_COMMIT=3f9be67b1eaf84057d7f9830883b055817683915
+_COMMIT=f94a3fe3f1c74938169317a6395b7f72452499c4
 TERMUX_PKG_VERSION="2:2021.12.19-${_COMMIT:0:8}"
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL="https://github.com/aircrack-ng/aircrack-ng/archive/$_COMMIT.tar.gz"
-TERMUX_PKG_SHA256="214ef3959bf93912db7c6b3eb40b00baf81bb3ccd3e1ad04203c67ec389fcd04"
+TERMUX_PKG_SHA256="d79c02351fe389c41e6c29ef4381109f78ae5f3ba552f776ee08b6a3cbd3aa13"
 TERMUX_PKG_DEPENDS="libc++, libnl, openssl, libpcap"
 # static build gives errors:
 #   error: undefined reference to 'ac_crypto_engine_init'
