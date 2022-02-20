@@ -97,13 +97,13 @@ termux_step_post_configure() {
 
 termux_step_post_make_install() {
 	if [ "$TERMUX_CMAKE_BUILD" = Ninja ]; then
-		ninja docs-llvm-man docs-clang-man
+		ninja docs-{llvm,clang}-man
 	else
-		make docs-llvm-man docs-clang-man
+		make docs-{llvm,clang}-man
 	fi
 
 	cp docs/man/* $TERMUX_PREFIX/share/man/man1
-	cp tools/clang/docs/man/clang.1 $TERMUX_PREFIX/share/man/man1
+	cp tools/clang/docs/man/{clang,diagtool}.1 $TERMUX_PREFIX/share/man/man1
 	cd $TERMUX_PREFIX/bin
 
 	for tool in clang clang++ cc c++ cpp gcc g++ ${TERMUX_HOST_PLATFORM}-{clang,clang++,gcc,g++,cpp}; do

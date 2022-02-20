@@ -30,6 +30,7 @@ lib/libscanbuild/
 libexec/
 share/clang
 share/man/man1/clang.1.gz
+share/man/man1/diagtool.1.gz
 share/man/man1/scan-*
 share/scan-*
 "
