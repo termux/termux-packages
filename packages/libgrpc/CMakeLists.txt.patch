@@ -2,15 +2,15 @@ diff --git a/CMakeLists.txt b/CMakeLists.txt
 index f6de091a0c..d21e04a24d 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -205,7 +205,7 @@ if(_gRPC_PLATFORM_MAC OR _gRPC_PLATFORM_IOS)
- elseif(_gRPC_PLATFORM_ANDROID)
-   set(_gRPC_ALLTARGETS_LIBRARIES ${CMAKE_DL_LIBS} m)
- elseif(UNIX)
--  set(_gRPC_ALLTARGETS_LIBRARIES ${CMAKE_DL_LIBS} rt m pthread)
-+  set(_gRPC_ALLTARGETS_LIBRARIES ${CMAKE_DL_LIBS} m)
+@@ -301,7 +301,7 @@ if(UNIX)
+   find_package(Threads)
+   set(_gRPC_ALLTARGETS_LIBRARIES ${CMAKE_DL_LIBS} m Threads::Threads)
+   if(_gRPC_PLATFORM_LINUX OR _gRPC_PLATFORM_POSIX)
+-    set(_gRPC_ALLTARGETS_LIBRARIES ${_gRPC_ALLTARGETS_LIBRARIES} rt)
++    set(_gRPC_ALLTARGETS_LIBRARIES ${_gRPC_ALLTARGETS_LIBRARIES})
+   endif()
  endif()
  
- if(WIN32 AND MSVC)
 @@ -1432,12 +1432,6 @@ target_link_libraries(gpr
    absl::strings
    absl::optional

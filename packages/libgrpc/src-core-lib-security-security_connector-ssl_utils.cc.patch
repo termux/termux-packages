@@ -1,0 +1,14 @@
+--- a/src/core/lib/security/security_connector/ssl_utils.cc
++++ b/src/core/lib/security/security_connector/ssl_utils.cc
+@@ -45,9 +45,9 @@
+ static const char* installed_roots_path = GRPC_ROOT_PEM_PATH;
+ #elif defined(INSTALL_PREFIX)
+ static const char* installed_roots_path =
+-    INSTALL_PREFIX "/usr/share/grpc/roots.pem";
++    INSTALL_PREFIX "/share/grpc/roots.pem";
+ #else
+-static const char* installed_roots_path = "/usr/share/grpc/roots.pem";
++static const char* installed_roots_path = "@TERMUX_PREFIX@/share/grpc/roots.pem";
+ #endif
+ 
+ #ifndef TSI_OPENSSL_ALPN_SUPPORT
