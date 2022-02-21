@@ -1,0 +1,22 @@
+--- znc-1.8.2/src/main.cpp	2020-09-08 05:57:50.000000000 +0700
++++ znc-1.8.2.mod/src/main.cpp	2022-02-21 17:08:57.974706825 +0700
+@@ -180,7 +180,6 @@
+         m_thread = std::thread([=]() { HandleSignals(pZNC); });
+     }
+     ~CSignalHandler() {
+-        pthread_cancel(m_thread.native_handle());
+         m_thread.join();
+     }
+ 
+@@ -216,11 +215,9 @@
+         pthread_sigmask(SIG_SETMASK, &signals, nullptr);
+         while (true) {
+             int sig;
+-            pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, nullptr);
+             // This thread can be cancelled, but only during this function.
+             // Such cancel will be the only way to finish this thread.
+             if (sigwait(&signals, &sig) == -1) continue;
+-            pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, nullptr);
+             // TODO probably move switch() to CSignalHandlerMonitorFD?
+             switch (sig) {
+                 case SIGHUP:
