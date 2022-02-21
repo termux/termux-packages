@@ -25,10 +25,9 @@ termux_step_post_get_source() {
 
 	cd ${TERMUX_PKG_BUILDDIR}/unix/xserver
 	for p in "$TERMUX_SCRIPTDIR/packages/xorg-server-xvfb"/*.patch; do
-		echo "$p"
 		sed -e "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" \
 			-e "s%\@TERMUX_HOME\@%${TERMUX_ANDROID_HOME}%g" "$p" \
-			| patch -p1
+			| patch --silent -p1
 	done
 
 	patch -p1 -i ${TERMUX_PKG_SRCDIR}/unix/xserver120.patch
