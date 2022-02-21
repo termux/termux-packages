@@ -40,7 +40,6 @@ termux_step_pre_configure() {
 	export ACLOCAL="aclocal -I ${TERMUX_PREFIX}/share/aclocal"
 	autoreconf -fi
 
-	patch -p3 -i ${TERMUX_PKG_BUILDER_DIR}/fix-xorg-configure.patch.txt
 
 	CFLAGS="${CFLAGS/-Os/-Oz} -DFNDELAY=O_NDELAY -DINITARGS=void"
 	CPPFLAGS="${CPPFLAGS} -I${TERMUX_PREFIX}/include/libdrm"
