@@ -10,6 +10,8 @@ TERMUX_PKG_SHA256=5960a0dbf57c7867cc76189b66a4867f7da899f222bd32c53d226f3090c600
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_AUTO_UPDATE_TAG_REGEXP="\d+\.\d+\.\d+"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_CONFLICTS="btfs"
+TERMUX_PKG_REPLACES="btfs"
 
 termux_step_pre_configure() {
 	termux_setup_golang
@@ -32,5 +34,6 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -m700 cmd/btfs/btfs $TERMUX_PREFIX/bin/btfs2
+	install -Dm700 -t $TERMUX_PREFIX/bin $TERMUX_PKG_SRCDIR/cmd/btfs/btfs
+	ln -sfT btfs $TERMUX_PREFIX/bin/btfs2
 }
