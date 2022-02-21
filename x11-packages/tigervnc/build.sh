@@ -45,13 +45,14 @@ termux_step_pre_configure() {
 	CPPFLAGS="${CPPFLAGS} -I${TERMUX_PREFIX}/include/libdrm"
 	LDFLAGS="${LDFLAGS} -llog"
 
+	local xorg_server_xvfb_configure_args="$(. $TERMUX_SCRIPTDIR/packages/xorg-server-xvfb/build.sh; echo $TERMUX_PKG_EXTRA_CONFIGURE_ARGS)"
 	./configure \
 		--host="${TERMUX_HOST_PLATFORM}" \
 		--prefix="${TERMUX_PREFIX}" \
 		--disable-static \
 		--disable-nls \
 		--enable-debug \
-		`TERMUX_PREFIX=${TERMUX_PREFIX} bash ${TERMUX_SCRIPTDIR}/packages/xorg-server-xvfb/build.sh xorg_server_flags`
+		${xorg_server_xvfb_configure_args}
 
 	LDFLAGS="${LDFLAGS} -landroid-shmem"
 

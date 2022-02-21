@@ -70,8 +70,3 @@ termux_step_pre_configure() {
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-debug"
 	fi
 }
-
-## The following is required for package 'tigervnc'.
-if [ "${#}" -eq 1 ] && [ "${1}" == "xorg_server_flags" ]; then
-	echo ${TERMUX_PKG_EXTRA_CONFIGURE_ARGS}
-fi
