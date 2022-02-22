@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="General-purpose concurrent functional programming langua
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=24.2.2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/erlang/otp/archive/OTP-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=b6adfc0bf14d94348146ae26cc38d09dca545f8e14ebab7ddcf9482a6e8d1162
 TERMUX_PKG_AUTO_UPDATE=true
