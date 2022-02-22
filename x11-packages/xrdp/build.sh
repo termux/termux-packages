@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="An open source remote desktop protocol (RDP) server"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.9.16
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://github.com/neutrinolabs/xrdp/releases/download/v${TERMUX_PKG_VERSION}/xrdp-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=72a86bf3bb8ca3a41905bfa84f500ad73cd23615753f34db7e36278a33c19916
 TERMUX_PKG_DEPENDS="libandroid-shmem, libcrypt, libice, libsm, libuuid, libx11, libxau, libxcb, libxfixes, libxdmcp, libxrandr, openssl, procps, tigervnc"
@@ -58,6 +58,11 @@ etc/xrdp/key.pem
 termux_step_pre_configure() {
 	LDFLAGS+=" -Wl,-rpath=${TERMUX_PREFIX}/lib/xrdp -Wl,--enable-new-dtags"
 	export LIBS="-landroid-shmem -llog"
+
+	CFLAGS="-I$TERMUX_PREFIX/include/openssl-1.1 $CFLAGS"
+	CPPFLAGS="-I$TERMUX_PREFIX/include/openssl-1.1 $CPPFLAGS"
+	CXXFLAGS="-I$TERMUX_PREFIX/include/openssl-1.1 $CXXFLAGS"
+	LDFLAGS="-L$TERMUX_PREFIX/lib/openssl-1.1 -Wl,-rpath=$TERMUX_PREFIX/lib/openssl-1.1 $LDFLAGS"	
 }
 
 termux_step_create_debscripts() {
