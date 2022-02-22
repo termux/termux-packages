@@ -1,17 +1,16 @@
 diff --git a/llvm/CMakeLists.txt b/llvm/CMakeLists.txt
-index 72f86e14f111..08cd28baa81c 100644
+index 72f86e14f111..9cb3211fe419 100644
 --- a/llvm/CMakeLists.txt
 +++ b/llvm/CMakeLists.txt
-@@ -1044,11 +1044,9 @@ include(TableGen)
- 
- include(LLVMDistributionSupport)
- 
--if( MINGW AND NOT "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" )
-   # People report that -O3 is unreliable on MinGW. The traditional
-   # build also uses -O2 for that reason:
-   llvm_replace_compiler_option(CMAKE_CXX_FLAGS_RELEASE "-O3" "-O2")
--endif()
- 
- # Put this before tblgen. Else we have a circular dependence.
- add_subdirectory(lib/Demangle)
+@@ -643,6 +643,10 @@ if(NOT DEFINED LLVM_DYLIB_COMPONENTS)
+     "Semicolon-separated list of components to include in libLLVM, or \"all\".")
+ endif()
+
++include(LLVMProcessSources)
++llvm_replace_compiler_option(CMAKE_CXX_FLAGS_RELEASE "-O3" "-O2")
++llvm_replace_compiler_option(CMAKE_C_FLAGS_RELEASE "-O3" "-O2")
++
+ if(MSVC)
+   option(LLVM_BUILD_LLVM_C_DYLIB "Build LLVM-C.dll (Windows only)" ON)
+   # Set this variable to OFF here so it can't be set with a command-line
 
