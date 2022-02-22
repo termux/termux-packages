@@ -1,0 +1,36 @@
+From 68595b46cb374658432fff998e82e5ff434557ac Mon Sep 17 00:00:00 2001
+From: Danny Wu <admin@glados.cc>
+Date: Wed, 12 May 2021 08:51:13 -0400
+Subject: [PATCH] fftools/ffmpeg: Restore DTS correction for VP9 copies
+
+Fixes ticket 9086.
+
+Since early 2021, some of YouTube's VP9 encodes have non-monotonous DTS.
+This makes ffmpeg fatally fail when trying to copy or encode the V9 video.
+
+ffmpeg already includes functionality to correct this, however it was
+disabled without explanation for VP9 stream copies in
+2e6636aa87303d37b112e79f093ca39500f92364
+
+This patch restores the DTS correction logic, and allows ffmpeg to correctly
+encode (invalid) videos produced by youtube.com. I have verified that frames
+are NOT being cut (so it does not re-introduce 4313).
+
+Reviwed-by: Ronald S. Bultje <rsbultje@gmail.com>
+Signed-off-by: James Almer <jamrial@gmail.com>
+---
+ fftools/ffmpeg.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/fftools/ffmpeg.c b/fftools/ffmpeg.c
+index d909fa58a7ff..7beea119333f 100644
+--- a/fftools/ffmpeg.c
++++ b/fftools/ffmpeg.c
+@@ -812,7 +812,6 @@ static void write_packet(OutputFile *of, AVPacket *pkt, OutputStream *ost, int u
+         }
+         if ((st->codecpar->codec_type == AVMEDIA_TYPE_AUDIO || st->codecpar->codec_type == AVMEDIA_TYPE_VIDEO || st->codecpar->codec_type == AVMEDIA_TYPE_SUBTITLE) &&
+             pkt->dts != AV_NOPTS_VALUE &&
+-            !(st->codecpar->codec_id == AV_CODEC_ID_VP9 && ost->stream_copy) &&
+             ost->last_mux_dts != AV_NOPTS_VALUE) {
+             int64_t max = ost->last_mux_dts + !(s->oformat->flags & AVFMT_TS_NONSTRICT);
+             if (pkt->dts < max) {
