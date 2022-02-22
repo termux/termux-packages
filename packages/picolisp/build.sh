@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=21.12
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=http://archive.ubuntu.com/ubuntu/pool/universe/p/picolisp/picolisp_$TERMUX_PKG_VERSION.orig.tar.gz
 TERMUX_PKG_SHA256=a06838236b7f5b52c5d587d32d31627f73cdb9775cc02a80f2cdaedd12888c7d
 TERMUX_PKG_DEPENDS="libcrypt, libffi, openssl, readline"
