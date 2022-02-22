@@ -1,0 +1,17 @@
+diff --git a/llvm/CMakeLists.txt b/llvm/CMakeLists.txt
+index 72f86e14f111..08cd28baa81c 100644
+--- a/llvm/CMakeLists.txt
++++ b/llvm/CMakeLists.txt
+@@ -1044,11 +1044,9 @@ include(TableGen)
+ 
+ include(LLVMDistributionSupport)
+ 
+-if( MINGW AND NOT "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" )
+   # People report that -O3 is unreliable on MinGW. The traditional
+   # build also uses -O2 for that reason:
+   llvm_replace_compiler_option(CMAKE_CXX_FLAGS_RELEASE "-O3" "-O2")
+-endif()
+ 
+ # Put this before tblgen. Else we have a circular dependence.
+ add_subdirectory(lib/Demangle)
+
