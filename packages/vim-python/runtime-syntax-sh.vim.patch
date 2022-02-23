@@ -1,0 +1,17 @@
+--- a/runtime/syntax/sh.vim
++++ b/runtime/syntax/sh.vim
+@@ -25,10 +25,10 @@
+  " the script itself does not specify which shell to use. FYI: /bin/sh is ambiguous.
+  " Assuming /bin/sh is executable, and if its a link, find out what it links to.
+  let s:shell = ""
+- if executable("/bin/sh")
+-  let s:shell = resolve("/bin/sh")
+- elseif executable("/usr/bin/sh")
+-  let s:shell = resolve("/usr/bin/sh")
++ if executable("@TERMUX_PREFIX@/bin/sh")
++  let s:shell = resolve("@TERMUX_PREFIX@/bin/sh")
++ elseif executable("/system/bin/sh")
++  let s:shell = resolve("/system/bin/sh")
+  endif
+  if     s:shell =~ '\<ksh\>'
+   let b:is_kornshell= 1
