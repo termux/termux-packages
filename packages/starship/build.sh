@@ -19,6 +19,13 @@ termux_step_pre_configure() {
 
 	mv $TERMUX_PREFIX/lib/libz.so.1{,.tmp}
 	mv $TERMUX_PREFIX/lib/libz.so{,.tmp}
+
+	local _CARGO_TARGET_LIBDIR=target/$CARGO_TARGET_NAME/release/deps
+	mkdir -p $_CARGO_TARGET_LIBDIR
+	ln -sfT $(readlink -f $TERMUX_PREFIX/lib/libz.so.1.tmp) \
+		$_CARGO_TARGET_LIBDIR/libz.so.1
+	ln -sfT $(readlink -f $TERMUX_PREFIX/lib/libz.so.tmp) \
+		$_CARGO_TARGET_LIBDIR/libz.so
 }
 
 termux_step_make() {
@@ -28,6 +35,7 @@ termux_step_make() {
 termux_step_make_install() {
 	install -Dm755 -t $TERMUX_PREFIX/bin target/${CARGO_TARGET_NAME}/release/starship
 }
+
 termux_step_post_make_install() {
 	mv $TERMUX_PREFIX/lib/libz.so.1{.tmp,}
 	mv $TERMUX_PREFIX/lib/libz.so{.tmp,}
