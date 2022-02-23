@@ -1,12 +1,19 @@
 TERMUX_PKG_HOMEPAGE=https://en.wikipedia.org/wiki/Util-linux
 TERMUX_PKG_DESCRIPTION="Miscellaneous system utilities"
-TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_LICENSE="GPL-3.0, GPL-2.0, LGPL-2.1, BSD 3-Clause, BSD, ISC"
+TERMUX_PKG_LICENSE_FILE="\
+Documentation/licenses/COPYING.GPL-3.0-or-later
+Documentation/licenses/COPYING.GPL-2.0-or-later
+Documentation/licenses/COPYING.LGPL-2.1-or-later
+Documentation/licenses/COPYING.BSD-3-Clause
+Documentation/licenses/COPYING.BSD-4-Clause-UC
+Documentation/licenses/COPYING.ISC"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.37.2
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=2.37.4
 TERMUX_PKG_SRCURL=https://www.kernel.org/pub/linux/utils/util-linux/v${TERMUX_PKG_VERSION:0:4}/util-linux-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=6a0764c1aae7fb607ef8a6dd2c0f6c47d5e5fd27aa08820abaad9ec14e28e9d9
-TERMUX_PKG_DEPENDS="ncurses, libcap-ng, libcrypt, zlib"
+TERMUX_PKG_SHA256=634e6916ad913366c3536b6468e7844769549b99a7b2bf80314de78ab5655b83
+# libcrypt is required for only newgrp and sulogin, which are not built anyways
+TERMUX_PKG_DEPENDS="ncurses, libcap-ng, zlib"
 TERMUX_PKG_ESSENTIAL=true
 TERMUX_PKG_BREAKS="util-linux-dev"
 TERMUX_PKG_REPLACES="util-linux-dev"
