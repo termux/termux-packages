@@ -1,14 +1,16 @@
 diff --git a/llvm/CMakeLists.txt b/llvm/CMakeLists.txt
-index 72f86e14f111..70885e19dfdf 100644
+index 72f86e14f111..83fce7b24728 100644
 --- a/llvm/CMakeLists.txt
 +++ b/llvm/CMakeLists.txt
-@@ -643,6 +643,10 @@ if(NOT DEFINED LLVM_DYLIB_COMPONENTS)
+@@ -643,6 +643,12 @@ if(NOT DEFINED LLVM_DYLIB_COMPONENTS)
      "Semicolon-separated list of components to include in libLLVM, or \"all\".")
  endif()
 
-+include(LLVMProcessSources)
-+llvm_replace_compiler_option(CMAKE_CXX_FLAGS_RELEASE "-O3" "-O3 -fmodulo-sched -fivopts -ftree-loop-linear -ftree-loop-ivcanon -ftree-vectorize -fmodulo-sched -fivopts")
-+llvm_replace_compiler_option(CMAKE_C_FLAGS_RELEASE "-O3" "-O3 -fmodulo-sched -fivopts -ftree-loop-linear -ftree-loop-ivcanon -ftree-vectorize -fmodulo-sched -fivopts")
++if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
++  include(LLVMProcessSources)
++  llvm_replace_compiler_option(CMAKE_CXX_FLAGS_RELEASE "-O3" "-O3 -fmodulo-sched -fivopts -ftree-loop-linear -ftree-loop-ivcanon -ftree-vectorize")
++  llvm_replace_compiler_option(CMAKE_C_FLAGS_RELEASE "-O3" "-O3 -fmodulo-sched -fivopts -ftree-loop-linear -ftree-loop-ivcanon -ftree-vectorize")
++endif()
 +
  if(MSVC)
    option(LLVM_BUILD_LLVM_C_DYLIB "Build LLVM-C.dll (Windows only)" ON)
