@@ -1,5 +1,5 @@
 diff --git a/llvm/CMakeLists.txt b/llvm/CMakeLists.txt
-index 72f86e14f111..9cb3211fe419 100644
+index 72f86e14f111..70885e19dfdf 100644
 --- a/llvm/CMakeLists.txt
 +++ b/llvm/CMakeLists.txt
 @@ -643,6 +643,10 @@ if(NOT DEFINED LLVM_DYLIB_COMPONENTS)
@@ -7,8 +7,8 @@ index 72f86e14f111..9cb3211fe419 100644
  endif()
 
 +include(LLVMProcessSources)
-+llvm_replace_compiler_option(CMAKE_CXX_FLAGS_RELEASE "-O3" "-O2")
-+llvm_replace_compiler_option(CMAKE_C_FLAGS_RELEASE "-O3" "-O2")
++llvm_replace_compiler_option(CMAKE_CXX_FLAGS_RELEASE "-O3" "-O3 -fmodulo-sched -fivopts -ftree-loop-linear -ftree-loop-ivcanon -ftree-vectorize -fmodulo-sched -fivopts")
++llvm_replace_compiler_option(CMAKE_C_FLAGS_RELEASE "-O3" "-O3 -fmodulo-sched -fivopts -ftree-loop-linear -ftree-loop-ivcanon -ftree-vectorize -fmodulo-sched -fivopts")
 +
  if(MSVC)
    option(LLVM_BUILD_LLVM_C_DYLIB "Build LLVM-C.dll (Windows only)" ON)
