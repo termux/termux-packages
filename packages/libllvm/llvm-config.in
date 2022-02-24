@@ -51,17 +51,18 @@ LIBFILE="${prefix}/lib/libLLVM-$version.so"
 components="aarch64 aarch64asmparser aarch64codegen aarch64desc \
 aarch64disassembler aarch64info aarch64utils aggressiveinstcombine all all-targets amdgpu \
 amdgpuasmparser amdgpucodegen amdgpudesc amdgpudisassembler amdgpuinfo amdgpuutils \
-analysis arm armasmparser armcodegen armdesc armdisassembler arminfo armutils asmparser \
-asmprinter avr avrasmparser avrcodegen avrdesc avrdisassembler avrinfo binaryformat \
-bitreader bitstreamreader bitwriter bpf bpfasmparser bpfcodegen bpfdesc bpfdisassembler \
-bpfinfo cfguard codegen core coroutines coverage debuginfocodeview debuginfodwarf \
+analysis arc arccodegen arcdesc arcdissembler arcinfo arm armasmparser armcodegen armdesc \
+armdisassembler arminfo armutils asmparser asmprinter avr avrasmparser avrcodegen avrdesc \
+avrdisassembler avrinfo binaryformat bitreader bitstreamreader bitwriter bpf bpfasmparser \
+bpfcodegen bpfdesc bpfdisassembler bpfinfo csky cskyasmparser cskycodegen cskydesc cskyinfo \
+cfguard codegen core coroutines coverage debuginfocodeview debuginfodwarf \
 debuginfogsym debuginfomsf debuginfopdb demangle dlltooldriver dwarflinker dwp engine \
 executionengine extensions filecheck frontendopenacc frontendopenmp \
 fuzzmutate globalisel hexagon hexagonasmparser hexagoncodegen hexagondesc \
 hexagondisassembler hexagoninfo instcombine instrumentation interfacestub \
 interpreter ipo irreader jitlink lanai lanaiasmparser lanaicodegen lanaidesc \
-lanaidisassembler lanaiinfo libdriver lineeditor linker lto mc mca mcdisassembler \
-mcjit mcparser mips mipsasmparser mipscodegen \
+lanaidisassembler lanaiinfo libdriver lineeditor linker lto m68k m68kasmparser m68kcodegen \
+m68kdesc m68kdisassembler m68kinfo mc mca mcdisassembler mcjit mcparser mips mipsasmparser mipscodegen \
 mipsdesc mipsdisassembler mipsinfo mirparser msp430 msp430asmparser msp430codegen \
 msp430desc msp430disassembler msp430info native nativecodegen nvptx nvptxcodegen \
 nvptxdesc nvptxinfo objcarcopts object objectyaml option orcjit orcshared orctargetprocess passes powerpc \
@@ -69,15 +70,19 @@ powerpcasmparser powerpccodegen powerpcdesc powerpcdisassembler powerpcinfo \
 profiledata remarks riscv riscvasmparser riscvcodegen riscvdesc riscvdisassembler riscvinfo \
 runtimedyld scalaropts selectiondag sparc sparcasmparser sparccodegen sparcdesc \
 sparcdisassembler sparcinfo support symbolize systemz systemzasmparser systemzcodegen \
-systemzdesc systemzdisassembler systemzinfo tablegen target textapi transformutils vectorize webassembly \
+systemzdesc systemzdisassembler systemzinfo tablegen target textapi transformutils ve veasmparser \
+vecodegen vedesc vedisassembler veinfo vectorize webassembly \
 webassemblyasmparser webassemblycodegen webassemblydesc webassemblydisassembler \
 webassemblyinfo webassemblyutils windowsmanifest x86 x86asmparser x86codegen x86desc x86disassembler x86info \
 xcore xcorecodegen xcoredesc xcoredisassembler xcoreinfo xray"
 static_libs="-lLLVMObjectYAML -lLLVMDlltoolDriver -lLLVMLineEditor -lLLVMFuzzMutate \
 -lLLVMCoroutines -lLLVMLTO -lLLVMPasses -lLLVMObjCARCOpts -lLLVMTextAPI -lLLVMCoverage \
 -lLLVMXRay -lLLVMInterpreter -lLLVMRemarks -lLLVMMIRParser -lLLVMDWP -lLLVMSymbolize -lLLVMDebugInfoPDB \
--lLLVMDebugInfoDWARF -lLLVMAVRAsmParser -lLLVMInterfaceStub -lLLVMFileCheck -lLLVMAVRCodeGen -lLLVMAVRDesc -lLLVMAVRDisassembler \
--lLLVMAVRInfo -lLLVMRISCVDisassembler -lLLVMRISCVCodeGen -lLLVMRISCVAsmParser \
+-lLLVMDebugInfoDWARF -lLLVMARCCodeGen -lLLVMARCDesc -lLLVMARCDisassembler -lLLVMARCInfo -lLLVMCSKYAsmParser \
+-lLLVMCSKYCodeGen -lLLVMCSKYDesc -lLLVMCSKYInfo -lLLVMM68kAsmParser -lLLVMM68kCodeGen -lLLVMM68kDesc \
+-lLLVMM68kDisassembler -lLLVMM68kInfo -lLLVMVEAsmParser -lLLVMVECodeGen -lLLVMVEDesc -lLLVMVEDisassembler \
+-lLLVMVEInfo -lLLVMAVRAsmParser -lLLVMInterfaceStub -lLLVMFileCheck -lLLVMAVRCodeGen -lLLVMAVRDesc \
+-lLLVMAVRDisassembler -lLLVMAVRInfo -lLLVMRISCVDisassembler -lLLVMRISCVCodeGen -lLLVMRISCVAsmParser \
 -lLLVMRISCVDesc -lLLVMRISCVInfo -lLLVMXCoreDisassembler -lLLVMXCoreCodeGen \
 -lLLVMXCoreDesc -lLLVMXCoreInfo -lLLVMX86Disassembler -lLLVMX86CodeGen -lLLVMX86AsmParser \
 -lLLVMX86Desc -lLLVMX86Info -lLLVMWebAssemblyDisassembler \
