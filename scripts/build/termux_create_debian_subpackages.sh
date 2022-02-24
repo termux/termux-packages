@@ -32,6 +32,8 @@ termux_create_debian_subpackages() {
 
 		# Allow globstar (i.e. './**/') patterns.
 		shopt -s globstar
+		# Allow negation patterns.
+		shopt -s extglob
 		for includeset in $TERMUX_SUBPKG_INCLUDE; do
 			local _INCLUDE_DIRSET
 			_INCLUDE_DIRSET=$(dirname "$includeset")
@@ -43,7 +45,7 @@ termux_create_debian_subpackages() {
 				mv "$includeset" "$SUB_PKG_MASSAGE_DIR/$_INCLUDE_DIRSET"
 			fi
 		done
-		shopt -u globstar
+		shopt -u globstar extglob
 
 		local SUB_PKG_ARCH=$TERMUX_ARCH
 		[ "$TERMUX_SUBPKG_PLATFORM_INDEPENDENT" = "true" ] && SUB_PKG_ARCH=all
