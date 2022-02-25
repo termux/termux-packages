@@ -1,11 +1,11 @@
 termux_step_extract_into_massagedir() {
-	local TARBALL_ORIG=$TERMUX_PKG_PACKAGEDIR/${TERMUX_PKG_NAME}_orig.tar.gz
+	local TARBALL_ORIG=$TERMUX_PKG_PACKAGEDIR/${TERMUX_PKG_NAME}_orig.tar.zst
 
 	# Build diff tar with what has changed during the build:
 	cd $TERMUX_PREFIX
 	tar -N "$TERMUX_BUILD_TS_FILE" \
 		--exclude='lib/libutil.so' --exclude='tmp' \
-		-czf "$TARBALL_ORIG" .
+		-c --zstd -f "$TARBALL_ORIG" .
 
 	# Extract tar in order to massage it
 	mkdir -p "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"

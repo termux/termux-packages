@@ -20,6 +20,7 @@ PACKAGES+=" git"
 PACKAGES+=" lzip"
 PACKAGES+=" tar"
 PACKAGES+=" unzip"
+PACKAGES+=" zstd"
 
 # Used by common build systems.
 PACKAGES+=" autoconf"
