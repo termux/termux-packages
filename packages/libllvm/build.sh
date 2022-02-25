@@ -21,7 +21,7 @@ TERMUX_PKG_REPLACES="gcc, libclang, libclang-dev, libllvm-dev"
 TERMUX_PKG_GROUPS="base-devel"
 # See http://llvm.org/docs/CMake.html:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
--DCMAKE_BUILD_TYPE=Release
+-DCMAKE_BUILD_TYPE=MinSizeRel
 -DPYTHON_EXECUTABLE=$(command -v python3)
 -DLLVM_ENABLE_PIC=ON
 -DLLVM_ENABLE_PROJECTS=clang;clang-tools-extra;compiler-rt;flang;lld;lldb;openmp;polly
