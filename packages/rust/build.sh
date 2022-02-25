@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=1.59.0
 TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/rustc-$TERMUX_PKG_VERSION-src.tar.xz
 TERMUX_PKG_SHA256=375996ead731cab2203ec10a66a3c4568ab6997d7e5d3ae597658164fe27be3d
 TERMUX_PKG_DEPENDS="libc++, clang, openssl, lld, zlib, libllvm"
-TERMUX_PKG_RM_AFTER_INSTALL="bin/llvm-dwp"
+TERMUX_PKG_RM_AFTER_INSTALL="bin/llvm-* bin/llc bin/opt"
 
 termux_step_configure() {
 	termux_setup_cmake
