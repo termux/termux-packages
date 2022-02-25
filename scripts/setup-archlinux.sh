@@ -43,6 +43,7 @@ PACKAGES+=" tar"
 PACKAGES+=" texinfo"
 PACKAGES+=" unzip"
 PACKAGES+=" xmlto"
+PACKAGES+=" zstd"		# Used to create diff tar
 
 # Do not require sudo if already running as root.
 if [ "$(id -u)" = "0" ]; then
