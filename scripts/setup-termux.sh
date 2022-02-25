@@ -11,6 +11,7 @@ PACKAGES+=" python"				# Used buildorder.py core script.
 PACKAGES+=" unzip"				# Used to extract *.zip source archives.
 PACKAGES+=" jq"					# Used for parsing repo.json.
 PACKAGES+=" binutils-is-llvm"			# Used for checking symbols.
+PACKAGES+=" lrzip"
 PACKAGES+=" lzop"
 PACKAGES+=" lz4"
 PACKAGES+=" zstd"		# Used to create diff tar
