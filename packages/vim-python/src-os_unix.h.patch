@@ -1,7 +1,17 @@
-diff -uNr vim-8.2.0000/src/os_unix.h vim-8.2.0000.mod/src/os_unix.h
---- vim-8.2.0000/src/os_unix.h	2019-12-12 15:18:35.000000000 +0200
-+++ vim-8.2.0000.mod/src/os_unix.h	2019-12-20 19:27:51.141441414 +0200
-@@ -350,7 +350,7 @@
+--- a/src/os_unix.h
++++ b/src/os_unix.h
+@@ -138,6 +138,10 @@
+ 
+ #include <signal.h>
+ 
++#ifdef __ANDROID__
++#undef SIGTSTP
++#endif
++
+ #if defined(DIRSIZ) && !defined(MAXNAMLEN)
+ # define MAXNAMLEN DIRSIZ
+ #endif
+@@ -356,7 +360,7 @@
  # ifdef VMS
  #  define DFLT_DIR     "./,sys$login:,tmp:"
  # else
