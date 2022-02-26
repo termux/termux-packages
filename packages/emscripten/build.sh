@@ -84,7 +84,7 @@ LLVM_BUILD_ARGS="
 -DLLVM_ENABLE_LIBEDIT=OFF
 -DLLVM_ENABLE_LIBPFM=OFF
 -DLLVM_ENABLE_LIBXML2=OFF
--DLLVM_ENABLE_PROJECTS=clang;compiler-rt;libunwind;lld
+-DLLVM_ENABLE_PROJECTS=clang;compiler-rt;lld
 -DLLVM_ENABLE_TERMINFO=OFF
 -DLLVM_INCLUDE_EXAMPLES=OFF
 -DLLVM_INCLUDE_TESTS=OFF
@@ -104,14 +104,12 @@ LLVM_BUILD_ARGS="
 -DCOMPILER_RT_BUILD_SANITIZERS=OFF
 -DCOMPILER_RT_BUILD_XRAY=OFF
 -DCOMPILER_RT_INCLUDE_TESTS=OFF
-
--DLIBUNWIND_USE_COMPILER_RT=ON
 "
 
 # https://github.com/WebAssembly/binaryen/blob/main/CMakeLists.txt
 BINARYEN_BUILD_ARGS="
--DCMAKE_BUILD_TYPE=MinSizeRel
 -DCMAKE_INSTALL_PREFIX=$TERMUX_PREFIX/opt/emscripten-binaryen
+-DENABLE_GTEST=OFF
 "
 
 termux_step_post_get_source() {
@@ -128,6 +126,11 @@ termux_step_post_get_source() {
 
 	cd "$TERMUX_PKG_CACHEDIR/llvm-project-$LLVM_COMMIT"
 	for patch in $TERMUX_PKG_BUILDER_DIR/llvm-project-*.patch.diff; do
+		patch -p1 -i "$patch"
+	done
+
+	cd "$TERMUX_PKG_CACHEDIR/binaryen-$BINARYEN_COMMIT"
+	for patch in $TERMUX_PKG_BUILDER_DIR/binaryen-*.patch.diff; do
 		patch -p1 -i "$patch"
 	done
 }
@@ -231,9 +234,9 @@ termux_step_make_install() {
 	# libclang_rt.builtins-*-android.a in different paths even after adding
 	# the patches from libllvm (also which one is more correct?)
 	#
-	# binutils LD searches lib/clang/14.0.0/lib/linux (exist)
-	# LLVM LD.LLD searches lib/clang/14.0.0/lib/android (not exist)
-	ln -fsT "linux" "$TERMUX_PREFIX/opt/emscripten-llvm/lib/clang/14.0.0/lib/android"
+	# binutils LD searches lib/clang/15.0.0/lib/linux (exist)
+	# LLVM LD.LLD searches lib/clang/15.0.0/lib/android (not exist)
+	ln -fsT "linux" "$TERMUX_PREFIX/opt/emscripten-llvm/lib/clang/15.0.0/lib/android"
 }
 
 termux_step_create_debscripts() {
@@ -289,7 +292,6 @@ termux_step_create_debscripts() {
 # Steps:
 # - pkg install emscripten-tests-third-party openjdk-17
 # - cd $PREFIX/opt/emscripten
-# - npm ci --no-optional
-# - export EMCC_CORES=1
+# - npm install --no-optional
 # - export EMTEST_SKIP_V8=1
 # - tests/runner {test_name}
