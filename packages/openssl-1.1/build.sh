@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Library implementing the SSL and TLS protocols as well a
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.1.1m
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.openssl.org/source/openssl-${TERMUX_PKG_VERSION/\~/-}.tar.gz
 TERMUX_PKG_SHA256=f89199be8b23ca45fc7cb9f1d8d3ee67312318286ad030f5316aca6462db6c96
 TERMUX_PKG_DEPENDS="ca-certificates, zlib"
@@ -15,6 +16,7 @@ TERMUX_PKG_REPLACES="openssl (<< 1.1.1m)"
 
 termux_step_pre_configure() {
 	test -d $TERMUX_PREFIX/include/openssl && mv $TERMUX_PREFIX/include/openssl{,.tmp} || :
+	LDFLAGS="-L$TERMUX_PREFIX/lib/openssl-1.1 -Wl,-rpath=$TERMUX_PREFIX/lib/openssl-1.1 $LDFLAGS"
 }
 
 termux_step_configure() {
