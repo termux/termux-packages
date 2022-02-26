@@ -1,0 +1,24 @@
+https://git.alpinelinux.org/aports/tree/community/ipmitool/gcc-10.patch
+
+--- a/include/ipmitool/ipmi_hpmfwupg.h
++++ b/include/ipmitool/ipmi_hpmfwupg.h
+@@ -800,8 +800,6 @@
+ 	char descString[HPMFWUPG_DESC_STRING_LENGTH + 1];
+ }VERSIONINFO, *PVERSIONINFO;
+ 
+-VERSIONINFO gVersionInfo[HPMFWUPG_COMPONENT_ID_MAX];
+-
+ #define TARGET_VER (0x01)
+ #define ROLLBACK_VER (0x02)
+ #define IMAGE_VER (0x04)
+--- a/lib/ipmi_hpmfwupg.c
++++ b/lib/ipmi_hpmfwupg.c
+@@ -52,6 +52,8 @@
+ # include <config.h>
+ #endif
+ 
++static VERSIONINFO gVersionInfo[HPMFWUPG_COMPONENT_ID_MAX];
++
+ /* From src/plugins/ipmi_intf.c: */
+ uint16_t
+ ipmi_intf_get_max_request_data_size(struct ipmi_intf * intf);
