@@ -1,0 +1,28 @@
+--- ./web/src/alpined.d/Makefile.orig	2021-09-18 20:32:36.402783672 +0530
++++ ./web/src/alpined.d/Makefile	2022-02-26 18:10:33.973824088 +0530
+@@ -257,13 +257,13 @@
+ CFLAGS = -fmessage-length=0 -grecord-gcc-switches -Wall -fstack-protector-strong -funwind-tables -fasynchronous-unwind-tables -fstack-clash-protection -g -fno-strict-aliasing -Wno-pointer-sign -Wno-unused -Wno-address -DOPENSSL_1_1_0 -DOPENSSL_API_COMPAT=0x10100000L
+ CP = /usr/bin/cp
+ CPP = gcc-10 -E
+-CPPFLAGS = -I/usr/include 
++CPPFLAGS = -I@TERMUX_PREFIX@/include 
+ CYGPATH_W = echo
+ C_CLIENT_AUTHS = gss 
+ C_CLIENT_BUNDLED = no
+-C_CLIENT_CFLAGS = EXTRACFLAGS=" -I/usr/include  -fmessage-length=0 -grecord-gcc-switches -Wall -fstack-protector-strong -funwind-tables -fasynchronous-unwind-tables -fstack-clash-protection -g -fno-strict-aliasing -Wno-pointer-sign -Wno-unused -Wno-address -DOPENSSL_1_1_0 -DOPENSSL_API_COMPAT=0x10100000L"
++C_CLIENT_CFLAGS = EXTRACFLAGS=" -I@TERMUX_PREFIX@/include  -fmessage-length=0 -grecord-gcc-switches -Wall -fstack-protector-strong -funwind-tables -fasynchronous-unwind-tables -fstack-clash-protection -g -fno-strict-aliasing -Wno-pointer-sign -Wno-unused -Wno-address -DOPENSSL_1_1_0 -DOPENSSL_API_COMPAT=0x10100000L"
+ C_CLIENT_GCCOPTLEVEL = 
+-C_CLIENT_LDFLAGS = EXTRALDFLAGS=" -L/usr/lib -rdynamic  -lgssapi_krb5 -lcrypt -lldap -lssl -lcrypto -ldl  -ltinfo -llber -lkrb5"
++C_CLIENT_LDFLAGS = EXTRALDFLAGS=" -L@TERMUX_PREFIX@/lib -rdynamic  -lgssapi_krb5 -lcrypt -lldap -lssl -lcrypto -ldl  -ltinfo -llber -lkrb5"
+ C_CLIENT_SPECIALS = SSLDIR=/usr SSLCERTS=/etc/ssl/certs 
+ C_CLIENT_TARGET = slx
+ C_CLIENT_WITH_IPV6 = touch imap/ip6
+@@ -290,7 +290,7 @@
+ INTL_MACOSX_LIBS = 
+ ISPELLPROG = hunspell
+ LD = /usr/x86_64-suse-linux/bin/ld -m elf_x86_64
+-LDFLAGS = -L/usr/lib -rdynamic
++LDFLAGS = -L@TERMUX_PREFIX@/lib -rdynamic
+ LIBICONV = -liconv
+ LIBINTL = 
+ LIBOBJS = 
