@@ -16,5 +16,5 @@ termux_step_make() {
 }
 	
 termux_step_make_install() {
-	install -Dm700 target/release/onefetch "$TERMUX_PREFIX"/bin/
+	install -Dm700 target/"${CARGO_TARGET_NAME}"/release/onefetch "$TERMUX_PREFIX"/bin
 }
