@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Command-line media player"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.34.1
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/mpv-player/mpv/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=32ded8c13b6398310fa27767378193dc1db6d78b006b70dbcbd3123a1445e746
 TERMUX_PKG_AUTO_UPDATE=true
@@ -12,6 +12,13 @@ TERMUX_PKG_RM_AFTER_INSTALL="share/icons share/applications"
 
 termux_step_pre_configure() {
 	LDFLAGS+=" -landroid-glob"
+
+	_NEED_DUMMY_LIBANDROID_A=
+	_LIBANDROID_A=$TERMUX_PREFIX/lib/libandroid.a
+	if [ ! -e $_LIBANDROID_A ]; then
+		_NEED_DUMMY_LIBANDROID_A=true
+		echo '!<arch>' > $_LIBANDROID_A
+	fi
 }
 
 termux_step_make_install() {
@@ -38,4 +45,12 @@ termux_step_make_install() {
 	# Use opensles audio out be default:
 	mkdir -p $TERMUX_PREFIX/etc/mpv
 	cp $TERMUX_PKG_BUILDER_DIR/mpv.conf $TERMUX_PREFIX/etc/mpv/mpv.conf
+}
+
+termux_step_post_make_install() {
+	if [ $_NEED_DUMMY_LIBANDROID_A ]; then
+		rm -f $_LIBANDROID_A
+	fi
+
+	sed -i 's/ -landroid / /g' $TERMUX_PREFIX/lib/pkgconfig/mpv.pc
 }

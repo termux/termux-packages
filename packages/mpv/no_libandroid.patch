@@ -1,0 +1,27 @@
+--- a/video/out/android_common.c
++++ b/video/out/android_common.c
+@@ -29,6 +29,7 @@
+     ANativeWindow *native_window;
+ };
+ 
++#ifndef __TERMUX__
+ int vo_android_init(struct vo *vo)
+ {
+     vo->android = talloc_zero(vo, struct vo_android_state);
+@@ -96,3 +97,4 @@
+     *out_h = h;
+     return true;
+ }
++#endif /* __TERMUX__ */
+--- a/video/out/android_common.h
++++ b/video/out/android_common.h
+@@ -23,7 +23,9 @@
+ 
+ struct vo;
+ 
++#ifndef __TERMUX__
+ int vo_android_init(struct vo *vo);
+ void vo_android_uninit(struct vo *vo);
+ ANativeWindow *vo_android_native_window(struct vo *vo);
+ bool vo_android_surface_size(struct vo *vo, int *w, int *h);
++#endif
