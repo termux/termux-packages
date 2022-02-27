@@ -21,26 +21,29 @@ opt/emscripten-llvm/bin/clang-extdef-mapping
 opt/emscripten-llvm/bin/clang-format
 opt/emscripten-llvm/bin/clang-func-mapping
 opt/emscripten-llvm/bin/clang-import-test
+opt/emscripten-llvm/bin/clang-linker-wrapper
 opt/emscripten-llvm/bin/clang-nvlink-wrapper
 opt/emscripten-llvm/bin/clang-offload-bundler
 opt/emscripten-llvm/bin/clang-offload-wrapper
+opt/emscripten-llvm/bin/clang-pseudo
 opt/emscripten-llvm/bin/clang-refactor
-opt/emscripten-llvm/bin/clang-repl
 opt/emscripten-llvm/bin/clang-rename
+opt/emscripten-llvm/bin/clang-repl
 opt/emscripten-llvm/bin/clang-scan-deps
 opt/emscripten-llvm/bin/diagtool
 opt/emscripten-llvm/bin/git-clang-format
 opt/emscripten-llvm/bin/hmaptool
-opt/emscripten-llvm/bin/llvm-cov
-opt/emscripten-llvm/bin/llvm-ml
-opt/emscripten-llvm/bin/llvm-profdata
-opt/emscripten-llvm/bin/llvm-rc
-opt/emscripten-llvm/bin/llvm-strip
 opt/emscripten-llvm/bin/ld.lld
 opt/emscripten-llvm/bin/ld64.lld
 opt/emscripten-llvm/bin/ld64.lld.darwin*
 opt/emscripten-llvm/bin/lld-link
+opt/emscripten-llvm/bin/llvm-cov
 opt/emscripten-llvm/bin/llvm-lib
+opt/emscripten-llvm/bin/llvm-ml
+opt/emscripten-llvm/bin/llvm-pdbutil
+opt/emscripten-llvm/bin/llvm-profdata
+opt/emscripten-llvm/bin/llvm-rc
+opt/emscripten-llvm/bin/llvm-strip
 opt/emscripten-llvm/lib/libclang.so*
 opt/emscripten-llvm/share
 opt/emscripten/LICENSE
@@ -220,7 +223,7 @@ termux_step_make_install() {
 	install -Dm644 "$TERMUX_PKG_TMPDIR/emscripten.sh" "$TERMUX_PREFIX/etc/profile.d/emscripten.sh"
 
 	# add useful tools not installed by LLVM_INSTALL_TOOLCHAIN_ONLY=ON
-	for tool in llc llvm-{addr2line,dwarfdump,dwp,link,nm,objdump,readobj,size} opt; do
+	for tool in llc llvm-{addr2line,dwarfdump,dwp,link,mc,nm,objdump,ranlib,readobj,size} opt; do
 		install -Dm755 "$TERMUX_PKG_CACHEDIR/build-llvm/bin/$tool" "$TERMUX_PREFIX/opt/emscripten-llvm/bin/$tool"
 	done
 
@@ -229,6 +232,7 @@ termux_step_make_install() {
 	ln -fsT "clang++" "$TERMUX_PREFIX/opt/emscripten-llvm/bin/wasm32-clang++"
 	ln -fsT "clang"   "$TERMUX_PREFIX/opt/emscripten-llvm/bin/wasm32-wasi-clang"
 	ln -fsT "clang++" "$TERMUX_PREFIX/opt/emscripten-llvm/bin/wasm32-wasi-clang++"
+	ln -fsT "lld"     "$TERMUX_PREFIX/opt/emscripten-llvm/bin/wasm-ld"
 
 	# unable to determine the reason why different linker searches for
 	# libclang_rt.builtins-*-android.a in different paths even after adding
