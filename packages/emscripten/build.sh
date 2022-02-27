@@ -204,7 +204,7 @@ termux_step_make_install() {
 
 	# first run generates .emscripten and exits immediately
 	rm -f "$TERMUX_PKG_SRCDIR/.emscripten"
-	./emcc
+	./emcc --generate-config
 	sed -i .emscripten -e "s|^EMSCRIPTEN_ROOT.*|EMSCRIPTEN_ROOT = '$TERMUX_PREFIX/opt/emscripten' # directory|"
 	sed -i .emscripten -e "s|^LLVM_ROOT.*|LLVM_ROOT = '$TERMUX_PREFIX/opt/emscripten-llvm/bin' # directory|"
 	sed -i .emscripten -e "s|^BINARYEN_ROOT.*|BINARYEN_ROOT = '$TERMUX_PREFIX/opt/emscripten-binaryen' # directory|"
