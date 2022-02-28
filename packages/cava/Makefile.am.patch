@@ -1,8 +1,6 @@
-diff --git a/Makefile.am b/Makefile.am
-index 8419207..1bd48e4 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -15,12 +15,11 @@ cava_LDFLAGS = -L/usr/local/lib -Wl,-rpath /usr/local/lib
+@@ -8,13 +8,13 @@
  cava_CPPFLAGS = -DPACKAGE=\"$(PACKAGE)\" -DVERSION=\"$(VERSION)\" \
             -D_POSIX_SOURCE -D _POSIX_C_SOURCE=200809L -D_XOPEN_SOURCE_EXTENDED \
  	   -DFONTDIR=\"@FONT_DIR@\"
@@ -11,8 +9,10 @@ index 8419207..1bd48e4 100644
  
  if OSX
      cava_CFLAGS += -DNORT
+     cava_LDADD =
  else
--    cava_LDFLAGS += -lrt
+-    cava_LDADD = -lrt
++    cava_LDADD =
      cava_font_dir = @FONT_DIR@
      cava_font__DATA = cava.psf
  endif
