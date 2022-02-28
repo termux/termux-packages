@@ -1,8 +1,6 @@
-diff --git a/configure.ac b/configure.ac
-index 47094de..caa62bd 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -63,9 +63,9 @@ dnl ######################
+@@ -63,9 +63,9 @@
  
  AC_CHECK_HEADERS([pthread.h],
  	AC_CHECK_LIB(pthread, pthread_create, LIBS="$LIBS -lpthread",
@@ -14,3 +12,12 @@ index 47094de..caa62bd 100644
  )
  
  dnl ######################
+@@ -260,7 +260,7 @@
+ AC_CHECK_LIB(iniparser,iniparser_load, have_iniparser=yes, have_iniparser=no)
+     if [[ $have_iniparser = "yes" ]] ; then
+     LIBS="$LIBS -liniparser"
+-      CPPFLAGS="$CPPFLAGS -I/usr/include/iniparser"
++      CPPFLAGS="$CPPFLAGS -I@TERMUX_PREFIX@/include/iniparser"
+     AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <iniparser.h>]],
+       [[dictionary* ini;
+       const char *keys[3];
