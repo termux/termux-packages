@@ -1,6 +1,6 @@
---- ./Configurations/15-android.conf.orig	2021-10-04 14:25:47.176057752 +0530
-+++ ./Configurations/15-android.conf	2021-10-04 14:33:03.366057586 +0530
-@@ -184,10 +184,10 @@
+--- a/Configurations/15-android.conf
++++ b/Configurations/15-android.conf
+@@ -184,14 +184,14 @@
          # systems are perfectly capable of executing binaries targeting
          # Froyo. Keep in mind that in the nutshell Android builds are
          # about JNI, i.e. shared libraries, not applications.
@@ -15,6 +15,11 @@
          bin_cflags       => "-fPIE",
          bin_lflags       => "-pie",
          enable           => [ ],
+-        shared_extension => ".so",
++        shared_extension => ".so.\$(SHLIB_VERSION_NUMBER)",
+     },
+     "android-arm" => {
+         ################################################################
 @@ -222,13 +222,13 @@
          # Newer NDK versions reportedly require additional -latomic.
          #
