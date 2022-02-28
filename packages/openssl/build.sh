@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Library implementing the SSL and TLS protocols as well a
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.0.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.openssl.org/source/openssl-${TERMUX_PKG_VERSION/\~/-}.tar.gz
 TERMUX_PKG_SHA256=c311ad853353bce796edad01a862c50a8a587f62e7e2100ef465ab53ec9b06d1
 TERMUX_PKG_DEPENDS="ca-certificates, zlib"
@@ -59,4 +60,11 @@ termux_step_make_install() {
 		$TERMUX_PKG_BUILDER_DIR/add-trusted-certificate \
 		> $TERMUX_PREFIX/bin/add-trusted-certificate
 	chmod 700 $TERMUX_PREFIX/bin/add-trusted-certificate
+}
+
+termux_step_post_make_install() {
+	mv $TERMUX_PREFIX/lib/libcrypto.so{,.3}
+	mv $TERMUX_PREFIX/lib/libssl.so{,.3}
+	ln -sf $TERMUX_PREFIX/lib/libcrypto.so{,.3}
+	ln -sf $TERMUX_PREFIX/lib/libssl.so{,.3}
 }
