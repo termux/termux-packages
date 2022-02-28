@@ -294,7 +294,7 @@ termux_step_create_debscripts() {
 # https://github.com/emscripten-core/emscripten/issues/9098
 #
 # Steps:
-# - pkg install emscripten-tests-third-party openjdk-17
+# - pkg install emscripten-tests-third-party ndk-sysroot openjdk-17
 # - cd $PREFIX/opt/emscripten
 # - npm install --no-optional
 # - export EMTEST_SKIP_V8=1
