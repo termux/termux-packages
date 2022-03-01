@@ -76,10 +76,10 @@ select_mirror() {
 	mirrors[15]="https://dl.kcubeterm.com/termux-main"
 	mirrors[14]="https://grimler.se/termux-packages-24"
 	mirrors[13]="https://termux.mentality.rip/termux-main"
-        mirrors[12]="https://termux.astra.in.ua/apt/termux-main"
+	mirrors[12]="https://termux.astra.in.ua/apt/termux-main"
 	mirrors[11]="https://termux.librehat.com/apt/termux-main"
-        mirrors[10]="https://mirror.mwt.me/termux/main"
-        mirrors[ 9]="https://termux.sahilister.in/apt/termux-main"
+	mirrors[10]="https://mirror.mwt.me/termux/main"
+	mirrors[ 9]="https://termux.sahilister.in/apt/termux-main"
 
 	local current_mirror
 	current_mirror=$(grep -m 1 -P "^\s*deb\s+" @TERMUX_PREFIX@/etc/apt/sources.list | grep -oP 'https?://[^\s]+')
@@ -87,7 +87,7 @@ select_mirror() {
 	# Do not update mirror if:
 	# * If $TERMUX_PKG_NO_MIRROR_SELECT was set.
 	# * Uses .cn domain - specific to Chinese users.
-        # * Uses mirror.bardia.tech, mirror based in Iran.
+	# * Uses mirror.bardia.tech, mirror based in Iran.
 	if [ -n "${TERMUX_PKG_NO_MIRROR_SELECT-}" ] || \
 		[[ "$(hostname "$current_mirror")" == *".cn" ]] || \
 		[[ "$(hostname "$current_mirror")" == *"mirror.bardia.tech"* ]]; then
