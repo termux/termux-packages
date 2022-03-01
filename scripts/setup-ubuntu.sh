@@ -60,6 +60,7 @@ PACKAGES+=" python3.9"
 PACKAGES+=" python3.10"
 PACKAGES+=" python3-pip"
 PACKAGES+=" python3-setuptools"
+PACKAGES+=" python3.10-venv"
 
 # Needed by package bc.
 PACKAGES+=" ed"

@@ -43,6 +43,9 @@ mkdir -p "$TERMUX_PKG_TMPDIR"
 (. "$TERMUX_SCRIPTDIR"/scripts/build/setup/termux_setup_protobuf.sh
 	termux_setup_protobuf
 )
+(. "$TERMUX_SCRIPTDIR"/scripts/build/setup/termux_setup_python_crossenv.sh
+	termux_setup_python_crossenv
+)
 # Offline rust is not supported yet.
 #(. "$TERMUX_SCRIPTDIR"/scripts/build/setup/termux_setup_rust.sh
 #	termux_setup_rust
