@@ -10,6 +10,7 @@ TERMUX_PKG_SRCURL=https://github.com/cruppstahl/upscaledb.git
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="boost, libc++, libsnappy, openssl, zlib"
+TERMUX_PKG_BUILD_DEPENDS="boost-headers"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-simd
 --disable-java

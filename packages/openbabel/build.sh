@@ -7,6 +7,7 @@ TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=https://github.com/openbabel/openbabel/archive/openbabel-${TERMUX_PKG_VERSION//./-}.tar.gz
 TERMUX_PKG_SHA256=c97023ac6300d26176c97d4ef39957f06e68848d64f1a04b0b284ccff2744f02
 TERMUX_PKG_DEPENDS="libc++, libcairo, libxml2, eigen, boost"
+TERMUX_PKG_BUILD_DEPENDS="boost-headers"
 TERMUX_PKG_BREAKS="openbabel-dev"
 TERMUX_PKG_REPLACES="openbabel-dev"
 TERMUX_PKG_GROUPS="science"

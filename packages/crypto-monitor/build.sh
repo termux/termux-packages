@@ -8,7 +8,7 @@ TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/edghyhdz/crypto_monitor.git
 TERMUX_PKG_GIT_BRANCH=main
 TERMUX_PKG_DEPENDS="libc++, libcurl, ncurses-ui-libs, openssl"
-TERMUX_PKG_BUILD_DEPENDS="boost"
+TERMUX_PKG_BUILD_DEPENDS="boost, boost-headers"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_post_get_source() {

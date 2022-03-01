@@ -7,7 +7,7 @@ TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=https://github.com/MusicPlayerDaemon/mpdscribble/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=8b3b79538fa9871ce61d7fb793d442c72b6aadf80af4c5eb664286f613d1feee
 TERMUX_PKG_DEPENDS="libcurl, libgcrypt, mpd, libmpdclient, glib"
-TERMUX_PKG_BUILD_DEPENDS="boost"
+TERMUX_PKG_BUILD_DEPENDS="boost, boost-headers"
 TERMUX_PKG_CONFFILES="etc/mpdscribble.conf"
 # mpdscribble already puts timestamps in the info printed to stdout so no need for svlogd -tt,
 # therefore we override the mpdscribble/log run script
