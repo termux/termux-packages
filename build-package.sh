@@ -75,6 +75,10 @@ source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_zig.sh"
 # shellcheck source=scripts/build/setup/termux_setup_ninja.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_ninja.sh"
 
+# Utility function to setup a current ninja build system.
+# shellcheck source=scripts/build/setup/termux_setup_nodejs.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_nodejs.sh"
+
 # Utility function to setup a current meson build system.
 # shellcheck source=scripts/build/setup/termux_setup_meson.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_meson.sh"
