@@ -8,5 +8,6 @@ TERMUX_PKG_SRCURL=https://github.com/mfontanini/libtins/archive/refs/tags/v$TERM
 TERMUX_PKG_SHA256=c70bce5a41a27258bf0e3ad535d8238fb747d909a4b87ea14620f25dd65828fd
 TRRMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="openssl, libpcap, boost"
+TERMUX_PKG_BUILD_DEPENDS="boost-headers"
 TERMUX_PKG_BREAKS="libtins-dev"
 TERMUX_PKG_REPLACES="libtins-dev"

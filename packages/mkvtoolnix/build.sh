@@ -7,7 +7,7 @@ TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://gitlab.com/mbunkus/mkvtoolnix/-/archive/release-$TERMUX_PKG_VERSION/mkvtoolnix-release-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=eca97e3da994799527b31bcf795c676dc9553949787808daa6598100f57aa221
 TERMUX_PKG_DEPENDS="boost, file, libflac, libogg, libvorbis, pcre2, zlib"
-TERMUX_PKG_BUILD_DEPENDS="fmt, libebml, libmatroska"
+TERMUX_PKG_BUILD_DEPENDS="boost-headers, fmt, libebml, libmatroska"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-static

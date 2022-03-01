@@ -7,3 +7,4 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/msgpack/msgpack-c/releases/download/cpp-${TERMUX_PKG_VERSION}/msgpack-cxx-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=9b3c1803b9855b7b023d7f181f66ebb0d6941275ba41d692037e0aa27736443f
 TERMUX_PKG_DEPENDS="boost"
+TERMUX_PKG_BUILD_DEPENDS="boost-headers"

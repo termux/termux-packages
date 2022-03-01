@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION=2112
 TERMUX_PKG_SRCURL=https://develop.openfoam.com/Development/openfoam/-/archive/OpenFOAM-v${TERMUX_PKG_VERSION}/openfoam-OpenFOAM-v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=ede3e2f6d7aed50969e5b9dbc06a0667f6d69b0d76adfc53f474d9ba5bf42272
 TERMUX_PKG_DEPENDS="openmpi, flex, boost, cgal, fftw, readline, libc++"
+TERMUX_PKG_BUILD_DEPENDS="boost-headers"
 TERMUX_PKG_GROUPS="science"
 TERMUX_PKG_RM_AFTER_INSTALL="opt/OpenFOAM-v${TERMUX_PKG_VERSION}/build"
 TERMUX_PKG_BUILD_IN_SRC=true

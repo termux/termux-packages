@@ -7,3 +7,4 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://constexpr.org/innoextract/files/innoextract-${TERMUX_PKG_VERSION}/innoextract-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=6344a69fc1ed847d4ed3e272e0da5998948c6b828cb7af39c6321aba6cf88126
 TERMUX_PKG_DEPENDS="libc++, boost, liblzma, libiconv"
+TERMUX_PKG_BUILD_DEPENDS="boost-headers"

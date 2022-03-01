@@ -7,7 +7,7 @@ TERMUX_PKG_VERSION=0.9.1
 TERMUX_PKG_SRCURL=https://github.com/WasmEdge/WasmEdge/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=b4a48bf5a009d6c4bf99479f87bf3bf8ebd6386d636fdeb721540456330dce59
 TERMUX_PKG_DEPENDS="libc++, libllvm"
-TERMUX_PKG_BUILD_DEPENDS="boost-static, libllvm-static, libpolly, lld, llvm"
+TERMUX_PKG_BUILD_DEPENDS="boost-headers, boost-static, libllvm-static, libpolly, lld, llvm"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DWASMEDGE_FORCE_DISABLE_LTO=ON
 "
