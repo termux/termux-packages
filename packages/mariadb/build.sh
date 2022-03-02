@@ -11,6 +11,8 @@ TERMUX_PKG_BREAKS="mariadb-dev"
 TERMUX_PKG_REPLACES="mariadb-dev"
 TERMUX_PKG_SERVICE_SCRIPT=("mysqld" "exec mysqld --basedir=$TERMUX_PREFIX --datadir=$TERMUX_PREFIX/var/lib/mysql 2>&1")
 
+TERMUX_DEBUG_BUILD=true
+
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DBISON_EXECUTABLE=$(command -v bison)
 -DGETCONF=$(command -v getconf)
