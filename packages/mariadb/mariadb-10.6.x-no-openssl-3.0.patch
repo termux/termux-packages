@@ -1,0 +1,23 @@
+From c9beef43154a199bfcd9f71049c011a2ed77ca74 Mon Sep 17 00:00:00 2001
+From: Sergei Golubchik <serg@mariadb.org>
+Date: Sat, 15 Jan 2022 17:33:28 +0100
+Subject: [PATCH] don't build with OpenSSL 3.0, it doesn't work before
+ MDEV-25785
+
+---
+ cmake/ssl.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cmake/ssl.cmake b/cmake/ssl.cmake
+index 1b23882631169..707aa4a017f3e 100644
+--- a/cmake/ssl.cmake
++++ b/cmake/ssl.cmake
+@@ -127,7 +127,7 @@ MACRO (MYSQL_CHECK_SSL)
+     ENDIF()
+     FIND_PACKAGE(OpenSSL)
+     SET_PACKAGE_PROPERTIES(OpenSSL PROPERTIES TYPE RECOMMENDED)
+-    IF(OPENSSL_FOUND)
++    IF(OPENSSL_FOUND AND OPENSSL_VERSION AND OPENSSL_VERSION VERSION_LESS "3.0.0")
+       SET(OPENSSL_LIBRARY ${OPENSSL_SSL_LIBRARY})
+       SET(SSL_SOURCES "")
+       SET(SSL_LIBRARIES ${OPENSSL_SSL_LIBRARY} ${OPENSSL_CRYPTO_LIBRARY})
