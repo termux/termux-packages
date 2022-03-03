@@ -1,0 +1,24 @@
+diff -uNr nim-1.6.4.orig/lib/pure/net.nim nim-1.6.4/lib/pure/net.nim
+--- nim-1.6.4.orig/lib/pure/net.nim	2022-02-09 06:12:37.000000000 +0530
++++ nim-1.6.4/lib/pure/net.nim	2022-03-03 19:04:21.875839065 +0530
+@@ -786,7 +786,7 @@
+     ## When name starts with a dot it will be matched by a certificate valid for any subdomain
+     when not defined(nimDisableCertificateValidation) and not defined(windows):
+       assert socket.isSsl
+-      let certificate = socket.sslHandle.SSL_get_peer_certificate()
++      let certificate = socket.sslHandle.SSL_get1_peer_certificate()
+       if certificate.isNil:
+         raiseSSLError("No SSL certificate found.")
+ 
+diff -uNr nim-1.6.4.orig/lib/wrappers/openssl.nim nim-1.6.4/lib/wrappers/openssl.nim
+--- nim-1.6.4.orig/lib/wrappers/openssl.nim	2022-02-09 06:12:37.000000000 +0530
++++ nim-1.6.4/lib/wrappers/openssl.nim	2022-03-03 19:05:19.079839069 +0530
+@@ -802,7 +802,7 @@
+ # On old openSSL version some of these symbols are not available
+ when not defined(nimDisableCertificateValidation) and not defined(windows):
+ 
+-  proc SSL_get_peer_certificate*(ssl: SslCtx): PX509{.cdecl, dynlib: DLLSSLName,
++  proc SSL_get1_peer_certificate*(ssl: SslCtx): PX509{.cdecl, dynlib: DLLSSLName,
+       importc.}
+ 
+   proc X509_get_subject_name*(a: PX509): PX509_NAME{.cdecl, dynlib: DLLSSLName, importc.}
