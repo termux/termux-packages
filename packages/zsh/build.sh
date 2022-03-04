@@ -1,11 +1,11 @@
 TERMUX_PKG_HOMEPAGE=https://www.zsh.org
 TERMUX_PKG_DESCRIPTION="Shell with lots of features"
-TERMUX_PKG_LICENSE="BSD"
+TERMUX_PKG_LICENSE="custom"
+TERMUX_PKG_LICENSE_FILE="LICENCE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=5.8
-TERMUX_PKG_REVISION=11
+TERMUX_PKG_VERSION=5.8.1
 TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/zsh-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=dcc4b54cc5565670a65581760261c163d720991f0d06486da61f8d839b52de27
+TERMUX_PKG_SHA256=b6973520bace600b4779200269b1e5d79e5f505ac4952058c11ad5bbf0dd9919
 # Remove hard link to bin/zsh as Android does not support hard links:
 TERMUX_PKG_RM_AFTER_INSTALL="bin/zsh-${TERMUX_PKG_VERSION}"
 TERMUX_PKG_DEPENDS="libandroid-support, libcap, ncurses, termux-tools, command-not-found, pcre"

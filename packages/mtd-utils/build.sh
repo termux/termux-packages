@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Utilities for dealing with MTD devices"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.1.3
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=ftp://ftp.infradead.org/pub/mtd-utils/mtd-utils-$TERMUX_PKG_VERSION.tar.bz2
 TERMUX_PKG_SHA256=11305a5daf6fc6ed85120695c8593290b577effb039adbfa63d35b4418ff5630
 TERMUX_PKG_DEPENDS="openssl, liblzo, libuuid, zlib, zstd"

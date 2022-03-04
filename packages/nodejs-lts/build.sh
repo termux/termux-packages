@@ -3,12 +3,17 @@ TERMUX_PKG_DESCRIPTION="Open Source, cross-platform JavaScript runtime environme
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Yaksh Bariya <yakshbari4@gmail.com>"
 TERMUX_PKG_VERSION=16.14.0
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=05eb64193e391fa8a2c159c0f60c171824715165f80c67fcab9dbc944e30c623
 # Note that we do not use a shared libuv to avoid an issue with the Android
 # linker, which does not use symbols of linked shared libraries when resolving
 # symbols on dlopen(). See https://github.com/termux/termux-packages/issues/462.
-TERMUX_PKG_DEPENDS="libc++, openssl, c-ares, libicu, zlib"
+#
+# Node.js 16.x does not support `NODE_OPTIONS=--openssl-legacy-provider` option.
+# See https://github.com/termux/termux-packages/issues/9266. Please revert back
+# to depending on openssl (instead of openssl-1.1) when migrating to next LTS.
+TERMUX_PKG_DEPENDS="libc++, openssl-1.1, c-ares, libicu, zlib"
 TERMUX_PKG_CONFLICTS="nodejs, nodejs-current"
 TERMUX_PKG_BREAKS="nodejs-dev"
 TERMUX_PKG_REPLACES="nodejs-current, nodejs-dev"
@@ -52,7 +57,6 @@ termux_step_configure() {
 		DEST_CPU="arm"
 	elif [ $TERMUX_ARCH = "i686" ]; then
 		DEST_CPU="ia32"
-		LDFLAGS+=" -u __atomic_fetch_add_8 -u __atomic_load_8 -u __atomic_compare_exchange_8 -latomic"
 	elif [ $TERMUX_ARCH = "aarch64" ]; then
 		DEST_CPU="arm64"
 	elif [ $TERMUX_ARCH = "x86_64" ]; then
@@ -67,6 +71,18 @@ termux_step_configure() {
 	export LINK_host=g++
 
 	LDFLAGS+=" -ldl"
+
+	local _SHARED_OPENSSL_INCLUDES=$TERMUX_PREFIX/include
+	local _SHARED_OPENSSL_LIBPATH=$TERMUX_PREFIX/lib
+
+	if [ "${TERMUX_PKG_VERSION%%.*}" != "16" ]; then
+		termux_error_exit 'Please migrate to using openssl (instead of openssl-1.1).'
+	else
+		_SHARED_OPENSSL_INCLUDES=$TERMUX_PREFIX/include/openssl-1.1
+		_SHARED_OPENSSL_LIBPATH=$TERMUX_PREFIX/lib/openssl-1.1
+		LDFLAGS="-Wl,-rpath=$_SHARED_OPENSSL_LIBPATH $LDFLAGS"
+	fi
+
 	# See note above TERMUX_PKG_DEPENDS why we do not use a shared libuv.
 	./configure \
 		--prefix=$TERMUX_PREFIX \
@@ -74,6 +90,8 @@ termux_step_configure() {
 		--dest-os=android \
 		--shared-cares \
 		--shared-openssl \
+		--shared-openssl-includes=$_SHARED_OPENSSL_INCLUDES \
+		--shared-openssl-libpath=$_SHARED_OPENSSL_LIBPATH \
 		--shared-zlib \
 		--with-intl=system-icu \
 		--cross-compiling

@@ -4,10 +4,11 @@ TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=86fd7de705babc2cef1e920e39ec439f5aa9c336
 TERMUX_PKG_VERSION=2021.02.22
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/edghyhdz/crypto_monitor.git
 TERMUX_PKG_GIT_BRANCH=main
 TERMUX_PKG_DEPENDS="libc++, libcurl, ncurses-ui-libs, openssl"
-TERMUX_PKG_BUILD_DEPENDS="boost"
+TERMUX_PKG_BUILD_DEPENDS="boost, boost-headers"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_post_get_source() {

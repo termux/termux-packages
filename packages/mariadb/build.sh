@@ -3,10 +3,13 @@ TERMUX_PKG_DESCRIPTION="A drop-in replacement for mysql server"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2:10.6.4
-TERMUX_PKG_REVISION=6
+TERMUX_PKG_REVISION=9
 TERMUX_PKG_SRCURL=http://ftp.hosteurope.de/mirror/archive.mariadb.org/mariadb-${TERMUX_PKG_VERSION:2}/source/mariadb-${TERMUX_PKG_VERSION:2}.tar.gz
 TERMUX_PKG_SHA256=75bf9b147a95d38160d01a73b098d50a1960563b46d16a235971fff64d99643c
-TERMUX_PKG_DEPENDS="libc++, libiconv, liblzma, ncurses, libedit, openssl, pcre2, libcrypt, libandroid-support, libandroid-glob, zlib, liblz4"
+# MariaDB 10.6.x does not support OpenSSL 3.0:
+#   https://github.com/MariaDB/server/commit/c9beef43154a199bfcd9f71049c011a2ed77ca74
+#   https://jira.mariadb.org/browse/MDEV-25785
+TERMUX_PKG_DEPENDS="libc++, libiconv, liblzma, ncurses, libedit, openssl-1.1, pcre2, libcrypt, libandroid-support, libandroid-glob, zlib, liblz4"
 TERMUX_PKG_BREAKS="mariadb-dev"
 TERMUX_PKG_REPLACES="mariadb-dev"
 TERMUX_PKG_SERVICE_SCRIPT=("mysqld" "exec mysqld --basedir=$TERMUX_PREFIX --datadir=$TERMUX_PREFIX/var/lib/mysql 2>&1")
@@ -54,6 +57,10 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DWITH_INNODB_SNAPPY=OFF
 -DWITH_UNIT_TESTS=OFF
 -DINSTALL_SYSCONFDIR=$TERMUX_PREFIX/etc
+-DOPENSSL_INCLUDE_DIR=$TERMUX_PREFIX/include/openssl-1.1
+-DOPENSSL_LIBRARIES=$TERMUX_PREFIX/lib/openssl-1.1
+-DOPENSSL_CRYPTO_LIBRARY=$TERMUX_PREFIX/lib/openssl-1.1/libcrypto.so.1.1
+-DOPENSSL_SSL_LIBRARY=$TERMUX_PREFIX/lib/openssl-1.1/libssl.so.1.1
 "
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_CONFLICTS="mysql"
@@ -99,6 +106,11 @@ termux_step_pre_configure() {
 		CFLAGS+=" -latomic"
 	fi
 	sed -i 's/^\s*END[(][)]/ENDIF()/g' $TERMUX_PKG_SRCDIR/libmariadb/cmake/ConnectorName.cmake
+
+	CFLAGS="-I$TERMUX_PREFIX/include/openssl-1.1 $CFLAGS"
+	CPPFLAGS="-I$TERMUX_PREFIX/include/openssl-1.1 $CPPFLAGS"
+	CXXFLAGS="-I$TERMUX_PREFIX/include/openssl-1.1 $CXXFLAGS"
+	LDFLAGS="-L$TERMUX_PREFIX/lib/openssl-1.1 -Wl,-rpath=$TERMUX_PREFIX/lib/openssl-1.1 $LDFLAGS"
 }
 
 termux_step_post_massage() {

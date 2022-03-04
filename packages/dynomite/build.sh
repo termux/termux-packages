@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A thin, distributed dynamo layer for different storage e
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.6.22
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/Netflix/dynomite/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=9c3c60d95b39939f3ce596776febe8aa00ae8614ba85aa767e74d41e302e704a
 TERMUX_PKG_DEPENDS="libyaml, openssl"

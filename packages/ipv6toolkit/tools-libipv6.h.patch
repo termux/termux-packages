@@ -1,0 +1,37 @@
+--- a/tools/libipv6.h
++++ b/tools/libipv6.h
+@@ -721,6 +721,8 @@
+ 	#include <netinet/icmp6.h>
+ 	#endif
+ 
++	#ifndef __ANDROID__
++
+ 	#define ICMP6_NI_QUERY			139	/* node information request */
+ 	#define ICMP6_NI_REPLY			140	/* node information reply */
+ 	/*
+@@ -747,12 +749,16 @@
+ 		/* could be followed by reply data */
+ 	} __attribute__ ((__packed__));
+ 
++	#endif /* __ANDROID__ */
++
+ 	#define ni_type		icmp6_ni_hdr.icmp6_type
+ 	#define ni_code		icmp6_ni_hdr.icmp6_code
+ 	#define ni_cksum	icmp6_ni_hdr.icmp6_cksum
+ 	#define ni_qtype	icmp6_ni_hdr.icmp6_data16[0]
+ 	#define ni_flags	icmp6_ni_hdr.icmp6_data16[1]
+ 
++	#ifndef __ANDROID__
++
+ 	#define NI_QTYPE_NOOP		0 /* NOOP  */
+ 	#define NI_QTYPE_SUPTYPES	1 /* Supported Qtypes */
+ 	#define NI_QTYPE_FQDN		2 /* FQDN (draft 04) */
+@@ -792,6 +798,8 @@
+ 		uint8_t ni_fqdn_name[3]; /* XXX: alignment */
+ 	} __attribute__ ((__packed__));
+ 
++	#endif /* __ANDROID__ */
++
+ #endif
+ 
+ 

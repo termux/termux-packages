@@ -1,6 +1,5 @@
-diff -uNr wrk-4.1.0/Makefile wrk-4.1.0.mod/Makefile
---- wrk-4.1.0/Makefile	2018-01-21 08:00:58.000000000 +0200
-+++ wrk-4.1.0.mod/Makefile	2020-05-08 02:09:33.254774677 +0300
+--- ./Makefile.orig	2022-02-21 18:50:35.103778638 +0530
++++ ./Makefile	2022-02-21 18:51:47.323778610 +0530
 @@ -1,5 +1,5 @@
 -CFLAGS  += -std=c99 -Wall -O2 -D_REENTRANT
 -LIBS    := -lpthread -lm -lssl -lcrypto
@@ -18,13 +17,15 @@ diff -uNr wrk-4.1.0/Makefile wrk-4.1.0.mod/Makefile
  	LDFLAGS += -L$(WITH_LUAJIT)/lib
  else
  	CFLAGS  += -I$(ODIR)/include/luajit-2.1
-@@ -61,7 +61,7 @@
+@@ -59,9 +59,9 @@
+ $(ODIR):
+ 	@mkdir -p $@
  
- $(ODIR)/bytecode.o: src/wrk.lua
+-$(ODIR)/bytecode.o: src/wrk.lua
++$(ODIR)/bytecode.c: src/wrk.lua
  	@echo LUAJIT $<
 -	@$(SHELL) -c 'PATH=obj/bin:$(PATH) luajit -b $(CURDIR)/$< $(CURDIR)/$@'
 +	@$(SHELL) -c 'PATH=obj/bin:$(PATH) luajit -b -a $(_ARCH) $(CURDIR)/$< $(CURDIR)/$@'
  
  $(ODIR)/version.o:
  	@echo 'const char *VERSION="$(VER)";' | $(CC) -xc -c -o $@ -
-  

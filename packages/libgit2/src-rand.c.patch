@@ -1,0 +1,13 @@
+--- a/src/rand.c
++++ b/src/rand.c
+@@ -74,6 +74,10 @@
+ 
+ #else
+ 
++#if defined __ANDROID__ && __ANDROID_API__ < 29
++int getloadavg(double[], int);
++#endif
++
+ GIT_INLINE(int) getseed(uint64_t *seed)
+ {
+ 	struct timeval tv;

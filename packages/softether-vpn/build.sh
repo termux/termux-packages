@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="An open-source cross-platform multi-protocol VPN program
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=(5.02.5180)
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_VERSION+=(1.0.18)
 TERMUX_PKG_SRCURL=(https://github.com/SoftEtherVPN/SoftEtherVPN/releases/download/${TERMUX_PKG_VERSION}/SoftEtherVPN-${TERMUX_PKG_VERSION}.tar.xz
                    https://github.com/jedisct1/libsodium/archive/${TERMUX_PKG_VERSION[1]}-RELEASE.tar.gz)

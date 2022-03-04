@@ -1,0 +1,22 @@
+--- ./acx_nlnetlabs.m4.orig	2021-12-03 13:15:47.000000000 +0530
++++ ./acx_nlnetlabs.m4	2022-02-26 11:45:09.003626697 +0530
+@@ -652,7 +652,7 @@
+         fi
+         for dir in $withval; do
+             ssldir="$dir"
+-            if test -f "$dir/include/openssl/ssl.h"; then
++            if test -f "$dir/include/openssl-1.1/openssl/ssl.h"; then
+                 found_ssl="yes"
+                 AC_DEFINE_UNQUOTED([HAVE_SSL], [], [Define if you have the SSL libraries installed.])
+                 dnl assume /usr/include is already in the include-path.
+@@ -675,8 +675,8 @@
+ 			LIBSSL_LDFLAGS="$LIBSSL_LDFLAGS -L$ssldir/lib64"
+ 			ACX_RUNTIME_PATH_ADD([$ssldir/lib64])
+ 		else
+-			LDFLAGS="$LDFLAGS -L$ssldir/lib"
+-			LIBSSL_LDFLAGS="$LIBSSL_LDFLAGS -L$ssldir/lib"
++			LDFLAGS="$LDFLAGS -L$ssldir/lib/openssl-1.1"
++			LIBSSL_LDFLAGS="$LIBSSL_LDFLAGS -L$ssldir/lib/openssl-1.1"
+ 			ACX_RUNTIME_PATH_ADD([$ssldir/lib])
+ 		fi
+             fi

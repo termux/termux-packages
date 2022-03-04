@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A modernized, complete, self-contained TeX/LaTeX engine"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.8.0
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/tectonic-typesetting/tectonic.git
 TERMUX_PKG_GIT_BRANCH=tectonic@${TERMUX_PKG_VERSION}
 TERMUX_PKG_DEPENDS="fontconfig, harfbuzz, libgraphite, libicu, openssl, zlib"

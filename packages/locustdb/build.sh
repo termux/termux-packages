@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.3.4
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/cswinter/LocustDB/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=b4ac9e44edc541522b7663ebbb6dfeafaf58a1a4fd060e86af59ed3baec6574a
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -21,18 +22,6 @@ TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
 
 termux_step_make() {
 	termux_setup_rust
-	: "${CARGO_HOME:=$HOME/.cargo}"
-	export CARGO_HOME
-
-	cargo fetch --target $CARGO_TARGET_NAME
-	for p in errno sched termios; do
-		patch --silent -p1 \
-			-d $CARGO_HOME/registry/src/github.com-*/nix-0.5.1 \
-			< $TERMUX_PKG_BUILDER_DIR/nix-0.5.1-${p}.diff
-	done
-	patch --silent -p1 \
-		-d $CARGO_HOME/registry/src/github.com-*/rustyline-1.0.0 \
-		< $TERMUX_PKG_BUILDER_DIR/rustyline-1.0.0-ioctl.diff
 
 	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
 }

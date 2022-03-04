@@ -63,6 +63,10 @@ source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_gn.sh"
 # shellcheck source=scripts/build/setup/termux_setup_golang.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_golang.sh"
 
+# Utility function for python packages to setup a python crossenv.
+# shellcheck source=scripts/build/setup/termux_setup_python_crossenv.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_python_crossenv.sh"
+
 # Utility function for rust-using packages to setup a rust toolchain.
 # shellcheck source=scripts/build/setup/termux_setup_rust.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_rust.sh"
@@ -74,6 +78,10 @@ source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_zig.sh"
 # Utility function to setup a current ninja build system.
 # shellcheck source=scripts/build/setup/termux_setup_ninja.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_ninja.sh"
+
+# Utility function to setup a current ninja build system.
+# shellcheck source=scripts/build/setup/termux_setup_nodejs.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_nodejs.sh"
 
 # Utility function to setup a current meson build system.
 # shellcheck source=scripts/build/setup/termux_setup_meson.sh

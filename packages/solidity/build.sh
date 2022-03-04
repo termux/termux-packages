@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL=https://github.com/ethereum/solidity/releases/download/v${TERM
 TERMUX_PKG_SHA256=c63c2caf64feaef9fbde7c8d26e3d15aa9b159d08e7213e1e6bd3e4fd06c8308
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="boost, jsoncpp"
+TERMUX_PKG_BUILD_DEPENDS="boost-headers"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DUSE_Z3=OFF
 -DUSE_CVC4=OFF

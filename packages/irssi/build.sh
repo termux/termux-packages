@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Terminal based IRC client"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.2.3
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://github.com/irssi/irssi/releases/download/$TERMUX_PKG_VERSION/irssi-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=a647bfefed14d2221fa77b6edac594934dc672c4a560417b1abcbbc6b88d769f
 TERMUX_PKG_AUTO_UPDATE=true
@@ -27,7 +27,7 @@ termux_step_pre_configure() {
 	sed -e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
 		-e "s|@TERMUX_PERL_VERSION@|$perl_version|g" \
 		-e "s|@TERMUX_PERL_TARGET@|${TERMUX_ARCH}-android|g" \
-		$TERMUX_PKG_BUILDER_DIR/perl_config_support.patch.txt | \
+		$TERMUX_PKG_BUILDER_DIR/perl_config_support.diff | \
 		patch -p1
 	autoconf
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-perl-lib=$TERMUX_PREFIX/lib/perl5/site_perl/$perl_version/${TERMUX_ARCH}-android"

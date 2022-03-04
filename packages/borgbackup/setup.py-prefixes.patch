@@ -1,0 +1,52 @@
+--- a/setup.py
++++ b/setup.py
+@@ -167,8 +167,7 @@
+ library_dirs = []
+ define_macros = []
+ 
+-possible_openssl_prefixes = ['/usr', '/usr/local', '/usr/local/opt/openssl', '/usr/local/ssl', '/usr/local/openssl',
+-                             '/usr/local/borg', '/opt/local', '/opt/pkg', '/opt/homebrew/opt/openssl@1.1', ]
++possible_openssl_prefixes = ['@TERMUX_PREFIX@', ]
+ if os.environ.get('BORG_OPENSSL_PREFIX'):
+     possible_openssl_prefixes.insert(0, os.environ.get('BORG_OPENSSL_PREFIX'))
+ ssl_prefix = detect_openssl(possible_openssl_prefixes)
+@@ -178,8 +177,7 @@
+ library_dirs.append(os.path.join(ssl_prefix, 'lib'))
+ 
+ 
+-possible_liblz4_prefixes = ['/usr', '/usr/local', '/usr/local/opt/lz4', '/usr/local/lz4',
+-                         '/usr/local/borg', '/opt/local', '/opt/pkg', ]
++possible_liblz4_prefixes = ['@TERMUX_PREFIX@', ]
+ if os.environ.get('BORG_LIBLZ4_PREFIX'):
+     possible_liblz4_prefixes.insert(0, os.environ.get('BORG_LIBLZ4_PREFIX'))
+ liblz4_prefix = setup_lz4.lz4_system_prefix(possible_liblz4_prefixes)
+@@ -190,8 +188,7 @@
+ else:
+     liblz4_system = False
+ 
+-possible_libb2_prefixes = ['/usr', '/usr/local', '/usr/local/opt/libb2', '/usr/local/libb2',
+-                           '/usr/local/borg', '/opt/local', '/opt/pkg', ]
++possible_libb2_prefixes = ['@TERMUX_PREFIX@', ]
+ if os.environ.get('BORG_LIBB2_PREFIX'):
+     possible_libb2_prefixes.insert(0, os.environ.get('BORG_LIBB2_PREFIX'))
+ libb2_prefix = setup_b2.b2_system_prefix(possible_libb2_prefixes)
+@@ -202,8 +199,7 @@
+ else:
+     libb2_system = False
+ 
+-possible_libzstd_prefixes = ['/usr', '/usr/local', '/usr/local/opt/libzstd', '/usr/local/libzstd',
+-                             '/usr/local/borg', '/opt/local', '/opt/pkg', ]
++possible_libzstd_prefixes = ['@TERMUX_PREFIX@', ]
+ if os.environ.get('BORG_LIBZSTD_PREFIX'):
+     possible_libzstd_prefixes.insert(0, os.environ.get('BORG_LIBZSTD_PREFIX'))
+ libzstd_prefix = setup_zstd.zstd_system_prefix(possible_libzstd_prefixes)
+@@ -214,8 +210,7 @@
+ else:
+     libzstd_system = False
+ 
+-possible_libxxhash_prefixes = ['/usr', '/usr/local', '/usr/local/opt/libxxhash', '/usr/local/libxxhash',
+-                           '/usr/local/borg', '/opt/local', '/opt/pkg', ]
++possible_libxxhash_prefixes = ['@TERMUX_PREFIX@', ]
+ if os.environ.get('BORG_LIBXXHASH_PREFIX'):
+     possible_libxxhash_prefixes.insert(0, os.environ.get('BORG_LIBXXHASH_PREFIX'))
+ libxxhash_prefix = setup_xxhash.xxhash_system_prefix(possible_libxxhash_prefixes)

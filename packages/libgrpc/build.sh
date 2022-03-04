@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="High performance, open source, general RPC framework tha
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_SRCURL=https://github.com/grpc/grpc.git
-TERMUX_PKG_VERSION=1.38.1
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_DEPENDS="libc++, openssl, protobuf, c-ares, zlib"
+TERMUX_PKG_VERSION=1.44.0
+TERMUX_PKG_REVISION=2
+TERMUX_PKG_DEPENDS="ca-certificates, libc++, libre2, openssl, protobuf, c-ares, zlib"
 TERMUX_PKG_BREAKS="libgrpc-dev"
 TERMUX_PKG_REPLACES="libgrpc-dev"
 TERMUX_PKG_BUILD_DEPENDS="gflags, gflags-static, libprotobuf"
@@ -18,6 +18,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DgRPC_CARES_PROVIDER=package
 -DgRPC_PROTOBUF_PROVIDER=package
 -DgRPC_SSL_PROVIDER=package
+-DgRPC_RE2_PROVIDER=package
 -DgRPC_ZLIB_PROVIDER=package
 -DgRPC_GFLAGS_PROVIDER=package
 -DRUN_HAVE_POSIX_REGEX=0
@@ -51,6 +52,7 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
+	export PATH=$TERMUX_PKG_HOSTBUILD_DIR/bin:$PATH
 	sed "s|@PATH_TO_PLUGIN@|$TERMUX_PKG_HOSTBUILD_DIR/bin/grpc_cpp_plugin|g" \
 		$TERMUX_PKG_BUILDER_DIR/CMakeLists.txt.diff \
 		| patch -p1

@@ -7,6 +7,7 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/POV-Ray/povray/releases/download/v${TERMUX_PKG_VERSION}/povunix-v${TERMUX_PKG_VERSION}-src.tar.gz
 TERMUX_PKG_SHA256=4717c9bed114deec47cf04a8175cc4060dafc159f26e7896480a60f4411ca5ad
 TERMUX_PKG_DEPENDS="boost, libjpeg-turbo, libpng, libtiff, zlib"
+TERMUX_PKG_BUILD_DEPENDS="boost-headers"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-debug

@@ -7,7 +7,7 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/rime/librime/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=c76b937a27d7b9352c3eea9eb3adaebf70c93457104c7d47d40c006009092c20
 TERMUX_PKG_DEPENDS="boost, capnproto, google-glog, leveldb, libc++, libopencc, libyaml-cpp, marisa"
-TERMUX_PKG_BUILD_DEPENDS="gflags, openssl"
+TERMUX_PKG_BUILD_DEPENDS="boost-headers, gflags, openssl"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DBUILD_TEST=OFF
 "

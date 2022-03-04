@@ -60,6 +60,7 @@ PACKAGES+=" python3.9"
 PACKAGES+=" python3.10"
 PACKAGES+=" python3-pip"
 PACKAGES+=" python3-setuptools"
+PACKAGES+=" python3.10-venv"
 
 # Needed by package bc.
 PACKAGES+=" ed"
@@ -207,6 +208,10 @@ PACKAGES+=" python3-jsonschema"
 
 # Needed by proxmark3/proxmark3-git
 PACKAGES+=" gcc-arm-none-eabi"
+
+# For opt, llvm-link, llc not shipped by NDK.
+# Required by picolisp (and maybe a few others in future)
+PACKAGES+=" llvm-12"
 
 # Do not require sudo if already running as root.
 if [ "$(id -u)" = "0" ]; then

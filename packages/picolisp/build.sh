@@ -1,84 +1,78 @@
 TERMUX_PKG_HOMEPAGE=https://picolisp.com/wiki/?home
 TERMUX_PKG_DESCRIPTION="Lisp interpreter and application server framework"
 TERMUX_PKG_LICENSE="MIT"
-# TERMUX_PKG_SRCDIR is overriden below
-TERMUX_PKG_LICENSE_FILE="../COPYING"
+TERMUX_PKG_LICENSE_FILE="COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=20.7.24
+TERMUX_PKG_VERSION=21.12
 TERMUX_PKG_REVISION=2
-# We use our source copies since old version snapshots are not kept on main site.
-TERMUX_PKG_SRCURL=https://github.com/termux/distfiles/releases/download/2021.01.04/picolisp_${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=72e8d394ad32a6659210ac2cc4b7bb736dc9b94c6ac8d6296506b6dfdc92f90c
-TERMUX_PKG_DEPENDS="libcrypt, openssl"
+TERMUX_PKG_SRCURL=http://archive.ubuntu.com/ubuntu/pool/universe/p/picolisp/picolisp_$TERMUX_PKG_VERSION.orig.tar.gz
+TERMUX_PKG_SHA256=a06838236b7f5b52c5d587d32d31627f73cdb9775cc02a80f2cdaedd12888c7d
+TERMUX_PKG_DEPENDS="libcrypt, libffi, openssl, readline"
 TERMUX_PKG_BUILD_IN_SRC=true
-# arm and i686: The c code uses gcc-specific "variable length array in structure":
-# x86_64: The assembly is not position-independent:
-TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686, x86_64"
+# For 32-bit archs we nees to build minipicolisp
+TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
 
-termux_step_pre_configure() {
-	# Certain packages are not safe to build on device because their
-	# build.sh script deletes specific files in $TERMUX_PREFIX.
-	if $TERMUX_ON_DEVICE_BUILD; then
-		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
-	fi
+termux_step_make() {
+	cd $TERMUX_PKG_SRCDIR/src
+	opt-12 -O3 --mtriple=$CCTERMUX_HOST_PLATFORM -o base.bc base.ll
+	$CC -O3 -w -c -D_OS="\"Android\"" -D_CPU="\"$TERMUX_ARCH\"" `$PKGCONFIG --cflags libffi` -emit-llvm lib.c
+	llvm-link-12 -o picolisp.bc base.bc lib.bc
+	mkdir -p ../bin ../lib
+	llc-12 --mtriple=$CCTERMUX_HOST_PLATFORM picolisp.bc -relocation-model=pic -o picolisp.s
+	$CC $CFLAGS $LDFLAGS picolisp.s -o ../bin/picolisp -rdynamic -lutil -lm -ldl -lreadline -lffi
+	$STRIP ../bin/picolisp
 
-	# Validate that we have the right version:
-	grep -q "Version ${TERMUX_PKG_VERSION//./ }" src64/version.l || {
-		termux_error_exit "Picolisp version needs to be bumped"
-	}
+	opt-12 -O3 --mtriple=$CCTERMUX_HOST_PLATFORM -o ext.bc ext.ll
+	llc-12 --mtriple=$CCTERMUX_HOST_PLATFORM ext.bc -relocation-model=pic -o ext.s
+	$CC $CFLAGS $LDFLAGS ext.s -o ../lib/ext.so -shared
+	$STRIP ../lib/ext.so
 
-	if [ $TERMUX_ARCH_BITS = 64 ]; then
-		cd $TERMUX_PKG_SRCDIR
-		if [ $TERMUX_ARCH = "aarch64" ]; then
-			export TERMUX_PKG_EXTRA_MAKE_ARGS=arm64.android
-		else
-			termux_error_exit "Unsupported arch: $TERMUX_ARCH"
-		fi
-		TERMUX_PKG_SRCDIR=$TERMUX_PKG_SRCDIR/src64
-	else
-		TERMUX_PKG_SRCDIR=$TERMUX_PKG_SRCDIR/src
-	fi
-	TERMUX_PKG_BUILDDIR=$TERMUX_PKG_SRCDIR
-	ORIG_CFLAGS="$CFLAGS"
-	CFLAGS+=" -c $LDFLAGS $CPPFLAGS"
+	opt-12 -O3 --mtriple=$CCTERMUX_HOST_PLATFORM -o ht.bc ht.ll
+	llc-12 --mtriple=$CCTERMUX_HOST_PLATFORM ht.bc -relocation-model=pic -o ht.s
+	$CC $CFLAGS $LDFLAGS ht.s -o ../lib/ht.so -shared
+	$STRIP ../lib/ht.so
+
+	$CC -O3 -w $CFLAGS -I$TERMUX_PREFIX/include -L$TERMUX_PREFIX/lib $LDFLAGS -o ../bin/balance balance.c
+	$CC -O3 -w $CFLAGS -I$TERMUX_PREFIX/include -L$TERMUX_PREFIX/lib $LDFLAGS -o ../bin/ssl ssl.c -lssl -lcrypto
+	$CC -O3 -w $CFLAGS -I$TERMUX_PREFIX/include -L$TERMUX_PREFIX/lib $LDFLAGS -o ../bin/httpGate httpGate.c -lssl -lcrypto
+
+	$CC -O3 -w -D_OS="\"Android\"" -D_CPU="\"$TERMUX_ARCH\"" $CFLAGS -I$TERMUX_PREFIX/include -L$TERMUX_PREFIX/lib $LDFLAGS sysdefs.c -o ../bin/sysdefs-gen
+
+	$STRIP ../bin/balance
+	$STRIP ../bin/ssl
+	$STRIP ../bin/httpGate
+	$STRIP ../bin/sysdefs-gen
 }
 
 termux_step_make_install() {
-	cd $TERMUX_PKG_SRCDIR/
+	cd $TERMUX_PKG_SRCDIR/src
+	install ../bin/{picolisp,pil} -t $TERMUX_PREFIX/bin
 
-	if [ $TERMUX_ARCH_BITS = "64" ]; then
-		$TERMUX_HOST_PLATFORM-as -o ${TERMUX_PKG_EXTRA_MAKE_ARGS}.base.o ${TERMUX_PKG_EXTRA_MAKE_ARGS}.base.s
-		$TERMUX_HOST_PLATFORM-as -o ${TERMUX_PKG_EXTRA_MAKE_ARGS}.ext.o ${TERMUX_PKG_EXTRA_MAKE_ARGS}.ext.s
-		$TERMUX_HOST_PLATFORM-as -o ${TERMUX_PKG_EXTRA_MAKE_ARGS}.ht.o ${TERMUX_PKG_EXTRA_MAKE_ARGS}.ht.s
+	install -d -m755 $TERMUX_PREFIX/lib/picolisp/bin
+	install ../bin/{balance,httpGate,psh,ssl,sysdefs-gen,vip,watchdog} -t $TERMUX_PREFIX/lib/picolisp
+	
+	install ../{ext.l,lib.css,lib.l} -t $TERMUX_PREFIX/lib/picolisp
+	install -d -m755 $TERMUX_PREFIX/lib/picolisp/lib
 
-		# Use -fuse-ld=bfd to avoid using the gold linker (which Termux
-		# patches NDK to use by default) as it causes (tzo), the time
-		# zone offset, to always be 0 (and probably other problems):
-		$CC -o ../bin/picolisp ${TERMUX_PKG_EXTRA_MAKE_ARGS}.base.o \
-			-Wl,--no-as-needed -rdynamic -lc -lm -ldl -pie -fuse-ld=bfd
-		chmod +x ../bin/picolisp
-		$CC -o ../lib/ext -shared -rdynamic -fuse-ld=bfd ${TERMUX_PKG_EXTRA_MAKE_ARGS}.ext.o
-		$CC -o ../lib/ht -shared -rdynamic -fuse-ld=bfd ${TERMUX_PKG_EXTRA_MAKE_ARGS}.ht.o
-	fi
+	cp ../lib $TERMUX_PREFIX/lib/picolisp -r
+	cp ../loc $TERMUX_PREFIX/lib/picolisp -r
+	cp ../src $TERMUX_PREFIX/lib/picolisp -r
+	cp ../test $TERMUX_PREFIX/lib/picolisp -r
+	cp ../doc $TERMUX_PREFIX/lib/picolisp -r
+	cp ../img $TERMUX_PREFIX/lib/picolisp -r
 
-	mkdir -p $TERMUX_PREFIX/share/man/man1
-	cp $TERMUX_PKG_SRCDIR/../man/man1/{pil,picolisp}.1 $TERMUX_PREFIX/share/man/man1/
+	install -d -m755 $TERMUX_PREFIX/share/man/man1
+	install ../man/man1/*.1 -t $TERMUX_PREFIX/share/man/man1
+}
 
-	rm -Rf $TERMUX_PREFIX/lib/picolisp
-	mkdir -p $TERMUX_PREFIX/lib/picolisp
+termux_step_create_debscripts() {
+	cat <<- EOF > ./postinst
+	#!$TERMUX_PREFIX/bin/sh
+	$TERMUX_PREFIX/lib/picolisp/sysdefs-gen > $TERMUX_PREFIX/lib/picolisp/sysdefs
+	EOF
 
-	cp -Rf $TERMUX_PKG_SRCDIR/../* $TERMUX_PREFIX/lib/picolisp/
-	rm -Rf $TERMUX_PREFIX/lib/picolisp/{src,man,java,ersatz}
-
-	# Replace first line "#!/usr/bin/picolisp /usr/lib/picolisp/lib.l":
-	sed -i "1 s|^.*$|#!$TERMUX_PREFIX/bin/picolisp $TERMUX_PREFIX/lib/picolisp/lib.l|g" $TERMUX_PREFIX/lib/picolisp/bin/pil
-
-	( cd $TERMUX_PREFIX/bin && ln -f -s ../lib/picolisp/bin/picolisp picolisp && ln -f -s ../lib/picolisp/bin/pil pil )
-
-	# Bundled tools:
-	$CC $ORIG_CFLAGS $CPPFLAGS $LDFLAGS -o $TERMUX_PREFIX/lib/picolisp/bin/ssl ../src/ssl.c -lssl -lcrypto
-	$CC $ORIG_CFLAGS $CPPFLAGS $LDFLAGS -o $TERMUX_PREFIX/lib/picolisp/bin/httpGate ../src/httpGate.c -lssl -lcrypto
-
-	# Man pages:
-	cp $TERMUX_PKG_SRCDIR/../man/man1/{pil,picolisp}.1 $TERMUX_PREFIX/share/man/man1/
+	cat <<- EOF > ./prerm
+	#!$TERMUX_PREFIX/bin/sh
+	rm -f $TERMUX_PREFIX/lib/picolisp/sysdefs
+	EOF
 }

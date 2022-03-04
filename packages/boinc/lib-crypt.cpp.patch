@@ -1,0 +1,11 @@
+--- ./lib/crypt.cpp.orig	2022-02-19 18:38:44.955894789 +0530
++++ ./lib/crypt.cpp	2022-02-19 18:39:20.225894775 +0530
+@@ -672,7 +672,7 @@
+         }
+ #ifdef HAVE_OPAQUE_RSA_DSA_DH
+         RSA *rsa;
+-        rsa = EVP_PKEY_get0_RSA(pubKey);
++        rsa = (rsa_st*)EVP_PKEY_get0_RSA(pubKey);
+         if (!RSA_blinding_on(rsa, c)) {
+ #else
+         if (!RSA_blinding_on(pubKey->pkey.rsa, c)) {

@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.00
 TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=https://github.com/transmission/transmission.git
 TERMUX_PKG_DEPENDS="libcurl, libevent, miniupnpc, openssl"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-gtk --enable-lightweight --cache-file=termux_configure.cache"

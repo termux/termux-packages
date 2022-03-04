@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/binutils/
 TERMUX_PKG_DESCRIPTION="Collection of binary tools, the main ones being ld, the GNU linker, and as, the GNU assembler"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.37
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_VERSION=2.38
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/binutils/binutils-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=820d9724f020a3e69cb337893a0b63c2db161dadcb0e06fc11dc29eb1e84a32c
+TERMUX_PKG_SHA256=e316477a914f567eccc34d5d29785b8b0f5a10208d36bbacedcc39048ecfe024
 TERMUX_PKG_DEPENDS="libc++, zlib"
 TERMUX_PKG_BREAKS="binutils-dev"
 TERMUX_PKG_REPLACES="binutils-dev"
@@ -26,14 +25,6 @@ termux_step_pre_configure() {
 	else
 		export LIB_PATH="${TERMUX_PREFIX}/lib:/system/lib64"
 	fi
-
-	# Force generation of manpages
-	rm \
-		$TERMUX_PKG_SRCDIR/binutils/doc/*.1 \
-		$TERMUX_PKG_SRCDIR/binutils/doc/cxxfilt.man \
-		$TERMUX_PKG_SRCDIR/gas/doc/as.1 \
-		$TERMUX_PKG_SRCDIR/ld/ld.1 \
-		$TERMUX_PKG_SRCDIR/gprof/gprof.1
 }
 
 termux_step_post_make_install() {

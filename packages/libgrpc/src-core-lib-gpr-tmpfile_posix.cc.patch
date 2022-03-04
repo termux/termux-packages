@@ -1,0 +1,11 @@
+--- a/src/core/lib/gpr/tmpfile_posix.cc
++++ b/src/core/lib/gpr/tmpfile_posix.cc
+@@ -39,7 +39,7 @@
+ 
+   if (tmp_filename != nullptr) *tmp_filename = nullptr;
+ 
+-  gpr_asprintf(&filename_template, "/tmp/%s_XXXXXX", prefix);
++  gpr_asprintf(&filename_template, "@TERMUX_PREFIX@/tmp/%s_XXXXXX", prefix);
+   GPR_ASSERT(filename_template != nullptr);
+ 
+   fd = mkstemp(filename_template);
