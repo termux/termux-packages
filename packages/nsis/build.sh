@@ -24,3 +24,7 @@ termux_step_make_install() {
 		PREFIX="$TERMUX_PREFIX/opt/nsis" \
 		install-compiler
 }
+
+termux_step_post_make_install() {
+        ln -s $PREFIX/opt/makensis $PREFIX/bin/makensis
+}
