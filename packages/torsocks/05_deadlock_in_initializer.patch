@@ -1,0 +1,64 @@
+https://github.com/dgoulet/torsocks/pull/56
+
+From e0e935c1f38f2952375e3fb5e771215035c59064 Mon Sep 17 00:00:00 2001
+From: Tee KOBAYASHI <xtkoba@gmail.com>
+Date: Sat, 5 Mar 2022 09:05:16 +0900
+Subject: [PATCH] Fix deadlock in initializer
+
+Downstream issue: https://github.com/termux/termux-packages/issues/8464
+---
+ src/lib/close.c    |  2 +-
+ src/lib/torsocks.c | 13 ++++++++++++-
+ 2 files changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/src/lib/close.c b/src/lib/close.c
+index 0bf9ea7..efb5967 100644
+--- a/src/lib/close.c
++++ b/src/lib/close.c
+@@ -68,7 +68,7 @@ LIBC_CLOSE_RET_TYPE tsocks_close(LIBC_CLOSE_SIG)
+ LIBC_CLOSE_DECL
+ {
+ 	if (!tsocks_libc_close) {
+-		tsocks_initialize();
++		tsocks_initialize_libc_symbols();
+ 	}
+ 	return tsocks_close(LIBC_CLOSE_ARGS);
+ }
+diff --git a/src/lib/torsocks.c b/src/lib/torsocks.c
+index 16f2da0..8087ed8 100644
+--- a/src/lib/torsocks.c
++++ b/src/lib/torsocks.c
+@@ -47,6 +47,9 @@ struct configuration tsocks_config;
+  */
+ struct onion_pool tsocks_onion_pool;
+ 
++/* Indicate if libc symbols were initialized previously. */
++static TSOCKS_INIT_ONCE(init_libc_symbols_once);
++
+ /* Indicate if the library was initialized previously. */
+ static TSOCKS_INIT_ONCE(init_once);
+ 
+@@ -321,7 +324,7 @@ static void tsocks_init(void)
+ 	 * We need to save libc symbols *before* we override them so torsocks can
+ 	 * use the original libc calls.
+ 	 */
+-	init_libc_symbols();
++	tsocks_once(&init_libc_symbols_once, &init_libc_symbols);
+ 
+ 	/*
+ 	 * Read configuration file and set the global config.
+@@ -695,6 +698,14 @@ void *tsocks_find_libc_symbol(const char *symbol,
+ 	return fct_ptr;
+ }
+ 
++/*
++ * Initialize libc symbols.
++ */
++void __attribute__((constructor)) tsocks_initialize_libc_symbols(void)
++{
++	tsocks_once(&init_libc_symbols_once, &init_libc_symbols);
++}
++
+ /*
+  * Initialize torsocks library.
+  */
