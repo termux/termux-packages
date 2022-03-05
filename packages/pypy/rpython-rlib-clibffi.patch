@@ -1,0 +1,13 @@
+diff -uNr pypy3.7-v7.3.7-src/rpython/rlib/clibffi.py pypy3.7-v7.3.7-src.mod/rpython/rlib/clibffi.py
+--- pypy3.7-v7.3.7-src/rpython/rlib/clibffi.py         2021-10-24 22:07:11.000000000 +0800
++++ pypy3.7-v7.3.7-src.mod/rpython/rlib/clibffi.py     2022-02-15 18:22:50.588792200 +0800
+@@ -277,7 +277,7 @@
+                 "arguments (%d bytes in excess) " % (result,))
+ 
+ if not _WIN32:
+-    libc_name = ctypes.util.find_library('c')
++    libc_name = "libc.so"
+     assert libc_name is not None, "Cannot find C library, ctypes.util.find_library('c') returned None"
+ 
+     def get_libc_name():
+

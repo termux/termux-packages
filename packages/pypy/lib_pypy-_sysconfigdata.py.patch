@@ -1,0 +1,13 @@
+diff -uNr pypy2.7-v7.3.6-src/lib_pypy/_sysconfigdata.py pypy2.7-v7.3.6-src.mod/lib_pypy/_sysconfigdata.py
+--- pypy2.7-v7.3.6-src/lib_pypy/_sysconfigdata.py       2021-10-03 14:36:11.000000000 +0800
++++ pypy2.7-v7.3.6-src.mod/lib_pypy/_sysconfigdata.py   2022-02-08 17:34:58.141093600 +0800
+@@ -3,3 +3,7 @@
+ build_time_vars = {
+     "SO": [s[0] for s in imp.get_suffixes() if s[2] == imp.C_EXTENSION][0]
+ }
++
++# Termux Fix: Add ANDROID_API_LEVEL
++build_time_vars["ANDROID_API_LEVEL"] = 24
++
+
+

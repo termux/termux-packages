@@ -1,0 +1,14 @@
+diff -uNr pypy2.7-v7.3.6-src/lib_pypy/dbm.py pypy2.7-v7.3.6-src.mod/lib_pypy/dbm.py
+--- pypy2.7-v7.3.6-src/lib_pypy/dbm.py      2021-10-03 14:36:11.000000000 +0800
++++ pypy2.7-v7.3.6-src.mod/lib_pypy/dbm.py  2022-02-09 09:35:04.548269800 +0800
+@@ -123,7 +123,9 @@
+         func.restype = restype
+ 
+ if sys.platform != 'darwin':
+-    libpath = ctypes.util.find_library('db')
++    libpath = ctypes.util.find_library('gdbm_compat')
++    if not libpath:
++        libpath = ctype.util.find_library('db')
+     if not libpath:
+         # XXX this is hopeless...
+         for c in ['5.3', '5.2', '5.1', '5.0', '4.9', '4.8', '4.7', '4.6', '4.5']:

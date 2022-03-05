@@ -1,0 +1,22 @@
+diff -uNr pypy3.7-v7.3.7-src/rpython/rlib/rposix.py pypy3.7-v7.3.7-src.mod/rpython/rlib/rposix.py
+--- pypy3.7-v7.3.7-src/rpython/rlib/rposix.py       2021-10-24 22:07:11.000000000 +0800
++++ pypy3.7-v7.3.7-src.mod/rpython/rlib/rposix.py   2022-02-12 18:32:05.555262500 +0800
+@@ -212,7 +212,7 @@
+         includes.append('sys/sysmacros.h')
+     if sys.platform.startswith('freebsd') or sys.platform.startswith('openbsd'):
+         includes.append('sys/ttycom.h')
+-    libraries = ['util']
++    libraries = ['c']
+ 
+ eci = ExternalCompilationInfo(
+     includes=includes,
+
+@@ -2094,6 +2094,8 @@
+         locals()['HAVE_%s' % _name.upper()] = rffi_platform.Has(_name)
+ cConfig = rffi_platform.configure(CConfig)
+ globals().update(cConfig)
++# Remove faccessat, linkat
++HAVE_FACCESSAT = HAVE_LINKAT = False
+ 
+ if not _WIN32:
+     class CConfig:
