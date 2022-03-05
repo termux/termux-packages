@@ -1,18 +1,23 @@
-diff -uNr nim-1.4.0/config/nim.cfg nim-1.4.0.mod/config/nim.cfg
---- nim-1.4.0/config/nim.cfg	2020-10-30 15:23:34.955027000 +0100
-+++ nim-1.4.0.mod/config/nim.cfg	2020-10-30 15:22:59.586260700 +0100
-@@ -136,13 +136,13 @@
+diff -uNr nim-1.6.4/config/nim.cfg nim-1.6.4.mod/config/nim.cfg
+--- nim-1.6.4/config/nim.cfg	2022-02-09 06:12:37.000000000 +0530
++++ nim-1.6.4.mod/config/nim.cfg	2022-03-05 12:08:06.184549530 +0530
+@@ -130,13 +130,13 @@
  
  @if android:
    cc = clang
 -  @if termux:
-+#  @if termux:
-     gcc.options.linker = "-landroid-glob"
-     gcc.cpp.options.linker = "-landroid-glob"
-     clang.options.linker = "-landroid-glob"
-     clang.cpp.options.linker = "-landroid-glob"
-     tcc.options.linker = "-landroid-glob"
+-    gcc.options.linker = "-landroid-glob"
+-    gcc.cpp.options.linker = "-landroid-glob"
+-    clang.options.linker = "-landroid-glob"
+-    clang.cpp.options.linker = "-landroid-glob"
+-    tcc.options.linker = "-landroid-glob"
 -  @end
++#  @if termux:
++    gcc.options.linker = "-landroid-glob -Wl,-rpath=@TERMUX_PREFIX@/lib/openssl-1.1"
++    gcc.cpp.options.linker = "-landroid-glob -Wl,-rpath=@TERMUX_PREFIX@/lib/openssl-1.1"
++    clang.options.linker = "-landroid-glob -Wl,-rpath=@TERMUX_PREFIX@/lib/openssl-1.1"
++    clang.cpp.options.linker = "-landroid-glob -Wl,-rpath=@TERMUX_PREFIX@/lib/openssl-1.1"
++    tcc.options.linker = "-landroid-glob -Wl,-rpath=@TERMUX_PREFIX@/lib/openssl-1.1"
 +#  @end
  @end
  
