@@ -18,7 +18,19 @@ termux_download_deb_pac() {
 	for idx in $(seq ${#TERMUX_REPO_URL[@]}); do
 		local TERMUX_REPO_NAME=$(echo ${TERMUX_REPO_URL[$idx-1]} | sed -e 's%https://%%g' -e 's%http://%%g' -e 's%/%-%g')
 		local PACKAGE_FILE_PATH="${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-${TERMUX_REPO_COMPONENT[$idx-1]}-Packages"
-		if [ ! -f "${TERMUX_COMMON_CACHEDIR}-${PACKAGE_ARCH}/${PACKAGE_FILE_PATH}" ] && \
+		if [ "${PACKAGE_ARCH}" = 'all' ]; then
+			for arch in 'aarch64' 'arm' 'i686' 'x86_64'; do
+				if [ -f "${TERMUX_COMMON_CACHEDIR}-${arch}/${PACKAGE_FILE_PATH}" ]; then
+					read -d "\n" PKG_PATH PKG_HASH <<<$(./scripts/get_hash_from_file.py "${TERMUX_COMMON_CACHEDIR}-${arch}/$PACKAGE_FILE_PATH" $PACKAGE $VERSION)
+					if [ -n "$PKG_HASH" ]; then
+						if [ ! "$TERMUX_QUIET_BUILD" = true ]; then
+							echo "Found $PACKAGE in ${TERMUX_REPO_URL[$idx-1]}/dists/${TERMUX_REPO_DISTRIBUTION[$idx-1]}"
+						fi
+						break 2
+					fi
+				fi
+			done
+		elif [ ! -f "${TERMUX_COMMON_CACHEDIR}-${PACKAGE_ARCH}/${PACKAGE_FILE_PATH}" ] && \
 			[ -f "${TERMUX_COMMON_CACHEDIR}-aarch64/${PACKAGE_FILE_PATH}" ]; then
 			# Packages file for $PACKAGE_ARCH did not
 			# exist. Could be an aptly mirror where the

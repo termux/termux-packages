@@ -33,9 +33,9 @@ termux_step_setup_variables() {
 	: "${TERMUX_PKG_MAINTAINER:="default"}"
 
 	TERMUX_REPO_URL=(
-		https://packages-cf.termux.org/apt/termux-main
-		https://packages-cf.termux.org/apt/termux-root
-		https://packages-cf.termux.org/apt/termux-x11
+		https://grimler.se/termux-packages-24
+		https://grimler.se/termux-root-packages-24
+		https://grimler.se/x11-packages
 	)
 
 	TERMUX_REPO_DISTRIBUTION=(
