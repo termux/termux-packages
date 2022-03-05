@@ -56,7 +56,7 @@ termux_step_make() {
 			koch) nim_flags="--opt:size" ;;
 			*) nim_flags= ;;
 		esac
-		nim --cc:clang --clang.exe=$CC --clang.linkerexe=$CC $nim_flags --define:termux -d:release --os:android --cpu:$NIM_ARCH  -t:"$CPPFLAGS $CFLAGS" -l:"$LDFLAGS -landroid-glob" -d:tempDir:$TERMUX_PREFIX/tmp c $(basename $cmd).nim
+		nim --cc:clang --clang.exe=$CC --clang.linkerexe=$CC $nim_flags --define:termux -d:release -d:sslVersion=1.1 --os:android --cpu:$NIM_ARCH  -t:"$CPPFLAGS $CFLAGS" -l:"$LDFLAGS -landroid-glob" -d:tempDir:$TERMUX_PREFIX/tmp c $(basename $cmd).nim
 		popd
 	done
 }
