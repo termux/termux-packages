@@ -10,6 +10,8 @@ TERMUX_PKG_DEPENDS="libllvm,ncurses,man,play-audio,termux-api,wget"
 termux_step_pre_configure() {
     mkdir -p $TERMUX_PREFIX/opt/predict
     echo ${TERMUX_PKG_VERSION} > $TERMUX_PREFIX/opt/predict/.version
+}
+
+termux_step_post_configure() {
     cp -ar * $TERMUX_PREFIX/opt/predict
-    cd $TERMUX_PREFIX/opt/predict
 }
