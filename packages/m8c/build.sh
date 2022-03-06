@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/laamaa/m8c
 TERMUX_PKG_DESCRIPTION="UI for the M8 and M8 Headless hardware music tracker"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_MAINTAINER="Alexander F. Rødseth <xyproto@archlinux.org>"
 TERMUX_PKG_VERSION=1.0.3
 TERMUX_PKG_SRCURL=https://github.com/laamaa/m8c/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=1607582c701da72b1808a00c388bccb01180e9d64c979ffae388b101e2c6de0b
-TERMUX_PKG_DEPENDS="sdl2 libserialport"
+TERMUX_PKG_DEPENDS="libserialport, sdl2"
 TERMUX_PKG_BUILD_IN_SRC=true
