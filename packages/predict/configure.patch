@@ -1,0 +1,111 @@
+diff -uNr predict-2.2.7/configure predict-2.2.7.mod/configure
+--- predict-2.2.7/configure	2020-10-12 06:49:02.000000000 +0800
++++ predict-2.2.7.mod/configure	2022-03-06 11:52:57.500000000 +0800
+@@ -1,65 +1,42 @@
+-#!/bin/bash
+-# Script to compile and install
+-# PREDICT under a termux environment
+-# KD2BD -- October 2020
+-
+-# Install all the required tools (if necessary). 
+-
+-if [ ! -x /data/data/com.termux/files/usr/bin/gcc ]; then
+-	pkg install gcc
+-fi
+-
+-if [ ! -e /data/data/com.termux/files/usr/lib/libcurses.so ]; then
+-	pkg install ncurses
+-fi
+-
+-if [ ! -e /data/data/com.termux/files/usr/bin/man ]; then
+-	pkg install man
+-fi
+-
+-if [ ! -x /data/data/com.termux/files/usr/bin/play-audio ]; then
+-	pkg install play-audio
+-fi
+-
+-if [ ! -x /data/data/com.termux/files/usr/bin/termux-volume ]; then
+-	pkg install term-api
+-fi
+-
+-if [ ! -x /data/data/com.termux/files/usr/bin/wget ]; then
+-	pkg install wget
+-fi
+-
+-# Now configure, compile, and install PREDICT, vocalizer,
+-# the kepupdate script, and PREDICT's man page.
+- 
+-echo "char *predictpath={\"`pwd`/\"}, soundcard=1, *version={\"`cat .version`\"};" > predict.h
+-
+-echo "char *path={\"`pwd`/vocalizer/\"};" > vocalizer/vocalizer.h
+-
+-rm -f predict
+-echo -n "Compiling PREDICT version `cat .version`... "
+-
+-cc -Wall -O3 -s -fomit-frame-pointer predict.c -lm -lncurses -o predict
+-
+-if [ -x predict ]; then
+-	ln -sf `pwd`/predict /data/data/com.termux/files/usr/bin/predict
+-	echo "Built and installed!"
+-else
+-	echo "PREDICT compilation failed!  :-("
+-fi
+-
+-cd `pwd`/vocalizer
+-./build
+-cd ..
+-
+-if [ -x kepupdate ]; then
+-	ln -sf `pwd`/kepupdate /data/data/com.termux/files/usr/bin/kepupdate
+-	echo "The kepupdate script has been installed!"
+-fi
+-
+-gzip -c `pwd`/docs/man/predict.1 > /data/data/com.termux/files/usr/share/man/man1/predict.1.gz
+-
+-if [ -e /data/data/com.termux/files/usr/share/man/man1/predict.1.gz ]; then
+-	echo "PREDICT's man page has been installed!"
+-fi
+-
++#!/bin/bash
++# Script to compile and install
++# PREDICT under a termux environment
++# KD2BD -- October 2020
++
++# Now configure, compile, and install PREDICT, vocalizer,
++# the kepupdate script, and PREDICT's man page.
++installpath=$TERMUX_PREFIX/opt/predict
++
++cp -r * $installpath
++
++cd $installpath
++echo "char *predictpath={\"$installpath/\"}, soundcard=1, *version={\"`cat $installpath/.version`\"};" > predict.h
++
++echo "char *path={\"$installpath/vocalizer/\"};" > vocalizer/vocalizer.h
++
++rm -f predict
++echo -n "Compiling PREDICT version `cat $installpath.version`... "
++
++cc -Wall -O3 -s -fomit-frame-pointer predict.c -lm -lncurses -o predict
++
++if [ -x predict ]; then
++	ln -sf $installpath/predict /data/data/com.termux/files/usr/bin/predict
++	echo "Built and installed!"
++else
++	echo "PREDICT compilation failed!  :-("
++fi
++
++cd $installpath/vocalizer
++./build
++cd ..
++
++if [ -x kepupdate ]; then
++	ln -sf $installpath/kepupdate /data/data/com.termux/files/usr/bin/kepupdate
++	echo "The kepupdate script has been installed!"
++fi
++
++gzip -c $installpath/docs/man/predict.1 > /data/data/com.termux/files/usr/share/man/man1/predict.1.gz
++
++if [ -e /data/data/com.termux/files/usr/share/man/man1/predict.1.gz ]; then
++	echo "PREDICT's man page has been installed!"
++fi
