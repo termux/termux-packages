@@ -11,7 +11,3 @@ termux_step_pre_configure() {
     mkdir -p $TERMUX_PREFIX/opt/predict
     echo ${TERMUX_PKG_VERSION} > $TERMUX_PREFIX/opt/predict/.version
 }
-
-termux_step_post_configure() {
-    cp -ar * $TERMUX_PREFIX/opt/predict
-}
