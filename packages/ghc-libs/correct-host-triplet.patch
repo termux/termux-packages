@@ -1,0 +1,37 @@
+From: Aditya Alok <dev.aditya.alok@gmail.com>
+
+Signed-off-by: Aditya Alok <dev.aditya.alok@gmail.com>
+
+--- ghc-8.10.7/libraries/Cabal/Cabal/Distribution/Simple.hs	2022-02-09 09:22:38.381445950 +0530
++++ ghc-8.10.7-patch/libraries/Cabal/Cabal/Distribution/Simple.hs	2022-03-05 12:03:02.509066261 +0530
+@@ -105,10 +105,20 @@
+ import Distribution.Compat.Environment      (getEnvironment)
+ import Distribution.Compat.GetShortPathName (getShortPathName)
+
+-import Data.List       (unionBy, (\\))
++import Data.List       (unionBy, (\\), take, drop, isInfixOf)
+
+ import Distribution.PackageDescription.Parsec
+
++correctHostTriplet :: String -> String
++correctHostTriplet s = do
++    if isInfixOf "-android" s
++      then
++        let arch = take (length s -8) ( drop 0 s ) -- drop "-android"
++        in
++          if arch == "arm" then "armv7a" else arch ++ "-linux-"
++            ++ if arch == "arm" then "androideabi" else "android"
++      else s
++
+ -- | A simple implementation of @main@ for a Cabal setup script.
+ -- It reads the package description file using IO, and performs the
+ -- action specified on the command line.
+@@ -754,7 +764,7 @@
+       overEnv = ("CFLAGS", Just cflagsEnv) :
+                 [("PATH", Just pathEnv) | not (null extraPath)]
+       hp = hostPlatform lbi
+-      maybeHostFlag = if hp == buildPlatform then [] else ["--host=" ++ show (pretty hp)]
++      maybeHostFlag = if hp == buildPlatform then [] else ["--host=" ++ correctHostTriplet (show (pretty hp))]
+       args' = configureFile':args ++ ["CC=" ++ ccProgShort] ++ maybeHostFlag
+       shProg = simpleProgram "sh"
+       progDb = modifyProgramSearchPath
