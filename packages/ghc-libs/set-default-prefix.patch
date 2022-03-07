@@ -1,0 +1,11 @@
+--- ghc-8.10.7/libraries/Cabal/Cabal/Distribution/Simple/InstallDirs.hs	2021-05-25 20:11:34.000000000 +0530
++++ ghc-8.10.7-patch/libraries/Cabal/Cabal/Distribution/Simple/InstallDirs.hs	2022-02-03 22:24:07.081585076 +0530
+@@ -193,7 +193,7 @@
+       else case buildOS of
+            Windows -> do windowsProgramFilesDir <- getWindowsProgramFilesDir
+                          return (windowsProgramFilesDir </> "Haskell")
+-           _       -> return "/usr/local"
++           _       -> return "@TERMUX_PREFIX@"
+   installLibDir <-
+       case buildOS of
+       Windows -> return "$prefix"
