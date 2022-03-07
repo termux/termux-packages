@@ -200,7 +200,7 @@ jobs:
               --user-agent "Termux-Packages/1.0 (https://github.com/termux/termux-packages)" \
               --request DELETE \
               --write-out "|%{http_code}" \
-              https://packages.termux.org/aptly-api/files/${REPOSITORY_NAME}-${{ github.sha }}
+              https://packages-cf.termux.org/aptly-api/files/${REPOSITORY_NAME}-${{ github.sha }}
           )
 
           http_status_code=$(echo "$curl_response" | cut -d'|' -f2 | grep -oP '\d{3}$')
@@ -224,7 +224,7 @@ jobs:
               --request POST \
               --form file=@${filename} \
               --write-out "|%{http_code}" \
-              https://packages.termux.org/aptly-api/files/${REPOSITORY_NAME}-${{ github.sha }} || true
+              https://packages-cf.termux.org/aptly-api/files/${REPOSITORY_NAME}-${{ github.sha }} || true
           )
 
           http_status_code=$(echo "$curl_response" | cut -d'|' -f2 | grep -oP '\d{3}$')
