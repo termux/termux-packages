@@ -112,6 +112,7 @@ termux_step_setup_variables() {
 	TERMUX_PKG_METAPACKAGE=false
 	TERMUX_PKG_NO_ELF_CLEANER=false # set this to true to disable running of termux-elf-cleaner on built binaries
 	TERMUX_PKG_NO_STATICSPLIT=false
+	TERMUX_PKG_STATICSPLIT_EXTRA_PATTERNS=""
 	TERMUX_PKG_PACKAGEDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/package
 	TERMUX_PKG_PLATFORM_INDEPENDENT=false
 	TERMUX_PKG_PRE_DEPENDS=""
@@ -127,6 +128,7 @@ termux_step_setup_variables() {
 	TERMUX_PKG_SERVICE_SCRIPT=() # Fill with entries like: ("daemon name" 'script to execute'). Script is echoed with -e so can contain \n for multiple lines
 	TERMUX_PKG_GROUPS="" # https://wiki.archlinux.org/title/Pacman#Installing_package_groups
 	TERMUX_PKG_NO_SHEBANG_FIX=false # if true, skip fixing shebang accordingly to TERMUX_PREFIX
+	TERMUX_PKG_IS_HASKELL_LIB=true # by default assume haskell package is lib package as most of them will always be libs.
 
 	unset CFLAGS CPPFLAGS LDFLAGS CXXFLAGS
 }
