@@ -1,0 +1,39 @@
+https://github.com/eafer/rdrview/pull/28
+
+From bc65f4430b34a05499d12fb846f61f58297efb2e Mon Sep 17 00:00:00 2001
+From: Tee KOBAYASHI <xtkoba@gmail.com>
+Date: Mon, 7 Mar 2022 10:39:40 +0900
+Subject: [PATCH] Add seccomp rules for Android
+
+---
+ src/sandbox.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/src/sandbox.c b/src/sandbox.c
+index ee0f676..c46f0a2 100644
+--- a/src/sandbox.c
++++ b/src/sandbox.c
+@@ -23,6 +23,10 @@
+ 
+ #include <seccomp.h>
+ 
++#ifdef __ANDROID__
++#include <sys/mman.h>
++#endif
++
+ static void do_start_sandbox(void)
+ {
+ 	scmp_filter_ctx ctx;
+@@ -44,6 +48,12 @@ static void do_start_sandbox(void)
+ 	fail |= seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(mmap), 0);
+ 	fail |= seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(mmap2), 0);
+ 	fail |= seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(munmap), 0);
++#ifdef __ANDROID__
++	fail |= seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(madvise), 1,
++	                         SCMP_A2_32(SCMP_CMP_EQ, MADV_DONTNEED, 0));
++	fail |= seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(mprotect), 1,
++	                         SCMP_A2_32(SCMP_CMP_MASKED_EQ, ~(PROT_READ|PROT_WRITE), 0));
++#endif
+ 
+ 	fail |= seccomp_load(ctx);
+ 	if (fail)
