@@ -70,10 +70,10 @@ termux_setup_ghc_cross_compiler() {
 			echo "Package 'ghc' is not installed."
 			exit 1
 		else
+			local ON_DEVICE_GHC_BIN="${TERMUX_COMMON_CACHEDIR}/${GHC_PREFIX}-runtime"
 			export PATH="${ON_DEVICE_GHC_BIN}:${PATH}"
 			[ -d "${ON_DEVICE_GHC_BIN}" ] && return
 
-			local ON_DEVICE_GHC_BIN="${TERMUX_COMMON_CACHEDIR}/${GHC_PREFIX}-runtime"
 			mkdir -p "${ON_DEVICE_GHC_BIN}"
 			for tool in ghc ghc-pkg hsc2hs hp2ps; do
 				ln -sf "${TERMUX_PREFIX}/bin/${tool}" "${ON_DEVICE_GHC_BIN}/termux-${tool}"
