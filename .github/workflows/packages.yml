@@ -181,67 +181,22 @@ jobs:
       env:
         REPOSITORY_NAME: termux-main
         REPOSITORY_DISTRIBUTION: stable
+        REPOSITORY_URL: https://packages-cf.termux.org/aptly-api
       run: |
+        GITHUB_SHA=${{ github.sha }}
+        APTLY_API_AUTH=${{ secrets.APTLY_API_AUTH }}
+
+        source scripts/aptly_api.sh
+
         for archive in termux-packages-*/*.tar; do
           tar xf "$archive"
         done
-
-        # Function for deleting temporary directory with uploaded files from
-        # the server.
-        aptly_delete_dir() {
-          echo "[$(date +%H:%M:%S)] Deleting uploads temporary directory..."
-
-          curl_response=$(
-            curl \
-              --silent \
-              --retry 2 \
-              --retry-delay 3 \
-              --user "${{ secrets.APTLY_API_AUTH }}" \
-              --user-agent "Termux-Packages/1.0 (https://github.com/termux/termux-packages)" \
-              --request DELETE \
-              --write-out "|%{http_code}" \
-              https://packages-cf.termux.org/aptly-api/files/${REPOSITORY_NAME}-${{ github.sha }}
-          )
-
-          http_status_code=$(echo "$curl_response" | cut -d'|' -f2 | grep -oP '\d{3}$')
-
-          if [ "$http_status_code" != "200" ]; then
-            echo "[$(date +%H:%M:%S)] Warning: server returned $http_status_code code while deleting temporary directory."
-          fi
-        }
 
         # Upload file to temporary directory.
         uploaded_files=false
         shopt -s nullglob
         for filename in $(cat debs/built_packages.txt | sed -E 's/(..*)/debs\/\1_\*.deb debs\/\1-static_\*.deb/g'); do
-          curl_response=$(
-            curl \
-              --silent \
-              --retry 2 \
-              --retry-delay 3 \
-              --user "${{ secrets.APTLY_API_AUTH }}" \
-              --user-agent "Termux-Packages/1.0 (https://github.com/termux/termux-packages)" \
-              --request POST \
-              --form file=@${filename} \
-              --write-out "|%{http_code}" \
-              https://packages-cf.termux.org/aptly-api/files/${REPOSITORY_NAME}-${{ github.sha }} || true
-          )
-
-          http_status_code=$(echo "$curl_response" | cut -d'|' -f2 | grep -oP '\d{3}$')
-
-          if [ "$http_status_code" = "200" ]; then
-            echo "[$(date +%H:%M:%S)] Uploaded: $(echo "$curl_response" | cut -d'|' -f1 | jq -r '.[]' | cut -d'/' -f2)"
-          elif [ "$http_status_code" = "000" ]; then
-            echo "[$(date +%H:%M:%S)]: Failed to upload '$filename'. Server/proxy dropped connection during upload."
-            echo "[$(date +%H:%M:%S)]: Aborting any further uploads."
-            aptly_delete_dir
-            exit 1
-          else
-            # Manually cleaning up the temporary directory to reclaim disk space.
-            # Don't rely on scheduled server-side scripts.
-            echo "[$(date +%H:%M:%S)] Error: failed to upload '$filename'. Server returned $http_status_code code."
-            echo "[$(date +%H:%M:%S)] Aborting any further uploads."
-            aptly_delete_dir
+          if ! aptly_upload_file "$filename"; then
             exit 1
           fi
 
@@ -251,69 +206,14 @@ jobs:
 
         # Publishing repository changes.
         if [ "$uploaded_files" = "true" ]; then
-          echo "[$(date +%H:%M:%S)] Adding packages to repository '$REPOSITORY_NAME'..."
-          http_status_code=""
-          curl_response=$(
-            curl \
-              --silent \
-              --retry 2 \
-              --retry-delay 3 \
-              --max-time 300 \
-              --user "${{ secrets.APTLY_API_AUTH }}" \
-              --user-agent "Termux-Packages/1.0 (https://github.com/termux/termux-packages)" \
-              --request POST \
-              --write-out "|%{http_code}" \
-              https://packages-cf.termux.org/aptly-api/repos/${REPOSITORY_NAME}/file/${REPOSITORY_NAME}-${{ github.sha }} || true
-          )
-          http_status_code=$(echo "$curl_response" | cut -d'|' -f2 | grep -oP '\d{3}$')
-
-          if [ "$http_status_code" = "200" ]; then
-            warnings=$(echo "$curl_response" | cut -d'|' -f1 | jq '.Report.Warnings' | jq -r '.[]')
-            if [ -n "$warnings" ]; then
-              echo "[$(date +%H:%M:%S)] APTLY WARNINGS (NON-CRITICAL):"
-              echo
-              echo "$warnings"
-              echo
-            fi
-          else
-            echo "[$(date +%H:%M:%S)] Error: got http_status_code == '$http_status_code', packages may not appear in repository."
-          fi
+          aptly_add_to_repo
 
           # Usually temporary directory is deleted automatically, but in certain cases it is left.
           aptly_delete_dir
 
           # Final part to make changes appear in web root.
           echo "[$(date +%H:%M:%S)] Publishing repository changes..."
-          http_status_code=""
-          curl_response=$(
-            curl \
-              --silent \
-              --retry 2 \
-              --retry-delay 3 \
-              --max-time 300 \
-              --user "${{ secrets.APTLY_API_AUTH }}" \
-              --user-agent "Termux-Packages/1.0 (https://github.com/termux/termux-packages)" \
-              --header 'Content-Type: application/json' \
-              --request PUT \
-              --data '{"Signing": {"Passphrase": "${{ secrets.GPG_PASSPHRASE }}"}}' \
-              --write-out '|%{http_code}' \
-              https://packages-cf.termux.org/aptly-api/publish/${REPOSITORY_NAME}/${REPOSITORY_DISTRIBUTION} || true
-          )
-          http_status_code=$(echo "$curl_response" | cut -d'|' -f2 | grep -oP '\d{3}$')
-
-          if [ "$http_status_code" = "200" ]; then
-            echo "[$(date +%H:%M:%S)] Repository has been updated successfully."
-          elif [ "$http_status_code" = "000" ]; then
-            echo "[$(date +%H:%M:%S)] Warning: server/proxy has dropped connection."
-            # Ignore - nothing can be done with that unless we change proxy.
-            #exit 1
-          elif [ "$http_status_code" = "504" ]; then
-            echo "[$(date +%H:%M:%S)] Warning: request processing time was too long, connection dropped."
-            # Ignore - nothing can be done with that unless we change repository
-            # management tool or reduce repository size.
-            #exit 1
-          else
-            echo "[$(date +%H:%M:%S)] Error: got http_status_code == '$http_status_code'"
+          if ! aptly_publish_repo; then
             exit 1
           fi
         fi
