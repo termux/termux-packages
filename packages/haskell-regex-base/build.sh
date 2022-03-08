@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE="https://wiki.haskell.org/Regular_expressions"
-TERMUX_PKG_DESCRIPTION="Common "Text.Regex.*" API for Regex matching"
+TERMUX_PKG_DESCRIPTION="Common 'Text.Regex.*' API for Regex matching"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="Aditya Alok <dev.aditya.alok@gmail.com>"
 TERMUX_PKG_VERSION="0.94.0.2"
