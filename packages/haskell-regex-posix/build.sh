@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE="https://hackage.haskell.org/package/regex-posix"
-TERMUX_PKG_DESCRIPTION="POSIX Backend for "Text.Regex" (regex-base)"
+TERMUX_PKG_DESCRIPTION="POSIX Backend for 'Text.Regex' (regex-base)"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="Aditya Alok <dev.aditya.alok@gmail.com>"
 TERMUX_PKG_VERSION="0.96.0.1"
