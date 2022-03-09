@@ -105,6 +105,12 @@ termux_step_configure_haskell_build() {
 	AVOID_GNULIB+=" gl_cv_header_working_fcntl_h=yes"
 	AVOID_GNULIB+=" gl_cv_C_locale_sans_EILSEQ=yes"
 
+	LLVM_BACKEND=""
+	[ "${TERMUX_ARCH}" != "i686" ] && {
+		LLVM_BACKEND="-fllvm --ghc-option=-fllvm"
+	}
+	[ "$TERMUX_DEBUG_BUILD" = "true" ] && OPTIMISATION="-O0" || OPTIMISATION="-O"
+
 	# Some packages rely on cabal build, therefore they may not have Setup.hs, (though very rare case)
 	# as cabal has that configured by default.
 	if [ ! -f "${TERMUX_PKG_SRCDIR}/Setup.hs" ] && [ ! -f "${TERMUX_PKG_SRCDIR}/Setup.lhs" ]; then
@@ -112,13 +118,6 @@ termux_step_configure_haskell_build() {
 		echo "Using default Setup.hs..."
 		cp "${TERMUX_SCRIPTDIR}/scripts/build/haskell-build/default-setup.hs" "${TERMUX_PKG_SRCDIR}/Setup.hs"
 	fi
-
-	LLVM_BACKEND=""
-	[ "${TERMUX_ARCH}" != "i686" ] && {
-		LLVM_BACKEND="-fllvm --ghc-option=-fllvm"
-	}
-
-	[ "$TERMUX_DEBUG_BUILD" = "true" ] && OPTIMISATION="-O0" || OPTIMISATION="-O"
 
 	# NOTE: We do not want to quote AVOID_GNULIB as we want word expansion.
 	# shellcheck disable=SC2086
