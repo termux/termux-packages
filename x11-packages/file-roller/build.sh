@@ -1,4 +1,3 @@
-# Builds fail in "ninja install"
 TERMUX_PKG_HOMEPAGE=https://wiki.gnome.org/Apps/FileRoller
 TERMUX_PKG_DESCRIPTION="File Roller is an archive manager for the GNOME desktop environment."
 TERMUX_PKG_LICENSE="GPL-2.0"
