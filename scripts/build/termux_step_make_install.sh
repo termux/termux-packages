@@ -3,27 +3,7 @@ termux_step_make_install() {
 
 	if test -f build.ninja; then
 		ninja -w dupbuild=warn -j $TERMUX_MAKE_PROCESSES install
-	elif ls ./*.cabal &>/dev/null; then
-		runhaskell Setup copy
-		if [ "${TERMUX_PKG_IS_HASKELL_LIB}" = true ]; then
-			runhaskell Setup register --gen-script
-			runhaskell Setup unregister --gen-script
-
-			install -Dm744 register.sh "${TERMUX_PREFIX}"/share/haskell/register/"${TERMUX_PKG_NAME}".sh
-			install -Dm744 unregister.sh "${TERMUX_PREFIX}"/share/haskell/unregister/"${TERMUX_PKG_NAME}".sh
-
-			sed -i -r -e "s|$(command -v termux-ghc-pkg)|${TERMUX_PREFIX}/bin/ghc-pkg|g" \
-				-e "s|ghc-pkg.*update[^ ]* |&'--force' |" \
-				-e "s|export PATH=.*||g" \
-				"${TERMUX_PREFIX}"/share/haskell/register/"${TERMUX_PKG_NAME}".sh
-
-			sed -i -r -e "s|$(command -v termux-ghc-pkg)|${TERMUX_PREFIX}/bin/ghc-pkg|g" \
-				-e "s|export PATH=.*||g" \
-				-e "s|ghc-pkg.*unregister[^ ]* |&'--force' |" \
-				"${TERMUX_PREFIX}"/share/haskell/unregister/"${TERMUX_PKG_NAME}".sh
-		fi
-
-	elif ls ./*akefile &>/dev/null || [ -n "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
+	elif ls ./*akefile &> /dev/null || [ -n "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
 		: "${TERMUX_PKG_MAKE_INSTALL_TARGET:="install"}"
 		# Some packages have problem with parallell install, and it does not buy much, so use -j 1.
 		if [ -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
