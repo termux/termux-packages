@@ -217,3 +217,45 @@ jobs:
             exit 1
           fi
         fi
+    - name: Upload to grimler.se
+      # Run even if upload to packages.termux.org failed:
+      if: always()
+      env:
+        REPOSITORY_NAME: termux-main
+        REPOSITORY_DISTRIBUTION: stable
+        REPOSITORY_URL: https://aptly-api.grimler.se
+      run: |
+        GITHUB_SHA=${{ github.sha }}
+        APTLY_API_AUTH=${{ secrets.APTLY_API_AUTH }}
+
+        source scripts/aptly_api.sh
+
+        for archive in termux-packages-*/*.tar; do
+          tar xf "$archive"
+        done
+
+        # Upload file to temporary directory.
+        uploaded_files=false
+        shopt -s nullglob
+        for filename in $(cat debs/built_packages.txt | sed -E 's/(..*)/debs\/\1_\*.deb debs\/\1-static_\*.deb/g'); do
+          if ! aptly_upload_file "$filename"; then
+            exit 1
+          fi
+
+          uploaded_files=true
+        done
+        shopt -u nullglob
+
+        # Publishing repository changes.
+        if [ "$uploaded_files" = "true" ]; then
+          aptly_add_to_repo
+
+          # Usually temporary directory is deleted automatically, but in certain cases it is left.
+          aptly_delete_dir
+
+          # grimler.se mirror is signed manually, can't publish
+          # through CI
+          # if ! aptly_publish_repo; then
+          #   exit 1
+          # fi
+        fi
