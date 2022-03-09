@@ -86,6 +86,9 @@ termux_step_massage() {
 		termux_create_pacman_subpackages
 	fi
 
+	# Remove unnecessary files in haskell pacakges:
+	test -d ./lib/ghc-* && rm -rf ./lib/ghc-* 2>/dev/null # Remove full ghc-* dir since cross compiler installs packages in "./lib/${TERMUX_ARCH}-android-ghc-X.Y.Z"
+
 	# .. remove empty directories (NOTE: keep this last):
 	find . -type d -empty -delete
 }
