@@ -1,7 +1,4 @@
 # Utility function to setup a GHC cross-compiler toolchain targeting Android.
-# This function should be called before termux_create_timestamp. By default,
-# it will be called automatically by `termux_step_get_dependencies` if `ghc-libs` or `ghc-libs-static`
-# is in dependency of the package.
 termux_setup_ghc_cross_compiler() {
 	local TERMUX_GHC_VERSION="8.10.7"
 	local GHC_PREFIX="ghc-cross-${TERMUX_GHC_VERSION}-${TERMUX_ARCH}"
@@ -14,8 +11,25 @@ termux_setup_ghc_cross_compiler() {
 			TERMUX_GHC_RUNTIME_FOLDER="${TERMUX_COMMON_CACHEDIR}/${GHC_PREFIX}-runtime"
 		fi
 
-		local GHC_BIN="${TERMUX_GHC_RUNTIME_FOLDER}/${TERMUX_ARCH}/bin"
+		local GHC_BIN="${TERMUX_GHC_RUNTIME_FOLDER}/${TERMUX_ARCH}"
 		local TERMUX_GHC_TAR="${TERMUX_COMMON_CACHEDIR}/${GHC_PREFIX}.tar.xz"
+
+		test -d "${TERMUX_PREFIX}/lib/ghc-${TERMUX_GHC_VERSION}" ||
+			termux_error_exit "Package 'ghc-libs' is not installed. It is required by GHC cross-compiler." \
+				"You should specify it in 'TERMUX_PKG_BUILD_DEPENDS'."
+
+		# Register dependency haskell packages with termux-ghc-pkg.
+		IFS=',' read -r -a DEP <<<"${TERMUX_PKG_DEPENDS},${TERMUX_PKG_BUILD_DEPENDS}"
+		for dep in "${DEP[@]}"; do
+			if [[ "${dep}" == haskell-* ]]; then
+				echo "Dependency '${pkg}' is a haskell package, registering it with ghc-pkg..."
+				sed "s|${TERMUX_PREFIX}/bin/ghc-pkg|$(command -v termux-ghc-pkg)|g" \
+					"${TERMUX_PREFIX}/share/haskell/register/${pkg}.sh" | sh
+				termux-ghc-pkg recache
+				# NOTE: Above command rewrites a cache file at "${TERMUX_PREFIX}/lib/ghc-${TERMUX_GHC_VERSION}/package.conf.d".
+			# Since it is done after timestamp creation, we need to remove it in massage step.
+			fi
+		done
 
 		export PATH="${GHC_BIN}:${PATH}"
 
@@ -23,10 +37,10 @@ termux_setup_ghc_cross_compiler() {
 
 		local CHECKSUMS="$(
 			cat <<-EOF
-				aarch64:f0324496eb5c072465f614a03492743ae28270d1844f08129ebc2b2f3148d331
-				arm:c7e2850d2b6e0905d7f68eb1be7119759c2e50ef0bff7243e58b86172d710a80
-				i686:86d7b38371b9098425b1abbffa667237f2624e079e3c65636b78f1b737e74891
-				x86_64:2704c3f8d8bea7e2c7fc9288fd3a197aca889123fa7283e44492b7e0197853b0
+				aarch64:1f0fb1579f0afa53a67bb2f20a8c270e971a955a1e508377628d6fe22e2254e1
+				arm:e79b1819537b49592cae9009d18baf610217bbc6c553c2f02d1bc8fe3de63704
+				i686:5ffd15446e1540fb2a75c10b97d5b426037540c024720337a7f9e297e599a749
+				x86_64:f78049742d0169054f289168833d35b06b464330b9236b13f3b8f38ddc87505b
 			EOF
 		)"
 
@@ -34,33 +48,32 @@ termux_setup_ghc_cross_compiler() {
 			"${TERMUX_GHC_TAR}" \
 			"$(echo "${CHECKSUMS}" | grep -w "${TERMUX_ARCH}" | cut -d ':' -f 2)"
 
-		(
-			if tar -tf "${TERMUX_GHC_TAR}" | grep "^./$" >/dev/null; then
-				# Strip prefixed ./, to avoid possible
-				# permission errors from tar
-				tar -xf "${TERMUX_GHC_TAR}" --strip-components=1 \
-					--no-overwrite-dir -C /
-			else
-				tar -xf "${TERMUX_GHC_TAR}" --no-overwrite-dir -C /
-			fi
-		)
+		mkdir -p "${GHC_BIN}"
+
+		tar -xf "${TERMUX_GHC_TAR}" -C "${TERMUX_GHC_RUNTIME_FOLDER}"
 
 		local _HOST="${TERMUX_HOST_PLATFORM}"
 		[ "${TERMUX_ARCH}" = "arm" ] && _HOST="armv7a-linux-androideabi"
 
-		mkdir -p "${GHC_BIN}"
-		for tool in ghc ghc-pkg hsc2hs hp2ps; do
-			ln -sf "${TERMUX_PREFIX}/bin/${_HOST}-${tool}" "${GHC_BIN}/termux-${tool}"
-		done
+		# Replace ghc settings with settings of the cross compiler.
+		sed "s|\$topdir/bin/unlit|${TERMUX_GHC_RUNTIME_FOLDER}/lib/ghc-${TERMUX_GHC_VERSION}/bin/unlit|g" \
+			"${TERMUX_GHC_RUNTIME_FOLDER}/lib/ghc-${TERMUX_GHC_VERSION}/settings" > \
+			"${TERMUX_PREFIX}/lib/ghc-${TERMUX_GHC_VERSION}/settings"
+		# NOTE: Above command is being run after timestamp is created, so we need to remove it in massage step.
 
-		for f in "${TERMUX_PREFIX}"/bin/"${_HOST}"-*; do
+		for tool in ghc ghc-pkg hsc2hs hp2ps ghci; do
+			ln -sf "${TERMUX_GHC_RUNTIME_FOLDER}/bin/${_HOST}-${tool}" "${GHC_BIN}/termux-${tool}"
+
 			sed -i -e "s|^#!${TERMUX_PREFIX}/bin/sh|#!/usr/bin/sh|" \
 				-e "s|${_HOST}-ghc-${TERMUX_GHC_VERSION}|ghc-${TERMUX_GHC_VERSION}|g" \
-				"$f"
+				-e "s|\$executablename|${TERMUX_GHC_RUNTIME_FOLDER}/lib/ghc-${TERMUX_GHC_VERSION}/bin/${tool}|g" \
+				"${GHC_BIN}/termux-${tool}"
 		done
 
 		# GHC ships with old version, we use our own.
 		termux-ghc-pkg unregister Cabal
+		# NOTE: Above command rewrites a cache file at "${TERMUX_PREFIX}/lib/ghc-${TERMUX_GHC_VERSION}/package.conf.d".
+		# Since it is done after timestamp creation, we need to remove it in massage step.
 
 		rm "${TERMUX_GHC_TAR}"
 	else
@@ -75,7 +88,7 @@ termux_setup_ghc_cross_compiler() {
 			[ -d "${ON_DEVICE_GHC_BIN}" ] && return
 
 			mkdir -p "${ON_DEVICE_GHC_BIN}"
-			for tool in ghc ghc-pkg hsc2hs hp2ps; do
+			for tool in ghc ghc-pkg hsc2hs hp2ps ghci; do
 				ln -sf "${TERMUX_PREFIX}/bin/${tool}" "${ON_DEVICE_GHC_BIN}/termux-${tool}"
 			done
 		fi

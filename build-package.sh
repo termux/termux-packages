@@ -56,11 +56,6 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_download.sh"
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_ghc.sh"
 
 # Utility function to setup a GHC cross-compiler toolchain targeting Android.
-# This function should be called before termux_create_timestamp, it installs ghc-libs in
-# $TERMUX_PREFIX otherwise ghc writes other path as rpath. 
-# NOTE: It should never be called by build.sh. By default, it will be called automatically by
-# `termux_step_get_dependencies` if `ghc-libs` or `ghc-libs-static`
-# is in dependency of the package.
 # shellcheck source=scripts/build/setup/termux_setup_ghc_cross_compiler.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_ghc_cross_compiler.sh"
 
