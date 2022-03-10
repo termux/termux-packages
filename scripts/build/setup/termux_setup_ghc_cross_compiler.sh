@@ -11,8 +11,9 @@ termux_setup_ghc_cross_compiler() {
 			TERMUX_GHC_RUNTIME_FOLDER="${TERMUX_COMMON_CACHEDIR}/${GHC_PREFIX}-runtime"
 		fi
 
-		local GHC_BIN="${TERMUX_GHC_RUNTIME_FOLDER}/${TERMUX_ARCH}"
 		local TERMUX_GHC_TAR="${TERMUX_COMMON_CACHEDIR}/${GHC_PREFIX}.tar.xz"
+
+		export PATH="${TERMUX_GHC_RUNTIME_FOLDER}/bin/${TERMUX_ARCH}:${TERMUX_GHC_RUNTIME_FOLDER}/bin:${PATH}"
 
 		test -d "${TERMUX_PREFIX}/lib/ghc-${TERMUX_GHC_VERSION}" ||
 			termux_error_exit "Package 'ghc-libs' is not installed. It is required by GHC cross-compiler." \
@@ -31,9 +32,7 @@ termux_setup_ghc_cross_compiler() {
 			fi
 		done
 
-		export PATH="${GHC_BIN}:${PATH}"
-
-		[ -d "${GHC_BIN}" ] && return
+		[ -d "${TERMUX_GHC_RUNTIME_FOLDER}/bin/${TERMUX_ARCH}" ] && return
 
 		local CHECKSUMS="$(
 			cat <<-EOF
@@ -48,7 +47,7 @@ termux_setup_ghc_cross_compiler() {
 			"${TERMUX_GHC_TAR}" \
 			"$(echo "${CHECKSUMS}" | grep -w "${TERMUX_ARCH}" | cut -d ':' -f 2)"
 
-		mkdir -p "${GHC_BIN}"
+		mkdir -p "${TERMUX_GHC_RUNTIME_FOLDER}"
 
 		tar -xf "${TERMUX_GHC_TAR}" -C "${TERMUX_GHC_RUNTIME_FOLDER}"
 
@@ -59,15 +58,12 @@ termux_setup_ghc_cross_compiler() {
 		sed "s|\$topdir/bin/unlit|${TERMUX_GHC_RUNTIME_FOLDER}/lib/ghc-${TERMUX_GHC_VERSION}/bin/unlit|g" \
 			"${TERMUX_GHC_RUNTIME_FOLDER}/lib/ghc-${TERMUX_GHC_VERSION}/settings" > \
 			"${TERMUX_PREFIX}/lib/ghc-${TERMUX_GHC_VERSION}/settings"
-		# NOTE: Above command is being run after timestamp is created, so we need to remove it in massage step.
+		# NOTE: Above command edits file in $TERMUX_PREFIX after timestamp is created,
+		# so we need to remove it in massage step.
 
 		for tool in ghc ghc-pkg hsc2hs hp2ps ghci; do
-			ln -sf "${TERMUX_GHC_RUNTIME_FOLDER}/bin/${_HOST}-${tool}" "${GHC_BIN}/termux-${tool}"
-
-			sed -i -e "s|^#!${TERMUX_PREFIX}/bin/sh|#!/usr/bin/sh|" \
-				-e "s|${_HOST}-ghc-${TERMUX_GHC_VERSION}|ghc-${TERMUX_GHC_VERSION}|g" \
-				-e "s|\$executablename|${TERMUX_GHC_RUNTIME_FOLDER}/lib/ghc-${TERMUX_GHC_VERSION}/bin/${tool}|g" \
-				"${GHC_BIN}/termux-${tool}"
+			sed -i "s|\$executablename|${TERMUX_GHC_RUNTIME_FOLDER}/lib/ghc-${TERMUX_GHC_VERSION}/bin/${tool}|g" \
+				"${TERMUX_GHC_RUNTIME_FOLDER}/bin/${TERMUX_ARCH}/termux-${tool}"
 		done
 
 		# GHC ships with old version, we use our own.

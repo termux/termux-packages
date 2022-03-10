@@ -111,17 +111,9 @@ termux_step_configure_haskell_build() {
 	}
 	[ "$TERMUX_DEBUG_BUILD" = "true" ] && OPTIMISATION="-O0" || OPTIMISATION="-O"
 
-	# Some packages rely on cabal build, therefore they may not have Setup.hs, (though very rare case)
-	# as cabal has that configured by default.
-	if [ ! -f "${TERMUX_PKG_SRCDIR}/Setup.hs" ] && [ ! -f "${TERMUX_PKG_SRCDIR}/Setup.lhs" ]; then
-		echo "Warning: No Setup.{hs,lhs} file found in ${TERMUX_PKG_SRCDIR}."
-		echo "Using default Setup.hs..."
-		cp "${TERMUX_SCRIPTDIR}/scripts/build/haskell-build/default-setup.hs" "${TERMUX_PKG_SRCDIR}/Setup.hs"
-	fi
-
 	# NOTE: We do not want to quote AVOID_GNULIB as we want word expansion.
 	# shellcheck disable=SC2086
-	env $AVOID_GNULIB runhaskell Setup configure \
+	env $AVOID_GNULIB termux-ghc-setup configure \
 		$OPTIMISATION \
 		--prefix=$TERMUX_PREFIX \
 		--configure-option=--disable-rpath \

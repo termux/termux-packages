@@ -4,10 +4,10 @@ termux_step_make_install() {
 	if test -f build.ninja; then
 		ninja -w dupbuild=warn -j $TERMUX_MAKE_PROCESSES install
 	elif ls ./*.cabal &>/dev/null; then
-		runhaskell Setup copy
+		termux-ghc-setup copy
 		if [ "${TERMUX_PKG_IS_HASKELL_LIB}" = true ]; then
-			runhaskell Setup register --gen-script
-			runhaskell Setup unregister --gen-script
+			termux-ghc-setup register --gen-script
+			termux-ghc-setup unregister --gen-script
 
 			install -Dm744 register.sh "${TERMUX_PREFIX}"/share/haskell/register/"${TERMUX_PKG_NAME}".sh
 			install -Dm744 unregister.sh "${TERMUX_PREFIX}"/share/haskell/unregister/"${TERMUX_PKG_NAME}".sh
