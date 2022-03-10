@@ -10,6 +10,7 @@ export PREFIX=@TERMUX_PREFIX@
 export TMPDIR=@TERMUX_PREFIX@/tmp
 export EXTUTILS_LIBBUILDER_VERSION=@EXTUTILS_LIBBUILDER_VERSION@
 export TEXT_BIBTEX_VERSION=@TEXT_BIBTEX_VERSION@
+export NET_SSLEAY_VERSION=@NET_SSLEAY_VERSION@
 export BIBER_VERSION=@BIBER_VERSION@
 
 # Lock terminal to prevent sending text input and special key
@@ -46,8 +47,22 @@ if [ ! -f Text-BibTeX-${TEXT_BIBTEX_VERSION}.tar.gz ]; then
 else
 	rm -rf Text-BibTeX-${TEXT_BIBTEX_VERSION}
 fi
-tar -xf Text-BibTeX-${TEXT_BIBTEX_VERSION}.tar.gz && cd Text-BibTeX-${TEXT_BIBTEX_VERSION}
+tar -xf Text-BibTeX-${TEXT_BIBTEX_VERSION}.tar.gz
+cd Text-BibTeX-${TEXT_BIBTEX_VERSION}
 patch -Np1 -i $PREFIX/opt/biber/Text-BibTeX.diff
+cpanm .
+
+cd ..
+
+if [ ! -f p5-net-ssleay-${NET_SSLEAY_VERSION}.tar.gz ]; then
+        curl --fail --retry 3 --location --output "$TMPDIR/p5-net-ssleay-${NET_SSLEAY_VERSION}.tar.gz" \
+        "https://github.com/radiator-software/p5-net-ssleay/archive/${NET_SSLEAY_VERSION}.tar.gz"
+else
+        rm -rf p5-net-ssleay-${NET_SSLEAY_VERSION}
+fi
+tar -xf p5-net-ssleay-${NET_SSLEAY_VERSION}.tar.gz
+cd p5-net-ssleay-${NET_SSLEAY_VERSION}
+patch -Np1 -i $PREFIX/opt/biber/Net-SSLeay.diff
 cpanm .
 
 cd ..
