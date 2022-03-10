@@ -12,6 +12,6 @@ termux_setup_make_install () {
 }
 
 termux_step_create_debscripts () {
-echo "#!$TERMUX_PREFIX/bin/sh" > postinst
-echo "pip3 install 'pygments' 'prompt-toolkit' 'setproctitle'" >> postinst
+        echo "#!$TERMUX_PREFIX/bin/sh" > postinst
+        echo "pip3 install 'pygments' 'prompt-toolkit' 'setproctitle'" >> postinst
 }
