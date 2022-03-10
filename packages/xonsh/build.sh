@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://xon.sh
 TERMUX_PKG_DESCRIPTION="Python-powered, cross-platform, Unix-gazing shell"
+TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="license"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.11.0
