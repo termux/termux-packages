@@ -8,7 +8,7 @@ TERMUX_PKG_SHA256=9d73273276996297920c234c7d4267a305c695f0e9e2454dbdf0655c3a8f75
 TERMUX_PKG_DEPENDS="python"
 _PYTHON_VERSION=3.10
 termux_setup_make_install () {
-	python${_PYTHON_VERSION} setup.py install --force --prefix=$TERMUX_PREFIX
+	python${_PYTHON_VERSION} setup.py install --force --prefix=${TERMUX_PREFIX}
 }
 
 termux_step_create_debscripts () {
