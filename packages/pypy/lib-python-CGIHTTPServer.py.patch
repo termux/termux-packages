@@ -1,0 +1,14 @@
+diff -uNr pypy2.7-v7.3.6-src/lib-python/2.7/CGIHTTPServer.py pypy2.7-v7.3.6-src.mod/lib-python/2.7/CGIHTTPServer.py
+--- pypy2.7-v7.3.6-src/lib-python/2.7/CGIHTTPServer.py          2021-10-03 14:36:11.000000000 +0800
++++ pypy2.7-v7.3.6-src.mod/lib-python/2.7/CGIHTTPServer.py      2022-01-18 00:12:25.779526200 +0800
+@@ -239,10 +239,6 @@
+                 return
+             # Child
+             try:
+-                try:
+-                    os.setuid(nobody)
+-                except os.error:
+-                    pass
+                 os.dup2(self.rfile.fileno(), 0)
+                 os.dup2(self.wfile.fileno(), 1)
+                 os.execve(scriptfile, args, env)

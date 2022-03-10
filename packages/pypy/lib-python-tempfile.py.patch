@@ -1,0 +1,12 @@
+diff -uNr pypy2.7-v7.3.6-src/lib-python/2.7/tempfile.py pypy2.7-v7.3.6-src.mod/lib-python/2.7/tempfile.py
+--- pypy2.7-v7.3.6-src/lib-python/2.7/tempfile.py       2021-10-03 14:36:11.000000000 +0800
++++ pypy2.7-v7.3.6-src.mod/lib-python/2.7/tempfile.py   2022-01-17 22:41:01.258679000 +0800
+@@ -163,7 +163,7 @@
+     elif _os.name == 'nt':
+         dirlist.extend([ r'c:\temp', r'c:\tmp', r'\temp', r'\tmp' ])
+     else:
+-        dirlist.extend([ '/tmp', '/var/tmp', '/usr/tmp' ])
++        dirlist.extend([ '@TERMUX_PREFIX@/tmp' ])
+
+     # As a last resort, the current directory.
+     try:

@@ -1,0 +1,25 @@
+diff -uNr pypy3.7-v7.3.7-src/rpython/rlib/rvmprof/cintf.py pypy3.7-v7.3.7-src.mod/rpython/rlib/rvmprof/cintf.py
+--- pypy3.7-v7.3.7-src/rpython/rlib/rvmprof/cintf.py            2022-01-02 01:09:08.909941000 +0800
++++ pypy3.7-v7.3.7-src.mod/rpython/rlib/rvmprof/cintf.py        2022-01-02 01:10:11.909941000 +0800
+@@ -16,14 +16,14 @@
+ class VMProfPlatformUnsupported(Exception):
+     pass
+
+-# vmprof works only on x86 for now
++# vmprof cannot compile on termux due to no dlinfo on Bionic Libc
+ IS_SUPPORTED = False
+-if sys.platform in ('darwin', 'linux', 'linux2') or sys.platform.startswith('freebsd'):
+-    try:
+-        proc = detect_cpu.autodetect()
+-        IS_SUPPORTED = proc.startswith('x86') or proc == 'aarch64'
+-    except detect_cpu.ProcessorAutodetectError:
+-        print("PROCESSOR NOT DETECTED, SKIPPING VMPROF")
++# if sys.platform in ('darwin', 'linux', 'linux2') or sys.platform.startswith('freebsd'):
++#     try:
++#         proc = detect_cpu.autodetect()
++#         IS_SUPPORTED = proc.startswith('x86') or proc == 'aarch64'
++#     except detect_cpu.ProcessorAutodetectError:
++#         print("PROCESSOR NOT DETECTED, SKIPPING VMPROF")
+
+ ROOT = py.path.local(rpythonroot).join('rpython', 'rlib', 'rvmprof')
+ SRC = ROOT.join('src')

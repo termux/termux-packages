@@ -1,0 +1,199 @@
+diff -uNr pypy3.7-v7.3.7-src/rpython/translator/platform/termux.py pypy3.7-v7.3.7-src.mod/rpython/translator/platform/termux.py
+--- pypy3.7-v7.3.7-src/rpython/translator/platform/termux.py        1970-01-01 08:00:00.000000000 +0800
++++ pypy3.7-v7.3.7-src.mod/rpython/translator/platform/termux.py    2022-03-04 00:27:54.849553700 +0800
+@@ -0,0 +1,195 @@
++from rpython.translator.platform.linux import LinuxPIC
++from rpython.translator.platform.posix import _run_subprocess, GnuMakefile
++from rpython.translator.platform import ExecutionResult, log
++import os
++
++PROOT_TARGET = os.getenv("PROOT_TARGET")
++if PROOT_TARGET == None:
++    log.Error("PROOT_TARGET: Must provide PROOT_TARGET.")
++    assert 0
++
++PROOT_TARGET_ARGS = PROOT_TARGET.split()
++
++PROOT_NDK = os.getenv("PROOT_NDK")
++if PROOT_NDK == None:
++    log.Error("PROOT_NDK: Must provide PROOT_NDK.")
++    assert 0
++
++PROOT_NDK_ARGS = PROOT_NDK.split()
++
++TERMUX_STANDALONE_TOOLCHAIN = os.getenv("TERMUX_STANDALONE_TOOLCHAIN")
++if TERMUX_STANDALONE_TOOLCHAIN == None:
++    log.Error("TERMUX_STANDALONE_TOOLCHAIN: Must provide TERMUX_STANDALONE_TOOLCHAIN.")
++    assert 0
++
++CROSS_COMPILER_PATH = TERMUX_STANDALONE_TOOLCHAIN + "/bin/"
++
++def _update_cflags_for_termux(cflags):
++    assert isinstance(cflags, tuple)
++    cflags += ("-fstack-protector-strong", "-fopenmp",
++               "-I@TERMUX_PREFIX@/include",
++               "-DBIONIC_IOCTL_NO_SIGNEDNESS_OVERLOAD", )
++    return cflags
++
++def _update_link_flags_for_termux(ldflags):
++    assert isinstance(ldflags, tuple)
++    ldflags += ("-fopenmp", "-static-openmp",
++                "-Wl,--enable-new-dtags", "-Wl,--as-needed", '-L@TERMUX_PREFIX@/lib',
++                "-Wl,-z,relro,-z,now", "-Wl,-rpath=@TERMUX_PREFIX@/lib", )
++    return ldflags
++
++def _update_rpath_flags(rpath_flags):
++    assert isinstance(rpath_flags, list)
++    return ["-Wl,-rpath=@TERMUX_PREFIX@/lib"] + rpath_flags
++
++
++class BaseTermux(LinuxPIC):
++    cflags = _update_cflags_for_termux(LinuxPIC.cflags)
++    extra_libs = ()
++    link_flags = _update_link_flags_for_termux(LinuxPIC.link_flags)
++    rpath_flags = _update_rpath_flags(LinuxPIC.rpath_flags)
++
++    available_includedirs = ['@TERMUX_PREFIX@/include/']
++
++    available_librarydirs = ['@TERMUX_PREFIX@/lib/']
++
++    @property
++    def cc(self):
++        return self._get_cross_compiler()
++
++    @cc.setter
++    def cc(self, *args):
++        pass
++
++    def _execute_c_compiler(self, cc, args, outname, cwd=None):
++        # 'cc' can also contain some options for the C compiler;
++        # e.g. it can be "gcc -m32".  We handle it by splitting on ' '.
++        cclist = cc.split()
++        cc = cclist[0]
++        args = cclist[1:] + args
++        log.execute('Host: ' + cc + ' ' + ' '.join(args))
++        proot_exec = PROOT_NDK_ARGS[0]
++        args = PROOT_NDK_ARGS[1:] + [cc] + args
++        returncode, stdout, stderr = _run_subprocess(proot_exec, args, self.c_environ, cwd)
++        self._handle_error(returncode, bytes(stdout), bytes(stderr), outname)
++
++    def execute(self, executable, args=[], env=None, compilation_info=None):
++        if self._is_same_platform_type():
++            log.execute('Exec (' + self.name + '): ' + str(executable) + ' ' + ' '.join(args))
++            return super(BaseTermux, self).execute(executable, args, env, compilation_info)
++        if isinstance(args, str):
++            args = ' ' + str(executable) + ' ' + args
++            log.execute('Cross Exec (' + self.name + '): ' + args)
++        else:
++            args = [str(executable)] + args
++            log.execute('Cross Exec (' + self.name + '): ' + ' '.join(args))
++        proot_exec = PROOT_TARGET_ARGS[0]
++        args = PROOT_TARGET_ARGS[1:] + args
++        returncode, stdout, stderr = _run_subprocess(proot_exec, args, env)
++        stdout = "" if stdout == None else stdout
++        stderr = "" if stderr == None else stderr
++        return ExecutionResult(returncode, stdout, stderr)
++
++    def include_dirs_for_libffi(self):
++        return self.available_includedirs
++
++    def library_dirs_for_libffi(self):
++        return self.available_librarydirs
++
++    def _preprocess_include_dirs(self, include_dirs):
++        return list(include_dirs) + self.available_includedirs
++
++    def _preprocess_library_dirs(self, library_dirs):
++        return list(library_dirs) + self.available_librarydirs
++
++    def execute_makefile(self, path_to_makefile, extra_opts=[]):
++        raise NotImplementedError()
++
++    def get_multiarch(self):
++        raise NotImplementedError("Needs to be overwritten")
++
++    def _get_cross_compiler(self):
++        raise NotImplementedError("Needs to be overwritten")
++
++    def _get_build_platform_type(self):
++        return "x86"
++    
++    def _get_target_platform_type(self):
++        raise NotImplementedError("Needs to be overwritten")
++    
++    def _get_qemu_name(self):
++        raise NotImplementedError("Needs to be overwritten")
++    
++    def _is_same_platform_type(self):
++        return self._get_build_platform_type() == self._get_target_platform_type()
++
++
++class Termux_AArch64(BaseTermux):
++    name = "termux-aarch64"
++
++    def get_multiarch(self):
++        return "aarch64-linux-android"
++
++    def _get_cross_compiler(self):
++        return CROSS_COMPILER_PATH + "aarch64-linux-android24-clang"
++
++    def _get_target_platform_type(self):
++        return "arm"
++    
++    def _get_qemu_name(self):
++        return "qemu-aarch64-static"
++
++
++def _update_cflags_for_termux_arm(cflags):
++    return ("-march=armv7-a", "-mfpu=neon",
++            "-mfloat-abi=softfp", "-mthumb", ) + cflags
++
++def _update_link_flags_for_termux_arm(cflags):
++    return ("-march=armv7-a", ) + cflags
++
++class Termux_ARM(BaseTermux):
++    name = "termux-arm"
++    cflags = _update_cflags_for_termux_arm(BaseTermux.cflags)
++
++    link_flags = _update_link_flags_for_termux_arm(BaseTermux.link_flags)
++
++    def get_multiarch(self):
++        return "arm-linux-androideabi"
++
++    def _get_cross_compiler(self):
++        return CROSS_COMPILER_PATH + "armv7a-linux-androideabi24-clang"
++    
++    def _get_target_platform_type(self):
++        return "arm"
++    
++    def _get_qemu_name(self):
++        return "qemu-arm-static"
++
++class Termux_AMD64(BaseTermux):
++    name = "termux-x86_64"
++
++    def get_multiarch(self):
++        return "x86_64-linux-android"
++
++    def _get_cross_compiler(self):
++        return CROSS_COMPILER_PATH + "x86_64-linux-android24-clang"
++
++    def _get_target_platform_type(self):
++        return "x86"
++
++def _update_cflags_for_termux_i686(cflags):
++    return ("-march=i686", "-msse3",
++            "-mstackrealign", "-mfpmath=sse", ) + cflags
++
++class Termux_IA32(BaseTermux):
++    name = "termux-i686"
++    cflags = _update_cflags_for_termux_i686(BaseTermux.cflags)
++
++    def get_multiarch(self):
++        return "i686-linux-android"
++
++    def _get_cross_compiler(self):
++        return CROSS_COMPILER_PATH + "i686-linux-android24-clang"
++
++    def _get_target_platform_type(self):
++        return "x86"

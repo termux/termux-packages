@@ -1,0 +1,34 @@
+diff -uNr pypy2.7-v7.3.6-src/rpython/config/translationoption.py pypy2.7-v7.3.6-src.mod/rpython/config/translationoption.py
+--- pypy2.7-v7.3.6-src/rpython/config/translationoption.py      2021-10-03 14:36:11.000000000 +0800
++++ pypy2.7-v7.3.6-src.mod/rpython/config/translationoption.py  2022-02-02 22:03:09.677990900 +0800
+@@ -40,6 +40,10 @@
+ PLATFORMS = [
+     'host',
+     'arm',
++    'termux-aarch64',
++    'termux-arm',
++    'termux-x86_64',
++    'termux-i686',
+ ]
+
+ translation_optiondescription = OptionDescription(
+@@ -285,8 +289,17 @@
+     ChoiceOption("platform",
+                  "target platform", ['host'] + PLATFORMS, default='host',
+                  cmdline='--platform',
+-                 suggests={"arm": [("translation.gcrootfinder", "shadowstack"),
+-                                   ("translation.jit_backend", "arm")]}),
++                 suggests={ "arm": [("translation.gcrootfinder", "shadowstack"),
++                                   ("translation.jit_backend", "arm")],
++                            "termux-aarch64": [("translation.gcrootfinder", "shadowstack"),
++                                               ("translation.jit_backend", "auto")],
++                            "termux-arm": [("translation.gcrootfinder", "shadowstack"),
++                                           ("translation.jit_backend", "arm")],
++                            "termux-x86_64": [("translation.gcrootfinder", "shadowstack"),
++                                              ("translation.jit_backend", "auto")],
++                            "termux-i686": [("translation.gcrootfinder", "shadowstack"),
++                                            ("translation.jit_backend", "auto")],
++                        }),
+
+     BoolOption("split_gc_address_space",
+                "Ensure full separation of GC and non-GC pointers", default=False),

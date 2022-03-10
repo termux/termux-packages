@@ -1,0 +1,32 @@
+diff -uNr pypy2.7-v7.3.6-src/rpython/translator/platform/__init__.py pypy2.7-v7.3.6-src.mod/rpython/translator/platform/__init__.py
+--- pypy2.7-v7.3.6-src/rpython/translator/platform/__init__.py          2021-10-03 14:36:11.000000000 +0800
++++ pypy2.7-v7.3.6-src.mod/rpython/translator/platform/__init__.py      2022-02-06 11:18:42.527715600 +0800
+@@ -332,6 +332,8 @@
+ else:
+     raise ValueError('unknown sys.platform "%s"', sys.platform)
+
++# Android always requires compiling with -fPIC
++host_factory = LinuxPIC
+ platform = host = host_factory()
+
+ def pick_platform(new_platform, cc):
+@@ -340,6 +342,18 @@
+     elif new_platform == 'arm':
+         from rpython.translator.platform.arm import ARM
+         return ARM(cc)
++    elif new_platform == 'termux-aarch64':
++        from rpython.translator.platform.termux import Termux_AArch64
++        return Termux_AArch64(cc)
++    elif new_platform == 'termux-arm':
++        from rpython.translator.platform.termux import Termux_ARM
++        return Termux_ARM(cc)
++    elif new_platform == 'termux-x86_64':
++        from rpython.translator.platform.termux import Termux_AMD64
++        return Termux_AMD64(cc)
++    elif new_platform == 'termux-i686':
++        from rpython.translator.platform.termux import Termux_IA32
++        return Termux_IA32(cc)
+     else:
+         raise ValueError("platform = %s" % (new_platform,))
+
+
