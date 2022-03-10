@@ -1,0 +1,49 @@
+--- a/Makefile
++++ b/Makefile
+@@ -9,7 +9,7 @@
+ 
+ ### enable ppm support ###
+ DEFINES  += -D_HAVE_LIB_PPM_
+-LIBS     += -lppm
++LIBS     += -lnetpbm
+ 
+ ### enable PNG support ###
+ DEFINES += -D_HAVE_PNG_
+@@ -19,11 +19,11 @@
+ DEFINES += -D_HAVE_ZLIB_
+ LIBS    += -lz
+ 
+-CC = gcc
++CC ?= gcc
+ WARN     = -Wall -Wstrict-prototypes 
+ COPT     = -g -O2  
+ 
+-CFLAGS = $(COPT) $(WARN) $(DEFINES) $(INCLUDES) 
++CFLAGS += $(WARN) $(DEFINES) $(INCLUDES) 
+ 
+ # list of all files that are part of the package
+ PACKAGE_FILES = Makefile \
+@@ -70,19 +70,19 @@
+ # Target
+ subtitle2pgm: subtitle2pgm.o spudec.o
+ 	@echo "Linking $@"
+-	@$(CC) $(LIBS) $^ -o $@  
++	@$(CC) $^ -o $@ $(LDFLAGS) $(LIBS)
+ 
+ subtitle2vobsub: subtitle2vobsub.o vobsub.o 
+ 	@echo "Linking $@"
+-	@$(CC) $(LIBS) $^ -o $@  
++	@$(CC) $^ -o $@ $(LDFLAGS) $(LIBS)
+ 
+ srttool: srttool.o
+ 	@echo "Linking $@"
+-	@$(CC) $(LIBS) -g $^ -o $@  
++	@$(CC) -g $^ -o $@ $(LDFLAGS) $(LIBS)
+ 
+ vobsub2pgm: vobsub2pgm.o vobsub.o spudec.o
+ 	@echo "Linking $@"
+-	@$(CC) $(LIBS) -g $^ -o $@  
++	@$(CC) -g $^ -o $@ $(LDFLAGS) $(LIBS)
+ 
+ .PHONY: clean dist rpm
+ clean:
