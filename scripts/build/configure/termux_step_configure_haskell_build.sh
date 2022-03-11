@@ -131,7 +131,6 @@ termux_step_configure_haskell_build() {
 		--with-pkg-config=$PKG_CONFIG \
 		--with-happy=$(command -v happy) \
 		--with-alex=$(command -v alex) \
-		--with-runghc=$(command -v runghc) \
 		--extra-include-dirs=$TERMUX_PREFIX/include \
 		--extra-lib-dirs=$TERMUX_PREFIX/lib \
 		--disable-tests \
