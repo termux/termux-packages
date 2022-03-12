@@ -55,6 +55,24 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_download.sh"
 # shellcheck source=scripts/build/setup/termux_setup_ghc.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_ghc.sh"
 
+# Utility function to setup a GHC cross-compiler toolchain targeting Android.
+# This function should be called before termux_create_timestamp, it installs ghc-libs in
+# $TERMUX_PREFIX otherwise ghc writes other path as rpath. 
+# NOTE: It should never be called by build.sh. By default, it will be called automatically by
+# `termux_step_get_dependencies` if `ghc-libs` or `ghc-libs-static`
+# is in dependency of the package.
+# shellcheck source=scripts/build/setup/termux_setup_ghc_cross_compiler.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_ghc_cross_compiler.sh"
+
+# Utility function to setup cabal-install (may be used by ghc toolchain).
+# shellcheck source=scripts/build/setup/termux_setup_cabal.sh.
+source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_cabal.sh"
+
+# Utility function to setup jailbreak-cabal. It is used to remove version constraints
+# from Cabal packages.
+# shellcheck source=scripts/build/setup/termux_setup_jailbreak_cabal.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_jailbreak_cabal.sh"
+
 # Utility function for setting up GN toolchain.
 # shellcheck source=scripts/build/setup/termux_setup_gn.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_gn.sh"
@@ -195,6 +213,10 @@ source "$TERMUX_SCRIPTDIR/scripts/build/configure/termux_step_configure_cmake.sh
 # shellcheck source=scripts/build/configure/termux_step_configure_meson.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/configure/termux_step_configure_meson.sh"
 
+# Setup configure args and run haskell build system. This function is called from termux_step_configure.
+# shellcheck source=scripts/build/configure/termux_step_configure_haskell_build.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/configure/termux_step_configure_haskell_build.sh"
+
 # Configure the package
 # shellcheck source=scripts/build/configure/termux_step_configure.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/configure/termux_step_configure.sh"
@@ -251,9 +273,14 @@ termux_step_post_massage() {
 	return
 }
 
+# Create debscripts for haskell packages. This only executes for haskell lib packages.
+# shellcheck source=scripts/build/haskell-build/termux_create_haskell_debscripts.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/haskell-build/termux_create_haskell_debscripts.sh"
+
 # Hook function to create {pre,post}install, {pre,post}rm-scripts and similar
 termux_step_create_debscripts() {
-	return
+	# This function is written here as it will allow overriding from build.sh.
+	termux_create_haskell_debscripts
 }
 
 # Convert Debian maintainer scripts into pacman-compatible installation hooks.
