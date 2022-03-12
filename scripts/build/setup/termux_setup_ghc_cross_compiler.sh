@@ -1,11 +1,11 @@
 __termux_haskell_register_packages() {
 	# Register dependency haskell packages with termux-ghc-pkg.
-	IFS=',' read -r -a DEP <<<"${TERMUX_PKG_DEPENDS},${TERMUX_PKG_BUILD_DEPENDS}"
+	IFS=',' read -r -a DEP <<<"$(echo "${TERMUX_PKG_DEPENDS},${TERMUX_PKG_BUILD_DEPENDS}" | tr -d ' ')"
 	for dep in "${DEP[@]}"; do
-		if [[ "${dep}" == haskell-* ]]; then
-			echo "Dependency '${pkg}' is a haskell package, registering it with ghc-pkg..."
+		if [[ "${dep/haskell-/}" != "${dep}" ]]; then
+			echo "Dependency '${dep}' is a haskell package, registering it with ghc-pkg..."
 			sed "s|${TERMUX_PREFIX}/bin/ghc-pkg|$(command -v termux-ghc-pkg)|g" \
-				"${TERMUX_PREFIX}/share/haskell/register/${pkg}.sh" | sh
+				"${TERMUX_PREFIX}/share/haskell/register/${dep}.sh" | sh
 			termux-ghc-pkg recache
 			# NOTE: Above command rewrites a cache file at
 			# "${TERMUX_PREFIX}/lib/ghc-${TERMUX_GHC_VERSION}/package.conf.d". Since it is done after
