@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/normen/whatscli
 TERMUX_PKG_DESCRIPTION="A command line interface for WhatsApp"
 TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_LICENSE_FILE="README.md"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.0.11
 TERMUX_PKG_SRCURL=https://github.com/normen/whatscli/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
