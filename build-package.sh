@@ -79,7 +79,7 @@ source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_zig.sh"
 # shellcheck source=scripts/build/setup/termux_setup_ninja.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_ninja.sh"
 
-# Utility function to setup a current ninja build system.
+# Utility function to setup Node.js JavaScript Runtime
 # shellcheck source=scripts/build/setup/termux_setup_nodejs.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_nodejs.sh"
 
