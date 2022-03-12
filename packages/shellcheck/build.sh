@@ -8,3 +8,7 @@ TERMUX_PKG_SHA256="62080e8a59174b12ecd2d753af3e6b9fed977e6f5f7301cde027a54aee555
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="ghc-libs, haskell-regex-tdfa, haskell-diff, haskell-quickcheck, haskell-aeson"
 TERMUX_PKG_IS_HASKELL_LIB=false
+
+termux_step_pre_configure() {
+	./striptests
+}
