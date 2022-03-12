@@ -17,6 +17,16 @@ termux_step_setup_toolchain() {
 	export READELF=llvm-readelf
 	export STRIP=llvm-strip
 	export NM=llvm-nm
+	
+	export TERMUX_HASKELL_LLVM_BACKEND="-fllvm --ghc-option=-fllvm"
+	if [ "${TERMUX_ARCH}" = "i686" ]; then
+		TERMUX_HASKELL_LLVM_BACKEND=""
+	fi
+
+	export TERMUX_HASKELL_OPTIMISATION="-O"
+	if [ "${TERMUX_DEBUG_BUILD}" = true ]; then
+		TERMUX_HASKELL_OPTIMISATION="-O0"
+	fi
 
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 		export PATH=$TERMUX_STANDALONE_TOOLCHAIN/bin:$PATH

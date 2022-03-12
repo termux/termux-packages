@@ -105,16 +105,10 @@ termux_step_configure_haskell_build() {
 	AVOID_GNULIB+=" gl_cv_header_working_fcntl_h=yes"
 	AVOID_GNULIB+=" gl_cv_C_locale_sans_EILSEQ=yes"
 
-	LLVM_BACKEND=""
-	[ "${TERMUX_ARCH}" != "i686" ] && {
-		LLVM_BACKEND="-fllvm --ghc-option=-fllvm"
-	}
-	[ "$TERMUX_DEBUG_BUILD" = "true" ] && OPTIMISATION="-O0" || OPTIMISATION="-O"
-
 	# NOTE: We do not want to quote AVOID_GNULIB as we want word expansion.
 	# shellcheck disable=SC2086
 	env $AVOID_GNULIB termux-ghc-setup configure \
-		$OPTIMISATION \
+		$TERMUX_HASKELL_OPTIMISATION \
 		--prefix=$TERMUX_PREFIX \
 		--configure-option=--disable-rpath \
 		--configure-option=--disable-rpath-hack \
@@ -134,7 +128,7 @@ termux_step_configure_haskell_build() {
 		--extra-include-dirs=$TERMUX_PREFIX/include \
 		--extra-lib-dirs=$TERMUX_PREFIX/lib \
 		--disable-tests \
-		$LLVM_BACKEND \
+		$TERMUX_HASKELL_LLVM_BACKEND \
 		$SPLIT_SECTIONS \
 		$EXECUTABLE_STRIPPING \
 		$LIB_STRIPPING \
