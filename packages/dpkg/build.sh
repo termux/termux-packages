@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Debian package management system"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.21.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/debian/pool/main/d/dpkg/dpkg_${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=1eb9fd5228b3199284ea5134904bb45b7a5bc12fb044b8e4964d89d2e5bbb563
 TERMUX_PKG_DEPENDS="bzip2, coreutils, diffutils, gzip, less, libbz2, liblzma, tar, xz-utils, zlib"
@@ -35,7 +36,6 @@ bin/dpkg-maintscript-helper
 bin/dpkg-mergechangelogs
 bin/dpkg-name
 bin/dpkg-parsechangelog
-bin/dpkg-scanpackages
 bin/dpkg-scansources
 bin/dpkg-shlibdeps
 bin/dpkg-source
@@ -57,7 +57,6 @@ share/man/man1/dpkg-maintscript-helper.1
 share/man/man1/dpkg-mergechangelogs.1
 share/man/man1/dpkg-name.1
 share/man/man1/dpkg-parsechangelog.1
-share/man/man1/dpkg-scanpackages.1
 share/man/man1/dpkg-scansources.1
 share/man/man1/dpkg-shlibdeps.1
 share/man/man1/dpkg-source.1
@@ -65,7 +64,6 @@ share/man/man1/dpkg-statoverride.1
 share/man/man1/dpkg-vendor.1
 share/man/man3
 share/man/man5
-share/perl5
 share/polkit-1
 "
 
