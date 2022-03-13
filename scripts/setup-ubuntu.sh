@@ -65,6 +65,9 @@ PACKAGES+=" python3.10-venv"
 # Needed by package bc.
 PACKAGES+=" ed"
 
+# Needed by gnunet.
+PACKAGES+=" recutils"
+
 # Provides utility hexdump which is needed by package bitcoin.
 PACKAGES+=" bsdmainutils"
 
