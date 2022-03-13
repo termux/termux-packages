@@ -8,7 +8,7 @@
 #                bootstrap archives to be easily built for (forked) termux
 #                apps without having to publish an apt repo first.
 # Usage:         run "build-bootstrap.sh --help"
-version=0.1.0
+version=0.2.0
 
 set -e
 
@@ -57,7 +57,7 @@ done
 
 # Build deb files for package and its dependencies deb from source for arch
 build_package() {
-	
+
 	local return_value
 
 	local package_arch="$1"
