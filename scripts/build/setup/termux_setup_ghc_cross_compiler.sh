@@ -16,8 +16,8 @@ __termux_haskell_register_packages() {
 
 __termux_haskell_eval_custom_build() {
 	local bin="$1"
-	if ! $(cat "${TERMUX_PKG_SRCDIR}"/*.cabal | grep -wq "^[bB]uild-type:") ||
-		$(cat "${TERMUX_PKG_SRCDIR}"/*.cabal | grep -wq '^[bB]uild-type:\s*[Ss]imple$'); then
+	if ! cat "${TERMUX_PKG_SRCDIR}"/*.cabal | grep -wq "^[bB]uild-type:" ||
+		cat "${TERMUX_PKG_SRCDIR}"/*.cabal | grep -wq '^[bB]uild-type:\s*[Ss]imple$'; then
 		return
 	fi
 	# Now, it must be a custom build.
@@ -29,10 +29,10 @@ __termux_haskell_eval_custom_build() {
 termux_setup_ghc_cross_compiler() {
 	local TERMUX_GHC_VERSION="8.10.7"
 	local GHC_PREFIX="ghc-cross-${TERMUX_GHC_VERSION}-${TERMUX_ARCH}"
-	if [ "${TERMUX_ON_DEVICE_BUILD}" = "false" ]; then
+	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "false" ]]; then
 		local TERMUX_GHC_RUNTIME_FOLDER
 
-		if [ "${TERMUX_PACKAGES_OFFLINE-false}" = "true" ]; then
+		if [[ "${TERMUX_PACKAGES_OFFLINE-false}" == "true" ]]; then
 			TERMUX_GHC_RUNTIME_FOLDER="${TERMUX_SCRIPTDIR}/build-tools/${GHC_PREFIX}-runtime"
 		else
 			TERMUX_GHC_RUNTIME_FOLDER="${TERMUX_COMMON_CACHEDIR}/${GHC_PREFIX}-runtime"
@@ -48,7 +48,7 @@ termux_setup_ghc_cross_compiler() {
 
 		__termux_haskell_register_packages
 
-		if [ -d "${TERMUX_GHC_RUNTIME_FOLDER}" ]; then
+		if [[ -d "${TERMUX_GHC_RUNTIME_FOLDER}" ]]; then
 			__termux_haskell_eval_custom_build "${TERMUX_GHC_RUNTIME_FOLDER}/bin/${TERMUX_ARCH}"
 			return
 		fi
@@ -79,7 +79,7 @@ termux_setup_ghc_cross_compiler() {
 
 		for tool in ghc ghc-pkg hsc2hs hp2ps ghci; do
 			_tool="${tool}"
-			[ "${tool}" = "ghci" ] && _tool="ghc"
+			[[ "${tool}" == "ghci" ]] && _tool="ghc"
 			sed -i "s|\$executablename|${TERMUX_GHC_RUNTIME_FOLDER}/lib/ghc-${TERMUX_GHC_VERSION}/bin/${_tool}|g" \
 				"${TERMUX_GHC_RUNTIME_FOLDER}/bin/${TERMUX_ARCH}/termux-${tool}"
 		done
@@ -95,8 +95,8 @@ termux_setup_ghc_cross_compiler() {
 		rm "${TERMUX_GHC_TAR}"
 	else
 
-		if [[ "$TERMUX_MAIN_PACKAGE_FORMAT" = "debian" && "$(dpkg-query -W -f '${db:Status-Status}\n' ghc 2>/dev/null)" != "installed" ]] ||
-			[[ "$TERMUX_MAIN_PACKAGE_FORMAT" = "pacman" && ! "$(pacman -Q ghc 2>/dev/null)" ]]; then
+		if [[ "${TERMUX_MAIN_PACKAGE_FORMAT}" == "debian" ]] && "$(dpkg-query -W -f '${db:Status-Status}\n' ghc 2>/dev/null)" != "installed" ||
+			[[ "${TERMUX_MAIN_PACKAGE_FORMAT}" == "pacman" ]] && ! "$(pacman -Q ghc 2>/dev/null)"; then
 			echo "Package 'ghc' is not installed."
 			exit 1
 		else
@@ -105,7 +105,7 @@ termux_setup_ghc_cross_compiler() {
 
 			__termux_haskell_register_packages
 
-			if [ -d "${ON_DEVICE_GHC_BIN}" ]; then
+			if [[ -d "${ON_DEVICE_GHC_BIN}" ]]; then
 				__termux_haskell_eval_custom_build "${ON_DEVICE_GHC_BIN}"
 				return
 			fi

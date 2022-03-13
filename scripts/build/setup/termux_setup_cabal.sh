@@ -1,11 +1,11 @@
 termux_setup_cabal() {
-	if [ "${TERMUX_ON_DEVICE_BUILD}" = "false" ]; then
+	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "false" ]]; then
 		local TERMUX_CABAL_VERSION=3.6.2.0
 		local TERMUX_CABAL_TAR="${TERMUX_COMMON_CACHEDIR}/cabal-${TERMUX_CABAL_VERSION}.tar.xz"
 
 		local TERMUX_CABAL_RUNTIME_FOLDER
 
-		if [ "${TERMUX_PACKAGES_OFFLINE-false}" = "true" ]; then
+		if [[ "${TERMUX_PACKAGES_OFFLINE-false}" == "true" ]]; then
 			TERMUX_CABAL_RUNTIME_FOLDER="${TERMUX_SCRIPTDIR}/build-tools/cabal-${TERMUX_CABAL_VERSION}-runtime"
 		else
 			TERMUX_CABAL_RUNTIME_FOLDER="${TERMUX_COMMON_CACHEDIR}/cabal-${TERMUX_CABAL_VERSION}-runtime"
@@ -13,7 +13,7 @@ termux_setup_cabal() {
 
 		export PATH="${TERMUX_CABAL_RUNTIME_FOLDER}:${PATH}"
 
-		[ -d "${TERMUX_CABAL_RUNTIME_FOLDER}" ] && return
+		[[ -d "${TERMUX_CABAL_RUNTIME_FOLDER}" ]] && return
 
 		termux_download "https://github.com/MrAdityaAlok/ghc-cross-tools/releases/download/cabal-install-v${TERMUX_CABAL_VERSION}/cabal-install-${TERMUX_CABAL_VERSION}.tar.xz" \
 			"${TERMUX_CABAL_TAR}" \
@@ -26,8 +26,8 @@ termux_setup_cabal() {
 		cabal update
 
 	else
-		if [[ "$TERMUX_MAIN_PACKAGE_FORMAT" = "debian" && "$(dpkg-query -W -f '${db:Status-Status}\n' cabal-install 2>/dev/null)" != "installed" ]] ||
-			[[ "$TERMUX_MAIN_PACKAGE_FORMAT" = "pacman" && ! "$(pacman -Q cabal-install 2>/dev/null)" ]]; then
+		if [[ "${TERMUX_MAIN_PACKAGE_FORMAT}" == "debian" ]] && "$(dpkg-query -W -f '${db:Status-Status}\n' cabal-install 2>/dev/null)" != "installed" ||
+			[[ "${TERMUX_MAIN_PACKAGE_FORMAT}" == "pacman" ]] && ! "$(pacman -Q cabal-install 2>/dev/null)"; then
 			echo "Package 'cabal-install' is not installed."
 			exit 1
 		fi
