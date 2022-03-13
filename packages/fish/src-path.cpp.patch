@@ -12,12 +12,12 @@ An example of this:-
 This can cause weird bugs when a script tries to execute with hardcoded paths, it might get errors about command not found even if it exists, because fish is checking it at the wrong place.
 
 This patch has been tested to fix the bug
---- ./src/path.cpp.orig	2021-12-08 12:51:35.296728931 +0530
-+++ ./src/path.cpp	2021-12-08 12:57:44.166728790 +0530
-@@ -38,10 +38,20 @@
- 
- static bool path_get_path_core(const wcstring &cmd, wcstring *out_path,
-                                const maybe_t<env_var_t> &bin_path_var) {
+--- a/src/path.cpp
++++ b/src/path.cpp
+@@ -42,10 +42,20 @@ static bool path_get_path_core(const wcs
+     // If we let this through, we'd end up checking up to the NULL,
+     // so we'd get the wrong path.
+     if (cmd.find(L'\0') != wcstring::npos) return false;
 +    // Map /bin and /usr/bin to @TERMUX_PREFIX@
 +    wcstring _cmd;
 +    
