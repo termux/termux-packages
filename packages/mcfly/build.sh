@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Replaces your default ctrl-r shell history search with a
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.5.12
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/cantino/mcfly/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=41bbcbde13c3a27696cb4ac0b9e752a925661747acc4075450e10d4e17b17bde
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -25,5 +26,5 @@ termux_step_make() {
 
 termux_step_make_install() {
 	install -Dm700 -t $TERMUX_PREFIX/bin target/${CARGO_TARGET_NAME}/release/mcfly
-	install -Dm600 -t $TERMUX_PREFIX/share/mcfly mcfly.{ba,fi,z}sh
+	install -Dm600 -t $TERMUX_PREFIX/share/mcfly mcfly.{fi,z}sh
 }
