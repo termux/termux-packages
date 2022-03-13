@@ -1,0 +1,89 @@
+--- a/filan.c
++++ b/filan.c
+@@ -261,7 +261,11 @@
+       headprinted = 1;
+    }
+    if (filan_rawoutput) {
++#if defined __ANDROID__ && !defined __LP64__
++      snprintf(stdevstr, 8, "%llu", buf->st_dev);
++#else
+       snprintf(stdevstr, 8, F_dev, buf->st_dev);
++#endif
+    } else {
+       snprintf(stdevstr, 8, "%hu,%hu", (unsigned short)(buf->st_dev>>8), (unsigned short)(buf->st_dev&0xff));
+    }
+@@ -271,7 +275,11 @@
+ #else
+ 	   F_st_ino
+ #endif /* HAVE_STAT64 */
++#if defined __ANDROID__ && !defined __LP64__
++	   "\t%u\t"F_st_nlink"\t"F_uid"\t"F_gid
++#else
+ 	   "\t"F_mode"\t"F_st_nlink"\t"F_uid"\t"F_gid
++#endif
+ #if HAVE_ST_RDEV
+ 	   "\t%hu,%hu"
+ #endif
+--- a/procan.c
++++ b/procan.c
+@@ -156,8 +156,12 @@
+       }
+ #endif
+ #ifdef SIZE_MAX
++#if defined __ANDROID__ && !defined __LP64__
++      fprintf(outfile, "SIZE_MAX                  = %-24u\n", SIZE_MAX);
++#else
+       fprintf(outfile, "SIZE_MAX                  = %-24lu\n", SIZE_MAX);
+ #endif
++#endif
+    }
+ 
+    /* file descriptors */
+--- a/sycls.c
++++ b/sycls.c
+@@ -395,12 +395,22 @@
+ static void prtstat(const char *func, struct stat *buf, int result) {
+    char txt[256], *t = txt;
+ 
++#if defined __ANDROID__ && !defined __LP64__
++   t += sprintf(t, "%s(, {%llu,"F_st_ino",%u,"F_st_nlink","F_uid","F_gid,
++		func, buf->st_dev, buf->st_ino,
++		buf->st_mode, buf->st_nlink, buf->st_uid, buf->st_gid);
++#else
+    t += sprintf(t, "%s(, {"F_dev","F_st_ino","F_mode","F_st_nlink","F_uid","F_gid,
+ 		func, buf->st_dev, buf->st_ino,
+ 		buf->st_mode, buf->st_nlink, buf->st_uid, buf->st_gid);
++#endif
+ #if HAVE_ST_RDEV
++#if defined __ANDROID__ && !defined __LP64__
++   t += sprintf(t, ",%llu", buf->st_rdev);
++#else
+    t += sprintf(t, ","F_dev, buf->st_rdev);
+ #endif
++#endif
+    t += sprintf(t, ","F_st_size, buf->st_size);
+ #if HAVE_ST_BLKSIZE
+    t += sprintf(t, ","F_st_blksize, buf->st_blksize);
+@@ -419,12 +429,22 @@
+    if (result < 0) {
+       sprintf(t, "%s(, {}) -> %d", func, result);
+    } else {
++#if defined __ANDROID__ && !defined __LP64__
++   t += sprintf(t, "%s(, {%llu,"F_st64_ino",%u,"F_st_nlink","F_uid","F_gid,
++		func, buf->st_dev, buf->st_ino,
++		buf->st_mode, buf->st_nlink, buf->st_uid, buf->st_gid);
++#else
+    t += sprintf(t, "%s(, {"F_dev","F_st64_ino","F_mode","F_st_nlink","F_uid","F_gid,
+ 		func, buf->st_dev, buf->st_ino,
+ 		buf->st_mode, buf->st_nlink, buf->st_uid, buf->st_gid);
++#endif
+ #if HAVE_ST_RDEV
++#if defined __ANDROID__ && !defined __LP64__
++   t += sprintf(t, ",%llu", buf->st_rdev);
++#else
+    t += sprintf(t, ","F_dev, buf->st_rdev);
+ #endif
++#endif
+    t += sprintf(t, ","F_st64_size, buf->st_size);
+ #if HAVE_ST_BLKSIZE
+    t += sprintf(t, ","F_st_blksize, buf->st_blksize);
