@@ -20,6 +20,14 @@ BOOTSTRAP_TMPDIR=$(mktemp -d "${TMPDIR:-/tmp}/bootstrap-tmp.XXXXXXXX")
 # and <10.
 BOOTSTRAP_ANDROID10_COMPATIBLE=false
 
+# ARM ONLY: By default, bootstrap archives are built with Neon.
+# Override with option '--no-neon'. Requires NDK r23 or older.
+# This option is not fully supported on all packages at the moment,
+# eg: ffmpeg
+BOOTSTRAP_ARM_NO_NEON_BUILD=false
+BOOTSTRAP_ARM_NO_NEON_FLAG=false
+BOOTSTRAP_NEED_CLEANUP_ARM_NO_NEON_FLAG=true
+
 # By default, bootstrap archives will be built for all architectures
 # supported by Termux application.
 # Override with option '--architectures'.
@@ -29,6 +37,10 @@ TERMUX_ARCHITECTURES=("${TERMUX_DEFAULT_ARCHITECTURES[@]}")
 TERMUX_PACKAGES_DIRECTORY="/home/builder/termux-packages"
 TERMUX_BUILT_DEBS_DIRECTORY="$TERMUX_PACKAGES_DIRECTORY/output"
 TERMUX_BUILT_PACKAGES_DIRECTORY="/data/data/.built-packages"
+
+TERMUX_PACKAGES_DIRECTORY_IS_GIT_REPO=false
+[ -n $(command -v git) ] && [ -d "$TERMUX_PACKAGES_DIRECTORY/.git" ] && \
+	TERMUX_PACKAGES_DIRECTORY_IS_GIT_REPO=true
 
 IGNORE_BUILD_SCRIPT_NOT_FOUND_ERROR=1
 FORCE_BUILD_PACKAGES=0
@@ -72,10 +84,46 @@ build_package() {
 
 	local build_output
 
+	echo $'\n\n\n'
+
+	# Cache behind a flag instead of running expensive find command every time
+	if [[ "$package_arch" == "arm" ]] && ${BOOTSTRAP_ARM_NO_NEON_BUILD}; then
+		echo "[*] Building '$package_name' for arch '$package_arch' without Neon support..."
+		if ! ${BOOTSTRAP_ARM_NO_NEON_FLAG}; then
+			sed -i "$TERMUX_PACKAGES_DIRECTORY/scripts/build/termux_step_setup_toolchain.sh" \
+				-e "s/-mfpu=neon/-mfpu=vfpv3-d16/g"
+			find "$TERMUX_PACKAGES_DIRECTORY/packages/" -name "build.sh" -exec sed -i {} \
+				-e "s/-mfpu=neon/-mfpu=vfpv3-d16/g" \
+				-e "s/--enable-neon/--disable-neon/g" \;
+			BOOTSTRAP_ARM_NO_NEON_FLAG=true
+		fi
+	else
+		# Cleanup is hard! Unfortunately not all packages uniformly enable Neon
+		if ${BOOTSTRAP_NEED_CLEANUP_ARM_NO_NEON_FLAG} && ${TERMUX_PACKAGES_DIRECTORY_IS_GIT_REPO}; then
+			git_diff_termux_step_setup_toolchain_sh="$(git diff $TERMUX_PACKAGES_DIRECTORY/scripts/build/termux_step_setup_toolchain.sh)"
+			git_diff_packages_build_sh="$(git diff $TERMUX_PACKAGES_DIRECTORY/packages/*/build.sh)"
+			[ -n "$(echo $git_diff_termux_step_setup_toolchain_sh | grep '\-mfpu=vfpv3-d16')" ] && \
+				git restore "$TERMUX_PACKAGES_DIRECTORY/scripts/build/termux_step_setup_toolchain.sh"
+			[ -n "$(echo $git_diff_packages_build_sh | grep '\-mfpu=vfpv3-d16')" ] || \
+			[ -n "$(echo $git_diff_packages_build_sh | grep '\--disable-neon')" ] && \
+				git restore "$TERMUX_PACKAGES_DIRECTORY/packages/*/build.sh"
+			unset git_diff_termux_step_setup_toolchain_sh
+			unset git_diff_packages_build_sh
+			BOOTSTRAP_NEED_CLEANUP_ARM_NO_NEON_FLAG=false
+		elif ${BOOTSTRAP_NEED_CLEANUP_ARM_NO_NEON_FLAG} && ! ${TERMUX_PACKAGES_DIRECTORY_IS_GIT_REPO}; then
+			sed -i "$TERMUX_PACKAGES_DIRECTORY/scripts/build/termux_step_setup_toolchain.sh" \
+				-e "s/-mfpu=vfpv3-d16/-mfpu=neon/g"
+			find "$TERMUX_PACKAGES_DIRECTORY/packages/" -name "build.sh" -exec sed -i {} \
+				-e "s/-mfpu=vfpv3-d16/-mfpu=neon/g" \
+				-e "s/--disable-neon/--enable-neon/g" \;
+			BOOTSTRAP_NEED_CLEANUP_ARM_NO_NEON_FLAG=false
+		fi
+	fi
+
 	# Build package from source
 	# stderr will be redirected to stdout and both will be captured into variable and printed on screen
 	cd "$TERMUX_PACKAGES_DIRECTORY"
-	echo $'\n\n\n'"[*] Building '$package_name'..."
+	echo "[*] Building '$package_name'..."
 	exec 99>&1
 	build_output="$("$TERMUX_PACKAGES_DIRECTORY"/build-package.sh "${BUILD_PACKAGE_OPTIONS[@]}" -a "$package_arch" "$package_name" 2>&1 | tee >(cat - >&99); exit ${PIPESTATUS[0]})";
 	return_value=$?
@@ -275,6 +323,7 @@ Available command_options:
                      Build the specified additional packages first rather than
                      the core packages. May avoid build conflicts for some
                      packages when building in certain order.
+  [ --no-neon ]      ARM ONLY: Disable building with Neon support
 
 
 The package name/prefix that the bootstrap is built for is defined by
@@ -342,6 +391,9 @@ main() {
 				;;
 			--build-extra-first)
 				BOOTSTRAP_BUILD_ADDITIONAL_PACKAGES_FIRST=true
+				;;
+			--no-neon)
+				BOOTSTRAP_ARM_NO_NEON_BUILD=true
 				;;
 			-f)
 				BUILD_PACKAGE_OPTIONS+=("-f")
@@ -482,7 +534,11 @@ main() {
 		extract_debs || return $?
 
 		# Create bootstrap archive.
-		create_bootstrap_archive "$package_arch" || return $?
+		if [[ "$package_arch" == "arm" ]] && ${BOOTSTRAP_ARM_NO_NEON_BUILD}; then
+			create_bootstrap_archive "arm_vfpv3-d16" || return $?
+		else
+			create_bootstrap_archive "$package_arch" || return $?
+		fi
 
 	done
 
