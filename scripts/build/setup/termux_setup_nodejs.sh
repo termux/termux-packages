@@ -10,7 +10,7 @@ termux_setup_nodejs() {
 	fi
 
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
-		if [ ! -x "$NODEJS_FOLDER/nodejs" ]; then
+		if [ ! -x "$NODEJS_FOLDER/bin/node" ]; then
 			mkdir -p "$NODEJS_FOLDER"
 			local NODEJS_TAR_FILE=$TERMUX_PKG_TMPDIR/nodejs-$NODEJS_VERSION.tar.xz
 			termux_download https://nodejs.org/dist/v${NODEJS_VERSION}/node-v${NODEJS_VERSION}-linux-x64.tar.xz \
