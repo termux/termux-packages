@@ -100,6 +100,7 @@ build_package() {
 # Extract *.deb files to the bootstrap root.
 extract_debs() {
 
+	local package_arch="$1"
 	local current_package_name
 	local data_archive
 	local control_archive
@@ -122,7 +123,14 @@ extract_debs() {
 	for deb in *.deb; do
 
 		current_package_name="$(echo "$deb" | sed -E 's/^([^_]+).*/\1/' )"
+		current_package_arch="$(echo "$deb" | sed -E 's/.*_(.*).deb$/\1/' )"
 		echo "current_package_name: '$current_package_name'"
+		echo "current_package_arch: '$current_package_arch'"
+
+		if [[ "$current_package_arch" != "$package_arch" ]] && [[ "$current_package_arch" != "all" ]]; then
+			echo "[*] Skipping incompatible package '$deb' for target '$package_arch'..."
+			continue
+		fi
 
 		if [[ "$current_package_name" == *"-static" ]]; then
 			echo "[*] Skipping static package '$deb'..."
@@ -479,7 +487,7 @@ main() {
 		done
 
 		# Extract all debs.
-		extract_debs || return $?
+		extract_debs "$package_arch" || return $?
 
 		# Create bootstrap archive.
 		create_bootstrap_archive "$package_arch" || return $?
