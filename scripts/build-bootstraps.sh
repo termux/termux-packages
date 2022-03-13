@@ -40,6 +40,13 @@ declare -a PACKAGES=()
 # By default it is empty, but can be filled with option '--add'.
 declare -a ADDITIONAL_PACKAGES=()
 
+# By default, build core packages first then additional packages
+# later. Override with option '--build-extra-first'.
+# Helpful in avoiding conflicts when building packages in a
+# certain order. Examples that have build issues:
+# libandroid-glob -> gdb
+BOOTSTRAP_BUILD_ADDITIONAL_PACKAGES_FIRST=false
+
 # A list of already extracted packages
 declare -a EXTRACTED_PACKAGES=()
 
@@ -264,6 +271,10 @@ Available command_options:
                      Override default list of architectures for which bootstrap
                      archives will be created. Multiple architectures should be
                      passed as comma-separated list.
+  [ --build-extra-first ]
+                     Build the specified additional packages first rather than
+                     the core packages. May avoid build conflicts for some
+                     packages when building in certain order.
 
 
 The package name/prefix that the bootstrap is built for is defined by
@@ -328,6 +339,9 @@ main() {
 					show_usage
 					return 1
 				fi
+				;;
+			--build-extra-first)
+				BOOTSTRAP_BUILD_ADDITIONAL_PACKAGES_FIRST=true
 				;;
 			-f)
 				BUILD_PACKAGE_OPTIONS+=("-f")
@@ -438,13 +452,24 @@ main() {
 		PACKAGES+=("patch")
 		PACKAGES+=("unzip")
 
-		# Handle additional packages.
-		for add_pkg in "${ADDITIONAL_PACKAGES[@]}"; do
-			if [[ " ${PACKAGES[*]} " != *" $add_pkg "* ]]; then
-				PACKAGES+=("$add_pkg")
-			fi
-		done
-		unset add_pkg
+		if ! ${BOOTSTRAP_BUILD_ADDITIONAL_PACKAGES_FIRST}; then
+			# Handle additional packages.
+			for add_pkg in "${ADDITIONAL_PACKAGES[@]}"; do
+				if [[ " ${PACKAGES[*]} " != *" $add_pkg "* ]]; then
+					PACKAGES+=("$add_pkg")
+				fi
+			done
+			unset add_pkg
+		else
+			# This is pretty much the reverse. Dont think too hard.
+			for core_pkg in "${PACKAGES[@]}"; do
+				if [[ " ${ADDITIONAL_PACKAGES[*]} " != *" $core_pkg "* ]]; then
+					ADDITIONAL_PACKAGES+=("$core_pkg")
+				fi
+			done
+			unset core_pkg
+			PACKAGES=("${ADDITIONAL_PACKAGES[@]}")
+		fi
 
 		# Build packages.
 		for package_name in "${PACKAGES[@]}"; do
