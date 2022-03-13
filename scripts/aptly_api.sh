@@ -89,7 +89,7 @@ aptly_publish_repo() {
       --max-time 300 \
       --header 'Content-Type: application/json' \
       --request PUT \
-      --data "{'Signing': {'Passphrase': '${GPG_PASSPHRASE}'}}" \
+      --data "{\"Signing\": {\"Passphrase\": \"${GPG_PASSPHRASE}\"}}" \
       ${REPOSITORY_URL}/publish/${REPOSITORY_NAME}/${REPOSITORY_DISTRIBUTION} || true
   )
   http_status_code=$(echo "$curl_response" | cut -d'|' -f2 | grep -oP '\d{3}$')
