@@ -40,7 +40,7 @@ termux_setup_ghc() {
 			CABAL_TAR="${CABAL_TEMP_FOLDER}/cabal-${CABAL_VERSION}.tar.gz"
 			cd "${CABAL_TEMP_FOLDER}"
 
-			termux-download \
+			termux_download \
 				https://hackage.haskell.org/package/Cabal-"${CABAL_VERSION}"/Cabal-"${CABAL_VERSION}".tar.gz \
 				"${CABAL_TAR}" \
 				9e903d06a7fb0893c6f303199e737a7d555fbb5e309be8bcc782b4eb2717bc42
