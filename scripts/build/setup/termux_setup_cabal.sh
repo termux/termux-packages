@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 termux_setup_cabal() {
 	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "false" ]]; then
 		local TERMUX_CABAL_VERSION=3.6.2.0

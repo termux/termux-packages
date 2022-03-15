@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # Utility script to setup jailbreak-cabal script. It is used by haskell build system to remove version
 # constraints in cabal files.
 termux_setup_jailbreak_cabal() {

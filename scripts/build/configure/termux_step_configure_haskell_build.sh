@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 termux_step_configure_haskell_build() {
 	termux_setup_jailbreak_cabal
 	printf "%s" "Jailbreaking Cabal file..."
