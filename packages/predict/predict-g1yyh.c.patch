@@ -1,0 +1,53 @@
+--- a/predict-g1yyh.c
++++ b/predict-g1yyh.c
+@@ -35,7 +35,6 @@
+ 
+ #include <math.h>
+ #include <time.h>
+-#include <sys/timeb.h>
+ #include <curses.h>
+ #include <menu.h>
+ #include <stdlib.h>
+@@ -2031,7 +2030,7 @@
+ 		exit(-1);
+ 	}
+ 
+-	if ((type=SOCK_STREAM && listen(s,qlen))<0) {
++	if (type==SOCK_STREAM && listen(sd,qlen)<0) {
+ 		bailout("Listen fail");
+ 		exit(-1);
+ 	}
+@@ -2264,7 +2263,7 @@
+ 			/* Send request to predict with output
+ 			   directed to a temporary file under /tmp */
+ 
+-			strcpy(tempname,"/tmp/XXXXXX\0");
++			strcpy(tempname,"@TERMUX_PREFIX@/tmp/XXXXXX\0");
+ 			i=mkstemp(tempname);
+ 
+ 			sprintf(buff,"%s -f %s -t %s -q %s -o %s\n",predict_name,satname,tlefile,qthfile,tempname);
+@@ -2309,7 +2308,7 @@
+ 			/* Send request to predict with output
+ 			   directed to a temporary file under /tmp */
+ 
+-			strcpy(tempname,"/tmp/XXXXXX\0");
++			strcpy(tempname,"@TERMUX_PREFIX@/tmp/XXXXXX\0");
+ 			i=mkstemp(tempname);
+ 
+ 			sprintf(buff,"%s -p %s -t %s -q %s -o %s\n",predict_name, satname,tlefile,qthfile,tempname);
+@@ -3301,12 +3300,12 @@
+         /* Read the system clock and return the number
+ 	 *            of days since 31Dec79 00:00:00 UTC (daynum 0) */
+ 
+-        struct timeb tptr;
++        struct timespec tptr;
+         int x;
+ 
+-        x=ftime(&tptr);
++        x=clock_gettime(CLOCK_REALTIME, &tptr);
+ 
+-        return ((((double)tptr.time+0.001*(double)tptr.millitm)/86400.0)-3651.0);
++        return ((((double)tptr.tv_sec+0.000000001*(double)tptr.tv_nsec)/86400.0)-3651.0);
+ }
+ 
+ char *Daynum2String(daynum, stlen, stfmt)
