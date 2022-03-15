@@ -1,0 +1,39 @@
+From 773f9d0803c6888ae7d5391878d7337f24216f4a Mon Sep 17 00:00:00 2001
+From: David Bryant <david@wavpack.com>
+Date: Tue, 23 Nov 2021 13:14:35 -0800
+Subject: [PATCH] issue #110: sanitize DSD file types for invalid lengths
+
+---
+ cli/dsdiff.c | 6 ++++++
+ cli/dsf.c    | 1 +
+ 2 files changed, 7 insertions(+)
+
+diff --git a/cli/dsdiff.c b/cli/dsdiff.c
+index d7adb6a..5bdcae3 100644
+--- a/cli/dsdiff.c
++++ b/cli/dsdiff.c
+@@ -278,6 +278,12 @@ int ParseDsdiffHeaderConfig (FILE *infile, char *infilename, char *fourcc, Wavpa
+             }
+ 
+             total_samples = dff_chunk_header.ckDataSize / config->num_channels;
++
++            if (total_samples <= 0 || total_samples > MAX_WAVPACK_SAMPLES) {
++                error_line ("%s is not a valid .DFF file!", infilename);
++                return WAVPACK_SOFT_ERROR;
++            }
++
+             break;
+         }
+         else {          // just copy unknown chunks to output file
+diff --git a/cli/dsf.c b/cli/dsf.c
+index e1d7973..dddd488 100644
+--- a/cli/dsf.c
++++ b/cli/dsf.c
+@@ -113,6 +113,7 @@ int ParseDsfHeaderConfig (FILE *infile, char *infilename, char *fourcc, WavpackC
+ 
+     if (format_chunk.ckSize != sizeof (DSFFormatChunk) || format_chunk.formatVersion != 1 ||
+         format_chunk.formatID != 0 || format_chunk.blockSize != DSF_BLOCKSIZE || format_chunk.reserved ||
++        format_chunk.sampleCount <= 0 || format_chunk.sampleCount > MAX_WAVPACK_SAMPLES * 8 ||
+         (format_chunk.bitsPerSample != 1 && format_chunk.bitsPerSample != 8) ||
+         format_chunk.numChannels < 1 || format_chunk.numChannels > 6 ||
+         format_chunk.chanType < 1 || format_chunk.chanType > NUM_CHAN_TYPES) {

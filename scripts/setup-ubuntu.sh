@@ -212,6 +212,9 @@ PACKAGES+=" python3-jsonschema"
 # Needed by proxmark3/proxmark3-git
 PACKAGES+=" gcc-arm-none-eabi"
 
+# Needed by pypy
+PACKAGES+=" qemu-user-static"
+
 # For opt, llvm-link, llc not shipped by NDK.
 # Required by picolisp (and maybe a few others in future)
 PACKAGES+=" llvm-12"
