@@ -24,7 +24,7 @@ TERMUX_PKG_SHA256=(9683da9a0c84d1c42d1bf92ecf6e012d302406a38fd987e3dfbcb7b58b2ee
                    c8f3ec591e3f17b939220f2b9eabb4c5e2db330f8af62c0a3aeee8a4d1a6c0db
                    01305f0befb644ce7fe90aa0c87573b9163a21d0e65149e8166c24974d9d37d2)
 TERMUX_PKG_DEPENDS="freetype, libc++, libjpeg-turbo, libtiff, libwebp, libxcb, littlecms, openjpeg, python, zlib"
-_PKG_PYTHON_DEPENDS="'cycler>=0.10' 'fonttools>=4.22.0' 'kiwisolver>=1.0.1' 'numpy>=1.17' 'packaging>=20.0' 'pillow>=6.2.0' 'pyparsing>=2.2.1' 'python-dateutil>=2.7'"
+_PKG_PYTHON_DEPENDS="'cycler>=0.10' 'fonttools>=4.22.0' 'kiwisolver<1.4.0,>=1.0.1' 'numpy>=1.17' 'packaging>=20.0' 'pillow>=6.2.0' 'pyparsing>=2.2.1' 'python-dateutil>=2.7'"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 _PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
