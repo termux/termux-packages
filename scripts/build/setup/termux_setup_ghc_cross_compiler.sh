@@ -46,10 +46,9 @@ termux_setup_ghc_cross_compiler() {
 			termux_error_exit "Package 'ghc-libs' is not installed. It is required by GHC cross-compiler." \
 				"You should specify it in 'TERMUX_PKG_BUILD_DEPENDS'."
 
-		__termux_haskell_register_packages
-
 		if [[ -d "${TERMUX_GHC_RUNTIME_FOLDER}" ]]; then
 			__termux_haskell_eval_custom_build "${TERMUX_GHC_RUNTIME_FOLDER}/bin/${TERMUX_ARCH}"
+			__termux_haskell_register_packages
 			return
 		fi
 
@@ -91,6 +90,7 @@ termux_setup_ghc_cross_compiler() {
 		# timestamp creation, we need to remove it in massage step.
 
 		__termux_haskell_eval_custom_build "${TERMUX_GHC_RUNTIME_FOLDER}/bin/${TERMUX_ARCH}"
+		__termux_haskell_register_packages
 
 		rm "${TERMUX_GHC_TAR}"
 	else
