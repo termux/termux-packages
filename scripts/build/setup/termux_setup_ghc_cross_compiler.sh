@@ -67,7 +67,7 @@ termux_setup_ghc_cross_compiler() {
 				"You should specify it in 'TERMUX_PKG_BUILD_DEPENDS'."
 
 		if [[ -d "${TERMUX_GHC_RUNTIME_FOLDER}" ]]; then
-			____termux_haskell_setup_build_script "${TERMUX_GHC_RUNTIME_FOLDER}"
+			__termux_haskell_setup_build_script "${TERMUX_GHC_RUNTIME_FOLDER}"
 			__termux_haskell_register_packages
 			return
 		fi
@@ -75,10 +75,10 @@ termux_setup_ghc_cross_compiler() {
 		local CHECKSUMS
 		CHECKSUMS="$(
 			cat <<-EOF
-				aarch64:abcb8c4e9d9c1ef3ce1e95049fe220c1947059c965a10baaa97a864666c17f4c
-				arm:2bc44818f312bf7110deefbd23da0177f9e299519c22fe28b21ac24a2ea689a4
-				i686:8e05cd5ffaeb1dc6dec824bf9ac42572f418ab95f86606e1dff91bcdca9e78b6
-				x86_64:1976ec89e16294c8866ae7e2d564ce5bae8ebc62ac3dab1c2b8845f775b85feb
+				aarch64:0912e8c6a8f4b362198c26129bb55f8e76edfcfbf38bfaf8b025a46429e6a887
+				arm:4f9acf98ee44eaebec6bce915507a934d1f880dd4c7ee679c075644e3bc41f78
+				i686:289a04baa67b8cbef401aebf8f5ffef90735e5a5b6e00ce39a50b82c134fe51b
+				x86_64:b43b4c8b80210c2b17ad4547d6d007163052edbd662495e0010b1c9b17d4f865
 			EOF
 		)"
 

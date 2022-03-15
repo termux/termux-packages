@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # Utility function to setup a GHC toolchain.
 termux_setup_ghc() {
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
@@ -36,9 +37,8 @@ termux_setup_ghc() {
 		# to Setup.hs configure.
 		(
 			CABAL_VERSION="3.6.2.0"
-			CABAL_TEMP_FOLDER="$(mktemp -d cabal.XXXXXX)"
+			CABAL_TEMP_FOLDER="$(mktemp -d -t cabal-"${CABAL_VERSION}".XXXXXX)"
 			CABAL_TAR="${CABAL_TEMP_FOLDER}/cabal-${CABAL_VERSION}.tar.gz"
-			cd "${CABAL_TEMP_FOLDER}"
 
 			termux_download \
 				https://hackage.haskell.org/package/Cabal-"${CABAL_VERSION}"/Cabal-"${CABAL_VERSION}".tar.gz \
