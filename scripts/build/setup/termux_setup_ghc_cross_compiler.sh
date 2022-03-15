@@ -124,10 +124,9 @@ termux_setup_ghc_cross_compiler() {
 			local ON_DEVICE_GHC_RUNTIME="${TERMUX_COMMON_CACHEDIR}/${GHC_PREFIX}-runtime"
 			export PATH="${ON_DEVICE_GHC_RUNTIME}/bin:${PATH}"
 
-			__termux_haskell_register_packages
-
 			if [[ -d "${ON_DEVICE_GHC_RUNTIME}" ]]; then
 				__termux_haskell_setup_build_script "${ON_DEVICE_GHC_RUNTIME}"
+				__termux_haskell_register_packages
 				return
 			fi
 
@@ -136,6 +135,7 @@ termux_setup_ghc_cross_compiler() {
 				ln -sf "${TERMUX_PREFIX}/bin/${tool}" "${ON_DEVICE_GHC_RUNTIME}/bin/termux-${tool}"
 			done
 			__termux_haskell_setup_build_script "${ON_DEVICE_GHC_RUNTIME}"
+			__termux_haskell_register_packages
 		fi
 	fi
 }
