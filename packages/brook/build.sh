@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A cross-platform strong encryption and not detectable pr
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Krishna kanhaiya @kcubeterm"
 TERMUX_PKG_VERSION=20220404
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/txthinking/brook/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=a119adf673df8f61fcaec841e471392cfdd9d307fe52ec9d6b3d9393846a7630
 TERMUX_PKG_AUTO_UPDATE=true
