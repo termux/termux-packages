@@ -17,6 +17,7 @@ termux_step_make() {
 	cd "$GOPATH"/src/github.com/aptly-dev/aptly
 
 	go mod init
+	go mod tidy
 	go mod vendor
 	make install VERSION=$TERMUX_PKG_VERSION
 }
