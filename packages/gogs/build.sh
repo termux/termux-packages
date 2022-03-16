@@ -15,7 +15,7 @@ termux_step_handle_hostbuild() {
 	export GOPATH=$TERMUX_PKG_HOSTBUILD_DIR
 	mkdir -p $TERMUX_PKG_HOSTBUILD_DIR
 	cd $TERMUX_PKG_HOSTBUILD_DIR
-	go get -u github.com/kevinburke/go-bindata/...
+	go install github.com/kevinburke/go-bindata/go-bindata@latest
 }
 
 termux_step_make() {
