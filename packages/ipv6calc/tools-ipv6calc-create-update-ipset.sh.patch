@@ -1,0 +1,29 @@
+--- a/tools/ipv6calc-create-update-ipset.sh
++++ b/tools/ipv6calc-create-update-ipset.sh
+@@ -271,7 +271,7 @@
+ 		return 4
+ 	else
+ 		# create temporary file
+-		commandfile=$(mktemp /tmp/ipset-$list-$setname.XXXXX)
++		commandfile=$(mktemp @TERMUX_PREFIX@/tmp/ipset-$list-$setname.XXXXX)
+ 		if [ -z "$commandfile" ]; then
+ 			echo "ERROR : can't create temporary command file"
+ 			return 2
+@@ -296,7 +296,7 @@
+ # update entries of an ipset (firewalld)
+ # rc: 0=ok 1=nothingtodo 4=dryrun 3=error 2=fatal
+ ipset_update_entries_firewalld() {
+-	local add_entries_file=$(mktemp /tmp/ipset-firewalld-add-$list-$setname.XXXXX)
++	local add_entries_file=$(mktemp @TERMUX_PREFIX@/tmp/ipset-firewalld-add-$list-$setname.XXXXX)
+ 	if [ -z "$add_entries_file" ]; then
+ 		echo "ERROR : can't create temporary file containing entries to add"
+ 		return 2
+@@ -310,7 +310,7 @@
+ 		fi
+ 	done
+ 
+-	local del_entries_file=$(mktemp /tmp/ipset-firewalld-remove-$list-$setname.XXXXX)
++	local del_entries_file=$(mktemp @TERMUX_PREFIX@/tmp/ipset-firewalld-remove-$list-$setname.XXXXX)
+ 	if [ -z "$del_entries_file" ]; then
+ 		echo "ERROR : can't create temporary file containing entries to remove"
+ 		return 2
