@@ -1,0 +1,84 @@
+--- a/src/mesa/drivers/x11/xm_buffer.c
++++ b/src/mesa/drivers/x11/xm_buffer.c
+@@ -45,6 +45,81 @@
+ #if defined(USE_XSHM)
+ static volatile int mesaXErrorFlag = 0;
+ 
++#ifdef __ANDROID__
++
++#include <dlfcn.h>
++
++typedef int (*shmctl_func_t)(int, int, struct shmid_ds *);
++typedef int (*shmget_func_t)(key_t, size_t, int);
++typedef void *(*shmat_func_t)(int, void const *, int);
++typedef int (*shmdt_func_t)(void const *);
++static shmctl_func_t shmctl_func;
++static shmget_func_t shmget_func;
++static shmat_func_t shmat_func;
++static shmdt_func_t shmdt_func;
++#undef shmctl
++#undef shmget
++#undef shmat
++#undef shmdt
++static int libandroid_shmem_funcs_initialized;
++
++static void
++libandroid_shmem_initialize(void)
++{
++   if (!libandroid_shmem_funcs_initialized) {
++      void *libandroid_shmem_handle = dlopen("libandroid-shmem.so", RTLD_NOW);
++      if (libandroid_shmem_handle != NULL) {
++         shmctl_func = dlsym(libandroid_shmem_handle, "shmctl");
++         shmget_func = dlsym(libandroid_shmem_handle, "shmget");
++         shmat_func = dlsym(libandroid_shmem_handle, "shmat");
++         shmdt_func = dlsym(libandroid_shmem_handle, "shmdt");
++      }
++      libandroid_shmem_funcs_initialized = 1;
++   }
++}
++
++#pragma GCC visibility push(hidden)
++
++int
++shmctl(int shmid, int cmd, struct shmid_ds *buf)
++{
++   if (!libandroid_shmem_funcs_initialized) {
++      libandroid_shmem_initialize();
++   }
++   return shmctl_func(shmid, cmd, buf);
++}
++
++int
++shmget(key_t key, size_t size, int shmflg)
++{
++   if (!libandroid_shmem_funcs_initialized) {
++      libandroid_shmem_initialize();
++   }
++   return shmget_func(key, size, shmflg);
++}
++
++void *
++shmat(int shmid, void const *shmaddr, int shmflg)
++{
++   if (!libandroid_shmem_funcs_initialized) {
++      libandroid_shmem_initialize();
++   }
++   return shmat_func(shmid, shmaddr, shmflg);
++}
++
++int
++shmdt(void const *shmaddr)
++{
++   if (!libandroid_shmem_funcs_initialized) {
++      libandroid_shmem_initialize();
++   }
++   return shmdt_func(shmaddr);
++}
++
++#pragma GCC visibility pop
++
++#endif /* __ANDROID__ */
++
+ /**
+  * Catches potential Xlib errors.
+  */
