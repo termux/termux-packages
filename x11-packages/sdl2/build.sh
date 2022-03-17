@@ -56,6 +56,12 @@ termux_step_pre_configure() {
 		-e 's/\([^A-Za-z0-9_]__ANDROID\)__$/\1_NO_TERMUX__/g'
 }
 
-termux_step_post_make_install() {
-	ln -sf libSDL2-2.0.so $TERMUX_PREFIX/lib/libSDL2.so
+termux_step_post_massage() {
+	cd ${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/lib || exit 1
+	if [ ! -e "./libSDL2.so" ]; then
+		ln -sf libSDL2-2.0.so libSDL2.so
+	fi
+	if [ ! -e "./libSDL2-2.0.so.0" ]; then
+		ln -sf libSDL2-2.0.so libSDL2-2.0.so.0
+	fi
 }
