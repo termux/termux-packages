@@ -1,0 +1,186 @@
+diff -uNr pypy3.7-v7.3.7-src/lib-python/3/http/server.py pypy3.7-v7.3.7-src.mod/lib-python/3/http/server.py
+--- pypy3.7-v7.3.7-src/lib-python/3/http/server.py      2021-10-24 22:07:11.000000000 +0800
++++ pypy3.7-v7.3.7-src.mod/lib-python/3/http/server.py  2022-01-18 00:16:44.328899400 +0800
+@@ -1161,10 +1161,6 @@
+                 return
+             # Child
+             try:
+-                try:
+-                    os.setuid(nobody)
+-                except OSError:
+-                    pass
+                 os.dup2(self.rfile.fileno(), 0)
+                 os.dup2(self.wfile.fileno(), 1)
+                 os.execve(scriptfile, args, env)
+
+diff -uNr pypy3.6-v7.3.2-src/lib_pypy/_pwdgrp_build.py pypy3.6-v7.3.2-src.mod/lib_pypy/_pwdgrp_build.py
+--- pypy3.6-v7.3.2-src/lib_pypy/_pwdgrp_build.py        2020-09-23 15:02:22.000000000 +0800
++++ pypy3.6-v7.3.2-src.mod/lib_pypy/_pwdgrp_build.py    2021-11-09 18:32:36.933096400 +0800
+@@ -35,9 +35,9 @@
+ struct passwd *getpwuid(uid_t uid);
+ struct passwd *getpwnam(const char *name);
+
+-struct passwd *getpwent(void);
+-void setpwent(void);
+-void endpwent(void);
++// struct passwd *getpwent(void);
++// void setpwent(void);
++// void endpwent(void);
+
+ struct group *getgrgid(gid_t gid);
+ struct group *getgrnam(const char *name);
+
+diff -uNr pypy3.7-v7.3.7-src/lib-python/3/smtpd.py pypy3.7-v7.3.7-src.mod/lib-python/3/smtpd.py
+--- pypy3.7-v7.3.7-src/lib-python/3/smtpd.py            2021-10-24 22:07:11.000000000 +0800
++++ pypy3.7-v7.3.7-src.mod/lib-python/3/smtpd.py        2022-01-18 00:18:09.630517000 +0800
+@@ -9,7 +9,8 @@
+     -n
+         This program generally tries to setuid `nobody', unless this flag is
+         set.  The setuid call will fail if this program is not run as root (in
+-        which case, use this flag).
++        which case, use this flag). Ignored in Termux as no setuid done on this
++        platform.
+
+     --version
+     -V
+@@ -861,7 +862,7 @@
+
+
+ class Options:
+-    setuid = True
++    setuid = False
+     classname = 'PureProxy'
+     size_limit = None
+     enable_SMTPUTF8 = False
+
+
+diff -uNr pypy3.6-v7.3.2-src/pypy/module/pwd/interp_pwd.py pypy3.6-v7.3.2-src.mod/pypy/module/pwd/interp_pwd.py
+--- pypy3.6-v7.3.2-src/pypy/module/pwd/interp_pwd.py            2020-09-23 15:02:22.000000000 +0800
++++ pypy3.6-v7.3.2-src.mod/pypy/module/pwd/interp_pwd.py        2022-01-09 05:13:04.669185900 +0800
+@@ -19,18 +19,25 @@
+ uid_t = config['uid_t']
+ gid_t = config['gid_t']
+
+-class CConfig:
+-    _compilation_info_ = eci
++# Android bionic libc has a different define for passwd.
++# On LP32, it defines pw_gecos to pw_passwd since they're both NULL.
++DEFINED__LP64__ = rffi_platform.getdefined('__LP64__', '')
+
+-    passwd = rffi_platform.Struct(
+-        'struct passwd',
+-        [('pw_name', rffi.CCHARP),
++fields = [('pw_name', rffi.CCHARP),
+          ('pw_passwd', rffi.CCHARP),
+          ('pw_uid', uid_t),
+          ('pw_gid', gid_t),
+          ('pw_gecos', rffi.CCHARP),
+          ('pw_dir', rffi.CCHARP),
+-         ('pw_shell', rffi.CCHARP)])
++         ('pw_shell', rffi.CCHARP)]
++
++if not DEFINED__LP64__:
++    fields.pop(4)
++
++class CConfig:
++    _compilation_info_ = eci
++
++    passwd = rffi_platform.Struct('struct passwd', fields)
+
+ config = rffi_platform.configure(CConfig)
+
+@@ -42,9 +49,10 @@
+
+ c_getpwuid = external("getpwuid", [uid_t], passwd_p)
+ c_getpwnam = external("getpwnam", [rffi.CCHARP], passwd_p)
+-c_setpwent = external("setpwent", [], lltype.Void)
+-c_getpwent = external("getpwent", [], passwd_p)
+-c_endpwent = external("endpwent", [], lltype.Void)
++# Android bionic libc doesn't have these functions until API 26, but termux compiles on API 23/24.
++# c_setpwent = external("setpwent", [], lltype.Void)
++# c_getpwent = external("getpwent", [], passwd_p)
++# c_endpwent = external("endpwent", [], lltype.Void)
+
+
+ def uid_converter(space, w_uid):
+@@ -80,7 +88,7 @@
+         space.newtext(rffi.charp2str(pw.c_pw_passwd)),
+         space.int(space.newint(pw.c_pw_uid)),
+         space.int(space.newint(pw.c_pw_gid)),
+-        space.newtext(rffi.charp2str(pw.c_pw_gecos)),
++        space.newtext(rffi.charp2str(pw.c_pw_gecos if DEFINED__LP64__ else pw.c_pw_passwd)),
+         space.newtext(rffi.charp2str(pw.c_pw_dir)),
+         space.newtext(rffi.charp2str(pw.c_pw_shell)),
+         ])
+@@ -120,15 +128,15 @@
+         raise oefmt(space.w_KeyError, "getpwnam(): name not found: %s", name)
+     return make_struct_passwd(space, pw)
+
+-def getpwall(space):
+-    users_w = []
+-    c_setpwent()
+-    try:
+-        while True:
+-            pw = c_getpwent()
+-            if not pw:
+-                break
+-            users_w.append(make_struct_passwd(space, pw))
+-    finally:
+-        c_endpwent()
+-    return space.newlist(users_w)
++# def getpwall(space):
++#     users_w = []
++#     c_setpwent()
++#     try:
++#         while True:
++#             pw = c_getpwent()
++#             if not pw:
++#                 break
++#             users_w.append(make_struct_passwd(space, pw))
++#     finally:
++#         c_endpwent()
++#     return space.newlist(users_w)
+
+diff -uNr pypy3.6-v7.3.2-src/pypy/module/pwd/moduledef.py pypy3.6-v7.3.2-src.mod/pypy/module/pwd/moduledef.py
+--- pypy3.6-v7.3.2-src/pypy/module/pwd/moduledef.py     2020-09-23 15:02:22.000000000 +0800
++++ pypy3.6-v7.3.2-src.mod/pypy/module/pwd/moduledef.py 2021-11-09 18:31:05.132729100 +0800
+@@ -15,11 +15,11 @@
+     interpleveldefs = {
+         'getpwuid': 'interp_pwd.getpwuid',
+         'getpwnam': 'interp_pwd.getpwnam',
+-        'getpwall': 'interp_pwd.getpwall',
++        # 'getpwall': 'interp_pwd.getpwall',
+     }
+
+     appleveldefs = {
+         'struct_passwd': 'app_pwd.struct_passwd',
+-        'struct_pwent': 'app_pwd.struct_passwd',
++        # 'struct_pwent': 'app_pwd.struct_passwd',
+     }
+
+diff -uNr pypy3.7-v7.3.7-src/rpython/rlib/rvmprof/cintf.py pypy3.7-v7.3.7-src.mod/rpython/rlib/rvmprof/cintf.py
+--- pypy3.7-v7.3.7-src/rpython/rlib/rvmprof/cintf.py            2022-01-02 01:09:08.909941000 +0800
++++ pypy3.7-v7.3.7-src.mod/rpython/rlib/rvmprof/cintf.py        2022-01-02 01:10:11.909941000 +0800
+@@ -16,14 +16,14 @@
+ class VMProfPlatformUnsupported(Exception):
+     pass
+
+-# vmprof works only on x86 for now
++# vmprof cannot compile on termux due to no dlinfo on Bionic Libc
+ IS_SUPPORTED = False
+-if sys.platform in ('darwin', 'linux', 'linux2') or sys.platform.startswith('freebsd'):
+-    try:
+-        proc = detect_cpu.autodetect()
+-        IS_SUPPORTED = proc.startswith('x86') or proc == 'aarch64'
+-    except detect_cpu.ProcessorAutodetectError:
+-        print("PROCESSOR NOT DETECTED, SKIPPING VMPROF")
++# if sys.platform in ('darwin', 'linux', 'linux2') or sys.platform.startswith('freebsd'):
++#     try:
++#         proc = detect_cpu.autodetect()
++#         IS_SUPPORTED = proc.startswith('x86') or proc == 'aarch64'
++#     except detect_cpu.ProcessorAutodetectError:
++#         print("PROCESSOR NOT DETECTED, SKIPPING VMPROF")
+
+ ROOT = py.path.local(rpythonroot).join('rpython', 'rlib', 'rvmprof')
+ SRC = ROOT.join('src')
+

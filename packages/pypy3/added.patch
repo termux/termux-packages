@@ -1,0 +1,176 @@
+diff -U 1 -Nr pypy3.7-v7.3.7-src/lib_pypy/_resource_build.py pypy3.7-v7.3.7-src.mod/lib_pypy/_resource_build.py
+--- pypy3.7-v7.3.7-src/lib_pypy/_resource_build.py      2021-10-24 22:07:11.000000000 +0800
++++ pypy3.7-v7.3.7-src.mod/lib_pypy/_resource_build.py  2022-03-04 20:21:29.878623200 +0800
+@@ -75,2 +75,5 @@
+ }
++
++/* Termux addition: Add wait3() declaration used by busybox. Available in libc for 32-bit only. */
++static pid_t wait3(int* status, int options, struct rusage* rusage) { return wait4(-1, status, options, rusage); }
+ """.replace('$RLIMIT_CONSTS', ''.join(rlimit_consts))
+
+
+diff -uNr pypy3.7-v7.3.7-src/lib_pypy/_sysconfigdata.py pypy3.7-v7.3.7-src.mod/lib_pypy/_sysconfigdata.py
+--- pypy3.7-v7.3.7-src/lib_pypy/_sysconfigdata.py       2021-10-24 22:07:11.000000000 +0800
++++ pypy3.7-v7.3.7-src.mod/lib_pypy/_sysconfigdata.py   2022-02-08 17:13:30.417939100 +0800
+@@ -67,3 +67,6 @@
+         build_time_vars['CXX'] += ' -arch %s' % (arch,)
+     build_time_vars['MACOSX_DEPLOYMENT_TARGET'] = '10.7'
+
++# Termux Fix: Add ANDROID_API_LEVEL
++build_time_vars["ANDROID_API_LEVEL"] = 24
++
+
+
+
+diff -uNr pypy2.7-v7.3.6-src/rpython/rlib/rsocket.py pypy2.7-v7.3.6-src.mod/rpython/rlib/rsocket.py
+--- pypy2.7-v7.3.6-src/rpython/rlib/rsocket.py          2021-10-03 14:36:11.000000000 +0800
++++ pypy2.7-v7.3.6-src.mod/rpython/rlib/rsocket.py      2022-01-17 22:54:28.191684700 +0800
+@@ -1627,11 +1627,48 @@
+         raise RSocketError("port/proto not found")
+     return rffi.charp2str(servent.c_s_name)
+
++PROTOCOL_NAME_AND_NUMBER = {
++    "ip": 0,
++    "icmp": 1,
++    "igmp": 2,
++    "ggp": 3,
++    "ipencap": 4,
++    "st": 5,
++    "tcp": 6,
++    "egp": 8,
++    "pup": 12,
++    "udp": 17,
++    "hmp": 20,
++    "xns-idp": 22,
++    "iso-tp4": 29,
++    "xtp": 36,
++    "ddp": 37,
++    "idpr-cmtp": 38,
++    "ipv6": 41,
++    "ipv6-route": 43,
++    "ipv6-frag": 44,
++    "idrp": 45,
++    "rsvp": 46,
++    "gre": 47,
++    "esp": 50,
++    "ah": 51,
++    "skip": 57,
++    "ipv6-icmp": 58,
++    "ipv6-nonxt": 59,
++    "ipv6-opts": 60,
++    "rspf": 73,
++    "vmtp": 81,
++    "ospf": 89,
++    "ipip": 94,
++    "encap": 98,
++    "pim": 103,
++    "raw": 255
++}
++
+ def getprotobyname(name):
+-    protoent = _c.getprotobyname(name)
+-    if not protoent:
++    proto = PROTOCOL_NAME_AND_NUMBER.get(name, -1)
++    if proto == -1:
+         raise RSocketError("protocol not found")
+-    proto = protoent.c_p_proto
+     return rffi.cast(lltype.Signed, proto)
+
+ def getnameinfo(address, flags):
+
+
+--- pypy3.8-v7.3.8-src/lib_pypy/_posixshmem_build.py        2022-03-17 19:56:33.673877800 +0800
++++ pypy3.8-v7.3.8-src.mod/lib_pypy/_posixshmem_build.py    2022-03-17 19:56:09.492363700 +0800
+@@ -12,15 +12,88 @@
+ """)
+ 
+ SOURCE = """
+-#include <sys/mman.h>
+-#include <sys/stat.h>        /* For mode constants */
+-#include <fcntl.h>           /* For O_* constants */
++/* This file is a port of posix shared memory for Python3 on Termux Android, 
++   based on musl-libc which is licensed under the following standard MIT 
++   license. The ported files are listed as following.
++
++   File(s): src/mman/shm_open.c
++
++   Copyright © 2005-2020 Rich Felker, et al.
++
++   Permission is hereby granted, free of charge, to any person obtaining
++   a copy of this software and associated documentation files (the
++   "Software"), to deal in the Software without restriction, including
++   without limitation the rights to use, copy, modify, merge, publish,
++   distribute, sublicense, and/or sell copies of the Software, and to
++   permit persons to whom the Software is furnished to do so, subject to
++   the following conditions:
++
++   The above copyright notice and this permission notice shall be
++   included in all copies or substantial portions of the Software.
++
++   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
++   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
++   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
++   IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
++   CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
++   TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
++   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
++ */
++
++#include <fcntl.h>     // open()
++#include <string.h>    // strlen(), memcpy()
++#include <errno.h>     // errno
++#include <limits.h>    // NAME_MAX
++#include <unistd.h>    // unlink()
++
++#define SHM_PREFIX "@TERMUX_PREFIX@/tmp/shm."
++
++static __inline__ char *__strchrnul(const char *s, int c)
++{
++    c = (unsigned char)c;
++    if (!c) return (char *)s + strlen(s);
++    for (; *s && *(unsigned char *)s != c; s++);
++    return (char *)s;
++}
++
++static char *__shm_mapname(const char *name, char *buf)
++{
++    char *p;
++    while (*name == '/') name++;
++    if (*(p = __strchrnul(name, '/')) || p==name ||
++        (p-name <= 2 && name[0]=='.' && p[-1]=='.')) {
++        errno = EINVAL;
++        return 0;
++    }
++    if (p-name > NAME_MAX-4) {
++        errno = ENAMETOOLONG;
++        return 0;
++    }
++    memcpy(buf, SHM_PREFIX, strlen(SHM_PREFIX));
++    memcpy(buf+strlen(SHM_PREFIX), name, p-name+1);
++    return buf;
++}
++
++int shm_open(const char *name, int flag, mode_t mode)
++{
++    char buf[NAME_MAX+strlen(SHM_PREFIX)+1];
++    if (!(name = __shm_mapname(name, buf))) return -1;
++    int fd = open(name, flag|O_NOFOLLOW|O_CLOEXEC|O_NONBLOCK, mode);
++    return fd;
++}
++
++int shm_unlink(const char *name)
++{
++    char buf[NAME_MAX+strlen(SHM_PREFIX)+1];
++    if (!(name = __shm_mapname(name, buf))) return -1;
++    return unlink(name);
++}
+ """
+ 
+ if sys.platform == 'darwin':
+     libraries = []
+ else:
+-    libraries=['rt']
++    libraries=['c']
+ _ffi.set_source("_posixshmem_cffi", SOURCE, libraries=libraries)
+ 
+ 

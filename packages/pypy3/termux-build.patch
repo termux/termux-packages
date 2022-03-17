@@ -1,0 +1,250 @@
+diff -uNr pypy2.7-v7.3.6-src/rpython/config/translationoption.py pypy2.7-v7.3.6-src.mod/rpython/config/translationoption.py
+--- pypy2.7-v7.3.6-src/rpython/config/translationoption.py      2021-10-03 14:36:11.000000000 +0800
++++ pypy2.7-v7.3.6-src.mod/rpython/config/translationoption.py  2022-02-02 22:03:09.677990900 +0800
+@@ -40,6 +40,10 @@
+ PLATFORMS = [
+     'host',
+     'arm',
++    'termux-aarch64',
++    'termux-arm',
++    'termux-x86_64',
++    'termux-i686',
+ ]
+
+ translation_optiondescription = OptionDescription(
+@@ -285,8 +289,17 @@
+     ChoiceOption("platform",
+                  "target platform", ['host'] + PLATFORMS, default='host',
+                  cmdline='--platform',
+-                 suggests={"arm": [("translation.gcrootfinder", "shadowstack"),
+-                                   ("translation.jit_backend", "arm")]}),
++                 suggests={ "arm": [("translation.gcrootfinder", "shadowstack"),
++                                   ("translation.jit_backend", "arm")],
++                            "termux-aarch64": [("translation.gcrootfinder", "shadowstack"),
++                                               ("translation.jit_backend", "auto")],
++                            "termux-arm": [("translation.gcrootfinder", "shadowstack"),
++                                           ("translation.jit_backend", "arm")],
++                            "termux-x86_64": [("translation.gcrootfinder", "shadowstack"),
++                                              ("translation.jit_backend", "auto")],
++                            "termux-i686": [("translation.gcrootfinder", "shadowstack"),
++                                            ("translation.jit_backend", "auto")],
++                        }),
+
+     BoolOption("split_gc_address_space",
+                "Ensure full separation of GC and non-GC pointers", default=False),
+
+diff -uNr pypy2.7-v7.3.6-src/rpython/translator/platform/__init__.py pypy2.7-v7.3.6-src.mod/rpython/translator/platform/__init__.py
+--- pypy2.7-v7.3.6-src/rpython/translator/platform/__init__.py          2021-10-03 14:36:11.000000000 +0800
++++ pypy2.7-v7.3.6-src.mod/rpython/translator/platform/__init__.py      2022-02-06 11:18:42.527715600 +0800
+@@ -332,6 +332,8 @@
+ else:
+     raise ValueError('unknown sys.platform "%s"', sys.platform)
+
++# Android always requires compiling with -fPIC
++host_factory = LinuxPIC
+ platform = host = host_factory()
+
+ def pick_platform(new_platform, cc):
+@@ -340,6 +342,18 @@
+     elif new_platform == 'arm':
+         from rpython.translator.platform.arm import ARM
+         return ARM(cc)
++    elif new_platform == 'termux-aarch64':
++        from rpython.translator.platform.termux import Termux_AArch64
++        return Termux_AArch64(cc)
++    elif new_platform == 'termux-arm':
++        from rpython.translator.platform.termux import Termux_ARM
++        return Termux_ARM(cc)
++    elif new_platform == 'termux-x86_64':
++        from rpython.translator.platform.termux import Termux_AMD64
++        return Termux_AMD64(cc)
++    elif new_platform == 'termux-i686':
++        from rpython.translator.platform.termux import Termux_IA32
++        return Termux_IA32(cc)
+     else:
+         raise ValueError("platform = %s" % (new_platform,))
+
+
+
+--- pypy3.7-v7.3.7-src/rpython/translator/platform/termux.py	1970-01-01 08:00:00.000000000 +0800
++++ pypy3.7-v7.3.7-src.mod/rpython/translator/platform/termux.py	2022-03-10 16:49:35.071701000 +0800
+@@ -0,0 +1,179 @@
++from rpython.translator.platform.linux import LinuxPIC
++from rpython.translator.platform.posix import _run_subprocess, GnuMakefile
++from rpython.translator.platform import ExecutionResult, log
++import os
++
++PROOT_TARGET = os.getenv("PROOT_TARGET")
++if PROOT_TARGET == None:
++    log.Error("PROOT_TARGET: Must provide PROOT_TARGET.")
++    assert 0
++
++PROOT_TARGET_ARGS = PROOT_TARGET.split()
++
++TARGET_ROOTFS_BASE = os.getenv("TARGET_ROOTFS_BASE")
++if TARGET_ROOTFS_BASE == None:
++    log.Error("TARGET_ROOTFS_BASE: Must provide TARGET_ROOTFS_BASE.")
++    assert 0
++
++def _update_cflags_for_termux(cflags):
++    assert isinstance(cflags, tuple)
++    cflags += ("-fstack-protector-strong", "-fopenmp",
++               "-DBIONIC_IOCTL_NO_SIGNEDNESS_OVERLOAD", )
++    return cflags
++
++def _update_link_flags_for_termux(ldflags):
++    assert isinstance(ldflags, tuple)
++    ldflags += ("-fopenmp", "-static-openmp",
++                "-Wl,--enable-new-dtags", "-Wl,--as-needed",
++                "-Wl,-z,relro,-z,now", "-Wl,-rpath=@TERMUX_PREFIX@/lib", )
++    return ldflags
++
++def _update_rpath_flags(rpath_flags):
++    assert isinstance(rpath_flags, list)
++    return ["-Wl,-rpath=@TERMUX_PREFIX@/lib"] + rpath_flags
++
++class BaseTermux(LinuxPIC):
++    cflags = _update_cflags_for_termux(LinuxPIC.cflags)
++    extra_libs = ()
++    link_flags = _update_link_flags_for_termux(LinuxPIC.link_flags)
++    rpath_flags = _update_rpath_flags(LinuxPIC.rpath_flags)
++    available_includedirs = []
++    available_librarydirs = []
++
++    @property
++    def cc(self):
++        return self._get_cross_compiler()
++
++    @cc.setter
++    def cc(self, *args):
++        pass
++
++    def _execute_c_compiler(self, cc, args, outname, cwd=None):
++        # 'cc' can also contain some options for the C compiler;
++        # e.g. it can be "gcc -m32".  We handle it by splitting on ' '.
++        cclist = cc.split()
++        cc = cclist[0]
++        args = cclist[1:] + args
++        log.execute('Exec: ' + cc + ' ' + ' '.join(args))
++        returncode, stdout, stderr = _run_subprocess(
++            cc, args, self.c_environ, cwd)
++        self._handle_error(returncode, bytes(stdout), bytes(stderr), outname)
++
++    def execute(self, executable, args=[], env=None, compilation_info=None):
++        if self._is_same_platform_type():
++            log.execute('Exec (' + self.name + '): ' +
++                        str(executable) + ' ' + ' '.join(args))
++            return super(BaseTermux, self).execute(executable, args, env, compilation_info)
++        if isinstance(args, str):
++            args = ' ' + str(executable) + ' ' + args
++            log.execute('Cross Exec (' + self.name + '): ' + args)
++        else:
++            args = [str(executable)] + args
++            log.execute('Cross Exec (' + self.name + '): ' + ' '.join(args))
++        proot_exec = PROOT_TARGET_ARGS[0]
++        args = PROOT_TARGET_ARGS[1:] + args
++        returncode, stdout, stderr = _run_subprocess(proot_exec, args, env)
++        stdout = "" if stdout == None else stdout
++        stderr = "" if stderr == None else stderr
++        return ExecutionResult(returncode, stdout, stderr)
++
++    def include_dirs_for_libffi(self):
++        return self.available_includedirs
++
++    def library_dirs_for_libffi(self):
++        return self.available_librarydirs
++
++    def _preprocess_include_dirs(self, include_dirs):
++        return list(include_dirs) + self.available_includedirs
++
++    def _preprocess_library_dirs(self, library_dirs):
++        return list(library_dirs) + self.available_librarydirs
++
++    def execute_makefile(self, path_to_makefile, extra_opts=[]):
++        raise NotImplementedError()
++
++    def get_multiarch(self):
++        raise NotImplementedError("Needs to be overwritten")
++
++    def _get_cross_compiler(self):
++        return "clang" if self._is_same_platform_type() else ("clang --target=" + self.get_multiarch())
++
++    def _get_build_platform_type(self):
++        return "x86"
++
++    def _get_target_platform_type(self):
++        raise NotImplementedError("Needs to be overwritten")
++
++    def _is_same_platform_type(self):
++        return self._get_build_platform_type() == self._get_target_platform_type()
++
++def _update_cflags_for_termux_aarch64(cflags):
++    return ('-I' + TARGET_ROOTFS_BASE + '@TERMUX_PREFIX@/include', ) + cflags
++
++def _update_link_flags_for_termux_aarch64(ldflags):
++    return ('-L' + TARGET_ROOTFS_BASE + '@TERMUX_PREFIX@/lib', ) + ldflags
++
++class Termux_AArch64(BaseTermux):
++    name = "termux-aarch64"
++    cflags = _update_cflags_for_termux_aarch64(BaseTermux.cflags)
++    link_flags = _update_link_flags_for_termux_aarch64(BaseTermux.link_flags)
++
++    def get_multiarch(self):
++        return "aarch64-linux-android"
++
++    def _get_target_platform_type(self):
++        return "arm"
++
++def _update_cflags_for_termux_arm(cflags):
++    return ('-I' + TARGET_ROOTFS_BASE + '@TERMUX_PREFIX@/include',
++            "-march=armv7-a", "-mfpu=neon",
++            "-mfloat-abi=softfp", "-mthumb", ) + cflags
++
++def _update_link_flags_for_termux_arm(ldflags):
++    return ("-march=armv7-a", '-L' + TARGET_ROOTFS_BASE + '@TERMUX_PREFIX@/lib', ) + ldflags
++
++class Termux_ARM(BaseTermux):
++    name = "termux-arm"
++    cflags = _update_cflags_for_termux_arm(BaseTermux.cflags)
++    link_flags = _update_link_flags_for_termux_arm(BaseTermux.link_flags)
++
++    def get_multiarch(self):
++        return "arm-linux-androideabi"
++
++    def _get_target_platform_type(self):
++        return "arm"
++
++def _update_cflags_for_termux_x86_64(ldflags):
++    return ('-I@TERMUX_PREFIX@/include', ) + ldflags
++
++def _update_link_flags_for_termux_x86_64(ldflags):
++    return ('-L@TERMUX_PREFIX@/lib', ) + ldflags
++
++class Termux_AMD64(BaseTermux):
++    name = "termux-x86_64"
++    cflags = _update_cflags_for_termux_x86_64(BaseTermux.cflags)
++    link_flags = _update_link_flags_for_termux_x86_64(BaseTermux.link_flags)
++
++    def get_multiarch(self):
++        return "x86_64-linux-android"
++
++    def _get_target_platform_type(self):
++        return "x86"
++
++def _update_cflags_for_termux_i686(cflags):
++    return ('-I@TERMUX_PREFIX@/include', "-march=i686", "-msse3",
++            "-mstackrealign", "-mfpmath=sse", "-fPIC", ) + cflags
++
++def _update_link_flags_for_termux_i686(ldflags):
++    return ('-L@TERMUX_PREFIX@/lib', "-fPIC", ) + ldflags
++
++class Termux_IA32(BaseTermux):
++    name = "termux-i686"
++    cflags = _update_cflags_for_termux_i686(BaseTermux.cflags)
++    link_flags = _update_link_flags_for_termux_i686(BaseTermux.link_flags)
++
++    def get_multiarch(self):
++        return "i686-linux-android"
++
++    def _get_target_platform_type(self):
++        return "x86"

@@ -1,0 +1,107 @@
+diff -U 1 -Nr pypy2.7-v7.3.6-src/lib_pypy/_audioop_build.py pypy2.7-v7.3.6-src.mod/lib_pypy/_audioop_build.py
+--- pypy2.7-v7.3.6-src/lib_pypy/_audioop_build.py       2021-10-03 14:36:11.000000000 +0800
++++ pypy2.7-v7.3.6-src.mod/lib_pypy/_audioop_build.py   2022-01-16 19:42:48.828092300 +0800
+@@ -629,3 +629,3 @@
+
+-ffi.set_source("_audioop_cffi", C_SOURCE)
++ffi.set_source("_audioop_cffi", C_SOURCE, libraries=["m"])
+
+diff -U 1 -Nr pypy2.7-v7.3.6-src/lib_pypy/_syslog_build.py pypy2.7-v7.3.6-src.mod/lib_pypy/_syslog_build.py
+--- pypy3.7-v7.3.7-src/lib_pypy/_syslog_build.py        2021-10-24 22:07:11.000000000 +0800
++++ pypy3.7-v7.3.7-src.mod/lib_pypy/_syslog_build.py    2022-01-18 13:15:23.250151600 +0800
+@@ -23,7 +23,7 @@
+ #ifndef LOG_NEWS
+ #define LOG_NEWS LOG_MAIL
+ #endif
+-""")
++""", libraries=['log'])
+
+ ffi.cdef("""
+ /* mandatory constants */
+
+
+diff -uNr pypy2.7-v7.3.6-src/lib_pypy/_dbm.py pypy2.7-v7.3.6-src.mod/lib_pypy/_dbm.py
+--- pypy2.7-v7.3.6-src/lib_pypy/_dbm.py      2021-10-03 14:36:11.000000000 +0800
++++ pypy2.7-v7.3.6-src.mod/lib_pypy/_dbm.py  2022-02-09 09:35:04.548269800 +0800
+@@ -123,7 +123,9 @@
+         func.restype = restype
+ 
+ if sys.platform != 'darwin':
+-    libpath = ctypes.util.find_library('db')
++    libpath = ctypes.util.find_library('gdbm_compat')
++    if not libpath:
++        libpath = ctype.util.find_library('db')
+     if not libpath:
+         # XXX this is hopeless...
+         for c in ['5.3', '5.2', '5.1', '5.0', '4.9', '4.8', '4.7', '4.6', '4.5']:
+
+
+diff -uNr pypy3.6-v7.3.2-src/pypy/module/_multiprocessing/interp_semaphore.py pypy3.6-v7.3.2-src.mod/pypy/module/_multiprocessing/interp_semaphore.py
+--- pypy3.6-v7.3.2-src/pypy/module/_multiprocessing/interp_semaphore.py         2020-09-23 15:02:22.000000000 +0800
++++ pypy3.6-v7.3.2-src.mod/pypy/module/_multiprocessing/interp_semaphore.py     2021-11-08 05:33:39.436884700 +0800
+@@ -43,7 +43,7 @@
+     if sys.platform == 'darwin':
+         libraries = []
+     else:
+-        libraries = ['rt']
++        libraries = ['android-posix-semaphore']
+
+     eci = ExternalCompilationInfo(
+         includes = ['sys/time.h',
+
+diff -uNr pypy3.7-v7.3.7-src/rpython/rlib/rposix.py pypy3.7-v7.3.7-src.mod/rpython/rlib/rposix.py
+--- pypy3.7-v7.3.7-src/rpython/rlib/rposix.py       2021-10-24 22:07:11.000000000 +0800
++++ pypy3.7-v7.3.7-src.mod/rpython/rlib/rposix.py   2022-02-12 18:32:05.555262500 +0800
+@@ -212,7 +212,7 @@
+         includes.append('sys/sysmacros.h')
+     if sys.platform.startswith('freebsd') or sys.platform.startswith('openbsd'):
+         includes.append('sys/ttycom.h')
+-    libraries = ['util']
++    libraries = ['c']
+ 
+ eci = ExternalCompilationInfo(
+     includes=includes,
+
+@@ -2094,6 +2094,8 @@
+         locals()['HAVE_%s' % _name.upper()] = rffi_platform.Has(_name)
+ cConfig = rffi_platform.configure(CConfig)
+ globals().update(cConfig)
++# Remove faccessat, linkat
++HAVE_FACCESSAT = HAVE_LINKAT = False
+ 
+ if not _WIN32:
+     class CConfig:
+
+diff -uNr pypy3.6-v7.3.2-src/rpython/rlib/rtime.py pypy3.6-v7.3.2-src.mod/rpython/rlib/rtime.py
+--- pypy3.6-v7.3.2-src/rpython/rlib/rtime.py            2020-09-23 15:02:22.000000000 +0800
++++ pypy3.6-v7.3.2-src.mod/rpython/rlib/rtime.py        2021-11-08 05:33:04.074015000 +0800
+@@ -29,10 +29,6 @@
+                 'sys/types.h', 'unistd.h',
+                 'sys/time.h', 'sys/resource.h']
+
+-    if not sys.platform.startswith("openbsd") and \
+-       not sys.platform.startswith("freebsd"):
+-        includes.append('sys/timeb.h')
+-
+     need_rusage = True
+
+
+@@ -51,7 +47,7 @@
+ if sys.platform.startswith('freebsd') or sys.platform.startswith('netbsd'):
+     libraries = ['compat']
+ elif sys.platform == 'linux2':
+-    libraries = ['rt']
++    libraries = ['c']
+ else:
+     libraries = []
+
+@@ -198,7 +194,7 @@
+     # do we need to add -lrt?
+     eciclock = CConfigForClockGetTime._compilation_info_
+     if not _NO_MISSING_RT:
+-        eciclock = eciclock.merge(ExternalCompilationInfo(libraries=['rt']))
++        eciclock = eciclock.merge(ExternalCompilationInfo(libraries=['c']))
+     # the functions:
+     c_clock_getres = external("clock_getres",
+                               [lltype.Signed, lltype.Ptr(TIMESPEC)],
+
