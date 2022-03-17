@@ -11,8 +11,8 @@ termux_step_make() {
 	termux_setup_golang
 
 	local _VERSION=$TERMUX_PKG_VERSION
-	local _DATE=$(date -u '+%Y.%m.%d-%H:%M)
-	go build -ldflags "-X \"main.Version=$_VERSION\" -X \"main.BuildTime=$_DATE\"" \
+	local _DATE=$(date -u '+%Y.%m.%d-%H:%M UTC')
+	go build -v -ldflags "-X \"main.Version=$_VERSION\" -X \"main.BuildTime=$_DATE\"" \
 		./cmd/cloudflared
 }
 
