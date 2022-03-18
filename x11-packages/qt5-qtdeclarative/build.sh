@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.qt.io/
 TERMUX_PKG_DESCRIPTION="The Qt Declarative module provides classes for using GUIs created using QML"
 TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
-TERMUX_PKG_VERSION=5.12.11
-TERMUX_PKG_REVISION=3
-TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/5.12/${TERMUX_PKG_VERSION}/submodules/qtdeclarative-everywhere-src-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=1267e029abc8424424c419bc1681db069ec76e51270cc220994e0f442c9f78d3
+TERMUX_PKG_VERSION=5.15.3
+TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/5.15/${TERMUX_PKG_VERSION}/submodules/qtdeclarative-everywhere-opensource-src-${TERMUX_PKG_VERSION}.tar.xz"
+TERMUX_PKG_SHA256=33f15a5caa451bddf8298466442ccf7ca65e4cf90453928ddbb95216c4374062
 TERMUX_PKG_DEPENDS="qt5-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="qt5-qtbase-cross-tools"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -20,6 +19,12 @@ opt/qt/cross/lib/libQt5Bootstrap.*
 TERMUX_PKG_REPLACES="qt5-declarative"
 
 termux_step_pre_configure () {
+    pushd "${TERMUX_PKG_SRCDIR}/src/qmltyperegistrar"
+    "${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
+        -spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-host"
+    make -j "${TERMUX_MAKE_PROCESSES}"
+    popd
+
     #######################################################
     ##
     ##  Hijack the bootstrap library for cross building
@@ -47,8 +52,20 @@ termux_step_post_make_install () {
     #######################################################
 
     ## Qt Declarative utilities.
-    for i in qmlcachegen qmlimportscanner qmllint qmlmin; do
+    for i in qmlcachegen qmlformat qmlimportscanner qmllint qmlmin; do
         cd "${TERMUX_PKG_SRCDIR}/tools/${i}" && {
+            "${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
+                -spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-cross"
+
+            make -j "${TERMUX_MAKE_PROCESSES}"
+            install -Dm700 "../../bin/${i}" "${TERMUX_PREFIX}/bin/${i}"
+        }
+    done
+
+    for i in qmltyperegistrar; do
+        cd "${TERMUX_PKG_SRCDIR}/src/${i}" && {
+            make clean
+
             "${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
                 -spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-cross"
 
@@ -94,8 +111,20 @@ termux_step_post_make_install () {
     }
 
     ## Qt Declarative utilities.
-    for i in qmlcachegen qmlimportscanner qmllint qmlmin; do
+    for i in qmlcachegen qmlformat qmlimportscanner qmllint qmlmin; do
         cd "${TERMUX_PKG_SRCDIR}/tools/${i}" && {
+            make clean
+
+            "${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
+                -spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-host"
+
+            make -j "${TERMUX_MAKE_PROCESSES}"
+            install -Dm700 "../../bin/${i}" "${TERMUX_PREFIX}/opt/qt/cross/bin/${i}"
+        }
+    done
+
+    for i in qmltyperegistrar; do
+        cd "${TERMUX_PKG_SRCDIR}/src/${i}" && {
             make clean
 
             "${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \

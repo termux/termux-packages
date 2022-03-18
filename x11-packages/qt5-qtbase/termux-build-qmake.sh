@@ -63,14 +63,13 @@ termux_step_configure () {
         -no-gbm \
         -no-kms \
         -no-linuxfb \
-        -no-mirclient \
         -no-libudev \
         -no-evdev \
         -no-libinput \
         -no-mtdev \
         -no-tslib \
-        -system-xcb \
-        -no-xcb-xinput \
+        -xcb \
+        -xcb-xlib \
         -gif \
         -system-libpng \
         -system-libjpeg \
@@ -79,14 +78,14 @@ termux_step_configure () {
         -no-feature-systemsemaphore
 }
 
-if [ ! -e "qtbase-everywhere-src-${TERMUX_PKG_VERSION}.tar.xz" ]; then
+if [ ! -e "qtbase-everywhere-opensource-src-${TERMUX_PKG_VERSION}.tar.xz" ]; then
     echo "[*] Downloading Qt sources..."
-    curl -L --output "qtbase-everywhere-src-${TERMUX_PKG_VERSION}.tar.xz" "${TERMUX_PKG_SRCURL}"
+    curl -L --output "qtbase-everywhere-opensource-src-${TERMUX_PKG_VERSION}.tar.xz" "${TERMUX_PKG_SRCURL}"
 fi
 
 echo "[*] Unpacking Qt sources..."
 rm -rf "qtbase-everywhere-src-${TERMUX_PKG_VERSION}"
-tar xf "qtbase-everywhere-src-${TERMUX_PKG_VERSION}.tar.xz"
+tar xf "qtbase-everywhere-opensource-src-${TERMUX_PKG_VERSION}.tar.xz"
 
 cd "qtbase-everywhere-src-${TERMUX_PKG_VERSION}" && {
     ## Patch the source

@@ -1,45 +1,44 @@
 --- src/src/corelib/io/qfilesystemengine_unix.cpp	2020-09-21 13:16:21.000000000 +0000
 +++ src.mod/src/corelib/io/qfilesystemengine_unix.cpp	2021-05-06 16:16:02.735214214 +0000
-@@ -95,7 +95,7 @@
+@@ -100,7 +100,7 @@ extern "C" NSString *NSTemporaryDirectory();
  #endif
  #endif
- 
+
 -#if defined(Q_OS_ANDROID)
 +#if defined(Q_OS_ANDROID) || defined(__ANDROID__)
  // statx() is disabled on Android because quite a few systems
  // come with sandboxes that kill applications that make system calls outside a
  // whitelist and several Android vendors can't be bothered to update the list.
-@@ -109,7 +109,7 @@
+@@ -114,7 +114,7 @@ struct statx { mode_t stx_mode; };      // dummy
  QT_BEGIN_NAMESPACE
- 
+
  enum {
 -#ifdef Q_OS_ANDROID
 +#if defined(Q_OS_ANDROID) || defined(__ANDROID__)
      // On Android, the link(2) system call has been observed to always fail
      // with EACCES, regardless of whether there are permission problems or not.
      SupportsHardlinking = false
-@@ -690,7 +690,7 @@
-     if (entry.isRoot())
-         return entry;
- 
+@@ -684,14 +684,14 @@ QFileSystemEntry QFileSystemEngine::canonicalName(const QFileSystemEntry &entry,
+ {
+     Q_CHECK_FILE_NAME(entry, entry);
+
 -#if !defined(Q_OS_MAC) && !defined(Q_OS_QNX) && !defined(Q_OS_ANDROID) && !defined(Q_OS_HAIKU) && _POSIX_VERSION < 200809L
 +#if !defined(Q_OS_MAC) && !defined(Q_OS_QNX) && !defined(Q_OS_ANDROID) && !defined(__ANDROID__) && !defined(Q_OS_HAIKU) && _POSIX_VERSION < 200809L
      // realpath(X,0) is not supported
      Q_UNUSED(data);
      return QFileSystemEntry(slowCanonicalized(absoluteName(entry).filePath()));
-@@ -704,7 +704,7 @@
-         errno = savedErrno;
-         ret = 0;
-     }
--# elif defined(Q_OS_ANDROID)
-+# elif defined(Q_OS_ANDROID) || defined(__ANDROID__)
-     // On some Android versions, realpath() will return a path even if it does not exist
-     // To work around this, we check existence in advance.
+ #else
+     char stack_result[PATH_MAX+1];
+     char *resolved_name = nullptr;
+-# if defined(Q_OS_DARWIN) || defined(Q_OS_ANDROID)
++# if defined(Q_OS_DARWIN) || defined(Q_OS_ANDROID) || defined(__ANDROID__)
+     // On some Android and macOS versions, realpath() will return a path even if
+     // it does not exist. To work around this, we check existence in advance.
      if (!data.hasFlags(QFileSystemMetaData::ExistsAttribute))
-@@ -854,7 +854,7 @@
- 
+@@ -833,7 +833,7 @@ QString QFileSystemEngine::resolveGroupName(uint groupId)
+
  #if !defined(Q_OS_INTEGRITY) && !defined(Q_OS_WASM)
-     struct group *gr = 0;
+     struct group *gr = nullptr;
 -#if QT_CONFIG(thread) && defined(_POSIX_THREAD_SAFE_FUNCTIONS) && !defined(Q_OS_OPENBSD) && !defined(Q_OS_VXWORKS) && (!defined(Q_OS_ANDROID) || defined(Q_OS_ANDROID) && (__ANDROID_API__ >= 24))
 +#if QT_CONFIG(thread) && defined(_POSIX_THREAD_SAFE_FUNCTIONS) && !defined(Q_OS_OPENBSD) && !defined(Q_OS_VXWORKS) && (!defined(Q_OS_ANDROID) || !defined(__ANDROID__) || defined(Q_OS_ANDROID) && (__ANDROID_API__ >= 24))
      size_max = sysconf(_SC_GETGR_R_SIZE_MAX);

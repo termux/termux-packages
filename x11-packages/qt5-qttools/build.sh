@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.qt.io/
 TERMUX_PKG_DESCRIPTION="Qt Development Tools (Linguist, Assistant, Designer, etc.)"
 TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
-TERMUX_PKG_VERSION=5.12.11
-TERMUX_PKG_REVISION=3
-TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/5.12/${TERMUX_PKG_VERSION}/submodules/qttools-everywhere-src-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=98b2aaca230458f65996f3534fd471d2ffd038dd58ac997c0589c06dc2385b4f
+TERMUX_PKG_VERSION=5.15.3
+TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/5.15/${TERMUX_PKG_VERSION}/submodules/qttools-everywhere-opensource-src-${TERMUX_PKG_VERSION}.tar.xz"
+TERMUX_PKG_SHA256=463b2fe71a085e7ab4e39333ae360ab0ec857b966d7a08f752c427e5df55f90d
 TERMUX_PKG_DEPENDS="qt5-qtbase, qt5-qtdeclarative"
 TERMUX_PKG_BUILD_DEPENDS="qt5-qtbase-cross-tools, qt5-qtdeclarative-cross-tools"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -91,7 +90,7 @@ termux_step_post_make_install() {
     #######################################################
 
     # Install the linguist utilities to the correct path
-    for i in lconvert lrelease lupdate; do
+    for i in lconvert lprodump lrelease{,-pro} lupdate{,-pro}; do
         install -Dm700 "${TERMUX_PKG_SRCDIR}/bin/${i}" "${TERMUX_PREFIX}/bin/${i}"
     done
 
@@ -196,7 +195,7 @@ termux_step_post_make_install() {
             "${TERMUX_PREFIX}/opt/qt/cross/bin/qtattributionsscanner"
     }
 
-    for i in lconvert lrelease lupdate; do
+    for i in lconvert lprodump lrelease{,-pro} lupdate{,-pro}; do
         cd "${TERMUX_PKG_SRCDIR}/src/linguist/${i}" && {
             make clean
             "${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \

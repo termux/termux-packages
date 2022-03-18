@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.qt.io/
 TERMUX_PKG_DESCRIPTION="Qt 5 Multimedia Library"
 TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
-TERMUX_PKG_VERSION=5.12.11
-TERMUX_PKG_REVISION=3
-TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/5.12/${TERMUX_PKG_VERSION}/submodules/qtmultimedia-everywhere-src-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=918d253e9b5bca4f030e4207b2329d6a96c9901a5f52c5ed84725709aa54ee27
+TERMUX_PKG_VERSION=5.15.3
+TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/5.15/${TERMUX_PKG_VERSION}/submodules/qtmultimedia-everywhere-opensource-src-${TERMUX_PKG_VERSION}.tar.xz"
+TERMUX_PKG_SHA256=2ebaa33720b808aa074fd15b9de506c1e89b670b39c7d4b62cb859e70ce606f0
 # qt5-qtdeclarative is not needed because quick widget requires OpenGL
 TERMUX_PKG_DEPENDS="qt5-qtbase, pulseaudio, openal-soft, gstreamer, gst-plugins-base, gst-plugins-bad"
 TERMUX_PKG_BUILD_DEPENDS="qt5-qtbase-cross-tools"
