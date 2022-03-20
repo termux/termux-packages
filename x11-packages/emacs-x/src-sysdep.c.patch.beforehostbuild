@@ -1,0 +1,14 @@
+--- a/src/sysdep.c
++++ b/src/sysdep.c
+@@ -1818,7 +1818,11 @@
+ 
+ /* Alternate stack used by SIGSEGV handler below.  */
+ 
++#ifdef __GLIBC__
++static unsigned char sigsegv_stack[16384];
++#else
+ static unsigned char sigsegv_stack[SIGSTKSZ];
++#endif
+ 
+ 
+ /* Return true if SIGINFO indicates a stack overflow.  */
