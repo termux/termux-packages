@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="S-Lang is a powerful interpreted language"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.3.2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.jedsoft.org/releases/slang/slang-$TERMUX_PKG_VERSION.tar.bz2
 TERMUX_PKG_SHA256=fc9e3b0fc4f67c3c1f6d43c90c16a5c42d117b8e28457c5b46831b8b5d3ae31a
 TERMUX_PKG_DEPENDS="libiconv, libpng, pcre, oniguruma, zlib"
