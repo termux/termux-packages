@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://core.telegram.org/tdlib/
-TERMUX_PKG_DESCRIPTION="Library for building Telegram clients"
+TERMUX_PKG_DESCRIPTION="Library for building Telegram clients."
 TERMUX_PKG_LICENSE="BSL-1.0"
 TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=1d15bafb5003cf36dbfdd4c839dbcc56368fb48e
