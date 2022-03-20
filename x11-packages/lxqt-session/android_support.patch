@@ -1,6 +1,8 @@
---- src/CMakeLists.txt	2021-04-16 16:36:14.000000000 +0000
-+++ src.mod/CMakeLists.txt	2021-05-20 14:57:23.675649000 +0000
-@@ -32,12 +32,7 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 91d0e2c..c8d85ad 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -32,12 +32,7 @@ find_package(lxqt ${LXQT_MINIMUM_VERSION} REQUIRED)
  find_package(X11 REQUIRED)
  message(STATUS "Building with Qt${Qt5Core_VERSION}")
  find_package(PkgConfig REQUIRED)
@@ -14,9 +16,11 @@
  
  # Patch Version
  set(LXQT_SESSION_PATCH_VERSION 1)
---- src/lxqt-session/CMakeLists.txt	2021-04-16 16:36:14.000000000 +0000
-+++ src.mod/lxqt-session/CMakeLists.txt	2021-05-20 15:00:28.556372000 +0000
-@@ -9,11 +9,9 @@
+diff --git a/lxqt-session/CMakeLists.txt b/lxqt-session/CMakeLists.txt
+index 04dcd82..88d3705 100644
+--- a/lxqt-session/CMakeLists.txt
++++ b/lxqt-session/CMakeLists.txt
+@@ -9,11 +9,10 @@ endif()
  include_directories(
      ${X11_INCLUDE_DIR}
  )
@@ -25,13 +29,14 @@
 -        ${PROCPS_INCLUDE_DIRS}
 -    )
 -endif()
++
 +include_directories(
-+    ${PROCPS_INCLUDE_DIRS}
++	${PROCPS_INCLUDE_DIRS}
 +)
  
  set(lxqt-session_HDRS "")
  
-@@ -67,11 +65,9 @@
+@@ -67,11 +66,12 @@ target_link_libraries(lxqt-session
      ${X11_LIBRARIES}
      KF5::WindowSystem
  )
@@ -39,10 +44,13 @@
 -    target_link_libraries(lxqt-session
 -        ${PROCPS_LIBRARIES}
 -    )
--endif()
+-elseif (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
++
 +target_link_libraries(lxqt-session
-+    ${PROCPS_LIBRARIES}
++	${PROCPS_LIBRARIES}
 +)
- 
- if (WITH_LIBUDEV)
-     target_link_libraries(lxqt-session ${UDEV_LIBS})
++
++if (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
+     target_link_libraries(lxqt-session
+         -lutil
+     )
