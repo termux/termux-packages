@@ -1,0 +1,28 @@
+Backport of
+
+https://github.com/openscad/openscad/commit/71f2831c0484c3f35cbf44e1d1dc2c857384100b
+
+--- a/src/cgalutils-tess.cc
++++ b/src/cgalutils-tess.cc
+@@ -6,11 +6,8 @@
+ #pragma push_macro("NDEBUG")
+ #undef NDEBUG
+ #include <CGAL/Constrained_Delaunay_triangulation_2.h>
+-#if CGAL_VERSION_NR >= CGAL_VERSION_NUMBER(4,11,0)
+-  #include <CGAL/Triangulation_2_projection_traits_3.h>
+-#else
+-  #include <CGAL/Triangulation_2_filtered_projection_traits_3.h>
+-#endif
++#include <CGAL/Projection_traits_3.h>
++typedef CGAL::Filtered_projection_traits_3<K> Projection;
+ #include <CGAL/Triangulation_face_base_with_info_2.h>
+ #pragma pop_macro("NDEBUG")
+ 
+@@ -19,7 +16,6 @@
+   bool in_domain() { return nesting_level%2 == 1; }
+ };
+ 
+-typedef CGAL::Triangulation_2_filtered_projection_traits_3<K> Projection;
+ typedef CGAL::Triangulation_face_base_with_info_2<FaceInfo, K> Fbb;
+ typedef CGAL::Triangulation_data_structure_2<
+ 	CGAL::Triangulation_vertex_base_2<Projection>,
