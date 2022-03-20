@@ -1,7 +1,8 @@
 TERMUX_SUBPKG_DESCRIPTION="Tkinter support for PyPy 3"
 TERMUX_SUBPKG_DEPENDS="tk"
+_MAJOR_VERSION=3.8
 TERMUX_SUBPKG_INCLUDE="
-opt/pypy3/lib_pypy/_tkinter/*
+opt/pypy3/lib/pypy$_MAJOR_VERSION/_tkinter/*
 "
 
 termux_step_create_subpkg_debscripts() {
@@ -14,7 +15,7 @@ termux_step_create_subpkg_debscripts() {
 	fi
 
 	echo "Deleting *.pyc..."
-	find $TERMUX_PREFIX/opt/pypy3/lib_pypy/_tkinter/ | grep -E "(__pycache__|\.pyc|\.pyo$)" | xargs rm -rf
+	find $TERMUX_PREFIX/opt/pypy3/lib/pypy$_MAJOR_VERSION/_tkinter/ | grep -E "(__pycache__|\.pyc|\.pyo$)" | xargs rm -rf
 
 	exit 0
 	PRERM_EOF

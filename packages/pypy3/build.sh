@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@licy183"
 _MAJOR_VERSION=3.8
 TERMUX_PKG_VERSION=7.3.8
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://downloads.python.org/pypy/pypy$_MAJOR_VERSION-v$TERMUX_PKG_VERSION-src.tar.bz2
 TERMUX_PKG_SHA256=f1a378b264cdbfb0e03d77dfc4d105d02f91d542bd7c9c957d1f8083a9808f1f
 TERMUX_PKG_DEPENDS="gdbm, libandroid-posix-semaphore, libandroid-support, libbz2, libcrypt, libexpat, libffi, liblzma, libsqlite, libxml2, ncurses, ncurses-ui-libs, openssl, readline, zlib"
@@ -15,9 +16,9 @@ TERMUX_PKG_BUILD_IN_SRC=true
 # See https://github.com/termux/termux-docker#known-issues
 TERMUX_PKG_BLACKLISTED_ARCHES="arm"
 TERMUX_PKG_RM_AFTER_INSTALL="
-opt/pypy3/lib-python/3/test
-opt/pypy3/lib-python/3/*/test
-opt/pypy3/lib-python/3/*/tests
+opt/pypy3/lib/pypy$_MAJOR_VERSION/test
+opt/pypy3/lib/pypy$_MAJOR_VERSION/*/test
+opt/pypy3/lib/pypy$_MAJOR_VERSION/*/tests
 "
 
 _docker_pull_url=https://raw.githubusercontent.com/NotGlop/docker-drag/5413165a2453aa0bc275d7dc14aeb64e814d5cc0/docker_pull.py
@@ -261,11 +262,10 @@ termux_step_create_debscripts() {
 	fi
 
 	echo "Deleting files from site-packages..."
-	rm -Rf $TERMUX_PREFIX/opt/pypy3/site-packages/*
+	rm -Rf $TERMUX_PREFIX/opt/pypy3/lib/pypy$_MAJOR_VERSION/site-packages/*
 
 	echo "Deleting *.pyc..."
-	find $TERMUX_PREFIX/opt/pypy3/lib-python/ | grep -E "(__pycache__|\.pyc|\.pyo$)" | xargs rm -rf
-	find $TERMUX_PREFIX/opt/pypy3/lib_pypy/ | grep -E "(__pycache__|\.pyc|\.pyo$)" | xargs rm -rf
+	find $TERMUX_PREFIX/opt/pypy3/lib/ | grep -E "(__pycache__|\.pyc|\.pyo$)" | xargs rm -rf
 
 	exit 0
 	PRERM_EOF
