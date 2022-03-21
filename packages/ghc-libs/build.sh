@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="The Glasgow Haskell Compiler - Dynamic Libraries"
 TERMUX_PKG_LICENSE="BSD 2-Clause, BSD 3-Clause, LGPL-2.1"
 TERMUX_PKG_MAINTAINER="Aditya Alok <dev.aditya.alok@gmail.com>"
 TERMUX_PKG_VERSION=8.10.7
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://downloads.haskell.org/~ghc/${TERMUX_PKG_VERSION}/ghc-${TERMUX_PKG_VERSION}-src.tar.xz"
 TERMUX_PKG_SHA256=e3eef6229ce9908dfe1ea41436befb0455fefb1932559e860ad4c606b0d03c9d
 TERMUX_PKG_DEPENDS="iconv, libffi, ncurses, libgmp"
@@ -129,25 +130,4 @@ termux_step_post_make_install() {
 
 termux_step_install_license() {
 	install -Dm600 -t "${TERMUX_PREFIX}/share/doc/ghc" "${TERMUX_PKG_SRCDIR}/LICENSE"
-}
-
-termux_step_create_debscripts() {
-	cat <<-EOF >./postinst
-		#!${TERMUX_PREFIX}/bin/sh
-		if [ "${TERMUX_PACKAGE_FORMAT}" = "pacman" ] || [ "\$1" = "configure" ] || [ "\$1" = "abort-upgrade" ]; then
-			if [ -x "${TERMUX_PREFIX}/bin/update-alternatives" ]; then
-				update-alternatives \
-					--install ${TERMUX_PREFIX}/bin/haskell-compiler haskell-compiler ${TERMUX_PREFIX}/bin/ghc 20
-			fi
-		fi
-	EOF
-
-	cat <<-EOF >./prerm
-		#!${TERMUX_PREFIX}/bin/sh
-		if [ "${TERMUX_PACKAGE_FORMAT}" = "pacman" ] || [ "\$1" != "upgrade" ] && [ "\$1" != "dist-upgrade" ]; then
-			if [ -x "${TERMUX_PREFIX}/bin/update-alternatives" ]; then
-				update-alternatives --remove haskell-compiler ${TERMUX_PREFIX}/bin/ghc
-			fi
-		fi
-	EOF
 }
