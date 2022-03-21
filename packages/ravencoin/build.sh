@@ -3,10 +3,10 @@ TERMUX_PKG_DESCRIPTION="A peer-to-peer blockchain, handling the efficient creati
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=4.3.2.1
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://github.com/RavenProject/Ravencoin/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=02e6c12220ba0f9378a3af790a57a0a6e11d7b091adfd91f555aab07341d62e3
-TERMUX_PKG_DEPENDS="boost, libevent, openssl"
+TERMUX_PKG_DEPENDS="boost, libc++, libevent, openssl"
 TERMUX_PKG_BUILD_DEPENDS="boost-headers, libdb"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-tests
@@ -17,6 +17,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 
 termux_step_pre_configure() {
 	autoreconf -fi
+
+	LDFLAGS+=" $($CC -print-libgcc-file-name)"
 
 	_NEED_DUMMY_LIBPTHREAD_A=
 	_LIBPTHREAD_A=$TERMUX_PREFIX/lib/libpthread.a
