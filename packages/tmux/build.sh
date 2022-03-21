@@ -1,11 +1,11 @@
 TERMUX_PKG_HOMEPAGE=https://tmux.github.io/
 TERMUX_PKG_DESCRIPTION="Terminal multiplexer"
-TERMUX_PKG_LICENSE="BSD"
+TERMUX_PKG_LICENSE="ISC"
 TERMUX_PKG_MAINTAINER="@termux"
 # Link against libandroid-support for wcwidth(), see https://github.com/termux/termux-packages/issues/224
 TERMUX_PKG_DEPENDS="ncurses, libevent, libandroid-support, libandroid-glob"
 TERMUX_PKG_VERSION=3.2a
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL="https://github.com/tmux/tmux/archive/${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=497bc4ee16f10b53b161bf0253b6f9e20cd0f86c5d0104f149212cb0778ae13a
 TERMUX_PKG_AUTO_UPDATE=true
