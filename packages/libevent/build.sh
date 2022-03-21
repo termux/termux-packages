@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Library that provides asynchronous event notification"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.1.12
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/libevent/libevent/archive/release-${TERMUX_PKG_VERSION}-stable.tar.gz
 TERMUX_PKG_SHA256=7180a979aaa7000e1264da484f712d403fcf7679b1e9212c4e3d09f5c93efc24
 TERMUX_PKG_AUTO_UPDATE=true
