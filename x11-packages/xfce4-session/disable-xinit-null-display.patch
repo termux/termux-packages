@@ -1,0 +1,20 @@
+diff -uNr xfce4-session-4.16.0.mod/scripts/startxfce4.in xfce4-session-4.16.0/scripts/startxfce4.in
+--- xfce4-session-4.16.0.mod/scripts/startxfce4.in	2016-05-02 21:02:14.000000000 +0000
++++ xfce4-session-4.16.0/scripts/startxfce4.in	2022-03-22 03:38:13.853954163 +0000
+@@ -89,14 +89,9 @@
+ export XDG_CONFIG_DIRS
+ 
+ if test "x$DISPLAY" = "x"
++  echo "$0: Failed to connect to display"
++  exit 1
+ then
+-  echo "$0: Starting X server"
+-  prog=xinit
+-
+-  if test ! "x$XDG_VTNR" = "x"; then
+-    SERVERRC="vt$XDG_VTNR $SERVERRC"
+-  fi
+-else
+   echo "$0: X server already running on display $DISPLAY"
+   prog=/bin/sh
+ fi
