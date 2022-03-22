@@ -1,0 +1,69 @@
+diff -uNr bspwm-0.9.10/doc/bspwm.1 bspwm-0.9.10.mod/doc/bspwm.1
+--- bspwm-0.9.10/doc/bspwm.1	2020-08-02 14:51:32.000000000 +0700
++++ bspwm-0.9.10.mod/doc/bspwm.1	2022-03-22 15:59:57.637000678 +0700
+@@ -1606,7 +1606,7 @@
+ \fBbspc\fR
+ and
+ \fBbspwm\fR\&. If it isn\(cqt defined, then the following path is used:
+-\fI/tmp/bspwm<host_name>_<display_number>_<screen_number>\-socket\fR\&.
++\fI@TERMUX_PREFIX@/tmp/bspwm<host_name>_<display_number>_<screen_number>\-socket\fR\&.
+ .RE
+ .SH "CONTRIBUTORS"
+ .sp
+diff -uNr bspwm-0.9.10/doc/bspwm.1.asciidoc bspwm-0.9.10.mod/doc/bspwm.1.asciidoc
+--- bspwm-0.9.10/doc/bspwm.1.asciidoc	2020-08-02 14:51:32.000000000 +0700
++++ bspwm-0.9.10.mod/doc/bspwm.1.asciidoc	2022-03-22 15:59:57.657000678 +0700
+@@ -948,7 +948,7 @@
+ ---------------------
+ 
+ 'BSPWM_SOCKET'::
+-	The path of the socket used for the communication between *bspc* and *bspwm*. If it isn't defined, then the following path is used: '/tmp/bspwm<host_name>_<display_number>_<screen_number>-socket'.
++	The path of the socket used for the communication between *bspc* and *bspwm*. If it isn't defined, then the following path is used: '@TERMUX_PREFIX@/tmp/bspwm<host_name>_<display_number>_<screen_number>-socket'.
+ 
+ Contributors
+ ------------
+diff -uNr bspwm-0.9.10/examples/panel/profile bspwm-0.9.10.mod/examples/panel/profile
+--- bspwm-0.9.10/examples/panel/profile	2020-08-02 14:51:32.000000000 +0700
++++ bspwm-0.9.10.mod/examples/panel/profile	2022-03-22 15:59:57.677000678 +0700
+@@ -1,4 +1,4 @@
+-PANEL_FIFO=/tmp/panel-fifo
++PANEL_FIFO=@TERMUX_PREFIX@/tmp/panel-fifo
+ PANEL_HEIGHT=24
+ PANEL_FONT="-*-fixed-*-*-*-*-10-*-*-*-*-*-*-*"
+ PANEL_WM_NAME=bspwm_panel
+diff -uNr bspwm-0.9.10/src/bspwm.h bspwm-0.9.10.mod/src/bspwm.h
+--- bspwm-0.9.10/src/bspwm.h	2020-08-02 14:51:32.000000000 +0700
++++ bspwm-0.9.10.mod/src/bspwm.h	2022-03-22 15:59:57.697000678 +0700
+@@ -32,7 +32,7 @@
+ #define CONFIG_HOME_ENV          "XDG_CONFIG_HOME"
+ #define RUNTIME_DIR_ENV          "XDG_RUNTIME_DIR"
+ 
+-#define STATE_PATH_TPL           "/tmp/bspwm%s_%i_%i-state"
++#define STATE_PATH_TPL           "@TERMUX_PREFIX@/tmp/bspwm%s_%i_%i-state"
+ 
+ #define ROOT_EVENT_MASK     (XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT | XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY | XCB_EVENT_MASK_STRUCTURE_NOTIFY | XCB_EVENT_MASK_BUTTON_PRESS)
+ #define CLIENT_EVENT_MASK   (XCB_EVENT_MASK_PROPERTY_CHANGE | XCB_EVENT_MASK_FOCUS_CHANGE)
+diff -uNr bspwm-0.9.10/src/common.h bspwm-0.9.10.mod/src/common.h
+--- bspwm-0.9.10/src/common.h	2020-08-02 14:51:32.000000000 +0700
++++ bspwm-0.9.10.mod/src/common.h	2022-03-22 15:59:57.729000678 +0700
+@@ -25,7 +25,7 @@
+ #ifndef BSPWM_COMMON_H
+ #define BSPWM_COMMON_H
+ 
+-#define SOCKET_PATH_TPL  "/tmp/bspwm%s_%i_%i-socket"
++#define SOCKET_PATH_TPL  "@TERMUX_PREFIX@/tmp/bspwm%s_%i_%i-socket"
+ #define SOCKET_ENV_VAR   "BSPWM_SOCKET"
+ 
+ #define FAILURE_MESSAGE  "\x07"
+diff -uNr bspwm-0.9.10/src/helpers.c bspwm-0.9.10.mod/src/helpers.c
+--- bspwm-0.9.10/src/helpers.c	2020-08-02 14:51:32.000000000 +0700
++++ bspwm-0.9.10.mod/src/helpers.c	2022-03-22 15:59:57.753000678 +0700
+@@ -124,7 +124,7 @@
+ 	int tempfd;
+ 	char *runtime_dir = getenv(RUNTIME_DIR_ENV);
+ 	if (runtime_dir == NULL) {
+-		runtime_dir = "/tmp";
++		runtime_dir = "@TERMUX_PREFIX@/tmp";
+ 	}
+ 
+ 	char *fifo_path = malloc(strlen(runtime_dir)+1+strlen(template)+1);
