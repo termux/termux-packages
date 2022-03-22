@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=cb124e1f91601872a7b3bd4da10e5fa97a8da86b
 _COMMIT_DATE=2021.08.20
 TERMUX_PKG_VERSION=2.2.1p${_COMMIT_DATE//./}
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://github.com/cruppstahl/upscaledb.git
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -34,6 +34,8 @@ termux_step_post_get_source() {
 
 termux_step_pre_configure() {
 	sh bootstrap.sh
+
+	LDFLAGS+=" $($CC -print-libgcc-file-name)"
 
 	_NEED_DUMMY_LIBPTHREAD_A=
 	_LIBPTHREAD_A=$TERMUX_PREFIX/lib/libpthread.a
