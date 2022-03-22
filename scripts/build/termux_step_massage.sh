@@ -21,9 +21,9 @@ termux_step_massage() {
 	if [ "$TERMUX_DEBUG_BUILD" = "false" ]; then
 		# Strip binaries. file(1) may fail for certain unusual files, so disable pipefail.
 		set +e +o pipefail
-		find . \( -path "./bin/*" -o -path "./lib/*" -o -path "./libexec/*" \) -type f | \
-			xargs -r file | grep -E "ELF .+ (executable|shared object)" | cut -f 1 -d : | \
-				xargs -r "$STRIP" --strip-unneeded --preserve-dates
+		find . \( -path "./bin/*" -o -path "./lib/*" -o -path "./libexec/*" \) -type f |
+			xargs -r file | grep -E "ELF .+ (executable|shared object)" | cut -f 1 -d : |
+			xargs -r "$STRIP" --strip-unneeded --preserve-dates
 		set -e -o pipefail
 	fi
 
@@ -35,7 +35,7 @@ termux_step_massage() {
 	if [ "$TERMUX_PKG_NO_SHEBANG_FIX" != "true" ]; then
 		# Fix shebang paths:
 		while IFS= read -r -d '' file; do
-			head -c 100 "$file" | grep -E "^#\!.*\\/bin\\/.*" | grep -q -E -v "^#\! ?\\/system" && \
+			head -c 100 "$file" | grep -E "^#\!.*\\/bin\\/.*" | grep -q -E -v "^#\! ?\\/system" &&
 				sed --follow-symlinks -i -E "1 s@^#\!(.*)/bin/(.*)@#\!$TERMUX_PREFIX/bin/\2@" "$file"
 		done < <(find -L . -type f -print0)
 	fi
@@ -58,8 +58,7 @@ termux_step_massage() {
 		find share/man -type f ! -iname \*.gz -print0 | xargs -r -0 gzip
 
 		# Update man page symlinks, e.g. unzstd.1 -> zstd.1:
-		while IFS= read -r -d '' file
-		do
+		while IFS= read -r -d '' file; do
 			local _link_value
 			_link_value=$(readlink $file)
 			rm $file
@@ -87,7 +86,9 @@ termux_step_massage() {
 	fi
 
 	# Remove unnecessary files in haskell pacakges:
-	test -d ./lib/ghc-* && rm -rf ./lib/ghc-* 2>/dev/null # Remove full ghc-* dir since cross compiler installs packages in "./lib/${TERMUX_ARCH}-android-ghc-X.Y.Z"
+	if [[ "${TERMUX_PKG_NAME}" != "ghc-libs" ]] && [[ "${TERMUX_PKG_NAME}" != "ghc" ]]; then
+		test -d ./lib/ghc-* && rm -rf ./lib/ghc-* 2>/dev/null # Remove full ghc-* dir since cross compiler installs packages in "./lib/${TERMUX_ARCH}-android-ghc-X.Y.Z"
+	fi
 
 	# .. remove empty directories (NOTE: keep this last):
 	find . -type d -empty -delete
