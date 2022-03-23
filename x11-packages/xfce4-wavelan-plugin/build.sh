@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://docs.xfce.org/panel-plugins/xfce4-wavelan-plugin/start
 TERMUX_PKG_DESCRIPTION="wavelan status plugin for the Xfce4 panel"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Yisus7u7 <yisus7u7v@gmail.com>"
+TERMUX_PKG_MAINTAINER="Yisus7u7 <dev.yisus@hotmail.com>"
 TERMUX_PKG_VERSION=0.6.2
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://archive.xfce.org/src/panel-plugins/xfce4-wavelan-plugin/0.6/xfce4-wavelan-plugin-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=ea7aa36650c596b1a29567d100776c68ed732aaf0f48c92245c4466058b5481d
 TERMUX_PKG_DEPENDS="gtk3, atk, libcairo, pango, gdk-pixbuf, glib, libxfce4util, libxfce4ui, xfce4-panel, harfbuzz"
