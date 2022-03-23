@@ -1,0 +1,17 @@
+diff --git a/3rdparty/solid-lite/managerbase.cpp b/3rdparty/solid-lite/managerbase.cpp
+index 001af38..5161fb0 100644
+--- a/3rdparty/solid-lite/managerbase.cpp
++++ b/3rdparty/solid-lite/managerbase.cpp
+@@ -87,11 +87,7 @@ void Solid::ManagerBasePrivate::loadBackends()
+ #               if defined(UDEV_FOUND)
+                     m_backends << new Solid::Backends::UDev::UDevManager(nullptr);
+ #               endif
+-#		if defined(WITH_SOLID_UDISKS2)
+-                m_backends << new Solid::Backends::UDisks2::Manager(nullptr)
+-#		else
+-                m_backends << new Solid::Backends::UDisks::UDisksManager(0)
+-#		endif
++
+                            /*<< new Solid::Backends::UPower::UPowerManager(0)
+                            << new Solid::Backends::Fstab::FstabManager(0)*/;
+             }
