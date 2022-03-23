@@ -1,10 +1,11 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/cronie-crond/cronie/
 TERMUX_PKG_DESCRIPTION="Daemon that runs specified programs at scheduled times and related tools"
-TERMUX_PKG_LICENSE="BSD"
+TERMUX_PKG_LICENSE="ISC, BSD 2-Clause, BSD 3-Clause, GPL-2.0, LGPL-2.1"
+TERMUX_PKG_LICENSE_FILE="COPYING, COPYING.obstack"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.5.7
+TERMUX_PKG_VERSION=1.6.0
 TERMUX_PKG_SRCURL=https://github.com/cronie-crond/cronie/releases/download/cronie-${TERMUX_PKG_VERSION}/cronie-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=538bcfaf2e986e5ae1edf6d1472a77ea8271d6a9005aee2497a9ed6e13320eb3
+TERMUX_PKG_SHA256=3f7cc263d21838b53a9943eb2a26b862059e2ae36c3f11789ac33cd6818e3628
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_AUTO_UPDATE_TAG_REGEXP="\d+\.\d+\.\d+"
 TERMUX_PKG_DEPENDS="dash"
