@@ -1,3 +1,5 @@
+Also patch Makefile.in directly due to autoreconf not working.
+
 diff -uNr gettext-0.20.1/gettext-tools/gnulib-lib/Makefile.am gettext-0.20.1.mod/gettext-tools/gnulib-lib/Makefile.am
 --- gettext-0.20.1/gettext-tools/gnulib-lib/Makefile.am	2019-04-11 12:22:44.000000000 +0300
 +++ gettext-0.20.1.mod/gettext-tools/gnulib-lib/Makefile.am	2019-05-21 15:02:52.740488355 +0300
@@ -14,3 +16,14 @@ diff -uNr gettext-0.20.1/gettext-tools/gnulib-lib/Makefile.am gettext-0.20.1.mod
  	-o $@
  else
  libgettextlib_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
+--- a/gettext-tools/gnulib-lib/Makefile.in
++++ b/gettext-tools/gnulib-lib/Makefile.in
+@@ -2925,7 +2925,7 @@
+ # Linking with C++ libraries is needed _only_ on mingw and Cygwin.
+ @WOE32DLL_FALSE@libgettextlib_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
+ @WOE32DLL_FALSE@	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link \
+-@WOE32DLL_FALSE@	$(CCLD) $(AM_CFLAGS) $(CFLAGS) $(libgettextlib_la_LDFLAGS) $(LDFLAGS) \
++@WOE32DLL_FALSE@	$(CCLD) $(AM_CFLAGS) $(CFLAGS) -lcroco-0.6 -lglib-2.0 -landroid-support -lpcre -lxml2 -lz -llzma -lm -lncurses -lunistring -liconv $(LDFLAGS) \
+ @WOE32DLL_FALSE@	-o $@
+ 
+ @WOE32DLL_TRUE@libgettextlib_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
