@@ -1,0 +1,217 @@
+From effb1e09dee263cdac4ec593e8caf316e6f01fe2 Mon Sep 17 00:00:00 2001
+From: Emmanuele Bassi <ebassi@gnome.org>
+Date: Tue, 11 Jan 2022 15:51:10 +0000
+Subject: [PATCH] build: Avoid the doctemplates hack
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The hack that copies the doctemplates directory into the build
+directory has stopped working with newer versions of Meson; while it's
+possible to copy files, custom_target() cannot depend on a directory.
+Additionally, the dependency has always been broken.
+
+Instead, we enumerate the template files—after all, it's not like they
+change a lot—and then we list them as dependencies for the test targets.
+
+Fixes: #414
+---
+ giscanner/doctemplates/devdocs/meson.build | 19 +++++++
+ giscanner/doctemplates/mallard/meson.build | 63 ++++++++++++++++++++++
+ giscanner/meson.build                      | 14 ++---
+ tests/scanner/meson.build                  | 24 +++++----
+ 4 files changed, 98 insertions(+), 22 deletions(-)
+ create mode 100644 giscanner/doctemplates/devdocs/meson.build
+ create mode 100644 giscanner/doctemplates/mallard/meson.build
+
+diff --git a/giscanner/doctemplates/devdocs/meson.build b/giscanner/doctemplates/devdocs/meson.build
+new file mode 100644
+index 00000000..2037182a
+--- /dev/null
++++ b/giscanner/doctemplates/devdocs/meson.build
+@@ -0,0 +1,19 @@
++doc_templates += files([
++  'Gjs/_doc.tmpl',
++  'Gjs/_index.tmpl',
++  'Gjs/_method.tmpl',
++  'Gjs/_methods.tmpl',
++  'Gjs/_properties.tmpl',
++  'Gjs/_signals.tmpl',
++  'Gjs/_staticmethods.tmpl',
++  'Gjs/_vfuncs.tmpl',
++  'Gjs/base.tmpl',
++  'Gjs/callback.tmpl',
++  'Gjs/class.tmpl',
++  'Gjs/default.tmpl',
++  'Gjs/enum.tmpl',
++  'Gjs/function.tmpl',
++  'Gjs/interface.tmpl',
++  'Gjs/method.tmpl',
++  'Gjs/namespace.tmpl',
++])
+diff --git a/giscanner/doctemplates/mallard/meson.build b/giscanner/doctemplates/mallard/meson.build
+new file mode 100644
+index 00000000..5fe4e2af
+--- /dev/null
++++ b/giscanner/doctemplates/mallard/meson.build
+@@ -0,0 +1,63 @@
++base_templates = files([
++  'base.tmpl',
++  'class.tmpl',
++  'namespace.tmpl',
++])
++
++c_templates = files([
++  'C/callback.tmpl',
++  'C/class.tmpl',
++  'C/constructor.tmpl',
++  'C/default.tmpl',
++  'C/enum.tmpl',
++  'C/field.tmpl',
++  'C/function.tmpl',
++  'C/interface.tmpl',
++  'C/method.tmpl',
++  'C/namespace.tmpl',
++  'C/property.tmpl',
++  'C/record.tmpl',
++  'C/signal.tmpl',
++  'C/vfunc.tmpl',
++])
++
++gjs_templates = files([
++  'Gjs/callback.tmpl',
++  'Gjs/class.tmpl',
++  'Gjs/constructor.tmpl',
++  'Gjs/default.tmpl',
++  'Gjs/enum.tmpl',
++  'Gjs/field.tmpl',
++  'Gjs/function.tmpl',
++  'Gjs/interface.tmpl',
++  'Gjs/method.tmpl',
++  'Gjs/namespace.tmpl',
++  'Gjs/property.tmpl',
++  'Gjs/record.tmpl',
++  'Gjs/signal.tmpl',
++  'Gjs/vfunc.tmpl',
++])
++
++py_templates = files([
++  'Python/callback.tmpl',
++  'Python/class.tmpl',
++  'Python/constructor.tmpl',
++  'Python/default.tmpl',
++  'Python/enum.tmpl',
++  'Python/field.tmpl',
++  'Python/function.tmpl',
++  'Python/interface.tmpl',
++  'Python/method.tmpl',
++  'Python/namespace.tmpl',
++  'Python/property.tmpl',
++  'Python/record.tmpl',
++  'Python/signal.tmpl',
++  'Python/vfunc.tmpl',
++])
++
++doc_templates += [
++  base_templates,
++  c_templates,
++  gjs_templates,
++  py_templates,
++]
+diff --git a/giscanner/meson.build b/giscanner/meson.build
+index 41edcd44..3d7dc678 100644
+--- a/giscanner/meson.build
++++ b/giscanner/meson.build
+@@ -53,17 +53,9 @@ configure_file(input : '../girepository/gdump.c',
+ 
+ install_subdir('doctemplates', install_dir: giscannerdir)
+ 
+-# XXX: this doesn't track the input, but there is nothing to copy many files
+-# in meson.
+-doc_templates = custom_target('copy-templates',
+-  input : 'doctemplates',
+-  output : 'doctemplates',
+-  command : [
+-    python, '-c',
+-      'import sys, shutil;' +
+-      'shutil.rmtree(sys.argv[2], ignore_errors=True);' +
+-      'shutil.copytree(sys.argv[1], sys.argv[2])',
+-    '@INPUT@', '@OUTPUT@'])
++doc_templates = []
++subdir('doctemplates/devdocs')
++subdir('doctemplates/mallard')
+ 
+ flex = find_program('flex', 'win_flex')
+ bison = find_program('bison', 'win_bison')
+diff --git a/tests/scanner/meson.build b/tests/scanner/meson.build
+index 5176b957..b81b3fd5 100644
+--- a/tests/scanner/meson.build
++++ b/tests/scanner/meson.build
+@@ -525,19 +525,26 @@ foreach gir : test_girs
+ endforeach
+ 
+ if has_girdoctool and glib_dep.type_name() == 'pkgconfig'
++  doctool_env = environment()
++  doctool_env.set('srcdir', meson.current_source_dir())
++  doctool_env.set('builddir', meson.current_build_dir())
++
+   foreach language : ['C', 'Python', 'Gjs']
+     regress_docs = custom_target(
+       'generate-docs-' + language,
+       input: regress_gir,
+-      depends: [doc_templates],
++      depend_files: doc_templates,
+       build_by_default: not cairo_deps_found,
++      env: doctool_env,
+       output: 'Regress-1.0-' + language,
+       command: [
+         python, girdoctool,
+         '--add-include-path=' + join_paths(build_root, 'gir'),
+         '--add-include-path=' + meson.current_build_dir(),
+         '--language', language,
+-        '@INPUT@', '-o', '@OUTPUT@'],
++        '--templates-dir=' + join_paths(meson.current_source_dir(), '../../giscanner/doctemplates'),
++        '@INPUT@', '-o', '@OUTPUT@',
++      ],
+     )
+ 
+     if cairo_deps_found
+@@ -546,10 +553,7 @@ if has_girdoctool and glib_dep.type_name() == 'pkgconfig'
+         python,
+         args: [gi_tester, 'Regress-1.0-' + language],
+         depends: [regress_docs],
+-        env: [
+-          'srcdir=' + meson.current_source_dir(),
+-          'builddir=' + meson.current_build_dir(),
+-        ],
++        env: doctool_env,
+       )
+     endif
+   endforeach
+@@ -557,9 +561,10 @@ if has_girdoctool and glib_dep.type_name() == 'pkgconfig'
+   regress_sections = custom_target(
+     'generate-docs-sections',
+     input: regress_gir,
+-    depends: [doc_templates],
++    depend_files: [doc_templates],
+     build_by_default: not cairo_deps_found,
+     output: 'Regress-1.0-sections.txt',
++    env: doctool_env,
+     command: [
+       python, girdoctool,
+       '--add-include-path=' + join_paths(build_root, 'gir'),
+@@ -574,10 +579,7 @@ if has_girdoctool and glib_dep.type_name() == 'pkgconfig'
+       python,
+       args: [gi_tester, 'Regress-1.0-sections.txt'],
+       depends: [regress_sections],
+-      env: [
+-        'srcdir=' + meson.current_source_dir(),
+-        'builddir=' + meson.current_build_dir(),
+-      ],
++      env: doctool_env,
+     )
+   endif
+ endif
+-- 
+GitLab
+
