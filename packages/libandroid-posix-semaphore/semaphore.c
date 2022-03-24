@@ -38,15 +38,13 @@
 #include <sys/stat.h>  // fstat()
 #include <stdlib.h>    // calloc()
 #include <pthread.h>   // mutex
+#include <paths.h>     // _PATH_TMP
 
 #ifndef SEM_NSEMS_MAX
 #define SEM_NSEMS_MAX 256
 #endif // !SEM_NSEMS_MAX
 
-#ifndef PREFIX
-#define PREFIX "/data/data/com.termux/files/usr"
-#endif
-#define SEM_PREFIX PREFIX"/tmp/sem."
+#define SEM_PREFIX _PATH_TMP "sem."
 
 static __inline__ char *__strchrnul(const char *s, int c)
 {
@@ -63,7 +61,7 @@ typedef struct {
 } semtab_type;
 
 static semtab_type *semtab;
-static pthread_mutex_t lock;
+static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 
 #define LOCK(l) (pthread_mutex_lock(&l))
 #define UNLOCK(l) (pthread_mutex_unlock(&l))
@@ -223,10 +221,15 @@ fail:
 
 int sem_close(sem_t *sem)
 {
+    if (sem == NULL || semtab == NULL) {
+        errno = EINVAL;
+        return -1;
+    }
     int i;
     LOCK(lock);
     for (i=0; i<SEM_NSEMS_MAX && semtab[i].sem != sem; i++);
     if (i == SEM_NSEMS_MAX) {
+        UNLOCK(lock);
         errno = EINVAL;
         return -1;
     }
