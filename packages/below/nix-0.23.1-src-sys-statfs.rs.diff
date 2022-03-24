@@ -1,0 +1,12 @@
+--- a/src/sys/statfs.rs
++++ b/src/sys/statfs.rs
+@@ -132,6 +132,9 @@
+ #[cfg(all(target_os = "linux", not(target_env = "musl")))]
+ #[allow(missing_docs)]
+ pub const CGROUP2_SUPER_MAGIC: FsType = FsType(libc::CGROUP2_SUPER_MAGIC as fs_type_t);
++#[cfg(target_os = "android")]
++#[allow(missing_docs)]
++pub const CGROUP2_SUPER_MAGIC: FsType = FsType(0x63677270 as fs_type_t);
+ 
+ 
+ impl Statfs {

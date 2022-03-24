@@ -1,0 +1,17 @@
+--- a/libbpf/include/linux/compiler.h
++++ b/libbpf/include/linux/compiler.h
+@@ -1,5 +1,14 @@
+ /* SPDX-License-Identifier: (LGPL-2.1 OR BSD-2-Clause) */
+ 
++#ifdef __ANDROID__
++#ifndef __user
++#define __user
++#endif
++#ifndef __force
++#define __force
++#endif
++#endif /* __ANDROID__ */
++
+ #ifndef __LINUX_COMPILER_H
+ #define __LINUX_COMPILER_H
+ 
