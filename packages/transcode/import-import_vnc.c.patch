@@ -1,0 +1,11 @@
+--- a/import/import_vnc.c
++++ b/import/import_vnc.c
+@@ -33,7 +33,7 @@
+ 	char fps[32];
+ 	char cmdbuf[1024];
+ 
+-	tc_snprintf (fifo, 256, "%s-%d", "/tmp/tc-vncfifo", getpid());
++	tc_snprintf (fifo, 256, "%s-%d", "@TERMUX_PREFIX@/tmp/tc-vncfifo", getpid());
+ 	tc_snprintf (fps, 32, "%f", vob->fps);
+ 	tc_snprintf (cmdbuf, 1024, "%s -o %s", PROGTOCALL, fifo);
+ 

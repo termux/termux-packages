@@ -1,0 +1,17 @@
+--- a/import/import_mplayer.c
++++ b/import/import_mplayer.c
+@@ -37,10 +37,10 @@
+ 
+ 
+ 
+-#define VIDEOPIPE_TEMPLATE "/tmp/mplayer2transcode-video.XXXXXX"
+-#define AUDIOPIPE_TEMPLATE "/tmp/mplayer2transcode-audio.XXXXXX"
+-static char videopipe[40];
+-static char audiopipe[40];
++#define VIDEOPIPE_TEMPLATE "@TERMUX_PREFIX@/tmp/mplayer2transcode-video.XXXXXX"
++#define AUDIOPIPE_TEMPLATE "@TERMUX_PREFIX@/tmp/mplayer2transcode-audio.XXXXXX"
++static char videopipe[strlen(VIDEOPIPE_TEMPLATE)+1];
++static char audiopipe[strlen(AUDIOPIPE_TEMPLATE)+1];
+ static FILE *videopipefd = NULL;
+ static FILE *audiopipefd = NULL;
+ 
