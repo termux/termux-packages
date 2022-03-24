@@ -8,29 +8,25 @@
  
  #if defined(HAVE_LIBSSL) && defined(HAVE_PTHREAD) && \
      (!defined(OPENSSL_VERSION_NUMBER) || OPENSSL_VERSION_NUMBER < 0x10100004)
-@@ -180,7 +181,7 @@
+@@ -177,10 +178,11 @@
+         sigset_t signals;
+         sigfillset(&signals);
+         pthread_sigmask(SIG_SETMASK, &signals, nullptr);
++        m_thread_cancel.test_and_set();
          m_thread = std::thread([=]() { HandleSignals(pZNC); });
      }
      ~CSignalHandler() {
 -        pthread_cancel(m_thread.native_handle());
-+        m_thread_cancel.test_and_set();
++        m_thread_cancel.clear();
          m_thread.join();
      }
  
-@@ -203,6 +204,7 @@
-     };
- 
-     void HandleSignals(CZNC* pZNC) {
-+        m_thread_cancel.clear();
-         sigset_t signals;
-         sigemptyset(&signals);
-         sigaddset(&signals, SIGHUP);
 @@ -216,11 +218,10 @@
          pthread_sigmask(SIG_SETMASK, &signals, nullptr);
          while (true) {
              int sig;
 -            pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, nullptr);
-+            if (m_thread_cancel.test_and_set()) pthread_exit(nullptr);
++            if (!m_thread_cancel.test_and_set()) pthread_exit(nullptr);
              // This thread can be cancelled, but only during this function.
              // Such cancel will be the only way to finish this thread.
              if (sigwait(&signals, &sig) == -1) continue;
