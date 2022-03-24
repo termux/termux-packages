@@ -86,6 +86,9 @@ PACKAGES+=" swig"
 # Needed by package dbus-glib.
 PACKAGES+=" libdbus-1-dev"
 
+# Needed by package below.
+PACKAGES+=" libelf-dev"
+
 # Needed by package ghostscript.
 PACKAGES+=" libexpat1-dev"
 PACKAGES+=" libjpeg-dev"
