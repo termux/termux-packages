@@ -1,14 +1,14 @@
---- ./meson.build.orig	2021-12-03 15:29:15.000000000 +0530
-+++ ./meson.build	2021-12-31 12:02:24.204785929 +0530
-@@ -443,7 +443,6 @@
-     # A zero-length format string shouldn't be considered an issue.
+--- a/meson.build
++++ b/meson.build
+@@ -464,7 +464,6 @@
      '-Wno-format-zero-length',
-     '-Werror=declaration-after-statement',
+     # We explicitly require variadic macros
+     '-Wno-variadic-macros',
 -    '-Werror=format=2',
-     '-Werror=implicit-function-declaration',
      '-Werror=init-self',
      '-Werror=missing-include-dirs',
-@@ -511,7 +510,6 @@
+     '-Werror=pointer-arith',
+@@ -545,7 +544,6 @@
    'getresuid',
    'getvfsstat',
    'gmtime_r',
@@ -16,11 +16,11 @@
    'inotify_init1',
    'issetugid',
    'kevent',
-@@ -2047,9 +2045,8 @@
+@@ -2088,9 +2086,8 @@
  # FIXME: glib-gettext.m4 has much more checks to detect broken/uncompatible
  # implementations. This could be extended if issues are found in some platforms.
  libintl_deps = []
--if cc.has_function('ngettext', args : osx_ldflags)
+-if cc.has_function('ngettext')
 -  have_bind_textdomain_codeset = cc.has_function('bind_textdomain_codeset')
 -else
 +have_bind_textdomain_codeset = cc.has_function('bind_textdomain_codeset')
