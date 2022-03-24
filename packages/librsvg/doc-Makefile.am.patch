@@ -1,0 +1,40 @@
+--- a/doc/Makefile.am
++++ b/doc/Makefile.am
+@@ -14,8 +14,7 @@
+ 
+ CLEANFILES = build.stamp
+ 
+-build.stamp: $(DOCS_SRC) $(HEADERS_WITH_DOCS) $(GIR_FILE)
+-	$(GI_DOCGEN) generate -C $(srcdir)/librsvg.toml --content-dir=$(top_srcdir)/doc $(GIR_FILE)
++build.stamp:
+ 	touch build.stamp
+ 
+ clean-local:
+@@ -23,7 +22,6 @@
+ 
+ install-data-local: build.stamp
+ 	$(MKDIR_P) $(DESTDIR)/$(docdir)/Rsvg-2.0
+-	for f in Rsvg-2.0/*; do $(INSTALL_DATA) $$f $(DESTDIR)/$(docdir)/Rsvg-2.0; done
+ 
+ uninstall-local:
+ 	rm -rf $(DESTDIR)/$(docdir)/Rsvg-2.0
+--- a/doc/Makefile.in
++++ b/doc/Makefile.in
+@@ -511,8 +511,7 @@
+ .PRECIOUS: Makefile
+ 
+ 
+-build.stamp: $(DOCS_SRC) $(HEADERS_WITH_DOCS) $(GIR_FILE)
+-	$(GI_DOCGEN) generate -C $(srcdir)/librsvg.toml --content-dir=$(top_srcdir)/doc $(GIR_FILE)
++build.stamp:
+ 	touch build.stamp
+ 
+ clean-local:
+@@ -520,7 +519,6 @@
+ 
+ install-data-local: build.stamp
+ 	$(MKDIR_P) $(DESTDIR)/$(docdir)/Rsvg-2.0
+-	for f in Rsvg-2.0/*; do $(INSTALL_DATA) $$f $(DESTDIR)/$(docdir)/Rsvg-2.0; done
+ 
+ uninstall-local:
+ 	rm -rf $(DESTDIR)/$(docdir)/Rsvg-2.0
