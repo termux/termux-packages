@@ -250,3 +250,11 @@ int sem_unlink(const char *name)
     if (!(name = __sem_mapname(name, buf))) return -1;
     return unlink(name);
 }
+
+/* Make alias for use with e.g. dlopen() */
+#undef sem_open
+sem_t *sem_open(const char *name, int flags, ...) __attribute__((alias("libandroid_sem_open")));
+#undef sem_close
+int sem_close(sem_t *sem) __attribute__((alias("libandroid_sem_close")));
+#undef sem_unlink
+int sem_unlink(const char *name) __attribute__((alias("libandroid_sem_unlink")));
