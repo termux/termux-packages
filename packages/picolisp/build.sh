@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=21.12
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=http://archive.ubuntu.com/ubuntu/pool/universe/p/picolisp/picolisp_$TERMUX_PKG_VERSION.orig.tar.gz
 TERMUX_PKG_SHA256=a06838236b7f5b52c5d587d32d31627f73cdb9775cc02a80f2cdaedd12888c7d
 TERMUX_PKG_DEPENDS="libcrypt, libffi, openssl, readline"
@@ -68,11 +68,11 @@ termux_step_make_install() {
 termux_step_create_debscripts() {
 	cat <<- EOF > ./postinst
 	#!$TERMUX_PREFIX/bin/sh
-	$TERMUX_PREFIX/lib/picolisp/sysdefs-gen > $TERMUX_PREFIX/lib/picolisp/sysdefs
+	$TERMUX_PREFIX/lib/picolisp/sysdefs-gen > $TERMUX_PREFIX/lib/picolisp/lib/sysdefs
 	EOF
 
 	cat <<- EOF > ./prerm
 	#!$TERMUX_PREFIX/bin/sh
-	rm -f $TERMUX_PREFIX/lib/picolisp/sysdefs
+	rm -f $TERMUX_PREFIX/lib/picolisp/lib/sysdefs
 	EOF
 }
