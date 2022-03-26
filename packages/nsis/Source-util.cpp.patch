@@ -1,0 +1,11 @@
+--- a/Source/util.cpp
++++ b/Source/util.cpp
+@@ -736,7 +736,7 @@
+   if (cch && cch < COUNTOF(buftmpdir) && GetTempFileName(buftmpdir, _T("nst"), 0, buf))
+     tfpath = _tcsdup(buf);
+ #else //! _WIN32
+-  char narrowpath[] = ("/tmp/makensisXXXXXX");
++  char narrowpath[] = ("@TERMUX_PREFIX@/tmp/makensisXXXXXX");
+   const mode_t org_umask = umask(0077);
+   int fd = mkstemp(narrowpath);
+   umask(org_umask);

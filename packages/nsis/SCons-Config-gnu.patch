@@ -1,0 +1,21 @@
+--- a/SCons/Config/gnu
++++ b/SCons/Config/gnu
+@@ -116,8 +116,6 @@
+ 
+ makensis_env.Append(CPPPATH = ['#$BUILD_CONFIG'])
+ 
+-if not defenv['DEBUG']:
+-	makensis_env.Append(CCFLAGS = ['-O2'])                # optimize
+ makensis_env.Append(CFLAGS = ['-Wall'])                   # all warnings
+ makensis_env.Append(CXXFLAGS = ['-Wno-non-virtual-dtor']) # ignore virtual dtor warnings
+ makensis_env.Append(CXXFLAGS = ['-Wall'])                 # all warnings
+@@ -352,9 +350,6 @@
+ 	return result
+ 
+ conf = defenv.Configure(custom_tests = { 'CheckBigEndian' : check_big_endian })
+-if conf.CheckBigEndian():
+-	makensis_env.Append(CPPDEFINES = ['__BIG_ENDIAN__'])
+-	test_env.Append(CPPDEFINES = ['__BIG_ENDIAN__'])
+ conf.Finish()
+ 
+ if makensis_env['PLATFORM'] == 'hpux':
