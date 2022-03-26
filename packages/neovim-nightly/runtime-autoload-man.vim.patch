@@ -1,0 +1,12 @@
+diff -u -r ../neovim-0851057a8deaa1197bd0af22babb62c1146d836c/runtime/autoload/man.vim ./runtime/autoload/man.vim
+--- ../neovim-0851057a8deaa1197bd0af22babb62c1146d836c/runtime/autoload/man.vim	2018-02-04 12:54:30.000000000 +0000
++++ ./runtime/autoload/man.vim	2018-02-05 00:48:37.422608665 +0000
+@@ -149,7 +149,7 @@
+   " Force MANPAGER=cat to ensure Vim is not recursively invoked (by man-db).
+   " http://comments.gmane.org/gmane.editors.vim.devel/29085
+   " Set MAN_KEEP_FORMATTING so Debian man doesn't discard backspaces.
+-  let cmd = ['env', 'MANPAGER=cat', 'MANWIDTH='.manwidth, 'MAN_KEEP_FORMATTING=1', 'man']
++  let cmd = ['env', 'MANPAGER=cat', 'MANWIDTH='.manwidth, 'MAN_KEEP_FORMATTING=1', 'mandoc']
+   return s:system(cmd + (s:localfile_arg ? ['-l', a:path] : [a:path]))
+ endfunction
+ 
