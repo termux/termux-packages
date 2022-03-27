@@ -74,8 +74,7 @@ termux_step_configure () {
         -system-libpng \
         -system-libjpeg \
         -system-sqlite \
-        -sql-sqlite \
-        -no-feature-systemsemaphore
+        -sql-sqlite
 }
 
 if [ ! -e "qtbase-everywhere-opensource-src-${TERMUX_PKG_VERSION}.tar.xz" ]; then
