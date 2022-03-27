@@ -89,8 +89,6 @@ termux_gitlab_api_get_tag() {
 				${response}
 			EndOfError
 		fi
-	elif [[ "${http_code}" == "304" ]]; then
-		return 2 # Up-to-date.
 	else
 		termux_error_exit <<-EndOfError
 			ERROR: Failed to get '${TAG_TYPE}' (${api_url}).

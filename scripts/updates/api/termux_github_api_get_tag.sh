@@ -30,11 +30,11 @@ termux_github_api_get_tag() {
 	fi
 
 	local jq_filter
-	local api_url=""
+	local api_url="https://api.github.com"
 	local extra_curl_opts=""
 
 	if [[ "${TAG_TYPE}" == "newest-tag" ]]; then
-		api_url="https://api.github.com/graphql"
+		api_url="${api_url}/graphql"
 		jq_filter='.data.repository.refs.edges[0].node.name'
 		extra_curl_opts="-d $(
 			cat <<-EOF
@@ -57,7 +57,7 @@ termux_github_api_get_tag() {
 			EOF
 		)"
 	elif [[ "${TAG_TYPE}" == "latest-release-tag" ]]; then
-		api_url="${api_url}/releases/latest"
+		api_url="${api_url}/repos/${project}/releases/latest"
 		jq_filter=".tag_name"
 	else
 		termux_error_exit <<-EndOfError

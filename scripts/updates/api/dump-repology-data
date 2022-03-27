@@ -38,7 +38,6 @@ def get_repology_data(last_project):
 def get_outdated_packages():
     termux_outdated_packages = {}
     last_project = ""
-    brk_flag = False  # Flag to break the infinite loop.
 
     while True:
         repology_data = get_repology_data(last_project)
@@ -48,9 +47,11 @@ def get_outdated_packages():
         # Quoting repology documentation: "You may iterate through
         # all projects by using the last project name in the next request"
         # For more info, visit https://repology.org/api
+        # NOTE: next response to request will include the last_project given.
         if len(repology_data) <= 1:
-            # Break the loop after this iteration.
-            brk_flag = True
+            # Break the loop now. Since api returned only one package, it
+            # must be the last_project, which was already included in previous iteration.
+            break
 
         for package_name, package_data in repology_data.items():
             if package_name in termux_outdated_packages:
@@ -74,8 +75,6 @@ def get_outdated_packages():
             else:
                 # If we don't find any version, skip the package.
                 continue
-        if brk_flag:
-            break
 
     return termux_outdated_packages
 

@@ -26,13 +26,13 @@ termux_pkg_is_update_needed() {
 	# If needed, filter version numbers from tag by using regexp.
 	if [[ -n "${VERSION_REGEX}" ]]; then
 		LATEST_VERSION="$(grep -oP "${VERSION_REGEX}" <<<"${LATEST_VERSION}" || true)"
-	fi
 
-	if [[ -z "${LATEST_VERSION}" ]]; then
-		termux_error_exit <<-EndOfError
-			ERROR: failed to check latest version. Ensure whether the version regex '${VERSION_REGEX}'
-			works correctly with latest release tag.
-		EndOfError
+		if [[ -z "${LATEST_VERSION}" ]]; then
+			termux_error_exit <<-EndOfError
+				ERROR: failed to check latest version. Ensure whether the version regex '${VERSION_REGEX}'
+				works correctly with latest release tag.
+			EndOfError
+		fi
 	fi
 
 	# Translate "_" into ".": some packages use underscores to seperate

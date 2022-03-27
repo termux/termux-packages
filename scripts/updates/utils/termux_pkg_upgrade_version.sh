@@ -27,7 +27,7 @@ termux_pkg_upgrade_version() {
 		echo "INFO: package being updated to $(echo "${LATEST_VERSION}" | cut -d':' -f2)."
 
 		sed -i \
-			"s/^\(TERMUX_PKG_VERSION=\)\(.*\)\$/\1${LATEST_VERSION}/g" \
+			"s/^\(TERMUX_PKG_VERSION=\)\(.*\)\$/\1\"${LATEST_VERSION}\"/g" \
 			"${PKG_DIR}/build.sh"
 		sed -i \
 			"/TERMUX_PKG_REVISION=/d" \
@@ -61,7 +61,6 @@ termux_pkg_upgrade_version() {
 			if [[ "${GIT_PUSH_PACKAGES}" == "true" ]]; then
 				echo "INFO: Pushing package."
 				stderr="$(
-					git status # DEBUG
 					git pull --rebase 2>&1 >/dev/null
 					git push 2>&1 >/dev/null
 				)" || {
