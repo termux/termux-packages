@@ -1,6 +1,6 @@
---- ./makefile.orig	2021-05-25 19:02:31.081243251 +0000
-+++ ./makefile	2021-05-25 19:02:50.741677177 +0000
-@@ -2,14 +2,13 @@
+--- ./makefile.orig	2022-03-27 13:31:57.231913431 +0530
++++ ./makefile	2022-03-27 13:33:07.581913404 +0530
+@@ -2,14 +2,14 @@
  # Makefile for UNIX - unrar
  
  # Linux using GCC
@@ -8,7 +8,8 @@
 -CXXFLAGS=-O2 -Wno-logical-op-parentheses -Wno-switch -Wno-dangling-else
 -LIBFLAGS=-fPIC
 +CXX?=c++
-+CXXFLAGS?=-O2 -Wno-logical-op-parentheses -Wno-switch -Wno-dangling-else
++CXXFLAGS?=
++CXXFLAGS+=-O3 -Wno-logical-op-parentheses -Wno-switch -Wno-dangling-else
 +LIBFLAGS=$(LDFLAGS)
  DEFINES=-D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -DRAR_SMP
 -STRIP=strip
@@ -21,7 +22,7 @@
  
  # Linux using LCC
  #CXX=lcc
-@@ -161,14 +160,14 @@
+@@ -161,14 +161,14 @@
  	$(AR) rcs libunrar.a $(OBJECTS) $(LIB_OBJ)
  
  install-unrar:
