@@ -7,7 +7,6 @@ TERMUX_PKG_SRCURL=https://github.com/emscripten-core/emscripten.git
 TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_RECOMMENDS="emscripten-llvm, emscripten-binaryen, python, nodejs-lts | nodejs"
-TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_NO_STATICSPLIT=true
 
@@ -176,25 +175,27 @@ termux_step_make() {
 	cmake \
 		-G Ninja \
 		-S "$TERMUX_PKG_CACHEDIR/llvm-project-$LLVM_COMMIT/llvm" \
-		-B "$TERMUX_PKG_CACHEDIR/build-llvm" \
+		-B "$TERMUX_PKG_BUILDDIR/build-llvm" \
 		$LLVM_BUILD_ARGS
 	cmake \
-		--build "$TERMUX_PKG_CACHEDIR/build-llvm" \
+		--build "$TERMUX_PKG_BUILDDIR/build-llvm" \
 		-j "$TERMUX_MAKE_PROCESSES" \
 		--target install
 
 	cmake \
 		-G Ninja \
 		-S "$TERMUX_PKG_CACHEDIR/binaryen-$BINARYEN_COMMIT" \
-		-B "$TERMUX_PKG_CACHEDIR/build-binaryen" \
+		-B "$TERMUX_PKG_BUILDDIR/build-binaryen" \
 		$BINARYEN_BUILD_ARGS
 	cmake \
-		--build "$TERMUX_PKG_CACHEDIR/build-binaryen" \
+		--build "$TERMUX_PKG_BUILDDIR/build-binaryen" \
 		-j "$TERMUX_MAKE_PROCESSES" \
 		--target install
 }
 
 termux_step_make_install() {
+	cd "$TERMUX_PKG_SRCDIR"
+
 	# https://github.com/emscripten-core/emscripten/pull/15840
 	sed -e "s|-git||" -i "$TERMUX_PKG_SRCDIR/emscripten-version.txt"
 
@@ -224,7 +225,7 @@ termux_step_make_install() {
 
 	# add useful tools not installed by LLVM_INSTALL_TOOLCHAIN_ONLY=ON
 	for tool in llc llvm-{addr2line,dwarfdump,dwp,link,mc,nm,objdump,ranlib,readobj,size} opt; do
-		install -Dm755 "$TERMUX_PKG_CACHEDIR/build-llvm/bin/$tool" "$TERMUX_PREFIX/opt/emscripten-llvm/bin/$tool"
+		install -Dm755 "$TERMUX_PKG_BUILDDIR/build-llvm/bin/$tool" "$TERMUX_PREFIX/opt/emscripten-llvm/bin/$tool"
 	done
 
 	# wasm32 triplets
