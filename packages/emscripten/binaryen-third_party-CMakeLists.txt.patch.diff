@@ -1,28 +1,18 @@
 diff -uNr binaryen/third_party/CMakeLists.txt binaryen.mod/third_party/CMakeLists.txt
---- binaryen/third_party/CMakeLists.txt	2022-02-26 23:46:14.268336047 +0800
-+++ binaryen.mod/third_party/CMakeLists.txt	2022-02-27 00:30:42.657030709 +0800
-@@ -2,15 +2,14 @@
-   add_subdirectory(llvm-project)
- endif()
- 
--include_directories(
--  googletest/googletest
--  googletest/googletest/include
--)
-+if(ENABLE_GTEST)
-+  include_directories(
-+    googletest/googletest
-+    googletest/googletest/include)
+--- binaryen/third_party/CMakeLists.txt	2022-03-31 22:51:24.112121827 +0800
++++ binaryen.mod/third_party/CMakeLists.txt	2022-03-31 22:55:16.326587396 +0800
+@@ -7,10 +7,7 @@
+   googletest/googletest/include
+ )
  
 -add_library(gtest STATIC
 -  googletest/googletest/src/gtest-all.cc
 -)
-+  add_library(gtest STATIC
-+    googletest/googletest/src/gtest-all.cc)
- 
+-
 -add_library(gtest_main STATIC
 -  googletest/googletest/src/gtest_main.cc
 -)
-+  add_library(gtest_main STATIC
-+    googletest/googletest/src/gtest_main.cc)
++if(BUILD_TESTS)
++  add_library(gtest STATIC googletest/googletest/src/gtest-all.cc)
++  add_library(gtest_main STATIC googletest/googletest/src/gtest_main.cc)
 +endif()
