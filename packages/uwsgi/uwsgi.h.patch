@@ -1,15 +1,6 @@
 --- a/uwsgi.h
 +++ b/uwsgi.h
-@@ -209,7 +209,7 @@
- #endif
- 
- #include <sys/ipc.h>
--#include <sys/sem.h>
-+#include <linux/sem.h>
- 
- #include <stdarg.h>
- #include <errno.h>
-@@ -4967,6 +4967,19 @@
+@@ -4967,6 +4967,15 @@
  int uwsgi_wait_for_mountpoint(char *);
  int uwsgi_wait_for_socket(char *);
  
@@ -20,10 +11,6 @@
 +#if __ANDROID_API__ < 26
 +int futimes(int, const struct timeval[2]);
 +#endif
-+#define semid_ds semid64_ds
-+int semctl(int, int, int, ...);
-+int semget(key_t, int, int);
-+int semop(int, struct sembuf *, size_t);
 +#endif
 +
  #ifdef __cplusplus
