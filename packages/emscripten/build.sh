@@ -111,7 +111,7 @@ LLVM_BUILD_ARGS="
 # https://github.com/WebAssembly/binaryen/blob/main/CMakeLists.txt
 BINARYEN_BUILD_ARGS="
 -DCMAKE_INSTALL_PREFIX=$TERMUX_PREFIX/opt/emscripten-binaryen
--DENABLE_GTEST=OFF
+-DBUILD_TESTS=OFF
 "
 
 termux_step_post_get_source() {
