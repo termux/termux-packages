@@ -1,0 +1,40 @@
+--- a/src/waypipe.c
++++ b/src/waypipe.c
+@@ -79,8 +79,8 @@
+ 		"  -n, --no-gpu         disable protocols which would use GPU resources\n"
+ 		"  -o, --oneshot        only permit one connected application\n"
+ 		"  -s, --socket S       set the socket path to either create or connect to:\n"
+-		"                         server default: /tmp/waypipe-server.sock\n"
+-		"                         client default: /tmp/waypipe-client.sock\n"
++		"                         server default: @TERMUX_PREFIX@/tmp/waypipe-server.sock\n"
++		"                         client default: @TERMUX_PREFIX@/tmp/waypipe-client.sock\n"
+ 		"                         ssh: sets the prefix for the socket path\n"
+ 		"      --version        print waypipe version and exit\n"
+ 		"      --allow-tiled    allow gpu buffers (DMABUFs) with format modifiers\n"
+@@ -743,7 +743,7 @@
+ 		} else {
+ 			strcpy(sockaddr.sun_path,
+ 					socketpath ? socketpath
+-						   : "/tmp/waypipe-client.sock");
++						   : "@TERMUX_PREFIX@/tmp/waypipe-client.sock");
+ 			int nmaxclients = oneshot ? 1 : 128;
+ 			int channelsock =
+ 					setup_nb_socket(&sockaddr, nmaxclients);
+@@ -776,7 +776,7 @@
+ 		} else {
+ 			strcpy(sockaddr.sun_path,
+ 					socketpath ? socketpath
+-						   : "/tmp/waypipe-server.sock");
++						   : "@TERMUX_PREFIX@/tmp/waypipe-server.sock");
+ 
+ 			ret = run_server(&sockaddr, wayland_display,
+ 					control_path, &config, oneshot,
+@@ -784,7 +784,7 @@
+ 		}
+ 	} else {
+ 		if (!socketpath) {
+-			socketpath = "/tmp/waypipe";
++			socketpath = "@TERMUX_PREFIX@/tmp/waypipe";
+ 		}
+ 		const size_t spsz =
+ 				sizeof(((struct sockaddr_un *)NULL)->sun_path);

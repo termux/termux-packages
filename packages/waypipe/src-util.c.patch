@@ -1,0 +1,13 @@
+--- a/src/util.c
++++ b/src/util.c
+@@ -255,8 +255,8 @@
+ 						i, i);
+ 			} else {
+ 				link[len] = '\0';
+-				if (!strcmp(link, "/var/lib/sss/mc/passwd")) {
+-					wp_debug("Known issue, leaked fd %d to /var/lib/sss/mc/passwd",
++				if (!strcmp(link, "@TERMUX_PREFIX@/var/lib/sss/mc/passwd")) {
++					wp_debug("Known issue, leaked fd %d to @TERMUX_PREFIX@/var/lib/sss/mc/passwd",
+ 							i);
+ 				} else {
+ 					wp_error("Unexpected open fd %d: %s", i,
