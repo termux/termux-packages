@@ -12,11 +12,10 @@
 # But hopefully, all this can be avoided if TERMUX_PKG_AUTO_UPDATE_TAG_REGEXP is set.
 #
 termux_pkg_is_update_needed() {
-	if [[ "$#" -lt 2 ]] || [[ "$#" -gt 3 ]]; then
-		termux_error_exit <<-EndOfUsage
-			Usage: ${FUNCNAME[0]} <current-version> <latest-version> [version-regexp]
-			Returns: 0 if update is needed, 1 if not.
-		EndOfUsage
+	# USAGE: termux_pkg_is_update_needed <current-version> <latest-version> [regexp]
+
+	if [[ -z "$1" ]] || [[ -z "$2" ]]; then
+		termux_error_exit "${BASH_SOURCE[0]}: at least 2 arguments expected"
 	fi
 
 	local CURRENT_VERSION="$1"
@@ -29,8 +28,8 @@ termux_pkg_is_update_needed() {
 
 		if [[ -z "${LATEST_VERSION}" ]]; then
 			termux_error_exit <<-EndOfError
-				ERROR: failed to check latest version. Ensure whether the version regex '${VERSION_REGEX}'
-				works correctly with latest release tag.
+				ERROR: failed to compare versions. Ensure whether the version regex '${VERSION_REGEX}'
+				works correctly with given versions.
 			EndOfError
 		fi
 	fi
@@ -58,8 +57,31 @@ termux_pkg_is_update_needed() {
 	return 1 # false. Update not needed.
 }
 
+show_help() {
+	echo "Usage: ${BASH_SOURCE[0]} [--help] <first-version> <second-version>] [version-regex]"
+	echo "--help - show this help message and exit"
+	echo "  <first-version> - first version to compare"
+	echo "  <second-version> - second version to compare"
+	echo "  [version-regex] - optional regular expression to filter version numbers"
+	exit 0
+}
+
 # Make script sourceable as well as executable.
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-	declare -f termux_error_exit >/dev/null || . "$(dirname "${BASH_SOURCE[0]}")/termux_error_exit.sh"
-	termux_pkg_is_update_needed "$@"
+	declare -f termux_error_exit >/dev/null ||
+		. "$(dirname "$(realpath "${BASH_SOURCE[0]}")")/termux_error_exit.sh" # realpath is used to resolve symlinks.
+
+	if [[ "${1}" == "--help" ]]; then
+		show_help
+	fi
+
+	# Print in human readable format.
+	first_version="$1"
+	second_version="$2"
+	version_regexp="${3:-}"
+	if termux_pkg_is_update_needed "${first_version}" "${second_version}" "${version_regexp}"; then
+		echo "${first_version} < ${second_version}"
+	else
+		echo "${first_version} >= ${second_version}"
+	fi
 fi
