@@ -1,0 +1,19 @@
+--- a/meson.build
++++ b/meson.build
+@@ -58,8 +58,6 @@
+ else
+ 	has_dmabuf = false
+ endif
+-pthreads = dependency('threads')
+-rt = cc.find_library('rt')
+ # XXX dtrace -G (Solaris, FreeBSD, NetBSD) isn't supported yet
+ is_linux = host_machine.system() == 'linux'
+ is_darwin = host_machine.system() == 'darwin'
+@@ -92,7 +90,6 @@
+ 
+ subdir('protocols')
+ subdir('src')
+-subdir('test')
+ 
+ scdoc = dependency('scdoc', version: '>=1.9.4', native: true, required: get_option('man-pages'))
+ if scdoc.found()
