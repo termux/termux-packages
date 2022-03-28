@@ -31,31 +31,35 @@ termux_github_api_get_tag() {
 
 	local jq_filter
 	local api_url="https://api.github.com"
-	local extra_curl_opts=""
+	local -a extra_curl_opts
 
 	if [[ "${TAG_TYPE}" == "newest-tag" ]]; then
 		api_url="${api_url}/graphql"
 		jq_filter='.data.repository.refs.edges[0].node.name'
-		extra_curl_opts="-d $(
-			cat <<-EOF
-				"{
-					"query": "query {
-						repository(owner: \"${project%/*}\", name: \"${project##*/}\") {
-							refs(refPrefix: \"refs/tags/\", first: 1, orderBy: {
-								field: TAG_COMMIT_DATE, direction: DESC
-							})
-							{
-								edges {
-									node {
-										name
+		extra_curl_opts=(
+			"-X POST"
+			"-d $(
+				cat <<-EOF | tr '\n' ' '
+					{
+						"query": "query {
+							repository(owner: \"${project%/*}\", name: \"${project##*/}\") {
+								refs(refPrefix: \"refs/tags/\", first: 1, orderBy: {
+									field: TAG_COMMIT_DATE, direction: DESC
+								})
+								{
+									edges {
+										node {
+											name
+										}
 									}
 								}
 							}
-						}
+						}"
 					}
-				}"
-			EOF
-		)"
+				EOF
+			)"
+		)
+
 	elif [[ "${TAG_TYPE}" == "latest-release-tag" ]]; then
 		api_url="${api_url}/repos/${project}/releases/latest"
 		jq_filter=".tag_name"
@@ -67,13 +71,14 @@ termux_github_api_get_tag() {
 	fi
 
 	local response
-	# shellcheck disable=SC2086 # we need expansion of $extra_curl_opts
+	# shellcheck disable=SC2086 # we need expansion of ${extra_curl_opts[0]}
 	response="$(
 		curl --silent --location --retry 10 --retry-delay 1 \
 			-H "Authorization: token ${GITHUB_TOKEN}" \
 			-H "Accept: application/vnd.github.v3+json" \
 			--write-out '|%{http_code}' \
-			$extra_curl_opts \
+			${extra_curl_opts[0]:-} \
+			"${extra_curl_opts[1]:-}" \
 			"${api_url}"
 	)"
 
