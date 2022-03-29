@@ -31,14 +31,22 @@ termux_github_api_get_tag() {
 
 	local jq_filter
 	local api_url="https://api.github.com"
-	local -a extra_curl_opts
+	local -a curl_opts=(
+		--silent
+		--location
+		--retry 10
+		--retry-delay 1
+		-H "Authorization: token ${GITHUB_TOKEN}"
+		-H "Accept: application/vnd.github.v3+json"
+		--write-out '|%{http_code}'
+	)
 
 	if [[ "${TAG_TYPE}" == "newest-tag" ]]; then
 		api_url="${api_url}/graphql"
 		jq_filter='.data.repository.refs.edges[0].node.name'
-		extra_curl_opts=(
-			"-X POST"
-			"-d $(
+		curl_opts+=(-X POST)
+		curl_opts+=(
+			-d "$(
 				cat <<-EOF | tr '\n' ' '
 					{
 						"query": "query {
@@ -71,16 +79,7 @@ termux_github_api_get_tag() {
 	fi
 
 	local response
-	# shellcheck disable=SC2086 # we need expansion of ${extra_curl_opts[0]}
-	response="$(
-		curl --silent --location --retry 10 --retry-delay 1 \
-			-H "Authorization: token ${GITHUB_TOKEN}" \
-			-H "Accept: application/vnd.github.v3+json" \
-			--write-out '|%{http_code}' \
-			${extra_curl_opts[0]:-} \
-			"${extra_curl_opts[1]:-}" \
-			"${api_url}"
-	)"
+	response="$(curl "${curl_opts[@]}" "${api_url}")"
 
 	local http_code
 	http_code="${response##*|}"
