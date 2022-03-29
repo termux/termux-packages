@@ -1,0 +1,24 @@
+From cfaa28168a07ea4a53276b63068f94fce37d6aff Mon Sep 17 00:00:00 2001
+From: Tim Kientzle <kientzle@acm.org>
+Date: Thu, 24 Mar 2022 10:35:00 +0100
+Subject: [PATCH] ZIP reader: fix possible out-of-bounds read in
+ zipx_lzma_alone_init()
+
+Fixes #1672
+---
+ libarchive/archive_read_support_format_zip.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libarchive/archive_read_support_format_zip.c b/libarchive/archive_read_support_format_zip.c
+index 38ada70b5..9d6c900b2 100644
+--- a/libarchive/archive_read_support_format_zip.c
++++ b/libarchive/archive_read_support_format_zip.c
+@@ -1667,7 +1667,7 @@ zipx_lzma_alone_init(struct archive_read *a, struct zip *zip)
+ 	 */
+ 
+ 	/* Read magic1,magic2,lzma_params from the ZIPX stream. */
+-	if((p = __archive_read_ahead(a, 9, NULL)) == NULL) {
++	if(zip->entry_bytes_remaining < 9 || (p = __archive_read_ahead(a, 9, NULL)) == NULL) {
+ 		archive_set_error(&a->archive, ARCHIVE_ERRNO_FILE_FORMAT,
+ 		    "Truncated lzma data");
+ 		return (ARCHIVE_FATAL);
