@@ -59,17 +59,17 @@ diff -uNr gtk-3.24.10/gtk/Makefile.am gtk-3.24.10.mod/gtk/Makefile.am
 @@ -1272,13 +1272,13 @@
  gtktypebuiltins.h: stamp-gtktypebuiltins.h
  	@true
- stamp-gtktypebuiltins.h: $(gtk_public_h_sources) $(a11y_h_sources) $(deprecated_h_sources) gtktypebuiltins.h.template
+ stamp-gtktypebuiltins.h: $(gtk_public_h_sources) $(a11y_h_sources) $(gtk_deprecated_h_sources) gtktypebuiltins.h.template
 -	$(AM_V_GEN) ( cd $(srcdir) && $(GLIB_MKENUMS) --template gtktypebuiltins.h.template \
 +	$(AM_V_GEN) ( cd $(srcdir) && glib-mkenums --template gtktypebuiltins.h.template \
- 		$(gtk_public_h_sources) $(a11y_h_sources) $(deprecated_h_sources) ) > xgen-gtbh \
+ 		$(gtk_public_h_sources) $(a11y_h_sources) $(gtk_deprecated_h_sources) ) > xgen-gtbh \
  	&& (cmp -s xgen-gtbh gtktypebuiltins.h || cp xgen-gtbh gtktypebuiltins.h ) \
  	&& rm -f xgen-gtbh \
  	&& echo timestamp > $(@F)
- gtktypebuiltins.c: $(gtk_public_h_sources) $(a11y_h_sources) $(deprecated_h_sources) gtktypebuiltins.c.template
+ gtktypebuiltins.c: $(gtk_public_h_sources) $(a11y_h_sources) $(gtk_deprecated_h_sources) gtktypebuiltins.c.template
 -	$(AM_V_GEN) ( cd $(srcdir) && $(GLIB_MKENUMS) --template gtktypebuiltins.c.template \
 +	$(AM_V_GEN) ( cd $(srcdir) && glib-mkenums --template gtktypebuiltins.c.template \
- 		$(gtk_public_h_sources) $(a11y_h_sources) $(deprecated_h_sources) ) > xgen-gtbc \
+ 		$(gtk_public_h_sources) $(a11y_h_sources) $(gtk_deprecated_h_sources) ) > xgen-gtbc \
  	&& cp xgen-gtbc gtktypebuiltins.c  \
  	&& rm -f xgen-gtbc
 @@ -1430,13 +1430,13 @@
