@@ -1,0 +1,92 @@
+#!/usr/bin/env python3
+
+# The MIT License (MIT)
+
+# Copyright (c) 2022 Aditya Alok (aka. @MrAdityaAlok) <dev.aditya.alok+legal@gmail.com>
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+
+from requests import get as requests_get
+
+
+def get_repology_data(last_project):
+    repology_data = requests_get(
+        f"https://repology.org/api/v1/projects/{last_project}?inrepo=termux&outdated=True&families_newest=2-"
+    ).json()  # NOTE: We are using 2- so that api will return a package as outdated if it is so in 2 or more
+    # repo family. This helps us avoid false positives.
+
+    return repology_data
+
+
+def get_outdated_packages():
+    termux_outdated_packages = {}
+    last_project = ""
+
+    while True:
+        repology_data = get_repology_data(last_project)
+        last_project = sorted(repology_data.keys())[
+            -1
+        ]  # This used to query repology for next set of packages.
+        # Quoting repology documentation: "You may iterate through
+        # all projects by using the last project name in the next request"
+        # For more info, visit https://repology.org/api
+        # NOTE: next response to request will include the last_project given.
+        if len(repology_data) <= 1:
+            # Break the loop now. Since api returned only one package, it
+            # must be the last_project, which was already included in previous iteration.
+            break
+
+        for package_name, package_data in repology_data.items():
+            if package_name in termux_outdated_packages:
+                # Skip if package is already in the dict.
+                continue
+            newest_stable = None
+            newest_devel = None
+            for repo_data in package_data:
+                if repo_data.get("status", "") == "newest":
+                    newest_stable = repo_data["version"]
+                    # If we found stable version, break the loop.
+                    break
+                elif repo_data.get("status", "") == "devel":
+                    # Do not break the loop if we found devel version as there may be stable version later.
+                    newest_devel = repo_data["version"]
+
+            if newest_stable:
+                termux_outdated_packages[package_name] = newest_stable
+            elif newest_devel:
+                termux_outdated_packages[package_name] = newest_devel
+            else:
+                # If we don't find any version, skip the package.
+                continue
+
+    return termux_outdated_packages
+
+
+if __name__ == "__main__":
+    import json
+    import sys
+
+    try:
+        output_file = sys.argv[1]
+    except IndexError:
+        sys.exit("Please provide an output file")
+
+    with open(output_file, "w") as f:
+        json.dump(get_outdated_packages(), f)

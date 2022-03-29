@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-set -e -u
-BASEDIR=$(dirname "$(realpath "$0")")
+# shellcheck source-path=/data/data/com.termux/files/home/termux-packages
+set -u
 
-# These variables should be set in environment outside of this script.
+# Following variables should be set in environment outside of this script.
 # Build updated packages.
 : "${BUILD_PACKAGES:=false}"
 # Commit changes to Git.
@@ -10,110 +10,184 @@ BASEDIR=$(dirname "$(realpath "$0")")
 # Push changes to remote.
 : "${GIT_PUSH_PACKAGES:=false}"
 
-if [ -z "${GITHUB_API_TOKEN-}" ]; then
-	echo "Error: you need a Github Personal Access Token be set in variable GITHUB_API_TOKEN."
-	exit 1
-fi
+export TERMUX_PKG_UPDATE_METHOD=""         # Which method to use for updating? (repology, github or gitlab)
+export TERMUX_PKG_UPDATE_TAG_TYPE=""       # Whether to use latest-release-tag or newest-tag.
+export TERMUX_GITLAB_API_HOST="gitlab.com" # Default host for gitlab-ci.
+export TERMUX_PKG_AUTO_UPDATE=false        # Whether to auto-update or not. Disabled by default.
+export TERMUX_PKG_UPDATE_VERSION_REGEXP="" # Regexp to extract version.
+export TERMUX_REPOLOGY_DATA_FILE
+TERMUX_REPOLOGY_DATA_FILE="$(mktemp -t termux-repology.XXXXXX)" # File to store repology data.
 
-for pkg_dir in "${BASEDIR}"/../../packages/*; do
-	if [ -f "${pkg_dir}/build.sh" ]; then
-		package=$(basename "$pkg_dir")
-	else
-		# Fail if detected a non-package directory.
-		echo "Error: directory '${pkg_dir}' is not a package."
-		exit 1
-	fi
+export TERMUX_SCRIPTDIR
+TERMUX_SCRIPTDIR="$(realpath "$(dirname "$0")/../..")" # Script directory.
 
-	# Extract the package auto-update configuration.
-	build_vars=$(
-		set +e +u
-		. "${BASEDIR}/../../packages/${package}/build.sh" 2>/dev/null
-		echo "auto_update_flag=${TERMUX_PKG_AUTO_UPDATE};"
-		echo "termux_version=\"${TERMUX_PKG_VERSION}\";"
-		echo "srcurl=\"${TERMUX_PKG_SRCURL}\";"
-		echo "version_regexp=\"${TERMUX_PKG_AUTO_UPDATE_TAG_REGEXP//\\/\\\\}\";"
-	)
-	auto_update_flag=""; termux_version=""; srcurl=""; version_regexp="";
-	eval "$build_vars"
+# Define few more variables used by scripts.
+# shellcheck source=scripts/properties.sh
+. "${TERMUX_SCRIPTDIR}/scripts/properties.sh"
 
-	# Ignore packages that have auto-update disabled.
-	if [ "${auto_update_flag}" != "true" ]; then
-		continue
-	fi
+# Utility function to write error message to stderr.
+# shellcheck source=scripts/updates/utils/termux_error_exit.sh
+. "${TERMUX_SCRIPTDIR}"/scripts/updates/utils/termux_error_exit.sh
 
-	# Extract github project from TERMUX_PKG_SRCURL
-	project="$(echo "${srcurl}" | grep github.com | cut -d / -f4-5)"
-	if [ -z "${project}" ]; then
-		echo "Error: package '${package}' doesn't use GitHub archive source URL but has been configured for automatic updates."
-		exit 1
-	fi
+# Utility function to write updated version to build.sh.
+# shellcheck source=scripts/updates/utils/termux_pkg_upgrade_version.sh
+. "${TERMUX_SCRIPTDIR}"/scripts/updates/utils/termux_pkg_upgrade_version.sh
 
-	# Our local version of package.
-	termux_epoch="$(echo "$termux_version" | cut -d: -f1)"
-	termux_version=$(echo "$termux_version" | cut -d: -f2-)
-	if [ "$termux_version" == "$termux_epoch" ]; then
-		# No epoch set.
-		termux_epoch=""
-	else
-		termux_epoch+=":"
-	fi
+# Utility function to check if package needs to be updated, based on version comparison.
+# shellcheck source=scripts/updates/utils/termux_pkg_is_update_needed.sh
+. "${TERMUX_SCRIPTDIR}"/scripts/updates/utils/termux_pkg_is_update_needed.sh
 
-	# Get the latest release tag.
-	latest_tag=$(curl --silent --location -H "Authorization: token ${GITHUB_API_TOKEN}" "https://api.github.com/repos/${project}/releases/latest" | jq -r .tag_name)
+# Wrapper around github api to get latest release or newest tag.
+# shellcheck source=scripts/updates/api/termux_github_api_get_tag.sh
+. "${TERMUX_SCRIPTDIR}"/scripts/updates/api/termux_github_api_get_tag.sh
 
-	# If the github api returns error
-	if [ -z "$latest_tag" ] || [ "${latest_tag}" = "null" ]; then
-		echo "Error: failed to get the latest release tag for '${package}'. GitHub API returned 'null' which indicates that no releases available."
-		exit 1
-	fi
+# Wrapper around gitlab api to get latest release or newest tag.
+# shellcheck source=scripts/updates/api/termux_gitlab_api_get_tag.sh
+. "${TERMUX_SCRIPTDIR}"/scripts/updates/api/termux_gitlab_api_get_tag.sh
 
-	# Remove leading 'v' which is common in version tag.
-	latest_version=${latest_tag#v}
+# Function to get latest version of a package as per repology.
+# shellcheck source=scripts/updates/api/termux_repology_api_get_latest_version.sh
+. "${TERMUX_SCRIPTDIR}"/scripts/updates/api/termux_repology_api_get_latest_version.sh
 
-	# If needed, filter version numbers from tag by using regexp.
-	if [ -n "$version_regexp" ]; then
-		latest_version=$(grep -oP "$version_regexp" <<< "$latest_version" || true)
-	fi
-	if [ -z "$latest_version" ]; then
-		echo "Error: failed to get latest version for '${package}'. Check whether the TERMUX_PKG_AUTO_UPDATE_TAG_REGEXP='${version_regexp}' is work right with latest_release='${latest_tag}'."
-		exit 1
-	fi
+# Default auto update script for packages hosted on github.com. Should not be overrided by build.sh.
+# To use custom algorithm, one should override termux_pkg_auto_update().
+# shellcheck source=scripts/updates/internal/termux_github_auto_update.sh
+. "${TERMUX_SCRIPTDIR}"/scripts/updates/internal/termux_github_auto_update.sh
 
-	# Translate "_" into ".": some packages use underscores to seperate
-	# version numbers, but we require them to be separated by dots.
-	latest_version=${latest_version//_/.}
+# Default auto update script for packages hosted on hosts using gitlab-ci. Should not be overrided by build.sh.
+# To use custom algorithm, one should override termux_pkg_auto_update().
+# shellcheck source=scripts/updates/internal/termux_gitlab_auto_update.sh
+. "${TERMUX_SCRIPTDIR}"/scripts/updates/internal/termux_gitlab_auto_update.sh
 
-	# We have no better choice for comparing versions.
-	if [ "$(echo -e "${termux_version}\n${latest_version}" | sort -V | head -n 1)" != "$latest_version" ] ;then
-		if [ "$BUILD_PACKAGES" = "false" ]; then
-			echo "Package '${package}' needs update to '${latest_version}'."
-		else
-			echo "Updating '${package}' to '${latest_version}'."
-			sed -i "s/^\(TERMUX_PKG_VERSION=\)\(.*\)\$/\1${termux_epoch}${latest_version}/g" "${BASEDIR}/../../packages/${package}/build.sh"
-			sed -i "/TERMUX_PKG_REVISION=/d" "${BASEDIR}/../../packages/${package}/build.sh"
-			echo n | "${BASEDIR}/../bin/update-checksum" "$package" || {
-				echo "Warning: failed to update checksum for '${package}', skipping..."
-				git checkout -- "${BASEDIR}/../../packages/${package}"
-				git pull --rebase
-				continue
-			}
+# Default auto update script for rest packages. Should not be overrided by build.sh.
+# To use custom algorithm, one should override termux_pkg_auto_update().
+# shellcheck source=scripts/updates/internal/termux_repology_auto_update.sh
+. "${TERMUX_SCRIPTDIR}"/scripts/updates/internal/termux_repology_auto_update.sh
 
-			echo "Trying to build package '${package}'."
-			if "${BASEDIR}/../run-docker.sh" ./build-package.sh -a aarch64 -I "$package" && \
-				"${BASEDIR}/../run-docker.sh" ./build-package.sh -a arm -I "$package"; then
-				if [ "$GIT_COMMIT_PACKAGES" = "true" ]; then
-					git add "${BASEDIR}/../../packages/${package}"
-					git commit -m "$(echo -e "${package}: update to ${latest_version}\n\nThis commit has been automatically submitted by Github Actions.")"
-				fi
+# Main script to:
+# - by default, decide which update method to use,
+# - but can be overrided by build.sh to use custom update method.
+# - For example: see neovim-nightly's build.sh.
+# shellcheck source=scripts/updates/termux_pkg_auto_update.sh
+. "${TERMUX_SCRIPTDIR}"/scripts/updates/termux_pkg_auto_update.sh
 
-				if [ "$GIT_PUSH_PACKAGES" = "true" ]; then
-					git pull --rebase
-					git push
-				fi
-			else
-				echo "Warning: failed to build '${package}'."
-				git checkout -- "${BASEDIR}/../../packages/${package}"
-			fi
+_update() {
+	export TERMUX_PKG_NAME
+	TERMUX_PKG_NAME="$(basename "$1")"
+	# Avoid:
+	# - ending on errors such as $(which prog), where prog is not installed.
+	# - error on unbound variable.
+	#
+	# Variables used by auto update script should be covered by above variables and properties.sh.
+	set +e +u
+	# shellcheck source=/dev/null
+	. "${pkg_dir}"/build.sh 2>/dev/null
+	set -e -u
+
+	IFS="," read -r -a BLACKLISTED_ARCH <<<"${TERMUX_PKG_BLACKLISTED_ARCHES:-}"
+	export TERMUX_ARCH="" # Arch to test updates.
+	for arch in aarch64 arm i686 x86_64; do
+		# shellcheck disable=SC2076
+		if [[ ! " ${BLACKLISTED_ARCH[*]} " =~ " ${arch} " ]]; then
+			TERMUX_ARCH="${arch}"
+			break
 		fi
+	done
+
+	echo # Newline.
+	echo "INFO: Updating ${TERMUX_PKG_NAME}..."
+	# Only update if auto update is enabled.
+	if [[ "${TERMUX_PKG_AUTO_UPDATE}" == "true" ]]; then
+		echo "INFO: Current version: ${TERMUX_PKG_VERSION}"
+		termux_pkg_auto_update
+		echo # Newline.
+	else
+		echo "INFO: Skipping update. Auto update is disabled."
 	fi
-done
+}
+
+_test_pkg_build_file() {
+	local pkg_dir="$1"
+	if [[ ! -f "${pkg_dir}/build.sh" ]]; then
+		# Fail if detected a non-package directory.
+		termux_error_exit "ERROR: directory '${pkg_dir}' is not a package."
+	fi
+}
+
+declare -a _FAILED_UPDATES=()
+
+_run_update() {
+	local pkg_dir="$1"
+	_test_pkg_build_file "${pkg_dir}"
+	# Run each package update in separate process since we include their environment variables.
+	(
+		set -euo pipefail
+		_update "${pkg_dir}"
+	)
+	# shellcheck disable=SC2181
+	if [[ $? -ne 0 ]]; then
+		_FAILED_UPDATES+=("$(basename "${pkg_dir}")")
+	fi
+}
+
+_get_unique_packages() {
+	local -a unique_packages=()
+
+	while read -r pkg; do
+		unique_packages+=("${pkg}")
+	done < <(curl --silent --location --retry 5 --retry-delay 5 --retry-max-time 60 \
+		"https://repology.org/api/v1/projects/?inrepo=termux&&repos=1" |
+		jq -r keys)
+
+	echo "${unique_packages[@]}"
+}
+
+declare -a _UNIQUE_PACKAGES
+read -r -a _UNIQUE_PACKAGES <<<"$(_get_unique_packages)"
+
+_unique_to_termux() {
+	local pkg_dir="$1"
+	# shellcheck disable=2076 # We want literal match not regex.
+	if [[ "${_UNIQUE_PACKAGES[*]}" =~ "$(basename "${pkg_dir}")" ]]; then
+		return 0
+	else
+		return 1
+	fi
+}
+
+main() {
+	echo "INFO: Running update for: $*"
+
+	if [[ "$1" == "@all" ]]; then
+		for pkg_dir in "${TERMUX_SCRIPTDIR}"/packages/*; do
+			# Skip update if package is unique to Termux.
+			if _unique_to_termux "${pkg_dir}"; then
+				echo # Newline.
+				echo "INFO: Skipping update for unique to Termux package: $(basename "${pkg_dir}")"
+				continue
+			fi
+			_run_update "${pkg_dir}"
+		done
+	else
+		for pkg in "$@"; do
+			# Skip update if package is unique to Termux.
+			if _unique_to_termux "${TERMUX_SCRIPTDIR}"/packages/"${pkg}"; then
+				echo # Newline.
+				echo "INFO: Skipping update for unique to Termux package: ${pkg}"
+				continue
+			fi
+			_run_update "${TERMUX_SCRIPTDIR}/packages/${pkg}"
+		done
+	fi
+
+	if ((${#_FAILED_UPDATES[@]} > 0)); then
+		echo # Newline.
+		echo "===========================Failed updates==========================="
+		for failed_update in "${_FAILED_UPDATES[@]}"; do
+			echo "==> ${failed_update}"
+		done
+		exit 1 # Exit with error code, so that we know that some/all updates failed.
+	fi
+}
+
+main "$@"
