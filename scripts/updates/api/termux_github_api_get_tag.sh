@@ -89,8 +89,8 @@ termux_github_api_get_tag() {
 
 	local tag_name
 	if [[ "${http_code}" == "200" ]]; then
-		if jq --exit-status --raw-output "${jq_filter}" <<<"${response:4}" >/dev/null; then
-			tag_name="$(jq --exit-status --raw-output "${jq_filter}" <<<"${response:4}")"
+		if jq --exit-status --raw-output "${jq_filter}" <<<"${response}" >/dev/null; then
+			tag_name="$(jq --exit-status --raw-output "${jq_filter}" <<<"${response}")"
 		else
 			termux_error_exit "ERROR: Failed to parse tag name from: '${response}'"
 		fi
