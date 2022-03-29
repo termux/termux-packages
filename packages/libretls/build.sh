@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://git.causal.agency/libretls/about/
 TERMUX_PKG_DESCRIPTION="libtls for OpenSSL"
-TERMUX_PKG_LICENSE="BSD"
+TERMUX_PKG_LICENSE="ISC"
 # There's no license file in the tarball source
 # Instead, copy README.7 as it also includes what LICENSE that they use.
 TERMUX_PKG_LICENSE_FILE="README.7"
