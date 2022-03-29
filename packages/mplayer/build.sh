@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="The Movie Player"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.4
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://ftp-osl.osuosl.org/pub/gentoo/distfiles/MPlayer-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=82596ed558478d28248c7bc3828eb09e6948c099bbd76bb7ee745a0e3275b548
 TERMUX_PKG_DEPENDS="ffmpeg, fontconfig, freetype, fribidi, libass, libbz2, libdvdread, libiconv, libjpeg-turbo, liblzo, libmp3lame, libogg, libpng, libvorbis, libx11, libx264, libxext, libxss, ncurses, xvidcore, zlib"
@@ -27,6 +27,16 @@ termux_step_post_get_source() {
 		$TERMUX_PKG_CACHEDIR/mplayer-1.4-ffmpeg5.patch.bz2 \
 		3397eb50fe7265dc435f6df824cd6153440c14029c8a0be76056ae89733970db
 	bzcat $TERMUX_PKG_CACHEDIR/mplayer-1.4-ffmpeg5.patch.bz2 | patch --silent -p1
+
+	local FFMPEG_BUILD_SH=$TERMUX_SCRIPTDIR/packages/ffmpeg/build.sh
+	local FFMPEG_SRCURL=$(bash -c ". $FFMPEG_BUILD_SH; echo \$TERMUX_PKG_SRCURL")
+	local FFMPEG_SHA256=$(bash -c ". $FFMPEG_BUILD_SH; echo \$TERMUX_PKG_SHA256")
+	local FFMPEG_TARFILE=$TERMUX_PKG_CACHEDIR/$(basename $FFMPEG_SRCURL)
+	termux_download $FFMPEG_SRCURL $FFMPEG_TARFILE $FFMPEG_SHA256
+	rm -rf ffmpeg
+	mkdir ffmpeg
+	cd ffmpeg
+	tar xf $FFMPEG_TARFILE --strip-components=1
 }
 
 termux_step_configure_autotools() {
