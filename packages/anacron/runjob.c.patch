@@ -1,0 +1,11 @@
+--- a/runjob.c
++++ b/runjob.c
+@@ -122,7 +122,7 @@
+     if (sigprocmask(SIG_SETMASK, &old_sigmask, NULL))
+ 	die_e("sigprocmask error");
+     xcloselog();
+-    execl("/bin/sh", "/bin/sh", "-c", jr->command, (char *)NULL);
++    execl("@TERMUX_PREFIX@/bin/sh", "@TERMUX_PREFIX@/bin/sh", "-c", jr->command, (char *)NULL);
+     die_e("execl() error");
+ }
+ 
