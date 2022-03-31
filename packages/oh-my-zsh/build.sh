@@ -9,8 +9,5 @@ TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_DEPENDS="zsh,git,python"
 
 termux_step_make_install() {
-  cd $TERMUX_PKG_SRCDIR
-  mkdir -p "${TERMUX_PREFIX}/usr/share/oh-my-zsh"
-  echo $PWD
-  cp -r "*" "${TERMUX_PREFIX}/usr/share/oh-my-zsh/"
+  cp -r "${TERMUX_PKG_SRCDIR}/.." "${TERMUX_PREFIX}/usr/share/oh-my-zsh"
 }
