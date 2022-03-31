@@ -1,0 +1,47 @@
+diff --git a/ugit b/ugit
+index ae0b8a2..4ff660f 100755
+--- a/ugit
++++ b/ugit
+@@ -328,7 +328,6 @@ Available options:
+ 
+ -h, --help      Print this help and exit
+ -v, --version   Print current ugit version
+--u, --update    Update ugit
+ -g, --guide     Open ugit undo text guide
+ EOF
+ printf "\n%s\n" "Contact 📬️: $(tput bold)varshneybhupesh@gmail.com${RESET} for assistance"
+@@ -344,25 +343,6 @@ get_changelog() {
+     echo -e "${CHANGELOG#* }"
+ }
+ 
+-ugit_update() {
+-    printf "%s\n" "Checking for updates ..."
+-    curl -s -L "$SCRIPT_URL" > "$TMP_FILE"
+-    NEW_VER=$(grep "^VERSION" "$TMP_FILE" | awk -F'[="]' '{print $3}')
+-
+-    if [[ "$VERSION" < "$NEW_VER" ]]; then
+-        printf "Updating ugit \e[31;1m%s\e[0m -> \e[32;1m%s\e[0m\n" "$VERSION" "$NEW_VER"
+-        chmod +x "$TMP_FILE"
+-        # WIP
+-        if cp "$TMP_FILE" "$SCRIPT_NAME"; then printf "%s\n" "Done"; fi
+-        rm -f "$TMP_FILE"
+-        get_changelog
+-    else
+-        printf "%s\n" "ugit is already at the latest version ($VERSION)"
+-        rm -f "$TMP_FILE"
+-    fi
+-    exit 0
+-}
+-
+ open_guide() {
+     GUIDE="https://bhupesh.gitbook.io/notes/git/how-to-undo-anything-in-git"
+ 
+@@ -407,8 +387,6 @@ main() {
+         case "$key" in
+             --version|-v)
+                 show_version;;
+-            --update|-u)
+-                ugit_update;;
+             --help|-h)
+                 print_help
+                 exit;;
