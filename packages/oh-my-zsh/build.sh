@@ -11,5 +11,6 @@ TERMUX_PKG_DEPENDS="zsh,git,python"
 termux_step_make_install() {
   cd "${TERMUX_TOPDIR}/${TERMUX_PKG_NAME}/package"
   mkdir -p "${TERMUX_PREFIX}/usr/share/oh-my-zsh"
+  echo $PWD
   cp -rf * "${TERMUX_PREFIX}/usr/share/oh-my-zsh/"
 }
