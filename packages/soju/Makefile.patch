@@ -1,0 +1,16 @@
+--- a/Makefile
++++ b/Makefile
+@@ -20,10 +20,10 @@
+ install:
+ 	mkdir -p $(DESTDIR)$(PREFIX)/$(BINDIR)
+ 	mkdir -p $(DESTDIR)$(PREFIX)/$(MANDIR)/man1
+-	mkdir -p $(DESTDIR)/etc/soju
+-	mkdir -p $(DESTDIR)/var/lib/soju
++	mkdir -p $(DESTDIR)$(PREFIX)/etc/soju
++	mkdir -p $(DESTDIR)$(PREFIX)/var/lib/soju
+ 	cp -f soju sojuctl $(DESTDIR)$(PREFIX)/$(BINDIR)
+ 	cp -f doc/soju.1 $(DESTDIR)$(PREFIX)/$(MANDIR)/man1
+-	[ -f $(DESTDIR)/etc/soju/config ] || cp -f config.in $(DESTDIR)/etc/soju/config
++	cp -f config.in $(DESTDIR)$(PREFIX)/etc/soju/config
+ 
+ .PHONY: soju sojuctl clean install

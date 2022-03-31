@@ -1,0 +1,28 @@
+--- a/Makefile
++++ b/Makefile
+@@ -18,16 +18,19 @@
+ hut:
+ 	$(GO) build $(GOFLAGS)
+ 
++hut-build:
++	CC=gcc CFLAGS= LDFLAGS= GOOS= GOARCH= $(GO) build $(GOFLAGS) -o $@
++
+ completions: hut.bash hut.zsh hut.fish
+ 
+-hut.bash: hut
+-	./hut completion bash >hut.bash
++hut.bash: hut-build
++	./hut-build completion bash >hut.bash
+ 
+-hut.zsh: hut
+-	./hut completion zsh >hut.zsh
++hut.zsh: hut-build
++	./hut-build completion zsh >hut.zsh
+ 
+-hut.fish: hut
+-	./hut completion fish >hut.fish
++hut.fish: hut-build
++	./hut-build completion fish >hut.fish
+ 
+ doc/hut.1: doc/hut.1.scd
+ 	$(SCDOC) <doc/hut.1.scd >doc/hut.1
