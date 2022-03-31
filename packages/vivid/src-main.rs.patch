@@ -7,7 +7,7 @@ index 67a3216..1dbd984 100644
  struct ThemeAssets;
  
 -const THEME_PATH_SYSTEM: &str = "/usr/share/vivid/themes/";
-+const THEME_PATH_SYSTEM: &str = "@TERMUX_PREFIX@/usr/share/vivid/themes/";
++const THEME_PATH_SYSTEM: &str = "@TERMUX_PREFIX@/share/vivid/themes/";
  
  fn get_user_config_path() -> PathBuf {
      #[cfg(target_os = "macos")]
@@ -16,7 +16,7 @@ index 67a3216..1dbd984 100644
      let database_path_env = database_path_env_s.as_ref().map(Path::new);
  
 -    let database_path_system = Path::new("/usr/share/vivid/filetypes.yml");
-+    let database_path_system = Path::new("@TERMUX_PREFIX@/usr/share/vivid/filetypes.yml");
++    let database_path_system = Path::new("@TERMUX_PREFIX@/share/vivid/filetypes.yml");
  
      let database_path = database_path_from_arg
          .or(database_path_env)
