@@ -11,3 +11,4 @@ bin/yaml-bench
 share/man/man1/FileCheck.1.gz
 "
 TERMUX_SUBPKG_DESCRIPTION="LLVM Development Tools"
+TERMUX_SUBPKG_DEPENDS="libc++, ncurses, zlib"
