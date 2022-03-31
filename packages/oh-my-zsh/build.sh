@@ -9,21 +9,25 @@ TERMUX_PKG_GIT_BRANCH=main
 TERMUX_PKG_DEPENDS="zsh,git,python"
 
 termux_step_make_install() {
-  cd "${TERMUX_TOPDIR}/${TERMUX_PKG_NAME}/package"
-  mkdir -p "${TERMUX_PREFIX}/usr/share/oh-my-zsh"
-  mkdir -p "${TERMUX_PREFIX}/usr/share/LICENSES/${TERMUX_PKG_NAME}"
-  # install -D -m644 "zshrc" "${HOME}/.zshrc"
-  install -D -m644 "LICENSE.txt" "${TERMUX_PREFIX}/usr/share/LICENSES/${TERMUX_PKG_NAME}/LICENSE"
-  cp -rf * "${TERMUX_PREFIX}/usr/share/oh-my-zsh/"
-}
-
-termux_step_make_install() {
   cd "${TERMUX_PKG_SRCDIR}"
 
-  # mkdir -p "${TERMUX_PREFIX}/usr/share/oh-my-zsh"
+  mkdir -p "${TERMUX_PREFIX}/usr/share/oh-my-zsh"
   mkdir -p "${TERMUX_PREFIX}/usr/share/LICENSES/${TERMUX_PKG_NAME}"
   echo $PWD
   # install -D -m644 "zshrc" "${HOME}/.zshrc"
   install -m644 "${TERMUX_PKG_SRCDIR}/LICENSE.txt" "${TERMUX_PREFIX}/usr/share/LICENSES/${TERMUX_PKG_NAME}/LICENSE"
-  install -Dm644 "${TERMUX_PKG_SRCDIR}" "${TERMUX_PREFIX}/usr/share/oh-my-zsh"
+  install -m644 "${TERMUX_PKG_SRCDIR}/CODE_OF_CONDUCT.md" "${TERMUX_PREFIX}/usr/share/oh-my-zsh"
+  install -m644 "${TERMUX_PKG_SRCDIR}/LICENSE.txt" "${TERMUX_PREFIX}/usr/share/oh-my-zsh"
+  install -m644 "${TERMUX_PKG_SRCDIR}/CONTRIBUTING.md" "${TERMUX_PREFIX}/usr/share/oh-my-zsh"
+  install -m644 "${TERMUX_PKG_SRCDIR}/README.md" "${TERMUX_PREFIX}/usr/share/oh-my-zsh"
+  install -m644 "${TERMUX_PKG_SRCDIR}/SECURITY.md" "${TERMUX_PREFIX}/usr/share/oh-my-zsh"
+  install -m644 "${TERMUX_PKG_SRCDIR}/oh-my-zsh.sh" "${TERMUX_PREFIX}/usr/share/oh-my-zsh"
+  install -Dm644 "${TERMUX_PKG_SRCDIR}/cache" "${TERMUX_PREFIX}/usr/share/oh-my-zsh"
+  install -Dm644 "${TERMUX_PKG_SRCDIR}/custom" "${TERMUX_PREFIX}/usr/share/oh-my-zsh"
+  install -Dm644 "${TERMUX_PKG_SRCDIR}/lib" "${TERMUX_PREFIX}/usr/share/oh-my-zsh"
+  install -Dm644 "${TERMUX_PKG_SRCDIR}/log" "${TERMUX_PREFIX}/usr/share/oh-my-zsh"
+  install -Dm644 "${TERMUX_PKG_SRCDIR}/plugins" "${TERMUX_PREFIX}/usr/share/oh-my-zsh"
+  install -Dm644 "${TERMUX_PKG_SRCDIR}/templates" "${TERMUX_PREFIX}/usr/share/oh-my-zsh"
+  install -Dm644 "${TERMUX_PKG_SRCDIR}/themes" "${TERMUX_PREFIX}/usr/share/oh-my-zsh"
+  install -Dm644 "${TERMUX_PKG_SRCDIR}/tools" "${TERMUX_PREFIX}/usr/share/oh-my-zsh"
 }
