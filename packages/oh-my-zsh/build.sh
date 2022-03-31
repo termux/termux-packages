@@ -31,4 +31,5 @@ termux_step_make_install() {
   cp -rf "${TERMUX_PKG_SRCDIR}/templates" "${TERMUX_PREFIX}/usr/share/oh-my-zsh"
   cp -rf "${TERMUX_PKG_SRCDIR}/themes" "${TERMUX_PREFIX}/usr/share/oh-my-zsh"
   cp -rf "${TERMUX_PKG_SRCDIR}/tools" "${TERMUX_PREFIX}/usr/share/oh-my-zsh"
+  echo "To change shell run 'chsh -s /bin/zsh'"
 }
