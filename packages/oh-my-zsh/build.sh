@@ -4,20 +4,21 @@ TERMUX_PKG_DESCRIPTION="A community-driven framework for managing your zsh confi
 TERMUX_PKG_LICENSE="MIT License"
 TERMUX_PKG_MAINTAINER="Sumith Emmadi <sumithemmadi244@gmail.com>"
 TERMUX_PKG_VERSION=1.0.0
-TERMUX_PKG_SRCURL=https://github.com/sumithemmadi/ohmyzsh.git
+TERMUX_PKG_SRCURL="${HOME}/ohmyzsh.git"
 TERMUX_PKG_GIT_BRANCH=main
 TERMUX_PKG_DEPENDS="zsh,git,python"
 
 termux_git_clone_src() {
-  cd "${TERMUX_PKG_SRCDIR}/${TERMUX_PKG_NAME}"
-  cp "termux.zshrc" "zshrc"
+  cd "${TERMUX_TOPDIR}/${TERMUX_PKG_NAME}/package"
+  echo "working"
+  # cp "termux.zshrc" "zshrc"
 }
 
 termux_step_make_install() {
-  cd "${TERMUX_PKG_SRCDIR}/${TERMUX_PKG_NAME}"
+  cd "${TERMUX_TOPDIR}/${TERMUX_PKG_NAME}/package"
   mkdir -p "${TERMUX_PREFIX}/usr/share/oh-my-zsh"
   mkdir -p "${TERMUX_PREFIX}/usr/share/LICENSES/${TERMUX_PKG_NAME}"
-  install -D -m644 "zshrc" "${HOME}/.zshrc"
+  # install -D -m644 "zshrc" "${HOME}/.zshrc"
   install -D -m644 "LICENSE.txt" "${TERMUX_PREFIX}/usr/share/LICENSES/${TERMUX_PKG_NAME}/LICENSE"
   cp -rf * "${TERMUX_PREFIX}/usr/share/oh-my-zsh/"
 }
