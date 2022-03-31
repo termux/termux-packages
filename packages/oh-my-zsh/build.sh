@@ -6,7 +6,7 @@ TERMUX_PKG_LICENSE_FILE="LICENSE.txt"
 TERMUX_PKG_MAINTAINER="Sumith Emmadi <sumithemmadi244@gmail.com>"
 TERMUX_PKG_VERSION=1.0.0
 TERMUX_PKG_SRCURL=https://github.com/sumithemmadi/ohmyzsh.git
-TERMUX_PKG_GIT_BRANCH=main
+TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_DEPENDS="zsh,git,python"
 
 termux_step_make_install() {
