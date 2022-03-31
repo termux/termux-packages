@@ -11,8 +11,5 @@ TERMUX_PKG_DEPENDS="zsh,git,python"
 termux_step_make_install() {
   cd "${TERMUX_TOPDIR}/${TERMUX_PKG_NAME}/package"
   mkdir -p "${TERMUX_PREFIX}/usr/share/oh-my-zsh"
-  mkdir -p "${TERMUX_PREFIX}/usr/share/LICENSES/${TERMUX_PKG_NAME}"
-  # install -D -m644 "zshrc" "${HOME}/.zshrc"
-  install -D -m644 "${TERMUX_TOPDIR}/${TERMUX_PKG_NAME}/package/LICENSE.txt" "${TERMUX_PREFIX}/usr/share/LICENSES/${TERMUX_PKG_NAME}/LICENSE"
   cp -rf * "${TERMUX_PREFIX}/usr/share/oh-my-zsh/"
 }
