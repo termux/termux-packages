@@ -25,5 +25,5 @@ termux_step_make_install() {
   echo $PWD
   # install -D -m644 "zshrc" "${HOME}/.zshrc"
   install -m644 "${TERMUX_PKG_SRCDIR}/LICENSE.txt" "${TERMUX_PREFIX}/usr/share/LICENSES/${TERMUX_PKG_NAME}/LICENSE"
-  install -Dm644 "$PWD/*" "${TERMUX_PREFIX}/usr/share/oh-my-zsh/"
+  install -Dm644 "${TERMUX_PKG_SRCDIR}" "${TERMUX_PREFIX}/usr/share/oh-my-zsh/"
 }
