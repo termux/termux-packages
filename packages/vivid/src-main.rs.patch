@@ -1,0 +1,22 @@
+diff --git a/src/main.rs b/src/main.rs
+index 67a3216..1dbd984 100644
+--- a/src/main.rs
++++ b/src/main.rs
+@@ -24,7 +24,7 @@ use crate::theme::Theme;
+ #[folder = "themes/"]
+ struct ThemeAssets;
+ 
+-const THEME_PATH_SYSTEM: &str = "/usr/share/vivid/themes/";
++const THEME_PATH_SYSTEM: &str = "@TERMUX_PREFIX@/usr/share/vivid/themes/";
+ 
+ fn get_user_config_path() -> PathBuf {
+     #[cfg(target_os = "macos")]
+@@ -50,7 +50,7 @@ fn load_filetypes_database(matches: &ArgMatches, user_config_path: &PathBuf) ->
+     let database_path_env_s = env::var("VIVID_DATABASE").ok();
+     let database_path_env = database_path_env_s.as_ref().map(Path::new);
+ 
+-    let database_path_system = Path::new("/usr/share/vivid/filetypes.yml");
++    let database_path_system = Path::new("@TERMUX_PREFIX@/usr/share/vivid/filetypes.yml");
+ 
+     let database_path = database_path_from_arg
+         .or(database_path_env)
