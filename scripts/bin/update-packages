@@ -148,7 +148,7 @@ read -r -a _UNIQUE_PACKAGES <<<"$(_get_unique_packages)"
 _unique_to_termux() {
 	local pkg_dir="$1"
 	# shellcheck disable=2076 # We want literal match not regex.
-	if [[ "${_UNIQUE_PACKAGES[*]}" =~ "$(basename "${pkg_dir}")" ]]; then
+	if [[ "${_UNIQUE_PACKAGES[*]}" =~ "\"$(basename "${pkg_dir}")\"" ]]; then
 		return 0
 	else
 		return 1
