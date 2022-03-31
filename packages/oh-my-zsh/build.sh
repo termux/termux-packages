@@ -9,5 +9,6 @@ TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_DEPENDS="zsh,git,python"
 
 termux_step_make_install() {
+  install -D -m644 "${TERMUX_PKG_SRCDIR}/LICENSE.txt" "${TERMUX_PREFIX}/usr/share/LICENSES/${TERMUX_PKG_NAME}/LICENSE"
   cp -r "${TERMUX_PKG_SRCDIR}/.." "${TERMUX_PREFIX}/usr/share/oh-my-zsh"
 }
