@@ -1,0 +1,93 @@
+--- a/src/net/conf.go
++++ b/src/net/conf.go
+@@ -2,7 +2,7 @@
+ // Use of this source code is governed by a BSD-style
+ // license that can be found in the LICENSE file.
+ 
+-//go:build aix || darwin || dragonfly || freebsd || linux || netbsd || openbsd || solaris
++//go:build aix || darwin || dragonfly || freebsd || (linux && !android) || netbsd || openbsd || solaris
+ 
+ package net
+ 
+--- a/src/net/conf_android.go
++++ b/src/net/conf_android.go
+@@ -2,7 +2,7 @@
+ // Use of this source code is governed by a BSD-style
+ // license that can be found in the LICENSE file.
+ 
+-//go:build aix || darwin || dragonfly || freebsd || linux || netbsd || openbsd || solaris
++//go:build android
+ 
+ package net
+ 
+@@ -95,10 +95,10 @@
+ 	}
+ 
+ 	if runtime.GOOS != "openbsd" {
+-		confVal.nss = parseNSSConfFile("/etc/nsswitch.conf")
++		confVal.nss = parseNSSConfFile("@TERMUX_PREFIX@/etc/nsswitch.conf")
+ 	}
+ 
+-	confVal.resolv = dnsReadConfig("/etc/resolv.conf")
++	confVal.resolv = dnsReadConfig("@TERMUX_PREFIX@/etc/resolv.conf")
+ 	if confVal.resolv.err != nil && !os.IsNotExist(confVal.resolv.err) &&
+ 		!os.IsPermission(confVal.resolv.err) {
+ 		// If we can't read the resolv.conf file, assume it
+@@ -108,7 +108,7 @@
+ 		confVal.forceCgoLookupHost = true
+ 	}
+ 
+-	if _, err := os.Stat("/etc/mdns.allow"); err == nil {
++	if _, err := os.Stat("@TERMUX_PREFIX@/etc/mdns.allow"); err == nil {
+ 		confVal.hasMDNSAllow = true
+ 	}
+ }
+--- a/src/net/dnsclient_unix.go
++++ b/src/net/dnsclient_unix.go
+@@ -2,7 +2,7 @@
+ // Use of this source code is governed by a BSD-style
+ // license that can be found in the LICENSE file.
+ 
+-//go:build aix || darwin || dragonfly || freebsd || linux || netbsd || openbsd || solaris
++//go:build aix || darwin || dragonfly || freebsd || (linux && !android) || netbsd || openbsd || solaris
+ 
+ // DNS client: see RFC 1035.
+ // Has to be linked into package net for Dial.
+--- a/src/net/dnsclient_android.go
++++ b/src/net/dnsclient_android.go
+@@ -2,7 +2,7 @@
+ // Use of this source code is governed by a BSD-style
+ // license that can be found in the LICENSE file.
+ 
+-//go:build aix || darwin || dragonfly || freebsd || linux || netbsd || openbsd || solaris
++//go:build android
+ 
+ // DNS client: see RFC 1035.
+ // Has to be linked into package net for Dial.
+@@ -338,7 +338,7 @@
+ 	// resolv.conf twice the first time.
+ 	conf.dnsConfig = systemConf().resolv
+ 	if conf.dnsConfig == nil {
+-		conf.dnsConfig = dnsReadConfig("/etc/resolv.conf")
++		conf.dnsConfig = dnsReadConfig("@TERMUX_PREFIX@/etc/resolv.conf")
+ 	}
+ 	conf.lastChecked = time.Now()
+ 
+@@ -401,7 +401,7 @@
+ 		// For consistency with libc resolvers, report no such host.
+ 		return dnsmessage.Parser{}, "", &DNSError{Err: errNoSuchHost.Error(), Name: name, IsNotFound: true}
+ 	}
+-	resolvConf.tryUpdate("/etc/resolv.conf")
++	resolvConf.tryUpdate("@TERMUX_PREFIX@/etc/resolv.conf")
+ 	resolvConf.mu.RLock()
+ 	conf := resolvConf.dnsConfig
+ 	resolvConf.mu.RUnlock()
+@@ -578,7 +578,7 @@
+ 		// See comment in func lookup above about use of errNoSuchHost.
+ 		return nil, dnsmessage.Name{}, &DNSError{Err: errNoSuchHost.Error(), Name: name, IsNotFound: true}
+ 	}
+-	resolvConf.tryUpdate("/etc/resolv.conf")
++	resolvConf.tryUpdate("@TERMUX_PREFIX@/etc/resolv.conf")
+ 	resolvConf.mu.RLock()
+ 	conf := resolvConf.dnsConfig
+ 	resolvConf.mu.RUnlock()
