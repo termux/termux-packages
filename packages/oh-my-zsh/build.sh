@@ -8,12 +8,6 @@ TERMUX_PKG_SRCURL="${HOME}/ohmyzsh.git"
 TERMUX_PKG_GIT_BRANCH=main
 TERMUX_PKG_DEPENDS="zsh,git,python"
 
-termux_git_clone_src() {
-  cd "${TERMUX_TOPDIR}/${TERMUX_PKG_NAME}/package"
-  echo "working"
-  # cp "termux.zshrc" "zshrc"
-}
-
 termux_step_make_install() {
   cd "${TERMUX_TOPDIR}/${TERMUX_PKG_NAME}/package"
   mkdir -p "${TERMUX_PREFIX}/usr/share/oh-my-zsh"
