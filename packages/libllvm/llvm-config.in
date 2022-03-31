@@ -50,7 +50,7 @@ LDFLAGS="-L${prefix}/lib"
 LIBFILE="${prefix}/lib/libLLVM-$version.so"
 components="aarch64 aarch64asmparser aarch64codegen aarch64desc \
 aarch64disassembler aarch64info aarch64utils aggressiveinstcombine all all-targets amdgpu \
-amdgpuasmparser amdgpucodegen amdgpudesc amdgpudisassembler amdgpuinfo amdgpuutils \
+amdgpuasmparser amdgpucodegen amdgpudesc amdgpudisassembler amdgpuinfo amdgputargetmca amdgpuutils \
 analysis arc arccodegen arcdesc arcdissembler arcinfo arm armasmparser armcodegen armdesc \
 armdisassembler arminfo armutils asmparser asmprinter avr avrasmparser avrcodegen avrdesc \
 avrdisassembler avrinfo binaryformat bitreader bitstreamreader bitwriter bpf bpfasmparser \
@@ -74,7 +74,7 @@ systemzdesc systemzdisassembler systemzinfo tablegen target textapi transformuti
 vecodegen vedesc vedisassembler veinfo vectorize webassembly \
 webassemblyasmparser webassemblycodegen webassemblydesc webassemblydisassembler \
 webassemblyinfo webassemblyutils windowsmanifest x86 x86asmparser x86codegen x86desc x86disassembler x86info \
-xcore xcorecodegen xcoredesc xcoredisassembler xcoreinfo xray"
+x86targetmca xcore xcorecodegen xcoredesc xcoredisassembler xcoreinfo xray"
 static_libs="-lLLVMObjectYAML -lLLVMDlltoolDriver -lLLVMLineEditor -lLLVMFuzzMutate \
 -lLLVMCoroutines -lLLVMLTO -lLLVMPasses -lLLVMObjCARCOpts -lLLVMTextAPI -lLLVMCoverage \
 -lLLVMXRay -lLLVMInterpreter -lLLVMRemarks -lLLVMMIRParser -lLLVMDWP -lLLVMSymbolize -lLLVMDebugInfoPDB \
@@ -85,7 +85,7 @@ static_libs="-lLLVMObjectYAML -lLLVMDlltoolDriver -lLLVMLineEditor -lLLVMFuzzMut
 -lLLVMAVRDisassembler -lLLVMAVRInfo -lLLVMRISCVDisassembler -lLLVMRISCVCodeGen -lLLVMRISCVAsmParser \
 -lLLVMRISCVDesc -lLLVMRISCVInfo -lLLVMXCoreDisassembler -lLLVMXCoreCodeGen \
 -lLLVMXCoreDesc -lLLVMXCoreInfo -lLLVMX86Disassembler -lLLVMX86CodeGen -lLLVMX86AsmParser \
--lLLVMX86Desc -lLLVMX86Info -lLLVMWebAssemblyDisassembler \
+-lLLVMX86Desc -lLLVMX86Info -lLLVMX86TargetMCA -lLLVMWebAssemblyDisassembler \
 -lLLVMWebAssemblyCodeGen -lLLVMWebAssemblyDesc -lLLVMWebAssemblyAsmParser \
 -lLLVMWebAssemblyUtils -lLLVMWebAssemblyInfo -lLLVMSystemZDisassembler -lLLVMSystemZCodeGen \
 -lLLVMSystemZAsmParser -lLLVMSystemZDesc -lLLVMSystemZInfo -lLLVMSparcDisassembler \
@@ -101,7 +101,7 @@ static_libs="-lLLVMObjectYAML -lLLVMDlltoolDriver -lLLVMLineEditor -lLLVMFuzzMut
 -lLLVMARMCodeGen -lLLVMARMAsmParser -lLLVMARMDesc -lLLVMARMInfo -lLLVMARMUtils \
 -lLLVMAMDGPUDisassembler -lLLVMAMDGPUCodeGen -lLLVMipo -lLLVMInstrumentation \
 -lLLVMVectorize -lLLVMLinker -lLLVMIRReader -lLLVMAsmParser -lLLVMAMDGPUAsmParser \
--lLLVMAMDGPUDesc -lLLVMAMDGPUInfo -lLLVMAMDGPUUtils -lLLVMLibDriver -lLLVMOption \
+-lLLVMAMDGPUDesc -lLLVMAMDGPUInfo -lLLVMAMDGPUTargetMCA -lLLVMAMDGPUUtils -lLLVMLibDriver -lLLVMOption \
 -lLLVMWindowsManifest -lLLVMAArch64Disassembler -lLLVMMCDisassembler \
 -lLLVMAArch64AsmParser -lLLVMMCJIT -lLLVMTableGen -lLLVMOrcJIT -lLLVMOrcTargetProcess -lLLVMOrcShared -lLLVMExecutionEngine \
 -lLLVMRuntimeDyld -lLLVMBitstreamReader -lLLVMCFGuard -lLLVMFrontendOpenACC -lLLVMExtensions -lLLVMDWARFLinker \
