@@ -1,0 +1,14 @@
+--- profanity-0.12.0/configure.ac	2022-03-30 17:58:28.000000000 +0530
++++ profanity-0.12.0-patch/configure.ac	2022-03-31 20:48:46.031796850 +0530
+@@ -99,9 +99,8 @@
+         AC_MSG_NOTICE([Symlinking Python.framework to $PYTHON_FRAMEWORK])
+         rm -f Python.framework
+         ln -s $PYTHON_FRAMEWORK Python.framework ])
+-    PKG_CHECK_MODULES([python], [python-embed], [PYTHON_CONFIG_EXISTS=yes], [PYTHON_CONFIG_EXISTS=no])
+-    PKG_CHECK_MODULES([python], [python3-embed], [PYTHON3_CONFIG_EXISTS=yes; AC_DEFINE(PY_IS_PYTHON3, [1], [Is Python version 3])], [PYTHON3_CONFIG_EXISTS=no])
+-    if test "$PYTHON_CONFIG_EXISTS" = "yes" || test "$PYTHON3_CONFIG_EXISTS" = "yes"; then
++	AC_DEFINE([PY_IS_PYTHON3], [1], [Is Python version 3])
++    if true; then
+         AM_CONDITIONAL([BUILD_PYTHON_API], [true])
+         AC_DEFINE([HAVE_PYTHON], [1], [Python support])
+     else
