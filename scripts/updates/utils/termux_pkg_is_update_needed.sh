@@ -9,7 +9,7 @@
 # latest lua:lpeg version (as of 2021-11-20T12:21:31) is "1.0.2" but MacPorts specifies as "1.0.2-1".
 # Hence repology returns "1.0.2-1" as the latest.
 #
-# But hopefully, all this can be avoided if TERMUX_PKG_AUTO_UPDATE_TAG_REGEXP is set.
+# But hopefully, all this can be avoided if TERMUX_PKG_UPDATE_VERSION_REGEXP is set.
 #
 termux_pkg_is_update_needed() {
 	# USAGE: termux_pkg_is_update_needed <current-version> <latest-version> [regexp]
@@ -20,23 +20,6 @@ termux_pkg_is_update_needed() {
 
 	local CURRENT_VERSION="$1"
 	local LATEST_VERSION="$2"
-	local VERSION_REGEX="${3:-}"
-
-	# If needed, filter version numbers from tag by using regexp.
-	if [[ -n "${VERSION_REGEX}" ]]; then
-		LATEST_VERSION="$(grep -oP "${VERSION_REGEX}" <<<"${LATEST_VERSION}" || true)"
-
-		if [[ -z "${LATEST_VERSION}" ]]; then
-			termux_error_exit <<-EndOfError
-				ERROR: failed to compare versions. Ensure whether the version regex '${VERSION_REGEX}'
-				works correctly with given versions.
-			EndOfError
-		fi
-	fi
-
-	# Translate "_" into ".": some packages use underscores to seperate
-	# version numbers, but we require them to be separated by dots.
-	LATEST_VERSION="${LATEST_VERSION//_/.}"
 
 	# Compare versions.
 	# shellcheck disable=SC2091
@@ -79,6 +62,13 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
 	first_version="$1"
 	second_version="$2"
 	version_regexp="${3:-}"
+	if [[ -n "${version_regexp}" ]]; then
+		first_version="$(grep -oP "${version_regexp}" <<<"${first_version}")"
+		second_version="$(grep -oP "${version_regexp}" <<<"${second_version}")"
+		if [[ -z "${first_version}" ]] || [[ -z "${second_version}" ]]; then
+			termux_error_exit "ERROR: Unable to parse version numbers using regexp '${version_regexp}'"
+		fi
+	fi
 	if termux_pkg_is_update_needed "${first_version}" "${second_version}" "${version_regexp}"; then
 		echo "${first_version} < ${second_version}"
 	else

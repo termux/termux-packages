@@ -13,9 +13,25 @@ termux_pkg_upgrade_version() {
 	local PKG_DIR
 	PKG_DIR="${TERMUX_SCRIPTDIR}/packages/${TERMUX_PKG_NAME}"
 
+	# If needed, filter version numbers using regexp.
+	if [[ -n "${TERMUX_PKG_UPDATE_VERSION_REGEXP}" ]]; then
+		LATEST_VERSION="$(grep -oP "${TERMUX_PKG_UPDATE_VERSION_REGEXP}" <<<"${LATEST_VERSION}" || true)"
+
+		if [[ -z "${LATEST_VERSION}" ]]; then
+			termux_error_exit <<-EndOfError
+				ERROR: failed to filter version numbers using regexp '${TERMUX_PKG_UPDATE_VERSION_REGEXP}'.
+				Ensure that it is works correctly with ${LATEST_VERSION}.
+			EndOfError
+		fi
+	fi
+
+	# Translate "_" into ".": some packages use underscores to seperate
+	# version numbers, but we require them to be separated by dots.
+	LATEST_VERSION="${LATEST_VERSION//_/.}"
+
 	if [[ "${SKIP_VERSION_CHECK}" != "--skip-version-check" ]]; then
 		if ! termux_pkg_is_update_needed \
-			"${TERMUX_PKG_VERSION}" "${LATEST_VERSION}" "${TERMUX_PKG_UPDATE_VERSION_REGEXP}"; then
+			"${TERMUX_PKG_VERSION}" "${LATEST_VERSION}"; then
 			echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
 			return 0
 		fi
