@@ -10,7 +10,7 @@ TERMUX_PKG_SRCURL=https://git.causal.agency/libretls/snapshot/libretls-${TERMUX_
 TERMUX_PKG_SHA256=dfd1fcf0015b9e99529a9d3c3cf0e4c35b7d778f120a7acc84fedd5ce13bc1f1
 TERMUX_PKG_DEPENDS="openssl"
 TERMUX_PKG_REPLACES="libtls"
-TERMUX_PKG_PROVIDEs="libtls"
+TERMUX_PKG_PROVIDES="libtls"
 
 termux_step_pre_configure(){
 	autoreconf -fi
