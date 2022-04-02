@@ -70,7 +70,8 @@ termux_step_configure() {
 			-Dar="$ORIG_AR" \
 			-Duseshrplib \
 			-Dusethreads \
-                        -Duseithreads -Dusemultiplicity
+			-Duseithreads \
+			-Dusemultiplicity
 	)
 }
 
