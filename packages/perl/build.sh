@@ -69,7 +69,8 @@ termux_step_configure() {
 			-Dld="$ORIG_CC -Wl,-rpath=$TERMUX_PREFIX/lib -Wl,--enable-new-dtags" \
 			-Dar="$ORIG_AR" \
 			-Duseshrplib \
-			-Dusethreads
+			-Dusethreads \
+                        -Duseithreads -Dusemultiplicity
 	)
 }
 
