@@ -9,9 +9,9 @@ Documentation/licenses/COPYING.BSD-3-Clause
 Documentation/licenses/COPYING.BSD-4-Clause-UC
 Documentation/licenses/COPYING.ISC"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.37.4
+TERMUX_PKG_VERSION=2.38
 TERMUX_PKG_SRCURL=https://www.kernel.org/pub/linux/utils/util-linux/v${TERMUX_PKG_VERSION:0:4}/util-linux-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=634e6916ad913366c3536b6468e7844769549b99a7b2bf80314de78ab5655b83
+TERMUX_PKG_SHA256=6d111cbe4d55b336db2f1fbeffbc65b89908704c01136371d32aa9bec373eb64
 # libcrypt is required for only newgrp and sulogin, which are not built anyways
 TERMUX_PKG_DEPENDS="ncurses, libcap-ng, zlib"
 TERMUX_PKG_ESSENTIAL=true
@@ -20,11 +20,13 @@ TERMUX_PKG_REPLACES="util-linux-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_func_setns=yes
 ac_cv_func_unshare=yes
+ac_cv_func_uselocale=no
 --enable-setpriv
 --disable-agetty
 --disable-ctrlaltdel
 --disable-eject
 --disable-fdformat
+--disable-ipcmk
 --disable-ipcrm
 --disable-ipcs
 --disable-kill
