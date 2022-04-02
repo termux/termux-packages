@@ -130,52 +130,15 @@ _run_update() {
 	fi
 }
 
-_get_unique_packages() {
-	local -a unique_packages=()
-
-	while read -r pkg; do
-		unique_packages+=("${pkg}")
-	done < <(curl --silent --location --retry 5 --retry-delay 5 --retry-max-time 60 \
-		"https://repology.org/api/v1/projects/?inrepo=termux&&repos=1" |
-		jq -r keys)
-
-	echo "${unique_packages[@]}"
-}
-
-declare -a _UNIQUE_PACKAGES
-read -r -a _UNIQUE_PACKAGES <<<"$(_get_unique_packages)"
-
-_unique_to_termux() {
-	local pkg_dir="$1"
-	# shellcheck disable=2076 # We want literal match not regex.
-	if [[ "${_UNIQUE_PACKAGES[*]}" =~ "\"$(basename "${pkg_dir}")\"" ]]; then
-		return 0
-	else
-		return 1
-	fi
-}
-
 main() {
 	echo "INFO: Running update for: $*"
 
 	if [[ "$1" == "@all" ]]; then
 		for pkg_dir in "${TERMUX_SCRIPTDIR}"/packages/*; do
-			# Skip update if package is unique to Termux.
-			if _unique_to_termux "${pkg_dir}"; then
-				echo # Newline.
-				echo "INFO: Skipping update for unique to Termux package: $(basename "${pkg_dir}")"
-				continue
-			fi
 			_run_update "${pkg_dir}"
 		done
 	else
 		for pkg in "$@"; do
-			# Skip update if package is unique to Termux.
-			if _unique_to_termux "${TERMUX_SCRIPTDIR}"/packages/"${pkg}"; then
-				echo # Newline.
-				echo "INFO: Skipping update for unique to Termux package: ${pkg}"
-				continue
-			fi
 			_run_update "${TERMUX_SCRIPTDIR}/packages/${pkg}"
 		done
 	fi
