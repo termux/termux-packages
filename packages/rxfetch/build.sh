@@ -1,12 +1,14 @@
-TERMUX_PKG_HOMEPAGE=https://github.com/mayTermux/rxfetch-termux
-TERMUX_PKG_DESCRIPTION="Fork of rxfetch for termux"
-TERMUX_PKG_LICENSE="GPL-3.0"
+TERMUX_PKG_HOMEPAGE=https://github.com/Mangeshrex/rxfetch
+TERMUX_PKG_DESCRIPTION="A custom system info fetching tool"
+TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@PeroSar"
-_COMMIT=4cbd2981d650a53748cdf84a23e22dfbf4bf0ea7
-TERMUX_PKG_VERSION=2022.04.01
-TERMUX_PKG_SRCURL=https://github.com/mayTermux/rxfetch-termux.git
+_COMMIT=53dc87c9e41bb83a5b466de14eca140c9205444c
+TERMUX_PKG_VERSION=2022.04.03
+TERMUX_PKG_SRCURL=https://github.com/mangeshrex/rxfetch.git
 TERMUX_PKG_GIT_BRANCH=main
 TERMUX_PKG_DEPENDS="bash"
+TERMUX_PKG_CONFLICTS="rxfetch-termux"
+TERMUX_PKG_REPLACES="rxfetch-termux"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
