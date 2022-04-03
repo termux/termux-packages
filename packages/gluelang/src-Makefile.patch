@@ -1,0 +1,15 @@
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -1,8 +1,8 @@
+-CXX = g++
++CXX ?= g++
+ TARGET = glue
+-BINDIR	= /usr/local/bin
+-CXXFLAGS = -Wall -O2 --static -std=c++11
+-LDFLAGS = -lm
++BINDIR	= @TERMUX_PREFIX@/bin
++CXXFLAGS ?= -Wall -O2 --static -std=c++11
++LDFLAGS ?= -lm
+ SRCS := $(wildcard *.cc)
+ OBJS := $(SRCS:.cc=.o)
+ 
