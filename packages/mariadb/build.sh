@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://mariadb.org
 TERMUX_PKG_DESCRIPTION="A drop-in replacement for mysql server"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2:10.6.4
-TERMUX_PKG_REVISION=9
+TERMUX_PKG_VERSION=2:10.6.5
 TERMUX_PKG_SRCURL=http://ftp.hosteurope.de/mirror/archive.mariadb.org/mariadb-${TERMUX_PKG_VERSION:2}/source/mariadb-${TERMUX_PKG_VERSION:2}.tar.gz
-TERMUX_PKG_SHA256=75bf9b147a95d38160d01a73b098d50a1960563b46d16a235971fff64d99643c
+TERMUX_PKG_SHA256=e0be040428d9a42a8bb4bd221b567ff2522cd6fa8906386273da4f03c5c20a8f
 # MariaDB 10.6.x does not support OpenSSL 3.0:
 #   https://github.com/MariaDB/server/commit/c9beef43154a199bfcd9f71049c011a2ed77ca74
 #   https://jira.mariadb.org/browse/MDEV-25785
