@@ -1,0 +1,23 @@
+--- a/slashtime.pl
++++ b/slashtime.pl
+@@ -35,7 +35,7 @@
+ use Date::Parse;
+ 
+ my $TZLIST="$ENV{'HOME'}/.tzlist";
+-my $SYSTZ="/etc/timezone";
++my $SYSTZ="@TERMUX_PREFIX@/etc/timezone";
+ my $FORMAT="%H:%M %a, %e %b %y";
+ 
+ my $now;
+@@ -54,9 +54,9 @@
+   open(LOCALZONE,"$SYSTZ"); $local_timezone = <LOCALZONE>; chomp
+   $local_timezone; close(LOCALZONE);
+ }
+-elsif (-f '/etc/localtime')
++elsif (-f '@TERMUX_PREFIX@/etc/localtime')
+ {
+-  $local_timezone = readlink '/etc/localtime';
++  $local_timezone = readlink '@TERMUX_PREFIX@/etc/localtime';
+   $local_timezone =~ s/.*zoneinfo\///;
+ }
+ else
