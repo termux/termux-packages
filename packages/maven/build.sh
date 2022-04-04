@@ -19,7 +19,7 @@ termux_step_make_install() {
 	mkdir -p $TERMUX_PREFIX/opt
 	cp -a $TERMUX_PKG_SRCDIR $TERMUX_PREFIX/opt/maven/
 	# Symlink only starter scripts for Linux
-        for i in mvn mvnDebug mvnyjp; do
-                ln -sfr $TERMUX_PREFIX/opt/maven/bin/$i $TERMUX_PREFIX/bin/$i
-        done
+	for i in mvn mvnDebug mvnyjp; do
+		ln -sfr $TERMUX_PREFIX/opt/maven/bin/$i $TERMUX_PREFIX/bin/$i
+	done
 }
