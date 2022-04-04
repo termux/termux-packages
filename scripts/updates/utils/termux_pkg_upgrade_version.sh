@@ -15,13 +15,18 @@ termux_pkg_upgrade_version() {
 
 	# If needed, filter version numbers using regexp.
 	if [[ -n "${TERMUX_PKG_UPDATE_VERSION_REGEXP}" ]]; then
+		# Before extracting version numbers, seperate epoch if present.
+		local EPOCH
+		EPOCH="${LATEST_VERSION%%:*}"
 		LATEST_VERSION="$(grep -oP "${TERMUX_PKG_UPDATE_VERSION_REGEXP}" <<<"${LATEST_VERSION}" || true)"
-
 		if [[ -z "${LATEST_VERSION}" ]]; then
 			termux_error_exit <<-EndOfError
 				ERROR: failed to filter version numbers using regexp '${TERMUX_PKG_UPDATE_VERSION_REGEXP}'.
 				Ensure that it is works correctly with ${LATEST_VERSION}.
 			EndOfError
+		fi
+		if [[ -n "${EPOCH}" ]]; then
+			LATEST_VERSION="${EPOCH}:${LATEST_VERSION}"
 		fi
 	fi
 
@@ -32,15 +37,15 @@ termux_pkg_upgrade_version() {
 	if [[ "${SKIP_VERSION_CHECK}" != "--skip-version-check" ]]; then
 		if ! termux_pkg_is_update_needed \
 			"${TERMUX_PKG_VERSION}" "${LATEST_VERSION}"; then
-			echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
+			echo "INFO: No update needed. Already at version '${LATEST_VERSION}'."
 			return 0
 		fi
 	fi
 
 	if [[ "${BUILD_PACKAGES}" == "false" ]]; then
-		echo "INFO: package needs to be updated to $(echo "${LATEST_VERSION}" | cut -d':' -f2)."
+		echo "INFO: package needs to be updated to ${LATEST_VERSION#*:}."
 	else
-		echo "INFO: package being updated to $(echo "${LATEST_VERSION}" | cut -d':' -f2)."
+		echo "INFO: package being updated to ${LATEST_VERSION#*:}."
 
 		sed -i \
 			"s/^\(TERMUX_PKG_VERSION=\)\(.*\)\$/\1\"${LATEST_VERSION}\"/g" \
@@ -64,7 +69,7 @@ termux_pkg_upgrade_version() {
 				echo "INFO: Committing package."
 				stderr="$(
 					git add "${PKG_DIR}" 2>&1 >/dev/null
-					git commit -m "${TERMUX_PKG_NAME}: update to $(echo "${LATEST_VERSION}" | cut -d':' -f2)" \
+					git commit -m "${TERMUX_PKG_NAME}: update to ${LATEST_VERSION#*:}" \
 						-m "This commit has been automatically submitted by Github Actions." 2>&1 >/dev/null
 				)" || {
 					termux_error_exit <<-EndOfError
