@@ -4,12 +4,12 @@ TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Update both make and make-guile to the same version in one PR.
 TERMUX_PKG_VERSION=4.3
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/make/make-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=e05fdde47c5f7ca45cb697e973894ff4f5d79e13b750ed57d7b66d8defc78e19
 TERMUX_PKG_DEPENDS="guile"
 TERMUX_PKG_BREAKS="make-dev"
 TERMUX_PKG_REPLACES="make-dev"
-TERMUX_PKG_GROUPS="base-devel"
 # Prevent linking against libelf:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_lib_elf_elf_begin=no"
 # Prevent linking against libiconv:
@@ -17,6 +17,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" am_cv_func_iconv=no"
 
 # make-guile:
 TERMUX_PKG_CONFLICTS="make"
+TERMUX_PKG_PROVIDES="make"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-guile"
 
 termux_step_pre_configure() {
