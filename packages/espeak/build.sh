@@ -5,10 +5,9 @@ TERMUX_PKG_MAINTAINER="@termux"
 # Use eSpeak NG as the original eSpeak project is dead.
 # See https://github.com/espeak-ng/espeak-ng/issues/180
 # about cross compilation of espeak-ng.
-TERMUX_PKG_VERSION=1.50
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://github.com/espeak-ng/espeak-ng/releases/download/$TERMUX_PKG_VERSION/espeak-ng-$TERMUX_PKG_VERSION.tgz
-TERMUX_PKG_SHA256=80ee6cd06fcd61888951ab49362b400e80dd1fac352a8b1131d90cfe8a210edb
+TERMUX_PKG_VERSION=1.51
+TERMUX_PKG_SRCURL=https://github.com/espeak-ng/espeak-ng/releases/download/$TERMUX_PKG_VERSION/espeak-ng-$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SHA256=027fa5dfa8616d5cc13f883209ff5f735eee6559f7689a019d5b2d01d290cd39
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="pcaudiolib"
 TERMUX_PKG_BREAKS="espeak-dev"
