@@ -1,0 +1,14 @@
+--- a/config/apache2/z-push.conf
++++ b/config/apache2/z-push.conf
+@@ -1,9 +1,9 @@
+ # Z-Push - ActiveSync over-the-air - default Apache configuration
+ <IfModule mod_alias.c>
+-    Alias /Microsoft-Server-ActiveSync /usr/share/z-push/index.php
++    Alias /Microsoft-Server-ActiveSync @TERMUX_PREFIX@/share/z-push/index.php
+ </IfModule>
+ 
+-<Directory /usr/share/z-push>
++<Directory @TERMUX_PREFIX@/share/z-push>
+     # Don't list a directory index, follow symlinks (maybe state dir is somewhere linked)
+     DirectoryIndex index.php
+     Options -Indexes +FollowSymLinks
