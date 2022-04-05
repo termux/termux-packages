@@ -10,6 +10,19 @@ TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
 TERMUX_PKG_DEPENDS="zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 
+termux_pkg_auto_update() {
+	# Get latest release tag:
+	local tag
+	tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}")"
+	# check if this is not a c++ release: We nned this check since upstream has multiple different
+	# releases within same repo. (i.e for c and cxx)
+	if grep -qP "^cli-v${TERMUX_PKG_UPDATE_VERSION_REGEXP}\$" <<<"$tag"; then
+		termux_pkg_upgrade_version "$tag"
+	else
+		echo "WARNING: Skipping auto-update: Not a cli release($tag)"
+	fi
+}
+
 termux_step_make_install() {
     termux_setup_rust
     cargo install \
