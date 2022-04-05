@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Highly configurable and lightweight X11 window manager"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.6.1
-TERMUX_PKG_REVISION=53
+TERMUX_PKG_REVISION=54
 TERMUX_PKG_SRCURL=http://openbox.org/dist/openbox/openbox-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=8b4ac0760018c77c0044fab06a4f0c510ba87eae934d9983b10878483bde7ef7
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-session-management"
@@ -38,12 +38,15 @@ etc/xdg/openbox/rc.xml
 termux_step_post_make_install() {
 	## install custom variant of scripts startup scripts
 	cp -f "${TERMUX_PKG_BUILDER_DIR}/scripts/openbox-session" "${TERMUX_PREFIX}/bin/openbox-session"
+	sed -i "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" "${TERMUX_PREFIX}/bin/openbox-session"
 	chmod 755 "${TERMUX_PREFIX}/bin/openbox-session"
 
 	cp -f "${TERMUX_PKG_BUILDER_DIR}/scripts/openbox-autostart" "${TERMUX_PREFIX}/libexec/openbox-autostart"
+	sed -i "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" "${TERMUX_PREFIX}/libexec/openbox-autostart"
 	chmod 755 "${TERMUX_PREFIX}/libexec/openbox-autostart"
 
 	cp -f "${TERMUX_PKG_BUILDER_DIR}/scripts/openbox-xdg-autostart" "${TERMUX_PREFIX}/libexec/openbox-xdg-autostart"
+	sed -i "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" "${TERMUX_PREFIX}/libexec/openbox-xdg-autostart"
 	chmod 755 "${TERMUX_PREFIX}/libexec/openbox-xdg-autostart"
 
 	## install custom config files

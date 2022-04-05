@@ -6,7 +6,7 @@ diff -uNr xorg-server-1.20.1/os/utils.c xorg-server-1.20.1.mod/os/utils.c
   * if the user forgets to give them different display numbers.
   */
 -#define LOCK_DIR "/tmp"
-+#define LOCK_DIR "/data/data/com.termux/files/usr/tmp"
++#define LOCK_DIR "@TERMUX_PREFIX@/tmp"
  #define LOCK_TMP_PREFIX "/.tX"
  #define LOCK_PREFIX "/.X"
  #define LOCK_SUFFIX "-lock"
@@ -28,7 +28,7 @@ diff -uNr xorg-server-1.20.1/os/utils.c xorg-server-1.20.1.mod/os/utils.c
 -        if (setuid(getuid()) == -1)
 -            _exit(127);
 -        execl("/bin/sh", "sh", "-c", command, (char *) NULL);
-+        execl("/data/data/com.termux/files/usr/bin/sh", "sh", "-c", command, (char *) NULL);
++        execl("@TERMUX_PREFIX@/bin/sh", "sh", "-c", command, (char *) NULL);
          _exit(127);
      default:                   /* parent */
          do {
@@ -48,7 +48,7 @@ diff -uNr xorg-server-1.20.1/os/utils.c xorg-server-1.20.1.mod/os/utils.c
              close(pdes[1]);
          }
 -        execl("/bin/sh", "sh", "-c", command, (char *) NULL);
-+        execl("/data/data/com.termux/files/usr/bin/sh", "sh", "-c", command, (char *) NULL);
++        execl("@TERMUX_PREFIX@/bin/sh", "sh", "-c", command, (char *) NULL);
          _exit(127);
      }
  
@@ -89,7 +89,7 @@ diff -uNr xorg-server-1.20.1/os/utils.c xorg-server-1.20.1.mod/os/utils.c
          return getenv("TMP");
      else
 -        return "/tmp";
-+        return "/data/data/com.termux/files/usr/tmp";
++        return "@TERMUX_PREFIX@/tmp";
  }
  
  int

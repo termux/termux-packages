@@ -6,7 +6,7 @@ diff -uNr xorg-server-1.20.1/hw/xwin/InitOutput.c xorg-server-1.20.1.mod/hw/xwin
      BOOL binary = TRUE;
  
 -    mnt = setmntent("/etc/mtab", "r");
-+    mnt = setmntent("/data/data/com.termux/files/usr/etc/mtab", "r");
++    mnt = setmntent("@TERMUX_PREFIX@/etc/mtab", "r");
      if (mnt == NULL) {
          ErrorF("setmntent failed");
          return;
@@ -15,7 +15,7 @@ diff -uNr xorg-server-1.20.1/hw/xwin/InitOutput.c xorg-server-1.20.1.mod/hw/xwin
          BOOL sys = (winCheckMntOpt(ent, "user") != NULL);
          BOOL root = (strcmp(ent->mnt_dir, "/") == 0);
 -        BOOL tmp = (strcmp(ent->mnt_dir, "/tmp") == 0);
-+        BOOL tmp = (strcmp(ent->mnt_dir, "/data/data/com.termux/files/usr/tmp") == 0);
++        BOOL tmp = (strcmp(ent->mnt_dir, "@TERMUX_PREFIX@/tmp") == 0);
  
          if (sys) {
              if (root)

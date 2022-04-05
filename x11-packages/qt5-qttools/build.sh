@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Qt Development Tools (Linguist, Assistant, Designer, etc
 TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
 TERMUX_PKG_VERSION=5.15.3
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/5.15/${TERMUX_PKG_VERSION}/submodules/qttools-everywhere-opensource-src-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=463b2fe71a085e7ab4e39333ae360ab0ec857b966d7a08f752c427e5df55f90d
 TERMUX_PKG_DEPENDS="qt5-qtbase, qt5-qtdeclarative"
@@ -228,4 +229,5 @@ termux_step_create_debscripts() {
     # Some clean-up is happening via `postinst`
     # Because we're using this package in both host (Ubuntu glibc) and device (Termux)
     cp -f "${TERMUX_PKG_BUILDER_DIR}/postinst" ./
+    sed -i "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" ./postinst
 }

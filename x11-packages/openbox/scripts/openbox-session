@@ -1,4 +1,4 @@
-#!/data/data/com.termux/files/usr/bin/sh
+#!@TERMUX_PREFIX@/bin/sh
 
 if test -n "$1"; then
     echo "Syntax: openbox-session"
@@ -13,10 +13,10 @@ xprop -root -remove _NET_NUMBER_OF_DESKTOPS \
       -remove _NET_CURRENT_DESKTOP 2> /dev/null
 
 # Set up the environment
-A="/data/data/com.termux/files/usr/etc/xdg/openbox/environment"
+A="@TERMUX_PREFIX@/etc/xdg/openbox/environment"
 test -r $A && . $A
 A="${XDG_CONFIG_HOME:-"$HOME/.config"}/openbox/environment"
 test -r $A && . $A
 
 # Run Openbox, and have it run the autostart stuff
-exec /data/data/com.termux/files/usr/bin/openbox --startup "/data/data/com.termux/files/usr/libexec/openbox-autostart OPENBOX" "$@"
+exec @TERMUX_PREFIX@/bin/openbox --startup "@TERMUX_PREFIX@/libexec/openbox-autostart OPENBOX" "$@"
