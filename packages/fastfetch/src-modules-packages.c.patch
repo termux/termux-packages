@@ -8,7 +8,7 @@
 -    uint32_t dpkg = getNumStrings("/var/lib/dpkg/status", "Status: ");
 -
 -    #if __ANDROID__
--        dpkg += getNumStrings("/data/data/com.termux/files/usr/var/lib/dpkg/status", "Status: ");
+-        dpkg += getNumStrings("@TERMUX_PREFIX@/var/lib/dpkg/status", "Status: ");
 -    #endif
 +    uint32_t pacman = getNumElements("@TERMUX_PREFIX@/var/lib/pacman/local", DT_DIR);
 +    uint32_t dpkg = getNumStrings("@TERMUX_PREFIX@/var/lib/dpkg/status", "Status: ");
