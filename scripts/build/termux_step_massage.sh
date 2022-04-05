@@ -81,7 +81,10 @@ termux_step_massage() {
 
 	# Check so that package is not affected by https://github.com/android/ndk/issues/1614
 	SYMBOLS="$(readelf -s $($CC -print-libgcc-file-name) | grep "FUNC    GLOBAL HIDDEN" | awk '{print $8}')"
-	LIBRARIES="$(find lib -name "*.so")"
+	LIBRARIES=""
+	if [ -d "lib" ]; then
+		LIBRARIES="$(find lib -name "*.so")"
+	fi
 	for lib in $LIBRARIES; do
 		for sym in $SYMBOLS; do
 			if ! readelf -h $lib &> /dev/null; then
