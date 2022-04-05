@@ -4,7 +4,6 @@ termux_pkg_upgrade_version() {
 		# Show usage.
 		termux_error_exit <<-EndUsage
 			Usage: ${FUNCNAME[0]} LATEST_VERSION [--skip-version-check]
-			Version should be passed with epoch, if any.
 		EndUsage
 	fi
 
@@ -13,20 +12,24 @@ termux_pkg_upgrade_version() {
 	local PKG_DIR
 	PKG_DIR="${TERMUX_SCRIPTDIR}/packages/${TERMUX_PKG_NAME}"
 
+	local EPOCH
+	EPOCH="${TERMUX_PKG_VERSION%%:*}" # If there is no epoch, this will be the full version.
+	# Check if it isn't the full version and add ':'.
+	if [[ "${EPOCH}" != "${TERMUX_PKG_VERSION}" ]]; then
+		EPOCH="${EPOCH}:"
+	else
+		EPOCH=""
+	fi
+
 	# If needed, filter version numbers using regexp.
 	if [[ -n "${TERMUX_PKG_UPDATE_VERSION_REGEXP}" ]]; then
-		# Before extracting version numbers, seperate epoch if present.
-		local EPOCH
-		EPOCH="${LATEST_VERSION%%:*}"
+		# Extract version numbers.
 		LATEST_VERSION="$(grep -oP "${TERMUX_PKG_UPDATE_VERSION_REGEXP}" <<<"${LATEST_VERSION}" || true)"
 		if [[ -z "${LATEST_VERSION}" ]]; then
 			termux_error_exit <<-EndOfError
 				ERROR: failed to filter version numbers using regexp '${TERMUX_PKG_UPDATE_VERSION_REGEXP}'.
 				Ensure that it is works correctly with ${LATEST_VERSION}.
 			EndOfError
-		fi
-		if [[ -n "${EPOCH}" ]]; then
-			LATEST_VERSION="${EPOCH}:${LATEST_VERSION}"
 		fi
 	fi
 
@@ -43,12 +46,12 @@ termux_pkg_upgrade_version() {
 	fi
 
 	if [[ "${BUILD_PACKAGES}" == "false" ]]; then
-		echo "INFO: package needs to be updated to ${LATEST_VERSION#*:}."
+		echo "INFO: package needs to be updated to ${LATEST_VERSION}."
 	else
-		echo "INFO: package being updated to ${LATEST_VERSION#*:}."
+		echo "INFO: package being updated to ${LATEST_VERSION}."
 
 		sed -i \
-			"s/^\(TERMUX_PKG_VERSION=\)\(.*\)\$/\1\"${LATEST_VERSION}\"/g" \
+			"s/^\(TERMUX_PKG_VERSION=\)\(.*\)\$/\1\"${EPOCH}${LATEST_VERSION}\"/g" \
 			"${PKG_DIR}/build.sh"
 		sed -i \
 			"/TERMUX_PKG_REVISION=/d" \
@@ -69,7 +72,7 @@ termux_pkg_upgrade_version() {
 				echo "INFO: Committing package."
 				stderr="$(
 					git add "${PKG_DIR}" 2>&1 >/dev/null
-					git commit -m "${TERMUX_PKG_NAME}: update to ${LATEST_VERSION#*:}" \
+					git commit -m "${TERMUX_PKG_NAME}: update to ${LATEST_VERSION}" \
 						-m "This commit has been automatically submitted by Github Actions." 2>&1 >/dev/null
 				)" || {
 					termux_error_exit <<-EndOfError
