@@ -40,7 +40,7 @@ termux_step_pre_configure() {
 
 	CFLAGS="${CFLAGS/-Os/-Oz} -DFNDELAY=O_NDELAY -DINITARGS=void"
 	CPPFLAGS="${CPPFLAGS} -I${TERMUX_PREFIX}/include/libdrm"
-	LDFLAGS="${LDFLAGS} -llog"
+	LDFLAGS="${LDFLAGS} -llog $($CC -print-libgcc-file-name)"
 
 	local xorg_server_xvfb_configure_args="$(. $TERMUX_SCRIPTDIR/packages/xorg-server-xvfb/build.sh; echo $TERMUX_PKG_EXTRA_CONFIGURE_ARGS)"
 	./configure \
