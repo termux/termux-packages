@@ -5,7 +5,7 @@ TERMUX_PKG_DESCRIPTION="D programming language compiler, built with LLVM"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=()
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_VERSION+=(1.27.1)
 TERMUX_PKG_VERSION+=(12.0.1)  # LLVM version
 TERMUX_PKG_VERSION+=(2.097.1) # TOOLS version
@@ -26,7 +26,8 @@ TERMUX_PKG_SHA256=(93c8f500b39823dcdabbd73e1bcb487a1b93cb9a60144b0de1c81ab50200e
 		   1e458599306bdfbe498418363c0e375bd75e9ae99676033ef3035f43cbd43dfd
 		   48d68e0747dc17b9b0d2799a2fffdc5ddaf986c649283c784830f19c4c82830c
 		   820d9724f020a3e69cb337893a0b63c2db161dadcb0e06fc11dc29eb1e84a32c)
-TERMUX_PKG_DEPENDS="binutils, clang, libc++, zlib"
+# dub dlopen()s libcurl.so:
+TERMUX_PKG_DEPENDS="binutils, clang, libc++, libcurl, zlib"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_FORCE_CMAKE=true
@@ -199,6 +200,9 @@ termux_step_make() {
 	# Extend DFLAGS for cross-linking with host ldmd2
 	export DFLAGS="$DFLAGS -linker=bfd -L-L$TERMUX_PKG_BUILDDIR/ldc-build-runtime.tmp/lib"
 	if [ $TERMUX_ARCH = arm ]; then export DFLAGS="$DFLAGS -L--fix-cortex-a8"; fi
+
+	# https://github.com/termux/termux-packages/issues/7188
+	DFLAGS+=" -L-rpath=$TERMUX_PREFIX/lib"
 
 	cd  $TERMUX_PKG_SRCDIR/dlang-tools
 	$DMD -w -de -dip1000 rdmd.d -of=$TERMUX_PKG_BUILDDIR/bin/rdmd
