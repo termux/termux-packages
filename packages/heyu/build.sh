@@ -11,6 +11,9 @@ TERMUX_PKG_BUILD_IN_SRC=true
 termux_step_pre_configure() {
 	# rindex is an obsolete version of strrchr which is not available in Android:
 	CFLAGS+=" -Drindex=strrchr"
+	sed -e "s|@TERMUX_CC@|${CC}|g" \
+		-e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
+		"${TERMUX_PKG_BUILDER_DIR}"/Configure.diff | patch -p1
 }
 
 termux_step_configure() {

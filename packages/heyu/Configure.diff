@@ -1,0 +1,35 @@
+--- heyu-2.10.3/Configure	2021-04-30 22:37:54.000000000 +0530
++++ heyu-patch/Configure	2022-04-07 19:47:06.868579932 +0530
+@@ -31,9 +31,9 @@
+ 
+ # paths:
+ cat >> Makefile <<EoF
+-BIN = /usr/local/bin
+-MAN = /usr/local/man/man1
+-MAN5 = /usr/local/man/man5
++BIN = @TERMUX_PREFIX@/bin
++MAN = @TERMUX_PREFIX@/man/man1
++MAN5 = @TERMUX_PREFIX@/man/man5
+ 
+ #       set DFLAGS equal to:
+ #          -DSYSV       if using SYSTEM V
+@@ -145,16 +145,14 @@
+     SYS=`uname -s | tr '[A-Z]' '[a-z]'`
+ fi
+ 
+-CC=gcc  #Set default for later
++CC="@TERMUX_CC@"  #Set default for later
+ 
+ echo "#This makefile is built for $SYS" >> Makefile
+ case "$SYS" in
+     linux)
+         cat >> Makefile <<-EoF
+-	OWNER = root
+-	GROUP = root 
+-	CC = gcc
+-	CFLAGS = -g -O \$(DFLAGS) -Wall
++	CC ?= gcc
++	CFLAGS += -g -O \$(DFLAGS) -Wall
+ 	DFLAGS = -DSYSV -DPOSIX -DHAS_ITIMER -DLINUX -DHASTZ $CM17AFLAG $EXT0FLAG $RFXSENFLAG $RFXMETFLAG $DMXFLAG $OREFLAG $KAKUFLAG $FLAGS_FLAG $TIMERS_FLAG $COUNTERS_FLAG
+ 	LIBS = -lm -lc
+ EoF
