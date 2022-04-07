@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Easy-to-use client-side URL transfer library"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=7.82.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/curl/curl/releases/download/curl-${TERMUX_PKG_VERSION//./_}/curl-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=0aaa12d7bd04b0966254f2703ce80dd5c38dbbd76af0297d3d690cdce58a583c
 TERMUX_PKG_AUTO_UPDATE=true
@@ -30,3 +31,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 # Support for http/2 as added in version 1.4.8-8 of the apt package, so we
 # conflict with previous versions to avoid broken installations.
 TERMUX_PKG_CONFLICTS="apt (<< 1.4.8-8)"
+
+termux_step_pre_configure() {
+	LDFLAGS+=" -Wl,-z,nodelete"
+}
