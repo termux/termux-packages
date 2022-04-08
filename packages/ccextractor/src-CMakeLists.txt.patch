@@ -1,0 +1,129 @@
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -58,71 +58,8 @@
+ include_directories(${PROJECT_SOURCE_DIR})
+ include_directories(${PROJECT_SOURCE_DIR}/lib_ccx)
+ include_directories(${PROJECT_SOURCE_DIR}/lib_ccx/zvbi)
+-include_directories(${PROJECT_SOURCE_DIR}/thirdparty)
+-include_directories(${PROJECT_SOURCE_DIR}/thirdparty/gpacmp4)
+-include_directories(${PROJECT_SOURCE_DIR}/thirdparty/protobuf-c)
+-include_directories(${PROJECT_SOURCE_DIR}/thirdparty/lib_hash)
+-include_directories(${PROJECT_SOURCE_DIR}/thirdparty/libpng)
+-
+-if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin" AND ${CMAKE_HOST_SYSTEM_PROCESSOR} MATCHES "arm64")
+-  include_directories(${PROJECT_SOURCE_DIR}/thirdparty/libpng/arm)
+-  aux_source_directory(${PROJECT_SOURCE_DIR}/thirdparty/libpng/arm SOURCEFILE)
+-endif ()
+-
+-include_directories(${PROJECT_SOURCE_DIR}/thirdparty/zlib)
+-include_directories(${PROJECT_SOURCE_DIR}/thirdparty/freetype/include)
+-aux_source_directory(${PROJECT_SOURCE_DIR}/thirdparty/gpacmp4/ SOURCEFILE)
+-aux_source_directory(${PROJECT_SOURCE_DIR}/thirdparty/lib_hash/ SOURCEFILE)
+-aux_source_directory(${PROJECT_SOURCE_DIR}/thirdparty/libpng/ SOURCEFILE)
+-aux_source_directory(${PROJECT_SOURCE_DIR}/thirdparty/protobuf-c/ SOURCEFILE)
+-aux_source_directory(${PROJECT_SOURCE_DIR}/thirdparty/zlib/ SOURCEFILE)
+ aux_source_directory(${PROJECT_SOURCE_DIR}/lib_ccx/zvbi/ SOURCEFILE)
+ 
+-set(UTF8PROC_SOURCE ${PROJECT_SOURCE_DIR}/thirdparty/utf8proc/utf8proc.c)
+-
+-set(FREETYPE_SOURCE
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/autofit/autofit.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftbase.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftbbox.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftbdf.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftbitmap.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftcid.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftfntfmt.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftfstype.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftgasp.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftglyph.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftgxval.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftinit.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftlcdfil.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftmm.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftotval.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftpatent.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftpfr.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftstroke.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftsynth.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftsystem.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/fttype1.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftwinfnt.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/bdf/bdf.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/bzip2/ftbzip2.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/cache/ftcache.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/cff/cff.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/cid/type1cid.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/gzip/ftgzip.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/lzw/ftlzw.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/pcf/pcf.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/pfr/pfr.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/psaux/psaux.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/pshinter/pshinter.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/psnames/psnames.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/raster/raster.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/sfnt/sfnt.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/smooth/smooth.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/truetype/truetype.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/type1/type1.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/type42/type42.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/winfonts/winfnt.c
+-        )
+ #Windows specific libraries and linker flags
+ if(WIN32)
+     include_directories ("${PROJECT_SOURCE_DIR}/thirdparty/win_spec_incld/")
+@@ -153,9 +90,33 @@
+ endif (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+ 
+ 
+-set (EXTRA_LIBS ${EXTRA_LIBS} -lm -lpthread -ldl)
++set (EXTRA_LIBS ${EXTRA_LIBS} -lm -ldl)
++
++find_package (PkgConfig REQUIRED)
+ 
+-find_package (PkgConfig)
++pkg_check_modules (GPAC REQUIRED gpac)
++pkg_check_modules (PROTOBUF_C REQUIRED libprotobuf-c)
++pkg_check_modules (LIBMD REQUIRED libmd)
++pkg_check_modules (LIBPNG REQUIRED libpng)
++pkg_check_modules (ZLIB REQUIRED zlib)
++pkg_check_modules (FREETYPE REQUIRED freetype2)
++pkg_check_modules (UTF8PROC REQUIRED libutf8proc)
++
++set (EXTRA_LIBS ${EXTRA_LIBS} ${GPAC_LIBRARIES})
++set (EXTRA_LIBS ${EXTRA_LIBS} ${PROTOBUF_C_LIBRARIES})
++set (EXTRA_LIBS ${EXTRA_LIBS} ${LIBMD_LIBRARIES})
++set (EXTRA_LIBS ${EXTRA_LIBS} ${LIBPNG_LIBRARIES})
++set (EXTRA_LIBS ${EXTRA_LIBS} ${ZLIB_LIBRARIES})
++set (EXTRA_LIBS ${EXTRA_LIBS} ${FREETYPE_LIBRARIES})
++set (EXTRA_LIBS ${EXTRA_LIBS} ${UTF8PROC_LIBRARIES})
++
++set (EXTRA_INCLUDES ${EXTRA_INCLUDES} ${GPAC_INCLUDE_DIRS})
++set (EXTRA_INCLUDES ${EXTRA_INCLUDES} ${PROTOBUF_C_INCLUDE_DIRS})
++set (EXTRA_INCLUDES ${EXTRA_INCLUDES} ${LIBMD_INCLUDE_DIRS})
++set (EXTRA_INCLUDES ${EXTRA_INCLUDES} ${LIBPNG_INCLUDE_DIRS})
++set (EXTRA_INCLUDES ${EXTRA_INCLUDES} ${ZLIB_INCLUDE_DIRS})
++set (EXTRA_INCLUDES ${EXTRA_INCLUDES} ${FREETYPE_INCLUDE_DIRS})
++set (EXTRA_INCLUDES ${EXTRA_INCLUDES} ${UTF8PROC_INCLUDE_DIRS})
+ 
+ ########################################################
+ # Build using FFmpeg libraries
+@@ -209,9 +170,6 @@
+   pkg_check_modules (NANOMSG REQUIRED libnanomsg)
+   set (EXTRA_LIBS ${EXTRA_LIBS} ${NANOMSG_STATIC_LIBRARIES})
+ 
+-  include_directories ("${PROJECT_SOURCE_DIR}/thirdparty/protobuf-c/")
+-  aux_source_directory ("${PROJECT_SOURCE_DIR}/thirdparty/protobuf-c/" SOURCEFILE)
+-
+   set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DENABLE_SHARING")
+ endif (PKG_CONFIG_FOUND AND WITH_SHARING)
+ 
+@@ -240,7 +198,7 @@
+   set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DENABLE_HARDSUBX")
+ endif (PKG_CONFIG_FOUND AND WITH_HARDSUBX)
+ 
+-add_executable (ccextractor ${SOURCEFILE} ${FREETYPE_SOURCE} ${UTF8PROC_SOURCE})
++add_executable (ccextractor ${SOURCEFILE})
+ 
+ ########################################################
+ # Build with Rust library
