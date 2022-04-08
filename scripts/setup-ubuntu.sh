@@ -90,6 +90,9 @@ PACKAGES+=" libdbus-1-dev"
 PACKAGES+=" libexpat1-dev"
 PACKAGES+=" libjpeg-dev"
 
+# Needed by package vlc.
+PACKAGES+=" lua5.2"
+
 # Needed by package luarocks.
 PACKAGES+=" lua5.3"
 
