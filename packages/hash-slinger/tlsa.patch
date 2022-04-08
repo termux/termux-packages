@@ -1,0 +1,42 @@
+--- a/tlsa
++++ b/tlsa
+@@ -37,7 +37,7 @@
+ from ipaddress import IPv4Address, IPv6Address
+ 
+ ROOTKEY="none"
+-cauldron = ( "/var/lib/unbound/root.anchor", "/var/lib/unbound/root.key", "/etc/unbound/root.key" )
++cauldron = ( "@TERMUX_PREFIX@/var/lib/unbound/root.anchor", "@TERMUX_PREFIX@/var/lib/unbound/root.key", "@TERMUX_PREFIX@/etc/unbound/root.key" )
+ for root in cauldron:
+ 	if os.path.isfile(root):
+ 		ROOTKEY=root
+@@ -188,7 +188,7 @@
+ 		except:
+ 			unbound.ub_ctx_trustedkeys(ctx,ROOTKEY)
+ 	# Use the local cache and emulate /etc/hosts
+-	ctx.hosts("/etc/hosts")
++	ctx.hosts("@TERMUX_PREFIX@/etc/hosts")
+ 	if resolvconf and not noresolver:
+ 		ctx.resolvconf(resolvconf)
+ 
+@@ -627,7 +627,7 @@
+ 	parser.add_argument('-4', '--ipv4', dest='ipv4', action='store_true',help='use ipv4 networking only')
+ 	parser.add_argument('-6', '--ipv6', dest='ipv6', action='store_true',help='use ipv6 networking only')
+ 	parser.add_argument('--insecure', action='store_true', default=False, help='Allow use of non-dnssec secured answers')
+-	parser.add_argument('--resolvconf', metavar='/PATH/TO/RESOLV.CONF', action='store', default='/etc/resolv.conf', help='Use a recursive resolver listed in a resolv.conf file (default: /etc/resolv.conf)')
++	parser.add_argument('--resolvconf', metavar='/PATH/TO/RESOLV.CONF', action='store', default='@TERMUX_PREFIX@/etc/resolv.conf', help='Use a recursive resolver listed in a resolv.conf file (default: @TERMUX_PREFIX@/etc/resolv.conf)')
+ 	parser.add_argument('host', metavar="hostname")
+ 
+ 	parser.add_argument('--port', '-p', action='store', default='443', help='The port, or \'*\' where running TLS is located (default: %(default)s).')
+@@ -636,10 +636,8 @@
+ 	parser.add_argument('--only-rr', action='store_true', help='Only verify that the TLSA resource record is correct (do not check certificate)')
+ 	parser.add_argument('--rootkey', metavar='/PATH/TO/ROOT.KEY', action='store', help='Specify file location containing the DNSSEC root key')
+ 
+-	if os.path.isdir("/etc/pki/tls/certs/"):
+-		cadir = "/etc/pki/tls/certs/"
+-	elif os.path.isdir("/etc/ssl/certs/"):
+-		cadir = "/etc/ssl/certs/"
++	if os.path.isdir("@TERMUX_PREFIX@/etc/tls/certs/"):
++		cadir = "@TERMUX_PREFIX@/etc/tls/certs/"
+ 	else:
+ 		cadir = "."
+ 		print ("warning: no system wide CAdir found, using current directory")
