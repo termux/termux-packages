@@ -1,0 +1,5 @@
+TERMUX_SUBPKG_DESCRIPTION="Python bindings for unbound"
+TERMUX_SUBPKG_DEPENDS="python"
+TERMUX_SUBPKG_INCLUDE="lib/python*"
+TERMUX_SUBPKG_REPLACES="unbound (<< 1.15.0-1)"
+TERMUX_SUBPKG_BREAKS="unbound (<< 1.15.0-1)"
