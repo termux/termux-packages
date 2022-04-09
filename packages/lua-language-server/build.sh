@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE="https://github.com/sumneko/lua-language-server"
 TERMUX_PKG_DESCRIPTION="Sumneko Lua Language Server coded in Lua"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Aditya Alok <dev.aditya.alok@gmail.com>"
-TERMUX_PKG_VERSION=2.6.7
+TERMUX_PKG_VERSION=2.6.8
 TERMUX_PKG_GIT_BRANCH="${TERMUX_PKG_VERSION}"
 TERMUX_PKG_SRCURL="https://github.com/sumneko/lua-language-server.git"
 TERMUX_PKG_DEPENDS="libandroid-spawn"
@@ -22,7 +22,7 @@ _patch_on_device() {
 }
 
 termux_step_host_build() {
-	_patch_on_device
+	(_patch_on_device)
 	termux_setup_ninja
 
 	mkdir 3rd
@@ -33,6 +33,8 @@ termux_step_host_build() {
 }
 
 termux_step_make() {
+	CFLAGS+=" -DBEE_ENABLE_FILESYSTEM" # without this, it tries to link against its own filesystem lib (though ndk >= 23 has std c++ filesystem) and fails.
+
 	sed \
 		-e "s%\@FLAGS\@%${CFLAGS} ${CPPFLAGS}%g" \
 		-e "s%\@LDFLAGS\@%${LDFLAGS}%g" \
