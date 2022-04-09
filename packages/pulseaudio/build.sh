@@ -4,8 +4,8 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_SRCURL=https://github.com/pulseaudio/pulseaudio.git
 TERMUX_PKG_VERSION=14.2
-TERMUX_PKG_REVISION=9
-TERMUX_PKG_DEPENDS="libc++, libltdl, libsndfile, libandroid-glob, libsoxr, speexdsp, libwebrtc-audio-processing, libandroid-posix-semaphore"
+TERMUX_PKG_REVISION=10
+TERMUX_PKG_DEPENDS="libandroid-glob, libc++, libltdl, libsndfile, libsoxr, libwebrtc-audio-processing, speexdsp"
 TERMUX_PKG_BREAKS="libpulseaudio-dev, libpulseaudio"
 TERMUX_PKG_REPLACES="libpulseaudio-dev, libpulseaudio"
 # glib is only a runtime dependency of pulseaudio-glib subpackage
@@ -46,6 +46,9 @@ termux_step_pre_configure() {
 	cp $TERMUX_PKG_BUILDER_DIR/module-aaudio-sink.c $TERMUX_PKG_SRCDIR/src/modules/aaudio
 
 	export LIBS="-landroid-glob"
+
+	local _libgcc="$($CC -print-libgcc-file-name)"
+	LIBS+=" -L$(dirname $_libgcc) -l:$(basename $_libgcc)"
 }
 
 termux_step_post_make_install() {
