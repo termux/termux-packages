@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/autoconf-archive
 TERMUX_PKG_DESCRIPTION="The GNU Autoconf Archive is a collection of more than 500 macros for GNU Autoconf"
 TERMUX_PKG_LICENSE="GPL-1.3"
+TERMUX_PKG_LICENSE_FILE=COPYING
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2022.02.11
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/autoconf-archive/autoconf-archive-${TERMUX_PKG_VERSION}.tar.xz
