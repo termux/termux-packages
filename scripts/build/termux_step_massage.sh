@@ -81,6 +81,8 @@ termux_step_massage() {
 
 	# Check so that package is not affected by https://github.com/android/ndk/issues/1614
 	SYMBOLS="$(readelf -s $($TERMUX_HOST_PLATFORM-clang -print-libgcc-file-name) | grep "FUNC    GLOBAL HIDDEN" | awk '{print $8}')"
+	# Also check for unresolved symbols defined in libandroid-* (#9944)
+	SYMBOLS+=" $(echo libandroid_{sem_{open,close,unlink},shm{ctl,get,at,dt}})"
 	LIBRARIES=""
 	if [ -d "lib" ]; then
 		LIBRARIES="$(find lib -name "*.so")"
