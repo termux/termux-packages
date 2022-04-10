@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="docs/license.rst"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=21.3.7
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://archive.mesa3d.org/mesa-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=b4fa9db7aa61bf209ef0b40bef83080999d86ad98df8b8b4fada7c128a1efc3d
 TERMUX_PKG_DEPENDS="libandroid-shmem, libc++, libx11, libxext, zlib, libexpat"
@@ -28,7 +28,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 
 termux_step_pre_configure() {
 	CPPFLAGS+=" -D__USE_GNU"
-	# Note: -landroid-shmem in LDFLAGS is not needed because it is dlopen()ed
+	LDFLAGS+=" -landroid-shmem"
 }
 
 termux_step_post_massage() {
