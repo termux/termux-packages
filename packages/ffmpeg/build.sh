@@ -3,11 +3,10 @@ TERMUX_PKG_DESCRIPTION="Tools and libraries to manipulate a wide range of multim
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # NOTE: mpv has to be rebuilt and version bumped after updating ffmpeg.
-TERMUX_PKG_VERSION=5.0
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_VERSION=5.0.1
 TERMUX_PKG_SRCURL=https://www.ffmpeg.org/releases/ffmpeg-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=51e919f7d205062c0fd4fae6243a84850391115104ccf1efc451733bc0ac7298
-TERMUX_PKG_DEPENDS="libaom, libass, libbz2, libdav1d, libiconv, librav1e, libsoxr, libx264, libx265, xvidcore, libvorbis, libmp3lame, libopus, libvpx, libgnutls, libandroid-glob, freetype, zlib, liblzma, libvidstab, libwebp, libxml2"
+TERMUX_PKG_SHA256=ef2efae259ce80a240de48ec85ecb062cecca26e4352ffb3fda562c21a93007b
+TERMUX_PKG_DEPENDS="game-music-emu, libaom, libass, libbluray, libbz2, libdav1d, libiconv, librav1e, libsoxr, libx264, libx265, xvidcore, libvorbis, libmp3lame, libopus, libvpx, libgnutls, libandroid-glob, freetype, zlib, liblzma, libvidstab, libwebp, libxml2"
 TERMUX_PKG_CONFLICTS="libav"
 TERMUX_PKG_BREAKS="ffmpeg-dev"
 TERMUX_PKG_REPLACES="ffmpeg-dev"
@@ -55,7 +54,9 @@ termux_step_configure() {
 		--enable-gpl \
 		--enable-libaom \
 		--enable-libass \
+		--enable-libbluray \
 		--enable-libdav1d \
+		--enable-libgme \
 		--enable-libmp3lame \
 		--enable-libfreetype \
 		--enable-libvorbis \
