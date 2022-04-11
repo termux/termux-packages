@@ -1,0 +1,13 @@
+--- a/wscript
++++ b/wscript
+@@ -267,8 +267,8 @@
+         else:
+             libdirname = os.path.basename(conf.env.LIBDIR)
+             lv2_path = lilv_path_sep.join(['~/.lv2',
+-                                           '/usr/%s/lv2' % libdirname,
+-                                           '/usr/local/%s/lv2' % libdirname])
++                                           '@TERMUX_PREFIX@/lib/lv2',
++                                           '@TERMUX_PREFIX@/local/lib/lv2'])
+ 
+     if sys.platform == 'win32':
+         lv2_path = lv2_path.replace('%', '%%')
