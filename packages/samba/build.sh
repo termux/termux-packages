@@ -74,6 +74,7 @@ Checking for the maximum value of the 'time_t' type: NO
 Checking whether the realpath function allows a NULL argument: OK
 Checking for ftruncate extend: OK
 getcwd takes a NULL argument: OK
+Checking for readlink breakage: NO
 EOF
 
 	USING_SYSTEM_ASN1_COMPILE=1 ASN1_COMPILE=/usr/bin/asn1_compile \
