@@ -1,0 +1,11 @@
+--- a/src/filesystem.c
++++ b/src/filesystem.c
+@@ -84,7 +84,7 @@
+ #else
+   const char* const tmpdir = getenv("TMPDIR");
+ 
+-  return tmpdir ? lilv_strdup(tmpdir) : lilv_strdup("/tmp");
++  return tmpdir ? lilv_strdup(tmpdir) : lilv_strdup("@TERMUX_PREFIX@/tmp");
+ #endif
+ }
+ 
