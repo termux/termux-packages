@@ -3,9 +3,10 @@ TERMUX_PKG_DESCRIPTION="Various tools to generate special DNS records"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/letoams/hash-slinger/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=2f0de62d561e585747732e44ce9ea5fcef93c75c95d66b684bd13b4e70374df6
-TERMUX_PKG_DEPENDS="ca-certificates, gnupg, openssh, python, swig, unbound"
+TERMUX_PKG_DEPENDS="ca-certificates, gnupg, openssh, python, pyunbound, swig"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
