@@ -225,6 +225,9 @@ PACKAGES+=" qemu-user-static"
 # Required by picolisp (and maybe a few others in future)
 PACKAGES+=" llvm-12"
 
+# Required by cava
+PACKAGES+=" xxd"
+
 # Do not require sudo if already running as root.
 if [ "$(id -u)" = "0" ]; then
 	SUDO=""
