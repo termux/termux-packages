@@ -2,12 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://www.tug.org/texlive/
 TERMUX_PKG_DESCRIPTION="TeX Live is a distribution of the TeX typesetting system. This package contains architecture dependent binaries."
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
-TERMUX_PKG_VERSION=20210325
-_SVN_VERSION=58837
-TERMUX_PKG_REVISION=7
-TERMUX_PKG_SRCURL=https://github.com/TeX-Live/texlive-source/archive/svn${_SVN_VERSION}.tar.gz
-TERMUX_PKG_SHA256=0afa6919e44675b7afe0fa45344747afef07b6ee98eeb14ff6a2ef78f458fc12
-TERMUX_PKG_DEPENDS="libc++, libiconv, freetype, libpng, libgd, libgmp, libmpfr, libicu, liblua52, libgraphite, harfbuzz, harfbuzz-icu, teckit, libpixman, libcairo, zlib, zziplib"
+TERMUX_PKG_VERSION=20220403
+TERMUX_PKG_SRCURL=https://github.com/TeX-Live/texlive-source/archive/refs/heads/tags/texlive-${TERMUX_PKG_VERSION:0:4}.0.tar.gz
+TERMUX_PKG_SHA256=e160606d25b6087c2d3520bfd2b852fd343eab3ab3ec90c07649ce1d1b49078d
+TERMUX_PKG_DEPENDS="freetype, harfbuzz, harfbuzz-icu, libc++, libcairo, libgd, libgmp, libgraphite, libiconv, libicu, liblua52, libmpfr, libpaper, libpixman, libpng, teckit, zlib, zziplib"
 # libpcre, glib, fonconfig are dependencies to libcairo. pkg-config gives an error if they are missing
 # libuuid, libxml2 are needed by fontconfig
 TERMUX_PKG_BUILD_DEPENDS="icu-devtools, pcre, glib, fontconfig, libuuid, libxml2"
@@ -21,47 +19,47 @@ TL_BINDIR=$TERMUX_PREFIX/bin/texlive
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 RANLIB=ranlib
---mandir=$TERMUX_PREFIX/share/man
---infodir=$TERMUX_PREFIX/share/info
 --bindir=$TL_BINDIR
---datarootdir=$TL_ROOT
 --build=$TERMUX_BUILD_TUPLE
---disable-ttfdump
---enable-makeindexk
+--datarootdir=$TL_ROOT
+--disable-dialog
+--disable-gregorio
+--disable-luajittex
 --disable-makejvf
 --disable-mendexk
---disable-musixtnt
---disable-ps2pk
---disable-seetexk
---disable-gregorio
---disable-native-texlive-build
---disable-bibtexu
---enable-dvisvgm
---disable-dialog
---disable-psutils
---disable-multiplatform
---disable-t1utils
---enable-luatex
---disable-luajittex
 --disable-mflua
 --disable-mfluajit
---disable-xz
+--disable-multiplatform
+--disable-musixtnt
+--disable-native-texlive-build
 --disable-pmx
---without-texinfo
---without-xdvipdfmx
---without-texi2html
+--disable-ps2pk
+--disable-psutils
+--disable-seetexk
+--disable-t1utils
+--disable-ttfdump
+--disable-xz
+--enable-dvisvgm
+--enable-luatex
+--enable-makeindexk
+--infodir=$TERMUX_PREFIX/share/info
+--mandir=$TERMUX_PREFIX/share/man
 --with-system-cairo
---with-system-graphite2
---with-system-harfbuzz
 --with-system-gd
 --with-system-gmp
+--with-system-graphite2
+--with-system-harfbuzz
 --with-system-icu
---with-system-mpfr
---with-system-zlib
+--with-system-libpaper
 --with-system-lua
+--with-system-mpfr
 --with-system-teckit
+--with-system-zlib
 --with-system-zziplib
+--without-texi2html
+--without-texinfo
 --without-x
+--without-xdvipdfmx
 --with-banner-add=/Termux"
 
 # These files are provided by texlive:
@@ -108,15 +106,15 @@ termux_step_host_build() {
 	make ctangle
 	make tie
 	make otangle
+	make himktables
 }
 
 termux_step_pre_configure() {
-	# When building against libicu 59.1 or later we need c++11:
-	CXXFLAGS+=" -std=c++11"
 	export TANGLE=$TERMUX_PKG_HOSTBUILD_DIR/texk/web2c/tangle
 	export TANGLEBOOT=$TERMUX_PKG_HOSTBUILD_DIR/texk/web2c/tangleboot
 	export CTANGLE=$TERMUX_PKG_HOSTBUILD_DIR/texk/web2c/ctangle
 	export CTANGLEBOOT=$TERMUX_PKG_HOSTBUILD_DIR/texk/web2c/ctangleboot
 	export TIE=$TERMUX_PKG_HOSTBUILD_DIR/texk/web2c/tie
 	export OTANGLE=$TERMUX_PKG_HOSTBUILD_DIR/texk/web2c/otangle
+	export HIMKTABLES=$TERMUX_PKG_HOSTBUILD_DIR/texk/web2c/himktables
 }
