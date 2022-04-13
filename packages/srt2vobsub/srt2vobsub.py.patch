@@ -1,0 +1,67 @@
+--- a/srt2vobsub.py
++++ b/srt2vobsub.py
+@@ -52,7 +52,7 @@
+ 'ENCODING': 'auto',
+ 'ENCODINGERRORS': 'strict',
+ 'SAVESRT': '0',
+-'FONT': 'DejaVuSans',
++'FONT': 'DroidSans',
+ 'FONTSIZE': 5.0,
+ 'MAXLINESIZE': 60,
+ 'OUTLINEWIDTH': 1,
+@@ -69,7 +69,7 @@
+ 'DEFAULTDISPLAYTIME': 2500,
+ 'FIXTIMES': 1,
+ 'BDSUP2SUBVERSION':'auto',
+-'BDSUP2SUBRUNTIME': '/usr/share/bdsup2sub/BDSup2Sub.jar',
++'BDSUP2SUBRUNTIME': '@TERMUX_PREFIX@/share/java/bdsup2sub.jar',
+ 'BDSUP2SUBOPTS': '()'
+ }
+ 
+@@ -260,7 +260,7 @@
+                 config[key] = value
+     return config
+ 
+-license_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'LICENSE')
++license_file = '@TERMUX_PREFIX@/share/doc/srt2vobsub/LICENSE'
+ license_info = '''srt2vobsub  Copyright (C) 2020  Michael Lange
+     This program comes with ABSOLUTELY NO WARRANTY; for details type
+     `cat %s'.
+@@ -327,7 +327,7 @@
+             help='detect resolution and framerate from movie file', default='')
+ 
+     parser.add_argument('-t', '--font', dest='FONT',
+-            help='font to use; default: DejaVuSans',
++            help='font to use; default: DroidSans',
+             default=CONFIG['FONT'])
+     parser.add_argument('-g', '--antialiasing', dest='ANTIALIASING',
+             help='enable font antialiasing (default: off)', type=getboolean,
+@@ -459,18 +459,12 @@
+                 printerror('Error: requested font not found: %s.' % fontdesc)
+                 for line in lines:
+                     base, ext = os.path.splitext(os.path.basename(line))
+-                    if base == 'DejaVuSans':
++                    if base == 'DroidSans':
+                         font = line
+                         printerror('Will use %s instead.' % line)
+                         break
+     else:
+         printerror('Error: unable to detect font "%s", command "fc-list" not found.')
+-    if not font:
+-        # fall back to our own DejaVuSans
+-        f = os.path.realpath(os.path.join(os.path.dirname(__file__), 'DejaVuSans.ttf'))
+-        if os.path.isfile(f):
+-            font = f
+-            printerror('Will use %s instead.' % f)
+     return font
+ 
+ def getstatusoutput(args, shell=False):
+@@ -910,7 +904,7 @@
+ 
+ ####   create temp directory   ####
+ 
+-TEMPDIR = tempfile.mkdtemp(prefix='srt2vobsub', dir='/tmp')
++TEMPDIR = tempfile.mkdtemp(prefix='srt2vobsub', dir='@TERMUX_PREFIX@/tmp')
+ os.chdir(TEMPDIR)
+ 
+ # try to convert the input file to UTF-8 first, so that we know what
