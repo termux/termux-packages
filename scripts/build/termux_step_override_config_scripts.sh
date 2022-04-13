@@ -1,5 +1,13 @@
 termux_step_override_config_scripts() {
-	if [ "$TERMUX_ON_DEVICE_BUILD" == true ] || [ "$TERMUX_INSTALL_DEPS" == false ]; then
+	if [ "$TERMUX_ON_DEVICE_BUILD" = true ]; then
+		return
+	fi
+
+	# Make $TERMUX_PREFIX/bin/sh executable on the builder, so that build
+	# scripts can assume that it works on both builder and host later on:
+	ln -sf /bin/sh "$TERMUX_PREFIX/bin/sh"
+
+	if [ "$TERMUX_INSTALL_DEPS" = false ]; then
 		return
 	fi
 
@@ -33,8 +41,4 @@ termux_step_override_config_scripts() {
 			-e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" > $TERMUX_PREFIX/bin/pg_config
 		chmod 755 $TERMUX_PREFIX/bin/pg_config
 	fi
-
-	# Make $TERMUX_PREFIX/bin/sh executable on the builder, so that build
-	# scripts can assume that it works on both builder and host later on:
-	[ "$TERMUX_ON_DEVICE_BUILD" = "false" ] && ln -sf /bin/sh "$TERMUX_PREFIX/bin/sh"
 }
