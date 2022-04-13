@@ -1,0 +1,33 @@
+--- ./Process.c.orig	2021-02-13 11:57:02.747930225 +0000
++++ ./Process.c	2021-02-13 11:58:40.299938503 +0000
+@@ -35,6 +35,13 @@
+ #include <sys/sysmacros.h>
+ #endif
+ 
++#ifndef major
++#define major(rdev) ((rdev)>>8)
++#endif
++
++#ifndef minor
++#define minor(rdev) ((rdev) & 0xff)
++#endif
+ 
+ static uid_t Process_getuid = (uid_t)-1;
+ 
+--- ./linux/LinuxProcessList.c.orig	2021-02-13 11:57:02.747930225 +0000
++++ ./linux/LinuxProcessList.c	2021-02-13 11:59:30.411609089 +0000
+@@ -52,6 +52,14 @@
+ #include <sys/sysmacros.h>
+ #endif
+ 
++#ifndef major
++#define major(rdev) ((rdev)>>8)
++#endif
++
++#ifndef minor
++#define minor(rdev) ((rdev) & 0xff)
++#endif
++
+ #ifdef HAVE_SENSORS_SENSORS_H
+ #include "LibSensors.h"
+ #endif
