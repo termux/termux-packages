@@ -1,0 +1,13 @@
+--- ./texk/web2c/Makefile.in.orig	2022-04-12 20:16:49.870674256 +0200
++++ ./texk/web2c/Makefile.in	2022-04-12 20:17:05.097317238 +0200
+@@ -22435,8 +22435,8 @@
+ 	$(hi_ctangle_sh) hitex
+ 
+ # Generating hitables.c using himktables.
+-hitables.c: himktables$(EXEEXT)
+-	./himktables > $@ || { rm -f hitables.c; exit 1; }
++hitables.c: 
++	$(HIMKTABLES) > $@ || { rm -f hitables.c; exit 1; }
+ 
+ # hitex, histretch, and hishrink all need (at least) some 
+ # of the sources generated from hiformat.w.
