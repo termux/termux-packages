@@ -214,9 +214,8 @@ jobs:
 
         # Publishing repository changes.
         if [ "$uploaded_files" = "true" ]; then
-          if ! aptly_add_to_repo; then
-            exit 1
-          fi
+          aptly_add_to_repo
+          sleep 180
 
           # Usually temporary directory is deleted automatically, but in certain cases it is left.
           aptly_delete_dir
@@ -253,9 +252,7 @@ jobs:
 
         # Publishing repository changes.
         if [ "$uploaded_files" = "true" ]; then
-          if ! aptly_add_to_repo; then
-            exit 1
-          fi
+          aptly_add_to_repo
 
           # Usually temporary directory is deleted automatically, but in certain cases it is left.
           aptly_delete_dir
