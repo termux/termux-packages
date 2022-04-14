@@ -1,0 +1,35 @@
+diff -uNr sc/configure sc.mod/configure
+--- sc/configure	2022-04-12 17:42:09.891984764 -0700
++++ sc.mod/configure	2022-04-12 21:21:41.160050820 -0700
+@@ -30,9 +30,7 @@
+ while [ $# -gt 0 ]; do
+ 	case $1 in
+ 	-s) SFLAG=1;;
+-	*)
+-		echo "$0: $1: Unknown option" >&2
+-		usage 1;;
++	*) ;;
+ 	esac
+ 	shift
+ done
+diff -uNr sc/Makefile.in sc.mod/Makefile.in
+--- sc/Makefile.in	2022-04-12 17:45:34.738634444 -0700
++++ sc.mod/Makefile.in	2022-04-12 18:04:04.218706481 -0700
+@@ -20,7 +20,7 @@
+ # packaging this with an O/S, for example, you'll probably want to change
+ # this to /usr.  Otherwise, /usr/local is probably more appropriate, unless
+ # you're replacing the vendor-supplied version.
+-prefix=/usr/local
++prefix=@TERMUX_PREFIX@
+ 
+ # This is where the install step puts it.
+ EXDIR=${prefix}/bin
+@@ -169,7 +169,7 @@
+ # Command to use to make temporary copies of some source files.
+ #LN=ln -s
+ #LN=cp
+-LN=ln
++LN=ln -s
+ 
+ #### SYSTEM DEFINES ####
+ 
