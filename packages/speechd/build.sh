@@ -2,12 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://github.com/brailcom/speechd
 TERMUX_PKG_DESCRIPTION="Common interface to speech synthesis"
 TERMUX_PKG_LICENSE="LGPL-2.1, GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.10.2
-TERMUX_PKG_REVISION=3
-TERMUX_PKG_SHA256=056efb80186f2bfc3f6ef468ab9905ca2d652cc2180b13514b752a9d616a6930
+TERMUX_PKG_VERSION=0.11.1
+TERMUX_PKG_SHA256=6dd8566188f70b1e971fe18f78960e30cb7daee88f147e5235b5cdfaf6184bb8
 TERMUX_PKG_SRCURL=https://github.com/brailcom/speechd/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="dotconf, espeak, glib, libiconv, pulseaudio, python"
 TERMUX_PKG_BUILD_DEPENDS="libiconv-static, libsndfile-static"
+TERMUX_PKG_AUTO_UPDATE=true
 
 ##
 ## Note: package needs patching for proper fix of pthread_cancel usage.
@@ -30,12 +30,13 @@ TERMUX_PKG_RM_AFTER_INSTALL="bin/spd-conf"
 # We cannot run cross-compiled programs to get help message, so disable
 # man-page generation with help2man
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="ac_cv_prog_HELP2MAN="
- 
-termux_step_pre_configure () {
-	_PYTHON_VERSION=$(source $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
-	./build.sh
-}
 
-termux_step_post_massage() {
-	mv lib/python3* lib/python$_PYTHON_VERSION
+termux_step_pre_configure() {
+	_PYTHON_VERSION=$(
+		source $TERMUX_SCRIPTDIR/packages/python/build.sh
+		echo $_MAJOR_VERSION
+	)
+	export am_cv_python_pythondir="${TERMUX_PREFIX}/lib/python${_PYTHON_VERSION}/site-packages"
+	export am_cv_python_pyexecdir="$am_cv_python_pythondir"
+	./build.sh
 }
