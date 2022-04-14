@@ -78,7 +78,9 @@ aptly_add_to_repo() {
     fi
   else
     echo "[$(date +%H:%M:%S)] Error: got http_status_code == '$http_status_code', packages may not appear in repository."
+    return 1
   fi
+  return 0
 }
 
 aptly_publish_repo() {
