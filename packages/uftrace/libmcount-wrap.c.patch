@@ -1,7 +1,6 @@
-diff -uNr uftrace-0.9.3/libmcount/wrap.c uftrace-0.9.3.mod/libmcount/wrap.c
---- uftrace-0.9.3/libmcount/wrap.c	2019-07-13 17:25:47.000000000 +0300
-+++ uftrace-0.9.3.mod/libmcount/wrap.c	2019-09-03 20:46:52.430226391 +0300
-@@ -216,7 +216,6 @@
+--- a/libmcount/wrap.c	2022-04-15 17:55:05.279817913 +0000
++++ b/libmcount/wrap.c	2022-04-15 19:45:32.879129081 +0000
+@@ -227,7 +227,6 @@
  /*
   * hooking functions
   */
@@ -9,7 +8,7 @@ diff -uNr uftrace-0.9.3/libmcount/wrap.c uftrace-0.9.3.mod/libmcount/wrap.c
  static void (*real_cxa_throw)(void *exc, void *type, void *dest);
  static void (*real_cxa_rethrow)(void);
  static void * (*real_cxa_begin_catch)(void *exc);
-@@ -241,7 +240,6 @@
+@@ -252,7 +251,6 @@
  
  void mcount_hook_functions(void)
  {
@@ -17,7 +16,7 @@ diff -uNr uftrace-0.9.3/libmcount/wrap.c uftrace-0.9.3.mod/libmcount/wrap.c
  	real_cxa_throw		= dlsym(RTLD_NEXT, "__cxa_throw");
  	real_cxa_rethrow	= dlsym(RTLD_NEXT, "__cxa_rethrow");
  	real_cxa_begin_catch	= dlsym(RTLD_NEXT, "__cxa_begin_catch");
-@@ -258,22 +256,7 @@
+@@ -269,23 +267,7 @@
  
  __visible_default int backtrace(void **buffer, int sz)
  {
@@ -31,6 +30,7 @@ diff -uNr uftrace-0.9.3/libmcount/wrap.c uftrace-0.9.3.mod/libmcount/wrap.c
 -	if (!check_thread_data(mtdp))
 -		mcount_rstack_restore(mtdp);
 -
+-	pr_dbg("%s is called from [%d]\n", __func__, mtdp->idx);
 -	ret = real_backtrace(buffer, sz);
 -
 -	if (!check_thread_data(mtdp))
@@ -41,7 +41,7 @@ diff -uNr uftrace-0.9.3/libmcount/wrap.c uftrace-0.9.3.mod/libmcount/wrap.c
  }
  
  __visible_default void __cxa_throw(void *exception, void *type, void *dest)
-@@ -324,7 +307,8 @@
+@@ -338,7 +320,8 @@
  	real_cxa_rethrow();
  }
  
@@ -51,7 +51,7 @@ diff -uNr uftrace-0.9.3/libmcount/wrap.c uftrace-0.9.3.mod/libmcount/wrap.c
  {
  	struct mcount_thread_data *mtdp;
  
-@@ -345,7 +329,7 @@
+@@ -360,7 +343,7 @@
  		mcount_rstack_restore(mtdp);
  	}
  
