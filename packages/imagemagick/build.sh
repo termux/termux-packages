@@ -27,8 +27,5 @@ share/ImageMagick-7/francais.xml
 "
 
 termux_step_pre_configure() {
-	if [ $TERMUX_ARCH = "i686" ]; then
-		#Avoid "libMagickCore-7.Q16HDRI.so: error: undefined reference to '__atomic_load'"
-		LDFLAGS+=" -latomic"
-	fi
+	export LDFLAGS+=" $($CC -print-libgcc-file-name)"
 }
