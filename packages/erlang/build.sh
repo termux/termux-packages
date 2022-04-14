@@ -6,8 +6,7 @@ TERMUX_PKG_VERSION="24.3.3"
 TERMUX_PKG_SRCURL=https://github.com/erlang/otp/archive/OTP-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=a5f4d83426fd3dc2f08c0c823ae29bcf72b69008a2baee66d27ad614ec7ab607
 TERMUX_PKG_AUTO_UPDATE=true
-# Only match stable versions, not intermidiate release candidates.
-TERMUX_PKG_UPDATE_VERSION_REGEXP='^OTP-\K\d+(\.\d+)+$'
+TERMUX_PKG_UPDATE_VERSION_REGEXP='\d+(\.\d+)+'
 TERMUX_PKG_DEPENDS="openssl, ncurses, zlib"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_HOSTBUILD=true
@@ -18,6 +17,17 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-termcap
 erl_xcomp_sysroot=${TERMUX_PREFIX}
 "
+termux_pkg_auto_update() {
+	# Get latest release tag:
+	local tag
+	tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}")"
+	# check if this is not an intermediate release candidate:
+	if grep -qP "^OTP-${TERMUX_PKG_UPDATE_VERSION_REGEXP}\$" <<<"$tag"; then
+		termux_pkg_upgrade_version "$tag"
+	else
+		echo "WARNING: Skipping auto-update: Not stable release($tag)"
+	fi
+}
 
 termux_step_post_get_source() {
 	# We need a host build every time, because we dont know the full output of host build and have no idea to cache it.
