@@ -1,14 +1,14 @@
---- a/CMakeLists.txt
-+++ b/CMakeLists.txt
+--- a/CMakeLists.txt	2022-04-15 02:22:36.772384329 +0530
++++ b/CMakeLists.txt	2022-04-15 03:22:33.096962106 +0530
 @@ -91,11 +91,6 @@
      if (BUILD_CLIENT)
          message(FATAL_ERROR "Snapclient not yet supported for FreeBSD, use \"-DBUILD_CLIENT=OFF\"")
      endif()
 -elseif (${CMAKE_SYSTEM_NAME} MATCHES "Android")
 -    set (ANDROID TRUE)
--    if (BUILD_SERVER)
--        message(FATAL_ERROR "Snapserver not yet supported for Android, use \"-DBUILD_SERVER=OFF\"")
--    endif()
+-#    if (BUILD_SERVER)
+-#        message(FATAL_ERROR "Snapserver not yet supported for Android, use \"-DBUILD_SERVER=OFF\"")
+-#    endif()
  endif()
  
  # Configure paths
@@ -30,7 +30,7 @@
  
      if(MACOSX)
          set(BONJOUR_FOUND true)
-@@ -178,11 +173,6 @@
+@@ -178,11 +173,7 @@
          list(APPEND INCLUDE_DIRS "/usr/local/include")
      else()
  
@@ -39,15 +39,16 @@
 -            add_definitions(-DHAS_ALSA)
 -        endif (ALSA_FOUND)
 -
++        
          if(BUILD_WITH_PULSE)
              pkg_search_module(PULSE libpulse)
              if (PULSE_FOUND)
-@@ -279,7 +269,7 @@
+@@ -279,7 +270,7 @@
      endif()
  endif()
  
 -if(NOT ANDROID)
 +if(TRUE)
-     find_package(Boost 1.70 REQUIRED)
+     find_package(Boost 1.74 REQUIRED)
  else()
      find_package(oboe REQUIRED CONFIG)

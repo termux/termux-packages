@@ -1,0 +1,24 @@
+--- a/server/CMakeLists.txt	2022-04-15 02:22:36.942384329 +0530
++++ b/server/CMakeLists.txt	2022-04-15 04:16:58.176960860 +0530
+@@ -41,7 +41,7 @@
+     ${CMAKE_SOURCE_DIR}/server
+     ${CMAKE_SOURCE_DIR}/common)
+ 
+-if (ANDROID)
++if (FALSE)
+     find_package(vorbis REQUIRED CONFIG)
+     list(APPEND SERVER_LIBRARIES boost::boost)
+     list(APPEND SERVER_LIBRARIES flac::flac)
+@@ -90,12 +90,6 @@
+         list(APPEND SERVER_INCLUDE ${OPUS_INCLUDE_DIRS})
+     endif (OPUS_FOUND)
+ 
+-    if (ALSA_FOUND)
+-        list(APPEND SERVER_SOURCES streamreader/alsa_stream.cpp)
+-        list(APPEND SERVER_LIBRARIES ${ALSA_LIBRARIES})
+-        list(APPEND SERVER_INCLUDE ${ALSA_INCLUDE_DIRS})
+-    endif (ALSA_FOUND)
+-
+     if (EXPAT_FOUND)
+         list(APPEND SERVER_LIBRARIES ${EXPAT_LIBRARIES})
+         list(APPEND SERVER_INCLUDE ${EXPAT_INCLUDE_DIRS})
