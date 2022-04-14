@@ -6,7 +6,8 @@ TERMUX_PKG_VERSION="24.3.3"
 TERMUX_PKG_SRCURL=https://github.com/erlang/otp/archive/OTP-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=a5f4d83426fd3dc2f08c0c823ae29bcf72b69008a2baee66d27ad614ec7ab607
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+(\.\d+)+"
+# Only match stable versions, not intermidiate release candidates.
+TERMUX_PKG_UPDATE_VERSION_REGEXP='^OTP-\K\d+(\.\d+)+$'
 TERMUX_PKG_DEPENDS="openssl, ncurses, zlib"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_HOSTBUILD=true
