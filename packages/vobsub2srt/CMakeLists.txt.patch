@@ -1,0 +1,25 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -53,10 +53,10 @@
+ include(CheckCXXSourceCompiles)
+ include(CheckCXXSourceRuns)
+ 
+-set(CMAKE_C_FLAGS "-std=gnu99")
+-set(CMAKE_CXX_FLAGS "-ansi -pedantic -Wall -Wextra -Wno-long-long")
++set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99")
++set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-long-long")
+ 
+-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -mtune=native -march=native -DNDEBUG -fomit-frame-pointer -ffast-math") # TODO -Ofast GCC 4.6
++set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG") # TODO -Ofast GCC 4.6
+ set(CMAKE_C_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
+ set(CMAKE_CXX_FLAGS_DEBUG "-g3 -DDEBUG")
+ set(CMAKE_C_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
+@@ -114,7 +114,7 @@
+   OUTPUT_STRIP_TRAILING_WHITESPACE
+   ERROR_QUIET
+ )
+-if(EXECUTE_RESULT)
++if(TRUE)
+   message(STATUS "dpkg not found: No package generation.")
+ else()
+   message(STATUS "Debian architecture: ${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
