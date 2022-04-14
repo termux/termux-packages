@@ -1,39 +1,49 @@
-Android does not provide pthread_cancel().
-
-Replacing it with pthread_kill(a, 0) makes program to compile
-without issues but potentially leads to runtime problems.
-
-See https://github.com/termux/termux-packages/issues/4378.
-
-diff -uNr spiped-1.6.1/spipe/main.c spiped-1.6.1.mod/spipe/main.c
---- spiped-1.6.1/spipe/main.c	2020-02-22 03:25:11.000000000 +0200
-+++ spiped-1.6.1.mod/spipe/main.c	2020-05-13 12:42:25.818390714 +0300
-@@ -70,8 +70,8 @@
- 	 * shutdown() that socket.
+--- a/lib/util/pthread_create_blocking_np.c	2021-12-24 19:27:38.000000000 +0000
++++ b/lib/util/pthread_create_blocking_np.c	2022-04-15 16:27:13.958553234 +0000
+@@ -148,7 +148,7 @@
  	 */
+ 	pthread_mutex_unlock(&U->mutex);
+ err4:
+-	pthread_cancel(*thread);
++	pthread_kill(*thread,0);
+ 	pthread_join(*thread, NULL);
+ err3:
+ 	pthread_cond_destroy(&U->cond);
+--- a/spipe/main.c	2021-12-24 19:27:38.000000000 +0000
++++ b/spipe/main.c	2022-04-15 16:26:28.373620198 +0000
+@@ -71,7 +71,7 @@
+ 
+ 	/* Cancel the threads. */
  	for (i = 0; i < 2; i++) {
 -		if ((rc = pthread_cancel(ET->threads[i])) != 0) {
--			warn0("pthread_cancel: %s", strerror(rc));
-+		if ((rc = pthread_kill(ET->threads[i], 0)) != 0) {
-+			warn0("pthread_kill: %s", strerror(rc));
- 			goto err0;
++		if ((rc = pthread_kill(ET->threads[i],0)) != 0) {
+ 			/*
+ 			 * According to the POSIX standard, a Thread ID should
+ 			 * still be valid after pthread_exit has been invoked
+@@ -80,7 +80,7 @@
+ 			 * this situation.
+ 			 */
+ 			if (rc != ESRCH) {
+-				warn0("pthread_cancel: %s", strerror(rc));
++				warn0("pthread_kill: %s", strerror(rc));
+ 				goto err0;
+ 			}
  		}
- 		if ((rc = pthread_join(ET->threads[i], NULL)) != 0) {
-@@ -294,13 +294,13 @@
+@@ -310,13 +310,13 @@
  	exit(0);
  
- err5:
+ err6:
 -	if ((rc = pthread_cancel(ET.threads[0])) != 0)
 -		warn0("pthread_cancel: %s", strerror(rc));
-+	if ((rc = pthread_kill(ET.threads[0], 0)) != 0)
++	if ((rc = pthread_kill(ET.threads[0],0)) != 0)
 +		warn0("pthread_kill: %s", strerror(rc));
  	if ((rc = pthread_join(ET.threads[0], NULL)) != 0)
  		warn0("pthread_join: %s", strerror(rc));
- err4:
+ err5:
 -	if ((rc = pthread_cancel(ET.threads[1])) != 0)
 -		warn0("pthread_cancel: %s", strerror(rc));
-+	if ((rc = pthread_kill(ET.threads[1], 0)) != 0)
++	if ((rc = pthread_kill(ET.threads[1],0)) != 0)
 +		warn0("pthread_kill: %s", strerror(rc));
  	if ((rc = pthread_join(ET.threads[1], NULL)) != 0)
  		warn0("pthread_join: %s", strerror(rc));
- err3:
+ err4:
