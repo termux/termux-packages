@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://neovim.io
 TERMUX_PKG_DESCRIPTION="Ambitious Vim-fork focused on extensibility and agility (nvim-nightly)"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="Aditya Alok <dev.aditya.alok@gmail.com>"
-TERMUX_PKG_VERSION=""
+TERMUX_PKG_VERSION="0.7.0-dev+1453-g8486c87e5"
 TERMUX_PKG_SRCURL="https://github.com/neovim/neovim/archive/nightly.tar.gz"
 TERMUX_PKG_SHA256=ef9ef44569b9959511890de0c8268454e5bcabd6e43483abb5fb568d191ea7fa
 TERMUX_PKG_DEPENDS="libiconv, libuv, luv, libmsgpack, libandroid-support, libvterm, libtermkey, libluajit, libunibilium, libtreesitter"
@@ -44,9 +44,14 @@ termux_pkg_auto_update() {
 	# this outputs in the following format: "0.6.0-dev+575-g2ef9d2a66"
 	local remote_nvim_version=$(
 		echo "$curl_response" |
-			cut -d"|" -f1 |
-			grep "<pre><code>NVIM" | cut -d " " -f2 | sed "0,/v/s///"
+			cut -d"|" -f1 | grep -oP '<pre class="notranslate"><code class="notranslate">NVIM \K.*'
 	)
+
+	if [ -z "${remote_nvim_version}" ]; then
+		echo "Error: failed to get latest neovim-nightly tag version."
+		echo -e "http code: ${http_code}\ncurl response: ${curl_response}"
+		exit 1
+	fi
 
 	# since we are using a nightly build, therefore no need to check for version increment/decrement.
 	if [ "${TERMUX_PKG_VERSION}" != "${remote_nvim_version}" ]; then
