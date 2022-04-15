@@ -48,13 +48,16 @@ termux_pkg_auto_update() {
 			cut -d"|" -f1 | grep -oP '<pre class="notranslate"><code class="notranslate">NVIM v\K.*'
 	)
 
+	if [ -z "$remote_nvim_version" ]; then
+		echo "ERROR: No version found in nightly page."
+		exit 1
+	fi
+
 	remote_nvim_version="$(grep -qP '^\d+\.\d+\.\d+-dev\+\d+-g[0-9a-f]+$' <<<"$remote_nvim_version" || true)"
 
 	if [ -z "$remote_nvim_version" ]; then
-		echo "ERROR: failed to parse neovim nightly version from github release page."
+		echo "WARNING: Version in nightly page is not in expected format. Skipping auto-update."
 		echo "remote_nvim_version: $remote_nvim_version"
-		echo "http code: $http_code"
-		exit 1
 	fi
 
 	# since we are using a nightly build, therefore no need to check for version increment/decrement.
