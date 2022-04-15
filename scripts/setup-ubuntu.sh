@@ -215,6 +215,12 @@ PACKAGES+=" aspell"
 # Needed by package kphp.
 PACKAGES+=" python3-jsonschema"
 
+# Needed by package lilypond.
+PACKAGES+=" fontforge-nox"
+PACKAGES+=" guile-2.2"
+PACKAGES+=" python3-fontforge"
+PACKAGES+=" texlive-metapost"
+
 # Needed by proxmark3/proxmark3-git
 PACKAGES+=" gcc-arm-none-eabi"
 
