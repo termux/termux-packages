@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://neovim.io/
 TERMUX_PKG_DESCRIPTION="Ambitious Vim-fork focused on extensibility and agility (nvim)"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.6.1
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="0.7.0"
 TERMUX_PKG_SRCURL=https://github.com/neovim/neovim/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=dd882c21a52e5999f656cae3f336b5fc702d52addd4d9b5cd3dc39cfff35e864
+TERMUX_PKG_SHA256=792a9c55d5d5f4a5148d475847267df309d65fb20f05523f21c1319ea8a6c7df
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libiconv, libuv, luv, libmsgpack, libandroid-support, libvterm, libtermkey, libluajit, libunibilium, libtreesitter"
 TERMUX_PKG_HOSTBUILD=true
@@ -44,13 +43,13 @@ termux_step_host_build() {
 	cd $TERMUX_PKG_HOSTBUILD_DIR/deps
 	cmake $TERMUX_PKG_SRCDIR/third-party
 
-	make -j 1 \
-	|| (_patch_luv $TERMUX_PKG_HOSTBUILD_DIR/deps && make -j 1 )
+	make -j 1 ||
+		(_patch_luv $TERMUX_PKG_HOSTBUILD_DIR/deps && make -j 1)
 
 	cd $TERMUX_PKG_SRCDIR
 
-	make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$TERMUX_PKG_HOSTBUILD_DIR -DUSE_BUNDLED_LUAROCKS=ON" install \
-	|| (_patch_luv $TERMUX_PKG_SRCDIR/.deps && make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$TERMUX_PKG_HOSTBUILD_DIR -DUSE_BUNDLED_LUAROCKS=ON" install)
+	make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$TERMUX_PKG_HOSTBUILD_DIR -DUSE_BUNDLED_LUAROCKS=ON" install ||
+		(_patch_luv $TERMUX_PKG_SRCDIR/.deps && make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$TERMUX_PKG_HOSTBUILD_DIR -DUSE_BUNDLED_LUAROCKS=ON" install)
 
 	make distclean
 	rm -Rf build/
@@ -69,25 +68,25 @@ termux_step_post_make_install() {
 }
 
 termux_step_create_debscripts() {
-	cat <<- EOF > ./postinst
-	#!$TERMUX_PREFIX/bin/sh
-	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" = "configure" ] || [ "\$1" = "abort-upgrade" ]; then
-		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
-			update-alternatives --install \
-				$TERMUX_PREFIX/bin/editor editor $TERMUX_PREFIX/bin/nvim 40
-			update-alternatives --install \
-				$TERMUX_PREFIX/bin/vi vi $TERMUX_PREFIX/bin/nvim 15
+	cat <<-EOF >./postinst
+		#!$TERMUX_PREFIX/bin/sh
+		if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" = "configure" ] || [ "\$1" = "abort-upgrade" ]; then
+			if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
+				update-alternatives --install \
+					$TERMUX_PREFIX/bin/editor editor $TERMUX_PREFIX/bin/nvim 40
+				update-alternatives --install \
+					$TERMUX_PREFIX/bin/vi vi $TERMUX_PREFIX/bin/nvim 15
+			fi
 		fi
-	fi
 	EOF
 
-	cat <<- EOF > ./prerm
-	#!$TERMUX_PREFIX/bin/sh
-	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" != "upgrade" ]; then
-		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
-			update-alternatives --remove editor $TERMUX_PREFIX/bin/nvim
-			update-alternatives --remove vi $TERMUX_PREFIX/bin/nvim
+	cat <<-EOF >./prerm
+		#!$TERMUX_PREFIX/bin/sh
+		if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" != "upgrade" ]; then
+			if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
+				update-alternatives --remove editor $TERMUX_PREFIX/bin/nvim
+				update-alternatives --remove vi $TERMUX_PREFIX/bin/nvim
+			fi
 		fi
-	fi
 	EOF
 }
