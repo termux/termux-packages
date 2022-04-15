@@ -1,10 +1,15 @@
-#!/bin/sh
+#!/bin/bash
+
 set -e -u
+
+: "${TERMUX_PKG_TMPDIR:="/tmp"}"
 
 # Install desired parts of the Android SDK:
 . $(cd "$(dirname "$0")"; pwd)/properties.sh
+. $(cd "$(dirname "$0")"; pwd)/build/termux_download.sh
 
-ANDROID_SDK_FILE=commandlinetools-linux-7583922_latest.zip
+ANDROID_SDK_REVISION=7583922
+ANDROID_SDK_FILE=commandlinetools-linux-${ANDROID_SDK_REVISION}_latest.zip
 ANDROID_SDK_SHA256=124f2d5115eee365df6cf3228ffbca6fc3911d16f8025bebd5b1c6e2fcfa7faf
 ANDROID_NDK_FILE=android-ndk-r${TERMUX_NDK_VERSION}-linux.zip
 ANDROID_NDK_SHA256=c6e97f9c8cfe5b7be0a9e6c15af8e7a179475b7ded23e2d1c1fa0945d6fb4382
@@ -14,15 +19,12 @@ if [ ! -d $ANDROID_HOME ]; then
 	rm -Rf $(basename $ANDROID_HOME)
 
 	# https://developer.android.com/studio/index.html#command-tools
-	# The downloaded version below is 26.1.1.:
 	echo "Downloading android sdk..."
-	curl --fail --retry 3 \
-		-o tools.zip \
-		https://dl.google.com/android/repository/${ANDROID_SDK_FILE}
-	echo "${ANDROID_SDK_SHA256} tools.zip" | sha256sum -c -
+	termux_download https://dl.google.com/android/repository/${ANDROID_SDK_FILE} \
+		tools-$ANDROID_SDK_REVISION.zip \
+		$ANDROID_SDK_SHA256
 	rm -Rf android-sdk
-	unzip -q tools.zip -d android-sdk
-	rm tools.zip
+	unzip -q tools-$ANDROID_SDK_REVISION.zip -d android-sdk
 fi
 
 if [ ! -d $NDK ]; then
@@ -30,13 +32,12 @@ if [ ! -d $NDK ]; then
 	cd $NDK/..
 	rm -Rf $(basename $NDK)
 	echo "Downloading android ndk..."
-	curl --fail --retry 3 -o ndk.zip \
-		https://dl.google.com/android/repository/${ANDROID_NDK_FILE}
-	echo "${ANDROID_NDK_SHA256} ndk.zip" | sha256sum -c -
+	termux_download https://dl.google.com/android/repository/${ANDROID_NDK_FILE} \
+		ndk-r${TERMUX_NDK_VERSION}.zip \
+		$ANDROID_NDK_SHA256
 	rm -Rf android-ndk-r$TERMUX_NDK_VERSION
-	unzip -q ndk.zip
+	unzip -q ndk-r${TERMUX_NDK_VERSION}.zip
 	mv android-ndk-r$TERMUX_NDK_VERSION $(basename $NDK)
-	rm ndk.zip
 fi
 
 yes | $ANDROID_HOME/cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_HOME --licenses
