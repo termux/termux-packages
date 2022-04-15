@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Ambitious Vim-fork focused on extensibility and agility 
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.7.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/neovim/neovim/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=792a9c55d5d5f4a5148d475847267df309d65fb20f05523f21c1319ea8a6c7df
 TERMUX_PKG_AUTO_UPDATE=true
@@ -18,6 +19,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DPKG_CONFIG_EXECUTABLE=$(command -v pkg-config)
 -DXGETTEXT_PRG=$(command -v xgettext)
 -DLUAJIT_INCLUDE_DIR=$TERMUX_PREFIX/include/luajit-2.1
+-DCOMPILE_LUA=OFF
 "
 TERMUX_PKG_CONFFILES="share/nvim/sysinit.vim"
 
