@@ -1,11 +1,10 @@
---- ../../build/libnl3/cache/libnl-3.2.25/src/nf-queue.c	2014-06-16 16:45:51.000000000 +0200
-+++ ./src/nf-queue.c	2017-02-09 00:08:34.248440250 +0100
-@@ -10,7 +10,7 @@
-  * Copyright (c) 2010  Karl Hiramoto <karl@hiramoto.org>
-  */
+--- nf-queue.c.orig	2022-04-15 18:49:58.769003690 +0000
++++ ./src/nf-queue.c	2022-04-15 18:51:25.966876442 +0000
+@@ -13,6 +13,7 @@
+ #include <netlink/netfilter/queue.h>
+ #include <netlink/netfilter/queue_msg.h>
  
--
 +#include <sys/select.h>
- #include <netlink/cli/utils.h>
- #include <netlink/cli/link.h>
- #include <netinet/in.h>
+ #include <linux/netlink.h>
+ 
+ static struct nl_sock *nf_sock;
