@@ -42,14 +42,18 @@ termux_pkg_auto_update() {
 	fi
 
 	# this outputs in the following format: "0.6.0-dev+575-g2ef9d2a66"
-	local remote_nvim_version=$(
+	local remote_nvim_version
+	remote_nvim_version=$(
 		echo "$curl_response" |
-			cut -d"|" -f1 | grep -oP '<pre class="notranslate"><code class="notranslate">NVIM \K.*'
+			cut -d"|" -f1 | grep -oP '<pre class="notranslate"><code class="notranslate">NVIM v\K.*'
 	)
 
-	if [ -z "${remote_nvim_version}" ]; then
-		echo "Error: failed to get latest neovim-nightly tag version."
-		echo -e "http code: ${http_code}\ncurl response: ${curl_response}"
+	remote_nvim_version="$(grep -qP '^\d+\.\d+\.\d+-dev\+\d+-g[0-9a-f]+$' <<<"$remote_nvim_version" || true)"
+
+	if [ -z "$remote_nvim_version" ]; then
+		echo "ERROR: failed to parse neovim nightly version from github release page."
+		echo "remote_nvim_version: $remote_nvim_version"
+		echo "http code: $http_code"
 		exit 1
 	fi
 
