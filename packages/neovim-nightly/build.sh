@@ -50,19 +50,22 @@ termux_pkg_auto_update() {
 
 	if [ -z "$remote_nvim_version" ]; then
 		echo "ERROR: No version found in nightly page."
-		exit 1
+		return 1
 	fi
 
-	remote_nvim_version="$(grep -qP '^\d+\.\d+\.\d+-dev\+\d+-g[0-9a-f]+$' <<<"$remote_nvim_version" || true)"
+	remote_nvim_version="$(grep -oP '^\d+\.\d+\.\d+-dev\+\d+-g[0-9a-f]+$' <<<"$remote_nvim_version" || true)"
 
 	if [ -z "$remote_nvim_version" ]; then
 		echo "WARNING: Version in nightly page is not in expected format. Skipping auto-update."
 		echo "remote_nvim_version: $remote_nvim_version"
+		return 0
 	fi
 
 	# since we are using a nightly build, therefore no need to check for version increment/decrement.
 	if [ "${TERMUX_PKG_VERSION}" != "${remote_nvim_version}" ]; then
 		termux_pkg_upgrade_version "${remote_nvim_version}" --skip-version-check
+	else
+		echo "INFO: No update available."
 	fi
 }
 
