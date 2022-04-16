@@ -2,12 +2,13 @@ TERMUX_PKG_HOMEPAGE=https://github.com/TheLocehiliosan/yadm
 TERMUX_PKG_DESCRIPTION="Yet Another Dotfiles Manager"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.1.0
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=3.2.1
 TERMUX_PKG_SRCURL=https://github.com/TheLocehiliosan/yadm/archive/$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=9f848c80deed2725c012d058bd60d1ea13539fd6fbacd5245bf97d442cb89263
+TERMUX_PKG_SHA256=6b7e0b32bdca074cbf36e64d8dd528f37c05ce0786fec1099cf374d81cd7d68e
 TERMUX_PKG_DEPENDS="git"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 
 termux_step_make() {
 	# Do not try to run 'make' as it causes a build failure.
