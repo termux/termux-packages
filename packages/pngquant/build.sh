@@ -10,6 +10,7 @@ TERMUX_PKG_DEPENDS="libimagequant, libpng, littlecms"
 TERMUX_PKG_BUILD_DEPENDS="zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-libimagequant
 --disable-sse
