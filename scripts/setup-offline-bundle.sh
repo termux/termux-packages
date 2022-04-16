@@ -59,7 +59,7 @@ rm -rf "${TERMUX_PKG_TMPDIR}"
 )
 
 # Package sources.
-for p in "$TERMUX_SCRIPTDIR"/packages/*; do
+for p in "$TERMUX_SCRIPTDIR"/{main,x11,root}/*; do
 	(
 		. "$TERMUX_SCRIPTDIR"/scripts/properties.sh
 		. "$TERMUX_SCRIPTDIR"/scripts/build/get_source/termux_step_get_source.sh

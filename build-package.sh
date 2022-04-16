@@ -458,10 +458,16 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 			TERMUX_PKG_BUILDER_DIR=$(realpath "${PACKAGE_LIST[i]}")
 		else
 			# Package name:
-			if [ -n "${TERMUX_IS_DISABLED=""}" ]; then
-				export TERMUX_PKG_BUILDER_DIR=$TERMUX_SCRIPTDIR/disabled-packages/$TERMUX_PKG_NAME
+			if [ -d "${TERMUX_SCRIPTDIR}/main/${TERMUX_PKG_NAME}" ]; then
+				export TERMUX_PKG_BUILDER_DIR=$TERMUX_SCRIPTDIR/main/$TERMUX_PKG_NAME
+			elif [ -d "${TERMUX_SCRIPTDIR}/x11/${TERMUX_PKG_NAME}" ]; then
+				export TERMUX_PKG_BUILDER_DIR=$TERMUX_SCRIPTDIR/x11/$TERMUX_PKG_NAME
+			elif [ -d "${TERMUX_SCRIPTDIR}/root/${TERMUX_PKG_NAME}" ]; then
+				export TERMUX_PKG_BUILDER_DIR=$TERMUX_SCRIPTDIR/root/$TERMUX_PKG_NAME
+			elif [ -n "${TERMUX_IS_DISABLED=""}" ] && [ -d "${TERMUX_SCRIPTDIR}/disabled/${TERMUX_PKG_NAME}"]; then
+				export TERMUX_PKG_BUILDER_DIR=$TERMUX_SCRIPTDIR/disabled/$TERMUX_PKG_NAME
 			else
-				export TERMUX_PKG_BUILDER_DIR=$TERMUX_SCRIPTDIR/packages/$TERMUX_PKG_NAME
+				termux_error_exit "No package $TERMUX_PKG_NAME found in any of the enabled repositories, if you are trying to set up your custom repository give a look at build-package.sh:460-470"
 			fi
 		fi
 		TERMUX_PKG_BUILDER_SCRIPT=$TERMUX_PKG_BUILDER_DIR/build.sh

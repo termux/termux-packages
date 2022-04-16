@@ -246,13 +246,11 @@ def main():
     parser.add_argument('package', nargs='?',
                         help='Package to generate dependency list for.')
     parser.add_argument('package_dirs', nargs='*',
-                        help='Directories with packages. Can for example point to "../x11-packages/packages/". "packages/" is appended automatically.')
+                        help='Directories with packages. Can for example point to "../community-packages/packages". Note that the packages suffix is no longer added automatically if not present.')
     args = parser.parse_args()
     fast_build_mode = args.i
     package = args.package
     packages_directories = args.package_dirs
-    if 'packages' not in packages_directories:
-        packages_directories.append('packages')
 
     if not package:
         full_buildorder = True
@@ -263,7 +261,6 @@ def main():
         die('-i mode does not work when building all packages')
 
     if not full_buildorder:
-        packages_real_path = os.path.realpath('packages')
         for path in packages_directories:
             if not os.path.isdir(path):
                 die('Not a directory: ' + path)
