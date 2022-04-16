@@ -1,8 +1,8 @@
---- ./Makefile.orig	2022-02-21 18:50:35.103778638 +0530
-+++ ./Makefile	2022-02-21 18:51:47.323778610 +0530
+--- ./Makefile.orig	2022-04-17 08:36:38.132700421 +0000
++++ ./Makefile	2022-04-17 19:16:25.686564910 +0000
 @@ -1,5 +1,5 @@
 -CFLAGS  += -std=c99 -Wall -O2 -D_REENTRANT
--LIBS    := -lpthread -lm -lssl -lcrypto
+-LIBS    := -lm -lssl -lcrypto -lpthread
 +CFLAGS  += -std=c99 -Wall -D_REENTRANT
 +LIBS    := -lm -lssl -lcrypto
  
@@ -17,15 +17,12 @@
  	LDFLAGS += -L$(WITH_LUAJIT)/lib
  else
  	CFLAGS  += -I$(ODIR)/include/luajit-2.1
-@@ -59,9 +59,9 @@
- $(ODIR):
- 	@mkdir -p $@
+@@ -61,7 +61,7 @@
  
--$(ODIR)/bytecode.o: src/wrk.lua
-+$(ODIR)/bytecode.c: src/wrk.lua
+ $(ODIR)/bytecode.c: src/wrk.lua $(DEPS)
  	@echo LUAJIT $<
--	@$(SHELL) -c 'PATH=obj/bin:$(PATH) luajit -b $(CURDIR)/$< $(CURDIR)/$@'
-+	@$(SHELL) -c 'PATH=obj/bin:$(PATH) luajit -b -a $(_ARCH) $(CURDIR)/$< $(CURDIR)/$@'
+-	@$(SHELL) -c 'PATH="obj/bin:$(PATH)" luajit -b "$(CURDIR)/$<" "$(CURDIR)/$@"'
++	@$(SHELL) -c 'PATH="obj/bin:$(PATH)" luajit -b -a $(_ARCH) "$(CURDIR)/$<" "$(CURDIR)/$@"'
  
  $(ODIR)/version.o:
  	@echo 'const char *VERSION="$(VER)";' | $(CC) -xc -c -o $@ -
