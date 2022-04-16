@@ -75,10 +75,19 @@ aptly_add_to_repo() {
       echo
       echo "$warnings"
       echo
+      return 1
     fi
+  elif [ "$http_status_code" == "000" ]; then
+    echo "[$(date +%H:%M:%S)] Warning: server/proxy dropped connection. Assuming that the host is adding packages inspite of lost connection."
+    echo "[$(date +%H:%M:%S)] Warning: Waiting for host to add packages. Sleeping for 180s. Assuming that packages will be added till then."
+    sleep 180
+    return 0
   else
-    echo "[$(date +%H:%M:%S)] Warning: got http_status_code == '$http_status_code', packages may not appear in repository."
+    echo "[$(date +%H:%M:%S)] Error: got http_status_code == '$http_status_code'."
+    echo "[$(date +%H:%M:%S)] Error: the unexpected happened. Ask any maintainer to check the aptly log"
+    return 1
   fi
+  return 0
 }
 
 aptly_publish_repo() {
