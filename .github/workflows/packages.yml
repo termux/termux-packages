@@ -5,14 +5,14 @@ on:
     branches:
     - master
     paths:
-    - 'main/**'
-    - 'x11/**'
-    - 'root/**'
+    - 'packages/**'
+    - 'root-packages/**'
+    - 'x11-packages/**'
   pull_request:
     paths:
-    - 'main/**'
-    - 'x11/**'
-    - 'root/**'
+    - 'packages/**'
+    - 'root-packages/**'
+    - 'x11-packages/**'
   workflow_dispatch:
     inputs:
       packages:
@@ -78,32 +78,33 @@ jobs:
             cd ..
           fi
 
-          for repo in main x11 root; do
+          for repo_path in $(jq --raw-output 'keys | .[]' < repo.json); do
+            local repo=$(jq --raw-output '.["'$repo_path'"]' < repo.json)
             # Parse changed files and identify new packages and deleted packages.
             # Create lists of those packages that will be passed to upload job for
             # further processing.
             while read -r file; do
-              if ! [[ $file == $repo/* ]]; then
+              if ! [[ $file == $repo_path/* ]]; then
                 # This file does not belong to a package, so ignore it
                 continue
               fi
-              if [[ $file =~ ^$repo/([.a-z0-9+-]*)/([.a-z0-9+-]*).subpackage.sh$ ]]; then
+              if [[ $file =~ ^$repo_path/([.a-z0-9+-]*)/([.a-z0-9+-]*).subpackage.sh$ ]]; then
                 # A subpackage was modified, check if it was deleted or just updated
                 pkg=${BASH_REMATCH[1]}
                 subpkg=${BASH_REMATCH[2]}
-                if [ ! -f "${repo}/${pkg}/${subpkg}.subpackage.sh" ]; then
+                if [ ! -f "${repo_path}/${pkg}/${subpkg}.subpackage.sh" ]; then
                   echo "$subpkg" >> ./deleted_$repo_packages.txt
                 fi
-              elif [[ $file =~ ^$repo/([.a-z0-9+-]*)/.*$ ]]; then
+              elif [[ $file =~ ^$repo_path/([.a-z0-9+-]*)/.*$ ]]; then
                 # package, check if it was deleted or updated
                 pkg=${BASH_REMATCH[1]}
-                if [ ! -d "${repo}/${pkg}" ]; then
+                if [ ! -d "${repo_path}/${pkg}" ]; then
                   echo "$pkg" >> ./deleted_$repo_packages.txt
                 else
                   echo "$pkg" >> ./built_$repo_packages.txt
                   # If there are subpackages we want to create a list of those
                   # as well
-                  for file in $(find "${repo}/${pkg}/" -maxdepth 1 -type f -name \*.subpackage.sh | sort); do
+                  for file in $(find "${repo_path}/${pkg}/" -maxdepth 1 -type f -name \*.subpackage.sh | sort); do
                     echo "$(basename "${file%%.subpackage.sh}")" >> ./built_$repo_subpackages.txt
                   done
                 fi
@@ -112,7 +113,8 @@ jobs:
           done
         else
           for pkg in ${{ github.event.inputs.packages }}; do
-            for repo in main x11 root; do
+            for repo_path in $(jq --raw-output 'keys | .[]' < repo.json); do
+              local repo=$(jq --raw-output '.["'$repo_path'"]' < repo.json)
               if [ -d "${repo}/${pkg}" ]; then
                 echo "$pkg" >> ./built_$repo_packages.txt
                 for subpkg in $(find "${repo}/${pkg}/" -maxdepth 1 -type f -name \*.subpackage.sh | sort); do
@@ -125,7 +127,7 @@ jobs:
           done
         fi
 
-        for repo in main x11 root; do
+        for repo in $(jq --raw-output '.[]' < repo.json); do
           # Fix so that lists do not contain duplicates
           if [ -f ./built_$repo_packages.txt ]; then
             uniq ./built_$repo_packages.txt > ./built_$repo_packages.txt.tmp
@@ -154,9 +156,10 @@ jobs:
     - name: Lint packages
       run: |
         local package_recipes=
-        for repo in main x11 root; do
+        for repo_path in $(jq --raw-output 'keys | .[]' < repo.json); do
+          local repo=$(jq --raw-output '.["'$repo_path'"]' < repo.json)
           if [ -f ./built_$repo_packages.txt ]; then
-            package_recipes+=$(cat ./built_$repo_packages.txt | repo=$repo awk '{print ENVIRON["repo"]"/"$1"/build.sh"}')
+            package_recipes+=$(cat ./built_$repo_packages.txt | repo_path=$repo_path awk '{print ENVIRON["repo_path"]"/"$1"/build.sh"}')
           fi
         done
 
@@ -165,7 +168,9 @@ jobs:
     - name: Build packages
       run: |
         local packages=
-        for repo in main x11 root; do
+        for repo_path in $(jq --raw-output 'keys | .[]' < repo.json); do
+          local repo=$(jq --raw-output '.["'$repo_path'"]' < repo.json)
+
           if [ -f ./built_$repo_packages.txt ]; then
             packages+=$(cat ./build_$repo_packages.txt)
           fi
@@ -178,7 +183,7 @@ jobs:
       run: |
         test -d termux-packages/output && mv termux-packages/output/* ./output/
 
-        for repo in main x11 root; do
+        for repo in $(jq --raw-output '.[]' < repo.json); do
           mkdir debs
           # Put package lists into directory with *.deb files so they will be transferred to
           # upload job.
@@ -223,7 +228,6 @@ jobs:
         path: ./
     - name: Upload to packages.termux.org
       env:
-        REPOSITORY_NAME: termux-main
         REPOSITORY_DISTRIBUTION: stable
         REPOSITORY_URL: https://packages.termux.org/aptly-api
       run: |
@@ -233,8 +237,8 @@ jobs:
 
         source scripts/aptly_api.sh
 
-        for repo in main x11 root; do
-          export REPOSITORY_NAME=termux-$repo
+        for repo in $(jq --raw-output '.[]' < repo.json); do
+          export REPOSITORY_NAME=$repo
 
           for archive in debs-*/debs-$repo-{aarch64,arm,i686,x86_64}-${{ github.sha }}.tar; do
             tar xf "$archive"
@@ -284,8 +288,8 @@ jobs:
         source scripts/aptly_api.sh
 
 
-        for repo in main x11 root; do
-          export REPOSITORY_NAME=termux-$repo
+        for repo in $(jq --raw-output '.[]' < repo.json); do
+          export REPOSITORY_NAME=$repo
 
           for archive in debs-*/debs-$repo-{aarch64,arm,i686,x86_64}-${{ github.sha }}.tar; do
             tar xf "$archive"
