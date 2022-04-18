@@ -2,9 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://miller.readthedocs.io/
 TERMUX_PKG_DESCRIPTION="Like awk, sed, cut, join, and sort for name-indexed data such as CSV, TSV, and tabular JSON"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=6.0.0
+TERMUX_PKG_VERSION=6.2.0
 TERMUX_PKG_SRCURL=https://github.com/johnkerl/miller.git
 TERMUX_PKG_EXTRA_MAKE_ARGS="PREFIX=$TERMUX_PREFIX"
+TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_pre_configure() {
 	termux_setup_golang
