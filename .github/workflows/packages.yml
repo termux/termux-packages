@@ -183,6 +183,8 @@ jobs:
       run: |
         test -d termux-packages/output && mv termux-packages/output/* ./output/
 
+        rm -rf debs
+
         for repo in $(jq --raw-output '.[]' < repo.json); do
           mkdir debs
           # Put package lists into directory with *.deb files so they will be transferred to
