@@ -2,10 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://rust-lang.github.io/mdBook/
 TERMUX_PKG_DESCRIPTION="Creates book from markdown files"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.4.15
+TERMUX_PKG_VERSION=0.4.17
 TERMUX_PKG_SRCURL=https://github.com/rust-lang/mdBook/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=fa7f217fb6be229c25be21ccb712af8d0012241b529d1bbacb8f5cac65fe0013
+TERMUX_PKG_SHA256=9523d0bed63ce35eec5a8259eb963651cd7e37ec5644ef551134068a2fb72f89
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make() {
 	termux_setup_rust
