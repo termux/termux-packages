@@ -1,5 +1,5 @@
---- ./doc/mpdconf.example.orig	2021-12-01 20:00:00.000000000 +0100
-+++ ./doc/mpdconf.example	2022-01-16 19:35:05.557761058 +0100
+--- a/doc/mpdconf.example	2022-03-14 17:55:47.000000000 +0000
++++ b/doc/mpdconf.example	2022-04-19 04:52:49.436770322 +0000
 @@ -10,14 +10,14 @@
  # be disabled and audio files will only be accepted over ipc socket (using
  # file:// protocol) or streaming files over an accepted protocol.
@@ -58,30 +58,30 @@
  #
  ###############################################################################
  
-@@ -80,17 +80,18 @@
- # should be paid if this is assigned to anything other than the default, any.
+@@ -81,16 +81,19 @@
  # This setting can deny access to control of the daemon. Not effective if
- # systemd socket activiation is in use.
--#
-+# For local connections only 
+ # systemd socket activation is in use.
+ #
++# For local connections only
 +#bind_to_address		"localhost"
++#
  # For network
  #bind_to_address		"any"
  #
  # And for Unix Socket
 -#bind_to_address		"~/.mpd/socket"
-+bind_to_address		"@TERMUX_PREFIX@/var/run/mpd.socket"
++#bind_to_address		"@TERMUX_PREFIX@/var/run/mpd.socket"
  #
  # This setting is the TCP port that is desired for the daemon to get assigned
 -# to.
-+# to. Normally this is 6600 but for termux this port needs to be above 8000. 
++# to. Normally this is 6600 but for termux this port needs to be above 8000.
  #
 -#port				"6600"
 +#port				"8600"
  #
  # Suppress all messages below the given threshold.  Use "verbose" for
  # troubleshooting. Available setting arguments are "notice", "info", "verbose",
-@@ -135,12 +136,12 @@
+@@ -135,12 +138,12 @@
  # If this setting is set to "yes", MPD will discover audio files by following
  # symbolic links outside of the configured music_directory.
  #
@@ -96,7 +96,7 @@
  #
  ###############################################################################
  
-@@ -213,28 +214,6 @@
+@@ -213,28 +216,6 @@
  # blocks. Setting this block is optional, though the server will only attempt
  # autodetection for one sound card.
  #
@@ -125,7 +125,7 @@
  #
  # An example of a shout output (for streaming to Icecast):
  #
-@@ -265,7 +244,8 @@
+@@ -265,7 +246,8 @@
  #	type		"recorder"
  #	name		"My recorder"
  #	encoder		"vorbis"		# optional, vorbis or lame
@@ -135,7 +135,7 @@
  ##	quality		"5.0"			# do not define if bitrate is defined
  #	bitrate		"128"			# do not define if quality is defined
  #	format		"44100:16:1"
-@@ -295,55 +275,31 @@
+@@ -295,55 +277,31 @@
  ##	media_role	"media_role"		#optional
  #}
  #
