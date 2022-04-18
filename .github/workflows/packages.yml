@@ -79,7 +79,7 @@ jobs:
           fi
 
           for repo_path in $(jq --raw-output 'keys | .[]' < repo.json); do
-            local repo=$(jq --raw-output '.["'$repo_path'"]' < repo.json)
+            repo=$(jq --raw-output '.["'$repo_path'"]' < repo.json)
             # Parse changed files and identify new packages and deleted packages.
             # Create lists of those packages that will be passed to upload job for
             # further processing.
@@ -114,7 +114,7 @@ jobs:
         else
           for pkg in ${{ github.event.inputs.packages }}; do
             for repo_path in $(jq --raw-output 'keys | .[]' < repo.json); do
-              local repo=$(jq --raw-output '.["'$repo_path'"]' < repo.json)
+              repo=$(jq --raw-output '.["'$repo_path'"]' < repo.json)
               if [ -d "${repo}/${pkg}" ]; then
                 echo "$pkg" >> ./built_$repo_packages.txt
                 for subpkg in $(find "${repo}/${pkg}/" -maxdepth 1 -type f -name \*.subpackage.sh | sort); do
@@ -155,9 +155,9 @@ jobs:
 
     - name: Lint packages
       run: |
-        local package_recipes=
+        package_recipes=
         for repo_path in $(jq --raw-output 'keys | .[]' < repo.json); do
-          local repo=$(jq --raw-output '.["'$repo_path'"]' < repo.json)
+          repo=$(jq --raw-output '.["'$repo_path'"]' < repo.json)
           if [ -f ./built_$repo_packages.txt ]; then
             package_recipes+=$(cat ./built_$repo_packages.txt | repo_path=$repo_path awk '{print ENVIRON["repo_path"]"/"$1"/build.sh"}')
           fi
@@ -167,9 +167,9 @@ jobs:
 
     - name: Build packages
       run: |
-        local packages=
+        packages=
         for repo_path in $(jq --raw-output 'keys | .[]' < repo.json); do
-          local repo=$(jq --raw-output '.["'$repo_path'"]' < repo.json)
+          repo=$(jq --raw-output '.["'$repo_path'"]' < repo.json)
 
           if [ -f ./built_$repo_packages.txt ]; then
             packages+=$(cat ./build_$repo_packages.txt)
