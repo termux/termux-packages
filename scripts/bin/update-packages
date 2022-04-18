@@ -130,12 +130,22 @@ main() {
 	echo "INFO: Running update for: $*"
 
 	if [[ "$1" == "@all" ]]; then
-		for pkg_dir in "${TERMUX_SCRIPTDIR}"/packages/*; do
-			_run_update "${pkg_dir}"
+		for repo_dir in $(jq --raw-output 'keys | .[]' < ${TERMUX_SCRIPTDIR}/repo.json); do
+			for pkg_dir in $repo_dir/*; do
+				_run_update "${pkg_dir}"
+			done
 		done
 	else
 		for pkg in "$@"; do
-			_run_update "${TERMUX_SCRIPTDIR}/packages/${pkg}"
+			if [ ! -d "${pkg}" ]; then
+				for repo_dir in $(jq --raw-output 'keys | .[]' < ${TERMUX_SCRIPTDIR}/repo.json); do
+					if [ -d "${repo_dir}/${pkg}" ]; then
+						pkg="${repo_dir}/${pkg}"
+						break
+					fi
+				done
+			fi
+			_run_update "${pkg}"
 		done
 	fi
 

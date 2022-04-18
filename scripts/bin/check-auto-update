@@ -173,9 +173,23 @@ write_to_first_empty_line() {
 check() {
 	PKG_NAME="$1"
 	[[ "${SILENT}" == "true" ]] || echo -e "${_BLUE}==>${_YELLOW} ${PKG_NAME}${_RESET_COLOR}"
+	local build_sh=
+
+	if [ -d "${PKG_NAME}" ] && [ -f "${PKG_NAME}/build.sh" ]; then
+		build_sh="${PKG_NAME}/build.sh"
+	else
+		for repo_dir in $(jq --raw-output 'keys | .[]' < $TERMUX_SCRIPTDIR/repo.json); do
+			if [ -f $TERMUX_SCRIPTDIR/$repo_dir/$PKG_NAME/build.sh ]; then
+				build_sh=$TERMUX_SCRIPTDIR/$repo_dir/$PKG_NAME/build.sh
+			fi
+		done
+	fi
+	if [ -z "$build_sh" ]; then
+		error "No package $PKG_NAME found in any of the repository"
+	fi
 	SRC_URL="$(
 		# shellcheck source=/dev/null
-		. "${TERMUX_SCRIPTDIR}"/packages/"${PKG_NAME}"/build.sh >/dev/null 2>&1
+		. $build_sh >/dev/null 2>&1
 		echo "${TERMUX_PKG_SRCURL}"
 	)"
 
@@ -202,7 +216,7 @@ check() {
 		if [[ "${ENABLE}" == "--enable" ]]; then
 			info "Enabling auto-update..."
 			write_to_first_empty_line \
-				"${TERMUX_SCRIPTDIR}/packages/${PKG_NAME}/build.sh" "TERMUX_PKG_AUTO_UPDATE=true"
+				$build_sh "TERMUX_PKG_AUTO_UPDATE=true"
 			info "Done."
 			return
 		fi
