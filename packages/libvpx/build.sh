@@ -56,3 +56,15 @@ termux_step_configure() {
 		--enable-small \
 		--extra-cflags="-fPIC"
 }
+
+termux_step_post_massage() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION_GUARD_FILES="lib/libvpx.so.7"
+	local f
+	for f in ${_SOVERSION_GUARD_FILES}; do
+		if [ ! -e "${f}" ]; then
+			termux_error_exit "Error: file ${f} not found; please check if SOVERSION has changed."
+		fi
+	done
+}
