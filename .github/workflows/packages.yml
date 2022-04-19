@@ -168,7 +168,9 @@ jobs:
           fi
         done
 
-        ./scripts/lint-packages.sh $package_recipes
+        if [ ! -z "$package_recipes" ]; then
+          ./scripts/lint-packages.sh $package_recipes
+        fi
 
     - name: Build packages
       run: |
@@ -181,7 +183,9 @@ jobs:
           fi
         done
 
-        ./scripts/run-docker.sh ./build-package.sh -I -a ${{ matrix.target_arch }} $packages
+        if [ ! -z "$packages" ]; then
+          ./scripts/run-docker.sh ./build-package.sh -I -a ${{ matrix.target_arch }} $packages
+        fi
 
     - name: Generate build artifacts
       if: always()
