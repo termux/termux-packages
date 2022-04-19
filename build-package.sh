@@ -39,6 +39,8 @@ if [ ! -e "$TERMUX_BUILD_LOCK_FILE" ]; then
 	touch "$TERMUX_BUILD_LOCK_FILE"
 fi
 
+export TERMUX_PACKAGES_DIRECTORIES=$(jq --raw-output 'keys | .[]' < ${TERMUX_SCRIPTDIR}/repo.json)
+
 # Special variable for internal use. It forces script to ignore
 # lock file.
 : "${TERMUX_BUILD_IGNORE_LOCK:=false}"
@@ -451,17 +453,24 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 
 		# Check the package to build:
 		TERMUX_PKG_NAME=$(basename "${PACKAGE_LIST[i]}")
+		export TERMUX_PKG_BUILDER_DIR=
 		if [[ ${PACKAGE_LIST[i]} == *"/"* ]]; then
 			# Path to directory which may be outside this repo:
 			if [ ! -d "${PACKAGE_LIST[i]}" ]; then termux_error_exit "'${PACKAGE_LIST[i]}' seems to be a path but is not a directory"; fi
-			export TERMUX_PKG_BUILDER_DIR
-			TERMUX_PKG_BUILDER_DIR=$(realpath "${PACKAGE_LIST[i]}")
+			export TERMUX_PKG_BUILDER_DIR=$(realpath "${PACKAGE_LIST[i]}")
 		else
 			# Package name:
-			if [ -n "${TERMUX_IS_DISABLED=""}" ]; then
-				export TERMUX_PKG_BUILDER_DIR=$TERMUX_SCRIPTDIR/disabled-packages/$TERMUX_PKG_NAME
-			else
-				export TERMUX_PKG_BUILDER_DIR=$TERMUX_SCRIPTDIR/packages/$TERMUX_PKG_NAME
+                        for package_directory in $TERMUX_PACKAGES_DIRECTORIES; do
+				if [ -d "${TERMUX_SCRIPTDIR}/${package_directory}/${TERMUX_PKG_NAME}" ]; then
+					export TERMUX_PKG_BUILDER_DIR=${TERMUX_SCRIPTDIR}/$package_directory/$TERMUX_PKG_NAME
+					break
+				elif [ -n "${TERMUX_IS_DISABLED=""}" ] && [ -d "${TERMUX_SCRIPTDIR}/disabled-packages/${TERMUX_PKG_NAME}"]; then
+					export TERMUX_PKG_BUILDER_DIR=$TERMUX_SCRIPTDIR/disabled-packages/$TERMUX_PKG_NAME
+					break
+				fi
+			done
+			if [ -z "${TERMUX_PKG_BUILDER_DIR}" ]; then
+				termux_error_exit "No package $TERMUX_PKG_NAME found in any of the enabled repositories. Are you trying to set up a custom repository?"
 			fi
 		fi
 		TERMUX_PKG_BUILDER_SCRIPT=$TERMUX_PKG_BUILDER_DIR/build.sh

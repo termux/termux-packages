@@ -1,0 +1,11 @@
+--- a/runtime/autoload/context.vim
++++ b/runtime/autoload/context.vim
+@@ -17,7 +17,7 @@
+ function! s:sh()
+   return has('win32') || has('win64') || has('win16') || has('win95')
+         \ ? ['cmd.exe', '/C']
+-        \ : ['/bin/sh', '-c']
++        \ : ['@TERMUX_PREFIX@/bin/sh', '-c']
+ endfunction
+ 
+ " For backward compatibility

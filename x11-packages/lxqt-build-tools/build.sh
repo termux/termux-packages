@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://lxqt.github.io
+TERMUX_PKG_DESCRIPTION="Building tools required by LXQt project"
+TERMUX_PKG_LICENSE="BSD 3-Clause"
+TERMUX_PKG_LICENSE_FILE="BSD-3-Clause"
+TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
+TERMUX_PKG_VERSION=0.10.0
+TERMUX_PKG_SRCURL="https://github.com/lxqt/lxqt-build-tools/releases/download/${TERMUX_PKG_VERSION}/lxqt-build-tools-${TERMUX_PKG_VERSION}.tar.xz"
+TERMUX_PKG_SHA256=facb86b0bf3bd4fd20306d3ae965a148ed59785eaf7d73169a82a97473d03bea
+TERMUX_PKG_DEPENDS="cmake, qt5-qtbase"
+TERMUX_PKG_PLATFORM_INDEPENDENT=true

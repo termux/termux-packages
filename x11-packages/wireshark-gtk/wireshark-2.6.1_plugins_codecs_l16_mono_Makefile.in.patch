@@ -1,0 +1,12 @@
+diff -uNr wireshark-2.6.1/plugins/codecs/l16_mono/Makefile.in wireshark-2.6.1.mod/plugins/codecs/l16_mono/Makefile.in
+--- wireshark-2.6.1/plugins/codecs/l16_mono/Makefile.in	2018-05-22 21:53:29.000000000 +0300
++++ wireshark-2.6.1.mod/plugins/codecs/l16_mono/Makefile.in	2018-06-26 21:21:28.648763042 +0300
+@@ -830,7 +830,7 @@
+ 	}
+ 
+ l16mono.la: $(l16mono_la_OBJECTS) $(l16mono_la_DEPENDENCIES) $(EXTRA_l16mono_la_DEPENDENCIES) 
+-	$(AM_V_CCLD)$(l16mono_la_LINK) -rpath $(codecs_plugindir) $(l16mono_la_OBJECTS) $(l16mono_la_LIBADD) $(LIBS)
++	$(AM_V_CCLD)$(l16mono_la_LINK) -rpath $(codecs_plugindir) $(l16mono_la_OBJECTS) $(l16mono_la_LIBADD) -L$(top_srcdir)/epan/.libs -L$(top_srcdir)/wsutil/.libs -L$(top_srcdir)/wiretap/.libs -L$(top_srcdir)/codecs/.libs -lwscodecs $(LIBS)
+ 
+ mostlyclean-compile:
+ 	-rm -f *.$(OBJEXT)

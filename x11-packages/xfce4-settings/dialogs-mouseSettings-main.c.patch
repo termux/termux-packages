@@ -1,0 +1,11 @@
+--- xfce4-settings-4.12.4/dialogs/mouse-settings/main.c	2018-06-19 07:18:13.000000000 +0530
++++ xfce4-settings/dialogs/mouse-settings/main.c	2019-01-30 12:51:13.820439696 +0530
+@@ -421,7 +421,7 @@
+ 
+     /* get the cursor paths */
+ #if XCURSOR_LIB_MAJOR == 1 && XCURSOR_LIB_MINOR < 1
+-    path = "~/.icons:/usr/share/icons:/usr/share/pixmaps:/usr/X11R6/lib/X11/icons";
++    path = "~/.icons:@TERMUX_PREFIX@/share/icons:@TERMUX_PREFIX@/share/pixmaps:@TERMUX_PREFIX@/X11R6/lib/X11/icons";
+ #else
+     path = XcursorLibraryPath ();
+ #endif

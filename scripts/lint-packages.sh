@@ -3,7 +3,6 @@
 set -e -u
 
 REPO_DIR=$(realpath "$(dirname "$0")/../")
-PACKAGES_DIR="$REPO_DIR/packages"
 
 check_package_license() {
 	local pkg_licenses=$1
@@ -454,7 +453,9 @@ linter_main() {
 }
 
 if [ $# -eq 0 ]; then
-	linter_main "$PACKAGES_DIR"/*/build.sh || exit 1
+	for repo_dir in $(jq --raw-output 'keys | .[]' < $REPO_DIR/repo.json); do
+		linter_main $repo_dir/*/build.sh
+	done || exit 1
 else
 	linter_main "$@" || exit 1
 fi

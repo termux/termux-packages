@@ -6,9 +6,13 @@ on:
     - master
     paths:
     - 'packages/**'
+    - 'root-packages/**'
+    - 'x11-packages/**'
   pull_request:
     paths:
     - 'packages/**'
+    - 'root-packages/**'
+    - 'x11-packages/**'
   workflow_dispatch:
     inputs:
       packages:
@@ -27,7 +31,7 @@ jobs:
       fail-fast: false
     steps:
     - name: Clone repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 1000
     - name: Gather build summary
@@ -73,58 +77,76 @@ jobs:
             docker build -t termux/package-builder:latest .
             cd ..
           fi
-          # Parse changed files and identify new packages and deleted packages.
-          # Create lists of those packages that will be passed to upload job for
-          # further processing.
-          while read -r file; do
-            if ! [[ $file == packages/* ]]; then
-              # This file does not belong to a package, so ignore it
-              continue
-            fi
-            if [[ $file =~ ^packages/([.a-z0-9+-]*)/([.a-z0-9+-]*).subpackage.sh$ ]]; then
-              # A subpackage was modified, check if it was deleted or just updated
-              pkg=${BASH_REMATCH[1]}
-              subpkg=${BASH_REMATCH[2]}
-              if [ ! -f "packages/${pkg}/${subpkg}.subpackage.sh" ]; then
-                echo "$subpkg" >> ./deleted_packages.txt
+
+          for repo_path in $(jq --raw-output 'keys | .[]' < repo.json); do
+            repo=$(jq --raw-output '.["'${repo_path}'"]' < repo.json)
+            # Parse changed files and identify new packages and deleted packages.
+            # Create lists of those packages that will be passed to upload job for
+            # further processing.
+            while read -r file; do
+              if ! [[ $file == ${repo_path}/* ]]; then
+                # This file does not belong to a package, so ignore it
+                continue
               fi
-            elif [[ $file =~ ^packages/([.a-z0-9+-]*)/.*$ ]]; then
-              # package, check if it was deleted or updated
-              pkg=${BASH_REMATCH[1]}
-              if [ ! -d "packages/${pkg}" ]; then
-                echo "$pkg" >> ./deleted_packages.txt
-              else
-                echo "$pkg" >> ./built_packages.txt
-                # If there are subpackages we want to create a list of those
-                # as well
-                for file in $(find "packages/${pkg}/" -maxdepth 1 -type f -name \*.subpackage.sh | sort); do
-                  echo "$(basename "${file%%.subpackage.sh}")" >> ./built_subpackages.txt
-                done
+              if [[ $file =~ ^${repo_path}/([.a-z0-9+-]*)/([.a-z0-9+-]*).subpackage.sh$ ]]; then
+                # A subpackage was modified, check if it was deleted or just updated
+                pkg=${BASH_REMATCH[1]}
+                subpkg=${BASH_REMATCH[2]}
+                if [ ! -f "${repo_path}/${pkg}/${subpkg}.subpackage.sh" ]; then
+                  echo "$subpkg" >> ./deleted_${repo}_packages.txt
+                fi
+              elif [[ $file =~ ^${repo_path}/([.a-z0-9+-]*)/.*$ ]]; then
+                # package, check if it was deleted or updated
+                pkg=${BASH_REMATCH[1]}
+                if [ -d "${repo_path}/${pkg}" ]; then
+                  echo "$pkg" >> ./built_${repo}_packages.txt
+                  # If there are subpackages we want to create a list of those
+                  # as well
+                  for file in $(find "${repo_path}/${pkg}/" -maxdepth 1 -type f -name \*.subpackage.sh | sort); do
+                    echo "$(basename "${file%%.subpackage.sh}")" >> ./built_${repo}_subpackages.txt
+                  done
+                else
+                  echo "$pkg" >> ./deleted_${repo}_packages
+                fi
               fi
-            fi
-          done<<<${CHANGED_FILES}
+            done<<<${CHANGED_FILES}
+          done
         else
           for pkg in ${{ github.event.inputs.packages }}; do
-            echo "$pkg" >> ./built_packages.txt
-            for subpkg in $(find "packages/${pkg}/" -maxdepth 1 -type f -name \*.subpackage.sh | sort); do
-              echo "$(basename "${subpkg%%.subpackage.sh}")" >> ./built_subpackages.txt
+            repo_paths=$(jq --raw-output 'keys | .[]' < repo.json)
+            found=false
+            for repo_path in $repo_paths; do
+              repo=$(jq --raw-output '.["'${repo_path}'"]' < repo.json)
+              if [ -d "${repo_path}/${pkg}" ]; then
+                found=true
+                echo "$pkg" >> ./built_${repo}_packages.txt
+                for subpkg in $(find "${repo_path}/${pkg}/" -maxdepth 1 -type f -name \*.subpackage.sh | sort); do
+                  echo "$(basename "${subpkg%%.subpackage.sh}")" >> ./built_${repo}_subpackages.txt
+                done
+              fi
             done
+            if [ "$found" != true ]; then
+              echo "Package '${pkg}' not found in any of the repo"
+              exit 1
+            fi
           done
         fi
 
-        # Fix so that lists do not contain duplicates
-        if [ -f ./built_packages.txt ]; then
-          uniq ./built_packages.txt > ./built_packages.txt.tmp
-          mv ./built_packages.txt.tmp ./built_packages.txt
-        fi
-        if [ -f ./built_subpackages.txt ]; then
-          uniq ./built_subpackages.txt > ./built_subpackages.txt.tmp
-          mv ./built_subpackages.txt.tmp ./built_subpackages.txt
-        fi
-        if [ -f ./deleted_packages.txt ]; then
-          uniq ./deleted_packages.txt > ./deleted_packages.txt.tmp
-          mv ./deleted_packages.txt.tmp ./deleted_packages.txt
-        fi
+        for repo in $(jq --raw-output '.[]' < repo.json); do
+          # Fix so that lists do not contain duplicates
+          if [ -f ./built_${repo}_packages.txt ]; then
+            uniq ./built_${repo}_packages.txt > ./built_${repo}_packages.txt.tmp
+            mv ./built_${repo}_packages.txt.tmp ./built_${repo}_packages.txt
+          fi
+          if [ -f ./built_${repo}_subpackages.txt ]; then
+            uniq ./built_${repo}_subpackages.txt > ./built_${repo}_subpackages.txt.tmp
+            mv ./built_${repo}_subpackages.txt.tmp ./built_${repo}_subpackages.txt
+          fi
+          if [ -f ./deleted_${repo}_packages.txt ]; then
+            uniq ./deleted_${repo}_packages.txt > ./deleted_${repo}_packages.txt.tmp
+            mv ./deleted_${repo}_packages.txt.tmp ./deleted_${repo}_packages.txt
+          fi
+        done
 
     - name: Free additional disk space (if necessary)
       run: |
@@ -136,32 +158,51 @@ jobs:
           sudo rm -rf /opt/hostedtoolcache /usr/local /usr/share/dotnet /usr/share/swift
         fi
 
-    - name: Build
+    - name: Lint packages
       run: |
-        if [ -f ./built_packages.txt ]; then
-          ./scripts/lint-packages.sh $(cat ./built_packages.txt | awk '{print "packages/"$1"/build.sh"}')
-          ./scripts/run-docker.sh ./build-package.sh -I -a ${{ matrix.target_arch }} $(cat ./built_packages.txt)
-        fi
+        declare -a package_recipes
+        for repo_path in $(jq --raw-output 'keys | .[]' < repo.json); do
+          repo=$(jq --raw-output '.["'${repo_path}'"]' < repo.json)
+          if [ -f ./built_${repo}_packages.txt ]; then
+            package_recipes="$package_recipes $(cat ./built_${repo}_packages.txt | repo_path=${repo_path} awk '{print ENVIRON["repo_path"]"/"$1"/build.sh"}')"
+          fi
+        done
+
+        ./scripts/lint-packages.sh $package_recipes
+
+    - name: Build packages
+      run: |
+        declare -a packages
+        for repo_path in $(jq --raw-output 'keys | .[]' < repo.json); do
+          repo=$(jq --raw-output '.["'${repo_path}'"]' < repo.json)
+
+          if [ -f ./built_${repo}_packages.txt ]; then
+            packages="$packages $(cat ./built_${repo}_packages.txt)"
+          fi
+        done
+
+        ./scripts/run-docker.sh ./build-package.sh -I -a ${{ matrix.target_arch }} $packages
 
     - name: Generate build artifacts
       if: always()
       run: |
-        mkdir -p debs
         test -d termux-packages/output && mv termux-packages/output/* ./output/
 
-        # Put package lists into directory with *.deb files so they will be transferred to
-        # upload job.
-        test -f ./built_packages.txt && mv ./built_packages.txt ./debs/
-        test -f ./built_subpackages.txt && cat ./built_subpackages.txt >> ./debs/built_packages.txt \
-          && rm ./built_subpackages.txt
-        test -f ./deleted_packages.txt && mv ./deleted_packages.txt ./debs/
+        for repo in $(jq --raw-output '.[]' < repo.json); do
+          # Put package lists into directory with *.deb files so they will be transferred to
+          # upload job.
+          test -f ./built_${repo}_packages.txt && mv ./built_${repo}_packages.txt ./debs/
+          test -f ./built_${repo}_subpackages.txt && cat ./built_${repo}_subpackages.txt >> ./debs/built_${repo}_packages.txt \
+            && rm ./built_${repo}_subpackages.txt
+          test -f ./deleted_${repo}_packages.txt && mv ./deleted_${repo}_packages.txt ./debs/
 
-        # Move only debs from built_packages into debs/ folder before
-        # creating an archive.
-        while read -r pkg; do
-          # Match both $pkg.deb and $pkg-static.deb.
-          find output \( -name "$pkg_*.deb" -o -name "$pkg-static_*.deb" \) -type f -print0 | xargs -0r mv -t debs/
-        done < <(cat ./debs/built_packages.txt)
+          # Move only debs from built_packages into debs/ folder before
+          # creating an archive.
+          while read -r pkg; do
+            # Match both $pkg.deb and $pkg-static.deb.
+            find output \( -name "$pkg_*.deb" -o -name "$pkg-static_*.deb" \) -type f -print0 | xargs -0r mv -t debs/
+          done < <(cat ./debs/built_${repo}_packages.txt)
+        done
 
         # Files containing certain symbols (e.g. ":") will cause failure in actions/upload-artifact.
         # Archiving *.deb files in a tarball to avoid issues with uploading.
@@ -172,9 +213,9 @@ jobs:
         find debs -type f -name "*.deb" -exec sha256sum "{}" \; | sort -k2
     - name: Store *.deb files
       if: always()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
-        name: termux-packages-${{ matrix.target_arch }}-${{ github.sha }}
+        name: debs-${{ matrix.target_arch }}-${{ github.sha }}
         path: ./artifacts
 
   upload:
@@ -183,14 +224,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Clone repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Get *.deb files
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         path: ./
     - name: Upload to packages.termux.org
       env:
-        REPOSITORY_NAME: termux-main
         REPOSITORY_DISTRIBUTION: stable
         REPOSITORY_URL: https://packages.termux.org/aptly-api
       run: |
@@ -200,41 +240,44 @@ jobs:
 
         source scripts/aptly_api.sh
 
-        for archive in termux-packages-*/*.tar; do
+        for archive in debs-*/debs-{aarch64,arm,i686,x86_64}-${{ github.sha }}.tar; do
           tar xf "$archive"
         done
 
-        # Upload file to temporary directory.
-        uploaded_files=false
-        shopt -s nullglob
-        for filename in $(cat debs/built_packages.txt | sed -E 's/(..*)/debs\/\1_\*.deb debs\/\1-static_\*.deb/g'); do
-          if ! aptly_upload_file "$filename"; then
-            exit 1
-          fi
+        for repo in $(jq --raw-output '.[]' < repo.json); do
+          export REPOSITORY_NAME=$repo
 
-          uploaded_files=true
+          # Upload file to temporary directory.
+          uploaded_files=false
+          shopt -s nullglob
+          for filename in $(cat debs/built_${repo}_packages.txt | sed -E 's/(..*)/debs\/\1_\*.deb debs\/\1-static_\*.deb/g'); do
+            if ! aptly_upload_file "$filename"; then
+              exit 1
+            fi
+
+            uploaded_files=true
+          done
+          shopt -u nullglob
+  
+          # Publishing repository changes.
+          if [ "$uploaded_files" = "true" ]; then
+            if ! aptly_add_to_repo; then
+              exit 1
+            fi
+
+            # Usually temporary directory is deleted automatically, but in certain cases it is left.
+            aptly_delete_dir
+
+            # Final part to make changes appear in web root.
+            if ! aptly_publish_repo; then
+              exit 1
+            fi
+          fi
         done
-        shopt -u nullglob
-
-        # Publishing repository changes.
-        if [ "$uploaded_files" = "true" ]; then
-          if ! aptly_add_to_repo; then
-            exit 1
-          fi
-
-          # Usually temporary directory is deleted automatically, but in certain cases it is left.
-          aptly_delete_dir
-
-          # Final part to make changes appear in web root.
-          if ! aptly_publish_repo; then
-            exit 1
-          fi
-        fi
     - name: Upload to grimler.se
       # Run even if upload to packages.termux.org failed:
       if: always()
       env:
-        REPOSITORY_NAME: termux-main
         REPOSITORY_DISTRIBUTION: stable
         REPOSITORY_URL: https://aptly-api.grimler.se
       run: |
@@ -243,30 +286,35 @@ jobs:
 
         source scripts/aptly_api.sh
 
-        # Upload file to temporary directory.
-        uploaded_files=false
-        shopt -s nullglob
-        for filename in $(cat debs/built_packages.txt | sed -E 's/(..*)/debs\/\1_\*.deb debs\/\1-static_\*.deb/g'); do
-          if ! aptly_upload_file "$filename"; then
-            exit 1
-          fi
 
-          uploaded_files=true
+        for repo in $(jq --raw-output '.[]' < repo.json); do
+          export REPOSITORY_NAME=$repo
+
+          # Upload file to temporary directory.
+          uploaded_files=false
+          shopt -s nullglob
+          for filename in $(cat debs/built_${repo}_packages.txt | sed -E 's/(..*)/debs\/\1_\*.deb debs\/\1-static_\*.deb/g'); do
+            if ! aptly_upload_file "$filename"; then
+              exit 1
+            fi
+
+            uploaded_files=true
+          done
+          shopt -u nullglob
+
+          # Publishing repository changes.
+          if [ "$uploaded_files" = "true" ]; then
+            if ! aptly_add_to_repo; then
+              exit 1
+            fi
+
+            # Usually temporary directory is deleted automatically, but in certain cases it is left.
+            aptly_delete_dir
+
+            # grimler.se mirror is signed manually, can't publish
+            # through CI
+            # if ! aptly_publish_repo; then
+            #   exit 1
+            # fi
+          fi
         done
-        shopt -u nullglob
-
-        # Publishing repository changes.
-        if [ "$uploaded_files" = "true" ]; then
-          if ! aptly_add_to_repo; then
-            exit 1
-          fi
-
-          # Usually temporary directory is deleted automatically, but in certain cases it is left.
-          aptly_delete_dir
-
-          # grimler.se mirror is signed manually, can't publish
-          # through CI
-          # if ! aptly_publish_repo; then
-          #   exit 1
-          # fi
-        fi

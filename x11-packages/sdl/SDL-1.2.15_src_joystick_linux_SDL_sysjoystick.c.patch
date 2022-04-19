@@ -1,0 +1,13 @@
+diff -uNr SDL-1.2.15/src/joystick/linux/SDL_sysjoystick.c SDL-1.2.15.mod/src/joystick/linux/SDL_sysjoystick.c
+--- SDL-1.2.15/src/joystick/linux/SDL_sysjoystick.c	2012-01-19 08:30:06.000000000 +0200
++++ SDL-1.2.15.mod/src/joystick/linux/SDL_sysjoystick.c	2018-10-26 23:20:45.208724512 +0300
+@@ -1106,6 +1106,9 @@
+ 				}
+ 				break;
+ 			    case EV_ABS:
++				if (code > ABS_MISC) {
++					break;
++				}
+ 				switch (code) {
+ 				    case ABS_HAT0X:
+ 				    case ABS_HAT0Y:

@@ -1,0 +1,11 @@
+--- a/gui/controls.cpp
++++ b/gui/controls.cpp
+@@ -691,7 +691,7 @@
+                           .arg(mProgramName)
+             + QString(" (%1);;").arg(mProgramName) + tr("All files", "This is part of filter for 'select program' dialog. 'All files (*)'") + " (*)";
+ 
+-    QString fileName = QFileDialog::getOpenFileName(this, tr("Select program file"), "/usr/bin/", flt);
++    QString fileName = QFileDialog::getOpenFileName(this, tr("Select program file"), "@TERMUX_PREFIX@/bin/", flt);
+     if (!fileName.isEmpty())
+         setText(fileName);
+ }

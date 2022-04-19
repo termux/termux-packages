@@ -1,0 +1,18 @@
+diff -uNr freeglut-3.2.1/src/fg_internal.h freeglut-3.2.1.mod/src/fg_internal.h
+--- freeglut-3.2.1/src/fg_internal.h	2019-09-25 13:08:07.000000000 +0300
++++ freeglut-3.2.1.mod/src/fg_internal.h	2019-12-22 01:43:56.649519813 +0200
+@@ -46,13 +46,10 @@
+     || ( defined(__CYGWIN__) && defined(X_DISPLAY_MISSING) )
+ #   define  TARGET_HOST_MS_WINDOWS 1
+ 
+-#elif defined (__ANDROID__)
+-#   define  TARGET_HOST_ANDROID  1
+-
+ #elif defined (__QNXNTO__) || defined (__PLAYBOOK__)
+ #   define  TARGET_HOST_BLACKBERRY  1
+ 
+-#elif defined(__posix__) || defined(__unix__) || defined(__linux__) || defined(__sun)
++#elif defined(__posix__) || defined(__unix__) || defined(__linux__) || defined(__sun) || defined(__ANDROID__)
+ #   if defined(FREEGLUT_WAYLAND)
+ #      define  TARGET_HOST_POSIX_WAYLAND  1
+ #   else

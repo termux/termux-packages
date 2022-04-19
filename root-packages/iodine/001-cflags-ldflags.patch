@@ -1,0 +1,14 @@
+diff -uNr iodine-0.7.0/src/Makefile iodine-0.7.0.mod/src/Makefile
+--- iodine-0.7.0/src/Makefile	2014-06-16 23:28:43.000000000 +0300
++++ iodine-0.7.0.mod/src/Makefile	2019-01-20 16:37:52.923519072 +0200
+@@ -8,8 +8,8 @@
+ ARCH = `uname -m`
+ 
+ LIBPATH = -L.
+-LDFLAGS +=  -lz `sh osflags $(TARGETOS) link` $(LIBPATH)
+-CFLAGS += -std=c99 -c -g -Wall -D$(OS) -pedantic `sh osflags $(TARGETOS) cflags`
++LDFLAGS +=  -lz -llog `sh osflags $(TARGETOS) link` $(LIBPATH)
++CFLAGS += -DANDROID -std=c99 -c -g -Wall -D$(OS) -pedantic `sh osflags $(TARGETOS) cflags` -I@TERMUX_PREFIX@/include
+ 
+ all: stateos $(CLIENT) $(SERVER)
+ 

@@ -1,0 +1,14 @@
+diff -uNr tigervnc-1.9.0/unix/tx/TXDialog.h tigervnc-1.9.0.mod/unix/tx/TXDialog.h
+--- tigervnc-1.9.0/unix/tx/TXDialog.h	2018-07-16 17:08:55.000000000 +0300
++++ tigervnc-1.9.0.mod/unix/tx/TXDialog.h	2018-09-12 11:14:21.779656681 +0300
+@@ -31,6 +31,10 @@
+ #include "TXWindow.h"
+ #include <errno.h>
+ 
++#ifdef __ANDROID__
++#include <sys/select.h>
++#endif
++
+ class TXDialog : public TXWindow, public TXDeleteWindowCallback {
+ public:
+   TXDialog(Display* dpy, int width, int height, const char* name,

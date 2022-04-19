@@ -1,0 +1,22 @@
+diff -uNr xarchiver-0.5.4.13/src/window.c xarchiver-0.5.4.13.mod/src/window.c
+--- xarchiver-0.5.4.13/src/window.c	2018-03-13 12:22:11.000000000 +0200
++++ xarchiver-0.5.4.13.mod/src/window.c	2018-06-23 22:35:26.471857582 +0300
+@@ -1534,12 +1534,12 @@
+ 				return;
+ 			archive_name_quoted = g_shell_quote(archive_name);
+ 
+-			if (g_file_test ( "/usr/lib/p7zip/7zCon.sfx",G_FILE_TEST_EXISTS))
+-				sfx_path = g_strdup("/usr/lib/p7zip/7zCon.sfx");
+-			else if (g_file_test ( "/usr/local/lib/p7zip/7zCon.sfx",G_FILE_TEST_EXISTS))
+-				sfx_path = g_strdup ("/usr/local/lib/p7zip/7zCon.sfx");
+-			else if (g_file_test ( "/usr/libexec/p7zip/7zCon.sfx",G_FILE_TEST_EXISTS))
+-				sfx_path = g_strdup ("/usr/libexec/p7zip/7zCon.sfx");
++			if (g_file_test ( "@TERMUX_PREFIX@/lib/p7zip/7zCon.sfx",G_FILE_TEST_EXISTS))
++				sfx_path = g_strdup("@TERMUX_PREFIX@/lib/p7zip/7zCon.sfx");
++			else if (g_file_test ( "@TERMUX_PREFIX@/local/lib/p7zip/7zCon.sfx",G_FILE_TEST_EXISTS))
++				sfx_path = g_strdup ("@TERMUX_PREFIX@/local/lib/p7zip/7zCon.sfx");
++			else if (g_file_test ( "@TERMUX_PREFIX@/libexec/p7zip/7zCon.sfx",G_FILE_TEST_EXISTS))
++				sfx_path = g_strdup ("@TERMUX_PREFIX@/libexec/p7zip/7zCon.sfx");
+ 			else
+ 			{
+ 				sfx_filter = gtk_file_filter_new ();

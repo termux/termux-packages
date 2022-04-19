@@ -1,0 +1,37 @@
+diff -uNr libfm-1.3.2/src/base/fm-file-info.c libfm-1.3.2.mod/src/base/fm-file-info.c
+--- libfm-1.3.2/src/base/fm-file-info.c	2021-02-02 13:59:25.000000000 +0000
++++ libfm-1.3.2.mod/src/base/fm-file-info.c	2021-02-09 20:25:02.577394206 +0000
+@@ -1394,8 +1394,7 @@
+                    which may be considered as a safe desktop entry path
+                    then check if that is a shortcut to a native file
+                    otherwise it is a link to a file under menu:// */
+-                if (!g_str_has_prefix(fi->target, "/usr/share/") &&
+-                    !g_str_has_prefix(fi->target, "/usr/local/share/"))
++                if (!g_str_has_prefix(fi->target, "@TERMUX_PREFIX@/share/"))
+                 {
+                     FmPath *target = fm_path_new_for_str(fi->target);
+                     gboolean is_native = fm_path_is_native(target);
+diff -uNr libfm-1.3.2/src/gtk/fm-app-chooser-dlg.c libfm-1.3.2.mod/src/gtk/fm-app-chooser-dlg.c
+--- libfm-1.3.2/src/gtk/fm-app-chooser-dlg.c	2018-04-16 19:11:33.000000000 +0000
++++ libfm-1.3.2.mod/src/gtk/fm-app-chooser-dlg.c	2021-02-09 20:24:24.057358675 +0000
+@@ -231,7 +231,7 @@
+     gtk_file_filter_add_custom(filter,
+         GTK_FILE_FILTER_FILENAME|GTK_FILE_FILTER_MIME_TYPE, exec_filter_func, NULL, NULL);
+     /* gtk_file_filter_set_name(filter, _("Executable files")); */
+-    file = fm_select_file(GTK_WINDOW(data->dlg), NULL, "/usr/bin", TRUE, FALSE, filter, NULL);
++    file = fm_select_file(GTK_WINDOW(data->dlg), NULL, "@TERMUX_PREFIX@/bin", TRUE, FALSE, filter, NULL);
+ 
+     if (file == NULL)
+         return;
+diff -uNr libfm-1.3.2/src/modules/gtk-fileprop-x-desktop.c libfm-1.3.2.mod/src/modules/gtk-fileprop-x-desktop.c
+--- libfm-1.3.2/src/modules/gtk-fileprop-x-desktop.c	2018-04-16 19:11:33.000000000 +0000
++++ libfm-1.3.2.mod/src/modules/gtk-fileprop-x-desktop.c	2021-02-09 20:24:15.160426586 +0000
+@@ -67,7 +67,7 @@
+                                           NULL, GTK_FILE_CHOOSER_ACTION_OPEN,
+                                           GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                                           GTK_STOCK_OPEN, GTK_RESPONSE_OK, NULL);
+-    gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(chooser), "/usr/bin");
++    gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(chooser), "@TERMUX_PREFIX@/bin");
+     filter = gtk_file_filter_new();
+     gtk_file_filter_set_name(GTK_FILE_FILTER(filter), _("Executable files") );
+     gtk_file_filter_add_custom(GTK_FILE_FILTER(filter), GTK_FILE_FILTER_FILENAME,

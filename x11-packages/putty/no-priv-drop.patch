@@ -1,0 +1,19 @@
+diff -uNr putty-0.73/unix/uxpty.c putty-0.73.mod/unix/uxpty.c
+--- putty-0.73/unix/uxpty.c	2019-09-22 12:14:52.000000000 +0300
++++ putty-0.73.mod/unix/uxpty.c	2020-09-23 19:29:25.338141793 +0300
+@@ -562,6 +562,7 @@
+ #endif
+     }
+ 
++#ifndef __ANDROID__
+     /* Drop privs. */
+     {
+ #ifndef HAVE_NO_SETRESUID
+@@ -587,6 +588,7 @@
+         }
+ #endif
+     }
++#endif
+ 
+ #endif /* NO_PTY_PRE_INIT */
+ 

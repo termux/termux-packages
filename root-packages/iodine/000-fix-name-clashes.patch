@@ -1,0 +1,97 @@
+diff -uNr iodine-0.7.0/src/android_dns.h iodine-0.7.0.mod/src/android_dns.h
+--- iodine-0.7.0/src/android_dns.h	2014-06-16 23:28:43.000000000 +0300
++++ iodine-0.7.0.mod/src/android_dns.h	2019-01-20 16:35:42.911541961 +0200
+@@ -2,7 +2,7 @@
+ #ifndef __FIX_ANDROID_H__
+ #define __FIX_ANDROID_H__
+ 
+-typedef struct {
++/*typedef struct {
+ 	unsigned id :16;
+ 	unsigned rd :1;
+ 	unsigned tc :1;
+@@ -18,7 +18,7 @@
+ 	unsigned ancount :16;
+ 	unsigned nscount :16;
+ 	unsigned arcount :16;
+-} HEADER;
++} HEADER;*/
+ 
+ #define NOERROR		0
+ #define FORMERR		1
+diff -uNr iodine-0.7.0/src/iodined.c iodine-0.7.0.mod/src/iodined.c
+--- iodine-0.7.0/src/iodined.c	2014-06-16 23:28:43.000000000 +0300
++++ iodine-0.7.0.mod/src/iodined.c	2019-01-20 16:37:23.255524447 +0200
+@@ -92,7 +92,7 @@
+ static int debug;
+ 
+ #if !defined(BSD) && !defined(__GLIBC__)
+-static char *__progname;
++static char *___progname;
+ #endif
+ 
+ static int read_dns(int, int, struct query *);
+@@ -2199,25 +2199,25 @@
+ 
+ static void
+ usage() {
+-	extern char *__progname;
++	extern char *___progname;
+ 
+ 	fprintf(stderr, "Usage: %s [-v] [-h] [-c] [-s] [-f] [-D] [-u user] "
+ 		"[-t chrootdir] [-d device] [-m mtu] [-z context] "
+ 		"[-l ip address to listen on] [-p port] [-n external ip] "
+ 		"[-b dnsport] [-P password] [-F pidfile] [-i max idle time] "
+-		"tunnel_ip[/netmask] topdomain\n", __progname);
++		"tunnel_ip[/netmask] topdomain\n", ___progname);
+ 	exit(2);
+ }
+ 
+ static void
+ help() {
+-	extern char *__progname;
++	extern char *___progname;
+ 
+ 	fprintf(stderr, "iodine IP over DNS tunneling server\n");
+ 	fprintf(stderr, "Usage: %s [-v] [-h] [-c] [-s] [-f] [-D] [-u user] "
+ 		"[-t chrootdir] [-d device] [-m mtu] [-z context] "
+ 		"[-l ip address to listen on] [-p port] [-n external ip] [-b dnsport] [-P password] "
+-		"[-F pidfile] tunnel_ip[/netmask] topdomain\n", __progname);
++		"[-F pidfile] tunnel_ip[/netmask] topdomain\n", ___progname);
+ 	fprintf(stderr, "  -v to print version info and exit\n");
+ 	fprintf(stderr, "  -h to print this help and exit\n");
+ 	fprintf(stderr, "  -c to disable check of client IP/port on each request\n");
+@@ -2255,7 +2255,7 @@
+ int
+ main(int argc, char **argv)
+ {
+-	extern char *__progname;
++	extern char *___progname;
+ 	char *listen_ip;
+ 	char *errormsg;
+ #ifndef WINDOWS32
+@@ -2324,11 +2324,11 @@
+ #endif
+ 
+ #if !defined(BSD) && !defined(__GLIBC__)
+-	__progname = strrchr(argv[0], '/');
+-	if (__progname == NULL)
+-		__progname = argv[0];
++	___progname = strrchr(argv[0], '/');
++	if (___progname == NULL)
++		___progname = argv[0];
+ 	else
+-		__progname++;
++		___progname++;
+ #endif
+ 
+ 	memset(password, 0, sizeof(password));
+@@ -2573,7 +2573,7 @@
+ 	tzsetwall();
+ #endif
+ #ifndef WINDOWS32
+-	openlog( __progname, LOG_NDELAY, LOG_DAEMON );
++	openlog( ___progname, LOG_NDELAY, LOG_DAEMON );
+ #endif
+ 
+ 	if (newroot != NULL)

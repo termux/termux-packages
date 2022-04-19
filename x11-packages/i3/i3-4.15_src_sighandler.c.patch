@@ -1,0 +1,12 @@
+diff -uNr i3-4.15/src/sighandler.c i3-4.15.mod/src/sighandler.c
+--- i3-4.15/src/sighandler.c	2018-03-10 19:29:14.000000000 +0200
++++ i3-4.15.mod/src/sighandler.c	2018-06-21 19:48:29.580253965 +0300
+@@ -56,7 +56,7 @@
+ static int sighandler_backtrace(void) {
+     char *tmpdir = getenv("TMPDIR");
+     if (tmpdir == NULL)
+-        tmpdir = "/tmp";
++        tmpdir = "@TERMUX_PREFIX@/tmp";
+ 
+     pid_t pid_parent = getpid();
+ 

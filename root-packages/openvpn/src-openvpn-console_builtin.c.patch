@@ -1,0 +1,50 @@
+diff -uNr openvpn-2.4.7/src/openvpn/console_builtin.c openvpn-2.4.7.mod/src/openvpn/console_builtin.c
+--- openvpn-2.4.7/src/openvpn/console_builtin.c	2019-02-20 14:28:20.000000000 +0200
++++ openvpn-2.4.7.mod/src/openvpn/console_builtin.c	2019-09-18 14:32:21.891795281 +0300
+@@ -40,6 +40,8 @@
+ #include "buffer.h"
+ #include "misc.h"
+ 
++#include <unistd.h>
++
+ #ifdef _WIN32
+ 
+ #include "win32.h"
+@@ -138,8 +140,6 @@
+ #endif   /* _WIN32 */
+ 
+ 
+-#ifdef HAVE_GETPASS
+-
+ /**
+  * Open the current console TTY for read/write operations
+  *
+@@ -177,7 +177,6 @@
+     }
+ }
+ 
+-#endif   /* HAVE_GETPASS */
+ 
+ 
+ /**
+@@ -199,10 +198,6 @@
+     ASSERT(capacity > 0);
+     input[0] = '\0';
+ 
+-#if defined(_WIN32)
+-    return get_console_input_win32(prompt, echo, input, capacity);
+-#elif defined(HAVE_GETPASS)
+-
+     /* did we --daemon'ize before asking for passwords?
+      * (in which case neither stdin or stderr are connected to a tty and
+      * /dev/tty can not be open()ed anymore)
+@@ -247,9 +242,6 @@
+             ret = true;
+         }
+     }
+-#else  /* if defined(_WIN32) */
+-    msg(M_FATAL, "Sorry, but I can't get console input on this OS (%s)", prompt);
+-#endif /* if defined(_WIN32) */
+     return ret;
+ }
+ 

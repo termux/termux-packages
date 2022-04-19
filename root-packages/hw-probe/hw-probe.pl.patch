@@ -1,0 +1,79 @@
+--- ./hw-probe.pl.orig	2020-01-15 12:58:41.000000000 +0100
++++ ./hw-probe.pl	2020-02-14 21:30:39.736517524 +0100
+@@ -193,7 +193,7 @@
+     }
+ }
+ 
+-my $PROBE_DIR = "/root/HW_PROBE";
++my $PROBE_DIR = "@TERMUX_HOME@/HW_PROBE";
+ 
+ if($Opt{"Snap"}) {
+     $PROBE_DIR = $ENV{"SNAP_USER_COMMON"}."/HW_PROBE";
+@@ -2624,11 +2624,11 @@
+         $Path = $Opt{"PnpIDs"};
+     }
+     else {
+-        $Path = "/usr/share/hwdata/pnp.ids"; # ROSA Fresh, RELS
++        $Path = "@TERMUX_PREFIX@/share/hwdata/pnp.ids"; # ROSA Fresh, RELS
+     }
+     
+     if(not -e $Path) {
+-        $Path = "/usr/share/misc/pnp.ids"; # ROSA Marathon
++        $Path = "@TERMUX_PREFIX@/share/misc/pnp.ids"; # ROSA Marathon
+     }
+     
+     if(not -e $Path) {
+@@ -2664,7 +2664,7 @@
+ 
+ sub readVendorIds()
+ {
+-    my $Path = "/usr/share/hwdata/pci.ids";
++    my $Path = "@TERMUX_PREFIX@/share/hwdata/pci.ids";
+     
+     if($Opt{"PciIDs"}) {
+         $Path = $Opt{"PciIDs"};
+@@ -6492,7 +6492,7 @@
+     else
+     {
+         listProbe("logs", "xorg.log");
+-        $XLog = readFile("/var/log/Xorg.0.log");
++        $XLog = readFile("@TERMUX_PREFIX@/var/log/Xorg.0.log");
+         
+         if(not $XLog)
+         {
+@@ -10394,7 +10394,7 @@
+     if(enabledLog("xorg.log.1"))
+     {
+         listProbe("logs", "xorg.log.1");
+-        my $XLog_Old = readFile("/var/log/Xorg.0.log.old");
++        my $XLog_Old = readFile("@TERMUX_PREFIX@/var/log/Xorg.0.log.old");
+         
+         if(not $XLog_Old)
+         {
+@@ -11233,7 +11233,7 @@
+         {
+             my $MAX_P_LEN = 1000;
+             
+-            my $ELog = "/var/log/cups/error_log";
++            my $ELog = "@TERMUX_PREFIX@/var/log/cups/error_log";
+             if(enabledLog("cups_error_log") and -e $ELog)
+             {
+                 listProbe("logs", "cups_error_log");
+@@ -11244,7 +11244,7 @@
+                 writeLog($LOG_DIR."/cups_error_log", $CupsError);
+             }
+             
+-            my $ALog = "/var/log/cups/access_log";
++            my $ALog = "@TERMUX_PREFIX@/var/log/cups/access_log";
+             if(enabledLog("cups_access_log") and -e $ALog)
+             {
+                 listProbe("logs", "cups_access_log");
+@@ -12246,7 +12246,7 @@
+ }
+ 
+ sub readSdioIds_Sys() {
+-    readSdioIds("/usr/share/hwdata/sdio.ids", \%SdioInfo, \%SdioVendor);
++    readSdioIds("@TERMUX_PREFIX@/share/hwdata/sdio.ids", \%SdioInfo, \%SdioVendor);
+ }
+ 
+ sub readSdioIds($$$)

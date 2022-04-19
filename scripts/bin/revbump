@@ -33,9 +33,18 @@ fi
 
 for package in "${@}"; do
 	package="${package%%/}"
-	buildsh_path="${REPO_ROOT}/packages/${package}/build.sh"
+	buildsh_path=
+	for repo in $(jq --raw-output 'keys | .[]' < ${REPO_ROOT}/repo.json); do
+		_buildsh_path="${REPO_ROOT}/${repo}/${package}/build.sh"
+		echo $_buildsh_path
 
-	if [ ! -f "${buildsh_path}" ]; then
+		if [ -f "${_buildsh_path}" ]; then
+			buildsh_path=$_buildsh_path
+			break
+		fi
+	done
+
+	if [ -z "$buildsh_path" ]; then
 		echo "${package}: skipping as no build.sh found"
 		continue
 	fi

@@ -1,0 +1,12 @@
+diff -uNr wireshark-2.6.1/plugins/epan/irda/Makefile.in wireshark-2.6.1.mod/plugins/epan/irda/Makefile.in
+--- wireshark-2.6.1/plugins/epan/irda/Makefile.in	2018-05-22 21:53:29.000000000 +0300
++++ wireshark-2.6.1.mod/plugins/epan/irda/Makefile.in	2018-06-26 18:53:17.444983265 +0300
+@@ -859,7 +859,7 @@
+ 	}
+ 
+ irda.la: $(irda_la_OBJECTS) $(irda_la_DEPENDENCIES) $(EXTRA_irda_la_DEPENDENCIES) 
+-	$(AM_V_CCLD)$(irda_la_LINK) -rpath $(epan_plugindir) $(irda_la_OBJECTS) $(irda_la_LIBADD) $(LIBS)
++	$(AM_V_CCLD)$(irda_la_LINK) -rpath $(epan_plugindir) $(irda_la_OBJECTS) $(irda_la_LIBADD) -L$(top_srcdir)/epan/.libs -L$(top_srcdir)/wsutil/.libs -L$(top_srcdir)/wiretap/.libs -lwireshark -lglib-2.0 $(LIBS)
+ 
+ mostlyclean-compile:
+ 	-rm -f *.$(OBJEXT)

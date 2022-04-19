@@ -1,0 +1,26 @@
+--- a/configure
++++ b/configure
+@@ -25729,23 +25729,6 @@
+ case "$host" in
+     *-*-linux*|*-*-uclinux*|*-*-gnu*|*-*-k*bsd*-gnu|*-*-bsdi*|*-*-freebsd*|*-*-dragonfly*|*-*-netbsd*|*-*-openbsd*|*-*-sysv5*|*-*-solaris*|*-*-hpux*|*-*-aix*|*-*-minix*|*-*-nto*)
+         case "$host" in
+-            *-*-android*)
+-                # Android
+-                ARCH=android
+-                ANDROID_CFLAGS="-DGL_GLEXT_PROTOTYPES"
+-                CFLAGS="$CFLAGS $ANDROID_CFLAGS"
+-                SDL_CFLAGS="$SDL_CFLAGS $ANDROID_CFLAGS"
+-                EXTRA_CFLAGS="$EXTRA_CFLAGS $ANDROID_CFLAGS"
+-                EXTRA_LDFLAGS="$EXTRA_LDFLAGS -ldl -lGLESv1_CM -lGLESv2 -llog -landroid"
+-                SDLMAIN_SOURCES="$srcdir/src/main/android/*.c"
+-                if test x$enable_video = xyes; then
+-                    SOURCES="$SOURCES $srcdir/src/core/android/*.c $srcdir/src/video/android/*.c"
+-
+-$as_echo "#define SDL_VIDEO_DRIVER_ANDROID 1" >>confdefs.h
+-
+-                    SUMMARY_video="${SUMMARY_video} android"
+-                fi
+-                ;;
+             *-*-linux*)         ARCH=linux ;;
+             *-*-uclinux*)       ARCH=linux ;;
+             *-*-kfreebsd*-gnu)  ARCH=kfreebsd-gnu ;;

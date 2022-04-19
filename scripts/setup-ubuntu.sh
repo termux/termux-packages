@@ -234,6 +234,9 @@ PACKAGES+=" llvm-12"
 # Required by cava
 PACKAGES+=" xxd"
 
+# Required for parsing repo.json
+PACKAGES+=" jq"
+
 # Do not require sudo if already running as root.
 if [ "$(id -u)" = "0" ]; then
 	SUDO=""

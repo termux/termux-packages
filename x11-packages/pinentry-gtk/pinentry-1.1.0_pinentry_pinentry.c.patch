@@ -1,0 +1,14 @@
+diff -uNr pinentry-1.1.0/pinentry/pinentry.c pinentry-1.1.0.mod/pinentry/pinentry.c
+--- pinentry-1.1.0/pinentry/pinentry.c	2017-12-03 18:13:15.000000000 +0200
++++ pinentry-1.1.0.mod/pinentry/pinentry.c	2018-10-05 23:01:15.445377981 +0300
+@@ -258,8 +258,10 @@
+     {
+       if (! lc_ctype_unknown_warning)
+ 	{
++#ifndef __ANDROID__
+ 	  fprintf (stderr, "%s: no LC_CTYPE known - assuming UTF-8\n",
+ 		   this_pgmname);
++#endif
+ 	  lc_ctype_unknown_warning = 1;
+ 	}
+       return strdup (text);

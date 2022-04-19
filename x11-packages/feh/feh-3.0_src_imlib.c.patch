@@ -1,0 +1,21 @@
+diff -uNr feh-3.0/src/imlib.c feh-3.0.mod/src/imlib.c
+--- feh-3.0/src/imlib.c	2018-11-09 18:17:58.000000000 +0200
++++ feh-3.0.mod/src/imlib.c	2018-11-23 23:30:25.020611522 +0200
+@@ -361,7 +361,7 @@
+ 	else
+ 		basename++;
+ 
+-	tmpname = feh_unique_filename("/tmp/", basename);
++	tmpname = feh_unique_filename("@TERMUX_PREFIX@/tmp/", basename);
+ 
+ 	if (strlen(tmpname) > (NAME_MAX-6))
+ 		tmpname[NAME_MAX-7] = '\0';
+@@ -559,7 +559,7 @@
+ 		else
+ 			path = "";
+ 	} else
+-		path = "/tmp/";
++		path = "@TERMUX_PREFIX@/tmp/";
+ 
+ 	curl = curl_easy_init();
+ 	if (!curl) {

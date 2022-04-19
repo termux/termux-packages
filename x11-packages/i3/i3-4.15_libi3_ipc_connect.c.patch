@@ -1,0 +1,12 @@
+diff -uNr i3-4.15/libi3/ipc_connect.c i3-4.15.mod/libi3/ipc_connect.c
+--- i3-4.15/libi3/ipc_connect.c	2018-03-10 19:29:14.000000000 +0200
++++ i3-4.15.mod/libi3/ipc_connect.c	2018-06-21 19:48:29.570253964 +0300
+@@ -38,7 +38,7 @@
+     }
+ 
+     if (path == NULL) {
+-        path = sstrdup("/tmp/i3-ipc.sock");
++        path = sstrdup("@TERMUX_PREFIX@/tmp/i3-ipc.sock");
+     }
+ 
+     int sockfd = socket(AF_LOCAL, SOCK_STREAM, 0);

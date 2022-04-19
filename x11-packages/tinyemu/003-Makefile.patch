@@ -1,0 +1,30 @@
+--- tinyemu-2019-12-21/Makefile	2019-12-22 00:23:54.000000000 +0700
++++ tinyemu-2019-12-21.mod/Makefile	2022-04-04 18:48:58.361000139 +0700
+@@ -44,13 +44,13 @@
+ CROSS_PREFIX=
+ EXE=
+ endif
+-CC=$(CROSS_PREFIX)gcc
+-STRIP=$(CROSS_PREFIX)strip
+-CFLAGS=-O2 -Wall -g -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -MMD
+-CFLAGS+=-D_GNU_SOURCE -DCONFIG_VERSION=\"$(shell cat VERSION)\"
+-LDFLAGS=
++CC?=$(CROSS_PREFIX)gcc
++STRIP?=$(CROSS_PREFIX)strip
++CFLAGS?=-O2
++CFLAGS+=-I@TERMUX_PREFIX@/include -Wall -g -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -MMD -DCONFIG_VERSION=\"$(cat VERSION)\"
++LDFLAGS?=
+ 
+-bindir=/usr/local/bin
++bindir=@TERMUX_PREFIX@/bin
+ INSTALL=install
+ 
+ PROGS+= temu$(EXE)
+@@ -72,7 +72,6 @@
+ 
+ ifndef CONFIG_WIN32
+ EMU_OBJS+=fs_disk.o
+-EMU_LIBS=-lrt
+ endif
+ ifdef CONFIG_FS_NET
+ CFLAGS+=-DCONFIG_FS_NET

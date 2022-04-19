@@ -1,0 +1,12 @@
+diff -uNr putty-0.73/unix/uxproxy.c putty-0.73.mod/unix/uxproxy.c
+--- putty-0.73/unix/uxproxy.c	2019-09-22 12:14:52.000000000 +0300
++++ putty-0.73.mod/unix/uxproxy.c	2019-10-28 15:01:54.259328879 +0200
+@@ -62,7 +62,7 @@
+             dup2(cmd_err_pipe[1], 2);
+             noncloexec(0);
+             noncloexec(1);
+-            execl("/bin/sh", "sh", "-c", cmd, (void *)NULL);
++            execl("@TERMUX_PREFIX@/bin/sh", "sh", "-c", cmd, (void *)NULL);
+             _exit(255);
+         }
+ 

@@ -1,0 +1,12 @@
+diff -uNr fluxbox-1.3.7/src/main.cc fluxbox-1.3.7.mod/src/main.cc
+--- fluxbox-1.3.7/src/main.cc	2015-02-08 12:44:45.377187009 +0200
++++ fluxbox-1.3.7.mod/src/main.cc	2018-06-19 20:52:20.791724555 +0300
+@@ -270,7 +270,7 @@
+         if (!restart_argument.empty()) {
+             const char *shell = getenv("SHELL");
+             if (!shell)
+-                shell = "/bin/sh";
++                shell = "@TERMUX_PREFIX@/bin/sh";
+ 
+             execlp(shell, shell, "-c", restart_argument.c_str(), (const char *) NULL);
+             perror(restart_argument.c_str());

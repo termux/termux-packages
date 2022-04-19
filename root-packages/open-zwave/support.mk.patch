@@ -1,0 +1,68 @@
+--- ../support.mk.orig	2020-04-17 15:25:18.603094464 +0200
++++ ./cpp/build/support.mk	2020-04-17 17:17:07.629191995 +0200
+@@ -79,7 +79,7 @@
+ ifneq ($(VERFILE),)
+ VERSION_REV := $(shell sed -n 's/uint16_t ozw_vers_revision = \(.*\);$$/\1/p' $(VERFILE))
+ else
+-$(warning Missing Either Git Binary, Not a Source Checkout or doesn't have a vers.cpp)
++$(warning Missing Either Git Binary, Not a Source Checkout or does not have a vers.cpp)
+ endif
+ endif
+ endif
+@@ -91,38 +91,11 @@
+ VERSION := $(VERSION_MAJ).$(VERSION_MIN)
+ 
+ 
+-# using seting from bitbake
+-ifeq ($(BITBAKE_ENV),1)
+ CC     := $(CC)
+ CXX    := $(CXX)
+ LD     := $(CXX)
+ AR     := $(AR)
+ RANLIB := $(RANLIB)
+-else
+-
+-# support Cross Compiling options
+-ifeq ($(UNAME),FreeBSD)
+-# Actually hide behind c++ which works for both clang based 10.0 and earlier(?)
+-CC     := $(CROSS_COMPILE)cc
+-CXX    := $(CROSS_COMPILE)c++
+-LD     := $(CROSS_COMPILE)c++
+-else
+-CC     := $(CROSS_COMPILE)gcc
+-CXX    := $(CROSS_COMPILE)g++
+-LD     := $(CROSS_COMPILE)g++
+-endif
+-ifeq ($(UNAME),Darwin)
+-AR     := libtool -static -o 
+-RANLIB := ranlib
+-CC     := clang
+-CXX    := clang++
+-LD     := clang++
+-else
+-AR     := $(CROSS_COMPILE)ar rc
+-RANLIB := $(CROSS_COMPILE)ranlib
+-endif
+-
+-endif
+ SED    := sed
+ 
+ 
+@@ -142,7 +115,7 @@
+ ifeq ($(wildcard /lib64),)
+ instlibdir.x86_64 = /lib/
+ else
+-instlibdir.x86_64 = /lib64/
++instlibdir.x86_64 = /lib/
+ endif
+ instlibdir.default   = /lib/
+ 
+@@ -153,7 +126,7 @@
+ instlibdir ?= $(PREFIX)$(instlibdir.default)
+ endif
+ 
+-#pkg-config doesn't exist, lets try to guess best place to put the pc file
++#pkg-config does not exist, lets try to guess best place to put the pc file
+ ifeq ($(PKGCONFIG),)
+ pkgconfigdir ?= $(shell if [ -d "/usr/lib64/pkgconfig" ]; then echo "/usr/lib64/pkgconfig"; else echo "/usr/lib/pkgconfig"; fi)
+ else

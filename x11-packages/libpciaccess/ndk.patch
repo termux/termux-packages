@@ -1,0 +1,39 @@
+diff -uNr libpciaccess-0.16/src/linux_sysfs.c libpciaccess-0.16.mod/src/linux_sysfs.c
+--- libpciaccess-0.16/src/linux_sysfs.c	2019-07-17 19:25:27.000000000 +0300
++++ libpciaccess-0.16.mod/src/linux_sysfs.c	2019-07-23 01:36:18.607882465 +0300
+@@ -50,7 +50,7 @@
+ #include <dirent.h>
+ #include <errno.h>
+ 
+-#if defined(__i386__) || defined(__x86_64__)
++#if (defined(__i386__) || defined(__x86_64__)) && !defined(__ANDROID__)
+ #include <sys/io.h>
+ #else
+ #define inb(x) -1
+@@ -462,7 +462,7 @@
+ 
+ 
+     while ( temp_size > 0 ) {
+-	const ssize_t bytes = pread64( fd, data_bytes, temp_size, offset );
++	const ssize_t bytes = pread( fd, data_bytes, temp_size, offset );
+ 
+ 	/* If zero bytes were read, then we assume it's the end of the
+ 	 * config file.
+@@ -522,7 +522,7 @@
+ 
+ 
+     while ( temp_size > 0 ) {
+-	const ssize_t bytes = pwrite64( fd, data_bytes, temp_size, offset );
++	const ssize_t bytes = pwrite( fd, data_bytes, temp_size, offset );
+ 
+ 	/* If zero bytes were written, then we assume it's the end of the
+ 	 * config file.
+@@ -890,7 +890,7 @@
+     } else {
+ 	ret = inl(port + handle->base);
+     }
+-	
++
+     return ret;
+ }
+ 

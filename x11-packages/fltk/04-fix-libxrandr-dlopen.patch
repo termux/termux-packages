@@ -1,0 +1,28 @@
+diff -uNr fltk-1.3.5/src/Fl_x.cxx fltk-1.3.5.mod/src/Fl_x.cxx
+--- fltk-1.3.5/src/Fl_x.cxx	2019-03-03 10:40:23.000000000 +0200
++++ fltk-1.3.5.mod/src/Fl_x.cxx	2019-05-19 17:30:59.885700620 +0300
+@@ -758,8 +758,8 @@
+ #endif
+ 
+ #if USE_XRANDR
+-  void *libxrandr_addr = dlopen("libXrandr.so.2", RTLD_LAZY);
+-  if (!libxrandr_addr)  libxrandr_addr = dlopen("libXrandr.so", RTLD_LAZY);
++  void *libxrandr_addr = dlopen("libXrandr.so", RTLD_LAZY);
++
+   if (libxrandr_addr) {
+     int error_base;
+     typedef Bool (*XRRQueryExtension_type)(Display*, int*, int*);
+diff -uNr fltk-1.3.5/src/screen_xywh.cxx fltk-1.3.5.mod/src/screen_xywh.cxx
+--- fltk-1.3.5/src/screen_xywh.cxx	2019-03-03 10:40:23.000000000 +0200
++++ fltk-1.3.5.mod/src/screen_xywh.cxx	2019-05-19 17:30:32.556510789 +0300
+@@ -176,8 +176,8 @@
+ 
+   static XRRSizes_type XRRSizes_f = NULL;
+   if (!XRRSizes_f) {
+-    void *libxrandr_addr = dlopen("libXrandr.so.2", RTLD_LAZY);
+-    if (!libxrandr_addr) libxrandr_addr = dlopen("libXrandr.so", RTLD_LAZY);
++    void *libxrandr_addr = dlopen("libXrandr.so", RTLD_LAZY);
++
+ #   ifdef __APPLE_CC__ // allows testing on Darwin + X11
+     if (!libxrandr_addr) libxrandr_addr = dlopen("/opt/X11/lib/libXrandr.dylib", RTLD_LAZY);
+ #   endif

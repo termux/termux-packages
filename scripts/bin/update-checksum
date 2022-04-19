@@ -34,8 +34,18 @@ if git status >/dev/null 2>&1; then
 fi
 
 for package in "${@}"; do
-	package="${package%%/}"
-	buildsh_path="${REPO_ROOT}/packages/${package}/build.sh"
+	buildsh_path=
+	if [ -d "${package}" ] && [ -f "${package}/build.sh" ]; then
+		buildsh_path="${package}/build.sh"
+		package=$(basename ${package})
+	else
+		for repo_path in $(jq --raw-output 'keys | . []' < $REPO_ROOT/repo.json); do
+			if [ -d "${repo_path}/${package}" ] && [ -f "${repo_path}/${package}/build.sh" ]; then
+				buildsh_path="${repo_path}/${package}/build.sh"
+				package=$(basename ${package})
+			fi
+		done
+	fi
 
 	if [ ! -f "${buildsh_path}" ]; then
 		echo "${package}: skipping as no build.sh found"

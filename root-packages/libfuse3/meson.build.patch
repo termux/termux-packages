@@ -1,0 +1,47 @@
+diff -uNr libfuse-fuse-3.9.1/lib/meson.build libfuse-fuse-3.9.1.mod/lib/meson.build
+--- libfuse-fuse-3.9.1/lib/meson.build	2020-03-19 22:00:41.000000000 +0200
++++ libfuse-fuse-3.9.1.mod/lib/meson.build	2020-08-11 20:32:33.806112774 +0300
+@@ -4,11 +4,7 @@
+                    'helper.c', 'modules/subdir.c', 'mount_util.c',
+                    'fuse_log.c' ]
+ 
+-if host_machine.system().startswith('linux')
+-   libfuse_sources += [ 'mount.c' ]
+-else
+-   libfuse_sources += [ 'mount_bsd.c' ]
+-endif
++libfuse_sources += [ 'mount.c' ]
+ 
+ deps = [ thread_dep ]
+ if cfg.get('HAVE_ICONV')
+@@ -27,9 +23,6 @@
+ if host_machine.system().startswith('netbsd')
+    deps += [ cc.find_library('perfuse'),
+              cc.find_library('puffs') ]
+-else
+-   # Required for clock_gettime before glibc 2.17
+-   deps += cc.find_library('rt')
+ endif
+ 
+ fusermount_path = join_paths(get_option('prefix'), get_option('bindir'))
+@@ -43,7 +36,7 @@
+                               + '/fuse_versionscript' ])
+ 
+ pkg = import('pkgconfig')
+-pkg.generate(libraries: [ libfuse, '-lpthread' ],
++pkg.generate(libraries: [ libfuse, '-lc' ],
+              libraries_private: '-ldl',
+              version: meson.project_version(),
+              name: 'fuse3',
+diff -uNr libfuse-fuse-3.9.1/meson.build libfuse-fuse-3.9.1.mod/meson.build
+--- libfuse-fuse-3.9.1/meson.build	2020-03-19 22:00:41.000000000 +0200
++++ libfuse-fuse-3.9.1.mod/meson.build	2020-08-11 20:32:23.502040209 +0300
+@@ -96,7 +96,7 @@
+ #
+ # Read build files from sub-directories
+ #
+-subdirs = [ 'lib', 'include', 'test' ]
++subdirs = [ 'lib', 'include' ]
+ if get_option('utils') and not platform.endswith('bsd') and platform != 'dragonfly'
+   subdirs += [ 'util', 'doc' ]
+ endif

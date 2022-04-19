@@ -1,0 +1,23 @@
+#!@TERMUX_PREFIX@/bin/sh
+
+GLOBALAUTOSTART="@TERMUX_PREFIX@/etc/xdg/openbox/autostart"
+AUTOSTART="${XDG_CONFIG_HOME:-"$HOME/.config"}/openbox/autostart"
+
+# Run the global openbox autostart script
+if test -f $GLOBALAUTOSTART; then
+    sh $GLOBALAUTOSTART
+elif test -f $GLOBALAUTOSTART.sh; then
+    sh $GLOBALAUTOSTART.sh
+fi
+
+# Run the user openbox autostart script
+if test -f $AUTOSTART; then
+    sh $AUTOSTART
+elif test -f $AUTOSTART.sh; then
+    sh $AUTOSTART.sh
+fi
+
+# Run the XDG autostart stuff.  These are found in /etc/xdg/autostart and
+# in $HOME/.config/autostart.  This requires PyXDG to be installed.
+# See openbox-xdg-autostart --help for more details.
+@TERMUX_PREFIX@/libexec/openbox-xdg-autostart "$@"

@@ -1,0 +1,73 @@
+diff -uNr freeglut-3.2.1/CMakeLists.txt freeglut-3.2.1.mod/CMakeLists.txt
+--- freeglut-3.2.1/CMakeLists.txt	2019-09-25 23:43:34.000000000 +0300
++++ freeglut-3.2.1.mod/CMakeLists.txt	2019-12-22 01:41:57.186531157 +0200
+@@ -145,7 +145,7 @@
+         )
+     ENDIF()
+ 
+-ELSEIF(ANDROID OR BLACKBERRY)
++ELSEIF(BLACKBERRY)
+     # BlackBerry and Android share some similar design concepts and ideas, as with many mobile devices.
+     # As such, some classes can be shared between the two. XXX: Possibly rename shareable classes to
+     # a more generic name. *_stub? *_mobile?
+@@ -303,14 +303,14 @@
+ 
+ IF(CMAKE_COMPILER_IS_GNUCC)
+   SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
+-  IF(NOT(ANDROID OR BLACKBERRY OR FREEGLUT_WAYLAND))
++  IF(NOT(BLACKBERRY OR FREEGLUT_WAYLAND))
+     # not setting -ansi as EGL/KHR headers doesn't support it
+     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic")
+   ENDIF()
+ ENDIF(CMAKE_COMPILER_IS_GNUCC)
+ 
+ INCLUDE(CheckIncludeFiles)
+-IF(UNIX AND NOT(ANDROID OR BLACKBERRY OR FREEGLUT_WAYLAND))
++IF(UNIX AND NOT(BLACKBERRY OR FREEGLUT_WAYLAND))
+     FIND_PACKAGE(X11 REQUIRED)
+     INCLUDE_DIRECTORIES(${X11_X11_INCLUDE_PATH})
+     LIST(APPEND LIBS ${X11_X11_LIB})
+@@ -330,11 +330,7 @@
+         MESSAGE(FATAL_ERROR "Missing X11's XInput.h (X11/extensions/XInput.h)")
+     ENDIF()
+ ENDIF()
+-IF(ANDROID)
+-    # -landroid for ANativeWindow
+-    # -llog for native Android logging
+-    LIST(APPEND LIBS android log)
+-ELSEIF(BLACKBERRY)
++IF(BLACKBERRY)
+     # -lbps for event loop
+     # -screen for native screen
+     LIST(APPEND LIBS bps screen)
+@@ -455,19 +451,6 @@
+     IF(FREEGLUT_BUILD_STATIC_LIBS)
+       SET_TARGET_PROPERTIES(freeglut_static PROPERTIES OUTPUT_NAME ${LIBNAME})
+     ENDIF()
+-    IF(ANDROID)
+-        # Not in CMake toolchain file, because the toolchain
+-        # file is called several times and generally doesn't
+-        # seem to be meant for modifying CFLAGS:
+-        # '-mandroid' is not mandatory but doesn't hurt
+-        # '-O0 -gstabs+' helps the currently buggy GDB port
+-        # Too late to manipulate ENV: SET(ENV{CFLAGS} "$ENV{CFLAGS} -mandroid")
+-        # Not using _INIT variables, they seem to be used internally only
+-        IF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+-            SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mandroid")
+-        ENDIF()
+-        SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0 -gstabs+")
+-    ENDIF()
+ ENDIF()
+ IF(FREEGLUT_BUILD_SHARED_LIBS)
+     TARGET_LINK_LIBRARIES(freeglut ${LIBS})
+@@ -571,9 +554,7 @@
+ IF(WIN32)
+   SET(PC_LIBS_PRIVATE "-lopengl32 -lwinmm -lgdi32 -lm")
+ ELSEIF(FREEGLUT_GLES)
+-  IF(ANDROID)
+-    SET(PC_LIBS_PRIVATE "-llog -landroid -lGLESv2 -lGLESv1_CM -lEGL -lm")
+-  ELSEIF(BLACKBERRY)
++  IF(BLACKBERRY)
+     IF(PLAYBOOK)
+       SET(PC_LIBS_PRIVATE "-lbps -lscreen -lGLESv2 -lGLESv1_CM -lEGL -lm")
+     ELSE()

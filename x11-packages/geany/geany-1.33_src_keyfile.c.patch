@@ -1,0 +1,30 @@
+diff -uNr geany-1.33/src/keyfile.c geany-1.33.mod/src/keyfile.c
+--- geany-1.33/src/keyfile.c	2018-02-25 15:02:21.000000000 +0200
++++ geany-1.33.mod/src/keyfile.c	2018-06-23 23:56:38.088775072 +0300
+@@ -79,7 +79,7 @@
+ #elif defined(__APPLE__)
+ #define GEANY_DEFAULT_TOOLS_TERMINAL	"open -a terminal %c"
+ #else
+-#define GEANY_DEFAULT_TOOLS_TERMINAL	"xterm -e \"/bin/sh %c\""
++#define GEANY_DEFAULT_TOOLS_TERMINAL	"aterm -e @TERMUX_PREFIX@/bin/sh %c"
+ #endif
+ #ifdef __APPLE__
+ #define GEANY_DEFAULT_TOOLS_BROWSER		"open -a safari"
+@@ -866,7 +866,7 @@
+ 	{
+ 		StashGroup *group;
+ 		struct passwd *pw = getpwuid(getuid());
+-		const gchar *shell = (pw != NULL) ? pw->pw_shell : "/bin/sh";
++		const gchar *shell = (pw != NULL) ? pw->pw_shell : "@TERMUX_PREFIX@/bin/sh";
+ 
+ #ifdef __APPLE__
+ 		/* Geany is started using launchd on OS X and we don't get any environment variables
+@@ -938,7 +938,7 @@
+ 			else
+ 				cmd = g_strconcat(cmd, " %c", NULL);
+ #else
+-			cmd = g_strconcat(cmd, " -e \"/bin/sh %c\"", NULL);
++			cmd = g_strconcat(cmd, " -e @TERMUX_PREFIX@/bin/sh %c", NULL);
+ #endif
+ 			g_free(tmp_string);
+ 		}

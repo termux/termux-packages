@@ -1,0 +1,172 @@
+diff -uNr xrdp-0.9.16/sesman/sesman.ini xrdp-0.9.16.mod/sesman/sesman.ini
+--- xrdp-0.9.16/sesman/sesman.ini	2021-04-30 12:26:36.000000000 +0000
++++ xrdp-0.9.16.mod/sesman/sesman.ini	2021-05-05 22:52:27.069387793 +0000
+@@ -4,11 +4,14 @@
+ ListenAddress=127.0.0.1
+ ListenPort=3350
+ EnableUserWindowManager=true
++
+ ; Give in relative path to user's home directory
+ UserWindowManager=startwm.sh
+-; Give in full path or relative path to /etc/xrdp
++
++; Give in full path or relative path to @TERMUX_PREFIX@/etc/xrdp
+ DefaultWindowManager=startwm.sh
+-; Give in full path or relative path to /etc/xrdp
++
++; Give in full path or relative path to @TERMUX_PREFIX@/etc/xrdp
+ ReconnectScript=reconnectwm.sh
+ 
+ [Security]
+@@ -16,6 +19,7 @@
+ MaxLoginRetry=4
+ TerminalServerUsers=tsusers
+ TerminalServerAdmins=tsadmins
++
+ ; When AlwaysGroupCheck=false access will be permitted
+ ; if the group TerminalServerUsers is not defined.
+ AlwaysGroupCheck=false
+@@ -67,7 +71,7 @@
+ ; Note: Log levels can be any of: core, error, warning, info, debug, or trace
+ LogFile=xrdp-sesman.log
+ LogLevel=INFO
+-EnableSyslog=true
++EnableSyslog=false
+ #SyslogLevel=INFO
+ #EnableConsole=false
+ #ConsoleLevel=INFO
+@@ -144,4 +148,4 @@
+ #main()=INFO
+ 
+ [SessionVariables]
+-PULSE_SCRIPT=/etc/xrdp/pulse/default.pa
++PULSE_SCRIPT=@TERMUX_PREFIX@/etc/xrdp/pulse/default.pa
+diff -uNr xrdp-0.9.16/sesman/startwm.sh xrdp-0.9.16.mod/sesman/startwm.sh
+--- xrdp-0.9.16/sesman/startwm.sh	2020-12-28 14:03:43.000000000 +0000
++++ xrdp-0.9.16.mod/sesman/startwm.sh	2021-05-05 22:52:27.069387793 +0000
+@@ -25,8 +25,8 @@
+ # END IF
+ pre_start()
+ {
+-  if [ -r /etc/profile ]; then
+-    . /etc/profile
++  if [ -r @TERMUX_PREFIX@/etc/profile ]; then
++    . @TERMUX_PREFIX@/etc/profile
+   fi
+   if [ -r ~/.bash_profile ]; then
+     . ~/.bash_profile
+@@ -58,6 +58,7 @@
+ #start the window manager
+ wm_start()
+ {
++  if ! [ -d "@TERMUX_PREFIX@" ]; then # !Termux
+   if [ -r /etc/default/locale ]; then
+     . /etc/default/locale
+     export LANG LANGUAGE
+@@ -89,26 +90,13 @@
+     . /usr/etc/X11/xdm/Xsession
+     exit 0
+   fi
++  fi # end !Termux
+ 
+   pre_start
+   xterm
+   post_start
+ }
+ 
+-#. /etc/environment
+-#export PATH=$PATH
+-#export LANG=$LANG
+-
+-# change PATH to be what your environment needs usually what is in
+-# /etc/environment
+-#PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games"
+-#export PATH=$PATH
+-
+-# for PATH and LANG from /etc/environment
+-# pam will auto process the environment file if /etc/pam.d/xrdp-sesman
+-# includes
+-# auth       required     pam_env.so readenv=1
+-
+ wm_start
+ 
+ exit 1
+diff -uNr xrdp-0.9.16/xrdp/xrdp.ini xrdp-0.9.16.mod/xrdp/xrdp.ini
+--- xrdp-0.9.16/xrdp/xrdp.ini	2021-04-30 12:26:36.000000000 +0000
++++ xrdp-0.9.16.mod/xrdp/xrdp.ini	2021-05-05 22:54:03.485386615 +0000
+@@ -153,7 +153,7 @@
+ ; Note: Log levels can be any of: core, error, warning, info, debug, or trace
+ LogFile=xrdp.log
+ LogLevel=INFO
+-EnableSyslog=true
++EnableSyslog=false
+ #SyslogLevel=INFO
+ #EnableConsole=false
+ #ConsoleLevel=INFO
+@@ -180,29 +180,17 @@
+ tcutils=true
+ 
+ ; for debugging xrdp, in section xrdp1, change port=-1 to this:
+-#port=/tmp/.xrdp/xrdp_display_10
++#port=@TERMUX_PREFIX@/tmp/.xrdp/xrdp_display_10
+ 
+ 
+ ;
+ ; Session types
+ ;
+ 
+-; Some session types such as Xorg, X11rdp and Xvnc start a display server.
+-; Startup command-line parameters for the display server are configured
+-; in sesman.ini. See and configure also sesman.ini.
+-[Xorg]
+-name=Xorg
+-lib=libxup.so
+-username=ask
+-password=ask
+-ip=127.0.0.1
+-port=-1
+-code=20
+-
+ [Xvnc]
+ name=Xvnc
+ lib=libvnc.so
+-username=ask
++username=na
+ password=ask
+ ip=127.0.0.1
+ port=-1
+@@ -215,34 +203,3 @@
+ ; (e.g. as part of an x11vnc console session). Replace '0' with the
+ ; display number of the session
+ #chansrvport=DISPLAY(0)
+-
+-[vnc-any]
+-name=vnc-any
+-lib=libvnc.so
+-ip=ask
+-port=ask5900
+-username=na
+-password=ask
+-#pamusername=asksame
+-#pampassword=asksame
+-#pamsessionmng=127.0.0.1
+-#delay_ms=2000
+-
+-[neutrinordp-any]
+-name=neutrinordp-any
+-lib=libxrdpneutrinordp.so
+-ip=ask
+-port=ask3389
+-username=ask
+-password=ask
+-; Currently NeutrinoRDP doesn't support dynamic resizing. Uncomment
+-; this line if you're using a client which does.
+-#enable_dynamic_resizing=false
+-
+-; You can override the common channel settings for each session type
+-#channel.rdpdr=true
+-#channel.rdpsnd=true
+-#channel.drdynvc=true
+-#channel.cliprdr=true
+-#channel.rail=true
+-#channel.xrdpvr=true

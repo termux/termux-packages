@@ -1,0 +1,19 @@
+--- a/lib/fuse_i.h
++++ b/lib/fuse_i.h
+@@ -8,6 +8,7 @@
+ 
+ #include "fuse.h"
+ #include "fuse_lowlevel.h"
++#include <stdatomic.h>
+ 
+ struct mount_opts;
+ 
+@@ -64,6 +65,8 @@ struct fuse_session {
+ 	struct fuse_notify_req notify_list;
+ 	size_t bufsize;
+ 	int error;
++	atomic_flag cancel;
++	int *retval;
+ };
+ 
+ struct fuse_chan {

@@ -1,0 +1,12 @@
+--- a/src/userinfo.c	2021-02-15 04:35:51.000000000 +0100
++++ b/src/userinfo.c	2021-12-18 10:33:46.323685173 +0100
+@@ -100,6 +100,9 @@
+ 
+ static int rebuild_uid_cache()
+ {
++    /* Not supported on Android. */
++    return 0;
++
+     /* We're holding the lock, so we have mutual exclusion on getpwent and getgrent too. */
+     struct passwd *pw;
+     struct uid_cache_entry *ent;

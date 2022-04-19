@@ -1,0 +1,26 @@
+diff --git a/caplets/env.go b/caplets/env.go
+index 9ba8706..fd12078 100644
+--- a/caplets/env.go
++++ b/caplets/env.go
+@@ -19,7 +19,7 @@ func getDefaultInstallBase() string {
+ 	if runtime.GOOS == "windows" {
+ 		return filepath.Join(os.Getenv("ALLUSERSPROFILE"), "bettercap")
+ 	}
+-	return "/usr/local/share/bettercap/"
++	return "@TERMUX_PREFIX@/share/bettercap/"
+ }
+ 
+ func getUserHomeDir() string {
+diff --git a/modules/ui/ui.go b/modules/ui/ui.go
+index 7bc5270..9a5476a 100644
+--- a/modules/ui/ui.go
++++ b/modules/ui/ui.go
+@@ -34,7 +34,7 @@ func getDefaultInstallBase() string {
+ 	if runtime.GOOS == "windows" {
+ 		return filepath.Join(os.Getenv("ALLUSERSPROFILE"), "bettercap")
+ 	}
+-	return "/usr/local/share/bettercap/"
++	return "@TERMUX_PREFIX@/share/bettercap/"
+ }
+ 
+ func NewUIModule(s *session.Session) *UIModule {
