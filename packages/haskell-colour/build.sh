@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE="https://www.haskell.org/haskellwiki/Colour"
+TERMUX_PKG_DESCRIPTION="A model for human colour/color perception"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="2.3.6"
+TERMUX_PKG_SRCURL="https://hackage.haskell.org/package/colour-${TERMUX_PKG_VERSION}/colour-${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256="2cd35dcd6944a5abc9f108a5eb5ee564b6b1fa98a9ec79cefcc20b588991f871"
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_DEPENDS="ghc-libs"

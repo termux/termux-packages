@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE="http://www.cs.uu.nl/wiki/GenericProgramming/SYB"
+TERMUX_PKG_DESCRIPTION="Scrap Your Boilerplate"
+TERMUX_PKG_LICENSE="BSD 3-Clause"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="0.7.2.1"
+TERMUX_PKG_SRCURL="https://hackage.haskell.org/package/syb-${TERMUX_PKG_VERSION}/syb-${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256="1807c66f77e66786739387f0ae9f16d150d1cfa9d626afcb729f0e9b442a8d96"
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_DEPENDS="ghc-libs"

@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE="https://github.com/acfoltzer/gitrev"
+TERMUX_PKG_DESCRIPTION="Compile git revision info into Haskell projects"
+TERMUX_PKG_LICENSE="BSD 3-Clause"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="1.3.1"
+TERMUX_PKG_SRCURL="https://hackage.haskell.org/package/gitrev-${TERMUX_PKG_VERSION}/gitrev-${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256="a89964db24f56727b0e7b10c98fe7c116d721d8c46f52d6e77088669aaa38332"
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_DEPENDS="ghc-libs, haskell-base-compat"

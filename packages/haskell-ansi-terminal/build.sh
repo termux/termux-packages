@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE="https://github.com/UnkindPartition/ansi-terminal"
+TERMUX_PKG_DESCRIPTION="Simple ANSI terminal support, with Windows compatibility"
+TERMUX_PKG_LICENSE="BSD 3-Clause"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="0.11.1"
+TERMUX_PKG_SRCURL="https://hackage.haskell.org/package/ansi-terminal-${TERMUX_PKG_VERSION}/ansi-terminal-${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256="ae54da066493747059c128ec66b00ab1668df318460d1337cec28b4444db722b"
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_DEPENDS="ghc-libs, haskell-colour"

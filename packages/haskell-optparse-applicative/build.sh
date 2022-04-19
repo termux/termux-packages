@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE="https://github.com/pcapriotti/optparse-applicative"
+TERMUX_PKG_DESCRIPTION="Utilities and combinators for parsing command line options"
+TERMUX_PKG_LICENSE="BSD 3-Clause"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="0.17.0.0"
+TERMUX_PKG_SRCURL="https://hackage.haskell.org/package/optparse-applicative-${TERMUX_PKG_VERSION}/optparse-applicative-${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256="825b2e4d3dafe0ba64a073366a88062b3712b81f851793d9ce2327bee70af724"
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_DEPENDS="ghc-libs, haskell-transformers-compat, haskell-ansi-wl-pprint"
