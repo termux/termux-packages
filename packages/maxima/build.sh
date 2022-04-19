@@ -3,11 +3,11 @@ TERMUX_PKG_DESCRIPTION="A Computer Algebra System"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Marlin Sööse <marlin.soose@laro.se>"
 TERMUX_PKG_VERSION=()
-TERMUX_PKG_VERSION+=(5.45.1)
+TERMUX_PKG_VERSION+=(5.46.0)
 TERMUX_PKG_VERSION+=(21.2.1) # ECL version
 TERMUX_PKG_SRCURL=(https://downloads.sourceforge.net/sourceforge/maxima/Maxima-source/$TERMUX_PKG_VERSION-source/maxima-$TERMUX_PKG_VERSION.tar.gz
                    https://common-lisp.net/project/ecl/static/files/release/ecl-${TERMUX_PKG_VERSION[1]}.tgz)
-TERMUX_PKG_SHA256=(fe9016276970bef214a1a244348558644514d7fdfaa4fc8b9d0e87afcbb4e7dc
+TERMUX_PKG_SHA256=(7390f06b48da65c9033e8b2f629b978b90056454a54022db7de70e2225aa8b07
                    b15a75dcf84b8f62e68720ccab1393f9611c078fcd3afdd639a1086cad010900)
 TERMUX_PKG_DEPENDS="ecl"
 TERMUX_PKG_BUILD_IN_SRC="true"
