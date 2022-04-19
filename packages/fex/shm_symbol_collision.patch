@@ -1,0 +1,273 @@
+diff --git a/Source/Tests/LinuxSyscalls/Arm64/SyscallsEnum.h b/Source/Tests/LinuxSyscalls/Arm64/SyscallsEnum.h
+index abbb3c92..a91871bf 100644
+--- a/Source/Tests/LinuxSyscalls/Arm64/SyscallsEnum.h
++++ b/Source/Tests/LinuxSyscalls/Arm64/SyscallsEnum.h
+@@ -204,10 +204,10 @@ enum Syscalls_Arm64 {
+   SYSCALL_Arm64_semctl = 191,
+   SYSCALL_Arm64_semtimedop = 192,
+   SYSCALL_Arm64_semop = 193,
+-  SYSCALL_Arm64_shmget = 194,
+-  SYSCALL_Arm64_shmctl = 195,
+-  SYSCALL_Arm64_shmat = 196,
+-  SYSCALL_Arm64_shmdt = 197,
++  SYSCALL_Arm64__shmget = 194,
++  SYSCALL_Arm64__shmctl = 195,
++  SYSCALL_Arm64__shmat = 196,
++  SYSCALL_Arm64__shmdt = 197,
+   SYSCALL_Arm64_socket = 198,
+   SYSCALL_Arm64_socketpair = 199,
+   SYSCALL_Arm64_bind = 200,
+diff --git a/Source/Tests/LinuxSyscalls/LinuxAllocator.cpp b/Source/Tests/LinuxSyscalls/LinuxAllocator.cpp
+index cb310be8..90b0a50d 100644
+--- a/Source/Tests/LinuxSyscalls/LinuxAllocator.cpp
++++ b/Source/Tests/LinuxSyscalls/LinuxAllocator.cpp
+@@ -47,8 +47,8 @@ public:
+   void *mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset) override;
+   int munmap(void *addr, size_t length) override;
+   void *mremap(void *old_address, size_t old_size, size_t new_size, int flags, void *new_address) override;
+-  uint64_t shmat(int shmid, const void* shmaddr, int shmflg, uint32_t *ResultAddress) override;
+-  uint64_t shmdt(const void* shmaddr) override;
++  uint64_t Shmat(int shmid, const void* shmaddr, int shmflg, uint32_t *ResultAddress) override;
++  uint64_t Shmdt(const void* shmaddr) override;
+   static constexpr bool SearchDown = true;
+ 
+   // PageAddr is a page already shifted to page index
+@@ -434,7 +434,7 @@ void *MemAllocator32Bit::mremap(void *old_address, size_t old_size, size_t new_s
+   return reinterpret_cast<void*>(-errno);
+ }
+ 
+-uint64_t MemAllocator32Bit::shmat(int shmid, const void* shmaddr, int shmflg, uint32_t *ResultAddress) {
++uint64_t MemAllocator32Bit::Shmat(int shmid, const void* shmaddr, int shmflg, uint32_t *ResultAddress) {
+   std::scoped_lock<std::mutex> lk{AllocMutex};
+ 
+   if (shmaddr != nullptr) {
+@@ -547,7 +547,7 @@ restart:
+     }
+   }
+ }
+-uint64_t MemAllocator32Bit::shmdt(const void* shmaddr) {
++uint64_t MemAllocator32Bit::Shmdt(const void* shmaddr) {
+   uint32_t AddrPage = reinterpret_cast<uint64_t>(shmaddr) >> FHU::FEX_PAGE_SHIFT;
+   auto it = PageToShm.find(AddrPage);
+ 
+@@ -584,7 +584,7 @@ public:
+     return reinterpret_cast<void*>(Result);
+   }
+ 
+-  uint64_t shmat(int shmid, const void* shmaddr, int shmflg, uint32_t *ResultAddress) override {
++  uint64_t Shmat(int shmid, const void* shmaddr, int shmflg, uint32_t *ResultAddress) override {
+     uint64_t Result = (uint64_t)::shmat(shmid, reinterpret_cast<const void*>(shmaddr), shmflg);
+     if (Result != ~0ULL) {
+       *ResultAddress = Result;
+@@ -593,7 +593,7 @@ public:
+     SYSCALL_ERRNO();
+   }
+ 
+-  uint64_t shmdt(const void* shmaddr) override {
++  uint64_t Shmdt(const void* shmaddr) override {
+     uint64_t Result = ::shmdt(shmaddr);
+     SYSCALL_ERRNO();
+   }
+diff --git a/Source/Tests/LinuxSyscalls/LinuxAllocator.h b/Source/Tests/LinuxSyscalls/LinuxAllocator.h
+index 0fa8f0ba..a12947a5 100644
+--- a/Source/Tests/LinuxSyscalls/LinuxAllocator.h
++++ b/Source/Tests/LinuxSyscalls/LinuxAllocator.h
+@@ -12,8 +12,9 @@ namespace FEX::HLE {
+     virtual void *mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset) = 0;
+     virtual int munmap(void *addr, size_t length) = 0;
+     virtual void *mremap(void *old_address, size_t old_size, size_t new_size, int flags, void *new_address) = 0;
+-    virtual uint64_t shmat(int shmid, const void* shmaddr, int shmflg, uint32_t *ResultAddress) = 0;
+-    virtual uint64_t shmdt(const void* shmaddr) = 0;
++    // Global symbol collision on undercase
++    virtual uint64_t Shmat(int shmid, const void* shmaddr, int shmflg, uint32_t *ResultAddress) = 0;
++    virtual uint64_t Shmdt(const void* shmaddr) = 0;
+   };
+ 
+   std::unique_ptr<FEX::HLE::MemAllocator> Create32BitAllocator();
+diff --git a/Source/Tests/LinuxSyscalls/Syscalls/SHM.cpp b/Source/Tests/LinuxSyscalls/Syscalls/SHM.cpp
+index f3be716e..fa537d92 100644
+--- a/Source/Tests/LinuxSyscalls/Syscalls/SHM.cpp
++++ b/Source/Tests/LinuxSyscalls/Syscalls/SHM.cpp
+@@ -18,14 +18,14 @@ namespace FEX::HLE {
+   void RegisterSHM() {
+     using namespace FEXCore::IR;
+ 
+-    REGISTER_SYSCALL_IMPL_PASS_FLAGS(shmget, SyscallFlags::OPTIMIZETHROUGH | SyscallFlags::NOSYNCSTATEONENTRY,
++    REGISTER_SYSCALL_IMPL_PASS_FLAGS(_shmget, SyscallFlags::OPTIMIZETHROUGH | SyscallFlags::NOSYNCSTATEONENTRY,
+       [](FEXCore::Core::CpuStateFrame *Frame, key_t key, size_t size, int shmflg) -> uint64_t {
+       uint64_t Result = shmget(key, size, shmflg);
+       SYSCALL_ERRNO();
+     });
+ 
+     // XXX: shmid_ds is definitely not correct for 32-bit
+-    REGISTER_SYSCALL_IMPL_PASS_FLAGS(shmctl, SyscallFlags::OPTIMIZETHROUGH | SyscallFlags::NOSYNCSTATEONENTRY,
++    REGISTER_SYSCALL_IMPL_PASS_FLAGS(_shmctl, SyscallFlags::OPTIMIZETHROUGH | SyscallFlags::NOSYNCSTATEONENTRY,
+       [](FEXCore::Core::CpuStateFrame *Frame, int shmid, int cmd, struct shmid_ds *buf) -> uint64_t {
+       uint64_t Result = ::shmctl(shmid, cmd, buf);
+       SYSCALL_ERRNO();
+diff --git a/Source/Tests/LinuxSyscalls/x32/Memory.cpp b/Source/Tests/LinuxSyscalls/x32/Memory.cpp
+index 1254df8b..91851ef4 100644
+--- a/Source/Tests/LinuxSyscalls/x32/Memory.cpp
++++ b/Source/Tests/LinuxSyscalls/x32/Memory.cpp
+@@ -94,10 +94,10 @@ namespace FEX::HLE::x32 {
+       SYSCALL_ERRNO();
+     });
+ 
+-    REGISTER_SYSCALL_IMPL_X32(shmat, [](FEXCore::Core::CpuStateFrame *Frame, int shmid, const void *shmaddr, int shmflg) -> uint64_t {
++    REGISTER_SYSCALL_IMPL_X32(_shmat, [](FEXCore::Core::CpuStateFrame *Frame, int shmid, const void *shmaddr, int shmflg) -> uint64_t {
+       uint32_t ResultAddr{};
+       uint64_t Result = static_cast<FEX::HLE::x32::x32SyscallHandler*>(FEX::HLE::_SyscallHandler)->GetAllocator()->
+-          shmat(shmid, reinterpret_cast<const void*>(shmaddr), shmflg, &ResultAddr);
++          Shmat(shmid, reinterpret_cast<const void*>(shmaddr), shmflg, &ResultAddr);
+       if (Result == 0) {
+         return ResultAddr;
+       }
+@@ -106,9 +106,9 @@ namespace FEX::HLE::x32 {
+       }
+     });
+ 
+-    REGISTER_SYSCALL_IMPL_X32(shmdt, [](FEXCore::Core::CpuStateFrame *Frame, const void *shmaddr) -> uint64_t {
++    REGISTER_SYSCALL_IMPL_X32(_shmdt, [](FEXCore::Core::CpuStateFrame *Frame, const void *shmaddr) -> uint64_t {
+       uint64_t Result = static_cast<FEX::HLE::x32::x32SyscallHandler*>(FEX::HLE::_SyscallHandler)->GetAllocator()->
+-        shmdt(shmaddr);
++        Shmdt(shmaddr);
+       SYSCALL_ERRNO();
+     });
+   }
+diff --git a/Source/Tests/LinuxSyscalls/x32/Semaphore.cpp b/Source/Tests/LinuxSyscalls/x32/Semaphore.cpp
+index 7cb79fe8..36a096a4 100644
+--- a/Source/Tests/LinuxSyscalls/x32/Semaphore.cpp
++++ b/Source/Tests/LinuxSyscalls/x32/Semaphore.cpp
+@@ -280,12 +280,12 @@ namespace FEX::HLE::x32 {
+       }
+       case OP_SHMAT: {
+         Result = static_cast<FEX::HLE::x32::x32SyscallHandler*>(FEX::HLE::_SyscallHandler)->GetAllocator()->
+-          shmat(first, reinterpret_cast<const void*>(ptr), second, reinterpret_cast<uint32_t*>(third));
++          Shmat(first, reinterpret_cast<const void*>(ptr), second, reinterpret_cast<uint32_t*>(third));
+         break;
+       }
+       case OP_SHMDT: {
+         Result = static_cast<FEX::HLE::x32::x32SyscallHandler*>(FEX::HLE::_SyscallHandler)->GetAllocator()->
+-          shmdt(reinterpret_cast<void*>(ptr));
++          Shmdt(reinterpret_cast<void*>(ptr));
+         break;
+       }
+       case OP_SHMGET: {
+@@ -309,7 +309,7 @@ namespace FEX::HLE::x32 {
+             else {
+               buf = *shmun.buf32;
+             }
+-            Result = ::syscall(SYSCALL_DEF(shmctl), shmid, cmd, &buf);
++            Result = ::syscall(SYSCALL_DEF(_shmctl), shmid, cmd, &buf);
+             // IPC_SET sets the internal data structure that the kernel uses
+             // No need to writeback
+             break;
+@@ -318,7 +318,7 @@ namespace FEX::HLE::x32 {
+           case SHM_STAT_ANY:
+           case IPC_STAT: {
+             struct shmid64_ds buf{};
+-            Result = ::syscall(SYSCALL_DEF(shmctl), shmid, cmd, &buf);
++            Result = ::syscall(SYSCALL_DEF(_shmctl), shmid, cmd, &buf);
+             if (Result != -1) {
+               if (IPC64) {
+                 *shmun.buf64 = buf;
+@@ -331,7 +331,7 @@ namespace FEX::HLE::x32 {
+           }
+           case IPC_INFO: {
+             struct shminfo si{};
+-            Result = ::syscall(SYSCALL_DEF(shmctl), shmid, cmd, reinterpret_cast<struct shmid_ds*>(&si));
++            Result = ::syscall(SYSCALL_DEF(_shmctl), shmid, cmd, reinterpret_cast<struct shmid_ds*>(&si));
+             if (Result != -1) {
+               if (IPC64) {
+                 *shmun.__buf64 = si;
+@@ -344,7 +344,7 @@ namespace FEX::HLE::x32 {
+           }
+           case SHM_INFO: {
+             struct shm_info si{};
+-            Result = ::syscall(SYSCALL_DEF(shmctl), shmid, cmd, reinterpret_cast<struct shmid_ds*>(&si));
++            Result = ::syscall(SYSCALL_DEF(_shmctl), shmid, cmd, reinterpret_cast<struct shmid_ds*>(&si));
+             if (Result != -1) {
+               // SHM_INFO doesn't follow IPC64 behaviour
+               *shmun.__buf_info_32 = si;
+@@ -352,13 +352,13 @@ namespace FEX::HLE::x32 {
+             break;
+           }
+           case SHM_LOCK:
+-            Result = ::syscall(SYSCALL_DEF(shmctl), shmid, cmd, nullptr);
++            Result = ::syscall(SYSCALL_DEF(_shmctl), shmid, cmd, nullptr);
+             break;
+           case SHM_UNLOCK:
+-            Result = ::syscall(SYSCALL_DEF(shmctl), shmid, cmd, nullptr);
++            Result = ::syscall(SYSCALL_DEF(_shmctl), shmid, cmd, nullptr);
+             break;
+           case IPC_RMID:
+-            Result = ::syscall(SYSCALL_DEF(shmctl), shmid, cmd, nullptr);
++            Result = ::syscall(SYSCALL_DEF(_shmctl), shmid, cmd, nullptr);
+             break;
+ 
+           default:
+diff --git a/Source/Tests/LinuxSyscalls/x32/SyscallsEnum.h b/Source/Tests/LinuxSyscalls/x32/SyscallsEnum.h
+index 341678a2..b8bc99eb 100644
+--- a/Source/Tests/LinuxSyscalls/x32/SyscallsEnum.h
++++ b/Source/Tests/LinuxSyscalls/x32/SyscallsEnum.h
+@@ -410,10 +410,10 @@ enum Syscalls_x86 {
+   SYSCALL_x86_rseq = 386,
+   SYSCALL_x86_semget = 393,
+   SYSCALL_x86_semctl = 394,
+-  SYSCALL_x86_shmget = 395,
+-  SYSCALL_x86_shmctl = 396,
+-  SYSCALL_x86_shmat = 397,
+-  SYSCALL_x86_shmdt = 398,
++  SYSCALL_x86__shmget = 395,
++  SYSCALL_x86__shmctl = 396,
++  SYSCALL_x86__shmat = 397,
++  SYSCALL_x86__shmdt = 398,
+   SYSCALL_x86_msgget = 399,
+   SYSCALL_x86_msgsnd = 400,
+   SYSCALL_x86_msgrcv = 401,
+diff --git a/Source/Tests/LinuxSyscalls/x64/Memory.cpp b/Source/Tests/LinuxSyscalls/x64/Memory.cpp
+index 7fa02d2d..acae1027 100644
+--- a/Source/Tests/LinuxSyscalls/x64/Memory.cpp
++++ b/Source/Tests/LinuxSyscalls/x64/Memory.cpp
+@@ -119,13 +119,13 @@ namespace FEX::HLE::x64 {
+       SYSCALL_ERRNO();
+     });
+ 
+-    REGISTER_SYSCALL_IMPL_X64_PASS_FLAGS(shmat, SyscallFlags::OPTIMIZETHROUGH | SyscallFlags::NOSYNCSTATEONENTRY,
++    REGISTER_SYSCALL_IMPL_X64_PASS_FLAGS(_shmat, SyscallFlags::OPTIMIZETHROUGH | SyscallFlags::NOSYNCSTATEONENTRY,
+       [](FEXCore::Core::CpuStateFrame *Frame, int shmid, const void *shmaddr, int shmflg) -> uint64_t {
+       uint64_t Result = reinterpret_cast<uint64_t>(shmat(shmid, shmaddr, shmflg));
+       SYSCALL_ERRNO();
+     });
+ 
+-    REGISTER_SYSCALL_IMPL_X64_PASS_FLAGS(shmdt, SyscallFlags::OPTIMIZETHROUGH | SyscallFlags::NOSYNCSTATEONENTRY,
++    REGISTER_SYSCALL_IMPL_X64_PASS_FLAGS(_shmdt, SyscallFlags::OPTIMIZETHROUGH | SyscallFlags::NOSYNCSTATEONENTRY,
+       [](FEXCore::Core::CpuStateFrame *Frame, const void *shmaddr) -> uint64_t {
+       uint64_t Result = ::shmdt(shmaddr);
+       SYSCALL_ERRNO();
+diff --git a/Source/Tests/LinuxSyscalls/x64/SyscallsEnum.h b/Source/Tests/LinuxSyscalls/x64/SyscallsEnum.h
+index 53c05c03..75db8832 100644
+--- a/Source/Tests/LinuxSyscalls/x64/SyscallsEnum.h
++++ b/Source/Tests/LinuxSyscalls/x64/SyscallsEnum.h
+@@ -36,9 +36,9 @@ enum Syscalls_x64 {
+   SYSCALL_x64_msync = 26,
+   SYSCALL_x64_mincore = 27,
+   SYSCALL_x64_madvise = 28,
+-  SYSCALL_x64_shmget = 29,
+-  SYSCALL_x64_shmat = 30,
+-  SYSCALL_x64_shmctl = 31,
++  SYSCALL_x64__shmget = 29,
++  SYSCALL_x64__shmat = 30,
++  SYSCALL_x64__shmctl = 31,
+   SYSCALL_x64_dup = 32,
+   SYSCALL_x64_dup2 = 33,
+   SYSCALL_x64_pause = 34,
+@@ -74,7 +74,7 @@ enum Syscalls_x64 {
+   SYSCALL_x64_semget = 64,
+   SYSCALL_x64_semop = 65,
+   SYSCALL_x64_semctl = 66,
+-  SYSCALL_x64_shmdt = 67,
++  SYSCALL_x64__shmdt = 67,
+   SYSCALL_x64_msgget = 68,
+   SYSCALL_x64_msgsnd = 69,
+   SYSCALL_x64_msgrcv = 70,
