@@ -23,7 +23,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_pre_configure() {
 	termux_setup_cmake
 
-	CFLAGS=" -I$TERMUX_PKG_BUILDDIR/src $CFLAGS $CPPFLAGS"
+	CFLAGS=" -I$TERMUX_PKG_BUILDDIR/src $CFLAGS $CPPFLAGS -fcommon"
 
 	# Arm does not support mmx and sse2 instructions, still checks return true
 	if [ "${TERMUX_ARCH}" = "arm" ] || [ "${TERMUX_ARCH}" = "aarch64" ]; then
