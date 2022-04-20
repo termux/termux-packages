@@ -104,7 +104,7 @@ _update() {
 	fi
 }
 
-declare -a _FAILED_UPDATES=()
+declare -A _FAILED_UPDATES=()
 
 _run_update() {
 	local pkg_dir="$1"
@@ -114,13 +114,86 @@ _run_update() {
 		termux_error_exit "ERROR: directory '${pkg_dir}' is not a package."
 	fi
 	# Run each package update in separate process since we include their environment variables.
-	(
-		set -euo pipefail
-		_update "${pkg_dir}"
-	)
+	local output=""
+	{
+		output=$(
+			set -euo pipefail
+			_update "${pkg_dir}" 2>&1 | tee /dev/fd/3 # fd 3 is used to output to stdout as well.
+			exit "${PIPESTATUS[0]}"                   # Return exit code of _update.
+		)
+	} 3>&1
 	# shellcheck disable=SC2181
 	if [[ $? -ne 0 ]]; then
-		_FAILED_UPDATES+=("$(basename "${pkg_dir}")")
+		_FAILED_UPDATES["$(basename "${pkg_dir}")"]="${output}"
+	fi
+}
+
+_create_gh_issue() {
+	local pkg="$1"
+	gh issue create --title "Auto update failing for ${pkg}" --label "auto update" \
+		--assignee "${GITHUB_ACTOR}" --body "$(
+			cat <<-EOF
+				Auto update failed for ${pkg}.
+				<details><summary>Output log</summary>
+				<pre lang="bash">
+					${_FAILED_UPDATES[$pkg]}
+				</pre>
+				</details>
+				<i>Automatically submitted by github ci.<br>
+				Run ID: <a href="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}">${GITHUB_RUN_ID}</a><br>
+				Timestamp: $(date -u +"%Y-%m-%dT%H:%M:%SZ")<br></i>
+			EOF
+		)"
+}
+
+_update_gh_issue() {
+	local issue_number="$1"
+	local pkg="$2"
+	gh issue edit "$issue_number" --body "$(
+		gh issue view --json body --jq '.body' "${issue_number}"
+		echo "<br>"
+		cat <<-EOF
+			<h4>EDIT:</h4>
+
+			Update failed again.
+
+			<details><summary>Output log</summary>
+			<pre lang="bash">
+				${_FAILED_UPDATES[$pkg]}
+			</pre>
+			</details>
+			<i>Automatically submitted by github ci.<br>
+			Run ID: <a href="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}">${GITHUB_RUN_ID}</a><br>
+			Timestamp: $(date -u +"%Y-%m-%dT%H:%M:%SZ")<br></i>
+		EOF
+	)"
+}
+
+_handle_failure() {
+	if [[ "${GITHUB_ACTIONS:-}" == "true" ]]; then # GITHUB_ACTIONS is always set to true on github CI.
+		echo "INFO: Creating issue for failed updates."
+		declare -A existing_issues # Map of ==> issue title :: issue number
+		for issue_number in $(gh issue list --label "auto update" --json number --jq '.[] | .number' --state open); do
+			existing_issues["$(gh issue view "${issue_number}" --json title --jq '.title')"]="${issue_number}"
+		done
+		for pkg in "${!_FAILED_UPDATES[@]}"; do
+			# shellcheck disable=SC2076
+			# Here we check if an issue with same title already existis then update that issue,
+			# rather than crating a new one again.
+			if [[ " ${!existing_issues[*]} " =~ " Auto update failing for ${pkg} " ]]; then
+				# Here we are passing issue_number, pkg name to _update_gh_issue function.
+				_update_gh_issue "${existing_issues["Auto update failing for ${pkg}"]}" "${pkg}"
+			else
+				_create_gh_issue "${pkg}" # Create a new issue with this package name.
+			fi
+		done
+	else
+		echo # Newline.
+		echo "==> Failed updates:"
+		for pkg in "${!_FAILED_UPDATES[@]}"; do
+			echo "-> ${pkg}" # Only print package name.
+		done
+		exit 1
 	fi
 }
 
@@ -146,14 +219,8 @@ main() {
 			_run_update "${pkg}" # Here, `pkg` is a directory.
 		done
 	fi
-
-	if ((${#_FAILED_UPDATES[@]} > 0)); then
-		echo # Newline.
-		echo "===========================Failed updates==========================="
-		for failed_update in "${_FAILED_UPDATES[@]}"; do
-			echo "==> ${failed_update}"
-		done
-		exit 1 # Exit with error code, so that we know that some/all updates failed.
+	if [[ ${#_FAILED_UPDATES[@]} -gt 0 ]]; then
+		_handle_failure
 	fi
 }
 
