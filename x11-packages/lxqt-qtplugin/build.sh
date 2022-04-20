@@ -7,4 +7,5 @@ TERMUX_PKG_SRCURL="https://github.com/lxqt/lxqt-qtplugin/releases/download/${TER
 TERMUX_PKG_SHA256=8e789430e1f3b6a354f61d496440a59b797f699320bb8c001d8ef7ac8e1db05e
 TERMUX_PKG_DEPENDS="qt5-qtbase, kwindowsystem, libqtxdg, libfm-qt, libexif, libdbusmenu-qt"
 TERMUX_PKG_BUILD_DEPENDS="lxqt-build-tools, qt5-qtbase-cross-tools, qt5-qttools-cross-tools"
+TERMUX_PKG_AUTO_UPDATE=true
 
