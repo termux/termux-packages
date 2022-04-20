@@ -73,11 +73,11 @@ output=""
 
 if [ -n "$TERMUX_VERSION" ]; then
 # Application version is exported in Termux v0.107 or higher only.
-output+="Application version:
-$TERMUX_VERSION
+output+="Termux Variables:
+$(compgen -e TERMUX_ | while read v; do echo "${v}=${!v}"; done)
 "
 else
-output+="Application version:
+output+="Termux Variables:
 unsupported
 "
 fi
