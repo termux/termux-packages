@@ -3,14 +3,13 @@ termux_pkg_upgrade_version() {
 	if [[ "$#" -lt 1 ]]; then
 		# Show usage.
 		termux_error_exit <<-EndUsage
-			Usage: ${FUNCNAME[0]} LATEST_VERSION [--skip-version-check]
+			Usage: ${FUNCNAME[0]} /path/to/build.sh  LATEST_VERSION [--skip-version-check]
 		EndUsage
 	fi
 
-	local LATEST_VERSION="$1"
-	local SKIP_VERSION_CHECK="${2:-}"
-	local PKG_DIR
-	PKG_DIR="${TERMUX_SCRIPTDIR}/packages/${TERMUX_PKG_NAME}"
+	local LATEST_VERSION="$2"
+	local SKIP_VERSION_CHECK="${3:-}"
+	local PKG_DIR=${TERMUX_SCRIPTDIR}/$(dirname $1)
 
 	local EPOCH
 	EPOCH="${TERMUX_PKG_VERSION%%:*}" # If there is no epoch, this will be the full version.
