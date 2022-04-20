@@ -23,7 +23,7 @@ termux_pkg_auto_update() {
 	tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}")"
 	# check if this is not an intermediate release candidate:
 	if grep -qP "^OTP-${TERMUX_PKG_UPDATE_VERSION_REGEXP}\$" <<<"$tag"; then
-		pkg_dir=$(dirname "$0") termux_pkg_upgrade_version "$tag"
+		termux_pkg_upgrade_version "$tag"
 	else
 		echo "WARNING: Skipping auto-update: Not stable release($tag)"
 	fi

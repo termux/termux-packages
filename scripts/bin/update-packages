@@ -74,6 +74,8 @@ TERMUX_SCRIPTDIR="$(realpath "$(dirname "$0")/../..")" # Script directory.
 _update() {
 	export TERMUX_PKG_NAME
 	TERMUX_PKG_NAME="$(basename "$1")"
+	export TERMUX_PKG_BUILDER_DIR
+	TERMUX_PKG_BUILDER_DIR="$(realpath "$1")" # Directory containing build.sh.
 	# Avoid:
 	# - ending on errors such as $(which prog), where prog is not installed.
 	# - error on unbound variable.
