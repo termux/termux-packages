@@ -7,4 +7,5 @@ TERMUX_PKG_SRCURL="https://github.com/lxqt/lxqt-openssh-askpass/releases/downloa
 TERMUX_PKG_SHA256=9de22a06646cfa50b0ddeef26ac87b510f820501ff8832dc80c7d88a55d878b5
 TERMUX_PKG_DEPENDS="qt5-qtbase, liblxqt"
 TERMUX_PKG_BUILD_DEPENDS="lxqt-build-tools, qt5-qtbase-cross-tools, qt5-qttools-cross-tools"
+TERMUX_PKG_AUTO_UPDATE=true
 
