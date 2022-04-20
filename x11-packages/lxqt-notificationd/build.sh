@@ -7,4 +7,5 @@ TERMUX_PKG_SRCURL="https://github.com/lxqt/lxqt-notificationd/releases/download/
 TERMUX_PKG_SHA256=94c10fd904995d3eea3b587dd521ed01b839d863ff80205af0af8cab6cb2a660
 TERMUX_PKG_DEPENDS="qt5-qtbase, liblxqt, libnotify"
 TERMUX_PKG_BUILD_DEPENDS="lxqt-build-tools, qt5-qtbase-cross-tools, qt5-qttools-cross-tools"
+TERMUX_PKG_AUTO_UPDATE=true
 
