@@ -63,7 +63,7 @@ termux_pkg_auto_update() {
 
 	# since we are using a nightly build, therefore no need to check for version increment/decrement.
 	if [ "${TERMUX_PKG_VERSION}" != "${remote_nvim_version}" ]; then
-		termux_pkg_upgrade_version "${remote_nvim_version}" --skip-version-check
+		pkg_dir=$(dirname "$0") termux_pkg_upgrade_version "${remote_nvim_version}" --skip-version-check
 	else
 		echo "INFO: No update available."
 	fi

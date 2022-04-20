@@ -21,7 +21,7 @@ termux_pkg_auto_update() {
 	tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}")"
 	# check if this is not a c++ release:
 	if grep -qP "^c-${TERMUX_PKG_UPDATE_VERSION_REGEXP}\$" <<<"$tag"; then
-		termux_pkg_upgrade_version "$tag"
+		pkg_dir=$(dirname "$0") termux_pkg_upgrade_version "$tag"
 	else
 		echo "WARNING: Skipping auto-update: Not a C release($tag)"
 	fi
