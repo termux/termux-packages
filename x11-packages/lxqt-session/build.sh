@@ -8,6 +8,7 @@ TERMUX_PKG_SHA256=3245457cb4a1e59ec62802308c872173baa300fa0f8e517fe14f45112733a6
 TERMUX_PKG_DEPENDS="qt5-qtbase, qt5-qtx11extras, kwindowsystem, liblxqt, procps, libandroid-wordexp"
 TERMUX_PKG_BUILD_DEPENDS="lxqt-build-tools, qt5-qtbase-cross-tools, qt5-qttools-cross-tools"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DWITH_LIBUDEV=OFF"
+TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_pre_configure(){
 	LDFLAGS+=" -landroid-wordexp"
