@@ -1,4 +1,15 @@
 # shellcheck shell=bash
+
+# NOTE: Repology sometimes returns "1.0-1" as the latest version even if "1.0" is latest.
+# This happens when any of the repositories tracked by repology has specified
+# "1.0-1" as the latest.
+#
+# For example:
+# latest lua:lpeg version (as of 2021-11-20T12:21:31) is "1.0.2" but MacPorts specifies as "1.0.2-1".
+# Hence repology returns "1.0.2-1" as the latest.
+#
+# But hopefully, all this can be avoided if TERMUX_PKG_UPDATE_VERSION_REGEXP is set.
+#
 termux_repology_api_get_latest_version() {
 	if [[ -z "$1" ]]; then
 		termux_error_exit "Usage: ${FUNCNAME[0]} PKG_NAME"

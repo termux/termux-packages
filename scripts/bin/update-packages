@@ -98,17 +98,9 @@ _update() {
 
 	# Only update if auto update is enabled.
 	if [[ "${TERMUX_PKG_AUTO_UPDATE}" == "true" ]]; then
-		echo "INFO: Updating ${TERMUX_PKG_NAME} [Current version: ${TERMUX_PKG_VERSION}]..."
-		pkg_dir=${pkg_dir} termux_pkg_auto_update
 		echo # Newline.
-	fi
-}
-
-_test_pkg_build_file() {
-	local pkg_dir="$1"
-	if [[ ! -f "${pkg_dir}/build.sh" ]]; then
-		# Fail if detected a non-package directory.
-		termux_error_exit "ERROR: directory '${pkg_dir}' is not a package."
+		echo "INFO: Updating ${TERMUX_PKG_NAME} [Current version: ${TERMUX_PKG_VERSION}]..."
+		termux_pkg_auto_update
 	fi
 }
 
@@ -116,7 +108,11 @@ declare -a _FAILED_UPDATES=()
 
 _run_update() {
 	local pkg_dir="$1"
-	_test_pkg_build_file "${pkg_dir}"
+	#  Check if this `pkg_dir` has a `build.sh` file.
+	if [[ ! -f "${pkg_dir}/build.sh" ]]; then
+		# Fail if detected a non-package directory.
+		termux_error_exit "ERROR: directory '${pkg_dir}' is not a package."
+	fi
 	# Run each package update in separate process since we include their environment variables.
 	(
 		set -euo pipefail
@@ -132,22 +128,22 @@ main() {
 	echo "INFO: Running update for: $*"
 
 	if [[ "$1" == "@all" ]]; then
-		for repo_dir in $(jq --raw-output 'keys | .[]' ${TERMUX_SCRIPTDIR}/repo.json); do
-			for pkg_dir in $repo_dir/*; do
+		for repo_dir in $(jq --raw-output 'keys | .[]' "${TERMUX_SCRIPTDIR}/repo.json"); do
+			for pkg_dir in "${repo_dir}"/*; do
 				_run_update "${pkg_dir}"
 			done
 		done
 	else
 		for pkg in "$@"; do
-			if [ ! -d "${pkg}" ]; then
-				for repo_dir in $(jq --raw-output 'keys | .[]' ${TERMUX_SCRIPTDIR}/repo.json); do
+			if [ ! -d "${pkg}" ]; then # If only package name is given, try to find it's directory.
+				for repo_dir in $(jq --raw-output 'keys | .[]' "${TERMUX_SCRIPTDIR}/repo.json"); do
 					if [ -d "${repo_dir}/${pkg}" ]; then
 						pkg="${repo_dir}/${pkg}"
 						break
 					fi
 				done
 			fi
-			_run_update "${pkg}"
+			_run_update "${pkg}" # Here, `pkg` is a directory.
 		done
 	fi
 

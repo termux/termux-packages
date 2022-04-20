@@ -6,8 +6,6 @@ termux_gitlab_auto_update() {
 		termux_gitlab_api_get_tag \
 			"${TERMUX_PKG_SRCURL}" "${TERMUX_PKG_UPDATE_TAG_TYPE}" "${TERMUX_GITLAB_API_HOST}"
 	)"
-	# No need to check for return code `2`, since gitlab api does not implement cache control.
-
 	if [[ -z "${latest_tag}" ]]; then
 		termux_error_exit "ERROR: Unable to get tag from ${TERMUX_PKG_SRCURL}"
 	fi

@@ -1,7 +1,6 @@
 # shellcheck shell=bash
 termux_pkg_upgrade_version() {
 	if [[ "$#" -lt 1 ]]; then
-		# Show usage.
 		termux_error_exit <<-EndUsage
 			Usage: ${FUNCNAME[0]} LATEST_VERSION [--skip-version-check]
 		EndUsage
@@ -9,9 +8,6 @@ termux_pkg_upgrade_version() {
 
 	local LATEST_VERSION="$1"
 	local SKIP_VERSION_CHECK="${2:-}"
-	local PKG_DIR
-	PKG_DIR="${pkg_dir}"
-
 	local EPOCH
 	EPOCH="${TERMUX_PKG_VERSION%%:*}" # If there is no epoch, this will be the full version.
 	# Check if it isn't the full version and add ':'.
@@ -52,15 +48,15 @@ termux_pkg_upgrade_version() {
 
 		sed -i \
 			"s/^\(TERMUX_PKG_VERSION=\)\(.*\)\$/\1\"${EPOCH}${LATEST_VERSION}\"/g" \
-			"${PKG_DIR}/build.sh"
+			"${TERMUX_PKG_BUILDER_DIR}/build.sh"
 		sed -i \
 			"/TERMUX_PKG_REVISION=/d" \
-			"${PKG_DIR}/build.sh"
+			"${TERMUX_PKG_BUILDER_DIR}/build.sh"
 
 		# Update checksum
 		if [[ "${TERMUX_PKG_SHA256[*]}" != "SKIP_CHECKSUM" ]] && [[ "${TERMUX_PKG_SRCURL: -4}" != ".git" ]]; then
 			echo n | "${TERMUX_SCRIPTDIR}/scripts/bin/update-checksum" "${TERMUX_PKG_NAME}" || {
-				git checkout -- "${PKG_DIR}"
+				git checkout -- "${TERMUX_PKG_BUILDER_DIR}"
 				git pull --rebase
 				termux_error_exit "ERROR: failed to update checksum."
 			}
@@ -71,7 +67,7 @@ termux_pkg_upgrade_version() {
 			if [[ "${GIT_COMMIT_PACKAGES}" == "true" ]]; then
 				echo "INFO: Committing package."
 				stderr="$(
-					git add "${PKG_DIR}" 2>&1 >/dev/null
+					git add "${TERMUX_PKG_BUILDER_DIR}" 2>&1 >/dev/null
 					git commit -m "${TERMUX_PKG_NAME}: update to ${LATEST_VERSION}" \
 						-m "This commit has been automatically submitted by Github Actions." 2>&1 >/dev/null
 				)" || {
@@ -95,7 +91,7 @@ termux_pkg_upgrade_version() {
 				}
 			fi
 		else
-			git checkout -- "${PKG_DIR}"
+			git checkout -- "${TERMUX_PKG_BUILDER_DIR}"
 			termux_error_exit "ERROR: failed to build."
 		fi
 
