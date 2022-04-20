@@ -39,7 +39,7 @@ if [ ! -e "$TERMUX_BUILD_LOCK_FILE" ]; then
 	touch "$TERMUX_BUILD_LOCK_FILE"
 fi
 
-export TERMUX_PACKAGES_DIRECTORIES=$(jq --raw-output 'keys | .[]' < ${TERMUX_SCRIPTDIR}/repo.json)
+export TERMUX_PACKAGES_DIRECTORIES=$(jq --raw-output 'keys | .[]' ${TERMUX_SCRIPTDIR}/repo.json)
 
 # Special variable for internal use. It forces script to ignore
 # lock file.

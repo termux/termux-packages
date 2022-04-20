@@ -59,7 +59,7 @@ rm -rf "${TERMUX_PKG_TMPDIR}"
 )
 
 # Package sources.
-for repo_path in $(jq --raw-output 'keys | .[]' < $TERMUX_SCRIPTDIR/repo.json); do
+for repo_path in $(jq --raw-output 'keys | .[]' $TERMUX_SCRIPTDIR/repo.json); do
 	for p in "$TERMUX_SCRIPTDIR"/$repo_path/*; do
 		(
 			. "$TERMUX_SCRIPTDIR"/scripts/properties.sh

@@ -178,7 +178,7 @@ check() {
 	if [ -d "${PKG_NAME}" ] && [ -f "${PKG_NAME}/build.sh" ]; then
 		build_sh="${PKG_NAME}/build.sh"
 	else
-		for repo_dir in $(jq --raw-output 'keys | .[]' < $TERMUX_SCRIPTDIR/repo.json); do
+		for repo_dir in $(jq --raw-output 'keys | .[]' $TERMUX_SCRIPTDIR/repo.json); do
 			if [ -f $TERMUX_SCRIPTDIR/$repo_dir/$PKG_NAME/build.sh ]; then
 				build_sh=$TERMUX_SCRIPTDIR/$repo_dir/$PKG_NAME/build.sh
 			fi

@@ -453,7 +453,7 @@ linter_main() {
 }
 
 if [ $# -eq 0 ]; then
-	for repo_dir in $(jq --raw-output 'keys | .[]' < $REPO_DIR/repo.json); do
+	for repo_dir in $(jq --raw-output 'keys | .[]' $REPO_DIR/repo.json); do
 		linter_main $repo_dir/*/build.sh
 	done || exit 1
 else

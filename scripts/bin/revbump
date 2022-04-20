@@ -34,7 +34,7 @@ fi
 for package in "${@}"; do
 	package="${package%%/}"
 	buildsh_path=
-	for repo in $(jq --raw-output 'keys | .[]' < ${REPO_ROOT}/repo.json); do
+	for repo in $(jq --raw-output 'keys | .[]' ${REPO_ROOT}/repo.json); do
 		_buildsh_path="${REPO_ROOT}/${repo}/${package}/build.sh"
 		echo $_buildsh_path
 

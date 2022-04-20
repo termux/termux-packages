@@ -39,7 +39,7 @@ for package in "${@}"; do
 		buildsh_path="${package}/build.sh"
 		package=$(basename ${package})
 	else
-		for repo_path in $(jq --raw-output 'keys | . []' < $REPO_ROOT/repo.json); do
+		for repo_path in $(jq --raw-output 'keys | .[]' $REPO_ROOT/repo.json); do
 			if [ -d "${repo_path}/${package}" ] && [ -f "${repo_path}/${package}/build.sh" ]; then
 				buildsh_path="${repo_path}/${package}/build.sh"
 				package=$(basename ${package})
