@@ -9,6 +9,7 @@ TERMUX_PKG_DEPENDS="qt5-qtbase, qt5-qtsvg, xcompmgr, picom"
 TERMUX_PKG_RECOMMENDS="featherpad"
 TERMUX_PKG_BUILD_DEPENDS="qt5-qtbase-cross-tools, qt5-qttools-cross-tools"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_configure(){
     "${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
