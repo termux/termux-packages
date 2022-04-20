@@ -18,6 +18,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DSENSORS_PLUGIN=OFF
 -DVOLUME_USE_ALSA=OFF
 "
+TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_pre_configure() {
     # Add RUNPATH to the private libraries used by lxqt-panel's plugins
