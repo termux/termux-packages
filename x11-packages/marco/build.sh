@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://marco.mate-desktop.dev/
 TERMUX_PKG_DESCRIPTION="MATE default window manager"
 TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.24.2
 TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://github.com/mate-desktop/marco/releases/download/v$TERMUX_PKG_VERSION/marco-$TERMUX_PKG_VERSION.tar.xz

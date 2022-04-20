@@ -4,6 +4,7 @@ TERMUX_PKG_SHA256="bcf60a270d19fc869f8228629b5fc38a4612fcf18dbd63dca2eb5914d644c
 TERMUX_PKG_VERSION="1.25.2"
 TERMUX_PKG_SRCURL="https://github.com/kubernetes/minikube/archive/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_LICENSE="Apache-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_DEPENDS="docker, kubectl"
 
 termux_step_make() {

@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://tarot.freeshell.org/leafpad/
 TERMUX_PKG_DESCRIPTION="GTK+ based simple text editor"
 TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.8.18.1
 TERMUX_PKG_REVISION=15
 TERMUX_PKG_SRCURL=http://download.savannah.gnu.org/releases/leafpad/leafpad-${TERMUX_PKG_VERSION}.tar.gz

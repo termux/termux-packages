@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://libmatekbd.mate-desktop.dev/
 TERMUX_PKG_DESCRIPTION="libmatekbd is a fork of libgnomekbd"
 TERMUX_PKG_LICENSE="LGPL-2.1"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.25.0
 TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://github.com/mate-desktop/libmatekbd/releases/download/v$TERMUX_PKG_VERSION/libmatekbd-$TERMUX_PKG_VERSION.tar.xz

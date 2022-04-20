@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://mate-settings-daemon.mate-desktop.dev/
 TERMUX_PKG_DESCRIPTION="mate-settings-daemon is a fork of gnome-settings-daemon"
 TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.24.2
 TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=https://github.com/mate-desktop/mate-settings-daemon/releases/download/v$TERMUX_PKG_VERSION/mate-settings-daemon-$TERMUX_PKG_VERSION.tar.xz

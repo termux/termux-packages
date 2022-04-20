@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://mate-terminal.mate-desktop.dev/
 TERMUX_PKG_DESCRIPTION="This is the MATE terminal emulator application"
 TERMUX_PKG_LICENSE="GPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.24.1
 TERMUX_PKG_REVISION=7
 TERMUX_PKG_SRCURL=https://github.com/mate-desktop/mate-terminal/releases/download/v$TERMUX_PKG_VERSION/mate-terminal-$TERMUX_PKG_VERSION.tar.xz

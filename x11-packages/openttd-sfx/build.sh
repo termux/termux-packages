@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://bundles.openttdcoop.org/opensfx
 TERMUX_PKG_DESCRIPTION="Free sound set for openttd"
-TERMUX_PKG_LICENSE="CCSP"
+TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="license.txt"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.2.3
