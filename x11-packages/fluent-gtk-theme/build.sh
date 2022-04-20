@@ -9,6 +9,7 @@ TERMUX_PKG_SHA256=e0cff57bd6b0a153315155584f144785d743fb29d30c5a3ea9e14bfbad7aad
 TERMUX_PKG_DEPENDS="gtk3, gtk2-engines-murrine"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
+TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make_install(){
 	./install.sh -d ${TERMUX_PREFIX}/share/themes

@@ -8,6 +8,7 @@ TERMUX_PKG_SHA256=cea0e7039a5d328158a92074034e172584071897ee256e85bb8f104cc10d6d
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_DEPENDS="hicolor-icon-theme"
 TERMUX_PKG_RM_AFTER_INSTALL="share/icons/Adwaita/icon-theme.cache"
+TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_pre_configure() {
 	autoreconf -fvi
