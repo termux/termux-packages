@@ -15,23 +15,45 @@ diff -uNr qemu-5.2.0/include/qapi/util.h qemu-5.2.0.mod/include/qapi/util.h
 diff -uNr qemu-5.2.0/meson.build qemu-5.2.0.mod/meson.build
 --- qemu-5.2.0/meson.build	2020-12-08 18:59:44.000000000 +0200
 +++ qemu-5.2.0.mod/meson.build	2020-12-09 17:18:04.165911853 +0200
-@@ -94,11 +94,11 @@
+@@ -185,38 +185,6 @@
  
  # Specify linker-script with add_project_link_arguments so that it is not placed
  # within a linker --start-group/--end-group pair
--if 'CONFIG_FUZZ' in config_host
--   add_project_link_arguments(['-Wl,-T,',
--                               (meson.current_source_dir() / 'tests/qtest/fuzz/fork_fuzz.ld')],
+-if get_option('fuzzing')
+-  add_project_link_arguments(['-Wl,-T,',
+-                              (meson.current_source_dir() / 'tests/qtest/fuzz/fork_fuzz.ld')],
+-                             native: false, language: ['c', 'cpp', 'objc'])
+-
+-  # Specify a filter to only instrument code that is directly related to
+-  # virtual-devices.
+-  configure_file(output: 'instrumentation-filter',
+-                 input: 'scripts/oss-fuzz/instrumentation-filter-template',
+-                 copy: true)
+-  add_global_arguments(
+-      cc.get_supported_arguments('-fsanitize-coverage-allowlist=instrumentation-filter'),
+-      native: false, language: ['c', 'cpp', 'objc'])
+-
+-  if get_option('fuzzing_engine') == ''
+-    # Add CFLAGS to tell clang to add fuzzer-related instrumentation to all the
+-    # compiled code.  To build non-fuzzer binaries with --enable-fuzzing, link
+-    # everything with fsanitize=fuzzer-no-link. Otherwise, the linker will be
+-    # unable to bind the fuzzer-related callbacks added by instrumentation.
+-    add_global_arguments('-fsanitize=fuzzer-no-link',
+-                         native: false, language: ['c', 'cpp', 'objc'])
+-    add_global_link_arguments('-fsanitize=fuzzer-no-link',
 -                              native: false, language: ['c', 'cpp', 'objc'])
+-    # For the actual fuzzer binaries, we need to link against the libfuzzer
+-    # library. They need to be configurable, to support OSS-Fuzz
+-    fuzz_exe_ldflags = ['-fsanitize=fuzzer']
+-  else
+-    # LIB_FUZZING_ENGINE was set; assume we are running on OSS-Fuzz, and
+-    # the needed CFLAGS have already been provided
+-    fuzz_exe_ldflags = get_option('fuzzing_engine').split()
+-  endif
 -endif
-+#if 'CONFIG_FUZZ' in config_host
-+#   add_project_link_arguments(['-Wl,-T,',
-+#                               (meson.current_source_dir() / 'tests/qtest/fuzz/fork_fuzz.ld')],
-+#                              native: false, language: ['c', 'cpp', 'objc'])
-+#endif
  
- add_project_arguments(config_host['QEMU_CFLAGS'].split(),
-                       native: false, language: ['c', 'objc'])
+ add_global_arguments(qemu_cflags, native: false, language: ['c'])
+ add_global_arguments(qemu_cxxflags, native: false, language: ['cpp'])
 @@ -1575,8 +1575,8 @@
  specific_ss.add_all(when: 'CONFIG_LINUX_USER', if_true: linux_user_ss)
  
