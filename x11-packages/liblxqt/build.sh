@@ -8,3 +8,4 @@ TERMUX_PKG_SHA256=d62820a94839637aedd6a0ceecc232f85d8ccd2173d4ec655cd92c9cbcbcc9
 TERMUX_PKG_DEPENDS="qt5-qtbase, qt5-qtx11extras, kwindowsystem, libqtxdg, libxss"
 TERMUX_PKG_BUILD_DEPENDS="lxqt-build-tools, qt5-qtbase-cross-tools"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DBUILD_BACKLIGHT_LINUX_BACKEND=OFF"
+TERMUX_PKG_AUTO_UPDATE=true
