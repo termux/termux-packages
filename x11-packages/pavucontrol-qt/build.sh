@@ -8,4 +8,4 @@ TERMUX_PKG_SRCURL="https://github.com/lxqt/pavucontrol-qt/releases/download/${TE
 TERMUX_PKG_SHA256=6c274cd3a80a699c4b3f4dbf4eccaef3fafdc677c6240e2b45672bafe46da170
 TERMUX_PKG_DEPENDS="qt5-qtbase, kwindowsystem, liblxqt, pulseaudio-glib"
 TERMUX_PKG_BUILD_DEPENDS="lxqt-build-tools, qt5-qtbase-cross-tools, qt5-qttools-cross-tools"
-
+TERMUX_PKG_AUTO_UPDATE=true

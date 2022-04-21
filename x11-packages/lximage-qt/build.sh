@@ -8,3 +8,4 @@ TERMUX_PKG_SRCURL="https://github.com/lxqt/lximage-qt/releases/download/${TERMUX
 TERMUX_PKG_SHA256=2e284f3f42506d5b6df6091982d24e1dc41c99c838037939844f70d703d1d03c
 TERMUX_PKG_DEPENDS="qt5-qtbase, qt5-qtx11extras, qt5-qtsvg, libfm-qt, libexif, libxfixes"
 TERMUX_PKG_BUILD_DEPENDS="lxqt-build-tools, qt5-qtbase-cross-tools, qt5-qttools-cross-tools"
+TERMUX_PKG_AUTO_UPDATE=true

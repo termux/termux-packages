@@ -7,4 +7,4 @@ TERMUX_PKG_SRCURL="https://github.com/lxqt/libfm-qt/releases/download/${TERMUX_P
 TERMUX_PKG_SHA256=743d9c8fc30d065d7fefc12e72f31085891733184f1320ba3ade890dae54993b
 TERMUX_PKG_DEPENDS="qt5-qtbase, qt5-qtx11extras, glib, libxcb, libexif, menu-cache"
 TERMUX_PKG_BUILD_DEPENDS="lxqt-build-tools, qt5-qtbase-cross-tools, qt5-qttools-cross-tools"
-
+TERMUX_PKG_AUTO_UPDATE=true

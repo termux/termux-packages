@@ -8,3 +8,4 @@ TERMUX_PKG_SRCURL="https://github.com/lxqt/libsysstat/releases/download/${TERMUX
 TERMUX_PKG_SHA256=f19b6550d78939cc1ad11c5788e2a7293f7f886d037837cd1cf56ebcdf2b5ed2
 TERMUX_PKG_DEPENDS="qt5-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="lxqt-build-tools, qt5-qtbase-cross-tools"
+TERMUX_PKG_AUTO_UPDATE=true

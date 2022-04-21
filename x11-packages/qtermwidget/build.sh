@@ -7,3 +7,4 @@ TERMUX_PKG_SRCURL="https://github.com/lxqt/qtermwidget/releases/download/${TERMU
 TERMUX_PKG_SHA256=2af0e9f212932cb36bbbf20722eaf4a1d3acf640dfed9b763ca7d388af8b7fd2
 TERMUX_PKG_DEPENDS="qt5-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="lxqt-build-tools, qt5-qttools-cross-tools"
+TERMUX_PKG_AUTO_UPDATE=true

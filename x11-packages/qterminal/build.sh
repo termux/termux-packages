@@ -7,3 +7,4 @@ TERMUX_PKG_SRCURL="https://github.com/lxqt/qterminal/releases/download/${TERMUX_
 TERMUX_PKG_SHA256=f169a5279ae5afe386ec3016385c7692b551fea1bae639a8ae438ec90165a643
 TERMUX_PKG_DEPENDS="qt5-qtbase, qt5-qtx11extras, qtermwidget"
 TERMUX_PKG_BUILD_DEPENDS="lxqt-build-tools, qt5-qttools-cross-tools"
+TERMUX_PKG_AUTO_UPDATE=true
