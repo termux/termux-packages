@@ -17,7 +17,6 @@ TERMUX_PKG_ESSENTIAL=true
 
 TERMUX_PKG_CONFFILES="
 etc/apt/sources.list
-etc/apt/trusted.gpg
 "
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -77,7 +76,6 @@ termux_step_post_make_install() {
 		echo "# The main termux repository:"
 		echo "# deb https://packages.termux.org/apt/termux-main/ stable main"
 	} > $TERMUX_PREFIX/etc/apt/sources.list
-	cp $TERMUX_PKG_BUILDER_DIR/trusted.gpg $TERMUX_PREFIX/etc/apt/
 
 	# apt-transport-tor
 	ln -sfr $TERMUX_PREFIX/lib/apt/methods/http $TERMUX_PREFIX/lib/apt/methods/tor
