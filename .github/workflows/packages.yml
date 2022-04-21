@@ -132,7 +132,7 @@ jobs:
           done
         fi
 
-        for repo in $(jq --raw-output '.[]' repo.json); do
+        for repo in $(jq --raw-output '.[].name' repo.json); do
           # Fix so that lists do not contain duplicates
           if [ -f ./built_${repo}_packages.txt ]; then
             uniq ./built_${repo}_packages.txt > ./built_${repo}_packages.txt.tmp
