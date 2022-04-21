@@ -1,0 +1,44 @@
+--- ./src/node_os.cc.orig	2022-05-21 12:57:08.452384635 +0530
++++ ./src/node_os.cc	2022-05-21 13:07:50.752384390 +0530
+@@ -32,6 +32,8 @@
+ # include <climits>         // PATH_MAX on Solaris.
+ #endif  // __POSIX__
+ 
++#include <sys/sysinfo.h>
++
+ #include <array>
+ #include <cerrno>
+ #include <cstring>
+@@ -98,6 +100,16 @@
+                                        arraysize(osInformation)));
+ }
+ 
++static void GetNumCPUs(const FunctionCallbackInfo<Value>& args) {
++  Environment* env = Environment::GetCurrent(args);
++  Isolate* isolate = env->isolate();
++  int n = get_nprocs();
++  if (n < 1) {
++    n = 1;
++  }
++  args.GetReturnValue().Set(Number::New(isolate, n));
++}
++
+ static void GetCPUInfo(const FunctionCallbackInfo<Value>& args) {
+   Environment* env = Environment::GetCurrent(args);
+   Isolate* isolate = env->isolate();
+@@ -388,6 +400,7 @@
+   env->SetMethod(target, "getUptime", GetUptime);
+   env->SetMethod(target, "getTotalMem", GetTotalMemory);
+   env->SetMethod(target, "getFreeMem", GetFreeMemory);
++  env->SetMethod(target, "getNumCPUs", GetNumCPUs);
+   env->SetMethod(target, "getCPUs", GetCPUInfo);
+   env->SetMethod(target, "getInterfaceAddresses", GetInterfaceAddresses);
+   env->SetMethod(target, "getHomeDirectory", GetHomeDirectory);
+@@ -406,6 +419,7 @@
+   registry->Register(GetUptime);
+   registry->Register(GetTotalMemory);
+   registry->Register(GetFreeMemory);
++  registry->Register(GetNumCPUs);
+   registry->Register(GetCPUInfo);
+   registry->Register(GetInterfaceAddresses);
+   registry->Register(GetHomeDirectory);

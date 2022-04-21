@@ -1,7 +1,16 @@
-diff '--color=auto' -uNr node-v17.8.0.orig/node.gyp node-v17.8.0/node.gyp
---- node-v17.8.0.orig/node.gyp	2022-03-26 22:11:04.155459285 +0530
-+++ node-v17.8.0/node.gyp	2022-03-26 22:12:22.275459256 +0530
-@@ -436,6 +436,7 @@
+--- node-v18.0.0.orig/node.gyp	2022-04-21 15:15:48.561869784 +0530
++++ node-v18.0.0/node.gyp	2022-05-19 18:01:39.524596955 +0530
+@@ -158,7 +158,8 @@
+       ],
+ 
+       'sources': [
+-        'src/node_main.cc'
++        'src/node_main.cc',
++        'src/getaddrinfo.c'
+       ],
+ 
+       'dependencies': [
+@@ -461,6 +462,7 @@
  
        'include_dirs': [
          'src',
@@ -9,7 +18,7 @@ diff '--color=auto' -uNr node-v17.8.0.orig/node.gyp node-v17.8.0/node.gyp
          '<(SHARED_INTERMEDIATE_DIR)' # for node_natives.h
        ],
        'dependencies': [
-@@ -1158,162 +1159,6 @@
+@@ -1183,162 +1185,6 @@
          }],
        ],
      }, # fuzz_env
@@ -172,7 +181,7 @@ diff '--color=auto' -uNr node-v17.8.0.orig/node.gyp node-v17.8.0/node.gyp
  
      {
        'target_name': 'overlapped-checker',
-@@ -1392,59 +1237,13 @@
+@@ -1417,59 +1263,13 @@
              'Ws2_32.lib',
            ],
          }],
