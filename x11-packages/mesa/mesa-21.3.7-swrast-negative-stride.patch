@@ -1,0 +1,91 @@
+https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/9352
+
+https://gitlab.freedesktop.org/mesa/mesa/-/issues/4377
+https://github.com/termux/termux-packages/issues/10079
+
+From 51a30a761f76f93f28ffbb5d407a47491173136c Mon Sep 17 00:00:00 2001
+From: Eric Anholt <eric@anholt.net>
+Date: Mon, 1 Mar 2021 14:06:10 -0800
+Subject: [PATCH] swrast: Fix put_values() to negative stride.
+
+In the refactor to use util_format_write_4*(), I missed that that path was
+doing its stride calcs in unsigned, while swrast likes to have negative
+strides for winsys buffers.
+
+We'll be faster with the format table lookups inlined, anyway, so just
+roll our own of the little bit of addressing math.
+
+Fixes: #4377
+---
+ src/mesa/swrast/s_span.c   | 23 ++++++++++++++---------
+ src/util/format/u_format.h | 13 +++++++++++++
+ 2 files changed, 27 insertions(+), 9 deletions(-)
+
+diff --git a/src/mesa/swrast/s_span.c b/src/mesa/swrast/s_span.c
+index cba2ddcb4c39..b0f6c18e0cfd 100644
+--- a/src/mesa/swrast/s_span.c
++++ b/src/mesa/swrast/s_span.c
+@@ -1042,22 +1042,27 @@ put_values(struct gl_context *ctx, struct gl_renderbuffer *rb,
+            const void *values, const GLubyte *mask)
+ {
+    struct swrast_renderbuffer *srb = swrast_renderbuffer(rb);
++   const struct util_format_description *format_desc =
++      util_format_description(rb->Format);
+    GLuint i;
+ 
+    for (i = 0; i < count; i++) {
+       if (mask[i]) {
+-         if (datatype == GL_UNSIGNED_BYTE) {
+-            util_format_write_4ub(rb->Format,
+-                                  (uint8_t *)values + 4 * i, 0,
+-                                  srb->Map, srb->RowStride,
+-                                  x[i], y[i], 1, 1);
++         /* NOTE: We don't use util_format_write_4* for this because it does the
++          * stride multiply in unsigned, but our rowstride can be negative for
++          * winsys buffers.
++          */
++         void *pixel = srb->Map +
++            y[i] * srb->RowStride +
++            x[i] * (format_desc->block.bits / 8);
++
++         if (datatype == GL_UNSIGNED_BYTE)
++         {
++            util_format_pack_rgba_8unorm(rb->Format, pixel, (const uint8_t *)values + 4 * i, 1);
+          }
+          else {
+             assert(datatype == GL_FLOAT);
+-            util_format_write_4(rb->Format,
+-                                (float *)values + 4 * i, 0,
+-                                srb->Map, srb->RowStride,
+-                                x[i], y[i], 1, 1);
++            util_format_pack_rgba(rb->Format, pixel, (const float *)values + 4 * i, 1);
+          }
+       }
+    }
+diff --git a/src/util/format/u_format.h b/src/util/format/u_format.h
+index 804dd3486a0c..2f6305d24cfa 100644
+--- a/src/util/format/u_format.h
++++ b/src/util/format/u_format.h
+@@ -1574,6 +1574,19 @@ util_format_pack_rgba(enum pipe_format format, void *dst,
+       desc->pack_rgba_float((uint8_t *)dst, 0, (const float *)src, 0, w, 1);
+ }
+ 
++/**
++ * Packs a row of color data from 8-bit-per-channel unorm RGBA.
++ */
++static inline void
++util_format_pack_rgba_8unorm(enum pipe_format format, void *dst,
++                        const void *src, unsigned w)
++{
++   const struct util_format_pack_description *desc =
++      util_format_pack_description(format);
++
++   desc->pack_rgba_8unorm((uint8_t *)dst, 0, (const uint8_t *)src, 0, w, 1);
++}
++
+ /*
+  * Format access functions for subrectangles
+  */
+-- 
+GitLab
+
