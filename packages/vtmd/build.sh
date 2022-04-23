@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://vtm.netxs.online/
-TERMUX_PKG_DESCRIPTION="Terminal multiplexer with TUI window manager and multi-party session sharing"
+TERMUX_PKG_DESCRIPTION="Terminal multiplexer with TUI window manager and multi-party session sharing [DEMO]"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.7.1"
