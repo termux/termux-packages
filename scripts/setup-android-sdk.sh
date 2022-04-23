@@ -8,8 +8,7 @@ set -e -u
 . $(cd "$(dirname "$0")"; pwd)/properties.sh
 . $(cd "$(dirname "$0")"; pwd)/build/termux_download.sh
 
-ANDROID_SDK_REVISION=7583922
-ANDROID_SDK_FILE=commandlinetools-linux-${ANDROID_SDK_REVISION}_latest.zip
+ANDROID_SDK_FILE=commandlinetools-linux-${TERMUX_SDK_REVISION}_latest.zip
 ANDROID_SDK_SHA256=124f2d5115eee365df6cf3228ffbca6fc3911d16f8025bebd5b1c6e2fcfa7faf
 ANDROID_NDK_FILE=android-ndk-r${TERMUX_NDK_VERSION}-linux.zip
 ANDROID_NDK_SHA256=c6e97f9c8cfe5b7be0a9e6c15af8e7a179475b7ded23e2d1c1fa0945d6fb4382
@@ -21,10 +20,10 @@ if [ ! -d $ANDROID_HOME ]; then
 	# https://developer.android.com/studio/index.html#command-tools
 	echo "Downloading android sdk..."
 	termux_download https://dl.google.com/android/repository/${ANDROID_SDK_FILE} \
-		tools-$ANDROID_SDK_REVISION.zip \
+		tools-$TERMUX_SDK_REVISION.zip \
 		$ANDROID_SDK_SHA256
-	rm -Rf android-sdk
-	unzip -q tools-$ANDROID_SDK_REVISION.zip -d android-sdk
+	rm -Rf android-sdk-$TERMUX_SDK_REVISION
+	unzip -q tools-$TERMUX_SDK_REVISION.zip -d android-sdk-$TERMUX_SDK_REVISION
 fi
 
 if [ ! -d $NDK ]; then
@@ -37,7 +36,6 @@ if [ ! -d $NDK ]; then
 		$ANDROID_NDK_SHA256
 	rm -Rf android-ndk-r$TERMUX_NDK_VERSION
 	unzip -q ndk-r${TERMUX_NDK_VERSION}.zip
-	mv android-ndk-r$TERMUX_NDK_VERSION $(basename $NDK)
 fi
 
 yes | $ANDROID_HOME/cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_HOME --licenses
