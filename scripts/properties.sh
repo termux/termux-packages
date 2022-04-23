@@ -11,7 +11,14 @@ TERMUX_NDK_VERSION=$TERMUX_NDK_VERSION_NUM$TERMUX_NDK_REVISION
 # update SHA256 sums in scripts/setup-android-sdk.sh
 # check all packages build and run correctly and bump if needed
 
-export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+if [ -d "/usr/lib/jvm/java-8-openjdk-amd64" ]; then
+	export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+elif [ -d "/usr/lib/jvm/java-8-openjdk" ]; then
+	export JAVA_HOME=/usr/lib/jvm/java-8-openjdk
+else
+	echo "Error: /usr/lib/jvm/java-8-openjdk{,-amd64} not found. Is openjdk 8 installed?"
+	exit 1
+fi
 
 if [ "${TERMUX_PACKAGES_OFFLINE-false}" = "true" ]; then
 	export ANDROID_HOME=${TERMUX_SCRIPTDIR}/build-tools/android-sdk-$TERMUX_SDK_REVISION
