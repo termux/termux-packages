@@ -39,10 +39,10 @@ termux_step_setup_variables() {
 	fi
 
 	TERMUX_REPO_URL=(
-		https://termux.net
-		https://dl.bintray.com/grimler/game-packages-21
-		https://dl.bintray.com/grimler/science-packages-21
-		https://dl.bintray.com/grimler/termux-root-packages-21
+		https://packages.termux.org/termux-main-21
+		https://termux.org/game-packages-21-bin
+		https://termux.org/science-packages-21-bin
+		https://termux.org/termux-root-packages-21-bin
 	)
 
 	TERMUX_REPO_DISTRIBUTION=(
