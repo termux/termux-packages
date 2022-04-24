@@ -128,70 +128,93 @@ _run_update() {
 	fi
 }
 
-_create_gh_issue() {
-	local pkg="$1"
-	gh issue create --title "Auto update failing for ${pkg}" --label "auto update" \
-		--assignee "${GITHUB_ACTOR}" --body "$(
-			cat <<-EOF
-				Auto update failed for ${pkg}.
-				<details><summary>Output log</summary>
-				<pre lang="bash">
-					${_FAILED_UPDATES[$pkg]}
-				</pre>
-				</details>
-				<i>Automatically submitted by github ci.<br>
-				Run ID: <a href="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}">${GITHUB_RUN_ID}</a><br>
-				Timestamp: $(date -u +"%Y-%m-%dT%H:%M:%SZ")<br></i>
-			EOF
-		)"
-}
+_gh_issue() {
+	local pkg_name="$1"
+	local header="$2"
+	local issue_number="${3:-}"
+	local max_comment_length=65536 # Max comment length in one request.
 
-_update_gh_issue() {
-	local issue_number="$1"
-	local pkg="$2"
-	gh issue edit "$issue_number" --body "$(
-		gh issue view --json body --jq '.body' "${issue_number}"
-		echo "<br>"
+	local body="$(
 		cat <<-EOF
-			<h4>EDIT:</h4>
+			${header}
 
-			Update failed again.
+			Here's the output of the update script:
 
 			<details><summary>Output log</summary>
 			<pre lang="bash">
-				${_FAILED_UPDATES[$pkg]}
+				${_FAILED_UPDATES[$pkg_name]}
 			</pre>
 			</details>
-			<i>Automatically submitted by github ci.<br>
-			Run ID: <a href="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}">${GITHUB_RUN_ID}</a><br>
-			Timestamp: $(date -u +"%Y-%m-%dT%H:%M:%SZ")<br></i>
+
+			Thanks!
+
+			<i>
+				Run ID: <a href="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}">${GITHUB_RUN_ID}</a><br>
+				Timestamp: $(date -u +"%Y-%m-%d %H:%M:%S UTC")<br>
+			</i>
 		EOF
 	)"
+
+	if [[ -z "${issue_number}" ]]; then
+		issue_number="$(
+			gh issue create \
+				--label "auto update failing" --label "bot" \
+				--title "Auto update failing for ${pkg_name}" \
+				--body "" |       # Body is empty, since we will append the logs later.
+				grep -oE '[0-9]+' # Last component in url returned is issue number.
+		)"
+	fi
+
+	while true; do
+		local comment_part="${body:0:$max_comment_length}"
+		body="${body:$max_comment_length}"
+		sleep 5 # Otherwise we might get rate limited.
+		gh issue edit "$issue_number" \
+			--body-file - <<<"$(gh issue view "$issue_number" --json body --jq '.body')<br>$comment_part"
+		# NOTE: we use --body-file instead of --body to avoid shell error 'argument list too long'.
+		if [[ -z "${body}" ]]; then
+			break
+		fi
+	done
 }
 
 _handle_failure() {
-	if [[ "${GITHUB_ACTIONS:-}" == "true" ]]; then # GITHUB_ACTIONS is always set to true on github CI.
-		echo "INFO: Creating issue for failed updates."
-		declare -A existing_issues # Map of ==> issue title :: issue number
-		for issue_number in $(gh issue list --label "auto update" --json number --jq '.[] | .number' --state open); do
-			existing_issues["$(gh issue view "${issue_number}" --json title --jq '.title')"]="${issue_number}"
-		done
-		for pkg in "${!_FAILED_UPDATES[@]}"; do
-			# shellcheck disable=SC2076
-			# Here we check if an issue with same title already existis then update that issue,
-			# rather than crating a new one again.
-			if [[ " ${!existing_issues[*]} " =~ " Auto update failing for ${pkg} " ]]; then
-				# Here we are passing issue_number, pkg name to _update_gh_issue function.
-				_update_gh_issue "${existing_issues["Auto update failing for ${pkg}"]}" "${pkg}"
+	if [[ "${GITHUB_ACTIONS:-}" == "true" ]]; then
+		echo # Newline.
+		echo "INFO: Creating/Updating issue for failed updates."
+		for pkg_name in "${!_FAILED_UPDATES[@]}"; do
+			local issue_number
+			issue_number=$(
+				gh issue list \
+					--label "auto update failing" --label "bot" \
+					--state open \
+					--search "Auto update failing for ${pkg_name} in:title type:issue" \
+					--json number --jq '.[0].number' # Assume only one issue (and it should be too).
+			)
+			local header
+			if [[ -z "${issue_number}" ]]; then
+				header="$(
+					cat <<-EOF
+						Hi, I'm Termux 🤖.
+
+						I'm here to help you update your Termux packages.
+
+						I've tried to update the ${pkg_name} package, but it failed. 
+					EOF
+				)"
 			else
-				_create_gh_issue "${pkg}" # Create a new issue with this package name.
+				header="<h4>EDIT:</h4><br>It failed again."
 			fi
+			_gh_issue "${pkg_name}" "${header}" ${issue_number}
 		done
+
 	else
 		echo # Newline.
 		echo "==> Failed updates:"
-		for pkg in "${!_FAILED_UPDATES[@]}"; do
-			echo "-> ${pkg}" # Only print package name.
+		local count=0
+		for pkg_name in "${!_FAILED_UPDATES[@]}"; do
+			count=$((count + 1))
+			echo "${count}. ${pkg_name}"
 		done
 		exit 1
 	fi
