@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@licy183"
 _MAJOR_VERSION=3.8
 TERMUX_PKG_VERSION=7.3.9
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://downloads.python.org/pypy/pypy$_MAJOR_VERSION-v$TERMUX_PKG_VERSION-src.tar.bz2
 TERMUX_PKG_SHA256=5b5d9d9256f12a129af8384e2f581bdfab3bc0fbbe3a0a480d9c1d2e95490eb1
 TERMUX_PKG_DEPENDS="gdbm, libandroid-posix-semaphore, libandroid-support, libbz2, libcrypt, libexpat, libffi, liblzma, libsqlite, libxml2, ncurses, ncurses-ui-libs, openssl, readline, zlib"
@@ -11,9 +12,6 @@ TERMUX_PKG_BUILD_DEPENDS="binutils, clang, dash, make, ndk-multilib, pkg-config,
 TERMUX_PKG_RECOMMENDS="clang, make, pkg-config"
 TERMUX_PKG_SUGGESTS="pypy3-tkinter"
 TERMUX_PKG_BUILD_IN_SRC=true
-# `termux-docker` doesn't provide the docker image of arm architecture.
-# See https://github.com/termux/termux-docker#known-issues
-TERMUX_PKG_BLACKLISTED_ARCHES="arm"
 TERMUX_PKG_RM_AFTER_INSTALL="
 opt/pypy3/lib/pypy$_MAJOR_VERSION/test
 opt/pypy3/lib/pypy$_MAJOR_VERSION/*/test
@@ -74,11 +72,11 @@ termux_step_pre_configure() {
 	fi
 
 	# Get host platform rootfs tar if needed.
-	if [ ! -f "$TERMUX_PKG_CACHEDIR/kcubeterm_termux_$HOST_ARCH.tar" ]; then
+	if [ ! -f "$TERMUX_PKG_CACHEDIR/termux_termux-docker_$HOST_ARCH.tar" ]; then
 		(
 			cd $TERMUX_PKG_CACHEDIR
-			$DOCKER_PULL kcubeterm/termux:$HOST_ARCH
-			mv kcubeterm_termux.tar kcubeterm_termux_$HOST_ARCH.tar
+			$DOCKER_PULL termux/termux-docker:$HOST_ARCH
+			mv termux_termux-docker.tar termux_termux-docker_$HOST_ARCH.tar
 		)
 	fi
 
@@ -91,11 +89,11 @@ termux_step_pre_configure() {
 		if [ $QEMU_MAJOR_VERSION -lt '6' ]; then
 			termux_error_exit "qemu-user-static's version must be greater than 6.0.0"
 		fi
-		if [ ! -f "$TERMUX_PKG_CACHEDIR/kcubeterm_termux_$TERMUX_ARCH.tar" ]; then
+		if [ ! -f "$TERMUX_PKG_CACHEDIR/termux_termux-docker_$TERMUX_ARCH.tar" ]; then
 			(
 				cd $TERMUX_PKG_CACHEDIR
-				$DOCKER_PULL kcubeterm/termux:$TERMUX_ARCH
-				mv kcubeterm_termux.tar kcubeterm_termux_$TERMUX_ARCH.tar
+				$DOCKER_PULL termux/termux-docker:$TERMUX_ARCH
+				mv termux_termux-docker.tar termux_termux-docker_$TERMUX_ARCH.tar
 			)
 		fi
 	fi
@@ -107,7 +105,7 @@ termux_step_configure() {
 
 	# Bootstrap a proot rootfs for the host platform
 	HOST_ROOTFS_BASE=$TERMUX_PKG_TMPDIR/host-rootfs
-	cat "$TERMUX_PKG_CACHEDIR/kcubeterm_termux_$HOST_ARCH.tar" | $UNDOCKER -o $HOST_ROOTFS_BASE
+	cat "$TERMUX_PKG_CACHEDIR/termux_termux-docker_$HOST_ARCH.tar" | $UNDOCKER -o $HOST_ROOTFS_BASE
 
 	# Add build dependicies for pypy on the host platform rootfs
 	# Build essential
@@ -140,7 +138,6 @@ termux_step_configure() {
 	$PROOT_HOST update-static-dns
 	$PROOT_HOST apt autoremove --purge -yq science-repo game-repo || :
 	sed -i "s/deb/deb [trusted=yes]/g" $HOST_ROOTFS_BASE/$TERMUX_PREFIX/etc/apt/sources.list
-	sed -i "s/packages.termux.org/packages-cf.termux.org/g" $HOST_ROOTFS_BASE/$TERMUX_PREFIX/etc/apt/sources.list
 	$PROOT_HOST apt update
 	$PROOT_HOST apt install -o Dpkg::Options::=--force-confnew -yq $BUILD_DEP
 	$PROOT_HOST python2 -m pip install cffi pycparser
@@ -155,7 +152,7 @@ termux_step_configure() {
 		cp /usr/bin/qemu-$TERMUX_ARCH-static $HOST_ROOTFS_BASE/$TERMUX_PREFIX/bin/
 		TARGET_ROOTFS_BASE=$TERMUX_ANDROID_HOME/target-rootfs
 		mkdir -p $HOST_ROOTFS_BASE/$TARGET_ROOTFS_BASE
-		cat "$TERMUX_PKG_CACHEDIR/kcubeterm_termux_$TERMUX_ARCH.tar" | $UNDOCKER -o $HOST_ROOTFS_BASE/$TARGET_ROOTFS_BASE
+		cat "$TERMUX_PKG_CACHEDIR/termux_termux-docker_$TERMUX_ARCH.tar" | $UNDOCKER -o $HOST_ROOTFS_BASE/$TARGET_ROOTFS_BASE
 		PROOT_TARGET="env -i PROOT_NO_SECCOMP=1
 			$TERMUX_RUNTIME_ENV_VARS
 			$PROOT
@@ -173,10 +170,7 @@ termux_step_configure() {
 		$PROOT_TARGET apt autoremove --purge -yq science-repo game-repo || :
 		# FIXME: If we don't add `[trusted=yes]`, apt-key will generate an error.
 		# FIXME: The key(s) in the keyring XXX.gpg are ignored as the file is not readable by user '' executing apt-key.
-		# FIXME: I have no idea why this error occurs in github action, neither
-		# FIXME: can I reproduce it in my local docker container.
 		sed -i "s/deb/deb [trusted=yes]/g" $HOST_ROOTFS_BASE/$TARGET_ROOTFS_BASE/$TERMUX_PREFIX/etc/apt/sources.list
-		sed -i "s/packages.termux.org/packages-cf.termux.org/g" $HOST_ROOTFS_BASE/$TARGET_ROOTFS_BASE/$TERMUX_PREFIX/etc/apt/sources.list
 		$PROOT_TARGET apt update
 		$PROOT_TARGET apt install -o Dpkg::Options::=--force-confnew -yq dash
 		# Use dash to provide /system/bin/sh, since /system/bin/sh is a symbolic link
