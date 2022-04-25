@@ -2,11 +2,11 @@
 __termux_haskell_register_packages() {
 	# Register dependency haskell packages with termux-ghc-pkg.
 	echo "Registering haskell packages with ghc-pkg...(if any)"
-	while read -r DEP DEP_DIR; do
+	while read DEP DEP_DIR; do
 		if [[ -z $DEP ]]; then
 			continue
 		elif [[ "${DEP}" == "ERROR" ]]; then
-			termux_error_exit "Failed to find dependencies of ${TERMUX_PKG_NAME}[Context: ${FUNCNAME[0]}]"
+			termux_error_exit "Failed to find dependencies of ${TERMUX_PKG_NAME} [Context: ${FUNCNAME[0]}]"
 		fi
 		if [[ "${DEP/haskell-/}" != "${DEP}" ]]; then
 			sed "s|${TERMUX_PREFIX}/bin/ghc-pkg|$(command -v termux-ghc-pkg)|g" \
@@ -18,7 +18,8 @@ __termux_haskell_register_packages() {
 		fi
 	done <<<"$(
 		# shellcheck disable=SC2086
-		"${TERMUX_SCRIPTDIR}"/buildorder.py -i "${TERMUX_PKG_BUILDER_DIR}" ${TERMUX_PACKAGES_DIRECTORIES} || echo "ERROR"
+		cd "${TERMUX_SCRIPTDIR}" &&
+			./scripts/buildorder.py -i "${TERMUX_PKG_BUILDER_DIR}" ${TERMUX_PACKAGES_DIRECTORIES} || echo "ERROR"
 	)"
 }
 
