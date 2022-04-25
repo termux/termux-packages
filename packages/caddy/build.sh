@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://caddyserver.com/
 TERMUX_PKG_DESCRIPTION="Fast, cross-platform HTTP/2 web server"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.4.6
+TERMUX_PKG_VERSION="2.5.0"
 TERMUX_PKG_SRCURL=https://github.com/caddyserver/caddy/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=5a450a4ff0d2dbd165d62f957ecdaebdc4bd0445c66a06a27d0025a82843402d
+TERMUX_PKG_SHA256=65b050af067dba4ff28d10dede5973a70474e7a7fc89ad8d7bc353f7c022732f
 TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make() {
