@@ -6,8 +6,10 @@ UNAME=$(uname)
 if [ "$UNAME" = Darwin ]; then
 	# Workaround for mac readlink not supporting -f.
 	REPOROOT=$PWD
+	SEC_OPT=""
 else
 	REPOROOT="$(dirname $(readlink -f $0))/../"
+	SEC_OPT=" --security-opt seccomp=$REPOROOT/scripts/profile.json"
 fi
 
 : ${TERMUX_BUILDER_IMAGE_NAME:=termux/package-builder}
@@ -36,6 +38,7 @@ $SUDO docker start $CONTAINER_NAME >/dev/null 2>&1 || {
 		--detach \
 		--name $CONTAINER_NAME \
 		--volume $REPOROOT:$CONTAINER_HOME_DIR/termux-packages \
+		$SEC_OPT \
 		--tty \
 		$TERMUX_BUILDER_IMAGE_NAME
 	if [ "$UNAME" != Darwin ]; then
