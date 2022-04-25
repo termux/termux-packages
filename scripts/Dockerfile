@@ -26,11 +26,7 @@ RUN apt-get update && \
 	# Removed unused parts to make a smaller Docker image:
 	apt-get remove -yq --autoremove lsb-release software-properties-common && \
 	apt-get clean && \
-	rm -rf /var/lib/apt/lists/* && \
-	cd /home/builder/lib/android-ndk/ && \
-	rm -Rf sources/cxx-stl/system && \
-	cd /home/builder/lib/android-sdk/tools && \
-	rm -Rf emulator* lib* proguard templates
+	rm -rf /var/lib/apt/lists/*
 
 # Switch User
 USER builder:builder
