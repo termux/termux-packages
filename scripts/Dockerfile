@@ -11,6 +11,8 @@ ENV LANG en_US.UTF-8
 
 # Needed for setup:
 COPY ./setup-ubuntu.sh ./setup-android-sdk.sh ./properties.sh /tmp/
+RUN mkdir /tmp/build
+COPY ./build/termux_download.sh /tmp/build/
 
 # Setup needed packages and the Android SDK and NDK:
 RUN apt-get update && \
