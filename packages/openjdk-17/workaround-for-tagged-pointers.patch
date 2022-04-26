@@ -1,7 +1,7 @@
 diff -uNr mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/java.base/share/native/libjli/java.c mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/java.base/share/native/libjli/java.c
 --- mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/java.base/share/native/libjli/java.c	2021-07-06 14:29:24.000000000 +0300
 +++ mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/java.base/share/native/libjli/java.c	2021-07-30 15:23:39.352949077 +0300
-@@ -54,6 +54,24 @@
+@@ -54,6 +54,32 @@
  #include "java.h"
  #include "jni.h"
  
@@ -11,6 +11,14 @@ diff -uNr mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/java.base/share/na
 +static void android_disable_tags() {
 +    void *lib_handle = dlopen("libc.so", RTLD_LAZY);
 +    if (lib_handle) {
++        if (android_get_device_api_level() >= 31) {
++            int (*mallopt_func)(int, int) = dlsym(lib_handle, "mallopt");
++            if (mallopt_func) {
++                mallopt_func(M_BIONIC_SET_HEAP_TAGGING_LEVEL, 0);
++            }
++            return;
++        }
++        /* android_get_device_api_level() < 31 */
 +        bool (*android_mallopt)(int opcode, void* arg, size_t arg_size) = dlsym(lib_handle, "android_mallopt");
 +        if (android_mallopt) {
 +            int android_malloc_tag_level = 0;
