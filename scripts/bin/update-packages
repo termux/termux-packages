@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# shellcheck source-path=/data/data/com.termux/files/home/termux-packages
+
 set -u
 
 # Following variables should be set in environment outside of this script.
@@ -104,6 +104,24 @@ _update() {
 	fi
 }
 
+# Check if an issue with same title already exists and is open.
+_gh_check_issue_exists() {
+	local pkg_name="$1"
+	while read -r title; do
+		# Check for exact title match.
+		if [[ "${title}" == "Auto update failing for ${pkg_name}" ]]; then
+			return 0
+		fi
+	done <<<"$(
+		gh issue list \
+			--label "auto update failing" --label "bot" \
+			--state open \
+			--search "Auto update failing for ${pkg_name} in:title type:issue" \
+			--json title | jq -r '.[] | .title'
+	)"
+	return 1
+}
+
 declare -A _FAILED_UPDATES=()
 
 _run_update() {
@@ -112,6 +130,10 @@ _run_update() {
 	if [[ ! -f "${pkg_dir}/build.sh" ]]; then
 		# Fail if detected a non-package directory.
 		termux_error_exit "ERROR: directory '${pkg_dir}' is not a package."
+	elif [[ "${GITHUB_ACTIONS:-}" == "true" ]] && _gh_check_issue_exists "$(basename "${pkg_dir}")"; then
+		# Skip if issue with same title already exists.
+		echo "INFO: Skipping '$(basename "${pkg_dir}")', an update issue for it hasn't been resolved yet."
+		return
 	fi
 	# Run each package update in separate process since we include their environment variables.
 	local output=""
@@ -128,88 +150,106 @@ _run_update() {
 	fi
 }
 
-_gh_issue() {
-	local pkg_name="$1"
-	local header="$2"
-	local issue_number="${3:-}"
-	local max_comment_length=65536 # Max comment length in one request.
+echo "INFO: Running update for: $*"
 
-	local body="$(
+if [[ "$1" == "@all" ]]; then
+	for repo_dir in $(jq --raw-output 'keys | .[]' "${TERMUX_SCRIPTDIR}/repo.json"); do
+		for pkg_dir in "${repo_dir}"/*; do
+			_run_update "${pkg_dir}"
+		done
+	done
+else
+	for pkg in "$@"; do
+		if [ ! -d "${pkg}" ]; then # If only package name is given, try to find it's directory.
+			for repo_dir in $(jq --raw-output 'keys | .[]' "${TERMUX_SCRIPTDIR}/repo.json"); do
+				if [ -d "${repo_dir}/${pkg}" ]; then
+					pkg="${repo_dir}/${pkg}"
+					break
+				fi
+			done
+		fi
+		_run_update "${pkg}" # Here, `pkg` is a directory.
+	done
+fi
+
+################################################Failure handling#################################################
+
+_gh_create_new_issue() {
+	local pkg_name="$1"
+
+	local max_body_length=65536 # Max length of the body for one request.
+	local assignee="${GITHUB_ACTOR:-}"
+	local issue_number
+	local body
+
+	if [[ "${assignee:-termuxbot2}" == "termuxbot2" ]]; then
+		assignee="MrAdityaAlok" # Assign myself if termuxbot2 is the actor.
+	fi
+
+	body="$(
 		cat <<-EOF
-			${header}
+			Hi, I'm Termux 🤖.
+
+			I'm here to help you update your Termux packages.
+
+			I've tried to update the ${pkg_name} package, but it failed.
 
 			Here's the output of the update script:
-
-			<details><summary>Output log</summary>
-			<pre lang="bash">
-				${_FAILED_UPDATES[$pkg_name]}
-			</pre>
+			<details>
+				<summary>Show log</summary>
+				<pre>${_FAILED_UPDATES["${pkg_name}"]}</pre>
 			</details>
 
-			Thanks!
-
+			<hr>
 			<i>
-				Run ID: <a href="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}">${GITHUB_RUN_ID}</a><br>
-				Timestamp: $(date -u +"%Y-%m-%d %H:%M:%S UTC")<br>
+			Above error occured when I last tried to update at $(date -u +"%Y-%m-%d %H:%M:%S UTC").<br>
+			Run ID: <a href="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}">${GITHUB_RUN_ID}</a><br><br>
+			<b>Note:</b> Automatic updates will be disabled until this issue is resolved.<br>
 			</i>
 		EOF
 	)"
-
-	if [[ -z "${issue_number}" ]]; then
-		issue_number="$(
-			gh issue create \
-				--label "auto update failing" --label "bot" \
-				--title "Auto update failing for ${pkg_name}" \
-				--body "" |       # Body is empty, since we will append the logs later.
-				grep -oE '[0-9]+' # Last component in url returned is issue number.
-		)"
+	issue_number=$(
+		gh issue create \
+			--title "Auto update failing for ${pkg_name}" \
+			--body "${body:0:${max_body_length}}" \
+			--label "auto update failing" --label "bot" \
+			--assignee ${assignee} |
+			grep -oE "[0-9]+" # Last component of the URL returned is the issue number.
+	)
+	if [ -z "${issue_number}" ]; then
+		echo "ERROR: Failed to create issue."
+		return 1
 	fi
 
-	while true; do
-		local comment_part="${body:0:$max_comment_length}"
-		body="${body:$max_comment_length}"
-		sleep 5 # Otherwise we might get rate limited.
-		gh issue edit "$issue_number" \
-			--body-file - <<<"$(gh issue view "$issue_number" --json body --jq '.body')<br>$comment_part"
-		# NOTE: we use --body-file instead of --body to avoid shell error 'argument list too long'.
-		if [[ -z "${body}" ]]; then
-			break
-		fi
-	done
+	echo "INFO: Created issue ${issue_number} for ${pkg_name}."
+
+	if [[ -n "${body:${max_body_length}}" ]]; then
+		# The body was too long, so we need to append the rest.
+		while true; do
+			body="${body:${max_body_length}}"
+			if [[ -z "${body}" ]]; then
+				break
+			fi
+			sleep 5 # Otherwise we might get rate limited.
+			gh issue edit "$issue_number" \
+				--body-file - <<<"$(
+					gh issue view "$issue_number" \
+						--json body \
+						--jq '.body'
+				)${body:0:${max_body_length}}" >/dev/null
+			# NOTE: we use --body-file instead of --body to avoid shell error 'argument list too long'.
+		done
+	fi
 }
 
 _handle_failure() {
+	echo # Newline.
 	if [[ "${GITHUB_ACTIONS:-}" == "true" ]]; then
-		echo # Newline.
-		echo "INFO: Creating/Updating issue for failed updates."
+		echo "INFO: Creating issue for failed updates...(if any)"
 		for pkg_name in "${!_FAILED_UPDATES[@]}"; do
-			local issue_number
-			issue_number=$(
-				gh issue list \
-					--label "auto update failing" --label "bot" \
-					--state open \
-					--search "Auto update failing for ${pkg_name} in:title type:issue" \
-					--json number --jq '.[0].number' # Assume only one issue (and it should be too).
-			)
-			local header
-			if [[ -z "${issue_number}" ]]; then
-				header="$(
-					cat <<-EOF
-						Hi, I'm Termux 🤖.
-
-						I'm here to help you update your Termux packages.
-
-						I've tried to update the ${pkg_name} package, but it failed. 
-					EOF
-				)"
-			else
-				header="<h4>EDIT:</h4><br>It failed again."
-			fi
-			_gh_issue "${pkg_name}" "${header}" ${issue_number}
+			_gh_create_new_issue "${pkg_name}"
 		done
-
 	else
-		echo # Newline.
 		echo "==> Failed updates:"
 		local count=0
 		for pkg_name in "${!_FAILED_UPDATES[@]}"; do
@@ -220,31 +260,6 @@ _handle_failure() {
 	fi
 }
 
-main() {
-	echo "INFO: Running update for: $*"
-
-	if [[ "$1" == "@all" ]]; then
-		for repo_dir in $(jq --raw-output 'keys | .[]' "${TERMUX_SCRIPTDIR}/repo.json"); do
-			for pkg_dir in "${repo_dir}"/*; do
-				_run_update "${pkg_dir}"
-			done
-		done
-	else
-		for pkg in "$@"; do
-			if [ ! -d "${pkg}" ]; then # If only package name is given, try to find it's directory.
-				for repo_dir in $(jq --raw-output 'keys | .[]' "${TERMUX_SCRIPTDIR}/repo.json"); do
-					if [ -d "${repo_dir}/${pkg}" ]; then
-						pkg="${repo_dir}/${pkg}"
-						break
-					fi
-				done
-			fi
-			_run_update "${pkg}" # Here, `pkg` is a directory.
-		done
-	fi
-	if [[ ${#_FAILED_UPDATES[@]} -gt 0 ]]; then
-		_handle_failure
-	fi
-}
-
-main "$@"
+if [[ ${#_FAILED_UPDATES[@]} -gt 0 ]]; then
+	_handle_failure
+fi
