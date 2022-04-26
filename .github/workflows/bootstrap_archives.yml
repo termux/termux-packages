@@ -17,11 +17,11 @@ jobs:
           - x86_64
     steps:
       - name: Git clone
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Create bootstrap archive
         run: ./scripts/generate-bootstraps.sh --architectures ${{ matrix.arch }}
       - name: Store artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: bootstrap-archives-${{ github.sha }}
           path: "*.zip"
@@ -30,11 +30,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Git clone
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Fetch bootstrap archives
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: bootstrap-archives-${{ github.sha }}
           path: ./
