@@ -1,0 +1,107 @@
+https://bugs.webkit.org/show_bug.cgi?id=232934
+
+diff --git a/Source/WebKit/UIProcess/CoordinatedGraphics/DrawingAreaProxyCoordinatedGraphics.cpp b/Source/WebKit/UIProcess/CoordinatedGraphics/DrawingAreaProxyCoordinatedGraphics.cpp
+index 038d9ee2f41cdeba4ae7b597311b663a58b6d629..5e828a101c0321a871b864805ad87c1588271b01 100644
+--- a/Source/WebKit/UIProcess/CoordinatedGraphics/DrawingAreaProxyCoordinatedGraphics.cpp
++++ b/Source/WebKit/UIProcess/CoordinatedGraphics/DrawingAreaProxyCoordinatedGraphics.cpp
+@@ -152,7 +152,7 @@ void DrawingAreaProxyCoordinatedGraphics::setBackingStoreIsDiscardable(bool isBa
+ #endif
+ }
+ 
+-#if PLATFORM(GTK)
++#if PLATFORM(GTK) && USE(COORDINATED_GRAPHICS)
+ void DrawingAreaProxyCoordinatedGraphics::adjustTransientZoom(double scale, FloatPoint origin)
+ {
+     send(Messages::DrawingArea::AdjustTransientZoom(scale, origin));
+diff --git a/Source/WebKit/UIProcess/CoordinatedGraphics/DrawingAreaProxyCoordinatedGraphics.h b/Source/WebKit/UIProcess/CoordinatedGraphics/DrawingAreaProxyCoordinatedGraphics.h
+index b23a45ff7d313317d8ba64fb430ebba3b6adef71..cd2634027544d9e615cfb0ac3962ffbb97c13bfb 100644
+--- a/Source/WebKit/UIProcess/CoordinatedGraphics/DrawingAreaProxyCoordinatedGraphics.h
++++ b/Source/WebKit/UIProcess/CoordinatedGraphics/DrawingAreaProxyCoordinatedGraphics.h
+@@ -57,7 +57,7 @@ private:
+     void waitForBackingStoreUpdateOnNextPaint() override;
+     void setBackingStoreIsDiscardable(bool) override;
+ 
+-#if PLATFORM(GTK)
++#if PLATFORM(GTK) && USE(COORDINATED_GRAPHICS)
+     void adjustTransientZoom(double scale, WebCore::FloatPoint origin) override;
+     void commitTransientZoom(double scale, WebCore::FloatPoint origin) override;
+ #endif
+diff --git a/Source/WebKit/WebProcess/WebPage/CoordinatedGraphics/DrawingAreaCoordinatedGraphics.cpp b/Source/WebKit/WebProcess/WebPage/CoordinatedGraphics/DrawingAreaCoordinatedGraphics.cpp
+index 33ac2e1d763105b82442ab34f5bc35406407bd89..423757848ef3081ac9aee7710bd1d56af0490bf9 100644
+--- a/Source/WebKit/WebProcess/WebPage/CoordinatedGraphics/DrawingAreaCoordinatedGraphics.cpp
++++ b/Source/WebKit/WebProcess/WebPage/CoordinatedGraphics/DrawingAreaCoordinatedGraphics.cpp
+@@ -486,7 +486,7 @@ void DrawingAreaCoordinatedGraphics::didUpdate()
+     displayTimerFired();
+ }
+ 
+-#if PLATFORM(GTK)
++#if PLATFORM(GTK) && USE(COORDINATED_GRAPHICS)
+ void DrawingAreaCoordinatedGraphics::adjustTransientZoom(double scale, FloatPoint origin)
+ {
+     if (!m_transientZoom) {
+diff --git a/Source/WebKit/WebProcess/WebPage/CoordinatedGraphics/DrawingAreaCoordinatedGraphics.h b/Source/WebKit/WebProcess/WebPage/CoordinatedGraphics/DrawingAreaCoordinatedGraphics.h
+index d8dc6df7d4d2ac6ae7e9eeffb8baadef8590cb16..c832236420ced7e15054e9ccc649a85578aa9e1a 100644
+--- a/Source/WebKit/WebProcess/WebPage/CoordinatedGraphics/DrawingAreaCoordinatedGraphics.h
++++ b/Source/WebKit/WebProcess/WebPage/CoordinatedGraphics/DrawingAreaCoordinatedGraphics.h
+@@ -84,7 +84,7 @@ private:
+     void updateBackingStoreState(uint64_t backingStoreStateID, bool respondImmediately, float deviceScaleFactor, const WebCore::IntSize&, const WebCore::IntSize& scrollOffset) override;
+     void didUpdate() override;
+ 
+-#if PLATFORM(GTK)
++#if PLATFORM(GTK) && USE(COORDINATED_GRAPHICS)
+     void adjustTransientZoom(double scale, WebCore::FloatPoint origin) override;
+     void commitTransientZoom(double scale, WebCore::FloatPoint origin) override;
+ #endif
+diff --git a/Source/WebKit/WebProcess/WebPage/CoordinatedGraphics/LayerTreeHost.cpp b/Source/WebKit/WebProcess/WebPage/CoordinatedGraphics/LayerTreeHost.cpp
+index f3304d10f728128652c33426558e4dc4f6b659b5..ca0476ff8a0395519fb32da053e1519d4c957840 100644
+--- a/Source/WebKit/WebProcess/WebPage/CoordinatedGraphics/LayerTreeHost.cpp
++++ b/Source/WebKit/WebProcess/WebPage/CoordinatedGraphics/LayerTreeHost.cpp
+@@ -156,7 +156,7 @@ void LayerTreeHost::layerFlushTimerFired()
+ 
+     bool didSync = m_coordinator.flushPendingLayerChanges(flags);
+ 
+-#if PLATFORM(GTK)
++#if PLATFORM(GTK) && USE(COORDINATED_GRAPHICS)
+     // If we have an active transient zoom, we want the zoom to win over any changes
+     // that WebCore makes to the relevant layers, so re-apply our changes after flushing.
+     if (m_transientZoom)
+@@ -453,7 +453,7 @@ void LayerTreeHost::renderNextFrame(bool forceRepaint)
+     }
+ }
+ 
+-#if PLATFORM(GTK)
++#if PLATFORM(GTK) && USE(COORDINATED_GRAPHICS)
+ FloatPoint LayerTreeHost::constrainTransientZoomOrigin(double scale, FloatPoint origin) const
+ {
+     FrameView& frameView = *m_webPage.mainFrameView();
+diff --git a/Source/WebKit/WebProcess/WebPage/CoordinatedGraphics/LayerTreeHost.h b/Source/WebKit/WebProcess/WebPage/CoordinatedGraphics/LayerTreeHost.h
+index 4f727e418b082eebe86711294bb0f26f9c74d7d1..b070266e9a6d46e9e4979be81822d91ce120305f 100644
+--- a/Source/WebKit/WebProcess/WebPage/CoordinatedGraphics/LayerTreeHost.h
++++ b/Source/WebKit/WebProcess/WebPage/CoordinatedGraphics/LayerTreeHost.h
+@@ -37,7 +37,7 @@
+ #include <wtf/Forward.h>
+ #include <wtf/OptionSet.h>
+ #include <wtf/RunLoop.h>
+-#if PLATFORM(GTK)
++#if PLATFORM(GTK) && USE(COORDINATED_GRAPHICS)
+ #include <WebCore/CoordinatedGraphicsLayer.h>
+ #endif
+ 
+@@ -100,7 +100,7 @@ public:
+ 
+     WebCore::PlatformDisplayID displayID() const { return m_displayID; }
+ 
+-#if PLATFORM(GTK)
++#if PLATFORM(GTK) && USE(COORDINATED_GRAPHICS)
+     void adjustTransientZoom(double, WebCore::FloatPoint);
+     void commitTransientZoom(double, WebCore::FloatPoint);
+ #endif
+@@ -213,7 +213,7 @@ private:
+ #endif // USE(COORDINATED_GRAPHICS)
+     WebCore::PlatformDisplayID m_displayID;
+ 
+-#if PLATFORM(GTK)
++#if PLATFORM(GTK) && USE(COORDINATED_GRAPHICS)
+     bool m_transientZoom { false };
+     double m_transientZoomScale { 1 };
+     WebCore::FloatPoint m_transientZoomOrigin;
