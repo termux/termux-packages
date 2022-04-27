@@ -35,7 +35,7 @@ termux_step_setup_variables() {
 		fi
 	else
 		TERMUX_BUILT_PACKAGES_DIRECTORY="/data/data/.built-packages"
-		: "${TERMUX_PKG_MAINTAINER:="Fredrik Fornwall @fornwall"}"
+		: "${TERMUX_PKG_MAINTAINER:="@termux"}"
 	fi
 
 	TERMUX_REPO_URL=(
