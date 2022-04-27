@@ -293,23 +293,30 @@ for package_arch in "${TERMUX_ARCHITECTURES[@]}"; do
 
 	# Core utilities.
 	pull_package bash
+	pull_package busybox
 	pull_package bzip2
 	pull_package command-not-found
 	pull_package coreutils
 	pull_package curl
 	pull_package dash
+	pull_package dpkg
 	pull_package diffutils
 	pull_package findutils
 	pull_package gawk
+	pull_package gpgv
 	pull_package grep
 	pull_package gzip
 	pull_package less
+	pull_package libc++
+	pull_package libiconv
 	pull_package procps
 	pull_package psmisc
 	pull_package sed
 	pull_package tar
+	pull_package termux-am-socket
 	pull_package termux-exec
 	pull_package termux-keyring
+	pull_package termux-licenses
 	pull_package termux-tools
 	pull_package util-linux
 	pull_package xz-utils
