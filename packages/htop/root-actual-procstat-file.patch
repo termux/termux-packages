@@ -1,0 +1,20 @@
+diff -uNr htop-3.1.2/linux/LinuxProcessList.c htop-3.1.2.mod/linux/LinuxProcessList.c
+--- htop-3.1.2/linux/LinuxProcessList.c	2021-11-30 01:03:21.000000000 +0000
++++ htop-3.1.2.mod/linux/LinuxProcessList.c	2022-04-27 07:36:29.194907488 +0000
+@@ -1898,7 +1898,15 @@
+ 
+    LinuxProcessList_updateCPUcount(super);
+ 
+-   FILE* file = fopen(PROCSTATFILE, "r");
++   FILE* file;
++
++   /* Read the actual procstat file only if we're rooted */
++   if (getuid() == 0){
++      file = fopen("/proc/stat", "r");
++   } else {
++      file = fopen(PROCSTATFILE, "r");
++   }
++
+    if (!file)
+       CRT_fatalError("Cannot open " PROCSTATFILE);
+ 
