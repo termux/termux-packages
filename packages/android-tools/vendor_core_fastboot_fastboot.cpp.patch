@@ -6,7 +6,7 @@ index 0062e7e..9d2ee12 100644
  #include <liblp/liblp.h>
  #include <sparse/sparse.h>
  #include <ziparchive/zip_archive.h>
-+#ifdef ANDROID
++#ifdef __ANDROID__
 +#include <libusb-1.0/libusb.h>
 +#endif
  
@@ -16,7 +16,7 @@ index 0062e7e..9d2ee12 100644
  //
  // The returned Transport is a singleton, so multiple calls to this function will return the same
  // object, and the caller should not attempt to delete the returned Transport.
-+#ifdef ANDROID
++#ifdef __ANDROID__
 +static Transport* open_device(libusb_context *context) {
 +#else
  static Transport* open_device() {
@@ -28,7 +28,7 @@ index 0062e7e..9d2ee12 100644
                  fprintf(stderr, "error: %s\n", error.c_str());
              }
          } else {
-+#ifdef ANDROID
++#ifdef __ANDROID__
 +            transport = usb_open(match_fastboot, context);
 +#else
              transport = usb_open(match_fastboot);
@@ -40,7 +40,7 @@ index 0062e7e..9d2ee12 100644
      }
  }
  
-+#ifdef ANDROID
++#ifdef __ANDROID__
 +static void list_devices(libusb_context *context) {
 +#else
  static void list_devices() {
@@ -48,7 +48,7 @@ index 0062e7e..9d2ee12 100644
      // We don't actually open a USB device here,
      // just getting our callback called so we can
      // list all the connected devices.
-+#ifdef ANDROID
++#ifdef __ANDROID__
 +    usb_open(list_devices_callback, context);
 +#else
 +
@@ -61,7 +61,7 @@ index 0062e7e..9d2ee12 100644
      return fb->GetVar("is-userspace", &value) == fastboot::SUCCESS && value == "yes";
  }
  
-+#ifdef ANDROID
++#ifdef __ANDROID__
 +static void reboot_to_userspace_fastboot(libusb_context *context) {
 +#else
  static void reboot_to_userspace_fastboot() {
@@ -73,7 +73,7 @@ index 0062e7e..9d2ee12 100644
      // Give the current connection time to close.
      std::this_thread::sleep_for(std::chrono::milliseconds(1000));
  
-+#ifdef ANDROID
++#ifdef __ANDROID__
 +    fb->set_transport(open_device(context));
 +#else
      fb->set_transport(open_device());
@@ -85,7 +85,7 @@ index 0062e7e..9d2ee12 100644
      FlashAllTool(const ImageSource& source, const std::string& slot_override, bool skip_secondary,
                   bool wipe, bool force_flash);
  
-+#ifdef ANDROID
++#ifdef __ANDROID__
 +    void Flash(libusb_context *context);
 +#else
      void Flash();
@@ -97,7 +97,7 @@ index 0062e7e..9d2ee12 100644
      void CollectImages();
      void FlashImages(const std::vector<std::pair<const Image*, std::string>>& images);
      void FlashImage(const Image& image, const std::string& slot, fastboot_buffer* buf);
-+#ifdef ANDROID
++#ifdef __ANDROID__
 +    void UpdateSuperPartition(libusb_context *context);
 +#else
      void UpdateSuperPartition();
@@ -109,7 +109,7 @@ index 0062e7e..9d2ee12 100644
  {
  }
  
-+#ifdef ANDROID
++#ifdef __ANDROID__
 +void FlashAllTool::Flash(libusb_context *context) {
 +#else
  void FlashAllTool::Flash() {
@@ -121,7 +121,7 @@ index 0062e7e..9d2ee12 100644
      FlashImages(boot_images_);
  
      // Sync the super partition. This will reboot to userspace fastboot if needed.
-+#ifdef ANDROID
++#ifdef __ANDROID__
 +    UpdateSuperPartition(context);
 +#else
      UpdateSuperPartition();
@@ -133,7 +133,7 @@ index 0062e7e..9d2ee12 100644
      do_for_partitions(image.part_name, slot, flash, false);
  }
  
-+#ifdef ANDROID
++#ifdef __ANDROID__
 +void FlashAllTool::UpdateSuperPartition(libusb_context *context) {
 +#else
  void FlashAllTool::UpdateSuperPartition() {
@@ -143,7 +143,7 @@ index 0062e7e..9d2ee12 100644
          return;
      }
      if (!is_userspace_fastboot()) {
-+#ifdef ANDROID
++#ifdef __ANDROID__
 +        reboot_to_userspace_fastboot(context);
 +#else
          reboot_to_userspace_fastboot();
@@ -155,7 +155,7 @@ index 0062e7e..9d2ee12 100644
  }
  
  static void do_update(const char* filename, const std::string& slot_override, bool skip_secondary,
-+#ifdef ANDROID
++#ifdef __ANDROID__
 +                      bool force_flash, libusb_context *context) {
 +#else
                        bool force_flash) {
@@ -167,7 +167,7 @@ index 0062e7e..9d2ee12 100644
      }
  
      FlashAllTool tool(ZipImageSource(zip), slot_override, skip_secondary, false, force_flash);
-+#ifdef ANDROID
++#ifdef __ANDROID__
 +    tool.Flash(context);
 +#else
      tool.Flash();
@@ -179,13 +179,13 @@ index 0062e7e..9d2ee12 100644
  }
  
  static void do_flashall(const std::string& slot_override, bool skip_secondary, bool wipe,
-+#ifdef ANDROID
++#ifdef __ANDROID__
 +                        bool force_flash, libusb_context *context) {
 +#else
                          bool force_flash) {
 +#endif
      FlashAllTool tool(LocalImageSource(), slot_override, skip_secondary, wipe, force_flash);
-+#ifdef ANDROID
++#ifdef __ANDROID__
 +    tool.Flash(context);
 +#else
      tool.Flash();
@@ -197,7 +197,7 @@ index 0062e7e..9d2ee12 100644
      }
  }
  
-+#ifdef ANDROID
++#ifdef __ANDROID__
 +int FastBootTool::Main(int argc, char* argv[]) {
 +    libusb_context *context;
 +    libusb_set_option(NULL, LIBUSB_OPTION_WEAK_AUTHORITY);
@@ -218,7 +218,7 @@ index 0062e7e..9d2ee12 100644
      if (argc == 0 && !wants_wipe && !wants_set_active) syntax_error("no command");
  
      if (argc > 0 && !strcmp(*argv, "devices")) {
-+#ifdef ANDROID
++#ifdef __ANDROID__
 +        list_devices(context);
 +#else
          list_devices();
@@ -230,7 +230,7 @@ index 0062e7e..9d2ee12 100644
          return show_help();
      }
  
-+#ifdef ANDROID
++#ifdef __ANDROID__
 +    Transport* transport = open_device(context);
 +#else
      Transport* transport = open_device();
@@ -242,13 +242,13 @@ index 0062e7e..9d2ee12 100644
          } else if (command == "flashall") {
              if (slot_override == "all") {
                  fprintf(stderr, "Warning: slot set to 'all'. Secondary slots will not be flashed.\n");
-+#ifdef ANDROID
++#ifdef __ANDROID__
 +                do_flashall(slot_override, true, wants_wipe, force_flash, context);
 +#else
                  do_flashall(slot_override, true, wants_wipe, force_flash);
 +#endif
              } else {
-+#ifdef ANDROID
++#ifdef __ANDROID__
 +                do_flashall(slot_override, skip_secondary, wants_wipe, force_flash, context);
 +#else
                  do_flashall(slot_override, skip_secondary, wants_wipe, force_flash);
@@ -260,7 +260,7 @@ index 0062e7e..9d2ee12 100644
              if (!args.empty()) {
                  filename = next_arg(&args);
              }
-+#ifdef ANDROID
++#ifdef __ANDROID__
 +            do_update(filename.c_str(), slot_override, skip_secondary || slot_all, force_flash, context);
 +#else
              do_update(filename.c_str(), slot_override, skip_secondary || slot_all, force_flash);
@@ -272,7 +272,7 @@ index 0062e7e..9d2ee12 100644
          fb->RebootTo("recovery");
          fb->WaitForDisconnect();
      } else if (wants_reboot_fastboot) {
-+#ifdef ANDROID
++#ifdef __ANDROID__
 +        reboot_to_userspace_fastboot(context);
 +#else
          reboot_to_userspace_fastboot();

@@ -6,7 +6,7 @@ index e5f56e2..eea0075 100644
  
  #pragma once
  
-+#ifdef ANDROID
++#ifdef __ANDROID__
 +#include <libusb-1.0/libusb.h>
 +#endif
 +
@@ -18,7 +18,7 @@ index e5f56e2..eea0075 100644
  
      char interface[256];
 +
-+#ifdef ANDROID
++#ifdef __ANDROID__
 +    bool termux_usb;
 +#endif
  };
@@ -28,7 +28,7 @@ index e5f56e2..eea0075 100644
  typedef int (*ifc_match_func)(usb_ifc_info *ifc);
  
  // 0 is non blocking
-+#ifdef ANDROID
++#ifdef __ANDROID__
 +UsbTransport* usb_open(ifc_match_func callback, libusb_context *context, uint32_t timeout_ms = 0);
 +#else
  UsbTransport* usb_open(ifc_match_func callback, uint32_t timeout_ms = 0);
