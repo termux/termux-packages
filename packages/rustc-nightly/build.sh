@@ -40,23 +40,30 @@ termux_step_configure () {
 	ln -sf $PREFIX/lib/libLLVM-$LLVM_VERSION.so $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/
 	
 	if [ -e $TERMUX_PREFIX/lib/libtinfo.so.6 ]; then
-	 	rm $TERMUX_PREFIX/lib/libtinfo.so.6
+	 	mv $TERMUX_PREFIX/lib/libtinfo.so.6 $TERMUX_PREFIX/lib/libtinfo.so.6.tmp
 	fi
 	if [ -e $TERMUX_PREFIX/lib/libz.so.1 ]; then
-		rm $TERMUX_PREFIX/lib/libz.so.1
+		mv $TERMUX_PREFIX/lib/libz.so.1 $TERMUX_PREFIX/lib/libz.so.1.tmp
 	fi
 	if [ -e $TERMUX_PREFIX/lib/libz.so ]; then
-		rm $TERMUX_PREFIX/lib/libz.so
+		mv $TERMUX_PREFIX/lib/libz.so $TERMUX_PREFIX/lib/libz.so.tmp
 	fi
 }
 
 termux_step_make_install () {
 	../src/x.py install --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME --target wasm32-unknown-unknown || bash
+
+	mv $TERMUX_PREFIX/lib/libtinfo.so.6.tmp $TERMUX_PREFIX/lib/libtinfo.so.6
+	mv $TERMUX_PREFIX/lib/libz.so.1.tmp $TERMUX_PREFIX/lib/libz.so.1
+	mv $TERMUX_PREFIX/lib/libz.so.tmp $TERMUX_PREFIX/lib/libz.so
 }
 
 termux_step_post_massage () {
 	rm $TERMUX_PKG_MASSAGEDIR/$RUST_PREFIX/lib/rustlib/{components,rust-installer-version,install.log,uninstall.sh}
 	rm $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libLLVM-$LLVM_VERSION.so
+	rm -f lib/libtinfo.so.6
+	rm -f lib/libz.so
+	rm -f lib/libz.so.1
 
 	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/profile.d
 	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib
