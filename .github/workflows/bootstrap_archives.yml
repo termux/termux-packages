@@ -47,14 +47,14 @@ jobs:
       - name: Create new tag
         id: get_tag
         run: |
-          new_tag="bootstrap-$(date "+%Y.%m.%d")+apt-android-5"
+          new_tag="bootstrap-$(date "+%Y.%m.%d")"
           existing_tag_revision=$(git tag | grep "$new_tag" | sort -r | head -n 1 | cut -d- -f3 | cut -dr -f2)
           if [ -n "$existing_tag_revision" ]; then
             tag_rev=$((existing_tag_revision + 1))
           else
             tag_rev=1
           fi
-          new_tag="${new_tag}-r${tag_rev}"
+          new_tag="${new_tag}-r${tag_rev}+apt-android-5"
           git tag "$new_tag"
           git push --tags
           echo "::set-output name=tag_name::$new_tag"
