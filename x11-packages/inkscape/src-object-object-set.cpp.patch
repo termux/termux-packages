@@ -1,0 +1,19 @@
+--- a/src/object/object-set.cpp
++++ b/src/object/object-set.cpp
+@@ -16,6 +16,7 @@
+ #include "box3d.h"
+ #include "persp3d.h"
+ #include "preferences.h"
++#include <boost/algorithm/minmax_element.hpp>
+ #include <boost/range/adaptor/filtered.hpp>
+ #include <boost/range/adaptor/transformed.hpp>
+ 
+@@ -263,7 +264,7 @@
+     auto const& n = nodes;
+ #endif
+ 
+-    return *std::max_element(n.begin(), n.end(), sp_repr_compare_position_bool);
++    return *boost::first_max_element(n.begin(), n.end(), sp_repr_compare_position_bool);
+ }
+ 
+ void ObjectSet::set(SPObject *object, bool persist_selection_context) {

@@ -1,0 +1,143 @@
+From d989cdf1059c78bc3bb6414330242073768d640b Mon Sep 17 00:00:00 2001
+From: Rafael Siejakowski <rs@rs-math.net>
+Date: Mon, 4 Apr 2022 22:09:39 -0300
+Subject: [PATCH] Compatibility with Poppler 22.04
+
+Replace vanilla pointers with std::shared_ptr for pointers to fonts;
+eliminate manual ref-counting.
+
+Fixes https://gitlab.com/inkscape/inkscape/-/issues/3387
+---
+ src/extension/internal/pdfinput/pdf-parser.cpp     | 14 ++++++++------
+ .../internal/pdfinput/poppler-transition-api.h     |  6 ++++++
+ src/extension/internal/pdfinput/svg-builder.cpp    |  7 +------
+ src/extension/internal/pdfinput/svg-builder.h      |  1 -
+ 4 files changed, 15 insertions(+), 13 deletions(-)
+
+diff --git a/src/extension/internal/pdfinput/pdf-parser.cpp b/src/extension/internal/pdfinput/pdf-parser.cpp
+index feecefa043..d6e2ede4f3 100644
+--- a/src/extension/internal/pdfinput/pdf-parser.cpp
++++ b/src/extension/internal/pdfinput/pdf-parser.cpp
+@@ -30,6 +30,7 @@
+ #include "Gfx.h"
+ #include "pdf-parser.h"
+ #include "util/units.h"
++#include "poppler-transition-api.h"
+ 
+ #include "glib/poppler-features.h"
+ #include "goo/gmem.h"
+@@ -2158,7 +2159,7 @@ void PdfParser::opSetCharSpacing(Object args[], int /*numArgs*/)
+ // TODO not good that numArgs is ignored but args[] is used:
+ void PdfParser::opSetFont(Object args[], int /*numArgs*/)
+ {
+-  GfxFont *font = res->lookupFont(args[0].getName());
++  auto font = res->lookupFont(args[0].getName());
+ 
+   if (!font) {
+     // unsetting the font (drawing no text) is better than using the
+@@ -2179,7 +2180,9 @@ void PdfParser::opSetFont(Object args[], int /*numArgs*/)
+     fflush(stdout);
+   }
+ 
++#if !POPPLER_CHECK_VERSION(22, 4, 0)
+   font->incRefCnt();
++#endif
+   state->setFont(font, args[1].getNum());
+   fontChanged = gTrue;
+ }
+@@ -2373,7 +2376,6 @@ void PdfParser::doShowText(const GooString *s) {
+ #else
+ void PdfParser::doShowText(GooString *s) {
+ #endif
+-  GfxFont *font;
+   int wMode;
+   double riseX, riseY;
+   CharCode code;
+@@ -2392,7 +2394,7 @@ void PdfParser::doShowText(GooString *s) {
+ #endif
+   int len, n, uLen;
+ 
+-  font = state->getFont();
++  auto font = state->getFont();
+   wMode = font->getWMode();
+ 
+   builder->beginString(state);
+@@ -2445,10 +2447,10 @@ void PdfParser::doShowText(GooString *s) {
+       //out->updateCTM(state, 1, 0, 0, 1, 0, 0);
+       if (false){ /*!out->beginType3Char(state, curX + riseX, curY + riseY, tdx, tdy,
+ 			       code, u, uLen)) {*/
+-        _POPPLER_CALL_ARGS(charProc, ((Gfx8BitFont *)font)->getCharProc, code);
+-	if ((resDict = ((Gfx8BitFont *)font)->getResources())) {
++        _POPPLER_CALL_ARGS(charProc, _POPPLER_FONTPTR_TO_GFX8(font)->getCharProc, code);
++    if (resDict = _POPPLER_FONTPTR_TO_GFX8(font)->getResources()) {
+ 	  pushResources(resDict);
+-	}
++    }
+ 	if (charProc.isStream()) {
+ 	  //parse(&charProc, gFalse); // TODO: parse into SVG font
+ 	} else {
+diff --git a/src/extension/internal/pdfinput/poppler-transition-api.h b/src/extension/internal/pdfinput/poppler-transition-api.h
+index 50b617c25c..dc9e47e45b 100644
+--- a/src/extension/internal/pdfinput/poppler-transition-api.h
++++ b/src/extension/internal/pdfinput/poppler-transition-api.h
+@@ -14,6 +14,12 @@
+ 
+ #include <glib/poppler-features.h>
+ 
++#if POPPLER_CHECK_VERSION(22, 4, 0)
++#define _POPPLER_FONTPTR_TO_GFX8(font_ptr) ((Gfx8BitFont *)font_ptr.get())
++#else
++#define _POPPLER_FONTPTR_TO_GFX8(font_ptr) ((Gfx8BitFont *)font_ptr)
++#endif
++
+ #if POPPLER_CHECK_VERSION(22, 3, 0)
+ #define _POPPLER_MAKE_SHARED_PDFDOC(uri) std::make_shared<PDFDoc>(std::make_unique<GooString>(uri))
+ #else
+diff --git a/src/extension/internal/pdfinput/svg-builder.cpp b/src/extension/internal/pdfinput/svg-builder.cpp
+index eede668893..901cc8cddb 100644
+--- a/src/extension/internal/pdfinput/svg-builder.cpp
++++ b/src/extension/internal/pdfinput/svg-builder.cpp
+@@ -108,7 +108,6 @@ SvgBuilder::~SvgBuilder() = default;
+ 
+ void SvgBuilder::_init() {
+     _font_style = nullptr;
+-    _current_font = nullptr;
+     _font_specification = nullptr;
+     _font_scaling = 1;
+     _need_font_update = true;
+@@ -1064,11 +1063,8 @@ void SvgBuilder::updateFont(GfxState *state) {
+     _need_font_update = false;
+     updateTextMatrix(state);    // Ensure that we have a text matrix built
+ 
+-    if (_font_style) {
+-        //sp_repr_css_attr_unref(_font_style);
+-    }
+     _font_style = sp_repr_css_attr_new();
+-    GfxFont *font = state->getFont();
++    auto font = state->getFont();
+     // Store original name
+     if (font->getName()) {
+         _font_specification = font->getName()->getCString();
+@@ -1213,7 +1209,6 @@ void SvgBuilder::updateFont(GfxState *state) {
+         sp_repr_css_set_property(_font_style, "writing-mode", "tb");
+     }
+ 
+-    _current_font = font;
+     _invalidated_style = true;
+ }
+ 
+diff --git a/src/extension/internal/pdfinput/svg-builder.h b/src/extension/internal/pdfinput/svg-builder.h
+index fb4e64fa19..e91febd717 100644
+--- a/src/extension/internal/pdfinput/svg-builder.h
++++ b/src/extension/internal/pdfinput/svg-builder.h
+@@ -204,7 +204,6 @@ private:
+     std::vector<SvgGraphicsState> _state_stack;
+ 
+     SPCSSAttr *_font_style;          // Current font style
+-    GfxFont *_current_font;
+     const char *_font_specification;
+     double _font_scaling;
+     bool _need_font_update;
+-- 
+GitLab
+
