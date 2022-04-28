@@ -1,0 +1,11 @@
+--- a/src/wl_platform.h
++++ b/src/wl_platform.h
+@@ -45,7 +45,7 @@
+ 
+ #include "posix_thread.h"
+ #include "posix_time.h"
+-#ifdef __linux__
++#if defined __linux__ && !defined __ANDROID__
+ #include "linux_joystick.h"
+ #else
+ #include "null_joystick.h"
