@@ -1,0 +1,20 @@
+--- a/src/wl_init.c
++++ b/src/wl_init.c
+@@ -1150,7 +1150,7 @@
+     // Sync so we got all initial output events
+     wl_display_roundtrip(_glfw.wl.display);
+ 
+-#ifdef __linux__
++#if defined __linux__ && !defined __ANDROID__
+     if (!_glfwInitJoysticksLinux())
+         return GLFW_FALSE;
+ #endif
+@@ -1211,7 +1211,7 @@
+ 
+ void _glfwPlatformTerminate(void)
+ {
+-#ifdef __linux__
++#if defined __linux__ && !defined __ANDROID__
+     _glfwTerminateJoysticksLinux();
+ #endif
+     _glfwTerminateEGL();
