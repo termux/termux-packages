@@ -1,0 +1,50 @@
+From a18c57ffff313fd08bc8a44f6b6bf0b01d7e9b75 Mon Sep 17 00:00:00 2001
+From: Evangelos Foutras <evangelos@foutrelis.com>
+Date: Sun, 20 Mar 2022 22:41:51 -0300
+Subject: [PATCH] Ensure compatibility with Poppler 22.03 and later
+
+This change ensures that Inkscape will build against Poppler 22.03 after
+the changes that were made to the constructor of `PDFDoc`.
+
+See: https://gitlab.freedesktop.org/poppler/poppler/-/commit/4f2abd3ef
+
+Co-authored-by: Rafael Siejakowski <rs@rs-math.net>
+---
+ src/extension/internal/pdfinput/pdf-input.cpp            | 3 +--
+ src/extension/internal/pdfinput/poppler-transition-api.h | 6 ++++++
+ 2 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/src/extension/internal/pdfinput/pdf-input.cpp b/src/extension/internal/pdfinput/pdf-input.cpp
+index 3dabc94ba2..079b0dc713 100644
+--- a/src/extension/internal/pdfinput/pdf-input.cpp
++++ b/src/extension/internal/pdfinput/pdf-input.cpp
+@@ -688,8 +688,7 @@ PdfInput::open(::Inkscape::Extension::Input * /*mod*/, const gchar * uri) {
+ 
+     // poppler does not use glib g_open. So on win32 we must use unicode call. code was copied from
+     // glib gstdio.c
+-    GooString *filename_goo = new GooString(uri);
+-    pdf_doc = std::make_shared<PDFDoc>(filename_goo, nullptr, nullptr, nullptr);   // TODO: Could ask for password
++    pdf_doc = _POPPLER_MAKE_SHARED_PDFDOC(uri); // TODO: Could ask for password
+ 
+     if (!pdf_doc->isOk()) {
+         int error = pdf_doc->getErrorCode();
+diff --git a/src/extension/internal/pdfinput/poppler-transition-api.h b/src/extension/internal/pdfinput/poppler-transition-api.h
+index 87a19d4c42..50b617c25c 100644
+--- a/src/extension/internal/pdfinput/poppler-transition-api.h
++++ b/src/extension/internal/pdfinput/poppler-transition-api.h
+@@ -14,6 +14,12 @@
+ 
+ #include <glib/poppler-features.h>
+ 
++#if POPPLER_CHECK_VERSION(22, 3, 0)
++#define _POPPLER_MAKE_SHARED_PDFDOC(uri) std::make_shared<PDFDoc>(std::make_unique<GooString>(uri))
++#else
++#define _POPPLER_MAKE_SHARED_PDFDOC(uri) std::make_shared<PDFDoc>(new GooString(uri), nullptr, nullptr, nullptr)
++#endif
++
+ #if POPPLER_CHECK_VERSION(0, 83, 0)
+ #define _POPPLER_CONST_83 const
+ #else
+-- 
+GitLab
+
