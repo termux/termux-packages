@@ -1,7 +1,6 @@
-diff -uNr lsof-4.93.2/main.c lsof-4.93.2.mod/main.c
---- lsof-4.93.2/main.c	2019-05-08 10:32:25.000000000 +0300
-+++ lsof-4.93.2.mod/main.c	2020-06-07 03:19:19.392693278 +0300
-@@ -121,7 +121,7 @@
+--- a/main.c
++++ b/main.c
+@@ -123,19 +123,19 @@
   * Make sure umask allows lsof to define its own file permissions.
   */
  
@@ -10,3 +9,17 @@ diff -uNr lsof-4.93.2/main.c lsof-4.93.2.mod/main.c
  	    MaxFd = 53;
  
  #if	defined(HAS_CLOSEFROM)
+ 	(void) closefrom(3);
+ #else	/* !defined(HAS_CLOSEFROM) */
+-#if	defined(SYS_close_range)
++#if	defined(SYS_close_range) && !defined(__ANDROID__)
+ 	if (MaxFd > 3 && syscall(SYS_close_range, 3, MaxFd - 1, 0) == 0)
+ 	    goto closed;
+ #endif
+ 	for (i = 3; i < MaxFd; i++)
+ 	    (void) close(i);
+-#if	defined(SYS_close_range)
++#if	defined(SYS_close_range) && !defined(__ANDROID__)
+   closed:
+ #endif
+ #endif	/* !defined(HAS_CLOSEFROM) */
