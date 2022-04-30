@@ -1,0 +1,54 @@
+From ae05e92df5a5d6151641622c83d35a6fdba47b1f Mon Sep 17 00:00:00 2001
+From: Hubert Figuiere <hub@figuiere.net>
+Date: Fri, 22 Nov 2019 20:02:52 -0500
+Subject: [PATCH] Require enchant 2 now
+
+---
+ configure.ac                      | 2 +-
+ src/af/xap/xp/enchant_checker.cpp | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index f2e392f04..3e1697ced 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -94,7 +94,7 @@
+ "
+ 
+ # optional deps
+-enchant_req='enchant >= 1.2.0'
++enchant_req='enchant-2'
+ gio_req='gio-2.0'
+ goffice_req='libgoffice-0.10 >= 0.10.0'
+ 
+--- a/src/af/xap/xp/enchant_checker.cpp
++++ b/src/af/xap/xp/enchant_checker.cpp
+@@ -127,7 +127,7 @@
+ 				pvSugg->addItem (ucszSugg);
+ 		}
+ 
+-		enchant_dict_free_suggestions (m_dict, suggestions);
++		enchant_dict_free_string_list(m_dict, suggestions);
+ 	}
+ 
+ 	return pvSugg;
+@@ -139,7 +139,7 @@
+ 
+ 	if (word && len) {
+ 		UT_UTF8String utf8 (word, len);
+-		enchant_dict_add_to_personal (m_dict, utf8.utf8_str(), utf8.byteLength());
++		enchant_dict_add(m_dict, utf8.utf8_str(), utf8.byteLength());
+ 		return true;
+ 	}
+ 	return false;
+@@ -150,7 +150,7 @@
+ 	UT_return_val_if_fail (m_dict, false);
+ 
+ 	UT_UTF8String ignore (toCorrect, toCorrectLen);
+-	return enchant_dict_is_in_session (m_dict, ignore.utf8_str(), ignore.byteLength()) != 0;
++	return enchant_dict_is_added(m_dict, ignore.utf8_str(), ignore.byteLength()) != 0;
+ }
+ 
+ void EnchantChecker::ignoreWord (const UT_UCSChar *toCorrect, size_t toCorrectLen)
+-- 
+2.24.1
