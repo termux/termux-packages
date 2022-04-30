@@ -1,0 +1,21 @@
+--- a/configure.ac
++++ b/configure.ac
+@@ -644,7 +644,6 @@
+ if test "$GCC" = "yes"; then
+ 	for option in -Wall -Wextra -Wsign-compare -Wpointer-arith \
+ 		      -Wchar-subscripts -Wwrite-strings -Wmissing-noreturn \
+-                      -Wformat-overflow=2 \
+ 		      -Wunused -Wpointer-arith -Wshadow; do
+ 		SAVE_CPPFLAGS="$CPPFLAGS"
+ 		CPPFLAGS="$CPPFLAGS $option"
+@@ -1030,8 +1029,8 @@
+ 	if test "$abi_cv_disable_default_plugins" != "yes"; then
+ 		PLUGINS="$default_plugins"
+ 	fi
+-	for i in $abi_cv_plugins; do
+-		if test -d "plugins/$i"; then 
++	for i in ${abi_cv_plugins//,/ }; do
++		if test -d "$srcdir/plugins/$i"; then 
+ 			PLUGINS="$PLUGINS $i"
+ 		else
+ 			AC_MSG_WARN([Plugin $i does not exist.])
