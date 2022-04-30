@@ -44,7 +44,7 @@ usage() {
 		"${_GREEN}[-h|--help]" \
 		"[-s|--silent]" \
 		"[--enable]" \
-		"PACKAGE_DIR [PACKAGE_DIR...]"
+		"PACKAGE_DIR"
 	echo
 	echo -e "${_TEAL}Check if packages can be auto-updated and optionally enable if so."
 	echo
@@ -55,11 +55,11 @@ usage() {
 	echo
 	echo -e "${_BLUE}Options:"
 	echo -e "${_GREEN}-h --help${_TEAL} Show this help message."
-	echo -e "${_GREEN}--enable${_TEAL} Enable auto-updates for packages if it can be" \
-		"(Writes ${_YELLOW}TERMUX_PKG_AUTO_UPDATE=true${_TEAL} to build.sh)."
+	echo -e "${_GREEN}--enable${_TEAL} Enable auto-update for package if check was successful." \
+		"(writes ${_YELLOW}TERMUX_PKG_AUTO_UPDATE=true${_TEAL} to build.sh)"
 	echo -e "${_GREEN}-s --silent${_TEAL} Do not print anything to stdout."
 	echo
-	echo -e "${_BLUE}Example:${_RESET_COLOR} $(basename "$0") packages/cppcheck x11-packages/xorg-server"
+	echo -e "${_BLUE}Example:${_RESET_COLOR} $(basename "$0") x11-packages/xorg-server"
 	echo
 }
 
@@ -73,8 +73,10 @@ warn() {
 }
 
 error() {
+	local exit="return"
+	[[ "${1}" == "--exit" ]] && exit="exit" && shift
 	color_print "${_BLUE}[${_RED}!${_BLUE}]${_RED} $*" >&2
-	exit 1
+	${exit} 1
 }
 
 info() {
@@ -88,13 +90,13 @@ _check_stderr() {
 	http_code="$(grep "HTTP code:" <<<"${stderr}" | cut -d ':' -f2 | tr -d ' ')"
 
 	if [[ -n "${http_code}" ]]; then
-		[[ ${http_code} == 000 ]] && error "Could not connect to server. Please check your connection."
+		[[ ${http_code} == 000 ]] && error --exit "Could not connect to server. Please check your connection."
 		warn "Failed to get tag. [HTTP code: $http_code]"
 		return "$http_code"
 	elif grep -qE "ERROR: No '(latest-release-tag|newest-tag)'" <<<"${stderr}"; then
 		return 2
 	elif grep -q "ERROR: GITHUB_TOKEN" <<<"$stderr"; then
-		error "GITHUB_TOKEN is not set." # exit script on this error.
+		error --exit "GITHUB_TOKEN is not set." # exit script on this error.
 	else
 		warn "$stderr"
 		return 1
@@ -118,6 +120,11 @@ check() {
 	local from_where="$1" # Can be either 'github' or 'gitlab'.
 	local url="$2"
 	local return_code=0
+
+	if [[ ! $src_url =~ ^https?://${from_where}.com ]]; then
+		warn "Not a ${from_where} url: ${src_url}"
+		return 1
+	fi
 
 	_check "$from_where" "$url" || return_code="$?"
 
@@ -144,13 +151,14 @@ repology() {
 				jq -r 'keys[]'
 		)
 
-		[[ -z "${UNIQUE_PACKAGES[*]}" ]] && error "Failed to get unique packages from repology.org"
+		[[ -z "${UNIQUE_PACKAGES[*]}" ]] && error --exit "Failed to get unique packages from repology.org"
 	fi
 	# shellcheck disable=SC2076
 	if [[ ! " ${UNIQUE_PACKAGES[*]} " =~ " ${pkg_name} " ]]; then
 		return 0 # Package is not unique, can be updated.
 	else
 		warn "Package '$pkg_name' is unique to Termux, cannot be auto-updated."
+		return 1 # Package is unique, cannot be updated.
 	fi
 }
 
@@ -172,7 +180,7 @@ test_pkg() {
 	pkg_name="$(basename "${pkg_dir}")"
 
 	if [[ ! -f "${pkg_dir}/build.sh" ]]; then
-		error "Package '$pkg_name' does not exist."
+		error --exit "Package '$pkg_name' does not exist."
 	fi
 
 	local vars
@@ -204,6 +212,7 @@ test_pkg() {
 	)
 	local can_be_updated=false
 	local tag_type=""
+	local update_method=""
 	for check in "${checks[@]}"; do
 		info "Checking if package can be updated from $check..."
 		local return_code=0
@@ -212,6 +221,7 @@ test_pkg() {
 			check "$check" "$src_url" || return_code="$?"
 		else
 			repology "$pkg_name" || return_code="$?"
+			update_method="repology"
 		fi
 
 		if [[ "$return_code" == "0" ]]; then
@@ -228,11 +238,13 @@ test_pkg() {
 		info "Package can be auto-updated."
 		if [[ "${ENABLE}" == "--enable" ]]; then
 			info "Enabling auto-update..."
-			write_to_first_empty_line \
-				"$pkg_dir/build.sh" "TERMUX_PKG_AUTO_UPDATE=true"
-			[[ -n "${tag_type}" ]] && write_to_first_empty_line \
-				"$pkg_dir/build.sh" \
-				"TERMUX_PKG_UPDATE_TAG_TYPE=\"${tag_type}\""
+			write_to_first_empty_line "$pkg_dir/build.sh" "TERMUX_PKG_AUTO_UPDATE=true"
+			if [[ -n "${tag_type}" ]]; then
+				write_to_first_empty_line "$pkg_dir/build.sh" "TERMUX_PKG_UPDATE_TAG_TYPE=\"${tag_type}\""
+			fi
+			if [[ -n "${update_method}" ]]; then
+				write_to_first_empty_line "$pkg_dir/build.sh" "TERMUX_PKG_UPDATE_METHOD=${update_method}"
+			fi
 			info "Done."
 		fi
 	else
@@ -240,8 +252,8 @@ test_pkg() {
 	fi
 }
 
-if [[ $# -lt 1 ]]; then
-	error "Invalid number of arguments. See --help for usage."
+if [[ $# -lt 1 ]] || [[ $# -gt 3 ]]; then
+	error --exit "Invalid number of arguments. See --help for usage."
 fi
 
 while [[ $# -gt 0 ]]; do
@@ -257,7 +269,7 @@ while [[ $# -gt 0 ]]; do
 		;;
 	*)
 		test_pkg "$1"
-		[[ "${SILENT}" == "true" ]] || echo # Newline.
+		[[ "${SILENT}" == "true" ]] || echo
 		;;
 	esac
 	shift
