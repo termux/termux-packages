@@ -1,27 +1,11 @@
---- a/src/netxs/os/system.hpp	2022-02-14 16:50:27.000000000 +0000
-+++ b/src/netxs/os/system.hpp	2022-04-17 10:03:16.743450407 +0000
-@@ -81,7 +81,7 @@
- 
-     #if defined(__linux__)
-         #include <sys/vt.h> // ::console_ioctl()
--        #include <sys/kd.h> // ::console_ioctl()
-+        #include <linux/kd.h> // ::console_ioctl()
-         #include <linux/keyboard.h> // ::keyb_ioctl()
-     #endif
- 
-@@ -1507,7 +1507,7 @@
+--- a/src/netxs/os/system.hpp
++++ b/src/netxs/os/system.hpp
+@@ -1696,7 +1696,7 @@
              #elif defined(__linux__)
  
-                 ucred cred = {};
--                unsigned size = sizeof(cred);
-+                socklen_t size = sizeof(cred);
- 
-                 if (!ok(::getsockopt(handle.h, SOL_SOCKET, SO_PEERCRED, &cred, &size), "getsockopt error"))
-                     return faux;
-@@ -2687,4 +2687,4 @@
-     };
- }
- 
--#endif // NETXS_SYSTEM_HPP
-\ No newline at end of file
-+#endif // NETXS_SYSTEM_HPP
+                 auto cred = ucred{};
+-                #ifndef __ANDROID__
++                #ifdef __ANDROID__
+                     socklen_t size = sizeof(cred);
+                 #else
+                     unsigned size = sizeof(cred);
