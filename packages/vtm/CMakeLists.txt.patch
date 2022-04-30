@@ -1,23 +1,11 @@
---- a/src/CMakeLists.txt	2022-02-14 16:50:27.000000000 +0000
-+++ b/src/CMakeLists.txt	2022-04-17 10:11:34.852563956 +0000
-@@ -14,13 +14,6 @@
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -14,7 +14,7 @@
      #set (CMAKE_EXE_LINKER_FLAGS "/MANIFEST:NO")
- 
      set (CMAKE_CXX_FLAGS "/DWIN32 /D_WINDOWS /W3 /GR /EHsc /bigobj")
--else ()
+ elseif (NOT CMAKE_HOST_SYSTEM_NAME MATCHES "Android")
 -    set (CMAKE_CXX_FLAGS "-pthread")
--    if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
--        #static linkage
--        #set (CMAKE_CXX_FLAGS "-static-libstdc++ -static-libgcc -pthread -s")
--        #set (CMAKE_CXX_FLAGS "-pthread -s")
--    endif ()
- endif ()
- 
- if (DEMO)
-@@ -31,4 +24,4 @@
- 
- if (NOT WIN32)
-     install (TARGETS vtm  DESTINATION bin)
--endif ()
-\ No newline at end of file
-+endif ()
++    #set (CMAKE_CXX_FLAGS "-pthread")
+     if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+         #static linkage
+         #set (CMAKE_CXX_FLAGS "-static-libstdc++ -static-libgcc -pthread -s")
