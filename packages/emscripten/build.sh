@@ -126,15 +126,39 @@ termux_step_post_get_source() {
 	tar -xf "$TERMUX_PKG_CACHEDIR/llvm.tar.gz" -C "$TERMUX_PKG_CACHEDIR"
 	tar -xf "$TERMUX_PKG_CACHEDIR/binaryen.tar.gz" -C "$TERMUX_PKG_CACHEDIR"
 
-	cd "$TERMUX_PKG_CACHEDIR/llvm-project-$LLVM_COMMIT"
-	for patch in $TERMUX_PKG_BUILDER_DIR/llvm-project-*.patch.diff; do
-		patch -p1 -i "$patch"
-	done
+	llvm_patches="$(find $TERMUX_PKG_BUILDER_DIR -mindepth 1 -maxdepth 1 -type f -name 'llvm-project-*.patch.diff')"
+	if [ -n "$llvm_patches" ]; then
+		cd "$TERMUX_PKG_CACHEDIR/llvm-project-$LLVM_COMMIT"
+		for patch in $llvm_patches; do
+			patch -p1 -i "$patch" || true
+		done
+		# https://github.com/llvm/llvm-project/commit/f6b7fd20a52ef83d0462db190eb40800afda2506
+		rm -fv lldb/source/Symbol/LocateSymbolFileMacOSX.cpp.rej
+		llvm_patches_rej="$(find . -type f -name '*.rej')"
+		if [ -n "$llvm_patches_rej" ]; then
+			for rej in $llvm_patches_rej; do
+				echo -e "\n\n${rej}"
+				cat "$rej"
+			done
+			termux_error_exit "Patch failed! Please check patch errors above."
+		fi
+	fi
 
-	cd "$TERMUX_PKG_CACHEDIR/binaryen-$BINARYEN_COMMIT"
-	for patch in $TERMUX_PKG_BUILDER_DIR/binaryen-*.patch.diff; do
-		patch -p1 -i "$patch"
-	done
+	binaryen_patches="$(find $TERMUX_PKG_BUILDER_DIR -mindepth 1 -maxdepth 1 -type f -name 'binaryen-*.patch.diff')"
+	if [ -n "$binaryen_patches" ]; then
+		cd "$TERMUX_PKG_CACHEDIR/binaryen-$BINARYEN_COMMIT"
+		for patch in $binaryen_patches; do
+			patch -p1 -i "$patch" || true
+		done
+		binaryen_patches_rej="$(find . -type f -name '*.rej')"
+		if [ -n "$binaryen_patches_rej" ]; then
+			for rej in $binaryen_patches_rej; do
+				echo -e "\n\n${rej}"
+				cat "$rej"
+			done
+			termux_error_exit "Patch failed! Please check patch errors above."
+		fi
+	fi
 }
 
 termux_step_host_build() {
