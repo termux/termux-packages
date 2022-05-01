@@ -1,0 +1,73 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -88,7 +88,7 @@
+ 	set(xournalpp_LDFLAGS ${xournalpp_LDFLAGS} "-mwindows")
+ 	# Need ImageMagick to generate icons on Windows
+ 	find_package(ImageMagick REQUIRED COMPONENTS convert)
+-else ()
++elseif (FALSE)
+ 	find_package(Backtrace REQUIRED)
+ 	add_includes_ldflags("${Backtrace_LIBRARIES}" "${Backtrace_INCLUDE_DIRS}")
+ endif ()
+--- a/src/util/CrashHandlerUnix.h
++++ b/src/util/CrashHandlerUnix.h
+@@ -11,7 +11,9 @@
+ 
+ #include <fstream>  // std::ofstream
+ 
++#ifndef __ANDROID__
+ #include <execinfo.h>
++#endif
+ 
+ #include "PathUtil.h"
+ 
+@@ -66,7 +68,11 @@
+     size_t size;
+ 
+     // get void*'s for all entries on the stack
++#ifndef __ANDROID__
+     size = backtrace(array, 100);
++#else
++    size = 0;
++#endif
+ 
+     time_t curtime = time(0);
+     char stime[128];
+@@ -83,7 +89,11 @@
+     fp << FORMAT_STR("Error: signal {1}") % sig;
+     fp << "\n";
+ 
++#ifndef __ANDROID__
+     messages = backtrace_symbols(array, size);
++#else
++    messages = NULL;
++#endif
+ 
+     for (size_t i = 0; i < size; i++) {
+         fp << FORMAT_STR("[bt]: ({1}) {2}") % i % messages[i];
+--- a/src/util/Stacktrace.cpp
++++ b/src/util/Stacktrace.cpp
+@@ -8,7 +8,9 @@
+ #include <Windows.h>
+ #else
+ 
++#ifndef __ANDROID__
+ #include <execinfo.h>
++#endif
+ #include <unistd.h>
+ #endif
+ 
+@@ -76,8 +78,13 @@
+     std::array<void*, 32> trace{};
+     std::array<char, 2048> buff{};
+ 
++#ifndef __ANDROID__
+     int trace_size = backtrace(trace.data(), trace.size());
+     char** messages = backtrace_symbols(trace.data(), trace_size);
++#else
++    int trace_size = 0;
++    char** messages = NULL;
++#endif
+ 
+     std::string exeName = getExePath();
+ 
