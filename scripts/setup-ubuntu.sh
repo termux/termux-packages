@@ -77,6 +77,9 @@ PACKAGES+=" valac"
 # Needed by package libgcrypt.
 PACKAGES+=" fig2dev"
 
+# Needed by package gimp.
+PACKAGES+=" gegl"
+
 # Needed by package libidn2.
 PACKAGES+=" gengetopt"
 
