@@ -6,8 +6,8 @@ export TMPDIR=@TERMUX_PREFIX@/tmp
 echo ""
 echo "You will now be shown texlive's install-tl text gui."
 echo "You can customize settings, but you have to use the"
-echo "default TEXDIR and custom binaries for texlive to be"
-echo "able to find and run the binaries."
+echo "default TEXDIR and custom binaries or else texlive"
+echo "is unable to find and run the binaries."
 echo ""
 echo "Press 'c' to continue"
 
@@ -58,8 +58,12 @@ fmtutil-sys --quiet --byfmt pdflatex
 echo "[*] Running updmap"
 updmap-sys --quiet
 
-echo "[*] Setting up symlinks"
-texlinks
+if command texlinks; then
+    echo "[*] Setting up symlinks"
+    texlinks
+else
+    echo "[!] texlive-scripts-extra is not installed, skipping to run texlinks"
+fi
 
 echo "[*] All done. Restart the shell or source"
 echo "    $PREFIX/etc/profile.d/texlive.sh"

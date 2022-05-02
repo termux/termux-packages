@@ -2,20 +2,23 @@ TERMUX_PKG_HOMEPAGE=https://www.tug.org/texlive/
 TERMUX_PKG_DESCRIPTION="Wrapper around texlive's install-tl script"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
-TERMUX_PKG_VERSION=20210325
-TERMUX_PKG_REVISION=3
-TERMUX_PKG_SRCURL=ftp://ftp.tug.org/texlive/historic/${TERMUX_PKG_VERSION:0:4}/install-tl-unx.tar.gz
-TERMUX_PKG_SHA256=74eac0855e1e40c8db4f28b24ef354bd7263c1f76031bdc02b52156b572b7a1d
+TERMUX_PKG_VERSION=20220403
+TERMUX_PKG_SRCURL=https://ftp.math.utah.edu/pub/tex/historic/systems/texlive/${TERMUX_PKG_VERSION:0:4}/install-tl-unx.tar.gz
+TERMUX_PKG_SHA256=e67edec49df6b7c4a987a7d5a9b31bcf41258220f9ac841c7a836080cd334fb5
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_DEPENDS="perl, texlive-bin (>= 20200406-4), gnupg, curl, lz4, xz-utils"
 TERMUX_PKG_REPLACES="texlive"
 TERMUX_PKG_BREAKS="texlive"
-TERMUX_PKG_RM_AFTER_INSTALL="opt/texlive/install-tl/texmf-dist"
+TERMUX_PKG_RM_AFTER_INSTALL="
+opt/texlive/install-tl/texmf-dist
+opt/texlive/install-tl/tlpkg/installer/curl
+opt/texlive/install-tl/tlpkg/installer/wget
+opt/texlive/install-tl/tlpkg/installer/xz
+"
 
 termux_step_make_install() {
 	mkdir -p $TERMUX_PREFIX/opt/texlive
 	sed -e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
-		-e "s|@INSTALLER_VERSION@|${TERMUX_PKG_VERSION}|g" \
 		"$TERMUX_PKG_BUILDER_DIR"/installer.sh \
 		> $TERMUX_PREFIX/bin/termux-install-tl
 	chmod 700 $TERMUX_PREFIX/bin/termux-install-tl

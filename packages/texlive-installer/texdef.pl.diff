@@ -1,6 +1,6 @@
---- ../texdef.pl.orig	2020-04-04 09:27:54.747454581 +0200
-+++ ./texmf-dist/scripts/texdef/texdef.pl	2020-04-04 09:28:20.700734760 +0200
-@@ -283,7 +283,7 @@
+--- ./texmf-dist/scripts/texdef/texdef.pl.orig	2020-09-28 23:01:50.000000000 +0200
++++ ./texmf-dist/scripts/texdef/texdef.pl	2022-05-01 22:22:11.349393307 +0200
+@@ -284,14 +284,14 @@
              $EDITOR = 'texworks "%f"';
          }
          else {
@@ -9,3 +9,11 @@
                  if (-x $ed) {
                      $EDITOR = $ed;
                      last;
+                 }
+             }
+             if (!$EDITOR) {
+-                for my $ed (qw(/usr/bin/editor /usr/bin/open /bin/open)) {
++                for my $ed (qw(@TERMUX_PREFIX@/bin/editor @TERMUX_PREFIX@/bin/open @TERMUX_PREFIX@/bin/open)) {
+                     if (-x $ed) {
+                         $EDITOR = "$ed \"%f\"";
+                         last;

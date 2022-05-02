@@ -1,6 +1,6 @@
---- ../install-tl.orig	2020-04-30 07:08:00.824228666 +0200
-+++ ./install-tl	2020-04-30 07:09:41.060703296 +0200
-@@ -33,7 +33,7 @@
+--- ./install-tl.orig	2022-03-16 23:20:47.000000000 +0100
++++ ./install-tl	2022-05-01 20:32:08.704613894 +0200
+@@ -35,7 +35,7 @@
  
  # debugging communication with external gui: use shared logfile
  
@@ -9,7 +9,7 @@
  $dblfile = $ENV{'TEMP'} . "\\dblog.txt" if ($^O =~ /^MSWin/i);
  $dblfile = $ENV{'TMPDIR'} . "/dblog" if ($^O eq 'darwin'
                                           && exists $ENV{'TMPDIR'});
-@@ -861,8 +861,6 @@
+@@ -862,8 +862,6 @@
    if ($opt_custom_bin) {
      if (-d $opt_custom_bin && (-r "$opt_custom_bin/kpsewhich"
                                 || -r "$opt_custom_bin/kpsewhich.exe")) {
@@ -18,7 +18,7 @@
      } else {
        tldie("$0: -custom-bin argument must be a directory "
              . "with TeX Live binaries, not like: $opt_custom_bin\n");
-@@ -980,11 +978,6 @@
+@@ -997,11 +995,6 @@
      do_install_packages();
      if ($opt_custom_bin) {
        $vars{'this_platform'} = "custom";
@@ -30,7 +30,7 @@
      }
    }
    # now we save every scheme that is fully covered by the stuff we have
-@@ -1612,7 +1605,7 @@
+@@ -1637,7 +1630,7 @@
    set_var_from_alternatives( \$tex_prefix,
      ($opt_in_place ? abs_path($::installerdir) : undef),
      $tlprefixenv,
