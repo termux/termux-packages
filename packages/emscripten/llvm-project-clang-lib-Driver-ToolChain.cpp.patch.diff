@@ -1,16 +1,7 @@
 diff -uNr llvm-project/clang/lib/Driver/ToolChain.cpp llvm-project.mod/clang/lib/Driver/ToolChain.cpp
---- llvm-project/clang/lib/Driver/ToolChain.cpp	2022-02-24 01:38:33.000000000 +0800
-+++ llvm-project.mod/clang/lib/Driver/ToolChain.cpp	2022-02-26 20:33:29.973336795 +0800
-@@ -414,7 +414,7 @@
-   case llvm::Triple::AIX:
-     return "aix";
-   default:
--    return getOS();
-+    return Triple.isAndroid() ? "android":getOS();
-   }
- }
- 
-@@ -965,7 +965,7 @@
+--- llvm-project/clang/lib/Driver/ToolChain.cpp	2022-05-03 21:10:32.000000000 +0800
++++ llvm-project.mod/clang/lib/Driver/ToolChain.cpp	2022-05-08 23:47:42.482356300 +0800
+@@ -967,7 +967,7 @@
  
    switch (Type) {
    case ToolChain::CST_Libcxx:
