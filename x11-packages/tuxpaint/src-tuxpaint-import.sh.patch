@@ -1,0 +1,41 @@
+--- a/src/tuxpaint-import.sh
++++ b/src/tuxpaint-import.sh
+@@ -52,14 +52,14 @@
+ 
+ # Determine preferred savedir
+ 
+-# First, check /usr/local/etc/
+-x=`grep -m 1 "^savedir=" /usr/local/etc/tuxpaint/tuxpaint.conf`
++# First, check @TERMUX_PREFIX@/local/etc/
++x=`grep -m 1 "^savedir=" @TERMUX_PREFIX@/local/etc/tuxpaint/tuxpaint.conf`
+ if test $? = 0 ; then
+   SAVEDIR=`echo $x | cut -d = -f 2-99`
+ fi
+ 
+-# First, check /etc/
+-x=`grep -m 1 "^savedir=" /etc/tuxpaint/tuxpaint.conf`
++# First, check @TERMUX_PREFIX@/etc/
++x=`grep -m 1 "^savedir=" @TERMUX_PREFIX@/etc/tuxpaint/tuxpaint.conf`
+ if test $? = 0 ; then
+   SAVEDIR=`echo $x | cut -d = -f 2-99`
+ fi
+@@ -100,15 +100,15 @@
+ window_width=800
+ window_height=600
+ 
+-# First, check /usr/local/etc/
+-x=`grep -m 1 "^windowsize=" /usr/local/etc/tuxpaint/tuxpaint.conf`
++# First, check @TERMUX_PREFIX@/local/etc/
++x=`grep -m 1 "^windowsize=" @TERMUX_PREFIX@/local/etc/tuxpaint/tuxpaint.conf`
+ if test $? = 0 ; then
+   window_width=`echo $x | cut -d = -f 2 | cut -d x -f 1`
+   window_height=`echo $x | cut -d = -f 2 | cut -d x -f 2`
+ fi
+ 
+-# First, check /etc/
+-x=`grep -m 1 "^windowsize=" /etc/tuxpaint/tuxpaint.conf`
++# First, check @TERMUX_PREFIX@/etc/
++x=`grep -m 1 "^windowsize=" @TERMUX_PREFIX@/etc/tuxpaint/tuxpaint.conf`
+ if test $? = 0 ; then
+   window_width=`echo $x | cut -d = -f 2 | cut -d x -f 1`
+   window_height=`echo $x | cut -d = -f 2 | cut -d x -f 2`
