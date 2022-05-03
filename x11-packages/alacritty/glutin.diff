@@ -1,0 +1,390 @@
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -40,40 +40,40 @@
+ 
+ [target."cfg(any(target_os = \"ios\", target_os = \"macos\"))".dependencies.objc]
+ version = "0.2.6"
+-[target."cfg(any(target_os = \"linux\", target_os = \"freebsd\", target_os = \"dragonfly\", target_os = \"netbsd\", target_os = \"openbsd\"))".dependencies.glutin_egl_sys]
++[target."cfg(any(target_os = \"android\", target_os = \"freebsd\", target_os = \"dragonfly\", target_os = \"netbsd\", target_os = \"openbsd\"))".dependencies.glutin_egl_sys]
+ version = "0.1.5"
+ 
+-[target."cfg(any(target_os = \"linux\", target_os = \"freebsd\", target_os = \"dragonfly\", target_os = \"netbsd\", target_os = \"openbsd\"))".dependencies.glutin_glx_sys]
++[target."cfg(any(target_os = \"android\", target_os = \"freebsd\", target_os = \"dragonfly\", target_os = \"netbsd\", target_os = \"openbsd\"))".dependencies.glutin_glx_sys]
+ version = "0.1.7"
+ optional = true
+ 
+-[target."cfg(any(target_os = \"linux\", target_os = \"freebsd\", target_os = \"dragonfly\", target_os = \"netbsd\", target_os = \"openbsd\"))".dependencies.libloading]
++[target."cfg(any(target_os = \"android\", target_os = \"freebsd\", target_os = \"dragonfly\", target_os = \"netbsd\", target_os = \"openbsd\"))".dependencies.libloading]
+ version = "0.7"
+ 
+-[target."cfg(any(target_os = \"linux\", target_os = \"freebsd\", target_os = \"dragonfly\", target_os = \"netbsd\", target_os = \"openbsd\"))".dependencies.log]
++[target."cfg(any(target_os = \"android\", target_os = \"freebsd\", target_os = \"dragonfly\", target_os = \"netbsd\", target_os = \"openbsd\"))".dependencies.log]
+ version = "0.4"
+ 
+-[target."cfg(any(target_os = \"linux\", target_os = \"freebsd\", target_os = \"dragonfly\", target_os = \"netbsd\", target_os = \"openbsd\"))".dependencies.osmesa-sys]
++[target."cfg(any(target_os = \"android\", target_os = \"freebsd\", target_os = \"dragonfly\", target_os = \"netbsd\", target_os = \"openbsd\"))".dependencies.osmesa-sys]
+ version = "0.1"
+ 
+-[target."cfg(any(target_os = \"linux\", target_os = \"freebsd\", target_os = \"dragonfly\", target_os = \"netbsd\", target_os = \"openbsd\"))".dependencies.parking_lot]
++[target."cfg(any(target_os = \"android\", target_os = \"freebsd\", target_os = \"dragonfly\", target_os = \"netbsd\", target_os = \"openbsd\"))".dependencies.parking_lot]
+ version = "0.11"
+ 
+-[target."cfg(any(target_os = \"linux\", target_os = \"freebsd\", target_os = \"dragonfly\", target_os = \"netbsd\", target_os = \"openbsd\"))".dependencies.wayland-client]
++[target."cfg(any(target_os = \"android\", target_os = \"freebsd\", target_os = \"dragonfly\", target_os = \"netbsd\", target_os = \"openbsd\"))".dependencies.wayland-client]
+ version = "0.29"
+ features = ["dlopen"]
+ optional = true
+ 
+-[target."cfg(any(target_os = \"linux\", target_os = \"freebsd\", target_os = \"dragonfly\", target_os = \"netbsd\", target_os = \"openbsd\"))".dependencies.wayland-egl]
++[target."cfg(any(target_os = \"android\", target_os = \"freebsd\", target_os = \"dragonfly\", target_os = \"netbsd\", target_os = \"openbsd\"))".dependencies.wayland-egl]
+ version = "0.29"
+ optional = true
+-[target."cfg(target_os = \"android\")".dependencies.android_glue]
++[target."cfg(target_os = \"notermux\")".dependencies.android_glue]
+ version = "0.2"
+ 
+-[target."cfg(target_os = \"android\")".dependencies.glutin_egl_sys]
++[target."cfg(target_os = \"notermux\")".dependencies.glutin_egl_sys]
+ version = "0.1.5"
+ 
+-[target."cfg(target_os = \"android\")".dependencies.parking_lot]
++[target."cfg(target_os = \"notermux\")".dependencies.parking_lot]
+ version = "0.11"
+ [target."cfg(target_os = \"emscripten\")".dependencies.glutin_emscripten_sys]
+ version = "0.1.1"
+--- a/Cargo.toml.orig0
++++ b/Cargo.toml.orig0
+@@ -24,7 +24,7 @@
+ lazy_static = "1.3"
+ winit = { version = "0.26", default-features = false }
+ 
+-[target.'cfg(target_os = "android")'.dependencies]
++[target.'cfg(target_os = "notermux")'.dependencies]
+ android_glue = "0.2"
+ glutin_egl_sys = { version = "0.1.5", path = "../glutin_egl_sys" }
+ parking_lot = "0.11"
+@@ -56,7 +56,7 @@
+ glutin_egl_sys = { version = "0.1.5", path = "../glutin_egl_sys" }
+ parking_lot = "0.11"
+ 
+-[target.'cfg(any(target_os = "linux", target_os = "freebsd", target_os = "dragonfly", target_os = "netbsd", target_os = "openbsd"))'.dependencies]
++[target.'cfg(any(target_os = "android", target_os = "freebsd", target_os = "dragonfly", target_os = "netbsd", target_os = "openbsd"))'.dependencies]
+ osmesa-sys = "0.1"
+ wayland-client = { version = "0.29", features = ["dlopen"], optional = true }
+ wayland-egl = { version = "0.29", optional = true }
+--- a/src/api/android/mod.rs
++++ b/src/api/android/mod.rs
+@@ -1,4 +1,4 @@
+-#![cfg(target_os = "android")]
++#![cfg(target_os = "notermux")]
+ 
+ use crate::api::egl::{Context as EglContext, NativeDisplay, SurfaceType as EglSurfaceType};
+ use crate::CreationError::{self, OsError};
+--- a/src/api/dlloader.rs
++++ b/src/api/dlloader.rs
+@@ -1,6 +1,6 @@
+ #![cfg(any(
+     target_os = "windows",
+-    target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+--- a/src/api/egl/mod.rs
++++ b/src/api/egl/mod.rs
+@@ -1,7 +1,7 @@
+ #![cfg(any(
+     target_os = "windows",
+-    target_os = "linux",
+     target_os = "android",
++    target_os = "notermux",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -9,7 +9,7 @@
+ ))]
+ #![allow(unused_variables)]
+ 
+-#[cfg(not(target_os = "android"))]
++#[cfg(not(target_os = "notermux"))]
+ mod egl {
+     use super::ffi;
+     use crate::api::dlloader::{SymTrait, SymWrapper};
+@@ -90,7 +90,7 @@
+     }
+ }
+ 
+-#[cfg(target_os = "android")]
++#[cfg(target_os = "notermux")]
+ mod egl {
+     use super::ffi;
+ 
+@@ -118,9 +118,9 @@
+ use glutin_egl_sys as ffi;
+ use parking_lot::Mutex;
+ #[cfg(any(
+-    target_os = "android",
++    target_os = "notermux",
+     target_os = "windows",
+-    target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -176,11 +176,11 @@
+     surface: Option<Mutex<ffi::egl::types::EGLSurface>>,
+     api: Api,
+     pixel_format: PixelFormat,
+-    #[cfg(target_os = "android")]
++    #[cfg(target_os = "notermux")]
+     config_id: ffi::egl::types::EGLConfig,
+ }
+ 
+-#[cfg(target_os = "android")]
++#[cfg(target_os = "notermux")]
+ #[inline]
+ fn get_native_display(native_display: &NativeDisplay) -> *const raw::c_void {
+     let egl = EGL.as_ref().unwrap();
+@@ -256,7 +256,7 @@
+     }
+ }
+ 
+-#[cfg(not(target_os = "android"))]
++#[cfg(not(target_os = "notermux"))]
+ fn get_native_display(native_display: &NativeDisplay) -> *const raw::c_void {
+     let egl = EGL.as_ref().unwrap();
+     // the first step is to query the list of extensions without any display, if
+@@ -541,7 +541,7 @@
+     // Android has started the activity or sent it to foreground.
+     // Create a new surface and attach it to the recreated ANativeWindow.
+     // Restore the EGLContext.
+-    #[cfg(target_os = "android")]
++    #[cfg(target_os = "notermux")]
+     pub unsafe fn on_surface_created(&self, nwin: ffi::EGLNativeWindowType) {
+         let egl = EGL.as_ref().unwrap();
+         let mut surface = self.surface.as_ref().unwrap().lock();
+@@ -562,7 +562,7 @@
+     // Android has stopped the activity or sent it to background.
+     // Release the surface attached to the destroyed ANativeWindow.
+     // The EGLContext is not destroyed so it can be restored later.
+-    #[cfg(target_os = "android")]
++    #[cfg(target_os = "notermux")]
+     pub unsafe fn on_surface_destroyed(&self) {
+         let egl = EGL.as_ref().unwrap();
+         let mut surface = self.surface.as_ref().unwrap().lock();
+@@ -771,7 +771,7 @@
+ }
+ 
+ #[cfg(any(
+-    target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -802,7 +802,7 @@
+ 
+ impl<'a> ContextPrototype<'a> {
+     #[cfg(any(
+-        target_os = "linux",
++        target_os = "android",
+         target_os = "dragonfly",
+         target_os = "freebsd",
+         target_os = "netbsd",
+@@ -828,7 +828,7 @@
+     }
+ 
+     #[cfg(any(
+-        target_os = "linux",
++        target_os = "android",
+         target_os = "dragonfly",
+         target_os = "freebsd",
+         target_os = "netbsd",
+@@ -845,9 +845,9 @@
+     }
+ 
+     #[cfg(any(
+-        target_os = "android",
++        target_os = "notermux",
+         target_os = "windows",
+-        target_os = "linux",
++        target_os = "android",
+         target_os = "dragonfly",
+         target_os = "freebsd",
+         target_os = "netbsd",
+@@ -995,7 +995,7 @@
+             surface: surface.map(|s| Mutex::new(s)),
+             api: self.api,
+             pixel_format: self.pixel_format,
+-            #[cfg(target_os = "android")]
++            #[cfg(target_os = "notermux")]
+             config_id: self.config_id,
+         })
+     }
+--- a/src/api/glx/mod.rs
++++ b/src/api/glx/mod.rs
+@@ -1,5 +1,5 @@
+ #![cfg(any(
+-    target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+--- a/src/api/osmesa/mod.rs
++++ b/src/api/osmesa/mod.rs
+@@ -1,5 +1,5 @@
+ #![cfg(any(
+-    target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+--- a/src/context.rs
++++ b/src/context.rs
+@@ -120,7 +120,7 @@
+     /// [`Context`]: struct.Context.html
+     #[cfg_attr(
+         not(any(
+-            target_os = "linux",
++            target_os = "android",
+             target_os = "dragonfly",
+             target_os = "freebsd",
+             target_os = "netbsd",
+@@ -133,7 +133,7 @@
+     )]
+     #[cfg_attr(
+         any(
+-            target_os = "linux",
++            target_os = "android",
+             target_os = "dragonfly",
+             target_os = "freebsd",
+             target_os = "netbsd",
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -42,7 +42,7 @@
+ )]
+ #![cfg_attr(
+     not(any(
+-        target_os = "linux",
++        target_os = "android",
+         target_os = "dragonfly",
+         target_os = "freebsd",
+         target_os = "netbsd",
+@@ -55,7 +55,7 @@
+ )]
+ #![cfg_attr(
+     any(
+-        target_os = "linux",
++        target_os = "android",
+         target_os = "dragonfly",
+         target_os = "freebsd",
+         target_os = "netbsd",
+@@ -72,8 +72,8 @@
+ 
+ #[cfg(any(
+     target_os = "windows",
+-    target_os = "linux",
+     target_os = "android",
++    target_os = "notermux",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -297,7 +297,7 @@
+ 
+ impl CreationError {
+     #[cfg(any(
+-        target_os = "linux",
++        target_os = "android",
+         target_os = "dragonfly",
+         target_os = "freebsd",
+         target_os = "netbsd",
+--- a/src/platform/android.rs
++++ b/src/platform/android.rs
+@@ -1,4 +1,4 @@
+-#![cfg(any(target_os = "android"))]
++#![cfg(any(target_os = "notermux"))]
+ 
+ use crate::platform::ContextTraitExt;
+ use crate::{Context, ContextCurrentState};
+--- a/src/platform/mod.rs
++++ b/src/platform/mod.rs
+@@ -24,12 +24,12 @@
+     #![cfg(any(
+         target_os = "windows",
+         target_os = "macos",
+-        target_os = "linux",
++        target_os = "android",
+         target_os = "dragonfly",
+         target_os = "freebsd",
+         target_os = "netbsd",
+         target_os = "openbsd",
+-        target_os = "android",
++        target_os = "notermux",
+     ))]
+     pub use winit::platform::run_return::*;
+ }
+--- a/src/platform/unix.rs
++++ b/src/platform/unix.rs
+@@ -1,5 +1,5 @@
+ #![cfg(any(
+-    target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+--- a/src/platform_impl/android/mod.rs
++++ b/src/platform_impl/android/mod.rs
+@@ -1,4 +1,4 @@
+-#![cfg(target_os = "android")]
++#![cfg(target_os = "notermux")]
+ 
+ pub use crate::api::android::*;
+ pub use winit::event_loop::EventLoop;
+--- a/src/platform_impl/mod.rs
++++ b/src/platform_impl/mod.rs
+@@ -4,7 +4,7 @@
+ #[path = "windows/mod.rs"]
+ mod platform_impl;
+ #[cfg(any(
+-    target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -15,7 +15,7 @@
+ #[cfg(target_os = "macos")]
+ #[path = "macos/mod.rs"]
+ mod platform_impl;
+-#[cfg(target_os = "android")]
++#[cfg(target_os = "notermux")]
+ #[path = "android/mod.rs"]
+ mod platform_impl;
+ #[cfg(target_os = "ios")]
+--- a/src/platform_impl/unix/mod.rs
++++ b/src/platform_impl/unix/mod.rs
+@@ -1,5 +1,5 @@
+ #![cfg(any(
+-    target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+--- a/src/windowed.rs
++++ b/src/windowed.rs
+@@ -56,7 +56,7 @@
+ )]
+ #[cfg_attr(
+     not(any(
+-        target_os = "linux",
++        target_os = "android",
+         target_os = "dragonfly",
+         target_os = "freebsd",
+         target_os = "netbsd",
+@@ -68,7 +68,7 @@
+ )]
+ #[cfg_attr(
+     any(
+-        target_os = "linux",
++        target_os = "android",
+         target_os = "dragonfly",
+         target_os = "freebsd",
+         target_os = "netbsd",

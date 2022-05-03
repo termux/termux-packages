@@ -1,0 +1,24 @@
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -1,7 +1,7 @@
+ #![cfg(any(
+     target_os = "windows",
+-    target_os = "linux",
+     target_os = "android",
++    target_os = "notermux",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -38,10 +38,10 @@
+ 
+ #[cfg(target_os = "windows")]
+ pub type EGLNativeWindowType = winapi::shared::windef::HWND;
+-#[cfg(target_os = "linux")]
+-pub type EGLNativeWindowType = *const raw::c_void;
+ #[cfg(target_os = "android")]
+ pub type EGLNativeWindowType = *const raw::c_void;
++#[cfg(target_os = "notermux")]
++pub type EGLNativeWindowType = *const raw::c_void;
+ #[cfg(any(
+     target_os = "dragonfly",
+     target_os = "freebsd",
