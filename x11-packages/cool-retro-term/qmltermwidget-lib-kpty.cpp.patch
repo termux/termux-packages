@@ -1,0 +1,13 @@
+--- a/qmltermwidget/lib/kpty.cpp
++++ b/qmltermwidget/lib/kpty.cpp
+@@ -100,6 +100,10 @@
+ }
+ #else
+ # include <utmp.h>
++# ifdef __ANDROID__
++#  define getutline(ut) (NULL)
++#  define updwtmp(wtmp_file,ut) ((void)0)
++# endif
+ # ifdef HAVE_UTMPX
+ #  include <utmpx.h>
+ # endif
