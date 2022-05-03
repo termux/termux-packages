@@ -1,0 +1,27 @@
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -22,5 +22,5 @@
+ repository = "https://github.com/rust-windowing/glutin"
+ [build-dependencies.gl_generator]
+ version = "0.14"
+-[target."cfg(any(target_os = \"linux\", target_os = \"freebsd\", target_os=\"dragonfly\", target_os=\"netbsd\", target_os=\"openbsd\"))".dependencies.x11-dl]
++[target."cfg(any(target_os = \"android\", target_os = \"freebsd\", target_os=\"dragonfly\", target_os=\"netbsd\", target_os=\"openbsd\"))".dependencies.x11-dl]
+ version = "2.18.3"
+--- a/Cargo.toml.orig0
++++ b/Cargo.toml.orig0
+@@ -12,5 +12,5 @@
+ [build-dependencies]
+ gl_generator = "0.14"
+ 
+-[target.'cfg(any(target_os = "linux", target_os = "freebsd", target_os="dragonfly", target_os="netbsd", target_os="openbsd"))'.dependencies]
++[target.'cfg(any(target_os = "android", target_os = "freebsd", target_os="dragonfly", target_os="netbsd", target_os="openbsd"))'.dependencies]
+ x11-dl = "2.18.3"
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -1,5 +1,5 @@
+ #![cfg(any(
+-    target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
