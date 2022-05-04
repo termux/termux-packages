@@ -1,11 +1,20 @@
 #!/bin/bash
 set -eu
 
-USER_AGENT='Termux-PKG/1.0 mirror-checker (termux-tools @PACKAGE_VERSION@) Termux (@TERMUX_APP_PACKAGE@; install-prefix:@TERMUX_PREFIX@)'
+declare -A commands_pkg=(
+["debian"]="dpkg -L|apt show|select_mirror; update_apt_cache; apt install|apt autoclean|apt clean|apt list|apt list --installed|apt install --reinstall|select_mirror; update_apt_cache; apt search|apt remove|select_mirror; apt update; apt full-upgrade"
+["pacman"]="pacman -Ql|pacman -Qi|pacman -Sy --needed|pacman -Sc|pacman -Scc|pacman -Sl|pacman -Q|pacman -S|pacman -Sys|pacman -Rcns|pacman -Syu"
+)
 
 show_help() {
 	local cache_size
-	cache_size=$(du -sh @TERMUX_CACHE_DIR@/apt/archives 2>/dev/null | cut -f1)
+	local cache_dir=""
+	if [ "$TERMUX_MAIN_PACKAGE_FORMAT" = "debian" ]; then
+		cache_dir="@TERMUX_CACHE_DIR@/apt/archives"
+	elif [ "$TERMUX_MAIN_PACKAGE_FORMAT" = "pacman" ]; then
+		cache_dir="@TERMUX_PREFIX@/var/cache/pacman/pkg"
+	fi
+	cache_size=$(du -sh "$cache_dir" 2>/dev/null | cut -f1)
 
 	echo 'Usage: pkg command [arguments]'
 	echo
@@ -51,7 +60,7 @@ check_mirror() {
 		--fail \
 		--connect-timeout "$timeout" \
 		--location \
-		--user-agent "$USER_AGENT" \
+		--user-agent "Termux-PKG/1.0 mirror-checker (termux-tools @PACKAGE_VERSION@) Termux (@TERMUX_APP_PACKAGE@; install-prefix:@TERMUX_PREFIX@)" \
 		"$mirror/dists/stable/Release" >/dev/null 2>&1
 }
 
@@ -185,33 +194,26 @@ if [ $# = 0 ]; then
 	show_help
 fi
 
+case "$TERMUX_MAIN_PACKAGE_FORMAT" in
+	debian|pacman) IFS="|" pkg_cmd=(${commands_pkg["$TERMUX_MAIN_PACKAGE_FORMAT"]});;
+	*) echo "Error: pkg is not supported with '$TERMUX_MAIN_PACKAGE_FORMAT' package manager format"; exit 1;;
+esac
+
 CMD="$1"
 shift 1
 
 case "$CMD" in
-	f*) dpkg -L "$@";;
+	f*) eval ${pkg_cmd[0]} "$@";;
 	h*) show_help;;
-	sh*|inf*) apt show "$@";;
-	add|i*)
-		select_mirror
-		update_apt_cache
-		apt install "$@"
-		;;
-	autoc*) apt autoclean;;
-	cl*) apt clean;;
-	list-a*) apt list "$@";;
-	list-i*) apt list --installed "$@";;
-	rei*) apt install --reinstall "$@";;
-	se*)
-		select_mirror
-		update_apt_cache
-		apt search "$@"
-		;;
-	un*|rem*|rm|del*) apt remove "$@";;
-	up*)
-		select_mirror
-		apt update
-		apt full-upgrade "$@"
-		;;
+	sh*|inf*) eval ${pkg_cmd[1]} "$@";;
+	add|i*) eval ${pkg_cmd[2]} "$@";;
+	autoc*) eval ${pkg_cmd[3]};;
+	cl*) eval ${pkg_cmd[4]};;
+	list-a*) eval ${pkg_cmd[5]} "$@";;
+	list-i*) eval ${pkg_cmd[6]} "$@";;
+	rei*) eval ${pkg_cmd[7]} "$@";;
+	se*) eval ${pkg_cmd[8]} "$@";;
+	un*|rem*|rm|del*) eval ${pkg_cmd[9]} "$@";;
+	up*) eval ${pkg_cmd[10]} "$@";;
 	*) echo "Unknown command: '$CMD' (run 'pkg help' for usage information)"; exit 1;;
 esac
