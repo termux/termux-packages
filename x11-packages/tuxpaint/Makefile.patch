@@ -83,3 +83,21 @@
  	@# FIXME: The other man pages aren't localizable yet -bjk 2021.08.14
  
  # Install the support files for macOS application bundle
+@@ -1332,7 +1318,7 @@
+ macos_MAGIC_SDL_LIBS:=-L/usr/local/lib $(shell $(PKG_CONFIG) $(SDL_PCNAME) --libs) -lSDL_image -lSDL_ttf $(SDL_MIXER_LIB)
+ ios_MAGIC_SDL_LIBS:=$(shell $(PKG_CONFIG) $(SDL_PCNAME) --libs) -lSDL_image -lSDL_ttf $(SDL_MIXER_LIB)
+ beos_MAGIC_SDL_LIBS:=-L/usr/local/lib $(shell $(PKG_CONFIG) $(SDL_PCNAME) --libs) -lSDL_image -lSDL_ttf $(SDL_MIXER_LIB)
+-linux_MAGIC_SDL_LIBS:=-L/usr/local/lib $(shell $(PKG_CONFIG) $(SDL_PCNAME) --libs) -lSDL_image -lSDL_ttf $(SDL_MIXER_LIB)
++linux_MAGIC_SDL_LIBS:=-L@TERMUX_PREFIX@/lib $(shell $(PKG_CONFIG) $(SDL_PCNAME) --libs) -lSDL_image -lSDL_ttf $(SDL_MIXER_LIB)
+ MAGIC_SDL_LIBS:=$($(OS)_MAGIC_SDL_LIBS)
+ 
+ windows_MAGIC_ARCH_LINKS=-lintl $(PNG)
+@@ -1346,7 +1332,7 @@
+ macos_PLUGIN_LIBS:=$(MAGIC_SDL_LIBS) $(MAGIC_ARCH_LINKS)
+ ios_PLUGIN_LIBS:=$(MAGIC_SDL_LIBS) $(MAGIC_ARCH_LINKS)
+ beos_PLUGIN_LIBS:="$(MAGIC_SDL_LIBS) $(MAGIC_ARCH_LINKS) $(MAGIC_SDL_CPPFLAGS)"
+-linux_PLUGIN_LIBS:=
++linux_PLUGIN_LIBS:=$(MAGIC_SDL_LIBS)
+ PLUGIN_LIBS:=$($(OS)_PLUGIN_LIBS)
+ 
+ #MAGIC_CFLAGS:=-g3 -O2 -fvisibility=hidden -fno-common -W -Wstrict-prototypes -Wmissing-prototypes -Wall $(MAGIC_SDL_CPPFLAGS) -Isrc/
