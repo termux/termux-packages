@@ -2,11 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://newsboat.org/
 TERMUX_PKG_DESCRIPTION="RSS/Atom feed reader for the text console"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.24
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_VERSION=2.27
 TERMUX_PKG_SRCURL=https://newsboat.org/releases/${TERMUX_PKG_VERSION}/newsboat-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=62420688cca25618859548d10ff6df9ac75b9cf766699f37edd3e324d67c6ffb
-TERMUX_PKG_DEPENDS="libc++, libiconv, libandroid-support, libandroid-glob, json-c, libsqlite, libcurl, libxml2, stfl, ncurses, openssl"
+TERMUX_PKG_SHA256=fd5a40096689d4fc0f18441319197769fa377709821b1a3f1b2ba1f006625285
+TERMUX_PKG_DEPENDS="json-c, libandroid-glob, libandroid-support, libc++, libcurl, libiconv, libsqlite, libxml2, ncurses, openssl, stfl"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_RM_AFTER_INSTALL="share/locale"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_lib_bsd_main=no"
