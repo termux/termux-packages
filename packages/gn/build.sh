@@ -2,42 +2,29 @@ TERMUX_PKG_HOMEPAGE=https://gn.googlesource.com/gn
 TERMUX_PKG_DESCRIPTION="Meta-build system that generates build files for Ninja"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="Yaksh Bariya <yakshbari4@gmail.com>"
-# While updating commit hash here also update it in
-# termux_setup_gn
-_COMMIT=e0afadf7a743d5b14737bd454df45d5f1caf0d23
-TERMUX_PKG_VERSION=20211203
+TERMUX_PKG_SRCURL=https://gn.googlesource.com/gn.git
+_COMMIT=53ef169800760fdc09f0773bf380fe99eaeab339
+_COMMIT_DATE=2022.05.02
+TERMUX_PKG_VERSION=${_COMMIT_DATE//./}
+TERMUX_PKG_GIT_BRANCH=main
 TERMUX_PKG_RECOMMENDS="ninja"
-TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
-termux_step_get_source() {
-	TERMUX_PKG_SRCURL=https://gn.googlesource.com/gn/+archive/$_COMMIT.tar.gz
-	# Prevent caching of builds
-	rm -rf $TERMUX_PKG_SRCDIR
-	# FIXME: We would like to enable checksums when downloading
-	# tar files, but they change each time as the tar metadata
-	# differs: https://github.com/google/gitiles/issues/84
-	GN_TARFILE=$TERMUX_PKG_CACHEDIR/gn_$_COMMIT.tar.gz
-	test ! -f $GN_TARFILE && termux_download \
-		$TERMUX_PKG_SRCURL \
-		$GN_TARFILE \
-		SKIP_CHECKSUM
-	mkdir -p $TERMUX_PKG_SRCDIR
-	tar xf $GN_TARFILE -C $TERMUX_PKG_SRCDIR
+termux_step_post_get_source() {
+      	git fetch --unshallow
+	git checkout $_COMMIT
+
+	local version="$(git log -1 --format=%cs | sed 's/-/./g')"
+	if [ "$version" != "$_COMMIT_DATE" ]; then
+		echo -n "ERROR: The specified commit date \"$_COMMIT_DATE\""
+		echo " is different from what is expected to be: \"$version\""
+		return 1
+	fi
+
 }
 
 termux_step_configure() {
-	./build/gen.py \
-		--no-last-commit-position \
-		--no-static-libstdc++
-
-	cat <<- EOF > ./out/last_commit_position.h
-	#ifndef OUT_LAST_COMMIT_POSITION_H_
-	#define OUT_LAST_COMMIT_POSITION_H_
-	#define LAST_COMMIT_POSITION_NUM 1953
-	#define LAST_COMMIT_POSITION "1953 ${_COMMIT:0:8}"
-	#endif  // OUT_LAST_COMMIT_POSITION_H_
-	EOF
+	./build/gen.py --no-static-libstdc++
 }
 
 termux_step_make() {
