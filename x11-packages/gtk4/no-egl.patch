@@ -1,0 +1,137 @@
+--- a/gdk/x11/gdkdisplay-x11.c
++++ b/gdk/x11/gdkdisplay-x11.c
+@@ -56,7 +56,9 @@
+ #include <errno.h>
+ #include <unistd.h>
+ 
++#ifndef __ANDROID__
+ #include <epoxy/egl.h>
++#endif
+ 
+ #include <X11/Xatom.h>
+ #include <X11/Xlibint.h>
+@@ -2921,6 +2923,9 @@
+                                  gpointer    egl_display,
+                                  gpointer    config)
+ {
++#ifdef __ANDROID__
++  return G_MAXUINT;
++#else
+   GdkX11Display *self = GDK_X11_DISPLAY (display);
+   XVisualInfo *visinfo;
+   guint distance;
+@@ -2941,6 +2946,7 @@
+   XFree (visinfo);
+ 
+   return distance;
++#endif /* __ANDROID__ */
+ }
+ 
+ static gboolean
+@@ -2949,6 +2955,7 @@
+                                  int            *out_depth,
+                                  GError        **error)
+ {
++#ifndef __ANDROID__
+   GdkDisplay *display = GDK_DISPLAY (self);
+   Display *dpy = gdk_x11_display_get_xdisplay (GDK_DISPLAY (self));
+   EGLDisplay egl_display;
+@@ -2969,10 +2976,15 @@
+   if (!gdk_display_init_egl (display, EGL_PLATFORM_X11_KHR, dpy, FALSE, error))
+     {
+       g_clear_error (error);
++#endif /* __ANDROID__ */
+ 
+       if (gdk_x11_display_init_glx (self, out_visual, out_depth, error))
+         return TRUE;
++#ifdef __ANDROID__
++      return FALSE;
++#endif
+       
++#ifndef __ANDROID__
+       g_clear_error (error);
+       if (!gdk_display_init_egl (display, EGL_PLATFORM_X11_KHR, dpy, TRUE, error))
+         return FALSE;
+@@ -2996,6 +3008,7 @@
+   self->egl_version = epoxy_egl_version (egl_display);
+ 
+   return TRUE;
++#endif /* __ANDROID__ */
+ }
+ 
+ static GdkGLContext *
+--- a/gdk/x11/gdkglcontext-egl.c
++++ b/gdk/x11/gdkglcontext-egl.c
+@@ -26,7 +26,9 @@
+ 
+ #include <cairo-xlib.h>
+ 
++#ifndef __ANDROID__
+ #include <epoxy/egl.h>
++#endif
+ 
+ struct _GdkX11GLContextEGL
+ {
+@@ -63,6 +65,9 @@
+ gdk_x11_gl_context_egl_make_current (GdkGLContext *context,
+                                      gboolean      surfaceless)
+ {
++#ifdef __ANDROID__
++  return FALSE;
++#else
+   GdkX11GLContextEGL *self = GDK_X11_GL_CONTEXT_EGL (context);
+   GdkDisplay *display = gdk_gl_context_get_display (context);
+   EGLDisplay egl_display = gdk_display_get_egl_display (display);
+@@ -91,6 +96,7 @@
+     }
+ 
+   return TRUE;
++#endif /* __ANDROID__ */
+ }
+ 
+ static void
+--- a/gtk/inspector/general.c
++++ b/gtk/inspector/general.c
+@@ -40,8 +40,10 @@
+ #ifdef GDK_WINDOWING_X11
+ #include "x11/gdkx.h"
+ #include <epoxy/glx.h>
++#ifndef __ANDROID__
+ #include <epoxy/egl.h>
+ #endif
++#endif
+ 
+ #ifdef GDK_WINDOWING_WIN32
+ #include "win32/gdkwin32.h"
+@@ -289,6 +291,7 @@
+ }
+ #endif
+ 
++#ifndef __ANDROID__
+ #if defined(GDK_WINDOWING_WAYLAND) || defined (GDK_WINDOWING_X11) || (defined (GDK_WINDOWING_WIN32) && defined(GDK_WIN32_ENABLE_EGL))
+ static void
+ append_egl_extension_row (GtkInspectorGeneral *gen,
+@@ -319,6 +322,7 @@
+    return NULL;
+ }
+ #endif
++#endif /* __ANDROID__ */
+ 
+ static void
+ init_gl (GtkInspectorGeneral *gen)
+@@ -341,6 +345,7 @@
+       return;
+     }
+ 
++#ifndef __ANDROID__
+ #if defined(GDK_WINDOWING_X11) || defined(GDK_WINDOWING_WAYLAND) || (defined(GDK_WINDOWING_WIN32) && defined(GDK_WIN32_ENABLE_EGL))
+   EGLDisplay egl_display = get_egl_display (gen->display);
+   if (egl_display)
+@@ -360,6 +365,7 @@
+     }
+   else
+ #endif
++#endif /* __ANDROID__ */
+ #ifdef GDK_WINDOWING_X11
+   if (GDK_IS_X11_DISPLAY (gen->display))
+     {
