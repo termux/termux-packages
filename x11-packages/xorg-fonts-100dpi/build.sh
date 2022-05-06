@@ -50,5 +50,6 @@ termux_step_post_make_install() {
 }
 
 termux_step_install_license() {
-    install -Dm600 -t $TERMUX_PREFIX/share/doc/xorg-fonts-100dpi $TERMUX_PKG_BUILDER_DIR/COPYING 
+	install -Dm600 -t $TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME \
+		$TERMUX_PKG_BUILDER_DIR/COPYING
 }
