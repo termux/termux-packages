@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="X.org 100dpi fonts"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.0.3
-TERMUX_PKG_REVISION=26
+TERMUX_PKG_REVISION=27
 TERMUX_PKG_SRCURL=("https://xorg.freedesktop.org/releases/individual/font/font-adobe-100dpi-1.0.3.tar.bz2"
                    "https://xorg.freedesktop.org/releases/individual/font/font-adobe-utopia-100dpi-1.0.4.tar.bz2"
                    "https://xorg.freedesktop.org/releases/individual/font/font-bh-100dpi-1.0.3.tar.bz2"
@@ -50,5 +50,5 @@ termux_step_post_make_install() {
 }
 
 termux_step_install_license() {
-    install -Dm600 -t $TERMUX_PREFIX/share/doc/xorg-fonts-75dpi $TERMUX_PKG_BUILDER_DIR/COPYING 
+    install -Dm600 -t $TERMUX_PREFIX/share/doc/xorg-fonts-100dpi $TERMUX_PKG_BUILDER_DIR/COPYING 
 }
