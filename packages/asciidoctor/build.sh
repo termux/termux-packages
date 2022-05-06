@@ -30,7 +30,7 @@ termux_step_make_install() {
 
 termux_step_install_license() {
 	local gemdir="$TERMUX_PREFIX/lib/ruby/gems/${ruby_version:0:3}.0"
-	mkdir -p $TERMUX_PREFIX/share/doc/asciidoctor
+	mkdir -p $TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME
 	cp $gemdir/gems/asciidoctor-${TERMUX_PKG_VERSION}/LICENSE \
-		$TERMUX_PREFIX/share/doc/asciidoctor/
+		$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME/
 }
