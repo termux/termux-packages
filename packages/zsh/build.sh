@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENCE"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=5.8.1
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/zsh-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=b6973520bace600b4779200269b1e5d79e5f505ac4952058c11ad5bbf0dd9919
 # Remove hard link to bin/zsh as Android does not support hard links:
@@ -23,6 +23,11 @@ ac_cv_func_setresuid=no
 "
 TERMUX_PKG_CONFFILES="etc/zshrc"
 TERMUX_PKG_BUILD_IN_SRC=true
+
+# Remove compdef pkg not suitable for Termux:
+TERMUX_PKG_RM_AFTER_INSTALL+="
+share/zsh/${TERMUX_PKG_VERSION}/functions/_pkg5
+"
 
 termux_step_post_configure() {
 	# Certain packages are not safe to build on device because their

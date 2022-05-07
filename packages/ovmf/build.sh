@@ -44,5 +44,5 @@ termux_step_make_install() {
 
 termux_step_install_license() {
 	install -Dm600 $TERMUX_PKG_BUILDER_DIR/License.txt \
-		$TERMUX_PREFIX/share/doc/ovmf/LICENSE.txt
+		$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME/LICENSE.txt
 }

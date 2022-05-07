@@ -1,0 +1,490 @@
+--- a/src/hotspot/os/linux/os_linux.cpp
++++ b/src/hotspot/os/linux/os_linux.cpp
+@@ -417,17 +417,17 @@
+   //        7: The default directories, normally /lib and /usr/lib.
+ #ifndef OVERRIDE_LIBPATH
+   #if defined(AMD64) || (defined(_LP64) && defined(SPARC)) || defined(PPC64) || defined(S390)
+-    #define DEFAULT_LIBPATH "/usr/lib64:/lib64:/lib:/usr/lib"
++    #define DEFAULT_LIBPATH "@TERMUX_PREFIX@/lib"
+   #else
+-    #define DEFAULT_LIBPATH "/lib:/usr/lib"
++    #define DEFAULT_LIBPATH "@TERMUX_PREFIX@/lib"
+   #endif
+ #else
+   #define DEFAULT_LIBPATH OVERRIDE_LIBPATH
+ #endif
+ 
+ // Base path of extensions installed on the system.
+-#define SYS_EXT_DIR     "/usr/java/packages"
+-#define EXTENSIONS_DIR  "/lib/ext"
++#define SYS_EXT_DIR     "@TERMUX_PREFIX@/java/packages"
++#define EXTENSIONS_DIR  "@TERMUX_PREFIX@/lib/ext"
+ 
+   // Buffer that fits several sprintfs.
+   // Note that the space for the colon and the trailing null are provided
+@@ -2244,7 +2244,7 @@
+ }
+ 
+ bool os::Linux::print_ld_preload_file(outputStream* st) {
+-  return _print_ascii_file("/etc/ld.so.preload", st, "/etc/ld.so.preload:");
++  return _print_ascii_file("@TERMUX_PREFIX@/etc/ld.so.preload", st, "@TERMUX_PREFIX@/etc/ld.so.preload:");
+ }
+ 
+ void os::Linux::print_uptime_info(outputStream* st) {
+--- a/src/hotspot/share/utilities/virtualizationSupport.cpp
++++ b/src/hotspot/share/utilities/virtualizationSupport.cpp
+@@ -52,7 +52,7 @@
+     // the open-vm-tools have a different guest lib name
+     // on some distros e.g. SLES12 the open-vm-tools are the default,
+     // so use the different libname as a fallback
+-    dlHandle = os::dll_load("/usr/lib64/libguestlib.so.0", ebuf, sizeof ebuf);
++    dlHandle = os::dll_load("@TERMUX_PREFIX@/lib/libguestlib.so.0", ebuf, sizeof ebuf);
+   }
+ #endif
+   if (dlHandle == NULL) {
+--- a/src/java.base/linux/classes/sun/nio/fs/LinuxFileSystem.java
++++ b/src/java.base/linux/classes/sun/nio/fs/LinuxFileSystem.java
+@@ -118,7 +118,7 @@
+      */
+     @Override
+     List<UnixMountEntry> getMountEntries() {
+-        return getMountEntries("/etc/mtab");
++        return getMountEntries("@TERMUX_PREFIX@/etc/mtab");
+     }
+ 
+ 
+--- a/src/java.base/linux/classes/sun/nio/fs/LinuxFileSystemProvider.java
++++ b/src/java.base/linux/classes/sun/nio/fs/LinuxFileSystemProvider.java
+@@ -104,7 +104,7 @@
+     FileTypeDetector getFileTypeDetector() {
+         String userHome = StaticProperty.userHome();
+         Path userMimeTypes = Path.of(userHome, ".mime.types");
+-        Path etcMimeTypes = Path.of("/etc/mime.types");
++        Path etcMimeTypes = Path.of("@TERMUX_PREFIX@/etc/mime.types");
+ 
+         return chain(new MimeTypesFileTypeDetector(userMimeTypes),
+                      new MimeTypesFileTypeDetector(etcMimeTypes));
+--- a/src/java.base/share/classes/sun/net/www/MimeTable.java
++++ b/src/java.base/share/classes/sun/net/www/MimeTable.java
+@@ -57,9 +57,8 @@
+                 mailcapLocations = new String[] {
+                     System.getProperty("user.mailcap"),
+                     StaticProperty.userHome() + "/.mailcap",
+-                    "/etc/mailcap",
+-                    "/usr/etc/mailcap",
+-                    "/usr/local/etc/mailcap",
++                    "@TERMUX_PREFIX@/etc/mailcap",
++                    "@TERMUX_PREFIX@/local/etc/mailcap",
+                 };
+                 return null;
+             }
+--- a/src/java.base/share/classes/sun/security/jca/ProviderConfig.java
++++ b/src/java.base/share/classes/sun/security/jca/ProviderConfig.java
+@@ -98,7 +98,7 @@
+         Boolean o = AccessController.doPrivileged(
+                                 new PrivilegedAction<Boolean>() {
+             public Boolean run() {
+-                File file = new File("/usr/lib/libpkcs11.so");
++                File file = new File("@TERMUX_PREFIX@/lib/libpkcs11.so");
+                 if (file.exists() == false) {
+                     return Boolean.FALSE;
+                 }
+--- a/src/java.base/unix/classes/sun/net/dns/ResolverConfigurationImpl.java
++++ b/src/java.base/unix/classes/sun/net/dns/ResolverConfigurationImpl.java
+@@ -62,7 +62,7 @@
+     {
+         LinkedList<String> ll = new LinkedList<>();
+ 
+-        String resolvPath = System.getProperty("ext.net.resolvPath", "/etc/resolv.conf");
++        String resolvPath = System.getProperty("ext.net.resolvPath", "@TERMUX_PREFIX@/etc/resolv.conf");
+ 
+         try {
+             BufferedReader in =
+--- a/src/java.base/unix/native/libjava/ProcessImpl_md.c
++++ b/src/java.base/unix/native/libjava/ProcessImpl_md.c
+@@ -230,7 +230,7 @@
+ static const char*
+ defaultPath(void)
+ {
+-    return ":/bin:/usr/bin";
++    return ":@TERMUX_PREFIX@/bin";
+ }
+ 
+ static const char*
+--- a/src/java.base/unix/native/libjava/TimeZone_md.c
++++ b/src/java.base/unix/native/libjava/TimeZone_md.c
+@@ -60,9 +60,9 @@
+ #endif
+ 
+ #if defined(__linux__) || defined(_ALLBSD_SOURCE)
+-static const char *ETC_TIMEZONE_FILE = "/etc/timezone";
+-static const char *ZONEINFO_DIR = "/usr/share/zoneinfo";
+-static const char *DEFAULT_ZONEINFO_FILE = "/etc/localtime";
++static const char *ETC_TIMEZONE_FILE = "@TERMUX_PREFIX@/etc/timezone";
++static const char *ZONEINFO_DIR = "@TERMUX_PREFIX@/share/zoneinfo";
++static const char *DEFAULT_ZONEINFO_FILE = "@TERMUX_PREFIX@/etc/localtime";
+ #else
+ static const char *SYS_INIT_FILE = "/etc/default/init";
+ static const char *ZONEINFO_DIR = "/usr/share/lib/zoneinfo";
+--- a/src/java.desktop/share/classes/com/sun/java/swing/plaf/gtk/Metacity.java
++++ b/src/java.desktop/share/classes/com/sun/java/swing/plaf/gtk/Metacity.java
+@@ -482,13 +482,10 @@
+                 String[] dirs = new String[] {
+                     userHome + sep + ".themes",
+                     System.getProperty("swing.metacitythemedir"),
+-                    "/usr/X11R6/share/themes",
+-                    "/usr/X11R6/share/gnome/themes",
+-                    "/usr/local/share/themes",
+-                    "/usr/local/share/gnome/themes",
+-                    "/usr/share/themes",
+-                    "/usr/gnome/share/themes",  // Debian/Redhat/Solaris
+-                    "/opt/gnome2/share/themes"  // SuSE
++                    "@TERMUX_PREFIX@/share/themes",
++                    "@TERMUX_PREFIX@/share/gnome/themes",
++                    "@TERMUX_PREFIX@/local/share/themes",
++                    "@TERMUX_PREFIX@/local/share/gnome/themes",
+                 };
+ 
+                 URL themeDir = null;
+--- a/src/java.desktop/share/classes/com/sun/media/sound/SoftSynthesizer.java
++++ b/src/java.desktop/share/classes/com/sun/media/sound/SoftSynthesizer.java
+@@ -685,11 +685,11 @@
+ 
+                         File[] systemSoundFontsDir = new File[] {
+                             /* Arch, Fedora, Mageia */
+-                            new File("/usr/share/soundfonts/"),
+-                            new File("/usr/local/share/soundfonts/"),
++                            new File("@TERMUX_PREFIX@/share/soundfonts/"),
++                            new File("@TERMUX_PREFIX@/local/share/soundfonts/"),
+                             /* Debian, Gentoo, OpenSUSE, Ubuntu */
+-                            new File("/usr/share/sounds/sf2/"),
+-                            new File("/usr/local/share/sounds/sf2/"),
++                            new File("@TERMUX_PREFIX@/share/sounds/sf2/"),
++                            new File("@TERMUX_PREFIX@/local/share/sounds/sf2/"),
+                         };
+ 
+                         /*
+--- a/src/java.desktop/share/classes/sun/font/SunFontManager.java
++++ b/src/java.desktop/share/classes/sun/font/SunFontManager.java
+@@ -3448,7 +3448,7 @@
+     public void register1dot0Fonts() {
+         AccessController.doPrivileged(new PrivilegedAction<Void>() {
+             public Void run() {
+-                String type1Dir = "/usr/openwin/lib/X11/fonts/Type1";
++                String type1Dir = "@TERMUX_PREFIX@/openwin/lib/X11/fonts/Type1";
+                 registerFontsInDir(type1Dir, true, Font2D.TYPE1_RANK,
+                                    false, false);
+                 return null;
+--- a/src/java.desktop/share/classes/sun/print/PSPrinterJob.java
++++ b/src/java.desktop/share/classes/sun/print/PSPrinterJob.java
+@@ -1630,7 +1630,7 @@
+         String osname = System.getProperty("os.name");
+         if (osname.equals("Linux") || osname.contains("OS X")) {
+             execCmd = new String[ncomps];
+-            execCmd[n++] = "/usr/bin/lpr";
++            execCmd[n++] = "@TERMUX_PREFIX@/bin/lpr";
+             if ((pFlags & PRINTER) != 0) {
+                 execCmd[n++] = "-P" + printer;
+             }
+@@ -1652,7 +1652,7 @@
+         } else {
+             ncomps+=1; //add 1 arg for lp
+             execCmd = new String[ncomps];
+-            execCmd[n++] = "/usr/bin/lp";
++            execCmd[n++] = "@TERMUX_PREFIX@/bin/lp";
+             execCmd[n++] = "-c";           // make a copy of the spool file
+             if ((pFlags & PRINTER) != 0) {
+                 execCmd[n++] = "-d" + printer;
+--- a/src/java.desktop/unix/classes/sun/awt/X11/MotifColorUtilities.java
++++ b/src/java.desktop/unix/classes/sun/awt/X11/MotifColorUtilities.java
+@@ -412,7 +412,7 @@
+         if (!pFile.exists())
+         {
+             // Must be a system palette
+-            paletteFilePath = "/usr/dt/palettes/" + paletteFile;
++            paletteFilePath = "@TERMUX_PREFIX@/dt/palettes/" + paletteFile;
+             pFile = new File(paletteFilePath);
+             if (!pFile.exists())
+             {
+--- a/src/java.desktop/unix/classes/sun/print/PrintServiceLookupProvider.java
++++ b/src/java.desktop/unix/classes/sun/print/PrintServiceLookupProvider.java
+@@ -81,10 +81,10 @@
+ 
+     // List of commands used to deal with the printer queues on AIX
+     String[] lpNameComAix = {
+-      "/usr/bin/lsallq",
+-      "/usr/bin/lpstat -W -p|/usr/bin/expand|/usr/bin/cut -f1 -d' '",
+-      "/usr/bin/lpstat -W -d|/usr/bin/expand|/usr/bin/cut -f1 -d' '",
+-      "/usr/bin/lpstat -W -v"
++      "@TERMUX_PREFIX@/bin/lsallq",
++      "@TERMUX_PREFIX@/bin/lpstat -W -p|@TERMUX_PREFIX@/bin/expand|@TERMUX_PREFIX@/bin/cut -f1 -d' '",
++      "@TERMUX_PREFIX@/bin/lpstat -W -d|@TERMUX_PREFIX@/bin/expand|@TERMUX_PREFIX@/bin/cut -f1 -d' '",
++      "@TERMUX_PREFIX@/bin/lpstat -W -v"
+     };
+     private static final int aix_lsallq = 0;
+     private static final int aix_lpstat_p = 1;
+@@ -172,13 +172,13 @@
+     static int cmdIndex = UNINITIALIZED;
+ 
+     String[] lpcFirstCom = {
+-        "/usr/sbin/lpc status | grep : | sed -ne '1,1 s/://p'",
+-        "/usr/sbin/lpc status | grep -E '^[ 0-9a-zA-Z_-]*@' | awk -F'@' '{print $1}'"
++        "@TERMUX_PREFIX@/bin/lpc status | grep : | sed -ne '1,1 s/://p'",
++        "@TERMUX_PREFIX@/bin/lpc status | grep -E '^[ 0-9a-zA-Z_-]*@' | awk -F'@' '{print $1}'"
+     };
+ 
+     String[] lpcAllCom = {
+-        "/usr/sbin/lpc status all | grep : | sed -e 's/://'",
+-        "/usr/sbin/lpc status all | grep -E '^[ 0-9a-zA-Z_-]*@' | awk -F'@' '{print $1}' | sort"
++        "@TERMUX_PREFIX@/bin/lpc status all | grep : | sed -e 's/://'",
++        "@TERMUX_PREFIX@/bin/lpc status all | grep -E '^[ 0-9a-zA-Z_-]*@' | awk -F'@' '{print $1}' | sort"
+     };
+ 
+     String[] lpcNameCom = {
+@@ -188,7 +188,7 @@
+ 
+ 
+     static int getBSDCommandIndex() {
+-        String command  = "/usr/sbin/lpc status all";
++        String command  = "@TERMUX_PREFIX@/bin/lpc status all";
+         String[] names = execCmd(command);
+ 
+         if ((names == null) || (names.length == 0)) {
+@@ -757,7 +757,7 @@
+       if (cmdIndex == UNINITIALIZED) {
+         cmdIndex = getBSDCommandIndex();
+       }
+-      String command = "/usr/sbin/lpc status " + name + lpcNameCom[cmdIndex];
++      String command = "@TERMUX_PREFIX@/bin/lpc status " + name + lpcNameCom[cmdIndex];
+       String[] result = execCmd(command);
+ 
+       if (result == null || !(result[0].equals(name))) {
+@@ -779,7 +779,7 @@
+ 
+     static String getDefaultPrinterNameSysV() {
+         String defaultPrinter = "lp";
+-        String command = "/usr/bin/lpstat -d";
++        String command = "@TERMUX_PREFIX@/bin/lpstat -d";
+ 
+         String [] names = execCmd(command);
+         if (names == null || names.length == 0) {
+@@ -801,7 +801,7 @@
+ 
+     private PrintService getNamedPrinterNameSysV(String name) {
+ 
+-        String command = "/usr/bin/lpstat -v " + name;
++        String command = "@TERMUX_PREFIX@/bin/lpstat -v " + name;
+         String []result = execCmd(command);
+ 
+         if (result == null || result[0].indexOf("unknown printer") > 0) {
+@@ -813,7 +813,7 @@
+ 
+     private String[] getAllPrinterNamesSysV() {
+         String defaultPrinter = "lp";
+-        String command = "/usr/bin/lpstat -v|/usr/bin/expand|/usr/bin/cut -f3 -d' ' |/usr/bin/cut -f1 -d':' | /usr/bin/sort";
++        String command = "@TERMUX_PREFIX@/bin/lpstat -v|@TERMUX_PREFIX@/bin/expand|@TERMUX_PREFIX@/bin/cut -f3 -d' ' |@TERMUX_PREFIX@/bin/cut -f1 -d':' | @TERMUX_PREFIX@/bin/sort";
+ 
+         String [] names = execCmd(command);
+         ArrayList<String> printerNames = new ArrayList<>();
+@@ -870,7 +870,7 @@
+         try {
+             final String[] cmd = new String[3];
+             if (isAIX()) {
+-                cmd[0] = "/usr/bin/sh";
++                cmd[0] = "@TERMUX_PREFIX@/bin/sh";
+                 cmd[1] = "-c";
+                 cmd[2] = "env LC_ALL=C " + command;
+             } else {
+--- a/src/java.desktop/unix/classes/sun/print/UnixPrintJob.java
++++ b/src/java.desktop/unix/classes/sun/print/UnixPrintJob.java
+@@ -882,7 +882,7 @@
+             ncomps+=1;
+         }
+         execCmd = new String[ncomps];
+-        execCmd[n++] = "/usr/bin/lpr";
++        execCmd[n++] = "@TERMUX_PREFIX@/bin/lpr";
+         if ((pFlags & PRINTER) != 0) {
+             execCmd[n++] = "-P" + printer;
+         }
+--- a/src/java.desktop/unix/classes/sun/print/UnixPrintService.java
++++ b/src/java.desktop/unix/classes/sun/print/UnixPrintService.java
+@@ -231,7 +231,7 @@
+                 PrintServiceLookupProvider.getBSDCommandIndex();
+         }
+ 
+-        String command = "/usr/sbin/lpc status " + printer
++        String command = "@TERMUX_PREFIX@/bin/lpc status " + printer
+             + lpcStatusCom[PrintServiceLookupProvider.cmdIndex];
+         String[] results= PrintServiceLookupProvider.execCmd(command);
+ 
+@@ -280,7 +280,7 @@
+ 
+     private PrinterIsAcceptingJobs getPrinterIsAcceptingJobsAIX() {
+         // On AIX there should not be a blank after '-a'.
+-        String command = "/usr/bin/lpstat -a" + printer;
++        String command = "@TERMUX_PREFIX@/bin/lpstat -a" + printer;
+         String[] results= PrintServiceLookupProvider.execCmd(command);
+ 
+         // Remove headers and bogus entries added by remote printers.
+@@ -336,7 +336,7 @@
+         }
+ 
+         int qlen = 0;
+-        String command = "/usr/sbin/lpc status " + printer
++        String command = "@TERMUX_PREFIX@/bin/lpc status " + printer
+             + lpcQueueCom[PrintServiceLookupProvider.cmdIndex];
+         String[] results = PrintServiceLookupProvider.execCmd(command);
+ 
+@@ -365,7 +365,7 @@
+ 
+     private QueuedJobCount getQueuedJobCountAIX() {
+         // On AIX there should not be a blank after '-a'.
+-        String command = "/usr/bin/lpstat -a" + printer;
++        String command = "@TERMUX_PREFIX@/bin/lpstat -a" + printer;
+         String[] results=  PrintServiceLookupProvider.execCmd(command);
+ 
+         // Remove headers and bogus entries added by remote printers.
+--- a/src/java.desktop/unix/native/common/awt/fontpath.c
++++ b/src/java.desktop/unix/native/common/awt/fontpath.c
+@@ -66,19 +66,18 @@
+  * various flavors of Linux
+  */
+ static char *fullLinuxFontPath[] = {
+-    "/usr/X11R6/lib/X11/fonts/TrueType",  /* RH 7.1+ */
+-    "/usr/X11R6/lib/X11/fonts/truetype",  /* SuSE */
+-    "/usr/X11R6/lib/X11/fonts/tt",
+-    "/usr/X11R6/lib/X11/fonts/TTF",
+-    "/usr/X11R6/lib/X11/fonts/OTF",       /* RH 9.0 (but empty!) */
+-    "/usr/share/fonts/ja/TrueType",       /* RH 7.2+ */
+-    "/usr/share/fonts/truetype",
+-    "/usr/share/fonts/ko/TrueType",       /* RH 9.0 */
+-    "/usr/share/fonts/zh_CN/TrueType",    /* RH 9.0 */
+-    "/usr/share/fonts/zh_TW/TrueType",    /* RH 9.0 */
+-    "/var/lib/defoma/x-ttcidfont-conf.d/dirs/TrueType", /* Debian */
+-    "/usr/X11R6/lib/X11/fonts/Type1",
+-    "/usr/share/fonts/default/Type1",     /* RH 9.0 */
++    "@TERMUX_PREFIX@/share/fonts/TrueType",
++    "@TERMUX_PREFIX@/share/fonts/truetype",
++    "@TERMUX_PREFIX@/share/fonts/tt",
++    "@TERMUX_PREFIX@/share/fonts/TTF",
++    "@TERMUX_PREFIX@/share/fonts/OTF",
++    "@TERMUX_PREFIX@/share/fonts/ja/TrueType",
++    "@TERMUX_PREFIX@/share/fonts/ko/TrueType",
++    "@TERMUX_PREFIX@/share/fonts/zh_CN/TrueType",
++    "@TERMUX_PREFIX@/share/fonts/zh_TW/TrueType",
++    "@TERMUX_PREFIX@/share/fonts/Type1",
++    "@TERMUX_PREFIX@/share/fonts/default/Type1",
++    "/system/fonts",
+     NULL, /* terminates the list */
+ };
+ #elif defined(_AIX)
+--- a/src/java.prefs/unix/classes/java/util/prefs/FileSystemPreferences.java
++++ b/src/java.prefs/unix/classes/java/util/prefs/FileSystemPreferences.java
+@@ -182,7 +182,7 @@
+         AccessController.doPrivileged(new PrivilegedAction<Void>() {
+             public Void run() {
+                 String systemPrefsDirName =
+-                  System.getProperty("java.util.prefs.systemRoot","/etc/.java");
++                  System.getProperty("java.util.prefs.systemRoot","@TERMUX_PREFIX@/etc/.java");
+                 systemRootDir =
+                      new File(systemPrefsDirName, ".systemPrefs");
+                 // Attempt to create root dir if it does not yet exist.
+--- a/src/java.security.jgss/share/classes/sun/security/krb5/Config.java
++++ b/src/java.security.jgss/share/classes/sun/security/krb5/Config.java
+@@ -930,7 +930,7 @@
+         } else if (osname.contains("OS X")) {
+             name = findMacosConfigFile();
+         } else {
+-            name =  "/etc/krb5.conf";
++            name =  "@TERMUX_PREFIX@/etc/krb5.conf";
+         }
+         if (DEBUG) {
+             System.out.println("Native config name: " + name);
+--- a/src/java.security.jgss/share/classes/sun/security/krb5/internal/ccache/FileCredentialsCache.java
++++ b/src/java.security.jgss/share/classes/sun/security/krb5/internal/ccache/FileCredentialsCache.java
+@@ -600,7 +600,7 @@
+                     (new InputStreamReader(p.getInputStream(), ISO_8859_1));
+             String s1 = null;
+             if ((command.length == 1) &&
+-                (command[0].equals("/usr/bin/env"))) {
++                (command[0].equals("@TERMUX_PREFIX@/bin/env"))) {
+                 while ((s1 = commandResult.readLine()) != null) {
+                     if (s1.length() >= 11) {
+                         if ((s1.substring(0, 11)).equalsIgnoreCase
+--- a/src/java.smartcardio/unix/classes/sun/security/smartcardio/PlatformPCSC.java
++++ b/src/java.smartcardio/unix/classes/sun/security/smartcardio/PlatformPCSC.java
+@@ -46,8 +46,8 @@
+ 
+     private final static String PROP_NAME = "sun.security.smartcardio.library";
+ 
+-    private final static String LIB1 = "/usr/$LIBISA/libpcsclite.so";
+-    private final static String LIB2 = "/usr/local/$LIBISA/libpcsclite.so";
++    private final static String LIB1 = "@TERMUX_PREFIX@/lib/libpcsclite.so";
++    private final static String LIB2 = "@TERMUX_PREFIX@/local/lib/libpcsclite.so";
+     private final static String PCSC_FRAMEWORK = "/System/Library/Frameworks/PCSC.framework/Versions/Current/PCSC";
+ 
+     PlatformPCSC() {
+--- a/src/jdk.hotspot.agent/linux/native/libsaproc/symtab.c
++++ b/src/jdk.hotspot.agent/linux/native/libsaproc/symtab.c
+@@ -53,7 +53,7 @@
+ // should be possible to change this, but in a Java environment there
+ // is no obvious place to put a user interface to do it.  Maybe this
+ // could be set with an environment variable.
+-static const char debug_file_directory[] = "/usr/lib/debug";
++static const char debug_file_directory[] = "@TERMUX_PREFIX@/lib/debug";
+ 
+ /* The CRC used in gnu_debuglink, retrieved from
+    http://sourceware.org/gdb/current/onlinedocs/gdb/Separate-Debug-Files.html#Separate-Debug-Files. */
+--- a/src/jdk.jpackage/linux/classes/jdk/jpackage/internal/LinuxDebBundler.java
++++ b/src/jdk.jpackage/linux/classes/jdk/jpackage/internal/LinuxDebBundler.java
+@@ -414,7 +414,7 @@
+         final String installDir = LINUX_INSTALL_DIR.fetchFrom(params);
+ 
+         if (!StandardBundlerParam.isRuntimeInstaller(params)
+-                || (isInstallDirInUsrTree(installDir) || installDir.startsWith("/usr/"))) {
++                || (isInstallDirInUsrTree(installDir) || installDir.startsWith("@TERMUX_PREFIX@/"))) {
+             debianFiles.add(new DebianFile(
+                     getConfig_CopyrightFile(params),
+                     "resource.copyright-file"));
+@@ -446,8 +446,8 @@
+         final String packageName = PACKAGE_NAME.fetchFrom(params);
+ 
+         final Path installPath;
+-        if (isInstallDirInUsrTree(installDir) || installDir.startsWith("/usr/")) {
+-            installPath = Path.of("/usr/share/doc/", packageName, "copyright");
++        if (isInstallDirInUsrTree(installDir) || installDir.startsWith("@TERMUX_PREFIX@/")) {
++            installPath = Path.of("@TERMUX_PREFIX@/share/doc/", packageName, "copyright");
+         } else {
+             installPath = Path.of(installDir, packageName, "share/doc/copyright");
+         }
+--- a/src/jdk.jpackage/linux/classes/jdk/jpackage/internal/LinuxPackageBundler.java
++++ b/src/jdk.jpackage/linux/classes/jdk/jpackage/internal/LinuxPackageBundler.java
+@@ -340,7 +340,7 @@
+     }
+ 
+     protected static boolean isInstallDirInUsrTree(String installDir) {
+-        return Set.of("/usr/local", "/usr").contains(installDir);
++        return Set.of("@TERMUX_PREFIX@/local", "@TERMUX_PREFIX@").contains(installDir);
+     }
+ 
+     private final BundlerParamInfo<String> packageName;
+@@ -368,7 +368,7 @@
+                      }
+                      return dir;
+                  }
+-                 return "/opt";
++                 return "@TERMUX_PREFIX@/opt";
+              },
+             (s, p) -> s
+     );
+--- a/src/jdk.jpackage/linux/classes/jdk/jpackage/internal/resources/utils.sh
++++ b/src/jdk.jpackage/linux/classes/jdk/jpackage/internal/resources/utils.sh
+@@ -92,7 +92,7 @@
+ #
+ uninstall_default_mime_handler ()
+ {
+-  for f in /usr/share/applications/defaults.list /usr/local/share/applications/defaults.list; do
++  for f in @TERMUX_PREFIX@/share/applications/defaults.list @TERMUX_PREFIX@/local/share/applications/defaults.list; do
+     _uninstall_default_mime_handler "$f" "$@"
+   done
+ }
