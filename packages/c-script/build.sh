@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/ryanmjacobs/c
-TERMUX_PKG_DESCRIPTION='Compile and execute C "scripts" in one go!'
+TERMUX_PKG_DESCRIPTION="Compile and execute C 'scripts' in one go!"
 TERMUX_PKG_LICENSE=MIT
 TERMUX_PKG_MAINTAINER=@termux
 TERMUX_PKG_VERSION=0.14
