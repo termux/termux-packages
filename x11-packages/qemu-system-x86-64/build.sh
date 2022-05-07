@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A generic and open source machine emulator and virtualiz
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1:7.0.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.qemu.org/qemu-${TERMUX_PKG_VERSION:2}.tar.xz
 TERMUX_PKG_SHA256=f6b375c7951f728402798b0baabb2d86478ca53d44cedbefabbe1c46bf46f839
 TERMUX_PKG_DEPENDS="glib, gtk3, libbz2, libc++, libcurl, libgnutls, libiconv, libjpeg-turbo, liblzo, libnettle, libnfs, libpixman, libpng, libspice-server, libssh, libusb, libusbredir, libx11, ncurses, pulseaudio, qemu-common, resolv-conf, sdl2, sdl2-image, zlib, zstd"
@@ -78,7 +79,7 @@ termux_step_configure() {
 		--enable-coroutine-pool \
 		--audio-drv-list=pa,sdl \
 		--enable-trace-backends=nop \
-		--disable-guest-agent \
+		--enable-guest-agent \
 		--enable-gnutls \
 		--enable-nettle \
 		--enable-sdl \
