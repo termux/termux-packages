@@ -14,6 +14,6 @@ termux_step_make_install() {
 }
 
 termux_step_install_license() {
-	install -Dm644 -t $TERMUX_PREFIX/share/doc/snake/ \
+	install -Dm644 -t $TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME/ \
 		$TERMUX_PKG_BUILDER_DIR/LICENSE
 }

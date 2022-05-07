@@ -10,5 +10,6 @@ TERMUX_PKG_DEPENDS="libxcb"
 TERMUX_PKG_BUILD_DEPENDS="xorg-util-macros"
 
 termux_step_install_license() {
-	install -Dm600 -t $TERMUX_PREFIX/share/doc/xcb-util-keysyms $TERMUX_PKG_BUILDER_DIR/LICENSE
+	install -Dm600 -t $TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME \
+		$TERMUX_PKG_BUILDER_DIR/LICENSE
 }
