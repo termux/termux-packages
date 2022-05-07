@@ -3,7 +3,9 @@ TERMUX_PKG_DESCRIPTION="Multilib binaries for cross-compilation"
 TERMUX_PKG_LICENSE="NCSA"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=$TERMUX_NDK_VERSION
-TERMUX_PKG_REVISION=5
+# Bump the revision on any libllvm major version update
+TERMUX_PKG_REVISION=6
+TERMUX_PKG_DEPENDS="clang"
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_NO_STATICSPLIT=true
@@ -44,7 +46,7 @@ prepare_libs() {
 add_cross_compiler_rt() {
 	RT_PREFIX=$NDK/toolchains/llvm/prebuilt/linux-x86_64/lib64/clang/*/lib/linux
 	RT_OPT_DIR=$TERMUX_PREFIX/opt/ndk-multilib/cross-compiler-rt
-	LIBLLVM_VERSION=$(. $TERMUX_SCRIPTDIR/packages/libllvm/build.sh; echo $TERMUX_PKG_VERSION)
+	LIBLLVM_VERSION=$(. $TERMUX_SCRIPTDIR/packages/libllvm/build.sh; echo $LLVM_MAJOR_VERSION)
 	RT_PATH=$TERMUX_PREFIX/lib/clang/$LIBLLVM_VERSION/lib/linux
 	mkdir -p $TERMUX_PKG_MASSAGEDIR/$RT_OPT_DIR
 	cp $RT_PREFIX/* $TERMUX_PKG_MASSAGEDIR/$RT_OPT_DIR || true
