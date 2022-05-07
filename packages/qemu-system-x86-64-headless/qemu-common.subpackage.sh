@@ -3,6 +3,7 @@ TERMUX_SUBPKG_DEPENDS="glib, libgcrypt"
 TERMUX_SUBPKG_DEPEND_ON_PARENT=no
 
 TERMUX_SUBPKG_INCLUDE="
+bin/qemu-ga
 bin/qemu-pr-helper
 bin/qemu-storage-daemon
 libexec/virtfs-proxy-helper
