@@ -15,6 +15,7 @@ TERMUX_PKG_BUILD_DEPENDS="libtasn1"
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/elf2dmp
 bin/qemu-edid
+bin/qemu-ga
 bin/qemu-img
 bin/qemu-io
 bin/qemu-nbd
