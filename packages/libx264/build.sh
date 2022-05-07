@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=55d517bc4569272a2c9a367a4106c234aba2ffbc
 TERMUX_PKG_VERSION=1:0.161.3049 # X264_BUILD from x264.h; commit count
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://code.videolan.org/videolan/x264/-/archive/$_COMMIT/x264-$_COMMIT.tar.bz2
 TERMUX_PKG_SHA256=f4b781e1e33f77e7bf283648537f38a3dd107589de7a87973df6d26480faf5d2
 TERMUX_PKG_BREAKS="libx264-dev"
@@ -27,4 +27,9 @@ termux_step_pre_configure() {
 		# Avoid requiring nasm for now:
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --disable-asm"
 	fi
+}
+
+termux_step_post_make_install() {
+	mkdir -p ${TERMUX_PREFIX}/share/bash-completion/completions
+	install -m 644 ${TERMUX_PKG_SRCDIR}/tools/bash-autocomplete.sh ${TERMUX_PREFIX}/share/bash-completion/completions/x264
 }
