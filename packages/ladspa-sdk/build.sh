@@ -1,0 +1,15 @@
+TERMUX_PKG_HOMEPAGE=https://www.ladspa.org/
+TERMUX_PKG_DESCRIPTION="Linux Audio Developer's Simple Plugin API"
+TERMUX_PKG_LICENSE="LGPL-2.1"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=1.17
+TERMUX_PKG_SRCURL=https://www.ladspa.org/download/ladspa_sdk_${TERMUX_PKG_VERSION}.tgz
+TERMUX_PKG_SHA256=27d24f279e4b81bd17ecbdcc38e4c42991bb388826c0b200067ce0eb59d3da5b
+TERMUX_PKG_DEPENDS="libc++, libsndfile"
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_EXTRA_MAKE_ARGS="targets"
+
+termux_step_pre_configure() {
+	TERMUX_PKG_SRCDIR+="/src"
+	TERMUX_PKG_BUILDDIR="$TERMUX_PKG_SRCDIR"
+}
