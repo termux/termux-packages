@@ -11,3 +11,4 @@ lib/clang/*/share/asan_ignorelist.txt
 lib/clang/*/share/cfi_ignorelist.txt
 lib/clang/*/share/hwasan_ignorelist.txt
 "
+TERMUX_SUBPKG_CONFLICTS="ndk-multilib (<< 23b-6)"

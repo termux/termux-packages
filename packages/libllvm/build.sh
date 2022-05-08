@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_LICENSE_FILE="llvm/LICENSE.TXT"
 TERMUX_PKG_MAINTAINER="@buttaface"
 LLVM_MAJOR_VERSION=14
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_VERSION=${LLVM_MAJOR_VERSION}.0.3
 TERMUX_PKG_SHA256=44d3e7a784d5cf805e72853bb03f218bd1058d448c03ca883dabbebc99204e0c
 TERMUX_PKG_SRCURL=https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/llvm-project-$TERMUX_PKG_VERSION.src.tar.xz
@@ -152,4 +153,12 @@ termux_step_post_make_install() {
 			chmod u+x $tool
 		done
 	fi
+
+	local RT_PREFIX=$NDK/toolchains/llvm/prebuilt/linux-x86_64/lib64/clang/*/lib/linux
+	if [ ! -d $RT_PREFIX ]; then
+		termux_error_exit "Directory $RT_PREFIX does not exist."
+	fi
+	local RT_PATH=$TERMUX_PREFIX/lib/clang/$TERMUX_PKG_VERSION/lib/linux
+	mkdir -p $RT_PATH
+	find $RT_PREFIX -maxdepth 1 -type f ! -name "libclang_rt*$TERMUX_ARCH*" -exec cp -r "{}" $RT_PATH \;
 }
