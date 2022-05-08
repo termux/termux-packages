@@ -96,6 +96,9 @@ PACKAGES+=" libelf-dev"
 PACKAGES+=" libexpat1-dev"
 PACKAGES+=" libjpeg-dev"
 
+# Needed by package news-flash-gtk.
+PACKAGES+=" libsqlite3-dev"
+
 # Needed by package vlc.
 PACKAGES+=" lua5.2"
 
