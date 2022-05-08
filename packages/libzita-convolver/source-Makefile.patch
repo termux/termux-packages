@@ -1,0 +1,40 @@
+--- a/source/Makefile
++++ b/source/Makefile
+@@ -20,7 +20,7 @@
+ 
+ # Modify as required.
+ #
+-SUFFIX := $(shell uname -m | sed -e 's/^unknown/$//' -e 's/^i.86/$//' -e 's/^x86_64/$/64/')
++SUFFIX :=
+ PREFIX ?= /usr/local
+ INCDIR ?= $(PREFIX)/include
+ LIBDIR ?= $(PREFIX)/lib$(SUFFIX)
+@@ -33,8 +33,7 @@
+ 
+ CPPFLAGS += -I. -D_REENTRANT -D_POSIX_PTHREAD_SEMANTICS
+ CPPFLAGS += -DENABLE_VECTOR_MODE 
+-CXXFLAGS += -fPIC -Wall -ffast-math -funroll-loops -O2
+-CXXFLAGS += -march=native
++CXXFLAGS += -fPIC -Wall -ffast-math -funroll-loops
+ LDLFAGS += 
+ LDLIBS +=
+ 
+@@ -42,7 +41,7 @@
+ ZITA-CONVOLVER_SO = libzita-convolver.so
+ ZITA-CONVOLVER_MAJ = $(ZITA-CONVOLVER_SO).$(MAJVERS)
+ ZITA-CONVOLVER_MIN = $(ZITA-CONVOLVER_MAJ).$(MINVERS)
+-ZITA-CONVOLVER_DEP = -lfftw3f -lpthread
++ZITA-CONVOLVER_DEP = -lfftw3f
+ ZITA-CONVOLVER_O = zita-convolver.o
+ ZITA-CONVOLVER_H = zita-convolver.h 
+ 
+@@ -56,8 +55,8 @@
+ 	install -d $(DESTDIR)$(LIBDIR)
+ 	install -m 644 $(ZITA-CONVOLVER_H) $(DESTDIR)$(INCDIR)
+ 	install -m 755 $(ZITA-CONVOLVER_MIN) $(DESTDIR)$(LIBDIR)
+-	ldconfig
+ 	ln -sf $(ZITA-CONVOLVER_MIN) $(DESTDIR)$(LIBDIR)/$(ZITA-CONVOLVER_SO)
++	ln -sf $(ZITA-CONVOLVER_MIN) $(DESTDIR)$(LIBDIR)/$(ZITA-CONVOLVER_MAJ)
+ 
+ uninstall:
+ 	rm -rf $(DESTDIR)$(INCDIR)/$(ZITA-CONVOLVER_H)
