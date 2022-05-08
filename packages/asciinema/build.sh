@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://asciinema.org/
 TERMUX_PKG_DESCRIPTION="Record and share your terminal sessions, the right way"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.1.0
+TERMUX_PKG_VERSION=2.2.0
 TERMUX_PKG_SRCURL=https://github.com/asciinema/asciinema/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=f4f4a04ab891dd513c99f72527c83fa9e634e858f2744a17e80258b90a6bf409
+TERMUX_PKG_SHA256=cce6f0ed6bcf47d54fe5caae14862bfb5a2e39eec1b3b467a8ed1050c298d0ec
 TERMUX_PKG_AUTO_UPDATE=true
 # ncurses-utils for tput which asciinema uses:
 TERMUX_PKG_DEPENDS="python, ncurses-utils"
@@ -26,5 +26,5 @@ termux_step_make() {
 
 termux_step_make_install() {
 	export PYTHONPATH=$TERMUX_PREFIX/lib/python${_PYTHON_VERSION}/site-packages/
-	python${_PYTHON_VERSION} setup.py install --prefix=$TERMUX_PREFIX --force
+	python${_PYTHON_VERSION} -m pip install . --prefix="${TERMUX_PREFIX}" --force
 }
