@@ -1,0 +1,12 @@
+--- a/source/zita-convolver.cc
++++ b/source/zita-convolver.cc
+@@ -619,7 +619,9 @@
+     pthread_attr_setschedpolicy (&attr, policy);
+     pthread_attr_setschedparam (&attr, &parm);
+     pthread_attr_setscope (&attr, PTHREAD_SCOPE_SYSTEM);
++#if !defined __ANDROID__ || __ANDROID_API__ >= 28
+     pthread_attr_setinheritsched (&attr, PTHREAD_EXPLICIT_SCHED);
++#endif
+     pthread_attr_setstacksize (&attr, 0x10000);
+     pthread_create (&_pthr, &attr, static_main, this);
+     pthread_attr_destroy (&attr);
