@@ -257,14 +257,6 @@ termux_step_make_install() {
 	ln -fsT "clang"   "$TERMUX_PREFIX/opt/emscripten-llvm/bin/wasm32-wasi-clang"
 	ln -fsT "clang++" "$TERMUX_PREFIX/opt/emscripten-llvm/bin/wasm32-wasi-clang++"
 	ln -fsT "lld"     "$TERMUX_PREFIX/opt/emscripten-llvm/bin/wasm-ld"
-
-	# unable to determine the reason why different linker searches for
-	# libclang_rt.builtins-*-android.a in different paths even after adding
-	# the patches from libllvm (also which one is more correct?)
-	#
-	# binutils LD searches lib/clang/15.0.0/lib/linux (exist)
-	# LLVM LD.LLD searches lib/clang/15.0.0/lib/android (not exist)
-	ln -fsT "linux" "$TERMUX_PREFIX/opt/emscripten-llvm/lib/clang/15.0.0/lib/android"
 }
 
 termux_step_create_debscripts() {
