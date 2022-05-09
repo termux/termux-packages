@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Sumneko Lua Language Server coded in Lua"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.org>"
 TERMUX_PKG_VERSION="3.2.2"
+TERMUX_PKG_REVISION="1"
 TERMUX_PKG_GIT_BRANCH="${TERMUX_PKG_VERSION}"
 TERMUX_PKG_SRCURL="https://github.com/sumneko/lua-language-server.git"
 TERMUX_PKG_DEPENDS="libandroid-spawn"
@@ -12,17 +13,15 @@ TERMUX_PKG_AUTO_UPDATE=true
 
 _patch_on_device() {
 	if [ "${TERMUX_ON_DEVICE_BUILD}" = true ]; then
-		current_dir=$(pwd)
-
-		cd "${TERMUX_PKG_SRCDIR}"
-		patch --silent -p1 <"${TERMUX_PKG_BUILDER_DIR}"/android.diff
-
-		cd "${current_dir}"
+		(
+			cd "${TERMUX_PKG_SRCDIR}"
+			patch --silent -p1 <"${TERMUX_PKG_BUILDER_DIR}"/android.diff
+		)
 	fi
 }
 
 termux_step_host_build() {
-	(_patch_on_device)
+	_patch_on_device
 	termux_setup_ninja
 
 	mkdir 3rd
@@ -33,7 +32,7 @@ termux_step_host_build() {
 }
 
 termux_step_make() {
-	CFLAGS+=" -DBEE_ENABLE_FILESYSTEM" # without this, it tries to link against its own filesystem lib (though ndk >= 23 has std c++ filesystem) and fails.
+	CFLAGS+=" -DBEE_ENABLE_FILESYSTEM" # without this, it tries to link against its own filesystem lib and fails.
 
 	sed \
 		-e "s%\@FLAGS\@%${CFLAGS} ${CPPFLAGS}%g" \
@@ -46,19 +45,19 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	local INSTALL_DIR="${TERMUX_PREFIX}/lib/${TERMUX_PKG_NAME}"
+	local datadir="${TERMUX_PREFIX}/share/${TERMUX_PKG_NAME}"
 
 	cat >"${TERMUX_PREFIX}/bin/${TERMUX_PKG_NAME}" <<-EOF
 		#!${TERMUX_PREFIX}/bin/bash
 
-		# After action of termux-elf-cleaner lua-language-server's binary(ELF) is unable to
+		# After action of termux-elf-cleaner lua-language-server's binary is unable to
 		# determine its version, so provide it manually.
 		if [ "\$1" = "--version" ]; then
 			echo "${TERMUX_PKG_NAME}: ${TERMUX_PKG_VERSION}"
 		else
 			TMPPATH=\$(mktemp -d "${TERMUX_PREFIX}/tmp/${TERMUX_PKG_NAME}.XXXX")
 
-			exec ${INSTALL_DIR}/bin/${TERMUX_PKG_NAME} \\
+			exec ${datadir}/bin/${TERMUX_PKG_NAME} \\
 				--logpath="\${TMPPATH}/log" \\
 				--metapath="\${TMPPATH}/meta" \\
 				"\${@}"
@@ -66,11 +65,11 @@ termux_step_make_install() {
 
 	EOF
 
-	chmod 744 "${TERMUX_PREFIX}/bin/${TERMUX_PKG_NAME}"
+	chmod 0700 "${TERMUX_PREFIX}/bin/${TERMUX_PKG_NAME}"
 
-	install -Dm744 -t "${INSTALL_DIR}"/bin ./bin/"${TERMUX_PKG_NAME}"
-	install -Dm644 -t "${INSTALL_DIR}" ./{main,debugger}.lua
-	install -Dm644 -t "${INSTALL_DIR}"/bin ./bin/main.lua
+	install -Dm700 -t "${datadir}"/bin ./bin/"${TERMUX_PKG_NAME}"
+	install -Dm600 -t "${datadir}" ./{main,debugger}.lua
+	install -Dm600 -t "${datadir}"/bin ./bin/main.lua
 
-	cp -r ./script ./meta ./locale "${INSTALL_DIR}"
+	cp -r ./script ./meta ./locale "${datadir}"
 }
