@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.haskell.org/ghc/
 TERMUX_PKG_DESCRIPTION="The Glasgow Haskell Compiler - Dynamic Libraries"
 TERMUX_PKG_LICENSE="BSD 2-Clause, BSD 3-Clause, LGPL-2.1"
-TERMUX_PKG_MAINTAINER="Aditya Alok <dev.aditya.alok@gmail.com>"
+TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.org>"
 TERMUX_PKG_VERSION=8.10.7
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL="https://downloads.haskell.org/~ghc/${TERMUX_PKG_VERSION}/ghc-${TERMUX_PKG_VERSION}-src.tar.xz"
