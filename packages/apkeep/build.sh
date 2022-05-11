@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.12.0
 TERMUX_PKG_SRCURL=https://github.com/EFForg/apkeep/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=a1ab0121e53cc63cad042c378ea3c28779fd201287917186b429aec69522f224
-TERMUX_PKG_DEPENDS="openssl-1.1"
+TERMUX_PKG_DEPENDS="openssl, openssl-1.1"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
