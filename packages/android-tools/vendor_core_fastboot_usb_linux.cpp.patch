@@ -1,5 +1,5 @@
 diff --git a/vendor/core/fastboot/usb_linux.cpp b/vendor/core/fastboot/usb_linux.cpp
-index 964488c..a84e0e3 100644
+index 964488c..7fd6ccb 100644
 --- a/vendor/core/fastboot/usb_linux.cpp
 +++ b/vendor/core/fastboot/usb_linux.cpp
 @@ -42,6 +42,9 @@
@@ -192,18 +192,22 @@ index 964488c..a84e0e3 100644
                  usb->ep_in = in;
                  usb->ep_out = out;
                  usb->desc = fd;
-@@ -516,7 +616,15 @@ int LinuxUsbTransport::WaitForDisconnect()
+@@ -516,7 +616,19 @@ int LinuxUsbTransport::WaitForDisconnect()
  {
    double deadline = now() + WAIT_FOR_DISCONNECT_TIMEOUT;
    while (now() < deadline) {
 +#ifdef __ANDROID__
-+    if(handle_->termux_usb) {
-+      if (fcntl(handle_->desc, F_GETFD) == -1) return 0;
-+    } else {
-+#endif
-     if (access(handle_->fname, F_OK)) return 0;
-+#ifdef __ANDROID__
++    bool ref_deleted = false;
++    if (handle_->termux_usb) {
++      struct stat fd_stat;
++      fstat(handle_->desc, &fd_stat);
++      if (fd_stat.st_nlink < 1)
++        ref_deleted = true;
 +    }
++    if (ref_deleted || access(handle_->fname, F_OK))
++        return 0;
++#else
+     if (access(handle_->fname, F_OK)) return 0;
 +#endif
      std::this_thread::sleep_for(50ms);
    }
