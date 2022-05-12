@@ -56,7 +56,7 @@ termux_step_configure () {
         -no-system-proxies \
         -no-cups \
         -system-harfbuzz \
-        -no-opengl \
+        -opengl desktop \
         -no-vulkan \
         -qpa xcb \
         -no-eglfs \

@@ -8,7 +8,7 @@ TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/5.15/${TERMUX_PKG
 TERMUX_PKG_SHA256=26394ec9375d52c1592bd7b689b1619c6b8dbe9b6f91fdd5c355589787f3a0b6
 TERMUX_PKG_DEPENDS="dbus, double-conversion, harfbuzz, libandroid-shmem, libandroid-sysv-semaphore, libc++, libice, libicu, libjpeg-turbo, libpng, libsm, libuuid, libx11, libxcb, libxi, libxkbcommon, openssl, pcre2, ttf-dejavu, freetype, xcb-util-image, xcb-util-keysyms, xcb-util-renderutil, xcb-util-wm, zlib, glib"
 # gtk3 dependency is a run-time dependency only for the gtk platformtheme subpackage
-TERMUX_PKG_BUILD_DEPENDS="gtk3"
+TERMUX_PKG_BUILD_DEPENDS="gtk3, mesa"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_NO_STATICSPLIT=true
 
@@ -94,7 +94,7 @@ termux_step_configure () {
         -no-system-proxies \
         -no-cups \
         -system-harfbuzz \
-        -no-opengl \
+        -opengl desktop \
         -no-vulkan \
         -qpa xcb \
         -no-eglfs \
