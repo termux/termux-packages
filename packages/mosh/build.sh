@@ -3,12 +3,13 @@ TERMUX_PKG_DESCRIPTION="Mobile shell that supports roaming and intelligent local
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.3.2
-TERMUX_PKG_REVISION=36
+TERMUX_PKG_REVISION=37
 TERMUX_PKG_SRCURL=https://github.com/mobile-shell/mosh/releases/download/mosh-${TERMUX_PKG_VERSION}/mosh-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=da600573dfa827d88ce114e0fed30210689381bbdcff543c931e4d6a2e851216
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
 TERMUX_PKG_DEPENDS="libandroid-support, libc++, libprotobuf, ncurses, openssl, openssh"
+TERMUX_PKG_SUGGESTS="mosh-perl"
 
 termux_step_pre_configure() {
 	termux_setup_protobuf
@@ -21,5 +22,14 @@ termux_step_post_make_install() {
 		-isystem $TERMUX_PREFIX/include \
 		-DPACKAGE_VERSION=\"$TERMUX_PKG_VERSION\" \
 		-std=c++11 -Wall -Wextra -Werror \
-		$TERMUX_PKG_BUILDER_DIR/mosh.cc -o mosh
+		$TERMUX_PKG_BUILDER_DIR/mosh.cc -o mosh-bin
+	cat <<-EOF > mosh
+		#!$TERMUX_PREFIX/bin/sh
+		if [ -e "$TERMUX_PREFIX/bin/mosh.pl" ]; then
+			exec "$TERMUX_PREFIX/bin/mosh.pl" "\$@"
+		else
+			exec "$TERMUX_PREFIX/bin/mosh-bin" "\$@"
+		fi
+	EOF
+	chmod 0700 mosh
 }
