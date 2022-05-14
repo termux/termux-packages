@@ -1,0 +1,43 @@
+--- a/src/FFmpeg.h
++++ b/src/FFmpeg.h
+@@ -545,19 +545,19 @@
+       ()
+    );
+    FFMPEG_FUNCTION_WITH_RETURN(
+-      AVCodec*,
++      const AVCodec*,
+       avcodec_find_encoder,
+       (enum AVCodecID id),
+       (id)
+    );
+    FFMPEG_FUNCTION_WITH_RETURN(
+-      AVCodec*,
++      const AVCodec*,
+       avcodec_find_encoder_by_name,
+       (const char *name),
+       (name)
+    );
+    FFMPEG_FUNCTION_WITH_RETURN(
+-      AVCodec*,
++      const AVCodec*,
+       avcodec_find_decoder,
+       (enum AVCodecID id),
+       (id)
+@@ -637,7 +637,7 @@
+    FFMPEG_FUNCTION_WITH_RETURN(
+       int,
+       avformat_open_input,
+-      (AVFormatContext **ic_ptr, const char *filename, AVInputFormat *fmt, AVDictionary **options),
++      (AVFormatContext **ic_ptr, const char *filename, const AVInputFormat *fmt, AVDictionary **options),
+       (ic_ptr, filename, fmt, options)
+    );
+    FFMPEG_FUNCTION_NO_RETURN(
+@@ -717,7 +717,7 @@
+       ()
+    );
+    FFMPEG_FUNCTION_WITH_RETURN(
+-      AVOutputFormat*,
++      const AVOutputFormat*,
+       av_guess_format,
+       (const char *short_name, const char *filename, const char *mime_type),
+       (short_name, filename, mime_type)
