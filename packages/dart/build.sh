@@ -3,8 +3,7 @@ TERMUX_PKG_DESCRIPTION="Dart is a general-purpose programming language"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_LICENSE_FILE="sdk/LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.16.2
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=2.17.0
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 
@@ -36,6 +35,9 @@ termux_step_pre_configure() {
 	sed -i -e 's:\([^A-Za-z0-9_]\)/usr/bin:\1'$TERMUX_PREFIX'/local/bin:g' \
 		-e 's:\([^A-Za-z0-9_]\)/bin:\1'$TERMUX_PREFIX'/bin:g' \
 		"$TERMUX_PKG_SRCDIR/sdk/third_party/pkg/pub/lib/src/io.dart"
+
+        # Build dart-sdk need more disk space, delete unused files
+        rm -rf $ANDROID_HOME $NDK
 }
 
 termux_step_make() {
