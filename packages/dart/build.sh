@@ -35,6 +35,9 @@ termux_step_pre_configure() {
 	sed -i -e 's:\([^A-Za-z0-9_]\)/usr/bin:\1'$TERMUX_PREFIX'/local/bin:g' \
 		-e 's:\([^A-Za-z0-9_]\)/bin:\1'$TERMUX_PREFIX'/bin:g' \
 		"$TERMUX_PKG_SRCDIR/sdk/third_party/pkg/pub/lib/src/io.dart"
+
+        # Build dart-sdk need more disk space, delete unused files
+        rm -rf $ANDROID_HOME $NDK
 }
 
 termux_step_make() {
