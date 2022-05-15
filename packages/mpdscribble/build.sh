@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A Music Player Daemon (MPD) client which submits informa
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 TERMUX_PKG_VERSION=0.24
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/MusicPlayerDaemon/mpdscribble/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=efd9dabc9850ff29412eaebd3377f107fe1f0fbc0e7967ee2d73d1967b375bf6
 TERMUX_PKG_DEPENDS="libcurl, libgcrypt, mpd, libmpdclient, glib"

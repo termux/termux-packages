@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Non-caching web proxy with advanced filtering capabiliti
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.0.33
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.privoxy.org/sf-download-mirror/Sources/$TERMUX_PKG_VERSION%20%28stable%29/privoxy-$TERMUX_PKG_VERSION-stable-src.tar.gz
 TERMUX_PKG_SHA256=04b104e70dac61561b9dd110684b250fafc8c13dbe437a60fae18ddd9a881fae
 # Termux-services adds the run scripts to TERMUX_PKG_CONFFILES. Those ones can

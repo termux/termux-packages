@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A peer-to-peer hypermedia distribution protocol"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.12.2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/ipfs/go-ipfs/releases/download/v${TERMUX_PKG_VERSION}/go-ipfs-source.tar.gz
 TERMUX_PKG_SHA256=eba34d2cc49f7811d087f4259c44c1fecb2b6bd08a6c3fa3b5a26e5fed78c74d
 TERMUX_PKG_AUTO_UPDATE=true
