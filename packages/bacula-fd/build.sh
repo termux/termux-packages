@@ -27,6 +27,7 @@ ac_cv_func_setpgrp_void=yes
 "
 
 termux_step_pre_configure() {
+	LDFLAGS+=" $($CC -print-libgcc-file-name)"
 	LDFLAGS+=" -Wl,-rpath=${TERMUX_PREFIX}/lib/bacula -Wl,--enable-new-dtags"
 }
 
