@@ -10,13 +10,17 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --sysconfdir=$TERMUX_PREFIX/etc
 "
 
-termux_step_pre_configure() {
-	autoreconf -fi
+termux_step_post_configure() {
+	# 210x297 is A4 size. Hard code as default.
+	sed -i \
+		-e "s|NL_PAPER_GET(_NL_PAPER_WIDTH)|210|g" \
+		-e "s|NL_PAPER_GET(_NL_PAPER_HEIGHT)|297|g" \
+		"${TERMUX_PKG_SRCDIR}"/lib/libpaper.c.in
 }
 
 termux_step_create_debscripts() {
-	cat <<- EOF > ./postinst
-	#!$TERMUX_PREFIX/bin/sh
-	mkdir -p $TERMUX_PREFIX/etc/libpaper.d
+	cat <<-EOF >./postinst
+		#!$TERMUX_PREFIX/bin/sh
+		mkdir -p $TERMUX_PREFIX/etc/libpaper.d
 	EOF
 }
