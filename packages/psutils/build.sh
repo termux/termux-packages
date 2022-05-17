@@ -3,12 +3,18 @@ TERMUX_PKG_DESCRIPTION="A set of postscript utilities"
 TERMUX_PKG_LICENSE="GPL-3.0, LGPL-3.0" # LGPL-3.0 for rrthomas's libpaper.
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.09"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/rrthomas/psutils/releases/download/v${TERMUX_PKG_VERSION}/psutils-${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=e31ab570e24478ce777b63b300ff428aedc916131cd7b077094311761604b7da
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="ghostscript, perl"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_path_PAPER=${TERMUX_PREFIX}/bin/paper"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
+TERMUX_PKG_RM_AFTER_INSTALL="
+bin/paperconfig
+include/
+share/doc/libpaper/
+"
 
 # @rrthomas's libpaper is fork of debian's libpaper, but it isn't compatible with its upstream any more.
 _RRTHOMAS_LIBPAPER_VERSION="1.2.0"
