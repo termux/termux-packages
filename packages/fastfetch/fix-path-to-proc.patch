@@ -1,0 +1,91 @@
+--- a/src/detection/displayserver/wmde.c
++++ b/src/detection/displayserver/wmde.c
+@@ -289,13 +289,13 @@
+ 
+ static void getFromProcDir(const FFinstance* instance, FFDisplayServerResult* result)
+ {
+-    DIR* proc = opendir(FASTFETCH_TARGET_DIR_ROOT"/proc");
++    DIR* proc = opendir("/proc");
+     if(proc == NULL)
+         return;
+ 
+     FFstrbuf procPath;
+     ffStrbufInitA(&procPath, 64);
+-    ffStrbufAppendS(&procPath, FASTFETCH_TARGET_DIR_ROOT"/proc/");
++    ffStrbufAppendS(&procPath, "/proc/");
+ 
+     uint32_t procPathLength = procPath.length;
+ 
+--- a/src/detection/terminalShell.c
++++ b/src/detection/terminalShell.c
+@@ -16,7 +16,7 @@
+ {
+     FFstrbuf cmdlineFilePath;
+     ffStrbufInit(&cmdlineFilePath);
+-    ffStrbufAppendS(&cmdlineFilePath, FASTFETCH_TARGET_DIR_ROOT"/proc/");
++    ffStrbufAppendS(&cmdlineFilePath, "/proc/");
+     ffStrbufAppendS(&cmdlineFilePath, pid);
+     ffStrbufAppendS(&cmdlineFilePath, "/cmdline");
+ 
+@@ -36,7 +36,7 @@
+ {
+     FFstrbuf statFilePath;
+     ffStrbufInit(&statFilePath);
+-    ffStrbufAppendS(&statFilePath, FASTFETCH_TARGET_DIR_ROOT"/proc/");
++    ffStrbufAppendS(&statFilePath, "/proc/");
+     ffStrbufAppendS(&statFilePath, pid);
+     ffStrbufAppendS(&statFilePath, "/stat");
+ 
+--- a/src/modules/cpu.c
++++ b/src/modules/cpu.c
+@@ -39,10 +39,10 @@
+     if(ffPrintFromCache(instance, FF_CPU_MODULE_NAME, &instance->config.cpuKey, &instance->config.cpuFormat, FF_CPU_NUM_FORMAT_ARGS))
+         return;
+ 
+-    FILE* cpuinfo = fopen(FASTFETCH_TARGET_DIR_ROOT"/proc/cpuinfo", "r");
++    FILE* cpuinfo = fopen("/proc/cpuinfo", "r");
+     if(cpuinfo == NULL)
+     {
+-        ffPrintError(instance, FF_CPU_MODULE_NAME, 0, &instance->config.cpuKey, &instance->config.cpuFormat, FF_CPU_NUM_FORMAT_ARGS, "fopen(\""FASTFETCH_TARGET_DIR_ROOT"/proc/cpuinfo\", \"r\") == NULL");
++        ffPrintError(instance, FF_CPU_MODULE_NAME, 0, &instance->config.cpuKey, &instance->config.cpuFormat, FF_CPU_NUM_FORMAT_ARGS, "fopen(\"/proc/cpuinfo\", \"r\") == NULL");
+         return;
+     }
+ 
+--- a/src/modules/cpuUsage.c
++++ b/src/modules/cpuUsage.c
+@@ -9,10 +9,10 @@
+ void ffPrintCPUUsage(FFinstance* instance)
+ {
+     long user, nice, system, idle, iowait, irq, softirq;
+-    FILE* procStat = fopen(FASTFETCH_TARGET_DIR_ROOT"/proc/stat", "r");
++    FILE* procStat = fopen("/proc/stat", "r");
+     if(procStat == NULL)
+     {
+-        ffPrintError(instance, FF_CPU_USAGE_MODULE_NAME, 0, &instance->config.cpuUsageKey, &instance->config.cpuUsageFormat, FF_CPU_USAGE_NUM_FORMAT_ARGS, "fopen(\""FASTFETCH_TARGET_DIR_ROOT"/proc/stat\", \"r\") == NULL");
++        ffPrintError(instance, FF_CPU_USAGE_MODULE_NAME, 0, &instance->config.cpuUsageKey, &instance->config.cpuUsageFormat, FF_CPU_USAGE_NUM_FORMAT_ARGS, "fopen(\"/proc/stat\", \"r\") == NULL");
+         return;
+     }
+     if (fscanf(procStat, "cpu%ld%ld%ld%ld%ld%ld%ld", &user, &nice, &system, &idle, &iowait, &irq, &softirq) < 0) goto exit;
+--- a/src/modules/memory.c
++++ b/src/modules/memory.c
+@@ -6,9 +6,9 @@
+ // Impl inspired by: https://github.com/sam-barr/paleofetch/blob/b7c58a52c0de39b53c9b5f417889a5886d324bfa/paleofetch.c#L544
+ void ffPrintMemory(FFinstance* instance)
+ {
+-    FILE* meminfo = fopen(FASTFETCH_TARGET_DIR_ROOT"/proc/meminfo", "r");
++    FILE* meminfo = fopen("/proc/meminfo", "r");
+     if(meminfo == NULL) {
+-        ffPrintError(instance, FF_MEMORY_MODULE_NAME, 0, &instance->config.memoryKey, &instance->config.memoryFormat, FF_MEMORY_NUM_FORMAT_ARGS, "fopen(\""FASTFETCH_TARGET_DIR_ROOT"/proc/meminfo\", \"r\") == NULL");
++        ffPrintError(instance, FF_MEMORY_MODULE_NAME, 0, &instance->config.memoryKey, &instance->config.memoryFormat, FF_MEMORY_NUM_FORMAT_ARGS, "fopen(\"/proc/meminfo\", \"r\") == NULL");
+         return;
+     }
+ 
+@@ -42,7 +42,7 @@
+ 
+     if(used_mem == 0 && total_mem == 0 && percentage == 0)
+     {
+-        ffPrintError(instance, FF_MEMORY_MODULE_NAME, 0, &instance->config.memoryKey, &instance->config.memoryFormat, FF_MEMORY_NUM_FORMAT_ARGS, FASTFETCH_TARGET_DIR_ROOT"/proc/meminfo could't be parsed");
++        ffPrintError(instance, FF_MEMORY_MODULE_NAME, 0, &instance->config.memoryKey, &instance->config.memoryFormat, FF_MEMORY_NUM_FORMAT_ARGS, "/proc/meminfo could't be parsed");
+         return;
+     }
+ 
