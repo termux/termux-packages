@@ -18,6 +18,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DPKG_CONFIG_EXECUTABLE=$(which pkg-config)
 -DXGETTEXT_PRG=$(which xgettext)
 -DLUAJIT_INCLUDE_DIR=$TERMUX_PREFIX/include/luajit-2.1
+-DCOMPILE_LUA=OFF
 "
 TERMUX_PKG_CONFFILES="share/nvim/sysinit.vim"
 TERMUX_PKG_CONFLICTS="neovim"
@@ -27,7 +28,8 @@ TERMUX_PKG_AUTO_UPDATE=true
 termux_pkg_auto_update() {
 	# Scrap and parse github release page to get version of nightly build.
 	# Neovim just uses 'nightly' tag for release and not nightly version specific, so cannot use github api.
-	local curl_response=$(
+	local curl_response
+	curl_response=$(
 		curl \
 			--silent \
 			"https://github.com/neovim/neovim/releases/tag/nightly" \
@@ -45,7 +47,7 @@ termux_pkg_auto_update() {
 	local remote_nvim_version
 	remote_nvim_version=$(
 		echo "$curl_response" |
-			cut -d"|" -f1 | grep -oP '<pre class="notranslate"><code class="notranslate">NVIM v\K.*'
+			cut -d"|" -f1 | grep -oP '<pre class="notranslate"><code>NVIM v\K.*'
 	)
 
 	if [ -z "$remote_nvim_version" ]; then
