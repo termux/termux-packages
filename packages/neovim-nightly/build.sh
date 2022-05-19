@@ -27,21 +27,21 @@ TERMUX_PKG_AUTO_UPDATE=true
 
 termux_pkg_auto_update() {
 	# Scrap and parse github release page to get version of nightly build.
-	# Neovim just uses 'nightly' tag for release and not nightly version specific, so cannot use github api.
+	# Neovim just uses 'nightly' tag for release, not version, therefore cannot use github api.
 	local curl_response
 	curl_response=$(
 		curl \
 			--silent \
 			"https://github.com/neovim/neovim/releases/tag/nightly" \
 			--write-out '|%{http_code}'
-	)
-	local http_code="${curl_response##*|}"
-
-	if [ "$http_code" != "200" ]; then
-		echo "Error: failed to get latest neovim-nightly tag page."
-		echo -e "http code: ${http_code}\ncurl response: ${curl_response}"
-		exit 1
-	fi
+	) || {
+		local http_code="${curl_response##*|}"
+		if [[ "${http_code}" != "200" ]]; then
+			echo "Error: failed to get latest neovim-nightly tag page."
+			echo -e "http code: ${http_code}\ncurl response: ${curl_response}"
+			exit 1
+		fi
+	}
 
 	# this outputs in the following format: "0.6.0-dev+575-g2ef9d2a66"
 	local remote_nvim_version
