@@ -36,6 +36,8 @@ termux_step_configure() {
 
 	local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
 	export ${env_host}_OPENSSL_DIR=$TERMUX_PREFIX
+	export CARGO_TARGET_${env_host}_RUSTFLAGS="-C link-arg=-l:libgetloadavg.a"
+
 	export X86_64_UNKNOWN_LINUX_GNU_OPENSSL_LIB_DIR=/usr/lib/x86_64-linux-gnu
 	export X86_64_UNKNOWN_LINUX_GNU_OPENSSL_INCLUDE_DIR=/usr/include
 	export PKG_CONFIG_ALLOW_CROSS=1
@@ -43,7 +45,6 @@ termux_step_configure() {
 	export CC_x86_64_unknown_linux_gnu=gcc
 	export CFLAGS_x86_64_unknown_linux_gnu="-O2"
 	export LLVM_MAJOR_VERSION=$(. $TERMUX_SCRIPTDIR/packages/libllvm/build.sh; echo $LLVM_MAJOR_VERSION)
-	unset CC CXX CPP LD CFLAGS CXXFLAGS CPPFLAGS LDFLAGS PKG_CONFIG RANLIB
 
 	# we can't use -L$PREFIX/lib since it breaks things but we need to link against libLLVM-9.so
 	ln -sf $PREFIX/lib/libLLVM-$LLVM_MAJOR_VERSION.so $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/
@@ -60,9 +61,16 @@ termux_step_configure() {
 }
 
 termux_step_make() {
-	return 0;
+	# ld: error: undefined symbol: getloadavg
+	# >>> referenced by rand.c
+        $CC $CPPFLAGS -c "$TERMUX_PKG_BUILDER_DIR"/getloadavg.c
+        $AR rcu $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libgetloadavg.a \
+                getloadavg.o
 }
+
 termux_step_make_install() {
+	unset CC CXX CPP LD CFLAGS CXXFLAGS CPPFLAGS LDFLAGS PKG_CONFIG RANLIB
+
 	if [ $TERMUX_ARCH = "x86_64" ]; then
 		 mv $TERMUX_PREFIX ${TERMUX_PREFIX}a
 		 $TERMUX_PKG_SRCDIR/x.py build --host x86_64-unknown-linux-gnu --stage 1 cargo || $TERMUX_PKG_SRCDIR/x.py build --host x86_64-unknown-linux-gnu  --stage 1 rls ||  $TERMUX_PKG_SRCDIR/x.py build --host x86_64-unknown-linux-gnu --stage 1 rustfmt || $TERMUX_PKG_SRCDIR/x.py --stage 1 --host x86_64-unknown-linux-gnu  build rustdoc || $TERMUX_PKG_SRCDIR/x.py --stage 1 --host x86_64-unknown-linux-gnu build error_index_generator  || true
@@ -92,8 +100,10 @@ termux_step_make_install() {
 		rust-installer-version \
 		manifest-* \
 		x86_64-unknown-linux-gnu
+
 	rm $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libLLVM-$LLVM_MAJOR_VERSION.so
 	rm $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libc++_shared.a
+	rm $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libgetloadavg.a
 }
 
 termux_step_post_massage() {
