@@ -1,10 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://neovim.io
 TERMUX_PKG_DESCRIPTION="Ambitious Vim-fork focused on extensibility and agility (nvim-nightly)"
 TERMUX_PKG_LICENSE="Apache-2.0"
-TERMUX_PKG_MAINTAINER="Aditya Alok <dev.aditya.alok@gmail.com>"
-TERMUX_PKG_VERSION="0.8.0-dev+112-g13520aae1"
+TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.org>"
+TERMUX_PKG_VERSION="0.8.0-dev+253-geb0aa8bb0"
 TERMUX_PKG_SRCURL="https://github.com/neovim/neovim/archive/nightly.tar.gz"
-TERMUX_PKG_SHA256=4245a23f208b8707239c1adc55463508ab5b2be462829893d8d3ee7d259c3adb
+TERMUX_PKG_SHA256=6f81410dc57d794986c416faf933c33fca10cb5a8c01e3845072b57f6dc84b47
 TERMUX_PKG_DEPENDS="libiconv, libuv, luv, libmsgpack, libandroid-support, libvterm, libtermkey, libluajit, libunibilium, libtreesitter"
 TERMUX_PKG_HOSTBUILD=true
 
@@ -18,6 +18,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DPKG_CONFIG_EXECUTABLE=$(which pkg-config)
 -DXGETTEXT_PRG=$(which xgettext)
 -DLUAJIT_INCLUDE_DIR=$TERMUX_PREFIX/include/luajit-2.1
+-DCOMPILE_LUA=OFF
 "
 TERMUX_PKG_CONFFILES="share/nvim/sysinit.vim"
 TERMUX_PKG_CONFLICTS="neovim"
@@ -26,26 +27,27 @@ TERMUX_PKG_AUTO_UPDATE=true
 
 termux_pkg_auto_update() {
 	# Scrap and parse github release page to get version of nightly build.
-	# Neovim just uses 'nightly' tag for release and not nightly version specific, so cannot use github api.
-	local curl_response=$(
+	# Neovim just uses 'nightly' tag for release, not version, therefore cannot use github api.
+	local curl_response
+	curl_response=$(
 		curl \
 			--silent \
 			"https://github.com/neovim/neovim/releases/tag/nightly" \
 			--write-out '|%{http_code}'
-	)
-	local http_code="${curl_response##*|}"
-
-	if [ "$http_code" != "200" ]; then
-		echo "Error: failed to get latest neovim-nightly tag page."
-		echo -e "http code: ${http_code}\ncurl response: ${curl_response}"
-		exit 1
-	fi
+	) || {
+		local http_code="${curl_response##*|}"
+		if [[ "${http_code}" != "200" ]]; then
+			echo "Error: failed to get latest neovim-nightly tag page."
+			echo -e "http code: ${http_code}\ncurl response: ${curl_response}"
+			exit 1
+		fi
+	}
 
 	# this outputs in the following format: "0.6.0-dev+575-g2ef9d2a66"
 	local remote_nvim_version
 	remote_nvim_version=$(
 		echo "$curl_response" |
-			cut -d"|" -f1 | grep -oP '<pre class="notranslate"><code class="notranslate">NVIM v\K.*'
+			cut -d"|" -f1 | grep -oP '<pre class="notranslate"><code>NVIM v\K.*'
 	)
 
 	if [ -z "$remote_nvim_version" ]; then

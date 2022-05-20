@@ -1,0 +1,22 @@
+# Termux doesn't provide locale support, but UTF-8 is the default.
+
+--- ./asciinema/__main__.py.orig	2022-05-08 04:11:10.417277242 +0000
++++ ./asciinema/__main__.py	2022-05-08 04:11:37.593919730 +0000
+@@ -35,17 +35,6 @@
+ 
+ 
+ def main() -> Any:
+-    if locale.nl_langinfo(locale.CODESET).upper() not in [
+-        "US-ASCII",
+-        "UTF-8",
+-        "UTF8",
+-    ]:
+-        sys.stderr.write(
+-            "asciinema needs an ASCII or UTF-8 character encoding to run. "
+-            "Check the output of `locale` command.\n"
+-        )
+-        return 1
+-
+     try:
+         cfg = config.load()
+     except config.ConfigError as e:

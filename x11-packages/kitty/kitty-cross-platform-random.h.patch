@@ -1,0 +1,11 @@
+--- a/kitty/cross-platform-random.h
++++ b/kitty/cross-platform-random.h
+@@ -10,7 +10,7 @@
+ 
+ #if __linux__
+ #include <errno.h>
+-#if __has_include(<sys/random.h>)
++#if __has_include(<sys/random.h>) && (!defined __ANDROID__ || __ANDROID_API__ >= 28)
+ #include <sys/random.h>
+ 
+ static inline bool

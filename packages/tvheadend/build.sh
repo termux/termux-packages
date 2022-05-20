@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE="https://tvheadend.org/"
 TERMUX_PKG_DESCRIPTION="TV streaming server for Linux and Android supporting DVB-S, DVB-S2 and other formats."
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_MAINTAINER="MrAdityaAlok <dev.aditya.alok@gmail.com>"
+TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.org>"
 TERMUX_PKG_VERSION=4.2.8
 TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL="https://github.com/tvheadend/tvheadend/archive/v${TERMUX_PKG_VERSION}.tar.gz"

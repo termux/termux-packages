@@ -30,8 +30,15 @@ termux_step_install_service_scripts() {
 		if [ "${TERMUX_PKG_SERVICE_SCRIPT[$i]: -4}" != "/log" ]; then
 			touch ${TERMUX_PKG_SERVICE_SCRIPT[$i]}/down
 			TERMUX_PKG_CONFFILES+=" var/service/${TERMUX_PKG_SERVICE_SCRIPT[$i]}/down"
-			mkdir -p ${TERMUX_PKG_SERVICE_SCRIPT[$i]}/log
-			ln -sf $TERMUX_PREFIX/share/termux-services/svlogger ${TERMUX_PKG_SERVICE_SCRIPT[$i]}/log/run
+			local _log_run=${TERMUX_PKG_SERVICE_SCRIPT[$i]}/log/run
+			rm -rf "${_log_run}"
+			mkdir -p "$(dirname "${_log_run}")"
+			cat <<-EOF > "${_log_run}"
+				#!$TERMUX_PREFIX/bin/sh
+				svlogger="$TERMUX_PREFIX/share/termux-services/svlogger"
+				exec "\${svlogger}" "\$@"
+			EOF
+			chmod 0700 "${_log_run}"
 
 			TERMUX_PKG_CONFFILES+="
 			var/service/${TERMUX_PKG_SERVICE_SCRIPT[$i]}/log/run

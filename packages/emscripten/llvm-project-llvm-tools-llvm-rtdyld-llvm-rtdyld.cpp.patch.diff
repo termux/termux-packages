@@ -1,12 +1,12 @@
 diff -uNr llvm-project/llvm/tools/llvm-rtdyld/llvm-rtdyld.cpp llvm-project.mod/llvm/tools/llvm-rtdyld/llvm-rtdyld.cpp
---- llvm-project/llvm/tools/llvm-rtdyld/llvm-rtdyld.cpp	2022-02-24 01:38:33.000000000 +0800
-+++ llvm-project.mod/llvm/tools/llvm-rtdyld/llvm-rtdyld.cpp	2022-02-26 20:36:55.959542847 +0800
+--- llvm-project/llvm/tools/llvm-rtdyld/llvm-rtdyld.cpp	2022-05-03 21:10:32.000000000 +0800
++++ llvm-project.mod/llvm/tools/llvm-rtdyld/llvm-rtdyld.cpp	2022-05-08 23:47:42.511357428 +0800
 @@ -286,7 +286,7 @@
    uintptr_t SlabSize = 0;
    uintptr_t CurrentSlabOffset = 0;
    SectionIDMap *SecIDMap = nullptr;
 -#if defined(__x86_64__) && defined(__ELF__) && defined(__linux__)
-+#if defined(__x86_64__) && defined(__ELF__) && defined(__linux__) && !defined(__TERMUX__)
++#if defined(__x86_64__) && defined(__ELF__) && defined(__linux__) && !defined(__ANDROID__)
    unsigned UsedTLSStorage = 0;
  #endif
  };
@@ -15,7 +15,7 @@ diff -uNr llvm-project/llvm/tools/llvm-rtdyld/llvm-rtdyld.cpp llvm-project.mod/l
  // In case the execution needs TLS storage, we define a very small TLS memory
  // area here that will be used in allocateTLSSection().
 -#if defined(__x86_64__) && defined(__ELF__) && defined(__linux__)
-+#if defined(__x86_64__) && defined(__ELF__) && defined(__linux__) && !defined(__TERMUX__)
++#if defined(__x86_64__) && defined(__ELF__) && defined(__linux__) && !defined(__ANDROID__)
  extern "C" {
  alignas(16) __attribute__((visibility("hidden"), tls_model("initial-exec"),
                             used)) thread_local char LLVMRTDyldTLSSpace[16];
@@ -24,7 +24,7 @@ diff -uNr llvm-project/llvm/tools/llvm-rtdyld/llvm-rtdyld.cpp llvm-project.mod/l
                                           unsigned SectionID,
                                           StringRef SectionName) {
 -#if defined(__x86_64__) && defined(__ELF__) && defined(__linux__)
-+#if defined(__x86_64__) && defined(__ELF__) && defined(__linux__) && !defined(__TERMUX__)
++#if defined(__x86_64__) && defined(__ELF__) && defined(__linux__) && !defined(__ANDROID__)
    if (Size + UsedTLSStorage > sizeof(LLVMRTDyldTLSSpace)) {
      return {};
    }

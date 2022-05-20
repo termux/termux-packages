@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.haskell.org/ghc/
 TERMUX_PKG_DESCRIPTION="The Glasgow Haskell Compiler - Dynamic Libraries"
 TERMUX_PKG_LICENSE="BSD 2-Clause, BSD 3-Clause, LGPL-2.1"
-TERMUX_PKG_MAINTAINER="Aditya Alok <dev.aditya.alok@gmail.com>"
+TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.org>"
 TERMUX_PKG_VERSION=8.10.7
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL="https://downloads.haskell.org/~ghc/${TERMUX_PKG_VERSION}/ghc-${TERMUX_PKG_VERSION}-src.tar.xz"
@@ -129,5 +129,6 @@ termux_step_post_make_install() {
 }
 
 termux_step_install_license() {
-	install -Dm600 -t "${TERMUX_PREFIX}/share/doc/ghc" "${TERMUX_PKG_SRCDIR}/LICENSE"
+	install -Dm600 -t "${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}" \
+		"${TERMUX_PKG_SRCDIR}/LICENSE"
 }

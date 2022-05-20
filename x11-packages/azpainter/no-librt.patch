@@ -1,14 +1,10 @@
-diff -uNr azpainter-2.1.6/configure azpainter-2.1.6.mod/configure
---- azpainter-2.1.6/configure	2020-04-21 02:27:27.000000000 +0300
-+++ azpainter-2.1.6.mod/configure	2020-04-27 17:23:13.316609232 +0300
-@@ -245,10 +245,6 @@
+--- azpainter-v3.0.5/configure.orig	2022-03-21 11:06:20.000000000 +0900
++++ azpainter-v3.0.5/configure	2022-04-21 02:00:04.000000000 +0900
+@@ -344,7 +344,6 @@
  
- fc_check_command_err $cf_make
+ fc_check_sharedlib "iconv"
  
--if test $cf_os = linux;then
--	LIBS_ADD=`fc_add_string "$LIBS_ADD" "-lrt"`
--fi
--
- #-------------
- # compiler
- 
+-fc_check_funclink rt "clock_gettime"
+ fc_check_lib libpng "libpng" "" "-lpng -lz" "png.h" "" "libpng-dev or libpng-devel or libpng or png" ""
+ fc_check_lib zlib "zlib" "" "" "zlib.h" "" "zlib1g-dev or zlib-devel or zlib" ""
+ fc_check_lib libjpeg "libjpeg" "" "-ljpeg" "stdio.h jpeglib.h" "" "libjpeg-dev or libjpeg-devel or libjpeg-turbo or jpeg-turbo" ""

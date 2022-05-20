@@ -1,0 +1,15 @@
+--- a/crates/nu-path/src/tilde.rs
++++ b/crates/nu-path/src/tilde.rs
+@@ -53,6 +53,12 @@
+     // Returns home dir of user.
+ }
+ 
++#[cfg(target_os = "android")]
++#[allow(unused)]
++fn user_home_dir(username: &str) -> PathBuf {
++    PathBuf::from(String::from("@TERMUX_HOME@"))
++}
++
+ #[cfg(target_os = "macos")]
+ fn user_home_dir(username: &str) -> PathBuf {
+     match dirs_next::home_dir() {

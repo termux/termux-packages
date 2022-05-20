@@ -150,7 +150,7 @@ jobs:
 
     - name: Free additional disk space (if necessary)
       run: |
-        if grep -q '^rust$\|^rustc-nightly$' ./built_termux-main_packages.txt; then
+        if grep -q '^rust$\|^rustc-nightly$\|^dart$' ./built_termux-main_packages.txt; then
           echo "Free additional disk space on host"
           sudo apt purge -yq $(dpkg -l | grep '^ii' | awk '{ print $2 }' | grep -P '(cabal-|dotnet-|ghc-|libmono|php)') \
             liblldb-6.0 libllvm6.0:amd64 mono-runtime-common monodoc-manual powershell ruby
@@ -254,27 +254,30 @@ jobs:
           # Upload file to temporary directory.
           uploaded_files=false
           shopt -s nullglob
-          for filename in $(cat debs/built_${REPOSITORY_NAME}_packages.txt | sed -E 's/(..*)/debs\/\1_\*.deb debs\/\1-static_\*.deb/g'); do
-            if ! aptly_upload_file "$filename"; then
-              exit 1
-            fi
+          
+          if [ -f debs/built_${REPOSITORY_NAME}_packages.txt ]; then
+            for filename in $(cat debs/built_${REPOSITORY_NAME}_packages.txt | sed -E 's/(..*)/debs\/\1_\*.deb debs\/\1-static_\*.deb/g'); do
+              if ! aptly_upload_file "$filename"; then
+                exit 1
+              fi
 
-            uploaded_files=true
-          done
-          shopt -u nullglob
+              uploaded_files=true
+            done
+            shopt -u nullglob
 
-          # Publishing repository changes.
-          if [ "$uploaded_files" = "true" ]; then
-            if ! aptly_add_to_repo; then
-              exit 1
-            fi
+            # Publishing repository changes.
+            if [ "$uploaded_files" = "true" ]; then
+              if ! aptly_add_to_repo; then
+                exit 1
+              fi
 
-            # Usually temporary directory is deleted automatically, but in certain cases it is left.
-            aptly_delete_dir
+              # Usually temporary directory is deleted automatically, but in certain cases it is left.
+              aptly_delete_dir
 
-            # Final part to make changes appear in web root.
-            if ! aptly_publish_repo; then
-              exit 1
+              # Final part to make changes appear in web root.
+              if ! aptly_publish_repo; then
+                exit 1
+              fi
             fi
           fi
         done

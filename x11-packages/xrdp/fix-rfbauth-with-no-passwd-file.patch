@@ -1,0 +1,18 @@
+Fixes https://github.com/termux/termux-packages/issues/10220.
+
+--- a/sesman/session.c
++++ b/sesman/session.c
+@@ -768,8 +768,11 @@
+                     list_add_item(xserver_params, (tintptr)g_strdup(geometry));
+                     list_add_item(xserver_params, (tintptr)g_strdup("-depth"));
+                     list_add_item(xserver_params, (tintptr)g_strdup(depth));
+-                    list_add_item(xserver_params, (tintptr)g_strdup("-rfbauth"));
+-                    list_add_item(xserver_params, (tintptr)g_strdup(passwd_file));
++                    if (passwd_file != 0 && *passwd_file != '\0')
++                    {
++                        list_add_item(xserver_params, (tintptr)g_strdup("-rfbauth"));
++                        list_add_item(xserver_params, (tintptr)g_strdup(passwd_file));
++                    }
+ 
+                     g_free(passwd_file);
+ 

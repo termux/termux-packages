@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://php.net
 TERMUX_PKG_DESCRIPTION="Server-side, HTML-embedded scripting language"
 TERMUX_PKG_LICENSE="PHP-3.0"
 TERMUX_PKG_VERSION=7.4.29
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_MAINTAINER="@xtkoba"
 TERMUX_PKG_SRCURL=https://github.com/php/php-src/archive/php-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=a99bf65b9fe8a4f75315f6ec8f7ebcc407b1dddbc124ac290a2187010a3ac351
@@ -84,6 +85,20 @@ termux_step_pre_configure() {
 	CPPFLAGS="-I$TERMUX_PREFIX/include/openssl-1.1 $CPPFLAGS"
 	CXXFLAGS="-I$TERMUX_PREFIX/include/openssl-1.1 $CXXFLAGS"
 	LDFLAGS="-L$TERMUX_PREFIX/lib/openssl-1.1 -Wl,-rpath=$TERMUX_PREFIX/lib/openssl-1.1 $LDFLAGS"
+	export PKG_CONFIG_PATH=$PKG_CONFIG_LIBDIR
+	export PKG_CONFIG_LIBDIR=$TERMUX_PREFIX/lib/openssl-1.1/pkgconfig
+
+	local wrapper_bin=$TERMUX_PKG_BUILDDIR/_wrapper/bin
+	local _cc=$(basename $CC)
+	rm -rf $wrapper_bin
+	mkdir -p $wrapper_bin
+	cat <<-EOF > $wrapper_bin/$_cc
+		#!$(command -v sh)
+		exec $(command -v $_cc) -L$TERMUX_PREFIX/lib/openssl-1.1 \
+			-Wno-unused-command-line-argument "\$@"
+	EOF
+	chmod 0700 $wrapper_bin/$_cc
+	export PATH=$wrapper_bin:$PATH
 }
 
 termux_step_post_configure() {

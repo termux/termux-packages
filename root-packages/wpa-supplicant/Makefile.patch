@@ -1,27 +1,21 @@
---- ../Makefile.orig	2020-03-10 20:58:52.384359092 +0100
-+++ ./wpa_supplicant/Makefile	2020-03-10 21:19:03.627147971 +0100
-@@ -17,9 +17,9 @@
+diff --git a/wpa_supplicant/Makefile b/wpa_supplicant/Makefile
+index cb66def..e70d74b 100644
+--- a/wpa_supplicant/Makefile
++++ b/wpa_supplicant/Makefile
+@@ -30,9 +30,9 @@ LIBS_p := $(LIBS)
  endif
  endif
  
--export LIBDIR ?= /usr/local/lib/
--export INCDIR ?= /usr/local/include/
--export BINDIR ?= /usr/local/sbin/
+-export LIBDIR ?= /usr/local/lib
+-export INCDIR ?= /usr/local/include
+-export BINDIR ?= /usr/local/sbin
 +export LIBDIR ?= $(PREFIX)/lib/
 +export INCDIR ?= $(PREFIX)/include/
 +export BINDIR ?= $(PREFIX)/bin/
  PKG_CONFIG ?= pkg-config
  
  CFLAGS += $(EXTRA_CFLAGS)
-@@ -60,7 +60,6 @@
- ALL += libwpa_client.so
- endif
- 
--
- all: verify_config $(ALL) dynamic_eap_methods
- 
- verify_config:
-@@ -155,16 +154,6 @@
+@@ -147,16 +147,6 @@ endif
  OBJS += ../src/utils/$(CONFIG_ELOOP).o
  OBJS_c += ../src/utils/$(CONFIG_ELOOP).o
  

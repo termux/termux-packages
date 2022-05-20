@@ -1,5 +1,5 @@
---- ./rust/libnewsboat/src/fslock.rs.orig	2021-05-17 16:33:46.781835254 +0000
-+++ ./rust/libnewsboat/src/fslock.rs	2021-05-17 16:34:30.623855213 +0000
+--- a/rust/libnewsboat/src/fslock.rs
++++ b/rust/libnewsboat/src/fslock.rs
 @@ -1,5 +1,4 @@
  use crate::logger::{self, Level};
 -use gettextrs::gettext;
@@ -19,8 +19,8 @@
                      reason.to_string()
                  ))
              }
-@@ -77,10 +76,10 @@
-             {
+@@ -74,10 +73,10 @@
+             if let Err(reason) = file.set_len(0).and_then(|_| file.write_all(pid.as_bytes())) {
                  log!(Level::Debug, "FsLock: Failed to write PID");
                  return Err(fmt!(
 -                    &gettext("Failed to write PID to lock file '%s': %s"),
@@ -32,16 +32,16 @@
                      reason.to_string()
                  ));
              }
-@@ -109,10 +108,10 @@
+@@ -106,10 +105,10 @@
                  pid
              );
              Err(fmt!(
--                &gettext("Failed to lock '%s', already locked by process with PID %{}"),
-+                "Failed to lock '%s', already locked by process with PID %{}",
+-                &gettext("Failed to lock '%s', already locked by process with PID %s"),
++                "Failed to lock '%s', already locked by process with PID %s",
                  new_lock_path
                      .to_str()
 -                    .unwrap_or(&gettext("<filename containing invalid UTF-8 codepoint>")),
 +                    .unwrap_or("<filename containing invalid UTF-8 codepoint>"),
-                 PRIi64,
-                 *pid as i64
+                 &(*pid).to_string()
              ))
+         }
