@@ -298,6 +298,148 @@ OS and is built by Android NDK. This often introduces compatibility issues as
 Android (specifically Termux) is not a standard platform. Do not expect there
 are exist package recipes available out-of-box.
 
+## Commit guidelines
+
+A commit message should look something like:
+```
+<commitType>(<repo>/<package>): (Summary of change(s) made/Short description of the change)
+
+[An optional but **highly recommended** commit message describing the changes made in the commit]
+
+[Fixes (termux/repo)#<issue number>]
+[Closes (termux/repo)#<pr number>]
+```
+
+Where:
+  - `<repo>` may be one of `main`, `root` or `x11`. It is the repository in which the package resides.
+    Other definition for this property can be done as the name property of the package directory as defined in `repo.json` file after removing the 'termux-' prefix (if any).
+  - `<package>` is the actual name of the package.
+
+Any line in the commit **should not exceed 80 characters**. In case it does, consider using different wordings or language style which better summarizes the changes done.
+
+- `<commitType>` describes the type of commit. Types of commits:
+  - `addpkg(<repo>/<package>)`: A new package was added.
+    Commit summary should include a short description of the package. Optional extended commit message may include usage instructions for the package and/or reasons for inclusion.
+  - `upgpkg(<repo>/<package>)`: One or more package(s) was/were updated.
+    Commit summary should include the newer version/tag to which the package was updated to. Optional extended commit message may include new list of features in the new version, and detailed list of changes in build scripts and/or patches
+  - `fix(<repo>/<package>): Fix a Termux specific bug in a package
+    Commit summary should contain a summary of old incorrect behaviour of the package. Extended commit message may contain a deeper analysis of the bug.
+  - `dwnpkg(<repo>/<package>)`: One or more package(s) was/were downgraded due to build issues or potential bugs
+    Commit summary should justify the downgrading of the package(s). If the summary can't completely describe the reason for downgrade, extended commit message should contain full reason for downgrade.
+  - `disable(<repo>/<package>)`: A package was disabled. The short description should contain the reason for disabling of the package.
+    If the reason doesn't fit well in the sunmary, extended commit message should contain the complete reason for disabling.
+  - `enhance(<repo>/<package>)`: Enable a feature in a package that was earlier not enabled.
+    Optional (but highly recommended) extended commit message may contain detailed summary of the enabled feature(s) and a basic use case
+  - `chore`: Any housekeeping change or a change which does not affect the user in any way.
+  - `rebuild`: Rebuild a package to link against newer version of shared library
+    Special cases:
+    - When mass rebuilding packages depending on a major package (e.g. openssl), consider using this format:
+      ```
+      rebuild(deps:main/openssl): link against OpenSSL 3.0
+      ```
+  - `scripts(path/to/script)`: Any change affecting our build scripts or other scripts which are not a part of build recipies including toolchain setup scripts.
+  - `ci(action_file_without_extension)`: Any change that affects GitHub Actions yaml file(s) and/or scripts used exclusively by it.
+
+Examples of good commit messages:
+1. ```
+   upgpkg(main/nodejs): upgrade to v18.2.0
+   ```
+
+2. ```
+   dwnpkg(main/htop): downgrade to v2.2.0
+
+   v3.x needs access to /proc/stat which is now restricted by Android
+   ```
+
+3. ```
+   enhance,upgpkg(main/nodejs): update to v18.2.0 and use shared libuv
+
+   # Describe the technical reasons of how using shared libuv is beneficial
+   ```
+
+4. ```
+   disable(main/nodejs): use LTS version instead
+
+   PS: This won't ever happen. Just an example :P
+   ```
+
+5. ```
+   ci(package_updates): panic on invalid versions
+   ```
+
+6. ```
+   chore,scripts(bin/revbump): support passing path to build.sh
+
+   Earlier only package directories defined in `repo.json` could be revbumped.
+   Now you can pass the path to build.sh
+   ```
+
+7. ```
+   fix(main/nodejs{,-lts}): test failures for `process.report`
+
+   This shows an example when scope can be minimised if they belong to the
+   same repository, and have same initials as well as are very similar in
+   nature.
+
+   The same can also be used for liblua as main/liblua{51,52,53,54}
+   ```
+
+8. ```
+   fix(main/vim{,-python},x11/vim-gtk): cursor flickering under certain rare conditions
+
+   Although the above commit message is quite long and also exceeds the
+   recommended length of a line in commit message. Such commits may be accepted
+   in cases where the changes are very similar for all three packages.
+   ```
+
+### Special notes for newbies who're just getting started with Open Source
+
+In order to encourage new contributors and help them contribute to open source, the above mentioned commit requirements should be optionally relaxed. In cases where commit messages need to be changed, the PR may be **Squashed and Merged** or may be merged manually from the command line.
+
+#### Notes for merging PRs from command line
+
+1. It is recommended to use the [GitHub CLI (`gh`)](https://cli.github.com) in order to fetch the contributor's branch.
+   ```sh
+   gh pr checkout <PR Number>
+   ```
+
+2. After checking out the branch, amend the commit message and optionally rebase against the master branch (if necessary).
+
+   When merging manually make sure that you give proper credits for the original patch to it's author by adding a `Co-authored-by: ` line. See https://docs.github.com/en/pull-requests/committing-changes-to-your-project/creating-and-editing-commits/creating-a-commit-with-multiple-authors for more details. Also add a `Closes #<PR number>`.
+
+   **Note** that the `Closes` and `Co-authored-by` lines are needed only when the PR author has disabled ability for maintainers to push to their branches. If possible, it is recommended to force-push to user's branch and then push the change to master branch since GitHub UI then will detect a merge.
+
+   ```sh
+   git fetch
+   git rebase origin/master
+
+   git commit --amend # Will open up your editor to amend the commit message
+
+   # If possible push to PR author's branch
+   # Note: no need to configure remote branch if you checked
+   # out using GitHub CLI.
+   # git push -f
+   ```
+
+3. Note down the branch name
+   ```sh
+   git branch
+   ```
+
+4. Merge the branch manually
+   ```sh
+   git switch master
+
+   # Note depending upon your git configuration, the default
+   # merge strategy may vary. It is recommended to pass the
+   # merge strategy as a flag to git.
+   git merge <branch name>
+   ```
+
+5. Congratulate the user on sending their (probably) first OSS contribution!
+
+6. Note that sometimes GitHub UI may fail to detect the merge, in such cases make sure that you tell the contributor that their PR was merged manually and they'll recieve their due credits in the repository contribution graph.
+
 ## Basics
 
 Each package is a defined through the `build.sh` script placed into directory
