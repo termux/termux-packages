@@ -38,6 +38,10 @@ termux_step_configure() {
 	export ${env_host}_OPENSSL_DIR=$TERMUX_PREFIX
 	export CARGO_TARGET_${env_host}_RUSTFLAGS="-C link-arg=-l:libgetloadavg.a"
 
+	if [ "$TERMUX_ARCH" == "x86_64" ]; then
+		export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C link-arg=$($CC -print-libgcc-file-name) -C link-arg=-l:libunwind.a"
+	fi
+
 	export X86_64_UNKNOWN_LINUX_GNU_OPENSSL_LIB_DIR=/usr/lib/x86_64-linux-gnu
 	export X86_64_UNKNOWN_LINUX_GNU_OPENSSL_INCLUDE_DIR=/usr/include
 	export PKG_CONFIG_ALLOW_CROSS=1
