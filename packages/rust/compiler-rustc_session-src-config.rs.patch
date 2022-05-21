@@ -1,0 +1,33 @@
+From beb4e16f055aa7925194fd2c360105a6d55f10f6 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Lo=C3=AFc=20BRANSTETT?= <lolo.branstett@numericable.fr>
+Date: Wed, 27 Apr 2022 19:11:56 +0200
+Subject: [PATCH] Add missing `target_feature` to the list of well known cfg
+ names
+
+---
+ compiler/rustc_session/src/config.rs | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/compiler/rustc_session/src/config.rs b/compiler/rustc_session/src/config.rs
+index 12c5c4445d46f..330201dd8fef6 100644
+--- a/compiler/rustc_session/src/config.rs
++++ b/compiler/rustc_session/src/config.rs
+@@ -1038,6 +1038,7 @@ impl CrateCheckConfig {
+             sym::target_has_atomic_load_store,
+             sym::target_has_atomic,
+             sym::target_has_atomic_equal_alignment,
++            sym::target_feature,
+             sym::panic,
+             sym::sanitize,
+             sym::debug_assertions,
+@@ -1081,6 +1082,10 @@ impl CrateCheckConfig {
+             .into_iter()
+             .map(|sanitizer| Symbol::intern(sanitizer.as_str().unwrap()));
+ 
++        // Unknown possible values:
++        //  - `feature`
++        //  - `target_feature`
++
+         // No-values
+         for name in [
+             sym::doc,
