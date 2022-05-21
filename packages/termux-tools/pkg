@@ -6,10 +6,6 @@ declare -A commands_pkg=(
 ["pacman"]="pacman -Ql|pacman -Qi|pacman -Sy --needed|pacman -Sc|pacman -Scc|pacman -Sl|pacman -Q|pacman -S|pacman -Sys|pacman -Rcns|pacman -Syu"
 )
 
-if [ "$TERMUX_MAIN_PACKAGE_FORMAT" = "debian" ]; then
-	USER_AGENT='Termux-PKG/1.0 mirror-checker (termux-tools @PACKAGE_VERSION@) Termux (@TERMUX_APP_PACKAGE@; install-prefix:@TERMUX_PREFIX@)'
-fi
-
 show_help() {
 	local cache_size
 	local cache_dir=""
@@ -64,7 +60,7 @@ check_mirror() {
 		--fail \
 		--connect-timeout "$timeout" \
 		--location \
-		--user-agent "$USER_AGENT" \
+		--user-agent "Termux-PKG/1.0 mirror-checker (termux-tools @PACKAGE_VERSION@) Termux (@TERMUX_APP_PACKAGE@; install-prefix:@TERMUX_PREFIX@)" \
 		"$mirror/dists/stable/Release" >/dev/null 2>&1
 }
 
