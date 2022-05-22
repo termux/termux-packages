@@ -28,7 +28,7 @@ termux_step_pre_configure() {
 termux_step_make() {
 	# https://github.com/wasmerio/wasmer/blob/master/Makefile
 	# Makefile only does host builds
-	make build-wasmer
+	# Dropping host build due to https://github.com/wasmerio/wasmer/issues/2822
 
 	# singlepass only for x86_64
 
@@ -92,19 +92,31 @@ termux_step_make_install() {
 	install -Dm644 "lib/c-api/README.md" "$TERMUX_PREFIX/include/wasmer-README.md"
 
 	# make install-capi-lib
-	pkgver="$(target/release/wasmer --version | cut -d\  -f2)"
-	shortver="${pkgver%.*}"
+	shortver="${TERMUX_PKG_VERSION%.*}"
 	majorver="${shortver%.*}"
-	install -Dm755 "target/$CARGO_TARGET_NAME/release/libwasmer_c_api.so" "$TERMUX_PREFIX/lib/libwasmer.so.$pkgver"
-	ln -sf "libwasmer.so.$pkgver" "$TERMUX_PREFIX/lib/libwasmer.so.$shortver"
-	ln -sf "libwasmer.so.$pkgver" "$TERMUX_PREFIX/lib/libwasmer.so.$majorver"
-	ln -sf "libwasmer.so.$pkgver" "$TERMUX_PREFIX/lib/libwasmer.so"
+	install -Dm755 "target/$CARGO_TARGET_NAME/release/libwasmer.so" "$TERMUX_PREFIX/lib/libwasmer.so.$TERMUX_PKG_VERSION"
+	ln -sf "libwasmer.so.$TERMUX_PKG_VERSION" "$TERMUX_PREFIX/lib/libwasmer.so.$shortver"
+	ln -sf "libwasmer.so.$TERMUX_PKG_VERSION" "$TERMUX_PREFIX/lib/libwasmer.so.$majorver"
+	ln -sf "libwasmer.so.$TERMUX_PKG_VERSION" "$TERMUX_PREFIX/lib/libwasmer.so"
 
 	# make install-capi-staticlib
-	install -Dm644 "target/$CARGO_TARGET_NAME/release/libwasmer_c_api.a" "$TERMUX_PREFIX/lib/libwasmer.a"
+	install -Dm644 "target/$CARGO_TARGET_NAME/release/libwasmer.a" "$TERMUX_PREFIX/lib/libwasmer.a"
 
 	# make install-pkg-config
-	target/release/wasmer config --pkg-config | install -Dm644 /dev/stdin "$TERMUX_PREFIX/lib/pkgconfig/wasmer.pc"
+	# https://github.com/wasmerio/wasmer/blob/master/lib/cli/src/commands/config.rs
+	mkdir -p "$TERMUX_PREFIX/lib/pkgconfig"
+	cat <<- EOF > "$TERMUX_PREFIX/lib/pkgconfig/wasmer.pc"
+	prefix=$TERMUX_PREFIX
+	exec_prefix=$TERMUX_PREFIX/bin
+	includedir=$TERMUX_PREFIX/include
+	libdir=$TERMUX_PREFIX/lib
+
+	Name: wasmer
+	Description: The Wasmer library for running WebAssembly
+	Version: $TERMUX_PKG_VERSION
+	Cflags: -I$TERMUX_PREFIX/include
+	Libs: -L$TERMUX_PREFIX/lib -lwasmer
+	EOF
 
 	# make install-wapm (non-existant)
 	install -Dm755 "wapm-cli/target/$CARGO_TARGET_NAME/release/wapm" "$TERMUX_PREFIX/bin/wapm"
