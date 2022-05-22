@@ -1,11 +1,6 @@
 #!/bin/bash
 set -eu
 
-declare -A commands_pkg=(
-["apt"]="dpkg -L|apt show|select_mirror; update_apt_cache; apt install|apt autoclean|apt clean|apt list|apt list --installed|apt install --reinstall|select_mirror; update_apt_cache; apt search|apt remove|select_mirror; apt update; apt full-upgrade"
-["pacman"]="pacman -Ql|pacman -Qi|pacman -Sy --needed|pacman -Sc|pacman -Scc|pacman -Sl|pacman -Q|pacman -S|pacman -Sys|pacman -Rcns|pacman -Syu"
-)
-
 # Setup TERMUX_APP_PACKAGE_MANAGER
 source "@TERMUX_PREFIX@/bin/termux-setup-package-manager" || exit 1
 
@@ -197,26 +192,65 @@ if [ $# = 0 ]; then
 	show_help
 fi
 
-case "${TERMUX_APP_PACKAGE_MANAGER-}" in
-	apt|pacman) IFS="|" pkg_cmd=(${commands_pkg["$TERMUX_APP_PACKAGE_MANAGER"]});;
-	*) echo "Error: pkg is not supported with '${TERMUX_APP_PACKAGE_MANAGER-}' package manager"; exit 1;;
-esac
-
 CMD="$1"
 shift 1
 
 case "$CMD" in
-	f*) eval ${pkg_cmd[0]} "$@";;
+	f*)
+		case "$TERMUX_APP_PACKAGE_MANAGER" in
+			apt) dpkg -L "$@";;
+			pacman) pacman -Ql "$@";;
+		esac;;
 	h*) show_help;;
-	sh*|inf*) eval ${pkg_cmd[1]} "$@";;
-	add|i*) eval ${pkg_cmd[2]} "$@";;
-	autoc*) eval ${pkg_cmd[3]};;
-	cl*) eval ${pkg_cmd[4]};;
-	list-a*) eval ${pkg_cmd[5]} "$@";;
-	list-i*) eval ${pkg_cmd[6]} "$@";;
-	rei*) eval ${pkg_cmd[7]} "$@";;
-	se*) eval ${pkg_cmd[8]} "$@";;
-	un*|rem*|rm|del*) eval ${pkg_cmd[9]} "$@";;
-	up*) eval ${pkg_cmd[10]} "$@";;
+	sh*|inf*)
+		case "$TERMUX_APP_PACKAGE_MANAGER" in
+			apt) apt show "$@";;
+			pacman) pacman -Qi "$@";;
+		esac;;
+	add|i*)
+		case "$TERMUX_APP_PACKAGE_MANAGER" in
+			apt) select_mirror; update_apt_cache; apt install "$@";;
+			pacman) pacman -Sy --needed "$@";;
+		esac;;
+	autoc*)
+		case "$TERMUX_APP_PACKAGE_MANAGER" in
+			apt) apt autoclean;;
+			pacman) pacman -Sc;;
+		esac;;
+	cl*)
+		case "$TERMUX_APP_PACKAGE_MANAGER" in
+			apt) apt clean;;
+			pacman) pacman -Scc;;
+		esac;;
+	list-a*)
+		case "$TERMUX_APP_PACKAGE_MANAGER" in
+			apt) apt list "$@";;
+			pacman) pacman -Sl "$@";;
+		esac;;
+	list-i*)
+		case "$TERMUX_APP_PACKAGE_MANAGER" in
+			apt) apt list --installed "$@";;
+			pacman) pacman -Q "$@";;
+		esac;;
+	rei*)
+		case "$TERMUX_APP_PACKAGE_MANAGER" in
+			apt) apt install --reinstall "$@";;
+			pacman) pacman -S "$@";;
+		esac;;
+	se*)
+		case "$TERMUX_APP_PACKAGE_MANAGER" in
+			apt) select_mirror; update_apt_cache; apt search "$@";;
+			pacman) pacman -Sys "$@";;
+		esac;;
+	un*|rem*|rm|del*)
+		case "$TERMUX_APP_PACKAGE_MANAGER" in
+			apt) apt remove "$@";;
+			pacman) pacman -Rcns "$@";;
+		esac;;
+	up*)
+		case "$TERMUX_APP_PACKAGE_MANAGER" in
+			apt) select_mirror; apt update; apt full-upgrade "$@";;
+			pacman) pacman -Syu "$@";;
+		esac;;
 	*) echo "Unknown command: '$CMD' (run 'pkg help' for usage information)"; exit 1;;
 esac
