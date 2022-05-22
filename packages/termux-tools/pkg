@@ -1,4 +1,9 @@
 #!/bin/bash
+
+if [ -z "$TERMUX_MAIN_PACKAGE_FORMAT" ]; then
+	eval $(grep TERMUX_MAIN_PACKAGE_FORMAT @TERMUX_PREFIX@/bin/login)
+fi
+
 set -eu
 
 declare -A commands_pkg=(
