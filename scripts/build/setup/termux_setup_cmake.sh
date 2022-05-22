@@ -25,8 +25,8 @@ termux_setup_cmake() {
 
 		export PATH=$TERMUX_CMAKE_FOLDER/bin:$PATH
 	else
-		if [[ "$TERMUX_MAIN_PACKAGE_FORMAT" = "debian" && "$(dpkg-query -W -f '${db:Status-Status}\n' cmake 2>/dev/null)" != "installed" ]] ||
-                   [[ "$TERMUX_MAIN_PACKAGE_FORMAT" = "pacman" && ! "$(pacman -Q cmake 2>/dev/null)" ]]; then
+		if [[ "$TERMUX_APP_PACKAGE_MANAGER" = "apt" && "$(dpkg-query -W -f '${db:Status-Status}\n' cmake 2>/dev/null)" != "installed" ]] ||
+                   [[ "$TERMUX_APP_PACKAGE_MANAGER" = "pacman" && ! "$(pacman -Q cmake 2>/dev/null)" ]]; then
 			echo "Package 'cmake' is not installed."
 			echo "You can install it with"
 			echo

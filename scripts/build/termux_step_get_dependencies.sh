@@ -5,8 +5,8 @@ termux_step_get_dependencies() {
 
 		# When doing build on device, ensure that apt lists are up-to-date.
 		if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
-			case "$TERMUX_MAIN_PACKAGE_FORMAT" in
-				"debian") apt update;;
+			case "$TERMUX_APP_PACKAGE_MANAGER" in
+				"apt") apt update;;
 				"pacman") pacman -Sy;;
 			esac
 		fi

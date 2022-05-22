@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# TERMUX_APP_PACKAGE_MANAGER should be exported by termux-app v0.119.0+
+# itself and should contain "apt" or "pacman".
+# TERMUX_MAIN_PACKAGE_FORMAT should be exported by login script in
+# termux-tools v0.161+ if termux-app version is less than 0.119.0 and
+# should contain "debian" or "pacman".
+if [ -z "${TERMUX_APP_PACKAGE_MANAGER-}" ]; then
+	if [ -n "${TERMUX_MAIN_PACKAGE_FORMAT-}" ]; then
+		TERMUX_APP_PACKAGE_MANAGER="$([ "${TERMUX_MAIN_PACKAGE_FORMAT-}" = "debian" ] && echo "apt" || echo "${TERMUX_MAIN_PACKAGE_FORMAT-}")"
+	else
+		TERMUX_APP_PACKAGE_MANAGER="@TERMUX_PACKAGE_MANAGER@"
+	fi
+fi
+
+case "${TERMUX_APP_PACKAGE_MANAGER-}" in
+	apt|pacman) :;;
+	*) echo "Unsupported package manager \"${TERMUX_APP_PACKAGE_MANAGER-}\". Only 'apt' and 'pacman' managers are supported" 1>&2; exit 1;;
+esac
+export TERMUX_APP_PACKAGE_MANAGER

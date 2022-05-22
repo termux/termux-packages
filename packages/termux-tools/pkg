@@ -2,16 +2,19 @@
 set -eu
 
 declare -A commands_pkg=(
-["debian"]="dpkg -L|apt show|select_mirror; update_apt_cache; apt install|apt autoclean|apt clean|apt list|apt list --installed|apt install --reinstall|select_mirror; update_apt_cache; apt search|apt remove|select_mirror; apt update; apt full-upgrade"
+["apt"]="dpkg -L|apt show|select_mirror; update_apt_cache; apt install|apt autoclean|apt clean|apt list|apt list --installed|apt install --reinstall|select_mirror; update_apt_cache; apt search|apt remove|select_mirror; apt update; apt full-upgrade"
 ["pacman"]="pacman -Ql|pacman -Qi|pacman -Sy --needed|pacman -Sc|pacman -Scc|pacman -Sl|pacman -Q|pacman -S|pacman -Sys|pacman -Rcns|pacman -Syu"
 )
+
+# Setup TERMUX_APP_PACKAGE_MANAGER
+source "@TERMUX_PREFIX@/bin/termux-setup-package-manager" || exit 1
 
 show_help() {
 	local cache_size
 	local cache_dir=""
-	if [ "$TERMUX_MAIN_PACKAGE_FORMAT" = "debian" ]; then
+	if [ "$TERMUX_APP_PACKAGE_MANAGER" = "apt" ]; then
 		cache_dir="@TERMUX_CACHE_DIR@/apt/archives"
-	elif [ "$TERMUX_MAIN_PACKAGE_FORMAT" = "pacman" ]; then
+	elif [ "$TERMUX_APP_PACKAGE_MANAGER" = "pacman" ]; then
 		cache_dir="@TERMUX_PREFIX@/var/cache/pacman/pkg"
 	fi
 	cache_size=$(du -sh "$cache_dir" 2>/dev/null | cut -f1)
@@ -194,9 +197,9 @@ if [ $# = 0 ]; then
 	show_help
 fi
 
-case "$TERMUX_MAIN_PACKAGE_FORMAT" in
-	debian|pacman) IFS="|" pkg_cmd=(${commands_pkg["$TERMUX_MAIN_PACKAGE_FORMAT"]});;
-	*) echo "Error: pkg is not supported with '$TERMUX_MAIN_PACKAGE_FORMAT' package manager format"; exit 1;;
+case "${TERMUX_APP_PACKAGE_MANAGER-}" in
+	apt|pacman) IFS="|" pkg_cmd=(${commands_pkg["$TERMUX_APP_PACKAGE_MANAGER"]});;
+	*) echo "Error: pkg is not supported with '${TERMUX_APP_PACKAGE_MANAGER-}' package manager"; exit 1;;
 esac
 
 CMD="$1"

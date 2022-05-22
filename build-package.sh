@@ -313,10 +313,13 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_finish_build.sh"
 . "$TERMUX_SCRIPTDIR/scripts/properties.sh"
 
 if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
+	# Setup TERMUX_APP_PACKAGE_MANAGER
+	source "$TERMUX_PREFIX/bin/termux-setup-package-manager"
+
 	# For on device builds cross compiling is not supported.
 	# Target architecture must be same as for environment used currently.
-	case "$TERMUX_MAIN_PACKAGE_FORMAT" in
-		"debian") TERMUX_ARCH=$(dpkg --print-architecture);;
+	case "$TERMUX_APP_PACKAGE_MANAGER" in
+		"apt") TERMUX_ARCH=$(dpkg --print-architecture);;
 		"pacman") TERMUX_ARCH=$(pacman-conf | grep Architecture | sed 's/Architecture = //g');;
 	esac
 	export TERMUX_ARCH
@@ -360,11 +363,7 @@ while (($# >= 1)); do
 				if [ -z "$1" ]; then
 					termux_error_exit "./build-package.sh: argument to '--format' should not be empty"
 				fi
-
-				case "$1" in
-					debian|pacman) TERMUX_PACKAGE_FORMAT="$1";;
-					*) termux_error_exit "./build-package.sh: only 'debian' and 'pacman' formats are supported";;
-				esac
+				TERMUX_PACKAGE_FORMAT="$1"
 			else
 				termux_error_exit "./build-package.sh: option '--format' requires an argument"
 			fi
@@ -415,6 +414,13 @@ while (($# >= 1)); do
 	shift 1
 done
 unset -f _show_usage
+
+if [ -n "${TERMUX_PACKAGE_FORMAT-}" ]; then
+	case "${TERMUX_PACKAGE_FORMAT-}" in
+		debian|pacman) :;;
+		*) termux_error_exit "Unsupported package format \"${TERMUX_PACKAGE_FORMAT-}\". Only 'debian' and 'pacman' formats are supported";;
+	esac
+fi
 
 if [ "${TERMUX_INSTALL_DEPS-false}" = "true" ]; then
 	# Setup PGP keys for verifying integrity of dependencies.

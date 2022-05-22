@@ -5,8 +5,8 @@ termux_download_deb_pac() {
 	local VERSION_PACMAN=$4
 
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
-		case "$TERMUX_MAIN_PACKAGE_FORMAT" in
-			"debian") apt install -y "${PACKAGE}=${VERSION}";;
+		case "$TERMUX_APP_PACKAGE_MANAGER" in
+			"apt") apt install -y "${PACKAGE}=${VERSION}";;
 			"pacman") pacman -S "${PACKAGE}=${VERSION_PACMAN}" --needed --noconfirm;;
 		esac
 		return "$?"

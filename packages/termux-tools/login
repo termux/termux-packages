@@ -23,8 +23,14 @@ else
 	done
 fi
 
-# for the correct operation of scripts that work with the package manager
-export TERMUX_MAIN_PACKAGE_FORMAT="@TERMUX_PACKAGE_FORMAT@"
+# TERMUX_APP_PACKAGE_MANAGER should be exported by termux-app v0.119.0+ itself
+if [ -z "${TERMUX_APP_PACKAGE_MANAGER-}" ]; then
+	if { [ -n "$(command -v dpkg)" ] && dpkg --compare-versions "$TERMUX_VERSION" lt 0.119.0; } ||   # apt
+		{ [ -n "$(command -v vercmp)" ] && [ "$(vercmp "$TERMUX_VERSION" 0.119.0)" = "-1" ]; }; then # pacman
+		# For the correct operation of scripts that work with the package manager
+		export TERMUX_MAIN_PACKAGE_FORMAT="@TERMUX_PACKAGE_FORMAT@"
+	fi
+fi
 
 if [ -f @TERMUX_PREFIX@/lib/libtermux-exec.so ]; then
 	export LD_PRELOAD=@TERMUX_PREFIX@/lib/libtermux-exec.so
