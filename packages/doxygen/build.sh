@@ -7,7 +7,6 @@ TERMUX_PKG_SRCURL=https://github.com/doxygen/doxygen/archive/Release_${TERMUX_PK
 TERMUX_PKG_SHA256=1b083d15b29817463129ae1ae73b930d883030eeec090ea7a99b3a04fdb51c76
 TERMUX_PKG_DEPENDS="libc++, libiconv"
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_METHOD=repology # Upstream makes use of git tags and not GitHub Releases
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DBISON_EXECUTABLE=$(command -v bison)
 -DCMAKE_BUILD_TYPE=Release
