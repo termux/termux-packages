@@ -1,0 +1,14 @@
+Prevent running dmake during builds. dmake just generates Makefile which we aren't using, and QT translation files, but as we are not building the GUI, there is no need.
+
+And anyways will lead to "Exec format" error as running target binaries on host
+
+--- ./cli/CMakeLists.txt.orig	2022-05-22 12:43:53.588222173 +0530
++++ ./cli/CMakeLists.txt	2022-05-22 12:44:16.178222164 +0530
+@@ -45,7 +45,6 @@
+ 
+ add_dependencies(cppcheck copy_cfg)
+ add_dependencies(cppcheck copy_addons)
+-add_dependencies(cppcheck run-dmake)
+ 
+ install(TARGETS cppcheck
+     RUNTIME DESTINATION ${CMAKE_INSTALL_FULL_BINDIR}
