@@ -33,6 +33,7 @@ termux_step_make() {
 	# singlepass only for x86_64
 
 	# make build-wasmer
+	# https://github.com/wasmerio/wasmer/blob/master/lib/cli/Cargo.toml
 	if [ "$TERMUX_ARCH" = "x86_64" ]; then
 		cargo build \
 			--jobs "$TERMUX_MAKE_PROCESSES" \
@@ -40,7 +41,8 @@ termux_step_make() {
 			--release \
 			--manifest-path lib/cli/Cargo.toml \
 			--bin wasmer \
-			--features cranelift,singlepass
+			--no-default-features \
+			--features wat,wast,universal,dylib,staticlib,cache,wasi,emscripten,cranelift,singlepass
 	else
 		cargo build \
 			--jobs "$TERMUX_MAKE_PROCESSES" \
@@ -48,7 +50,8 @@ termux_step_make() {
 			--release \
 			--manifest-path lib/cli/Cargo.toml \
 			--bin wasmer \
-			--features cranelift
+			--no-default-features \
+			--features wat,wast,universal,dylib,staticlib,cache,wasi,emscripten,cranelift
 	fi
 
 	# make build-capi
