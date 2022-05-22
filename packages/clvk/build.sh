@@ -56,6 +56,7 @@ termux_step_host_build() {
 	cmake \
 		-G Ninja \
 		-S "$TERMUX_PKG_SRCDIR/external/clspv/third_party/llvm/llvm" \
+		-DCMAKE_BUILD_TYPE=Release \
 		-DLLVM_ENABLE_PROJECTS=clang
 	cmake \
 		--build "$TERMUX_PKG_HOSTBUILD_DIR" \
