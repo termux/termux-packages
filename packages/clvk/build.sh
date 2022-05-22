@@ -11,9 +11,12 @@ TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_SUGGESTS="ocl-icd"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DCMAKE_BUILD_TYPE=MinSizeRel
 -DLLVM_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/llvm-tblgen
 -DCLANG_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/clang-tblgen
 "
+
+# https://github.com/kpet/clvk/blob/main/CMakeLists.txt
 
 # clvk currently does not have proper versioning nor releases
 # Use dates and commits as versioning for now
@@ -81,6 +84,10 @@ termux_step_pre_configure() {
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_TARGET_ARCH=$LLVM_TARGET_ARCH"
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_TARGETS_TO_BUILD=$LLVM_TARGET_ARCH"
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_HOST_TRIPLE=$LLVM_DEFAULT_TARGET_TRIPLE"
+
+	# TERMUX_DEBUG_BUILD doesnt really have somewhere in between
+	#TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCMAKE_BUILD_TYPE=RelWithDebInfo"
+	#export STRIP=:
 }
 
 termux_step_make_install() {
