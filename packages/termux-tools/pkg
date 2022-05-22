@@ -89,8 +89,12 @@ select_mirror() {
 	mirrors[8]="https://termux.sahilister.in/apt/termux-main"
 	mirrors[7]="https://plug-mirror.rcac.purdue.edu/termux/termux-main"
 
-	local current_mirror
+	local current_mirror current_weight
 	current_mirror=$(grep -m 1 -P "^\s*deb\s+" @TERMUX_PREFIX@/etc/apt/sources.list | grep -oP 'https?://[^\s]+')
+	if [ -n "$current_mirror" ]; then
+		current_mirror="${current_mirror%/}"
+		for weight in "${!mirrors[@]}"; do [[ ${mirrors[$weight]} == "$current_mirror" ]] && current_weight="$weight" && break; done
+	fi
 
 	# Do not update mirror if:
 	# * If $TERMUX_PKG_NO_MIRROR_SELECT was set.
@@ -106,7 +110,8 @@ select_mirror() {
 	local pkgcache="@TERMUX_CACHE_DIR@/apt/pkgcache.bin"
 	if [ -e "$pkgcache" ] && (( $(last_modified "$pkgcache") <= 6 * 3600 )); then
 		if [ -n "$current_mirror" ]; then
-			echo -n "Checking availability of current mirror: "
+			echo "Checking availability of current mirror:"
+			echo -n "[*] (${current_weight-}) $current_mirror: "
 			if check_mirror "$current_mirror"; then
 				echo "ok"
 				return
@@ -118,30 +123,108 @@ select_mirror() {
 
 	# Test mirror availability, remove unaccessible mirrors from list.
 	echo "Testing the available mirrors:"
-	local w total_mirror_weight=0
-	for w in "${!mirrors[@]}"; do
-		echo -n "[*] ${mirrors[$w]}: "
-		if check_mirror "${mirrors[$w]}"; then
-			echo "ok"
-			total_mirror_weight=$((total_mirror_weight + w))
-		else
-			echo "bad"
-			unset "mirrors[$w]"
+
+	local parallel_jobs_max_count=10
+
+	if [[ ! "$parallel_jobs_max_count" =~ ^[0-9]+$ ]] || \
+		[[ "$parallel_jobs_max_count" -lt 1 ]] || \
+			[[ "$parallel_jobs_max_count" -gt 1000 ]]; then
+		parallel_jobs_max_count=1
+	fi
+
+	declare -a parallel_jobs_mirrors=()
+	declare -a parallel_jobs_wights=()
+	declare -a parallel_jobs_urls=()
+	declare -a parallel_jobs_numbers=()
+	declare -a parallel_jobs_pids=()
+	declare -a parallel_jobs_return_values=()
+
+	local i j mirror weight url job_number job_pid return_value
+	local total_mirror_weight=0
+	local total_mirrors=${#mirrors[@]}
+	local parallel_jobs_current_count=1
+
+	set +e
+	i=0
+	for mirror in "${!mirrors[@]}"; do
+		weight="$mirror" # mirror will be file path in future #9889
+		url="${mirrors[$weight]}"
+
+		if [[ ! "$weight" =~ ^[0-9]+$ ]]; then
+			echo "Invalid weight \"$weight\" for mirror \"$url\"" 1>&2
+			set -e; return 1
 		fi
+
+		job_number=$parallel_jobs_current_count
+		parallel_jobs_current_count=$((parallel_jobs_current_count + 1))
+
+		# Start mirror check in background 
+		check_mirror "$url" &
+		job_pid=$!
+
+		parallel_jobs_mirrors=("${parallel_jobs_mirrors[@]}" "$mirror")
+		parallel_jobs_wights=("${parallel_jobs_wights[@]}" "$weight")
+		parallel_jobs_urls=("${parallel_jobs_urls[@]}" "$url")
+		parallel_jobs_numbers=("${parallel_jobs_numbers[@]}" "$job_number")
+		parallel_jobs_pids=("${parallel_jobs_pids[@]}" "$job_pid")
+
+		# If current job count has reached max value or is the last mirror, wait for already started jobs to finish
+		if [ "$job_number" -ge $parallel_jobs_max_count ] || \
+			[ "$i" -ge $((total_mirrors - 1)) ]; then
+
+			j=0
+			# For pids of all jobs
+			for job_pid in "${parallel_jobs_pids[@]}"; do
+				# Wait for job with matching pid to return
+				#echo "waiting for check_mirror job ${parallel_jobs_numbers[j]} for mirror \"${parallel_jobs_urls[j]}\" with pid ${parallel_jobs_pids[j]}"
+				wait "$job_pid"
+				return_value=$?
+
+				parallel_jobs_return_values=("${parallel_jobs_return_values[@]}" "$return_value")
+				j=$((j + 1))
+			done
+
+			j=0
+			# For return_values of all jobs
+			for return_value in "${parallel_jobs_return_values[@]}"; do
+				echo -n "[*] (${parallel_jobs_wights[j]}) ${parallel_jobs_urls[j]}: "
+				if [ "$return_value" -eq 0 ]; then
+					echo "ok"
+					total_mirror_weight=$((total_mirror_weight + parallel_jobs_wights[j]))
+				else
+					echo "bad"
+					#echo "check_mirror job ${parallel_jobs_numbers[j]} for mirror \"${parallel_jobs_urls[j]}\" with pid ${parallel_jobs_pids[j]} failed with exit code $return_value"
+					unset "mirrors[${parallel_jobs_mirrors[j]}]"
+				fi
+
+				j=$((j + 1))
+			done
+
+			# Reset job related variables
+			parallel_jobs_current_count=1
+			parallel_jobs_mirrors=()
+			parallel_jobs_wights=()
+			parallel_jobs_urls=()
+			parallel_jobs_numbers=()
+			parallel_jobs_pids=()
+			parallel_jobs_return_values=()
+		fi
+
+		i=$((i + 1))
 	done
-	unset w
+	set -e
 
 	# Weight-based mirror selection.
 	local selected_mirror=""
 	if ((total_mirror_weight > 0)); then
-		local w random_weight calc_weight=0
+		local random_weight calc_weight=0
 		random_weight=$((RANDOM % total_mirror_weight + 1))
-		for w in $(echo "${!mirrors[@]}" | tr ' ' '\n' | sort -n); do
-			calc_weight=$((calc_weight + w))
+		for weight in $(echo "${!mirrors[@]}" | tr ' ' '\n' | sort -n); do
+			calc_weight=$((calc_weight + weight))
 
 			if ((calc_weight >= random_weight)); then
-				echo "Picking mirror: ${mirrors[$w]}"
-				selected_mirror="${mirrors[$w]}"
+				echo "Picking mirror: ($weight) ${mirrors[$weight]}"
+				selected_mirror="${mirrors[$weight]}"
 				break
 			fi
 		done
