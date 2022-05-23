@@ -14,9 +14,12 @@ show_help() {
 	fi
 	cache_size=$(du -sh "$cache_dir" 2>/dev/null | cut -f1)
 
-	echo 'Usage: pkg command [arguments]'
+	echo 'Usage: pkg [--check-mirror] command [arguments]'
 	echo
-	echo 'A tool for managing packages. Commands:'
+	echo 'A tool for managing packages.'
+	echo '  --check-mirror forces a re-check of availability of mirrors'
+	echo
+	echo 'Commands:'
 	echo
 	echo '  autoclean            - Remove all outdated packages from .deb package'
 	echo '                         cache.'
@@ -75,44 +78,52 @@ last_modified() {
 	echo $((now - mtime))
 }
 
+has_repo() {
+	# Check if root-repo or x11-repo are installed
+	repo="$1"
+
+	if [ -f "@TERMUX_PREFIX@/etc/apt/sources.list.d/$repo.list" ]; then
+		echo true
+	else
+		echo false
+	fi
+}
+
+get_mirror_url() {
+	source "$1"
+	echo $MAIN
+}
+
+get_mirror_weight() {
+	source "$1"
+	echo $WEIGHT
+}
+
 select_mirror() {
-	local main_repo="https://packages-cf.termux.org/apt/termux-main"
+	local default_repo="@TERMUX_PREFIX@/etc/termux/mirrors/default"
 
-	declare -A mirrors
-	mirrors[16]="$main_repo"
-	mirrors[15]="https://dl.kcubeterm.com/termux-main"
-	mirrors[14]="https://grimler.se/termux-packages-24"
-	mirrors[13]="https://termux.mentality.rip/termux-main"
-	mirrors[12]="https://termux.astra.in.ua/apt/termux-main"
-	mirrors[11]="https://termux.librehat.com/apt/termux-main"
-	mirrors[10]="https://mirror.mwt.me/termux/main"
-	mirrors[4]="https://termux.sahilister.in/apt/termux-main"
-	mirrors[3]="https://plug-mirror.rcac.purdue.edu/termux/termux-main"
-	mirrors[2]="https://packages.nscdn.top/apt/termux-main"
-
-	local current_mirror current_weight
-	current_mirror=$(grep -m 1 -P "^\s*deb\s+" @TERMUX_PREFIX@/etc/apt/sources.list | grep -oP 'https?://[^\s]+')
-	if [ -n "$current_mirror" ]; then
-		current_mirror="${current_mirror%/}"
-		for weight in "${!mirrors[@]}"; do [[ ${mirrors[$weight]} == "$current_mirror" ]] && current_weight="$weight" && break; done
+	if [ -d "@TERMUX_PREFIX@/etc/termux/chosen_mirrors" ]; then
+		mirrors=($(find @TERMUX_PREFIX@/etc/termux/chosen_mirrors/ -type f))
+	else
+		echo "No group of mirrors selected. You might want to select a group by running 'termux-change-repo'"
+		mirrors=("@TERMUX_PREFIX@/etc/termux/mirrors/default")
+		mirrors+=($(find @TERMUX_PREFIX@/etc/termux/mirrors/{china,europe,iran,north_america}/ -type f))
 	fi
 
-	# Do not update mirror if:
-	# * If $TERMUX_PKG_NO_MIRROR_SELECT was set.
-	# * Uses .cn domain - specific to Chinese users.
-	# * Uses mirror.bardia.tech, mirror based in Iran.
-	if [ -n "${TERMUX_PKG_NO_MIRROR_SELECT-}" ] || \
-		[[ "$(hostname "$current_mirror")" == *".cn" ]] || \
-		[[ "$(hostname "$current_mirror")" == *"mirror.bardia.tech"* ]]; then
+	local current_mirror
+	current_mirror=$(grep -m 1 -P "^\s*deb\s+" @TERMUX_PREFIX@/etc/apt/sources.list | grep -oP 'https?://[^\s]+')
+
+	# Do not update mirror if $TERMUX_PKG_NO_MIRROR_SELECT was set.
+	if [ -n "${TERMUX_PKG_NO_MIRROR_SELECT-}" ] && [ ! -n "$current_mirror" ]; then
 		return
 	fi
 
 	# Mirrors are rotated if 6 hours timeout has been passed or mirror is no longer accessible.
 	local pkgcache="@TERMUX_CACHE_DIR@/apt/pkgcache.bin"
-	if [ -e "$pkgcache" ] && (( $(last_modified "$pkgcache") <= 6 * 3600 )); then
+	if [ -e "$pkgcache" ] && (( $(last_modified "$pkgcache") <= 6 * 3600 )) && [ "$force_check_mirror" = "false" ]; then
 		if [ -n "$current_mirror" ]; then
 			echo "Checking availability of current mirror:"
-			echo -n "[*] (${current_weight-}) $current_mirror: "
+			echo -n "[*] $current_mirror: "
 			if check_mirror "$current_mirror"; then
 				echo "ok"
 				return
@@ -124,7 +135,6 @@ select_mirror() {
 
 	# Test mirror availability, remove unaccessible mirrors from list.
 	echo "Testing the available mirrors:"
-
 	local parallel_jobs_max_count=10
 
 	if [[ ! "$parallel_jobs_max_count" =~ ^[0-9]+$ ]] || \
@@ -134,37 +144,30 @@ select_mirror() {
 	fi
 
 	declare -a parallel_jobs_mirrors=()
-	declare -a parallel_jobs_wights=()
+	declare -a parallel_jobs_weights=()
 	declare -a parallel_jobs_urls=()
 	declare -a parallel_jobs_numbers=()
 	declare -a parallel_jobs_pids=()
 	declare -a parallel_jobs_return_values=()
 
-	local i j mirror weight url job_number job_pid return_value
-	local total_mirror_weight=0
+	local i j mirror url job_number job_pid return_value
 	local total_mirrors=${#mirrors[@]}
 	local parallel_jobs_current_count=1
 
 	set +e
 	i=0
 	for mirror in "${!mirrors[@]}"; do
-		weight="$mirror" # mirror will be file path in future #9889
-		url="${mirrors[$weight]}"
-
-		if [[ ! "$weight" =~ ^[0-9]+$ ]]; then
-			echo "Invalid weight \"$weight\" for mirror \"$url\"" 1>&2
-			set -e; return 1
-		fi
+		url="$(get_mirror_url ${mirrors[$mirror]})"
 
 		job_number=$parallel_jobs_current_count
 		parallel_jobs_current_count=$((parallel_jobs_current_count + 1))
 
-		# Start mirror check in background 
+		# Start mirror check in background
 		check_mirror "$url" &
 		job_pid=$!
 
 		parallel_jobs_mirrors=("${parallel_jobs_mirrors[@]}" "$mirror")
-		parallel_jobs_wights=("${parallel_jobs_wights[@]}" "$weight")
+		parallel_jobs_weights=("${parallel_jobs_weights[@]}" "$(get_mirror_weight ${mirrors[$mirror]})")
 		parallel_jobs_urls=("${parallel_jobs_urls[@]}" "$url")
 		parallel_jobs_numbers=("${parallel_jobs_numbers[@]}" "$job_number")
 		parallel_jobs_pids=("${parallel_jobs_pids[@]}" "$job_pid")
@@ -177,7 +180,7 @@ select_mirror() {
 			# For pids of all jobs
 			for job_pid in "${parallel_jobs_pids[@]}"; do
 				# Wait for job with matching pid to return
-				#echo "waiting for check_mirror job ${parallel_jobs_numbers[j]} for mirror \"${parallel_jobs_urls[j]}\" with pid ${parallel_jobs_pids[j]}"
+				# echo "waiting for check_mirror job ${parallel_jobs_numbers[j]} for mirror \"${parallel_jobs_urls[j]}\" with pid ${parallel_jobs_pids[j]}"
 				wait "$job_pid"
 				return_value=$?
 
@@ -188,13 +191,12 @@ select_mirror() {
 			j=0
 			# For return_values of all jobs
 			for return_value in "${parallel_jobs_return_values[@]}"; do
-				echo -n "[*] (${parallel_jobs_wights[j]}) ${parallel_jobs_urls[j]}: "
+				echo -n "[*] (${parallel_jobs_weights[j]}) ${parallel_jobs_urls[j]}: "
 				if [ "$return_value" -eq 0 ]; then
 					echo "ok"
-					total_mirror_weight=$((total_mirror_weight + parallel_jobs_wights[j]))
 				else
 					echo "bad"
-					#echo "check_mirror job ${parallel_jobs_numbers[j]} for mirror \"${parallel_jobs_urls[j]}\" with pid ${parallel_jobs_pids[j]} failed with exit code $return_value"
+					# echo "check_mirror job ${parallel_jobs_numbers[j]} for mirror \"${parallel_jobs_urls[j]}\" with pid ${parallel_jobs_pids[j]} failed with exit code $return_value"
 					unset "mirrors[${parallel_jobs_mirrors[j]}]"
 				fi
 
@@ -204,7 +206,7 @@ select_mirror() {
 			# Reset job related variables
 			parallel_jobs_current_count=1
 			parallel_jobs_mirrors=()
-			parallel_jobs_wights=()
+			parallel_jobs_weights=()
 			parallel_jobs_urls=()
 			parallel_jobs_numbers=()
 			parallel_jobs_pids=()
@@ -215,27 +217,44 @@ select_mirror() {
 	done
 	set -e
 
-	# Weight-based mirror selection.
+	# Build weighted array of valid mirrors
+	declare -a weighted_mirrors
+	local total_mirror_weight=0
+	local weight
+	for mirror in "${!mirrors[@]}"; do
+		# Check if mirror was unset in parallel check
+		if [ -z "${mirrors[$mirror]-}" ]; then
+			continue
+		fi
+		weight="$(get_mirror_weight ${mirrors[$mirror]})"
+		total_mirror_weight=$((total_mirror_weight + weight))
+		j=0
+		while [ "$j" -lt "$weight" ]; do
+			weighted_mirrors+=(${mirrors[$mirror]})
+			j=$((j + 1))
+		done
+	done
+
+	# Select random mirror
 	local selected_mirror=""
 	if ((total_mirror_weight > 0)); then
-		local random_weight calc_weight=0
+		local random_weight
 		random_weight=$((RANDOM % total_mirror_weight + 1))
-		for weight in $(echo "${!mirrors[@]}" | tr ' ' '\n' | sort -n); do
-			calc_weight=$((calc_weight + weight))
-
-			if ((calc_weight >= random_weight)); then
-				echo "Picking mirror: ($weight) ${mirrors[$weight]}"
-				selected_mirror="${mirrors[$weight]}"
-				break
-			fi
-		done
+		echo "Picking mirror: (${random_weight}) ${weighted_mirrors[${random_weight}]}"
+		selected_mirror="${weighted_mirrors[${random_weight}]}"
 	fi
 
 	if [ -n "$selected_mirror" ]; then
-		echo "deb $selected_mirror/ stable main" > @TERMUX_PREFIX@/etc/apt/sources.list
-	else
-		echo "Using fallback mirror: $main_repo"
-		echo "deb $main_repo/ stable main" > @TERMUX_PREFIX@/etc/apt/sources.list
+		(
+			source "$selected_mirror"
+			echo "deb $MAIN stable main" > @TERMUX_PREFIX@/etc/apt/sources.list
+			if [ "$(has_repo x11)" == "true" ]; then
+				echo "deb $X11 x11 main" > @TERMUX_PREFIX@/etc/apt/sources.list.d/x11.list
+			fi
+			if [ "$(has_repo root)" == "true" ]; then
+				echo "deb $ROOT root stable" > @TERMUX_PREFIX@/etc/apt/sources.list.d/root.list
+			fi
+		)
 	fi
 }
 
@@ -271,6 +290,12 @@ update_apt_cache() {
 		apt update
 	fi
 }
+
+force_check_mirror=false
+if [ "${1-}" = "--check-mirror" ]; then
+    force_check_mirror=true
+    shift 1
+fi
 
 if [[ $# = 0 || $(echo "$1" | grep "^h") ]]; then
 	show_help
