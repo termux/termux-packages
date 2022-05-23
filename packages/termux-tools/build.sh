@@ -103,4 +103,7 @@ termux_step_make_install() {
 	## This script is sourced by $PREFIX/bin/login before executing shell.
 	##
 	EOF
+
+	mkdir -p $TERMUX_PREFIX/etc/termux
+	cp -r $TERMUX_PKG_BUILDER_DIR/mirrors $TERMUX_PREFIX/etc/termux/
 }
