@@ -158,6 +158,12 @@ select_repository() {
         ROOT="https://mirrors.njupt.edu.cn/termux/apt/termux-root"
         X11="https://mirrors.njupt.edu.cn/termux/apt/termux-x11"
 
+    elif [ "$1" == "Mirrors by NYIST"]; then
+        echo "[*] NYIST (CN) mirrors selected"
+	MAIN="https://mirror.nyist.edu.cn/termux/apt/termux-main"
+	ROOT="https://mirror.nyist.edu.cn/termux/apt/termux-root"
+	X11="https://mirror.nyist.edu.cn/termux/apt/termux-x11"
+
     else
         echo "[!] Error: unknown repository: '$1'. Exiting"
         exit 1
@@ -226,6 +232,7 @@ dialog \
     "Mirrors by SAU" "Hosted on mirrors.sau.edu.cn" off \
     "Mirrors by SusTech" "Hosted on mirrors.sustech.edu.cn" off \
     "Mirrors by NJUPT" "Hosted on mirrors.njupt.edu.cn" off \
+    "Mirrors by NYIST" "Hosted on mirror.nyist.edu.cn" off \
     2> "$TEMPFILE"
 
 retval=$?
