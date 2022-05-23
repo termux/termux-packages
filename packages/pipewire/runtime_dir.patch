@@ -1,0 +1,38 @@
+# Default to temporary folder for runtime_dir.
+
+--- module-protocol-native.c.orig	2022-05-25 11:10:34.812429150 +0530
++++ ./src/modules/module-protocol-native.c	2022-05-25 11:22:50.862428869 +0530
+@@ -660,5 +661,8 @@
+ 		runtime_dir = getenv("XDG_RUNTIME_DIR");
+ 	if (runtime_dir == NULL)
+ 		runtime_dir = getenv("USERPROFILE");
++	if (runtime_dir == NULL) {
++		runtime_dir = "@TERMUX_PREFIX@/tmp";
++	}
+ 	return runtime_dir;
+ }
+
+--- utils.c.orig	2022-05-25 11:10:14.722429157 +0530
++++ ./src/modules/module-protocol-pulse/utils.c	2022-05-25 11:21:28.562428900 +0530
+@@ -59,7 +59,10 @@
+ 	runtime_dir = getenv("PULSE_RUNTIME_PATH");
+ 	if (runtime_dir == NULL)
+ 		runtime_dir = getenv("XDG_RUNTIME_DIR");
++	if (runtime_dir == NULL) {
++		runtime_dir = "@TERMUX_PREFIX@/tmp";
++	}
+
+ 	if (runtime_dir == NULL) {
+ 		pw_log_error("could not find a suitable runtime directory in"
+
+--- local-socket.c.orig	2022-05-25 11:10:47.232429145 +0530
++++ ./src/modules/module-protocol-native/local-socket.c	2022-05-25 11:19:02.752428956 +0530
+@@ -70,5 +71,8 @@
+ 		runtime_dir = getenv("XDG_RUNTIME_DIR");
+ 	if (runtime_dir == NULL)
+ 		runtime_dir = getenv("USERPROFILE");
++	if (runtime_dir == NULL){
++		runtime_dir = "@TERMUX_PREFIX@/tmp";
++	}
+ 	return runtime_dir;
+ }
