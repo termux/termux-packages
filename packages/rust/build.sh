@@ -36,7 +36,9 @@ termux_step_configure() {
 
 	local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
 	export ${env_host}_OPENSSL_DIR=$TERMUX_PREFIX
-	export CARGO_TARGET_${env_host}_RUSTFLAGS="-C link-arg=-l:libgetloadavg.a"
+	export RUST_LIBDIR=$TERMUX_PKG_BUILDDIR/_lib
+	mkdir -p $RUST_LIBDIR
+	export CARGO_TARGET_${env_host}_RUSTFLAGS="-L$RUST_LIBDIR -C link-arg=-l:libgetloadavg.a"
 
 	if [ "$TERMUX_ARCH" == "x86_64" ]; then
 		export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C link-arg=$($CC -print-libgcc-file-name) -C link-arg=-l:libunwind.a"
@@ -48,29 +50,30 @@ termux_step_configure() {
 	# for backtrace-sys
 	export CC_x86_64_unknown_linux_gnu=gcc
 	export CFLAGS_x86_64_unknown_linux_gnu="-O2"
-	export LLVM_VERSION=$(. $TERMUX_SCRIPTDIR/packages/libllvm/build.sh; echo $TERMUX_PKG_VERSION)
 
+	export LLVM_VERSION=$(. $TERMUX_SCRIPTDIR/packages/libllvm/build.sh; echo $TERMUX_PKG_VERSION)
 	# we can't use -L$PREFIX/lib since it breaks things but we need to link against libLLVM-9.so
-	ln -sf $PREFIX/lib/libLLVM-${LLVM_VERSION/.*/}.so $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/
-	ln -sf $PREFIX/lib/libLLVM-$LLVM_VERSION.so $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/
+	ln -sf $PREFIX/lib/libLLVM-${LLVM_VERSION/.*/}.so $RUST_LIBDIR
+	ln -sf $PREFIX/lib/libLLVM-$LLVM_VERSION.so $RUST_LIBDIR
 
 	# rust tries to find static library 'c++_shared'
 	ln -sf $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/libc++_static.a \
-		$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libc++_shared.a
+		$RUST_LIBDIR/libc++_shared.a
 
 	# rust checks libs in PREFIX/lib. It then can't find libc.so and libdl.so because rust program doesn't
 	# know where those are. Putting them temporarly in $PREFIX/lib prevents that failure
 	mv $TERMUX_PREFIX/lib/libtinfo.so.6 $TERMUX_PREFIX/lib/libtinfo.so.6.tmp
 	mv $TERMUX_PREFIX/lib/libz.so.1 $TERMUX_PREFIX/lib/libz.so.1.tmp
 	mv $TERMUX_PREFIX/lib/libz.so $TERMUX_PREFIX/lib/libz.so.tmp
+
+	# ld: error: undefined symbol: getloadavg
+	# >>> referenced by rand.c
+	$CC $CPPFLAGS -c $TERMUX_PKG_BUILDER_DIR/getloadavg.c
+	$AR rcu $RUST_LIBDIR/libgetloadavg.a getloadavg.o
 }
 
 termux_step_make() {
-	# ld: error: undefined symbol: getloadavg
-	# >>> referenced by rand.c
-        $CC $CPPFLAGS -c "$TERMUX_PKG_BUILDER_DIR"/getloadavg.c
-        $AR rcu $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libgetloadavg.a \
-                getloadavg.o
+	:
 }
 
 termux_step_make_install() {
@@ -105,11 +108,6 @@ termux_step_make_install() {
 		rust-installer-version \
 		manifest-* \
 		x86_64-unknown-linux-gnu
-
-	rm -f $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libLLVM-${LLVM_VERSION/.*/}.so \
-		$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libLLVM-$LLVM_VERSION.so \
-		$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libc++_shared.a \
-		$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libgetloadavg.a
 }
 
 termux_step_post_massage() {
