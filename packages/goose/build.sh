@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION=3.5.3
 TERMUX_PKG_SRCURL="https://github.com/pressly/goose/archive/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=9a5f9dc2b3b5f0876ad1e4609e1d1812e2b9ff03ea04e00c69ca05e7d9584601
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_pre_configure() {
 	termux_setup_golang
