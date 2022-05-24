@@ -6,13 +6,18 @@ on:
 jobs:
   node-runtime-builder:
     runs-on: ubuntu-latest
-    container:
-      image: dockitava/package-builder:latest
-      # this is need because... bugs?
-      options: --user root
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
+      - name: Run the build process with Docker
+        uses: addnab/docker-run-action@v3
+        with:
+          image: dockitava/package-builder:latest
+          options: -v ${{ github.workspace }}:/home/builder/
+          run: |
+            composer install
+            npm install
+            npm run production
       - name: Debug
         run: |
           mkdir -p /home/builder/
