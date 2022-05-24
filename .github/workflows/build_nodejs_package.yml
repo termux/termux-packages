@@ -16,14 +16,16 @@ jobs:
           image: dockitava/package-builder:latest
           options: -v ${{ github.workspace }}:/home/builder/termux-packages
           run: |
+            id -u
+            sudo chown -R $(id -u) /home/builder
+            sudo chown -R $(id -u) /data
+            sudo usermod -u $(id -u) builder
+            sudo groupmod -g $(id -g) builder
             ls -al /home/
             ls -al /home/builder
             cd /home/builder/termux-packages
-            pwd
-            hostname
             ls -al
-            scripts/setup-android-sdk.sh
-            sudo ./build-package.sh bc
+            ./build-package.sh bc
 
       - name: Unpack Node.js & rename
         run: |
