@@ -9,30 +9,18 @@ jobs:
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
-      - name: Run the build process with Docker
+
+      - name: Build Node.js
         uses: addnab/docker-run-action@v3
         with:
           image: dockitava/package-builder:latest
           options: -v ${{ github.workspace }}:/home/builder/
           run: |
-            composer install
-            npm install
-            npm run production
-      - name: Debug
-        run: |
-          mkdir -p /home/builder/
-          cd /home/builder/
-          ls -al /home/builder/termux-packages | true
-          rm -rf /home/builder/termux-packages
-          sudo ln -s /__w/termux-packages/termux-packages | true
-      - name: Build package
-        run: |
-          # openssl nodejs
-          cd /home/builder/termux-packages
-          pwd
-          hostname
-          ls -al
-          ./build-package.sh bc
+            cd /home/builder/termux-packages
+            pwd
+            hostname
+            ls -al
+            ./build-package.sh bc
 
       - name: Unpack Node.js & rename
         run: |
