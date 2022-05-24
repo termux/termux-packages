@@ -8,8 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: dockitava/package-builder:latest
-      volumes:
-        - /datafromdocker:/data
+    #      volumes:
+    #        - /datafromdocker:/data
     steps:
       - name: Debug
         run: |
@@ -17,6 +17,9 @@ jobs:
           whoami
           hostname
           ls -al /
+          ls -al /home/
+          ls -al /home/builder/
+          ls -al /home/builder/termux-packages/
       - name: Build package
         run: |
           # openssl nodejs
