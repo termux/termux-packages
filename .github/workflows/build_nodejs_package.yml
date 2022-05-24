@@ -1,7 +1,9 @@
 name: Build Node.js package
 
 on:
-  workflow_dispatch:
+  push:
+    tags:
+      - "*"
 
 jobs:
   node-runtime-builder:
@@ -27,9 +29,10 @@ jobs:
             mkdir -p /home/builder/termux-packages/_out/node
             mkdir -p /home/builder/termux-packages/_out/libs
 
-            echo "# Build packages"
+            echo "# Build packages - this takes a loooong time!"
             cd /home/builder/termux-packages
-            ./build-package.sh openssl nodejs
+            # quite build
+            ./build-package.sh -q openssl nodejs
 
             echo "# Unpack Node.js & rename"
             cd /home/builder/termux-packages/_out
@@ -54,4 +57,6 @@ jobs:
       - name: Create Github Release
         uses: softprops/action-gh-release@v1
         with:
-          files: /home/builder/termux-packages/_out/node/libnodeexe.so
+          files: |
+            ./_out/node/libnodeexe.so
+            ./_out/libs/libs.zip
