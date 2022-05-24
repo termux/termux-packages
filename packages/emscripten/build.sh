@@ -165,6 +165,7 @@ termux_step_host_build() {
 	cmake \
 		-G Ninja \
 		-S "$TERMUX_PKG_CACHEDIR/llvm-project-$LLVM_COMMIT/llvm" \
+		-DCMAKE_BUILD_TYPE=Release \
 		-DLLVM_ENABLE_PROJECTS=clang
 	cmake \
 		--build "$TERMUX_PKG_HOSTBUILD_DIR" \
