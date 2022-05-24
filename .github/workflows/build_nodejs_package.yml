@@ -8,18 +8,15 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: dockitava/package-builder:latest
-      volumes:
-        - $RUNNER_WORKSPACE:/home/builder/termux-packages
+      #volumes:
+      #  - $RUNNER_WORKSPACE:/home/builder/termux-packages
     steps:
       - name: Debug
         run: |
           echo Hello
           whoami
           hostname
-          ls -al /
-          ls -al /home/
-          ls -al /home/builder/
-          ls -al /home/builder/termux-packages/
+          ls -al /github/home
       - name: Build package
         run: |
           # openssl nodejs
