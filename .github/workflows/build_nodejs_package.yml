@@ -4,25 +4,12 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Debug
-        run: |
-          echo Hello
-          env
-          ls -al /
-          echo ---1
-          ls -al $RUNNER_WORKSPACE
-          echo ---2
-          ls -al $GITHUB_WORKSPACE
-
   node-runtime-builder:
     runs-on: ubuntu-latest
     container:
       image: dockitava/package-builder:latest
       volumes:
-        - ${{ env.RUNNER_WORKSPACE }}:/github/workspace
+        - $RUNNER_WORKSPACE:/home/builder/termux-packages
     steps:
       - name: Debug
         run: |
