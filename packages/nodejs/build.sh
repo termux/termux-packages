@@ -8,7 +8,7 @@ TERMUX_PKG_SHA256=2305b15ebf5547474e905b5002f9ba99c7eeef01d7394dfe6f3846cc6bcad6
 # Note that we do not use a shared libuv to avoid an issue with the Android
 # linker, which does not use symbols of linked shared libraries when resolving
 # symbols on dlopen(). See https://github.com/termux/termux-packages/issues/462.
-TERMUX_PKG_DEPENDS="libc++, openssl, c-ares, libicu, zlib"
+TERMUX_PKG_DEPENDS="libc++, openssl, c-ares, zlib"
 TERMUX_PKG_CONFLICTS="nodejs-lts, nodejs-current"
 TERMUX_PKG_BREAKS="nodejs-dev"
 TERMUX_PKG_REPLACES="nodejs-current, nodejs-dev"
@@ -70,11 +70,17 @@ termux_step_configure() {
 		--prefix=$TERMUX_PREFIX \
 		--dest-cpu=$DEST_CPU \
 		--dest-os=android \
-		--shared-cares \
+    --tag=AVA1 \
+    --enable-static \
+    --partly-static \
 		--shared-openssl \
-		--shared-zlib \
-		--with-intl=system-icu \
+    --without-intl \
+    --without-npm \
+    --without-etw \
+    --without-corepack \
 		--cross-compiling
+
+# no intl support, check out https://github.com/nodejs/node/issues/2300 // https://nodejs.org/api/intl.html#intl_options_for_building_node_j
 
 	export LD_LIBRARY_PATH=$TERMUX_PKG_HOSTBUILD_DIR/icu-installed/lib
 	perl -p -i -e "s@LIBS := \\$\\(LIBS\\)@LIBS := -L$TERMUX_PKG_HOSTBUILD_DIR/icu-installed/lib -lpthread -licui18n -licuuc -licudata -ldl -lz@" \
