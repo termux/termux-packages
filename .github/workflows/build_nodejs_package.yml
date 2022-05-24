@@ -9,7 +9,7 @@ jobs:
     container:
       image: dockitava/package-builder:latest
       #volumes:
-      #  - $RUNNER_WORKSPACE:/home/builder/termux-packages
+      #  - $RUNNER_WORKSPACE:/__w/termux-packages
     steps:
       - name: Debug
         run: |
@@ -17,11 +17,10 @@ jobs:
           whoami
           hostname
           ls -al /__w/termux-packages/
-          exit 1
       - name: Build package
         run: |
           # openssl nodejs
-          cd /home/builder/termux-packages
+          cd /__w/termux-packages
           pwd
           hostname
           ls -al
@@ -29,9 +28,9 @@ jobs:
 
       - name: Unpack Node.js & rename
         run: |
-          mkdir -p /home/builder/termux-packages/_out/node
-          cd /home/builder/termux-packages/_out
-          cp -f /home/builder/termux-packages/output/bc* ./
+          mkdir -p /__w/termux-packages/_out/node
+          cd /__w/termux-packages/_out
+          cp -f /__w/termux-packages/output/bc* ./
           # TODO rename to node
           ar x ./bc_1.07.1-1_aarch64.deb data.tar.xz
           unxz -v data.tar.xz
@@ -43,15 +42,15 @@ jobs:
 
       - name: Copy Node.js runtime deps
         run: |
-          mkdir -p /home/builder/termux-packages/_out/libs
-          cd /home/builder/termux-packages/_out
+          mkdir -p /__w/termux-packages/_out/libs
+          cd /__w/termux-packages/_out
           cp -rf /data/data/com.termux/files/usr/lib/libssl* ./libs
           cp -rf /data/data/com.termux/files/usr/lib/libcrypt* ./libs
           rm -f ./libs/*.a
           cp -f /data/data/com.termux/files/usr/lib/libc++_shared.so ./libs
           echo == NODELIBSOUT
           ls -al ./libs
-          cd /home/builder/termux-packages/_out/libs
+          cd /__w/termux-packages/_out/libs
           zip -9 libs *
           ls -al
 
