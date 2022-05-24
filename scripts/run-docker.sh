@@ -12,7 +12,7 @@ else
 	SEC_OPT=" --security-opt seccomp=$REPOROOT/scripts/profile.json"
 fi
 
-: ${TERMUX_BUILDER_IMAGE_NAME:=termux/package-builder}
+: ${TERMUX_BUILDER_IMAGE_NAME:=dockitava/package-builder}
 : ${CONTAINER_NAME:=termux-package-builder}
 
 USER=builder

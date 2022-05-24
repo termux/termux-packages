@@ -8,8 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: dockitava/package-builder:latest
-    #      volumes:
-    #        - /datafromdocker:/data
+        volumes:
+        - ./:/home/builder/termux-packages
     steps:
       - name: Debug
         run: |
@@ -31,8 +31,8 @@ jobs:
 
       - name: Unpack Node.js & rename
         run: |
-          mkdir -p /home/builder/termux-packages/out/node
-          cd /home/builder/termux-packages/out
+          mkdir -p /home/builder/termux-packages/_out/node
+          cd /home/builder/termux-packages/_out
           cp -f /home/builder/termux-packages/output/bc* ./
           # TODO rename to node
           ar x ./bc_1.07.1-1_aarch64.deb data.tar.xz
@@ -45,19 +45,19 @@ jobs:
 
       - name: Copy Node.js runtime deps
         run: |
-          mkdir -p /home/builder/termux-packages/out/libs
-          cd /home/builder/termux-packages/out
+          mkdir -p /home/builder/termux-packages/_out/libs
+          cd /home/builder/termux-packages/_out
           cp -rf /data/data/com.termux/files/usr/lib/libssl* ./libs
           cp -rf /data/data/com.termux/files/usr/lib/libcrypt* ./libs
           rm -f ./libs/*.a
           cp -f /data/data/com.termux/files/usr/lib/libc++_shared.so ./libs
           echo == NODELIBSOUT
           ls -al ./libs
-          cd /home/builder/termux-packages/out/libs
+          cd /home/builder/termux-packages/_out/libs
           zip -9 libs *
           ls -al
 
       - name: Create Github Release
         uses: softprops/action-gh-release@v1
         with:
-          files: home/builder/termux-packages/out/node/libnodeexe.so
+          files: home/builder/termux-packages/_out/node/libnodeexe.so
