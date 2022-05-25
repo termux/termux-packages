@@ -272,69 +272,47 @@ update_apt_cache() {
 	fi
 }
 
-if [ $# = 0 ]; then
+if [[ $# = 0 || $(echo "$1" | grep "^h") ]]; then
 	show_help
 fi
 
 CMD="$1"
 shift 1
+ERROR=false
 
-case "$CMD" in
-	f*)
-		case "$TERMUX_APP_PACKAGE_MANAGER" in
-			apt) dpkg -L "$@";;
-			pacman) pacman -Ql "$@";;
+case "$TERMUX_APP_PACKAGE_MANAGER" in
+	apt)
+		case "$CMD" in
+			f*) dpkg -L "$@";;
+			sh*|inf*) apt show "$@";;
+			add|i*) select_mirror; update_apt_cache; apt install "$@";;
+			autoc*) apt autoclean;;
+			cl*) apt clean;;
+			list-a*) apt list "$@";;
+			list-i*) apt list --installed "$@";;
+			rei*) apt install --reinstall "$@";;
+			se*) select_mirror; update_apt_cache; apt search "$@";;
+			un*|rem*|rm|del*) apt remove "$@";;
+			up*) select_mirror; apt update; apt full-upgrade "$@";;
+			*) ERROR=true;;
 		esac;;
-	h*) show_help;;
-	sh*|inf*)
-		case "$TERMUX_APP_PACKAGE_MANAGER" in
-			apt) apt show "$@";;
-			pacman) pacman -Qi "$@";;
+	pacman)
+		case "$CMD" in
+			f*) pacman -Ql "$@";;
+			sh*|inf*) pacman -Qi "$@";;
+			add|i*) pacman -Sy --needed "$@";;
+			autoc*) pacman -Sc;;
+			cl*) pacman -Scc;;
+			list-a*) pacman -Sl "$@";;
+			list-i*) pacman -Q "$@";;
+			rei*) pacman -S "$@";;
+			se*) pacman -Sys "$@";;
+			un*|rem*|rm|del*) pacman -Rcns "$@";;
+			up*) pacman -Syu "$@";;
+			*) ERROR=true;;
 		esac;;
-	add|i*)
-		case "$TERMUX_APP_PACKAGE_MANAGER" in
-			apt) select_mirror; update_apt_cache; apt install "$@";;
-			pacman) pacman -Sy --needed "$@";;
-		esac;;
-	autoc*)
-		case "$TERMUX_APP_PACKAGE_MANAGER" in
-			apt) apt autoclean;;
-			pacman) pacman -Sc;;
-		esac;;
-	cl*)
-		case "$TERMUX_APP_PACKAGE_MANAGER" in
-			apt) apt clean;;
-			pacman) pacman -Scc;;
-		esac;;
-	list-a*)
-		case "$TERMUX_APP_PACKAGE_MANAGER" in
-			apt) apt list "$@";;
-			pacman) pacman -Sl "$@";;
-		esac;;
-	list-i*)
-		case "$TERMUX_APP_PACKAGE_MANAGER" in
-			apt) apt list --installed "$@";;
-			pacman) pacman -Q "$@";;
-		esac;;
-	rei*)
-		case "$TERMUX_APP_PACKAGE_MANAGER" in
-			apt) apt install --reinstall "$@";;
-			pacman) pacman -S "$@";;
-		esac;;
-	se*)
-		case "$TERMUX_APP_PACKAGE_MANAGER" in
-			apt) select_mirror; update_apt_cache; apt search "$@";;
-			pacman) pacman -Sys "$@";;
-		esac;;
-	un*|rem*|rm|del*)
-		case "$TERMUX_APP_PACKAGE_MANAGER" in
-			apt) apt remove "$@";;
-			pacman) pacman -Rcns "$@";;
-		esac;;
-	up*)
-		case "$TERMUX_APP_PACKAGE_MANAGER" in
-			apt) select_mirror; apt update; apt full-upgrade "$@";;
-			pacman) pacman -Syu "$@";;
-		esac;;
-	*) echo "Unknown command: '$CMD' (run 'pkg help' for usage information)"; exit 1;;
 esac
+
+if $ERROR; then
+	echo "Unknown command: '$CMD' (run 'pkg help' for usage information)"; exit 1
+fi
