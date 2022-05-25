@@ -53,6 +53,10 @@ jobs:
             cd /home/builder/termux-packages/_out/libs
             zip -9 libs *
             ls -al
+      - name: Post build
+        run: |
+          ls -al
+          sudo chown -R $(id -u) ./_out
 
       - name: Create Github Release
         uses: softprops/action-gh-release@v1
