@@ -131,8 +131,6 @@ termux_step_post_get_source() {
 		for patch in $llvm_patches; do
 			patch -p1 -i "$patch" || true
 		done
-		# https://github.com/llvm/llvm-project/commit/f6b7fd20a52ef83d0462db190eb40800afda2506
-		rm -fv lldb/source/Symbol/LocateSymbolFileMacOSX.cpp.rej
 		llvm_patches_rej="$(find . -type f -name '*.rej')"
 		if [ -n "$llvm_patches_rej" ]; then
 			for rej in $llvm_patches_rej; do
