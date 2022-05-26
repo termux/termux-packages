@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="wxWindows"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 _MAJOR_VERSION=15
 _MINOR_VERSION=1
-_MICRO_VERSION=12
+_MICRO_VERSION=24
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.${_MINOR_VERSION}.${_MICRO_VERSION}
 TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
 TERMUX_PKG_SRCURL=https://github.com/frida/frida.git
@@ -25,14 +25,6 @@ termux_step_pre_configure () {
 		$TERMUX_PKG_BUILDER_DIR/frida-python-version.diff | patch -Np1
 }
 
-termux_step_post_configure () {
-	# frida-version.h is normally generated from git and the commits.
-	sed -i "s/@TERMUX_PKG_VERSION@/$TERMUX_PKG_VERSION/g" ${TERMUX_PKG_SRCDIR}/build/frida-version.h
-	sed -i "s/@_MAJOR_VERSION@/$_MAJOR_VERSION/g" ${TERMUX_PKG_SRCDIR}/build/frida-version.h
-	sed -i "s/@_MINOR_VERSION@/$_MINOR_VERSION/g" ${TERMUX_PKG_SRCDIR}/build/frida-version.h
-	sed -i "s/@_MICRO_VERSION@/$_MICRO_VERSION/g" ${TERMUX_PKG_SRCDIR}/build/frida-version.h
-}
-
 termux_step_make () {
 	if [[ ${TERMUX_ARCH} == "aarch64" ]]; then
 		arch=arm64
@@ -41,10 +33,9 @@ termux_step_make () {
 	else
 		arch=${TERMUX_ARCH}
 	fi
-	CC=gcc CXX=g++ PATH=${TERMUX_PKG_HOSTBUILD_DIR}/bin:$PATH \
-		make python-android-${arch} ${TERMUX_PKG_EXTRA_MAKE_ARGS}
-	CC=gcc CXX=g++ PATH=${TERMUX_PKG_HOSTBUILD_DIR}/bin:$PATH \
-		make tools-android-${arch} ${TERMUX_PKG_EXTRA_MAKE_ARGS}
+
+	CC=gcc CXX=g++ make python-android-${arch} ${TERMUX_PKG_EXTRA_MAKE_ARGS}
+	CC=gcc CXX=g++ make tools-android-${arch} ${TERMUX_PKG_EXTRA_MAKE_ARGS}
 }
 
 termux_step_make_install () {
@@ -73,7 +64,7 @@ termux_step_post_make_install () {
 	} > $TERMUX_PREFIX/var/service/frida-server/run
 
 	# Unfortunately, running sv down frida-server just kills the "su" process but leaves frida-server
-        # running (even though it is running in the foreground). This finish script works around that.
+	# running (even though it is running in the foreground). This finish script works around that.
 	{
 		echo "#!$TERMUX_PREFIX/bin/sh"
 		echo "su -c pkill -9 frida-server"

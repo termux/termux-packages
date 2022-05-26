@@ -1,6 +1,15 @@
---- ../frida-python-src-_frida.c.orig	2020-03-25 09:09:39.556304220 +0100
-+++ ./frida-python/src/_frida.c	2020-03-25 09:27:46.744314351 +0100
-@@ -1879,6 +1879,9 @@
+--- ./frida-python/src/_frida.c.orig	2022-03-13 17:50:17.883223968 +0100
++++ ./frida-python/src/_frida.c	2022-03-13 17:51:27.582892972 +0100
+@@ -45,6 +45,8 @@
+ # include <crt_externs.h>
+ #endif
+ 
++#include <frida-selinux.h>
++
+ #define PyUnicode_FromUTF8String(str) PyUnicode_DecodeUTF8 (str, strlen (str), "strict")
+ #if PY_MAJOR_VERSION >= 3
+ # define MOD_INIT(name) PyMODINIT_FUNC PyInit_##name (void)
+@@ -2412,6 +2414,9 @@
  static int
  PyDeviceManager_init (PyDeviceManager * self, PyObject * args, PyObject * kw)
  {
