@@ -1,5 +1,5 @@
 diff --git a/vendor/core/fastboot/usb_linux.cpp b/vendor/core/fastboot/usb_linux.cpp
-index 964488c..7b980b1 100644
+index 964488c..67089f8 100644
 --- a/vendor/core/fastboot/usb_linux.cpp
 +++ b/vendor/core/fastboot/usb_linux.cpp
 @@ -48,6 +48,9 @@
@@ -122,14 +122,19 @@ index 964488c..7b980b1 100644
      }
  
      for(i = 0; i < cfg->bNumInterfaces; i++) {
-@@ -265,12 +323,20 @@ static int filter_usb_device(char* sysfs_name,
+@@ -265,12 +323,25 @@ static int filter_usb_device(char* sysfs_name,
          info.has_bulk_in = (in != -1);
          info.has_bulk_out = (out != -1);
  
 +#ifdef __ANDROID__
-+        if (is_termux_usb)
-+            snprintf(info.interface, sizeof(info.interface), "fastboot\n");
-+        else {
++        if (is_termux_usb) {
++            if (ifc->iInterface) {
++                unsigned char interface_name[256];
++                libusb_get_string_descriptor_ascii(libusb_handle, ifc->iInterface,
++                                                   interface_name, sizeof(interface_name));
++                snprintf(info.interface, sizeof(interface_name), "%s\n", interface_name);
++            }
++        } else {
 +#endif
          std::string interface;
          auto path = android::base::StringPrintf("/sys/bus/usb/devices/%s/%s:1.%d/interface",
@@ -143,7 +148,7 @@ index 964488c..7b980b1 100644
  
          if(callback(&info) == 0) {
              *ept_in_id = in;
-@@ -353,16 +419,51 @@ static std::unique_ptr<usb_handle> find_usb_device(const char* base, ifc_match_f
+@@ -353,16 +424,51 @@ static std::unique_ptr<usb_handle> find_usb_device(const char* base, ifc_match_f
      int fd;
      int writable;
  
@@ -195,7 +200,7 @@ index 964488c..7b980b1 100644
              if ((fd = open(devname, O_RDWR)) < 0) {
                  // Check if we have read-only access, so we can give a helpful
                  // diagnostic like "adb devices" does.
-@@ -371,12 +472,25 @@ static std::unique_ptr<usb_handle> find_usb_device(const char* base, ifc_match_f
+@@ -371,12 +477,25 @@ static std::unique_ptr<usb_handle> find_usb_device(const char* base, ifc_match_f
                      continue;
                  }
              }
@@ -221,7 +226,7 @@ index 964488c..7b980b1 100644
                  usb->ep_in = in;
                  usb->ep_out = out;
                  usb->desc = fd;
-@@ -516,6 +630,11 @@ int LinuxUsbTransport::WaitForDisconnect()
+@@ -516,6 +635,11 @@ int LinuxUsbTransport::WaitForDisconnect()
  {
    double deadline = now() + WAIT_FOR_DISCONNECT_TIMEOUT;
    while (now() < deadline) {
