@@ -1,23 +1,23 @@
 diff --git a/vendor/core/fastboot/usb_linux.cpp b/vendor/core/fastboot/usb_linux.cpp
-index 964488c..7fd6ccb 100644
+index 964488c..7f2f77f 100644
 --- a/vendor/core/fastboot/usb_linux.cpp
 +++ b/vendor/core/fastboot/usb_linux.cpp
-@@ -42,6 +42,9 @@
- #include <linux/usbdevice_fs.h>
- #include <linux/version.h>
- #include <linux/usb/ch9.h>
+@@ -48,6 +48,9 @@
+ #include <chrono>
+ #include <memory>
+ #include <thread>
 +#ifdef __ANDROID__
 +#include <libusb-1.0/libusb.h>
 +#endif
  
- #include <android-base/file.h>
- #include <android-base/stringprintf.h>
+ #include "usb.h"
+ #include "util.h"
 @@ -88,11 +91,29 @@ using namespace std::chrono_literals;
  struct usb_handle
  {
      char fname[64];
 +#ifdef __ANDROID__
-+    bool termux_usb;
++    bool is_termux_usb;
 +#endif
      int desc;
      unsigned char ep_in;
@@ -25,39 +25,70 @@ index 964488c..7fd6ccb 100644
  };
  
 +#ifdef __ANDROID__
-+struct usb_context {
++struct context {
 +    libusb_context *libusb_ctx;
 +
-+    usb_context() {
++    context() {
 +        libusb_set_option(NULL, LIBUSB_OPTION_WEAK_AUTHORITY);
 +        libusb_init(&libusb_ctx);
 +    }
 +
-+    ~usb_context() {
++    ~context() {
 +        libusb_exit(libusb_ctx);
 +    }
-+} usb_ctx;
++} ctx;
 +#endif
 +
  class LinuxUsbTransport : public UsbTransport {
    public:
      explicit LinuxUsbTransport(std::unique_ptr<usb_handle> handle, uint32_t ms_timeout = 0)
-@@ -141,6 +162,9 @@ static int check(void *_desc, int len, unsigned type, int size)
+@@ -140,7 +161,18 @@ static int check(void *_desc, int len, unsigned type, int size)
+     return 0;
  }
  
++#ifdef __ANDROID__
++bool ref_deleted(int fd) {
++    struct stat fd_stat;
++    fstat(fd, &fd_stat);
++    return fd_stat.st_nlink < 1;
++}
++#endif
++
  static int filter_usb_device(char* sysfs_name,
 +#ifdef __ANDROID__
-+                             bool termux_usb, int termux_usb_fd,
++                             bool is_termux_usb, int termux_usb_fd,
 +#endif
                               char *ptr, int len, int writable,
                               ifc_match_func callback,
                               int *ept_in_id, int *ept_out_id, int *ifc_id)
-@@ -174,6 +198,12 @@ static int filter_usb_device(char* sysfs_name,
+@@ -149,6 +181,9 @@ static int filter_usb_device(char* sysfs_name,
+     struct usb_config_descriptor *cfg;
+     struct usb_interface_descriptor *ifc;
+     struct usb_endpoint_descriptor *ept;
++#ifdef __ANDROID__
++    libusb_device_handle *libusb_handle;
++#endif
+     struct usb_ifc_info info;
+ 
+     int in, out;
+@@ -167,6 +202,11 @@ static int filter_usb_device(char* sysfs_name,
+     len -= cfg->bLength;
+     ptr += cfg->bLength;
+ 
++#ifdef __ANDROID__
++    if (is_termux_usb)
++        libusb_wrap_sys_device(ctx.libusb_ctx, termux_usb_fd, &libusb_handle);
++#endif
++
+     info.dev_vendor = dev->idVendor;
+     info.dev_product = dev->idProduct;
+     info.dev_class = dev->bDeviceClass;
+@@ -174,6 +214,12 @@ static int filter_usb_device(char* sysfs_name,
      info.dev_protocol = dev->bDeviceProtocol;
      info.writable = writable;
  
 +#ifdef __ANDROID__
-+    if (termux_usb)
++    if (is_termux_usb)
 +        snprintf(info.device_path, sizeof(info.device_path),
 +                 "fd:%d", termux_usb_fd);
 +    else
@@ -65,16 +96,14 @@ index 964488c..7fd6ccb 100644
      snprintf(info.device_path, sizeof(info.device_path), "usb:%s", sysfs_name);
  
      /* Read device serial number (if there is one).
-@@ -184,6 +214,17 @@ static int filter_usb_device(char* sysfs_name,
+@@ -184,6 +230,15 @@ static int filter_usb_device(char* sysfs_name,
       */
      info.serial_number[0] = '\0';
      if (dev->iSerialNumber) {
 +#ifdef __ANDROID__
-+        if (termux_usb) {
-+            libusb_device_handle *handle;
++        if (is_termux_usb) {
 +            unsigned char serial_num[256];
-+            libusb_wrap_sys_device(usb_ctx.libusb_ctx, termux_usb_fd, &handle);
-+            libusb_get_string_descriptor_ascii(handle, dev->iSerialNumber,
++            libusb_get_string_descriptor_ascii(libusb_handle, dev->iSerialNumber,
 +                                               serial_num, sizeof(serial_num));
 +            snprintf(info.serial_number, sizeof(info.serial_number),
 +                     "%s", serial_num);
@@ -83,7 +112,7 @@ index 964488c..7fd6ccb 100644
          char path[80];
          int fd;
  
-@@ -204,6 +245,9 @@ static int filter_usb_device(char* sysfs_name,
+@@ -204,6 +259,9 @@ static int filter_usb_device(char* sysfs_name,
                  info.serial_number[chars_read - 1] = '\0';
              }
          }
@@ -93,12 +122,12 @@ index 964488c..7fd6ccb 100644
      }
  
      for(i = 0; i < cfg->bNumInterfaces; i++) {
-@@ -265,12 +309,20 @@ static int filter_usb_device(char* sysfs_name,
+@@ -265,12 +323,20 @@ static int filter_usb_device(char* sysfs_name,
          info.has_bulk_in = (in != -1);
          info.has_bulk_out = (out != -1);
  
 +#ifdef __ANDROID__
-+        if (termux_usb)
++        if (is_termux_usb)
 +            snprintf(info.interface, sizeof(info.interface), "fastboot\n");
 +        else {
 +#endif
@@ -114,7 +143,7 @@ index 964488c..7fd6ccb 100644
  
          if(callback(&info) == 0) {
              *ept_in_id = in;
-@@ -353,16 +405,51 @@ static std::unique_ptr<usb_handle> find_usb_device(const char* base, ifc_match_f
+@@ -353,16 +419,51 @@ static std::unique_ptr<usb_handle> find_usb_device(const char* base, ifc_match_f
      int fd;
      int writable;
  
@@ -166,7 +195,7 @@ index 964488c..7fd6ccb 100644
              if ((fd = open(devname, O_RDWR)) < 0) {
                  // Check if we have read-only access, so we can give a helpful
                  // diagnostic like "adb devices" does.
-@@ -371,12 +458,25 @@ static std::unique_ptr<usb_handle> find_usb_device(const char* base, ifc_match_f
+@@ -371,12 +472,25 @@ static std::unique_ptr<usb_handle> find_usb_device(const char* base, ifc_match_f
                      continue;
                  }
              }
@@ -185,26 +214,20 @@ index 964488c..7fd6ccb 100644
                  usb.reset(new usb_handle());
 +#ifdef __ANDROID__
 +                if (is_termux_usb)
-+                    usb->termux_usb = true;
++                    usb->is_termux_usb = true;
 +#else
                  strcpy(usb->fname, devname);
 +#endif
                  usb->ep_in = in;
                  usb->ep_out = out;
                  usb->desc = fd;
-@@ -516,7 +616,19 @@ int LinuxUsbTransport::WaitForDisconnect()
+@@ -516,7 +630,13 @@ int LinuxUsbTransport::WaitForDisconnect()
  {
    double deadline = now() + WAIT_FOR_DISCONNECT_TIMEOUT;
    while (now() < deadline) {
 +#ifdef __ANDROID__
-+    bool ref_deleted = false;
-+    if (handle_->termux_usb) {
-+      struct stat fd_stat;
-+      fstat(handle_->desc, &fd_stat);
-+      if (fd_stat.st_nlink < 1)
-+        ref_deleted = true;
-+    }
-+    if (ref_deleted || access(handle_->fname, F_OK))
++    if (handle_->is_termux_usb && ref_deleted(handle_->desc) ||
++                access(handle_->fname, F_OK))
 +        return 0;
 +#else
      if (access(handle_->fname, F_OK)) return 0;
