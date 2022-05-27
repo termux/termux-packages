@@ -1,0 +1,147 @@
+#!/usr/bin/env sh
+
+# MIT License
+# Copyright (c) 2022 Pooya Moradi
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+# Author: Pooya Moradi
+# Date: 2022-03-16
+# Description: A wrapper over termux-notification of Termux with aim of
+#              compatibility with freedesktop notify-send
+# Dependencies: termux-notification (from 'termux-api' package)
+# TODO handle arbitrary ordering just like notify-send
+
+show_help() {
+    h_summary=$(printf "Usage:\n  notify-send [OPTION?] [SUMMARY] [BODY]\
+- create a notification")
+
+    h_msg=$(
+        cat << 'END_HEREDOC'
+Help Options:
+  -?, -h, --help                    Show help options
+
+Application Options:
+  -i, --icon=ICON[,ICON...]         Specifies an icon filename (absolute path)
+  -c, --category=TYPE[,TYPE...]     Specifies the notification category.
+  -v, -V, --version                 Version of the package.
+
+NOTES
+  - deviations from Freedesktop's notify-send:
+      - notify-send '-h' option shows help instead of specification of 'hint'.
+      - notify-send '-V' option prints version (alongside -v and --version)
+      - all options must come before summary and body.
+
+EXAMPLES
+    notify-send -i "/path/to/image" "my title" "my body text"
+END_HEREDOC
+    )
+    printf >&1 "%s\n%s\n" "$h_summary" "$h_msg"
+    exit 0
+
+}
+
+die() {
+    printf '%s\n' "$1" >&2
+    exit 1
+}
+
+VERSION="0.1"
+icon_path=
+category=
+
+while :; do
+    case "$1" in
+        --help | -\? | -h)
+            show_help
+            exit 0
+            ;;
+        -i | --icon)
+            if [ "$2" ]; then
+                icon_path=$2
+                shift
+            else
+                die 'ERROR: "-i/--icon" requires a non-empty option argument.'
+            fi
+            ;;
+        --icon=?*)
+            icon_path=${1#*=}
+            ;;
+        --icon=)
+            die 'ERROR: "--icon" requires a non-empty option argument.'
+            ;;
+        -c | --category)
+            if [ "$2" ]; then
+                category=$2
+                shift
+            else
+                die 'ERROR: "-c/--category" requires a non-empty option argument.'
+            fi
+            ;;
+        --category=?*)
+            category=${1#*=}
+            ;;
+        --category=)
+            die 'ERROR: "--category" requires a non-empty option argument.'
+            ;;
+        -u | --urgency | -t | --expire-time | --hint)
+            if [ "$2" ]; then
+                printf >&2 "[WARNING] ignoring %s %s option.\n" "$1" "$2"
+                shift
+            else
+                die "ERROR: $1 requires a non-empty option argument."
+            fi
+            ;;
+        --urgency=?* | --expire-time=?* | --hint=?*)
+            printf >&2 "[WARNING] ignoring %s option.\n" "$1"
+            ;;
+        --urgency= | --expire-time= | --hint=)
+            die "ERROR: $1 requires a non-empty option argument."
+            ;;
+        -v | -V | --version)
+            printf "notify-send %s\n" "$VERSION"
+            exit 0
+            ;;
+        --)
+            shift
+            break
+            ;;
+        -?*)
+            printf 'WARNING: Unknown option (ignored): %s\n' "$1" >&2
+            ;;
+        *)
+            break
+            ;;
+    esac
+    shift
+done
+shift $((OPTIND - 1))
+
+if ! command -v "termux-notification" > /dev/null 2>&1; then
+    die "ERROR: dependency 'termux-notification' not found in \$PATH. \
+Execute 'pkg install termux-api' to install it."
+fi
+
+summary="$1"
+body="$2"
+
+[ -z "$summary" ] && summary='""'
+[ -z "$body" ] && body='""'
+[ -z "$category" ] && category='""'
+[ -z "$icon_path" ] && icon_path='""'
+termux-notification --title "$summary" --content "$body" \
+    --group "$category" --image-path "$icon_path"
