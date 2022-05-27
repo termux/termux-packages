@@ -1,0 +1,58 @@
+TERMUX_PKG_HOMEPAGE=https://alist-doc.nn.ci
+TERMUX_PKG_DESCRIPTION="A file list program that supports multiple storage."
+TERMUX_PKG_LICENSE="AGPL-V3"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=2.5.2
+TERMUX_PKG_SRCURL=https://github.com/Xhofe/alist/archive/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=2f62ede85e9cabb3a338e2274301ab0389a2e9d986b32247ef9d8b48cec481b0
+TERMUX_PKG_BUILD_DEPENDS="yarn,git,golang (>= 1.17)"
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_BUILD_IN_SRC=true
+
+termux_step_get_source(){
+        git clone https://github.com/Xhofe/alist "$TERMUX_PKG_SRCDIR"/alist
+        git clone https://github.com/Xhofe/alist-web "$TERMUX_PKG_SRCDIR"/alist-web
+}
+
+termux_step_pre_configure(){
+#Switch to local to prevent some countries from not connecting to cdn.
+        sed -i 's/https:\/\/npm.*\/dist/http:\/\/127.0.0.1:5244/g' "$TERMUX_PKG_SRCDIR"/alist/conf/config.go
+}
+
+termux_step_make() {
+        termux_setup_nodejs
+        termux_setup_golang
+        
+#Build html page
+        cd "$TERMUX_PKG_SRCDIR"/alist-web
+        $TERMUX_PREFIX/bin/yarn
+        $TERMUX_PREFIX/bin/yarn build
+        cp -a dist/* "$TERMUX_PKG_SRCDIR"/alist/public
+        
+#Build program
+        cd "$TERMUX_PKG_SRCDIR"/alist
+        appName="alist"
+        builtAt="$(date +'%F %T %z')"
+        goVersion=$(go version | sed 's/go version //')
+        gitAuthor=$(git show -s --format='format:%aN <%ae>' HEAD)
+        gitCommit=$(git log --pretty=format:"%h" -1)
+        gitTag=$(git describe --long --tags --dirty --always)
+        ldflags="\
+                -w -s \
+                -X 'github.com/Xhofe/alist/conf.BuiltAt=$builtAt' \
+                -X 'github.com/Xhofe/alist/conf.GoVersion=$goVersion' \
+                -X 'github.com/Xhofe/alist/conf.GitAuthor=$gitAuthor' \
+                -X 'github.com/Xhofe/alist/conf.GitCommit=$gitCommit' \
+                -X 'github.com/Xhofe/alist/conf.GitTag=$gitTag' \
+                "
+        go build -ldflags="$ldflags" alist.go
+}
+
+termux_step_make_install() {
+        mkdir -p "$TERMUX_PREFIX"/opt/alist
+        cd "$TERMUX_PKG_SRCDIR"/alist
+        ipath="$TERMUX_PREFIX/opt/alist"
+        cp -a alist $ipath
+        cp -a public $ipath
+        ln -s $ipath/alist $TERMUX_PREFIX/bin
+}
