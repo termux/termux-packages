@@ -16,7 +16,7 @@ termux_setup_cmake() {
 		if [ ! -d "$TERMUX_CMAKE_FOLDER" ]; then
 			termux_download https://cmake.org/files/v$TERMUX_CMAKE_MAJORVESION/$TERMUX_CMAKE_TARNAME \
 				"$TERMUX_CMAKE_TARFILE" \
-				f3c654b2e226b9d43369e0bd8487c51618d4dbe5a1af929dd32af7e6ca432d60
+				aaced6f745b86ce853661a595bdac6c5314a60f8181b6912a0a4920acfa32708
 			rm -Rf "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-linux-x86_64"
 			tar xf "$TERMUX_CMAKE_TARFILE" -C "$TERMUX_PKG_TMPDIR"
 			mv "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-linux-x86_64" \
