@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE="http://www.haskell.org/cabal/"
+TERMUX_PKG_HOMEPAGE="https://www.haskell.org/cabal/"
 TERMUX_PKG_DESCRIPTION="A framework for packaging Haskell software"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.org>"

@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE="http://github.com/ekmett/contravariant/"
+TERMUX_PKG_HOMEPAGE="https://github.com/ekmett/contravariant/"
 TERMUX_PKG_DESCRIPTION="Contravariant functors"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.org>"

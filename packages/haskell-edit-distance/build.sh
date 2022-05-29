@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE="http://github.com/phadej/edit-distance"
+TERMUX_PKG_HOMEPAGE="https://github.com/phadej/edit-distance"
 TERMUX_PKG_DESCRIPTION="Levenshtein and restricted Damerau-Levenshtein edit distances"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.org>"

@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE="http://github.com/haskell/base16-bytestring"
+TERMUX_PKG_HOMEPAGE="https://github.com/haskell/base16-bytestring"
 TERMUX_PKG_DESCRIPTION="RFC 4648-compliant Base16 encodings for ByteStrings"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.org>"
