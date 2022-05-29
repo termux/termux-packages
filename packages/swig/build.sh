@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://swig.org
+TERMUX_PKG_HOMEPAGE=https://swig.org
 TERMUX_PKG_DESCRIPTION="Generate scripting interfaces to C/C++ code"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"

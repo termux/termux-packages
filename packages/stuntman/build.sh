@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://www.stunprotocol.org/
+TERMUX_PKG_HOMEPAGE=https://www.stunprotocol.org/
 TERMUX_PKG_DESCRIPTION="An open source STUN server"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
