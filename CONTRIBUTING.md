@@ -124,7 +124,7 @@ met these conditions:
   present ones.
 
   The more useless packages in repositories, the less overall packaging and
-  service quality - *remembering that our resources are limited?*
+  service quality - _remembering that our resources are limited?_
 
 - **Not serving hacking, phishing, spamming, spying, ddos functionality**
 
@@ -146,6 +146,7 @@ provide some help with fixing your pull request or give some recommendations,
 but that DOES NOT mean they will do all work instead of you.
 
 **Minimal requirements:**
+
 - Experience with Linux distribution like Debian (preferred), Arch, Fedora, etc.
 - Experience with compiling software from source.
 - Good shell scripting skills.
@@ -198,6 +199,7 @@ request with new package. Pay attention to things listed below.
    other ways to manipulate content referenced through variables.
 
    Examples:
+
    ```
    TERMUX_PKG_VERSION=1.0
    TERMUX_PKG_SRCURL=https://example.com/archive/package-${TERMUX_PKG_VERSION}.tar.gz
@@ -229,6 +231,7 @@ request with new package. Pay attention to things listed below.
    format internals.
 
    Patch is usually created by
+
    ```
    diff -uNr sourcedir sourcedir.mod > filename.patch
    ```
@@ -237,25 +240,28 @@ request with new package. Pay attention to things listed below.
 
    Software often relies on paths defined by Filesystem Hierarchy Standard:
 
-   * `/bin`
-   * `/etc`
-   * `/home`
-   * `/run`
-   * `/sbin`
-   * `/tmp`
-   * `/usr`
-   * `/var`
+   - `/bin`
+   - `/etc`
+   - `/home`
+   - `/run`
+   - `/sbin`
+   - `/tmp`
+   - `/usr`
+   - `/var`
 
    These paths do not exist in Termux and have been replaced by prefixed
    equivalents. Termux installation prefix is
+
    ```
-   /data/data/com.termux/files/usr
+   /data/data/bin.mt.plus/files/term/usr
    ```
+
    and can be considered as virtual rootfs.
 
    Home directory is stored outside of prefix:
+
    ```
-   /data/data/com.termux/files/home
+   /data/data/bin.mt.plus/home
    ```
 
    Don't hardcode home and prefix, use shortcuts `@TERMUX_HOME@` and
@@ -276,18 +282,18 @@ request with new package. Pay attention to things listed below.
    package builds using GNU Autotools. Therefore you do not need to
    specify flags like
 
-   * `--prefix`
-   * `--host`
-   * `--build`
-   * `--disable-nls`
-   * `--disable-rpath`
+   - `--prefix`
+   - `--host`
+   - `--build`
+   - `--disable-nls`
+   - `--disable-rpath`
 
    and some others.
 
    Additional options to `./configure` can be passed through variable
    `TERMUX_PKG_EXTRA_CONFIGURE_ARGS`.
 
-***
+---
 
 # Working with packages
 
@@ -318,6 +324,7 @@ TERMUX_PKG_DEPENDS="libiconv, ncurses"
 ```
 
 It can contain some additional variables:
+
 - `TERMUX_PKG_BUILD_IN_SRC=true`
 
   Use this variable if package supports in-tree builds only, for example if
@@ -426,6 +433,7 @@ Here are few things you may to try:
    by patch.
 
    Regenerate patch file, e.g. with:
+
    ```
    diff -uNr package-1.0 package-1.0.mod > previously-failed-patch-file.patch
    ```
@@ -464,7 +472,7 @@ TERMUX_PKG_VERSION=1:5.0.0
 ```
 
 Note that if you are not @termux collaborator, pull request must contain a
-*description* why you are submitting a package downgrade. All pull requests
+_description_ why you are submitting a package downgrade. All pull requests
 which submit package downgrading without any serious reason will be rejected.
 
 ## Common build issues
@@ -475,6 +483,7 @@ No files in package. Maybe you need to run autoreconf -fi before configuring?
 
 Means that build system cannot find the Makefile. Depending on project, there
 are some tips for trying:
+
 - Set `TERMUX_PKG_BUILD_IN_SRC=true` - applicable to Makefile-only projects.
 - Run `./autogen.sh` or `autoreconf -fi` in `termux_step_pre_configure`. This
   is applicable to projects that use Autotools.
