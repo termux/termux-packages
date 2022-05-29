@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE="http://github.com/ekmett/tagged"
+TERMUX_PKG_HOMEPAGE="https://github.com/ekmett/tagged"
 TERMUX_PKG_DESCRIPTION="Haskell 98 phantom types to avoid unsafely passing dummy arguments"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.org>"

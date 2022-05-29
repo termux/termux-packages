@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE="http://github.com/ekmett/distributive/"
+TERMUX_PKG_HOMEPAGE="https://github.com/ekmett/distributive/"
 TERMUX_PKG_DESCRIPTION="Distributive functors -- Dual to Traversable"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.org>"

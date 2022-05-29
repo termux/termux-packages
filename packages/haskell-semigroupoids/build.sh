@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE="http://github.com/ekmett/semigroupoids"
+TERMUX_PKG_HOMEPAGE="https://github.com/ekmett/semigroupoids"
 TERMUX_PKG_DESCRIPTION="Semigroupoids: Category sans id"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.org>"

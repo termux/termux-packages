@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE="http://github.com/ekmett/transformers-compat/"
+TERMUX_PKG_HOMEPAGE="https://github.com/ekmett/transformers-compat/"
 TERMUX_PKG_DESCRIPTION="A small compatibility shim for the transformers library"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.org>"

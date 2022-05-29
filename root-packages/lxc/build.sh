@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://linuxcontainers.org/
+TERMUX_PKG_HOMEPAGE=https://linuxcontainers.org/
 TERMUX_PKG_DESCRIPTION="Linux Containers"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"

@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE="http://github.com/haskell-unordered-containers/hashable"
+TERMUX_PKG_HOMEPAGE="https://github.com/haskell-unordered-containers/hashable"
 TERMUX_PKG_DESCRIPTION="A class for types that can be converted to a hash value"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.org>"

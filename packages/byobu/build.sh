@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://byobu.co/
+TERMUX_PKG_HOMEPAGE=https://byobu.co/
 TERMUX_PKG_DESCRIPTION="Byobu is a GPLv3 open source text-based window manager and terminal multiplexer"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"

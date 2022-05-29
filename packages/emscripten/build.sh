@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://emscripten.org
 TERMUX_PKG_DESCRIPTION="Emscripten: An LLVM-to-WebAssembly Compiler"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@truboxl"
-TERMUX_PKG_VERSION=3.1.10
+TERMUX_PKG_VERSION=3.1.11
 TERMUX_PKG_SRCURL=https://github.com/emscripten-core/emscripten.git
 TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
@@ -62,13 +62,13 @@ opt/emscripten/LICENSE
 
 # https://github.com/emscripten-core/emscripten/issues/11362
 # can switch to stable LLVM to save space once above is fixed
-LLVM_COMMIT=8bc29d14273b05b05d5a56e34c07948dc2c770d3
-LLVM_TGZ_SHA256=aa7d5f49ff5867cad2075c479d6615996c1f8c3bf948695fe18f518574c49fac
+LLVM_COMMIT=295d032762ad284068c72cc1904680a4db5e80d3
+LLVM_TGZ_SHA256=580fa4760b38a89cc6c4ad3aa1e187ce087c8aef98dc9384ff12b897f79e249f
 
 # https://github.com/emscripten-core/emscripten/issues/12252
 # upstream says better bundle the right binaryen revision for now
-BINARYEN_COMMIT=f124a11ca3a40c87ab6aa4498037449584689be9
-BINARYEN_TGZ_SHA256=25f4d37955658059d88b3c2afc19db574e7e2deb9fe3e69ff6d3a171c041197f
+BINARYEN_COMMIT=fa3ffd0c2697fde7705495b52b139f7939f97925
+BINARYEN_TGZ_SHA256=f9e6c25f0e642bb3b3a0aabe8dcea380ceeac9f2b1f4f2a00b09d53154a1a810
 
 # https://github.com/emscripten-core/emsdk/blob/main/emsdk.py
 # https://chromium.googlesource.com/emscripten-releases/+/refs/heads/main/src/build.py
@@ -131,8 +131,6 @@ termux_step_post_get_source() {
 		for patch in $llvm_patches; do
 			patch -p1 -i "$patch" || true
 		done
-		# https://github.com/llvm/llvm-project/commit/f6b7fd20a52ef83d0462db190eb40800afda2506
-		rm -fv lldb/source/Symbol/LocateSymbolFileMacOSX.cpp.rej
 		llvm_patches_rej="$(find . -type f -name '*.rej')"
 		if [ -n "$llvm_patches_rej" ]; then
 			for rej in $llvm_patches_rej; do
@@ -167,6 +165,7 @@ termux_step_host_build() {
 	cmake \
 		-G Ninja \
 		-S "$TERMUX_PKG_CACHEDIR/llvm-project-$LLVM_COMMIT/llvm" \
+		-DCMAKE_BUILD_TYPE=Release \
 		-DLLVM_ENABLE_PROJECTS=clang
 	cmake \
 		--build "$TERMUX_PKG_HOSTBUILD_DIR" \

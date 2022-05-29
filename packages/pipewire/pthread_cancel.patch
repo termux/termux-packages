@@ -1,0 +1,13 @@
+--- ./data-loop.c.orig	2022-05-23 23:10:06.894402311 +0530
++++ ./src/pipewire/data-loop.c	2022-05-23 23:13:31.814402233 +0530
+@@ -230,8 +230,8 @@
+ 	if (loop->running) {
+ 		struct spa_thread_utils *utils;
+ 		if (loop->cancel) {
+-			pw_log_debug("%p cancel", loop);
+-			pthread_cancel(loop->thread);
++			pw_log_debug("%p cancel (used pthread_kill as cancel not available on android)", loop);
++			pthread_kill(loop->thread, 0);
+ 		} else {
+ 			pw_log_debug("%p signal", loop);
+ 			pw_loop_invoke(loop->loop, do_stop, 1, NULL, 0, false, loop);
