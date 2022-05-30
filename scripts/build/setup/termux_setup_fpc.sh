@@ -20,6 +20,8 @@ termux_setup_fpc() {
 			"${TERMUX_FPC_TARFOLDER}.tar" \
 			5adac308a5534b6a76446d8311fc340747cbb7edeaacfe6b651493ff3fe31e83
 
+		mkdir -p "${TERMUX_FPC_TARFOLDER}"
+
 		tar xf "${TERMUX_FPC_TARFOLDER}.tar" -C "${TERMUX_FPC_TARFOLDER}"
 
 		# Run nstall script.
