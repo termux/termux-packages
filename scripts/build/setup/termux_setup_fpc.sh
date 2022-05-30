@@ -22,7 +22,7 @@ termux_setup_fpc() {
 
 		mkdir -p "${TERMUX_FPC_TARFOLDER}"
 
-		tar xf "${TERMUX_FPC_TARFOLDER}.tar" -C "${TERMUX_FPC_TARFOLDER}"
+		tar xf "${TERMUX_FPC_TARFOLDER}.tar" -C "${TERMUX_FPC_TARFOLDER}" --strip-components=1
 
 		# Run nstall script.
 		# Following args are respectively: Install prefix | Install docs? | Install demo? | Write configuration file?
