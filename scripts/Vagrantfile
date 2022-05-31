@@ -3,14 +3,16 @@
 
 Vagrant.configure("2") do |config|
 
-  config.vm.box = "ubuntu/focal64"
+  # config.vm.box = "ubuntu/focal64"
+  config.vm.box = "bento/ubuntu-20.04"
 
   # use vagrant-disksize plugin to resize partition - https://github.com/sprotheroe/vagrant-disksize
-  config.disksize.size = '50GB'
+  # config.disksize.size = '50GB'
 
   config.vm.provider "virtualbox" do |vb|
     # Customize the amount of memory on the VM
-    vb.memory = "4096"
+    vb.memory = "2048"
+    vb.linked_clone = true
   end
 
   # Share the root of the repo
@@ -19,7 +21,8 @@ Vagrant.configure("2") do |config|
   config.vm.synced_folder ".", "/vagrant", disabled: true
 
   # Filesystem needs to be resized
-  config.vm.provision "shell", inline: "resize2fs /dev/sda1", privileged: true
+  # config.vm.provision "shell", inline: "resize2fs /dev/sda1", privileged: true
+  config.vm.provision "shell", inline: "sudo add-apt-repository ppa:deadsnakes/ppa", privileged: true
 
   # Run environment setup scripts
   config.vm.provision "shell", inline: "cd /home/vagrant/termux-packages && ./scripts/setup-ubuntu.sh", privileged: false
