@@ -25,8 +25,11 @@ termux_setup_fpc() {
 		tar xf "${TERMUX_FPC_TARFOLDER}.tar" -C "${TERMUX_FPC_TARFOLDER}" --strip-components=1
 
 		# Run nstall script.
-		# Following args are respectively: Install prefix | Install docs? | Install demo? | Write configuration file?
-		printf "%s\n%s\n%s\n%s\n" "${TERMUX_FPC_FOLDER}" "n" "n" "y" | "${TERMUX_FPC_TARFOLDER}"/install.sh
+		(
+			cd "${TERMUX_FPC_TARFOLDER}" || exit 1
+			# printf args are (respectively): Install prefix | Install docs? | Install demo? | Write configuration file?
+			printf "%s\n%s\n%s\n%s\n" "${TERMUX_FPC_FOLDER}" "n" "n" "y" | ./install.sh
+		)
 
 		rm -rf "${TERMUX_FPC_TARFOLDER}"{,.tar}
 
