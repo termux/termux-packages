@@ -29,9 +29,12 @@ termux_step_post_get_source() {
 
 
 termux_step_host_build() {
+	termux_setup_cmake 
 cd $TERMUX_PKG_SRCDIR 
-mkdir build_native
-cd build_native
+#mkdir build_native
+#cd build_native
+mkdir build
+cd build
 cmake ..
 cmake --build . --target prepare_cross_compiling
 
@@ -43,15 +46,15 @@ termux_step_pre_configure() {
 	# export OPENSSL_LIB_DIR=$TERMUX_PREFIX/lib/openssl-1.1
 	CXXFLAGS="-stdlib=libc++ $CXXFLAGS"
 	
-      rm -rf build/
+     # rm -rf build/
 }
 
 termux_step_configure () {
 
 	termux_setup_cmake
 	cd $TERMUX_PKG_SRCDIR 
-	rm -rf build
-	mkdir build
+	# rm -rf build
+	# mkdir build
 	cd build
 	cmake -DCMAKE_CROSSCOMPILING=True  -DCMAKE_BUILD_TYPE=Release -DZLIB_LIBRARY=$TERMUX_PREFIX/lib/libz.dll.a ..
 	
