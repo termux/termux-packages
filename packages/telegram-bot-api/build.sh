@@ -56,7 +56,7 @@ termux_step_configure () {
 	# rm -rf build
 	# mkdir build
 	cd build
-	cmake -DCMAKE_CROSSCOMPILING=True  -DCMAKE_BUILD_TYPE=Release -DZLIB_LIBRARY=$TERMUX_PREFIX/lib/libz.dll.a ..
+	cmake -DCMAKE_CROSSCOMPILING=True  -DCMAKE_BUILD_TYPE=Release -DZLIB_LIBRARY=$TERMUX_PREFIX/lib/libz.so ..
 	
 }
 
