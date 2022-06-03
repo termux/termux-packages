@@ -33,19 +33,3 @@ termux_step_make_install() {
 	install -Dm600 -t $TERMUX_PREFIX/lib \
 		target/${CARGO_TARGET_NAME}/${BUILD_TYPE}/libtergent.so
 }
-
-termux_step_create_debscripts() {
-	cat <<- EOF > ./postinst
-	#!${TERMUX_PREFIX}/bin/bash
-	echo
-	echo "Tergent since v1.x has some breaking changes."
-	echo
-	echo "You will need new keys. See https://github.com/aeolwyr/tergent/blob/master/README.md#upgrading-from-01 for more details on how to upgrade."
-	echo
-	read -p "Are you sure you're ready to upgrade? [yN] " yn
-	case \$yn in
-		[Yy]* ) exit 0;;
-		* ) exit 1;;
-	esac
-	EOF
-}
