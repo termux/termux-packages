@@ -11,10 +11,27 @@ TERMUX_PKG_DEPENDS="termux-api"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
 
-termux_step_make_install() {
+termux_step_pre_configure() {
 	termux_setup_rust
-	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
-	install -Dm600 -t $TERMUX_PREFIX/lib target/${CARGO_TARGET_NAME}/release/libtergent.so
+}
+
+termux_step_make() {
+	local BUILD_TYPE=
+	if [ $TERMUX_DEBUG_BUILD = false ]; then
+		BUILD_TYPE=--release
+	fi
+
+	cargo build --jobs $TERMUX_MAKE_PROCESSES \
+		--target $CARGO_TARGET_NAME ${BUILD_TYPE}
+}
+
+termux_step_make_install() {
+	local BUILD_TYPE=release
+	if [ $TERMUX_DEBUG_BUILD = true ]; then
+		BUILD_TYPE=debug
+	fi
+	install -Dm600 -t $TERMUX_PREFIX/lib \
+		target/${CARGO_TARGET_NAME}/${BUILD_TYPE}/libtergent.so
 }
 
 termux_step_create_debscripts() {
