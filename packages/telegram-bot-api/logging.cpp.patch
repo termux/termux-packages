@@ -1,0 +1,12 @@
+--- a/td/tdutils/td/utils/logging.cpp
++++ b/td/tdutils/td/utils/logging.cpp
+@@ -152,7 +152,7 @@ Logger::~Logger() {
+
+ class DefaultLog final : public LogInterface {
+   void do_append(int log_level, CSlice slice) final {
+-#if TD_ANDROID
++#if TD_ANDROID_EXCLUDE
+     switch (log_level) {
+       case VERBOSITY_NAME(FATAL):
+         __android_log_write(ANDROID_LOG_FATAL, ALOG_TAG, slice.c_str());
+         
