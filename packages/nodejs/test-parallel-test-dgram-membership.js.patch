@@ -1,0 +1,40 @@
+--- ./test/parallel/test-dgram-membership.js.orig	2022-06-05 10:44:44.687598191 +0530
++++ ./test/parallel/test-dgram-membership.js	2022-06-05 10:46:16.867598156 +0530
+@@ -3,6 +3,7 @@
+ const common = require('../common');
+ const assert = require('assert');
+ const dgram = require('dgram');
++const { platform } = require('os');
+ const multicastAddress = '224.0.0.114';
+ 
+ const setup = dgram.createSocket.bind(dgram, { type: 'udp4', reuseAddr: true });
+@@ -106,11 +107,12 @@
+ // addSourceSpecificMembership with invalid groupAddress should throw
+ {
+   const socket = setup();
++  const errCode = platform() === 'android' ? 'ENOSYS' : 'EINVAL';
+   assert.throws(() => {
+     socket.addSourceSpecificMembership(multicastAddress, '0');
+   }, {
+-    code: 'EINVAL',
+-    message: 'addSourceSpecificMembership EINVAL'
++    code: errCode,
++    message: `addSourceSpecificMembership ${errCode}`
+   });
+   socket.close();
+ }
+@@ -144,11 +146,12 @@
+ // dropSourceSpecificMembership with invalid UDP should throw
+ {
+   const socket = setup();
++  const errCode = platform() === 'android' ? 'ENOSYS' : 'EINVAL';
+   assert.throws(() => {
+     socket.dropSourceSpecificMembership(multicastAddress, '0');
+   }, {
+-    code: 'EINVAL',
+-    message: 'dropSourceSpecificMembership EINVAL'
++    code: errCode,
++    message: `dropSourceSpecificMembership ${errCode}`
+   });
+   socket.close();
+ }

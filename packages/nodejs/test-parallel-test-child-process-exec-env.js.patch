@@ -1,0 +1,11 @@
+--- ./test/parallel/test-child-process-exec-env.js.orig	2022-06-05 08:57:52.717600637 +0530
++++ ./test/parallel/test-child-process-exec-env.js	2022-06-05 09:02:24.887600533 +0530
+@@ -44,7 +44,7 @@
+ }
+ 
+ if (!isWindows) {
+-  child = exec('/usr/bin/env', { env: { 'HELLO': 'WORLD' } }, after);
++  child = exec('@TERMUX_PREFIX@/bin/env', { env: { 'HELLO': 'WORLD' } }, after);
+ } else {
+   child = exec('set',
+                { env: { ...process.env, 'HELLO': 'WORLD' } },
