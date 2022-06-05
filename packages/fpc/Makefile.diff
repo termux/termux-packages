@@ -1,88 +1,6 @@
---- ./Makefile.orig	2022-06-02 05:26:20.412574751 +0000
-+++ ./Makefile	2022-06-02 06:03:40.590151191 +0000
-@@ -234,42 +234,9 @@
- DEB_HOST_MULTIARCH=$(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
- endif
- export DEB_HOST_MULTIARCH
--ifdef FPCDIR
--override FPCDIR:=$(subst \,/,$(FPCDIR))
--ifeq ($(wildcard $(addprefix $(FPCDIR)/,rtl)),)
--override FPCDIR=wrong
--endif
--else
--override FPCDIR=wrong
--endif
--ifdef DEFAULT_FPCDIR
--ifeq ($(FPCDIR),wrong)
--override FPCDIR:=$(subst \,/,$(DEFAULT_FPCDIR))
--ifeq ($(wildcard $(addprefix $(FPCDIR)/,rtl)),)
--override FPCDIR=wrong
--endif
--endif
--endif
--ifeq ($(FPCDIR),wrong)
--ifdef inUnix
--override FPCDIR=/usr/local/lib/fpc/$(FPC_VERSION)
--ifeq ($(wildcard $(FPCDIR)/units),)
--override FPCDIR=/usr/lib/${DEB_HOST_MULTIARCH}/fpc/$(FPC_VERSION)
--endif
--else
--override FPCDIR:=$(subst /$(FPC),,$(firstword $(strip $(wildcard $(addsuffix /$(FPC),$(SEARCHPATH))))))
--override FPCDIR:=$(FPCDIR)/..
--ifeq ($(wildcard $(addprefix $(FPCDIR)/,rtl)),)
--override FPCDIR:=$(FPCDIR)/..
--ifeq ($(wildcard $(addprefix $(FPCDIR)/,rtl)),)
--override FPCDIR:=$(BASEDIR)
--ifeq ($(wildcard $(addprefix $(FPCDIR)/,rtl)),)
--override FPCDIR=c:/pp
--endif
--endif
--endif
--endif
--endif
-+
-+override FPCDIR=@TERMUX_PREFIX@/lib/fpc/$(FPC_VERSION)
-+
- ifndef CROSSBINDIR
- CROSSBINDIR:=$(wildcard $(FPCDIR)/bin/$(TARGETSUFFIX))
- endif
-@@ -278,32 +245,9 @@
- DARWIN2DARWIN=1
- endif
- endif
--ifndef BINUTILSPREFIX
--ifndef CROSSBINDIR
--ifdef CROSSCOMPILE
--ifneq ($(OS_TARGET),msdos)
--ifndef DARWIN2DARWIN
--ifneq ($(CPU_TARGET),jvm)
--BINUTILSPREFIX=$(CPU_TARGET)-$(OS_TARGET)-
--ifeq ($(OS_TARGET),android)
--ifeq ($(CPU_TARGET),arm)
--BINUTILSPREFIX=arm-linux-androideabi-
--else
--ifeq ($(CPU_TARGET),i386)
--BINUTILSPREFIX=i686-linux-android-
--else
--BINUTILSPREFIX=$(CPU_TARGET)-linux-android-
--endif
--endif
--endif
--endif
--endif
--else
--BINUTILSPREFIX=$(OS_TARGET)-
--endif
--endif
--endif
--endif
-+
-+BINUTILSPREFIX ?=
-+
- UNITSDIR:=$(wildcard $(FPCDIR)/units/$(TARGETSUFFIX))
- ifeq ($(UNITSDIR),)
- UNITSDIR:=$(wildcard $(FPCDIR)/units/$(OS_TARGET))
-@@ -2295,105 +2239,19 @@
+--- ./Makefile.orig	2022-06-02 09:10:11.587243501 +0000
++++ ./Makefile	2022-06-02 09:14:24.432460451 +0000
+@@ -2282,105 +2226,19 @@
  endif   # spec found
  endif   # rpm available
  endif   # inUnix
@@ -180,7 +98,7 @@
 -  CROSSBINDIR=$(ANDROID_MIPS_BINUTILS)
 -  override LIBDIR+=$(NDK_LIB)/arch-mips/usr/lib
 -endif
-+override LIBDIR+=@TERMUX_PREFIX@/lib
++override LIBDIR+=@LIBDIR@
  export CROSSBINDIR
  export BINUTILSPREFIX
  export LIBDIR
