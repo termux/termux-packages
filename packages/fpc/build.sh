@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.freepascal.org
 TERMUX_PKG_DESCRIPTION="The Free Pascal Compiler (Turbo Pascal 7.0 and Delphi compatible)"
 TERMUX_PKG_LICENSE="GPL-2.0, LGPL-2.0"
-TERMUX_PKG_LICENSE_FILE="rtl/COPYING.FPC, rtl/COPYING.txt"
+TERMUX_PKG_LICENSE_FILE="fpcsrc/rtl/COPYING.FPC, fpcsrc/rtl/COPYING.txt"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.2.2
 TERMUX_PKG_SRCURL=https://sourceforge.net/projects/freepascal/files/Source/${TERMUX_PKG_VERSION}/fpcbuild-${TERMUX_PKG_VERSION}.tar.gz
