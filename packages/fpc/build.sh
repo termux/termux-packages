@@ -37,9 +37,18 @@ termux_step_pre_configure() {
 	# Generate makefile for Android build.
 	fpcmake -T "${_ARCH}"-android
 
-	# fpc directly invokes linker, so we need to provode NDK libs dir.
-	local libdir && libdir="$(realpath "$("${CC}" --print-file-name libc.so)")"
+	# fpc directly invokes linker, therefore it needs libc files.
+	local LIBDIR="${TERMUX_PKG_TMPDIR}/libdir"
+	mkdir -p "${LIBDIR}"
 
-	sed "s|@LIBDIR@|${TERMUX_PREFIX} ${libdir/\/libc.so/}|g" \
+	cp "$("${CC}" --print-file-name libc.so)" \
+		"$("${CC}" --print-file-name crtbegin_so.o)" \
+		"$("${CC}" --print-file-name crtbegin_dynamic.o)" \
+		"$("${CC}" --print-file-name crtbegin_static.o)" \
+		"$("${CC}" --print-file-name crtend_so.o)" \
+		"$("${CC}" --print-file-name crtend_android.o)" \
+		"${LIBDIR}"
+
+	sed "s|@LIBDIR@|${TERMUX_PREFIX} ${LIBDIR}|g" \
 		"${TERMUX_PKG_BUILDER_DIR}"/Makefile.diff | patch -p1
 }
