@@ -42,6 +42,7 @@ termux_step_pre_configure() {
 	mkdir -p "${LIBDIR}"
 
 	cp "$("${CC}" --print-file-name libc.so)" \
+		"$("${CC}" --print-file-name libdl.so)" \
 		"$("${CC}" --print-file-name crtbegin_so.o)" \
 		"$("${CC}" --print-file-name crtbegin_dynamic.o)" \
 		"$("${CC}" --print-file-name crtbegin_static.o)" \
