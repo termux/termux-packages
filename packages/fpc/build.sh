@@ -9,6 +9,16 @@ TERMUX_PKG_SHA256=85ef993043bb83f999e2212f1bca766eb71f6f973d362e2290475dbaaf5016
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_MAKE_ARGS="OS_TARGET=android NOGDB=1"
 
+__setup_wrapper_bin() {
+	local WRAPPER_BIN="${TERMUX_PKG_TMPDIR}/wrapper"
+	mkdir -p "${WRAPPER_BIN}"
+
+	ln -sf "$(command -v "${LD}")" "${WRAPPER_BIN}/${TERMUX_HOST_PLATFORM}-ld"
+	ln -sf "$(command -v "${AR}")" "${WRAPPER_BIN}/${TERMUX_HOST_PLATFORM}-ar"
+
+	export PATH="${WRAPPER_BIN}:${PATH}"
+}
+
 termux_step_pre_configure() {
 	termux_setup_fpc
 
@@ -17,27 +27,18 @@ termux_step_pre_configure() {
 
 	TERMUX_PKG_EXTRA_MAKE_ARGS+=" CPU_TARGET=${_ARCH}"
 
-	# Setup wrapper bin.
-	local _WRAPPER="${TERMUX_PKG_TMPDIR}/wrapper"
-	mkdir -p "${_WRAPPER}"
+	__setup_wrapper_bin
 
-	cat <<- EOF > "${_WRAPPER}/${TERMUX_HOST_PLATFORM}-ld"
-		#!$(command -v sh)
-		exec ${LD}
-	EOF
-	cat <<- EOF > "${_WRAPPER}/${TERMUX_HOST_PLATFORM}-ar"
-		#!$(command -v sh)
-		exec ${AR}
-	EOF
-	chmod 0700 "${_WRAPPER}/${TERMUX_HOST_PLATFORM}-"{ar,ld}
-
-	export PATH="${_WRAPPER}:/usr/bin:${PATH}"
+	# fpc searches PATH for ld.lld for host-build.
+	# Since we have ld.lld of clang before hosts, therefore it fails.
+	export PATH="/usr/bin:${PATH}"
 
 	# Generate makefile for Android build.
 	fpcmake -T "${_ARCH}"-android
 
 	# fpc directly invokes linker, so we need to provode NDK libs dir.
 	local libdir && libdir="$(realpath "$("${CC}" --print-file-name libc.so)")"
+
 	sed "s|@LIBDIR@|${TERMUX_PREFIX} ${libdir/\/libc.so/}|g" \
 		"${TERMUX_PKG_BUILDER_DIR}"/Makefile.diff | patch -p1
 }
