@@ -1,0 +1,15 @@
+--- ./fpcsrc/rtl/android/sysandroid.inc.orig	2022-06-05 18:05:27.583606376 +0000
++++ ./fpcsrc/rtl/android/sysandroid.inc	2022-06-05 18:07:57.945363881 +0000
+@@ -194,11 +194,10 @@
+ var
+   DefaultLogTag: string[20];
+ 
+-function __android_log_write(prio: longint; tag, text: pchar): longint; cdecl; external 'log' name '__android_log_write';
+ 
+ procedure SysLogWrite(Priority: longint; Tag, Msg: PAnsiChar);
+ begin
+-  __android_log_write(Priority, Tag, Msg);
++  writeln(StdErr, '[' ,Tag, ']: ', Msg);
+ end;
+ 
+ procedure SysLogWrite(Priority: longint; Msg: PAnsiChar);
