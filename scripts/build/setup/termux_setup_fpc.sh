@@ -16,7 +16,7 @@ termux_setup_fpc() {
 			return
 		fi
 
-		termux_download https://sourceforge.net/projects/freepascal/files/Linux/"${TERMUX_FPC_VERSION}"/fpc-"${TERMUX_FPC_VERSION}".x86_64-linux.tar \
+		termux_download https://downloads.sourceforge.net/project/freepascal/Linux/"${TERMUX_FPC_VERSION}"/fpc-"${TERMUX_FPC_VERSION}".x86_64-linux.tar \
 			"${TERMUX_FPC_TARFOLDER}.tar" \
 			5adac308a5534b6a76446d8311fc340747cbb7edeaacfe6b651493ff3fe31e83
 
