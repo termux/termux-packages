@@ -21,7 +21,7 @@ termux_step_pre_configure() {
 	# for benchmark purposes
 	CFLAGS="${CFLAGS/-Oz/-Os}"
 	CXXFLAGS="${CXXFLAGS/-Oz/-Os}"
-	LDFLAGS+=" -landroid-shmem"
+	LDFLAGS+=" -landroid-shmem $($CC -print-libgcc-file-name)"
 	./_autosetup
 }
 
