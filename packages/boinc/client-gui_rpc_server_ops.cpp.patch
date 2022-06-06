@@ -1,0 +1,19 @@
+diff -uNr boinc/client/gui_rpc_server_ops.cpp boinc.mod/client/gui_rpc_server_ops.cpp
+--- boinc/client/gui_rpc_server_ops.cpp	2021-08-03 23:52:19.000000000 +0800
++++ boinc.mod/client/gui_rpc_server_ops.cpp	2022-06-09 06:44:37.271979600 +0800
+@@ -414,6 +414,7 @@
+                 safe_strcpy(gstate.host_info.os_name, hi.os_name);
+             }
+ 
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+             // We already have the Linux kernel version;
+             // append the Android version.
+             //
+@@ -424,6 +425,7 @@
+                     safe_strcat(gstate.host_info.os_version, ")");
+                 }
+             }
++#endif
+ 
+             // Device name
+             if (strlen(hi.domain_name)) {

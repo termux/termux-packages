@@ -1,7 +1,18 @@
-diff -uNr boinc-client_release-7.18-7.18.1/client/hostinfo_unix.cpp boinc-client_release-7.18-7.18.1.mod/client/hostinfo_unix.cpp
---- boinc-client_release-7.18-7.18.1/client/hostinfo_unix.cpp	2021-08-03 23:52:19.000000000 +0800
-+++ boinc-client_release-7.18-7.18.1.mod/client/hostinfo_unix.cpp	2021-12-29 17:16:37.153466855 +0800
-@@ -1536,11 +1536,11 @@
+diff -uNr boinc/client/hostinfo_unix.cpp boinc.mod/client/hostinfo_unix.cpp
+--- boinc/client/hostinfo_unix.cpp	2021-08-03 23:52:19.000000000 +0800
++++ boinc.mod/client/hostinfo_unix.cpp	2022-06-09 00:02:01.071996878 +0800
+@@ -169,6 +169,10 @@
+ #include <OS.h>
+ #endif
+ 
++#ifdef __ANDROID__
++#include <sys/system_properties.h> // PROP_VALUE_MAX
++#endif
++
+ // Some OS define _SC_PAGE_SIZE instead of _SC_PAGESIZE
+ #if defined(_SC_PAGE_SIZE) && !defined(_SC_PAGESIZE)
+ #define _SC_PAGESIZE _SC_PAGE_SIZE
+@@ -1536,12 +1540,19 @@
  #if HAVE_SYS_UTSNAME_H
      struct utsname u;
      uname(&u);
@@ -11,11 +22,20 @@ diff -uNr boinc-client_release-7.18-7.18.1/client/hostinfo_unix.cpp boinc-client
  #else
      safe_strcpy(os_name, u.sysname);
 -#endif //ANDROID
-+#endif // __ANDROID__
- #if defined(__EMX__) // OS2: version is in u.version
+-#if defined(__EMX__) // OS2: version is in u.version
++#endif
++#ifdef __ANDROID__
++    // remove the need of query Android version through Java API
++    // which then process in client/gui_rpc_server_ops.cpp,
++    // handle_set_host_info()
++    char android_version[PROP_VALUE_MAX];
++    __system_property_get("ro.build.version.release", android_version);
++    snprintf(os_version, sizeof(os_version), "%s (Android %s)", u.release, android_version);
++#elif defined(__EMX__) // OS2: version is in u.version
      safe_strcpy(os_version, u.version);
  #elif defined(__HAIKU__)
-@@ -1698,7 +1698,7 @@
+     snprintf(os_version, sizeof(os_version), "%s, %s", u.release, u.version);
+@@ -1698,7 +1709,7 @@
          return false;
      }
  } tty_patterns[] = {
