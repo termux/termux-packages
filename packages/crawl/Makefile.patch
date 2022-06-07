@@ -1,0 +1,54 @@
+--- a/crawl-ref/source/Makefile
++++ b/crawl-ref/source/Makefile
+@@ -165,8 +165,8 @@ endif
+ #
+ AR = ar
+ RANLIB = ranlib
+-CC = $(GCC)
+-CXX = $(GXX)
++CC := $(CC)
++CXX := $(CXX)
+ RM = rm -f
+ COPY = cp
+ COPY_R = cp -r
+@@ -474,10 +474,10 @@ ifdef MACOSX_MIN_VERSION
+ 	CFLAGS_ARCH += -mmacosx-version-min=$(MACOSX_MIN_VERSION)
+ 	CFLAGS_DEPCC_ARCH += -mmacosx-version-min=$(MACOSX_MIN_VERSION)
+ endif
+-CC = $(GCC) $(CFLAGS_ARCH)
+-CXX = $(GXX) $(CFLAGS_ARCH) -stdlib=libc++
+-DEPCC = $(GCC) $(or $(CFLAGS_DEPCC_ARCH),$(CFLAGS_ARCH))
+-DEPCXX = $(GXX) $(or $(CFLAGS_DEPCC_ARCH),$(CFLAGS_ARCH)) -stdlib=libc++
++CC := $(CC) $(CFLAGS_ARCH)
++CXX := $(CXX) $(CFLAGS_ARCH) -stdlib=libc++
++DEPCC := $(CC) $(or $(CFLAGS_DEPCC_ARCH),$(CFLAGS_ARCH))
++DEPCXX := $(CXX) $(or $(CFLAGS_DEPCC_ARCH),$(CFLAGS_ARCH)) -stdlib=libc++
+
+ ifdef USE_ICC
+ CC += -gcc-name=gcc-$(GCC_VER) -gxx-name=g++-$(GCC_VER)
+@@ -532,12 +532,10 @@ endif
+ else
+
+ # Cross-compiling is a weird case.
+-GCC := $(CROSSHOST)-gcc
+-GXX := $(CROSSHOST)-g++
+-AR := $(CROSSHOST)-ar
+-RANLIB := $(CROSSHOST)-ranlib
+-STRIP := $(CROSSHOST)-strip
+-WINDRES := $(CROSSHOST)-windres
++AR := llvm-ar
++RANLIB := llvm-ranlib
++STRIP := llvm-strip
++WINDRES := llvm-windres
+
+ endif
+
+@@ -1039,5 +1037,5 @@ else
+   NCURSESLIB = ncursesw
+ endif
+
+-NC_LIBS := -L$(NC_PREFIX)/lib -l$(NCURSESLIB)
++NC_LIBS := -L@TERMUX_PREFIX@/lib -lncurses
+ NC_CFLAGS := -isystem $(NC_PREFIX)/include/$(NCURSESLIB)
+
+ ifndef NO_PKGCONFIG
