@@ -11,25 +11,18 @@ TERMUX_PKG_SRCURL=https://github.com/frida/frida.git
 TERMUX_PKG_DEPENDS="libiconv, python"
 TERMUX_PKG_BUILD_DEPENDS="openssl"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_EXTRA_MAKE_ARGS="ANDROID_NDK_ROOT=$NDK"
 TERMUX_PKG_CONFFILES="var/service/frida-server/run var/service/frida-server/down"
 
 termux_step_pre_configure () {
+	termux_setup_nodejs
+
 	_PYTHON_VERSION=$(source $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
 	export TERMUX_PKG_EXTRA_MAKE_ARGS+=" PYTHON=/usr/bin/python${_PYTHON_VERSION}"
 	sed -e "s%@TERMUX_PREFIX@%$TERMUX_PREFIX%g" \
 		-e "s%@PYTHON_VERSION@%$_PYTHON_VERSION%g" \
 		$TERMUX_PKG_BUILDER_DIR/frida-python-version.diff | patch -Np1
-}
-
-termux_step_host_build () {
-	local node_version=14.18.1
-	termux_download https://nodejs.org/dist/v${node_version}/node-v${node_version}-linux-x64.tar.xz \
-			${TERMUX_PKG_CACHEDIR}/node-v${node_version}-linux-x64.tar.xz \
-			ad1e3baa1aee8028b43206da3b2be9b8867cb598b4318bc88a0ae4518cc062a2
-	tar -xf ${TERMUX_PKG_CACHEDIR}/node-v${node_version}-linux-x64.tar.xz --strip-components=1
 }
 
 termux_step_post_configure () {
