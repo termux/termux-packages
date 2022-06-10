@@ -1,12 +1,17 @@
 TERMUX_SUBPKG_DESCRIPTION="CLI tools for Frida"
 TERMUX_SUBPKG_DEPENDS="frida-python"
 TERMUX_SUBPKG_INCLUDE="
-bin/frida-discover
 bin/frida
+bin/frida-apk
+bin/frida-create
+bin/frida-discover
+bin/frida-join
 bin/frida-kill
 bin/frida-ls-devices
+bin/frida-portal
 bin/frida-ps
 bin/frida-trace
+bin/gum-graft
 "
 
 termux_step_create_subpkg_debscripts() {

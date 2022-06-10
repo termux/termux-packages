@@ -56,15 +56,19 @@ termux_step_make () {
 }
 
 termux_step_make_install () {
-	install build/frida-android-${arch}/bin/frida-server \
-	        build/frida-android-${arch}/bin/frida-inject \
-	        build/frida-android-${arch}/bin/frida-discover \
-	        build/frida-android-${arch}/bin/frida \
-	        build/frida-android-${arch}/bin/frida-kill \
-	        build/frida-android-${arch}/bin/frida-ls-devices \
-	        build/frida-android-${arch}/bin/frida-ps \
-	        build/frida-android-${arch}/bin/frida-trace \
-	        ${TERMUX_PREFIX}/bin/
+	install build/frida-android-${arch}/bin/frida \
+		build/frida-android-${arch}/bin/frida-apk \
+		build/frida-android-${arch}/bin/frida-create \
+		build/frida-android-${arch}/bin/frida-discover \
+		build/frida-android-${arch}/bin/frida-inject \
+		build/frida-android-${arch}/bin/frida-kill \
+		build/frida-android-${arch}/bin/frida-ls-devices \
+		build/frida-android-${arch}/bin/frida-portal \
+		build/frida-android-${arch}/bin/frida-ps \
+		build/frida-android-${arch}/bin/frida-server \
+		build/frida-android-${arch}/bin/frida-trace \
+		build/frida-android-${arch}/bin/gum-graft \
+		${TERMUX_PREFIX}/bin/
 	install build/frida-android-${arch}/lib/{*.so,*.a} ${TERMUX_PREFIX}/lib/
 	cp -r build/frida-android-${arch}/lib/{pkgconfig,python*} ${TERMUX_PREFIX}/lib/
 	cp -r build/frida-android-${arch}/include/frida-* ${TERMUX_PREFIX}/include/
