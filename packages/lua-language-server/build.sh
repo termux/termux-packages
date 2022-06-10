@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE="https://github.com/sumneko/lua-language-server"
 TERMUX_PKG_DESCRIPTION="Sumneko Lua Language Server coded in Lua"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.org>"
-TERMUX_PKG_VERSION="3.2.4"
+TERMUX_PKG_VERSION=3.2.5
 TERMUX_PKG_GIT_BRANCH="${TERMUX_PKG_VERSION}"
 TERMUX_PKG_SRCURL="https://github.com/sumneko/lua-language-server.git"
 TERMUX_PKG_DEPENDS="libandroid-spawn"
@@ -14,7 +14,7 @@ _patch_on_device() {
 	if [ "${TERMUX_ON_DEVICE_BUILD}" = true ]; then
 		(
 			cd "${TERMUX_PKG_SRCDIR}"
-			patch --silent -p1 <"${TERMUX_PKG_BUILDER_DIR}"/android.diff
+			patch --silent -p1 < "${TERMUX_PKG_BUILDER_DIR}"/android.diff
 		)
 	fi
 }
@@ -31,7 +31,8 @@ termux_step_host_build() {
 }
 
 termux_step_make() {
-	CFLAGS+=" -DBEE_ENABLE_FILESYSTEM" # without this, it tries to link against its own filesystem lib and fails.
+	CFLAGS+=" -DBEE_ENABLE_FILESYSTEM"     # without this, it tries to link against its own filesystem lib and fails.
+	CFLAGS+=" -Wno-unknown-warning-option" # for -Wno-maybe-uninitialized argument.
 
 	sed \
 		-e "s%\@FLAGS\@%${CFLAGS} ${CPPFLAGS}%g" \
@@ -46,7 +47,7 @@ termux_step_make() {
 termux_step_make_install() {
 	local datadir="${TERMUX_PREFIX}/share/${TERMUX_PKG_NAME}"
 
-	cat >"${TERMUX_PREFIX}/bin/${TERMUX_PKG_NAME}" <<-EOF
+	cat > "${TERMUX_PREFIX}/bin/${TERMUX_PKG_NAME}" <<- EOF
 		#!${TERMUX_PREFIX}/bin/bash
 
 		# After action of termux-elf-cleaner lua-language-server's binary is unable to
