@@ -14,6 +14,21 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_EXTRA_MAKE_ARGS="ANDROID_NDK_ROOT=$NDK"
 TERMUX_PKG_CONFFILES="var/service/frida-server/run var/service/frida-server/down"
+TERMUX_PKG_HOSTBUILD=true
+
+termux_step_host_build() {
+	termux_setup_nodejs
+
+	# make and save frida-resource-compiler in hostbuild step,
+	# otherwise the one that is compiled in termux_step_make
+	# segfaults (seem to be some tool in termux's toolchain bin
+	# dir that causes it, removing our bin/ dir from PATH fixes
+	# the issue)
+	cd $TERMUX_PKG_SRCDIR
+	make core-linux-x86_64 ${TERMUX_PKG_EXTRA_MAKE_ARGS}
+	cp build/tmp-linux-x86_64/frida-core/tools/frida-resource-compiler \
+		$TERMUX_PKG_HOSTBUILD_DIR/
+}
 
 termux_step_pre_configure () {
 	termux_setup_nodejs
@@ -33,6 +48,8 @@ termux_step_make () {
 	else
 		arch=${TERMUX_ARCH}
 	fi
+
+	export PATH=$TERMUX_PKG_HOSTBUILD_DIR:$PATH
 
 	CC=gcc CXX=g++ make python-android-${arch} ${TERMUX_PKG_EXTRA_MAKE_ARGS}
 	CC=gcc CXX=g++ make tools-android-${arch} ${TERMUX_PKG_EXTRA_MAKE_ARGS}

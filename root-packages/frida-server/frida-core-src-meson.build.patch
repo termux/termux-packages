@@ -1,0 +1,47 @@
+--- ./frida-core/src/meson.build.orig	2022-06-10 09:09:38.955317481 +0200
++++ ./frida-core/src/meson.build	2022-06-10 09:09:54.362354379 +0200
+@@ -49,7 +49,7 @@
+       'frida-data-darwin-blob.S',
+     ],
+     command: [
+-      resource_compiler,
++      'frida-resource-compiler',
+       '--toolchain=apple',
+       '-c', '@INPUT0@',
+       '-o', join_paths(meson.current_build_dir(), 'frida-data-darwin'),
+@@ -150,7 +150,7 @@
+         helper_legacy,
+         meson.current_build_dir(),
+         host_os,
+-        resource_compiler,
++        'frida-resource-compiler',
+         '@INPUT0@',
+       ],
+     )
+@@ -187,7 +187,7 @@
+         'frida-data-android-blob.S',
+       ],
+       command: [
+-        resource_compiler,
++        'frida-resource-compiler',
+         '--toolchain=gnu',
+         '-c', '@INPUT0@',
+         '-o', join_paths(meson.current_build_dir(), 'frida-data-android'),
+@@ -266,7 +266,7 @@
+         helper_legacy,
+         meson.current_build_dir(),
+         host_os,
+-        resource_compiler,
++        'frida-resource-compiler',
+         '@INPUT@',
+       ],
+     )
+@@ -324,7 +324,7 @@
+       get_option('agent_emulated_legacy'),
+       meson.current_build_dir(),
+       host_os,
+-      resource_compiler,
++      'frida-resource-compiler',
+       '@INPUT0@',
+     ],
+   )
