@@ -16,7 +16,8 @@ TERMUX_PKG_EXTRA_MAKE_ARGS="ANDROID_NDK_ROOT=$NDK"
 TERMUX_PKG_CONFFILES="var/service/frida-server/run var/service/frida-server/down"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_CONFLICTS="frida-tools (<< 15.1.24)"
-TERMUX_PKG_REPLACES="frida-tools (<< 15.1.24)"
+TERMUX_PKG_BREAKS="frida-server (<< 15.1.24)"
+TERMUX_PKG_REPLACES="frida-tools (<< 15.1.24), frida-server (<< 15.1.24)"
 
 termux_step_host_build() {
 	termux_setup_nodejs
