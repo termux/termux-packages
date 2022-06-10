@@ -1,0 +1,22 @@
+Fix clang `-wformat` warning.
+
+--- ciso-1.0.2/ciso.c	2015-07-08 02:05:38.000000000 +0800
++++ ciso-1.0.2.mod/ciso.c	2022-06-11 09:32:26.930298711 +0800
+@@ -139,7 +139,7 @@
+
+ 	/* show info */
+ 	printf("Decompress '%s' to '%s'\n",fname_in,fname_out);
+-	printf("Total File Size %lld bytes\n",ciso.total_bytes);
++	printf("Total File Size %lu bytes\n",ciso.total_bytes);
+ 	printf("block size      %d  bytes\n",ciso.block_size);
+ 	printf("total blocks    %d  blocks\n",ciso_total_block);
+ 	printf("index align     %d\n",1<<ciso.align);
+@@ -280,7 +280,7 @@
+
+ 	/* show info */
+ 	printf("Compress '%s' to '%s'\n",fname_in,fname_out);
+-	printf("Total File Size %lld bytes\n",ciso.total_bytes);
++	printf("Total File Size %lu bytes\n",ciso.total_bytes);
+ 	printf("block size      %d  bytes\n",ciso.block_size);
+ 	printf("index align     %d\n",1<<ciso.align);
+ 	printf("compress level  %d\n",level);
