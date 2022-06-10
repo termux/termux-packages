@@ -1,5 +1,14 @@
 --- ./releng/setup-env.sh.orig	2021-12-05 14:17:02.109846250 +0100
 +++ ./releng/setup-env.sh	2021-12-05 14:21:05.179490094 +0100
+@@ -458,7 +458,7 @@
+     NM="${NM:-${host_toolprefix}nm}"
+     RANLIB="${RANLIB:-${host_toolprefix}ranlib}"
+     STRIP="${STRIP:-${host_toolprefix}strip}"
+-    STRIP_FLAGS="--strip-all"
++    STRIP_FLAGS="--strip-unneeded --preserve-dates"
+     READELF="${READELF:-${host_toolprefix}readelf}"
+     OBJCOPY="${OBJCOPY:-${host_toolprefix}objcopy}"
+     OBJDUMP="${OBJDUMP:-${host_toolprefix}objdump}"
 @@ -695,7 +695,7 @@
      host_cxxlibs="c++_static c++abi"
      case $host_arch in

@@ -1,0 +1,35 @@
+--- ../setup-env.sh.orig	2022-06-09 20:08:37.737613041 +0000
++++ ./releng/setup-env.sh	2022-06-09 20:08:51.947604601 +0000
+@@ -789,19 +789,19 @@
+       "$FRIDA_RELENG/driver-wrapper-android.sh.in" > "$cxx_wrapper"
+     chmod +x "$cxx_wrapper"
+ 
+-    CPP="$cc_wrapper -E"
+-    CC="$cc_wrapper"
+-    CXX="$cxx_wrapper"
+-    LD="${android_toolroot}/bin/ld"
+-
+-    AR="${android_toolroot}/bin/llvm-ar"
+-    NM="${android_toolroot}/bin/llvm-nm"
+-    RANLIB="${android_toolroot}/bin/llvm-ranlib"
+-    STRIP="${android_toolroot}/bin/llvm-strip"
+-    STRIP_FLAGS="--strip-all"
+-    READELF="${android_toolroot}/bin/llvm-readelf"
+-    OBJCOPY="${android_toolroot}/bin/llvm-objcopy"
+-    OBJDUMP="${android_toolroot}/bin/llvm-objdump"
++    CPP="${host_compiler_prefix}cpp"
++    CC="${host_compiler_prefix}clang"
++    CXX="${host_compiler_prefix}clang++"
++    LD="ld.lld"
++
++    AR="llvm-ar"
++    NM="llvm-nm"
++    RANLIB="llvm-ranlib"
++    STRIP="llvm-strip"
++    STRIP_FLAGS="--strip-unneeded --preserve-dates"
++    READELF="llvm-readelf"
++    OBJCOPY="llvm-objcopy"
++    OBJDUMP="llvm-objdump"
+ 
+     CFLAGS="$base_compiler_flags"
+     LDFLAGS="$base_linker_flags"
