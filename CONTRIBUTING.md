@@ -134,7 +134,9 @@ met these conditions:
 
 Packages that require root permission to get working or rely on features that
 are available only with SELinux permissive mode or require custom firmware
-are handled in a dedicated repository: https://github.com/termux/termux-root-packages.
+are handled in a dedicated
+[apt repository](https://packages-cf.termux.dev/apt/termux-root/) whose build
+recipes you can find in [x11-packages directory](/x11-packages).
 Remember that Termux is designed primarily for non-root use and we may
 remove functionality requiring root from packages if it interfere with
 non-root usage or cause build time issues.
