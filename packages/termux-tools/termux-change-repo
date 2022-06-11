@@ -1,5 +1,8 @@
 #!@TERMUX_PREFIX@/bin/bash
 
+# Setup TERMUX_APP_PACKAGE_MANAGER
+source "@TERMUX_PREFIX@/bin/termux-setup-package-manager" || exit 1
+
 if [ "$1" == "--help" ] || [ "$1" == "-help" ]; then
     echo "Script for redirecting subscribed repositories to mirrors."
     echo "You can choose between mirrors listed at"
@@ -195,6 +198,17 @@ replace_repository() {
         mv "$TMPFILE" "@TERMUX_PREFIX@/etc/apt/${SOURCE_FILE}"
     fi
 }
+
+if ! command -v apt 1>/dev/null; then
+    echo "Error: changing mirrors can't execute because apt is not installed."
+    exit 1
+fi
+
+if [ "$TERMUX_APP_PACKAGE_MANAGER" = "pacman" ]; then
+    read -p "Warning: termux-change-repo can only change mirrors for apt, is that what you intended? [y|n] " -n 1 -r
+    echo
+    [[ ${REPLY} =~ ^[Nn]$ ]] && exit
+fi
 
 TEMPFILE="$(mktemp @TERMUX_PREFIX@/tmp/mirror.XXXXXX)"
 
