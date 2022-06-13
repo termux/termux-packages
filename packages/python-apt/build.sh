@@ -5,8 +5,9 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.3.0
 TERMUX_PKG_SRCURL=https://ftp.debian.org/debian/pool/main/p/python-apt/python-apt_${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=de4a284bc7a738793615631d451524f42404034f4d787953b7621b25bc29e474
-TERMUX_PKG_DEPENDS="apt, libc++, python"
+TERMUX_PKG_DEPENDS="apt, libc++, python, build-essential, texinfo"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_REVISION=1
 
 _PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
 
