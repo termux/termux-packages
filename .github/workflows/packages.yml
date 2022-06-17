@@ -150,7 +150,7 @@ jobs:
 
     - name: Free additional disk space (if necessary)
       run: |
-        if grep -q '^rust$\|^rustc-nightly$\|^dart$' ./built_termux-main_packages.txt; then
+        if grep -q '^dart$\|^rust$\|^rustc-nightly$\|^swift$' ./built_termux-main_packages.txt; then
           echo "Free additional disk space on host"
           sudo apt purge -yq $(dpkg -l | grep '^ii' | awk '{ print $2 }' | grep -P '(cabal-|dotnet-|ghc-|libmono|php)') \
             liblldb-6.0 libllvm6.0:amd64 mono-runtime-common monodoc-manual powershell ruby

@@ -11,9 +11,9 @@ TERMUX_PKG_DEPENDS="clang, libandroid-glob, libandroid-posix-semaphore, libandro
 TERMUX_PKG_BUILD_DEPENDS="rsync"
 TERMUX_PKG_BLACKLISTED_ARCHES="i686"
 TERMUX_PKG_NO_STATICSPLIT=true
-# Build of swift uses cmake, but the standard
-# termux_step_configure_cmake function is not used. Instead we set
-# TERMUX_PKG_FORCE_CMAKE to make the build system aware that cmake is
+# Building swift uses CMake, but the standard
+# termux_step_configure_cmake function is not used. Instead, we set
+# TERMUX_PKG_FORCE_CMAKE to make the build system aware that CMake is
 # needed.
 TERMUX_PKG_FORCE_CMAKE=true
 TERMUX_CMAKE_BUILD=Ninja
