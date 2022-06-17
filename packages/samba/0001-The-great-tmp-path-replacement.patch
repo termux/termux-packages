@@ -230,59 +230,76 @@ diff -uNr samba-4.14.4/source3/winbindd/winbindd_pam.c samba-4.14.4.mod/source3/
  		}
  		if (strequal(type, "KEYRING")) {
  			gen_cc = talloc_asprintf(
-diff -uNr samba-4.14.4/source4/heimdal/lib/krb5/expand_path.c samba-4.14.4.mod/source4/heimdal/lib/krb5/expand_path.c
---- samba-4.14.4/source4/heimdal/lib/krb5/expand_path.c	2021-01-21 13:20:40.000000000 +0000
-+++ samba-4.14.4.mod/source4/heimdal/lib/krb5/expand_path.c	2021-05-06 11:30:43.346213897 +0000
-@@ -287,11 +287,11 @@
+diff --color -uNr samba-4.16.2/third_party/heimdal/lib/base/expand_path.c samba-4.16.2.mod/third_party/heimdal/lib/base/expand_path.c
+--- samba-4.16.2/third_party/heimdal/lib/base/expand_path.c	2022-03-08 11:53:05.738089600 -0300
++++ samba-4.16.2.mod/third_party/heimdal/lib/base/expand_path.c	2022-06-22 13:06:48.566946511 -0300
+@@ -281,12 +281,12 @@
+ {
      const char *p = NULL;
  
-     if (issuid())
--	p = getenv("TEMP");
-+	p = getenv("TMPDIR");
+-    p = secure_getenv("TEMP");
++    p = secure_getenv("TMPDIR");
+ 
      if (p)
- 	*ret = strdup(p);
+         *ret = strdup(p);
      else
--	*ret = strdup("/tmp");
-+	*ret = strdup("@TERMUX_PREFIX@/tmp");
+-        *ret = strdup("/tmp");
++        *ret = strdup("@TERMUX_PREFIX@/tmp");
      if (*ret == NULL)
- 	return ENOMEM;
+         return heim_enomem(context);
      return 0;
-diff -uNr samba-4.14.4/source4/heimdal/lib/krb5/krb5.h samba-4.14.4.mod/source4/heimdal/lib/krb5/krb5.h
---- samba-4.14.4/source4/heimdal/lib/krb5/krb5.h	2021-01-21 13:20:40.000000000 +0000
-+++ samba-4.14.4.mod/source4/heimdal/lib/krb5/krb5.h	2021-05-06 11:30:43.346213897 +0000
-@@ -351,7 +351,7 @@
- #ifdef KRB5_USE_PATH_TOKENS
- #define KRB5_DEFAULT_CCFILE_ROOT "%{TEMP}/krb5cc_"
- #else
--#define KRB5_DEFAULT_CCFILE_ROOT "/tmp/krb5cc_"
-+#define KRB5_DEFAULT_CCFILE_ROOT "@TERMUX_PREFIX@/tmp/krb5cc_"
- #endif
+diff --color -uNr samba-4.16.2/third_party/heimdal/lib/sqlite/sqlite3.c samba-4.16.2.mod/third_party/heimdal/lib/sqlite/sqlite3.c
+--- samba-4.16.2/third_party/heimdal/lib/sqlite/sqlite3.c	2022-01-24 07:27:00.581315300 -0300
++++ samba-4.16.2.mod/third_party/heimdal/lib/sqlite/sqlite3.c	2022-06-22 13:04:28.923462956 -0300
+@@ -39360,9 +39360,7 @@
+   static const char *azDirs[] = {
+      0,
+      0,
+-     "/var/tmp",
+-     "/usr/tmp",
+-     "/tmp",
++     "@TERMUX_PREFIX@/tmp",
+      "."
+   };
+   unsigned int i = 0;
+diff --color -uNr samba-4.16.2/third_party/heimdal/lib/krb5/krb5.h samba-4.16.2.mod/third_party/heimdal/lib/krb5/krb5.h
+--- samba-4.16.2/third_party/heimdal/lib/krb5/krb5.h	2022-03-08 11:53:05.786090000 -0300
++++ samba-4.16.2.mod/third_party/heimdal/lib/krb5/krb5.h	2022-06-22 13:44:39.524014625 -0300
+@@ -368,7 +368,7 @@
+ 
+ struct krb5_cc_ops;
+ 
+-#define KRB5_DEFAULT_CCFILE_ROOT "%{TEMP}/krb5cc_"
++#define KRB5_DEFAULT_CCFILE_ROOT "%{TMPDIR}/krb5cc_"
  
  #define KRB5_DEFAULT_CCROOT "FILE:" KRB5_DEFAULT_CCFILE_ROOT
-diff -uNr samba-4.14.4/source4/heimdal/lib/krb5/krb5_locl.h samba-4.14.4.mod/source4/heimdal/lib/krb5/krb5_locl.h
---- samba-4.14.4/source4/heimdal/lib/krb5/krb5_locl.h	2021-01-21 13:20:40.000000000 +0000
-+++ samba-4.14.4.mod/source4/heimdal/lib/krb5/krb5_locl.h	2021-05-06 11:30:43.346213897 +0000
-@@ -303,7 +303,7 @@
+
+diff --color -uNr samba-4.16.2/third_party/heimdal/lib/krb5/krb5_locl.h samba-4.16.2.mod/third_party/heimdal/lib/krb5/krb5_locl.h
+--- samba-4.16.2/third_party/heimdal/lib/krb5/krb5_locl.h	2022-03-08 11:53:05.786090000 -0300
++++ samba-4.16.2.mod/third_party/heimdal/lib/krb5/krb5_locl.h	2022-06-22 13:17:17.317004849 -0300
+@@ -341,8 +341,8 @@
+     krb5_boolean no_ticket_store;       /* Don't store service tickets */
  } krb5_context_data;
  
- #ifndef KRB5_USE_PATH_TOKENS
--#define KRB5_DEFAULT_CCNAME_FILE "FILE:/tmp/krb5cc_%{uid}"
+-#define KRB5_DEFAULT_CCNAME_FILE "FILE:%{TEMP}/krb5cc_%{uid}"
+-#define KRB5_DEFAULT_CCNAME_DIR "DIR:%{TEMP}/krb5cc_%{uid}_dir/"
 +#define KRB5_DEFAULT_CCNAME_FILE "FILE:@TERMUX_PREFIX@/tmp/krb5cc_%{uid}"
- #else
- #define KRB5_DEFAULT_CCNAME_FILE "FILE:%{TEMP}/krb5cc_%{uid}"
- #endif
-diff -uNr samba-4.14.4/source4/heimdal/lib/krb5/krb5-v4compat.h samba-4.14.4.mod/source4/heimdal/lib/krb5/krb5-v4compat.h
---- samba-4.14.4/source4/heimdal/lib/krb5/krb5-v4compat.h	2021-01-21 13:20:40.000000000 +0000
-+++ samba-4.14.4.mod/source4/heimdal/lib/krb5/krb5-v4compat.h	2021-05-06 11:30:43.346213897 +0000
-@@ -108,7 +108,7 @@
- #ifdef KRB5_USE_PATH_TOKENS
- #define TKT_ROOT "%{TEMP}/tkt"
- #else
--#define TKT_ROOT "/tmp/tkt"
-+#define TKT_ROOT "@TERMUX_PREFIX@/tmp/tkt"
- #endif
++#define KRB5_DEFAULT_CCNAME_DIR "DIR:@TERMUX_PREFIX@/tmp/krb5cc_%{uid}_dir/"
+ #define KRB5_DEFAULT_CCNAME_API "API:"
+ #define KRB5_DEFAULT_CCNAME_KCM_KCM "KCM:%{uid}"
+ #define KRB5_DEFAULT_CCNAME_KCM_API "API:%{uid}"
+diff --color -uNr samba-4.16.2/third_party/heimdal/lib/krb5/krb5-v4compat.h samba-4.16.2.mod/third_party/heimdal/lib/krb5/krb5-v4compat.h
+--- samba-4.16.2/third_party/heimdal/lib/krb5/krb5-v4compat.h	2022-01-24 07:27:00.493315000 -0300
++++ samba-4.16.2.mod/third_party/heimdal/lib/krb5/krb5-v4compat.h	2022-06-22 13:20:24.143596374 -0300
+@@ -105,7 +105,7 @@
+ #define 	CLOCK_SKEW	5*60
+ 
+ #ifndef TKT_ROOT
+-#define TKT_ROOT "%{TEMP}/tkt"
++#define TKT_ROOT "%{TMPDIR}/tkt"
  #endif
  
+ struct _krb5_krb_auth_data {
 diff -uNr samba-4.14.4/source4/librpc/tests/binding_string.c samba-4.14.4.mod/source4/librpc/tests/binding_string.c
 --- samba-4.14.4/source4/librpc/tests/binding_string.c	2021-01-21 13:20:40.000000000 +0000
 +++ samba-4.14.4.mod/source4/librpc/tests/binding_string.c	2021-05-06 11:30:43.346213897 +0000
