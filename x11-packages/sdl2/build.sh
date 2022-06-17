@@ -2,15 +2,16 @@ TERMUX_PKG_HOMEPAGE=https://www.libsdl.org
 TERMUX_PKG_DESCRIPTION="A library for portable low-level access to a video framebuffer, audio output, mouse, and keyboard (version 2)"
 TERMUX_PKG_LICENSE="ZLIB"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.0.20
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=2.0.22
 TERMUX_PKG_SRCURL=https://www.libsdl.org/release/SDL2-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=c56aba1d7b5b0e7e999e4a7698c70b63a3394ff9704b5f6e1c57e0c16f04dd06
+TERMUX_PKG_SHA256=fe7cbf3127882e3fc7259a75a0cb585620272c51745d3852ab9dd87960697f2e
 TERMUX_PKG_DEPENDS="libandroid-glob, libflac, libogg, libsndfile, libvorbis, libx11, libxau, libxcb, libxcursor, libxdmcp, libxext, libxfixes, libxi, libxinerama, libxrandr, libxrender, libxss, libxxf86vm, pulseaudio"
 TERMUX_PKG_BUILD_DEPENDS="mesa"
 TERMUX_PKG_RECOMMENDS="mesa"
 TERMUX_PKG_CONFLICTS="libsdl2"
 TERMUX_PKG_REPLACES="libsdl2"
+
+TERMUX_PKG_AUTO_UPDATE=true
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --x-includes=${TERMUX_PREFIX}/include
