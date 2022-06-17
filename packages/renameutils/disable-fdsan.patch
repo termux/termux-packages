@@ -1,0 +1,29 @@
+diff -uNr renameutils-0.12.0/src/qcmd.c renameutils-0.12.0.mod/src/qcmd.c
+--- renameutils-0.12.0/src/qcmd.c     2022-06-17 18:18:07.573138900 +0800
++++ renameutils-0.12.0.mod/src/qcmd.c 2022-06-17 18:21:25.330399000 +0800
+@@ -40,6 +40,9 @@
+ #include "common/llist.h"
+ #include "qcmd.h"
+
++#include <android/fdsan.h>
++#include <dlfcn.h>
++
+ char *program;
+ bool simulate = false;
+ bool verbose = false;
+@@ -157,6 +160,16 @@
+     char *format_options = NULL;
+     bool interactive = false;
+
++    // For Android 11+.
++    void *lib_handle = dlopen("libc.so", RTLD_LAZY);
++    if (lib_handle) {
++        void (*set_fdsan_error_level)(enum android_fdsan_error_level newlevel) = dlsym(lib_handle, "android_fdsan_set_error_level");
++        if (set_fdsan_error_level) {
++            set_fdsan_error_level(ANDROID_FDSAN_ERROR_LEVEL_DISABLED);
++        }
++        dlclose(lib_handle);
++    }
++
+     set_program_name(argv[0]);
+     program = base_name(program_name);
