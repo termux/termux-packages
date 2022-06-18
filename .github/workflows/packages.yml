@@ -246,7 +246,7 @@ jobs:
         REPOSITORY_DOMAIN="$(echo "$REPOSITORY_URL" | cut -d'/' -f3)"
         echo "Checking $REPOSITORY_DOMAIN ip access"
         for ip in $(dig -t a +short "$REPOSITORY_DOMAIN" | sed '1d'); do
-          if [ $(curl -s -o /dev/null -w "%{http_code}" --resolve "$REPOSITORY_DOMAIN:$ip"  "http://$REPOSITORY_DOMAIN") != "200" ]; then
+          if [ $(curl -s -o /dev/null -w "%{http_code}" --resolve "$REPOSITORY_DOMAIN:80:$ip"  "http://$REPOSITORY_DOMAIN") != "200" ]; then
             echo "success: $ip"
             CURL_ADDITIONAL_OPTIONS=(--resolve "$REPOSITORY_DOMAIN:$ip")
             break
