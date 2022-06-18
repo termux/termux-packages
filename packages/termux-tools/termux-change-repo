@@ -11,7 +11,19 @@ if [ "$1" == "--help" ] || [ "$1" == "-help" ]; then
 fi
 
 select_repository_group() {
-    if [ "$1" == "Mirrors in Europe" ]; then
+    if [ "$1" == "Mirrors in Asia" ]; then
+        echo "[*] Mirrors in Asia (excl. China) selected"
+        unlink @TERMUX_PREFIX@/etc/termux/chosen_mirrors
+        ln -sf @TERMUX_PREFIX@/etc/termux/mirrors/asia \
+           @TERMUX_PREFIX@/etc/termux/chosen_mirrors
+
+    elif [ "$1" == "Mirrors in China" ]; then
+        echo "[*] Mirrors in China selected"
+        unlink @TERMUX_PREFIX@/etc/termux/chosen_mirrors
+        ln -sf @TERMUX_PREFIX@/etc/termux/mirrors/china \
+           @TERMUX_PREFIX@/etc/termux/chosen_mirrors
+
+    elif [ "$1" == "Mirrors in Europe" ]; then
         echo "[*] Mirrors in Europe selected"
         unlink @TERMUX_PREFIX@/etc/termux/chosen_mirrors
         ln -sf @TERMUX_PREFIX@/etc/termux/mirrors/europe \
@@ -21,18 +33,6 @@ select_repository_group() {
         echo "[*] Mirrors in North America selected"
         unlink @TERMUX_PREFIX@/etc/termux/chosen_mirrors
         ln -sf @TERMUX_PREFIX@/etc/termux/mirrors/north_america \
-            @TERMUX_PREFIX@/etc/termux/chosen_mirrors
-
-    elif [ "$1" == "Mirrors in China" ]; then
-        echo "[*] Mirrors in China selected"
-        unlink @TERMUX_PREFIX@/etc/termux/chosen_mirrors
-        ln -sf @TERMUX_PREFIX@/etc/termux/mirrors/china \
-            @TERMUX_PREFIX@/etc/termux/chosen_mirrors
-
-    elif [ "$1" == "Mirrors in Iran" ]; then
-        echo "[*] Mirrors in iran selected"
-        unlink @TERMUX_PREFIX@/etc/termux/chosen_mirrors
-        ln -sf @TERMUX_PREFIX@/etc/termux/mirrors/iran \
             @TERMUX_PREFIX@/etc/termux/chosen_mirrors
 
     elif [ "$1" == "All mirrors" ]; then
@@ -62,9 +62,9 @@ TEMPFILE="$(mktemp @TERMUX_PREFIX@/tmp/mirror.XXXXXX)"
 
 MIRRORS=()
 MIRRORS+=("All mirrors" "All in the entire world" "on")
+MIRRORS+=("Mirrors in Asia" "All in Asia (excl. China)" "off")
 MIRRORS+=("Mirrors in China" "All in China" "off")
 MIRRORS+=("Mirrors in Europe" "All in Europe" "off")
-MIRRORS+=("Mirrors in Iran" "All in Iran" "off")
 MIRRORS+=("Mirrors in North America" "All in North America" "off")
 
 dialog \
