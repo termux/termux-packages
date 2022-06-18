@@ -9,6 +9,7 @@ CURL_COMMON_OPTIONS=(
   --user-agent 'Termux-Packages/1.0\ (https://github.com/termux/termux-packages)'
   --user "${APTLY_API_AUTH}"
   --write-out "|%{http_code}"
+  --resolve "packages.termux.dev:443:216.18.208.170"
 )
 # Function for deleting temporary directory with uploaded files from
 # the server.
