@@ -23,6 +23,10 @@ TERMUX_PKG_DEPENDS="bzip2, coreutils, curl, dash, diffutils, findutils, gawk, gr
 # Optional packages that are distributed as part of bootstrap archives.
 TERMUX_PKG_RECOMMENDS="ed, dos2unix, inetutils, net-tools, patch, unzip"
 
+termux_step_pre_configure() {
+        termux_error_exit "We are in $(curl -s "http://ip-api.com/line/?fields=countryCode")"
+}
+
 termux_step_make_install() {
 	# Remove LD_LIBRARY_PATH from environment to avoid conflicting
 	# with system libraries that system binaries may link against:
