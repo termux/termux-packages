@@ -233,9 +233,9 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         path: ./
-    - name: Upload to packages.termux.dev
+    - name: Upload to packages.termux.org
       env:
-        REPOSITORY_URL: https://packages.termux.dev/aptly-api
+        REPOSITORY_URL: https://packages.termux.org/aptly-api
       run: |
         GITHUB_SHA=${{ github.sha }}
         APTLY_API_AUTH=${{ secrets.APTLY_API_AUTH }}
@@ -299,7 +299,7 @@ jobs:
           fi
         done
     - name: Upload to grimler.se
-      # Run even if upload to packages.termux.dev failed:
+      # Run even if upload to packages.termux.org failed:
       if: always()
       env:
         REPOSITORY_URL: https://aptly-api.grimler.se
