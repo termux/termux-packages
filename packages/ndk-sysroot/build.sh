@@ -3,7 +3,6 @@ TERMUX_PKG_DESCRIPTION="System header and library files from the Android NDK nee
 TERMUX_PKG_LICENSE="NCSA"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=$TERMUX_NDK_VERSION
-TERMUX_PKG_REVISION=7
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 # This package has taken over <pty.h> from the previous libutil-dev
 # and iconv.h from libandroid-support-dev:
@@ -48,7 +47,7 @@ termux_step_extract_into_massagedir() {
 	NDK_ARCH=$TERMUX_ARCH
 	test $NDK_ARCH == 'i686' && NDK_ARCH='i386'
 	# clang 13 requires libunwind on Android.
-	cp $TERMUX_STANDALONE_TOOLCHAIN/lib64/clang/12.0.8/lib/linux/$NDK_ARCH/libunwind.a .
+	cp $TERMUX_STANDALONE_TOOLCHAIN/lib64/clang/12.0.9/lib/linux/$NDK_ARCH/libunwind.a .
 
 	for lib in librt.so libpthread.so libutil.so; do
 		echo 'INPUT(-lc)' > $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/$lib
