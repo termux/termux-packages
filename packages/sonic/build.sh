@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/valeriansaliou/sonic
+TERMUX_PKG_DESCRIPTION="A light-weight search engine backened"
+TERMUX_PKG_LICENSE="MPL-2.0"
+TERMUX_PKG_MAINTAINER="@kcubeterm"
+TERMUX_PKG_VERSION="1.3.2"
+TERMUX_PKG_SRCURL="https://github.com/valeriansaliou/sonic/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
+TERMUX_PKG_SHA256=e07baccdc24dea6a6c0e6ef32e7faa3945318cfb2577127806c8558f1809283d
+TERMUX_PKG_BUILD_DEPENDS="clang,llvm"
+TERMUX_PKG_BUILD_IN_SRC=true
