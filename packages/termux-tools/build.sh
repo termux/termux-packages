@@ -106,4 +106,6 @@ termux_step_make_install() {
 
 	mkdir -p $TERMUX_PREFIX/etc/termux
 	cp -r $TERMUX_PKG_BUILDER_DIR/mirrors $TERMUX_PREFIX/etc/termux/
+	cd $TERMUX_PREFIX
+	TERMUX_PKG_CONFFILES+=" $(find etc/termux/mirrors -type f)"
 }
