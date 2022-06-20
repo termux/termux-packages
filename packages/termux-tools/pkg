@@ -118,7 +118,7 @@ select_mirror() {
 	current_mirror=$(grep -m 1 -P "^\s*deb\s+" @TERMUX_PREFIX@/etc/apt/sources.list | grep -oP 'https?://[^\s]+')
 
 	# Do not update mirror if $TERMUX_PKG_NO_MIRROR_SELECT was set.
-	if [ -n "${TERMUX_PKG_NO_MIRROR_SELECT-}" ] && [ ! -n "$current_mirror" ]; then
+	if [ -n "${TERMUX_PKG_NO_MIRROR_SELECT-}" ] && [ -n "$current_mirror" ]; then
 		return
 	fi
 
