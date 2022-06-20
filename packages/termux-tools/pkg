@@ -243,7 +243,7 @@ select_mirror() {
 	local selected_mirror=""
 	if ((total_mirror_weight > 0)); then
 		local random_weight
-		random_weight=$((RANDOM % total_mirror_weight + 1))
+		random_weight=$(( (RANDOM % total_mirror_weight + 1) - 1 ))
 		echo "Picking mirror: (${random_weight}) ${weighted_mirrors[${random_weight}]}"
 		selected_mirror="${weighted_mirrors[${random_weight}]}"
 	fi
