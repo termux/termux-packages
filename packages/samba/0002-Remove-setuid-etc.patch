@@ -1,9 +1,9 @@
 When non-root, this only succeeds when SELinux is in permissive mode.
 
-diff -uNr samba-4.13.2/lib/replace/wscript samba-4.13.2.mod/lib/replace/wscript
---- samba-4.13.2/lib/replace/wscript	2020-09-15 13:43:18.000000000 +0000
-+++ samba-4.13.2.mod/lib/replace/wscript	2020-11-23 13:26:08.057004700 +0000
-@@ -389,8 +389,8 @@
+diff --color -uNr samba-4.16.2/lib/replace/wscript samba-4.16.2.mod/lib/replace/wscript
+--- samba-4.16.2/lib/replace/wscript	2022-01-24 07:26:58.905306300 -0300
++++ samba-4.16.2.mod/lib/replace/wscript	2022-06-22 18:40:47.788122340 -0300
+@@ -401,8 +401,8 @@
  
      conf.CHECK_FUNCS('shl_load shl_unload shl_findsym')
      conf.CHECK_FUNCS('pipe strftime srandom random srand rand usleep setbuffer')
@@ -14,7 +14,7 @@ diff -uNr samba-4.13.2/lib/replace/wscript samba-4.13.2.mod/lib/replace/wscript
      conf.CHECK_FUNCS('ftruncate chsize rename waitpid wait4')
      conf.CHECK_FUNCS('initgroups pread pwrite strndup strcasestr strsep')
      conf.CHECK_FUNCS('strtok_r mkdtemp dup2 dprintf vdprintf isatty chown lchown')
-@@ -460,7 +460,7 @@
+@@ -472,7 +472,7 @@
      conf.CHECK_FUNCS('if_nametoindex strerror_r')
      conf.CHECK_FUNCS('syslog')
      conf.CHECK_FUNCS('gai_strerror get_current_dir_name')
@@ -122,7 +122,7 @@ diff -uNr samba-4.13.2/source3/modules/vfs_aio_pthread.c samba-4.13.2.mod/source
  
  	/*
  	 * Copy the full fsp_name and smb_fname which is the basename.
-@@ -506,7 +495,7 @@
+@@ -513,7 +502,7 @@
  #endif
  
  static struct vfs_fn_pointers vfs_aio_pthread_fns = {
@@ -131,21 +131,6 @@ diff -uNr samba-4.13.2/source3/modules/vfs_aio_pthread.c samba-4.13.2.mod/source
  	.openat_fn = aio_pthread_openat_fn,
  #endif
  };
-diff -uNr samba-4.13.2/source3/modules/vfs_aio_pthread.c.rej samba-4.13.2.mod/source3/modules/vfs_aio_pthread.c.rej
---- samba-4.13.2/source3/modules/vfs_aio_pthread.c.rej	1970-01-01 00:00:00.000000000 +0000
-+++ samba-4.13.2.mod/source3/modules/vfs_aio_pthread.c.rej	2020-11-23 13:26:08.058004764 +0000
-@@ -0,0 +1,11 @@
-+--- source3/modules/vfs_aio_pthread.c
-++++ source3/modules/vfs_aio_pthread.c
-+@@ -477,7 +466,7 @@ static int aio_pthread_open_fn(vfs_handle_struct *handle,
-+ #endif
-+ 
-+ static struct vfs_fn_pointers vfs_aio_pthread_fns = {
-+-#if defined(HAVE_OPENAT) && defined(HAVE_LINUX_THREAD_CREDENTIALS)
-++#if defined(HAVE_OPENAT)
-+ 	.open_fn = aio_pthread_open_fn,
-+ #endif
-+ };
 diff -uNr samba-4.13.2/source3/modules/vfs_default.c samba-4.13.2.mod/source3/modules/vfs_default.c
 --- samba-4.13.2/source3/modules/vfs_default.c	2020-07-09 09:33:56.000000000 +0000
 +++ samba-4.13.2.mod/source3/modules/vfs_default.c	2020-11-23 13:26:08.059004828 +0000
@@ -159,9 +144,10 @@ diff -uNr samba-4.13.2/source3/modules/vfs_default.c samba-4.13.2.mod/source3/mo
  	if (have_per_thread_cwd && have_per_thread_creds) {
  		do_async = true;
  	}
-diff -uNr samba-4.13.2/source3/wscript samba-4.13.2.mod/source3/wscript
---- samba-4.13.2/source3/wscript	2020-09-07 10:52:25.000000000 +0000
-+++ samba-4.13.2.mod/source3/wscript	2020-11-23 13:26:08.060004892 +0000
+)
+diff --color -uNr samba-4.16.2/source3/wscript samba-4.16.2.mod/source3/wscript
+--- samba-4.16.2/source3/wscript	2022-06-13 03:50:28.986470500 -0300
++++ samba-4.16.2.mod/source3/wscript	2022-06-22 19:16:58.986512960 -0300
 @@ -131,7 +131,7 @@
      conf.CHECK_FUNCS('setsid glob strpbrk crypt16 getauthuid')
      conf.CHECK_FUNCS('innetgr')
@@ -187,7 +173,7 @@ diff -uNr samba-4.13.2/source3/wscript samba-4.13.2.mod/source3/wscript
  statvfs
  strcasecmp
  strchr
-@@ -989,110 +986,6 @@
+@@ -944,111 +941,6 @@
  #
  # Ensure we select the correct set of system calls on Linux.
  #
@@ -295,9 +281,10 @@ diff -uNr samba-4.13.2/source3/wscript samba-4.13.2.mod/source3/wscript
 -                                execute=True,
 -                                mandatory=True,
 -                                msg="Checking whether setuidx is available")
-     if Options.options.with_dnsupdate:
-         if not conf.CONFIG_SET('HAVE_KRB5'):
-             Logs.warn("--with-dnsupdate=yes but gssapi support not sufficient")
+-    # valgrind.h or valgrind/valgrind.h is checked in lib/replace/wscript
+     if Options.options.developer:
+         if conf.CONFIG_SET('HAVE_VALGRIND_H') or conf.CONFIG_SET('HAVE_VALGRIND_VALGRIND_H'):
+             conf.DEFINE('VALGRIND', '1')
 diff -uNr samba-4.13.2/tests/summary.c samba-4.13.2.mod/tests/summary.c
 --- samba-4.13.2/tests/summary.c	2020-07-09 09:33:57.000000000 +0000
 +++ samba-4.13.2.mod/tests/summary.c	2020-11-23 13:26:08.060004892 +0000
