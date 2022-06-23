@@ -13,9 +13,10 @@
 +
 +check_system_heimdal_binary("compile_et")
 +check_system_heimdal_binary("asn1_compile")
---- a/wscript_configure_system_heimdal	2019-12-17
-+++ b/wscript_configure_system_heimdal	2019-12-17
-@@ -37,14 +37,6 @@ def check_system_heimdal_lib(name, funct
+diff --color -uNr samba-4.16.2/wscript_configure_system_heimdal samba-4.16.2.mod/wscript_configure_system_heimdal
+--- samba-4.16.2/wscript_configure_system_heimdal	2022-01-24 07:27:00.645315600 -0300
++++ samba-4.16.2.mod/wscript_configure_system_heimdal	2022-06-23 20:05:32.963151404 -0300
+@@ -37,14 +37,6 @@
      conf.define('USING_SYSTEM_%s' % name.upper(), 1)
      return True
  
@@ -30,11 +31,13 @@
  check_system_heimdal_lib("com_err", "com_right_r com_err", "com_err.h")
  
  if check_system_heimdal_lib("roken", "rk_socket_set_reuseaddr", "roken.h"):
-@@ -96,7 +88,4 @@ finally:
+@@ -86,9 +78,6 @@
  #if conf.CHECK_BUNDLED_SYSTEM('tommath', checkfunctions='mp_init', headers='tommath.h'):
  #    conf.define('USING_SYSTEM_TOMMATH', 1)
  
 -check_system_heimdal_binary("compile_et")
 -check_system_heimdal_binary("asn1_compile")
 -
+ conf.env.KRB5_VENDOR = 'heimdal'
  conf.define('USING_SYSTEM_KRB5', 1)
+ conf.define('USING_SYSTEM_HEIMDAL', 1)
