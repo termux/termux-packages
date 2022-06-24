@@ -108,7 +108,6 @@ EOF
 		--without-ads \
 		--without-automount \
 		--without-dmapi \
-		--without-dnsupdate \
 		--without-fam \
 		--without-gettext \
 		--with-gpfs=/dev/null \
