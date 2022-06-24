@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=6.12.0.122
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.mono-project.com/sources/mono/mono-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=29c277660fc5e7513107aee1cbf8c5057c9370a4cdfeda2fc781be6986d89d23
 TERMUX_PKG_DEPENDS="krb5, zlib"
@@ -36,4 +37,6 @@ termux_step_pre_configure() {
 termux_step_post_make_install() {
 	find $_PREFIX_FOR_BUILD/lib/mono -name '*.so' -exec rm -f \{\} \;
 	cp -rT $_PREFIX_FOR_BUILD/lib/mono $TERMUX_PREFIX/lib/mono
+	# XXX: Map libc to libc.so rather than libc.so.6
+	sed -i "s/libc.so.6/libc.so/g" $TERMUX_PREFIX/etc/mono/config
 }
