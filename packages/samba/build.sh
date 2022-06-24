@@ -117,7 +117,6 @@ EOF
 		--without-ldb-lmdb \
 		--without-libarchive \
 		--without-lttng \
-		--without-ntvfs-fileserver \
 		--without-pam \
 		--without-quotas \
 		--without-regedit \
