@@ -1,0 +1,338 @@
+diff --git a/.build/checkouts/Embassy/Sources/KqueueSelector.swift b/.build/checkouts/Embassy/Sources/KqueueSelector.swift
+index e8d2817..192cc9c 100644
+--- a/.build/checkouts/Embassy/Sources/KqueueSelector.swift
++++ b/.build/checkouts/Embassy/Sources/KqueueSelector.swift
+@@ -8,7 +8,7 @@
+ 
+ import Foundation
+ 
+-#if !os(Linux)
++#if !os(Linux) && !os(Android)
+ 
+ public final class KqueueSelector: Selector {
+     enum Error: Swift.Error {
+diff --git a/.build/checkouts/Embassy/Sources/SelectSelector.swift b/.build/checkouts/Embassy/Sources/SelectSelector.swift
+index 9351898..9a2e876 100644
+--- a/.build/checkouts/Embassy/Sources/SelectSelector.swift
++++ b/.build/checkouts/Embassy/Sources/SelectSelector.swift
+@@ -66,7 +66,7 @@ public final class SelectSelector: Selector {
+         let microsecondsPerSecond = 1000000
+         if let timeout = timeout {
+             var timeoutVal = timeval()
+-            #if os(Linux)
++            #if os(Linux) || os(Android)
+             timeoutVal.tv_sec = Int(timeout)
+             timeoutVal.tv_usec = Int(
+                 Int(timeout * Double(microsecondsPerSecond)) -
+diff --git a/.build/checkouts/Embassy/Sources/SystemLibrary.swift b/.build/checkouts/Embassy/Sources/SystemLibrary.swift
+index d51e046..1df7898 100644
+--- a/.build/checkouts/Embassy/Sources/SystemLibrary.swift
++++ b/.build/checkouts/Embassy/Sources/SystemLibrary.swift
+@@ -8,7 +8,7 @@
+ 
+ import Foundation
+ 
+-#if os(Linux)
++#if canImport(Glibc)
+ import Glibc
+ #else
+ import Darwin
+@@ -16,7 +16,7 @@ import Darwin
+ 
+ /// Collection of system library methods and constants
+ struct SystemLibrary {
+-    #if os(Linux)
++    #if os(Linux) || os(Android)
+         // MARK: Linux constants
+         static let fdSetSize = FD_SETSIZE
+         static let nfdbits: Int32 = Int32(MemoryLayout<Int>.size) * 8
+@@ -42,24 +42,24 @@ struct SystemLibrary {
+         static func fdSet(fd: Int32, set: inout fd_set) {
+             let intOffset = Int(fd / SystemLibrary.nfdbits)
+             let bitOffset = Int(fd % SystemLibrary.nfdbits)
+-            let mask = 1 << bitOffset
++            let mask : UInt = 1 << bitOffset
+             switch intOffset {
+-            case 0: set.__fds_bits.0 = set.__fds_bits.0 | mask
+-            case 1: set.__fds_bits.1 = set.__fds_bits.1 | mask
+-            case 2: set.__fds_bits.2 = set.__fds_bits.2 | mask
+-            case 3: set.__fds_bits.3 = set.__fds_bits.3 | mask
+-            case 4: set.__fds_bits.4 = set.__fds_bits.4 | mask
+-            case 5: set.__fds_bits.5 = set.__fds_bits.5 | mask
+-            case 6: set.__fds_bits.6 = set.__fds_bits.6 | mask
+-            case 7: set.__fds_bits.7 = set.__fds_bits.7 | mask
+-            case 8: set.__fds_bits.8 = set.__fds_bits.8 | mask
+-            case 9: set.__fds_bits.9 = set.__fds_bits.9 | mask
+-            case 10: set.__fds_bits.10 = set.__fds_bits.10 | mask
+-            case 11: set.__fds_bits.11 = set.__fds_bits.11 | mask
+-            case 12: set.__fds_bits.12 = set.__fds_bits.12 | mask
+-            case 13: set.__fds_bits.13 = set.__fds_bits.13 | mask
+-            case 14: set.__fds_bits.14 = set.__fds_bits.14 | mask
+-            case 15: set.__fds_bits.15 = set.__fds_bits.15 | mask
++            case 0: set.fds_bits.0 = set.fds_bits.0 | mask
++            case 1: set.fds_bits.1 = set.fds_bits.1 | mask
++            case 2: set.fds_bits.2 = set.fds_bits.2 | mask
++            case 3: set.fds_bits.3 = set.fds_bits.3 | mask
++            case 4: set.fds_bits.4 = set.fds_bits.4 | mask
++            case 5: set.fds_bits.5 = set.fds_bits.5 | mask
++            case 6: set.fds_bits.6 = set.fds_bits.6 | mask
++            case 7: set.fds_bits.7 = set.fds_bits.7 | mask
++            case 8: set.fds_bits.8 = set.fds_bits.8 | mask
++            case 9: set.fds_bits.9 = set.fds_bits.9 | mask
++            case 10: set.fds_bits.10 = set.fds_bits.10 | mask
++            case 11: set.fds_bits.11 = set.fds_bits.11 | mask
++            case 12: set.fds_bits.12 = set.fds_bits.12 | mask
++            case 13: set.fds_bits.13 = set.fds_bits.13 | mask
++            case 14: set.fds_bits.14 = set.fds_bits.14 | mask
++            case 15: set.fds_bits.15 = set.fds_bits.15 | mask
+             default: break
+             }
+         }
+@@ -67,24 +67,24 @@ struct SystemLibrary {
+         static func fdIsSet(fd: Int32, set: inout fd_set) -> Bool {
+             let intOffset = Int(fd / SystemLibrary.nfdbits)
+             let bitOffset = Int(fd % SystemLibrary.nfdbits)
+-            let mask = Int(1 << bitOffset)
++            let mask = UInt(1 << bitOffset)
+             switch intOffset {
+-            case 0: return set.__fds_bits.0 & mask != 0
+-            case 1: return set.__fds_bits.1 & mask != 0
+-            case 2: return set.__fds_bits.2 & mask != 0
+-            case 3: return set.__fds_bits.3 & mask != 0
+-            case 4: return set.__fds_bits.4 & mask != 0
+-            case 5: return set.__fds_bits.5 & mask != 0
+-            case 6: return set.__fds_bits.6 & mask != 0
+-            case 7: return set.__fds_bits.7 & mask != 0
+-            case 8: return set.__fds_bits.8 & mask != 0
+-            case 9: return set.__fds_bits.9 & mask != 0
+-            case 10: return set.__fds_bits.10 & mask != 0
+-            case 11: return set.__fds_bits.11 & mask != 0
+-            case 12: return set.__fds_bits.12 & mask != 0
+-            case 13: return set.__fds_bits.13 & mask != 0
+-            case 14: return set.__fds_bits.14 & mask != 0
+-            case 15: return set.__fds_bits.15 & mask != 0
++            case 0: return set.fds_bits.0 & mask != 0
++            case 1: return set.fds_bits.1 & mask != 0
++            case 2: return set.fds_bits.2 & mask != 0
++            case 3: return set.fds_bits.3 & mask != 0
++            case 4: return set.fds_bits.4 & mask != 0
++            case 5: return set.fds_bits.5 & mask != 0
++            case 6: return set.fds_bits.6 & mask != 0
++            case 7: return set.fds_bits.7 & mask != 0
++            case 8: return set.fds_bits.8 & mask != 0
++            case 9: return set.fds_bits.9 & mask != 0
++            case 10: return set.fds_bits.10 & mask != 0
++            case 11: return set.fds_bits.11 & mask != 0
++            case 12: return set.fds_bits.12 & mask != 0
++            case 13: return set.fds_bits.13 & mask != 0
++            case 14: return set.fds_bits.14 & mask != 0
++            case 15: return set.fds_bits.15 & mask != 0
+             default: return false
+             }
+         }
+diff --git a/.build/checkouts/Embassy/Sources/TCPSocket.swift b/.build/checkouts/Embassy/Sources/TCPSocket.swift
+index 17314af..0d3b802 100644
+--- a/.build/checkouts/Embassy/Sources/TCPSocket.swift
++++ b/.build/checkouts/Embassy/Sources/TCPSocket.swift
+@@ -27,7 +27,7 @@ public final class TCPSocket {
+     /// Whether to ignore SIGPIPE signal or not
+     var ignoreSigPipe: Bool {
+         get {
+-            #if os(Linux)
++            #if os(Linux) || os(Android)
+                 return false
+             #else
+                 var value: Int32 = 0
+@@ -41,7 +41,7 @@ public final class TCPSocket {
+         }
+ 
+         set {
+-            #if os(Linux)
++            #if os(Linux) || os(Android)
+                 // TODO: maybe we should call signal(SIGPIPE, SIG_IGN) here? but it affects
+                 // whole process
+                 return
+@@ -103,7 +103,7 @@ public final class TCPSocket {
+         }
+         // create IPv6 socket address
+         var address = sockaddr_in6()
+-        #if !os(Linux)
++        #if !os(Linux) && !os(Android)
+         address.sin6_len = UInt8(MemoryLayout<sockaddr_in6>.stride)
+         #endif
+         address.sin6_family = sa_family_t(AF_INET6)
+@@ -151,7 +151,7 @@ public final class TCPSocket {
+     func connect(host: String, port: Int) throws {
+         // create IPv6 socket address
+         var address = sockaddr_in6()
+-        #if !os(Linux)
++        #if !os(Linux) && !os(Android)
+         address.sin6_len = UInt8(MemoryLayout<sockaddr_in6>.stride)
+         #endif
+         address.sin6_family = sa_family_t(AF_INET6)
+diff --git a/.build/checkouts/ZIPFoundation/Sources/ZIPFoundation/Archive+BackingConfiguration.swift b/.build/checkouts/ZIPFoundation/Sources/ZIPFoundation/Archive+BackingConfiguration.swift
+index dcd1a0e..2c40f40 100644
+--- a/.build/checkouts/ZIPFoundation/Sources/ZIPFoundation/Archive+BackingConfiguration.swift
++++ b/.build/checkouts/ZIPFoundation/Sources/ZIPFoundation/Archive+BackingConfiguration.swift
+@@ -13,13 +13,13 @@ import Foundation
+ extension Archive {
+ 
+     struct BackingConfiguration {
+-        let file: UnsafeMutablePointer<FILE>
++        let file: OpaquePointer
+         let endOfCentralDirectoryRecord: EndOfCentralDirectoryRecord
+         let zip64EndOfCentralDirectory: ZIP64EndOfCentralDirectory?
+         #if swift(>=5.0)
+         let memoryFile: MemoryFile?
+ 
+-        init(file: UnsafeMutablePointer<FILE>,
++        init(file: OpaquePointer,
+              endOfCentralDirectoryRecord: EndOfCentralDirectoryRecord,
+              zip64EndOfCentralDirectory: ZIP64EndOfCentralDirectory? = nil,
+              memoryFile: MemoryFile? = nil) {
+@@ -30,7 +30,7 @@ extension Archive {
+         }
+         #else
+ 
+-        init(file: UnsafeMutablePointer<FILE>,
++        init(file: OpaquePointer,
+              endOfCentralDirectoryRecord: EndOfCentralDirectoryRecord,
+              zip64EndOfCentralDirectory: ZIP64EndOfCentralDirectory?) {
+             self.file = file
+diff --git a/.build/checkouts/ZIPFoundation/Sources/ZIPFoundation/Archive+MemoryFile.swift b/.build/checkouts/ZIPFoundation/Sources/ZIPFoundation/Archive+MemoryFile.swift
+index 916eff6..c36cc60 100644
+--- a/.build/checkouts/ZIPFoundation/Sources/ZIPFoundation/Archive+MemoryFile.swift
++++ b/.build/checkouts/ZIPFoundation/Sources/ZIPFoundation/Archive+MemoryFile.swift
+@@ -29,11 +29,11 @@ class MemoryFile {
+         self.data = data
+     }
+ 
+-    func open(mode: String) -> UnsafeMutablePointer<FILE>? {
++    func open(mode: String) -> OpaquePointer? {
+         let cookie = Unmanaged.passRetained(self)
+         let writable = mode.count > 0 && (mode.first! != "r" || mode.last! == "+")
+         let append = mode.count > 0 && mode.first! == "a"
+-        #if os(macOS) || os(iOS) || os(watchOS) || os(tvOS)
++        #if os(macOS) || os(iOS) || os(watchOS) || os(tvOS) || os(Android)
+         let result = writable
+             ? funopen(cookie.toOpaque(), readStub, writeStub, seekStub, closeStub)
+             : funopen(cookie.toOpaque(), readStub, nil, seekStub, closeStub)
+@@ -99,7 +99,7 @@ private func closeStub(_ cookie: UnsafeMutableRawPointer?) -> Int32 {
+     return 0
+ }
+ 
+-#if os(macOS) || os(iOS) || os(watchOS) || os(tvOS)
++#if os(macOS) || os(iOS) || os(watchOS) || os(tvOS) || os(Android)
+ private func readStub(_ cookie: UnsafeMutableRawPointer?,
+                       _ bytePtr: UnsafeMutablePointer<Int8>?,
+                       _ count: Int32) -> Int32 {
+diff --git a/.build/checkouts/ZIPFoundation/Sources/ZIPFoundation/Archive+Reading.swift b/.build/checkouts/ZIPFoundation/Sources/ZIPFoundation/Archive+Reading.swift
+index cfdf3f5..8ea890d 100644
+--- a/.build/checkouts/ZIPFoundation/Sources/ZIPFoundation/Archive+Reading.swift
++++ b/.build/checkouts/ZIPFoundation/Sources/ZIPFoundation/Archive+Reading.swift
+@@ -35,7 +35,7 @@ extension Archive {
+             }
+             try fileManager.createParentDirectoryStructure(for: url)
+             let destinationRepresentation = fileManager.fileSystemRepresentation(withPath: url.path)
+-            guard let destinationFile: UnsafeMutablePointer<FILE> = fopen(destinationRepresentation, "wb+") else {
++            guard let destinationFile: OpaquePointer = fopen(destinationRepresentation, "wb+") else {
+                 throw CocoaError(.fileNoSuchFile)
+             }
+             defer { fclose(destinationFile) }
+diff --git a/.build/checkouts/ZIPFoundation/Sources/ZIPFoundation/Archive+Writing.swift b/.build/checkouts/ZIPFoundation/Sources/ZIPFoundation/Archive+Writing.swift
+index 4c9224e..860fe13 100644
+--- a/.build/checkouts/ZIPFoundation/Sources/ZIPFoundation/Archive+Writing.swift
++++ b/.build/checkouts/ZIPFoundation/Sources/ZIPFoundation/Archive+Writing.swift
+@@ -66,7 +66,7 @@ extension Archive {
+         switch type {
+         case .file:
+             let entryFileSystemRepresentation = fileManager.fileSystemRepresentation(withPath: fileURL.path)
+-            guard let entryFile: UnsafeMutablePointer<FILE> = fopen(entryFileSystemRepresentation, "rb") else {
++            guard let entryFile: OpaquePointer = fopen(entryFileSystemRepresentation, "rb") else {
+                 throw CocoaError(.fileNoSuchFile)
+             }
+             defer { fclose(entryFile) }
+diff --git a/.build/checkouts/ZIPFoundation/Sources/ZIPFoundation/Archive.swift b/.build/checkouts/ZIPFoundation/Sources/ZIPFoundation/Archive.swift
+index a821e82..cf078c3 100644
+--- a/.build/checkouts/ZIPFoundation/Sources/ZIPFoundation/Archive.swift
++++ b/.build/checkouts/ZIPFoundation/Sources/ZIPFoundation/Archive.swift
+@@ -124,7 +124,7 @@ public final class Archive: Sequence {
+     public let url: URL
+     /// Access mode for an archive file.
+     public let accessMode: AccessMode
+-    var archiveFile: UnsafeMutablePointer<FILE>
++    var archiveFile: OpaquePointer
+     var endOfCentralDirectoryRecord: EndOfCentralDirectoryRecord
+     var zip64EndOfCentralDirectory: ZIP64EndOfCentralDirectory?
+     var preferredEncoding: String.Encoding?
+@@ -265,7 +265,7 @@ public final class Archive: Sequence {
+ 
+     // MARK: - Helpers
+ 
+-    static func scanForEndOfCentralDirectoryRecord(in file: UnsafeMutablePointer<FILE>)
++    static func scanForEndOfCentralDirectoryRecord(in file: OpaquePointer)
+         -> EndOfCentralDirectoryStructure? {
+         var eocdOffset: UInt64 = 0
+         var index = minEndOfCentralDirectoryOffset
+@@ -288,7 +288,7 @@ public final class Archive: Sequence {
+         return nil
+     }
+ 
+-    private static func scanForZIP64EndOfCentralDirectory(in file: UnsafeMutablePointer<FILE>, eocdOffset: UInt64)
++    private static func scanForZIP64EndOfCentralDirectory(in file: OpaquePointer, eocdOffset: UInt64)
+         -> ZIP64EndOfCentralDirectory? {
+         guard UInt64(ZIP64EndOfCentralDirectoryLocator.size) < eocdOffset else {
+             return nil
+diff --git a/.build/checkouts/ZIPFoundation/Sources/ZIPFoundation/Data+Serialization.swift b/.build/checkouts/ZIPFoundation/Sources/ZIPFoundation/Data+Serialization.swift
+index 663f3f9..17fa4b7 100644
+--- a/.build/checkouts/ZIPFoundation/Sources/ZIPFoundation/Data+Serialization.swift
++++ b/.build/checkouts/ZIPFoundation/Sources/ZIPFoundation/Data+Serialization.swift
+@@ -31,7 +31,7 @@ extension Data {
+         #endif
+     }
+ 
+-    static func readStruct<T>(from file: UnsafeMutablePointer<FILE>, at offset: UInt64)
++    static func readStruct<T>(from file: OpaquePointer, at offset: UInt64)
+     -> T? where T: DataSerializable {
+         guard offset <= .max else { return nil }
+         fseeko(file, off_t(offset), SEEK_SET)
+@@ -68,7 +68,7 @@ extension Data {
+         return checksum
+     }
+ 
+-    static func readChunk(of size: Int, from file: UnsafeMutablePointer<FILE>) throws -> Data {
++    static func readChunk(of size: Int, from file: OpaquePointer) throws -> Data {
+         let alignment = MemoryLayout<UInt>.alignment
+         #if swift(>=4.1)
+         let bytes = UnsafeMutableRawPointer.allocate(byteCount: size, alignment: alignment)
+@@ -88,7 +88,7 @@ extension Data {
+         #endif
+     }
+ 
+-    static func write(chunk: Data, to file: UnsafeMutablePointer<FILE>) throws -> Int {
++    static func write(chunk: Data, to file: OpaquePointer) throws -> Int {
+         var sizeWritten: Int = 0
+         chunk.withUnsafeBytes { (rawBufferPointer) in
+             if let baseAddress = rawBufferPointer.baseAddress, rawBufferPointer.count > 0 {
+@@ -104,7 +104,7 @@ extension Data {
+     }
+ 
+     static func writeLargeChunk(_ chunk: Data, size: UInt64, bufferSize: Int,
+-                                to file: UnsafeMutablePointer<FILE>) throws -> UInt64 {
++                                to file: OpaquePointer) throws -> UInt64 {
+         var sizeWritten: UInt64 = 0
+         chunk.withUnsafeBytes { (rawBufferPointer) in
+             if let baseAddress = rawBufferPointer.baseAddress, rawBufferPointer.count > 0 {
+diff --git a/.build/checkouts/ZIPFoundation/Sources/ZIPFoundation/FileManager+ZIP.swift b/.build/checkouts/ZIPFoundation/Sources/ZIPFoundation/FileManager+ZIP.swift
+index 7c32141..e93070c 100644
+--- a/.build/checkouts/ZIPFoundation/Sources/ZIPFoundation/FileManager+ZIP.swift
++++ b/.build/checkouts/ZIPFoundation/Sources/ZIPFoundation/FileManager+ZIP.swift
+@@ -246,7 +246,7 @@ extension FileManager {
+         let entryFileSystemRepresentation = fileManager.fileSystemRepresentation(withPath: url.path)
+         var fileStat = stat()
+         lstat(entryFileSystemRepresentation, &fileStat)
+-        return Entry.EntryType(mode: fileStat.st_mode)
++        return Entry.EntryType(mode: mode_t(fileStat.st_mode))
+     }
+ }
+ 
