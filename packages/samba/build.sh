@@ -77,6 +77,7 @@ Checking whether the realpath function allows a NULL argument: OK
 Checking for ftruncate extend: OK
 getcwd takes a NULL argument: OK
 Checking for readlink breakage: NO
+Checking for gnutls fips mode support: OK
 EOF
 
 	USING_SYSTEM_ASN1_COMPILE=1 ASN1_COMPILE=/usr/bin/asn1_compile \
