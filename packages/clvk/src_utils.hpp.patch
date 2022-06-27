@@ -1,0 +1,12 @@
+diff -uNr clvk/src/utils.hpp clvk.mod/src/utils.hpp
+--- clvk/src/utils.hpp	2022-06-13 00:32:33.443304982 +0800
++++ clvk.mod/src/utils.hpp	2022-06-15 00:26:24.094256899 +0800
+@@ -62,7 +62,7 @@
+ 
+ static inline uint32_t ceil_div(uint32_t num, uint32_t divisor) {
+     CVK_ASSERT(divisor != 0);
+-    return num / divisor + (num % divisor != 0);
++    return (num + divisor - 1) / divisor;
+ }
+ 
+ static inline uint32_t round_up(uint32_t num, uint32_t multiple) {

@@ -1,15 +1,24 @@
---- a/Makefile
-+++ b/Makefile
-@@ -16,10 +16,8 @@
+diff -uNr LiteSpeedTest-0.10.0/Makefile LiteSpeedTest-0.10.0.mod/Makefile
+--- LiteSpeedTest-0.10.0/Makefile	2022-05-26 10:27:22.000000000 +0800
++++ LiteSpeedTest-0.10.0.mod/Makefile	2022-06-24 22:39:36.305998751 +0800
+@@ -15,11 +15,8 @@
+ 	windows-386 \
  	windows-amd64
  
- 
+-
 -all: linux-amd64 darwin-amd64 windows-amd64 # Most used
 -
 -docker:
--	$(GOBUILD) -o $(BINDIR)/$(NAME)-$@
+-	$(GOBUILD) GOAMD64=v3 -o $(BINDIR)/$(NAME)-$@
 +all:
 +	$(GOBUILD) -o $(BINDIR)/$(NAME)
  
  darwin-amd64:
- 	GOARCH=amd64 GOOS=darwin $(GOBUILD) -o $(BINDIR)/$(NAME)-$@
+ 	GOARCH=amd64 GOOS=darwin GOAMD64=v3 $(GOBUILD) -o $(BINDIR)/$(NAME)-$@
+@@ -101,4 +98,4 @@
+ 
+ releases: $(gz_releases) $(zip_releases)
+ clean:
+-	rm $(BINDIR)/*
+\ No newline at end of file
++	rm $(BINDIR)/*

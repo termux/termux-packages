@@ -50,6 +50,9 @@ mkdir -p "$TERMUX_PKG_TMPDIR"
 #(. "$TERMUX_SCRIPTDIR"/scripts/build/setup/termux_setup_rust.sh
 #	termux_setup_rust
 #)
+(. "$TERMUX_SCRIPTDIR"/scripts/build/setup/termux_setup_swift.sh
+	termux_setup_swift
+)
 (. "$TERMUX_SCRIPTDIR"/scripts/build/setup/termux_setup_zig.sh
 	termux_setup_zig
 )

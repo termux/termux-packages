@@ -1,6 +1,6 @@
 diff -uNr llvm-project/clang/lib/Driver/ToolChains/Linux.cpp llvm-project.mod/clang/lib/Driver/ToolChains/Linux.cpp
---- llvm-project/clang/lib/Driver/ToolChains/Linux.cpp	2022-05-03 21:10:32.000000000 +0800
-+++ llvm-project.mod/clang/lib/Driver/ToolChains/Linux.cpp	2022-05-08 23:49:55.901100813 +0800
+--- llvm-project/clang/lib/Driver/ToolChains/Linux.cpp	2022-05-27 00:44:58.000000000 +0800
++++ llvm-project.mod/clang/lib/Driver/ToolChains/Linux.cpp	2022-06-06 00:18:38.107958390 +0800
 @@ -162,8 +162,8 @@
    // FIXME: This is a bit of a hack. We should really unify this code for
    // reasoning about oslibdir spellings with the lib dir spellings in the
@@ -21,13 +21,7 @@ diff -uNr llvm-project/clang/lib/Driver/ToolChains/Linux.cpp llvm-project.mod/cl
      addPathIfExists(D, SysRoot + "/usr/lib/../" + OSLibDir, Paths);
    if (IsRISCV) {
      StringRef ABIName = tools::riscv::getRISCVABI(Args, Triple);
-@@ -308,12 +308,20 @@
-   // The deprecated -DLLVM_ENABLE_PROJECTS=libcxx configuration installs
-   // libc++.so in D.Dir+"/../lib/". Detect this path.
-   // TODO Remove once LLVM_ENABLE_PROJECTS=libcxx is unsupported.
--  if (StringRef(D.Dir).startswith(SysRoot) &&
-+  if (StringRef(D.Dir).startswith(SysRoot) && !IsAndroid &&
-       D.getVFS().exists(D.Dir + "/../lib/libc++.so"))
+@@ -313,7 +313,15 @@
      addPathIfExists(D, D.Dir + "/../lib", Paths);
  
    addPathIfExists(D, SysRoot + "/lib", Paths);

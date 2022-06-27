@@ -86,6 +86,10 @@ source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_python_crossenv.sh"
 # shellcheck source=scripts/build/setup/termux_setup_rust.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_rust.sh"
 
+# Utility function for swift-using packages to setup a swift toolchain
+# shellcheck source=scripts/build/setup/termux_setup_swift.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_swift.sh"
+
 # Utility function for zig-using packages to setup a zig toolchain.
 # shellcheck source=scripts/build/setup/termux_setup_zig.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_zig.sh"

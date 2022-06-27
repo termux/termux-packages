@@ -1,6 +1,6 @@
---- node-v18.0.0.orig/node.gyp	2022-04-21 15:15:48.561869784 +0530
-+++ node-v18.0.0/node.gyp	2022-05-19 18:01:39.524596955 +0530
-@@ -158,7 +158,8 @@
+--- ./node.gyp.orig	2022-06-02 07:52:24.000000000 +0530
++++ ./node.gyp	2022-06-04 12:08:56.649547879 +0530
+@@ -157,7 +157,8 @@
        ],
  
        'sources': [
@@ -10,7 +10,7 @@
        ],
  
        'dependencies': [
-@@ -461,6 +462,7 @@
+@@ -452,6 +453,7 @@
  
        'include_dirs': [
          'src',
@@ -18,10 +18,83 @@
          '<(SHARED_INTERMEDIATE_DIR)' # for node_natives.h
        ],
        'dependencies': [
-@@ -1183,162 +1185,6 @@
-         }],
-       ],
-     }, # fuzz_env
+@@ -1104,306 +1106,6 @@
+         } ],
+       ]
+     }, # specialize_node_d
+-    { # fuzz_url
+-      'target_name': 'fuzz_url',
+-      'type': 'executable',
+-      'dependencies': [
+-        '<(node_lib_target_name)',
+-      ],
+-      'includes': [
+-        'node.gypi'
+-      ],
+-      'include_dirs': [
+-        'src',
+-      ],
+-      'defines': [
+-        'NODE_ARCH="<(target_arch)"',
+-        'NODE_PLATFORM="<(OS)"',
+-        'NODE_WANT_INTERNALS=1',
+-      ],
+-      'sources': [
+-        'src/node_snapshot_stub.cc',
+-        'test/fuzzers/fuzz_url.cc',
+-      ],
+-      'conditions': [
+-        ['OS=="linux"', {
+-          'ldflags': [ '-fsanitize=fuzzer' ]
+-        }],
+-        # Ensure that ossfuzz flag has been set and that we are on Linux
+-        [ 'OS!="linux" or ossfuzz!="true"', {
+-          'type': 'none',
+-        }],
+-      ],
+-    }, # fuzz_url
+-    { # fuzz_env
+-      'target_name': 'fuzz_env',
+-      'type': 'executable',
+-      'dependencies': [
+-        '<(node_lib_target_name)',
+-        'deps/histogram/histogram.gyp:histogram',
+-        'deps/uvwasi/uvwasi.gyp:uvwasi',
+-        'node_dtrace_header',
+-        'node_dtrace_ustack',
+-        'node_dtrace_provider',
+-      ],
+-      'includes': [
+-        'node.gypi'
+-      ],
+-      'include_dirs': [
+-        'src',
+-        'tools/msvs/genfiles',
+-        'deps/v8/include',
+-        'deps/cares/include',
+-        'deps/uv/include',
+-        'deps/uvwasi/include',
+-        'test/cctest',
+-      ],
+-      'defines': [
+-        'NODE_ARCH="<(target_arch)"',
+-        'NODE_PLATFORM="<(OS)"',
+-        'NODE_WANT_INTERNALS=1',
+-      ],
+-      'sources': [
+-        'src/node_snapshot_stub.cc',
+-        'test/fuzzers/fuzz_env.cc',
+-      ],
+-      'conditions': [
+-        ['OS=="linux"', {
+-          'ldflags': [ '-fsanitize=fuzzer' ]
+-        }],
+-        # Ensure that ossfuzz flag has been set and that we are on Linux
+-        [ 'OS!="linux" or ossfuzz!="true"', {
+-          'type': 'none',
+-        }],
+-      ],
+-    }, # fuzz_env
 -    {
 -      'target_name': 'cctest',
 -      'type': 'executable',
@@ -59,7 +132,6 @@
 -
 -      'sources': [
 -        'src/node_snapshot_stub.cc',
--        'src/node_code_cache_stub.cc',
 -        'test/cctest/node_test_fixture.cc',
 -        'test/cctest/node_test_fixture.h',
 -        'test/cctest/test_aliased_buffer.cc',
@@ -152,7 +224,6 @@
 -
 -      'sources': [
 -        'src/node_snapshot_stub.cc',
--        'src/node_code_cache_stub.cc',
 -        'test/embedding/embedtest.cc',
 -      ],
 -
@@ -178,15 +249,24 @@
 -        }],
 -      ],
 -    }, # embedtest
- 
-     {
-       'target_name': 'overlapped-checker',
-@@ -1417,59 +1263,13 @@
-             'Ws2_32.lib',
-           ],
-         }],
--      ],
--    }, # mkcodecache
+-
+-    {
+-      'target_name': 'overlapped-checker',
+-      'type': 'executable',
+-
+-      'conditions': [
+-        ['OS=="win"', {
+-          'sources': [
+-            'test/overlapped-checker/main_win.c'
+-          ],
+-        }],
+-        ['OS!="win"', {
+-          'sources': [
+-            'test/overlapped-checker/main_unix.c'
+-          ],
+-        }],
+-      ]
+-    }, # overlapped-checker
 -    {
 -      'target_name': 'node_mksnapshot',
 -      'type': 'executable',
@@ -214,7 +294,6 @@
 -
 -      'sources': [
 -        'src/node_snapshot_stub.cc',
--        'src/node_code_cache_stub.cc',
 -        'tools/snapshot/node_mksnapshot.cc',
 -      ],
 -
@@ -224,23 +303,25 @@
 -            'HAVE_OPENSSL=1',
 -          ],
 -        }],
+-        [ 'node_use_node_code_cache=="true"', {
+-          'defines': [
+-            'NODE_USE_NODE_CODE_CACHE=1',
+-          ],
+-        }],
 -        ['v8_enable_inspector==1', {
 -          'defines': [
 -            'HAVE_INSPECTOR=1',
 -          ],
 -        }],
 -        ['OS=="win"', {
-+        ['target_arch=="ia32"', {
-           'libraries': [
+-          'libraries': [
 -            'Dbghelp.lib',
 -            'winmm.lib',
 -            'Ws2_32.lib',
-+            '-latomic',
-           ],
-         }],
-       ],
+-          ],
+-        }],
+-      ],
 -    }, # node_mksnapshot
-+    }, # mkcodecache
    ], # end targets
  
    'conditions': [

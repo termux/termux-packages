@@ -17,7 +17,7 @@ termux_step_setup_toolchain() {
 	export READELF=llvm-readelf
 	export STRIP=llvm-strip
 	export NM=llvm-nm
-	
+
 	export TERMUX_HASKELL_LLVM_BACKEND="-fllvm --ghc-option=-fllvm"
 	if [ "${TERMUX_ARCH}" = "i686" ]; then
 		TERMUX_HASKELL_LLVM_BACKEND=""
@@ -182,13 +182,6 @@ termux_setup_standalone_toolchain() {
 		exec $_HOST_PKGCONFIG "\$@"
 	HERE
 	chmod +x $_TERMUX_TOOLCHAIN_TMPDIR/bin/pkg-config
-
-	# Fix broken as symlinks in r23b (which prevents building with
-	# the -fno-integrated-as flag)
-	for PLATFORM in aarch64-linux-android arm-linux-androideabi i686-linux-android x86_64-linux-android; do
-		unlink $_TERMUX_TOOLCHAIN_TMPDIR/$PLATFORM/bin/as
-		ln -s ../../bin/$PLATFORM-as $_TERMUX_TOOLCHAIN_TMPDIR/$PLATFORM/bin/as
-		done
 
 	cd $_TERMUX_TOOLCHAIN_TMPDIR/sysroot
 	for f in $TERMUX_SCRIPTDIR/ndk-patches/*.patch; do

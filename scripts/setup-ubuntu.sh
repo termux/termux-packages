@@ -240,6 +240,9 @@ PACKAGES+=" llvm-12"
 # Required by cava
 PACKAGES+=" xxd"
 
+# Required by samba
+PACKAGES+=" libjson-perl"
+
 # Required for parsing repo.json
 PACKAGES+=" jq"
 

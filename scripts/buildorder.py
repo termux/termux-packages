@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 "Script to generate a build order respecting package dependencies."
 
-import os
-import re
-import sys
+import json, os, re, sys
 
 from itertools import filterfalse
 
@@ -135,11 +133,17 @@ class TermuxSubPackage:
             result += [dependency_package]
         return unique_everseen(result)
 
-def read_packages_from_directories(directories, fast_build_mode):
+def read_packages_from_directories(directories, fast_build_mode, full_buildmode):
     """Construct a map from package name to TermuxPackage.
     Subpackages are mapped to the parent package if fast_build_mode is false."""
     pkgs_map = {}
     all_packages = []
+
+    if full_buildmode:
+        # Ignore directories and get all folders from repo.json file
+        with open ('repo.json') as f:
+            data = json.load(f)
+        directories = [d for d in data.keys()]
 
     for package_dir in directories:
         for pkgdir_name in sorted(os.listdir(package_dir)):
@@ -272,7 +276,7 @@ def main():
             die('Not a directory: ' + package)
         if not os.path.relpath(os.path.dirname(package), '.') in packages_directories:
             packages_directories.insert(0, os.path.dirname(package))
-    pkgs_map = read_packages_from_directories(packages_directories, fast_build_mode)
+    pkgs_map = read_packages_from_directories(packages_directories, fast_build_mode, full_buildorder)
 
     if full_buildorder:
         build_order = generate_full_buildorder(pkgs_map)

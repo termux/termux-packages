@@ -150,7 +150,7 @@ jobs:
 
     - name: Free additional disk space (if necessary)
       run: |
-        if grep -q '^rust$\|^rustc-nightly$\|^dart$' ./built_termux-main_packages.txt; then
+        if grep -q '^clvk$\|^dart$\|^rust$\|^rustc-nightly$\|^swift$' ./built_termux-main_packages.txt; then
           echo "Free additional disk space on host"
           sudo apt purge -yq $(dpkg -l | grep '^ii' | awk '{ print $2 }' | grep -P '(cabal-|dotnet-|ghc-|libmono|php)') \
             liblldb-6.0 libllvm6.0:amd64 mono-runtime-common monodoc-manual powershell ruby
@@ -233,15 +233,32 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         path: ./
-    - name: Upload to packages.termux.org
+    - name: Upload to packages.termux.dev
       env:
-        REPOSITORY_URL: https://packages.termux.org/aptly-api
+        REPOSITORY_URL: https://packages.termux.dev/aptly-api
       run: |
         GITHUB_SHA=${{ github.sha }}
         APTLY_API_AUTH=${{ secrets.APTLY_API_AUTH }}
         GPG_PASSPHRASE=${{ secrets.GPG_PASSPHRASE }}
 
         source scripts/aptly_api.sh
+
+        REPOSITORY_DOMAIN="$(echo "$REPOSITORY_URL" | cut -d'/' -f3)"
+        echo "Checking $REPOSITORY_DOMAIN ip access"
+        for ip in $(dig -t a +short "$REPOSITORY_DOMAIN" | sed '1d'); do
+          if [ $(curl -s -o /dev/null -w "%{http_code}" --resolve "$REPOSITORY_DOMAIN:80:$ip"  "http://$REPOSITORY_DOMAIN") != "200" ]; then
+            echo "success: $ip"
+            CURL_ADDITIONAL_OPTIONS=(--resolve "$REPOSITORY_DOMAIN:$ip")
+            break
+          else
+            echo "failed: $ip" 
+          fi
+        done
+
+        if [ ${#CURL_ADDITIONAL_OPTIONS[@]} -eq 0 ]; then
+          echo "No working ip address found for $REPOSITORY_DOMAIN"
+          exit 1
+        fi
 
         for archive in debs-*/debs-{aarch64,arm,i686,x86_64}-${{ github.sha }}.tar; do
           tar xf "$archive"
@@ -282,7 +299,7 @@ jobs:
           fi
         done
     - name: Upload to grimler.se
-      # Run even if upload to packages.termux.org failed:
+      # Run even if upload to packages.termux.dev failed:
       if: always()
       env:
         REPOSITORY_URL: https://aptly-api.grimler.se

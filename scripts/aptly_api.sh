@@ -10,6 +10,9 @@ CURL_COMMON_OPTIONS=(
   --user "${APTLY_API_AUTH}"
   --write-out "|%{http_code}"
 )
+
+CURL_ADDITIONAL_OPTIONS=()
+
 # Function for deleting temporary directory with uploaded files from
 # the server.
 aptly_delete_dir() {
@@ -17,7 +20,7 @@ aptly_delete_dir() {
 
   curl_response=$(
     curl \
-      "${CURL_COMMON_OPTIONS[@]}" \
+      "${CURL_COMMON_OPTIONS[@]}" "${CURL_ADDITIONAL_OPTIONS[@]}" \
       --request DELETE \
       ${REPOSITORY_URL}/files/${REPOSITORY_NAME}-${GITHUB_SHA}
   )
@@ -32,7 +35,7 @@ aptly_delete_dir() {
 aptly_upload_file() {
   local filename="$1"
   curl_response=$(curl \
-    "${CURL_COMMON_OPTIONS[@]}" \
+    "${CURL_COMMON_OPTIONS[@]}" "${CURL_ADDITIONAL_OPTIONS[@]}" \
     --request POST \
     --form file=@${filename} \
     ${REPOSITORY_URL}/files/${REPOSITORY_NAME}-${GITHUB_SHA} || true
@@ -61,7 +64,7 @@ aptly_add_to_repo() {
   echo "[$(date +%H:%M:%S)] Adding packages to repository '$REPOSITORY_NAME'..."
   curl_response=$(
     curl \
-      "${CURL_COMMON_OPTIONS[@]}" \
+      "${CURL_COMMON_OPTIONS[@]}" "${CURL_ADDITIONAL_OPTIONS[@]}" \
       --max-time 300 \
       --request POST \
       ${REPOSITORY_URL}/repos/${REPOSITORY_NAME}/file/${REPOSITORY_NAME}-${GITHUB_SHA} || true
@@ -94,7 +97,7 @@ aptly_publish_repo() {
   echo "[$(date +%H:%M:%S)] Publishing repository changes..."
   curl_response=$(
     curl \
-      "${CURL_COMMON_OPTIONS[@]}" \
+      "${CURL_COMMON_OPTIONS[@]}" "${CURL_ADDITIONAL_OPTIONS[@]}" \
       --max-time 300 \
       --header 'Content-Type: application/json' \
       --request PUT \

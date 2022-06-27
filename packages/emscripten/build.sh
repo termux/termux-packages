@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://emscripten.org
 TERMUX_PKG_DESCRIPTION="Emscripten: An LLVM-to-WebAssembly Compiler"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@truboxl"
-TERMUX_PKG_VERSION=3.1.11
+TERMUX_PKG_VERSION=3.1.12
 TERMUX_PKG_SRCURL=https://github.com/emscripten-core/emscripten.git
 TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
@@ -62,13 +62,13 @@ opt/emscripten/LICENSE
 
 # https://github.com/emscripten-core/emscripten/issues/11362
 # can switch to stable LLVM to save space once above is fixed
-LLVM_COMMIT=295d032762ad284068c72cc1904680a4db5e80d3
-LLVM_TGZ_SHA256=580fa4760b38a89cc6c4ad3aa1e187ce087c8aef98dc9384ff12b897f79e249f
+LLVM_COMMIT=d58cc0839ee5935e649dbbc18c898a8e4bcd6724
+LLVM_TGZ_SHA256=31d2a5beaa3703305d4c389bfb87d624f5ef2954420a6ab51394f4dec2e67f96
 
 # https://github.com/emscripten-core/emscripten/issues/12252
 # upstream says better bundle the right binaryen revision for now
-BINARYEN_COMMIT=fa3ffd0c2697fde7705495b52b139f7939f97925
-BINARYEN_TGZ_SHA256=f9e6c25f0e642bb3b3a0aabe8dcea380ceeac9f2b1f4f2a00b09d53154a1a810
+BINARYEN_COMMIT=7476d64271354d42d864e1ed21f87f514949bc64
+BINARYEN_TGZ_SHA256=f01e5d575c757c130d5270fce9f6113d10d43d002524f0919a3802cde0169e26
 
 # https://github.com/emscripten-core/emsdk/blob/main/emsdk.py
 # https://chromium.googlesource.com/emscripten-releases/+/refs/heads/main/src/build.py
@@ -309,7 +309,7 @@ termux_step_create_debscripts() {
 # https://github.com/emscripten-core/emscripten/issues/9098
 #
 # Steps:
-# - pkg install emscripten-tests-third-party ndk-sysroot openjdk-17
+# - apt install cmake emscripten-tests-third-party ndk-sysroot openjdk-17
 # - cd $PREFIX/opt/emscripten
 # - npm install --no-optional
 # - export EMTEST_SKIP_V8=1
