@@ -1,7 +1,7 @@
 diff -uNr llvm-project/llvm/tools/llvm-rtdyld/llvm-rtdyld.cpp llvm-project.mod/llvm/tools/llvm-rtdyld/llvm-rtdyld.cpp
---- llvm-project/llvm/tools/llvm-rtdyld/llvm-rtdyld.cpp	2022-05-27 00:44:58.000000000 +0800
-+++ llvm-project.mod/llvm/tools/llvm-rtdyld/llvm-rtdyld.cpp	2022-06-06 00:15:23.759958529 +0800
-@@ -286,7 +286,7 @@
+--- llvm-project/llvm/tools/llvm-rtdyld/llvm-rtdyld.cpp	2022-06-20 05:49:00.000000000 +0800
++++ llvm-project.mod/llvm/tools/llvm-rtdyld/llvm-rtdyld.cpp	2022-06-28 23:33:05.451005964 +0800
+@@ -285,7 +285,7 @@
    uintptr_t SlabSize = 0;
    uintptr_t CurrentSlabOffset = 0;
    SectionIDMap *SecIDMap = nullptr;
@@ -10,7 +10,7 @@ diff -uNr llvm-project/llvm/tools/llvm-rtdyld/llvm-rtdyld.cpp llvm-project.mod/l
    unsigned UsedTLSStorage = 0;
  #endif
  };
-@@ -350,7 +350,7 @@
+@@ -349,7 +349,7 @@
  
  // In case the execution needs TLS storage, we define a very small TLS memory
  // area here that will be used in allocateTLSSection().
@@ -19,7 +19,7 @@ diff -uNr llvm-project/llvm/tools/llvm-rtdyld/llvm-rtdyld.cpp llvm-project.mod/l
  extern "C" {
  alignas(16) __attribute__((visibility("hidden"), tls_model("initial-exec"),
                             used)) thread_local char LLVMRTDyldTLSSpace[16];
-@@ -361,7 +361,7 @@
+@@ -360,7 +360,7 @@
  TrivialMemoryManager::allocateTLSSection(uintptr_t Size, unsigned Alignment,
                                           unsigned SectionID,
                                           StringRef SectionName) {
