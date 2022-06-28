@@ -107,11 +107,11 @@ select_mirror() {
 	elif [ -L "@TERMUX_PREFIX@/etc/termux/chosen_mirrors" ]; then
 		# Broken symlink, use all mirrors
 		mirrors=("@TERMUX_PREFIX@/etc/termux/mirrors/default")
-		mirrors+=($(find @TERMUX_PREFIX@/etc/termux/mirrors/{asia,china,europe,north_america}/ -type f ! -name "*\.dpkg-old" ! -name "*~"))
+		mirrors+=($(find @TERMUX_PREFIX@/etc/termux/mirrors/{asia,china,europe,north_america,russia}/ -type f ! -name "*\.dpkg-old" ! -name "*~"))
 	else
 		echo "No group of mirrors selected. You might want to select a group by running 'termux-change-repo'"
 		mirrors=("@TERMUX_PREFIX@/etc/termux/mirrors/default")
-		mirrors+=($(find @TERMUX_PREFIX@/etc/termux/mirrors/{asia,china,europe,north_america}/ -type f ! -name "*\.dpkg-old" ! -name "*~"))
+		mirrors+=($(find @TERMUX_PREFIX@/etc/termux/mirrors/{asia,china,europe,north_america,russia}/ -type f ! -name "*\.dpkg-old" ! -name "*~"))
 	fi
 
 	local current_mirror

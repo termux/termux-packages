@@ -20,7 +20,7 @@ unlink_and_link() {
 
 select_repository_group() {
     if [ "$1" == "Mirrors in Asia" ]; then
-        echo "[*] Mirrors in Asia (excl. China) selected"
+        echo "[*] Mirrors in Asia (excl. China and Russia) selected"
         unlink_and_link @TERMUX_PREFIX@/etc/termux/mirrors/asia
 
     elif [ "$1" == "Mirrors in China" ]; then
@@ -34,6 +34,10 @@ select_repository_group() {
     elif [ "$1" == "Mirrors in North America" ]; then
         echo "[*] Mirrors in North America selected"
         unlink_and_link @TERMUX_PREFIX@/etc/termux/mirrors/north_america
+
+    elif [ "$1" == "Mirrors in Russia" ]; then
+        echo "[*] Mirrors in Russia selected"
+        unlink_and_link @TERMUX_PREFIX@/etc/termux/mirrors/russia
 
     elif [ "$1" == "All mirrors" ]; then
         echo "[*] All mirrors selected"
@@ -60,10 +64,11 @@ TEMPFILE="$(mktemp @TERMUX_PREFIX@/tmp/mirror.XXXXXX)"
 
 MIRRORS=()
 MIRRORS+=("All mirrors" "All in the entire world" "on")
-MIRRORS+=("Mirrors in Asia" "All in Asia (excl. China)" "off")
+MIRRORS+=("Mirrors in Asia" "All in Asia (excl. China and Russia)" "off")
 MIRRORS+=("Mirrors in China" "All in China" "off")
 MIRRORS+=("Mirrors in Europe" "All in Europe" "off")
 MIRRORS+=("Mirrors in North America" "All in North America" "off")
+MIRRORS+=("Mirrors in Russia" "All in Russia" "off")
 
 dialog \
     --title "termux-change-repo" --clear \
