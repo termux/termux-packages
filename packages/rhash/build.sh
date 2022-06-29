@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/rhash/RHash
 TERMUX_PKG_DESCRIPTION="Console utility for calculation and verification of magnet links and a wide range of hash sums"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.4.2
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=1.4.3
 TERMUX_PKG_SRCURL=https://github.com/rhash/RHash/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=600d00f5f91ef04194d50903d3c79412099328c42f28ff43a0bdb777b00bec62
+TERMUX_PKG_SHA256=1e40fa66966306920f043866cbe8612f4b939b033ba5e2708c3f41be257c8a3e
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="openssl"
 TERMUX_PKG_CONFLICTS="librhash, rhash-dev"
@@ -13,6 +12,7 @@ TERMUX_PKG_REPLACES="librhash, rhash-dev"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_configure() {
+	CFLAGS="-DOPENSSL_RUNTIME -DSYSCONFDIR=\"${TERMUX_PREFIX}/etc\" $CPPFLAGS $CFLAGS"
 	./configure \
 		--prefix=$TERMUX_PREFIX \
 		--disable-static \
@@ -22,7 +22,6 @@ termux_step_configure() {
 }
 
 termux_step_make() {
-	CFLAGS="-DOPENSSL_RUNTIME $CPPFLAGS $CFLAGS"
 	make -j $TERMUX_MAKE_PROCESSES \
 		ADDCFLAGS="$CFLAGS" \
 		ADDLDFLAGS="$LDFLAGS"
