@@ -5,8 +5,9 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=4.1.2
 TERMUX_PKG_SRCURL=https://github.com/anordal/shellharden/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=8e5f623f9d58e08460d3ecabb28c53f1969bed09c2526f01b5e00362a8b08e7f
-TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 
 termux_step_post_make_install() {
 	install -Dm700 \
