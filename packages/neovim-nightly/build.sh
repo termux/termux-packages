@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://neovim.io
 TERMUX_PKG_DESCRIPTION="Ambitious Vim-fork focused on extensibility and agility (nvim-nightly)"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.org>"
-TERMUX_PKG_VERSION="0.8.0-dev+504-g7e1cf6b76"
+TERMUX_PKG_VERSION="0.8.0-dev+513-g01fc5097d"
 TERMUX_PKG_SRCURL="https://github.com/neovim/neovim/archive/nightly.tar.gz"
-TERMUX_PKG_SHA256=3a87572e4f578e781c1cb146c336d7ef80f0039a6430eb5496a2eaec730aec47
+TERMUX_PKG_SHA256=47f4d5fab8d173c87727375e148e1801bed8650ed4d034bac2ac7e9192123086
 TERMUX_PKG_DEPENDS="libiconv, libuv, luv, libmsgpack, libandroid-support, libvterm, libtermkey, libluajit, libunibilium, libtreesitter"
 TERMUX_PKG_HOSTBUILD=true
 
@@ -91,7 +91,7 @@ termux_step_host_build() {
 
 	mkdir -p $TERMUX_PKG_HOSTBUILD_DIR/deps
 	cd $TERMUX_PKG_HOSTBUILD_DIR/deps
-	cmake $TERMUX_PKG_SRCDIR/third-party
+	cmake $TERMUX_PKG_SRCDIR/cmake.deps
 
 	make -j 1 ||
 		(_patch_luv $TERMUX_PKG_HOSTBUILD_DIR/deps && make -j 1)
