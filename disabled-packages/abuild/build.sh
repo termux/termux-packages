@@ -7,6 +7,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/alpinelinux/abuild
 TERMUX_PKG_DESCRIPTION="Build script to build Alpine packages"
 TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.4.0
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/alpinelinux/abuild/archive/v$TERMUX_PKG_VERSION.tar.gz

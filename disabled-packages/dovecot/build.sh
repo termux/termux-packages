@@ -1,9 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://www.dovecot.org
 TERMUX_PKG_DESCRIPTION="Secure IMAP and POP3 email server"
+TERMUX_PKG_LICENSE="LGPL-2.1"
+TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
 TERMUX_PKG_VERSION=2.2.31
 TERMUX_PKG_SRCURL=https://www.dovecot.org/releases/2.2/dovecot-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=034be40907748128d65088a4f59789b2f99ae7b33a88974eae0b6a68ece376a1
-TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
 TERMUX_PKG_DEPENDS="openssl, libcrypt"
 # turning on icu gives undefined reference to __cxa_call_unexpected
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="

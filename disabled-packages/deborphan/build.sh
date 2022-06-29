@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://packages.debian.org/source/sid/deborphan
 TERMUX_PKG_DESCRIPTION="Program that can find unused packages"
+TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Pierre Rudloff @Rudloff"
 TERMUX_PKG_VERSION=1.7.33
 TERMUX_PKG_SRCURL=http://deb.debian.org/debian/pool/main/d/deborphan/deborphan_1.7.33.tar.xz

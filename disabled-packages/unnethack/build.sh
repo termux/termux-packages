@@ -1,8 +1,11 @@
 # Crashes with "Dungeon description not valid"
-TERMUX_PKG_HOMEPAGE=http://sourceforge.net/apps/trac/unnethack
+TERMUX_PKG_HOMEPAGE=https://sourceforge.net/apps/trac/unnethack
 TERMUX_PKG_DESCRIPTION="Dungeon crawling game, fork of NetHack"
+TERMUX_PKG_LICENSE="custom"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=5.1.0
-TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/project/unnethack/unnethack/${TERMUX_PKG_VERSION}/unnethack-${TERMUX_PKG_VERSION}-20131208.tar.gz
+TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/unnethack/unnethack/${TERMUX_PKG_VERSION}/unnethack-${TERMUX_PKG_VERSION}-20131208.tar.gz
+TERMUX_PKG_SHA256=d92886a02fd8f5a427d1acf628e12ee03852fdebd3af0e7d0d1279dc41c75762
 # --with-owner=$USER to avoid unnethack trying to use a "games" user, --with-groups to avoid "bin" group
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-owner=$USER --with-group=$(groups | cut -d ' ' -f 1)"
 TERMUX_PKG_DEPENDS="gsl, ncurses"

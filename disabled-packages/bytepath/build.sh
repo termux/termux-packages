@@ -2,7 +2,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/a327ex/BYTEPATH
 TERMUX_PKG_DESCRIPTION="A replayable arcade shooter with a focus on build theorycrafting"
 # License: MIT (assets have their own licenses)
-TERMUX_PKG_LICENSE="unknown"
+TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE, objects/modules/CreditsModule.lua"
 TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=51ee3086ae3369a2c80e4e47d4b62d480af4fe89
