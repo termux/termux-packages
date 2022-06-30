@@ -1,0 +1,61 @@
+diff --git a/meson.build b/meson.build
+index acd9dbcf..9c3a1ec3 100644
+--- a/meson.build
++++ b/meson.build
+@@ -124,12 +124,6 @@ awk=find_program(['gawk', 'awk'])
+ 
+ # soft dependencies
+ 
+-# emacs -- needed for mu4e compilation
+-emacs=find_program(['emacs'], version: '>=25.3', required:false)
+-if not emacs.found()
+-  message('emacs not found; not pre-compiling mu4e sources')
+-endif
+-
+ makeinfo=find_program(['makeinfo'], required:false)
+ if not makeinfo.found()
+   message('makeinfo (texinfo) not found; not building info documentation')
+@@ -172,9 +166,8 @@ subdir('lib')
+ subdir('mu')
+ subdir('man')
+ 
+-if emacs.found()
+-   subdir('mu4e')
+-endif
++# will not compile, but still copy the files
++subdir('mu4e')
+ 
+ if not get_option('guile').disabled() and guile_dep.found()
+   config_h_data.set('BUILD_GUILE', 1)
+diff --git a/mu4e/meson.build b/mu4e/meson.build
+index 87bcdfc3..a0568f65 100644
+--- a/mu4e/meson.build
++++ b/mu4e/meson.build
+@@ -70,26 +70,7 @@ foreach src : mu4e_srcs
+   configure_file(input: src, output:'@BASENAME@.el', copy:true)
+ endforeach
+ 
+-foreach src : mu4e_srcs
+-  target_name= '@BASENAME@.elc'
+-  target_path = join_paths(meson.current_build_dir(), target_name)
+-  target_func = '(setq byte-compile-dest-file-function(lambda(_) "' + target_path + '"))'
+-
+-  custom_target(src.underscorify() + '_el',
+-                build_by_default: true,
+-                input: src,
+-                output: target_name,
+-                install_dir: lispdir,
+-                install: true,
+-                command: [emacs,
+-                          '--no-init-file',
+-                          '--batch',
+-                          '--eval', '(setq load-prefer-newer t)',
+-                          '--eval', target_func,
+-                          '--directory', meson.current_build_dir(),
+-                          '--directory', meson.current_source_dir(),
+-                          '--funcall', 'batch-byte-compile', '@INPUT@'])
+-endforeach
++# termux: do not compile .el files to .elc, we will do that when the package is installed.
+ 
+ # also install the sources and the config
+ install_data(mu4e_srcs, install_dir: lispdir)
