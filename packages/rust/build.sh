@@ -52,6 +52,8 @@ termux_step_configure() {
 	export CFLAGS_x86_64_unknown_linux_gnu="-O2"
 
 	export LLVM_VERSION=$(. $TERMUX_SCRIPTDIR/packages/libllvm/build.sh; echo $TERMUX_PKG_VERSION)
+	export LZMA_VERSION=$(. $TERMUX_SCRIPTDIR/packages/liblzma/build.sh; echo $TERMUX_PKG_VERSION)
+
 	# we can't use -L$PREFIX/lib since it breaks things but we need to link against libLLVM-9.so
 	ln -sf $PREFIX/lib/libLLVM-${LLVM_VERSION/.*/}.so $RUST_LIBDIR
 	ln -sf $PREFIX/lib/libLLVM-$LLVM_VERSION.so $RUST_LIBDIR
@@ -65,6 +67,7 @@ termux_step_configure() {
 	mv $TERMUX_PREFIX/lib/libtinfo.so.6 $TERMUX_PREFIX/lib/libtinfo.so.6.tmp
 	mv $TERMUX_PREFIX/lib/libz.so.1 $TERMUX_PREFIX/lib/libz.so.1.tmp
 	mv $TERMUX_PREFIX/lib/libz.so $TERMUX_PREFIX/lib/libz.so.tmp
+	mv $TERMUX_PREFIX/lib/liblzma.so.$LZMA_VERSION $TERMUX_PREFIX/lib/liblzma.so.tmp
 
 	# ld: error: undefined symbol: getloadavg
 	# >>> referenced by rand.c
@@ -97,6 +100,7 @@ termux_step_make_install() {
 	mv $TERMUX_PREFIX/lib/libtinfo.so.6.tmp $TERMUX_PREFIX/lib/libtinfo.so.6
 	mv $TERMUX_PREFIX/lib/libz.so.1.tmp $TERMUX_PREFIX/lib/libz.so.1
 	mv $TERMUX_PREFIX/lib/libz.so.tmp $TERMUX_PREFIX/lib/libz.so
+	mv $TERMUX_PREFIX/lib/liblzma.so.tmp $TERMUX_PREFIX/lib/liblzma.so.$LZMA_VERSION
 
 	ln -sf rustlib/$CARGO_TARGET_NAME/lib/*.so .
 	ln -sf $TERMUX_PREFIX/bin/lld $TERMUX_PREFIX/bin/rust-lld
@@ -114,5 +118,5 @@ termux_step_post_massage() {
 	rm -f lib/libtinfo.so.6
 	rm -f lib/libz.so
 	rm -f lib/libz.so.1
+	rm -f lib/liblzma.so.$LZMA_VERSION
 }
-
