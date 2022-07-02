@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/inetutils/
 TERMUX_PKG_DESCRIPTION="Collection of common network programs"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.9.4
-TERMUX_PKG_REVISION=13
+TERMUX_PKG_VERSION=2.2
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/inetutils/inetutils-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=849d96f136effdef69548a940e3e0ec0624fc0c81265296987986a0dd36ded37
+TERMUX_PKG_SHA256=d547f69172df73afef691a0f7886280fd781acea28def4ff4b4b212086a89d80
 TERMUX_PKG_DEPENDS="readline"
 TERMUX_PKG_SUGGESTS="whois"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/whois share/man/man1/whois.1"
@@ -28,6 +27,11 @@ ac_cv_lib_crypt_crypt=no
 "
 
 termux_step_pre_configure() {
-	CPPFLAGS+=" -DLOGIN_PROCESS=6 -DDEAD_PROCESS=8 -DLOG_NFACILITIES=24 -fcommon"
+	CFLAGS+=" -DNO_INLINE_GETPASS=1"
+	CPPFLAGS+=" -DNO_INLINE_GETPASS=1 -DLOGIN_PROCESS=6 -DDEAD_PROCESS=8 -DLOG_NFACILITIES=24 -fcommon"
 	touch -d "next hour" ./man/whois.1
+}
+
+termux_step_post_configure() {
+	cp $TERMUX_PKG_BUILDER_DIR/malloc.h $TERMUX_PKG_BUILDDIR/lib/
 }
