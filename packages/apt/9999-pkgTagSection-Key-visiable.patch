@@ -1,0 +1,15 @@
+This is a temp fix for termux/termux-packages#11120.
+diff -uNr a/apt-pkg/tagfile.h b/apt-pkg/tagfile.h
+--- a/apt-pkg/tagfile.h 2022-07-02 19:02:18.806569800 +0800
++++ b/apt-pkg/tagfile.h 2022-07-02 19:03:23.976744900 +0800
+@@ -70,9 +70,9 @@
+    std::string FindS(APT::StringView sv) const { return Find(sv).to_string(); }
+    std::string FindRawS(APT::StringView sv) const { return FindRaw(sv).to_string(); };
+ 
+-#ifdef APT_COMPILING_APT
+    // Functions for lookup with a perfect hash function
+    enum class Key;
++#ifdef APT_COMPILING_APT
+    bool Find(Key key,const char *&Start, const char *&End) const;
+    bool Find(Key key,unsigned int &Pos) const;
+    signed int FindI(Key key,signed long Default = 0) const;
