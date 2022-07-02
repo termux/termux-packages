@@ -1,0 +1,433 @@
+This adds CMake support available in 1.9.4/dev.
+
+diff --git a/Makefile b/Makefile
+index 744005f..cab660c 100644
+--- a/Makefile
++++ b/Makefile
+@@ -73,18 +73,19 @@ build_tests:
+ 
+ .PHONY: clean
+ clean:
+-	@$(MAKE) -C $(LZ4DIR) $@ > $(VOID)
+-	@$(MAKE) -C $(PRGDIR) $@ > $(VOID)
+-	@$(MAKE) -C $(TESTDIR) $@ > $(VOID)
+-	@$(MAKE) -C $(EXDIR) $@ > $(VOID)
+-	@$(MAKE) -C $(FUZZDIR) $@ > $(VOID)
+-	@$(MAKE) -C contrib/gen_manual $@ > $(VOID)
+-	@$(RM) lz4$(EXT)
++	$(MAKE) -C $(LZ4DIR) $@ > $(VOID)
++	$(MAKE) -C $(PRGDIR) $@ > $(VOID)
++	$(MAKE) -C $(TESTDIR) $@ > $(VOID)
++	$(MAKE) -C $(EXDIR) $@ > $(VOID)
++	$(MAKE) -C $(FUZZDIR) $@ > $(VOID)
++	$(MAKE) -C contrib/gen_manual $@ > $(VOID)
++	$(RM) lz4$(EXT)
++	$(RM) -r $(CMAKE_BUILD_DIR)
+ 	@echo Cleaning completed
+ 
+ 
+ #-----------------------------------------------------------------------------
+-# make install is validated only for Linux, OSX, BSD, Hurd and Solaris targets
++# make install is validated only for Posix environments
+ #-----------------------------------------------------------------------------
+ ifeq ($(POSIX_ENV),Yes)
+ HOST_OS = POSIX
+@@ -97,20 +98,24 @@ install uninstall:
+ travis-install:
+ 	$(MAKE) -j1 install DESTDIR=~/install_test_dir
+ 
+-cmake:
+-	@cd build/cmake; cmake $(CMAKE_PARAMS) CMakeLists.txt; $(MAKE)
+-
+-endif
++endif   # POSIX_ENV
+ 
+ 
+-ifneq (,$(filter MSYS%,$(shell uname)))
++CMAKE ?= cmake
++CMAKE_BUILD_DIR ?= build/cmake/build
++ifneq (,$(filter MSYS%,$(shell $(UNAME))))
+ HOST_OS = MSYS
+ CMAKE_PARAMS = -G"MSYS Makefiles"
+ endif
+ 
++.PHONY: cmake
++cmake:
++	mkdir -p $(CMAKE_BUILD_DIR)
++	cd $(CMAKE_BUILD_DIR); $(CMAKE) $(CMAKE_PARAMS) ..; $(CMAKE) --build .
++
+ 
+ #------------------------------------------------------------------------
+-#make tests validated only for MSYS, Linux, OSX, kFreeBSD and Hurd targets
++# make tests validated only for MSYS and Posix environments
+ #------------------------------------------------------------------------
+ ifneq (,$(filter $(HOST_OS),MSYS POSIX))
+ 
+diff --git a/Makefile.inc b/Makefile.inc
+index 2d64405..2d367ea 100644
+--- a/Makefile.inc
++++ b/Makefile.inc
+@@ -57,7 +57,7 @@ else
+ POSIX_ENV = No
+ endif
+ 
+-# Avoid symlinks when targetting Windows or building on a Windows host
++# Avoid symlinks when targeting Windows or building on a Windows host
+ ifeq ($(WINBASED),yes)
+ LN_S  = cp -p
+ LN_SF = cp -p
+diff --git a/build/cmake/.gitignore b/build/cmake/.gitignore
+index d39505d..0ad8240 100644
+--- a/build/cmake/.gitignore
++++ b/build/cmake/.gitignore
+@@ -1,4 +1,4 @@
+-# cmake artefact
++# cmake build artefact
+ 
+ CMakeCache.txt
+ CMakeFiles
+@@ -7,3 +7,4 @@ Makefile
+ liblz4.pc
+ lz4c
+ install_manifest.txt
++build
+diff --git a/build/cmake/CMakeLists.txt b/build/cmake/CMakeLists.txt
+index 57501ee..e92115b 100644
+--- a/build/cmake/CMakeLists.txt
++++ b/build/cmake/CMakeLists.txt
+@@ -13,7 +13,7 @@
+ set(LZ4_TOP_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../..")
+ 
+ option(LZ4_BUILD_CLI "Build lz4 program" ON)
+-option(LZ4_BUILD_LEGACY_LZ4C "Build lz4c progam with legacy argument support" ON)
++option(LZ4_BUILD_LEGACY_LZ4C "Build lz4c program with legacy argument support" ON)
+ 
+ # Parse version information
+ file(STRINGS "${LZ4_TOP_SOURCE_DIR}/lib/lz4.h" LZ4_VERSION_MAJOR REGEX "^#define LZ4_VERSION_MAJOR +([0-9]+) +.*$")
+@@ -34,7 +34,7 @@ else()
+     LANGUAGES C)
+ endif()
+ 
+-cmake_minimum_required (VERSION 2.8.6)
++cmake_minimum_required (VERSION 2.8.12)
+ 
+ # If LZ4 is being bundled in another project, we don't want to
+ # install anything.  However, we want to let people override this, so
+@@ -103,6 +103,9 @@ option(LZ4_POSITION_INDEPENDENT_LIB "Use position independent code for static li
+ set(LZ4_LIBRARIES_BUILT)
+ if(BUILD_SHARED_LIBS)
+   add_library(lz4_shared SHARED ${LZ4_SOURCES})
++  target_include_directories(lz4_shared
++    PUBLIC $<BUILD_INTERFACE:${LZ4_LIB_SOURCE_DIR}>
++    INTERFACE $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+   set_target_properties(lz4_shared PROPERTIES
+     OUTPUT_NAME lz4
+     SOVERSION "${LZ4_VERSION_MAJOR}"
+@@ -114,18 +117,24 @@ if(BUILD_SHARED_LIBS)
+   list(APPEND LZ4_LIBRARIES_BUILT lz4_shared)
+ endif()
+ if(BUILD_STATIC_LIBS)
++  set(STATIC_LIB_NAME lz4)
++  if (MSVC AND BUILD_SHARED_LIBS)
++    set(STATIC_LIB_NAME lz4_static)
++  endif()
+   add_library(lz4_static STATIC ${LZ4_SOURCES})
++  target_include_directories(lz4_static
++    PUBLIC $<BUILD_INTERFACE:${LZ4_LIB_SOURCE_DIR}>
++    INTERFACE $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+   set_target_properties(lz4_static PROPERTIES
+-    OUTPUT_NAME lz4
++    OUTPUT_NAME ${STATIC_LIB_NAME}
+     POSITION_INDEPENDENT_CODE ${LZ4_POSITION_INDEPENDENT_LIB})
+   list(APPEND LZ4_LIBRARIES_BUILT lz4_static)
+ endif()
+ 
+-# link to shared whenever possible, to static otherwise
+-if(BUILD_SHARED_LIBS)
+-  set(LZ4_LINK_LIBRARY lz4_shared)
+-else()
++if(BUILD_STATIC_LIBS)
+   set(LZ4_LINK_LIBRARY lz4_static)
++else()
++  list(APPEND LZ4_CLI_SOURCES ${LZ4_SOURCES})
+ endif()
+ 
+ # lz4
+@@ -133,7 +142,9 @@ if (LZ4_BUILD_CLI)
+   set(LZ4_PROGRAMS_BUILT lz4cli)
+   add_executable(lz4cli ${LZ4_CLI_SOURCES})
+   set_target_properties(lz4cli PROPERTIES OUTPUT_NAME lz4)
+-  target_link_libraries(lz4cli ${LZ4_LINK_LIBRARY})
++  if (BUILD_STATIC_LIBS)
++    target_link_libraries(lz4cli ${LZ4_LINK_LIBRARY})
++  endif()
+ endif()
+ 
+ # lz4c
+@@ -141,7 +152,9 @@ if (LZ4_BUILD_LEGACY_LZ4C)
+   list(APPEND LZ4_PROGRAMS_BUILT lz4c)
+   add_executable(lz4c ${LZ4_CLI_SOURCES})
+   set_target_properties(lz4c PROPERTIES COMPILE_DEFINITIONS "ENABLE_LZ4C_LEGACY_OPTIONS")
+-  target_link_libraries(lz4c ${LZ4_LINK_LIBRARY})
++  if (BUILD_STATIC_LIBS)
++    target_link_libraries(lz4c ${LZ4_LINK_LIBRARY})
++  endif()
+ endif()
+ 
+ # Extra warning flags
+@@ -182,6 +195,7 @@ if(NOT LZ4_BUNDLED_MODE)
+     BUNDLE	DESTINATION "${CMAKE_INSTALL_BINDIR}"
+     RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
+   install(TARGETS ${LZ4_LIBRARIES_BUILT}
++    EXPORT lz4Targets
+     LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+     ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+     RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
+@@ -195,6 +209,30 @@ if(NOT LZ4_BUNDLED_MODE)
+   install(FILES "${CMAKE_CURRENT_BINARY_DIR}/liblz4.pc"
+     DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+ 
++  include(CMakePackageConfigHelpers)
++  write_basic_package_version_file(
++    "${CMAKE_CURRENT_BINARY_DIR}/lz4ConfigVersion.cmake"
++    VERSION ${LZ4_VERSION_STRING}
++    COMPATIBILITY SameMajorVersion)
++
++  set(LZ4_PKG_INSTALLDIR "${CMAKE_INSTALL_LIBDIR}/cmake/lz4")
++  configure_package_config_file(
++    "${CMAKE_CURRENT_LIST_DIR}/lz4Config.cmake.in"
++    "${CMAKE_CURRENT_BINARY_DIR}/lz4Config.cmake"
++    INSTALL_DESTINATION ${LZ4_PKG_INSTALLDIR})
++  export(EXPORT lz4Targets
++    FILE ${CMAKE_CURRENT_BINARY_DIR}/lz4Targets.cmake
++    NAMESPACE LZ4::)
++
++  install(EXPORT lz4Targets
++    FILE lz4Targets.cmake
++    NAMESPACE LZ4::
++    DESTINATION ${LZ4_PKG_INSTALLDIR})
++  install(FILES
++      ${CMAKE_CURRENT_BINARY_DIR}/lz4Config.cmake
++      ${CMAKE_CURRENT_BINARY_DIR}/lz4ConfigVersion.cmake
++    DESTINATION ${LZ4_PKG_INSTALLDIR})
++
+   # install lz4cat and unlz4 symlinks on *nix
+   if(UNIX AND LZ4_BUILD_CLI)
+     install(CODE "
+diff --git a/build/cmake/lz4Config.cmake.in b/build/cmake/lz4Config.cmake.in
+new file mode 100644
+index 0000000..e9c9473
+--- /dev/null
++++ b/build/cmake/lz4Config.cmake.in
+@@ -0,0 +1,2 @@
++@PACKAGE_INIT@
++include( "${CMAKE_CURRENT_LIST_DIR}/lz4Targets.cmake" )
+\ No newline at end of file
+diff --git a/examples/compress_functions.c b/examples/compress_functions.c
+index 7fd6775..e27c612 100644
+--- a/examples/compress_functions.c
++++ b/examples/compress_functions.c
+@@ -35,7 +35,7 @@
+  *
+  *               LZ4_decompress_safe
+  *                 This is the recommended function for decompressing data.  It is considered safe because the caller specifies
+- *                 both the size of the compresssed buffer to read as well as the maximum size of the output (decompressed) buffer
++ *                 both the size of the compressed buffer to read as well as the maximum size of the output (decompressed) buffer
+  *                 instead of just the latter.
+  *               LZ4_decompress_fast
+  *                 Again, despite its name it's not a "fast" version of decompression.  It simply frees the caller of sending the
+diff --git a/examples/dictionaryRandomAccess.md b/examples/dictionaryRandomAccess.md
+index 53d825d..fb1fade 100644
+--- a/examples/dictionaryRandomAccess.md
++++ b/examples/dictionaryRandomAccess.md
+@@ -7,7 +7,7 @@ Please note that the output file is not compatible with lz4frame and is platform
+ 
+ ## What's the point of this example ?
+ 
+- - Dictionary based compression for homogenous files.
++ - Dictionary based compression for homogeneous files.
+  - Random access to compressed blocks.
+ 
+ 
+diff --git a/examples/frameCompress.c b/examples/frameCompress.c
+index aac4a3b..7b22d8e 100644
+--- a/examples/frameCompress.c
++++ b/examples/frameCompress.c
+@@ -139,7 +139,7 @@ compress_file(FILE* f_in, FILE* f_out)
+                                         src, IN_CHUNK_SIZE,
+                                         outbuff, outbufCapacity);
+     } else {
+-        printf("error : ressource allocation failed \n");
++        printf("error : resource allocation failed \n");
+     }
+ 
+     LZ4F_freeCompressionContext(ctx);   /* supports free on NULL */
+diff --git a/lib/Makefile b/lib/Makefile
+index c12949b..8ea48c1 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -179,7 +179,7 @@ install: lib liblz4.pc
+ 	$(Q)$(INSTALL_DATA) lz4frame_static.h $(DESTDIR)$(includedir)/lz4frame_static.h
+   endif
+   ifeq ($(BUILD_SHARED),yes)
+-# Traditionnally, one installs the DLLs in the bin directory as programs
++# Traditionally, one installs the DLLs in the bin directory as programs
+ # search them first in their directory. This allows to not pollute system
+ # directories (like c:/windows/system32), nor modify the PATH variable.
+     ifeq ($(WINBASED),yes)
+diff --git a/lib/lz4frame.c b/lib/lz4frame.c
+index ec02c92..6cc7778 100644
+--- a/lib/lz4frame.c
++++ b/lib/lz4frame.c
+@@ -143,7 +143,7 @@ static int g_debuglog_enable = 1;
+ #endif
+ 
+ 
+-/* unoptimized version; solves endianess & alignment issues */
++/* unoptimized version; solves endianness & alignment issues */
+ static U32 LZ4F_readLE32 (const void* src)
+ {
+     const BYTE* const srcPtr = (const BYTE*)src;
+diff --git a/lib/lz4frame.h b/lib/lz4frame.h
+index 4573317..0f682b7 100644
+--- a/lib/lz4frame.h
++++ b/lib/lz4frame.h
+@@ -256,7 +256,7 @@ LZ4FLIB_API LZ4F_errorCode_t LZ4F_freeCompressionContext(LZ4F_cctx* cctx);
+ 
+ /*----    Compression    ----*/
+ 
+-#define LZ4F_HEADER_SIZE_MIN  7   /* LZ4 Frame header size can vary, depending on selected paramaters */
++#define LZ4F_HEADER_SIZE_MIN  7   /* LZ4 Frame header size can vary, depending on selected parameters */
+ #define LZ4F_HEADER_SIZE_MAX 19
+ 
+ /* Size in bytes of a block header in little-endian format. Highest bit indicates if block data is uncompressed */
+diff --git a/lib/lz4hc.c b/lib/lz4hc.c
+index 77c9f43..e9caf3c 100644
+--- a/lib/lz4hc.c
++++ b/lib/lz4hc.c
+@@ -201,7 +201,7 @@ LZ4HC_countPattern(const BYTE* ip, const BYTE* const iEnd, U32 const pattern32)
+ 
+ /* LZ4HC_reverseCountPattern() :
+  * pattern must be a sample of repetitive pattern of length 1, 2 or 4 (but not 3!)
+- * read using natural platform endianess */
++ * read using natural platform endianness */
+ static unsigned
+ LZ4HC_reverseCountPattern(const BYTE* ip, const BYTE* const iLow, U32 pattern)
+ {
+@@ -211,7 +211,7 @@ LZ4HC_reverseCountPattern(const BYTE* ip, const BYTE* const iLow, U32 pattern)
+         if (LZ4_read32(ip-4) != pattern) break;
+         ip -= 4;
+     }
+-    {   const BYTE* bytePtr = (const BYTE*)(&pattern) + 3; /* works for any endianess */
++    {   const BYTE* bytePtr = (const BYTE*)(&pattern) + 3; /* works for any endianness */
+         while (likely(ip>iLow)) {
+             if (ip[-1] != *bytePtr) break;
+             ip--; bytePtr--;
+diff --git a/lib/lz4hc.h b/lib/lz4hc.h
+index 3d441fb..edd08e0 100644
+--- a/lib/lz4hc.h
++++ b/lib/lz4hc.h
+@@ -305,7 +305,7 @@ LZ4LIB_API void LZ4_resetStreamHC (LZ4_streamHC_t* streamHCPtr, int compressionL
+  * They should not be linked from DLL,
+  * as there is no guarantee of API stability yet.
+  * Prototypes will be promoted to "stable" status
+- * after successfull usage in real-life scenarios.
++ * after successful usage in real-life scenarios.
+  ***************************************************/
+ #ifdef LZ4_HC_STATIC_LINKING_ONLY   /* protection macro */
+ #ifndef LZ4_HC_SLO_098092834
+diff --git a/ossfuzz/decompress_fuzzer.c b/ossfuzz/decompress_fuzzer.c
+index 6f48e30..a9a197c 100644
+--- a/ossfuzz/decompress_fuzzer.c
++++ b/ossfuzz/decompress_fuzzer.c
+@@ -39,7 +39,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+     /* No dictionary. */
+     LZ4_decompress_safe_usingDict((char const*)data, dst, size,
+                                   dstCapacity, NULL, 0);
+-    /* Small external dictonary. */
++    /* Small external dictionary. */
+     LZ4_decompress_safe_usingDict((char const*)data, dst, size,
+                                   dstCapacity, smallDict, smallDictSize);
+     /* Large external dictionary. */
+diff --git a/ossfuzz/fuzz_helpers.h b/ossfuzz/fuzz_helpers.h
+index c4a8645..aae359e 100644
+--- a/ossfuzz/fuzz_helpers.h
++++ b/ossfuzz/fuzz_helpers.h
+@@ -81,7 +81,7 @@ FUZZ_STATIC uint32_t FUZZ_rand(uint32_t *state) {
+     return rand32 >> 5;
+ }
+ 
+-/* Returns a random numer in the range [min, max]. */
++/* Returns a random number in the range [min, max]. */
+ FUZZ_STATIC uint32_t FUZZ_rand32(uint32_t *state, uint32_t min, uint32_t max) {
+     uint32_t random = FUZZ_rand(state);
+     return min + (random % (max - min + 1));
+diff --git a/programs/lz4io.c b/programs/lz4io.c
+index a274798..6108567 100644
+--- a/programs/lz4io.c
++++ b/programs/lz4io.c
+@@ -377,7 +377,7 @@ static FILE* LZ4IO_openDstFile(const char* dstFileName, const LZ4IO_prefs_t* con
+ *   Legacy Compression
+ ***************************************/
+ 
+-/* unoptimized version; solves endianess & alignment issues */
++/* unoptimized version; solves endianness & alignment issues */
+ static void LZ4IO_writeLE32 (void* p, unsigned value32)
+ {
+     unsigned char* const dstPtr = (unsigned char*)p;
+@@ -1387,7 +1387,7 @@ static const char * LZ4IO_frameTypeNames[] = {"LZ4Frame", "LegacyFrame", "Skippa
+ /* Read block headers and skip block data
+    Return total blocks size for this frame including block headers,
+    block checksums and content checksums.
+-   returns 0 in case it can't succesfully skip block data.
++   returns 0 in case it can't successfully skip block data.
+    Assumes SEEK_CUR after frame header.
+  */
+ static unsigned long long
+@@ -1427,7 +1427,7 @@ LZ4IO_skipBlocksData(FILE* finput,
+ /* For legacy frames only.
+    Read block headers and skip block data.
+    Return total blocks size for this frame including block headers.
+-   or 0 in case it can't succesfully skip block data.
++   or 0 in case it can't successfully skip block data.
+    This works as long as legacy block header size = magic number size.
+    Assumes SEEK_CUR after frame header.
+  */
+@@ -1445,7 +1445,7 @@ static unsigned long long LZ4IO_skipLegacyBlocksData(FILE* finput)
+             if ( nextCBlockSize == LEGACY_MAGICNUMBER ||
+                     nextCBlockSize == LZ4IO_MAGICNUMBER ||
+                     LZ4IO_isSkippableMagicNumber(nextCBlockSize)) {
+-                /* Rewind back. we want cursor at the begining of next frame.*/
++                /* Rewind back. we want cursor at the beginning of next frame.*/
+                 if (fseek(finput, -LZIO_LEGACY_BLOCK_HEADER_SIZE, SEEK_CUR) != 0) {
+                     return 0;
+                 }
+diff --git a/tests/README.md b/tests/README.md
+index 75b7b9f..75edf4c 100644
+--- a/tests/README.md
++++ b/tests/README.md
+@@ -13,7 +13,7 @@ This directory contains the following programs and scripts:
+ #### `test-lz4-versions.py` - script for testing lz4 interoperability between versions
+ 
+ This script creates `versionsTest` directory to which lz4 repository is cloned.
+-Then all taged (released) versions of lz4 are compiled.
++Then all tagged (released) versions of lz4 are compiled.
+ In the following step interoperability between lz4 versions is checked.
+ 
+ 
+diff --git a/tests/frametest.c b/tests/frametest.c
+index e613cbf..15f01e6 100644
+--- a/tests/frametest.c
++++ b/tests/frametest.c
+@@ -51,7 +51,7 @@
+ #include "xxhash.h"     /* XXH64 */
+ 
+ 
+-/* unoptimized version; solves endianess & alignment issues */
++/* unoptimized version; solves endianness & alignment issues */
+ static void FUZ_writeLE32 (void* dstVoidPtr, U32 value32)
+ {
+     BYTE* dstPtr = (BYTE*)dstVoidPtr;
+-- 
+2.37.0
+
