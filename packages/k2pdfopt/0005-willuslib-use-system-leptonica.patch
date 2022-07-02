@@ -1,7 +1,7 @@
-From 3ad840c8df25ac73df7ede81f4025a1e781a9e5b Mon Sep 17 00:00:00 2001
+From edda6dc15300ba8dcb92c9f004e18cd9aafb3f32 Mon Sep 17 00:00:00 2001
 From: yangfl <yangfl@users.noreply.github.com>
 Date: Mon, 7 Jan 2019 16:51:09 +0800
-Subject: [PATCH 5/7] willuslib/ocrtess.c: use system leptonica
+Subject: [PATCH 05/10] willuslib: use system leptonica
 
 ---
  willuslib/ocrtess.c    | 3 +--
@@ -9,19 +9,19 @@ Subject: [PATCH 5/7] willuslib/ocrtess.c: use system leptonica
  2 files changed, 3 insertions(+), 4 deletions(-)
 
 diff --git a/willuslib/ocrtess.c b/willuslib/ocrtess.c
-index e1366e1..58aaf97 100644
+index 2ba8a3c..bd3ce4b 100644
 --- a/willuslib/ocrtess.c
 +++ b/willuslib/ocrtess.c
-@@ -24,8 +24,7 @@
- #include <stdlib.h>
+@@ -25,8 +25,7 @@
  #include <string.h>
  #include <ctype.h>
+ #include <locale.h>
 -#include <leptonica.h>
 -#include <tesseract.h>
 +#include <leptonica/allheaders.h>
  #include "willus.h"
  
- 
+ char *ocrtess_langnames[] =
 diff --git a/willuslib/wleptonica.c b/willuslib/wleptonica.c
 index a4e3cfd..a85be09 100644
 --- a/willuslib/wleptonica.c
@@ -45,5 +45,5 @@ index a4e3cfd..a85be09 100644
          {
          PIX *pix2,*pix2d;
 -- 
-2.20.1
+2.28.0
 

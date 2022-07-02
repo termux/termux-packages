@@ -1,0 +1,25 @@
+From 2bc3d62571944d176d9d99b45edab504aa66bc23 Mon Sep 17 00:00:00 2001
+From: yangfl <yangfl@users.noreply.github.com>
+Date: Wed, 26 Aug 2020 23:21:44 +0800
+Subject: [PATCH 10/10] willuslib: use system djvu
+
+---
+ willuslib/bmpdjvu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/willuslib/bmpdjvu.c b/willuslib/bmpdjvu.c
+index a67e758..fd08fda 100644
+--- a/willuslib/bmpdjvu.c
++++ b/willuslib/bmpdjvu.c
+@@ -23,7 +23,7 @@
+ #include "willus.h"
+ 
+ #ifdef HAVE_DJVU_LIB
+-#include <djvu.h>
++#include <libdjvu/ddjvuapi.h>
+ 
+ static void handle(int wait,ddjvu_context_t *ctx);
+ static void djvu_add_page_info(char *buf,ddjvu_document_t *doc,int page,int npages);
+-- 
+2.28.0
+
