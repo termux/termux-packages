@@ -1,8 +1,8 @@
-TERMUX_PKG_HOMEPAGE=https://termux.org/
+TERMUX_PKG_HOMEPAGE=https://termux.dev/
 TERMUX_PKG_DESCRIPTION="Basic system tools for Termux"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.17
+TERMUX_PKG_VERSION=1.18
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_ESSENTIAL=true
@@ -57,7 +57,7 @@ termux_step_make_install() {
 		echo ""
 		echo "Welcome to Termux!"
 		echo ""
-		echo "Communities: https://termux.org/community"
+		echo "Communities: https://termux.dev/community"
 		echo "Gitter chat: https://gitter.im/termux/termux"
 		echo "IRC channel: #termux on libera.chat"
 		echo ""
@@ -74,7 +74,7 @@ termux_step_make_install() {
 			echo " * X11:      pkg install x11-repo"
 			echo ""
 		fi
-		echo "Report issues at https://termux.org/issues"
+		echo "Report issues at https://termux.dev/issues"
 		echo ""
 	} > $TERMUX_PKG_BUILDER_DIR/motd
 	install -Dm600 $TERMUX_PKG_BUILDER_DIR/motd $TERMUX_PREFIX/etc/motd
