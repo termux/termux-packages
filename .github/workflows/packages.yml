@@ -243,23 +243,6 @@ jobs:
 
         source scripts/aptly_api.sh
 
-        REPOSITORY_DOMAIN="$(echo "$REPOSITORY_URL" | cut -d'/' -f3)"
-        echo "Checking $REPOSITORY_DOMAIN ip access"
-        for ip in $(dig -t a +short "$REPOSITORY_DOMAIN" | sed '1d'); do
-          if [ $(curl -s -o /dev/null -w "%{http_code}" --resolve "$REPOSITORY_DOMAIN:80:$ip"  "http://$REPOSITORY_DOMAIN") != "200" ]; then
-            echo "success: $ip"
-            CURL_ADDITIONAL_OPTIONS=(--resolve "$REPOSITORY_DOMAIN:$ip")
-            break
-          else
-            echo "failed: $ip" 
-          fi
-        done
-
-        if [ ${#CURL_ADDITIONAL_OPTIONS[@]} -eq 0 ]; then
-          echo "No working ip address found for $REPOSITORY_DOMAIN"
-          exit 1
-        fi
-
         for archive in debs-*/debs-{aarch64,arm,i686,x86_64}-${{ github.sha }}.tar; do
           tar xf "$archive"
         done
