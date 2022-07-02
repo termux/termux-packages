@@ -16,7 +16,7 @@ trap 'rm -rf $BOOTSTRAP_TMPDIR' EXIT
 TERMUX_ARCHITECTURES=("aarch64" "arm" "i686" "x86_64")
 
 # Can be changed by using '--repository' option.
-REPO_BASE_URL="https://packages-cf.termux.org/termux-main-21"
+REPO_BASE_URL="https://packages-cf.termux.dev/apt/termux-main-21"
 
 # A list of non-essential packages. By default it is empty, but can
 # be filled with option '--add'.
