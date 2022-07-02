@@ -80,16 +80,16 @@ index a448bcb23c4..0ddbac17a52 100644
    endif()
    get_versioned_target_triple(target ${SWIFT_HOST_VARIANT_SDK}
        ${SWIFT_HOST_VARIANT_ARCH} "${deployment_version}")
-@@ -758,6 +758,9 @@
-   add_library(${name} STATIC ${all_obj_files})
-   set_target_properties(${name} PROPERTIES LINKER_LANGUAGE CXX)
-   set_property(GLOBAL APPEND PROPERTY SWIFT_BUILDTREE_EXPORTS ${name})
-+  if(${LIBSWIFT_BUILD_MODE} STREQUAL "CROSSCOMPILE")
-+    add_dependencies(${name} swift-stdlib-android-${SWIFT_HOST_VARIANT_ARCH})
-+  endif()
- endfunction()
+@@ -766,6 +766,9 @@ function(add_libswift name)
+       COMMENT "Building libswift module ${module}")
  
- macro(add_swift_tool_subdirectory name)
+     set("${module}_dep_target" ${dep_target})
++    if(${LIBSWIFT_BUILD_MODE} STREQUAL "CROSSCOMPILE")
++      add_dependencies(${dep_target} swift-stdlib-android-${SWIFT_HOST_VARIANT_ARCH})
++    endif()
+   endforeach()
+ 
+   # Create a static libswift library containing all module object files.
 @@ -922,7 +923,7 @@ function(add_swift_host_tool executable)
        # installed host toolchain.
        get_filename_component(swift_bin_dir ${SWIFT_EXEC_FOR_LIBSWIFT} DIRECTORY)
