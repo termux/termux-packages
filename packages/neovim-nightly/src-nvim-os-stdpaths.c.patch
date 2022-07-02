@@ -1,14 +1,12 @@
-diff -u -r ../neovim-master/src/nvim/os/stdpaths.c ./src/nvim/os/stdpaths.c
---- ../neovim-master/src/nvim/os/stdpaths.c	2015-11-01 16:16:38.000000000 -0500
-+++ ./src/nvim/os/stdpaths.c	2015-11-02 14:12:12.770172673 -0500
-@@ -34,8 +34,8 @@
-   [kXDGDataHome] = "~/.local/share",
+--- ./src/nvim/os/stdpaths.c.orig	2022-07-02 15:46:11.997439729 +0530
++++ ./src/nvim/os/stdpaths.c	2022-07-02 15:47:38.817439696 +0530
+@@ -51,8 +51,8 @@
    [kXDGCacheHome] = "~/.cache",
-   [kXDGRuntimeDir] = NULL,
+   [kXDGStateHome] = "~/.local/state",
+   [kXDGRuntimeDir] = NULL,  // Decided by vim_mktempdir().
 -  [kXDGConfigDirs] = "/etc/xdg/",
 -  [kXDGDataDirs] = "/usr/local/share/:/usr/share/",
 +  [kXDGConfigDirs] = "@TERMUX_PREFIX@/etc/xdg/",
 +  [kXDGDataDirs] = "@TERMUX_PREFIX@/local/share/:@TERMUX_PREFIX@/share/",
  #endif
  };
- 
