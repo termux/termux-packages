@@ -3,9 +3,10 @@ TERMUX_PKG_DESCRIPTION="Python bindings for APT"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.3.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://ftp.debian.org/debian/pool/main/p/python-apt/python-apt_${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=de4a284bc7a738793615631d451524f42404034f4d787953b7621b25bc29e474
-TERMUX_PKG_DEPENDS="apt, libc++, python"
+TERMUX_PKG_DEPENDS="apt, build-essential, libc++, python, texinfo"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 _PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
