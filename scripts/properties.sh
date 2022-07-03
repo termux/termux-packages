@@ -1,4 +1,7 @@
-# keep repology-metadata in sync with this
+# XXX: This file is sourced by repology-updater script
+# So avoid doing things like executing commands except of those available in
+# coreutils and are clearly not a default part of most Linux installations,
+# or sourcing any other script in our build directories.
 
 TERMUX_SDK_REVISION=8512546
 TERMUX_ANDROID_BUILD_TOOLS_VERSION=30.0.3
