@@ -1,0 +1,59 @@
+--- ./meson.build.orig	2022-07-05 08:58:24.604395395 +0530
++++ ./meson.build	2022-07-05 09:00:57.594395336 +0530
+@@ -124,13 +124,6 @@
+ guile_dep = dependency('guile-3.0', required: get_option('guile'))
+ # soft dependencies
+
+-# emacs -- needed for mu4e compilation
+-emacs_name=get_option('emacs')
+-emacs=find_program([emacs_name], version: '>=25.3', required:false)
+-if not emacs.found()
+-  message('emacs not found; not pre-compiling mu4e sources')
+-endif
+-
+ makeinfo=find_program(['makeinfo'], required:false)
+ if not makeinfo.found()
+   message('makeinfo (texinfo) not found; not building info documentation')
+@@ -181,9 +174,8 @@
+ subdir('mu')
+ subdir('man')
+
+-if emacs.found()
+-   subdir('mu4e')
+-endif
++# This will not compile, but still copy files.
++subdir('mu4e')
+
+ if not get_option('guile').disabled() and guile_dep.found()
+   config_h_data.set('BUILD_GUILE', 1)
+
+# Do not compile .el files to .elc. We will do it during installation, on device.
+--- ./mu4e/meson.build.orig	2022-07-05 09:03:00.844395289 +0530
++++ ./mu4e/meson.build	2022-07-05 09:04:51.624395247 +0530
+@@ -70,27 +70,6 @@
+   configure_file(input: src, output:'@BASENAME@.el', copy:true)
+ endforeach
+
+-foreach src : mu4e_srcs
+-  target_name= '@BASENAME@.elc'
+-  target_path = join_paths(meson.current_build_dir(), target_name)
+-  target_func = '(setq byte-compile-dest-file-function(lambda(_) "' + target_path + '"))'
+-
+-  custom_target(src.underscorify() + '_el',
+-                build_by_default: true,
+-                input: src,
+-                output: target_name,
+-                install_dir: lispdir,
+-                install: true,
+-                command: [emacs,
+-                          '--no-init-file',
+-                          '--batch',
+-                          '--eval', '(setq load-prefer-newer t)',
+-                          '--eval', target_func,
+-                          '--directory', meson.current_build_dir(),
+-                          '--directory', meson.current_source_dir(),
+-                          '--funcall', 'batch-byte-compile', '@INPUT@'])
+-endforeach
+-
+ # also install the sources and the config
+ install_data(mu4e_srcs, install_dir: lispdir)
