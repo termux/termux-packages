@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.djcbsoftware.nl/code/mu/
 TERMUX_PKG_DESCRIPTION="Maildir indexer/searcher and Emacs client (mu4e)"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.8.3"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="1.8.5"
 TERMUX_PKG_SRCURL=https://github.com/djcb/mu/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=ac6110beb0f2119b0ffc5c258e20f29de91dbb890d77c36bef934ba1c02b91a6
+TERMUX_PKG_SHA256=155529ef4606624492f714db02863050e75a479db000b2c0ab61e689f629e4b4
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="emacs, glib, libc++, libxapian, libgmime"
 
