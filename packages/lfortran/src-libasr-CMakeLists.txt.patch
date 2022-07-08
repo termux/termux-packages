@@ -1,0 +1,12 @@
+When building with -DBUILD_SHARED_LIBS=ON, libasr will be a shared library but not installed.
+--- a/src/libasr/CMakeLists.txt
++++ b/src/libasr/CMakeLists.txt
+@@ -72,7 +72,7 @@
+             COMPILE_FLAGS -Wno-deprecated-declarations)
+     endif()
+ endif()
+-add_library(asr ${SRC})
++add_library(asr STATIC ${SRC})
+ target_include_directories(asr BEFORE PUBLIC ${libasr_SOURCE_DIR}/..)
+ target_include_directories(asr BEFORE PUBLIC ${libasr_BINARY_DIR}/..)
+ if (WITH_BFD)
