@@ -61,21 +61,14 @@ termux_step_pre_configure() {
 	CPPFLAGS="-I$TERMUX_PKG_SRCDIR $CPPFLAGS"
 }
 
-termux_step_make() {
-	make -j $TERMUX_MAKE_PROCESSES $TERMUX_PKG_EXTRA_MAKE_ARGS
-	make -j $TERMUX_MAKE_PROCESSES -C contrib/subtree $TERMUX_PKG_EXTRA_MAKE_ARGS
-}
-
-termux_step_make_install() {
-	make $TERMUX_PKG_EXTRA_MAKE_ARGS install
-	make -C contrib/subtree $TERMUX_PKG_EXTRA_MAKE_ARGS install
-
+termux_step_post_make_install() {
 	# Installing man requires asciidoc and xmlto, so git uses separate make targets for man pages
 	make -j $TERMUX_MAKE_PROCESSES install-man
-	make -j $TERMUX_MAKE_PROCESSES -C contrib/subtree install-man
-}
 
-termux_step_post_make_install() {
+	make -j $TERMUX_MAKE_PROCESSES -C contrib/subtree $TERMUX_PKG_EXTRA_MAKE_ARGS
+	make -C contrib/subtree $TERMUX_PKG_EXTRA_MAKE_ARGS ${TERMUX_PKG_MAKE_INSTALL_TARGET}
+	make -j $TERMUX_MAKE_PROCESSES -C contrib/subtree install-man
+
 	mkdir -p $TERMUX_PREFIX/etc/bash_completion.d/
 	cp $TERMUX_PKG_SRCDIR/contrib/completion/git-completion.bash \
 	   $TERMUX_PKG_SRCDIR/contrib/completion/git-prompt.sh \
