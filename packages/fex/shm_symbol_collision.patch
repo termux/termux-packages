@@ -18,7 +18,7 @@ index e54ba14c..ec6c111f 100644
    SYSCALL_Arm64_socketpair = 199,
    SYSCALL_Arm64_bind = 200,
 diff --git a/Source/Tests/LinuxSyscalls/LinuxAllocator.cpp b/Source/Tests/LinuxSyscalls/LinuxAllocator.cpp
-index 7cee0b29..78bbe6c6 100644
+index 927794ac..a0ff3287 100644
 --- a/Source/Tests/LinuxSyscalls/LinuxAllocator.cpp
 +++ b/Source/Tests/LinuxSyscalls/LinuxAllocator.cpp
 @@ -47,8 +47,8 @@ public:
@@ -32,7 +32,7 @@ index 7cee0b29..78bbe6c6 100644
    static constexpr bool SearchDown = true;
  
    // PageAddr is a page already shifted to page index
-@@ -434,7 +434,7 @@ void *MemAllocator32Bit::mremap(void *old_address, size_t old_size, size_t new_s
+@@ -435,7 +435,7 @@ void *MemAllocator32Bit::mremap(void *old_address, size_t old_size, size_t new_s
    return reinterpret_cast<void*>(-errno);
  }
  
@@ -41,7 +41,7 @@ index 7cee0b29..78bbe6c6 100644
    std::scoped_lock<std::mutex> lk{AllocMutex};
  
    if (shmaddr != nullptr) {
-@@ -547,7 +547,7 @@ restart:
+@@ -548,7 +548,7 @@ restart:
      }
    }
  }
@@ -50,7 +50,7 @@ index 7cee0b29..78bbe6c6 100644
    std::scoped_lock<std::mutex> lk{AllocMutex};
    
    uint32_t AddrPage = reinterpret_cast<uint64_t>(shmaddr) >> FHU::FEX_PAGE_SHIFT;
-@@ -587,7 +587,7 @@ public:
+@@ -588,7 +588,7 @@ public:
      return reinterpret_cast<void*>(Result);
    }
  
@@ -59,7 +59,7 @@ index 7cee0b29..78bbe6c6 100644
      uint64_t Result = (uint64_t)::shmat(shmid, reinterpret_cast<const void*>(shmaddr), shmflg);
      if (Result != ~0ULL) {
        *ResultAddress = Result;
-@@ -596,7 +596,7 @@ public:
+@@ -597,7 +597,7 @@ public:
      SYSCALL_ERRNO();
    }
  
