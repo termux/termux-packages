@@ -23,10 +23,11 @@ TERMUX_PKG_EXTRA_MAKE_ARGS="
 NO_NSEC=1
 NO_GETTEXT=1
 NO_EXPAT=1
-NO_INSTALL_HARDLINKS=1
+INSTALL_SYMLINKS=1
 PERL_PATH=$TERMUX_PREFIX/bin/perl
 USE_LIBPCRE2=1
 "
+
 TERMUX_PKG_BUILD_IN_SRC=true
 
 # Things to remove to save space:
@@ -42,47 +43,22 @@ share/man/man1/git-shell.1
 "
 
 termux_step_pre_configure() {
-	# Certain packages are not safe to build on device because their
-	# build.sh script deletes specific files in $TERMUX_PREFIX.
-	if $TERMUX_ON_DEVICE_BUILD; then
-		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
-	fi
-
-	# Setup perl so that the build process can execute it:
-	rm -f $TERMUX_PREFIX/bin/perl
-	ln -s $(command -v perl) $TERMUX_PREFIX/bin/perl
-
-	# Force fresh perl files (otherwise files from earlier builds
-	# remains without bumped modification times, so are not picked
-	# up by the package):
-	rm -Rf $TERMUX_PREFIX/share/git-perl
-
 	# Fixes build if utfcpp is installed:
 	CPPFLAGS="-I$TERMUX_PKG_SRCDIR $CPPFLAGS"
 }
 
 termux_step_post_make_install() {
 	# Installing man requires asciidoc and xmlto, so git uses separate make targets for man pages
-	make -j $TERMUX_MAKE_PROCESSES install-man
+	make -j $TERMUX_MAKE_PROCESSES $TERMUX_PKG_EXTRA_MAKE_ARGS install-man DESTDIR=$TERMUX_PKG_MASSAGEDIR
 
 	make -j $TERMUX_MAKE_PROCESSES -C contrib/subtree $TERMUX_PKG_EXTRA_MAKE_ARGS
-	make -C contrib/subtree $TERMUX_PKG_EXTRA_MAKE_ARGS ${TERMUX_PKG_MAKE_INSTALL_TARGET}
-	make -j $TERMUX_MAKE_PROCESSES -C contrib/subtree install-man
+	make -C contrib/subtree $TERMUX_PKG_EXTRA_MAKE_ARGS ${TERMUX_PKG_MAKE_INSTALL_TARGET} DESTDIR=$TERMUX_PKG_MASSAGEDIR
+	make -j $TERMUX_MAKE_PROCESSES -C contrib/subtree $TERMUX_PKG_EXTRA_MAKE_ARGS install-man DESTDIR=$TERMUX_PKG_MASSAGEDIR
 
-	mkdir -p $TERMUX_PREFIX/etc/bash_completion.d/
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/bash_completion.d/
 	cp $TERMUX_PKG_SRCDIR/contrib/completion/git-completion.bash \
 	   $TERMUX_PKG_SRCDIR/contrib/completion/git-prompt.sh \
-	   $TERMUX_PREFIX/etc/bash_completion.d/
-
-	# Remove the build machine perl setup in termux_step_pre_configure to avoid it being packaged:
-	rm $TERMUX_PREFIX/bin/perl
-
-	# Remove clutter:
-	rm -Rf $TERMUX_PREFIX/lib/*-linux*/perl
-
-	# Remove duplicated binaries in bin/ with symlink to the one in libexec/git-core:
-	(cd $TERMUX_PREFIX/bin; ln -s -f ../libexec/git-core/git git)
-	(cd $TERMUX_PREFIX/bin; ln -s -f ../libexec/git-core/git-upload-pack git-upload-pack)
+	   $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/bash_completion.d/
 }
 
 termux_step_post_massage() {
