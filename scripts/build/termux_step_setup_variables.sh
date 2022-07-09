@@ -44,24 +44,6 @@ termux_step_setup_variables() {
 	# TERMUX_PKG_MAINTAINER should be explicitly set in build.sh of the package.
 	: "${TERMUX_PKG_MAINTAINER:="default"}"
 
-	TERMUX_REPO_URL=(
-		https://packages-cf.termux.dev/apt/termux-main
-		https://packages-cf.termux.dev/apt/termux-root
-		https://packages-cf.termux.dev/apt/termux-x11
-	)
-
-	TERMUX_REPO_DISTRIBUTION=(
-		stable
-		root
-		x11
-	)
-
-	TERMUX_REPO_COMPONENT=(
-		main
-		stable
-		main
-	)
-
 	if [ "x86_64" = "$TERMUX_ARCH" ] || [ "aarch64" = "$TERMUX_ARCH" ]; then
 		TERMUX_ARCH_BITS=64
 	else
