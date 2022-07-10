@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Use llvm as binutils"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 # The version number is different from the original one.
-TERMUX_PKG_VERSION=0.2
+TERMUX_PKG_VERSION=0.3
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_DEPENDS="lld, llvm"
 TERMUX_PKG_PROVIDES="binutils"
@@ -13,7 +13,7 @@ TERMUX_PKG_CONFLICTS="binutils"
 termux_step_make_install() {
 	ln -sf lld $TERMUX_PREFIX/bin/ld
 	local f
-	for f in addr2line ar as dwp nm objcopy objdump ranlib readelf size strings strip; do
+	for f in addr2line ar dwp nm objcopy objdump ranlib readelf size strings strip; do
 		ln -sf llvm-${f} $TERMUX_PREFIX/bin/${f}
 	done
 	ln -sf llvm-cxxfilt $TERMUX_PREFIX/bin/c++filt
