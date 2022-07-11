@@ -3,7 +3,8 @@ TERMUX_PKG_DESCRIPTION="Instrumentation framework for building dynamic analysis 
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.19.0
-TERMUX_PKG_SRCURL=ftp://sourceware.org/pub/valgrind/valgrind-${TERMUX_PKG_VERSION}.tar.bz2
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL=http://sourceware.org/pub/valgrind/valgrind-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=dd5e34486f1a483ff7be7300cc16b4d6b24690987877c3278d797534d6738f02
 TERMUX_PKG_BREAKS="valgrind-dev"
 TERMUX_PKG_REPLACES="valgrind-dev"
@@ -32,5 +33,9 @@ termux_step_post_massage() {
 	termux_download https://github.com/Lzhiyong/termux-ndk/raw/902f483485b4/patches/align_fix.py \
 		$TERMUX_PKG_CACHEDIR/align_fix.py \
 		83579beef5f0899300b2f1cb7cfad25c3ee2c90089f9b7eb83ce7472d0e730bd
+	# XXX: These files may need to be patched.
 	python3 $TERMUX_PKG_CACHEDIR/align_fix.py bin/valgrind
+	python3 $TERMUX_PKG_CACHEDIR/align_fix.py bin/valgrind-di-server
+	python3 $TERMUX_PKG_CACHEDIR/align_fix.py bin/valgrind-listener
+	python3 $TERMUX_PKG_CACHEDIR/align_fix.py bin/vgdb
 }
