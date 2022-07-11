@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://sourceforge.net/projects/ta-lib/
-TERMUX_PKG_DESCRIPTION="Technical analysis library with indicators like ADX."
+TERMUX_PKG_DESCRIPTION="Technical analysis library with indicators like ADX"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.4.0

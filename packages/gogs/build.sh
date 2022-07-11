@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://gogs.io
-TERMUX_PKG_DESCRIPTION="A painless self-hosted Git service."
+TERMUX_PKG_DESCRIPTION="A painless self-hosted Git service"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Injamul Mohammad Mollah <mrinjamul@gmail.com>"
 TERMUX_PKG_VERSION="0.12.9"

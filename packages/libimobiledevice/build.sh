@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://libimobiledevice.org/
-TERMUX_PKG_DESCRIPTION="A library to communicate with services on iOS devices using native protocols."
+TERMUX_PKG_DESCRIPTION="A library to communicate with services on iOS devices using native protocols"
 TERMUX_PKG_LICENSE="GPL-2.0, LGPL-2.1"
 TERMUX_PKG_LICENSE_FILE="COPYING, COPYING.LESSER"
 TERMUX_PKG_MAINTAINER="@termux"

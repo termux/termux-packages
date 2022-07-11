@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://strophe.im/libstrophe
-TERMUX_PKG_DESCRIPTION="libstrophe is a minimal XMPP library written in C."
+TERMUX_PKG_DESCRIPTION="libstrophe is a minimal XMPP library written in C"
 TERMUX_PKG_LICENSE="MIT, GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.12.1"

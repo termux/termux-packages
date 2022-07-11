@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE="https://hackage.haskell.org/package/tar"
-TERMUX_PKG_DESCRIPTION="Reading, writing and manipulating '.tar' archive files."
+TERMUX_PKG_DESCRIPTION="Reading, writing and manipulating '.tar' archive files"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.org>"
 TERMUX_PKG_VERSION="0.5.1.1"

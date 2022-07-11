@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://electrum.org
-TERMUX_PKG_DESCRIPTION="Electrum is a lightweight Bitcoin wallet."
+TERMUX_PKG_DESCRIPTION="Electrum is a lightweight Bitcoin wallet"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=4.0.5

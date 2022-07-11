@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE="https://github.com/haskellari/these"
-TERMUX_PKG_DESCRIPTION="Align and Zip type-classes from the common Semialign ancestor."
+TERMUX_PKG_DESCRIPTION="Align and Zip type-classes from the common Semialign ancestor"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.org>"
 TERMUX_PKG_VERSION="1.2.0.1"

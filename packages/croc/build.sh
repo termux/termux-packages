@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/schollz/croc
-TERMUX_PKG_DESCRIPTION="Easily and securely send things from one computer to another."
+TERMUX_PKG_DESCRIPTION="Easily and securely send things from one computer to another"
 TERMUX_PKG_LICENSE=MIT
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="9.6.0"
