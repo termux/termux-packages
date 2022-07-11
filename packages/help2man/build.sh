@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/help2man/
-TERMUX_PKG_DESCRIPTION="Conversion tool to create man files."
+TERMUX_PKG_DESCRIPTION="Conversion tool to create man files"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.49.1

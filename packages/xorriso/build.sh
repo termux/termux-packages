@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/xorriso
-TERMUX_PKG_DESCRIPTION="Tool for creating ISO files."
+TERMUX_PKG_DESCRIPTION="Tool for creating ISO files"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1:1.5.4

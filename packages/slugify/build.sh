@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/benlinton/slugify
-TERMUX_PKG_DESCRIPTION="Bash command that converts filenames and directories to a web friendly format."
+TERMUX_PKG_DESCRIPTION="Bash command that converts filenames and directories to a web friendly format"
 TERMUX_PKG_LICENSE="MIT"
 _COMMIT=4528e8ecc2de14f76dfc76d045635beed138fb39
 TERMUX_PKG_MAINTAINER="@termux"

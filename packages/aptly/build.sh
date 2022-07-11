@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://www.aptly.info
-TERMUX_PKG_DESCRIPTION="A Swiss Army knife for Debian repository management."
+TERMUX_PKG_DESCRIPTION="A Swiss Army knife for Debian repository management"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.5.0

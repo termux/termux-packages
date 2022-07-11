@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/Akianonymus/gdrive-downloader
-TERMUX_PKG_DESCRIPTION="Download a gdrive folder or file easily, shell ftw."
+TERMUX_PKG_DESCRIPTION="Download a gdrive folder or file easily, shell ftw"
 TERMUX_PKG_LICENSE="Unlicense"
 _COMMIT=b8ea865e56ad70cee368a322720dc723295db2c0
 TERMUX_PKG_MAINTAINER="@termux"

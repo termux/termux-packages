@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/gopasspw/gopass
-TERMUX_PKG_DESCRIPTION="The slightly more awesome standard unix password manager for teams."
+TERMUX_PKG_DESCRIPTION="The slightly more awesome standard unix password manager for teams"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.14.3"

@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://solidity.readthedocs.io
-TERMUX_PKG_DESCRIPTION="An Ethereum smart contract-oriented language."
+TERMUX_PKG_DESCRIPTION="An Ethereum smart contract-oriented language"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.8.15"

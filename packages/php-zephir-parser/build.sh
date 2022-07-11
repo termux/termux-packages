@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/phalcon/php-zephir-parser
-TERMUX_PKG_DESCRIPTION="The Zephir Parser delivered as a C extension for the PHP language."
+TERMUX_PKG_DESCRIPTION="The Zephir Parser delivered as a C extension for the PHP language"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="ian4hu <hu2008yinxiang@163.com>"
 TERMUX_PKG_VERSION=1.5.0

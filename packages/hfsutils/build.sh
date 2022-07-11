@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://www.mars.org/home/rob/proj/hfs/
-TERMUX_PKG_DESCRIPTION="Tool for manipulating HFS images."
+TERMUX_PKG_DESCRIPTION="Tool for manipulating HFS images"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.2.6
