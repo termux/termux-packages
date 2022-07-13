@@ -45,13 +45,15 @@ termux_step_get_dependencies() {
 			(
 				cd $TERMUX_COMMON_CACHEDIR-$DEP_ARCH
 				ar x ${PKG}_${DEP_VERSION}_${DEP_ARCH}.deb data.tar.xz
+				# Strip prefixed ./data/data/com.termux or
+				# /data/data/com.termux, to avoid permission errors
+				# from tar when extracting on device.
 				if tar -tf data.tar.xz|grep "^./$">/dev/null; then
-					# Strip prefixed ./, to avoid possible
-					# permission errors from tar
-					tar -xf data.tar.xz --strip-components=1 \
-						--no-overwrite-dir -C /
+					tar -xf data.tar.xz --strip-components=4 \
+						--no-overwrite-dir -C /data/data/$TERMUX_APP_PACKAGE/
 				else
-					tar -xf data.tar.xz --no-overwrite-dir -C /
+					tar -xf data.tar.xz --strip-components=3 \
+						--no-overwrite-dir -C /data/data/$TERMUX_APP_PACKAGE/
 				fi
 			)
 
