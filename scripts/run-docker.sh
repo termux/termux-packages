@@ -12,6 +12,15 @@ else
 	SEC_OPT=" --security-opt seccomp=$REPOROOT/scripts/profile.json"
 fi
 
+# Required for Linux with SELinux and btrfs to avoid permission issues, eg: Fedora
+# To reset, use "restorecon -Fr ."
+# To check, use "ls -Z ."
+if [ -n "$(command -v getenforce)" ] && [ "$(getenforce)" = Enforcing ]; then
+	VOLUME=$REPOROOT:$CONTAINER_HOME_DIR/termux-packages:z
+else
+	VOLUME=$REPOROOT:$CONTAINER_HOME_DIR/termux-packages
+fi
+
 : ${TERMUX_BUILDER_IMAGE_NAME:=termux/package-builder}
 : ${CONTAINER_NAME:=termux-package-builder}
 
@@ -37,7 +46,7 @@ $SUDO docker start $CONTAINER_NAME >/dev/null 2>&1 || {
 	$SUDO docker run \
 		--detach \
 		--name $CONTAINER_NAME \
-		--volume $REPOROOT:$CONTAINER_HOME_DIR/termux-packages \
+		--volume $VOLUME \
 		$SEC_OPT \
 		--tty \
 		$TERMUX_BUILDER_IMAGE_NAME
