@@ -1,11 +1,18 @@
 #!/bin/sh
 
-if [ $# = 0 ] && [ -f @TERMUX_PREFIX@/etc/motd ] && [ ! -f ~/.hushlogin ] && [ -z "$TERMUX_HUSHLOGIN" ]; then
-	cat @TERMUX_PREFIX@/etc/motd
+if [ $# = 0 ] && [ -f @TERMUX_PREFIX@/etc/motd ] || [ -f @TERMUX_PREFIX@/etc/motd.sh ] && [ ! -f ~/.hushlogin ] && [ -z "$TERMUX_HUSHLOGIN" ]; then
+    # Dynamic motd check
+    if [ -e @TERMUX_PREFIX@/etc/motd.sh ]; then
+	    bash @TERMUX_PREFIX@/etc/motd.sh
+    else
+        cat @TERMUX_PREFIX@/etc/motd
+    fi
 else
 	# This variable shouldn't be kept set.
 	unset TERMUX_HUSHLOGIN
 fi
+
+
 
 # TERMUX_VERSION env variable has been exported since v0.107 and PATH was being set to following value in <0.104. Last playstore version was v0.101.
 if [ $# = 0 ] && [ -f @TERMUX_PREFIX@/etc/motd-playstore ] && [ -z "$TERMUX_VERSION" ] && [ "$PATH" = "@TERMUX_PREFIX@/bin:@TERMUX_PREFIX@/bin/applets" ]; then
