@@ -12,18 +12,18 @@
  	return runtime_dir;
  }
 
---- utils.c.orig	2022-05-25 11:10:14.722429157 +0530
-+++ ./src/modules/module-protocol-pulse/utils.c	2022-05-25 11:21:28.562428900 +0530
-@@ -59,7 +59,10 @@
- 	runtime_dir = getenv("PULSE_RUNTIME_PATH");
- 	if (runtime_dir == NULL)
- 		runtime_dir = getenv("XDG_RUNTIME_DIR");
-+	if (runtime_dir == NULL) {
+--- pipewire-0.3.55/src/modules/module-protocol-pulse/utils.c
++++ pipewire-0.3.55.mod/src/modules/module-protocol-pulse/utils.c
+@@ -62,6 +62,9 @@
+ 		dir = "pulse";
+ 	}
+ 	if (runtime_dir == NULL) {
 +		runtime_dir = "@TERMUX_PREFIX@/tmp";
 +	}
-
- 	if (runtime_dir == NULL) {
++	if (runtime_dir == NULL) {
  		pw_log_error("could not find a suitable runtime directory in"
+ 				"$PULSE_RUNTIME_PATH and $XDG_RUNTIME_DIR");
+ 		return -ENOENT;
 
 --- local-socket.c.orig	2022-05-25 11:10:47.232429145 +0530
 +++ ./src/modules/module-protocol-native/local-socket.c	2022-05-25 11:19:02.752428956 +0530
