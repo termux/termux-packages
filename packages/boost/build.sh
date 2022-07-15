@@ -13,19 +13,8 @@ TERMUX_PKG_BREAKS="libboost-python (<= 1.65.1-2), boost-dev"
 TERMUX_PKG_REPLACES="libboost-python (<= 1.65.1-2), boost-dev"
 TERMUX_PKG_BUILD_IN_SRC=true
 
-termux_step_pre_configure() {
-	# Certain packages are not safe to build on device because their
-	# build.sh script deletes specific files in $TERMUX_PREFIX.
-	if $TERMUX_ON_DEVICE_BUILD; then
-		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
-	fi
-}
-
 termux_step_make_install() {
 	CXXFLAGS+=" -std=c++14"
-
-	rm $TERMUX_PREFIX/lib/libboost* -f
-	rm $TERMUX_PREFIX/include/boost -rf
 
 	CC= CXX= LDFLAGS= CXXFLAGS= ./bootstrap.sh
 	echo "using clang : $TERMUX_ARCH : $CXX : <linkflags>-L$TERMUX_PREFIX/lib ; " >> project-config.jam
@@ -49,11 +38,12 @@ termux_step_make_install() {
 		define=BOOST_FILESYSTEM_DISABLE_STATX \
 		include=$TERMUX_PREFIX/include \
 		toolset=clang-$TERMUX_ARCH \
-		--prefix="$TERMUX_PREFIX"  \
+		--prefix="$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"  \
 		-q \
 		--without-stacktrace \
 		--disable-icu \
 		-sNO_ZSTD=1 \
+                --build-dir=$TERMUX_PKG_BUILDDIR \
 		cxxflags="$CXXFLAGS" \
 		linkflags="$LDFLAGS" \
 		architecture="$BOOSTARCH" \
