@@ -1,3 +1,5 @@
+#!/usr/bin/bash
+
 termux_download_deb_pac() {
 	local PACKAGE=$1
 	local PACKAGE_ARCH=$2

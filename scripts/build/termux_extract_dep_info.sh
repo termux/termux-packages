@@ -1,3 +1,5 @@
+#!/usr/bin/bash
+
 termux_extract_dep_info() {
 	PKG=$1
 	PKG_DIR=$2
