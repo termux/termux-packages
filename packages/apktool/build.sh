@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A tool for reverse engineering 3rd party, closed, binary
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.6.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/iBotPeaches/Apktool/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=8932e77d963b9e0e07227422d82ed4a355e8aa268bad1361e5cfaffa8e4d52ee
 TERMUX_PKG_DEPENDS="aapt, aapt2, openjdk-17"
@@ -16,8 +17,6 @@ termux_step_pre_configure() {
 		local exe_path=$prebuilt_dir/linux/${exe_name}
 		$CC $CFLAGS $CPPFLAGS aapt-wrapper/${exe_name}-wrapper.c \
 			-o ${exe_path} $LDFLAGS
-		$STRIP --strip-unneeded ${exe_path}
-		$TERMUX_ELF_CLEANER ${exe_path}
 		cp -a ${exe_path} ${exe_path}_64
 	done
 }
