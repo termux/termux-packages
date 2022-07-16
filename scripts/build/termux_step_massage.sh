@@ -29,7 +29,8 @@ termux_step_massage() {
 
 	if [ "$TERMUX_PKG_NO_ELF_CLEANER" != "true" ]; then
 		# Remove entries unsupported by Android's linker:
-		find . \( -path "./bin/*" -o -path "./lib/*" -o -path "./libexec/*" -o -path "./opt/*" \) -type f -print0 | xargs -r -0 "$TERMUX_ELF_CLEANER"
+		find . \( -path "./bin/*" -o -path "./lib/*" -o -path "./libexec/*" -o -path "./opt/*" \) -type f -print0 | xargs -r -0 \
+			"$TERMUX_ELF_CLEANER" --api-level $TERMUX_PKG_API_LEVEL
 	fi
 
 	if [ "$TERMUX_PKG_NO_SHEBANG_FIX" != "true" ]; then
