@@ -3,7 +3,6 @@ TERMUX_PKG_DESCRIPTION="Portable, embeddable Scheme implementation written in C"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.0.8
-TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/guile/guile-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=f25ae0c26e911af1b5005292d4f56621879f74d6958b30741cf67d8b6feb2016
 TERMUX_PKG_DEPENDS="libandroid-support, libffi, libgc, libgmp, libltdl, libunistring"
