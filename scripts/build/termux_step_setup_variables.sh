@@ -71,6 +71,7 @@ termux_step_setup_variables() {
 
 	TERMUX_COMMON_CACHEDIR="$TERMUX_TOPDIR/_cache"
 	TERMUX_ELF_CLEANER=$TERMUX_COMMON_CACHEDIR/termux-elf-cleaner
+	TERMUX_FIX_SHEBANG=$TERMUX_SCRIPTDIR/scripts/bin/termux-fix-shebang
 
 	export prefix=${TERMUX_PREFIX}
 	export PREFIX=${TERMUX_PREFIX}

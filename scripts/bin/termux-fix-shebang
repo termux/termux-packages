@@ -1,0 +1,16 @@
+#!/usr/bin/bash
+
+# Please keep script in sync with packages/termux-tools/termux-fix-shebang
+
+if [ $# = 0 -o "$1" = "-h" ]; then
+	echo 'usage: termux-fix-shebang <files>'
+	echo 'Rewrite shebangs in specified files for running under Termux,'
+	echo 'which is done by rewriting #!*/bin/binary to #!${TERMUX_PREFIX}/bin/binary.'
+	exit 1
+fi
+
+for file in "$@"; do
+	if head -c 100 "$file" | grep -E "^#\!.*\\/bin\\/.*" | grep -q -E -v "^#\! ?\\/system"; then
+		sed --follow-symlinks -i -E "1 s@^#\!(.*)/bin/(.*)@#\!$TERMUX_PREFIX/bin/\2@" "$file"
+	fi
+done
