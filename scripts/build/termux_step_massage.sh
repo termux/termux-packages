@@ -50,11 +50,7 @@ termux_step_massage() {
 
 	if [ "$TERMUX_PKG_NO_SHEBANG_FIX" != "true" ]; then
 		# Fix shebang paths:
-		while IFS= read -r -d '' file; do
-			if head -c 100 "$file" | head -n 1 | grep -E "^#!.*/bin/.*" | grep -q -E -v "^#! ?/system"; then
-				sed --follow-symlinks -i -E "1 s@^#\!(.*)/bin/(.*)@#\!$TERMUX_PREFIX/bin/\2@" "$file"
-			fi
-		done < <(find -L . -type f -print0)
+	        find -L . -type f -exec "$TERMUX_FIX_SHEBANG" {} +
 	fi
 
 	# Delete the info directory file.
