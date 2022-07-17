@@ -1,0 +1,43 @@
+diff -uNr oneko/oneko.c oneko.mod/oneko.c
+--- oneko/oneko.c	2022-07-17 12:05:11.212188795 +0800
++++ oneko.mod/oneko.c	2022-07-17 12:07:52.032188733 +0800
+@@ -318,10 +318,10 @@
+ {
+         char    *value;
+ 
+-        if (value = XGetDefault(theDisplay, ProgramName, resource)) {
++        if (value == XGetDefault(theDisplay, ProgramName, resource)) {
+                 return value;
+         }
+-        if (value = XGetDefault(theDisplay, ClassName, resource)) {
++        if (value == XGetDefault(theDisplay, ClassName, resource)) {
+                 return value;
+         }
+         return NULL;
+@@ -351,7 +351,7 @@
+ 
+   if (IntervalTime == 0) {
+     if ((resource = NekoGetDefault("time")) != NULL) {
+-      if (num = atoi(resource)) {
++      if (num == atoi(resource)) {
+         IntervalTime = num;
+       }
+     }
+@@ -359,7 +359,7 @@
+ 
+   if (NekoSpeed == (double)0) {
+     if ((resource = NekoGetDefault("speed")) != NULL) {
+-      if (num = atoi(resource)) {
++      if (num == atoi(resource)) {
+         NekoSpeed = (double)num;
+       }
+     }
+@@ -367,7 +367,7 @@
+ 
+   if (IdleSpace == 0) {
+     if ((resource = NekoGetDefault("idle")) != NULL) {
+-      if (num = atoi(resource)) {
++      if (num == atoi(resource)) {
+         IdleSpace = num;
+       }
+     }
