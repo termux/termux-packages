@@ -1,0 +1,31 @@
+diff --git a/Makefile b/Makefile
+index 0fdcb64d..a98cd919 100644
+--- a/Makefile
++++ b/Makefile
+@@ -28,7 +28,7 @@ INCLUDEDIR?=$(PREFIX)/include
+ BINDIR?=$(PREFIX)/bin
+ LIBDIR?=$(PREFIX)/lib
+ JANET_BUILD?="\"$(shell git log --pretty=format:'%h' -n 1 2> /dev/null || echo local)\""
+-CLIBS=-lm -lpthread
++CLIBS=-lm
+ JANET_TARGET=build/janet
+ JANET_LIBRARY=build/libjanet.so
+ JANET_STATIC_LIBRARY=build/libjanet.a
+@@ -46,7 +46,7 @@ HOSTAR?=$(AR)
+ CFLAGS?=-O2
+ LDFLAGS?=-rdynamic
+ 
+-COMMON_CFLAGS:=-std=c99 -Wall -Wextra -Isrc/include -Isrc/conf -fvisibility=hidden -fPIC
++COMMON_CFLAGS:=-std=c99 -Wall -Wextra -Isrc/include -Isrc/conf -fvisibility=hidden -fPIC -I@TERMUX_PREFIX@/include
+ BOOT_CFLAGS:=-DJANET_BOOTSTRAP -DJANET_BUILD=$(JANET_BUILD) -O0 -g $(COMMON_CFLAGS)
+ BUILD_CFLAGS:=$(CFLAGS) $(COMMON_CFLAGS)
+ 
+@@ -61,7 +61,7 @@ ifeq ($(UNAME), Darwin)
+ 	JANET_LIBRARY=build/libjanet.dylib
+ 	LDCONFIG:=true
+ else ifeq ($(UNAME), Linux)
+-	CLIBS:=$(CLIBS) -lrt -ldl
++	CLIBS:=$(CLIBS) -ldl
+ endif
+ 
+ # For other unix likes, add flags here!
