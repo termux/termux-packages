@@ -1,0 +1,2 @@
+TERMUX_SUBPKG_DESCRIPTION="amber replace"
+TERMUX_SUBPKG_INCLUDE="bin/ambr"
