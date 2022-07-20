@@ -148,8 +148,7 @@ termux_step_post_make_install() {
     ##  Compiling necessary programs for target.
     ##
     #######################################################
-    ## Note: qmake can be built only on host so it is omitted here.
-    for i in moc qlalr qvkgen rcc uic qdbuscpp2xml qdbusxml2cpp; do
+    for i in qmake moc qlalr qvkgen rcc uic qdbuscpp2xml qdbusxml2cpp; do
         cd "${TERMUX_PKG_SRCDIR}/src/tools/${i}" && {
             make clean
 
@@ -172,14 +171,6 @@ termux_step_post_make_install() {
     done
     unset i
 
-
-    ## Unpacking prebuilt qmake from archive.
-    cd "${TERMUX_PKG_SRCDIR}" && {
-        tar xf "${TERMUX_PKG_BUILDER_DIR}/prebuilt.tar.xz"
-        install \
-            -Dm700 "${TERMUX_PKG_SRCDIR}/bin/qmake-${TERMUX_HOST_PLATFORM}" \
-            "${TERMUX_PREFIX}/bin/qmake"
-    }
 
     #######################################################
     ##
