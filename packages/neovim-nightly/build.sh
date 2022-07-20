@@ -43,7 +43,7 @@ termux_pkg_auto_update() {
 		fi
 	}
 
-	# this outputs in the following format: "0.6.0-dev+575-g2ef9d2a66"
+	# this outputs in the following format: "0.8.0-dev-nightly-9-g1ef84547a"
 	local remote_nvim_version
 	remote_nvim_version=$(
 		echo "$curl_response" \
@@ -55,7 +55,7 @@ termux_pkg_auto_update() {
 		return 1
 	fi
 
-	remote_nvim_version="$(grep -oP '^\d+\.\d+\.\d+-dev\+\d+-g[0-9a-f]+$' <<< "$remote_nvim_version" || true)"
+	remote_nvim_version="$(grep -oP '^\d+\.\d+\.\d+-dev-nightly-\d+-g[0-9a-f]+$' <<< "$remote_nvim_version" || true)"
 
 	if [ -z "$remote_nvim_version" ]; then
 		echo "WARNING: Version in nightly page is not in expected format. Skipping auto-update."
