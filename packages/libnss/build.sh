@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_LICENSE_FILE="nss/COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.78
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://archive.mozilla.org/pub/security/nss/releases/NSS_${TERMUX_PKG_VERSION//./_}_RTM/src/nss-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=f455f341e787c1167328e80a84f77b9a557d595066dda6486a1874d72da68800
 TERMUX_PKG_DEPENDS="libnspr, libsqlite, zlib"
@@ -20,6 +21,11 @@ OS_TEST=$TERMUX_ARCH
 "
 TERMUX_MAKE_PROCESSES=1
 TERMUX_PKG_HOSTBUILD=true
+
+# libssl.a conflicts with openssl-static, see #11192
+TERMUX_PKG_RM_AFTER_INSTALL="
+lib/libssl.a
+"
 
 _LIBNSS_SIGN_LIBS="libfreebl3.so libnssdbm3.so libsoftokn3.so"
 
