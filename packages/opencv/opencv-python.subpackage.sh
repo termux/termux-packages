@@ -4,5 +4,5 @@ TERMUX_SUBPKG_DEPENDS="python"
 
 termux_step_create_subpkg_debscripts() {
 	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
-	echo "pip3 install numpy" >> postinst
+	echo "MATHLIB=m pip3 install numpy==1.22.3" >> postinst
 }
