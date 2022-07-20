@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://termux.dev/
 TERMUX_PKG_DESCRIPTION="Basic system tools for Termux"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.22
+TERMUX_PKG_VERSION=1.23
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_ESSENTIAL=true
@@ -56,11 +56,11 @@ termux_step_make_install() {
 	{
 		echo 'echo ""'
 		echo 'echo -e " \033[47m                \033[0m  \e[1mWelcome to Termux!\e[0m"'
-		echo 'echo -e " \033[47m  \033[0m            \033[47m  \033[0m"'
+		echo 'echo -e " \033[47m  \033[0m            \033[0;37m\033[47m .\e[0m"'
 		echo 'echo -e " \033[47m  \033[0m  \033[47m  \033[0m        \033[47m  \033[0m  \e[1mDocs:\e[0m   \e[4mtermux.dev/docs\e[0m"'
 		echo 'echo -e " \033[47m  \033[0m  \033[47m  \033[0m        \033[47m  \033[0m  \e[1mGitter:\e[0m \e[4mgitter.im/termux/termux\e[0m"'
 		echo 'echo -e " \033[47m  \033[0m            \033[47m  \033[0m  \e[1mCommunity:\e[0m \e[4mtermux.dev/community\e[0m"'
-		echo 'echo -e " \033[47m  \033[0m            \033[47m  \033[0m"'
+		echo 'echo -e " \033[47m  \033[0m            \033[0;37m\033[47m .\e[0m"'
 		echo 'echo -e " \033[47m                \033[0m  \e[1mTermux version:\e[0m ${TERMUX_VERSION-Unknown}"'
 		echo 'echo ""'
 		echo 'echo -e "                   \e[1mWorking with packages:\e[0m"'
