@@ -1,7 +1,26 @@
 diff -uNr unicorn-2.0.0/CMakeLists.txt unicorn-2.0.0.mod/CMakeLists.txt
 --- unicorn-2.0.0/CMakeLists.txt	2022-07-07 18:49:09.000000000 +0300
-+++ unicorn-2.0.0.mod/CMakeLists.txt	2022-07-21 01:09:52.344584678 +0300
-@@ -1434,7 +1434,7 @@
++++ unicorn-2.0.0.mod/CMakeLists.txt	2022-07-21 01:20:23.722263943 +0300
+@@ -1159,10 +1159,6 @@
+     ${UNICORN_COMMON_SRCS}
+ )
+ 
+-if(NOT MSVC AND NOT ANDROID_ABI)
+-    target_link_libraries(unicorn-common PRIVATE pthread)
+-endif()
+-
+ add_library(unicorn ${UNICORN_SRCS})
+ # For static archive
+ if (BUILD_SHARED_LIBS)
+@@ -1340,7 +1336,6 @@
+ elseif(NOT ANDROID_ABI)
+     set(SAMPLES_LIB
+         unicorn
+-        pthread
+     )
+ else()
+     set(SAMPLES_LIB
+@@ -1434,7 +1429,7 @@
  libdir=${CMAKE_INSTALL_FULL_LIBDIR}\n\
  includedir=${CMAKE_INSTALL_FULL_INCLUDEDIR}\n\
  Libs: -L\$\{libdir\} -lunicorn\n\
