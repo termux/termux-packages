@@ -134,6 +134,7 @@ termux_step_post_make_install() {
         install -Dm644 ../../../lib/libQt5Bootstrap.prl "${TERMUX_PREFIX}/lib/libQt5Bootstrap.prl"
     }
     cd "${TERMUX_PKG_SRCDIR}/src/tools/bootstrap-dbus" && {
+	
         # create the dbus bootstrap archieve but we don't need to install this
         make clean
 
@@ -171,22 +172,81 @@ termux_step_post_make_install() {
     done
     unset i
 
+    #Compile qmake for host
     cd "${TERMUX_PKG_SRCDIR}/qmake" && {
-            make clean
+	"${TERMUX_PKG_SRCDIR}"/configure -v \
+	-opensource \
+	-confirm-license \
+	-release \
+	-optimized-tools \
+	-device "${TERMUX_HOST_PLATFORM}"
+	-shared \
+	-no-rpath \
+	-no-use-gold-linker \
+	-prefix "${TERMUX_PREFIX}" \
+	-docdir "${TERMUX_PREFIX}/share/doc/qt" \
+	-archdatadir "${TERMUX_PREFIX}/lib/qt" \
+	-datadir "${TERMUX_PREFIX}/share/qt" \
+	-plugindir "${TERMUX_PREFIX}/libexec/qt" \
+	-hostbindir "${TERMUX_PREFIX}/opt/qt/cross/bin" \
+	-hostlibdir "${TERMUX_PREFIX}/opt/qt/cross/lib" \
+	-I "${TERMUX_PREFIX}/include" \
+	-I "${TERMUX_PREFIX}/include/glib-2.0" \
+	-I "${TERMUX_PREFIX}/lib/glib-2.0/include" \
+	-I "${TERMUX_PREFIX}/include/gio-unix-2.0" \
+	-I "${TERMUX_PREFIX}/include/cairo" \
+	-I "${TERMUX_PREFIX}/include/pango-1.0" \
+	-I "${TERMUX_PREFIX}/include/fribidi" \
+	-I "${TERMUX_PREFIX}/include/harfbuzz" \
+	-I "${TERMUX_PREFIX}/include/atk-1.0" \
+	-I "${TERMUX_PREFIX}/include/pixman-1" \
+	-I "${TERMUX_PREFIX}/include/uuid" \
+	-I "${TERMUX_PREFIX}/include/libxml2" \
+	-I "${TERMUX_PREFIX}/include/freetype2" \
+	-I "${TERMUX_PREFIX}/include/gdk-pixbuf-2.0" \
+	-I "${TERMUX_PREFIX}/include/gtk-3.0" \
+	-L "${TERMUX_PREFIX}/lib" \
+	-nomake examples \
+	-no-pch \
+	-no-accessibility \
+	-glib \
+	-gtk \
+	-icu \
+	-system-doubleconversion \
+	-system-pcre \
+	-system-zlib \
+	-system-freetype \
+	-ssl \
+	-openssl-linked \
+	-no-system-proxies \
+	-no-cups \
+	-system-harfbuzz \
+	-no-opengl \
+	-no-vulkan \
+	-qpa xcb \
+	-no-eglfs \
+	-no-gbm \
+	-no-kms \
+	-no-linuxfb \
+	-no-libudev \
+	-no-evdev \
+	-no-libinput \
+	-no-mtdev \
+	-no-tslib \
+	-xcb \
+	-xcb-xlib \
+	-gif \
+	-system-libpng \
+	-system-libjpeg \
+	-system-sqlite \
+	-sql-sqlite
+    
+	make clean
+	make -j "${TERMUX_MAKE_PROCESSES}"
 
-            ## Ensure that no '-lpthread' specified in makefile.
-            sed \
-                -i 's@-lpthread@@g' \
-                Makefile
+	install -Dm700 "./qmake" "${TERMUX_PREFIX}/bin/qmake"
 
-            ## Fix build failure on at least 'i686'.
-            sed \
-                -i 's@$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)@$(LINK) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS) $(LFLAGS) -lz@g' \
-                Makefile
-
-            make -j "${TERMUX_MAKE_PROCESSES}"
-            install -Dm700 "${TERMUX_PKG_SRCDIR}/qmake/qmake" "${TERMUX_PREFIX}/bin/qmake"
-        }
+	}
 
     #######################################################
     ##
