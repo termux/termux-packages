@@ -148,7 +148,7 @@ termux_step_post_make_install() {
     ##  Compiling necessary programs for target.
     ##
     #######################################################
-    for i in qmake moc qlalr qvkgen rcc uic qdbuscpp2xml qdbusxml2cpp; do
+    for i in moc qlalr qvkgen rcc uic qdbuscpp2xml qdbusxml2cpp; do
         cd "${TERMUX_PKG_SRCDIR}/src/tools/${i}" && {
             make clean
 
@@ -171,6 +171,22 @@ termux_step_post_make_install() {
     done
     unset i
 
+    cd "${TERMUX_PKG_SRCDIR}/qmake" && {
+            make clean
+
+            ## Ensure that no '-lpthread' specified in makefile.
+            sed \
+                -i 's@-lpthread@@g' \
+                Makefile
+
+            ## Fix build failure on at least 'i686'.
+            sed \
+                -i 's@$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)@$(LINK) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS) $(LFLAGS) -lz@g' \
+                Makefile
+
+            make -j "${TERMUX_MAKE_PROCESSES}"
+            install -Dm700 "${TERMUX_PKG_SRCDIR}/qmake/qmake" "${TERMUX_PREFIX}/bin/qmake"
+        }
 
     #######################################################
     ##
