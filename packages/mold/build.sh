@@ -2,11 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://github.com/rui314/mold
 TERMUX_PKG_DESCRIPTION="mold: A Modern Linker"
 TERMUX_PKG_LICENSE="AGPL-V3"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.3.0
+TERMUX_PKG_VERSION="1.3.1"
 TERMUX_PKG_SRCURL=https://github.com/rui314/mold/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=02132ae717d7f22f8bc7e5c22642ad41541ec4c535fa85f095c60ecc81465a3d
+TERMUX_PKG_SHA256=d436e2d4c1619a97aca0e28f26c4e79c0242d10ce24e829c1b43cfbdd196fd77
 TERMUX_PKG_DEPENDS="libc++, openssl, zlib, libandroid-spawn"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_pre_configure() {
 	# onetbb use cmake
