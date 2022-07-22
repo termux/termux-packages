@@ -16,6 +16,9 @@ on:
 jobs:
   update:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
     - name: Clone repository
       uses: actions/checkout@v3
@@ -23,13 +26,22 @@ jobs:
       run: |
         cd ./scripts
         docker build --tag termux/package-builder:latest .
+        docker tag termux/package-builder:latest ghcr.io/termux/package-builder:latest
+    - name: Login to GHCR
+      if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request' && github.repository == 'termux/termux-packages'
+      uses: docker/login-action@v1
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     - name: Login to Docker Hub
       if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request' && github.repository == 'termux/termux-packages'
       uses: docker/login-action@v1
       with:
         username: grimler
         password: ${{ secrets.DOCKER_TOKEN }}
-    - name: Push to Docker Hub
+    - name: Push
       if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request' && github.repository == 'termux/termux-packages'
       run: |
+        docker push ghcr.io/termux/package-builder:latest
         docker push termux/package-builder:latest
