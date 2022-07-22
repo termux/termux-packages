@@ -1,5 +1,5 @@
---- elfutils-0.185/debuginfod/Makefile.am	2021-05-22 23:55:24.000000000 +0530
-+++ elfutils-0.185-patch/debuginfod/Makefile.am	2021-08-29 00:51:31.449999941 +0530
+--- elfutils-0.187/debuginfod/Makefile.am	2022-04-25 21:56:39.000000000 +0100
++++ elfutils-0.187.mod/debuginfod/Makefile.am	2022-07-22 16:59:13.856181000 +0100
 @@ -42,7 +42,7 @@
  
  if BUILD_STATIC
@@ -18,3 +18,12 @@
  
  debuginfod_find_SOURCES = debuginfod-find.c
  debuginfod_find_LDADD = $(libdw) $(libelf) $(libeu) $(libdebuginfod) $(argp_LDADD) $(fts_LIBS)
+@@ -97,7 +97,7 @@
+ if DUMMY_LIBDEBUGINFOD
+ libdebuginfod_so_LDLIBS =
+ else
+-libdebuginfod_so_LDLIBS = -lpthread $(libcurl_LIBS) $(fts_LIBS)
++libdebuginfod_so_LDLIBS = $(libcurl_LIBS) $(fts_LIBS)
+ endif
+ $(LIBDEBUGINFOD_SONAME): $(srcdir)/libdebuginfod.map $(libdebuginfod_so_LIBS)
+ 	$(AM_V_CCLD)$(LINK) $(dso_LDFLAGS) -o $@ \
