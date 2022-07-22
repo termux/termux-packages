@@ -1,22 +1,22 @@
---- ../makefile.orig	2022-02-04 07:15:35.023914372 +0000
-+++ ./makefile	2022-02-04 07:16:53.153727804 +0000
-@@ -3,9 +3,9 @@
+diff -uNr jhead-3.06.0.1/makefile jhead-3.06.0.1.mod/makefile
+--- jhead-3.06.0.1/makefile	2021-04-14 13:02:45.000000000 +0100
++++ jhead-3.06.0.1.mod/makefile	2022-07-22 22:16:22.465375000 +0100
+@@ -3,8 +3,8 @@
  #--------------------------------
- OBJ=.
+ OBJ=obj
  SRC=.
--CPPFLAGS:=$(shell dpkg-buildflags --get CPPFLAGS)
 -CFLAGS:=$(shell dpkg-buildflags --get CFLAGS)
 -LDFLAGS:=$(shell dpkg-buildflags --get LDFLAGS)
-+CPPFLAGS?=$(shell dpkg-buildflags --get CPPFLAGS)
 +CFLAGS?=$(shell dpkg-buildflags --get CFLAGS)
 +LDFLAGS?=$(shell dpkg-buildflags --get LDFLAGS)
  
- all: jhead
+ all: objdir jhead
  
-@@ -22,4 +22,6 @@
+@@ -24,5 +24,6 @@
  	rm -f $(objs) jhead
  
  install:
+-	mkdir -p ${DESTDIR}/usr/bin/
 -	cp jhead ${DESTDIR}/usr/bin/
 +	install -Dm700 jhead ${DESTDIR}$(PREFIX)/bin/
 +	mkdir -p ${DESTDIR}$(PREFIX)/share/man/man1/
