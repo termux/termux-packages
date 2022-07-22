@@ -46,7 +46,7 @@ termux_step_post_configure() {
 }
 
 termux_step_post_make_install() {
-	cp doc/mutt.man $TERMUX_PREFIX/share/man/man1/mutt.1.man
-	mkdir -p $TERMUX_PREFIX/share/examples/mutt/
-	cp contrib/gpg.rc $TERMUX_PREFIX/share/examples/mutt/
+	cp doc/mutt.man $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man1/mutt.1.man
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/examples/mutt/
+	cp contrib/gpg.rc $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/examples/mutt/
 }
