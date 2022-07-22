@@ -18,7 +18,7 @@ COPY ./build/termux_download.sh /tmp/build/
 RUN apt-get update && \
 	apt-get -yq upgrade && \
 	apt-get install -yq sudo lsb-release software-properties-common && \
-	useradd -u 1001 -U -m -s /bin/bash builder \
+	useradd -u 1001 -U -m -s /bin/bash builder && \
 	echo "builder ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/builder && \
 	chmod 0440 /etc/sudoers.d/builder && \
 	su - builder -c /tmp/setup-ubuntu.sh && \
