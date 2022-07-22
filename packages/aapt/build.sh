@@ -82,7 +82,7 @@ termux_step_pre_configure() {
 
 	termux_setup_protobuf
 
-	export PATH=$_PREFIX_FOR_BUILD/bin:$PATH
+	export PATH=$TERMUX_PKG_HOSTBUILD_DIR/_prefix/bin:$PATH
 
 	CFLAGS+=" -fPIC"
 	CXXFLAGS+=" -fPIC -std=c++17"
