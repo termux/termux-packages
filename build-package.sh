@@ -419,6 +419,13 @@ while (($# >= 1)); do
 done
 unset -f _show_usage
 
+# Dependencies should be used from repo only if they are built for
+# same package name.
+if [ "$TERMUX_REPO_PACKAGE" != "$TERMUX_APP_PACKAGE" ]; then
+	echo "Ignoring -i option to download dependencies since repo package name ($TERMUX_REPO_PACKAGE) does not equal app package name ($TERMUX_APP_PACKAGE)"
+	TERMUX_INSTALL_DEPS=false
+fi
+
 if [ -n "${TERMUX_PACKAGE_FORMAT-}" ]; then
 	case "${TERMUX_PACKAGE_FORMAT-}" in
 		debian|pacman) :;;

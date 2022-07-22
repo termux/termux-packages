@@ -6,6 +6,19 @@ termux_download_deb_pac() {
 	local VERSION=$3
 	local VERSION_PACMAN=$4
 
+	local DEB_FILE="${PACKAGE}_${VERSION}_${PACKAGE_ARCH}.deb"
+	PKG_HASH=""
+
+	# Dependencies should be used from repo only if they are built for
+	# same package name.
+	# The data.tar.xz extraction by termux_step_get_dependencies would
+	# extract files to different prefix than TERMUX_PREFIX and builds
+	# would fail when looking for -I$TERMUX_PREFIX/include files.
+	if [ "$TERMUX_REPO_PACKAGE" != "$TERMUX_APP_PACKAGE" ]; then
+		echo "Ignoring download of $DEB_FILE since repo package name ($TERMUX_REPO_PACKAGE) does not equal app package name ($TERMUX_APP_PACKAGE)"
+		return 1
+	fi
+
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
 		case "$TERMUX_APP_PACKAGE_MANAGER" in
 			"apt") apt install -y "${PACKAGE}=${VERSION}";;
@@ -13,9 +26,6 @@ termux_download_deb_pac() {
 		esac
 		return "$?"
 	fi
-
-	local DEB_FILE="${PACKAGE}_${VERSION}_${PACKAGE_ARCH}.deb"
-	PKG_HASH=""
 
 	for idx in $(seq ${#TERMUX_REPO_URL[@]}); do
 		local TERMUX_REPO_NAME=$(echo ${TERMUX_REPO_URL[$idx-1]} | sed -e 's%https://%%g' -e 's%http://%%g' -e 's%/%-%g')

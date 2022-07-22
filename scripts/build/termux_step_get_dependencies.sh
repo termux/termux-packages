@@ -28,6 +28,9 @@ termux_step_get_dependencies() {
 
 			if [ -e "$TERMUX_BUILT_PACKAGES_DIRECTORY/$PKG" ]; then
 				if [ "$(cat "$TERMUX_BUILT_PACKAGES_DIRECTORY/$PKG")" = "$DEP_VERSION" ]; then
+					if [ ! "$TERMUX_QUIET_BUILD" = true ]; then
+						echo "Skipping already built dependency $PKG@$DEP_VERSION"
+					fi
 					continue
 				fi
 			fi
@@ -39,7 +42,7 @@ termux_step_get_dependencies() {
 			fi
 			if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 				if [ ! "$TERMUX_QUIET_BUILD" = true ]; then
-					echo "extracting $PKG..."
+					echo "extracting $PKG to $TERMUX_COMMON_CACHEDIR-$DEP_ARCH..."
 				fi
 				(
 					cd $TERMUX_COMMON_CACHEDIR-$DEP_ARCH
