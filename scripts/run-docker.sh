@@ -51,7 +51,7 @@ $SUDO docker start $CONTAINER_NAME >/dev/null 2>&1 || {
 		--tty \
 		$TERMUX_BUILDER_IMAGE_NAME
 	if [ "$UNAME" != Darwin ]; then
-		if [ $(id -u) -ne 1000 -a $(id -u) -ne 0 ]; then
+		if [ $(id -u) -ne 1001 -a $(id -u) -ne 0 ]; then
 			echo "Changed builder uid/gid... (this may take a while)"
 			$SUDO docker exec $DOCKER_TTY $CONTAINER_NAME sudo chown -R $(id -u) $CONTAINER_HOME_DIR
 			$SUDO docker exec $DOCKER_TTY $CONTAINER_NAME sudo chown -R $(id -u) /data
