@@ -10,7 +10,7 @@ FROM ubuntu:22.04
 ENV LANG en_US.UTF-8
 
 # Needed for setup:
-COPY ./setup-ubuntu.sh ./setup-android-sdk.sh ./properties.sh /tmp/
+COPY ./setup-ubuntu.sh ./setup-android-sdk.sh ./properties.sh ./openjdk-r-ppa.gpg /tmp/
 RUN mkdir /tmp/build
 COPY ./build/termux_download.sh /tmp/build/
 
