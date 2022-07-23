@@ -1,10 +1,10 @@
 # Build with:
-#	docker build -t termux/package-builder .
-# Push to docker hub with:
-#	docker push termux/package-builder
+#	docker build -t ghcr.io/termux/package-builder .
+# Push to GitHub registry with:
+#	docker push ghcr.io/termux/package-builder
 # This is done after changing this file or any of the
 # scripts/setup-{ubuntu,android-sdk}.sh setup scripts.
-FROM ubuntu:21.10
+FROM ubuntu:22.04
 
 # Fix locale to avoid warnings:
 ENV LANG en_US.UTF-8
