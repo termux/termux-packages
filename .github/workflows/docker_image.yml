@@ -43,5 +43,17 @@ jobs:
     - name: Push
       if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request' && github.repository == 'termux/termux-packages'
       run: |
-        docker push ghcr.io/termux/package-builder:latest
+        # ghcr.io seem to be unstable sometimes. It may suddenly drop connection
+        # during docker push when some layers are already uploaded. The workaround
+        # is to retry again 1 or 2 more times.
+        for t in 1 2 3; do
+          if docker push "ghcr.io/termux/package-builder:latest"; then
+            break
+          else
+            if [ "$t" = "3" ]; then
+              exit 1
+            fi
+          fi
+        done
+
         docker push termux/package-builder:latest
