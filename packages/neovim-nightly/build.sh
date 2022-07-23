@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://neovim.io
 TERMUX_PKG_DESCRIPTION="Ambitious Vim-fork focused on extensibility and agility (nvim-nightly)"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.org>"
-TERMUX_PKG_VERSION="0.8.0-dev-nightly-6-gbb7853a62"
+TERMUX_PKG_VERSION="0.8.0-dev-nightly-7-gd0ced2a12"
 TERMUX_PKG_SRCURL="https://github.com/neovim/neovim/archive/nightly.tar.gz"
-TERMUX_PKG_SHA256=8bb3c957e8ce90494644a9f06aa287dfcd64553a077ab90c775e490b2364f9f8
+TERMUX_PKG_SHA256=359041530b7f49c43470dadbfbacbfc3f37eb3f02961c878b9bcb8795331d19d
 TERMUX_PKG_DEPENDS="libiconv, libuv, luv, libmsgpack, libandroid-support, libvterm, libtermkey, libluajit, libunibilium, libtreesitter"
 TERMUX_PKG_HOSTBUILD=true
 
