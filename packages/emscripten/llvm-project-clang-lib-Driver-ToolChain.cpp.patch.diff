@@ -1,12 +1,12 @@
 diff -uNr llvm-project/clang/lib/Driver/ToolChain.cpp llvm-project.mod/clang/lib/Driver/ToolChain.cpp
---- llvm-project/clang/lib/Driver/ToolChain.cpp	2022-06-20 05:49:00.000000000 +0800
-+++ llvm-project.mod/clang/lib/Driver/ToolChain.cpp	2022-06-28 23:33:05.425005209 +0800
+--- llvm-project/clang/lib/Driver/ToolChain.cpp	2022-07-22 22:56:15.000000000 +0800
++++ llvm-project.mod/clang/lib/Driver/ToolChain.cpp	2022-07-23 14:50:06.701119073 +0800
 @@ -1012,7 +1012,7 @@
  
    switch (Type) {
    case ToolChain::CST_Libcxx:
 -    CmdArgs.push_back("-lc++");
 +    CmdArgs.push_back("-lc++_shared");
+     if (Args.hasArg(options::OPT_fexperimental_library))
+       CmdArgs.push_back("-lc++experimental");
      break;
- 
-   case ToolChain::CST_Libstdcxx:

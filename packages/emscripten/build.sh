@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://emscripten.org
 TERMUX_PKG_DESCRIPTION="Emscripten: An LLVM-to-WebAssembly Compiler"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@truboxl"
-TERMUX_PKG_VERSION="3.1.16"
+TERMUX_PKG_VERSION="3.1.17"
 TERMUX_PKG_SRCURL=https://github.com/emscripten-core/emscripten.git
 TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
@@ -78,6 +78,9 @@ termux_pkg_auto_update() {
 	llvm_tgz_sha256=$(sha256sum /tmp/$llvm_commit.tar.gz | sed -e "s| .*$||")
 	binaryen_tgz_sha256=$(sha256sum /tmp/$binaryen_commit.tar.gz | sed -e "s| .*$||")
 
+	echo "INFO: Generated *.tar.gz checksum for LLVM_COMMIT     $llvm_commit = $llvm_tgz_sha256"
+	echo "INFO: Generated *.tar.gz checksum for BINARYEN_COMMIT $binaryen_commit = $binaryen_tgz_sha256"
+
 	sed -i "${TERMUX_PKG_BUILDER_DIR}/build.sh" -e "s|^LLVM_COMMIT=.*|LLVM_COMMIT=${llvm_commit}|"
 	sed -i "${TERMUX_PKG_BUILDER_DIR}/build.sh" -e "s|^LLVM_TGZ_SHA256=.*|LLVM_TGZ_SHA256=${llvm_tgz_sha256}|"
 	sed -i "${TERMUX_PKG_BUILDER_DIR}/build.sh" -e "s|^BINARYEN_COMMIT=.*|BINARYEN_COMMIT=${binaryen_commit}|"
@@ -90,13 +93,13 @@ termux_pkg_auto_update() {
 
 # https://github.com/emscripten-core/emscripten/issues/11362
 # can switch to stable LLVM to save space once above is fixed
-LLVM_COMMIT=ffa7384f10b89b6322c827d29d25108e34b8f6f0
-LLVM_TGZ_SHA256=798ddbbbc1dc23bbd2b8740c170091c3c346c6bccf6d8c80fe0d89a67d0ac4a1
+LLVM_COMMIT=661577b5f40bb05534869b9635315e9265c37417
+LLVM_TGZ_SHA256=6caa514b918738995bdff088afb372828eee3f765a614a270ebe4f7204de5745
 
 # https://github.com/emscripten-core/emscripten/issues/12252
 # upstream says better bundle the right binaryen revision for now
-BINARYEN_COMMIT=4e9f216a1ceae8bc4111fd68bda9fb681e1eeca1
-BINARYEN_TGZ_SHA256=c73e4959140ba25e719a364afda54937b86979c2216eeafb742e0ccddc4c7a26
+BINARYEN_COMMIT=ed704448a6883e9ee0b2f6284f6b5a7b5e7b4aa9
+BINARYEN_TGZ_SHA256=a62fe07d52bc6fb912982198fe0b0d4a8b771bb3895573e9d6d034ec60424643
 
 # https://github.com/emscripten-core/emsdk/blob/main/emsdk.py
 # https://chromium.googlesource.com/emscripten-releases/+/refs/heads/main/src/build.py
@@ -161,11 +164,12 @@ termux_step_post_get_source() {
 		done
 		local llvm_patches_rej="$(find . -type f -name '*.rej')"
 		if [ -n "$llvm_patches_rej" ]; then
+			echo "INFO: Printing *.rej files ..."
 			for rej in $llvm_patches_rej; do
 				echo -e "\n\n${rej}"
 				cat "$rej"
 			done
-			termux_error_exit "Patch failed! Please check patch errors above."
+			termux_error_exit "Patch failed! Please check patch errors above!"
 		fi
 	fi
 
@@ -177,11 +181,12 @@ termux_step_post_get_source() {
 		done
 		local binaryen_patches_rej="$(find . -type f -name '*.rej')"
 		if [ -n "$binaryen_patches_rej" ]; then
+			echo "INFO: Printing *.rej files ..."
 			for rej in $binaryen_patches_rej; do
 				echo -e "\n\n${rej}"
 				cat "$rej"
 			done
-			termux_error_exit "Patch failed! Please check patch errors above."
+			termux_error_exit "Patch failed! Please check patch errors above!"
 		fi
 	fi
 }
