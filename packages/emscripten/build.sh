@@ -301,13 +301,13 @@ termux_step_create_debscripts() {
 	cd "$TERMUX_PREFIX/opt/emscripten"
 	NPM_VERSION=\$(npm --version)
 	NPM_MAJOR_VERSION=\${NPM_VERSION:0:1}
-	if [ 6 = \$NPM_MAJOR_VERSION ]; then
-	echo 'Running "npm ci --no-optional --production" in $TERMUX_PREFIX/opt/emscripten ...'
-	npm ci --no-optional --production
+	if [ "\$NPM_MAJOR_VERSION" = 6 ]; then
+	echo 'Running "npm ci --production --no-optional" in $TERMUX_PREFIX/opt/emscripten ...'
+	npm ci --production --no-optional
 	else
-	echo 'Running "npm install --no-optional --production" in $TERMUX_PREFIX/opt/emscripten ...'
+	echo 'Running "npm install --omit=dev --omit=optional" in $TERMUX_PREFIX/opt/emscripten ...'
 	rm package-lock.json
-	npm install --no-optional --production
+	npm install --omit=dev --omit=optional
 	fi
 	else
 	echo 'Warning: npm is not installed! Emscripten may not work properly without installing node modules!' >&2
@@ -344,6 +344,6 @@ termux_step_create_debscripts() {
 # Steps:
 # - apt install cmake emscripten-tests-third-party ndk-sysroot openjdk-17
 # - cd $PREFIX/opt/emscripten
-# - npm install --no-optional
+# - npm install --omit=optional
 # - export EMTEST_SKIP_V8=1
 # - tests/runner {test_name}
