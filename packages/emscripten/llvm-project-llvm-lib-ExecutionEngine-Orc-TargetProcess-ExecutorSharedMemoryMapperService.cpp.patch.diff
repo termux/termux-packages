@@ -1,0 +1,12 @@
+diff -uNr llvm-project/llvm/lib/ExecutionEngine/Orc/TargetProcess/ExecutorSharedMemoryMapperService.cpp llvm-project.mod/llvm/lib/ExecutionEngine/Orc/TargetProcess/ExecutorSharedMemoryMapperService.cpp
+--- llvm-project/llvm/lib/ExecutionEngine/Orc/TargetProcess/ExecutorSharedMemoryMapperService.cpp	2022-07-23 16:37:08.875416904 +0800
++++ llvm-project.mod/llvm/lib/ExecutionEngine/Orc/TargetProcess/ExecutorSharedMemoryMapperService.cpp	2022-07-23 16:39:54.048648369 +0800
+@@ -52,7 +52,7 @@
+ 
+ Expected<std::pair<ExecutorAddr, std::string>>
+ ExecutorSharedMemoryMapperService::reserve(uint64_t Size) {
+-#if defined(LLVM_ON_UNIX) || defined(_WIN32)
++#if (defined(LLVM_ON_UNIX) || defined(_WIN32)) && !defined(__ANDROID__)
+ 
+ #if defined(LLVM_ON_UNIX)
+ 
