@@ -3,6 +3,12 @@
 
 set -e -u -o pipefail
 
+TERMUX_SCRIPTDIR=$(cd "$(realpath "$(dirname "$0")")"; pwd)
+
+# Store pid of current process in a file for docker__run_docker_exec_trap
+source "$TERMUX_SCRIPTDIR/scripts/utils/docker/docker.sh"; docker__create_docker_exec_pid_file
+
+
 if [ "$(uname -o)" = "Android" ] || [ -e "/system/bin/app_process" ]; then
 	echo "On-device execution of this script is not supported."
 	exit 1
@@ -53,7 +59,7 @@ if [ -e "$BUILDORDER_FILE" ]; then
 	echo "Using existing buildorder file: $BUILDORDER_FILE"
 else
 	mkdir -p "$BUILDALL_DIR"
-	./scripts/buildorder.py > "$BUILDORDER_FILE"
+	"$TERMUX_SCRIPTDIR/scripts/buildorder.py" > "$BUILDORDER_FILE"
 fi
 if [ -e "$BUILDSTATUS_FILE" ]; then
 	echo "Continuing build-all from: $BUILDSTATUS_FILE"

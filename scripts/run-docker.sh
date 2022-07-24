@@ -1,6 +1,8 @@
 #!/bin/sh
 set -e -u
 
+TERMUX_SCRIPTDIR=$(cd "$(realpath "$(dirname "$0")")"; cd ..; pwd)
+
 CONTAINER_HOME_DIR=/home/builder
 UNAME=$(uname)
 if [ "$UNAME" = Darwin ]; then
@@ -45,6 +47,7 @@ $SUDO docker start $CONTAINER_NAME >/dev/null 2>&1 || {
 	echo "Creating new container..."
 	$SUDO docker run \
 		--detach \
+		--init \
 		--name $CONTAINER_NAME \
 		--volume $VOLUME \
 		$SEC_OPT \
@@ -61,8 +64,11 @@ $SUDO docker start $CONTAINER_NAME >/dev/null 2>&1 || {
 	fi
 }
 
+# Set traps to ensure that the process started with docker exec and all its children are killed. 
+. "$TERMUX_SCRIPTDIR/scripts/utils/docker/docker.sh"; docker__setup_docker_exec_traps
+
 if [ "$#" -eq  "0" ]; then
-	$SUDO docker exec --interactive $DOCKER_TTY $CONTAINER_NAME bash
+	$SUDO docker exec --env "DOCKER_EXEC_PID_FILE_PATH=$DOCKER_EXEC_PID_FILE_PATH" --interactive $DOCKER_TTY $CONTAINER_NAME bash
 else
-	$SUDO docker exec --interactive $DOCKER_TTY $CONTAINER_NAME "$@"
+	$SUDO docker exec --env "DOCKER_EXEC_PID_FILE_PATH=$DOCKER_EXEC_PID_FILE_PATH" --interactive $DOCKER_TTY $CONTAINER_NAME "$@"
 fi

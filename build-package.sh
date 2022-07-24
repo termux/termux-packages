@@ -3,6 +3,14 @@
 
 set -e -o pipefail -u
 
+cd "$(realpath "$(dirname "$0")")"
+TERMUX_SCRIPTDIR=$(pwd)
+export TERMUX_SCRIPTDIR
+
+# Store pid of current process in a file for docker__run_docker_exec_trap
+source "$TERMUX_SCRIPTDIR/scripts/utils/docker/docker.sh"; docker__create_docker_exec_pid_file
+
+
 SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct 2>/dev/null || date "+%s")
 export SOURCE_DATE_EPOCH
 
@@ -21,10 +29,6 @@ if [ "$(uname -o)" = "Android" ] || [ -e "/system/bin/app_process" ]; then
 else
 	export TERMUX_ON_DEVICE_BUILD=false
 fi
-
-cd "$(realpath "$(dirname "$0")")"
-TERMUX_SCRIPTDIR=$(pwd)
-export TERMUX_SCRIPTDIR
 
 # Automatically enable offline set of sources and build tools.
 # Offline termux-packages bundle can be created by executing
