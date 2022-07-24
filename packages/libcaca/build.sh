@@ -19,6 +19,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 TERMUX_PKG_HOSTBUILD=true
 
 termux_step_host_build() {
+	local _PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
+
 	local AUTOCONF_BUILD_SH=$TERMUX_SCRIPTDIR/packages/autoconf/build.sh
 	local AUTOCONF_SRCURL=$(bash -c ". $AUTOCONF_BUILD_SH; echo \$TERMUX_PKG_SRCURL")
 	local AUTOCONF_SHA256=$(bash -c ". $AUTOCONF_BUILD_SH; echo \$TERMUX_PKG_SHA256")
@@ -27,13 +29,15 @@ termux_step_host_build() {
 	mkdir -p autoconf
 	cd autoconf
 	tar xf $AUTOCONF_TARFILE --strip-components=1
-	./configure --prefix=$TERMUX_PKG_HOSTBUILD_DIR/_prefix
+	./configure --prefix=$_PREFIX_FOR_BUILD
 	make -j $TERMUX_MAKE_PROCESSES
 	make install
 }
 
 termux_step_pre_configure() {
-	export PATH=$TERMUX_PKG_HOSTBUILD_DIR/_prefix/bin:$PATH
+	local _PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
+	export PATH=$_PREFIX_FOR_BUILD/bin:$PATH
+
 	autoreconf -fi
 }
 

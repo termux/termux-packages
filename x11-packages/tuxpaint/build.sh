@@ -11,7 +11,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
 
 termux_step_host_build() {
-	local _PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/_prefix
+	local _PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
 
 	# Need imagemagick that can handle SVG format.
 	local IMAGEMAGICK_BUILD_SH=$TERMUX_SCRIPTDIR/packages/imagemagick/build.sh
@@ -31,7 +31,8 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
-	export PATH=$TERMUX_PKG_HOSTBUILD_DIR/_prefix/bin:$PATH
+	local _PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
+	export PATH=$_PREFIX_FOR_BUILD/bin:$PATH
 
 	LDFLAGS+=" -landroid-wordexp"
 }

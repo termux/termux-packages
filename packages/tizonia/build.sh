@@ -11,8 +11,9 @@ TERMUX_PKG_BUILD_DEPENDS="boost-headers, libev"
 TERMUX_PKG_HOSTBUILD=true
 
 termux_step_host_build() {
-	_PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
+	local _PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
 	mkdir -p $_PREFIX_FOR_BUILD
+
 	local srcdir="$TERMUX_PKG_SRCDIR"/3rdparty/dbus-cplusplus
 	autoreconf -fi "$srcdir"
 	"$srcdir"/configure --prefix=$_PREFIX_FOR_BUILD
@@ -21,6 +22,8 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
+	local _PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
+	
 	install -Dm700 $TERMUX_PKG_BUILDER_DIR/exe_wrapper $_PREFIX_FOR_BUILD/bin/
 	PATH=$_PREFIX_FOR_BUILD/bin:$PATH
 

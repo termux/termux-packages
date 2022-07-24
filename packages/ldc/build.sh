@@ -69,17 +69,16 @@ termux_step_post_get_source() {
 }
 
 termux_step_host_build() {
-	_BINUTILS_PREFIX=$TERMUX_PKG_HOSTBUILD_DIR/prefix
+	local _PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
+
 	mkdir -p binutils
 	pushd binutils
 	$TERMUX_PKG_SRCDIR/binutils/configure \
-		--prefix=$_BINUTILS_PREFIX \
+		--prefix=$_PREFIX_FOR_BUILD \
 		--target=$TERMUX_HOST_PLATFORM
 	make -j $TERMUX_MAKE_PROCESSES
 	make install
 	popd
-
-	_BINUTILS_BIN=$_BINUTILS_PREFIX/$TERMUX_HOST_PLATFORM/bin
 
 	termux_setup_cmake
 	termux_setup_ninja
@@ -96,7 +95,9 @@ termux_step_host_build() {
 
 # Just before CMake invokation for LLVM:
 termux_step_pre_configure() {
-	export PATH=$_BINUTILS_BIN:$PATH
+	local _PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
+	export PATH=$_PREFIX_FOR_BUILD/$TERMUX_HOST_PLATFORM/bin:$PATH
+
 	if [ "$TERMUX_ARCH" == "arm" ]; then
 		# [...]/ldc/src/llvm/projects/compiler-rt/lib/builtins/clear_cache.c:85:20:
 		# error: write to reserved register 'R7'
