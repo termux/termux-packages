@@ -12,23 +12,23 @@ TERMUX_PKG_REPLACES="emacs-dev"
 TERMUX_PKG_SERVICE_SCRIPT=("emacsd" 'exec emacs --fg-daemon 2>&1')
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-autodepend
+--with-dumping=none
 --with-gif=no
 --with-gnutls
 --with-jpeg=no
---without-gconf
---without-gsettings
---without-lcms2
---without-x
+--with-json
+--with-modules
+--with-pdumper=yes
 --with-png=no
 --with-tiff=no
 --with-xml2
 --with-xpm=no
 --without-dbus
+--without-gconf
+--without-gsettings
+--without-lcms2
 --without-selinux
---with-modules
---with-pdumper=yes
---with-dumping=none
---with-json
+--without-x
 "
 
 if $TERMUX_DEBUG_BUILD; then
