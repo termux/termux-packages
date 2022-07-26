@@ -1,0 +1,35 @@
+diff -Naur dosbox-x/src/cpu/core_normal.cpp dosbox-x-patched/src/cpu/core_normal.cpp
+--- dosbox-x/src/cpu/core_normal.cpp    2022-06-01 19:12:44.754995495 -0700
++++ dosbox-x-patched/src/cpu/core_normal.cpp    2022-06-01 21:27:17.626999806 -0700
+@@ -23,6 +23,7 @@
+ #include "fpu.h"
+ #include "paging.h"
+ #include "mmx.h"
++#include "sse2neon.h"
+
+ bool CPU_RDMSR();
+ bool CPU_WRMSR();
+diff -Naur dosbox-x/src/cpu/core_normal_286.cpp dosbox-x-patched/src/cpu/core_normal_286.cpp
+--- dosbox-x/src/cpu/core_normal_286.cpp        2022-06-01 19:12:44.774995495 -0700
++++ dosbox-x-patched/src/cpu/core_normal_286.cpp        2022-06-01 21:27:43.516999796 -0700
+@@ -23,6 +23,8 @@
+ #include "callback.h"
+ #include "pic.h"
+ #include "fpu.h"
++#include "mmx.h"
++#include "sse2neon.h"
+
+ bool CPU_RDMSR();
+ bool CPU_WRMSR();
+diff -Naur dosbox-x/src/cpu/core_normal_8086.cpp dosbox-x-patched/src/cpu/core_normal_8086.cpp
+--- dosbox-x/src/cpu/core_normal_8086.cpp       2022-06-01 19:12:44.774995495 -0700
++++ dosbox-x-patched/src/cpu/core_normal_8086.cpp       2022-06-01 21:28:03.256999788 -0700
+@@ -21,6 +21,8 @@
+ #include "callback.h"
+ #include "pic.h"
+ #include "fpu.h"
++#include "mmx.h"
++#include "sse2neon.h"
+
+ /* Do not emulate segment limit exceptions on 8086. This turns the if() statements into if (0)
+  * and the C++ compiler optimizer should then completely omit the code for the 8086 cputype. */
