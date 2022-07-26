@@ -69,7 +69,7 @@ termux_step_massage() {
 	# Check so files were actually installed. Exclude
 	# share/doc/$TERMUX_PKG_NAME/ as a license file is always
 	# installed there.
-	if [ "$(find . -type f -not -path "./share/doc/$TERMUX_PKG_NAME/*")" = "" ] && [ -f "$TERMUX_PKG_SRCDIR"/configure.ac ] || [ -f "$TERMUX_PKG_SRCDIR"/configure.in ]; then
+	if [ "$(find . -type f -not -path "./share/doc/$TERMUX_PKG_NAME/*")" = "" ] && { [ -f "$TERMUX_PKG_SRCDIR"/configure.ac ] || [ -f "$TERMUX_PKG_SRCDIR"/configure.in ]; }; then
 		termux_error_exit "No files in package. Maybe you need to run autoreconf -fi before configuring."
 	elif [ "$(find . -type f -not -path "./share/doc/$TERMUX_PKG_NAME/*")" = "" ]; then
 		termux_error_exit "No files in package."
