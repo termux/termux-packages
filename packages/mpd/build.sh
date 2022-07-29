@@ -26,21 +26,15 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 
 termux_step_pre_configure() {
-	# Certain packages are not safe to build on device because their
-	# build.sh script deletes specific files in $TERMUX_PREFIX.
-	if $TERMUX_ON_DEVICE_BUILD; then
-		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
-	fi
-
 	CXXFLAGS+=" -DTERMUX -UANDROID"
 	LDFLAGS+=" -lOpenSLES"
-	rm -f $TERMUX_PREFIX/etc/mpd.conf
 
 	export BOOST_ROOT=$TERMUX_PREFIX
 }
 
 termux_step_post_make_install() {
-	install -Dm600 $TERMUX_PKG_SRCDIR/doc/mpdconf.example $TERMUX_PREFIX/etc/mpd.conf
+	install -Dm600 $TERMUX_PKG_SRCDIR/doc/mpdconf.example \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/mpd.conf
 }
 
 termux_step_create_debscripts() {
