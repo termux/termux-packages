@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://termux.dev/
 TERMUX_PKG_DESCRIPTION="Basic system tools for Termux"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.23
+TERMUX_PKG_VERSION=1.24
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_ESSENTIAL=true
@@ -12,6 +12,7 @@ TERMUX_PKG_SUGGESTS="termux-api"
 TERMUX_PKG_CONFFILES="
 etc/motd.sh
 etc/motd-playstore
+etc/profile.d/init-termux-properties.sh
 etc/termux-login.sh
 "
 
