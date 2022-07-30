@@ -3,30 +3,21 @@ TERMUX_PKG_DESCRIPTION="A featureful, general-purpose sound server"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_SRCURL=https://github.com/pulseaudio/pulseaudio.git
-TERMUX_PKG_VERSION=14.2
-TERMUX_PKG_REVISION=10
+TERMUX_PKG_VERSION=16.1
+# TERMUX_PKG_REVISION=1
 TERMUX_PKG_DEPENDS="libandroid-glob, libc++, libltdl, libsndfile, libsoxr, libwebrtc-audio-processing, speexdsp"
 TERMUX_PKG_BREAKS="libpulseaudio-dev, libpulseaudio"
 TERMUX_PKG_REPLACES="libpulseaudio-dev, libpulseaudio"
 # glib is only a runtime dependency of pulseaudio-glib subpackage
-TERMUX_PKG_BUILD_DEPENDS="libtool, glib"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-neon-opt
---disable-alsa
---disable-esound
---disable-x11
---disable-gtk3
---disable-openssl
---enable-glib2
---without-caps
---with-database=simple
---disable-memfd
---disable-gsettings
-ax_cv_PTHREAD_PRIO_INHERIT=no"
+TERMUX_PKG_BUILD_DEPENDS="libtool, glib, check"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-D alsa=disabled
+-D x11=disabled
+-D gtk=disabled
+-D openssl=disabled
+-D gsettings=disabled
+-D doxygen=false
+-D database=simple"
 TERMUX_PKG_CONFFILES="etc/pulse/client.conf etc/pulse/daemon.conf etc/pulse/default.pa etc/pulse/system.pa"
-
-termux_step_post_get_source() {
-	NOCONFIGURE=1 ./bootstrap.sh
-}
 
 termux_step_pre_configure() {
 	# Our aaudio sink module needs libaaudio.so from a later android api version:
@@ -54,8 +45,8 @@ termux_step_pre_configure() {
 termux_step_post_make_install() {
 	# Some binaries link against these:
 	cd $TERMUX_PREFIX/lib
-	for lib in pulseaudio/lib*.so* pulse-${TERMUX_PKG_VERSION}/modules/lib*.so*; do
-		ln -s -f $lib $(basename $lib)
+	for lib in pulseaudio/{,modules/}lib*.so*; do
+		ln -v -s -f "$lib" "$(basename "$lib")"
 	done
 
 	# Pulseaudio fails to start when it cannot detect any sound hardware
