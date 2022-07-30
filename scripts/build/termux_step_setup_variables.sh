@@ -113,7 +113,7 @@ termux_step_setup_variables() {
 	TERMUX_PKG_PROVIDES="" #https://www.debian.org/doc/debian-policy/#virtual-packages-provides
 	TERMUX_PKG_RECOMMENDS="" # https://www.debian.org/doc/debian-policy/ch-relationships.html#s-binarydeps
 	TERMUX_PKG_REPLACES=""
-	TERMUX_PKG_REVISION="0" # http://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-Version
+	TERMUX_PKG_REVISION="" # http://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-Version
 	TERMUX_PKG_RM_AFTER_INSTALL=""
 	TERMUX_PKG_SHA256=""
 	TERMUX_PKG_SRCDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/src
