@@ -187,6 +187,9 @@ lint_package() {
 				echo "INVALID (allowed: number in range 1 - 999999999)"
 				pkg_lint_error=true
 			fi
+                else
+                        echo "NOT SET"
+                        pkg_lint_error=true
 		fi
 
 		if [ -n "$TERMUX_PKG_SKIP_SRC_EXTRACT" ]; then
