@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Open-source software for volunteer computing"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=7.18.1
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://github.com/BOINC/boinc/archive/client_release/${TERMUX_PKG_VERSION:0:4}/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=274388d9c49e488b6c8502ffc6eb605d5ceae391fb0c2fc56dbb0254d0ceb27e
 TERMUX_PKG_DEPENDS="libandroid-shmem, libc++, libcurl, openssl, zlib"
@@ -21,11 +21,12 @@ termux_step_pre_configure() {
 	# for benchmark purposes
 	CFLAGS="${CFLAGS/-Oz/-Os}"
 	CXXFLAGS="${CXXFLAGS/-Oz/-Os}"
+	CFLAGS+=" -fPIC -DTERMUX_PKG_ANDROID_VERSION=\\\"7.0\\\""
+	CXXFLAGS+=" -fPIC -DTERMUX_PKG_ANDROID_VERSION=\\\"7.0\\\""
 	LDFLAGS+=" -landroid-shmem $($CC -print-libgcc-file-name)"
 	./_autosetup
 }
 
 termux_step_post_make_install() {
-	mkdir -p "$TERMUX_PREFIX/share/bash-completion/completions"
-	install -m 644 "$TERMUX_PKG_SRCDIR/client/scripts/boinc.bash" "$TERMUX_PREFIX/share/bash-completion/completions/boinc"
+	install -Dm644 "$TERMUX_PKG_SRCDIR/client/scripts/boinc.bash" "$TERMUX_PREFIX/share/bash-completion/completions/boinc"
 }
