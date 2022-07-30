@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A simple tool for batch test ss/ssr/v2ray/trojan servers
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.10.0
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/xxf098/LiteSpeedTest/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=2b2be435da12b48d8cd5dbace489f2497586ded1957377a8ceb4ea44883510c5
 TERMUX_PKG_BUILD_IN_SRC=true

@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0, LGPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 _MAJOR_VERSION=41
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.6
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/gnome-desktop/${_MAJOR_VERSION}/gnome-desktop-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=8b3d942ae2ece55c1c9bbd87e7c9550f6ab9d441ac73ae54aab0c3ef621a388b
 TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gsettings-desktop-schemas, gtk3, iso-codes, libcairo, libxkbcommon, xkeyboard-config"

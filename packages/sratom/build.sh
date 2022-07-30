@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A small library for serialising LV2 atoms to and from RD
 TERMUX_PKG_LICENSE="ISC"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.6.8
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://download.drobilla.net/sratom-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=3acb32b1adc5a2b7facdade2e0818bcd6c71f23f84a1ebc17815bb7a0d2d02df
 TERMUX_PKG_DEPENDS="lv2, serd, sord"

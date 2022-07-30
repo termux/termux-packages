@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Thread debugging library"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=22 # removed in NDK r23
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://android.googlesource.com/platform/ndk/+archive/refs/tags/ndk-r${TERMUX_PKG_VERSION}/sources/android/libthread_db.tar.gz
 TERMUX_PKG_SHA256=SKIP_CHECKSUM
 TERMUX_PKG_BUILD_IN_SRC=true

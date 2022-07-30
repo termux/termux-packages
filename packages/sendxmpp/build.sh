@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A perl-script to send XMPP (jabber) messages"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=1.24
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/lhost/sendxmpp/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=dfaf735b4585efd6b3b0f95db31203f9ab0fe607b50e75c6951bc18a6269837d
 TERMUX_PKG_DEPENDS="perl, clang, make"

@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Mobile shell that supports roaming and intelligent local
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2022.02.04
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_SRCURL=https://github.com/mobile-shell/mosh.git
 TERMUX_PKG_DEPENDS="libandroid-support, libc++, libprotobuf, ncurses, openssl, openssh, perl"

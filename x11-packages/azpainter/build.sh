@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Full color painting software for Unix-like systems for i
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1:3.0.5
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_SRCURL=https://gitlab.com/azelpg/azpainter/-/archive/v${TERMUX_PKG_VERSION:2}/azpainter-${TERMUX_PKG_VERSION:2}.tar.bz2
 TERMUX_PKG_SHA256=e40f2d0fc104d7097097cf38b50852587d0031cc9ecefff03d0ee8cbefaee399

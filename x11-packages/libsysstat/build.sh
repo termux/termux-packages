@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A library to query system information"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
 TERMUX_PKG_VERSION="0.4.6"
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL="https://github.com/lxqt/libsysstat/releases/download/${TERMUX_PKG_VERSION}/libsysstat-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=e6c6383d6d6e0e67791be812329cb245035eed35e201e01088515e3ffefb13be
 TERMUX_PKG_DEPENDS="qt5-qtbase"

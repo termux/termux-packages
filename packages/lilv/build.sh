@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A C library to make the use of LV2 plugins as simple as 
 TERMUX_PKG_LICENSE="ISC"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.24.12
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://download.drobilla.net/lilv-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=26a37790890c9c1f838203b47f5b2320334fe92c02a4d26ebbe2669dbd769061
 TERMUX_PKG_DEPENDS="libsndfile, lv2, python, serd, sord, sratom"

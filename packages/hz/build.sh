@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A high-performance and strong-extensibility Go HTTP fram
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.2.0"
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/cloudwego/hertz/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=9195863a41480cbe53647cc214150a92e9876a5a08b997bc2ebe9ca85356ecec
 TERMUX_PKG_BUILD_IN_SRC=true

@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Comprehensive Python Bindings for Qt v5"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=5.15.6
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://ftp-osl.osuosl.org/pub/gentoo/distfiles/PyQt5-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=80343bcab95ffba619f2ed2467fd828ffeb0a251ad7225be5fc06dcc333af452
 TERMUX_PKG_DEPENDS="python, qt5-qtbase, qt5-qtdeclarative, qt5-qtlocation, qt5-qtmultimedia, qt5-qtsensors, qt5-qtsvg, qt5-qttools, qt5-qtwebchannel, qt5-qtwebkit, qt5-qtwebsockets, qt5-qtx11extras, qt5-qtxmlpatterns"

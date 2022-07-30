@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Qt 5 WebChannel Library"
 TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
 TERMUX_PKG_VERSION=5.15.3
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/${TERMUX_PKG_VERSION%.*}/${TERMUX_PKG_VERSION}/submodules/qtwebchannel-everywhere-opensource-src-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=2fa019ebd2fa6805ca3011540ffa7d294727316191794a1612b00129845302eb
 TERMUX_PKG_DEPENDS="qt5-qtbase, qt5-qtdeclarative, qt5-qtwebsockets"

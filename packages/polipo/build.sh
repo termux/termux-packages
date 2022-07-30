@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A small and fast caching web proxy"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.1.1
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=http://www.pps.univ-paris-diderot.fr/~jch/software/files/polipo/polipo-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=a259750793ab79c491d05fcee5a917faf7d9030fb5d15e05b3704e9c9e4ee015
 TERMUX_PKG_DEPENDS="resolv-conf"

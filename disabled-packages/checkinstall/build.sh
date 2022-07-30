@@ -4,6 +4,7 @@ TERMUX_PKG_DESCRIPTION="Installation tracker creating a package from a local ins
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.6.2
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=http://checkinstall.izto.org/files/source/checkinstall-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256="dc61192cf7b8286d42c44abae6cf594ee52eafc08bfad0bea9d434b73dd593f4"
 TERMUX_PKG_BUILD_IN_SRC=true

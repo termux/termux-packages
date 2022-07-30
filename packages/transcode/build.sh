@@ -4,6 +4,7 @@ TERMUX_PKG_DESCRIPTION="A video stream processing utility"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.1.7
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=(https://ftp-osl.osuosl.org/pub/gentoo/distfiles/transcode-${TERMUX_PKG_VERSION}.tar.bz2
                    https://dev.gentoo.org/~mgorny/dist/transcode-${TERMUX_PKG_VERSION}-patchset.tar.bz2)
 TERMUX_PKG_SHA256=(1e4e72d8e0dd62a80b8dd90699f5ca64c9b0cb37a5c9325c184166a9654f0a92

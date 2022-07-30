@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="tool for static C/C++ code analysis"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.8.2"
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_METHOD=repology # Upstream only releases major versions theough GitHub. Other minor updates are released using git tags, better rely on repology for updated versiom
 TERMUX_PKG_SRCURL=https://github.com/danmar/cppcheck/archive/$TERMUX_PKG_VERSION.tar.gz

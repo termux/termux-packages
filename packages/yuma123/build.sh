@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="BSD 3-Clause, MIT, Public Domain"
 TERMUX_PKG_LICENSE_FILE="debian/copyright"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.12
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/yuma123/yuma123_${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=81a0e4d4b4420891fb0a091e9cf4c36d50dbdc5dfedb09609e9b1fee58377ea9
 TERMUX_PKG_DEPENDS="libssh2, libxml2, ncurses, openssl, readline, zlib"

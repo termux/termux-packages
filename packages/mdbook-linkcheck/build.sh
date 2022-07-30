@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A backend for mdbook which will check your links for you
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.7.6
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/Michael-F-Bryan/mdbook-linkcheck.git
 TERMUX_PKG_BUILD_IN_SRC=true
 

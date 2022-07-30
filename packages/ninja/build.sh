@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A small build system with a focus on speed"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.11.0"
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/ninja-build/ninja/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=3c6ba2e66400fe3f1ae83deb4b235faf3137ec20bd5b08c29bfc368db143e4c6
 TERMUX_PKG_AUTO_UPDATE=true

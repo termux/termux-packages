@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Collection of libraries providing APIs to netlink protoc
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.7.0"
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/thom311/libnl/releases/download/libnl${TERMUX_PKG_VERSION//./_}/libnl-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=9fe43ccbeeea72c653bdcf8c93332583135cda46a79507bfd0a483bb57f65939
 TERMUX_PKG_AUTO_UPDATE=true

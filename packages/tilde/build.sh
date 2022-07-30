@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A text editor for the console/terminal"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.1.3
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://os.ghalkes.nl/dist/tilde-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=6b86ffaa5c632c9055f74fca713c5bf8420ee60718850dc16a95abe49fa2641a
 TERMUX_PKG_DEPENDS="libc++, libt3config, libt3highlight, libt3widget, libtranscript, libunistring"

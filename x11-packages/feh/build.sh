@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Fast and light imlib2-based image viewer"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.8
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://feh.finalrewind.org/feh-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=7f3c34552b39336d7ebee2d7c4bf5697aaaa2c6c102c357f6e82ea240bd62ba9
 TERMUX_PKG_DEPENDS="imlib2, libandroid-shmem, libcurl, libexif, libjpeg-turbo, libpng, libx11, libxinerama"

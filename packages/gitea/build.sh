@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Git with a cup of tea, painless self-hosted git service"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.16.9"
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/go-gitea/gitea/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=eecd6228ae5dd2ae74befb063828cba6a2f8ef1a5a5bbbc813df83c5c1f52a3d
 TERMUX_PKG_AUTO_UPDATE=true

@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Wrapper around texlive's install-tl script"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 TERMUX_PKG_VERSION=20220403
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://ftp.math.utah.edu/pub/tex/historic/systems/texlive/${TERMUX_PKG_VERSION:0:4}/install-tl-unx.tar.gz
 TERMUX_PKG_SHA256=e67edec49df6b7c4a987a7d5a9b31bcf41258220f9ac841c7a836080cd334fb5
 TERMUX_PKG_PLATFORM_INDEPENDENT=true

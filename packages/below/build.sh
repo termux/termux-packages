@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="An interactive tool to view and record historical system
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.5.0
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/facebookincubator/below/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=9e76d066ce4815b8c51c720375a29d8b0a97a7890fd80602bbe49968573adeb5
 TERMUX_PKG_DEPENDS="libelf, zlib"

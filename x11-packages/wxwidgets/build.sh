@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="docs/gpl.txt, docs/lgpl.txt, docs/licence.txt, docs/licendoc.txt, docs/preamble.txt"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.1.6
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/wxWidgets/wxWidgets/releases/download/v${TERMUX_PKG_VERSION}/wxWidgets-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=4980e86c6494adcd527a41fc0a4e436777ba41d1893717d7b7176c59c2061c25
 TERMUX_PKG_DEPENDS="glu, gtk3, libcurl, libexpat, libiconv, libjpeg-turbo, liblzma, libnotify, libpng, libsecret, libsm, libtiff, mesa, sdl2"

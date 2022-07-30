@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Track and predict passes of satellites in Earth orbit"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.2.3
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://ftp-osl.osuosl.org/pub/gentoo/distfiles/predict_${TERMUX_PKG_VERSION}.orig.tar.gz
 TERMUX_PKG_SHA256=47b7c185f1cf4d318b6b31a22a533c03c4a3f57394839df036367c7cdf2dd7ff
 TERMUX_PKG_DEPENDS="ncurses, ncurses-ui-libs"

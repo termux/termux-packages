@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A powerful descriptive vector graphics language for tech
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=(2.79)
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_VERSION+=(0.9.9.8)
 TERMUX_PKG_SRCURL=(https://downloads.sourceforge.net/asymptote/asymptote-${TERMUX_PKG_VERSION}.src.tgz
                    https://github.com/g-truc/glm/archive/${TERMUX_PKG_VERSION[1]}.tar.gz)

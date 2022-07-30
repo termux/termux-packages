@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A single and trusted place for all unofficial/less popul
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux-user-repository"
 TERMUX_PKG_VERSION=1.0
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 

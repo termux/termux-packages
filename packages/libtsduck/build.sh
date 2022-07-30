@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 _VERSION=3.29-2651
 TERMUX_PKG_VERSION=${_VERSION//-/.}
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/tsduck/tsduck/archive/refs/tags/v${_VERSION}.tar.gz
 TERMUX_PKG_SHA256=cab8f5838993aa1abd1a6a4c2ef7f2afba801da02a4001904f3f5ba5c5fe85a0
 TERMUX_PKG_DEPENDS="libandroid-glob, libcurl, libedit"

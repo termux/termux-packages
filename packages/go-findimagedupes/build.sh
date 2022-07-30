@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=0bb9ce8d74fbfdee6cfc66073b6729ea9b89611d
 TERMUX_PKG_VERSION=2022.02.23
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://gitlab.com/opennota/findimagedupes.git
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_DEPENDS="file, libc++, libheif, libjpeg-turbo, libpng, libtiff"

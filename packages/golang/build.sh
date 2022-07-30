@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 _MAJOR_VERSION=1.18.3
 # Use the ~ deb versioning construct in the future:
 TERMUX_PKG_VERSION=3:${_MAJOR_VERSION}
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://storage.googleapis.com/golang/go${_MAJOR_VERSION}.src.tar.gz
 TERMUX_PKG_SHA256=0012386ddcbb5f3350e407c679923811dbd283fcdc421724931614a842ecbc2d
 TERMUX_PKG_DEPENDS="clang"

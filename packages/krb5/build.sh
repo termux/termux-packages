@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="../NOTICE"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.19.3
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/krb5-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=56d04863cfddc9d9eb7af17556e043e3537d41c6e545610778676cf551b9dcd0
 TERMUX_PKG_DEPENDS="libandroid-support, libandroid-glob, libresolv-wrapper, readline, openssl-1.1, libdb"

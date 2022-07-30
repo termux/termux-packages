@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Lightweight implementation of the Ruby language"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.0.0
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/mruby/mruby/archive/${TERMUX_PKG_VERSION}.zip
 TERMUX_PKG_SHA256=c7d95fdc05efdc8f5a0df4d5f0fbad5092596d61927c39515d03b8dde4743a8e
 TERMUX_PKG_DEPENDS="ncurses, readline"

@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Simplifies the task of creating regular expressions"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.3.0
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/pemistahl/grex.git
 TERMUX_PKG_BUILD_IN_SRC=true
 

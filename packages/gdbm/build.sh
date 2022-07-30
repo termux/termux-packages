@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Library of database functions that use extensible hashin
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.23
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/gdbm/gdbm-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=74b1081d21fff13ae4bd7c16e5d6e504a4c26f7cde1dca0d963a484174bbcacd
 TERMUX_PKG_DEPENDS="readline"

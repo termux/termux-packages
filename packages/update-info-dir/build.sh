@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Update or create index file from all installed info file
 TERMUX_PKG_LICENSE="GPL-2.0, GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=6.8-4
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://deb.debian.org/debian/pool/main/t/texinfo/texinfo_${TERMUX_PKG_VERSION}.debian.tar.xz
 TERMUX_PKG_SHA256=1194b3f1a9480f1796fdf92fb366b02d855a17f8873ec5daa4b6befe51d69f57
 TERMUX_PKG_PLATFORM_INDEPENDENT=true

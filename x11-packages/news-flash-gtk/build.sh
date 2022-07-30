@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A modern feed reader designed for the GNOME desktop"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.0.2
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/patchedsoul/news-flash/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=bc4ce6aa7cd26409d5d9a7ffa539214c9907c7b263eb88f46d8bbab7546fd323
 TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libcairo, libhandy-0.0, libsqlite, libxml2, openssl-1.1, pango, webkit2gtk"

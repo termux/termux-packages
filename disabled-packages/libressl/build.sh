@@ -6,6 +6,7 @@ TERMUX_PKG_DESCRIPTION="Library implementing the TLS protocol as well as general
 TERMUX_PKG_LICENSE="OpenSSL, ISC"
 TERMUX_PKG_MAINTEINER="@termux"
 TERMUX_PKG_VERSION=2.5.5
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=e57f5e3d5842a81fe9351b6e817fcaf0a749ca4ef35a91465edba9e071dce7c4
 TERMUX_PKG_DEPENDS="ca-certificates"

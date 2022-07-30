@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_LICENSE_FILE="BSD-3-Clause"
 TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
 TERMUX_PKG_VERSION=0.11.0
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL="https://github.com/lxqt/lxqt-build-tools/releases/download/${TERMUX_PKG_VERSION}/lxqt-build-tools-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=dd5d49e59f9b0552cb40118eb28a463f630b5de6e626b2910410b54ef3bcc1b9
 TERMUX_PKG_DEPENDS="cmake, qt5-qtbase"

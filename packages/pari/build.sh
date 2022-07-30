@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A computer algebra system designed for fast computations
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.13.4
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://pari.math.u-bordeaux.fr/pub/pari/unix/pari-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=bcde9eceae1592814381c1697cdb7063567b6504201b1be47bb58920f3bce185
 TERMUX_PKG_DEPENDS="gzip, libgmp, readline"

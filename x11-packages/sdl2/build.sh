@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A library for portable low-level access to a video frame
 TERMUX_PKG_LICENSE="ZLIB"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.0.22
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://www.libsdl.org/release/SDL2-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=fe7cbf3127882e3fc7259a75a0cb585620272c51745d3852ab9dd87960697f2e
 TERMUX_PKG_DEPENDS="libandroid-glob, libflac, libogg, libsndfile, libvorbis, libx11, libxau, libxcb, libxcursor, libxdmcp, libxext, libxfixes, libxi, libxinerama, libxrandr, libxrender, libxss, libxxf86vm, pulseaudio"

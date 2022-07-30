@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Demystifies and debugs your sed scripts"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.2.0
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/SoptikHa2/desed.git
 TERMUX_PKG_BUILD_IN_SRC=true
 

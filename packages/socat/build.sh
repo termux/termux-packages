@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Relay for bidirectional data transfer between two indepe
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.7.4.3
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=http://www.dest-unreach.org/socat/download/socat-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=d697245144731423ddbbceacabbd29447089ea223e9a439b28f9ff90d0dd216e
 TERMUX_PKG_DEPENDS="openssl, readline"

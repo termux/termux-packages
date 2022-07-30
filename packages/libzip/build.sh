@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Library for reading, creating, and modifying zip archive
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.9.2"
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/nih-at/libzip/releases/download/v$TERMUX_PKG_VERSION/libzip-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=fd6a7f745de3d69cf5603edc9cb33d2890f0198e415255d0987a0cf10d824c6f
 TERMUX_PKG_AUTO_UPDATE=true

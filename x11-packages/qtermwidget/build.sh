@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A terminal emulator widget for Qt 5"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
 TERMUX_PKG_VERSION="1.1.0"
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL="https://github.com/lxqt/qtermwidget/releases/download/${TERMUX_PKG_VERSION}/qtermwidget-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=64830460f558e806710e64366ce085f76a6995502d81e99e3360cd866a60c4d4
 TERMUX_PKG_DEPENDS="qt5-qtbase"

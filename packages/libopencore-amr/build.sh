@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="William Goodspeed @goodspeed34"
 TERMUX_PKG_VERSION=0.1.5
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://sourceforge.net/projects/opencore-amr/files/opencore-amr/opencore-amr-${TERMUX_PKG_VERSION}.tar.gz/download
 TERMUX_PKG_SHA256=2c006cb9d5f651bfb5e60156dbff6af3c9d35c7bbcc9015308c0aff1e14cd341
 TERMUX_PKG_BREAKS="libopencore-amr-dev"

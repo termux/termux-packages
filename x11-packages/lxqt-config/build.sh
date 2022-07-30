@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Tools to configure LXQt and the underlying operating sys
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
 TERMUX_PKG_VERSION="1.1.0"
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL="https://github.com/lxqt/lxqt-config/releases/download/${TERMUX_PKG_VERSION}/lxqt-config-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=454550ae75b875eb59b4d0c93823b62ec1de3c781423607793d32055b1401d38
 TERMUX_PKG_DEPENDS="qt5-qtbase, qt5-qtx11extras, liblxqt, libxcb, zlib, shared-mime-info"

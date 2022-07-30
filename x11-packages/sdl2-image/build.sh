@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="ZLIB"
 TERMUX_PKG_LICENSE_FILE="LICENSE.txt"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.6.0
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/libsdl-org/SDL_image/releases/download/release-${TERMUX_PKG_VERSION}/SDL2_image-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=611c862f40de3b883393aabaa8d6df350aa3ae4814d65030972e402edae85aaa
 TERMUX_PKG_DEPENDS="libandroid-glob, libflac, libjpeg-turbo, liblzma, libogg, libpng, libsndfile, libtiff, libvorbis, libwebp, libx11, libxau, libxcb, libxcursor, libxdmcp, libxext, libxfixes, libxi, libxinerama, libxrandr, libxrender, libxss, libxxf86vm, pulseaudio, sdl2, zlib"

@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Software synthesizer based on the SoundFont 2 specificat
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="Yonle <yonle@duck.com>"
 TERMUX_PKG_VERSION=2.2.8
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/FluidSynth/fluidsynth/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=7c29a5cb7a2755c8012d941d1335da7bda957bbb0a86b7c59215d26773bb51fe
 TERMUX_PKG_DEPENDS="glib, pulseaudio"

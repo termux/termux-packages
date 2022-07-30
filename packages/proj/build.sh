@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Generic coordinate transformation software"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 TERMUX_PKG_VERSION="9.0.1"
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/OSGeo/proj.4/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=65f965e5ac965a144898343261b3b7cafd50cb5dc1c2ddcc2897e726ba5e289f
 TERMUX_PKG_DEPENDS="libc++, libsqlite, sqlite, libtiff, libcurl"

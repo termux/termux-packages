@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.alsa-project.org
 TERMUX_PKG_DESCRIPTION="Extra ALSA plugins"
 TERMUX_PKG_VERSION=1.1.1
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_LICENSE=LGPL-2.1
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_SRCURL=https://alsa-project.org/files/pub/plugins/alsa-plugins-$TERMUX_PKG_VERSION.tar.bz2

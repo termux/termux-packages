@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Silicon is an alternative to Carbon implemented in Rust"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Yaksh Bariya <yakshbari4@gmail.com>"
 TERMUX_PKG_VERSION=0.4.3
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/Aloxaf/silicon/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=68d64ade34ac571cf2d092f9a6f124e2c7d0441a91e3ba00ca1c8edcdd008630
 TERMUX_PKG_AUTO_UPDATE=true

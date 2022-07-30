@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Text document format for short documents, articles, book
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="10.2.0"
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/asciidoc/asciidoc-py3/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=684ea53c1f5b71d6d1ac6086bbc96906b1f709ecc7ab536615b0f0c9e1baa3cc
 TERMUX_PKG_AUTO_UPDATE=true

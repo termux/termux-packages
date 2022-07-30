@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Qt SVG Library"
 TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
 TERMUX_PKG_VERSION=5.15.3
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/5.15/${TERMUX_PKG_VERSION}/submodules/qtsvg-everywhere-opensource-src-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=3adc41dfcc67bbe3b8ff553bdac30ee75e270745536a58e54cdb741fa0505d89
 TERMUX_PKG_DEPENDS="qt5-qtbase"

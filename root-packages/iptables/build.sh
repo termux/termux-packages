@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Program used to configure the Linux 2.4 and later kernel
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.8.8
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://www.netfilter.org/projects/iptables/files/iptables-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=71c75889dc710676631553eb1511da0177bbaaf1b551265b912d236c3f51859f
 TERMUX_PKG_DEPENDS="libmnl, libnftnl, libandroid-spawn"

@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="licenses/COPYING.Lua, licenses/COPYING.LuaBitOp, licenses/COPYING.LuaFileSystem, licenses/COPYING.Minizip, licenses/COPYING.Scowl, licenses/COPYING.uthash, licenses/COPYING.wcwidth, licenses/COPYING.WordGrinder, licenses/COPYING.xpattern"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.8
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/davidgiven/wordgrinder/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=856cbed2b4ccd5127f61c4997a30e642d414247970f69932f25b4b5a81b18d3f
 TERMUX_PKG_AUTO_UPDATE=true

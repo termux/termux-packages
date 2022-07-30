@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="LXQt Image Viewer"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
 TERMUX_PKG_VERSION="1.1.0"
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL="https://github.com/lxqt/lximage-qt/releases/download/${TERMUX_PKG_VERSION}/lximage-qt-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=8b8b7825eb0d046b4a4d5476329513ad8e3066462c69b6da554ecd6a8f455459
 TERMUX_PKG_DEPENDS="qt5-qtbase, qt5-qtx11extras, qt5-qtsvg, libfm-qt, libexif, libxfixes"

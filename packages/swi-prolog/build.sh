@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="ISC"
 TERMUX_PKG_MAINTAINER="@termux"
 # Use "development" versions.
 TERMUX_PKG_VERSION=8.5.2
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://www.swi-prolog.org/download/devel/src/swipl-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=4f582b70e5aef59ca95338a1cac3630360f3c2fe6623a0701bd49b46079a5aa4
 TERMUX_PKG_DEPENDS="libarchive, libcrypt, libgmp, libjpeg-turbo, libyaml, ncurses, ncurses-ui-libs, pcre, readline, ossp-uuid, zlib"

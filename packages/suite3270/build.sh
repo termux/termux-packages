@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_LICENSE_FILE="include/copyright.h"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=4.1ga11
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://prdownloads.sourceforge.net/x3270/suite3270-${TERMUX_PKG_VERSION}-src.tgz
 TERMUX_PKG_SHA256=c36d12fcf211cce48c7488b06d806b0194c71331abdce6da90953099acb1b0bf
 TERMUX_PKG_DEPENDS="less, libexpat, libiconv, ncurses"

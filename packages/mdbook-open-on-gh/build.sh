@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A preprocessor for mdbook to add a open-on-github link o
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.2.0"
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/badboy/mdbook-open-on-gh.git
 TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
 TERMUX_PKG_BUILD_IN_SRC=true

@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A small java library that allows you to use ANSI escape 
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.4.0
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/fusesource/jansi.git
 TERMUX_PKG_GIT_BRANCH=jansi-${TERMUX_PKG_VERSION}
 TERMUX_PKG_BUILD_IN_SRC=true

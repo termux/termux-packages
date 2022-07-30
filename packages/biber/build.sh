@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A Unicode-capable BibTeX replacement for biblatex users"
 TERMUX_PKG_LICENSE="Artistic-License-2.0"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 TERMUX_PKG_VERSION=2.17
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_DEPENDS="perl (>> 5.34.0-3), libxslt, libxml2 (>> 2.9.10-3), openssl-tool, make, clang, pkg-config"

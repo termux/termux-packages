@@ -15,6 +15,7 @@ LICENSE/LICENSE_STIX
 LICENSE/LICENSE_YORICK"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=(3.5.1)
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_VERSION+=(1.22.3) # NumPy version
 TERMUX_PKG_VERSION+=(9.0.1)  # Pillow version
 TERMUX_PKG_SRCURL=(https://github.com/matplotlib/matplotlib/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz

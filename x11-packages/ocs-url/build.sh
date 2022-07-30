@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="An install helper program for items served via OpenColla
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.1.0
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://www.opencode.net/dfn2/ocs-url.git
 TERMUX_PKG_GIT_BRANCH=release-${TERMUX_PKG_VERSION}
 TERMUX_PKG_DEPENDS="libc++, qt5-qtbase, qt5-qtdeclarative, qt5-qtsvg"

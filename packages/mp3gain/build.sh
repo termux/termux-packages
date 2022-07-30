@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Analyzes and adjusts mp3 files so that they have the sam
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.6.2
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/mp3gain/mp3gain-${TERMUX_PKG_VERSION//./_}-src.zip
 TERMUX_PKG_SHA256=5cc04732ef32850d5878b28fbd8b85798d979a025990654aceeaa379bcc9596d
 TERMUX_PKG_DEPENDS="mpg123"

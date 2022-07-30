@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A simple, fast, clean and dynamic language"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.0.6
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/blade-lang/blade/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=3c13f2a81dc027871993e8a369691a470ed7f62b9fb4a72237ff75db36abe35d
 TERMUX_PKG_DEPENDS="libsqlite, readline"

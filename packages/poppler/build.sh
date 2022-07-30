@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="PDF rendering library"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=22.04.0
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://poppler.freedesktop.org/poppler-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=813fb4b90e7bda63df53205c548602bae728887a60f4048aae4dbd9b1927deff
 TERMUX_PKG_DEPENDS="fontconfig, freetype, glib, libc++, libcairo, libcurl, libiconv, libjpeg-turbo, libpng, libtiff, littlecms, openjpeg, openjpeg-tools, zlib"

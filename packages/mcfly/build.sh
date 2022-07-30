@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Replaces your default ctrl-r shell history search with a
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.6.1"
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/cantino/mcfly/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=e2eebca8f66ec99ff8582886a10e8dfa1a250329ac02c27855698c8d4a33a3f2
 TERMUX_PKG_BUILD_IN_SRC=true

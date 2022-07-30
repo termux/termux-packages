@@ -6,6 +6,7 @@ TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.org>"
 # "0.8.0-dev-698-g1ef84547a" < "0.8.0-dev-nightly-10-g1a07044c1", we need to bump
 # the epoch of the package version.
 TERMUX_PKG_VERSION="1:0.8.0-dev-739-ge59bc078d"
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL="https://github.com/neovim/neovim/archive/nightly.tar.gz"
 TERMUX_PKG_SHA256=649c96209d85e756402f2be38b7429639707678709aeeda8e83eba79bfe7ed0d
 TERMUX_PKG_DEPENDS="libiconv, libuv, luv, libmsgpack, libandroid-support, libvterm, libtermkey, libluajit, libunibilium, libtreesitter"

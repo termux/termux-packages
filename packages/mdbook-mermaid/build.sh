@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A preprocessor for mdbook to add mermaid support"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.11.2"
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/badboy/mdbook-mermaid.git
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true

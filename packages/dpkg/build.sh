@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Debian package management system"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.21.9
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/debian/pool/main/d/dpkg/dpkg_${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=a0aba375625459260cbc89933a12b3188a713c840e3aaefc14bf2d9adee19642
 TERMUX_PKG_DEPENDS="bzip2, coreutils, diffutils, gzip, less, libbz2, liblzma, tar, xz-utils, zlib"

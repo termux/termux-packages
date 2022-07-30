@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Dynamic programming language with a focus on simplicity 
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.1.2
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://cache.ruby-lang.org/pub/ruby/${TERMUX_PKG_VERSION:0:3}/ruby-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=ca10d017f8a1b6d247556622c841fc56b90c03b1803f87198da1e4fd3ec3bf2a
 # libbffi is used by the fiddle extension module:

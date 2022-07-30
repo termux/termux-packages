@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Allows you to easily manage large numbers of patches"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.66
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://savannah.nongnu.org/download/quilt/quilt-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=314b319a6feb13bf9d0f9ffa7ce6683b06919e734a41275087ea457cc9dc6e07
 TERMUX_PKG_DEPENDS="coreutils, diffstat, gawk, graphviz, perl"

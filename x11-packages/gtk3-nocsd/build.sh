@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A small module used to disable the client side decoratio
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/PCMan/gtk3-nocsd/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=779c47d894ee3b6751ddb02b62a76757b77eb81232c4f9335564654817889570
 TERMUX_PKG_BUILD_DEPENDS="gobject-introspection, gtk3"

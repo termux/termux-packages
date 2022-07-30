@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A library of widgets and dialogs to facilitate construct
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.2.2
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://os.ghalkes.nl/dist/libt3widget-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=9eb7e1d0ccdfc917f18ba1785a2edb4faa6b0af8b460653d962abf91136ddf1c
 TERMUX_PKG_DEPENDS="libc++, libt3key, libt3window, libtranscript, libunistring, pcre2"

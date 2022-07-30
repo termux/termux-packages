@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Hierarchical, reference counted memory pool system with 
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.3.3
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://www.samba.org/ftp/talloc/talloc-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=6be95b2368bd0af1c4cd7a88146eb6ceea18e46c3ffc9330bf6262b40d1d8aaa
 TERMUX_PKG_BREAKS="libtalloc-dev"

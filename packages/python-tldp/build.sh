@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Tools for publishing from TLDP sources"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.7.5
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/tLDP/python-tldp/archive/refs/tags/tldp-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=bae313095b877b4272ddccaabd70efcbc526e2c1036f63fb665ec7ce10c94cde
 TERMUX_PKG_DEPENDS="python"

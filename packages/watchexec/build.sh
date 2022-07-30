@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Executes commands in response to file modifications"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.18.11
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/watchexec/watchexec/archive/refs/tags/cli-v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=bdd5af45ab7e5981eed25ac09767388aa1fbf711a9d286bcb99884464980af5b
 TERMUX_PKG_AUTO_UPDATE=false

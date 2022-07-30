@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="The open-source platform for monitoring and observabilit
 TERMUX_PKG_LICENSE="AGPL-V3"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=8.3.4
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/grafana/grafana.git
 TERMUX_PKG_BUILD_DEPENDS="yarn"
 TERMUX_PKG_BUILD_IN_SRC=true

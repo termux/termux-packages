@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A program for interactively transferring files to a remo
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.5c
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/zssh/zssh-${TERMUX_PKG_VERSION}.tgz
 TERMUX_PKG_SHA256=a2e840f82590690d27ea1ea1141af509ee34681fede897e58ae8d354701ce71b
 TERMUX_PKG_DEPENDS="libandroid-glob, lrzsz, openssh, readline"

@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A library providing a windowing abstraction on terminals
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.4.1
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://os.ghalkes.nl/dist/libt3window-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=4c14d3f4f946637fd6c3fa23ef7511fa505880946e151406d5e16f645d24e792
 TERMUX_PKG_DEPENDS="libtranscript, libunistring, ncurses"

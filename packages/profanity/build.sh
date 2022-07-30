@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Profanity is a console based XMPP client written in C us
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Oliver Schmidhauser @Neo-Oli"
 TERMUX_PKG_VERSION="0.12.1"
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/profanity-im/profanity/releases/download/$TERMUX_PKG_VERSION/profanity-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=e344481e7bf3b16baf58a169d321b809c4700becffb70db6f1c39adc3fad306e
 TERMUX_PKG_AUTO_UPDATE=true

@@ -7,6 +7,7 @@ _COMMIT_DATE=20220730
 _COMMIT_TIME=103516
 # termux_pkg_upgrade_version edits TERMUX_PKG_VERSION wholly
 TERMUX_PKG_VERSION="0.0.20220730g8d0412c7"
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/kpet/clvk.git
 TERMUX_PKG_GIT_BRANCH=main
 TERMUX_PKG_BUILD_DEPENDS="vulkan-loader-android, vulkan-headers"

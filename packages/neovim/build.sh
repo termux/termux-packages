@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Ambitious Vim-fork focused on extensibility and agility 
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.7.2"
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/neovim/neovim/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=ccab8ca02a0c292de9ea14b39f84f90b635a69282de38a6b4ccc8565bc65d096
 TERMUX_PKG_AUTO_UPDATE=true

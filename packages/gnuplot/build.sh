@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="Copyright"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=5.4.4
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/gnuplot/gnuplot/${TERMUX_PKG_VERSION}/gnuplot-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=372300b7867f5b3538b25fc5d0ac7734af6e3fe0d202b6db926e4369913f0902
 TERMUX_PKG_DEPENDS="libandroid-support, libgd, libiconv, libx11, pango, readline"

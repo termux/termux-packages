@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="GD is an open source code library for the dynamic creati
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1:2.3.3
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/libgd/libgd/releases/download/gd-${TERMUX_PKG_VERSION:2}/libgd-${TERMUX_PKG_VERSION:2}.tar.gz
 TERMUX_PKG_SHA256=dd3f1f0bb016edcc0b2d082e8229c822ad1d02223511997c80461481759b1ed2
 TERMUX_PKG_DEPENDS="freetype, fontconfig, libiconv, libjpeg-turbo, libpng, libtiff, libwebp, zlib"

@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Library to import various well-known 3D model formats in
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="5.2.4"
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/assimp/assimp/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=6a4ff75dc727821f75ef529cea1c4fc0a7b5fc2e0a0b2ff2f6b7993fe6cb54ba
 TERMUX_PKG_AUTO_UPDATE=true

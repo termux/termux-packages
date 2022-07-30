@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Generate vanity ed25519 (hidden service version 3) onion
 TERMUX_PKG_LICENSE="CC0-1.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.6.1
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/cathugger/mkp224o/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=ba6953588b1a683bdaaf065fbbeebfa7a7db1413e8ba9c9a52e7c90d3a7fa348
 TERMUX_PKG_DEPENDS="libsodium"

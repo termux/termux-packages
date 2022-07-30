@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Qt Quick Controls2 module"
 TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
 TERMUX_PKG_VERSION=5.15.3
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/5.15/${TERMUX_PKG_VERSION}/submodules/qtquickcontrols2-everywhere-opensource-src-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=3b95e9be58c3d918f4c4a805116459a403ae6c61e33edf71b319672c46af562f
 TERMUX_PKG_DEPENDS="qt5-qtbase, qt5-qtdeclarative"

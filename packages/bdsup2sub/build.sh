@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A subtitle conversion tool for image based stream format
 TERMUX_PKG_LICENSE="Apache-2.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=4.0.1
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/mjuhasz/BDSup2Sub/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=8ad9529e58d2eeadb5c2be80bfcdaaa06a8714c3144c327491c1d19431993ad9
 TERMUX_PKG_DEPENDS="openjdk-17"

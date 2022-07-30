@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=600ea9a50ecb49e21c4cc9c65e2a9cad69b32cf2
 TERMUX_PKG_VERSION=2022.03.16
+TERMUX_PKG_REVISION=0
 # This repository does not accept ".git" suffix:
 TERMUX_PKG_SRCURL=https://git.sr.ht/~ghost08/photon
 TERMUX_PKG_SHA256=SKIP_CHECKSUM

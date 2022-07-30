@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENCE"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=5.9
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/zsh-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=9b8d1ecedd5b5e81fbf1918e876752a7dd948e05c1a0dba10ab863842d45acd5
 # Remove hard link to bin/zsh as Android does not support hard links:

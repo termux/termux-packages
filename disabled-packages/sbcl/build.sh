@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Steel Bank Common Lisp"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.3.9
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://prdownloads.sourceforge.net/sbcl/sbcl-${TERMUX_PKG_VERSION}-source.tar.bz2
 TERMUX_PKG_SHA256=af0f09d4379113dfd5aa255279cb3df9cb9cac0bcd65369cc43dd857ca51de6e
 

@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="docs/license.rst"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=22.1.0
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://archive.mesa3d.org/mesa-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=df6270c1371eaa2aa6eb65b95cbbb2a98b14fa4b7ba0ed45e4ca2fd32df60477
 TERMUX_PKG_DEPENDS="libandroid-shmem, libc++, libexpat, libx11, libxext, ncurses, zlib, zstd"

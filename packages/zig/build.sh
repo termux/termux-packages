@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="General-purpose programming language and toolchain for m
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@leapofazzam123"
 TERMUX_PKG_VERSION=0.9.1
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://ziglang.org/download/$TERMUX_PKG_VERSION/zig-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=38cf4e84481f5facc766ba72783e7462e08d6d29a5d47e3b75c8ee3142485210
 TERMUX_PKG_DEPENDS="libandroid-spawn, libc++, libxml2, ncurses, zlib"

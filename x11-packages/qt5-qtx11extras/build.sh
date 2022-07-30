@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Qt X11 Extras enables the Qt programmer to write applica
 TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
 TERMUX_PKG_VERSION=5.15.3
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/5.15/${TERMUX_PKG_VERSION}/submodules/qtx11extras-everywhere-opensource-src-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=a3a9b048da73bd944b407ee29ed9da9e009463329ca700c1452bc226715e3eb8
 TERMUX_PKG_DEPENDS="qt5-qtbase"

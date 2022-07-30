@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A bi-directional ping utility"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=4.5.1
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/rfinnie/2ping/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=0f85dc21be1266daccfbba903819ca8935ebdbe002b1e0305bfda258af44fdcd
 TERMUX_PKG_DEPENDS="python"

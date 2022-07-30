@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A full-featured port of the WebKit rendering engine"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.36.2
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://webkitgtk.org/releases/webkitgtk-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=fe93bddb4a02c0e36f926efb6e81d28afd288b8824f6c5cf6a75cf40228e008e
 TERMUX_PKG_DEPENDS="atk, enchant, fontconfig, freetype, glib, gst-plugins-base, gstreamer, gtk3, harfbuzz, harfbuzz-icu, libc++, libcairo, libgcrypt, libhyphen, libicu, libjpeg-turbo, libnotify, libpng, libsoup, libtasn1, libwebp, libxml2, libx11, libxcomposite, libxdamage, libxslt, libxt, littlecms, openjpeg, pango, woff2"

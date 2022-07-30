@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A small utility which can be called from anywhere to sen
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.2.4
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/kha7iq/pingme/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=6f65858f7b44d9c4a327128ef020d34c4e8294244bece5f8867a08c6da81bc62
 TERMUX_PKG_BUILD_IN_SRC=true

@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="jftui is a minimalistic, lightweight C99 command line cl
 TERMUX_PKG_LICENSE="Unlicense"
 TERMUX_PKG_MAINTAINER="Maxr1998 <max.rumpf1998@gmail.com>"
 TERMUX_PKG_VERSION="0.5.2"
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/Aanok/jftui/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=8416a43c5ad8294eddb77f919356f04a511ef0dfa2e2943e8c26e763760c2c49
 TERMUX_PKG_AUTO_UPDATE=true

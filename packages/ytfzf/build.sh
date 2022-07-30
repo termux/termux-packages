@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A POSIX script that helps you find Youtube videos (witho
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.4.0
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/pystardust/ytfzf/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=887cced6619f3d941f95c8b08c1446699951bb75f0e8c6eaf22d6992548d8f59
 TERMUX_PKG_DEPENDS="curl, jq"

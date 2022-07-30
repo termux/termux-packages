@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Sumneko Lua Language Server coded in Lua"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.org>"
 TERMUX_PKG_VERSION="3.5.1"
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_GIT_BRANCH="${TERMUX_PKG_VERSION}"
 TERMUX_PKG_SRCURL="https://github.com/sumneko/lua-language-server.git"
 TERMUX_PKG_DEPENDS="libandroid-spawn"

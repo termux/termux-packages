@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Unicorn is a lightweight multi-platform, multi-architect
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.0.0
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/unicorn-engine/unicorn/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=67b445c760e2bbac663e8c8bc410e43311c7fc92df4dfa8d90e06a021d07f634
 TERMUX_PKG_AUTO_UPDATE=true

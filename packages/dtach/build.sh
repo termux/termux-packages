@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Emulates the detach feature of screen"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.9
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/sourceforge/dtach/dtach-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=32e9fd6923c553c443fab4ec9c1f95d83fa47b771e6e1dafb018c567291492f3
 

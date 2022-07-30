@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Dialog allowing secure password entry"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.2.0
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://www.gnupg.org/ftp/gcrypt/pinentry/pinentry-$TERMUX_PKG_VERSION.tar.bz2
 TERMUX_PKG_SHA256=10072045a3e043d0581f91cd5676fcac7ffee957a16636adedaa4f583a616470
 TERMUX_PKG_DEPENDS="libandroid-support, libassuan, libiconv, ncurses"

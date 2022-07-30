@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A tool for building, changing, and versioning infrastruc
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.2.1
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/hashicorp/terraform/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=d244277c3b8d10afa8d130cfd9db3570995a03a34052952de1ab2368fc25ab1c
 TERMUX_PKG_DEPENDS="git"

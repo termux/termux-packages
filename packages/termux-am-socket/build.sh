@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A faster version of am with less features that only work
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.5.0
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/termux/termux-am-socket/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=5175023c7fd675492451a72d06b75c772f257685b69fe117227bae5a5e6f5494
 

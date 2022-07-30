@@ -8,6 +8,7 @@ TERMUX_PKG_REPLACES="readline-dev"
 _MAIN_VERSION=8.1
 _PATCH_VERSION=1
 TERMUX_PKG_VERSION=$_MAIN_VERSION.$_PATCH_VERSION
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/readline/readline-${_MAIN_VERSION}.tar.gz
 TERMUX_PKG_SHA256=f8ceb4ee131e3232226a17f51b164afc46cd0b9e6cef344be87c65962cb82b02
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-curses --enable-multibyte bash_cv_wcwidth_broken=no"

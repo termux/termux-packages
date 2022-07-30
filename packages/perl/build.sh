@@ -10,6 +10,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # - psutils
 # - subversion
 TERMUX_PKG_VERSION=(5.36.0
+TERMUX_PKG_REVISION=0
                     1.4)
 TERMUX_PKG_SHA256=(e26085af8ac396f62add8a533c3a0ea8c8497d836f0689347ac5abd7b7a4e00a
                    be9d9f9f7148edff7a2f9695ba3cb7e3975eff6b25a9a81dd311725fd757aa91)

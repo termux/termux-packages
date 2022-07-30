@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A neofetch-like tool for fetching system information and
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.6.1"
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SRCURL=https://github.com/LinusDierheimer/fastfetch/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=59eb19b5a1c7f8e29831d8a215d7a58eb88f269362cca4b8c4add5ae672c6f29
 TERMUX_PKG_AUTO_UPDATE=true
