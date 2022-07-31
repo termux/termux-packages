@@ -83,12 +83,19 @@ termux_step_start_build() {
 		# a continued build
 		return
 	fi
-
-	local TERMUX_ELF_CLEANER_VERSION
-	TERMUX_ELF_CLEANER_VERSION=$(bash -c ". $TERMUX_SCRIPTDIR/packages/termux-elf-cleaner/build.sh; echo \$TERMUX_PKG_VERSION")
-	termux_download \
-		"https://github.com/termux/termux-elf-cleaner/releases/download/v${TERMUX_ELF_CLEANER_VERSION}/termux-elf-cleaner" \
-		"$TERMUX_ELF_CLEANER" \
-		7c29143b9cffb3a9a580f39a7966b2bb36c5fc099da6f4c98dcdedacb14f08a2
-	chmod u+x "$TERMUX_ELF_CLEANER"
+	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
+		case "$TERMUX_APP_PACKAGE_MANAGER" in
+			"apt") apt install -y termux-elf-cleaner;
+			"pacman") pacman -S termux-elf-cleaner --needed --noconfirm;;
+		esac
+		TERMUX_ELF_CLEANER="$(command -v termux-elf-cleaner)"
+	else
+		local TERMUX_ELF_CLEANER_VERSION
+		TERMUX_ELF_CLEANER_VERSION=$(bash -c ". $TERMUX_SCRIPTDIR/packages/termux-elf-cleaner/build.sh; echo \$TERMUX_PKG_VERSION")
+		termux_download \
+			"https://github.com/termux/termux-elf-cleaner/releases/download/v${TERMUX_ELF_CLEANER_VERSION}/termux-elf-cleaner" \
+			"$TERMUX_ELF_CLEANER" \
+			7c29143b9cffb3a9a580f39a7966b2bb36c5fc099da6f4c98dcdedacb14f08a2
+		chmod u+x "$TERMUX_ELF_CLEANER"
+	fi
 }
