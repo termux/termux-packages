@@ -85,7 +85,7 @@ termux_step_start_build() {
 	fi
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
 		case "$TERMUX_APP_PACKAGE_MANAGER" in
-			"apt") apt install -y termux-elf-cleaner;
+			"apt") apt install -y termux-elf-cleaner;;
 			"pacman") pacman -S termux-elf-cleaner --needed --noconfirm;;
 		esac
 		TERMUX_ELF_CLEANER="$(command -v termux-elf-cleaner)"
