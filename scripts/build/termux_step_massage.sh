@@ -88,15 +88,15 @@ termux_step_massage() {
 	# https://github.com/android/ndk/issues/1614, or
 	# https://github.com/termux/termux-packages/issues/9944
 	if [ -d "lib" ]; then
-		SYMBOLS="$(llvm-readelf -s $($TERMUX_HOST_PLATFORM-clang -print-libgcc-file-name) | grep "FUNC    GLOBAL HIDDEN" | awk '{print $8}')"
+		SYMBOLS="$($READELF -s $($TERMUX_HOST_PLATFORM-clang -print-libgcc-file-name) | grep "FUNC    GLOBAL HIDDEN" | awk '{print $8}')"
 		SYMBOLS+=" $(echo libandroid_{sem_{open,close,unlink},shm{ctl,get,at,dt}})"
 		grep_pattern="$(create_grep_pattern $SYMBOLS)"
 		for lib in "$(find lib -name "*.so")"; do
-			if ! llvm-readelf -h "$lib" &> /dev/null; then
+			if ! $READELF -h "$lib" &> /dev/null; then
 				continue
 			fi
-			if llvm-readelf -s "$lib" | egrep "${grep_pattern}" &> /dev/null; then
-				termux_error_exit "$lib contains undefined symbols:\n$(llvm-readelf -s "$lib" | egrep "${grep_pattern}")"
+			if $READELF -s "$lib" | egrep "${grep_pattern}" &> /dev/null; then
+				termux_error_exit "$lib contains undefined symbols:\n$($READELF -s "$lib" | egrep "${grep_pattern}")"
 			fi
 		done
 	fi
