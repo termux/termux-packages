@@ -5,7 +5,6 @@ TERMUX_PKG_MAINTAINER="@termux-user-repository"
 # Don't forget to bump the REVISION of python-scipy.
 TERMUX_PKG_VERSION=1.23.0
 TERMUX_PKG_SRCURL=https://github.com/numpy/numpy.git
-TERMUX_PKG_PROVIDES="python-numpy"
 TERMUX_PKG_DEPENDS="libc++, python"
 TERMUX_PKG_BUILD_IN_SRC=true
 
