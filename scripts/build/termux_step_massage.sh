@@ -93,7 +93,7 @@ termux_step_massage() {
 		grep_pattern="$(create_grep_pattern $SYMBOLS)"
 		for lib in "$(find lib -name "*.so")"; do
 			if ! llvm-readelf -h "$lib" &> /dev/null; then
-				return
+				continue
 			fi
 			if llvm-readelf -s "$lib" | egrep "${grep_pattern}" &> /dev/null; then
 				termux_error_exit "$lib contains undefined symbols:\n$(llvm-readelf -s "$lib" | egrep "${grep_pattern}")"
