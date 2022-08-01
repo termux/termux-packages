@@ -9,15 +9,16 @@ TERMUX_PKG_PROVIDES="python-numpy"
 TERMUX_PKG_DEPENDS="libc++, python"
 TERMUX_PKG_BUILD_IN_SRC=true
 
-_PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
-
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/
 "
 
-if $TERMUX_ON_DEVICE_BUILD; then
-	termux_error_exit "Package '$TERMUX_PKG_NAME' is not available for on-device builds."
-fi
+termux_step_pre_configure() {
+	if $TERMUX_ON_DEVICE_BUILD; then
+		termux_error_exit "Package '$TERMUX_PKG_NAME' is not available for on-device builds."
+	fi
+	_PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
+}
 
 termux_step_configure() {
 	termux_setup_python_crossenv
