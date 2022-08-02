@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Qt 5 Multimedia Library"
 TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
 TERMUX_PKG_VERSION=5.15.3
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/5.15/${TERMUX_PKG_VERSION}/submodules/qtmultimedia-everywhere-opensource-src-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=2ebaa33720b808aa074fd15b9de506c1e89b670b39c7d4b62cb859e70ce606f0
 # qt5-qtdeclarative is not needed because quick widget requires OpenGL
