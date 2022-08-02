@@ -4,10 +4,9 @@ Fixes errors like:
 
 There's probably a better way to fix this. This patch will be annoying to maintain..
 
-diff -u -r ../LVM2.2.03.16.orig/configure ./configure
-diff -u -r ../LVM2.2.03.16.orig/daemons/dmeventd/dmeventd.c ./daemons/dmeventd/dmeventd.c
---- ../LVM2.2.03.16.orig/daemons/dmeventd/dmeventd.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./daemons/dmeventd/dmeventd.c	2022-06-30 16:18:13.510063540 +0200
+diff -ur ../LVM2.2.03.16/daemons/dmeventd/dmeventd.c ./daemons/dmeventd/dmeventd.c
+--- ../LVM2.2.03.16/daemons/dmeventd/dmeventd.c	2022-05-18 18:24:20.000000000 +0200
++++ ./daemons/dmeventd/dmeventd.c	2022-08-02 16:33:12.749449426 +0200
 @@ -729,7 +729,7 @@
  				message_data->id, getpid(),
  				_foreground ? "no" : "yes",
@@ -68,9 +67,9 @@ diff -u -r ../LVM2.2.03.16.orig/daemons/dmeventd/dmeventd.c ./daemons/dmeventd/d
  
  	DEBUGLOG("<<< CMD:%s (0x%x) completed (result %d).", decode_cmd(cmd), cmd, msg.cmd);
  
-diff -u -r ../LVM2.2.03.16.orig/daemons/dmeventd/libdevmapper-event.c ./daemons/dmeventd/libdevmapper-event.c
---- ../LVM2.2.03.16.orig/daemons/dmeventd/libdevmapper-event.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./daemons/dmeventd/libdevmapper-event.c	2022-06-30 16:18:13.513396942 +0200
+diff -ur ../LVM2.2.03.16/daemons/dmeventd/libdevmapper-event.c ./daemons/dmeventd/libdevmapper-event.c
+--- ../LVM2.2.03.16/daemons/dmeventd/libdevmapper-event.c	2022-05-18 18:24:20.000000000 +0200
++++ ./daemons/dmeventd/libdevmapper-event.c	2022-08-02 16:33:12.749449426 +0200
 @@ -379,7 +379,7 @@
  	 * read status return code from daemon.
  	 */
@@ -89,9 +88,9 @@ diff -u -r ../LVM2.2.03.16.orig/daemons/dmeventd/libdevmapper-event.c ./daemons/
  			return -EIO;
  		}
  	} while (!_check_message_id(msg));
-diff -u -r ../LVM2.2.03.16.orig/daemons/dmeventd/plugins/thin/dmeventd_thin.c ./daemons/dmeventd/plugins/thin/dmeventd_thin.c
---- ../LVM2.2.03.16.orig/daemons/dmeventd/plugins/thin/dmeventd_thin.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./daemons/dmeventd/plugins/thin/dmeventd_thin.c	2022-06-30 16:18:13.416728276 +0200
+diff -ur ../LVM2.2.03.16/daemons/dmeventd/plugins/thin/dmeventd_thin.c ./daemons/dmeventd/plugins/thin/dmeventd_thin.c
+--- ../LVM2.2.03.16/daemons/dmeventd/plugins/thin/dmeventd_thin.c	2022-05-18 18:24:20.000000000 +0200
++++ ./daemons/dmeventd/plugins/thin/dmeventd_thin.c	2022-08-02 16:33:12.749449426 +0200
 @@ -185,7 +185,7 @@
  		if (_use_policy(dmt, state))
  			goto out;
@@ -101,9 +100,9 @@ diff -u -r ../LVM2.2.03.16.orig/daemons/dmeventd/plugins/thin/dmeventd_thin.c ./
  
  		/*
  		 * Rather update oldish status
-diff -u -r ../LVM2.2.03.16.orig/daemons/dmeventd/plugins/vdo/dmeventd_vdo.c ./daemons/dmeventd/plugins/vdo/dmeventd_vdo.c
---- ../LVM2.2.03.16.orig/daemons/dmeventd/plugins/vdo/dmeventd_vdo.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./daemons/dmeventd/plugins/vdo/dmeventd_vdo.c	2022-06-30 16:18:13.506730138 +0200
+diff -ur ../LVM2.2.03.16/daemons/dmeventd/plugins/vdo/dmeventd_vdo.c ./daemons/dmeventd/plugins/vdo/dmeventd_vdo.c
+--- ../LVM2.2.03.16/daemons/dmeventd/plugins/vdo/dmeventd_vdo.c	2022-05-18 18:24:20.000000000 +0200
++++ ./daemons/dmeventd/plugins/vdo/dmeventd_vdo.c	2022-08-02 16:33:12.749449426 +0200
 @@ -178,7 +178,7 @@
  		if (_use_policy(dmt, state))
  			goto out;
@@ -113,9 +112,9 @@ diff -u -r ../LVM2.2.03.16.orig/daemons/dmeventd/plugins/vdo/dmeventd_vdo.c ./da
  
  		if (!(new_dmt = dm_task_create(DM_DEVICE_STATUS)))
  			goto_out;
-diff -u -r ../LVM2.2.03.16.orig/device_mapper/ioctl/libdm-iface.c ./device_mapper/ioctl/libdm-iface.c
---- ../LVM2.2.03.16.orig/device_mapper/ioctl/libdm-iface.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./device_mapper/ioctl/libdm-iface.c	2022-06-30 16:18:13.223390943 +0200
+diff -ur ../LVM2.2.03.16/device_mapper/ioctl/libdm-iface.c ./device_mapper/ioctl/libdm-iface.c
+--- ../LVM2.2.03.16/device_mapper/ioctl/libdm-iface.c	2022-05-18 18:24:20.000000000 +0200
++++ ./device_mapper/ioctl/libdm-iface.c	2022-08-02 16:33:12.749449426 +0200
 @@ -565,7 +565,7 @@
  
  	r = dm_task_run(task);
@@ -184,9 +183,9 @@ diff -u -r ../LVM2.2.03.16.orig/device_mapper/ioctl/libdm-iface.c ./device_mappe
  
  	if (r < 0 && dmt->expected_errno != errno) {
  		dmt->ioctl_errno = errno;
-diff -u -r ../LVM2.2.03.16.orig/device_mapper/libdm-common.c ./device_mapper/libdm-common.c
---- ../LVM2.2.03.16.orig/device_mapper/libdm-common.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./device_mapper/libdm-common.c	2022-06-30 16:18:13.143389288 +0200
+diff -ur ../LVM2.2.03.16/device_mapper/libdm-common.c ./device_mapper/libdm-common.c
+--- ../LVM2.2.03.16/device_mapper/libdm-common.c	2022-05-18 18:24:20.000000000 +0200
++++ ./device_mapper/libdm-common.c	2022-08-02 16:33:12.749449426 +0200
 @@ -1812,7 +1812,7 @@
  	while (!feof(minfo) && fgets(buffer, sizeof(buffer), minfo))
  		if (!_mountinfo_parse_line(buffer, &maj, &min, target) ||
@@ -241,9 +240,9 @@ diff -u -r ../LVM2.2.03.16.orig/device_mapper/libdm-common.c ./device_mapper/lib
  
  	*cookie = 0;
  
-diff -u -r ../LVM2.2.03.16.orig/device_mapper/libdm-deptree.c ./device_mapper/libdm-deptree.c
---- ../LVM2.2.03.16.orig/device_mapper/libdm-deptree.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./device_mapper/libdm-deptree.c	2022-06-30 16:18:13.146722690 +0200
+diff -ur ../LVM2.2.03.16/device_mapper/libdm-deptree.c ./device_mapper/libdm-deptree.c
+--- ../LVM2.2.03.16/device_mapper/libdm-deptree.c	2022-05-18 18:24:20.000000000 +0200
++++ ./device_mapper/libdm-deptree.c	2022-08-02 16:33:12.749449426 +0200
 @@ -640,7 +640,7 @@
  			"%s (" FMTu32 ":" FMTu32 ")",
  			dnode->name ? dnode->name : "",
@@ -494,9 +493,9 @@ diff -u -r ../LVM2.2.03.16.orig/device_mapper/libdm-deptree.c ./device_mapper/li
  		dm_tree_set_cookie(dnode, 0);
  
  		if (r && !dnode->info.exists && dnode->callback &&
-diff -u -r ../LVM2.2.03.16.orig/device_mapper/libdm-file.c ./device_mapper/libdm-file.c
---- ../LVM2.2.03.16.orig/device_mapper/libdm-file.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./device_mapper/libdm-file.c	2022-06-30 16:18:13.083388046 +0200
+diff -ur ../LVM2.2.03.16/device_mapper/libdm-file.c ./device_mapper/libdm-file.c
+--- ../LVM2.2.03.16/device_mapper/libdm-file.c	2022-05-18 18:24:20.000000000 +0200
++++ ./device_mapper/libdm-file.c	2022-08-02 16:33:12.749449426 +0200
 @@ -252,12 +252,12 @@
                 log_error("Cannot check lock status of lockfile [%s], error was [%s]",
                           lockfile, strerror(errno));
@@ -512,9 +511,9 @@ diff -u -r ../LVM2.2.03.16.orig/device_mapper/libdm-file.c ./device_mapper/libdm
  
         return (lock.l_type == F_UNLCK) ? 0 : 1;
  }
-diff -u -r ../LVM2.2.03.16.orig/device_mapper/libdm-report.c ./device_mapper/libdm-report.c
---- ../LVM2.2.03.16.orig/device_mapper/libdm-report.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./device_mapper/libdm-report.c	2022-06-30 16:18:13.083388046 +0200
+diff -ur ../LVM2.2.03.16/device_mapper/libdm-report.c ./device_mapper/libdm-report.c
+--- ../LVM2.2.03.16/device_mapper/libdm-report.c	2022-05-18 18:24:20.000000000 +0200
++++ ./device_mapper/libdm-report.c	2022-08-02 16:33:12.749449426 +0200
 @@ -836,7 +836,7 @@
  	}
  
@@ -524,9 +523,9 @@ diff -u -r ../LVM2.2.03.16.orig/device_mapper/libdm-report.c ./device_mapper/lib
  		dm_pool_free(rh->mem, fp);
  		return NULL;
  	}
-diff -u -r ../LVM2.2.03.16.orig/device_mapper/libdm-timestamp.c ./device_mapper/libdm-timestamp.c
---- ../LVM2.2.03.16.orig/device_mapper/libdm-timestamp.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./device_mapper/libdm-timestamp.c	2022-06-30 16:18:13.076721242 +0200
+diff -ur ../LVM2.2.03.16/device_mapper/libdm-timestamp.c ./device_mapper/libdm-timestamp.c
+--- ../LVM2.2.03.16/device_mapper/libdm-timestamp.c	2022-05-18 18:24:20.000000000 +0200
++++ ./device_mapper/libdm-timestamp.c	2022-08-02 16:33:12.749449426 +0200
 @@ -55,7 +55,7 @@
  	struct dm_timestamp *ts = NULL;
  
@@ -545,9 +544,9 @@ diff -u -r ../LVM2.2.03.16.orig/device_mapper/libdm-timestamp.c ./device_mapper/
  
  	return ts;
  }
-diff -u -r ../LVM2.2.03.16.orig/device_mapper/regex/parse_rx.c ./device_mapper/regex/parse_rx.c
---- ../LVM2.2.03.16.orig/device_mapper/regex/parse_rx.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./device_mapper/regex/parse_rx.c	2022-06-30 16:18:13.223390943 +0200
+diff -ur ../LVM2.2.03.16/device_mapper/regex/parse_rx.c ./device_mapper/regex/parse_rx.c
+--- ../LVM2.2.03.16/device_mapper/regex/parse_rx.c	2022-05-18 18:24:20.000000000 +0200
++++ ./device_mapper/regex/parse_rx.c	2022-08-02 16:33:12.749449426 +0200
 @@ -377,7 +377,7 @@
  		return l;
  
@@ -566,9 +565,9 @@ diff -u -r ../LVM2.2.03.16.orig/device_mapper/regex/parse_rx.c ./device_mapper/r
  
  	return n;
  }
-diff -u -r ../LVM2.2.03.16.orig/lib/activate/activate.c ./lib/activate/activate.c
---- ../LVM2.2.03.16.orig/lib/activate/activate.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/activate/activate.c	2022-06-30 16:18:10.473334049 +0200
+diff -ur ../LVM2.2.03.16/lib/activate/activate.c ./lib/activate/activate.c
+--- ../LVM2.2.03.16/lib/activate/activate.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/activate/activate.c	2022-08-02 16:33:12.749449426 +0200
 @@ -888,7 +888,7 @@
  		log_debug_activation("Retrying open_count check for %s.",
  				     display_lvname(lv));
@@ -841,9 +840,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/activate/activate.c ./lib/activate/activate.
  out:
  	return r;
  }
-diff -u -r ../LVM2.2.03.16.orig/lib/activate/dev_manager.c ./lib/activate/dev_manager.c
---- ../LVM2.2.03.16.orig/lib/activate/dev_manager.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/activate/dev_manager.c	2022-06-30 16:18:10.473334049 +0200
+diff -ur ../LVM2.2.03.16/lib/activate/dev_manager.c ./lib/activate/dev_manager.c
+--- ../LVM2.2.03.16/lib/activate/dev_manager.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/activate/dev_manager.c	2022-08-02 16:33:12.752782843 +0200
 @@ -336,7 +336,7 @@
  
  		if (!target_name ||
@@ -889,9 +888,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/activate/dev_manager.c ./lib/activate/dev_ma
  out:
  	dm_pool_free(cmd->mem, name);
  
-diff -u -r ../LVM2.2.03.16.orig/lib/activate/fs.c ./lib/activate/fs.c
---- ../LVM2.2.03.16.orig/lib/activate/fs.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/activate/fs.c	2022-06-30 16:18:10.473334049 +0200
+diff -ur ../LVM2.2.03.16/lib/activate/fs.c ./lib/activate/fs.c
+--- ../LVM2.2.03.16/lib/activate/fs.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/activate/fs.c	2022-08-02 16:33:12.752782843 +0200
 @@ -286,10 +286,10 @@
  	case FS_RENAME:
  		if (old_lv_name && !_rm_link(dev_dir, vg_name, old_lv_name,
@@ -914,9 +913,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/activate/fs.c ./lib/activate/fs.c
  		_fs_cookie = DM_COOKIE_AUTO_CREATE; /* Reset cookie */
  		dm_lib_release();
  		_pop_fs_ops();
-diff -u -r ../LVM2.2.03.16.orig/lib/cache/lvmcache.c ./lib/cache/lvmcache.c
---- ../LVM2.2.03.16.orig/lib/cache/lvmcache.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/cache/lvmcache.c	2022-06-30 16:18:10.480000854 +0200
+diff -ur ../LVM2.2.03.16/lib/cache/lvmcache.c ./lib/cache/lvmcache.c
+--- ../LVM2.2.03.16/lib/cache/lvmcache.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/cache/lvmcache.c	2022-08-02 16:33:12.756116260 +0200
 @@ -618,7 +618,7 @@
  	dm_list_iterate_items(devl, &_unused_duplicates) {
  		memcpy(&id, devl->dev->pvid, ID_LEN);
@@ -967,9 +966,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/cache/lvmcache.c ./lib/cache/lvmcache.c
  		}
  	}
  }
-diff -u -r ../LVM2.2.03.16.orig/lib/commands/toolcontext.c ./lib/commands/toolcontext.c
---- ../LVM2.2.03.16.orig/lib/commands/toolcontext.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/commands/toolcontext.c	2022-06-30 16:18:10.513334877 +0200
+diff -ur ../LVM2.2.03.16/lib/commands/toolcontext.c ./lib/commands/toolcontext.c
+--- ../LVM2.2.03.16/lib/commands/toolcontext.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/commands/toolcontext.c	2022-08-02 16:33:12.756116260 +0200
 @@ -128,7 +128,7 @@
  	free(line);
  
@@ -1006,9 +1005,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/commands/toolcontext.c ./lib/commands/toolco
  	_destroy_dev_types(cmd);
  	_destroy_tags(cmd);
  
-diff -u -r ../LVM2.2.03.16.orig/lib/config/config.c ./lib/config/config.c
---- ../LVM2.2.03.16.orig/lib/config/config.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/config/config.c	2022-06-30 16:18:10.513334877 +0200
+diff -ur ../LVM2.2.03.16/lib/config/config.c ./lib/config/config.c
+--- ../LVM2.2.03.16/lib/config/config.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/config/config.c	2022-08-02 16:33:12.756116260 +0200
 @@ -253,7 +253,7 @@
  		cf = cs->source.file;
  		if (cf && cf->dev)
@@ -1045,9 +1044,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/config/config.c ./lib/config/config.c
  		chunk_size = DEFAULT_THIN_POOL_CHUNK_SIZE * 2;
  	}
  
-diff -u -r ../LVM2.2.03.16.orig/lib/device/bcache.c ./lib/device/bcache.c
---- ../LVM2.2.03.16.orig/lib/device/bcache.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/device/bcache.c	2022-06-30 16:18:10.486667659 +0200
+diff -ur ../LVM2.2.03.16/lib/device/bcache.c ./lib/device/bcache.c
+--- ../LVM2.2.03.16/lib/device/bcache.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/device/bcache.c	2022-08-02 16:33:12.756116260 +0200
 @@ -1180,7 +1180,7 @@
  		log_warn("some blocks are still locked");
  
@@ -1057,9 +1056,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/device/bcache.c ./lib/device/bcache.c
  	_wait_all(cache);
  	_exit_free_list(cache);
  	radix_tree_destroy(cache->rtree);
-diff -u -r ../LVM2.2.03.16.orig/lib/device/dev-cache.c ./lib/device/dev-cache.c
---- ../LVM2.2.03.16.orig/lib/device/dev-cache.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/device/dev-cache.c	2022-06-30 16:18:10.486667659 +0200
+diff -ur ../LVM2.2.03.16/lib/device/dev-cache.c ./lib/device/dev-cache.c
+--- ../LVM2.2.03.16/lib/device/dev-cache.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/device/dev-cache.c	2022-08-02 16:33:12.756116260 +0200
 @@ -1308,7 +1308,7 @@
  				  dev_name(dev), dev->open_count);
  			num_open++;
@@ -1096,9 +1095,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/device/dev-cache.c ./lib/device/dev-cache.c
  		}
  		break;
  	}
-diff -u -r ../LVM2.2.03.16.orig/lib/device/dev-dasd.c ./lib/device/dev-dasd.c
---- ../LVM2.2.03.16.orig/lib/device/dev-dasd.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/device/dev-dasd.c	2022-06-30 16:18:10.493334464 +0200
+diff -ur ../LVM2.2.03.16/lib/device/dev-dasd.c ./lib/device/dev-dasd.c
+--- ../LVM2.2.03.16/lib/device/dev-dasd.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/device/dev-dasd.c	2022-08-02 16:33:12.756116260 +0200
 @@ -96,7 +96,7 @@
  
  out:
@@ -1108,9 +1107,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/device/dev-dasd.c ./lib/device/dev-dasd.c
  
  	return ret;
  }
-diff -u -r ../LVM2.2.03.16.orig/lib/device/device_id.c ./lib/device/device_id.c
---- ../LVM2.2.03.16.orig/lib/device/device_id.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/device/device_id.c	2022-06-30 16:18:10.486667659 +0200
+diff -ur ../LVM2.2.03.16/lib/device/device_id.c ./lib/device/device_id.c
+--- ../LVM2.2.03.16/lib/device/device_id.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/device/device_id.c	2022-08-02 16:33:12.756116260 +0200
 @@ -64,7 +64,7 @@
  	if (!(fp = fopen(_searched_file, "w")))
  		return;
@@ -1234,9 +1233,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/device/device_id.c ./lib/device/device_id.c
  	_devices_fd = -1;
  }
  
-diff -u -r ../LVM2.2.03.16.orig/lib/device/dev-io.c ./lib/device/dev-io.c
---- ../LVM2.2.03.16.orig/lib/device/dev-io.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/device/dev-io.c	2022-06-30 16:18:10.486667659 +0200
+diff -ur ../LVM2.2.03.16/lib/device/dev-io.c ./lib/device/dev-io.c
+--- ../LVM2.2.03.16/lib/device/dev-io.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/device/dev-io.c	2022-08-02 16:33:12.756116260 +0200
 @@ -109,7 +109,7 @@
  	if (ioctl(fd, BLKGETSIZE64, size) < 0) {
  		log_warn("WARNING: %s: ioctl BLKGETSIZE64 %s", name, strerror(errno));
@@ -1325,9 +1324,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/device/dev-io.c ./lib/device/dev-io.c
  		return 0;
  	}
  
-diff -u -r ../LVM2.2.03.16.orig/lib/device/dev-md.c ./lib/device/dev-md.c
---- ../LVM2.2.03.16.orig/lib/device/dev-md.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/device/dev-md.c	2022-06-30 16:18:10.486667659 +0200
+diff -ur ../LVM2.2.03.16/lib/device/dev-md.c ./lib/device/dev-md.c
+--- ../LVM2.2.03.16/lib/device/dev-md.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/device/dev-md.c	2022-08-02 16:33:12.756116260 +0200
 @@ -179,7 +179,7 @@
  	int ret;
  
@@ -1337,9 +1336,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/device/dev-md.c ./lib/device/dev-md.c
  		return -1;
  	}
  
-diff -u -r ../LVM2.2.03.16.orig/lib/device/dev-mpath.c ./lib/device/dev-mpath.c
---- ../LVM2.2.03.16.orig/lib/device/dev-mpath.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/device/dev-mpath.c	2022-06-30 16:18:10.503334670 +0200
+diff -ur ../LVM2.2.03.16/lib/device/dev-mpath.c ./lib/device/dev-mpath.c
+--- ../LVM2.2.03.16/lib/device/dev-mpath.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/device/dev-mpath.c	2022-08-02 16:33:12.762783094 +0200
 @@ -150,15 +150,15 @@
  
  		if (section_exceptions) {
@@ -1386,9 +1385,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/device/dev-mpath.c ./lib/device/dev-mpath.c
  
  	return wwid;
  }
-diff -u -r ../LVM2.2.03.16.orig/lib/device/dev-swap.c ./lib/device/dev-swap.c
---- ../LVM2.2.03.16.orig/lib/device/dev-swap.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/device/dev-swap.c	2022-06-30 16:18:10.493334464 +0200
+diff -ur ../LVM2.2.03.16/lib/device/dev-swap.c ./lib/device/dev-swap.c
+--- ../LVM2.2.03.16/lib/device/dev-swap.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/device/dev-swap.c	2022-08-02 16:33:12.762783094 +0200
 @@ -43,7 +43,7 @@
  	int ret = 0;
  
@@ -1398,9 +1397,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/device/dev-swap.c ./lib/device/dev-swap.c
  		return -1;
  	}
  
-diff -u -r ../LVM2.2.03.16.orig/lib/display/display.c ./lib/display/display.c
---- ../LVM2.2.03.16.orig/lib/display/display.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/display/display.c	2022-06-30 16:18:12.340039335 +0200
+diff -ur ../LVM2.2.03.16/lib/display/display.c ./lib/display/display.c
+--- ../LVM2.2.03.16/lib/display/display.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/display/display.c	2022-08-02 16:33:12.762783094 +0200
 @@ -214,7 +214,7 @@
  		return;
  
@@ -1446,9 +1445,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/display/display.c ./lib/display/display.c
  		ret = 'n';
  	} else if (c == EOF) {
  		fputs("[n]\n", stderr);
-diff -u -r ../LVM2.2.03.16.orig/lib/format_text/archiver.c ./lib/format_text/archiver.c
---- ../LVM2.2.03.16.orig/lib/format_text/archiver.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/format_text/archiver.c	2022-06-30 16:18:12.100034370 +0200
+diff -ur ../LVM2.2.03.16/lib/format_text/archiver.c ./lib/format_text/archiver.c
+--- ../LVM2.2.03.16/lib/format_text/archiver.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/format_text/archiver.c	2022-08-02 16:33:12.762783094 +0200
 @@ -326,7 +326,7 @@
  
  	dm_list_iterate_items(mda, &tf->metadata_areas_in_use) {
@@ -1488,9 +1487,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/format_text/archiver.c ./lib/format_text/arc
 -		stack;
 +		log_stack;
  }
-diff -u -r ../LVM2.2.03.16.orig/lib/format_text/format-text.c ./lib/format_text/format-text.c
---- ../LVM2.2.03.16.orig/lib/format_text/format-text.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/format_text/format-text.c	2022-06-30 16:18:12.103367773 +0200
+diff -ur ../LVM2.2.03.16/lib/format_text/format-text.c ./lib/format_text/format-text.c
+--- ../LVM2.2.03.16/lib/format_text/format-text.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/format_text/format-text.c	2022-08-02 16:33:12.762783094 +0200
 @@ -1732,7 +1732,7 @@
  		return_0;
  
@@ -1500,9 +1499,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/format_text/format-text.c ./lib/format_text/
  		return 0;
  	}
  
-diff -u -r ../LVM2.2.03.16.orig/lib/format_text/import.c ./lib/format_text/import.c
---- ../LVM2.2.03.16.orig/lib/format_text/import.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/format_text/import.c	2022-06-30 16:18:12.103367773 +0200
+diff -ur ../LVM2.2.03.16/lib/format_text/import.c ./lib/format_text/import.c
+--- ../LVM2.2.03.16/lib/format_text/import.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/format_text/import.c	2022-08-02 16:33:12.762783094 +0200
 @@ -232,7 +232,7 @@
  		 * so it can use cached PV state too.
  		 */
@@ -1512,9 +1511,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/format_text/import.c ./lib/format_text/impor
  		else {
  			set_pv_devices(fid, vg);
  
-diff -u -r ../LVM2.2.03.16.orig/lib/format_text/text_label.c ./lib/format_text/text_label.c
---- ../LVM2.2.03.16.orig/lib/format_text/text_label.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/format_text/text_label.c	2022-06-30 16:18:12.003365703 +0200
+diff -ur ../LVM2.2.03.16/lib/format_text/text_label.c ./lib/format_text/text_label.c
+--- ../LVM2.2.03.16/lib/format_text/text_label.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/format_text/text_label.c	2022-08-02 16:33:12.762783094 +0200
 @@ -105,7 +105,7 @@
  	memcpy(pvhdr->pv_uuid, &lvmcache_device(info)->pvid, sizeof(struct id));
  	if (!id_write_format((const struct id *)pvhdr->pv_uuid, buffer,
@@ -1524,9 +1523,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/format_text/text_label.c ./lib/format_text/t
  		buffer[0] = '\0';
  	}
  
-diff -u -r ../LVM2.2.03.16.orig/lib/label/hints.c ./lib/label/hints.c
---- ../LVM2.2.03.16.orig/lib/label/hints.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/label/hints.c	2022-06-30 16:18:12.183369427 +0200
+diff -ur ../LVM2.2.03.16/lib/label/hints.c ./lib/label/hints.c
+--- ../LVM2.2.03.16/lib/label/hints.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/label/hints.c	2022-08-02 16:33:12.762783094 +0200
 @@ -235,7 +235,7 @@
  	if (!(fp = fopen(_newhints_file, "w")))
  		return_0;
@@ -1635,9 +1634,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/label/hints.c ./lib/label/hints.c
  }
  
  /*
-diff -u -r ../LVM2.2.03.16.orig/lib/label/label.c ./lib/label/label.c
---- ../LVM2.2.03.16.orig/lib/label/label.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/label/label.c	2022-06-30 16:18:12.180036025 +0200
+diff -ur ../LVM2.2.03.16/lib/label/label.c ./lib/label/label.c
+--- ../LVM2.2.03.16/lib/label/label.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/label/label.c	2022-08-02 16:33:12.766116510 +0200
 @@ -2042,7 +2042,7 @@
  	unsigned int bs;
  
@@ -1647,9 +1646,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/label/label.c ./lib/label/label.c
  		return; /* FIXME: error path ? */
  	}
  
-diff -u -r ../LVM2.2.03.16.orig/lib/locking/locking.c ./lib/locking/locking.c
---- ../LVM2.2.03.16.orig/lib/locking/locking.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/locking/locking.c	2022-06-30 16:18:10.563335911 +0200
+diff -ur ../LVM2.2.03.16/lib/locking/locking.c ./lib/locking/locking.c
+--- ../LVM2.2.03.16/lib/locking/locking.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/locking/locking.c	2022-08-02 16:33:12.766116510 +0200
 @@ -187,7 +187,7 @@
  		/* ensure signals are blocked while VG_GLOBAL lock is held */
  		_update_vg_lock_count(resource, flags);
@@ -1668,9 +1667,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/locking/locking.c ./lib/locking/locking.c
  			}
  			return 0;
  		}
-diff -u -r ../LVM2.2.03.16.orig/lib/locking/locking.h ./lib/locking/locking.h
---- ../LVM2.2.03.16.orig/lib/locking/locking.h	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/locking/locking.h	2022-06-30 16:18:10.513334877 +0200
+diff -ur ../LVM2.2.03.16/lib/locking/locking.h ./lib/locking/locking.h
+--- ../LVM2.2.03.16/lib/locking/locking.h	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/locking/locking.h	2022-08-02 16:33:12.766116510 +0200
 @@ -58,11 +58,11 @@
  	do { \
  		if (is_real_vg(vol)) { \
@@ -1685,9 +1684,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/locking/locking.h ./lib/locking/locking.h
  	} while (0)
  #define unlock_and_release_vg(cmd, vg, vol) \
  	do { \
-diff -u -r ../LVM2.2.03.16.orig/lib/locking/lvmlockd.c ./lib/locking/lvmlockd.c
---- ../LVM2.2.03.16.orig/lib/locking/lvmlockd.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/locking/lvmlockd.c	2022-06-30 16:18:10.513334877 +0200
+diff -ur ../LVM2.2.03.16/lib/locking/lvmlockd.c ./lib/locking/lvmlockd.c
+--- ../LVM2.2.03.16/lib/locking/lvmlockd.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/locking/lvmlockd.c	2022-08-02 16:33:12.766116510 +0200
 @@ -965,7 +965,7 @@
  		_deactivate_sanlock_lv(cmd, vg);
  		_remove_sanlock_lv(cmd, vg);
@@ -1697,10 +1696,10 @@ diff -u -r ../LVM2.2.03.16.orig/lib/locking/lvmlockd.c ./lib/locking/lvmlockd.c
  	}
  
  	daemon_reply_destroy(reply);
-diff -u -r ../LVM2.2.03.16.orig/lib/log/log.h ./lib/log/log.h
---- ../LVM2.2.03.16.orig/lib/log/log.h	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/log/log.h	2022-06-30 16:18:12.106701175 +0200
-@@ -109,7 +107,7 @@
+diff -ur ../LVM2.2.03.16/lib/log/log.h ./lib/log/log.h
+--- ../LVM2.2.03.16/lib/log/log.h	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/log/log.h	2022-08-02 16:33:12.766116510 +0200
+@@ -107,7 +107,7 @@
  #define log_err_once(x...) LOG_LINE_WITH_ERRNO(_LOG_ERR | _LOG_ONCE, EUNCLASSIFIED, x)
  #define log_fatal(x...) LOG_LINE_WITH_ERRNO(_LOG_FATAL, EUNCLASSIFIED, x)
  
@@ -1728,9 +1727,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/log/log.h ./lib/log/log.h
 +#define goto_bad	do { log_stack; goto bad; } while (0)
  
  #endif
-diff -u -r ../LVM2.2.03.16.orig/lib/lvmpolld/lvmpolld-client.c ./lib/lvmpolld/lvmpolld-client.c
---- ../LVM2.2.03.16.orig/lib/lvmpolld/lvmpolld-client.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/lvmpolld/lvmpolld-client.c	2022-06-30 16:18:10.483334256 +0200
+diff -ur ../LVM2.2.03.16/lib/lvmpolld/lvmpolld-client.c ./lib/lvmpolld/lvmpolld-client.c
+--- ../LVM2.2.03.16/lib/lvmpolld/lvmpolld-client.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/lvmpolld/lvmpolld-client.c	2022-08-02 16:33:12.766116510 +0200
 @@ -180,7 +180,7 @@
  		ret.error = 0;
  	} else {
@@ -1749,9 +1748,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/lvmpolld/lvmpolld-client.c ./lib/lvmpolld/lv
  	}
  
  out_rep:
-diff -u -r ../LVM2.2.03.16.orig/lib/metadata/cache_manip.c ./lib/metadata/cache_manip.c
---- ../LVM2.2.03.16.orig/lib/metadata/cache_manip.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/metadata/cache_manip.c	2022-06-30 16:18:11.610024233 +0200
+diff -ur ../LVM2.2.03.16/lib/metadata/cache_manip.c ./lib/metadata/cache_manip.c
+--- ../LVM2.2.03.16/lib/metadata/cache_manip.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/metadata/cache_manip.c	2022-08-02 16:33:12.766116510 +0200
 @@ -476,7 +476,7 @@
  				cache_seg->cleaner_policy = 0;
  				/* Restore normal table */
@@ -1761,9 +1760,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/metadata/cache_manip.c ./lib/metadata/cache_
  			}
  			return 0;
  		}
-diff -u -r ../LVM2.2.03.16.orig/lib/metadata/integrity_manip.c ./lib/metadata/integrity_manip.c
---- ../LVM2.2.03.16.orig/lib/metadata/integrity_manip.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/metadata/integrity_manip.c	2022-06-30 16:18:12.003365703 +0200
+diff -ur ../LVM2.2.03.16/lib/metadata/integrity_manip.c ./lib/metadata/integrity_manip.c
+--- ../LVM2.2.03.16/lib/metadata/integrity_manip.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/metadata/integrity_manip.c	2022-08-02 16:33:12.766116510 +0200
 @@ -638,7 +638,7 @@
  			goto bad;
  		}
@@ -1782,9 +1781,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/metadata/integrity_manip.c ./lib/metadata/in
  		goto_bad;
  	}
  
-diff -u -r ../LVM2.2.03.16.orig/lib/metadata/lv.c ./lib/metadata/lv.c
---- ../LVM2.2.03.16.orig/lib/metadata/lv.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/metadata/lv.c	2022-06-30 16:18:11.816695175 +0200
+diff -ur ../LVM2.2.03.16/lib/metadata/lv.c ./lib/metadata/lv.c
+--- ../LVM2.2.03.16/lib/metadata/lv.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/metadata/lv.c	2022-08-02 16:33:12.766116510 +0200
 @@ -277,7 +277,7 @@
  		goto_bad;
  
@@ -1803,9 +1802,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/metadata/lv.c ./lib/metadata/lv.c
  		else
  			parent_lv = seg->lv;
  	}
-diff -u -r ../LVM2.2.03.16.orig/lib/metadata/lv_manip.c ./lib/metadata/lv_manip.c
---- ../LVM2.2.03.16.orig/lib/metadata/lv_manip.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/metadata/lv_manip.c	2022-06-30 16:18:10.683338394 +0200
+diff -ur ../LVM2.2.03.16/lib/metadata/lv_manip.c ./lib/metadata/lv_manip.c
+--- ../LVM2.2.03.16/lib/metadata/lv_manip.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/metadata/lv_manip.c	2022-08-02 16:33:12.769449927 +0200
 @@ -2267,10 +2267,10 @@
  					       (top_level_area_index != -1) ? top_level_area_index : (int) (s * stripes_per_mimage),
  					       only_single_area_segments, fn,
@@ -1991,9 +1990,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/metadata/lv_manip.c ./lib/metadata/lv_manip.
  				goto deactivate_and_revert_new_lv;
  			}
  		}
-diff -u -r ../LVM2.2.03.16.orig/lib/metadata/metadata.c ./lib/metadata/metadata.c
---- ../LVM2.2.03.16.orig/lib/metadata/metadata.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/metadata/metadata.c	2022-06-30 16:18:11.113347290 +0200
+diff -ur ../LVM2.2.03.16/lib/metadata/metadata.c ./lib/metadata/metadata.c
+--- ../LVM2.2.03.16/lib/metadata/metadata.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/metadata/metadata.c	2022-08-02 16:33:12.769449927 +0200
 @@ -376,7 +376,7 @@
  	if (find_pv_in_vg(vg, pv_name) ||
  	    find_pv_in_vg_by_uuid(vg, &pv->id)) {
@@ -2162,9 +2161,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/metadata/metadata.c ./lib/metadata/metadata.
  		return 0;
  	}
  	*/
-diff -u -r ../LVM2.2.03.16.orig/lib/metadata/mirror.c ./lib/metadata/mirror.c
---- ../LVM2.2.03.16.orig/lib/metadata/mirror.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/metadata/mirror.c	2022-06-30 16:18:12.003365703 +0200
+diff -ur ../LVM2.2.03.16/lib/metadata/mirror.c ./lib/metadata/mirror.c
+--- ../LVM2.2.03.16/lib/metadata/mirror.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/metadata/mirror.c	2022-08-02 16:33:12.772783344 +0200
 @@ -1811,7 +1811,7 @@
  					  (region_size > lv->vg->extent_size) ?
  					  lv->vg->extent_size : region_size,
@@ -2183,9 +2182,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/metadata/mirror.c ./lib/metadata/mirror.c
  
  	alloc_destroy(ah);
  	return 1;
-diff -u -r ../LVM2.2.03.16.orig/lib/metadata/raid_manip.c ./lib/metadata/raid_manip.c
---- ../LVM2.2.03.16.orig/lib/metadata/raid_manip.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/metadata/raid_manip.c	2022-06-30 16:18:11.390019682 +0200
+diff -ur ../LVM2.2.03.16/lib/metadata/raid_manip.c ./lib/metadata/raid_manip.c
+--- ../LVM2.2.03.16/lib/metadata/raid_manip.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/metadata/raid_manip.c	2022-08-02 16:33:12.772783344 +0200
 @@ -675,7 +675,7 @@
  			  display_lvname(lock_lv));
  		vg_revert(vg);
@@ -2248,9 +2247,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/metadata/raid_manip.c ./lib/metadata/raid_ma
  						continue;
  					}
  					lv_iorig->name = tmp_name_dup;
-diff -u -r ../LVM2.2.03.16.orig/lib/metadata/thin_manip.c ./lib/metadata/thin_manip.c
---- ../LVM2.2.03.16.orig/lib/metadata/thin_manip.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/metadata/thin_manip.c	2022-06-30 16:18:11.070013061 +0200
+diff -ur ../LVM2.2.03.16/lib/metadata/thin_manip.c ./lib/metadata/thin_manip.c
+--- ../LVM2.2.03.16/lib/metadata/thin_manip.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/metadata/thin_manip.c	2022-08-02 16:33:12.772783344 +0200
 @@ -565,7 +565,7 @@
  			activate = 0; /* Was already active */
  
@@ -2260,9 +2259,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/metadata/thin_manip.c ./lib/metadata/thin_ma
  		else {
  			if (!(ret = suspend_lv_origin(lv->vg->cmd, lv)))
  				/* Send messages */
-diff -u -r ../LVM2.2.03.16.orig/lib/metadata/vg.c ./lib/metadata/vg.c
---- ../LVM2.2.03.16.orig/lib/metadata/vg.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/metadata/vg.c	2022-06-30 16:18:10.566669314 +0200
+diff -ur ../LVM2.2.03.16/lib/metadata/vg.c ./lib/metadata/vg.c
+--- ../LVM2.2.03.16/lib/metadata/vg.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/metadata/vg.c	2022-08-02 16:33:12.772783344 +0200
 @@ -112,7 +112,7 @@
  	struct lv_list *lvl;
  
@@ -2272,9 +2271,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/metadata/vg.c ./lib/metadata/vg.c
  
  	if (!(lvl = dm_pool_zalloc(vg->vgmem, sizeof(*lvl))))
  		return_0;
-diff -u -r ../LVM2.2.03.16.orig/lib/metadata/writecache_manip.c ./lib/metadata/writecache_manip.c
---- ../LVM2.2.03.16.orig/lib/metadata/writecache_manip.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/metadata/writecache_manip.c	2022-06-30 16:18:10.683338394 +0200
+diff -ur ../LVM2.2.03.16/lib/metadata/writecache_manip.c ./lib/metadata/writecache_manip.c
+--- ../LVM2.2.03.16/lib/metadata/writecache_manip.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/metadata/writecache_manip.c	2022-08-02 16:33:12.772783344 +0200
 @@ -161,7 +161,7 @@
  	}
  
@@ -2284,9 +2283,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/metadata/writecache_manip.c ./lib/metadata/w
  		return;
  	}
  
-diff -u -r ../LVM2.2.03.16.orig/lib/mirror/mirrored.c ./lib/mirror/mirrored.c
---- ../LVM2.2.03.16.orig/lib/mirror/mirrored.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/mirror/mirrored.c	2022-06-30 16:18:12.106701175 +0200
+diff -ur ../LVM2.2.03.16/lib/mirror/mirrored.c ./lib/mirror/mirrored.c
+--- ../LVM2.2.03.16/lib/mirror/mirrored.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/mirror/mirrored.c	2022-08-02 16:33:12.772783344 +0200
 @@ -380,7 +380,7 @@
  		return_0;
  
@@ -2296,9 +2295,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/mirror/mirrored.c ./lib/mirror/mirrored.c
  		return r;
  	}
  
-diff -u -r ../LVM2.2.03.16.orig/lib/misc/lvm-exec.c ./lib/misc/lvm-exec.c
---- ../LVM2.2.03.16.orig/lib/misc/lvm-exec.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/misc/lvm-exec.c	2022-06-30 16:18:12.283371495 +0200
+diff -ur ../LVM2.2.03.16/lib/misc/lvm-exec.c ./lib/misc/lvm-exec.c
+--- ../LVM2.2.03.16/lib/misc/lvm-exec.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/misc/lvm-exec.c	2022-08-02 16:33:12.772783344 +0200
 @@ -171,7 +171,7 @@
  	if (pdata->pid == 0) {
  		/* Child -> writer, convert pipe[0] to STDOUT */
@@ -2308,9 +2307,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/misc/lvm-exec.c ./lib/misc/lvm-exec.c
  		else if (close(pipefd[0 /*read*/]))
  			log_sys_error("close", "pipe[0]");
  		else if (close(STDOUT_FILENO))
-diff -u -r ../LVM2.2.03.16.orig/lib/misc/lvm-file.c ./lib/misc/lvm-file.c
---- ../LVM2.2.03.16.orig/lib/misc/lvm-file.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/misc/lvm-file.c	2022-06-30 16:18:12.280038093 +0200
+diff -ur ../LVM2.2.03.16/lib/misc/lvm-file.c ./lib/misc/lvm-file.c
+--- ../LVM2.2.03.16/lib/misc/lvm-file.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/misc/lvm-file.c	2022-08-02 16:33:12.776116760 +0200
 @@ -213,7 +213,7 @@
  		if (warn_if_read_only || (errno != EROFS && errno != EACCES))
  			log_sys_error("open", file);
@@ -2320,9 +2319,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/misc/lvm-file.c ./lib/misc/lvm-file.c
  
  		return -1;
  	}
-diff -u -r ../LVM2.2.03.16.orig/lib/misc/lvm-flock.c ./lib/misc/lvm-flock.c
---- ../LVM2.2.03.16.orig/lib/misc/lvm-flock.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/misc/lvm-flock.c	2022-06-30 16:18:12.340039335 +0200
+diff -ur ../LVM2.2.03.16/lib/misc/lvm-flock.c ./lib/misc/lvm-flock.c
+--- ../LVM2.2.03.16/lib/misc/lvm-flock.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/misc/lvm-flock.c	2022-08-02 16:33:12.776116760 +0200
 @@ -241,7 +241,7 @@
  	else {
  		free(ll->res);
@@ -2332,9 +2331,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/misc/lvm-flock.c ./lib/misc/lvm-flock.c
  	}
  
  	return r;
-diff -u -r ../LVM2.2.03.16.orig/lib/misc/lvm-wrappers.c ./lib/misc/lvm-wrappers.c
---- ../LVM2.2.03.16.orig/lib/misc/lvm-wrappers.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/misc/lvm-wrappers.c	2022-06-30 16:18:12.233370461 +0200
+diff -ur ../LVM2.2.03.16/lib/misc/lvm-wrappers.c ./lib/misc/lvm-wrappers.c
+--- ../LVM2.2.03.16/lib/misc/lvm-wrappers.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/misc/lvm-wrappers.c	2022-08-02 16:33:12.776116760 +0200
 @@ -123,12 +123,12 @@
  	if (read(fd, buf, len) != (ssize_t) len) {
  		log_sys_error("read", "read_urandom: /dev/urandom");
@@ -2350,18 +2349,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/misc/lvm-wrappers.c ./lib/misc/lvm-wrappers.
  
  	return 1;
  }
-diff -u -r ../LVM2.2.03.16.orig/lib/mm/memlock.c ./lib/mm/memlock.c
---- ../LVM2.2.03.16.orig/lib/mm/memlock.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/mm/memlock.c	2022-06-30 16:18:10.506668073 +0200
-@@ -79,7 +79,7 @@
- 
- #else				/* DEVMAPPER_SUPPORT */
- 
--static size_t _size_stack;
-+static size_t _size_log_stack;
- static size_t _size_malloc_tmp;
- static size_t _size_malloc = 2000000;
- 
+diff -ur ../LVM2.2.03.16/lib/mm/memlock.c ./lib/mm/memlock.c
+--- ../LVM2.2.03.16/lib/mm/memlock.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/mm/memlock.c	2022-08-02 16:33:59.780627134 +0200
 @@ -542,11 +542,11 @@
  		}
  
@@ -2385,9 +2375,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/mm/memlock.c ./lib/mm/memlock.c
  
  	if (!_use_mlockall) {
  		_restore_mmap();
-diff -u -r ../LVM2.2.03.16.orig/lib/raid/raid.c ./lib/raid/raid.c
---- ../LVM2.2.03.16.orig/lib/raid/raid.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/raid/raid.c	2022-06-30 16:18:10.503334670 +0200
+diff -ur ../LVM2.2.03.16/lib/raid/raid.c ./lib/raid/raid.c
+--- ../LVM2.2.03.16/lib/raid/raid.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/raid/raid.c	2022-08-02 16:33:12.776116760 +0200
 @@ -723,7 +723,7 @@
  		if ((segtype = _init_raid_segtype(cmd, &_raid_types[i], dso, monitored)) &&
  		    !lvm_register_segtype(seglib, segtype)) {
@@ -2397,9 +2387,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/raid/raid.c ./lib/raid/raid.c
  			r = 0;
  			break;
  		}
-diff -u -r ../LVM2.2.03.16.orig/lib/report/properties.c ./lib/report/properties.c
---- ../LVM2.2.03.16.orig/lib/report/properties.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./lib/report/properties.c	2022-06-30 16:18:12.176702623 +0200
+diff -ur ../LVM2.2.03.16/lib/report/properties.c ./lib/report/properties.c
+--- ../LVM2.2.03.16/lib/report/properties.c	2022-05-18 18:24:20.000000000 +0200
++++ ./lib/report/properties.c	2022-08-02 16:33:12.776116760 +0200
 @@ -155,21 +155,21 @@
  
  	if (lv_is_cache(lv) || lv_is_used_cache_pool(lv)) {
@@ -2442,9 +2432,9 @@ diff -u -r ../LVM2.2.03.16.orig/lib/report/properties.c ./lib/report/properties.
  		else {
  			percent = thin_pool_status->metadata_usage;
  			dm_pool_destroy(thin_pool_status->mem);
-diff -u -r ../LVM2.2.03.16.orig/libdm/dm-tools/dmsetup.c ./libdm/dm-tools/dmsetup.c
---- ../LVM2.2.03.16.orig/libdm/dm-tools/dmsetup.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./libdm/dm-tools/dmsetup.c	2022-06-30 16:18:16.326788476 +0200
+diff -ur ../LVM2.2.03.16/libdm/dm-tools/dmsetup.c ./libdm/dm-tools/dmsetup.c
+--- ../LVM2.2.03.16/libdm/dm-tools/dmsetup.c	2022-05-18 18:24:20.000000000 +0200
++++ ./libdm/dm-tools/dmsetup.c	2022-08-02 16:33:12.776116760 +0200
 @@ -656,7 +656,7 @@
  	/* Final interval? */
  	if (_count == 2) {
@@ -2484,9 +2474,9 @@ diff -u -r ../LVM2.2.03.16.orig/libdm/dm-tools/dmsetup.c ./libdm/dm-tools/dmsetu
  			else
  				log_debug("Timestamp:       0.000000000 seconds");
  		}
-diff -u -r ../LVM2.2.03.16.orig/libdm/ioctl/libdm-iface.c ./libdm/ioctl/libdm-iface.c
---- ../LVM2.2.03.16.orig/libdm/ioctl/libdm-iface.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./libdm/ioctl/libdm-iface.c	2022-06-30 16:18:16.636794890 +0200
+diff -ur ../LVM2.2.03.16/libdm/ioctl/libdm-iface.c ./libdm/ioctl/libdm-iface.c
+--- ../LVM2.2.03.16/libdm/ioctl/libdm-iface.c	2022-05-18 18:24:20.000000000 +0200
++++ ./libdm/ioctl/libdm-iface.c	2022-08-02 16:33:12.776116760 +0200
 @@ -558,7 +558,7 @@
  
  	r = dm_task_run(task);
@@ -2555,9 +2545,9 @@ diff -u -r ../LVM2.2.03.16.orig/libdm/ioctl/libdm-iface.c ./libdm/ioctl/libdm-if
  
  	if (r < 0 && dmt->expected_errno != errno) {
  		dmt->ioctl_errno = errno;
-diff -u -r ../LVM2.2.03.16.orig/libdm/libdm-common.c ./libdm/libdm-common.c
---- ../LVM2.2.03.16.orig/libdm/libdm-common.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./libdm/libdm-common.c	2022-06-30 16:18:16.510125603 +0200
+diff -ur ../LVM2.2.03.16/libdm/libdm-common.c ./libdm/libdm-common.c
+--- ../LVM2.2.03.16/libdm/libdm-common.c	2022-05-18 18:24:20.000000000 +0200
++++ ./libdm/libdm-common.c	2022-08-02 16:33:12.779450178 +0200
 @@ -1810,7 +1810,7 @@
  	while (!feof(minfo) && fgets(buffer, sizeof(buffer), minfo))
  		if (!_mountinfo_parse_line(buffer, &maj, &min, target) ||
@@ -2612,9 +2602,9 @@ diff -u -r ../LVM2.2.03.16.orig/libdm/libdm-common.c ./libdm/libdm-common.c
  
  	*cookie = 0;
  
-diff -u -r ../LVM2.2.03.16.orig/libdm/libdm-deptree.c ./libdm/libdm-deptree.c
---- ../LVM2.2.03.16.orig/libdm/libdm-deptree.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./libdm/libdm-deptree.c	2022-06-30 16:18:16.583460454 +0200
+diff -ur ../LVM2.2.03.16/libdm/libdm-deptree.c ./libdm/libdm-deptree.c
+--- ../LVM2.2.03.16/libdm/libdm-deptree.c	2022-05-18 18:24:20.000000000 +0200
++++ ./libdm/libdm-deptree.c	2022-08-02 16:33:12.779450178 +0200
 @@ -602,7 +602,7 @@
  			"%s (" FMTu32 ":" FMTu32 ")",
  			dnode->name ? dnode->name : "",
@@ -2856,9 +2846,9 @@ diff -u -r ../LVM2.2.03.16.orig/libdm/libdm-deptree.c ./libdm/libdm-deptree.c
  		dm_tree_set_cookie(dnode, 0);
  
  		if (r && !dnode->info.exists && dnode->callback &&
-diff -u -r ../LVM2.2.03.16.orig/libdm/libdm-file.c ./libdm/libdm-file.c
---- ../LVM2.2.03.16.orig/libdm/libdm-file.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./libdm/libdm-file.c	2022-06-30 16:18:16.446790959 +0200
+diff -ur ../LVM2.2.03.16/libdm/libdm-file.c ./libdm/libdm-file.c
+--- ../LVM2.2.03.16/libdm/libdm-file.c	2022-05-18 18:24:20.000000000 +0200
++++ ./libdm/libdm-file.c	2022-08-02 16:33:12.779450178 +0200
 @@ -251,12 +251,12 @@
                 log_error("Cannot check lock status of lockfile [%s], error was [%s]",
                           lockfile, strerror(errno));
@@ -2874,9 +2864,9 @@ diff -u -r ../LVM2.2.03.16.orig/libdm/libdm-file.c ./libdm/libdm-file.c
  
         return (lock.l_type == F_UNLCK) ? 0 : 1;
  }
-diff -u -r ../LVM2.2.03.16.orig/libdm/libdm-report.c ./libdm/libdm-report.c
---- ../LVM2.2.03.16.orig/libdm/libdm-report.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./libdm/libdm-report.c	2022-06-30 16:18:16.440124155 +0200
+diff -ur ../LVM2.2.03.16/libdm/libdm-report.c ./libdm/libdm-report.c
+--- ../LVM2.2.03.16/libdm/libdm-report.c	2022-05-18 18:24:20.000000000 +0200
++++ ./libdm/libdm-report.c	2022-08-02 16:33:12.779450178 +0200
 @@ -835,7 +835,7 @@
  	}
  
@@ -2886,9 +2876,9 @@ diff -u -r ../LVM2.2.03.16.orig/libdm/libdm-report.c ./libdm/libdm-report.c
  		dm_pool_free(rh->mem, fp);
  		return NULL;
  	}
-diff -u -r ../LVM2.2.03.16.orig/libdm/libdm-stats.c ./libdm/libdm-stats.c
---- ../LVM2.2.03.16.orig/libdm/libdm-stats.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./libdm/libdm-stats.c	2022-06-30 16:18:16.446790959 +0200
+diff -ur ../LVM2.2.03.16/libdm/libdm-stats.c ./libdm/libdm-stats.c
+--- ../LVM2.2.03.16/libdm/libdm-stats.c	2022-05-18 18:24:20.000000000 +0200
++++ ./libdm/libdm-stats.c	2022-08-02 16:33:12.779450178 +0200
 @@ -148,12 +148,12 @@
  	if (!fgets(buf, sizeof(buf), comm)) {
  		log_error("Could not read from %s", PROC_SELF_COMM);
@@ -2990,9 +2980,9 @@ diff -u -r ../LVM2.2.03.16.orig/libdm/libdm-stats.c ./libdm/libdm-stats.c
  	}
  	/* dm_free() expects a (void *). */
  	dm_free((void *) bounds);
-diff -u -r ../LVM2.2.03.16.orig/libdm/libdm-timestamp.c ./libdm/libdm-timestamp.c
---- ../LVM2.2.03.16.orig/libdm/libdm-timestamp.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./libdm/libdm-timestamp.c	2022-06-30 16:18:16.383456316 +0200
+diff -ur ../LVM2.2.03.16/libdm/libdm-timestamp.c ./libdm/libdm-timestamp.c
+--- ../LVM2.2.03.16/libdm/libdm-timestamp.c	2022-05-18 18:24:20.000000000 +0200
++++ ./libdm/libdm-timestamp.c	2022-08-02 16:33:12.779450178 +0200
 @@ -54,7 +54,7 @@
  	struct dm_timestamp *ts = NULL;
  
@@ -3011,9 +3001,9 @@ diff -u -r ../LVM2.2.03.16.orig/libdm/libdm-timestamp.c ./libdm/libdm-timestamp.
  
  	return ts;
  }
-diff -u -r ../LVM2.2.03.16.orig/libdm/regex/parse_rx.c ./libdm/regex/parse_rx.c
---- ../LVM2.2.03.16.orig/libdm/regex/parse_rx.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./libdm/regex/parse_rx.c	2022-06-30 16:18:16.636794890 +0200
+diff -ur ../LVM2.2.03.16/libdm/regex/parse_rx.c ./libdm/regex/parse_rx.c
+--- ../LVM2.2.03.16/libdm/regex/parse_rx.c	2022-05-18 18:24:20.000000000 +0200
++++ ./libdm/regex/parse_rx.c	2022-08-02 16:33:12.779450178 +0200
 @@ -377,7 +377,7 @@
  		return l;
  
@@ -3032,9 +3022,9 @@ diff -u -r ../LVM2.2.03.16.orig/libdm/regex/parse_rx.c ./libdm/regex/parse_rx.c
  
  	return n;
  }
-diff -u -r ../LVM2.2.03.16.orig/tools/command.c ./tools/command.c
---- ../LVM2.2.03.16.orig/tools/command.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./tools/command.c	2022-06-30 16:18:16.266787236 +0200
+diff -ur ../LVM2.2.03.16/tools/command.c ./tools/command.c
+--- ../LVM2.2.03.16/tools/command.c	2022-05-18 18:24:20.000000000 +0200
++++ ./tools/command.c	2022-08-02 16:33:12.782783594 +0200
 @@ -41,7 +41,7 @@
   */
  #ifdef MAN_PAGE_GENERATOR
@@ -3089,9 +3079,9 @@ diff -u -r ../LVM2.2.03.16.orig/tools/command.c ./tools/command.c
  				return 0;
  			}
  			continue;
-diff -u -r ../LVM2.2.03.16.orig/tools/dumpconfig.c ./tools/dumpconfig.c
---- ../LVM2.2.03.16.orig/tools/dumpconfig.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./tools/dumpconfig.c	2022-06-30 16:18:16.056782891 +0200
+diff -ur ../LVM2.2.03.16/tools/dumpconfig.c ./tools/dumpconfig.c
+--- ../LVM2.2.03.16/tools/dumpconfig.c	2022-05-18 18:24:20.000000000 +0200
++++ ./tools/dumpconfig.c	2022-08-02 16:33:12.782783594 +0200
 @@ -331,7 +331,7 @@
  	}
  
@@ -3101,9 +3091,9 @@ diff -u -r ../LVM2.2.03.16.orig/tools/dumpconfig.c ./tools/dumpconfig.c
  		r = ECMD_FAILED;
  	}
  out:
-diff -u -r ../LVM2.2.03.16.orig/tools/lvchange.c ./tools/lvchange.c
---- ../LVM2.2.03.16.orig/tools/lvchange.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./tools/lvchange.c	2022-06-30 16:18:15.996781651 +0200
+diff -ur ../LVM2.2.03.16/tools/lvchange.c ./tools/lvchange.c
+--- ../LVM2.2.03.16/tools/lvchange.c	2022-05-18 18:24:20.000000000 +0200
++++ ./tools/lvchange.c	2022-08-02 16:33:12.782783594 +0200
 @@ -404,7 +404,7 @@
  
  	if (!_vg_write_commit(lv, "intermediate")) {
@@ -3113,9 +3103,9 @@ diff -u -r ../LVM2.2.03.16.orig/tools/lvchange.c ./tools/lvchange.c
  		return 0;
  	}
  
-diff -u -r ../LVM2.2.03.16.orig/tools/lvconvert.c ./tools/lvconvert.c
---- ../LVM2.2.03.16.orig/tools/lvconvert.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./tools/lvconvert.c	2022-06-30 16:18:16.186785581 +0200
+diff -ur ../LVM2.2.03.16/tools/lvconvert.c ./tools/lvconvert.c
+--- ../LVM2.2.03.16/tools/lvconvert.c	2022-05-18 18:24:20.000000000 +0200
++++ ./tools/lvconvert.c	2022-08-02 16:33:12.782783594 +0200
 @@ -685,7 +685,7 @@
  
  	if (removed) {
@@ -3254,9 +3244,9 @@ diff -u -r ../LVM2.2.03.16.orig/tools/lvconvert.c ./tools/lvconvert.c
  		goto_bad;
  	}
  
-diff -u -r ../LVM2.2.03.16.orig/tools/lvconvert_poll.c ./tools/lvconvert_poll.c
---- ../LVM2.2.03.16.orig/tools/lvconvert_poll.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./tools/lvconvert_poll.c	2022-06-30 16:18:16.186785581 +0200
+diff -ur ../LVM2.2.03.16/tools/lvconvert_poll.c ./tools/lvconvert_poll.c
+--- ../LVM2.2.03.16/tools/lvconvert_poll.c	2022-05-18 18:24:20.000000000 +0200
++++ ./tools/lvconvert_poll.c	2022-08-02 16:33:12.782783594 +0200
 @@ -183,7 +183,7 @@
  		return PROGRESS_FINISHED_ALL; /* Already merged by someone else */
  
@@ -3266,9 +3256,9 @@ diff -u -r ../LVM2.2.03.16.orig/tools/lvconvert_poll.c ./tools/lvconvert_poll.c
  		return PROGRESS_CHECK_FAILED;
  	}
  
-diff -u -r ../LVM2.2.03.16.orig/tools/lvcreate.c ./tools/lvcreate.c
---- ../LVM2.2.03.16.orig/tools/lvcreate.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./tools/lvcreate.c	2022-06-30 16:18:16.056782891 +0200
+diff -ur ../LVM2.2.03.16/tools/lvcreate.c ./tools/lvcreate.c
+--- ../LVM2.2.03.16/tools/lvcreate.c	2022-05-18 18:24:20.000000000 +0200
++++ ./tools/lvcreate.c	2022-08-02 16:33:12.786117011 +0200
 @@ -1795,12 +1795,12 @@
  	int ret;
  
@@ -3302,9 +3292,9 @@ diff -u -r ../LVM2.2.03.16.orig/tools/lvcreate.c ./tools/lvcreate.c
  		return EINVALID_CMD_LINE;
  	}
  
-diff -u -r ../LVM2.2.03.16.orig/tools/lvm.c ./tools/lvm.c
---- ../LVM2.2.03.16.orig/tools/lvm.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./tools/lvm.c	2022-06-30 16:18:16.150118156 +0200
+diff -ur ../LVM2.2.03.16/tools/lvm.c ./tools/lvm.c
+--- ../LVM2.2.03.16/tools/lvm.c	2022-05-18 18:24:20.000000000 +0200
++++ ./tools/lvm.c	2022-08-02 16:33:12.786117011 +0200
 @@ -341,7 +341,7 @@
  
  	if (cmd->cmd_report.report_group) {
@@ -3314,9 +3304,9 @@ diff -u -r ../LVM2.2.03.16.orig/tools/lvm.c ./tools/lvm.c
  		cmd->cmd_report.report_group = NULL;
  	}
  
-diff -u -r ../LVM2.2.03.16.orig/tools/lvmcmdline.c ./tools/lvmcmdline.c
---- ../LVM2.2.03.16.orig/tools/lvmcmdline.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./tools/lvmcmdline.c	2022-06-30 16:18:16.100117122 +0200
+diff -ur ../LVM2.2.03.16/tools/lvmcmdline.c ./tools/lvmcmdline.c
+--- ../LVM2.2.03.16/tools/lvmcmdline.c	2022-05-18 18:24:20.000000000 +0200
++++ ./tools/lvmcmdline.c	2022-08-02 16:33:12.786117011 +0200
 @@ -3225,7 +3225,7 @@
  
  	if ((ret = _process_common_commands(cmd))) {
@@ -3339,9 +3329,9 @@ diff -u -r ../LVM2.2.03.16.orig/tools/lvmcmdline.c ./tools/lvmcmdline.c
  	}
  
  	if (ret == EINVALID_CMD_LINE && !cmd->is_interactive)
-diff -u -r ../LVM2.2.03.16.orig/tools/lvmdevices.c ./tools/lvmdevices.c
---- ../LVM2.2.03.16.orig/tools/lvmdevices.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./tools/lvmdevices.c	2022-06-30 16:18:16.150118156 +0200
+diff -ur ../LVM2.2.03.16/tools/lvmdevices.c ./tools/lvmdevices.c
+--- ../LVM2.2.03.16/tools/lvmdevices.c	2022-05-18 18:24:20.000000000 +0200
++++ ./tools/lvmdevices.c	2022-08-02 16:33:12.786117011 +0200
 @@ -265,7 +265,7 @@
  					log_print("Adding multipath device %s for multipath component %s.",
  						  dev_name(mpath_dev), dev_name(du->dev));
@@ -3351,9 +3341,9 @@ diff -u -r ../LVM2.2.03.16.orig/tools/lvmdevices.c ./tools/lvmdevices.c
  				} else {
  					log_print("Missing multipath device %s for multipath component %s.",
  						  dev_name(mpath_dev), dev_name(du->dev));
-diff -u -r ../LVM2.2.03.16.orig/tools/lvrename.c ./tools/lvrename.c
---- ../LVM2.2.03.16.orig/tools/lvrename.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./tools/lvrename.c	2022-06-30 16:18:16.270120638 +0200
+diff -ur ../LVM2.2.03.16/tools/lvrename.c ./tools/lvrename.c
+--- ../LVM2.2.03.16/tools/lvrename.c	2022-05-18 18:24:20.000000000 +0200
++++ ./tools/lvrename.c	2022-08-02 16:33:12.789450428 +0200
 @@ -187,7 +187,7 @@
  	}
  
@@ -3363,9 +3353,9 @@ diff -u -r ../LVM2.2.03.16.orig/tools/lvrename.c ./tools/lvrename.c
  		return EINVALID_CMD_LINE;
  	}
  
-diff -u -r ../LVM2.2.03.16.orig/tools/lvresize.c ./tools/lvresize.c
---- ../LVM2.2.03.16.orig/tools/lvresize.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./tools/lvresize.c	2022-06-30 16:18:16.150118156 +0200
+diff -ur ../LVM2.2.03.16/tools/lvresize.c ./tools/lvresize.c
+--- ../LVM2.2.03.16/tools/lvresize.c	2022-05-18 18:24:20.000000000 +0200
++++ ./tools/lvresize.c	2022-08-02 16:33:12.789450428 +0200
 @@ -203,7 +203,7 @@
  	int ret;
  
@@ -3375,9 +3365,9 @@ diff -u -r ../LVM2.2.03.16.orig/tools/lvresize.c ./tools/lvresize.c
  		return EINVALID_CMD_LINE;
  	}
  
-diff -u -r ../LVM2.2.03.16.orig/tools/polldaemon.c ./tools/polldaemon.c
---- ../LVM2.2.03.16.orig/tools/polldaemon.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./tools/polldaemon.c	2022-06-30 16:18:16.100117122 +0200
+diff -ur ../LVM2.2.03.16/tools/polldaemon.c ./tools/polldaemon.c
+--- ../LVM2.2.03.16/tools/polldaemon.c	2022-05-18 18:24:20.000000000 +0200
++++ ./tools/polldaemon.c	2022-08-02 16:33:12.789450428 +0200
 @@ -228,7 +228,7 @@
  		unlock_and_release_vg(cmd, vg, vg->name);
  
@@ -3405,9 +3395,9 @@ diff -u -r ../LVM2.2.03.16.orig/tools/polldaemon.c ./tools/polldaemon.c
  			ret = ECMD_FAILED;
  		}
  	} else {
-diff -u -r ../LVM2.2.03.16.orig/tools/pvck.c ./tools/pvck.c
---- ../LVM2.2.03.16.orig/tools/pvck.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./tools/pvck.c	2022-06-30 16:18:16.056782891 +0200
+diff -ur ../LVM2.2.03.16/tools/pvck.c ./tools/pvck.c
+--- ../LVM2.2.03.16/tools/pvck.c	2022-05-18 18:24:20.000000000 +0200
++++ ./tools/pvck.c	2022-08-02 16:33:12.789450428 +0200
 @@ -308,7 +308,7 @@
  	uint64_t mda2_offset;
  
@@ -3519,9 +3509,9 @@ diff -u -r ../LVM2.2.03.16.orig/tools/pvck.c ./tools/pvck.c
  	return 0;
  }
  
-diff -u -r ../LVM2.2.03.16.orig/tools/pvmove.c ./tools/pvmove.c
---- ../LVM2.2.03.16.orig/tools/pvmove.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./tools/pvmove.c	2022-06-30 16:18:16.186785581 +0200
+diff -ur ../LVM2.2.03.16/tools/pvmove.c ./tools/pvmove.c
+--- ../LVM2.2.03.16/tools/pvmove.c	2022-05-18 18:24:20.000000000 +0200
++++ ./tools/pvmove.c	2022-08-02 16:33:12.789450428 +0200
 @@ -547,7 +547,7 @@
  	r = activate_lv(cmd, lv_mirr);
  
@@ -3546,9 +3536,9 @@ diff -u -r ../LVM2.2.03.16.orig/tools/pvmove.c ./tools/pvmove.c
  				return pp.setup_result;
  			}
  		} else {
-diff -u -r ../LVM2.2.03.16.orig/tools/pvscan.c ./tools/pvscan.c
---- ../LVM2.2.03.16.orig/tools/pvscan.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./tools/pvscan.c	2022-06-30 16:18:15.996781651 +0200
+diff -ur ../LVM2.2.03.16/tools/pvscan.c ./tools/pvscan.c
+--- ../LVM2.2.03.16/tools/pvscan.c	2022-05-18 18:24:20.000000000 +0200
++++ ./tools/pvscan.c	2022-08-02 16:33:12.789450428 +0200
 @@ -76,7 +76,7 @@
  
  	if (arg_is_set(cmd, uuid_ARG)) {
@@ -3576,9 +3566,9 @@ diff -u -r ../LVM2.2.03.16.orig/tools/pvscan.c ./tools/pvscan.c
  	return ret;
  }
  
-diff -u -r ../LVM2.2.03.16.orig/tools/reporter.c ./tools/reporter.c
---- ../LVM2.2.03.16.orig/tools/reporter.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./tools/reporter.c	2022-06-30 16:18:16.100117122 +0200
+diff -ur ../LVM2.2.03.16/tools/reporter.c ./tools/reporter.c
+--- ../LVM2.2.03.16/tools/reporter.c	2022-05-18 18:24:20.000000000 +0200
++++ ./tools/reporter.c	2022-08-02 16:33:12.789450428 +0200
 @@ -1186,7 +1186,7 @@
  out:
  	if (report_handle) {
@@ -3614,9 +3604,9 @@ diff -u -r ../LVM2.2.03.16.orig/tools/reporter.c ./tools/reporter.c
  	if (tmp_log_rh)
  		dm_report_free(tmp_log_rh);
  	return 0;
-diff -u -r ../LVM2.2.03.16.orig/tools/toollib.c ./tools/toollib.c
---- ../LVM2.2.03.16.orig/tools/toollib.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./tools/toollib.c	2022-06-30 16:18:16.270120638 +0200
+diff -ur ../LVM2.2.03.16/tools/toollib.c ./tools/toollib.c
+--- ../LVM2.2.03.16/tools/toollib.c	2022-05-18 18:24:20.000000000 +0200
++++ ./tools/toollib.c	2022-08-02 16:33:12.789450428 +0200
 @@ -332,7 +332,7 @@
  	if (dm_list_empty(&pv->segments)) {
  		ret = process_single_pvseg(cmd, NULL, &_free_pv_segment, handle);
@@ -3930,9 +3920,9 @@ diff -u -r ../LVM2.2.03.16.orig/tools/toollib.c ./tools/toollib.c
  
  	/*
  	 * Don't keep devs open excl in bcache because the excl will prevent
-diff -u -r ../LVM2.2.03.16.orig/tools/vgchange.c ./tools/vgchange.c
---- ../LVM2.2.03.16.orig/tools/vgchange.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./tools/vgchange.c	2022-06-30 16:18:16.223453006 +0200
+diff -ur ../LVM2.2.03.16/tools/vgchange.c ./tools/vgchange.c
+--- ../LVM2.2.03.16/tools/vgchange.c	2022-05-18 18:24:20.000000000 +0200
++++ ./tools/vgchange.c	2022-08-02 16:33:12.789450428 +0200
 @@ -127,7 +127,7 @@
  		expected_count++;
  
@@ -3969,9 +3959,9 @@ diff -u -r ../LVM2.2.03.16.orig/tools/vgchange.c ./tools/vgchange.c
  
  		if (!start_opt || !strcmp(start_opt, "auto")) {
  			if (vp.lock_start_sanlock)
-diff -u -r ../LVM2.2.03.16.orig/tools/vgremove.c ./tools/vgremove.c
---- ../LVM2.2.03.16.orig/tools/vgremove.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./tools/vgremove.c	2022-06-30 16:18:16.056782891 +0200
+diff -ur ../LVM2.2.03.16/tools/vgremove.c ./tools/vgremove.c
+--- ../LVM2.2.03.16/tools/vgremove.c	2022-05-18 18:24:20.000000000 +0200
++++ ./tools/vgremove.c	2022-08-02 16:33:12.829451429 +0200
 @@ -60,7 +60,7 @@
  
  		if ((ret = process_each_lv_in_vg(cmd, vg, NULL, NULL, 1, &void_handle,
@@ -3981,9 +3971,9 @@ diff -u -r ../LVM2.2.03.16.orig/tools/vgremove.c ./tools/vgremove.c
  			return ret;
  		}
  	}
-diff -u -r ../LVM2.2.03.16.orig/tools/vgrename.c ./tools/vgrename.c
---- ../LVM2.2.03.16.orig/tools/vgrename.c	2022-05-18 18:24:20.000000000 +0200
-+++ ./tools/vgrename.c	2022-06-30 16:18:16.153451558 +0200
+diff -ur ../LVM2.2.03.16/tools/vgrename.c ./tools/vgrename.c
+--- ../LVM2.2.03.16/tools/vgrename.c	2022-05-18 18:24:20.000000000 +0200
++++ ./tools/vgrename.c	2022-08-02 16:33:12.829451429 +0200
 @@ -108,7 +108,7 @@
  	dev_dir = cmd->dev_dir;
  
