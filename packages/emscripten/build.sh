@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://emscripten.org
 TERMUX_PKG_DESCRIPTION="Emscripten: An LLVM-to-WebAssembly Compiler"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@truboxl"
-TERMUX_PKG_VERSION="3.1.17"
+TERMUX_PKG_VERSION="3.1.18"
 TERMUX_PKG_SRCURL=https://github.com/emscripten-core/emscripten.git
 TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
@@ -93,13 +93,13 @@ termux_pkg_auto_update() {
 
 # https://github.com/emscripten-core/emscripten/issues/11362
 # can switch to stable LLVM to save space once above is fixed
-LLVM_COMMIT=661577b5f40bb05534869b9635315e9265c37417
-LLVM_TGZ_SHA256=6caa514b918738995bdff088afb372828eee3f765a614a270ebe4f7204de5745
+LLVM_COMMIT=48129cf0ed5053ed3fdf4f928180635e84892614
+LLVM_TGZ_SHA256=315cca0c5ca54a306f670121016bd4b9972d48dd02dc6e6d4df590e07da7a723
 
 # https://github.com/emscripten-core/emscripten/issues/12252
 # upstream says better bundle the right binaryen revision for now
-BINARYEN_COMMIT=ed704448a6883e9ee0b2f6284f6b5a7b5e7b4aa9
-BINARYEN_TGZ_SHA256=a62fe07d52bc6fb912982198fe0b0d4a8b771bb3895573e9d6d034ec60424643
+BINARYEN_COMMIT=eb157d230c68cdc91c9da8841a53a80246f345d7
+BINARYEN_TGZ_SHA256=0369681e2171cd79bfd548e770cce3888551d9b6ace33d8f1d535cc74686565e
 
 # https://github.com/emscripten-core/emsdk/blob/main/emsdk.py
 # https://chromium.googlesource.com/emscripten-releases/+/refs/heads/main/src/build.py
@@ -259,7 +259,7 @@ termux_step_make_install() {
 	./tools/install.py "$TERMUX_PREFIX/opt/emscripten"
 
 	# subpackage optional third party test suite files
-	cp -fr "$TERMUX_PKG_SRCDIR/tests/third_party" "$TERMUX_PREFIX/opt/emscripten/tests/third_party"
+	cp -fr "$TERMUX_PKG_SRCDIR/test/third_party" "$TERMUX_PREFIX/opt/emscripten/test/third_party"
 
 	# first run generates .emscripten and exits immediately
 	rm -f "$TERMUX_PKG_SRCDIR/.emscripten"
@@ -346,4 +346,4 @@ termux_step_create_debscripts() {
 # - cd $PREFIX/opt/emscripten
 # - npm install --omit=optional
 # - export EMTEST_SKIP_V8=1
-# - tests/runner {test_name}
+# - test/runner {test_name}
