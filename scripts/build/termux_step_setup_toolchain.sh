@@ -1,4 +1,9 @@
 termux_step_setup_toolchain() {
+	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_COMMON_CACHEDIR/android-r${TERMUX_NDK_VERSION}-api-${TERMUX_PKG_API_LEVEL}"
+	# Bump the below version if a change is made in toolchain setup to ensure
+	# that everyone gets an updated toolchain:
+	TERMUX_STANDALONE_TOOLCHAIN+="-v0"
+
 	[ "$TERMUX_PKG_METAPACKAGE" = "true" ] && return
 
 	export CFLAGS=""
