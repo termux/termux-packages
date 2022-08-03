@@ -1,0 +1,14 @@
+TERMUX_PKG_HOMEPAGE="https://geographiclib.sourceforge.io"
+TERMUX_PKG_DESCRIPTION="Utilities and C++ library to solve some geodesic problems"
+TERMUX_PKG_GROUPS="science"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="2.1.1"
+TERMUX_PKG_SRCURL="https://sourceforge.net/projects/geographiclib/files/distrib-C%2B%2B/GeographicLib-$TERMUX_PKG_VERSION.tar.gz/download"
+TERMUX_PKG_SHA256=28080fc48e1c76560eb2f8c306404de80c13d35687f676ff47a51695506e4a0a
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_FORCE_CMAKE=true
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DBUILD_SHARED_LIBS=ON
+-DBUILD_BOTH_LIBS=OFF
+"
