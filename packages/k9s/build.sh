@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://k9scli.io
 TERMUX_PKG_DESCRIPTION="Kubernetes CLI To Manage Your Clusters In Style!"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="Krishna Kanhaiya @kcubeterm"
-TERMUX_PKG_VERSION="0.26.1"
+TERMUX_PKG_VERSION="0.26.2"
 TERMUX_PKG_SRCURL=https://github.com/derailed/k9s/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=bf3ebe038cde716df02ac1c00d5d42ecdc07e937e3c6167ded5f4863867a25b5
+TERMUX_PKG_SHA256=27c6e53a6c0202f3143a10a99f0648b4beb12d7bbfd332d90ba5e98ec6527ff4
 TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make() {
