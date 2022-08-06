@@ -2,11 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://github.com/kpet/clvk
 TERMUX_PKG_DESCRIPTION="Experimental implementation of OpenCL on Vulkan"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-_COMMIT=6682bffe0a7219d8fb9c5a3ac3b80414370035c9
-_COMMIT_DATE=20220805
-_COMMIT_TIME=203013
+_COMMIT=ad6d1b71dc6b351928b6c9e9d4d826e39fe2ea44
+_COMMIT_DATE=20220806
+_COMMIT_TIME=052514
 # termux_pkg_upgrade_version edits TERMUX_PKG_VERSION wholly
-TERMUX_PKG_VERSION="0.0.20220805g6682bffe"
+TERMUX_PKG_VERSION="0.0.20220806gad6d1b71"
 TERMUX_PKG_SRCURL=https://github.com/kpet/clvk.git
 TERMUX_PKG_GIT_BRANCH=main
 TERMUX_PKG_BUILD_DEPENDS="vulkan-loader-android, vulkan-headers"
