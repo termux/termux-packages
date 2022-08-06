@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL="https://github.com/poljar/weechat-matrix-rs.git"
 TERMUX_PKG_GIT_BRANCH="master"
 _COMMIT="dd6701910e687ed1ea3d768844a902cfd2ff8231"
 TERMUX_PKG_VERSION="2022.04.17"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_DEPENDS="weechat, openssl"
 TERMUX_PKG_BUILD_IN_SRC=true
 # There are compile errors for 32-bit platforms in weechat-rust dependency
@@ -32,12 +33,16 @@ termux_step_make() {
 	# olm-sys needs the path to Android NDK to be built
 	export ANDROID_NDK="$NDK"
 	# force the plugin to be built against the weechat SDK available in packages
-	export WEECHAT_PLUGIN_API_VERSION="$TERMUX_PREFIX/usr/include/weechat/weechat-plugin.h"
+	export WEECHAT_PLUGIN_FILE="$TERMUX_PREFIX/include/weechat/weechat-plugin.h"
+	WEECHAT_PLUGIN_API_VERSION=$(grep 'define WEECHAT_PLUGIN_API_VERSION' \
+		"$WEECHAT_PLUGIN_FILE" | cut -d " " -f 3 | tr -d '"')
+	printf "WeeChat Plugin API version: %s \n" "$WEECHAT_PLUGIN_API_VERSION"
+	[[ -z "$WEECHAT_PLUGIN_API_VERSION" ]] && exit 1
 
 	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
 }
 
 termux_step_make_install() {
 	install -Dm755 target/${CARGO_TARGET_NAME}/release/libmatrix.so \
-		"$TERMUX_PREFIX/usr/lib/weechat/plugins/matrix.so"
+		"$TERMUX_PREFIX/lib/weechat/plugins/matrix.so"
 }
