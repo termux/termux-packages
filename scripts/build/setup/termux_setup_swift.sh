@@ -25,7 +25,7 @@ termux_setup_swift() {
 		fi
 		export SWIFT_BINDIR="$SWIFT_FOLDER/usr/bin"
 		export SWIFT_CROSSCOMPILE_CONFIG="$SWIFT_FOLDER/usr/android-$TERMUX_ARCH.json"
-		if [ -d $TERMUX_STANDALONE_TOOLCHAIN ]; then
+		if [ ! -z ${TERMUX_STANDALONE_TOOLCHAIN+x} ]; then
 			cat <<- EOF > $SWIFT_CROSSCOMPILE_CONFIG
 			{ "version": 1,
 			"target": "${SWIFT_TARGET_TRIPLE}",
