@@ -1,11 +1,19 @@
---- a/src/netxs/os/system.hpp
-+++ b/src/netxs/os/system.hpp
-@@ -1696,7 +1696,7 @@
-             #elif defined(__linux__)
+diff -uNr vtm-0.8.0/src/netxs/os/system.hpp vtm-0.8.0.mod/src/netxs/os/system.hpp
+--- vtm-0.8.0/src/netxs/os/system.hpp	2022-08-03 05:13:37.000000000 +0800
++++ vtm-0.8.0.mod/src/netxs/os/system.hpp	2022-08-07 11:10:39.985818809 +0800
+@@ -2361,7 +2361,7 @@
+                 #elif defined(__linux__)
  
-                 auto cred = ucred{};
--                #ifndef __ANDROID__
-+                #ifdef __ANDROID__
-                     socklen_t size = sizeof(cred);
-                 #else
-                     unsigned size = sizeof(cred);
+                     auto cred = ucred{};
+-                    #ifndef __ANDROID__
++                    #ifdef __ANDROID__
+                         auto size = socklen_t{ sizeof(cred) };
+                     #else
+                         auto size = unsigned{ sizeof(cred) };
+@@ -4350,4 +4350,4 @@
+     }
+ }
+ 
+-#endif // NETXS_SYSTEM_HPP
+\ No newline at end of file
++#endif // NETXS_SYSTEM_HPP
