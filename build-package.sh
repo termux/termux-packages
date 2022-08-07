@@ -257,9 +257,8 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_install_license.sh"
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_extract_into_massagedir.sh"
 
 # Hook function to create {pre,post}install, {pre,post}rm-scripts for subpkgs
-termux_step_create_subpkg_debscripts() {
-	return
-}
+# shellcheck source=scripts/build/termux_step_create_subpkg_debscripts.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_create_subpkg_debscripts.sh"
 
 # Create all subpackages. Run from termux_step_massage
 # shellcheck source=scripts/build/termux_create_debian_subpackages.sh
