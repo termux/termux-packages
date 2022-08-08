@@ -9,9 +9,7 @@ TERMUX_PKG_SRCURL=https://www.kernel.org/pub/linux/kernel/people/tytso/e2fsprogs
 TERMUX_PKG_SHA256=2f16c9176704cf645dc69d5b15ff704ae722d665df38b2ed3cfc249757d8d81e
 TERMUX_PKG_CONFFILES="etc/mke2fs.conf"
 TERMUX_PKG_NO_STATICSPLIT=true
-
-## util-linux provides libblkid
-TERMUX_PKG_DEPENDS="libuuid, util-linux"
+TERMUX_PKG_DEPENDS="libblkid, libuuid"
 TERMUX_PKG_BREAKS="e2fsprogs-dev"
 TERMUX_PKG_REPLACES="e2fsprogs-dev"
 
