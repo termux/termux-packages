@@ -13,10 +13,16 @@ TERMUX_PKG_VERSION=2.38.1
 TERMUX_PKG_SRCURL=https://www.kernel.org/pub/linux/utils/util-linux/v${TERMUX_PKG_VERSION:0:4}/util-linux-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=60492a19b44e6cf9a3ddff68325b333b8b52b6c59ce3ebd6a0ecaa4c5117e84f
 # libcrypt is required for only newgrp and sulogin, which are not built anyways
-TERMUX_PKG_DEPENDS="ncurses, libcap-ng, zlib"
+TERMUX_PKG_DEPENDS="libcap-ng, libsmartcols, ncurses, zlib"
 TERMUX_PKG_ESSENTIAL=true
 TERMUX_PKG_BREAKS="util-linux-dev"
 TERMUX_PKG_REPLACES="util-linux-dev"
+# Most android kernels are built without namespace support, so remove lsns
+TERMUX_PKG_RM_AFTER_INSTALL="
+bin/lsns
+share/bash-completion/completions/lsns
+share/man/man8/lsns.8.gz
+"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_func_setns=yes
 ac_cv_func_unshare=yes
