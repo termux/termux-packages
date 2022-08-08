@@ -24,7 +24,7 @@ termux_step_post_get_source() {
 	cp -r xorg-server-${TERMUX_PKG_VERSION[1]}/* unix/xserver/
 
 	cd ${TERMUX_PKG_BUILDDIR}/unix/xserver
-	for p in "$TERMUX_SCRIPTDIR/packages/xorg-server-xvfb"/*.patch; do
+	for p in "$TERMUX_SCRIPTDIR/x11-packages/xorg-server-xvfb"/*.patch; do
 		sed -e "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" \
 			-e "s%\@TERMUX_HOME\@%${TERMUX_ANDROID_HOME}%g" "$p" \
 			| patch --silent -p1
@@ -42,7 +42,7 @@ termux_step_pre_configure() {
 	CPPFLAGS="${CPPFLAGS} -I${TERMUX_PREFIX}/include/libdrm"
 	LDFLAGS="${LDFLAGS} -llog $($CC -print-libgcc-file-name)"
 
-	local xorg_server_xvfb_configure_args="$(. $TERMUX_SCRIPTDIR/packages/xorg-server-xvfb/build.sh; echo $TERMUX_PKG_EXTRA_CONFIGURE_ARGS)"
+	local xorg_server_xvfb_configure_args="$(. $TERMUX_SCRIPTDIR/x11-packages/xorg-server-xvfb/build.sh; echo $TERMUX_PKG_EXTRA_CONFIGURE_ARGS)"
 	./configure \
 		--host="${TERMUX_HOST_PLATFORM}" \
 		--prefix="${TERMUX_PREFIX}" \
