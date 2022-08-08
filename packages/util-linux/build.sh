@@ -37,7 +37,6 @@ ac_cv_func_uselocale=no
 --disable-ipcs
 --disable-kill
 --disable-last
---disable-libuuid
 --disable-logger
 --disable-mesg
 --disable-nologin
