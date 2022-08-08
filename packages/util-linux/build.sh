@@ -10,6 +10,7 @@ Documentation/licenses/COPYING.BSD-4-Clause-UC
 Documentation/licenses/COPYING.ISC"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.38.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.kernel.org/pub/linux/utils/util-linux/v${TERMUX_PKG_VERSION:0:4}/util-linux-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=60492a19b44e6cf9a3ddff68325b333b8b52b6c59ce3ebd6a0ecaa4c5117e84f
 # libcrypt is required for only newgrp and sulogin, which are not built anyways
@@ -39,12 +40,13 @@ ac_cv_func_uselocale=no
 --disable-last
 --disable-logger
 --disable-mesg
+--disable-makeinstall-chown
+--disable-mountpoint
 --disable-nologin
 --disable-pivot_root
 --disable-raw
 --disable-switch_root
 --disable-wall
---disable-libmount
 --disable-lsmem
 --disable-chmem
 --disable-rfkill
