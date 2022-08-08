@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Library extending the Android C library (Bionic) for add
 TERMUX_PKG_LICENSE="Apache-2.0, MIT"
 TERMUX_PKG_VERSION=(28
 		    3)
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_LICENSE_FILE="LICENSE.txt, wcwidth-${TERMUX_PKG_VERSION[1]}/LICENSE.txt"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_SRCURL=(https://github.com/termux/libandroid-support/archive/v${TERMUX_PKG_VERSION[0]}.tar.gz
