@@ -1,0 +1,54 @@
+From 70a8c30f1a1ae35e7742ee2224bdcf8eb95572a5 Mon Sep 17 00:00:00 2001
+Date: Sat, 13 Aug 2022 11:06:02 +0530
+Subject: [PATCH] [Driver] Work around lld 13+ issue with --gc-sections for ELF
+ by adding -z nostart-stop-gc
+
+diff --git a/swift/lib/Driver/UnixToolChains.cpp b/swift/lib/Driver/UnixToolChains.cpp
+index dc14e7782c79a..6f85e245a002e 100644
+--- a/swift/lib/Driver/UnixToolChains.cpp
++++ b/swift/lib/Driver/UnixToolChains.cpp
+@@ -184,6 +184,17 @@ toolchains::GenericUnix::constructInvocation(const DynamicLinkJobAction &job,
+ #else
+     Arguments.push_back(context.Args.MakeArgString("-fuse-ld=" + Linker));
+ #endif
++    // Starting with lld 13, Swift stopped working with the lld --gc-sections
++    // implementation for ELF, unless -z nostart-stop-gc is also passed to lld:
++    //
++    // https://reviews.llvm.org/D96914
++    if (Linker == "lld" || (Linker.length() > 5 &&
++                            Linker.substr(Linker.length() - 6) == "ld.lld")) {
++      Arguments.push_back("-Xlinker");
++      Arguments.push_back("-z");
++      Arguments.push_back("-Xlinker");
++      Arguments.push_back("nostart-stop-gc");
++    }
+   }
+ 
+   // Configure the toolchain.
+From 546768bb95b0bcc3fb480525f269d838c76da530 Mon Sep 17 00:00:00 2001
+Date: Sun, 14 Aug 2022 16:10:36 +0530
+Subject: [PATCH] Work around lld 13+ issue with --gc-sections for ELF by
+ adding -z nostart-stop-gc
+
+diff --git a/swift-driver/Sources/SwiftDriver/Jobs/GenericUnixToolchain+LinkerSupport.swift b/swift-driver/Sources/SwiftDriver/Jobs/GenericUnixToolchain+LinkerSupport.swift
+index ff2799a82..c274901b3 100644
+--- a/swift-driver/Sources/SwiftDriver/Jobs/GenericUnixToolchain+LinkerSupport.swift
++++ b/swift-driver/Sources/SwiftDriver/Jobs/GenericUnixToolchain+LinkerSupport.swift
+@@ -84,6 +84,17 @@ extension GenericUnixToolchain {
+         #else
+         commandLine.appendFlag("-fuse-ld=\(linker)")
+         #endif
++        // Starting with lld 13, Swift stopped working with the lld
++        // --gc-sections implementation for ELF, unless -z nostart-stop-gc is
++        // also passed to lld:
++        //
++        // https://reviews.llvm.org/D96914
++        if linker == "lld" || linker.hasSuffix("ld.lld") {
++          commandLine.appendFlag(.Xlinker)
++          commandLine.appendFlag("-z")
++          commandLine.appendFlag(.Xlinker)
++          commandLine.appendFlag("nostart-stop-gc")
++        }
+       }
+ 
+       // Configure the toolchain.
