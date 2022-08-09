@@ -1,0 +1,16 @@
+diff --git a/lib/gvc/gvconfig.c b/lib/gvc/gvconfig.c
+index 2d86321..ecb011b 100644
+--- a/lib/gvc/gvconfig.c
++++ b/lib/gvc/gvconfig.c
+@@ -268,6 +268,11 @@ static void gvconfig_write_library_config(GVC_t *gvc, char *lib_path,
+ static int line_callback(struct dl_phdr_info *info, size_t size, void *line)
+ {
+    const char *p = info->dlpi_name;
++
++   /* At least on an Android O device I have, this can happen */
++   if (!p)
++     return 0;
++
+    char *tmp = strstr(p, "/libgvc.");
+    (void) size;
+    if (tmp) {
