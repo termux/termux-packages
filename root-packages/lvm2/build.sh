@@ -11,6 +11,8 @@ TERMUX_PKG_DEPENDS="libaio, libandroid-support, libblkid, readline"
 TERMUX_PKG_BREAKS="libdevmapper-dev"
 TERMUX_PKG_REPLACES="libdevmapper-dev"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_NO_STATICSPLIT=true
+
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-pkgconfig
 --disable-selinux
