@@ -1,6 +1,8 @@
---- ./CMakeLists.txt.orig	2021-12-08 16:43:22.784370693 +0530
-+++ ./CMakeLists.txt	2021-12-08 16:44:08.814370676 +0530
-@@ -118,9 +118,7 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 025052b..59bc17d 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -118,9 +118,7 @@ if(with_zlib)
    find_package(ZLIB)
  endif()
  
@@ -11,3 +13,16 @@
  
  if(WIN32)
      # Find Windows specific dependencies
+diff --git a/lib/gvc/CMakeLists.txt b/lib/gvc/CMakeLists.txt
+index decab25..737a6fa 100644
+--- a/lib/gvc/CMakeLists.txt
++++ b/lib/gvc/CMakeLists.txt
+@@ -76,6 +76,8 @@ if(ZLIB_FOUND)
+    target_link_libraries(gvc PUBLIC ${ZLIB_LIBRARIES})
+ endif()
+ 
++target_link_libraries(gvc PUBLIC -landroid-glob)
++
+ if(${with_ortho})
+     target_link_libraries(gvc PRIVATE
+         $<TARGET_OBJECTS:ortho_obj>
