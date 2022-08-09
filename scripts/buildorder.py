@@ -113,6 +113,7 @@ class TermuxPackage(object):
         self.excluded_arches = parse_build_file_excluded_arches(build_sh_path)
         self.only_installing = parse_build_file_variable_bool(build_sh_path, 'TERMUX_PKG_ONLY_INSTALLING')
         self.separate_subdeps = parse_build_file_variable_bool(build_sh_path, 'TERMUX_PKG_SEPARATE_SUB_DEPENDS')
+        self.no_static = parse_build_file_variable_bool(build_sh_path, 'TERMUX_PKG_NO_STATICSPLIT')
 
         if os.getenv('TERMUX_ON_DEVICE_BUILD') == "true" and termux_pkg_library == "bionic":
             always_deps = ['libc++']
@@ -132,8 +133,10 @@ class TermuxPackage(object):
 
             self.subpkgs.append(subpkg)
 
-        subpkg = TermuxSubPackage(self.dir + '/' + self.name + '-static' + '.subpackage.sh', self, virtual=True)
-        self.subpkgs.append(subpkg)
+        if not self.no_static:
+            # if no_static is true then there can be no static subpackage
+            subpkg = TermuxSubPackage(self.dir + '/' + self.name + '-static' + '.subpackage.sh', self, virtual=True)
+            self.subpkgs.append(subpkg)
 
         self.needed_by = set()  # Populated outside constructor, reverse of deps.
 
