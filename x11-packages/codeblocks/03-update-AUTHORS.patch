@@ -1,0 +1,84 @@
+From a4aacc92640b587ad049cd6aa68c637e536e9ab5 Mon Sep 17 00:00:00 2001
+From: mortenmacfly <mortenmacfly@2a5c6006-c6dd-42ca-98ab-0921f2732cef>
+Date: Tue, 29 Dec 2020 09:51:54 +0000
+Subject: [PATCH] * updated AUTHORS file and about dialog to better reflect
+ current developers/contribters
+
+git-svn-id: https://svn.code.sf.net/p/codeblocks/code/trunk@12281 2a5c6006-c6dd-42ca-98ab-0921f2732cef
+---
+ AUTHORS              | 13 +++++++++++--
+ src/src/dlgabout.cpp |  4 +++-
+ 2 files changed, 14 insertions(+), 3 deletions(-)
+
+diff --git a/AUTHORS b/AUTHORS
+index 07fa7d5c4..b0d6aab5d 100644
+--- a/AUTHORS
++++ b/AUTHORS
+@@ -12,6 +12,8 @@ Teodor Petrov       : Developer
+ Daniel Anselmi      : Developer
+ Yuanhui Zhang       : Developer
+ Damien Moore        : Developer
++Micah Ng            : Developer
++BlueHazzard         : Developer
+ Ricardo Garcia      : All-hands person
+ Paul A. Jimenez     : Help and AStyle plugins
+ Thomas Lorblanches  : CodeStat and Profiler plugins
+@@ -20,13 +22,16 @@ Jerome Antoine      : ThreadSearch plugin
+ Pecan Heber         : Keybinder, BrowseTracker, DragScroll
+                       CodeSnippets plugins
+ Arto Jonsson        : CodeSnippets plugin (passed on to Pecan)
+-Mario Cupelli       : User's manual
++Darius Markauskas   : Fortran support
++Mario Cupelli       : Compiler support for embedded systems
++                      User's manual
++Jonas Zinn          : Misc. wxSmith AddOns and plugins
++Mirai Computing     : cbp2make tool
+ Anders F Bjoerklund : wxMac compatibility
+ 
+ Contributors (in no special order):
+ -----------------------------------
+ Daniel Orb          : RPM spec file and packages
+-Mario Cupelli       : Compiler support for embedded systems
+ byo,elvstone, me22  : Conversion to Unicode
+ pasgui              : Providing Ubuntu nightly packages
+ Hakki Dogusan       : DigitalMars compiler support
+@@ -37,6 +42,10 @@ David Perfors       : Unicode tester and future documentation writer
+ Sylvain Prat        : Initial MSVC workspace and project importers
+ Chris Raschko       : Design of the 3D logo for Code::Blocks
+ J.A. Ortega         : 3D Icon based on the above
++Alexandr Efremo     : Providing OpenSuSe packages
++Huki                : Misc. Code-Completion improvements
++stahta01            : Misc. patches for several enhancements
++Miguel Gimenez      : Misc. patches for several enhancements
+ 
+ All contributors that provided patches.
+ 
+diff --git a/src/src/dlgabout.cpp b/src/src/dlgabout.cpp
+index 5c66794ec..2afeeabac 100644
+--- a/src/src/dlgabout.cpp
++++ b/src/src/dlgabout.cpp
+@@ -84,6 +84,7 @@ dlgAbout::dlgAbout(wxWindow* parent)
+     txtDescription->SetValue(description);
+ 
+     wxTextCtrl *txtThanksTo = XRCCTRL(*this, "txtThanksTo", wxTextCtrl);
++    // Note: Keep this is sync with the AUTHORS file in SVN.
+     txtThanksTo->SetValue(_(
+         "Developers:\n"
+         "--------------\n"
+@@ -100,6 +101,7 @@ dlgAbout::dlgAbout(wxWindow* parent)
+         "Yuanhui Zhang       : Developer\n"
+         "Damien Moore        : Developer\n"
+         "Micah Ng            : Developer\n"
++        "BlueHazzard         : Developer\n"
+         "Ricardo Garcia      : All-hands person\n"
+         "Paul A. Jimenez     : Help and AStyle plugins\n"
+         "Thomas Lorblanches  : CodeStat and Profiler plugins\n"
+@@ -131,7 +133,7 @@ dlgAbout::dlgAbout(wxWindow* parent)
+         "Alexandr Efremo     : Providing OpenSuSe packages\n"
+         "Huki                : Misc. Code-Completion improvements\n"
+         "stahta01            : Misc. patches for several enhancements\n"
+-        "BlueHazzard         : Misc. patches for several enhancements\n"
++        "Miguel Gimenez      : Misc. patches for several enhancements\n"
+         "\n"
+         "All contributors that provided patches.\n"
+         "The wxWidgets project (http://www.wxwidgets.org).\n"

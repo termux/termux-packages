@@ -1,0 +1,66 @@
+From b2e4f1279804e1d11b71bc75eeb37072c3589296 Mon Sep 17 00:00:00 2001
+From: wh11204 <wh11204@2a5c6006-c6dd-42ca-98ab-0921f2732cef>
+Date: Sat, 18 Dec 2021 08:13:26 +0000
+Subject: [PATCH] * Fix scale factor detection for wxWidgets >= 3.1.4 (ticket
+ #1132). wxWidgets changed the value returned by
+ wxWindow::GetContentScaleFactor() in 3.1.0. In 3.1.4 they restored the
+ pre-3.1.0 behaviour and created a new method GetDPIScaleFactor() returning
+ what GetContentScaleFactor() was returning until then.
+
+This change broke HiDPI detection when using wxWidgets >= 3.1.4. BTW, it was already broken in
+32-bit C::B because it was not DPI-aware; this has been fixed in [r12591].
+
+Update developer list in Thanks section of the About dialog.
+
+
+git-svn-id: https://svn.code.sf.net/p/codeblocks/code/trunk@12592 2a5c6006-c6dd-42ca-98ab-0921f2732cef
+---
+ src/sdk/globals.cpp  | 4 ++++
+ src/src/dlgabout.cpp | 4 ++--
+ 2 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/src/sdk/globals.cpp b/src/sdk/globals.cpp
+index f05975ab0..9069305ca 100644
+--- a/src/sdk/globals.cpp
++++ b/src/sdk/globals.cpp
+@@ -1186,7 +1186,11 @@ wxBitmap cbLoadBitmapScaled(const wxString& filename, wxBitmapType bitmapType, d
+ 
+ double cbGetContentScaleFactor(const wxWindow &window)
+ {
++#if wxCHECK_VERSION(3, 1, 4)
++    return window.GetDPIScaleFactor();
++#else
+     return window.GetContentScaleFactor();
++#endif
+ }
+ 
+ #ifdef __WXGTK__
+diff --git a/src/src/dlgabout.cpp b/src/src/dlgabout.cpp
+index 545f7d13a..f024d5ed5 100644
+--- a/src/src/dlgabout.cpp
++++ b/src/src/dlgabout.cpp
+@@ -101,6 +101,7 @@ dlgAbout::dlgAbout(wxWindow* parent)
+         "Damien Moore        : Developer\n"
+         "Micah Ng            : Developer\n"
+         "BlueHazzard         : Developer\n"
++        "Miguel Gimenez      : Developer\n"
+         "Ricardo Garcia      : All-hands person\n"
+         "Paul A. Jimenez     : Help and AStyle plugins\n"
+         "Thomas Lorblanches  : CodeStat and Profiler plugins\n"
+@@ -132,7 +133,6 @@ dlgAbout::dlgAbout(wxWindow* parent)
+         "Alexandr Efremo     : Providing OpenSuSe packages\n"
+         "Huki                : Misc. Code-Completion improvements\n"
+         "stahta01            : Misc. patches for several enhancements\n"
+-        "Miguel Gimenez      : Misc. patches for several enhancements\n"
+         "\n"
+         "All contributors that provided patches.\n"
+         "The wxWidgets project (http://www.wxwidgets.org).\n"
+@@ -171,7 +171,7 @@ dlgAbout::dlgAbout(wxWindow* parent)
+     if (!desktopEnv.empty())
+         items.push_back({_("Desktop environment"), desktopEnv });
+ 
+-    items.push_back({_("Scaling factor"), wxString::Format("%f", GetContentScaleFactor())});
++    items.push_back({_("Scaling factor"), wxString::Format("%f", cbGetContentScaleFactor(*this))});
+     items.push_back({_("Detected scaling factor"),
+                      wxString::Format("%f", cbGetActualContentScaleFactor(*this))});
+     const wxSize displayPPI = wxGetDisplayPPI();

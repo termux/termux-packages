@@ -1,0 +1,724 @@
+From 8035dfdff321754819f79e3165401aa59bd8c7f7 Mon Sep 17 00:00:00 2001
+From: wh11204 <wh11204@2a5c6006-c6dd-42ca-98ab-0921f2732cef>
+Date: Tue, 14 Dec 2021 08:57:56 +0000
+Subject: [PATCH] - Remove code for wxWidgets < 3.0.0 (part I). Includes:  
+ src\include\cbart_provider.h   src\include\cbauibook.h  
+ src\include\globals.h   src\include\logmanager.h  
+ src\include\scrollingdialog.h   src\plugins\debuggergdb\debuggergdb.cpp  
+ src\plugins\debuggergdb\gdb_commands.h   src\sdk\base64.cpp  
+ src\sdk\cbauibook.cpp   src\sdk\crc32.cpp   src\sdk\editorcolourset.cpp  
+ src\sdk\editorlexerloader.cpp
+
+git-svn-id: https://svn.code.sf.net/p/codeblocks/code/trunk@12578 2a5c6006-c6dd-42ca-98ab-0921f2732cef
+---
+ src/include/cbart_provider.h            |  18 +--
+ src/include/cbauibook.h                 |  41 ------
+ src/include/globals.h                   |   4 -
+ src/include/logmanager.h                |   4 +-
+ src/include/scrollingdialog.h           | 184 ------------------------
+ src/plugins/debuggergdb/debuggergdb.cpp |  10 --
+ src/plugins/debuggergdb/gdb_commands.h  |   4 -
+ src/sdk/base64.cpp                      |  22 ---
+ src/sdk/cbauibook.cpp                   |  84 +----------
+ src/sdk/crc32.cpp                       |   4 -
+ src/sdk/editorcolourset.cpp             |   4 -
+ src/sdk/editorlexerloader.cpp           |   4 -
+ 12 files changed, 10 insertions(+), 373 deletions(-)
+
+diff --git a/src/include/cbart_provider.h b/src/include/cbart_provider.h
+index ed04be85f..272b6d6b5 100644
+--- a/src/include/cbart_provider.h
++++ b/src/include/cbart_provider.h
+@@ -34,17 +34,13 @@ class DLLIMPORT cbArtProvider : public wxArtProvider
+     wxString m_prefix;
+ 
+     struct StringHash
+-    {
+-        size_t operator()(const wxString& s) const
+-        {
+-#if wxCHECK_VERSION(3, 0, 0)
+-            return std::hash<std::wstring>()(s.ToStdWstring());
+-#else
+-            return std::hash<std::wstring>()(s.wc_str());
+-#endif // wxCHECK_VERSION
+-        }
+-    };
+-
++    {
++        size_t operator()(const wxString& s) const
++        {
++            return std::hash<std::wstring>()(s.ToStdWstring());
++        }
++    };
++
+     struct Data
+     {
+         Data() : hasFormatting(false) {}
+diff --git a/src/include/cbauibook.h b/src/include/cbauibook.h
+index d0bf79a3a..4e90a65e5 100644
+--- a/src/include/cbauibook.h
++++ b/src/include/cbauibook.h
+@@ -78,25 +78,6 @@ class DLLIMPORT cbAuiNotebook : public wxAuiNotebook
+          * \return int the visible position
+          */
+         int GetTabPositionFromIndex(int index);
+-#if !wxCHECK_VERSION(3, 0, 0)
+-        /** \brief Set a tab tooltip
+-         *
+-         * Sets the tooltip for the tab belonging to win.
+-         * Starts the dwell timer and the stopwatch if it is not already done.
+-         * \param idx the index of the pane that belongs to the tab
+-         * \param text the tooltip
+-         * @remarks Uses the name of the wxWindow to store the message
+-         * \return bool true if tooltip was updated
+-         */
+-        bool SetPageToolTip(size_t idx, const wxString & text );
+-        /** \brief Get a tab tooltip
+-         *
+-         * Returns the tooltip for the tab label of the page.
+-         * @remarks Uses the name of the wxWindow to store the message
+-         * \return wxString the tooltip of the page with the given index
+-         */
+-        wxString GetPageToolTip(size_t idx	);
+-#endif // !wxCHECK_VERSION(3, 0, 0)
+         /** \brief Minmize free horizontal page
+          *
+          * Moves the active tab of all tabCtrl's to the rightmost place,
+@@ -205,25 +186,12 @@ class DLLIMPORT cbAuiNotebook : public wxAuiNotebook
+          * \param event
+          * @remarks Works not reliable, due to OS/wxWidgets-limitations
+          */
+-#if wxCHECK_VERSION(3, 0, 0)
+         void OnNavigationKeyNotebook(wxNavigationKeyEvent& event);
+-#else
+-        void OnNavigationKey(wxNavigationKeyEvent& event);
+-#endif // wxCHECK_VERSION(3, 0, 0)
+         /** \brief OnIdle
+          *
+          * \param event unused
+          */
+         void OnIdle(cb_unused wxIdleEvent& event);
+-#if !wxCHECK_VERSION(3, 0, 0)
+-        /** \brief Catch mousemotion-events
+-         *
+-         * Needed for the backport of tabtooltip from wx2.9
+-         *
+-         * \param event holds the wxTabCtrl, that sends the event
+-         */
+-        void OnMotion(wxMouseEvent& event);
+-#endif // !wxCHECK_VERSION(3, 0, 0)
+         /** \brief Catch doubleclick-events from wxTabCtrl
+          *
+          * Sends cbEVT_CBAUIBOOK_LEFT_DCLICK, if doubleclick was on a tab,
+@@ -318,15 +286,6 @@ class DLLIMPORT cbAuiNotebook : public wxAuiNotebook
+          */
+         long m_LastId;
+ #endif // __WXMSW__
+-#if !wxCHECK_VERSION(3, 0, 0)
+-        /** \brief If false, tooltips are not shown
+-         *
+-         * Needed to only show tooltips, if they have been explicitely set.
+-         * We store the tooltip-text in the tabs name, without this flag, we
+-         * get the wxWidgets default-names as tooltips.
+-         */
+-        bool m_HasToolTip;
+-#endif // !wxCHECK_VERSION(3, 0, 0)
+         /** \brief If true, zoom for all editors
+          * is set in next OnIdle-call
+          */
+diff --git a/src/include/globals.h b/src/include/globals.h
+index c2924cb7f..f5086b643 100644
+--- a/src/include/globals.h
++++ b/src/include/globals.h
+@@ -441,11 +441,7 @@ extern DLLIMPORT wxArrayInt cbGetMultiChoiceDialog(const wxString& message, cons
+                                      const wxSize& size = wxSize(300, 300),
+                                      const wxArrayInt& initialSelection = wxArrayInt());
+ 
+-#if wxCHECK_VERSION(3, 0, 0)
+ extern DLLIMPORT const char *cbGetTextFromUserPromptStr;
+-#else
+-extern DLLIMPORT const wxChar *cbGetTextFromUserPromptStr;
+-#endif // wxCHECK_VERSION
+ 
+ extern DLLIMPORT wxString cbGetTextFromUser(const wxString &message,
+                                             const wxString &caption = cbGetTextFromUserPromptStr,
+diff --git a/src/include/logmanager.h b/src/include/logmanager.h
+index 704698f27..29af5fe24 100644
+--- a/src/include/logmanager.h
++++ b/src/include/logmanager.h
+@@ -21,7 +21,7 @@
+     {
+         va_list arg_list;
+         va_start(arg_list, msg);
+-#if wxCHECK_VERSION(3, 0, 0) && wxUSE_UNICODE
++#if wxUSE_UNICODE
+ // in wx >=  3.0 unicode-build (default) we need the %ls here, or the strings get
+ // cut after the first character
+         ::temp_string = msg;
+@@ -38,7 +38,7 @@
+     {
+         va_list arg_list;
+         va_start(arg_list, msg);
+-#if wxCHECK_VERSION(2,9,0) && wxUSE_UNICODE
++#if wxUSE_UNICODE
+ // in wx >=  2.9 unicode-build (default) we need the %ls here, or the strings get
+ // cut after the first character
+         ::temp_string = msg;
+diff --git a/src/include/scrollingdialog.h b/src/include/scrollingdialog.h
+index 06f3a1b60..17173f970 100644
+--- a/src/include/scrollingdialog.h
++++ b/src/include/scrollingdialog.h
+@@ -30,151 +30,18 @@ class wxBoxSizer;
+ class wxButton;
+ class wxScrolledWindow;
+ 
+-#if !wxCHECK_VERSION(3, 0, 0)
+-class wxDialogLayoutAdapter: public wxObject
+-{
+-    DECLARE_CLASS(wxDialogLayoutAdapter)
+-public:
+-    wxDialogLayoutAdapter() {}
+-
+-    /// Override this function to indicate that adaptation should be done
+-    virtual bool CanDoLayoutAdaptation(wxDialogHelper* dialog) = 0;
+-
+-    /// Override this function to do the adaptation
+-    virtual bool DoLayoutAdaptation(wxDialogHelper* dialog) = 0;
+-};
+-
+-/*!
+- * Standard adapter. Does scrolling adaptation for paged and regular dialogs.
+- *
+- */
+-
+-class wxStandardDialogLayoutAdapter: public wxDialogLayoutAdapter
+-{
+-    DECLARE_CLASS(wxStandardDialogLayoutAdapter)
+-public:
+-    wxStandardDialogLayoutAdapter() {}
+-
+-// Overrides
+-
+-    /// Indicate that adaptation should be done
+-    bool CanDoLayoutAdaptation(wxDialogHelper* dialog) override;
+-
+-    /// Do layout adaptation
+-    bool DoLayoutAdaptation(wxDialogHelper* dialog) override;
+-
+-// Implementation
+-
+-    /// Find a standard or horizontal box sizer
+-    virtual wxSizer* FindButtonSizer(bool stdButtonSizer, wxDialogHelper* dialog, wxSizer* sizer, int& retBorder, int accumlatedBorder = 0);
+-
+-    /// Check if this sizer contains standard buttons, and so can be repositioned in the dialog
+-    virtual bool IsOrdinaryButtonSizer(wxDialogHelper* dialog, wxBoxSizer* sizer);
+-
+-    /// Check if this is a standard button
+-    virtual bool IsStandardButton(wxDialogHelper* dialog, wxButton* button);
+-
+-    /// Find 'loose' main buttons in the existing layout and add them to the standard dialog sizer
+-    virtual bool FindLooseButtons(wxDialogHelper* dialog, wxStdDialogButtonSizer* buttonSizer, wxSizer* sizer, int& count);
+-
+-    /// Reparent the controls to the scrolled window, except those in buttonSizer
+-    virtual void ReparentControls(wxWindow* parent, wxWindow* reparentTo, wxSizer* buttonSizer = NULL);
+-
+-    /// A function to fit the dialog around its contents, and then adjust for screen size.
+-    /// If scrolled windows are passed, scrolling is enabled in the required orientation(s).
+-    virtual bool FitWithScrolling(wxDialog* dialog, wxScrolledWindow* scrolledWindow);
+-    virtual bool FitWithScrolling(wxDialog* dialog, wxWindowList& windows);
+-
+-    /// Find whether scrolling will be necessary for the dialog, returning wxVERTICAL, wxHORIZONTAL or both
+-    virtual int MustScroll(wxDialog* dialog, wxSize& windowSize, wxSize& displaySize);
+-};
+-
+-/*!
+- * A base class for dialogs that have adaptation. In wxWidgets 3.0, this will not
+- * be needed since the new functionality will be implemented in wxDialogBase.
+- */
+-
+-class wxDialogHelper
+-{
+-public:
+-
+-    wxDialogHelper(wxDialog* dialog = NULL) { Init(); m_dialog = dialog; }
+-    virtual ~wxDialogHelper() {}
+-
+-    void Init();
+-
+-    void SetDialog(wxDialog* dialog) { m_dialog = dialog; }
+-    wxDialog* GetDialog() const { return m_dialog; }
+-
+-    /// Do the adaptation
+-    virtual bool DoLayoutAdaptation();
+-
+-    /// Can we do the adaptation?
+-    virtual bool CanDoLayoutAdaptation();
+-
+-    /// Returns a content window if there is one
+-    virtual wxWindow* GetContentWindow() const { return NULL; }
+-
+-    /// Add an id to the list of custom button identifiers that should be in the button sizer
+-    void AddButtonId(wxWindowID id) { m_buttonIds.Add((int) id); }
+-    wxArrayInt& GetButtonIds() { return m_buttonIds; }
+-
+-    /// Is this id in the custom button id array?
+-    bool IsUserButtonId(wxWindowID id) { return (m_buttonIds.Index((int) id) != wxNOT_FOUND); }
+-
+-// ACCESSORS
+-
+-    /// Level of adaptation, from none (Level 0) to full (Level 3). To disable adaptation,
+-    /// set level 0, for example in your dialog constructor. You might
+-    /// do this if you know that you are displaying on a large screen and you don't want the
+-    /// dialog changed.
+-    void SetLayoutAdaptationLevel(int level) { m_layoutAdaptationLevel = level; }
+-
+-    /// Get level of adaptation
+-    int GetLayoutAdaptationLevel() const { return m_layoutAdaptationLevel; }
+-
+-    /// Returns true if the adaptation has been done
+-    void SetLayoutAdaptationDone(bool adaptationDone) { m_layoutLayoutAdaptationDone = adaptationDone; }
+-    bool GetLayoutAdaptationDone() const { return m_layoutLayoutAdaptationDone; }
+-
+-    /// Set layout adapter class, returning old adapter
+-    static wxDialogLayoutAdapter* SetLayoutAdapter(wxDialogLayoutAdapter* adapter);
+-    static wxDialogLayoutAdapter* GetLayoutAdapter() { return sm_layoutAdapter; }
+-
+-    /// Global switch for layout adaptation
+-    static bool GetLayoutAdaptation() { return sm_layoutAdaptation; }
+-    static void SetLayoutAdaptation(bool enable) { sm_layoutAdaptation = enable; }
+-
+-protected:
+-
+-    wxDialog*                           m_dialog;
+-    bool                                m_layoutLayoutAdaptationDone;
+-    wxArrayInt                          m_buttonIds;
+-    int                                 m_layoutAdaptationLevel;
+-    static wxDialogLayoutAdapter*       sm_layoutAdapter;
+-    static bool                         sm_layoutAdaptation;
+-};
+-#endif //#if !wxCHECK_VERSION(3, 0, 0)
+-
+ /*!
+  * A class that makes its content scroll if necessary
+  */
+ 
+ class DLLIMPORT wxScrollingDialog: public wxDialog
+-#if !wxCHECK_VERSION(3, 0, 0)
+-    , public wxDialogHelper
+-#endif
+ {
+     DECLARE_CLASS(wxScrollingDialog)
+ public:
+ 
+     wxScrollingDialog()
+     {
+-#if !wxCHECK_VERSION(3, 0, 0)
+-        Init();
+-#else
+         SetLayoutAdaptationMode(wxDIALOG_ADAPTATION_MODE_ENABLED);
+-#endif
+     }
+     wxScrollingDialog(wxWindow *parent,
+              int id = wxID_ANY,
+@@ -184,30 +51,9 @@ class DLLIMPORT wxScrollingDialog: public wxDialog
+              long style = wxDEFAULT_DIALOG_STYLE,
+              const wxString& name = _("dialogBox"))
+     {
+-#if !wxCHECK_VERSION(3, 0, 0)
+-        Init();
+-#else
+         SetLayoutAdaptationMode(wxDIALOG_ADAPTATION_MODE_ENABLED);
+-#endif
+         Create(parent, id, title, pos, size, style, name);
+     }
+-#if !wxCHECK_VERSION(3, 0, 0)
+-    bool Create(wxWindow *parent,
+-             int id = wxID_ANY,
+-             const wxString& title = wxEmptyString,
+-             const wxPoint& pos = wxDefaultPosition,
+-             const wxSize& size = wxDefaultSize,
+-             long style = wxDEFAULT_DIALOG_STYLE,
+-             const wxString& name = _("dialogBox"));
+-
+-    void Init();
+-
+-    /// Override Show to rejig the control and sizer hierarchy if necessary
+-    bool Show(bool show = true) override;
+-
+-    /// Override ShowModal to rejig the control and sizer hierarchy if necessary
+-    int ShowModal() override;
+-#endif
+ };
+ 
+ /*!
+@@ -215,19 +61,11 @@ class DLLIMPORT wxScrollingDialog: public wxDialog
+  */
+ 
+ class wxScrollingPropertySheetDialog : public wxPropertySheetDialog
+-#if !wxCHECK_VERSION(3, 0, 0)
+-    , public wxDialogHelper
+-#endif
+-
+ {
+ public:
+     wxScrollingPropertySheetDialog() : wxPropertySheetDialog()
+     {
+-#if !wxCHECK_VERSION(3, 0, 0)
+-        Init();
+-#else
+         SetLayoutAdaptationMode(wxDIALOG_ADAPTATION_MODE_ENABLED);
+-#endif
+     }
+ 
+     wxScrollingPropertySheetDialog(wxWindow* parent, wxWindowID id,
+@@ -237,32 +75,10 @@ class wxScrollingPropertySheetDialog : public wxPropertySheetDialog
+                        long style = wxDEFAULT_DIALOG_STYLE,
+                        const wxString& name = wxDialogNameStr)
+     {
+-#if !wxCHECK_VERSION(3, 0, 0)
+-        Init();
+-#else
+         SetLayoutAdaptationMode(wxDIALOG_ADAPTATION_MODE_ENABLED);
+-#endif
+         Create(parent, id, title, pos, sz, style, name);
+     }
+ 
+-#if !wxCHECK_VERSION(3, 0, 0)
+-//// Accessors
+-
+-    /// Returns the content window
+-    wxWindow* GetContentWindow() const override;
+-
+-/// Operations
+-
+-    /// Override Show to rejig the control and sizer hierarchy if necessary
+-    bool Show(bool show = true) override;
+-
+-    /// Override ShowModal to rejig the control and sizer hierarchy if necessary
+-    int ShowModal() override;
+-
+-private:
+-    void Init();
+-#endif
+-
+ protected:
+ 
+     DECLARE_DYNAMIC_CLASS(wxScrollingPropertySheetDialog)
+diff --git a/src/plugins/debuggergdb/debuggergdb.cpp b/src/plugins/debuggergdb/debuggergdb.cpp
+index 4d1dabba5..845de0bb3 100644
+--- a/src/plugins/debuggergdb/debuggergdb.cpp
++++ b/src/plugins/debuggergdb/debuggergdb.cpp
+@@ -554,7 +554,6 @@ int DebuggerGDB::LaunchProcessWithShell(const wxString &cmd, wxProcess *process,
+                                         const wxString &cwd)
+ {
+     wxString shell = GetShellString();
+-#if wxCHECK_VERSION(3, 0, 0)
+     wxExecuteEnv execEnv;
+     execEnv.cwd = cwd;
+     // Read the current environment variables and then make changes to them.
+@@ -565,15 +564,6 @@ int DebuggerGDB::LaunchProcessWithShell(const wxString &cmd, wxProcess *process,
+         execEnv.env["SHELL"] = shell;
+     }
+     return wxExecute(cmd, wxEXEC_ASYNC, process, &execEnv);
+-#else
+-    if (!shell.empty())
+-    {
+-        Log(wxString::Format(wxT("Setting SHELL to '%s'"), shell.wx_str()));
+-        wxSetEnv(wxT("SHELL"), shell);
+-    }
+-    (void)cwd;
+-    return wxExecute(cmd, wxEXEC_ASYNC, process);
+-#endif // !wxCHECK_VERSION(3, 0, 0)
+ }
+ 
+ int DebuggerGDB::LaunchProcess(const wxString& cmd, const wxString& cwd)
+diff --git a/src/plugins/debuggergdb/gdb_commands.h b/src/plugins/debuggergdb/gdb_commands.h
+index cd564b29c..5a77fbb5e 100644
+--- a/src/plugins/debuggergdb/gdb_commands.h
++++ b/src/plugins/debuggergdb/gdb_commands.h
+@@ -63,11 +63,7 @@ namespace
+ 
+     while (count < sizeof(T) * 2) // be sure we don't keep adding more to ret
+     {
+-      #if wxCHECK_VERSION(3, 0, 0)
+       switch (str[pos].GetValue())
+-      #else
+-      switch (str[pos])
+-      #endif
+       {
+         case _T('0'):
+         case _T('1'):
+diff --git a/src/sdk/base64.cpp b/src/sdk/base64.cpp
+index 3837cb55f..c4593f17f 100644
+--- a/src/sdk/base64.cpp
++++ b/src/sdk/base64.cpp
+@@ -22,9 +22,7 @@
+ 
+ #include "base64.h"
+ 
+-#if wxCHECK_VERSION(3, 0, 0)
+ #include <wx/unichar.h>
+-#endif
+ 
+ const wxChar fillchar = '=';
+ 
+@@ -105,29 +103,17 @@ wxString wxBase64::Decode(const wxString& data)
+         c1 = cvt.Find(data[i]);
+         wxASSERT_MSG(c1 >= 0, _T("invalid base64 input"));
+         c = (c << 2) | ((c1 >> 4) & 0x3);
+-        #if wxCHECK_VERSION(3, 0, 0)
+         ret.Append(static_cast<wxUniChar>(c), 1);
+-        #else
+-        ret.Append(c, 1);
+-        #endif
+         if (++i < len)
+         {
+             c = data[i];
+             if ((char)fillchar == c)
+                 break;
+ 
+-            #if wxCHECK_VERSION(3, 0, 0)
+             c = cvt.Find(static_cast<wxUniChar>(c));
+-            #else
+-            c = cvt.Find(c);
+-            #endif
+             wxASSERT_MSG(c >= 0, _T("invalid base64 input"));
+             c1 = ((c1 << 4) & 0xf0) | ((c >> 2) & 0xf);
+-            #if wxCHECK_VERSION(3, 0, 0)
+             ret.Append(static_cast<wxUniChar>(c1), 1);
+-            #else
+-            ret.Append(c1, 1);
+-            #endif
+         }
+ 
+         if (++i < len)
+@@ -136,18 +122,10 @@ wxString wxBase64::Decode(const wxString& data)
+             if ((char)fillchar == c1)
+                 break;
+ 
+-            #if wxCHECK_VERSION(3, 0, 0)
+             c1 = cvt.Find(static_cast<wxUniChar>(c1));
+-            #else
+-            c1 = cvt.Find(c1);
+-            #endif
+             wxASSERT_MSG(c1 >= 0, _T("invalid base64 input"));
+             c = ((c << 6) & 0xc0) | c1;
+-            #if wxCHECK_VERSION(3, 0, 0)
+             ret.Append(static_cast<wxUniChar>(c), 1);
+-            #else
+-            ret.Append(c, 1);
+-            #endif
+         }
+     }
+ 
+diff --git a/src/sdk/cbauibook.cpp b/src/sdk/cbauibook.cpp
+index b1841b669..ae4776a3d 100644
+--- a/src/sdk/cbauibook.cpp
++++ b/src/sdk/cbauibook.cpp
+@@ -37,11 +37,7 @@ int cbAuiNotebook::s_moveDirection = 1;
+ 
+ 
+ BEGIN_EVENT_TABLE(cbAuiNotebook, wxAuiNotebook)
+-#if wxCHECK_VERSION(3, 0, 0)
+     EVT_NAVIGATION_KEY(cbAuiNotebook::OnNavigationKeyNotebook)
+-#else
+-    EVT_NAVIGATION_KEY(cbAuiNotebook::OnNavigationKey)
+-#endif
+     EVT_IDLE(cbAuiNotebook::OnIdle)
+     EVT_AUINOTEBOOK_DRAG_DONE(wxID_ANY, cbAuiNotebook::OnDragDone)
+ END_EVENT_TABLE()
+@@ -51,9 +47,6 @@ cbAuiNotebook::cbAuiNotebook(wxWindow* pParent, wxWindowID id, const wxPoint& po
+ #ifdef __WXMSW__
+           m_LastSelected(wxNOT_FOUND),
+           m_LastId(0),
+-#endif
+-#if !wxCHECK_VERSION(3, 0, 0)
+-          m_HasToolTip(false),
+ #endif
+           m_SetZoomOnIdle(false),
+           m_MinimizeFreeSpaceOnIdle(false),
+@@ -64,7 +57,7 @@ cbAuiNotebook::cbAuiNotebook(wxWindow* pParent, wxWindowID id, const wxPoint& po
+     m_mgr.SetFlags((m_mgr.GetFlags() | wxAUI_MGR_VENETIAN_BLINDS_HINT) & ~wxAUI_MGR_TRANSPARENT_HINT);
+ #endif  // #ifdef __WXGTK__
+     ConfigManager *cfg = Manager::Get()->GetConfigManager(_T("app"));
+-#if defined __WXMSW__ && wxCHECK_VERSION(3, 0, 0)
++#if defined __WXMSW__
+     wxToolTip::SetMaxWidth(-1);
+ #endif
+     s_AllowMousewheel = cfg->ReadBool(_T("/environment/tabs_use_mousewheel"),true);
+@@ -152,10 +145,6 @@ void cbAuiNotebook::ResetTabCtrlEvents()
+ {
+     for (size_t i = 0; i < m_TabCtrls.GetCount(); ++i)
+     {
+-#if !wxCHECK_VERSION(3, 0, 0)
+-        m_TabCtrls[i]->Disconnect(wxEVT_MOTION, wxMouseEventHandler(cbAuiNotebook::OnMotion));
+-        m_TabCtrls[i]->Connect(wxEVT_MOTION ,   wxMouseEventHandler(cbAuiNotebook::OnMotion));
+-#endif
+         m_TabCtrls[i]->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(cbAuiNotebook::OnTabCtrlDblClick));
+         m_TabCtrls[i]->Connect(wxEVT_LEFT_DCLICK,    wxMouseEventHandler(cbAuiNotebook::OnTabCtrlDblClick));
+         m_TabCtrls[i]->Disconnect(wxEVT_SIZE,        wxSizeEventHandler(cbAuiNotebook::OnResize));
+@@ -427,57 +416,6 @@ void cbAuiNotebook::OnResize(wxSizeEvent& event)
+     event.Skip();
+ }
+ 
+-#if !wxCHECK_VERSION(3, 0, 0)
+-void cbAuiNotebook::OnMotion(wxMouseEvent& event)
+-{
+-    event.Skip();
+-    wxAuiTabCtrl* tabCtrl = (wxAuiTabCtrl*)event.GetEventObject();
+-    if (!tabCtrl)
+-        return;
+-    cbAuiNotebook* nb = (cbAuiNotebook*)tabCtrl->GetParent();
+-    if (!nb || !nb->m_HasToolTip)
+-        return;
+-
+-    wxWindow* win = nullptr;
+-    if (event.Moving() && tabCtrl->TabHitTest(event.m_x, event.m_y, &win))
+-    {
+-        if (!win)
+-        {
+-            tabCtrl->UnsetToolTip();
+-            return;
+-        }
+-        wxString text(win->GetName());
+-        // If the text changes, set it else, keep old, to avoid
+-        // 'moving tooltip' effect
+-        wxToolTip* tooltip = tabCtrl->GetToolTip();
+-        if (!tooltip || tooltip->GetTip() != text)
+-            tabCtrl->SetToolTip(text);
+-    }
+-    else
+-        tabCtrl->UnsetToolTip();
+-}
+-
+-bool cbAuiNotebook::SetPageToolTip(size_t idx, const wxString & text)
+-{
+-    if (!m_HasToolTip)
+-        UpdateTabControlsArray();
+-
+-    m_HasToolTip = true;
+-    wxWindow* win = GetPage(idx);
+-    if (win && win->GetName() != text)
+-        win->SetName(text);
+-    else
+-        return false;
+-    return true;
+-}
+-wxString cbAuiNotebook::GetPageToolTip(size_t idx)
+-{
+-    wxWindow* win = GetPage(idx);
+-    if (win)
+-        return win->GetName();
+-    return wxEmptyString;
+-}
+-#endif
+ void cbAuiNotebook::MinimizeFreeSpace()
+ {
+     if (GetPageCount() < 2)
+@@ -657,22 +595,14 @@ void cbAuiNotebook::AdvanceSelection(bool forward)
+     }
+ }
+ 
+-#if wxCHECK_VERSION(3, 0, 0)
+ void cbAuiNotebook::OnNavigationKeyNotebook(wxNavigationKeyEvent& event)
+-#else
+-void cbAuiNotebook::OnNavigationKey(wxNavigationKeyEvent& event)
+-#endif
+ {
+     // if we change window, we call our own AdvanceSelection
+     if ( event.IsWindowChange() )
+         AdvanceSelection(event.GetDirection());
+     else // otherwise we call the event-handler from the parent-class
+     {
+-#if wxCHECK_VERSION(3, 0, 0)
+         wxAuiNotebook::OnNavigationKeyNotebook(event);
+-#else
+-        wxAuiNotebook::OnNavigationKey(event);
+-#endif
+     }
+ }
+ 
+@@ -726,11 +656,7 @@ wxString cbAuiNotebook::SavePerspective(const wxString projectTitle)
+                 if (!tabsTmp.empty())
+                     tabsTmp += wxT(",");
+ 
+-#if wxCHECK_VERSION(3, 0, 0)
+                 if ((int)page_idx == m_curPage)
+-#else
+-                if ((int)page_idx == m_curpage)
+-#endif
+                     tabsTmp += wxT("*");
+                 else if ((int)p == tabCtrl->GetActivePage())
+                     tabsTmp += wxT("+");
+@@ -886,11 +812,7 @@ bool cbAuiNotebook::LoadPerspective(const wxString& layout, bool mergeLayouts)
+         wxString pane_name = tab_part.BeforeFirst(wxT('='));
+ 
+         // create a new tab frame
+-#if wxCHECK_VERSION(3, 0, 0)
+         m_curPage = -1;
+-#else
+-        m_curpage = -1;
+-#endif
+ 
+         // Get list of tab id's and move them to pane
+         wxString tab_list = tab_part.AfterFirst(wxT('='));
+@@ -1004,11 +926,7 @@ bool cbAuiNotebook::LoadPerspective(const wxString& layout, bool mergeLayouts)
+     RemoveEmptyTabFrames();
+ 
+     // Force refresh of selection
+-#if wxCHECK_VERSION(3, 0, 0)
+     m_curPage = -1;
+-#else
+-    m_curpage = -1;
+-#endif
+     SetSelection(sel_page);
+ 
+     UpdateTabControlsArray();
+diff --git a/src/sdk/crc32.cpp b/src/sdk/crc32.cpp
+index 7b387877d..62024d3c0 100644
+--- a/src/sdk/crc32.cpp
++++ b/src/sdk/crc32.cpp
+@@ -78,11 +78,7 @@ wxUint32 wxCrc32::FromString(const wxString& text)
+             // Calculate the checksum
+             crc = 0xFFFFFFFFUL;
+             while (text[i])
+-            #if wxCHECK_VERSION(3, 0, 0)
+                 { crc = (crc>>8) ^ crc_table[ (crc^(text[i++].GetValue())) & 0xFF ]; }
+-            #else
+-                { crc = (crc>>8) ^ crc_table[ (crc^(text[i++])) & 0xFF ]; }
+-            #endif
+ 
+             crc ^= 0xFFFFFFFFUL ;
+         }
+diff --git a/src/sdk/editorcolourset.cpp b/src/sdk/editorcolourset.cpp
+index e39eb412a..483d6a0e8 100644
+--- a/src/sdk/editorcolourset.cpp
++++ b/src/sdk/editorcolourset.cpp
+@@ -835,11 +835,7 @@ void EditorColourSet::SetKeywords(HighlightLanguage lang, int idx, const wxStrin
+         wxString tmp(_T(' '), keywords.length()); // faster than using Alloc()
+ 
+         const wxChar *src = keywords.c_str();
+-        #if wxCHECK_VERSION(3, 0, 0)
+         wxStringCharType *dst = const_cast<wxStringCharType*>(tmp.wx_str());
+-        #else
+-        wxChar *dst = (wxChar *) tmp.c_str();
+-        #endif
+         wxChar c;
+         size_t len = 0;
+ 
+diff --git a/src/sdk/editorlexerloader.cpp b/src/sdk/editorlexerloader.cpp
+index ee291b734..85e4d7db8 100644
+--- a/src/sdk/editorlexerloader.cpp
++++ b/src/sdk/editorlexerloader.cpp
+@@ -229,11 +229,7 @@ void EditorLexerLoader::DoSingleKeywordNode(HighlightLanguage language, TiXmlEle
+             wxString value(keywords->Attribute("value"), wxConvUTF8);
+             regex.Replace(&value, _T(" "));
+ 
+-            #if wxCHECK_VERSION(3, 0, 0)
+             m_pTarget->SetKeywords(language, keyidx, value );
+-            #else
+-            m_pTarget->SetKeywords(language, keyidx, wxString ( value, wxConvUTF8 ) );
+-            #endif
+         }
+ 
+         keywords = keywords->NextSiblingElement(nodename.mb_str());

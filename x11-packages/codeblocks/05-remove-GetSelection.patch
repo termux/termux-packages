@@ -1,0 +1,54 @@
+From dbdf5c5ea9e3161233f0588a7616b7e4fedc7870 Mon Sep 17 00:00:00 2001
+From: mortenmacfly <mortenmacfly@2a5c6006-c6dd-42ca-98ab-0921f2732cef>
+Date: Sat, 3 Apr 2021 05:14:39 +0000
+Subject: [PATCH] * applied patch #1079 Don't call wxChoice::GetString() with
+ wxNOT_FOUND (thanks Miguel Gimenez)
+
+git-svn-id: https://svn.code.sf.net/p/codeblocks/code/trunk@12312 2a5c6006-c6dd-42ca-98ab-0921f2732cef
+---
+ .../FileManager/FileExplorerUpdater.cpp       | 20 +++++++++++++++----
+ 1 file changed, 16 insertions(+), 4 deletions(-)
+
+diff --git a/src/plugins/contrib/FileManager/FileExplorerUpdater.cpp b/src/plugins/contrib/FileManager/FileExplorerUpdater.cpp
+index 5a0b3a9ee..9dee80696 100644
+--- a/src/plugins/contrib/FileManager/FileExplorerUpdater.cpp
++++ b/src/plugins/contrib/FileManager/FileExplorerUpdater.cpp
+@@ -150,10 +150,16 @@ void FileExplorerUpdater::Update(const wxTreeItemId &ti)
+     m_path=wxString(m_fe->GetFullPath(ti).c_str());
+     m_wildcard=wxString(m_fe->m_WildCards->GetValue().c_str());
+     m_vcs_type=wxString(m_fe->m_VCS_Type->GetLabel().c_str());
+-    m_vcs_commit_string=wxString(m_fe->m_VCS_Control->GetString(m_fe->m_VCS_Control->GetSelection()).c_str());
++    const int selection = m_fe->m_VCS_Control->GetSelection();
++    if (selection == wxNOT_FOUND)
++        m_vcs_commit_string.clear();
++    else
++        m_vcs_commit_string = wxString(m_fe->m_VCS_Control->GetString(selection).c_str());
++
+     m_vcs_changes_only = m_fe->m_VCS_ChangesOnly->IsChecked();
+-    if (m_vcs_type != wxEmptyString)
++    if (!m_vcs_type.empty())
+         m_repo_path=wxString(m_fe->GetRootFolder().c_str());
++
+     GetTreeState(ti);
+     if (Create()==wxTHREAD_NO_ERROR)
+     {
+@@ -1262,11 +1268,17 @@ void VCSFileLoader::Update(const wxString &op, const wxString &source_path, cons
+     m_source_path=wxString(source_path.c_str());
+     m_destination_path=wxString(destination_path.c_str());
+     m_vcs_type=wxString(m_fe->m_VCS_Type->GetLabel().c_str());
+-    m_vcs_commit_string=wxString(m_fe->m_VCS_Control->GetString(m_fe->m_VCS_Control->GetSelection()).c_str());
++    const int selection = m_fe->m_VCS_Control->GetSelection();
++    if (selection == wxNOT_FOUND)
++        m_vcs_commit_string.clear();
++    else
++        m_vcs_commit_string = wxString(m_fe->m_VCS_Control->GetString(selection).c_str());
++
+     m_vcs_op = wxString(op.c_str());
+     m_vcs_comp_commit = wxString(comp_commit.c_str());
+-    if (m_vcs_type != wxEmptyString)
++    if (!m_vcs_type.empty())
+         m_repo_path=wxString(m_fe->GetRootFolder().c_str());
++
+     if (Create()==wxTHREAD_NO_ERROR)
+     {
+         SetPriority(20);

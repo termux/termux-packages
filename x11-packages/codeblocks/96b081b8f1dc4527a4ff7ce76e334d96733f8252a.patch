@@ -1,0 +1,52 @@
+From 6b081b8f1dc4527a4ff7ce76e334d96733f8252a Mon Sep 17 00:00:00 2001
+From: wh11204 <wh11204@2a5c6006-c6dd-42ca-98ab-0921f2732cef>
+Date: Thu, 30 Jun 2022 09:36:18 +0000
+Subject: [PATCH] - Complete previous commit, InsertPage() must be fixed too.
+ It appeared in the diff, but I forgot about it when editing.
+
+git-svn-id: https://svn.code.sf.net/p/codeblocks/code/trunk@12842 2a5c6006-c6dd-42ca-98ab-0921f2732cef
+---
+ src/include/cbauibook.h | 6 +++++-
+ src/sdk/cbauibook.cpp   | 4 ++++
+ 2 files changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/src/include/cbauibook.h b/src/include/cbauibook.h
+index b5add7342..4d75d6261 100644
+--- a/src/include/cbauibook.h
++++ b/src/include/cbauibook.h
+@@ -138,14 +138,18 @@ class DLLIMPORT cbAuiNotebook : public wxAuiNotebook
+          * \param page The page to add
+          * \param caption The caption of the page
+          * \param select If true the page gets selected
+-         * \param bitmap The bitmap of the tab
++         * \param bitmap The bitmap (or bitmap bundle since wx3.1.6) of the tab
+          * \return true if successful
+          */
+         bool InsertPage(size_t page_idx,
+                         wxWindow* page,
+                         const wxString& caption,
+                         bool select = false,
++#if wxCHECK_VERSION(3, 1, 6)
++                        const wxBitmapBundle& bitmap = wxBitmapBundle());
++#else
+                         const wxBitmap& bitmap = wxNullBitmap);
++#endif
+         /** \brief Set zoom factor for builtin editors
+          *
+          * Sets the zoom factor for all visible builtin
+diff --git a/src/sdk/cbauibook.cpp b/src/sdk/cbauibook.cpp
+index 3d60470e9..bd7f9c2d0 100644
+--- a/src/sdk/cbauibook.cpp
++++ b/src/sdk/cbauibook.cpp
+@@ -515,7 +515,11 @@ bool cbAuiNotebook::InsertPage(size_t page_idx,
+                                wxWindow* page,
+                                const wxString& caption,
+                                bool select,
++#if wxCHECK_VERSION(3, 1, 6)
++                               const wxBitmapBundle& bitmap)
++#else
+                                const wxBitmap& bitmap)
++#endif
+ {
+     bool result = wxAuiNotebook::InsertPage(page_idx, page, caption, select, bitmap);
+     MinimizeFreeSpace();

@@ -1,0 +1,70 @@
+From f2f127cf5cd97c7da6a957a3f7764cb25cc9017e Mon Sep 17 00:00:00 2001
+From: fuscated <fuscated@2a5c6006-c6dd-42ca-98ab-0921f2732cef>
+Date: Tue, 16 Mar 2021 23:28:35 +0000
+Subject: [PATCH] * UI: Add display info in the Help -> About -> Information
+ dialog
+
+> There are many reports of people having trouble with either multi monitor
+  setups or HiDPI setups. It would be a lot easier if they could gather
+  the information form one single place.
+> Note0: The scaling factors are based on the scaling factors of the About
+  dialog. In a system which supports monitors with different PPIs it might
+  report the incorrect value.
+> Note1: wxGetDisplayPPI is also some global and not per display.
+
+git-svn-id: https://svn.code.sf.net/p/codeblocks/code/trunk@12305 2a5c6006-c6dd-42ca-98ab-0921f2732cef
+---
+ src/src/dlgabout.cpp | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
+
+diff --git a/src/src/dlgabout.cpp b/src/src/dlgabout.cpp
+index 2afeeabac..1df51142a 100644
+--- a/src/src/dlgabout.cpp
++++ b/src/src/dlgabout.cpp
+@@ -31,6 +31,7 @@
+ 
+ #include <wx/bitmap.h>
+ #include <wx/dcmemory.h>    // wxMemoryDC
++#include <wx/display.h>
+ #include <wx/statbmp.h>
+ 
+ #include "appglobals.h"
+@@ -164,10 +165,38 @@ dlgAbout::dlgAbout(wxWindow* parent)
+     items.push_back({_("Version"), appglobals::AppActualVersion});
+     items.push_back({_("SDK Version"), appglobals::AppSDKVersion});
+     items.push_back({_("Scintilla Version"), scintillaStr});
++
+     items.push_back({_("Author"), _("The Code::Blocks Team")});
+     items.push_back({_("E-mail"), appglobals::AppContactEmail});
+     items.push_back({_("Website"), appglobals::AppUrl});
+ 
++    items.push_back({_("Scaling factor"), wxString::Format("%f", GetContentScaleFactor())});
++    items.push_back({_("Detected scaling factor"),
++                     wxString::Format("%f", cbGetActualContentScaleFactor(*this))});
++    const wxSize displayPPI = wxGetDisplayPPI();
++    items.push_back({_("Display PPI"), wxString::Format("%dx%d", displayPPI.x, displayPPI.y)});
++
++    unsigned displays = wxDisplay::GetCount();
++    items.push_back({_("Display count"), wxString::Format("%u", displays)});
++
++    for (unsigned ii = 0; ii < displays; ++ii)
++    {
++        wxDisplay display(ii);
++
++        Item item;
++        item.name = wxString::Format(_("Display %u"), ii);
++
++        const wxString &name = display.GetName();
++        if (!name.empty())
++            item.name += " (" + name + ")";
++
++        const wxRect geometry = display.GetGeometry();
++        item.value= wxString::Format(_("XY=[%d,%d]; Size=[%d,%d]; %s"), geometry.GetLeft(),
++                                     geometry.GetTop(), geometry.GetWidth(), geometry.GetHeight(),
++                                     (display.IsPrimary() ? _("Primary") : wxString()));
++        items.push_back(item);
++    }
++
+     int maxNameLength = 0;
+     for (const Item &item : items)
+     {

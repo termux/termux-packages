@@ -1,0 +1,30 @@
+From 46720043319758cb0e798eb23520063583c40eaa Mon Sep 17 00:00:00 2001
+From: fuscated <fuscated@2a5c6006-c6dd-42ca-98ab-0921f2732cef>
+Date: Sun, 15 Aug 2021 11:51:11 +0000
+Subject: [PATCH] * SDK: Fix a regex in the MacroManager to work with the PCRE2
+ regex engine used by wx3.1.6 (ticket #1120)
+
+> This regex is totally bonkers. I don't know what its purpose is, but it
+  is mighty strange. There is a group at the beginning which tries to match
+  non-$ or start of the string. At the end there is code to match ' ', '/'
+  or '\'. The braces could be mismatched - ${var) works perfectly fine.
+> The fix is - we want to match '\', so we need to escape it.
+
+git-svn-id: https://svn.code.sf.net/p/codeblocks/code/trunk@12511 2a5c6006-c6dd-42ca-98ab-0921f2732cef
+---
+ src/sdk/macrosmanager.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/sdk/macrosmanager.cpp b/src/sdk/macrosmanager.cpp
+index 4027d1974..086dc35cd 100644
+--- a/src/sdk/macrosmanager.cpp
++++ b/src/sdk/macrosmanager.cpp
+@@ -80,7 +80,7 @@ void MacrosManager::Reset()
+     m_Plugins  = UnixFilename(ConfigManager::GetPluginsFolder());
+     m_DataPath = UnixFilename(ConfigManager::GetDataFolder());
+     ClearProjectKeys();
+-    m_RE_Unix.Compile(_T("([^$]|^)(\\$[({]?(#?[A-Za-z_0-9.]+)[)} /\\]?)"),               wxRE_EXTENDED | wxRE_NEWLINE);
++    m_RE_Unix.Compile(_T("([^$]|^)(\\$[({]?(#?[A-Za-z_0-9.]+)[\\)} /\\\\]?)"),           wxRE_EXTENDED | wxRE_NEWLINE);
+     m_RE_DOS.Compile(_T("([^%]|^)(%(#?[A-Za-z_0-9.]+)%)"),                               wxRE_EXTENDED | wxRE_NEWLINE);
+     m_RE_IfSp.Compile(_T("(([^=!<>]+)[ ]*(=|==|!=|>|<|>=|<=)[ ]*([^=!<>]+))"),           wxRE_EXTENDED | wxRE_NEWLINE);
+     m_RE_Script.Compile(_T("(\\[\\[(.*)\\]\\])"),                                        wxRE_EXTENDED | wxRE_NEWLINE);

@@ -1,0 +1,213 @@
+From 40eb88e3f2b933f19f9933e06c8d0899c54f5e25 Mon Sep 17 00:00:00 2001
+From: mortenmacfly <mortenmacfly@2a5c6006-c6dd-42ca-98ab-0921f2732cef>
+Date: Sat, 4 Jan 2020 15:41:53 +0000
+Subject: [PATCH] * applied patch #805: Flashing icons in Windows' taskbar
+ while starting C::B. Thanks Miguel Gimenez.
+
+git-svn-id: https://svn.code.sf.net/p/codeblocks/code/trunk@11938 2a5c6006-c6dd-42ca-98ab-0921f2732cef
+---
+ src/include/compiler.h                    |  15 +--
+ src/plugins/compilergcc/compilerMINGW.cpp |  13 +--
+ src/sdk/compiler.cpp                      | 106 +++++++++++++++++++---
+ 3 files changed, 104 insertions(+), 30 deletions(-)
+
+diff --git a/src/include/compiler.h b/src/include/compiler.h
+index f151ef62f..8d18c8ffc 100644
+--- a/src/include/compiler.h
++++ b/src/include/compiler.h
+@@ -100,12 +100,12 @@ struct RegExStruct
+     }
+     RegExStruct& operator=(const RegExStruct &obj)
+     {
+-        desc=obj.desc;
+-        lt=obj.lt;
+-        regex=obj.regex;
+-        regexCompiled=false;
+-        filename=obj.filename;
+-        line=obj.line;
++        desc          = obj.desc;
++        lt            = obj.lt;
++        regex         = obj.regex;
++        regexCompiled = false;
++        filename      = obj.filename;
++        line          = obj.line;
+         memcpy(msg, obj.msg, sizeof(msg));
+ 
+         return *this;
+@@ -404,6 +404,9 @@ class DLLIMPORT Compiler : public CompileOptionsBase
+         // keeps a copy of current settings (works only the first time it's called)
+         void MirrorCurrentSettings();
+ 
++        // execute without creating taskbar icon
++        long Execute(const wxString& cmd, wxArrayString& output);
++
+         // set the following members in your class
+         wxString            m_Name;
+         wxString            m_MasterPath;
+diff --git a/src/plugins/compilergcc/compilerMINGW.cpp b/src/plugins/compilergcc/compilerMINGW.cpp
+index 1c6cd88a7..5f5509229 100644
+--- a/src/plugins/compilergcc/compilerMINGW.cpp
++++ b/src/plugins/compilergcc/compilerMINGW.cpp
+@@ -173,7 +173,7 @@ void CompilerMINGW::SetVersionString()
+ {
+ //    Manager::Get()->GetLogManager()->DebugLog(_T("Compiler detection for compiler ID: '") + GetID() + _T("' (parent ID= '") + GetParentID() + _T("')"));
+ 
+-    wxArrayString output, errors;
++    wxArrayString output;
+     wxString sep = wxFileName::GetPathSeparator();
+     wxString master_path = m_MasterPath;
+     wxString compiler_exe = m_Programs.C;
+@@ -223,16 +223,7 @@ void CompilerMINGW::SetVersionString()
+ 
+ //    Manager::Get()->GetLogManager()->DebugLog(_T("Compiler version detection: Issuing command: ") + gcc_command);
+ 
+-    int flags = wxEXEC_SYNC;
+-#if wxCHECK_VERSION(3, 0, 0)
+-    // Stop event-loop while wxExecute runs, to avoid a deadlock on startup,
+-    // that occurs from time to time on wx3
+-    flags |= wxEXEC_NOEVENTS;
+-#else
+-    flags |= wxEXEC_NODISABLE;
+-#endif
+-    long result = wxExecute(gcc_command + _T(" --version"), output, errors, flags );
+-    if(result != 0)
++    if ( Execute(gcc_command + _T(" --version"), output) != 0 )
+     {
+ //        Manager::Get()->GetLogManager()->DebugLog(_T("Compiler version detection: Error executing command."));
+     }
+diff --git a/src/sdk/compiler.cpp b/src/sdk/compiler.cpp
+index b356de382..c80bbbd61 100644
+--- a/src/sdk/compiler.cpp
++++ b/src/sdk/compiler.cpp
+@@ -20,7 +20,9 @@
+     #include "compilerfactory.h"
+ 
+     #include <wx/intl.h>
++    #include <wx/process.h>
+     #include <wx/regex.h>
++    #include <wx/txtstrm.h>
+ #endif
+ 
+ #include "compilercommandgenerator.h"
+@@ -28,7 +30,6 @@
+ #include <wx/filefn.h>
+ #include <wx/xml/xml.h>
+ 
+-
+ // static
+ wxArrayString Compiler::m_CompilerIDs; // map to guarantee unique IDs
+ 
+@@ -1229,18 +1230,7 @@ bool Compiler::EvalXMLCondition(const wxXmlNode* node)
+ 
+         long ret = -1;
+         if ( !cmd[0].IsEmpty() ) // should never be empty
+-        {
+-            int flags = wxEXEC_SYNC;
+-            #if wxCHECK_VERSION(3, 0, 0)
+-                // Stop event-loop while wxExecute runs, to avoid a deadlock on startup,
+-                // that occurs from time to time on wx3
+-                flags |= wxEXEC_NOEVENTS;
+-            #else
+-                flags |= wxEXEC_NODISABLE;
+-            #endif
+-            wxLogNull logNo; // do not warn if execution fails
+-            ret = wxExecute(GetStringFromArray(cmd, wxT(" "), false), cmd, flags);
+-        }
++            ret = Execute(GetStringFromArray(cmd, wxT(" "), false), cmd);
+ 
+         if (ret != 0) // execution failed
+             val = (node->GetAttribute(wxT("default"), wxEmptyString) == wxT("true"));
+@@ -1284,3 +1274,93 @@ wxString Compiler::GetExecName(const wxString& name)
+         ret = m_Programs.MAKE;
+     return ret;
+ }
++
++#ifdef __WXMSW__
++
++// In MSW calling wxExecute in synchronous mode while the main window is not visible makes
++// the system show a C::B icon in the taskbar. When this is made repeatedly (as in compiler
++// loading) the result is a stream of flashing icons.
++// However, wxExecute in asynchronous mode does not do this. The caveat is that we must wait
++// in a loop for the end of the task and extract the command output in a separate step.
++
++// This auxiliary class is needed for detecting the end of the task and retrieving the ouput.
++// OnTerminate() will be called when the task ends with the return code of the task, and then
++// the task output can be retrieved (as a stream).
++
++class ExecProcess : public wxProcess
++{
++    public:
++          ExecProcess(cb_unused wxEvtHandler *parent = NULL, cb_unused int id = -1)
++          {
++              m_status = 0;
++          }
++
++          long GetStatus() const {return m_status;}
++          wxSemaphore &GetSemaphore() {return m_semaphore;}
++          void OnTerminate(cb_unused int pid, int status)
++          {
++              m_status = status;
++              m_semaphore.Post();
++          }
++
++    protected:
++          long m_status;
++          wxSemaphore m_semaphore;
++};
++
++// Emulates wxExecute() in synchronous mode using asynchronous mode
++
++long Compiler::Execute(const wxString &cmd, wxArrayString &output)
++{
++    wxLogNull logNo; // do not warn if execution fails
++
++    output.Clear();
++
++    ExecProcess process;
++    process.Redirect(); // capture task input/output streams
++
++    // wxExecute in asynchronous mode returns 0 if execution failed.
++    // Return -1 emulating the behaviour of wxExecute in synchronous mode
++    if ( !wxExecute(cmd, wxEXEC_ASYNC, &process) )
++        return -1;
++
++    // Wait for the end of the task
++    for (;;)
++    {
++        Manager::Yield(); // needed for semaphore update
++        if (process.GetSemaphore().WaitTimeout(25) == wxSEMA_NO_ERROR)
++            break;
++    }
++
++    // Loads the wxArrayString with the task output (returned in a wxInputStream)
++    wxInputStream *inputStream = process.GetInputStream();
++    wxTextInputStream text(*inputStream);
++#if wxCHECK_VERSION(3, 0, 0)
++    while (!text.GetInputStream().Eof())
++#else
++    while (!inputStream->Eof())
++#endif
++    {
++        output.Add(text.ReadLine());
++    }
++
++    // Return task exit code emulating the behaviour of wxExecute in synchronous mode
++    return process.GetStatus();
++}
++
++#else // __WXMSW__
++
++long Compiler::Execute(const wxString &cmd, wxArrayString &output)
++{
++    wxLogNull logNo; // do not warn if execution fails
++    int flags = wxEXEC_SYNC;
++    #if wxCHECK_VERSION(3, 0, 0)
++        // Stop event-loop while wxExecute runs, to avoid a deadlock on startup,
++        // that occurs from time to time on wx3
++        flags |= wxEXEC_NOEVENTS;
++    #else
++        flags |= wxEXEC_NODISABLE;
++    #endif
++    return wxExecute(cmd, output, flags);
++}
++#endif // __WXMSW__
