@@ -183,6 +183,10 @@ PACKAGES+=" rsync"
 # Needed by megacmd
 PACKAGES+=" wget"
 
+# Needed by codeblocks
+PACKAGES+=" libwxgtk3.0-gtk3-dev"
+PACKAGES+=" libgtk-3-dev"
+
 # Needed by packages in unstable repository.
 PACKAGES+=" comerr-dev"
 PACKAGES+=" docbook-to-man"

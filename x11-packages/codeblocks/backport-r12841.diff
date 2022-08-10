@@ -1,0 +1,248 @@
+------------------------------------------------------------------------
+r12841 | wh11204 | 2022-06-29 21:34:36 +0900 (Wed, 29 Jun 2022) | 4 lines
+
+* Fix compilation of wx3.1.6 and later with Clang (thanks AndrewCot).
+See https://forums.codeblocks.org/index.php/topic,25004.msg170429.html#msg170429
+Also fix some typos in documentation.
+
+------------------------------------------------------------------------
+Index: src/include/cbauibook.h
+===================================================================
+--- src/include/cbauibook.h	(revision 12840)
++++ src/include/cbauibook.h	(revision 12841)
+@@ -57,14 +57,14 @@
+         /** \brief Loads serialized notebook layout
+          * \param layout the serialized layout
+          * \param mergeLayouts try to merge the tab-layouts
+-         * \return bool true if successfull
++         * \return bool true if successful
+          *
+          */
+         bool LoadPerspective(const wxString& layout, bool mergeLayouts = false);
+-        /** \brief Get the tab index from tooltiptext
++        /** \brief Get the tab index from tooltip text
+          * \param text the notebooks name
+          * \return int the tab's index
+-         * @remarks We use the name internally to store the tooltip-text. To use it
++         * @remarks We use the name internally to store the tooltip text. To use it
+          * in this function, we create a unique string from the relative filename
+          * and the projects title. So it should be unique even after a
+          * restart of C::B.
+@@ -78,7 +78,7 @@
+          * \return int the visible position
+          */
+         int GetTabPositionFromIndex(int index);
+-        /** \brief Minmize free horizontal page
++        /** \brief Minimize free horizontal page
+          *
+          * Moves the active tab of all tabCtrl's to the rightmost place,
+          * to show as many tabs as possible.
+@@ -87,21 +87,21 @@
+         /** \brief Delete Page
+          *
+          * Calls the base-class function and after that
+-         * MinmizeFreeSpace(), needed to hook into the close-events.
++         * MinimizeFreeSpace(), needed to hook into the close-events.
+          * The system generated close event has to be veto'd, and Close()
+          * has to be called manually, so we can handle it ourselves.
+          * \param The index of the tab to be closed
+-         * \return true if successfull
++         * \return true if successful
+          */
+         bool DeletePage(size_t page) override;
+         /** \brief Remove Page
+          *
+          * Calls the base-class function and after that
+-         * MinmizeFreeSpace(), needed to hook into the close-events.
++         * MinimizeFreeSpace(), needed to hook into the close-events.
+          * The system generated close event has to be veto'd, and Close()
+          * has to be called manually, so we can handle it ourselves.
+          * \param The index of the tab to be closed
+-         * \return true if successfull
++         * \return true if successful
+          */
+         bool RemovePage(size_t page) override;
+         /** \brief Move page
+@@ -109,33 +109,37 @@
+          * Moves the tab containing page to new_idx
+          * \param page The page to move (e.g. cbEditor*)
+          * \param new_idx The index the page should be moved to
+-         * \return true if successfull
++         * \return true if successful
+          */
+         bool MovePage(wxWindow* page, size_t new_idx);
+         /** \brief Add Page
+          *
+          * Calls the base-class function and after that
+-         * MinmizeFreeSpace().
++         * MinimizeFreeSpace().
+          * \param page The page to add
+          * \param caption The caption of the page
+          * \param select If true the page gets selected
+-         * \param bitmap The bitmap of the tab
+-         * \return true if successfull
++         * \param bitmap The bitmap (or bitmap bundle since wx3.1.6) of the tab
++         * \return true if successful
+          */
+         bool AddPage(wxWindow* page,
+                      const wxString& caption,
+                      bool select = false,
++#if wxCHECK_VERSION(3, 1, 6)
++                     const wxBitmapBundle& bitmap = wxBitmapBundle());
++#else
+                      const wxBitmap& bitmap = wxNullBitmap);
++#endif
+         /** \brief Insert Page
+          *
+          * Calls the base-class function and after that
+-         * MinmizeFreeSpace().
++         * MinimizeFreeSpace().
+          * \param page_idx The index where the page should be inserted
+          * \param page The page to add
+          * \param caption The caption of the page
+          * \param select If true the page gets selected
+          * \param bitmap The bitmap of the tab
+-         * \return true if successfull
++         * \return true if successful
+          */
+         bool InsertPage(size_t page_idx,
+                         wxWindow* page,
+@@ -142,11 +146,11 @@
+                         const wxString& caption,
+                         bool select = false,
+                         const wxBitmap& bitmap = wxNullBitmap);
+-        /** \brief Set zoomfactor for builtin editors
++        /** \brief Set zoom factor for builtin editors
+          *
+-         * Sets the zoomfactor for all visible builtin
++         * Sets the zoom factor for all visible builtin
+          * editors.
+-         * \param zoom zoomfactor to use
++         * \param zoom zoom factor to use
+          */
+         void SetZoom(int zoom);
+         /** \brief Set Focus on the tabCtrl belonging to the active tab
+@@ -165,7 +169,7 @@
+         /** \brief Create a unique id from the tooltip-text
+          *
+          * Tries to create a unique id from the tooltip.
+-         * Find the projectfile, geet the relative filename and put it
++         * Find the projectfile, get the relative filename and put it
+          * together with the projects name.
+          * We use it to save and load the pane layout.
+          * By using the relative filename, it works even if the project
+@@ -173,7 +177,7 @@
+          * \param text The tooltip text
+          */
+         wxString UniqueIdFromTooltip(const wxString& text);
+-        /** \brief Minmize free horizontal page of tabCtrl
++        /** \brief Minimize free horizontal page of tabCtrl
+          *
+          * Moves the active tab of tabCtrl to the rightmost place,
+          * to show as many tabs as possible.
+@@ -194,7 +198,7 @@
+         void OnIdle(cb_unused wxIdleEvent& event);
+         /** \brief Catch doubleclick-events from wxTabCtrl
+          *
+-         * Sends cbEVT_CBAUIBOOK_LEFT_DCLICK, if doubleclick was on a tab,
++         * Sends cbEVT_CBAUIBOOK_LEFT_DCLICK, if double click was on a tab,
+          * event-Id is the notebook-Id, event-object is the pointer to the window the
+          * tab belongs to.
+          * \param event holds the wxTabCtrl, that sends the event
+@@ -202,7 +206,7 @@
+         void OnTabCtrlDblClick(wxMouseEvent& event);
+         /** \brief Catch mousewheel-events from wxTabCtrl
+          *
+-         * Sends cbEVT_CBAUIBOOK_MOUSEWHEEL, if doubleclick was on a tab,
++         * Sends cbEVT_CBAUIBOOK_MOUSEWHEEL, if double click was on a tab,
+          * event-Id is the notebook-Id, event-object is the pointer to the window the
+          * tab belongs to.
+          * \param event holds the wxTabCtrl, that sends the event
+@@ -229,7 +233,7 @@
+          * \param event holds the wxTabCtrl, that sends the event
+          */
+         void OnLeaveTabCtrl(wxMouseEvent& event);
+-        // hack needed on wxMSW, because only focused windows get mousewheel-events
++        // hack needed on wxMSW, because only focused windows get mouse wheel-events
+         /** \brief Checks the old focus
+          *
+          * Checks whether the old focused window or one of it's
+@@ -276,7 +280,7 @@
+         // needed for wxMSW-hack, see above
+         /** \brief Last selected tab
+          *
+-         * Used to determine whether the tab-selection has changed btween mouseenter
++         * Used to determine whether the tab-selection has changed between mouseenter
+          * and mouseleave-event.
+          */
+         int m_LastSelected;
+@@ -308,7 +312,7 @@
+          * \param use If true tooltips are allowed
+          */
+         static void UseToolTips(bool use = true);
+-        /** \brief Enable or disable tab-scrolling with mousewheel
++        /** \brief Enable or disable tab-scrolling with mouse wheel
+          *
+          * \param allow If true scrolling is allowed
+          */
+@@ -316,15 +320,15 @@
+         /** \brief Sets the modifier keys for scrolling
+          */
+         static void SetModKeys(wxString keys = _T("Strg"));
+-        /** \brief Use modkey to advance through tabs with mousewheel
++        /** \brief Use modkey to advance through tabs with mouse wheel
+          */
+         static void UseModToAdvance(bool use = false);
+-        /** \brief Change direction of tab-advancing with mousewheel
++        /** \brief Change direction of tab-advancing with mouse wheel
+          *
+          * \param invert If true advance direction is inverted
+          */
+         static void InvertAdvanceDirection(bool invert = false);
+-        /** \brief Change direction of tab-moving with mousewheel
++        /** \brief Change direction of tab-moving with mouse wheel
+          *
+          * \param invert If true move direction is inverted
+          */
+@@ -333,7 +337,7 @@
+         /** \brief Enable or disable tab tooltips
+          */
+         static bool s_UseTabTooltips;
+-        /** \brief Enable or disable scrolling tabs with mousewheel
++        /** \brief Enable or disable scrolling tabs with mouse wheel
+          */
+         static bool s_AllowMousewheel;
+         /** \brief Holds an array of all existing cbAuiNotebooks
+@@ -342,13 +346,13 @@
+         /** \brief Holds the modifier keys for scrolling
+          */
+         static wxString s_modKeys;
+-        /** \brief Use modkey to advance through tabs with mousewheel
++        /** \brief Use modkey to advance through tabs with mouse wheel
+          */
+         static bool s_modToAdvance;
+-        /** \brief Mousewheel move direction: negative => invert
++        /** \brief Mouse wheel move direction: negative => invert
+          */
+         static int s_moveDirection;
+-        /** \brief Mouseweheel advance direction: negative => invert
++        /** \brief Mouse wheel advance direction: negative => invert
+          */
+         static int s_advanceDirection;
+ 
+Index: src/sdk/cbauibook.cpp
+===================================================================
+--- src/sdk/cbauibook.cpp	(revision 12840)
++++ src/sdk/cbauibook.cpp	(revision 12841)
+@@ -500,7 +500,11 @@
+ bool cbAuiNotebook::AddPage(wxWindow* page,
+                             const wxString& caption,
+                             bool select,
++#if wxCHECK_VERSION(3, 1, 6)
++                            const wxBitmapBundle& bitmap)
++#else
+                             const wxBitmap& bitmap)
++#endif
+ {
+     bool result = wxAuiNotebook::AddPage(page, caption, select, bitmap);
+     MinimizeFreeSpace();
