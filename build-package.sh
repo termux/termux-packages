@@ -370,7 +370,7 @@ while (($# >= 1)); do
 				if [ -z "$1" ]; then
 					termux_error_exit "./build-package.sh: argument to '--format' should not be empty"
 				fi
-				TERMUX_PACKAGE_FORMAT="$1"
+				export TERMUX_PACKAGE_FORMAT="$1"
 			else
 				termux_error_exit "./build-package.sh: option '--format' requires an argument"
 			fi
