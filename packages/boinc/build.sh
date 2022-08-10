@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=7.18.1
 TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://github.com/BOINC/boinc/archive/client_release/${TERMUX_PKG_VERSION:0:4}/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=274388d9c49e488b6c8502ffc6eb605d5ceae391fb0c2fc56dbb0254d0ceb27e
-TERMUX_PKG_DEPENDS="libandroid-shmem, libc++, libcurl, openssl, zlib"
+TERMUX_PKG_DEPENDS="libandroid-execinfo, libandroid-shmem, libc++, libcurl, openssl, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_NO_STATICSPLIT=true
 
@@ -23,7 +23,7 @@ termux_step_pre_configure() {
 	CXXFLAGS="${CXXFLAGS/-Oz/-Os}"
 	CFLAGS+=" -fPIC -DTERMUX_PKG_ANDROID_VERSION=\\\"7.0\\\""
 	CXXFLAGS+=" -fPIC -DTERMUX_PKG_ANDROID_VERSION=\\\"7.0\\\""
-	LDFLAGS+=" -landroid-shmem $($CC -print-libgcc-file-name)"
+	LDFLAGS+=" -landroid-shmem -landroid-execinfo $($CC -print-libgcc-file-name)"
 	./_autosetup
 }
 
