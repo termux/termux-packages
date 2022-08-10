@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # Newer version requires newer gtk4 which has build issue.
 _MAJOR_VERSION=4.2
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/gtkmm/${_MAJOR_VERSION}/gtkmm-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=480c4c38f2e7ffcf58f56bb4b4d612f3f0cac9fd5908fd2cd8249fe10592a98b
 TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, graphene, gtk4, libc++, libcairo, libcairomm-1.16, libglibmm-2.68, libpangomm-2.48, libsigc++-3.0"
