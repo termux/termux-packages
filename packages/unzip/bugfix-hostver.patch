@@ -1,0 +1,14 @@
+From: Santiago Vila <sanvila@debian.org>
+Subject: zipinfo.c: Do not crash when hostver byte is >= 100
+
+--- a/zipinfo.c
++++ b/zipinfo.c
+@@ -2114,7 +2114,7 @@
+             else
+                 attribs[9] = (xattr & UNX_ISVTX)? 'T' : '-';  /* T==undefined */
+ 
+-            sprintf(&attribs[12], "%u.%u", hostver/10, hostver%10);
++            sprintf(&attribs[11], "%2u.%u", hostver/10, hostver%10);
+             break;
+ 
+     } /* end switch (hostnum: external attributes format) */

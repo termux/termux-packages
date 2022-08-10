@@ -22,8 +22,8 @@ termux_step_setup_variables() {
 	fi
 
 	case "${TERMUX_PACKAGE_FORMAT-}" in
-		debian) TERMUX_PACKAGE_MANAGER="apt";;
-		pacman) TERMUX_PACKAGE_MANAGER="pacman";;
+		debian) export TERMUX_PACKAGE_MANAGER="apt";;
+		pacman) export TERMUX_PACKAGE_MANAGER="pacman";;
 		*) termux_error_exit "Unsupported package format \"${TERMUX_PACKAGE_FORMAT-}\". Only 'debian' and 'pacman' formats are supported";;
 	esac
 

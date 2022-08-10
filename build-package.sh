@@ -257,9 +257,8 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_install_license.sh"
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_extract_into_massagedir.sh"
 
 # Hook function to create {pre,post}install, {pre,post}rm-scripts for subpkgs
-termux_step_create_subpkg_debscripts() {
-	return
-}
+# shellcheck source=scripts/build/termux_step_create_subpkg_debscripts.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_create_subpkg_debscripts.sh"
 
 # Create all subpackages. Run from termux_step_massage
 # shellcheck source=scripts/build/termux_create_debian_subpackages.sh
@@ -371,7 +370,7 @@ while (($# >= 1)); do
 				if [ -z "$1" ]; then
 					termux_error_exit "./build-package.sh: argument to '--format' should not be empty"
 				fi
-				TERMUX_PACKAGE_FORMAT="$1"
+				export TERMUX_PACKAGE_FORMAT="$1"
 			else
 				termux_error_exit "./build-package.sh: option '--format' requires an argument"
 			fi
