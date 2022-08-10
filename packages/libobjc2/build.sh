@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="The GNUstep Objective-C runtime"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.1
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 _ROBIN_MAP_COMMIT=757de829927489bee55ab02147484850c687b620
 TERMUX_PKG_SRCURL=(https://github.com/gnustep/libobjc2/archive/v${TERMUX_PKG_VERSION}.tar.gz
                    https://github.com/Tessil/robin-map/archive/${_ROBIN_MAP_COMMIT:0:7}.tar.gz)

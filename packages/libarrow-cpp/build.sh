@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="C++ libraries for Apache Arrow"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=(8.0.1)
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_VERSION+=(1.22.3) # NumPy version
 TERMUX_PKG_SRCURL=(https://github.com/apache/arrow/archive/refs/tags/apache-arrow-${TERMUX_PKG_VERSION}.tar.gz
                    https://github.com/numpy/numpy/archive/refs/tags/v${TERMUX_PKG_VERSION[1]}.tar.gz)

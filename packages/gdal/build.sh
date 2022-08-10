@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="LICENSE.TXT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.4.2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.osgeo.org/gdal/${TERMUX_PKG_VERSION}/gdal-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=16baf03dfccf9e3f72bb2e15cd2d5b3f4be0437cdff8a785bceab0c7be557335
 TERMUX_PKG_DEPENDS="libc++, openjpeg, libcurl, libtiff, libpng, proj, libiconv, libsqlite, libgeos, libspatialite, libexpat, openssl, postgresql, netcdf-c, libjxl"

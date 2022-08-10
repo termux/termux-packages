@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A free text editor for developers"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=20110708
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(https://downloads.sourceforge.net/fte/fte-${TERMUX_PKG_VERSION}-src.zip
                    https://downloads.sourceforge.net/fte/fte-${TERMUX_PKG_VERSION}-common.zip)
 TERMUX_PKG_SHA256=(d6311c542d3f0f2890a54a661c3b67228e27b894b4164e9faf29f014f254499e
