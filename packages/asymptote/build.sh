@@ -9,7 +9,8 @@ TERMUX_PKG_SRCURL=(https://downloads.sourceforge.net/asymptote/asymptote-${TERMU
                    https://github.com/g-truc/glm/archive/${TERMUX_PKG_VERSION[1]}.tar.gz)
 TERMUX_PKG_SHA256=(9a15dd89c57d15826f51b0fcb93e3956a603f77941bc50acdc71281ea0f00f18
                    7d508ab72cb5d43227a3711420f06ff99b0a0cb63ee2f93631b162bfe1fe9592)
-TERMUX_PKG_DEPENDS="libc++, libtirpc, ncurses, readline, zlib"
+TERMUX_PKG_DEPENDS="libc++, libtirpc, zlib"
+TERMUX_PKG_BUILD_DEPENDS="ncurses-static, readline-static"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-gc
