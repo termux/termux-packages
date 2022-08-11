@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=5.1
 #TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.ffmpeg.org/releases/ffmpeg-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=55eb6aab5ee235550fa54a33eaf8bf1b4ec66c01453182b12f6a993d75698b03
-TERMUX_PKG_DEPENDS="freetype, game-music-emu, libaom, libandroid-glob, libass, libbluray, libbz2, libdav1d, libgnutls, libiconv, liblzma, libmp3lame, libopus, librav1e, libsoxr, libtheora, libvorbis, libvpx, libvidstab, libwebp, libx264, libx265, libxml2, xvidcore, zlib"
+TERMUX_PKG_DEPENDS="freetype, game-music-emu, libaom, libandroid-glob, libass, libbluray, libbz2, libdav1d, libgnutls, libiconv, liblzma, libmp3lame, libopus, librav1e, libsoxr, libtheora, libvorbis, libvidstab, libwebp, libx264, libxml2, xvidcore, zlib"
 TERMUX_PKG_CONFLICTS="libav"
 TERMUX_PKG_BREAKS="ffmpeg-dev"
 TERMUX_PKG_REPLACES="ffmpeg-dev"
@@ -14,8 +14,6 @@ TERMUX_PKG_REPLACES="ffmpeg-dev"
 
 termux_step_configure() {
 	cd $TERMUX_PKG_BUILDDIR
-
-	export ASFLAGS="-no-integrated-as"
 
 	local _EXTRA_CONFIGURE_FLAGS=""
 	if [ $TERMUX_ARCH = "arm" ]; then
@@ -64,10 +62,10 @@ termux_step_configure() {
 		--enable-librav1e \
 		--enable-libsoxr \
 		--enable-libx264 \
-		--enable-libx265 \
+		--disable-libx265 \
 		--enable-libxvid \
 		--enable-libvidstab \
-		--enable-libvpx \
+		--disable-libvpx \
 		--enable-libwebp \
 		--enable-libxml2 \
 		--enable-libtheora \
@@ -75,5 +73,6 @@ termux_step_configure() {
 		--prefix="$TERMUX_PREFIX" \
 		--target-os=android \
 		--extra-libs="-landroid-glob" \
+		--disable-vulkan \
 		$_EXTRA_CONFIGURE_FLAGS
 }
