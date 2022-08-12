@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="JSON for Modern C++"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="LICENSE.MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.11.1"
+TERMUX_PKG_VERSION="3.11.2"
 TERMUX_PKG_SRCURL=https://github.com/nlohmann/json/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=598becb62ee0e01cf32795073c8ae09b6e95335cd43a4417b785d93ce105b0d0
+TERMUX_PKG_SHA256=d69f9deb6a75e2580465c6c4c5111b89c4dc2fa94e3a85fcd2ffcd9a143d9273
 TERMUX_PKG_AUTO_UPDATE=true
 # Avoid tests, otherwise we run into the same/similar issue as in
 # https://github.com/termux/termux-packages/issues/1149
