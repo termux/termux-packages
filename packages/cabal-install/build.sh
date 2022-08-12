@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE="https://www.haskell.org/cabal/"
-TERMUX_PKG_DESCRIPTION="The command-line interface for Cabal and Hackage."
+TERMUX_PKG_DESCRIPTION="The command-line interface for Cabal and Hackage"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.org>"
 TERMUX_PKG_VERSION="3.6.2.0"

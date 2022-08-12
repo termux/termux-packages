@@ -29,7 +29,8 @@ termux_step_massage() {
 
 	if [ "$TERMUX_PKG_NO_ELF_CLEANER" != "true" ]; then
 		# Remove entries unsupported by Android's linker:
-		find . \( -path "./bin/*" -o -path "./lib/*" -o -path "./libexec/*" -o -path "./opt/*" \) -type f -print0 | xargs -r -0 "$TERMUX_ELF_CLEANER"
+		find . \( -path "./bin/*" -o -path "./lib/*" -o -path "./libexec/*" -o -path "./opt/*" \) -type f -print0 | xargs -r -0 \
+			"$TERMUX_ELF_CLEANER" --api-level $TERMUX_PKG_API_LEVEL
 	fi
 
 	if [ "$TERMUX_PKG_NO_SHEBANG_FIX" != "true" ]; then
@@ -69,8 +70,12 @@ termux_step_massage() {
 	# Check so files were actually installed. Exclude
 	# share/doc/$TERMUX_PKG_NAME/ as a license file is always
 	# installed there.
-	if [ "$(find . -type f -not -path "./share/doc/$TERMUX_PKG_NAME/*")" = "" ]; then
-		termux_error_exit "No files in package. Maybe you need to run autoreconf -fi before configuring?"
+	if [ "$(find . -path "./share/doc/$TERMUX_PKG_NAME" -prune -o -type f -print | head -n1)" = "" ]; then
+		if [ -f "$TERMUX_PKG_SRCDIR"/configure.ac -o -f "$TERMUX_PKG_SRCDIR"/configure.in ]; then
+			termux_error_exit "No files in package. Maybe you need to run autoreconf -fi before configuring."
+		else
+			termux_error_exit "No files in package."
+		fi
 	fi
 
 	local HARDLINKS
@@ -79,24 +84,22 @@ termux_step_massage() {
 		termux_error_exit "Package contains hard links: $HARDLINKS"
 	fi
 
-	# Check so that package is not affected by https://github.com/android/ndk/issues/1614
-	SYMBOLS="$(llvm-readelf -s $($TERMUX_HOST_PLATFORM-clang -print-libgcc-file-name) | grep "FUNC    GLOBAL HIDDEN" | awk '{print $8}')"
-	# Also check for unresolved symbols defined in libandroid-* (#9944)
-	SYMBOLS+=" $(echo libandroid_{sem_{open,close,unlink},shm{ctl,get,at,dt}})"
-	LIBRARIES=""
+	# Check so that package is not affected by
+	# https://github.com/android/ndk/issues/1614, or
+	# https://github.com/termux/termux-packages/issues/9944
 	if [ -d "lib" ]; then
-		LIBRARIES="$(find lib -name "*.so")"
-	fi
-	for lib in $LIBRARIES; do
-		for sym in $SYMBOLS; do
-			if ! llvm-readelf -h $lib &> /dev/null; then
+		SYMBOLS="$($READELF -s $($TERMUX_HOST_PLATFORM-clang -print-libgcc-file-name) | grep "FUNC    GLOBAL HIDDEN" | awk '{print $8}')"
+		SYMBOLS+=" $(echo libandroid_{sem_{open,close,unlink},shm{ctl,get,at,dt}})"
+		grep_pattern="$(create_grep_pattern $SYMBOLS)"
+		for lib in "$(find lib -name "*.so")"; do
+			if ! $READELF -h "$lib" &> /dev/null; then
 				continue
 			fi
-			if llvm-readelf -s $lib | egrep 'NOTYPE[[:space:]]+GLOBAL[[:space:]]+DEFAULT[[:space:]]+UND[[:space:]]+'$sym'$' &> /dev/null; then
-				termux_error_exit "$lib contains undefined symbol $sym"
+			if $READELF -s "$lib" | egrep "${grep_pattern}" &> /dev/null; then
+				termux_error_exit "$lib contains undefined symbols:\n$($READELF -s "$lib" | egrep "${grep_pattern}")"
 			fi
 		done
-	done
+	fi
 
 	if [ "$TERMUX_PACKAGE_FORMAT" = "debian" ]; then
 		termux_create_debian_subpackages
@@ -111,4 +114,14 @@ termux_step_massage() {
 
 	# .. remove empty directories (NOTE: keep this last):
 	find . -type d -empty -delete
+}
+
+# Local function called by termux_step_massage
+create_grep_pattern() {
+	symbol_type='NOTYPE[[:space:]]+GLOBAL[[:space:]]+DEFAULT[[:space:]]+UND[[:space:]]+'
+	echo -n "$symbol_type$1"'$'
+	shift 1
+	for arg in "$@"; do
+		echo -n "\|$symbol_type$arg"'$'
+	done
 }

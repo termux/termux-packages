@@ -21,7 +21,7 @@ termux_step_post_get_source() {
 }
 
 termux_step_host_build() {
-	_PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
+	local _PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
 	mkdir -p $_PREFIX_FOR_BUILD
 	export PKG_CONFIG_PATH=$_PREFIX_FOR_BUILD/lib/pkgconfig
 

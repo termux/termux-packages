@@ -1,8 +1,8 @@
 diff --git a/Source/Tests/FEXLoader.cpp b/Source/Tests/FEXLoader.cpp
-index 6d357fea..1bfbedfd 100644
+index 12c3de2c..23bd5d30 100644
 --- a/Source/Tests/FEXLoader.cpp
 +++ b/Source/Tests/FEXLoader.cpp
-@@ -377,8 +377,14 @@ int main(int argc, char **argv, char **const envp) {
+@@ -385,8 +385,14 @@ int main(int argc, char **argv, char **const envp) {
    auto SyscallHandler = Loader.Is64BitMode() ? FEX::HLE::x64::CreateHandler(CTX, SignalDelegation.get())
                                               : FEX::HLE::x32::CreateHandler(CTX, SignalDelegation.get(), std::move(Allocator));
  
@@ -20,23 +20,23 @@ index 6d357fea..1bfbedfd 100644
    if (!Loader.MapMemory(Mapper, Unmapper)) {
      // failed to map
 diff --git a/Source/Tests/TestHarnessRunner.cpp b/Source/Tests/TestHarnessRunner.cpp
-index c9361ae7..d7ee0063 100644
+index 9f1ea954..8c5f2016 100644
 --- a/Source/Tests/TestHarnessRunner.cpp
 +++ b/Source/Tests/TestHarnessRunner.cpp
-@@ -165,8 +165,14 @@ int main(int argc, char **argv, char **const envp) {
-   auto SyscallHandler = Loader.Is64BitMode() ? FEX::HLE::x64::CreateHandler(CTX, SignalDelegation.get())
-                                              : FEX::HLE::x32::CreateHandler(CTX, SignalDelegation.get(), std::move(Allocator));
+@@ -177,8 +177,14 @@ int main(int argc, char **argv, char **const envp) {
+     auto SyscallHandler = Loader.Is64BitMode() ? FEX::HLE::x64::CreateHandler(CTX, SignalDelegation.get())
+                                                : FEX::HLE::x32::CreateHandler(CTX, SignalDelegation.get(), std::move(Allocator));
  
--  auto Mapper = std::bind_front(&FEX::HLE::SyscallHandler::GuestMmap, SyscallHandler.get());
--  auto Unmapper = std::bind_front(&FEX::HLE::SyscallHandler::GuestMunmap, SyscallHandler.get());
-+  auto SyscallHandlerPtr = SyscallHandler.get();
+-    auto Mapper = std::bind_front(&FEX::HLE::SyscallHandler::GuestMmap, SyscallHandler.get());
+-    auto Unmapper = std::bind_front(&FEX::HLE::SyscallHandler::GuestMunmap, SyscallHandler.get());
++    auto SyscallHandlerPtr = SyscallHandler.get();
 +
-+  auto Mapper = [SyscallHandlerPtr](void *addr, size_t length, int prot, int flags, int fd, off_t offset) -> void* {
-+    return SyscallHandlerPtr->GuestMmap(addr, length, prot, flags, fd, offset);
-+  };
-+  auto Unmapper = [SyscallHandlerPtr](void *addr, uint64_t length) -> int {
-+    return SyscallHandlerPtr->GuestMunmap(addr, length);
-+  };
++    auto Mapper = [SyscallHandlerPtr](void *addr, size_t length, int prot, int flags, int fd, off_t offset) -> void* {
++      return SyscallHandlerPtr->GuestMmap(addr, length, prot, flags, fd, offset);
++    };
++    auto Unmapper = [SyscallHandlerPtr](void *addr, uint64_t length) -> int {
++      return SyscallHandlerPtr->GuestMunmap(addr, length);
++    };
  
-   if (!Loader.MapMemory(Mapper, Unmapper)) {
-     // failed to map
+     if (!Loader.MapMemory(Mapper, Unmapper)) {
+       // failed to map

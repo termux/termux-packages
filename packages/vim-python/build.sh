@@ -6,9 +6,9 @@ TERMUX_PKG_DEPENDS="libiconv, ncurses, vim-runtime, python"
 TERMUX_PKG_RECOMMENDS="diffutils"
 # vim should only be updated every 50 releases on multiples of 50.
 # Update both vim and vim-python to the same version in one PR.
-TERMUX_PKG_VERSION=8.2.5050
+TERMUX_PKG_VERSION=9.0.0000
 TERMUX_PKG_SRCURL="https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=8eecb277ad3993bea9f117070ab2a8648299ee37b9282b3e7f6681c3ac95a052
+TERMUX_PKG_SHA256=1b3cd3732eb7039cf58a9321de26ab1a12d81c2f6760eb03c5d7b60d548f4587
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 vim_cv_getcwd_broken=no
 vim_cv_memmove_handles_overlap=yes
@@ -31,9 +31,9 @@ bin/rvim
 bin/ex
 share/man/man1/evim.1
 share/icons
-share/vim/vim82/spell/en.ascii*
-share/vim/vim82/print
-share/vim/vim82/tools
+share/vim/vim90/spell/en.ascii*
+share/vim/vim90/print
+share/vim/vim90/tools
 "
 TERMUX_PKG_CONFFILES="share/vim/vimrc"
 
@@ -47,8 +47,8 @@ vi_cv_var_python3_version=3.10
 --with-python3-config-dir=$TERMUX_PREFIX/lib/python3.10/config-3.10/
 "
 TERMUX_PKG_DESCRIPTION+=" - with python support"
-# Remove share/vim/vim82 which is in vim-runtime built as a subpackage of vim:
-TERMUX_PKG_RM_AFTER_INSTALL+=" share/vim/vim82"
+# Remove share/vim/vim90 which is in vim-runtime built as a subpackage of vim:
+TERMUX_PKG_RM_AFTER_INSTALL+=" share/vim/vim90"
 termux_step_pre_configure() {
 	CPPFLAGS+=" -I${TERMUX_PREFIX}/include/python3.10"
 }
@@ -72,9 +72,9 @@ termux_step_post_make_install() {
 		> $TERMUX_PREFIX/share/vim/vimrc
 
 	# Remove most tutor files:
-	cp $TERMUX_PREFIX/share/vim/vim82/tutor/{tutor,tutor.vim,tutor.utf-8} $TERMUX_PKG_TMPDIR/
-	rm -f $TERMUX_PREFIX/share/vim/vim82/tutor/*
-	cp $TERMUX_PKG_TMPDIR/{tutor,tutor.vim,tutor.utf-8} $TERMUX_PREFIX/share/vim/vim82/tutor/
+	cp $TERMUX_PREFIX/share/vim/vim90/tutor/{tutor,tutor.vim,tutor.utf-8} $TERMUX_PKG_TMPDIR/
+	rm -f $TERMUX_PREFIX/share/vim/vim90/tutor/*
+	cp $TERMUX_PKG_TMPDIR/{tutor,tutor.vim,tutor.utf-8} $TERMUX_PREFIX/share/vim/vim90/tutor/
 }
 
 termux_step_create_debscripts() {

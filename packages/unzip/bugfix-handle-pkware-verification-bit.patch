@@ -1,0 +1,21 @@
+From: "Steven M. Schweda" <sms@antinode.info>
+Subject: Handle the PKWare verification bit of internal attributes
+Bug-Debian: https://bugs.debian.org/630078
+X-Debian-version: 6.0-5
+
+--- a/process.c
++++ b/process.c
+@@ -1729,6 +1729,13 @@
+     else if (uO.L_flag > 1)   /* let -LL force lower case for all names */
+         G.pInfo->lcflag = 1;
+ 
++    /* Handle the PKWare verification bit, bit 2 (0x0004) of internal
++       attributes.  If this is set, then a verification checksum is in the
++       first 3 bytes of the external attributes.  In this case all we can use
++       for setting file attributes is the last external attributes byte. */
++    if (G.crec.internal_file_attributes & 0x0004)
++      G.crec.external_file_attributes &= (ulg)0xff;
++
+     /* do Amigas (AMIGA_) also have volume labels? */
+     if (IS_VOLID(G.crec.external_file_attributes) &&
+         (G.pInfo->hostnum == FS_FAT_ || G.pInfo->hostnum == FS_HPFS_ ||

@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE="https://github.com/haskell-strict/strict"
-TERMUX_PKG_DESCRIPTION="Strict data types and String IO."
+TERMUX_PKG_DESCRIPTION="Strict data types and String IO"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.org>"
 TERMUX_PKG_VERSION="0.4.0.1"

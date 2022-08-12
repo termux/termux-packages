@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Extensible, customizable text editor-and more"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=28.1
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/emacs/emacs-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=28b1b3d099037a088f0a4ca251d7e7262eab5ea1677aabffa6c4426961ad75e1
 TERMUX_PKG_DEPENDS="ncurses, gnutls, libxml2, libjansson"
@@ -12,23 +12,23 @@ TERMUX_PKG_REPLACES="emacs-dev"
 TERMUX_PKG_SERVICE_SCRIPT=("emacsd" 'exec emacs --fg-daemon 2>&1')
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-autodepend
+--with-dumping=none
 --with-gif=no
 --with-gnutls
 --with-jpeg=no
---without-gconf
---without-gsettings
---without-lcms2
---without-x
+--with-json
+--with-modules
+--with-pdumper=yes
 --with-png=no
 --with-tiff=no
 --with-xml2
 --with-xpm=no
 --without-dbus
+--without-gconf
+--without-gsettings
+--without-lcms2
 --without-selinux
---with-modules
---with-pdumper=yes
---with-dumping=none
---with-json
+--without-x
 "
 
 if $TERMUX_DEBUG_BUILD; then

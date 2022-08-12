@@ -57,7 +57,7 @@ termux_step_post_get_source() {
 }
 
 termux_step_host_build() {
-	_PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/_prefix
+	local _PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
 
 	# Need bison that understands --header=[FILE] option.
 	local BISON_BUILD_SH=$TERMUX_SCRIPTDIR/packages/bison/build.sh
@@ -74,6 +74,8 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
+	local _PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
+	
 	# Certain packages are not safe to build on device because their
 	# build.sh script deletes specific files in $TERMUX_PREFIX.
 	if $TERMUX_ON_DEVICE_BUILD; then
@@ -82,7 +84,7 @@ termux_step_pre_configure() {
 
 	termux_setup_protobuf
 
-	export PATH=$_PREFIX_FOR_BUILD/bin:$PATH
+	export PATH=$TERMUX_PKG_HOSTBUILD_DIR/_prefix/bin:$PATH
 
 	CFLAGS+=" -fPIC"
 	CXXFLAGS+=" -fPIC -std=c++17"

@@ -14,10 +14,10 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_host_build() {
-	_PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
+	local _PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
 	mkdir -p $_PREFIX_FOR_BUILD
 
-	TERMUX_ORIG_PATH=$PATH
+	local TERMUX_ORIG_PATH=$PATH
 	mkdir -p native
 	pushd native
 	export PATH=$(pwd):$TERMUX_ORIG_PATH

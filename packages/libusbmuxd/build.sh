@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://libimobiledevice.org
-TERMUX_PKG_DESCRIPTION="A client library for applications to handle usbmux protocol connections with iOS devices."
+TERMUX_PKG_DESCRIPTION="A client library for applications to handle usbmux protocol connections with iOS devices"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_LICENSE_FILE="COPYING"
 TERMUX_PKG_MAINTAINER="@termux"

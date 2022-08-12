@@ -2,12 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://github.com/tesseract-ocr/tesseract
 TERMUX_PKG_DESCRIPTION="Tesseract is probably the most accurate open source OCR engine available"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=5.1.0
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION=5.2.0
 TERMUX_PKG_SRCURL=https://github.com/tesseract-ocr/tesseract/archive/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=fdec8528d5a0ecc28ab5fff985e0b8ced60726f6ef33f54126f2868e323d4bd2
+TERMUX_PKG_SHA256=eba4deb2f92a3f89a6623812074af8c53b772079525b3c263aa70bbf7b748b3c
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="leptonica, libandroid-glob, libandroid-posix-semaphore, libc++, libicu, libtool, libuuid, pango, zstd"
+TERMUX_PKG_DEPENDS="leptonica, libandroid-glob, libandroid-posix-semaphore, libcpufeatures, libc++, libicu, libtool, libuuid, pango, zstd"
 TERMUX_PKG_BREAKS="tesseract-dev"
 TERMUX_PKG_REPLACES="tesseract-dev"
 TERMUX_PKG_FORCE_CMAKE=true
@@ -16,8 +15,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DUSE_SYSTEM_ICU=on
 -DTESSDATA_PREFIX=$TERMUX_PREFIX/share
 "
-# NEON checks in src/arch/simddetect.cpp don't work for i686 currently
-TERMUX_PKG_BLACKLISTED_ARCHES="i686"
 
 termux_step_pre_configure() {
 	LDFLAGS+=" -landroid-posix-semaphore"

@@ -2,13 +2,14 @@ TERMUX_PKG_HOMEPAGE=https://emscripten.org
 TERMUX_PKG_DESCRIPTION="Emscripten: An LLVM-to-WebAssembly Compiler"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@truboxl"
-TERMUX_PKG_VERSION=3.1.15
+TERMUX_PKG_VERSION="3.1.18"
 TERMUX_PKG_SRCURL=https://github.com/emscripten-core/emscripten.git
 TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_RECOMMENDS="emscripten-llvm, emscripten-binaryen, python, nodejs-lts | nodejs"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_NO_STATICSPLIT=true
+TERMUX_PKG_AUTO_UPDATE=true
 
 # remove files according to emsdk/upstream directory after running
 # ./emsdk install latest
@@ -23,6 +24,7 @@ opt/emscripten-llvm/bin/clang-import-test
 opt/emscripten-llvm/bin/clang-linker-wrapper
 opt/emscripten-llvm/bin/clang-nvlink-wrapper
 opt/emscripten-llvm/bin/clang-offload-bundler
+opt/emscripten-llvm/bin/clang-offload-packager
 opt/emscripten-llvm/bin/clang-offload-wrapper
 opt/emscripten-llvm/bin/clang-pseudo
 opt/emscripten-llvm/bin/clang-refactor
@@ -47,28 +49,57 @@ opt/emscripten-llvm/share
 opt/emscripten/LICENSE
 "
 
-# https://github.com/emscripten-core/emscripten/blob/main/docs/packaging.md
-# https://github.com/archlinux/svntogit-community/tree/packages/emscripten/trunk
-# below generates commit hash for the deps according to emscripten releases
-#RELEASES_TAGS=$(curl -s https://raw.githubusercontent.com/emscripten-core/emsdk/main/emscripten-releases-tags.json)
-#RELEASE_TAG=$(echo $RELEASES_TAGS | python3 -c "import json,sys;print(json.load(sys.stdin)[\"releases\"][\"$TERMUX_PKG_VERSION\"])")
-#DEPS_REVISION=$(curl -s https://chromium.googlesource.com/emscripten-releases/+/$RELEASE_TAG/DEPS?format=text | base64 -d | grep "_revision':" | sed -e "s|'|\"|g")
-#DEPS_JSON=$(echo -e "{\n${DEPS_REVISION}EOL" | sed -e "s|,EOL|\n}|")
-#LLVM_COMMIT=$(echo $DEPS_JSON | python3 -c "import json,sys;print(json.load(sys.stdin)[\"llvm_project_revision\"])")
-#BINARYEN_COMMIT=$(echo $DEPS_JSON | python3 -c "import json,sys;print(json.load(sys.stdin)[\"binaryen_revision\"])")
-#curl -LOC - https://github.com/llvm/llvm-project/archive/$LLVM_COMMIT.tar.gz
-#curl -LOC - https://github.com/WebAssembly/binaryen/archive/$BINARYEN_COMMIT.tar.gz
-#sha256sum $LLVM_COMMIT.tar.gz $BINARYEN_COMMIT.tar.gz
+# based on scripts/updates/internal/termux_github_auto_update.sh
+termux_pkg_auto_update() {
+	local latest_tag
+	latest_tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}" "${TERMUX_PKG_UPDATE_TAG_TYPE}")"
+
+	if [ -z "$latest_tag" ]; then
+		termux_error_exit "ERROR: Unable to get tag from ${TERMUX_PKG_SRCURL}"
+	fi
+
+	if [ "$latest_tag" = "$TERMUX_PKG_VERSION" ]; then
+		echo "INFO: No update needed. Already at version '$TERMUX_PKG_VERSION'."
+		return 0
+	fi
+
+	# https://github.com/emscripten-core/emscripten/blob/main/docs/packaging.md
+	# https://github.com/archlinux/svntogit-community/tree/packages/emscripten/trunk
+	# below generates commit hash for the deps according to emscripten releases
+	local releases_tags release_tag deps_revision deps_json llvm_commit binaryen_commit llvm_tgz_sha256 binaryen_tgz_sha256
+	releases_tags=$(curl -s https://raw.githubusercontent.com/emscripten-core/emsdk/main/emscripten-releases-tags.json)
+	release_tag=$(echo $releases_tags | python3 -c "import json,sys;print(json.load(sys.stdin)[\"releases\"][\"$latest_tag\"])")
+	deps_revision=$(curl -s https://chromium.googlesource.com/emscripten-releases/+/$release_tag/DEPS?format=text | base64 -d | grep "_revision':" | sed -e "s|'|\"|g")
+	deps_json=$(echo -e "{\n${deps_revision}EOL" | sed -e "s|,EOL|\n}|")
+	llvm_commit=$(echo $deps_json | python3 -c "import json,sys;print(json.load(sys.stdin)[\"llvm_project_revision\"])")
+	binaryen_commit=$(echo $deps_json | python3 -c "import json,sys;print(json.load(sys.stdin)[\"binaryen_revision\"])")
+	curl -LC - "https://github.com/llvm/llvm-project/archive/$llvm_commit.tar.gz" -o "/tmp/$llvm_commit.tar.gz"
+	curl -LC - "https://github.com/WebAssembly/binaryen/archive/$binaryen_commit.tar.gz" -o "/tmp/$binaryen_commit.tar.gz"
+	llvm_tgz_sha256=$(sha256sum /tmp/$llvm_commit.tar.gz | sed -e "s| .*$||")
+	binaryen_tgz_sha256=$(sha256sum /tmp/$binaryen_commit.tar.gz | sed -e "s| .*$||")
+
+	echo "INFO: Generated *.tar.gz checksum for LLVM_COMMIT     $llvm_commit = $llvm_tgz_sha256"
+	echo "INFO: Generated *.tar.gz checksum for BINARYEN_COMMIT $binaryen_commit = $binaryen_tgz_sha256"
+
+	sed -i "${TERMUX_PKG_BUILDER_DIR}/build.sh" -e "s|^LLVM_COMMIT=.*|LLVM_COMMIT=${llvm_commit}|"
+	sed -i "${TERMUX_PKG_BUILDER_DIR}/build.sh" -e "s|^LLVM_TGZ_SHA256=.*|LLVM_TGZ_SHA256=${llvm_tgz_sha256}|"
+	sed -i "${TERMUX_PKG_BUILDER_DIR}/build.sh" -e "s|^BINARYEN_COMMIT=.*|BINARYEN_COMMIT=${binaryen_commit}|"
+	sed -i "${TERMUX_PKG_BUILDER_DIR}/build.sh" -e "s|^BINARYEN_TGZ_SHA256=.*|BINARYEN_TGZ_SHA256=${binaryen_tgz_sha256}|"
+
+	rm -f "/tmp/$llvm_commit.tar.gz" "/tmp/$binaryen_commit.tar.gz"
+
+	termux_pkg_upgrade_version "$latest_tag"
+}
 
 # https://github.com/emscripten-core/emscripten/issues/11362
 # can switch to stable LLVM to save space once above is fixed
-LLVM_COMMIT=27abff670bc7ad9702c4f9fc8b82aae6b530bf0f
-LLVM_TGZ_SHA256=ec3f60499ae041dc4dda9ca4c6f993f6cd085c57b77773ca29604a73f736ba96
+LLVM_COMMIT=48129cf0ed5053ed3fdf4f928180635e84892614
+LLVM_TGZ_SHA256=315cca0c5ca54a306f670121016bd4b9972d48dd02dc6e6d4df590e07da7a723
 
 # https://github.com/emscripten-core/emscripten/issues/12252
 # upstream says better bundle the right binaryen revision for now
-BINARYEN_COMMIT=b69d3a8fa0d6d7588811ef92067a48eed576e03f
-BINARYEN_TGZ_SHA256=c81f8940c93adb6e25537aeb0794789b135c865fcb753f83abd8a7dd0e6749a6
+BINARYEN_COMMIT=eb157d230c68cdc91c9da8841a53a80246f345d7
+BINARYEN_TGZ_SHA256=0369681e2171cd79bfd548e770cce3888551d9b6ace33d8f1d535cc74686565e
 
 # https://github.com/emscripten-core/emsdk/blob/main/emsdk.py
 # https://chromium.googlesource.com/emscripten-releases/+/refs/heads/main/src/build.py
@@ -125,35 +156,37 @@ termux_step_post_get_source() {
 	tar -xf "$TERMUX_PKG_CACHEDIR/llvm.tar.gz" -C "$TERMUX_PKG_CACHEDIR"
 	tar -xf "$TERMUX_PKG_CACHEDIR/binaryen.tar.gz" -C "$TERMUX_PKG_CACHEDIR"
 
-	llvm_patches="$(find $TERMUX_PKG_BUILDER_DIR -mindepth 1 -maxdepth 1 -type f -name 'llvm-project-*.patch.diff')"
+	local llvm_patches="$(find $TERMUX_PKG_BUILDER_DIR -mindepth 1 -maxdepth 1 -type f -name 'llvm-project-*.patch.diff')"
 	if [ -n "$llvm_patches" ]; then
 		cd "$TERMUX_PKG_CACHEDIR/llvm-project-$LLVM_COMMIT"
 		for patch in $llvm_patches; do
 			patch -p1 -i "$patch" || true
 		done
-		llvm_patches_rej="$(find . -type f -name '*.rej')"
+		local llvm_patches_rej="$(find . -type f -name '*.rej')"
 		if [ -n "$llvm_patches_rej" ]; then
+			echo "INFO: Printing *.rej files ..."
 			for rej in $llvm_patches_rej; do
 				echo -e "\n\n${rej}"
 				cat "$rej"
 			done
-			termux_error_exit "Patch failed! Please check patch errors above."
+			termux_error_exit "Patch failed! Please check patch errors above!"
 		fi
 	fi
 
-	binaryen_patches="$(find $TERMUX_PKG_BUILDER_DIR -mindepth 1 -maxdepth 1 -type f -name 'binaryen-*.patch.diff')"
+	local binaryen_patches="$(find $TERMUX_PKG_BUILDER_DIR -mindepth 1 -maxdepth 1 -type f -name 'binaryen-*.patch.diff')"
 	if [ -n "$binaryen_patches" ]; then
 		cd "$TERMUX_PKG_CACHEDIR/binaryen-$BINARYEN_COMMIT"
 		for patch in $binaryen_patches; do
 			patch -p1 -i "$patch" || true
 		done
-		binaryen_patches_rej="$(find . -type f -name '*.rej')"
+		local binaryen_patches_rej="$(find . -type f -name '*.rej')"
 		if [ -n "$binaryen_patches_rej" ]; then
+			echo "INFO: Printing *.rej files ..."
 			for rej in $binaryen_patches_rej; do
 				echo -e "\n\n${rej}"
 				cat "$rej"
 			done
-			termux_error_exit "Patch failed! Please check patch errors above."
+			termux_error_exit "Patch failed! Please check patch errors above!"
 		fi
 	fi
 }
@@ -180,11 +213,11 @@ termux_step_make() {
 	# from packages/libllvm/build.sh
 	export LLVM_DEFAULT_TARGET_TRIPLE=${CCTERMUX_HOST_PLATFORM/-/-unknown-}
 	export LLVM_TARGET_ARCH
-	if [ $TERMUX_ARCH = "arm" ]; then
+	if [ "$TERMUX_ARCH" = arm ]; then
 		LLVM_TARGET_ARCH=ARM
-	elif [ $TERMUX_ARCH = "aarch64" ]; then
+	elif [ "$TERMUX_ARCH" = aarch64 ]; then
 		LLVM_TARGET_ARCH=AArch64
-	elif [ $TERMUX_ARCH = "i686" ] || [ $TERMUX_ARCH = "x86_64" ]; then
+	elif [ "$TERMUX_ARCH" = i686 ] || [ "$TERMUX_ARCH" = x86_64 ]; then
 		LLVM_TARGET_ARCH=X86
 	else
 		termux_error_exit "Invalid arch: $TERMUX_ARCH"
@@ -226,7 +259,7 @@ termux_step_make_install() {
 	./tools/install.py "$TERMUX_PREFIX/opt/emscripten"
 
 	# subpackage optional third party test suite files
-	cp -fr "$TERMUX_PKG_SRCDIR/tests/third_party" "$TERMUX_PREFIX/opt/emscripten/tests/third_party"
+	cp -fr "$TERMUX_PKG_SRCDIR/test/third_party" "$TERMUX_PREFIX/opt/emscripten/test/third_party"
 
 	# first run generates .emscripten and exits immediately
 	rm -f "$TERMUX_PKG_SRCDIR/.emscripten"
@@ -268,13 +301,13 @@ termux_step_create_debscripts() {
 	cd "$TERMUX_PREFIX/opt/emscripten"
 	NPM_VERSION=\$(npm --version)
 	NPM_MAJOR_VERSION=\${NPM_VERSION:0:1}
-	if [ 6 = \$NPM_MAJOR_VERSION ]; then
-	echo 'Running "npm ci --no-optional --production" in $TERMUX_PREFIX/opt/emscripten ...'
-	npm ci --no-optional --production
+	if [ "\$NPM_MAJOR_VERSION" = 6 ]; then
+	echo 'Running "npm ci --production --no-optional" in $TERMUX_PREFIX/opt/emscripten ...'
+	npm ci --production --no-optional
 	else
-	echo 'Running "npm install --no-optional --production" in $TERMUX_PREFIX/opt/emscripten ...'
+	echo 'Running "npm install --omit=dev --omit=optional" in $TERMUX_PREFIX/opt/emscripten ...'
 	rm package-lock.json
-	npm install --no-optional --production
+	npm install --omit=dev --omit=optional
 	fi
 	else
 	echo 'Warning: npm is not installed! Emscripten may not work properly without installing node modules!' >&2
@@ -311,6 +344,6 @@ termux_step_create_debscripts() {
 # Steps:
 # - apt install cmake emscripten-tests-third-party ndk-sysroot openjdk-17
 # - cd $PREFIX/opt/emscripten
-# - npm install --no-optional
+# - npm install --omit=optional
 # - export EMTEST_SKIP_V8=1
-# - tests/runner {test_name}
+# - test/runner {test_name}

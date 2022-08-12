@@ -1,36 +1,23 @@
---- ./meson.build.orig	2022-07-05 08:58:24.604395395 +0530
-+++ ./meson.build	2022-07-05 09:00:57.594395336 +0530
-@@ -124,13 +124,6 @@
- guile_dep = dependency('guile-3.0', required: get_option('guile'))
- # soft dependencies
-
--# emacs -- needed for mu4e compilation
--emacs_name=get_option('emacs')
--emacs=find_program([emacs_name], version: '>=25.3', required:false)
--if not emacs.found()
--  message('emacs not found; not pre-compiling mu4e sources')
--endif
--
- makeinfo=find_program(['makeinfo'], required:false)
- if not makeinfo.found()
-   message('makeinfo (texinfo) not found; not building info documentation')
-@@ -181,9 +174,8 @@
+# Patch meson to copy mu4e source files even if emacs was not found.
+--- ./meson.build.orig	2022-07-06 09:38:17.491018593 +0530
++++ ./meson.build	2022-07-06 09:39:41.161018561 +0530
+@@ -189,9 +182,7 @@
  subdir('mu')
  subdir('man')
 
 -if emacs.found()
 -   subdir('mu4e')
 -endif
-+# This will not compile, but still copy files.
 +subdir('mu4e')
 
  if not get_option('guile').disabled() and guile_dep.found()
    config_h_data.set('BUILD_GUILE', 1)
 
-# Do not compile .el files to .elc. We will do it during installation, on device.
---- ./mu4e/meson.build.orig	2022-07-05 09:03:00.844395289 +0530
-+++ ./mu4e/meson.build	2022-07-05 09:04:51.624395247 +0530
-@@ -70,27 +70,6 @@
+# Do not compile .el files to .elc.
+# We will do it during installation, on device.
+--- ./mu4e/meson.build.orig	2022-07-06 09:21:53.456610752 +0530
++++ ./mu4e/meson.build	2022-07-06 09:36:08.601018642 +0530
+@@ -68,27 +68,6 @@
    configure_file(input: src, output:'@BASENAME@.el', copy:true)
  endforeach
 
@@ -43,7 +30,7 @@
 -                build_by_default: true,
 -                input: src,
 -                output: target_name,
--                install_dir: lispdir,
+-                install_dir: mu4e_lispdir,
 -                install: true,
 -                command: [emacs,
 -                          '--no-init-file',
@@ -56,4 +43,4 @@
 -endforeach
 -
  # also install the sources and the config
- install_data(mu4e_srcs, install_dir: lispdir)
+ install_data(mu4e_srcs, install_dir: mu4e_lispdir)

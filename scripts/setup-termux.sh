@@ -38,6 +38,7 @@ PACKAGES+=" python2"
 PACKAGES+=" rust"
 PACKAGES+=" texinfo"
 PACKAGES+=" valac"
+PACKAGES+=" xmlto"                      # Needed by git's manpage generation
 
 apt update
 apt dist-upgrade -y

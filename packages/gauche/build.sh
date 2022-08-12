@@ -23,7 +23,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-threads=none"
 
 termux_step_host_build() {
-	_PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
+	local _PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
 	mkdir -p $_PREFIX_FOR_BUILD
 
 	find "$TERMUX_PKG_SRCDIR" -mindepth 1 -maxdepth 1 ! -name build_gosh -exec cp -a \{\} ./ \;
@@ -33,6 +33,8 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
+	local _PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
+
 	cp $TERMUX_PKG_BUILDER_DIR/fake-ndbm-makedb.c "$TERMUX_PKG_SRCDIR"/ext/dbm/
 
 	export BUILD_GOSH=$_PREFIX_FOR_BUILD/bin/gosh

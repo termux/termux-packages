@@ -1,6 +1,6 @@
 --- a/src/bin/lfortran.cpp
 +++ b/src/bin/lfortran.cpp
-@@ -81,10 +81,15 @@
+@@ -95,10 +95,15 @@
  {
      char *env_p = std::getenv("LFORTRAN_KOKKOS_DIR");
      if (env_p) return env_p;
@@ -16,19 +16,7 @@
  }
  
  #ifdef HAVE_LFORTRAN_LLVM
-@@ -873,7 +878,11 @@
-                 out << " ";
-             }
-             char *env_CC = std::getenv("LFORTRAN_CC");
-+#ifdef __ANDROID__
-+            std::string CC="clang";
-+#else
-             std::string CC="gcc";
-+#endif
-             if (env_CC) CC = env_CC;
-             std::string cmd = CC + " -c " + outfile_empty + " -o " + outfile;
-             int err = system(cmd.c_str());
-@@ -905,7 +914,11 @@
+@@ -1082,7 +1087,11 @@
              out << src;
          }
  
@@ -38,9 +26,9 @@
          std::string CXX = "g++";
 +#endif
          std::string options;
-         if (openmp) {
+         if (compiler_options.openmp) {
              options += "-fopenmp ";
-@@ -1037,7 +1050,11 @@
+@@ -1212,7 +1221,11 @@
          }
          return 0;
      } else if (backend == Backend::cpp) {
@@ -52,7 +40,7 @@
          std::string options, post_options;
          if (static_executable) {
              options += " -static ";
-@@ -1047,8 +1064,13 @@
+@@ -1222,8 +1235,13 @@
          }
          if (kokkos) {
              std::string kokkos_dir = get_kokkos_dir();
@@ -68,3 +56,12 @@
          }
          std::string cmd = CXX + options + " -o " + outfile + " ";
          for (auto &s : infiles) {
+@@ -1304,7 +1322,7 @@
+         bool show_asm = false;
+         bool time_report = false;
+         bool static_link = false;
+-        std::string arg_backend = "llvm";
++        std::string arg_backend = "cpp";
+         std::string arg_kernel_f;
+         bool print_targets = false;
+ 
