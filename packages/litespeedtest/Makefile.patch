@@ -1,24 +1,31 @@
-diff -uNr LiteSpeedTest-0.10.0/Makefile LiteSpeedTest-0.10.0.mod/Makefile
---- LiteSpeedTest-0.10.0/Makefile	2022-05-26 10:27:22.000000000 +0800
-+++ LiteSpeedTest-0.10.0.mod/Makefile	2022-06-24 22:39:36.305998751 +0800
-@@ -15,11 +15,8 @@
- 	windows-386 \
- 	windows-amd64
+diff -uNr LiteSpeedTest-0.11.2/Makefile LiteSpeedTest-0.11.2.mod/Makefile
+--- LiteSpeedTest-0.11.2/Makefile	2022-08-13 09:00:15.000000000 +0800
++++ LiteSpeedTest-0.11.2.mod/Makefile	2022-08-13 16:18:54.116696305 +0800
+@@ -1,6 +1,5 @@
+ NAME=lite
+ BINDIR=bin
+-VERSION=$(shell git describe --tags || echo "unknown version")
+ BUILDTIME=$(shell date -u)
+ GOBUILD=CGO_ENABLED=0 go build -trimpath -ldflags '-X "github.com/xxf098/LiteSpeedTest/constant.Version=$(VERSION)" \
+ 		-X "github.com/xxf098/LiteSpeedTest/constant.BuildTime=$(BUILDTIME)" \
+@@ -27,10 +26,8 @@
+ 	windows-arm64 \
+ 	windows-arm32v7
  
--
 -all: linux-amd64 darwin-amd64 windows-amd64 # Most used
 -
 -docker:
--	$(GOBUILD) GOAMD64=v3 -o $(BINDIR)/$(NAME)-$@
+-	$(GOBUILD) -o $(BINDIR)/$(NAME)-$@
 +all:
 +	$(GOBUILD) -o $(BINDIR)/$(NAME)
  
  darwin-amd64:
- 	GOARCH=amd64 GOOS=darwin GOAMD64=v3 $(GOBUILD) -o $(BINDIR)/$(NAME)-$@
-@@ -101,4 +98,4 @@
+ 	GOARCH=amd64 GOOS=darwin $(GOBUILD) -o $(BINDIR)/$(NAME)-$@
+@@ -128,4 +125,5 @@
+ 	GOOS=freebsd golangci-lint run ./...
  
- releases: $(gz_releases) $(zip_releases)
  clean:
 -	rm $(BINDIR)/*
 \ No newline at end of file
 +	rm $(BINDIR)/*
++
