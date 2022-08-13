@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="VP8 & VP9 Codec SDK"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1:1.12.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/webmproject/libvpx/archive/v${TERMUX_PKG_VERSION:2}.tar.gz
 TERMUX_PKG_SHA256=f1acc15d0fd0cb431f4bf6eac32d5e932e40ea1186fe78e074254d6d003957bb
 TERMUX_PKG_DEPENDS="libc++"
@@ -21,18 +22,13 @@ termux_step_configure() {
 	# Force fresh install of header files:
 	rm -Rf $TERMUX_PREFIX/include/vpx
 
-	export LD=$CC
-
 	if [ $TERMUX_ARCH = "arm" ]; then
-		export AS=$TERMUX_HOST_PLATFORM-as
-		_CONFIGURE_TARGET="--target=armv7-android-gcc"
+		_CONFIGURE_TARGET="--target=armv7-android-gcc --disable-neon-asm"
 	elif [ $TERMUX_ARCH = "i686" ]; then
-		export AS=yasm
 		_CONFIGURE_TARGET="--target=x86-android-gcc"
 	elif [ $TERMUX_ARCH = "aarch64" ]; then
 		_CONFIGURE_TARGET="--force-target=arm64-v8a-android-gcc"
 	elif [ $TERMUX_ARCH = "x86_64" ]; then
-		export AS=yasm
 		_CONFIGURE_TARGET="--target=x86_64-android-gcc"
 	else
 		termux_error_exit "Unsupported arch: $TERMUX_ARCH"
@@ -54,6 +50,7 @@ termux_step_configure() {
 		--enable-vp8 \
 		--enable-shared \
 		--enable-small \
+		--as=auto \
 		--extra-cflags="-fPIC"
 }
 

@@ -5,6 +5,7 @@ TERMUX_PKG_LICENSE_FILE="../LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=cd12cb33c848e38960c5fd4c3d1a7270de0fbaa7
 TERMUX_PKG_VERSION=2022.03.27
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/keshavbhatt/olivia.git
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_DEPENDS="coreutils, libc++, mpv, python, qt5-qtbase, qt5-qtwebkit, socat, taglib, wget"

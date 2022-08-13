@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A fully featured LaTeX editor"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=4.2.3
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/texstudio-org/texstudio/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=bb5d98a4bcf0023d628cd6b9741dd10209ddd147152c7b4950876f179c682b70
 TERMUX_PKG_DEPENDS="hunspell, libc++, libx11, poppler-qt, qt5-qtbase, qt5-qtdeclarative, qt5-qtsvg, qt5-qttools, quazip, texstudio-data, zlib"

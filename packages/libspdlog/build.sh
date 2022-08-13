@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Very fast, header-only/compiled, C++ logging library"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.10.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/gabime/spdlog/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=697f91700237dbae2326b90469be32b876b2b44888302afbc7aceb68bcfe8224
 TERMUX_PKG_DEPENDS="libc++"

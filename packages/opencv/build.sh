@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=(4.5.5)
 TERMUX_PKG_VERSION+=(1.22.3) # NumPy version
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=(https://github.com/opencv/opencv/archive/${TERMUX_PKG_VERSION}.tar.gz
                    https://github.com/numpy/numpy/archive/refs/tags/v${TERMUX_PKG_VERSION[1]}.tar.gz)
 TERMUX_PKG_SHA256=(a1cfdcf6619387ca9e232687504da996aaa9f7b5689986b8331ec02cb61d28ad

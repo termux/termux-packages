@@ -20,6 +20,9 @@ termux_step_extract_into_massagedir() {
 	# replace vulkan headers with upstream version
 	rm -rf $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/vulkan
 
+	# replace ICU headers with upstream version
+	rm -rf $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/unicode
+
 	patch -d $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/c++/v1  -p1 < $TERMUX_PKG_BUILDER_DIR/math-header.diff
 	# disable for now
 	# patch -d $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/ -p1 < $TERMUX_PKG_BUILDER_DIR/gcc_fixes.diff
@@ -37,7 +40,7 @@ termux_step_extract_into_massagedir() {
 
 	cp $LIBATOMIC/libatomic.a $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/
 
-	cp $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libcompiler_rt-extras.a $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/
+	cp $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/libcompiler_rt-extras.a $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/
 	# librt and libpthread are built into libc on android, so setup them as symlinks
 	# to libc for compatibility with programs that users try to build:
 	local _SYSTEM_LIBDIR=/system/lib64
@@ -47,7 +50,7 @@ termux_step_extract_into_massagedir() {
 	NDK_ARCH=$TERMUX_ARCH
 	test $NDK_ARCH == 'i686' && NDK_ARCH='i386'
 	# clang 13 requires libunwind on Android.
-	cp $TERMUX_STANDALONE_TOOLCHAIN/lib64/clang/12.0.9/lib/linux/$NDK_ARCH/libunwind.a .
+	cp $TERMUX_STANDALONE_TOOLCHAIN/lib64/clang/14.0.6/lib/linux/$NDK_ARCH/libunwind.a .
 
 	for lib in librt.so libpthread.so libutil.so; do
 		echo 'INPUT(-lc)' > $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/$lib

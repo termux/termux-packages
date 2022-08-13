@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Version 3.0.0 or higher does not work with vanilla wxWidgets.
 TERMUX_PKG_VERSION=2.4.2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/audacity/audacity/archive/Audacity-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=cdb4800c8e9d1d4ca19964caf8d24000f80286ebd8a4db566c2622449744c099
 TERMUX_PKG_DEPENDS="glib, gtk3, libc++, libexpat, libflac, libmp3lame, libogg, libsndfile, libsoxr, libvorbis, wxwidgets, zlib"

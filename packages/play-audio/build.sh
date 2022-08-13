@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Simple command line audio player for Android"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.6
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/termux/play-audio/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=0ec4f2ab36e99d642f10978f67957d956e1d8dbe1eff1efb4619ef41ca9b07c0
 TERMUX_PKG_DEPENDS="libc++"

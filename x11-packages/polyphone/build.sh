@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="An open-source soundfont editor for creating musical ins
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.3.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/davy7125/polyphone/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=ecf401f2a083bb5396032953bb3d051e39aa4483063da9546852219ad532605a
 TERMUX_PKG_DEPENDS="glib, libc++, libflac, libogg, librtmidi, libvorbis, openssl, portaudio, qcustomplot, qt5-qtbase, qt5-qtsvg, zlib"
