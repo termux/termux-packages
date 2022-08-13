@@ -85,11 +85,11 @@ index 0fa8f0ba..a12947a5 100644
  
    std::unique_ptr<FEX::HLE::MemAllocator> Create32BitAllocator();
 diff --git a/Source/Tests/LinuxSyscalls/Syscalls/SHM.cpp b/Source/Tests/LinuxSyscalls/Syscalls/SHM.cpp
-index f3be716e..fa537d92 100644
+index bdc39fd2..da377bd7 100644
 --- a/Source/Tests/LinuxSyscalls/Syscalls/SHM.cpp
 +++ b/Source/Tests/LinuxSyscalls/Syscalls/SHM.cpp
 @@ -18,14 +18,14 @@ namespace FEX::HLE {
-   void RegisterSHM() {
+   void RegisterSHM(FEX::HLE::SyscallHandler *Handler) {
      using namespace FEXCore::IR;
  
 -    REGISTER_SYSCALL_IMPL_PASS_FLAGS(shmget, SyscallFlags::OPTIMIZETHROUGH | SyscallFlags::NOSYNCSTATEONENTRY,
@@ -106,7 +106,7 @@ index f3be716e..fa537d92 100644
        uint64_t Result = ::shmctl(shmid, cmd, buf);
        SYSCALL_ERRNO();
 diff --git a/Source/Tests/LinuxSyscalls/x32/Memory.cpp b/Source/Tests/LinuxSyscalls/x32/Memory.cpp
-index 1c6c38c5..7e43e107 100644
+index e4366deb..c5d1ccc7 100644
 --- a/Source/Tests/LinuxSyscalls/x32/Memory.cpp
 +++ b/Source/Tests/LinuxSyscalls/x32/Memory.cpp
 @@ -111,11 +111,11 @@ namespace FEX::HLE::x32 {
@@ -137,7 +137,7 @@ index 1c6c38c5..7e43e107 100644
        if (!FEX::HLE::HasSyscallError(Result)) {
          FEX::HLE::_SyscallHandler->TrackShmdt((uintptr_t)shmaddr);
 diff --git a/Source/Tests/LinuxSyscalls/x32/Semaphore.cpp b/Source/Tests/LinuxSyscalls/x32/Semaphore.cpp
-index 53a66269..5cade7ef 100644
+index 973a071e..d1e29df3 100644
 --- a/Source/Tests/LinuxSyscalls/x32/Semaphore.cpp
 +++ b/Source/Tests/LinuxSyscalls/x32/Semaphore.cpp
 @@ -281,7 +281,7 @@ namespace FEX::HLE::x32 {
@@ -231,7 +231,7 @@ index 4925e085..45f75bc1 100644
    SYSCALL_x86_msgsnd = 400,
    SYSCALL_x86_msgrcv = 401,
 diff --git a/Source/Tests/LinuxSyscalls/x64/Memory.cpp b/Source/Tests/LinuxSyscalls/x64/Memory.cpp
-index e1c5b306..5adb610a 100644
+index 2d1e17be..3c3818b5 100644
 --- a/Source/Tests/LinuxSyscalls/x64/Memory.cpp
 +++ b/Source/Tests/LinuxSyscalls/x64/Memory.cpp
 @@ -117,7 +117,7 @@ namespace FEX::HLE::x64 {
