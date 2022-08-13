@@ -5,7 +5,7 @@ TERMUX_PKG_LICENSE_FILE="llvm/LICENSE.TXT"
 TERMUX_PKG_MAINTAINER="@buttaface"
 LLVM_MAJOR_VERSION=14
 TERMUX_PKG_VERSION=${LLVM_MAJOR_VERSION}.0.6
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SHA256=8b3cfd7bc695bd6cea0f37f53f0981f34f87496e79e2529874fd03a2f9dd3a8a
 TERMUX_PKG_SRCURL=https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/llvm-project-$TERMUX_PKG_VERSION.src.tar.xz
 TERMUX_PKG_HOSTBUILD=true
@@ -122,6 +122,8 @@ termux_step_post_make_install() {
 	for tool in clang clang++ cc c++ cpp gcc g++ ${TERMUX_HOST_PLATFORM}-{clang,clang++,gcc,g++,cpp}; do
 		ln -f -s clang-${LLVM_MAJOR_VERSION} $tool
 	done
+
+	ln -f -s clang++ clang++-${LLVM_MAJOR_VERSION}
 
 	if [ $TERMUX_ARCH == "arm" ]; then
 		# For arm we replace symlinks with the same type of
