@@ -1,18 +1,20 @@
 diff -uNr psmisc/src/killall.c psmisc.mod/src/killall.c
---- psmisc/src/killall.c	2022-03-18 06:47:48.712425525 +0800
-+++ psmisc.mod/src/killall.c	2022-08-04 00:04:01.358949441 +0800
-@@ -46,6 +46,10 @@
+--- psmisc/src/killall.c	2022-03-18 06:47:48.712425500 +0800
++++ psmisc.mod/src/killall.c	2022-08-13 22:12:03.633953000 +0800
+@@ -46,6 +46,12 @@
  #include <ctype.h>
  #include <assert.h>
  
 +#ifdef __ANDROID__
++#include <android/fdsan.h>
++#include <dlfcn.h>
 +#include <sys/sysinfo.h>
 +#endif
 +
  #ifdef WITH_SELINUX
  #include <dlfcn.h>
  #include <selinux/selinux.h>
-@@ -135,6 +139,16 @@
+@@ -135,6 +141,16 @@
  static double
  uptime()
  {
@@ -29,7 +31,7 @@ diff -uNr psmisc/src/killall.c psmisc.mod/src/killall.c
      char * savelocale;
      char buf[2048];
      FILE* file;
-@@ -147,6 +161,7 @@
+@@ -147,6 +163,7 @@
      fclose(file);
      setlocale(LC_NUMERIC,savelocale);
      return atof(buf);
@@ -37,3 +39,34 @@ diff -uNr psmisc/src/killall.c psmisc.mod/src/killall.c
  }
  
  /* process age from jiffies to seconds via uptime */
+@@ -881,6 +898,20 @@
+     return stat(filename, &isproc) == 0;
+ }
+ 
++#ifdef __ANDROID__
++static inline void termux_disable_fdsan() {
++	// For Android 11+.
++	void *lib_handle = dlopen("libc.so", RTLD_LAZY);
++	if (lib_handle) {
++		void (*set_fdsan_error_level)(enum android_fdsan_error_level newlevel) = dlsym(lib_handle, "android_fdsan_set_error_level");
++		if (set_fdsan_error_level) {
++			set_fdsan_error_level(ANDROID_FDSAN_ERROR_LEVEL_DISABLED);
++		}
++		dlclose(lib_handle);
++	}
++}
++#endif
++
+ int
+ main (int argc, char **argv)
+ {
+@@ -914,6 +945,9 @@
+         {"version", 0, NULL, 'V'},
+         {0,0,0,0 }};
+ 
++#ifdef __ANDROID__
++    termux_disable_fdsan();
++#endif
+ 
+     /* Setup the i18n */
+ #ifdef ENABLE_NLS
