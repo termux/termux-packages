@@ -20,19 +20,19 @@ termux_step_post_get_source() {
 }
 
 termux_step_make_install() {
-	mkdir -p $TERMUX_PREFIX/share/hunspell/
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/hunspell/
 	# On checksum mismatch the files may have been updated:
 	#  https://cgit.freedesktop.org/libreoffice/dictionaries/log/nl_NL/nl_NL.aff
 	#  https://cgit.freedesktop.org/libreoffice/dictionaries/log/nl_NL/nl_NL.dic
 	# In which case we need to bump version and checksum used.
 	termux_download https://cgit.freedesktop.org/libreoffice/dictionaries/plain/nl_NL/nl_NL.aff \
-			$TERMUX_PREFIX/share/hunspell/nl_NL.aff \
+			$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/hunspell/nl_NL.aff \
 			0ee9233fe1c5785f9a803a05ac882e8363ac785c06fbd455af88ce0c0a57324b
 	termux_download https://cgit.freedesktop.org/libreoffice/dictionaries/plain/nl_NL/nl_NL.dic \
-			$TERMUX_PREFIX/share/hunspell/nl_NL.dic \
+			$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/hunspell/nl_NL.dic \
 			24782020d0d0bd465270027f51443b752f8ddaecf7c612a225e8668e1746aa24
-	touch $TERMUX_PREFIX/share/hunspell/nl_NL.{aff,dic}
+	touch $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/hunspell/nl_NL.{aff,dic}
 
-	install -Dm600 -t $TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME \
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME \
 		$TERMUX_PKG_SRCDIR/README_NL.txt
 }
