@@ -29,6 +29,8 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm600 -t $TERMUX_PREFIX/lib libexecinfo.{a,so}
-	install -Dm600 -t $TERMUX_PREFIX/include $TERMUX_PKG_SRCDIR/execinfo.h
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib \
+		libexecinfo.{a,so}
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include \
+		$TERMUX_PKG_SRCDIR/execinfo.h
 }
