@@ -4,7 +4,6 @@ TERMUX_PKG_LICENSE="GPL-3.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 _MAJOR_VERSION=2.10
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.30
-TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.gimp.org/mirror/pub/gimp/v${_MAJOR_VERSION}/gimp-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=88815daa76ed7d4277eeb353358bafa116cd2fcd2c861d95b95135c1d52b67dc
 TERMUX_PKG_DEPENDS="aalib, atk, babl, fontconfig, freetype, gdk-pixbuf, gegl, gexiv2, ghostscript, gimp-data, glib, glib-networking, gtk2, harfbuzz, hicolor-icon-theme, json-glib, libandroid-shmem, libc++, libcairo, libheif, libjpeg-turbo, libmypaint, libpng, librsvg, libtiff, libwebp, libxcursor, libxml2, libxpm, libxslt, littlecms, mypaint-brushes, openexr2, openjpeg, pango, poppler, poppler-data, zlib"
