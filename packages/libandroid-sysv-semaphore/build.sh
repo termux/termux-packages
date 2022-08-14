@@ -25,6 +25,8 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm600 -t $TERMUX_PREFIX/lib libandroid-sysv-semaphore.{a,so}
-	install -Dm600 -T sys_sem.h $TERMUX_PREFIX/include/sys/sem.h
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib \
+		libandroid-sysv-semaphore.{a,so}
+	install -Dm600 -T sys_sem.h \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/sys/sem.h
 }
