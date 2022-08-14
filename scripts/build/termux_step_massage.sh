@@ -122,6 +122,6 @@ create_grep_pattern() {
 	echo -n "$symbol_type$1"'$'
 	shift 1
 	for arg in "$@"; do
-		echo -n "\|$symbol_type$arg"'$'
+		echo -n "|$symbol_type$arg"'$'
 	done
 }
