@@ -21,6 +21,7 @@ PACKAGES+=" gperf" # Used by the fontconfig build.
 PACKAGES+=" help2man"
 PACKAGES+=" intltool" # Used by qalc build.
 PACKAGES+=" jre8-openjdk-headless"
+PACKAGES+=" re2c" # Needed by kphp-timelib
 PACKAGES+=" libjpeg-turbo" # Needed by ghostscript.
 PACKAGES+=" libtool"
 PACKAGES+=" lua" # Needed to build luarocks package.

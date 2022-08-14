@@ -35,6 +35,7 @@ PACKAGES+=" perl"
 PACKAGES+=" pkg-config"
 PACKAGES+=" protobuf"
 PACKAGES+=" python2"
+PACKAGES+=" re2c"                       # Needed by kphp-timelib
 PACKAGES+=" rust"
 PACKAGES+=" texinfo"
 PACKAGES+=" valac"
