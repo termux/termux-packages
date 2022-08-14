@@ -9,16 +9,16 @@ TERMUX_PKG_SHA256=425cdb5fba13a01db59a1713780f0662e984204f402d3dae1525bda9e6d30f
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {
-	install -Dm700 -t $TERMUX_PREFIX/bin stemwords
-	install -Dm600 -t $TERMUX_PREFIX/include include/libstemmer.h
-	install -Dm600 -t $TERMUX_PREFIX/lib libstemmer.a
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin stemwords
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include include/libstemmer.h
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib libstemmer.a
 
 	local f
 	for f in libstemmer.so*; do
 		if test -L "${f}"; then
-			ln -sf "$(readlink "${f}")" $TERMUX_PREFIX/lib/"${f}"
+			ln -sf "$(readlink "${f}")" $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/"${f}"
 		else
-			install -Dm600 -t $TERMUX_PREFIX/lib "${f}"
+			install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib "${f}"
 		fi
 	done
 }
