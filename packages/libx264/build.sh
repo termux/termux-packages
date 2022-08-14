@@ -30,6 +30,6 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_make_install() {
-	mkdir -p ${TERMUX_PREFIX}/share/bash-completion/completions
-	install -m 644 ${TERMUX_PKG_SRCDIR}/tools/bash-autocomplete.sh ${TERMUX_PREFIX}/share/bash-completion/completions/x264
+	mkdir -p ${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/share/bash-completion/completions
+	install -m 644 ${TERMUX_PKG_SRCDIR}/tools/bash-autocomplete.sh ${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/share/bash-completion/completions/x264
 }
