@@ -1,5 +1,5 @@
---- heyu-2.10.3/Makefile.in	2021-04-30 22:37:54.000000000 +0530
-+++ heyu-patch/Makefile.in	2022-04-07 20:17:28.648579237 +0530
+--- ../heyu-2.10.3/Makefile.in	2021-04-30 19:07:54.000000000 +0200
++++ ./Makefile.in	2022-08-14 19:03:21.296803407 +0200
 @@ -36,11 +36,11 @@
  	history.txt version.h heyufaq.txt x10sched.5 process.h sun.h \
  	x10scripts.5 Configure Makefile.in install.sh AUTHORS COPYING INSTALL \
@@ -14,17 +14,138 @@
  
  heyu:	$(OBJS) version.h
  	$(CC) $(LDFLAGS) -o heyu $(OBJS) $(LIBS)
-@@ -90,10 +90,7 @@
- $(BIN)/heyu:	heyu
- 	mkdir -p -m 755 $(BIN)
- 	cp heyu $(BIN)
+@@ -74,81 +74,78 @@
+ 	$(MAN5)/x10digimax.5 $(MAN5)/x10oregon.5 $(MAN5)/x10kaku.5
+ 
+ uninstall:
+-	rm -f $(BIN)/heyu
+-	rm -f $(MAN)/heyu.1
+-	rm -f $(MAN5)/x10config.5
+-	rm -f $(MAN5)/x10sched.5
+-	rm -f $(MAN5)/x10scripts.5
+-	rm -f $(MAN5)/x10cm17a.5
+-	rm -f $(MAN5)/x10aux.5
+-	rm -f $(MAN5)/x10rfxsensors.5
+-	rm -f $(MAN5)/x10rfxmeters.5
+-	rm -f $(MAN5)/x10digimax.5
+-	rm -f $(MAN5)/x10oregon.5
+-	rm -f $(MAN5)/x10kaku.5
+-
+-$(BIN)/heyu:	heyu
+-	mkdir -p -m 755 $(BIN)
+-	cp heyu $(BIN)
 -	chgrp $(GROUP) $(BIN)/heyu
- 	chmod 755 $(BIN)/heyu
+-	chmod 755 $(BIN)/heyu
 -	chown $(OWNER) $(BIN)/heyu
 -	./install.sh
++	rm -f $(DESTDIR)$(BIN)/heyu
++	rm -f $(DESTDIR)$(MAN)/heyu.1
++	rm -f $(DESTDIR)$(MAN5)/x10config.5
++	rm -f $(DESTDIR)$(MAN5)/x10sched.5
++	rm -f $(DESTDIR)$(MAN5)/x10scripts.5
++	rm -f $(DESTDIR)$(MAN5)/x10cm17a.5
++	rm -f $(DESTDIR)$(MAN5)/x10aux.5
++	rm -f $(DESTDIR)$(MAN5)/x10rfxsensors.5
++	rm -f $(DESTDIR)$(MAN5)/x10rfxmeters.5
++	rm -f $(DESTDIR)$(MAN5)/x10digimax.5
++	rm -f $(DESTDIR)$(MAN5)/x10oregon.5
++	rm -f $(DESTDIR)$(MAN5)/x10kaku.5
++
++$(BIN)/heyu: heyu
++	mkdir -p -m 755 $(DESTDIR)$(BIN)
++	cp heyu $(DESTDIR)$(BIN)
++	chmod 755 $(DESTDIR)$(BIN)/heyu
  
  $(MAN)/heyu.1: heyu.1
- 	mkdir -p -m 755 $(MAN)
+-	mkdir -p -m 755 $(MAN)
+-	cp heyu.1 $(MAN)
+-	chmod 644 $(MAN)/heyu.1
++	mkdir -p -m 755 $(DESTDIR)$(MAN)
++	cp heyu.1 $(DESTDIR)$(MAN)
++	chmod 644 $(DESTDIR)$(MAN)/heyu.1
+ 
+ $(MAN5)/x10config.5: x10config.5
+-	mkdir -p -m 755 $(MAN5)
+-	cp x10config.5 $(MAN5)
+-	chmod 644 $(MAN5)/x10config.5
++	mkdir -p -m 755 $(DESTDIR)$(MAN5)
++	cp x10config.5 $(DESTDIR)$(MAN5)
++	chmod 644 $(DESTDIR)$(MAN5)/x10config.5
+ 
+ $(MAN5)/x10sched.5: x10sched.5
+-	mkdir -p -m 755 $(MAN5)
+-	cp x10sched.5 $(MAN5)
+-	chmod 644 $(MAN5)/x10sched.5
++	mkdir -p -m 755 $(DESTDIR)$(MAN5)
++	cp x10sched.5 $(DESTDIR)$(MAN5)
++	chmod 644 $(DESTDIR)$(MAN5)/x10sched.5
+ 
+ $(MAN5)/x10scripts.5: x10scripts.5
+-	mkdir -p -m 755 $(MAN5)
+-	cp x10scripts.5 $(MAN5)
+-	chmod 644 $(MAN5)/x10scripts.5
++	mkdir -p -m 755 $(DESTDIR)$(MAN5)
++	cp x10scripts.5 $(DESTDIR)$(MAN5)
++	chmod 644 $(DESTDIR)$(MAN5)/x10scripts.5
+ 
+ $(MAN5)/x10cm17a.5: x10cm17a.5
+-	mkdir -p -m 755 $(MAN5)
+-	cp x10cm17a.5 $(MAN5)
+-	chmod 644 $(MAN5)/x10cm17a.5
++	mkdir -p -m 755 $(DESTDIR)$(MAN5)
++	cp x10cm17a.5 $(DESTDIR)$(MAN5)
++	chmod 644 $(DESTDIR)$(MAN5)/x10cm17a.5
+ 
+ $(MAN5)/x10aux.5: x10aux.5
+-	mkdir -p -m 755 $(MAN5)
+-	cp x10aux.5 $(MAN5)
+-	chmod 644 $(MAN5)/x10aux.5
++	mkdir -p -m 755 $(DESTDIR)$(MAN5)
++	cp x10aux.5 $(DESTDIR)$(MAN5)
++	chmod 644 $(DESTDIR)$(MAN5)/x10aux.5
+ 
+ $(MAN5)/x10rfxsensors.5: x10rfxsensors.5
+-	mkdir -p -m 755 $(MAN5)
+-	cp x10rfxsensors.5 $(MAN5)
+-	chmod 644 $(MAN5)/x10rfxsensors.5
++	mkdir -p -m 755 $(DESTDIR)$(MAN5)
++	cp x10rfxsensors.5 $(DESTDIR)$(MAN5)
++	chmod 644 $(DESTDIR)$(MAN5)/x10rfxsensors.5
+ 
+ $(MAN5)/x10rfxmeters.5: x10rfxmeters.5
+-	mkdir -p -m 755 $(MAN5)
+-	cp x10rfxmeters.5 $(MAN5)
+-	chmod 644 $(MAN5)/x10rfxmeters.5
++	mkdir -p -m 755 $(DESTDIR)$(MAN5)
++	cp x10rfxmeters.5 $(DESTDIR)$(MAN5)
++	chmod 644 $(DESTDIR)$(MAN5)/x10rfxmeters.5
+ 
+ $(MAN5)/x10digimax.5: x10digimax.5
+-	mkdir -p -m 755 $(MAN5)
+-	cp x10digimax.5 $(MAN5)
+-	chmod 644 $(MAN5)/x10digimax.5
++	mkdir -p -m 755 $(DESTDIR)$(MAN5)
++	cp x10digimax.5 $(DESTDIR)$(MAN5)
++	chmod 644 $(DESTDIR)$(MAN5)/x10digimax.5
+ 
+ $(MAN5)/x10oregon.5: x10oregon.5
+-	mkdir -p -m 755 $(MAN5)
+-	cp x10oregon.5 $(MAN5)
+-	chmod 644 $(MAN5)/x10oregon.5
++	mkdir -p -m 755 $(DESTDIR)$(MAN5)
++	cp x10oregon.5 $(DESTDIR)$(MAN5)
++	chmod 644 $(DESTDIR)$(MAN5)/x10oregon.5
+ 
+ $(MAN5)/x10kaku.5: x10kaku.5
+-	mkdir -p -m 755 $(MAN5)
+-	cp x10kaku.5 $(MAN5)
+-	chmod 644 $(MAN5)/x10kaku.5
++	mkdir -p -m 755 $(DESTDIR)$(MAN5)
++	cp x10kaku.5 $(DESTDIR)$(MAN5)
++	chmod 644 $(DESTDIR)$(MAN5)/x10kaku.5
+ 
+ lint:
+ 	lint $(DFLAGS) $(SRCS)
 @@ -256,4 +253,3 @@
  
  $(EVERYTHING):
