@@ -1,71 +1,79 @@
 For 32-bit Android `socklen_t` is defined as `int32_t`.
 
---- a/include/host/wasi/environ.h
-+++ b/include/host/wasi/environ.h
-@@ -964,7 +964,7 @@
- 
-   WasiExpect<void> sockGetOpt(__wasi_fd_t Fd, int32_t Level, int32_t Name,
-                               void *FlagPtr,
+diff -uNr WasmEdge/include/host/wasi/environ.h WasmEdge.mod/include/host/wasi/environ.h
+--- WasmEdge/include/host/wasi/environ.h	2022-07-28 18:56:12.000000000 +0800
++++ WasmEdge.mod/include/host/wasi/environ.h	2022-08-15 01:51:55.617253141 +0800
+@@ -1015,7 +1015,7 @@
+   WasiExpect<void> sockGetOpt(__wasi_fd_t Fd,
+                               __wasi_sock_opt_level_t SockOptLevel,
+                               __wasi_sock_opt_so_t SockOptName, void *FlagPtr,
 -                              uint32_t *FlagSizePtr) const noexcept {
 +                              socklen_t *FlagSizePtr) const noexcept {
      auto Node = getNodeOrNull(Fd);
      if (unlikely(!Node)) {
        return WasiUnexpect(__WASI_ERRNO_BADF);
---- a/include/host/wasi/inode.h
-+++ b/include/host/wasi/inode.h
-@@ -540,7 +540,7 @@
-   WasiExpect<void> sockShutdown(__wasi_sdflags_t SdFlags) const noexcept;
+diff -uNr WasmEdge/include/host/wasi/inode.h WasmEdge.mod/include/host/wasi/inode.h
+--- WasmEdge/include/host/wasi/inode.h	2022-07-28 18:56:12.000000000 +0800
++++ WasmEdge.mod/include/host/wasi/inode.h	2022-08-15 01:52:42.628642901 +0800
+@@ -595,7 +595,7 @@
  
-   WasiExpect<void> sockGetOpt(int32_t Level, int32_t Name, void *FlagPtr,
+   WasiExpect<void> sockGetOpt(__wasi_sock_opt_level_t SockOptLevel,
+                               __wasi_sock_opt_so_t SockOptName, void *FlagPtr,
 -                              uint32_t *FlagSizePtr) const noexcept;
 +                              socklen_t *FlagSizePtr) const noexcept;
-   WasiExpect<void> sockSetOpt(int32_t Level, int32_t Name, void *FlagPtr,
-                               uint32_t FlagSizePtr) const noexcept;
  
---- a/include/host/wasi/vinode.h
-+++ b/include/host/wasi/vinode.h
-@@ -603,7 +603,7 @@
-   }
+   WasiExpect<void> sockSetOpt(__wasi_sock_opt_level_t SockOptLevel,
+                               __wasi_sock_opt_so_t SockOptName, void *FlagPtr,
+diff -uNr WasmEdge/include/host/wasi/vinode.h WasmEdge.mod/include/host/wasi/vinode.h
+--- WasmEdge/include/host/wasi/vinode.h	2022-07-28 18:56:12.000000000 +0800
++++ WasmEdge.mod/include/host/wasi/vinode.h	2022-08-15 01:53:09.700443206 +0800
+@@ -654,7 +654,7 @@
  
-   WasiExpect<void> sockGetOpt(int32_t Level, int32_t OptName, void *FlagPtr,
+   WasiExpect<void> sockGetOpt(__wasi_sock_opt_level_t SockOptLevel,
+                               __wasi_sock_opt_so_t SockOptName, void *FlagPtr,
 -                              uint32_t *FlagSizePtr) const noexcept {
 +                              socklen_t *FlagSizePtr) const noexcept {
-     return Node.sockGetOpt(Level, OptName, FlagPtr, FlagSizePtr);
+     return Node.sockGetOpt(SockOptLevel, SockOptName, FlagPtr, FlagSizePtr);
    }
-   WasiExpect<void> sockSetOpt(int32_t Level, int32_t OptName, void *FlagPtr,
---- a/include/host/wasi/wasifunc.h
-+++ b/include/host/wasi/wasifunc.h
-@@ -455,7 +455,7 @@
+ 
+diff -uNr WasmEdge/include/host/wasi/wasifunc.h WasmEdge.mod/include/host/wasi/wasifunc.h
+--- WasmEdge/include/host/wasi/wasifunc.h	2022-07-28 18:56:12.000000000 +0800
++++ WasmEdge.mod/include/host/wasi/wasifunc.h	2022-08-15 01:54:16.532418910 +0800
+@@ -457,7 +457,7 @@
  
    Expect<uint32_t> body(Runtime::Instance::MemoryInstance *MemInst, int32_t Fd,
-                         int32_t Level, int32_t Name, uint32_t FlagPtr,
--                        uint32_t FlagSizePtr);
-+                        socklen_t FlagSizePtr);
+                         uint32_t SockOptLevel, uint32_t SockOptName,
+-                        uint32_t FlagPtr, uint32_t FlagSizePtr);
++                        uint32_t FlagPtr, socklen_t FlagSizePtr);
  };
  
  class WasiSockSetOpt : public Wasi<WasiSockSetOpt> {
---- a/lib/host/wasi/inode-linux.cpp
-+++ b/lib/host/wasi/inode-linux.cpp
-@@ -1060,7 +1060,7 @@
- 
- WasiExpect<void> INode::sockGetOpt(int32_t Level, int32_t OptName,
+diff -uNr WasmEdge/lib/host/wasi/inode-linux.cpp WasmEdge.mod/lib/host/wasi/inode-linux.cpp
+--- WasmEdge/lib/host/wasi/inode-linux.cpp	2022-07-28 18:56:12.000000000 +0800
++++ WasmEdge.mod/lib/host/wasi/inode-linux.cpp	2022-08-15 01:55:09.152974492 +0800
+@@ -1136,7 +1136,7 @@
+ WasiExpect<void> INode::sockGetOpt(__wasi_sock_opt_level_t SockOptLevel,
+                                    __wasi_sock_opt_so_t SockOptName,
                                     void *FlagPtr,
 -                                   uint32_t *FlagSizePtr) const noexcept {
 +                                   socklen_t *FlagSizePtr) const noexcept {
-   auto SysLevel = toSockOptLevel(static_cast<__wasi_sock_opt_level_t>(Level));
-   auto SysOptName = toSockOptSoName(static_cast<__wasi_sock_opt_so_t>(OptName));
-   if (OptName == __WASI_SOCK_OPT_SO_ERROR) {
---- a/lib/host/wasi/wasifunc.cpp
-+++ b/lib/host/wasi/wasifunc.cpp
-@@ -1854,13 +1854,13 @@
+   auto SysSockOptLevel = toSockOptLevel(SockOptLevel);
+   auto SysSockOptName = toSockOptSoName(SockOptName);
+   if (SockOptName == __WASI_SOCK_OPT_SO_ERROR) {
+diff -uNr WasmEdge/lib/host/wasi/wasifunc.cpp WasmEdge.mod/lib/host/wasi/wasifunc.cpp
+--- WasmEdge/lib/host/wasi/wasifunc.cpp	2022-07-28 18:56:12.000000000 +0800
++++ WasmEdge.mod/lib/host/wasi/wasifunc.cpp	2022-08-15 01:56:27.730339246 +0800
+@@ -2061,7 +2061,7 @@
  Expect<uint32_t>
  WasiSockGetOpt::body(Runtime::Instance::MemoryInstance *MemInst, int32_t Fd,
-                      int32_t Level, int32_t Name, uint32_t FlagPtr,
--                     uint32_t FlagSizePtr) {
-+                     socklen_t FlagSizePtr) {
- 
+                      uint32_t SockOptLevel, uint32_t SockOptName,
+-                     uint32_t FlagPtr, uint32_t FlagSizePtr) {
++                     uint32_t FlagPtr, socklen_t FlagSizePtr) {
    if (MemInst == nullptr) {
      return __WASI_ERRNO_FAULT;
+   }
+@@ -2080,7 +2080,7 @@
+     WasiSockOptName = *Res;
    }
  
 -  uint32_t *InnerFlagSizePtr = MemInst->getPointer<uint32_t *>(FlagSizePtr);
