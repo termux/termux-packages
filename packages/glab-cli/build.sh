@@ -14,11 +14,11 @@ termux_step_pre_configure() {
 }
 
 termux_step_make_install() {
-	install -Dm700 -t "${TERMUX_PREFIX}"/bin bin/glab
+	install -Dm700 -t "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}"/bin bin/glab
 
-	install -Dm644 /dev/null "$TERMUX_PREFIX"/share/bash-completion/completions/glab.bash
-	install -Dm644 /dev/null "$TERMUX_PREFIX"/share/zsh/site-functions/_glab
-	install -Dm644 /dev/null "$TERMUX_PREFIX"/share/fish/vendor_completions.d/glab.fish
+	install -Dm644 /dev/null "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/bash-completion/completions/glab.bash
+	install -Dm644 /dev/null "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/zsh/site-functions/_glab
+	install -Dm644 /dev/null "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/fish/vendor_completions.d/glab.fish
 }
 
 termux_step_create_debscripts() {
