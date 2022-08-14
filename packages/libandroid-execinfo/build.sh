@@ -8,7 +8,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PROVIDES="libexecinfo"
 TERMUX_PKG_CONFLICTS="libexecinfo"
 
-# Files are taken from the Bionic libc repo. 
+# Files are taken from the Bionic libc repo.
 # exexinfo.h: https://android.googlesource.com/platform/bionic/+/refs/heads/master/libc/include/execinfo.h
 # execinfo.c: https://android.googlesource.com/platform/bionic/+/refs/heads/master/libc/bionic/execinfo.cpp
 termux_step_make() {
@@ -19,8 +19,12 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm600 $TERMUX_PKG_BUILDER_DIR/execinfo.h $TERMUX_PREFIX/include/execinfo.h
-	install -Dm600 libandroid-execinfo.a $TERMUX_PREFIX/lib/libandroid-execinfo.a
-	install -Dm600 libandroid-execinfo.so $TERMUX_PREFIX/lib/libandroid-execinfo.so
-	ln -sfr $TERMUX_PREFIX/lib/libandroid-execinfo.so $TERMUX_PREFIX/lib/libexecinfo.so
+	install -Dm600 $TERMUX_PKG_BUILDER_DIR/execinfo.h \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/execinfo.h
+	install -Dm600 libandroid-execinfo.a \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/libandroid-execinfo.a
+	install -Dm600 libandroid-execinfo.so \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/libandroid-execinfo.so
+	ln -sfr $TERMUX_PREFIX/lib/libandroid-execinfo.so \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/libexecinfo.so
 }
