@@ -8,7 +8,7 @@ TERMUX_PKG_SHA256=960daa800dd31d70ba1bacf3ea2d22e8ddfc2906534bf328319495966443f3
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {
-	install -Dm600 -t $TERMUX_PREFIX/lib libiniparser.so.1
-	ln -sf libiniparser.so.1 $TERMUX_PREFIX/lib/libiniparser.so
-	install -Dm600 -t $TERMUX_PREFIX/include/iniparser src/*.h
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib libiniparser.so.1
+	ln -sf libiniparser.so.1 $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/libiniparser.so
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/iniparser src/*.h
 }
