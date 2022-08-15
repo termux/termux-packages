@@ -16,7 +16,7 @@ TERMUX_PKG_AUTO_UPDATE=true
 
 termux_pkg_auto_update() {
 	local version="$(curl -L https://ziglang.org/download/index.json | jq ".master.version")"
-	local sha256="$(curl -L https://ziglang.org/download/index.json | jq "del(.master) | .master.src.shasum")"
+	local sha256="$(curl -L https://ziglang.org/download/index.json | jq ".master.src.shasum")"
 	sed -i "${TERMUX_PKG_BUILDER_DIR}/build.sh" -e "s|^TERMUX_PKG_VERSION=.*|TERMUX_PKG_VERSION=$version|"
 	sed -i "${TERMUX_PKG_BUILDER_DIR}/build.sh" -e "s|^TERMUX_PKG_SHA256=.*|TERMUX_PKG_SHA256=$sha256|"
 }
