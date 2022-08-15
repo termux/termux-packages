@@ -22,7 +22,7 @@ termux_step_get_source() {
 
 termux_step_make_install() {
 	cd "opengfx-$TERMUX_PKG_VERSION"
-	install -d "$TERMUX_PREFIX"/share/openttd/data
-	install -m600 *.grf "$TERMUX_PREFIX"/share/openttd/data
-	install -m600 *.obg "$TERMUX_PREFIX"/share/openttd/data
+	install -d "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/openttd/data
+	install -m600 *.grf "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/openttd/data
+	install -m600 *.obg "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/openttd/data
 }
