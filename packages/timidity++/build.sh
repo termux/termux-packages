@@ -35,5 +35,6 @@ termux_step_post_configure() {
 termux_step_post_make_install() {
 	sed "s:@TERMUX_PREFIX@:$TERMUX_PREFIX:g" \
 		$TERMUX_PKG_BUILDER_DIR/timidity.cfg > timidity.cfg
-	install -Dm600 -t $TERMUX_PREFIX/share/timidity timidity.cfg
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/timidity \
+		timidity.cfg
 }
