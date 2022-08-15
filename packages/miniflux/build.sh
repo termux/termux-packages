@@ -16,6 +16,6 @@ termux_step_pre_configure() {
 }
 
 termux_step_make_install() {
-	install -Dm700 -t $TERMUX_PREFIX/bin miniflux
-	install -Dm600 -t $TERMUX_PREFIX/share/man/man1 miniflux.1
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin miniflux
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man1 miniflux.1
 }
