@@ -29,6 +29,6 @@ termux_step_make_install() {
 		BUILD_TYPE=debug
 	fi
 
-	install -Dm755 -t $TERMUX_PREFIX/bin \
+	install -Dm755 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin \
 		target/${CARGO_TARGET_NAME}/${BUILD_TYPE}/bindgen
 }
