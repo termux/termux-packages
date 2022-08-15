@@ -9,5 +9,6 @@ TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_AUTO_UPDATE=false # No src url to update from.
 
 termux_step_make_install() {
-	install -Dm644 "${TERMUX_PKG_BUILDER_DIR}/index.theme" "${TERMUX_PREFIX}/share/icons/hicolor/index.theme"
+	install -Dm644 "${TERMUX_PKG_BUILDER_DIR}/index.theme" \
+		"${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/share/icons/hicolor/index.theme"
 }
