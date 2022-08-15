@@ -11,6 +11,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # - subversion
 TERMUX_PKG_VERSION=(5.36.0
                     1.4)
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=(e26085af8ac396f62add8a533c3a0ea8c8497d836f0689347ac5abd7b7a4e00a
                    be9d9f9f7148edff7a2f9695ba3cb7e3975eff6b25a9a81dd311725fd757aa91)
 TERMUX_PKG_SRCURL=(http://www.cpan.org/src/5.0/perl-${TERMUX_PKG_VERSION}.tar.gz
@@ -38,18 +39,11 @@ termux_step_post_get_source() {
 termux_step_configure() {
 	export PATH=$PATH:$TERMUX_STANDALONE_TOOLCHAIN/bin
 
-	# Since we specify $TERMUX_PREFIX/bin/sh below for the shell
-	# it will be run during the build, so temporarily (removed in
-	# termux_step_post_make_install below) setup symlink:
-	rm -f $TERMUX_PREFIX/bin/sh
-	ln -s /bin/sh $TERMUX_PREFIX/bin/sh
-
 	(
 		ORIG_AR=$AR; unset AR
 		ORIG_AS=$AS; unset AS
 		ORIG_CC=$CC; unset CC
 		ORIG_CXX=$CXX; unset CXX
-		ORIG_CPP=$CPP; unset CPP
 		ORIG_CFLAGS=$CFLAGS; unset CFLAGS
 		ORIG_CPPFLAGS=$CPPFLAGS; unset CPPFLAGS
 		ORIG_CXXFLAGS=$CXXFLAGS; unset CXXFLAGS
@@ -79,9 +73,6 @@ termux_step_post_make_install() {
 	cd $TERMUX_PREFIX/share/man/man1
 	rm perlbug.1
 	ln -s perlthanks.1 perlbug.1
-
-	# Cleanup:
-	rm $TERMUX_PREFIX/bin/sh
 
 	cd $TERMUX_PREFIX/lib
 	ln -f -s perl5/${TERMUX_PKG_VERSION}/${TERMUX_ARCH}-android/CORE/libperl.so libperl.so
