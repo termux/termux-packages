@@ -23,6 +23,6 @@ termux_step_post_get_source() {
 }
 
 termux_step_make_install() {
-	install -Dm700 -t $TERMUX_PREFIX/bin pcasc pc{x,y,z}m picocom
-	install -Dm600 -t $TERMUX_PREFIX/share/man/man1 picocom.1
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin pcasc pc{x,y,z}m picocom
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man1 picocom.1
 }
