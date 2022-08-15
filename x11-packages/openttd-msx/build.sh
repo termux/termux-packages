@@ -20,7 +20,7 @@ termux_step_get_source() {
 }
 
 termux_step_make_install() {
-	install -d "$TERMUX_PREFIX"/share/openttd/data
-	install -m600 openmsx.obm "$TERMUX_PREFIX"/share/openttd/data
-	install -m600 *.mid "$TERMUX_PREFIX"/share/openttd/data
+	install -d "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/openttd/data
+	install -m600 openmsx.obm "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/openttd/data
+	install -m600 *.mid "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/openttd/data
 }
