@@ -11,6 +11,6 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
 termux_step_make_install() {
-	install -d "$TERMUX_PREFIX"/share/openttd/data
-	install -m600 opensfx.* "$TERMUX_PREFIX"/share/openttd/data
+	install -d "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/openttd/data
+	install -m600 opensfx.* "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/openttd/data
 }
