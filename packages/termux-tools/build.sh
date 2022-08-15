@@ -12,6 +12,7 @@ TERMUX_PKG_BREAKS="termux-keyring (<< 1.9)"
 TERMUX_PKG_CONFLICTS="procps (<< 3.3.15-2)"
 TERMUX_PKG_SUGGESTS="termux-api"
 TERMUX_PKG_CONFFILES="
+etc/motd
 etc/motd.sh
 etc/motd-playstore
 etc/profile.d/init-termux-properties.sh
