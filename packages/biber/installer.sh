@@ -62,7 +62,6 @@ else
 fi
 tar -xf p5-net-ssleay-${NET_SSLEAY_VERSION}.tar.gz
 cd p5-net-ssleay-${NET_SSLEAY_VERSION}
-patch -Np1 -i $PREFIX/opt/biber/Net-SSLeay.diff
 cpanm .
 
 cd ..
