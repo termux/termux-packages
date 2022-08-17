@@ -8,9 +8,8 @@ TERMUX_PKG_SHA256=43c1feae4170742671ffef900acd5dbe7c72099aa602d58e95e22c2174edd0
 TERMUX_PKG_DEPENDS="python"
 TERMUX_PKG_BUILD_IN_SRC=true
 
-_PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
-
 termux_step_pre_configure() {
+	_PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION) 
 	termux_setup_python_crossenv
 	pushd $TERMUX_PYTHON_CROSSENV_SRCDIR
 	_CROSSENV_PREFIX=$TERMUX_PKG_BUILDDIR/python-crossenv-prefix
@@ -22,6 +21,5 @@ termux_step_pre_configure() {
 }
 
 termux_step_make_install() {
-	DEBVER=$TERMUX_PKG_VERSION \
 		python setup.py install --force --prefix $TERMUX_PREFIX
 }
