@@ -1,0 +1,42 @@
+From 857ac91a03a096601f62b358fc61355d4cc25b9b Mon Sep 17 00:00:00 2001
+From: Fabrice Fontaine <fontaine.fabrice@gmail.com>
+Date: Sat, 9 Oct 2021 18:51:13 +0200
+Subject: [PATCH] configure.ac: fix autoreconf with autoconf >= 2.70
+
+Remove the whitespace before IT_PROG_INTLTOOL as suggested in
+https://www.mail-archive.com/bug-autoconf@gnu.org/msg04851.html
+to avoid the following build failure with autoconf >= 2.70:
+
+ERROR: 'IT_PROG_INTLTOOL' must appear in configure.ac for intltool to work.
+
+The problem has been introduced by upstream autoconf commit
+http://git.savannah.gnu.org/gitweb/?p=autoconf.git;a=commit;h=b3b3af821a0b9e82ebe56b77b1731d2fe58f52de
+
+Fixes:
+ - http://autobuild.buildroot.org/results/e8bea26f6b12adf16335b24836a7c5c31911af6a
+
+Signed-off-by: Fabrice Fontaine <fontaine.fabrice@gmail.com>
+[Upstream status: not upstreamable as upstream swicthed to cmake (
+https://github.com/transmission/transmission/issues/1573)]
+---
+ configure.ac | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index fd1132fda..04e0e19bb 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -555,9 +555,7 @@ dnl it should be safe to re-edit 0.40 back down to 0.23
+ use_nls=no
+ if test "x$enable_nls" = "xyes" ; then
+     use_nls=yes
+-    m4_ifdef([IT_PROG_INTLTOOL],
+-             [IT_PROG_INTLTOOL([0.35.0],[no-xml])],
+-             [AC_MSG_ERROR("--enable-nls requires intltool to be installed.")])
++IT_PROG_INTLTOOL([0.35.0],[no-xml])
+     AC_CHECK_HEADERS([libintl.h])
+     GETTEXT_PACKAGE=transmission-gtk
+     AC_SUBST(GETTEXT_PACKAGE)
+-- 
+2.33.0
+
