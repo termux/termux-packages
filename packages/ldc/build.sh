@@ -5,7 +5,7 @@ TERMUX_PKG_DESCRIPTION="D programming language compiler, built with LLVM"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=()
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_VERSION+=(1.27.1)
 TERMUX_PKG_VERSION+=(12.0.1)  # LLVM version
 TERMUX_PKG_VERSION+=(2.097.1) # TOOLS version
@@ -18,7 +18,7 @@ TERMUX_PKG_SRCURL=(https://github.com/ldc-developers/ldc/releases/download/v${TE
 		   https://github.com/dlang/tools/archive/v${TERMUX_PKG_VERSION[2]}.tar.gz
 		   https://github.com/dlang/dub/archive/v${TERMUX_PKG_VERSION[3]}.tar.gz
 		   https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc2-${TERMUX_PKG_VERSION}-linux-x86_64.tar.xz
-		   https://mirrors.kernel.org/gnu/binutils/binutils-${TERMUX_PKG_VERSION[4]}.tar.xz)
+		   https://ftp.gnu.org/gnu/binutils/binutils-${TERMUX_PKG_VERSION[4]}.tar.xz)
 TERMUX_PKG_SHA256=(93c8f500b39823dcdabbd73e1bcb487a1b93cb9a60144b0de1c81ab50200e59c
 		   9fc126f4ddfc80c5135ab182b3a4e8764282c15b9462161f8fb0c5ee00126f89
 		   0bea6089518395ca65cf58b0a450716c5c99ce1f041079d3aa42d280ace15ca4
@@ -95,6 +95,9 @@ termux_step_host_build() {
 
 # Just before CMake invokation for LLVM:
 termux_step_pre_configure() {
+	# Remove this marker all the time, as binutils is architecture-specific.
+	rm -rf $TERMUX_HOSTBUILD_MARKER
+
 	local _PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
 	export PATH=$_PREFIX_FOR_BUILD/$TERMUX_HOST_PLATFORM/bin:$PATH
 
