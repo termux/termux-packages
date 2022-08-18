@@ -205,7 +205,7 @@ termux_step_setup_toolchain_23c() {
 	sed -i "s/define __ANDROID_API__ __ANDROID_API_FUTURE__/define __ANDROID_API__ $TERMUX_PKG_API_LEVEL/" \
 		usr/include/android/api-level.h
 
-	$TERMUX_ELF_CLEANER usr/lib/*/*/*.so
+	$TERMUX_ELF_CLEANER --api-level=$TERMUX_PKG_API_LEVEL usr/lib/*/*/*.so
 	for dir in usr/lib/*; do
 		# This seem to be needed when building rust
 		# packages
