@@ -1,0 +1,21 @@
+diff -uNr netcat-openbsd-debian-1.218-5/debian/patches/port-to-linux-with-libbsd.patch netcat-openbsd-debian-1.218-5.mod/debian/patches/port-to-linux-with-libbsd.patch
+--- netcat-openbsd-debian-1.218-5/debian/patches/port-to-linux-with-libbsd.patch	2022-03-12 05:06:36.000000000 +0800
++++ netcat-openbsd-debian-1.218-5.mod/debian/patches/port-to-linux-with-libbsd.patch	2022-08-19 14:06:55.555066100 +0800
+@@ -23,7 +23,7 @@
+ +LIBS=  `$(PKG_CONFIG) --libs libbsd` -lresolv
+ +OBJS=  $(SRCS:.c=.o)
+ +CFLAGS=  -g -O2
+-+LDFLAGS=  -Wl,--no-add-needed
+++LDFLAGS=  -Wl,--no-copy-dt-needed-entries
+ +
+ +all: nc
+ +nc: $(OBJS)
+@@ -76,7 +76,7 @@
+ +# include <linux/in6.h>
+ +#endif
+ +
+-+#ifndef IPTOS_LOWDELAY
+++#ifdef __ANDROID__
+ +# define IPTOS_LOWDELAY 0x10
+ +# define IPTOS_THROUGHPUT 0x08
+ +# define IPTOS_RELIABILITY 0x04
