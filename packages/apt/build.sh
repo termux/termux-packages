@@ -26,6 +26,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DDPKG_DATADIR=$TERMUX_PREFIX/share/dpkg
 -DUSE_NLS=OFF
 -DWITH_DOC=OFF
+-DWITH_DOC_MANPAGES=ON
 "
 
 # ubuntu uses instead $PREFIX/lib instead of $PREFIX/libexec to
