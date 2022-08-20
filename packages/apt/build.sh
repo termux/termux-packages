@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Front-end for the dpkg package manager"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.5.2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://deb.debian.org/debian/pool/main/a/apt/apt_${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=cc5c374c2831c9e390d9c5f08029a81c3ca2b778abc0dd1426c81c657628fe9d
 # apt-key requires utilities from coreutils, findutils, gpgv, grep, sed.
@@ -26,6 +27,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DDPKG_DATADIR=$TERMUX_PREFIX/share/dpkg
 -DUSE_NLS=OFF
 -DWITH_DOC=OFF
+-DWITH_DOC_MANPAGES=ON
 "
 
 # ubuntu uses instead $PREFIX/lib instead of $PREFIX/libexec to
