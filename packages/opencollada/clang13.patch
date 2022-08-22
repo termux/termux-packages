@@ -1,0 +1,15 @@
+--- OpenCOLLADA-1.6.68/common/libBuffer/include/CommonFWriteBufferFlusher.h	2018-11-26 22:43:10.000000000 +0000
++++ OpenCOLLADA-1.6.68.mod/common/libBuffer/include/CommonFWriteBufferFlusher.h	2022-08-30 15:06:56.471587348 +0000
+@@ -16,9 +16,12 @@
+ #if (defined(WIN64) || defined(_WIN64) || defined(__WIN64__)) || (defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__) || defined(__APPLE__))
+ #if defined(__GNUC__) && !defined(_LIBCPP_VERSION)
+ #	include <tr1/unordered_map>
++
+ #else
+ #	include <unordered_map>
+ #endif
++#elif defined(__clang_major__) && __clang_major__ >= 13
++#	include <unordered_map>
+ #else
+ #	include <tr1/unordered_map>
+ #endif
