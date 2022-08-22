@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://alembic.io
+TERMUX_PKG_DESCRIPTION="A framework for sharing scene data that includes a C++ lib, a file format and client plugin"
+TERMUX_PKG_LICENSE="BSD, BSL-1.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=1.8.3
+TERMUX_PKG_SRCURL=https://github.com/alembic/alembic/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=b0bc74833bff118a869e81e6acb810a58797e77ef63143954b2f8e817c7f65cb
+TERMUX_PKG_DEPENDS="openexr2"
+TERMUX_PKG_LICENSE_FILE=LICENSE.txt
