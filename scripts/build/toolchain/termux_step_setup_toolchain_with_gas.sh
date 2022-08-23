@@ -27,18 +27,8 @@ termux_step_setup_toolchain_with_gas() {
 		local NDK="$(dirname "$NDK")"/android-ndk-r23c
 		local TERMUX_NDK_VERSION_NUM=23
 		local TERMUX_NDK_REVISION="c"
-		sed -i "$TERMUX_SCRIPTDIR"/scripts/properties.sh \
-			-e "s|^TERMUX_NDK_VERSION_NUM=.*|TERMUX_NDK_VERSION_NUM=$TERMUX_NDK_VERSION_NUM|" \
-			-e "s|^TERMUX_NDK_REVISION=.*|TERMUX_NDK_REVISION=\"$TERMUX_NDK_REVISION\"|"
-		# install NDK r23c
-		bash -c "cd $TERMUX_SCRIPTDIR; NDK=$NDK ./scripts/setup-android-sdk.sh"
-		# restore variables
-		sed -i "$TERMUX_SCRIPTDIR/scripts/properties.sh" \
-			-e "s|^TERMUX_NDK_VERSION_NUM=.*|TERMUX_NDK_VERSION_NUM=$CURRENT_TERMUX_NDK_VERSION_NUM|" \
-			-e "s|^TERMUX_NDK_REVISION=.*|TERMUX_NDK_REVISION=\"$CURRENT_TERMUX_NDK_REVISION\"|"
-		local NDK="$CURRENT_NDK"
-		local TERMUX_NDK_VERSION_NUM="$CURRENT_TERMUX_NDK_VERSION_NUM"
-		local TERMUX_NDK_REVISION="$CURRENT_TERMUX_NDK_REVISION"
+		# install NDK r23c if necessary
+		TERMUX_NDK_VERSION_NUM=23 TERMUX_NDK_REVISION=c ${TERMUX_TOPDIR}/scripts/setup-android-sdk.sh
 		# prepare custom toolchain with GAS
 		local TERMUX_STANDALONE_TOOLCHAIN_CUSTOM="$TERMUX_COMMON_CACHEDIR/android-r${TERMUX_NDK_VERSION}-gas-api-${TERMUX_PKG_API_LEVEL}"
 		termux_step_setup_toolchain
