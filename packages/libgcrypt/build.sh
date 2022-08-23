@@ -17,8 +17,8 @@ ac_cv_lib_pthread_pthread_create=yes
 "
 
 termux_step_pre_configure() {
-	termux_step_setup_toolchain_with_gas
-	CFLAGS+=" -no-integrated-as"
+	termux_setup_gnu_as_23c
+	CFLAGS+=" -fno-integrated-as"
 	if [ "$TERMUX_ARCH" = arm ]; then
 		# See http://marc.info/?l=gnupg-devel&m=139136972631909&w=3
 		CFLAGS+=" -mno-unaligned-access"

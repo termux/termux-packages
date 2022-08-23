@@ -12,7 +12,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-libpng"
 
 termux_step_pre_configure() {
 	if [ "$TERMUX_ARCH" = arm ]; then
-		termux_step_setup_toolchain_with_gas
+		termux_setup_gnu_as_23c
 		CFLAGS+=" -fno-integrated-as"
 	fi
 }
