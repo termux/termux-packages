@@ -28,7 +28,8 @@ termux_step_configure() {
 	fi
 
 	CFLAGS+=" -DNO_SYSLOG"
-	if [ $TERMUX_ARCH = arm ]; then
+	if [ "$TERMUX_ARCH" = arm ]; then
+		termux_setup_gnu_as_23c
 		CFLAGS+=" -fno-integrated-as"
 	fi
 
