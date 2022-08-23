@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Library implementing the SSL and TLS protocols as well a
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.0.3
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.openssl.org/source/openssl-${TERMUX_PKG_VERSION/\~/-}.tar.gz
 TERMUX_PKG_SHA256=ee0078adcef1de5f003c62c80cc96527721609c6f3bb42b7795df31f8b558c0b
 TERMUX_PKG_DEPENDS="ca-certificates, zlib"
@@ -21,7 +22,7 @@ termux_step_configure() {
 	fi
 
 	CFLAGS+=" -DNO_SYSLOG"
-	if [ $TERMUX_ARCH = arm ]; then
+	if [ "$TERMUX_ARCH" = arm ]; then
 		ASLAGS+=" -fno-integrated-as"
 	fi
 
