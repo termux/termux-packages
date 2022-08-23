@@ -12,7 +12,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-multi-os-directory"
 TERMUX_PKG_RM_AFTER_INSTALL="lib/libffi-${TERMUX_PKG_VERSION}/include"
 
 termux_step_pre_configure() {
-	if [ $TERMUX_ARCH = arm ]; then
+	if [ "$TERMUX_ARCH" = arm ]; then
+		termux_setup_gnu_as_23c
 		CFLAGS+=" -fno-integrated-as"
 	fi
 }
