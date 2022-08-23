@@ -10,7 +10,8 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
-	if [ $TERMUX_ARCH = arm ]; then
+	if [ "$TERMUX_ARCH" = arm ]; then
+		termux_setup_gnu_as_23c
 		CFLAGS+=" -fno-integrated-as"
 	fi
 
