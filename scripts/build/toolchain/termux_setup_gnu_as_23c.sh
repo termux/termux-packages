@@ -28,16 +28,36 @@ termux_setup_gnu_as_23c() {
 		local TERMUX_NDK_REVISION=c
 		local TERMUX_NDK_VERSION=$TERMUX_NDK_VERSION_NUM$TERMUX_NDK_REVISION
 		# install NDK r23c if necessary
-		NDK=$NDK TERMUX_NDK_VERSION_NUM=$TERMUX_NDK_VERSION_NUM TERMUX_NDK_REVISION=$TERMUX_NDK_REVISION ${TERMUX_SCRIPTDIR}/scripts/setup-android-sdk.sh
+		NDK=$NDK TERMUX_NDK_VERSION_NUM=$TERMUX_NDK_VERSION_NUM TERMUX_NDK_REVISION=$TERMUX_NDK_REVISION "$TERMUX_SCRIPTDIR"/scripts/setup-android-sdk.sh
 	fi
 
-	if [ ! -d "$GAS_TOOLCHAIN_DIR" ]; then
-		# https://github.com/android/ndk/issues/1569
-		# https://android-review.googlesource.com/c/platform/ndk/+/1817218
-		# these must be present for clang -fno-integrated-as to work correctly
-		# 1. bin/*-linux-android*-as
-		# 2. *-linux-android*/bin/as (symlink to #1)
-		# 3. lib/gcc/*-linux-android*/4.9.x/crtbegin.o (dummy file)
+	# https://github.com/android/ndk/issues/1569
+	# https://android-review.googlesource.com/c/platform/ndk/+/1817218
+	# GNU assembler must be installed this way in a standalone toolchain for clang -fno-integrated-as to work correctly
+	# 1. bin/*-linux-android*-as
+	# 2. *-linux-android*/bin/as (symlink to #1)
+	# 3. lib/gcc/*-linux-android*/4.9.x/crtbegin.o (dummy file)
+
+	# https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang-gcc-toolchain
+	# Alternatively we install to a separate dir and pass --gcc-toolchain to keep the current toolchain clean
+
+	# be really pedantic
+	local GAS_TOOLCHAIN_VALID=true
+	[ ! -x "$GAS_TOOLCHAIN_DIR/bin/arm-linux-androideabi-as" ] && GAS_TOOLCHAIN_VALID=false
+	[ ! -x "$GAS_TOOLCHAIN_DIR/bin/aarch64-linux-android-as" ] && GAS_TOOLCHAIN_VALID=false
+	[ ! -x "$GAS_TOOLCHAIN_DIR/bin/i686-linux-android-as" ] && GAS_TOOLCHAIN_VALID=false
+	[ ! -x "$GAS_TOOLCHAIN_DIR/bin/x86_64-linux-android-as" ] && GAS_TOOLCHAIN_VALID=false
+	[ ! -x "$GAS_TOOLCHAIN_DIR/arm-linux-androideabi/bin/as" ] && GAS_TOOLCHAIN_VALID=false
+	[ ! -x "$GAS_TOOLCHAIN_DIR/aarch64-linux-android/bin/as" ] && GAS_TOOLCHAIN_VALID=false
+	[ ! -x "$GAS_TOOLCHAIN_DIR/i686-linux-android/bin/as" ] && GAS_TOOLCHAIN_VALID=false
+	[ ! -x "$GAS_TOOLCHAIN_DIR/x86_64-linux-android/bin/as" ] && GAS_TOOLCHAIN_VALID=false
+	[ ! -e "$GAS_TOOLCHAIN_DIR/lib/gcc/arm-linux-androideabi/crtbegin.o" ] && GAS_TOOLCHAIN_VALID=false
+	[ ! -e "$GAS_TOOLCHAIN_DIR/lib/gcc/aarch64-linux-android/crtbegin.o" ] && GAS_TOOLCHAIN_VALID=false
+	[ ! -e "$GAS_TOOLCHAIN_DIR/lib/gcc/i686-linux-android/crtbegin.o" ] && GAS_TOOLCHAIN_VALID=false
+	[ ! -e "$GAS_TOOLCHAIN_DIR/lib/gcc/x86_64-linux-android/crtbegin.o" ] && GAS_TOOLCHAIN_VALID=false
+
+	if ! $GAS_TOOLCHAIN_VALID; then
+		rm -fr "$GAS_TOOLCHAIN_DIR" "$GAS_TOOLCHAIN_DIR"-tmp
 		mkdir -p "$GAS_TOOLCHAIN_DIR"-tmp/bin
 		cp -fv "$NDK"/toolchains/llvm/prebuilt/linux-x86_64/bin/{arm-linux-androideabi,{aarch64,i686,x86_64}-linux-android}-as \
 			"$GAS_TOOLCHAIN_DIR-tmp/bin"
@@ -54,4 +74,5 @@ termux_setup_gnu_as_23c() {
 	export PATH="$GAS_TOOLCHAIN_DIR"/bin:"$PATH"
 	export AS=$TERMUX_HOST_PLATFORM-as
 	CFLAGS+=" --gcc-toolchain=$GAS_TOOLCHAIN_DIR"
+	CXXFLAGS+=" --gcc-toolchain=$GAS_TOOLCHAIN_DIR"
 }
