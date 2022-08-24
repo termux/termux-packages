@@ -22,14 +22,12 @@ termux_setup_gnu_as_23c() {
 	local GAS_TOOLCHAIN_REVISION="-v0"
 	local GAS_TOOLCHAIN_DIR="$TERMUX_COMMON_CACHEDIR/android-r23c-gas-api-${TERMUX_PKG_API_LEVEL}${GAS_TOOLCHAIN_REVISION}"
 	local NDK="$(dirname "$NDK")"/android-ndk-r23c
-	if [ ! -d "$NDK" ]; then
-		# set to 23c
-		local TERMUX_NDK_VERSION_NUM=23
-		local TERMUX_NDK_REVISION=c
-		local TERMUX_NDK_VERSION=$TERMUX_NDK_VERSION_NUM$TERMUX_NDK_REVISION
-		# install NDK r23c if necessary
-		NDK=$NDK TERMUX_NDK_VERSION_NUM=$TERMUX_NDK_VERSION_NUM TERMUX_NDK_REVISION=$TERMUX_NDK_REVISION "$TERMUX_SCRIPTDIR"/scripts/setup-android-sdk.sh
-	fi
+	# set to 23c
+	local TERMUX_NDK_VERSION_NUM=23
+	local TERMUX_NDK_REVISION=c
+	local TERMUX_NDK_VERSION=$TERMUX_NDK_VERSION_NUM$TERMUX_NDK_REVISION
+	# install NDK r23c if necessary
+	NDK=$NDK TERMUX_NDK_VERSION_NUM=$TERMUX_NDK_VERSION_NUM TERMUX_NDK_REVISION=$TERMUX_NDK_REVISION "$TERMUX_SCRIPTDIR"/scripts/setup-android-sdk.sh
 
 	# https://github.com/android/ndk/issues/1569
 	# https://android-review.googlesource.com/c/platform/ndk/+/1817218
