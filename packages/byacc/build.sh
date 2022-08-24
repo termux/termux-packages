@@ -1,0 +1,11 @@
+TERMUX_PKG_HOMEPAGE=https://invisible-island.net/byacc/
+TERMUX_PKG_DESCRIPTION="byacc is generally conceded to be the best yacc variant available"
+TERMUX_PKG_LICENSE="Public Domain"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=20220128
+TERMUX_PKG_SRCURL=https://invisible-island.net/archives/byacc/byacc-${TERMUX_PKG_VERSION}.tgz
+TERMUX_PKG_SHA256=42c1805cc529314e6a76326fe1b33e80c70862a44b01474da362e2f7db2d749c
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_BUILD_DEPENDS="groff"
+TERMUX_PKG_CONFLICTS="bison"
+TERMUX_PKG_REPLACES="bison"
