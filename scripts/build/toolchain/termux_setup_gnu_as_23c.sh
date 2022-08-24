@@ -33,13 +33,29 @@ termux_setup_gnu_as_23c() {
 
 	# https://github.com/android/ndk/issues/1569
 	# https://android-review.googlesource.com/c/platform/ndk/+/1817218
-	# GNU assembler must be installed this way in a standalone toolchain for clang -fno-integrated-as to work correctly
+	# GNU Assembler (GAS) must be installed this way in a standalone toolchain for clang -fno-integrated-as to work correctly
+	# Only bin/ need to present in PATH var
 	# 1. bin/*-linux-android*-as
 	# 2. *-linux-android*/bin/as (symlink to #1)
 	# 3. lib/gcc/*-linux-android*/4.9.x/crtbegin.o (dummy file)
 
+	# No. 3 is important as demonstrated below:
+	# Running android-ndk-r23c/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang -v
+	# ...
+	# Found candidate GCC installation: /home/builder/lib/android-ndk-r23c/toolchains/llvm/prebuilt/linux-x86_64/bin/../lib/gcc/aarch64-linux-android/4.9.x
+	# Selected GCC installation: /home/builder/lib/android-ndk-r23c/toolchains/llvm/prebuilt/linux-x86_64/bin/../lib/gcc/aarch64-linux-android/4.9.x
+	# ...
+
+	# Running android-ndk-r25/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang -v
+	# unmodified will not show anything on GCC installation as GAS has been removed
+
 	# https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang-gcc-toolchain
-	# Alternatively we install to a separate dir and pass --gcc-toolchain to keep the current toolchain clean
+	# Alternatively if we install GAS to a separate dir and pass --gcc-toolchain, output as shown:
+	# Running android-ndk-r25/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang -v --gcc-toolchain=/home/builder/.termux-build/_cache/android-r23c-gas-api-24-v0/
+	# ...
+	# Found candidate GCC installation: /home/builder/.termux-build/_cache/android-r23c-gas-api-24-v0/lib/gcc/aarch64-linux-android/4.9.x
+	# Selected GCC installation: /home/builder/.termux-build/_cache/android-r23c-gas-api-24-v0/lib/gcc/aarch64-linux-android/4.9.x
+	# ...
 
 	# be really pedantic
 	local GAS_TOOLCHAIN_VALID=true
