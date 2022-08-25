@@ -23,7 +23,7 @@ TERMUX_PACKAGE_MANAGERS=("apt" "pacman")
 
 # The repository base urls mapping for package managers.
 declare -A REPO_BASE_URLS=(
-	["apt"]="https://grimler.se/termux/termux-main"
+	["apt"]="https://packages-cf.termux.dev/apt/termux-main"
 	["pacman"]="https://s3.amazonaws.com/termux-main.pacman"
 )
 
