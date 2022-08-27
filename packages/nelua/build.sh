@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://nelua.io
+TERMUX_PKG_DESCRIPTION="Minimal, efficient, statically-typed and meta-programmable systems programming language"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=2022.07.21
+TERMUX_PKG_SRCURL=https://github.com/edubart/nelua-lang.git
+TERMUX_PKG_GIT_BRANCH="master"
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_DEPENDS="build-essential, gdb, git"
+TERMUX_PKG_SUGGESTS="sdl2"
