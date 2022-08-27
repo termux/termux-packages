@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="OpenCL ICD Loader"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.3.1
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/OCL-dev/ocl-icd/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=a32b67c2d52ffbaf490be9fc18b46428ab807ab11eff7664d7ff75e06cfafd6d
 TERMUX_PKG_NO_STATICSPLIT=true
@@ -19,13 +19,17 @@ termux_step_pre_configure() {
 	./bootstrap
 }
 
-termux_step_post_make_install() {
-	# User is still expected to export LD_LIBRARY_PATH environment variable to use
-	# vendor provided libOpenCL.so on Android
-	if [ "$TERMUX_ARCH_BITS" = 64 ]; then
-		echo "/vendor/lib64/libOpenCL.so" > "$TERMUX_PKG_TMPDIR/android.icd"
-	else
-		echo "/vendor/lib/libOpenCL.so" > "$TERMUX_PKG_TMPDIR/android.icd"
-	fi
-	install -Dm644 "$TERMUX_PKG_TMPDIR/android.icd" "$TERMUX_PREFIX/etc/OpenCL/vendors/android.icd"
-}
+# https://github.com/termux/termux-packages/issues/7510
+# On Android, libOpenCL.so usually lives in /vendor/lib{,64} and
+# requires exporting LD_LIBRARY_PATH env var to work
+# This means that OpenCL never worked in Termux without prepping upfront
+
+# ocl-icd also does not provide vendor specific ICD file out of the box
+
+# Hence the provided ICD file will be removed in ocl-icd
+# PREFIX/etc/OpenCL/vendors dir will also be removed
+# This matches desktop Linux behaviour
+
+# Driver packages (or users) themselves are expected to create ICD files
+# They also need to handle creation of PREFIX/etc/OpenCL/vendors directory
+# Though users can override the default by exporting OPENCL_VENDOR_PATH env var
