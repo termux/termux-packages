@@ -9,9 +9,14 @@ on:
         description: "A space-seperated list of packages to update. Defaults to all packages"
         default: "@all"
         required: false
+        
+permissions: {} # none
 
 jobs:
   update-packages:
+    permissions:
+      issues: write
+      contents: write
     if: github.repository == 'termux/termux-packages'
     runs-on: ubuntu-latest
     steps:

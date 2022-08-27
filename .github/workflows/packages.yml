@@ -18,9 +18,13 @@ on:
       packages:
         description: "A space-separated names of packages selected for rebuilding"
         required: true
+        
+permissions: {} # none
 
 jobs:
   build:
+    permissions:
+      contents: read # actions/upload-artifact doesn't need contents: write
     runs-on: ubuntu-latest
     env:
       ANDROID_HOME: "/opt/termux/android-sdk"
@@ -223,6 +227,8 @@ jobs:
         path: ./artifacts
 
   upload:
+    permissions:
+      contents: read
     if: github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest

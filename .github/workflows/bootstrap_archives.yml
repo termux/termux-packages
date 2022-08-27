@@ -5,12 +5,16 @@ on:
     - cron: "0 0 * * 0"
   workflow_dispatch:
 
+permissions: {} # none
+
 concurrency:
   group: ${{ github.workflow }}
   cancel-in-progress: true
 
 jobs:
   build:
+    permissions:
+      contents: read # actions/upload-artifact doesn't need contents: write
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -30,6 +34,8 @@ jobs:
           name: bootstrap-archives-${{ github.sha }}
           path: "*.zip"
   publish:
+    permissions:
+      contents: write # for git push
     needs: build
     runs-on: ubuntu-latest
     steps:
