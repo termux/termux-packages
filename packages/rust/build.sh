@@ -69,6 +69,11 @@ termux_step_configure() {
 	mv $TERMUX_PREFIX/lib/libz.so $TERMUX_PREFIX/lib/libz.so.tmp
 	mv $TERMUX_PREFIX/lib/liblzma.so.$LZMA_VERSION $TERMUX_PREFIX/lib/liblzma.so.tmp
 
+	# https://github.com/termux/termux-packages/issues/11427
+	# Fresh build conflict: liblzma -> rust
+	# ld: error: /data/data/com.termux/files/usr/lib/liblzma.a(liblzma_la-common.o) is incompatible with elf64-x86-64
+	mv $TERMUX_PREFIX/lib/liblzma.a $TERMUX_PREFIX/lib/liblzma.a.tmp || true
+
 	# ld: error: undefined symbol: getloadavg
 	# >>> referenced by rand.c
 	$CC $CPPFLAGS -c $TERMUX_PKG_BUILDER_DIR/getloadavg.c
@@ -101,6 +106,7 @@ termux_step_make_install() {
 	mv $TERMUX_PREFIX/lib/libz.so.1.tmp $TERMUX_PREFIX/lib/libz.so.1
 	mv $TERMUX_PREFIX/lib/libz.so.tmp $TERMUX_PREFIX/lib/libz.so
 	mv $TERMUX_PREFIX/lib/liblzma.so.tmp $TERMUX_PREFIX/lib/liblzma.so.$LZMA_VERSION
+	mv $TERMUX_PREFIX/lib/liblzma.a.tmp $TERMUX_PREFIX/lib/liblzma.a || true
 
 	ln -sf rustlib/$CARGO_TARGET_NAME/lib/*.so .
 	ln -sf $TERMUX_PREFIX/bin/lld $TERMUX_PREFIX/bin/rust-lld
@@ -119,4 +125,5 @@ termux_step_post_massage() {
 	rm -f lib/libz.so
 	rm -f lib/libz.so.1
 	rm -f lib/liblzma.so.$LZMA_VERSION
+	rm -f lib/liblzma.a
 }
