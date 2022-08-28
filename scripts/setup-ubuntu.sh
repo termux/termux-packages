@@ -143,7 +143,6 @@ PACKAGES+=" zlib1g-dev:i386"
 
 # For swift.
 PACKAGES+=" lld"
-PACKAGES+=" patchelf"
 
 # Needed by wrk.
 PACKAGES+=" luajit"
