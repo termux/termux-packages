@@ -35,12 +35,15 @@ fi
 
 for package in "${@}"; do
 	buildsh_path=
+	repo=
 	if [ -d "${package}" ] && [ -f "${package}/build.sh" ]; then
 		buildsh_path="${package}/build.sh"
 		package=$(basename ${package})
 	else
 		for repo_path in $(jq --raw-output 'keys | .[]' $REPO_ROOT/repo.json); do
 			if [ -d "${repo_path}/${package}" ] && [ -f "${repo_path}/${package}/build.sh" ]; then
+				repo=$(jq --raw-output '.["'$repo_path'"].name' $REPO_ROOT/repo.json)
+				repo=${repo#"termux-"}
 				buildsh_path="${repo_path}/${package}/build.sh"
 				package=$(basename ${package})
 			fi
@@ -90,13 +93,13 @@ for package in "${@}"; do
 			git --no-pager diff --patch "${buildsh_path}"
 			echo "--------------------"
 			echo
-			echo "${package}: update to $(. "${buildsh_path}"; echo "${TERMUX_PKG_VERSION}" | cut -d: -f2-)"
+			echo "upgpkg(${repo}/${package}): update to $(. "${buildsh_path}"; echo "${TERMUX_PKG_VERSION}" | cut -d: -f2-)"
 			echo
 			read -re -p "Do you want to commit changes ? (y/n) " CHOICE
 			echo
 			if [[ ${CHOICE} =~ (Y|y) ]]; then
 				git add "${buildsh_path}"
-				git commit -m "${package}: update to $(. "${buildsh_path}"; echo "${TERMUX_PKG_VERSION}" | cut -d: -f2-)"
+				git commit -m "upgpkg(${repo}/${package}): update to $(. "${buildsh_path}"; echo "${TERMUX_PKG_VERSION}" | cut -d: -f2-)"
 			else
 				echo "Not committing to Git!"
 			fi

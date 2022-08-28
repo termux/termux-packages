@@ -15,9 +15,11 @@
 ##  limitations under the License.
 ##
 
+echo "WARNING: interface to this script has been changed. Run without any arguments to see the help message"
+
 if [ "${#}" = "0" ]; then
 	echo
-	echo "Usage: revbump [package name] ..."
+	echo "Usage: revbump [reason for rebuild] [package names] ..."
 	echo
 	echo "Add or increment TERMUX_PKG_REVISION of package."
 	echo
@@ -31,11 +33,13 @@ if git status >/dev/null 2>&1; then
 	IS_GIT_REPOSITORY=true
 fi
 
-for package in "${@}"; do
+for package in "${@:2}"; do
 	package="${package%%/}"
 	buildsh_path=
-	for repo in $(jq --raw-output 'keys | .[]' ${REPO_ROOT}/repo.json); do
-		_buildsh_path="${REPO_ROOT}/${repo}/${package}/build.sh"
+	repo=
+	for repo_path in $(jq --raw-output 'keys | .[]' ${REPO_ROOT}/repo.json); do
+		_buildsh_path="${REPO_ROOT}/${repo_path}/${package}/build.sh"
+		repo=$(jq --raw-output ".[\"${repo_path}\"].repo" ${REPO_ROOT}/repo.json)
 		echo $_buildsh_path
 
 		if [ -f "${_buildsh_path}" ]; then
@@ -76,13 +80,13 @@ for package in "${@}"; do
 		git --no-pager diff --patch "${buildsh_path}"
 		echo "--------------------"
 		echo
-		echo "${package}: bump revision"
+		echo "rebuild(${repo}/${package}): $1"
 		echo
 		read -re -p "Do you want to commit these changes ? (y/n) " CHOICE
 		echo
 		if [[ ${CHOICE} =~ (Y|y) ]]; then
 			git add "${buildsh_path}"
-			git commit -m "${package}: bump revision"
+			git commit -m "rebuild(${repo}/${package}): $1"
 		else
 			echo "Not committing to Git!"
 		fi
