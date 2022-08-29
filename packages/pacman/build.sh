@@ -3,19 +3,13 @@ TERMUX_PKG_DESCRIPTION="A library-based package manager with dependency support"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@Maxython"
 TERMUX_PKG_VERSION=6.0.1
-TERMUX_PKG_REVISION=7
+TERMUX_PKG_REVISION=8
 TERMUX_PKG_SRCURL=https://sources.archlinux.org/other/pacman/pacman-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=0db61456e56aa49e260e891c0b025be210319e62b15521f29d3e93b00d3bf731
-TERMUX_PKG_DEPENDS="bash, libarchive, curl, gpgme, openssl"
+TERMUX_PKG_DEPENDS="bash, libarchive, curl, gpgme, openssl, termux-licenses"
 TERMUX_PKG_BUILD_DEPENDS="doxygen, asciidoc, nettle"
 TERMUX_PKG_GROUPS="base-devel"
-TERMUX_PKG_CONFFILES="etc/pacman.conf etc/makepkg.conf"
-
-# A temporary solution to the problem with compiling the documentation.
-# https://github.com/termux/termux-packages/pull/7759#issuecomment-945664581
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
--Ddoc=disabled
-"
+TERMUX_PKG_CONFFILES="etc/pacman.conf, etc/makepkg.conf, var/log/pacman.log"
 
 termux_step_pre_configure() {
 	rm -f ./scripts/libmakepkg/executable/sudo.sh.in

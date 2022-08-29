@@ -1,7 +1,6 @@
-diff -uNr pacman-6.0.0/etc/pacman.conf.in pacman-termux/etc/pacman.conf.in
---- pacman-6.0.0/etc/pacman.conf.in	2021-05-20 06:38:45.938120000 +0300
-+++ pacman-termux/etc/pacman.conf.in	2021-11-05 17:39:44.301346062 +0300
-@@ -9,20 +9,20 @@
+--- pacman-6.0.1/etc/pacman.conf.in	2021-09-04 12:42:20.344308000 +0300
++++ pacman-6.0.1/etc/pacman.conf.in.ter	2022-08-29 18:01:00.695250960 +0300
+@@ -9,15 +9,15 @@
  [options]
  # The following paths are commented out with their default values listed.
  # If you wish to use different paths, uncomment and update the paths.
@@ -21,12 +20,7 @@ diff -uNr pacman-6.0.0/etc/pacman.conf.in pacman-termux/etc/pacman.conf.in
  #CleanMethod = KeepInstalled
  Architecture = auto
  
- # Pacman won't upgrade packages listed in IgnorePkg and members of IgnoreGroup
- #IgnorePkg   =
- #IgnoreGroup =
- 
- #NoUpgrade   =
-@@ -30,16 +30,21 @@
+@@ -30,16 +30,17 @@
  
  # Misc options
  #UseSyslog
@@ -46,17 +40,13 @@ diff -uNr pacman-6.0.0/etc/pacman.conf.in pacman-termux/etc/pacman.conf.in
 +SigLevel    = Never
 +LocalFileSigLevel = Optional
 +#RemoteFileSigLevel = Required
-+
-+# NOTE: You must run `pacman-key --init` before first using pacman; the local
-+# keyring can then be populated with the keys of all official Arch Linux ARM
-+# packagers with `pacman-key --populate archlinuxarm`.
  
  #
  # REPOSITORIES
-@@ -60,18 +65,15 @@
+@@ -60,18 +61,11 @@
  # uncommented to enable the repo.
  #
-
+ 
 -# An example of a disabled remote package repository with multiple servers
 -# available. To enable, uncomment the following lines. You can add preferred
 -# servers immediately after the header and they will be used before the
@@ -72,15 +62,11 @@ diff -uNr pacman-6.0.0/etc/pacman.conf.in pacman-termux/etc/pacman.conf.in
 -#[custom]
 -#SigLevel = Optional TrustAll
 -#Server = file:///home/custompkgs
-+# The testing repositories are disabled by default. To enable, uncomment the
-+# repo name header and Include lines. You can add preferred servers immediately
-+# after the header, and they will be used before the default mirrors.
-+
 +[main]
-+Server = https://s3.amazonaws.com/termux-main.pacman/$arch
++Server = https://s3.amazonaws.com/termux-pacman.us/main/$arch
 +
 +[x11]
-+Server = https://s3.amazonaws.com/termux-x11.pacman/$arch
++Server = https://s3.amazonaws.com/termux-pacman.us/x11/$arch
 +
 +[root]
-+Server = https://s3.amazonaws.com/termux-root.pacman/$arch
++Server = https://s3.amazonaws.com/termux-pacman.us/root/$arch
