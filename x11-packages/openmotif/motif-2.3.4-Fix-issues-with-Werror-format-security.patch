@@ -1,0 +1,815 @@
+From 4783fb4cec8624311bb87b2eb4a2ac94a5c7d849 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20=C5=A0abata?= <contyk@redhat.com>
+Date: Thu, 8 Jun 2017 12:12:04 +0200
+Subject: [PATCH] Fix issues with -Werror=format-security
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Petr Šabata <contyk@redhat.com>
+---
+ lib/Mrm/Mrmhier.c       |   4 +-
+ lib/Mrm/Mrmicon.c       |   4 +-
+ lib/Mrm/Mrmlread.c      |   2 +-
+ lib/Mrm/Mrmwcrw.c       |   4 +-
+ tools/wml/wmldbcreate.c |   2 +-
+ tools/wml/wmlouth.c     | 128 ++++++++++++++++++++++++------------------------
+ tools/wml/wmloutkey.c   |  10 ++--
+ tools/wml/wmloutmm.c    |  16 +++---
+ tools/wml/wmlresolve.c  |  26 +++++-----
+ 9 files changed, 98 insertions(+), 98 deletions(-)
+
+diff --git a/lib/Mrm/Mrmhier.c b/lib/Mrm/Mrmhier.c
+index 2712742..2a8703c 100644
+--- a/lib/Mrm/Mrmhier.c
++++ b/lib/Mrm/Mrmhier.c
+@@ -264,10 +264,10 @@ Urm__OpenHierarchy (MrmCount			num_files,
+ 	    case MrmSUCCESS:
+ 	      break;
+ 	    case MrmNOT_VALID:
+-	      sprintf (err_stg, _MrmMMsg_0113);
++	      sprintf (err_stg, "%s", _MrmMMsg_0113);
+ 	      break;
+ 	    default:
+-	      sprintf (err_stg, _MrmMMsg_0114);
++	      sprintf (err_stg, "%s", _MrmMMsg_0114);
+ 	      break;
+ 	    }
+ 	}
+diff --git a/lib/Mrm/Mrmicon.c b/lib/Mrm/Mrmicon.c
+index 95d4086..191e2d2 100644
+--- a/lib/Mrm/Mrmicon.c
++++ b/lib/Mrm/Mrmicon.c
+@@ -1176,7 +1176,7 @@ Urm__RealizeColorTable (Screen			*screen,
+ 		}
+ 		break;
+ 	      default:
+-		sprintf(err_msg, _MrmMMsg_0040);
++		sprintf(err_msg, "%s", _MrmMMsg_0040);
+ 		return Urm__UT_Error ("Urm__RelizeColorTable",
+ 				      err_msg, NULL, NULL, MrmFAILURE) ;
+ 	      }
+@@ -1252,7 +1252,7 @@ Urm__RealizeColorTable (Screen			*screen,
+ 	      break;
+ 	    default:
+ 	      result = MrmFAILURE;
+-	      sprintf (err_msg, _MrmMMsg_0040);
++	      sprintf (err_msg, "%s", _MrmMMsg_0040);
+ 	      Urm__UT_Error ("Urm__RelizeColorTable",
+ 			     err_msg, NULL, NULL, MrmFAILURE) ;
+ 	    }
+diff --git a/lib/Mrm/Mrmlread.c b/lib/Mrm/Mrmlread.c
+index c2fd94c..be433a3 100644
+--- a/lib/Mrm/Mrmlread.c
++++ b/lib/Mrm/Mrmlread.c
+@@ -698,7 +698,7 @@ MrmFetchColorLiteral (MrmHierarchy                hierarchy_id,
+ 	 XBlackPixelOfScreen(XDefaultScreenOfDisplay(display)));
+       break;
+     default:
+-      sprintf(err_msg, _MrmMMsg_0040);
++      sprintf(err_msg, "%s", _MrmMMsg_0040);
+       result = Urm__UT_Error ("MrmFetchColorLiteral",
+ 			      err_msg, NULL, NULL, MrmFAILURE) ;
+       _MrmAppUnlock(app);
+diff --git a/lib/Mrm/Mrmwcrw.c b/lib/Mrm/Mrmwcrw.c
+index fe3db52..3c5857f 100644
+--- a/lib/Mrm/Mrmwcrw.c
++++ b/lib/Mrm/Mrmwcrw.c
+@@ -1390,7 +1390,7 @@ Urm__CW_CreateArglist (Widget			parent,
+ 			}
+ 		      break;
+ 		    default:
+-		      sprintf (err_msg, _MrmMMsg_0040);
++		      sprintf (err_msg, "%s", _MrmMMsg_0040);
+ 		      result = Urm__UT_Error ("Urm__CW_ConvertValue",
+ 					      err_msg, NULL, NULL, MrmFAILURE) ;
+ 		    };
+@@ -2426,7 +2426,7 @@ Urm__CW_ConvertValue (Widget			parent,
+ 	    }
+ 	  break;
+ 	default:
+-	  sprintf(err_msg, _MrmMMsg_0040);
++	  sprintf(err_msg, "%s", _MrmMMsg_0040);
+ 	  return Urm__UT_Error ("Urm__CW_ConvertValue",
+ 				err_msg, NULL, NULL, MrmFAILURE) ;
+ 	};
+diff --git a/tools/wml/wmldbcreate.c b/tools/wml/wmldbcreate.c
+index 07c0a3c..6de585a 100644
+--- a/tools/wml/wmldbcreate.c
++++ b/tools/wml/wmldbcreate.c
+@@ -425,7 +425,7 @@ int	table_id;
+ 		{
+ 		fprintf (afile, "%d, ", entry_vec[j]);
+ 		}
+-	    fprintf (afile, "\n");
++	    fprintf (afile, "%s", "\n");
+ 	    }
+         }
+ }
+diff --git a/tools/wml/wmlouth.c b/tools/wml/wmlouth.c
+index d2330e3..a52843f 100644
+--- a/tools/wml/wmlouth.c
++++ b/tools/wml/wmlouth.c
+@@ -225,12 +225,12 @@ if ( outfil == (FILE *) NULL )
+     printf ("\nCouldn't open UilSymGen.h");
+     return;
+     }
+-fprintf (outfil, canned_warn);
++fprintf (outfil, "%s", canned_warn);
+ 
+ /*
+  * Write the sym_k..._object literals
+  */
+-fprintf (outfil, canned1);
++fprintf (outfil, "%s", canned1);
+ for ( ndx=0 ; ndx<wml_obj_class_ptr->cnt ; ndx++ )
+     {
+     clsobj = (WmlClassDefPtr) wml_obj_class_ptr->hvec[ndx].objptr;
+@@ -244,7 +244,7 @@ for ( ndx=0 ; ndx<wml_obj_class_ptr->cnt ; ndx++ )
+ /*
+  * Define the sym_k_..._reason literals
+  */
+-fprintf (outfil, canned3);
++fprintf (outfil, "%s", canned3);
+ for ( ndx=0 ; ndx<wml_obj_reason_ptr->cnt ; ndx++ )
+     {
+     resobj = (WmlResourceDefPtr) wml_obj_reason_ptr->hvec[ndx].objptr;
+@@ -258,7 +258,7 @@ for ( ndx=0 ; ndx<wml_obj_reason_ptr->cnt ; ndx++ )
+ /*
+  * Define the sym_k_..._arg literals
+  */
+-fprintf (outfil, canned4);
++fprintf (outfil, "%s", canned4);
+ for ( ndx=0 ; ndx<wml_obj_arg_ptr->cnt ; ndx++ )
+     {
+     resobj = (WmlResourceDefPtr) wml_obj_arg_ptr->hvec[ndx].objptr;
+@@ -272,7 +272,7 @@ for ( ndx=0 ; ndx<wml_obj_arg_ptr->cnt ; ndx++ )
+ /*
+  * Define the sym_k_..._enumset structs and literals
+  */
+-fprintf (outfil, canned5);
++fprintf (outfil, "%s", canned5);
+ for ( ndx=0 ; ndx<wml_obj_enumset_ptr->cnt ; ndx++ )
+     {
+     enumsetobj = (WmlEnumSetDefPtr) wml_obj_enumset_ptr->hvec[ndx].objptr;
+@@ -286,7 +286,7 @@ for ( ndx=0 ; ndx<wml_obj_enumset_ptr->cnt ; ndx++ )
+ /*
+  * Define the sym_k_..._enumval literals
+  */
+-fprintf (outfil, canned6);
++fprintf (outfil, "%s", canned6);
+ for ( ndx=0 ; ndx<wml_obj_enumval_ptr->cnt ; ndx++ )
+     {
+     enumvalobj = (WmlEnumValueDefPtr) wml_obj_enumval_ptr->hvec[ndx].objptr;
+@@ -301,7 +301,7 @@ for ( ndx=0 ; ndx<wml_obj_enumval_ptr->cnt ; ndx++ )
+  * Define the sym_k_..._charsize literals
+  * Define the sym_k_..._charset literals
+  */
+-fprintf (outfil, canned7);
++fprintf (outfil, "%s", canned7);
+ for ( ndx=0 ; ndx<wml_obj_charset_ptr->cnt ; ndx++ )
+     {
+     charsetobj = (WmlCharSetDefPtr) wml_obj_charset_ptr->hvec[ndx].objptr;
+@@ -315,7 +315,7 @@ for ( ndx=0 ; ndx<wml_obj_charset_ptr->cnt ; ndx++ )
+ /*
+  * Define the sym_k_..._child literals
+  */
+-fprintf (outfil, canned8);
++fprintf (outfil, "%s", canned8);
+ for ( ndx=0 ; ndx<wml_obj_child_ptr->cnt ; ndx++ )
+     {
+     childobj = (WmlChildDefPtr) wml_obj_child_ptr->hvec[ndx].objptr;
+@@ -379,12 +379,12 @@ if ( outfil == (FILE *) NULL )
+     printf ("\nCouldn't open UilSymChCL.h");
+     return;
+     }
+-fprintf (outfil, canned_warn);
++fprintf (outfil, "%s", canned_warn);
+ 
+ /*
+  * Create table entries, similar to writing sym_k...
+  */
+-fprintf (outfil, canned1);
++fprintf (outfil, "%s", canned1);
+ for ( ndx=0 ; ndx<wml_obj_child_ptr->cnt ; ndx++ )
+     {
+     childobj = (WmlChildDefPtr) wml_obj_child_ptr->hvec[ndx].objptr;
+@@ -392,7 +392,7 @@ for ( ndx=0 ; ndx<wml_obj_child_ptr->cnt ; ndx++ )
+     fprintf (outfil, "    sym_k_%s_object,\n",
+ 	     classobj->tkname);
+     }
+-fprintf (outfil, canned1a);
++fprintf (outfil, "%s", canned1a);
+ 
+ /*
+  * close the output file
+@@ -446,12 +446,12 @@ if ( outfil == (FILE *) NULL )
+     printf ("\nCouldn't open UilSymArTy.h");
+     return;
+     }
+-fprintf (outfil, canned_warn);
++fprintf (outfil, "%s", canned_warn);
+ 
+ /*
+  * Create table entries, similar to writing sym_k...
+  */
+-fprintf (outfil, canned1);
++fprintf (outfil, "%s", canned1);
+ for ( ndx=0 ; ndx<wml_obj_arg_ptr->cnt ; ndx++ )
+     {
+     resobj = (WmlResourceDefPtr) wml_obj_arg_ptr->hvec[ndx].objptr;
+@@ -459,7 +459,7 @@ for ( ndx=0 ; ndx<wml_obj_arg_ptr->cnt ; ndx++ )
+     fprintf (outfil, "    sym_k_%s_value,\n",
+ 	     datobj->tkname);
+     }
+-fprintf (outfil, canned1a);
++fprintf (outfil, "%s", canned1a);
+ 
+ /*
+  * close the output file
+@@ -509,19 +509,19 @@ if ( outfil == (FILE *) NULL )
+     printf ("\nCouldn't open UilSymRArg.h");
+     return;
+     }
+-fprintf (outfil, canned_warn);
++fprintf (outfil, "%s", canned_warn);
+ 
+ /*
+  * Create table entries, similar to writing sym_k...
+  */
+-fprintf (outfil, canned1);
++fprintf (outfil, "%s", canned1);
+ for ( ndx=0 ; ndx<wml_obj_arg_ptr->cnt ; ndx++ )
+     {
+     resobj = (WmlResourceDefPtr) wml_obj_arg_ptr->hvec[ndx].objptr;
+     fprintf (outfil, "    %d,\n",
+ 	     resobj->related_code);
+     }
+-fprintf (outfil, canned1a);
++fprintf (outfil, "%s", canned1a);
+ 
+ /*
+  * close the output file
+@@ -621,12 +621,12 @@ if ( outfil == (FILE *) NULL )
+     printf ("\nCouldn't open UilUrmClas.h");
+     return;
+     }
+-fprintf (outfil, canned_warn);
++fprintf (outfil, "%s", canned_warn);
+ 
+ /*
+  * Write entries for widgets
+  */
+-fprintf (outfil, canned1);
++fprintf (outfil, "%s", canned1);
+ for ( ndx=0 ; ndx<wml_obj_class_ptr->cnt ; ndx++ )
+     {
+     clsobj = (WmlClassDefPtr) wml_obj_class_ptr->hvec[ndx].objptr;
+@@ -637,7 +637,7 @@ for ( ndx=0 ; ndx<wml_obj_class_ptr->cnt ; ndx++ )
+     else 
+ 	fprintf (outfil, "  \"%s\",\t\n", synobj->convfunc);
+     }
+-fprintf (outfil, canned2);
++fprintf (outfil, "%s", canned2);
+ 
+ /*
+  * Write entries for gadget variants of widget classes
+@@ -661,7 +661,7 @@ for ( ndx=0 ; ndx<wml_obj_class_ptr->cnt ; ndx++ )
+ 		     synobj->name);
+ 	}
+     }
+-fprintf (outfil, canned3);
++fprintf (outfil, "%s", canned3);
+ 
+ /*
+  * Write entries for non-dialog widgets
+@@ -685,7 +685,7 @@ for ( ndx=0 ; ndx<wml_obj_class_ptr->cnt ; ndx++ )
+ 		     synobj->name);
+ 	}
+     }
+-fprintf (outfil, canned4);
++fprintf (outfil, "%s", canned4);
+ 
+ /*
+  * Write entries for the resource a widget's controls map to
+@@ -701,7 +701,7 @@ for ( ndx=0 ; ndx<wml_obj_class_ptr->cnt ; ndx++ )
+     else
+ 	fprintf (outfil, "  sym_k_%s_arg,\n", mapresobj->tkname);
+     }
+-fprintf (outfil, canned5);
++fprintf (outfil, "%s", canned5);
+ 
+ /*
+  * Write entries for arguments
+@@ -714,7 +714,7 @@ for ( ndx=0 ; ndx<wml_obj_arg_ptr->cnt ; ndx++ )
+     fprintf (outfil, "  %s,\n",
+ 	     synres->resliteral);
+     }
+-fprintf (outfil, canned6);
++fprintf (outfil, "%s", canned6);
+ 
+ /*
+  * Write entries for reasons
+@@ -727,7 +727,7 @@ for ( ndx=0 ; ndx<wml_obj_reason_ptr->cnt ; ndx++ )
+     fprintf (outfil, "  %s,\n",
+ 	     synres->resliteral);
+     }
+-fprintf (outfil, canned7);
++fprintf (outfil, "%s", canned7);
+ 
+ /*
+  * close the output file
+@@ -781,13 +781,13 @@ if ( outfil == (FILE *) NULL )
+     printf ("\nCouldn't open UilConst.h");
+     return;
+     }
+-fprintf (outfil, canned_warn);
++fprintf (outfil, "%s", canned_warn);
+ 
+ /*
+  * Process the arguments in code order. We start with 1, and write out
+  * the mask after processing 8 codes.
+  */
+-fprintf (outfil, canned1);
++fprintf (outfil, "%s", canned1);
+ strcpy (maskbuf, "0");
+ for ( ndx=0 ; ndx<wml_obj_arg_ptr->cnt ; ndx++ )
+     {
+@@ -805,7 +805,7 @@ for ( ndx=0 ; ndx<wml_obj_arg_ptr->cnt ; ndx++ )
+     }
+ if ( bitno != 8 )
+     fprintf (outfil, "%s", maskbuf);
+-fprintf (outfil, canned1a);
++fprintf (outfil, "%s", canned1a);
+ 
+ /*
+  * close the output file
+@@ -878,8 +878,8 @@ if ( outfil == (FILE *) NULL )
+     printf ("\nCouldn't open UilSymReas.h");
+     return;
+     }
+-fprintf (outfil, canned_warn);
+-fprintf (outfil, canned1);
++fprintf (outfil, "%s", canned_warn);
++fprintf (outfil, "%s", canned1);
+ 
+ /*
+  * Generate the bit vectors for each class. Outer loop on the reason code,
+@@ -919,19 +919,19 @@ for ( resndx=0 ; resndx<wml_obj_reason_ptr->cnt ; resndx++ )
+     if ( itemno != 0 )
+ 	fprintf (outfil, "%s 0};\n", maskbuf);
+     else
+-	fprintf (outfil, "};\n");
++	fprintf (outfil, "%s", "};\n");
+     }
+ 
+ /*
+  * Write the vector of vectors.
+  */
+-fprintf (outfil, canned2);
++fprintf (outfil, "%s", canned2);
+ for ( resndx=0 ; resndx<wml_obj_reason_ptr->cnt ; resndx++ )
+     {
+     resobj = (WmlResourceDefPtr) wml_obj_reason_ptr->hvec[resndx].objptr;
+     fprintf (outfil, "  reason_class_vec%d,\n", resobj->sym_code);
+     }
+-fprintf (outfil, canned3);
++fprintf (outfil, "%s", canned3);
+ 
+ /*
+  * close the output file
+@@ -1004,8 +1004,8 @@ if ( outfil == (FILE *) NULL )
+     printf ("\nCouldn't open UilSymArTa.h");
+     return;
+     }
+-fprintf (outfil, canned_warn);
+-fprintf (outfil, canned1);
++fprintf (outfil, "%s", canned_warn);
++fprintf (outfil, "%s", canned1);
+ 
+ /*
+  * Generate the bit vectors for each class. Outer loop on the argument code,
+@@ -1045,19 +1045,19 @@ for ( resndx=0 ; resndx<wml_obj_arg_ptr->cnt ; resndx++ )
+     if ( itemno != 0 )
+ 	fprintf (outfil, "%s 0};\n", maskbuf);
+     else
+-	fprintf (outfil, "};\n");
++	fprintf (outfil, "%s", "};\n");
+     }
+ 
+ /*
+  * Write the vector of vectors.
+  */
+-fprintf (outfil, canned2);
++fprintf (outfil, "%s", canned2);
+ for ( resndx=0 ; resndx<wml_obj_arg_ptr->cnt ; resndx++ )
+     {
+     resobj = (WmlResourceDefPtr) wml_obj_arg_ptr->hvec[resndx].objptr;
+     fprintf (outfil, "  arg_class_vec%d,\n", resobj->sym_code);
+     }
+-fprintf (outfil, canned3);
++fprintf (outfil, "%s", canned3);
+ 
+ /*
+  * close the output file
+@@ -1129,8 +1129,8 @@ if ( outfil == (FILE *) NULL )
+     printf ("\nCouldn't open UilSymChTa.h");
+     return;
+     }
+-fprintf (outfil, canned_warn);
+-fprintf (outfil, canned1);
++fprintf (outfil, "%s", canned_warn);
++fprintf (outfil, "%s", canned1);
+ 
+ /*
+  * Generate the bit vectors for each class. Outer loop on the child code,
+@@ -1168,19 +1168,19 @@ for ( childndx=0 ; childndx<wml_obj_child_ptr->cnt ; childndx++ )
+     if ( itemno != 0 )
+ 	fprintf (outfil, "%s 0};\n", maskbuf);
+     else
+-	fprintf (outfil, "};\n");
++	fprintf (outfil, "%s", "};\n");
+     }
+ 
+ /*
+  * Write the vector of vectors.
+  */
+-fprintf (outfil, canned2);
++fprintf (outfil, "%s", canned2);
+ for ( childndx=0 ; childndx<wml_obj_child_ptr->cnt ; childndx++ )
+     {
+     childobj = (WmlChildDefPtr) wml_obj_child_ptr->hvec[childndx].objptr;
+     fprintf (outfil, "  child_class_vec%d,\n", childobj->sym_code);
+     }
+-fprintf (outfil, canned3);
++fprintf (outfil, "%s", canned3);
+ 
+ /*
+  * close the output file
+@@ -1251,8 +1251,8 @@ if ( outfil == (FILE *) NULL )
+     printf ("\nCouldn't open UilSymCtl.h");
+     return;
+     }
+-fprintf (outfil, canned_warn);
+-fprintf (outfil, canned1);
++fprintf (outfil, "%s", canned_warn);
++fprintf (outfil, "%s", canned1);
+ 
+ /*
+  * Generate the bit vectors for each class. Outer loop on the class code,
+@@ -1290,19 +1290,19 @@ for ( ctlndx=0 ; ctlndx<wml_obj_class_ptr->cnt ; ctlndx++ )
+     if ( itemno != 0 )
+ 	fprintf (outfil, "%s 0};\n", maskbuf);
+     else
+-	fprintf (outfil, "};\n");
++	fprintf (outfil, "%s", "};\n");
+     }
+ 
+ /*
+  * Write the vector of vectors.
+  */
+-fprintf (outfil, canned2);
++fprintf (outfil, "%s", canned2);
+ for ( ctlndx=0 ; ctlndx<wml_obj_class_ptr->cnt ; ctlndx++ )
+     {
+     clsobj = (WmlClassDefPtr) wml_obj_class_ptr->hvec[ctlndx].objptr;
+     fprintf (outfil, "  object_class_vec%d,\n", clsobj->sym_code);
+     }
+-fprintf (outfil, canned3);
++fprintf (outfil, "%s", canned3);
+ 
+ /*
+  * close the output file
+@@ -1438,7 +1438,7 @@ if ( outfil == (FILE *) NULL )
+     printf ("\nCouldn't open UilSymNam.h");
+     return;
+     }
+-fprintf (outfil, canned_warn);
++fprintf (outfil, "%s", canned_warn);
+ 
+ /*
+  * Write entries for widgets
+@@ -1517,7 +1517,7 @@ for ( ndx=0 ; ndx<wml_obj_child_ptr->cnt ; ndx++ )
+     fprintf (outfil, "    \"%s\",\n",
+ 	     synch->name);
+     }
+-fprintf (outfil, canned7);
++fprintf (outfil, "%s", canned7);
+ 
+ /*
+  * close the output file
+@@ -1621,12 +1621,12 @@ if ( outfil == (FILE *) NULL )
+     printf ("\nCouldn't open UilSymEnum.h");
+     return;
+     }
+-fprintf (outfil, canned_warn);
++fprintf (outfil, "%s", canned_warn);
+ 
+ /*
+  * Generate the enumeration value vectors for each enumeration set.
+  */
+-fprintf (outfil, canned1);
++fprintf (outfil, "%s", canned1);
+ for ( ndx=0 ; ndx<wml_obj_enumset_ptr->cnt ; ndx++ )
+     {
+     enumsetobj = (WmlEnumSetDefPtr) wml_obj_enumset_ptr->hvec[ndx].objptr;
+@@ -1637,13 +1637,13 @@ for ( ndx=0 ; ndx<wml_obj_enumset_ptr->cnt ; ndx++ )
+ 	fprintf (outfil, "    %d,\n",
+ 		 evobj->sym_code);
+ 	}
+-    fprintf (outfil, "  };\n");
++    fprintf (outfil, "%s", "  };\n");
+     }
+ 
+ /*
+  * Generate the enumeration set tables
+  */
+-fprintf (outfil, canned3);
++fprintf (outfil, "%s", canned3);
+ for ( ndx=0 ; ndx<wml_obj_enumset_ptr->cnt ; ndx++ )
+     {
+     enumsetobj = (WmlEnumSetDefPtr) wml_obj_enumset_ptr->hvec[ndx].objptr;
+@@ -1655,7 +1655,7 @@ for ( ndx=0 ; ndx<wml_obj_enumset_ptr->cnt ; ndx++ )
+ /*
+  * Create enumset table entries for arguments, similar to writing sym_k...
+  */
+-fprintf (outfil, canned4);
++fprintf (outfil, "%s", canned4);
+ for ( ndx=0 ; ndx<wml_obj_arg_ptr->cnt ; ndx++ )
+     {
+     resobj = (WmlResourceDefPtr) wml_obj_arg_ptr->hvec[ndx].objptr;
+@@ -1669,13 +1669,13 @@ for ( ndx=0 ; ndx<wml_obj_arg_ptr->cnt ; ndx++ )
+ /*
+  * Create the enumval values table.
+  */
+-fprintf (outfil, canned5);
++fprintf (outfil, "%s", canned5);
+ for ( ndx=0 ; ndx<wml_obj_enumval_ptr->cnt ; ndx++ )
+     {
+     evobj = (WmlEnumValueDefPtr) wml_obj_enumval_ptr->hvec[ndx].objptr;
+     fprintf (outfil, "  %s,\n", evobj->syndef->enumlit);
+     }
+-fprintf (outfil, canned5a);
++fprintf (outfil, "%s", canned5a);
+ 
+ /*
+  * close the output file
+@@ -1813,12 +1813,12 @@ if ( outfil == (FILE *) NULL )
+     printf ("\nCouldn't open UilSymCSet.h");
+     return;
+     }
+-fprintf (outfil, canned_warn);
++fprintf (outfil, "%s", canned_warn);
+ 
+ /*
+  * Generate the standards name table
+  */
+-fprintf (outfil, canned1);
++fprintf (outfil, "%s", canned1);
+ for ( ndx=0 ; ndx<wml_obj_charset_ptr->cnt ; ndx++ )
+     {
+     csobj = (WmlCharSetDefPtr) wml_obj_charset_ptr->hvec[ndx].objptr;
+@@ -1836,7 +1836,7 @@ for ( ndx=0 ; ndx<wml_obj_charset_ptr->cnt ; ndx++ )
+ /*
+  * Generate the writing direction table
+  */
+-fprintf (outfil, canned2);
++fprintf (outfil, "%s", canned2);
+ for ( ndx=0 ; ndx<wml_obj_charset_ptr->cnt ; ndx++ )
+     {
+     csobj = (WmlCharSetDefPtr) wml_obj_charset_ptr->hvec[ndx].objptr;
+@@ -1858,7 +1858,7 @@ for ( ndx=0 ; ndx<wml_obj_charset_ptr->cnt ; ndx++ )
+ /*
+  * Generate the parsing direction table
+  */
+-fprintf (outfil, canned3);
++fprintf (outfil, "%s", canned3);
+ for ( ndx=0 ; ndx<wml_obj_charset_ptr->cnt ; ndx++ )
+     {
+     csobj = (WmlCharSetDefPtr) wml_obj_charset_ptr->hvec[ndx].objptr;
+@@ -1880,7 +1880,7 @@ for ( ndx=0 ; ndx<wml_obj_charset_ptr->cnt ; ndx++ )
+ /*
+  * Generate the character size table
+  */
+-fprintf (outfil, canned4);
++fprintf (outfil, "%s", canned4);
+ for ( ndx=0 ; ndx<wml_obj_charset_ptr->cnt ; ndx++ )
+     {
+     csobj = (WmlCharSetDefPtr) wml_obj_charset_ptr->hvec[ndx].objptr;
+@@ -1906,7 +1906,7 @@ for ( ndx=0 ; ndx<wml_obj_charset_ptr->cnt ; ndx++ )
+ /*
+  * Generate the $LANG name recognition table
+  */
+-fprintf (outfil, canned5);
++fprintf (outfil, "%s", canned5);
+ lang_max = 0;
+ for ( ndx=0 ; ndx<wml_obj_charset_ptr->cnt ; ndx++ )
+     {
+@@ -1936,7 +1936,7 @@ for ( ndx=0 ; ndx<wml_obj_charset_ptr->cnt ; ndx++ )
+ /*
+  * Generate the $LANG code lookup table, in upper case
+  */
+-fprintf (outfil, canned6);
++fprintf (outfil, "%s", canned6);
+ for ( ndx=0 ; ndx<wml_obj_charset_ptr->cnt ; ndx++ )
+     {
+     csobj = (WmlCharSetDefPtr) wml_obj_charset_ptr->hvec[ndx].objptr;
+diff --git a/tools/wml/wmloutkey.c b/tools/wml/wmloutkey.c
+index af42f22..4c14728 100644
+--- a/tools/wml/wmloutkey.c
++++ b/tools/wml/wmloutkey.c
+@@ -574,16 +574,16 @@ if ( outfil == NULL )
+     printf ("\nCouldn't open UilKeyTab.h");
+     return;
+     }
+-fprintf (outfil, canned_warn);
++fprintf (outfil, "%s", canned_warn);
+ 
+ /*
+  * Print the case sensitive and insensitive tables
+  */
+-fprintf (outfil, canned1);
++fprintf (outfil, "%s", canned1);
+ wmlOutputUilKeyTabBody (outfil, wml_tok_sens_ptr, &maxlen, &maxkey);
+ fprintf (outfil, canned2, maxlen, maxkey);
+ wmlOutputUilKeyTabBody (outfil, wml_tok_insens_ptr, &maxlen, &maxkey);
+-fprintf (outfil, canned3);
++fprintf (outfil, "%s", canned3);
+ 
+ /*
+  * close the output file
+@@ -812,8 +812,8 @@ if ( outfil == NULL )
+     printf ("\nCouldn't open UilTokName.h");
+     return;
+     }
+-fprintf (outfil, canned_warn);
+-fprintf (outfil, canned1);
++fprintf (outfil, "%s", canned_warn);
++fprintf (outfil, "%s", canned1);
+ 
+ /*
+  * Print the token name entries
+diff --git a/tools/wml/wmloutmm.c b/tools/wml/wmloutmm.c
+index 84a97bb..dc8ec09 100644
+--- a/tools/wml/wmloutmm.c
++++ b/tools/wml/wmloutmm.c
+@@ -209,9 +209,9 @@ int			ctlndx;		/* to access ordered vector */
+ /*
+  * Write out header information
+  */
+-fprintf (outfil, canned1);
++fprintf (outfil, "%s", canned1);
+ fprintf (outfil, "%s\n", name);
+-fprintf (outfil, canned2);
++fprintf (outfil, "%s", canned2);
+ 
+ /*
+  * Alphabetize the controls, reason, and argument lists
+@@ -264,7 +264,7 @@ while ( ctlref != NULL )
+ rsnndx = 0;
+ ctlndx = 0;
+ if ( mm_ctl_ptr->cnt == 0 )
+-    fprintf (outfil, "No children are supported");
++    fprintf (outfil, "%s", "No children are supported");
+ while ( rsnndx<mm_rsn_ptr->cnt || ctlndx<mm_ctl_ptr->cnt )
+     {
+     if ( ctlndx < mm_ctl_ptr->cnt )
+@@ -275,7 +275,7 @@ while ( rsnndx<mm_rsn_ptr->cnt || ctlndx<mm_ctl_ptr->cnt )
+ 	ctlndx += 1;
+ 	}
+     else
+-	fprintf (outfil, "@");
++	fprintf (outfil, "%s", "@");
+     
+     if ( rsnndx < mm_rsn_ptr->cnt )
+ 	{
+@@ -285,9 +285,9 @@ while ( rsnndx<mm_rsn_ptr->cnt || ctlndx<mm_ctl_ptr->cnt )
+ 	rsnndx += 1;
+ 	}
+     else
+-	fprintf (outfil, "\n");
++	fprintf (outfil, "%s", "\n");
+     }
+-fprintf (outfil, canned3);
++fprintf (outfil, "%s", canned3);
+ 
+ /*
+  * Write out the argument table
+@@ -319,11 +319,11 @@ while ( argndx < mm_arg_ptr->cnt )
+ 			 argref->act_resource->syndef->dflt);
+ 	}
+ 	else
+-	    fprintf (outfil, "  \n");
++	    fprintf (outfil, "%s", "  \n");
+     }    
+     argndx += 1;
+     }
+-fprintf (outfil, canned4);
++fprintf (outfil, "%s", canned4);
+ 
+ }
+ 
+diff --git a/tools/wml/wmlresolve.c b/tools/wml/wmlresolve.c
+index 464ef29..3b8642c 100644
+--- a/tools/wml/wmlresolve.c
++++ b/tools/wml/wmlresolve.c
+@@ -1340,7 +1340,7 @@ for ( ndx=0 ; ndx<wml_obj_allclass_ptr->cnt ; ndx++ )
+ /*
+  * close the output file
+  */
+-fprintf (outfil, "\n\n");
++fprintf (outfil, "%s", "\n\n");
+ printf ("\nCreated report file wml.report");
+ fclose (outfil);
+ 
+@@ -1369,14 +1369,14 @@ fprintf (outfil, "\n\n\nClass %s:", synobj->name);
+ switch ( synobj->type )
+     {
+     case WmlClassTypeMetaclass:
+-        fprintf (outfil, "\n  Type: Metaclass\t");
++        fprintf (outfil, "%s", "\n  Type: Metaclass\t");
+ 	if ( synobj->superclass != NULL )
+ 	    fprintf (outfil, "Superclass: %s\t", synobj->superclass);
+ 	if ( synobj->parentclass != NULL )
+ 	    fprintf (outfil, "Parentclass: %s\t", synobj->parentclass);
+ 	break;
+     case WmlClassTypeWidget:
+-	fprintf (outfil, "\n  Type: Widget\t");
++	fprintf (outfil, "%s", "\n  Type: Widget\t");
+ 	if ( synobj->superclass != NULL )
+ 	    fprintf (outfil, "Superclass: %s\t", synobj->superclass);
+ 	if ( synobj->parentclass != NULL )
+@@ -1388,7 +1388,7 @@ switch ( synobj->type )
+ 	    fprintf (outfil, "Convenience function: %s", synobj->convfunc);
+ 	break;
+     case WmlClassTypeGadget:
+-	fprintf (outfil, "\n  Type: Gadget\t");
++	fprintf (outfil, "%s", "\n  Type: Gadget\t");
+ 	if ( synobj->superclass != NULL )
+ 	    fprintf (outfil, "Superclass: %s\t", synobj->superclass);
+ 	if ( synobj->parentclass != NULL )
+@@ -1414,19 +1414,19 @@ if ( clsobj->nondialog != NULL )
+  * is intended to match the way resources are printed in the toolkit manual,
+  * so that checking is as easy as possible.
+  */
+-fprintf (outfil, "\n  Arguments:");
++fprintf (outfil, "%s", "\n  Arguments:");
+ wmlResolvePrintClassArgs (outfil, clsobj);
+ 
+ /*
+  * Print the reasons valid in the class
+  */
+-fprintf (outfil, "\n  Reasons:");
++fprintf (outfil, "%s", "\n  Reasons:");
+ wmlResolvePrintClassReasons (outfil, clsobj);
+ 
+ /*
+  * Print the controls valid in the class
+  */
+-fprintf (outfil, "\n  Controls:");
++fprintf (outfil, "%s", "\n  Controls:");
+ for ( ndx=0 ; ndx<wml_obj_class_ptr->cnt ; ndx++ )
+     {
+     ctrlobj = (WmlClassDefPtr) wml_obj_class_ptr->hvec[ndx].objptr;
+@@ -1512,10 +1512,10 @@ for ( ndx=0 ; ndx<wml_obj_arg_ptr->cnt ; ndx++ )
+     switch ( resref->exclude )
+ 	{
+ 	case WmlAttributeTrue:
+-	    fprintf (outfil, "\n\tExclude = True;");
++	    fprintf (outfil, "%s", "\n\tExclude = True;");
+ 	    break;
+ 	case WmlAttributeFalse:
+-	    fprintf (outfil, "\n\tExclude = False;");
++	    fprintf (outfil, "%s", "\n\tExclude = False;");
+ 	    break;
+ 	}
+     if ( resref->dflt != NULL )
+@@ -1558,10 +1558,10 @@ if ( constr )
+ 	switch ( resref->exclude )
+ 	    {
+ 	    case WmlAttributeTrue:
+-	        fprintf (outfil, "\n\tExclude = True;");
++	        fprintf (outfil, "%s", "\n\tExclude = True;");
+ 		break;
+ 	    case WmlAttributeFalse:
+-		fprintf (outfil, "\n\tExclude = False;");
++		fprintf (outfil, "%s", "\n\tExclude = False;");
+ 		break;
+ 	    }
+ 	if ( resref->dflt != NULL )
+@@ -1632,10 +1632,10 @@ for ( ndx=0 ; ndx<wml_obj_reason_ptr->cnt ; ndx++ )
+     switch ( resref->exclude )
+ 	{
+ 	case WmlAttributeTrue:
+-	    fprintf (outfil, "\n\tExclude = True;");
++	    fprintf (outfil, "%s", "\n\tExclude = True;");
+ 	    break;
+ 	case WmlAttributeFalse:
+-	    fprintf (outfil, "\n\tExclude = False;");
++	    fprintf (outfil, "%s", "\n\tExclude = False;");
+ 	    break;
+ 	}
+     resobj->ref_ptr = NULL;
+-- 
+2.13.0
+

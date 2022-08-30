@@ -1,0 +1,18 @@
+Description: To prevent build failure during building with Hardening options
+ enabled due to "format '%d' expects argument of type 'int', but argument 5 has
+ type 'size_t'", the fifth argument is cast to integer on the input.
+Forwarded: http://bugs.motifzone.net/show_bug.cgi?id=1711
+Author: Paul Gevers <elbrus@debian.org>
+Updated: 2017-08-03
+
+--- a/tools/wml/wmloutkey.c
++++ b/tools/wml/wmloutkey.c
+@@ -621,7 +621,7 @@
+     fprintf (outfil, "    {%s, %s, %d, %s, \"%s\"},\n",
+ 	     tkclass,
+ 	     tksym,
+-	     strlen(tokstg),
++	     (int)strlen(tokstg),
+ 	     tktoken,
+ 	     tokstg);
+     if ( (int)strlen(tokstg) > *maxlen )

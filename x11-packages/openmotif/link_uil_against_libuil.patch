@@ -1,0 +1,29 @@
+Description: Link the uil executable against libUil
+ Linking the uil executable againt libUil instead of compiling with the libUil
+ code results in a reduction in size of the uil executable from about 348KB
+ to about 16KB.
+ .
+ This patch originates from Red Hat.
+Author: Graham Inggs <ginggs@debian.org>
+Forwarded: http://bugs.motifzone.net/show_bug.cgi?id=1586
+Last-Update: 2013-03-12
+--- a/clients/uil/Makefile.am
++++ b/clients/uil/Makefile.am
+@@ -13,7 +13,7 @@
+ 
+ libUil_la_LIBADD = UilParser.lo ../../lib/Mrm/libMrm.la ../../lib/Xm/libXm.la -lXt
+ 
+-uil_LDADD = ../../lib/Mrm/libMrm.la ../../lib/Xm/libXm.la -lXt
++uil_LDADD = libUil.la ../../lib/Mrm/libMrm.la ../../lib/Xm/libXm.la -lXt
+ 
+ INCLUDES = -DINCDIR=\"@INCDIR@\" \
+            -DLIBDIR=\"@LIBDIR@\" \
+@@ -42,7 +42,7 @@
+ 		UilLstMac.c	UilSemVal.c	UilSemCSet.c	UilDB.c
+ 
+ SRCS =		$(COMMON_SRC)
+-SRCS2 =		$(COMMON_SRC)	UilMain.c
++SRCS2 =		UilMain.c
+ 
+ HEADERS_1 = 	Uil.h		UilSymGl.h	UilSymDef.h \
+ 		UilDef.h	XmAppl.uil

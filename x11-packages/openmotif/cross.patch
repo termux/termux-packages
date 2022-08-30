@@ -1,0 +1,21 @@
+Description: Fix AC_CHECK_FILE abuse
+Bug-Debian: https://bugs.debian.org/928872
+Forwarded: http://bugs.motifzone.net/show_bug.cgi?id=1710
+Author: Helmut Grohne <helmut@subdivi.de>
+Last-Update: 2019-05-12
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -8,10 +8,10 @@
+ AM_INIT_AUTOMAKE([foreign no-define])
+ dnl AM_MAINTAINER_MODE
+ 
+-AC_CHECK_FILE(/usr/X/include/X11/X.h,
++AS_IF([test -f "/usr/X/include/X11/X.h"],
+   AC_PREFIX_DEFAULT(/usr/X),
+   AC_PREFIX_DEFAULT(/usr))
+-AC_CHECK_FILE(/usr/X11R6/include/X11/X.h,
++AS_IF([test -f "/usr/X11R6/include/X11/X.h"],
+   AC_PREFIX_DEFAULT(/usr/X11R6),
+   AC_PREFIX_DEFAULT(/usr))
+ 

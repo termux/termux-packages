@@ -165,6 +165,12 @@ PACKAGES+=" rsync"
 # Needed by megacmd
 PACKAGES+=" wget"
 
+# Needed by openmotif
+PACKAGES+=" libxft-dev"
+PACKAGES+=" libxmu-dev"
+PACKAGES+=" xbitmaps"
+PACKAGES+=" libfl-dev"
+
 # Needed by packages in unstable repository.
 PACKAGES+=" comerr-dev"
 PACKAGES+=" docbook-to-man"

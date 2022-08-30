@@ -1,0 +1,47 @@
+Description: Update build system to satisfy latest automake/autoconf
+ This is part of the patch submitted by Adam Sampson,
+ so we can build without having to provide AUTHORS and NEWS files
+ .
+ Adam licensed his patch under MIT license (whatever that means ;) )
+Forwarded: http://bugs.motifzone.net/show_bug.cgi?id=1571
+Author: Adam Sampson <ats-motif@offog.org>
+Author: Graham Inggs <ginggs@debian.org>
+Last-Update: 2017-12-16
+--- a/configure.ac
++++ b/configure.ac
+@@ -1,8 +1,13 @@
+ dnl Process this file with autoconf to produce a configure script.
+-AC_INIT
++AC_PREREQ(2.59)
++AC_INIT([motif], [2.3.8])
+ AC_CONFIG_SRCDIR([lib/Xm/Form.c])
+-AC_PREREQ(2.52)
+ AC_CONFIG_AUX_DIR(.)
++AC_CANONICAL_TARGET
++
++AM_INIT_AUTOMAKE([foreign no-define])
++dnl AM_MAINTAINER_MODE
++
+ AC_CHECK_FILE(/usr/X/include/X11/X.h,
+   AC_PREFIX_DEFAULT(/usr/X),
+   AC_PREFIX_DEFAULT(/usr))
+@@ -10,9 +15,6 @@
+   AC_PREFIX_DEFAULT(/usr/X11R6),
+   AC_PREFIX_DEFAULT(/usr))
+ 
+-dnl AM_MAINTAINER_MODE
+-AC_CANONICAL_TARGET
+-
+ dnl The version of the Motif libraries
+ CURRENT=4
+ REVISION=4
+@@ -21,9 +23,6 @@
+ AC_SUBST(REVISION)
+ AC_SUBST(AGE)
+ 
+-dnl This is really dumb but it seems to be bug
+-AM_INIT_AUTOMAKE(motif,2.3.8,no-define)
+-
+ LIBTOOL_VERSION=$CURRENT:$REVISION:$AGE
+ 
+ dnl

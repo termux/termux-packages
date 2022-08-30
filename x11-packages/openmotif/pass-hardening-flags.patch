@@ -1,0 +1,15 @@
+Description: Pass hardening flags
+Forwarded: not-yet
+Author: Graham Inggs <ginggs@debian.org>
+Last-Update: 2017-08-03
+--- a/demos/lib/Exm/wml/Makefile.am
++++ b/demos/lib/Exm/wml/Makefile.am
+@@ -69,7 +69,7 @@
+ # 	$(RM) wml-uil.mm
+ 	$(RM) Exm.h
+ 	$(LN_S) $(srcdir)/$(TABLE) ./Exm.h
+-	$(CPP) -I$(WMLDIR) Exm.h | $(top_builddir)/tools/wml/wml
++	$(CPP) $(CPPFLAGS) -I$(WMLDIR) Exm.h | $(top_builddir)/tools/wml/wml
+ 	$(RM) Exm.h
+ # 	$(RM) tokens.dat
+ # 
