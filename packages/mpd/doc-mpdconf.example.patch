@@ -1,5 +1,5 @@
---- a/doc/mpdconf.example	2022-03-14 17:55:47.000000000 +0000
-+++ b/doc/mpdconf.example	2022-04-19 04:52:49.436770322 +0000
+--- a/doc/mpdconf.example
++++ b/doc/mpdconf.example
 @@ -10,14 +10,14 @@
  # be disabled and audio files will only be accepted over ipc socket (using
  # file:// protocol) or streaming files over an accepted protocol.
@@ -135,6 +135,21 @@
  ##	quality		"5.0"			# do not define if bitrate is defined
  #	bitrate		"128"			# do not define if quality is defined
  #	format		"44100:16:1"
+@@ -285,6 +267,14 @@
+ #	max_clients	"0"			# optional 0=no limit
+ #}
+ #
++# An example of a pulseaudio output
++#
++audio_output {
++	type		"pulse"
++	name		"PulseAudio Output"
++	enabled		"no"
++}
++#
+ # An example of a pulseaudio output (streaming to a remote pulseaudio server)
+ #
+ #audio_output {
 @@ -295,55 +277,31 @@
  ##	media_role	"media_role"		#optional
  #}
