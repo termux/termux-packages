@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Content-Preserving PDF Transformation System"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=10.6.3
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/qpdf/qpdf/releases/download/release-qpdf-$TERMUX_PKG_VERSION/qpdf-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=e8fc23b2a584ea68c963a897515d3eb3129186741dd19d13c86d31fa33493811
 TERMUX_PKG_AUTO_UPDATE=true
@@ -16,4 +16,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-random=/dev/urandom"
 
 termux_step_pre_configure() {
 	./autogen.sh
+
+	LDFLAGS+=" $($CC -print-libgcc-file-name)"
 }
