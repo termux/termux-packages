@@ -1,0 +1,12 @@
+diff -uNr fdm-2.1/file.c fdm-2.1.mod/file.c
+--- fdm-2.1/file.c	2016-08-26 20:30:47.000000000 +0300
++++ fdm-2.1.mod/file.c	2022-09-01 14:54:46.220592731 +0300
+@@ -336,7 +336,7 @@
+ 	struct stat	sb;
+ 
+ 	ret = link(oldpath, newpath);
+-	if (ret != 0 && errno == EXDEV) {
++	if (ret != 0 && (errno == EXDEV || errno == EPERM)) {
+ 		ret = stat(newpath, &sb);
+ 		if (ret == -1) {
+ 			if (errno == ENOENT)
