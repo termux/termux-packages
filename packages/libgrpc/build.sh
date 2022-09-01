@@ -29,7 +29,6 @@ termux_step_host_build() {
 	termux_setup_cmake
 	termux_setup_ninja
 
-	cd $TERMUX_PKG_SRCDIR
 	export LD=gcc
 	export LDXX=g++
 
@@ -39,10 +38,9 @@ termux_step_host_build() {
 	# when building version 1.17.2:
 	CXXFLAGS="-Wno-error=class-memaccess" \
 		CFLAGS="-Wno-implicit-fallthrough" \
-		cmake -G Ninja -DCMAKE_INSTALL_PREFIX=$TERMUX_PKG_HOSTBUILD_DIR
-	ninja -j $TERMUX_MAKE_PROCESSES install
-	ninja -t clean
-	rm -rf CMakeCache.txt CMakeFiles
+		cmake -G Ninja "$TERMUX_PKG_SRCDIR"
+
+	ninja grpc_cpp_plugin
 }
 
 termux_step_pre_configure() {
@@ -50,6 +48,6 @@ termux_step_pre_configure() {
 	termux_setup_cmake
 	termux_setup_ninja
 
-	export PATH=$TERMUX_PKG_HOSTBUILD_DIR/bin:$PATH
+	export PATH=$TERMUX_PKG_HOSTBUILD_DIR:$PATH
 	export GRPC_CROSS_COMPILE=true
 }
