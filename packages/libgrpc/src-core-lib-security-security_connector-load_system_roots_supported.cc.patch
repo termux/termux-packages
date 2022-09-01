@@ -1,0 +1,20 @@
+--- ./src/core/lib/security/security_connector/load_system_roots_supported.cc.orig	2022-09-01 18:38:33.746608984 +0000
++++ ./src/core/lib/security/security_connector/load_system_roots_supported.cc	2022-09-01 18:39:43.052126864 +0000
+@@ -52,12 +52,12 @@
+ 
+ #if defined(GPR_LINUX) || defined(GPR_ANDROID)
+ const char* kCertFiles[] = {
+-    "/etc/ssl/certs/ca-certificates.crt", "/etc/pki/tls/certs/ca-bundle.crt",
+-    "/etc/ssl/ca-bundle.pem", "/etc/pki/tls/cacert.pem",
+-    "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem"};
++    "@TERMUX_PREFIX@/etc/ssl/certs/ca-certificates.crt", "@TERMUX_PREFIX@/etc/pki/tls/certs/ca-bundle.crt",
++    "@TERMUX_PREFIX@/etc/ssl/ca-bundle.pem", "@TERMUX_PREFIX@/etc/pki/tls/cacert.pem",
++    "@TERMUX_PREFIX@/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem"};
+ const char* kCertDirectories[] = {
+-    "/etc/ssl/certs", "/system/etc/security/cacerts", "/usr/local/share/certs",
+-    "/etc/pki/tls/certs", "/etc/openssl/certs"};
++    "@TERMUX_PREFIX@/etc/ssl/certs", "@TERMUX_PREFIX@/share/certs",
++    "@TERMUX_PREFIX@/etc/pki/tls/certs", "@TERMUX_PREFIX@/etc/openssl/certs"};
+ #elif defined(GPR_FREEBSD)  // endif GPR_LINUX || GPR_ANDROID
+ const char* kCertFiles[] = {"/etc/ssl/cert.pem",
+                             "/usr/local/share/certs/ca-root-nss.crt"};
