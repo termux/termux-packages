@@ -3,9 +3,10 @@ TERMUX_PKG_DESCRIPTION="Collection of common network programs"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.3
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/inetutils/inetutils-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=0b01bb08e29623c4e3b940f233c961451d9af8c5066301add76a52a95d51772c
-TERMUX_PKG_DEPENDS="readline"
+TERMUX_PKG_DEPENDS="libandroid-glob, readline"
 TERMUX_PKG_SUGGESTS="whois"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/whois share/man/man1/whois.1"
 # These are old cruft / not suited for android
@@ -29,6 +30,7 @@ ac_cv_lib_crypt_crypt=no
 termux_step_pre_configure() {
 	CFLAGS+=" -DNO_INLINE_GETPASS=1"
 	CPPFLAGS+=" -DNO_INLINE_GETPASS=1 -DLOGIN_PROCESS=6 -DDEAD_PROCESS=8 -DLOG_NFACILITIES=24 -fcommon"
+	LDFLAGS+=" -landroid-glob"
 	touch -d "next hour" ./man/whois.1
 }
 

@@ -1,0 +1,29 @@
+diff -uNr nelua-lang/Makefile nelua-lang.mod/Makefile
+--- nelua-lang/Makefile	2022-08-28 12:14:53.076791242 +0800
++++ nelua-lang.mod/Makefile	2022-08-28 12:16:10.306791213 +0800
+@@ -40,7 +40,6 @@
+ OPT_CFLAGS=-O3 -flto -fno-plt -fno-stack-protector
+ ifeq ($(SYS), Linux)
+ 	CFLAGS=-std=gnu99 -O2
+-	CC=gcc
+ 	DEFS+=-DLUA_USE_LINUX
+ 	LIBS+=-lm -ldl
+ 	LDFLAGS+=-Wl,-E
+@@ -227,7 +226,7 @@
+ # Install
+ 
+ # Install paths
+-PREFIX=/usr/local
++PREFIX=@TERMUX_PREFIX@
+ DPREFIX=$(DESTDIR)$(PREFIX)
+ PREFIX_BIN=$(DPREFIX)/bin
+ PREFIX_LIB=$(DPREFIX)/lib
+@@ -350,7 +349,7 @@
+ 
+ CACHE_DIR=.cache
+ ifdef HOME
+-	CACHE_DIR=$(HOME)/.cache/nelua
++	CACHE_DIR=@TERMUX_HOME@/.cache/nelua
+ else ifdef USERPROFILE
+ 	CACHE_DIR=$(USERPROFILE)\\.cache\\nelua
+ endif
