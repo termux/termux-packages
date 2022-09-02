@@ -6,7 +6,7 @@ diff -uNr fdm-2.1/file.c fdm-2.1.mod/file.c
  
  	ret = link(oldpath, newpath);
 -	if (ret != 0 && errno == EXDEV) {
-+	if (ret != 0 && (errno == EXDEV || errno == EPERM)) {
++	if (ret != 0 && (errno == EXDEV || errno == EACCES)) {
  		ret = stat(newpath, &sb);
  		if (ret == -1) {
  			if (errno == ENOENT)
