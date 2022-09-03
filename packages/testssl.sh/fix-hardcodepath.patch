@@ -1,0 +1,96 @@
+--- a/testssl.sh
++++ b/testssl.sh
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env bash
++#!@TERMUX_PREFIX@/bin/env bash
+ #
+ # vim:ts=5:sw=5:expandtab
+ # we have a spaces softtab, that ensures readability with other editors too
+@@ -99,11 +99,11 @@
+ if [[ "$SHELLOPTS" =~ xtrace ]]; then
+      if "$DEBUGTIME"; then
+           # separate debugging, doesn't mess up the screen, $DEBUGTIME determines whether we also do performance analysis
+-          exec 42>&2 2> >(tee /tmp/testssl-$$.log | sed -u 's/^.*$/now/' | date -f - +%s.%N >/tmp/testssl-$$.time)
++          exec 42>&2 2> >(tee @TERMUX_PREFIX@/tmp/testssl-$$.log | sed -u 's/^.*$/now/' | date -f - +%s.%N >/tmp/testssl-$$.time)
+           # BASH_XTRACEFD=42
+      else
+           if ! "$DEBUG_ALLINONE"; then
+-               exec 42>| /tmp/testssl-$$.log
++               exec 42>| @TERMUX_PREFIX@/tmp/testssl-$$.log
+                BASH_XTRACEFD=42
+           fi
+      fi
+@@ -132,12 +132,12 @@
+ declare -r SYSTEM="$(uname -s)"
+ declare -r SYSTEMREV="$(uname -r)"
+ SYSTEM2=""                                        # currently only being used for WSL = bash on windows
+-TESTSSL_INSTALL_DIR="${TESTSSL_INSTALL_DIR:-""}"  # If you run testssl.sh and it doesn't find it necessary file automagically set TESTSSL_INSTALL_DIR
++TESTSSL_INSTALL_DIR="${TESTSSL_INSTALL_DIR:-"@TERMUX_PREFIX@/share/testssl"}"  # If you run testssl.sh and it doesn't find it necessary file automagically set TESTSSL_INSTALL_DIR
+ CA_BUNDLES_PATH="${CA_BUNDLES_PATH:-""}"          # You can have your stores some place else
+ ADDITIONAL_CA_FILES="${ADDITIONAL_CA_FILES:-""}"  # single file with a CA in PEM format or comma separated lists of them
+ CIPHERS_BY_STRENGTH_FILE=""
+ TLS_DATA_FILE=""                                  # mandatory file for socket-based handshakes
+-OPENSSL_LOCATION=""
++OPENSSL_LOCATION="@TERMUX_PREFIX@/bin/openssl"
+ HNAME="$(uname -n)"
+ HNAME="${HNAME%%.*}"
+ 
+@@ -187,7 +187,7 @@
+ ########### Defining (and presetting) variables which can be changed
+ #
+ # Following variables make use of $ENV and can be used like "OPENSSL=<myprivate_path_to_openssl> ./testssl.sh <URI>"
+-declare -x OPENSSL
++OPENSSL=@TERMUX_PREFIX@/bin/openssl
+ OPENSSL_TIMEOUT=${OPENSSL_TIMEOUT:-""}  # Default connect timeout with openssl before we call the server side unreachable
+ CONNECT_TIMEOUT=${CONNECT_TIMEOUT:-""}  # Default connect timeout with sockets before we call the server side unreachable
+ PHONE_OUT=${PHONE_OUT:-false}           # Whether testssl can retrieve CRLs and OCSP
+@@ -300,7 +300,7 @@
+ # alpn_protos needs to be space-separated, not comma-seperated, including odd ones observed @ facebook and others, old ones like h2-17 omitted as they could not be found
+ declare -r ALPN_PROTOs="h2 spdy/3.1 http/1.1 grpc-exp h2-fb spdy/1 spdy/2 spdy/3 stun.turn stun.nat-discovery webrtc c-webrtc ftp"
+ declare -a SESS_RESUMPTION
+-TEMPDIR=""
++TEMPDIR="@TERMUX_PREFIX@/tmp"
+ TMPFILE=""
+ ERRFILE=""
+ CLIENT_AUTH=false
+@@ -375,8 +375,8 @@
+ CORRECT_SPACES=""                       # Used for IPv6 and proper output formatting
+ IPADDRs=""
+ IP46ADDRs=""
+-LOCAL_A=false                           # Does the $NODEIP come from /etc/hosts?
+-LOCAL_AAAA=false                        # Does the IPv6 IP come from /etc/hosts?
++LOCAL_A=false                           # Does the $NODEIP come from @TERMUX_PREFIX@/etc/hosts?
++LOCAL_AAAA=false                        # Does the IPv6 IP come from @TERMUX_PREFIX@/etc/hosts?
+ XMPP_HOST=""
+ PROXYIP=""                              # $PROXYIP:$PROXPORT is your proxy if --proxy is defined ...
+ PROXYPORT=""                            # ... and openssl has proxy support
+@@ -20586,7 +20586,7 @@
+ # arg1 is the entry we want to look up in the host file
+ get_local_aaaa() {
+      local ip6=""
+-     local etchosts="/etc/hosts /c/Windows/System32/drivers/etc/hosts"
++     local etchosts="@TERMUX_PREFIX@/etc/hosts /c/Windows/System32/drivers/etc/hosts"
+ 
+      [[ -z "$1" ]] && echo "" && return 1
+      # Also multiple records should work fine
+@@ -20599,7 +20599,7 @@
+ }
+ get_local_a() {
+      local ip4=""
+-     local etchosts="/etc/hosts /c/Windows/System32/drivers/etc/hosts"
++     local etchosts="@TERMUX_PREFIX@/etc/hosts /c/Windows/System32/drivers/etc/hosts"
+ 
+      ip4=$(grep -wih "$1" $etchosts 2>/dev/null | grep -Ev ':|^#|\.local' | grep -Ei "[[:space:]]$1" | awk '{ print $1 }')
+      if is_ipv4addr "$ip4"; then
+@@ -21727,9 +21727,9 @@
+           outln "$(out_row_aligned_max_width "$further_ip_addrs" "                         $CORRECT_SPACES" $TERM_WIDTH)"
+      fi
+      if "$LOCAL_A"; then
+-          outln " A record via:          $CORRECT_SPACES /etc/hosts "
++          outln " A record via:          $CORRECT_SPACES @TERMUX_PREFIX@/etc/hosts "
+      elif "$LOCAL_AAAA"; then
+-          outln " AAAA record via:       $CORRECT_SPACES /etc/hosts "
++          outln " AAAA record via:       $CORRECT_SPACES @TERMUX_PREFIX@/etc/hosts "
+      elif  [[ -n "$CMDLINE_IP" ]]; then
+           if is_ipv6addr $"$CMDLINE_IP"; then
+                outln " AAAA record via:       $CORRECT_SPACES supplied IP \"$CMDLINE_IP\""

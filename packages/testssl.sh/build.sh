@@ -12,10 +12,7 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
 
 termux_step_configure() {
-	sed -e 's#\${TESTSSL_INSTALL_DIR.*$#\${TESTSSL_INSTALL_DIR:-"%{_datadir}/%{name}}"#' \
-	-e "s|OPENSSL=\"\"|OPENSSL=\"\$TERMUX_PREFIX/bin/openssl\"|g" -e "s|/etc/hosts|\$TERMUX_PREFIX/etc/hosts|g" \
-	-e "s|TEMPDIR=\"\"|TEMPDIR=\"\$TERMUX_PREFIX/tmp\"|g" -e "s|tee /tmp/testssl|tee \$TERMUX_PREFIX/tmp/testssl|g" \
-	-e 's#\${CA_BUNDLES_PATH.*$#\${CA_BUNDLES_PATH:-"%{_datadir}/%{name}}"#' -i testssl.sh
+	sed -i "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" testssl.sh
 	sed -i '0,/.SH "COPYRIGHT"/s#testssl\\.sh#testssl#g' doc/testssl.1
 }
 
