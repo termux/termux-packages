@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://gitlab.freedesktop.org/xorg/lib/libxp
+TERMUX_PKG_DESCRIPTION="X Print Client Library"
+TERMUX_PKG_LICENSE=""
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=1.0.3
+TERMUX_PKG_SRCURL=https://gitlab.freedesktop.org/xorg/lib/libxp/-/archive/libXp-${TERMUX_PKG_VERSION}/libxp-libXp-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=
+#TERMUX_PKG_DEPENDS=""
+#TERMUX_PKG_BUILD_IN_SRC=true

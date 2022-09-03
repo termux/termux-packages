@@ -1,0 +1,49 @@
+Description:
+ For multiarch support, we change libdir to /usr/lib/$(DEB_HOST_MULTIARCH).
+ However, we do not want to do this to /usr/lib/X11 yet.
+ .
+ Note that XMBINDDIR_FALLBACK should really be set to /usr/share/X11/bindings
+ since the files are platform-independent. We postpone moving them until a
+ decision has been reached on libmotif-common.
+ .
+ The configure.ac fixes are minimal and only suitable for Debian/Ubuntu
+ packaging. For upstream one might want to add a command line option.
+Author: Sergio Gelato <Sergio.Gelato@astro.su.se>
+Bug-Debian: http://bugs.debian.org/673690
+
+--- a/configure
++++ b/configure
+@@ -18786,13 +18786,13 @@
+ LIBDIR="${libdir}/X11"
+ 
+ 
+-MWMRCDIR="${libdir}/X11"
++MWMRCDIR="${prefix}/lib/X11"
+ 
+ 
+ INCDIR="${includedir}/X11"
+ 
+ 
+-XMBINDDIR_FALLBACK="${libdir}/X11/bindings"
++XMBINDDIR_FALLBACK="${prefix}/lib/X11/bindings"
+ 
+ 
+ RM="rm -f"
+--- a/configure.ac
++++ b/configure.ac
+@@ -179,13 +179,13 @@
+ LIBDIR="${libdir}/X11"
+ AC_SUBST(LIBDIR)
+ 
+-MWMRCDIR="${libdir}/X11"
++MWMRCDIR="${prefix}/lib/X11"
+ AC_SUBST(MWMRCDIR)
+ 
+ INCDIR="${includedir}/X11"
+ AC_SUBST(INCDIR)
+ 
+-XMBINDDIR_FALLBACK="${libdir}/X11/bindings"
++XMBINDDIR_FALLBACK="${prefix}/lib/X11/bindings"
+ AC_SUBST(XMBINDDIR_FALLBACK)
+ 
+ RM="rm -f"

@@ -14,6 +14,7 @@ termux_step_post_get_source() {
 	touch NEWS AUTHORS
 	#sed "0,/%{/{s/%{/%option main{/}" -i tools/wml/wmluiltok.l
 	sed "s/test\ \-f/[\ \-e /g;s/||/\ ]\ ||/g;s/\$(LN_S)/\$(LN_S)\ \-f/g" -i lib/Xm/Makefile.am
+	cd lib/Xm
 	autoreconf -if
 }
 
