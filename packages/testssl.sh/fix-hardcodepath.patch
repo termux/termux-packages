@@ -1,0 +1,281 @@
+diff -uNr testssl.sh-3.0.7/testssl.sh testssl.sh-3.0.7.mod/testssl.sh
+--- testssl.sh-3.0.7/testssl.sh	2022-02-19 15:38:16.000000000 +0200
++++ testssl.sh-3.0.7.mod/testssl.sh	2022-09-03 23:22:46.909613493 +0300
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env bash
++#!@TERMUX_PREFIX@/bin/env bash
+ #
+ # vim:ts=5:sw=5:expandtab
+ # we have a spaces softtab, that ensures readability with other editors too
+@@ -99,11 +99,11 @@
+ if [[ "$SHELLOPTS" =~ xtrace ]]; then
+      if "$DEBUGTIME"; then
+           # separate debugging, doesn't mess up the screen, $DEBUGTIME determines whether we also do performance analysis
+-          exec 42>&2 2> >(tee /tmp/testssl-$$.log | sed -u 's/^.*$/now/' | date -f - +%s.%N >/tmp/testssl-$$.time)
++          exec 42>&2 2> >(tee @TERMUX_PREFIX@/tmp/testssl-$$.log | sed -u 's/^.*$/now/' | date -f - +%s.%N >@TERMUX_PREFIX@/tmp/testssl-$$.time)
+           # BASH_XTRACEFD=42
+      else
+           if ! "$DEBUG_ALLINONE"; then
+-               exec 42>| /tmp/testssl-$$.log
++               exec 42>| @TERMUX_PREFIX@/tmp/testssl-$$.log
+                BASH_XTRACEFD=42
+           fi
+      fi
+@@ -132,8 +132,8 @@
+ declare -r SYSTEM="$(uname -s)"
+ declare -r SYSTEMREV="$(uname -r)"
+ SYSTEM2=""                                        # currently only being used for WSL = bash on windows
+-TESTSSL_INSTALL_DIR="${TESTSSL_INSTALL_DIR:-""}"  # If you run testssl.sh and it doesn't find it necessary file automagically set TESTSSL_INSTALL_DIR
+-CA_BUNDLES_PATH="${CA_BUNDLES_PATH:-""}"          # You can have your stores some place else
++TESTSSL_INSTALL_DIR="${TESTSSL_INSTALL_DIR:-"@TERMUX_PREFIX@"}"  # If you run testssl.sh and it doesn't find it necessary file automagically set TESTSSL_INSTALL_DIR
++CA_BUNDLES_PATH="${CA_BUNDLES_PATH:-"@TERMUX_PREFIX@/etc/tls"}"          # You can have your stores some place else
+ ADDITIONAL_CA_FILES="${ADDITIONAL_CA_FILES:-""}"  # single file with a CA in PEM format or comma separated lists of them
+ CIPHERS_BY_STRENGTH_FILE=""
+ TLS_DATA_FILE=""                                  # mandatory file for socket-based handshakes
+@@ -203,7 +203,7 @@
+ BASICAUTH=${BASICAUTH:-""}              # HTTP basic auth credentials can be set here like user:pass
+ BUGS=${BUGS:-""}                        # -bugs option from openssl, needed for some BIG IP F5
+ WARNINGS=${WARNINGS:-""}                # can be either off or batch
+-DEBUG=${DEBUG:-0}                       # 1: normal output the files in /tmp/ are kept for further debugging purposes
++DEBUG=${DEBUG:-0}                       # 1: normal output the files in @TERMUX_PREFIX@/tmp/ are kept for further debugging purposes
+                                         # 2: list more what's going on , also lists some errors of connections
+                                         # 3: slight hexdumps + other info,
+                                         # 4: display bytes sent via sockets
+@@ -252,7 +252,7 @@
+ UNBRACKTD_IPV6=${UNBRACKTD_IPV6:-false} # some versions of OpenSSL (like Gentoo) don't support [bracketed] IPv6 addresses
+ NO_ENGINE=${NO_ENGINE:-false}           # if there are problems finding the (external) openssl engine set this to true
+ declare -r CLIENT_MIN_PFS=5             # number of ciphers needed to run a test for PFS
+-CAPATH="${CAPATH:-/etc/ssl/certs/}"     # Does nothing yet (FC has only a CA bundle per default, ==> openssl version -d)
++CAPATH="${CAPATH:-@TERMUX_PREFIX@/etc/tls/certs/}"     # Does nothing yet (FC has only a CA bundle per default, ==> openssl version -d)
+ GOOD_CA_BUNDLE=""                       # A bundle of CA certificates that can be used to validate the server's certificate
+ CERTIFICATE_LIST_ORDERING_PROBLEM=false # Set to true if server sends a certificate list that contains a certificate
+                                         # that does not certify the one immediately preceding it. (See RFC 8446, Section 4.4.2)
+@@ -380,8 +380,8 @@
+ CORRECT_SPACES=""                       # Used for IPv6 and proper output formatting
+ IPADDRs=""
+ IP46ADDRs=""
+-LOCAL_A=false                           # Does the $NODEIP come from /etc/hosts?
+-LOCAL_AAAA=false                        # Does the IPv6 IP come from /etc/hosts?
++LOCAL_A=false                           # Does the $NODEIP come from @TERMUX_PREFIX@/etc/hosts?
++LOCAL_AAAA=false                        # Does the IPv6 IP come from @TERMUX_PREFIX@/etc/hosts?
+ XMPP_HOST=""
+ PROXYIP=""                              # $PROXYIP:$PROXPORT is your proxy if --proxy is defined ...
+ PROXYPORT=""                            # ... and openssl has proxy support
+@@ -722,7 +722,7 @@
+                bold=$(tput md)
+                underline=$(tput us)
+                italic=$(tput ZH 2>/dev/null)       # This doesn't work on FreeBSDi (9,10) and OpenBSD
+-               italic_end=$(tput ZR 2>/dev/null)   # ... probably entry missing in /etc/termcap
++               italic_end=$(tput ZR 2>/dev/null)   # ... probably entry missing in @TERMUX_PREFIX@/etc/termcap
+                reverse=$(tput mr)
+                off=$(tput me)
+           fi
+@@ -2488,7 +2488,7 @@
+      local -i i nrsaved
+      local first_hpkp_header
+      local spki
+-     local ca_hashes="$TESTSSL_INSTALL_DIR/etc/ca_hashes.txt"
++     local ca_hashes="$TESTSSL_INSTALL_DIR/etc/testssl/ca_hashes.txt"
+ 
+      if [[ ! -s $HEADERFILE ]]; then
+           run_http_header "$1" || return 1
+@@ -4594,9 +4594,9 @@
+      local client_service=""
+ 
+      # source the external file
+-     . "$TESTSSL_INSTALL_DIR/etc/client-simulation.txt" 2>/dev/null
++     . "$TESTSSL_INSTALL_DIR/etc/testssl/client-simulation.txt" 2>/dev/null
+      if [[ $? -ne 0 ]]; then
+-          prln_local_problem "couldn't find client simulation data in $TESTSSL_INSTALL_DIR/etc/client-simulation.txt"
++          prln_local_problem "couldn't find client simulation data in $TESTSSL_INSTALL_DIR/etc/testssl/client-simulation.txt"
+           return 1
+      fi
+ 
+@@ -7040,7 +7040,7 @@
+ 
+      # if you run testssl.sh from a different path /you can set either TESTSSL_INSTALL_DIR or CA_BUNDLES_PATH to find the CA BUNDLES
+      if [[ -z "$CA_BUNDLES_PATH" ]]; then
+-          ca_bundles="$TESTSSL_INSTALL_DIR/etc/*.pem"
++          ca_bundles="$TESTSSL_INSTALL_DIR/etc/testssl/*.pem"
+      else
+           ca_bundles="$CA_BUNDLES_PATH/*.pem"
+      fi
+@@ -15316,7 +15316,7 @@
+      local spaces="$3"
+      local pubkey dh_p=""
+      local -i subret=0
+-     local common_primes_file="$TESTSSL_INSTALL_DIR/etc/common-primes.txt"
++     local common_primes_file="$TESTSSL_INSTALL_DIR/etc/testssl/common-primes.txt"
+      local -i lineno_matched=0
+ 
+      "$HAS_PKEY" || return 2
+@@ -16947,12 +16947,12 @@
+ get_install_dir() {
+      [[ -z "$TESTSSL_INSTALL_DIR" ]] && TESTSSL_INSTALL_DIR="$(dirname "${BASH_SOURCE[0]}")"
+ 
+-     if [[ -r "$RUN_DIR/etc/cipher-mapping.txt" ]]; then
+-          CIPHERS_BY_STRENGTH_FILE="$RUN_DIR/etc/cipher-mapping.txt"
++     if [[ -r "$RUN_DIR/etc/testssl/cipher-mapping.txt" ]]; then
++          CIPHERS_BY_STRENGTH_FILE="$RUN_DIR/etc/testssl/cipher-mapping.txt"
+           [[ -z "$TESTSSL_INSTALL_DIR" ]] && TESTSSL_INSTALL_DIR="$RUN_DIR"          # probably TESTSSL_INSTALL_DIR
+      fi
+ 
+-     [[ -r "$TESTSSL_INSTALL_DIR/etc/cipher-mapping.txt" ]] && CIPHERS_BY_STRENGTH_FILE="$TESTSSL_INSTALL_DIR/etc/cipher-mapping.txt"
++     [[ -r "$TESTSSL_INSTALL_DIR/etc/testssl/cipher-mapping.txt" ]] && CIPHERS_BY_STRENGTH_FILE="$TESTSSL_INSTALL_DIR/etc/testssl/cipher-mapping.txt"
+      if [[ ! -r "$CIPHERS_BY_STRENGTH_FILE" ]]; then
+           [[ -r "$RUN_DIR/cipher-mapping.txt" ]] && CIPHERS_BY_STRENGTH_FILE="$RUN_DIR/cipher-mapping.txt"
+           [[ -r "$TESTSSL_INSTALL_DIR/cipher-mapping.txt" ]] && CIPHERS_BY_STRENGTH_FILE="$TESTSSL_INSTALL_DIR/cipher-mapping.txt"
+@@ -16966,13 +16966,13 @@
+                # not sure whether Darwin has -f
+           TESTSSL_INSTALL_DIR="$(dirname "$TESTSSL_INSTALL_DIR" 2>/dev/null)"
+           [[ -r "$TESTSSL_INSTALL_DIR/cipher-mapping.txt" ]] && CIPHERS_BY_STRENGTH_FILE="$TESTSSL_INSTALL_DIR/cipher-mapping.txt"
+-          [[ -r "$TESTSSL_INSTALL_DIR/etc/cipher-mapping.txt" ]] && CIPHERS_BY_STRENGTH_FILE="$TESTSSL_INSTALL_DIR/etc/cipher-mapping.txt"
++          [[ -r "$TESTSSL_INSTALL_DIR/etc/testssl/cipher-mapping.txt" ]] && CIPHERS_BY_STRENGTH_FILE="$TESTSSL_INSTALL_DIR/etc/testssl/cipher-mapping.txt"
+      fi
+ 
+      # still no cipher mapping file:
+      if [[ ! -r "$CIPHERS_BY_STRENGTH_FILE" ]] && type -p realpath &>/dev/null ; then
+           TESTSSL_INSTALL_DIR="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
+-          CIPHERS_BY_STRENGTH_FILE="$TESTSSL_INSTALL_DIR/etc/cipher-mapping.txt"
++          CIPHERS_BY_STRENGTH_FILE="$TESTSSL_INSTALL_DIR/etc/testssl/cipher-mapping.txt"
+           [[ -r "$TESTSSL_INSTALL_DIR/cipher-mapping.txt" ]] && CIPHERS_BY_STRENGTH_FILE="$TESTSSL_INSTALL_DIR/cipher-mapping.txt"
+      fi
+ 
+@@ -16982,7 +16982,7 @@
+                TESTSSL_INSTALL_DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" || \
+                TESTSSL_INSTALL_DIR="$(dirname "$(readlink "${BASH_SOURCE[0]}")")"
+                # not sure whether Darwin has -f
+-          CIPHERS_BY_STRENGTH_FILE="$TESTSSL_INSTALL_DIR/etc/cipher-mapping.txt"
++          CIPHERS_BY_STRENGTH_FILE="$TESTSSL_INSTALL_DIR/etc/testssl/cipher-mapping.txt"
+           [[ -r "$TESTSSL_INSTALL_DIR/cipher-mapping.txt" ]] && CIPHERS_BY_STRENGTH_FILE="$TESTSSL_INSTALL_DIR/cipher-mapping.txt"
+      fi
+ 
+@@ -16990,16 +16990,16 @@
+           DISPLAY_CIPHERNAMES="openssl-only"
+           debugme echo "$CIPHERS_BY_STRENGTH_FILE"
+           prln_warning "\nATTENTION: No cipher mapping file found!"
+-          outln "Please note from 2.9 on $PROG_NAME needs files in \"\$TESTSSL_INSTALL_DIR/etc/\" to function correctly."
++          outln "Please note from 2.9 on $PROG_NAME needs files in \"\$TESTSSL_INSTALL_DIR/etc/testssl\" to function correctly."
+           outln
+           ignore_no_or_lame "Type \"yes\" to ignore this warning and proceed at your own risk" "yes"
+           [[ $? -ne 0 ]] && exit $ERR_RESOURCE
+      fi
+ 
+-     TLS_DATA_FILE="$TESTSSL_INSTALL_DIR/etc/tls_data.txt"
++     TLS_DATA_FILE="$TESTSSL_INSTALL_DIR/etc/testssl/tls_data.txt"
+      if [[ ! -r "$TLS_DATA_FILE" ]]; then
+           prln_warning "\nATTENTION: No TLS data file found -- needed for socket-based handshakes"
+-          outln "Please note from 2.9 on $PROG_NAME needs files in \"\$TESTSSL_INSTALL_DIR/etc/\" to function correctly."
++          outln "Please note from 2.9 on $PROG_NAME needs files in \"\$TESTSSL_INSTALL_DIR/etc/testssl\" to function correctly."
+           outln
+           ignore_no_or_lame "Type \"yes\" to ignore this warning and proceed at your own risk" "yes"
+           [[ $? -ne 0 ]] && exit $ERR_RESOURCE
+@@ -17065,7 +17065,7 @@
+      # couldn't be parsed by our openssl it bailed out here with a misleading error, see #1982.
+      # Now we try with another version of the config file and if it still fails we bail out.
+      if ! $OPENSSL version -d >/dev/null 2>&1 ; then
+-          export OPENSSL_CONF="$TESTSSL_INSTALL_DIR/etc/openssl.cnf"
++          export OPENSSL_CONF="$TESTSSL_INSTALL_DIR/etc/testssl/openssl.cnf"
+           if ! $OPENSSL version -d >/dev/null 2>&1 ; then
+                fatal "cannot exec or find any openssl binary" $ERR_OSSLBIN
+           else
+@@ -17435,7 +17435,7 @@
+                 no-iana|no-rfc>      -> don't display the IANA/(RFC) cipher suite name, display OpenSSL names only
+      --color <0|1|2|3>             0: no escape or other codes,  1: b/w escape codes,  2: color (default), 3: extra color (color all ciphers)
+      --colorblind                  swap green and blue in the output
+-     --debug <0-6>                 1: screen output normal but keeps debug output in /tmp/.  2-6: see "grep -A 5 '^DEBUG=' testssl.sh"
++     --debug <0-6>                 1: screen output normal but keeps debug output in @TERMUX_PREFIX@/tmp/.  2-6: see "grep -A 5 '^DEBUG=' testssl.sh"
+ 
+ file output options (can also be preset via environment variables)
+      --log, --logging              logs stdout to '\${NODE}-p\${port}\${YYYYMMDD-HHMM}.log' in current working directory (cwd)
+@@ -17456,7 +17456,7 @@
+      --outprefix <fname_prefix>    before  '\${NODE}.' above prepend <fname_prefix>
+ 
+ 
+-Options requiring a value can also be called with '=' e.g. testssl.sh -t=smtp --wide --openssl=/usr/bin/openssl <URI>.
++Options requiring a value can also be called with '=' e.g. testssl.sh -t=smtp --wide --openssl=@TERMUX_PREFIX@/bin/openssl <URI>.
+ <URI> always needs to be the last parameter.
+ 
+ EOF
+@@ -17470,9 +17470,9 @@
+ }
+ 
+ maketempf() {
+-     TEMPDIR=$(mktemp -d /tmp/testssl.XXXXXX)
++     TEMPDIR=$(mktemp -d @TERMUX_PREFIX@/tmp/testssl.XXXXXX)
+      if [[ $? -ne 0 ]]; then
+-          # For e.g. devices where we can't write to /tmp we chose $PWD but we can't
++          # For e.g. devices where we can't write to @TERMUX_PREFIX@/tmp we chose $PWD but we can't
+           # allow every char as we haven't quoted all strings depending on it, see #1445
+           if [[ $PWD =~ [^A-Za-z0-9\.,/_-] ]]; then
+                fatal "\$PWD contains illegal chars: \"$BASH_REMATCH\"" $ERR_FCREATE
+@@ -17796,7 +17796,7 @@
+           # check for openssl 1.1.1 config -- not this may not be reliable. We only use this
+           # to suppress the warning (confuses users), see #1119
+           # https://github.com/openssl/openssl/commit/b524b808a1d1ba204dbdcbb42de4e3bddb3472ac
+-          if ! grep -q 'using the .include directive' /etc/ssl/openssl.cnf; then
++          if ! grep -q 'using the .include directive' @TERMUX_PREFIX@/etc/tls/testssl.cnf; then
+                outln
+                pr_warning "No engine or GOST support via engine with your $OPENSSL"; outln
+           fi
+@@ -17806,8 +17806,8 @@
+           return 1
+      else
+           # we have engine support. But we want to check whether an external OPENSSL_CONF was supplied.
+-          # $TESTSSL_INSTALL_DIR/etc/openssl.cnf is an internal presetting, see #1982
+-          if [[ -n "$OPENSSL_CONF" ]] && [[ "$OPENSSL_CONF" != "$TESTSSL_INSTALL_DIR/etc/openssl.cnf" ]]; then
++          # $TESTSSL_INSTALL_DIR/etc/testssl/openssl.cnf is an internal presetting, see #1982
++          if [[ -n "$OPENSSL_CONF" ]] && [[ "$OPENSSL_CONF" != "$TESTSSL_INSTALL_DIR/etc/testssl/openssl.cnf" ]]; then
+                prln_warning "For now I am providing the config file to have GOST support"
+           else
+                OPENSSL_CONF=$TEMPDIR/gost.conf
+@@ -17962,7 +17962,7 @@
+ # arg1 is the entry we want to look up in the host file
+ get_local_aaaa() {
+      local ip6=""
+-     local etchosts="/etc/hosts /c/Windows/System32/drivers/etc/hosts"
++     local etchosts="@TERMUX_PREFIX@/etc/hosts /c/Windows/System32/drivers/etc/hosts"
+ 
+      [[ -z "$1" ]] && echo "" && return 1
+      # Also multiple records should work fine
+@@ -17975,7 +17975,7 @@
+ }
+ get_local_a() {
+      local ip4=""
+-     local etchosts="/etc/hosts /c/Windows/System32/drivers/etc/hosts"
++     local etchosts="@TERMUX_PREFIX@/etc/hosts /c/Windows/System32/drivers/etc/hosts"
+ 
+      ip4=$(grep -wih "$1" $etchosts 2>/dev/null | grep -Ev ':|^#|\.local' | grep -Ei "[[:space:]]$1" | awk '{ print $1 }')
+      if is_ipv4addr "$ip4"; then
+@@ -18605,7 +18605,7 @@
+      elif "$all_failed" && ! "$ALL_FAILED_SOCKETS"; then
+           if ! "$HAS_TLS13" && "$TLS13_ONLY"; then
+                pr_magenta " $NODE:$PORT appears to support TLS 1.3 ONLY. You better use --openssl=<path_to_openssl_supporting_TLS_1.3>"
+-               if ! "$OSSL_SHORTCUT" || [[ ! -x /usr/bin/openssl ]] || /usr/bin/openssl s_client -tls1_3 2>&1 | grep -aiq "unknown option"; then
++               if ! "$OSSL_SHORTCUT" || [[ ! -x @TERMUX_PREFIX@/bin/openssl ]] || @TERMUX_PREFIX@/bin/openssl s_client -tls1_3 2>&1 | grep -aiq "unknown option"; then
+                     outln
+                     ignore_no_or_lame " Type \"yes\" to proceed and accept all scan problems" "yes"
+                     [[ $? -ne 0 ]] && exit $ERR_CLUELESS
+@@ -18614,8 +18614,8 @@
+                     # dirty hack but an idea for the future to be implemented upfront: Now we know, we'll better off
+                     # with the OS supplied openssl binary. We need to inittialize variables / arrays again though.
+                     # And the service detection can't be made up for now
+-                    outln ", \n proceeding with /usr/bin/openssl"
+-                    OPENSSL=/usr/bin/openssl
++                    outln ", \n proceeding with @TERMUX_PREFIX@/bin/openssl"
++                    OPENSSL=@TERMUX_PREFIX@/bin/openssl
+                     find_openssl_binary
+                     prepare_arrays
+                fi
+@@ -18841,9 +18841,9 @@
+           outln "$(out_row_aligned_max_width "$further_ip_addrs" "                         $CORRECT_SPACES" $TERM_WIDTH)"
+      fi
+      if "$LOCAL_A"; then
+-          outln " A record via:          $CORRECT_SPACES /etc/hosts "
++          outln " A record via:          $CORRECT_SPACES @TERMUX_PREFIX@/etc/hosts "
+      elif "$LOCAL_AAAA"; then
+-          outln " AAAA record via:       $CORRECT_SPACES /etc/hosts "
++          outln " AAAA record via:       $CORRECT_SPACES @TERMUX_PREFIX@/etc/hosts "
+      elif  [[ -n "$CMDLINE_IP" ]]; then
+           if is_ipv6addr $"$CMDLINE_IP"; then
+                outln " AAAA record via:       $CORRECT_SPACES supplied IP \"$CMDLINE_IP\""
