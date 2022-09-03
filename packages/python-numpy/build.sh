@@ -1,8 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://numpy.org/
 TERMUX_PKG_DESCRIPTION="The fundamental package for scientific computing with Python"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
-TERMUX_PKG_MAINTAINER="@termux-user-repository"
-# Don't forget to bump the REVISION of python-scipy.
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.23.0
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/numpy/numpy.git
