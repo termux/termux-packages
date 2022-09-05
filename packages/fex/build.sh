@@ -1,8 +1,8 @@
-TERMUX_PKG_HOMEPAGE=https://wiki.fex-emu.org/index.php/Main_Page
+TERMUX_PKG_HOMEPAGE=https://fex-emu.com/
 TERMUX_PKG_DESCRIPTION="Fast x86 emulation frontend"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2208
+TERMUX_PKG_VERSION=2209
 TERMUX_PKG_SRCURL=https://github.com/FEX-Emu/FEX.git
 TERMUX_PKG_GIT_BRANCH=FEX-${TERMUX_PKG_VERSION}
 TERMUX_PKG_DEPENDS="libandroid-shmem, libc++"
@@ -17,8 +17,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686, x86_64"
 
 termux_step_pre_configure() {
-	LDFLAGS+=" -landroid-shmem"
-
 	find $TERMUX_PKG_SRCDIR -name '*.h' -o -name '*.c' -o -name '*.cpp' | \
 		xargs -n 1 sed -i -e 's:"/tmp:"'$TERMUX_PREFIX'/tmp:g'
 
