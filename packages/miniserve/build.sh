@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Tool to serve files and dirs over HTTP"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.20.0"
+TERMUX_PKG_REVISION="1"
 TERMUX_PKG_SRCURL=https://github.com/svenstaro/miniserve/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=77aca0e3660564cc2b9a7f318c5d9065d471f3c5ab0a7d1b6850a5cb6e21904f
 TERMUX_PKG_AUTO_UPDATE=true
@@ -13,14 +14,15 @@ termux_step_pre_configure() {
 	rm -f Makefile
 }
 
+termux_step_post_make_install() {
+	install -Dm644 /dev/null "$TERMUX_PREFIX"/share/bash-completion/completions/miniserve
+	install -Dm644 /dev/null "$TERMUX_PREFIX"/share/zsh/site-functions/_miniserve
+	install -Dm644 /dev/null "$TERMUX_PREFIX"/share/fish/vendor_completions.d/miniserve.fish
+}
+
 termux_step_create_debscripts() {
 	cat <<- EOF > ./postinst
 	#!$TERMUX_PREFIX/bin/sh
-
-	# Generating shell completions.
-	mkdir -p $TERMUX_PREFIX/share/bash-completion/completions
-	mkdir -p $TERMUX_PREFIX/share/zsh/site-functions
-	mkdir -p $TERMUX_PREFIX/share/fish/vendor_completions.d
 
 	miniserve --print-completions bash \
 		> "$TERMUX_PREFIX"/share/bash-completion/completions/miniserve
