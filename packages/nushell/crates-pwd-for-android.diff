@@ -1,0 +1,55 @@
+diff -uNr pwd-1.4.0/src/unix.rs pwd-1.4.0.mod/src/unix.rs
+--- pwd-1.4.0/src/unix.rs
++++ pwd-1.4.0.mod/src/unix.rs
+@@ -1,4 +1,6 @@
+-use libc::{c_char, endpwent, getpwent, getpwnam, getpwuid, getuid, passwd, setpwent};
++use libc::{c_char, getpwnam, getpwuid, getuid, passwd};
++#[cfg(not(target_os = "android"))]
++use libc::{endpwent, getpwent, setpwent};
+ use std::ffi::{CStr, CString};
+ 
+ use crate::errors::{PwdError, Result};
+@@ -40,6 +42,7 @@
+ impl Iterator for PasswdIter {
+     type Item = Passwd;
+ 
++    #[cfg(not(target_os = "android"))]
+     fn next(&mut self) -> Option<Self::Item> {
+         if !self.inited {
+             unsafe {
+@@ -63,6 +66,11 @@
+             None
+         }
+     }
++
++    #[cfg(target_os = "android")]
++    fn next(&mut self) -> Option<Self::Item> {
++        None
++    }
+ }
+ 
+ fn cstr_to_string(cstr: *const c_char) -> Result<String> {
+@@ -86,10 +94,19 @@
+             Some(cstr_to_string(pwd.pw_passwd)?)
+         };
+ 
+-        let gecos = if pwd.pw_gecos.is_null() {
+-            None
+-        } else {
+-            Some(cstr_to_string(pwd.pw_gecos)?)
++        let gecos = {
++            #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
++            {
++                if pwd.pw_gecos.is_null() {
++                    None
++                } else {
++                    Some(cstr_to_string(pwd.pw_gecos)?)
++                }
++            }
++            #[cfg(all(target_os = "android", target_pointer_width = "32"))]
++            {
++                None
++            }
+         };
+ 
+         Ok(Passwd {
