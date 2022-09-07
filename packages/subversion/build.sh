@@ -47,5 +47,5 @@ termux_step_post_make_install() {
 	mkdir -p "perl5/site_perl/$perl_version/${TERMUX_ARCH}-android"
 	mv "x86_64-linux-gnu/perl/$host_perl_version/"* \
 		"perl5/site_perl/$perl_version/${TERMUX_ARCH}-android"
-	rmdir x86_64-linux-gnu/{perl/{"$perl_version/",},}
+	rmdir x86_64-linux-gnu/{perl/{"$host_perl_version/",},}
 }
