@@ -8,48 +8,12 @@ TERMUX_PKG_SHA256=8f44af6dc44cc4146634a4dd5e4cc5470b3052a2337019b870c0e025e8987e
 TERMUX_PKG_DEPENDS="libc++, clang, openssl, lld, zlib, libllvm"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/llvm-* bin/llc bin/opt"
 
-termux_step_configure() {
+termux_step_pre_configure() {
 	termux_setup_cmake
 	termux_setup_rust
 
-	# it breaks building rust tools without doing this because it tries to find
-	# ../lib from bin location:
-	# this is about to get ugly but i have to make sure a rustc in a proper bin lib
-	# configuration is used otherwise it fails a long time into the build...
-	# like 30 to 40 + minutes ... so lets get it right
-
-	# upstream only tests build ver one version behind $TERMUX_PKG_VERSION
-	local BOOTSTRAP_VERSION=1.62.1
-	rustup install $BOOTSTRAP_VERSION
-	rustup default $BOOTSTRAP_VERSION-x86_64-unknown-linux-gnu
-	export PATH=$HOME/.rustup/toolchains/$BOOTSTRAP_VERSION-x86_64-unknown-linux-gnu/bin:$PATH
-	local RUSTC=$(command -v rustc)
-	local CARGO=$(command -v cargo)
-
-	sed "s%\\@TERMUX_PREFIX\\@%$TERMUX_PREFIX%g" \
-		$TERMUX_PKG_BUILDER_DIR/config.toml \
-		| sed "s%\\@TERMUX_STANDALONE_TOOLCHAIN\\@%$TERMUX_STANDALONE_TOOLCHAIN%g" \
-		| sed "s%\\@triple\\@%$CARGO_TARGET_NAME%g" \
-		| sed "s%\\@RUSTC\\@%$RUSTC%g" \
-		| sed "s%\\@CARGO\\@%$CARGO%g" \
-		> config.toml
-
-	local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
-	export ${env_host}_OPENSSL_DIR=$TERMUX_PREFIX
 	export RUST_LIBDIR=$TERMUX_PKG_BUILDDIR/_lib
 	mkdir -p $RUST_LIBDIR
-	export CARGO_TARGET_${env_host}_RUSTFLAGS="-L$RUST_LIBDIR -C link-arg=-l:libgetloadavg.a"
-
-	if [ "$TERMUX_ARCH" == "x86_64" ]; then
-		export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C link-arg=$($CC -print-libgcc-file-name) -C link-arg=-l:libunwind.a"
-	fi
-
-	export X86_64_UNKNOWN_LINUX_GNU_OPENSSL_LIB_DIR=/usr/lib/x86_64-linux-gnu
-	export X86_64_UNKNOWN_LINUX_GNU_OPENSSL_INCLUDE_DIR=/usr/include
-	export PKG_CONFIG_ALLOW_CROSS=1
-	# for backtrace-sys
-	export CC_x86_64_unknown_linux_gnu=gcc
-	export CFLAGS_x86_64_unknown_linux_gnu="-O2"
 
 	export LLVM_VERSION=$(. $TERMUX_SCRIPTDIR/packages/libllvm/build.sh; echo $TERMUX_PKG_VERSION)
 	export LZMA_VERSION=$(. $TERMUX_SCRIPTDIR/packages/liblzma/build.sh; echo $TERMUX_PKG_VERSION)
@@ -90,6 +54,49 @@ termux_step_configure() {
 	$AR rcu $RUST_LIBDIR/libgetloadavg.a getloadavg.o
 }
 
+termux_step_configure() {
+	termux_setup_cmake
+	termux_setup_rust
+
+	# it breaks building rust tools without doing this because it tries to find
+	# ../lib from bin location:
+	# this is about to get ugly but i have to make sure a rustc in a proper bin lib
+	# configuration is used otherwise it fails a long time into the build...
+	# like 30 to 40 + minutes ... so lets get it right
+
+	# upstream only tests build ver one version behind $TERMUX_PKG_VERSION
+	local BOOTSTRAP_VERSION=1.62.1
+	rustup install $BOOTSTRAP_VERSION
+	rustup default $BOOTSTRAP_VERSION-x86_64-unknown-linux-gnu
+	export PATH=$HOME/.rustup/toolchains/$BOOTSTRAP_VERSION-x86_64-unknown-linux-gnu/bin:$PATH
+	local RUSTC=$(command -v rustc)
+	local CARGO=$(command -v cargo)
+
+	sed "s%\\@TERMUX_PREFIX\\@%$TERMUX_PREFIX%g" \
+		$TERMUX_PKG_BUILDER_DIR/config.toml \
+		| sed "s%\\@TERMUX_STANDALONE_TOOLCHAIN\\@%$TERMUX_STANDALONE_TOOLCHAIN%g" \
+		| sed "s%\\@triple\\@%$CARGO_TARGET_NAME%g" \
+		| sed "s%\\@RUSTC\\@%$RUSTC%g" \
+		| sed "s%\\@CARGO\\@%$CARGO%g" \
+		> config.toml
+
+	local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
+	export ${env_host}_OPENSSL_DIR=$TERMUX_PREFIX
+	export RUST_LIBDIR=$TERMUX_PKG_BUILDDIR/_lib
+	export CARGO_TARGET_${env_host}_RUSTFLAGS="-L$RUST_LIBDIR -C link-arg=-l:libgetloadavg.a"
+
+	if [ "$TERMUX_ARCH" == "x86_64" ]; then
+		export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C link-arg=$($CC -print-libgcc-file-name) -C link-arg=-l:libunwind.a"
+	fi
+
+	export X86_64_UNKNOWN_LINUX_GNU_OPENSSL_LIB_DIR=/usr/lib/x86_64-linux-gnu
+	export X86_64_UNKNOWN_LINUX_GNU_OPENSSL_INCLUDE_DIR=/usr/include
+	export PKG_CONFIG_ALLOW_CROSS=1
+	# for backtrace-sys
+	export CC_x86_64_unknown_linux_gnu=gcc
+	export CFLAGS_x86_64_unknown_linux_gnu="-O2"
+}
+
 termux_step_make() {
 	:
 }
@@ -104,7 +111,7 @@ termux_step_make_install() {
 	fi
 
 	#$TERMUX_PKG_SRCDIR/x.py dist --stage 1 --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME || bash
-	$TERMUX_PKG_SRCDIR/x.py install --stage 1 --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME  || bash
+	$TERMUX_PKG_SRCDIR/x.py install --stage 1 --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME || bash
 	$TERMUX_PKG_SRCDIR/x.py install --stage 1 std --target wasm32-unknown-unknown || bash
 	$TERMUX_PKG_SRCDIR/x.py dist rustc-dev --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME --target wasm32-unknown-unknown || bash
 	tar xvf build/dist/rustc-dev-$TERMUX_PKG_VERSION-$CARGO_TARGET_NAME.tar.gz
