@@ -28,7 +28,7 @@ termux_setup_rust() {
 	local ENV_NAME=CARGO_TARGET_${CARGO_TARGET_NAME^^}_LINKER
 	ENV_NAME=${ENV_NAME//-/_}
 	export $ENV_NAME=$CC
-	export TARGET_CFLAGS="$CFLAGS $CPPFLAGS"
+	export TARGET_CFLAGS="${CFLAGS-} $CPPFLAGS"
 	# This was getting applied for the host build of Rust macros or whatever, so
 	# unset it.
 	unset CFLAGS
