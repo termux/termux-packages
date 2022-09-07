@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.nushell.sh
 TERMUX_PKG_DESCRIPTION="A new type of shell operating on structured data"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.67.0"
+TERMUX_PKG_VERSION="0.68.0"
 TERMUX_PKG_SRCURL=https://github.com/nushell/nushell/archive/$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=a8c4c092087d035805781dff11000f2b7c4a44ae487b013f9d0a59c4dc610546
+TERMUX_PKG_SHA256=c170ce2a0fa931194c8169585608747fea0cbf7c957f67c6e2fd54c0c5071c64
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="openssl, zlib"
 TERMUX_PKG_AUTO_UPDATE=true
@@ -31,12 +31,18 @@ termux_step_pre_configure() {
 	: "${CARGO_HOME:=$HOME/.cargo}"
 	export CARGO_HOME
 
+	rm -rf $CARGO_HOME/registry/src/github.com-*/libgit2-sys-*
+	rm -rf $CARGO_HOME/registry/src/github.com-*/pwd-*
 	cargo fetch --target "${CARGO_TARGET_NAME}"
 
 	for d in $CARGO_HOME/registry/src/github.com-*/libgit2-sys-*/libgit2; do
 		patch --silent -p1 -d ${d} \
 			<$TERMUX_SCRIPTDIR/packages/libgit2/src-rand.c.patch || :
 		cp $TERMUX_SCRIPTDIR/packages/libgit2/getloadavg.c ${d}/src/ || :
+	done
+
+	for d in $CARGO_HOME/registry/src/github.com-*/pwd-*; do
+		patch --silent -p1 -d ${d} < $TERMUX_PKG_BUILDER_DIR/crates-pwd-for-android.diff || :
 	done
 
 	mv $TERMUX_PREFIX/lib/libz.so.1{,.tmp}
