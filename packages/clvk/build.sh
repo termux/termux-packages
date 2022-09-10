@@ -2,14 +2,13 @@ TERMUX_PKG_HOMEPAGE=https://github.com/kpet/clvk
 TERMUX_PKG_DESCRIPTION="Experimental implementation of OpenCL on Vulkan"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-_COMMIT=f001d519415f97ca54fd1b37c9a13566e09a5e8e
-_COMMIT_DATE=20220904
-_COMMIT_TIME=103310
-# termux_pkg_upgrade_version edits TERMUX_PKG_VERSION wholly
-TERMUX_PKG_VERSION="0.0.20220904gf001d519"
+_COMMIT=df8b39f9819dff689b2d8a42dd84d1ecdbebee2f
+_COMMIT_DATE=20220905
+_COMMIT_TIME=094010
+TERMUX_PKG_VERSION="0.0.20220905.094010gdf8b39f9"
 TERMUX_PKG_SRCURL=https://github.com/kpet/clvk.git
 TERMUX_PKG_GIT_BRANCH=main
-TERMUX_PKG_BUILD_DEPENDS="vulkan-loader-android, vulkan-headers"
+TERMUX_PKG_BUILD_DEPENDS="vulkan-headers, vulkan-loader-android"
 TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_SUGGESTS="ocl-icd"
 TERMUX_PKG_HOSTBUILD=true
@@ -21,11 +20,33 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 
 # https://github.com/kpet/clvk/blob/main/CMakeLists.txt
 
+# clvk prefers Khronos Vulkan Loader instead of NDK stub
+# Sticking with NDK should expose more Vulkan limitations in Android
+# As noted in build test, failure comes when linking with API 24 libvulkan.so
+# clvk will not work on Android versions older than Android 9 (API 28)
+#
+# [1877/1888] Linking CXX executable api_tests
+# FAILED: api_tests
+# ...
+# libOpenCL.so: error: undefined reference to 'vkGetPhysicalDeviceFeatures2'
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
+-DCLVK_BUILD_TESTS=OFF
+-DCLVK_VULKAN_IMPLEMENTATION=custom
+-DVulkan_INCLUDE_DIRS=$TERMUX_PREFIX/include
+-DVulkan_LIBRARIES=vulkan
+"
+
+# clvk libOpenCL.so has hardcoded clspv bin path at build time
+# clvk cant automatically find clspv from PATH env var
+# and rely on CLVK_CLSPV_BIN env var
+# Use CLVK_CLSPV_ONLINE_COMPILER=ON to combine clspv with clvk
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCLVK_CLSPV_ONLINE_COMPILER=ON"
+
 # clvk currently does not have proper versioning nor releases
 # Use dates and commits as versioning for now
 termux_pkg_auto_update() {
-	local latest_commit
-	latest_commit="$(curl -s https://api.github.com/repos/kpet/clvk/commits | jq .[].sha | head -1 | sed -e 's|\"||g')"
+	local latest_commit latest_commit_date_tz latest_commit_date latest_commit_time latest_version
+	latest_commit=$(curl -s https://api.github.com/repos/kpet/clvk/commits | jq .[].sha | head -1 | sed -e 's|\"||g')
 
 	if [ -z "$latest_commit" ]; then
 		termux_error_exit "ERROR: Unable to get latest commit from upstream"
@@ -36,22 +57,22 @@ termux_pkg_auto_update() {
 		return 0
 	fi
 
-	local latest_commit_date_tz
-	latest_commit_date_tz="$(curl -s https://api.github.com/repos/kpet/clvk/commits/$latest_commit | jq .commit.committer.date | sed -e 's|\"||g')"
+	latest_commit_date_tz=$(curl -s "https://api.github.com/repos/kpet/clvk/commits/$latest_commit" | jq .commit.committer.date | sed -e 's|\"||g')
 
 	if [ -z "$latest_commit_date_tz" ]; then
 		termux_error_exit "ERROR: Unable to get latest commit date info"
 	fi
 
-	local latest_commit_date="$(echo $latest_commit_date_tz | sed -e 's|\(.*\)T\(.*\)Z|\1|' -e 's|\-||g')"
-	local latest_commit_time="$(echo $latest_commit_date_tz | sed -e 's|\(.*\)T\(.*\)Z|\2|' -e 's|\:||g')"
-	local latest_version="0.0.${latest_commit_date}g${latest_commit:0:8}"
+	latest_commit_date=$(echo "$latest_commit_date_tz" | sed -e 's|\(.*\)T\(.*\)Z|\1|' -e 's|\-||g')
+	latest_commit_time=$(echo "$latest_commit_date_tz" | sed -e 's|\(.*\)T\(.*\)Z|\2|' -e 's|\:||g')
 
-	# less likely to happen, not going to include time into an already long versioning
-	if [ "$latest_commit_date" -eq "$_COMMIT_DATE" ] && [ "$latest_commit_time" -gt "$_COMMIT_TIME" ]; then
-		if ! dpkg --compare-versions "$latest_version" gt "$TERMUX_PKG_VERSION"; then
-			termux_error_exit "ERROR: Resulting latest version is not counted as update to the current version ($latest_version < $TERMUX_PKG_VERSION)"
-		fi
+	# https://github.com/termux/termux-packages/issues/11827
+	# really fix it by including longer date time info into versioning
+	# always check this in case upstream change the version format
+	latest_version="0.0.${latest_commit_date}.${latest_commit_time}g${latest_commit:0:8}"
+
+	if ! dpkg --compare-versions "$latest_version" gt "$TERMUX_PKG_VERSION"; then
+		termux_error_exit "ERROR: Resulting latest version is not counted as update to the current version ($latest_version < $TERMUX_PKG_VERSION)"
 	fi
 
 	# unlikely to happen
@@ -69,32 +90,9 @@ termux_pkg_auto_update() {
 	termux_pkg_upgrade_version "$latest_version" --skip-version-check
 }
 
-# clvk prefers Khronos Vulkan Loader than the one come from NDK
-# Sticking with NDK should expose more Vulkan limitations in Android (like below)
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
--DCLVK_VULKAN_IMPLEMENTATION=custom
--DVulkan_INCLUDE_DIRS=$TERMUX_PREFIX/include
--DVulkan_LIBRARIES=vulkan
-"
-
-# clvk build test fail when linking with API 24 libvulkan.so
-# clvk likely wont work on Android versions older than Android 9 (API 28)
-#
-# [1877/1888] Linking CXX executable api_tests
-# FAILED: api_tests
-# ...
-# libOpenCL.so: error: undefined reference to 'vkGetPhysicalDeviceFeatures2'
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCLVK_BUILD_TESTS=OFF"
-
-# clvk libOpenCL.so has a hardcoded path clspv bin at build time
-# clvk cant automatically find clspv from PATH env var
-# and rely on CLVK_CLSPV_BIN env var
-# Use CLVK_CLSPV_ONLINE_COMPILER=1 to combine clspv with clvk
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCLVK_CLSPV_ONLINE_COMPILER=1"
-
 termux_step_post_get_source() {
 	git fetch --unshallow
-	git reset --hard ${_COMMIT}
+	git reset --hard $_COMMIT
 	git submodule deinit --force --all
 	git submodule update --init --recursive
 	./external/clspv/utils/fetch_sources.py --deps llvm
@@ -117,21 +115,21 @@ termux_step_host_build() {
 
 termux_step_pre_configure() {
 	# from packages/libllvm/build.sh
-	export LLVM_DEFAULT_TARGET_TRIPLE=${CCTERMUX_HOST_PLATFORM/-/-unknown-}
-	export LLVM_TARGET_ARCH
+	export _LLVM_DEFAULT_TARGET_TRIPLE=${CCTERMUX_HOST_PLATFORM/-/-unknown-}
+	export _LLVM_TARGET_ARCH
 	if [ "$TERMUX_ARCH" = arm ]; then
-		LLVM_TARGET_ARCH=ARM
+		_LLVM_TARGET_ARCH=ARM
 	elif [ "$TERMUX_ARCH" = aarch64 ]; then
-		LLVM_TARGET_ARCH=AArch64
+		_LLVM_TARGET_ARCH=AArch64
 	elif [ "$TERMUX_ARCH" = i686 ] || [ "$TERMUX_ARCH" = x86_64 ]; then
-		LLVM_TARGET_ARCH=X86
+		_LLVM_TARGET_ARCH=X86
 	else
 		termux_error_exit "Invalid arch: $TERMUX_ARCH"
 	fi
 
-	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_TARGET_ARCH=$LLVM_TARGET_ARCH"
-	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_TARGETS_TO_BUILD=$LLVM_TARGET_ARCH"
-	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_HOST_TRIPLE=$LLVM_DEFAULT_TARGET_TRIPLE"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_TARGET_ARCH=$_LLVM_TARGET_ARCH"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_TARGETS_TO_BUILD=$_LLVM_TARGET_ARCH"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_HOST_TRIPLE=$_LLVM_DEFAULT_TARGET_TRIPLE"
 
 	# TERMUX_DEBUG_BUILD doesnt really have somewhere in between
 	#TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCMAKE_BUILD_TYPE=RelWithDebInfo"
@@ -139,7 +137,7 @@ termux_step_pre_configure() {
 }
 
 termux_step_make_install() {
-	# clvk has a very basic install rule
+	# clvk does not have proper install rule yet
 	install -Dm644 "$TERMUX_PKG_BUILDDIR/libOpenCL.so" "$TERMUX_PREFIX/lib/clvk/libOpenCL.so"
 
 	echo "$TERMUX_PREFIX/lib/clvk/libOpenCL.so" > "$TERMUX_PKG_TMPDIR/clvk.icd"
