@@ -25,7 +25,7 @@ jobs:
   build:
     permissions:
       contents: read # actions/upload-artifact doesn't need contents: write
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     env:
       ANDROID_HOME: "/opt/termux/android-sdk"
       NDK: "/opt/termux/android-ndk"
@@ -75,12 +75,12 @@ jobs:
 
           # Build local Docker image if setup scripts were changed.
           # Useful for pull requests submitting changes for both build environment and packages.
-          if grep -qP '^scripts/(Dockerfile|setup-android-sdk\.sh|setup-ubuntu\.sh)$' <<< "$CHANGED_FILES"; then
-            echo "Detected changes for environment setup scripts. Building custom Docker image now."
-            cd ./scripts
-            docker build -t ghcr.io/termux/package-builder:latest .
-            cd ..
-          fi
+          #if grep -qP '^scripts/(Dockerfile|setup-android-sdk\.sh|setup-ubuntu\.sh)$' <<< "$CHANGED_FILES"; then
+          #  echo "Detected changes for environment setup scripts. Building custom Docker image now."
+          #  cd ./scripts
+          #  docker build -t ghcr.io/termux/package-builder:latest .
+          #  cd ..
+          #fi
 
           for repo_path in $(jq --raw-output 'keys | .[]' repo.json); do
             repo=$(jq --raw-output '.["'${repo_path}'"].name' repo.json)
@@ -176,6 +176,11 @@ jobs:
           ./scripts/lint-packages.sh $package_recipes
         fi
 
+    - name: Setup build environment
+      run: |
+        ./scripts/setup-ubuntu.sh
+        ./scripts/setup-android-sdk.sh
+
     - name: Build packages
       run: |
         declare -a packages
@@ -188,7 +193,7 @@ jobs:
         done
 
         if [ ! -z "$packages" ]; then
-          ./scripts/run-docker.sh ./build-package.sh -I -a ${{ matrix.target_arch }} $packages
+          ./build-package.sh -I -a ${{ matrix.target_arch }} $packages
         fi
 
     - name: Generate build artifacts

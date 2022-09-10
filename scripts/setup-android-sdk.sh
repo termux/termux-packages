@@ -36,6 +36,11 @@ if [ ! -d "$ANDROID_HOME" ]; then
 
 	# Remove unused parts
 	rm -Rf android-sdk-$TERMUX_SDK_REVISION/{emulator*,lib*,proguard,templates}
+
+	# Rename if ANDROID_HOME is set by user
+	if [ "$(basename "$ANDROID_HOME")" != "android-sdk-$TERMUX_SDK_REVISION" ]; then
+		mv -v "android-sdk-$TERMUX_SDK_REVISION" "$ANDROID_HOME"
+	fi
 fi
 
 if [ ! -d "$NDK" ]; then
@@ -53,6 +58,11 @@ if [ ! -d "$NDK" ]; then
 
 	# Remove unused parts
 	rm -Rf android-ndk-r$TERMUX_NDK_VERSION/sources/cxx-stl/system
+
+	# Rename if NDK is set by user
+	if [ "$(basename "$NDK")" != "android-ndk-r$TERMUX_NDK_VERSION" ]; then
+		mv -v "android-ndk-r$TERMUX_NDK_VERSION" "$NDK"
+	fi
 fi
 
 if [ -x "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" ]; then
