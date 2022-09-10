@@ -3,12 +3,12 @@ TERMUX_PKG_DESCRIPTION="Open Source Computer Vision Library"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=(4.6.0)
-TERMUX_PKG_VERSION+=(1.22.3) # NumPy version
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_VERSION+=(1.23.3) # NumPy version
+TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=(https://github.com/opencv/opencv/archive/${TERMUX_PKG_VERSION}.tar.gz
                    https://github.com/numpy/numpy/archive/refs/tags/v${TERMUX_PKG_VERSION[1]}.tar.gz)
 TERMUX_PKG_SHA256=(1ec1cba65f9f20fe5a41fda1586e01c70ea0c9a6d7b67c9e13edf0cfe2239277
-                   c8f3ec591e3f17b939220f2b9eabb4c5e2db330f8af62c0a3aeee8a4d1a6c0db)
+                   d55da69341fd6e617ada55feec6798730457f26f08300956625c086499aced7e)
 TERMUX_PKG_DEPENDS="libc++, libjpeg-turbo, libpng, libprotobuf, libtiff, libwebp, openjpeg, openjpeg-tools, zlib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DANDROID_NO_TERMUX=OFF
@@ -58,7 +58,7 @@ termux_step_pre_configure() {
 	LDFLAGS+=" -lpython${_PYTHON_VERSION}"
 	export NPY_DISABLE_SVML=1
 	pushd $TERMUX_PKG_SRCDIR/numpy
-	pip install .
+	MATHLIB=m pip install .
 	popd
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
 		-DPYTHON_DEFAULT_EXECUTABLE=python
