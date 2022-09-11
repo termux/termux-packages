@@ -1,10 +1,11 @@
-termux_setup_toolchain_25() {
+termux_setup_toolchain_25b() {
 	export CFLAGS=""
 	export CPPFLAGS=""
 	export LDFLAGS="-L${TERMUX_PREFIX}/lib"
 
 	export AS=$TERMUX_HOST_PLATFORM-clang
 	export CC=$TERMUX_HOST_PLATFORM-clang
+	export CPP=$TERMUX_HOST_PLATFORM-cpp
 	export CXX=$TERMUX_HOST_PLATFORM-clang++
 	export LD=ld.lld
 	export AR=llvm-ar
@@ -145,6 +146,11 @@ termux_setup_toolchain_25() {
 		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT$TERMUX_PKG_API_LEVEL-clang++ \
 			$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang++
 
+		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT$TERMUX_PKG_API_LEVEL-clang \
+			$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-cpp
+		sed -i 's|"$bin_dir/clang"|& -E|' \
+			$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-cpp
+
 		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang \
 			$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-gcc
 		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang++ \
@@ -155,6 +161,8 @@ termux_setup_toolchain_25() {
 		$_TERMUX_TOOLCHAIN_TMPDIR/bin/arm-linux-androideabi-clang
 	cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL-clang++ \
 		$_TERMUX_TOOLCHAIN_TMPDIR/bin/arm-linux-androideabi-clang++
+	cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/armv7a-linux-androideabi-cpp \
+		$_TERMUX_TOOLCHAIN_TMPDIR/bin/arm-linux-androideabi-cpp
 
 	# Create a pkg-config wrapper. We use path to host pkg-config to
 	# avoid picking up a cross-compiled pkg-config later on.
