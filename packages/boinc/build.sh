@@ -2,20 +2,20 @@ TERMUX_PKG_HOMEPAGE=https://boinc.berkeley.edu/
 TERMUX_PKG_DESCRIPTION="Open-source software for volunteer computing"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=7.18.1
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_VERSION=7.20.2
 TERMUX_PKG_SRCURL=https://github.com/BOINC/boinc/archive/client_release/${TERMUX_PKG_VERSION:0:4}/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=274388d9c49e488b6c8502ffc6eb605d5ceae391fb0c2fc56dbb0254d0ceb27e
+TERMUX_PKG_SHA256=e577072b06f590d3230c25c94b221dba528b0938681e645bbd870778f8958077
 TERMUX_PKG_DEPENDS="libandroid-execinfo, libandroid-shmem, libc++, libcurl, openssl, zlib"
-TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_NO_STATICSPLIT=true
-
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-server
 --disable-manager
 "
 
-TERMUX_PKG_CONFFILES="etc/boinc-client.conf"
+# etc/boinc-client.conf is not for Android, extra hooks needed to work
+TERMUX_PKG_RM_AFTER_INSTALL="
+etc/boinc-client.conf
+"
 
 termux_step_pre_configure() {
 	# for benchmark purposes
