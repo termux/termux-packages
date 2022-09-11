@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="The fundamental package for scientific computing with Py
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.23.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/numpy/numpy.git
 TERMUX_PKG_DEPENDS="libc++, python"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -51,6 +52,17 @@ termux_step_make_install() {
 		fi
 	done
 	test -n "${_NUMPY_EGGDIR}"
+
+	# XXX: Fix the EXT_SUFFIX. More investigation is needed to find the underlying cause.
+	pushd "${_NUMPY_EGGDIR}"
+	local old_suffix=".cpython-310-$TERMUX_HOST_PLATFORM.so"
+	local new_suffix=".cpython-310.so"
+
+	find . \
+		-name '*'"$old_suffix" \
+		-exec sh -c '_f="{}"; mv -- "$_f" "${_f%'"$old_suffix"'}'"$new_suffix"'"' \;
+	popd
+
 	popd
 }
 
