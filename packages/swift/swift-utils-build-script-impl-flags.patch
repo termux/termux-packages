@@ -26,6 +26,14 @@ index b1d060328bc..218c9215260 100755
                      )
                  fi
  
+@@ -2035,6 +2035,7 @@ for host in "${ALL_HOSTS[@]}"; do
+                     -DSWIFT_TOOLS_ENABLE_LTO:STRING="${SWIFT_TOOLS_ENABLE_LTO}"
+                     -DSWIFT_BUILD_RUNTIME_WITH_HOST_COMPILER:BOOL=$(true_false "${BUILD_RUNTIME_WITH_HOST_COMPILER}")
+                     -DLIBDISPATCH_CMAKE_BUILD_TYPE:STRING="${LIBDISPATCH_BUILD_TYPE}"
++                    -DSWIFT_CLANG_RESOURCE_DIR_SYMLINK_INSTALL_TARGET:STRING="../clang/${TERMUX_CLANG_VERSION}"
+                     "${swift_cmake_options[@]}"
+                 )
+ 
 @@ -2045,6 +2045,8 @@ for host in "${ALL_HOSTS[@]}"; do
                      cmake_options+=(
                          -DCMAKE_FIND_ROOT_PATH:PATH="${CROSS_COMPILE_DEPS_PATH}"

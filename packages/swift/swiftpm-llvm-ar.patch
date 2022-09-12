@@ -1,0 +1,324 @@
+commit e3a61c0c348646993d129bc39d13c938da3017b3
+Author: Saleem Abdulrasool <compnerd@compnerd.org>
+Date:   Tue Aug 16 13:04:44 2022 -0700
+
+    Build: initial pass to support static archives on Windows (#5720)
+    
+    Introduce a SPM controlled build rule for building static libraries.
+    This is the intended way to use llbuild to drive the generation of
+    static libraries.  We would previously rely on the static default
+    rule intended for testing to generate the static libraries.  Not only
+    did this tool not properly support Windows, it would actually cause
+    problems on macOS due to the use of `ar` for the creation of the library
+    over the preferred tool - `libtool`.  We now locally determine the
+    correct rule and generate the command.
+    
+    This is incomplete support for Windows and in fact regresses
+    functionality.  We no longer honour `AR` as an environment variable on
+    Windows and thus cannot switch the implementation of the librarian.  We
+    now drive the archiving through `lld-link` unconditionally while we
+    should prefer `link` unless otherwise requested.  This is covered as
+    an issue in #5719.
+
+diff --git a/swiftpm/Sources/Build/BuildPlan.swift b/swiftpm/Sources/Build/BuildPlan.swift
+index 23aedc70..a70003b5 100644
+--- a/swiftpm/Sources/Build/BuildPlan.swift
++++ b/swiftpm/Sources/Build/BuildPlan.swift
+@@ -1344,6 +1344,19 @@ public final class ProductBuildDescription {
+         }
+     }
+ 
++    /// The arguments to the librarian to create a static library.
++    public func archiveArguments() throws -> [String] {
++        let librarian = buildParameters.toolchain.librarianPath.pathString
++        let triple = buildParameters.triple
++        if triple.isWindows(), librarian.hasSuffix("link") || librarian.hasSuffix("link.exe") {
++            return [librarian, "/LIB", "/OUT:\(binary.pathString)", "@\(linkFileListPath.pathString)"]
++        }
++        if triple.isDarwin(), librarian.hasSuffix("libtool") {
++            return [librarian, "-o", binary.pathString, "@\(linkFileListPath.pathString)"]
++        }
++        return [librarian, "crs", binary.pathString, "@\(linkFileListPath.pathString)"]
++    }
++
+     /// The arguments to link and create this product.
+     public func linkArguments() throws -> [String] {
+         var args = [buildParameters.toolchain.swiftCompilerPath.pathString]
+diff --git a/swiftpm/Sources/Build/LLBuildManifestBuilder.swift b/swiftpm/Sources/Build/LLBuildManifestBuilder.swift
+index 4ca69495..47a4d0dc 100644
+--- a/swiftpm/Sources/Build/LLBuildManifestBuilder.swift
++++ b/swiftpm/Sources/Build/LLBuildManifestBuilder.swift
+@@ -853,14 +853,17 @@ extension LLBuildManifestBuilder {
+     private func createProductCommand(_ buildProduct: ProductBuildDescription) throws {
+         let cmdName = try buildProduct.product.getCommandName(config: buildConfig)
+ 
+-        // Create archive tool for static library and shell tool for rest of the products.
+-        if buildProduct.product.type == .library(.static) {
+-            manifest.addArchiveCmd(
++        switch buildProduct.product.type {
++        case .library(.static):
++            manifest.addShellCmd(
+                 name: cmdName,
++                description: "Archiving \(buildProduct.binary.prettyPath())",
+                 inputs: buildProduct.objects.map(Node.file),
+-                outputs: [.file(buildProduct.binary)]
++                outputs: [.file(buildProduct.binary)],
++                arguments: try buildProduct.archiveArguments()
+             )
+-        } else {
++
++        default:
+             let inputs = buildProduct.objects + buildProduct.dylibs.map({ $0.binary })
+ 
+             manifest.addShellCmd(
+diff --git a/swiftpm/Sources/LLBuildManifest/BuildManifest.swift b/swiftpm/Sources/LLBuildManifest/BuildManifest.swift
+index dde10b7d..77e3a114 100644
+--- a/swiftpm/Sources/LLBuildManifest/BuildManifest.swift
++++ b/swiftpm/Sources/LLBuildManifest/BuildManifest.swift
+@@ -88,16 +88,6 @@ public struct BuildManifest {
+         commands[name] = Command(name: name, tool: tool)
+     }
+ 
+-    public mutating func addArchiveCmd(
+-        name: String,
+-        inputs: [Node],
+-        outputs: [Node]
+-    ) {
+-        assert(commands[name] == nil, "already had a command named '\(name)'")
+-        let tool = ArchiveTool(inputs: inputs, outputs: outputs)
+-        commands[name] = Command(name: name, tool: tool)
+-    }
+-
+     public mutating func addShellCmd(
+         name: String,
+         description: String,
+diff --git a/swiftpm/Sources/PackageModel/Toolchain.swift b/swiftpm/Sources/PackageModel/Toolchain.swift
+index 1c2b34ed..c932742f 100644
+--- a/swiftpm/Sources/PackageModel/Toolchain.swift
++++ b/swiftpm/Sources/PackageModel/Toolchain.swift
+@@ -13,6 +13,9 @@
+ import TSCBasic
+ 
+ public protocol Toolchain {
++    /// Path of the librarian.
++    var librarianPath: AbsolutePath { get }
++
+     /// Path of the `swiftc` compiler.
+     var swiftCompilerPath: AbsolutePath { get }
+ 
+diff --git a/swiftpm/Sources/PackageModel/ToolchainConfiguration.swift b/swiftpm/Sources/PackageModel/ToolchainConfiguration.swift
+index 00968aa8..7e377e29 100644
+--- a/swiftpm/Sources/PackageModel/ToolchainConfiguration.swift
++++ b/swiftpm/Sources/PackageModel/ToolchainConfiguration.swift
+@@ -18,6 +18,9 @@ import TSCBasic
+ /// These requirements are abstracted out to make it easier to add support for
+ /// using the package manager with alternate toolchains in the future.
+ public struct ToolchainConfiguration {
++    /// The path of the librarian.
++    public var librarianPath: AbsolutePath
++
+     /// The path of the swift compiler.
+     public var swiftCompilerPath: AbsolutePath
+ 
+@@ -43,13 +46,15 @@ public struct ToolchainConfiguration {
+     /// Creates the set of manifest resources associated with a `swiftc` executable.
+     ///
+     /// - Parameters:
+-    ///     - swiftCompilerPath: The absolute path of the associated swift compiler  executable (`swiftc`).
++    ///     - librarianPath: The absolute path to the librarian
++    ///     - swiftCompilerPath: The absolute path of the associated swift compiler executable (`swiftc`).
+     ///     - swiftCompilerFlags: Extra flags to pass to the Swift compiler.
+     ///     - swiftCompilerEnvironment: Environment variables to pass to the Swift compiler.
+     ///     - swiftPMLibrariesRootPath: Custom path for SwiftPM libraries. Computed based on the compiler path by default.
+     ///     - sdkRootPath: Optional path to SDK root.
+     ///     - xctestPath: Optional path to XCTest.
+     public init(
++        librarianPath: AbsolutePath,
+         swiftCompilerPath: AbsolutePath,
+         swiftCompilerFlags: [String] = [],
+         swiftCompilerEnvironment: EnvironmentVariables = .process(),
+@@ -61,6 +66,7 @@ public struct ToolchainConfiguration {
+             return .init(swiftCompilerPath: swiftCompilerPath)
+         }()
+ 
++        self.librarianPath = librarianPath
+         self.swiftCompilerPath = swiftCompilerPath
+         self.swiftCompilerFlags = swiftCompilerFlags
+         self.swiftCompilerEnvironment = swiftCompilerEnvironment
+diff --git a/swiftpm/Sources/PackageModel/UserToolchain.swift b/swiftpm/Sources/PackageModel/UserToolchain.swift
+index a5248401..1e1c0bb6 100644
+--- a/swiftpm/Sources/PackageModel/UserToolchain.swift
++++ b/swiftpm/Sources/PackageModel/UserToolchain.swift
+@@ -28,6 +28,9 @@ public final class UserToolchain: Toolchain {
+     /// The toolchain configuration.
+     private let configuration: ToolchainConfiguration
+ 
++    /// Path of the librarian.
++    public let librarianPath: AbsolutePath
++
+     /// Path of the `swiftc` compiler.
+     public let swiftCompilerPath: AbsolutePath
+ 
+@@ -113,6 +116,43 @@ public final class UserToolchain: Toolchain {
+ 
+     // MARK: - public API
+ 
++    public static func determineLibrarian(triple: Triple, binDir: AbsolutePath,
++                                          useXcrun: Bool,
++                                          environment: EnvironmentVariables,
++                                          searchPaths: [AbsolutePath]) throws
++            -> AbsolutePath {
++        let variable: String = triple.isDarwin() ? "LIBTOOL" : "AR"
++        let tool: String = {
++            if triple.isDarwin() { return "libtool" }
++            if triple.isWindows() {
++                if let librarian: AbsolutePath =
++                        UserToolchain.lookup(variable: "AR",
++                                             searchPaths: searchPaths,
++                                             environment: environment) {
++                    return librarian.basename
++                }
++                // TODO(5719) use `lld-link` if the build requests lld.
++                return "link"
++            }
++            // TODO(compnerd) consider defaulting to `llvm-ar` universally with
++            // a fallback to `ar`.
++            return triple.isAndroid() ? "llvm-ar" : "ar"
++        }()
++
++        if let librarian: AbsolutePath = UserToolchain.lookup(variable: variable,
++                                                              searchPaths: searchPaths,
++                                                              environment: environment) {
++            if localFileSystem.isExecutableFile(librarian) {
++                return librarian
++            }
++        }
++
++        if let librarian = try? UserToolchain.getTool(tool, binDir: binDir) {
++            return librarian
++        }
++        return try UserToolchain.findTool(tool, envSearchPaths: searchPaths, useXcrun: useXcrun)
++    }
++
+     /// Determines the Swift compiler paths for compilation and manifest parsing.
+     public static func determineSwiftCompilers(binDir: AbsolutePath, useXcrun: Bool, environment: EnvironmentVariables, searchPaths: [AbsolutePath]) throws -> SwiftCompilers {
+         func validateCompiler(at path: AbsolutePath?) throws {
+@@ -339,6 +379,8 @@ public final class UserToolchain: Toolchain {
+         // Use the triple from destination or compute the host triple using swiftc.
+         var triple = destination.target ?? Triple.getHostTriple(usingSwiftCompiler: swiftCompilers.compile)
+ 
++        self.librarianPath = try UserToolchain.determineLibrarian(triple: triple, binDir: binDir, useXcrun: useXcrun, environment: environment, searchPaths: envSearchPaths)
++
+         // Change the triple to the specified arch if there's exactly one of them.
+         // The Triple property is only looked at by the native build system currently.
+         if archs.count == 1 {
+@@ -400,6 +442,7 @@ public final class UserToolchain: Toolchain {
+         }
+ 
+         self.configuration = .init(
++            librarianPath: librarianPath,
+             swiftCompilerPath: swiftCompilers.manifest,
+             swiftCompilerFlags: self.extraSwiftCFlags,
+             swiftCompilerEnvironment: environment,
+diff --git a/swiftpm/Tests/BuildTests/BuildPlanTests.swift b/swiftpm/Tests/BuildTests/BuildPlanTests.swift
+index 166667d4..804bd5a0 100644
+--- a/swiftpm/Tests/BuildTests/BuildPlanTests.swift
++++ b/swiftpm/Tests/BuildTests/BuildPlanTests.swift
+@@ -3227,6 +3227,77 @@ final class BuildPlanTests: XCTestCase {
+             """))
+     }
+ 
++    func testArchiving() throws {
++        let fs = InMemoryFileSystem(emptyFiles:
++            "/Package/Sources/rary/rary.swift"
++        )
++
++        let observability = ObservabilitySystem.makeForTesting()
++        let graph = try loadPackageGraph(
++            fileSystem: fs,
++            manifests: [
++                Manifest.createRootManifest(
++                    name: "Package",
++                    path: .init("/Package"),
++                    products: [
++                        ProductDescription(name: "rary", type: .library(.static), targets: ["rary"]),
++                    ],
++                    targets: [
++                        TargetDescription(name: "rary", dependencies: []),
++                    ]
++                ),
++            ],
++            observabilityScope: observability.topScope
++        )
++        XCTAssertNoDiagnostics(observability.diagnostics)
++
++        let result = try BuildPlanResult(plan: BuildPlan(
++            buildParameters: mockBuildParameters(),
++            graph: graph,
++            fileSystem: fs,
++            observabilityScope: observability.topScope
++        ))
++
++        let buildPath: AbsolutePath = result.plan.buildParameters.dataPath.appending(components: "debug")
++
++        let yaml = fs.tempDirectory.appending(components: UUID().uuidString, "debug.yaml")
++        try fs.createDirectory(yaml.parentDirectory, recursive: true)
++
++        let llbuild = LLBuildManifestBuilder(result.plan, fileSystem: fs, observabilityScope: observability.topScope)
++        try llbuild.generateManifest(at: yaml)
++
++        let contents: String = try fs.readFileContents(yaml)
++
++        if result.plan.buildParameters.triple.isWindows() {
++            XCTAssertMatch(contents, .contains("""
++              "C.rary-debug.a":
++                tool: shell
++                inputs: ["\(buildPath.appending(components: "rary.build", "rary.swift.o").escapedPathString())","\(buildPath.appending(components: "rary.build", "rary.swiftmodule.o").escapedPathString())"]
++                outputs: ["\(buildPath.appending(components: "library.a").escapedPathString())"]
++                description: "Archiving \(buildPath.appending(components: "library.a").escapedPathString())"
++                args: ["\(result.plan.buildParameters.toolchain.librarianPath.escapedPathString())","/LIB","/OUT:\(buildPath.appending(components: "library.a").escapedPathString())","@\(buildPath.appending(components: "rary.product", "Objects.LinkFileList").escapedPathString())"]
++            """))
++        } else if result.plan.buildParameters.triple.isDarwin() {
++            XCTAssertMatch(contents, .contains("""
++              "C.rary-debug.a":
++                tool: shell
++                inputs: ["\(buildPath.appending(components: "rary.build", "rary.swift.o").escapedPathString())"]
++                outputs: ["\(buildPath.appending(components: "library.a").escapedPathString())"]
++                description: "Archiving \(buildPath.appending(components: "library.a").escapedPathString())"
++                args: ["\(result.plan.buildParameters.toolchain.librarianPath.escapedPathString())","-o","\(buildPath.appending(components: "library.a").escapedPathString())","@\(buildPath.appending(components: "rary.product", "Objects.LinkFileList").escapedPathString())"]
++            """))
++        } else {    // assume Unix `ar` is the librarian
++            XCTAssertMatch(contents, .contains("""
++              "C.rary-debug.a":
++                tool: shell
++                inputs: ["\(buildPath.appending(components: "rary.build", "rary.swift.o").escapedPathString())","\(buildPath.appending(components: "rary.build", "rary.swiftmodule.o").escapedPathString())"]
++                outputs: ["\(buildPath.appending(components: "library.a").escapedPathString())"]
++                description: "Archiving \(buildPath.appending(components: "library.a").escapedPathString())"
++                args: ["\(result.plan.buildParameters.toolchain.librarianPath.escapedPathString())","crs","\(buildPath.appending(components: "library.a").escapedPathString())","@\(buildPath.appending(components: "rary.product", "Objects.LinkFileList").escapedPathString())"]
++            """))
++        }
++    }
++
+     func testSwiftBundleAccessor() throws {
+         // This has a Swift and ObjC target in the same package.
+         let fs = InMemoryFileSystem(emptyFiles:
+diff --git a/swiftpm/Tests/BuildTests/MockBuildTestHelper.swift b/swiftpm/Tests/BuildTests/MockBuildTestHelper.swift
+index 90e9ec6d..e91ce847 100644
+--- a/swiftpm/Tests/BuildTests/MockBuildTestHelper.swift
++++ b/swiftpm/Tests/BuildTests/MockBuildTestHelper.swift
+@@ -7,6 +7,15 @@ import TSCBasic
+ import XCTest
+ 
+ struct MockToolchain: PackageModel.Toolchain {
++#if os(Windows)
++    let librarianPath = AbsolutePath("/fake/path/to/link.exe")
++#elseif os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
++    let librarianPath = AbsolutePath("/fake/path/to/libtool")
++#elseif os(Android)
++    let librarianPath = AbsolutePath("/fake/path/to/llvm-ar")
++#else
++    let librarianPath = AbsolutePath("/fake/path/to/ar")
++#endif
+     let swiftCompilerPath = AbsolutePath("/fake/path/to/swiftc")
+     let extraCCFlags: [String] = []
+     let extraSwiftCFlags: [String] = []

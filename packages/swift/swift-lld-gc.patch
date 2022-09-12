@@ -25,30 +25,3 @@ index dc14e7782c79a..6f85e245a002e 100644
    }
  
    // Configure the toolchain.
-From 546768bb95b0bcc3fb480525f269d838c76da530 Mon Sep 17 00:00:00 2001
-Date: Sun, 14 Aug 2022 16:10:36 +0530
-Subject: [PATCH] Work around lld 13+ issue with --gc-sections for ELF by
- adding -z nostart-stop-gc
-
-diff --git a/swift-driver/Sources/SwiftDriver/Jobs/GenericUnixToolchain+LinkerSupport.swift b/swift-driver/Sources/SwiftDriver/Jobs/GenericUnixToolchain+LinkerSupport.swift
-index ff2799a82..c274901b3 100644
---- a/swift-driver/Sources/SwiftDriver/Jobs/GenericUnixToolchain+LinkerSupport.swift
-+++ b/swift-driver/Sources/SwiftDriver/Jobs/GenericUnixToolchain+LinkerSupport.swift
-@@ -84,6 +84,17 @@ extension GenericUnixToolchain {
-         #else
-         commandLine.appendFlag("-fuse-ld=\(linker)")
-         #endif
-+        // Starting with lld 13, Swift stopped working with the lld
-+        // --gc-sections implementation for ELF, unless -z nostart-stop-gc is
-+        // also passed to lld:
-+        //
-+        // https://reviews.llvm.org/D96914
-+        if linker == "lld" || linker.hasSuffix("ld.lld") {
-+          commandLine.appendFlag(.Xlinker)
-+          commandLine.appendFlag("-z")
-+          commandLine.appendFlag(.Xlinker)
-+          commandLine.appendFlag("nostart-stop-gc")
-+        }
-       }
- 
-       // Configure the toolchain.
