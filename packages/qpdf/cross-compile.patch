@@ -1,0 +1,33 @@
+From 796a20f9489f80552465209ef90f565ad2531215 Mon Sep 17 00:00:00 2001
+From: Uchiha Kakashi <45286352+licy183@users.noreply.github.com>
+Date: Mon, 12 Sep 2022 14:08:08 +0800
+Subject: [PATCH] Fix CMake Error when cross-compiling
+
+---
+ libqpdf/CMakeLists.txt | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
+
+diff --git a/libqpdf/CMakeLists.txt b/libqpdf/CMakeLists.txt
+index 1323e60ce..89d9c43f3 100644
+--- a/libqpdf/CMakeLists.txt
++++ b/libqpdf/CMakeLists.txt
+@@ -402,9 +402,16 @@ int main(int argc, char* argv[]) {
+ }"
+     HAVE_OPEN_MEMSTREAM)
+ 
+-qpdf_check_ll_fmt("%lld" fmt_lld)
+-qpdf_check_ll_fmt("%I64d" fmt_i64d)
+-qpdf_check_ll_fmt("%I64lld" fmt_i64lld)
++if (NOT CMAKE_CROSSCOMPILING)
++  qpdf_check_ll_fmt("%lld" fmt_lld)
++  qpdf_check_ll_fmt("%I64d" fmt_i64d)
++  qpdf_check_ll_fmt("%I64lld" fmt_i64lld)
++else()
++  if (NOT DEFINED LL_FMT)
++    message(WARNING "Assuming LL_FMT is '%lld' as we are cross-compiling. This may be wrong. Please set LL_FMT if needed.")
++    set(LL_FMT "%lld")
++  endif()
++endif()
+ 
+ configure_file(
+   "${CMAKE_CURRENT_SOURCE_DIR}/qpdf/qpdf-config.h.in"
