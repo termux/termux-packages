@@ -14,24 +14,24 @@
 @@ -287,7 +287,7 @@
    if (Triple.getVendor() == llvm::Triple::OpenEmbedded &&
        Triple.isArch64Bit())
-     addPathIfExists(D, SysRoot + "/usr/" + OSLibDir, Paths);
+     addPathIfExists(D, concat(SysRoot, "/usr", OSLibDir), Paths);
 -  else
 +  else if (!IsAndroid)
-     addPathIfExists(D, SysRoot + "/usr/lib/../" + OSLibDir, Paths);
+     addPathIfExists(D, concat(SysRoot, "/usr/lib/..", OSLibDir), Paths);
    if (IsRISCV) {
      StringRef ABIName = tools::riscv::getRISCVABI(Args, Triple);
 @@ -311,7 +311,15 @@
-   }
+     addPathIfExists(D, D.Dir + "/../lib", Paths);
  
-   addPathIfExists(D, SysRoot + "/lib", Paths);
--  addPathIfExists(D, SysRoot + "/usr/lib", Paths);
+   addPathIfExists(D, concat(SysRoot, "/lib"), Paths);
+-  addPathIfExists(D, concat(SysRoot, "/usr/lib"), Paths);
 +  bool nativeBuild = MultiarchTriple == getMultiarchTriple(D, llvm::Triple(llvm::sys::getDefaultTargetTriple()), SysRoot);
 +  if (nativeBuild || !IsAndroid)
-+    addPathIfExists(D, SysRoot + "/usr/lib", Paths);
++    addPathIfExists(D, concat(SysRoot, "/usr/lib"), Paths);
 +
 +  if (IsAndroid) {
-+    addPathIfExists(D, SysRoot + "/usr/" + MultiarchTriple + "/lib", Paths);
-+    addPathIfExists(D, "/system/" + OSLibDir, Paths);
++    addPathIfExists(D, concat(SysRoot, "/usr/", MultiarchTriple, "/lib"), Paths);
++    addPathIfExists(D, concat("/system/", OSLibDir), Paths);
 +    ExtraOpts.push_back("-rpath=" + SysRoot + "/usr/lib");
 +  }
  }
