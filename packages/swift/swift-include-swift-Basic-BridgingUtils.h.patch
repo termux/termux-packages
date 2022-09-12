@@ -1,0 +1,13 @@
+diff --git a/swift/include/swift/Basic/BridgingUtils.h b/swift/include/swift/Basic/BridgingUtils.h
+index bd8fe2e6a06..55e962f2ec3 100644
+--- a/swift/include/swift/Basic/BridgingUtils.h
++++ b/swift/include/swift/Basic/BridgingUtils.h
+@@ -54,7 +54,7 @@ getCharSourceRange(const BridgedCharSourceRange &bridged) {
+ inline BridgedCharSourceRange
+ getBridgedCharSourceRange(const CharSourceRange &range) {
+   auto start = getBridgedSourceLoc(range.getStart());
+-  return {start, range.getByteLength()};
++  return {start, static_cast<SwiftInt>(range.getByteLength())};
+ }
+ 
+ /// Copies the string in an malloc'ed memory and the caller is responsible for
