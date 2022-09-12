@@ -1,0 +1,11 @@
+--- a/mlir/lib/ExecutionEngine/CRunnerUtils.cpp	2022-09-10 18:52:59.699421049 +0000
++++ b/mlir/lib/ExecutionEngine/CRunnerUtils.cpp	2022-09-10 18:53:48.899575574 +0000
+@@ -127,7 +127,7 @@
+ extern "C" void *_mlir_aligned_alloc(uint64_t alignment, uint64_t size) {
+ #ifdef _WIN32
+   return _aligned_malloc(size, alignment);
+-#elif defined(__APPLE__)
++#elif defined(__APPLE__) || defined(__ANDROID__)
+   // aligned_alloc was added in MacOS 10.15. Fall back to posix_memalign to also
+   // support older versions.
+   void *result = nullptr;
