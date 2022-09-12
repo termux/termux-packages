@@ -42,16 +42,18 @@ docker_killtree() {
 	local signal="${1-}"; local pid="${2-}"; local cpid; local docker_process
 	for cpid in $(pgrep -P "$pid"); do docker_killtree "$signal" "$cpid"; done
 	[[ "$pid" != "$$" ]] && \
-	docker_process="$(ps -efww --pid "$pid" --no-headers -o pid:1,cmd)" && \
-	#echo "Killing $docker_process" && \
+	docker_process="$(ps -efww --pid "$pid" --no-headers -o pid:1,cmd || :)" && \
+	test -n "$docker_process" && \
+	#echo "Killing $docker_process" && \ 
 	kill "-${signal:=15}" "$pid" 2>/dev/null || :
 }
 
 # Read the pid stored in file path and send kill signals to the process and all its children
 DOCKER_PID="$(cat '"$DOCKER_EXEC_PID_FILE_PATH"')" && [[ "$DOCKER_PID" =~ ^[0-9]+$ ]] && \
-DOCKER_PROCESS="$(ps -efww --pid "$DOCKER_PID" --no-headers -o pid:1,cmd)" && \
-echo "Docker trap killing $DOCKER_PROCESS" && \
-docker_killtree "'"$signal"'" "$DOCKER_PID"
+DOCKER_PROCESS="$(ps -efww --pid "$DOCKER_PID" --no-headers -o pid:1,cmd || :)" && \
+test -n "$DOCKER_PROCESS" && \
+echo "Docker trap killing DOCKER_PROCESS" && \
+docker_killtree "'"$signal"'" "$DOCKER_PID" || :
 		'
 		# Exec docker_exec_trap_command inside docker context
 		$SUDO docker exec "$CONTAINER_NAME" bash -c "$docker_exec_trap_command"
