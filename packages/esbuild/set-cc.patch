@@ -1,0 +1,23 @@
+diff -uNr esbuild-0.15.7/Makefile esbuild-0.15.7.mod/Makefile
+--- esbuild-0.15.7/Makefile	2022-09-04 20:31:27.000000000 +0800
++++ esbuild-0.15.7.mod/Makefile	2022-09-12 13:09:37.228822827 +0800
+@@ -7,7 +7,7 @@
+ GO_FLAGS += -trimpath
+ 
+ esbuild: version-go cmd/esbuild/*.go pkg/*/*.go internal/*/*.go go.mod
+-	CGO_ENABLED=0 go build $(GO_FLAGS) ./cmd/esbuild
++	CGO_ENABLED=0 CC=${CC} go build $(GO_FLAGS) ./cmd/esbuild
+ 
+ test:
+ 	@$(MAKE) --no-print-directory -j6 test-common
+@@ -296,7 +296,7 @@
+ 	@test -n "$(GOARCH)" || (echo "The environment variable GOARCH must be provided" && false)
+ 	@test -n "$(NPMDIR)" || (echo "The environment variable NPMDIR must be provided" && false)
+ 	node scripts/esbuild.js "$(NPMDIR)/package.json" --version
+-	CGO_ENABLED=0 GOOS="$(GOOS)" GOARCH="$(GOARCH)" go build $(GO_FLAGS) -o "$(NPMDIR)/bin/esbuild" ./cmd/esbuild
++	CGO_ENABLED=0 CC=${CC} GOOS="$(GOOS)" GOARCH="$(GOARCH)" go build $(GO_FLAGS) -o "$(NPMDIR)/bin/esbuild" ./cmd/esbuild
+ 
+ platform-android: platform-wasm
+ 	node scripts/esbuild.js npm/esbuild-android-64/package.json --version
+Binary files esbuild-0.15.7/esbuild and esbuild-0.15.7.mod/esbuild differ
+Binary files esbuild-0.15.7/npm/esbuild-android-arm64/bin/esbuild and esbuild-0.15.7.mod/npm/esbuild-android-arm64/bin/esbuild differ
