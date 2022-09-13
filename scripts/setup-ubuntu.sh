@@ -202,6 +202,7 @@ PACKAGES+=" wayland-scanner++"
 PACKAGES+=" xfce4-dev-tools"
 PACKAGES+=" xfonts-utils"
 PACKAGES+=" xutils-dev"
+PACKAGES+=" desktop-file-utils"
 
 # Needed by packages in science repository
 PACKAGES+=" protobuf-c-compiler"
