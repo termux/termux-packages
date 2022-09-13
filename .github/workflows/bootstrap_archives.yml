@@ -51,6 +51,7 @@ jobs:
       - name: Get checksums
         id: get_checksums
         run: |
+          sha256sum *.zip | sed "s/\.zip$/.sha256sum/g" | awk '{print "echo "$1" > "$2}' | sh
           checksums=$(printf 'SHA-256:\n```\n%s\n```\n' "$(sha256sum *.zip)")
           checksums="${checksums//'%'/'%25'}"
           checksums="${checksums//$'\n'/'%0A'}"
@@ -74,7 +75,7 @@ jobs:
         uses: termux/upload-release-action@v3.0.3
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: "*.zip"
+          file: "*.zip *.sha256sum"
           file_glob: true
           release_name: "Bootstrap archives for Termux application"
           tag: ${{ steps.get_tag.outputs.tag_name }}
