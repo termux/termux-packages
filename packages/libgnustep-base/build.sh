@@ -41,7 +41,7 @@ termux_step_pre_configure() {
 	local bin="$TERMUX_PKG_BUILDDIR/bin"
 	mkdir -p "$bin"
 	local sh="$(command -v sh)"
-	for cmd in CPP CC CXX; do
+	for cmd in CC CXX; do
 		local wrapper="$bin/$(basename $(eval echo \${$cmd}))"
 		cat > "$wrapper" <<-EOF
 			#!${sh}
