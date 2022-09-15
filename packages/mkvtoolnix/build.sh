@@ -4,12 +4,13 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=53.0.0
 TERMUX_PKG_REVISION=5
-TERMUX_PKG_SRCURL=https://gitlab.com/mbunkus/mkvtoolnix/-/archive/release-$TERMUX_PKG_VERSION/mkvtoolnix-release-$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=eca97e3da994799527b31bcf795c676dc9553949787808daa6598100f57aa221
+TERMUX_PKG_SRCURL=https://gitlab.com/mbunkus/mkvtoolnix.git
+TERMUX_PKG_GIT_BRANCH=release-$TERMUX_PKG_VERSION
 TERMUX_PKG_DEPENDS="boost, file, libflac, libogg, libvorbis, pcre2, zlib"
-TERMUX_PKG_BUILD_DEPENDS="boost-headers, fmt, libebml, libmatroska"
+TERMUX_PKG_BUILD_DEPENDS="boost-headers, libebml, libmatroska"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+ac_cv_fmt=no
 --disable-static
 --with-boost-filesystem=boost_filesystem
 --with-boost-system=boost_system
