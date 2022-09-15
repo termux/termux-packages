@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE="https://github.com/getzola/zola"
+TERMUX_PKG_DESCRIPTION="A fast static site generator in a single binary with everything built-in"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="0.16.1"
+TERMUX_PKG_SRCURL="https://github.com/getzola/zola/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
+TERMUX_PKG_SHA256=c153fd0cc1435930a4871165e6ad4865e3528465f3f41d0671a9837121688ac7
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_DEPENDS="libc++, libandroid-support, libandroid-spawn"
