@@ -18,6 +18,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --without-zstd
 "
 
+TERMUX_MAKE_PROCESSES=1
+
 termux_step_pre_configure() {
     ./autogen.sh
 }
