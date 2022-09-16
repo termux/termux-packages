@@ -12,6 +12,8 @@ TERMUX_PKG_CONFLICTS="dosbox"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Duse_fluidsynth=true
 -Duse_alsa=false
+-Ddynamic_core=none
+-Denable_debugger=normal
 -Ddefault_library=shared
 -Dtry_static_libs=mt32emu"
 
