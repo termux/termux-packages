@@ -1,0 +1,20 @@
+Fix build against FFmpeg 5.1.
+
+--- a/av_helpers.c
++++ b/av_helpers.c
+@@ -48,6 +48,7 @@ static void mp_msp_av_log_callback(void
+         mp_msg(MSGT_DECVIDEO, MSGL_ERR, "libav* called av_log with context containing a broken AVClass!\n");
+     if (avc) {
+         if(!strcmp(avc->class_name, "AVCodecContext")){
++#if 0
+             AVCodecContext *s= ptr;
+             if(s->codec){
+                 if(s->codec->type == AVMEDIA_TYPE_AUDIO){
+@@ -59,6 +60,7 @@ static void mp_msp_av_log_callback(void
+                 }
+                 //FIXME subtitles, encoders (what msgt for them? there is no appropriate ...)
+             }
++#endif
+         }else if(!strcmp(avc->class_name, "AVFormatContext")){
+             AVFormatContext *s= ptr;
+             if(s->iformat)
