@@ -13,4 +13,4 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Duse_fluidsynth=false
 -Duse_alsa=false
 -Ddefault_library=shared
--Dtry_static_libs=iir,mt32emu,tracy"
+-Dtry_static_libs=mt32emu"
