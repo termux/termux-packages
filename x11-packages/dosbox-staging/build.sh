@@ -1,0 +1,11 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/dosbox-staging/dosbox-staging
+TERMUX_PKG_DESCRIPTION="DOSBox Staging is a fork of the DOSBox project that focuses on ease of use, modern technology and best practices."
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@leapofazzam123"
+TERMUX_PKG_VERSION=0.78.1
+TERMUX_PKG_SRCURL=https://github.com/dosbox-staging/dosbox-staging/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=dcd93ce27f5f3f31e7022288f7cbbc1f1f6eb7cc7150c2c085eeff8ba76c3690
+TERMUX_PKG_DEPENDS="libc++, libpng, libx11, sdl2, sdl2-net, sdl2-mixer, libslirp, zlib"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-Duse_fluidsynth=false
+-Duse_alsa=false"
