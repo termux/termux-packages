@@ -1,0 +1,11 @@
+--- a/collects/compiler/private/xform.rkt
++++ b/collects/compiler/private/xform.rkt
+@@ -506,7 +506,7 @@
+         (when recorded-cpp-in
+           ;; Skip over common part:
+           (let loop ([lpos 1])
+-            (let ([pl (read-bytes-line recorded-cpp-in 'any)])
++            (let ([pl (skip-to-interesting-line recorded-cpp-in)])
+               (unless (eof-object? pl)
+                 (let ([l (skip-to-interesting-line (car cpp-process))])
+                   (unless (equal? pl l)
