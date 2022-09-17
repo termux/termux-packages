@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="The fundamental package for scientific computing with Py
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.23.3"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/numpy/numpy.git
-TERMUX_PKG_DEPENDS="libc++, python"
+TERMUX_PKG_DEPENDS="libc++, libopenblas, python"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
@@ -84,6 +84,8 @@ termux_step_create_debscripts() {
 
 	cat <<- EOF > ./prerm
 	#!$TERMUX_PREFIX/bin/sh
+	echo "Removing numpy..."
+	find $TERMUX_PREFIX/lib/python${_PYTHON_VERSION}/site-packages/$_NUMPY_EGGDIR | grep -E "(__pycache__|\.pyc|\.pyo$)" | xargs rm -rf
 	sed -i "/\.\/${_NUMPY_EGGDIR//./\\.}/d" $TERMUX_PREFIX/lib/python${_PYTHON_VERSION}/site-packages/easy-install.pth
 	EOF
 }
