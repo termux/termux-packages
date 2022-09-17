@@ -15,7 +15,7 @@ HOST_GLIB_COMPILE_RESOURCES=glib-compile-resources
 "
 
 termux_step_pre_configure() {
-	LDFLAGS+=" -landroid-shmem"
+	LDFLAGS+=" -landroid-shmem -lm"
 
 	local pc_dir=$TERMUX_PKG_BUILDDIR/_pkgconfig
 	mkdir -p $pc_dir
