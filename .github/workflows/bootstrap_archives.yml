@@ -71,12 +71,18 @@ jobs:
           git tag "$new_tag"
           git push --tags
           echo "::set-output name=tag_name::$new_tag"
-      - name: Publish GitHub release
+      - name: Publish bootstrap zips to GitHub release
         uses: termux/upload-release-action@v3.0.3
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: "*.zip *.sha256sum"
+          file: "*.zip"
           file_glob: true
           release_name: "Bootstrap archives for Termux application"
           tag: ${{ steps.get_tag.outputs.tag_name }}
           body: ${{ steps.get_checksums.outputs.checksums }}
+      - name: Publish bootstraps sha256sum to GitHub release
+        uses: termux/upload-release-action@v3.0.3
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: "bootstraps.sha256sum"
+          tag: ${{ steps.get_tag.outputs.tag_name }}
