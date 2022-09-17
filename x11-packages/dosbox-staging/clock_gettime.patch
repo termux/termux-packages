@@ -1,0 +1,15 @@
+diff -uNr dosbox-staging-0.78.1{,.mod}/meson.build
+--- dosbox-staging-0.78.1/meson.build   2022-01-07 22:37:04.000000000 +0700
++++ dosbox-staging-0.78.1.mod/meson.build       2022-09-17 09:12:41.810954749 +0700
+@@ -116,9 +116,9 @@
+   endif
+ endforeach
+
+-if cc.has_function('clock_gettime', prefix : '#include <time.h>')
++#if cc.has_function('clock_gettime', prefix : '#include <time.h>')
+   conf_data.set10('HAVE_CLOCK_GETTIME', true)
+-endif
++#endif
+
+ if cc.has_function('__builtin_available')
+   conf_data.set10('HAVE_BUILTIN_AVAILABLE', true)
