@@ -62,6 +62,16 @@ termux_step_configure() {
 	ln -sf $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/libc++_static.a \
 		$RUST_LIBDIR/libc++_shared.a
 
+	# https://github.com/termux/termux-packages/issues/11640
+	# https://github.com/termux/termux-packages/issues/11658
+	# The build system somehow tries to link binaries against a wrong libc,
+	# leading to build failures for arm and runtime errors for others.
+	# The following command is equivalent to
+	#	ln -sft $RUST_LIBDIR \
+	#		$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/lib{c,dl}.so
+	# but written in a future-proof manner.
+	ln -sft $RUST_LIBDIR $(echo | $CC -x c - -Wl,-t -shared | grep '\.so$')
+
 	# rust checks libs in PREFIX/lib. It then can't find libc.so and libdl.so because rust program doesn't
 	# know where those are. Putting them temporarly in $PREFIX/lib prevents that failure
 	mv $TERMUX_PREFIX/lib/libtinfo.so.6 $TERMUX_PREFIX/lib/libtinfo.so.6.tmp
