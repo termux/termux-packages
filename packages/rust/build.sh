@@ -105,9 +105,13 @@ termux_step_make_install() {
 	unset CC CXX CPP LD CFLAGS CXXFLAGS CPPFLAGS LDFLAGS PKG_CONFIG RANLIB
 
 	if [ $TERMUX_ARCH = "x86_64" ]; then
-		 mv $TERMUX_PREFIX ${TERMUX_PREFIX}a
-		 $TERMUX_PKG_SRCDIR/x.py build --host x86_64-unknown-linux-gnu --stage 1 cargo || $TERMUX_PKG_SRCDIR/x.py build --host x86_64-unknown-linux-gnu  --stage 1 rls ||  $TERMUX_PKG_SRCDIR/x.py build --host x86_64-unknown-linux-gnu --stage 1 rustfmt || $TERMUX_PKG_SRCDIR/x.py --stage 1 --host x86_64-unknown-linux-gnu  build rustdoc || $TERMUX_PKG_SRCDIR/x.py --stage 1 --host x86_64-unknown-linux-gnu build error_index_generator  || true
-		 mv ${TERMUX_PREFIX}a ${TERMUX_PREFIX}
+		mv $TERMUX_PREFIX ${TERMUX_PREFIX}a
+		$TERMUX_PKG_SRCDIR/x.py build --host x86_64-unknown-linux-gnu --stage 1 cargo
+		$TERMUX_PKG_SRCDIR/x.py build --host x86_64-unknown-linux-gnu --stage 1 rls
+		$TERMUX_PKG_SRCDIR/x.py build --host x86_64-unknown-linux-gnu --stage 1 rustfmt
+		$TERMUX_PKG_SRCDIR/x.py build --host x86_64-unknown-linux-gnu --stage 1 rustdoc
+		$TERMUX_PKG_SRCDIR/x.py build --host x86_64-unknown-linux-gnu --stage 1 error_index_generator
+		mv ${TERMUX_PREFIX}a ${TERMUX_PREFIX}
 	fi
 
 	$TERMUX_PKG_SRCDIR/x.py install --stage 1 --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME
