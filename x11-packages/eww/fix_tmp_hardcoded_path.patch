@@ -1,0 +1,23 @@
+diff '--color=auto' -uNr eww/crates/eww/src/paths.rs eww.mod/crates/eww/src/paths.rs
+--- eww/crates/eww/src/paths.rs	2022-09-20 10:59:18.645199645 +0000
++++ eww.mod/crates/eww/src/paths.rs	2022-09-20 10:57:51.443494861 +0000
+@@ -35,7 +35,7 @@
+ 
+         let ipc_socket_file = std::env::var("XDG_RUNTIME_DIR")
+             .map(std::path::PathBuf::from)
+-            .unwrap_or_else(|_| std::path::PathBuf::from("/tmp"))
++            .unwrap_or_else(|_| std::path::PathBuf::from("@TERMUX_PREFIX@/tmp"))
+             .join(format!("eww-server_{}", daemon_id));
+ 
+         // 100 as the limit isn't quite 108 everywhere (i.e 104 on BSD or mac)
+diff '--color=auto' -uNr eww/crates/yuck/src/config/script_var_definition.rs eww.mod/crates/yuck/src/config/script_var_definition.rs
+--- eww/crates/yuck/src/config/script_var_definition.rs	2022-09-20 10:59:18.661200876 +0000
++++ eww.mod/crates/yuck/src/config/script_var_definition.rs	2022-09-20 10:59:03.011997321 +0000
+@@ -112,6 +112,6 @@
+             iter.expect_done()?;
+             Self { name_span, name: VarName(name), command: script.to_string(), initial_value, command_span }
+         };
+-        result.note(r#"Expected format: `(deflisten name :initial "0" "tail -f /tmp/example")`"#)
++        result.note(r#"Expected format: `(deflisten name :initial "0" "tail -f @TERMUX_PREFIX@/tmp/example")`"#)
+     }
+ }
