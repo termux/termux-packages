@@ -1,0 +1,13 @@
+--- sssnake-0.2.0/makefile	2022-09-17 10:29:21.000000000 +0530
++++ sssnake-0.2.0.mod/makefile	2022-09-22 16:18:04.176494029 +0530
+@@ -1,8 +1,8 @@
+-PREFIX = /usr/local
++PREFIX = @TERMUX_PREFIX@
+ MANDIR = $(PREFIX)/share/man
+ 
+ sssnake: main.c autopilot.c xymap.c essentials.c snake.c 
+-	$(CC) -w $(ncursesw5-config --cflags --libs) main.c autopilot.c xymap.c essentials.c snake.c -lncursesw -o sssnake
++	$(CC) -w $(CPPFLAGS) $(CFLAGS) main.c autopilot.c xymap.c essentials.c snake.c $(LDFLAGS) -lncursesw -o sssnake
+ #autopilot.o: autopilot.c xymap.c essentials.c snake.c 
+ #	gcc -c autopilot.c xymap.c essentials.c snake.c
+ 
