@@ -1,0 +1,16 @@
+diff -uNr a/flang/CMakeLists.txt b/flang/CMakeLists.txt
+--- a/flang/CMakeLists.txt
++++ b/flang/CMakeLists.txt
+@@ -92,8 +92,12 @@
+   get_filename_component(MLIR_DIR_ABSOLUTE ${MLIR_DIR} REALPATH)
+   list(APPEND CMAKE_MODULE_PATH ${MLIR_DIR_ABSOLUTE})
+   include(AddMLIR)
++  if (CMAKE_CROSSCOMPILING)
++  set(MLIR_TABLEGEN_EXE mlir-tblgen CACHE STRING "Native mlir-tblgen executable. Saves building one when cross-compiling.")
++  else()
+   find_program(MLIR_TABLEGEN_EXE "mlir-tblgen" ${LLVM_TOOLS_BINARY_DIR}
+     NO_DEFAULT_PATH)
++  endif()
+ 
+   option(LLVM_INSTALL_TOOLCHAIN_ONLY
+     "Only include toolchain files in the 'install' target." OFF)
