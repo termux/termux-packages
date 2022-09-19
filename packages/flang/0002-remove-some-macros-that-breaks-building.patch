@@ -1,0 +1,22 @@
+diff -uNr a/flang/runtime/complex-reduction.c b/flang/runtime/complex-reduction.c
+--- a/flang/runtime/complex-reduction.c
++++ b/flang/runtime/complex-reduction.c
+@@ -10,6 +10,18 @@
+ #include "complex-reduction.h"
+ #include <float.h>
+ 
++#ifdef __ANDROID__
++#ifdef CMPLXF
++#undef CMPLXF
++#endif // CMPLXF
++#ifdef CMPLX
++#undef CMPLX
++#endif // CMPLX
++#ifdef CMPLXL
++#undef CMPLXL
++#endif // CMPLXL
++#endif // __ANDROID__
++
+ struct CppComplexFloat {
+   float r, i;
+ };
