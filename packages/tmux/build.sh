@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # Link against libandroid-support for wcwidth(), see https://github.com/termux/termux-packages/issues/224
 TERMUX_PKG_DEPENDS="ncurses, libevent, libandroid-support, libandroid-glob"
 TERMUX_PKG_VERSION=3.3
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL="https://github.com/tmux/tmux/archive/${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=967044a34cf69197355f18f2f66e7300b29799576f91fbe04200ab71e5ef6913
 TERMUX_PKG_AUTO_UPDATE=true
