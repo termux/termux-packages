@@ -1,0 +1,25 @@
+diff -uNr webkitgtk-2.36.2/Source/WebKit/NetworkProcess/cache/NetworkCacheBlobStorage.cpp webkitgtk-2.36.2.mod/Source/WebKit/NetworkProcess/cache/NetworkCacheBlobStorage.cpp
+--- webkitgtk-2.36.2/Source/WebKit/NetworkProcess/cache/NetworkCacheBlobStorage.cpp	2022-02-23 20:41:51.724201200 +0900
++++ webkitgtk-2.36.2.mod/Source/WebKit/NetworkProcess/cache/NetworkCacheBlobStorage.cpp	2022-09-19 17:25:01.383860107 +0900
+@@ -99,8 +99,8 @@
+         FileSystem::makeSafeToUseMemoryMapForPath(blobPath);
+         auto existingData = mapFile(blobPath);
+         if (bytesEqual(existingData, data)) {
+-            if (!FileSystem::hardLink(blobPath, path))
+-                WTFLogAlways("Failed to create hard link from %s to %s", blobPath.utf8().data(), path.utf8().data());
++            if (!FileSystem::createSymbolicLink(blobPath, path))
++                WTFLogAlways("Failed to create symbolic link from %s to %s", blobPath.utf8().data(), path.utf8().data());
+             return { existingData, hash };
+         }
+         FileSystem::deleteFile(blobPath);
+@@ -110,8 +110,8 @@
+     if (mappedData.isNull())
+         return { };
+ 
+-    if (!FileSystem::hardLink(blobPath, path))
+-        WTFLogAlways("Failed to create hard link from %s to %s", blobPath.utf8().data(), path.utf8().data());
++    if (!FileSystem::createSymbolicLink(blobPath, path))
++        WTFLogAlways("Failed to create symbolic link from %s to %s", blobPath.utf8().data(), path.utf8().data());
+ 
+     m_approximateSize += mappedData.size();
+ 
