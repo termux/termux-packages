@@ -1,0 +1,18 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -117,7 +117,7 @@
+ add_subdirectory(k2pdfoptlib)
+ 
+ # ms
+-add_executable(k2pdfopt k2pdfopt.c)
++add_executable(k2pdfopt k2pdfopt.c misc.c)
+ target_link_libraries (k2pdfopt k2pdfoptlib willuslib ${K2PDFOPT_LIB})
+ 
+ install(TARGETS k2pdfopt RUNTIME DESTINATION bin)
+--- a/misc.c
++++ b/misc.c
+@@ -0,0 +1,4 @@
++#include <k2pdfopt.h>
++#ifdef HAVE_MUPDF_LIB
++void pdf_install_load_system_font_funcs(void *p) {}
++#endif
