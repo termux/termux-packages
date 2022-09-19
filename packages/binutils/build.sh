@@ -2,14 +2,20 @@ TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/binutils/
 TERMUX_PKG_DESCRIPTION="Collection of binary tools, the main ones being ld, the GNU linker, and as, the GNU assembler"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.38
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=2.39
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/binutils/binutils-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=e316477a914f567eccc34d5d29785b8b0f5a10208d36bbacedcc39048ecfe024
-TERMUX_PKG_DEPENDS="libc++, zlib"
+TERMUX_PKG_SHA256=645c25f563b8adc0a81dbd6a41cffbf4d37083a382e02d5d3df4f65c09516d00
+TERMUX_PKG_DEPENDS="binutils-libs (>= ${TERMUX_PKG_VERSION}), libc++, zlib"
 TERMUX_PKG_BREAKS="binutils-dev"
 TERMUX_PKG_REPLACES="binutils-dev"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-gold --enable-plugins --disable-werror --with-system-zlib --enable-new-dtags"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--enable-gold
+--disable-gprofng
+--enable-plugins
+--disable-werror
+--with-system-zlib
+--enable-new-dtags
+"
 TERMUX_PKG_EXTRA_MAKE_ARGS="tooldir=$TERMUX_PREFIX"
 TERMUX_PKG_RM_AFTER_INSTALL="share/man/man1/windmc.1 share/man/man1/windres.1 bin/ld.bfd"
 TERMUX_PKG_NO_STATICSPLIT=true
