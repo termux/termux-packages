@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A powerful multi-faceted programming language for the JV
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=4.0.3
+TERMUX_PKG_REVISION=1
 _JANSI_VERSION=2.4.0
 _JLINE_VERSION=2.14.6
 _JANSI_TAGNAME="jansi-${_JANSI_VERSION}"
@@ -13,7 +14,7 @@ TERMUX_PKG_SRCURL=(https://groovy.jfrog.io/artifactory/dist-release-local/groovy
 TERMUX_PKG_SHA256=(ddfc8e26fdcf3626d1c83f28d198c3e4e616a72337ca6e46fcaca09e7a4bb37f
                    ba18c50770eebb0b6f472254ada8608138e70045a564efa43626a09691dcf553
                    c6205afb214288cd8ef53f1ea1243ba9388c84b55c929f0b9e6cee7757c6efac)
-TERMUX_PKG_DEPENDS="libjansi, openjdk-17"
+TERMUX_PKG_DEPENDS="libjansi (>= 2.4.0-1), openjdk-17"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
@@ -30,7 +31,7 @@ termux_step_make() {
 	rm -f ./bin/*.bat
 
 	mkdir -p lib/jansi-native
-	ln -sf $TERMUX_PREFIX/lib/libjansi.so lib/jansi-native/
+	ln -sf $TERMUX_PREFIX/lib/jansi/libjansi.so lib/jansi-native/
 
 	local _JANSI_JARFILE="$TERMUX_PKG_BUILDDIR"/lib/${_JANSI_TAGNAME}.jar
 	rm "${_JANSI_JARFILE}"
