@@ -114,12 +114,6 @@ termux_step_host_build() {
 	fi
 }
 
-termux_step_pre_configure() {
-	cd llvm-project
-	patch -p1 < $TERMUX_PKG_BUILDER_DIR/../libllvm/clang-lib-Driver-ToolChain.cpp.patch
-	patch -p1 < $TERMUX_PKG_BUILDER_DIR/../libllvm/clang-lib-Driver-ToolChains-Linux.cpp.patch
-}
-
 termux_step_make() {
 	# The Swift compiler searches for the clang headers, so symlink against them using the clang major version.
 	export TERMUX_CLANG_VERSION=$(. $TERMUX_SCRIPTDIR/packages/libllvm/build.sh; echo $LLVM_MAJOR_VERSION)
