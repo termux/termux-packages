@@ -1,0 +1,59 @@
+https://github.com/rust-lang/rust/commit/fe02ee8be97fc94166e3920d16d550bd6994fabd
+https://github.com/rust-lang/rust/commit/a89d014a211386f2b0ead0d309a588c625d45514
+
+From fe02ee8be97fc94166e3920d16d550bd6994fabd Mon Sep 17 00:00:00 2001
+From: Krasimir Georgiev <krasimir@google.com>
+Date: Tue, 28 Jun 2022 14:08:35 +0000
+Subject: [PATCH] llvm-wrapper: adapt for an LLVM API change
+
+This adapts llvm-wrapper for
+https://github.com/llvm/llvm-project/commit/dacfa24f75c328ae30b710ecadaa18e4ba10cdc6,
+which removed ASanGlobalsMetadataAnalysis.
+---
+ compiler/rustc_llvm/llvm-wrapper/PassWrapper.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/compiler/rustc_llvm/llvm-wrapper/PassWrapper.cpp b/compiler/rustc_llvm/llvm-wrapper/PassWrapper.cpp
+index 38fddbdba54dd..0f4973ebf7129 100644
+--- a/compiler/rustc_llvm/llvm-wrapper/PassWrapper.cpp
++++ b/compiler/rustc_llvm/llvm-wrapper/PassWrapper.cpp
+@@ -985,7 +985,9 @@ LLVMRustOptimizeWithNewPassManager(
+     if (SanitizerOptions->SanitizeAddress) {
+       OptimizerLastEPCallbacks.push_back(
+         [SanitizerOptions](ModulePassManager &MPM, OptimizationLevel Level) {
++#if LLVM_VERSION_LT(15, 0)
+           MPM.addPass(RequireAnalysisPass<ASanGlobalsMetadataAnalysis, Module>());
++#endif
+ #if LLVM_VERSION_GE(14, 0)
+           AddressSanitizerOptions opts = AddressSanitizerOptions{
+             /*CompileKernel=*/false,
+
+
+From a89d014a211386f2b0ead0d309a588c625d45514 Mon Sep 17 00:00:00 2001
+From: Krasimir Georgiev <krasimir@google.com>
+Date: Tue, 12 Jul 2022 15:36:28 +0000
+Subject: [PATCH] llvm-wrapper: adapt for LLVM API change
+
+---
+ compiler/rustc_llvm/llvm-wrapper/RustWrapper.cpp | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/compiler/rustc_llvm/llvm-wrapper/RustWrapper.cpp b/compiler/rustc_llvm/llvm-wrapper/RustWrapper.cpp
+index 8c5b4e2dc96f9..7ac3157e7a1de 100644
+--- a/compiler/rustc_llvm/llvm-wrapper/RustWrapper.cpp
++++ b/compiler/rustc_llvm/llvm-wrapper/RustWrapper.cpp
+@@ -411,8 +411,14 @@ LLVMRustInlineAsm(LLVMTypeRef Ty, char *AsmString, size_t AsmStringLen,
+ 
+ extern "C" bool LLVMRustInlineAsmVerify(LLVMTypeRef Ty, char *Constraints,
+                                         size_t ConstraintsLen) {
++#if LLVM_VERSION_LT(15, 0)
+   return InlineAsm::Verify(unwrap<FunctionType>(Ty),
+                            StringRef(Constraints, ConstraintsLen));
++#else
++  // llvm::Error converts to true if it is an error.
++  return !llvm::errorToBool(InlineAsm::verify(
++      unwrap<FunctionType>(Ty), StringRef(Constraints, ConstraintsLen)));
++#endif
+ }
+ 
+ extern "C" void LLVMRustAppendModuleInlineAsm(LLVMModuleRef M, const char *Asm,
