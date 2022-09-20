@@ -5,7 +5,8 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.63.0
 TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/rustc-$TERMUX_PKG_VERSION-src.tar.xz
 TERMUX_PKG_SHA256=8f44af6dc44cc4146634a4dd5e4cc5470b3052a2337019b870c0e025e8987e0c
-TERMUX_PKG_DEPENDS="libc++, clang, openssl, lld, zlib, libllvm"
+_LLVM_MAJOR_VERSION=$(. $TERMUX_SCRIPTDIR/packages/libllvm/build.sh; echo $LLVM_MAJOR_VERSION)
+TERMUX_PKG_DEPENDS="libc++, clang, openssl, lld, zlib, libllvm (<< $(($_LLVM_MAJOR_VERSION+1)))"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/llvm-* bin/llc bin/opt"
 
 termux_step_pre_configure() {
