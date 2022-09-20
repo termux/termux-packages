@@ -49,18 +49,17 @@ diff -uNr qemu-6.1.0/hw/usb/ccid-card-emulated.c qemu-6.1.0.mod/hw/usb/ccid-card
  #define CERTIFICATES_ARGS_TEMPLATE\
      "db=\"%s\" use_hw=no soft=(,Virtual Reader,CAC,,%s,%s,%s)"
  
-diff -uNr qemu-6.1.0/linux-user/syscall.c qemu-6.1.0.mod/linux-user/syscall.c
---- qemu-6.1.0/linux-user/syscall.c	2021-08-24 20:35:41.000000000 +0300
-+++ qemu-6.1.0.mod/linux-user/syscall.c	2021-08-25 15:22:26.477952648 +0300
-@@ -8018,7 +8018,7 @@
-         /* create temporary file to map stat to */
-         tmpdir = getenv("TMPDIR");
-         if (!tmpdir)
--            tmpdir = "/tmp";
-+            tmpdir = "@TERMUX_PREFIX@/tmp";
-         snprintf(filename, sizeof(filename), "%s/qemu-open.XXXXXX", tmpdir);
-         fd = mkstemp(filename);
-         if (fd < 0) {
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -8363,7 +8363,7 @@ static int do_openat(CPUArchState *cpu_e
+             /* create temporary file to map stat to */
+             tmpdir = getenv("TMPDIR");
+             if (!tmpdir)
+-                tmpdir = "/tmp";
++                tmpdir = "@TERMUX_PREFIX@/tmp";
+             snprintf(filename, sizeof(filename), "%s/qemu-open.XXXXXX", tmpdir);
+             fd = mkstemp(filename);
+             if (fd < 0) {
 diff -uNr qemu-6.1.0/migration/exec.c qemu-6.1.0.mod/migration/exec.c
 --- qemu-6.1.0/migration/exec.c	2021-08-24 20:35:41.000000000 +0300
 +++ qemu-6.1.0.mod/migration/exec.c	2021-08-25 15:22:26.477952648 +0300
