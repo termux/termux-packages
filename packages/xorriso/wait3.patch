@@ -1,0 +1,14 @@
+--- a/xorriso/parse_exec.c	2022-09-21 17:03:37.540907532 +0800
++++ b/xorriso/parse_exec.c	2022-09-21 17:03:02.380907545 +0800
+@@ -39,6 +39,11 @@
+ #include <pthread.h>
+ #endif
+ 
++/* Wrap wait3() to wait4() for libc implementations without (e.g. Bionic on ANDROID >= 21) */
++#if __ANDROID_API__ >= 21
++static pid_t wait3(int* status, int options, struct rusage* rusage) { return wait4(-1, status, options, rusage); }
++#endif
++
+ /* @param flag bit0= do not warn of wildcards
+                bit1= these are disk_paths
+ */
