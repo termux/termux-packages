@@ -51,14 +51,6 @@ termux_step_pre_configure() {
 		EOF
 		chmod 0700 "$wrapper"
 	done
-	for p in gnustep; do
-		local conf="$bin/${p}-config"
-		cat > "$conf" <<-EOF
-			#!${sh}
-			exec sh "$TERMUX_PREFIX/bin/${p}-config" "\$@"
-		EOF
-		chmod 0700 "$conf"
-	done
 	export PATH="$bin":$PATH
 
 	rm -f cross.config

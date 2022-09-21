@@ -18,17 +18,4 @@ termux_step_pre_configure() {
 	export COB_LI_IS_LL="${lp64}"
 	export COB_32_BIT_LONG="$(( 1 - ${lp64} ))"
 	export COB_HAS_64_BIT_POINTER="${lp64}"
-
-	local bin="$TERMUX_PKG_BUILDDIR/bin"
-	local sh="$(command -v sh)"
-	mkdir -p "$bin"
-	for p in xml2; do
-		local conf="$bin/${p}-config"
-		cat > "$conf" <<-EOF
-			#!${sh}
-			exec sh "$TERMUX_PREFIX/bin/${p}-config" "\$@"
-		EOF
-		chmod 0700 "$conf"
-	done
-	export PATH="$bin":$PATH
 }
