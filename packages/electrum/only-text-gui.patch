@@ -1,22 +1,22 @@
-diff -u -r ../Electrum-4.0.2/electrum/daemon.py ./electrum/daemon.py
---- ../Electrum-4.0.2/electrum/daemon.py	2019-07-11 15:08:35.000000000 +0200
-+++ ./electrum/daemon.py	2020-05-03 13:46:52.373992401 +0200
-@@ -342,7 +342,7 @@
+--- a/electrum/daemon.py
++++ b/electrum/daemon.py
+@@ -646,7 +646,7 @@
  
-     def init_gui(self, config, plugins):
-         threading.current_thread().setName('GUI')
+     def run_gui(self, config, plugins):
+         threading.current_thread().name = 'GUI'
 -        gui_name = config.get('gui', 'qt')
 +        gui_name = config.get('gui', 'text')
          if gui_name in ['lite', 'classic']:
              gui_name = 'qt'
-         gui = __import__('electrum.gui.' + gui_name, fromlist=['electrum'])
---- ./setup.py.orig	2000-11-11 12:11:11.000000000 +0100
-+++ ./setup.py	2020-09-07 20:42:26.406766373 +0200
-@@ -73,7 +73,6 @@
-     packages=[
-         'electrum',
-         'electrum.gui',
--        'electrum.gui.qt',
-         'electrum.plugins',
-     ] + [('electrum.plugins.'+pkg) for pkg in find_packages('electrum/plugins')],
-     package_dir={
+         self.logger.info(f'launching GUI: {gui_name}')
+--- a/electrum/electrum
++++ b/electrum/electrum
+@@ -426,7 +426,7 @@
+         configure_logging(config)
+         fd = daemon.get_file_descriptor(config)
+         if fd is not None:
+-            plugins = init_plugins(config, config.get('gui', 'qt'))
++            plugins = init_plugins(config, config.get('gui', 'text'))
+             d = daemon.Daemon(config, fd)
+             try:
+                 d.run_gui(config, plugins)
