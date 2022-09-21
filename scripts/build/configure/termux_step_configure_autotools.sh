@@ -36,7 +36,9 @@ termux_step_configure_autotools() {
 		# Some packages provides a $PKG-config script which some configure scripts pickup instead of pkg-config:
 		mkdir "$TERMUX_PKG_TMPDIR/config-scripts"
 		for f in $TERMUX_PREFIX/bin/*config; do
-			test -f "$f" && cp "$f" "$TERMUX_PKG_TMPDIR/config-scripts"
+			if [[ -f "$f" && "$(head -c 4 "$f")" != "$(echo -ne '\0177ELF')" ]]; then
+				cp "$f" "$TERMUX_PKG_TMPDIR/config-scripts"
+			fi
 		done
 		export PATH=$TERMUX_PKG_TMPDIR/config-scripts:$PATH
 	fi
