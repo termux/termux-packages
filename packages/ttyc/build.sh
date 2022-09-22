@@ -2,11 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://github.com/Depau/ttyc
 TERMUX_PKG_DESCRIPTION="ttyd protocol client"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.3"
-TERMUX_PKG_SRCURL=https://github.com/Depau/ttyc/archive/refs/tags/wistty-v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=c2240bff19219e5770dbe6e9ed1e5b96916bee4a5b2c5e7b636c5495724c2881
+TERMUX_PKG_VERSION="0.4"
+TERMUX_PKG_SRCURL=https://github.com/Depau/ttyc/archive/refs/tags/ttyc-v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=375e2b27335ed3db13aee6d4525548148b8579cdbe34ed4d971d4e3cdff0f173
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_REVISION=1
 
 termux_step_pre_configure() {
 	termux_setup_golang
