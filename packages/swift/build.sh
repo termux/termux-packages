@@ -3,14 +3,14 @@ TERMUX_PKG_DESCRIPTION="Swift is a high-performance system programming language"
 TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_MAINTAINER="@buttaface"
 TERMUX_PKG_VERSION=5.7
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 SWIFT_RELEASE="RELEASE"
 TERMUX_PKG_SRCURL=https://github.com/apple/swift/archive/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE.tar.gz
 TERMUX_PKG_SHA256=5385aa70a62d57087c4f34e5cde0f0154dc9e3916bf4ac95a21594433e7db5f8
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_DEPENDS="clang, libandroid-glob, libandroid-posix-semaphore, libandroid-spawn, libcurl, libicu, libicu-static, libsqlite, libuuid, libxml2, libdispatch, llbuild"
 TERMUX_PKG_BUILD_DEPENDS="rsync"
-TERMUX_PKG_BLACKLISTED_ARCHES="arm,i686"
+TERMUX_PKG_BLACKLISTED_ARCHES="i686"
 TERMUX_PKG_NO_STATICSPLIT=true
 # Building swift uses CMake, but the standard
 # termux_step_configure_cmake function is not used. Instead, we set
@@ -122,10 +122,13 @@ termux_step_make() {
 	        termux_setup_swift
 		ln -sf $TERMUX_PKG_HOSTBUILD_DIR/llvm-linux-x86_64 $TERMUX_PKG_BUILDDIR/llvm-linux-x86_64
 
+		BOOTSTRAP=
+		test $SWIFT_ARCH == 'armv7' && BOOTSTRAP='--bootstrapping=off'
+
 		SWIFT_BUILD_FLAGS="$SWIFT_BUILD_FLAGS --android
 		--android-ndk $TERMUX_STANDALONE_TOOLCHAIN --android-arch $SWIFT_ARCH
 		--build-toolchain-only --skip-local-build --skip-local-host-install
-		--cross-compile-hosts=android-$SWIFT_ARCH
+		--cross-compile-hosts=android-$SWIFT_ARCH $BOOTSTRAP
 		--cross-compile-deps-path=$(dirname $TERMUX_PREFIX)
 		--native-swift-tools-path=$SWIFT_BINDIR
 		--native-clang-tools-path=$SWIFT_BINDIR
