@@ -16,7 +16,7 @@ TERMUX_PKG_AUTO_UPDATE=true
 termux_step_make() {
 	termux_setup_swift
 
-	# This will check out the package dependencies, so they can be patched.
+	# This will check out the package dependencies, so one can be patched.
 	$SWIFT_BINDIR/swift package update
 
 	patch -p1 < $TERMUX_PKG_BUILDER_DIR/cook-dependencies.diff
