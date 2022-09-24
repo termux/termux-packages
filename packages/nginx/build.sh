@@ -65,6 +65,7 @@ termux_step_configure() {
 		--with-http_ssl_module \
 		--with-http_v2_module \
 		--with-http_gunzip_module \
+		--with-http_sub_module \
 		--with-stream \
 		--with-stream_ssl_module \
 		$DEBUG_FLAG
