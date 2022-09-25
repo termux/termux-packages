@@ -6,6 +6,7 @@ _COMMIT=bb063e81fdcfb1abf991bad84a3f48ef7f4f6be6
 _COMMIT_DATE=20220919
 _COMMIT_TIME=073102
 TERMUX_PKG_VERSION="1.1.4.20220919.073102gbb063e81"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/ptitSeb/gl4es.git
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_DEPENDS="libx11"
@@ -62,7 +63,7 @@ termux_pkg_auto_update() {
 
 termux_step_post_get_source() {
 	git fetch --unshallow
-	git reset --hard $_COMMIT
+	git checkout $_COMMIT
 }
 
 termux_step_pre_configure() {
