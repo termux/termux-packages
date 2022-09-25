@@ -1,0 +1,37 @@
+diff '--color=auto' -uNr blender-3.3.4/intern/guardedalloc/intern/mallocn_guarded_impl.c blender-3.3.4.mod/intern/guardedalloc/intern/mallocn_guarded_impl.c
+--- blender-3.4.1/intern/guardedalloc/intern/mallocn_guarded_impl.c	2023-02-21 14:42:54.000000000 +0530
++++ blender-3.4.1.mod/intern/guardedalloc/intern/mallocn_guarded_impl.c	2023-03-10 17:28:54.764539311 +0530
+@@ -699,10 +699,10 @@
+ 
+   mem_unlock_thread();
+ 
+-#ifdef HAVE_MALLOC_STATS
+-  printf("System Statistics:\n");
+-  malloc_stats();
+-#endif
++//#ifdef HAVE_MALLOC_STATS
++//  printf("System Statistics:\n");
++//  malloc_stats();
++//#endif
+ }
+ 
+ static const char mem_printmemlist_pydict_script[] =
+diff '--color=auto' -uNr blender-3.4.1/intern/guardedalloc/intern/mallocn_lockfree_impl.c blender-3.4.1.mod/intern/guardedalloc/intern/mallocn_lockfree_impl.c
+--- blender-3.3.4/intern/guardedalloc/intern/mallocn_lockfree_impl.c	2023-02-21 14:42:54.000000000 +0530
++++ blender-3.3.4.mod/intern/guardedalloc/intern/mallocn_lockfree_impl.c	2023-03-10 17:29:54.214539288 +0530
+@@ -375,10 +375,11 @@
+       "\nFor more detailed per-block statistics run Blender with memory debugging command line "
+       "argument.\n");
+ 
+-#ifdef HAVE_MALLOC_STATS
+-  printf("System Statistics:\n");
+-  malloc_stats();
+-#endif
++// No malloc_stats in android 
++//#ifdef HAVE_MALLOC_STATS
++//  printf("System Statistics:\n");
++//  malloc_stats();
++//#endif
+ }
+ 
+ void MEM_lockfree_set_error_callback(void (*func)(const char *))

@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/FreeSpacenav/libspnav
+TERMUX_PKG_DESCRIPTION="Library for communicating with spacenavd or 3dxsrv to get input from 6-dof devices"
+TERMUX_PKG_LICENSE="BSD 3-Clause"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=1.0
+TERMUX_PKG_SRCURL=https://github.com/FreeSpacenav/libspnav/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=8849b7f7826d750f6956cf8f4f53937f2359ab6da97d6c834c71d5f771212e7c
+TERMUX_PKG_DEPENDS="libx11"
+TERMUX_PKG_BUILD_IN_SRC=true
