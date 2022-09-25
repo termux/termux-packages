@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/Krush206/3bsd-csh
+TERMUX_PKG_DESCRIPTION="C Shell with process control from 3BSD."
+TERMUX_PKG_LICENSE="BSD 3-Clause"
+TERMUX_PKG_MAINTAINER="@Krush206"
+TERMUX_PKG_VERSION=1.0
+TERMUX_PKG_SRCURL=https://github.com/Krush206/3bsd-csh/archive/bionic.tar.gz
+TERMUX_PKG_SHA256=13a479a568dd933af2acc34b95a6e8a6d6933509b8b38e71436a5023cf04506e
+TERMUX_PKG_DEPENDS="libbsd"
+TERMUX_PKG_BUILD_IN_SRC=true
