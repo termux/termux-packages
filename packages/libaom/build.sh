@@ -10,3 +10,15 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DBUILD_SHARED_LIBS=ON
 -DCMAKE_INSTALL_LIBDIR=lib
 "
+
+termux_step_pre_configure() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	# Not exactly the same as the SOVERSION though.
+	local _MAJOR_VERSION=3
+
+	case "$TERMUX_PKG_VERSION" in
+		${_MAJOR_VERSION}.*|*:${_MAJOR_VERSION}.* ) ;;
+		* ) termux_error_exit "SOVERSION check failed." ;;
+	esac
+}
