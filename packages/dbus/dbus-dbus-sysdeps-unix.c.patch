@@ -1,0 +1,12 @@
+--- a/dbus/dbus-sysdeps-unix.c
++++ b/dbus/dbus-sysdeps-unix.c
+@@ -144,7 +144,8 @@
+ 
+ #endif /* Solaris */
+ 
+-#if defined(__linux__) && defined(__NR_close_range) && !defined(HAVE_CLOSE_RANGE)
++#if defined(__linux__) && defined(__NR_close_range) && !defined(HAVE_CLOSE_RANGE) && \
++    !defined(__ANDROID__)
+ /* The kernel headers are new enough to have the close_range syscall,
+  * but glibc isn't new enough to have the syscall wrapper, so call the
+  * syscall directly. */
