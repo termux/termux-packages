@@ -39,18 +39,19 @@ TERMUX_PKG_CONFFILES="share/vim/vimrc"
 
 # vim-python:
 TERMUX_PKG_CONFLICTS="vim"
+_PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
 vi_cv_path_python3_pfx=$TERMUX_PREFIX
 vi_cv_var_python3_abiflags=
-vi_cv_var_python3_version=3.10
+vi_cv_var_python3_version=${_PYTHON_VERSION}
 --enable-python3interp
---with-python3-config-dir=$TERMUX_PREFIX/lib/python3.10/config-3.10/
+--with-python3-config-dir=$TERMUX_PREFIX/lib/python${_PYTHON_VERSION}/config-${_PYTHON_VERSION}/
 "
 TERMUX_PKG_DESCRIPTION+=" - with python support"
 # Remove share/vim/vim90 which is in vim-runtime built as a subpackage of vim:
 TERMUX_PKG_RM_AFTER_INSTALL+=" share/vim/vim90"
 termux_step_pre_configure() {
-	CPPFLAGS+=" -I${TERMUX_PREFIX}/include/python3.10"
+	CPPFLAGS+=" -I${TERMUX_PREFIX}/include/python${_PYTHON_VERSION}"
 }
 
 termux_step_pre_configure() {

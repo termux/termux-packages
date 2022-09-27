@@ -17,3 +17,11 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DUSE_PYTHON=ON
 -DUTFCPP_PATH=$TERMUX_PREFIX/include/utf8cpp
 "
+
+termux_step_pre_configure() {
+	local _PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
+	sed $TERMUX_PKG_BUILDER_DIR/CMakeLists.diff \
+		-e "s%@TERMUX_PREFIX@%${TERMUX_PREFIX}%g" \
+		-e "s%@PYTHON_VERSION@%${_PYTHON_VERSION}%g" \
+		| patch --silent -p1
+}
