@@ -19,7 +19,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_pre_configure() {
 	./autogen.sh
 	export CPPFLAGS="-I$TERMUX_PKG_SRCDIR/lib $CPPFLAGS"
-	export PYTHON="python3.10"
+	local _PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
+	export PYTHON="python${_PYTHON_VERSION}"
 }
 
 termux_step_post_configure() {
