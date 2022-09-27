@@ -27,7 +27,6 @@ TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="libc++, libexpat, libpng, libzopfli, zlib"
 TERMUX_PKG_BUILD_DEPENDS="fmt, googletest"
-TERMUX_PKG_HOSTBUILD=true
 
 termux_step_post_get_source() {
 	# FIXME: We would like to enable checksums when downloading
@@ -56,26 +55,7 @@ termux_step_post_get_source() {
 	mv zopfli-zopfli-$ZOPFLI_VER zopfli
 }
 
-termux_step_host_build() {
-	local _PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
-
-	# Need bison that understands --header=[FILE] option.
-	local BISON_BUILD_SH=$TERMUX_SCRIPTDIR/packages/bison/build.sh
-	local BISON_SRCURL=$(bash -c ". $BISON_BUILD_SH; echo \$TERMUX_PKG_SRCURL")
-	local BISON_SHA256=$(bash -c ". $BISON_BUILD_SH; echo \$TERMUX_PKG_SHA256")
-	local BISON_TARFILE=$TERMUX_PKG_CACHEDIR/$(basename $BISON_SRCURL)
-	termux_download $BISON_SRCURL $BISON_TARFILE $BISON_SHA256
-	mkdir -p bison
-	cd bison
-	tar xf $BISON_TARFILE --strip-components=1
-	./configure --prefix=$_PREFIX_FOR_BUILD
-	make -j $TERMUX_MAKE_PROCESSES
-	make install
-}
-
 termux_step_pre_configure() {
-	local _PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
-	
 	# Certain packages are not safe to build on device because their
 	# build.sh script deletes specific files in $TERMUX_PREFIX.
 	if $TERMUX_ON_DEVICE_BUILD; then
