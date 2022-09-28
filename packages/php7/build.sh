@@ -1,10 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://php.net
 TERMUX_PKG_DESCRIPTION="Server-side, HTML-embedded scripting language"
 TERMUX_PKG_LICENSE="PHP-3.0"
-TERMUX_PKG_VERSION=7.4.30
+TERMUX_PKG_VERSION=7.4.31
 TERMUX_PKG_MAINTAINER="@xtkoba"
 TERMUX_PKG_SRCURL=https://github.com/php/php-src/archive/php-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=14cc61935732e11c17ed25d26b1388692d69ee363e96c82532249d65146067bd
+TERMUX_PKG_SHA256=9c40716f1d5496e9155b452eb07451fd00e48abb451ad69fc35d7e4d9acf7111
 # Build native php for phar to build (see pear-Makefile.frag.patch):
 TERMUX_PKG_HOSTBUILD=true
 # Build the native php without xml support as we only need phar:
@@ -84,8 +84,6 @@ termux_step_pre_configure() {
 	CPPFLAGS="-I$TERMUX_PREFIX/include/openssl-1.1 $CPPFLAGS"
 	CXXFLAGS="-I$TERMUX_PREFIX/include/openssl-1.1 $CXXFLAGS"
 	LDFLAGS="-L$TERMUX_PREFIX/lib/openssl-1.1 -Wl,-rpath=$TERMUX_PREFIX/lib/openssl-1.1 $LDFLAGS"
-	export PKG_CONFIG_PATH=$PKG_CONFIG_LIBDIR
-	export PKG_CONFIG_LIBDIR=$TERMUX_PREFIX/lib/openssl-1.1/pkgconfig
 
 	local wrapper_bin=$TERMUX_PKG_BUILDDIR/_wrapper/bin
 	local _cc=$(basename $CC)
@@ -113,4 +111,16 @@ termux_step_post_make_install() {
 	cp sapi/fpm/www.conf $TERMUX_PREFIX/etc/php-fpm.d/
 
 	sed -i 's/SED=.*/SED=sed/' $TERMUX_PREFIX/bin/phpize
+}
+
+termux_step_create_debscripts() {
+	cat <<-EOF > ./postinst
+		#!$TERMUX_PREFIX/bin/sh
+		echo
+		echo "********"
+		echo "PHP 7.4 reaches its end of life on 28 Nov 2022 and is no longer supported afterwards."
+		echo "Please consider migrating to a newer version of PHP."
+		echo "********"
+		echo
+	EOF
 }
