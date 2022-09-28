@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/google/flatbuffers
 TERMUX_PKG_DESCRIPTION="Memory Efficient Serialization Library"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
-TERMUX_PKG_VERSION="2.0.8"
+TERMUX_PKG_VERSION="22.9.24"
 TERMUX_PKG_SRCURL=https://github.com/google/flatbuffers/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=f97965a727d26386afaefff950badef2db3ab6af9afe23ed6d94bfb65f95f37e
+TERMUX_PKG_SHA256=40e0788873012def4d66a2fdbac15fbe012784473c01a703ccb5be33383556bf
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libc++"
 
