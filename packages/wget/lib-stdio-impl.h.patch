@@ -1,12 +1,22 @@
-diff -u -r ../wget-1.20.2/lib/stdio-impl.h ./lib/stdio-impl.h
---- ../wget-1.20.2/lib/stdio-impl.h	2019-04-01 18:26:23.000000000 +0000
-+++ ./lib/stdio-impl.h	2019-04-03 21:54:29.141765465 +0000
-@@ -60,7 +60,7 @@
- #  define _flags pub._flags
- #  define _r pub._r
- #  define _w pub._w
--# elif defined __ANDROID__ /* Android */
-+# elif defined __ANDROID_BUT_THIS_IS_BROKEN__ /* Android */
+--- a/lib/stdio-impl.h
++++ b/lib/stdio-impl.h
+@@ -68,8 +68,10 @@
+ # elif defined __ANDROID__ /* Android */
  #  ifdef __LP64__
  #   define _gl_flags_file_t int
++#   define _gl_struct_file_off_t int64_t
  #  else
+ #   define _gl_flags_file_t short
++#   define _gl_struct_file_off_t __kernel_off_t
+ #  endif
+   /* Up to this commit from 2015-10-12
+      <https://android.googlesource.com/platform/bionic.git/+/f0141dfab10a4b332769d52fa76631a64741297a>
+@@ -96,7 +98,7 @@
+                          unsigned char _nbuf[1]; \
+                          struct { unsigned char *_base; size_t _size; } _lb; \
+                          int _blksize; \
+-                         fpos_t _offset; \
++                         _gl_struct_file_off_t _offset; \
+                          /* More fields, not relevant here.  */ \
+                        } *) fp)
+ # else
