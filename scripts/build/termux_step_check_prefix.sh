@@ -4,7 +4,8 @@ termux_step_check_prefix() {
 				 -path $TERMUX_PREFIX/tmp -prune -o \
 				 -path $TERMUX_PREFIX/var/run -prune -o \
 				 ! -name libutil.so \
-				 -newer "$TERMUX_BUILD_TS_FILE" -type f)
+				 -newer "$TERMUX_BUILD_TS_FILE" -type f \
+				 -print)
 	else
 		new_files=$(find $TERMUX_PREFIX \
 				 ! -name libutil.so \
