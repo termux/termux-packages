@@ -108,6 +108,10 @@ PACKAGES+=" lua5.3"
 # Used bt host build of package mariadb.
 PACKAGES+=" libncurses5-dev"
 
+# Needed to build neovim >= 8.0.0
+PACKAGES+=" lua-lpeg"
+PACKAGES+=" lua-mpack"
+
 # Needed by packages mkvtoolnix and ruby.
 PACKAGES+=" ruby"
 
