@@ -1,6 +1,32 @@
---- ./src/training/CMakeLists.txt.orig	2022-02-16 20:32:23.235233044 +0000
-+++ ./src/training/CMakeLists.txt	2022-02-16 20:34:18.595048181 +0000
-@@ -252,7 +252,7 @@
+diff -uNr tesseract-5.2.0/src/training/CMakeLists.txt tesseract-5.2.0.mod/src/training/CMakeLists.txt
+--- tesseract-5.2.0/src/training/CMakeLists.txt	2022-07-07 05:15:49.000000000 +0900
++++ tesseract-5.2.0.mod/src/training/CMakeLists.txt	2022-09-30 13:12:18.222593892 +0900
+@@ -108,13 +108,14 @@
+     common/trainingsampleset.h)
+ endif()
+ 
+-add_library(common_training ${COMMON_TRAINING_SRC})
++add_library(common_training SHARED ${COMMON_TRAINING_SRC})
+ target_include_directories(common_training PUBLIC common
+                                                   ${CMAKE_CURRENT_BINARY_DIR})
+ target_link_libraries(common_training PUBLIC libtesseract)
+ generate_export_header(common_training EXPORT_MACRO_NAME
+                        TESS_COMMON_TRAINING_API)
+ project_group(common_training "Training Tools")
++install(TARGETS common_training DESTINATION lib)
+ 
+ # ##############################################################################
+ # EXECUTABLE ambiguous_words
+@@ -242,7 +243,7 @@
+ 
+   file(GLOB unicharset_training_src unicharset/*)
+ 
+-  add_library(unicharset_training ${unicharset_training_src})
++  add_library(unicharset_training SHARED ${unicharset_training_src})
+   if(SW_BUILD)
+     target_link_libraries(unicharset_training
+                           PUBLIC common_training org.sw.demo.unicode.icu.i18n)
+@@ -252,7 +253,7 @@
                                                         PkgConfig::ICU)
      else()
        target_link_libraries(unicharset_training PUBLIC common_training
@@ -9,3 +35,28 @@
      endif()
    endif()
    target_include_directories(unicharset_training
+@@ -260,6 +261,7 @@
+   generate_export_header(unicharset_training EXPORT_MACRO_NAME
+                          TESS_UNICHARSET_TRAINING_API)
+   project_group(unicharset_training "Training Tools")
++  install(TARGETS unicharset_training DESTINATION lib)
+ 
+   # ############################################################################
+   # EXECUTABLE combine_lang_model
+@@ -361,7 +363,7 @@
+ 
+     file(GLOB pango_training_src pango/*)
+ 
+-    add_library(pango_training ${pango_training_src})
++    add_library(pango_training SHARED ${pango_training_src})
+     target_link_libraries(pango_training PUBLIC unicharset_training)
+     if(SW_BUILD)
+       target_link_libraries(pango_training
+@@ -383,6 +385,7 @@
+     generate_export_header(pango_training EXPORT_MACRO_NAME
+                            TESS_PANGO_TRAINING_API)
+     project_group(pango_training "Training Tools")
++    install(TARGETS pango_training DESTINATION lib)
+ 
+     # ##########################################################################
+     # EXECUTABLE text2image
