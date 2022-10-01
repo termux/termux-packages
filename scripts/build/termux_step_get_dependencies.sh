@@ -37,11 +37,13 @@ termux_step_get_dependencies() {
 
 			ret=1
 			if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
+				set +e
 				case "$TERMUX_APP_PACKAGE_MANAGER" in
 					"apt") apt install -y "${PKG}=${DEP_VERSION}";;
 					"pacman") pacman -S "${PKG}=${DEP_VERSION_PAC}" --needed --noconfirm;;
 				esac
 				ret="$?"
+				set -e
 			elif [ "$ret" != 0 ]; then
 				if ! termux_download_deb_pac $PKG $DEP_ARCH $DEP_VERSION; then
 					echo "Download of $PKG@$DEP_VERSION from $TERMUX_REPO_URL failed, building instead"
