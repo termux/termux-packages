@@ -35,27 +35,35 @@ termux_step_get_dependencies() {
 				fi
 			fi
 
-			if ! termux_download_deb_pac $PKG $DEP_ARCH $DEP_VERSION $DEP_VERSION_PAC; then
-				echo "Download of $PKG@$DEP_VERSION from $TERMUX_REPO_URL failed, building instead"
-				TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh ${TERMUX_FORCE_BUILD+-f} -I -o $TERMUX_COMMON_CACHEDIR-$DEP_ARCH --format $TERMUX_PACKAGE_FORMAT "${PKG_DIR}"
-			fi
-			if [ ! "$TERMUX_QUIET_BUILD" = true ]; then
-				echo "extracting $PKG to $TERMUX_COMMON_CACHEDIR-$DEP_ARCH..."
-			fi
-			(
-				cd $TERMUX_COMMON_CACHEDIR-$DEP_ARCH
-				ar x ${PKG}_${DEP_VERSION}_${DEP_ARCH}.deb data.tar.xz
-				# Strip prefixed ./data/data/com.termux or
-				# /data/data/com.termux, to avoid permission errors
-				# from tar when extracting on device.
-				if tar -tf data.tar.xz|grep "^./$">/dev/null; then
-					tar -xf data.tar.xz --strip-components=4 \
-						--no-overwrite-dir -C /data/data/$TERMUX_APP_PACKAGE/
-				else
-					tar -xf data.tar.xz --strip-components=3 \
-						--no-overwrite-dir -C /data/data/$TERMUX_APP_PACKAGE/
+			if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
+				case "$TERMUX_APP_PACKAGE_MANAGER" in
+					"apt") apt install -y "${PKG}=${DEP_VERSION}";;
+					"pacman") pacman -S "${PKG}=${DEP_VERSION_PAC}" --needed --noconfirm;;
+				esac
+				ret="$?"
+			elif [ "$ret" != 0 ]; then
+				if ! termux_download_deb_pac $PKG $DEP_ARCH $DEP_VERSION; then
+					echo "Download of $PKG@$DEP_VERSION from $TERMUX_REPO_URL failed, building instead"
+					TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh ${TERMUX_FORCE_BUILD+-f} -I -o $TERMUX_COMMON_CACHEDIR-$DEP_ARCH --format $TERMUX_PACKAGE_FORMAT "${PKG_DIR}"
 				fi
-			)
+				if [ ! "$TERMUX_QUIET_BUILD" = true ]; then
+					echo "extracting $PKG to $TERMUX_COMMON_CACHEDIR-$DEP_ARCH..."
+				fi
+				(
+					cd $TERMUX_COMMON_CACHEDIR-$DEP_ARCH
+					ar x ${PKG}_${DEP_VERSION}_${DEP_ARCH}.deb data.tar.xz
+					# Strip prefixed ./data/data/com.termux or
+					# /data/data/com.termux, to avoid permission errors
+					# from tar when extracting on device.
+					if tar -tf data.tar.xz|grep "^./$">/dev/null; then
+						tar -xf data.tar.xz --strip-components=4 \
+							--no-overwrite-dir -C /data/data/$TERMUX_APP_PACKAGE/
+					else
+						tar -xf data.tar.xz --strip-components=3 \
+							--no-overwrite-dir -C /data/data/$TERMUX_APP_PACKAGE/
+					fi
+				)
+			fi
 
 			mkdir -p $TERMUX_BUILT_PACKAGES_DIRECTORY
 			echo "$DEP_VERSION" > "$TERMUX_BUILT_PACKAGES_DIRECTORY/$PKG"
