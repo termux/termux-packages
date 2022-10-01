@@ -4,7 +4,6 @@ termux_download_deb_pac() {
 	local PACKAGE=$1
 	local PACKAGE_ARCH=$2
 	local VERSION=$3
-	local VERSION_PACMAN=$4
 
 	local DEB_FILE="${PACKAGE}_${VERSION}_${PACKAGE_ARCH}.deb"
 	PKG_HASH=""
@@ -17,14 +16,6 @@ termux_download_deb_pac() {
 	if [ "$TERMUX_REPO_PACKAGE" != "$TERMUX_APP_PACKAGE" ]; then
 		echo "Ignoring download of $DEB_FILE since repo package name ($TERMUX_REPO_PACKAGE) does not equal app package name ($TERMUX_APP_PACKAGE)"
 		return 1
-	fi
-
-	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
-		case "$TERMUX_APP_PACKAGE_MANAGER" in
-			"apt") apt install -y "${PACKAGE}=${VERSION}";;
-			"pacman") pacman -S "${PACKAGE}=${VERSION_PACMAN}" --needed --noconfirm;;
-		esac
-		return "$?"
 	fi
 
 	for idx in $(seq ${#TERMUX_REPO_URL[@]}); do
