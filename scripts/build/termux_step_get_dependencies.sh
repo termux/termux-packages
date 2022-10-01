@@ -67,6 +67,9 @@ termux_step_get_dependencies() {
 			fi
 			termux_add_package_to_built_packages_list "$PKG"
 			[ ! "$TERMUX_QUIET_BUILD" = true ] && echo "extracting $PKG to $TERMUX_COMMON_CACHEDIR-$DEP_ARCH..."
+			if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
+				apt install -y $TERMUX_COMMON_CACHEDIR-$DEP_ARCH/${PKG}_${DEP_VERSION}_${DEP_ARCH}.deb
+			else
 			(
 				cd $TERMUX_COMMON_CACHEDIR-$DEP_ARCH
 				ar x ${PKG}_${DEP_VERSION}_${DEP_ARCH}.deb data.tar.xz
