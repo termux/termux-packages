@@ -40,10 +40,12 @@ termux_step_get_dependencies() {
 					continue
 				fi
 				if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
+					set +e
 					case "$TERMUX_APP_PACKAGE_MANAGER" in
 						"apt") apt install -y "${PKG}=${DEP_VERSION}";;
 						"pacman") pacman -S "${PKG}=${DEP_VERSION_PAC}" --needed --noconfirm;;
 					esac
+					set -e
 					if [ "$?" == 0 ]; then
 						termux_add_package_to_built_packages_list "$PKG"
 						mkdir -p $TERMUX_BUILT_PACKAGES_DIRECTORY
