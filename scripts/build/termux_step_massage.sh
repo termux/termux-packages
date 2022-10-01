@@ -36,7 +36,7 @@ termux_step_massage() {
 	if [ "$TERMUX_PKG_NO_SHEBANG_FIX" != "true" ]; then
 		# Fix shebang paths:
 		while IFS= read -r -d '' file; do
-			head -c 100 "$file" | grep -E "^#\!.*\\/bin\\/.*" | grep -q -E -v "^#\! ?\\/system" &&
+			head -c 100 "$file" | grep -E "^#!.*/bin/.*" | grep -q -E -v "^#! ?/system" &&
 				sed --follow-symlinks -i -E "1 s@^#\!(.*)/bin/(.*)@#\!$TERMUX_PREFIX/bin/\2@" "$file"
 		done < <(find -L . -type f -print0)
 	fi
