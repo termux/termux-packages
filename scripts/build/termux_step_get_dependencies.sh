@@ -35,6 +35,7 @@ termux_step_get_dependencies() {
 				fi
 			fi
 
+			ret=1
 			if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
 				case "$TERMUX_APP_PACKAGE_MANAGER" in
 					"apt") apt install -y "${PKG}=${DEP_VERSION}";;
@@ -46,9 +47,10 @@ termux_step_get_dependencies() {
 					echo "Download of $PKG@$DEP_VERSION from $TERMUX_REPO_URL failed, building instead"
 					TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh ${TERMUX_FORCE_BUILD+-f} -I -o $TERMUX_COMMON_CACHEDIR-$DEP_ARCH --format $TERMUX_PACKAGE_FORMAT "${PKG_DIR}"
 				fi
-				if [ ! "$TERMUX_QUIET_BUILD" = true ]; then
-					echo "extracting $PKG to $TERMUX_COMMON_CACHEDIR-$DEP_ARCH..."
-				fi
+
+				if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
+					apt install -y $TERMUX_COMMON_CACHEDIR-$DEP_ARCH/${PKG}_${DEP_VERSION}_${DEP_ARCH}.deb
+				else
 				(
 					cd $TERMUX_COMMON_CACHEDIR-$DEP_ARCH
 					ar x ${PKG}_${DEP_VERSION}_${DEP_ARCH}.deb data.tar.xz
@@ -61,6 +63,7 @@ termux_step_get_dependencies() {
 						tar -xf data.tar.xz --overwrite-dir -C /
 					fi
 				)
+				fi
 			fi
 
 			mkdir -p $TERMUX_BUILT_PACKAGES_DIRECTORY
