@@ -4,8 +4,8 @@ TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENCE"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=5.9
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/zsh-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_REVISION=2
+TERMUX_PKG_SRCURL="https://sourceforge.net/projects/zsh/files/zsh/$TERMUX_PKG_VERSION/zsh-$TERMUX_PKG_VERSION".tar.xz
 TERMUX_PKG_SHA256=9b8d1ecedd5b5e81fbf1918e876752a7dd948e05c1a0dba10ab863842d45acd5
 # Remove hard link to bin/zsh as Android does not support hard links:
 TERMUX_PKG_RM_AFTER_INSTALL="bin/zsh-${TERMUX_PKG_VERSION}"
@@ -16,6 +16,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-pcre
 --enable-cap
 --enable-etcdir=$TERMUX_PREFIX/etc
+zsh_cv_path_wtmp=no
 ac_cv_header_utmp_h=no
 ac_cv_func_getpwuid=yes
 ac_cv_func_setresgid=no
@@ -28,6 +29,36 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_RM_AFTER_INSTALL+="
 share/zsh/${TERMUX_PKG_VERSION}/functions/_pkg5
 "
+
+termux_step_pre_configure() {
+
+	## fix "largefile" for arithmetic larger than sint32
+	## as zsh force disable the detection of these flags in its ./configure when running in a cross-build environment
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
+	zsh_cv_printf_has_lld=yes
+	zsh_cv_rlim_t_is_longer=no
+	zsh_cv_type_rlim_t_is_unsigned=yes
+	"
+	if [[ "$TERMUX_ARCH" = arm || "$TERMUX_ARCH" = i686 ]] ; then
+		## this essentially attempts to add zsh_cv_64_bit_type="long long" in EXTRA_CONFIGURE_ARGS.
+		## the space in argument to this flag make build script of termux
+		## wrongly splitted the flag as separated flags
+		## the reason is termux build script does not use ${TERMUX_PKG_EXTRA_CONFIGURE_ARGS[@]}
+		## (which is required to keep space in each flags by using an array) during shell expansion
+		perl -0pe 's#zsh_cv_64_bit_type=no#zsh_cv_64_bit_type="long long"#ms' < configure > configure.newf
+		cat configure.newf > configure
+		rm configure.newf
+
+ 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
+		zsh_cv_off_t_is_64_bit=yes
+		"
+	else
+ 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
+		zsh_cv_64_bit_type=long
+		"
+	fi
+
+}
 
 termux_step_post_configure() {
 	# Certain packages are not safe to build on device because their
