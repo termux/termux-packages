@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE="https://github.com/sirwart/ripsecrets"
+TERMUX_PKG_DESCRIPTION="A command-line tool to prevent committing secret keys into your source code"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="0.1.5"
+TERMUX_PKG_SRCURL="https://github.com/sirwart/ripsecrets/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
+TERMUX_PKG_SHA256=1e3d36b3892d241dfd5e9abd86ddb47f22e6837b89cf9ee44989d6c1271dda2b
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_BUILD_IN_SRC=true
