@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Modular compiler and toolchain technologies library"
 TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_LICENSE_FILE="llvm/LICENSE.TXT"
 TERMUX_PKG_MAINTAINER="@buttaface"
-LLVM_MAJOR_VERSION=14
-TERMUX_PKG_VERSION=${LLVM_MAJOR_VERSION}.0.5
-TERMUX_PKG_SHA256=c9d27903ba3883c476a83cd515e36e1e07b0585db55692835de11385d9e3c8fa
+LLVM_MAJOR_VERSION=15
+TERMUX_PKG_VERSION=${LLVM_MAJOR_VERSION}.0.1
+TERMUX_PKG_SHA256=f25ce2d4243bebf527284eb7be7f6f56ef454fca8b3de9523f7eb4efb8d26218
 TERMUX_PKG_SRCURL=https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/llvm-project-$TERMUX_PKG_VERSION.src.tar.xz
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_RM_AFTER_INSTALL="
@@ -41,6 +41,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLLDB_PYTHON_EXE_RELATIVE_PATH=bin/python${_PYTHON_VERSION}
 -DLLDB_PYTHON_EXT_SUFFIX=.cpython-${_PYTHON_VERSION}.so
 -DCLANG_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/clang-tblgen
+-DCLANG_PSEUDO_GEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/clang-pseudo-gen
+-DCLANG_TIDY_CONFUSABLE_CHARS_GEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/clang-tidy-confusable-chars-gen
 -DLLDB_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/lldb-tblgen
 -DLLVM_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/llvm-tblgen
 -DMLIR_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/mlir-tblgen
@@ -73,8 +75,10 @@ termux_step_host_build() {
 	termux_setup_cmake
 	termux_setup_ninja
 
-	cmake -G Ninja -DLLVM_ENABLE_PROJECTS='clang;lldb;mlir' $TERMUX_PKG_SRCDIR/llvm
-	ninja -j $TERMUX_MAKE_PROCESSES clang-tblgen lldb-tblgen llvm-tblgen mlir-tblgen mlir-linalg-ods-yaml-gen
+	cmake -G Ninja -DCMAKE_BUILD_TYPE=Release \
+		-DLLVM_ENABLE_PROJECTS='clang;clang-tools-extra;lldb;mlir' $TERMUX_PKG_SRCDIR/llvm
+	ninja -j $TERMUX_MAKE_PROCESSES clang-tblgen clang-pseudo-gen \
+		clang-tidy-confusable-chars-gen lldb-tblgen llvm-tblgen mlir-tblgen mlir-linalg-ods-yaml-gen
 }
 
 termux_step_pre_configure() {
@@ -121,6 +125,8 @@ termux_step_post_make_install() {
 	for tool in clang clang++ cc c++ cpp gcc g++ ${TERMUX_HOST_PLATFORM}-{clang,clang++,gcc,g++,cpp}; do
 		ln -f -s clang-${LLVM_MAJOR_VERSION} $tool
 	done
+
+	ln -f -s clang++ clang++-${LLVM_MAJOR_VERSION}
 
 	if [ $TERMUX_ARCH == "arm" ]; then
 		# For arm we replace symlinks with the same type of

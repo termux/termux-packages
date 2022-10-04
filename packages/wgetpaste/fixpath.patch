@@ -1,0 +1,61 @@
+--- a/wgetpaste
++++ b/wgetpaste
+@@ -334,7 +334,7 @@
+ noxclip() {
+ 	cat <<EOF >&2
+ Could not find xclip on your system. In order to use --x$1 you must either
+-emerge x11-misc/xclip or define x_$1() globally in /etc/wgetpaste.conf or
++emerge x11-misc/xclip or define x_$1() globally in @TERMUX_PREFIX@/etc/wgetpaste.conf or
+ per user in ~/.wgetpaste.conf to use another program (such as e.g. xcut or
+ klipper) to $2 your clipboard.
+ 
+@@ -532,11 +532,11 @@
+         --debug                   be *very* verbose (implies -v)
+ 
+     -h, --help                    show this help
+-    -g, --ignore-configs          ignore /etc/wgetpaste.conf, ~/.wgetpaste.conf etc.
++    -g, --ignore-configs          ignore @TERMUX_PREFIX@/etc/wgetpaste.conf, ~/.wgetpaste.conf etc.
+         --version                 show version information
+ 
+ Defaults (DEFAULT_{NICK,LANGUAGE,EXPIRATION}[_\${SERVICE}] and DEFAULT_SERVICE)
+-can be overridden globally in /etc/wgetpaste.conf or /etc/wgetpaste.d/*.conf or
++can be overridden globally in @TERMUX_PREFIX@/etc/wgetpaste.conf or @TERMUX_PREFIX@/etc/wgetpaste.d/*.conf or
+ per user in any of ~/.wgetpaste.conf or ~/.wgetpaste.d/*.conf.
+ 
+ An additional http header can be passed by setting HEADER_\${SERVICE} in any of the
+@@ -823,7 +823,7 @@
+ 	if [[ ! $IGNORECONFIGS ]]; then
+ 		# compatibility code
+ 		local f deprecated=
+-		for f in {/etc/,~/.}wgetpaste{.d/*.bash,}; do
++		for f in {@TERMUX_PREFIX@/etc/,~/.}wgetpaste{.d/*.bash,}; do
+ 			if [[ -f $f ]]; then
+ 				if [[ -z $deprecated ]]; then
+ 					echo "The config files for wgetpaste have changed to *.conf.$N" >&2
+@@ -835,7 +835,7 @@
+ 		done
+ 		[[ -n $deprecated ]] && echo >&2
+ 		# new locations override old ones in case they collide
+-		for f in {/etc/,~/.}wgetpaste{.d/*,}.conf; do
++		for f in {@TERMUX_PREFIX@/etc/,~/.}wgetpaste{.d/*,}.conf; do
+ 			if [[ -f $f ]]; then
+ 				source "$f" || die "Failed to source $f"
+ 			fi
+@@ -922,7 +922,7 @@
+ 
+ # create tmpfile for use with tee
+ if [[ $TEE ]]; then
+-	TMPF=$(mktemp /tmp/wgetpaste.XXXXXX)
++	TMPF=$(mktemp @TERMUX_PREFIX@/tmp/wgetpaste.XXXXXX)
+ 	[[ -f $TMPF ]] || die "Could not create a temporary file for use with tee."
+ fi
+ 
+@@ -1026,7 +1026,7 @@
+ else
+ 	# create temp file (wget is much more reliable reading
+ 	# large input via --post-file rather than --post-data)
+-	[[ -f $TMPF ]] || TMPF=$(mktemp /tmp/wgetpaste.XXXXXX)
++	[[ -f $TMPF ]] || TMPF=$(mktemp @TERMUX_PREFIX@/tmp/wgetpaste.XXXXXX)
+ 	if [[ -f $TMPF ]]; then
+ 		postdata > "$TMPF" || die "Failed to write to temporary file: \"$TMPF\"."
+ 		WGETARGS="--post-file=$TMPF"

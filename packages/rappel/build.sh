@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/yrp604/rappel
-TERMUX_PKG_DESCRIPTION="Rappel is a pretty janky assembly REPL."
+TERMUX_PKG_DESCRIPTION="Rappel is a pretty janky assembly REPL"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"

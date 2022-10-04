@@ -1,6 +1,6 @@
-diff -uNr boinc-client_release-7.18-7.18.1/client/app_start.cpp boinc-client_release-7.18-7.18.1.mod/client/app_start.cpp
---- boinc-client_release-7.18-7.18.1/client/app_start.cpp	2021-08-03 23:52:19.000000000 +0800
-+++ boinc-client_release-7.18-7.18.1.mod/client/app_start.cpp	2021-12-29 19:46:22.481460428 +0800
+diff -uNr boinc/client/app_start.cpp boinc.mod/client/app_start.cpp
+--- boinc/client/app_start.cpp	2022-07-18 18:32:21.000000000 +0800
++++ boinc.mod/client/app_start.cpp	2022-09-11 21:07:05.075844110 +0800
 @@ -81,6 +81,10 @@
  
  #include "app.h"
@@ -12,7 +12,7 @@ diff -uNr boinc-client_release-7.18-7.18.1/client/app_start.cpp boinc-client_rel
  
  #ifdef _WIN32
  // Dynamically link to these functions at runtime;
-@@ -1129,6 +1133,49 @@
+@@ -1117,6 +1121,49 @@
              //
              umask(2);
              retval = execv(switcher_path, argv);
@@ -62,7 +62,7 @@ diff -uNr boinc-client_release-7.18-7.18.1/client/app_start.cpp boinc-client_rel
          } else {
              argv[0] = buf;
              parse_command_line(cmdline, argv+1);
-@@ -1151,6 +1198,17 @@
+@@ -1139,6 +1186,17 @@
          );
      }
  

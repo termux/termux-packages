@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://nasm.us
-TERMUX_PKG_DESCRIPTION="A cross-platform x86 assembler with an Intel-like syntax."
+TERMUX_PKG_DESCRIPTION="A cross-platform x86 assembler with an Intel-like syntax"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.15.05

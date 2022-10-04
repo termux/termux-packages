@@ -19,6 +19,7 @@ local libcutils_nonwindows_sources="
 "
 libcutils_nonwindows_sources+="
 	ashmem-host.cpp
+	canned_fs_config.cpp
 	fs_config.cpp
 	trace-host.cpp
 "
@@ -26,7 +27,6 @@ local libcutils_sources="
 	$libcutils_sockets_sources
 	$libcutils_nonwindows_sources
 	config_utils.cpp
-	canned_fs_config.cpp
 	iosched_policy.cpp
 	load_file.cpp
 	native_handle.cpp
@@ -69,10 +69,12 @@ local libbase_sources="
 	chrono_utils.cpp
 	cmsg.cpp
 	file.cpp
+	hex.cpp
 	logging.cpp
 	mapped_file.cpp
 	parsebool.cpp
 	parsenetaddress.cpp
+	posix_strerror_r.cpp
 	process.cpp
 	properties.cpp
 	stringprintf.cpp
@@ -231,8 +233,8 @@ local libaidl_sources="
 	aidl_to_rust.cpp
 	aidl_typenames.cpp
 	aidl.cpp
-	ast_cpp.cpp
 	ast_java.cpp
+	check_valid.cpp
 	code_writer.cpp
 	comments.cpp
 	diagnostics.cpp
@@ -244,11 +246,12 @@ local libaidl_sources="
 	generate_rust.cpp
 	import_resolver.cpp
 	io_delegate.cpp
-	line_reader.cpp
 	location.cpp
 	logging.cpp
 	options.cpp
 	parser.cpp
+	permission.cpp
+	preprocess.cpp
 "
 libaidl_sources+="
 	lex.yy.c

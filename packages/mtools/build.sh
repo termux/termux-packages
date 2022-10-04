@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/mtools/
-TERMUX_PKG_DESCRIPTION="Tool for manipulating FAT images."
+TERMUX_PKG_DESCRIPTION="Tool for manipulating FAT images"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=4.0.35

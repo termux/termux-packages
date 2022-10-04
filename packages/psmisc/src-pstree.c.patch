@@ -1,6 +1,6 @@
-diff -u -r ../psmisc-23.3/src/pstree.c ./src/pstree.c
---- ../psmisc-23.3/src/pstree.c	2019-10-23 10:40:19.516725375 +0000
-+++ ./src/pstree.c	2020-01-12 00:27:42.797645090 +0000
+diff -uNr psmisc/src/pstree.c psmisc.mod/src/pstree.c
+--- psmisc/src/pstree.c	2022-03-18 06:06:43.006913676 +0800
++++ psmisc.mod/src/pstree.c	2022-08-04 00:04:01.363949569 +0800
 @@ -36,7 +36,9 @@
  #include <curses.h>
  #include <term.h>
@@ -21,9 +21,9 @@ diff -u -r ../psmisc-23.3/src/pstree.c ./src/pstree.c
 +#endif
 +
  #ifdef WITH_SELINUX
+ #include <dlfcn.h>
  #include <selinux/selinux.h>
- #else
-@@ -904,6 +910,16 @@
+@@ -961,6 +967,16 @@
  static double
  uptime()
  {
@@ -40,7 +40,7 @@ diff -u -r ../psmisc-23.3/src/pstree.c ./src/pstree.c
      char * savelocale;
      char buf[2048];
      FILE* file;
-@@ -916,6 +932,7 @@
+@@ -973,6 +989,7 @@
      fclose(file);
      setlocale(LC_NUMERIC,savelocale);
      return atof(buf);
@@ -48,7 +48,7 @@ diff -u -r ../psmisc-23.3/src/pstree.c ./src/pstree.c
  }
  
  /* process age from jiffies to seconds via uptime */
-@@ -1292,6 +1309,10 @@
+@@ -1327,6 +1344,10 @@
       * command-line options, if given.
       */
  
@@ -59,11 +59,11 @@ diff -u -r ../psmisc-23.3/src/pstree.c ./src/pstree.c
      if (isatty(1) && !strcmp(nl_langinfo(CODESET), "UTF-8")) {
          /* Use UTF-8 symbols if the locale's character set is UTF-8. */
          sym = &sym_utf;
-@@ -1311,6 +1332,7 @@
+@@ -1346,6 +1367,7 @@
          /* Otherwise, fall back to ASCII. */
          sym = &sym_ascii;
      }
 +#endif
  
- #ifdef WITH_SELINUX
      while ((c =
+             getopt_long(argc, argv, "aAcC:GhH:nN:pglsStTuUVZ", options,

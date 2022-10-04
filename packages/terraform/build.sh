@@ -29,6 +29,10 @@ termux_step_make() {
 		chmod 0755 "$(dirname "$f")"
 		chmod 0644 "${f}"
 		patch --silent -p1 -d "$(dirname "$f")" <"${TERMUX_PKG_TMPDIR}"/patch1
+		# The patch above does not fix build issue for some reason.
+		# Alternative workaround:
+		rm -f "${f}"
+		echo "package pq" > "${f}"
 	done
 
 	local GO_LDFLAGS="-X 'github.com/hashicorp/terraform/version.Prerelease='"

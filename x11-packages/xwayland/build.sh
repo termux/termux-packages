@@ -3,12 +3,15 @@ TERMUX_PKG_DESCRIPTION="Wayland X11 server"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.20.5
-TERMUX_PKG_REVISION=14
+TERMUX_PKG_REVISION=15
 TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/xserver/xorg-server-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=a81d8243f37e75a03d4f8c55f96d0bc25802be6ec45c3bfa5cb614c6d01bac9d
 TERMUX_PKG_DEPENDS="libandroid-shmem, libdrm, libpciaccess, libpixman, libx11, libxau, libxfont2, libxinerama, libxkbfile, libxshmfence, mesa, openssl, xkeyboard-config, xorg-xkbcomp, libwayland, libwayland-protocols, libepoxy"
+TERMUX_PKG_BUILD_DEPENDS="libwayland-cross-scanner"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+ac_cv_path_RAWCPP=/usr/bin/cpp
+ac_cv_path_WAYLAND_SCANNER=$TERMUX_PREFIX/opt/libwayland/cross/bin/wayland-scanner
 --enable-composite
 --enable-mitshm
 --enable-xres

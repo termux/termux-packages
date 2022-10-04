@@ -15,7 +15,8 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	python3.10 setup.py install --prefix=$TERMUX_PREFIX --force
+	local _PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
+	python${_PYTHON_VERSION} setup.py install --prefix=$TERMUX_PREFIX --force
 }
 
 termux_step_post_massage() {

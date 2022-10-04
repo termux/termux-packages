@@ -3,6 +3,14 @@
 
 set -e -o pipefail -u
 
+cd "$(realpath "$(dirname "$0")")"
+TERMUX_SCRIPTDIR=$(pwd)
+export TERMUX_SCRIPTDIR
+
+# Store pid of current process in a file for docker__run_docker_exec_trap
+source "$TERMUX_SCRIPTDIR/scripts/utils/docker/docker.sh"; docker__create_docker_exec_pid_file
+
+
 SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct 2>/dev/null || date "+%s")
 export SOURCE_DATE_EPOCH
 
@@ -21,10 +29,6 @@ if [ "$(uname -o)" = "Android" ] || [ -e "/system/bin/app_process" ]; then
 else
 	export TERMUX_ON_DEVICE_BUILD=false
 fi
-
-cd "$(realpath "$(dirname "$0")")"
-TERMUX_SCRIPTDIR=$(pwd)
-export TERMUX_SCRIPTDIR
 
 # Automatically enable offline set of sources and build tools.
 # Offline termux-packages bundle can be created by executing
@@ -185,9 +189,21 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_handle_hostbuild.sh"
 # shellcheck source=scripts/build/termux_step_host_build.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_host_build.sh"
 
-# Setup a standalone Android NDK toolchain. Not to be overridden by packages.
+# Setup a standalone Android NDK 25b toolchain. Called from termux_step_setup_toolchain.
+# shellcheck source=scripts/build/toolchain/termux_setup_toolchain_25b.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/toolchain/termux_setup_toolchain_25b.sh"
+
+# Setup a standalone Android NDK 23c toolchain. Called from termux_step_setup_toolchain.
+# shellcheck source=scripts/build/toolchain/termux_setup_toolchain_23c.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/toolchain/termux_setup_toolchain_23c.sh"
+
+# Runs termux_step_setup_toolchain_${TERMUX_NDK_VERSION}. Not to be overridden by packages.
 # shellcheck source=scripts/build/termux_step_setup_toolchain.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_setup_toolchain.sh"
+
+# Setup a standalone toolchain with GNU Assembler (GAS). Can be called from build.sh.
+# shellcheck source=scripts/build/toolchain/termux_setup_gnu_as_23c.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/toolchain/termux_setup_gnu_as_23c.sh"
 
 # Apply all *.patch files for the package. Not to be overridden by packages.
 # shellcheck source=scripts/build/termux_step_patch_package.sh
@@ -253,9 +269,8 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_install_license.sh"
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_extract_into_massagedir.sh"
 
 # Hook function to create {pre,post}install, {pre,post}rm-scripts for subpkgs
-termux_step_create_subpkg_debscripts() {
-	return
-}
+# shellcheck source=scripts/build/termux_step_create_subpkg_debscripts.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_create_subpkg_debscripts.sh"
 
 # Create all subpackages. Run from termux_step_massage
 # shellcheck source=scripts/build/termux_create_debian_subpackages.sh
@@ -367,7 +382,7 @@ while (($# >= 1)); do
 				if [ -z "$1" ]; then
 					termux_error_exit "./build-package.sh: argument to '--format' should not be empty"
 				fi
-				TERMUX_PACKAGE_FORMAT="$1"
+				export TERMUX_PACKAGE_FORMAT="$1"
 			else
 				termux_error_exit "./build-package.sh: option '--format' requires an argument"
 			fi
@@ -418,6 +433,13 @@ while (($# >= 1)); do
 	shift 1
 done
 unset -f _show_usage
+
+# Dependencies should be used from repo only if they are built for
+# same package name.
+if [ "$TERMUX_REPO_PACKAGE" != "$TERMUX_APP_PACKAGE" ]; then
+	echo "Ignoring -i option to download dependencies since repo package name ($TERMUX_REPO_PACKAGE) does not equal app package name ($TERMUX_APP_PACKAGE)"
+	TERMUX_INSTALL_DEPS=false
+fi
 
 if [ -n "${TERMUX_PACKAGE_FORMAT-}" ]; then
 	case "${TERMUX_PACKAGE_FORMAT-}" in
@@ -474,7 +496,7 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 				if [ -d "${TERMUX_SCRIPTDIR}/${package_directory}/${TERMUX_PKG_NAME}" ]; then
 					export TERMUX_PKG_BUILDER_DIR=${TERMUX_SCRIPTDIR}/$package_directory/$TERMUX_PKG_NAME
 					break
-				elif [ -n "${TERMUX_IS_DISABLED=""}" ] && [ -d "${TERMUX_SCRIPTDIR}/disabled-packages/${TERMUX_PKG_NAME}"]; then
+				elif [ -n "${TERMUX_IS_DISABLED=""}" ] && [ -d "${TERMUX_SCRIPTDIR}/disabled-packages/${TERMUX_PKG_NAME}" ]; then
 					export TERMUX_PKG_BUILDER_DIR=$TERMUX_SCRIPTDIR/disabled-packages/$TERMUX_PKG_NAME
 					break
 				fi

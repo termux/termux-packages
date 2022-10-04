@@ -18,16 +18,13 @@ index 08b1a50..f2b1457 100644
  
      if (cur == NULL) return;
      if (cur->type == XML_NAMESPACE_DECL) {
-@@ -3703,21 +3701,8 @@ xmlFreeNodeList(xmlNodePtr cur) {
+@@ -3753,18 +3751,8 @@ xmlFreeNodeList(xmlNodePtr cur) {
  	return;
      }
      if (cur->doc != NULL) dict = cur->doc->dict;
 -    while (1) {
 -        while ((cur->children != NULL) &&
 -               (cur->type != XML_DOCUMENT_NODE) &&
--#ifdef LIBXML_DOCB_ENABLED
--               (cur->type != XML_DOCB_DOCUMENT_NODE) &&
--#endif
 -               (cur->type != XML_HTML_DOCUMENT_NODE) &&
 -               (cur->type != XML_DTD_NODE) &&
 -               (cur->type != XML_ENTITY_REF_NODE)) {
@@ -39,8 +36,8 @@ index 08b1a50..f2b1457 100644
          next = cur->next;
 -        parent = cur->parent;
  	if ((cur->type == XML_DOCUMENT_NODE) ||
- #ifdef LIBXML_DOCB_ENABLED
-             (cur->type == XML_DOCB_DOCUMENT_NODE) ||
+             (cur->type == XML_HTML_DOCUMENT_NODE)) {
+             xmlFreeDoc((xmlDocPtr) cur);
 @@ -3729,6 +3714,9 @@ xmlFreeNodeList(xmlNodePtr cur) {
  	    if ((__xmlRegisterCallbacks) && (xmlDeregisterNodeDefaultValue))
  		xmlDeregisterNodeDefaultValue(cur);

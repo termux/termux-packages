@@ -5,5 +5,5 @@
 
 ;; Assume UTF-8 keyboard input for emacsclient:
 (add-hook 'server-visit-hook
-          '(lambda ()
+          #'(lambda ()
              (set-keyboard-coding-system 'utf-8-unix)))

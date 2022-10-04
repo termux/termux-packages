@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://elinux.org/Android_aapt
 TERMUX_PKG_DESCRIPTION="Android Asset Packaging Tool"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-_TAG_VERSION=12.0.0
-_TAG_REVISION=27
+_TAG_VERSION=13.0.0
+_TAG_REVISION=6
 TERMUX_PKG_VERSION=${_TAG_VERSION}.${_TAG_REVISION}
-TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=(https://android.googlesource.com/platform/frameworks/base
                    https://android.googlesource.com/platform/system/core
                    https://android.googlesource.com/platform/system/libbase
@@ -27,7 +26,6 @@ TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="libc++, libexpat, libpng, libzopfli, zlib"
 TERMUX_PKG_BUILD_DEPENDS="fmt, googletest"
-TERMUX_PKG_HOSTBUILD=true
 
 termux_step_post_get_source() {
 	# FIXME: We would like to enable checksums when downloading
@@ -56,23 +54,6 @@ termux_step_post_get_source() {
 	mv zopfli-zopfli-$ZOPFLI_VER zopfli
 }
 
-termux_step_host_build() {
-	_PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/_prefix
-
-	# Need bison that understands --header=[FILE] option.
-	local BISON_BUILD_SH=$TERMUX_SCRIPTDIR/packages/bison/build.sh
-	local BISON_SRCURL=$(bash -c ". $BISON_BUILD_SH; echo \$TERMUX_PKG_SRCURL")
-	local BISON_SHA256=$(bash -c ". $BISON_BUILD_SH; echo \$TERMUX_PKG_SHA256")
-	local BISON_TARFILE=$TERMUX_PKG_CACHEDIR/$(basename $BISON_SRCURL)
-	termux_download $BISON_SRCURL $BISON_TARFILE $BISON_SHA256
-	mkdir -p bison
-	cd bison
-	tar xf $BISON_TARFILE --strip-components=1
-	./configure --prefix=$_PREFIX_FOR_BUILD
-	make -j $TERMUX_MAKE_PROCESSES
-	make install
-}
-
 termux_step_pre_configure() {
 	# Certain packages are not safe to build on device because their
 	# build.sh script deletes specific files in $TERMUX_PREFIX.
@@ -82,7 +63,7 @@ termux_step_pre_configure() {
 
 	termux_setup_protobuf
 
-	export PATH=$_PREFIX_FOR_BUILD/bin:$PATH
+	export PATH=$TERMUX_PKG_HOSTBUILD_DIR/_prefix/bin:$PATH
 
 	CFLAGS+=" -fPIC"
 	CXXFLAGS+=" -fPIC -std=c++17"
@@ -246,7 +227,7 @@ termux_step_make_install() {
 	rm -rf android-jar
 	mkdir android-jar
 	cd android-jar
-	cp $ANDROID_HOME/platforms/android-32/android.jar .
+	cp $ANDROID_HOME/platforms/android-33/android.jar .
 	unzip -q android.jar
 	mkdir -p $TERMUX_PREFIX/share/aapt
 	jar cfM $TERMUX_PREFIX/share/aapt/android.jar AndroidManifest.xml resources.arsc

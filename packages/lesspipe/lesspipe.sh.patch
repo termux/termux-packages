@@ -1,11 +1,12 @@
---- a/lesspipe.sh
-+++ b/lesspipe.sh
-@@ -719,7 +719,7 @@
+diff -uNr lesspipe-2.06/lesspipe.sh lesspipe-2.06.mod/lesspipe.sh
+--- lesspipe-2.06/lesspipe.sh	2022-08-17 17:56:28.000000000 +0800
++++ lesspipe-2.06.mod/lesspipe.sh	2022-08-18 09:08:30.092341078 +0800
+@@ -724,7 +724,7 @@
  setopt sh_word_split 2>/dev/null
  PATH=$PATH:${0%%/lesspipe.sh}
  # the current locale in lowercase (or generic utf-8)
 -locale=$(locale|grep LC_CTYPE|sed 's/.*"\(.*\)"/\1/') || locale=en_US.UTF-8
 +locale=en_US.UTF-8
- lclocale=$(echo ${locale##*.}|tr '[A-Z]' '[a-z]')
+ lclocale=$(echo ${locale##*.}|tr '[:upper:]' '[:lower:]')
  
  sep=:					# file name separator

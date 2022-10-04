@@ -28,6 +28,10 @@ termux_create_pacman_subpackages() {
 		local SUB_PKG_PACKAGE_DIR=$SUB_PKG_DIR/package
 		mkdir -p "$SUB_PKG_MASSAGE_DIR" "$SUB_PKG_PACKAGE_DIR"
 
+		# Override termux_step_create_subpkg_debscripts
+		# shellcheck source=/dev/null
+		source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_create_subpkg_debscripts.sh"
+
 		# shellcheck source=/dev/null
 		source "$subpackage"
 

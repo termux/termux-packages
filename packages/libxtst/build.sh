@@ -3,9 +3,15 @@ TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="X11 Testing -- Resource extension library"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.2.3
-TERMUX_PKG_REVISION=26
-TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/lib/libXtst-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=4655498a1b8e844e3d6f21f3b2c4e2b571effb5fd83199d428a6ba7ea4bf5204
+TERMUX_PKG_VERSION=1.2.4
+TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/lib/libXtst-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=84f5f30b9254b4ffee14b5b0940e2622153b0d3aed8286a3c5b7eeb340ca33c8
 TERMUX_PKG_DEPENDS="libx11, libxext, libxi"
 TERMUX_PKG_BUILD_DEPENDS="libxfixes, xorg-util-macros"
+
+termux_step_post_massage() {
+	cd ${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/lib || exit 1
+	if [ ! -e "./libXtst.so.6" ]; then
+		ln -sf libXtst.so libXtst.so.6
+	fi
+}

@@ -1,0 +1,12 @@
+diff -uNr delve-1.9.0/pkg/proc/dump.go delve-1.9.0.mod/pkg/proc/dump.go
+--- delve-1.9.0/pkg/proc/dump.go	2022-07-07 01:18:27.000000000 +0800
++++ delve-1.9.0.mod/pkg/proc/dump.go	2022-07-14 17:04:23.616488636 +0800
+@@ -118,7 +118,7 @@
+ 	fhdr.Version = elf.EV_CURRENT
+ 
+ 	switch bi.GOOS {
+-	case "linux":
++	case "linux", "android":
+ 		fhdr.OSABI = elf.ELFOSABI_LINUX
+ 	case "freebsd":
+ 		fhdr.OSABI = elf.ELFOSABI_FREEBSD

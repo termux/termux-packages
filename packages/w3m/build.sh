@@ -5,13 +5,14 @@ TERMUX_PKG_MAINTAINER="@termux"
 _MAJOR_VERSION=0.5.3
 _MINOR_VERSION=20190105
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.${_MINOR_VERSION}
-TERMUX_PKG_REVISION=8
+TERMUX_PKG_REVISION=9
 # The upstream w3m project is dead, but every linux distribution uses
 # this maintained fork in debian:
 TERMUX_PKG_SRCURL=https://github.com/tats/w3m/archive/v${_MAJOR_VERSION}+git${_MINOR_VERSION}.tar.gz
 TERMUX_PKG_SHA256=0467bb5429b75749205a3f57b9f5e8abba49929272aeab6fce94ff17953f0784
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="libgc, ncurses, openssl, zlib"
+TERMUX_PKG_RECOMMENDS="libsixel"
 TERMUX_PKG_SUGGESTS="perl"
 
 # ac_cv_func_bcopy=yes to avoid w3m defining it's own bcopy function, which

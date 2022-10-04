@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Portable, embeddable Scheme implementation written in C.
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.8.8
-TERMUX_PKG_REVISION=15
+TERMUX_PKG_REVISION=16
 TERMUX_PKG_SRCURL=ftp://ftp.gnu.org/pub/gnu/guile/guile-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=c3471fed2e72e5b04ad133bbaaf16369e8360283679bcf19800bc1b381024050
 TERMUX_PKG_DEPENDS="libcrypt, libgmp, libltdl, ncurses, readline"
@@ -20,7 +20,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_host_build() {
 	mkdir HOSTBUILDINSTALL
 
-	../src/configure \
+	CFLAGS=" -O1" ../src/configure \
 		--prefix="$TERMUX_PKG_HOSTBUILD_DIR"/HOSTBUILDINSTALL \
 		--program-suffix=1.8 \
 		--disable-error-on-warning

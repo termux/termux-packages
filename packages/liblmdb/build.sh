@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://symas.com/lmdb/
-TERMUX_PKG_DESCRIPTION="LMDB implements a simplified variant of the BerkeleyDB (BDB) API."
+TERMUX_PKG_DESCRIPTION="LMDB implements a simplified variant of the BerkeleyDB (BDB) API"
 TERMUX_PKG_LICENSE="OpenLDAP"
 TERMUX_PKG_LICENSE_FILE="libraries/liblmdb/LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"

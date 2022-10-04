@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/s-yata/marisa-trie
-TERMUX_PKG_DESCRIPTION="Matching Algorithm with Recursively Implemented StorAge."
+TERMUX_PKG_DESCRIPTION="Matching Algorithm with Recursively Implemented StorAge"
 TERMUX_PKG_LICENSE="BSD 2-Clause, LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.2.6

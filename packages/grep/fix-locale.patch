@@ -1,0 +1,46 @@
+This may seem to disregard commit a328a50407c41d634d48c886c4c198465b817d4a.
+As stated in the commit message, `setlocale()` can behave in an unexpeced
+manner when an empty string (`""`) is specified as its second argument.
+Such usage in `sed` program is strictly avoided by the following patch,
+and there is no intention to disrespect the aforementioned commit at all.
+
+--- a/lib/stdlib.in.h
++++ b/lib/stdlib.in.h
+@@ -1557,3 +1557,8 @@
+ #endif /* _@GUARD_PREFIX@_STDLIB_H */
+ #endif /* _@GUARD_PREFIX@_STDLIB_H */
+ #endif
++
++#if defined __ANDROID__ && defined __TERMUX__
++# undef MB_CUR_MAX
++# define MB_CUR_MAX __ctype_get_mb_cur_max()
++#endif
+--- a/src/grep.c
++++ b/src/grep.c
+@@ -2489,7 +2489,26 @@
+ 
+   /* Internationalization. */
+ #if defined HAVE_SETLOCALE
++# ifndef __ANDROID__
+   setlocale (LC_ALL, "");
++# else /* __ANDROID__ */
++  {
++    const char *locale;
++    locale = getenv ("LC_ALL");
++    if (locale == NULL || locale[0] == '\0')
++      {
++        locale = getenv ("LC_CTYPE");
++        if (locale == NULL || locale[0] == '\0')
++          locale = getenv ("LANG");
++          if (locale == NULL)
++            locale = "";
++      }
++    if (strcmp (locale, "C") == 0 || strcmp (locale, "POSIX") == 0)
++      setlocale (LC_CTYPE, "C");
++    else
++      setlocale (LC_CTYPE, "C.UTF-8");
++  }
++# endif /* __ANDROID__ */
+ #endif
+ #if defined ENABLE_NLS
+   bindtextdomain (PACKAGE, LOCALEDIR);

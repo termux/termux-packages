@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/lnslbrty/ptunnel-ng
-TERMUX_PKG_DESCRIPTION="Tunnel TCP connections through ICMP."
+TERMUX_PKG_DESCRIPTION="Tunnel TCP connections through ICMP"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.42

@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://capnproto.org/
-TERMUX_PKG_DESCRIPTION="Data interchange format and capability-based RPC system."
+TERMUX_PKG_DESCRIPTION="Data interchange format and capability-based RPC system"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.9.1

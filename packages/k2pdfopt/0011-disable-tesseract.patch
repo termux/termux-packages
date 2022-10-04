@@ -1,0 +1,50 @@
+diff -uNr k2pdfopt_v2.53/CMakeLists.txt k2pdfopt_v2.53.mod/CMakeLists.txt
+--- k2pdfopt_v2.53/CMakeLists.txt	2022-07-02 19:22:29.234522657 +0300
++++ k2pdfopt_v2.53.mod/CMakeLists.txt	2022-07-02 19:23:02.466782225 +0300
+@@ -94,12 +94,12 @@
+   include_directories(SYSTEM ${LEPT_INCLUDEDIR})
+ endif(LEPT_FOUND)
+ 
+-pkg_check_modules(TESSERACT tesseract)
+-if(TESSERACT_FOUND)
+-  set(HAVE_TESSERACT_LIB 1)
+-  set(K2PDFOPT_LIB ${K2PDFOPT_LIB} ${TESSERACT_LDFLAGS})
+-  include_directories(SYSTEM ${TESSERACT_INCLUDEDIR})
+-endif(TESSERACT_FOUND)
++#pkg_check_modules(TESSERACT tesseract)
++#if(TESSERACT_FOUND)
++#  set(HAVE_TESSERACT_LIB 1)
++#  set(K2PDFOPT_LIB ${K2PDFOPT_LIB} ${TESSERACT_LDFLAGS})
++#  include_directories(SYSTEM ${TESSERACT_INCLUDEDIR})
++#endif(TESSERACT_FOUND)
+ 
+ # ---- Describe project
+ 
+diff -uNr k2pdfopt_v2.53/k2pdfoptlib/k2publish.c k2pdfopt_v2.53.mod/k2pdfoptlib/k2publish.c
+--- k2pdfopt_v2.53/k2pdfoptlib/k2publish.c	2020-07-11 16:45:32.000000000 +0300
++++ k2pdfopt_v2.53.mod/k2pdfoptlib/k2publish.c	2022-07-02 19:22:49.042677376 +0300
+@@ -104,7 +104,7 @@
+ #else
+     ocrwords=NULL;
+     nocr=0;
+-    queue_page=0;
++    queue_pages_only=0;
+ #endif
+ #if (WILLUSDEBUGX2==3)
+ aprintf(ANSI_GREEN "\n   SRC PAGE %d, nocr=%d, queue=%d, threads=%d\n\n" ANSI_NORMAL,masterinfo->pageinfo.srcpage,nocr,queue_pages_only,k2ocr_max_threads());
+diff -uNr k2pdfopt_v2.53/willuslib/ocrtess.c k2pdfopt_v2.53.mod/willuslib/ocrtess.c
+--- k2pdfopt_v2.53/willuslib/ocrtess.c	2022-07-02 19:22:29.222522563 +0300
++++ k2pdfopt_v2.53.mod/willuslib/ocrtess.c	2022-07-02 19:22:49.042677376 +0300
+@@ -28,6 +28,7 @@
+ #include <leptonica/allheaders.h>
+ #include "willus.h"
+ 
++#ifdef HAVE_TESSERACT_LIB
+ char *ocrtess_langnames[] =
+     {
+     "af","afr","Afrikaans",
+@@ -1079,3 +1080,4 @@
+             }
+     return(langname);
+     }
++#endif

@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/AngelJumbo/sssnake
+TERMUX_PKG_DESCRIPTION="cli snake game that plays itself"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="0.2.0"
+TERMUX_PKG_SRCURL=https://github.com/AngelJumbo/sssnake/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=5e7dd572cec18417d6a839188156b47ae36e7d2350220bd25ffc304aa8d7fcc5
+TERMUX_PKG_DEPENDS="ncurses"
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_GROUPS="games"

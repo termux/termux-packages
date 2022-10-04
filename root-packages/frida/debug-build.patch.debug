@@ -1,0 +1,22 @@
+--- ../setup-env.sh.orig	2022-08-02 08:20:34.776681935 +0200
++++ ./releng/setup-env.sh	2022-08-05 09:23:34.507645559 +0200
+@@ -734,7 +734,7 @@
+         ;;
+     esac
+ 
+-    base_compiler_flags="-DANDROID -fPIC -ffunction-sections -fdata-sections"
++    base_compiler_flags="-g3 -O1 -D_FORTIFY_SOURCE=2 -D__USE_FORTIFY_LEVEL=2 -DANDROID -fPIC -ffunction-sections -fdata-sections"
+     base_linker_flags="-Wl,--gc-sections -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now"
+ 
+     if [ -n "$host_arch_flags" ]; then
+--- ../config.mk.orig	2022-08-05 09:17:54.768507879 +0200
++++ ./config.mk	2022-08-05 09:18:01.568682226 +0200
+@@ -20,7 +20,7 @@
+ FRIDA_FLAGS_COMMON := -Doptimization=1 -Db_sanitize=address
+ FRIDA_FLAGS_BOTTLE := -Doptimization=1 -Db_sanitize=address
+ else
+-FRIDA_FLAGS_COMMON := -Doptimization=s -Db_ndebug=true --strip
++FRIDA_FLAGS_COMMON := -Doptimization=s -Db_ndebug=true
+ FRIDA_FLAGS_BOTTLE := -Doptimization=s -Db_ndebug=true
+ endif
+ 

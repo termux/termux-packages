@@ -24,20 +24,13 @@ NOGITHUB=1
 "
 TERMUX_PKG_RM_AFTER_INSTALL="etc/security etc/udev"
 
-termux_step_pre_configure() {
-	local bin="$TERMUX_PKG_BUILDDIR/_wrapper/bin"
-	local sh="$(command -v sh)"
-	mkdir -p "$bin"
-	for p in curl; do
-		local conf="$bin/${p}-config"
-		cat > "$conf" <<-EOF
-			#!${sh}
-			exec sh "$TERMUX_PREFIX/bin/${p}-config" "\$@"
-		EOF
-		chmod 0700 "$conf"
-	done
-	export PATH="$bin":$PATH
+termux_step_post_get_source() {
+	# Needs to call `termux_step_configure_autotools` for `*-config` hack.
+	touch configure
+	chmod u+x configure
+}
 
+termux_step_pre_configure() {
 	CXXFLAGS+=" -fno-strict-aliasing"
 	LDFLAGS+=" -landroid-glob"
 }

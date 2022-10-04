@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL=https://www.zlib.net/zlib-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=7db46b8d7726232a621befaab4a1c870f00a90805511c0e0090441dac57def18
 TERMUX_PKG_BREAKS="ndk-sysroot (<< 19b-3), zlib-dev"
 TERMUX_PKG_REPLACES="ndk-sysroot (<< 19b-3), zlib-dev"
+TERMUX_PKG_REVISION=1
 
 termux_step_pre_configure() {
 	if [ "$TERMUX_ARCH" = "aarch64" ]; then

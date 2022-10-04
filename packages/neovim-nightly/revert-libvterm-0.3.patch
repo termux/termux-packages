@@ -1,0 +1,53 @@
+From 440568c208908115a2c64f816b28639b4139c695 Mon Sep 17 00:00:00 2001
+From: Chongyun Lee <45286352+licy183@users.noreply.github.com>
+Date: Fri, 30 Sep 2022 17:11:11 +0800
+Subject: [PATCH] Revert "build(deps): require libvterm version 0.3"
+
+As for now, we maintain two packages `neovim` and `neovim-nightly`.
+The former needs `libvterm-0.1.3` but the latter needs `libvterm-0.3`.
+In commit 6917a2e569e9f7306a9858f1aeeb32dd1c3ece4e, `neovim-nightly`
+dropped the support for `libvterm-0.1.3`, which will break the building.
+
+This reverts commit 6917a2e569e9f7306a9858f1aeeb32dd1c3ece4e.
+---
+ CMakeLists.txt      | 2 +-
+ src/nvim/terminal.c | 4 ++++
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 76526d6cc..034c349c9 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -502,7 +502,7 @@ if(FEAT_TUI)
+   include_directories(SYSTEM ${LIBTERMKEY_INCLUDE_DIRS})
+ endif()
+ 
+-find_package(LIBVTERM 0.3 REQUIRED)
++find_package(LIBVTERM 0.1 REQUIRED)
+ include_directories(SYSTEM ${LIBVTERM_INCLUDE_DIRS})
+ 
+ option(CLANG_ASAN_UBSAN "Enable Clang address & undefined behavior sanitizer for nvim binary." OFF)
+diff --git a/src/nvim/terminal.c b/src/nvim/terminal.c
+index c52586fea..8ec51438f 100644
+--- a/src/nvim/terminal.c
++++ b/src/nvim/terminal.c
+@@ -908,6 +908,7 @@ static int term_settermprop(VTermProp prop, VTermValue *val, void *data)
+ 
+   case VTERM_PROP_TITLE: {
+     buf_T *buf = handle_get_buffer(term->buf_handle);
++#if VTERM_VERSION_MAJOR > 0 || (VTERM_VERSION_MAJOR == 0 && VTERM_VERSION_MINOR >= 2)
+     VTermStringFragment frag = val->string;
+ 
+     if (frag.initial && frag.final) {
+@@ -932,6 +933,9 @@ static int term_settermprop(VTermProp prop, VTermValue *val, void *data)
+       xfree(term->title);
+       term->title = NULL;
+     }
++#else
++    buf_set_term_title(buf, val->string, strlen(val->string));
++#endif
+     break;
+   }
+ 
+-- 
+2.37.3

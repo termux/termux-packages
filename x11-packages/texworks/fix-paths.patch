@@ -1,0 +1,24 @@
+diff -uNr a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt	2022-09-18 11:00:37.033145252 +0800
++++ b/CMakeLists.txt	2022-09-18 11:15:45.373144906 +0800
+@@ -207,13 +207,13 @@
+ ENDIF ()
+ 
+ IF (UNIX AND NOT APPLE)
+-  SET(TeXworks_HELP_DIR share/doc/texworks-help CACHE PATH "Path where TeXworks looks for help files")
+-  SET(TeXworks_DIC_DIR /usr/share/hunspell:/usr/share/myspell/dicts CACHE PATH "Path where TeXworks looks for spellchecking dictionaries")
+-  SET(TeXworks_DOCS_DIR share/doc/texworks CACHE PATH "Path in which documentation files are installed")
+-  SET(TeXworks_ICON_DIR share/icons/hicolor CACHE PATH "Path in which icons are installed")
+-  SET(TeXworks_MAN_DIR share/man/man1 CACHE PATH "Path in which manpages are installed")
+-  SET(TeXworks_DESKTOP_DIR share/applications CACHE PATH "Path in which .desktop files are installed")
+-  SET(TeXworks_APPDATA_DIR share/metainfo CACHE PATH "Path in which .appdata.xml files are installed")
++  SET(TeXworks_HELP_DIR ${CMAKE_INSTALL_PREFIX}/share/doc/texworks-help CACHE PATH "Path where TeXworks looks for help files")
++  SET(TeXworks_DIC_DIR ${CMAKE_INSTALL_PREFIX}/share/hunspell:${CMAKE_INSTALL_PREFIX}/share/myspell/dicts CACHE PATH "Path where TeXworks looks for spellchecking dictionaries")
++  SET(TeXworks_DOCS_DIR ${CMAKE_INSTALL_PREFIX}/share/doc/texworks CACHE PATH "Path in which documentation files are installed")
++  SET(TeXworks_ICON_DIR ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor CACHE PATH "Path in which icons are installed")
++  SET(TeXworks_MAN_DIR ${CMAKE_INSTALL_PREFIX}/share/man/man1 CACHE PATH "Path in which manpages are installed")
++  SET(TeXworks_DESKTOP_DIR ${CMAKE_INSTALL_PREFIX}/share/applications CACHE PATH "Path in which .desktop files are installed")
++  SET(TeXworks_APPDATA_DIR ${CMAKE_INSTALL_PREFIX}/share/metainfo CACHE PATH "Path in which .appdata.xml files are installed") 
+   MARK_AS_ADVANCED(TeXworks_HELP_DIR)
+   MARK_AS_ADVANCED(TeXworks_DIC_DIR)
+   MARK_AS_ADVANCED(TeXworks_DOCS_DIR)

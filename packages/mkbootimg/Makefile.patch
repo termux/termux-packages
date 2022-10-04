@@ -1,0 +1,9 @@
+--- ./Makefile.orig	2022-07-12 22:39:50.910860490 +0200
++++ ./Makefile	2022-07-12 22:40:55.774137149 +0200
+@@ -49,3 +49,6 @@
+ 	$(RM) *.a *.~ *.exe *.o
+ 	$(MAKE) -C libmincrypt clean
+ 
++install: mkbootimg unpackbootimg
++	install -m700 mkbootimg $(DESTDIR)$(PREFIX)/bin/
++	install -m700 unpackbootimg $(DESTDIR)$(PREFIX)/bin/

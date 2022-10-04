@@ -4,6 +4,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.adel.nursat.kz/apg/index.shtml
 TERMUX_PKG_DESCRIPTION="Automated Password Generator"
 TERMUX_PKG_LICENSE="BSD"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.3.0b
 TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://github.com/termux/distfiles/releases/download/2021.01.04/apg-${TERMUX_PKG_VERSION}.tar.gz

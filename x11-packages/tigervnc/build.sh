@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # No update anymore. v1.11.x requires support of PAM.
 TERMUX_PKG_VERSION=(1.10.1
 		    1.20.0)
-TERMUX_PKG_REVISION=23
+TERMUX_PKG_REVISION=24
 TERMUX_PKG_SRCURL=(https://github.com/TigerVNC/tigervnc/archive/v${TERMUX_PKG_VERSION}.tar.gz
 		   https://xorg.freedesktop.org/releases/individual/xserver/xorg-server-${TERMUX_PKG_VERSION[1]}.tar.bz2)
 TERMUX_PKG_SHA256=(19fcc80d7d35dd58115262e53cac87d8903180261d94c2a6b0c19224f50b58c4
@@ -24,7 +24,7 @@ termux_step_post_get_source() {
 	cp -r xorg-server-${TERMUX_PKG_VERSION[1]}/* unix/xserver/
 
 	cd ${TERMUX_PKG_BUILDDIR}/unix/xserver
-	for p in "$TERMUX_SCRIPTDIR/packages/xorg-server-xvfb"/*.patch; do
+	for p in "$TERMUX_SCRIPTDIR/x11-packages/xorg-server-xvfb"/*.patch; do
 		sed -e "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" \
 			-e "s%\@TERMUX_HOME\@%${TERMUX_ANDROID_HOME}%g" "$p" \
 			| patch --silent -p1
@@ -42,7 +42,7 @@ termux_step_pre_configure() {
 	CPPFLAGS="${CPPFLAGS} -I${TERMUX_PREFIX}/include/libdrm"
 	LDFLAGS="${LDFLAGS} -llog $($CC -print-libgcc-file-name)"
 
-	local xorg_server_xvfb_configure_args="$(. $TERMUX_SCRIPTDIR/packages/xorg-server-xvfb/build.sh; echo $TERMUX_PKG_EXTRA_CONFIGURE_ARGS)"
+	local xorg_server_xvfb_configure_args="$(. $TERMUX_SCRIPTDIR/x11-packages/xorg-server-xvfb/build.sh; echo $TERMUX_PKG_EXTRA_CONFIGURE_ARGS)"
 	./configure \
 		--host="${TERMUX_HOST_PLATFORM}" \
 		--prefix="${TERMUX_PREFIX}" \
