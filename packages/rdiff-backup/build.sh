@@ -15,7 +15,7 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	local _PYTHON_VERSION=3.10
+	local _PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
 	export PYTHONPATH=$TERMUX_PREFIX/lib/python${_PYTHON_VERSION}/site-packages
 	export CPPFLAGS+=" -I${TERMUX_PREFIX}/include/python${_PYTHON_VERSION}"
 	export LDFLAGS+=" -lpython${_PYTHON_VERSION}"

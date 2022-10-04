@@ -4,10 +4,9 @@ TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # When updating the package, also update terminfo for kitty by updating
 # ncurses' kitty sources in main repo
-TERMUX_PKG_VERSION=0.25.0
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=0.26.2
 TERMUX_PKG_SRCURL=https://github.com/kovidgoyal/kitty/releases/download/v${TERMUX_PKG_VERSION}/kitty-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=1a2c81bf46687d4141d3182dc984bbc0330791705af152199e5b5815dae933de
+TERMUX_PKG_SHA256=586ff599c5a3f31831b2a32dd9faafacb6c3581f2561f8ddcab0ba815bc7dab4
 TERMUX_PKG_DEPENDS="dbus, fontconfig, freetype, harfbuzz, libpng, librsync, libx11, libxkbcommon, littlecms, mesa (>= 22.0.3), python, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libxcursor, libxi, libxinerama, libxrandr, xorgproto"
 TERMUX_PKG_BUILD_IN_SRC=true

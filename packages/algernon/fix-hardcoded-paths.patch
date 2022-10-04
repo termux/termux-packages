@@ -1,7 +1,16 @@
-diff -uNr algernon-1.12.7/engine/config.go algernon-1.12.7.mod/engine/config.go
---- algernon-1.12.7/engine/config.go	2020-03-24 22:48:26.000000000 +0200
-+++ algernon-1.12.7.mod/engine/config.go	2020-03-29 22:25:30.231409340 +0300
-@@ -289,7 +289,7 @@
+diff -uNr algernon-1.14.0/engine/config.go algernon-1.14.0.mod/engine/config.go
+--- algernon-1.14.0/engine/config.go	2022-08-05 01:16:22.000000000 +0800
++++ algernon-1.14.0.mod/engine/config.go	2022-08-19 13:24:12.361899812 +0800
+@@ -158,7 +158,7 @@
+ 
+ // New creates a new server configuration based using the default values
+ func New(versionString, description string) (*Config, error) {
+-	tmpdir := env.Str("TMPDIR", "/tmp")
++	tmpdir := env.Str("TMPDIR", "@TERMUX_PREFIX@/tmp")
+ 	ac := &Config{
+ 		curlSupport: true,
+ 
+@@ -191,7 +191,7 @@
  		defaultLuaDataFilename: "data.lua",
  
  		// List of configuration filenames to check
@@ -10,10 +19,10 @@ diff -uNr algernon-1.12.7/engine/config.go algernon-1.12.7.mod/engine/config.go
  
  		// Compression speed over compactness
  		cacheCompressionSpeed: true,
-diff -uNr algernon-1.12.7/engine/flags.go algernon-1.12.7.mod/engine/flags.go
---- algernon-1.12.7/engine/flags.go	2020-03-24 22:48:26.000000000 +0200
-+++ algernon-1.12.7.mod/engine/flags.go	2020-03-29 22:24:25.286093743 +0300
-@@ -311,9 +311,9 @@
+diff -uNr algernon-1.14.0/engine/flags.go algernon-1.14.0.mod/engine/flags.go
+--- algernon-1.14.0/engine/flags.go	2022-08-05 01:16:22.000000000 +0800
++++ algernon-1.14.0.mod/engine/flags.go	2022-08-19 13:26:06.321899768 +0800
+@@ -210,9 +210,9 @@
  	switch {
  	case ac.productionMode:
  		// Use system directories
@@ -26,9 +35,9 @@ diff -uNr algernon-1.12.7/engine/flags.go algernon-1.12.7.mod/engine/flags.go
  		ac.cacheMode = cachemode.Production
  		ac.serverMode = true
  	case ac.devMode:
-diff -uNr algernon-1.12.7/engine/mime.go algernon-1.12.7.mod/engine/mime.go
---- algernon-1.12.7/engine/mime.go	2020-03-24 22:48:26.000000000 +0200
-+++ algernon-1.12.7.mod/engine/mime.go	2020-03-29 22:24:25.286093743 +0300
+diff -uNr algernon-1.14.0/engine/mime.go algernon-1.14.0.mod/engine/mime.go
+--- algernon-1.14.0/engine/mime.go	2022-08-05 01:16:22.000000000 +0800
++++ algernon-1.14.0.mod/engine/mime.go	2022-08-19 13:28:10.601899721 +0800
 @@ -6,5 +6,5 @@
  
  func (ac *Config) initializeMime() {
@@ -36,9 +45,21 @@ diff -uNr algernon-1.12.7/engine/mime.go algernon-1.12.7.mod/engine/mime.go
 -	ac.mimereader = mime.New("/etc/mime.types", true)
 +	ac.mimereader = mime.New("@TERMUX_PREFIX@/etc/mime.types", true)
  }
-diff -uNr algernon-1.12.7/vendor/github.com/go-sql-driver/mysql/dsn.go algernon-1.12.7.mod/vendor/github.com/go-sql-driver/mysql/dsn.go
---- algernon-1.12.7/vendor/github.com/go-sql-driver/mysql/dsn.go	2020-03-24 22:48:26.000000000 +0200
-+++ algernon-1.12.7.mod/vendor/github.com/go-sql-driver/mysql/dsn.go	2020-03-29 22:24:25.286093743 +0300
+diff -uNr algernon-1.14.0/engine/serve.go algernon-1.14.0.mod/engine/serve.go
+--- algernon-1.14.0/engine/serve.go	2022-08-05 01:16:22.000000000 +0800
++++ algernon-1.14.0.mod/engine/serve.go	2022-08-19 13:37:48.681899500 +0800
+@@ -169,7 +169,7 @@
+ 			// If $XDG_CONFIG_DIR is not set, use $HOME.
+ 			// If $HOME is not set, use $TMPDIR.
+ 			// If $TMPDIR is not set, use /tmp.
+-			certStorageDir := env.Str("XDG_CONFIG_DIR", env.Str("HOME", env.Str("TMPDIR", "/tmp")))
++			certStorageDir := env.Str("XDG_CONFIG_DIR", env.Str("HOME", env.Str("TMPDIR", "@TERMUX_PREFIX@/tmp")))
+ 
+ 			defaultEmail := env.Str("LOGNAME", "root") + "@localhost"
+ 			if len(ac.certMagicDomains) > 0 {
+diff -uNr algernon-1.14.0/vendor/github.com/go-sql-driver/mysql/dsn.go algernon-1.14.0.mod/vendor/github.com/go-sql-driver/mysql/dsn.go
+--- algernon-1.14.0/vendor/github.com/go-sql-driver/mysql/dsn.go	2022-08-05 01:16:22.000000000 +0800
++++ algernon-1.14.0.mod/vendor/github.com/go-sql-driver/mysql/dsn.go	2022-08-19 13:29:33.841899689 +0800
 @@ -111,7 +111,7 @@
  		case "tcp":
  			cfg.Addr = "127.0.0.1:3306"
@@ -48,8 +69,9 @@ diff -uNr algernon-1.12.7/vendor/github.com/go-sql-driver/mysql/dsn.go algernon-
  		default:
  			return errors.New("default addr for network '" + cfg.Net + "' unknown")
  		}
---- ./vendor/github.com/yuin/gopher-lua/utils.go.orig	2022-05-10 03:51:40.004112631 +0000
-+++ ./vendor/github.com/yuin/gopher-lua/utils.go	2022-05-10 03:52:13.423062564 +0000
+diff -uNr algernon-1.14.0/vendor/github.com/xyproto/gopher-lua/utils.go algernon-1.14.0.mod/vendor/github.com/xyproto/gopher-lua/utils.go
+--- algernon-1.14.0/vendor/github.com/xyproto/gopher-lua/utils.go	2022-08-05 01:16:22.000000000 +0800
++++ algernon-1.14.0.mod/vendor/github.com/xyproto/gopher-lua/utils.go	2022-08-19 13:30:29.971899668 +0800
 @@ -156,7 +156,7 @@
  }
  

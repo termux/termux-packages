@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Xorg server"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.20.11
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/xserver/xorg-server-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=914c796e3ffabe1af48071d40ccc85e92117c97a9082ed1df29e4d64e3c34c49
 
@@ -12,9 +12,13 @@ TERMUX_PKG_SHA256=914c796e3ffabe1af48071d40ccc85e92117c97a9082ed1df29e4d64e3c34c
 
 TERMUX_PKG_BLACKLISTED_ARCHES="i686"
 
-TERMUX_PKG_DEPENDS="libandroid-shmem, libdrm, libpciaccess, libpixman, libx11, libxau, libxfont2, libxinerama, libxkbfile, libxshmfence, mesa, openssl, xkeyboard-config, xorg-xkbcomp"
+TERMUX_PKG_DEPENDS="libandroid-shmem, libdrm, libpciaccess, libpixman, libx11, libxau, libxfont2, libxinerama, libxkbfile, libxshmfence, mesa, openssl, xkeyboard-config, xorg-protocol-txt, xorg-xkbcomp"
+
+# Provided by xorg-protocol-txt (subpackage of xorg-server-xvfb):
+TERMUX_PKG_RM_AFTER_INSTALL="lib/xorg/protocol.txt"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+ac_cv_path_RAWCPP=/usr/bin/cpp
 --enable-composite
 --enable-mitshm
 --enable-xres

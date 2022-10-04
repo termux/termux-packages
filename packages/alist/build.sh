@@ -2,44 +2,58 @@ TERMUX_PKG_HOMEPAGE=https://alist-doc.nn.ci
 TERMUX_PKG_DESCRIPTION="A file list program that supports multiple storage"
 TERMUX_PKG_LICENSE="AGPL-V3"
 TERMUX_PKG_MAINTAINER="2096779623 <admin@utermux.dev>"
-TERMUX_PKG_VERSION=2.6.1
+TERMUX_PKG_VERSION="3.0.3"
 TERMUX_PKG_SRCURL=https://github.com/alist-org/alist/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=abc4b68ff5166998da3615a673570e87f65fc1667a4fd820977b20afee6c4fa8
+TERMUX_PKG_SHA256=55c4d7c5ab50e16e2711d25403a522f251838ba4e8c1fcab0340d9ca6e42d274
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
-
-termux_step_pre_configure() {
-	# Switch to local to prevent some countries from not connecting to cdn.
-	sed -i 's|https://npm.*/dist|/|g' ./conf/config.go
-}
 
 termux_step_make() {
 	termux_setup_golang
 
 	# Get alist-web:
-	(
-		mkdir -p alist-web
-		cd alist-web && cp ../build.sh .
-		bash ./build.sh cdn
-		sed -ri 's|(lang=")zh-CN"|\1en-US"|g' dist/index.html
-		mv dist/* ../public
-	)
-
 	local ldflags webTag
 	webTag=$(
 		wget -qO- -t1 -T2 "https://api.github.com/repos/alist-org/alist-web/releases/latest" \
 			| grep "tag_name" | head -n 1 | awk -F ":" '{print $2}' | sed 's/\"//g;s/,//g;s/ //g'
 	)
-	ldflags="-w -s \
-		-X 'github.com/Xhofe/alist/conf.BuiltAt=$(date +'%F %T %z')' \
-		-X 'github.com/Xhofe/alist/conf.GoVersion=$(go version | sed 's/go version //')' \
-		-X 'github.com/Xhofe/alist/conf.WebTag=${webTag}' \
-		-X 'github.com/Xhofe/alist/conf.GitTag=v${TERMUX_PKG_VERSION}'
-		"
+	wget https://github.com/alist-org/alist-web/releases/download/${webTag}/dist.tar.gz
+	tar -zxvf dist.tar.gz
+	rm -rf public/dist
+	mv -f dist public
+	rm -rf dist.tar.gz
 
-	go build -ldflags="${ldflags}" -tags=jsoniter -o "${TERMUX_PKG_NAME}" .
+	local _builtAt=$(date +'%F %T %z')
+	local _goVersion=$(go version | sed 's/go version //')
+	local _gitAuthor="Noah Hsu <i@nn.ci>"
+	local _gitCommit=$(git ls-remote https://github.com/alist-org/alist refs/tags/v3.0.1 | head -c 7)
+	export CGO_ENABLED=1
+
+	ldflags="\
+	-w -s \
+	-X 'github.com/alist-org/alist/v3/internal/conf.BuiltAt=$_builtAt' \
+	-X 'github.com/alist-org/alist/v3/internal/conf.GoVersion=$_goVersion' \
+	-X 'github.com/alist-org/alist/v3/internal/conf.GitAuthor=$_gitAuthor' \
+	-X 'github.com/alist-org/alist/v3/internal/conf.GitCommit=$_gitCommit' \
+	-X 'github.com/alist-org/alist/v3/internal/conf.Version=$TERMUX_PKG_VERSION' \
+	-X 'github.com/alist-org/alist/v3/internal/conf.WebVersion=$webTag' \
+	"
+	go build -o "${TERMUX_PKG_NAME}" -ldflags="$ldflags" -tags=jsoniter
 }
 
 termux_step_make_install() {
 	install -Dm700 ./"${TERMUX_PKG_NAME}" "${TERMUX_PREFIX}"/bin
+
+	install -Dm644 /dev/null "${TERMUX_PREFIX}/share/bash-completion/completions/alist.bash"
+	install -Dm644 /dev/null "${TERMUX_PREFIX}/share/zsh/site-functions/_alist"
+	install -Dm644 /dev/null "${TERMUX_PREFIX}/share/fish/vendor_completions.d/alist.fish"
+}
+
+termux_step_create_debscripts() {
+	cat <<- EOF > ./postinst
+		#!${TERMUX_PREFIX}/bin/sh
+		alist completion bash > ${TERMUX_PREFIX}/share/bash-completion/completions/alist.bash
+		alist completion zsh > ${TERMUX_PREFIX}/share/zsh/site-functions/_alist
+		alist completion fish > ${TERMUX_PREFIX}/share/fish/vendor_completions.d/alist.fish
+	EOF
 }

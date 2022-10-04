@@ -50,10 +50,10 @@ diff -uNr busybox-1.31.1/include/libbb.h busybox-1.31.1.mod/include/libbb.h
  
  /* The following devices are the same on all systems.  */
  #define CURRENT_TTY "/dev/tty"
-diff -uNr busybox-1.31.1/networking/telnetd.c busybox-1.31.1.mod/networking/telnetd.c
---- busybox-1.31.1/networking/telnetd.c	2019-06-10 13:50:53.000000000 +0300
-+++ busybox-1.31.1.mod/networking/telnetd.c	2019-11-11 22:00:22.799539737 +0200
-@@ -99,7 +99,7 @@
+diff -uNr ../busybox-1.35.0/networking/telnetd.c ./networking/telnetd.c
+--- ../busybox-1.35.0/networking/telnetd.c	2021-12-26 17:53:21.000000000 +0100
++++ ./networking/telnetd.c	2022-08-05 08:44:20.976821463 +0200
+@@ -105,7 +105,7 @@
  //usage:       "Handle incoming telnet connections"
  //usage:	IF_NOT_FEATURE_TELNETD_STANDALONE(" via inetd") "\n"
  //usage:     "\n	-l LOGIN	Exec LOGIN on connect"
@@ -62,11 +62,13 @@ diff -uNr busybox-1.31.1/networking/telnetd.c busybox-1.31.1.mod/networking/teln
  //usage:     "\n	-K		Close connection as soon as login exits"
  //usage:     "\n			(normally wait until all programs close slave pty)"
  //usage:	IF_FEATURE_TELNETD_STANDALONE(
-@@ -160,7 +160,7 @@
+@@ -166,8 +166,8 @@
+ #define G (*(struct globals*)bb_common_bufsiz1)
  #define INIT_G() do { \
  	setup_common_bufsiz(); \
- 	G.loginpath = "/bin/login"; \
+-	G.loginpath = "/bin/login"; \
 -	G.issuefile = "/etc/issue.net"; \
++	G.loginpath = "@TERMUX_PREFIX@/bin/login"; \
 +	G.issuefile = "@TERMUX_PREFIX@/etc/issue.net"; \
  } while (0)
  

@@ -2,11 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://ffmpeg.org
 TERMUX_PKG_DESCRIPTION="Tools and libraries to manipulate a wide range of multimedia formats and protocols"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-# NOTE: mpv has to be rebuilt and version bumped after updating ffmpeg.
-TERMUX_PKG_VERSION=5.0.1
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=5.1.2
 TERMUX_PKG_SRCURL=https://www.ffmpeg.org/releases/ffmpeg-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=ef2efae259ce80a240de48ec85ecb062cecca26e4352ffb3fda562c21a93007b
+TERMUX_PKG_SHA256=619e706d662c8420859832ddc259cd4d4096a48a2ce1eefd052db9e440eef3dc
 TERMUX_PKG_DEPENDS="freetype, game-music-emu, libaom, libandroid-glob, libass, libbluray, libbz2, libdav1d, libgnutls, libiconv, liblzma, libmp3lame, libopus, librav1e, libsoxr, libtheora, libvorbis, libvpx, libvidstab, libwebp, libx264, libx265, libxml2, xvidcore, zlib"
 TERMUX_PKG_CONFLICTS="libav"
 TERMUX_PKG_BREAKS="ffmpeg-dev"
@@ -15,8 +13,6 @@ TERMUX_PKG_REPLACES="ffmpeg-dev"
 
 termux_step_configure() {
 	cd $TERMUX_PKG_BUILDDIR
-
-	export ASFLAGS="-no-integrated-as"
 
 	local _EXTRA_CONFIGURE_FLAGS=""
 	if [ $TERMUX_ARCH = "arm" ]; then
@@ -76,5 +72,6 @@ termux_step_configure() {
 		--prefix="$TERMUX_PREFIX" \
 		--target-os=android \
 		--extra-libs="-landroid-glob" \
+		--disable-vulkan \
 		$_EXTRA_CONFIGURE_FLAGS
 }

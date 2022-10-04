@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="C library for generating audio fingerprints used by Acou
 TERMUX_PKG_LICENSE="LGPL-2.1, MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.5.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/acoustid/chromaprint/releases/download/v${TERMUX_PKG_VERSION}/chromaprint-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=a1aad8fa3b8b18b78d3755b3767faff9abb67242e01b478ec9a64e190f335e1c
 TERMUX_PKG_AUTO_UPDATE=true

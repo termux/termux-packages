@@ -2,13 +2,14 @@ TERMUX_PKG_HOMEPAGE=https://nodejs.org/
 TERMUX_PKG_DESCRIPTION="Open Source, cross-platform JavaScript runtime environment"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Yaksh Bariya <yakshbari4@gmail.com>"
-TERMUX_PKG_VERSION=18.4.0
+TERMUX_PKG_VERSION=18.7.0
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=94d6f19a970361f8c8ad17450604095389f51ca6a00dcde59c21f373e95abbb5
+TERMUX_PKG_SHA256=8834a33c92dfe6ba8903e6715caeaa25dff4657e703c54cd06ec113493e2c3c2
 # Note that we do not use a shared libuv to avoid an issue with the Android
 # linker, which does not use symbols of linked shared libraries when resolving
 # symbols on dlopen(). See https://github.com/termux/termux-packages/issues/462.
-TERMUX_PKG_DEPENDS="libc++, openssl, c-ares, zlib"
+TERMUX_PKG_DEPENDS="libc++, openssl, c-ares, libicu, zlib"
 TERMUX_PKG_CONFLICTS="nodejs-lts, nodejs-current"
 TERMUX_PKG_BREAKS="nodejs-dev"
 TERMUX_PKG_REPLACES="nodejs-current, nodejs-dev"
@@ -42,7 +43,7 @@ termux_step_host_build() {
 			--disable-samples \
 			--disable-tests
 	fi
-	#make -j $TERMUX_MAKE_PROCESSES install
+	make -j $TERMUX_MAKE_PROCESSES install
 }
 
 termux_step_configure() {
@@ -70,17 +71,11 @@ termux_step_configure() {
 		--prefix=$TERMUX_PREFIX \
 		--dest-cpu=$DEST_CPU \
 		--dest-os=android \
-    --tag=AVA1 \
-    --enable-static \
-    --partly-static \
+		--shared-cares \
 		--shared-openssl \
-    --without-intl \
-    --without-npm \
-    --without-etw \
-    --without-corepack \
+		--shared-zlib \
+		--with-intl=system-icu \
 		--cross-compiling
-
-# no intl support, check out https://github.com/nodejs/node/issues/2300 // https://nodejs.org/api/intl.html#intl_options_for_building_node_j
 
 	export LD_LIBRARY_PATH=$TERMUX_PKG_HOSTBUILD_DIR/icu-installed/lib
 	perl -p -i -e "s@LIBS := \\$\\(LIBS\\)@LIBS := -L$TERMUX_PKG_HOSTBUILD_DIR/icu-installed/lib -lpthread -licui18n -licuuc -licudata -ldl -lz@" \

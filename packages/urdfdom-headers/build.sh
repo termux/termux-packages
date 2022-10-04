@@ -1,0 +1,11 @@
+TERMUX_PKG_HOMEPAGE="https://github.com/ros/urdfdom_headers"
+TERMUX_PKG_DESCRIPTION="Headers for URDF parsers"
+TERMUX_PKG_GROUPS="science"
+TERMUX_PKG_LICENSE="BSD 3-Clause"
+TERMUX_PKG_MAINTAINER="Pooya Moradi <pvonmoradi@gmail.com>"
+TERMUX_PKG_VERSION="1.0.5"
+TERMUX_PKG_SRCURL="https://github.com/ros/urdfdom_headers/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz"
+TERMUX_PKG_SHA256=76a68657c38e54bb45bddc4bd7d823a3b04edcd08064a56d8e7d46b9912035ac
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_FORCE_CMAKE=true

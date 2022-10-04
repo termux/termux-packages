@@ -13,18 +13,3 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-icu-config=icu-config
 --with-yajl=$TERMUX_PREFIX
 "
-
-termux_step_pre_configure() {
-	local bin="$TERMUX_PKG_BUILDDIR/bin"
-	local sh="$(command -v sh)"
-	mkdir -p "$bin"
-	for p in curl icu xml2 xslt; do
-		local conf="$bin/${p}-config"
-		cat > "$conf" <<-EOF
-			#!${sh}
-			exec sh "$TERMUX_PREFIX/bin/${p}-config" "\$@"
-		EOF
-		chmod 0700 "$conf"
-	done
-	export PATH="$bin":$PATH
-}

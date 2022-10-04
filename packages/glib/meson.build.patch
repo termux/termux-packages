@@ -16,15 +16,30 @@
    'inotify_init1',
    'issetugid',
    'kevent',
-@@ -2088,9 +2086,8 @@
- # FIXME: glib-gettext.m4 has much more checks to detect broken/uncompatible
+@@ -907,7 +905,7 @@
+                  syscall (SYS_pidfd_open, 0, 0);
+                  waitid (P_PIDFD, 0, &child_info, WEXITED | WNOHANG);
+                  return 0;
+-               }''', name : 'pidfd_open(2) system call')
++               }''', name : 'pidfd_open(2) system call') and host_system != 'android'
+   glib_conf.set('HAVE_PIDFD', 1)
+ endif
+ 
+@@ -2092,7 +2090,7 @@
  # implementations. This could be extended if issues are found in some platforms.
  libintl_deps = []
--if cc.has_function('ngettext')
--  have_bind_textdomain_codeset = cc.has_function('bind_textdomain_codeset')
--else
-+have_bind_textdomain_codeset = cc.has_function('bind_textdomain_codeset')
-+if host_system != 'android'
-   # First just find the bare library.
-   libintl = cc.find_library('intl', required : false)
-   # The bare library probably won't link without help if it's static.
+ libintl = dependency('intl', required: false)
+-if libintl.found()
++if false
+   # libintl supports different threading APIs, which may not
+   # require additional flags, but it defaults to using pthreads if
+   # found. Meson's "threads" dependency does not allow you to
+@@ -2114,7 +2112,7 @@
+   endif
+ endif
+ 
+-if libintl.found()
++if true
+   have_bind_textdomain_codeset = cc.has_function('bind_textdomain_codeset', dependencies: libintl_deps)
+ else
+   libintl = subproject('proxy-libintl').get_variable('intl_dep')

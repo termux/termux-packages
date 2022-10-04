@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE="https://www.cjmweb.net/vbindiff/"
+TERMUX_PKG_DESCRIPTION="Visual binary diff"
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="3.0-beta5"
+TERMUX_PKG_SRCURL="http://deb.debian.org/debian/pool/main/v/vbindiff/vbindiff_$TERMUX_PKG_VERSION.orig.tar.gz"
+TERMUX_PKG_SHA256=f04da97de993caf8b068dcb57f9de5a4e7e9641dc6c47f79b60b8138259133b8
+TERMUX_PKG_DEPENDS="libc++, ncurses, ncurses-ui-libs"
+TERMUX_PKG_BUILD_IN_SRC=true

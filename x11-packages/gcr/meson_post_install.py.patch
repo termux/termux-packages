@@ -1,0 +1,17 @@
+--- a/meson_post_install.py
++++ b/meson_post_install.py
+@@ -21,14 +21,6 @@
+ if os.environ.get('DESTDIR'):
+   sys.exit(0)
+ 
+-print('Update icon cache...')
+-subprocess.call(['gtk-update-icon-cache', '-f', '-t', icondir])
+-
+-print('Compiling gsettings schemas...')
+-subprocess.call(['glib-compile-schemas', schemadir])
+-
+-print('Updating MIME database...')
+-subprocess.call(['update-mime-database', mimedatabasedir])
+ 
+ # FIXME: after a major version bump, just drop this
+ print('Creating symlink for libgcr-{}.so'.format(gcr_major_version))

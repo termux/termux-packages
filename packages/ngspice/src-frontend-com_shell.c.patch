@@ -1,5 +1,5 @@
---- a/src/frontend/com_shell.c
-+++ b/src/frontend/com_shell.c
+--- ngspice-37/src/frontend/com_shell.c	2022-05-17 18:00:52.000000000 +0800
++++ ngspice-37.mod/src/frontend/com_shell.c	2022-06-16 22:56:25.591998228 +0800
 @@ -14,7 +14,7 @@
  #ifdef _WIN32
  #define SHELL "cmd /k"
@@ -9,3 +9,12 @@
  #endif
  
  /* Fork a shell. */
+@@ -41,7 +41,7 @@
+             _exit(99);
+         } else {
+             char * const com = wl_flatten(wl);
+-            execl("/bin/sh", "sh", "-c", com, 0);
++            execl("@TERMUX_PREFIX@/bin/sh", "sh", "-c", com, 0);
+             txfree(com);
+         }
+     } else {

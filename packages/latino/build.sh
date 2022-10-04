@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://www.lenguajelatino.org/
-TERMUX_PKG_DESCRIPTION="Lenguaje de programación de código abierto para latinos y de habla hispana."
+TERMUX_PKG_DESCRIPTION="Lenguaje de programación de código abierto para latinos y de habla hispana"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.3.1

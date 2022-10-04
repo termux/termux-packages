@@ -2,7 +2,7 @@
 set -e -u
 
 CONTAINER=termux-package-builder
-IMAGE=termux/package-builder
+IMAGE=ghcr.io/termux/package-builder
 
 docker pull $IMAGE
 

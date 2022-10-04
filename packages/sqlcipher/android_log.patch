@@ -1,19 +1,21 @@
---- a/src/crypto.h	2022-02-28 20:11:16.000000000 +0000
-+++ b/src/crypto.h	2022-04-15 22:46:24.166211467 +0000
-@@ -39,10 +39,6 @@
- #include "btreeInt.h"
+diff -uNr sqlcipher-4.5.2/src/crypto.h sqlcipher-4.5.2.mod/src/crypto.h
+--- sqlcipher-4.5.2/src/crypto.h	2022-07-28 03:23:29.000000000 +0800
++++ sqlcipher-4.5.2.mod/src/crypto.h	2022-08-04 09:04:30.948978453 +0800
+@@ -40,10 +40,6 @@
  #include "pager.h"
+ #include "vdbeInt.h"
  
 -#ifdef __ANDROID__
 -#include <android/log.h>
 -#endif
 -
- /* extensions defined in pager.c */ 
- void *sqlite3PagerGetCodec(Pager*);
- void sqlite3PagerSetCodec(Pager*, void *(*)(void*,void*,Pgno,int),  void (*)(void*,int,int),  void (*)(void*), void *);
---- a/src/crypto_impl.c	2022-02-28 20:11:16.000000000 +0000
-+++ b/src/crypto_impl.c	2022-04-15 23:00:47.610944833 +0000
-@@ -1660,11 +1660,6 @@
+ #include <time.h>
+ 
+ #if defined(_WIN32) || defined(SQLITE_OS_WINRT)
+diff -uNr sqlcipher-4.5.2/src/crypto_impl.c sqlcipher-4.5.2.mod/src/crypto_impl.c
+--- sqlcipher-4.5.2/src/crypto_impl.c	2022-07-28 03:23:29.000000000 +0800
++++ sqlcipher-4.5.2.mod/src/crypto_impl.c	2022-08-04 09:06:21.678978411 +0800
+@@ -1648,11 +1648,6 @@
    FILE *f = (FILE*) file;
    char *fmt = "Elapsed time:%.3f ms - %s\n";
    double elapsed = (*((sqlite3_uint64*)run_time))/1000000.0;
@@ -25,7 +27,7 @@
    if(f) fprintf(f, fmt, elapsed, sqlite3_sql((sqlite3_stmt*)stmt));
    return SQLITE_OK;
  }
-@@ -1714,13 +1709,9 @@
+@@ -1702,13 +1697,9 @@
    va_start(params, message);
  
  #ifdef CODEC_DEBUG
@@ -39,7 +41,7 @@
  
    if(level > sqlcipher_log_level || (sqlcipher_log_logcat == 0 && sqlcipher_log_file == NULL)) {
      /* no log target or tag not in included filters */
-@@ -1752,11 +1743,6 @@
+@@ -1740,11 +1731,7 @@
        fprintf((FILE*)sqlcipher_log_file, "\n");
      }
    }
@@ -48,6 +50,7 @@
 -    __android_log_vprint(ANDROID_LOG_DEBUG, "sqlcipher", message, params);
 -  }
 -#endif
++
  end:
    va_end(params);
  }

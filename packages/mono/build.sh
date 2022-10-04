@@ -19,8 +19,9 @@ termux_step_post_get_source() {
 }
 
 termux_step_host_build() {
-	_PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/_prefix
+	local _PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
 	mkdir -p $_PREFIX_FOR_BUILD
+
 	$TERMUX_PKG_SRCDIR/configure --prefix=$_PREFIX_FOR_BUILD \
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
 	make -j $TERMUX_MAKE_PROCESSES
@@ -35,6 +36,8 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_make_install() {
+	local _PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
+
 	find $_PREFIX_FOR_BUILD/lib/mono -name '*.so' -exec rm -f \{\} \;
 	cp -rT $_PREFIX_FOR_BUILD/lib/mono $TERMUX_PREFIX/lib/mono
 	# XXX: Map libc to libc.so rather than libc.so.6

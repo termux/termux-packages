@@ -1,6 +1,7 @@
-diff -uNr pulseaudio-12.2/src/daemon/caps.c pulseaudio-12.2.mod/src/daemon/caps.c
---- pulseaudio-12.2/src/daemon/caps.c	2018-07-13 22:06:14.000000000 +0300
-+++ pulseaudio-12.2.mod/src/daemon/caps.c	2018-09-23 11:34:28.598244818 +0300
+diff --git a/src/daemon/caps.c b/src/daemon/caps.c
+index fd135c0d2..e68e0a69b 100644
+--- a/src/daemon/caps.c
++++ b/src/daemon/caps.c
 @@ -36,64 +36,11 @@
  
  #include "caps.h"
@@ -69,17 +70,105 @@ diff -uNr pulseaudio-12.2/src/daemon/caps.c pulseaudio-12.2.mod/src/daemon/caps.
 -#endif
 +    return;
  }
-diff -uNr pulseaudio-12.2/src/daemon/main.c pulseaudio-12.2.mod/src/daemon/main.c
---- pulseaudio-12.2/src/daemon/main.c	2018-07-16 17:40:33.000000000 +0300
-+++ pulseaudio-12.2.mod/src/daemon/main.c	2018-09-23 11:32:53.513876685 +0300
-@@ -147,119 +147,11 @@
-     }
+diff --git a/src/daemon/main.c b/src/daemon/main.c
+index 924a4d4aa..80130e056 100644
+--- a/src/daemon/main.c
++++ b/src/daemon/main.c
+@@ -163,206 +163,11 @@ static void signal_callback(pa_mainloop_api* m, pa_signal_event *e, int sig, voi
  }
  
--#if defined(HAVE_PWD_H) && defined(HAVE_GRP_H)
+ 
+-#if defined(OS_IS_WIN32)
 -
 +// Disable privilege dropping on Android.
  static int change_user(void) {
+-    pa_log_info("Overriding system runtime/config base dir to '%s'.", pa_win32_get_system_appdata());
+-
+-    /* On other platforms, these paths are compiled into PulseAudio. This isn't
+-     * suitable on Windows. Firstly, Windows doesn't follow the FHS or use Unix
+-     * paths and the build system can't handle Windows-style paths properly.
+-     * Secondly, the idiomatic location for a service's state and shared data is
+-     * ProgramData, and the location of special folders is dynamic on Windows.
+-     * Also, this method of handling paths is consistent with how they are
+-     * handled on Windows in other parts of PA. Note that this is only needed
+-     * in system-wide mode since paths in user instances are already handled
+-     * properly.
+-     */
+-
+-    char *run_path = pa_sprintf_malloc("%s" PA_PATH_SEP "run", pa_win32_get_system_appdata());
+-    char *lib_path = pa_sprintf_malloc("%s" PA_PATH_SEP "lib", pa_win32_get_system_appdata());
+-
+-    /* https://docs.microsoft.com/en-us/windows/win32/secauthz/ace-strings */
+-    /* https://docs.microsoft.com/en-us/windows/win32/secauthz/modifying-the-acls-of-an-object-in-c-- */
+-    /* https://docs.microsoft.com/en-us/windows/win32/api/sddl/nf-sddl-convertstringsecuritydescriptortosecuritydescriptora */
+-    {
+-        mkdir(run_path);
+-        PSECURITY_DESCRIPTOR sd;
+-        if (ConvertStringSecurityDescriptorToSecurityDescriptorA(
+-            "D:PAI"                   /* DACL, disable inheritance from parent, enable propagation to children */
+-            "(A;OICI;FA;;;SY)"        /* give system full access */
+-            "(A;OICI;FA;;;CO)"        /* give owner full access */
+-            "(A;OICI;FA;;;BA)"        /* give administrators full access */
+-            "(A;OICI;0x1200a9;;;WD)", /* give everyone read/write/execute access */
+-            SDDL_REVISION_1, &sd, NULL
+-        )) {
+-            PACL acl;
+-            BOOL acl_present, acl_default;
+-            if (GetSecurityDescriptorDacl(sd, &acl_present, &acl, &acl_default)) {
+-                if (SetNamedSecurityInfo(run_path, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION | PROTECTED_DACL_SECURITY_INFORMATION, NULL, NULL, acl, NULL) != ERROR_SUCCESS) {
+-                    pa_log_warn("Failed to set DACL for runtime dir: failed to apply DACL: error %lu.", GetLastError());
+-                }
+-                LocalFree(acl);
+-            } else {
+-                pa_log_warn("Failed to set DACL for runtime dir: failed to get security descriptor DACL: error %lu.", GetLastError());
+-            }
+-        } else {
+-            pa_log_warn("Failed to set DACL for runtime dir: failed to parse security descriptor: error %lu.", GetLastError());
+-        }
+-    }
+-    {
+-        mkdir(lib_path);
+-        PSECURITY_DESCRIPTOR sd;
+-        if (ConvertStringSecurityDescriptorToSecurityDescriptorA(
+-            "D:PAI"             /* DACL, disable inheritance from parent, enable propagation to children */
+-            "(A;OICI;FA;;;SY)"  /* give system full access */
+-            "(A;OICI;FA;;;CO)"  /* give owner full access */
+-            "(A;OICI;FA;;;BA)", /* give administrators full access */
+-            SDDL_REVISION_1, &sd, NULL
+-        )) {
+-            PACL acl;
+-            BOOL acl_present, acl_default;
+-            if (GetSecurityDescriptorDacl(sd, &acl_present, &acl, &acl_default)) {
+-                if (SetNamedSecurityInfo(lib_path, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION | PROTECTED_DACL_SECURITY_INFORMATION, NULL, NULL, acl, NULL) != ERROR_SUCCESS) {
+-                    pa_log_warn("Failed to set DACL for lib dir: failed to apply DACL: error %lu.", GetLastError());
+-                }
+-                LocalFree(acl);
+-            } else {
+-                pa_log_warn("Failed to set DACL for lib dir: failed to get security descriptor DACL: error %lu.", GetLastError());
+-            }
+-        } else {
+-            pa_log_warn("Failed to set DACL for lib dir: failed to parse security descriptor: error %lu.", GetLastError());
+-        }
+-    }
+-
+-    pa_set_env("HOME", run_path);
+-    if (!getenv("PULSE_RUNTIME_PATH"))
+-        pa_set_env("PULSE_RUNTIME_PATH", run_path);
+-    if (!getenv("PULSE_CONFIG_PATH"))
+-        pa_set_env("PULSE_CONFIG_PATH", lib_path);
+-    if (!getenv("PULSE_STATE_PATH"))
+-        pa_set_env("PULSE_STATE_PATH", lib_path);
+-
+-    pa_xfree(run_path);
+-    pa_xfree(lib_path);
+-
+-    pa_log_info("Not changing user for system instance on Windows.");
+     return 0;
+ }
+ 
+-#elif defined(HAVE_PWD_H) && defined(HAVE_GRP_H)
+-
+-static int change_user(void) {
 -    struct passwd *pw;
 -    struct group * gr;
 -    int r;
@@ -178,9 +267,9 @@ diff -uNr pulseaudio-12.2/src/daemon/main.c pulseaudio-12.2.mod/src/daemon/main.
 -
 -    pa_log_info("Successfully changed user to \"" PA_SYSTEM_USER "\".");
 -
-     return 0;
- }
- 
+-    return 0;
+-}
+-
 -#else /* HAVE_PWD_H && HAVE_GRP_H */
 -
 -static int change_user(void) {

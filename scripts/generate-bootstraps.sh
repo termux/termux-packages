@@ -23,8 +23,8 @@ TERMUX_PACKAGE_MANAGERS=("apt" "pacman")
 
 # The repository base urls mapping for package managers.
 declare -A REPO_BASE_URLS=(
-	["apt"]="https://packages-cf.termux.org/apt/termux-main"
-	["pacman"]="https://s3.amazonaws.com/termux-main.pacman"
+	["apt"]="https://packages-cf.termux.dev/apt/termux-main"
+	["pacman"]="https://s3.amazonaws.com/termux-pacman.us/main"
 )
 
 # The package manager that will be installed in bootstrap.
@@ -453,9 +453,7 @@ for package_arch in "${TERMUX_ARCHITECTURES[@]}"; do
 	pull_package sed
 	pull_package tar
 	pull_package termux-exec
-	if [ ${TERMUX_PACKAGE_MANAGER} = "apt" ]; then
-		pull_package termux-keyring
-	fi
+	pull_package termux-keyring
 	pull_package termux-tools
 	pull_package util-linux
 	pull_package xz-utils

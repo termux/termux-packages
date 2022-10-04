@@ -15,6 +15,7 @@ LICENSE/LICENSE_STIX
 LICENSE/LICENSE_YORICK"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=(3.5.1)
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_VERSION+=(1.22.3) # NumPy version
 TERMUX_PKG_VERSION+=(9.0.1)  # Pillow version
 TERMUX_PKG_SRCURL=(https://github.com/matplotlib/matplotlib/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
@@ -50,10 +51,6 @@ termux_step_pre_configure() {
 		${_CROSSENV_PREFIX}
 	popd
 	. ${_CROSSENV_PREFIX}/bin/activate
-
-	pushd ${_CROSSENV_PREFIX}/build/lib/python${_PYTHON_VERSION}/site-packages
-	patch --silent -p1 < $TERMUX_PKG_BUILDER_DIR/setuptools-44.1.1-no-bdist_wininst.diff || :
-	popd
 
 	build-pip install numpy
 

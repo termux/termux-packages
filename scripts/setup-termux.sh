@@ -35,9 +35,11 @@ PACKAGES+=" perl"
 PACKAGES+=" pkg-config"
 PACKAGES+=" protobuf"
 PACKAGES+=" python2"
+PACKAGES+=" re2c"                       # Needed by kphp-timelib
 PACKAGES+=" rust"
 PACKAGES+=" texinfo"
 PACKAGES+=" valac"
+PACKAGES+=" xmlto"                      # Needed by git's manpage generation
 
 apt update
 apt dist-upgrade -y

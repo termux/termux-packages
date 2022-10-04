@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Library implementing the SSL and TLS protocols as well a
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.1.1o
+TERMUX_PKG_VERSION=1.1.1q
 TERMUX_PKG_SRCURL=https://www.openssl.org/source/openssl-${TERMUX_PKG_VERSION/\~/-}.tar.gz
-TERMUX_PKG_SHA256=9384a2b0570dd80358841464677115df785edb941c71211f75076d72fe6b438f
+TERMUX_PKG_SHA256=d7939ce614029cdff0b6c20f0e2e5703158a489a72b2507b8bd51bf8c8fd10ca
 TERMUX_PKG_DEPENDS="ca-certificates, zlib"
 TERMUX_PKG_CONFFILES="etc/tls/openssl.cnf"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/c_rehash etc/"
@@ -27,9 +27,6 @@ termux_step_configure() {
 	fi
 
 	CFLAGS+=" -DNO_SYSLOG"
-	if [ $TERMUX_ARCH = arm ]; then
-		CFLAGS+=" -fno-integrated-as"
-	fi
 
 	perl -p -i -e "s@TERMUX_CFLAGS@$CFLAGS@g" Configure
 	test $TERMUX_ARCH = "arm" && TERMUX_OPENSSL_PLATFORM="android-arm"

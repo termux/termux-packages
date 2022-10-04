@@ -2,9 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://neovim.io
 TERMUX_PKG_DESCRIPTION="Ambitious Vim-fork focused on extensibility and agility (nvim-nightly)"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.org>"
-TERMUX_PKG_VERSION="0.8.0-dev+488-g7dd73625d"
+# Upstream now has version number like "0.8.0-dev-698-ga5920e98f", but actually
+# "0.8.0-dev-698-g1ef84547a" < "0.8.0-dev-nightly-10-g1a07044c1", we need to bump
+# the epoch of the package version.
+TERMUX_PKG_VERSION="1:0.9.0-dev-18-ga93ff5fc6"
 TERMUX_PKG_SRCURL="https://github.com/neovim/neovim/archive/nightly.tar.gz"
-TERMUX_PKG_SHA256=f5aa2e3220ef4e815f33d14af87c99ed8fcf7ea0f1166ad6bbc1006de2e348f4
+TERMUX_PKG_SHA256=5d46437819d85f00fb63753df3006e9d07281122ef56ed0e55e0fe347597e405
 TERMUX_PKG_DEPENDS="libiconv, libuv, luv, libmsgpack, libandroid-support, libvterm, libtermkey, libluajit, libunibilium, libtreesitter"
 TERMUX_PKG_HOSTBUILD=true
 
@@ -43,11 +46,11 @@ termux_pkg_auto_update() {
 		fi
 	}
 
-	# this outputs in the following format: "0.6.0-dev+575-g2ef9d2a66"
+	# this outputs in the following format: "0.8.0-dev-698-ga5920e98f"
 	local remote_nvim_version
 	remote_nvim_version=$(
-		echo "$curl_response" |
-			cut -d"|" -f1 | grep -oP '<pre class="notranslate"><code>NVIM v\K.*'
+		echo "$curl_response" \
+			| cut -d"|" -f1 | grep -oP '<pre class="notranslate"><code>NVIM v\K.*'
 	)
 
 	if [ -z "$remote_nvim_version" ]; then
@@ -55,7 +58,7 @@ termux_pkg_auto_update() {
 		return 1
 	fi
 
-	remote_nvim_version="$(grep -oP '^\d+\.\d+\.\d+-dev\+\d+-g[0-9a-f]+$' <<<"$remote_nvim_version" || true)"
+	remote_nvim_version="$(grep -oP '^\d+\.\d+\.\d+-dev-\d+-g[0-9a-f]+$' <<< "$remote_nvim_version" || true)"
 
 	if [ -z "$remote_nvim_version" ]; then
 		echo "WARNING: Version in nightly page is not in expected format. Skipping auto-update."
@@ -64,7 +67,7 @@ termux_pkg_auto_update() {
 	fi
 
 	# since we are using a nightly build, therefore no need to check for version increment/decrement.
-	if [ "${TERMUX_PKG_VERSION}" != "${remote_nvim_version}" ]; then
+	if [ "${TERMUX_PKG_VERSION#*:}" != "${remote_nvim_version}" ]; then
 		termux_pkg_upgrade_version "${remote_nvim_version}" --skip-version-check
 	else
 		echo "INFO: No update available."
@@ -91,15 +94,15 @@ termux_step_host_build() {
 
 	mkdir -p $TERMUX_PKG_HOSTBUILD_DIR/deps
 	cd $TERMUX_PKG_HOSTBUILD_DIR/deps
-	cmake $TERMUX_PKG_SRCDIR/third-party
+	cmake $TERMUX_PKG_SRCDIR/cmake.deps
 
-	make -j 1 ||
-		(_patch_luv $TERMUX_PKG_HOSTBUILD_DIR/deps && make -j 1)
+	make -j 1 \
+		|| (_patch_luv $TERMUX_PKG_HOSTBUILD_DIR/deps && make -j 1)
 
 	cd $TERMUX_PKG_SRCDIR
 
-	make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$TERMUX_PKG_HOSTBUILD_DIR -DUSE_BUNDLED_LUAROCKS=ON" install ||
-		(_patch_luv $TERMUX_PKG_SRCDIR/.deps && make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$TERMUX_PKG_HOSTBUILD_DIR -DUSE_BUNDLED_LUAROCKS=ON" install)
+	make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$TERMUX_PKG_HOSTBUILD_DIR -DUSE_BUNDLED_LUAROCKS=ON" install \
+		|| (_patch_luv $TERMUX_PKG_SRCDIR/.deps && make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$TERMUX_PKG_HOSTBUILD_DIR -DUSE_BUNDLED_LUAROCKS=ON" install)
 
 	make distclean
 	rm -Rf build/
@@ -118,7 +121,7 @@ termux_step_post_make_install() {
 }
 
 termux_step_create_debscripts() {
-	cat <<-EOF >./postinst
+	cat <<- EOF > ./postinst
 		#!$TERMUX_PREFIX/bin/sh
 		if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" = "configure" ] || [ "\$1" = "abort-upgrade" ]; then
 			if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
@@ -130,7 +133,7 @@ termux_step_create_debscripts() {
 		fi
 	EOF
 
-	cat <<-EOF >./prerm
+	cat <<- EOF > ./prerm
 		#!$TERMUX_PREFIX/bin/sh
 		if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" != "upgrade" ]; then
 			if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then

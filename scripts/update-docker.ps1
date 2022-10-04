@@ -5,7 +5,7 @@
 # .\scripts\update-docker.ps1
 
 Set-Variable -Name CONTAINER -Value "termux-package-builder"
-Set-Variable -Name IMAGE -Value "termux/package-builder"
+Set-Variable -Name IMAGE -Value "ghcr.io/termux/package-builder"
 
 docker pull $IMAGE
 

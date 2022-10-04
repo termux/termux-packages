@@ -15,7 +15,7 @@ termux_step_post_get_source() {
 }
 
 termux_step_host_build() {
-	_PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/_prefix
+	local _PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
 	export PKG_CONFIG_PATH=$_PREFIX_FOR_BUILD/lib/pkgconfig
 
 	local LIBT3CONFIG_BUILD_SH=$TERMUX_SCRIPTDIR/packages/libt3config/build.sh
@@ -45,6 +45,7 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
+	local _PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
 	export PATH=$_PREFIX_FOR_BUILD/bin:$PATH
 
 	local libtooldir=$TERMUX_PKG_TMPDIR/_libtool

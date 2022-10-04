@@ -2,10 +2,16 @@ TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="X11 XFree86 video mode extension library"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.1.4
-TERMUX_PKG_REVISION=30
-TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/lib/libXxf86vm-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=afee27f93c5f31c0ad582852c0fb36d50e4de7cd585fcf655e278a633d85cd57
+TERMUX_PKG_VERSION=1.1.5
+TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/lib/libXxf86vm-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=247fef48b3e0e7e67129e41f1e789e8d006ba47dba1c0cdce684b9b703f888e7
 TERMUX_PKG_DEPENDS="libx11, libxau, libxcb, libxdmcp, libxext"
 TERMUX_PKG_BUILD_DEPENDS="xorgproto, xorg-util-macros"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-malloc0returnsnull"
+
+termux_step_post_massage() {
+	cd ${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/lib || exit 1
+	if [ ! -e "./libXxf86vm.so.1" ]; then
+		ln -sf libXxf86vm.so libXxf86vm.so.1
+	fi
+}

@@ -143,7 +143,6 @@ PACKAGES+=" zlib1g-dev:i386"
 
 # For swift.
 PACKAGES+=" lld"
-PACKAGES+=" patchelf"
 
 # Needed by wrk.
 PACKAGES+=" luajit"
@@ -152,7 +151,7 @@ PACKAGES+=" luajit"
 PACKAGES+=" bc"
 
 # Java.
-PACKAGES+=" openjdk-8-jdk openjdk-16-jdk"
+PACKAGES+=" openjdk-8-jdk openjdk-18-jdk"
 
 # needed by ovmf
 PACKAGES+=" libarchive-tools"
@@ -203,6 +202,7 @@ PACKAGES+=" wayland-scanner++"
 PACKAGES+=" xfce4-dev-tools"
 PACKAGES+=" xfonts-utils"
 PACKAGES+=" xutils-dev"
+PACKAGES+=" desktop-file-utils"
 
 # Needed by packages in science repository
 PACKAGES+=" protobuf-c-compiler"
@@ -246,6 +246,12 @@ PACKAGES+=" libjson-perl"
 # Required for parsing repo.json
 PACKAGES+=" jq"
 
+# Required by txikijs's hostbuild step
+PACKAGES+=" libcurl4-openssl-dev"
+
+# Required by openjdk-17
+PACKAGES+=" openjdk-17-jre openjdk-17-jdk"
+
 # Do not require sudo if already running as root.
 if [ "$(id -u)" = "0" ]; then
 	SUDO=""
@@ -255,6 +261,9 @@ fi
 
 # Allow 32-bit packages.
 $SUDO dpkg --add-architecture i386
+# Add ppa repo to be able to get openjdk-17 on ubuntu 22.04
+$SUDO cp $(dirname "$(realpath "$0")")/openjdk-r-ppa.gpg /etc/apt/trusted.gpg.d/
+echo "deb https://ppa.launchpadcontent.net/openjdk-r/ppa/ubuntu/ jammy main" | $SUDO tee /etc/apt/sources.list.d/openjdk-r-ubuntu-ppa-jammy.list > /dev/null
 $SUDO apt-get -yq update
 
 $SUDO env DEBIAN_FRONTEND=noninteractive \

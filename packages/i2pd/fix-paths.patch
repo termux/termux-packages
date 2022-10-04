@@ -1,6 +1,6 @@
-diff -uNr i2pd-2.39.0/libi2pd/Config.cpp i2pd-2.39.0.mod/libi2pd/Config.cpp
---- i2pd-2.39.0/libi2pd/Config.cpp	2021-08-23 17:03:26.000000000 +0300
-+++ i2pd-2.39.0.mod/libi2pd/Config.cpp	2021-11-06 21:44:21.097504481 +0200
+diff -uNr i2pd-2.43.0/libi2pd/Config.cpp i2pd-2.43.0.mod/libi2pd/Config.cpp
+--- i2pd-2.43.0/libi2pd/Config.cpp	2022-08-22 03:40:41.000000000 +0800
++++ i2pd-2.43.0.mod/libi2pd/Config.cpp	2022-08-22 08:52:00.452412943 +0800
 @@ -34,11 +34,11 @@
  		general.add_options()
  			("help",                                                          "Show this message")
@@ -26,17 +26,21 @@ diff -uNr i2pd-2.39.0/libi2pd/Config.cpp i2pd-2.39.0.mod/libi2pd/Config.cpp
 +			("service", bool_switch()->default_value(false),                  "Router will use system folders like '@TERMUX_PREFIX@/var/lib/i2pd' (default: disabled)")
  			("notransit", bool_switch()->default_value(false),                "Router will not accept transit tunnels at startup (default: disabled)")
  			("floodfill", bool_switch()->default_value(false),                "Router will be floodfill (default: disabled)")
- 			("bandwidth", value<std::string>()->default_value(""),            "Bandwidth limit: integer in KBps or letters: L (32), O (256), P (2048), X (>9000)")
-diff -uNr i2pd-2.39.0/libi2pd/FS.cpp i2pd-2.39.0.mod/libi2pd/FS.cpp
---- i2pd-2.39.0/libi2pd/FS.cpp	2021-08-23 17:03:26.000000000 +0300
-+++ i2pd-2.39.0.mod/libi2pd/FS.cpp	2021-11-06 21:41:30.409511991 +0200
-@@ -121,11 +121,11 @@
- 		// otherwise use /data/files
- 		char *home = getenv("HOME");
- 		if (isService) {
+ 			("bandwidth", value<std::string>()->default_value(""),            "Transit traffic bandwidth limit: integer in KBps or letters: L (32), O (256), P (2048), X (>9000)")
+diff -uNr i2pd-2.43.0/libi2pd/FS.cpp i2pd-2.43.0.mod/libi2pd/FS.cpp
+--- i2pd-2.43.0/libi2pd/FS.cpp	2022-08-22 03:40:41.000000000 +0800
++++ i2pd-2.43.0.mod/libi2pd/FS.cpp	2022-08-22 08:53:49.542412901 +0800
+@@ -85,7 +85,7 @@
+ 				dataDir = boost::filesystem::wpath(commonAppData).string() + "\\" + appName;
+ 			}
+ #else
 -			dataDir = "/var/lib/" + appName;
 +			dataDir = "@TERMUX_PREFIX@/var/lib/" + appName;
- 		} else if (home != NULL && strlen(home) > 0) {
+ #endif
+ 			return;
+ 		}
+@@ -151,7 +151,7 @@
+ 		if (home != NULL && strlen(home) > 0) {
  			dataDir = std::string(home) + "/." + appName;
  		} else {
 -			dataDir = "/tmp/" + appName;

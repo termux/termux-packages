@@ -1,12 +1,26 @@
 --- a/crates/nu-path/src/tilde.rs
 +++ b/crates/nu-path/src/tilde.rs
-@@ -53,6 +53,12 @@
+@@ -1,4 +1,4 @@
+-#[cfg(all(unix, not(target_os = "macos")))]
++#[cfg(all(unix, not(target_os = "macos"), not(target_os = "android")))]
+ use pwd::Passwd;
+ use std::path::{Path, PathBuf};
+ 
+@@ -45,7 +45,7 @@
+     }
+ }
+ 
+-#[cfg(all(unix, not(target_os = "macos")))]
++#[cfg(all(unix, not(target_os = "macos"), not(target_os = "android")))]
+ fn user_home_dir(username: &str) -> PathBuf {
+     let passwd = Passwd::from_name(username);
+     match &passwd.ok() {
+@@ -60,6 +60,11 @@
      // Returns home dir of user.
  }
  
 +#[cfg(target_os = "android")]
-+#[allow(unused)]
-+fn user_home_dir(username: &str) -> PathBuf {
++fn user_home_dir(_username: &str) -> PathBuf {
 +    PathBuf::from(String::from("@TERMUX_HOME@"))
 +}
 +

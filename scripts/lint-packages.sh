@@ -32,7 +32,7 @@ check_package_license() {
 			PythonPL|PythonSoftFoundation|QTPL-1.0|RPL-1.5|Real-1.0|RicohPL);;
 			SUNPublic-1.0|Scala|SimPL-2.0|Sleepycat|Sybase-1.0|TMate|UPL-1.0);;
 			Unicode-DFS-2015|Unlicense|UoI-NCSA|"VIM License"|VovidaPL-1.0|W3C);;
-			WTFPL|Xnet|ZLIB|ZPL-2.0|wxWindows);;
+			WTFPL|Xnet|ZLIB|ZPL-2.0|wxWindows|X11);;
 
 			*)
 				license_ok=false

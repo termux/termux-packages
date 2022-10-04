@@ -1,11 +1,11 @@
-TERMUX_PKG_HOMEPAGE=http://blog.calhariz.com/index.php/tag/at
+TERMUX_PKG_HOMEPAGE=https://salsa.debian.org/debian/at
 TERMUX_PKG_DESCRIPTION="AT and batch delayed command scheduling utility and daemon"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.2.2
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SRCURL=https://salsa.debian.org/debian/at/-/archive/upstream/${TERMUX_PKG_VERSION}/at-upstream-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=8239236f692aba2dba1c5c2cd97ae6aa02bbfe14e23a7e292131b0594a735d84
+TERMUX_PKG_VERSION=3.2.5
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_SRCURL=https://deb.debian.org/debian/pool/main/a/at/at_${TERMUX_PKG_VERSION}.orig.tar.gz
+TERMUX_PKG_SHA256=bb066b389d7c9bb9d84a35738032b85c30cba7d949f758192adc72c9477fd3b8
 TERMUX_PKG_SUGGESTS="termux-services"
 TERMUX_PKG_BUILD_IN_SRC=true
 

@@ -1,7 +1,7 @@
 diff -uNr llvm-project/clang/lib/Driver/ToolChains/Linux.cpp llvm-project.mod/clang/lib/Driver/ToolChains/Linux.cpp
---- llvm-project/clang/lib/Driver/ToolChains/Linux.cpp	2022-05-27 00:44:58.000000000 +0800
-+++ llvm-project.mod/clang/lib/Driver/ToolChains/Linux.cpp	2022-06-06 00:18:38.107958390 +0800
-@@ -162,8 +162,8 @@
+--- llvm-project/clang/lib/Driver/ToolChains/Linux.cpp	2022-06-20 05:49:00.000000000 +0800
++++ llvm-project.mod/clang/lib/Driver/ToolChains/Linux.cpp	2022-06-28 23:43:47.540674027 +0800
+@@ -164,8 +164,8 @@
    // FIXME: This is a bit of a hack. We should really unify this code for
    // reasoning about oslibdir spellings with the lib dir spellings in the
    // GCCInstallationDetector, but that is a more significant refactoring.
@@ -12,28 +12,28 @@ diff -uNr llvm-project/clang/lib/Driver/ToolChains/Linux.cpp llvm-project.mod/cl
      return "lib32";
  
    if (Triple.getArch() == llvm::Triple::x86_64 && Triple.isX32())
-@@ -295,7 +295,7 @@
+@@ -297,7 +297,7 @@
    if (Triple.getVendor() == llvm::Triple::OpenEmbedded &&
        Triple.isArch64Bit())
-     addPathIfExists(D, SysRoot + "/usr/" + OSLibDir, Paths);
+     addPathIfExists(D, concat(SysRoot, "/usr", OSLibDir), Paths);
 -  else
 +  else if (!IsAndroid)
-     addPathIfExists(D, SysRoot + "/usr/lib/../" + OSLibDir, Paths);
+     addPathIfExists(D, concat(SysRoot, "/usr/lib/..", OSLibDir), Paths);
    if (IsRISCV) {
      StringRef ABIName = tools::riscv::getRISCVABI(Args, Triple);
-@@ -313,7 +313,15 @@
+@@ -315,7 +315,15 @@
      addPathIfExists(D, D.Dir + "/../lib", Paths);
  
-   addPathIfExists(D, SysRoot + "/lib", Paths);
--  addPathIfExists(D, SysRoot + "/usr/lib", Paths);
+   addPathIfExists(D, concat(SysRoot, "/lib"), Paths);
+-  addPathIfExists(D, concat(SysRoot, "/usr/lib"), Paths);
 +  bool nativeBuild = MultiarchTriple == getMultiarchTriple(D, llvm::Triple(llvm::sys::getDefaultTargetTriple()), SysRoot);
 +  if (nativeBuild || !IsAndroid)
-+    addPathIfExists(D, SysRoot + "/usr/lib", Paths);
++    addPathIfExists(D, concat(SysRoot, "/usr/lib"), Paths);
 +
 +  if (IsAndroid) {
-+    addPathIfExists(D, SysRoot + "/usr/" + MultiarchTriple + "/lib", Paths);
-+    addPathIfExists(D, "/system/" + OSLibDir, Paths);
-+    ExtraOpts.push_back("-rpath=" + SysRoot + "/usr/lib");
++    addPathIfExists(D, concat(SysRoot, "/usr/", MultiarchTriple, "/lib"), Paths);
++    addPathIfExists(D, concat("/system/", OSLibDir), Paths);
++    ExtraOpts.push_back(concat("-rpath=", SysRoot, "/usr/lib"));
 +  }
  }
  

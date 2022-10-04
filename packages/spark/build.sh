@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/holman/spark
-TERMUX_PKG_DESCRIPTION="▁▂▃▅▂▇ in your shell."
+TERMUX_PKG_DESCRIPTION="▁▂▃▅▂▇ in your shell"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.0.1

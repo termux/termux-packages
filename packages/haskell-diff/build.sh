@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE="https://hackage.haskell.org/package/Diff"
-TERMUX_PKG_DESCRIPTION="O(ND) diff algorithm in haskell."
+TERMUX_PKG_DESCRIPTION="O(ND) diff algorithm in haskell"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.org>"
 TERMUX_PKG_VERSION="0.4.1"

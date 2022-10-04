@@ -1,0 +1,24 @@
+diff --git sfeed-1.6.old/Makefile sfeed-1.6/Makefile
+index 9958954..3112e11 100644
+--- sfeed-1.6.old/Makefile
++++ sfeed-1.6/Makefile
+@@ -7,8 +7,8 @@ VERSION = 1.6
+ SFEED_THEME = mono
+ 
+ # paths
+-PREFIX = /usr/local
+-MANPREFIX = ${PREFIX}/man
++PREFIX ?= /usr/local
++MANPREFIX ?= ${PREFIX}/share/man
+ DOCPREFIX = ${PREFIX}/share/doc/${NAME}
+ 
+ RANLIB = ranlib
+@@ -16,7 +16,7 @@ RANLIB = ranlib
+ # use system flags.
+ SFEED_CFLAGS = ${CFLAGS}
+ SFEED_LDFLAGS = ${LDFLAGS}
+-SFEED_CPPFLAGS = -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700 -D_BSD_SOURCE
++SFEED_CPPFLAGS = -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700 -D_BSD_SOURCE ${CPPFLAGS}
+ 
+ # uncomment for conservative locked I/O.
+ #SFEED_CPPFLAGS = -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700 -D_BSD_SOURCE \

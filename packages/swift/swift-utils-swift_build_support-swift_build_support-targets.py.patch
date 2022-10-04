@@ -20,15 +20,6 @@ index 7ebcdc070c1..5a6ed88182e 100644
  
      def swiftpm_config(self, args, output_dir, swift_toolchain, resource_path):
          config_file = '%s/swiftpm-android-%s.json' % (output_dir, args.android_arch)
-@@ -190,7 +190,7 @@ class AndroidPlatform(Platform):
-         spm_json += '  "version": 1,\n'
-         spm_json += '  "target": "%s-unknown-linux-android%s",\n' % (
-                     args.android_arch, args.android_api_level)
--        spm_json += '  "toolchain-bin-dir": "%s/bin",\n' % swift_toolchain
-+        spm_json += '  "toolchain-bin-dir": "%s/bin",\n' % args.android_ndk
-         spm_json += '  "sdk": "%s/sysroot",\n' % self.ndk_toolchain_path(args)
- 
-         spm_json += '  "extra-cc-flags": [ "-fPIC", "-I%s/usr/include" ],\n' % (
 @@ -203,6 +203,7 @@ class AndroidPlatform(Platform):
          spm_json += '    "-tools-directory", "%s/bin",\n' % (
                      self.ndk_toolchain_path(args))

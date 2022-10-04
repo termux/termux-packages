@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE="https://github.com/haskellari/integer-logarithms"
-TERMUX_PKG_DESCRIPTION="Integer logarithms."
+TERMUX_PKG_DESCRIPTION="Integer logarithms"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.org>"
 TERMUX_PKG_VERSION="1.0.3.1"

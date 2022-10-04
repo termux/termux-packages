@@ -23,7 +23,7 @@ TERMUX_MAKE_PROCESSES=1
 TERMUX_PKG_HOSTBUILD=true
 
 termux_step_host_build() {
-	_PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
+	local _PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
 	mkdir -p $_PREFIX_FOR_BUILD
 
 	find $TERMUX_PKG_SRCDIR -mindepth 1 -maxdepth 1 -exec cp -a \{\} ./ \;
@@ -33,7 +33,8 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
-	PATH=$TERMUX_PKG_HOSTBUILD_DIR/prefix/bin:$PATH
+	local _PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
+	PATH=$_PREFIX_FOR_BUILD/bin:$PATH
 }
 
 termux_step_post_configure() {

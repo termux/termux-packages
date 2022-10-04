@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Provides a C++ interface to cairo"
 TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.14.3
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.cairographics.org/releases/cairomm-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=0d37e067c5c4ca7808b7ceddabfe1932c5bd2a750ad64fb321e1213536297e78
 TERMUX_PKG_DEPENDS="libc++, libcairo, libsigc++-2.0"
