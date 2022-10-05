@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Tool to serve files and dirs over HTTP"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.22.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/svenstaro/miniserve/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=325f6cde391c468000b1bdcc8455ec2c6950b3c930029187671c536507b185ba
 TERMUX_PKG_AUTO_UPDATE=true
@@ -28,9 +29,13 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_make_install() {
+	# shell completions
 	install -Dm644 /dev/null "$TERMUX_PREFIX"/share/bash-completion/completions/miniserve
 	install -Dm644 /dev/null "$TERMUX_PREFIX"/share/zsh/site-functions/_miniserve
 	install -Dm644 /dev/null "$TERMUX_PREFIX"/share/fish/vendor_completions.d/miniserve.fish
+
+	# manpage
+	install -Dm644 /dev/null "$TERMUX_PREFIX"/share/man/man1/miniserve.1
 }
 
 termux_step_create_debscripts() {
@@ -43,6 +48,8 @@ termux_step_create_debscripts() {
 		> "$TERMUX_PREFIX"/share/zsh/site-functions/_miniserve
 	miniserve --print-completions fish \
 		> "$TERMUX_PREFIX"/share/fish/vendor_completions.d/miniserve.fish
+	miniserve --print-manpage \
+		> "$TERMUX_PREFIX"/share/man/man1/miniserve.1
 
 	# Warn user on default behaviour of miniserve.
 	echo
