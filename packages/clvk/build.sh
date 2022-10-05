@@ -46,11 +46,12 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCLVK_CLSPV_ONLINE_COMPILER=ON"
 # clvk currently does not have proper versioning nor releases
 # Use dates and commits as versioning for now
 termux_pkg_auto_update() {
-	local latest_commit latest_commit_date_tz latest_commit_date latest_commit_time latest_version
-	latest_commit=$(curl -s https://api.github.com/repos/kpet/clvk/commits | jq .[].sha | head -1 | sed -e 's|\"||g')
+	local latest_commit_date_tz latest_commit_date latest_commit_time latest_version
+	local latest_commit=$(curl -s https://api.github.com/repos/kpet/clvk/commits | jq .[].sha | head -1 | sed -e 's|\"||g')
 
 	if [ -z "$latest_commit" ]; then
-		termux_error_exit "ERROR: Unable to get latest commit from upstream"
+		echo "WARN: Unable to get latest commit from upstream. Try again later." >&2
+		return 0
 	fi
 
 	if [ "$latest_commit" = "$_COMMIT" ]; then
