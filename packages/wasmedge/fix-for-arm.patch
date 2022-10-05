@@ -1,0 +1,74 @@
+This reverts commit af59a11d976821c7775fecc1f5cad6c2b6fc728c.
+diff --git a/include/common/variant.h b/include/common/variant.h
+index dbfaad64..d1e6846f 100644
+--- a/include/common/variant.h
++++ b/include/common/variant.h
+@@ -35,7 +35,9 @@ union VariadicUnion<FirstT, RestT...> {
+ 
+   template <typename... Args>
+   constexpr VariadicUnion(std::in_place_index_t<0>, Args &&...Values)
+-      : First(std::forward<Args>(Values)...) {}
++      : First() {
++    ::new (&First) FirstT(std::forward<Args>(Values)...);
++  }
+ 
+   template <std::size_t N, typename... Args>
+   constexpr VariadicUnion(std::in_place_index_t<N>, Args &&...Values)
+@@ -43,28 +45,28 @@ union VariadicUnion<FirstT, RestT...> {
+ 
+   template <typename T> constexpr const T &get() const &noexcept {
+     if constexpr (std::is_same_v<T, FirstT>) {
+-      return First;
++      return *std::launder(reinterpret_cast<const FirstT *>(&First));
+     } else {
+       return Rest.template get<T>();
+     }
+   }
+   template <typename T> constexpr T &get() &noexcept {
+     if constexpr (std::is_same_v<T, FirstT>) {
+-      return First;
++      return *std::launder(reinterpret_cast<FirstT *>(&First));
+     } else {
+       return Rest.template get<T>();
+     }
+   }
+   template <typename T> constexpr const T &&get() const &&noexcept {
+     if constexpr (std::is_same_v<T, FirstT>) {
+-      return std::move(First);
++      return std::move(*std::launder(reinterpret_cast<const FirstT *>(&First)));
+     } else {
+       return std::move(Rest).template get<T>();
+     }
+   }
+   template <typename T> constexpr T &&get() &&noexcept {
+     if constexpr (std::is_same_v<T, FirstT>) {
+-      return std::move(First);
++      return std::move(*std::launder(reinterpret_cast<FirstT *>(&First)));
+     } else {
+       return std::move(Rest).template get<T>();
+     }
+@@ -74,7 +76,7 @@ union VariadicUnion<FirstT, RestT...> {
+   constexpr T &emplace(Args &&...Values) &noexcept {
+     if constexpr (std::is_same_v<T, FirstT>) {
+       ::new (&First) FirstT(std::forward<Args>(Values)...);
+-      return *std::launder(&First);
++      return *std::launder(reinterpret_cast<FirstT *>(&First));
+     } else {
+       return Rest.template emplace<T>(std::forward<Args>(Values)...);
+     }
+@@ -84,13 +86,13 @@ union VariadicUnion<FirstT, RestT...> {
+   constexpr T &emplace(Args &&...Values) &&noexcept {
+     if constexpr (std::is_same_v<T, FirstT>) {
+       ::new (&First) FirstT(std::forward<Args>(Values)...);
+-      return std::move(*std::launder(&First));
++      return std::move(*std::launder(reinterpret_cast<FirstT *>(&First)));
+     } else {
+       return std::move(Rest).template emplace<T>(std::forward<Args>(Values)...);
+     }
+   }
+ 
+-  FirstT First;
++  std::aligned_storage_t<sizeof(FirstT), alignof(FirstT)> First;
+   VariadicUnion<RestT...> Rest;
+ };
+ 
