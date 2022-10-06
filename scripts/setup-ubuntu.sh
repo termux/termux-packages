@@ -227,7 +227,7 @@ PACKAGES+=" python3-jsonschema"
 
 # Needed by package lilypond.
 PACKAGES+=" fontforge-nox"
-PACKAGES+=" guile-2.2"
+PACKAGES+=" guile-3.0"
 PACKAGES+=" python3-fontforge"
 PACKAGES+=" texlive-metapost"
 
