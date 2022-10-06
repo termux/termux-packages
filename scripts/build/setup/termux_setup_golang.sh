@@ -1,7 +1,7 @@
 # Utility function for golang-using packages to setup a go toolchain.
 termux_setup_golang() {
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
-		local TERMUX_GO_VERSION=go1.19.1
+		local TERMUX_GO_VERSION=go1.19.2
 		local TERMUX_GO_PLATFORM=linux-amd64
 
 		local TERMUX_BUILDGO_FOLDER
@@ -20,7 +20,7 @@ termux_setup_golang() {
 		rm -Rf "$TERMUX_COMMON_CACHEDIR/go" "$TERMUX_BUILDGO_FOLDER"
 		termux_download https://golang.org/dl/${TERMUX_GO_VERSION}.${TERMUX_GO_PLATFORM}.tar.gz \
 			"$TERMUX_BUILDGO_TAR" \
-			acc512fbab4f716a8f97a8b3fbaa9ddd39606a28be6c2515ef7c6c6311acffde
+			5e8c5a74fe6470dd7e055a461acda8bb4050ead8c2df70f227e3ff7d8eb7eeb6
 
 		( cd "$TERMUX_COMMON_CACHEDIR"; tar xf "$TERMUX_BUILDGO_TAR"; mv go "$TERMUX_BUILDGO_FOLDER"; rm "$TERMUX_BUILDGO_TAR" )
 
