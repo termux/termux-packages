@@ -18,11 +18,17 @@ on:
       packages:
         description: "A space-separated names of packages selected for rebuilding"
         required: true
-        
+      run_only_upload_job:
+        type: boolean
+        description: Run only upload job
+        required: false
+        default: false
+
 permissions: {} # none
 
 jobs:
   build:
+    if: ${{ inputs.run_only_upload_job != true }}
     permissions:
       contents: read # actions/upload-artifact doesn't need contents: write
     runs-on: ubuntu-22.04
