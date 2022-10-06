@@ -1,0 +1,17 @@
+--- ./test/parallel/test-child-process-stdio-overlapped.js.orig	2022-06-05 09:57:50.337599264 +0530
++++ ./test/parallel/test-child-process-stdio-overlapped.js	2022-06-05 10:12:13.197598935 +0530
+@@ -28,10 +28,13 @@
+ const assert = require('assert');
+ const path = require('path');
+ const child_process = require('child_process');
++const { mkdtempSync } = require('fs')
+ 
+ const exeExtension = process.platform === 'win32' ? '.exe' : '';
+ const exe = 'overlapped-checker' + exeExtension;
+-const exePath = path.join(path.dirname(process.execPath), exe);
++const exePath = path.join(mkdtempSync(process.env.TMPDIR + '/' || '@TERMUX_PREFIX@/tmp/'), exe);
++
++child_process.spawnSync('clang', ['-O3', 'test/overlapped-checker/main_unix.c', '-o', exePath]);
+ 
+ const child = child_process.spawn(exePath, [], {
+   stdio: ['overlapped', 'pipe', 'pipe']

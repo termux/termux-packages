@@ -1,0 +1,17 @@
+--- ./test/parallel/test-blob-buffer-too-large.js.orig	2022-06-05 08:43:15.647600971 +0530
++++ ./test/parallel/test-blob-buffer-too-large.js	2022-06-05 08:55:58.717600680 +0530
+@@ -4,10 +4,14 @@
+ const common = require('../common');
+ const assert = require('assert');
+ const { Blob } = require('buffer');
++const { platform } = require('os');
+ 
+ if (common.isFreeBSD)
+   common.skip('Oversized buffer make the FreeBSD CI runner crash');
+ 
++if (platform() === 'android')
++  common.skip('Android will kill heavy memory using processes sometimes crashing Termux');
++
+ try {
+   new Blob([new Uint8Array(0xffffffff), [1]]);
+ } catch (e) {
