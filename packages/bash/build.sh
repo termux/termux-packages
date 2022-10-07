@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 _MAIN_VERSION=5.2
 _PATCH_VERSION=2
 TERMUX_PKG_VERSION=${_MAIN_VERSION}.${_PATCH_VERSION}
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/bash/bash-${_MAIN_VERSION}.tar.gz
 TERMUX_PKG_SHA256=a139c166df7ff4471c5e0733051642ee5556c1cc8a4a78f145583c5c81ab32fb
 TERMUX_PKG_DEPENDS="libandroid-support, libiconv, ncurses, readline (>= 8.0), termux-tools"
@@ -53,12 +53,12 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_make_install() {
-	sed -e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|" \
-		-e "s|@TERMUX_HOME@|$TERMUX_ANDROID_HOME|" \
+	sed -e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
+		-e "s|@TERMUX_HOME@|$TERMUX_ANDROID_HOME|g" \
 		$TERMUX_PKG_BUILDER_DIR/etc-profile > $TERMUX_PREFIX/etc/profile
 
 	# /etc/bash.bashrc - System-wide .bashrc file for interactive shells. (config-top.h in bash source, patched to enable):
-	sed -e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|" \
-		-e "s|@TERMUX_HOME@|$TERMUX_ANDROID_HOME|" \
+	sed -e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
+		-e "s|@TERMUX_HOME@|$TERMUX_ANDROID_HOME|g" \
 		$TERMUX_PKG_BUILDER_DIR/etc-bash.bashrc > $TERMUX_PREFIX/etc/bash.bashrc
 }
