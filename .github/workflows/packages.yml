@@ -236,8 +236,11 @@ jobs:
     concurrency: ${{ github.workflow }}
     permissions:
       contents: read
-    if: github.event_name != 'pull_request'
     needs: build
+    if: |
+      always() &&
+      (needs.build.result == 'success' || needs.build.result == 'skipped') &&
+      github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
     - name: Clone repository
