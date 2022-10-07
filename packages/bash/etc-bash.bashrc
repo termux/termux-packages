@@ -22,3 +22,5 @@ if [ -x @TERMUX_PREFIX@/libexec/termux/command-not-found ]; then
 		@TERMUX_PREFIX@/libexec/termux/command-not-found "$1"
 	}
 fi
+
+[ -r @TERMUX_PREFIX@/share/bash-completion/bash_completion ] && . @TERMUX_PREFIX@/share/bash-completion/bash_completion
