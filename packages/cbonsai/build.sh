@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://gitlab.com/jallbrit/cbonsai
+TERMUX_PKG_DESCRIPTION="Grow bonsai trees in your terminal" 
+TERMUX_PKG_LICENSE="GPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux"                        
+TERMUX_PKG_VERSION=1.3.1
+TERMUX_PKG_SRCURL=https://gitlab.com/jallbrit/cbonsai/-/archive/v${TERMUX_PKG_VERSION}/cbonsai-v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=62aa7e0eaf3098b7a6a2787146bd2531437df6ad0e604b0f9176128797efd8f9
+TERMUX_PKG_DEPENDS="ncurses, ncurses-ui-libs, ncurses-utils"
+TERMUX_PKG_BUILD_IN_SRC=true
