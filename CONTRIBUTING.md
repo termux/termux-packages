@@ -306,7 +306,7 @@ are exist package recipes available out-of-box.
 
 ## Commit guidelines
 
-A commit message should look something like:
+Commit messages should describe the changes done, so that maintainers can understand what was done, and to what package or scope, without having to look at the code changes. One good (but not mandatory) way to make sure the commit message fulfills these requirements is to write it on the format:
 
 ```
 <commitType>(<repo>/<package>): (Summary of change(s) made/Short description of the change)
