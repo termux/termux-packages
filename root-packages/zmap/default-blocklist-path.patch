@@ -1,0 +1,35 @@
+diff --git a/conf/zmap.conf b/conf/zmap.conf
+index 817c184..b390da7 100644
+--- a/conf/zmap.conf
++++ b/conf/zmap.conf
+@@ -16,7 +16,7 @@
+ ### RFC1918, IANA reserved, and multicast networks,
+ ### in addition to those who have opted out of your
+ ### network scans.
+-blocklist-file "/etc/zmap/blocklist.conf"
++blocklist-file "@TERMUX_PERFIX@/etc/zmap/blocklist.conf"
+ 
+ ### Optionally print a summary at the end
+ #summary
+diff --git a/src/zmap.c b/src/zmap.c
+index 77674e0..0ed66cc 100644
+--- a/src/zmap.c
++++ b/src/zmap.c
+@@ -650,14 +650,14 @@ int main(int argc, char *argv[])
+ 	zconf.destination_cidrs = args.inputs;
+ 	zconf.destination_cidrs_len = args.inputs_num;
+ 	if (zconf.destination_cidrs && zconf.blocklist_filename &&
+-	    !strcmp(zconf.blocklist_filename, "/etc/zmap/blocklist.conf")) {
++	    !strcmp(zconf.blocklist_filename, "@TERMUX_PREFIX@/etc/zmap/blocklist.conf")) {
+ 		log_warn(
+ 		    "blocklist",
+ 		    "ZMap is currently using the default blocklist located "
+-		    "at /etc/zmap/blocklist.conf. By default, this blocklist excludes locally "
++		    "at @TERMUX_PREFIX@/etc/zmap/blocklist.conf. By default, this blocklist excludes locally "
+ 		    "scoped networks (e.g. 10.0.0.0/8, 127.0.0.1/8, and 192.168.0.0/16). If you are"
+ 		    " trying to scan local networks, you can change the default blocklist by "
+-		    "editing the default ZMap configuration at /etc/zmap/zmap.conf.");
++		    "editing the default ZMap configuration at @TERMUX_PREFIX@/etc/zmap/zmap.conf.");
+ 	}
+ 	SET_IF_GIVEN(zconf.allowlist_filename, allowlist_file);
+ 
