@@ -15,7 +15,7 @@ termux_pkg_auto_update() {
 	output_file=$(basename "$TERMUX_PKG_SRCURL")
 	curl_response=$(curl -s -w '%{response_code}\n' -o "$output_file" "$TERMUX_PKG_SRCURL")
 	if [ "$curl_response" = 200 ]; then
-		file_checksum=$(sha256sum output_file | cut -d' ' -f1)
+		file_checksum=$(sha256sum $output_file | cut -d' ' -f1)
 		rm -f "$output_file"
 		if [ "$file_checksum" = "$TERMUX_PKG_SHA256" ]; then
 			echo "INFO: No update needed. Already at version '$TERMUX_PKG_VERSION'."
