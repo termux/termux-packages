@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/LinusDierheimer/fastfetch
 TERMUX_PKG_DESCRIPTION="A neofetch-like tool for fetching system information and displaying them in a pretty way"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.7.2"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="1.7.3"
 TERMUX_PKG_SRCURL=https://github.com/LinusDierheimer/fastfetch/archive/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=f0778cdc6d33f5399bb82a8689b816ec3ff1d6b3eb74488e88d7a92a0bd3f7b6
+TERMUX_PKG_SHA256=3b902d6c361e48f924a5ccd165c80eafd81c60d2fa7a5d08f3c3623b82eef6b8
 TERMUX_PKG_AUTO_UPDATE=true
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
