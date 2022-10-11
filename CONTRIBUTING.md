@@ -351,17 +351,17 @@ Any line in the commit **should not exceed 80 characters**. In case it does, con
 Examples of good commit messages:
 
 1. ```
-   upgpkg(main/nodejs): upgrade to v18.2.0
+   upgpkg(main/nodejs): v18.2.0
    ```
 
 2. ```
-   dwnpkg(main/htop): downgrade to v2.2.0
+   dwnpkg(main/htop): v2.2.0
 
    v3.x needs access to /proc/stat which is now restricted by Android
    ```
 
 3. ```
-   enhance,upgpkg(main/nodejs): update to v18.2.0 and use shared libuv
+   enhance,upgpkg(main/nodejs): v18.2.0 and use shared libuv
 
    # Describe the technical reasons of how using shared libuv is beneficial
    ```
