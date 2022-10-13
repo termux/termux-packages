@@ -63,8 +63,19 @@ termux_pkg_upgrade_version() {
 		fi
 
 		echo "INFO: Trying to build package."
-		repo=$(jq --raw-output '.'"$(basename $(dirname ${TERMUX_SCRIPTDIR}/*packages/${TERMUX_PKG_NAME}))"'.name' ${TERMUX_SCRIPTDIR}/repo.json)
-		repo=${repo#*-}
+
+		for repo_path in $(jq --raw-output 'keys | .[]' ${TERMUX_SCRIPTDIR}/repo.json); do
+			_buildsh_path="${TERMUX_SCRIPTDIR}/${repo_path}/${TERMUX_PKG_NAME}/build.sh"
+			repo=$(jq --raw-output ".\"${repo_path}\".repo" ${TERMUX_SCRIPTDIR}/repo.json)
+			repo=${repo#"termux-"}
+
+			if [ -f "${_buildsh_path}" ]; then
+				echo "INFO: Package ${TERMUX_PKG_NAME} exists in ${repo} repo."
+				unset _buildsh_path repo_path
+				break
+			fi
+		done
+
 		if "${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" ./build-package.sh -a "${TERMUX_ARCH}" -I "${TERMUX_PKG_NAME}"; then
 			if [[ "${GIT_COMMIT_PACKAGES}" == "true" ]]; then
 				echo "INFO: Committing package."
