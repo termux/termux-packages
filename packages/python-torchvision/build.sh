@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.13.1
 TERMUX_PKG_SRCURL=https://github.com/pytorch/vision.git
-TERMUX_PKG_DEPENDS="python, python-numpy, python-torch, libjpeg-turbo, libpng, ffmpeg, zlib"
+TERMUX_PKG_DEPENDS="python, python-numpy, python-pillow, python-torch, libjpeg-turbo, libpng, ffmpeg, zlib"
 
 termux_step_pre_configure() {
 	_PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
@@ -32,9 +32,4 @@ termux_step_configure() {
 
 termux_step_make_install() {
 	pip -v install --prefix "$TERMUX_PREFIX" "$TERMUX_PKG_SRCDIR"
-}
-
-termux_step_create_debscripts() {
-	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
-	echo "LDFLAGS='-L/system/lib64' pip3 install Pillow" >> postinst
 }
