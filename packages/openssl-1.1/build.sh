@@ -3,6 +3,8 @@ TERMUX_PKG_DESCRIPTION="Library implementing the SSL and TLS protocols as well a
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
+# Upstream has withdrawn 1.1.1r version:
+#   https://mta.openssl.org/pipermail/openssl-announce/2022-October/000237.html
 _VERSION=1.1.1q
 TERMUX_PKG_VERSION=1:${_VERSION}
 TERMUX_PKG_SRCURL=https://www.openssl.org/source/openssl-${_VERSION/\~/-}.tar.gz
