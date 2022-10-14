@@ -19,6 +19,8 @@ termux_step_configure() {
 		${_CROSSENV_PREFIX}
 	popd
 	. ${_CROSSENV_PREFIX}/bin/activate
+
+	LDFLAGS+=" -lpython${_PYTHON_VERSION}"
 }
 
 termux_step_make_install() {
