@@ -14,3 +14,7 @@ termux_step_pre_configure() {
 		CXXFLAGS+=" -march=armv8-a+crc"
 	fi
 }
+
+termux_step_configure() {
+	"$TERMUX_PKG_SRCDIR/configure" --prefix=$TERMUX_PREFIX
+}
