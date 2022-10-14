@@ -33,3 +33,8 @@ termux_step_configure() {
 termux_step_make_install() {
 	pip -v install --prefix "$TERMUX_PREFIX" "$TERMUX_PKG_SRCDIR"
 }
+
+termux_step_create_debscripts() {
+	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
+	echo "pip3 install typing_extensions requests" >> postinst
+}
