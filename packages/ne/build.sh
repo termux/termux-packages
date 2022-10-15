@@ -9,6 +9,7 @@ TERMUX_PKG_DEPENDS="libandroid-support, ncurses"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
+TERMUX_MAKE_PROCESSES=1
 
 termux_step_pre_configure() {
 	export OPTS="$CFLAGS $CPPFLAGS"
