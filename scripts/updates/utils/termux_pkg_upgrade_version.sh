@@ -66,7 +66,7 @@ termux_pkg_upgrade_version() {
 
 		for repo_path in $(jq --raw-output 'keys | .[]' ${TERMUX_SCRIPTDIR}/repo.json); do
 			_buildsh_path="${TERMUX_SCRIPTDIR}/${repo_path}/${TERMUX_PKG_NAME}/build.sh"
-			repo=$(jq --raw-output ".\"${repo_path}\".repo" ${TERMUX_SCRIPTDIR}/repo.json)
+			repo=$(jq --raw-output ".\"${repo_path}\".name" ${TERMUX_SCRIPTDIR}/repo.json)
 			repo=${repo#"termux-"}
 
 			if [ -f "${_buildsh_path}" ]; then
