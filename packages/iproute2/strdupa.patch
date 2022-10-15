@@ -1,3 +1,15 @@
+--- iproute2-6.0.0/bridge/vni.c.orig	2022-10-05 00:17:15.000000000 +0900
++++ iproute2-6.0.0/bridge/vni.c	2022-10-15 20:17:02.509331351 +0900
+@@ -41,6 +41,9 @@
+ 	exit(-1);
+ }
+ 
++#undef strdupa
++#define strdupa(s) strcpy(alloca(strlen(s) + 1), s)
++
+ static int parse_vni_filter(const char *argv, struct nlmsghdr *n, int reqsize,
+ 			    inet_prefix *group)
+ {
 --- iproute2-5.15.0/ip/iplink_bond.c.orig
 +++ iproute2-5.15.0/ip/iplink_bond.c
 @@ -171,6 +171,9 @@
