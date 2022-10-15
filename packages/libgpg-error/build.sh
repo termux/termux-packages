@@ -2,12 +2,15 @@ TERMUX_PKG_HOMEPAGE=https://www.gnupg.org/related_software/libgpg-error/
 TERMUX_PKG_DESCRIPTION="Small library that defines common error values for all GnuPG components"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.45
+TERMUX_PKG_VERSION=1.46
 TERMUX_PKG_SRCURL=https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=570f8ee4fb4bff7b7495cff920c275002aea2147e9a1d220c068213267f80a26
+TERMUX_PKG_SHA256=b7e11a64246bbe5ef37748de43b245abd72cfcd53c9ae5e7fc5ca59f1c81268d
 TERMUX_PKG_BREAKS="libgpg-error-dev"
 TERMUX_PKG_REPLACES="libgpg-error-dev"
 TERMUX_PKG_RM_AFTER_INSTALL="share/common-lisp"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--enable-install-gpg-error-config
+"
 
 termux_step_post_get_source() {
 	# Upstream only has Android definitions for platform-specific lock objects.
