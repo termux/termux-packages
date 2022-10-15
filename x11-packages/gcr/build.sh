@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://gitlab.gnome.org/GNOME/gcr
 TERMUX_PKG_DESCRIPTION="A library for displaying certificates and crypto UI, accessing key stores"
 TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
+# This specific package is for libgcr-3.
 _MAJOR_VERSION=3.41
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.1
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/gcr/${_MAJOR_VERSION}/gcr-${TERMUX_PKG_VERSION}.tar.xz
@@ -32,4 +33,14 @@ termux_step_pre_configure() {
 	done
 	popd
 	export PATH+=":$bin_dir"
+}
+
+termux_step_post_massage() {
+	local _GUARD_FILES="lib/libgcr-3.so lib/libgck-1.so"
+	local f
+	for f in ${_GUARD_FILES}; do
+		if [ ! -e "${f}" ]; then
+			termux_error_exit "Error: file ${f} not found."
+		fi
+	done
 }
