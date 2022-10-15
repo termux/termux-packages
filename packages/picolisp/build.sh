@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=21.12
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=http://archive.ubuntu.com/ubuntu/pool/universe/p/picolisp/picolisp_$TERMUX_PKG_VERSION.orig.tar.gz
 TERMUX_PKG_SHA256=a06838236b7f5b52c5d587d32d31627f73cdb9775cc02a80f2cdaedd12888c7d
 TERMUX_PKG_DEPENDS="libcrypt, libffi, openssl, readline"
@@ -13,22 +13,25 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
 
 termux_step_make() {
+	local LLVM_OPT=opt-14
+	local LLVM_LINK=llvm-link-14
+	local LLVM_LLC=llc-14
 	cd $TERMUX_PKG_SRCDIR/src
-	opt-12 -O3 --mtriple=$CCTERMUX_HOST_PLATFORM -o base.bc base.ll
+	$LLVM_OPT -O3 --mtriple=$CCTERMUX_HOST_PLATFORM -o base.bc base.ll
 	$CC -O3 -w -c -D_OS="\"Android\"" -D_CPU="\"$TERMUX_ARCH\"" `$PKGCONFIG --cflags libffi` -emit-llvm lib.c
-	llvm-link-12 -o picolisp.bc base.bc lib.bc
+	$LLVM_LINK -o picolisp.bc base.bc lib.bc
 	mkdir -p ../bin ../lib
-	llc-12 --mtriple=$CCTERMUX_HOST_PLATFORM picolisp.bc -relocation-model=pic -o picolisp.s
+	$LLVM_LLC --mtriple=$CCTERMUX_HOST_PLATFORM picolisp.bc -relocation-model=pic -o picolisp.s
 	$CC $CFLAGS $LDFLAGS picolisp.s -o ../bin/picolisp -rdynamic -lutil -lm -ldl -lreadline -lffi
 	$STRIP ../bin/picolisp
 
-	opt-12 -O3 --mtriple=$CCTERMUX_HOST_PLATFORM -o ext.bc ext.ll
-	llc-12 --mtriple=$CCTERMUX_HOST_PLATFORM ext.bc -relocation-model=pic -o ext.s
+	$LLVM_OPT -O3 --mtriple=$CCTERMUX_HOST_PLATFORM -o ext.bc ext.ll
+	$LLVM_LLC --mtriple=$CCTERMUX_HOST_PLATFORM ext.bc -relocation-model=pic -o ext.s
 	$CC $CFLAGS $LDFLAGS ext.s -o ../lib/ext.so -shared
 	$STRIP ../lib/ext.so
 
-	opt-12 -O3 --mtriple=$CCTERMUX_HOST_PLATFORM -o ht.bc ht.ll
-	llc-12 --mtriple=$CCTERMUX_HOST_PLATFORM ht.bc -relocation-model=pic -o ht.s
+	$LLVM_OPT -O3 --mtriple=$CCTERMUX_HOST_PLATFORM -o ht.bc ht.ll
+	$LLVM_LLC --mtriple=$CCTERMUX_HOST_PLATFORM ht.bc -relocation-model=pic -o ht.s
 	$CC $CFLAGS $LDFLAGS ht.s -o ../lib/ht.so -shared
 	$STRIP ../lib/ht.so
 

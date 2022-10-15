@@ -239,7 +239,8 @@ PACKAGES+=" qemu-user-static"
 
 # For opt, llvm-link, llc not shipped by NDK.
 # Required by picolisp (and maybe a few others in future)
-PACKAGES+=" llvm-12"
+# XXX: Keep up with the same version od LLVM as in the NDK
+PACKAGES+=" llvm-14"
 
 # Required by cava
 PACKAGES+=" xxd"
