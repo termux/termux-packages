@@ -10,3 +10,13 @@ TERMUX_PKG_DEPENDS="dbus-glib, glib"
 TERMUX_PKG_BREAKS="telepathy-glib-dev"
 TERMUX_PKG_REPLACES="telepathy-glib-dev"
 TERMUX_PKG_BUILD_IN_SRC=true
+
+termux_step_post_massage() {
+	local _GUARD_FILES="lib/libtelepathy-glib.so"
+	local f
+	for f in ${_GUARD_FILES}; do
+		 if [ ! -e "${f}" ]; then
+			  termux_error_exit "Error: file ${f} not found."
+		 fi
+	done
+}
