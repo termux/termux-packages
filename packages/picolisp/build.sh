@@ -14,22 +14,18 @@ TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
 
 termux_step_make() {
 	cd $TERMUX_PKG_SRCDIR/src
-	opt-12 -O3 --mtriple=$CCTERMUX_HOST_PLATFORM -o base.bc base.ll
+	$CC -O3 -c -emit-llvm base.ll
 	$CC -O3 -w -c -D_OS="\"Android\"" -D_CPU="\"$TERMUX_ARCH\"" `$PKGCONFIG --cflags libffi` -emit-llvm lib.c
-	llvm-link-12 -o picolisp.bc base.bc lib.bc
 	mkdir -p ../bin ../lib
-	llc-12 --mtriple=$CCTERMUX_HOST_PLATFORM picolisp.bc -relocation-model=pic -o picolisp.s
-	$CC $CFLAGS $LDFLAGS picolisp.s -o ../bin/picolisp -rdynamic -lutil -lm -ldl -lreadline -lffi
+	$CC $CFLAGS $LDFLAGS base.bc lib.bc -o ../bin/picolisp -rdynamic -lutil -lm -ldl -lreadline -lffi
 	$STRIP ../bin/picolisp
 
-	opt-12 -O3 --mtriple=$CCTERMUX_HOST_PLATFORM -o ext.bc ext.ll
-	llc-12 --mtriple=$CCTERMUX_HOST_PLATFORM ext.bc -relocation-model=pic -o ext.s
-	$CC $CFLAGS $LDFLAGS ext.s -o ../lib/ext.so -shared
+	$CC -O3 -c -emit-llvm ext.ll
+	$CC $CFLAGS $LDFLAGS ext.bc -o ../lib/ext.so -shared
 	$STRIP ../lib/ext.so
 
-	opt-12 -O3 --mtriple=$CCTERMUX_HOST_PLATFORM -o ht.bc ht.ll
-	llc-12 --mtriple=$CCTERMUX_HOST_PLATFORM ht.bc -relocation-model=pic -o ht.s
-	$CC $CFLAGS $LDFLAGS ht.s -o ../lib/ht.so -shared
+	$CC -O3 -c -emit-llvm ht.ll
+	$CC $CFLAGS $LDFLAGS ht.bc -o ../lib/ht.so -shared
 	$STRIP ../lib/ht.so
 
 	$CC -O3 -w $CFLAGS -I$TERMUX_PREFIX/include -L$TERMUX_PREFIX/lib $LDFLAGS -o ../bin/balance balance.c
