@@ -1,0 +1,26 @@
+https://github.com/WayneD/rsync/commit/464555ea923b32f3504678d05bc7de9205e5c8da
+
+From 464555ea923b32f3504678d05bc7de9205e5c8da Mon Sep 17 00:00:00 2001
+From: Wayne Davison <wayne@opencoder.net>
+Date: Tue, 13 Sep 2022 20:56:32 -0700
+Subject: [PATCH] Fix really silly bug with --relative rules.
+
+---
+ exclude.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/exclude.c b/exclude.c
+index 4bf85cb37..b21207bab 100644
+--- a/exclude.c
++++ b/exclude.c
+@@ -494,9 +494,9 @@ void add_implied_include(const char *arg, int skip_daemon_module)
+ 				maybe_add_literal_brackets_rule(rule, arg_len);
+ 			if (relative_paths && slash_cnt) {
+ 				filter_rule const *ent;
+-				int found = 0;
+ 				slash_cnt = 1;
+ 				for (p = new_pat + 1; (p = strchr(p, '/')) != NULL; p++) {
++					int found = 0;
+ 					*p = '\0';
+ 					for (ent = implied_filter_list.head; ent; ent = ent->next) {
+ 						if (ent != rule && strcmp(ent->pattern, new_pat) == 0) {
