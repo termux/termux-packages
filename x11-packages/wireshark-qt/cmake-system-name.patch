@@ -1,0 +1,33 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1336,7 +1336,7 @@
+ endif()
+ 
+ # Capabilities to run dumpcap as non-root user.
+-if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
++if(CMAKE_SYSTEM_NAME MATCHES "^(Linux|Android)$")
+ 	ws_find_package(CAP ENABLE_CAP HAVE_LIBCAP)
+ 	find_package(SETCAP)
+ endif()
+--- a/CMakeOptions.txt
++++ b/CMakeOptions.txt
+@@ -108,7 +108,7 @@
+ endif()
+ if(UNIX)
+ 	# Libnl is Linux-specific.
+-	if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
++	if(CMAKE_SYSTEM_NAME MATCHES "^(Linux|Android)$")
+ 		set(_enable_libnl ON)
+ 	endif()
+ 	option(ENABLE_NETLINK    "Build with libnl support" ${_enable_libnl})
+--- a/ConfigureChecks.cmake
++++ b/ConfigureChecks.cmake
+@@ -33,7 +33,7 @@
+ # workaround for a bonding driver bug and for libpcap's current lack
+ # of its own workaround for that bug.
+ #
+-if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
++if(CMAKE_SYSTEM_NAME MATCHES "^(Linux|Android)$")
+ 	#
+ 	# Those header files require <sys/socket.h>.
+ 	#
