@@ -1,6 +1,6 @@
 termux_setup_nodejs() {
 	# Use LTS version for now
-	local NODEJS_VERSION=16.14.0
+	local NODEJS_VERSION=16.17.1
 	local NODEJS_FOLDER
 
 	if [ "${TERMUX_PACKAGES_OFFLINE-false}" = "true" ]; then
@@ -15,7 +15,7 @@ termux_setup_nodejs() {
 			local NODEJS_TAR_FILE=$TERMUX_PKG_TMPDIR/nodejs-$NODEJS_VERSION.tar.xz
 			termux_download https://nodejs.org/dist/v${NODEJS_VERSION}/node-v${NODEJS_VERSION}-linux-x64.tar.xz \
 				"$NODEJS_TAR_FILE" \
-				0570b9354959f651b814e56a4ce98d4a067bf2385b9a0e6be075739bc65b0fae
+				06ba2eb34aa385967f5f58c87a44753f83212f6cccea892b33f80a2e7fda8384
 			tar -xf "$NODEJS_TAR_FILE" -C "$NODEJS_FOLDER" --strip-components=1
 		fi
 		export PATH=$NODEJS_FOLDER/bin:$PATH

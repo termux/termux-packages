@@ -1,6 +1,6 @@
---- ./src/node_os.cc.orig	2022-05-21 12:57:08.452384635 +0530
-+++ ./src/node_os.cc	2022-05-21 13:07:50.752384390 +0530
-@@ -32,6 +32,8 @@
+--- ./src/node_os.cc.orig	2022-10-05 20:33:26.560099607 +0530
++++ ./src/node_os.cc	2022-10-05 20:41:12.950099429 +0530
+@@ -31,6 +31,8 @@
  # include <climits>         // PATH_MAX on Solaris.
  #endif  // __POSIX__
  
@@ -9,7 +9,7 @@
  #include <array>
  #include <cerrno>
  #include <cstring>
-@@ -98,6 +100,16 @@
+@@ -97,6 +99,16 @@
                                         arraysize(osInformation)));
  }
  
@@ -26,15 +26,15 @@
  static void GetCPUInfo(const FunctionCallbackInfo<Value>& args) {
    Environment* env = Environment::GetCurrent(args);
    Isolate* isolate = env->isolate();
-@@ -388,6 +400,7 @@
-   env->SetMethod(target, "getUptime", GetUptime);
-   env->SetMethod(target, "getTotalMem", GetTotalMemory);
-   env->SetMethod(target, "getFreeMem", GetFreeMemory);
-+  env->SetMethod(target, "getNumCPUs", GetNumCPUs);
-   env->SetMethod(target, "getCPUs", GetCPUInfo);
-   env->SetMethod(target, "getInterfaceAddresses", GetInterfaceAddresses);
-   env->SetMethod(target, "getHomeDirectory", GetHomeDirectory);
-@@ -406,6 +419,7 @@
+@@ -391,6 +403,7 @@
+   SetMethod(context, target, "getUptime", GetUptime);
+   SetMethod(context, target, "getTotalMem", GetTotalMemory);
+   SetMethod(context, target, "getFreeMem", GetFreeMemory);
++  SetMethod(context, target, "getNumCPUs", GetNumCPUs);
+   SetMethod(context, target, "getCPUs", GetCPUInfo);
+   SetMethod(context, target, "getInterfaceAddresses", GetInterfaceAddresses);
+   SetMethod(context, target, "getHomeDirectory", GetHomeDirectory);
+@@ -411,6 +424,7 @@
    registry->Register(GetUptime);
    registry->Register(GetTotalMemory);
    registry->Register(GetFreeMemory);

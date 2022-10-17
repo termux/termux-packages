@@ -108,6 +108,10 @@ PACKAGES+=" lua5.3"
 # Used bt host build of package mariadb.
 PACKAGES+=" libncurses5-dev"
 
+# Needed to build neovim >= 8.0.0
+PACKAGES+=" lua-lpeg"
+PACKAGES+=" lua-mpack"
+
 # Needed by packages mkvtoolnix and ruby.
 PACKAGES+=" ruby"
 
@@ -223,7 +227,7 @@ PACKAGES+=" python3-jsonschema"
 
 # Needed by package lilypond.
 PACKAGES+=" fontforge-nox"
-PACKAGES+=" guile-2.2"
+PACKAGES+=" guile-3.0"
 PACKAGES+=" python3-fontforge"
 PACKAGES+=" texlive-metapost"
 
