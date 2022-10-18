@@ -1,0 +1,13 @@
+--- a/vendor/CMakeLists.txt
++++ b/vendor/CMakeLists.txt
+@@ -57,8 +57,8 @@
+ add_subdirectory(fmtlib EXCLUDE_FROM_ALL)
+ 
+ find_package(Protobuf REQUIRED)
+-set(THREADS_PREFER_PTHREAD_FLAG ON)
+-find_package(Threads REQUIRED)
++set(CMAKE_THREAD_PREFER_PTHREAD OFF)
++set(THREADS_PREFER_PTHREAD_FLAG OFF)
+ 
+ include_directories(${PROTOBUF_INCLUDE_DIRS})
+ include_directories(${CMAKE_CURRENT_BINARY_DIR})
