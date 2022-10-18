@@ -1,0 +1,38 @@
+diff -uNr a/dcmqrdb/apps/dcmqrscp.cc b/dcmqrdb/apps/dcmqrscp.cc
+--- a/dcmqrdb/apps/dcmqrscp.cc
++++ b/dcmqrdb/apps/dcmqrscp.cc
+@@ -854,6 +854,7 @@
+       return 10;
+     }
+ 
++#ifndef __ANDROID__
+ #if defined(HAVE_SETUID) && defined(HAVE_GRP_H) && defined(HAVE_PWD_H)
+     OFStandard::OFGroup grp;
+     OFStandard::OFPasswd pwd;
+@@ -887,6 +888,7 @@
+       }
+     }
+ #endif // defined(HAVE_SETUID) && defined(HAVE_GRP_H) && defined(HAVE_PWD_H)
++#endif
+ 
+ #ifdef WITH_SQL_DATABASE
+     // use SQL database
+diff -uNr a/ofstd/libsrc/ofstd.cc b/ofstd/libsrc/ofstd.cc
+--- a/ofstd/libsrc/ofstd.cc
++++ b/ofstd/libsrc/ofstd.cc
+@@ -3108,6 +3108,7 @@
+ 
+ OFCondition OFStandard::dropPrivileges()
+ {
++#ifndef __ANDROID__
+ #if defined(HAVE_SETUID) && defined(HAVE_GETUID)
+   if ((setuid(getuid()) != 0) && (errno != EPERM))
+   {
+@@ -3122,6 +3123,7 @@
+     return EC_setuidFailed;
+   }
+ #endif
++#endif
+   return EC_Normal;
+ }
+ 
