@@ -13,6 +13,18 @@ termux_step_create_pacman_install_hook() {
 		echo "}" >> .INSTALL
 		rm -f postinst
 	fi
+	if [ -f "./preupg" ]; then
+		echo "pre_upgrade() {" >> .INSTALL
+		cat preupg | grep -v '^#' >> .INSTALL
+		echo "}" >> .INSTALL
+		rm -f preupg
+	fi
+	if [ -f "./postupg" ]; then
+		echo "post_upgrade() {" >> .INSTALL
+		cat postupg | grep -v '^#' >> .INSTALL
+		echo "}" >> .INSTALL
+		rm -f postupg
+	fi
 	if [ -f "./prerm" ]; then
 		echo "pre_remove() {" >> .INSTALL
 		cat prerm | grep -v '^#' >> .INSTALL
