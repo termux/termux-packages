@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="GPG public keys for the official Termux repositories"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.9
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_ESSENTIAL=true
@@ -31,5 +32,15 @@ termux_step_make_install() {
 	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ]; then
 		install -Dm600 $TERMUX_PKG_BUILDER_DIR/termux-pacman.gpg $GPG_DIR
 		echo "998DE27318E867EA976BA877389CEED64573DFCA:4:" > $GPG_DIR/termux-pacman-trusted
+	fi
+}
+
+termux_step_create_debscripts() {
+	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ]; then
+		echo "if [ ! -d $TERMUX_PREFIX/etc/pacman.d/ ]; then" > postupg
+		echo "  pacman-key --init" >> postupg
+		echo "fi" >> postupg
+		echo "pacman-key --populate" >> postupg
+		echo "post_upgrade" > postinst
 	fi
 }
