@@ -1,6 +1,6 @@
 diff -uNr firefox-105.0.3/ipc/chromium/src/base/shared_memory_posix.cc firefox-105.0.3.mod/ipc/chromium/src/base/shared_memory_posix.cc
 --- firefox-105.0.3/ipc/chromium/src/base/shared_memory_posix.cc	2022-10-08 00:25:40.000000000 +0900
-+++ firefox-105.0.3.mod/ipc/chromium/src/base/shared_memory_posix.cc	2022-10-16 01:32:09.441085153 +0900
++++ firefox-105.0.3.mod/ipc/chromium/src/base/shared_memory_posix.cc	2022-10-17 19:18:56.056807327 +0900
 @@ -40,6 +40,65 @@
  #include "mozilla/UniquePtrExtensions.h"
  #include "prenv.h"
@@ -67,14 +67,12 @@ diff -uNr firefox-105.0.3/ipc/chromium/src/base/shared_memory_posix.cc firefox-1
  namespace base {
  
  void SharedMemory::MappingDeleter::operator()(void* ptr) {
-@@ -195,6 +254,10 @@
- #    elif defined(__FreeBSD__)
- #      define USE_MEMFD_CREATE 1
+@@ -153,7 +212,7 @@
+ // FreeBSD in version 13.
  
-+#if defined(USE_MEMFD_CREATE) && defined(__TERMUX__)
-+#undef USE_MEMFD_CREATE
-+#endif
-+
- // FreeBSD's Capsicum framework allows irrevocably restricting the
- // operations permitted on a file descriptor.
+ #  if !defined(HAVE_MEMFD_CREATE) && defined(OS_LINUX) && \
+-      defined(SYS_memfd_create)
++      defined(SYS_memfd_create) && !defined(__TERMUX__)
  
+ // Older libc versions (e.g., glibc before 2.27) don't have the
+ // wrapper, but we can supply our own; see `linux_memfd_defs.h`.

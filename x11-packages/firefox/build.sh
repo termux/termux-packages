@@ -8,6 +8,8 @@ TERMUX_PKG_SHA256=f2fa1e03aecdd4dca0bcda94fd228d3a9ef3635862a2c140f8982d32ae7761
 TERMUX_PKG_DEPENDS="at-spi2-atk, fontconfig, freetype, gdk-pixbuf, glib, gtk3, harfbuzz, libandroid-shmem, libandroid-sysv-semaphore, libcairo, libffi, libice, libsm, libx11, libxcb, libxcomposite, libxcursor, libxdamage, libxext, libxfixes, libxi, libxrandr, libxrender, libxtst, pango"
 
 termux_step_pre_configure() {
+	local _CFLAGS="$CFLAGS"
+
 	termux_setup_rust
 	termux_setup_nodejs
 	cargo install cbindgen
@@ -17,8 +19,8 @@ termux_step_pre_configure() {
 	export HOST_CC=$(command -v clang)
 	export HOST_CXX=$(command -v clang++)
 
-	CFLAGS+=" -U__ANDROID__ -UANDROID -I$NDK/sources/android/cpufeatures"
-	CXXFLAGS+=" -U__ANDROID__ -UANDROID"
+	export CFLAGS="$_CFLAGS -DNO_NSPR_10_SUPPORT -DHAVE_STDINT_H -DMOZ_X11"
+	CXXFLAGS+=" -U__ANDROID__ -DMOZ_X11"
 	LDFLAGS+=" -landroid-shmem -landroid-sysv-semaphore -llog"
 
 	_NEED_DUMMY_LIBPTHREAD_A=
@@ -46,6 +48,8 @@ termux_step_configure() {
 		--disable-audio-backends \
 		--enable-minify=properties \
 		--enable-mobile-optimize \
+		--enable-jemalloc \
+		--enable-system-pixman \
 		--without-wasm-sandboxed-libraries \
 		--with-branding=browser/branding/aurora \
 		--disable-sandbox \

@@ -1,14 +1,3 @@
-diff -uNr firefox-105.0.3/browser/installer/package-manifest.in firefox-105.0.3.mod/browser/installer/package-manifest.in
---- firefox-105.0.3/browser/installer/package-manifest.in	2022-10-08 00:25:40.000000000 +0900
-+++ firefox-105.0.3.mod/browser/installer/package-manifest.in	2022-10-15 22:40:20.473582334 +0900
-@@ -177,7 +177,6 @@
- @RESPATH@/components/nsUpdateService.manifest
- #endif
- @RESPATH@/components/ProcessSingleton.manifest
--@RESPATH@/components/SyncComponents.manifest
- @RESPATH@/components/servicesComponents.manifest
- @RESPATH@/components/servicesSettings.manifest
- @RESPATH@/components/cryptoComponents.manifest
 diff -uNr firefox-105.0.3/browser/moz.configure firefox-105.0.3.mod/browser/moz.configure
 --- firefox-105.0.3/browser/moz.configure	2022-10-07 22:37:47.000000000 +0900
 +++ firefox-105.0.3.mod/browser/moz.configure	2022-10-15 22:21:38.317020036 +0900
@@ -17,9 +6,8 @@ diff -uNr firefox-105.0.3/browser/moz.configure firefox-105.0.3.mod/browser/moz.
  
  imply_option("MOZ_PLACES", True)
 -imply_option("MOZ_SERVICES_HEALTHREPORT", True)
--imply_option("MOZ_SERVICES_SYNC", True)
 +imply_option("MOZ_SERVICES_HEALTHREPORT", False)
-+imply_option("MOZ_SERVICES_SYNC", False)
+ imply_option("MOZ_SERVICES_SYNC", True)
  imply_option("MOZ_DEDICATED_PROFILES", True)
  imply_option("MOZ_BLOCK_PROFILE_DOWNGRADE", True)
 -imply_option("MOZ_NORMANDY", True)
@@ -257,7 +245,7 @@ diff -uNr firefox-105.0.3/toolkit/components/moz.build firefox-105.0.3.mod/toolk
  if CONFIG["BUILD_CTYPES"]:
 diff -uNr firefox-105.0.3/toolkit/moz.configure firefox-105.0.3.mod/toolkit/moz.configure
 --- firefox-105.0.3/toolkit/moz.configure	2022-10-08 00:40:08.000000000 +0900
-+++ firefox-105.0.3.mod/toolkit/moz.configure	2022-10-15 20:24:12.767380220 +0900
++++ firefox-105.0.3.mod/toolkit/moz.configure	2022-10-18 01:42:19.379553089 +0900
 @@ -172,7 +172,7 @@
  # ==============================================================
  @depends(target)
@@ -285,7 +273,19 @@ diff -uNr firefox-105.0.3/toolkit/moz.configure firefox-105.0.3.mod/toolkit/moz.
          die("Cannot enable OpenSL on %s", target.os)
      return any("opensl" in value for value in values) or None
  
-@@ -2776,8 +2776,6 @@
+ set_config("MOZ_PDF_PRINTING", pdf_printing)
+@@ -1167,9 +1166,7 @@
+ 
+ @depends(target, tree_freetype, freetype2_info)
+ def enable_cairo_ft(target, tree_freetype, freetype2_info):
+-    # Avoid defining MOZ_ENABLE_CAIRO_FT on Windows platforms because
+-    # "cairo-ft-font.c" includes <dlfcn.h>, which only exists on posix platforms
+-    return freetype2_info or (tree_freetype and target.os != "WINNT")
++    return
+ 
+ 
+ set_config("MOZ_ENABLE_CAIRO_FT", True, when=enable_cairo_ft)
+@@ -2776,8 +2773,6 @@
  # ==============================================================
  @depends(target)
  def oxidized_breakpad(target):
@@ -294,7 +294,7 @@ diff -uNr firefox-105.0.3/toolkit/moz.configure firefox-105.0.3.mod/toolkit/moz.
      return False
  
  
-@@ -2968,8 +2966,8 @@
+@@ -2968,8 +2963,8 @@
  
  # Enable runtime logging
  # ==============================================================
@@ -305,7 +305,16 @@ diff -uNr firefox-105.0.3/toolkit/moz.configure firefox-105.0.3.mod/toolkit/moz.
  
  # This will enable logging of addref, release, ctor, dtor.
  # ==============================================================
-@@ -3189,7 +3187,7 @@
+@@ -3157,7 +3152,7 @@
+     option(
+         env="MOZ_LINKER",
+         default=depends(target.os, when="--enable-jemalloc")(
+-            lambda os: os == "Android"
++            lambda os: True
+         ),
+         help="{Enable|Disable} custom dynamic linker",
+     )
+@@ -3189,7 +3184,7 @@
          "Can't find header linux/joystick.h, needed for gamepad support."
          " Please install Linux kernel headers."
      ),
@@ -314,3 +323,136 @@ diff -uNr firefox-105.0.3/toolkit/moz.configure firefox-105.0.3.mod/toolkit/moz.
  )
  
  # Smart card support
+diff -uNr firefox-105.0.3/toolkit/xre/glxtest.cpp firefox-105.0.3.mod/toolkit/xre/glxtest.cpp
+--- firefox-105.0.3/toolkit/xre/glxtest.cpp	2022-10-08 00:25:42.000000000 +0900
++++ firefox-105.0.3.mod/toolkit/xre/glxtest.cpp	2022-10-17 19:31:36.885513927 +0900
+@@ -1197,7 +1197,11 @@
+   glxtest_bufsize = bufsize;
+ 
+   // Get a list of all GPUs from the PCI bus.
++#if !defined(__TERMUX__)
+   int pci_count = get_pci_status();
++#else
++  int pci_count = 0;
++#endif
+ 
+ #ifdef MOZ_WAYLAND
+   if (IsWaylandEnabled()) {
+
+diff -uNr firefox-105.0.3/js/src/ctypes/libffi/src/closures.c firefox-105.0.3.mod/js/src/ctypes/libffi/src/closures.c
+--- firefox-105.0.3/js/src/ctypes/libffi/src/closures.c	2022-10-07 22:37:49.000000000 +0900
++++ firefox-105.0.3.mod/js/src/ctypes/libffi/src/closures.c	2022-10-17 19:42:34.472896402 +0900
+@@ -112,7 +112,7 @@
+ #else /* !NetBSD with PROT_MPROTECT */
+ 
+ #if !FFI_MMAP_EXEC_WRIT && !FFI_EXEC_TRAMPOLINE_TABLE
+-# if __linux__ && !defined(__ANDROID__)
++# if __linux__ && !defined(__TERMUX__)
+ /* This macro indicates it may be forbidden to map anonymous memory
+    with both write and execute permission.  Code compiled when this
+    option is defined will attempt to map such pages once, but if it
+diff -uNr firefox-105.0.3/modules/zlib/src/gzguts.h firefox-105.0.3.mod/modules/zlib/src/gzguts.h
+--- firefox-105.0.3/modules/zlib/src/gzguts.h	2022-10-07 22:37:53.000000000 +0900
++++ firefox-105.0.3.mod/modules/zlib/src/gzguts.h	2022-10-17 23:15:15.124694789 +0900
+@@ -3,6 +3,8 @@
+  * For conditions of distribution and use, see copyright notice in zlib.h
+  */
+ 
++#include <unistd.h>
++
+ #ifdef _LARGEFILE64_SOURCE
+ #  ifndef _LARGEFILE_SOURCE
+ #    define _LARGEFILE_SOURCE 1
+diff -uNr firefox-105.0.3/nsprpub/pr/src/pthreads/ptthread.c firefox-105.0.3.mod/nsprpub/pr/src/pthreads/ptthread.c
+--- firefox-105.0.3/nsprpub/pr/src/pthreads/ptthread.c	2022-10-07 22:37:53.000000000 +0900
++++ firefox-105.0.3.mod/nsprpub/pr/src/pthreads/ptthread.c	2022-10-17 23:22:02.822992745 +0900
+@@ -37,6 +37,10 @@
+ #endif
+ #endif
+ 
++#if defined(_POSIX_THREAD_PRIORITY_SCHEDULING) && defined(__TERMUX__)
++#undef _POSIX_THREAD_PRIORITY_SCHEDULING
++#endif
++
+ /*
+  * Record whether or not we have the privilege to set the scheduling
+  * policy and priority of threads.  0 means that privilege is available.
+diff -uNr firefox-105.0.3/gfx/cairo/cairo/src/moz.build firefox-105.0.3.mod/gfx/cairo/cairo/src/moz.build
+--- firefox-105.0.3/gfx/cairo/cairo/src/moz.build	2022-10-07 22:37:48.000000000 +0900
++++ firefox-105.0.3.mod/gfx/cairo/cairo/src/moz.build	2022-10-18 01:50:34.180360552 +0900
+@@ -15,7 +15,7 @@
+     'pixman-rename.h',
+ ]
+ 
+-if CONFIG['MOZ_WIDGET_TOOLKIT'] not in ('cocoa', 'uikit'):
++if False:
+     EXPORTS.cairo += [
+         'cairo-pdf.h',
+     ]
+diff -uNr firefox-105.0.3/gfx/cairo/cairo/src/cairo-features.h firefox-105.0.3.mod/gfx/cairo/cairo/src/cairo-features.h
+--- firefox-105.0.3/gfx/cairo/cairo/src/cairo-features.h	2022-10-07 22:37:48.000000000 +0900
++++ firefox-105.0.3.mod/gfx/cairo/cairo/src/cairo-features.h	2022-10-18 03:44:09.352362967 +0900
+@@ -52,7 +52,6 @@
+ #endif
+ 
+ #ifdef MOZ_PDF_PRINTING
+-#define CAIRO_HAS_PDF_SURFACE 1
+ #endif
+ 
+ #if defined(MOZ_X11) || defined(MOZ_WAYLAND)
+diff -uNr firefox-105.0.3/gfx/thebes/moz.build firefox-105.0.3.mod/gfx/thebes/moz.build
+--- firefox-105.0.3/gfx/thebes/moz.build	2022-10-08 00:40:07.000000000 +0900
++++ firefox-105.0.3.mod/gfx/thebes/moz.build	2022-10-18 03:50:47.722636946 +0900
+@@ -126,7 +126,6 @@
+         "gfxFT2FontBase.cpp",
+         "gfxFT2Utils.cpp",
+         "gfxPlatformGtk.cpp",
+-        "PrintTargetPDF.cpp",
+     ]
+ 
+     if CONFIG["MOZ_X11"]:
+diff -uNr firefox-105.0.3/gfx/cairo/cairo/src/cairoint.h firefox-105.0.3.mod/gfx/cairo/cairo/src/cairoint.h
+--- firefox-105.0.3/gfx/cairo/cairo/src/cairoint.h	2022-10-07 22:37:49.000000000 +0900
++++ firefox-105.0.3.mod/gfx/cairo/cairo/src/cairoint.h	2022-10-18 04:14:40.627988166 +0900
+@@ -84,7 +84,6 @@
+     CAIRO_HAS_PDF_SURFACE || \
+     CAIRO_HAS_SVG_SURFACE || \
+     CAIRO_HAS_WIN32_SURFACE
+-#define CAIRO_HAS_FONT_SUBSET 1
+ #endif
+ 
+ #if CAIRO_HAS_PS_SURFACE  || \
+diff -uNr firefox-105.0.3/dom/media/systemservices/moz.build firefox-105.0.3.mod/dom/media/systemservices/moz.build
+--- firefox-105.0.3/dom/media/systemservices/moz.build	2022-10-07 23:40:08.000000000 +0900
++++ firefox-105.0.3.mod/dom/media/systemservices/moz.build	2022-10-18 04:48:14.802451213 +0900
+@@ -57,7 +57,7 @@
+     DEFINES["WEBRTC_ANDROID"] = True
+ 
+ 
+-if CONFIG["OS_TARGET"] == "Android":
++if True:
+     EXPORTS += ["OpenSLESProvider.h"]
+     UNIFIED_SOURCES += [
+         "OpenSLESProvider.cpp",
+diff -uNr firefox-105.0.3/old-configure.in firefox-105.0.3.mod/old-configure.in
+--- firefox-105.0.3/old-configure.in	2022-10-07 22:37:53.000000000 +0900
++++ firefox-105.0.3.mod/old-configure.in	2022-10-18 11:44:37.005989967 +0900
+@@ -242,9 +242,6 @@
+     AC_MSG_CHECKING([for --noexecstack option to as])
+     _SAVE_CFLAGS=$CFLAGS
+     CFLAGS="$CFLAGS -Wa,--noexecstack"
+-    AC_TRY_COMPILE(,,AC_MSG_RESULT([yes])
+-                     [ASFLAGS="$ASFLAGS -Wa,--noexecstack"],
+-                     AC_MSG_RESULT([no]))
+     CFLAGS=$_SAVE_CFLAGS
+     AC_MSG_CHECKING([for -z noexecstack option to ld])
+     _SAVE_LDFLAGS=$LDFLAGS
+@@ -1299,7 +1299,7 @@
+ dnl If we have any service that uploads data (and requires data submission
+ dnl policy alert), set MOZ_DATA_REPORTING.
+ dnl We need SUBST for build system and DEFINE for xul preprocessor.
+-if test -n "$MOZ_TELEMETRY_REPORTING" || test -n "$MOZ_SERVICES_HEALTHREPORT" || test -n "$MOZ_CRASHREPORTER"  || test -n "$MOZ_NORMANDY"; then
++if false; then
+   MOZ_DATA_REPORTING=1
+   AC_DEFINE(MOZ_DATA_REPORTING)
+   AC_SUBST(MOZ_DATA_REPORTING)
