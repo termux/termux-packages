@@ -1,0 +1,106 @@
+#!/bin/bash
+
+KLIBPATH=lib
+if [ "@ARCH_BITS@" == "64" ]; then
+    KLIBPATH+=64
+fi
+
+system_libs=(libEGL.so libGLESv1_CM.so libGLESv2.so libGLESv3.so libOpenMAXAL.so libOpenSLES.so libandroid.so libc.so libcamera2ndk.so libdl.so libjnigraphics.so liblog.so libm.so libmediandk.so libstdc++.so libvulkan.so libz.so)
+
+do_search() {
+    local f="$1"
+    local s
+    for s in "${so_read[@]}"; do
+        if [ "$s" == "$f" ]; then
+            return
+        fi
+    done
+    so_read+=("$f")
+    local origin=$(dirname "$f")
+    local is_system_lib=
+    local runpath_sav
+    if [ "$origin" == "/system/$KLIBPATH" ]; then
+        is_system_lib=true
+        runpath_sav=("${runpath[@]}")
+        runpath=()
+        if test "$LD_LIBRARY_PATH"; then
+            IFS=: runpath+=($LD_LIBRARY_PATH)
+        fi
+    else
+        IFS=: runpath+=($(readelf -d "$f" | sed -n 's/^.*(RUNPATH).*\[\(.*\)\]$/\1/p'))
+    fi
+    runpath+=("/system/$KLIBPATH")
+    local needed
+    IFS=$'\n' needed=($(readelf -d "$f" | sed -n 's/^.*(NEEDED).*\[\(.*\)\]$/\1/p'))
+    local libs=()
+    local l
+    for l in "${needed[@]}"; do
+        l="${l##*/}"
+        local target=
+        local d
+        for d in "${runpath[@]}"; do
+            if ! test "$d"; then
+                d=.
+            else
+                d="${d//\$ORIGIN/"$origin"}"
+                d="${d//\$LIB/"$KLIBPATH"}"
+            fi
+            if test -f "$d/$l" && \
+                    [ "$(head -c 4 "$d/$l")" == "$(echo -ne '\0177ELF')" ]; then
+                target="$(readlink -f "$d")/$l"
+                libs+=("$target")
+                break
+            fi
+        done
+        if ! test "$target"; then
+            for s in "${system_libs[@]}"; do
+                if [ "$s" == "$l" ]; then
+                    target="/system/$KLIBPATH/$l"
+                    so_read+=("$target")
+                fi
+            done
+        fi
+        if test "$target"; then
+            while :; do
+                for s in "${so_found[@]}"; do
+                    if [ "$s" == "$target" ]; then
+                        break 2
+                    fi
+                done
+                so_found+=("$target")
+                echo -ne "\t$l => "
+                echo $target
+                break
+            done
+        else
+            echo -ne "\t$l => "
+            echo not found
+        fi
+    done
+    for l in "${libs[@]}"; do
+        do_search "$l"
+    done
+    if test "$is_system_lib"; then
+        runpath=("${runpath_sav[@]}")
+    fi
+}
+
+num_args="$#"
+if [ "$num_args" -lt 1 ]; then
+    echo "Usage: ldd file..." >&2
+    exit 1
+fi
+
+for f in "$@"; do
+    if [ "$num_args" -gt 1 ]; then
+        echo "$f":
+    fi
+    runpath=()
+    if test "$LD_LIBRARY_PATH"; then
+        IFS=: runpath+=($LD_LIBRARY_PATH)
+    fi
+    so_read=()
+    so_found=()
+    ff="$(readlink -f "$f")"
+    do_search "$ff"
+done
