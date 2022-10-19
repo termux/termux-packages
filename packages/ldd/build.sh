@@ -3,9 +3,10 @@ TERMUX_PKG_DESCRIPTION="Fake ldd command"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
-TERMUX_PKG_DEPENDS="bash, binutils-is-llvm"
-TERMUX_PKG_CONFLICTS="binutils"
+TERMUX_PKG_DEPENDS="bash, binutils-is-llvm | binutils"
+TERMUX_PKG_CONFLICTS="binutils (<< 2.39-1)"
 
 termux_step_make_install() {
 	local ldd="$TERMUX_PREFIX/bin/ldd"
