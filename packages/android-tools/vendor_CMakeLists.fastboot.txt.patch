@@ -1,6 +1,31 @@
 --- a/vendor/CMakeLists.fastboot.txt
 +++ b/vendor/CMakeLists.fastboot.txt
-@@ -136,4 +136,4 @@
+@@ -72,7 +72,8 @@
+ 	selinux/libselinux/src/setenforce.c
+ 	selinux/libselinux/src/setrans_client.c
+ 	selinux/libselinux/src/seusers.c
+-	selinux/libselinux/src/sha1.c)
++	selinux/libselinux/src/sha1.c
++	selinux/libselinux/src/android/android_platform.c)
+ 
+ target_compile_definitions(libselinux PRIVATE
+ 	-DAUDITD_LOG_TAG=1003 -D_GNU_SOURCE -DHOST -DUSE_PCRE2
+@@ -80,7 +81,13 @@
+ 	-DDISABLE_BOOL -DNO_MEDIA_BACKEND -DNO_X_BACKEND -DNO_DB_BACKEND
+ 	-DPCRE2_CODE_UNIT_WIDTH=8)
+ target_include_directories(libselinux PUBLIC
+-	selinux/libselinux/include selinux/libsepol/include)
++	selinux/libselinux/include
++	selinux/libsepol/include
++	selinux/libselinux/src
++	libselinux/src/android
++	core/libpackagelistparser/include/packagelistparser
++	core/include
++	logging/liblog/include)
+ 
+ add_library(libsepol
+ 	selinux/libsepol/src/assertion.c
+@@ -136,4 +137,4 @@
  target_link_libraries(fastboot
  	libsparse libzip libcutils liblog libfsmgr libutil
  	libbase libext4 libselinux libsepol libdiagnoseusb crypto

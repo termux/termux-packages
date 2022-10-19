@@ -1,0 +1,13 @@
+--- a/vendor/selinux/libselinux/src/selinux_internal.h
++++ b/vendor/selinux/libselinux/src/selinux_internal.h
+@@ -1,6 +1,10 @@
+ #include <selinux/selinux.h>
+ #include <pthread.h>
+ 
++#if defined(__ANDROID__) || defined(__APPLE__)
++// Android and Mac do not have fgets_unlocked()
++#define fgets_unlocked(buf, size, fp) fgets(buf, size, fp)
++#endif
+ 
+ extern int require_seusers ;
+ extern int selinux_page_size ;
