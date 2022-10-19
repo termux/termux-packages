@@ -1,0 +1,18 @@
+--- a/bin/gjots2
++++ b/bin/gjots2
+@@ -70,15 +70,8 @@
+     #   https://bugzilla.gnome.org/show_bug.cgi?id=574520
+     locale_domain = "gjots2"
+ 
+-    gettext.bindtextdomain(locale_domain, locale_dir)
+-    locale.setlocale(locale.LC_ALL, '')
+     gettext.textdomain(locale_domain)
+     gettext.install(locale_domain, localedir=locale_dir)
+-    try:
+-        locale.bindtextdomain(locale_domain, locale_dir)
+-        locale.bind_textdomain_codeset(locale_domain, 'UTF-8')
+-    except locale.Error:
+-        print("Couldn't bind the translation domain. Some translations won't work.")
+     _ = gettext.gettext
+ 
+     #
