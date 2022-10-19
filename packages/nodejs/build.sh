@@ -70,10 +70,14 @@ termux_step_configure() {
 		--prefix=$TERMUX_PREFIX \
 		--dest-cpu=$DEST_CPU \
 		--dest-os=android \
-		--shared-cares \
+    --tag=AVA2 \
+    --enable-static \
+    --partly-static \
 		--shared-openssl \
-		--shared-zlib \
-		--with-intl=system-icu \
+    --without-intl \
+    --without-npm \
+    --without-etw \
+    --without-corepack \
 		--cross-compiling
 
 	export LD_LIBRARY_PATH=$TERMUX_PKG_HOSTBUILD_DIR/icu-installed/lib

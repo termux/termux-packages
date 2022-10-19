@@ -27,3 +27,28 @@ Developer mailing list: https://groups.io/g/termux-dev
 General chat: https://gitter.im/termux/termux or #termux on IRC/libera.chat.
 
 Developer chat: https://gitter.im/termux/dev.
+
+## Misc
+
+### ldd for OSX
+
+```
+aarch64-elf-readelf -a libnodeexe.so | grep "Shared library:"
+```
+
+### nodejs patch
+```
+	./configure \
+		--prefix=$TERMUX_PREFIX \
+		--dest-cpu=$DEST_CPU \
+		--dest-os=android \
+    --tag=AVA1 \
+    --enable-static \
+    --partly-static \
+		--shared-openssl \
+    --without-intl \
+    --without-npm \
+    --without-etw \
+    --without-corepack \
+		--cross-compiling
+```
