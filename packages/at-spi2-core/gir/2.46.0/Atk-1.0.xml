@@ -1,0 +1,502 @@
+<?xml version="1.0"?>
+<dump>
+  <class name="AtkObject" get-type="atk_object_get_type" parents="GObject">
+    <property name="accessible-name" type="gchararray" flags="3"/>
+    <property name="accessible-description" type="gchararray" flags="3"/>
+    <property name="accessible-parent" type="AtkObject" flags="3"/>
+    <property name="accessible-value" type="gdouble" flags="3"/>
+    <property name="accessible-role" type="AtkRole" flags="3"/>
+    <property name="accessible-component-layer" type="gint" flags="1"/>
+    <property name="accessible-component-mdi-zorder" type="gint" flags="1"/>
+    <property name="accessible-table-caption" type="gchararray" flags="3"/>
+    <property name="accessible-table-column-description" type="gchararray" flags="3"/>
+    <property name="accessible-table-column-header" type="AtkObject" flags="3"/>
+    <property name="accessible-table-row-description" type="gchararray" flags="3"/>
+    <property name="accessible-table-row-header" type="AtkObject" flags="3"/>
+    <property name="accessible-table-summary" type="AtkObject" flags="3"/>
+    <property name="accessible-table-caption-object" type="AtkObject" flags="3"/>
+    <property name="accessible-hypertext-nlinks" type="gint" flags="1"/>
+    <signal name="children-changed" return="void" when="last" detailed="1">
+      <param type="guint"/>
+      <param type="gpointer"/>
+    </signal>
+    <signal name="focus-event" return="void" when="last">
+      <param type="gboolean"/>
+    </signal>
+    <signal name="property-change" return="void" when="last" detailed="1">
+      <param type="gpointer"/>
+    </signal>
+    <signal name="state-change" return="void" when="last" detailed="1">
+      <param type="gchararray"/>
+      <param type="gboolean"/>
+    </signal>
+    <signal name="visible-data-changed" return="void" when="last">
+    </signal>
+    <signal name="active-descendant-changed" return="void" when="last" detailed="1">
+      <param type="gpointer"/>
+    </signal>
+    <signal name="announcement" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+  </class>
+  <interface name="AtkImplementorIface" get-type="atk_implementor_get_type">
+  </interface>
+  <interface name="AtkAction" get-type="atk_action_get_type">
+  </interface>
+  <class name="AtkUtil" get-type="atk_util_get_type" parents="GObject">
+  </class>
+  <boxed name="AtkRectangle" get-type="atk_rectangle_get_type"/>
+  <interface name="AtkComponent" get-type="atk_component_get_type">
+    <signal name="bounds-changed" return="void" when="last">
+      <param type="AtkRectangle"/>
+    </signal>
+  </interface>
+  <interface name="AtkDocument" get-type="atk_document_get_type">
+    <signal name="load-complete" return="void" when="last">
+    </signal>
+    <signal name="reload" return="void" when="last">
+    </signal>
+    <signal name="load-stopped" return="void" when="last">
+    </signal>
+    <signal name="page-changed" return="void" when="last">
+      <param type="gint"/>
+    </signal>
+  </interface>
+  <boxed name="AtkTextRange" get-type="atk_text_range_get_type"/>
+  <interface name="AtkText" get-type="atk_text_get_type">
+    <signal name="text-changed" return="void" when="last" detailed="1">
+      <param type="gint"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="text-insert" return="void" when="last" detailed="1">
+      <param type="gint"/>
+      <param type="gint"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="text-remove" return="void" when="last" detailed="1">
+      <param type="gint"/>
+      <param type="gint"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="text-caret-moved" return="void" when="last">
+      <param type="gint"/>
+    </signal>
+    <signal name="text-selection-changed" return="void" when="last">
+    </signal>
+    <signal name="text-attributes-changed" return="void" when="last">
+    </signal>
+  </interface>
+  <interface name="AtkEditableText" get-type="atk_editable_text_get_type">
+  </interface>
+  <class name="AtkGObjectAccessible" get-type="atk_gobject_accessible_get_type" parents="AtkObject,GObject">
+  </class>
+  <class name="AtkHyperlink" get-type="atk_hyperlink_get_type" parents="GObject">
+    <implements name="AtkAction"/>
+    <property name="selected-link" type="gboolean" flags="1"/>
+    <property name="number-of-anchors" type="gint" flags="1"/>
+    <property name="end-index" type="gint" flags="1"/>
+    <property name="start-index" type="gint" flags="1"/>
+    <signal name="link-activated" return="void" when="last">
+    </signal>
+  </class>
+  <interface name="AtkHyperlinkImpl" get-type="atk_hyperlink_impl_get_type">
+  </interface>
+  <interface name="AtkHypertext" get-type="atk_hypertext_get_type">
+    <signal name="link-selected" return="void" when="last">
+      <param type="gint"/>
+    </signal>
+  </interface>
+  <interface name="AtkImage" get-type="atk_image_get_type">
+  </interface>
+  <class name="AtkMisc" get-type="atk_misc_get_type" parents="GObject">
+  </class>
+  <class name="AtkNoOpObject" get-type="atk_no_op_object_get_type" parents="AtkObject,GObject">
+    <implements name="AtkComponent"/>
+    <implements name="AtkAction"/>
+    <implements name="AtkEditableText"/>
+    <implements name="AtkImage"/>
+    <implements name="AtkSelection"/>
+    <implements name="AtkTable"/>
+    <implements name="AtkTableCell"/>
+    <implements name="AtkText"/>
+    <implements name="AtkHypertext"/>
+    <implements name="AtkValue"/>
+    <implements name="AtkDocument"/>
+    <implements name="AtkWindow"/>
+  </class>
+  <class name="AtkObjectFactory" get-type="atk_object_factory_get_type" parents="GObject">
+  </class>
+  <class name="AtkNoOpObjectFactory" get-type="atk_no_op_object_factory_get_type" parents="AtkObjectFactory,GObject">
+  </class>
+  <class name="AtkPlug" get-type="atk_plug_get_type" parents="AtkObject,GObject">
+    <implements name="AtkComponent"/>
+  </class>
+  <boxed name="AtkRange" get-type="atk_range_get_type"/>
+  <class name="AtkRegistry" get-type="atk_registry_get_type" parents="GObject">
+  </class>
+  <class name="AtkRelation" get-type="atk_relation_get_type" parents="GObject">
+    <property name="relation-type" type="AtkRelationType" flags="3"/>
+    <property name="target" type="GValueArray" flags="3"/>
+  </class>
+  <class name="AtkRelationSet" get-type="atk_relation_set_get_type" parents="GObject">
+  </class>
+  <interface name="AtkSelection" get-type="atk_selection_get_type">
+    <signal name="selection-changed" return="void" when="last">
+    </signal>
+  </interface>
+  <class name="AtkSocket" get-type="atk_socket_get_type" parents="AtkObject,GObject">
+    <implements name="AtkComponent"/>
+  </class>
+  <class name="AtkStateSet" get-type="atk_state_set_get_type" parents="GObject">
+  </class>
+  <interface name="AtkStreamableContent" get-type="atk_streamable_content_get_type">
+  </interface>
+  <interface name="AtkTable" get-type="atk_table_get_type">
+    <signal name="row-inserted" return="void" when="last">
+      <param type="gint"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="column-inserted" return="void" when="last">
+      <param type="gint"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="row-deleted" return="void" when="last">
+      <param type="gint"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="column-deleted" return="void" when="last">
+      <param type="gint"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="row-reordered" return="void" when="last">
+    </signal>
+    <signal name="column-reordered" return="void" when="last">
+    </signal>
+    <signal name="model-changed" return="void" when="last">
+    </signal>
+  </interface>
+  <interface name="AtkTableCell" get-type="atk_table_cell_get_type">
+    <prerequisite name="AtkObject"/>
+  </interface>
+  <interface name="AtkValue" get-type="atk_value_get_type">
+    <signal name="value-changed" return="void" when="last">
+      <param type="gdouble"/>
+      <param type="gchararray"/>
+    </signal>
+  </interface>
+  <interface name="AtkWindow" get-type="atk_window_get_type">
+    <prerequisite name="AtkObject"/>
+    <signal name="activate" return="void" when="last">
+    </signal>
+    <signal name="create" return="void" when="last">
+    </signal>
+    <signal name="deactivate" return="void" when="last">
+    </signal>
+    <signal name="destroy" return="void" when="last">
+    </signal>
+    <signal name="maximize" return="void" when="last">
+    </signal>
+    <signal name="minimize" return="void" when="last">
+    </signal>
+    <signal name="move" return="void" when="last">
+    </signal>
+    <signal name="resize" return="void" when="last">
+    </signal>
+    <signal name="restore" return="void" when="last">
+    </signal>
+  </interface>
+  <enum name="AtkScrollType" get-type="atk_scroll_type_get_type">
+    <member name="ATK_SCROLL_TOP_LEFT" nick="top-left" value="0"/>
+    <member name="ATK_SCROLL_BOTTOM_RIGHT" nick="bottom-right" value="1"/>
+    <member name="ATK_SCROLL_TOP_EDGE" nick="top-edge" value="2"/>
+    <member name="ATK_SCROLL_BOTTOM_EDGE" nick="bottom-edge" value="3"/>
+    <member name="ATK_SCROLL_LEFT_EDGE" nick="left-edge" value="4"/>
+    <member name="ATK_SCROLL_RIGHT_EDGE" nick="right-edge" value="5"/>
+    <member name="ATK_SCROLL_ANYWHERE" nick="anywhere" value="6"/>
+  </enum>  <flags name="AtkHyperlinkStateFlags" get-type="atk_hyperlink_state_flags_get_type">
+    <member name="ATK_HYPERLINK_IS_INLINE" nick="inline" value="1"/>
+  </flags>
+  <enum name="AtkRole" get-type="atk_role_get_type">
+    <member name="ATK_ROLE_INVALID" nick="invalid" value="0"/>
+    <member name="ATK_ROLE_ACCEL_LABEL" nick="accelerator-label" value="1"/>
+    <member name="ATK_ROLE_ALERT" nick="alert" value="2"/>
+    <member name="ATK_ROLE_ANIMATION" nick="animation" value="3"/>
+    <member name="ATK_ROLE_ARROW" nick="arrow" value="4"/>
+    <member name="ATK_ROLE_CALENDAR" nick="calendar" value="5"/>
+    <member name="ATK_ROLE_CANVAS" nick="canvas" value="6"/>
+    <member name="ATK_ROLE_CHECK_BOX" nick="check-box" value="7"/>
+    <member name="ATK_ROLE_CHECK_MENU_ITEM" nick="check-menu-item" value="8"/>
+    <member name="ATK_ROLE_COLOR_CHOOSER" nick="color-chooser" value="9"/>
+    <member name="ATK_ROLE_COLUMN_HEADER" nick="column-header" value="10"/>
+    <member name="ATK_ROLE_COMBO_BOX" nick="combo-box" value="11"/>
+    <member name="ATK_ROLE_DATE_EDITOR" nick="date-editor" value="12"/>
+    <member name="ATK_ROLE_DESKTOP_ICON" nick="desktop-icon" value="13"/>
+    <member name="ATK_ROLE_DESKTOP_FRAME" nick="desktop-frame" value="14"/>
+    <member name="ATK_ROLE_DIAL" nick="dial" value="15"/>
+    <member name="ATK_ROLE_DIALOG" nick="dialog" value="16"/>
+    <member name="ATK_ROLE_DIRECTORY_PANE" nick="directory-pane" value="17"/>
+    <member name="ATK_ROLE_DRAWING_AREA" nick="drawing-area" value="18"/>
+    <member name="ATK_ROLE_FILE_CHOOSER" nick="file-chooser" value="19"/>
+    <member name="ATK_ROLE_FILLER" nick="filler" value="20"/>
+    <member name="ATK_ROLE_FONT_CHOOSER" nick="font-chooser" value="21"/>
+    <member name="ATK_ROLE_FRAME" nick="frame" value="22"/>
+    <member name="ATK_ROLE_GLASS_PANE" nick="glass-pane" value="23"/>
+    <member name="ATK_ROLE_HTML_CONTAINER" nick="html-container" value="24"/>
+    <member name="ATK_ROLE_ICON" nick="icon" value="25"/>
+    <member name="ATK_ROLE_IMAGE" nick="image" value="26"/>
+    <member name="ATK_ROLE_INTERNAL_FRAME" nick="internal-frame" value="27"/>
+    <member name="ATK_ROLE_LABEL" nick="label" value="28"/>
+    <member name="ATK_ROLE_LAYERED_PANE" nick="layered-pane" value="29"/>
+    <member name="ATK_ROLE_LIST" nick="list" value="30"/>
+    <member name="ATK_ROLE_LIST_ITEM" nick="list-item" value="31"/>
+    <member name="ATK_ROLE_MENU" nick="menu" value="32"/>
+    <member name="ATK_ROLE_MENU_BAR" nick="menu-bar" value="33"/>
+    <member name="ATK_ROLE_MENU_ITEM" nick="menu-item" value="34"/>
+    <member name="ATK_ROLE_OPTION_PANE" nick="option-pane" value="35"/>
+    <member name="ATK_ROLE_PAGE_TAB" nick="page-tab" value="36"/>
+    <member name="ATK_ROLE_PAGE_TAB_LIST" nick="page-tab-list" value="37"/>
+    <member name="ATK_ROLE_PANEL" nick="panel" value="38"/>
+    <member name="ATK_ROLE_PASSWORD_TEXT" nick="password-text" value="39"/>
+    <member name="ATK_ROLE_POPUP_MENU" nick="popup-menu" value="40"/>
+    <member name="ATK_ROLE_PROGRESS_BAR" nick="progress-bar" value="41"/>
+    <member name="ATK_ROLE_PUSH_BUTTON" nick="push-button" value="42"/>
+    <member name="ATK_ROLE_RADIO_BUTTON" nick="radio-button" value="43"/>
+    <member name="ATK_ROLE_RADIO_MENU_ITEM" nick="radio-menu-item" value="44"/>
+    <member name="ATK_ROLE_ROOT_PANE" nick="root-pane" value="45"/>
+    <member name="ATK_ROLE_ROW_HEADER" nick="row-header" value="46"/>
+    <member name="ATK_ROLE_SCROLL_BAR" nick="scroll-bar" value="47"/>
+    <member name="ATK_ROLE_SCROLL_PANE" nick="scroll-pane" value="48"/>
+    <member name="ATK_ROLE_SEPARATOR" nick="separator" value="49"/>
+    <member name="ATK_ROLE_SLIDER" nick="slider" value="50"/>
+    <member name="ATK_ROLE_SPLIT_PANE" nick="split-pane" value="51"/>
+    <member name="ATK_ROLE_SPIN_BUTTON" nick="spin-button" value="52"/>
+    <member name="ATK_ROLE_STATUSBAR" nick="statusbar" value="53"/>
+    <member name="ATK_ROLE_TABLE" nick="table" value="54"/>
+    <member name="ATK_ROLE_TABLE_CELL" nick="table-cell" value="55"/>
+    <member name="ATK_ROLE_TABLE_COLUMN_HEADER" nick="table-column-header" value="56"/>
+    <member name="ATK_ROLE_TABLE_ROW_HEADER" nick="table-row-header" value="57"/>
+    <member name="ATK_ROLE_TEAR_OFF_MENU_ITEM" nick="tear-off-menu-item" value="58"/>
+    <member name="ATK_ROLE_TERMINAL" nick="terminal" value="59"/>
+    <member name="ATK_ROLE_TEXT" nick="text" value="60"/>
+    <member name="ATK_ROLE_TOGGLE_BUTTON" nick="toggle-button" value="61"/>
+    <member name="ATK_ROLE_TOOL_BAR" nick="tool-bar" value="62"/>
+    <member name="ATK_ROLE_TOOL_TIP" nick="tool-tip" value="63"/>
+    <member name="ATK_ROLE_TREE" nick="tree" value="64"/>
+    <member name="ATK_ROLE_TREE_TABLE" nick="tree-table" value="65"/>
+    <member name="ATK_ROLE_UNKNOWN" nick="unknown" value="66"/>
+    <member name="ATK_ROLE_VIEWPORT" nick="viewport" value="67"/>
+    <member name="ATK_ROLE_WINDOW" nick="window" value="68"/>
+    <member name="ATK_ROLE_HEADER" nick="header" value="69"/>
+    <member name="ATK_ROLE_FOOTER" nick="footer" value="70"/>
+    <member name="ATK_ROLE_PARAGRAPH" nick="paragraph" value="71"/>
+    <member name="ATK_ROLE_RULER" nick="ruler" value="72"/>
+    <member name="ATK_ROLE_APPLICATION" nick="application" value="73"/>
+    <member name="ATK_ROLE_AUTOCOMPLETE" nick="autocomplete" value="74"/>
+    <member name="ATK_ROLE_EDITBAR" nick="edit-bar" value="75"/>
+    <member name="ATK_ROLE_EMBEDDED" nick="embedded" value="76"/>
+    <member name="ATK_ROLE_ENTRY" nick="entry" value="77"/>
+    <member name="ATK_ROLE_CHART" nick="chart" value="78"/>
+    <member name="ATK_ROLE_CAPTION" nick="caption" value="79"/>
+    <member name="ATK_ROLE_DOCUMENT_FRAME" nick="document-frame" value="80"/>
+    <member name="ATK_ROLE_HEADING" nick="heading" value="81"/>
+    <member name="ATK_ROLE_PAGE" nick="page" value="82"/>
+    <member name="ATK_ROLE_SECTION" nick="section" value="83"/>
+    <member name="ATK_ROLE_REDUNDANT_OBJECT" nick="redundant-object" value="84"/>
+    <member name="ATK_ROLE_FORM" nick="form" value="85"/>
+    <member name="ATK_ROLE_LINK" nick="link" value="86"/>
+    <member name="ATK_ROLE_INPUT_METHOD_WINDOW" nick="input-method-window" value="87"/>
+    <member name="ATK_ROLE_TABLE_ROW" nick="table-row" value="88"/>
+    <member name="ATK_ROLE_TREE_ITEM" nick="tree-item" value="89"/>
+    <member name="ATK_ROLE_DOCUMENT_SPREADSHEET" nick="document-spreadsheet" value="90"/>
+    <member name="ATK_ROLE_DOCUMENT_PRESENTATION" nick="document-presentation" value="91"/>
+    <member name="ATK_ROLE_DOCUMENT_TEXT" nick="document-text" value="92"/>
+    <member name="ATK_ROLE_DOCUMENT_WEB" nick="document-web" value="93"/>
+    <member name="ATK_ROLE_DOCUMENT_EMAIL" nick="document-email" value="94"/>
+    <member name="ATK_ROLE_COMMENT" nick="comment" value="95"/>
+    <member name="ATK_ROLE_LIST_BOX" nick="list-box" value="96"/>
+    <member name="ATK_ROLE_GROUPING" nick="grouping" value="97"/>
+    <member name="ATK_ROLE_IMAGE_MAP" nick="image-map" value="98"/>
+    <member name="ATK_ROLE_NOTIFICATION" nick="notification" value="99"/>
+    <member name="ATK_ROLE_INFO_BAR" nick="info-bar" value="100"/>
+    <member name="ATK_ROLE_LEVEL_BAR" nick="level-bar" value="101"/>
+    <member name="ATK_ROLE_TITLE_BAR" nick="title-bar" value="102"/>
+    <member name="ATK_ROLE_BLOCK_QUOTE" nick="block-quote" value="103"/>
+    <member name="ATK_ROLE_AUDIO" nick="audio" value="104"/>
+    <member name="ATK_ROLE_VIDEO" nick="video" value="105"/>
+    <member name="ATK_ROLE_DEFINITION" nick="definition" value="106"/>
+    <member name="ATK_ROLE_ARTICLE" nick="article" value="107"/>
+    <member name="ATK_ROLE_LANDMARK" nick="landmark" value="108"/>
+    <member name="ATK_ROLE_LOG" nick="log" value="109"/>
+    <member name="ATK_ROLE_MARQUEE" nick="marquee" value="110"/>
+    <member name="ATK_ROLE_MATH" nick="math" value="111"/>
+    <member name="ATK_ROLE_RATING" nick="rating" value="112"/>
+    <member name="ATK_ROLE_TIMER" nick="timer" value="113"/>
+    <member name="ATK_ROLE_DESCRIPTION_LIST" nick="description-list" value="114"/>
+    <member name="ATK_ROLE_DESCRIPTION_TERM" nick="description-term" value="115"/>
+    <member name="ATK_ROLE_DESCRIPTION_VALUE" nick="description-value" value="116"/>
+    <member name="ATK_ROLE_STATIC" nick="static" value="117"/>
+    <member name="ATK_ROLE_MATH_FRACTION" nick="math-fraction" value="118"/>
+    <member name="ATK_ROLE_MATH_ROOT" nick="math-root" value="119"/>
+    <member name="ATK_ROLE_SUBSCRIPT" nick="subscript" value="120"/>
+    <member name="ATK_ROLE_SUPERSCRIPT" nick="superscript" value="121"/>
+    <member name="ATK_ROLE_FOOTNOTE" nick="footnote" value="122"/>
+    <member name="ATK_ROLE_CONTENT_DELETION" nick="content-deletion" value="123"/>
+    <member name="ATK_ROLE_CONTENT_INSERTION" nick="content-insertion" value="124"/>
+    <member name="ATK_ROLE_MARK" nick="mark" value="125"/>
+    <member name="ATK_ROLE_SUGGESTION" nick="suggestion" value="126"/>
+    <member name="ATK_ROLE_PUSH_BUTTON_MENU" nick="push-button-menu" value="127"/>
+    <member name="ATK_ROLE_LAST_DEFINED" nick="last-defined" value="128"/>
+  </enum>  <enum name="AtkLayer" get-type="atk_layer_get_type">
+    <member name="ATK_LAYER_INVALID" nick="invalid" value="0"/>
+    <member name="ATK_LAYER_BACKGROUND" nick="background" value="1"/>
+    <member name="ATK_LAYER_CANVAS" nick="canvas" value="2"/>
+    <member name="ATK_LAYER_WIDGET" nick="widget" value="3"/>
+    <member name="ATK_LAYER_MDI" nick="mdi" value="4"/>
+    <member name="ATK_LAYER_POPUP" nick="popup" value="5"/>
+    <member name="ATK_LAYER_OVERLAY" nick="overlay" value="6"/>
+    <member name="ATK_LAYER_WINDOW" nick="window" value="7"/>
+  </enum>  <enum name="AtkRelationType" get-type="atk_relation_type_get_type">
+    <member name="ATK_RELATION_NULL" nick="null" value="0"/>
+    <member name="ATK_RELATION_CONTROLLED_BY" nick="controlled-by" value="1"/>
+    <member name="ATK_RELATION_CONTROLLER_FOR" nick="controller-for" value="2"/>
+    <member name="ATK_RELATION_LABEL_FOR" nick="label-for" value="3"/>
+    <member name="ATK_RELATION_LABELLED_BY" nick="labelled-by" value="4"/>
+    <member name="ATK_RELATION_MEMBER_OF" nick="member-of" value="5"/>
+    <member name="ATK_RELATION_NODE_CHILD_OF" nick="node-child-of" value="6"/>
+    <member name="ATK_RELATION_FLOWS_TO" nick="flows-to" value="7"/>
+    <member name="ATK_RELATION_FLOWS_FROM" nick="flows-from" value="8"/>
+    <member name="ATK_RELATION_SUBWINDOW_OF" nick="subwindow-of" value="9"/>
+    <member name="ATK_RELATION_EMBEDS" nick="embeds" value="10"/>
+    <member name="ATK_RELATION_EMBEDDED_BY" nick="embedded-by" value="11"/>
+    <member name="ATK_RELATION_POPUP_FOR" nick="popup-for" value="12"/>
+    <member name="ATK_RELATION_PARENT_WINDOW_OF" nick="parent-window-of" value="13"/>
+    <member name="ATK_RELATION_DESCRIBED_BY" nick="described-by" value="14"/>
+    <member name="ATK_RELATION_DESCRIPTION_FOR" nick="description-for" value="15"/>
+    <member name="ATK_RELATION_NODE_PARENT_OF" nick="node-parent-of" value="16"/>
+    <member name="ATK_RELATION_DETAILS" nick="details" value="17"/>
+    <member name="ATK_RELATION_DETAILS_FOR" nick="details-for" value="18"/>
+    <member name="ATK_RELATION_ERROR_MESSAGE" nick="error-message" value="19"/>
+    <member name="ATK_RELATION_ERROR_FOR" nick="error-for" value="20"/>
+    <member name="ATK_RELATION_LAST_DEFINED" nick="last-defined" value="21"/>
+  </enum>  <enum name="AtkStateType" get-type="atk_state_type_get_type">
+    <member name="ATK_STATE_INVALID" nick="invalid" value="0"/>
+    <member name="ATK_STATE_ACTIVE" nick="active" value="1"/>
+    <member name="ATK_STATE_ARMED" nick="armed" value="2"/>
+    <member name="ATK_STATE_BUSY" nick="busy" value="3"/>
+    <member name="ATK_STATE_CHECKED" nick="checked" value="4"/>
+    <member name="ATK_STATE_DEFUNCT" nick="defunct" value="5"/>
+    <member name="ATK_STATE_EDITABLE" nick="editable" value="6"/>
+    <member name="ATK_STATE_ENABLED" nick="enabled" value="7"/>
+    <member name="ATK_STATE_EXPANDABLE" nick="expandable" value="8"/>
+    <member name="ATK_STATE_EXPANDED" nick="expanded" value="9"/>
+    <member name="ATK_STATE_FOCUSABLE" nick="focusable" value="10"/>
+    <member name="ATK_STATE_FOCUSED" nick="focused" value="11"/>
+    <member name="ATK_STATE_HORIZONTAL" nick="horizontal" value="12"/>
+    <member name="ATK_STATE_ICONIFIED" nick="iconified" value="13"/>
+    <member name="ATK_STATE_MODAL" nick="modal" value="14"/>
+    <member name="ATK_STATE_MULTI_LINE" nick="multi-line" value="15"/>
+    <member name="ATK_STATE_MULTISELECTABLE" nick="multiselectable" value="16"/>
+    <member name="ATK_STATE_OPAQUE" nick="opaque" value="17"/>
+    <member name="ATK_STATE_PRESSED" nick="pressed" value="18"/>
+    <member name="ATK_STATE_RESIZABLE" nick="resizable" value="19"/>
+    <member name="ATK_STATE_SELECTABLE" nick="selectable" value="20"/>
+    <member name="ATK_STATE_SELECTED" nick="selected" value="21"/>
+    <member name="ATK_STATE_SENSITIVE" nick="sensitive" value="22"/>
+    <member name="ATK_STATE_SHOWING" nick="showing" value="23"/>
+    <member name="ATK_STATE_SINGLE_LINE" nick="single-line" value="24"/>
+    <member name="ATK_STATE_STALE" nick="stale" value="25"/>
+    <member name="ATK_STATE_TRANSIENT" nick="transient" value="26"/>
+    <member name="ATK_STATE_VERTICAL" nick="vertical" value="27"/>
+    <member name="ATK_STATE_VISIBLE" nick="visible" value="28"/>
+    <member name="ATK_STATE_MANAGES_DESCENDANTS" nick="manages-descendants" value="29"/>
+    <member name="ATK_STATE_INDETERMINATE" nick="indeterminate" value="30"/>
+    <member name="ATK_STATE_TRUNCATED" nick="truncated" value="31"/>
+    <member name="ATK_STATE_REQUIRED" nick="required" value="32"/>
+    <member name="ATK_STATE_INVALID_ENTRY" nick="invalid-entry" value="33"/>
+    <member name="ATK_STATE_SUPPORTS_AUTOCOMPLETION" nick="supports-autocompletion" value="34"/>
+    <member name="ATK_STATE_SELECTABLE_TEXT" nick="selectable-text" value="35"/>
+    <member name="ATK_STATE_DEFAULT" nick="default" value="36"/>
+    <member name="ATK_STATE_ANIMATED" nick="animated" value="37"/>
+    <member name="ATK_STATE_VISITED" nick="visited" value="38"/>
+    <member name="ATK_STATE_CHECKABLE" nick="checkable" value="39"/>
+    <member name="ATK_STATE_HAS_POPUP" nick="has-popup" value="40"/>
+    <member name="ATK_STATE_HAS_TOOLTIP" nick="has-tooltip" value="41"/>
+    <member name="ATK_STATE_READ_ONLY" nick="read-only" value="42"/>
+    <member name="ATK_STATE_COLLAPSED" nick="collapsed" value="43"/>
+    <member name="ATK_STATE_LAST_DEFINED" nick="last-defined" value="44"/>
+  </enum>  <enum name="AtkTextAttribute" get-type="atk_text_attribute_get_type">
+    <member name="ATK_TEXT_ATTR_INVALID" nick="invalid" value="0"/>
+    <member name="ATK_TEXT_ATTR_LEFT_MARGIN" nick="left-margin" value="1"/>
+    <member name="ATK_TEXT_ATTR_RIGHT_MARGIN" nick="right-margin" value="2"/>
+    <member name="ATK_TEXT_ATTR_INDENT" nick="indent" value="3"/>
+    <member name="ATK_TEXT_ATTR_INVISIBLE" nick="invisible" value="4"/>
+    <member name="ATK_TEXT_ATTR_EDITABLE" nick="editable" value="5"/>
+    <member name="ATK_TEXT_ATTR_PIXELS_ABOVE_LINES" nick="pixels-above-lines" value="6"/>
+    <member name="ATK_TEXT_ATTR_PIXELS_BELOW_LINES" nick="pixels-below-lines" value="7"/>
+    <member name="ATK_TEXT_ATTR_PIXELS_INSIDE_WRAP" nick="pixels-inside-wrap" value="8"/>
+    <member name="ATK_TEXT_ATTR_BG_FULL_HEIGHT" nick="bg-full-height" value="9"/>
+    <member name="ATK_TEXT_ATTR_RISE" nick="rise" value="10"/>
+    <member name="ATK_TEXT_ATTR_UNDERLINE" nick="underline" value="11"/>
+    <member name="ATK_TEXT_ATTR_STRIKETHROUGH" nick="strikethrough" value="12"/>
+    <member name="ATK_TEXT_ATTR_SIZE" nick="size" value="13"/>
+    <member name="ATK_TEXT_ATTR_SCALE" nick="scale" value="14"/>
+    <member name="ATK_TEXT_ATTR_WEIGHT" nick="weight" value="15"/>
+    <member name="ATK_TEXT_ATTR_LANGUAGE" nick="language" value="16"/>
+    <member name="ATK_TEXT_ATTR_FAMILY_NAME" nick="family-name" value="17"/>
+    <member name="ATK_TEXT_ATTR_BG_COLOR" nick="bg-color" value="18"/>
+    <member name="ATK_TEXT_ATTR_FG_COLOR" nick="fg-color" value="19"/>
+    <member name="ATK_TEXT_ATTR_BG_STIPPLE" nick="bg-stipple" value="20"/>
+    <member name="ATK_TEXT_ATTR_FG_STIPPLE" nick="fg-stipple" value="21"/>
+    <member name="ATK_TEXT_ATTR_WRAP_MODE" nick="wrap-mode" value="22"/>
+    <member name="ATK_TEXT_ATTR_DIRECTION" nick="direction" value="23"/>
+    <member name="ATK_TEXT_ATTR_JUSTIFICATION" nick="justification" value="24"/>
+    <member name="ATK_TEXT_ATTR_STRETCH" nick="stretch" value="25"/>
+    <member name="ATK_TEXT_ATTR_VARIANT" nick="variant" value="26"/>
+    <member name="ATK_TEXT_ATTR_STYLE" nick="style" value="27"/>
+    <member name="ATK_TEXT_ATTR_TEXT_POSITION" nick="text-position" value="28"/>
+    <member name="ATK_TEXT_ATTR_LAST_DEFINED" nick="last-defined" value="29"/>
+  </enum>  <enum name="AtkTextBoundary" get-type="atk_text_boundary_get_type">
+    <member name="ATK_TEXT_BOUNDARY_CHAR" nick="char" value="0"/>
+    <member name="ATK_TEXT_BOUNDARY_WORD_START" nick="word-start" value="1"/>
+    <member name="ATK_TEXT_BOUNDARY_WORD_END" nick="word-end" value="2"/>
+    <member name="ATK_TEXT_BOUNDARY_SENTENCE_START" nick="sentence-start" value="3"/>
+    <member name="ATK_TEXT_BOUNDARY_SENTENCE_END" nick="sentence-end" value="4"/>
+    <member name="ATK_TEXT_BOUNDARY_LINE_START" nick="line-start" value="5"/>
+    <member name="ATK_TEXT_BOUNDARY_LINE_END" nick="line-end" value="6"/>
+  </enum>  <enum name="AtkTextGranularity" get-type="atk_text_granularity_get_type">
+    <member name="ATK_TEXT_GRANULARITY_CHAR" nick="char" value="0"/>
+    <member name="ATK_TEXT_GRANULARITY_WORD" nick="word" value="1"/>
+    <member name="ATK_TEXT_GRANULARITY_SENTENCE" nick="sentence" value="2"/>
+    <member name="ATK_TEXT_GRANULARITY_LINE" nick="line" value="3"/>
+    <member name="ATK_TEXT_GRANULARITY_PARAGRAPH" nick="paragraph" value="4"/>
+  </enum>  <enum name="AtkTextClipType" get-type="atk_text_clip_type_get_type">
+    <member name="ATK_TEXT_CLIP_NONE" nick="none" value="0"/>
+    <member name="ATK_TEXT_CLIP_MIN" nick="min" value="1"/>
+    <member name="ATK_TEXT_CLIP_MAX" nick="max" value="2"/>
+    <member name="ATK_TEXT_CLIP_BOTH" nick="both" value="3"/>
+  </enum>  <enum name="AtkKeyEventType" get-type="atk_key_event_type_get_type">
+    <member name="ATK_KEY_EVENT_PRESS" nick="press" value="0"/>
+    <member name="ATK_KEY_EVENT_RELEASE" nick="release" value="1"/>
+    <member name="ATK_KEY_EVENT_LAST_DEFINED" nick="last-defined" value="2"/>
+  </enum>  <enum name="AtkCoordType" get-type="atk_coord_type_get_type">
+    <member name="ATK_XY_SCREEN" nick="screen" value="0"/>
+    <member name="ATK_XY_WINDOW" nick="window" value="1"/>
+    <member name="ATK_XY_PARENT" nick="parent" value="2"/>
+  </enum>  <enum name="AtkValueType" get-type="atk_value_type_get_type">
+    <member name="ATK_VALUE_VERY_WEAK" nick="very-weak" value="0"/>
+    <member name="ATK_VALUE_WEAK" nick="weak" value="1"/>
+    <member name="ATK_VALUE_ACCEPTABLE" nick="acceptable" value="2"/>
+    <member name="ATK_VALUE_STRONG" nick="strong" value="3"/>
+    <member name="ATK_VALUE_VERY_STRONG" nick="very-strong" value="4"/>
+    <member name="ATK_VALUE_VERY_LOW" nick="very-low" value="5"/>
+    <member name="ATK_VALUE_LOW" nick="low" value="6"/>
+    <member name="ATK_VALUE_MEDIUM" nick="medium" value="7"/>
+    <member name="ATK_VALUE_HIGH" nick="high" value="8"/>
+    <member name="ATK_VALUE_VERY_HIGH" nick="very-high" value="9"/>
+    <member name="ATK_VALUE_VERY_BAD" nick="very-bad" value="10"/>
+    <member name="ATK_VALUE_BAD" nick="bad" value="11"/>
+    <member name="ATK_VALUE_GOOD" nick="good" value="12"/>
+    <member name="ATK_VALUE_VERY_GOOD" nick="very-good" value="13"/>
+    <member name="ATK_VALUE_BEST" nick="best" value="14"/>
+    <member name="ATK_VALUE_LAST_DEFINED" nick="last-defined" value="15"/>
+  </enum></dump>

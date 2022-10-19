@@ -1,0 +1,155 @@
+<?xml version="1.0"?>
+<dump>
+  <class name="GstRTPBasePayload" get-type="gst_rtp_base_payload_get_type" parents="GstElement,GstObject,GInitiallyUnowned,GObject" abstract="1">
+    <property name="mtu" type="guint" flags="227"/>
+    <property name="pt" type="guint" flags="227"/>
+    <property name="ssrc" type="guint" flags="227"/>
+    <property name="timestamp-offset" type="guint" flags="227"/>
+    <property name="seqnum-offset" type="gint" flags="227"/>
+    <property name="max-ptime" type="gint64" flags="227"/>
+    <property name="min-ptime" type="gint64" flags="227"/>
+    <property name="timestamp" type="guint" flags="225"/>
+    <property name="seqnum" type="guint" flags="225"/>
+    <property name="perfect-rtptime" type="gboolean" flags="227"/>
+    <property name="ptime-multiple" type="gint64" flags="227"/>
+    <property name="stats" type="GstStructure" flags="225"/>
+    <property name="source-info" type="gboolean" flags="3"/>
+    <property name="onvif-no-rate-control" type="gboolean" flags="227"/>
+    <property name="scale-rtptime" type="gboolean" flags="227"/>
+    <property name="auto-header-extension" type="gboolean" flags="227"/>
+    <signal name="add-extension" return="void" when="last" action="1">
+      <param type="GstRTPHeaderExtension"/>
+    </signal>
+    <signal name="request-extension" return="GstRTPHeaderExtension" when="last">
+      <param type="guint"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="clear-extensions" return="void" when="last" action="1">
+    </signal>
+  </class>
+  <class name="GstRTPBaseAudioPayload" get-type="gst_rtp_base_audio_payload_get_type" parents="GstRTPBasePayload,GstElement,GstObject,GInitiallyUnowned,GObject">
+    <property name="buffer-list" type="gboolean" flags="227"/>
+  </class>
+  <class name="GstRTPBaseDepayload" get-type="gst_rtp_base_depayload_get_type" parents="GstElement,GstObject,GInitiallyUnowned,GObject" abstract="1">
+    <property name="stats" type="GstStructure" flags="225"/>
+    <property name="source-info" type="gboolean" flags="3"/>
+    <property name="max-reorder" type="gint" flags="3"/>
+    <property name="auto-header-extension" type="gboolean" flags="227"/>
+    <signal name="add-extension" return="void" when="last" action="1">
+      <param type="GstRTPHeaderExtension"/>
+    </signal>
+    <signal name="request-extension" return="GstRTPHeaderExtension" when="last">
+      <param type="guint"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="clear-extensions" return="void" when="last" action="1">
+    </signal>
+  </class>
+  <class name="GstRTPHeaderExtension" get-type="gst_rtp_header_extension_get_type" parents="GstElement,GstObject,GInitiallyUnowned,GObject" abstract="1">
+  </class>
+  <enum name="GstRTCPType" get-type="gst_rtcp_type_get_type">
+    <member name="GST_RTCP_TYPE_INVALID" nick="invalid" value="0"/>
+    <member name="GST_RTCP_TYPE_SR" nick="sr" value="200"/>
+    <member name="GST_RTCP_TYPE_RR" nick="rr" value="201"/>
+    <member name="GST_RTCP_TYPE_SDES" nick="sdes" value="202"/>
+    <member name="GST_RTCP_TYPE_BYE" nick="bye" value="203"/>
+    <member name="GST_RTCP_TYPE_APP" nick="app" value="204"/>
+    <member name="GST_RTCP_TYPE_RTPFB" nick="rtpfb" value="205"/>
+    <member name="GST_RTCP_TYPE_PSFB" nick="psfb" value="206"/>
+    <member name="GST_RTCP_TYPE_XR" nick="xr" value="207"/>
+  </enum>  <enum name="GstRTCPFBType" get-type="gst_rtcpfb_type_get_type">
+    <member name="GST_RTCP_FB_TYPE_INVALID" nick="fb-type-invalid" value="0"/>
+    <member name="GST_RTCP_RTPFB_TYPE_NACK" nick="rtpfb-type-nack" value="1"/>
+    <member name="GST_RTCP_RTPFB_TYPE_TMMBR" nick="rtpfb-type-tmmbr" value="3"/>
+    <member name="GST_RTCP_RTPFB_TYPE_TMMBN" nick="rtpfb-type-tmmbn" value="4"/>
+    <member name="GST_RTCP_RTPFB_TYPE_RTCP_SR_REQ" nick="rtpfb-type-rtcp-sr-req" value="5"/>
+    <member name="GST_RTCP_RTPFB_TYPE_TWCC" nick="rtpfb-type-twcc" value="15"/>
+    <member name="GST_RTCP_PSFB_TYPE_PLI" nick="psfb-type-pli" value="1"/>
+    <member name="GST_RTCP_PSFB_TYPE_SLI" nick="psfb-type-sli" value="2"/>
+    <member name="GST_RTCP_PSFB_TYPE_RPSI" nick="psfb-type-rpsi" value="3"/>
+    <member name="GST_RTCP_PSFB_TYPE_AFB" nick="psfb-type-afb" value="15"/>
+    <member name="GST_RTCP_PSFB_TYPE_FIR" nick="psfb-type-fir" value="4"/>
+    <member name="GST_RTCP_PSFB_TYPE_TSTR" nick="psfb-type-tstr" value="5"/>
+    <member name="GST_RTCP_PSFB_TYPE_TSTN" nick="psfb-type-tstn" value="6"/>
+    <member name="GST_RTCP_PSFB_TYPE_VBCN" nick="psfb-type-vbcn" value="7"/>
+  </enum>  <enum name="GstRTCPSDESType" get-type="gst_rtcpsdes_type_get_type">
+    <member name="GST_RTCP_SDES_INVALID" nick="invalid" value="-1"/>
+    <member name="GST_RTCP_SDES_END" nick="end" value="0"/>
+    <member name="GST_RTCP_SDES_CNAME" nick="cname" value="1"/>
+    <member name="GST_RTCP_SDES_NAME" nick="name" value="2"/>
+    <member name="GST_RTCP_SDES_EMAIL" nick="email" value="3"/>
+    <member name="GST_RTCP_SDES_PHONE" nick="phone" value="4"/>
+    <member name="GST_RTCP_SDES_LOC" nick="loc" value="5"/>
+    <member name="GST_RTCP_SDES_TOOL" nick="tool" value="6"/>
+    <member name="GST_RTCP_SDES_NOTE" nick="note" value="7"/>
+    <member name="GST_RTCP_SDES_PRIV" nick="priv" value="8"/>
+    <member name="GST_RTCP_SDES_H323_CADDR" nick="h323-caddr" value="9"/>
+    <member name="GST_RTCP_SDES_APSI" nick="apsi" value="10"/>
+    <member name="GST_RTCP_SDES_RGRP" nick="rgrp" value="11"/>
+    <member name="GST_RTCP_SDES_RTP_STREAM_ID" nick="rtp-stream-id" value="12"/>
+    <member name="GST_RTCP_SDES_REPAIRED_RTP_STREAM_ID" nick="repaired-rtp-stream-id" value="13"/>
+    <member name="GST_RTCP_SDES_CCID" nick="ccid" value="14"/>
+    <member name="GST_RTCP_SDES_MID" nick="mid" value="15"/>
+  </enum>  <enum name="GstRTCPXRType" get-type="gst_rtcpxr_type_get_type">
+    <member name="GST_RTCP_XR_TYPE_INVALID" nick="invalid" value="-1"/>
+    <member name="GST_RTCP_XR_TYPE_LRLE" nick="lrle" value="1"/>
+    <member name="GST_RTCP_XR_TYPE_DRLE" nick="drle" value="2"/>
+    <member name="GST_RTCP_XR_TYPE_PRT" nick="prt" value="3"/>
+    <member name="GST_RTCP_XR_TYPE_RRT" nick="rrt" value="4"/>
+    <member name="GST_RTCP_XR_TYPE_DLRR" nick="dlrr" value="5"/>
+    <member name="GST_RTCP_XR_TYPE_SSUMM" nick="ssumm" value="6"/>
+    <member name="GST_RTCP_XR_TYPE_VOIP_METRICS" nick="voip-metrics" value="7"/>
+  </enum>  <flags name="GstRTPBufferFlags" get-type="gst_rtp_buffer_flags_get_type">
+    <member name="GST_RTP_BUFFER_FLAG_RETRANSMISSION" nick="retransmission" value="1048576"/>
+    <member name="GST_RTP_BUFFER_FLAG_REDUNDANT" nick="redundant" value="2097152"/>
+    <member name="GST_RTP_BUFFER_FLAG_LAST" nick="last" value="268435456"/>
+  </flags>
+  <flags name="GstRTPBufferMapFlags" get-type="gst_rtp_buffer_map_flags_get_type">
+    <member name="GST_RTP_BUFFER_MAP_FLAG_SKIP_PADDING" nick="skip-padding" value="65536"/>
+    <member name="GST_RTP_BUFFER_MAP_FLAG_LAST" nick="last" value="16777216"/>
+  </flags>
+  <enum name="GstRTPProfile" get-type="gst_rtp_profile_get_type">
+    <member name="GST_RTP_PROFILE_UNKNOWN" nick="unknown" value="0"/>
+    <member name="GST_RTP_PROFILE_AVP" nick="avp" value="1"/>
+    <member name="GST_RTP_PROFILE_SAVP" nick="savp" value="2"/>
+    <member name="GST_RTP_PROFILE_AVPF" nick="avpf" value="3"/>
+    <member name="GST_RTP_PROFILE_SAVPF" nick="savpf" value="4"/>
+  </enum>  <flags name="GstRTPHeaderExtensionFlags" get-type="gst_rtp_header_extension_flags_get_type">
+    <member name="GST_RTP_HEADER_EXTENSION_ONE_BYTE" nick="one-byte" value="1"/>
+    <member name="GST_RTP_HEADER_EXTENSION_TWO_BYTE" nick="two-byte" value="2"/>
+  </flags>
+  <flags name="GstRTPHeaderExtensionDirection" get-type="gst_rtp_header_extension_direction_get_type">
+    <member name="GST_RTP_HEADER_EXTENSION_DIRECTION_INACTIVE" nick="inactive" value="0"/>
+    <member name="GST_RTP_HEADER_EXTENSION_DIRECTION_SENDONLY" nick="sendonly" value="1"/>
+    <member name="GST_RTP_HEADER_EXTENSION_DIRECTION_RECVONLY" nick="recvonly" value="2"/>
+    <member name="GST_RTP_HEADER_EXTENSION_DIRECTION_SENDRECV" nick="sendrecv" value="3"/>
+    <member name="GST_RTP_HEADER_EXTENSION_DIRECTION_INHERITED" nick="inherited" value="4"/>
+  </flags>
+  <enum name="GstRTPPayload" get-type="gst_rtp_payload_get_type">
+    <member name="GST_RTP_PAYLOAD_PCMU" nick="pcmu" value="0"/>
+    <member name="GST_RTP_PAYLOAD_1016" nick="1016" value="1"/>
+    <member name="GST_RTP_PAYLOAD_G721" nick="g721" value="2"/>
+    <member name="GST_RTP_PAYLOAD_GSM" nick="gsm" value="3"/>
+    <member name="GST_RTP_PAYLOAD_G723" nick="g723" value="4"/>
+    <member name="GST_RTP_PAYLOAD_DVI4_8000" nick="dvi4-8000" value="5"/>
+    <member name="GST_RTP_PAYLOAD_DVI4_16000" nick="dvi4-16000" value="6"/>
+    <member name="GST_RTP_PAYLOAD_LPC" nick="lpc" value="7"/>
+    <member name="GST_RTP_PAYLOAD_PCMA" nick="pcma" value="8"/>
+    <member name="GST_RTP_PAYLOAD_G722" nick="g722" value="9"/>
+    <member name="GST_RTP_PAYLOAD_L16_STEREO" nick="l16-stereo" value="10"/>
+    <member name="GST_RTP_PAYLOAD_L16_MONO" nick="l16-mono" value="11"/>
+    <member name="GST_RTP_PAYLOAD_QCELP" nick="qcelp" value="12"/>
+    <member name="GST_RTP_PAYLOAD_CN" nick="cn" value="13"/>
+    <member name="GST_RTP_PAYLOAD_MPA" nick="mpa" value="14"/>
+    <member name="GST_RTP_PAYLOAD_G728" nick="g728" value="15"/>
+    <member name="GST_RTP_PAYLOAD_DVI4_11025" nick="dvi4-11025" value="16"/>
+    <member name="GST_RTP_PAYLOAD_DVI4_22050" nick="dvi4-22050" value="17"/>
+    <member name="GST_RTP_PAYLOAD_G729" nick="g729" value="18"/>
+    <member name="GST_RTP_PAYLOAD_CELLB" nick="cellb" value="25"/>
+    <member name="GST_RTP_PAYLOAD_JPEG" nick="jpeg" value="26"/>
+    <member name="GST_RTP_PAYLOAD_NV" nick="nv" value="28"/>
+    <member name="GST_RTP_PAYLOAD_H261" nick="h261" value="31"/>
+    <member name="GST_RTP_PAYLOAD_MPV" nick="mpv" value="32"/>
+    <member name="GST_RTP_PAYLOAD_MP2T" nick="mp2t" value="33"/>
+    <member name="GST_RTP_PAYLOAD_H263" nick="h263" value="34"/>
+  </enum></dump>

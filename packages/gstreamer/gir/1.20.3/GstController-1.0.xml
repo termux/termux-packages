@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<dump>
+  <boxed name="GstControlPoint" get-type="gst_control_point_get_type"/>
+  <class name="GstTimedValueControlSource" get-type="gst_timed_value_control_source_get_type" parents="GstControlSource,GstObject,GInitiallyUnowned,GObject" abstract="1">
+    <signal name="value-changed" return="void" when="first">
+      <param type="GstControlPoint"/>
+    </signal>
+    <signal name="value-added" return="void" when="first">
+      <param type="GstControlPoint"/>
+    </signal>
+    <signal name="value-removed" return="void" when="first">
+      <param type="GstControlPoint"/>
+    </signal>
+  </class>
+  <enum name="GstInterpolationMode" get-type="gst_interpolation_mode_get_type">
+    <member name="GST_INTERPOLATION_MODE_NONE" nick="none" value="0"/>
+    <member name="GST_INTERPOLATION_MODE_LINEAR" nick="linear" value="1"/>
+    <member name="GST_INTERPOLATION_MODE_CUBIC" nick="cubic" value="2"/>
+    <member name="GST_INTERPOLATION_MODE_CUBIC_MONOTONIC" nick="cubic-monotonic" value="3"/>
+  </enum>  <enum name="GstLFOWaveform" get-type="gst_lfo_waveform_get_type">
+    <member name="GST_LFO_WAVEFORM_SINE" nick="sine" value="0"/>
+    <member name="GST_LFO_WAVEFORM_SQUARE" nick="square" value="1"/>
+    <member name="GST_LFO_WAVEFORM_SAW" nick="saw" value="2"/>
+    <member name="GST_LFO_WAVEFORM_REVERSE_SAW" nick="reverse-saw" value="3"/>
+    <member name="GST_LFO_WAVEFORM_TRIANGLE" nick="triangle" value="4"/>
+  </enum>  <class name="GstInterpolationControlSource" get-type="gst_interpolation_control_source_get_type" parents="GstTimedValueControlSource,GstControlSource,GstObject,GInitiallyUnowned,GObject">
+    <property name="mode" type="GstInterpolationMode" flags="227"/>
+  </class>
+  <class name="GstLFOControlSource" get-type="gst_lfo_control_source_get_type" parents="GstControlSource,GstObject,GInitiallyUnowned,GObject">
+    <property name="waveform" type="GstLFOWaveform" flags="227"/>
+    <property name="frequency" type="gdouble" flags="739"/>
+    <property name="timeshift" type="guint64" flags="739"/>
+    <property name="amplitude" type="gdouble" flags="739"/>
+    <property name="offset" type="gdouble" flags="739"/>
+  </class>
+  <class name="GstARGBControlBinding" get-type="gst_argb_control_binding_get_type" parents="GstControlBinding,GstObject,GInitiallyUnowned,GObject">
+    <property name="control-source-a" type="GstControlSource" flags="231"/>
+    <property name="control-source-r" type="GstControlSource" flags="231"/>
+    <property name="control-source-g" type="GstControlSource" flags="231"/>
+    <property name="control-source-b" type="GstControlSource" flags="231"/>
+  </class>
+  <class name="GstDirectControlBinding" get-type="gst_direct_control_binding_get_type" parents="GstControlBinding,GstObject,GInitiallyUnowned,GObject">
+    <property name="control-source" type="GstControlSource" flags="231"/>
+    <property name="absolute" type="gboolean" flags="235"/>
+  </class>
+  <class name="GstProxyControlBinding" get-type="gst_proxy_control_binding_get_type" parents="GstControlBinding,GstObject,GInitiallyUnowned,GObject">
+  </class>
+  <class name="GstTriggerControlSource" get-type="gst_trigger_control_source_get_type" parents="GstTimedValueControlSource,GstControlSource,GstObject,GInitiallyUnowned,GObject">
+    <property name="tolerance" type="gint64" flags="227"/>
+  </class>
+</dump>

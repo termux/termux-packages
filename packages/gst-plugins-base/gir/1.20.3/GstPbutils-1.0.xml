@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+<dump>
+  <boxed name="GstInstallPluginsContext" get-type="gst_install_plugins_context_get_type"/>
+  <flags name="GstPbUtilsCapsDescriptionFlags" get-type="gst_pb_utils_caps_description_flags_get_type">
+    <member name="GST_PBUTILS_CAPS_DESCRIPTION_FLAG_CONTAINER" nick="container" value="1"/>
+    <member name="GST_PBUTILS_CAPS_DESCRIPTION_FLAG_AUDIO" nick="audio" value="2"/>
+    <member name="GST_PBUTILS_CAPS_DESCRIPTION_FLAG_VIDEO" nick="video" value="4"/>
+    <member name="GST_PBUTILS_CAPS_DESCRIPTION_FLAG_IMAGE" nick="image" value="8"/>
+    <member name="GST_PBUTILS_CAPS_DESCRIPTION_FLAG_SUBTITLE" nick="subtitle" value="16"/>
+    <member name="GST_PBUTILS_CAPS_DESCRIPTION_FLAG_TAG" nick="tag" value="32"/>
+    <member name="GST_PBUTILS_CAPS_DESCRIPTION_FLAG_GENERIC" nick="generic" value="64"/>
+  </flags>
+  <enum name="GstAudioVisualizerShader" get-type="gst_audio_visualizer_shader_get_type">
+    <member name="GST_AUDIO_VISUALIZER_SHADER_NONE" nick="none" value="0"/>
+    <member name="GST_AUDIO_VISUALIZER_SHADER_FADE" nick="fade" value="1"/>
+    <member name="GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_UP" nick="fade-and-move-up" value="2"/>
+    <member name="GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_DOWN" nick="fade-and-move-down" value="3"/>
+    <member name="GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_LEFT" nick="fade-and-move-left" value="4"/>
+    <member name="GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_RIGHT" nick="fade-and-move-right" value="5"/>
+    <member name="GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_HORIZ_OUT" nick="fade-and-move-horiz-out" value="6"/>
+    <member name="GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_HORIZ_IN" nick="fade-and-move-horiz-in" value="7"/>
+    <member name="GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_VERT_OUT" nick="fade-and-move-vert-out" value="8"/>
+    <member name="GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_VERT_IN" nick="fade-and-move-vert-in" value="9"/>
+  </enum>  <enum name="GstDiscovererResult" get-type="gst_discoverer_result_get_type">
+    <member name="GST_DISCOVERER_OK" nick="ok" value="0"/>
+    <member name="GST_DISCOVERER_URI_INVALID" nick="uri-invalid" value="1"/>
+    <member name="GST_DISCOVERER_ERROR" nick="error" value="2"/>
+    <member name="GST_DISCOVERER_TIMEOUT" nick="timeout" value="3"/>
+    <member name="GST_DISCOVERER_BUSY" nick="busy" value="4"/>
+    <member name="GST_DISCOVERER_MISSING_PLUGINS" nick="missing-plugins" value="5"/>
+  </enum>  <flags name="GstDiscovererSerializeFlags" get-type="gst_discoverer_serialize_flags_get_type">
+    <member name="GST_DISCOVERER_SERIALIZE_BASIC" nick="basic" value="0"/>
+    <member name="GST_DISCOVERER_SERIALIZE_CAPS" nick="caps" value="1"/>
+    <member name="GST_DISCOVERER_SERIALIZE_TAGS" nick="tags" value="2"/>
+    <member name="GST_DISCOVERER_SERIALIZE_MISC" nick="misc" value="4"/>
+    <member name="GST_DISCOVERER_SERIALIZE_ALL" nick="all" value="7"/>
+  </flags>
+  <enum name="GstInstallPluginsReturn" get-type="gst_install_plugins_return_get_type">
+    <member name="GST_INSTALL_PLUGINS_SUCCESS" nick="success" value="0"/>
+    <member name="GST_INSTALL_PLUGINS_NOT_FOUND" nick="not-found" value="1"/>
+    <member name="GST_INSTALL_PLUGINS_ERROR" nick="error" value="2"/>
+    <member name="GST_INSTALL_PLUGINS_PARTIAL_SUCCESS" nick="partial-success" value="3"/>
+    <member name="GST_INSTALL_PLUGINS_USER_ABORT" nick="user-abort" value="4"/>
+    <member name="GST_INSTALL_PLUGINS_CRASHED" nick="crashed" value="100"/>
+    <member name="GST_INSTALL_PLUGINS_INVALID" nick="invalid" value="101"/>
+    <member name="GST_INSTALL_PLUGINS_STARTED_OK" nick="started-ok" value="200"/>
+    <member name="GST_INSTALL_PLUGINS_INTERNAL_FAILURE" nick="internal-failure" value="201"/>
+    <member name="GST_INSTALL_PLUGINS_HELPER_MISSING" nick="helper-missing" value="202"/>
+    <member name="GST_INSTALL_PLUGINS_INSTALL_IN_PROGRESS" nick="install-in-progress" value="203"/>
+  </enum>  <class name="GstDiscovererStreamInfo" get-type="gst_discoverer_stream_info_get_type" parents="GObject">
+  </class>
+  <class name="GstDiscovererContainerInfo" get-type="gst_discoverer_container_info_get_type" parents="GstDiscovererStreamInfo,GObject">
+  </class>
+  <class name="GstDiscovererAudioInfo" get-type="gst_discoverer_audio_info_get_type" parents="GstDiscovererStreamInfo,GObject">
+  </class>
+  <class name="GstDiscovererVideoInfo" get-type="gst_discoverer_video_info_get_type" parents="GstDiscovererStreamInfo,GObject">
+  </class>
+  <class name="GstDiscovererSubtitleInfo" get-type="gst_discoverer_subtitle_info_get_type" parents="GstDiscovererStreamInfo,GObject">
+  </class>
+  <class name="GstDiscovererInfo" get-type="gst_discoverer_info_get_type" parents="GObject">
+  </class>
+  <class name="GstDiscoverer" get-type="gst_discoverer_get_type" parents="GObject">
+    <property name="timeout" type="guint64" flags="231"/>
+    <property name="use-cache" type="gboolean" flags="231"/>
+    <signal name="finished" return="void" when="last">
+    </signal>
+    <signal name="starting" return="void" when="last">
+    </signal>
+    <signal name="discovered" return="void" when="last">
+      <param type="GstDiscovererInfo"/>
+      <param type="GError"/>
+    </signal>
+    <signal name="source-setup" return="void" when="last">
+      <param type="GstElement"/>
+    </signal>
+  </class>
+  <class name="GstEncodingProfile" get-type="gst_encoding_profile_get_type" parents="GObject">
+    <property name="restriction-caps" type="GstCaps" flags="1073742051"/>
+    <property name="element-properties" type="GstStructure" flags="1073742051"/>
+  </class>
+  <class name="GstEncodingContainerProfile" get-type="gst_encoding_container_profile_get_type" parents="GstEncodingProfile,GObject">
+  </class>
+  <class name="GstEncodingVideoProfile" get-type="gst_encoding_video_profile_get_type" parents="GstEncodingProfile,GObject">
+  </class>
+  <class name="GstEncodingAudioProfile" get-type="gst_encoding_audio_profile_get_type" parents="GstEncodingProfile,GObject">
+  </class>
+  <class name="GstEncodingTarget" get-type="gst_encoding_target_get_type" parents="GObject">
+  </class>
+  <class name="GstAudioVisualizer" get-type="gst_audio_visualizer_get_type" parents="GstElement,GstObject,GInitiallyUnowned,GObject" abstract="1">
+    <property name="shader" type="GstAudioVisualizerShader" flags="739"/>
+    <property name="shade-amount" type="guint" flags="739"/>
+  </class>
+</dump>

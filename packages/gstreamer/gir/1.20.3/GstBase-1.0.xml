@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<dump>
+  <class name="GstAdapter" get-type="gst_adapter_get_type" parents="GObject">
+  </class>
+  <class name="GstAggregatorPad" get-type="gst_aggregator_pad_get_type" parents="GstPad,GstObject,GInitiallyUnowned,GObject">
+    <property name="emit-signals" type="gboolean" flags="227"/>
+    <signal name="buffer-consumed" return="void" when="first">
+      <param type="GstBuffer"/>
+    </signal>
+  </class>
+  <class name="GstAggregator" get-type="gst_aggregator_get_type" parents="GstElement,GstObject,GInitiallyUnowned,GObject" abstract="1">
+    <property name="latency" type="guint64" flags="227"/>
+    <property name="min-upstream-latency" type="guint64" flags="227"/>
+    <property name="start-time-selection" type="GstAggregatorStartTimeSelection" flags="227"/>
+    <property name="start-time" type="guint64" flags="227"/>
+    <property name="emit-signals" type="gboolean" flags="227"/>
+    <signal name="samples-selected" return="void" when="first">
+      <param type="GstSegment"/>
+      <param type="guint64"/>
+      <param type="guint64"/>
+      <param type="guint64"/>
+      <param type="GstStructure"/>
+    </signal>
+  </class>
+  <enum name="GstAggregatorStartTimeSelection" get-type="gst_aggregator_start_time_selection_get_type">
+    <member name="GST_AGGREGATOR_START_TIME_SELECTION_ZERO" nick="zero" value="0"/>
+    <member name="GST_AGGREGATOR_START_TIME_SELECTION_FIRST" nick="first" value="1"/>
+    <member name="GST_AGGREGATOR_START_TIME_SELECTION_SET" nick="set" value="2"/>
+  </enum>  <class name="GstBaseParse" get-type="gst_base_parse_get_type" parents="GstElement,GstObject,GInitiallyUnowned,GObject" abstract="1">
+    <property name="disable-passthrough" type="gboolean" flags="227"/>
+  </class>
+  <boxed name="GstBaseParseFrame" get-type="gst_base_parse_frame_get_type"/>
+  <class name="GstBaseSink" get-type="gst_base_sink_get_type" parents="GstElement,GstObject,GInitiallyUnowned,GObject" abstract="1">
+    <property name="sync" type="gboolean" flags="227"/>
+    <property name="max-lateness" type="gint64" flags="227"/>
+    <property name="qos" type="gboolean" flags="227"/>
+    <property name="async" type="gboolean" flags="227"/>
+    <property name="ts-offset" type="gint64" flags="227"/>
+    <property name="enable-last-sample" type="gboolean" flags="227"/>
+    <property name="last-sample" type="GstSample" flags="225"/>
+    <property name="blocksize" type="guint" flags="227"/>
+    <property name="render-delay" type="guint64" flags="227"/>
+    <property name="throttle-time" type="guint64" flags="227"/>
+    <property name="max-bitrate" type="guint64" flags="227"/>
+    <property name="processing-deadline" type="guint64" flags="227"/>
+    <property name="stats" type="GstStructure" flags="225"/>
+  </class>
+  <class name="GstBaseSrc" get-type="gst_base_src_get_type" parents="GstElement,GstObject,GInitiallyUnowned,GObject" abstract="1">
+    <property name="blocksize" type="guint" flags="227"/>
+    <property name="num-buffers" type="gint" flags="227"/>
+    <property name="typefind" type="gboolean" flags="-2147483421"/>
+    <property name="do-timestamp" type="gboolean" flags="227"/>
+  </class>
+  <class name="GstBaseTransform" get-type="gst_base_transform_get_type" parents="GstElement,GstObject,GInitiallyUnowned,GObject" abstract="1">
+    <property name="qos" type="gboolean" flags="227"/>
+  </class>
+  <class name="GstCollectPads" get-type="gst_collect_pads_get_type" parents="GstObject,GInitiallyUnowned,GObject">
+  </class>
+  <class name="GstDataQueue" get-type="gst_data_queue_get_type" parents="GObject">
+    <property name="current-level-visible" type="guint" flags="225"/>
+    <property name="current-level-bytes" type="guint" flags="225"/>
+    <property name="current-level-time" type="guint64" flags="225"/>
+    <signal name="empty" return="void" when="first">
+    </signal>
+    <signal name="full" return="void" when="first">
+    </signal>
+  </class>
+  <boxed name="GstFlowCombiner" get-type="gst_flow_combiner_get_type"/>
+  <class name="GstPushSrc" get-type="gst_push_src_get_type" parents="GstBaseSrc,GstElement,GstObject,GInitiallyUnowned,GObject">
+  </class>
+</dump>
