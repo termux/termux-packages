@@ -74,6 +74,10 @@ source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_cabal.sh"
 # shellcheck source=scripts/build/setup/termux_setup_jailbreak_cabal.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_jailbreak_cabal.sh"
 
+# Utility function for setting up GObject Introspection cross environment.
+# shellcheck source=scripts/build/setup/termux_setup_gir.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_gir.sh"
+
 # Utility function for setting up GN toolchain.
 # shellcheck source=scripts/build/setup/termux_setup_gn.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_gn.sh"
