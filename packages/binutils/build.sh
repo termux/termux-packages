@@ -3,9 +3,11 @@ TERMUX_PKG_DESCRIPTION="Collection of binary tools, the main ones being ld, the 
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.39
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/binutils/binutils-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=645c25f563b8adc0a81dbd6a41cffbf4d37083a382e02d5d3df4f65c09516d00
 TERMUX_PKG_DEPENDS="binutils-libs (>= ${TERMUX_PKG_VERSION}), libc++, zlib"
+TERMUX_PKG_SUGGESTS="ldd"
 TERMUX_PKG_BREAKS="binutils-dev"
 TERMUX_PKG_REPLACES="binutils-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -35,7 +37,6 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_make_install() {
-	cp $TERMUX_PKG_BUILDER_DIR/ldd $TERMUX_PREFIX/bin/ldd
 	cd $TERMUX_PREFIX/bin
 	# Setup symlinks as these are used when building, so used by
 	# system setup in e.g. python, perl and libtool:
