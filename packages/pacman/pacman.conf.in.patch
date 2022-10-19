@@ -1,5 +1,6 @@
---- pacman-6.0.1/etc/pacman.conf.in.org	2022-09-17 11:20:40.037339337 +0300
-+++ pacman-6.0.1/etc/pacman.conf.in	2022-09-17 11:21:58.557339307 +0300
+diff -uNr pacman-6.0.1/etc/pacman.conf.in pacman-6.0.1/etc/pacman.conf.in.patch
+--- pacman-6.0.1/etc/pacman.conf.in	2022-10-19 09:05:03.548158181 +0300
++++ pacman-6.0.1/etc/pacman.conf.in.patch	2022-10-19 09:07:22.858158128 +0300
 @@ -9,15 +9,15 @@
  [options]
  # The following paths are commented out with their default values listed.
@@ -37,7 +38,7 @@
 -#RemoteFileSigLevel = Optional
 +# By default, pacman accepts packages signed by keys that its local keyring
 +# trusts (see pacman-key and its man page), as well as unsigned packages.
-+SigLevel    = Never
++SigLevel    = DatabaseRequired
 +LocalFileSigLevel = Optional
 +#RemoteFileSigLevel = Required
  
