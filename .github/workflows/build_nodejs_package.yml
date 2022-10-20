@@ -8,6 +8,7 @@ on:
 jobs:
   node-runtime-builder:
     runs-on: ubuntu-latest
+    timeout-minutes: 600
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
@@ -31,8 +32,12 @@ jobs:
 
             echo "# Build packages - this takes a loooong time!"
             cd /home/builder/termux-packages
-            # quite build
-            ./build-package.sh -q openssl nodejs
+            # build for different architectures:
+            # - aarch64 (arm 64bit)
+            # - arm (arm 32bit)
+            # - i686
+            # - x86_64
+            ./build-package.sh -a i686 -q openssl nodejs
 
             echo "# Unpack Node.js & rename"
             cd /home/builder/termux-packages/_out

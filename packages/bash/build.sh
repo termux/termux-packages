@@ -3,8 +3,9 @@ TERMUX_PKG_DESCRIPTION="A sh-compatible shell that incorporates useful features 
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 _MAIN_VERSION=5.2
-_PATCH_VERSION=0
+_PATCH_VERSION=2
 TERMUX_PKG_VERSION=${_MAIN_VERSION}.${_PATCH_VERSION}
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/bash/bash-${_MAIN_VERSION}.tar.gz
 TERMUX_PKG_SHA256=a139c166df7ff4471c5e0733051642ee5556c1cc8a4a78f145583c5c81ab32fb
 TERMUX_PKG_DEPENDS="libandroid-support, libiconv, ncurses, readline (>= 8.0), termux-tools"
@@ -37,7 +38,8 @@ TERMUX_PKG_RM_AFTER_INSTALL="share/man/man1/bashbug.1 bin/bashbug"
 termux_step_pre_configure() {
 	declare -A PATCH_CHECKSUMS
 
-	# PATCH_CHECKSUMS[001]=
+	PATCH_CHECKSUMS[001]=f42f2fee923bc2209f406a1892772121c467f44533bedfe00a176139da5d310a
+	PATCH_CHECKSUMS[002]=45cc5e1b876550eee96f95bffb36c41b6cb7c07d33f671db5634405cd00fd7b8
 
 	for PATCH_NUM in $(seq -f '%03g' ${_PATCH_VERSION}); do
 		PATCHFILE=$TERMUX_PKG_CACHEDIR/bash_patch_${PATCH_NUM}.patch
@@ -51,12 +53,12 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_make_install() {
-	sed -e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|" \
-		-e "s|@TERMUX_HOME@|$TERMUX_ANDROID_HOME|" \
+	sed -e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
+		-e "s|@TERMUX_HOME@|$TERMUX_ANDROID_HOME|g" \
 		$TERMUX_PKG_BUILDER_DIR/etc-profile > $TERMUX_PREFIX/etc/profile
 
 	# /etc/bash.bashrc - System-wide .bashrc file for interactive shells. (config-top.h in bash source, patched to enable):
-	sed -e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|" \
-		-e "s|@TERMUX_HOME@|$TERMUX_ANDROID_HOME|" \
+	sed -e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
+		-e "s|@TERMUX_HOME@|$TERMUX_ANDROID_HOME|g" \
 		$TERMUX_PKG_BUILDER_DIR/etc-bash.bashrc > $TERMUX_PREFIX/etc/bash.bashrc
 }

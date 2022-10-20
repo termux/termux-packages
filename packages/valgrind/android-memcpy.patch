@@ -9,31 +9,14 @@ When we link against clang's builtin library
 
 Hopefully it is fine to remove these overrides now.
 
---- ./coregrind/m_main.c.orig	2022-01-02 12:15:07.892429627 +0100
-+++ ./coregrind/m_main.c	2022-01-02 12:24:20.961799164 +0100
-@@ -2595,25 +2595,6 @@
-         || defined(VGPV_mips32_linux_android) \
-         || defined(VGPV_arm64_linux_android))
+--- a/coregrind/m_main.c
++++ b/coregrind/m_main.c
+@@ -2633,7 +2633,7 @@
+ #endif /* defined(VGP_arm_linux) */
  
--/* Replace __aeabi_memcpy* functions with vgPlain_memcpy. */
--void *__aeabi_memcpy(void *dest, const void *src, SizeT n);
--void *__aeabi_memcpy(void *dest, const void *src, SizeT n)
--{
--    return VG_(memcpy)(dest, src, n);
--}
--
--void *__aeabi_memcpy4(void *dest, const void *src, SizeT n);
--void *__aeabi_memcpy4(void *dest, const void *src, SizeT n)
--{
--    return VG_(memcpy)(dest, src, n);
--}
--
--void *__aeabi_memcpy8(void *dest, const void *src, SizeT n);
--void *__aeabi_memcpy8(void *dest, const void *src, SizeT n)
--{
--    return VG_(memcpy)(dest, src, n);
--}
--
- /* Replace __aeabi_memclr* functions with vgPlain_memset. */
- void *__aeabi_memclr(void *dest, SizeT n);
- void *__aeabi_memclr(void *dest, SizeT n)
+ /* Some Android helpers.  See bug 368529. */
+-#if defined(__clang__) \
++#if 0 && defined(__clang__) \
+     && (defined(VGPV_arm_linux_android) \
+         || defined(VGPV_x86_linux_android) \
+         || defined(VGPV_mips32_linux_android) \

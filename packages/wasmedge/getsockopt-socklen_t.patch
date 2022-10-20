@@ -64,14 +64,14 @@ diff -uNr WasmEdge/lib/host/wasi/wasifunc.cpp WasmEdge.mod/lib/host/wasi/wasifun
 --- WasmEdge/lib/host/wasi/wasifunc.cpp	2022-07-28 18:56:12.000000000 +0800
 +++ WasmEdge.mod/lib/host/wasi/wasifunc.cpp	2022-08-15 01:56:27.730339246 +0800
 @@ -2061,7 +2061,7 @@
- Expect<uint32_t>
- WasiSockGetOpt::body(Runtime::Instance::MemoryInstance *MemInst, int32_t Fd,
-                      uint32_t SockOptLevel, uint32_t SockOptName,
--                     uint32_t FlagPtr, uint32_t FlagSizePtr) {
-+                     uint32_t FlagPtr, socklen_t FlagSizePtr) {
+ Expect<uint32_t> WasiSockGetOpt::body(const Runtime::CallingFrame &Frame,
+                                       int32_t Fd, uint32_t SockOptLevel,
+                                       uint32_t SockOptName, uint32_t FlagPtr,
+-                                      uint32_t FlagSizePtr) {
++                                      socklen_t FlagSizePtr) {
+   auto *MemInst = Frame.getMemoryByIndex(0);
    if (MemInst == nullptr) {
      return __WASI_ERRNO_FAULT;
-   }
 @@ -2080,7 +2080,7 @@
      WasiSockOptName = *Res;
    }

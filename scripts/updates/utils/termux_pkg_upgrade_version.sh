@@ -63,12 +63,25 @@ termux_pkg_upgrade_version() {
 		fi
 
 		echo "INFO: Trying to build package."
+
+		for repo_path in $(jq --raw-output 'keys | .[]' ${TERMUX_SCRIPTDIR}/repo.json); do
+			_buildsh_path="${TERMUX_SCRIPTDIR}/${repo_path}/${TERMUX_PKG_NAME}/build.sh"
+			repo=$(jq --raw-output ".\"${repo_path}\".name" ${TERMUX_SCRIPTDIR}/repo.json)
+			repo=${repo#"termux-"}
+
+			if [ -f "${_buildsh_path}" ]; then
+				echo "INFO: Package ${TERMUX_PKG_NAME} exists in ${repo} repo."
+				unset _buildsh_path repo_path
+				break
+			fi
+		done
+
 		if "${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" ./build-package.sh -a "${TERMUX_ARCH}" -I "${TERMUX_PKG_NAME}"; then
 			if [[ "${GIT_COMMIT_PACKAGES}" == "true" ]]; then
 				echo "INFO: Committing package."
 				stderr="$(
 					git add "${TERMUX_PKG_BUILDER_DIR}" 2>&1 >/dev/null
-					git commit -m "${TERMUX_PKG_NAME}: update to ${LATEST_VERSION}" \
+					git commit -m "upgpkg(${repo}/${TERMUX_PKG_NAME}): ${LATEST_VERSION}" \
 						-m "This commit has been automatically submitted by Github Actions." 2>&1 >/dev/null
 				)" || {
 					termux_error_exit <<-EndOfError

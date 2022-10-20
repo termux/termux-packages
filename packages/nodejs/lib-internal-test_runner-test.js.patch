@@ -1,8 +1,6 @@
-diff --git a/lib/internal/test_runner/test.js b/lib/internal/test_runner/test.js
-index 1663958f..8813f52b 100644
---- a/lib/internal/test_runner/test.js
-+++ b/lib/internal/test_runner/test.js
-@@ -39,7 +39,7 @@ const {
+--- ./lib/internal/test_runner/test.js.orig	2022-10-05 20:33:27.680099607 +0530
++++ ./lib/internal/test_runner/test.js	2022-10-05 20:35:19.150099564 +0530
+@@ -44,7 +44,7 @@
  } = require('internal/validators');
  const { setTimeout } = require('timers/promises');
  const { TIMEOUT_MAX } = require('internal/timers');
@@ -11,21 +9,21 @@ index 1663958f..8813f52b 100644
  const { bigint: hrtime } = process.hrtime;
  const kCallbackAndPromisePresent = 'callbackAndPromisePresent';
  const kCancelledByParent = 'cancelledByParent';
-@@ -53,7 +53,7 @@ const noop = FunctionPrototype;
+@@ -59,7 +59,7 @@
  const isTestRunner = getOptionValue('--test');
  const testOnlyFlag = !isTestRunner && getOptionValue('--test-only');
  // TODO(cjihrig): Use uv_available_parallelism() once it lands.
 -const rootConcurrency = isTestRunner ? MathMax(cpus().length - 1, 1) : 1;
 +const rootConcurrency = isTestRunner ? MathMax(numcpus() - 1, 1) : 1;
  const kShouldAbort = Symbol('kShouldAbort');
+ const kRunHook = Symbol('kRunHook');
+ const kHookNames = ObjectSeal(['before', 'after', 'beforeEach', 'afterEach']);
+@@ -180,7 +180,7 @@
  
- 
-@@ -153,7 +153,7 @@ class Test extends AsyncResource {
-       this.concurrency = concurrency;
-     } else if (typeof concurrency === 'boolean') {
-       if (concurrency) {
--        this.concurrency = isTestRunner ? MathMax(cpus().length - 1, 1) : Infinity;
-+        this.concurrency = isTestRunner ? MathMax(numcpus() - 1, 1) : Infinity;
-       } else {
-         this.concurrency = 1;
-       }
+       case 'boolean':
+         if (concurrency) {
+-          this.concurrency = parent === null ? MathMax(cpus().length - 1, 1) : Infinity;
++          this.concurrency = parent === null ? MathMax(numcpus() - 1, 1) : Infinity;
+         } else {
+           this.concurrency = 1;
+         }

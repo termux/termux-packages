@@ -1,0 +1,19 @@
+--- ./test/parallel/test-dgram-bind-fd.js.orig	2022-06-05 10:30:47.907598510 +0530
++++ ./test/parallel/test-dgram-bind-fd.js	2022-06-05 10:31:18.697598498 +0530
+@@ -7,6 +7,7 @@
+ const assert = require('assert');
+ const dgram = require('dgram');
+ const { internalBinding } = require('internal/test/binding');
++const { platform } = require('os');
+ const { UDP } = internalBinding('udp_wrap');
+ const { UV_UDP_REUSEADDR } = require('os').constants;
+ 
+@@ -77,7 +78,7 @@
+         const sendBufferSize = socket.getSendBufferSize();
+ 
+         // note: linux will double the buffer size
+-        const expectedBufferSize = common.isLinux ?
++        const expectedBufferSize = (common.isLinux || platform() === 'android') ?
+           BUFFER_SIZE * 2 : BUFFER_SIZE;
+         assert.strictEqual(recvBufferSize, expectedBufferSize);
+         assert.strictEqual(sendBufferSize, expectedBufferSize);

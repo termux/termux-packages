@@ -39,9 +39,9 @@ TERMUX_REPO_PACKAGE="com.termux"
 
 # Termux repo urls.
 TERMUX_REPO_URL=(
-	https://packages-cf.termux.dev/apt/termux-main
-	https://packages-cf.termux.dev/apt/termux-root
-	https://packages-cf.termux.dev/apt/termux-x11
+	https://packages.termux.dev/apt/termux-main
+	https://packages.termux.dev/apt/termux-root
+	https://packages.termux.dev/apt/termux-x11
 )
 
 TERMUX_REPO_DISTRIBUTION=(
