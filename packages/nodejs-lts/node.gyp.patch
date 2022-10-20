@@ -1,7 +1,6 @@
-diff '--color=auto' -uNr node-v16.14.2.orig/node.gyp node-v16.14.2/node.gyp
---- node-v16.14.2.orig/node.gyp	2022-03-18 15:06:23.851091188 +0530
-+++ node-v16.14.2/node.gyp	2022-03-18 15:08:48.671091132 +0530
-@@ -353,6 +353,7 @@
+--- ./node.gyp.orig	2022-10-12 17:19:36.000000000 +0530
++++ ./node.gyp	2022-10-20 06:36:48.853792369 +0530
+@@ -402,6 +402,7 @@
  
        'include_dirs': [
          'src',
@@ -9,7 +8,7 @@ diff '--color=auto' -uNr node-v16.14.2.orig/node.gyp node-v16.14.2/node.gyp
          '<(SHARED_INTERMEDIATE_DIR)' # for node_natives.h
        ],
        'dependencies': [
-@@ -1075,162 +1076,6 @@
+@@ -1126,165 +1127,6 @@
          }],
        ],
      }, # fuzz_env
@@ -19,6 +18,7 @@ diff '--color=auto' -uNr node-v16.14.2.orig/node.gyp node-v16.14.2/node.gyp
 -
 -      'dependencies': [
 -        '<(node_lib_target_name)',
+-        'deps/base64/base64.gyp:base64',
 -        'deps/googletest/googletest.gyp:gtest',
 -        'deps/googletest/googletest.gyp:gtest_main',
 -        'deps/histogram/histogram.gyp:histogram',
@@ -63,6 +63,7 @@ diff '--color=auto' -uNr node-v16.14.2.orig/node.gyp node-v16.14.2/node.gyp
 -        'test/cctest/test_node_api.cc',
 -        'test/cctest/test_per_process.cc',
 -        'test/cctest/test_platform.cc',
+-        'test/cctest/test_report.cc',
 -        'test/cctest/test_json_utils.cc',
 -        'test/cctest/test_sockaddr.cc',
 -        'test/cctest/test_traced_value.cc',
@@ -76,6 +77,7 @@ diff '--color=auto' -uNr node-v16.14.2.orig/node.gyp node-v16.14.2/node.gyp
 -            'HAVE_OPENSSL=1',
 -          ],
 -          'sources': [
+-            'test/cctest/test_crypto_clienthello.cc',
 -            'test/cctest/test_node_crypto.cc',
 -          ]
 -        }],
@@ -172,7 +174,7 @@ diff '--color=auto' -uNr node-v16.14.2.orig/node.gyp node-v16.14.2/node.gyp
  
      {
        'target_name': 'overlapped-checker',
-@@ -1309,59 +1154,13 @@
+@@ -1363,59 +1205,13 @@
              'Ws2_32.lib',
            ],
          }],
