@@ -216,6 +216,9 @@ PACKAGES+=" sqlite3"
 PACKAGES+=" cvs"
 PACKAGES+=" python3-yaml"
 
+# Needed by gobject-introspection (termux_setup_gir).
+PACKAGES+=" bash-static"
+
 # Needed by apt.
 PACKAGES+=" triehash"
 
