@@ -1,5 +1,14 @@
 --- a/meson.build
 +++ b/meson.build
+@@ -151,7 +152,7 @@
+   fallback : ['libffi', 'ffi_dep'])
+ 
+ if not (host_system == 'darwin' and host_arch == 'aarch64' or
+-        host_system == 'linux' and libffi_dep.version().version_compare('>= 3.4'))
++        (host_system == 'linux' or host_system == 'android') and libffi_dep.version().version_compare('>= 3.4'))
+   config.set('LEGACY_GIRFFI_FREE', 1)
+ endif
+ 
 @@ -251,9 +249,9 @@
  pkgconfig_variables = [
    'datadir=' + '${prefix}' / get_option('datadir'),
