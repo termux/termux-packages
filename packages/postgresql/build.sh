@@ -25,7 +25,6 @@ USE_UNNAMED_POSIX_SEMAPHORES=1
 --with-uuid=e2fs
 ZIC=$TERMUX_PKG_HOSTBUILD_DIR/src/timezone/zic
 "
-TERMUX_PKG_EXTRA_MAKE_ARGS=" -s"
 TERMUX_PKG_RM_AFTER_INSTALL="lib/libecpg* bin/ecpg share/man/man1/ecpg.1"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_BREAKS="postgresql-contrib (<= 10.3-1), postgresql-dev"
