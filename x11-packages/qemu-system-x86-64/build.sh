@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A generic and open source machine emulator and virtualiz
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1:7.1.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.qemu.org/qemu-${TERMUX_PKG_VERSION:2}.tar.xz
 TERMUX_PKG_SHA256=a0634e536bded57cf38ec8a751adb124b89c776fe0846f21ab6c6728f1cbbbe6
 TERMUX_PKG_DEPENDS="glib, gtk3, libbz2, libc++, libcurl, libgnutls, libiconv, libjpeg-turbo, liblzo, libnettle, libnfs, libpixman, libpng, libspice-server, libssh, libusb, libusbredir, libx11, ncurses, pulseaudio, qemu-common, resolv-conf, sdl2, sdl2-image, zlib, zstd"
@@ -44,7 +45,10 @@ TERMUX_PKG_BUILD_IN_SRC=true
 termux_step_configure() {
 	termux_setup_ninja
 
-	if [ "$TERMUX_ARCH" = "i686" ]; then
+	if [ "$TERMUX_ARCH" = aarch64 ]; then
+		CFLAGS+=" -mbranch-protection=pac-ret"
+		CXXFLAGS+=" -mbranch-protection=pac-ret"
+	elif [ "$TERMUX_ARCH" = i686 ]; then
 		LDFLAGS+=" -latomic"
 	fi
 
