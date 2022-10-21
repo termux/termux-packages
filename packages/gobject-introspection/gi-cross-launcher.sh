@@ -28,7 +28,7 @@ esac
 arg="$2"
 case "$arg" in
     --introspect-dump=*,* ) ;;
-    * ) echo "$ERROR_HEADER Unsupported command: $@" >&2 ;;
+    * ) echo "$ERROR_HEADER Unsupported command: $@" >&2; exit 1 ;;
 esac
 
 cmd_base="$(basename "$cmd")"

@@ -17,13 +17,15 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 
 termux_step_pre_configure() {
 	termux_setup_gir
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
+		-Dgi_cross_binary_wrapper=$GI_CROSS_LAUNCHER
+		"
+	unset GI_CROSS_LAUNCHER
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
 			-Dgi_cross_use_prebuilt_gi=true
-			-Dgi_cross_binary_wrapper=$GI_CROSS_LAUNCHER
 			-Dgi_cross_ldd_wrapper=$(command -v ldd)
 			"
-		unset GI_CROSS_LAUNCHER
 	fi
 
 	_PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
