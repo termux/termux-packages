@@ -7,3 +7,6 @@ TERMUX_PKG_SRCURL=https://github.com/jordansissel/xdotool/releases/download/v${T
 TERMUX_PKG_SHA256=96f0facfde6d78eacad35b91b0f46fecd0b35e474c03e00e30da3fdd345f9ada
 TERMUX_PKG_DEPENDS="libx11, libxtst, libxinerama, libxkbcommon"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_EXTRA_MAKE_ARGS="
+INSTALLMAN=$TERMUX_PREFIX/share/man
+"
