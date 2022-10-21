@@ -10,6 +10,7 @@ TERMUX_PKG_DEPENDS="graphene, gstreamer, libandroid-shmem, libjpeg-turbo, libopu
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner"
 TERMUX_PKG_BREAKS="gst-plugins-base-dev"
 TERMUX_PKG_REPLACES="gst-plugins-base-dev"
+TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dintrospection=enabled
 -Dtests=disabled

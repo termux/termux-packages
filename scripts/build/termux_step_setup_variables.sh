@@ -91,6 +91,7 @@ termux_step_setup_variables() {
 	TERMUX_PKG_CONFLICTS="" # https://www.debian.org/doc/debian-policy/ch-relationships.html#s-conflicts
 	TERMUX_PKG_DEPENDS=""
 	TERMUX_PKG_DESCRIPTION="FIXME:Add description"
+	TERMUX_PKG_DISABLE_GIR=false # termux_setup_gir
 	TERMUX_PKG_ESSENTIAL=false
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS=""
 	TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS=""

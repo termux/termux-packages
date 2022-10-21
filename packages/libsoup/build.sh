@@ -14,6 +14,7 @@ TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner"
 TERMUX_PKG_RECOMMENDS="glib-networking"
 TERMUX_PKG_BREAKS="libsoup-dev"
 TERMUX_PKG_REPLACES="libsoup-dev"
+TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dintrospection=enabled
 -Dvapi=enabled

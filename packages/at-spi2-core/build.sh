@@ -12,6 +12,7 @@ TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, libxml2"
 TERMUX_PKG_PROVIDES="at-spi2-atk, atk"
 TERMUX_PKG_REPLACES="at-spi2-atk (<< 2.46.0), atk (<< 2.46.0), libatk"
 TERMUX_PKG_BREAKS="at-spi2-atk (<< 2.46.0), atk (<< 2.46.0), libatk"
+TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Ddbus_daemon=$TERMUX_PREFIX/bin/dbus-daemon
 -Dintrospection=yes

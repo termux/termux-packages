@@ -1,4 +1,21 @@
 termux_setup_gir() {
+	if [ "$TERMUX_PKG_DISABLE_GIR" = "true" ]; then
+		local args=" ${TERMUX_PKG_EXTRA_CONFIGURE_ARGS//$'\n'/ } "
+		args="${args//$'\t'/ }"
+		args="${args// --enable-introspection / --disable-introspection }"
+		args="${args// --enable-introspection=yes / --enable-introspection=no }"
+		args="${args// -DENABLE_INTROSPECTION=ON / -DENABLE_INTROSPECTION=OFF }"
+		args="${args// -Dbuild_introspection_data=true / -Dbuild_introspection_data=false }"
+		args="${args// -Dgir=true / -Dgir=false }"
+		args="${args// -Dgobject=enabled / -Dgobject=disabled }"
+		args="${args// -Dintrospection=enabled / -Dintrospection=disabled }"
+		args="${args// -Dintrospection=true / -Dintrospection=false }"
+		args="${args// -Dintrospection=yes / -Dintrospection=no }"
+		args="${args// -Dvapi=enabled / -Dvapi=disabled }"
+		args="${args// -Dvapi=true / -Dvapi=false }"
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS="$args"
+	fi
+
 	# Used by gi-cross-launcher:
 	export TERMUX_PKG_GIR_PRE_GENERATED_DUMP_DIR="$TERMUX_PKG_BUILDER_DIR/gir/${TERMUX_PKG_VERSION##*:}"
 

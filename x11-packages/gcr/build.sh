@@ -11,6 +11,7 @@ TERMUX_PKG_SHA256=bb7128a3c2febbfee9c03b90d77d498d0ceb237b0789802d60185c71c4bea2
 TERMUX_PKG_DEPENDS="glib, gtk3, libcairo, libgcrypt, p11-kit, pango"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, gnupg"
 TERMUX_PKG_RECOMMENDS="gnupg"
+TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dintrospection=true
 -Dgtk=true

@@ -10,6 +10,7 @@ TERMUX_PKG_DEPENDS="glib, libpng, libtiff, libjpeg-turbo, zstd"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner"
 TERMUX_PKG_BREAKS="gdk-pixbuf-dev"
 TERMUX_PKG_REPLACES="gdk-pixbuf-dev"
+TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dgtk_doc=false
 -Dintrospection=enabled

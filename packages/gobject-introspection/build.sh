@@ -9,6 +9,7 @@ TERMUX_PKG_SRCURL=https://download.gnome.org/sources/gobject-introspection/${_MA
 TERMUX_PKG_SHA256=347b3a719e68ba4c69ff2d57ee2689233ea8c07fc492205e573386779e42d653
 TERMUX_PKG_DEPENDS="glib, libffi"
 TERMUX_PKG_SUGGESTS="g-ir-scanner"
+TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dcairo_libname=libcairo-gobject.so
 -Dpython=python

@@ -9,6 +9,7 @@ TERMUX_PKG_SRCURL=https://download.gnome.org/sources/gtksourceview/${_MAJOR_VERS
 TERMUX_PKG_SHA256=c30019506320ca2474d834cced1e2217ea533e00eb2a3f4eb7879007940ec682
 TERMUX_PKG_DEPENDS="atk, fribidi, glib, gtk3, libcairo, libxml2, pango"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner"
+TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dgir=true
 -Dvapi=false
