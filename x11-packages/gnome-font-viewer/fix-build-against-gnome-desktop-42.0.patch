@@ -1,0 +1,28 @@
+--- a/src/font-view.c
++++ b/src/font-view.c
+@@ -207,7 +207,7 @@
+ 
+     factory = gnome_desktop_thumbnail_factory_new (GNOME_DESKTOP_THUMBNAIL_SIZE_LARGE);
+     pixbuf = gnome_desktop_thumbnail_factory_generate_thumbnail
+-        (factory, thumb_uri, g_file_info_get_content_type (info));
++        (factory, thumb_uri, g_file_info_get_content_type (info), NULL, NULL);
+ 
+     mtime = g_file_info_get_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED);
+     if (pixbuf != NULL) {
+@@ -216,12 +216,14 @@
+                                                      128 * scale_factor,
+                                                      GDK_INTERP_BILINEAR);
+         gnome_desktop_thumbnail_factory_save_thumbnail (factory, pixbuf,
+-                                                        thumb_uri, (time_t) mtime);
++                                                        thumb_uri, (time_t) mtime,
++                                                        NULL, NULL);
+         g_object_unref (pixbuf);
+         pixbuf = scaled;
+     } else {
+         gnome_desktop_thumbnail_factory_create_failed_thumbnail (factory,
+-                                                                 thumb_uri, (time_t) mtime);
++                                                                 thumb_uri, (time_t) mtime,
++                                                                 NULL, NULL);
+     }
+ 
+     return g_steal_pointer (&pixbuf);
