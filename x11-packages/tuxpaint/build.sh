@@ -36,3 +36,8 @@ termux_step_pre_configure() {
 
 	LDFLAGS+=" -landroid-wordexp"
 }
+
+termux_step_post_configure() {
+	# https://github.com/termux/termux-packages/issues/12458
+	mkdir -p trans
+}
