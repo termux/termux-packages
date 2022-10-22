@@ -34,7 +34,6 @@ termux_setup_gir() {
 		else
 			local scanner="$bin/g-ir-scanner"
 			local compiler="$bin/g-ir-compiler"
-			local vapigen="$bin/vapigen"
 			local ldd="$bin/ldd"
 			export TERMUX_G_IR_COMPILER="$compiler"
 
@@ -56,13 +55,18 @@ termux_setup_gir() {
 			EOF
 			chmod 0700 "$compiler"
 
-			cat > "$vapigen" <<-EOF
-				#!$(command -v sh)
-				exec /usr/bin/vapigen \
+			local cmd
+			for cmd in valac vapigen; do
+				local v="$bin/$cmd"
+				cat > "$v" <<-EOF
+					#!$(command -v sh)
+					exec /usr/bin/$cmd \
+					--vapidir="$TERMUX_PREFIX/share/vala/vapi" \
 					--girdir="$TERMUX_PREFIX/share/gir-1.0" \
 					"\$@"
-			EOF
-			chmod 0700 "$vapigen"
+				EOF
+				chmod 0700 "$v"
+			done
 
 			cat > "$ldd" <<-EOF
 				#!/bin/bash-static
