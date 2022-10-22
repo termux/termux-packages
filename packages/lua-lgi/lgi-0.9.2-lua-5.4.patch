@@ -1,0 +1,29 @@
+From 5cfd42c386d3adae6d211fbb4011179c3c141b04 Mon Sep 17 00:00:00 2001
+From: Uli Schlachter <psychon@znc.in>
+Date: Sun, 2 Aug 2020 16:14:27 +0200
+Subject: [PATCH] Fix the build with Lua 5.4
+
+Lua 5.4 changed the API to lua_resume(). This commit changes the code to
+cope with that.
+
+Signed-off-by: Uli Schlachter <psychon@znc.in>
+---
+ lgi/callable.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/lgi/callable.c b/lgi/callable.c
+index e96d3af4..3234b64f 100644
+--- a/lgi/callable.c
++++ b/lgi/callable.c
+@@ -1355,7 +1355,10 @@ closure_callback (ffi_cif *cif, void *ret, void **args, void *closure_arg)
+     }
+   else
+     {
+-#if LUA_VERSION_NUM >= 502
++#if LUA_VERSION_NUM >= 504
++      int nresults;
++      res = lua_resume (L, NULL, npos, &nresults);
++#elif LUA_VERSION_NUM >= 502
+       res = lua_resume (L, NULL, npos);
+ #else
+       res = lua_resume (L, npos);
