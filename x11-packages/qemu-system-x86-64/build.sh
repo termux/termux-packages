@@ -46,8 +46,8 @@ termux_step_configure() {
 	termux_setup_ninja
 
 	if [ "$TERMUX_ARCH" = aarch64 ]; then
-		CFLAGS+=" -mbranch-protection=pac-ret+leaf"
-		CXXFLAGS+=" -mbranch-protection=pac-ret+leaf"
+		CFLAGS+=" -mbranch-protection=standard"
+		CXXFLAGS+=" -mbranch-protection=standard"
 	elif [ "$TERMUX_ARCH" = i686 ]; then
 		LDFLAGS+=" -latomic"
 	fi
