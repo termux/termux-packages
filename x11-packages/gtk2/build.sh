@@ -2,16 +2,15 @@ TERMUX_PKG_HOMEPAGE=https://www.gtk.org/
 TERMUX_PKG_DESCRIPTION="GObject-based multi-platform GUI toolkit (legacy)"
 TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.24.32
-TERMUX_PKG_REVISION=36
+TERMUX_PKG_VERSION=2.24.33
 TERMUX_PKG_SRCURL=https://github.com/GNOME/gtk/archive/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=961678c64ad986029befd7bdd8ed3e3849e2c5e54d24affbc7d49758245c87fa
+TERMUX_PKG_SHA256=dedfaf04952434c5e3e1ce4de373ac7474d12da2d99b0afc947ef1983df64601
 TERMUX_PKG_BUILD_IN_SRC=true
-
-TERMUX_PKG_DEPENDS="adwaita-icon-theme, atk, coreutils, desktop-file-utils, glib-bin, gtk-update-icon-cache, libcairo, librsvg, libxcomposite, libxcursor, libxdamage, libxi, libxinerama, libxrandr, pango, shared-mime-info, ttf-dejavu"
+TERMUX_PKG_DEPENDS="adwaita-icon-theme, atk, coreutils, desktop-file-utils, glib-bin, gtk-update-icon-cache, libandroid-shmem, libcairo, librsvg, libxcomposite, libxcursor, libxdamage, libxi, libxinerama, libxrandr, pango, shared-mime-info, ttf-dejavu"
+TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner"
 TERMUX_PKG_CONFLICTS="libgtk2"
 TERMUX_PKG_REPLACES="libgtk2"
-
+TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-shm
 --enable-xkb
@@ -19,7 +18,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-glibtest
 --disable-cups
 --disable-papi
---enable-introspection=no
+--enable-introspection=yes
 "
 
 ## 1. gtk-update-icon-cache is subpackage of 'gtk3'
@@ -31,8 +30,15 @@ lib/locale
 
 termux_step_pre_configure() {
 	NOCONFIGURE=1 ./autogen.sh
+
+	termux_setup_gir
+
 	export LIBS="-landroid-shmem"
 	export LDFLAGS="${LDFLAGS} -landroid-shmem"
+}
+
+termux_step_post_configure() {
+	touch ./gtk/g-ir-scanner
 }
 
 termux_step_create_debscripts() {
