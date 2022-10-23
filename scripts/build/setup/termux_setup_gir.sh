@@ -14,6 +14,8 @@ termux_setup_gir() {
 		args="${args// -Dintrospection=yes / -Dintrospection=no }"
 		args="${args// -Dvapi=enabled / -Dvapi=disabled }"
 		args="${args// -Dvapi=true / -Dvapi=false }"
+		args="${args// -Dwith_introspection=true / -Dwith_introspection=false }"
+		args="${args// -Dwith_vapi=true / -Dwith_vapi=false }"
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS="$args"
 	fi
 
