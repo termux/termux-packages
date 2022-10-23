@@ -2,12 +2,18 @@ TERMUX_PKG_HOMEPAGE=https://gitlab.gnome.org/GNOME/libwnck
 TERMUX_PKG_DESCRIPTION="Window Navigator Construction Kit"
 TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.36.0
-TERMUX_PKG_REVISION=13
-TERMUX_PKG_SRCURL=http://ftp.gnome.org/pub/gnome/sources/libwnck/${TERMUX_PKG_VERSION:0:4}/libwnck-$TERMUX_PKG_VERSION.tar.xz
-TERMUX_PKG_SHA256=bc508150b3ed5d22354b0e6774ad4eee465381ebc0ace45eb0e2d3a4186c925f
-TERMUX_PKG_DEPENDS="gtk2, startup-notification"
+_MAJOR_VERSION=43
+TERMUX_PKG_VERSION=${_MAJOR_VERSION}.0
+TERMUX_PKG_SRCURL=https://ftp.gnome.org/pub/GNOME/sources/libwnck/${_MAJOR_VERSION}/libwnck-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=905bcdb85847d6b8f8861e56b30cd6dc61eae67ecef4cd994a9f925a26a2c1fe
+TERMUX_PKG_DEPENDS="atk, gdk-pixbuf, glib, gtk3, libcairo, libx11, libxrender, pango, startup-notification"
+TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner"
 TERMUX_PKG_RM_AFTER_INSTALL="lib/locale"
+TERMUX_PKG_DISABLE_GIR=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
--Dintrospection=disabled
+-Dintrospection=enabled
 "
+
+termux_step_pre_configure() {
+	termux_setup_gir
+}
