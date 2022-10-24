@@ -10,12 +10,12 @@ TERMUX_PKG_DEPENDS="xfce4-panel, python"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_configure() {
-    sed -e s,@prefix@,$TERMUX_PREFIX, Makefile.in.in > Makefile.in
-    sed \
-    -e s,@appname@,xfce4-panel-profiles,g \
-    -e s,@version@,$TERMUX_PKG_VERSION,g \
-    -e s,@mandir@,$TERMUX_PREFIX/share/man,g \
-    -e s,@docdir@,$TERMUX_PREFIX/share/doc/xfce4-panel-profiles,g \
-    -e s,@python@,$TERMUX_PREFIX/bin/python,g \
-     Makefile.in > Makefile
+	sed -e s,@prefix@,$TERMUX_PREFIX, Makefile.in.in > Makefile.in
+	sed \
+		-e s,@appname@,xfce4-panel-profiles,g \
+		-e s,@version@,$TERMUX_PKG_VERSION,g \
+		-e s,@mandir@,$TERMUX_PREFIX/share/man,g \
+		-e s,@docdir@,$TERMUX_PREFIX/share/doc/xfce4-panel-profiles,g \
+		-e s,@python@,$TERMUX_PREFIX/bin/python,g \
+		Makefile.in > Makefile
 }
