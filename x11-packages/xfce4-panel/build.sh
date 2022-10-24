@@ -7,12 +7,12 @@ TERMUX_PKG_REVISION=18
 TERMUX_PKG_SRCURL=https://archive.xfce.org/src/xfce/xfce4-panel/4.16/xfce4-panel-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=5934eaed8a76da52c29b734ccd79600255420333dd6ebd8fd9f066379af1e092
 TERMUX_PKG_DEPENDS="desktop-file-utils, exo, hicolor-icon-theme, garcon, libwnck, libxfce4ui, xfconf"
-TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, valac"
+TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner"
 TERMUX_PKG_DISABLE_GIR=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-gtk-doc-html=no
 --enable-introspection=yes
---enable-vala=yes
+--enable-vala=no
 --disable-dbusmenu-gtk3
 "
 
