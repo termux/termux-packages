@@ -4,7 +4,6 @@ termux_setup_gir() {
 		args="${args//$'\t'/ }"
 		args="${args// --enable-introspection / --disable-introspection }"
 		args="${args// --enable-introspection=yes / --enable-introspection=no }"
-		args="${args// -DENABLE_GOBJECT_INTROSPECTION=ON / -DENABLE_GOBJECT_INTROSPECTION=OFF }"
 		args="${args// -DENABLE_INTROSPECTION=ON / -DENABLE_INTROSPECTION=OFF }"
 		args="${args// -Dbuild_introspection_data=true / -Dbuild_introspection_data=false }"
 		args="${args// -Denable-gir=true / -Denable-gir=false }"
@@ -15,8 +14,6 @@ termux_setup_gir() {
 		args="${args// -Dintrospection=yes / -Dintrospection=no }"
 		args="${args// -Dvapi=enabled / -Dvapi=disabled }"
 		args="${args// -Dvapi=true / -Dvapi=false }"
-		args="${args// -Dwith_introspection=true / -Dwith_introspection=false }"
-		args="${args// -Dwith_vapi=true / -Dwith_vapi=false }"
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS="$args"
 	fi
 
