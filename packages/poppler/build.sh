@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Please align the version with `poppler-qt` package.
 TERMUX_PKG_VERSION=22.04.0
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 # Do not forget to bump revision of reverse dependencies and rebuild them
 # when SOVERSION is changed.
 _POPPLER_SOVERSION=120
@@ -12,8 +12,8 @@ TERMUX_PKG_SRCURL=https://poppler.freedesktop.org/poppler-${TERMUX_PKG_VERSION}.
 TERMUX_PKG_SHA256=813fb4b90e7bda63df53205c548602bae728887a60f4048aae4dbd9b1927deff
 TERMUX_PKG_DEPENDS="fontconfig, freetype, glib, libc++, libcairo, libcurl, libiconv, libjpeg-turbo, libpng, libtiff, littlecms, openjpeg, openjpeg-tools, zlib"
 TERMUX_PKG_BUILD_DEPENDS="boost, boost-headers"
-TERMUX_PKG_BREAKS="poppler-dev"
-TERMUX_PKG_REPLACES="poppler-dev"
+TERMUX_PKG_BREAKS="poppler-dev, poppler-qt (<< 22.04.0-3), poppler-qt (<< ${TERMUX_PKG_VERSION})"
+TERMUX_PKG_REPLACES="poppler-dev, poppler-qt (<< 22.04.0-3)"
 #texlive needs the xpdf headers
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DENABLE_GLIB=ON
