@@ -3,10 +3,10 @@ TERMUX_PKG_DESCRIPTION="A simple application to manage Xfce panel layouts."
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.0.13
-TERMUX_PKG_REVISION=8
+TERMUX_PKG_REVISION=9
 TERMUX_PKG_SRCURL=https://archive.xfce.org/src/apps/xfce4-panel-profiles/${TERMUX_PKG_VERSION:0:3}/xfce4-panel-profiles-$TERMUX_PKG_VERSION.tar.bz2
 TERMUX_PKG_SHA256=bc387c13f94109422dc72b0fcb919b0dc11619ba589d03e492252b0d2513b170
-TERMUX_PKG_DEPENDS="xfce4-panel, python"
+TERMUX_PKG_DEPENDS="xfce4-panel, pygobject, python"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_configure() {
