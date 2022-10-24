@@ -4,6 +4,8 @@ termux_setup_gir() {
 		args="${args//$'\t'/ }"
 		args="${args// --enable-introspection / --disable-introspection }"
 		args="${args// --enable-introspection=yes / --enable-introspection=no }"
+		args="${args// --enable-vala / --disable-vala }"
+		args="${args// --enable-vala=yes / --enable-vala=no }"
 		args="${args// -DENABLE_GOBJECT_INTROSPECTION=ON / -DENABLE_GOBJECT_INTROSPECTION=OFF }"
 		args="${args// -DENABLE_INTROSPECTION=ON / -DENABLE_INTROSPECTION=OFF }"
 		args="${args// -Dbuild_introspection_data=true / -Dbuild_introspection_data=false }"
