@@ -21,6 +21,13 @@ termux_setup_python_crossenv() {
 			tar xf $TERMUX_PKG_TMPDIR/$_CROSSENV_TAR -C $TERMUX_PKG_TMPDIR
 			mv "$TERMUX_PKG_TMPDIR/crossenv-$_CROSSENV_VERSION" \
 				$_CROSSENV_FOLDER
+			shopt -s nullglob
+			local f
+			for f in "$TERMUX_SCRIPTDIR"/scripts/build/setup/python-crossenv-*.patch; do
+				echo "[${FUNCNAME[0]}]: Applying $(basename "$f")"
+				patch --silent -p1 -d "$_CROSSENV_FOLDER" < "$f"
+			done
+			shopt -u nullglob
 		fi
 	fi
 }
