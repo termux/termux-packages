@@ -100,6 +100,7 @@ termux_step_create_debscripts() {
 	    rm -Rf ${TERMUX_PREFIX}/lib/python${_MAJOR_VERSION}/site-packages/pip-*.dist-info
 	fi
 
+	cd ${TERMUX_PREFIX}
 	${TERMUX_PREFIX}/bin/python3 -m ensurepip --upgrade --default-pip
 
 	exit 0
