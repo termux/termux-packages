@@ -48,16 +48,16 @@ jobs:
             cp -rf ./data/data/com.termux/files/usr/bin/node ./node/libnodeexe.so
             ls -al ./node
 
-            echo "# Copy Node.js runtime deps"
-            cd /home/builder/termux-packages/_out
-            cp -rf /data/data/com.termux/files/usr/lib/libssl* ./libs
-            cp -rf /data/data/com.termux/files/usr/lib/libcrypt* ./libs
-            rm -f ./libs/*.a
-            cp -f /data/data/com.termux/files/usr/lib/libc++_shared.so ./libs
-            ls -al ./libs
-            cd /home/builder/termux-packages/_out/libs
-            zip -9 libs *
-            ls -al
+      #            echo "# Copy Node.js runtime deps"
+      #            cd /home/builder/termux-packages/_out
+      #            cp -rf /data/data/com.termux/files/usr/lib/libssl* ./libs
+      #            cp -rf /data/data/com.termux/files/usr/lib/libcrypt* ./libs
+      #            rm -f ./libs/*.a
+      #            cp -f /data/data/com.termux/files/usr/lib/libc++_shared.so ./libs
+      #            ls -al ./libs
+      #            cd /home/builder/termux-packages/_out/libs
+      #            zip -9 libs *
+      #            ls -al
       - name: Post build
         run: |
           ls -al
@@ -68,4 +68,5 @@ jobs:
         with:
           files: |
             ./_out/node/libnodeexe.so
-            ./_out/libs/libs.zip
+
+#            ./_out/libs/libs.zip
