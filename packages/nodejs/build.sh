@@ -72,8 +72,6 @@ termux_step_configure() {
 
 	# See note above TERMUX_PKG_DEPENDS why we do not use a shared libuv.
   #    --openssl-no-asm \
-  #    --with-arm-fpu=neon
-  #    --with-arm-float-abi=hard
 	./configure \
 		--prefix=$TERMUX_PREFIX \
 		--dest-cpu=$DEST_CPU \
@@ -82,6 +80,8 @@ termux_step_configure() {
     --enable-static \
     --partly-static \
     --openssl-no-asm \
+    --with-arm-fpu=neon
+    --with-arm-float-abi=hard
     --without-intl \
     --without-npm \
     --without-etw \
