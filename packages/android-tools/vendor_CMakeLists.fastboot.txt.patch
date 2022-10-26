@@ -1,10 +1,87 @@
 diff --git a/vendor/CMakeLists.fastboot.txt b/vendor/CMakeLists.fastboot.txt
-index 1d43937..880bb8c 100644
+index a217ecc..1d8d3b1 100644
 --- a/vendor/CMakeLists.fastboot.txt
 +++ b/vendor/CMakeLists.fastboot.txt
-@@ -135,4 +135,4 @@ target_compile_definitions(fastboot PRIVATE
+@@ -5,7 +5,7 @@ add_library(libzip STATIC
+ 	libziparchive/zip_error.cpp
+ 	libziparchive/zip_writer.cc)
+ 
+-target_compile_definitions(libzip PRIVATE -DZLIB_CONST)
++target_compile_definitions(libzip PRIVATE -DZLIB_CONST -DINCFS_SUPPORT_DISABLED)
+ target_include_directories(libzip PUBLIC
+ 	libziparchive/include
+ 	libziparchive/incfs_support/include
+@@ -61,7 +61,41 @@ add_library(libselinux STATIC
+ 	selinux/libselinux/src/setrans_client.c
+ 	selinux/libselinux/src/sha1.c
+ 	selinux/libselinux/src/label_file.c
+-	selinux/libselinux/src/regex.c)
++	selinux/libselinux/src/regex.c
++	selinux/libselinux/src/android/android_platform.c
++	selinux/libselinux/src/android/android.c
++	selinux/libselinux/src/avc.c
++	selinux/libselinux/src/avc_internal.c
++	selinux/libselinux/src/avc_sidtab.c
++	selinux/libselinux/src/canonicalize_context.c
++	selinux/libselinux/src/checkAccess.c
++	selinux/libselinux/src/check_context.c
++	selinux/libselinux/src/compute_av.c
++	selinux/libselinux/src/compute_create.c
++	selinux/libselinux/src/compute_member.c
++	selinux/libselinux/src/context.c
++	selinux/libselinux/src/deny_unknown.c
++	selinux/libselinux/src/disable.c
++	selinux/libselinux/src/enabled.c
++	selinux/libselinux/src/fgetfilecon.c
++	selinux/libselinux/src/fsetfilecon.c
++	selinux/libselinux/src/getenforce.c
++	selinux/libselinux/src/getfilecon.c
++	selinux/libselinux/src/get_initial_context.c
++	selinux/libselinux/src/getpeercon.c
++	selinux/libselinux/src/init.c
++	selinux/libselinux/src/lgetfilecon.c
++	selinux/libselinux/src/load_policy.c
++	selinux/libselinux/src/lsetfilecon.c
++	selinux/libselinux/src/mapping.c
++	selinux/libselinux/src/policyvers.c
++	selinux/libselinux/src/procattr.c
++	selinux/libselinux/src/reject_unknown.c
++	selinux/libselinux/src/sestatus.c
++	selinux/libselinux/src/setenforce.c
++	selinux/libselinux/src/setfilecon.c
++	selinux/libselinux/src/stringrep.c
++	core/libpackagelistparser/packagelistparser.cpp)
+ 
+ target_compile_definitions(libselinux PRIVATE
+ 	-DAUDITD_LOG_TAG=1003 -D_GNU_SOURCE -DBUILD_HOST -DUSE_PCRE2
+@@ -82,6 +86,13 @@ target_compile_definitions(libselinux PRIVATE
+ target_include_directories(libselinux PUBLIC
+ 	selinux/libselinux/include selinux/libsepol/include)
+
++target_include_directories(libselinux PRIVATE
++	selinux/libselinux/src
++	libselinux/src/android
++	core/include
++	core/libpackagelistparser/include
++	logging/liblog/include)
++
+ add_library(libsepol
+ 	selinux/libsepol/src/assertion.c
+ 	selinux/libsepol/src/avrule_block.c
+@@ -100,6 +111,7 @@ add_library(libsepol
+ 	selinux/libsepol/src/policydb.c
+ 	selinux/libsepol/src/policydb_convert.c
+ 	selinux/libsepol/src/policydb_public.c
++	selinux/libsepol/src/policydb_validate.c
+ 	selinux/libsepol/src/services.c
+ 	selinux/libsepol/src/sidtab.c
+ 	selinux/libsepol/src/symtab.c
+@@ -135,7 +147,7 @@ target_compile_definitions(fastboot PRIV
  target_link_libraries(fastboot
  	libsparse libzip libcutils liblog libfsmgr libutil
  	libbase libext4 libselinux libsepol libdiagnoseusb crypto
--	z pcre2-8 pthread dl)
-+	z pcre2-8 dl usb-1.0)
+-	z PkgConfig::libpcre2-8 Threads::Threads dl)
++	z PkgConfig::libpcre2-8 Threads::Threads dl usb-1.0)
+ 
+ if(APPLE)
+ 	target_link_libraries(fastboot
