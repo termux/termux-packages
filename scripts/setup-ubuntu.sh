@@ -98,6 +98,9 @@ PACKAGES+=" libelf-dev"
 PACKAGES+=" libexpat1-dev"
 PACKAGES+=" libjpeg-dev"
 
+# Needed by package gimp3.
+PACKAGES+=" librsvg2-dev"
+
 # Needed by package news-flash-gtk.
 PACKAGES+=" libsqlite3-dev"
 
