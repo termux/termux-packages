@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://www.samba.org/
 TERMUX_PKG_DESCRIPTION="SMB/CIFS fileserver"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=4.14.14
+TERMUX_PKG_VERSION=4.15.11
 TERMUX_PKG_SRCURL=https://download.samba.org/pub/samba/samba-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=abd5e9e6aa45e55114b188ba189ebdfc8fd3d7718d43f749e477ce7f791e5519
-TERMUX_PKG_DEPENDS="libbsd, libcap, libcrypt, libgnutls, libiconv, libicu, libpopt, libtalloc, libtirpc, ncurses, openssl, readline, tdb-tools, zlib"
+TERMUX_PKG_SHA256=2f305980d49c7723cbef281fff2b81a2eeafae51e58b5172bb43d9693ef8953b
+TERMUX_PKG_DEPENDS="krb5, libandroid-spawn, libbsd, libcap, libcrypt, libgnutls, libiconv, libicu, libpopt, libtalloc, libtasn1, libtirpc, ncurses, openssl, readline, tdb-tools, zlib"
 TERMUX_PKG_BUILD_DEPENDS="e2fsprogs"
 TERMUX_PKG_BUILD_IN_SRC=true
 
@@ -21,15 +21,12 @@ share/man/man8/tdbrestore.8.gz
 share/man/man8/tdbtool.8.gz
 "
 
+termux_step_pre_configure() {
+	CPPFLAGS+=" -D_FILE_OFFSET_BITS=64"
+	LDFLAGS+=" -landroid-spawn"
+}
+
 termux_step_configure() {
-	:
-}
-
-termux_step_make() {
-	:
-}
-
-termux_step_make_install() {
 	local _auth_modules='auth_server,auth_netlogond,auth_script'
 	local _pdb_modules='pdb_tdbsam,pdb_smbpasswd,pdb_wbc_sam'
 	local _vfs_modules='vfs_fake_perms,!vfs_recycle,!vfs_btrfs,!vfs_glusterfs_fuse'
@@ -87,11 +84,13 @@ Checking whether the realpath function allows a NULL argument: OK
 Checking for ftruncate extend: OK
 getcwd takes a NULL argument: OK
 Checking for readlink breakage: NO
+Checking for gnutls fips mode support: NO
+Checking whether the WRFILE -keytab is supported: OK
 EOF
 
 	USING_SYSTEM_ASN1_COMPILE=1 ASN1_COMPILE=/usr/bin/asn1_compile \
 	USING_SYSTEM_COMPILE_ET=1 COMPILE_ET=/usr/bin/compile_et \
-	CFLAGS="-D__ANDROID_API__=24 -D__USE_FILE_OFFSET64=1" \
+	CFLAGS="$CFLAGS" LINKFLAGS="$CFLAGS $LDFLAGS" \
 	./buildtools/bin/waf configure \
 		--jobs="$TERMUX_MAKE_PROCESSES" \
 		--bundled-libraries='!asn1_compile,!compile_et' \
@@ -118,7 +117,6 @@ EOF
 		--without-ads \
 		--without-automount \
 		--without-dmapi \
-		--without-dnsupdate \
 		--without-fam \
 		--without-gettext \
 		--with-gpfs=/dev/null \
@@ -128,10 +126,10 @@ EOF
 		--without-ldb-lmdb \
 		--without-libarchive \
 		--without-lttng \
-		--without-ntvfs-fileserver \
 		--without-pam \
 		--without-quotas \
 		--without-regedit \
+		--with-system-mitkrb5 "$TERMUX_PREFIX" \
 		--without-systemd \
 		--without-utmp \
 		--without-winbind \
@@ -140,10 +138,21 @@ EOF
 		# --disable-fault-handling \
 		# --disable-rpath-private-install \
 		# --with-logfilebase="$TERMUX_PREFIX/tmp/log/samba" \
-                (cat cross-answers.txt | grep UNKNOWN && return 1)
+		(cat cross-answers.txt | grep UNKNOWN && return 1)
+}
 
+
+termux_step_make() {
+	./buildtools/bin/waf build --jobs="$TERMUX_MAKE_PROCESSES"
+}
+
+termux_step_make_install() {
 	./buildtools/bin/waf install --jobs="$TERMUX_MAKE_PROCESSES"
+}
 
+termux_step_post_make_install() {
+	install -Dm700 -t "$TERMUX_PREFIX/bin" \
+		"$TERMUX_PKG_SRCDIR/examples/scripts/nmb/findsmb"
 	mkdir -p "$TERMUX_PREFIX/share/doc/samba"
 	sed -e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
 		"$TERMUX_PKG_BUILDER_DIR/smb.conf.example.in" \
