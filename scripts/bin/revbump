@@ -1,95 +1,132 @@
-#!/usr/bin/env bash
-##
-##  Script for bumping package revision.
-##
-##  Licensed under the Apache License, Version 2.0 (the "License");
-##  you may not use this file except in compliance with the License.
-##  You may obtain a copy of the License at
-##
-##    http://www.apache.org/licenses/LICENSE-2.0
-##
-##  Unless required by applicable law or agreed to in writing, software
-##  distributed under the License is distributed on an "AS IS" BASIS,
-##  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-##  See the License for the specific language governing permissions and
-##  limitations under the License.
-##
+#!/usr/bin/env python3
+## Maintainer : @T-Dynamos
+import os
+import json
+import sys
 
-echo "WARNING: interface to this script has been changed. Run without any arguments to see the help message"
+filename = os.path.basename(sys.argv[0])
 
-if [ "${#}" = "0" ]; then
-	echo
-	echo "Usage: revbump [reason for rebuild] [package names] ..."
-	echo
-	echo "Add or increment TERMUX_PKG_REVISION of package."
-	echo
-	exit 1
-fi
+usage = f"""
+Usage:
 
-REPO_ROOT=$(realpath "$(dirname "$0")/../../")
-IS_GIT_REPOSITORY=false
+{filename} <package> ...            
 
-if git status >/dev/null 2>&1; then
-	IS_GIT_REPOSITORY=true
-fi
+Add or increment TERMUX_PKG_REVISION of package. 
 
-for package in "${@:2}"; do
-	package="${package%%/}"
-	buildsh_path=
-	repo=
-	for repo_path in $(jq --raw-output 'keys | .[]' ${REPO_ROOT}/repo.json); do
-		_buildsh_path="${REPO_ROOT}/${repo_path}/${package}/build.sh"
-		repo=$(jq --raw-output ".[\"${repo_path}\"].repo" ${REPO_ROOT}/repo.json)
-		echo $_buildsh_path
 
-		if [ -f "${_buildsh_path}" ]; then
-			buildsh_path=$_buildsh_path
-			break
-		fi
-	done
+{filename} --dependencies  <package>    
 
-	if [ -z "$buildsh_path" ]; then
-		echo "${package}: skipping as no build.sh found"
-		continue
-	fi
+Add or increment TERMUX_PKG_REVISION of all the packages that have <package> in TERMUX_PKG_DEPENDS or in TERMUX_PKG_BUILD_DEPENDS
+"""
 
-	if grep -qP '^TERMUX_PKG_REVISION=(\d+)$' "${buildsh_path}"; then
-		# Increment revision.
-		current_rev=$(. "${buildsh_path}" 2>/dev/null; echo "${TERMUX_PKG_REVISION}")
-		incremented_rev=$((current_rev + 1))
+REPO_PATH = os.path.join("/".join(os.path.realpath(sys.argv[0]).split("/")[:-3]), "repo.json")
+FOLDERS = [os.path.join("/".join(os.path.realpath(sys.argv[0]).split("/")[:-3]),folder) for folder in list(json.load(open(REPO_PATH)).keys())]
 
-		# Replace revision value in build.sh.
-		if ! ${IS_GIT_REPOSITORY}; then
-			echo "${package}: bumping to ${incremented_rev}"
-		fi
-		sed -i -E "s/^(TERMUX_PKG_REVISION=)(.*)$/\1${incremented_rev}/g" "${buildsh_path}"
-	else
-		# Add base (1) revision right after TERMUX_PKG_VERSION.
-		if ! ${IS_GIT_REPOSITORY}; then
-			echo "${package}: setting revision to 1"
-		fi
-		sed -i -E "/TERMUX_PKG_VERSION=(.*)/a TERMUX_PKG_REVISION=1" "${buildsh_path}"
-	fi
 
-	# If we are on Git repository, prompt for committing changes.
-	if ${IS_GIT_REPOSITORY}; then
-		echo
-		echo "You are about to commit these changes:"
-		echo
-		echo "--------------------"
-		git --no-pager diff --patch "${buildsh_path}"
-		echo "--------------------"
-		echo
-		echo "rebuild(${repo}/${package}): $1"
-		echo
-		read -re -p "Do you want to commit these changes ? (y/n) " CHOICE
-		echo
-		if [[ ${CHOICE} =~ (Y|y) ]]; then
-			git add "${buildsh_path}"
-			git commit -m "rebuild(${repo}/${package}): $1"
-		else
-			echo "Not committing to Git!"
-		fi
-		echo
-	fi
-done
+def is_dep(DEP: str, line: str) -> bool:
+    """
+    Checks if the dep is in line
+    """
+    tmp_deps = line.split("=")[1]
+    if tmp_deps.startswith('"'):
+        deps = [dep.strip() for dep in tmp_deps.split('"')[1].split(",")]
+    elif tmp_deps.startswith("'"):
+        deps = [dep.strip() for dep in tmp_deps.split("'")[1].split(",")]
+    else:
+        deps = [tmp_deps]
+
+    return DEP in deps
+
+
+def get_build_dependent_files(folders: list, DEP: str) -> list:
+    """
+    Gets all the packages that depend on some package
+    """
+    build_files = []
+    for d in folders:
+        for folder in os.listdir(d):
+            if os.path.exists(os.path.join(d, folder, "build.sh")):
+                with open(os.path.join(d, folder, "build.sh"), "r") as file:
+                    for line in file.read().split("\n"):
+                        if line.startswith("TERMUX_PKG_DEPENDS") or line.startswith(
+                            "TERMUX_PKG_BUILD_DEPENDS"
+                        ):
+                            if is_dep(DEP, line):
+                                build_files.append(os.path.join(d, folder, "build.sh"))
+                    file.close()
+    return build_files
+
+
+def bump_revision(file: str) -> None:
+    """
+    Bumps version in file
+    """
+    opened_file = open(file, "r")
+    file_read = opened_file.read().split("\n")
+    revision = 0
+
+    if "TERMUX_PKG_REVISION" in "\n".join(file_read):
+        for line in file_read:
+            if line.startswith("TERMUX_PKG_REVISION"):
+                revision = line.split("=")[-1]
+                if revision.startswith('"'):
+                    revision = revision.split('"')[1]
+                revision = int(revision) + 1
+                file_read[file_read.index(line)] = (
+                    line.split("=")[0] + "=" + str(revision)
+                    )
+                break
+
+    else:
+        for line in file_read:
+            if line.startswith("TERMUX_PKG_VERSION"):
+                file_read.insert(file_read.index(line) + 1, "TERMUX_PKG_REVISION=1")
+                revision = 1
+                break
+
+    opened_file.close()
+    opened_file = open(file,"w")
+    opened_file.write("\n".join(file_read))
+    opened_file.close()
+    print("{} -> {} {}".format(revision - 1, revision, file))
+
+
+def locate_dir(file: str) -> str:
+    """
+    Finds package in repo
+    """
+    for repo in FOLDERS:
+        if file in os.listdir(repo):
+            file_final = f"{repo}/{file}/build.sh"
+            return file_final if os.path.exists(file_final) else exit("Error : File {} does not exists!".format(file_final))
+    return exit("Package {} not found".format(file))
+
+
+def parse_args() -> None:
+    if len(sys.argv) == 1 or sys.argv[1] in ["--help", "-h"]:
+        print(usage)
+        exit(0)
+
+    if sys.argv[1] in ["--dependencies", "-d"] and len(sys.argv) > 2:
+        build_files = get_build_dependent_files(FOLDERS, os.path.basename(sys.argv[2]))
+        print("Bumping all {} files".format(len(build_files)), end="\n\n")
+        for files in build_files:
+            bump_revision(files)
+        exit(0)
+
+    if len(sys.argv) >= 2 and sys.argv[1] not in ["--dependencies", "-d"]:
+        print("Bumping {} packages".format(len(sys.argv[1:])), end="\n\n")
+        packages = sys.argv[1:]
+        for package in packages:
+            bump_revision(locate_dir((
+                    os.path.basename(package[:-1]) if package[-1] == "/" else os.path.basename(package)
+                    ) if "/" in package else package))
+        exit(0)
+
+    else:
+        print(usage)
+        exit(0)
+
+
+if __name__ == "__main__":
+    parse_args()
