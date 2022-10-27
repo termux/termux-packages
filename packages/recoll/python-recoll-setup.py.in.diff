@@ -1,0 +1,22 @@
+--- a/python/recoll/setup.py.in
++++ b/python/recoll/setup.py.in
+@@ -13,8 +13,8 @@
+ localtop = os.path.join(os.path.dirname(__file__), '..', '..')
+ 
+ library_dirs = [os.path.join(localtop, '.libs')]
+-if "CYGWIN" in os.environ:
+-	libraries =  ['recoll', 'xapian', 'iconv', 'z']
++if True:
++	libraries =  ['recoll', 'python@PYTHON_VERSION@', 'xslt', 'xml2', 'xapian', 'iconv', 'z']
+ else:
+ 	libraries = ['recoll']
+ 	
+@@ -31,7 +31,7 @@
+                     define_macros = [
+                                      ('RECOLL_DATADIR', '"@RECOLL_DATADIR@"')
+                                      ],
+-                    include_dirs = ['/usr/local/include',
++                    include_dirs = [
+                                     os.path.join(top, 'utils'), 
+                                     os.path.join(top, 'common'),
+                                     os.path.join(localtop, 'common'),
