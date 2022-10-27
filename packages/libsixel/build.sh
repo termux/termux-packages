@@ -14,10 +14,5 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dgdk-pixbuf2=enabled
 -Dgd=enabled
 -Dlibcurl=enabled
+-Dpython2=disabled
 "
-
-termux_step_pre_configure() {
-	export PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
-	export PYTHON=python$PYTHON_VERSION
-	TERMUX_PKG_RM_AFTER_INSTALL="lib/${PYTHON}/site-packages/libsixel/__pycache__"
-}
