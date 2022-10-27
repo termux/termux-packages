@@ -8,7 +8,7 @@ TERMUX_PKG_SRCURL=https://archive.mesa3d.org/mesa-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=2de11fb74fc5cc671b818e49fe203cea0cd1d8b69756e97cdb06a2f4e78948f9
 TERMUX_PKG_DEPENDS="libandroid-shmem, libc++, libdrm, libexpat, libx11, libxext, ncurses, zlib, zstd"
 TERMUX_PKG_BUILD_DEPENDS="libllvm-static, llvm, llvm-tools, mlir, xorgproto"
-TERMUX_PKG_CONFLICTS="libmesa, ndk-sysroot (<< 23b-6)"
+TERMUX_PKG_CONFLICTS="libmesa, ndk-sysroot (<= 25b)"
 TERMUX_PKG_REPLACES="libmesa"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
