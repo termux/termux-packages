@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Commandline frontend for the apt package manager"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.7.2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://gitlab.com/volian/nala/-/archive/v${TERMUX_PKG_VERSION}/nala-v${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=0ac394ab2bd924c28c513a8e8bfc9e899a21f2f8fa5e5d77366cb20e0be8676e
 TERMUX_PKG_DEPENDS="python-apt"
@@ -37,21 +38,8 @@ termux_step_pre_configure() {
 }
 
 termux_step_make_install() {
-	python setup.py install --force
-
 	export PYTHONPATH=$TERMUX_PREFIX/lib/python${_PYTHON_VERSION}/site-packages
-	python setup.py install --force --prefix $TERMUX_PREFIX
-
-	pushd $PYTHONPATH
-	_NALA_EGG=
-	for f in nala-${TERMUX_PKG_VERSION##*:}-py${_PYTHON_VERSION}.egg; do
-		if [ -e "$f" ]; then
-			_NALA_EGG="$f"
-			break
-		fi
-	done
-	test -n "${_NALA_EGG}"
-	popd
+	pip install --no-deps . --prefix $TERMUX_PREFIX
 
 	install -Dm600 -t $TERMUX_PREFIX/etc/nala debian/nala.conf
 }
@@ -59,15 +47,9 @@ termux_step_make_install() {
 termux_step_create_debscripts() {
 	cat <<- EOF > ./postinst
 	#!$TERMUX_PREFIX/bin/sh
-	echo "./${_NALA_EGG}" >> $TERMUX_PREFIX/lib/python${_PYTHON_VERSION}/site-packages/easy-install.pth
 	mkdir -p $TERMUX_PREFIX/var/lib/nala
 	mkdir -p $TERMUX_PREFIX/var/log/nala
 	echo "Installing dependencies through pip..."
 	pip3 install anyio httpx jsbeautifier pexpect rich
-	EOF
-
-	cat <<- EOF > ./prerm
-	#!$TERMUX_PREFIX/bin/sh
-	sed -i "/\.\/${_NALA_EGG//./\\.}/d" $TERMUX_PREFIX/lib/python${_PYTHON_VERSION}/site-packages/easy-install.pth
 	EOF
 }
