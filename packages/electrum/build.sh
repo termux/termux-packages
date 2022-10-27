@@ -14,12 +14,6 @@ TERMUX_PKG_CONFLICTS="asciinema (<< 1.4.0-1)"
 
 _PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
 
-TERMUX_PKG_RM_AFTER_INSTALL="
-lib/python${_PYTHON_VERSION}/site-packages/__pycache__
-lib/python${_PYTHON_VERSION}/site-packages/easy-install.pth
-lib/python${_PYTHON_VERSION}/site-packages/site.py
-"
-
 termux_step_pre_configure() {
 	termux_setup_python_crossenv
 	pushd $TERMUX_PYTHON_CROSSENV_SRCDIR

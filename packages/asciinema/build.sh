@@ -14,12 +14,6 @@ TERMUX_PKG_HAS_DEBUG=false
 
 _PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
 
-TERMUX_PKG_RM_AFTER_INSTALL="
-lib/python${_PYTHON_VERSION}/site-packages/easy-install.pth
-lib/python${_PYTHON_VERSION}/site-packages/site.py
-lib/python${_PYTHON_VERSION}/site-packages/__pycache__
-"
-
 termux_step_make() {
 	return
 }

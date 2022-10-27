@@ -14,12 +14,6 @@ TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 
 _PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
 
-TERMUX_PKG_RM_AFTER_INSTALL="
-lib/python${_PYTHON_VERSION}/site-packages/__pycache__
-lib/python${_PYTHON_VERSION}/site-packages/easy-install.pth
-lib/python${_PYTHON_VERSION}/site-packages/site.py
-"
-
 termux_step_post_get_source() {
 	echo "Applying openssl-libs.diff"
 	sed "s%@PYTHON_VERSION@%$_PYTHON_VERSION%g" \
