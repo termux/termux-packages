@@ -27,7 +27,7 @@ termux_step_pre_configure() {
 	export LDSHARED="$CC -shared"
 }
 
-termux_step_make() {
+termux_step_make_install() {
 	export PYTHONPATH=$TERMUX_PREFIX/lib/python${_PYTHON_VERSION}/site-packages
 	pip install --no-deps . --prefix $TERMUX_PREFIX
 }
