@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Text document format for short documents, articles, book
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="10.2.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/asciidoc/asciidoc-py3/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=684ea53c1f5b71d6d1ac6086bbc96906b1f709ecc7ab536615b0f0c9e1baa3cc
 TERMUX_PKG_AUTO_UPDATE=true
@@ -24,28 +25,7 @@ termux_step_pre_configure() {
 	. ${_CROSSENV_PREFIX}/bin/activate
 }
 
-termux_step_make() {
-	python setup.py install --force
-}
-
 termux_step_make_install() {
-	pushd ${_CROSSENV_PREFIX}/cross/lib/python${_PYTHON_VERSION}/site-packages
-	_ASCIIDOC_EGGDIR=asciidoc-${TERMUX_PKG_VERSION}-py${_PYTHON_VERSION}.egg
-	cp -rT "${_ASCIIDOC_EGGDIR}" $TERMUX_PREFIX/lib/python${_PYTHON_VERSION}/site-packages/"${_ASCIIDOC_EGGDIR}"
-	popd
-	for f in asciidoc a2x; do
-		cp -T ${_CROSSENV_PREFIX}/cross/bin/$f $TERMUX_PREFIX/bin/$f
-	done
-}
-
-termux_step_create_debscripts() {
-	cat <<- EOF > ./postinst
-	#!$TERMUX_PREFIX/bin/sh
-	echo "./${_ASCIIDOC_EGGDIR}" >> $TERMUX_PREFIX/lib/python${_PYTHON_VERSION}/site-packages/easy-install.pth
-	EOF
-
-	cat <<- EOF > ./prerm
-	#!$TERMUX_PREFIX/bin/sh
-	sed -i "/\.\/${_ASCIIDOC_EGGDIR//./\\.}/d" $TERMUX_PREFIX/lib/python${_PYTHON_VERSION}/site-packages/easy-install.pth
-	EOF
+	export PYTHONPATH=$TERMUX_PREFIX/lib/python${_PYTHON_VERSION}/site-packages
+	pip install --no-deps . --prefix $TERMUX_PREFIX
 }
