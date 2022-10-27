@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="An open-source implementation of the OpenGL specificatio
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="docs/license.rst"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=22.2.1
+TERMUX_PKG_VERSION=22.2.2
 TERMUX_PKG_SRCURL=https://archive.mesa3d.org/mesa-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=0079beac0a33f45e7e0aec59e6913eafbc4268a3f1e2e330017440494f91b13c
+TERMUX_PKG_SHA256=2de11fb74fc5cc671b818e49fe203cea0cd1d8b69756e97cdb06a2f4e78948f9
 TERMUX_PKG_DEPENDS="libandroid-shmem, libc++, libexpat, libx11, libxext, ncurses, zlib, zstd"
 TERMUX_PKG_BUILD_DEPENDS="libllvm-static, llvm, llvm-tools, mlir, xorgproto"
 TERMUX_PKG_CONFLICTS="libmesa, ndk-sysroot (<< 23b-6)"
@@ -26,6 +26,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Ddri-drivers=
 -Dgallium-drivers=swrast
 -Dvulkan-drivers=
+-Dosmesa=true
 "
 
 termux_step_pre_configure() {
