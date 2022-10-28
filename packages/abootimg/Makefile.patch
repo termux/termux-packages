@@ -1,5 +1,5 @@
 --- ../abootimg-v0.6/Makefile	2011-07-14 21:13:25.000000000 +0200
-+++ ./Makefile	2022-10-27 21:48:21.460756923 +0200
++++ ./Makefile	2022-10-28 21:46:26.988109133 +0200
 @@ -1,6 +1,6 @@
  
 -CPPFLAGS=-DHAS_BLKID
@@ -9,12 +9,14 @@
  LDLIBS=-lblkid
  
  all: abootimg
-@@ -16,6 +16,9 @@
+@@ -16,6 +16,11 @@
  
  abootimg.o: bootimg.h version.h
  
 +install:
 +	install -Dm700 abootimg $(DESTDIR)$(PREFIX)/bin/
++	install -Dm700 abootimg-pack-initrd $(DESTDIR)$(PREFIX)/bin/
++	install -Dm700 abootimg-unpack-initrd $(DESTDIR)$(PREFIX)/bin/
 +
  clean:
  	rm -f abootimg *.o version.h
