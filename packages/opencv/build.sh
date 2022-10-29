@@ -3,8 +3,8 @@ TERMUX_PKG_DESCRIPTION="Open Source Computer Vision Library"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=(4.6.0)
+TERMUX_PKG_REVISION=7
 TERMUX_PKG_VERSION+=(1.23.3) # NumPy version
-TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=(https://github.com/opencv/opencv/archive/${TERMUX_PKG_VERSION}.tar.gz
                    https://github.com/numpy/numpy/archive/refs/tags/v${TERMUX_PKG_VERSION[1]}.tar.gz)
 TERMUX_PKG_SHA256=(1ec1cba65f9f20fe5a41fda1586e01c70ea0c9a6d7b67c9e13edf0cfe2239277
