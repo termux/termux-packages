@@ -119,22 +119,3 @@ diff -uNr Python-3.10.1/Modules/_multiprocessing/posix-shm-extension.c Python-3.
 +    return unlink(name);
 +}
 
-diff -uNr Python-3.10.1/setup.py Python-3.10.1.mod/setup.py
---- Python-3.10.1/setup.py      2021-12-07 02:23:39.000000000 +0800
-+++ Python-3.10.1.mod/setup.py  2022-02-10 17:26:38.314970000 +0800
-@@ -1846,12 +1846,14 @@
-                 sysconfig.get_config_var('POSIX_SEMAPHORES_NOT_ENABLED')):
-                 multiprocessing_srcs.append('_multiprocessing/semaphore.c')
-         self.add(Extension('_multiprocessing', multiprocessing_srcs,
-+                           libraries=["android-posix-semaphore"],
-                            include_dirs=["Modules/_multiprocessing"]))
- 
-         if (not MS_WINDOWS and
-            sysconfig.get_config_var('HAVE_SHM_OPEN') and
-            sysconfig.get_config_var('HAVE_SHM_UNLINK')):
--            posixshmem_srcs = ['_multiprocessing/posixshmem.c']
-+            posixshmem_srcs = ['_multiprocessing/posixshmem.c', 
-+                               '_multiprocessing/posix-shm-extension.c']
-             libs = []
-             if sysconfig.get_config_var('SHM_NEEDS_LIBRT'):
-                 # need to link with librt to get shm_open()

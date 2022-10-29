@@ -1,13 +1,23 @@
-diff -uNr Python-3.8.0/setup.py Python-3.8.0.mod/setup.py
---- Python-3.8.0/setup.py	2019-10-14 16:34:47.000000000 +0300
-+++ Python-3.8.0.mod/setup.py	2019-11-17 21:16:46.524157731 +0200
-@@ -824,7 +824,8 @@
+--- Python-3.11.0/setup.py	2022-10-24 23:05:39.000000000 +0530
++++ Python-3.11.0.mod/setup.py	2022-10-25 19:23:59.154046267 +0530
+@@ -981,7 +981,8 @@
  
          # Lance Ellinghaus's syslog module
          # syslog daemon interface
--        self.add(Extension('syslog', ['syslogmodule.c']))
-+        # Termux: Add 'log' android library since we use android logging:
-+        self.add(Extension('syslog', ['syslogmodule.c'], libraries=['log']))
+-        self.addext(Extension('syslog', ['syslogmodule.c']))
++	# Termux: Add 'log' android library since we use android logging
++        self.addext(Extension('syslog', ['syslogmodule.c'], libraries=['log']))
  
          # Python interface to subinterpreter C-API.
-         self.add(Extension('_xxsubinterpreters', ['_xxsubinterpretersmodule.c']))
+         self.addext(Extension('_xxsubinterpreters', ['_xxsubinterpretersmodule.c']))
+@@ -1328,8 +1329,8 @@
+             sysconfig.get_config_var('POSIX_SEMAPHORES_NOT_ENABLED')
+         ):
+             multiprocessing_srcs.append('_multiprocessing/semaphore.c')
+-        self.addext(Extension('_multiprocessing', multiprocessing_srcs))
+-        self.addext(Extension('_posixshmem', ['_multiprocessing/posixshmem.c']))
++        self.addext(Extension('_multiprocessing', multiprocessing_srcs, libraries=["android-posix-semaphore"]))
++        self.addext(Extension('_posixshmem', ['_multiprocessing/posixshmem.c','_multiprocessing/posix-shm-extension.c']))
+ 
+     def detect_uuid(self):
+         # Build the _uuid module if possible
