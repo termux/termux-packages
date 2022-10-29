@@ -1,0 +1,102 @@
+https://github.com/fvwmorg/fvwm3/commit/5c17c83df4605d2d97999740cf180af983298896
+
+From 5c17c83df4605d2d97999740cf180af983298896 Mon Sep 17 00:00:00 2001
+From: Matthieu Herrb <matthieu@herrb.eu>
+Date: Mon, 8 Aug 2022 22:13:59 +0200
+Subject: [PATCH] Fix for lock recusion in handle_all_expose()
+
+XCheckIfEvent() holds the X display lock and the predicate
+function it calls is not allowed to call any Xlib function that
+would re-enter the lock.
+libX11 1.8.1 enables X display locks unconditionnaly (it was only
+enabled by XInitThreads() when called explicitely before) and
+thus exposes the issue.
+
+So don't process events in the FCheckPeekIfEvent() predicate, but
+instead use a separate handler that is called for the returned event
+out of the lock.
+---
+ fvwm/events.c |  9 ++++++++-
+ libs/FEvent.c | 22 ++++++++++++++++++++++
+ libs/FEvent.h |  8 ++++++++
+ 3 files changed, 38 insertions(+), 1 deletion(-)
+
+diff --git a/fvwm/events.c b/fvwm/events.c
+index ae179d620..72d857079 100644
+--- a/fvwm/events.c
++++ b/fvwm/events.c
+@@ -267,6 +267,12 @@ static int _pred_weed_accumulate_expose(
+ 	return 1;
+ }
+ 
++static int _pred_weed_is_expose(
++	Display *display, XEvent *event, XPointer arg)
++{
++	return (event->type == Expose);
++}
++
+ static int _pred_weed_handle_expose(
+ 	Display *display, XEvent *event, XPointer arg)
+ {
+@@ -4546,7 +4552,8 @@ void handle_all_expose(void)
+ 
+ 	saved_event = fev_save_event();
+ 	FPending(dpy);
+-	FWeedIfEvents(dpy, _pred_weed_handle_expose, NULL);
++	FWeedAndHandleIfEvents(dpy, _pred_weed_is_expose,
++			       _pred_weed_handle_expose, NULL);
+ 	fev_restore_event(saved_event);
+ 
+ 	return;
+diff --git a/libs/FEvent.c b/libs/FEvent.c
+index f3bf54d3b..7e0621181 100644
+--- a/libs/FEvent.c
++++ b/libs/FEvent.c
+@@ -534,6 +534,28 @@ int FWeedIfEvents(
+ 	return weed_args.count;
+ }
+ 
++int FWeedAndHandleIfEvents(
++	Display *display,
++	int (*weed_predicate) (Display *display, XEvent *event, XPointer arg),
++	int (*handler) (Display *display, XEvent *event, XPointer arg),
++	XPointer arg)
++{
++	_fev_weed_args weed_args;
++	XEvent e;
++
++	assert(fev_is_invalid_event_type_set);
++	memset(&weed_args, 0, sizeof(weed_args));
++	weed_args.weed_predicate = weed_predicate;
++	weed_args.arg = arg;
++	if (FCheckPeekIfEvent(display, &e, _fev_pred_weed_if,
++			      (XPointer)&weed_args)) {
++		handler(display, &e, arg);
++	}
++	_fev_pred_weed_if_finish(&weed_args);
++
++	return weed_args.count;
++}
++
+ int FWeedIfWindowEvents(
+ 	Display *display, Window window,
+ 	int (*weed_predicate) (
+diff --git a/libs/FEvent.h b/libs/FEvent.h
+index ecfb164ca..f17ac5e9b 100644
+--- a/libs/FEvent.h
++++ b/libs/FEvent.h
+@@ -114,6 +114,14 @@ int FWeedIfEvents(
+ 		Display *display, XEvent *current_event, XPointer arg),
+ 	XPointer arg);
+ 
++/* Same as FWeedIfEvents but with a second callback out of XLockDisplay()
++ * to handle events in a lock-safe manner */
++int FWeedAndHandleIfEvents(
++	Display *display,
++	int (*weed_predicate) (Display *display, XEvent *event, XPointer arg),
++	int (*handler) (Display *display, XEvent *event, XPointer arg),
++	XPointer arg);
++
+ /* Same as FWeedIfEvents but weeds only events for the given window.  The
+  * weed_predicate is only called for events with a matching window.  */
+ int FWeedIfWindowEvents(
