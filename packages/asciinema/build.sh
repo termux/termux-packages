@@ -14,11 +14,22 @@ TERMUX_PKG_HAS_DEBUG=false
 
 _PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
 
+termux_step_pre_configure() {
+	termux_setup_python_crossenv
+	pushd $TERMUX_PYTHON_CROSSENV_SRCDIR
+	_CROSSENV_PREFIX=$TERMUX_PKG_BUILDDIR/python-crossenv-prefix
+	python${_PYTHON_VERSION} -m crossenv \
+		$TERMUX_PREFIX/bin/python${_PYTHON_VERSION} \
+		${_CROSSENV_PREFIX}
+	popd
+	. ${_CROSSENV_PREFIX}/bin/activate
+}
+
 termux_step_make() {
 	return
 }
 
 termux_step_make_install() {
-	export PYTHONPATH=$TERMUX_PREFIX/lib/python${_PYTHON_VERSION}/site-packages/
-	python${_PYTHON_VERSION} -m pip install . --prefix="${TERMUX_PREFIX}" --force
+	export PYTHONPATH=$TERMUX_PREFIX/lib/python${_PYTHON_VERSION}/site-packages
+	pip install --no-deps . --prefix $TERMUX_PREFIX
 }
