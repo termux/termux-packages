@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Python bindings for GStreamer"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.20.3
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://gstreamer.freedesktop.org/src/gst-python/gst-python-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=db348120eae955b8cc4de3560a7ea06e36d6e1ddbaa99a7ad96b59846601cfdc
 TERMUX_PKG_DEPENDS="gst-plugins-base, gstreamer, pygobject, python"
