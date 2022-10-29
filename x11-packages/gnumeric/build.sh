@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0, GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 _MAJOR_VERSION=1.12
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.53
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/gnumeric/${_MAJOR_VERSION}/gnumeric-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=5568e4c8dceabb9028f1361d1045522f95f0a71daa59e973cbdd2d39badd4f02
 TERMUX_PKG_DEPENDS="glib, goffice, gtk3, libcairo, libgsf, libxml2, pango, zlib"
