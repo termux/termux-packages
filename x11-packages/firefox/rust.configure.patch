@@ -1,0 +1,21 @@
+diff -uNr firefox-105.0.3/build/moz.configure/rust.configure firefox-105.0.3.mod/build/moz.configure/rust.configure
+--- firefox-105.0.3/build/moz.configure/rust.configure	2022-10-07 22:37:47.000000000 +0900
++++ firefox-105.0.3.mod/build/moz.configure/rust.configure	2022-10-15 20:41:38.791916336 +0900
+@@ -399,7 +399,7 @@
+     rustc_target = find_candidate(candidates)
+ 
+     if rustc_target is None:
+-        die("Don't know how to translate {} for rustc".format(host_or_target.alias))
++        rustc_target = "%TERMUX_CARGO_TARGET_NAME%"
+ 
+     return rustc_target
+ 
+@@ -584,8 +584,6 @@
+ 
+ # ==============================================================
+ 
+-option(env="RUSTFLAGS", nargs=1, help="Rust compiler flags")
+-set_config("RUSTFLAGS", depends("RUSTFLAGS")(lambda flags: flags))
+ 
+ 
+ # Rust compiler flags
