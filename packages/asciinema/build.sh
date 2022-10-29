@@ -24,6 +24,7 @@ termux_step_pre_configure() {
 		${_CROSSENV_PREFIX}
 	popd
 	. ${_CROSSENV_PREFIX}/bin/activate
+	pip install wheel
 }
 
 termux_step_make() {
