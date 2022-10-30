@@ -6,6 +6,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 _MAJOR_VERSION=0.70
 _VERSION=${_MAJOR_VERSION}.1
 TERMUX_PKG_VERSION=2:${_VERSION}
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://ftp.gnome.org/pub/GNOME/sources/vte/${_MAJOR_VERSION}/vte-${_VERSION}.tar.xz
 TERMUX_PKG_SHA256=1f4601cbfea5302b96902208c8f185e5b18b259b5358bc93cf392bf59871c5b6
 TERMUX_PKG_DEPENDS="atk, fribidi, gdk-pixbuf, gtk3, libc++, libcairo, libgnutls, libicu, pango, pcre2, zlib"
