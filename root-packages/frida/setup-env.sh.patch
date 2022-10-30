@@ -1,15 +1,6 @@
---- ./releng/setup-env.sh.orig	2021-12-05 14:17:02.109846250 +0100
-+++ ./releng/setup-env.sh	2021-12-05 14:21:05.179490094 +0100
-@@ -458,7 +458,7 @@
-     NM="${NM:-${host_toolprefix}nm}"
-     RANLIB="${RANLIB:-${host_toolprefix}ranlib}"
-     STRIP="${STRIP:-${host_toolprefix}strip}"
--    STRIP_FLAGS="--strip-all"
-+    STRIP_FLAGS="--strip-unneeded --preserve-dates"
-     READELF="${READELF:-${host_toolprefix}readelf}"
-     OBJCOPY="${OBJCOPY:-${host_toolprefix}objcopy}"
-     OBJDUMP="${OBJDUMP:-${host_toolprefix}objdump}"
-@@ -695,7 +695,7 @@
+--- ./releng/setup-env.sh.orig	2022-10-30 12:24:03.607549465 +0100
++++ ./releng/setup-env.sh	2022-10-30 12:25:00.977548248 +0100
+@@ -703,7 +703,7 @@
      host_cxxlibs="c++_static c++abi"
      case $host_arch in
        x86)
@@ -18,7 +9,7 @@
          android_abi="x86"
          android_target="i686-none-linux-android${android_api}"
          android_clang_arch="i386"
-@@ -706,7 +706,7 @@
+@@ -714,7 +714,7 @@
          host_cxxlibs="$host_cxxlibs android_support"
          ;;
        x86_64)
@@ -27,7 +18,7 @@
          android_abi="x86_64"
          android_target="x86_64-none-linux-android${android_api}"
          android_clang_arch="x86_64"
-@@ -714,7 +714,7 @@
+@@ -722,7 +722,7 @@
          host_ldflags=""
          ;;
        arm)
@@ -36,7 +27,7 @@
          android_abi="armeabi-v7a"
          android_target="armv7-none-linux-androideabi${android_api}"
          android_clang_arch="arm"
-@@ -725,7 +725,7 @@
+@@ -733,7 +733,7 @@
          host_cxxlibs="$host_cxxlibs android_support"
          ;;
        arm64)
@@ -45,3 +36,12 @@
          android_abi="arm64-v8a"
          android_target="aarch64-none-linux-android${android_api}"
          android_clang_arch="aarch64"
+@@ -805,7 +805,7 @@
+     selected_nm="${android_toolroot}/bin/llvm-nm"
+     selected_ranlib="${android_toolroot}/bin/llvm-ranlib"
+     selected_strip="${android_toolroot}/bin/llvm-strip"
+-    strip_flags="--strip-all"
++    strip_flags="--strip-unneeded --preserve-dates"
+     selected_readelf="${android_toolroot}/bin/llvm-readelf"
+     selected_objcopy="${android_toolroot}/bin/llvm-objcopy"
+     selected_objdump="${android_toolroot}/bin/llvm-objdump"
