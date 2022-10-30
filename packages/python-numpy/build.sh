@@ -29,6 +29,7 @@ termux_step_configure() {
 		${_CROSSENV_PREFIX}
 	popd
 	. ${_CROSSENV_PREFIX}/bin/activate
+	build-pip install wheel
 
 	LDFLAGS+=" -lpython${_PYTHON_VERSION} -lm"
 

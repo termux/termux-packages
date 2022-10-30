@@ -20,6 +20,7 @@ termux_step_pre_configure() {
 		${_CROSSENV_PREFIX}
 	popd
 	. ${_CROSSENV_PREFIX}/bin/activate
+	build-pip install wheel
 
 	CFLAGS+=" $CPPFLAGS"
 	CXXFLAGS+=" $CPPFLAGS"

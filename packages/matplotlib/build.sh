@@ -46,7 +46,7 @@ termux_step_pre_configure() {
 	popd
 	. ${_CROSSENV_PREFIX}/bin/activate
 
-	build-pip install numpy setuptools_scm setuptools_scm_git_archive
+	build-pip install wheel numpy setuptools_scm setuptools_scm_git_archive
 
 	LDFLAGS+=" -lpython${_PYTHON_VERSION} -lm"
 

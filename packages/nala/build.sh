@@ -28,7 +28,7 @@ termux_step_pre_configure() {
 	popd
 	. ${_CROSSENV_PREFIX}/bin/activate
 
-	build-pip install tomli
+	build-pip install wheel tomli
 }
 
 termux_step_make_install() {

@@ -32,7 +32,7 @@ termux_step_pre_configure() {
 		popd
 		. ${_CROSSENV_PREFIX}/bin/activate
 
-		build-pip install -U pyyaml numpy typing_extensions
+		build-pip install -U wheel pyyaml numpy typing_extensions
 	fi
 	
 	pip install -U typing_extensions

@@ -24,7 +24,7 @@ termux_step_pre_configure() {
 	popd
 	. ${_CROSSENV_PREFIX}/bin/activate
 
-	build-pip install setuptools-rust
+	build-pip install wheel setuptools-rust
 }
 
 termux_step_make_install() {

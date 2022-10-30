@@ -19,7 +19,7 @@ termux_step_pre_configure() {
 	popd
 	. ${_CROSSENV_PREFIX}/bin/activate
 
-	build-pip install -U setuptools
+	build-pip install -U wheel setuptools
 
 	CFLAGS+=" -I${TERMUX_PREFIX}/lib/python${_PYTHON_VERSION}/site-packages/torch/include"
 	CFLAGS+=" -I${TERMUX_PREFIX}/lib/python${_PYTHON_VERSION}/site-packages/torch/include/torch/csrc/api/include"

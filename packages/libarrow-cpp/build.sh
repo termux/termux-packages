@@ -32,6 +32,7 @@ termux_step_pre_configure() {
 		${_CROSSENV_PREFIX}
 	popd
 	. ${_CROSSENV_PREFIX}/bin/activate
+	build-pip install wheel
 	LDFLAGS+=" -lpython${_PYTHON_VERSION}"
 	export NPY_DISABLE_SVML=1
 	pushd $TERMUX_PKG_SRCDIR/numpy

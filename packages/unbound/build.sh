@@ -40,6 +40,7 @@ termux_step_pre_configure() {
 		${_CROSSENV_PREFIX}
 	popd
 	. ${_CROSSENV_PREFIX}/bin/activate
+	build-pip install wheel
 
 	export PYTHON_SITE_PKG=$TERMUX_PREFIX/lib/python${_PYTHON_VERSION}/site-packages
 }

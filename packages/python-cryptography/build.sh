@@ -33,7 +33,7 @@ termux_step_pre_configure() {
 	popd
 	. ${_CROSSENV_PREFIX}/bin/activate
 
-	build-pip install cffi setuptools-rust
+	build-pip install wheel cffi setuptools-rust
 }
 
 termux_step_make_install() {

@@ -44,7 +44,7 @@ termux_step_pre_configure() {
 	popd
 	. ${_CROSSENV_PREFIX}/bin/activate
 
-	build-pip install PyQt-builder
+	build-pip install wheel PyQt-builder
 
 	local _cxx=$(basename $CXX)
 	local _bindir=$TERMUX_PKG_BUILDDIR/_wrapper/bin

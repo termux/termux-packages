@@ -38,6 +38,7 @@ termux_step_pre_configure() {
 		${_CROSSENV_PREFIX}
 	popd
 	. ${_CROSSENV_PREFIX}/bin/activate
+	build-pip install wheel
 
 	echo "Applying plugins-python-loader-Makefile.in.diff"
 	sed "s|@PYTHON_VERSION@|${_PYTHON_VERSION}|g" \
