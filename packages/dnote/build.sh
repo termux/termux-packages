@@ -42,14 +42,13 @@ termux_step_create_debscripts() {
 		dnote completion bash > ${TERMUX_PREFIX}/share/bash-completion/completions/dnote.bash
 		dnote completion zsh > ${TERMUX_PREFIX}/share/zsh/site-functions/_dnote
 		dnote completion fish > ${TERMUX_PREFIX}/share/fish/vendor_completions.d/dnote.fish
-                
 	EOF
 }
 
 termux_step_install_license() {
 	install -Dm600 -t "${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}" \
 		"${TERMUX_PKG_SRCDIR}/licenses/GPLv3.txt"
-    install -Dm600 -t "${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}" \
+        install -Dm600 -t "${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}" \
 		"${TERMUX_PKG_SRCDIR}/licenses/AGPLv3.txt"
         install -Dm600 -t "${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}" \
 		"${TERMUX_PKG_SRCDIR}/LICENSE"
