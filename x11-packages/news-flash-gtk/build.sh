@@ -3,9 +3,10 @@ TERMUX_PKG_DESCRIPTION="A modern feed reader designed for the GNOME desktop"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.0.2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/patchedsoul/news-flash/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=bc4ce6aa7cd26409d5d9a7ffa539214c9907c7b263eb88f46d8bbab7546fd323
-TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libcairo, libhandy-0.0, libsqlite, libxml2, openssl-1.1, pango, webkit2gtk"
+TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libcairo, libhandy-0.0, libsqlite, libxml2, openssl-1.1, pango, webkit2gtk-4.1"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
@@ -14,6 +15,17 @@ termux_step_pre_configure() {
 
 	TERMUX_RUST_VERSION=1.52.1
 	termux_setup_rust
+	: "${CARGO_HOME:=$HOME/.cargo}"
+	export CARGO_HOME
+
+	cargo fetch --target $CARGO_TARGET_NAME
+
+	local p=$TERMUX_PKG_BUILDER_DIR/webkit2gtk-sys.diff
+	local d
+	for d in $CARGO_HOME/registry/src/github.com-*/webkit2gtk-sys-*; do
+		echo "Applying $(basename ${p}) to $(basename ${d})"
+		patch --silent -p1 -d ${d} < ${p} || :
+	done
 
 	export RUSTC_BOOTSTRAP=1
 	export GETTEXT_DIR=$TERMUX_PREFIX
