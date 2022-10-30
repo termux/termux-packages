@@ -4,11 +4,11 @@ TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=(4.6.0)
 TERMUX_PKG_REVISION=7
-TERMUX_PKG_VERSION+=(1.23.3) # NumPy version
+TERMUX_PKG_VERSION+=(1.23.4) # NumPy version
 TERMUX_PKG_SRCURL=(https://github.com/opencv/opencv/archive/${TERMUX_PKG_VERSION}.tar.gz
                    https://github.com/numpy/numpy/archive/refs/tags/v${TERMUX_PKG_VERSION[1]}.tar.gz)
 TERMUX_PKG_SHA256=(1ec1cba65f9f20fe5a41fda1586e01c70ea0c9a6d7b67c9e13edf0cfe2239277
-                   d55da69341fd6e617ada55feec6798730457f26f08300956625c086499aced7e)
+                   3ffd7b40ebe8a316324ff0cf83b820a25a034626836e001548d09d5b63ba84a8)
 TERMUX_PKG_DEPENDS="libc++, libjpeg-turbo, libpng, libprotobuf, libtiff, libwebp, openjpeg, openjpeg-tools, zlib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DANDROID_NO_TERMUX=OFF
@@ -55,7 +55,7 @@ termux_step_pre_configure() {
 		${_CROSSENV_PREFIX}
 	popd
 	. ${_CROSSENV_PREFIX}/bin/activate
-	build-pip install wheel
+	build-pip install Cython wheel
 	LDFLAGS+=" -lpython${_PYTHON_VERSION}"
 	export NPY_DISABLE_SVML=1
 	pushd $TERMUX_PKG_SRCDIR/numpy
