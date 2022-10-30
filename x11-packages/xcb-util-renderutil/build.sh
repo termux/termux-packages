@@ -1,10 +1,18 @@
 TERMUX_PKG_HOMEPAGE=https://xcb.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="Utility libraries for XC Binding - Convenience functions for the Render extension"
-TERMUX_PKG_LICENSE="MIT"
+# Licenses: HPND, MIT
+TERMUX_PKG_LICENSE="custom"
+TERMUX_PKG_LICENSE_FILE="COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.3.9
-TERMUX_PKG_REVISION=25
-TERMUX_PKG_SRCURL=https://xcb.freedesktop.org/dist/xcb-util-renderutil-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=c6e97e48fb1286d6394dddb1c1732f00227c70bd1bedb7d1acabefdd340bea5b
+TERMUX_PKG_VERSION=0.3.10
+TERMUX_PKG_SRCURL=https://xcb.freedesktop.org/dist/xcb-util-renderutil-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=3e15d4f0e22d8ddbfbb9f5d77db43eacd7a304029bf25a6166cc63caa96d04ba
 TERMUX_PKG_DEPENDS="libxcb"
 TERMUX_PKG_BUILD_DEPENDS="xorg-util-macros"
+
+termux_step_post_massage() {
+	cd ${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/lib || exit 1
+	if [ ! -e "./libxcb-render-util.so.0" ]; then
+		ln -sf libxcb-render-util.so libxcb-render-util.so.0
+	fi
+}
