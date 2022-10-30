@@ -139,15 +139,15 @@ jobs:
         for repo in $(jq --raw-output '.[].name' repo.json); do
           # Fix so that lists do not contain duplicates
           if [ -f ./built_${repo}_packages.txt ]; then
-            uniq ./built_${repo}_packages.txt > ./built_${repo}_packages.txt.tmp
+            sort ./built_${repo}_packages.txt | uniq > ./built_${repo}_packages.txt.tmp
             mv ./built_${repo}_packages.txt.tmp ./built_${repo}_packages.txt
           fi
           if [ -f ./built_${repo}_subpackages.txt ]; then
-            uniq ./built_${repo}_subpackages.txt > ./built_${repo}_subpackages.txt.tmp
+            sort ./built_${repo}_subpackages.txt | uniq > ./built_${repo}_subpackages.txt.tmp
             mv ./built_${repo}_subpackages.txt.tmp ./built_${repo}_subpackages.txt
           fi
           if [ -f ./deleted_${repo}_packages.txt ]; then
-            uniq ./deleted_${repo}_packages.txt > ./deleted_${repo}_packages.txt.tmp
+            sort ./deleted_${repo}_packages.txt | uniq > ./deleted_${repo}_packages.txt.tmp
             mv ./deleted_${repo}_packages.txt.tmp ./deleted_${repo}_packages.txt
           fi
         done
