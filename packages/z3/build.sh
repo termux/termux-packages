@@ -10,10 +10,8 @@ TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_configure() {
-	_PYTHON_VERSION=$(source $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
-
 	chmod +x scripts/mk_make.py
-	CXX="$CXX" CC="$CC" python${_PYTHON_VERSION} scripts/mk_make.py --prefix=$TERMUX_PREFIX --build=$TERMUX_PKG_BUILDDIR
+	CXX="$CXX" CC="$CC" python3 scripts/mk_make.py --prefix=$TERMUX_PREFIX --build=$TERMUX_PKG_BUILDDIR
 	if $TERMUX_ON_DEVICE_BUILD; then
 		sed 's%../../../../../../../../%%g' -i Makefile
 	else
