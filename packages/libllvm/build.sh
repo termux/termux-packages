@@ -5,6 +5,7 @@ TERMUX_PKG_LICENSE_FILE="llvm/LICENSE.TXT"
 TERMUX_PKG_MAINTAINER="@buttaface"
 LLVM_MAJOR_VERSION=15
 TERMUX_PKG_VERSION=${LLVM_MAJOR_VERSION}.0.3
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=dd07bdab557866344d85ae21bbeca5259d37b4b0e2ebf6e0481f42d1ba0fee88
 TERMUX_PKG_SRCURL=https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/llvm-project-$TERMUX_PKG_VERSION.src.tar.xz
 TERMUX_PKG_HOSTBUILD=true
@@ -24,7 +25,7 @@ _PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VER
 # See http://llvm.org/docs/CMake.html:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DANDROID_PLATFORM_LEVEL=$TERMUX_PKG_API_LEVEL
--DPYTHON_EXECUTABLE=$(command -v python3)
+-DPYTHON_EXECUTABLE=$(command -v python${_PYTHON_VERSION})
 -DLLVM_ENABLE_PIC=ON
 -DLLVM_ENABLE_PROJECTS=clang;clang-tools-extra;compiler-rt;lld;lldb;mlir;openmp;polly
 -DLLVM_ENABLE_LIBEDIT=OFF
