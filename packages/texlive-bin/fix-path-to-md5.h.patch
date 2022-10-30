@@ -1,0 +1,55 @@
+--- a/texk/dvisvgm/dvisvgm-src/src/MD5HashFunction.hpp
++++ b/texk/dvisvgm/dvisvgm-src/src/MD5HashFunction.hpp
+@@ -25,7 +25,7 @@
+ #ifdef HAVE_OPENSSL_MD5_H
+ #	include <openssl/md5.h>
+ #else
+-#	include <md5.h>
++#	include "../libs/md5/md5.h"
+ #endif
+ 
+ #include "HashFunction.hpp"
+--- a/texk/web2c/lib/texmfmp.c
++++ b/texk/web2c/lib/texmfmp.c
+@@ -3261,7 +3261,7 @@
+ #if defined (pdfTeX) || defined (epTeX) || defined (eupTeX) || defined(XeTeX)
+ 
+ #include <kpathsea/c-stat.h>
+-#include "md5.h"
++#include "libmd5/md5.h"
+ 
+ #define check_nprintf(size_get, size_want) \
+     if ((unsigned)(size_get) >= (unsigned)(size_want)) \
+--- a/texk/web2c/pdftexdir/utils.c
++++ b/texk/web2c/pdftexdir/utils.c
+@@ -28,7 +28,7 @@
+ #include <string.h>
+ #include <time.h>
+ #include <float.h>              /* for DBL_EPSILON */
+-#include "md5.h"
++#include "libmd5/md5.h"
+ #include <zlib.h>
+ #include "ptexlib.h"
+ #include <png.h>
+--- a/texk/web2c/luatexdir/pdf/pdfgen.c
++++ b/texk/web2c/luatexdir/pdf/pdfgen.c
+@@ -24,7 +24,7 @@
+ #include <kpathsea/c-dir.h>
+ #include <kpathsea/c-ctype.h>
+ #include "lua/luatex-api.h"
+-#include "md5.h"
++#include "libmd5/md5.h"
+ 
+ #define check_nprintf(size_get, size_want) \
+     if ((unsigned)(size_get) >= (unsigned)(size_want)) \
+--- a/texk/web2c/luatexdir/utils/utils.c
++++ b/texk/web2c/luatexdir/utils/utils.c
+@@ -39,7 +39,7 @@
+ #include <float.h>
+ 
+ #include "zlib.h"
+-#include "md5.h"
++#include "libmd5/md5.h"
+ 
+ #include "lua/luatex-api.h"
+ #include "luatex_svnversion.h"
