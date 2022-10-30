@@ -18,9 +18,7 @@ termux_step_configure() {
 	fi
 
 	./configure --prefix=$TERMUX_PREFIX \
-		--with-lua=$TERMUX_PREFIX \
-		--with-lua-include=$TERMUX_PREFIX/include/lua5.3 \
-		--lua-version=5.3
+		--with-lua=$TERMUX_PREFIX
 
 	# Create temporary symlink to workaround luarock bootstrap
 	# script trying to run cross-compiled lua
@@ -35,9 +33,6 @@ termux_step_post_make_install() {
 }
 
 termux_step_post_massage() {
-	sed -i "1 s|$|lua|" bin/luarocks
-	sed -i "1 s|$|lua|" bin/luarocks-admin
-
 	# Remove lua, due to us moving it back and fourth the package
 	# thinks it is a newly compiled program
 	rm bin/lua5.3
