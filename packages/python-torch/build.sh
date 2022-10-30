@@ -52,7 +52,7 @@ termux_step_pre_configure() {
 	-DCMAKE_BUILD_TYPE=Release
 	-DCMAKE_INSTALL_PREFIX=${TERMUX_PKG_SRCDIR}/torch
 	-DCMAKE_PREFIX_PATH=${TERMUX_PREFIX}/lib/python${_PYTHON_VERSION}/site-packages
-	-DNUMPY_INCLUDE_DIR=$( echo ${TERMUX_PREFIX}/lib/python${_PYTHON_VERSION}/site-packages/*/numpy/core/include )
+	-DNUMPY_INCLUDE_DIR=${TERMUX_PREFIX}/lib/python${_PYTHON_VERSION}/site-packages/numpy/core/include
 	-DPYTHON_EXECUTABLE=$(command -v python3)
 	-DPYTHON_INCLUDE_DIR=${TERMUX_PREFIX}/include/python${_PYTHON_VERSION}
 	-DPYTHON_LIBRARY=${TERMUX_PREFIX}/lib//libpython${_PYTHON_VERSION}.so
