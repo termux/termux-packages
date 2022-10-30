@@ -37,6 +37,9 @@ cross_objc2_runtime=1
 ac_cv_func_setpgrp_void=yes
 "
 
+# For testing:
+TERMUX_PKG_BUILD_DEPENDS="coreutils, grep, sed"
+
 termux_step_pre_configure() {
 	local bin="$TERMUX_PKG_BUILDDIR/bin"
 	mkdir -p "$bin"
