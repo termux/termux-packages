@@ -261,7 +261,7 @@ jobs:
           # Upload file to temporary directory.
           uploaded_files=false
           shopt -s nullglob
-          
+
           if [ -f debs/built_${REPOSITORY_NAME}_packages.txt ]; then
             for filename in $(cat debs/built_${REPOSITORY_NAME}_packages.txt | sed -E 's/(..*)/debs\/\1_\*.deb debs\/\1-static_\*.deb/g'); do
               if ! aptly_upload_file "$filename"; then
@@ -299,7 +299,6 @@ jobs:
 
         source scripts/aptly_api.sh
 
-
         for repo in $(jq --raw-output 'keys | .[]' repo.json); do
           export REPOSITORY_NAME=$(jq --raw-output '.["'$repo'"].name' repo.json)
           export REPOSITORY_DISTRIBUTION=$(jq --raw-output '.["'$repo'"].distribution' repo.json)
@@ -307,28 +306,31 @@ jobs:
           # Upload file to temporary directory.
           uploaded_files=false
           shopt -s nullglob
-          for filename in $(cat debs/built_${REPOSITORY_NAME}_packages.txt | sed -E 's/(..*)/debs\/\1_\*.deb debs\/\1-static_\*.deb/g'); do
-            if ! aptly_upload_file "$filename"; then
-              exit 1
+
+          if [ -f debs/built_${REPOSITORY_NAME}_packages.txt ]; then
+            for filename in $(cat debs/built_${REPOSITORY_NAME}_packages.txt | sed -E 's/(..*)/debs\/\1_\*.deb debs\/\1-static_\*.deb/g'); do
+              if ! aptly_upload_file "$filename"; then
+                exit 1
+              fi
+
+              uploaded_files=true
+            done
+            shopt -u nullglob
+
+            # Publishing repository changes.
+            if [ "$uploaded_files" = "true" ]; then
+              if ! aptly_add_to_repo; then
+                exit 1
+              fi
+
+              # Usually temporary directory is deleted automatically, but in certain cases it is left.
+              aptly_delete_dir
+
+              # grimler.se mirror is signed manually, can't publish
+              # through CI
+              # if ! aptly_publish_repo; then
+              #   exit 1
+              # fi
             fi
-
-            uploaded_files=true
-          done
-          shopt -u nullglob
-
-          # Publishing repository changes.
-          if [ "$uploaded_files" = "true" ]; then
-            if ! aptly_add_to_repo; then
-              exit 1
-            fi
-
-            # Usually temporary directory is deleted automatically, but in certain cases it is left.
-            aptly_delete_dir
-
-            # grimler.se mirror is signed manually, can't publish
-            # through CI
-            # if ! aptly_publish_repo; then
-            #   exit 1
-            # fi
           fi
         done
