@@ -22,10 +22,10 @@ termux_step_pre_configure() {
 		${_CROSSENV_PREFIX}
 	popd
 	. ${_CROSSENV_PREFIX}/bin/activate
-	build-pip install wheel
 
-	export LDFLAGS+=" -lpython${_PYTHON_VERSION}"
-	export LDSHARED="$CC -shared"
+	build-pip install Cython wheel
+
+	LDFLAGS+=" -lpython${_PYTHON_VERSION}"
 }
 
 termux_step_make_install() {
