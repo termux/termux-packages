@@ -4,11 +4,11 @@ TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=(9.0.0)
 TERMUX_PKG_REVISION=1
-TERMUX_PKG_VERSION+=(1.22.3) # NumPy version
+TERMUX_PKG_VERSION+=(1.23.4) # NumPy version
 TERMUX_PKG_SRCURL=(https://github.com/apache/arrow/archive/refs/tags/apache-arrow-${TERMUX_PKG_VERSION}.tar.gz
                    https://github.com/numpy/numpy/archive/refs/tags/v${TERMUX_PKG_VERSION[1]}.tar.gz)
 TERMUX_PKG_SHA256=(bb187b4b0af8dcc027fffed3700a7b891c9f76c9b63ad8925b4afb8257a2bb1b
-                   c8f3ec591e3f17b939220f2b9eabb4c5e2db330f8af62c0a3aeee8a4d1a6c0db)
+                   3ffd7b40ebe8a316324ff0cf83b820a25a034626836e001548d09d5b63ba84a8)
 TERMUX_PKG_DEPENDS="libc++, libre2, utf8proc"
 TERMUX_PKG_BUILD_DEPENDS="rapidjson"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -32,11 +32,13 @@ termux_step_pre_configure() {
 		${_CROSSENV_PREFIX}
 	popd
 	. ${_CROSSENV_PREFIX}/bin/activate
-	build-pip install wheel
+
+	build-pip install Cython wheel
+
 	LDFLAGS+=" -lpython${_PYTHON_VERSION}"
 	export NPY_DISABLE_SVML=1
 	pushd $TERMUX_PKG_SRCDIR/numpy
-	pip install .
+	MATHLIB="m" pip install .
 	popd
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
 		-DPYTHON_EXECUTABLE=python
