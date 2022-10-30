@@ -1,0 +1,14 @@
+--- a/utils/script-python.c
++++ b/utils/script-python.c
+@@ -469,9 +469,11 @@
+ 			case 8:
+ 				dval = val.d;
+ 				break;
++#if !(defined __ANDROID__ && defined __x86_64__)
+ 			case 10:
+ 				dval = (double)val.D;
+ 				break;
++#endif
+ 			default:
+ 				pr_dbg("invalid floating-point type size %d\n",
+ 				       spec->size);
