@@ -1,11 +1,10 @@
-TERMUX_PKG_HOMEPAGE=https://www.dettus.net/dMagnetic
+TERMUX_PKG_HOMEPAGE=https://dettus.net/dMagnetic
 TERMUX_PKG_DESCRIPTION="Interpreter for classic text adventure games and interactive fiction"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.32
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://www.dettus.net/dMagnetic/dMagnetic_${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=9671b863cbb126e122923fa974806ff0e998af471c98e878c1392c20a3606206
+TERMUX_PKG_VERSION=0.34
+TERMUX_PKG_SRCURL=https://dettus.net/dMagnetic/dMagnetic_${TERMUX_PKG_VERSION}.tar.bz2
+TERMUX_PKG_SHA256=570b1beb7111874cfbb54fc71868dccc732bc3235b9e5df586d93a4ff2b8e897
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_GROUPS="games"
