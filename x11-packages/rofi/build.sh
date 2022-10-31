@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A window switcher, application launcher and dmenu replac
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Tristan Ross <spaceboyross@yandex.com>"
 TERMUX_PKG_VERSION=1.7.5
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/DaveDavenport/rofi/releases/download/$TERMUX_PKG_VERSION/rofi-$TERMUX_PKG_VERSION.tar.xz"
 TERMUX_PKG_SHA256=caffcf66d165cb32b748c1db7f229d6d75da58c1685eb17455f65c60e8220c8d
 TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, libandroid-glob, libcairo, libxcb, libxkbcommon, pango, startup-notification, xcb-util, xcb-util-cursor, xcb-util-wm"
