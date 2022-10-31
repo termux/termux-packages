@@ -48,13 +48,3 @@ termux_step_post_configure() {
 		perl -p -i -e 's/#define HAVE_FLDLN2 1//' $TERMUX_PKG_BUILDDIR/config.h
 	fi
 }
-
-termux_step_post_massage() {
-	cd ${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/lib || exit 1
-	if [ ! -e "./libcaca.so.0" ]; then
-		ln -sf libcaca.so libcaca.so.0
-	fi
-	if [ ! -e "./libcaca++.so.0" ]; then
-		ln -sf libcaca++.so libcaca++.so.0
-	fi
-}
