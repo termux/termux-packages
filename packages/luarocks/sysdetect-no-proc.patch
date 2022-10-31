@@ -1,8 +1,8 @@
---- ./src/luarocks/core/sysdetect.lua.orig	2022-01-30 15:20:11.835200454 +0100
-+++ ./src/luarocks/core/sysdetect.lua	2022-01-30 15:21:17.085262684 +0100
-@@ -136,62 +136,7 @@
+--- ./src/luarocks/core/sysdetect.lua.orig	2022-11-01 03:04:32.179749415 +0530
++++ ./src/luarocks/core/sysdetect.lua	2022-11-01 03:05:38.819749390 +0530
+@@ -136,65 +136,7 @@
  end
- 
+
  local function detect_elf_system(fd, hdr, sections)
 -   local system = e_osabi[hdr.osabi]
 -   local endian = hdr.endian
@@ -21,6 +21,9 @@
 -         return "netbsd"
 -      elseif sections[".note.openbsd.ident"] then
 -         return "openbsd"
+-      elseif sections[".note.tag"] and
+-             sections[".note.tag"].namedata == "DragonFly" then
+-         return "dragonfly"
 -      end
 -
 -      local gnu_version_r = sections[".gnu.version_r"]
@@ -62,5 +65,5 @@
 -   return system
 +   return "linux"
  end
- 
+
  local function read_elf_header(fd)
