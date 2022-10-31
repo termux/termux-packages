@@ -63,7 +63,4 @@ termux_step_post_massage() {
 	if [ ! -e "./libSDL2.so" ]; then
 		ln -sf libSDL2-2.0.so libSDL2.so
 	fi
-	if [ ! -e "./libSDL2-2.0.so.0" ]; then
-		ln -sf libSDL2-2.0.so libSDL2-2.0.so.0
-	fi
 }
