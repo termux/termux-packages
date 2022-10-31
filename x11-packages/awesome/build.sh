@@ -3,8 +3,8 @@ TERMUX_PKG_DESCRIPTION="A highly configurable, next generation framework window 
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Latest release version 4.3 does not support Lua 5.4.
-_COMMIT=26032bf018cfac3b930e055cabc3ee07cbc2a4f9
-TERMUX_PKG_VERSION=2022.10.16
+_COMMIT=5077c8381b6bf7fb8215d24d1f0c683816e27a55
+TERMUX_PKG_VERSION=2022.10.31
 TERMUX_PKG_SRCURL=https://github.com/awesomeWM/awesome.git
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_DEPENDS="dbus, gdk-pixbuf, glib, libcairo, liblua54, libx11, libxcb, libxdg-basedir, libxkbcommon, lua-lgi, pango, startup-notification, xcb-util, xcb-util-cursor, xcb-util-keysyms, xcb-util-wm, xcb-util-xrm"
