@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="The standard GNU Debugger that runs on many Unix-like sy
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=12.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/gdb/gdb-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=0e1793bf8f2b54d53f46dea84ccfd446f48f81b297b28c4f7fc017b818d69fed
 TERMUX_PKG_DEPENDS="libc++, liblzma, libexpat, readline, ncurses, libmpfr, python, zlib, libthread-db"
