@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="X.org font encoding files"
 TERMUX_PKG_LICENSE="Public Domain"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.0.5
-TERMUX_PKG_REVISION=23
-TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/font/encodings-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=bd96e16143a044b19e87f217cf6a3763a70c561d1076aad6f6d862ec41774a31
+TERMUX_PKG_VERSION=1.0.6
+TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/font/encodings-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=77e301de661f35a622b18f60b555a7e7d8c4d5f43ed41410e830d5ac9084fc26
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-fontrootdir=$TERMUX_PREFIX/share/fonts"
