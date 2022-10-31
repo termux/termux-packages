@@ -8,10 +8,3 @@ TERMUX_PKG_SHA256=247fef48b3e0e7e67129e41f1e789e8d006ba47dba1c0cdce684b9b703f888
 TERMUX_PKG_DEPENDS="libx11, libxau, libxcb, libxdmcp, libxext"
 TERMUX_PKG_BUILD_DEPENDS="xorgproto, xorg-util-macros"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-malloc0returnsnull"
-
-termux_step_post_massage() {
-	cd ${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/lib || exit 1
-	if [ ! -e "./libXxf86vm.so.1" ]; then
-		ln -sf libXxf86vm.so libXxf86vm.so.1
-	fi
-}
