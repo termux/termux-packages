@@ -10,13 +10,13 @@ TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
-_PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
-
-TERMUX_PKG_RM_AFTER_INSTALL="
-lib/python${_PYTHON_VERSION}/site-packages/nala/__pycache__
-"
-
 termux_step_pre_configure() {
+	_PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
+
+	TERMUX_PKG_RM_AFTER_INSTALL="
+	lib/python${_PYTHON_VERSION}/site-packages/nala/__pycache__
+	"
+
 	termux_setup_python_crossenv
 	pushd $TERMUX_PYTHON_CROSSENV_SRCDIR
 	_CROSSENV_PREFIX=$TERMUX_PKG_BUILDDIR/python-crossenv-prefix
