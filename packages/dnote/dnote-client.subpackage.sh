@@ -1,3 +1,2 @@
 TERMUX_SUBPKG_DESCRIPTION="dnote server"
 TERMUX_SUBPKG_INCLUDE="bin/dnote, share/doc/${TERMUX_PKG_NAME}/GPLv3.txt"
-TERMUX_SUBPKG_DEPEND_ON_PARENT="unversioned"
