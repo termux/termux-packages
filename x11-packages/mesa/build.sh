@@ -50,6 +50,9 @@ termux_step_post_configure() {
 }
 
 termux_step_post_massage() {
+	# A bunch of programs in the wild assume that the name of OpenGL shared
+	# library is `libGL.so.1` and try to dlopen(3) it. In fact `sdl2` does
+	# this. So please do not ever remove the symlink.
 	cd ${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/lib || exit 1
 	if [ ! -e "./libGL.so.1" ]; then
 		ln -sf libGL.so libGL.so.1
