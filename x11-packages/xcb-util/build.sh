@@ -14,8 +14,11 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_massage() {
-	cd ${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/lib || exit 1
-	if [ ! -e "./libxcb-util.so.1" ]; then
-		ln -sf libxcb-util.so libxcb-util.so.1
-	fi
+	local _SOVERSION_SUFFIXED_SO_FILES="lib/libxcb-util.so.1"
+	local f
+	for f in ${_SOVERSION_SUFFIXED_SO_FILES}; do
+		if [ -e "${f}" ]; then
+			termux_error_exit "File ${f} should not be contained in this package."
+		fi
+	done
 }
