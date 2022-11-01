@@ -1,38 +1,27 @@
 TERMUX_PKG_HOMEPAGE=https://www.getdnote.com/
 TERMUX_PKG_DESCRIPTION="A simple command line notebook for programmers"
-TERMUX_PKG_LICENSE="AGPL-V3,GPL-3.0"
-TERMUX_PKG_MAINTAINER="2096779623 <admin@utermux.dev>"
-TERMUX_PKG_VERSION=2.0.1
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SRCURL=https://github.com/dnote/dnote/archive/refs/tags/server-v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=28cc3bf93b3849b9a4a5e65e531f8a34d6be6048427d924c56ab8c7887676bad
+TERMUX_PKG_LICENSE="GPL-3.0"
+TERMUX_PKG_MAINTAINER="Ravener <ravener.anime@gmail.com>"
+TERMUX_PKG_VERSION=1:0.12.0
+TERMUX_PKG_SRCURL=https://github.com/dnote/dnote/archive/refs/tags/cli-v${TERMUX_PKG_VERSION:2}.tar.gz
+TERMUX_PKG_SHA256=2b2c276f3b381a853e155ed2eab7007c5b5f2ec927b3d882d5605f2650b15085
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_SUGGESTS="postgresql, dnote-server, dnote-client"
+TERMUX_PKG_BREAKS=dnote-client
+TERMUX_PKG_REPLACES=dnote-client
 
 termux_step_pre_configure() {
-        termux_setup_nodejs
-        termux_setup_golang
-
-        go mod download
-        # build assets for dnote-server:
-        cd "$TERMUX_PKG_SRCDIR/pkg/server/assets"
-        npm update && npm i
+	termux_setup_golang
+	go mod download 
 }
 
 termux_step_make() {
-        cd "$TERMUX_PKG_SRCDIR"
-        export GOOS=android
-        $TERMUX_PKG_SRCDIR/scripts/cli/build.sh ${TERMUX_PKG_VERSION}
-        $TERMUX_PKG_SRCDIR/scripts/server/build.sh ${TERMUX_PKG_VERSION}
-
+	cd "$TERMUX_PKG_SRCDIR"
+	go build -o dnote -ldflags "-X main.versionTag=${TERMUX_PKG_VERSION:2}" pkg/cli/main.go
 }
 
 termux_step_make_install() {
-        install -Dm700 $TERMUX_PKG_SRCDIR/build/server/android-$GOARCH/dnote-server "$TERMUX_PREFIX/bin/dnote-server"
-        install -Dm700 $TERMUX_PKG_SRCDIR/build/cli/android-$GOARCH/dnote "$TERMUX_PREFIX/bin/dnote"
-
-        install -Dm644 /dev/null "${TERMUX_PREFIX}/share/bash-completion/completions/dnote.bash"
+	install -Dm700 $TERMUX_PKG_SRCDIR/dnote $TERMUX_PREFIX/bin/dnote
+	install -Dm644 /dev/null "${TERMUX_PREFIX}/share/bash-completion/completions/dnote.bash"
 	install -Dm644 /dev/null "${TERMUX_PREFIX}/share/zsh/site-functions/_dnote"
 	install -Dm644 /dev/null "${TERMUX_PREFIX}/share/fish/vendor_completions.d/dnote.fish"
 }
@@ -49,8 +38,6 @@ termux_step_create_debscripts() {
 termux_step_install_license() {
 	install -Dm600 -t "${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}" \
 		"${TERMUX_PKG_SRCDIR}/licenses/GPLv3.txt"
-        install -Dm600 -t "${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}" \
-		"${TERMUX_PKG_SRCDIR}/licenses/AGPLv3.txt"
-        install -Dm600 -t "${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}" \
+	install -Dm600 -t "${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}" \
 		"${TERMUX_PKG_SRCDIR}/LICENSE"
 }
