@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Free and open source vector graphics editor"
 TERMUX_PKG_LICENSE="GPL-3.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.2.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://media.inkscape.org/dl/resources/file/inkscape-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=46ce7da0eba7ca4badc1db70e9cbb67e0adf9bb342687dc6e08b5ca21b8d4c1b
 TERMUX_PKG_DEPENDS="atk, boost, double-conversion, fontconfig, freetype, gdk-pixbuf, glib, gsl, gtk3, gtkmm3, harfbuzz, libc++, libcairo, libgc, libice, libiconv, libjpeg-turbo, libpng, libpopt, libsm, libsoup, libx11, libxext, libxml2, libxslt, littlecms, pango, poppler, potrace, readline, zlib"
