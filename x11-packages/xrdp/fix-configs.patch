@@ -135,11 +135,14 @@ diff -uNr xrdp-0.9.16/xrdp/xrdp.ini xrdp-0.9.16.mod/xrdp/xrdp.ini
  password=ask
  ip=127.0.0.1
  port=-1
-@@ -215,34 +203,3 @@
+@@ -243,75 +231,3 @@
  ; (e.g. as part of an x11vnc console session). Replace '0' with the
  ; display number of the session
  #chansrvport=DISPLAY(0)
 -
+-; Generic VNC Proxy
+-; Tailor this to specific hosts and VNC instances by specifying an ip
+-; and port and setting a suitable name.
 -[vnc-any]
 -name=vnc-any
 -lib=libvnc.so
@@ -152,16 +155,54 @@ diff -uNr xrdp-0.9.16/xrdp/xrdp.ini xrdp-0.9.16.mod/xrdp/xrdp.ini
 -#pamsessionmng=127.0.0.1
 -#delay_ms=2000
 -
+-; Generic RDP proxy using NeutrinoRDP
+-; Tailor this to specific hosts by specifying an ip and port and setting
+-; a suitable name.
 -[neutrinordp-any]
 -name=neutrinordp-any
+-; To use this section, you should build xrdp with configure option
+-; --enable-neutrinordp.
 -lib=libxrdpneutrinordp.so
 -ip=ask
 -port=ask3389
 -username=ask
 -password=ask
+-; Uncomment the following lines to enable PAM authentication for proxy
+-; connections.
+-#pamusername=ask
+-#pampassword=ask
+-#pamsessionmng=127.0.0.1
 -; Currently NeutrinoRDP doesn't support dynamic resizing. Uncomment
 -; this line if you're using a client which does.
 -#enable_dynamic_resizing=false
+-; By default, performance settings requested by the RDP client are ignored
+-; and chosen by NeutrinoRDP. Uncomment this line to allow the user to
+-; select performance settings in the RDP client.
+-#perf.allow_client_experiencesettings=true
+-; Override any experience setting by uncommenting one or more of the
+-; following lines.
+-#perf.wallpaper=false
+-#perf.font_smoothing=false
+-#perf.desktop_composition=false
+-#perf.full_window_drag=false
+-#perf.menu_anims=false
+-#perf.themes=false
+-#perf.cursor_blink=false
+-; By default NeutrinoRDP supports cursor shadows. If this is giving
+-; you problems (e.g. cursor is a black rectangle) try disabling cursor
+-; shadows by uncommenting the following line.
+-#perf.cursor_shadow=false
+-; By default, NeutrinoRDP uses the keyboard layout of the remote RDP Server.
+-; If you want to tell the remote the keyboard layout of the RDP Client,
+-; by uncommenting the following line.
+-#neutrinordp.allow_client_keyboardLayout=true
+-; The following options will override the remote keyboard layout settings.
+-; These options are for DEBUG and are not recommended for regular use.
+-#neutrinordp.override_keyboardLayout_mask=0x0000FFFF
+-#neutrinordp.override_kbd_type=0x04
+-#neutrinordp.override_kbd_subtype=0x01
+-#neutrinordp.override_kbd_fn_keys=12
+-#neutrinordp.override_kbd_layout=0x00000409
 -
 -; You can override the common channel settings for each session type
 -#channel.rdpdr=true
