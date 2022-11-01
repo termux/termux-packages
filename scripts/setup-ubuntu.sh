@@ -110,7 +110,7 @@ PACKAGES+=" libsqlite3-dev"
 PACKAGES+=" lua5.2"
 
 # Needed by package luarocks.
-PACKAGES+=" lua5.3"
+PACKAGES+=" lua5.1"
 
 # Used bt host build of package mariadb.
 PACKAGES+=" libncurses5-dev"
