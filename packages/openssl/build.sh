@@ -4,10 +4,10 @@ TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Upstream has withdrawn 3.0.6 version:
 #   https://mta.openssl.org/pipermail/openssl-announce/2022-October/000237.html
-_VERSION=3.0.5
+_VERSION=3.0.7
 TERMUX_PKG_VERSION=1:${_VERSION}
 TERMUX_PKG_SRCURL=https://www.openssl.org/source/openssl-${_VERSION/\~/-}.tar.gz
-TERMUX_PKG_SHA256=aa7d8d9bef71ad6525c55ba11e5f4397889ce49c2c9349dcea6d3e4f0b024a7a
+TERMUX_PKG_SHA256=83049d042a260e696f62406ac5c08bf706fd84383f945cf21bd61e9ed95c396e
 TERMUX_PKG_DEPENDS="ca-certificates, zlib"
 TERMUX_PKG_CONFFILES="etc/tls/openssl.cnf"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/c_rehash etc/ssl/misc"
