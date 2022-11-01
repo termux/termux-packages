@@ -1,12 +1,11 @@
 TERMUX_PKG_HOMEPAGE=https://mate-panel.mate-desktop.dev/
 TERMUX_PKG_DESCRIPTION="mate-panel contains the MATE panel, the libmate-panel-applet library and several applets"
-TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_VERSION=1.24.2
+TERMUX_PKG_LICENSE="GPL-2.0, LGPL-2.0"
+TERMUX_PKG_VERSION=1.26.2
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://github.com/mate-desktop/mate-panel/releases/download/v$TERMUX_PKG_VERSION/mate-panel-$TERMUX_PKG_VERSION.tar.xz
-TERMUX_PKG_SHA256=30c5ba0392ec76b110220ee6d10bbdba76af36586592a6b3d604db70602848ea
-TERMUX_PKG_DEPENDS="libsm, gtk3, libice, mate-desktop, mate-menus, libwnck, libmateweather, librsvg"
+TERMUX_PKG_SHA256=aec4f98c89c59e76cc0656ed0482f1d82912f4decc660f21c8d004e493e05410
+TERMUX_PKG_DEPENDS="atk, fontconfig, freetype, gdk-pixbuf, glib, gtk3, harfbuzz, libandroid-shmem, libcairo, libice, libmateweather, libpixman, libpng, libsm, libwnck, libx11, libxcb, libxext, libxrandr, libxrender, mate-desktop, mate-menus, pango, zlib"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner"
 TERMUX_PKG_DISABLE_GIR=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
