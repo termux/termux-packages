@@ -3,8 +3,8 @@ TERMUX_PKG_DESCRIPTION="libcanberra defines a simple abstract interface for play
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.30
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=http://0pointer.de/lennart/projects/libcanberra/libcanberra-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=c2b671e67e0c288a69fc33dc1b6f1b534d07882c2aceed37004bf48c601afa72
-TERMUX_PKG_DEPENDS="libltdl, libvorbis, gstreamer, gtk3, pulseaudio, zenity"
-
+TERMUX_PKG_DEPENDS="atk, fontconfig, freetype, glib, gstreamer, gtk3, harfbuzz, libandroid-shmem, libcairo, libltdl, libpixman, libpng, libvorbis, libx11, libxcb, libxext, libxrender, pango, pulseaudio, zlib"
+TERMUX_PKG_RECOMMENDS="zenity"
