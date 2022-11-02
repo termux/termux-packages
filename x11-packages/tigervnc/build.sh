@@ -67,3 +67,7 @@ termux_step_post_make_install() {
 	cp -f "${TERMUX_PKG_BUILDER_DIR}/vncserver" "${TERMUX_PREFIX}/bin/vncserver"
 	sed -i "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" "${TERMUX_PREFIX}/bin/vncserver"
 }
+
+termux_step_post_massage() {
+	find lib -name '*.la' -delete
+}
