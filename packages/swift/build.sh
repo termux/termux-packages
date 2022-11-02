@@ -2,11 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://swift.org/
 TERMUX_PKG_DESCRIPTION="Swift is a high-performance system programming language"
 TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_MAINTAINER="@buttaface"
-TERMUX_PKG_VERSION=5.7
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=5.7.1
 SWIFT_RELEASE="RELEASE"
 TERMUX_PKG_SRCURL=https://github.com/apple/swift/archive/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE.tar.gz
-TERMUX_PKG_SHA256=5385aa70a62d57087c4f34e5cde0f0154dc9e3916bf4ac95a21594433e7db5f8
+TERMUX_PKG_SHA256=10fc9ad6163120adfdb99b6d6287783cf07f81a89a26819cb6fcb26845b13cf1
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_DEPENDS="clang, libandroid-glob, libandroid-posix-semaphore, libandroid-spawn, libcurl, libicu, libicu-static, libsqlite, libuuid, libxml2, libdispatch, llbuild"
 TERMUX_PKG_BUILD_DEPENDS="rsync"
@@ -35,23 +34,23 @@ termux_step_post_get_source() {
 	mv .temp swift
 
 	declare -A library_checksums
-	library_checksums[swift-cmark]=1c49d849f4bc4664f88f2938bd8410f29e107b6ae51ef038599b23eae11b4325
-	library_checksums[llvm-project]=0361c7d65344b7bcfea26cccf63387f137192e21268f84956de5be66a25ac7c9
-	library_checksums[swift-experimental-string-processing]=d7282d9cbded01dd944022ec1a6ad9e1157bb0aedd45f2baa7a5ea351dc95862
-	library_checksums[swift-corelibs-libdispatch]=b8398571561f3e94053309c55029726af541180e3323ea68e3ca544bbdc57a10
-	library_checksums[swift-corelibs-foundation]=3a50954f6c821448dec94f3da51e6a101f8fba2ee3da8327637a9150f865411e
-	library_checksums[swift-corelibs-xctest]=c801bf4ca0727214036eb9aa2a8c27b6954b0063569147a4cc9d2a212b9ed9cf
-	library_checksums[swift-llbuild]=048bfb7f8b3baece8fc3b4f30ed7a96619a7817c5dbe02976c087eafb610bcd3
+	library_checksums[swift-cmark]=4f1c08bed89647e9fbcec1bbc4404f2f659df81756bff79e6f9725404d1e6e05
+	library_checksums[llvm-project]=1a1f59f3433eedf6c260e6c578abc965e98b521db25387a73d00691009c2e87b
+	library_checksums[swift-experimental-string-processing]=bbc2d4b018b1a3a0509705ef0aaaed900bfc8bcfef7e00577413f99027759c02
+	library_checksums[swift-corelibs-libdispatch]=363ae53e1b71d6849cc456872a278675620d811dccb3094ac1790f1cff944013
+	library_checksums[swift-corelibs-foundation]=667f0b75aae7c54d6c430ba25b6dc3be04e5388c0ea8b6435b8ab5c8a7e01337
+	library_checksums[swift-corelibs-xctest]=6a0c0d6f60e7211bbbc2096ca8cbb3a9400a5f9c4f0720f91ad447da0bffd2b8
+	library_checksums[swift-llbuild]=1695da65abdf5268b57df1ae691d0c36b3086501fdfc3a0e2b4a3eb73f089833
 	library_checksums[swift-argument-parser]=a4d4c08cf280615fe6e00752ef60e28e76f07c25eb4706a9269bf38135cd9c3f
 	library_checksums[Yams]=b31b6df500d6191368c93f605690ca9857fff7c6fd1c8897e9765fb624535c63
 	library_checksums[swift-collections]=575cf0f88d9068411f9acc6e3ca5d542bef1cc9e87dc5d69f7b5a1d5aec8c6b6
 	library_checksums[swift-crypto]=86d6c22c9f89394fd579e967b0d5d0b6ce33cdbf52ba70f82fa313baf70c759f
 	library_checksums[swift-system]=865b8c380455eef27e73109835142920c60ae4c4f4178a3d12ad04acc83f1371
-	library_checksums[swift-driver]=12a074d874866f76d3e58266c68cdb75d3c27ea07e529902783662ec4d495393
-	library_checksums[swift-tools-support-core]=8c9d098f4c2420496fc480f8de3b8f4edb19fb29d78f63c1869073343ccdded7
-	library_checksums[swift-package-manager]=9a6839811be8fc9de822244df96b54473cd847c87a6ff21e8016fc6f8da65a13
-	library_checksums[indexstore-db]=cee2355b7bc120b3a3fa7ecf00f54819aab298829547a629643d00c1add53269
-	library_checksums[sourcekit-lsp]=e246a3320bd09845cf06b18beccbcf1b9994ee32616e9033f11a536c62d304d5
+	library_checksums[swift-driver]=d1cb3644b5f37a4a0d87e01caef44013f344e87e181bdafbd4126181d49a1362
+	library_checksums[swift-tools-support-core]=ac20787154088cfa82edc38ce2abb12a85007d9625a9e1e7ebc319851702a8be
+	library_checksums[swift-package-manager]=51e12bbafea8962df78be2c1e8993a893cdb869de5f22933e5b00fc9d8e40960
+	library_checksums[indexstore-db]=e92722b19f05206ec338e329897bb2e115c89dcad55f2d275e0f75eb42231417
+	library_checksums[sourcekit-lsp]=274b49eb2d0f1539af69636e2667a20a77e31992a21bf59ee6138d3fa28f9ff8
 
 	for library in "${!library_checksums[@]}"; do \
 		GH_ORG="apple"
