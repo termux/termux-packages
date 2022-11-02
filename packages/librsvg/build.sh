@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 _MAJOR_VERSION=2.55
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.1
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://ftp.gnome.org/pub/GNOME/sources/librsvg/${_MAJOR_VERSION}/librsvg-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=6baf48a9d3a56fd13bbfbb9f1f76759b240b70a1fa220fd238474d66a926f98c
 TERMUX_PKG_DEPENDS="fontconfig, freetype, gdk-pixbuf, glib, harfbuzz, libcairo, libpng, libxml2, pango, zlib"
@@ -32,4 +32,8 @@ termux_step_pre_configure() {
 
 	# See https://github.com/GNOME/librsvg/blob/master/COMPILING.md
 	export RUST_TARGET=$CARGO_TARGET_NAME
+}
+
+termux_step_post_massage() {
+	find lib -name '*.la' -delete
 }
