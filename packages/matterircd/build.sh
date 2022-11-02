@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/42wim/matterircd
 TERMUX_PKG_DESCRIPTION="Connect to your mattermost or slack using your IRC-client of choice"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.25.1"
+TERMUX_PKG_VERSION="0.26.0"
 TERMUX_PKG_SRCURL=https://github.com/42wim/matterircd/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=b06c992609e741023ec278d98936462d3e0643adae390d6c4eb39f3144e9ecd9
+TERMUX_PKG_SHA256=520afcbea61f03bc7851b867dedc7604e474e6f57a813f01b3ac0c9be4562da5
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
