@@ -2,11 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://www.libsdl.org
 TERMUX_PKG_DESCRIPTION="A library for portable low-level access to a video framebuffer, audio output, mouse, and keyboard"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.2.15
-TERMUX_PKG_REVISION=48
-TERMUX_PKG_SRCURL=https://www.libsdl.org/release/SDL-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=d6d316a793e5e348155f0dd93b979798933fb98aa1edebcc108829d6474aad00
-TERMUX_PKG_DEPENDS="libandroid-glob, libflac, libogg, libsndfile, libvorbis, libx11, libxext, libxrandr, libxrender, pulseaudio"
+_COMMIT=d95c1a4bbd644baba748d341b03141e5f0481ae6
+_COMMIT_DATE=20221028
+TERMUX_PKG_VERSION=1.2.15-p${_COMMIT_DATE}
+TERMUX_PKG_SRCURL=https://github.com/libsdl-org/SDL-1.2.git
+TERMUX_PKG_GIT_BRANCH=main
+TERMUX_PKG_DEPENDS="libiconv, libx11, libxext, libxrandr, libxrender, pulseaudio"
 TERMUX_PKG_BUILD_DEPENDS="glu, mesa"
 TERMUX_PKG_RECOMMENDS="mesa"
 TERMUX_PKG_CONFLICTS="libsdl"
@@ -18,3 +19,16 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-pth
 --enable-video-opengl
 "
+
+termux_step_post_get_source() {
+	git fetch --unshallow
+	git checkout $_COMMIT
+
+	local pdate="p$(git log -1 --format=%cs | sed 's/-//g')"
+	if [[ "$TERMUX_PKG_VERSION" != *"${pdate}" ]]; then
+		echo -n "ERROR: The version string \"$TERMUX_PKG_VERSION\" is"
+		echo -n " different from what is expected to be; should end"
+		echo " with \"${pdate}\"."
+		return 1
+	fi
+}
