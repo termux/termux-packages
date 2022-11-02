@@ -1,0 +1,26 @@
+diff -uNr unicorn-2.0.1/tests/unit/endian.h unicorn-2.0.1.mod/tests/unit/endian.h
+--- unicorn-2.0.1/tests/unit/endian.h	2022-11-01 23:36:54.000000000 +0800
++++ unicorn-2.0.1.mod/tests/unit/endian.h	2022-11-02 12:35:06.520365981 +0800
+@@ -32,7 +32,7 @@
+ // GNU libc offers the helpful header <endian.h> which defines
+ // __BYTE_ORDER
+ 
+-#if defined (__GLIBC__)
++#if defined (__GLIBC__) || defined(ANDROID)
+ # include <endian.h>
+ # if (__BYTE_ORDER == __LITTLE_ENDIAN)
+ #  define BOOST_LITTLE_ENDIAN
+diff -uNr unicorn-2.0.1/tests/unit/unicorn_test.h unicorn-2.0.1.mod/tests/unit/unicorn_test.h
+--- unicorn-2.0.1/tests/unit/unicorn_test.h	2022-11-01 23:36:54.000000000 +0800
++++ unicorn-2.0.1.mod/tests/unit/unicorn_test.h	2022-11-02 12:34:28.160365996 +0800
+@@ -5,7 +5,9 @@
+ #include <stdint.h>
+ #include <unicorn/unicorn.h>
+ #include "acutest.h"
+-#include "endian.h"
++#ifdef __ANDROID__
++#include <sys/endian.h>
++#endif
+ 
+ // Copied from glibc-2.29
+ 
