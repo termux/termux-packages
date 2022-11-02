@@ -28,5 +28,5 @@ termux_step_pre_configure() {
 		-DZIG_EXECUTABLE=$(command -v zig)
 		-DZIG_TARGET_TRIPLE=$ZIG_TARGET_NAME
 		"
-	LDFLAGS+=" -landroid-spawn -lncursesw -lxml2 -lz"
+        LDFLAGS+=" -landroid-spawn -lncursesw -lxml2 -lz $($CC -print-libgcc-file-name)"
 }
