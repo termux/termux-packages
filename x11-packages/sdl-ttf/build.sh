@@ -2,12 +2,26 @@ TERMUX_PKG_HOMEPAGE=https://www.libsdl.org/projects/SDL_ttf
 TERMUX_PKG_DESCRIPTION="A companion library to SDL for working with TrueType (tm) fonts"
 TERMUX_PKG_LICENSE="ZLIB"
 TERMUX_PKG_MAINTAINER="@Yonle"
-TERMUX_PKG_VERSION=2.0.11
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SRCURL=https://www.libsdl.org/projects/SDL_ttf/release/SDL_ttf-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=724cd895ecf4da319a3ef164892b72078bd92632a5d812111261cde248ebcdb7
+_COMMIT=2648c22c4f9e32d05a11b32f636b1c225a1502ac
+_COMMIT_DATE=20220526
+TERMUX_PKG_VERSION=2.0.11-p${_COMMIT_DATE}
+TERMUX_PKG_SRCURL=https://github.com/libsdl-org/SDL_ttf.git
+TERMUX_PKG_GIT_BRANCH=SDL-1.2
 TERMUX_PKG_DEPENDS="freetype, sdl"
 
+termux_step_post_get_source() {
+	git fetch --unshallow
+	git checkout $_COMMIT
+
+	local pdate="p$(git log -1 --format=%cs | sed 's/-//g')"
+	if [[ "$TERMUX_PKG_VERSION" != *"${pdate}" ]]; then
+		echo -n "ERROR: The version string \"$TERMUX_PKG_VERSION\" is"
+		echo -n " different from what is expected to be; should end"
+		echo " with \"${pdate}\"."
+		return 1
+	fi
+}
+
 termux_step_pre_configure() {
-	LDFLAGS="${LDFLAGS/-Wl,--as-needed/} -lm"
+	LDFLAGS+=" -lm"
 }
