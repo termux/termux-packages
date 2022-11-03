@@ -26,7 +26,7 @@ termux_step_host_build() {
 
 termux_step_pre_configure() {
 	_PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
-	
+
 	termux_setup_python_crossenv
 	pushd $TERMUX_PYTHON_CROSSENV_SRCDIR
 	_CROSSENV_PREFIX=$TERMUX_PKG_BUILDDIR/python-crossenv-prefix
@@ -39,7 +39,7 @@ termux_step_pre_configure() {
 	build-pip install -U wheel pyyaml numpy typing_extensions
 
 	pip install -U typing_extensions
-	
+
 	termux_setup_protobuf
 
 	find "$TERMUX_PKG_SRCDIR" -name CMakeLists.txt -o -name '*.cmake' | \
@@ -48,7 +48,7 @@ termux_step_pre_configure() {
 		-e 's/\([^A-Za-z0-9_]ANDROID\)$/\1_NO_TERMUX/g'
 
 	LDFLAGS+=" -llog -lpython${_PYTHON_VERSION}"
-	
+
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 	-DBUILD_PYTHON=ON
 	-DBUILD_TEST=OFF
@@ -71,17 +71,29 @@ termux_step_pre_configure() {
 	-DPROTOBUF_PROTOC_EXECUTABLE=$(command -v protoc)	
 	-DCAFFE2_CUSTOM_PROTOC_EXECUTABLE=$(command -v protoc)
 	-DUSE_ITT=OFF
+	-DUSE_MKLDNN=OFF
 	"
-	
+
 	# /home/builder/.termux-build/_cache/android-r25b-api-24-v0/sysroot/usr/include/linux/types.h:21:10: fatal error: 'asm/types.h' file not found
 	ln -s ${TERMUX_STANDALONE_TOOLCHAIN}/sysroot/usr/include/${TERMUX_HOST_PLATFORM}/asm
-	
+
 	ln -s "$TERMUX_PKG_BUILDDIR" build
+
+	_NEED_DUMMY_LIBPTHREAD_A=
+	_LIBPTHREAD_A=$TERMUX_PREFIX/lib/libpthread.a
+	if [ ! -e $_LIBPTHREAD_A ]; then
+		_NEED_DUMMY_LIBPTHREAD_A=true
+		echo '!<arch>' > $_LIBPTHREAD_A
+	fi
 }
 
 termux_step_make_install() {
 	pip -v install --prefix $TERMUX_PREFIX --no-build-isolation "$TERMUX_PKG_SRCDIR"
 	ln -s ${TERMUX_PREFIX}/lib/python${_PYTHON_VERSION}/site-packages/torch/lib/*.so ${TERMUX_PREFIX}/lib
+
+	if [ $_NEED_DUMMY_LIBPTHREAD_A ]; then
+		rm -f $_LIBPTHREAD_A
+	fi
 }
 
 termux_step_create_debscripts() {
