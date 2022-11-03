@@ -12,9 +12,3 @@ TERMUX_PKG_REPLACES="liblz4-dev"
 termux_step_pre_configure() {
 	TERMUX_PKG_SRCDIR+=/build/cmake
 }
-
-termux_step_post_make_install() {
-	# Rebuild all dependent packages to remove this.
-	ln -sf liblz4.so "${TERMUX_PREFIX}/lib/liblz4.so.${TERMUX_PKG_VERSION}"
-	ln -sf liblz4.so "${TERMUX_PREFIX}/lib/liblz4.so.${TERMUX_PKG_VERSION//.*}"
-}
