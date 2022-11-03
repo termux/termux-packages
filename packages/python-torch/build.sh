@@ -70,6 +70,7 @@ termux_step_pre_configure() {
 	-DBUILD_CUSTOM_PROTOBUF=OFF
 	-DPROTOBUF_PROTOC_EXECUTABLE=$(command -v protoc)	
 	-DCAFFE2_CUSTOM_PROTOC_EXECUTABLE=$(command -v protoc)
+	-DUSE_ITT=OFF
 	"
 	
 	# /home/builder/.termux-build/_cache/android-r25b-api-24-v0/sysroot/usr/include/linux/types.h:21:10: fatal error: 'asm/types.h' file not found
