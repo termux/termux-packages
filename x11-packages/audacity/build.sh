@@ -4,13 +4,13 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Version 3.0.0 or higher does not work with vanilla wxWidgets.
 TERMUX_PKG_VERSION=2.4.2
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 _FFMPEG_VERSION=4.4.2
 TERMUX_PKG_SRCURL=(https://github.com/audacity/audacity/archive/Audacity-${TERMUX_PKG_VERSION}.tar.gz
                    https://www.ffmpeg.org/releases/ffmpeg-${_FFMPEG_VERSION}.tar.xz)
 TERMUX_PKG_SHA256=(cdb4800c8e9d1d4ca19964caf8d24000f80286ebd8a4db566c2622449744c099
                    af419a7f88adbc56c758ab19b4c708afbcae15ef09606b82b855291f6a6faa93)
-TERMUX_PKG_DEPENDS="glib, gtk3, libc++, libexpat, libflac, libmp3lame, libogg, libsndfile, libsoxr, libvorbis, wxwidgets, zlib"
+TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libc++, libexpat, libflac, libmp3lame, libogg, libsndfile, libsoxr, libvorbis, wxwidgets"
 # Support for FFmpeg 5.0 is not backported:
 # https://github.com/audacity/audacity/issues/2445
 TERMUX_PKG_SUGGESTS="audacity-ffmpeg"

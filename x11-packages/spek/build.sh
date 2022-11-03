@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="An acoustic spectrum analyser"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.8.4
+TERMUX_PKG_REVISION=1
 _FFMPEG_VERSION=4.4.2
 TERMUX_PKG_SRCURL=(https://github.com/alexkay/spek/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
                    https://www.ffmpeg.org/releases/ffmpeg-${_FFMPEG_VERSION}.tar.xz)
@@ -10,7 +11,7 @@ TERMUX_PKG_SHA256=(1751246e958cff91fe30b01925a38bf8cbd9c6abbd0d24e5b21eaad3d0545
                    af419a7f88adbc56c758ab19b4c708afbcae15ef09606b82b855291f6a6faa93)
 # FFmpeg 5.0 is not yet supported:
 # https://github.com/alexkay/spek/issues/218
-TERMUX_PKG_DEPENDS="wxwidgets"
+TERMUX_PKG_DEPENDS="libc++, wxwidgets"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_path_WX_CONFIG_PATH=$TERMUX_PREFIX/bin/wx-config"
 TERMUX_PKG_RM_AFTER_INSTALL="
 opt/$TERMUX_PKG_NAME/include
