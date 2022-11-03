@@ -2,13 +2,18 @@ TERMUX_PKG_HOMEPAGE=https://pytorch.org/
 TERMUX_PKG_DESCRIPTION="Tensors and Dynamic neural networks in Python"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.12.1
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=1.13.0
 TERMUX_PKG_SRCURL=https://github.com/pytorch/pytorch.git
 TERMUX_PKG_DEPENDS="python, python-numpy, libopenblas, libprotobuf, libzmq, ffmpeg, opencv"
 TERMUX_PKG_HOSTBUILD=true
 
-TERMUX_PKG_RM_AFTER_INSTALL="lib/pkgconfig/sleef.pc"
+TERMUX_PKG_RM_AFTER_INSTALL="
+lib/pkgconfig/sleef.pc
+lib/pkgconfig/libcpuinfo.pc
+bin/convert-onnx-to-caffe2
+bin/convert-caffe2-to-onnx
+bin/torchrun
+"
 
 termux_step_post_get_source() {
 	termux_setup_cmake
@@ -22,19 +27,17 @@ termux_step_host_build() {
 termux_step_pre_configure() {
 	_PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
 	
-	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
-		termux_setup_python_crossenv
-		pushd $TERMUX_PYTHON_CROSSENV_SRCDIR
-		_CROSSENV_PREFIX=$TERMUX_PKG_BUILDDIR/python-crossenv-prefix
-		python${_PYTHON_VERSION} -m crossenv \
-			$TERMUX_PREFIX/bin/python${_PYTHON_VERSION} \
-			${_CROSSENV_PREFIX}
-		popd
-		. ${_CROSSENV_PREFIX}/bin/activate
+	termux_setup_python_crossenv
+	pushd $TERMUX_PYTHON_CROSSENV_SRCDIR
+	_CROSSENV_PREFIX=$TERMUX_PKG_BUILDDIR/python-crossenv-prefix
+	python${_PYTHON_VERSION} -m crossenv \
+		$TERMUX_PREFIX/bin/python${_PYTHON_VERSION} \
+		${_CROSSENV_PREFIX}
+	popd
+	. ${_CROSSENV_PREFIX}/bin/activate
 
-		build-pip install -U wheel pyyaml numpy typing_extensions
-	fi
-	
+	build-pip install -U wheel pyyaml numpy typing_extensions
+
 	pip install -U typing_extensions
 	
 	termux_setup_protobuf
@@ -55,7 +58,7 @@ termux_step_pre_configure() {
 	-DNUMPY_INCLUDE_DIR=${TERMUX_PREFIX}/lib/python${_PYTHON_VERSION}/site-packages/numpy/core/include
 	-DPYTHON_EXECUTABLE=$(command -v python3)
 	-DPYTHON_INCLUDE_DIR=${TERMUX_PREFIX}/include/python${_PYTHON_VERSION}
-	-DPYTHON_LIBRARY=${TERMUX_PREFIX}/lib//libpython${_PYTHON_VERSION}.so
+	-DPYTHON_LIBRARY=${TERMUX_PREFIX}/lib/libpython${_PYTHON_VERSION}.so
 	-DTORCH_BUILD_VERSION=${TERMUX_PKG_VERSION}
 	-DUSE_NUMPY=ON
 	-DUSE_OPENCV=ON
@@ -85,11 +88,14 @@ termux_step_pre_configure() {
 	ln -s ${TERMUX_STANDALONE_TOOLCHAIN}/sysroot/usr/include/${TERMUX_ARCH}-linux-android$( if test $TERMUX_ARCH = arm; then echo eabi; fi )/asm
 	
 	ln -s "$TERMUX_PKG_BUILDDIR" build
+
+	CC="ccache $CC"
+	CXX="ccache $CXX"
 }
 
 termux_step_make_install() {
-	pip -v install --prefix $TERMUX_PREFIX "$TERMUX_PKG_SRCDIR"
-	ln -s ${TERMUX_PREFIX}/lib/python3.10/site-packages/torch/lib/*.so ${TERMUX_PREFIX}/lib
+	pip -v install --prefix $TERMUX_PREFIX --no-build-isolation "$TERMUX_PKG_SRCDIR"
+	ln -s ${TERMUX_PREFIX}/lib/python${_PYTHON_VERSION}/site-packages/torch/lib/*.so ${TERMUX_PREFIX}/lib
 }
 
 termux_step_create_debscripts() {
