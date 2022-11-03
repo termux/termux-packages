@@ -15,10 +15,3 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DBUILD_TOOLS=OFF
 -DBUILD_TESTS=OFF
 "
-
-termux_step_post_make_install() {
-	ln -sf libchromaprint.so \
-		"${TERMUX_PREFIX}/lib/libchromaprint.so.${TERMUX_PKG_VERSION:0:1}"
-	ln -sf libchromaprint.so \
-		"${TERMUX_PREFIX}/lib/libchromaprint.so.${TERMUX_PKG_VERSION}"
-}

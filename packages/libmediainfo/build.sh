@@ -18,8 +18,3 @@ termux_step_pre_configure() {
 
 	LDFLAGS+=" $($CC -print-libgcc-file-name)"
 }
-
-termux_step_post_make_install() {
-	ln -sf libmediainfo.so "${TERMUX_PREFIX}/lib/libmediainfo.so.0"
-	ln -sf libmediainfo.so "${TERMUX_PREFIX}/lib/libmediainfo.so.0.0"
-}
