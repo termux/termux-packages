@@ -11,30 +11,32 @@
  		"                         ssh: sets the prefix for the socket path\n"
  		"      --version        print waypipe version and exit\n"
  		"      --allow-tiled    allow gpu buffers (DMABUFs) with format modifiers\n"
-@@ -743,7 +743,7 @@
+@@ -757,7 +757,7 @@
  		} else {
- 			strcpy(sockaddr.sun_path,
- 					socketpath ? socketpath
--						   : "/tmp/waypipe-client.sock");
-+						   : "@TERMUX_PREFIX@/tmp/waypipe-client.sock");
- 			int nmaxclients = oneshot ? 1 : 128;
- 			int channelsock =
- 					setup_nb_socket(&sockaddr, nmaxclients);
-@@ -776,7 +776,7 @@
+ 			struct socket_path client_sock_path;
+ 			client_sock_path.folder =
+-					socketpath ? socketpath : "/tmp/";
++					socketpath ? socketpath : "@TERMUX_PREFIX@/tmp/";
+ 			client_sock_path.filename = &sockaddr;
+ 			if (!socketpath) {
+ 				sockaddr.sun_family = AF_UNIX;
+@@ -799,7 +799,7 @@
  		} else {
- 			strcpy(sockaddr.sun_path,
- 					socketpath ? socketpath
--						   : "/tmp/waypipe-server.sock");
-+						   : "@TERMUX_PREFIX@/tmp/waypipe-server.sock");
- 
- 			ret = run_server(&sockaddr, wayland_display,
- 					control_path, &config, oneshot,
-@@ -784,7 +784,7 @@
- 		}
- 	} else {
- 		if (!socketpath) {
+ 			struct socket_path server_sock_path;
+ 			server_sock_path.folder =
+-					socketpath ? socketpath : "/tmp/";
++					socketpath ? socketpath : "@TERMUX_PREFIX@/tmp/";
+ 			server_sock_path.filename = &sockaddr;
+ 			if (!socketpath) {
+ 				sockaddr.sun_family = AF_UNIX;
+@@ -830,8 +830,8 @@
+ 		} else {
+ 			clientsock.sun_family = AF_UNIX;
+ 			strcpy(clientsock.sun_path, "waypipe");
+-			strcpy(socket_folder, "/tmp/");
 -			socketpath = "/tmp/waypipe";
++			strcpy(socket_folder, "@TERMUX_PREFIX@/tmp/");
 +			socketpath = "@TERMUX_PREFIX@/tmp/waypipe";
  		}
- 		const size_t spsz =
- 				sizeof(((struct sockaddr_un *)NULL)->sun_path);
+ 		if (strlen(clientsock.sun_path) +
+ 						sizeof("-server-88888888.sock") >=
