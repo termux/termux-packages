@@ -6,8 +6,7 @@ TERMUX_PKG_VERSION=4.2.8
 TERMUX_PKG_REVISION=7
 TERMUX_PKG_SRCURL="https://github.com/tvheadend/tvheadend/archive/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=1aef889373d5fad2a7bd2f139156d4d5e34a64b6d38b87b868a2df415f01f7ad
-TERMUX_PKG_DEPENDS="libiconv, ffmpeg, libopus, libx264, libx265, libvpx, libfdk-aac, libogg, libtheora, libvorbis, pngquant"
-TERMUX_PKG_BUILD_DEPENDS="gettext, openssl, zlib, libdvbcsa, pcre2, dbus"
+TERMUX_PKG_DEPENDS="dbus, libdvbcsa, libiconv, openssl, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
