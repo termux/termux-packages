@@ -3,10 +3,10 @@ TERMUX_PKG_DESCRIPTION="TV streaming server for Linux and Android supporting DVB
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.org>"
 TERMUX_PKG_VERSION=4.2.8
-TERMUX_PKG_REVISION=7
+TERMUX_PKG_REVISION=8
 TERMUX_PKG_SRCURL="https://github.com/tvheadend/tvheadend/archive/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=1aef889373d5fad2a7bd2f139156d4d5e34a64b6d38b87b868a2df415f01f7ad
-TERMUX_PKG_DEPENDS="dbus, libdvbcsa, libiconv, openssl, zlib"
+TERMUX_PKG_DEPENDS="dbus, libdvbcsa, libiconv, openssl, tvheadend-data, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
