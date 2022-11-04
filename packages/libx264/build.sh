@@ -2,11 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://www.videolan.org/developers/x264.html
 TERMUX_PKG_DESCRIPTION="Library for encoding video streams into the H.264/MPEG-4 AVC format"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-_COMMIT=55d517bc4569272a2c9a367a4106c234aba2ffbc
-TERMUX_PKG_VERSION=1:0.161.3049 # X264_BUILD from x264.h; commit count
-TERMUX_PKG_REVISION=2
+_COMMIT=b093bbe7d9bc642c8f24067cbdcc73bb43562eab
+TERMUX_PKG_VERSION=1:0.164.3101 # X264_BUILD from x264.h; commit count
 TERMUX_PKG_SRCURL=https://code.videolan.org/videolan/x264/-/archive/$_COMMIT/x264-$_COMMIT.tar.bz2
-TERMUX_PKG_SHA256=f4b781e1e33f77e7bf283648537f38a3dd107589de7a87973df6d26480faf5d2
+TERMUX_PKG_SHA256=8a943822d761c302da647399582354fa8788802570ce3b865edd44b1aa77e9b0
 TERMUX_PKG_BREAKS="libx264-dev"
 TERMUX_PKG_REPLACES="libx264-dev"
 # Avoid linking against ffmpeg libraries to avoid circular dependency:
