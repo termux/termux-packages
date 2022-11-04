@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_SRCURL=https://github.com/zyedidia/micro.git
 TERMUX_PKG_VERSION=2.0.11
+TERMUX_PKG_REVISION=1
 
 termux_step_make() {
 	return
@@ -20,7 +21,7 @@ termux_step_make_install() {
 	cp -R . $MICRO_SRC
 
 	cd $MICRO_SRC
-	make build-quick
+	make build
 	mv micro $TERMUX_PREFIX/bin/micro
 }
 
