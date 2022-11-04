@@ -1,0 +1,21 @@
+commit 5864f397ccad30f6e73221b90bdac57a303b9752
+Author: Andrey Semashev <andrey.semashev@gmail.com>
+Date:   Fri Aug 12 12:59:56 2022 +0300
+
+    Fixed a missing include on POSIX systems that don't support *at APIs.
+    
+    Fixes https://github.com/boostorg/filesystem/issues/250.
+
+diff --git a/libs/filesystem/src/operations.cpp b/libs/filesystem/src/operations.cpp
+index ca2fff3..e22967e 100644
+--- a/libs/filesystem/src/operations.cpp
++++ b/libs/filesystem/src/operations.cpp
+@@ -70,7 +70,7 @@
+ 
+ #include <unistd.h>
+ #include <fcntl.h>
+-#if _POSIX_C_SOURCE < 200809L
++#if !defined(BOOST_FILESYSTEM_HAS_POSIX_AT_APIS)
+ #include <utime.h>
+ #endif
+ #include <limits.h>
