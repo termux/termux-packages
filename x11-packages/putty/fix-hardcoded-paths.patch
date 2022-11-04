@@ -1,0 +1,75 @@
+--- a/ssh/sesschan.c
++++ b/ssh/sesschan.c
+@@ -482,7 +482,7 @@
+     agent->cl = cl;
+     agent->plug.vt = &agentfwd_plugvt;
+ 
+-    char *dir_prefix = dupprintf("/tmp/%s-agentfwd", appname);
++    char *dir_prefix = dupprintf("@TERMUX_PREFIX@/tmp/%s-agentfwd", appname);
+     char *error = NULL, *socketname = NULL;
+     agent->socket = platform_make_agent_socket(
+         &agent->plug, dir_prefix, &error, &socketname);
+--- a/unix/network.c
++++ b/unix/network.c
+@@ -29,7 +29,7 @@
+ #endif
+ 
+ #ifndef X11_UNIX_PATH
+-# define X11_UNIX_PATH "/tmp/.X11-unix/X"
++# define X11_UNIX_PATH "@TERMUX_PREFIX@/tmp/.X11-unix/X"
+ #endif
+ 
+ /*
+--- a/unix/noise.c
++++ b/unix/noise.c
+@@ -70,7 +70,7 @@
+         exit(1);
+     }
+ 
+-    fp = popen("ls -al /tmp 2>/dev/null", "r");
++    fp = popen("ls -al @TERMUX_PREFIX@/tmp 2>/dev/null", "r");
+     if (fp) {
+         while ( (ret = fread(buf, 1, sizeof(buf), fp)) > 0)
+             func(buf, ret);
+--- a/unix/pageant.c
++++ b/unix/pageant.c
+@@ -233,7 +233,7 @@
+     /* Nothing needs doing in Unix Pageant */
+ }
+ 
+-#define PAGEANT_DIR_PREFIX "/tmp/pageant"
++#define PAGEANT_DIR_PREFIX "@TERMUX_PREFIX@/tmp/pageant"
+ 
+ static bool time_to_die = false;
+ 
+--- a/unix/sharing.c
++++ b/unix/sharing.c
+@@ -19,7 +19,7 @@
+ #include "proxy/proxy.h"
+ #include "ssh.h"
+ 
+-#define CONNSHARE_SOCKETDIR_PREFIX "/tmp/putty-connshare"
++#define CONNSHARE_SOCKETDIR_PREFIX "@TERMUX_PREFIX@/tmp/putty-connshare"
+ #define SALT_FILENAME "salt"
+ #define SALT_SIZE 64
+ #ifndef PIPE_BUF
+--- a/unix/x11.c
++++ b/unix/x11.c
+@@ -117,7 +117,7 @@
+      * but it's worth a try, and we don't consider it a fatal error if
+      * it doesn't work.
+      */
+-    unix_path = dupprintf("/tmp/.X11-unix/X%d", displayno);
++    unix_path = dupprintf("@TERMUX_PREFIX@/tmp/.X11-unix/X%d", displayno);
+     a_unix = unix_sock_addr(unix_path);
+ 
+     sockets[nsockets] = new_unix_listener(a_unix, plug);
+@@ -138,7 +138,7 @@
+ 
+     tmpdir = getenv("TMPDIR");
+     if (!tmpdir || !*tmpdir)
+-        tmpdir = "/tmp";
++        tmpdir = "@TERMUX_PREFIX@/tmp";
+ 
+     authfilename = dupcat(tmpdir, "/", progname, "-Xauthority-XXXXXX");
+ 
