@@ -1,21 +1,11 @@
 --- a/meson.build
 +++ b/meson.build
-@@ -441,9 +441,6 @@
-                             default_options: ['tests=false'])
- iso_codes_dep  = dependency('iso-codes', required: false)
- 
--gidocgen_dep    = dependency('gi-docgen', version: '>= 2021.1',
--                             fallback: ['gi-docgen', 'dummy_dep'],
--                             required: get_option('gtk_doc'))
- gi_dep         = dependency('gobject-introspection-1.0', version: introspection_req,
-                             required: get_option('introspection').enabled() and
-                                       get_option('build-tests'))
-@@ -882,7 +879,7 @@
+@@ -884,7 +884,7 @@
  
  subdir('docs/reference')
  
 -if not meson.is_cross_build()
 +if false
-   if meson.version().version_compare('>=0.57.0')
-     gnome.post_install(
-       glib_compile_schemas: true,
+   gnome.post_install(
+     glib_compile_schemas: true,
+     gio_querymodules: gio_module_dirs,
