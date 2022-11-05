@@ -4,8 +4,8 @@ TERMUX_PKG_LICENSE="AGPL-V3"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_SRCURL=https://git.gnunet.org/git/gnunet.git
 TERMUX_PKG_VERSION=0.16.1
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_DEPENDS="gnurl, libgcrypt, libgmp, libidn, libjansson, libltdl, libmicrohttpd, libsqlite, libunistring, libsodium"
+TERMUX_PKG_REVISION=3
+TERMUX_PKG_DEPENDS="gnurl, libgcrypt, libiconv, libidn2, libjansson, libltdl, libmicrohttpd, libnettle, libsodium, libsqlite, libunistring, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_have_decl_struct_in6_ifreq=yes"
 
