@@ -4,18 +4,18 @@ TERMUX_PKG_LICENSE="VIM License"
 TERMUX_PKG_MAINTAINER="@termux"
 
 # vim should only be updated every 50 releases on multiples of 50.
-TERMUX_PKG_VERSION=8.2.4650
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=9.0.0800
 TERMUX_PKG_SRCURL=https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=f91b3bddaeb538a7a2cc3325cbc80bd1b0009a92407b3a8cb29f7618498fa950
+TERMUX_PKG_SHA256=2665476c5b3cbf4005e0ed859fe75fbc258c519b0ee72707da2a3385719d1a09
 
-TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libcairo, libcanberra, libice, libiconv, liblua53, libsm, libx11, libxpm, libxt, ncurses, pango, python"
+TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libcairo, libcanberra, libice, libiconv, liblua52, libsm, libx11, libxt, ncurses, pango, python"
 TERMUX_PKG_CONFLICTS="vim, vim-python, vim-runtime"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 _PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_small_wchar_t=no
+ac_cv_path_vi_cv_path_plain_lua=lua5.2
 vi_cv_path_python3_pfx=$TERMUX_PREFIX
 vi_cv_var_python3_abiflags=
 vi_cv_var_python3_version=${_PYTHON_VERSION}
@@ -38,9 +38,10 @@ vim_cv_tty_group=world
 --with-x"
 
 TERMUX_PKG_RM_AFTER_INSTALL="
-share/vim/vim81/spell/en.ascii*
-share/vim/vim81/print
-share/vim/vim81/tools
+share/vim/vim90/spell/en.ascii*
+share/vim/vim90/print
+share/vim/vim90/tools
+share/applications/mimeinfo.cache
 share/icons/hicolor/icon-theme.cache
 "
 
