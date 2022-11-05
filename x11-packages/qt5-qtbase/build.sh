@@ -9,6 +9,7 @@ TERMUX_PKG_DEPENDS="dbus, double-conversion, harfbuzz, libandroid-shmem, libandr
 # gtk3 dependency is a run-time dependency only for the gtk platformtheme subpackage
 TERMUX_PKG_BUILD_DEPENDS="gtk3"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_NO_STATICSPLIT=true
 
 TERMUX_PKG_RM_AFTER_INSTALL="
