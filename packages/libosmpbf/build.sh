@@ -10,5 +10,5 @@ TERMUX_PKG_DEPENDS="libprotobuf"
 TERMUX_PKG_GROUPS="science"
 
 termux_step_pre_configure() {
-  termux_setup_protobuf
+	termux_setup_protobuf
 }

@@ -23,6 +23,6 @@ termux_step_make() {
 termux_step_make_install() {
 	rm -rf $TERMUX_PREFIX/opt/jython
 	mkdir -p $TERMUX_PREFIX/opt/jython
-        cp -a $TERMUX_PKG_SRCDIR/dist/* $TERMUX_PREFIX/opt/jython/
-        ln -sfr $TERMUX_PREFIX/opt/jython/bin/jython $TERMUX_PREFIX/bin/jython
+	cp -a $TERMUX_PKG_SRCDIR/dist/* $TERMUX_PREFIX/opt/jython/
+	ln -sfr $TERMUX_PREFIX/opt/jython/bin/jython $TERMUX_PREFIX/bin/jython
 }

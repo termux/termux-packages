@@ -9,5 +9,5 @@ TERMUX_PKG_DEPENDS="zlib,freetype,libpng"
 TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_post_make_install() {
-        mv "$TERMUX_PREFIX"/lib/libPNGwriter_shared.so libPNGwriter.so
+	mv "$TERMUX_PREFIX"/lib/libPNGwriter_shared.so libPNGwriter.so
 }

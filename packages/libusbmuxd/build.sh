@@ -11,8 +11,9 @@ TERMUX_PKG_DEPENDS="libusb, libplist, usbmuxd"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_configure() {
-        ./autogen.sh --prefix=$TERMUX_PREFIX \
-		     --without-preflight \
-		     --without-systemd \
-		     --host=$TERMUX_HOST_PLATFORM
+	./autogen.sh \
+		--prefix=$TERMUX_PREFIX \
+		--without-preflight \
+		--without-systemd \
+		--host=$TERMUX_HOST_PLATFORM
 }

@@ -11,8 +11,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-Dbuild_dir=$TERMUX_PKG_BUILDDIR"
 TERMUX_PKG_GROUPS="games"
 
 termux_step_create_debscripts() {
-    # Create scores file in a debscript, so an update to the package wouldn't erease any scores
-    echo "mkdir -p $TERMUX_PREFIX/lib/games/moria/" > postinst
-    echo "touch $TERMUX_PREFIX/lib/games/moria/scores.dat" >> postinst
-    chmod 0755 postinst
+	# Create scores file in a debscript, so an update to the package wouldn't erease any scores
+	echo "mkdir -p $TERMUX_PREFIX/lib/games/moria/" > postinst
+	echo "touch $TERMUX_PREFIX/lib/games/moria/scores.dat" >> postinst
+	chmod 0755 postinst
 }

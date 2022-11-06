@@ -10,5 +10,5 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="openssl"
 
 termux_step_pre_configure() {
-    rm -f Makefile
+	rm -f Makefile
 }

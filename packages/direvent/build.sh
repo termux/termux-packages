@@ -8,5 +8,5 @@ TERMUX_PKG_SHA256=9405a8a77da49fe92bbe4af18bf925ff91f6d3374c10b7d700a031bacb94c4
 TERMUX_PKG_DEPENDS="libandroid-glob"
 
 termux_step_pre_configure() {
-       export LIBS="-landroid-glob"
+	export LIBS="-landroid-glob"
 }

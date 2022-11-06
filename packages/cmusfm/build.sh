@@ -8,5 +8,5 @@ TERMUX_PKG_SHA256=ff5338d4b473a3e295f3ae4273fb097c0f79c42e3d803eefdf372b51dba606
 TERMUX_PKG_DEPENDS=libcurl
 
 termux_step_pre_configure() {
-  autoreconf --install
+	autoreconf --install
 }

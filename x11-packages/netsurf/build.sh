@@ -11,7 +11,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-gtk3"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_configure () {
-    echo CC=$CC
+	echo CC=$CC
 	export HOST=`$CC -dumpmachine`
 	export BUILD=`$CC_FOR_BUILD -dumpmachine`
 	export CFLAGS+=" -I${TERMUX_PREFIX}/include"
@@ -20,21 +20,21 @@ termux_step_configure () {
 	mkdir -p netsurf/build/Linux-gtk3
 	# Note: NETSURF_USE_DUKTAPE= disables javascript, because I couldn't figure out how to build
 	# required the nsgenbind tool so that it can be executed on the *host* (it is used during the build process only)
-    make PREFIX="${TERMUX_PREFIX}" NETSURF_GTK_MAJOR=3 NETSURF_USE_DUKTAPE=NO NETSURF_USE_LIBICONV_PLUG=NO toolchain=clang
+	make PREFIX="${TERMUX_PREFIX}" NETSURF_GTK_MAJOR=3 NETSURF_USE_DUKTAPE=NO NETSURF_USE_LIBICONV_PLUG=NO toolchain=clang
 }
 
 termux_step_make() {
 	# Nothing to do
-    echo CC=$CC
+	echo CC=$CC
 }
 
 termux_step_make_install () {
-    echo CC=$CC
+	echo CC=$CC
 	export HOST=`$CC -dumpmachine`
 	export BUILD=`$CC_FOR_BUILD -dumpmachine`
 	export CFLAGS+=" -I${TERMUX_PREFIX}/include"
 	export CPPFLAGS+=" -I${TERMUX_PREFIX}/include"
 	export CXXFLAGS+=" -I${TERMUX_PREFIX}/include"
-    make install PREFIX="${TERMUX_PREFIX}" NETSURF_GTK_MAJOR=3 NETSURF_USE_DUKTAPE=NO NETSURF_USE_LIBICONV_PLUG=NO toolchain=clang
+	make install PREFIX="${TERMUX_PREFIX}" NETSURF_GTK_MAJOR=3 NETSURF_USE_DUKTAPE=NO NETSURF_USE_LIBICONV_PLUG=NO toolchain=clang
 	ln -sfr $TERMUX_PREFIX/bin/netsurf-gtk3 $TERMUX_PREFIX/bin/netsurf
 }

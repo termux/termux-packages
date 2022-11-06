@@ -49,11 +49,11 @@ termux_step_pre_configure() {
 		cat configure.newf > configure
 		rm configure.newf
 
- 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
 		zsh_cv_off_t_is_64_bit=yes
 		"
 	else
- 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
 		zsh_cv_64_bit_type=long
 		"
 	fi

@@ -9,12 +9,11 @@ TERMUX_PKG_SHA256="aaf60095884abb872e25f8e919a8a63d0dabaeca46faeba87d12812d6efc7
 TERMUX_PKG_DEPENDS="perl"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_RECOMMENDS="file,binutils,bzip2,cpio,gzip,lhasa,liblzma,lzop,lzip \
-                       ,p7zip,tar,unrar,zip,unzip,arj,zstd"
+TERMUX_PKG_RECOMMENDS="file, binutils, bzip2, cpio, gzip, lhasa, liblzma, lzop, lzip, p7zip, tar, unrar, zip, unzip, arj, zstd"
 TERMUX_PKG_SUGGESTS="bash-completion"
 
 termux_step_post_make_install() {
-    mkdir -p "$TERMUX_PREFIX/share/bash-completion/completions"
-    install -Dm600 "extra/bash-completion-atool_0.1-1" \
-        "$TERMUX_PREFIX/share/bash-completion/completions/atool"
+	mkdir -p "$TERMUX_PREFIX/share/bash-completion/completions"
+	install -Dm600 "extra/bash-completion-atool_0.1-1" \
+		"$TERMUX_PREFIX/share/bash-completion/completions/atool"
 }

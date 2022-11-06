@@ -8,10 +8,10 @@ TERMUX_PKG_SHA256=6313a4b3b0b53e899f4612701dbf4d4abd212b51f48a69461309d136338a40
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
-        termux_setup_golang
+	termux_setup_golang
 
-        go mod init || :
-        go mod tidy 
+	go mod init || :
+	go mod tidy 
 }
 
 

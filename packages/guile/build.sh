@@ -32,5 +32,5 @@ termux_step_post_configure() {
 }
 
 termux_step_post_massage() {
-        sed -i 's',"$TERMUX_STANDALONE_TOOLCHAIN/bin/$TERMUX_HOST_PLATFORM-pkg-config","$TERMUX_PREFIX/bin/pkg-config",'g' $TERMUX_PKG_MASSAGEDIR$TERMUX_PREFIX/bin/guile-config
-}                              
+	sed -i 's',"$TERMUX_STANDALONE_TOOLCHAIN/bin/$TERMUX_HOST_PLATFORM-pkg-config","$TERMUX_PREFIX/bin/pkg-config",'g' $TERMUX_PKG_MASSAGEDIR$TERMUX_PREFIX/bin/guile-config
+}

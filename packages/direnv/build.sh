@@ -9,5 +9,5 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
- 	termux_setup_golang
+	termux_setup_golang
 }

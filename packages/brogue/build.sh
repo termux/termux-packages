@@ -10,7 +10,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_GROUPS="games"
 
 termux_step_pre_configure () {
-        CFLAGS+=" -fcommon"
+	CFLAGS+=" -fcommon"
 	CC="$CC $CFLAGS $CPPFLAGS $LDFLAGS"
 }
 

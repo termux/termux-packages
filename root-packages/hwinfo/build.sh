@@ -22,6 +22,6 @@ termux_step_pre_configure() {
 termux_step_configure() {
 	echo 'touch changelog' > git2log
 	LDFLAGS+=" -landroid-shmem"
-        export HWINFO_VERSION="$TERMUX_PKG_VERSION"
-        export DESTDIR="$TERMUX_PREFIX"
+	export HWINFO_VERSION="$TERMUX_PKG_VERSION"
+	export DESTDIR="$TERMUX_PREFIX"
 }

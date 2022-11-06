@@ -15,7 +15,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DUSE_SHARED_MBEDTLS_LIBRARY=ON
 -DENABLE_TESTING=OFF
 -DENABLE_PROGRAMS=OFF
- "
+"
 
 termux_step_post_get_source() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them

@@ -9,5 +9,5 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {
-  cp $TERMUX_PKG_SRCDIR/bin/* $TERMUX_PREFIX/bin/
+	cp $TERMUX_PKG_SRCDIR/bin/* $TERMUX_PREFIX/bin/
 }

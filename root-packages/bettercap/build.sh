@@ -15,7 +15,7 @@ termux_step_configure() {
 
 	mkdir -p "$GOPATH"/src/github.com/bettercap/
 	cp -a "$TERMUX_PKG_SRCDIR" "$GOPATH"/src/github.com/bettercap/bettercap
-        go get github.com/bettercap/recording
+	go get github.com/bettercap/recording
 }
 
 termux_step_make() {

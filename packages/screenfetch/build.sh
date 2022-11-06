@@ -12,6 +12,6 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
 termux_step_make_install() {
-    install screenfetch-dev ${TERMUX_PREFIX}/bin/screenfetch
-    install screenfetch.1 ${TERMUX_PREFIX}/share/man/man1/
+	install screenfetch-dev ${TERMUX_PREFIX}/bin/screenfetch
+	install screenfetch.1 ${TERMUX_PREFIX}/share/man/man1/
 }

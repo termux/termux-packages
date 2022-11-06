@@ -10,5 +10,5 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="xorgproto, libx11, xorg-util-macros"
 
 termux_step_pre_configure() {
-        NOCONFIGURE=1 ./autogen.sh
+	NOCONFIGURE=1 ./autogen.sh
 }

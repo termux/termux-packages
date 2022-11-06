@@ -11,16 +11,16 @@ TERMUX_PKG_DEPENDS="golang"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
-        termux_setup_golang
+	termux_setup_golang
 
-        go mod init || :
-        go mod tidy
+	go mod init || :
+	go mod tidy
 }
 
 termux_step_make() {
-        go build -trimpath -buildmode=pie -ldflags "-s -w" .
+	go build -trimpath -buildmode=pie -ldflags "-s -w" .
 }
 
 termux_step_make_install() {
-        install -Dm700 -t "${TERMUX_PREFIX}"/bin "$TERMUX_PKG_SRCDIR"/discordo
+	install -Dm700 -t "${TERMUX_PREFIX}"/bin "$TERMUX_PKG_SRCDIR"/discordo
 }

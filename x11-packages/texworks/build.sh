@@ -12,7 +12,7 @@ TERMUX_PKG_BUILD_DEPENDS="git, qt5-qtbase-cross-tools, qt5-qtdeclarative-cross-t
 TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_pre_configure() {
-        termux_setup_cmake
+	termux_setup_cmake
 
-        TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DLUA_MATH_LIBRARY=$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libm.so"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DLUA_MATH_LIBRARY=$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libm.so"
 }

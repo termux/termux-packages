@@ -12,7 +12,7 @@ termux_step_make() {
 	export GOPATH=$TERMUX_PKG_BUILDDIR
 	cd $TERMUX_PKG_SRCDIR
 	mkdir bin/
-        if ! [ -z "$GOOS" ];then export GOOS=android;fi
+	if ! [ -z "$GOOS" ];then export GOOS=android;fi
 	go build -o bin/docker-compose -ldflags="-s -w -X github.com/docker/compose/v2/internal.Version=${TERMUX_PKG_VERSION}" ./cmd
 }
 

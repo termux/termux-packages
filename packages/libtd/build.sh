@@ -9,9 +9,9 @@ TERMUX_PKG_DEPENDS="readline, openssl (>= 1.1.1), zlib"
 TERMUX_PKG_HOSTBUILD=true
 
 termux_step_host_build() {
-        termux_setup_cmake
-        cmake "-DCMAKE_BUILD_TYPE=Release" "$TERMUX_PKG_SRCDIR"
-        cmake --build . --target prepare_cross_compiling
+	termux_setup_cmake
+	cmake "-DCMAKE_BUILD_TYPE=Release" "$TERMUX_PKG_SRCDIR"
+	cmake --build . --target prepare_cross_compiling
 }
 
 termux_step_post_make_install() {

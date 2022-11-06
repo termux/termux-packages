@@ -11,8 +11,8 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="libc++"
 
 termux_step_make_install() {
-    install -m 0755 libtinyxml.so \
-        "$TERMUX_PREFIX/lib/"
-    install -m 0644 tinyxml.h tinystr.h \
-        "$TERMUX_PREFIX/include/"
+	install -m 0755 libtinyxml.so \
+		"$TERMUX_PREFIX/lib/"
+	install -m 0644 tinyxml.h tinystr.h \
+		"$TERMUX_PREFIX/include/"
 }

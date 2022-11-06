@@ -28,5 +28,5 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure() {
-    cp $TERMUX_PKG_BUILDER_DIR/arith.h/$TERMUX_ARCH.h $TERMUX_PKG_SRCDIR/config/include/dcmtk/config/arith.h
+	cp $TERMUX_PKG_BUILDER_DIR/arith.h/$TERMUX_ARCH.h $TERMUX_PKG_SRCDIR/config/include/dcmtk/config/arith.h
 }

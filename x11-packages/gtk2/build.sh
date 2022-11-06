@@ -44,7 +44,7 @@ termux_step_post_configure() {
 
 termux_step_create_debscripts() {
 	for i in postinst postrm triggers; do
- 		sed \
+		sed \
 			"s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
 			"${TERMUX_PKG_BUILDER_DIR}/hooks/${i}.in" > ./${i}
 		chmod 755 ./${i}

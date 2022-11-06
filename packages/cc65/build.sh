@@ -9,9 +9,9 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
 
 termux_step_host_build() {
-    cd $TERMUX_PKG_SRCDIR
-    make clean
-    make
+	cd $TERMUX_PKG_SRCDIR
+	make clean
+	make
 }
 
 termux_step_pre_configure() {
@@ -20,6 +20,6 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
-    make clean -C src
-    make bin
+	make clean -C src
+	make bin
 }

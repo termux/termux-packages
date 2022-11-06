@@ -11,9 +11,9 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-fuse --enable-docs-build"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
-    mkdir -p m4
-    autoreconf -v --install
+	mkdir -p m4
+	autoreconf -v --install
 
-    sed -i -e 's/-V -qversion//' configure
-    sed -i -e 's/GOBJECT_INTROSPECTION_CHECK/#GOBJECT_INTROSPECTION_CHECK/' configure
+	sed -i -e 's/-V -qversion//' configure
+	sed -i -e 's/GOBJECT_INTROSPECTION_CHECK/#GOBJECT_INTROSPECTION_CHECK/' configure
 }

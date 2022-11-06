@@ -9,13 +9,13 @@ TERMUX_PKG_DEPENDS="ncurses, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
-    export CROSSHOST="$TERMUX_HOST_PLATFORM"
-    export TERMUX_PKG_BUILDDIR="$TERMUX_PKG_SRCDIR/crawl-ref/source"
+	export CROSSHOST="$TERMUX_HOST_PLATFORM"
+	export TERMUX_PKG_BUILDDIR="$TERMUX_PKG_SRCDIR/crawl-ref/source"
 
-    export INCLUDES_L="-I$TERMUX_PREFIX/include"
-    export LIBS="-llog -Wl,--rpath=$TERMUX_PREFIX/lib"
+	export INCLUDES_L="-I$TERMUX_PREFIX/include"
+	export LIBS="-llog -Wl,--rpath=$TERMUX_PREFIX/lib"
 }
 
 termux_step_post_configure() {
-    sed -i 's,#ifdef __ANDROID__,#ifdef __NO_THANKS__,g' "$TERMUX_PKG_BUILDDIR/syscalls.cc"
+	sed -i 's,#ifdef __ANDROID__,#ifdef __NO_THANKS__,g' "$TERMUX_PKG_BUILDDIR/syscalls.cc"
 }
