@@ -4,7 +4,6 @@ TERMUX_PKG_LICENSE="CPL-1.0"
 TERMUX_PKG_LICENSE_FILE="CPLv1.0.txt, NOTICE"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=4.2.0
-_SOVERSION=${TERMUX_PKG_VERSION%%.*}
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/oorexx/oorexx/${TERMUX_PKG_VERSION}/ooRexx-${TERMUX_PKG_VERSION}-source.tar.gz
 TERMUX_PKG_SHA256=ac5af11e7d4d239d2ebe06f40092f4aebf87fc40740b46458bff3b4069ce6e0b
@@ -23,6 +22,8 @@ termux_step_pre_configure() {
 	CFLAGS+=" -fwrapv -fno-strict-aliasing"
 	LDFLAGS+=" -landroid-posix-semaphore"
 	LDFLAGS+=" -landroid-wordexp -lcrypt $($CC -print-libgcc-file-name)"
+
+	local _SOVERSION=${TERMUX_PKG_VERSION%%.*}
 
 	local dummylibdir=$TERMUX_PKG_BUILDDIR/_dummylib
 	mkdir -p $dummylibdir
