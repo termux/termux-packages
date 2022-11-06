@@ -9,6 +9,7 @@ termux_setup_gir() {
 		args="${args// -DENABLE_GOBJECT_INTROSPECTION=ON / -DENABLE_GOBJECT_INTROSPECTION=OFF }"
 		args="${args// -DENABLE_INTROSPECTION=ON / -DENABLE_INTROSPECTION=OFF }"
 		args="${args// -Dbuild_introspection_data=true / -Dbuild_introspection_data=false }"
+		args="${args// -Ddisable-introspection=false / -Ddisable-introspection=true }"
 		args="${args// -Denable-gir=true / -Denable-gir=false }"
 		args="${args// -Dgir=true / -Dgir=false }"
 		args="${args// -Dgobject=enabled / -Dgobject=disabled }"
