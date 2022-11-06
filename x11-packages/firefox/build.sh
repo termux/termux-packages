@@ -2,10 +2,16 @@ TERMUX_PKG_HOMEPAGE=https://www.mozilla.org/firefox
 TERMUX_PKG_DESCRIPTION="Mozilla Firefox web browser"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=105.0.3
-TERMUX_PKG_SRCURL=http://ftp.mozilla.org/pub/firefox/releases/${TERMUX_PKG_VERSION}/source/firefox-${TERMUX_PKG_VERSION}.source.tar.xz
-TERMUX_PKG_SHA256=f2fa1e03aecdd4dca0bcda94fd228d3a9ef3635862a2c140f8982d32ae7761e7
+TERMUX_PKG_VERSION=106.0.5
+TERMUX_PKG_SRCURL=https://ftp.mozilla.org/pub/firefox/releases/${TERMUX_PKG_VERSION}/source/firefox-${TERMUX_PKG_VERSION}.source.tar.xz
+TERMUX_PKG_SHA256=9471a7610d0adc350f14c363f1fcd2e15a85f22744f5850604af01aa844bc8a8
 TERMUX_PKG_DEPENDS="at-spi2-atk, fontconfig, freetype, gdk-pixbuf, glib, gtk3, harfbuzz, libandroid-shmem, libandroid-sysv-semaphore, libcairo, libffi, libice, libsm, libx11, libxcb, libxcomposite, libxcursor, libxdamage, libxext, libxfixes, libxi, libxrandr, libxrender, libxtst, pango"
+
+termux_step_post_get_source() {
+	local f="media/ffvpx/config_unix_aarch64.h"
+	echo "Applying sed substitution to ${f}"
+	sed -i -E '/^#define (CONFIG_LINUX_PERF|HAVE_SYSCTL) /s/1$/0/' ${f}
+}
 
 termux_step_pre_configure() {
 	local _CFLAGS="$CFLAGS"

@@ -166,19 +166,19 @@ diff -uNr firefox-105.0.3/memory/build/malloc_decls.h firefox-105.0.3.mod/memory
 diff -uNr firefox-105.0.3/memory/build/Mutex.h firefox-105.0.3.mod/memory/build/Mutex.h
 --- firefox-105.0.3/memory/build/Mutex.h	2022-10-08 00:40:08.000000000 +0900
 +++ firefox-105.0.3.mod/memory/build/Mutex.h	2022-10-15 09:48:55.157535800 +0900
-@@ -67,7 +67,7 @@
-     // OS_SPINLOCK_INIT initialize the lock to 0 and in both case it's a 32-bit
-     // integer.
-     mMutex.mUnfairLock = OS_UNFAIR_LOCK_INIT;
+@@ -55,7 +55,7 @@
+     }
+ #elif defined(XP_DARWIN)
+     mMutex = OS_UNFAIR_LOCK_INIT;
 -#elif defined(XP_LINUX) && !defined(ANDROID)
 +#elif defined(XP_LINUX) && !defined(__TERMUX__)
      pthread_mutexattr_t attr;
      if (pthread_mutexattr_init(&attr) != 0) {
        return false;
-@@ -161,7 +161,7 @@
- // initialize the lock to 0 and in both case it's a 32-bit integer.
- #    define STATIC_MUTEX_INIT \
-       { .mUnfairLock = OS_UNFAIR_LOCK_INIT }
+@@ -169,7 +169,7 @@
+ 
+ #  if defined(XP_DARWIN)
+ #    define STATIC_MUTEX_INIT OS_UNFAIR_LOCK_INIT
 -#  elif defined(XP_LINUX) && !defined(ANDROID)
 +#  elif defined(XP_LINUX) && !defined(__TERMUX__)
  #    define STATIC_MUTEX_INIT PTHREAD_ADAPTIVE_MUTEX_INITIALIZER_NP
@@ -246,15 +246,15 @@ diff -uNr firefox-105.0.3/toolkit/components/moz.build firefox-105.0.3.mod/toolk
 diff -uNr firefox-105.0.3/toolkit/moz.configure firefox-105.0.3.mod/toolkit/moz.configure
 --- firefox-105.0.3/toolkit/moz.configure	2022-10-08 00:40:08.000000000 +0900
 +++ firefox-105.0.3.mod/toolkit/moz.configure	2022-10-18 01:42:19.379553089 +0900
-@@ -172,7 +172,7 @@
- # ==============================================================
+@@ -173,7 +173,7 @@
  @depends(target)
  def midir_linux_support(target):
--    return target.kernel == "Linux" and target.os != "Android"
-+    return False
+     return (
+-        target.kernel == "Linux" and target.os != "Android" and target.cpu != "riscv64"
++        False
+     )
  
  
- @depends(target, midir_linux_support)
 @@ -225,7 +225,7 @@
  
  @depends("--enable-audio-backends", target)
