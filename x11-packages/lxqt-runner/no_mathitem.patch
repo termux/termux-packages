@@ -1,13 +1,15 @@
-We've disabled math plugin at the moment.
-This patch is probably not needed when -DRUNNER_MATH=ON
---- src/dialog.cpp	2021-04-11 09:01:40.000000000 +0000
-+++ src.mod/dialog.cpp	2021-05-20 16:11:59.594667000 +0000
-@@ -498,8 +498,7 @@
+diff -uNr lxqt-runner-1.2.0/dialog.cpp lxqt-runner-1.2.0.mod/dialog.cpp
+--- lxqt-runner-1.2.0/dialog.cpp	2022-11-05 16:33:14.000000000 +0800
++++ lxqt-runner-1.2.0.mod/dialog.cpp	2022-11-06 17:22:18.897744844 +0800
+@@ -534,11 +534,7 @@
      if (res)
      {
          hide();
--        if (!qobject_cast<const MathItem*>(command)) // don't clear math results
+-        if (mClearOnRunning
+-            && !qobject_cast<const MathItem*>(command)) // don't clear math results
+-        {
 -            ui->commandEd->clear();
+-        }
 +        ui->commandEd->clear();
      }
  
