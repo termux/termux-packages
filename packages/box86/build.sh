@@ -6,7 +6,6 @@ _COMMIT=b0ac567e7a020d4c8e5de820ce01977808356fc9
 _COMMIT_DATE=20221103
 _COMMIT_TIME=152729
 TERMUX_PKG_VERSION="0.2.6.20221103.152729gb0ac567e"
-TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/ptitSeb/box86.git
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_DEPENDS="libandroid-complex-math, libandroid-glob, libandroid-spawn, libandroid-sysv-semaphore"
