@@ -1,0 +1,20 @@
+--- a/external/CMakeLists.txt
++++ b/external/CMakeLists.txt
+@@ -37,6 +37,9 @@
+ 
+ find_package(Miniupnpc REQUIRED)
+ 
++if(MINIUPNPC_FOUND)
++  include_directories(${MINIUPNP_INCLUDE_DIR})
++else()
+ message(STATUS "Using in-tree miniupnpc")
+ set(UPNPC_NO_INSTALL TRUE CACHE BOOL "Disable miniupnp installation" FORCE)
+ add_subdirectory(miniupnp/miniupnpc)
+@@ -52,6 +55,7 @@
+ endif()
+ 
+ set(UPNP_LIBRARIES "libminiupnpc-static" PARENT_SCOPE)
++endif()
+ 
+ find_package(Unbound)
+ 
