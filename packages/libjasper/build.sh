@@ -16,3 +16,15 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -B$TERMUX_PKG_BUILDDIR
 -DJAS_STDC_VERSION=201112L
 "
+
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=7
+
+	local v="$(sed -En 's/^.*set\(JAS_SO_VERSION ([0-9]+).*$/\1/p' \
+			CMakeLists.txt)"
+	if [ "${_SOVERSION}" != "${v}" ]; then
+		termux_error_exit "Error: SOVERSION guard check failed."
+	fi
+}
