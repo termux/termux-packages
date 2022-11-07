@@ -2,14 +2,13 @@ TERMUX_PKG_HOMEPAGE=http://bochs.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="Bochs is a highly portable open source IA-32 (x86) PC emulator and debugger written in C++."
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.6.9
-TERMUX_PKG_REVISION=25
+TERMUX_PKG_VERSION=2.7
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/bochs/bochs-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=ee5b677fd9b1b9f484b5aeb4614f43df21993088c0c0571187f93acb0866e98c
-TERMUX_PKG_DEPENDS="atk, fontconfig, freetype, gdk-pixbuf, glib, gtk2, libc++, libcairo, libgraphite, libx11, libxpm, libxrandr, ncurses, pango, readline"
-TERMUX_PKG_BLACKLISTED_ARCHES="arm"
+TERMUX_PKG_SHA256=a010ab1bfdc72ac5a08d2e2412cd471c0febd66af1d9349bc0d796879de5b17a
+TERMUX_PKG_DEPENDS="glib, gtk2, libc++, libx11, libxpm, libxrandr, ncurses, pango, readline"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+ac_cv_func_strtouq=no
 --without-wx
 --with-x11
 --with-x
