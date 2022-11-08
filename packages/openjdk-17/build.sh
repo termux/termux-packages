@@ -131,15 +131,4 @@ termux_step_make_install() {
 	mkdir -p $TERMUX_PREFIX/etc/profile.d
 	echo "export JAVA_HOME=$TERMUX_PREFIX/opt/openjdk" > \
 		$TERMUX_PREFIX/etc/profile.d/java.sh
-
-	# Symlink external dependencies.
-	local l
-	for l in libandroid-shmem.so libandroid-spawn.so libfreetype.so \
-		libiconv.so libz.so.1 libXext.so libX11.so libXrender.so \
-		libXrender.so.1 libXrender.so.1.3.0 libXtst.so libXtst.so.6 \
-		libXtst.so.6.1.0 libXi.so libxcb.so libXau.so libXdmcp.so \
-		libfreetype.so libfontconfig.so; do
-		ln -sfr $TERMUX_PREFIX/lib/$l \
-			$TERMUX_PREFIX/opt/openjdk/lib/$l
-	done
 }
