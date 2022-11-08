@@ -45,6 +45,9 @@ termux_step_host_build() {
 export LEXLIB=
 
 termux_step_pre_configure() {
+	# Remove this marker all the time, as binutils is architecture-specific.
+	rm -rf $TERMUX_HOSTBUILD_MARKER
+
 	export CPPFLAGS="$CPPFLAGS -Wno-c++11-narrowing"
 
 	if [ $TERMUX_ARCH_BITS = 32 ]; then
