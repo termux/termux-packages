@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=1.33.1
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://www.lesbonscomptes.com/recoll/recoll-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=025dec0b9745e1ddacd86ee5478f9c52b2da2e5c307f831aaa5b2c7f9d7e8db9
-TERMUX_PKG_DEPENDS="aspell, libiconv, libxapian, libxml2, libxslt, zlib"
+TERMUX_PKG_DEPENDS="aspell, libc++, libiconv, libxapian, libxml2, libxslt, zlib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS=" --disable-userdoc --disable-python-chm --disable-x11mon --disable-qtgui"
 
 termux_step_pre_configure() {

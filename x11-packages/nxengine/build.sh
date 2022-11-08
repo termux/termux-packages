@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=1.0.0.4-Rev4
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/EXL/NXEngine/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=d467c112e81d4c56337ebf6968bd8bd781bce9140f674e72009a5274d2c15784
-TERMUX_PKG_DEPENDS="pulseaudio, sdl, sdl-ttf"
+TERMUX_PKG_DEPENDS="libc++, pulseaudio, sdl, sdl-ttf"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {

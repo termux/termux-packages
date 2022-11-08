@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=0.3.55
 TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL="https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/${TERMUX_PKG_VERSION}/pipewire-${TERMUX_PKG_VERSION}.tar.bz2"
 TERMUX_PKG_SHA256=99feaf600f45f6a510e4c91565cf917dae76e630f394ea8bd238ba0ecfc78ede
-TERMUX_PKG_DEPENDS="avahi, ffmpeg, libfdk-aac, liblua54, lilv, libsndfile, libusb, libwebrtc-audio-processing, pulseaudio"
+TERMUX_PKG_DEPENDS="avahi, ffmpeg, libc++, libfdk-aac, liblua54, lilv, libsndfile, libusb, libwebrtc-audio-processing, pulseaudio"
 
 # 'media-session' session-managers is disabled as it requires alsa.
 # Since we are building without x11, dbus is disabled.

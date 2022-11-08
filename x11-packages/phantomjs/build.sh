@@ -7,7 +7,7 @@ _COMMIT=0a0b0facb16acfbabb7804822ecaf4f4b9dce3d2
 TERMUX_PKG_VERSION=2020.07.13
 TERMUX_PKG_SRCURL=https://github.com/ariya/phantomjs.git
 TERMUX_PKG_GIT_BRANCH=master
-TERMUX_PKG_DEPENDS="qt5-qtbase, qt5-qtwebkit"
+TERMUX_PKG_DEPENDS="libc++, qt5-qtbase, qt5-qtwebkit"
 TERMUX_PKG_BUILD_DEPENDS="qt5-qtbase-cross-tools"
 TERMUX_PKG_FORCE_CMAKE=true
 

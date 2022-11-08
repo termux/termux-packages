@@ -7,6 +7,7 @@ TERMUX_PKG_VERSION=2.3.1
 TERMUX_PKG_SRCURL=https://github.com/Netflix/vmaf/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=8d60b1ddab043ada25ff11ced821da6e0c37fd7730dd81c24f1fc12be7293ef2
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="libc++"
 
 termux_step_pre_configure() {
 	TERMUX_PKG_SRCDIR=$TERMUX_PKG_SRCDIR/libvmaf

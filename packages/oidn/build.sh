@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.4.3
 TERMUX_PKG_SRCURL=https://github.com/OpenImageDenoise/oidn/releases/download/v$TERMUX_PKG_VERSION/oidn-$TERMUX_PKG_VERSION.src.tar.gz
 TERMUX_PKG_SHA256=3276e252297ebad67a999298d8f0c30cfb221e166b166ae5c955d88b94ad062a
-TERMUX_PKG_DEPENDS="libllvm, libtbb"
+TERMUX_PKG_DEPENDS="libc++, libllvm, libtbb"
 # OIDN supports 64-bit platforms only and won't build on Linux ARM64, see
 # https://github.com/OpenImageDenoise/oidn/issues/125#issuecomment-916479769
 # and https://github.com/OpenImageDenoise/oidn/#prerequisites.

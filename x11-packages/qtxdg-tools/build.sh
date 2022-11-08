@@ -5,5 +5,5 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.10.0"
 TERMUX_PKG_SRCURL="https://github.com/lxqt/qtxdg-tools/archive/${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=56c25d9d07cfafaaedeb380b50bf5a2c8da6a3b9567926a37510af5a482586bb
-TERMUX_PKG_DEPENDS="libqtxdg"
+TERMUX_PKG_DEPENDS="libc++, libqtxdg, qt5-qtbase"
 TERMUX_PKG_AUTO_UPDATE=true

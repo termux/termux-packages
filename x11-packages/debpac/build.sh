@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=1.7
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL="https://github.com/ThiBsc/debpac/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=402f9dfcc739fb64666832f1a0d5b47295c900a22232150af4cc069b420515c9
-TERMUX_PKG_DEPENDS="qt5-qtbase, qt5-qtsvg"
+TERMUX_PKG_DEPENDS="libc++, qt5-qtbase, qt5-qtsvg"
 TERMUX_PKG_BUILD_DEPENDS="qt5-qtbase-cross-tools, qt5-qttools-cross-tools"
 TERMUX_PKG_BUILD_IN_SRC=true
 

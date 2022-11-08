@@ -10,7 +10,7 @@ TERMUX_PKG_GIT_BRANCH=master
 _TD_SRCURL=https://github.com/tdlib/td.git
 _TD_COMMIT=ab3a8282d4ee307d341071267ef1090b1a941478
 TERMUX_PKG_HOSTBUILD=true
-TERMUX_PKG_DEPENDS="readline, openssl, zlib"
+TERMUX_PKG_DEPENDS="libc++, readline, openssl, zlib"
 
 termux_step_post_get_source() {
 	git fetch --unshallow

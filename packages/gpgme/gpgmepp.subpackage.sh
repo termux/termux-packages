@@ -4,3 +4,4 @@ lib/libgpgmepp.so
 lib/cmake/Gpgmepp
 include/gpgme++
 "
+TERMUX_SUBPKG_DEPENDS="libc++"

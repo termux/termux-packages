@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=0.90.1
 _COMMIT=a85c743e10e39a43737d5f8a0f0cc4ea755eb545
 TERMUX_PKG_SRCURL=https://github.com/mvo5/synaptic/archive/${_COMMIT}.zip
 TERMUX_PKG_SHA256=a500cfeea6c4ec4463b42495cba224b9548acbd557e9da695730acf7e49e0798
-TERMUX_PKG_DEPENDS="apt, dpkg, gtk3, atk, libvte, hicolor-icon-theme"
+TERMUX_PKG_DEPENDS="libc++, apt, dpkg, gtk3, atk, libvte, hicolor-icon-theme"
 TERMUX_PKG_RECOMMENDS="netsurf"
 TERMUX_PKG_BUILD_IN_SRC=true
 

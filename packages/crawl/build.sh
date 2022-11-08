@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_SRCURL=https://github.com/crawl/crawl.git
 TERMUX_PKG_VERSION=0.29-a0
 TERMUX_PKG_GIT_BRANCH=0.29-a0
-TERMUX_PKG_DEPENDS="ncurses, zlib"
+TERMUX_PKG_DEPENDS="libc++, ncurses, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {

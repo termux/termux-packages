@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=0.1.40
 TERMUX_PKG_REVISION=7
 TERMUX_PKG_SRCURL=http://deb.debian.org/debian/pool/main/liba/libapt-pkg-perl/libapt-pkg-perl_${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=524d2ef77f3d6896c50e7674022d85e4a391a6a2b3c65ba5e50ac671fa7ce4a1
-TERMUX_PKG_DEPENDS="apt, perl"
+TERMUX_PKG_DEPENDS="apt, libc++, perl"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 

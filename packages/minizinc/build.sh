@@ -7,4 +7,4 @@ TERMUX_PKG_VERSION="2.6.4"
 TERMUX_PKG_SRCURL="https://github.com/MiniZinc/libminizinc/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=f1f5adba23c749ddfdb2420e797d7ff46e72b843850529978f867583dbc599ca
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="zlib, gecode"
+TERMUX_PKG_DEPENDS="libc++, zlib, gecode"

@@ -9,6 +9,7 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/OctoMap/octomap/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=417af6da4e855e9a83b93458aa98b01a2c88f880088baad2b59d323ce162586e
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_FORCE_CMAKE=true
 
 # disable GUI subprojects

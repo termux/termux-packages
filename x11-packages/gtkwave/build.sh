@@ -6,5 +6,5 @@ TERMUX_PKG_VERSION=3.3.110
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=http://gtkwave.sourceforge.net/gtkwave-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=e4c6edd53a59cf43188707df264b61dead9cf747502bcf80f62a2799c6ab54c3
-TERMUX_PKG_DEPENDS="bzip2, gtk2, desktop-file-utils, libandroid-shmem, xz-utils"
+TERMUX_PKG_DEPENDS="libc++, bzip2, gtk2, desktop-file-utils, libandroid-shmem, xz-utils"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-tcl --disable-mime-update"

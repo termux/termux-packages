@@ -6,6 +6,6 @@ TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
 TERMUX_PKG_VERSION="0.12.0"
 TERMUX_PKG_SRCURL="https://github.com/lxqt/lxqt-build-tools/releases/download/${TERMUX_PKG_VERSION}/lxqt-build-tools-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=10075cf6ba6d3bcd8bf444ef78e7e754f40e1f40cd90e8338c1e4c784ca89530
-TERMUX_PKG_DEPENDS="cmake, qt5-qtbase"
+TERMUX_PKG_DEPENDS="cmake, libc++, qt5-qtbase"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_AUTO_UPDATE=true

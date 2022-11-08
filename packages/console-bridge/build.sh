@@ -6,5 +6,6 @@ TERMUX_PKG_MAINTAINER="Pooya Moradi <pvonmoradi@gmail.com>"
 TERMUX_PKG_VERSION="1.0.2"
 TERMUX_PKG_SRCURL="https://github.com/ros/console_bridge/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=303a619c01a9e14a3c82eb9762b8a428ef5311a6d46353872ab9a904358be4a4
+TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true

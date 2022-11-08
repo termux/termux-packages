@@ -7,4 +7,4 @@ TERMUX_PKG_VERSION=2020.05.09-${_COMMIT:0:8}
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/vgough/encfs/archive/${_COMMIT}.tar.gz
 TERMUX_PKG_SHA256=4b4d6b7465114ae74e2c9c6faea0411ea59bcea0f11193db72459e8bb73c16c7
-TERMUX_PKG_DEPENDS="libfuse2, openssl"
+TERMUX_PKG_DEPENDS="libc++, libfuse2, openssl"

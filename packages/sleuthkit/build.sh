@@ -8,7 +8,7 @@ TERMUX_PKG_SRCURL=https://github.com/sleuthkit/sleuthkit/archive/sleuthkit-${TER
 TERMUX_PKG_SHA256=81432c57458e9369dbdfbade096f8e779b0f169683a833675e787c34014d4d3f
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
-TERMUX_PKG_DEPENDS="libsqlite, ncurses"
+TERMUX_PKG_DEPENDS="libc++, libsqlite, ncurses"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-java"
 

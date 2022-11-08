@@ -12,7 +12,7 @@ TERMUX_PKG_AUTO_UPDATE=true
 # added (hence LAPACK)
 # FIXME why pagmo is not detected by build system?
 # FIXME add urdfdom
-TERMUX_PKG_DEPENDS="eigen, assimp, libccd, libfcl, boost, libbullet, libode, libpagmo, octomap-static, libtinyxml2"
+TERMUX_PKG_DEPENDS="libc++, eigen, assimp, libccd, libfcl, boost, libbullet, libode, libpagmo, octomap-static, libtinyxml2"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DDART_VERBOSE=ON

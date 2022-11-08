@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=0.9.0
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/tectonic-typesetting/tectonic.git
 TERMUX_PKG_GIT_BRANCH=tectonic@${TERMUX_PKG_VERSION}
-TERMUX_PKG_DEPENDS="fontconfig, harfbuzz, libgraphite, libicu, openssl, zlib"
+TERMUX_PKG_DEPENDS="fontconfig, harfbuzz, libc++, libgraphite, libicu, openssl, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {

@@ -7,7 +7,7 @@ TERMUX_PKG_REVISION=5
 _COMMIT=a8aa6341f4da161d0747c9cad205d821105ed09d
 TERMUX_PKG_SRCURL=https://github.com/OpenZWave/open-zwave/archive/${_COMMIT}.tar.gz
 TERMUX_PKG_SHA256=2af7f0e58d6c28be9d2229a0ede2e0799bddba617e7fd4f1ab7edcdbad6cf487
-TERMUX_PKG_DEPENDS="libusb"
+TERMUX_PKG_DEPENDS="libc++, libusb"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {

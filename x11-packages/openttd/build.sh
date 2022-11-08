@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=1.10.3
 TERMUX_PKG_REVISION=10
 TERMUX_PKG_SRCURL=https://github.com/OpenTTD/OpenTTD/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=eb57249c221b9b7cb1c86d81e60bbc54661d7e2ead50f529a2c1d733f6bbf381
-TERMUX_PKG_DEPENDS="desktop-file-utils, fontconfig, hicolor-icon-theme, libicu, liblzma, liblzo, libpng, openttd-gfx, openttd-msx, openttd-sfx, sdl"
+TERMUX_PKG_DEPENDS="desktop-file-utils, fontconfig, hicolor-icon-theme, libc++, libicu, liblzma, liblzo, libpng, openttd-gfx, openttd-msx, openttd-sfx, sdl"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_configure() {

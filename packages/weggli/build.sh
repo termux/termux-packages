@@ -6,4 +6,5 @@ TERMUX_PKG_VERSION="0.2.4"
 TERMUX_PKG_SRCURL="https://github.com/googleprojectzero/weggli/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=12fde9a0dca2852d5f819eeb9de85c4d11c5c384822f93ac66b2b7b166c3af78
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_BUILD_IN_SRC=true

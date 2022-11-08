@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=1.0.5
 TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://sourceforge.net/projects/gptfdisk/files/gptfdisk/$TERMUX_PKG_VERSION/gptfdisk-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=0e7d3987cd0488ecaf4b48761bc97f40b1dc089e5ff53c4b37abe30bc67dcb2f
-TERMUX_PKG_DEPENDS="libpopt, libuuid, ncurses"
+TERMUX_PKG_DEPENDS="libc++, libpopt, libuuid, ncurses"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {
