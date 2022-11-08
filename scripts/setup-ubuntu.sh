@@ -135,9 +135,9 @@ PACKAGES+=" composer"
 
 # Needed by package rust.
 PACKAGES+=" libssl-dev" # Needed to build Rust
-PACKAGES+=" llvm-12-dev"
-PACKAGES+=" llvm-12-tools"
-PACKAGES+=" clang-12"
+PACKAGES+=" llvm-13-dev"
+PACKAGES+=" llvm-13-tools"
+PACKAGES+=" clang-13"
 
 # Needed for package smalltalk.
 PACKAGES+=" libsigsegv-dev"
@@ -190,8 +190,6 @@ PACKAGES+=" libjansson-dev"
 PACKAGES+=" libparse-yapp-perl"
 PACKAGES+=" libreadline-dev"
 PACKAGES+=" libunistring-dev"
-PACKAGES+=" llvm-12-dev"
-PACKAGES+=" llvm-12-tools"
 
 # Needed by packages in X11 repository.
 PACKAGES+=" alex"
@@ -246,10 +244,6 @@ PACKAGES+=" gcc-arm-none-eabi"
 
 # Needed by pypy
 PACKAGES+=" qemu-user-static"
-
-# For opt, llvm-link, llc not shipped by NDK.
-# Required by picolisp (and maybe a few others in future)
-PACKAGES+=" llvm-12"
 
 # Required by cava
 PACKAGES+=" xxd"
