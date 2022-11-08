@@ -9,10 +9,3 @@ TERMUX_PKG_SHA256=bc53759a3a83d1ff702fb59641b3d2f7c56e05051fa0cfa93501166fa782dc
 TERMUX_PKG_DEPENDS="libx11"
 TERMUX_PKG_BUILD_DEPENDS="xorgproto"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-malloc0returnsnull"
-
-termux_step_post_massage() {
-	cd ${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/lib || exit 1
-	if [ ! -e "./libXrender.so.1" ]; then
-		ln -sf libXrender.so libXrender.so.1
-	fi
-}
