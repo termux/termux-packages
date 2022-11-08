@@ -10,24 +10,22 @@ TERMUX_PKG_VERSION+=(1.27.1)
 TERMUX_PKG_VERSION+=(12.0.1)  # LLVM version
 TERMUX_PKG_VERSION+=(2.097.1) # TOOLS version
 TERMUX_PKG_VERSION+=(1.26.1)  # DUB version
-TERMUX_PKG_VERSION+=(2.37)    # GNU Binutils version
 
 TERMUX_PKG_SRCURL=(https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc-${TERMUX_PKG_VERSION}-src.tar.gz
 		   https://github.com/ldc-developers/llvm-project/releases/download/ldc-v${TERMUX_PKG_VERSION[1]}/llvm-${TERMUX_PKG_VERSION[1]}.src.tar.xz
 		   https://github.com/llvm/llvm-project/releases/download/llvmorg-${TERMUX_PKG_VERSION[1]}/libunwind-${TERMUX_PKG_VERSION[1]}.src.tar.xz
 		   https://github.com/dlang/tools/archive/v${TERMUX_PKG_VERSION[2]}.tar.gz
 		   https://github.com/dlang/dub/archive/v${TERMUX_PKG_VERSION[3]}.tar.gz
-		   https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc2-${TERMUX_PKG_VERSION}-linux-x86_64.tar.xz
-		   https://ftp.gnu.org/gnu/binutils/binutils-${TERMUX_PKG_VERSION[4]}.tar.xz)
+		   https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc2-${TERMUX_PKG_VERSION}-linux-x86_64.tar.xz)
 TERMUX_PKG_SHA256=(93c8f500b39823dcdabbd73e1bcb487a1b93cb9a60144b0de1c81ab50200e59c
 		   9fc126f4ddfc80c5135ab182b3a4e8764282c15b9462161f8fb0c5ee00126f89
 		   0bea6089518395ca65cf58b0a450716c5c99ce1f041079d3aa42d280ace15ca4
 		   e42c3bac10266e44cb4939124fce0392ce155979c1791981e30d8166f44c03ab
 		   1e458599306bdfbe498418363c0e375bd75e9ae99676033ef3035f43cbd43dfd
-		   48d68e0747dc17b9b0d2799a2fffdc5ddaf986c649283c784830f19c4c82830c
-		   820d9724f020a3e69cb337893a0b63c2db161dadcb0e06fc11dc29eb1e84a32c)
+		   48d68e0747dc17b9b0d2799a2fffdc5ddaf986c649283c784830f19c4c82830c)
 # dub dlopen()s libcurl.so:
 TERMUX_PKG_DEPENDS="binutils, clang, libc++, libcurl, zlib"
+TERMUX_PKG_BUILD_DEPENDS="binutils-cross"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_FORCE_CMAKE=true
@@ -59,7 +57,6 @@ termux_step_post_get_source() {
 	mv libunwind-${TERMUX_PKG_VERSION[1]}.src libunwind
 	mv tools-${TERMUX_PKG_VERSION[2]} dlang-tools
 	mv dub-${TERMUX_PKG_VERSION[3]} dub
-	mv binutils-${TERMUX_PKG_VERSION[4]} binutils
 
 	# Exclude MLIR
 	rm -Rf llvm/projects/mlir
@@ -69,17 +66,6 @@ termux_step_post_get_source() {
 }
 
 termux_step_host_build() {
-	local _PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
-
-	mkdir -p binutils
-	pushd binutils
-	$TERMUX_PKG_SRCDIR/binutils/configure \
-		--prefix=$_PREFIX_FOR_BUILD \
-		--target=$TERMUX_HOST_PLATFORM
-	make -j $TERMUX_MAKE_PROCESSES
-	make install
-	popd
-
 	termux_setup_cmake
 	termux_setup_ninja
 
@@ -95,11 +81,7 @@ termux_step_host_build() {
 
 # Just before CMake invokation for LLVM:
 termux_step_pre_configure() {
-	# Remove this marker all the time, as binutils is architecture-specific.
-	rm -rf $TERMUX_HOSTBUILD_MARKER
-
-	local _PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
-	export PATH=$_PREFIX_FOR_BUILD/$TERMUX_HOST_PLATFORM/bin:$PATH
+	PATH=$TERMUX_PREFIX/opt/binutils/cross/$TERMUX_HOST_PLATFORM/bin:$PATH
 
 	if [ "$TERMUX_ARCH" == "arm" ]; then
 		# [...]/ldc/src/llvm/projects/compiler-rt/lib/builtins/clear_cache.c:85:20:
