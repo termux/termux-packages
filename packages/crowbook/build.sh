@@ -9,6 +9,9 @@ TERMUX_PKG_SHA256=ac950c051faece985821c28c17206188a6211247a040a8e7afaa34a5f45cf8
 TERMUX_PKG_DEPENDS="openssl-1.1"
 TERMUX_PKG_BUILD_IN_SRC=true
 
+# https://github.com/termux/termux-packages/issues/12824
+TERMUX_RUST_VERSION=1.63.0
+
 termux_step_pre_configure() {
 	# openssl-sys supports OpenSSL 3 in >= 0.9.69
 	# We can switch to OpenSSL 3 once new version of crowbook is released
