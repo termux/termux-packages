@@ -5,9 +5,9 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=(6.3
 		    9.30
 		    15
-		    0.26.2
+		    0.26.5
 		    0.9.0)
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=(https://ftp.gnu.org/gnu/ncurses/ncurses-${TERMUX_PKG_VERSION[0]}.tar.gz
 		   https://fossies.org/linux/misc/rxvt-unicode-${TERMUX_PKG_VERSION[1]}.tar.bz2
 		   https://github.com/thestinger/termite/archive/v${TERMUX_PKG_VERSION[2]}.tar.gz
@@ -16,7 +16,7 @@ TERMUX_PKG_SRCURL=(https://ftp.gnu.org/gnu/ncurses/ncurses-${TERMUX_PKG_VERSION[
 TERMUX_PKG_SHA256=(97fc51ac2b085d4cde31ef4d2c3122c21abc217e9090a43a30fc5ec21684e059
 		   fe1c93d12f385876457a989fc3ae05c0915d2692efc59289d0f70fabe5b44d2d
 		   3ae9ebef28aad081c6c11351f086776e2fd9547563b2f900732b41c376bec05a
-		   69d3ad67b9a4db696c3c089623adadaa34237287cb53ef3309e0bcb62c2324eb
+		   7a1b444f1cc10e16ee0f20a804c0f80b52417eeabf60d9f25e37ef192503ba26
 		   6d3aaac9e0477f903563b6fb26e089118407cdbfe952a1e2ffbf4e971b7062b3)
 # ncurses-utils: tset/reset/clear are moved to package 'ncurses'.
 TERMUX_PKG_BREAKS="ncurses-dev, ncurses-utils (<< 6.1.20190511-4)"
