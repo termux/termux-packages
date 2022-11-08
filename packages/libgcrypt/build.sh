@@ -8,6 +8,7 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=ef14ae546b0084cd84259f61a55e07a38c3b53afc0f546bffcef2f01baffe9de
 TERMUX_PKG_DEPENDS="libgpg-error"
+TERMUX_PKG_BUILD_DEPENDS="binutils-cross"
 TERMUX_PKG_BREAKS="libgcrypt-dev"
 TERMUX_PKG_REPLACES="libgcrypt-dev"
 # configure tries to detect pthreads by linking with -lpthread, which does not exist on Android:
@@ -17,8 +18,7 @@ ac_cv_lib_pthread_pthread_create=yes
 "
 
 termux_step_pre_configure() {
-	termux_setup_gnu_as_23c
-	CFLAGS+=" -fno-integrated-as"
+	termux_setup_no_integrated_as
 	if [ "$TERMUX_ARCH" = arm ]; then
 		# See http://marc.info/?l=gnupg-devel&m=139136972631909&w=3
 		CFLAGS+=" -mno-unaligned-access"
