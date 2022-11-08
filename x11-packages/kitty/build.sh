@@ -4,11 +4,11 @@ TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # When updating the package, also update terminfo for kitty by updating
 # ncurses' kitty sources in main repo
-TERMUX_PKG_VERSION=0.26.2
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=0.26.5
 TERMUX_PKG_SRCURL=https://github.com/kovidgoyal/kitty/releases/download/v${TERMUX_PKG_VERSION}/kitty-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=586ff599c5a3f31831b2a32dd9faafacb6c3581f2561f8ddcab0ba815bc7dab4
-TERMUX_PKG_DEPENDS="dbus, fontconfig, freetype, harfbuzz, libpng, librsync, libx11, libxkbcommon, littlecms, mesa (>= 22.0.3), python, zlib"
+TERMUX_PKG_SHA256=5544a580314fec7711187ce28162909b5ecff6780071444fe96fb97f8be5c9ad
+# fontconfig is dlopen(3)ed:
+TERMUX_PKG_DEPENDS="dbus, fontconfig, harfbuzz, libpng, librsync, libx11, libxkbcommon, littlecms, mesa (>= 22.0.3), ncurses, openssl, python, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libxcursor, libxi, libxinerama, libxrandr, xorgproto"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_RM_AFTER_INSTALL="
@@ -16,10 +16,13 @@ share/doc/kitty/html
 share/terminfo/x/xterm-kitty
 "
 
-termux_step_pre_configure() {
+termux_step_post_get_source() {
 	sed 's|@TERMUX_PREFIX@|'"$TERMUX_PREFIX"'|g' \
 		$TERMUX_PKG_BUILDER_DIR/posix-shm.c.in > kitty/posix-shm.c
+	cp $TERMUX_PKG_BUILDER_DIR/reallocarray.c glfw/
+}
 
+termux_step_pre_configure() {
 	_PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
 	termux_setup_python_crossenv
 	pushd $TERMUX_PYTHON_CROSSENV_SRCDIR
