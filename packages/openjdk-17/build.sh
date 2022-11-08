@@ -3,12 +3,14 @@ TERMUX_PKG_DESCRIPTION="Java development kit and runtime"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=17.0
-TERMUX_PKG_REVISION=24
+TERMUX_PKG_REVISION=25
 TERMUX_PKG_SRCURL=https://github.com/termux/openjdk-mobile-termux/archive/ec285598849a27f681ea6269342cf03cf382eb56.tar.gz
 TERMUX_PKG_SHA256=d7c6ead9d80d0f60d98d0414e9dc87f5e18a304e420f5cd21f1aa3210c1a1528
-TERMUX_PKG_DEPENDS="freetype, giflib, libandroid-shmem, libandroid-spawn, libiconv, zlib, xorgproto, libx11, libxcursor, libxext, cups, fontconfig, libjpeg-turbo, libpng, libxrender, libxtst, libxrandr, libxt, libxi"
-TERMUX_PKG_BUILD_DEPENDS="cups, fontconfig, libpng, libx11, libxrender"
-TERMUX_PKG_SUGGESTS="cups, fontconfig, libx11, libxrender"
+TERMUX_PKG_DEPENDS="libiconv, libjpeg-turbo, zlib"
+TERMUX_PKG_BUILD_DEPENDS="cups, libandroid-spawn, xorgproto"
+# openjdk-17-x is recommended because X11 separation is still very experimental.
+TERMUX_PKG_RECOMMENDS="openjdk-17-x"
+TERMUX_PKG_SUGGESTS="cups"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HAS_DEBUG=false
 
@@ -67,7 +69,7 @@ termux_step_configure() {
 		--openjdk-target=$TERMUX_HOST_PLATFORM \
 		--with-extra-cflags="$CFLAGS $CPPFLAGS -DLE_STANDALONE -DANDROID -D__TERMUX__=1" \
 		--with-extra-cxxflags="$CXXFLAGS $CPPFLAGS -DLE_STANDALONE -DANDROID -D__TERMUX__=1" \
-		--with-extra-ldflags="${jdk_ldflags} -landroid-shmem -landroid-spawn" \
+		--with-extra-ldflags="${jdk_ldflags} -Wl,--as-needed -landroid-shmem" \
 		--disable-precompiled-headers \
 		--disable-warnings-as-errors \
 		--enable-option-checking=fatal \
