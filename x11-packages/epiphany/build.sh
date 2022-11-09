@@ -10,7 +10,3 @@ TERMUX_PKG_DEPENDS="adwaita-icon-theme, atk, gcr, gdk-pixbuf, glib, gsettings-de
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dunit_tests=disabled
 "
-
-termux_step_pre_configure() {
-	export PKG_CONFIG_PATH=$TERMUX_PREFIX/share/pkgconfig
-}

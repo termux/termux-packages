@@ -20,8 +20,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 
 termux_step_pre_configure() {
 	termux_setup_gir
-
-	export PKG_CONFIG_PATH=$TERMUX_PREFIX/share/pkgconfig
 }
 
 termux_step_post_massage() {
