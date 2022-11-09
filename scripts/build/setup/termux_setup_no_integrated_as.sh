@@ -16,6 +16,11 @@ termux_setup_no_integrated_as() {
 		return
 	fi
 
+	local binutils_cross_bin="$TERMUX_PREFIX/opt/binutils/cross/$TERMUX_HOST_PLATFORM/bin"
+	if [ ! -x "$binutils_cross_bin/as" ]; then
+		termux_error_exit "[${FUNCNAME[0]}]: Package 'binutils-cross' is not installed."
+	fi
+
 	local prefix="$TERMUX_COMMON_CACHEDIR/no-integrated-as"
 	local bin="$prefix/bin"
 	mkdir -p "$bin"
@@ -26,7 +31,7 @@ termux_setup_no_integrated_as() {
 		if [ ! -e "$w" ]; then
 			cat > "$w" <<-EOF
 				#!$(command -v sh)
-				PATH=$TERMUX_PREFIX/opt/binutils/cross/$TERMUX_HOST_PLATFORM/bin:\$PATH
+				PATH="$binutils_cross_bin:\$PATH"
 				exec "$(command -v "$cmd")" \
 					--start-no-unused-arguments \
 					-fno-integrated-as \
