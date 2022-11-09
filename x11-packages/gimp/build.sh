@@ -10,6 +10,7 @@ TERMUX_PKG_SHA256=3f15c70554af5dcc1b46e6dc68f3d8f0a6cc9fe56b6d78ac08c0fd859ab89a
 TERMUX_PKG_DEPENDS="aalib, atk, babl, fontconfig, freetype, gdk-pixbuf, gegl, gexiv2, ghostscript, gimp-data, glib, glib-networking, gtk2, harfbuzz, hicolor-icon-theme, json-glib, libandroid-shmem, libc++, libcairo, libheif, libjpeg-turbo, libmypaint, libpng, librsvg, libtiff, libwebp, libxcursor, libxml2, libxpm, libxslt, littlecms, mypaint-brushes, openexr, openjpeg, pango, poppler, poppler-data, zlib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-python
+--disable-vector-icons
 ac_cv_func_bind_textdomain_codeset=yes
 ac_cv_path_GEGL=/usr/bin/gegl
 HOST_GLIB_COMPILE_RESOURCES=glib-compile-resources
@@ -19,10 +20,5 @@ TERMUX_PKG_RM_AFTER_INSTALL="lib/locale"
 termux_step_pre_configure() {
 	LDFLAGS+=" -landroid-shmem -lm"
 
-	local pc_dir=$TERMUX_PKG_BUILDDIR/_pkgconfig
-	mkdir -p $pc_dir
-	ln -sf $TERMUX_PREFIX/share/pkgconfig/mypaint-brushes-2.0.pc \
-		$pc_dir/mypaint-brushes-1.0.pc
-	ln -sf $TERMUX_PREFIX/share/pkgconfig/poppler-data.pc $pc_dir/
-	export PKG_CONFIG_PATH=$pc_dir
+	sed -i 's/\(mypaint-brushes-\)1/\12/g' configure
 }
