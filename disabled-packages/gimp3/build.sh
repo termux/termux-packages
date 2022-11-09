@@ -30,7 +30,6 @@ termux_step_pre_configure() {
 	termux_setup_gir
 
 	LDFLAGS+=" -landroid-execinfo -landroid-shmem -lm"
-	export PKG_CONFIG_PATH=$TERMUX_PREFIX/share/pkgconfig
 	export CC_FOR_BUILD=$(basename $CC_FOR_BUILD)
 }
 
