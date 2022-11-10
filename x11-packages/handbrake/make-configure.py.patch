@@ -1,0 +1,25 @@
+--- a/make/configure.py
++++ b/make/configure.py
+@@ -1655,9 +1655,6 @@
+         libtool    = ToolProbe( 'LIBTOOL.exe',    'libtool',    'libtool', abort=True )
+         lipo       = ToolProbe( 'LIPO.exe',       'lipo',       'lipo', abort=False )
+         pkgconfig  = ToolProbe( 'PKGCONFIG.exe',  'pkgconfig',  'pkg-config', abort=True, minversion=[0,27,0] )
+-        meson      = ToolProbe( 'MESON.exe',      'meson',      'meson', abort=True, minversion=[0,47,0] )
+-        nasm       = ToolProbe( 'NASM.exe',       'asm',        'nasm', abort=True, minversion=[2,13,0] )
+-        ninja      = ToolProbe( 'NINJA.exe',      'ninja',      'ninja-build', 'ninja', abort=True )
+ 
+         xcodebuild = ToolProbe( 'XCODEBUILD.exe', 'xcodebuild', 'xcodebuild', abort=(True if (not xcode_opts['disabled'] and (build_tuple.match('*-*-darwin*') and cross is None)) else False), versionopt='-version', minversion=[10,3,0] )
+ 
+@@ -1747,12 +1744,6 @@
+     #####################################
+     ## Additional library and tool checks
+     #####################################
+-    # Requires oneVPL which requires CMake 3.16.3 or later
+-    Tools.cmake = ToolProbe('CMAKE.exe', 'cmake', 'cmake', abort=True, minversion=[3,16,3])
+-    Tools.cmake.__init__( Tools.cmake.var, Tools.cmake.option, Tools.cmake.name, **Tools.cmake.kwargs )
+-    Tools.cmake.run()
+-    for action in Action.actions:
+-        action.run()
+ 
+     #########################################
+     ## MinGW specific library and tool checks
