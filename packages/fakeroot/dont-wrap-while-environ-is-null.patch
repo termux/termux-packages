@@ -1,0 +1,27 @@
+Workaround for https://github.com/termux/termux-packages/issues/3148.
+
+--- a/libfakeroot.c
++++ b/libfakeroot.c
+@@ -699,6 +699,22 @@ int WRAP_FSTAT FSTAT_ARG(int ver,
+ 			int fd,
+ 			struct stat *st){
+ 
++#ifdef __ANDROID__
++  static int initialized = 0;
++  if (!initialized) {
++    if (environ == NULL) {
++      void *libc_handle = dlopen("libc.so", RTLD_NOW);
++      if (libc_handle == NULL)
++        __builtin_abort();
++      int (*libc_impl)(int, struct stat *) = dlsym(libc_handle, "fstat");
++      if (libc_impl == NULL)
++        __builtin_abort();
++      return libc_impl(fd, st);
++    } else {
++      initialized = 1;
++    }
++  }
++#endif
+ 
+   int r;
+ 
