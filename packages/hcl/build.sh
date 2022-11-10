@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/hashicorp/hcl
 TERMUX_PKG_DESCRIPTION="A toolkit for creating structured configuration languages"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.14.1"
+TERMUX_PKG_VERSION="2.15.0"
 TERMUX_PKG_SRCURL=https://github.com/hashicorp/hcl/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=452eb7ffe12ce4f6b39e0f737966dc2e05318693bbf47887abceb85ec31b1fa2
+TERMUX_PKG_SHA256=76f234c7bd4de52225b5d7a7f09b5dd1df1eb40084478569707d00d0c1c66ef9
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
