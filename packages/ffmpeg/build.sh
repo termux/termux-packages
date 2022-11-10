@@ -75,5 +75,7 @@ termux_step_configure() {
 		--target-os=android \
 		--extra-libs="-landroid-glob" \
 		--disable-vulkan \
-		$_EXTRA_CONFIGURE_FLAGS
+		$_EXTRA_CONFIGURE_FLAGS \
+		--disable-libfdk-aac
+	# GPLed FFmpeg binaries linked against fdk-aac are not redistributable.
 }
