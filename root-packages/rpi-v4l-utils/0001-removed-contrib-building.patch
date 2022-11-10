@@ -1,0 +1,59 @@
+From ad6cdbea1a3a6c7cd1f03397ce948204f8741fee Mon Sep 17 00:00:00 2001
+From: Simon Hafner <hafnersimon@gmail.com>
+Date: Fri, 11 Nov 2022 16:47:26 +0100
+Subject: [PATCH] removed contrib building
+
+---
+ Makefile.am      |  2 +-
+ android-config.h | 12 ++++++------
+ 2 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 3c3d3ce6..8725c032 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -4,7 +4,7 @@ ACLOCAL_AMFLAGS = -I m4
+ SUBDIRS = v4l-utils-po libdvbv5-po lib
+ 
+ if WITH_V4LUTILS
+-SUBDIRS += utils contrib
++SUBDIRS += utils
+ endif
+ 
+ EXTRA_DIST = android-config.h bootstrap.sh doxygen_libdvbv5.cfg include COPYING.libv4l \
+diff --git a/android-config.h b/android-config.h
+index e82a847e..bef061a0 100644
+--- a/android-config.h
++++ b/android-config.h
+@@ -59,22 +59,22 @@
+ /* #undef ICONV_CONST */
+ 
+ /* ir-keytable preinstalled tables directory */
+-#define IR_KEYTABLE_SYSTEM_DIR "/lib/udev/rc_keymaps"
++#define IR_KEYTABLE_SYSTEM_DIR "/data/data/com.termux/files/usr/lib/udev/rc_keymaps"
+ 
+ /* ir-keytable user defined tables directory */
+-#define IR_KEYTABLE_USER_DIR "/system/etc/rc_keymaps"
++#define IR_KEYTABLE_USER_DIR "/data/data/com.termux/files/usr/system/etc/rc_keymaps"
+ 
+ /* libv4l1 private lib directory */
+-#define LIBV4L1_PRIV_DIR "/system/lib/libv4l"
++#define LIBV4L1_PRIV_DIR "/data/data/com.termux/files/usr/system/lib/libv4l"
+ 
+ /* libv4l2 plugin directory */
+-#define LIBV4L2_PLUGIN_DIR "/system/lib/libv4l/plugins"
++#define LIBV4L2_PLUGIN_DIR "/data/data/com.termux/files/usr/system/lib/libv4l/plugins"
+ 
+ /* libv4l2 private lib directory */
+-#define LIBV4L2_PRIV_DIR "/system/lib/libv4l"
++#define LIBV4L2_PRIV_DIR "/data/data/com.termux/files/usr/system/lib/libv4l"
+ 
+ /* libv4lconvert private lib directory */
+-#define LIBV4LCONVERT_PRIV_DIR "/system/lib/libv4l"
++#define LIBV4LCONVERT_PRIV_DIR "/data/data/com.termux/files/usr/system/lib/libv4l"
+ 
+ /* Define to the sub-directory in which libtool stores uninstalled libraries.
+    */
+-- 
+2.38.1
+
