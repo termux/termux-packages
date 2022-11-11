@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://ctags.io/
 TERMUX_PKG_DESCRIPTION="Universal ctags: Source code index builder"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2:5.9.20210613.0
+TERMUX_PKG_VERSION=2:5.9.20221106.0
 TERMUX_PKG_SRCURL=https://github.com/universal-ctags/ctags/archive/p${TERMUX_PKG_VERSION:2}.tar.gz
-TERMUX_PKG_SHA256=74c9e515f0cb71d92b4422392effba21794b11fc34f0971aa4dc44e9a86708f4
-TERMUX_PKG_DEPENDS="libiconv, libjansson, liblzma, libxml2, libyaml"
+TERMUX_PKG_SHA256=8e647fa314a33088d7e8384a9aca3903ce91dfe8805676d4219051d5353cf0ab
+TERMUX_PKG_DEPENDS="libiconv, libjansson, libxml2, libyaml"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-tmpdir=$TERMUX_PREFIX/tmp --disable-static"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
