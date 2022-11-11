@@ -23,34 +23,24 @@
  DRECDIR = $(DESTDIR)$(JRECDIR)
  
  # Install permission for DRECDIR
-@@ -170,7 +170,7 @@
- #	PDP-11 with separate I&D: -i
- #	PDP-11 without separate I&D: -n
+@@ -134,7 +134,7 @@
+ LDLIBS = $(TERMCAPLIB) $(EXTRALIBS)
  
--LDFLAGS =
-+LDFLAGS? =
+ # linker flags (LDFLAGS) not needed for most systems
+-LDFLAGS = 
++LDFLAGS ?= 
  
- # for SCO Xenix, set
- #	MEMFLAGS = -Mle
-@@ -186,7 +186,7 @@
- #	CC = /opt/SUNWspro/bin/cc
- # For DG AViiON, expect compile errors unless you use the GNU C compiler:
- #	CC=gcc
--
-+CC? = gcc
- # Load invocation of cc.
- # to use Purify(TM): LDCC = purify $(CC)
- 
-@@ -198,9 +198,9 @@
- # Set LOCALCFLAGS and LOCALLDFLAGS appropriately too. For Xenix, note
- # that LOCALCFLAGS must be set to $(MEMFLAGS)
+ # LDCC can be used for link-time alternatives to CC.  Also useful
+ # for purify or similar link-time processing.
+@@ -149,9 +149,9 @@
+ # flags are usually needed (other than Xenix?!), since setmaps is 
+ # run just once, so use whatever compiles fastest.
  
 -LOCALCC = $(CC)
--LOCALCFLAGS = $(CFLAGS)	# $(MEMFLAGS)
++LOCALCC = $(CC_FOR_BUILD)
+ LOCALCFLAGS = # nothing really needed for setmaps
 -LOCALLDFLAGS = $(LDFLAGS)
-+LOCALCC = gcc # $(CC)
-+LOCALCFLAGS = $(MEMFLAGS)
-+LOCALLDFLAGS = #$(LDFLAGS)
- LOCALEXTRALIBS = $(EXTRALIBS)
++LOCALLDFLAGS = #
+ LOCALEXTRALIBS = # nothing really needed for setmaps
+ LOCALEXT = # default is a Un*x-style machine, not Windows
  
- # Objects are grouped into overlays for the benefit of (at least) 2.xBSD.
