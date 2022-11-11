@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://mariadb.org
 TERMUX_PKG_DESCRIPTION="A drop-in replacement for mysql server"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2:10.9.2
+TERMUX_PKG_VERSION=2:10.9.4
 TERMUX_PKG_SRCURL=http://ftp.hosteurope.de/mirror/archive.mariadb.org/mariadb-${TERMUX_PKG_VERSION:2}/source/mariadb-${TERMUX_PKG_VERSION:2}.tar.gz
-TERMUX_PKG_SHA256=5f45ff75e043966555a95fbdb8f092e60ce2a6c47ba59d144db46e138e922f48
-TERMUX_PKG_DEPENDS="libc++, libiconv, liblzma, ncurses, libedit, openssl, pcre2, libcrypt, libandroid-support, libandroid-glob, zlib, liblz4"
+TERMUX_PKG_SHA256=1dff08a0f37ea5cf8f00cbd12d40e80759fae7d73184ccf56b5b51acfdcfc054
+TERMUX_PKG_DEPENDS="libandroid-support, libc++, libcrypt, libedit, liblz4, liblzma, ncurses, openssl, pcre2, zlib"
 TERMUX_PKG_BREAKS="mariadb-dev"
 TERMUX_PKG_REPLACES="mariadb-dev"
 TERMUX_PKG_SERVICE_SCRIPT=("mysqld" "exec mysqld --basedir=$TERMUX_PREFIX --datadir=$TERMUX_PREFIX/var/lib/mysql 2>&1")
@@ -66,11 +66,6 @@ mysql-test
 sql-bench
 "
 
-# i686 build fails due to:
-#  /home/builder/.termux-build/mariadb/src/include/my_pthread.h:822:10: error: use of undeclared identifier 'my_atomic_add32'
-#    (void) my_atomic_add32_explicit(value, 1, MY_MEMORY_ORDER_RELAXED);
-TERMUX_PKG_BLACKLISTED_ARCHES="i686"
-
 termux_step_host_build() {
 	termux_setup_cmake
 	sed -i 's/^\s*END[(][)]/ENDIF()/g' $TERMUX_PKG_SRCDIR/libmariadb/cmake/ConnectorName.cmake
@@ -94,10 +89,6 @@ termux_step_pre_configure() {
 		CPPFLAGS+=" -D__off64_t_defined"
 	fi
 
-	if [ $TERMUX_ARCH = "i686" ]; then
-		# Avoid undefined reference to __atomic_load_8:
-		CFLAGS+=" -latomic"
-	fi
 	sed -i 's/^\s*END[(][)]/ENDIF()/g' $TERMUX_PKG_SRCDIR/libmariadb/cmake/ConnectorName.cmake
 
 }
