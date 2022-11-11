@@ -1,11 +1,14 @@
 TERMUX_PKG_HOMEPAGE=https://invisible-island.net/vile/
 TERMUX_PKG_DESCRIPTION="VI Like Emacs - vi work-alike"
-TERMUX_PKG_LICENSE="custom"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_LICENSE_FILE="COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="9.8u"
-TERMUX_PKG_SRCURL="ftp://ftp.invisible-island.net/vile/current/vile-$TERMUX_PKG_VERSION.tgz"
-TERMUX_PKG_SHA256=31a82833fe4fef5a60043bcc3278d1a875a1028b1b2577c9e0fa3a179cff165e
+TERMUX_PKG_VERSION="9.8w"
+TERMUX_PKG_SRCURL="https://invisible-island.net/archives/vile/current/vile-$TERMUX_PKG_VERSION.tgz"
+TERMUX_PKG_SHA256=78253ec3f7ae5f4f9d4799a3c8bc35b85b47d456f2ac172810008a48e4609815
 TERMUX_PKG_DEPENDS="ncurses"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-stripping"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--disable-stripping
+--without-iconv
+"
