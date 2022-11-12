@@ -3,10 +3,10 @@ TERMUX_PKG_DESCRIPTION="Network Security Services (NSS)"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_LICENSE_FILE="nss/COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.84
+TERMUX_PKG_VERSION=3.85
 TERMUX_PKG_SRCURL=https://archive.mozilla.org/pub/security/nss/releases/NSS_${TERMUX_PKG_VERSION//./_}_RTM/src/nss-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=9a387ffe350ff14f001d943f96cc0c064891551d71e1a97a5ddbffe7f1207a25
-TERMUX_PKG_DEPENDS="libnspr, libsqlite, zlib"
+TERMUX_PKG_SHA256=afd9d64510b1154debbd6cab3571e9ff64a3373898e03483e4c85cdada13d297
+TERMUX_PKG_DEPENDS="libnspr, libsqlite"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_MAKE_ARGS="
 CC_IS_CLANG=1
@@ -20,11 +20,7 @@ OS_TEST=$TERMUX_ARCH
 "
 TERMUX_MAKE_PROCESSES=1
 TERMUX_PKG_HOSTBUILD=true
-
-# libssl.a conflicts with openssl-static, see #11192
-TERMUX_PKG_RM_AFTER_INSTALL="
-lib/libssl.a
-"
+TERMUX_PKG_NO_STATICSPLIT=true
 
 _LIBNSS_SIGN_LIBS="libfreebl3.so libnssdbm3.so libsoftokn3.so"
 
@@ -72,6 +68,15 @@ termux_step_make_install() {
 		fi
 	done
 	popd
+}
+
+termux_step_post_massage() {
+	find lib -name '*.a' \
+		-a ! -name libcrmf.a \
+		-a ! -name libfreebl.a \
+		-a ! -name libnssb.a \
+		-a ! -name libnssckfw.a \
+		-delete
 }
 
 termux_step_create_debscripts() {
