@@ -1,5 +1,5 @@
 TERMUX_SUBPKG_DESCRIPTION="The Glasgow Haskell Compiler"
-TERMUX_SUBPKG_DEPENDS="binutils, llvm, clang"
+TERMUX_SUBPKG_DEPENDS="binutils-is-llvm | binutils, llvm, clang"
 
 TERMUX_SUBPKG_INCLUDE="lib/ghc-${TERMUX_PKG_VERSION}/ghc-${TERMUX_PKG_VERSION}"
 
