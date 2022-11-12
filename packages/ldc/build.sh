@@ -4,9 +4,8 @@ TERMUX_PKG_HOMEPAGE=https://github.com/ldc-developers/ldc
 TERMUX_PKG_DESCRIPTION="D programming language compiler, built with LLVM"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=()
-TERMUX_PKG_REVISION=5
-TERMUX_PKG_VERSION+=(1.27.1)
+TERMUX_PKG_VERSION=(1.27.1)
+TERMUX_PKG_REVISION=6
 TERMUX_PKG_VERSION+=(12.0.1)  # LLVM version
 TERMUX_PKG_VERSION+=(2.097.1) # TOOLS version
 TERMUX_PKG_VERSION+=(1.26.1)  # DUB version
@@ -24,7 +23,7 @@ TERMUX_PKG_SHA256=(93c8f500b39823dcdabbd73e1bcb487a1b93cb9a60144b0de1c81ab50200e
 		   1e458599306bdfbe498418363c0e375bd75e9ae99676033ef3035f43cbd43dfd
 		   48d68e0747dc17b9b0d2799a2fffdc5ddaf986c649283c784830f19c4c82830c)
 # dub dlopen()s libcurl.so:
-TERMUX_PKG_DEPENDS="binutils, clang, libc++, libcurl, zlib"
+TERMUX_PKG_DEPENDS="binutils-bin, binutils-is-llvm | binutils, clang, libc++, libcurl, zlib"
 TERMUX_PKG_BUILD_DEPENDS="binutils-cross"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_HOSTBUILD=true
@@ -207,9 +206,6 @@ termux_step_make_install() {
 	cp $TERMUX_PKG_BUILDDIR/ldc-build-runtime.tmp/lib/*.a $TERMUX_PREFIX/lib
 	cp lib/libldc_rt.* $TERMUX_PREFIX/lib || true
 	sed "s|$TERMUX_PREFIX/|%%ldcbinarypath%%/../|g" bin/ldc2_install.conf > $TERMUX_PREFIX/etc/ldc2.conf
-	# LDC defaults to `-linker=bfd` for Android, but Termux apparently has no `ld.bfd`, so use default `ld` (bfd apparently)
-	sed -i 's|"-link-defaultlib-shared=false",|"-link-defaultlib-shared=false", "-linker=",|' $TERMUX_PREFIX/etc/ldc2.conf
-	cat $TERMUX_PREFIX/etc/ldc2.conf
 
 	rm -Rf $TERMUX_PREFIX/include/d
 	mkdir $TERMUX_PREFIX/include/d
