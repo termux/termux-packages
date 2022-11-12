@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_LICENSE_FILE="nss/COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.85
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://archive.mozilla.org/pub/security/nss/releases/NSS_${TERMUX_PKG_VERSION//./_}_RTM/src/nss-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=afd9d64510b1154debbd6cab3571e9ff64a3373898e03483e4c85cdada13d297
 TERMUX_PKG_DEPENDS="libnspr, libsqlite"
@@ -53,6 +54,16 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
+	local pkgconfig_dir=$TERMUX_PREFIX/lib/pkgconfig
+	mkdir -p $pkgconfig_dir
+	sed \
+		-e "s|%prefix%|${TERMUX_PREFIX}|g" \
+		-e 's|%exec_prefix%|${prefix}|g' \
+		-e 's|%libdir%|${prefix}/lib|g' \
+		-e 's|%includedir%|${prefix}/include/nss|g' \
+		-e "s|%NSS_VERSION%|${TERMUX_PKG_VERSION#*:}|g" \
+		-e 's|%NSPR_VERSION%|4.25|g' \
+		nss/pkg/pkg-config/nss.pc.in > $pkgconfig_dir/nss.pc
 	cd dist
 	install -Dm600 -t $TERMUX_PREFIX/include/nss public/nss/*
 	install -Dm600 -t $TERMUX_PREFIX/include/nss/private private/nss/*
