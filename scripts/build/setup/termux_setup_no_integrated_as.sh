@@ -1,13 +1,13 @@
 termux_setup_no_integrated_as() {
 	if [ "$TERMUX_ON_DEVICE_BUILD" = true ]; then
-		if [[ "$TERMUX_APP_PACKAGE_MANAGER" = "apt" && "$(dpkg-query -W -f '${db:Status-Status}\n' binutils 2>/dev/null)" != "installed" ]] ||
-			[[ "$TERMUX_APP_PACKAGE_MANAGER" = "pacman" && ! "$(pacman -Q binutils 2>/dev/null)" ]]; then
-			echo "Package 'binutils' is not installed."
+		if [[ "$TERMUX_APP_PACKAGE_MANAGER" = "apt" && "$(dpkg-query -W -f '${db:Status-Status}\n' binutils-bin 2>/dev/null)" != "installed" ]] ||
+			[[ "$TERMUX_APP_PACKAGE_MANAGER" = "pacman" && ! "$(pacman -Q binutils-bin 2>/dev/null)" ]]; then
+			echo "Package 'binutils-bin' is not installed."
 			echo "You can install it with"
 			echo
-			echo "  pkg install binutils"
+			echo "  pkg install binutils-bin"
 			echo
-			echo "  pacman -S binutils"
+			echo "  pacman -S binutils-bin"
 			echo
 			exit 1
 		fi
