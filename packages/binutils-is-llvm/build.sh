@@ -4,10 +4,9 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 # The version number is different from the original one.
 TERMUX_PKG_VERSION=0.3
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_DEPENDS="lld, llvm"
-TERMUX_PKG_PROVIDES="binutils"
-TERMUX_PKG_REPLACES="binutils"
 TERMUX_PKG_CONFLICTS="binutils"
 
 termux_step_make_install() {
