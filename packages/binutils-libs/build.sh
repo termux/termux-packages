@@ -1,16 +1,16 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/binutils/
-TERMUX_PKG_DESCRIPTION="Collection of binary tools, the main ones being ld, the GNU linker, and as, the GNU assembler"
+TERMUX_PKG_DESCRIPTION="GNU Binutils libraries"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.39
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/binutils/binutils-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=645c25f563b8adc0a81dbd6a41cffbf4d37083a382e02d5d3df4f65c09516d00
-TERMUX_PKG_DEPENDS="binutils-libs (>= ${TERMUX_PKG_VERSION}), libc++, zlib"
-TERMUX_PKG_SUGGESTS="ldd"
-TERMUX_PKG_BREAKS="binutils-dev"
-TERMUX_PKG_REPLACES="binutils-dev"
+TERMUX_PKG_DEPENDS="zlib"
+TERMUX_PKG_BREAKS="binutils (<< 2.39), binutils-dev"
+TERMUX_PKG_REPLACES="binutils (<< 2.39), binutils-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--bindir=$TERMUX_PREFIX/libexec/binutils
 --enable-gold
 --disable-gprofng
 --enable-plugins
@@ -58,12 +58,35 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_make_install() {
-	cd $TERMUX_PREFIX/bin
+	local d=$TERMUX_PREFIX/share/binutils
+	mkdir -p ${d}
+	touch ${d}/.placeholder
+
+	mkdir -p $TERMUX_PREFIX/bin
+	cd $TERMUX_PREFIX/libexec/binutils
+
+	mv ld{.bfd,}
+	ln -sf ld{,.bfd}
+	ln -sfr $TERMUX_PREFIX/libexec/binutils/ld $TERMUX_PREFIX/bin/ld.bfd
+
+	rm -f $TERMUX_PREFIX/bin/ld.gold
+	mv ld.gold $TERMUX_PREFIX/bin/
+	ln -sfr $TERMUX_PREFIX/bin/{ld.,}gold
+
+	for b in *; do
+		ln -sfr $TERMUX_PREFIX/libexec/binutils/${b} \
+			$TERMUX_PREFIX/bin/${b}
+	done
+
 	# Setup symlinks as these are used when building, so used by
 	# system setup in e.g. python, perl and libtool:
-	for b in ar ld nm objdump ranlib readelf strip; do
-		ln -s -f $b $TERMUX_HOST_PLATFORM-$b
+	local _TOOLS_WITH_HOST_PREFIX="ar ld nm objdump ranlib readelf strip"
+	for b in ${_TOOLS_WITH_HOST_PREFIX}; do
+		ln -sfr $TERMUX_PREFIX/libexec/binutils/${b} \
+			$TERMUX_PREFIX/bin/$TERMUX_HOST_PLATFORM-${b}
 	done
-	mv ld.bfd ld
-	ln -sf ld.gold gold
+}
+
+termux_step_post_massage() {
+	rm -rf bin
 }
