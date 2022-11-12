@@ -1,75 +1,29 @@
 QtGraphicalEffects module is not available because it depends on OpenGL.
-This patch removes all usage of QtGraphicalEffects (shadows and gradients).
-diff --color -uNr src/CMakeLists.txt src.mod/CMakeLists.txt
---- src/CMakeLists.txt	2021-05-26 15:17:14.799260147 +0100
-+++ src.mod/CMakeLists.txt	2021-05-26 14:20:31.085469568 +0100
-@@ -103,8 +103,6 @@
-     add_definitions(-DKIRIGAMI_ENABLE_DBUS)
+This patch removes all usage of QtGraphicalEffects (shadows and gradients).diff -uNr kirigami2-5.99.0/CMakeLists.txt kirigami2-5.99.0.mod/CMakeLists.txt
+--- kirigami2-5.99.0/CMakeLists.txt	2022-10-01 22:20:15.000000000 +0800
++++ kirigami2-5.99.0.mod/CMakeLists.txt	2022-11-12 15:59:23.578160679 +0800
+@@ -128,7 +128,6 @@
  endif()
  
+ 
 -ecm_find_qmlmodule(QtGraphicalEffects 1.0)
--
- add_definitions(-DQT_DISABLE_DEPRECATED_BEFORE=0x050d00)
- add_subdirectory(src)
- add_subdirectory(templates)
-diff --color -uNr src/src/controls/AbstractApplicationItem.qml src.mod/src/controls/AbstractApplicationItem.qml
---- src/src/controls/AbstractApplicationItem.qml	2021-05-26 15:17:14.799260147 +0100
-+++ src.mod/src/controls/AbstractApplicationItem.qml	2021-05-26 14:33:20.951241121 +0100
-@@ -9,7 +9,6 @@
- import QtQuick.Window 2.2
- import "templates/private"
- import org.kde.kirigami 2.4
--import QtGraphicalEffects 1.0
  
- /**
-  * A window that provides some basic features needed for all apps
-diff --color -uNr src/src/controls/AbstractApplicationWindow.qml src.mod/src/controls/AbstractApplicationWindow.qml
---- src/src/controls/AbstractApplicationWindow.qml	2021-05-26 15:17:14.799260147 +0100
-+++ src.mod/src/controls/AbstractApplicationWindow.qml	2021-05-26 14:32:33.647649364 +0100
-@@ -8,7 +8,6 @@
- import QtQuick.Controls 2.0 as QQC2
- import "templates/private"
- import org.kde.kirigami 2.4
--import QtGraphicalEffects 1.0
- 
- /**
-  * A window that provides some basic features needed for all apps
-diff --color -uNr src/src/controls/ApplicationItem.qml src.mod/src/controls/ApplicationItem.qml
---- src/src/controls/ApplicationItem.qml	2021-05-26 15:17:14.799260147 +0100
-+++ src.mod/src/controls/ApplicationItem.qml	2021-05-26 14:32:12.723837137 +0100
+ ecm_set_disabled_deprecation_versions(
+     QT 5.15.2
+diff -uNr kirigami2-5.99.0/src/controls/Avatar.qml kirigami2-5.99.0.mod/src/controls/Avatar.qml
+--- kirigami2-5.99.0/src/controls/Avatar.qml	2022-10-01 22:20:15.000000000 +0800
++++ kirigami2-5.99.0.mod/src/controls/Avatar.qml	2022-11-12 15:59:54.918160667 +0800
 @@ -7,7 +7,6 @@
- import QtQuick 2.5
- import "templates/private"
- import org.kde.kirigami 2.4 as Kirigami
+ import QtQuick 2.13
+ import org.kde.kirigami 2.14 as Kirigami
+ import QtQuick.Controls 2.13 as QQC2
 -import QtGraphicalEffects 1.0
+ import org.kde.kirigami.private 2.14
+ import "templates/private" as P
  
- /**
-  * A window that provides some basic features needed for all apps
-diff --color -uNr src/src/controls/ApplicationWindow.qml src.mod/src/controls/ApplicationWindow.qml
---- src/src/controls/ApplicationWindow.qml	2021-05-26 15:17:14.799260147 +0100
-+++ src.mod/src/controls/ApplicationWindow.qml	2021-05-26 14:26:30.126563514 +0100
-@@ -7,7 +7,6 @@
- import QtQuick 2.5
- import "templates/private"
- import org.kde.kirigami 2.4 as Kirigami
--import QtGraphicalEffects 1.0
- 
- /**
-  * A window that provides some basic features needed for all apps
-diff --color -uNr src/src/controls/GlobalDrawer.qml src.mod/src/controls/GlobalDrawer.qml
---- src/src/controls/GlobalDrawer.qml	2021-05-26 15:17:14.799260147 +0100
-+++ src.mod/src/controls/GlobalDrawer.qml	2021-05-26 14:25:00.691132069 +0100
-@@ -8,7 +8,6 @@
- import QtQuick.Templates 2.0 as T2
- import QtQuick.Controls 2.2 as QQC2
- import QtQuick.Layouts 1.2
--import QtGraphicalEffects 1.0
- import org.kde.kirigami 2.4
- 
- import "private"
-diff --color -uNr src/src/controls/ItemViewHeader.qml src.mod/src/controls/ItemViewHeader.qml
---- src/src/controls/ItemViewHeader.qml	2021-05-26 15:17:14.799260147 +0100
-+++ src.mod/src/controls/ItemViewHeader.qml	2021-05-26 14:25:29.138945315 +0100
+diff -uNr kirigami2-5.99.0/src/controls/ItemViewHeader.qml kirigami2-5.99.0.mod/src/controls/ItemViewHeader.qml
+--- kirigami2-5.99.0/src/controls/ItemViewHeader.qml	2022-10-01 22:20:15.000000000 +0800
++++ kirigami2-5.99.0.mod/src/controls/ItemViewHeader.qml	2022-11-12 16:00:50.808160646 +0800
 @@ -6,7 +6,6 @@
  
  import QtQuick 2.5
@@ -78,7 +32,7 @@ diff --color -uNr src/src/controls/ItemViewHeader.qml src.mod/src/controls/ItemV
  import org.kde.kirigami 2.4 as Kirigami
  import "private"
  
-@@ -89,13 +88,6 @@
+@@ -95,13 +94,6 @@
              elide: Text.ElideRight
  
              layer.enabled: root.backgroundImage.hasImage
@@ -92,65 +46,36 @@ diff --color -uNr src/src/controls/ItemViewHeader.qml src.mod/src/controls/ItemV
          }
      }
  }
-diff --color -uNr src/src/controls/OverlayDrawer.qml src.mod/src/controls/OverlayDrawer.qml
---- src/src/controls/OverlayDrawer.qml	2021-05-26 15:17:14.799260147 +0100
-+++ src.mod/src/controls/OverlayDrawer.qml	2021-05-26 14:25:58.214760590 +0100
-@@ -5,7 +5,6 @@
-  */
- 
- import QtQuick 2.1
+diff -uNr kirigami2-5.99.0/src/controls/ScrollablePage.qml kirigami2-5.99.0.mod/src/controls/ScrollablePage.qml
+--- kirigami2-5.99.0/src/controls/ScrollablePage.qml	2022-10-01 22:20:15.000000000 +0800
++++ kirigami2-5.99.0.mod/src/controls/ScrollablePage.qml	2022-11-12 16:00:14.048160660 +0800
+@@ -9,7 +9,6 @@
+ import QtQuick.Templates 2.15 as T
+ import QtQuick.Controls 2.15 as QQC2
+ import QtQuick.Layouts 1.15
 -import QtGraphicalEffects 1.0
- import QtQuick.Templates 2.0 as T2
- import org.kde.kirigami 2.5
  
-@@ -42,16 +41,6 @@
-             parent: root.handle
-             anchors.fill: parent
- 
--            DropShadow {
--                anchors.fill: handleGraphics
--                visible: !parent.parent.handleAnchor || !parent.parent.handleAnchor.visible || root.handle.pressed || (root.modal && root.position > 0)
--                horizontalOffset: 0
--                verticalOffset: Units.devicePixelRatio
--                radius: Units.gridUnit /2
--                samples: 16
--                color: Qt.rgba(0, 0, 0, root.handle.pressed ? 0.6 : 0.4)
--                source: handleGraphics
--            }
-             Rectangle {
-                 id: handleGraphics
-                 anchors.centerIn: parent
-diff --color -uNr src/src/controls/plugins.qmltypes src.mod/src/controls/plugins.qmltypes
---- src/src/controls/plugins.qmltypes	2021-05-26 15:17:14.799260147 +0100
-+++ src.mod/src/controls/plugins.qmltypes	2021-05-26 14:29:00.917680399 +0100
-@@ -8,7 +8,6 @@
- 
- Module {
-     dependencies: [
--        "QtGraphicalEffects 1.0",
-         "QtQml 2.1",
-         "QtQml.Models 2.2",
-         "QtQuick 2.9",
-diff --color -uNr src/src/controls/private/ActionButton.qml src.mod/src/controls/private/ActionButton.qml
---- src/src/controls/private/ActionButton.qml	2021-05-26 15:17:14.803260119 +0100
-+++ src.mod/src/controls/private/ActionButton.qml	2021-05-26 14:31:39.908141743 +0100
+ import org.kde.kirigami 2.19
+ import org.kde.kirigami.templates 2.2 as KT
+diff -uNr kirigami2-5.99.0/src/controls/private/ActionButton.qml kirigami2-5.99.0.mod/src/controls/private/ActionButton.qml
+--- kirigami2-5.99.0/src/controls/private/ActionButton.qml	2022-10-01 22:20:15.000000000 +0800
++++ kirigami2-5.99.0.mod/src/controls/private/ActionButton.qml	2022-11-12 16:03:44.848160579 +0800
 @@ -7,7 +7,6 @@
- import QtQuick 2.1
+ import QtQuick 2.15
  import QtQuick.Layouts 1.2
  import QtQuick.Controls 2.0 as Controls
 -import QtGraphicalEffects 1.0
- import org.kde.kirigami 2.7
+ import org.kde.kirigami 2.16
  
  import "../templates/private"
-@@ -357,16 +356,6 @@
-                     }
+@@ -433,15 +432,6 @@
                  }
              }
--
+ 
 -            DropShadow {
 -                anchors.fill: background
 -                horizontalOffset: 0
--                verticalOffset: Units.devicePixelRatio
+-                verticalOffset: 1
 -                radius: Units.gridUnit /2
 -                samples: 16
 -                color: Qt.rgba(0, 0, 0, mouseArea.pressed ? 0.6 : 0.4)
@@ -159,15 +84,14 @@ diff --color -uNr src/src/controls/private/ActionButton.qml src.mod/src/controls
          }
      }
  
-@@ -390,16 +379,6 @@
-         width: Units.iconSizes.smallMedium + Units.smallSpacing*2
+@@ -466,15 +456,6 @@
          height: width
  
--
+ 
 -        DropShadow {
 -            anchors.fill: handleGraphics
 -            horizontalOffset: 0
--            verticalOffset: Units.devicePixelRatio
+-            verticalOffset: 1
 -            radius: Units.gridUnit /2
 -            samples: 16
 -            color: Qt.rgba(0, 0, 0, fakeContextMenuButton.pressed ? 0.6 : 0.4)
@@ -176,20 +100,9 @@ diff --color -uNr src/src/controls/private/ActionButton.qml src.mod/src/controls
          Rectangle {
              id: handleGraphics
              anchors.fill: parent
-diff --color -uNr src/src/controls/private/BannerImage.qml src.mod/src/controls/private/BannerImage.qml
---- src/src/controls/private/BannerImage.qml	2021-05-26 15:17:14.803260119 +0100
-+++ src.mod/src/controls/private/BannerImage.qml	2021-05-26 14:29:26.989532396 +0100
-@@ -6,7 +6,6 @@
- 
- import QtQuick 2.6
- import QtQuick.Layouts 1.2
--import QtGraphicalEffects 1.0
- import org.kde.kirigami 2.12 as Kirigami
- 
- /**
-diff --color -uNr src/src/controls/private/CornerShadow.qml src.mod/src/controls/private/CornerShadow.qml
---- src/src/controls/private/CornerShadow.qml	2021-05-26 15:17:14.803260119 +0100
-+++ src.mod/src/controls/private/CornerShadow.qml	2021-05-26 14:30:32.924808566 +0100
+diff -uNr kirigami2-5.99.0/src/controls/private/CornerShadow.qml kirigami2-5.99.0.mod/src/controls/private/CornerShadow.qml
+--- kirigami2-5.99.0/src/controls/private/CornerShadow.qml	2022-10-01 22:20:15.000000000 +0800
++++ kirigami2-5.99.0.mod/src/controls/private/CornerShadow.qml	2022-11-12 16:02:46.408160601 +0800
 @@ -5,7 +5,6 @@
   */
  
@@ -198,9 +111,9 @@ diff --color -uNr src/src/controls/private/CornerShadow.qml src.mod/src/controls
  import org.kde.kirigami 2.4
  
  RadialGradient {
-diff --color -uNr src/src/controls/private/EdgeShadow.qml src.mod/src/controls/private/EdgeShadow.qml
---- src/src/controls/private/EdgeShadow.qml	2021-05-26 15:17:14.803260119 +0100
-+++ src.mod/src/controls/private/EdgeShadow.qml	2021-05-26 15:17:44.551056384 +0100
+diff -uNr kirigami2-5.99.0/src/controls/private/EdgeShadow.qml kirigami2-5.99.0.mod/src/controls/private/EdgeShadow.qml
+--- kirigami2-5.99.0/src/controls/private/EdgeShadow.qml	2022-10-01 22:20:15.000000000 +0800
++++ kirigami2-5.99.0.mod/src/controls/private/EdgeShadow.qml	2022-11-12 16:06:58.898160505 +0800
 @@ -5,10 +5,9 @@
   */
  
@@ -212,12 +125,11 @@ diff --color -uNr src/src/controls/private/EdgeShadow.qml src.mod/src/controls/p
 +Item {
      id: shadow
      /**
-      * edge: enumeration
-@@ -25,26 +24,5 @@
-     property int radius: Units.gridUnit
+      * @brief This property holds the edge of the shadow that will determine the direction of the gradient.
+@@ -26,25 +25,5 @@
      implicitWidth: radius
      implicitHeight: radius
--
+ 
 -    start: Qt.point((edge !== Qt.RightEdge ? 0 : width), (edge !== Qt.BottomEdge ? 0 : height))
 -    end: Qt.point((edge !== Qt.LeftEdge ? 0 : width), (edge !== Qt.TopEdge ? 0 : height))
 -    gradient: Gradient {
@@ -240,92 +152,9 @@ diff --color -uNr src/src/controls/private/EdgeShadow.qml src.mod/src/controls/p
 -    }
  }
  
-diff --color -uNr src/src/controls/private/RefreshableScrollView.qml src.mod/src/controls/private/RefreshableScrollView.qml
---- src/src/controls/private/RefreshableScrollView.qml	2021-05-26 15:17:14.803260119 +0100
-+++ src.mod/src/controls/private/RefreshableScrollView.qml	2021-05-26 15:01:26.477968469 +0100
-@@ -7,7 +7,6 @@
- import QtQuick 2.7
- import QtQuick.Window 2.2
- import QtQuick.Controls 2.0 as QQC2
--import QtGraphicalEffects 1.0
- import QtQuick.Layouts 1.2
- import org.kde.kirigami 2.4
- import "../templates/private" as P
-@@ -96,17 +95,6 @@
-                 //also take into account the listview header height if present
-                 property real progress: supportsRefreshing && !refreshing ? ((parent.y - busyIndicatorFrame.headerItemHeight)/busyIndicatorFrame.height) : 0
-             }
--            ConicalGradient {
--                source: spinnerProgress
--                visible: spinnerProgress.visible
--                anchors.fill: spinnerProgress
--                gradient: Gradient {
--                    GradientStop { position: 0.00; color: Theme.highlightColor }
--                    GradientStop { position: spinnerProgress.progress; color: Theme.highlightColor }
--                    GradientStop { position: spinnerProgress.progress + 0.01; color: "transparent" }
--                    GradientStop { position: 1.00; color: "transparent" }
--                }
--            }
- 
-             onYChanged: {
-                 //it's overshooting enough and not reachable: start countdown for reachability
-diff --color -uNr src/src/controls/qmldir src.mod/src/controls/qmldir
---- src/src/controls/qmldir	2021-05-26 15:17:14.803260119 +0100
-+++ src.mod/src/controls/qmldir	2021-05-26 14:32:42.943567427 +0100
-@@ -2,6 +2,5 @@
- plugin kirigamiplugin
- classname KirigamiPlugin
- depends QtQuick.Controls 2.0
--depends QtGraphicalEffects 1.0
- designersupported
- 
-diff --color -uNr src/src/controls/templates/OverlaySheet.qml src.mod/src/controls/templates/OverlaySheet.qml
---- src/src/controls/templates/OverlaySheet.qml	2021-05-26 15:17:14.803260119 +0100
-+++ src.mod/src/controls/templates/OverlaySheet.qml	2021-05-26 14:27:26.994223196 +0100
-@@ -9,7 +9,6 @@
- import QtQuick.Layouts 1.2
- import QtQuick.Window 2.2
- import org.kde.kirigami 2.11
--import QtGraphicalEffects 1.0
- import QtQuick.Templates 2.0 as T2
- import "private"
- import "../private"
-diff --color -uNr src/src/controls/templates/private/ContextIcon.qml src.mod/src/controls/templates/private/ContextIcon.qml
---- src/src/controls/templates/private/ContextIcon.qml	2021-05-26 15:17:14.803260119 +0100
-+++ src.mod/src/controls/templates/private/ContextIcon.qml	2021-05-26 14:28:17.245930577 +0100
-@@ -6,7 +6,6 @@
- 
- import QtQuick 2.1
- import QtQuick.Layouts 1.2
--import QtGraphicalEffects 1.0
- import org.kde.kirigami 2.4
- 
- Item {
-diff --color -uNr src/src/controls/templates/private/GenericDrawerIcon.qml src.mod/src/controls/templates/private/GenericDrawerIcon.qml
---- src/src/controls/templates/private/GenericDrawerIcon.qml	2021-05-26 15:17:14.803260119 +0100
-+++ src.mod/src/controls/templates/private/GenericDrawerIcon.qml	2021-05-26 14:27:53.350068967 +0100
-@@ -6,7 +6,6 @@
- 
- import QtQuick 2.1
- import QtQuick.Layouts 1.2
--import QtGraphicalEffects 1.0
- import org.kde.kirigami 2.4 as Kirigami
- 
- Item {
-diff --color -uNr src/src/controls/templates/private/MenuIcon.qml src.mod/src/controls/templates/private/MenuIcon.qml
---- src/src/controls/templates/private/MenuIcon.qml	2021-05-26 15:17:14.803260119 +0100
-+++ src.mod/src/controls/templates/private/MenuIcon.qml	2021-05-26 14:28:05.761996928 +0100
-@@ -6,7 +6,6 @@
- 
- import QtQuick 2.1
- import QtQuick.Layouts 1.2
--import QtGraphicalEffects 1.0
- import org.kde.kirigami 2.4
- 
- Item {
-diff --color -uNr src/src/controls/templates/private/PassiveNotification.qml src.mod/src/controls/templates/private/PassiveNotification.qml
---- src/src/controls/templates/private/PassiveNotification.qml	2021-05-26 15:17:14.803260119 +0100
-+++ src.mod/src/controls/templates/private/PassiveNotification.qml	2021-05-26 14:28:41.845789264 +0100
+diff -uNr kirigami2-5.99.0/src/controls/templates/private/PassiveNotification.qml kirigami2-5.99.0.mod/src/controls/templates/private/PassiveNotification.qml
+--- kirigami2-5.99.0/src/controls/templates/private/PassiveNotification.qml	2022-10-01 22:20:15.000000000 +0800
++++ kirigami2-5.99.0.mod/src/controls/templates/private/PassiveNotification.qml	2022-11-12 16:05:38.268160536 +0800
 @@ -8,7 +8,6 @@
  import QtQuick.Controls 2.3 as Controls
  import QtQuick.Layouts 1.2
@@ -333,21 +162,10 @@ diff --color -uNr src/src/controls/templates/private/PassiveNotification.qml src
 -import QtGraphicalEffects 1.0
  import org.kde.kirigami 2.12 as Kirigami
  
- /**
-diff --color -uNr src/src/qmldir src.mod/src/qmldir
---- src/src/qmldir	2021-05-26 15:17:14.803260119 +0100
-+++ src.mod/src/qmldir	2021-05-26 14:23:47.035655017 +0100
-@@ -2,7 +2,6 @@
- 
- classname KirigamiPlugin
- depends QtQuick.Controls 2.0
--depends QtGraphicalEffects 1.0
- designersupported
- 
- typeinfo plugins.qmltypes
-diff --color -uNr src/src/styles/Material/InlineMessage.qml src.mod/src/styles/Material/InlineMessage.qml
---- src/src/styles/Material/InlineMessage.qml	2021-05-26 15:17:14.803260119 +0100
-+++ src.mod/src/styles/Material/InlineMessage.qml	2021-05-26 14:23:23.219840986 +0100
+ /*
+diff -uNr kirigami2-5.99.0/src/styles/Material/InlineMessage.qml kirigami2-5.99.0.mod/src/styles/Material/InlineMessage.qml
+--- kirigami2-5.99.0/src/styles/Material/InlineMessage.qml	2022-10-01 22:20:15.000000000 +0800
++++ kirigami2-5.99.0.mod/src/styles/Material/InlineMessage.qml	2022-11-12 16:08:01.528160481 +0800
 @@ -7,7 +7,6 @@
   */
  
@@ -356,16 +174,3 @@ diff --color -uNr src/src/styles/Material/InlineMessage.qml src.mod/src/styles/M
  import org.kde.kirigami 2.5 as Kirigami
  
  import "../../private"
-@@ -104,12 +103,5 @@
-         }
- 
-         layer.enabled: true
--        layer.effect: DropShadow {
--            horizontalOffset: 0
--            verticalOffset: 1
--            radius: 12
--            samples: 32
--            color: Qt.rgba(0, 0, 0, 0.5)
--        }
-     }
- }

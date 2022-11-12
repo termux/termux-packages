@@ -17,8 +17,8 @@ diff --git a/src/kirigamiplugin.cpp b/src/kirigamiplugin.cpp
 index acdefbc4..4670eb86 100644
 --- a/src/kirigamiplugin.cpp
 +++ b/src/kirigamiplugin.cpp
-@@ -50,33 +50,6 @@ class CopyHelperPrivate : public QObject
-         }
+@@ -59,32 +59,6 @@
+     }
  };
  
 -// we can't do this in the plugin object directly, as that can live in a different thread
@@ -30,7 +30,7 @@ index acdefbc4..4670eb86 100644
 -    bool eventFilter(QObject *receiver, QEvent *event) override
 -    {
 -        if (event->type() == QEvent::LanguageChange && receiver == QCoreApplication::instance()) {
--            emit languageChangeEvent();
+-            Q_EMIT languageChangeEvent();
 -        }
 -        return QObject::eventFilter(receiver, event);
 -    }
@@ -47,11 +47,10 @@ index acdefbc4..4670eb86 100644
 -    QCoreApplication::instance()->installEventFilter(filter);
 -    connect(filter, &LanguageChangeEventFilter::languageChangeEvent, this, &KirigamiPlugin::languageChangeEvent);
 -}
--
+ 
  QUrl KirigamiPlugin::componentUrl(const QString &fileName) const
  {
-     for (const QString &style : qAsConst(m_stylesFallbackChain)) {
-@@ -266,10 +239,4 @@ void KirigamiPlugin::registerTypes(const char *uri)
+@@ -328,11 +302,6 @@
      qmlProtectModule(uri, 2);
  }
  
@@ -60,13 +59,14 @@ index acdefbc4..4670eb86 100644
 -    Q_UNUSED(uri);
 -    connect(this, &KirigamiPlugin::languageChangeEvent, engine, &QQmlEngine::retranslate);
 -}
--
- #include "kirigamiplugin.moc"
+ 
+ #ifdef KIRIGAMI_BUILD_TYPE_STATIC
+ KirigamiPlugin& KirigamiPlugin::getInstance()
 diff --git a/src/kirigamiplugin.h b/src/kirigamiplugin.h
 index 22279421..caa95f1e 100644
 --- a/src/kirigamiplugin.h
 +++ b/src/kirigamiplugin.h
-@@ -20,9 +20,7 @@ class KirigamiPlugin : public QQmlExtensionPlugin
+@@ -19,18 +19,13 @@
      Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QQmlExtensionInterface")
  
  public:
@@ -75,9 +75,8 @@ index 22279421..caa95f1e 100644
 -    void initializeEngine(QQmlEngine *engine, const char *uri) override;
  
  #ifdef KIRIGAMI_BUILD_TYPE_STATIC
-     static KirigamiPlugin& getInstance()
-@@ -39,9 +37,6 @@ public:
-     }
+     static KirigamiPlugin& getInstance();
+     static void registerTypes(QQmlEngine* engine = nullptr);
  #endif
  
 -Q_SIGNALS:
@@ -85,8 +84,4 @@ index 22279421..caa95f1e 100644
 -
  private:
      QUrl componentUrl(const QString &fileName) const;
-     QString resolveFilePath(const QString &path) const
--- 
-2.26.2
-
-
+ };

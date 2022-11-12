@@ -1,144 +1,90 @@
 Qt build on Termux doesn't have accessibility feature. It needs to be removed.
-diff --color -uNr src/src/controls/LinkButton.qml src.mod/src/controls/LinkButton.qml
---- src/src/controls/LinkButton.qml	2020-06-07 19:29:04.000000000 +0100
-+++ src.mod/src/controls/LinkButton.qml	2021-05-26 15:04:01.628823854 +0100
-@@ -25,9 +25,6 @@
-     property Action action: null
-     property alias acceptedButtons: area.acceptedButtons
+diff -uNr kirigami2-5.99.0/src/controls/LinkButton.qml kirigami2-5.99.0.mod/src/controls/LinkButton.qml
+--- kirigami2-5.99.0/src/controls/LinkButton.qml	2022-10-01 22:20:15.000000000 +0800
++++ kirigami2-5.99.0.mod/src/controls/LinkButton.qml	2022-11-12 15:54:26.588160792 +0800
+@@ -38,9 +38,6 @@
+      */
      property alias mouseArea: area
+ 
 -    Accessible.role: Accessible.Button
 -    Accessible.name: text
 -    Accessible.onPressAction: control.clicked(null)
  
      text: action ? action.text : ""
      enabled: !action || action.enabled
-diff --color -uNr src/src/controls/swipenavigator/PrivateSwipeHighlight.qml src.mod/src/controls/swipenavigator/PrivateSwipeHighlight.qml
---- src/src/controls/swipenavigator/PrivateSwipeHighlight.qml	2020-06-07 19:29:04.000000000 +0100
-+++ src.mod/src/controls/swipenavigator/PrivateSwipeHighlight.qml	2021-05-26 15:04:22.268673726 +0100
-@@ -10,8 +10,6 @@
+diff -uNr kirigami2-5.99.0/src/controls/swipenavigator/PageTab.qml kirigami2-5.99.0.mod/src/controls/swipenavigator/PageTab.qml
+--- kirigami2-5.99.0/src/controls/swipenavigator/PageTab.qml	2022-10-01 22:20:15.000000000 +0800
++++ kirigami2-5.99.0.mod/src/controls/swipenavigator/PageTab.qml	2022-11-12 15:57:50.318160714 +0800
+@@ -48,7 +48,6 @@
+     RowLayout {
+         id: verticalTitleRow
+         anchors.fill: parent
+-        Accessible.ignored: true
+         visible: vertical
+ 
+         ColumnLayout {
+@@ -81,7 +80,6 @@
+     RowLayout {
+         id: horizontalTitleRow
+         anchors.fill: parent
+-        Accessible.ignored: true
+         visible: !vertical
+ 
+         RowLayout {
+diff -uNr kirigami2-5.99.0/src/controls/swipenavigator/PrivateSwipeHighlight.qml kirigami2-5.99.0.mod/src/controls/swipenavigator/PrivateSwipeHighlight.qml
+--- kirigami2-5.99.0/src/controls/swipenavigator/PrivateSwipeHighlight.qml	2022-10-01 22:20:15.000000000 +0800
++++ kirigami2-5.99.0.mod/src/controls/swipenavigator/PrivateSwipeHighlight.qml	2022-11-12 15:54:39.598160787 +0800
+@@ -10,7 +10,6 @@
  import org.kde.kirigami 2.12 as Kirigami
  
  Rectangle {
 -    Accessible.ignored: true
--
+ 
      anchors {
          bottom: Kirigami.Settings.isMobile ? undefined : parent.bottom
-         top: Kirigami.Settings.isMobile ? parent.top : undefined
-@@ -30,4 +28,4 @@
- 
-     // Unlike most things, we don't want to scale with the em grid, so we don't use a Unit.
-     height: 2
--}
-\ No newline at end of file
-+}
-diff --color -uNr src/src/controls/swipenavigator/PrivateSwipeProgress.qml src.mod/src/controls/swipenavigator/PrivateSwipeProgress.qml
---- src/src/controls/swipenavigator/PrivateSwipeProgress.qml	2020-06-07 19:29:04.000000000 +0100
-+++ src.mod/src/controls/swipenavigator/PrivateSwipeProgress.qml	2021-05-26 15:04:32.540599175 +0100
-@@ -14,8 +14,6 @@
+diff -uNr kirigami2-5.99.0/src/controls/swipenavigator/PrivateSwipeProgress.qml kirigami2-5.99.0.mod/src/controls/swipenavigator/PrivateSwipeProgress.qml
+--- kirigami2-5.99.0/src/controls/swipenavigator/PrivateSwipeProgress.qml	2022-10-01 22:20:15.000000000 +0800
++++ kirigami2-5.99.0.mod/src/controls/swipenavigator/PrivateSwipeProgress.qml	2022-11-12 15:57:18.668160726 +0800
+@@ -14,7 +14,6 @@
      property var progress
  
      Rectangle {
 -        Accessible.ignored: true
--
+ 
          anchors {
              top: parent.top
-             bottom: parent.bottom
-@@ -41,8 +39,6 @@
+@@ -41,7 +40,6 @@
  
  
      Rectangle {
 -        Accessible.ignored: true
--
+ 
          anchors {
              top: parent.top
-             bottom: parent.bottom
-@@ -65,4 +61,4 @@
+@@ -65,4 +63,4 @@
              height: 2
          }
      }
 -}
 \ No newline at end of file
 +}
-diff --color -uNr src/src/controls/swipenavigator/PrivateSwipeTab.qml src.mod/src/controls/swipenavigator/PrivateSwipeTab.qml
---- src/src/controls/swipenavigator/PrivateSwipeTab.qml	2020-06-07 19:29:04.000000000 +0100
-+++ src.mod/src/controls/swipenavigator/PrivateSwipeTab.qml	2021-05-26 15:04:52.672453373 +0100
-@@ -38,28 +38,6 @@
-         }
-     }
+diff -uNr kirigami2-5.99.0/src/controls/swipenavigator/SwipeNavigator.qml kirigami2-5.99.0.mod/src/controls/swipenavigator/SwipeNavigator.qml
+--- kirigami2-5.99.0/src/controls/swipenavigator/SwipeNavigator.qml	2022-10-01 22:20:15.000000000 +0800
++++ kirigami2-5.99.0.mod/src/controls/swipenavigator/SwipeNavigator.qml	2022-11-12 15:56:15.758160750 +0800
+@@ -219,7 +219,6 @@
+                     Loader { id: _footer; sourceComponent: swipeNavigatorRoot.footer; Layout.row: 1; Layout.column: 2 }
+                 }
  
--    Accessible.name: modelData.title
--    Accessible.description: {
--        if (!!modelData.progress) {
--            if (index == columnView.currentIndex) {
--                return i18nc("Accessibility text for a page tab. Keep the text as concise as possible and don't use a percent sign.", "Current page. Progress: %1 percent.", Math.round(modelData.progress*100))
--            } else {
--                return i18nc("Accessibility text for a page tab. Keep the text as concise as possible.", "Navigate to %1. Progress: %1 percent.", modelData.title, Math.round(modelData.progress*100))
--            }
--        } else {
--            if (index == columnView.currentIndex) {
--                return i18nc("Accessibility text for a page tab. Keep the text as concise as possible.", "Current page.")
--            } else if (modelData.needsAttention) {
--                return i18nc("Accessibility text for a page tab that's requesting the user's attention. Keep the text as concise as possible.", "Navigate to %1. Demanding attention.", modelData.title)
--            } else {
--                return i18nc("Accessibility text for a page tab that's requesting the user's attention. Keep the text as concise as possible.", "Navigate to %1.", modelData.title)
--            }
--        }
--    }
--    Accessible.role: Accessible.PageTab
--    Accessible.focusable: true
--    Accessible.onPressAction: columnView.currentIndex = index
--
-     implicitWidth: small ? smallTitleRow.implicitWidth : largeTitleRow.implicitWidth
-     border {
-         width: activeFocus ? 2 : 0
-@@ -91,7 +69,6 @@
-     RowLayout {
-         id: smallTitleRow
-         anchors.fill: parent
--        Accessible.ignored: true
-         visible: small
+-                Accessible.role: Accessible.PageTabList
+             }
+             contentItem: Kirigami.ColumnView {
+                 id: columnView
+diff -uNr kirigami2-5.99.0/src/controls/templates/AbstractListItem.qml kirigami2-5.99.0.mod/src/controls/templates/AbstractListItem.qml
+--- kirigami2-5.99.0/src/controls/templates/AbstractListItem.qml	2022-10-01 22:20:15.000000000 +0800
++++ kirigami2-5.99.0.mod/src/controls/templates/AbstractListItem.qml	2022-11-12 15:56:45.038160739 +0800
+@@ -184,6 +184,5 @@
  
-         ColumnLayout {
-@@ -120,7 +97,6 @@
-     RowLayout {
-         id: largeTitleRow
-         anchors.fill: parent
--        Accessible.ignored: true
-         visible: !small
- 
-         RowLayout {
-@@ -149,7 +125,6 @@
-     MouseArea {
-         id: mouse
-         anchors.fill: parent
--        Accessible.ignored: true
-         onClicked: {
-             columnView.currentIndex = index
-         }
-@@ -157,4 +132,4 @@
- 
-     Layout.fillHeight: true
-     Layout.alignment: Qt.AlignHCenter
--}
-\ No newline at end of file
-+}
-diff --color -uNr src/src/controls/swipenavigator/SwipeNavigator.qml src.mod/src/controls/swipenavigator/SwipeNavigator.qml
---- src/src/controls/swipenavigator/SwipeNavigator.qml	2020-06-07 19:29:04.000000000 +0100
-+++ src.mod/src/controls/swipenavigator/SwipeNavigator.qml	2021-05-26 15:04:13.336738638 +0100
-@@ -159,7 +159,6 @@
- 
-         Layout.fillWidth: true
- 
--        Accessible.role: Accessible.PageTabList
-     }
- 
-     StackView {
-diff --color -uNr src/src/controls/templates/AbstractListItem.qml src.mod/src/controls/templates/AbstractListItem.qml
---- src/src/controls/templates/AbstractListItem.qml	2020-06-07 19:29:04.000000000 +0100
-+++ src.mod/src/controls/templates/AbstractListItem.qml	2021-05-26 15:03:49.128915000 +0100
-@@ -153,6 +153,5 @@
-         property bool indicateActiveFocus: listItem.pressed || Settings.tabletMode || listItem.activeFocus || (view ? view.activeFocus : false)
-     }
+     hoverEnabled: true
  
 -    Accessible.role: Accessible.ListItem
      highlighted: focus && ListView.isCurrentItem && ListView.view && ListView.view.keyNavigationEnabled
