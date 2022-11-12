@@ -1,0 +1,31 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -49,7 +49,7 @@
+ 
+ 
+ add_definitions(-D_FORTIFY_SOURCE=2)
+-add_definitions(-DCONFIG_FILE=\"/etc/multitail.conf\")
++add_definitions(-DCONFIG_FILE=\"@TERMUX_PREFIX@/etc/multitail.conf\")
+ add_definitions(-DVERSION=\"${VERSION}\")
+ add_definitions(-D${CMAKE_C_PLATFORM_ID})
+ message(STATUS "CMAKE_C_PLATFORM_ID=${CMAKE_C_PLATFORM_ID}")
+@@ -142,16 +142,16 @@
+ # install the bin
+ install(TARGETS multitail DESTINATION bin)
+ # install the config file
+-install(FILES multitail.conf DESTINATION etc RENAME multitail.conf.new)
++install(FILES multitail.conf DESTINATION etc)
+ # install the manual files
+ install(FILES multitail.1 DESTINATION share/man/man1)
+ # install doc files
+ install(FILES manual.html DESTINATION share/doc/multitail-${VERSION})
+-install(FILES license.txt DESTINATION share/doc/multitail-${VERSION})
++install(FILES LICENSE DESTINATION share/doc/multitail-${VERSION})
+ install(FILES readme.txt DESTINATION share/doc/multitail-${VERSION})
+ install(FILES thanks.txt DESTINATION share/doc/multitail-${VERSION})
+ # cp conversion-scripts/* etc/multitail/
+-install(DIRECTORY conversion-scripts DESTINATION ect/multitail)
++install(DIRECTORY conversion-scripts DESTINATION etc/multitail)
+ 
+ 
+ if(USE_CPPCHECK)
