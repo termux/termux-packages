@@ -106,6 +106,13 @@ termux_step_create_debscripts() {
 	exit 0
 	POSTINST_EOF
 
+	# For pacman users have to completely reinstall python
+        # (first uninstall and then install) to set up pip.
+	# In order not to do this, need to run an action that runs after installation.
+	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ]; then
+		echo "post_install" > postupg
+	fi
+
 	# Pre-rm script to cleanup runtime-generated files.
 	cat <<- PRERM_EOF > ./prerm
 	#!$TERMUX_PREFIX/bin/sh
