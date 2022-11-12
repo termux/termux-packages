@@ -1,39 +1,45 @@
---- src/CMakeLists.txt	2020-06-07 19:29:04.000000000 +0100
-+++ src.mod/CMakeLists.txt	2021-05-19 13:56:28.854533182 +0100
-@@ -98,23 +98,16 @@
+diff -uNr kirigami2-5.99.0/CMakeLists.txt kirigami2-5.99.0.mod/CMakeLists.txt
+--- kirigami2-5.99.0/CMakeLists.txt	2022-10-01 22:20:15.000000000 +0800
++++ kirigami2-5.99.0.mod/CMakeLists.txt	2022-11-12 15:52:38.878160833 +0800
+@@ -114,7 +114,7 @@
  )
  
- #use dbus on linux, bsd etc, but not andoid and apple stuff
+ #use dbus on linux, bsd etc, but not android and apple stuff
 -if (UNIX AND NOT ANDROID AND NOT(APPLE) AND NOT(DISABLE_DBUS))
 +if (UNIX AND NOT(APPLE) AND NOT(DISABLE_DBUS))
-     find_package(Qt5DBus)
+     find_package(Qt${QT_MAJOR_VERSION}DBus)
      add_definitions(-DKIRIGAMI_ENABLE_DBUS)
+ endif()
+@@ -123,9 +123,6 @@
+     add_definitions(-DUBUNTU_TOUCH)
  endif()
  
 -if(BUILD_EXAMPLES AND ANDROID)
--    find_package(Qt5AndroidExtras ${REQUIRED_QT_VERSION} REQUIRED)
+-    find_package(Qt${QT_MAJOR_VERSION}AndroidExtras ${REQUIRED_QT_VERSION} REQUIRED)
 -endif()
--
--
- ecm_find_qmlmodule(QtGraphicalEffects 1.0)
  
- add_definitions(-DQT_DISABLE_DEPRECATED_BEFORE=0x050d00)
+ 
+ ecm_find_qmlmodule(QtGraphicalEffects 1.0)
+@@ -136,9 +133,7 @@
+ )
+ 
  add_subdirectory(src)
 -if (NOT ANDROID)
 -    add_subdirectory(templates)
 -endif()
 +add_subdirectory(templates)
  
- if (BUILD_EXAMPLES AND BUILD_SHARED_LIBS)
+ if (BUILD_EXAMPLES)
      add_subdirectory(examples)
---- src/src/libkirigami/CMakeLists.txt	2020-06-07 19:29:04.000000000 +0100
-+++ src.mod/src/libkirigami/CMakeLists.txt	2021-05-19 13:59:42.909309847 +0100
-@@ -8,7 +8,7 @@
- )
+diff -uNr kirigami2-5.99.0/src/libkirigami/CMakeLists.txt kirigami2-5.99.0.mod/src/libkirigami/CMakeLists.txt
+--- kirigami2-5.99.0/src/libkirigami/CMakeLists.txt	2022-10-01 22:20:15.000000000 +0800
++++ kirigami2-5.99.0.mod/src/libkirigami/CMakeLists.txt	2022-11-12 15:53:01.618160825 +0800
+@@ -16,7 +16,7 @@
+ set(libkirigami_extra_sources "")
  
- #use dbus on linux, bsd etc, but not andoid and apple stuff
+ #use dbus on linux, bsd etc, but not android and apple stuff
 -if (UNIX AND NOT ANDROID AND NOT(APPLE) AND NOT(DISABLE_DBUS))
 +if (UNIX AND NOT(APPLE) AND NOT(DISABLE_DBUS))
-     qt5_add_dbus_interface(libkirigami_SRCS org.kde.KWin.TabletModeManager.xml tabletmodemanager_interface)
-     set(LIBKIRIGAMKI_EXTRA_LIBS Qt5::DBus)
- endif()
+     qt_add_dbus_interface(libkirigami_extra_sources org.kde.KWin.TabletModeManager.xml tabletmodemanager_interface)
+     qt_add_dbus_interface(libkirigami_extra_sources org.kde.KWin.VirtualKeyboard.xml virtualkeyboard_interface)
+     set(LIBKIRIGAMKI_EXTRA_LIBS Qt${QT_MAJOR_VERSION}::DBus)
