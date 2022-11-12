@@ -61,3 +61,4 @@ bin/vfychain
 bin/vfyserv
 "
 TERMUX_SUBPKG_DESCRIPTION="Tools for NSS"
+TERMUX_SUBPKG_DEPENDS="zlib"
