@@ -1,11 +1,11 @@
---- ../src-CMakeLists.txt.orig	2021-10-15 17:34:25.460656823 +0000
-+++ ./src/CMakeLists.txt	2021-10-15 17:34:39.275431640 +0000
-@@ -60,8 +60,6 @@
-     REQUIRED_HEADERS KI18n_HEADERS
- )
- 
--find_package(PythonModuleGeneration)
--
- if (PythonModuleGeneration_FOUND)
-   ecm_generate_python_binding(
-     TARGET KF5::I18n
+diff -uNr ki18n-5.99.0/CMakeLists.txt ki18n-5.99.0.mod/CMakeLists.txt
+--- ki18n-5.99.0/CMakeLists.txt	2022-10-01 22:18:23.000000000 +0800
++++ ki18n-5.99.0.mod/CMakeLists.txt	2022-11-12 17:33:46.408158519 +0800
+@@ -63,7 +63,6 @@
+ # Due to CMake caching the variables, and KF5I18nMacros being included by KF5I18nConfig,
+ # we have to hardcode the PYTHON_EXECUTABLE path or anything depending on KF5I18n
+ # would be unable to find another Python version.
+-find_package(PythonInterp REQUIRED)
+ configure_file(cmake/KF5I18nMacros.cmake.in ${KI18n_BINARY_DIR}/cmake/KF5I18nMacros.cmake @ONLY)
+ # Needed to build the ki18n translations and run the autotests
+ file(COPY ${KI18n_SOURCE_DIR}/cmake/build-pofiles.cmake DESTINATION ${KI18n_BINARY_DIR}/cmake)
