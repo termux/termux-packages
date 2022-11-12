@@ -9,7 +9,7 @@ set -e -u
 . $(cd "$(dirname "$0")"; pwd)/build/termux_download.sh
 
 ANDROID_SDK_FILE=commandlinetools-linux-${TERMUX_SDK_REVISION}_latest.zip
-ANDROID_SDK_SHA256=2ccbda4302db862a28ada25aa7425d99dce9462046003c1714b059b5c47970d8
+ANDROID_SDK_SHA256=0bebf59339eaa534f4217f8aa0972d14dc49e7207be225511073c661ae01da0a
 if [ "$TERMUX_NDK_VERSION" = 25b ]; then
 	ANDROID_NDK_FILE=android-ndk-r${TERMUX_NDK_VERSION}-linux.zip
 	ANDROID_NDK_SHA256=403ac3e3020dd0db63a848dcaba6ceb2603bf64de90949d5c4361f848e44b005
@@ -33,9 +33,6 @@ if [ ! -d "$ANDROID_HOME" ]; then
 		$ANDROID_SDK_SHA256
 	rm -Rf android-sdk-$TERMUX_SDK_REVISION
 	unzip -q tools-$TERMUX_SDK_REVISION.zip -d android-sdk-$TERMUX_SDK_REVISION
-
-	# Remove unused parts
-	rm -Rf android-sdk-$TERMUX_SDK_REVISION/{emulator*,lib*,proguard,templates}
 fi
 
 if [ ! -d "$NDK" ]; then
@@ -77,5 +74,4 @@ yes | $SDK_MANAGER --sdk_root="$ANDROID_HOME" \
 		"build-tools;${TERMUX_ANDROID_BUILD_TOOLS_VERSION}" \
 		"platforms;android-33" \
 		"platforms;android-28" \
-		"platforms;android-24" \
-		"platforms;android-21"
+		"platforms;android-24"
