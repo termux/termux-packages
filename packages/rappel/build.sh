@@ -3,15 +3,27 @@ TERMUX_PKG_DESCRIPTION="Rappel is a pretty janky assembly REPL"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2020.09.18
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://github.com/yrp604/rappel/archive/dd45bfa000efb89357d5c80a3a77550b96dee499.tar.gz
-TERMUX_PKG_SHA256=c310855880051a9e0c802b74ba0c8eafddeb5bd2a930728356101e385d04d015
-TERMUX_PKG_DEPENDS="binutils, libedit"
+_COMMIT=b848fce5e3759f3cbeda55e3cd8dcd7321525a44
+TERMUX_PKG_VERSION=2022.11.07
+TERMUX_PKG_SRCURL=https://github.com/yrp604/rappel.git
+TERMUX_PKG_GIT_BRANCH=master
+TERMUX_PKG_DEPENDS="binutils-is-llvm | binutils, libedit"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 # Need nasm.
 TERMUX_PKG_BLACKLISTED_ARCHES="i686, x86_64"
+
+termux_step_post_get_source() {
+	git fetch --unshallow
+	git checkout $_COMMIT
+
+	local version="$(git log -1 --format=%cs | sed 's/-/./g')"
+	if [ "$version" != "$TERMUX_PKG_VERSION" ]; then
+		echo -n "ERROR: The specified version \"$TERMUX_PKG_VERSION\""
+		echo " is different from what is expected to be: \"$version\""
+		return 1
+	fi
+}
 
 termux_step_make() {
 	local _ARCH
