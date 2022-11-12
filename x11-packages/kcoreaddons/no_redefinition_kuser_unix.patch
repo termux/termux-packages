@@ -1,13 +1,23 @@
---- src/src/lib/util/kuser_unix.cpp	2021-05-19 15:27:34.057310497 +0100
-+++ src.mod/src/lib/util/kuser_unix.cpp	2021-05-19 15:27:55.301184843 +0100
-@@ -25,10 +25,6 @@
- #if defined(__BIONIC__) && __ANDROID_API__ < 26
- static inline struct passwd * getpwent() { return nullptr; }
- inline void setpwent() { }
--static inline void setgrent() { }
--static inline struct group * getgrent() { return nullptr; }
--inline void endpwent() { }
--static inline void endgrent() { }
+diff -uNr kcoreaddons-5.99.0/src/lib/util/kuser_unix.cpp kcoreaddons-5.99.0.mod/src/lib/util/kuser_unix.cpp
+--- kcoreaddons-5.99.0/src/lib/util/kuser_unix.cpp	2022-10-01 22:14:02.000000000 +0800
++++ kcoreaddons-5.99.0.mod/src/lib/util/kuser_unix.cpp	2022-11-12 15:17:30.688161637 +0800
+@@ -30,19 +30,6 @@
+ inline void setpwent()
+ {
+ }
+-static inline void setgrent()
+-{
+-}
+-static inline struct group *getgrent()
+-{
+-    return nullptr;
+-}
+-inline void endpwent()
+-{
+-}
+-static inline void endgrent()
+-{
+-}
  #endif
  
- class Q_DECL_HIDDEN KUser::Private : public QSharedData
+ // Only define os_pw_size() if it's going to be used
