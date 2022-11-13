@@ -2,11 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/inetutils/
 TERMUX_PKG_DESCRIPTION="Collection of common network programs"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.3
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=2.4
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/inetutils/inetutils-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=0b01bb08e29623c4e3b940f233c961451d9af8c5066301add76a52a95d51772c
-TERMUX_PKG_DEPENDS="libandroid-glob, readline"
+TERMUX_PKG_SHA256=1789d6b1b1a57dfe2a7ab7b533ee9f5dfd9cbf5b59bb1bb3c2612ed08d0f68b2
+TERMUX_PKG_DEPENDS="readline"
+TERMUX_PKG_BUILD_DEPENDS="libandroid-glob"
 TERMUX_PKG_SUGGESTS="whois"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/whois share/man/man1/whois.1"
 # These are old cruft / not suited for android
@@ -25,6 +25,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-traceroute
 --disable-uucpd
 ac_cv_lib_crypt_crypt=no
+gl_cv_have_weak=no
 "
 
 termux_step_pre_configure() {
