@@ -1,0 +1,14 @@
+--- a/common/rfb/util.h
++++ b/common/rfb/util.h
+@@ -31,7 +31,11 @@
+ #include <limits.h>
+ #include <string.h>
+ 
++#ifdef __ANDROID__
++#include <sys/time.h>
++#else
+ struct timeval;
++#endif
+ 
+ #ifdef __GNUC__
+ #  define __printf_attr(a, b) __attribute__((__format__ (__printf__, a, b)))
