@@ -4,10 +4,11 @@ TERMUX_PKG_LICENSE="ZLIB"
 TERMUX_PKG_LICENSE_FILE="../../../License.txt"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.4.39
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://mediaarea.net/download/source/libzen/${TERMUX_PKG_VERSION}/libzen_${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=bbf877062227828ccca63d36af04a16789f3f1013e0c99f6dfd908bf5f2dbe43
-TERMUX_PKG_DEPENDS="libandroid-glob, libandroid-support, libc++"
+TERMUX_PKG_DEPENDS="libandroid-support, libc++"
+TERMUX_PKG_BUILD_DEPENDS="libandroid-glob"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-shared --enable-static"
 
 termux_step_pre_configure() {
