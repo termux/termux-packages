@@ -2,20 +2,15 @@ diff --git a/data/data/com.termux/files/usr/tmp/docker-build/containerd-1.4.3/Ma
 index c0fecb9..e724e52 100644
 --- a/data/data/com.termux/files/usr/tmp/docker-build/containerd-1.4.3/Makefile
 +++ b/Makefile
-@@ -20,10 +20,10 @@ ROOTDIR=$(dir $(abspath $(lastword $(MAKEFILE_LIST))))
- DESTDIR ?= /usr/local
- 
- # Used to populate variables in version package.
--VERSION=$(shell git describe --match 'v[0-9]*' --dirty='.m' --always)
--REVISION=$(shell git rev-parse HEAD)$(shell if ! git diff --no-ext-diff --quiet --exit-code; then echo .m; fi)
-+VERSION=v1.4.3.m
-+REVISION=269548fa27e0089a8b8278fc4fc781d7f65a939b.m
+@@ -33,7 +33,7 @@
+ VERSION ?= $(shell git describe --match 'v[0-9]*' --dirty='.m' --always)
+ REVISION=$(shell git rev-parse HEAD)$(shell if ! git diff --no-ext-diff --quiet --exit-code; then echo .m; fi)
  PACKAGE=github.com/containerd/containerd
 -SHIM_CGO_ENABLED ?= 0
 +SHIM_CGO_ENABLED ?= 1
  
- ifneq "$(strip $(shell command -v go 2>/dev/null))" ""
- 	GOOS ?= $(shell go env GOOS)
+ ifneq "$(strip $(shell command -v $(GO) 2>/dev/null))" ""
+ 	GOOS ?= $(shell $(GO) env GOOS)
 @@ -69,7 +69,7 @@ RELEASE=containerd-$(VERSION:v%=%).${GOOS}-${GOARCH}
  PKG=github.com/containerd/containerd
  
@@ -25,22 +20,34 @@ index c0fecb9..e724e52 100644
  MANPAGES=ctr.8 containerd.8 containerd-config.8 containerd-config.toml.5
  
  ifdef BUILDTAGS
-@@ -80,7 +80,7 @@ GO_BUILDTAGS ?= apparmor selinux
- GO_BUILDTAGS += ${DEBUG_TAGS}
- GO_TAGS=$(if $(GO_BUILDTAGS),-tags "$(GO_BUILDTAGS)",)
- GO_LDFLAGS=-ldflags '-X $(PKG)/version.Version=$(VERSION) -X $(PKG)/version.Revision=$(REVISION) -X $(PKG)/version.Package=$(PACKAGE) $(EXTRA_LDFLAGS)'
+@@ -100,7 +100,7 @@
+ endif
+ GO_LDFLAGS+='
+ 
 -SHIM_GO_LDFLAGS=-ldflags '-X $(PKG)/version.Version=$(VERSION) -X $(PKG)/version.Revision=$(REVISION) -X $(PKG)/version.Package=$(PACKAGE) -extldflags "-static" $(EXTRA_LDFLAGS)'
 +SHIM_GO_LDFLAGS=-ldflags '-X $(PKG)/version.Version=$(VERSION) -X $(PKG)/version.Revision=$(REVISION) -X $(PKG)/version.Package=$(PACKAGE) -extldflags $(EXTRA_LDFLAGS)'
  
  # Project packages.
- PACKAGES=$(shell go list ${GO_TAGS} ./... | grep -v /vendor/)
-@@ -226,7 +226,8 @@ man/ctr.8: FORCE
+ PACKAGES=$(shell $(GO) list ${GO_TAGS} ./... | grep -v /vendor/ | grep -v /integration)
+@@ -274,15 +274,18 @@ genman: man/containerd.8 man/ctr.8
+ 
+ man/containerd.8: FORCE
+ 	@echo "$(WHALE) $@"
+-	$(GO) run -mod=readonly ${GO_TAGS} cmd/gen-manpages/main.go $(@F) $(@D)
++	-CC=gcc CFLAGS= LDFLAGS= GOOS= GOARCH= $(GO) run -mod=readonly ${GO_TAGS} cmd/gen-manpages/main.go $(@F) $(@D)
++	touch $@
+ 
+ man/ctr.8: FORCE
+ 	@echo "$(WHALE) $@"
+-	$(GO) run -mod=readonly ${GO_TAGS} cmd/gen-manpages/main.go $(@F) $(@D)
++	-CC=gcc CFLAGS= LDFLAGS= GOOS= GOARCH= $(GO) run -mod=readonly ${GO_TAGS} cmd/gen-manpages/main.go $(@F) $(@D)
++	touch $@
  
  man/%: docs/man/%.md FORCE
  	@echo "$(WHALE) $@"
 -	go-md2man -in "$<" -out "$@"
-+	go build -o "bin/go-md2man" ./vendor/github.com/cpuguy83/go-md2man/v2
++	CC=gcc CFLAGS= LDFLAGS= GOOS= GOARCH= $(GO) build -o "bin/go-md2man" ./vendor/github.com/cpuguy83/go-md2man/v2
 +	bin/go-md2man -in "$<" -out "$@"
  
  define installmanpage
- mkdir -p $(DESTDIR)/man/man$(2);
+ $(INSTALL) -d $(DESTDIR)$(MANDIR)/man$(2);
