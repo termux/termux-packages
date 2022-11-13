@@ -19,8 +19,8 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
-	"$ANDROID_HOME/build-tools/${TERMUX_ANDROID_BUILD_TOOLS_VERSION}/dx" \
-		--dex --output=beanshell.jar "$TERMUX_PKG_CACHEDIR/bsh-$TERMUX_PKG_VERSION.jar"
+	$TERMUX_D8 --output beanshell.jar \
+		"$TERMUX_PKG_CACHEDIR/bsh-$TERMUX_PKG_VERSION.jar"
 }
 
 termux_step_make_install() {
