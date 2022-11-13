@@ -2,7 +2,7 @@
 +++ ghc-8.10.7-patch/rts/package.conf.in	2022-02-02 15:19:26.221569951 +0530
 @@ -26,9 +26,7 @@
  hs-libraries:   "HSrts" FFI_LIB
- 
+
  extra-libraries:
 -#if defined(HAVE_LIBM)
                                  "m"             /* for ldexp() */
@@ -10,9 +10,9 @@
  #if defined(HAVE_LIBRT)
                                , "rt"
  #endif
---- ghc-8.10.7/compiler/main/SysTools.hs	2021-06-29 12:54:51.000000000 +0530
-+++ ghc-8.10.7-patch/compiler/main/SysTools.hs	2022-02-02 15:17:37.251569993 +0530
-@@ -424,11 +424,7 @@
+--- ghc.orig/compiler/GHC/Linker/Dynamic.hs	2022-11-07 01:10:29.000000000 +0530
++++ ghc.mod/compiler/GHC/Linker/Dynamic.hs	2022-11-10 13:19:22.885682312 +0530
+@@ -229,11 +229,7 @@
  -- math-y things are used (which we assume to include all programs). See #14022.
  libmLinkOpts :: [Option]
  libmLinkOpts =
@@ -21,6 +21,6 @@
 -#else
 -  []
 -#endif
- 
- getPkgFrameworkOpts :: DynFlags -> Platform -> [InstalledUnitId] -> IO [String]
- getPkgFrameworkOpts dflags platform dep_packages
+
+ {-
+ Note [-Bsymbolic assumptions by GHC]

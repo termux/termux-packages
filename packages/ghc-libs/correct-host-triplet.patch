@@ -1,6 +1,6 @@
---- ghc-8.10.7/libraries/Cabal/Cabal/Distribution/Simple.hs	2022-02-09 09:22:38.381445950 +0530
-+++ ghc-8.10.7-patch/libraries/Cabal/Cabal/Distribution/Simple.hs	2022-03-05 12:03:02.509066261 +0530
-@@ -105,10 +105,20 @@
+--- ghc.orig/libraries/Cabal/Cabal/src/Distribution/Simple.hs	2022-11-07 01:11:17.000000000 +0530
++++ ghc.mod/libraries/Cabal/Cabal/src/Distribution/Simple.hs	2022-11-10 13:28:41.695682098 +0530
+@@ -108,10 +108,20 @@
  import Distribution.Compat.Environment      (getEnvironment)
  import Distribution.Compat.GetShortPathName (getShortPathName)
 
@@ -11,18 +11,18 @@
 
 +correctHostTriplet :: String -> String
 +correctHostTriplet s = do
-+    if isInfixOf "-android" s
-+      then
-+        let arch = take (length s -8) ( drop 0 s ) -- drop "-android"
-+        in
-+          if arch == "arm" then "armv7a" else arch ++ "-linux-"
-+            ++ if arch == "arm" then "androideabi" else "android"
-+      else s
++  if isInfixOf "-android" s
++    then
++      let arch = take (length s -8) ( drop 0 s ) -- drop "-android"
++      in
++        if arch == "arm" then "armv7a" else arch ++ "-linux-"
++          ++ if arch == "arm" then "androideabi" else "android"
++    else s
 +
  -- | A simple implementation of @main@ for a Cabal setup script.
  -- It reads the package description file using IO, and performs the
  -- action specified on the command line.
-@@ -754,7 +764,7 @@
+@@ -722,7 +732,7 @@
        overEnv = ("CFLAGS", Just cflagsEnv) :
                  [("PATH", Just pathEnv) | not (null extraPath)]
        hp = hostPlatform lbi
