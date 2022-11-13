@@ -2,16 +2,28 @@ TERMUX_PKG_HOMEPAGE=https://acoustid.org/chromaprint
 TERMUX_PKG_DESCRIPTION="C library for generating audio fingerprints used by AcoustID"
 TERMUX_PKG_LICENSE="LGPL-2.1, MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.5.1
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://github.com/acoustid/chromaprint/releases/download/v${TERMUX_PKG_VERSION}/chromaprint-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=a1aad8fa3b8b18b78d3755b3767faff9abb67242e01b478ec9a64e190f335e1c
-TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="libc++, ffmpeg"
-# `-DBUILD_TOOLS=ON` is not speficied as `fpcalc` does not build with ffmpeg 5.0.
+_COMMIT=b6d5f131e0c693ea877cbf49e0174be9fb0f9856
+_COMMIT_DATE=20221105
+TERMUX_PKG_VERSION=1.5.1-p${_COMMIT_DATE}
+TERMUX_PKG_SRCURL=https://github.com/acoustid/chromaprint.git
+TERMUX_PKG_GIT_BRANCH=master
+TERMUX_PKG_DEPENDS="ffmpeg, libc++"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCMAKE_BUILD_TYPE=Release
 -DBUILD_SHARED_LIBS=ON
--DBUILD_TOOLS=OFF
+-DBUILD_TOOLS=ON
 -DBUILD_TESTS=OFF
 "
+
+termux_step_post_get_source() {
+	git fetch --unshallow
+	git checkout $_COMMIT
+
+	local pdate="p$(git log -1 --format=%cs | sed 's/-//g')"
+	if [[ "$TERMUX_PKG_VERSION" != *"${pdate}" ]]; then
+		echo -n "ERROR: The version string \"$TERMUX_PKG_VERSION\" is"
+		echo -n " different from what is expected to be; should end"
+		echo " with \"${pdate}\"."
+		return 1
+	fi
+}
