@@ -15,7 +15,7 @@ index f4b94d25..aabf93ac 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -1,4 +1,4 @@
--cmake_minimum_required(VERSION 2.6)
+-cmake_minimum_required(VERSION 2.8.12)
 +cmake_minimum_required(VERSION 3.12)
  
  if(COMMAND cmake_policy)
@@ -25,9 +25,9 @@ index f4b94d25..aabf93ac 100644
  find_package(PkgConfig REQUIRED)
  pkg_check_modules(LZ4 REQUIRED liblz4)
 +string(JOIN " " LZ4_STATIC_LDFLAGS_STR ${LZ4_STATIC_LDFLAGS})
+ include_directories(${LZ4_INCLUDE_DIRS})
  
  #set the C/C++ include path to the "include" directory
- include_directories(BEFORE ${PROJECT_SOURCE_DIR}/src/cpp)
 diff --git a/cmake/flann.pc.in b/cmake/flann.pc.in
 index 07b8d649..1e7673ac 100644
 --- a/cmake/flann.pc.in
