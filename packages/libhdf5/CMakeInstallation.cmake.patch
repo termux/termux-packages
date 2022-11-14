@@ -1,0 +1,76 @@
+--- a/CMakeInstallation.cmake
++++ b/CMakeInstallation.cmake
+@@ -31,7 +31,7 @@
+   if (HDF5_EXPORTED_TARGETS)
+     install (
+         EXPORT ${HDF5_EXPORTED_TARGETS}
+-        DESTINATION ${HDF5_INSTALL_CMAKE_DIR}
++        DESTINATION "lib/cmake"
+         FILE ${HDF5_PACKAGE}${HDF_PACKAGE_EXT}-targets.cmake
+         NAMESPACE ${HDF_PACKAGE_NAMESPACE}
+         COMPONENT configinstall
+@@ -67,12 +67,12 @@
+ # Configure the hdf5-config.cmake file for the build directory
+ #-----------------------------------------------------------------------------
+ set (INCLUDE_INSTALL_DIR ${HDF5_INSTALL_INCLUDE_DIR})
+-set (SHARE_INSTALL_DIR "${CMAKE_CURRENT_BINARY_DIR}/${HDF5_INSTALL_CMAKE_DIR}" )
++set (SHARE_INSTALL_DIR "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake" )
+ set (CURRENT_BUILD_DIR "${CMAKE_CURRENT_BINARY_DIR}" )
+ configure_package_config_file (
+     ${HDF_RESOURCES_DIR}/hdf5-config.cmake.in
+     "${HDF5_BINARY_DIR}/${HDF5_PACKAGE}${HDF_PACKAGE_EXT}-config.cmake"
+-    INSTALL_DESTINATION "${HDF5_INSTALL_CMAKE_DIR}"
++    INSTALL_DESTINATION "lib/cmake"
+     PATH_VARS INCLUDE_INSTALL_DIR SHARE_INSTALL_DIR CURRENT_BUILD_DIR
+     INSTALL_PREFIX "${CMAKE_CURRENT_BINARY_DIR}"
+ )
+@@ -81,19 +81,19 @@
+ # Configure the hdf5-config.cmake file for the install directory
+ #-----------------------------------------------------------------------------
+ set (INCLUDE_INSTALL_DIR ${HDF5_INSTALL_INCLUDE_DIR})
+-set (SHARE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/${HDF5_INSTALL_CMAKE_DIR}" )
++set (SHARE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib/cmake" )
+ set (CURRENT_BUILD_DIR "${CMAKE_INSTALL_PREFIX}" )
+ configure_package_config_file (
+     ${HDF_RESOURCES_DIR}/hdf5-config.cmake.in
+     "${HDF5_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${HDF5_PACKAGE}${HDF_PACKAGE_EXT}-config.cmake"
+-    INSTALL_DESTINATION "${HDF5_INSTALL_CMAKE_DIR}"
++    INSTALL_DESTINATION "lib/cmake"
+     PATH_VARS INCLUDE_INSTALL_DIR SHARE_INSTALL_DIR CURRENT_BUILD_DIR
+ )
+ 
+ if (NOT HDF5_EXTERNALLY_CONFIGURED)
+   install (
+       FILES ${HDF5_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${HDF5_PACKAGE}${HDF_PACKAGE_EXT}-config.cmake
+-      DESTINATION ${HDF5_INSTALL_CMAKE_DIR}
++      DESTINATION "lib/cmake"
+       COMPONENT configinstall
+   )
+ endif ()
+@@ -109,7 +109,7 @@
+   )
+   install (
+       FILES ${HDF5_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${HDF5_PACKAGE}${HDF_PACKAGE_EXT}-config-version.cmake
+-      DESTINATION ${HDF5_INSTALL_CMAKE_DIR}
++      DESTINATION "lib/cmake"
+       COMPONENT configinstall
+   )
+ endif ()
+@@ -195,7 +195,7 @@
+ if (NOT HDF5_EXTERNALLY_CONFIGURED)
+   install (
+       FILES ${HDF5_SOURCE_DIR}/COPYING
+-      DESTINATION ${HDF5_INSTALL_DATA_DIR}
++      DESTINATION "share/doc/hdf5"
+       COMPONENT hdfdocuments
+   )
+   if (EXISTS "${HDF5_SOURCE_DIR}/release_docs" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/release_docs")
+@@ -238,7 +238,7 @@
+     endif ()
+     install (
+         FILES ${release_files}
+-        DESTINATION ${HDF5_INSTALL_DATA_DIR}
++        DESTINATION "share/doc/hdf5"
+         COMPONENT hdfdocuments
+     )
+   endif ()

@@ -58,6 +58,33 @@ set( H5_PRINTF_LL_TEST_RUN__TRYRUN_OUTPUT
      CACHE STRING "Output from TRY_RUN" FORCE)
 
 
+# RUN_RESULT_VAR
+#    indicates whether the executable would have been able to run on its
+#    target platform. If so, set RUN_RESULT_VAR to
+#    the exit code (in many cases 0 for success), otherwise enter "FAILED_TO_RUN".
+# RUN_RESULT_VAR__TRYRUN_OUTPUT
+#    contains the text the executable would have printed on stdout and stderr.
+#    If the executable would not have been able to run, set RUN_RESULT_VAR__TRYRUN_OUTPUT empty.
+#    Otherwise check if the output is evaluated by the calling CMake code. If so,
+#    check what the source file would have printed when called with the given arguments.
+# The COMPILE_RESULT_VAR variable holds the build result for this try_run().
+# 
+# Source file   : /home/builder/.termux-build/libhdf5/build/CMakeFiles/CMakeTmp/testCCompiler1.c
+# Executable    : /home/builder/.termux-build/libhdf5/build/CMakeFiles/cmTC_b3a46-RUN_RESULT_VAR
+# Run arguments : 
+#    Called from: [3]	/home/builder/.termux-build/libhdf5/src/hdf5-1.12.2/config/cmake/ConfigureChecks.cmake
+#                 [2]	/home/builder/.termux-build/libhdf5/src/hdf5-1.12.2/config/cmake/ConfigureChecks.cmake
+#                 [1]	/home/builder/.termux-build/libhdf5/src/hdf5-1.12.2/CMakeLists.txt
+
+set( RUN_RESULT_VAR 
+     "0"
+     CACHE STRING "Result from try_run" FORCE)
+
+set( RUN_RESULT_VAR__TRYRUN_OUTPUT 
+     ""
+     CACHE STRING "Output from try_run" FORCE)
+
+
 # H5_LDOUBLE_TO_LONG_SPECIAL_RUN
 #    indicates whether the executable would have been able to run on its
 #    target platform. If so, set H5_LDOUBLE_TO_LONG_SPECIAL_RUN to
