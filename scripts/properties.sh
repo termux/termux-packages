@@ -58,6 +58,11 @@ TERMUX_REPO_COMPONENT=(
 )
 
 # Allow to override setup.
-if [ -f "$HOME/.termuxrc" ]; then
-	. "$HOME/.termuxrc"
-fi
+for f in "${HOME}/.config/termux/termuxrc.sh" "${HOME}/.termux/termuxrc.sh" "${HOME}/.termuxrc"; do
+	if [ -f "$f" ]; then
+		echo "Using builder configuration from '$f'..."
+		. "$f"
+		break
+	fi
+done
+unset f
