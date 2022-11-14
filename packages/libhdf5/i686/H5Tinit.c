@@ -10,7 +10,7 @@
  * This file is part of HDF5.  The full HDF5 copyright notice, including     *
  * terms governing use, modification, and redistribution, is contained in    *
  * the COPYING file, which can be found at the root of the source code       *
- * distribution tree, or in https://support.hdfgroup.org/ftp/HDF5/releases.  *
+ * distribution tree, or in https://www.hdfgroup.org/licenses.               *
  * If you do not have access to either file, you may request a copy from     *
  * help@hdfgroup.org.                                                        *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -938,11 +938,12 @@ H5T__init_native(void)
     /* Set the native order for this machine */
     H5T_native_order_g = H5T_ORDER_LE;
 
-    /* Structure alignment for pointers, hvl_t, hobj_ref_t, hdset_reg_ref_t */
+    /* Structure alignment for pointers, vlen and reference types */
     H5T_POINTER_COMP_ALIGN_g = 4;
     H5T_HVL_COMP_ALIGN_g = 4;
     H5T_HOBJREF_COMP_ALIGN_g = 4;
     H5T_HDSETREGREF_COMP_ALIGN_g = 1;
+    H5T_REF_COMP_ALIGN_g = 4;
 
 done:
     if(ret_value < 0) {
