@@ -28,6 +28,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dx11=disabled
 -Dxv=disabled
 -Dandroid-media-ndk=disabled
+-Dsixel=enabled
 "
 
 termux_step_pre_configure() {
