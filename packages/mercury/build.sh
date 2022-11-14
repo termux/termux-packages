@@ -2,16 +2,14 @@ TERMUX_PKG_HOMEPAGE=https://www.mercurylang.org/
 TERMUX_PKG_DESCRIPTION="A logic/functional programming language"
 TERMUX_PKG_LICENSE="GPL-2.0, LGPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=20.06.1
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SRCURL=https://dl.mercurylang.org/release-${TERMUX_PKG_VERSION:0:5}/mercury-srcdist-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=ef093ae81424c4f3fe696eff9aefb5fb66899e11bb17ae0326adfb70d09c1c1f
+TERMUX_PKG_VERSION=22.01.4
+TERMUX_PKG_SRCURL=https://dl.mercurylang.org/release/mercury-srcdist-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=7755a03142002f4a31a73effcca3c9592bba25da38a479789ff45e9cc99353ed
 TERMUX_PKG_DEPENDS="libandroid-sysv-semaphore-static"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-csharp-grade
---disable-erlang-grade
 --disable-java-grade
 --disable-debug-grades
 --disable-par-grades
@@ -48,6 +46,10 @@ termux_step_pre_configure() {
 	export MERCURY_DEMANGLER=$_BUILD_UTIL/mdemangle
 	export MERCURY_COMPILER=$_BUILD_COMPILER/mercury_compile
 	export MERCURY_ALL_LOCAL_C_INCL_DIRS=-I$TERMUX_PREFIX/include
+
+	mkdir -p _bin
+	ln -sf $MERCURY_MKINIT _bin/
+	PATH=$TERMUX_PKG_BUILDDIR/_bin:$PATH
 
 	find "$TERMUX_PKG_SRCDIR" -name '*.c' -o -name '*.m' | \
 		xargs -n 1 sed -i \
