@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://matt.ucc.asn.au/dropbear/dropbear.html
 TERMUX_PKG_DESCRIPTION="Small SSH server and client"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2022.82
+TERMUX_PKG_VERSION=2022.83
 TERMUX_PKG_SRCURL=https://matt.ucc.asn.au/dropbear/releases/dropbear-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=3a038d2bbc02bf28bbdd20c012091f741a3ec5cbe460691811d714876aad75d1
+TERMUX_PKG_SHA256=bc5a121ffbc94b5171ad5ebe01be42746d50aa797c9549a4639894a16749443b
 TERMUX_PKG_DEPENDS="termux-auth, zlib"
 TERMUX_PKG_SUGGESTS="openssh-sftp-server"
 TERMUX_PKG_CONFLICTS="openssh"
@@ -28,7 +28,7 @@ termux_step_create_debscripts() {
 	{
 	echo "#!$TERMUX_PREFIX/bin/sh"
 	echo "mkdir -p $TERMUX_PREFIX/etc/dropbear"
-	echo "for a in rsa dss ecdsa ed25519; do"
+	echo "for a in rsa ecdsa ed25519; do"
 	echo "	KEYFILE=$TERMUX_PREFIX/etc/dropbear/dropbear_\${a}_host_key"
 	echo "	test ! -f \$KEYFILE && dropbearkey -t \$a -f \$KEYFILE"
 	echo "done"

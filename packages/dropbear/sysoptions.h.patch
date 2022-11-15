@@ -10,6 +10,15 @@ diff -uNr dropbear-2018.76/sysoptions.h dropbear-2018.76.mod/sysoptions.h
  
  #define DROPBEAR_ESCAPE_CHAR '~'
  
+@@ -85,7 +85,7 @@
+   -DCOMPAT_USER_SHELLS='"/bin/sh","/apps/bin/sh","/data/bin/zsh"'
+  */
+ #ifndef COMPAT_USER_SHELLS
+-#define COMPAT_USER_SHELLS "/bin/sh","/bin/csh"
++#define COMPAT_USER_SHELLS "@TERMUX_PREFIX@/bin/sh","@TERMUX_PREFIX@/bin/csh"
+ #endif
+ 
+ #define DROPBEAR_ESCAPE_CHAR '~'
 @@ -233,10 +233,6 @@
  #error "DROPBEAR_SVR_PATM_AUTH requires PAM headers. Perhaps ./configure --enable-pam ?"
  #endif
@@ -21,3 +30,16 @@ diff -uNr dropbear-2018.76/sysoptions.h dropbear-2018.76.mod/sysoptions.h
  #if !(DROPBEAR_SVR_PASSWORD_AUTH || DROPBEAR_SVR_PAM_AUTH || DROPBEAR_SVR_PUBKEY_AUTH)
  	#error "At least one server authentication type must be enabled. DROPBEAR_SVR_PUBKEY_AUTH and DROPBEAR_SVR_PASSWORD_AUTH are recommended."
  #endif
+@@ -382,10 +378,12 @@
+ #define DROPBEAR_MULTI 0
+ #endif
+ 
++#ifndef __ANDROID__
+ /* Fuzzing expects all key types to be enabled */
+ #if defined(DROPBEAR_DSS)
+ #undef DROPBEAR_DSS
+ #endif
+ #define DROPBEAR_DSS 1
++#endif
+ 
+ /* no include guard for this file */
