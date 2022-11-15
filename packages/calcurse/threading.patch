@@ -1,139 +1,142 @@
---- ./src/io.c.orig	2020-10-12 17:18:02.000000000 +0200
-+++ ./src/io.c	2020-10-18 10:34:54.061491515 +0200
-@@ -44,6 +44,7 @@
- #include <math.h>
- #include <unistd.h>
- #include <errno.h>
-+#include <stdatomic.h>
- 
+--- a/src/io.c
++++ b/src/io.c
+@@ -48,6 +48,13 @@
  #include "calcurse.h"
  #include "sha1.h"
-@@ -69,6 +70,8 @@
- static char apts_sha1[SHA1_DIGESTLEN * 2 + 1];
- static char todo_sha1[SHA1_DIGESTLEN * 2 + 1];
  
-+static atomic_flag psave_thread_cancel;
++#ifdef __ANDROID__
++static void thread_signal_handler(int signum)
++{
++	pthread_exit(0);
++}
++#endif
 +
- /* Ask user for a file name to export data to. */
- static FILE *get_export_stream(enum export_type type)
- {
-@@ -1453,13 +1456,16 @@
+ struct ht_keybindings_s {
+ 	const char *label;
+ 	enum vkey key;
+@@ -1432,12 +1439,23 @@
  /* Thread used to periodically save data. */
  static void *io_psave_thread(void *arg)
  {
-+	atomic_flag_clear(&psave_thread_cancel);
++#ifdef __ANDROID__
++	struct sigaction actions;
++	memset(&actions, 0, sizeof(actions));
++	sigemptyset(&actions.sa_mask);
++	actions.sa_flags = 0;
++	actions.sa_handler = thread_signal_handler;
++	sigaction(SIGUSR2, &actions, NULL);
++#endif
 +
  	int delay = conf.periodic_save;
  	EXIT_IF(delay < 0, _("Invalid delay"));
  	char *mesg = _("Periodic save cancelled. Data files have changed. "
  		     "Save and merge interactively");
  
--	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
++#ifndef __ANDROID__
+ 	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
++#endif
  	for (;;) {
-+		if (atomic_flag_test_and_set(&psave_thread_cancel)) pthread_exit(NULL);
-+		atomic_flag_clear(&psave_thread_cancel);
  		sleep(delay * MININSEC);
  		pthread_mutex_lock(&io_periodic_save_mutex);
- 		if (io_save_cal(periodic) == IO_SAVE_CANCEL)
-@@ -1483,8 +1489,7 @@
+@@ -1462,7 +1480,11 @@
  
  	/* Lock the mutex to avoid cancelling the thread during saving. */
  	pthread_mutex_lock(&io_periodic_save_mutex);
--	pthread_cancel(io_t_psave);
--	pthread_join(io_t_psave, NULL);
-+	atomic_flag_test_and_set(&psave_thread_cancel);
++#ifndef __ANDROID__
+ 	pthread_cancel(io_t_psave);
++#else
++	pthread_kill(io_t_psave, SIGUSR2);
++#endif
+ 	pthread_join(io_t_psave, NULL);
  	pthread_mutex_unlock(&io_periodic_save_mutex);
  	io_t_psave = pthread_self();
- }
-diff -uNr calcurse-4.6.0/src/notify.c calcurse-4.6.0.mod/src/notify.c
---- calcurse-4.6.0/src/notify.c	2020-02-04 23:46:34.000000000 +0200
-+++ calcurse-4.6.0.mod/src/notify.c	2020-10-01 20:39:57.884475331 +0300
-@@ -38,6 +38,7 @@
- #include <stdlib.h>
- #include <string.h>
- #include <unistd.h>
-+#include <stdatomic.h>
+--- a/src/notify.c
++++ b/src/notify.c
+@@ -42,6 +42,14 @@
  
  #include "calcurse.h"
  
-@@ -55,6 +56,8 @@
- static struct notify_app notify_app;
- static pthread_attr_t detached_thread_attr;
- 
-+static atomic_flag main_thread_cancel;
++#ifdef __ANDROID__
++#include <signal.h>
++static void thread_signal_handler(int signum)
++{
++	pthread_exit(0);
++}
++#endif
 +
- /*
-  * Return the number of seconds before next appointment
-  * (0 if no upcoming appointment).
-@@ -196,8 +199,7 @@
+ #define NOTIFY_FIELD_LENGTH	25
+ 
+ struct notify_vars {
+@@ -194,7 +202,11 @@
  	if (pthread_equal(notify_t_main, pthread_self()))
  		return;
  
--	pthread_cancel(notify_t_main);
--	pthread_join(notify_t_main, NULL);
-+	atomic_flag_test_and_set(&main_thread_cancel);
++#ifndef __ANDROID__
+ 	pthread_cancel(notify_t_main);
++#else
++	pthread_kill(notify_t_main, SIGUSR2);
++#endif
+ 	pthread_join(notify_t_main, NULL);
  	notify_t_main = pthread_self();
  }
- 
-@@ -334,6 +336,8 @@
+@@ -324,6 +336,15 @@
  /* ARGSUSED0 */
  static void *notify_main_thread(void *arg)
  {
-+	atomic_flag_clear(&main_thread_cancel);
++#ifdef __ANDROID__
++	struct sigaction actions;
++	memset(&actions, 0, sizeof(actions));
++	sigemptyset(&actions.sa_mask);
++	actions.sa_flags = 0;
++	actions.sa_handler = thread_signal_handler;
++	sigaction(SIGUSR2, &actions, NULL);
++#endif
 +
  	const unsigned thread_sleep = 1;
  	const unsigned check_app = MININSEC;
  	int elapse = 0;
-@@ -346,6 +350,8 @@
- 	pthread_cleanup_push(notify_main_thread_cleanup, NULL);
- 
- 	for (;;) {
-+		if (atomic_flag_test_and_set(&main_thread_cancel)) pthread_exit(NULL);
-+		atomic_flag_clear(&main_thread_cancel);
- 		ntimer = time(NULL);
- 		localtime_r(&ntimer, &ntime);
- 		pthread_mutex_lock(&notify.mutex);
-diff -uNr calcurse-4.6.0/src/ui-calendar.c calcurse-4.6.0.mod/src/ui-calendar.c
---- calcurse-4.6.0/src/ui-calendar.c	2020-02-04 23:46:34.000000000 +0200
-+++ calcurse-4.6.0.mod/src/ui-calendar.c	2020-10-01 20:40:09.024576943 +0300
-@@ -41,6 +41,7 @@
- #include <time.h>
- #include <math.h>
- #include <langinfo.h>
-+#include <stdatomic.h>
+--- a/src/ui-calendar.c
++++ b/src/ui-calendar.c
+@@ -44,6 +44,14 @@
  
  #include "calcurse.h"
  
-@@ -59,6 +60,8 @@
- static int monthly_view_cache_valid = 0;
- static int monthly_view_cache_month = 0;
- 
-+static atomic_flag date_thread_cancel;
++#ifdef __ANDROID__
++#include <signal.h>
++static void thread_signal_handler(int signum)
++{
++	pthread_exit(0);
++}
++#endif
 +
- /* Switch between calendar views (monthly view is selected by default). */
- void ui_calendar_view_next(void)
- {
-@@ -89,9 +92,13 @@
+ static struct date today, slctd_day;
+ static unsigned ui_calendar_view;
+ static int wday_start; /* this is used in signed arithmetic */
+@@ -89,6 +97,15 @@
  /* ARGSUSED0 */
  static void *ui_calendar_date_thread(void *arg)
  {
-+	atomic_flag_clear(&date_thread_cancel);
++#ifdef __ANDROID__
++	struct sigaction actions;
++	memset(&actions, 0, sizeof(actions));
++	sigemptyset(&actions.sa_mask);
++	actions.sa_flags = 0;
++	actions.sa_handler = thread_signal_handler;
++	sigaction(SIGUSR2, &actions, NULL);
++#endif
 +
  	time_t actual, tomorrow;
  
  	for (;;) {
-+		if (atomic_flag_test_and_set(&date_thread_cancel)) pthread_exit(NULL);
-+		atomic_flag_clear(&date_thread_cancel);
- 		tomorrow = date2sec(today, 24, 0);
- 
- 		while ((actual = time(NULL)) < tomorrow)
-@@ -118,8 +125,7 @@
+@@ -118,7 +135,11 @@
  	if (pthread_equal(ui_calendar_t_date, pthread_self()))
  		return;
  
--	pthread_cancel(ui_calendar_t_date);
--	pthread_join(ui_calendar_t_date, NULL);
-+	atomic_flag_test_and_set(&date_thread_cancel);
++#ifndef __ANDROID__
+ 	pthread_cancel(ui_calendar_t_date);
++#else
++	pthread_kill(ui_calendar_t_date, SIGUSR2);
++#endif
+ 	pthread_join(ui_calendar_t_date, NULL);
  	ui_calendar_t_date = pthread_self();
  }
- 
