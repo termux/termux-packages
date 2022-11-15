@@ -54,15 +54,15 @@ diff -uNr firefox-105.0.3/build/moz.configure/pkg.configure firefox-105.0.3.mod/
 diff -uNr firefox-105.0.3/build/moz.configure/toolchain.configure firefox-105.0.3.mod/build/moz.configure/toolchain.configure
 --- firefox-105.0.3/build/moz.configure/toolchain.configure	2022-10-08 00:40:07.000000000 +0900
 +++ firefox-105.0.3.mod/build/moz.configure/toolchain.configure	2022-10-15 17:25:19.398719772 +0900
-@@ -1168,8 +1168,6 @@
+@@ -1175,7 +1175,7 @@
      ):
          wrapper = list(compiler_wrapper or ())
          flags = []
 -        if sysroot.path:
--            flags.extend(("--sysroot", sysroot.path))
-         if host_or_target.os == "OSX" and macos_target:
-             flags.append("-mmacosx-version-min=%s" % macos_target)
-         if provided_compiler:
++        if False:
+             if host_or_target.kernel == "Darwin":
+                 # While --sysroot and -isysroot are roughly equivalent, when not using
+                 # -isysroot on mac, clang takes the SDKROOT environment variable into
 @@ -1763,17 +1761,7 @@
  
  @depends(cxx_compiler, target)
@@ -326,19 +326,16 @@ diff -uNr firefox-105.0.3/toolkit/moz.configure firefox-105.0.3.mod/toolkit/moz.
 diff -uNr firefox-105.0.3/toolkit/xre/glxtest.cpp firefox-105.0.3.mod/toolkit/xre/glxtest.cpp
 --- firefox-105.0.3/toolkit/xre/glxtest.cpp	2022-10-08 00:25:42.000000000 +0900
 +++ firefox-105.0.3.mod/toolkit/xre/glxtest.cpp	2022-10-17 19:31:36.885513927 +0900
-@@ -1197,7 +1197,11 @@
+@@ -1175,7 +1175,9 @@
    glxtest_bufsize = bufsize;
  
    // Get a list of all GPUs from the PCI bus.
 +#if !defined(__TERMUX__)
-   int pci_count = get_pci_status();
-+#else
-+  int pci_count = 0;
+   get_pci_status();
 +#endif
  
  #ifdef MOZ_WAYLAND
    if (IsWaylandEnabled()) {
-
 diff -uNr firefox-105.0.3/js/src/ctypes/libffi/src/closures.c firefox-105.0.3.mod/js/src/ctypes/libffi/src/closures.c
 --- firefox-105.0.3/js/src/ctypes/libffi/src/closures.c	2022-10-07 22:37:49.000000000 +0900
 +++ firefox-105.0.3.mod/js/src/ctypes/libffi/src/closures.c	2022-10-17 19:42:34.472896402 +0900
@@ -422,18 +419,6 @@ diff -uNr firefox-105.0.3/gfx/cairo/cairo/src/cairoint.h firefox-105.0.3.mod/gfx
  #endif
  
  #if CAIRO_HAS_PS_SURFACE  || \
-diff -uNr firefox-105.0.3/dom/media/systemservices/moz.build firefox-105.0.3.mod/dom/media/systemservices/moz.build
---- firefox-105.0.3/dom/media/systemservices/moz.build	2022-10-07 23:40:08.000000000 +0900
-+++ firefox-105.0.3.mod/dom/media/systemservices/moz.build	2022-10-18 04:48:14.802451213 +0900
-@@ -57,7 +57,7 @@
-     DEFINES["WEBRTC_ANDROID"] = True
- 
- 
--if CONFIG["OS_TARGET"] == "Android":
-+if True:
-     EXPORTS += ["OpenSLESProvider.h"]
-     UNIFIED_SOURCES += [
-         "OpenSLESProvider.cpp",
 diff -uNr firefox-105.0.3/old-configure.in firefox-105.0.3.mod/old-configure.in
 --- firefox-105.0.3/old-configure.in	2022-10-07 22:37:53.000000000 +0900
 +++ firefox-105.0.3.mod/old-configure.in	2022-10-18 11:44:37.005989967 +0900
