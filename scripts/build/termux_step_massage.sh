@@ -12,6 +12,9 @@ termux_step_massage() {
 	# Remove old kept libraries (readline):
 	find . -name '*.old' -print0 | xargs -0 -r rm -f
 
+	# Move over $PREFIX/$PREFIX to $PREFIX:
+	for file in data/data/com.termux/files/usr/*; do if test -d "$file"; then cp -a "$file" .; rm -rf data/; fi; done
+
 	# Move over sbin to bin:
 	for file in sbin/*; do if test -f "$file"; then mv "$file" bin/; fi; done
 
