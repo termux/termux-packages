@@ -8,7 +8,6 @@ TERMUX_PKG_SRCURL=https://download.gnome.org/sources/libxml2/${_MAJOR_VERSION}/l
 TERMUX_PKG_SHA256=5d2cc3d78bec3dbe212a9d7fa629ada25a7da928af432c93060ff5c17ee28a9c
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --without-python
---with-legacy
 "
 TERMUX_PKG_RM_AFTER_INSTALL="share/gtk-doc"
 TERMUX_PKG_DEPENDS="libiconv, liblzma, zlib"
