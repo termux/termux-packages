@@ -19,3 +19,14 @@ diff -uNr squid-4.8/src/dns_internal.cc squid-4.8.mod/src/dns_internal.cc
  #endif
  
          debugs(78, DBG_IMPORTANT, "or use the 'dns_nameservers' option in squid.conf.");
+--- a/src/tools.cc
++++ b/src/tools.cc
+@@ -117,7 +117,7 @@
+     const mode_t prev_umask=umask(S_IXUSR|S_IXGRP|S_IWGRP|S_IWOTH|S_IXOTH);
+ 
+ #if HAVE_MKSTEMP
+-    char filename[] = "/tmp/squid-XXXXXX";
++    char filename[] = "@TERMUX_PREFIX@/tmp/squid-XXXXXX";
+     int tfd = mkstemp(filename);
+     if (tfd < 0 || (fp = fdopen(tfd, "w")) == NULL) {
+         umask(prev_umask);
