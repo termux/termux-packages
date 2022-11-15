@@ -33,51 +33,19 @@ diff -u -r ../dropbear-2019.77/svr-authpasswd.c ./svr-authpasswd.c
  
  	/* check if client wants to change password */
  	changepw = buf_getbool(ses.payload);
-@@ -65,47 +50,14 @@
+@@ -65,6 +50,7 @@
  	}
  
  	password = buf_getstring(ses.payload, &passwordlen);
--	if (valid_user && passwordlen <= DROPBEAR_MAX_PASSWORD_LEN) {
--		/* the first bytes of passwdcrypt are the salt */
--		passwdcrypt = ses.authstate.pw_passwd;
--		testcrypt = crypt(password, passwdcrypt);
--	}
--	m_burn(password, passwordlen);
--	m_free(password);
--
--	/* After we have got the payload contents we can exit if the username
--	is invalid. Invalid users have already been logged. */
--	if (!valid_user) {
--		send_msg_userauth_failure(0, 1);
--		return;
--	}
--
--	if (passwordlen > DROPBEAR_MAX_PASSWORD_LEN) {
--		dropbear_log(LOG_WARNING,
--				"Too-long password attempt for '%s' from %s",
--				ses.authstate.pw_name,
--				svr_ses.addrstring);
--		send_msg_userauth_failure(0, 1);
--		return;
--	}
--
--	if (testcrypt == NULL) {
--		/* crypt() with an invalid salt like "!!" */
--		dropbear_log(LOG_WARNING, "User account '%s' is locked",
--				ses.authstate.pw_name);
--		send_msg_userauth_failure(0, 1);
--		return;
--	}
--
--	/* check for empty password */
--	if (passwdcrypt[0] == '\0') {
--		dropbear_log(LOG_WARNING, "User '%s' has blank password, rejected",
--				ses.authstate.pw_name);
--		send_msg_userauth_failure(0, 1);
--		return;
--	}
++#ifndef __ANDROID__
+ 	if (valid_user && passwordlen <= DROPBEAR_MAX_PASSWORD_LEN) {
+ 		/* the first bytes of passwdcrypt are the salt */
+ 		passwdcrypt = ses.authstate.pw_passwd;
+@@ -106,6 +92,15 @@
+ 	}
  
--	if (constant_time_strcmp(testcrypt, passwdcrypt) == 0) {
+ 	if (constant_time_strcmp(testcrypt, passwdcrypt) == 0) {
++#else /* __ANDROID__ */
 +	/* check if password is valid */
 +	if (termux_auth(ses.authstate.pw_name, password)) {
 +		if (!ses.authstate.pw_name) {
@@ -85,6 +53,7 @@ diff -u -r ../dropbear-2019.77/svr-authpasswd.c ./svr-authpasswd.c
 +			send_msg_userauth_failure(0, 1);
 +			return;
 +		}
- 		/* successful authentication */
- 		dropbear_log(LOG_NOTICE, 
- 				"Password auth succeeded for '%s' from %s",
++#endif /* __ANDROID__ */
+ 		if (svr_opts.multiauthmethod && (ses.authstate.authtypes & ~AUTH_TYPE_PASSWORD)) {
+ 			/* successful password authentication, but extra auth required */
+ 			dropbear_log(LOG_NOTICE,
