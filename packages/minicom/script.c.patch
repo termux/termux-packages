@@ -1,0 +1,14 @@
+--- ../minicom-2.7/src/script.c	2013-10-29 22:07:42.000000000 +1100
++++ ./src/script.c	2016-04-19 16:02:45.252434872 +1000
+@@ -1093,7 +1093,10 @@
+   signal(SIGHUP, SIG_IGN);
+ #endif
+   /* On some Linux systems SIGALRM is masked by default. Unmask it */  
+-  sigrelse(SIGALRM);  
++  sigset_t sigset;
++  sigemptyset(&sigset);
++  sigaddset(&sigset, SIGALRM);
++  sigprocmask(SIG_UNBLOCK, &sigset, NULL);
+ 
+   /* initialize locale support */
+   setlocale(LC_ALL, "");
