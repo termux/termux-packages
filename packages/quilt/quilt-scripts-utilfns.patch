@@ -4,10 +4,10 @@
  {
  	if [ "$1" = -d ]
  	then
--		mktemp -d ${2:-${TMPDIR:-/tmp}/quilt.}XXXXXX
-+		mktemp -d ${2:-${TMPDIR:-@TERMUX_PREFIX@/tmp}/quilt.}XXXXXX
+-		mktemp -d "${2:-${TMPDIR:-/tmp}/quilt.}XXXXXX"
++		mktemp -d "${2:-${TMPDIR:-@TERMUX_PREFIX@/tmp}/quilt.}XXXXXX"
  	else
--		mktemp ${1:-${TMPDIR:-/tmp}/quilt.}XXXXXX
-+		mktemp ${1:-${TMPDIR:-@TERMUX_PREFIX@/tmp}/quilt.}XXXXXX
+-		mktemp "${1:-${TMPDIR:-/tmp}/quilt.}XXXXXX"
++		mktemp "${1:-${TMPDIR:-@TERMUX_PREFIX@/tmp}/quilt.}XXXXXX"
  	fi
  }
