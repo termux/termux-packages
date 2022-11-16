@@ -1,0 +1,14 @@
+--- a/src/minicom.c
++++ b/src/minicom.c
+@@ -1544,7 +1544,10 @@
+ #endif
+ 
+   /* On some Linux systems SIGALRM is masked by default. Unmask it */  
+-  sigrelse(SIGALRM);
++  sigset_t sigset;
++  sigemptyset(&sigset);
++  sigaddset(&sigset, SIGALRM);
++  sigprocmask(SIG_UNBLOCK, &sigset, NULL);
+ 
+   keyboard(KINSTALL, 0);
+ 

@@ -1,0 +1,11 @@
+--- a/src/port.h
++++ b/src/port.h
+@@ -72,7 +72,7 @@
+ #endif
+ 
+ /* Enable music routines. Could we use defined(i386) here? */
+-#if defined(__linux__) || defined(_SCO)
++#if defined(__linux__) && !defined(__ANDROID__) || defined(_SCO)
+ # define VC_MUSIC 1
+ # include <linux/version.h>
+ # include <linux/serial.h>
