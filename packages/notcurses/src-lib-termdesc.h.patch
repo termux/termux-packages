@@ -1,0 +1,11 @@
+--- a/src/lib/termdesc.h
++++ b/src/lib/termdesc.h
+@@ -290,7 +290,7 @@
+ static inline int
+ ncfputs(const char* ext, FILE* out){
+   int r;
+-#ifdef __USE_GNU
++#if defined __USE_GNU && (!defined __ANDROID__ || __ANDROID_API__ >= 28)
+   r = fputs_unlocked(ext, out);
+ #else
+   r = fputs(ext, out);
