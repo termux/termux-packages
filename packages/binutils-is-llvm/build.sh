@@ -12,6 +12,10 @@ TERMUX_PKG_CONFLICTS="binutils"
 termux_step_make_install() {
 	ln -sf lld $TERMUX_PREFIX/bin/ld
 	local f
+	# Please do not include `as`. `llvm-as` is pretty much different from
+	# GNU as. Clang's `-fno-integrated-as` will not work as expected when
+	# `as` is a symlink to `llvm-as`. `bin/as` is provided by `binutils-bin`
+	# package which does not collide with this package.
 	for f in addr2line ar dwp nm objcopy objdump ranlib readelf size strings strip; do
 		ln -sf llvm-${f} $TERMUX_PREFIX/bin/${f}
 	done
