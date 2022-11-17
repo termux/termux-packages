@@ -1,17 +1,15 @@
 --- ../libucontext-libucontext-1.1/Makefile	2021-03-09 07:46:31.000000000 +0000
 +++ ./Makefile	2022-02-11 13:33:41.720671627 +0000
-@@ -14,10 +14,10 @@
- 	override ARCH = arm
+@@ -17,9 +17,9 @@
+ 	override ARCH = aarch64
  endif
  
 -LIBDIR := /lib
 -INCLUDEDIR := /usr/include
 -PKGCONFIGDIR := /usr/lib/pkgconfig
--CFLAGS := -ggdb3 -O2 -Wall
 +LIBDIR := $(PREFIX)/lib
 +INCLUDEDIR := $(PREFIX)/include
 +PKGCONFIGDIR := $(PREFIX)/lib/pkgconfig
-+CFLAGS ?= -ggdb3 -O2 -Wall
+ CFLAGS ?= -ggdb3 -O2 -Wall
  CPPFLAGS := -Iinclude -Iarch/${ARCH} -Iarch/common
- EXPORT_UNPREFIXED := yes
- FREESTANDING := no
+ ifneq ($(shell uname),Darwin)
