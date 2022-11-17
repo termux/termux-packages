@@ -2,8 +2,8 @@ TERMUX_PKG_HOMEPAGE=http://caca.zoy.org/wiki/zzuf
 TERMUX_PKG_DESCRIPTION="A transparent application input fuzzer"
 TERMUX_PKG_LICENSE="WTFPL"
 TERMUX_PKG_MAINTAINER="@termux"
-_COMMIT=e598eef77a98d77dc6aec6fd2c845e3cd07dc4fd
-TERMUX_PKG_VERSION=2019.02.08
+_COMMIT=a7111e51eac3086264fcca0c7026de22b5ab55c7
+TERMUX_PKG_VERSION=2022.05.29
 TERMUX_PKG_SRCURL=https://github.com/samhocevar/zzuf.git
 TERMUX_PKG_GIT_BRANCH=master
 
