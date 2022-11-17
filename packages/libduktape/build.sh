@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.duktape.org/
 TERMUX_PKG_DESCRIPTION="An embeddable Javascript engine with a focus on portability and compact footprint"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_SRCURL=https://github.com/svaarala/duktape.git
-TERMUX_PKG_VERSION=2.6.0
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=2.7.0
+TERMUX_PKG_SRCURL=https://github.com/svaarala/duktape/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=fde9a11e816cf06ccc1da5d85e2d15d62eace6122c8177bcee18ce042a649cdc
 TERMUX_PKG_REPLACES="duktape (<< 2.3.0-1), libduktape-dev"
 TERMUX_PKG_BREAKS="duktape (<< 2.3.0-1), libduktape-dev"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -28,8 +28,9 @@ termux_step_make_install() {
 
 termux_step_post_make_install() {
 	# Add a pkg-config file for the duktape lib
-	mkdir -p "$PKG_CONFIG_LIBDIR"
-	cat > "$PKG_CONFIG_LIBDIR/duktape.pc" <<-HERE
+	local pkgconfig_dir="$TERMUX_PREFIX/lib/pkgconfig"
+	mkdir -p "${pkgconfig_dir}"
+	cat > "${pkgconfig_dir}/duktape.pc" <<-HERE
 		Name: Duktape
 		Description: Shared library for the Duktape interpreter
 		Version: $TERMUX_PKG_VERSION
