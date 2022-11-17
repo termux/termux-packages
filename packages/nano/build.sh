@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://www.nano-editor.org/
 TERMUX_PKG_DESCRIPTION="Small, free and friendly text editor"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=6.3
+TERMUX_PKG_VERSION=7.0
 TERMUX_PKG_SRCURL=https://nano-editor.org/dist/latest/nano-$TERMUX_PKG_VERSION.tar.xz
-TERMUX_PKG_SHA256=eb532da4985672730b500f685dbaab885a466d08fbbf7415832b95805e6f8687
-TERMUX_PKG_DEPENDS="libandroid-support, libandroid-glob, ncurses"
+TERMUX_PKG_SHA256=8dd6eac38b2b8786d82681f0e1afd84f6b75210d17391b6443c437e451552149
+TERMUX_PKG_DEPENDS="libandroid-support, ncurses"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_header_pwd_h=no
 --disable-libmagic
@@ -14,10 +14,6 @@ ac_cv_header_pwd_h=no
 "
 TERMUX_PKG_CONFFILES="etc/nanorc"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/rnano share/man/man1/rnano.1 share/nano/man-html"
-
-termux_step_pre_configure() {
-	LDFLAGS+=" -landroid-glob"
-}
 
 termux_step_post_make_install() {
 	# Configure nano to use syntax highlighting:
