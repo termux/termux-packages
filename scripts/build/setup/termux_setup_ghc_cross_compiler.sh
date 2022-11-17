@@ -16,21 +16,21 @@ __termux_haskell_register_packages() {
 			# "${TERMUX_PREFIX}/lib/ghc-${TERMUX_GHC_VERSION}/package.conf.d". Since it is done after
 			# timestamp creation, we need to remove it in massage step.
 		fi
-	done <<<"$(
+	done <<< "$(
 		# shellcheck disable=SC2086
-		cd "${TERMUX_SCRIPTDIR}" &&
-			./scripts/buildorder.py -i "${TERMUX_PKG_BUILDER_DIR}" ${TERMUX_PACKAGES_DIRECTORIES} || echo "ERROR"
+		cd "${TERMUX_SCRIPTDIR}" \
+			&& ./scripts/buildorder.py -i "${TERMUX_PKG_BUILDER_DIR}" ${TERMUX_PACKAGES_DIRECTORIES} || echo "ERROR"
 	)"
 }
 
 __termux_haskell_setup_build_script() {
 	local runtime_folder="$1"
 
-	if ! command -v termux-ghc-setup &>/dev/null; then
+	if ! command -v termux-ghc-setup &> /dev/null; then
 		if [ "${TERMUX_ON_DEVICE_BUILD}" = false ]; then
 			local build_type=""
-			if ! cat "${TERMUX_PKG_SRCDIR}"/*.cabal | grep -wq "^[bB]uild-type:" ||
-				cat "${TERMUX_PKG_SRCDIR}"/*.cabal | grep -wq '^[bB]uild-type:\s*[Ss]imple$'; then
+			if ! cat "${TERMUX_PKG_SRCDIR}"/*.cabal | grep -wq "^[bB]uild-type:" \
+				|| cat "${TERMUX_PKG_SRCDIR}"/*.cabal | grep -wq '^[bB]uild-type:\s*[Ss]imple$'; then
 				build_type="simple"
 			elif cat "${TERMUX_PKG_SRCDIR}"/*.cabal | grep -wq '^[bB]uild-type:\s*[Cc]onfigure$'; then
 				build_type="configure"
@@ -55,7 +55,7 @@ __termux_haskell_setup_build_script() {
 
 # Utility function to setup a GHC cross-compiler toolchain targeting Android.
 termux_setup_ghc_cross_compiler() {
-	local TERMUX_GHC_VERSION="8.10.7"
+	local TERMUX_GHC_VERSION="9.2.5"
 	local GHC_PREFIX="ghc-cross-${TERMUX_GHC_VERSION}-${TERMUX_ARCH}"
 	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "false" ]]; then
 		local TERMUX_GHC_RUNTIME_FOLDER
@@ -70,8 +70,8 @@ termux_setup_ghc_cross_compiler() {
 
 		export PATH="${TERMUX_GHC_RUNTIME_FOLDER}/bin:${PATH}"
 
-		test -d "${TERMUX_PREFIX}/lib/ghc-${TERMUX_GHC_VERSION}" ||
-			termux_error_exit "Package 'ghc-libs' is not installed. It is required by GHC cross-compiler." \
+		test -d "${TERMUX_PREFIX}/lib/ghc-${TERMUX_GHC_VERSION}" \
+			|| termux_error_exit "Package 'ghc-libs' is not installed. It is required by GHC cross-compiler." \
 				"You should specify it in 'TERMUX_PKG_BUILD_DEPENDS'."
 
 		if [[ -d "${TERMUX_GHC_RUNTIME_FOLDER}" ]]; then
@@ -82,11 +82,11 @@ termux_setup_ghc_cross_compiler() {
 
 		local CHECKSUMS
 		CHECKSUMS="$(
-			cat <<-EOF
-				aarch64:0912e8c6a8f4b362198c26129bb55f8e76edfcfbf38bfaf8b025a46429e6a887
-				arm:4f9acf98ee44eaebec6bce915507a934d1f880dd4c7ee679c075644e3bc41f78
-				i686:289a04baa67b8cbef401aebf8f5ffef90735e5a5b6e00ce39a50b82c134fe51b
-				x86_64:b43b4c8b80210c2b17ad4547d6d007163052edbd662495e0010b1c9b17d4f865
+			cat <<- EOF
+				aarch64:4adccabe3cbe007290498a360425eaef17350bfbb4bc645dc5dfe826037a4515
+				arm:668e64b004ceb70da660a6b0cb6c68ce6f9b9bb07b1f2c3202e1298245cb3d1f
+				i686:c675af560c3a429a41a3766a9eca7f0f7bae2f1033b66b4d6a693873946a15ec
+				x86_64:b3fd312dfb825e60f4475df59b67e5b89d81aae9d9b18aee8755662ebfe88130
 			EOF
 		)"
 
@@ -100,8 +100,7 @@ termux_setup_ghc_cross_compiler() {
 
 		# Replace ghc settings with settings of the cross compiler.
 		sed "s|\$topdir/bin/unlit|${TERMUX_GHC_RUNTIME_FOLDER}/lib/ghc-${TERMUX_GHC_VERSION}/bin/unlit|g" \
-			"${TERMUX_GHC_RUNTIME_FOLDER}/lib/ghc-${TERMUX_GHC_VERSION}/settings" > \
-			"${TERMUX_PREFIX}/lib/ghc-${TERMUX_GHC_VERSION}/settings"
+			"${TERMUX_GHC_RUNTIME_FOLDER}/lib/ghc-${TERMUX_GHC_VERSION}/settings" > "${TERMUX_PREFIX}/lib/ghc-${TERMUX_GHC_VERSION}/settings"
 		# NOTE: Above command edits file in $TERMUX_PREFIX after timestamp is created,
 		# so we need to remove it in massage step.
 
@@ -124,8 +123,8 @@ termux_setup_ghc_cross_compiler() {
 		rm "${TERMUX_GHC_TAR}"
 	else
 
-		if [[ "${TERMUX_APP_PACKAGE_MANAGER}" == "apt" ]] && "$(dpkg-query -W -f '${db:Status-Status}\n' ghc 2>/dev/null)" != "installed" ||
-			[[ "${TERMUX_APP_PACKAGE_MANAGER}" == "pacman" ]] && ! "$(pacman -Q ghc 2>/dev/null)"; then
+		if [[ "${TERMUX_APP_PACKAGE_MANAGER}" == "apt" ]] && "$(dpkg-query -W -f '${db:Status-Status}\n' ghc 2> /dev/null)" != "installed" \
+			|| [[ "${TERMUX_APP_PACKAGE_MANAGER}" == "pacman" ]] && ! "$(pacman -Q ghc 2> /dev/null)"; then
 			echo "Package 'ghc' is not installed."
 			exit 1
 		else
