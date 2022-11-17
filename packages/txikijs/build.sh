@@ -2,13 +2,17 @@ TERMUX_PKG_HOMEPAGE=https://github.com/saghul/txiki.js
 TERMUX_PKG_DESCRIPTION="A small and powerful JavaScript runtime"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-_COMMIT=ffa4b191eeb23984d502b183a1f521be717f1eb5
-TERMUX_PKG_VERSION=2021.11.16
+TERMUX_PKG_VERSION=1:22.11.1
 TERMUX_PKG_SRCURL=https://github.com/saghul/txiki.js.git
-TERMUX_PKG_GIT_BRANCH=master
-TERMUX_PKG_DEPENDS="libcurl"
+TERMUX_PKG_GIT_BRANCH=v${TERMUX_PKG_VERSION#*:}
+TERMUX_PKG_DEPENDS="libcurl, libffi"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DBUILD_NATIVE=OFF"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DBUILD_NATIVE=OFF
+-DUSE_EXTERNAL_FFI=ON
+-DFFI_INCLUDE_DIR=$TERMUX_PREFIX/include
+-DFFI_LIB=$TERMUX_PREFIX/lib/libffi.so
+"
 TERMUX_PKG_HOSTBUILD=true
 
 # Build failure for i686:
@@ -18,18 +22,6 @@ TERMUX_PKG_HOSTBUILD=true
 #   _Static_assert(_Alignof(int64_t) == 8, "non-wasi data layout");
 #   ^              ~~~~~~~~~~~~~~~~~~~~~~
 TERMUX_PKG_BLACKLISTED_ARCHES="i686"
-
-termux_step_post_get_source() {
-	git fetch --unshallow
-	git checkout $_COMMIT
-
-	local version="$(git log -1 --format=%cs | sed 's/-/./g')"
-	if [ "$version" != "$TERMUX_PKG_VERSION" ]; then
-		echo -n "ERROR: The specified version \"$TERMUX_PKG_VERSION\""
-		echo " is different from what is expected to be: \"$version\""
-		return 1
-	fi
-}
 
 termux_step_host_build() {
 	find $TERMUX_PKG_SRCDIR -mindepth 1 -maxdepth 1 ! -name '.git*' \
