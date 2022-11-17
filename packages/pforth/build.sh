@@ -2,12 +2,24 @@ TERMUX_PKG_HOMEPAGE=http://www.softsynth.com/pforth/
 TERMUX_PKG_DESCRIPTION="Portable Forth in C"
 TERMUX_PKG_LICENSE="Public Domain"
 TERMUX_PKG_MAINTAINER="@termux"
-_COMMIT=1aa4eb4976630fdb6882bb3aacb97aa09f69571e
-TERMUX_PKG_VERSION=20211129
-TERMUX_PKG_SRCURL=https://github.com/philburk/pforth/archive/${_COMMIT}.zip
-TERMUX_PKG_SHA256=f06e5142d37c203a706057b303db18494919069583414731e2578ac374c01f61
+_COMMIT=fa8de1fa6ddd9d3c394b851ba87db15a22505bea
+TERMUX_PKG_VERSION=20220403
+TERMUX_PKG_SRCURL=https://github.com/philburk/pforth.git
+TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_BUILD_IN_SRC=true
+
+termux_step_post_get_source() {
+	git fetch --unshallow
+	git checkout $_COMMIT
+
+	local version="$(git log -1 --format=%cs | sed 's/-//g')"
+	if [ "$version" != "$TERMUX_PKG_VERSION" ]; then
+		echo -n "ERROR: The specified version \"$TERMUX_PKG_VERSION\""
+		echo " is different from what is expected to be: \"$version\""
+		return 1
+	fi
+}
 
 termux_step_host_build() {
 	termux_setup_cmake
