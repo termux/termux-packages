@@ -1,0 +1,15 @@
+--- a/glrender.cc
++++ b/glrender.cc
+@@ -1902,8 +1902,12 @@
+ 
+ bool NVIDIA()
+ {
++#ifdef __ANDROID__
++  return false;
++#else
+   char *GLSL_VERSION=(char *) glGetString(GL_SHADING_LANGUAGE_VERSION);
+   return string(GLSL_VERSION).find("NVIDIA") != string::npos;
++#endif
+ }
+ 
+ // angle=0 means orthographic.
