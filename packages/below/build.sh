@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/facebookincubator/below
 TERMUX_PKG_DESCRIPTION="An interactive tool to view and record historical system data"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.5.0
+TERMUX_PKG_VERSION=0.6.3
 TERMUX_PKG_SRCURL=https://github.com/facebookincubator/below/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=9e76d066ce4815b8c51c720375a29d8b0a97a7890fd80602bbe49968573adeb5
+TERMUX_PKG_SHA256=a1b54744108dabc908c4d533ee2a4d029c6f21c48b6896e248e695b9e248e8ca
 TERMUX_PKG_DEPENDS="libelf, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 
