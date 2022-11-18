@@ -1,0 +1,11 @@
+--- a/cmake/FindRust.cmake
++++ b/cmake/FindRust.cmake
+@@ -245,7 +245,7 @@
+ # Determine the native libs required to link w/ rust static libs
+ # message(STATUS "Detecting native static libs for rust: ${rustc_EXECUTABLE} --crate-type staticlib --print=native-static-libs /dev/null")
+ execute_process(
+-    COMMAND ${CMAKE_COMMAND} -E env "CARGO_TARGET_DIR=${CMAKE_CURRENT_BINARY_DIR}" ${rustc_EXECUTABLE} --crate-type staticlib --print=native-static-libs /dev/null
++    COMMAND ${CMAKE_COMMAND} -E env "CARGO_TARGET_DIR=${CMAKE_CURRENT_BINARY_DIR}" ${rustc_EXECUTABLE} --target ${RUST_COMPILER_TARGET} --crate-type staticlib --print=native-static-libs /dev/null
+     OUTPUT_VARIABLE RUST_NATIVE_STATIC_LIBS_OUTPUT
+     ERROR_VARIABLE  RUST_NATIVE_STATIC_LIBS_ERROR
+     RESULT_VARIABLE RUST_NATIVE_STATIC_LIBS_RESULT

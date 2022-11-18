@@ -2,39 +2,34 @@ TERMUX_PKG_HOMEPAGE=https://www.clamav.net/
 TERMUX_PKG_DESCRIPTION="Anti-virus toolkit for Unix"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.103.6
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=0.105.1
 TERMUX_PKG_SRCURL=https://www.clamav.net/downloads/production/clamav-$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=aaa12e3dc19f1d323b1c50d7a10fa8af557e4390149e864d59bde39b6ad9ba33
-TERMUX_PKG_DEPENDS="json-c, libandroid-support, libbz2, libc++, libcurl, libltdl, liblzma, libxml2, openssl, pcre2, zlib"
+TERMUX_PKG_SHA256=d2bc16374db889a6e5a6ac40f8c6e700254a039acaa536885a09eeea4b8529f6
+TERMUX_PKG_DEPENDS="json-c, libandroid-support, libbz2, libc++, libcurl, libiconv, libxml2, ncurses, openssl, pcre2, zlib"
 TERMUX_PKG_BREAKS="clamav-dev"
 TERMUX_PKG_REPLACES="clamav-dev"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
---sysconfdir=$TERMUX_PREFIX/etc/clamav
---with-libcurl=$TERMUX_PREFIX
---with-pcre=$TERMUX_PREFIX
---with-libjson=$TERMUX_PREFIX
---with-openssl=$TERMUX_PREFIX
---with-xml=$TERMUX_PREFIX
---with-zlib=$TERMUX_PREFIX
---disable-clamonacc
---disable-llvm
---disable-dns"
-
+-DAPP_CONFIG_DIRECTORY=$TERMUX_PREFIX/etc/clamav
+-DBYTECODE_RUNTIME=interpreter
+-DENABLE_CLAMONACC=OFF
+-DENABLE_MILTER=OFF
+-DENABLE_TESTS=OFF
+-Dtest_run_result=0
+-Dtest_run_result__TRYRUN_OUTPUT=
+"
 TERMUX_PKG_RM_AFTER_INSTALL="
 share/man/man5/clamav-milter.conf.5
-share/man/man8/clamav-milter.8"
-
+share/man/man8/clamav-milter.8
+share/man/man8/clamonacc.8
+"
 TERMUX_PKG_CONFFILES="
 etc/clamav/clamd.conf
 etc/clamav/freshclam.conf"
 
 termux_step_pre_configure() {
-	export OBJC=$CC
-
-	local _libgcc="$($CC -print-libgcc-file-name)"
-	LDFLAGS+=" -L$(dirname $_libgcc) -l:$(basename $_libgcc)"
+	termux_setup_rust
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DRUST_COMPILER_TARGET=$CARGO_TARGET_NAME"
 }
 
 termux_step_post_make_install() {
