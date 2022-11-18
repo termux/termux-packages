@@ -1,11 +1,12 @@
 TERMUX_PKG_HOMEPAGE=http://taglib.github.io/
 TERMUX_PKG_DESCRIPTION="A Library for reading and editing the meta-data of several popular audio formats."
-TERMUX_PKG_LICENSE="LGPL-2.0, MPL-2.0"
+# License: LGPL-2.1, MPL-1.1
+TERMUX_PKG_LICENSE="custom"
+TERMUX_PKG_LICENSE_FILE="COPYING.LGPL, COPYING.MPL"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.12
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SRCURL=http://taglib.github.io/releases/taglib-$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=7fccd07669a523b07a15bd24c8da1bbb92206cb19e9366c3692af3d79253b703
+TERMUX_PKG_VERSION=1.13
+TERMUX_PKG_SRCURL=https://github.com/taglib/taglib/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=58f08b4db3dc31ed152c04896ee9172d22052bc7ef12888028c01d8b1d60ade0
 TERMUX_PKG_DEPENDS="libc++, zlib"
 TERMUX_PKG_BUILD_DEPENDS="boost, boost-headers"
 TERMUX_PKG_BREAKS="taglib-dev"
