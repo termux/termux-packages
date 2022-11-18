@@ -1,0 +1,11 @@
+--- a/http.c
++++ b/http.c
+@@ -2202,7 +2202,7 @@
+   static int initialized;
+   if (!initialized) {
+     unsigned char buf[16];
+-#if defined(__linux__) || defined(__OpenBSD__)
++#if defined(__linux__) && (!defined(__ANDROID__) || __ANDROID_API__ >= 28) || defined(__OpenBSD__)
+     if (getentropy(buf, sizeof buf)) {
+       buffer_putsflush(buffer_2, "getentropy failed (should never happen)\n");
+       // carry on with bad randomness
