@@ -1,29 +1,29 @@
 --- a/Makefile
 +++ b/Makefile
-@@ -51,7 +51,7 @@
+@@ -24,7 +24,7 @@
  
  WARNFLAGS=-Werror -Wall -Wextra -Wunreachable-code
- INCLUDES=-Iinclude -Istfl -Ifilter -I. -Irss -I$(relative_cargo_target_dir)/cxxbridge/
+ INCLUDES=-Iinclude -Istfl -Ifilter -I. -Irss -I$(CARGO_TARGET_DIR)/cxxbridge/
 -BARE_CXXFLAGS=-std=c++11 -O2 -ggdb $(INCLUDES)
 +BARE_CXXFLAGS=-std=c++11 -O2 $(INCLUDES)
  LDFLAGS+=-L.
  
  # Constants
-@@ -83,7 +83,7 @@
+@@ -56,7 +56,7 @@
  NEWSBOAT=newsboat
- NEWSBOAT_SOURCES:=$(shell cat mk/newsboat.deps)
- NEWSBOAT_OBJS:=$(patsubst %.cpp,%.o,$(NEWSBOAT_SOURCES))
+ NEWSBOAT_SRCS:=$(shell cat mk/newsboat.deps)
+ NEWSBOAT_OBJS:=$(patsubst %.cpp,%.o,$(NEWSBOAT_SRCS))
 -NEWSBOAT_LIBS=-lboat -lnewsboat -lfilter -lpthread -lrsspp -ldl
-+NEWSBOAT_LIBS=-lboat -lnewsboat -lfilter -lrsspp -ldl -landroid-glob
++NEWSBOAT_LIBS=-lboat -lnewsboat -lfilter -lrsspp -landroid-glob -ldl
  
- RSSPPLIB_SOURCES=$(sort $(wildcard rss/*.cpp))
- RSSPPLIB_OBJS=$(patsubst rss/%.cpp,rss/%.o,$(RSSPPLIB_SOURCES))
-@@ -109,7 +109,7 @@
+ RSSPPLIB_SRCS=$(sort $(wildcard rss/*.cpp))
+ RSSPPLIB_OBJS=$(patsubst rss/%.cpp,rss/%.o,$(RSSPPLIB_SRCS))
+@@ -65,7 +65,7 @@
  PODBOAT=podboat
- PODBOAT_SOURCES:=$(shell cat mk/podboat.deps)
- PODBOAT_OBJS:=$(patsubst %.cpp,%.o,$(PODBOAT_SOURCES))
+ PODBOAT_SRCS:=$(shell cat mk/podboat.deps)
+ PODBOAT_OBJS:=$(patsubst %.cpp,%.o,$(PODBOAT_SRCS))
 -PODBOAT_LIBS=-lboat -lnewsboat -lfilter -lpthread -ldl
 +PODBOAT_LIBS=-lboat -lnewsboat -lfilter -ldl
  
- ifeq (, $(filter Linux GNU GNU/%, $(shell uname -s)))
- NEWSBOAT_LIBS+=-liconv -lintl
+ TEST_SRCS:=$(wildcard test/*.cpp test/test_helpers/*.cpp)
+ TEST_OBJS:=$(patsubst %.cpp,%.o,$(TEST_SRCS))
