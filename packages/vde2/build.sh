@@ -1,15 +1,12 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/virtualsquare/vde-2
 TERMUX_PKG_DESCRIPTION="Virtual Distributed Ethernet for emulators like qemu"
-TERMUX_PKG_LICENSE="custom"
-TERMUX_PKG_LICENSE_FILE="COPYING, COPYING.libvdeplug, COPYING.slirpvde"
+TERMUX_PKG_LICENSE="GPL-2.0, LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.3.2
-TERMUX_PKG_REVISION=5
-TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/vde/vde2-$TERMUX_PKG_VERSION.tar.bz2
-TERMUX_PKG_SHA256=cbea9b7e03097f87a6b5e98b07890d2275848f1fe4b9fcda77b8994148bc9542
-TERMUX_PKG_DEPENDS="libpcap, openssl"
+TERMUX_PKG_VERSION=2.3.3
+TERMUX_PKG_SRCURL=https://github.com/virtualsquare/vde-2/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=a7d2cc4c3d0c0ffe6aff7eb0029212f2b098313029126dcd12dc542723972379
+TERMUX_PKG_DEPENDS="libpcap, libwolfssl"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --disable-python"
 
 termux_step_pre_configure() {
 	autoreconf --install
