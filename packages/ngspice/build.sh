@@ -3,10 +3,9 @@ TERMUX_PKG_DESCRIPTION="A mixed-level/mixed-signal circuit simulator"
 TERMUX_PKG_LICENSE="BSD 3-Clause, LGPL-2.1"
 TERMUX_PKG_LICENSE_FILE="COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=37
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=38
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/ngspice/ngspice-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=9beea6741a36a36a70f3152a36c82b728ee124c59a495312796376b30c8becbe
+TERMUX_PKG_SHA256=2c3e22f6c47b165db241cf355371a0a7558540ab2af3f8b5eedeeb289a317c56
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-xspice
 --enable-cider
@@ -19,7 +18,7 @@ TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="
 --enable-cider
 --enable-xspice
 "
-TERMUX_PKG_DEPENDS="libc++, readline, fftw"
+TERMUX_PKG_DEPENDS="fftw, libc++, ncurses, readline"
 TERMUX_PKG_GROUPS="science"
 
 termux_step_host_build(){
