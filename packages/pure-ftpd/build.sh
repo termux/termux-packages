@@ -1,11 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://www.pureftpd.org/project/pure-ftpd
 TERMUX_PKG_DESCRIPTION="Pure-FTPd is a free (BSD), secure, production-quality and standard-conformant FTP server"
-TERMUX_PKG_LICENSE="BSD"
+TERMUX_PKG_LICENSE="ISC"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.0.50
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=1.0.51
 TERMUX_PKG_SRCURL=https://download.pureftpd.org/pub/pure-ftpd/releases/pure-ftpd-$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=abe2f94eb40b330d4dc22b159991f44e5e515212f8e887049dccdef266d0ea23
+TERMUX_PKG_SHA256=4160f66b76615eea2397eac4ea3f0a146b7928207b79bc4cc2f99ad7b7bd9513
 TERMUX_PKG_DEPENDS="libcrypt, openssl"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_lib_elf_elf_begin=no
