@@ -374,51 +374,6 @@ diff -uNr firefox-105.0.3/nsprpub/pr/src/pthreads/ptthread.c firefox-105.0.3.mod
  /*
   * Record whether or not we have the privilege to set the scheduling
   * policy and priority of threads.  0 means that privilege is available.
-diff -uNr firefox-105.0.3/gfx/cairo/cairo/src/moz.build firefox-105.0.3.mod/gfx/cairo/cairo/src/moz.build
---- firefox-105.0.3/gfx/cairo/cairo/src/moz.build	2022-10-07 22:37:48.000000000 +0900
-+++ firefox-105.0.3.mod/gfx/cairo/cairo/src/moz.build	2022-10-18 01:50:34.180360552 +0900
-@@ -15,7 +15,7 @@
-     'pixman-rename.h',
- ]
- 
--if CONFIG['MOZ_WIDGET_TOOLKIT'] not in ('cocoa', 'uikit'):
-+if False:
-     EXPORTS.cairo += [
-         'cairo-pdf.h',
-     ]
-diff -uNr firefox-105.0.3/gfx/cairo/cairo/src/cairo-features.h firefox-105.0.3.mod/gfx/cairo/cairo/src/cairo-features.h
---- firefox-105.0.3/gfx/cairo/cairo/src/cairo-features.h	2022-10-07 22:37:48.000000000 +0900
-+++ firefox-105.0.3.mod/gfx/cairo/cairo/src/cairo-features.h	2022-10-18 03:44:09.352362967 +0900
-@@ -52,7 +52,6 @@
- #endif
- 
- #ifdef MOZ_PDF_PRINTING
--#define CAIRO_HAS_PDF_SURFACE 1
- #endif
- 
- #if defined(MOZ_X11) || defined(MOZ_WAYLAND)
-diff -uNr firefox-105.0.3/gfx/thebes/moz.build firefox-105.0.3.mod/gfx/thebes/moz.build
---- firefox-105.0.3/gfx/thebes/moz.build	2022-10-08 00:40:07.000000000 +0900
-+++ firefox-105.0.3.mod/gfx/thebes/moz.build	2022-10-18 03:50:47.722636946 +0900
-@@ -126,7 +126,6 @@
-         "gfxFT2FontBase.cpp",
-         "gfxFT2Utils.cpp",
-         "gfxPlatformGtk.cpp",
--        "PrintTargetPDF.cpp",
-     ]
- 
-     if CONFIG["MOZ_X11"]:
-diff -uNr firefox-105.0.3/gfx/cairo/cairo/src/cairoint.h firefox-105.0.3.mod/gfx/cairo/cairo/src/cairoint.h
---- firefox-105.0.3/gfx/cairo/cairo/src/cairoint.h	2022-10-07 22:37:49.000000000 +0900
-+++ firefox-105.0.3.mod/gfx/cairo/cairo/src/cairoint.h	2022-10-18 04:14:40.627988166 +0900
-@@ -84,7 +84,6 @@
-     CAIRO_HAS_PDF_SURFACE || \
-     CAIRO_HAS_SVG_SURFACE || \
-     CAIRO_HAS_WIN32_SURFACE
--#define CAIRO_HAS_FONT_SUBSET 1
- #endif
- 
- #if CAIRO_HAS_PS_SURFACE  || \
 diff -uNr firefox-105.0.3/old-configure.in firefox-105.0.3.mod/old-configure.in
 --- firefox-105.0.3/old-configure.in	2022-10-07 22:37:53.000000000 +0900
 +++ firefox-105.0.3.mod/old-configure.in	2022-10-18 11:44:37.005989967 +0900
