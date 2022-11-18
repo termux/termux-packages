@@ -1,44 +1,34 @@
---- ../GNUmakefile.orig	2021-09-22 13:58:37.598012446 +0200
-+++ ./GNUmakefile	2021-09-22 13:59:03.258474130 +0200
-@@ -21,7 +21,9 @@
- CROSS=
- #CROSS=i686-mingw-
- CC?=gcc
--CCC=$(CROSS)$(CC)
-+AR?=$(CROSS)ar
-+RANLIB?=$(CROSS)ranlib
-+CCC=$(CROSS)clang
- WERROR=
- WARN=-W -Wall -Wextra $(WERROR)
+--- a/GNUmakefile
++++ b/GNUmakefile
+@@ -41,8 +41,8 @@
  
-@@ -169,8 +171,8 @@
- $(IO_OBJS) $(CDB_OBJS) $(CRITBIT_OBJS)
+ DEFINE=-D_REENTRANT
  
- libowfat.a: $(ALL_OBJS)
--	$(CROSS)ar cru $@ $(ALL_OBJS)
--	-$(CROSS)ranlib $@
-+	$(AR) cru $@ $(ALL_OBJS)
-+	-$(RANLIB) $@
+-CFLAGS=-pipe $(WARN) $(DEFINE) $(OPT_REG)
+-CFLAGS_OPT=-pipe $(WARN) $(DEFINE) $(OPT_PLUS)
++CFLAGS+=-pipe $(WARN) $(DEFINE)
++CFLAGS_OPT=$(CFLAGS)
  
- CFLAGS+=-I.
- CFLAGS_OPT+=-I.
-@@ -182,8 +184,8 @@
- 	$(DIET) $(CCC) -c $< $(CFLAGS)
+ #CFLAGS=-pipe -Os -march=pentiumpro -mcpu=pentiumpro -fomit-frame-pointer -fschedule-insns2 -Wall
  
- %.a:
--	$(CROSS)ar cru $@ $^
--	-$(CROSS)ranlib $@
-+	$(AR) cru $@ $^
-+	-$(RANLIB) $@
+@@ -68,9 +68,9 @@
+ endif
+ gcc_path = $(foreach dir,$(path),$(wildcard $(dir)/gcc))
+ ifeq ($(strip $(gcc_path)),)
+-CC=clang
++CC?=clang
+ else
+-CC=gcc
++CC?=gcc
+ endif
  
- t.o: t.c fmt.h scan.h str.h uint16.h uint32.h stralloc.h socket.h \
-   buffer.h ip4.h ip6.h byte.h mmap.h open.h textcode.h dns.h iopause.h \
-@@ -192,7 +194,7 @@
+ ifneq ($(DIET),)
+@@ -197,7 +197,7 @@
    havesigio.h CAS.h
  
  t: t.o libowfat.a libsocket
--	$(DIET) $(CCC) -g -o $@ t.o libowfat.a `cat libsocket` -lpthread
-+	$(DIET) $(CCC) -g -o $@ t.o libowfat.a `cat libsocket`
+-	$(DIET) $(CCC) -g -o $@ t.o libowfat.a `cat libsocket` -lpthread $(LDFLAGS)
++	$(DIET) $(CCC) -g -o $@ t.o libowfat.a `cat libsocket` $(LDFLAGS)
  
  .PHONY: all clean tar install rename
  clean:
