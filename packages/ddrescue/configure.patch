@@ -1,7 +1,6 @@
-diff -u -r ../ddrescue-1.23/configure ./configure
---- ../ddrescue-1.23/configure	2018-02-13 12:54:43.000000000 +0000
-+++ ./configure	2018-02-18 21:07:51.862861331 +0000
-@@ -15,23 +15,15 @@
+--- a/configure
++++ b/configure
+@@ -15,19 +15,18 @@
  LC_ALL=C
  export LC_ALL
  srcdir=
@@ -17,14 +16,11 @@ diff -u -r ../ddrescue-1.23/configure ./configure
  CPPFLAGS=
 -CXXFLAGS='-Wall -W -O2'
 -LDFLAGS=
--
--# checking whether we are using GNU C++.
--/bin/sh -c "${CXX} --version" > /dev/null 2>&1 ||
--	{
--	CXX=c++
--	CXXFLAGS=-O2
--	}
 +CXXFLAGS?='-Wall -W -O2'
++LDFLAGS?=
+ 
+ # checking whether we are using GNU C++.
+-/bin/sh -c "${CXX} --version" > /dev/null 2>&1 || { CXX=c++ ; CXXFLAGS=-O2 ; }
  
  # Loop over all args
  args=
