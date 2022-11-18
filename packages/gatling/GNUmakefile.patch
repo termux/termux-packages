@@ -5,24 +5,41 @@ diff -uNr gatling-0.13/GNUmakefile gatling-0.13.mod/GNUmakefile
  man1dir=$(MANDIR)/man1
  
  TARGETS=gatling httpbench bindbench dl ioerr bench tlsgatling_nofail \
--pthreadbench cgi ptlsgatling_nofail
-+pthreadbench cgi
+-pthreadbench cgi ptlsgatling_nofail tlsdl_nofail ptlsdl_nofail
++pthreadbench cgi tlsdl_nofail
  TARGETS2=mktestdata mmapbench manymapbench forkbench forksbench
  ALLTARGETS=$(TARGETS) acc hcat referrer hitprofile matchiprange getlinks \
  rellink $(TARGETS2)
-@@ -15,9 +15,8 @@
- 
- CROSS=
- #CROSS=i686-mingw32-
+@@ -19,13 +19,13 @@
+ path = $(subst :, ,$(PATH))
+ gcc_path = $(foreach dir,$(path),$(wildcard $(dir)/$(CROSS)gcc))
+ ifeq ($(strip $(gcc_path)),)
+-CC=$(CROSS)clang
++CC?=$(CROSS)clang
+ else
 -CC=$(CROSS)gcc
++CC?=$(CROSS)gcc
+ endif
+ 
 -CFLAGS=-pipe -Wall
 -LDFLAGS=
-+CC=$(CROSS)clang
-+CFLAGS=-pipe -Wall $(CPPFLAGS)
++CFLAGS?=-pipe -Wall
++LDFLAGS?=
  
  #CFLAGS+=-DSTATE_DEBUG -DMOREDEBUG -DDEBUG_EVENTS -DSMDEBUG
  
-@@ -70,10 +69,10 @@
+@@ -47,10 +47,7 @@
+ CFLAGS+=-g -Og
+ LDFLAGS+=-g
+ else
+-CFLAGS+=-O2 -fomit-frame-pointer -I/usr/local/include
+-LDFLAGS+=-s
+ ifneq ($(DIET),)
+-DIET+=-Os
+ endif
+ endif
+ 
+@@ -81,10 +78,10 @@
  CC:=$(DIET) $(CC)
  
  pthreadbench: pthreadbench.o
