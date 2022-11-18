@@ -1,15 +1,21 @@
 TERMUX_PKG_HOMEPAGE=http://simh.trailing-edge.com/
 TERMUX_PKG_DESCRIPTION="A collection of simulators for computer hardware and software from the past"
-TERMUX_PKG_LICENSE="MIT, BSD 2-Clause"
-TERMUX_PKG_LICENSE_FILE="LICENSE, slirp/COPYRIGHT"
+# The additional restrictions in LICENSE.txt make the license non-free.
+# slirp/COPYRIGHT belongs to BSD 2-Clause.
+TERMUX_PKG_LICENSE="non-free"
+TERMUX_PKG_LICENSE_FILE="LICENSE.txt, slirp/COPYRIGHT"
 TERMUX_PKG_MAINTAINER="@termux"
-_COMMIT=370bfe006d9f9fb87885c31f943d151013cd529f
-TERMUX_PKG_VERSION=2022.01.16
+_COMMIT=9ecf680eb5701df7e4cc3b0cc00fb9a5f3d773e6
+TERMUX_PKG_VERSION=2022.11.14
 TERMUX_PKG_SRCURL=https://github.com/simh/simh.git
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_DEPENDS="libandroid-glob"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_EXTRA_MAKE_ARGS="DONT_USE_ROMS=1 TESTS=0"
+TERMUX_PKG_EXTRA_MAKE_ARGS="
+DONT_USE_ROMS=1
+TESTS=0
+USEFUL_PACKAGES=
+"
 
 termux_step_post_get_source() {
 	git fetch --unshallow
@@ -21,8 +27,6 @@ termux_step_post_get_source() {
 		echo " is different from what is expected to be: \"$version\""
 		return 1
 	fi
-
-	cp $TERMUX_PKG_BUILDER_DIR/LICENSE ./
 }
 
 termux_step_pre_configure() {
