@@ -3,10 +3,10 @@ TERMUX_PKG_DESCRIPTION="A popular libre and open source media player and multime
 TERMUX_PKG_LICENSE="GPL-2.0, LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.0.17.4
-TERMUX_PKG_REVISION=8
+TERMUX_PKG_REVISION=9
 TERMUX_PKG_SRCURL=https://download.videolan.org/pub/videolan/vlc/${TERMUX_PKG_VERSION}/vlc-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=8c5a62d88a4fb45c1b095cf10befef217dfa87aedcec5184b9e7d590b6dd4133
-TERMUX_PKG_DEPENDS="avahi, chromaprint, dbus, ffmpeg, fluidsynth, fontconfig, freetype, fribidi, gdk-pixbuf, glib, gst-plugins-base, gstreamer, harfbuzz, liba52, libandroid-shmem, libandroid-spawn, libaom, libarchive, libass, libbluray, libc++, libcaca, libcairo, libcddb, libdav1d, libdvbpsi, libdvdread, libebml, libflac, libgcrypt, libgnutls, libgpg-error, libiconv, libidn, libjpeg-turbo, liblua52, libmad, libmatroska, libnfs, libogg, libopus, libpng, librsvg, libsecret, libsoxr, libssh2, libtheora, libtwolame, libvorbis, libvpx, libx11, libx264, libx265, libxcb, libxml2, mpg123, ncurses, pulseaudio, samba, taglib, zlib"
+TERMUX_PKG_DEPENDS="avahi, chromaprint, dbus, ffmpeg, fluidsynth, fontconfig, freetype, fribidi, gdk-pixbuf, glib, gst-plugins-base, gstreamer, harfbuzz, liba52, libandroid-shmem, libandroid-spawn, libaom, libarchive, libass, libbluray, libc++, libcaca, libcairo, libcddb, libdav1d, libdvbpsi, libdvdnav, libdvdread, libebml, libflac, libgcrypt, libgnutls, libgpg-error, libiconv, libidn, libjpeg-turbo, liblua52, libmad, libmatroska, libnfs, libogg, libopus, libpng, librsvg, libsecret, libsoxr, libssh2, libtheora, libtwolame, libvorbis, libvpx, libx11, libx264, libx265, libxcb, libxml2, mpg123, ncurses, pulseaudio, samba, taglib, zlib"
 TERMUX_PKG_BUILD_DEPENDS="xorgproto"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-static
@@ -14,7 +14,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-dc1394
 --disable-dv1394
 --disable-linsys
---disable-dvdnav
 --disable-opencv
 --disable-dsm
 --disable-v4l2
