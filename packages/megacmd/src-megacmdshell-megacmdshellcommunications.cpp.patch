@@ -9,26 +9,21 @@
          }
          else
          {
-@@ -293,7 +293,7 @@ SOCKET MegaCmdShellCommunications::creat
+@@ -296,7 +296,7 @@
      else
      {
          SOCKET thesock = socket(AF_UNIX, SOCK_STREAM, 0);
 -        char socket_path[60];
-+        char socket_path[] = "@TERMUX_PREFIX@/tmp/megaCMD_XXXXXXXXXXXXXXXXXXXX/srv_XXXXXXXXXXX";
++        char socket_path[] = "@TERMUX_PREFIX@/tmp/megaCMD_XXXXXXXXXXXXXXXXXXXX/srv";
          if (!socketValid(thesock))
          {
              cerr << "ERROR opening socket: " << ERRNO << endl;
-@@ -307,11 +307,11 @@ SOCKET MegaCmdShellCommunications::creat
-         bzero(socket_path, sizeof( socket_path ) * sizeof( *socket_path ));
-         if (number)
-         {
--            sprintf(socket_path, "/tmp/megaCMD_%d/srv_%d", getuid(), number);
-+            sprintf(socket_path, "@TERMUX_PREFIX@/tmp/megaCMD_%d/srv_%d", getuid(), number);
-         }
-         else
-         {
--            sprintf(socket_path, "/tmp/megaCMD_%d/srv", getuid() );
-+            sprintf(socket_path, "@TERMUX_PREFIX@/tmp/megaCMD_%d/srv", getuid() );
+@@ -308,7 +308,7 @@
          }
  
+         bzero(socket_path, sizeof( socket_path ) * sizeof( *socket_path ));
+-        sprintf(socket_path, "/tmp/megaCMD_%d/srv", getuid() );
++        sprintf(socket_path, "@TERMUX_PREFIX@/tmp/megaCMD_%d/srv", getuid() );
+ 
          struct sockaddr_un addr;
+ 

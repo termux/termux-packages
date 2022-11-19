@@ -1,19 +1,6 @@
 --- a/src/comunicationsmanagerfilesockets.cpp
 +++ b/src/comunicationsmanagerfilesockets.cpp
-@@ -76,10 +76,10 @@ int ComunicationsManagerFileSockets::cre
-         return -1;
-     }
- 
--    char socket_path[60];
-+    char socket_path[] = "@TERMUX_PREFIX@/tmp/megaCMD_XXXXXXXXXXXXXXXXXXXX/srv_XXXXXXXXXXX";
-     *sockId = get_next_comm_id();
-     bzero(socket_path, sizeof( socket_path ) * sizeof( *socket_path ));
--    sprintf(socket_path, "/tmp/megaCMD_%d/srv_%d", getuid(), *sockId);
-+    sprintf(socket_path, "@TERMUX_PREFIX@/tmp/megaCMD_%d/srv_%d", getuid(), *sockId);
- 
-     struct sockaddr_un addr;
-     socklen_t saddrlen = sizeof( addr );
-@@ -140,8 +140,8 @@ ComunicationsManagerFileSockets::Comunic
+@@ -42,8 +42,8 @@
  int ComunicationsManagerFileSockets::initialize()
  {
      MegaFileSystemAccess *fsAccess = new MegaFileSystemAccess();
@@ -21,7 +8,7 @@
 -    sprintf(csocketsFolder, "/tmp/megaCMD_%d", getuid());
 +    char csocketsFolder[] = "@TERMUX_PREFIX@/tmp/megaCMD_XXXXXXXXXXXXXXXXXXXX"; // enough to hold all numbers up to 64-bits
 +    sprintf(csocketsFolder, "@TERMUX_PREFIX@/tmp/megaCMD_%d", getuid());
-     LocalPath socketsFolder = LocalPath::fromLocalname(csocketsFolder);
+     LocalPath socketsFolder = LocalPath::fromPlatformEncoded(csocketsFolder);
  
      fsAccess->setdefaultfolderpermissions(0700);
 @@ -169,9 +169,9 @@ int ComunicationsManagerFileSockets::ini
