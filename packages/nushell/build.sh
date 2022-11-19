@@ -31,15 +31,8 @@ termux_step_pre_configure() {
 	: "${CARGO_HOME:=$HOME/.cargo}"
 	export CARGO_HOME
 
-	rm -rf $CARGO_HOME/registry/src/github.com-*/libgit2-sys-*
 	rm -rf $CARGO_HOME/registry/src/github.com-*/pwd-*
 	cargo fetch --target "${CARGO_TARGET_NAME}"
-
-	for d in $CARGO_HOME/registry/src/github.com-*/libgit2-sys-*/libgit2; do
-		patch --silent -p1 -d ${d} \
-			<$TERMUX_SCRIPTDIR/packages/libgit2/src-rand.c.patch || :
-		cp $TERMUX_SCRIPTDIR/packages/libgit2/getloadavg.c ${d}/src/ || :
-	done
 
 	for d in $CARGO_HOME/registry/src/github.com-*/pwd-*; do
 		patch --silent -p1 -d ${d} < $TERMUX_PKG_BUILDER_DIR/crates-pwd-for-android.diff || :
