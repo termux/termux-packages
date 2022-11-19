@@ -5,10 +5,10 @@
 -CXX=g++
 -PLATFORM_LDFLAGS= -lpthread -lrt
 -PLATFORM_CXXFLAGS= -std=c++11 -fno-builtin-memcmp -msse -msse4.2 
-+PLATFORM_CXXFLAGS= -std=c++11 -fno-builtin-memcmp $(CPPFLAGS)
- PROFILING_FLAGS=-pg
- OPT=
- LDFLAGS += -Wl,-rpath=$(RPATH)
++PLATFORM_CXXFLAGS= -std=c++17 -fno-builtin-memcmp $(CPPFLAGS)
+ ROCKSDB_CXXFLAGS=
+ CC_VERSION_MAJOR := $(shell $(CXX) -dumpversion | cut -d '.' -f1)
+ ifeq (1,$(shell expr $(CC_VERSION_MAJOR) \> 7))
 @@ -27,7 +25,7 @@
  
  # compile with -O2 if debug level is not 2
