@@ -23,10 +23,14 @@ termux_step_pre_configure() {
 
 	cargo fetch --target "${CARGO_TARGET_NAME}"
 
+	local _patch=$TERMUX_SCRIPTDIR/packages/libgit2/src-util-rand.c.patch
+	local d
 	for d in $CARGO_HOME/registry/src/github.com-*/libgit2-sys-*/libgit2; do
-		patch --silent -p1 -d ${d} \
-			<$TERMUX_SCRIPTDIR/packages/libgit2/src-rand.c.patch || :
-		cp $TERMUX_SCRIPTDIR/packages/libgit2/getloadavg.c ${d}/src/ || :
+		(
+			t=${d}/src/
+			cp $TERMUX_SCRIPTDIR/packages/libgit2/getloadavg.c ${t}
+			patch --silent -d ${t} < ${_patch}
+		) || :
 	done
 }
 
