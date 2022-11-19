@@ -1,46 +1,44 @@
-diff -uNr The-Powder-Toy-95.0/src/client/Client.cpp The-Powder-Toy-95.0.mod/src/client/Client.cpp
---- The-Powder-Toy-95.0/src/client/Client.cpp	2020-02-27 05:38:53.000000000 +0200
-+++ The-Powder-Toy-95.0.mod/src/client/Client.cpp	2020-03-08 20:36:18.935572466 +0200
-@@ -67,7 +67,8 @@
+--- a/src/client/Client.cpp
++++ b/src/client/Client.cpp
+@@ -68,7 +68,8 @@
  {
  	//Read config
  	std::ifstream configFile;
 -	configFile.open("powder.pref", std::ios::binary);
-+	MakeDirectory("@TERMUX_HOME@/.powdertoy");
++	Platform::MakeDirectory("@TERMUX_HOME@/.powdertoy");
 +	configFile.open("@TERMUX_HOME@/.powdertoy/powder.pref", std::ios::binary);
  	if (configFile)
  	{
  		try
-@@ -888,7 +889,8 @@
+@@ -777,7 +778,8 @@
  void Client::WritePrefs()
  {
  	std::ofstream configFile;
 -	configFile.open("powder.pref", std::ios::trunc);
-+	MakeDirectory("@TERMUX_HOME@/.powdertoy");
++	Platform::MakeDirectory("@TERMUX_HOME@/.powdertoy");
 +	configFile.open("@TERMUX_HOME@/.powdertoy/powder.pref", std::ios::trunc);
  
  	if (configFile)
  	{
-@@ -1066,6 +1068,7 @@
+@@ -956,6 +958,7 @@
  	ByteString saveID = ByteString::Build(Format::Hex(Format::Width(lastStampTime, 8)), Format::Hex(Format::Width(lastStampName, 2)));
  	ByteString filename = STAMPS_DIR PATH_SEP + saveID + ".stm";
  
-+	MakeDirectory("@TERMUX_HOME@/.powdertoy");
- 	MakeDirectory(STAMPS_DIR);
++	Platform::MakeDirectory("@TERMUX_HOME@/.powdertoy");
+ 	Platform::MakeDirectory(STAMPS_DIR);
  
  	Json::Value stampInfo;
-@@ -1101,6 +1104,7 @@
+@@ -991,6 +994,7 @@
  
  void Client::updateStamps()
  {
-+	MakeDirectory("@TERMUX_HOME@/.powdertoy");
- 	MakeDirectory(STAMPS_DIR);
++	Platform::MakeDirectory("@TERMUX_HOME@/.powdertoy");
+ 	Platform::MakeDirectory(STAMPS_DIR);
  
  	std::ofstream stampsStream;
-diff -uNr The-Powder-Toy-95.0/src/Config.h The-Powder-Toy-95.0.mod/src/Config.h
---- The-Powder-Toy-95.0/src/Config.h	2020-02-27 05:38:53.000000000 +0200
-+++ The-Powder-Toy-95.0.mod/src/Config.h	2020-03-08 20:36:18.935572466 +0200
-@@ -61,11 +61,7 @@
+--- a/src/Config.template.h
++++ b/src/Config.template.h
+@@ -73,11 +73,7 @@
  #define IDENT_PLATFORM "WIN32"
  #endif
  #elif defined(LIN)
@@ -53,8 +51,8 @@ diff -uNr The-Powder-Toy-95.0/src/Config.h The-Powder-Toy-95.0.mod/src/Config.h
  #elif defined(MACOSX)
  #define IDENT_PLATFORM "MACOSX"
  #else
-@@ -91,11 +87,11 @@
- #define STATICSERVER "static.powdertoy.co.uk"
+@@ -101,11 +97,11 @@
+ #define STATICSCHEME "https://"
  #define ENFORCE_HTTPS
  
 -#define LOCAL_SAVE_DIR "Saves"
@@ -68,10 +66,9 @@ diff -uNr The-Powder-Toy-95.0/src/Config.h The-Powder-Toy-95.0.mod/src/Config.h
  
  #ifndef M_GRAV
  #define M_GRAV 6.67300e-1
-diff -uNr The-Powder-Toy-95.0/src/gui/game/GameController.cpp The-Powder-Toy-95.0.mod/src/gui/game/GameController.cpp
---- The-Powder-Toy-95.0/src/gui/game/GameController.cpp	2020-02-27 05:38:53.000000000 +0200
-+++ The-Powder-Toy-95.0.mod/src/gui/game/GameController.cpp	2020-03-08 20:37:59.986378271 +0200
-@@ -774,7 +774,7 @@
+--- a/src/gui/game/GameController.cpp
++++ b/src/gui/game/GameController.cpp
+@@ -741,7 +741,7 @@
  #if !defined(MACOSX) && !defined(NO_INSTALL_CHECK)
  		if (Client::Ref().IsFirstRun())
  		{
@@ -80,45 +77,46 @@ diff -uNr The-Powder-Toy-95.0/src/gui/game/GameController.cpp The-Powder-Toy-95.
  		}
  #endif
  		firstTick = false;
-@@ -1210,6 +1210,7 @@
+@@ -1202,6 +1202,7 @@
  			gameSave->authors = localSaveInfo;
  
  			gameModel->SetSaveFile(&tempSave, gameView->ShiftBehaviour());
-+			Client::Ref().MakeDirectory("@TERMUX_HOME@/.powdertoy");
- 			Client::Ref().MakeDirectory(LOCAL_SAVE_DIR);
++			Platform::MakeDirectory("@TERMUX_HOME@/.powdertoy");
+ 			Platform::MakeDirectory(LOCAL_SAVE_DIR);
  			std::vector<char> saveData = gameSave->Serialise();
  			if (saveData.size() == 0)
-diff -uNr The-Powder-Toy-95.0/src/gui/game/GameModel.cpp The-Powder-Toy-95.0.mod/src/gui/game/GameModel.cpp
---- The-Powder-Toy-95.0/src/gui/game/GameModel.cpp	2020-02-27 05:38:53.000000000 +0200
-+++ The-Powder-Toy-95.0.mod/src/gui/game/GameModel.cpp	2020-03-08 20:36:18.936572474 +0200
-@@ -423,6 +423,7 @@
+--- a/src/gui/game/GameModel.cpp
++++ b/src/gui/game/GameModel.cpp
+@@ -479,6 +479,7 @@
  	brushList.push_back(new TriangleBrush(ui::Point(4, 4)));
  
  	//Load more from brushes folder
-+	Client::Ref().MakeDirectory("@TERMUX_HOME@/.powdertoy");
- 	std::vector<ByteString> brushFiles = Client::Ref().DirectorySearch(BRUSH_DIR, "", ".ptb");
++	Platform::MakeDirectory("@TERMUX_HOME@/.powdertoy");
+ 	std::vector<ByteString> brushFiles = Platform::DirectorySearch(BRUSH_DIR, "", { ".ptb" });
  	for (size_t i = 0; i < brushFiles.size(); i++)
  	{
-diff -uNr The-Powder-Toy-95.0/src/gui/options/OptionsView.cpp The-Powder-Toy-95.0.mod/src/gui/options/OptionsView.cpp
---- The-Powder-Toy-95.0/src/gui/options/OptionsView.cpp	2020-02-27 05:38:53.000000000 +0200
-+++ The-Powder-Toy-95.0.mod/src/gui/options/OptionsView.cpp	2020-03-08 20:38:45.213738818 +0200
-@@ -300,7 +300,7 @@
- 		const char* openCommand = "xdg-open ";
- #endif
- 		char* workingDirectory = new char[FILENAME_MAX+strlen(openCommand)];
--		sprintf(workingDirectory, "%s\"%s\"", openCommand, getcwd(NULL, 0));
-+		sprintf(workingDirectory, "%s\"%s\"", openCommand, "@TERMUX_HOME@/.powdertoy");
- 		system(workingDirectory);
- 		delete[] workingDirectory;
+--- a/src/gui/options/OptionsView.cpp
++++ b/src/gui/options/OptionsView.cpp
+@@ -319,11 +319,7 @@
+ 	currentY+=20;
+ 	ui::Button * dataFolderButton = new ui::Button(ui::Point(8, currentY), ui::Point(90, 16), "Open Data Folder");
+ 	dataFolderButton->SetActionCallback({ [] {
+-		ByteString cwd = Platform::GetCwd();
+-		if (!cwd.empty())
+-			Platform::OpenURI(cwd);
+-		else
+-			fprintf(stderr, "cannot open data folder: getcwd(...) failed\n");
++		Platform::OpenURI("@TERMUX_HOME@/.powdertoy");
  	} });
-diff -uNr The-Powder-Toy-95.0/src/gui/save/LocalSaveActivity.cpp The-Powder-Toy-95.0.mod/src/gui/save/LocalSaveActivity.cpp
---- The-Powder-Toy-95.0/src/gui/save/LocalSaveActivity.cpp	2020-02-27 05:38:53.000000000 +0200
-+++ The-Powder-Toy-95.0.mod/src/gui/save/LocalSaveActivity.cpp	2020-03-08 20:36:18.937572482 +0200
-@@ -104,6 +104,7 @@
+ 	scrollPanel->AddChild(dataFolderButton);
+ 
+--- a/src/gui/save/LocalSaveActivity.cpp
++++ b/src/gui/save/LocalSaveActivity.cpp
+@@ -103,6 +103,7 @@
  
  void LocalSaveActivity::saveWrite(ByteString finalFilename)
  {
-+	Client::Ref().MakeDirectory("@TERMUX_HOME@/.powdertoy");
- 	Client::Ref().MakeDirectory(LOCAL_SAVE_DIR);
++	Platform::MakeDirectory("@TERMUX_HOME@/.powdertoy");
+ 	Platform::MakeDirectory(LOCAL_SAVE_DIR);
  	GameSave *gameSave = save.GetGameSave();
  	Json::Value localSaveInfo;
