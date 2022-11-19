@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE="https://github.com/epi052/feroxbuster"
 TERMUX_PKG_DESCRIPTION="A fast, simple, recursive content discovery tool written in Rust"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.7.1"
-TERMUX_PKG_SRCURL="https://github.com/epi052/feroxbuster/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=4fc37897d98bb09bfe738067eb5889adff20e0caef70e4487d20f41ec920381b
+TERMUX_PKG_VERSION="2.7.2"
+TERMUX_PKG_SRCURL="https://github.com/epi052/feroxbuster/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
+TERMUX_PKG_SHA256=7120613f966b311d3c7cca888c9f033a48a22edbc7ec4078c3d8dbfd3a327dda
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 # FIXME Why building with 'openssl' fails?
