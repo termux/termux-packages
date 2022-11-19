@@ -2,9 +2,8 @@ TERMUX_PKG_HOMEPAGE=https://lfortran.org/
 TERMUX_PKG_DESCRIPTION="A modern open-source interactive Fortran compiler"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.16.0
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://gitlab.com/lfortran/lfortran.git
+TERMUX_PKG_VERSION=0.18.0
+TERMUX_PKG_SRCURL=https://github.com/lfortran/lfortran.git
 TERMUX_PKG_DEPENDS="clang, libc++, libkokkos, zlib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DBUILD_SHARED_LIBS=ON"
 TERMUX_PKG_HOSTBUILD=true
@@ -32,16 +31,5 @@ termux_step_pre_configure() {
 
 	( cd $TERMUX_PKG_SRCDIR && sh build0.sh )
 
-	for f in fpmath.h math_private.h s_clog.c s_clogf.c s_cpowf.c; do
-		cp $TERMUX_PKG_BUILDER_DIR/$f $TERMUX_PKG_SRCDIR/src/runtime/impure/
-	done
-
 	LDFLAGS+=" -lm"
-}
-
-termux_step_post_make_install() {
-	# XXX: This file is used in cpp backend but not installed by the build system.
-	# XXX: So is this an upstream issue?
-	mkdir -p $PREFIX/share/lfortran/lib/impure
-	cp ${TERMUX_PKG_SRCDIR}/src/runtime/impure/lfortran_intrinsics.h $PREFIX/share/lfortran/lib/impure
 }
