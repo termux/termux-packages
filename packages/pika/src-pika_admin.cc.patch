@@ -1,26 +1,29 @@
 --- a/src/pika_admin.cc
 +++ b/src/pika_admin.cc
-@@ -822,19 +822,19 @@
+@@ -847,22 +847,22 @@
+   getrusage(RUSAGE_CHILDREN, &c_ru);
    std::stringstream tmp_stream;
    tmp_stream << "# CPU\r\n";
-   tmp_stream << "used_cpu_sys:" <<
--    setiosflags(std::ios::fixed) << std::setprecision(2) <<
-+    std::setiosflags(std::ios::fixed) << std::setprecision(2) <<
-     (float)self_ru.ru_stime.tv_sec+(float)self_ru.ru_stime.tv_usec/1000000 <<
-     "\r\n";
-   tmp_stream << "used_cpu_user:" <<
--    setiosflags(std::ios::fixed) << std::setprecision(2) <<
-+    std::setiosflags(std::ios::fixed) << std::setprecision(2) <<
-     (float)self_ru.ru_utime.tv_sec+(float)self_ru.ru_utime.tv_usec/1000000 <<
-     "\r\n";
-   tmp_stream << "used_cpu_sys_children:" <<
--    setiosflags(std::ios::fixed) << std::setprecision(2) <<
-+    std::setiosflags(std::ios::fixed) << std::setprecision(2) <<
-     (float)c_ru.ru_stime.tv_sec+(float)c_ru.ru_stime.tv_usec/1000000 <<
-     "\r\n";
-   tmp_stream << "used_cpu_user_children:" <<
--    setiosflags(std::ios::fixed) << std::setprecision(2) <<
-+    std::setiosflags(std::ios::fixed) << std::setprecision(2) <<
-     (float)c_ru.ru_utime.tv_sec+(float)c_ru.ru_utime.tv_usec/1000000 <<
-     "\r\n";
-   info.append(tmp_stream.str());
+-  tmp_stream << "used_cpu_sys:" << setiosflags(std::ios::fixed)
++  tmp_stream << "used_cpu_sys:" << std::setiosflags(std::ios::fixed)
+              << std::setprecision(2)
+              << (float)self_ru.ru_stime.tv_sec +
+                     (float)self_ru.ru_stime.tv_usec / 1000000
+              << "\r\n";
+-  tmp_stream << "used_cpu_user:" << setiosflags(std::ios::fixed)
++  tmp_stream << "used_cpu_user:" << std::setiosflags(std::ios::fixed)
+              << std::setprecision(2)
+              << (float)self_ru.ru_utime.tv_sec +
+                     (float)self_ru.ru_utime.tv_usec / 1000000
+              << "\r\n";
+-  tmp_stream << "used_cpu_sys_children:" << setiosflags(std::ios::fixed)
++  tmp_stream << "used_cpu_sys_children:" << std::setiosflags(std::ios::fixed)
+              << std::setprecision(2)
+              << (float)c_ru.ru_stime.tv_sec +
+                     (float)c_ru.ru_stime.tv_usec / 1000000
+              << "\r\n";
+-  tmp_stream << "used_cpu_user_children:" << setiosflags(std::ios::fixed)
++  tmp_stream << "used_cpu_user_children:" << std::setiosflags(std::ios::fixed)
+              << std::setprecision(2)
+              << (float)c_ru.ru_utime.tv_sec +
+                     (float)c_ru.ru_utime.tv_usec / 1000000

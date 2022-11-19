@@ -1,6 +1,6 @@
 --- a/third/blackwidow/src/db_checkpoint.cc
 +++ b/third/blackwidow/src/db_checkpoint.cc
-@@ -18,16 +18,29 @@
+@@ -18,16 +18,30 @@
  #include <inttypes.h>
  
  #include "rocksdb/db.h"
@@ -21,7 +21,8 @@
 +extern Status CopyFile(FileSystem* env, const std::string& source,
 +                       const std::string& destination, uint64_t size,
 +                       bool use_fsync,
-+                       const std::shared_ptr<IOTracer>& io_tracer = nullptr);
++                       const std::shared_ptr<IOTracer>& io_tracer = nullptr,
++                       const Temperature temperature = Temperature::kUnknown);
 +
 +extern Status CreateFile(FileSystem* env, const std::string& destination,
 +                         const std::string& contents, bool);
