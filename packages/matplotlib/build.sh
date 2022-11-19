@@ -15,26 +15,14 @@ LICENSE/LICENSE_SOLARIZED
 LICENSE/LICENSE_STIX
 LICENSE/LICENSE_YORICK"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=(3.6.1)
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_VERSION+=(1.23.4) # NumPy version
-TERMUX_PKG_VERSION+=(9.2.0)  # Pillow version
-TERMUX_PKG_SRCURL=(https://github.com/matplotlib/matplotlib/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-                   https://github.com/numpy/numpy/archive/refs/tags/v${TERMUX_PKG_VERSION[1]}.tar.gz
-                   https://github.com/python-pillow/Pillow/archive/refs/tags/${TERMUX_PKG_VERSION[2]}.tar.gz)
-TERMUX_PKG_SHA256=(02163f7c2063c615b7fcb36c9b81b4293e567bdf7b6678ff80df914f16cf03a0
-                   3ffd7b40ebe8a316324ff0cf83b820a25a034626836e001548d09d5b63ba84a8
-                   95836f00972dbf724bf1270178683a0ac4ea23c6c3a980858fc9f2f9456e32ef)
-TERMUX_PKG_DEPENDS="freetype, libc++, libjpeg-turbo, libtiff, libwebp, libxcb, littlecms, openjpeg, python, zlib"
-_PKG_PYTHON_DEPENDS="'contourpy>=1.0.1' 'cycler>=0.10' 'fonttools>=4.22.0' 'kiwisolver>=1.0.1' 'numpy>=1.19' 'packaging>=20.0' 'pillow>=6.2.0' 'pyparsing>=2.2.1' 'python-dateutil>=2.7'"
+TERMUX_PKG_VERSION=3.6.2
+TERMUX_PKG_SRCURL=https://github.com/matplotlib/matplotlib/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=5ac5ca25e6ecd1e7711e1f859b4b6f74f290ef517387d1502bf8012bf2b1647e
+TERMUX_PKG_DEPENDS="freetype, libc++, python, python-numpy, python-pillow"
+_PKG_PYTHON_DEPENDS="'contourpy>=1.0.1' 'cycler>=0.10' 'fonttools>=4.22.0' 'kiwisolver>=1.0.1' 'numpy>=1.19' 'packaging>=20.0' 'pyparsing>=2.2.1' 'python-dateutil>=2.7'"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 _PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
-
-termux_step_post_get_source() {
-	mv numpy-${TERMUX_PKG_VERSION[1]} numpy
-	mv Pillow-${TERMUX_PKG_VERSION[2]} Pillow
-}
 
 termux_step_pre_configure() {
 	termux_setup_python_crossenv
@@ -49,16 +37,6 @@ termux_step_pre_configure() {
 	build-pip install Cython numpy setuptools_scm setuptools_scm_git_archive wheel
 
 	LDFLAGS+=" -lpython${_PYTHON_VERSION} -lm"
-
-	export NPY_DISABLE_SVML=1
-	pushd $TERMUX_PKG_SRCDIR/numpy
-	MATHLIB="m" pip install .
-	popd
-
-	pushd $TERMUX_PKG_SRCDIR/Pillow
-	INCLUDE=$TERMUX_PREFIX/include LIB=$TERMUX_PREFIX/lib \
-		python setup.py install --force
-	popd
 }
 
 termux_step_make_install() {
