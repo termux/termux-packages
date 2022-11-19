@@ -1,0 +1,13 @@
+--- a/src/util/rand.c
++++ b/src/util/rand.c
+@@ -14,6 +14,10 @@
+ # include <sys/random.h>
+ #endif
+ 
++#if defined __ANDROID__ && __ANDROID_API__ < 29
++int getloadavg(double[], int);
++#endif
++
+ static uint64_t state[4];
+ static git_mutex state_lock;
+ 
