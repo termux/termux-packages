@@ -21,5 +21,5 @@ termux_step_pre_configure() {
 	find "$TERMUX_PKG_SRCDIR" -name CMakeLists.txt | xargs -n 1 \
 		sed -i 's/\( PROPERTIES C_STANDARD\) 90/\1 99/g'
 
-	cp "$TERMUX_PKG_BUILDER_DIR"/getloadavg.c "$TERMUX_PKG_SRCDIR"/src/
+	cp "$TERMUX_PKG_BUILDER_DIR"/getloadavg.c "$TERMUX_PKG_SRCDIR"/src/util/
 }
