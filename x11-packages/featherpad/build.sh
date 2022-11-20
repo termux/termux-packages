@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/tsujan/FeatherPad
 TERMUX_PKG_DESCRIPTION="Lightweight Qt Plain-Text Editor"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
-TERMUX_PKG_VERSION=1.1.1
+TERMUX_PKG_VERSION=1.3.3
 TERMUX_PKG_SRCURL=https://github.com/tsujan/FeatherPad/releases/download/V${TERMUX_PKG_VERSION}/FeatherPad-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=90ed9fb3509ce2c5760ac3358e1783d7e2b7d35ee05b48c86d6a2fa25789736d
-TERMUX_PKG_DEPENDS="libc++, hicolor-icon-theme, qt5-qtbase, qt5-qtsvg, qt5-qtx11extras, hunspell"
+TERMUX_PKG_SHA256=1be94e5112fec3b8305f5c3cb2f62a2262c1df6a773a03d599507e5a31521ab8
+TERMUX_PKG_DEPENDS="hunspell, libc++, libx11, qt5-qtbase, qt5-qtsvg, qt5-qtx11extras"
+TERMUX_PKG_RECOMMENDS="hicolor-icon-theme"
 TERMUX_PKG_BUILD_DEPENDS="qt5-qtbase-cross-tools, qt5-qttools-cross-tools"
-
