@@ -2,11 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://postgis.net
 TERMUX_PKG_DESCRIPTION="Spatial database extender for PostgreSQL object-relational database"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.1.4
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=3.1.8
 TERMUX_PKG_SRCURL=https://download.osgeo.org/postgis/source/postgis-$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=dc8e3fe8bc532e422f5d724c5a7c437f6555511716f6410d4d2db9762e1a3796
-TERMUX_PKG_DEPENDS="libc++, gdal, json-c, postgresql, proj, libprotobuf-c, libxml2, libiconv"
+TERMUX_PKG_SHA256=54254fb57070ce44d1da9434f472e0a82df0ef24321c2b9a22c449f756e278e7
+TERMUX_PKG_DEPENDS="gdal, json-c, libc++, libiconv, libprotobuf-c, libxml2, pcre, postgresql, proj"
 
 # both configure script and Makefile(s) look for files in current
 # directory rather than srcdir, so need to build in source
