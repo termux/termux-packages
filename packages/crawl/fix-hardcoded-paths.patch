@@ -1,0 +1,22 @@
+--- a/crawl-ref/source/AppHdr.h
++++ b/crawl-ref/source/AppHdr.h
+@@ -144,7 +144,7 @@
+ #ifdef TARGET_OS_MACOSX
+ # define GDB_PATH "/usr/local/bin/gdb"
+ #else
+-# define GDB_PATH "/usr/bin/gdb"
++# define GDB_PATH "@TERMUX_PREFIX@/bin/gdb"
+ #endif
+ 
+ 
+--- a/crawl-ref/source/crash.cc
++++ b/crawl-ref/source/crash.cc
+@@ -428,7 +428,7 @@
+                 "-ex", "bt full",
+                 0
+             };
+-            execv("/usr/bin/nice", (char* const*)argv);
++            execv("@TERMUX_PREFIX@/bin/nice", (char* const*)argv);
+             printf("Failed to start gdb: %s\n", strerror(errno));
+             fflush(stdout);
+             _exit(0);
