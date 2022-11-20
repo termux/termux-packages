@@ -3,14 +3,14 @@ TERMUX_PKG_DESCRIPTION="Telegram Bot API server"
 TERMUX_PKG_LICENSE="BSL-1.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_SRCURL=https://github.com/tdlib/telegram-bot-api.git
-_COMMIT=8a0f1dd730aa41ab7b792b9ff03d92b1c5022c9f
-_COMMIT_DATE=2022.05.05
+_COMMIT=a822b35d8737c4aab01d702c788a28dc75aa0f55
+_COMMIT_DATE=2022.11.08
 TERMUX_PKG_VERSION=${_COMMIT_DATE//./}
 TERMUX_PKG_GIT_BRANCH=master
 _TD_SRCURL=https://github.com/tdlib/td.git
-_TD_COMMIT=ab3a8282d4ee307d341071267ef1090b1a941478
+_TD_COMMIT=7eba19887ad834fd731b6b07b53c2426fe4beb59
 TERMUX_PKG_HOSTBUILD=true
-TERMUX_PKG_DEPENDS="libc++, readline, openssl, zlib"
+TERMUX_PKG_DEPENDS="libc++, openssl, zlib"
 
 termux_step_post_get_source() {
 	git fetch --unshallow
