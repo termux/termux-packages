@@ -1,0 +1,29 @@
+--- a/gtk/rgtaskswin.cc
++++ b/gtk/rgtaskswin.cc
+@@ -56,7 +56,7 @@
+    gboolean marked = FALSE;
+    gboolean activatable = FALSE;
+    gchar *taskname = NULL;
+-   string cmd = _config->Find("Synaptic::taskHelperProg", "/usr/bin/tasksel");
++   string cmd = _config->Find("Synaptic::taskHelperProg", "@TERMUX_PREFIX@/bin/tasksel");
+    do {
+       gtk_tree_model_get(model, &iter, 
+ 			 TASK_CHECKBOX_COLUMN, &marked, 
+@@ -126,7 +126,7 @@
+ 		      TASK_NAME_COLUMN, &str, -1);
+ 
+    // ask tasksel about the selected task
+-   string cmd = _config->Find("Synaptic::taskHelperProg", "/usr/bin/tasksel") + " --task-desc " + string(str);
++   string cmd = _config->Find("Synaptic::taskHelperProg", "@TERMUX_PREFIX@/bin/tasksel") + " --task-desc " + string(str);
+    string taskDescr;
+    char buf[255];
+    FILE *f=popen(cmd.c_str(), "r");
+@@ -222,7 +222,7 @@
+    // fiel in tasks
+    char buf[255];
+    gchar **strArray;
+-   string cmd = _config->Find("Synaptic::taskHelperProg", "/usr/bin/tasksel") + " --list-tasks";
++   string cmd = _config->Find("Synaptic::taskHelperProg", "@TERMUX_PREFIX@/bin/tasksel") + " --list-tasks";
+    FILE *f = popen(cmd.c_str(),"r");
+ 
+    while(fgets(buf,254,f) != NULL) {

@@ -1,0 +1,145 @@
+--- a/gtk/rgmainwindow.cc
++++ b/gtk/rgmainwindow.cc
+@@ -405,10 +405,8 @@
+    gtk_widget_set_sensitive(_detailsM, TRUE);
+    gtk_widget_set_sensitive(_propertiesB, TRUE);
+    // activate for root only
+-   if(getuid() == 0) {
+-       gtk_widget_set_sensitive(_pinM, TRUE);
+-       gtk_widget_set_sensitive(_autoM, TRUE);
+-   }    
++   gtk_widget_set_sensitive(_pinM, TRUE);
++   gtk_widget_set_sensitive(_autoM, TRUE);
+ 
+    // set info
+    gtk_widget_set_sensitive(pkginfo, true);
+@@ -872,19 +870,16 @@
+    }
+ 
+    // do not run if we don't have it
+-   if(!FileExists("/usr/sbin/update-apt-xapian-index"))
+-      return false;
+-   // no permission
+-   if (getuid() != 0)
++   if(!FileExists("@TERMUX_PREFIX@/bin/update-apt-xapian-index"))
+       return false;
+ 
+    // if we make it to this point, we need a xapian update
+    if(_config->FindB("Debug::Synaptic::Xapian",false))
+       std::cerr << "running update-apt-xapian-index" << std::endl;
+    GPid pid;
+-   const char *argp[] = {"/usr/bin/nice",
+-		   "/usr/bin/ionice","-c3",
+-		   "/usr/sbin/update-apt-xapian-index", 
++   const char *argp[] = {"@TERMUX_PREFIX@/bin/nice",
++		   "@TERMUX_PREFIX@/bin/ionice","-c3",
++		   "@TERMUX_PREFIX@/bin/update-apt-xapian-index", 
+ 		   "--update", "-q",
+ 		   NULL};
+    if(g_spawn_async(NULL, const_cast<char **>(argp), NULL, 
+@@ -1175,7 +1170,7 @@
+                               (_builder, "separator_debian")));
+ #endif
+    
+-   if(!FileExists(_config->Find("Synaptic::taskHelperProg","/usr/bin/tasksel")))
++   if(!FileExists(_config->Find("Synaptic::taskHelperProg","@TERMUX_PREFIX@/bin/tasksel")))
+       gtk_widget_hide(GTK_WIDGET(gtk_builder_get_object(_builder, "menu_tasks")));
+ 
+    button = GTK_WIDGET(gtk_builder_get_object(_builder, "button_update"));
+@@ -1568,7 +1563,7 @@
+    // only enable fast search if its usable
+ #ifdef WITH_EPT
+    if(!_lister->xapiandatabase() ||
+-      !FileExists("/usr/sbin/update-apt-xapian-index")) {
++      !FileExists("@TERMUX_PREFIX@/bin/update-apt-xapian-index")) {
+       gtk_widget_hide(GTK_WIDGET(
+             gtk_builder_get_object(_builder, "toolitem_fast_search")));
+       gtk_box_set_center_widget(GTK_BOX(
+@@ -1580,29 +1575,6 @@
+    gtk_box_set_center_widget(GTK_BOX(
+          gtk_builder_get_object(_builder, "hbox_button_toolbar")), NULL);
+ #endif
+-   // stuff for the non-root mode
+-   if(getuid() != 0) {
+-      GtkWidget *menu;
+-      gtk_widget_set_sensitive(_proceedB, false);
+-      gtk_widget_set_sensitive(_proceedM, false);
+-      button = GTK_WIDGET(gtk_builder_get_object(_builder, "button_update"));
+-      gtk_widget_set_sensitive(button, false);
+-      menu = GTK_WIDGET(gtk_builder_get_object
+-                        (_builder, "menu_add_downloadedfiles"));
+-      gtk_widget_set_sensitive(menu, false);
+-      menu = GTK_WIDGET(gtk_builder_get_object(_builder, "menu_repositories"));
+-      gtk_widget_set_sensitive(menu, false);
+-      menu = GTK_WIDGET(gtk_builder_get_object(_builder, "view_commit_log"));
+-      gtk_widget_set_sensitive(menu, false);
+-      menu = GTK_WIDGET(gtk_builder_get_object
+-                        (_builder, "menu_update_packages"));
+-      gtk_widget_set_sensitive(menu, false);
+-      menu = GTK_WIDGET(gtk_builder_get_object(_builder, "add_cdrom"));
+-      gtk_widget_set_sensitive(menu, false);
+-      menu = GTK_WIDGET(gtk_builder_get_object(_builder, "menu_hold"));
+-      gtk_widget_set_sensitive(menu, false);
+-   }
+-
+ }
+ 
+ 
+@@ -1690,10 +1662,8 @@
+    gtk_widget_set_sensitive(_upgradeB, _lister->upgradable());
+    gtk_widget_set_sensitive(_upgradeM, _lister->upgradable());
+ 
+-   if (getuid() == 0) {
+-      gtk_widget_set_sensitive(_proceedB, (toInstall + toRemove) != 0);
+-      gtk_widget_set_sensitive(_proceedM, (toInstall + toRemove) != 0);
+-   }
++   gtk_widget_set_sensitive(_proceedB, (toInstall + toRemove) != 0);
++   gtk_widget_set_sensitive(_proceedM, (toInstall + toRemove) != 0);
+    _unsavedChanges = ((toInstall + toRemove) != 0);
+ 
+    gtk_widget_queue_draw(_statusL);
+@@ -2173,7 +2143,7 @@
+    bool Changed = false;
+    bool ForceReload = _config->FindB("Synaptic::UpdateAfterSrcChange",false);
+    
+-   if(!g_file_test("/usr/bin/software-properties-gtk", 
++   if(!g_file_test("@TERMUX_PREFIX@/bin/software-properties-gtk", 
+ 		   G_FILE_TEST_IS_EXECUTABLE) 
+       || _config->FindB("Synaptic::dontUseGnomeSoftwareProperties", false)) 
+    {
+@@ -2185,7 +2155,7 @@
+       GPid pid;
+       int status;
+       const char *argv[5];
+-      argv[0] = "/usr/bin/software-properties-gtk";
++      argv[0] = "@TERMUX_PREFIX@/bin/software-properties-gtk";
+       argv[1] = "-n";
+       argv[2] = "-t";
+       argv[3] = g_strdup_printf("%lu", GDK_WINDOW_XID(gtk_widget_get_window(me->_win)));
+@@ -2381,7 +2351,7 @@
+       cmd.push_back("yelp");
+       cmd.push_back("ghelp:synaptic");
+    } else {
+-      cmd.push_back("/usr/bin/xdg-open");
++      cmd.push_back("@TERMUX_PREFIX@/bin/xdg-open");
+       cmd.push_back(PACKAGE_DATA_DIR "/synaptic/html/index.html");
+    }
+ 
+@@ -2548,7 +2518,7 @@
+    }
+ 
+    me->setStatusText(_("Starting package configuration tool..."));
+-   const gchar *cmd[] = { "/usr/sbin/dpkg-reconfigure",
++   const gchar *cmd[] = { "@TERMUX_PREFIX@/bin/dpkg-reconfigure",
+                     "-fgnome",
+                     me->selectedPackage()->name(),
+                     NULL };
+@@ -2582,7 +2552,7 @@
+       cmd[0] = "dwww";
+       cmd[1] = me->selectedPackage()->name();
+       cmd[2] = NULL;
+-      g_spawn_async("/tmp", const_cast<gchar **>(cmd), NULL, (GSpawnFlags)0, NULL, NULL, NULL, NULL);
++      g_spawn_async("@TERMUX_PREFIX@/tmp", const_cast<gchar **>(cmd), NULL, (GSpawnFlags)0, NULL, NULL, NULL, NULL);
+    } else {
+       me->_userDialog->error(_("You have to install the package \"dwww\" "
+ 			       "to browse the documentation of a package"));

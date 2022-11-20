@@ -1,0 +1,90 @@
+--- a/common/rconfiguration.cc
++++ b/common/rconfiguration.cc
+@@ -88,24 +88,22 @@
+ 
+    // store option 'consider recommended packages as dependencies'
+    // to config of apt if we run as root
+-   if (getuid() == 0) {
+-      string aptConfPath = _config->FindDir("Dir::Etc::parts", "/etc/apt/apt.conf.d/")
+-                         + "99synaptic";
+-
+-      int old_umask = umask(0022);
+-      ofstream aptfile(aptConfPath.c_str(), ios::out);
+-      if (!aptfile != 0) {
+-         cerr << "cannot open " << aptConfPath.c_str() <<
+-                 " to write APT::Install-Recommends" << endl;
+-      } else {
+-         if (_config->FindB("APT::Install-Recommends", false))
+-            aptfile << "APT::Install-Recommends \"true\";" << endl;
+-         else
+-            aptfile << "APT::Install-Recommends \"false\";" << endl;
++   string aptConfPath = _config->FindDir("Dir::Etc::parts", "@TERMUX_PREFIX@/etc/apt/apt.conf.d/")
++                     + "99synaptic";
++
++   int old_umask = umask(0022);
++   ofstream aptfile(aptConfPath.c_str(), ios::out);
++   if (!aptfile != 0) {
++      cerr << "cannot open " << aptConfPath.c_str() <<
++              " to write APT::Install-Recommends" << endl;
++   } else {
++      if (_config->FindB("APT::Install-Recommends", false))
++         aptfile << "APT::Install-Recommends \"true\";" << endl;
++      else
++         aptfile << "APT::Install-Recommends \"false\";" << endl;
+          aptfile.close();
+-      }
+-      umask(old_umask);
+    }
++   umask(old_umask);
+    // and backup Install-Recommends to config of synaptic
+    _config->Set("Synaptic::Install-Recommends",
+                 _config->FindB("APT::Install-Recommends",
+@@ -137,14 +135,14 @@
+    struct stat stbuf;
+    struct passwd *pwd;
+ 
+-   pwd = getpwuid(getuid());
++  /* pwd = getpwuid(getuid());
+    if (!pwd) {
+       return _error->Errno("getpwuid",
+                            _
+                            ("ERROR: Could not get password entry for superuser"));
+    }
+-   path = string(pwd->pw_dir) + "/.synaptic";
+-   //path = "/etc/synaptic";
++   path = string(pwd->pw_dir) + "/.synaptic";*/
++   path = "@TERMUX_PREFIX@/etc/synaptic";
+ 
+    if (stat(path.c_str(), &stbuf) < 0) {
+       if (mkdir(path.c_str(), 0700) < 0) {
+@@ -187,7 +185,7 @@
+ string RTmpDir()
+ {
+    struct stat stbuf;
+-   static string tmpDir = RConfDir() + string("/tmp/");
++   static string tmpDir = RConfDir() + string("@TERMUX_PREFIX@/tmp/");
+    if (stat(tmpDir.c_str(), &stbuf) < 0) {
+       if (mkdir(tmpDir.c_str(), 0700) < 0) {
+ 	 _error->Errno("mkdir",
+@@ -243,17 +241,10 @@
+ 
+    // read Install-Recommends, preferably from APT:: if we run as root
+    // or from Synaptic:: otherwise
+-   if(getuid() == 0) {
+-      _config->Set("APT::Install-Recommends",
+-                   _config->FindB("APT::Install-Recommends",
+-                   _config->FindB("Synaptic::Install-Recommends",
+-                   false)));
+-   } else {
+-      _config->Set("APT::Install-Recommends",
+-                   _config->FindB("Synaptic::Install-Recommends",
+-                   _config->FindB("APT::Install-Recommends",
+-                   false)));
+-   }
++   _config->Set("APT::Install-Recommends",
++                _config->FindB("APT::Install-Recommends",
++                _config->FindB("Synaptic::Install-Recommends",
++                false)));
+ 
+    return true;
+ }

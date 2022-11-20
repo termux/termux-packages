@@ -1,0 +1,29 @@
+--- a/common/rpackagelister.cc
++++ b/common/rpackagelister.cc
+@@ -118,7 +118,7 @@
+    cleanCommitLog();
+ #if 0
+    string Recommends = _config->Find("Synaptic::RecommendsFile",
+-                                     "/etc/apt/metadata");
++                                     "@TERMUX_PREFIX@/etc/apt/metadata");
+    if (FileExists(Recommends))
+       _actors.push_back(new RCacheActorRecommends(this, Recommends));
+ #endif
+@@ -309,8 +309,6 @@
+ 
+    // only lock if we run as root
+    bool lock = true;
+-   if(getuid() != 0)
+-      lock = false;
+ 
+    if (!_cache->open(_progMeter,lock)) {
+       _progMeter->Done();
+@@ -444,7 +442,7 @@
+       std::cerr << "xapainIndexNeedsUpdate()" << std::endl;
+ 
+    // check the xapian index
+-   if(FileExists("/usr/sbin/update-apt-xapian-index") && 
++   if(FileExists("@TERMUX_PREFIX@/bin/update-apt-xapian-index") && 
+       (!_xapianDatabase )) {
+       if(_config->FindB("Debug::Synaptic::Xapian",false))
+ 	 std::cerr << "xapain index not build yet" << std::endl;
