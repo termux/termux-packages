@@ -93,13 +93,13 @@ for package in "${@}"; do
 			git --no-pager diff --patch "${buildsh_path}"
 			echo "--------------------"
 			echo
-			echo "upgpkg(${repo}/${package}): $(. "${buildsh_path}"; echo "${TERMUX_PKG_VERSION}" | cut -d: -f2-)"
+			echo "bump(${repo}/${package}): $(. "${buildsh_path}"; echo "${TERMUX_PKG_VERSION}" | cut -d: -f2-)"
 			echo
 			read -re -p "Do you want to commit changes ? (y/n) " CHOICE
 			echo
 			if [[ ${CHOICE} =~ (Y|y) ]]; then
 				git add "${buildsh_path}"
-				git commit -m "upgpkg(${repo}/${package}): $(. "${buildsh_path}"; echo "${TERMUX_PKG_VERSION}" | cut -d: -f2-)"
+				git commit -m "bump(${repo}/${package}): $(. "${buildsh_path}"; echo "${TERMUX_PKG_VERSION}" | cut -d: -f2-)"
 			else
 				echo "Not committing to Git!"
 			fi

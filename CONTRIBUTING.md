@@ -328,7 +328,7 @@ Any line in the commit **should not exceed 80 characters**. In case it does, con
 - `<commitType>` describes the type of commit. Types of commits:
   - `addpkg(<repo>/<package>)`: A new package was added.
     Commit summary should include a short description of the package. Optional extended commit message may include usage instructions for the package and/or reasons for inclusion.
-  - `upgpkg(<repo>/<package>)`: One or more package(s) was/were updated.
+  - `bump(<repo>/<package>)`: One or more package(s) was/were updated.
     Commit summary should include the newer version/tag to which the package was updated to. Optional extended commit message may include new list of features in the new version, and detailed list of changes in build scripts and/or patches
   - `fix(<repo>/<package>): Fix a Termux specific bug in a package
     Commit summary should contain a summary of old incorrect behaviour of the package. Extended commit message may contain a deeper analysis of the bug.
@@ -351,7 +351,7 @@ Any line in the commit **should not exceed 80 characters**. In case it does, con
 Examples of good commit messages:
 
 1. ```
-   upgpkg(main/nodejs): v18.2.0
+   bump(main/nodejs): v18.2.0
    ```
 
 2. ```
@@ -361,7 +361,7 @@ Examples of good commit messages:
    ```
 
 3. ```
-   enhance,upgpkg(main/nodejs): v18.2.0 and use shared libuv
+   enhance,bump(main/nodejs): v18.2.0 and use shared libuv
 
    # Describe the technical reasons of how using shared libuv is beneficial
    ```
