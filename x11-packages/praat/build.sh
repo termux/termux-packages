@@ -1,11 +1,11 @@
 TERMUX_PKG_HOMEPAGE=https://www.praat.org
 TERMUX_PKG_DESCRIPTION="Doing phonetics by computer"
-TERMUX_PKG_LICENSE="GPL-3.0"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=6.2.23
+TERMUX_PKG_VERSION=6.3
 TERMUX_PKG_SRCURL=https://github.com/praat/praat/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=cc2041656a9d8b36a7dd5115ddde2af09d669c6179d252330b83da9504483b62
-TERMUX_PKG_DEPENDS="gtk3, libc++, pulseaudio, xorgproto"
+TERMUX_PKG_SHA256=5d294c046ab07509a4c94851f7f9060089897b1fa90eaa335d84fd3e147e181e
+TERMUX_PKG_DEPENDS="atk, gdk-pixbuf, glib, gtk3, harfbuzz, libc++, libcairo, pango, pulseaudio"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {
