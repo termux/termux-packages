@@ -1,0 +1,24 @@
+--- a/Makefile.inc
++++ b/Makefile.inc
+@@ -164,9 +164,9 @@
+ 
+ # Enforce English locale by default in all commands for predictible output.
+ 
+-export LANGUAGE = en_US.UTF-8
+-export LC_ALL = en_US.UTF-8
+-export LANG = en_US.UTF-8
++export LANGUAGE = C.UTF-8
++export LC_ALL = C.UTF-8
++export LANG = C.UTF-8
+ 
+ # Operating system, architecture, host name.
+ 
+@@ -264,7 +264,7 @@
+ else ifneq ($(DEBUG),)
+     BINDIR = $(ROOTDIR)/bin/debug-$(MAIN_ARCH)$(if $(HOSTNAME),-$(HOSTNAME),)$(BINDIR_SUFFIX)
+ else
+-    BINDIR = $(ROOTDIR)/bin/release-$(MAIN_ARCH)$(if $(HOSTNAME),-$(HOSTNAME),)$(BINDIR_SUFFIX)
++    BINDIR = $(ROOTDIR)/bin/release
+ endif
+ 
+ OBJDIR = $(BINDIR)/objs-$(notdir $(CURDIR))
