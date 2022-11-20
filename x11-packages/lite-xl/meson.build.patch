@@ -1,17 +1,10 @@
-diff -uNr lite-xl.orig/meson.build lite-xl/meson.build
---- lite-xl.orig/meson.build
-+++ lite-xl/meson.build
-@@ -47,11 +47,11 @@
-     libm = cc.find_library('m', required : false)
-     libdl = cc.find_library('dl', required : false)
-     threads_dep = dependency('threads')
--    lua_dep = dependency('lua5.2', fallback: ['lua', 'lua_dep'],
-+    lua_dep = dependency('lua52', fallback: ['lua', 'lua_dep'],
-         default_options: ['shared=false', 'use_readline=false', 'app=false']
-     )
-     pcre2_dep = dependency('libpcre2-8')
--    sdl_dep = dependency('sdl2', method: 'config-tool')
-+    sdl_dep = dependency('sdl2', method: 'pkg-config')
-     reproc_dep = dependency('reproc', fallback: ['reproc', 'reproc_dep'],
-         default_options: [
-             'default_library=static', 'multithreaded=false',
+--- a/meson.build
++++ b/meson.build
+@@ -78,6 +78,7 @@
+     # Lua has no official .pc file
+     # so distros come up with their own names
+     lua_names = [
++        'lua54',
+         'lua5.4', # Debian
+         'lua-5.4', # FreeBSD
+         'lua',    # Fedora
