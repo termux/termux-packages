@@ -1,12 +1,11 @@
-diff -uNr OpenTTD-1.9.1/src/ini.cpp OpenTTD-1.9.1.mod/src/ini.cpp
---- OpenTTD-1.9.1/src/ini.cpp	2019-04-08 22:37:59.000000000 +0300
-+++ OpenTTD-1.9.1.mod/src/ini.cpp	2019-06-30 00:10:53.677008246 +0300
-@@ -79,7 +79,7 @@
+--- a/src/ini.cpp
++++ b/src/ini.cpp
+@@ -84,7 +84,7 @@
   * APIs to do so. We only need to flush the data as the metadata itself
   * (modification date etc.) is not important to us; only the real data is.
   */
 -#if defined(_POSIX_SYNCHRONIZED_IO) && _POSIX_SYNCHRONIZED_IO > 0
 +#if defined(_POSIX_SYNCHRONIZED_IO) && _POSIX_SYNCHRONIZED_IO > 0 && !defined(__ANDROID__)
- 	int ret = fdatasync(fileno(f));
- 	fclose(f);
- 	if (ret != 0) return false;
+ 	int f = open(file_new.c_str(), O_RDWR);
+ 	int ret = fdatasync(f);
+ 	close(f);
