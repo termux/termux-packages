@@ -1,0 +1,23 @@
+--- a/src/mpd_client/autoconf.c
++++ b/src/mpd_client/autoconf.c
+@@ -117,14 +117,14 @@
+         }
+         FREE_SDS(socket);
+     }
+-    if (test_mpd_conn("/run/mpd/socket") == true) {
+-        MYMPD_LOG_NOTICE("Setting mpd host to \"/run/mpd/socket\"");
+-        mympd_state->mpd_state->mpd_host = sds_replace(mympd_state->mpd_state->mpd_host, "/run/mpd/socket");
++    if (test_mpd_conn("@TERMUX_PREFIX@/var/run/mpd/socket") == true) {
++        MYMPD_LOG_NOTICE("Setting mpd host to \"@TERMUX_PREFIX@/var/run/mpd/socket\"");
++        mympd_state->mpd_state->mpd_host = sds_replace(mympd_state->mpd_state->mpd_host, "@TERMUX_PREFIX@/var/run/mpd/socket");
+         return;
+     }
+-    if (test_mpd_conn("/var/run/mpd/socket") == true) {
+-        MYMPD_LOG_NOTICE("Setting mpd host to \"/var/run/mpd/socket\"");
+-        mympd_state->mpd_state->mpd_host = sds_replace(mympd_state->mpd_state->mpd_host, "/var/run/mpd/socket");
++    if (test_mpd_conn("@TERMUX_PREFIX@/run/mpd/socket") == true) {
++        MYMPD_LOG_NOTICE("Setting mpd host to \"@TERMUX_PREFIX@/run/mpd/socket\"");
++        mympd_state->mpd_state->mpd_host = sds_replace(mympd_state->mpd_state->mpd_host, "@TERMUX_PREFIX@/run/mpd/socket");
+         return;
+     }
+     if (test_mpd_conn("/vsrc/lib/mpd/socket") == true) {
