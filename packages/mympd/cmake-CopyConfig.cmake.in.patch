@@ -1,0 +1,15 @@
+--- a/cmake/CopyConfig.cmake.in
++++ b/cmake/CopyConfig.cmake.in
+@@ -1,3 +1,4 @@
++if(FALSE)
+ # Install startup script
+ if((EXISTS "/etc/debian_version") AND (EXISTS "/usr/lib/systemd/system"))
+   #Install systemd unit
+@@ -43,6 +44,7 @@
+               "$ENV{DESTDIR}@CMAKE_INSTALL_FULL_DATAROOTDIR@/doc/mympd/changelog.Debian")
+   execute_process(COMMAND gzip -n -f -v -9 "$ENV{DESTDIR}@CMAKE_INSTALL_FULL_DATAROOTDIR@/doc/mympd/changelog.Debian")
+ endif()
++endif(FALSE)
+ 
+ # Install and compress manpages
+ if("@MYMPD_MANPAGES@" STREQUAL "ON")
