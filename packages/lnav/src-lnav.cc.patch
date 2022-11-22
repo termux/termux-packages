@@ -1,23 +1,23 @@
 --- a/src/lnav.cc
 +++ b/src/lnav.cc
-@@ -149,7 +149,7 @@
- #include "archive_manager.hh"
+@@ -163,7 +163,7 @@
+ #include "yajlpp/yajlpp.hh"
  
  #ifndef SYSCONFDIR
--#define SYSCONFDIR "/usr/etc"
-+#define SYSCONFDIR "@TERMUX_PREFIX@/etc"
+-#    define SYSCONFDIR "/usr/etc"
++#    define SYSCONFDIR "@TERMUX_PREFIX@/etc"
  #endif
  
- using namespace std;
-@@ -2098,7 +2098,7 @@
- #endif
+ using namespace std::literals::chrono_literals;
+@@ -2406,7 +2406,7 @@
+     lnav_data.ld_config_paths.insert(lnav_data.ld_config_paths.begin(),
+                                      SYSCONFDIR "/lnav");
+     lnav_data.ld_config_paths.insert(lnav_data.ld_config_paths.begin(),
+-                                     "/etc/lnav");
++                                     "@TERMUX_PREFIX@/etc/lnav");
  
-     lnav_data.ld_debug_log_name = "/dev/null";
--    lnav_data.ld_config_paths.emplace_back("/etc/lnav");
-+    lnav_data.ld_config_paths.emplace_back("@TERMUX_PREFIX@/etc/lnav");
-     lnav_data.ld_config_paths.emplace_back(SYSCONFDIR "/lnav");
-     lnav_data.ld_config_paths.emplace_back(lnav::paths::dotlnav());
-     while ((c = getopt(argc, argv, "hHarRCc:I:iuf:d:nNqtw:vVW")) != -1) {
+     if (lnav_data.ld_debug_log_name != DEFAULT_DEBUG_LOG) {
+         lnav_log_level = lnav_log_level_t::TRACE;
 @@ -2363,7 +2363,7 @@
       * so that it will try the default path.
       */
