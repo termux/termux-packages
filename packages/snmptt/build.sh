@@ -2,10 +2,11 @@ TERMUX_PKG_HOMEPAGE=http://www.snmptt.org/
 TERMUX_PKG_DESCRIPTION="SNMP trap translator"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.4.2
+TERMUX_PKG_VERSION=1.5
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/snmptt/snmptt_${TERMUX_PKG_VERSION}.tgz
-TERMUX_PKG_SHA256=1b455a5ae252dab5d828926125073b5376e36855e38423aca8da9bce6c4920c5
+TERMUX_PKG_SHA256=91fb6146a08c0d143e4193f1fffdb697f769f75666d72a73eeb78c013b8a227f
 TERMUX_PKG_DEPENDS="net-snmp, perl"
+TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
@@ -23,7 +24,7 @@ termux_step_make_install() {
 		snmpttconvert snmpttconvertmib \
 		snmptthandler snmptthandler-embedded
 	install -Dm600 -t $TERMUX_PREFIX/share/snmptt/examples examples/*
-	install -Dm600 -t $TERMUX_PREFIX/etc/snmp snmptt.ini
+	install -Dm600 -t $TERMUX_PREFIX/etc/snmptt snmptt.ini
 	install -Dm600 -T examples/snmptt.conf.generic \
-		$TERMUX_PREFIX/etc/snmp/snmptt.conf
+		$TERMUX_PREFIX/etc/snmptt/snmptt.conf
 }
