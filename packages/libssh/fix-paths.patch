@@ -34,12 +34,12 @@ diff -uNr libssh-0.9.0/src/options.c libssh-0.9.0.mod/src/options.c
 diff -uNr libssh-0.9.0/src/socket.c libssh-0.9.0.mod/src/socket.c
 --- libssh-0.9.0/src/socket.c	2019-06-27 11:34:16.000000000 +0300
 +++ libssh-0.9.0.mod/src/socket.c	2019-06-29 17:26:21.278467080 +0300
-@@ -838,7 +838,7 @@
- void
- ssh_execute_command(const char *command, socket_t in, socket_t out)
- {
--    const char *args[] = {"/bin/sh", "-c", command, NULL};
-+    const char *args[] = {"@TERMUX_PREFIX@/bin/sh", "-c", command, NULL};
-     /* Prepare /dev/null socket for the stderr redirection */
-     int devnull = open("/dev/null", O_WRONLY);
-     if (devnull == -1) {
+@@ -908,7 +908,7 @@
+     if (shell == NULL || shell[0] == '\0') {
+         /* Fall back to bash. There are issues with dash or
+          * whatever people tend to link to /bin/sh */
+-        shell = "/bin/bash";
++        shell = "@TERMUX_PREFIX@/bin/bash";
+     }
+     args[0] = shell;
+ 
