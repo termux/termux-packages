@@ -1,6 +1,5 @@
-diff '--color=auto' -uNr node-v18.0.0.orig/deps/uv/uv.gyp node-v18.0.0/deps/uv/uv.gyp
---- node-v18.0.0.orig/deps/uv/uv.gyp	2022-04-21 15:15:32.951869789 +0530
-+++ node-v18.0.0/deps/uv/uv.gyp	2022-04-21 15:43:16.397175174 +0530
+--- ./deps/uv/uv.gyp.orig	2022-11-14 07:56:05.000000000 +0530
++++ ./deps/uv/uv.gyp	2022-11-25 18:51:25.022527139 +0530
 @@ -40,7 +40,7 @@
      {
        'target_name': 'libuv',
@@ -19,7 +18,7 @@ diff '--color=auto' -uNr node-v18.0.0.orig/deps/uv/uv.gyp node-v18.0.0/deps/uv/u
          'conditions': [
            ['OS == "linux"', {
              'defines': [ '_POSIX_C_SOURCE=200112' ],
-@@ -247,6 +247,7 @@
+@@ -249,6 +249,7 @@
              'src/unix/procfs-exepath.c',
              'src/unix/random-getrandom.c',
              'src/unix/random-sysctl-linux.c',
@@ -27,3 +26,19 @@ diff '--color=auto' -uNr node-v18.0.0.orig/deps/uv/uv.gyp node-v18.0.0/deps/uv/u
            ],
            'link_settings': {
              'libraries': [ '-ldl', '-lrt' ],
+@@ -256,7 +257,6 @@
+         }],
+         [ 'OS=="android"', {
+           'sources': [
+-            'src/unix/android-ifaddrs.c',
+             'src/unix/linux-core.c',
+             'src/unix/linux-inotify.c',
+             'src/unix/linux-syscalls.c',
+@@ -267,6 +267,7 @@
+             'src/unix/random-sysctl-linux.c',
+             'src/unix/epoll.c',
+           ],
++          'defines': [ '__USE_GNU' ],
+           'link_settings': {
+             'libraries': [ '-ldl' ],
+           },

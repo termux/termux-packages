@@ -1,6 +1,5 @@
-diff '--color=auto' -uNr node-v18.0.0.orig/deps/v8/src/trap-handler/trap-handler.h node-v18.0.0/deps/v8/src/trap-handler/trap-handler.h
---- node-v18.0.0.orig/deps/v8/src/trap-handler/trap-handler.h	2022-04-21 15:15:33.491869789 +0530
-+++ node-v18.0.0/deps/v8/src/trap-handler/trap-handler.h	2022-04-21 15:45:22.317175126 +0530
+--- ./deps/v8/src/trap-handler/trap-handler.h.orig	2022-11-23 18:22:22.422329609 +0530
++++ ./deps/v8/src/trap-handler/trap-handler.h	2022-11-23 18:28:14.112329475 +0530
 @@ -17,23 +17,7 @@
  namespace internal {
  namespace trap_handler {
@@ -15,7 +14,7 @@ diff '--color=auto' -uNr node-v18.0.0.orig/deps/v8/src/trap-handler/trap-handler
 -#define V8_TRAP_HANDLER_SUPPORTED true
 -// Arm64 simulator on x64 on Linux, Mac, or Windows.
 -#elif V8_TARGET_ARCH_ARM64 && V8_HOST_ARCH_X64 && \
--    (V8_OS_LINUX || V8_OS_DARWIN)
+-    (V8_OS_LINUX || V8_OS_DARWIN || V8_OS_WIN)
 -#define V8_TRAP_HANDLER_VIA_SIMULATOR
 -#define V8_TRAP_HANDLER_SUPPORTED true
 -// Everything else is unsupported.
