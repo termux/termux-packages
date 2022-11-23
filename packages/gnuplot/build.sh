@@ -10,7 +10,9 @@ TERMUX_PKG_DEPENDS="glib, libandroid-support, libcairo, libgd, libiconv, libx11,
 TERMUX_PKG_BREAKS="gnuplot-x"
 TERMUX_PKG_REPLACES="gnuplot-x"
 TERMUX_PKG_HOSTBUILD=true
-
+TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="
+--without-lua
+"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-x
 --without-lua
@@ -20,7 +22,8 @@ ac_cv_search_iconv_open=-liconv
 "
 
 termux_step_host_build() {
-	"$TERMUX_PKG_SRCDIR/configure"
+	"$TERMUX_PKG_SRCDIR/configure" \
+		${TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS}
 	make -C docs/ gnuplot.gih
 }
 
