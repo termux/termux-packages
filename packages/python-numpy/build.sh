@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL=https://github.com/numpy/numpy.git
 TERMUX_PKG_DEPENDS="libc++, libopenblas, python"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
 
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/
