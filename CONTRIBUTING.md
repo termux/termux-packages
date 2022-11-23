@@ -100,10 +100,10 @@ met these conditions:
 
 - **Not installable through cpan, gem, npm, or pip**
 
-  These packages should be installable through `cpan`, `gem`, `npm`, `pip` and
+  These packages should be installed through `cpan`, `gem`, `npm`, `pip` and
   so on.
 
-  Packaging modules for Perl, Ruby, Node.js, Python is problematic, especially
+  Packaging modules for Perl, Ruby, Node.js, is problematic, especially
   when it comes to cross-compiling native extensions.
 
 - **Not taking too much disk space**
