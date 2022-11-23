@@ -1,14 +1,12 @@
 diff -uNr recordmydesktop-0.3.8.1/src/rmd_initialize_data.c recordmydesktop-0.3.8.1.mod/src/rmd_initialize_data.c
 --- recordmydesktop-0.3.8.1/src/rmd_initialize_data.c	2008-12-13 17:49:09.000000000 +0200
 +++ recordmydesktop-0.3.8.1.mod/src/rmd_initialize_data.c	2020-02-11 15:45:12.372308546 +0200
-@@ -239,8 +239,8 @@
-     args->device = (char *) malloc(strlen(DEFAULT_AUDIO_DEVICE) + 1);
-     strcpy(args->device, DEFAULT_AUDIO_DEVICE);
+@@ -239,7 +239,7 @@
  
--    args->workdir = (char *) malloc(5);
--    strcpy(args->workdir, "/tmp");
-+    args->workdir = (char *) malloc(sizeof("@TERMUX_PREFIX@/tmp"));
-+    strcpy(args->workdir, "@TERMUX_PREFIX@/tmp");
+     char *tmpdir = getenv("TMPDIR");
+     if (tmpdir == NULL) {
+-        tmpdir = "/tmp";
++        tmpdir = "@TERMUX_PREFIX@/tmp";
+     }
+     args->workdir = strdup(tmpdir);
  
-     args->pause_shortcut = (char *) malloc(15);
-     strcpy(args->pause_shortcut, "Control+Mod1+p");
