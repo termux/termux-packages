@@ -2,12 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://dwm.suckless.org/
 TERMUX_PKG_DESCRIPTION="A dynamic window manager for X"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Tristan Ross <spaceboyross@yandex.com>"
-TERMUX_PKG_VERSION=6.3
-TERMUX_PKG_SRCURL="http://dl.suckless.org/dwm/dwm-$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=badaa028529b1fba1fd7f9a84f3b64f31190466c858011b53e2f7b70c6a3078d
-TERMUX_PKG_DEPENDS="libx11, libxinerama, libxft, freetype, st, dmenu"
+TERMUX_PKG_VERSION=6.4
+TERMUX_PKG_SRCURL="https://dl.suckless.org/dwm/dwm-$TERMUX_PKG_VERSION.tar.gz"
+TERMUX_PKG_SHA256=fa9c0d69a584485076cfc18809fd705e5c2080dafb13d5e729a3646ca7703a6e
+TERMUX_PKG_DEPENDS="dmenu, fontconfig, libx11, libxft, libxinerama, st"
 TERMUX_PKG_BUILD_IN_SRC=true
 
-termux_step_configure() {
-	cp "$TERMUX_PKG_BUILDER_DIR/config.h" "config.h"
+termux_step_pre_configure() {
+	cp config.def.h config.h
 }
