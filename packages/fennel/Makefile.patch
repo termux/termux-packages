@@ -2,19 +2,26 @@ diff --git a/Makefile b/Makefile
 index d48a66c..444fa06 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1,5 +1,5 @@
- LUA ?= lua
+@@ -1,10 +1,10 @@
+-LUA ?= lua
 -LUA_VERSION ?= $(shell $(LUA) -e 'v=_VERSION:gsub("^Lua *","");print(v)')
 +LUA_VERSION ?= 5.3
++LUA ?= lua$(LUA_VERSION)
  DESTDIR ?=
  PREFIX ?= /usr/local
  BIN_DIR ?= $(PREFIX)/bin
+ LUA_LIB_DIR ?= $(PREFIX)/share/lua/$(LUA_VERSION)
+-MAN_DIR ?= $(PREFIX)/man/man1
++MAN_DIR ?= $(PREFIX)/share/man/man1
+ 
+ MINI_SRC=src/fennel.fnl src/fennel/parser.fnl src/fennel/specials.fnl \
+ 		src/fennel/utils.fnl src/fennel/compiler.fnl  src/fennel/macros.fnl
 @@ -60,7 +60,7 @@ lint: fennel
  
  ## Binaries
  
 -BIN_LUA_VERSION=5.4.4
-+BIN_LUA_VERSION=5.3.5
++BIN_LUA_VERSION=5.3.6
  BIN_LUA_DIR ?= $(PWD)/lua-$(BIN_LUA_VERSION)
  NATIVE_LUA_LIB ?= $(BIN_LUA_DIR)/src/liblua-native.a
  LUA_INCLUDE_DIR ?= $(BIN_LUA_DIR)/src
