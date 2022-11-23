@@ -1,0 +1,13 @@
+--- a/configure.ac
++++ b/configure.ac
+@@ -727,8 +727,8 @@
+ 
+ OLD_LIBS=$LIBS
+ LIBS="$LIBS $LIBCURL"
+-AC_RUN_IFELSE(
+-     [AC_LANG_PROGRAM([[#include <curl/curl.h>]],
++AC_COMPILE_IFELSE(
++     [AC_LANG_PROGRAM([[#error]],
+                       [[return (CURLSSLSET_OK != curl_global_sslset(CURLSSLBACKEND_GNUTLS, NULL, NULL));]])],
+                     [curl_gnutls=1],
+                     [AC_MSG_WARN([cURL does not have GnuTLS backend])
