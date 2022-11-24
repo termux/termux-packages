@@ -1,0 +1,33 @@
+From c651152a9db56d9fb4681789e38d9b52d996e960 Mon Sep 17 00:00:00 2001
+From: "Justin M. Keyes" <justinkz@gmail.com>
+Date: Tue, 4 Oct 2022 18:35:32 +0200
+Subject: [PATCH] fix(build): "make clean" fails
+
+Problem:
+"make clean" fails since 03bc23de36c8.
+
+    make -C runtime/doc clean
+    make[1]: *** No rule to make target `clean'.  Stop.
+    make: *** [clean] Error 2
+
+Solution:
+Update the "clean" target.
+---
+ Makefile | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 8322e0f3c..7fb6139c5 100644
+--- a/Makefile
++++ b/Makefile
+@@ -138,7 +138,6 @@ test: functionaltest unittest
+ clean:
+ 	+test -d build && $(BUILD_TOOL) -C build clean || true
+ 	$(MAKE) -C src/nvim/testdir clean
+-	$(MAKE) -C runtime/doc clean
+ 	$(MAKE) -C runtime/indent clean
+ 
+ distclean:
+-- 
+2.38.0
+
