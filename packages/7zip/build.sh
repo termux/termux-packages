@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="7-Zip file archiver with a high compression ratio"
 TERMUX_PKG_LICENSE="LGPL-2.1, BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=22.01
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.7-zip.org/a/7z${TERMUX_PKG_VERSION//./}-src.tar.xz
 TERMUX_PKG_SHA256=393098730c70042392af808917e765945dc2437dee7aae3cfcc4966eb920fbc5
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -52,6 +53,6 @@ termux_step_make_install() {
 		-t "$TERMUX_PREFIX"/share/doc/"$TERMUX_PKG_NAME" \
 		"$TERMUX_PKG_BUILDDIR"/DOC/{7zC,7zFormat,lzma,Methods,readme,src-history}.txt
 	install -Dm0644 \
-		-t "$TERMUX_PREFIX"/share/licenses/"$TERMUX_PKG_NAME" \
+		-t "$TERMUX_PREFIX"/share/LICENSES/"$TERMUX_PKG_NAME" \
 		"$TERMUX_PKG_BUILDDIR"/DOC/{copying,License}.txt
 }
