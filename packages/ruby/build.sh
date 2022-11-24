@@ -2,11 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://www.ruby-lang.org/
 TERMUX_PKG_DESCRIPTION="Dynamic programming language with a focus on simplicity and productivity"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.1.2
+TERMUX_PKG_VERSION=3.1.3
 TERMUX_PKG_SRCURL=https://cache.ruby-lang.org/pub/ruby/${TERMUX_PKG_VERSION:0:3}/ruby-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=ca10d017f8a1b6d247556622c841fc56b90c03b1803f87198da1e4fd3ec3bf2a
+TERMUX_PKG_SHA256=4ee161939826bcdfdafa757cf8e293a7f14e357f62be7144f040335cc8c7371a
 # libbffi is used by the fiddle extension module:
-TERMUX_PKG_DEPENDS="libandroid-support, libffi, libgmp, readline, openssl, libyaml, zlib"
+TERMUX_PKG_DEPENDS="libandroid-execinfo, libandroid-support, libffi, libgmp, readline, openssl, libyaml, zlib"
 TERMUX_PKG_RECOMMENDS="clang, make, pkg-config"
 TERMUX_PKG_BREAKS="ruby-dev"
 TERMUX_PKG_REPLACES="ruby-dev"
@@ -27,6 +27,8 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
+	autoreconf -fi
+
 	export PATH=$TERMUX_PKG_HOSTBUILD_DIR/ruby-host/bin:$PATH
 
 	if [ "$TERMUX_ARCH_BITS" = 32 ]; then

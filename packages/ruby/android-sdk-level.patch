@@ -1,23 +1,17 @@
---- ruby-3.1.0/configure
-+++ ruby-3.1.0.mod/configure
-@@ -9234,13 +9234,19 @@
- 
- 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-     $as_echo "${msg_result_yes}yes${msg_reset}" >&6 ; }
-+case ${target_os} in #(
-+    *android*) :
-+	;; #(
-+    *) :
+--- a/configure.ac
++++ b/configure.ac
+@@ -510,11 +510,13 @@
+ ]], [[]])],
+ [
+ 	AC_MSG_RESULT(yes)
++	AS_CASE(["$target_os"], [*android*], [], [
  	target_os=${target_os}-android
-+	;;
-+esac
- 	if test "x$cross_compiling" = xno; then :
- 
-                 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for Android API version" >&5
- $as_echo_n "checking for Android API version... " >&6; }
++	])
+ 	AS_IF([test "x$cross_compiling" = xno], [
+                 AC_MSG_CHECKING([for Android API version])
                  # hacky workaround: https://github.com/termux/termux-packages/issues/6176
 -                rb_android_api=`getprop ro.build.version.sdk`
 +                rb_android_api=24
-                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $rb_android_api" >&5
-     colorize_result "$rb_android_api" ; }
-                 # RUBY_APPEND_OPTIONS(CPPFLAGS)
+                 AC_MSG_RESULT($rb_android_api)
+                 RUBY_APPEND_OPTIONS(CPPFLAGS, -D__ANDROID_API__=$rb_android_api -Wno-macro-redefined)
+ 	])
