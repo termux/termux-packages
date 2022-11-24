@@ -61,11 +61,11 @@
  static char **fretwork_images;  //the pathes to all the images needed
  static unsigned int fretwork_segment_modified;  //which segment was modified this time?
 @@ -66,7 +66,7 @@
- void fretwork_shutdown(magic_api * api);
  void fretwork_switchin(magic_api * api, int which, int mode, SDL_Surface * canvas, SDL_Surface * snapshot);
  void fretwork_switchout(magic_api * api, int which, int mode, SDL_Surface * canvas, SDL_Surface * snapshot);
--inline void fretwork_extract_coords_from_segment(unsigned int segment, Sint16 * x, Sint16 * y);
-+static inline void fretwork_extract_coords_from_segment(unsigned int segment, Sint16 * x, Sint16 * y);
+ #define POINT_TYPE typeof(((SDL_Rect *)NULL)->x)
+-inline void fretwork_extract_coords_from_segment(unsigned int segment, POINT_TYPE * x, POINT_TYPE * y);
++static inline void fretwork_extract_coords_from_segment(unsigned int segment, POINT_TYPE * x, POINT_TYPE * y);
  void fretwork_click(magic_api * api, int which, int mode,
                      SDL_Surface * canvas, SDL_Surface * snapshot, int x, int y, SDL_Rect * update_rect);
  
@@ -100,8 +100,8 @@
    return (yy - 1) * fretwork_segments_x + xx;
  }
  
--inline void fretwork_extract_coords_from_segment(unsigned int segment, Sint16 * x, Sint16 * y)
-+static inline void fretwork_extract_coords_from_segment(unsigned int segment, Sint16 * x, Sint16 * y)
+-inline void fretwork_extract_coords_from_segment(unsigned int segment, POINT_TYPE * x, POINT_TYPE * y)
++static inline void fretwork_extract_coords_from_segment(unsigned int segment, POINT_TYPE * x, POINT_TYPE * y)
  {
    *x = ((segment % fretwork_segments_x) - 1) * img_w;   //useful to set update_rect as small as possible
    *y = (int)(segment / fretwork_segments_x) * img_h;
@@ -116,14 +116,15 @@
  static Uint8 *rails_status_of_segments; //a place to store an info about bitmap used for selected segment
  static char **rails_images;     //the pathes to all the images needed
  static unsigned int rails_segment_modified;     //which segment was modified this time?
-@@ -53,8 +53,8 @@
+@@ -53,9 +53,9 @@
  void rails_shutdown(magic_api * api);
  void rails_switchin(magic_api * api, int which, int mode, SDL_Surface * canvas);
  void rails_switchout(magic_api * api, int which, int mode, SDL_Surface * canvas);
 -inline unsigned int rails_get_segment(int x, int y);
--inline void rails_extract_coords_from_segment(unsigned int segment, Sint16 * x, Sint16 * y);
 +static inline unsigned int rails_get_segment(int x, int y);
-+static inline void rails_extract_coords_from_segment(unsigned int segment, Sint16 * x, Sint16 * y);
+ #define POINT_TYPE typeof(((SDL_Rect *)NULL)->x)
+-inline void rails_extract_coords_from_segment(unsigned int segment, POINT_TYPE * x, POINT_TYPE * y);
++static inline void rails_extract_coords_from_segment(unsigned int segment, POINT_TYPE * x, POINT_TYPE * y);
  static void rails_flip(void *ptr, SDL_Surface * dest, SDL_Surface * src);
  static void rails_flip_flop(void *ptr, SDL_Surface * dest, SDL_Surface * src);
  static void rails_rotate(void *ptr, SDL_Surface * dest, SDL_Surface * src, unsigned int direction);
@@ -149,8 +150,8 @@
  
  }
  
--inline void rails_extract_coords_from_segment(unsigned int segment, Sint16 * x, Sint16 * y)
-+static inline void rails_extract_coords_from_segment(unsigned int segment, Sint16 * x, Sint16 * y)
+-inline void rails_extract_coords_from_segment(unsigned int segment, POINT_TYPE * x, POINT_TYPE * y)
++static inline void rails_extract_coords_from_segment(unsigned int segment, POINT_TYPE * x, POINT_TYPE * y)
  {                               //extracts the coords of the beginning and the segment
    *x = ((segment % rails_segments_x) - 1) * img_w;      //useful to set update_rect as small as possible
    *y = (int)(segment / rails_segments_x) * img_h;
