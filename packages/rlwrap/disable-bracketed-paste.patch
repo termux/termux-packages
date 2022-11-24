@@ -2,12 +2,16 @@ https://github.com/termux/termux-packages/issues/12282
 
 --- a/src/readline.c
 +++ b/src/readline.c
-@@ -103,7 +103,7 @@
+@@ -96,10 +96,12 @@
  				   in .inputrc */
  
    /* put the next variable binding(s) *after* rl_initialize(), so they cannot be overridden */
--  /* rl_variable_bind("enable-bracketed-paste","off"); */     /* enable-bracketed-paste changes cursor positioning after printing the prompt ...
-+  rl_variable_bind("enable-bracketed-paste","off");     /* enable-bracketed-paste changes cursor positioning after printing the prompt ...
-                                                            ... causing rlwrap to overwrite it after accepting input                        */
++#if 0
+   if (rl_readline_version < 0x802)  /* in bracketed_paste_mode rl_deprep_terminal() prints BRACK_PASTE_FINI ("\033[?2004l\r") 
+                                        which moves the cursor to the beginning of the line. In pre-8.2 readline,  this doesn't
+                                        set _rl_last_c_pos to 0, which makes rl_redisplay() think that it is already past the prompt,
+                                        making it overwrite the prompt that rlwrap has already printed. cf. https://github.com/hanslub42/rlwrap/issues/168                    */
++#endif
+       rl_variable_bind("enable-bracketed-paste","off");      
   
    using_history();
