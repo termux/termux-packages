@@ -49,6 +49,15 @@ diff -uNr fossil-2.11/auto.def fossil-2.11.mod/auto.def
          set found [check-for-openssl "ssl in source tree" "$cflags $ldflags" $ssllibs]
      } else {
          if {$ssldirs in {auto ""}} {
+@@ -501,7 +499,7 @@
+       # e.g. --with-sqlite=/usr/local. Try $sq3path/lib/libsqlite3*
+       # and $sq3path/include/sqlite3.h
+       define-append CFLAGS_INCLUDE -I$sq3path/include
+-      define-append EXTRA_LDFLAGS -L$sq3path/lib -lsqlite3 -lpthread
++      define-append EXTRA_LDFLAGS -L$sq3path/lib -lsqlite3
+       # ^^^ additional -lXXX flags are conservative estimates
+       msg-result "Using -lsqlite3 from $sq3path"
+     } else {
 @@ -479,23 +445,6 @@
              cc-with [list -cflags $cflags -libs $libs] {
                  if {$tclstubs} {
