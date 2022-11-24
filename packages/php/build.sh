@@ -3,15 +3,14 @@ TERMUX_PKG_DESCRIPTION="Server-side, HTML-embedded scripting language"
 TERMUX_PKG_LICENSE="PHP-3.01"
 TERMUX_PKG_LICENSE_FILE=LICENSE
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=8.1.12
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=8.1.13
 TERMUX_PKG_SRCURL=https://github.com/php/php-src/archive/php-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=65ffd98d7203774e4dea5ead29122311936a3af0b07c5b0d500f4787344d2a0c
+TERMUX_PKG_SHA256=03e3cba9e8f3a559203cfb0145204d38cdfdbf4b674aadf8b62e548c5b937287
 # Build native php for phar to build (see pear-Makefile.frag.patch):
 TERMUX_PKG_HOSTBUILD=true
 # Build the native php without xml support as we only need phar:
 TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="--disable-libxml --disable-dom --disable-simplexml --disable-xml --disable-xmlreader --disable-xmlwriter --without-pear --disable-sqlite3 --without-libxml --without-sqlite3 --without-pdo-sqlite"
-TERMUX_PKG_DEPENDS="libc++, freetype, libandroid-glob, libandroid-support, libbz2, libcrypt, libcurl, libgd, libgmp, libiconv, liblzma, libresolv-wrapper, libsqlite, libxml2, libxslt, libzip, oniguruma, openssl, pcre2, readline, zlib, libicu, libffi, tidy, zstd"
+TERMUX_PKG_DEPENDS="libandroid-glob, libandroid-support, libbz2, libc++, libcurl, libffi, libgd, libgmp, libiconv, libicu, libresolv-wrapper, libsqlite, libxml2, libxslt, libzip, oniguruma, openssl, pcre2, readline, tidy, zlib"
 TERMUX_PKG_CONFLICTS="php-mysql, php-dev"
 TERMUX_PKG_REPLACES="php-mysql, php-dev"
 TERMUX_PKG_RM_AFTER_INSTALL="php/php/fpm"
@@ -81,6 +80,22 @@ termux_step_pre_configure() {
 	echo "perl $TERMUX_PREFIX/bin/apxs \$@" > $TERMUX_PKG_TMPDIR/apxs-wrapper.sh
 	chmod +x $TERMUX_PKG_TMPDIR/apxs-wrapper.sh
 	cat $TERMUX_PKG_TMPDIR/apxs-wrapper.sh
+
+	# Fix overlinking (unneeded DT_NEEDED entries) with libtool:
+	local wrapper_bin=$TERMUX_PKG_BUILDDIR/_wrapper/bin
+	local _cc=$(basename $CC)
+	rm -rf $wrapper_bin
+	mkdir -p $wrapper_bin
+	cat <<-EOF > $wrapper_bin/$_cc
+		#!$(command -v sh)
+		exec $(command -v $_cc) \
+			--start-no-unused-arguments \
+			-Wl,--as-needed \
+			--end-no-unused-arguments \
+			"\$@"
+	EOF
+	chmod 0700 $wrapper_bin/$_cc
+	export PATH=$wrapper_bin:$PATH
 }
 
 termux_step_post_configure() {
