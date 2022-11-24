@@ -1,10 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://packages.debian.org/sid/netcat-openbsd
 TERMUX_PKG_DESCRIPTION="TCP/IP swiss army knife. OpenBSD variant."
-TERMUX_PKG_LICENSE="BSD"
+TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.218-5
+TERMUX_PKG_VERSION=1.219-1
 TERMUX_PKG_SRCURL=https://salsa.debian.org/debian/netcat-openbsd/-/archive/debian/${TERMUX_PKG_VERSION}/netcat-openbsd-debian-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=e966b598e8af34141e9993c0434cafc83fb707f8ace900fb7c4e758889653c08
+TERMUX_PKG_SHA256=25fb463ba60d2c54f3f44ddd45d122e9a95b9cc2a2f4dfb264b5b2d0adfc9265
 TERMUX_PKG_DEPENDS="libbsd"
 TERMUX_PKG_BUILD_IN_SRC=true
 
