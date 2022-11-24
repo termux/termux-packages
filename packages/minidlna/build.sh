@@ -3,11 +3,10 @@ TERMUX_PKG_DESCRIPTION="A server software with the aim of being fully compliant 
 TERMUX_PKG_LICENSE="GPL-2.0, BSD 3-Clause"
 TERMUX_PKG_LICENSE_FILE="COPYING, LICENCE.miniupnpd"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.3.1
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_VERSION=1.3.2
 TERMUX_PKG_SRCURL=https://git.code.sf.net/p/minidlna/git.git
 TERMUX_PKG_GIT_BRANCH=v${TERMUX_PKG_VERSION//./_}
-TERMUX_PKG_DEPENDS="ffmpeg, libexif, libflac, libid3tag, libjpeg-turbo, libogg, libsqlite, libvorbis"
+TERMUX_PKG_DEPENDS="ffmpeg, libexif, libflac, libiconv, libid3tag, libjpeg-turbo, libogg, libsqlite, libvorbis"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 TERMUX_PKG_CONFFILES="etc/minidlna.conf"
