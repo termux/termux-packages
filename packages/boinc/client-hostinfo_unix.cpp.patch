@@ -1,7 +1,7 @@
 diff -uNr boinc/client/hostinfo_unix.cpp boinc.mod/client/hostinfo_unix.cpp
---- boinc/client/hostinfo_unix.cpp	2022-07-18 18:32:21.000000000 +0800
-+++ boinc.mod/client/hostinfo_unix.cpp	2022-09-11 21:07:05.211844109 +0800
-@@ -169,6 +169,10 @@
+--- boinc/client/hostinfo_unix.cpp	2022-11-09 18:26:42.000000000 +0800
++++ boinc.mod/client/hostinfo_unix.cpp	2022-11-18 14:59:05.689992523 +0800
+@@ -169,6 +169,16 @@
  #include <OS.h>
  #endif
  
@@ -9,10 +9,16 @@ diff -uNr boinc/client/hostinfo_unix.cpp boinc.mod/client/hostinfo_unix.cpp
 +#include <sys/system_properties.h> // PROP_VALUE_MAX
 +#endif
 +
++#ifdef __TERMUX__
++#ifndef TERMUX_PKG_ANDROID_VERSION
++#define TERMUX_PKG_ANDROID_VERSION "7.0"
++#endif
++#endif
++
  // Some OS define _SC_PAGE_SIZE instead of _SC_PAGESIZE
  #if defined(_SC_PAGE_SIZE) && !defined(_SC_PAGESIZE)
  #define _SC_PAGESIZE _SC_PAGE_SIZE
-@@ -1536,12 +1540,21 @@
+@@ -1536,12 +1546,21 @@
  #if HAVE_SYS_UTSNAME_H
      struct utsname u;
      uname(&u);
@@ -37,7 +43,7 @@ diff -uNr boinc/client/hostinfo_unix.cpp boinc.mod/client/hostinfo_unix.cpp
      safe_strcpy(os_version, u.version);
  #elif defined(__HAIKU__)
      snprintf(os_version, sizeof(os_version), "%s, %s", u.release, u.version);
-@@ -1698,7 +1711,7 @@
+@@ -1698,7 +1717,7 @@
          return false;
      }
  } tty_patterns[] = {
