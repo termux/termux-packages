@@ -1,0 +1,14 @@
+--- ./src/src/xlibi18n/lcWrap.c_old     2022-11-25 16:12:21.465706672 +0100
++++ ./src/src/xlibi18n/lcWrap.c 2022-11-25 16:13:51.121706638 +0100
+@@ -96,7 +96,11 @@
+ Bool
+ XSupportsLocale(void)
+ {
++#ifdef __ANDROID__
++    return 1==1;
++#else
+     return _XlcCurrentLC() != (XLCd)NULL;
++#endif
+ }
+ 
+ Bool _XlcValidModSyntax(
