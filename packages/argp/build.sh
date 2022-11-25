@@ -1,14 +1,15 @@
-TERMUX_PKG_HOMEPAGE=https://www.lysator.liu.se/~nisse/misc/
+TERMUX_PKG_HOMEPAGE=https://github.com/argp-standalone/argp-standalone
 TERMUX_PKG_DESCRIPTION="Standalone version of arguments parsing functions from GLIBC"
-TERMUX_PKG_LICENSE="LGPL-2.0"
+TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.3
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SRCURL=https://distfiles.macports.org/argp-standalone/argp-standalone-$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=dec79694da1319acd2238ce95df57f3680fea2482096e483323fddf3d818d8be
-TERMUX_PKG_NO_STATICSPLIT=true
+TERMUX_PKG_VERSION=1.5.0
+TERMUX_PKG_SRCURL=https://github.com/argp-standalone/argp-standalone/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=c29eae929dfebd575c38174f2c8c315766092cec99a8f987569d0cad3c6d64f6
+
+termux_step_pre_configure() {
+	autoreconf -fi
+}
 
 termux_step_post_make_install() {
-	cp libargp.a $TERMUX_PREFIX/lib
-	cp $TERMUX_PKG_SRCDIR/argp.h $TERMUX_PREFIX/include
+	install -Dm600 $TERMUX_PKG_SRCDIR/argp.h $TERMUX_PREFIX/include
 }
