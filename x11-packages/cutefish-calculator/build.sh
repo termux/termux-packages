@@ -1,0 +1,11 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/cutefishos/calculator
+TERMUX_PKG_DESCRIPTION="CutefishOS Calculator"
+TERMUX_PKG_LICENSE="GPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=0.4
+TERMUX_PKG_SRCURL=https://github.com/cutefishos/calculator/archive/${TERMUX_PKG_VERSION}/cutefish-calculator-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=6c50f80545c4d96f1632541da53cd030e353237177f3de8b014a5d3d469102da
+TERMUX_PKG_DEPENDS="fishui"
+TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules, qt5-qttools, qt5-qtbase-cross-tools"
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_CMAKE_BUILD="Unix Makefiles"
