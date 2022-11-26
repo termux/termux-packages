@@ -4,11 +4,11 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 # It cannot be simply updated to the 2.0 series, for which the build system is
 # pretty much different from that for 1.x.
-_GIT_BRANCH=1.8
-TERMUX_PKG_VERSION=${_GIT_BRANCH}.10
-_COMMIT=688e697c51fd5353725da078555adbeff0363d01
+_GIT_BRANCH=1.10
+TERMUX_PKG_VERSION=${_GIT_BRANCH}.0
+_COMMIT=39b4ee5fa080d21c3a3b8df37ba7c1fbb84a9440
 TERMUX_PKG_SRCURL=https://github.com/influxdata/influxdb/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=4f53c61f548bab7cb805af0d02586263d9a348dc18baf90efb142b029e2e7097
+TERMUX_PKG_SHA256=2efe515ba55e4fee18a994902bb3de242f0d498e3662e6cec1548c7f700d8278
 TERMUX_PKG_BUILD_IN_SRC=true
 _GO_LDFLAGS="
 -X main.version=${TERMUX_PKG_VERSION}
