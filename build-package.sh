@@ -209,10 +209,6 @@ source "$TERMUX_SCRIPTDIR/scripts/build/toolchain/termux_setup_toolchain_23c.sh"
 # shellcheck source=scripts/build/termux_step_setup_toolchain.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_setup_toolchain.sh"
 
-# Setup a standalone toolchain with GNU Assembler (GAS). Can be called from build.sh.
-# shellcheck source=scripts/build/toolchain/termux_setup_gnu_as_23c.sh
-source "$TERMUX_SCRIPTDIR/scripts/build/toolchain/termux_setup_gnu_as_23c.sh"
-
 # Apply all *.patch files for the package. Not to be overridden by packages.
 # shellcheck source=scripts/build/termux_step_patch_package.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_patch_package.sh"
