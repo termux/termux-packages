@@ -88,7 +88,7 @@ tar xf "qtbase-everywhere-opensource-src-${TERMUX_PKG_VERSION}.tar.xz"
 
 cd "qtbase-everywhere-src-${TERMUX_PKG_VERSION}" && {
     ## Patch the source
-    for i in `ls ../*.patch`; do
+    for i in `ls ../../qt5-qtbase/*.patch`; do
         patch -p1 -Ni "${i}"
     done
     unset i
