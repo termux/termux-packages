@@ -1,7 +1,25 @@
-diff '--color=auto' -uNr node-v16.14.2.orig/lib/os.js node-v16.14.2/lib/os.js
---- node-v16.14.2.orig/lib/os.js	2022-03-18 15:06:23.831091188 +0530
-+++ node-v16.14.2/lib/os.js	2022-03-18 15:08:46.251091133 +0530
-@@ -183,7 +183,7 @@
+--- ./lib/os.js.orig	2022-05-21 13:09:26.332384353 +0530
++++ ./lib/os.js	2022-05-21 13:10:15.732384334 +0530
+@@ -45,6 +45,7 @@
+ const { validateInt32 } = require('internal/validators');
+ 
+ const {
++  getNumCPUs,
+   getCPUs,
+   getFreeMem,
+   getHomeDirectory: _getHomeDirectory,
+@@ -114,6 +115,10 @@
+   return [avgValues[0], avgValues[1], avgValues[2]];
+ }
+ 
++function numcpus() {
++  return getNumCPUs();
++}
++
+ /**
+  * Returns an array of objects containing information about each
+  * logical CPU core.
+@@ -183,7 +188,7 @@
      path = safeGetenv('TMPDIR') ||
             safeGetenv('TMP') ||
             safeGetenv('TEMP') ||
@@ -10,3 +28,11 @@ diff '--color=auto' -uNr node-v16.14.2.orig/lib/os.js node-v16.14.2/lib/os.js
      if (path.length > 1 && StringPrototypeEndsWith(path, '/'))
        path = StringPrototypeSlice(path, 0, -1);
    }
+@@ -351,6 +356,7 @@
+ 
+ module.exports = {
+   arch,
++  numcpus,
+   cpus,
+   endianness,
+   freemem: getFreeMem,
