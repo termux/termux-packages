@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/wasmerio/wasmer
 TERMUX_PKG_DESCRIPTION="A fast and secure WebAssembly runtime"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.3.0
-TERMUX_PKG_SRCURL=https://github.com/wasmerio/wasmer/archive/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=b27d12494191a5fe4a77b2cce085b6005f2bf6285ede6c86601a3062c6135782
+TERMUX_PKG_VERSION=3.0.1
+TERMUX_PKG_SRCURL=https://github.com/wasmerio/wasmer/archive/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=a04a8b32890523e39b6fa3df170248db437a3067382847b8a2e5626bc6425fac
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_NO_STATICSPLIT=true
 
@@ -42,7 +42,7 @@ termux_step_make() {
 			--manifest-path lib/cli/Cargo.toml \
 			--bin wasmer \
 			--no-default-features \
-			--features wat,wast,universal,dylib,staticlib,cache,wasi,emscripten,cranelift,singlepass
+			--features wat,wast,cache,wasi,emscripten,cranelift,singlepass
 	else
 		cargo build \
 			--jobs "$TERMUX_MAKE_PROCESSES" \
@@ -51,7 +51,7 @@ termux_step_make() {
 			--manifest-path lib/cli/Cargo.toml \
 			--bin wasmer \
 			--no-default-features \
-			--features wat,wast,universal,dylib,staticlib,cache,wasi,emscripten,cranelift
+			--features wat,wast,cache,wasi,emscripten,cranelift
 	fi
 
 	# make build-capi
@@ -62,7 +62,7 @@ termux_step_make() {
 			--release \
 			--manifest-path lib/c-api/Cargo.toml \
 			--no-default-features \
-			--features wat,universal,dylib,staticlib,wasi,middlewares,cranelift,singlepass
+			--features wat,wasi,middlewares,cranelift,singlepass
 	else
 		cargo build \
 			--jobs "$TERMUX_MAKE_PROCESSES" \
@@ -70,7 +70,7 @@ termux_step_make() {
 			--release \
 			--manifest-path lib/c-api/Cargo.toml \
 			--no-default-features \
-			--features wat,universal,dylib,staticlib,wasi,middlewares,cranelift
+			--features wat,wasi,middlewares,cranelift
 	fi
 
 	# make build-wapm
