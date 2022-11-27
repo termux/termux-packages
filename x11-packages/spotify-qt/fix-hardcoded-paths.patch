@@ -1,0 +1,49 @@
+diff '--color=auto' -uNr spotify-qt-3.9/lib/thirdparty/include/thirdparty/filesystem.hpp spotify-qt-3.9.mod/lib/thirdparty/include/thirdparty/filesystem.hpp
+--- spotify-qt-3.9/lib/thirdparty/include/thirdparty/filesystem.hpp	2022-07-13 01:07:50.000000000 +0530
++++ spotify-qt-3.9.mod/lib/thirdparty/include/thirdparty/filesystem.hpp	2022-11-27 23:47:28.774600094 +0530
+@@ -5069,7 +5069,7 @@
+             return path(temp_path);
+         }
+     }
+-    return path("/tmp");
++    return path("@TERMUX_PREFIX@/tmp");
+ #endif
+ }
+ 
+diff '--color=auto' -uNr spotify-qt-3.9/src/spotifyclient/helper.cpp spotify-qt-3.9.mod/src/spotifyclient/helper.cpp
+--- spotify-qt-3.9/src/spotifyclient/helper.cpp	2022-07-13 01:07:50.000000000 +0530
++++ spotify-qt-3.9.mod/src/spotifyclient/helper.cpp	2022-11-27 23:42:38.296679095 +0530
+@@ -131,13 +131,13 @@
+ 
+ auto SpotifyClient::Helper::running(const QString &path) -> bool
+ {
+-	if (path.isEmpty() || !QFile("/usr/bin/ps").exists())
++	if (path.isEmpty() || !QFile("@TERMUX_PREFIX@/bin/ps").exists())
+ 	{
+ 		return false;
+ 	}
+ 
+ 	QProcess ps;
+-	ps.start("/usr/bin/ps", {"aux"});
++	ps.start("@TERMUX_PREFIX@/bin/ps", {"aux"});
+ 	ps.waitForFinished();
+ 	auto out = ps.readAllStandardOutput();
+ 	return QString(out).contains(path);
+diff '--color=auto' -uNr spotify-qt-3.9/src/util/appinstalltype.cpp spotify-qt-3.9.mod/src/util/appinstalltype.cpp
+--- spotify-qt-3.9/src/util/appinstalltype.cpp	2022-07-13 01:07:50.000000000 +0530
++++ spotify-qt-3.9.mod/src/util/appinstalltype.cpp	2022-11-27 23:43:59.700634507 +0530
+@@ -30,12 +30,12 @@
+ 
+ auto AppInstallType::getInstallType(const QString &path) -> InstallType
+ {
+-	if (path.startsWith(QStringLiteral("/home/")))
++	if (path.startsWith(QStringLiteral("@TERMUX_HOME@/")))
+ 	{
+ 		return InstallType::User;
+ 	}
+ 
+-	if (path.startsWith(QStringLiteral("/usr/")))
++	if (path.startsWith(QStringLiteral("@TERMUX_PREFIX@/")))
+ 	{
+ 		return InstallType::System;
+ 	}
