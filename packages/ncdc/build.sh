@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://dev.yorhel.nl/ncdc
 TERMUX_PKG_DESCRIPTION="Modern and lightweight direct connect client with a friendly ncurses interface"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.23
+TERMUX_PKG_VERSION=1.23.1
 TERMUX_PKG_SRCURL=https://dev.yorhel.nl/download/ncdc-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=804abae41fcca969e87f650483ae7e3a237419dabbd320897e25fe8851f0a2cb
+TERMUX_PKG_SHA256=95881214077a5b3c24fbbaf020ada0d084ee3b596a7c3cc1e0e68aaac4c9b5e6
 TERMUX_PKG_DEPENDS="glib, libbz2, libgnutls, libsqlite, ncurses, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 
