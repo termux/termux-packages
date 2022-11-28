@@ -1,0 +1,119 @@
+<?xml version="1.0"?>
+<dump>
+  <boxed name="ClutterGstFrame" get-type="clutter_gst_frame_get_type"/>
+  <boxed name="ClutterGstBox" get-type="clutter_gst_box_get_type"/>
+  <boxed name="ClutterGstOverlay" get-type="clutter_gst_overlay_get_type"/>
+  <boxed name="ClutterGstOverlays" get-type="clutter_gst_overlays_get_type"/>
+  <class name="ClutterGstCameraDevice" get-type="clutter_gst_camera_device_get_type" parents="GObject">
+    <property name="element-factory" type="GstElementFactory" flags="235"/>
+    <property name="node" type="gchararray" flags="235"/>
+    <property name="name" type="gchararray" flags="235"/>
+    <signal name="capture-resolution-changed" return="void" when="last">
+      <param type="gint"/>
+      <param type="gint"/>
+    </signal>
+  </class>
+  <class name="ClutterGstCamera" get-type="clutter_gst_camera_get_type" parents="GObject">
+    <implements name="ClutterGstPlayer"/>
+    <property name="device" type="ClutterGstCameraDevice" flags="227"/>
+    <signal name="ready-for-capture" return="void" when="last">
+      <param type="gboolean"/>
+    </signal>
+    <signal name="photo-saved" return="void" when="last" action="1">
+    </signal>
+    <signal name="photo-taken" return="void" when="last" action="1">
+      <param type="GdkPixbuf"/>
+    </signal>
+    <signal name="video-saved" return="void" when="last" action="1">
+    </signal>
+  </class>
+  <class name="ClutterGstCameraManager" get-type="clutter_gst_camera_manager_get_type" parents="GObject">
+    <signal name="camera-added" return="void" when="last">
+      <param type="ClutterGstCameraDevice"/>
+    </signal>
+    <signal name="camera-removed" return="void" when="last">
+      <param type="ClutterGstCameraDevice"/>
+    </signal>
+  </class>
+  <class name="ClutterGstPlayback" get-type="clutter_gst_playback_get_type" parents="GObject">
+    <implements name="ClutterGstPlayer"/>
+    <property name="uri" type="gchararray" flags="227"/>
+    <property name="progress" type="gdouble" flags="227"/>
+    <property name="subtitle-uri" type="gchararray" flags="227"/>
+    <property name="subtitle-font-name" type="gchararray" flags="227"/>
+    <property name="can-seek" type="gboolean" flags="225"/>
+    <property name="buffer-fill" type="gdouble" flags="225"/>
+    <property name="duration" type="gdouble" flags="225"/>
+    <property name="user-agent" type="gchararray" flags="227"/>
+    <property name="seek-flags" type="ClutterGstSeekFlags" flags="227"/>
+    <property name="audio-streams" type="gpointer" flags="225"/>
+    <property name="audio-stream" type="gint" flags="227"/>
+    <property name="subtitle-tracks" type="gpointer" flags="225"/>
+    <property name="subtitle-track" type="gint" flags="227"/>
+    <property name="in-seek" type="gboolean" flags="225"/>
+    <signal name="should-buffer" return="gboolean" when="last">
+      <param type="GstQuery"/>
+    </signal>
+  </class>
+  <class name="ClutterGstVideoSink" get-type="clutter_gst_video_sink_get_type" parents="GstVideoSink,GstBaseSink,GstElement,GstObject,GInitiallyUnowned,GObject">
+    <implements name="GstColorBalance"/>
+    <implements name="GstNavigation"/>
+    <property name="update-priority" type="gint" flags="227"/>
+    <signal name="new-frame" return="void" when="last">
+    </signal>
+    <signal name="pipeline-ready" return="void" when="last">
+    </signal>
+    <signal name="new-overlays" return="void" when="last">
+    </signal>
+  </class>
+  <interface name="ClutterGstPlayer" get-type="clutter_gst_player_get_type">
+    <property name="audio-volume" type="gdouble" flags="227"/>
+    <property name="idle" type="gboolean" flags="225"/>
+    <property name="playing" type="gboolean" flags="227"/>
+    <signal name="ready" return="void" when="last">
+    </signal>
+    <signal name="eos" return="void" when="last">
+    </signal>
+    <signal name="error" return="void" when="last">
+      <param type="GError"/>
+    </signal>
+    <signal name="new-frame" return="void" when="last">
+      <param type="ClutterGstFrame"/>
+    </signal>
+    <signal name="size-change" return="void" when="last">
+      <param type="gint"/>
+      <param type="gint"/>
+    </signal>
+  </interface>
+  <class name="ClutterGstContent" get-type="clutter_gst_content_get_type" parents="GObject">
+    <implements name="ClutterContent"/>
+    <property name="frame" type="ClutterGstFrame" flags="227"/>
+    <property name="sink" type="ClutterGstVideoSink" flags="227"/>
+    <property name="player" type="GObject" flags="227"/>
+    <property name="paint-frame" type="gboolean" flags="227"/>
+    <property name="paint-overlays" type="gboolean" flags="227"/>
+    <signal name="size-change" return="void" when="last">
+      <param type="gint"/>
+      <param type="gint"/>
+    </signal>
+  </class>
+  <class name="ClutterGstAspectratio" get-type="clutter_gst_aspectratio_get_type" parents="ClutterGstContent,GObject">
+    <implements name="ClutterContent"/>
+    <property name="paint-borders" type="gboolean" flags="227"/>
+    <property name="fill-allocation" type="gboolean" flags="227"/>
+  </class>
+  <class name="ClutterGstCrop" get-type="clutter_gst_crop_get_type" parents="ClutterGstContent,GObject">
+    <implements name="ClutterContent"/>
+    <property name="paint-borders" type="gboolean" flags="227"/>
+    <property name="cull-backface" type="gboolean" flags="227"/>
+    <property name="input-region" type="ClutterGstBox" flags="227"/>
+    <property name="output-region" type="ClutterGstBox" flags="227"/>
+  </class>
+  <flags name="ClutterGstSeekFlags" get-type="clutter_gst_seek_flags_get_type">
+    <member name="CLUTTER_GST_SEEK_FLAG_NONE" nick="none" value="0"/>
+    <member name="CLUTTER_GST_SEEK_FLAG_ACCURATE" nick="accurate" value="1"/>
+  </flags>
+  <enum name="ClutterGstBufferingMode" get-type="clutter_gst_buffering_mode_get_type">
+    <member name="CLUTTER_GST_BUFFERING_MODE_STREAM" nick="stream" value="0"/>
+    <member name="CLUTTER_GST_BUFFERING_MODE_DOWNLOAD" nick="download" value="1"/>
+  </enum></dump>
