@@ -2,33 +2,25 @@ similar to https://www.gnu.org/software/gnutls/clang/report-NwyD8A.html
 
 --- argp-standalone-1.3/argp-help.c	2003-12-11 14:07:05.000000000 +0530
 +++ argp-standalone-1.3-patch/argp-help.c	2021-08-30 20:06:23.807999907 +0530
-@@ -726,15 +726,20 @@
- canon_doc_option (const char **name)
+@@ -731,6 +731,11 @@
+ canon_doc_option(const char** name)
  {
-   int non_opt;
--  /* Skip initial whitespace.  */
--  while (isspace ( (unsigned char) **name))
--    (*name)++;
--  /* Decide whether this looks like an option (leading `-') or not.  */
--  non_opt = (**name != '-');
--  /* Skip until part of name used for sorting.  */
--  while (**name && !isalnum ( (unsigned char) **name))
--    (*name)++;
--  return non_opt;
-+
-+  if(!*name)
-+    non_opt = 1;
-+  else {
-+    /* Skip initial whitespace.  */
-+    while (isspace ( (unsigned char) **name))
-+      (*name)++;
-+    /* Decide whether this looks like an option (leading `-') or not.  */
-+    non_opt = (**name != '-');
-+    /* Skip until part of name used for sorting.  */
-+    while (**name && !isalnum ( (unsigned char) **name))
-+      (*name)++;
-+    return non_opt;
-+  }
+     int non_opt;
++#if 1
++    if (!*name)
++        non_opt = 1;
++    else {
++#endif
+     /* Skip initial whitespace.  */
+     while (isspace(**name))
+         (*name)++;
+@@ -739,6 +744,9 @@
+     /* Skip until part of name used for sorting.  */
+     while (**name && !isalnum(**name))
+         (*name)++;
++#if 1
++    }
++#endif
+     return non_opt;
  }
  
- /* Order ENTRY1 & ENTRY2 by the order which they should appear in a help

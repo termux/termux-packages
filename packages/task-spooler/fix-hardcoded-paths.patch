@@ -1,0 +1,110 @@
+--- a/env.c
++++ b/env.c
+@@ -40,8 +40,8 @@
+             if (p[1] != 1 && p[1] != 2)
+                 close(p[1]);
+             close(p[0]);
+-            execlp("/bin/sh", "/bin/sh", "-c", command, (char*)NULL);
+-            error("/bin/sh exec error");
++            execlp("@TERMUX_PREFIX@/bin/sh", "@TERMUX_PREFIX@/bin/sh", "-c", command, (char*)NULL);
++            error("@TERMUX_PREFIX@/bin/sh exec error");
+         case -1:
+             error("Fork error");
+         default:
+--- a/execute.c
++++ b/execute.c
+@@ -163,7 +163,7 @@
+         char *outfname_full;
+ 
+         if (tmpdir == NULL)
+-            tmpdir = "/tmp";
++            tmpdir = "@TERMUX_PREFIX@/tmp";
+         lname = strlen(tmpdir) + strlen(outfname) + 1 /* \0 */;
+ 
+         outfname_full = (char *)malloc(lname);
+--- a/list.c
++++ b/list.c
+@@ -19,7 +19,7 @@
+     char * line;
+ 
+     line = malloc(600);
+-    snprintf(line, 600, "#!/bin/sh\n# - task spooler (ts) job dump\n"
++    snprintf(line, 600, "#!@TERMUX_PREFIX@/bin/sh\n# - task spooler (ts) job dump\n"
+             "# This file has been created because a SIGTERM killed\n"
+             "# your queue server.\n"
+             "# The finished commands are listed first.\n"
+--- a/mail.c
++++ b/mail.c
+@@ -36,7 +36,7 @@
+             close(2);
+ 	    close(p[1]);
+             dup2(p[0], 0);
+-            execl("/usr/sbin/sendmail", "sendmail", "-oi", dest, NULL);
++            execl("@TERMUX_PREFIX@/bin/sendmail", "sendmail", "-oi", dest, NULL);
+             error("run sendmail");
+         case -1:
+             error("fork sendmail");
+--- a/server_start.c
++++ b/server_start.c
+@@ -51,7 +51,7 @@
+     /* Create the path */
+     tmpdir = getenv("TMPDIR");
+     if (tmpdir == NULL)
+-        tmpdir = "/tmp";
++        tmpdir = "@TERMUX_PREFIX@/tmp";
+ 
+     sprintf(userid, "%u", (unsigned int) getuid());
+ 
+--- a/ts.1
++++ b/ts.1
+@@ -70,7 +70,7 @@
+ , or to the
+ .B $USER
+ using
+-.B /usr/sbin/sendmail.
++.B @TERMUX_PREFIX@/bin/sendmail.
+ Look at
+ .B ENVIRONMENT.
+ .TP
+@@ -237,7 +237,7 @@
+ temporary directory, 
+ .B TMPDIR
+ will be used if defined, or
+-.B /tmp
++.B @TERMUX_PREFIX@/tmp
+ otherwise.
+ .TP
+ .B "TS_SOCKET"
+@@ -261,7 +261,7 @@
+ or if not defined,
+ .B nobody.
+ The system
+-.B /usr/sbin/sendmail
++.B @TERMUX_PREFIX@/bin/sendmail
+ is used. The
+ job outputs are not sent as an attachment, so understand the consequences if you
+ use the
+@@ -281,12 +281,12 @@
+ .TP
+ .B "TS_ENV"
+ This has a command to be run at enqueue time through
+-\fB/bin/sh\fR. The output of the command will be readable through the option
++\fB@TERMUX_PREFIX@/bin/sh\fR. The output of the command will be readable through the option
+ \fB\-i\fR. You can use a command which shows relevant environment for the command run.
+ For example, you may use \fBTS_ENV='pwd;set;mount'\fR.
+ .SH FILES
+ .TP
+-.B /tmp/ts.error
++.B @TERMUX_PREFIX@/tmp/ts.error
+ if
+ .B ts
+ finds any internal problem, you should find an error report there.
+@@ -304,7 +304,7 @@
+ in order to set redirections to the command run.
+ 
+ If an internal problem is found in runtime, a file
+-.B /tmp/ts.error
++.B @TERMUX_PREFIX@/tmp/ts.error
+ is created, which you can submit to the developer in order to fix the bug.
+ 
+ .SH SEE ALSO

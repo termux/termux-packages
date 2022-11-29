@@ -13,29 +13,35 @@
  
  # Use libkmod to resolve kernel modules on Linux (yes/no, default: detect)
  LIBKMOD=
-@@ -32,8 +32,8 @@
- ABI_VERSION=.3
+@@ -32,9 +32,9 @@
+ ABI_VERSION=3
  
  # Installation directories
 -PREFIX=/usr/local
--SBINDIR=$(PREFIX)/sbin
 +PREFIX?=/usr/local
+ BINDIR=$(PREFIX)/bin
+-SBINDIR=$(PREFIX)/sbin
 +SBINDIR=$(PREFIX)/bin
  SHAREDIR=$(PREFIX)/share
  IDSDIR=$(SHAREDIR)
  MANDIR:=$(shell if [ -d $(PREFIX)/share/man ] ; then echo $(PREFIX)/share/man ; else echo $(PREFIX)/man ; fi)
-@@ -44,10 +44,10 @@
+@@ -45,14 +45,14 @@
  # Commands
  INSTALL=install
  DIRINSTALL=install -d
 -STRIP=-s
++STRIP=
+ ifdef CROSS_COMPILE
 -CC=$(CROSS_COMPILE)gcc
++CC?=$(CROSS_COMPILE)gcc
+ else
+-CC=cc
++CC?=cc
+ endif
 -AR=$(CROSS_COMPILE)ar
 -RANLIB=$(CROSS_COMPILE)ranlib
-+STRIP=
-+CC?=$(CROSS_COMPILE)gcc
 +AR?=$(CROSS_COMPILE)ar
 +RANLIB?=$(CROSS_COMPILE)ranlib
+ DLLTOOL=$(CROSS_COMPILE)dlltool
+ WINDRES=$(CROSS_COMPILE)windres
  
- # Base name of the library (overriden on NetBSD, which has its own libpci)
- LIBNAME=libpci

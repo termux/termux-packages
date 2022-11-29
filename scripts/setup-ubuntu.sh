@@ -50,6 +50,7 @@ PACKAGES+=" pandoc"
 PACKAGES+=" python3-docutils"
 PACKAGES+=" python3-recommonmark"
 PACKAGES+=" python3-sphinx"
+PACKAGES+=" python3-sphinx-rtd-theme"
 PACKAGES+=" python3-sphinxcontrib.qthelp"
 PACKAGES+=" scdoc"
 PACKAGES+=" texinfo"
@@ -105,6 +106,9 @@ PACKAGES+=" librsvg2-dev"
 
 # Needed by package news-flash-gtk.
 PACKAGES+=" libsqlite3-dev"
+
+# Needed by package fennel.
+PACKAGES+=" lua5.3"
 
 # Needed by package vlc.
 PACKAGES+=" lua5.2"

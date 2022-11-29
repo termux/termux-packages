@@ -1,0 +1,1362 @@
+<?xml version="1.0"?>
+<dump>
+  <boxed name="ClutterPoint" get-type="clutter_point_get_type"/>
+  <boxed name="ClutterSize" get-type="clutter_size_get_type"/>
+  <boxed name="ClutterRect" get-type="clutter_rect_get_type"/>
+  <boxed name="ClutterVertex" get-type="clutter_vertex_get_type"/>
+  <boxed name="ClutterActorBox" get-type="clutter_actor_box_get_type"/>
+  <boxed name="ClutterGeometry" get-type="clutter_geometry_get_type"/>
+  <boxed name="ClutterKnot" get-type="clutter_knot_get_type"/>
+  <boxed name="ClutterPathNode" get-type="clutter_path_node_get_type"/>
+  <boxed name="ClutterPaintVolume" get-type="clutter_paint_volume_get_type"/>
+  <boxed name="ClutterMargin" get-type="clutter_margin_get_type"/>
+  <boxed name="ClutterMatrix" get-type="clutter_matrix_get_type"/>
+  <class name="ClutterActorMeta" get-type="clutter_actor_meta_get_type" parents="GInitiallyUnowned,GObject" abstract="1">
+    <property name="actor" type="ClutterActor" flags="225"/>
+    <property name="name" type="gchararray" flags="227"/>
+    <property name="enabled" type="gboolean" flags="227"/>
+  </class>
+  <class name="ClutterAction" get-type="clutter_action_get_type" parents="ClutterActorMeta,GInitiallyUnowned,GObject" abstract="1">
+  </class>
+  <class name="ClutterInputDevice" get-type="clutter_input_device_get_type" parents="GObject">
+    <property name="backend" type="ClutterBackend" flags="235"/>
+    <property name="id" type="gint" flags="235"/>
+    <property name="name" type="gchararray" flags="235"/>
+    <property name="device-type" type="ClutterInputDeviceType" flags="235"/>
+    <property name="device-manager" type="ClutterDeviceManager" flags="235"/>
+    <property name="device-mode" type="ClutterInputMode" flags="235"/>
+    <property name="has-cursor" type="gboolean" flags="235"/>
+    <property name="enabled" type="gboolean" flags="227"/>
+    <property name="n-axes" type="guint" flags="225"/>
+    <property name="vendor-id" type="gchararray" flags="235"/>
+    <property name="product-id" type="gchararray" flags="235"/>
+  </class>
+  <boxed name="ClutterEvent" get-type="clutter_event_get_type"/>
+  <boxed name="ClutterEventSequence" get-type="clutter_event_sequence_get_type"/>
+  <class name="ClutterActor" get-type="clutter_actor_get_type" parents="GInitiallyUnowned,GObject">
+    <implements name="ClutterContainer"/>
+    <implements name="ClutterScriptable"/>
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+    <property name="name" type="gchararray" flags="227"/>
+    <property name="x" type="gfloat" flags="483"/>
+    <property name="y" type="gfloat" flags="483"/>
+    <property name="width" type="gfloat" flags="483"/>
+    <property name="height" type="gfloat" flags="483"/>
+    <property name="position" type="ClutterPoint" flags="483"/>
+    <property name="size" type="ClutterSize" flags="483"/>
+    <property name="fixed-x" type="gfloat" flags="227"/>
+    <property name="fixed-y" type="gfloat" flags="227"/>
+    <property name="fixed-position-set" type="gboolean" flags="227"/>
+    <property name="min-width" type="gfloat" flags="227"/>
+    <property name="min-width-set" type="gboolean" flags="227"/>
+    <property name="min-height" type="gfloat" flags="227"/>
+    <property name="min-height-set" type="gboolean" flags="227"/>
+    <property name="natural-width" type="gfloat" flags="227"/>
+    <property name="natural-width-set" type="gboolean" flags="227"/>
+    <property name="natural-height" type="gfloat" flags="227"/>
+    <property name="natural-height-set" type="gboolean" flags="227"/>
+    <property name="request-mode" type="ClutterRequestMode" flags="227"/>
+    <property name="allocation" type="ClutterActorBox" flags="481"/>
+    <property name="depth" type="gfloat" flags="-2147483165"/>
+    <property name="z-position" type="gfloat" flags="483"/>
+    <property name="clip" type="ClutterGeometry" flags="227"/>
+    <property name="clip-rect" type="ClutterRect" flags="227"/>
+    <property name="has-clip" type="gboolean" flags="225"/>
+    <property name="clip-to-allocation" type="gboolean" flags="227"/>
+    <property name="opacity" type="guint" flags="483"/>
+    <property name="offscreen-redirect" type="ClutterOffscreenRedirect" flags="227"/>
+    <property name="visible" type="gboolean" flags="227"/>
+    <property name="mapped" type="gboolean" flags="225"/>
+    <property name="realized" type="gboolean" flags="225"/>
+    <property name="reactive" type="gboolean" flags="227"/>
+    <property name="pivot-point" type="ClutterPoint" flags="483"/>
+    <property name="pivot-point-z" type="gfloat" flags="483"/>
+    <property name="scale-x" type="gdouble" flags="483"/>
+    <property name="scale-y" type="gdouble" flags="483"/>
+    <property name="scale-z" type="gdouble" flags="483"/>
+    <property name="scale-center-x" type="gfloat" flags="-2147483421"/>
+    <property name="scale-center-y" type="gfloat" flags="-2147483421"/>
+    <property name="scale-gravity" type="ClutterGravity" flags="-2147483421"/>
+    <property name="rotation-angle-x" type="gdouble" flags="483"/>
+    <property name="rotation-angle-y" type="gdouble" flags="483"/>
+    <property name="rotation-angle-z" type="gdouble" flags="483"/>
+    <property name="rotation-center-x" type="ClutterVertex" flags="-2147483421"/>
+    <property name="rotation-center-y" type="ClutterVertex" flags="-2147483421"/>
+    <property name="rotation-center-z" type="ClutterVertex" flags="-2147483421"/>
+    <property name="rotation-center-z-gravity" type="ClutterGravity" flags="-2147483421"/>
+    <property name="anchor-x" type="gfloat" flags="-2147483421"/>
+    <property name="anchor-y" type="gfloat" flags="-2147483421"/>
+    <property name="anchor-gravity" type="ClutterGravity" flags="-2147483421"/>
+    <property name="translation-x" type="gfloat" flags="483"/>
+    <property name="translation-y" type="gfloat" flags="483"/>
+    <property name="translation-z" type="gfloat" flags="483"/>
+    <property name="transform" type="ClutterMatrix" flags="483"/>
+    <property name="transform-set" type="gboolean" flags="225"/>
+    <property name="child-transform" type="ClutterMatrix" flags="483"/>
+    <property name="child-transform-set" type="gboolean" flags="225"/>
+    <property name="show-on-set-parent" type="gboolean" flags="227"/>
+    <property name="text-direction" type="ClutterTextDirection" flags="227"/>
+    <property name="has-pointer" type="gboolean" flags="225"/>
+    <property name="actions" type="ClutterAction" flags="226"/>
+    <property name="constraints" type="ClutterConstraint" flags="226"/>
+    <property name="effect" type="ClutterEffect" flags="226"/>
+    <property name="layout-manager" type="ClutterLayoutManager" flags="227"/>
+    <property name="x-expand" type="gboolean" flags="227"/>
+    <property name="y-expand" type="gboolean" flags="227"/>
+    <property name="x-align" type="ClutterActorAlign" flags="227"/>
+    <property name="y-align" type="ClutterActorAlign" flags="227"/>
+    <property name="margin-top" type="gfloat" flags="483"/>
+    <property name="margin-bottom" type="gfloat" flags="483"/>
+    <property name="margin-left" type="gfloat" flags="483"/>
+    <property name="margin-right" type="gfloat" flags="483"/>
+    <property name="background-color" type="ClutterColor" flags="483"/>
+    <property name="background-color-set" type="gboolean" flags="225"/>
+    <property name="first-child" type="ClutterActor" flags="225"/>
+    <property name="last-child" type="ClutterActor" flags="225"/>
+    <property name="content" type="ClutterContent" flags="227"/>
+    <property name="content-gravity" type="ClutterContentGravity" flags="227"/>
+    <property name="content-box" type="ClutterActorBox" flags="481"/>
+    <property name="minification-filter" type="ClutterScalingFilter" flags="227"/>
+    <property name="magnification-filter" type="ClutterScalingFilter" flags="227"/>
+    <property name="content-repeat" type="ClutterContentRepeat" flags="227"/>
+    <signal name="destroy" return="void" when="cleanup" no-recurse="1" no-hooks="1">
+    </signal>
+    <signal name="show" return="void" when="first">
+    </signal>
+    <signal name="hide" return="void" when="first">
+    </signal>
+    <signal name="parent-set" return="void" when="last">
+      <param type="ClutterActor"/>
+    </signal>
+    <signal name="queue-redraw" return="void" when="last" no-hooks="1">
+      <param type="ClutterActor"/>
+    </signal>
+    <signal name="queue-relayout" return="void" when="last" no-hooks="1">
+    </signal>
+    <signal name="event" return="gboolean" when="last">
+      <param type="ClutterEvent"/>
+    </signal>
+    <signal name="button-press-event" return="gboolean" when="last">
+      <param type="ClutterEvent"/>
+    </signal>
+    <signal name="button-release-event" return="gboolean" when="last">
+      <param type="ClutterEvent"/>
+    </signal>
+    <signal name="scroll-event" return="gboolean" when="last">
+      <param type="ClutterEvent"/>
+    </signal>
+    <signal name="key-press-event" return="gboolean" when="last">
+      <param type="ClutterEvent"/>
+    </signal>
+    <signal name="key-release-event" return="gboolean" when="last">
+      <param type="ClutterEvent"/>
+    </signal>
+    <signal name="motion-event" return="gboolean" when="last">
+      <param type="ClutterEvent"/>
+    </signal>
+    <signal name="key-focus-in" return="void" when="last">
+    </signal>
+    <signal name="key-focus-out" return="void" when="last">
+    </signal>
+    <signal name="enter-event" return="gboolean" when="last">
+      <param type="ClutterEvent"/>
+    </signal>
+    <signal name="leave-event" return="gboolean" when="last">
+      <param type="ClutterEvent"/>
+    </signal>
+    <signal name="captured-event" return="gboolean" when="last">
+      <param type="ClutterEvent"/>
+    </signal>
+    <signal name="paint" return="void" when="last" no-hooks="1">
+    </signal>
+    <signal name="realize" return="void" when="last">
+    </signal>
+    <signal name="unrealize" return="void" when="last">
+    </signal>
+    <signal name="pick" return="void" when="last">
+      <param type="ClutterColor"/>
+    </signal>
+    <signal name="allocation-changed" return="void" when="last">
+      <param type="ClutterActorBox"/>
+      <param type="ClutterAllocationFlags"/>
+    </signal>
+    <signal name="transitions-completed" return="void" when="last">
+    </signal>
+    <signal name="transition-stopped" return="void" when="last" no-recurse="1" detailed="1" no-hooks="1">
+      <param type="gchararray"/>
+      <param type="gboolean"/>
+    </signal>
+    <signal name="touch-event" return="gboolean" when="last">
+      <param type="ClutterEvent"/>
+    </signal>
+  </class>
+  <class name="ClutterConstraint" get-type="clutter_constraint_get_type" parents="ClutterActorMeta,GInitiallyUnowned,GObject" abstract="1">
+  </class>
+  <class name="ClutterAlignConstraint" get-type="clutter_align_constraint_get_type" parents="ClutterConstraint,ClutterActorMeta,GInitiallyUnowned,GObject">
+    <property name="source" type="ClutterActor" flags="231"/>
+    <property name="align-axis" type="ClutterAlignAxis" flags="231"/>
+    <property name="factor" type="gfloat" flags="231"/>
+  </class>
+  <interface name="ClutterAnimatable" get-type="clutter_animatable_get_type">
+  </interface>
+  <class name="ClutterBackend" get-type="clutter_backend_get_type" parents="GObject" abstract="1">
+    <signal name="resolution-changed" return="void" when="first">
+    </signal>
+    <signal name="font-changed" return="void" when="first">
+    </signal>
+    <signal name="settings-changed" return="void" when="first">
+    </signal>
+  </class>
+  <class name="ClutterBindConstraint" get-type="clutter_bind_constraint_get_type" parents="ClutterConstraint,ClutterActorMeta,GInitiallyUnowned,GObject">
+    <property name="source" type="ClutterActor" flags="231"/>
+    <property name="coordinate" type="ClutterBindCoordinate" flags="231"/>
+    <property name="offset" type="gfloat" flags="231"/>
+  </class>
+  <class name="ClutterBindingPool" get-type="clutter_binding_pool_get_type" parents="GObject">
+    <property name="name" type="gchararray" flags="235"/>
+  </class>
+  <class name="ClutterLayoutManager" get-type="clutter_layout_manager_get_type" parents="GInitiallyUnowned,GObject" abstract="1">
+    <signal name="layout-changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="ClutterBinLayout" get-type="clutter_bin_layout_get_type" parents="ClutterLayoutManager,GInitiallyUnowned,GObject">
+    <property name="x-align" type="ClutterBinAlignment" flags="227"/>
+    <property name="y-align" type="ClutterBinAlignment" flags="227"/>
+  </class>
+  <class name="ClutterEffect" get-type="clutter_effect_get_type" parents="ClutterActorMeta,GInitiallyUnowned,GObject" abstract="1">
+  </class>
+  <class name="ClutterBlurEffect" get-type="clutter_blur_effect_get_type" parents="ClutterOffscreenEffect,ClutterEffect,ClutterActorMeta,GInitiallyUnowned,GObject">
+  </class>
+  <class name="ClutterBoxLayout" get-type="clutter_box_layout_get_type" parents="ClutterLayoutManager,GInitiallyUnowned,GObject">
+    <property name="spacing" type="guint" flags="227"/>
+    <property name="vertical" type="gboolean" flags="-2147483421"/>
+    <property name="homogeneous" type="gboolean" flags="227"/>
+    <property name="pack-start" type="gboolean" flags="227"/>
+    <property name="use-animations" type="gboolean" flags="227"/>
+    <property name="easing-mode" type="gulong" flags="227"/>
+    <property name="easing-duration" type="guint" flags="227"/>
+    <property name="orientation" type="ClutterOrientation" flags="227"/>
+  </class>
+  <boxed name="ClutterColor" get-type="clutter_color_get_type"/>
+  <fundamental name="ClutterParamSpecColor" get-type="clutter_param_color_get_type" instantiatable="1" parents="GParam">
+  </fundamental>
+  <class name="ClutterBrightnessContrastEffect" get-type="clutter_brightness_contrast_effect_get_type" parents="ClutterOffscreenEffect,ClutterEffect,ClutterActorMeta,GInitiallyUnowned,GObject">
+    <property name="brightness" type="ClutterColor" flags="227"/>
+    <property name="contrast" type="ClutterColor" flags="227"/>
+  </class>
+  <class name="ClutterCanvas" get-type="clutter_canvas_get_type" parents="GObject">
+    <implements name="ClutterContent"/>
+    <property name="width" type="gint" flags="227"/>
+    <property name="height" type="gint" flags="227"/>
+    <property name="scale-factor" type="gint" flags="227"/>
+    <property name="scale-factor-set" type="gboolean" flags="225"/>
+    <signal name="draw" return="gboolean" when="last" no-recurse="1">
+      <param type="CairoContext"/>
+      <param type="gint"/>
+      <param type="gint"/>
+    </signal>
+  </class>
+  <class name="ClutterChildMeta" get-type="clutter_child_meta_get_type" parents="GObject" abstract="1">
+    <property name="container" type="ClutterContainer" flags="235"/>
+    <property name="actor" type="ClutterActor" flags="235"/>
+  </class>
+  <class name="ClutterClickAction" get-type="clutter_click_action_get_type" parents="ClutterAction,ClutterActorMeta,GInitiallyUnowned,GObject">
+    <property name="held" type="gboolean" flags="225"/>
+    <property name="pressed" type="gboolean" flags="225"/>
+    <property name="long-press-threshold" type="gint" flags="227"/>
+    <property name="long-press-duration" type="gint" flags="227"/>
+    <signal name="clicked" return="void" when="last">
+      <param type="ClutterActor"/>
+    </signal>
+    <signal name="long-press" return="gboolean" when="last">
+      <param type="ClutterActor"/>
+      <param type="ClutterLongPressState"/>
+    </signal>
+  </class>
+  <class name="ClutterClone" get-type="clutter_clone_get_type" parents="ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterContainer"/>
+    <implements name="ClutterScriptable"/>
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+    <property name="source" type="ClutterActor" flags="231"/>
+  </class>
+  <class name="ClutterColorizeEffect" get-type="clutter_colorize_effect_get_type" parents="ClutterOffscreenEffect,ClutterEffect,ClutterActorMeta,GInitiallyUnowned,GObject">
+    <property name="tint" type="ClutterColor" flags="227"/>
+  </class>
+  <interface name="ClutterContainer" get-type="clutter_container_get_type">
+    <signal name="actor-added" return="void" when="first">
+      <param type="ClutterActor"/>
+    </signal>
+    <signal name="actor-removed" return="void" when="first">
+      <param type="ClutterActor"/>
+    </signal>
+    <signal name="child-notify" return="void" when="first" detailed="1">
+      <param type="ClutterActor"/>
+      <param type="GParam"/>
+    </signal>
+  </interface>
+  <interface name="ClutterContent" get-type="clutter_content_get_type">
+    <signal name="attached" return="void" when="first">
+      <param type="ClutterActor"/>
+    </signal>
+    <signal name="detached" return="void" when="first">
+      <param type="ClutterActor"/>
+    </signal>
+  </interface>
+  <class name="ClutterOffscreenEffect" get-type="clutter_offscreen_effect_get_type" parents="ClutterEffect,ClutterActorMeta,GInitiallyUnowned,GObject" abstract="1">
+  </class>
+  <class name="ClutterDeformEffect" get-type="clutter_deform_effect_get_type" parents="ClutterOffscreenEffect,ClutterEffect,ClutterActorMeta,GInitiallyUnowned,GObject" abstract="1">
+    <property name="x-tiles" type="guint" flags="227"/>
+    <property name="y-tiles" type="guint" flags="227"/>
+    <property name="back-material" type="CoglHandle" flags="227"/>
+  </class>
+  <class name="ClutterTimeline" get-type="clutter_timeline_get_type" parents="GObject">
+    <implements name="ClutterScriptable"/>
+    <property name="loop" type="gboolean" flags="-2147483421"/>
+    <property name="delay" type="guint" flags="227"/>
+    <property name="duration" type="guint" flags="227"/>
+    <property name="direction" type="ClutterTimelineDirection" flags="227"/>
+    <property name="auto-reverse" type="gboolean" flags="227"/>
+    <property name="repeat-count" type="gint" flags="227"/>
+    <property name="progress-mode" type="ClutterAnimationMode" flags="227"/>
+    <signal name="new-frame" return="void" when="last">
+      <param type="gint"/>
+    </signal>
+    <signal name="completed" return="void" when="last">
+    </signal>
+    <signal name="started" return="void" when="last">
+    </signal>
+    <signal name="paused" return="void" when="last">
+    </signal>
+    <signal name="marker-reached" return="void" when="last" no-recurse="1" detailed="1" no-hooks="1">
+      <param type="gchararray"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="stopped" return="void" when="last">
+      <param type="gboolean"/>
+    </signal>
+  </class>
+  <class name="ClutterAlpha" get-type="clutter_alpha_get_type" parents="GInitiallyUnowned,GObject">
+    <implements name="ClutterScriptable"/>
+    <property name="timeline" type="ClutterTimeline" flags="227"/>
+    <property name="alpha" type="gdouble" flags="225"/>
+    <property name="mode" type="gulong" flags="231"/>
+  </class>
+  <class name="ClutterAnimation" get-type="clutter_animation_get_type" parents="GObject">
+    <implements name="ClutterScriptable"/>
+    <property name="object" type="GObject" flags="227"/>
+    <property name="mode" type="gulong" flags="227"/>
+    <property name="duration" type="guint" flags="227"/>
+    <property name="loop" type="gboolean" flags="227"/>
+    <property name="timeline" type="ClutterTimeline" flags="227"/>
+    <property name="alpha" type="ClutterAlpha" flags="-2147483421"/>
+    <signal name="completed" return="void" when="last">
+    </signal>
+    <signal name="started" return="void" when="last">
+    </signal>
+  </class>
+  <class name="ClutterAnimator" get-type="clutter_animator_get_type" parents="GObject">
+    <implements name="ClutterScriptable"/>
+    <property name="duration" type="guint" flags="227"/>
+    <property name="timeline" type="ClutterTimeline" flags="227"/>
+  </class>
+  <boxed name="ClutterAnimatorKey" get-type="clutter_animator_key_get_type"/>
+  <class name="ClutterBehaviour" get-type="clutter_behaviour_get_type" parents="GObject" abstract="1">
+    <implements name="ClutterScriptable"/>
+    <property name="alpha" type="ClutterAlpha" flags="227"/>
+    <signal name="applied" return="void" when="first">
+      <param type="ClutterActor"/>
+    </signal>
+    <signal name="removed" return="void" when="first">
+      <param type="ClutterActor"/>
+    </signal>
+  </class>
+  <class name="ClutterBehaviourDepth" get-type="clutter_behaviour_depth_get_type" parents="ClutterBehaviour,GObject">
+    <implements name="ClutterScriptable"/>
+    <property name="depth-start" type="gint" flags="227"/>
+    <property name="depth-end" type="gint" flags="227"/>
+  </class>
+  <class name="ClutterBehaviourEllipse" get-type="clutter_behaviour_ellipse_get_type" parents="ClutterBehaviour,GObject">
+    <implements name="ClutterScriptable"/>
+    <property name="center" type="ClutterKnot" flags="227"/>
+    <property name="width" type="gint" flags="227"/>
+    <property name="height" type="gint" flags="227"/>
+    <property name="angle-start" type="gdouble" flags="227"/>
+    <property name="angle-end" type="gdouble" flags="227"/>
+    <property name="angle-tilt-x" type="gdouble" flags="227"/>
+    <property name="angle-tilt-y" type="gdouble" flags="227"/>
+    <property name="angle-tilt-z" type="gdouble" flags="227"/>
+    <property name="direction" type="ClutterRotateDirection" flags="227"/>
+  </class>
+  <class name="ClutterBehaviourOpacity" get-type="clutter_behaviour_opacity_get_type" parents="ClutterBehaviour,GObject">
+    <implements name="ClutterScriptable"/>
+    <property name="opacity-start" type="guint" flags="227"/>
+    <property name="opacity-end" type="guint" flags="227"/>
+  </class>
+  <class name="ClutterPath" get-type="clutter_path_get_type" parents="GInitiallyUnowned,GObject">
+    <property name="description" type="gchararray" flags="227"/>
+    <property name="length" type="guint" flags="225"/>
+  </class>
+  <class name="ClutterBehaviourPath" get-type="clutter_behaviour_path_get_type" parents="ClutterBehaviour,GObject">
+    <implements name="ClutterScriptable"/>
+    <property name="path" type="ClutterPath" flags="227"/>
+    <signal name="knot-reached" return="void" when="last">
+      <param type="guint"/>
+    </signal>
+  </class>
+  <class name="ClutterBehaviourRotate" get-type="clutter_behaviour_rotate_get_type" parents="ClutterBehaviour,GObject">
+    <implements name="ClutterScriptable"/>
+    <property name="angle-start" type="gdouble" flags="227"/>
+    <property name="angle-end" type="gdouble" flags="227"/>
+    <property name="axis" type="ClutterRotateAxis" flags="227"/>
+    <property name="direction" type="ClutterRotateDirection" flags="227"/>
+    <property name="center-x" type="gint" flags="227"/>
+    <property name="center-y" type="gint" flags="227"/>
+    <property name="center-z" type="gint" flags="227"/>
+  </class>
+  <class name="ClutterBehaviourScale" get-type="clutter_behaviour_scale_get_type" parents="ClutterBehaviour,GObject">
+    <implements name="ClutterScriptable"/>
+    <property name="x-scale-start" type="gdouble" flags="227"/>
+    <property name="y-scale-start" type="gdouble" flags="227"/>
+    <property name="x-scale-end" type="gdouble" flags="227"/>
+    <property name="y-scale-end" type="gdouble" flags="227"/>
+  </class>
+  <class name="ClutterBox" get-type="clutter_box_get_type" parents="ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterContainer"/>
+    <implements name="ClutterScriptable"/>
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+    <property name="color" type="ClutterColor" flags="227"/>
+    <property name="color-set" type="gboolean" flags="227"/>
+  </class>
+  <class name="ClutterTexture" get-type="clutter_texture_get_type" parents="ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterContainer"/>
+    <implements name="ClutterScriptable"/>
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+    <property name="disable-slicing" type="gboolean" flags="235"/>
+    <property name="tile-waste" type="gint" flags="225"/>
+    <property name="pixel-format" type="CoglPixelFormat" flags="225"/>
+    <property name="sync-size" type="gboolean" flags="227"/>
+    <property name="repeat-y" type="gboolean" flags="227"/>
+    <property name="repeat-x" type="gboolean" flags="227"/>
+    <property name="filter-quality" type="ClutterTextureQuality" flags="231"/>
+    <property name="cogl-texture" type="CoglHandle" flags="227"/>
+    <property name="cogl-material" type="CoglHandle" flags="227"/>
+    <property name="filename" type="gchararray" flags="227"/>
+    <property name="keep-aspect-ratio" type="gboolean" flags="227"/>
+    <property name="load-async" type="gboolean" flags="226"/>
+    <property name="load-data-async" type="gboolean" flags="226"/>
+    <property name="pick-with-alpha" type="gboolean" flags="227"/>
+    <signal name="size-change" return="void" when="last">
+      <param type="gint"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="pixbuf-change" return="void" when="last">
+    </signal>
+    <signal name="load-finished" return="void" when="last">
+      <param type="GError"/>
+    </signal>
+  </class>
+  <class name="ClutterCairoTexture" get-type="clutter_cairo_texture_get_type" parents="ClutterTexture,ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterContainer"/>
+    <implements name="ClutterScriptable"/>
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+    <property name="surface-width" type="guint" flags="-2147483421"/>
+    <property name="surface-height" type="guint" flags="-2147483421"/>
+    <property name="auto-resize" type="gboolean" flags="-2147483421"/>
+    <signal name="draw" return="gboolean" when="last" no-recurse="1">
+      <param type="CairoContext"/>
+    </signal>
+    <signal name="create-surface" return="CairoSurface" when="last" no-recurse="1">
+      <param type="guint"/>
+      <param type="guint"/>
+    </signal>
+  </class>
+  <fundamental name="ClutterParamSpecFixed" get-type="clutter_param_fixed_get_type" instantiatable="1" parents="GParam">
+  </fundamental>
+  <class name="ClutterGroup" get-type="clutter_group_get_type" parents="ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterContainer"/>
+    <implements name="ClutterScriptable"/>
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+  </class>
+  <class name="ClutterModel" get-type="clutter_model_get_type" parents="GObject" abstract="1">
+    <implements name="ClutterScriptable"/>
+    <property name="filter-set" type="gboolean" flags="225"/>
+    <signal name="row-added" return="void" when="last">
+      <param type="ClutterModelIter"/>
+    </signal>
+    <signal name="row-removed" return="void" when="last">
+      <param type="ClutterModelIter"/>
+    </signal>
+    <signal name="row-changed" return="void" when="last">
+      <param type="ClutterModelIter"/>
+    </signal>
+    <signal name="sort-changed" return="void" when="last">
+    </signal>
+    <signal name="filter-changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="ClutterModelIter" get-type="clutter_model_iter_get_type" parents="GObject" abstract="1">
+    <property name="model" type="ClutterModel" flags="227"/>
+    <property name="row" type="guint" flags="227"/>
+  </class>
+  <class name="ClutterListModel" get-type="clutter_list_model_get_type" parents="ClutterModel,GObject">
+    <implements name="ClutterScriptable"/>
+  </class>
+  <interface name="ClutterMedia" get-type="clutter_media_get_type">
+    <property name="audio-volume" type="gdouble" flags="-2147483421"/>
+    <property name="buffer-fill" type="gdouble" flags="-2147483423"/>
+    <property name="can-seek" type="gboolean" flags="-2147483423"/>
+    <property name="duration" type="gdouble" flags="225"/>
+    <property name="playing" type="gboolean" flags="-2147483421"/>
+    <property name="progress" type="gdouble" flags="-2147483421"/>
+    <property name="subtitle-font-name" type="gchararray" flags="-2147483421"/>
+    <property name="subtitle-uri" type="gchararray" flags="-2147483421"/>
+    <property name="uri" type="gchararray" flags="-2147483421"/>
+    <signal name="eos" return="void" when="last">
+    </signal>
+    <signal name="error" return="void" when="last">
+      <param type="GError"/>
+    </signal>
+  </interface>
+  <class name="ClutterRectangle" get-type="clutter_rectangle_get_type" parents="ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterContainer"/>
+    <implements name="ClutterScriptable"/>
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+    <property name="color" type="ClutterColor" flags="227"/>
+    <property name="border-color" type="ClutterColor" flags="227"/>
+    <property name="border-width" type="guint" flags="227"/>
+    <property name="has-border" type="gboolean" flags="227"/>
+  </class>
+  <class name="ClutterScore" get-type="clutter_score_get_type" parents="GObject">
+    <property name="loop" type="gboolean" flags="227"/>
+    <signal name="completed" return="void" when="last">
+    </signal>
+    <signal name="started" return="void" when="last">
+    </signal>
+    <signal name="paused" return="void" when="last">
+    </signal>
+    <signal name="timeline-started" return="void" when="last">
+      <param type="ClutterTimeline"/>
+    </signal>
+    <signal name="timeline-completed" return="void" when="last">
+      <param type="ClutterTimeline"/>
+    </signal>
+  </class>
+  <fundamental name="ClutterShaderFloat" get-type="clutter_shader_float_get_type">
+  </fundamental>
+  <fundamental name="ClutterShaderInt" get-type="clutter_shader_int_get_type">
+  </fundamental>
+  <fundamental name="ClutterShaderMatrix" get-type="clutter_shader_matrix_get_type">
+  </fundamental>
+  <class name="ClutterShader" get-type="clutter_shader_get_type" parents="GObject">
+    <property name="vertex-source" type="gchararray" flags="227"/>
+    <property name="fragment-source" type="gchararray" flags="227"/>
+    <property name="compiled" type="gboolean" flags="225"/>
+    <property name="enabled" type="gboolean" flags="227"/>
+  </class>
+  <class name="ClutterStageManager" get-type="clutter_stage_manager_get_type" parents="GObject">
+    <property name="default-stage" type="ClutterStage" flags="225"/>
+    <signal name="stage-added" return="void" when="last">
+      <param type="ClutterStage"/>
+    </signal>
+    <signal name="stage-removed" return="void" when="last">
+      <param type="ClutterStage"/>
+    </signal>
+  </class>
+  <class name="ClutterState" get-type="clutter_state_get_type" parents="GObject">
+    <implements name="ClutterScriptable"/>
+    <property name="duration" type="guint" flags="227"/>
+    <property name="state" type="gchararray" flags="227"/>
+    <signal name="completed" return="void" when="last">
+    </signal>
+  </class>
+  <boxed name="ClutterStateKey" get-type="clutter_state_key_get_type"/>
+  <class name="ClutterTableLayout" get-type="clutter_table_layout_get_type" parents="ClutterLayoutManager,GInitiallyUnowned,GObject">
+    <property name="row-spacing" type="guint" flags="227"/>
+    <property name="column-spacing" type="guint" flags="227"/>
+    <property name="use-animations" type="gboolean" flags="227"/>
+    <property name="easing-mode" type="gulong" flags="227"/>
+    <property name="easing-duration" type="guint" flags="227"/>
+  </class>
+  <class name="ClutterDesaturateEffect" get-type="clutter_desaturate_effect_get_type" parents="ClutterOffscreenEffect,ClutterEffect,ClutterActorMeta,GInitiallyUnowned,GObject">
+    <property name="factor" type="gdouble" flags="227"/>
+  </class>
+  <boxed name="ClutterPerspective" get-type="clutter_perspective_get_type"/>
+  <boxed name="ClutterFog" get-type="clutter_fog_get_type"/>
+  <class name="ClutterStage" get-type="clutter_stage_get_type" parents="ClutterGroup,ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterContainer"/>
+    <implements name="ClutterScriptable"/>
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+    <property name="color" type="ClutterColor" flags="-2147483421"/>
+    <property name="fullscreen-set" type="gboolean" flags="225"/>
+    <property name="offscreen" type="gboolean" flags="-2147483421"/>
+    <property name="cursor-visible" type="gboolean" flags="227"/>
+    <property name="perspective" type="ClutterPerspective" flags="227"/>
+    <property name="title" type="gchararray" flags="227"/>
+    <property name="user-resizable" type="gboolean" flags="227"/>
+    <property name="use-fog" type="gboolean" flags="-2147483421"/>
+    <property name="fog" type="ClutterFog" flags="-2147483421"/>
+    <property name="use-alpha" type="gboolean" flags="227"/>
+    <property name="key-focus" type="ClutterActor" flags="227"/>
+    <property name="no-clear-hint" type="gboolean" flags="227"/>
+    <property name="accept-focus" type="gboolean" flags="227"/>
+    <signal name="fullscreen" return="void" when="first">
+    </signal>
+    <signal name="unfullscreen" return="void" when="last">
+    </signal>
+    <signal name="activate" return="void" when="last">
+    </signal>
+    <signal name="deactivate" return="void" when="last">
+    </signal>
+    <signal name="delete-event" return="gboolean" when="last">
+      <param type="ClutterEvent"/>
+    </signal>
+    <signal name="after-paint" return="void" when="last">
+    </signal>
+  </class>
+  <class name="ClutterDeviceManager" get-type="clutter_device_manager_get_type" parents="GObject" abstract="1">
+    <property name="backend" type="ClutterBackend" flags="235"/>
+    <signal name="device-added" return="void" when="last">
+      <param type="ClutterInputDevice"/>
+    </signal>
+    <signal name="device-removed" return="void" when="last">
+      <param type="ClutterInputDevice"/>
+    </signal>
+  </class>
+  <class name="ClutterDragAction" get-type="clutter_drag_action_get_type" parents="ClutterAction,ClutterActorMeta,GInitiallyUnowned,GObject">
+    <property name="x-drag-threshold" type="gint" flags="227"/>
+    <property name="y-drag-threshold" type="gint" flags="227"/>
+    <property name="drag-handle" type="ClutterActor" flags="227"/>
+    <property name="drag-axis" type="ClutterDragAxis" flags="227"/>
+    <property name="drag-area" type="ClutterRect" flags="227"/>
+    <property name="drag-area-set" type="gboolean" flags="225"/>
+    <signal name="drag-begin" return="void" when="last">
+      <param type="ClutterActor"/>
+      <param type="gfloat"/>
+      <param type="gfloat"/>
+      <param type="ClutterModifierType"/>
+    </signal>
+    <signal name="drag-progress" return="gboolean" when="last">
+      <param type="ClutterActor"/>
+      <param type="gfloat"/>
+      <param type="gfloat"/>
+    </signal>
+    <signal name="drag-motion" return="void" when="last">
+      <param type="ClutterActor"/>
+      <param type="gfloat"/>
+      <param type="gfloat"/>
+    </signal>
+    <signal name="drag-end" return="void" when="last">
+      <param type="ClutterActor"/>
+      <param type="gfloat"/>
+      <param type="gfloat"/>
+      <param type="ClutterModifierType"/>
+    </signal>
+  </class>
+  <class name="ClutterDropAction" get-type="clutter_drop_action_get_type" parents="ClutterAction,ClutterActorMeta,GInitiallyUnowned,GObject">
+    <signal name="can-drop" return="gboolean" when="last">
+      <param type="ClutterActor"/>
+      <param type="gfloat"/>
+      <param type="gfloat"/>
+    </signal>
+    <signal name="over-in" return="void" when="last">
+      <param type="ClutterActor"/>
+    </signal>
+    <signal name="over-out" return="void" when="last">
+      <param type="ClutterActor"/>
+    </signal>
+    <signal name="drop" return="void" when="last">
+      <param type="ClutterActor"/>
+      <param type="gfloat"/>
+      <param type="gfloat"/>
+    </signal>
+    <signal name="drop-cancel" return="void" when="last">
+      <param type="ClutterActor"/>
+      <param type="gfloat"/>
+      <param type="gfloat"/>
+    </signal>
+  </class>
+  <class name="ClutterFixedLayout" get-type="clutter_fixed_layout_get_type" parents="ClutterLayoutManager,GInitiallyUnowned,GObject">
+  </class>
+  <class name="ClutterFlowLayout" get-type="clutter_flow_layout_get_type" parents="ClutterLayoutManager,GInitiallyUnowned,GObject">
+    <property name="orientation" type="ClutterFlowOrientation" flags="231"/>
+    <property name="homogeneous" type="gboolean" flags="227"/>
+    <property name="column-spacing" type="gfloat" flags="227"/>
+    <property name="row-spacing" type="gfloat" flags="227"/>
+    <property name="min-column-width" type="gfloat" flags="227"/>
+    <property name="max-column-width" type="gfloat" flags="227"/>
+    <property name="min-row-height" type="gfloat" flags="227"/>
+    <property name="max-row-height" type="gfloat" flags="227"/>
+    <property name="snap-to-grid" type="gboolean" flags="227"/>
+  </class>
+  <class name="ClutterGestureAction" get-type="clutter_gesture_action_get_type" parents="ClutterAction,ClutterActorMeta,GInitiallyUnowned,GObject">
+    <property name="n-touch-points" type="gint" flags="227"/>
+    <property name="threshold-trigger-edge" type="ClutterGestureTriggerEdge" flags="235"/>
+    <property name="threshold-trigger-distance-x" type="gfloat" flags="235"/>
+    <property name="threshold-trigger-distance-y" type="gfloat" flags="235"/>
+    <signal name="gesture-begin" return="gboolean" when="last">
+      <param type="ClutterActor"/>
+    </signal>
+    <signal name="gesture-progress" return="gboolean" when="last">
+      <param type="ClutterActor"/>
+    </signal>
+    <signal name="gesture-end" return="void" when="last">
+      <param type="ClutterActor"/>
+    </signal>
+    <signal name="gesture-cancel" return="void" when="last">
+      <param type="ClutterActor"/>
+    </signal>
+  </class>
+  <class name="ClutterGridLayout" get-type="clutter_grid_layout_get_type" parents="ClutterLayoutManager,GInitiallyUnowned,GObject">
+    <property name="orientation" type="ClutterOrientation" flags="227"/>
+    <property name="row-spacing" type="guint" flags="227"/>
+    <property name="column-spacing" type="guint" flags="227"/>
+    <property name="row-homogeneous" type="gboolean" flags="227"/>
+    <property name="column-homogeneous" type="gboolean" flags="227"/>
+  </class>
+  <class name="ClutterImage" get-type="clutter_image_get_type" parents="GObject">
+    <implements name="ClutterContent"/>
+  </class>
+  <class name="ClutterInterval" get-type="clutter_interval_get_type" parents="GInitiallyUnowned,GObject">
+    <implements name="ClutterScriptable"/>
+    <property name="value-type" type="GType" flags="235"/>
+    <property name="initial" type="GValue" flags="227"/>
+    <property name="final" type="GValue" flags="227"/>
+  </class>
+  <class name="ClutterTransition" get-type="clutter_transition_get_type" parents="ClutterTimeline,GObject" abstract="1">
+    <implements name="ClutterScriptable"/>
+    <property name="interval" type="ClutterInterval" flags="227"/>
+    <property name="animatable" type="ClutterAnimatable" flags="227"/>
+    <property name="remove-on-complete" type="gboolean" flags="227"/>
+  </class>
+  <class name="ClutterPropertyTransition" get-type="clutter_property_transition_get_type" parents="ClutterTransition,ClutterTimeline,GObject">
+    <implements name="ClutterScriptable"/>
+    <property name="property-name" type="gchararray" flags="227"/>
+  </class>
+  <class name="ClutterKeyframeTransition" get-type="clutter_keyframe_transition_get_type" parents="ClutterPropertyTransition,ClutterTransition,ClutterTimeline,GObject">
+    <implements name="ClutterScriptable"/>
+  </class>
+  <class name="ClutterLayoutMeta" get-type="clutter_layout_meta_get_type" parents="ClutterChildMeta,GObject" abstract="1">
+    <property name="manager" type="ClutterLayoutManager" flags="235"/>
+  </class>
+  <class name="ClutterPageTurnEffect" get-type="clutter_page_turn_effect_get_type" parents="ClutterDeformEffect,ClutterOffscreenEffect,ClutterEffect,ClutterActorMeta,GInitiallyUnowned,GObject">
+    <property name="period" type="gdouble" flags="227"/>
+    <property name="angle" type="gdouble" flags="227"/>
+    <property name="radius" type="gfloat" flags="227"/>
+  </class>
+  <fundamental name="ClutterColorNode" get-type="clutter_color_node_get_type" instantiatable="1" parents="ClutterPipelineNode,ClutterPaintNode">
+  </fundamental>
+  <fundamental name="ClutterTextureNode" get-type="clutter_texture_node_get_type" instantiatable="1" parents="ClutterPipelineNode,ClutterPaintNode">
+  </fundamental>
+  <fundamental name="ClutterClipNode" get-type="clutter_clip_node_get_type" instantiatable="1" parents="ClutterPaintNode">
+  </fundamental>
+  <fundamental name="ClutterPipelineNode" get-type="clutter_pipeline_node_get_type" instantiatable="1" parents="ClutterPaintNode">
+  </fundamental>
+  <fundamental name="ClutterTextNode" get-type="clutter_text_node_get_type" instantiatable="1" parents="ClutterPaintNode">
+  </fundamental>
+  <fundamental name="ClutterPaintNode" get-type="clutter_paint_node_get_type" abstract="1" instantiatable="1">
+  </fundamental>
+  <class name="ClutterPanAction" get-type="clutter_pan_action_get_type" parents="ClutterGestureAction,ClutterAction,ClutterActorMeta,GInitiallyUnowned,GObject">
+    <property name="pan-axis" type="ClutterPanAxis" flags="227"/>
+    <property name="interpolate" type="gboolean" flags="227"/>
+    <property name="deceleration" type="gdouble" flags="227"/>
+    <property name="acceleration-factor" type="gdouble" flags="227"/>
+    <signal name="pan" return="gboolean" when="last">
+      <param type="ClutterActor"/>
+      <param type="gboolean"/>
+    </signal>
+    <signal name="pan-stopped" return="void" when="last">
+      <param type="ClutterActor"/>
+    </signal>
+  </class>
+  <class name="ClutterPathConstraint" get-type="clutter_path_constraint_get_type" parents="ClutterConstraint,ClutterActorMeta,GInitiallyUnowned,GObject">
+    <property name="path" type="ClutterPath" flags="227"/>
+    <property name="offset" type="gfloat" flags="227"/>
+    <signal name="node-reached" return="void" when="last">
+      <param type="ClutterActor"/>
+      <param type="guint"/>
+    </signal>
+  </class>
+  <class name="ClutterRotateAction" get-type="clutter_rotate_action_get_type" parents="ClutterGestureAction,ClutterAction,ClutterActorMeta,GInitiallyUnowned,GObject">
+    <signal name="rotate" return="gboolean" when="last">
+      <param type="ClutterActor"/>
+      <param type="gdouble"/>
+    </signal>
+  </class>
+  <class name="ClutterScript" get-type="clutter_script_get_type" parents="GObject">
+    <property name="filename-set" type="gboolean" flags="225"/>
+    <property name="filename" type="gchararray" flags="225"/>
+    <property name="translation-domain" type="gchararray" flags="227"/>
+  </class>
+  <interface name="ClutterScriptable" get-type="clutter_scriptable_get_type">
+  </interface>
+  <class name="ClutterScrollActor" get-type="clutter_scroll_actor_get_type" parents="ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterContainer"/>
+    <implements name="ClutterScriptable"/>
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+    <property name="scroll-mode" type="ClutterScrollMode" flags="227"/>
+  </class>
+  <class name="ClutterSettings" get-type="clutter_settings_get_type" parents="GObject">
+    <property name="backend" type="ClutterBackend" flags="-2147483414"/>
+    <property name="double-click-time" type="gint" flags="227"/>
+    <property name="double-click-distance" type="gint" flags="227"/>
+    <property name="dnd-drag-threshold" type="gint" flags="227"/>
+    <property name="font-name" type="gchararray" flags="227"/>
+    <property name="font-antialias" type="gint" flags="227"/>
+    <property name="font-dpi" type="gint" flags="227"/>
+    <property name="font-hinting" type="gint" flags="227"/>
+    <property name="font-hint-style" type="gchararray" flags="227"/>
+    <property name="font-subpixel-order" type="gchararray" flags="227"/>
+    <property name="long-press-duration" type="gint" flags="227"/>
+    <property name="fontconfig-timestamp" type="guint" flags="226"/>
+    <property name="password-hint-time" type="guint" flags="227"/>
+    <property name="window-scaling-factor" type="gint" flags="227"/>
+    <property name="unscaled-font-dpi" type="gint" flags="226"/>
+  </class>
+  <class name="ClutterShaderEffect" get-type="clutter_shader_effect_get_type" parents="ClutterOffscreenEffect,ClutterEffect,ClutterActorMeta,GInitiallyUnowned,GObject">
+    <property name="shader-type" type="ClutterShaderType" flags="234"/>
+  </class>
+  <class name="ClutterSwipeAction" get-type="clutter_swipe_action_get_type" parents="ClutterGestureAction,ClutterAction,ClutterActorMeta,GInitiallyUnowned,GObject">
+    <signal name="swept" return="void" when="last">
+      <param type="ClutterActor"/>
+      <param type="ClutterSwipeDirection"/>
+    </signal>
+    <signal name="swipe" return="gboolean" when="last">
+      <param type="ClutterActor"/>
+      <param type="ClutterSwipeDirection"/>
+    </signal>
+  </class>
+  <class name="ClutterSnapConstraint" get-type="clutter_snap_constraint_get_type" parents="ClutterConstraint,ClutterActorMeta,GInitiallyUnowned,GObject">
+    <property name="source" type="ClutterActor" flags="231"/>
+    <property name="from-edge" type="ClutterSnapEdge" flags="231"/>
+    <property name="to-edge" type="ClutterSnapEdge" flags="231"/>
+    <property name="offset" type="gfloat" flags="231"/>
+  </class>
+  <class name="ClutterTapAction" get-type="clutter_tap_action_get_type" parents="ClutterGestureAction,ClutterAction,ClutterActorMeta,GInitiallyUnowned,GObject">
+    <signal name="tap" return="void" when="last">
+      <param type="ClutterActor"/>
+    </signal>
+  </class>
+  <class name="ClutterTextBuffer" get-type="clutter_text_buffer_get_type" parents="GObject">
+    <property name="text" type="gchararray" flags="225"/>
+    <property name="length" type="guint" flags="225"/>
+    <property name="max-length" type="gint" flags="227"/>
+    <signal name="inserted-text" return="void" when="first">
+      <param type="guint"/>
+      <param type="gchararray"/>
+      <param type="guint"/>
+    </signal>
+    <signal name="deleted-text" return="void" when="first">
+      <param type="guint"/>
+      <param type="guint"/>
+    </signal>
+  </class>
+  <class name="ClutterText" get-type="clutter_text_get_type" parents="ClutterActor,GInitiallyUnowned,GObject">
+    <implements name="ClutterContainer"/>
+    <implements name="ClutterScriptable"/>
+    <implements name="ClutterAnimatable"/>
+    <implements name="AtkImplementorIface"/>
+    <property name="buffer" type="ClutterTextBuffer" flags="227"/>
+    <property name="font-name" type="gchararray" flags="227"/>
+    <property name="font-description" type="PangoFontDescription" flags="227"/>
+    <property name="text" type="gchararray" flags="227"/>
+    <property name="color" type="ClutterColor" flags="483"/>
+    <property name="use-markup" type="gboolean" flags="227"/>
+    <property name="attributes" type="PangoAttrList" flags="227"/>
+    <property name="line-alignment" type="PangoAlignment" flags="227"/>
+    <property name="line-wrap" type="gboolean" flags="227"/>
+    <property name="line-wrap-mode" type="PangoWrapMode" flags="227"/>
+    <property name="justify" type="gboolean" flags="227"/>
+    <property name="ellipsize" type="PangoEllipsizeMode" flags="227"/>
+    <property name="position" type="gint" flags="-2147483421"/>
+    <property name="selection-bound" type="gint" flags="227"/>
+    <property name="selection-color" type="ClutterColor" flags="483"/>
+    <property name="selection-color-set" type="gboolean" flags="225"/>
+    <property name="cursor-visible" type="gboolean" flags="227"/>
+    <property name="cursor-color" type="ClutterColor" flags="483"/>
+    <property name="cursor-color-set" type="gboolean" flags="225"/>
+    <property name="cursor-size" type="gint" flags="227"/>
+    <property name="cursor-position" type="gint" flags="227"/>
+    <property name="editable" type="gboolean" flags="3"/>
+    <property name="selectable" type="gboolean" flags="3"/>
+    <property name="activatable" type="gboolean" flags="3"/>
+    <property name="password-char" type="guint" flags="227"/>
+    <property name="max-length" type="gint" flags="227"/>
+    <property name="single-line-mode" type="gboolean" flags="227"/>
+    <property name="selected-text-color" type="ClutterColor" flags="483"/>
+    <property name="selected-text-color-set" type="gboolean" flags="225"/>
+    <signal name="activate" return="void" when="last">
+    </signal>
+    <signal name="text-changed" return="void" when="last">
+    </signal>
+    <signal name="insert-text" return="void" when="last" action="1">
+      <param type="gchararray"/>
+      <param type="gint"/>
+      <param type="gpointer"/>
+    </signal>
+    <signal name="delete-text" return="void" when="last" action="1">
+      <param type="gint"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="cursor-event" return="void" when="last">
+      <param type="ClutterGeometry"/>
+    </signal>
+    <signal name="cursor-changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="ClutterTransitionGroup" get-type="clutter_transition_group_get_type" parents="ClutterTransition,ClutterTimeline,GObject">
+    <implements name="ClutterScriptable"/>
+  </class>
+  <boxed name="ClutterUnits" get-type="clutter_units_get_type"/>
+  <fundamental name="ClutterParamSpecUnit" get-type="clutter_param_units_get_type" instantiatable="1" parents="GParam">
+  </fundamental>
+  <class name="ClutterZoomAction" get-type="clutter_zoom_action_get_type" parents="ClutterGestureAction,ClutterAction,ClutterActorMeta,GInitiallyUnowned,GObject">
+    <property name="zoom-axis" type="ClutterZoomAxis" flags="227"/>
+    <signal name="zoom" return="gboolean" when="last">
+      <param type="ClutterActor"/>
+      <param type="ClutterPoint"/>
+      <param type="gdouble"/>
+    </signal>
+  </class>
+  <enum name="ClutterGravity" get-type="clutter_gravity_get_type">
+    <member name="CLUTTER_GRAVITY_NONE" nick="none" value="0"/>
+    <member name="CLUTTER_GRAVITY_NORTH" nick="north" value="1"/>
+    <member name="CLUTTER_GRAVITY_NORTH_EAST" nick="north-east" value="2"/>
+    <member name="CLUTTER_GRAVITY_EAST" nick="east" value="3"/>
+    <member name="CLUTTER_GRAVITY_SOUTH_EAST" nick="south-east" value="4"/>
+    <member name="CLUTTER_GRAVITY_SOUTH" nick="south" value="5"/>
+    <member name="CLUTTER_GRAVITY_SOUTH_WEST" nick="south-west" value="6"/>
+    <member name="CLUTTER_GRAVITY_WEST" nick="west" value="7"/>
+    <member name="CLUTTER_GRAVITY_NORTH_WEST" nick="north-west" value="8"/>
+    <member name="CLUTTER_GRAVITY_CENTER" nick="center" value="9"/>
+  </enum>  <enum name="ClutterRotateAxis" get-type="clutter_rotate_axis_get_type">
+    <member name="CLUTTER_X_AXIS" nick="x-axis" value="0"/>
+    <member name="CLUTTER_Y_AXIS" nick="y-axis" value="1"/>
+    <member name="CLUTTER_Z_AXIS" nick="z-axis" value="2"/>
+  </enum>  <enum name="ClutterRotateDirection" get-type="clutter_rotate_direction_get_type">
+    <member name="CLUTTER_ROTATE_CW" nick="cw" value="0"/>
+    <member name="CLUTTER_ROTATE_CCW" nick="ccw" value="1"/>
+  </enum>  <enum name="ClutterRequestMode" get-type="clutter_request_mode_get_type">
+    <member name="CLUTTER_REQUEST_HEIGHT_FOR_WIDTH" nick="height-for-width" value="0"/>
+    <member name="CLUTTER_REQUEST_WIDTH_FOR_HEIGHT" nick="width-for-height" value="1"/>
+    <member name="CLUTTER_REQUEST_CONTENT_SIZE" nick="content-size" value="2"/>
+  </enum>  <enum name="ClutterAnimationMode" get-type="clutter_animation_mode_get_type">
+    <member name="CLUTTER_CUSTOM_MODE" nick="custom-mode" value="0"/>
+    <member name="CLUTTER_LINEAR" nick="linear" value="1"/>
+    <member name="CLUTTER_EASE_IN_QUAD" nick="ease-in-quad" value="2"/>
+    <member name="CLUTTER_EASE_OUT_QUAD" nick="ease-out-quad" value="3"/>
+    <member name="CLUTTER_EASE_IN_OUT_QUAD" nick="ease-in-out-quad" value="4"/>
+    <member name="CLUTTER_EASE_IN_CUBIC" nick="ease-in-cubic" value="5"/>
+    <member name="CLUTTER_EASE_OUT_CUBIC" nick="ease-out-cubic" value="6"/>
+    <member name="CLUTTER_EASE_IN_OUT_CUBIC" nick="ease-in-out-cubic" value="7"/>
+    <member name="CLUTTER_EASE_IN_QUART" nick="ease-in-quart" value="8"/>
+    <member name="CLUTTER_EASE_OUT_QUART" nick="ease-out-quart" value="9"/>
+    <member name="CLUTTER_EASE_IN_OUT_QUART" nick="ease-in-out-quart" value="10"/>
+    <member name="CLUTTER_EASE_IN_QUINT" nick="ease-in-quint" value="11"/>
+    <member name="CLUTTER_EASE_OUT_QUINT" nick="ease-out-quint" value="12"/>
+    <member name="CLUTTER_EASE_IN_OUT_QUINT" nick="ease-in-out-quint" value="13"/>
+    <member name="CLUTTER_EASE_IN_SINE" nick="ease-in-sine" value="14"/>
+    <member name="CLUTTER_EASE_OUT_SINE" nick="ease-out-sine" value="15"/>
+    <member name="CLUTTER_EASE_IN_OUT_SINE" nick="ease-in-out-sine" value="16"/>
+    <member name="CLUTTER_EASE_IN_EXPO" nick="ease-in-expo" value="17"/>
+    <member name="CLUTTER_EASE_OUT_EXPO" nick="ease-out-expo" value="18"/>
+    <member name="CLUTTER_EASE_IN_OUT_EXPO" nick="ease-in-out-expo" value="19"/>
+    <member name="CLUTTER_EASE_IN_CIRC" nick="ease-in-circ" value="20"/>
+    <member name="CLUTTER_EASE_OUT_CIRC" nick="ease-out-circ" value="21"/>
+    <member name="CLUTTER_EASE_IN_OUT_CIRC" nick="ease-in-out-circ" value="22"/>
+    <member name="CLUTTER_EASE_IN_ELASTIC" nick="ease-in-elastic" value="23"/>
+    <member name="CLUTTER_EASE_OUT_ELASTIC" nick="ease-out-elastic" value="24"/>
+    <member name="CLUTTER_EASE_IN_OUT_ELASTIC" nick="ease-in-out-elastic" value="25"/>
+    <member name="CLUTTER_EASE_IN_BACK" nick="ease-in-back" value="26"/>
+    <member name="CLUTTER_EASE_OUT_BACK" nick="ease-out-back" value="27"/>
+    <member name="CLUTTER_EASE_IN_OUT_BACK" nick="ease-in-out-back" value="28"/>
+    <member name="CLUTTER_EASE_IN_BOUNCE" nick="ease-in-bounce" value="29"/>
+    <member name="CLUTTER_EASE_OUT_BOUNCE" nick="ease-out-bounce" value="30"/>
+    <member name="CLUTTER_EASE_IN_OUT_BOUNCE" nick="ease-in-out-bounce" value="31"/>
+    <member name="CLUTTER_STEPS" nick="steps" value="32"/>
+    <member name="CLUTTER_STEP_START" nick="step-start" value="33"/>
+    <member name="CLUTTER_STEP_END" nick="step-end" value="34"/>
+    <member name="CLUTTER_CUBIC_BEZIER" nick="cubic-bezier" value="35"/>
+    <member name="CLUTTER_EASE" nick="ease" value="36"/>
+    <member name="CLUTTER_EASE_IN" nick="ease-in" value="37"/>
+    <member name="CLUTTER_EASE_OUT" nick="ease-out" value="38"/>
+    <member name="CLUTTER_EASE_IN_OUT" nick="ease-in-out" value="39"/>
+    <member name="CLUTTER_ANIMATION_LAST" nick="animation-last" value="40"/>
+  </enum>  <flags name="ClutterFontFlags" get-type="clutter_font_flags_get_type">
+    <member name="CLUTTER_FONT_MIPMAPPING" nick="mipmapping" value="1"/>
+    <member name="CLUTTER_FONT_HINTING" nick="hinting" value="2"/>
+  </flags>
+  <enum name="ClutterTextDirection" get-type="clutter_text_direction_get_type">
+    <member name="CLUTTER_TEXT_DIRECTION_DEFAULT" nick="default" value="0"/>
+    <member name="CLUTTER_TEXT_DIRECTION_LTR" nick="ltr" value="1"/>
+    <member name="CLUTTER_TEXT_DIRECTION_RTL" nick="rtl" value="2"/>
+  </enum>  <enum name="ClutterShaderType" get-type="clutter_shader_type_get_type">
+    <member name="CLUTTER_VERTEX_SHADER" nick="vertex-shader" value="0"/>
+    <member name="CLUTTER_FRAGMENT_SHADER" nick="fragment-shader" value="1"/>
+  </enum>  <flags name="ClutterModifierType" get-type="clutter_modifier_type_get_type">
+    <member name="CLUTTER_SHIFT_MASK" nick="shift-mask" value="1"/>
+    <member name="CLUTTER_LOCK_MASK" nick="lock-mask" value="2"/>
+    <member name="CLUTTER_CONTROL_MASK" nick="control-mask" value="4"/>
+    <member name="CLUTTER_MOD1_MASK" nick="mod1-mask" value="8"/>
+    <member name="CLUTTER_MOD2_MASK" nick="mod2-mask" value="16"/>
+    <member name="CLUTTER_MOD3_MASK" nick="mod3-mask" value="32"/>
+    <member name="CLUTTER_MOD4_MASK" nick="mod4-mask" value="64"/>
+    <member name="CLUTTER_MOD5_MASK" nick="mod5-mask" value="128"/>
+    <member name="CLUTTER_BUTTON1_MASK" nick="button1-mask" value="256"/>
+    <member name="CLUTTER_BUTTON2_MASK" nick="button2-mask" value="512"/>
+    <member name="CLUTTER_BUTTON3_MASK" nick="button3-mask" value="1024"/>
+    <member name="CLUTTER_BUTTON4_MASK" nick="button4-mask" value="2048"/>
+    <member name="CLUTTER_BUTTON5_MASK" nick="button5-mask" value="4096"/>
+    <member name="CLUTTER_MODIFIER_RESERVED_13_MASK" nick="modifier-reserved-13-mask" value="8192"/>
+    <member name="CLUTTER_MODIFIER_RESERVED_14_MASK" nick="modifier-reserved-14-mask" value="16384"/>
+    <member name="CLUTTER_MODIFIER_RESERVED_15_MASK" nick="modifier-reserved-15-mask" value="32768"/>
+    <member name="CLUTTER_MODIFIER_RESERVED_16_MASK" nick="modifier-reserved-16-mask" value="65536"/>
+    <member name="CLUTTER_MODIFIER_RESERVED_17_MASK" nick="modifier-reserved-17-mask" value="131072"/>
+    <member name="CLUTTER_MODIFIER_RESERVED_18_MASK" nick="modifier-reserved-18-mask" value="262144"/>
+    <member name="CLUTTER_MODIFIER_RESERVED_19_MASK" nick="modifier-reserved-19-mask" value="524288"/>
+    <member name="CLUTTER_MODIFIER_RESERVED_20_MASK" nick="modifier-reserved-20-mask" value="1048576"/>
+    <member name="CLUTTER_MODIFIER_RESERVED_21_MASK" nick="modifier-reserved-21-mask" value="2097152"/>
+    <member name="CLUTTER_MODIFIER_RESERVED_22_MASK" nick="modifier-reserved-22-mask" value="4194304"/>
+    <member name="CLUTTER_MODIFIER_RESERVED_23_MASK" nick="modifier-reserved-23-mask" value="8388608"/>
+    <member name="CLUTTER_MODIFIER_RESERVED_24_MASK" nick="modifier-reserved-24-mask" value="16777216"/>
+    <member name="CLUTTER_MODIFIER_RESERVED_25_MASK" nick="modifier-reserved-25-mask" value="33554432"/>
+    <member name="CLUTTER_SUPER_MASK" nick="super-mask" value="67108864"/>
+    <member name="CLUTTER_HYPER_MASK" nick="hyper-mask" value="134217728"/>
+    <member name="CLUTTER_META_MASK" nick="meta-mask" value="268435456"/>
+    <member name="CLUTTER_MODIFIER_RESERVED_29_MASK" nick="modifier-reserved-29-mask" value="536870912"/>
+    <member name="CLUTTER_RELEASE_MASK" nick="release-mask" value="1073741824"/>
+    <member name="CLUTTER_MODIFIER_MASK" nick="modifier-mask" value="1543512063"/>
+  </flags>
+  <flags name="ClutterActorFlags" get-type="clutter_actor_flags_get_type">
+    <member name="CLUTTER_ACTOR_MAPPED" nick="mapped" value="2"/>
+    <member name="CLUTTER_ACTOR_REALIZED" nick="realized" value="4"/>
+    <member name="CLUTTER_ACTOR_REACTIVE" nick="reactive" value="8"/>
+    <member name="CLUTTER_ACTOR_VISIBLE" nick="visible" value="16"/>
+    <member name="CLUTTER_ACTOR_NO_LAYOUT" nick="no-layout" value="32"/>
+  </flags>
+  <flags name="ClutterOffscreenRedirect" get-type="clutter_offscreen_redirect_get_type">
+    <member name="CLUTTER_OFFSCREEN_REDIRECT_AUTOMATIC_FOR_OPACITY" nick="automatic-for-opacity" value="1"/>
+    <member name="CLUTTER_OFFSCREEN_REDIRECT_ALWAYS" nick="always" value="2"/>
+  </flags>
+  <flags name="ClutterAllocationFlags" get-type="clutter_allocation_flags_get_type">
+    <member name="CLUTTER_ALLOCATION_NONE" nick="allocation-none" value="0"/>
+    <member name="CLUTTER_ABSOLUTE_ORIGIN_CHANGED" nick="absolute-origin-changed" value="2"/>
+    <member name="CLUTTER_DELEGATE_LAYOUT" nick="delegate-layout" value="4"/>
+  </flags>
+  <enum name="ClutterAlignAxis" get-type="clutter_align_axis_get_type">
+    <member name="CLUTTER_ALIGN_X_AXIS" nick="x-axis" value="0"/>
+    <member name="CLUTTER_ALIGN_Y_AXIS" nick="y-axis" value="1"/>
+    <member name="CLUTTER_ALIGN_BOTH" nick="both" value="2"/>
+  </enum>  <enum name="ClutterInterpolation" get-type="clutter_interpolation_get_type">
+    <member name="CLUTTER_INTERPOLATION_LINEAR" nick="linear" value="0"/>
+    <member name="CLUTTER_INTERPOLATION_CUBIC" nick="cubic" value="1"/>
+  </enum>  <enum name="ClutterBinAlignment" get-type="clutter_bin_alignment_get_type">
+    <member name="CLUTTER_BIN_ALIGNMENT_FIXED" nick="fixed" value="0"/>
+    <member name="CLUTTER_BIN_ALIGNMENT_FILL" nick="fill" value="1"/>
+    <member name="CLUTTER_BIN_ALIGNMENT_START" nick="start" value="2"/>
+    <member name="CLUTTER_BIN_ALIGNMENT_END" nick="end" value="3"/>
+    <member name="CLUTTER_BIN_ALIGNMENT_CENTER" nick="center" value="4"/>
+  </enum>  <enum name="ClutterBindCoordinate" get-type="clutter_bind_coordinate_get_type">
+    <member name="CLUTTER_BIND_X" nick="x" value="0"/>
+    <member name="CLUTTER_BIND_Y" nick="y" value="1"/>
+    <member name="CLUTTER_BIND_WIDTH" nick="width" value="2"/>
+    <member name="CLUTTER_BIND_HEIGHT" nick="height" value="3"/>
+    <member name="CLUTTER_BIND_POSITION" nick="position" value="4"/>
+    <member name="CLUTTER_BIND_SIZE" nick="size" value="5"/>
+    <member name="CLUTTER_BIND_ALL" nick="all" value="6"/>
+  </enum>  <flags name="ClutterEffectPaintFlags" get-type="clutter_effect_paint_flags_get_type">
+    <member name="CLUTTER_EFFECT_PAINT_ACTOR_DIRTY" nick="actor-dirty" value="1"/>
+  </flags>
+  <enum name="ClutterBoxAlignment" get-type="clutter_box_alignment_get_type">
+    <member name="CLUTTER_BOX_ALIGNMENT_START" nick="start" value="0"/>
+    <member name="CLUTTER_BOX_ALIGNMENT_END" nick="end" value="1"/>
+    <member name="CLUTTER_BOX_ALIGNMENT_CENTER" nick="center" value="2"/>
+  </enum>  <enum name="ClutterLongPressState" get-type="clutter_long_press_state_get_type">
+    <member name="CLUTTER_LONG_PRESS_QUERY" nick="query" value="0"/>
+    <member name="CLUTTER_LONG_PRESS_ACTIVATE" nick="activate" value="1"/>
+    <member name="CLUTTER_LONG_PRESS_CANCEL" nick="cancel" value="2"/>
+  </enum>  <enum name="ClutterStaticColor" get-type="clutter_static_color_get_type">
+    <member name="CLUTTER_COLOR_WHITE" nick="white" value="0"/>
+    <member name="CLUTTER_COLOR_BLACK" nick="black" value="1"/>
+    <member name="CLUTTER_COLOR_RED" nick="red" value="2"/>
+    <member name="CLUTTER_COLOR_DARK_RED" nick="dark-red" value="3"/>
+    <member name="CLUTTER_COLOR_GREEN" nick="green" value="4"/>
+    <member name="CLUTTER_COLOR_DARK_GREEN" nick="dark-green" value="5"/>
+    <member name="CLUTTER_COLOR_BLUE" nick="blue" value="6"/>
+    <member name="CLUTTER_COLOR_DARK_BLUE" nick="dark-blue" value="7"/>
+    <member name="CLUTTER_COLOR_CYAN" nick="cyan" value="8"/>
+    <member name="CLUTTER_COLOR_DARK_CYAN" nick="dark-cyan" value="9"/>
+    <member name="CLUTTER_COLOR_MAGENTA" nick="magenta" value="10"/>
+    <member name="CLUTTER_COLOR_DARK_MAGENTA" nick="dark-magenta" value="11"/>
+    <member name="CLUTTER_COLOR_YELLOW" nick="yellow" value="12"/>
+    <member name="CLUTTER_COLOR_DARK_YELLOW" nick="dark-yellow" value="13"/>
+    <member name="CLUTTER_COLOR_GRAY" nick="gray" value="14"/>
+    <member name="CLUTTER_COLOR_DARK_GRAY" nick="dark-gray" value="15"/>
+    <member name="CLUTTER_COLOR_LIGHT_GRAY" nick="light-gray" value="16"/>
+    <member name="CLUTTER_COLOR_BUTTER" nick="butter" value="17"/>
+    <member name="CLUTTER_COLOR_BUTTER_LIGHT" nick="butter-light" value="18"/>
+    <member name="CLUTTER_COLOR_BUTTER_DARK" nick="butter-dark" value="19"/>
+    <member name="CLUTTER_COLOR_ORANGE" nick="orange" value="20"/>
+    <member name="CLUTTER_COLOR_ORANGE_LIGHT" nick="orange-light" value="21"/>
+    <member name="CLUTTER_COLOR_ORANGE_DARK" nick="orange-dark" value="22"/>
+    <member name="CLUTTER_COLOR_CHOCOLATE" nick="chocolate" value="23"/>
+    <member name="CLUTTER_COLOR_CHOCOLATE_LIGHT" nick="chocolate-light" value="24"/>
+    <member name="CLUTTER_COLOR_CHOCOLATE_DARK" nick="chocolate-dark" value="25"/>
+    <member name="CLUTTER_COLOR_CHAMELEON" nick="chameleon" value="26"/>
+    <member name="CLUTTER_COLOR_CHAMELEON_LIGHT" nick="chameleon-light" value="27"/>
+    <member name="CLUTTER_COLOR_CHAMELEON_DARK" nick="chameleon-dark" value="28"/>
+    <member name="CLUTTER_COLOR_SKY_BLUE" nick="sky-blue" value="29"/>
+    <member name="CLUTTER_COLOR_SKY_BLUE_LIGHT" nick="sky-blue-light" value="30"/>
+    <member name="CLUTTER_COLOR_SKY_BLUE_DARK" nick="sky-blue-dark" value="31"/>
+    <member name="CLUTTER_COLOR_PLUM" nick="plum" value="32"/>
+    <member name="CLUTTER_COLOR_PLUM_LIGHT" nick="plum-light" value="33"/>
+    <member name="CLUTTER_COLOR_PLUM_DARK" nick="plum-dark" value="34"/>
+    <member name="CLUTTER_COLOR_SCARLET_RED" nick="scarlet-red" value="35"/>
+    <member name="CLUTTER_COLOR_SCARLET_RED_LIGHT" nick="scarlet-red-light" value="36"/>
+    <member name="CLUTTER_COLOR_SCARLET_RED_DARK" nick="scarlet-red-dark" value="37"/>
+    <member name="CLUTTER_COLOR_ALUMINIUM_1" nick="aluminium-1" value="38"/>
+    <member name="CLUTTER_COLOR_ALUMINIUM_2" nick="aluminium-2" value="39"/>
+    <member name="CLUTTER_COLOR_ALUMINIUM_3" nick="aluminium-3" value="40"/>
+    <member name="CLUTTER_COLOR_ALUMINIUM_4" nick="aluminium-4" value="41"/>
+    <member name="CLUTTER_COLOR_ALUMINIUM_5" nick="aluminium-5" value="42"/>
+    <member name="CLUTTER_COLOR_ALUMINIUM_6" nick="aluminium-6" value="43"/>
+    <member name="CLUTTER_COLOR_TRANSPARENT" nick="transparent" value="44"/>
+  </enum>  <enum name="ClutterDragAxis" get-type="clutter_drag_axis_get_type">
+    <member name="CLUTTER_DRAG_AXIS_NONE" nick="axis-none" value="0"/>
+    <member name="CLUTTER_DRAG_X_AXIS" nick="x-axis" value="1"/>
+    <member name="CLUTTER_DRAG_Y_AXIS" nick="y-axis" value="2"/>
+  </enum>  <flags name="ClutterEventFlags" get-type="clutter_event_flags_get_type">
+    <member name="CLUTTER_EVENT_NONE" nick="none" value="0"/>
+    <member name="CLUTTER_EVENT_FLAG_SYNTHETIC" nick="flag-synthetic" value="1"/>
+  </flags>
+  <enum name="ClutterEventType" get-type="clutter_event_type_get_type">
+    <member name="CLUTTER_NOTHING" nick="nothing" value="0"/>
+    <member name="CLUTTER_KEY_PRESS" nick="key-press" value="1"/>
+    <member name="CLUTTER_KEY_RELEASE" nick="key-release" value="2"/>
+    <member name="CLUTTER_MOTION" nick="motion" value="3"/>
+    <member name="CLUTTER_ENTER" nick="enter" value="4"/>
+    <member name="CLUTTER_LEAVE" nick="leave" value="5"/>
+    <member name="CLUTTER_BUTTON_PRESS" nick="button-press" value="6"/>
+    <member name="CLUTTER_BUTTON_RELEASE" nick="button-release" value="7"/>
+    <member name="CLUTTER_SCROLL" nick="scroll" value="8"/>
+    <member name="CLUTTER_STAGE_STATE" nick="stage-state" value="9"/>
+    <member name="CLUTTER_DESTROY_NOTIFY" nick="destroy-notify" value="10"/>
+    <member name="CLUTTER_CLIENT_MESSAGE" nick="client-message" value="11"/>
+    <member name="CLUTTER_DELETE" nick="delete" value="12"/>
+    <member name="CLUTTER_TOUCH_BEGIN" nick="touch-begin" value="13"/>
+    <member name="CLUTTER_TOUCH_UPDATE" nick="touch-update" value="14"/>
+    <member name="CLUTTER_TOUCH_END" nick="touch-end" value="15"/>
+    <member name="CLUTTER_TOUCH_CANCEL" nick="touch-cancel" value="16"/>
+    <member name="CLUTTER_TOUCHPAD_PINCH" nick="touchpad-pinch" value="17"/>
+    <member name="CLUTTER_TOUCHPAD_SWIPE" nick="touchpad-swipe" value="18"/>
+    <member name="CLUTTER_EVENT_LAST" nick="event-last" value="19"/>
+  </enum>  <enum name="ClutterScrollDirection" get-type="clutter_scroll_direction_get_type">
+    <member name="CLUTTER_SCROLL_UP" nick="up" value="0"/>
+    <member name="CLUTTER_SCROLL_DOWN" nick="down" value="1"/>
+    <member name="CLUTTER_SCROLL_LEFT" nick="left" value="2"/>
+    <member name="CLUTTER_SCROLL_RIGHT" nick="right" value="3"/>
+    <member name="CLUTTER_SCROLL_SMOOTH" nick="smooth" value="4"/>
+  </enum>  <flags name="ClutterStageState" get-type="clutter_stage_state_get_type">
+    <member name="CLUTTER_STAGE_STATE_FULLSCREEN" nick="fullscreen" value="2"/>
+    <member name="CLUTTER_STAGE_STATE_OFFSCREEN" nick="offscreen" value="4"/>
+    <member name="CLUTTER_STAGE_STATE_ACTIVATED" nick="activated" value="8"/>
+  </flags>
+  <flags name="ClutterFeatureFlags" get-type="clutter_feature_flags_get_type">
+    <member name="CLUTTER_FEATURE_TEXTURE_NPOT" nick="texture-npot" value="4"/>
+    <member name="CLUTTER_FEATURE_SYNC_TO_VBLANK" nick="sync-to-vblank" value="8"/>
+    <member name="CLUTTER_FEATURE_TEXTURE_YUV" nick="texture-yuv" value="16"/>
+    <member name="CLUTTER_FEATURE_TEXTURE_READ_PIXELS" nick="texture-read-pixels" value="32"/>
+    <member name="CLUTTER_FEATURE_STAGE_STATIC" nick="stage-static" value="64"/>
+    <member name="CLUTTER_FEATURE_STAGE_USER_RESIZE" nick="stage-user-resize" value="128"/>
+    <member name="CLUTTER_FEATURE_STAGE_CURSOR" nick="stage-cursor" value="256"/>
+    <member name="CLUTTER_FEATURE_SHADERS_GLSL" nick="shaders-glsl" value="512"/>
+    <member name="CLUTTER_FEATURE_OFFSCREEN" nick="offscreen" value="1024"/>
+    <member name="CLUTTER_FEATURE_STAGE_MULTIPLE" nick="stage-multiple" value="2048"/>
+    <member name="CLUTTER_FEATURE_SWAP_EVENTS" nick="swap-events" value="4096"/>
+  </flags>
+  <enum name="ClutterFlowOrientation" get-type="clutter_flow_orientation_get_type">
+    <member name="CLUTTER_FLOW_HORIZONTAL" nick="horizontal" value="0"/>
+    <member name="CLUTTER_FLOW_VERTICAL" nick="vertical" value="1"/>
+  </enum>  <enum name="ClutterInputDeviceType" get-type="clutter_input_device_type_get_type">
+    <member name="CLUTTER_POINTER_DEVICE" nick="pointer-device" value="0"/>
+    <member name="CLUTTER_KEYBOARD_DEVICE" nick="keyboard-device" value="1"/>
+    <member name="CLUTTER_EXTENSION_DEVICE" nick="extension-device" value="2"/>
+    <member name="CLUTTER_JOYSTICK_DEVICE" nick="joystick-device" value="3"/>
+    <member name="CLUTTER_TABLET_DEVICE" nick="tablet-device" value="4"/>
+    <member name="CLUTTER_TOUCHPAD_DEVICE" nick="touchpad-device" value="5"/>
+    <member name="CLUTTER_TOUCHSCREEN_DEVICE" nick="touchscreen-device" value="6"/>
+    <member name="CLUTTER_PEN_DEVICE" nick="pen-device" value="7"/>
+    <member name="CLUTTER_ERASER_DEVICE" nick="eraser-device" value="8"/>
+    <member name="CLUTTER_CURSOR_DEVICE" nick="cursor-device" value="9"/>
+    <member name="CLUTTER_N_DEVICE_TYPES" nick="n-device-types" value="10"/>
+  </enum>  <enum name="ClutterInputMode" get-type="clutter_input_mode_get_type">
+    <member name="CLUTTER_INPUT_MODE_MASTER" nick="master" value="0"/>
+    <member name="CLUTTER_INPUT_MODE_SLAVE" nick="slave" value="1"/>
+    <member name="CLUTTER_INPUT_MODE_FLOATING" nick="floating" value="2"/>
+  </enum>  <enum name="ClutterInputAxis" get-type="clutter_input_axis_get_type">
+    <member name="CLUTTER_INPUT_AXIS_IGNORE" nick="ignore" value="0"/>
+    <member name="CLUTTER_INPUT_AXIS_X" nick="x" value="1"/>
+    <member name="CLUTTER_INPUT_AXIS_Y" nick="y" value="2"/>
+    <member name="CLUTTER_INPUT_AXIS_PRESSURE" nick="pressure" value="3"/>
+    <member name="CLUTTER_INPUT_AXIS_XTILT" nick="xtilt" value="4"/>
+    <member name="CLUTTER_INPUT_AXIS_YTILT" nick="ytilt" value="5"/>
+    <member name="CLUTTER_INPUT_AXIS_WHEEL" nick="wheel" value="6"/>
+    <member name="CLUTTER_INPUT_AXIS_DISTANCE" nick="distance" value="7"/>
+    <member name="CLUTTER_INPUT_AXIS_LAST" nick="last" value="8"/>
+  </enum>  <enum name="ClutterSnapEdge" get-type="clutter_snap_edge_get_type">
+    <member name="CLUTTER_SNAP_EDGE_TOP" nick="top" value="0"/>
+    <member name="CLUTTER_SNAP_EDGE_RIGHT" nick="right" value="1"/>
+    <member name="CLUTTER_SNAP_EDGE_BOTTOM" nick="bottom" value="2"/>
+    <member name="CLUTTER_SNAP_EDGE_LEFT" nick="left" value="3"/>
+  </enum>  <enum name="ClutterPickMode" get-type="clutter_pick_mode_get_type">
+    <member name="CLUTTER_PICK_NONE" nick="none" value="0"/>
+    <member name="CLUTTER_PICK_REACTIVE" nick="reactive" value="1"/>
+    <member name="CLUTTER_PICK_ALL" nick="all" value="2"/>
+  </enum>  <flags name="ClutterSwipeDirection" get-type="clutter_swipe_direction_get_type">
+    <member name="CLUTTER_SWIPE_DIRECTION_UP" nick="up" value="1"/>
+    <member name="CLUTTER_SWIPE_DIRECTION_DOWN" nick="down" value="2"/>
+    <member name="CLUTTER_SWIPE_DIRECTION_LEFT" nick="left" value="4"/>
+    <member name="CLUTTER_SWIPE_DIRECTION_RIGHT" nick="right" value="8"/>
+  </flags>
+  <enum name="ClutterPanAxis" get-type="clutter_pan_axis_get_type">
+    <member name="CLUTTER_PAN_AXIS_NONE" nick="axis-none" value="0"/>
+    <member name="CLUTTER_PAN_X_AXIS" nick="x-axis" value="1"/>
+    <member name="CLUTTER_PAN_Y_AXIS" nick="y-axis" value="2"/>
+    <member name="CLUTTER_PAN_AXIS_AUTO" nick="axis-auto" value="3"/>
+  </enum>  <enum name="ClutterTableAlignment" get-type="clutter_table_alignment_get_type">
+    <member name="CLUTTER_TABLE_ALIGNMENT_START" nick="start" value="0"/>
+    <member name="CLUTTER_TABLE_ALIGNMENT_CENTER" nick="center" value="1"/>
+    <member name="CLUTTER_TABLE_ALIGNMENT_END" nick="end" value="2"/>
+  </enum>  <flags name="ClutterTextureFlags" get-type="clutter_texture_flags_get_type">
+    <member name="CLUTTER_TEXTURE_NONE" nick="none" value="0"/>
+    <member name="CLUTTER_TEXTURE_RGB_FLAG_BGR" nick="rgb-flag-bgr" value="2"/>
+    <member name="CLUTTER_TEXTURE_RGB_FLAG_PREMULT" nick="rgb-flag-premult" value="4"/>
+    <member name="CLUTTER_TEXTURE_YUV_FLAG_YUV2" nick="yuv-flag-yuv2" value="8"/>
+  </flags>
+  <enum name="ClutterTextureQuality" get-type="clutter_texture_quality_get_type">
+    <member name="CLUTTER_TEXTURE_QUALITY_LOW" nick="low" value="0"/>
+    <member name="CLUTTER_TEXTURE_QUALITY_MEDIUM" nick="medium" value="1"/>
+    <member name="CLUTTER_TEXTURE_QUALITY_HIGH" nick="high" value="2"/>
+  </enum>  <enum name="ClutterTimelineDirection" get-type="clutter_timeline_direction_get_type">
+    <member name="CLUTTER_TIMELINE_FORWARD" nick="forward" value="0"/>
+    <member name="CLUTTER_TIMELINE_BACKWARD" nick="backward" value="1"/>
+  </enum>  <enum name="ClutterUnitType" get-type="clutter_unit_type_get_type">
+    <member name="CLUTTER_UNIT_PIXEL" nick="pixel" value="0"/>
+    <member name="CLUTTER_UNIT_EM" nick="em" value="1"/>
+    <member name="CLUTTER_UNIT_MM" nick="mm" value="2"/>
+    <member name="CLUTTER_UNIT_POINT" nick="point" value="3"/>
+    <member name="CLUTTER_UNIT_CM" nick="cm" value="4"/>
+  </enum>  <enum name="ClutterPathNodeType" get-type="clutter_path_node_type_get_type">
+    <member name="CLUTTER_PATH_MOVE_TO" nick="move-to" value="0"/>
+    <member name="CLUTTER_PATH_LINE_TO" nick="line-to" value="1"/>
+    <member name="CLUTTER_PATH_CURVE_TO" nick="curve-to" value="2"/>
+    <member name="CLUTTER_PATH_CLOSE" nick="close" value="3"/>
+    <member name="CLUTTER_PATH_REL_MOVE_TO" nick="rel-move-to" value="32"/>
+    <member name="CLUTTER_PATH_REL_LINE_TO" nick="rel-line-to" value="33"/>
+    <member name="CLUTTER_PATH_REL_CURVE_TO" nick="rel-curve-to" value="34"/>
+  </enum>  <enum name="ClutterActorAlign" get-type="clutter_actor_align_get_type">
+    <member name="CLUTTER_ACTOR_ALIGN_FILL" nick="fill" value="0"/>
+    <member name="CLUTTER_ACTOR_ALIGN_START" nick="start" value="1"/>
+    <member name="CLUTTER_ACTOR_ALIGN_CENTER" nick="center" value="2"/>
+    <member name="CLUTTER_ACTOR_ALIGN_END" nick="end" value="3"/>
+  </enum>  <flags name="ClutterRepaintFlags" get-type="clutter_repaint_flags_get_type">
+    <member name="CLUTTER_REPAINT_FLAGS_PRE_PAINT" nick="pre-paint" value="1"/>
+    <member name="CLUTTER_REPAINT_FLAGS_POST_PAINT" nick="post-paint" value="2"/>
+    <member name="CLUTTER_REPAINT_FLAGS_QUEUE_REDRAW_ON_ADD" nick="queue-redraw-on-add" value="4"/>
+  </flags>
+  <enum name="ClutterContentGravity" get-type="clutter_content_gravity_get_type">
+    <member name="CLUTTER_CONTENT_GRAVITY_TOP_LEFT" nick="top-left" value="0"/>
+    <member name="CLUTTER_CONTENT_GRAVITY_TOP" nick="top" value="1"/>
+    <member name="CLUTTER_CONTENT_GRAVITY_TOP_RIGHT" nick="top-right" value="2"/>
+    <member name="CLUTTER_CONTENT_GRAVITY_LEFT" nick="left" value="3"/>
+    <member name="CLUTTER_CONTENT_GRAVITY_CENTER" nick="center" value="4"/>
+    <member name="CLUTTER_CONTENT_GRAVITY_RIGHT" nick="right" value="5"/>
+    <member name="CLUTTER_CONTENT_GRAVITY_BOTTOM_LEFT" nick="bottom-left" value="6"/>
+    <member name="CLUTTER_CONTENT_GRAVITY_BOTTOM" nick="bottom" value="7"/>
+    <member name="CLUTTER_CONTENT_GRAVITY_BOTTOM_RIGHT" nick="bottom-right" value="8"/>
+    <member name="CLUTTER_CONTENT_GRAVITY_RESIZE_FILL" nick="resize-fill" value="9"/>
+    <member name="CLUTTER_CONTENT_GRAVITY_RESIZE_ASPECT" nick="resize-aspect" value="10"/>
+  </enum>  <enum name="ClutterScalingFilter" get-type="clutter_scaling_filter_get_type">
+    <member name="CLUTTER_SCALING_FILTER_LINEAR" nick="linear" value="0"/>
+    <member name="CLUTTER_SCALING_FILTER_NEAREST" nick="nearest" value="1"/>
+    <member name="CLUTTER_SCALING_FILTER_TRILINEAR" nick="trilinear" value="2"/>
+  </enum>  <enum name="ClutterOrientation" get-type="clutter_orientation_get_type">
+    <member name="CLUTTER_ORIENTATION_HORIZONTAL" nick="horizontal" value="0"/>
+    <member name="CLUTTER_ORIENTATION_VERTICAL" nick="vertical" value="1"/>
+  </enum>  <flags name="ClutterScrollMode" get-type="clutter_scroll_mode_get_type">
+    <member name="CLUTTER_SCROLL_NONE" nick="none" value="0"/>
+    <member name="CLUTTER_SCROLL_HORIZONTALLY" nick="horizontally" value="1"/>
+    <member name="CLUTTER_SCROLL_VERTICALLY" nick="vertically" value="2"/>
+    <member name="CLUTTER_SCROLL_BOTH" nick="both" value="3"/>
+  </flags>
+  <enum name="ClutterGridPosition" get-type="clutter_grid_position_get_type">
+    <member name="CLUTTER_GRID_POSITION_LEFT" nick="left" value="0"/>
+    <member name="CLUTTER_GRID_POSITION_RIGHT" nick="right" value="1"/>
+    <member name="CLUTTER_GRID_POSITION_TOP" nick="top" value="2"/>
+    <member name="CLUTTER_GRID_POSITION_BOTTOM" nick="bottom" value="3"/>
+  </enum>  <flags name="ClutterContentRepeat" get-type="clutter_content_repeat_get_type">
+    <member name="CLUTTER_REPEAT_NONE" nick="none" value="0"/>
+    <member name="CLUTTER_REPEAT_X_AXIS" nick="x-axis" value="1"/>
+    <member name="CLUTTER_REPEAT_Y_AXIS" nick="y-axis" value="2"/>
+    <member name="CLUTTER_REPEAT_BOTH" nick="both" value="3"/>
+  </flags>
+  <enum name="ClutterStepMode" get-type="clutter_step_mode_get_type">
+    <member name="CLUTTER_STEP_MODE_START" nick="start" value="0"/>
+    <member name="CLUTTER_STEP_MODE_END" nick="end" value="1"/>
+  </enum>  <enum name="ClutterZoomAxis" get-type="clutter_zoom_axis_get_type">
+    <member name="CLUTTER_ZOOM_X_AXIS" nick="x-axis" value="0"/>
+    <member name="CLUTTER_ZOOM_Y_AXIS" nick="y-axis" value="1"/>
+    <member name="CLUTTER_ZOOM_BOTH" nick="both" value="2"/>
+  </enum>  <enum name="ClutterGestureTriggerEdge" get-type="clutter_gesture_trigger_edge_get_type">
+    <member name="CLUTTER_GESTURE_TRIGGER_EDGE_NONE" nick="none" value="0"/>
+    <member name="CLUTTER_GESTURE_TRIGGER_EDGE_AFTER" nick="after" value="1"/>
+    <member name="CLUTTER_GESTURE_TRIGGER_EDGE_BEFORE" nick="before" value="2"/>
+  </enum>  <enum name="ClutterTouchpadGesturePhase" get-type="clutter_touchpad_gesture_phase_get_type">
+    <member name="CLUTTER_TOUCHPAD_GESTURE_PHASE_BEGIN" nick="begin" value="0"/>
+    <member name="CLUTTER_TOUCHPAD_GESTURE_PHASE_UPDATE" nick="update" value="1"/>
+    <member name="CLUTTER_TOUCHPAD_GESTURE_PHASE_END" nick="end" value="2"/>
+    <member name="CLUTTER_TOUCHPAD_GESTURE_PHASE_CANCEL" nick="cancel" value="3"/>
+  </enum>  <enum name="ClutterScrollSource" get-type="clutter_scroll_source_get_type">
+    <member name="CLUTTER_SCROLL_SOURCE_UNKNOWN" nick="unknown" value="0"/>
+    <member name="CLUTTER_SCROLL_SOURCE_WHEEL" nick="wheel" value="1"/>
+    <member name="CLUTTER_SCROLL_SOURCE_FINGER" nick="finger" value="2"/>
+    <member name="CLUTTER_SCROLL_SOURCE_CONTINUOUS" nick="continuous" value="3"/>
+  </enum>  <flags name="ClutterScrollFinishFlags" get-type="clutter_scroll_finish_flags_get_type">
+    <member name="CLUTTER_SCROLL_FINISHED_NONE" nick="none" value="0"/>
+    <member name="CLUTTER_SCROLL_FINISHED_HORIZONTAL" nick="horizontal" value="1"/>
+    <member name="CLUTTER_SCROLL_FINISHED_VERTICAL" nick="vertical" value="2"/>
+  </flags>
+  <enum name="ClutterImageError" get-type="clutter_image_error_get_type">
+    <member name="CLUTTER_IMAGE_ERROR_INVALID_DATA" nick="data" value="0"/>
+  </enum>  <enum name="ClutterInitError" get-type="clutter_init_error_get_type">
+    <member name="CLUTTER_INIT_SUCCESS" nick="success" value="1"/>
+    <member name="CLUTTER_INIT_ERROR_UNKNOWN" nick="error-unknown" value="0"/>
+    <member name="CLUTTER_INIT_ERROR_THREADS" nick="error-threads" value="-1"/>
+    <member name="CLUTTER_INIT_ERROR_BACKEND" nick="error-backend" value="-2"/>
+    <member name="CLUTTER_INIT_ERROR_INTERNAL" nick="error-internal" value="-3"/>
+  </enum>  <enum name="ClutterScriptError" get-type="clutter_script_error_get_type">
+    <member name="CLUTTER_SCRIPT_ERROR_INVALID_TYPE_FUNCTION" nick="type-function" value="0"/>
+    <member name="CLUTTER_SCRIPT_ERROR_INVALID_PROPERTY" nick="property" value="1"/>
+    <member name="CLUTTER_SCRIPT_ERROR_INVALID_VALUE" nick="value" value="2"/>
+  </enum>  <enum name="ClutterTextureError" get-type="clutter_texture_error_get_type">
+    <member name="CLUTTER_TEXTURE_ERROR_OUT_OF_MEMORY" nick="out-of-memory" value="0"/>
+    <member name="CLUTTER_TEXTURE_ERROR_NO_YUV" nick="no-yuv" value="1"/>
+    <member name="CLUTTER_TEXTURE_ERROR_BAD_FORMAT" nick="bad-format" value="2"/>
+  </enum>  <enum name="ClutterShaderError" get-type="clutter_shader_error_get_type">
+    <member name="CLUTTER_SHADER_ERROR_NO_ASM" nick="no-asm" value="0"/>
+    <member name="CLUTTER_SHADER_ERROR_NO_GLSL" nick="no-glsl" value="1"/>
+    <member name="CLUTTER_SHADER_ERROR_COMPILE" nick="compile" value="2"/>
+  </enum>  <error-quark function="clutter_texture_error_quark" domain="clutter-texture-error-quark"/>
+  <error-quark function="clutter_shader_error_quark" domain="clutter-shader-error"/>
+  <error-quark function="clutter_image_error_quark" domain="clutter-image-error-quark"/>
+  <error-quark function="clutter_init_error_quark" domain="clutter-init-error-quark"/>
+  <error-quark function="clutter_script_error_quark" domain="clutter-script-error"/>
+</dump>

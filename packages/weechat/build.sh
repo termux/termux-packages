@@ -29,6 +29,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DMSGFMT_EXECUTABLE=$(command -v msgfmt)
 -DMSGMERGE_EXECUTABLE=$(command -v msgmerge)
 -DXGETTEXT_EXECUTABLE=$(command -v xgettext)
+-DLIBGCRYPT_CONFIG_EXECUTABLE=$TERMUX_PREFIX/bin/libgcrypt-config
 "
 
 termux_step_pre_configure() {

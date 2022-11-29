@@ -1,0 +1,41 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -81,25 +81,26 @@
+ target_link_libraries(komorebi ${DEPS_LIBRARIES} -lm)
+ target_link_libraries(komorebi-wallpaper-creator ${DEPS_LIBRARIES} -lm)
+ 
+-install(TARGETS komorebi RUNTIME DESTINATION /System/Applications/)
+-install(TARGETS komorebi-wallpaper-creator RUNTIME DESTINATION /System/Applications/)
++install(TARGETS komorebi RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
++install(TARGETS komorebi-wallpaper-creator RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
+ 
+ 
+ ######### Wallpapers ############
+-install(DIRECTORY data/Wallpapers/ DESTINATION /System/Resources/Komorebi)
++install(DIRECTORY data/Wallpapers/ DESTINATION "${PKGDATADIR}")
+ 
+ 
+ ######### Fonts ############
+-install(DIRECTORY data/Fonts/ DESTINATION /usr/share/fonts)
++install(DIRECTORY data/Fonts/ DESTINATION "${CMAKE_INSTALL_PREFIX}/share/fonts")
+ 
+ ######### Icons ############
+-install(DIRECTORY data/Icons/ DESTINATION /System/Resources/Komorebi)
++install(DIRECTORY data/Icons/ DESTINATION "${PKGDATADIR}")
+ 
+ ######### Other ############
+-install(FILES data/Other/komorebi.desktop DESTINATION /usr/share/applications/)
+-install(FILES data/Other/wallpapercreator.desktop DESTINATION /usr/share/applications/)
++install(FILES data/Other/komorebi.desktop DESTINATION "${CMAKE_INSTALL_PREFIX}/share/applications/")
++install(FILES data/Other/wallpapercreator.desktop DESTINATION "${CMAKE_INSTALL_PREFIX}/share/applications/")
+ 
+ ######### Run the upgrade script #########
++if(FALSE)
+ install(CODE "execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/data/Other/postinst.sh)")
+ 
+ # Packaging configuration
+@@ -121,3 +122,4 @@
+ set(CPACK_DEBIAN_PACKAGE_SECTION "system")
+ 
+ include(CPack)
++endif(FALSE)

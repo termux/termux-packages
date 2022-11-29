@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.terraform.io
 TERMUX_PKG_DESCRIPTION="A tool for building, changing, and versioning infrastructure safely and efficiently"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.2.1
+TERMUX_PKG_VERSION=1.3.5
 TERMUX_PKG_SRCURL=https://github.com/hashicorp/terraform/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=d244277c3b8d10afa8d130cfd9db3570995a03a34052952de1ab2368fc25ab1c
+TERMUX_PKG_SHA256=6c44d7b30b31c68333688a794646077842aea94fe6073368824c47d57c22862e
 TERMUX_PKG_DEPENDS="git"
 
 termux_step_make() {

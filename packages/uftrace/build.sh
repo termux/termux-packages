@@ -10,7 +10,6 @@ TERMUX_PKG_SHA256=2aad01f27d4f18717b681824c7a28ac3e1efd5e7bbed3ec888a3ea5af60e37
 # Please revbump and rebuild when bumping _PYTHON_VERSION, where
 # _PYTHON_VERSION == _MAJOR_VERSION in build.sh of python package.
 TERMUX_PKG_DEPENDS="capstone, libandroid-glob, libandroid-spawn, libc++, libdw, libelf, libluajit, ncurses, python"
-TERMUX_PKG_BUILD_DEPENDS="argp"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 

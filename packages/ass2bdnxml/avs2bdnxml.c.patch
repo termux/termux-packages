@@ -1,0 +1,62 @@
+--- a/avs2bdnxml.c
++++ b/avs2bdnxml.c
+@@ -468,10 +468,29 @@
+ 	fclose(fh);
+ }
+ 
++#ifndef __ANDROID__
+ extern int asm_is_identical_sse2 (stream_info_t *s_info, char *img, char *img_old);
+ extern int asm_is_empty_sse2 (stream_info_t *s_info, char *img);
+ extern void asm_zero_transparent_sse2 (stream_info_t *s_info, char volatile *img);
+ extern void asm_swap_rb_sse2 (stream_info_t *s_info, char volatile *img, char volatile *out);
++#else
++static int asm_is_identical_sse2 (stream_info_t *s_info, char *img, char *img_old)
++{
++	__builtin_abort();
++}
++static int asm_is_empty_sse2 (stream_info_t *s_info, char *img)
++{
++	__builtin_abort();
++}
++static void asm_zero_transparent_sse2 (stream_info_t *s_info, char volatile *img)
++{
++	__builtin_abort();
++}
++static void asm_swap_rb_sse2 (stream_info_t *s_info, char volatile *img, char volatile *out)
++{
++	__builtin_abort();
++}
++#endif
+ 
+ int is_identical_c (stream_info_t *s_info, char *img, char *img_old)
+ {
+@@ -535,6 +554,7 @@
+ 
+ int detect_sse2 ()
+ {
++#ifndef __ANDROID__
+ 	static int detection = -1;
+ 	unsigned int func = 0x00000001;
+ 	unsigned int eax, ebx, ecx, edx;
+@@ -560,6 +580,9 @@
+ 		fprintf(stderr, "CPU: Using pure C functions.\n");
+ 
+ 	return detection;
++#else /* __ANDROID__ */
++	return 0;
++#endif
+ }
+ 
+ int is_identical (stream_info_t *s_info, char *img, char *img_old)
+@@ -664,7 +687,11 @@
+ 		);
+ }
+ 
++#ifndef __ANDROID__
+ extern char *rindex(const char *s, int c);
++#else
++#define rindex strrchr
++#endif
+ int is_extension(char *filename, char *check_ext)
+ {
+ 	char *ext = rindex(filename, '.');

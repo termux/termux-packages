@@ -7,6 +7,7 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.sourceforge.net/pong2.berlios/pong2-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=7b3601b35a4f2d64e2a4e85b9d6ad2fe84a79d40a39be2909f3e52b094307639
 TERMUX_PKG_DEPENDS="glu, libc++, mesa, openssl, sdl, sdl-image"
+TERMUX_PKG_GROUPS="games"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
