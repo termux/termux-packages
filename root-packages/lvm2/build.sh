@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0, LGPL-2.1, BSD 2-Clause"
 TERMUX_PKG_LICENSE_FILE="COPYING, COPYING.BSD, COPYING.LIB"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.03.17
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/sourceware/lvm2/releases/LVM2.${TERMUX_PKG_VERSION}.tgz
 TERMUX_PKG_SHA256=7286cfa9651828c589389509546333b8da965dfa84a1a4c8ab3e681a47fabae7
 TERMUX_PKG_DEPENDS="libandroid-support, libaio, readline"
@@ -19,6 +20,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-default-run-dir=$TERMUX_PREFIX/var/run
 --with-default-locking-dir=$TERMUX_PREFIX/var/run/lock/lvm
 --with-confdir=$TERMUX_PREFIX/etc
+--with-symvers=no
 "
 
 termux_step_pre_configure() {
