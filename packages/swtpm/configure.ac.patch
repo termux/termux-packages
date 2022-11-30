@@ -1,0 +1,38 @@
+--- a/configure.ac
++++ b/configure.ac
+@@ -200,14 +200,6 @@
+ fi
+ AM_CONDITIONAL([HAVE_TCSD], test "$have_tcsd" != "no")
+ 
+-dnl We either need netstat (more common across systems) or 'ss' for test cases
+-AC_PATH_PROG([NETSTAT], [netstat])
+-if test "x$NETSTAT" = "x"; then
+-	AC_PATH_PROG([SS], [ss])
+-	if test "x$SS" = "x"; then
+-		AC_MSG_ERROR(['netstat' and 'ss' tools are missing for tests: net-tools OR iproute/iproute2 package])
+-	fi
+-fi
+ 
+ AC_MSG_CHECKING([for whether to build with CUSE interface])
+ AC_ARG_WITH([cuse],
+@@ -384,20 +376,12 @@
+ pcr_bank_checks
+ AC_SUBST([DEFAULT_PCR_BANKS])
+ 
+-AC_PATH_PROG([EXPECT], expect)
+-if test "x$EXPECT" = "x"; then
+-	AC_MSG_ERROR([expect is required: expect package])
+-fi
+ 
+ AC_PATH_PROG([GAWK], gawk)
+ if test "x$GAWK" = "x"; then
+ 	AC_MSG_ERROR([gawk is required: gawk package])
+ fi
+ 
+-AC_PATH_PROG([SOCAT], socat)
+-if test "x$SOCAT" = "x"; then
+-	AC_MSG_ERROR([socat is required: socat package])
+-fi
+ 
+ AC_PATH_PROG([BASE64], base64)
+ if test "x$BASE64" = "x"; then
