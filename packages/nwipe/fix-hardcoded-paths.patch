@@ -1,0 +1,104 @@
+--- a/src/device.c
++++ b/src/device.c
+@@ -448,11 +448,11 @@
+     int idx2;
+ 
+     char readlink_command[] = "readlink /sys/block/%s";
+-    char readlink_command2[] = "/usr/bin/readlink /sys/block/%s";
+-    char readlink_command3[] = "/sbin/readlink /sys/block/%s";
++    char readlink_command2[] = "@TERMUX_PREFIX@/bin/readlink /sys/block/%s";
++    char readlink_command3[] = "@TERMUX_PREFIX@/local/bin/readlink /sys/block/%s";
+     char smartctl_command[] = "smartctl -i %s";
+-    char smartctl_command2[] = "/sbin/smartctl -i %s";
+-    char smartctl_command3[] = "/usr/bin/smartctl -i %s";
++    char smartctl_command2[] = "@TERMUX_PREFIX@/local/bin/smartctl -i %s";
++    char smartctl_command3[] = "@TERMUX_PREFIX@/bin/smartctl -i %s";
+     char device_shortform[50];
+     char result[512];
+     char final_cmd_readlink[sizeof( readlink_command ) + sizeof( device_shortform )];
+@@ -499,11 +499,11 @@
+ 
+     /* Determine whether we can access readlink, required if the PATH environment is not setup ! (Debian sid 'su' as
+      * opposed to 'su -' */
+-    if( system( "which readlink > /dev/null 2>&1" ) )
++    if( system( "command -v readlink > /dev/null 2>&1" ) )
+     {
+-        if( system( "which /sbin/readlink > /dev/null 2>&1" ) )
++        if( system( "command -v @TERMUX_PREFIX@/local/bin/readlink > /dev/null 2>&1" ) )
+         {
+-            if( system( "which /usr/bin/readlink > /dev/null 2>&1" ) )
++            if( system( "command -v @TERMUX_PREFIX@/bin/readlink > /dev/null 2>&1" ) )
+             {
+                 nwipe_log( NWIPE_LOG_WARNING, "Command not found. Install readlink !" );
+                 set_return_value = 2;
+@@ -620,11 +620,11 @@
+ 
+     /* Determine whether we can access smartctl, required if the PATH environment is not setup ! (Debian sid 'su' as
+      * opposed to 'su -' */
+-    if( system( "which smartctl > /dev/null 2>&1" ) )
++    if( system( "command -v smartctl > /dev/null 2>&1" ) )
+     {
+-        if( system( "which /sbin/smartctl > /dev/null 2>&1" ) )
++        if( system( "command -v @TERMUX_PREFIX@/local/bin/smartctl > /dev/null 2>&1" ) )
+         {
+-            if( system( "which /usr/bin/smartctl > /dev/null 2>&1" ) )
++            if( system( "command -v @TERMUX_PREFIX@/bin/smartctl > /dev/null 2>&1" ) )
+             {
+                 nwipe_log( NWIPE_LOG_WARNING, "Command not found. Install smartmontools !" );
+             }
+--- a/src/logging.c
++++ b/src/logging.c
+@@ -541,8 +541,8 @@
+     };
+ 
+     char dmidecode_command[] = "dmidecode -s %s";
+-    char dmidecode_command2[] = "/sbin/dmidecode -s %s";
+-    char dmidecode_command3[] = "/usr/bin/dmidecode -s %s";
++    char dmidecode_command2[] = "@TERMUX_PREFIX@/local/bin/dmidecode -s %s";
++    char dmidecode_command3[] = "@TERMUX_PREFIX@/bin/dmidecode -s %s";
+     char* p_dmidecode_command;
+ 
+     char cmd[sizeof( dmidecode_keywords ) + sizeof( dmidecode_command2 )];
+@@ -553,11 +553,11 @@
+ 
+     p_dmidecode_command = 0;
+ 
+-    if( system( "which dmidecode > /dev/null 2>&1" ) )
++    if( system( "command -v dmidecode > /dev/null 2>&1" ) )
+     {
+-        if( system( "which /sbin/dmidecode > /dev/null 2>&1" ) )
++        if( system( "command -v @TERMUX_PREFIX@/local/bin/dmidecode > /dev/null 2>&1" ) )
+         {
+-            if( system( "which /usr/bin/dmidecode > /dev/null 2>&1" ) )
++            if( system( "command -v @TERMUX_PREFIX@/bin/dmidecode > /dev/null 2>&1" ) )
+             {
+                 nwipe_log( NWIPE_LOG_WARNING, "Command not found. Install dmidecode !" );
+             }
+--- a/src/nwipe.c
++++ b/src/nwipe.c
+@@ -67,8 +67,8 @@
+     pthread_t nwipe_sigint_thread;  // The thread ID of the sigint handler.
+ 
+     char modprobe_command[] = "modprobe %s";
+-    char modprobe_command2[] = "/sbin/modprobe %s";
+-    char modprobe_command3[] = "/usr/sbin/modprobe %s";
++    char modprobe_command2[] = "@TERMUX_PREFIX@/local/bin/modprobe %s";
++    char modprobe_command3[] = "@TERMUX_PREFIX@/bin/modprobe %s";
+     char module_shortform[50];
+     char final_cmd_modprobe[sizeof( modprobe_command ) + sizeof( module_shortform )];
+ 
+@@ -227,11 +227,11 @@
+     /* Determine whether we can access modprobe, required if the PATH environment is not setup ! (Debian sid 'su' as
+      * opposed to 'su -' */
+ 
+-    if( system( "which modprobe > /dev/null 2>&1" ) )
++    if( system( "command -v modprobe > /dev/null 2>&1" ) )
+     {
+-        if( system( "which /sbin/modprobe > /dev/null 2>&1" ) )
++        if( system( "command -v @TERMUX_PREFIX@/local/bin/modprobe > /dev/null 2>&1" ) )
+         {
+-            if( system( "which /usr/sbin/modprobe > /dev/null 2>&1" ) )
++            if( system( "command -v @TERMUX_PREFIX@/bin/modprobe > /dev/null 2>&1" ) )
+             {
+                 nwipe_log( NWIPE_LOG_WARNING, "modprobe command not found. Install kmod package (modprobe)) !" );
+                 nwipe_log( NWIPE_LOG_WARNING, "Most temperature monitoring may be unavailable as module drivetemp" );

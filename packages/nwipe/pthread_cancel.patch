@@ -1,0 +1,89 @@
+--- a/src/context.h
++++ b/src/context.h
+@@ -127,6 +127,7 @@
+     nwipe_speedring_t speedring;  // Ring buffer for computing the rolling throughput average.
+     short sync_status;  // A flag to indicate when the method is syncing.
+     pthread_t thread;  // The ID of the thread.
++    atomic_flag thread_cancel;  // The cancelation flag of the thread.
+     u64 throughput;  // Average throughput in bytes per second.
+     u64 verify_errors;  // The number of verification errors across all passes.
+     char temp1_path[MAX_HWMON_PATH_LENGTH];  // path to temperature variables /sys/class/hwmon/hwmonX/ etc.
+--- a/src/nwipe.c
++++ b/src/nwipe.c
+@@ -516,6 +516,7 @@
+             }
+ 
+             /* Fork a child process. */
++            atomic_flag_test_and_set( &c2[i]->thread_cancel );
+             errno = pthread_create( &c2[i]->thread, NULL, nwipe_options.method, (void*) c2[i] );
+             if( errno )
+             {
+@@ -597,7 +598,7 @@
+             {
+                 nwipe_log( NWIPE_LOG_INFO, "Requesting wipe thread cancellation for %s", c2[i]->device_name );
+             }
+-            pthread_cancel( c2[i]->thread );
++            atomic_flag_clear( &c2[i]->thread_cancel );
+         }
+     }
+ 
+--- a/src/nwipe.h
++++ b/src/nwipe.h
+@@ -111,4 +111,7 @@
+ /* This is required for ioctl FDFLUSH. */
+ #include <linux/fd.h>
+ 
++/* This is required for pthread_cancel() substitution. */
++#include <stdatomic.h>
++
+ #endif /* NWIPE_H_ */
+--- a/src/pass.c
++++ b/src/pass.c
+@@ -208,7 +208,10 @@
+         c->pass_done += r;
+         c->round_done += r;
+ 
+-        pthread_testcancel();
++        if ( !atomic_flag_test_and_set( &c->thread_cancel ) )
++        {
++            pthread_exit( NULL );
++        }
+ 
+     } /* while bytes remaining */
+ 
+@@ -416,7 +419,10 @@
+             }
+         }
+ 
+-        pthread_testcancel();
++        if ( !atomic_flag_test_and_set( &c->thread_cancel ) )
++        {
++            pthread_exit( NULL );
++        }
+ 
+     } /* remaining bytes */
+ 
+@@ -637,7 +643,10 @@
+         c->pass_done += r;
+         c->round_done += r;
+ 
+-        pthread_testcancel();
++        if ( !atomic_flag_test_and_set( &c->thread_cancel ) )
++        {
++            pthread_exit( NULL );
++        }
+ 
+     } /* while bytes remaining */
+ 
+@@ -836,7 +845,10 @@
+             }
+         }
+ 
+-        pthread_testcancel();
++        if ( !atomic_flag_test_and_set( &c->thread_cancel ) )
++        {
++            pthread_exit( NULL );
++        }
+ 
+     } /* remaining bytes */
+ 
