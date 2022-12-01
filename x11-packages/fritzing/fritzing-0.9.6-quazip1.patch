@@ -1,0 +1,27 @@
+Borrowed from https://github.com/gentoo/gentoo/blob/7a1ecd6cc46b1f97eef4b3d79c1bb03d41c133d0/sci-electronics/fritzing/files/fritzing-0.9.4-quazip1.patch
+
+--- a/phoenix.pro
++++ b/phoenix.pro
+@@ -205,7 +205,8 @@
+ 
+ contains(DEFINES, QUAZIP_INSTALLED) {
+     !build_pass:message("using installed QuaZIP library")
+-    LIBS += -lquazip5
++    CONFIG += link_pkgconfig
++    PKGCONFIG += quazip1-qt5
+ } else {
+     include(pri/quazip.pri)
+ }
+--- a/src/utils/folderutils.cpp
++++ b/src/utils/folderutils.cpp
+@@ -35,8 +35,8 @@
+ 
+ #include "../debugdialog.h"
+ #ifdef QUAZIP_INSTALLED
+-#include <quazip5/quazip.h>
+-#include <quazip5/quazipfile.h>
++#include <quazip.h>
++#include <quazipfile.h>
+ #else
+ #include "../lib/quazip/quazip.h"
+ #include "../lib/quazip/quazipfile.h"
