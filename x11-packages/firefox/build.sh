@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://www.mozilla.org/firefox
 TERMUX_PKG_DESCRIPTION="Mozilla Firefox web browser"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=107.0
+TERMUX_PKG_VERSION=107.0.1
 TERMUX_PKG_SRCURL=https://ftp.mozilla.org/pub/firefox/releases/${TERMUX_PKG_VERSION}/source/firefox-${TERMUX_PKG_VERSION}.source.tar.xz
-TERMUX_PKG_SHA256=8a562e5a397b57e9bf383c2988308ab494c5d28844e792c658fedea27756584a
-TERMUX_PKG_DEPENDS="at-spi2-atk, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libandroid-sysv-semaphore, libc++, libcairo, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libpixman, libsm, libvpx, libwebp, libx11, libxcb, libxcomposite, libxcursor, libxdamage, libxext, libxfixes, libxi, libxrandr, libxrender, libxtst, pango"
+TERMUX_PKG_SHA256=e29950b9ba9143b0d683dc18779bbe70bbd082533aff8f6a7af69b19533e0647
+TERMUX_PKG_DEPENDS="at-spi2-atk, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libandroid-sysv-semaphore, libc++, libcairo, libcpufeatures, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libpixman, libsm, libvpx, libwebp, libx11, libxcb, libxcomposite, libxcursor, libxdamage, libxext, libxfixes, libxi, libxrandr, libxrender, libxtst, pango, pulseaudio"
 
 termux_step_post_get_source() {
 	local f="media/ffvpx/config_unix_aarch64.h"
@@ -14,8 +14,6 @@ termux_step_post_get_source() {
 }
 
 termux_step_pre_configure() {
-	local _CFLAGS="$CFLAGS"
-
 	termux_setup_rust
 	termux_setup_nodejs
 	cargo install cbindgen
@@ -25,8 +23,7 @@ termux_step_pre_configure() {
 	export HOST_CC=$(command -v clang)
 	export HOST_CXX=$(command -v clang++)
 
-	export CFLAGS="$_CFLAGS -DNO_NSPR_10_SUPPORT -DHAVE_STDINT_H -DMOZ_X11"
-	CXXFLAGS+=" -U__ANDROID__ -DMOZ_X11"
+	CXXFLAGS+=" -U__ANDROID__"
 	LDFLAGS+=" -landroid-shmem -landroid-sysv-semaphore -llog"
 
 	_NEED_DUMMY_LIBPTHREAD_A=
@@ -41,9 +38,6 @@ termux_step_pre_configure() {
 		_NEED_DUMMY_LIBRT_A=true
 		echo '!<arch>' > $_LIBRT_A
 	fi
-
-	# SIGKILL while building gkrust
-	TERMUX_MAKE_PROCESSES=1
 }
 
 termux_step_configure() {
@@ -51,9 +45,10 @@ termux_step_configure() {
 		--target=$TERMUX_HOST_PLATFORM \
 		--prefix=$TERMUX_PREFIX \
 		--with-sysroot=$TERMUX_PREFIX \
-		--disable-audio-backends \
+		--enable-audio-backends=pulseaudio \
 		--enable-minify=properties \
 		--enable-mobile-optimize \
+		--enable-printing \
 		--disable-jemalloc \
 		--enable-system-ffi \
 		--enable-system-pixman \
@@ -66,7 +61,7 @@ termux_step_configure() {
 		--with-system-webp \
 		--with-system-zlib \
 		--without-wasm-sandboxed-libraries \
-		--with-branding=browser/branding/aurora \
+		--with-branding=browser/branding/official \
 		--disable-sandbox \
 		--disable-tests \
 		--disable-accessibility \
@@ -76,7 +71,6 @@ termux_step_configure() {
 		--disable-updater \
 		--disable-hardening \
 		--disable-parental-controls \
-		--disable-printing \
 		--disable-webspeech \
 		--disable-synth-speechd \
 		--disable-elf-hack \
