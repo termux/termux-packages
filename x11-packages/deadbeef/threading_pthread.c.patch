@@ -1,0 +1,11 @@
+--- a/threading_pthread.c
++++ b/threading_pthread.c
+@@ -59,7 +59,7 @@
+ 
+ intptr_t
+ thread_start_low_priority (void (*fn)(void *ctx), void *ctx) {
+-#if defined(__linux__) && !defined(ANDROID)
++#if defined(__linux__) && !defined(ANDROID) && !defined(__ANDROID__)
+     pthread_t tid;
+     pthread_attr_t attr;
+     int s = pthread_attr_init (&attr);
