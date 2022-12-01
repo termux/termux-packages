@@ -1,0 +1,22 @@
+--- a/plugins/opus/Makefile.am
++++ b/plugins/opus/Makefile.am
+@@ -1,7 +1,7 @@
+ if HAVE_OPUS
+ pkglib_LTLIBRARIES = opus.la
+ opus_la_SOURCES = opus.c
+-opus_la_LDFLAGS = -module -avoid-version -lm -export-symbols-regex opus_load
++opus_la_LDFLAGS = -module -avoid-version -logg -lm -export-symbols-regex opus_load
+ 
+ opus_la_LIBADD = $(LDADD) $(OPUS_LIBS) ../liboggedit/liboggedit.la
+ AM_CFLAGS = $(CFLAGS) $(OPUS_CFLAGS) -std=c99
+--- a/plugins/vorbis/Makefile.am
++++ b/plugins/vorbis/Makefile.am
+@@ -1,7 +1,7 @@
+ if HAVE_VORBIS
+ pkglib_LTLIBRARIES = vorbis.la
+ vorbis_la_SOURCES = vorbis.c
+-vorbis_la_LDFLAGS = -module -avoid-version -lm -export-symbols-regex vorbis_load
++vorbis_la_LDFLAGS = -module -avoid-version -logg -lm -export-symbols-regex vorbis_load
+ 
+ vorbis_la_LIBADD = $(LDADD) $(VORBIS_LIBS) ../liboggedit/liboggedit.la
+ AM_CFLAGS = $(CFLAGS) $(VORBIS_CFLAGS) -std=c99
