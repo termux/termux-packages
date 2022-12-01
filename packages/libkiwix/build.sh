@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/kiwix/libkiwix
+TERMUX_PKG_DESCRIPTION="A library that contains a lot of things used by other kiwix programs"
+TERMUX_PKG_LICENSE="GPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=12.0.0
+TERMUX_PKG_SRCURL=https://github.com/kiwix/libkiwix/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=8608ef73fdaa34c28144eb5ad732a74ca94dd99710d08d7a1ddb1277d1985b02
+TERMUX_PKG_DEPENDS="libc++, libcurl, libicu, libmicrohttpd, libpugixml, libxapian, libzim, zlib"
+TERMUX_PKG_BUILD_DEPENDS="googletest, kainjow-mustache"
