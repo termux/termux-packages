@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/xiph/rav1e/
 TERMUX_PKG_DESCRIPTION="An AV1 encoder library focused on speed and safety"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.5.1
+TERMUX_PKG_VERSION=0.6.1
 TERMUX_PKG_SRCURL=https://github.com/xiph/rav1e/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=7b3060e8305e47f10b79f3a3b3b6adc3a56d7a58b2cb14e86951cc28e1b089fd
+TERMUX_PKG_SHA256=dd12132ad9dac229ce00a9caad132c4ad23d7db2b3ad4b5a59e89658fee04d9a
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -13,10 +13,10 @@ termux_step_make_install(){
 	termux_setup_rust
 
 	termux_download \
-		https://github.com/lu-zero/cargo-c/releases/download/v0.9.5/cargo-c-linux.tar.gz \
-		$TERMUX_PKG_CACHEDIR/cargo-c-linux.tar.gz \
-		b16717417b5e07f7aabcff1227d94689a8a8bcbcac7df6999135ab86c762066f
-	tar -xzf $TERMUX_PKG_CACHEDIR/cargo-c-linux.tar.gz -C $HOME/.cargo/bin
+		https://github.com/lu-zero/cargo-c/releases/download/v0.9.14/cargo-c-x86_64-unknown-linux-musl.tar.gz \
+		$TERMUX_PKG_CACHEDIR/cargo-c-x86_64-unknown-linux-musl.tar.gz \
+		3babffbe9316d3ff00957ec19e82ecf07050c5c6ff8d70fe0d17f40db8ff3e56
+	tar -xzf $TERMUX_PKG_CACHEDIR/cargo-c-x86_64-unknown-linux-musl.tar.gz -C $HOME/.cargo/bin
 
 	export CARGO_BUILD_TARGET=$CARGO_TARGET_NAME
 
