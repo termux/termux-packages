@@ -1,0 +1,11 @@
+--- a/config.def.h
++++ b/config.def.h
+@@ -20,7 +20,7 @@
+ static Bool npisrelative  = False;
+ 
+ #define SETPROP(p) { \
+-	.v = (char *[]){ "/bin/sh", "-c", \
++	.v = (char *[]){ "@TERMUX_PREFIX@/bin/sh", "-c", \
+ 		"prop=\"`xwininfo -children -id $1 | grep '^     0x' | sed -e's@^ *\\(0x[0-9a-f]*\\) \"\\([^\"]*\\)\".*@\\1 \\2@' | xargs -0 printf %b | dmenu -l 10`\" &&" \
+ 		"xprop -id $1 -f $0 8s -set $0 \"$prop\"", \
+ 		p, winid, NULL \
