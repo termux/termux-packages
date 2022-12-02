@@ -2,26 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://github.com/lzanini/mdbook-katex
 TERMUX_PKG_DESCRIPTION="A preprocessor for mdBook, pre-rendering LaTex equations to HTML at build time"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-_COMMIT=a16a13f4358cf67db5570ecff5e1002578c161d5
-_COMMIT_DATE=2022.01.27
-TERMUX_PKG_VERSION=0.2.10p${_COMMIT_DATE//./}
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SRCURL=https://github.com/lzanini/mdbook-katex.git
-TERMUX_PKG_GIT_BRANCH=master
+TERMUX_PKG_VERSION=0.2.17
+TERMUX_PKG_SRCURL=https://github.com/lzanini/mdbook-katex/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=ce980c2d6a3cb870c05371030f7f189044d5199b56c5c134c3c858ce9edcca07
 TERMUX_PKG_DEPENDS="openssl"
 TERMUX_PKG_BUILD_IN_SRC=true
-
-termux_step_post_get_source() {
-	git fetch --unshallow
-	git checkout $_COMMIT
-
-	local version="$(git log -1 --format=%cs | sed 's/-/./g')"
-	if [ "$version" != "$_COMMIT_DATE" ]; then
-		echo -n "ERROR: The specified commit date \"$_COMMIT_DATE\""
-		echo " is different from what is expected to be: \"$version\""
-		return 1
-	fi
-}
 
 termux_step_pre_configure() {
 	export OPENSSL_INCLUDE_DIR=$TERMUX_PREFIX/include/openssl
