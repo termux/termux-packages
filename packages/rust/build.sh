@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Systems programming language focused on safety, speed an
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.65.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/rustc-$TERMUX_PKG_VERSION-src.tar.xz
 TERMUX_PKG_SHA256=2d6aa2ea3fedd55acbbd65f78349385f9daa9c14e25db7a8df5d015588eee1cf
 _LLVM_MAJOR_VERSION=$(. $TERMUX_SCRIPTDIR/packages/libllvm/build.sh; echo $LLVM_MAJOR_VERSION)
@@ -10,9 +11,19 @@ _LLVM_MAJOR_VERSION_NEXT=$((_LLVM_MAJOR_VERSION + 1))
 TERMUX_PKG_DEPENDS="libc++, clang, openssl, lld, zlib, libllvm (<< $_LLVM_MAJOR_VERSION_NEXT)"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/llvm-* bin/llc bin/opt"
 
+termux_step_post_get_source() {
+	local _wasi_sdk_url=https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-16/wasi-sysroot-16.0.tar.gz
+	local _wasi_sdk_tarfile=$TERMUX_PKG_CACHEDIR/$(basename ${_wasi_sdk_url})
+	local _wasi_sdk_sha256=b8bfc0d4940c91bc9206a2316a3c93e01e203c6a1ac71bfa5a2aa5c74f327ee7
+	termux_download ${_wasi_sdk_url} ${_wasi_sdk_tarfile} ${_wasi_sdk_sha256}
+	tar xf ${_wasi_sdk_tarfile}
+}
+
 termux_step_pre_configure() {
 	termux_setup_cmake
 	termux_setup_rust
+
+	export RUST_BACKTRACE=1
 
 	export RUST_LIBDIR=$TERMUX_PKG_BUILDDIR/_lib
 	mkdir -p $RUST_LIBDIR
@@ -80,6 +91,7 @@ termux_step_configure() {
 		| sed "s%\\@triple\\@%$CARGO_TARGET_NAME%g" \
 		| sed "s%\\@RUSTC\\@%$RUSTC%g" \
 		| sed "s%\\@CARGO\\@%$CARGO%g" \
+		| sed "s%\\@TERMUX_PKG_SRCDIR\\@%$TERMUX_PKG_SRCDIR%g" \
 		> config.toml
 
 	local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
@@ -117,8 +129,12 @@ termux_step_make_install() {
 	fi
 
 	$TERMUX_PKG_SRCDIR/x.py install --stage 1 --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME
-	$TERMUX_PKG_SRCDIR/x.py install --stage 1 std --target wasm32-unknown-unknown
-	$TERMUX_PKG_SRCDIR/x.py dist rustc-dev --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME --target wasm32-unknown-unknown
+	$TERMUX_PKG_SRCDIR/x.py install --stage 1 std \
+		--target wasm32-unknown-unknown \
+		--target wasm32-wasi
+	$TERMUX_PKG_SRCDIR/x.py dist rustc-dev --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME \
+		--target wasm32-unknown-unknown \
+		--target wasm32-wasi
 	tar xvf build/dist/rustc-dev-$TERMUX_PKG_VERSION-$CARGO_TARGET_NAME.tar.gz
 	./rustc-dev-$TERMUX_PKG_VERSION-$CARGO_TARGET_NAME/install.sh --prefix=$TERMUX_PREFIX
 
@@ -148,4 +164,6 @@ termux_step_post_massage() {
 	rm -f lib/libz.so.1
 	rm -f lib/liblzma.so.$LZMA_VERSION
 	rm -f lib/liblzma.a
+
+	rm -rf lib/wasm32-wasi
 }
