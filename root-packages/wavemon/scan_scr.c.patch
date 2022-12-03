@@ -1,12 +1,12 @@
-diff -uNr wavemon-0.9.0/scan_scr.c wavemon-0.9.0.mod/scan_scr.c
---- wavemon-0.9.0/scan_scr.c	2018-12-30 03:08:25.000000000 +0200
-+++ wavemon-0.9.0.mod/scan_scr.c	2019-07-03 16:51:31.595109371 +0300
-@@ -250,7 +250,7 @@
- 
- void scr_aplst_fini(void)
- {
+diff -uNr wavemon-0.9.4/scan_scr.c wavemon-0.9.4.mod/scan_scr.c
+--- wavemon-0.9.4/scan_scr.c	2021-09-18 02:25:37.000000000 +0200
++++ wavemon-0.9.4.mod/scan_scr.c	2022-12-02 12:09:07.020276448 +0100
+@@ -299,7 +299,7 @@
+ 	/* Unlock mutex in case it was taken when scr_aplst_loop got interrupted by a SIGWINCH.
+ 	 * We are ignoring the error (EPERM) here if the main thread did not acquire the mutex. */
+ 	pthread_mutex_unlock(&sr.mutex);
 -	pthread_cancel(scan_thread);
 +	pthread_kill(scan_thread, 0);
- 	free_scan_list(sr.head);
- 	free(sr.channel_stats);
- 
+ 	pthread_join(scan_thread, NULL);
+ 	delwin(w_aplst);
+ }
