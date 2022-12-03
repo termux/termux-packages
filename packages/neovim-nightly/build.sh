@@ -5,9 +5,9 @@ TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.org>"
 # Upstream now has version number like "0.8.0-dev-698-ga5920e98f", but actually
 # "0.8.0-dev-698-g1ef84547a" < "0.8.0-dev-nightly-10-g1a07044c1", we need to bump
 # the epoch of the package version.
-TERMUX_PKG_VERSION="1:0.9.0-dev-136-gfad558b6a"
+TERMUX_PKG_VERSION="1:0.9.0-dev-430+gc0840087c"
 TERMUX_PKG_SRCURL="https://github.com/neovim/neovim/archive/nightly.tar.gz"
-TERMUX_PKG_SHA256=fe4bc9703ec7e9e8f6ef00966b7f1dba9c77fa33158bf751086bd5cdae8a133e
+TERMUX_PKG_SHA256=6212fb4176ac0376b1e8e1e0dc17ff49638a1c6821f3bce2ceb068c43f06e5b7
 TERMUX_PKG_DEPENDS="libiconv, libuv, luv, libmsgpack, libandroid-support, libvterm, libtermkey, libluajit, libunibilium, libtreesitter"
 TERMUX_PKG_HOSTBUILD=true
 
@@ -58,7 +58,7 @@ termux_pkg_auto_update() {
 		return 1
 	fi
 
-	remote_nvim_version="$(grep -oP '^\d+\.\d+\.\d+-dev-\d+-g[0-9a-f]+$' <<< "$remote_nvim_version" || true)"
+	remote_nvim_version="$(grep -oP '^\d+\.\d+\.\d+-dev-\d+\+g[0-9a-f]+' <<< "$remote_nvim_version" || true)"
 
 	if [ -z "$remote_nvim_version" ]; then
 		echo "WARNING: Version in nightly page is not in expected format. Skipping auto-update."
