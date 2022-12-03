@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Shell history suggest box for bash and zsh"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.5
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/dvorka/hstr/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=7f5933fc07d55d09d5f7f9a6fbfdfc556d8a7d8575c3890ac1e672adabd2bec4
 TERMUX_PKG_DEPENDS="ncurses, readline"
