@@ -1,7 +1,45 @@
 Qt build on Termux doesn't have accessibility feature. It needs to be removed.
-diff -uNr kirigami2-5.99.0/src/controls/LinkButton.qml kirigami2-5.99.0.mod/src/controls/LinkButton.qml
---- kirigami2-5.99.0/src/controls/LinkButton.qml	2022-10-01 22:20:15.000000000 +0800
-+++ kirigami2-5.99.0.mod/src/controls/LinkButton.qml	2022-11-12 15:54:26.588160792 +0800
+diff -uNr kirigami2-5.100.0/src/controls/Avatar.qml kirigami2-5.100.0.mod/src/controls/Avatar.qml
+--- kirigami2-5.100.0/src/controls/Avatar.qml	2022-11-05 20:28:40.000000000 +0800
++++ kirigami2-5.100.0.mod/src/controls/Avatar.qml	2022-12-03 12:57:42.000000000 +0800
+@@ -159,12 +159,6 @@
+ 
+     activeFocusOnTab: !!actions.main
+ 
+-    Accessible.role: !!actions.main ? Accessible.Button : Accessible.Graphic
+-    Accessible.name: !!actions.main ? qsTr("%1 — %2").arg(name).arg(actions.main.text) : name
+-    Accessible.focusable: !!actions.main
+-    Accessible.onPressAction: {
+-        avatarRoot.actions.main.trigger()
+-    }
+     Keys.onEnterPressed: if (!!avatarRoot.actions.main.trigger()) avatarRoot.actions.main.trigger()
+     Keys.onSpacePressed: if (!!avatarRoot.actions.main.trigger()) avatarRoot.actions.main.trigger()
+ 
+diff -uNr kirigami2-5.100.0/src/controls/FormLayout.qml kirigami2-5.100.0.mod/src/controls/FormLayout.qml
+--- kirigami2-5.100.0/src/controls/FormLayout.qml	2022-11-05 20:28:40.000000000 +0800
++++ kirigami2-5.100.0.mod/src/controls/FormLayout.qml	2022-12-03 12:57:40.000000000 +0800
+@@ -97,7 +97,6 @@
+     implicitHeight: lay.implicitHeight
+     Layout.preferredHeight: lay.implicitHeight
+     Layout.fillWidth: true
+-    Accessible.role: Accessible.Form
+ 
+     GridLayout {
+         id: lay
+diff -uNr kirigami2-5.100.0/src/controls/Heading.qml kirigami2-5.100.0.mod/src/controls/Heading.qml
+--- kirigami2-5.100.0/src/controls/Heading.qml	2022-11-05 20:28:40.000000000 +0800
++++ kirigami2-5.100.0.mod/src/controls/Heading.qml	2022-12-03 12:57:40.000000000 +0800
+@@ -88,7 +88,6 @@
+ 
+     opacity: type === Heading.Type.Secondary ? 0.7 : 1
+ 
+-    Accessible.role: Accessible.Heading
+ 
+     // TODO KF6: Remove this public method
+     function headerPointSize(l) {
+diff -uNr kirigami2-5.100.0/src/controls/LinkButton.qml kirigami2-5.100.0.mod/src/controls/LinkButton.qml
+--- kirigami2-5.100.0/src/controls/LinkButton.qml	2022-11-05 20:28:40.000000000 +0800
++++ kirigami2-5.100.0.mod/src/controls/LinkButton.qml	2022-12-03 12:57:48.000000000 +0800
 @@ -38,9 +38,6 @@
       */
      property alias mouseArea: area
@@ -12,9 +50,45 @@ diff -uNr kirigami2-5.99.0/src/controls/LinkButton.qml kirigami2-5.99.0.mod/src/
  
      text: action ? action.text : ""
      enabled: !action || action.enabled
-diff -uNr kirigami2-5.99.0/src/controls/swipenavigator/PageTab.qml kirigami2-5.99.0.mod/src/controls/swipenavigator/PageTab.qml
---- kirigami2-5.99.0/src/controls/swipenavigator/PageTab.qml	2022-10-01 22:20:15.000000000 +0800
-+++ kirigami2-5.99.0.mod/src/controls/swipenavigator/PageTab.qml	2022-11-12 15:57:50.318160714 +0800
+diff -uNr kirigami2-5.100.0/src/controls/SearchField.qml kirigami2-5.100.0.mod/src/controls/SearchField.qml
+--- kirigami2-5.100.0/src/controls/SearchField.qml	2022-11-05 20:28:40.000000000 +0800
++++ kirigami2-5.100.0.mod/src/controls/SearchField.qml	2022-12-03 12:57:54.000000000 +0800
+@@ -95,9 +95,6 @@
+ 
+     placeholderText: qsTr("Search…")
+ 
+-    Accessible.name: qsTr("Search")
+-    Accessible.searchEdit: true
+-
+     focusSequence: "Ctrl+F"
+     inputMethodHints: Qt.ImhNoPredictiveText
+     rightActions: [
+diff -uNr kirigami2-5.100.0/src/controls/SelectableLabel.qml kirigami2-5.100.0.mod/src/controls/SelectableLabel.qml
+--- kirigami2-5.100.0/src/controls/SelectableLabel.qml	2022-11-05 20:28:40.000000000 +0800
++++ kirigami2-5.100.0.mod/src/controls/SelectableLabel.qml	2022-12-03 12:57:56.000000000 +0800
+@@ -49,8 +49,6 @@
+     textFormat: TextEdit.AutoText
+     verticalAlignment: TextEdit.AlignTop
+ 
+-    Accessible.selectableText: true
+-    Accessible.editable: false
+ 
+     background: Item {}
+ 
+diff -uNr kirigami2-5.100.0/src/controls/Separator.qml kirigami2-5.100.0.mod/src/controls/Separator.qml
+--- kirigami2-5.100.0/src/controls/Separator.qml	2022-11-05 20:28:40.000000000 +0800
++++ kirigami2-5.100.0.mod/src/controls/Separator.qml	2022-12-03 12:58:02.000000000 +0800
+@@ -20,7 +20,6 @@
+     id: root
+     implicitHeight: 1
+     implicitWidth: 1
+-    Accessible.role: Accessible.Separator
+ 
+     enum Weight {
+         Light,
+diff -uNr kirigami2-5.100.0/src/controls/swipenavigator/PageTab.qml kirigami2-5.100.0.mod/src/controls/swipenavigator/PageTab.qml
+--- kirigami2-5.100.0/src/controls/swipenavigator/PageTab.qml	2022-11-05 20:28:40.000000000 +0800
++++ kirigami2-5.100.0.mod/src/controls/swipenavigator/PageTab.qml	2022-12-03 12:58:10.000000000 +0800
 @@ -48,7 +48,6 @@
      RowLayout {
          id: verticalTitleRow
@@ -31,9 +105,9 @@ diff -uNr kirigami2-5.99.0/src/controls/swipenavigator/PageTab.qml kirigami2-5.9
          visible: !vertical
  
          RowLayout {
-diff -uNr kirigami2-5.99.0/src/controls/swipenavigator/PrivateSwipeHighlight.qml kirigami2-5.99.0.mod/src/controls/swipenavigator/PrivateSwipeHighlight.qml
---- kirigami2-5.99.0/src/controls/swipenavigator/PrivateSwipeHighlight.qml	2022-10-01 22:20:15.000000000 +0800
-+++ kirigami2-5.99.0.mod/src/controls/swipenavigator/PrivateSwipeHighlight.qml	2022-11-12 15:54:39.598160787 +0800
+diff -uNr kirigami2-5.100.0/src/controls/swipenavigator/PrivateSwipeHighlight.qml kirigami2-5.100.0.mod/src/controls/swipenavigator/PrivateSwipeHighlight.qml
+--- kirigami2-5.100.0/src/controls/swipenavigator/PrivateSwipeHighlight.qml	2022-11-05 20:28:40.000000000 +0800
++++ kirigami2-5.100.0.mod/src/controls/swipenavigator/PrivateSwipeHighlight.qml	2022-12-03 12:58:14.000000000 +0800
 @@ -10,7 +10,6 @@
  import org.kde.kirigami 2.12 as Kirigami
  
@@ -42,9 +116,9 @@ diff -uNr kirigami2-5.99.0/src/controls/swipenavigator/PrivateSwipeHighlight.qml
  
      anchors {
          bottom: Kirigami.Settings.isMobile ? undefined : parent.bottom
-diff -uNr kirigami2-5.99.0/src/controls/swipenavigator/PrivateSwipeProgress.qml kirigami2-5.99.0.mod/src/controls/swipenavigator/PrivateSwipeProgress.qml
---- kirigami2-5.99.0/src/controls/swipenavigator/PrivateSwipeProgress.qml	2022-10-01 22:20:15.000000000 +0800
-+++ kirigami2-5.99.0.mod/src/controls/swipenavigator/PrivateSwipeProgress.qml	2022-11-12 15:57:18.668160726 +0800
+diff -uNr kirigami2-5.100.0/src/controls/swipenavigator/PrivateSwipeProgress.qml kirigami2-5.100.0.mod/src/controls/swipenavigator/PrivateSwipeProgress.qml
+--- kirigami2-5.100.0/src/controls/swipenavigator/PrivateSwipeProgress.qml	2022-11-05 20:28:40.000000000 +0800
++++ kirigami2-5.100.0.mod/src/controls/swipenavigator/PrivateSwipeProgress.qml	2022-12-03 12:58:20.000000000 +0800
 @@ -14,7 +14,6 @@
      property var progress
  
@@ -61,16 +135,9 @@ diff -uNr kirigami2-5.99.0/src/controls/swipenavigator/PrivateSwipeProgress.qml 
  
          anchors {
              top: parent.top
-@@ -65,4 +63,4 @@
-             height: 2
-         }
-     }
--}
-\ No newline at end of file
-+}
-diff -uNr kirigami2-5.99.0/src/controls/swipenavigator/SwipeNavigator.qml kirigami2-5.99.0.mod/src/controls/swipenavigator/SwipeNavigator.qml
---- kirigami2-5.99.0/src/controls/swipenavigator/SwipeNavigator.qml	2022-10-01 22:20:15.000000000 +0800
-+++ kirigami2-5.99.0.mod/src/controls/swipenavigator/SwipeNavigator.qml	2022-11-12 15:56:15.758160750 +0800
+diff -uNr kirigami2-5.100.0/src/controls/swipenavigator/SwipeNavigator.qml kirigami2-5.100.0.mod/src/controls/swipenavigator/SwipeNavigator.qml
+--- kirigami2-5.100.0/src/controls/swipenavigator/SwipeNavigator.qml	2022-11-05 20:28:40.000000000 +0800
++++ kirigami2-5.100.0.mod/src/controls/swipenavigator/SwipeNavigator.qml	2022-12-03 12:58:24.000000000 +0800
 @@ -219,7 +219,6 @@
                      Loader { id: _footer; sourceComponent: swipeNavigatorRoot.footer; Layout.row: 1; Layout.column: 2 }
                  }
@@ -79,9 +146,46 @@ diff -uNr kirigami2-5.99.0/src/controls/swipenavigator/SwipeNavigator.qml kiriga
              }
              contentItem: Kirigami.ColumnView {
                  id: columnView
-diff -uNr kirigami2-5.99.0/src/controls/templates/AbstractListItem.qml kirigami2-5.99.0.mod/src/controls/templates/AbstractListItem.qml
---- kirigami2-5.99.0/src/controls/templates/AbstractListItem.qml	2022-10-01 22:20:15.000000000 +0800
-+++ kirigami2-5.99.0.mod/src/controls/templates/AbstractListItem.qml	2022-11-12 15:56:45.038160739 +0800
+diff -uNr kirigami2-5.100.0/src/controls/swipenavigator/templates/PageTab.qml kirigami2-5.100.0.mod/src/controls/swipenavigator/templates/PageTab.qml
+--- kirigami2-5.100.0/src/controls/swipenavigator/templates/PageTab.qml	2022-11-05 20:28:40.000000000 +0800
++++ kirigami2-5.100.0.mod/src/controls/swipenavigator/templates/PageTab.qml	2022-12-03 12:58:36.000000000 +0800
+@@ -31,33 +31,6 @@
+ 
+     activeFocusOnTab: true
+ 
+-    Accessible.name: control.title
+-    Accessible.description: {
+-        if (!!control.progress) {
+-            if (control.active) {
+-                //: Accessibility text for a page tab. Keep the text as concise as possible and don't use a percent sign.
+-                return qsTr("Current page. Progress: %1 percent.").arg(Math.round(control.progress*100))
+-            } else {
+-                //: Accessibility text for a page tab. Keep the text as concise as possible.
+-                return qsTr("Navigate to %1. Progress: %2 percent.").arg(control.title).arg(Math.round(control.progress*100))
+-            }
+-        } else {
+-            if (control.active) {
+-                //: Accessibility text for a page tab. Keep the text as concise as possible.
+-                return qsTr("Current page.")
+-            } else if (control.needsAttention) {
+-                //: Accessibility text for a page tab that's requesting the user's attention. Keep the text as concise as possible.
+-                return qsTr("Navigate to %1. Demanding attention.", control.title)
+-            } else {
+-                //: Accessibility text for a page tab that's requesting the user's attention. Keep the text as concise as possible.
+-                return qsTr("Navigate to %1.", control.title)
+-            }
+-        }
+-    }
+-    Accessible.role: Accessible.PageTab
+-    Accessible.focusable: true
+-    Accessible.onPressAction: control.clicked()
+-
+     Keys.onPressed: {
+         if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return) {
+             control.clicked()
+diff -uNr kirigami2-5.100.0/src/controls/templates/AbstractListItem.qml kirigami2-5.100.0.mod/src/controls/templates/AbstractListItem.qml
+--- kirigami2-5.100.0/src/controls/templates/AbstractListItem.qml	2022-11-05 20:28:40.000000000 +0800
++++ kirigami2-5.100.0.mod/src/controls/templates/AbstractListItem.qml	2022-12-03 12:58:42.000000000 +0800
 @@ -184,6 +184,5 @@
  
      hoverEnabled: true
@@ -89,3 +193,26 @@ diff -uNr kirigami2-5.99.0/src/controls/templates/AbstractListItem.qml kirigami2
 -    Accessible.role: Accessible.ListItem
      highlighted: focus && ListView.isCurrentItem && ListView.view && ListView.view.keyNavigationEnabled
  }
+diff -uNr kirigami2-5.100.0/src/controls/templates/OverlayDrawer.qml kirigami2-5.100.0.mod/src/controls/templates/OverlayDrawer.qml
+--- kirigami2-5.100.0/src/controls/templates/OverlayDrawer.qml	2022-11-05 20:28:40.000000000 +0800
++++ kirigami2-5.100.0.mod/src/controls/templates/OverlayDrawer.qml	2022-12-03 12:58:46.000000000 +0800
+@@ -170,7 +170,6 @@
+             width: parent.height - Units.smallSpacing * 1.5
+             height: parent.height - Units.smallSpacing * 1.5
+             onClicked: root.drawerOpen = !root.drawerOpen;
+-            Accessible.name: root.drawerOpen ? root.handleOpenToolTip : root.handleClosedToolTip
+             visible: !Settings.tabletMode && !Settings.hasTransientTouchInput
+         }
+ 
+diff -uNr kirigami2-5.100.0/src/controls/templates/SwipeListItem.qml kirigami2-5.100.0.mod/src/controls/templates/SwipeListItem.qml
+--- kirigami2-5.100.0/src/controls/templates/SwipeListItem.qml	2022-11-05 20:28:40.000000000 +0800
++++ kirigami2-5.100.0.mod/src/controls/templates/SwipeListItem.qml	2022-12-03 12:58:52.000000000 +0800
+@@ -526,8 +526,6 @@
+                     slideAnim.restart();
+                 }
+ 
+-                Accessible.name: modelData.text
+-                Accessible.description: modelData.tooltip
+             }
+         }
+     }
