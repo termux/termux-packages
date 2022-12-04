@@ -12,6 +12,10 @@ TERMUX_PKG_REPLACES="libutil-dev, libgcc, libandroid-support-dev, ndk-stl"
 TERMUX_PKG_NO_STATICSPLIT=true
 
 termux_step_extract_into_massagedir() {
+	if $TERMUX_ON_DEVICE_BUILD; then
+		termux_error_exit "Package '$TERMUX_PKG_NAME' is not available for on-device builds."
+	fi
+
 	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib \
 		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include
 
