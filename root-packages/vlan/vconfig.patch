@@ -1,0 +1,20 @@
+--- a/vconfig
++++ b/vconfig
+@@ -45,7 +45,7 @@
+ 
+ ARGC=$(expr $# + 1)
+ 
+-STATEDIR=/run/network/vlan
++STATEDIR=@TERMUX_PREFIX@/var/run/network/vlan
+ 
+ echo "" >&2
+ echo "Warning: vconfig is deprecated and might be removed in the future, please migrate to ip(route2) as soon as possible!" >&2
+@@ -59,7 +59,7 @@
+ fi
+ 
+ ip () {
+-    /sbin/ip "$@"
++    @TERMUX_PREFIX@/bin/ip "$@"
+ }
+ 
+ condret () {
