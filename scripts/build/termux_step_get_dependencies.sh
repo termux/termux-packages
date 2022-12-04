@@ -37,7 +37,7 @@ termux_step_get_dependencies() {
 
 			if ! termux_download_deb_pac $PKG $DEP_ARCH $DEP_VERSION $DEP_VERSION_PAC; then
 				echo "Download of $PKG@$DEP_VERSION from $TERMUX_REPO_URL failed, building instead"
-				TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh ${TERMUX_FORCE_BUILD+-f} -I --format $TERMUX_PACKAGE_FORMAT "${PKG_DIR}"
+				TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh $(test "${TERMUX_FORCE_BUILD}" = "true" && echo "-f" || true) -I --format $TERMUX_PACKAGE_FORMAT "${PKG_DIR}"
 				continue
 			fi
 			if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
@@ -71,7 +71,7 @@ termux_step_get_dependencies() {
 			fi
 			echo "Building dependency $PKG if necessary..."
 			# Built dependencies are put in the default TERMUX_OUTPUT_DIR instead of the specified one
-			TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh ${TERMUX_FORCE_BUILD+-f} -s --format $TERMUX_PACKAGE_FORMAT "${PKG_DIR}"
+			TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh $(test "${TERMUX_FORCE_BUILD}" = "true" && echo "-f" || true) -s --format $TERMUX_PACKAGE_FORMAT "${PKG_DIR}"
 		done<<<$(./scripts/buildorder.py "$TERMUX_PKG_BUILDER_DIR" $TERMUX_PACKAGES_DIRECTORIES || echo "ERROR")
 	fi
 }
