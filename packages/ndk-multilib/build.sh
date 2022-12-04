@@ -47,6 +47,9 @@ add_cross_compiler_rt() {
 }
 
 termux_step_extract_into_massagedir() {
+	if $TERMUX_ON_DEVICE_BUILD; then
+		termux_error_exit "Package '$TERMUX_PKG_NAME' is not available for on-device builds."
+	fi
 	prepare_libs "arm" "arm-linux-androideabi"
 	prepare_libs "arm64" "aarch64-linux-android"
 	prepare_libs "x86" "i686-linux-android"
