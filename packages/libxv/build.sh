@@ -5,24 +5,9 @@ TERMUX_PKG_DESCRIPTION="Library for the X Video (Xv) extension to the X Window S
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.0.11
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/lib/libXv-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=d26c13eac99ac4504c532e8e76a1c8e4bd526471eb8a0a4ff2a88db60cb0b088
+TERMUX_PKG_VERSION=1.0.12
+TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/lib/libXv-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=aaf7fa09f689f7a2000fe493c0d64d1487a1210db154053e9e2336b860c63848
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-malloc0returnsnull"
 TERMUX_PKG_DEPENDS="libx11, libxext"
 TERMUX_PKG_BUILD_DEPENDS="xorgproto"
-
-termux_step_pre_configure() {
-	autoreconf -fi
-}
-
-termux_step_post_massage() {
-	local _SOVERSION_SUFFIXED_SO_FILES="lib/libXv.so.1"
-	local f
-	for f in ${_SOVERSION_SUFFIXED_SO_FILES}; do
-		if [ -e "${f}" ]; then
-			termux_error_exit "File ${f} should not be contained in this package."
-		fi
-	done
-}
