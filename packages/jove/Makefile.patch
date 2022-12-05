@@ -9,6 +9,15 @@
  JSHAREDIR = $(JOVEHOME)/share/jove
  DSHAREDIR = $(DESTDIR)$(JSHAREDIR)
  JLIBDIR = $(JOVEHOME)/lib/jove
+@@ -35,7 +35,7 @@
+ JBINDIR = $(JOVEHOME)/bin
+ DBINDIR = $(DESTDIR)$(JBINDIR)
+ XEXT=
+-JMANDIR = $(JOVEHOME)/man/man$(MANEXT)
++JMANDIR = $(JOVEHOME)/share/man/man$(MANEXT)
+ DMANDIR = $(DESTDIR)$(JMANDIR)
+ MANEXT = 1
+ 
 @@ -52,10 +52,10 @@
  # (in case the system startup salvages tempfiles by moving them,
  # which is probably a good idea).
@@ -23,6 +32,15 @@
  DRECDIR = $(DESTDIR)$(JRECDIR)
  
  # Install permission for DRECDIR
+@@ -65,7 +65,7 @@
+ RPMHOME = $(HOME)/rpmbuild/SOURCES
+ 
+ # DFLTSHELL is the default shell invoked by JOVE and TEACHJOVE.
+-DFLTSHELL = /bin/sh
++DFLTSHELL = @TERMUX_PREFIX@/bin/sh
+ 
+ # The install commands of BSD and System V differ in unpleasant ways:
+ # -c: copy (BSD); -c dir: destination directory (SysV)
 @@ -134,7 +134,7 @@
  LDLIBS = $(TERMCAPLIB) $(EXTRALIBS)
  
