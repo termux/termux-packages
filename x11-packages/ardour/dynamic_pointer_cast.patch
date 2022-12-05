@@ -1,0 +1,29 @@
+See https://github.com/android/ndk/issues/533
+
+--- a/libs/ardour/ardour/port_engine.h
++++ b/libs/ardour/ardour/port_engine.h
+@@ -78,7 +78,7 @@
+ class LIBARDOUR_API ProtoPort {
+   public:
+ 	ProtoPort() {}
+-	virtual ~ProtoPort () {}
++	virtual ~ProtoPort ();
+ };
+ 
+ class LIBARDOUR_API PortEngine
+--- a/libs/ardour/port_engine.cc
++++ b/libs/ardour/port_engine.cc
+@@ -0,0 +1,3 @@
++#include "ardour/port_engine.h"
++using namespace ARDOUR;
++ProtoPort::~ProtoPort() {}
+--- a/libs/ardour/wscript
++++ b/libs/ardour/wscript
+@@ -186,6 +186,7 @@
+         'plugin_scan_result.cc',
+         'polarity_processor.cc',
+         'port.cc',
++        'port_engine.cc',
+         'port_engine_shared.cc',
+         'port_insert.cc',
+         'port_manager.cc',
