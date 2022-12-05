@@ -1,0 +1,11 @@
+--- a/libs/ardour/port_manager.cc
++++ b/libs/ardour/port_manager.cc
+@@ -80,7 +80,7 @@
+ 			_cfg_db_s  = Config->get_meter_falloff ();
+ 			_n_samples = n_samples;
+ 			_rate      = rate;
+-#ifdef _GNU_SOURCE
++#if defined _GNU_SOURCE && !defined __ANDROID__
+ 			_falloff = exp10f (-0.05f * _cfg_db_s * _n_samples / _rate);
+ #else
+ 			_falloff = powf (10.f, -0.05f * _cfg_db_s * _n_samples / _rate);

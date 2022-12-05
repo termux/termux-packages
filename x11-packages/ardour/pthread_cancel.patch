@@ -1,0 +1,158 @@
+--- a/gtk2_ardour/editor_timefx.cc
++++ b/gtk2_ardour/editor_timefx.cc
+@@ -411,7 +411,14 @@
+ 		delete fx;
+ 	}
+ 
++#ifndef __ANDROID__
+ 	pthread_setcancelstate (PTHREAD_CANCEL_DISABLE, NULL);
++#else
++	sigset_t pthread_cancel_block;
++	sigemptyset (&pthread_cancel_block);
++	sigaddset (&pthread_cancel_block, SIGUSR2);
++	sigprocmask (SIG_BLOCK, &pthread_cancel_block, NULL);
++#endif
+ 	if (current_timefx->request.cancel) {
+ 		current_timefx->status = -1;
+ 		for (ResultMap::const_iterator i = results.begin(); i != results.end(); ++i) {
+@@ -434,7 +441,11 @@
+ 			}
+ 		}
+ 	}
++#ifndef __ANDROID__
+ 	pthread_setcancelstate (PTHREAD_CANCEL_ENABLE, NULL);
++#else
++	sigprocmask (SIG_UNBLOCK, &pthread_cancel_block, NULL);
++#endif
+ 
+ 	current_timefx->request.done = true;
+ }
+@@ -447,7 +458,9 @@
+ 
+ 	TimeFXDialog* tsd = static_cast<TimeFXDialog*>(arg);
+ 
++#ifndef __ANDROID__
+ 	pthread_setcanceltype (PTHREAD_CANCEL_ASYNCHRONOUS, 0);
++#endif
+ 
+ 	tsd->editor.do_timefx ();
+ 
+--- a/gtk2_ardour/main.cc
++++ b/gtk2_ardour/main.cc
+@@ -307,7 +307,9 @@
+ 	(void) bind_textdomain_codeset (PACKAGE,"UTF-8");
+ #endif
+ 
++#ifndef __ANDROID__
+ 	pthread_setcanceltype (PTHREAD_CANCEL_ASYNCHRONOUS, 0);
++#endif
+ 
+ 	// catch error message system signals ();
+ 
+--- a/gtk2_ardour/video_image_frame.cc
++++ b/gtk2_ardour/video_image_frame.cc
+@@ -199,8 +199,10 @@
+ http_get_thread (void *arg) {
+ 	VideoImageFrame *vif = static_cast<VideoImageFrame *>(arg);
+ 	char url[2048];
++#ifndef __ANDROID__
+ 	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+ 	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
++#endif
+ 	snprintf(url, sizeof(url), "%s?frame=%li&w=%d&h=%d&file=%s&format=bgra",
+ 	  vif->get_video_server_url().c_str(),
+ 	  (long int) vif->get_req_frame(), vif->get_width(), vif->get_height(),
+@@ -218,7 +220,14 @@
+ 		printf("no-video frame: video-server returned http-status: %d\n", status);
+ 	}
+ 
++#ifndef __ANDROID__
+ 	pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
++#else
++	sigset_t pthread_cancel_block;
++	sigemptyset (&pthread_cancel_block);
++	sigaddset (&pthread_cancel_block, SIGUSR2);
++	sigprocmask (SIG_BLOCK, &pthread_cancel_block, NULL);
++#endif
+ 	vif->http_download_done(res);
+ 	pthread_exit(0);
+ 	return 0;
+--- a/libs/pbd/pthread_utils.cc
++++ b/libs/pbd/pthread_utils.cc
+@@ -84,9 +84,26 @@
+ 	{}
+ };
+ 
++#ifdef __ANDROID__
++static void
++thread_signal_handler (int signum)
++{
++	pthread_exit (0);
++}
++#endif
++
+ static void*
+ fake_thread_start (void* arg)
+ {
++#ifdef __ANDROID__
++	struct sigaction actions;
++	memset (&actions, 0, sizeof (actions));
++	sigemptyset (&actions.sa_mask);
++	actions.sa_flags = 0;
++	actions.sa_handler = thread_signal_handler;
++	sigaction (SIGUSR2, &actions, NULL);
++#endif
++
+ 	ThreadStartWithName* ts      = (ThreadStartWithName*)arg;
+ 	void* (*thread_work) (void*) = ts->thread_work;
+ 	void* thread_arg             = ts->arg;
+@@ -188,7 +205,11 @@
+ 		++nxt;
+ 
+ 		if (!pthread_equal ((*i), pthread_self ())) {
++#ifndef __ANDROID__
+ 			pthread_cancel ((*i));
++#else
++			pthread_kill ((*i), SIGUSR2);
++#endif
+ 		}
+ 
+ 		i = nxt;
+@@ -208,7 +229,11 @@
+ 		}
+ 	}
+ 
++#ifndef __ANDROID__
+ 	pthread_cancel (thread);
++#else
++	pthread_kill (thread, SIGUSR2);
++#endif
+ 	pthread_mutex_unlock (&thread_map_lock);
+ }
+ 
+--- a/libs/surfaces/frontier/tranzport/tranzport_control_protocol.cc
++++ b/libs/surfaces/frontier/tranzport/tranzport_control_protocol.cc
+@@ -1029,8 +1029,10 @@
+ 
+ 
+ 	PBD::notify_gui_about_thread_creation ("gui", pthread_self(), X_("Tranzport"));
++#ifndef __ANDROID__
+ 	pthread_setcancelstate (PTHREAD_CANCEL_ENABLE, 0);
+ 	pthread_setcanceltype (PTHREAD_CANCEL_ASYNCHRONOUS, 0);
++#endif
+ 	next_track ();
+ 	rtpriority_set();
+ 	inflight=0;
+--- a/libs/surfaces/tranzport/init.cc
++++ b/libs/surfaces/tranzport/init.cc
+@@ -155,8 +155,10 @@
+ 	uint8_t offline = 0;
+ 
+ 	register_thread (X_("Tranzport"));
++#ifndef __ANDROID__
+ 	pthread_setcancelstate (PTHREAD_CANCEL_ENABLE, 0);
+ 	pthread_setcanceltype (PTHREAD_CANCEL_ASYNCHRONOUS, 0);
++#endif
+ 	rtpriority_set();
+ 	inflight=0;
+ 	//int intro = 20;
