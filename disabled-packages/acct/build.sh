@@ -1,3 +1,4 @@
+# Not making sense on Termux which is essentially a single-user environment.
 TERMUX_PKG_HOMEPAGE=https://savannah.gnu.org/projects/acct/
 TERMUX_PKG_DESCRIPTION="GNU Accounting Utilities"
 TERMUX_PKG_LICENSE="GPL-3.0"
