@@ -1,0 +1,19 @@
+--- a/build.rs
++++ b/build.rs
+@@ -636,7 +636,7 @@
+             return include.as_path().to_str().unwrap().to_string();
+         }
+     }
+-    format!("/usr/include/{}", header)
++    format!("@TERMUX_PREFIX@/include/{}", header)
+ }
+ 
+ fn maybe_search_include(include_paths: &[PathBuf], header: &str) -> Option<String> {
+@@ -1197,7 +1197,6 @@
+             .header(search_include(&include_paths, "libavcodec/avcodec.h"))
+             .header(search_include(&include_paths, "libavcodec/dv_profile.h"))
+             .header(search_include(&include_paths, "libavcodec/avfft.h"))
+-            .header(search_include(&include_paths, "libavcodec/vaapi.h"))
+             .header(search_include(&include_paths, "libavcodec/vorbis_parser.h"));
+     }
+ 
