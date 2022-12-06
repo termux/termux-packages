@@ -4,12 +4,12 @@ TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 # Use "development" versions.
 TERMUX_PKG_VERSION=9.1.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.swi-prolog.org/download/devel/src/swipl-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=4718c426c58d09e76bd84c109ae59f47b8cc261213a47796296b3733f455a195
-TERMUX_PKG_DEPENDS="libarchive, libcrypt, libgmp, libyaml, ncurses, openssl, ossp-uuid, readline, zlib"
+TERMUX_PKG_DEPENDS="libarchive, libcrypt, libgmp, libyaml, ncurses, openssl, ossp-uuid, readline, zlib, pcre2"
 TERMUX_PKG_FORCE_CMAKE=true
 TERMUX_PKG_HOSTBUILD=true
-
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DHAVE_WEAK_ATTRIBUTE_EXITCODE=0
 -DHAVE_WEAK_ATTRIBUTE_EXITCODE__TRYRUN_OUTPUT=
