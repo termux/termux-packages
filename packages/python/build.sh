@@ -3,13 +3,14 @@ TERMUX_PKG_DESCRIPTION="Python 3 programming language intended to enable clear p
 TERMUX_PKG_LICENSE="PythonPL"
 TERMUX_PKG_MAINTAINER="@termux"
 _MAJOR_VERSION=3.11
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}.0
+TERMUX_PKG_VERSION=${_MAJOR_VERSION}.1
 TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=a57dc82d77358617ba65b9841cee1e3b441f386c3789ddc0676eca077f2951c3
+TERMUX_PKG_SHA256=85879192f2cffd56cb16c092905949ebf3e5e394b7f764723529637901dfb58f
 TERMUX_PKG_DEPENDS="gdbm, libandroid-posix-semaphore, libandroid-support, libbz2, libcrypt, libexpat, libffi, liblzma, libsqlite, ncurses, ncurses-ui-libs, openssl, readline, zlib"
 TERMUX_PKG_RECOMMENDS="clang, make, pkg-config"
 TERMUX_PKG_SUGGESTS="python-tkinter"
-TERMUX_PKG_BREAKS="python2 (<= 2.7.15), python-dev"
+# For python-pip, see https://github.com/termux/termux-packages/pull/13611.
+TERMUX_PKG_BREAKS="python2 (<= 2.7.15), python-dev, python-pip"
 TERMUX_PKG_REPLACES="python-dev"
 # Let "python3" will be alias to this package.
 TERMUX_PKG_PROVIDES="python3"
