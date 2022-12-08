@@ -1,27 +1,25 @@
 termux_git_clone_src() {
-	local CHECKED_OUT_FOLDER=$TERMUX_PKG_TMPDIR/checkout-$TERMUX_PKG_VERSION
 	local TMP_CHECKOUT=$TERMUX_PKG_CACHEDIR/tmp-checkout
+	local TMP_CHECKOUT_VERSION=$TERMUX_PKG_CACHEDIR/tmp-checkout-version
 
-	# If user aborts git clone step here the folder needs to be removed
-	# manually. IMO this is better than git cloning the src everytime
-	if [ ! -d $CHECKED_OUT_FOLDER ] && [ ! -d $TMP_CHECKOUT ]; then
+	if [ ! -f $TMP_CHECKOUT_VERSION ] || [ "$(cat $TMP_CHECKOUT_VERSION)" != "$TERMUX_PKG_VERSION" ]; then
 		if [ "$TERMUX_PKG_GIT_BRANCH" == "" ]; then
 			TERMUX_PKG_GIT_BRANCH=v$TERMUX_PKG_VERSION
 		fi
+
+		rm -rf $TMP_CHECKOUT
 		git clone --depth 1 \
 			--branch $TERMUX_PKG_GIT_BRANCH \
 			$TERMUX_PKG_SRCURL \
 			$TMP_CHECKOUT
-		cd $TMP_CHECKOUT
 
-		git submodule update --init --recursive
-		cd ..
-	fi
+		pushd $TMP_CHECKOUT
+		git submodule update --init --recursive --depth=1
+		popd
 
-	if [ ! -d $CHECKED_OUT_FOLDER ]; then
-		cp -Rf $TMP_CHECKOUT $CHECKED_OUT_FOLDER
+		echo "$TERMUX_PKG_VERSION" > $TMP_CHECKOUT_VERSION
 	fi
 
 	rm -rf $TERMUX_PKG_SRCDIR
-	cp -Rf $CHECKED_OUT_FOLDER $TERMUX_PKG_SRCDIR
+	cp -Rf $TMP_CHECKOUT $TERMUX_PKG_SRCDIR
 }
