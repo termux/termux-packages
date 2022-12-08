@@ -243,6 +243,12 @@ PACKAGES+=" guile-3.0"
 PACKAGES+=" python3-fontforge"
 PACKAGES+=" texlive-metapost"
 
+# Needed by package motif.
+PACKAGES+=" libfl-dev"
+PACKAGES+=" libxft-dev"
+PACKAGES+=" libxt-dev"
+PACKAGES+=" xbitmaps"
+
 # Needed by proxmark3/proxmark3-git
 PACKAGES+=" gcc-arm-none-eabi"
 
