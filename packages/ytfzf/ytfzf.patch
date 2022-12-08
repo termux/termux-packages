@@ -4,8 +4,8 @@
  	# clean up only as parent process
  	# kill ytfzf sub process{{{
  	# I think this needs to be written to a file because of sub-shells
--	jobs_file="${TMPDIR:-/tmp}/the-jobs-need-to-be-written-to-a-file.list"
-+	jobs_file="${TMPDIR:-@TERMUX_PREFIX@/tmp}/the-jobs-need-to-be-written-to-a-file.list"
+-    jobs_file="${TMPDIR:-/tmp}/ytfzf-the-jobs-need-to-be-written-to-a-file-$(id -u).list"
++    jobs_file="${TMPDIR:-@TERMUX_PREFIX@/tmp}/ytfzf-the-jobs-need-to-be-written-to-a-file-$(id -u).list"
  	jobs -p > "$jobs_file"
  	while read -r line; do
  		[ "$line" ] && kill "$line" 2> /dev/null
@@ -22,8 +22,8 @@
  
      # save the ecurrent environment so that any user set variables will be saved
      if [ "$check_exists" -eq 1 ]; then
--        tmp_env=/tmp/ytfzf-env
-+        tmp_env=@TERMUX_PREFIX@/tmp/ytfzf-env
+-        tmp_env=/tmp/"ytfzf-env-$(id -u)"
++        tmp_env=@TERMUX_PREFIX@/tmp/"ytfzf-env-$(id -u)"
          export -p > "$tmp_env"
      fi
  
