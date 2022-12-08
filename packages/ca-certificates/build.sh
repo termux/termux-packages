@@ -1,9 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://curl.se/docs/caextract.html
 TERMUX_PKG_DESCRIPTION="Common CA certificates"
-TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 _DATE=2022-10-11
 TERMUX_PKG_VERSION=1:${_DATE//-/.}
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://curl.se/ca/cacert-${_DATE}.pem
 TERMUX_PKG_SHA256=2cff03f9efdaf52626bd1b451d700605dc1ea000c5da56bd0fc59f8f43071040
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
@@ -19,6 +20,9 @@ termux_step_make_install() {
 		$CERTFILE \
 		$TERMUX_PKG_SHA256
 	touch $CERTFILE
+
+	# CVE-2022-23491
+	sed -i '/^TrustCor /,/^-----END CERTIFICATE-----$/d' $CERTFILE
 
 	# Build java keystore which is split out into a ca-certificates-java subpackage:
 	local KEYUTIL_JAR=$TERMUX_PKG_CACHEDIR/keyutil-0.4.0.jar
