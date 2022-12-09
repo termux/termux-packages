@@ -1,12 +1,11 @@
-diff -uNr delve-1.9.0/service/debugger/debugger_unix.go delve-1.9.0.mod/service/debugger/debugger_unix.go
---- delve-1.9.0/service/debugger/debugger_unix.go	2022-07-07 01:18:27.000000000 +0800
-+++ delve-1.9.0.mod/service/debugger/debugger_unix.go	2022-07-14 16:58:54.736488762 +0800
-@@ -32,7 +32,7 @@
- 	switch runtime.GOOS {
- 	case "darwin":
- 		exe, err = macho.NewFile(f)
--	case "linux", "freebsd":
-+	case "linux", "freebsd", "android":
- 		exe, err = elf.NewFile(f)
- 	default:
- 		panic("attempting to open file Delve cannot parse")
+diff -uNr delve-1.20.0/service/debugger/debugger_unix_test.go delve-1.20.0.mod/service/debugger/debugger_unix_test.go
+--- delve-1.20.0/service/debugger/debugger_unix_test.go	2022-12-09 02:34:57.000000000 +0800
++++ delve-1.20.0.mod/service/debugger/debugger_unix_test.go	2022-12-09 22:38:00.158612578 +0800
+@@ -32,6 +32,7 @@
+ 		"windows": "linux",
+ 		"freebsd": "windows",
+ 		"linux":   "windows",
++		"android": "windows",
+ 	}
+ 	if runtime.GOARCH == "arm64" && runtime.GOOS == "linux" {
+ 		os.Setenv("GOARCH", "amd64")
