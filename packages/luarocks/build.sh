@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://luarocks.org/
 TERMUX_PKG_DESCRIPTION="Deployment and management system for Lua modules"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.9.1
+TERMUX_PKG_VERSION=3.9.2
 TERMUX_PKG_SRCURL=https://luarocks.org/releases/luarocks-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=ffafd83b1c42aa38042166a59ac3b618c838ce4e63f4ace9d961a5679ef58253
+TERMUX_PKG_SHA256=bca6e4ecc02c203e070acdb5f586045d45c078896f6236eb46aa33ccd9b94edb
 __LUA_VERSION=5.1 # Lua version against which it will be built.
 # Do not use varible here since buildorder.py do not evaluate bash before reading.
 TERMUX_PKG_DEPENDS="curl, lua51"
