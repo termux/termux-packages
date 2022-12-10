@@ -41,12 +41,12 @@ diff -uNr kirigami2-5.100.0/src/controls/LinkButton.qml kirigami2-5.100.0.mod/sr
 --- kirigami2-5.100.0/src/controls/LinkButton.qml	2022-11-05 20:28:40.000000000 +0800
 +++ kirigami2-5.100.0.mod/src/controls/LinkButton.qml	2022-12-03 12:57:48.000000000 +0800
 @@ -38,9 +38,6 @@
-      */
      property alias mouseArea: area
  
+     activeFocusOnTab: true
 -    Accessible.role: Accessible.Button
 -    Accessible.name: text
--    Accessible.onPressAction: control.clicked(null)
+-    Accessible.onPressAction: control.clicked({"button": Qt.LeftButton})
  
      text: action ? action.text : ""
      enabled: !action || action.enabled
@@ -197,11 +197,11 @@ diff -uNr kirigami2-5.100.0/src/controls/templates/OverlayDrawer.qml kirigami2-5
 --- kirigami2-5.100.0/src/controls/templates/OverlayDrawer.qml	2022-11-05 20:28:40.000000000 +0800
 +++ kirigami2-5.100.0.mod/src/controls/templates/OverlayDrawer.qml	2022-12-03 12:58:46.000000000 +0800
 @@ -170,7 +170,6 @@
-             width: parent.height - Units.smallSpacing * 1.5
-             height: parent.height - Units.smallSpacing * 1.5
+             width: parent.height - Kirigami.Units.smallSpacing * 1.5
+             height: parent.height - Kirigami.Units.smallSpacing * 1.5
              onClicked: root.drawerOpen = !root.drawerOpen;
 -            Accessible.name: root.drawerOpen ? root.handleOpenToolTip : root.handleClosedToolTip
-             visible: !Settings.tabletMode && !Settings.hasTransientTouchInput
+             visible: !Kirigami.SettingstabletMode && !Kirigami.SettingshasTransientTouchInput
          }
  
 diff -uNr kirigami2-5.100.0/src/controls/templates/SwipeListItem.qml kirigami2-5.100.0.mod/src/controls/templates/SwipeListItem.qml
