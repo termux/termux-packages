@@ -5,9 +5,9 @@ TERMUX_PKG_MAINTAINER="@termux"
 # Please as well update SHA256 checksum for $_PROTOBUF_ZIP in
 #   $TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_protobuf.sh
 # when bumping version.
-TERMUX_PKG_VERSION=2:3.21.10
+TERMUX_PKG_VERSION=2:3.21.11
 TERMUX_PKG_SRCURL=https://github.com/protocolbuffers/protobuf/archive/v${TERMUX_PKG_VERSION:2}.tar.gz
-TERMUX_PKG_SHA256=90de7e780db97e0ee8cfabc3aecc0da56c3d443824b968ec0c7c600f9585b9ba
+TERMUX_PKG_SHA256=902f0db07d0e4726b4b649c1aaecc7c514e1c0724841e7c0b49691b28fa3d9ec
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="libc++, zlib"
 TERMUX_PKG_BREAKS="libprotobuf-dev"
