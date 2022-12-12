@@ -8,7 +8,7 @@
  
  /* Environment var controlling the thread stack size */
  #define ENVNAME_THREAD_STACK "FUSE_THREAD_STACK"
-@@ -39,6 +40,7 @@ struct fuse_worker {
+@@ -45,6 +46,7 @@ struct fuse_worker {
  	struct fuse_buf fbuf;
  	struct fuse_chan *ch;
  	struct fuse_mt *mt;
@@ -16,30 +16,31 @@
  };
  
  struct fuse_mt {
-@@ -118,14 +120,15 @@ static void *fuse_do_work(void *data)
- {
- 	struct fuse_worker *w = (struct fuse_worker *) data;
- 	struct fuse_mt *mt = w->mt;
-+	atomic_flag_clear(&w->cancel);
- 
- 	while (!fuse_session_exited(mt->se)) {
+@@ -130,9 +132,8 @@ static void *fuse_do_work(void *data)
  		int isforget = 0;
  		int res;
  
 -		pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
-+		if (atomic_flag_test_and_set(&w->cancel)) pthread_exit(NULL);
-+		atomic_flag_clear(&w->cancel);
++		if (!atomic_flag_test_and_set(&w->cancel)) pthread_exit(NULL);
  		res = fuse_session_receive_buf_int(mt->se, &w->fbuf, w->ch);
 -		pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
  		if (res == -EINTR)
  			continue;
  		if (res <= 0) {
-@@ -333,7 +336,7 @@ int fuse_session_loop_mt_32(struct fuse_session *se, struct fuse_loop_config *co
+@@ -297,6 +298,7 @@ static int fuse_loop_start_thread(struct
+ 		}
+ 	}
+ 
++	atomic_flag_test_and_set(&w->cancel);
+ 	res = fuse_start_thread(&w->thread_id, fuse_do_work, w);
+ 	if (res == -1) {
+ 		fuse_chan_put(w->ch);
+@@ -364,7 +366,7 @@ int err;
  
  		pthread_mutex_lock(&mt.lock);
  		for (w = mt.main.next; w != &mt.main; w = w->next)
 -			pthread_cancel(w->thread_id);
-+			atomic_flag_test_and_set(&w->cancel);
++			atomic_flag_clear(&w->cancel);
  		mt.exit = 1;
  		pthread_mutex_unlock(&mt.lock);
  

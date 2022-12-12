@@ -8,7 +8,7 @@
  
  #define FUSE_NODE_SLAB 1
  
-@@ -128,6 +129,7 @@ struct fuse {
+@@ -127,6 +128,7 @@ struct fuse {
  	struct list_head partial_slabs;
  	struct list_head full_slabs;
  	pthread_t prune_thread;
@@ -16,25 +16,32 @@
  };
  
  struct lock {
-@@ -4843,9 +4845,12 @@ static void *fuse_prune_nodes(void *fuse)
- {
- 	struct fuse *f = fuse;
- 	int sleep_time;
-+	atomic_flag_clear(&f->cancel);
+@@ -4881,6 +4883,7 @@ static void *fuse_prune_nodes(void *fuse
  
  	while(1) {
  		sleep_time = fuse_clean_cache(f);
-+		if (atomic_flag_test_and_set(&f->cancel)) pthread_exit(NULL);
-+		atomic_flag_clear(&f->cancel);
++		if (!atomic_flag_test_and_set(&f->cancel)) pthread_exit(NULL);
  		sleep(sleep_time);
  	}
  	return NULL;
-@@ -4863,7 +4868,7 @@ void fuse_stop_cleanup_thread(struct fuse *f)
+@@ -4888,8 +4891,10 @@ static void *fuse_prune_nodes(void *fuse
+ 
+ int fuse_start_cleanup_thread(struct fuse *f)
+ {
+-	if (lru_enabled(f))
++	if (lru_enabled(f)) {
++		atomic_flag_test_and_set(&f->cancel);
+ 		return fuse_start_thread(&f->prune_thread, fuse_prune_nodes, f);
++	}
+ 
+ 	return 0;
+ }
+@@ -4898,7 +4903,7 @@ void fuse_stop_cleanup_thread(struct fus
  {
  	if (lru_enabled(f)) {
  		pthread_mutex_lock(&f->lock);
 -		pthread_cancel(f->prune_thread);
-+		atomic_flag_test_and_set(&f->cancel);
++		atomic_flag_clear(&f->cancel);
  		pthread_mutex_unlock(&f->lock);
  		pthread_join(f->prune_thread, NULL);
  	}
