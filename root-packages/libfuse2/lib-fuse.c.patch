@@ -1,7 +1,5 @@
-diff --git a/lib/fuse.c b/../fuse.c
-index d1d873a..c3ddf68 100644
 --- a/lib/fuse.c
-+++ b/../fuse.c
++++ b/lib/fuse.c
 @@ -38,6 +38,7 @@
  #include <sys/time.h>
  #include <sys/mman.h>
@@ -18,25 +16,32 @@ index d1d873a..c3ddf68 100644
  };
  
  struct lock {
-@@ -4637,9 +4639,12 @@ static void *fuse_prune_nodes(void *fuse)
- {
- 	struct fuse *f = fuse;
- 	int sleep_time;
-+	atomic_flag_clear(&f->cancel);
+@@ -4640,6 +4642,7 @@ static void *fuse_prune_nodes(void *fuse
  
  	while(1) {
  		sleep_time = fuse_clean_cache(f);
-+		if (atomic_flag_test_and_set(&f->cancel)) pthread_exit(NULL);
-+		atomic_flag_clear(&f->cancel);
++		if (!atomic_flag_test_and_set(&f->cancel)) pthread_exit(NULL);
  		sleep(sleep_time);
  	}
  	return NULL;
-@@ -4657,7 +4662,7 @@ void fuse_stop_cleanup_thread(struct fuse *f)
+@@ -4647,8 +4650,10 @@ static void *fuse_prune_nodes(void *fuse
+ 
+ int fuse_start_cleanup_thread(struct fuse *f)
+ {
+-	if (lru_enabled(f))
++	if (lru_enabled(f)) {
++		atomic_flag_test_and_set(&f->cancel);
+ 		return fuse_start_thread(&f->prune_thread, fuse_prune_nodes, f);
++	}
+ 
+ 	return 0;
+ }
+@@ -4657,7 +4662,7 @@ void fuse_stop_cleanup_thread(struct fus
  {
  	if (lru_enabled(f)) {
  		pthread_mutex_lock(&f->lock);
 -		pthread_cancel(f->prune_thread);
-+		atomic_flag_test_and_set(&f->cancel);
++		atomic_flag_clear(&f->cancel);
  		pthread_mutex_unlock(&f->lock);
  		pthread_join(f->prune_thread, NULL);
  	}
