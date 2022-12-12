@@ -7,13 +7,7 @@ TERMUX_PKG_DEPENDS="openjdk-17"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
-
-termux_step_pre_configure() {
-	# Requires Android SDK, not available on device
-	if $TERMUX_ON_DEVICE_BUILD; then
-		termux_error_exit "Package '$TERMUX_PKG_NAME' is not available for on-device builds."
-	fi
-}
+TERMUX_PKG_COMPILE_ACCESS_FOR_DEVICE=false
 
 termux_step_make_install() {
 	install -Dm600 $ANDROID_HOME/build-tools/${TERMUX_PKG_VERSION}/lib/apksigner.jar \
