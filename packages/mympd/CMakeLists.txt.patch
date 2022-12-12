@@ -1,6 +1,14 @@
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -125,7 +125,6 @@
+@@ -71,7 +71,6 @@
+ # cmake modules
+ include(CheckCCompilerFlag)
+ include(CheckCSourceCompiles)
+-include(CheckIPOSupported)
+ include(GNUInstallDirs)
+ 
+ # custom cmake modules
+@@ -123,7 +122,6 @@
  # required dependencies
  find_package(Threads REQUIRED)
  find_package(PCRE2 REQUIRED)
@@ -8,7 +16,7 @@
  
  # optional dependencies
  if(MYMPD_ENABLE_SSL)
-@@ -229,7 +228,7 @@
+@@ -227,7 +225,7 @@
  configure_file(contrib/initscripts/mympd.sysVinit.in contrib/initscripts/mympd.sysVinit @ONLY)
  configure_file(contrib/initscripts/mympd.openrc.in contrib/initscripts/mympd.openrc @ONLY)
  
@@ -17,3 +25,13 @@
    # set strict global compile flags
    add_compile_options(
      "-fdata-sections"
+@@ -317,8 +315,7 @@
+     add_compile_options("-g")
+   endif()
+   # IPO/LTO support
+-  check_ipo_supported()
+-  set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
++  set(CMAKE_INTERPROCEDURAL_OPTIMIZATION FALSE)
+ elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
+   add_compile_options(
+     "-ggdb"
