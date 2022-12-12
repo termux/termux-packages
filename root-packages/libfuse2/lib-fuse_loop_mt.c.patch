@@ -1,7 +1,5 @@
-diff --git a/lib/fuse_loop_mt.c b/../fuse_loop_mt.c
-index 82e3001..005639a 100644
 --- a/lib/fuse_loop_mt.c
-+++ b/../fuse_loop_mt.c
++++ b/lib/fuse_loop_mt.c
 @@ -19,6 +19,7 @@
  #include <semaphore.h>
  #include <errno.h>
@@ -18,32 +16,31 @@ index 82e3001..005639a 100644
  };
  
  struct fuse_mt {
-@@ -67,6 +69,7 @@ static void *fuse_do_work(void *data)
- {
- 	struct fuse_worker *w = (struct fuse_worker *) data;
- 	struct fuse_mt *mt = w->mt;
-+	atomic_flag_clear(&w->cancel);
- 
- 	while (!fuse_session_exited(mt->se)) {
- 		int isforget = 0;
-@@ -77,9 +80,9 @@ static void *fuse_do_work(void *data)
+@@ -77,9 +79,8 @@ static void *fuse_do_work(void *data)
  		};
  		int res;
  
 -		pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
-+		if (atomic_flag_test_and_set(&w->cancel)) pthread_exit(NULL);
-+		atomic_flag_clear(&w->cancel);
++		if (!atomic_flag_test_and_set(&w->cancel)) pthread_exit(NULL);
  		res = fuse_session_receive_buf(mt->se, &fbuf, &ch);
 -		pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
  		if (res == -EINTR)
  			continue;
  		if (res <= 0) {
-@@ -243,7 +246,7 @@ int fuse_session_loop_mt(struct fuse_session *se)
+@@ -193,6 +194,7 @@ static int fuse_loop_start_thread(struct
+ 		return -1;
+ 	}
+ 
++	atomic_flag_test_and_set(&w->cancel);
+ 	res = fuse_start_thread(&w->thread_id, fuse_do_work, w);
+ 	if (res == -1) {
+ 		free(w->buf);
+@@ -243,7 +245,7 @@ int fuse_session_loop_mt(struct fuse_ses
  
  		pthread_mutex_lock(&mt.lock);
  		for (w = mt.main.next; w != &mt.main; w = w->next)
 -			pthread_cancel(w->thread_id);
-+			atomic_flag_test_and_set(&w->cancel);
++			atomic_flag_clear(&w->cancel);
  		mt.exit = 1;
  		pthread_mutex_unlock(&mt.lock);
  
