@@ -8,26 +8,24 @@
  
  /*
   * fsel_open_mask is used to limit the number of opens to 1 per file.
-@@ -220,7 +221,8 @@ static void *fsel_producer(void *data)
+@@ -220,7 +221,7 @@ static void *fsel_producer(void *data)
  	const struct timespec interval = { 0, 250000000 };
  	unsigned idx = 0, nr = 1;
  
 -	(void) data;
 +	atomic_flag *cancel = (atomic_flag *) data;
-+	atomic_flag_clear(cancel);
  
  	while (1) {
  		int i, t;
-@@ -257,6 +259,8 @@ static void *fsel_producer(void *data)
+@@ -257,6 +258,7 @@ static void *fsel_producer(void *data)
  
  		pthread_mutex_unlock(&fsel_mutex);
  
-+		if (atomic_flag_test_and_set(cancel)) pthread_exit(NULL);
-+		atomic_flag_clear(cancel);
++		if (!atomic_flag_test_and_set(cancel)) pthread_exit(NULL);
  		nanosleep(&interval, NULL);
  	}
  
-@@ -268,6 +272,7 @@ int main(int argc, char *argv[])
+@@ -268,6 +270,7 @@ int main(int argc, char *argv[])
  	pthread_t producer;
  	pthread_attr_t attr;
  	int ret;
@@ -35,21 +33,22 @@
  
  	errno = pthread_mutex_init(&fsel_mutex, NULL);
  	if (errno) {
-@@ -281,7 +286,7 @@ int main(int argc, char *argv[])
+@@ -281,7 +284,8 @@ int main(int argc, char *argv[])
  		return 1;
  	}
  
 -	errno = pthread_create(&producer, &attr, fsel_producer, NULL);
++	atomic_flag_test_and_set(&cancel);
 +	errno = pthread_create(&producer, &attr, fsel_producer, (void *)&cancel);
  	if (errno) {
  		perror("pthread_create");
  		return 1;
-@@ -289,7 +294,7 @@ int main(int argc, char *argv[])
+@@ -289,7 +293,7 @@ int main(int argc, char *argv[])
  
  	ret = fuse_main(argc, argv, &fsel_oper, NULL);
  
 -	pthread_cancel(producer);
-+	atomic_flag_test_and_set(&cancel);
++	atomic_flag_clear(&cancel);
  	pthread_join(producer, NULL);
  
  	return ret;

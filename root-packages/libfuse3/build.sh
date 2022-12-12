@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="FUSE (Filesystem in Userspace) is an interface for users
 TERMUX_PKG_LICENSE="LGPL-2.1, GPL-2.0"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 TERMUX_PKG_VERSION=3.12.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/libfuse/libfuse/archive/fuse-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=df6cc8807c4fd36b6b0ebef2b738dad6d19a9c7c085ccc3775063688d0bfcc0b
 
