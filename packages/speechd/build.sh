@@ -3,18 +3,12 @@ TERMUX_PKG_DESCRIPTION="Common interface to speech synthesis"
 TERMUX_PKG_LICENSE="LGPL-2.1, GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.11.4"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=628d4446894b47f0df099123924c1070180b5b5b09c5b637ebe80d8578fba92f
 TERMUX_PKG_SRCURL=https://github.com/brailcom/speechd/archive/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_DEPENDS="dotconf, espeak, glib, libiconv, pulseaudio, python"
+TERMUX_PKG_DEPENDS="dotconf, espeak, glib, libiconv, libltdl, libsndfile, pulseaudio, python, speechd-data"
 TERMUX_PKG_BUILD_DEPENDS="libiconv-static, libsndfile-static"
 TERMUX_PKG_AUTO_UPDATE=true
-
-##
-## Note: package needs patching for proper fix of pthread_cancel usage.
-## Right now it uses pthread_kill(t, 0) which does nothing and is not
-## correct solution to the missing pthread_cancel on Android OS.
-## See package "calcurse" for example of proper pthread_cancel replacement.
-##
 
 # Fails to find generated headers
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -36,6 +30,15 @@ termux_step_pre_configure() {
 		source $TERMUX_SCRIPTDIR/packages/python/build.sh
 		echo $_MAJOR_VERSION
 	)
+	termux_setup_python_crossenv
+	pushd $TERMUX_PYTHON_CROSSENV_SRCDIR
+	_CROSSENV_PREFIX=$TERMUX_PKG_BUILDDIR/python-crossenv-prefix
+	python${_PYTHON_VERSION} -m crossenv \
+		$TERMUX_PREFIX/bin/python${_PYTHON_VERSION} \
+		${_CROSSENV_PREFIX}
+	popd
+	. ${_CROSSENV_PREFIX}/bin/activate
+
 	export am_cv_python_pythondir="${TERMUX_PREFIX}/lib/python${_PYTHON_VERSION}/site-packages"
 	export am_cv_python_pyexecdir="$am_cv_python_pythondir"
 	./build.sh

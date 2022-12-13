@@ -1,0 +1,176 @@
+--- a/src/api/c/libspeechd.c
++++ b/src/api/c/libspeechd.c
+@@ -610,7 +610,11 @@ void spd_close(SPDConnection * connectio
+ 	pthread_mutex_lock(&connection->ssip_mutex);
+ 
+ 	if (connection->mode == SPD_MODE_THREADED) {
++#ifndef __ANDROID__
+ 		pthread_cancel(connection->td->events_thread);
++#else
++		pthread_kill(connection->td->events_thread, SIGUSR2);
++#endif
+ 		pthread_mutex_destroy(&connection->td->mutex_reply_ready);
+ 		pthread_mutex_destroy(&connection->td->mutex_reply_ack);
+ 		pthread_cond_destroy(&connection->td->cond_reply_ready);
+@@ -1842,12 +1846,28 @@ static char *get_reply(SPDConnection * c
+ 	return reply;
+ }
+ 
++#ifdef __ANDROID__
++static void thread_signal_handler(int signum)
++{
++	pthread_exit(0);
++}
++#endif
++
+ static void *spd_events_handler(void *conn)
+ {
+ 	char *reply;
+ 	int reply_code;
+ 	SPDConnection *connection = conn;
+ 
++#ifdef __ANDROID__
++	struct sigaction actions;
++	memset(&actions, 0, sizeof(actions));
++	sigemptyset(&actions.sa_mask);
++	actions.sa_flags = 0;
++	actions.sa_handler = thread_signal_handler;
++	sigaction(SIGUSR2, &actions, NULL);
++#endif
++
+ 	while (1) {
+ 
+ 		/* Read the reply/event (block if none is available) */
+--- a/src/audio/nas.c
++++ b/src/audio/nas.c
+@@ -51,11 +51,27 @@ typedef struct {
+ 
+ static int nas_log_level;
+ 
++#ifdef __ANDROID__
++static void thread_signal_handler(int signum)
++{
++	pthread_exit(0);
++}
++#endif
++
+ /* Internal event handler */
+ static void *_nas_handle_events(void *par)
+ {
+ 	spd_nas_id_t *nas_id = (spd_nas_id_t *) par;
++#ifndef __ANDROID__
+ 	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
++#else
++	struct sigaction actions;
++	memset(&actions, 0, sizeof(actions));
++	sigemptyset(&actions.sa_mask);
++	actions.sa_flags = 0;
++	actions.sa_handler = thread_signal_handler;
++	sigaction(SIGUSR2, &actions, NULL);
++#endif
+ 
+ 	while (1)
+ 		AuHandleEvents(nas_id->aud);
+@@ -214,7 +230,11 @@ static int nas_close(AudioID * id)
+ 	if (nas_id == NULL)
+ 		return -2;
+ 
++#ifndef __ANDROID__
+ 	pthread_cancel(nas_id->nas_event_handler);
++#else
++	pthread_kill(nas_id->nas_event_handler, SIGUSR2);
++#endif
+ 	pthread_join(nas_id->nas_event_handler, NULL);
+ 
+ 	pthread_mutex_destroy(&nas_id->pt_mutex);
+--- a/src/common/common.c
++++ b/src/common/common.c
+@@ -47,8 +47,24 @@ int spd_pthread_create(pthread_t *thread
+ 	return ret;
+ }
+ 
++#ifdef __ANDROID__
++static void thread_signal_handler(int signum)
++{
++	pthread_exit(0);
++}
++#endif
++
+ void set_speaking_thread_parameters(void)
+ {
++#ifndef __ANDROID__
+ 	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+ 	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
++#else
++	struct sigaction actions;
++	memset(&actions, 0, sizeof(actions));
++	sigemptyset(&actions.sa_mask);
++	actions.sa_flags = 0;
++	actions.sa_handler = thread_signal_handler;
++	sigaction(SIGUSR2, &actions, NULL);
++#endif
+ }
+--- a/src/modules/module_utils.c
++++ b/src/modules/module_utils.c
+@@ -586,7 +586,11 @@ int module_terminate_thread(pthread_t th
+ {
+ 	int ret;
+ 
++#ifndef __ANDROID__
+ 	ret = pthread_cancel(thread);
++#else
++	ret = pthread_kill(thread, SIGUSR2);
++#endif
+ 	if (ret != 0) {
+ 		DBG("Cancellation of speak thread failed");
+ 		return 1;
+--- a/src/server/output.c
++++ b/src/server/output.c
+@@ -225,7 +225,16 @@ void
+ static output_lock(void)
+ {
+ 	if (pthread_self() == speak_thread)
++#ifndef __ANDROID__
+ 		pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &oldstate);
++#else
++	{
++		sigset_t pthread_cancel_block;
++		sigemptyset(&pthread_cancel_block);
++		sigaddset(&pthread_cancel_block, SIGUSR2);
++		sigprocmask(SIG_BLOCK, &pthread_cancel_block, NULL);
++	}
++#endif
+ 	pthread_mutex_lock(&output_layer_mutex);
+ }
+ 
+@@ -234,7 +243,16 @@ static output_unlock(void)
+ {
+ 	pthread_mutex_unlock(&output_layer_mutex);
+ 	if (pthread_self() == speak_thread)
++#ifndef __ANDROID__
+ 		pthread_setcancelstate(oldstate, NULL);
++#else
++	{
++		sigset_t pthread_cancel_block;
++		sigemptyset(&pthread_cancel_block);
++		sigaddset(&pthread_cancel_block, SIGUSR2);
++		sigprocmask(SIG_UNBLOCK, &pthread_cancel_block, NULL);
++	}
++#endif
+ }
+ 
+ #define OL_RET(value) \
+--- a/src/server/speechd.c
++++ b/src/server/speechd.c
+@@ -1353,7 +1353,11 @@ int main(int argc, char *argv[])
+ 	g_hash_table_destroy(fd_settings);
+ 
+ 	MSG(4, "Closing speak() thread...");
++#ifndef __ANDROID__
+ 	ret = pthread_cancel(speak_thread);
++#else
++	ret = pthread_kill(speak_thread, SIGUSR2);
++#endif
+ 	if (ret != 0)
+ 		FATAL("Speak thread failed to cancel!\n");
+ 
