@@ -1,49 +1,80 @@
---- a/lib/util/pthread_create_blocking_np.c	2021-12-24 19:27:38.000000000 +0000
-+++ b/lib/util/pthread_create_blocking_np.c	2022-04-15 16:27:13.958553234 +0000
-@@ -148,7 +148,7 @@
+--- a/lib/util/pthread_create_blocking_np.c
++++ b/lib/util/pthread_create_blocking_np.c
+@@ -18,6 +18,14 @@ struct wrapped_cookie {
+ 	int rc_sync;		/* non-zero if synchronization failed. */
+ };
+ 
++#ifdef __ANDROID__
++static void
++thread_signal_handler(int signum)
++{
++	pthread_exit(0);
++}
++#endif
++
+ /* Routine which is executed by pthread_create(). */
+ static void *
+ wrapped_thread(void * cookie)
+@@ -27,6 +35,15 @@ wrapped_thread(void * cookie)
+ 	void * arg;
+ 	int rc;
+ 
++#ifdef __ANDROID__
++	struct sigaction actions;
++	memset(&actions, 0, sizeof(actions));
++	sigemptyset(&actions.sa_mask);
++	actions.sa_flags = 0;
++	actions.sa_handler = thread_signal_handler;
++	sigaction(SIGUSR2, &actions, NULL);
++#endif
++
+ 	/*
+ 	 * Copy the user-supplied parameters, because U will not be valid
+ 	 * after we signal the parent thread that we have started running.
+@@ -148,7 +165,11 @@ err5:
  	 */
  	pthread_mutex_unlock(&U->mutex);
  err4:
--	pthread_cancel(*thread);
-+	pthread_kill(*thread,0);
++#ifndef __ANDROID__
+ 	pthread_cancel(*thread);
++#else
++	pthread_kill(*thread, SIGUSR2);
++#endif
  	pthread_join(*thread, NULL);
  err3:
  	pthread_cond_destroy(&U->cond);
---- a/spipe/main.c	2021-12-24 19:27:38.000000000 +0000
-+++ b/spipe/main.c	2022-04-15 16:26:28.373620198 +0000
-@@ -71,7 +71,7 @@
+--- a/spipe/main.c
++++ b/spipe/main.c
+@@ -71,7 +71,11 @@ callback_graceful_shutdown(void * cookie
  
  	/* Cancel the threads. */
  	for (i = 0; i < 2; i++) {
--		if ((rc = pthread_cancel(ET->threads[i])) != 0) {
-+		if ((rc = pthread_kill(ET->threads[i],0)) != 0) {
++#ifndef __ANDROID__
+ 		if ((rc = pthread_cancel(ET->threads[i])) != 0) {
++#else
++		if ((rc = pthread_kill(ET->threads[i], SIGUSR2)) != 0) {
++#endif
  			/*
  			 * According to the POSIX standard, a Thread ID should
  			 * still be valid after pthread_exit has been invoked
-@@ -80,7 +80,7 @@
- 			 * this situation.
- 			 */
- 			if (rc != ESRCH) {
--				warn0("pthread_cancel: %s", strerror(rc));
-+				warn0("pthread_kill: %s", strerror(rc));
- 				goto err0;
- 			}
- 		}
-@@ -310,13 +310,13 @@
+@@ -310,12 +314,20 @@ main(int argc, char * argv[])
  	exit(0);
  
  err6:
--	if ((rc = pthread_cancel(ET.threads[0])) != 0)
--		warn0("pthread_cancel: %s", strerror(rc));
-+	if ((rc = pthread_kill(ET.threads[0],0)) != 0)
-+		warn0("pthread_kill: %s", strerror(rc));
++#ifndef __ANDROID__
+ 	if ((rc = pthread_cancel(ET.threads[0])) != 0)
++#else
++	if ((rc = pthread_kill(ET.threads[0], SIGUSR2)) != 0)
++#endif
+ 		warn0("pthread_cancel: %s", strerror(rc));
  	if ((rc = pthread_join(ET.threads[0], NULL)) != 0)
  		warn0("pthread_join: %s", strerror(rc));
  err5:
--	if ((rc = pthread_cancel(ET.threads[1])) != 0)
--		warn0("pthread_cancel: %s", strerror(rc));
-+	if ((rc = pthread_kill(ET.threads[1],0)) != 0)
-+		warn0("pthread_kill: %s", strerror(rc));
++#ifndef __ANDROID__
+ 	if ((rc = pthread_cancel(ET.threads[1])) != 0)
++#else
++	if ((rc = pthread_kill(ET.threads[1], SIGUSR2)) != 0)
++#endif
+ 		warn0("pthread_cancel: %s", strerror(rc));
  	if ((rc = pthread_join(ET.threads[1], NULL)) != 0)
  		warn0("pthread_join: %s", strerror(rc));
- err4:
