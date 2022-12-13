@@ -1,0 +1,29 @@
+--- a/src/ec_ui.c
++++ b/src/ec_ui.c
+@@ -262,7 +262,14 @@ int ui_msg_flush(int max)
+ 	return 0; 
+ 
+    // don't allow the thread to cancel while holding the ui mutex
++#ifndef __ANDROID__
+    pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &old);
++#else
++   sigset_t pthread_cancel_block;
++   sigemptyset(&pthread_cancel_block);
++   sigaddset(&pthread_cancel_block, SIGUSR2);
++   sigprocmask(SIG_BLOCK, &pthread_cancel_block, NULL);
++#endif
+ 
+    /* the queue is updated by other threads */
+    UI_MSG_LOCK;
+@@ -285,7 +292,11 @@ int ui_msg_flush(int max)
+    
+    UI_MSG_UNLOCK;
+ 
++#ifndef __ANDROID__
+    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, &old);
++#else
++   sigprocmask(SIG_UNBLOCK, &pthread_cancel_block, NULL);
++#endif
+ 
+    /* returns the number of displayed messages */
+    return i;

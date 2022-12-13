@@ -1,0 +1,58 @@
+--- a/src/ec_threads.c
++++ b/src/ec_threads.c
+@@ -233,6 +233,13 @@ pthread_t ec_thread_new_detached(char *n
+    return id;
+ }
+ 
++#ifdef __ANDROID__
++static void thread_signal_handler(int signum)
++{
++   pthread_exit(0);
++}
++#endif
++
+ /* 
+  * set the state of a thread 
+  * all the new thread MUST call this on startup
+@@ -250,8 +257,17 @@ void ec_thread_init(void)
+     * allow a thread to be cancelled as soon as the
+     * cancellation  request  is received
+     */
++#ifndef __ANDROID__
+    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+    pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
++#else
++   struct sigaction actions;
++   memset(&actions, 0, sizeof(actions));
++   sigemptyset(&actions.sa_mask);
++   actions.sa_flags = 0;
++   actions.sa_handler = thread_signal_handler;
++   sigaction(SIGUSR2, &actions, NULL);
++#endif
+ 
+    /* sync with the creator */ 
+    if ((e = pthread_cond_signal(&init_cond)))
+@@ -275,7 +291,11 @@ void ec_thread_destroy(pthread_t id)
+ 
+ 
+    /* send the cancel signal to the thread */
++#ifndef __ANDROID__
+    pthread_cancel((pthread_t)id);
++#else
++   pthread_kill((pthread_t)id, SIGUSR2);
++#endif
+ 
+ 
+    DEBUG_MSG("ec_thread_destroy -- [%s] terminated", ec_thread_getname(id));
+@@ -331,7 +351,11 @@ void ec_thread_kill_all(void)
+          DEBUG_MSG("ec_thread_kill_all -- terminating %lu [%s]", PTHREAD_ID(current->t.id), current->t.name);
+ 
+          /* send the cancel signal to the thread */
++#ifndef __ANDROID__
+          pthread_cancel((pthread_t)current->t.id);
++#else
++         pthread_kill((pthread_t)current->t.id, SIGUSR2);
++#endif
+          
+ #ifndef BROKEN_PTHREAD_JOIN
+          if (!current->t.detached) {
