@@ -1,0 +1,69 @@
+--- a/src/components.cc
++++ b/src/components.cc
+@@ -74,6 +74,37 @@ int pipefd_e2a[2];
+   return 0;
+ }*/
+ 
++#ifdef __ANDROID__
++typedef struct wrapped_thread_start {
++  void *(*start)(void *);
++  void *arg;
++} wrapped_thread_start_t;
++
++static void thread_signal_handler(int signum)
++{
++  pthread_exit(0);
++}
++
++static void *pthread_create_wrapper(void *wrapped_arg)
++{
++  wrapped_thread_start_t *wrapped_start = (wrapped_thread_start_t *)wrapped_arg;
++
++  struct sigaction actions;
++  memset( &actions, 0, sizeof( actions ) );
++  sigemptyset( &actions.sa_mask );
++  actions.sa_flags = 0;
++  actions.sa_handler = thread_signal_handler;
++  sigaction( SIGUSR2, &actions, NULL );
++
++  void *(*start)(void *) = wrapped_start->start;
++  void *arg = wrapped_start->arg;
++
++  free( wrapped_start );
++
++  return (*start)( arg );
++}
++#endif
++
+ /*
+  * Starts the input on a separate thread.
+  */
+@@ -87,7 +118,17 @@ void InitInputThread()
+   }
+ 
+   /* Start input thread */
++#ifndef __ANDROID__
+   pthread_create(&input_thread, NULL, input_func, NULL);
++#else
++  wrapped_thread_start_t *wrapped_start = (wrapped_thread_start_t *)malloc( sizeof( wrapped_thread_start_t ) );
++  if ( wrapped_start == NULL ) {
++    return;
++  }
++  wrapped_start->start = input_func;
++  wrapped_start->arg = NULL;
++  pthread_create( &input_thread, NULL, pthread_create_wrapper, wrapped_start );
++#endif
+ }
+ 
+ /*
+@@ -171,6 +212,10 @@ void TerminateAdapterEngine()
+ 
+ void TerminateInput()
+ {
++#ifndef __ANDROID__
+   pthread_cancel( input_thread );
++#else
++  pthread_kill( input_thread, SIGUSR2 );
++#endif
+   pthread_join( input_thread, NULL );
+ }
