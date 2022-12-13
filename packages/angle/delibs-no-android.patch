@@ -1,0 +1,47 @@
+--- a/third_party/VK-GL-CTS/src/framework/qphelper/qpDebugOut.c
++++ b/third_party/VK-GL-CTS/src/framework/qphelper/qpDebugOut.c
+@@ -98,7 +98,7 @@
+ }
+ 
+ /* print() implementation. */
+-#if (DE_OS == DE_OS_ANDROID)
++#if (DE_OS == DE_OS_ANDROID) && !defined(__TERMUX__)
+ 
+ #include <android/log.h>
+ 
+--- a/third_party/VK-GL-CTS/src/framework/delibs/debase/deDefs.c
++++ b/third_party/VK-GL-CTS/src/framework/delibs/debase/deDefs.c
+@@ -57,7 +57,7 @@
+ #	include <stdlib.h>
+ #endif
+ 
+-#if (DE_OS == DE_OS_ANDROID)
++#if (DE_OS == DE_OS_ANDROID) && !defined(__TERMUX__)
+ #	include <android/log.h>
+ #endif
+ 
+@@ -132,9 +132,12 @@
+     __assert(reason, file, (unsigned int)line, "Unknown function");
+ #elif (DE_OS == DE_OS_SYMBIAN)
+ 	__assert("Unknown function", file, line, reason);
+-#elif (DE_OS == DE_OS_ANDROID)
++#elif (DE_OS == DE_OS_ANDROID) && !defined(__TERMUX__)
+ 	__android_log_print(ANDROID_LOG_ERROR, "delibs", "Assertion '%s' failed at %s:%d", reason, file, line);
+ 	__assert(file, line, reason);
++#elif defined(__TERMUX__)
++	fprintf(stderr, "Assertion '%s' failed at %s:%d\n", reason, file, line);
++	__assert(file, line, reason);
+ #else
+ #	error Implement assertion function on your platform.
+ #endif
+--- a/src/tests/deqp_support/angle_deqp_libtester_main.cpp
++++ b/src/tests/deqp_support/angle_deqp_libtester_main.cpp
+@@ -37,7 +37,7 @@
+ 
+ std::string GetLogFileName(std::string deqpDataDir)
+ {
+-#if (DE_OS == DE_OS_ANDROID)
++#if (DE_OS == DE_OS_ANDROID) && !defined(__TERMUX__)
+     // On Android executable dir is not writable, so use data dir instead
+     return std::string("/data/data/com.android.angle.test/") + g_cmdLine->getLogFileName();
+ #else

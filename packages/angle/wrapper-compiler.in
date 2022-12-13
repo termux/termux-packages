@@ -1,0 +1,72 @@
+#!/usr/bin/env python3
+# Do not know why host_toolchain will append target_sysroot as param.
+# But anyway, we could replace it manually.
+import os
+import subprocess
+import sys
+import typing
+
+COMPLIER_PATH = "@COMPILER@"
+NEW_SYSROOT = "@NEW_SYSROOT@"
+TERMUX_PREFIX = "@TERMUX_PREFIX@"
+
+
+def main(argv: typing.List[str]):
+    cwd = os.getcwd()
+    args = []
+    args.append(COMPLIER_PATH)
+    # Find current exists sysroot param
+    sysroot_orig = "../../../tmp/sysroot"
+    possible_pathes = []
+    possible_pathes.append(f"--sysroot={sysroot_orig}")
+    possible_pathes.append(f"-I{sysroot_orig}")
+    possible_pathes.append(f"-L{sysroot_orig}")
+    possible_pathes.append(f"-isystem{sysroot_orig}")
+    for arg in argv[1:]:
+        if arg.startswith("--sysroot="):
+            sysroot_orig = arg.replace("--sysroot=", "")
+    if not sysroot_orig.startswith("/"):
+        sysroot_orig_n = os.path.normpath(os.path.join(cwd, sysroot_orig))
+        possible_pathes.append(f"--sysroot={sysroot_orig_n}")
+        possible_pathes.append(f"-I{sysroot_orig_n}")
+        possible_pathes.append(f"-L{sysroot_orig_n}")
+        possible_pathes.append(f"-isystem{sysroot_orig_n}")
+    # Replace the invalid include or link path
+    # What is the invalid path like? See the following:
+    # Example1: -I@INVALID_SYSROOT@/usr/include             ---|
+    # Example2: -I@INVALID_SYSROOT@/@TERMUX_PREFIX@/include    |=> -I@NEW_SYSROOT@/usr/include
+    # Example3: -I@TERMUX_PREFIX@/include                   ---|
+    # Example4: -L@INVALID_SYSROOT@/usr/lib                 ---|
+    # Example5: -L@INVALID_SYSROOT@/@TERMUX_PREFIX@/lib        |=> -L@NEW_SYSROOT@/usr/lib/x86_64-linux-gnu
+    # Example6: -L@TERMUX_PREFIX@/lib                       ---|
+    for arg in argv[1:]:
+        if arg.startswith(tuple(possible_pathes)):
+            arg = arg.replace(sysroot_orig, NEW_SYSROOT)
+            arg = arg.replace(sysroot_orig_n, NEW_SYSROOT)
+            if TERMUX_PREFIX in arg:
+                arg = arg.replace(TERMUX_PREFIX, "/usr")
+        elif arg.startswith((f"-I{TERMUX_PREFIX}", f"-L{TERMUX_PREFIX}", f"-isystem{TERMUX_PREFIX}")):
+            arg = arg.replace(TERMUX_PREFIX, f"{NEW_SYSROOT}/usr")
+        if f"{NEW_SYSROOT}/usr/lib" in arg:
+            arg = arg.replace(
+                f"{NEW_SYSROOT}/usr/lib", f"{NEW_SYSROOT}/usr/lib/x86_64-linux-gnu")
+        # Remove `-I@NEW_SYSROOT@/usr/include` related argument. It will break C++ build.
+        if arg not in [f"-I{NEW_SYSROOT}/usr/include", f"-isystem{NEW_SYSROOT}/usr/include"]:
+            args.append(arg)
+    try:
+        subprocess.run(args,
+                       env=os.environ,
+                       cwd=os.getcwd(),
+                       check=True,
+                       text=True,
+                       stdout=subprocess.PIPE,
+                       stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError as e:
+        print('Executing {} failed'.format(args), file=sys.stderr)
+        end = '' if e.output[-1] == '\n' else '\n'
+        print(e.output, file=sys.stderr, end=end)
+        sys.exit(e.returncode)
+
+
+if __name__ == '__main__':
+    main(sys.argv)

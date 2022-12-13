@@ -1,0 +1,70 @@
+--- a/third_party/vulkan-deps/vulkan-loader/src/BUILD.gn
++++ b/third_party/vulkan-deps/vulkan-loader/src/BUILD.gn
+@@ -57,9 +57,9 @@
+   }
+   if (is_linux || is_chromeos || is_mac) {
+     defines += [
+-      "SYSCONFDIR=\"/etc\"",
+-      "FALLBACK_CONFIG_DIRS=\"/etc/xdg\"",
+-      "FALLBACK_DATA_DIRS=\"/usr/local/share:/usr/share\"",
++      "SYSCONFDIR=\"@TERMUX_PREFIX@/etc\"",
++      "FALLBACK_CONFIG_DIRS=\"@TERMUX_PREFIX@/etc/xdg\"",
++      "FALLBACK_DATA_DIRS=\"@TERMUX_PREFIX@/local/share:@TERMUX_PREFIX@/share\"",
+     ]
+   }
+ }
+--- a/third_party/vulkan-deps/vulkan-loader/src/CMakeLists.txt
++++ b/third_party/vulkan-deps/vulkan-loader/src/CMakeLists.txt
+@@ -149,9 +149,9 @@
+ set(LOADER_HELPER_FOLDER "Helper Targets")
+ 
+ if(UNIX)
+-    set(FALLBACK_CONFIG_DIRS "/etc/xdg" CACHE STRING
++    set(FALLBACK_CONFIG_DIRS "@TERMUX_PREFIX@/etc/xdg" CACHE STRING
+             "Search path to use when XDG_CONFIG_DIRS is unset or empty or the current process is SUID/SGID. Default is freedesktop compliant.")
+-    set(FALLBACK_DATA_DIRS "/usr/local/share:/usr/share" CACHE STRING
++    set(FALLBACK_DATA_DIRS "@TERMUX_PREFIX@/usr/local/share:@TERMUX_PREFIX@/usr/share" CACHE STRING
+             "Search path to use when XDG_DATA_DIRS is unset or empty or the current process is SUID/SGID. Default is freedesktop compliant.")
+     set(SYSCONFDIR "" CACHE STRING
+             "System-wide search directory. If not set or empty, CMAKE_INSTALL_FULL_SYSCONFDIR and /etc are used.")
+@@ -339,8 +339,8 @@
+         target_compile_definitions(loader_common_options INTERFACE SYSCONFDIR="${CMAKE_INSTALL_FULL_SYSCONFDIR}")
+ 
+         # Make sure /etc is searched by the loader
+-        if(NOT (CMAKE_INSTALL_FULL_SYSCONFDIR STREQUAL "/etc"))
+-            target_compile_definitions(loader_common_options INTERFACE EXTRASYSCONFDIR="/etc")
++        if(NOT (CMAKE_INSTALL_FULL_SYSCONFDIR STREQUAL "@TERMUX_PREFIX@/etc"))
++            target_compile_definitions(loader_common_options INTERFACE EXTRASYSCONFDIR="@TERMUX_PREFIX@/etc")
+         endif()
+     endif()
+ endif()
+--- a/third_party/vulkan-deps/vulkan-tools/src/BUILD.gn
++++ b/third_party/vulkan-deps/vulkan-tools/src/BUILD.gn
+@@ -27,9 +27,9 @@
+   }
+   if (is_linux || is_chromeos) {
+     defines += [
+-      "SYSCONFDIR=\"/etc\"",
+-      "FALLBACK_CONFIG_DIRS=\"/etc/xdg\"",
+-      "FALLBACK_DATA_DIRS=\"/usr/local/share:/usr/share\"",
++      "SYSCONFDIR=\"@TERMUX_PREFIX@/etc\"",
++      "FALLBACK_CONFIG_DIRS=\"@TERMUX_PREFIX@/etc/xdg\"",
++      "FALLBACK_DATA_DIRS=\"@TERMUX_PREFIX@/local/share:@TERMUX_PREFIX@/share\"",
+     ]
+   }
+ }
+--- a/third_party/vulkan-deps/vulkan-validation-layers/src/BUILD.gn
++++ b/third_party/vulkan-deps/vulkan-validation-layers/src/BUILD.gn
+@@ -79,9 +79,9 @@
+   }
+   if (is_linux) {
+     defines += [
+-      "SYSCONFDIR=\"/etc\"",
+-      "FALLBACK_CONFIG_DIRS=\"/etc/xdg\"",
+-      "FALLBACK_DATA_DIRS=\"/usr/local/share:/usr/share\"",
++      "SYSCONFDIR=\"@TERMUX_PREFIX@/etc\"",
++      "FALLBACK_CONFIG_DIRS=\"@TERMUX_PREFIX@/etc/xdg\"",
++      "FALLBACK_DATA_DIRS=\"@TERMUX_PREFIX@/local/share:@TERMUX_PREFIX@/share\"",
+     ]
+   }
+ 

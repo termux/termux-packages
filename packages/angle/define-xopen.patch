@@ -1,0 +1,30 @@
+--- a/third_party/VK-GL-CTS/src/framework/delibs/dethread/unix/deThreadLocalUnix.c
++++ b/third_party/VK-GL-CTS/src/framework/delibs/dethread/unix/deThreadLocalUnix.c
+@@ -25,6 +25,12 @@
+ 
+ #if (DE_OS == DE_OS_UNIX || DE_OS == DE_OS_OSX || DE_OS == DE_OS_ANDROID || DE_OS == DE_OS_SYMBIAN || DE_OS == DE_OS_IOS || DE_OS == DE_OS_QNX || DE_OS == DE_OS_FUCHSIA)
+ 
++#ifdef __TERMUX__
++#ifndef _XOPEN_SOURCE
++#define _XOPEN_SOURCE 600
++#endif
++#endif
++
+ #if !defined(_XOPEN_SOURCE) || (_XOPEN_SOURCE < 500)
+ #	error You are using too old posix API!
+ #endif
+--- a/third_party/VK-GL-CTS/src/framework/delibs/dethread/unix/deThreadUnix.c
++++ b/third_party/VK-GL-CTS/src/framework/delibs/dethread/unix/deThreadUnix.c
+@@ -28,6 +28,12 @@
+ #include "deMemory.h"
+ #include "deInt32.h"
+ 
++#ifdef __TERMUX__
++#ifndef _XOPEN_SOURCE
++#define _XOPEN_SOURCE 600
++#endif
++#endif
++
+ #if !defined(_XOPEN_SOURCE) || (_XOPEN_SOURCE < 500)
+ #	error "You are using too old posix API!"
+ #endif

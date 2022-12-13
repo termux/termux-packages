@@ -1,0 +1,31 @@
+--- a/util/posix/crash_handler_posix.cpp
++++ b/util/posix/crash_handler_posix.cpp
+@@ -24,7 +24,7 @@
+ #include <unistd.h>
+ #include <iostream>
+ 
+-#if !defined(ANGLE_PLATFORM_ANDROID) && !defined(ANGLE_PLATFORM_FUCHSIA)
++#if !defined(ANGLE_PLATFORM_ANDROID) && !defined(ANGLE_PLATFORM_FUCHSIA) && !defined(__TERMUX__)
+ #    if defined(ANGLE_PLATFORM_APPLE)
+ // We only use local unwinding, so we can define this to select a faster implementation.
+ #        define UNW_LOCAL_ONLY
+@@ -71,7 +71,7 @@
+ 
+ namespace angle
+ {
+-#if defined(ANGLE_PLATFORM_ANDROID) || defined(ANGLE_PLATFORM_FUCHSIA)
++#if defined(ANGLE_PLATFORM_ANDROID) || defined(ANGLE_PLATFORM_FUCHSIA) || defined(__TERMUX__)
+ 
+ void PrintStackBacktrace()
+ {
+--- a/third_party/SwiftShader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h
++++ b/third_party/SwiftShader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h
+@@ -58,7 +58,7 @@
+ #define HAVE_ERRNO_H 1
+ 
+ /* Define to 1 if you have the <execinfo.h> header file. */
+-#define HAVE_EXECINFO_H 1
++/* #define HAVE_EXECINFO_H 1 */
+ 
+ /* Define to 1 if you have the <fcntl.h> header file. */
+ #define HAVE_FCNTL_H 1

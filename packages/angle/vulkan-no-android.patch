@@ -1,0 +1,47 @@
+--- a/third_party/vulkan-deps/vulkan-validation-layers/src/layers/vk_layer_logging.h
++++ b/third_party/vulkan-deps/vulkan-validation-layers/src/layers/vk_layer_logging.h
+@@ -57,7 +57,7 @@
+ #include "vk_safe_struct.h"
+ #include "xxhash.h"
+ 
+-#if defined __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ #include <android/log.h>
+ #define LOGCONSOLE(...) ((void)__android_log_print(ANDROID_LOG_INFO, "VALIDATION", __VA_ARGS__))
+ [[maybe_unused]] static const char *kForceDefaultCallbackKey = "debug.vvl.forcelayerlog";
+@@ -462,7 +462,7 @@
+         use_default_callbacks &= current_callback.IsDefault();
+     }
+ 
+-#if defined __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+     if (debug_data->forceDefaultLogCallback) {
+         use_default_callbacks = true;
+     }
+@@ -575,7 +575,7 @@
+         callback_state.debug_report_msg_flags = report_create_info->flags;
+     }
+ 
+-#if defined __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+     // On Android, if the default callback system property is set, force the default callback to be printed
+     std::string forceLayerLog = GetEnvironment(kForceDefaultCallbackKey);
+     int forceDefaultCallback = atoi(forceLayerLog.c_str());
+@@ -756,7 +756,7 @@
+     fprintf((FILE *)user_data, "%s", cstr);
+     fflush((FILE *)user_data);
+ 
+-#if defined __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+     LOGCONSOLE("%s", cstr);
+ #endif
+ 
+@@ -831,7 +831,7 @@
+     fprintf((FILE *)user_data, "%s", cstr);
+     fflush((FILE *)user_data);
+ 
+-#if defined __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+     LOGCONSOLE("%s", cstr);
+ #endif
+ 

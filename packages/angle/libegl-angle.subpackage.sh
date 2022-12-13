@@ -1,0 +1,5 @@
+TERMUX_SUBPKG_DESCRIPTION="ANGLE's EGL support"
+TERMUX_SUBPKG_INCLUDE="
+lib/libEGL.so
+lib/libEGL.so.1
+"
