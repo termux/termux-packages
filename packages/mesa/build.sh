@@ -4,9 +4,10 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="docs/license.rst"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=22.3.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://archive.mesa3d.org/mesa-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=644bf936584548c2b88762111ad58b4aa3e4688874200e5a4eb74e53ce301746
-TERMUX_PKG_DEPENDS="libandroid-shmem, libc++, libexpat, libx11, libxext, ncurses, zlib, zstd"
+TERMUX_PKG_DEPENDS="libandroid-shmem, libc++, libdrm, libexpat, libx11, libxext, libxfixes, libxshmfence, libxxf86vm, ncurses, zlib, zstd"
 TERMUX_PKG_SUGGESTS="mesa-dev"
 TERMUX_PKG_BUILD_DEPENDS="libdrm, libllvm-static, libxrandr, llvm, llvm-tools, mlir, xorgproto"
 TERMUX_PKG_CONFLICTS="libmesa, ndk-sysroot (<= 25b)"
@@ -16,15 +17,16 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --cmake-prefix-path $TERMUX_PREFIX
 -Dcpp_rtti=false
 -Dgbm=disabled
--Degl=disabled
+-Dopengl=true
+-Degl=enabled
+-Degl-native-platform=x11
 -Dgles1=enabled
 -Dgles2=enabled
 -Ddri3=enabled
+-Dglx=dri
 -Dllvm=enabled
 -Dshared-llvm=disabled
--Dglx=xlib
 -Dplatforms=x11
--Ddri-drivers=
 -Dgallium-drivers=swrast
 -Dvulkan-drivers=
 -Dosmesa=true
@@ -51,12 +53,14 @@ termux_step_post_configure() {
 	rm -f $_WRAPPER_BIN/cmake
 }
 
-termux_step_post_massage() {
+termux_step_post_make_install() {
 	# A bunch of programs in the wild assume that the name of OpenGL shared
 	# library is `libGL.so.1` and try to dlopen(3) it. In fact `sdl2` does
 	# this. So please do not ever remove the symlink.
-	cd ${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/lib || exit 1
-	if [ ! -e "./libGL.so.1" ]; then
-		ln -sf libGL.so libGL.so.1
-	fi
+	ln -sf libGL.so ${TERMUX_PREFIX}/lib/libGL.so.1
+	ln -sf libEGL.so ${TERMUX_PREFIX}/lib/libEGL.so.1
+	ln -sf libGLESv1_CM.so ${TERMUX_PREFIX}/lib/libGLESv1_CM.so.1
+	ln -sf libGLESv2.so ${TERMUX_PREFIX}/lib/libGLESv2.so.2
+
+	patch -p1 -d $TERMUX_PREFIX/include < $TERMUX_PKG_BUILDER_DIR/egl-not-android.diff
 }
