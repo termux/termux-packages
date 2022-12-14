@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://swift.org/
 TERMUX_PKG_DESCRIPTION="Swift is a high-performance system programming language"
 TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_MAINTAINER="@buttaface"
-TERMUX_PKG_VERSION=5.7.1
+TERMUX_PKG_VERSION=5.7.2
 SWIFT_RELEASE="RELEASE"
 TERMUX_PKG_SRCURL=https://github.com/apple/swift/archive/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE.tar.gz
-TERMUX_PKG_SHA256=10fc9ad6163120adfdb99b6d6287783cf07f81a89a26819cb6fcb26845b13cf1
+TERMUX_PKG_SHA256=8e7f4f6f70e8806128a66342d101a209c924ffb2f9ff3ccc3064e49302e24577
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_DEPENDS="clang, libandroid-glob, libandroid-posix-semaphore, libandroid-spawn, libcurl, libicu, libicu-static, libsqlite, libuuid, libxml2, libdispatch, llbuild"
 TERMUX_PKG_BUILD_DEPENDS="rsync"
@@ -34,23 +34,23 @@ termux_step_post_get_source() {
 	mv .temp swift
 
 	declare -A library_checksums
-	library_checksums[swift-cmark]=4f1c08bed89647e9fbcec1bbc4404f2f659df81756bff79e6f9725404d1e6e05
-	library_checksums[llvm-project]=1a1f59f3433eedf6c260e6c578abc965e98b521db25387a73d00691009c2e87b
-	library_checksums[swift-experimental-string-processing]=bbc2d4b018b1a3a0509705ef0aaaed900bfc8bcfef7e00577413f99027759c02
-	library_checksums[swift-corelibs-libdispatch]=363ae53e1b71d6849cc456872a278675620d811dccb3094ac1790f1cff944013
-	library_checksums[swift-corelibs-foundation]=667f0b75aae7c54d6c430ba25b6dc3be04e5388c0ea8b6435b8ab5c8a7e01337
-	library_checksums[swift-corelibs-xctest]=6a0c0d6f60e7211bbbc2096ca8cbb3a9400a5f9c4f0720f91ad447da0bffd2b8
-	library_checksums[swift-llbuild]=1695da65abdf5268b57df1ae691d0c36b3086501fdfc3a0e2b4a3eb73f089833
+	library_checksums[swift-cmark]=fba4e4d40d641daa7752a64f7e45a0806be180942a265b9362168a4a02dc1c65
+	library_checksums[llvm-project]=e1d310fb5453ef3a6abe5129a8f9029916320baf8422f3e4da94fd84f08e871b
+	library_checksums[swift-experimental-string-processing]=a5f8db10c736cf4e33ab813fa1db1783c936e9587b79e15b1fec643cd78c7703
+	library_checksums[swift-corelibs-libdispatch]=99294849b57a2e8443e957483c90405693d09bbd1684f7b96a8b063d812f7825
+	library_checksums[swift-corelibs-foundation]=92f06d557f033f4cb4a2e32e3fdd5f809713ea9716af73c959cc235946702935
+	library_checksums[swift-corelibs-xctest]=d03d496ce8c0813a9dab202d0ed8d2d4cc81a371aaf8fe017334f31150f7e198
+	library_checksums[swift-llbuild]=7b5bf47d124c5722a423e296b21fb81dfd246a2442d8b05c65cedf8026e2cb4c
 	library_checksums[swift-argument-parser]=a4d4c08cf280615fe6e00752ef60e28e76f07c25eb4706a9269bf38135cd9c3f
 	library_checksums[Yams]=b31b6df500d6191368c93f605690ca9857fff7c6fd1c8897e9765fb624535c63
 	library_checksums[swift-collections]=575cf0f88d9068411f9acc6e3ca5d542bef1cc9e87dc5d69f7b5a1d5aec8c6b6
 	library_checksums[swift-crypto]=86d6c22c9f89394fd579e967b0d5d0b6ce33cdbf52ba70f82fa313baf70c759f
 	library_checksums[swift-system]=865b8c380455eef27e73109835142920c60ae4c4f4178a3d12ad04acc83f1371
-	library_checksums[swift-driver]=d1cb3644b5f37a4a0d87e01caef44013f344e87e181bdafbd4126181d49a1362
-	library_checksums[swift-tools-support-core]=ac20787154088cfa82edc38ce2abb12a85007d9625a9e1e7ebc319851702a8be
-	library_checksums[swift-package-manager]=51e12bbafea8962df78be2c1e8993a893cdb869de5f22933e5b00fc9d8e40960
-	library_checksums[indexstore-db]=e92722b19f05206ec338e329897bb2e115c89dcad55f2d275e0f75eb42231417
-	library_checksums[sourcekit-lsp]=274b49eb2d0f1539af69636e2667a20a77e31992a21bf59ee6138d3fa28f9ff8
+	library_checksums[swift-driver]=193750dba9822685daff20dc61d910b6812435b44361adc8093f1b850c20eaa4
+	library_checksums[swift-tools-support-core]=45a17aa44e0080056f416d71f743d62dbbe03515f95ad2a9482a3ed954535fe5
+	library_checksums[swift-package-manager]=004c99ac28a54ddb352c1eddb02ac1cb1c3782dc9b8f6c2c2652ed17934a2769
+	library_checksums[indexstore-db]=9c0aeae36a6c992b95200cdfad3ab08cb2e249893e312bd3732e859cbe26ffac
+	library_checksums[sourcekit-lsp]=9f72d9ea15f29fa31cd7e25fb97c2165707f2c57907d58195f8140d198bf5499
 
 	for library in "${!library_checksums[@]}"; do \
 		GH_ORG="apple"
@@ -99,10 +99,10 @@ termux_step_host_build() {
 		local CLANGXX=$(command -v clang++)
 
 		# The Ubuntu CI may not have clang/clang++ in its path so explicitly set it
-		# to clang-12 instead.
+		# to clang-13 instead.
 		if [ -z "$CLANG" ]; then
-			CLANG=$(command -v clang-12)
-			CLANGXX=$(command -v clang++-12)
+			CLANG=$(command -v clang-13)
+			CLANGXX=$(command -v clang++-13)
 		fi
 
 		# Natively compile llvm-tblgen and some other files needed later.
