@@ -197,13 +197,13 @@ termux_setup_toolchain_25b() {
 	# Remove <zlib.h> and <zconf.h> as we build our own zlib.
 	# Remove unicode headers provided by libicu.
 	# Remove KHR/khrplatform.h provided by mesa.
-	# Remove GLES, GLES2, and GLES3 provided by mesa.
+	# Remove EGL, GLES, GLES2, and GLES3 provided by mesa.
 	# Remove execinfo provided by libandroid-execinfo.
 	# Remove NDK vulkan headers.
 	rm usr/include/{sys/{capability,shm,sem},{glob,iconv,spawn,zlib,zconf},KHR/khrplatform,execinfo}.h
 	rm usr/include/unicode/{char16ptr,platform,ptypes,putil,stringoptions,ubidi,ubrk,uchar,uconfig,ucpmap,udisplaycontext,uenum,uldnames,ulocdata,uloc,umachine,unorm2,urename,uscript,ustring,utext,utf16,utf8,utf,utf_old,utypes,uvernum,uversion}.h
 	rm -Rf usr/include/vulkan
-	rm -Rf usr/include/GLES{,2,3}
+	rm -Rf usr/include/{EGL,GLES{,2,3}}
 
 	sed -i "s/define __ANDROID_API__ __ANDROID_API_FUTURE__/define __ANDROID_API__ $TERMUX_PKG_API_LEVEL/" \
 		usr/include/android/api-level.h
