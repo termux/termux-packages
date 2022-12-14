@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="GObject-based multi-platform GUI toolkit"
 TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.24.35
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://gitlab.gnome.org/GNOME/gtk/-/archive/$TERMUX_PKG_VERSION/gtk-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=8b08020b183729fbc14c959c46124de10e43563334f4811a283ded0e8ba5463e
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -19,6 +20,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-xcomposite
 --enable-xdamage
 --enable-x11-backend
+--enable-broadway-backend
 --disable-wayland-backend
 "
 TERMUX_PKG_RM_AFTER_INSTALL="share/glib-2.0/schemas/gschemas.compiled"

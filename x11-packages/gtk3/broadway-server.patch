@@ -1,0 +1,28 @@
+--- a/gdk/broadway/broadway-server.c	2022-12-12 14:17:52.598502580 +0000
++++ b/gdk/broadway/broadway-server.c	2022-12-12 14:18:54.758683298 +0000
+@@ -829,9 +829,6 @@
+   void *ptr;
+   char *filename = NULL;
+
+-  fd = shm_open (name, O_RDONLY, 0600);
+-  if (fd == -1)
+-    {
+       filename = g_build_filename (g_get_tmp_dir (), name, NULL);
+       fd = open (filename, O_RDONLY);
+       if (fd == -1)
+@@ -841,7 +838,6 @@
+
+ 	  return NULL;
+ 	}
+-    }
+
+   ptr = mmap (0, size, PROT_READ, MAP_SHARED, fd, 0);
+
+@@ -852,8 +848,6 @@
+       unlink (filename);
+       g_free (filename);
+     }
+-  else
+-    shm_unlink (name);
+
+   return ptr;
