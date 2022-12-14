@@ -139,7 +139,7 @@ termux_step_configure() {
 	$PROOT_HOST apt autoremove --purge -yq science-repo game-repo || :
 	sed -i "s/deb/deb [trusted=yes]/g" $HOST_ROOTFS_BASE/$TERMUX_PREFIX/etc/apt/sources.list
 	$PROOT_HOST apt update
-	$PROOT_HOST apt install -o Dpkg::Options::=--force-confnew -yq $BUILD_DEP
+	$PROOT_HOST apt install -yq $BUILD_DEP
 	$PROOT_HOST python2 -m pip install cffi pycparser
 
 	# Copy the statically-built proot
