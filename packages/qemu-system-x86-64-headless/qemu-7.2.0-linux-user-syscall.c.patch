@@ -1,0 +1,11 @@
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -102,7 +102,7 @@
+ #include <linux/kd.h>
+ #include <linux/mtio.h>
+ 
+-#ifdef HAVE_SYS_MOUNT_FSCONFIG
++#if defined HAVE_SYS_MOUNT_FSCONFIG && !defined __ANDROID__
+ /*
+  * glibc >= 2.36 linux/mount.h conflicts with sys/mount.h,
+  * which in turn prevents use of linux/fs.h. So we have to

@@ -2,14 +2,14 @@ diff -uNr qemu-6.1.0/block.c qemu-6.1.0.mod/block.c
 --- qemu-6.1.0/block.c	2021-08-24 20:35:40.000000000 +0300
 +++ qemu-6.1.0.mod/block.c	2021-08-25 15:22:26.469952602 +0300
 @@ -833,7 +833,7 @@
-     const char *tmpdir;
-     tmpdir = getenv("TMPDIR");
-     if (!tmpdir) {
+      * /var/tmp is usually on a disk, so more appropriate for disk images.
+      */
+     if (!g_strcmp0(tmpdir, "/tmp")) {
 -        tmpdir = "/var/tmp";
 +        tmpdir = "@TERMUX_PREFIX@/tmp";
      }
-     if (snprintf(filename, size, "%s/vl.XXXXXX", tmpdir) >= size) {
-         return -EOVERFLOW;
+ #endif
+ 
 diff -uNr qemu-6.1.0/hw/hppa/machine.c qemu-6.1.0.mod/hw/hppa/machine.c
 --- qemu-6.1.0/hw/hppa/machine.c	2021-08-24 20:35:40.000000000 +0300
 +++ qemu-6.1.0.mod/hw/hppa/machine.c	2021-08-25 15:22:26.469952602 +0300
@@ -122,31 +122,6 @@ diff -uNr qemu-6.1.0/qemu-nbd.c qemu-6.1.0.mod/qemu-nbd.c
      }
  
      server = qio_net_listener_new();
-diff -uNr qemu-6.1.0/slirp/src/slirp.c qemu-6.1.0.mod/slirp/src/slirp.c
---- qemu-6.1.0/slirp/src/slirp.c	2021-08-24 20:36:28.000000000 +0300
-+++ qemu-6.1.0.mod/slirp/src/slirp.c	2021-08-25 15:23:17.110356661 +0300
-@@ -221,7 +221,7 @@
- #if defined(__HAIKU__)
- #define RESOLV_CONF_PATH "/boot/system/settings/network/resolv.conf"
- #else
--#define RESOLV_CONF_PATH "/etc/resolv.conf"
-+#define RESOLV_CONF_PATH "@TERMUX_PREFIX@/etc/resolv.conf"
- #endif
- 
- static int get_dns_addr_cached(void *pdns_addr, void *cached_addr,
-diff -uNr qemu-6.1.0/tcg/tcg.c qemu-6.1.0.mod/tcg/tcg.c
---- qemu-6.1.0/tcg/tcg.c	2021-08-24 20:35:41.000000000 +0300
-+++ qemu-6.1.0.mod/tcg/tcg.c	2021-08-25 15:22:26.485952693 +0300
-@@ -4684,7 +4684,8 @@
-     /* Enable this block to be able to debug the ELF image file creation.
-        One can use readelf, objdump, or other inspection utilities.  */
-     {
--        FILE *f = fopen("/tmp/qemu.jit", "w+b");
-+        FILE *f = fopen("@TERMUX_PREFIX@/tmp/qemu.jit", "w+b");
-+
-         if (f) {
-             if (fwrite(img, img_size, 1, f) != img_size) {
-                 /* Avoid stupid unused return value warning for fwrite.  */
 diff -uNr qemu-6.1.0/util/module.c qemu-6.1.0.mod/util/module.c
 --- qemu-6.1.0/util/module.c	2021-08-24 20:35:41.000000000 +0300
 +++ qemu-6.1.0.mod/util/module.c	2021-08-25 15:22:26.485952693 +0300
@@ -159,15 +134,3 @@ diff -uNr qemu-6.1.0/util/module.c qemu-6.1.0.mod/util/module.c
  #endif
  
      assert(n_dirs <= ARRAY_SIZE(dirs));
-diff -uNr qemu-6.1.0/util/qemu-sockets.c qemu-6.1.0.mod/util/qemu-sockets.c
---- qemu-6.1.0/util/qemu-sockets.c	2021-08-24 20:35:41.000000000 +0300
-+++ qemu-6.1.0.mod/util/qemu-sockets.c	2021-08-25 15:22:26.485952693 +0300
-@@ -923,7 +923,7 @@
-         path = saddr->path;
-     } else {
-         const char *tmpdir = getenv("TMPDIR");
--        tmpdir = tmpdir ? tmpdir : "/tmp";
-+        tmpdir = tmpdir ? tmpdir : "@TERMUX_PREFIX@/tmp";
-         path = pathbuf = g_strdup_printf("%s/qemu-socket-XXXXXX", tmpdir);
-     }
- 
