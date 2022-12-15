@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A tag editor with Qt GUI and command-line interface. Sup
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.7.6
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/Martchus/tageditor/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=48991e04a95caeaa60a458a3c05b127d96268a2c3092487010ba7f1fe7c94f3e
 TERMUX_PKG_DEPENDS="libc++, libc++utilities, qt5-qtbase, qt5-qtdeclarative, qtutilities, tagparser"
