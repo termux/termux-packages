@@ -38,6 +38,28 @@ diff -uNr netpbm-10.73.31/buildtools/installnetpbm.pl netpbm-10.73.31.mod/buildt
  
              if (uc($response) eq "Y") {
                  execLdconfig();
+@@ -766,7 +756,7 @@
+     my $manDir;
+ 
+     while (!$manDir) {
+-        my $default = "$prefix/man";
++        my $default = "$prefix/share/man";
+ 
+         my $response = prompt("man page directory", $default);
+ 
+@@ -954,10 +944,10 @@
+ 
+     print("Installing man pages...\n");
+ 
+-    my $rc = system("$cpCommand $pkgdir/man/* $manDir/");
++    my $rc = system("$cpCommand $pkgdir/share/man/* $manDir/");
+ 
+     if ($rc != 0) {
+-        print("copy of man pages from $pkgdir/man to $manDir failed.\n");
++        print("copy of man pages from $pkgdir/share/man to $manDir failed.\n");
+         print("cp exit code is $rc\n");
+     } else {
+         print("done.\n");
 @@ -967,8 +957,6 @@
  
      removeObsoleteManPage($manDir);
