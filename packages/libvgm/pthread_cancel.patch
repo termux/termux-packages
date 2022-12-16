@@ -1,0 +1,16 @@
+diff -uNr libvgm/utils/OSThread_POSIX.c libvgm.mod/utils/OSThread_POSIX.c
+--- libvgm/utils/OSThread_POSIX.c	2022-12-16 17:19:46.508761717 +0800
++++ libvgm.mod/utils/OSThread_POSIX.c	2022-12-16 17:26:29.958761563 +0800
+@@ -78,8 +78,11 @@
+ 	
+ 	if (! thr->id)
+ 		return;
+-	
++#ifndef __ANDROID__	
+ 	retVal = pthread_cancel(thr->id);
++#else
++	retVal = pthread_kill(thr->id, SIGUSR2);
++#endif
+ 	if (! retVal)
+ 		thr->id = 0;	// stopped successfully
+ 	
