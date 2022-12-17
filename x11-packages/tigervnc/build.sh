@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # No update anymore. v1.11.x requires support of PAM.
 TERMUX_PKG_VERSION=(1.10.1
 		    1.20.14)
-TERMUX_PKG_REVISION=29
+TERMUX_PKG_REVISION=30
 TERMUX_PKG_SRCURL=(https://github.com/TigerVNC/tigervnc/archive/v${TERMUX_PKG_VERSION}.tar.gz
 		   https://xorg.freedesktop.org/releases/individual/xserver/xorg-server-${TERMUX_PKG_VERSION[1]}.tar.xz)
 TERMUX_PKG_SHA256=(19fcc80d7d35dd58115262e53cac87d8903180261d94c2a6b0c19224f50b58c4
