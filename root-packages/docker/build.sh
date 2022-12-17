@@ -2,15 +2,15 @@ TERMUX_PKG_HOMEPAGE=https://docker.com
 TERMUX_PKG_DESCRIPTION="Set of products that use OS-level virtualization to deliver software in packages called containers."
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=20.10.21
-LIBNETWORK_COMMIT=399a3439d84b3b6ba6077ba08cadea506b52547c
-DOCKER_GITCOMMIT=baeda1f
+TERMUX_PKG_VERSION=20.10.22
+LIBNETWORK_COMMIT=dcdf8f176d1e13ad719e913e796fb698d846de98
+DOCKER_GITCOMMIT=3a2c30b
 TERMUX_PKG_SRCURL=(https://github.com/moby/moby/archive/v${TERMUX_PKG_VERSION}.tar.gz
                    https://github.com/docker/cli/archive/v${TERMUX_PKG_VERSION}.tar.gz
                    https://github.com/moby/libnetwork/archive/${LIBNETWORK_COMMIT}.tar.gz)
-TERMUX_PKG_SHA256=(61f4c3a2d0426e1bbbda1b0e5dd33ec203776f7d99d1a61522c77c04c4ed09fe
-                   f0f62ca1c80e8fd5b9e140ca64ef3e75dc7cf7a28040b3d10b260307128946e8
-                   953b909f31c40b434980de180b81b8f7371bafd35888ec0cfd3fa26c7df45977)
+TERMUX_PKG_SHA256=(ee0e2168e27ec87f1b0650e86af5d3e167a07fd2ff8c1ce3bb588f0b4f9a4658
+                   84d71ac2b508b54e8df9f3ea425aa33e254fd3645fe9bad5619b98eaffb33408
+                   dbe30210e00fd4fcc63ade49ab3b00ba8fa5a1e90d34b92c1ecc25f8b78149ba)
 TERMUX_PKG_DEPENDS="containerd, libdevmapper"
 TERMUX_PKG_CONFFILES="etc/docker/daemon.json"
 TERMUX_PKG_BUILD_IN_SRC=true
