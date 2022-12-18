@@ -10,7 +10,7 @@ TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_CONFLICTS="libutil-dev, libgcc, libandroid-support-dev"
 TERMUX_PKG_REPLACES="libutil-dev, libgcc, libandroid-support-dev, ndk-stl"
 TERMUX_PKG_NO_STATICSPLIT=true
-TERMUX_PKG_COMPILE_ACCESS_FOR_DEVICE=false
+TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 
 termux_step_extract_into_massagedir() {
 	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib \
