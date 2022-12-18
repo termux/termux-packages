@@ -6,6 +6,6 @@
          pytest.skip('link fails on cygwin')
 +    if os.path.exists("/system/bin/app_process"):
 +        pytest.skip('link fails on Android')
+     if IS_WASM:
+         pytest.skip("Can't build module inside Wasm")
      functions = [
-         ("get_default_policy", "METH_NOARGS", """
-              Py_INCREF(PyDataMem_DefaultHandler);
