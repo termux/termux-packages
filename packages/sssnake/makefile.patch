@@ -5,9 +5,9 @@
 +PREFIX = @TERMUX_PREFIX@
  MANDIR = $(PREFIX)/share/man
  
- sssnake: main.c autopilot.c xymap.c essentials.c snake.c 
--	$(CC) -w $(ncursesw5-config --cflags --libs) main.c autopilot.c xymap.c essentials.c snake.c -lncursesw -o sssnake
-+	$(CC) -w $(CPPFLAGS) $(CFLAGS) main.c autopilot.c xymap.c essentials.c snake.c $(LDFLAGS) -lncursesw -o sssnake
- #autopilot.o: autopilot.c xymap.c essentials.c snake.c 
- #	gcc -c autopilot.c xymap.c essentials.c snake.c
+ sssnake: main.c autopilot.c xymap.c structs.c snake.c draw.c 
+-	$(CC) -w $(ncursesw5-config --cflags --libs) main.c autopilot.c xymap.c structs.c snake.c draw.c -lncursesw -o sssnake
++	$(CC) -w $(CPPFLAGS) $(CFLAGS) main.c autopilot.c xymap.c structs.c snake.c draw.c $(LDFLAGS) -lncursesw -o sssnake
  
+ debug: main.c autopilot.c xymap.c structs.c snake.c draw.c 
+ 	$(CC) -w $(ncursesw5-config --cflags --libs) -Wall -g main.c autopilot.c xymap.c structs.c snake.c draw.c -lncursesw -o sssnake
