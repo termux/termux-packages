@@ -1,0 +1,168 @@
+From 0029c1f8f0e0fce98134f6d64a0b1f56e0f5bde5 Mon Sep 17 00:00:00 2001
+From: Henrik Grimler <henrik@grimler.se>
+Date: Sat, 31 Dec 2022 11:42:22 +0100
+Subject: [PATCH] Revert "COMP: remove wmake rules for ARM7 (discontinued)
+ arch"
+
+This reverts commit e15b103003578e1eb916a739e9a3dc6b200ff6b0.
+---
+ etc/config.csh/settings           |  5 +++++
+ etc/config.sh/settings            |  5 +++++
+ wmake/rules/linuxARM7Gcc/c        | 18 ++++++++++++++++++
+ wmake/rules/linuxARM7Gcc/c++      | 21 +++++++++++++++++++++
+ wmake/rules/linuxARM7Gcc/c++Debug |  2 ++
+ wmake/rules/linuxARM7Gcc/c++Opt   |  5 +++++
+ wmake/rules/linuxARM7Gcc/cDebug   |  2 ++
+ wmake/rules/linuxARM7Gcc/cOpt     |  3 +++
+ wmake/rules/linuxARM7Gcc/general  | 14 ++++++++++++++
+ 9 files changed, 75 insertions(+)
+ create mode 100644 wmake/rules/linuxARM7Gcc/c
+ create mode 100644 wmake/rules/linuxARM7Gcc/c++
+ create mode 100644 wmake/rules/linuxARM7Gcc/c++Debug
+ create mode 100644 wmake/rules/linuxARM7Gcc/c++Opt
+ create mode 100644 wmake/rules/linuxARM7Gcc/cDebug
+ create mode 100644 wmake/rules/linuxARM7Gcc/cOpt
+ create mode 100644 wmake/rules/linuxARM7Gcc/general
+
+diff --git a/etc/config.csh/settings b/etc/config.csh/settings
+index cc9da12d65b2..a0100abeeb21 100644
+--- a/etc/config.csh/settings
++++ b/etc/config.csh/settings
+@@ -52,6 +52,11 @@ case Linux:
+         setenv WM_COMPILER_LIB_ARCH 64  # Use lib64
+         breaksw
+ 
++    case armv7l:
++        setenv WM_ARCH linuxARM7
++        setenv WM_COMPILER_LIB_ARCH 32  # Use lib32
++        breaksw
++
+     case ppc64:
+         setenv WM_ARCH linuxPPC64
+         setenv WM_COMPILER_LIB_ARCH 64  # Use lib64
+diff --git a/etc/config.sh/settings b/etc/config.sh/settings
+index 7735c4cf4142..0555cbb9cf5d 100644
+--- a/etc/config.sh/settings
++++ b/etc/config.sh/settings
+@@ -49,6 +49,11 @@ Linux)
+         export WM_COMPILER_LIB_ARCH=64  # Use lib64
+         ;;
+ 
++    armv7l)
++        WM_ARCH=linuxARM7
++        export WM_COMPILER_LIB_ARCH=32  # Use lib32
++        ;;
++
+     ppc64)
+         WM_ARCH=linuxPPC64
+         export WM_COMPILER_LIB_ARCH=64  # Use lib64
+diff --git a/wmake/rules/linuxARM7Gcc/c b/wmake/rules/linuxARM7Gcc/c
+new file mode 100644
+index 000000000000..cf19662b5e59
+--- /dev/null
++++ b/wmake/rules/linuxARM7Gcc/c
+@@ -0,0 +1,18 @@
++#------------------------------------------------------------------------------
++include $(GENERAL_RULES)/Gcc/c
++
++cARCH      := -mcpu=cortex-a9
++
++ifneq (,$(WM_COMPILE_OPTION))
++    sinclude $(DEFAULT_RULES)/c$(WM_COMPILE_OPTION)
++endif
++
++cFLAGS      = \
++    $(cARCH) $(GFLAGS) $(cWARN) $(cOPT) $(cDBUG) \
++    $(FOAM_EXTRA_CFLAGS) $(LIB_HEADER_DIRS) -fPIC
++
++ctoo        = $(WM_SCHEDULER) $(cc) $(cFLAGS) -c $< -o $@
++
++include $(GENERAL_RULES)/Gcc/link-c
++
++#------------------------------------------------------------------------------
+diff --git a/wmake/rules/linuxARM7Gcc/c++ b/wmake/rules/linuxARM7Gcc/c++
+new file mode 100644
+index 000000000000..08b1ed5aa3fb
+--- /dev/null
++++ b/wmake/rules/linuxARM7Gcc/c++
+@@ -0,0 +1,21 @@
++#------------------------------------------------------------------------------
++include $(GENERAL_RULES)/Gcc/c++
++
++c++ARCH    := -mcpu=cortex-a9 -pthread
++
++ifneq (,$(WM_COMPILE_OPTION))
++    sinclude $(DEFAULT_RULES)/c++$(WM_COMPILE_OPTION)
++endif
++
++c++FLAGS    = \
++    $(c++ARCH) $(GFLAGS) $(c++WARN) $(c++OPT) $(c++DBUG) $(ptFLAGS) \
++    $(FOAM_EXTRA_CXXFLAGS) $(LIB_HEADER_DIRS) -fPIC
++
++Ctoo        = $(WM_SCHEDULER) $(CC) $(c++FLAGS) -c $< -o $@
++cctoo       = $(Ctoo)
++cpptoo      = $(Ctoo)
++cxxtoo      = $(Ctoo)
++
++include $(GENERAL_RULES)/Gcc/link-c++
++
++#------------------------------------------------------------------------------
+diff --git a/wmake/rules/linuxARM7Gcc/c++Debug b/wmake/rules/linuxARM7Gcc/c++Debug
+new file mode 100644
+index 000000000000..08680a0e4aa0
+--- /dev/null
++++ b/wmake/rules/linuxARM7Gcc/c++Debug
+@@ -0,0 +1,2 @@
++c++DBUG     = -ggdb3 -DFULLDEBUG
++c++OPT      = -O0 -fdefault-inline
+diff --git a/wmake/rules/linuxARM7Gcc/c++Opt b/wmake/rules/linuxARM7Gcc/c++Opt
+new file mode 100644
+index 000000000000..ab2bfabcd080
+--- /dev/null
++++ b/wmake/rules/linuxARM7Gcc/c++Opt
+@@ -0,0 +1,5 @@
++c++DBUG     =
++#c++OPT     = -O3 -floop-optimize -falign-loops -falign-labels -falign-functions -falign-jumps -fprefetch-loop-arrays -mfpu=vfpv3-d16 -mfloat-abi=hard
++c++OPT      = -O3 -floop-optimize -falign-loops -falign-labels -falign-functions -falign-jumps -fprefetch-loop-arrays -mfpu=vfpv3-d16 -mfloat-abi=softfp
++
++ROUNDING_MATH = -frounding-math
+diff --git a/wmake/rules/linuxARM7Gcc/cDebug b/wmake/rules/linuxARM7Gcc/cDebug
+new file mode 100644
+index 000000000000..72b638f45822
+--- /dev/null
++++ b/wmake/rules/linuxARM7Gcc/cDebug
+@@ -0,0 +1,2 @@
++cDBUG       = -ggdb -DFULLDEBUG
++cOPT        = -O1 -fdefault-inline -finline-functions
+diff --git a/wmake/rules/linuxARM7Gcc/cOpt b/wmake/rules/linuxARM7Gcc/cOpt
+new file mode 100644
+index 000000000000..6efb6d39bf73
+--- /dev/null
++++ b/wmake/rules/linuxARM7Gcc/cOpt
+@@ -0,0 +1,3 @@
++cDBUG       =
++#cOPT       = -O3 -floop-optimize -falign-loops -falign-labels -falign-functions -falign-jumps -fprefetch-loop-arrays -mfpu=vfpv3-d16 -mfloat-abi=hard
++cOPT        = -O3 -floop-optimize -falign-loops -falign-labels -falign-functions -falign-jumps -fprefetch-loop-arrays -mfpu=vfpv3-d16 -mfloat-abi=softfp
+diff --git a/wmake/rules/linuxARM7Gcc/general b/wmake/rules/linuxARM7Gcc/general
+new file mode 100644
+index 000000000000..676a1fd1f1f3
+--- /dev/null
++++ b/wmake/rules/linuxARM7Gcc/general
+@@ -0,0 +1,14 @@
++CPP        = cpp -traditional-cpp $(GFLAGS)
++LD         = ld
++
++include $(GENERAL_RULES)/standard
++include $(GENERAL_RULES)/Gcc/openmp
++
++ifneq (,$(findstring ~openmp,$(WM_COMPILE_CONTROL)))
++    include $(GENERAL_RULES)/no-openmp
++endif
++
++include $(DEFAULT_RULES)/c
++include $(DEFAULT_RULES)/c++
++
++#------------------------------------------------------------------------------
+-- 
+2.39.0
+

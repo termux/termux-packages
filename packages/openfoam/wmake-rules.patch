@@ -89,33 +89,36 @@
 +
 +include $(DEFAULT_RULES)/c
 +include $(DEFAULT_RULES)/c++
---- ./wmake/rules/General/Clang/c.orig	2022-02-08 17:30:19.869452605 +0100
-+++ ./wmake/rules/General/Clang/c	2022-02-08 17:31:31.762700333 +0100
-@@ -1,6 +1,6 @@
- SUFFIXES += .c
- 
--cc          = clang$(COMPILER_VERSION)
-+cc          = @TERMUX_COMPILER_PREFIX@-clang$(COMPILER_VERSION)
- 
- cARCH       =
- cDBUG       =
---- ./wmake/rules/General/Clang/c++.orig	2022-02-08 17:30:19.869452605 +0100
-+++ ./wmake/rules/General/Clang/c++	2022-02-08 17:31:16.646051743 +0100
-@@ -1,7 +1,7 @@
+diff -u -r ../openfoam-OpenFOAM-v2212/wmake/rules/General/Clang/c wmake/rules/General/Clang/c
+--- ../openfoam-OpenFOAM-v2212/wmake/rules/General/Clang/c	2022-12-21 16:16:18.000000000 +0000
++++ ./wmake/rules/General/Clang/c	2022-12-31 10:45:47.289540080 +0000
+@@ -3,7 +3,7 @@
  #------------------------------------------------------------------------------
- SUFFIXES += .C .cc .cpp .cxx
+ SUFFIXES   += .c
  
--CC          = clang++$(COMPILER_VERSION) -std=c++14
-+CC          = @TERMUX_COMPILER_PREFIX@-clang++$(COMPILER_VERSION) -std=c++14
+-cc         := clang$(COMPILER_VERSION)
++cc         := @TERMUX_COMPILER_PREFIX@-clang$(COMPILER_VERSION)
  
- c++ARCH     =
- c++DBUG     =
-diff -u -r ../rules.orig/General/general ./wmake/rules/General/general
---- ../rules.orig/General/general	2021-09-11 07:37:23.639344141 +0000
-+++ ./wmake/rules/General/general	2021-09-11 07:39:16.659812615 +0000
-@@ -1,15 +1,15 @@
+ cARCH      :=
+ cDBUG      :=
+diff -u -r ../openfoam-OpenFOAM-v2212/wmake/rules/General/Clang/c++ wmake/rules/General/Clang/c++
+--- ../openfoam-OpenFOAM-v2212/wmake/rules/General/Clang/c++	2022-12-21 16:16:18.000000000 +0000
++++ ./wmake/rules/General/Clang/c++	2022-12-31 10:46:02.242895173 +0000
+@@ -3,7 +3,7 @@
+ #------------------------------------------------------------------------------
+ SUFFIXES   += .C .cc .cpp .cxx
+ 
+-CC         := clang++$(COMPILER_VERSION) -std=c++14
++CC         := @TERMUX_COMPILER_PREFIX@-clang++$(COMPILER_VERSION) -std=c++14
+ 
+ c++ARCH    :=
+ c++DBUG    :=
+diff -u -r ../openfoam-OpenFOAM-v2212/wmake/rules/General/general wmake/rules/General/general
+--- ../openfoam-OpenFOAM-v2212/wmake/rules/General/general	2022-12-21 16:16:18.000000000 +0000
++++ ./wmake/rules/General/general	2022-12-31 10:44:59.006132246 +0000
+@@ -1,16 +1,16 @@
  #-------------------------------*- makefile -*---------------------------------
- WM_VERSION = OPENFOAM=2106
+ WM_VERSION = OPENFOAM=2212
  
 -AR         = ar
 +AR        ?= ar
@@ -134,9 +137,10 @@ diff -u -r ../rules.orig/General/general ./wmake/rules/General/general
 +GLIBS      = -lm $(LDFLAGS) -L$(WM_PROJECT_DIR)/platforms/$(WM_ARCH)$(WM_COMPILER)$(WM_PRECISION_OPTION)$(WM_LABEL_OPTION)$(WM_COMPILE_OPTION)/lib/sys-openmpi -lPstream -Wl,-rpath=$(WM_PROJECT_DIR)/platforms/$(WM_ARCH)$(WM_COMPILER)$(WM_PRECISION_OPTION)$(WM_LABEL_OPTION)$(WM_COMPILE_OPTION)/lib,--enable-new-dtags,--as-needed,-z,relro,-z,now -Wl,-rpath=$(WM_PROJECT_DIR)/platforms/$(WM_ARCH)$(WM_COMPILER)$(WM_PRECISION_OPTION)$(WM_LABEL_OPTION)$(WM_COMPILE_OPTION)/lib/sys-openmpi
  GLIB_LIBS  =
  
-diff -u -r ../rules.orig/General/mplibSYSTEMOPENMPI ./wmake/rules/General/mplibSYSTEMOPENMPI
---- ../rules.orig/General/mplibSYSTEMOPENMPI	2021-09-11 07:23:40.180606194 +0000
-+++ ./wmake/rules/General/mplibSYSTEMOPENMPI	2021-09-11 07:32:24.648246360 +0000
+ 
+diff -u -r ../openfoam-OpenFOAM-v2212/wmake/rules/General/mplibSYSTEMOPENMPI wmake/rules/General/mplibSYSTEMOPENMPI
+--- ../openfoam-OpenFOAM-v2212/wmake/rules/General/mplibSYSTEMOPENMPI	2022-12-21 16:16:18.000000000 +0000
++++ ./wmake/rules/General/mplibSYSTEMOPENMPI	2022-12-31 10:44:59.006132246 +0000
 @@ -1,6 +1,12 @@
  #------------------------------------------------------------------------------
 -# Use openmpi mpicc to obtain settings - mpicc must be available
@@ -151,21 +155,26 @@ diff -u -r ../rules.orig/General/mplibSYSTEMOPENMPI ./wmake/rules/General/mplibS
 +PLIBS      = -L$(MPI_ARCH_PATH)/lib $(LDFLAGS) -lmpi
 +
  #------------------------------------------------------------------------------
-diff -u -r ../wmake-rules-General-Clang.orig/link-c ./wmake/rules/General/Clang/link-c
---- ../rules.orig/General/Clang/link-c	2021-11-30 12:47:16.409236950 +0000
-+++ ./wmake/rules/General/Clang/link-c	2021-11-30 12:47:36.519250093 +0000
-@@ -2,4 +2,4 @@
- 
+diff -u -r ../openfoam-OpenFOAM-v2212/wmake/rules/General/Clang/link-c ./wmake/rules/General/Clang/link-c
+--- ../openfoam-OpenFOAM-v2212/wmake/rules/General/Clang/link-c 2022-12-21 17:16:18.000000000 +0100
++++ ./wmake/rules/General/Clang/link-c  2023-01-01 13:11:23.248669018 +0100
+@@ -4,6 +4,6 @@
+
  LINKLIBSO   = $(cc) $(cARCH) -shared
- 
+
 -LINKEXE     = $(cc) $(cARCH) -Xlinker --add-needed -Xlinker -z -Xlinker nodefs
 +LINKEXE     = $(cc) $(cARCH) -Xlinker -z -Xlinker nodefs
-diff -u -r ../wmake-rules-General-Clang.orig/link-c++ ./wmake/rules/General/Clang/link-c++
---- ../rules.orig/General/Clang/link-c++	2021-11-30 12:47:16.409236950 +0000
-+++ ./wmake/rules/General/Clang/link-c++	2021-11-30 12:47:45.459255918 +0000
-@@ -4,5 +4,4 @@
-     $(FOAM_EXTRA_LDFLAGS)
- 
- LINKEXE     = $(CC) $(c++FLAGS) \
--    -Xlinker --add-needed \
-     $(FOAM_EXTRA_LDFLAGS)
+
+ #------------------------------------------------------------------------------
+diff -u -r ../openfoam-OpenFOAM-v2212/wmake/rules/General/Clang/link-c++ ./wmake/rules/General/Clang/link-c++
+--- ../openfoam-OpenFOAM-v2212/wmake/rules/General/Clang/link-c++       2022-12-21 17:16:18.000000000 +0100
++++ ./wmake/rules/General/Clang/link-c++        2023-01-01 13:11:30.722003101 +0100
+@@ -4,7 +4,6 @@
+
+ LINKLIBSO   = $(CC) $(c++FLAGS) -shared
+
+-LINKEXE     = $(CC) $(c++FLAGS) \
+-    -Xlinker --add-needed
++LINKEXE     = $(CC) $(c++FLAGS)
+
+ #------------------------------------------------------------------------------
