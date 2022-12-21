@@ -9,18 +9,30 @@ index 8e79e18..a844183 100644
 -  target_link_libraries(llvmSupport PRIVATE curses)
 +  target_link_libraries(llvmSupport PRIVATE android-spawn curses)
  endif()
+diff --git a/llvm-project/clang/tools/driver/CMakeLists.txt b/llvm-project/clang/tools/driver/CMakeLists.txt
+index dd34c12880..ffd68d908b 100644
+--- a/llvm-project/clang/tools/driver/CMakeLists.txt
++++ b/llvm-project/clang/tools/driver/CMakeLists.txt
+@@ -97,6 +97,7 @@ if (APPLE)
+   set(TOOL_INFO_VERSION)
+   set(TOOL_INFO_BUILD_VERSION)
+ endif()
++target_link_libraries(clang PRIVATE "android-spawn")
+ 
+ if(CLANG_ORDER_FILE AND
+     (LLVM_LINKER_IS_LD64 OR LLVM_LINKER_IS_GOLD OR LLVM_LINKER_IS_LLD))
 diff --git a/sourcekit-lsp/Utilities/build-script-helper.py b/sourcekit-lsp/Utilities/build-script-helper.py
 index a64795c..d48876d 100755
 --- a/sourcekit-lsp/Utilities/build-script-helper.py
 +++ b/sourcekit-lsp/Utilities/build-script-helper.py
-@@ -54,6 +54,7 @@ def get_swiftpm_options(args):
-   if 'ANDROID_DATA' in os.environ or (args.cross_compile_host and re.match(
-     'android-', args.cross_compile_host)):
-     swiftpm_args += [
-+      '-Xlinker', '-landroid-spawn',
-       '-Xlinker', '-rpath', '-Xlinker', '$ORIGIN/../lib/swift/android',
-       # SwiftPM will otherwise try to compile against GNU strerror_r on
-       # Android and fail.
+@@ -124,6 +124,7 @@ def get_swiftpm_options(swift_exec: str, args: argparse.Namespace) -> List[str]:
+     if 'ANDROID_DATA' in os.environ or (args.cross_compile_host and re.match(
+             'android-', args.cross_compile_host)):
+         swiftpm_args += [
++            '-Xlinker', '-landroid-spawn',
+             '-Xlinker', '-rpath', '-Xlinker', '$ORIGIN/../lib/swift/android',
+             # SwiftPM will otherwise try to compile against GNU strerror_r on
+             # Android and fail.
 diff --git a/swift-corelibs-foundation/Sources/Foundation/CMakeLists.txt b/swift-corelibs-foundation/Sources/Foundation/CMakeLists.txt
 index 016bf294..cd534f16 100644
 --- a/swift-corelibs-foundation/Sources/Foundation/CMakeLists.txt
