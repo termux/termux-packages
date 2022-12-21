@@ -1,3 +1,16 @@
+diff --git a/cmark/src/CMakeLists.txt b/cmark/src/CMakeLists.txt
+index faabffa..65e23cc 100644
+--- a/cmark/src/CMakeLists.txt
++++ b/cmark/src/CMakeLists.txt
+@@ -162,7 +162,7 @@ if(CMARK_SHARED OR CMARK_STATIC)
+   set(CMARK_TARGETS_FILE ${CMAKE_CURRENT_BINARY_DIR}/cmarkTargets.cmake)
+   export(TARGETS ${CMARK_INSTALL} FILE ${CMARK_TARGETS_FILE})
+ 
+-  if(CMARK_THREADING AND NOT APPLE AND NOT MSVC)
++  if(CMARK_THREADING AND NOT APPLE AND NOT MSVC AND NOT ANDROID)
+     if(CMARK_SHARED)
+       target_link_libraries(${LIBRARY} pthread)
+     endif(CMARK_SHARED)
 diff --git a/llvm-project/clang/runtime/CMakeLists.txt b/llvm-project/clang/runtime/CMakeLists.txt
 index 61b1c60bf590..5b0d10a67699 100644
 --- a/llvm-project/clang/runtime/CMakeLists.txt
@@ -31,38 +44,63 @@ index 1bcfc0734785..ddb77c91b22d 100644
  
  install(DIRECTORY ../../include/indexstore
    COMPONENT IndexStore
-diff --git a/llvm-project/compiler-rt/cmake/Modules/HandleCompilerRT.cmake b/llvm-project/compiler-rt/cmake/Modules/HandleCompilerRT.cmake
+diff --git a/llvm-project/llvm/CMakeLists.txt b/llvm-project/llvm/CMakeLists.txt
+index a888c4177fa5..6788a62fa8bd 100644
+--- a/llvm-project/llvm/CMakeLists.txt
++++ b/llvm-project/llvm/CMakeLists.txt
+@@ -625,7 +625,7 @@ option (LLVM_ENABLE_SPHINX "Use Sphinx to generate llvm documentation." OFF)
+ option (LLVM_ENABLE_OCAMLDOC "Build OCaml bindings documentation." ON)
+ option (LLVM_ENABLE_BINDINGS "Build bindings." ON)
+ 
+-if(UNIX)
++if(UNIX AND CMAKE_SIZEOF_VOID_P GREATER_EQUAL 8)
+   set(LLVM_ENABLE_ONDISK_CAS_default ON)
+ else()
+   set(LLVM_ENABLE_ONDISK_CAS_default OFF)
+diff --git a/llvm-project/cmake/Modules/HandleCompilerRT.cmake b/llvm-project/cmake/Modules/HandleCompilerRT.cmake
 index ac9e0871489d..b495cbfb5c2e 100644
---- a/llvm-project/compiler-rt/cmake/Modules/HandleCompilerRT.cmake
-+++ b/llvm-project/compiler-rt/cmake/Modules/HandleCompilerRT.cmake
-@@ -31,7 +31,7 @@ function(find_compiler_rt_library name target variable)
-     # If the cache variable is not defined, invoke clang and then 
-     # set it with cache_compiler_rt_library.
-     set(CLANG_COMMAND ${CMAKE_CXX_COMPILER} ${SANITIZER_COMMON_FLAGS}
--        "--rtlib=compiler-rt" "-print-libgcc-file-name")
-+        "--rtlib=compiler-rt" "-print-libgcc-file-name" "-resource-dir=$ENV{PREFIX}/lib/clang/$ENV{TERMUX_CLANG_VERSION}/")
-     if(target)
-       list(APPEND CLANG_COMMAND "--target=${target}")
+--- a/llvm-project/cmake/Modules/HandleCompilerRT.cmake
++++ b/llvm-project/cmake/Modules/HandleCompilerRT.cmake
+@@ -77,7 +77,7 @@
+       set(cmd_prefix "/clang:")
      endif()
+     execute_process(
+-      COMMAND ${clang_command} "${cmd_prefix}--rtlib=compiler-rt" "${cmd_prefix}-print-libgcc-file-name"
++      COMMAND ${clang_command} "${cmd_prefix}--rtlib=compiler-rt" "${cmd_prefix}-print-libgcc-file-name" "-resource-dir=$ENV{PREFIX}/lib/clang/$ENV{TERMUX_CLANG_VERSION}/"
+       RESULT_VARIABLE had_error
+       OUTPUT_VARIABLE library_file
+     )
+diff --git a/llvm-project/llvm/cmake/modules/FindTerminfo.cmake b/llvm-project/llvm/cmake/modules/FindTerminfo.cmake
+index 65edb80fa6..d02a445021 100644
+--- a/llvm-project/llvm/cmake/modules/FindTerminfo.cmake
++++ b/llvm-project/llvm/cmake/modules/FindTerminfo.cmake
+@@ -14,15 +14,7 @@
+ find_library(Terminfo_LIBRARIES NAMES terminfo tinfo curses ncurses ncursesw)
+ 
+ if(Terminfo_LIBRARIES)
+-  include(CMakePushCheckState)
+-  include(CheckCSourceCompiles)
+-  cmake_push_check_state()
+-  list(APPEND CMAKE_REQUIRED_LIBRARIES ${Terminfo_LIBRARIES})
+-  check_c_source_compiles("
+-    int setupterm(char *term, int filedes, int *errret);
+-    int main() { return setupterm(0, 0, 0); }"
+-    Terminfo_LINKABLE)
+-  cmake_pop_check_state()
++  set(Terminfo_LINKABLE 1)
+ endif()
+ 
+ include(FindPackageHandleStandardArgs)
 diff --git a/swift/CMakeLists.txt b/swift/CMakeLists.txt
 index b7503ecdd6..c643c2c9a5 100644
 --- a/swift/CMakeLists.txt
 +++ b/swift/CMakeLists.txt
-@@ -315,7 +315,7 @@ set(SWIFT_ANDROID_API_LEVEL "" CACHE STRING
- 
- set(SWIFT_ANDROID_NDK_PATH "" CACHE STRING
-   "Path to the directory that contains the Android NDK tools that are executable on the build machine")
--set(SWIFT_ANDROID_NDK_CLANG_VERSION "12.0.8" CACHE STRING
-+set(SWIFT_ANDROID_NDK_CLANG_VERSION "14.0.6" CACHE STRING
-   "The Clang version to use when building for Android.")
- set(SWIFT_ANDROID_DEPLOY_DEVICE_PATH "" CACHE STRING
-   "Path on an Android device where build products will be pushed. These are used when running the test suite against the device")
 @@ -463,7 +463,7 @@ set(SWIFT_BUILD_HOST_DISPATCH FALSE)
  if(SWIFT_ENABLE_DISPATCH AND NOT CMAKE_SYSTEM_NAME STREQUAL Darwin)
    # Only build libdispatch for the host if the host tools are being built and
    # specifically if these two libraries that depend on it are built.
--  if(SWIFT_INCLUDE_TOOLS AND (SWIFT_BUILD_SYNTAXPARSERLIB OR SWIFT_BUILD_SOURCEKIT))
-+  if(${CMAKE_HOST_SYSTEM_NAME} STREQUAL Android AND SWIFT_INCLUDE_TOOLS AND (SWIFT_BUILD_SYNTAXPARSERLIB OR SWIFT_BUILD_SOURCEKIT))
+-  if(SWIFT_INCLUDE_TOOLS AND SWIFT_BUILD_SOURCEKIT)
++  if(${CMAKE_HOST_SYSTEM_NAME} STREQUAL Android AND SWIFT_INCLUDE_TOOLS AND SWIFT_BUILD_SOURCEKIT)
      set(SWIFT_BUILD_HOST_DISPATCH TRUE)
    endif()
  
@@ -89,7 +127,7 @@ index f4a2eb2dddc..61a2548cf77 100644
    endif()
    get_versioned_target_triple(target ${SWIFT_HOST_VARIANT_SDK}
        ${SWIFT_HOST_VARIANT_ARCH} "${deployment_version}")
-@@ -155,6 +155,9 @@ function(add_swift_compiler_modules_library name)
+@@ -186,6 +186,9 @@ function(add_swift_compiler_modules_library name)
  
      set("${module}_dep_target" ${dep_target})
      set(all_module_targets ${all_module_targets} ${dep_target})
@@ -103,29 +141,41 @@ diff --git a/swift/cmake/modules/AddSwift.cmake b/swift/cmake/modules/AddSwift.c
 index a448bcb23c4..0ddbac17a52 100644
 --- a/swift/cmake/modules/AddSwift.cmake
 +++ b/swift/cmake/modules/AddSwift.cmake
-@@ -922,7 +923,7 @@ function(add_swift_host_tool executable)
+@@ -526,7 +526,7 @@ function(_add_swift_runtime_link_flags target relpath_to_lib_dir bootstrapping)
        # installed host toolchain.
-       get_filename_component(swift_bin_dir ${SWIFT_EXEC_FOR_LIBSWIFT} DIRECTORY)
+       get_filename_component(swift_bin_dir ${SWIFT_EXEC_FOR_SWIFT_MODULES} DIRECTORY)
        get_filename_component(swift_dir ${swift_bin_dir} DIRECTORY)
 -      set(host_lib_dir "${swift_dir}/lib/swift/${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_LIB_SUBDIR}")
 +      set(host_lib_dir "${SWIFT_BINARY_DIR}/lib/swift/${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_LIB_SUBDIR}")
  
-       target_link_libraries(${executable} PRIVATE ${swiftrt})
-       target_link_libraries(${executable} PRIVATE "swiftCore")
+       target_link_libraries(${target} PRIVATE ${swiftrt})
+       target_link_libraries(${target} PRIVATE "swiftCore")
 diff --git a/swift/localization/CMakeLists.txt b/swift/localization/CMakeLists.txt
 index 07a3585a66c..461a98b6856 100644
 --- a/swift/localization/CMakeLists.txt
 +++ b/swift/localization/CMakeLists.txt
 @@ -1,3 +1,4 @@
-+if("${SWIFT_NATIVE_SWIFT_TOOLS_PATH}" STREQUAL "${SWIFT_RUNTIME_OUTPUT_INTDIR}")
++if(NOT SWIFT_PREBUILT_SWIFT)
  set(diagnostic_witness "${CMAKE_BINARY_DIR}/share/swift/diagnostics/generated")
  
  add_custom_command(
 @@ -32,3 +33,4 @@ swift_install_in_component(
-   PATTERN "*.db"
    PATTERN "*.yaml"
+   PATTERN "*.strings"
  )
 +endif()
+diff --git a/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake b/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake
+index 25a79d145fb..74a838e2075 100644
+--- a/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake
++++ b/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake
+@@ -462,6 +462,7 @@ function(_add_target_variant_link_flags)
+     list(APPEND link_libraries "dl" "log")
+     # We need to add the math library, which is linked implicitly by libc++
+     list(APPEND result "-lm")
++    list(APPEND result "-fno-openmp-implicit-rpath")
+     if(NOT "${SWIFT_ANDROID_NDK_PATH}" STREQUAL "")
+       file(GLOB RESOURCE_DIR ${SWIFT_SDK_ANDROID_ARCH_${LFLAGS_ARCH}_PATH}/../lib64/clang/*)
+       list(APPEND result "-resource-dir=${RESOURCE_DIR}")
 diff --git a/swift/stdlib/cmake/modules/SwiftSource.cmake b/swift/stdlib/cmake/modules/SwiftSource.cmake
 index 4bc312f7f89..d71f6408d9f 100644
 --- a/swift/stdlib/cmake/modules/SwiftSource.cmake
@@ -155,8 +205,8 @@ index 3313f56c8a6..59804ff6228 100644
  elseif("${SWIFT_CONCURRENCY_GLOBAL_EXECUTOR}" STREQUAL "singlethreaded" OR
         "${SWIFT_CONCURRENCY_GLOBAL_EXECUTOR}" STREQUAL "hooked")
 @@ -120,6 +120,7 @@ add_swift_target_library(swift_Concurrency ${SWIFT_STDLIB_LIBRARY_BUILD_TYPES} I
-   SWIFT_MODULE_DEPENDS_WINDOWS CRT
- 
+   INCORPORATE_OBJECT_LIBRARIES_SHARED_ONLY
+     ${swift_concurrency_incorporate_object_libraries_so}
    LINK_LIBRARIES ${swift_concurrency_link_libraries}
 +  LINK_FLAGS "-ldispatch"
  
@@ -188,7 +238,7 @@ index 7a77e125f95..7eddfea2054 100644
 +    ${SWIFT_ANDROID_NATIVE_SYSROOT}/usr/include)
  endfunction()
  
- # Add a new SourceKit library.
+ function(add_sourcekitd_swifrt_linking target path HAS_SWIFT_MODULES)
 @@ -115,7 +115,7 @@ function(add_sourcekitd_swifrt_linking target path HAS_SWIFT_MODULES)
        # installed host toolchain.
        get_filename_component(swift_bin_dir ${SWIFT_EXEC_FOR_SWIFT_MODULES} DIRECTORY)
@@ -198,20 +248,20 @@ index 7a77e125f95..7eddfea2054 100644
  
        target_link_libraries(${target} PRIVATE ${swiftrt})
        target_link_libraries(${target} PRIVATE "swiftCore")
-diff --git a/swift/tools/libSwiftSyntaxParser/CMakeLists.txt b/swift/tools/libSwiftSyntaxParser/CMakeLists.txt
-index 42dda212164..2338df9072a 100644
---- a/swift/tools/libSwiftSyntaxParser/CMakeLists.txt
-+++ b/swift/tools/libSwiftSyntaxParser/CMakeLists.txt
-@@ -13,6 +13,9 @@ add_swift_host_library(libSwiftSyntaxParser SHARED
- if(NOT SWIFT_BUILT_STANDALONE AND NOT CMAKE_C_COMPILER_ID MATCHES Clang)
-   add_dependencies(libSwiftSyntaxParser clang)
- endif()
-+# Look in Termux sysroot for Block.h from libdispatch
-+target_include_directories(libSwiftSyntaxParser SYSTEM PRIVATE
-+  ${SWIFT_ANDROID_NATIVE_SYSROOT}/usr/include)
- target_link_libraries(libSwiftSyntaxParser PRIVATE
-   swiftParse)
- set_target_properties(libSwiftSyntaxParser
+diff --git a/swift/tools/swift-compatibility-symbols/CMakeLists.txt b/swift/tools/swift-compatibility-symbols/CMakeLists.txt
+index 11cda641cc2..bd2cb152725 100644
+--- a/swift/tools/swift-compatibility-symbols/CMakeLists.txt
++++ b/swift/tools/swift-compatibility-symbols/CMakeLists.txt
+@@ -1,3 +1,4 @@
++if(NOT SWIFT_PREBUILT_SWIFT)
+ add_swift_host_tool(swift-compatibility-symbols
+   swift-compatibility-symbols.cpp
+   LLVM_LINK_COMPONENTS support
+@@ -26,3 +27,4 @@ swift_install_in_component(
+   COMPONENT
+     compiler
+ )
++endif()
 diff --git a/swift-corelibs-xctest/CMakeLists.txt b/swift-corelibs-xctest/CMakeLists.txt
 index 531e7c0..589930f 100644
 --- a/swift-corelibs-xctest/CMakeLists.txt
@@ -224,25 +274,11 @@ index 531e7c0..589930f 100644
    endif()
  endif()
  set_target_properties(XCTest PROPERTIES
-diff --git a/swift-crypto/Sources/CCryptoBoringSSL/CMakeLists.txt b/swift-crypto/Sources/CCryptoBoringSSL/CMakeLists.txt
-index 1a890d6..639126c 100644
---- a/swift-crypto/Sources/CCryptoBoringSSL/CMakeLists.txt
-+++ b/swift-crypto/Sources/CCryptoBoringSSL/CMakeLists.txt
-@@ -337,7 +337,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL Darwin AND CMAKE_SYSTEM_PROCESSOR MATCHES "amd64|x
-     crypto/fipsmodule/vpaes-x86_64.mac.x86_64.S
-     crypto/fipsmodule/x86_64-mont.mac.x86_64.S
-     crypto/fipsmodule/x86_64-mont5.mac.x86_64.S)
--elseif(CMAKE_SYSTEM_NAME STREQUAL Linux AND CMAKE_SYSTEM_PROCESSOR MATCHES "amd64|x86_64")
-+elseif(CMAKE_SYSTEM_NAME MATCHES "Linux|Android" AND CMAKE_SYSTEM_PROCESSOR MATCHES "amd64|x86_64")
-   target_sources(CCryptoBoringSSL PRIVATE
-     crypto/chacha/chacha-x86_64.linux.x86_64.S
-     crypto/cipher_extra/aes128gcmsiv-x86_64.linux.x86_64.S
-@@ -368,7 +368,7 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL Darwin AND CMAKE_SYSTEM_PROCESSOR MATCHES "arm
-     crypto/fipsmodule/sha256-armv8.ios.aarch64.S
-     crypto/fipsmodule/sha512-armv8.ios.aarch64.S
-     crypto/fipsmodule/vpaes-armv8.ios.aarch64.S)
--elseif(CMAKE_SYSTEM_NAME STREQUAL Linux AND CMAKE_SYSTEM_PROCESSOR MATCHES "arm64|aarch64")
-+elseif(CMAKE_SYSTEM_NAME MATCHES "Linux|Android" AND CMAKE_SYSTEM_PROCESSOR MATCHES "arm64|aarch64")
-   target_sources(CCryptoBoringSSL PRIVATE
-     crypto/chacha/chacha-armv8.linux.aarch64.S
-     crypto/fipsmodule/aesv8-armx64.linux.aarch64.S
+@@ -69,7 +69,6 @@ set_target_properties(XCTest PROPERTIES
+ if(ENABLE_TESTING)
+   enable_testing()
+ 
+-  enable_language(C)
+   find_package(LLVM CONFIG)
+   if(LLVM_FOUND)
+     message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")

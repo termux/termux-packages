@@ -76,6 +76,9 @@ termux_step_setup_variables() {
 	export prefix=${TERMUX_PREFIX}
 	export PREFIX=${TERMUX_PREFIX}
 
+	# Explicitly export in case the default was set.
+	export TERMUX_ARCH=${TERMUX_ARCH}
+
 	if [ "${TERMUX_PACKAGES_OFFLINE-false}" = "true" ]; then
 		# In "offline" mode store/pick cache from directory with
 		# build.sh script.

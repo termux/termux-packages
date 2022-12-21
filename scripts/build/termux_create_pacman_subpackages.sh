@@ -57,6 +57,13 @@ termux_create_pacman_subpackages() {
 		[ "$TERMUX_SUBPKG_PLATFORM_INDEPENDENT" = "true" ] && SUB_PKG_ARCH=any
 
 		cd "$SUB_PKG_DIR/massage"
+		# Check that files were actually installed, else don't subpackage.
+		if [ "$(find . -type f -print | head -n1)" = "" ]; then
+			echo "No files in subpackage '$SUB_PKG_NAME' when built for $SUB_PKG_ARCH with package '$TERMUX_PKG_NAME', so"
+			echo "the subpackage was not created. If unexpected, check to make sure the files are where you expect."
+			cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"
+			continue
+		fi
 		local SUB_PKG_INSTALLSIZE
 		SUB_PKG_INSTALLSIZE=$(du -bs . | cut -f 1)
 

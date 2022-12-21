@@ -2,20 +2,6 @@ diff --git a/swift/utils/build-script-impl b/swift/utils/build-script-impl
 index b1d060328bc..218c9215260 100755
 --- a/swift/utils/build-script-impl
 +++ b/swift/utils/build-script-impl
-@@ -1652,6 +1688,13 @@ for host in "${ALL_HOSTS[@]}"; do
-                         -DLLVM_NATIVE_BUILD=$(build_directory "${LOCAL_HOST}" llvm)
-                     )
-                     cmake_options+=("${SWIFT_TARGET_CMAKE_OPTIONS[@]}")
-+                    cmake_options+=(
-+                        -DCMAKE_CXX_FLAGS="$CXXFLAGS --target=$CCTERMUX_HOST_PLATFORM $CPPFLAGS"
-+                        -DCMAKE_EXE_LINKER_FLAGS="$LDFLAGS --target=$CCTERMUX_HOST_PLATFORM"
-+                        -DCMAKE_FIND_ROOT_PATH:PATH="${CROSS_COMPILE_DEPS_PATH}"
-+                        -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER
-+                        -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY
-+                    )
-                 fi
- 
-                 ;;
 @@ -1854,6 +1854,9 @@ for host in "${ALL_HOSTS[@]}"; do
                          "${cmake_options[@]}"
                          -DLLVM_TABLEGEN=$(build_directory "${LOCAL_HOST}" llvm)/bin/llvm-tblgen
@@ -27,9 +13,9 @@ index b1d060328bc..218c9215260 100755
                  fi
  
 @@ -2035,6 +2035,7 @@ for host in "${ALL_HOSTS[@]}"; do
-                     -DSWIFT_TOOLS_ENABLE_LTO:STRING="${SWIFT_TOOLS_ENABLE_LTO}"
                      -DSWIFT_BUILD_RUNTIME_WITH_HOST_COMPILER:BOOL=$(true_false "${BUILD_RUNTIME_WITH_HOST_COMPILER}")
                      -DLIBDISPATCH_CMAKE_BUILD_TYPE:STRING="${LIBDISPATCH_BUILD_TYPE}"
+                     -DSWIFT_PATH_TO_SWIFT_SYNTAX_SOURCE:PATH="${SWIFT_SYNTAX_SOURCE_DIR}"
 +                    -DSWIFT_CLANG_RESOURCE_DIR_SYMLINK_INSTALL_TARGET:STRING="../clang/${TERMUX_CLANG_VERSION}"
                      "${swift_cmake_options[@]}"
                  )
