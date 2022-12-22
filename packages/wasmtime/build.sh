@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="A standalone runtime for WebAssembly"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.0.1
+TERMUX_PKG_VERSION=4.0.0
 TERMUX_PKG_SRCURL=https://github.com/bytecodealliance/wasmtime.git
 TERMUX_PKG_BUILD_IN_SRC=true
 
