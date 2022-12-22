@@ -3,11 +3,11 @@ TERMUX_PKG_DESCRIPTION=" Rust implementation of Magic Wormhole, with new feature
 TERMUX_PKG_LICENSE="EUPL-1.2"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.5.0"
+TERMUX_PKG_VERSION=0.6.0
 TERMUX_PKG_SRCURL="https://github.com/magic-wormhole/magic-wormhole.rs/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=fdd1d0bd00948f9bdce28b7d21e84bebd25d08502efe30408ded91a150afa5ce
+TERMUX_PKG_SHA256=cfa72215b1b0f519b9986523d0c41d6b3e562c41668f28ee80c23ce0aa3fe685
 TERMUX_PKG_BUILD_IN_SRC=true
-# disable auto-update since 'remove-clipboard' patch was maually crafted for v0.5.0
+# disable auto-update since 'remove-clipboard' patch was maually crafted for v0.6.0
 TERMUX_PKG_AUTO_UPDATE=false
 
 termux_step_make() {
