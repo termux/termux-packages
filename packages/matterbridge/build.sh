@@ -23,7 +23,7 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
-	go build
+	go build -tags whatsappmulti
 }
 
 termux_step_make_install() {
