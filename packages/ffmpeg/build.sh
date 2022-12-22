@@ -12,6 +12,23 @@ TERMUX_PKG_CONFLICTS="libav"
 TERMUX_PKG_BREAKS="ffmpeg-dev"
 TERMUX_PKG_REPLACES="ffmpeg-dev"
 
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVER_avutil=57
+	local _SOVER_avcodec=59
+	local _SOVER_avformat=59
+
+	local f
+	for f in util codec format; do
+		local v=$(sh ffbuild/libversion.sh av${f} \
+				libav${f}/version.h libav${f}/version_major.h \
+				| sed -En 's/^libav'"${f}"'_VERSION_MAJOR=([0-9]+)$/\1/p')
+		if [ ! "${v}" ] || [ "$(eval echo \$_SOVER_av${f})" != "${v}" ]; then
+			termux_error_exit "SOVERSION guard check failed for libav${f}.so."
+		fi
+	done
+}
 
 termux_step_configure() {
 	cd $TERMUX_PKG_BUILDDIR
