@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.lesbonscomptes.com/recoll/index.html
 TERMUX_PKG_DESCRIPTION="Full-text search for your desktop"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.33.3
+TERMUX_PKG_VERSION=1.33.4
 TERMUX_PKG_SRCURL=https://www.lesbonscomptes.com/recoll/recoll-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=756a27a472088d8ac9d33363be8f34c67b4ffdc9f13333b8613e3d5daa08bb8e
+TERMUX_PKG_SHA256=7df0f8f6c1985981160053d1b69c8353f09816f92b1032f6d4376add0b170af7
 TERMUX_PKG_DEPENDS="aspell, libc++, libiconv, libxapian, libxml2, libxslt, zlib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS=" --disable-userdoc --disable-python-chm --disable-x11mon --disable-qtgui"
 
