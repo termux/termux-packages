@@ -1,14 +1,27 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/Byron/gitoxide
 TERMUX_PKG_DESCRIPTION="Rust implementation of Git"
-TERMUX_PKG_LICENSE="MIT,Apache-2.0"
+TERMUX_PKG_LICENSE="Apache-2.0, MIT"
+TERMUX_PKG_LICENSE_FILE="LICENSE-APACHE, LICENSE-MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.1.0
 _RELEASE_PREFIX="git-hashtable"
 TERMUX_PKG_SRCURL=https://github.com/Byron/gitoxide/archive/refs/tags/${_RELEASE_PREFIX}-v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=33f761b9e6bb268a2ad725bf88e85808e4a9c7e06cface2fd637ac14dc2382fc
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_LICENSE_FILE="LICENSE-APACHE, LICENSE-MIT"
+
+termux_pkg_auto_update() {
+	# Get latest release tag:
+	local tag
+	tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}")"
+	# check if this is not a ${_RELEASE_PREFIX} release:
+	if grep -qP "^${_RELEASE_PREFIX}-v${TERMUX_PKG_UPDATE_VERSION_REGEXP}\$" <<<"$tag"; then
+		termux_pkg_upgrade_version "$tag"
+	else
+		echo "WARNING: Skipping auto-update: Not a ${_RELEASE_PREFIX} release($tag)"
+	fi
+}
 
 termux_step_pre_configure() {
 	termux_setup_cmake
