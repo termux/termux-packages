@@ -273,6 +273,12 @@ PACKAGES+=" libcurl4-openssl-dev"
 # Required by openjdk-17
 PACKAGES+=" openjdk-17-jre openjdk-17-jdk"
 
+# Required by qt5-qtwebengine
+PACKAGES+=" libnss3 libnss3:i386 libnss3-dev"
+PACKAGES+=" libwebp7 libwebp7:i386 libwebp-dev"
+PACKAGES+=" libwebpdemux2 libwebpdemux2:i386"
+PACKAGES+=" libwebpmux3 libwebpmux3:i386"
+
 # Do not require sudo if already running as root.
 if [ "$(id -u)" = "0" ]; then
 	SUDO=""
