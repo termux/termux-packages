@@ -18,6 +18,17 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DOPENMP_BUILD=ON
 "
 
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=5
+
+	local v=$(sed -n 's/^\([^.]*\)\..*/\1/p' VERSION)
+	if [ "${_SOVERSION}" != "${v}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
+
 termux_step_pre_configure() {
 	LDFLAGS+=" -landroid-posix-semaphore"
 }
