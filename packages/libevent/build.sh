@@ -23,3 +23,21 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DEVENT__HAVE_WAITPID_WITH_WNOWAIT=ON
 -DEVENT__SIZEOF_PTHREAD_T=$((TERMUX_ARCH_BITS/8))
 "
+
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after RELEASE / SOVERSION is changed.
+	local _RELEASE=2.1
+	local _SOVERSION=7
+
+	for a in LIBVERSION_CURRENT LIBVERSION_AGE; do
+		local _${a}=$(sed -En 's/.*set\(EVENT_ABI_'"${a}"'\s+([0-9])\).*/\1/p' \
+				CMakeLists.txt)
+	done
+	local r=$(sed -En 's/.*set\(EVENT_PACKAGE_RELEASE\s+([0-9.]+)\).*/\1/p' \
+			CMakeLists.txt)
+	local v=$(( _LIBVERSION_CURRENT - _LIBVERSION_AGE ))
+	if [ "${_RELEASE}" != "${r}" ] || [ "${_SOVERSION}" != "${v}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
