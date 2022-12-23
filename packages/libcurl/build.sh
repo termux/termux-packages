@@ -31,6 +31,22 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 # conflict with previous versions to avoid broken installations.
 TERMUX_PKG_CONFLICTS="apt (<< 1.4.8-8)"
 
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=4
+
+	local a
+	for a in VERSIONCHANGE VERSIONDEL; do
+		local _${a}=$(sed -En 's/^'"${a}"'=([0-9]+).*/\1/p' \
+				lib/Makefile.soname)
+	done
+	local v=$(( _VERSIONCHANGE - _VERSIONDEL ))
+	if [ "${v}" != "${_SOVERSION}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
+
 termux_step_pre_configure() {
 	LDFLAGS+=" -Wl,-z,nodelete"
 }
