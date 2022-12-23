@@ -1,0 +1,30 @@
+From 47cee723de9616f1a4b406b17dbd1c75d7a4b0aa Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?J=C3=A9r=C3=B4me=20Martinez?= <jerome@mediaarea.net>
+Date: Tue, 13 Dec 2022 09:30:32 +0100
+Subject: [PATCH] + BitStream_Fast: Resize()
+
+---
+ Source/ZenLib/BitStream_Fast.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/Source/ZenLib/BitStream_Fast.h b/Source/ZenLib/BitStream_Fast.h
+index 8f579f3..bbf6f39 100644
+--- a/Source/ZenLib/BitStream_Fast.h
++++ b/Source/ZenLib/BitStream_Fast.h
+@@ -403,6 +403,13 @@ public:
+         return Buffer_Size%8;
+     }
+ 
++    inline void Resize(size_t Size_) //Size_ is the new count of remaining bits, must have the same alignment as Remain()
++    {
++        if (BufferUnderRun && Size_>Buffer_Size)
++            BufferUnderRun=false;
++        Buffer_Size=Size_;
++    }
++
+ private :
+     const int8u*    Buffer;
+     size_t          Buffer_Size;
+-- 
+2.38.0
+
