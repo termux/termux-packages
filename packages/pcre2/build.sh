@@ -18,3 +18,20 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-pcre2-16
 --enable-pcre2-32
 "
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVER_libpcre2_8=0
+	local _SOVER_libpcre2_16=0
+	local _SOVER_libpcre2_32=0
+	local _SOVER_libpcre2_posix=3
+
+	local a
+	for a in libpcre2_{8,16,32,posix}; do
+		local e=$(sed -En 's/^m4_define\('"${a}"'_version,\s*\[([0-9]+):([0-9]+):([0-9]+)\].*/\1-\3/p' \
+				configure.ac)
+		if [ ! "${e}" ] || [ "$(eval echo \$_SOVER_${a})" != "$(( "${e}" ))" ]; then
+			termux_error_exit "SOVERSION guard check failed for ${a/_/-}.so."
+		fi
+	done
+}
