@@ -5,7 +5,7 @@
  
  def install_default_gem(dir, srcdir, bindir)
 -  gem_dir = Gem.default_dir
-+  gem_dir = "@TERMUX_PREFIX@/lib/ruby/gems/3.1.0"
++  gem_dir = "@TERMUX_PREFIX@/lib/ruby/gems/@RUBY_API_VERSION@"
    install_dir = with_destdir(gem_dir)
    prepare "default gems from #{dir}", gem_dir
    RbInstall.no_write do
@@ -14,7 +14,7 @@
  
  install?(:ext, :comm, :gem, :'bundled-gems') do
 -  gem_dir = Gem.default_dir
-+  gem_dir = "@TERMUX_PREFIX@/lib/ruby/gems/3.1.0"
++  gem_dir = "@TERMUX_PREFIX@/lib/ruby/gems/@RUBY_API_VERSION@"
    install_dir = with_destdir(gem_dir)
    prepare "bundled gems", gem_dir
    RbInstall.no_write do
