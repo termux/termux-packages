@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.ruby-lang.org/
 TERMUX_PKG_DESCRIPTION="Dynamic programming language with a focus on simplicity and productivity"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.1.3
-TERMUX_PKG_SRCURL=https://cache.ruby-lang.org/pub/ruby/${TERMUX_PKG_VERSION:0:3}/ruby-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=4ee161939826bcdfdafa757cf8e293a7f14e357f62be7144f040335cc8c7371a
+TERMUX_PKG_VERSION=3.2.0
+TERMUX_PKG_SRCURL=https://cache.ruby-lang.org/pub/ruby/$(echo $TERMUX_PKG_VERSION | cut -d . -f 1-2)/ruby-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=d2f4577306e6dd932259693233141e5c3ec13622c95b75996541b8d5b68b28b4
 # libbffi is used by the fiddle extension module:
 TERMUX_PKG_DEPENDS="libandroid-execinfo, libandroid-support, libffi, libgmp, readline, openssl, libyaml, zlib"
 TERMUX_PKG_RECOMMENDS="clang, make, pkg-config"
@@ -19,14 +19,29 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" rb_cv_type_deprecated=x"
 # getresuid(2) does not work on ChromeOS - https://github.com/termux/termux-app/issues/147:
 # TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_getresuid=no"
 TERMUX_PKG_HOSTBUILD=true
+TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="
+--prefix=$TERMUX_PKG_HOSTBUILD_DIR/ruby-host
+--disable-install-doc
+--disable-install-rdoc
+--disable-install-capi
+"
 
 termux_step_host_build() {
-	"$TERMUX_PKG_SRCDIR/configure" --prefix=$TERMUX_PKG_HOSTBUILD_DIR/ruby-host
+	"$TERMUX_PKG_SRCDIR/configure" ${TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS}
 	make -j $TERMUX_MAKE_PROCESSES
 	make install
 }
 
 termux_step_pre_configure() {
+	_RUBY_API_VERSION=$(echo $TERMUX_PKG_VERSION | cut -d . -f 1-2).0
+	test ${_RUBY_ABI_VERSION:=} && _RUBY_API_VERSION+=+${_RUBY_ABI_VERSION}
+
+	echo "Applying tool-rbinstall.rb.diff"
+	sed -e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
+		-e "s|@RUBY_API_VERSION@|${_RUBY_API_VERSION}|g" \
+		$TERMUX_PKG_BUILDER_DIR/tool-rbinstall.rb.diff \
+		| patch --silent -p1
+
 	autoreconf -fi
 
 	export PATH=$TERMUX_PKG_HOSTBUILD_DIR/ruby-host/bin:$PATH
@@ -45,7 +60,7 @@ termux_step_make_install() {
 	make uninstall # remove possible remains to get fresh timestamps
 	make install
 
-	local RBCONFIG=$TERMUX_PREFIX/lib/ruby/${TERMUX_PKG_VERSION:0:3}.0/${TERMUX_HOST_PLATFORM}/rbconfig.rb
+	local RBCONFIG=$TERMUX_PREFIX/lib/ruby/${_RUBY_API_VERSION}/${TERMUX_HOST_PLATFORM}/rbconfig.rb
 
 	# Fix absolute paths to executables:
 	perl -p -i -e 's/^.*CONFIG\["INSTALL"\].*$/  CONFIG["INSTALL"] = "install -c"/' $RBCONFIG
@@ -57,7 +72,11 @@ termux_step_make_install() {
 }
 
 termux_step_post_massage() {
-	if [ ! -f $TERMUX_PREFIX/lib/ruby/${TERMUX_PKG_VERSION:0:3}.0/${TERMUX_HOST_PLATFORM}/readline.so ]; then
-		echo "Error: The readline extension was not built"
+	if [ ! -f ./lib/ruby/${_RUBY_API_VERSION}/${TERMUX_HOST_PLATFORM}/readline.so ]; then
+		termux_error_exit "The readline extension was not installed."
+	fi
+	local _RUBYGEMS_ARCH=${TERMUX_HOST_PLATFORM/i686-/x86-}
+	if [ ! -d ./lib/ruby/gems/${_RUBY_API_VERSION}/extensions/${_RUBYGEMS_ARCH} ]; then
+		termux_error_exit "Extensions for bundled gems were not installed."
 	fi
 }
