@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # Never forget to always bump revision of reverse dependencies and rebuild them
 # when bumping version.
 TERMUX_PKG_VERSION=1.80.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://boostorg.jfrog.io/artifactory/main/release/$TERMUX_PKG_VERSION/source/boost_${TERMUX_PKG_VERSION//./_}.tar.bz2
 TERMUX_PKG_SHA256=1e19565d82e43bc59209a168f5ac899d3ba471d55c7610c677d4ccf2c9c500c0
 TERMUX_PKG_DEPENDS="libc++, libbz2, libiconv, liblzma, zlib"
