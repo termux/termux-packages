@@ -2,8 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://groovy-lang.org/
 TERMUX_PKG_DESCRIPTION="A powerful multi-faceted programming language for the JVM platform"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=4.0.6
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=4.0.7
 _JANSI_VERSION=2.4.0
 _JLINE_VERSION=2.14.6
 _JANSI_TAGNAME="jansi-${_JANSI_VERSION}"
@@ -11,7 +10,7 @@ _JLINE2_TAGNAME="jline-${_JLINE_VERSION}"
 TERMUX_PKG_SRCURL=(https://groovy.jfrog.io/artifactory/dist-release-local/groovy-zips/apache-groovy-binary-$TERMUX_PKG_VERSION.zip
                    https://github.com/fusesource/jansi/archive/refs/tags/${_JANSI_TAGNAME}.tar.gz
                    https://github.com/jline/jline2/archive/refs/tags/${_JLINE2_TAGNAME}.tar.gz)
-TERMUX_PKG_SHA256=(e3b541567e65787279f02031206589bcdf3cdaab9328d9e4d72ad23a86aa1053
+TERMUX_PKG_SHA256=(efae81322fc28b63f30edb27aa308600f08bda73fb63b51c92a89825be87fade
                    ba18c50770eebb0b6f472254ada8608138e70045a564efa43626a09691dcf553
                    c6205afb214288cd8ef53f1ea1243ba9388c84b55c929f0b9e6cee7757c6efac)
 TERMUX_PKG_DEPENDS="libjansi (>= 2.4.0-1), openjdk-17"
