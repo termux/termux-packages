@@ -18,3 +18,16 @@
      if (!MEGAjvm)
      {
          LOG_err << "No JVM found";
+@@ -1787,10 +1787,10 @@
+     uuid_unparse(uuid, uuid_str);
+     id->append(uuid_str);
+ #else
+-    int fd = open("/etc/machine-id", O_RDONLY);
++    int fd = open("@TERMUX_PREFIX@/etc/machine-id", O_RDONLY);
+     if (fd < 0)
+     {
+-        fd = open("/var/lib/dbus/machine-id", O_RDONLY);
++        fd = open("@TERMUX_PREFIX@/var/lib/dbus/machine-id", O_RDONLY);
+         if (fd < 0)
+         {
+             return;
