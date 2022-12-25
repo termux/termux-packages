@@ -1,0 +1,37 @@
+https://github.com/boostorg/python/commit/a218babc8daee904a83f550fb66e5cb3f1cb3013
+
+From a218babc8daee904a83f550fb66e5cb3f1cb3013 Mon Sep 17 00:00:00 2001
+From: Victor Stinner <vstinner@python.org>
+Date: Mon, 25 Apr 2022 10:51:46 +0200
+Subject: [PATCH] Fix enum_type_object type on Python 3.11
+
+The enum_type_object type inherits from PyLong_Type which is not tracked
+by the GC. Instances doesn't have to be tracked by the GC: remove the
+Py_TPFLAGS_HAVE_GC flag.
+
+The Python C API documentation says:
+
+    "To create a container type, the tp_flags field of the type object
+    must include the Py_TPFLAGS_HAVE_GC and provide an implementation of
+    the tp_traverse handler."
+
+https://docs.python.org/dev/c-api/gcsupport.html
+
+The new exception was introduced in Python 3.11 by:
+https://github.com/python/cpython/issues/88429
+---
+ src/object/enum.cpp | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/src/object/enum.cpp b/src/object/enum.cpp
+index 293e705899..5753b32e07 100644
+--- a/src/object/enum.cpp
++++ b/libs/python/src/object/enum.cpp
+@@ -113,7 +113,6 @@ static PyTypeObject enum_type_object = {
+ #if PY_VERSION_HEX < 0x03000000
+     | Py_TPFLAGS_CHECKTYPES
+ #endif
+-    | Py_TPFLAGS_HAVE_GC
+     | Py_TPFLAGS_BASETYPE,                  /* tp_flags */
+     0,                                      /* tp_doc */
+     0,                                      /* tp_traverse */
