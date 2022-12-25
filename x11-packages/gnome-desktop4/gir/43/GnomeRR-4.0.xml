@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<dump>
+  <class name="GnomeRROutputInfo" get-type="gnome_rr_output_info_get_type" parents="GObject">
+  </class>
+  <class name="GnomeRRScreen" get-type="gnome_rr_screen_get_type" parents="GObject">
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <property name="gdk-display" type="GdkDisplay" flags="235"/>
+    <property name="dpms-mode" type="GnomeRRDpmsModeType" flags="227"/>
+    <signal name="changed" return="void" when="first" no-recurse="1" no-hooks="1">
+    </signal>
+    <signal name="output-connected" return="void" when="first" no-recurse="1" no-hooks="1">
+      <param type="GnomeRROutput"/>
+    </signal>
+    <signal name="output-disconnected" return="void" when="first" no-recurse="1" no-hooks="1">
+      <param type="GnomeRROutput"/>
+    </signal>
+  </class>
+  <boxed name="GnomeRROutput" get-type="gnome_rr_output_get_type"/>
+  <boxed name="GnomeRRCrtc" get-type="gnome_rr_crtc_get_type"/>
+  <boxed name="GnomeRRMode" get-type="gnome_rr_mode_get_type"/>
+  <enum name="GnomeRRDpmsModeType" get-type="gnome_rr_dpms_mode_get_type">
+    <member name="GNOME_RR_DPMS_ON" nick="on" value="0"/>
+    <member name="GNOME_RR_DPMS_STANDBY" nick="standby" value="1"/>
+    <member name="GNOME_RR_DPMS_SUSPEND" nick="suspend" value="2"/>
+    <member name="GNOME_RR_DPMS_OFF" nick="off" value="3"/>
+    <member name="GNOME_RR_DPMS_UNKNOWN" nick="unknown" value="4"/>
+  </enum>  <class name="GnomeRRConfig" get-type="gnome_rr_config_get_type" parents="GObject">
+    <property name="screen" type="GnomeRRScreen" flags="202"/>
+  </class>
+  <error-quark function="gnome_rr_error_quark" domain="gnome-rr-error-quark"/>
+</dump>
