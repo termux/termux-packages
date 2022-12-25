@@ -14,7 +14,7 @@ termux_step_post_get_source() {
 	git fetch --unshallow
 	git checkout $_COMMIT
 
-	local version="$(git log -1 --date=format:"%Y.%m.%d" --format="%ad")"
+	local version="$(git log -1 --format=%cs | sed 's/-/./g')"
 	if [ "$version" != "$TERMUX_PKG_VERSION" ]; then
 		echo -n "ERROR: The specified version \"$TERMUX_PKG_VERSION\""
 		echo " is different from what is expected to be: \"$version\""
