@@ -3,7 +3,6 @@
 
 # Title:          package
 # Description:    A library for package utils.
-# License-SPDX:   Apache
 
 
 
@@ -23,7 +22,7 @@
 # pacakge__is_package_on_device_build_supported `package_dir`
 ##
 pacakge__is_package_on_device_build_supported() {
-	[ "$(. ${1}/build.sh; echo $TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED)" != "true" ]
+	[ $(. "${1}/build.sh"; echo "$TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED") != "true" ]
 	return $?
 }
 

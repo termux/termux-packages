@@ -51,7 +51,6 @@ termux_step_get_dependencies() {
 			fi
 			if $build_dependency; then
 				TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh -I $(test "${TERMUX_FORCE_BUILD_DEPENDENCIES}" = "true" && echo "-F" || true) --format $TERMUX_PACKAGE_FORMAT "${PKG_DIR}"
-				termux_add_package_to_built_packages_list "$PKG"
 				continue
 			fi
 			termux_add_package_to_built_packages_list "$PKG"
@@ -94,13 +93,12 @@ termux_step_get_dependencies() {
 				[ ! "$TERMUX_QUIET_BUILD" = true ] && echo "Building dependency $PKG if necessary..."
 			fi
 			TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh -s $(test "${TERMUX_FORCE_BUILD_DEPENDENCIES}" = "true" && echo "-F" || true) --format $TERMUX_PACKAGE_FORMAT "${PKG_DIR}"
-			termux_add_package_to_built_packages_list "$PKG"
 		done<<<$(./scripts/buildorder.py "$TERMUX_PKG_BUILDER_DIR" $TERMUX_PACKAGES_DIRECTORIES || echo "ERROR")
 	fi
 }
 
 termux_force_check_package_dependency() {
-	if [[ "$TERMUX_BUILD_PACKAGE_CALL_BUILT_PACKAGES_LIST" == *" $PKG "* ]] && pacakge__is_package_version_built "$PKG" "$DEP_VERSION"; then
+	if termux_check_package_in_built_packages_list "$PKG" && pacakge__is_package_version_built "$PKG" "$DEP_VERSION"; then
 		[ ! "$TERMUX_QUIET_BUILD" = true ] && echo "Skipping already built dependency $PKG@$DEP_VERSION"
 		return 0
 	fi

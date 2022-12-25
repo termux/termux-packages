@@ -1,20 +1,20 @@
 #!/bin/bash
 # shellcheck disable=SC1117
 
-# Fixing the number of calls and the list of compiled packages
+# Setting the TMPDIR variable
+: "${TMPDIR:=/tmp}"
+export TMPDIR
+
+# Set the build-package.sh call depth
+# If its the root call, then create a file to store the list of packages and their dependencies
+# that have been compiled at any instant by recursive calls to build-package.sh
 if [[ ! "$TERMUX_BUILD_PACKAGE_CALL_DEPTH" =~ ^[0-9]+$ ]]; then
 	export TERMUX_BUILD_PACKAGE_CALL_DEPTH=0
-	export TERMUX_BUILD_PACKAGE_CALL_BUILT_PACKAGES_LIST=" "
+	export TERMUX_BUILD_PACKAGE_CALL_BUILT_PACKAGES_LIST_FILE_PATH="${TMPDIR}/build-package-call-built-packages-list-$(date +"%Y-%m-%d-%H.%M.%S.")$((RANDOM%1000))"
+	echo -n " " > "$TERMUX_BUILD_PACKAGE_CALL_BUILT_PACKAGES_LIST_FILE_PATH"
 else
 	export TERMUX_BUILD_PACKAGE_CALL_DEPTH=$((TERMUX_BUILD_PACKAGE_CALL_DEPTH+1))
 fi
-
-# Adds a package to the list of built packages if it is not in the list
-termux_add_package_to_built_packages_list() {
-	if [[ "$TERMUX_BUILD_PACKAGE_CALL_BUILT_PACKAGES_LIST" != *" $1 "* ]]; then
-		TERMUX_BUILD_PACKAGE_CALL_BUILT_PACKAGES_LIST+="$1 "
-	fi
-}
 
 set -e -o pipefail -u
 
@@ -30,12 +30,6 @@ source "$TERMUX_SCRIPTDIR/scripts/utils/package/package.sh"
 
 SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct 2>/dev/null || date "+%s")
 export SOURCE_DATE_EPOCH
-
-: "${TMPDIR:=/tmp}"
-export TMPDIR
-
-# file to update list of compiled packages
-export TERMUX_BUILD_PACKAGE_CALL_BUILT_PACKAGES_LIST_FILE_PATH="${TMPDIR}/build-package-call-built-packages-list-$(date +"%Y-%m-%d-%H.%M.%S.")$((RANDOM%1000))"
 
 if [ "$(uname -o)" = "Android" ] || [ -e "/system/bin/app_process" ]; then
 	if [ "$(id -u)" = "0" ]; then
@@ -368,6 +362,20 @@ if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
 	export TERMUX_ARCH
 fi
 
+# Check if the package is in the compiled list
+termux_check_package_in_built_packages_list() {
+	[ ! -f "$TERMUX_BUILD_PACKAGE_CALL_BUILT_PACKAGES_LIST_FILE_PATH" ] && termux_error_exit "ERROR: file '$TERMUX_BUILD_PACKAGE_CALL_BUILT_PACKAGES_LIST_FILE_PATH' not found."
+	cat "$TERMUX_BUILD_PACKAGE_CALL_BUILT_PACKAGES_LIST_FILE_PATH" | grep -q " $1 "
+	return $?
+}
+
+# Adds a package to the list of built packages if it is not in the list
+termux_add_package_to_built_packages_list() {
+	if ! termux_check_package_in_built_packages_list "$1"; then
+		echo -n "$1 " >> $TERMUX_BUILD_PACKAGE_CALL_BUILT_PACKAGES_LIST_FILE_PATH
+	fi
+}
+
 # Special hook to prevent use of "sudo" inside package build scripts.
 # build-package.sh shouldn't perform any privileged operations.
 sudo() {
@@ -599,13 +607,13 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 		else
 			termux_error_exit "Unknown packaging format '$TERMUX_PACKAGE_FORMAT'."
 		fi
-		# saving a list of compiled packages for further work with it
+		# Saving a list of compiled packages for further work with it
 		termux_add_package_to_built_packages_list "$TERMUX_PKG_NAME"
-		echo "$TERMUX_BUILD_PACKAGE_CALL_BUILT_PACKAGES_LIST" > $TERMUX_BUILD_PACKAGE_CALL_BUILT_PACKAGES_LIST_FILE_PATH
 		termux_step_finish_build
 	) 5< "$TERMUX_BUILD_LOCK_FILE"
-	if [ -f "$TERMUX_BUILD_PACKAGE_CALL_BUILT_PACKAGES_LIST_FILE_PATH" ]; then
-		export TERMUX_BUILD_PACKAGE_CALL_BUILT_PACKAGES_LIST="$(cat $TERMUX_BUILD_PACKAGE_CALL_BUILT_PACKAGES_LIST_FILE_PATH)"
-		rm $TERMUX_BUILD_PACKAGE_CALL_BUILT_PACKAGES_LIST_FILE_PATH
-	fi
 done
+
+# Removing a file to store a list of compiled packages
+if [ "$TERMUX_BUILD_PACKAGE_CALL_DEPTH" = "0" ]; then
+	rm "$TERMUX_BUILD_PACKAGE_CALL_BUILT_PACKAGES_LIST_FILE_PATH"
+fi
