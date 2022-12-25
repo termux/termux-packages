@@ -2,10 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://www.mozilla.org/firefox
 TERMUX_PKG_DESCRIPTION="Mozilla Firefox web browser"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=107.0.1
+TERMUX_PKG_VERSION=108.0.1
 TERMUX_PKG_SRCURL=https://ftp.mozilla.org/pub/firefox/releases/${TERMUX_PKG_VERSION}/source/firefox-${TERMUX_PKG_VERSION}.source.tar.xz
-TERMUX_PKG_SHA256=e29950b9ba9143b0d683dc18779bbe70bbd082533aff8f6a7af69b19533e0647
+TERMUX_PKG_SHA256=9821ac130dad01383e03276bf6cc92d41329d351da1fa7fa238168f8890611ea
 TERMUX_PKG_DEPENDS="at-spi2-atk, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libandroid-sysv-semaphore, libc++, libcairo, libcpufeatures, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libpixman, libsm, libvpx, libwebp, libx11, libxcb, libxcomposite, libxcursor, libxdamage, libxext, libxfixes, libxi, libxrandr, libxrender, libxtst, pango, pulseaudio"
+TERMUX_MAKE_PROCESSES=1
 
 termux_step_post_get_source() {
 	local f="media/ffvpx/config_unix_aarch64.h"

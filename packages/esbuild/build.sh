@@ -2,9 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://esbuild.github.io/
 TERMUX_PKG_DESCRIPTION="An extremely fast JavaScript bundler"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.16.4
+TERMUX_PKG_VERSION="0.16.10"
 TERMUX_PKG_SRCURL=https://github.com/evanw/esbuild/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=baa99a18801feefecfe9ffa8fffeb65aebadefe38cb80f85dc52b0bc1cff90b5
+TERMUX_PKG_SHA256=edd43991a3169393f978598889fd81faa5db54551a32682c2c8249655799e805
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {

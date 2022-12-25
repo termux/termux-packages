@@ -4,8 +4,8 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_SRCURL=https://github.com/pulseaudio/pulseaudio.git
 TERMUX_PKG_VERSION=16.1
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_DEPENDS="libandroid-execinfo, libandroid-glob, libc++, libltdl, libsndfile, libsoxr, libwebrtc-audio-processing, speexdsp"
+TERMUX_PKG_REVISION=3
+TERMUX_PKG_DEPENDS="dbus, libandroid-execinfo, libandroid-glob, libc++, libltdl, libsndfile, libsoxr, libwebrtc-audio-processing, speexdsp"
 TERMUX_PKG_BREAKS="libpulseaudio-dev, libpulseaudio"
 TERMUX_PKG_REPLACES="libpulseaudio-dev, libpulseaudio"
 # glib is only a runtime dependency of pulseaudio-glib subpackage

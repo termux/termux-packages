@@ -123,7 +123,10 @@ PACKAGES+=" libncurses5-dev"
 PACKAGES+=" lua-lpeg"
 PACKAGES+=" lua-mpack"
 
-# Needed by packages mkvtoolnix and ruby.
+# Needed by host build of package ruby.
+PACKAGES+=" libyaml-dev"
+
+# Needed by package mkvtoolnix.
 PACKAGES+=" ruby"
 
 # Needed by host build of package nodejs.

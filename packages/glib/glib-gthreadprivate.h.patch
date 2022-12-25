@@ -1,0 +1,13 @@
+--- a/glib/gthreadprivate.h
++++ b/glib/gthreadprivate.h
+@@ -45,6 +45,10 @@
+ #include <sys/syscall.h>
+ #include <unistd.h>
+ 
++#ifndef __LP64__
++#include <errno.h>
++#endif
++
+ #ifndef FUTEX_WAIT_PRIVATE
+ #define FUTEX_WAIT_PRIVATE FUTEX_WAIT
+ #define FUTEX_WAKE_PRIVATE FUTEX_WAKE

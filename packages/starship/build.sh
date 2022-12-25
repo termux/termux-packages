@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://starship.rs
 TERMUX_PKG_DESCRIPTION="A minimal, blazing fast, and extremely customizable prompt for any shell"
 TERMUX_PKG_LICENSE="ISC"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.11.0"
+TERMUX_PKG_VERSION="1.12.0"
 TERMUX_PKG_SRCURL=https://github.com/starship/starship/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=7b408ef8a2ab47d7a7d0e120889bf12c8f2a965796f8a027d8b2176287fdec6b
+TERMUX_PKG_SHA256=748a0541009b0bee5f51b716d072f244d8d5cb3fb8d768519ed305494ea11e02
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="openssl, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -16,15 +16,7 @@ termux_step_pre_configure() {
 	: "${CARGO_HOME:=${HOME}/.cargo}"
 	export CARGO_HOME
 
-	rm -rf "${CARGO_HOME}"/registry/src/github.com-*/git-config-value*/
 	cargo fetch --target "${CARGO_TARGET_NAME}"
-
-	for d in "${CARGO_HOME}"/registry/src/github.com-*/git-config-value*/; do
-		patch --silent -p1 -d "${d}" <"${TERMUX_PKG_BUILDER_DIR}"/rust-git-config-path.diff || {
-			echo "[${FUNCNAME[0]}]: failed to patch git-config. Exiting now."
-			exit 1
-		}
-	done
 
 	CFLAGS+=" ${CPPFLAGS}"
 

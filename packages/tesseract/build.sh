@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/tesseract-ocr/tesseract
 TERMUX_PKG_DESCRIPTION="Tesseract is probably the most accurate open source OCR engine available"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=5.2.0
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION=5.3.0
 TERMUX_PKG_SRCURL=https://github.com/tesseract-ocr/tesseract/archive/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=eba4deb2f92a3f89a6623812074af8c53b772079525b3c263aa70bbf7b748b3c
+TERMUX_PKG_SHA256=7e70870f8341e5ea228af2836ce79a36eefa11b01b56177b4a8997f330c014b8
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="leptonica, libandroid-glob, libandroid-posix-semaphore, libcpufeatures, libc++, libicu, libtool, libuuid, openmpi, pango, zstd"
 TERMUX_PKG_BREAKS="tesseract-dev"
@@ -17,6 +16,17 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DTESSDATA_PREFIX=$TERMUX_PREFIX/share
 -DOPENMP_BUILD=ON
 "
+
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=5
+
+	local v=$(sed -n 's/^\([^.]*\)\..*/\1/p' VERSION)
+	if [ "${_SOVERSION}" != "${v}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
 
 termux_step_pre_configure() {
 	LDFLAGS+=" -landroid-posix-semaphore"

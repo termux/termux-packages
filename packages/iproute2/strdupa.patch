@@ -22,6 +22,18 @@
  static int bond_parse_opt(struct link_util *lu, int argc, char **argv,
  			  struct nlmsghdr *n)
  {
+--- iproute2-v6.1.0/ip/iproute_lwtunnel.c.orig
++++ iproute2-v6.1.0/ip/iproute_lwtunnel.c
+@@ -185,6 +185,9 @@
+ 	return -1;
+ }
+ 
++#undef strdupa
++#define strdupa(s) strcpy(alloca(strlen(s) + 1), s)
++
+ static int parse_seg6local_flavors(const char *buf, __u32 *flv_mask)
+ {
+ 	unsigned char flavor_ok[SEG6_LOCAL_FLV_OP_MAX + 1] = { 0, };
 --- iproute2-5.15.0/lib/color.c.orig
 +++ iproute2-5.15.0/lib/color.c
 @@ -93,6 +93,9 @@

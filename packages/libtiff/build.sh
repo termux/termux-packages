@@ -1,11 +1,11 @@
 TERMUX_PKG_HOMEPAGE=http://www.simplesystems.org/libtiff/ # Note that http://libtiff.org/ is hijacked
 TERMUX_PKG_DESCRIPTION="Support for the Tag Image File Format (TIFF) for storing image data"
 TERMUX_PKG_LICENSE="custom"
-TERMUX_PKG_LICENSE_FILE="COPYRIGHT"
+TERMUX_PKG_LICENSE_FILE="LICENSE.md"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=4.4.0
+TERMUX_PKG_VERSION=4.5.0
 TERMUX_PKG_SRCURL=https://download.osgeo.org/libtiff/tiff-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=49307b510048ccc7bc40f2cba6e8439182fe6e654057c1a1683139bf2ecb1dc1
+TERMUX_PKG_SHA256=dafac979c5e7b6c650025569c5a4e720995ba5f17bc17e6276d1f12427be267c
 TERMUX_PKG_DEPENDS="libc++, libjpeg-turbo, liblzma, zlib, zstd"
 TERMUX_PKG_BREAKS="libtiff-dev"
 TERMUX_PKG_REPLACES="libtiff-dev"

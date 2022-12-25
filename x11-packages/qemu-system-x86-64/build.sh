@@ -2,11 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://www.qemu.org
 TERMUX_PKG_DESCRIPTION="A generic and open source machine emulator and virtualizer"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1:7.1.0
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=1:7.2.0
 TERMUX_PKG_SRCURL=https://download.qemu.org/qemu-${TERMUX_PKG_VERSION:2}.tar.xz
-TERMUX_PKG_SHA256=a0634e536bded57cf38ec8a751adb124b89c776fe0846f21ab6c6728f1cbbbe6
-TERMUX_PKG_DEPENDS="glib, gtk3, libbz2, libc++, libcurl, libgnutls, libiconv, libjpeg-turbo, liblzo, libnettle, libnfs, libpixman, libpng, libspice-server, libssh, libusb, libusbredir, libx11, ncurses, pulseaudio, qemu-common, resolv-conf, sdl2, sdl2-image, zlib, zstd"
+TERMUX_PKG_SHA256=5b49ce2687744dad494ae90a898c52204a3406e84d072482a1e1be854eeb2157
+TERMUX_PKG_DEPENDS="glib, gtk3, libbz2, libc++, libcurl, libgnutls, libiconv, libjpeg-turbo, liblzo, libnettle, libnfs, libpixman, libpng, libslirp, libspice-server, libssh, libusb, libusbredir, libx11, ncurses, pulseaudio, qemu-common, resolv-conf, sdl2, sdl2-image, zlib, zstd"
 
 # Required by configuration script, but I can't find any binary that uses it.
 TERMUX_PKG_BUILD_DEPENDS="libtasn1"
@@ -41,6 +40,29 @@ TERMUX_PKG_CONFLICTS="qemu-system-x86_64, qemu-system-x86_64-headless, qemu-syst
 TERMUX_PKG_REPLACES="qemu-system-x86_64, qemu-system-x86_64-headless, qemu-system-x86-64-headless"
 TERMUX_PKG_PROVIDES="qemu-system-x86_64"
 TERMUX_PKG_BUILD_IN_SRC=true
+
+termux_step_pre_configure() {
+	# Workaround for https://github.com/termux/termux-packages/issues/12261.
+	if [ $TERMUX_ARCH = "aarch64" ]; then
+		rm -f $TERMUX_PKG_BUILDDIR/_lib
+		mkdir -p $TERMUX_PKG_BUILDDIR/_lib
+
+		cd $TERMUX_PKG_BUILDDIR
+		mkdir -p _setjmp-aarch64
+		pushd _setjmp-aarch64
+		mkdir -p private
+		local s
+		for s in $TERMUX_PKG_BUILDER_DIR/setjmp-aarch64/{setjmp.S,private-*.h}; do
+			local f=$(basename ${s})
+			cp ${s} ./${f/-//}
+		done
+		$CC $CFLAGS $CPPFLAGS -I. setjmp.S -c
+		$AR cru $TERMUX_PKG_BUILDDIR/_lib/libandroid-setjmp.a setjmp.o
+		popd
+
+		LDFLAGS+=" -L$TERMUX_PKG_BUILDDIR/_lib -l:libandroid-setjmp.a"
+	fi
+}
 
 termux_step_configure() {
 	termux_setup_ninja
@@ -115,6 +137,7 @@ termux_step_configure() {
 		--enable-dmg \
 		--enable-parallels \
 		--enable-qed \
+		--enable-slirp \
 		--enable-spice \
 		--enable-libusb \
 		--enable-usb-redir \
