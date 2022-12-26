@@ -7,6 +7,8 @@
 [![Join the chat at https://gitter.im/termux/termux](https://badges.gitter.im/termux/termux.svg)](https://gitter.im/termux/termux)
 [![Join the Termux discord server](https://img.shields.io/discord/641256914684084234.svg?label=&logo=discord&logoColor=ffffff&color=5865F2)](https://discord.gg/HXpF69X)
 
+<img src=".github/static/hosted-by-hetzner.png" alt="Hosted by Hetzner" width="128px"></img>
+
 This project contains scripts and patches to build packages for the [Termux](https://github.com/termux/termux-app)
 Android application.
 
