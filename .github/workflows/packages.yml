@@ -75,7 +75,7 @@ jobs:
 
           # Build local Docker image if setup scripts were changed.
           # Useful for pull requests submitting changes for both build environment and packages.
-          if grep -qP '^scripts/(Dockerfile|setup-android-sdk\.sh|setup-ubuntu\.sh)$' <<< "$CHANGED_FILES"; then
+          if grep -qP '^scripts/(Dockerfile|properties\.sh|setup-android-sdk\.sh|setup-ubuntu\.sh)$' <<< "$CHANGED_FILES"; then
             echo "Detected changes for environment setup scripts. Building custom Docker image now."
             cd ./scripts
             docker build -t ghcr.io/termux/package-builder:latest .
@@ -285,52 +285,6 @@ jobs:
               if ! aptly_publish_repo; then
                 exit 1
               fi
-            fi
-          fi
-        done
-    - name: Upload to grimler.se
-      # Run even if upload to packages.termux.dev failed:
-      if: always()
-      env:
-        REPOSITORY_URL: https://aptly-api.grimler.se
-      run: |
-        GITHUB_SHA=${{ github.sha }}
-        APTLY_API_AUTH=${{ secrets.APTLY_API_AUTH }}
-
-        source scripts/aptly_api.sh
-
-        for repo in $(jq --raw-output 'keys | .[]' repo.json); do
-          export REPOSITORY_NAME=$(jq --raw-output '.["'$repo'"].name' repo.json)
-          export REPOSITORY_DISTRIBUTION=$(jq --raw-output '.["'$repo'"].distribution' repo.json)
-
-          # Upload file to temporary directory.
-          uploaded_files=false
-          shopt -s nullglob
-
-          if [ -f debs/built_${REPOSITORY_NAME}_packages.txt ]; then
-            for filename in $(cat debs/built_${REPOSITORY_NAME}_packages.txt | sed -E 's/(..*)/debs\/\1_\*.deb debs\/\1-static_\*.deb/g'); do
-              if ! aptly_upload_file "$filename"; then
-                exit 1
-              fi
-
-              uploaded_files=true
-            done
-            shopt -u nullglob
-
-            # Publishing repository changes.
-            if [ "$uploaded_files" = "true" ]; then
-              if ! aptly_add_to_repo; then
-                exit 1
-              fi
-
-              # Usually temporary directory is deleted automatically, but in certain cases it is left.
-              aptly_delete_dir
-
-              # grimler.se mirror is signed manually, can't publish
-              # through CI
-              # if ! aptly_publish_repo; then
-              #   exit 1
-              # fi
             fi
           fi
         done

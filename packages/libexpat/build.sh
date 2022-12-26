@@ -11,6 +11,20 @@ TERMUX_PKG_BREAKS="libexpat-dev"
 TERMUX_PKG_REPLACES="libexpat-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-xmlwf --without-docbook"
 
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=1
+
+	local a
+	for a in LIBCURRENT LIBAGE; do
+		local _${a}=$(sed -En 's/^'"${a}"'=([0-9]+).*/\1/p' configure.ac)
+	done
+	local v=$(( _LIBCURRENT - _LIBAGE ))
+	if [ "${v}" != "${_SOVERSION}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
 
 termux_step_post_make_install() {
 	sed  -r 's/.[0-9]+(\.[0-9]+)*//' -i $TERMUX_PREFIX/lib/cmake/expat-$TERMUX_PKG_VERSION/expat-noconfig.cmake

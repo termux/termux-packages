@@ -16,6 +16,15 @@
    'inotify_init1',
    'issetugid',
    'kevent',
+@@ -900,7 +898,7 @@
+                int main (int argc, char ** argv) {
+                  syscall (__NR_futex_time64, NULL, FUTEX_WAKE, FUTEX_WAIT);
+                  return 0;
+-               }''', name : 'futex(2) system call')
++               }''', name : 'futex(2) system call') and host_system != 'android'
+   glib_conf.set('HAVE_FUTEX_TIME64', 1)
+ endif
+ 
 @@ -907,7 +905,7 @@
                   syscall (SYS_pidfd_open, 0, 0);
                   waitid (P_PIDFD, 0, &child_info, WEXITED | WNOHANG);

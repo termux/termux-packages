@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Version 3.0.0 or higher does not work with vanilla wxWidgets.
 TERMUX_PKG_VERSION=2.4.2
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 _FFMPEG_VERSION=4.4.2
 TERMUX_PKG_SRCURL=(https://github.com/audacity/audacity/archive/Audacity-${TERMUX_PKG_VERSION}.tar.gz
                    https://www.ffmpeg.org/releases/ffmpeg-${_FFMPEG_VERSION}.tar.xz)

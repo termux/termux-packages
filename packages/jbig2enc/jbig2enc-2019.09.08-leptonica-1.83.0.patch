@@ -1,0 +1,42 @@
+--- a/src/jbig2.cc
++++ b/src/jbig2.cc
+@@ -29,6 +29,8 @@
+ #endif
+ 
+ #include <leptonica/allheaders.h>
++#include <leptonica/array_internal.h>
++#include <leptonica/pix_internal.h>
+ 
+ #include "jbig2enc.h"
+ 
+--- a/src/jbig2enc.cc
++++ b/src/jbig2enc.cc
+@@ -24,6 +24,8 @@
+ #include <string.h>
+ 
+ #include <leptonica/allheaders.h>
++#include <leptonica/array_internal.h>
++#include <leptonica/pix_internal.h>
+ 
+ #include <math.h>
+ #if defined(sun)
+@@ -206,7 +208,7 @@
+         numaSetValue(ctx->classer->naclass, i, new_representant);
+       }
+     }
+-    pixChangeRefcount(ctx->classer->pixat->pix[new_representant],pixGetRefcount(ctx->classer->pixat->pix[second_template]));
++    ctx->classer->pixat->pix[new_representant]->refcount += ctx->classer->pixat->pix[second_template]->refcount;
+   }
+   return 0;
+ }
+--- a/src/jbig2sym.cc
++++ b/src/jbig2sym.cc
+@@ -29,6 +29,8 @@
+ #include <stdio.h>
+ 
+ #include <leptonica/allheaders.h>
++#include <leptonica/array_internal.h>
++#include <leptonica/pix_internal.h>
+ 
+ #include <math.h>
+ 

@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="X virtual framebuffer"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.20.14
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/xserver/xorg-server-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=5cc5b70b9be89443e2594b93656c60bd5e82cd7f01deb4ce4faf81dcf546a16b
 
@@ -22,10 +22,10 @@ ac_cv_path_RAWCPP=/usr/bin/cpp
 --enable-dga
 --enable-screensaver
 --enable-xdmcp
---disable-glx
+--enable-glx
 --disable-dri
 --disable-dri2
---disable-dri3
+--enable-dri3
 --enable-present
 --enable-xinerama
 --enable-xf86vidmode

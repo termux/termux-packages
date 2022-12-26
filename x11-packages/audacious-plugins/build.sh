@@ -6,6 +6,7 @@ TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="COPYING"
 TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
 TERMUX_PKG_VERSION=4.2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://distfiles.audacious-media-player.org/audacious-plugins-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=6fa0f69c3a1041eb877c37109513ab4a2a0a56a77d9e8c13a1581cf1439a417f
 TERMUX_PKG_DEPENDS="audacious, ffmpeg, fluidsynth, glib, libc++, libcue, libcurl, libflac, libmp3lame, libogg, libsndfile, libsoxr, libvorbis, libx11, libxml2, mpg123, pulseaudio, qt5-qtbase, qt5-qtmultimedia, qt5-qtx11extras, zlib"

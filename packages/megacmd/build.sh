@@ -3,9 +3,11 @@ TERMUX_PKG_DESCRIPTION="Provides non UI access to MEGA services"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.5.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/meganz/MEGAcmd.git
 TERMUX_PKG_GIT_BRANCH=${TERMUX_PKG_VERSION}_Linux
-TERMUX_PKG_DEPENDS="c-ares, cryptopp, ffmpeg, freeimage, libc++, libcurl, libsodium, libsqlite, libuv, mediainfo, openssl, pcre, readline, zlib"
+# dbus is required for $PREFIX/var/lib/dbus/machine-id
+TERMUX_PKG_DEPENDS="c-ares, cryptopp, dbus, ffmpeg, freeimage, libc++, libcurl, libsodium, libsqlite, libuv, mediainfo, openssl, pcre, readline, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-static
@@ -33,4 +35,8 @@ termux_step_post_make_install() {
 	if [ $_NEED_DUMMY_LIBPTHREAD_A ]; then
 		rm -f $_LIBPTHREAD_A
 	fi
+}
+
+termux_step_post_massage() {
+	find lib -name '*.la' -delete
 }

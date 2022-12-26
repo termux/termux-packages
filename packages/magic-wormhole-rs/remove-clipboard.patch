@@ -1,25 +1,22 @@
-diff --git a/cli/Cargo.toml b/cli/Cargo.toml
-index a613541..d1b903f 100644
 --- a/cli/Cargo.toml
 +++ b/cli/Cargo.toml
-@@ -22,4 +22,3 @@ dialoguer = "0.10.0"
+@@ -23,5 +23,4 @@ dialoguer = "0.10.0"
  color-eyre = "0.6.0"
  number_prefix = "0.4.0"
  ctrlc = "3.2.1"
--cli-clipboard = { git = "https://github.com/ActuallyAllie/cli-clipboard" }
-diff --git a/cli/src/main.rs b/cli/src/main.rs
-index 86d3150..9cb822e 100644
+-cli-clipboard = "0.4.0"
+ qr2term = "0.3.0"
 --- a/cli/src/main.rs
 +++ b/cli/src/main.rs
 @@ -8,7 +8,6 @@ use std::{
  
  use async_std::{fs::OpenOptions, sync::Arc};
- use clap::{crate_description, crate_name, crate_version, Arg, Args, Command, Parser, Subcommand};
+ use clap::{Args, CommandFactory, Parser, Subcommand};
 -use cli_clipboard::{ClipboardContext, ClipboardProvider};
  use color_eyre::{eyre, eyre::Context};
  use console::{style, Term};
  use futures::{future::Either, Future, FutureExt};
-@@ -276,12 +275,6 @@ async fn main() -> eyre::Result<()> {
+@@ -283,12 +282,6 @@ async fn main() -> eyre::Result<()> {
              .try_init()?;
      }
  
@@ -32,55 +29,55 @@ index 86d3150..9cb822e 100644
      let concat_file_name = |file_path: &Path, file_name: Option<_>| {
          // TODO this has gotten out of hand (it ugly)
          // The correct solution would be to make `file_name` an Option everywhere and
-@@ -330,7 +323,6 @@ async fn main() -> eyre::Result<()> {
+@@ -337,7 +330,6 @@ async fn main() -> eyre::Result<()> {
                      true,
                      transfer::APP_CONFIG,
                      Some(&sender_print_code),
 -                    clipboard.as_mut(),
-                 ),
+                 )),
                  ctrl_c(),
              )
-@@ -368,7 +360,6 @@ async fn main() -> eyre::Result<()> {
+@@ -375,7 +367,6 @@ async fn main() -> eyre::Result<()> {
                      true,
                      transfer::APP_CONFIG,
                      Some(&sender_print_code),
 -                    clipboard.as_mut(),
-                 );
-                 futures::pin_mut!(connect_fut);
+                 ));
                  match futures::future::select(connect_fut, ctrl_c()).await {
-@@ -415,7 +406,6 @@ async fn main() -> eyre::Result<()> {
+                     Either::Left((result, _)) => result?,
+@@ -421,7 +412,6 @@ async fn main() -> eyre::Result<()> {
                      false,
                      transfer::APP_CONFIG,
                      None,
 -                    clipboard.as_mut(),
-                 );
-                 futures::pin_mut!(connect_fut);
+                 ));
                  match futures::future::select(connect_fut, ctrl_c()).await {
-@@ -491,7 +481,6 @@ async fn main() -> eyre::Result<()> {
+                     Either::Left((result, _)) => result?,
+@@ -496,7 +486,6 @@ async fn main() -> eyre::Result<()> {
                      true,
                      app_config,
                      Some(&server_print_code),
 -                    clipboard.as_mut(),
-                 );
-                 futures::pin_mut!(connect_fut);
-                 let (wormhole, _code, relay_server) =
-@@ -529,7 +518,6 @@ async fn main() -> eyre::Result<()> {
+                 ));
+                 let (wormhole, _code, relay_hints) =
+                     match futures::future::select(connect_fut, ctrl_c()).await {
+@@ -532,7 +521,6 @@ async fn main() -> eyre::Result<()> {
                  false,
                  app_config,
                  None,
 -                clipboard.as_mut(),
              )
              .await?;
-             let relay_server = vec![transit::RelayHint::from_urls(None, [relay_server])];
-@@ -587,7 +575,6 @@ async fn parse_and_connect(
-     is_send: bool,
-     mut app_config: magic_wormhole::AppConfig<impl serde::Serialize + Send + Sync + 'static>,
-     print_code: Option<&dyn Fn(&mut Term, &magic_wormhole::Code) -> eyre::Result<()>>,
+ 
+@@ -618,7 +606,6 @@ async fn parse_and_connect(
+     print_code: Option<
+         &dyn Fn(&mut Term, &magic_wormhole::Code, &Option<url::Url>) -> eyre::Result<()>,
+     >,
 -    clipboard: Option<&mut ClipboardContext>,
- ) -> eyre::Result<(Wormhole, magic_wormhole::Code, url::Url)> {
-     // TODO handle multiple relay servers correctly
-     let relay_server: url::Url = common_args
-@@ -626,15 +613,8 @@ async fn parse_and_connect(
+ ) -> eyre::Result<(Wormhole, magic_wormhole::Code, Vec<transit::RelayHint>)> {
+     // TODO handle relay servers with multiple endpoints better
+     let mut relay_hints: Vec<transit::RelayHint> = common_args
+@@ -666,15 +653,8 @@ async fn parse_and_connect(
              let (server_welcome, connector) =
                  magic_wormhole::Wormhole::connect_without_code(app_config, numwords).await?;
              print_welcome(term, &server_welcome)?;

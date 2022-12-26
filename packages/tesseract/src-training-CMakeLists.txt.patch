@@ -1,7 +1,7 @@
 diff -uNr tesseract-5.2.0/src/training/CMakeLists.txt tesseract-5.2.0.mod/src/training/CMakeLists.txt
 --- tesseract-5.2.0/src/training/CMakeLists.txt	2022-07-07 05:15:49.000000000 +0900
 +++ tesseract-5.2.0.mod/src/training/CMakeLists.txt	2022-09-30 13:12:18.222593892 +0900
-@@ -108,13 +108,14 @@
+@@ -115,7 +115,7 @@
      common/trainingsampleset.h)
  endif()
  
@@ -10,13 +10,6 @@ diff -uNr tesseract-5.2.0/src/training/CMakeLists.txt tesseract-5.2.0.mod/src/tr
  target_include_directories(common_training PUBLIC common
                                                    ${CMAKE_CURRENT_BINARY_DIR})
  target_link_libraries(common_training PUBLIC libtesseract)
- generate_export_header(common_training EXPORT_MACRO_NAME
-                        TESS_COMMON_TRAINING_API)
- project_group(common_training "Training Tools")
-+install(TARGETS common_training DESTINATION lib)
- 
- # ##############################################################################
- # EXECUTABLE ambiguous_words
 @@ -242,7 +243,7 @@
  
    file(GLOB unicharset_training_src unicharset/*)
@@ -30,8 +23,8 @@ diff -uNr tesseract-5.2.0/src/training/CMakeLists.txt tesseract-5.2.0.mod/src/tr
                                                         PkgConfig::ICU)
      else()
        target_link_libraries(unicharset_training PUBLIC common_training
--                                                       ${ICU_LINK_LIBRARIES})
-+                                                       ${ICU_LINK_LIBRARIES} libandroid-glob.so)
+-                                                       ${ICU_LIBRARIES})
++                                                       ${ICU_LIBRARIES} libandroid-glob.so)
      endif()
    endif()
    target_include_directories(unicharset_training

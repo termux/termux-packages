@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://curl.se/
 TERMUX_PKG_DESCRIPTION="Easy-to-use client-side URL transfer library"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="7.86.0"
+TERMUX_PKG_VERSION="7.87.0"
 TERMUX_PKG_SRCURL=https://github.com/curl/curl/releases/download/curl-${TERMUX_PKG_VERSION//./_}/curl-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=2d61116e5f485581f6d59865377df4463f2e788677ac43222b496d4e49fb627b
+TERMUX_PKG_SHA256=ee5f1a1955b0ed413435ef79db28b834ea5f0fb7c8cfb1ce47175cc3bee08fff
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+.\d+.\d+"
 TERMUX_PKG_DEPENDS="libnghttp2, libssh2, openssl (>= 3.0.3), zlib"
@@ -30,6 +30,22 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 # Support for http/2 as added in version 1.4.8-8 of the apt package, so we
 # conflict with previous versions to avoid broken installations.
 TERMUX_PKG_CONFLICTS="apt (<< 1.4.8-8)"
+
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=4
+
+	local a
+	for a in VERSIONCHANGE VERSIONDEL; do
+		local _${a}=$(sed -En 's/^'"${a}"'=([0-9]+).*/\1/p' \
+				lib/Makefile.soname)
+	done
+	local v=$(( _VERSIONCHANGE - _VERSIONDEL ))
+	if [ "${v}" != "${_SOVERSION}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
 
 termux_step_pre_configure() {
 	LDFLAGS+=" -Wl,-z,nodelete"

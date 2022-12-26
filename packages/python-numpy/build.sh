@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://numpy.org/
 TERMUX_PKG_DESCRIPTION="The fundamental package for scientific computing with Python"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.23.5"
+TERMUX_PKG_VERSION="1.24.1"
 TERMUX_PKG_SRCURL=https://github.com/numpy/numpy.git
-TERMUX_PKG_DEPENDS="libc++, libopenblas, python"
+TERMUX_PKG_DEPENDS="libandroid-complex-math, libc++, libopenblas, python"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
@@ -31,7 +31,7 @@ termux_step_configure() {
 	. ${_CROSSENV_PREFIX}/bin/activate
 	build-pip install wheel
 
-	LDFLAGS+=" -lpython${_PYTHON_VERSION} -lm"
+	LDFLAGS+=" -lpython${_PYTHON_VERSION} -landroid-complex-math -lm"
 
 	build-pip install pybind11 Cython pythran wheel
 }

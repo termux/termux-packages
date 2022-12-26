@@ -1,0 +1,11 @@
+--- a/glib/gthread-posix.c
++++ b/glib/gthread-posix.c
+@@ -1647,7 +1647,7 @@
+   sampled = cond->i[0];
+   g_mutex_unlock (mutex);
+ 
+-#ifdef __NR_futex_time64
++#if defined __NR_futex_time64 && !defined __ANDROID__
+   {
+     struct
+     {

@@ -2,20 +2,18 @@ TERMUX_PKG_HOMEPAGE=https://gitlab.com/volian/nala
 TERMUX_PKG_DESCRIPTION="Commandline frontend for the apt package manager"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.11.1
+TERMUX_PKG_VERSION=0.12.0
 TERMUX_PKG_SRCURL=https://gitlab.com/volian/nala/-/archive/v${TERMUX_PKG_VERSION}/nala-v${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=4ce87d75e785e45b1638817077797a3fcd4a15059615455fc1af0127c70cf5cd
+TERMUX_PKG_SHA256=fbd8d35759cb17045ae31766ef94d35ab8009dc0d52759e9fd1d4a5f8a3420b3
 TERMUX_PKG_DEPENDS="python-apt"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_pre_configure() {
-	_PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
+	rm -rf nala/__init__.py.orig
 
-	TERMUX_PKG_RM_AFTER_INSTALL="
-	lib/python${_PYTHON_VERSION}/site-packages/nala/__pycache__
-	"
+	_PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
 
 	termux_setup_python_crossenv
 	pushd $TERMUX_PYTHON_CROSSENV_SRCDIR
@@ -30,7 +28,7 @@ termux_step_pre_configure() {
 }
 
 termux_step_make_install() {
-	python${_PYTHON_VERSION} -m pip install . --no-deps --prefix $TERMUX_PREFIX
+	pip install . --no-deps --prefix $TERMUX_PREFIX
 	install -Dm600 -t $TERMUX_PREFIX/etc/nala debian/nala.conf
 }
 

@@ -25,13 +25,13 @@ diff -uNr ruby-3.0.0/dln_find.c ruby-3.0.0.mod/dln_find.c
 @@ -72,10 +72,7 @@
  
      if (!path) {
- 	path =
--	    "/usr/local/bin" PATH_SEP
--	    "/usr/ucb" PATH_SEP
--	    "/usr/bin" PATH_SEP
--	    "/bin" PATH_SEP
-+        "@TERMUX_PREFIX@/bin" PATH_SEP
- 	    ".";
+         path =
+-            "/usr/local/bin" PATH_SEP
+-            "/usr/ucb" PATH_SEP
+-            "/usr/bin" PATH_SEP
+-            "/bin" PATH_SEP
++            "@TERMUX_PREFIX@/bin" PATH_SEP
+             ".";
      }
      buf = dln_find_1(fname, path, buf, size, 1 DLN_FIND_EXTRA_ARG);
 diff -uNr ruby-3.0.0/ext/etc/etc.c ruby-3.0.0.mod/ext/etc/etc.c
@@ -46,20 +46,6 @@ diff -uNr ruby-3.0.0/ext/etc/etc.c ruby-3.0.0.mod/ext/etc/etc.c
      const char *tmpstr = default_tmp;
      size_t tmplen = strlen(default_tmp);
  # if defined _CS_DARWIN_USER_TEMP_DIR
-diff -uNr ruby-3.0.0/ext/fiddle/libffi-3.2.1/src/closures.c ruby-3.0.0.mod/ext/fiddle/libffi-3.2.1/src/closures.c
---- ruby-3.0.0/ext/fiddle/libffi-3.2.1/src/closures.c	2014-11-08 14:47:24.000000000 +0200
-+++ ruby-3.0.0.mod/ext/fiddle/libffi-3.2.1/src/closures.c	2021-02-09 17:40:07.564105731 +0200
-@@ -391,8 +391,8 @@
-   int repeat;
- } open_temp_exec_file_opts[] = {
-   { open_temp_exec_file_env, "TMPDIR", 0 },
--  { open_temp_exec_file_dir, "/tmp", 0 },
--  { open_temp_exec_file_dir, "/var/tmp", 0 },
-+  { open_temp_exec_file_dir, "@TERMUX_PREFIX@/tmp", 0 },
-+  { open_temp_exec_file_dir, "@TERMUX_PREFIX@/var/tmp", 0 },
-   { open_temp_exec_file_dir, "/dev/shm", 0 },
-   { open_temp_exec_file_env, "HOME", 0 },
- #ifdef HAVE_MNTENT
 diff -uNr ruby-3.0.0/ext/pty/pty.c ruby-3.0.0.mod/ext/pty/pty.c
 --- ruby-3.0.0/ext/pty/pty.c	2020-12-25 05:33:01.000000000 +0200
 +++ ruby-3.0.0.mod/ext/pty/pty.c	2021-02-09 17:45:16.473977053 +0200
@@ -67,11 +53,11 @@ diff -uNr ruby-3.0.0/ext/pty/pty.c ruby-3.0.0.mod/ext/pty/pty.c
      char		errbuf[32];
  
      if (argc == 0) {
--	const char *shellname = "/bin/sh";
-+	const char *shellname = "@TERMUX_PREFIX@/bin/sh";
+-        const char *shellname = "/bin/sh";
++        const char *shellname = "@TERMUX_PREFIX@/bin/sh";
  
- 	if ((p = getenv("SHELL")) != NULL) {
- 	    shellname = p;
+         if ((p = getenv("SHELL")) != NULL) {
+             shellname = p;
 diff -uNr ruby-3.0.0/hash.c ruby-3.0.0.mod/hash.c
 --- ruby-3.0.0/hash.c	2020-12-25 05:33:01.000000000 +0200
 +++ ruby-3.0.0.mod/hash.c	2021-02-09 17:43:01.683876134 +0200
@@ -172,6 +158,15 @@ diff -uNr ruby-3.0.0/mjit.c ruby-3.0.0.mod/mjit.c
  # undef RETURN_ENV
  }
  
+@@ -1741,7 +1741,7 @@
+     M("--mjit-warnings",           "", "Enable printing JIT warnings"),
+     M("--mjit-debug",              "", "Enable JIT debugging (very slow), or add cflags if specified"),
+     M("--mjit-wait",               "", "Wait until JIT compilation finishes every time (for testing)"),
+-    M("--mjit-save-temps",         "", "Save JIT temporary files in $TMP or /tmp (for testing)"),
++    M("--mjit-save-temps",         "", "Save JIT temporary files in $TMP or @TERMUX_PREFIX@/tmp (for testing)"),
+     M("--mjit-verbose=num",        "", "Print JIT logs of level num or less to stderr (default: 0)"),
+     M("--mjit-max-cache=num",      "", "Max number of methods to be JIT-ed in a cache (default: "
+       STRINGIZE(DEFAULT_MAX_CACHE_SIZE) ")"),
 diff -uNr ruby-3.0.0/process.c ruby-3.0.0.mod/process.c
 --- ruby-3.0.0/process.c	2020-12-25 05:33:01.000000000 +0200
 +++ ruby-3.0.0.mod/process.c	2021-02-09 17:49:30.716668413 +0200
@@ -202,24 +197,15 @@ diff -uNr ruby-3.0.0/process.c ruby-3.0.0.mod/process.c
 diff -uNr ruby-3.1.0/ruby.c ruby-3.1.0.mod/ruby.c
 --- ruby-3.1.0/ruby.c
 +++ ruby-3.1.0.mod/ruby.c
-@@ -359,7 +359,7 @@
-         M("--mjit-warnings",      "", "Enable printing JIT warnings"),
-         M("--mjit-debug",         "", "Enable JIT debugging (very slow), or add cflags if specified"),
-         M("--mjit-wait",          "", "Wait until JIT compilation finishes every time (for testing)"),
--        M("--mjit-save-temps",    "", "Save JIT temporary files in $TMP or /tmp (for testing)"),
-+        M("--mjit-save-temps",    "", "Save JIT temporary files in $TMP or @TERMUX_PREFIX@/tmp (for testing)"),
-         M("--mjit-verbose=num",   "", "Print JIT logs of level num or less to stderr (default: 0)"),
-         M("--mjit-max-cache=num", "", "Max number of methods to be JIT-ed in a cache (default: 100)"),
-         M("--mjit-min-calls=num", "", "Number of calls to trigger JIT (for testing, default: 10000)"),
 @@ -684,7 +684,7 @@
- 	    RUBY_ARCH_PATH;
- 	const ptrdiff_t libdir_len = (ptrdiff_t)sizeof(libdir)
- 	    - rb_strlen_lit(RUBY_ARCH_PATH) - 1;
--	static const char bindir[] = "/bin";
-+	static const char bindir[] = "@TERMUX_PREFIX@/bin";
- 	const ptrdiff_t bindir_len = (ptrdiff_t)sizeof(bindir) - 1;
+             RUBY_ARCH_PATH;
+         const ptrdiff_t libdir_len = (ptrdiff_t)sizeof(libdir)
+             - rb_strlen_lit(RUBY_ARCH_PATH) - 1;
+-        static const char bindir[] = "/bin";
++        static const char bindir[] = "@TERMUX_PREFIX@/bin";
+         const ptrdiff_t bindir_len = (ptrdiff_t)sizeof(bindir) - 1;
  
- 	const char *p2 = NULL;
+         const char *p2 = NULL;
 diff -uNr ruby-3.0.0/spec/bundler/commands/exec_spec.rb ruby-3.0.0.mod/spec/bundler/commands/exec_spec.rb
 --- ruby-3.0.0/spec/bundler/commands/exec_spec.rb	2020-12-25 05:33:01.000000000 +0200
 +++ ruby-3.0.0.mod/spec/bundler/commands/exec_spec.rb	2021-02-09 17:50:58.332721054 +0200
