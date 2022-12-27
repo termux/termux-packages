@@ -12,6 +12,24 @@ TERMUX_PKG_REPLACES="openjpeg-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DBUILD_STATIC_LIBS=OFF"
 # for fast building packages that depend on openjpeg with cmake
 
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _MAJOR_VERSION=2
+	local _SOVERSION=7
+
+	case "$TERMUX_PKG_VERSION" in
+		${_MAJOR_VERSION}.*|*:${_MAJOR_VERSION}.* ) ;;
+		* ) termux_error_exit "Version guard check failed." ;;
+	esac
+
+	local v=$(sed -En 's/^.*set\(OPENJPEG_SOVERSION ([0-9]+).*$/\1/p' \
+			CMakeLists.txt)
+	if [ "${v}" != "${_SOVERSION}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
+
 termux_step_pre_configure() {
 	# Certain packages are not safe to build on device because their
 	# build.sh script deletes specific files in $TERMUX_PREFIX.
