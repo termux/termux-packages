@@ -18,6 +18,20 @@ TERMUX_PKG_RM_AFTER_INSTALL="bin/ share/man/man1/"
 
 termux_step_post_get_source() {
 	rm -f CMakeLists.txt
+
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=1
+
+	local a
+	for a in LT_CURRENT LT_AGE; do
+		local _${a}=$(sed -En 's/^m4_define\(\['"${a,,}"'\],\s*\[([0-9]+)\].*/\1/p' \
+				configure.ac)
+	done
+	local v=$(( _LT_CURRENT - _LT_AGE ))
+	if [ "${v}" != "${_SOVERSION}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
 }
 
 termux_step_pre_configure() {
