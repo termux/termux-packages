@@ -7,3 +7,14 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="@termux"
 
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=5
+
+	local e=$(sed -En 's/^LTVERSION="?([0-9]+):([0-9]+):([0-9]+).*/\1-\3/p' \
+			configure.ac)
+	if [ ! "${e}" ] || [ "${_SOVERSION}" != "$(( "${e}" ))" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
