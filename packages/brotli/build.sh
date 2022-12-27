@@ -11,6 +11,21 @@ TERMUX_PKG_BREAKS="brotli-dev"
 TERMUX_PKG_REPLACES="brotli-dev"
 TERMUX_PKG_FORCE_CMAKE=true
 
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=1
+
+	local _ABI_VERSION=$(sed -En 's/^#define BROTLI_ABI_VERSION (0x[0-9a-fA-F]+)$/\1/p' \
+			c/common/version.h)
+	local _ABI_CURRENT=$(( _ABI_VERSION >> 24 ))
+	local _ABI_AGE=$(( _ABI_VERSION & 4095 ))
+	local v=$(( _ABI_CURRENT - _ABI_AGE ))
+	if [ ! "${_ABI_VERSION}" ] || [ "${v}" != "${_SOVERSION}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
+
 termux_step_post_make_install() {
 	mkdir -p $TERMUX_PREFIX/share/man/man{1,3}
 	cp $TERMUX_PKG_SRCDIR/docs/brotli.1 $TERMUX_PREFIX/share/man/man1/
