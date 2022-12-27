@@ -11,3 +11,15 @@ TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_BREAKS="libgraphite-dev"
 TERMUX_PKG_REPLACES="libgraphite-dev"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/gr2fonttest"
+
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=3
+
+	local v=$(sed -En 's/^set\(GRAPHITE_API_CURRENT\s+([0-9]+).*/\1/p' \
+			src/CMakeLists.txt)
+	if [ "${v}" != "${_SOVERSION}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
