@@ -14,3 +14,15 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DENABLE_MBEDTLS=NO
 -DENABLE_OPENSSL=YES
 "
+
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=5
+
+	local v=$(sed -En 's/^\s*set_target_properties\(zip\s+.*\s+SOVERSION\s+([0-9]+).*/\1/p' \
+			lib/CMakeLists.txt)
+	if [ "${v}" != "${_SOVERSION}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
