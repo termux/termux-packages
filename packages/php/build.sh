@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Server-side, HTML-embedded scripting language"
 TERMUX_PKG_LICENSE="PHP-3.01"
 TERMUX_PKG_LICENSE_FILE=LICENSE
 TERMUX_PKG_MAINTAINER="@termux"
+# Please bump php-* addons on package updates
 TERMUX_PKG_VERSION=8.2.0
 TERMUX_PKG_SRCURL=https://github.com/php/php-src/archive/php-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=e6e9d2dd5b7981ecaefcebda330dde40b884f05d1431c7c86ea1a7ee5aaad649
