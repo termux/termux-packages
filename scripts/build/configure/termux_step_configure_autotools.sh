@@ -113,6 +113,5 @@ termux_step_configure_autotools() {
 		$ENABLE_SHARED \
 		$ENABLE_STATIC \
 		$LIBEXEC_FLAG \
-		$QUIET_BUILD \
-		|| (cat config.log && false)
+		$QUIET_BUILD
 }
