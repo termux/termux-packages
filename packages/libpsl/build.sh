@@ -10,6 +10,18 @@ TERMUX_PKG_DEPENDS="libidn2, libunistring"
 TERMUX_PKG_BREAKS="libpsl-dev"
 TERMUX_PKG_REPLACES="libpsl-dev"
 
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=5
+
+	local e=$(sed -En 's/^([0-9]+):([0-9]+):([0-9]+).*/\1-\3/p' \
+			libtool_version_info.txt)
+	if [ ! "${e}" ] || [ "${_SOVERSION}" != "$(( "${e}" ))" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
+
 termux_step_pre_configure() {
 	autoreconf -fiv
 }
