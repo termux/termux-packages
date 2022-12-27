@@ -16,3 +16,15 @@ termux_step_post_make_install() {
 	make -j $TERMUX_MAKE_PROCESSES -C contrib/pzstd
 	make -j $TERMUX_MAKE_PROCESSES -C contrib/pzstd install
 }
+
+termux_step_post_massage() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION_GUARD_FILES="lib/libzstd.so.1"
+	local f
+	for f in ${_SOVERSION_GUARD_FILES}; do
+		if [ ! -e "${f}" ]; then
+			termux_error_exit "SOVERSION guard check failed."
+		fi
+	done
+}
