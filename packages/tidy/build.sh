@@ -13,6 +13,22 @@ TERMUX_PKG_BREAKS="tidy-dev"
 TERMUX_PKG_REPLACES="tidy-dev"
 TERMUX_PKG_HOSTBUILD=true
 
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=58
+
+	local _MAJOR=$(echo ${TERMUX_PKG_VERSION#*:} | cut -d . -f 1)
+	local _MINOR=$(echo ${TERMUX_PKG_VERSION#*:} | cut -d . -f 2)
+	local v=
+	if [ $(( _MINOR % 2 )) == 0 ]; then
+		v="${_MAJOR}${_MINOR}"
+	fi
+	if [ "${v}" != "${_SOVERSION}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
+
 termux_step_host_build() {
 	## Host build required to generate man pages.
 	termux_setup_cmake
