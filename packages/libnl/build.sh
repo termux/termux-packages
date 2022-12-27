@@ -15,6 +15,23 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-cli
 "
 
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after RELEASE / SOVERSION is changed.
+	local _RELEASE=3
+	local _SOVERSION=200
+
+	for a in MAJOR_VERSION LT_CURRENT LT_AGE; do
+		local _${a}=$(sed -En 's/^m4_define\(\[libnl_'"${a,,}"'\],\s*\[([0-9]+).*/\1/p' \
+				configure.ac)
+	done
+	local v=$(( _LT_CURRENT - _LT_AGE ))
+	if [ "${_RELEASE}" != "${_MAJOR_VERSION}" ] || \
+		[ ! "${_LT_CURRENT}" ] || [ "${_SOVERSION}" != "${v}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
+
 termux_step_pre_configure() {
 	CFLAGS+=" -Dsockaddr_storage=__kernel_sockaddr_storage"
 }
