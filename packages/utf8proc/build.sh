@@ -10,6 +10,17 @@ TERMUX_PKG_BREAKS="utf8proc-dev"
 TERMUX_PKG_REPLACES="utf8proc-dev"
 TERMUX_PKG_BUILD_IN_SRC=true
 
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=2
+
+	local v=$(sed -En 's/^MAJOR=([0-9]+).*/\1/p' Makefile)
+	if [ "${v}" != "${_SOVERSION}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
+
 termux_step_pre_configure() {
 	rm $TERMUX_PKG_SRCDIR/CMakeLists.txt
 }
