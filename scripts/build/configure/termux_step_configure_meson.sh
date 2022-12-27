@@ -8,5 +8,10 @@ termux_step_configure_meson() {
 		--libdir lib \
 		--buildtype minsize \
 		--strip \
-		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
+		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS \
+		|| (termux_step_configure_meson_failure_hook && false)
+}
+
+termux_step_configure_meson_failure_hook() {
+	false
 }

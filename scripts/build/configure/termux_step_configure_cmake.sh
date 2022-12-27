@@ -47,5 +47,10 @@ termux_step_configure_cmake() {
 		-DDOXYGEN_EXECUTABLE= \
 		-DBUILD_TESTING=OFF \
 		"${CMAKE_ADDITIONAL_ARGS[@]}" \
-		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
+		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS \
+		|| (termux_step_configure_cmake_failure_hook && false)
+}
+
+termux_step_configure_cmake_failure_hook() {
+	false
 }

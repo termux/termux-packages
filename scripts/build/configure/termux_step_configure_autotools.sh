@@ -113,5 +113,10 @@ termux_step_configure_autotools() {
 		$ENABLE_SHARED \
 		$ENABLE_STATIC \
 		$LIBEXEC_FLAG \
-		$QUIET_BUILD
+		$QUIET_BUILD \
+		|| (termux_step_configure_autotools_failure_hook && false)
+}
+
+termux_step_configure_autotools_failure_hook() {
+	false
 }
