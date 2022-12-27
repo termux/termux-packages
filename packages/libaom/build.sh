@@ -14,11 +14,15 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_pre_configure() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them
 	# after SOVERSION is changed.
-	# Not exactly the same as the SOVERSION though.
-	local _MAJOR_VERSION=3
+	local _SOVERSION=3
 
-	case "$TERMUX_PKG_VERSION" in
-		${_MAJOR_VERSION}.*|*:${_MAJOR_VERSION}.* ) ;;
-		* ) termux_error_exit "SOVERSION check failed." ;;
-	esac
+	local a
+	for a in LT_CURRENT LT_AGE; do
+		local _${a}=$(sed -En 's/^set\('"${a}"'\s+([0-9]+).*/\1/p' \
+				CMakeLists.txt)
+	done
+	local v=$(( _LT_CURRENT - _LT_AGE ))
+	if [ "${v}" != "${_SOVERSION}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
 }
