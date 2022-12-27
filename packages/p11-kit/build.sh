@@ -8,3 +8,19 @@ TERMUX_PKG_SHA256=d8be783efd5cd4ae534cee4132338e3f40f182c3205d23b200094ec85faaae
 TERMUX_PKG_DEPENDS="gettext, libffi, libtasn1"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-trust-paths --disable-static"
 TERMUX_PKG_AUTO_UPDATE=true
+
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=0
+
+	local a
+	for a in CURRENT AGE; do
+		local _LT_${a}=$(sed -En 's/^P11KIT_'"${a}"'=([0-9]+).*/\1/p' \
+				configure.ac)
+	done
+	local v=$(( _LT_CURRENT - _LT_AGE ))
+	if [ ! "${_LT_CURRENT}" ] || [ "${v}" != "${_SOVERSION}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
