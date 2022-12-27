@@ -49,6 +49,17 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-render-d3d
 "
 
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=0
+
+	local v=$(sed -En 's/^LT_MAJOR=([0-9]+).*/\1/p' configure.ac)
+	if [ "${v}" != "${_SOVERSION}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
+
 termux_step_pre_configure() {
 	rm -rf "$TERMUX_PKG_SRCDIR"/Xcode-iOS
 	find "$TERMUX_PKG_SRCDIR" -type f | \
