@@ -19,8 +19,18 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_massage() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION_GUARD_FILES="lib/libheif.so.1"
+	local f
+	for f in ${_SOVERSION_GUARD_FILES}; do
+		if [ ! -e "${f}" ]; then
+			termux_error_exit "SOVERSION guard check failed."
+		fi
+	done
+
 	# Check if SONAME is properly set:
-	if readelf -d lib/libheif.so | grep -q '(SONAME).*\[libheif\.so\]'; then
+	if ! readelf -d lib/libheif.so | grep -q '(SONAME).*\[libheif\.so\.'; then
 		termux_error_exit "SONAME for libheif.so is not properly set."
 	fi
 }
