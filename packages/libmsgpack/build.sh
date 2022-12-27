@@ -26,3 +26,15 @@ termux_pkg_auto_update() {
 		echo "WARNING: Skipping auto-update: Not a C release($tag)"
 	fi
 }
+
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=2
+
+	local v=$(sed -En 's/^\s*SET_TARGET_PROPERTIES\s*\(msgpackc\s+.*\s+SOVERSION\s+([0-9]+).*/\1/p' \
+			CMakeLists.txt)
+	if [ "${v}" != "${_SOVERSION}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
