@@ -3,11 +3,11 @@ TERMUX_PKG_DESCRIPTION="A modern replacement for ls"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.10.1
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://github.com/ogham/exa/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=ff0fa0bfc4edef8bdbbb3cabe6fdbd5481a71abbbcc2159f402dea515353ae7c
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="zlib, libgit2"
+TERMUX_PKG_DEPENDS="libgit2"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
