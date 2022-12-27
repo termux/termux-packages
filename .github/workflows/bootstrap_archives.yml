@@ -56,7 +56,7 @@ jobs:
           checksums="${checksums//'%'/'%25'}"
           checksums="${checksums//$'\n'/'%0A'}"
           checksums="${checksums//$'\r'/'%0D'}"
-          echo "::set-output name=checksums::$checksums"
+          echo "checksums=$checksums" >> $GITHUB_OUTPUT
       - name: Create new tag
         id: get_tag
         run: |
@@ -70,7 +70,7 @@ jobs:
           new_tag="${new_tag}-r${tag_rev}+apt-android-7"
           git tag "$new_tag"
           git push --tags
-          echo "::set-output name=tag_name::$new_tag"
+          echo "tag_name=$new_tag" >> $GITHUB_OUTPUT
       - name: Publish bootstrap zips to GitHub release
         uses: termux/upload-release-action@v3.0.3
         with:
