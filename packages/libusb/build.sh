@@ -10,3 +10,15 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BREAKS="libusb-dev"
 TERMUX_PKG_REPLACES="libusb-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-udev"
+
+termux_step_post_massage() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION_GUARD_FILES="lib/libusb-1.0.so"
+	local f
+	for f in ${_SOVERSION_GUARD_FILES}; do
+		if [ ! -e "${f}" ]; then
+			termux_error_exit "SOVERSION guard check failed."
+		fi
+	done
+}
