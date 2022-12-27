@@ -38,6 +38,7 @@ PACKAGES+=" python2"
 PACKAGES+=" re2c"                       # Needed by kphp-timelib
 PACKAGES+=" rust"
 PACKAGES+=" texinfo"
+PACKAGES+=" uuid-utils"
 PACKAGES+=" valac"
 PACKAGES+=" xmlto"                      # Needed by git's manpage generation
 
