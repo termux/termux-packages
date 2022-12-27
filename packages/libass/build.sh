@@ -11,3 +11,19 @@ TERMUX_PKG_BREAKS="libass-dev"
 TERMUX_PKG_REPLACES="libass-dev"
 # Avoid text relocations.
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_prog_nasm_check=no"
+
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=9
+
+	local a
+	for a in LT_CURRENT LT_AGE; do
+		local _${a}=$(sed -En 's/^LIBASS_'"${a}"'\s+=\s+([0-9]+).*/\1/p' \
+				libass/Makefile_library.am)
+	done
+	local v=$(( _LT_CURRENT - _LT_AGE ))
+	if [ "${v}" != "${_SOVERSION}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
