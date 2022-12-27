@@ -17,3 +17,15 @@ termux_step_pre_configure() {
 
 	LDFLAGS+=" $($CC -print-libgcc-file-name)"
 }
+
+termux_step_post_massage() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION_GUARD_FILES="lib/libhunspell-1.7.so"
+	local f
+	for f in ${_SOVERSION_GUARD_FILES}; do
+		if [ ! -e "${f}" ]; then
+			termux_error_exit "SOVERSION guard check failed."
+		fi
+	done
+}
