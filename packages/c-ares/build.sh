@@ -12,3 +12,15 @@ TERMUX_PKG_REPLACES="c-ares-dev"
 # Build with cmake to install cmake/c-ares/*.cmake files:
 TERMUX_PKG_FORCE_CMAKE=true
 TERMUX_PKG_RM_AFTER_INSTALL="bin/"
+
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=2
+
+	local e=$(sed -En 's/^\s*SET\s*\(CARES_LIB_VERSIONINFO\s+"?([0-9]+):([0-9]+):([0-9]+).*/\1-\3/p' \
+			CMakeLists.txt)
+	if [ ! "${e}" ] || [ "${_SOVERSION}" != "$(( "${e}" ))" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
