@@ -17,6 +17,17 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DREGEX_BACKEND=pcre
 "
 
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=1.5
+
+	local v=$(echo ${TERMUX_PKG_VERSION#*:} | cut -d . -f 1-2)
+	if [ "${v}" != "${_SOVERSION}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
+
 termux_step_pre_configure() {
 	find "$TERMUX_PKG_SRCDIR" -name CMakeLists.txt | xargs -n 1 \
 		sed -i 's/\( PROPERTIES C_STANDARD\) 90/\1 99/g'
