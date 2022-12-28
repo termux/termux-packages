@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Lisp interpreter and application server framework"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=22.9
+TERMUX_PKG_VERSION=22.12
 TERMUX_PKG_SRCURL=https://deb.debian.org/debian/pool/main/p/picolisp/picolisp_${TERMUX_PKG_VERSION}.orig.tar.gz
-TERMUX_PKG_SHA256=2cf0ed9e176c9df76a2c5cffc87c48d838b7560fb678a16a45569521102da1e8
+TERMUX_PKG_SHA256=ce626575ffcabe35fb393502017485b9948cd0c145fc1cfc9ce74d2403de0ec6
 TERMUX_PKG_DEPENDS="libcrypt, libffi, openssl, readline"
 TERMUX_PKG_BUILD_IN_SRC=true
 # For 32-bit archs we nees to build minipicolisp
