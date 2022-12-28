@@ -1,0 +1,30 @@
+Borrowed from https://github.com/gentoo/gentoo/blob/315ec115b0312f4e43cacfdcc93fce4ba1505532/net-print/cups-pdf/files/cups-pdf-3.0.1-ghostscript-gpl-9.54-compat.patch
+
+https://git.ghostscript.com/?p=ghostpdl.git;a=commitdiff;h=180419375973b9ce4664286a67106d712260ef7f
+
+--- a/extra/cups-pdf.conf
++++ b/extra/cups-pdf.conf
+@@ -250,9 +250,9 @@
+ ### Key: GSCall (config)
+ ## command line for calling GhostScript (!!! DO NOT USE NEWLINES !!!)
+ ## MacOSX: for using pstopdf set this to %s %s -o %s %s
+-### Default: %s -q -dCompatibilityLevel=%s -dNOPAUSE -dBATCH -dSAFER -sDEVICE=pdfwrite -sOutputFile="%s" -dAutoRotatePages=/PageByPage -dAutoFilterColorImages=false -dColorImageFilter=/FlateEncode -dPDFSETTINGS=/prepress -c .setpdfwrite -f %s
++### Default: %s -q -dCompatibilityLevel=%s -dNOPAUSE -dBATCH -dSAFER -sDEVICE=pdfwrite -sOutputFile="%s" -dAutoRotatePages=/PageByPage -dAutoFilterColorImages=false -dColorImageFilter=/FlateEncode -dPDFSETTINGS=/prepress -c -f %s
+ 
+-#GSCall %s -q -dCompatibilityLevel=%s -dNOPAUSE -dBATCH -dSAFER -sDEVICE=pdfwrite -sOutputFile="%s" -dAutoRotatePages=/PageByPage -dAutoFilterColorImages=false -dColorImageFilter=/FlateEncode -dPDFSETTINGS=/prepress -c .setpdfwrite -f %s
++#GSCall %s -q -dCompatibilityLevel=%s -dNOPAUSE -dBATCH -dSAFER -sDEVICE=pdfwrite -sOutputFile="%s" -dAutoRotatePages=/PageByPage -dAutoFilterColorImages=false -dColorImageFilter=/FlateEncode -dPDFSETTINGS=/prepress -c -f %s
+ 
+ ### Key: PDFVer (config, ppd, lptopions)
+ ##  PDF version to be created - can be "1.5", "1.4", "1.3" or "1.2" 
+--- a/src/cups-pdf.h
++++ b/src/cups-pdf.h
+@@ -58,7 +58,7 @@ struct {
+   { "AnonDirName", SEC_CONF|SEC_PPD, { "/var/spool/cups-pdf/ANONYMOUS" } },
+   { "AnonUser", SEC_CONF|SEC_PPD, { "nobody" } },
+   { "GhostScript", SEC_CONF|SEC_PPD, { "/usr/bin/gs" } },
+-  { "GSCall", SEC_CONF|SEC_PPD, { "%s -q -dCompatibilityLevel=%s -dNOPAUSE -dBATCH -dSAFER -sDEVICE=pdfwrite -sOutputFile=\"%s\" -dAutoRotatePages=/PageByPage -dAutoFilterColorImages=false -dColorImageFilter=/FlateEncode -dPDFSETTINGS=/prepress -c .setpdfwrite -f %s" } },
++  { "GSCall", SEC_CONF|SEC_PPD, { "%s -q -dCompatibilityLevel=%s -dNOPAUSE -dBATCH -dSAFER -sDEVICE=pdfwrite -sOutputFile=\"%s\" -dAutoRotatePages=/PageByPage -dAutoFilterColorImages=false -dColorImageFilter=/FlateEncode -dPDFSETTINGS=/prepress -c -f %s" } },
+   { "Grp", SEC_CONF|SEC_PPD, { "lp" } },
+   { "GSTmp", SEC_CONF|SEC_PPD, { "TMPDIR=/var/tmp" } },
+   { "Log", SEC_CONF|SEC_PPD, { "/var/log/cups" } },
+ 
