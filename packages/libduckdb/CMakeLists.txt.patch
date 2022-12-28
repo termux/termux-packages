@@ -1,10 +1,10 @@
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -426,7 +426,6 @@
- 
+@@ -280,7 +280,6 @@ option(EXTENSION_STATIC_BUILD
+ set(JEMALLOC_DEFAULT_BUILD FALSE)
  if(NOT CLANG_TIDY AND OS_NAME STREQUAL "linux")
-   # always build jemalloc for linux
--  set(BUILD_JEMALLOC_EXTENSION 1)
- elseif(OS_NAME STREQUAL "windows")
-   if(BUILD_JEMALLOC_EXTENSION EQUAL 1)
-     # have to throw an error because this will crash at runtime
+   # build jemalloc by default for linux
+-  set(JEMALLOC_DEFAULT_BUILD TRUE)
+ endif()
+ 
+ option(BUILD_ICU_EXTENSION "Build the ICU extension." FALSE)
