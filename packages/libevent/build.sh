@@ -37,7 +37,8 @@ termux_step_post_get_source() {
 	local r=$(sed -En 's/.*set\(EVENT_PACKAGE_RELEASE\s+([0-9.]+)\).*/\1/p' \
 			CMakeLists.txt)
 	local v=$(( _LIBVERSION_CURRENT - _LIBVERSION_AGE ))
-	if [ "${_RELEASE}" != "${r}" ] || [ "${_SOVERSION}" != "${v}" ]; then
+	if [ "${_RELEASE}" != "${r}" ] || \
+		[ ! "${_LIBVERSION_CURRENT}" ] || [ "${_SOVERSION}" != "${v}" ]; then
 		termux_error_exit "SOVERSION guard check failed."
 	fi
 }

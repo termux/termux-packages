@@ -21,7 +21,7 @@ termux_step_post_get_source() {
 		local _${a}=$(sed -En 's/^'"${a}"'=([0-9]+).*/\1/p' configure.ac)
 	done
 	local v=$(( _LIBCURRENT - _LIBAGE ))
-	if [ "${v}" != "${_SOVERSION}" ]; then
+	if [ ! "${_LIBCURRENT}" ] || [ "${v}" != "${_SOVERSION}" ]; then
 		termux_error_exit "SOVERSION guard check failed."
 	fi
 }

@@ -42,7 +42,7 @@ termux_step_post_get_source() {
 				lib/Makefile.soname)
 	done
 	local v=$(( _VERSIONCHANGE - _VERSIONDEL ))
-	if [ "${v}" != "${_SOVERSION}" ]; then
+	if [ ! "${_VERSIONCHANGE}" ] || [ "${v}" != "${_SOVERSION}" ]; then
 		termux_error_exit "SOVERSION guard check failed."
 	fi
 }

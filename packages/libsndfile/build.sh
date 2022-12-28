@@ -29,7 +29,7 @@ termux_step_post_get_source() {
 				configure.ac)
 	done
 	local v=$(( _LT_CURRENT - _LT_AGE ))
-	if [ "${v}" != "${_SOVERSION}" ]; then
+	if [ ! "${_LT_CURRENT}" ] || [ "${v}" != "${_SOVERSION}" ]; then
 		termux_error_exit "SOVERSION guard check failed."
 	fi
 }
