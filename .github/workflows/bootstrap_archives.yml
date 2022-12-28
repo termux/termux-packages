@@ -53,9 +53,6 @@ jobs:
         run: |
           find . -maxdepth 1 -type f -name "bootstrap-*.zip" -exec sha256sum {} \; | sed "s| ./| |g" | sort -k2 > bootstraps.sha256sum
           checksums=$(printf 'SHA-256:\n```\n%s\n```\n' "$(sha256sum *.zip)")
-          checksums="${checksums//'%'/'%25'}"
-          checksums="${checksums//$'\n'/'%0A'}"
-          checksums="${checksums//$'\r'/'%0D'}"
           echo "checksums=$checksums" >> $GITHUB_OUTPUT
       - name: Create new tag
         id: get_tag
