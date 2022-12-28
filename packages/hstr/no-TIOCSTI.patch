@@ -1,0 +1,22 @@
+https://github.com/termux/termux-packages/issues/14160
+
+--- a/src/hstr_utils.c
++++ b/src/hstr_utils.c
+@@ -106,7 +106,7 @@
+     }
+ }
+ 
+-#if !defined(__MS_WSL__) && !defined(__CYGWIN__) && !defined(DEBUG_NO_TIOCSTI)
++#if !defined(__MS_WSL__) && !defined(__CYGWIN__) && !defined(DEBUG_NO_TIOCSTI) && !defined(__ANDROID__)
+ void tiocsti()
+ {
+     char buf[] = DEFAULT_COMMAND;
+@@ -120,7 +120,7 @@
+ void fill_terminal_input(char* cmd, bool padding)
+ {
+     if(cmd && strlen(cmd)>0) {
+-#if defined(__MS_WSL__) || defined(__CYGWIN__) || defined(DEBUG_NO_TIOCSTI)
++#if defined(__MS_WSL__) || defined(__CYGWIN__) || defined(DEBUG_NO_TIOCSTI) || defined(__ANDROID__)
+         fprintf(stderr, "%s", cmd);
+         if(padding) fprintf(stderr, "%s", "\n");
+ #else
