@@ -56,9 +56,23 @@ termux_step_pre_configure() {
 }
 
 termux_step_make_install() {
+	echo
+	echo '[ruby ${top_srcdir}/tool/outdate-bundled-gems.rb -n .] # right after make, before make install'
+	echo '================================================================'
+	ruby $TERMUX_PKG_SRCDIR/tool/outdate-bundled-gems.rb -n . || :
+	echo '================================================================'
+	echo
 	make install
+	echo
+	echo '[ruby ${top_srcdir}/tool/outdate-bundled-gems.rb -n .] # after make install'
+	echo '================================================================'
+	ruby $TERMUX_PKG_SRCDIR/tool/outdate-bundled-gems.rb -n . || :
+	echo '================================================================'
+	echo
 	make uninstall # remove possible remains to get fresh timestamps
-	make install
+	make install --debug
+
+	local RBCONFIG=$TERMUX_PREFIX/lib/ruby/${_RUBY_API_VERSION}/${TERMUX_HOST_PLATFORM}/rbconfig.rb
 
 	local RBCONFIG=$TERMUX_PREFIX/lib/ruby/${_RUBY_API_VERSION}/${TERMUX_HOST_PLATFORM}/rbconfig.rb
 
