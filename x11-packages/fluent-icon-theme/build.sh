@@ -9,7 +9,7 @@ TERMUX_PKG_DEPENDS="hicolor-icon-theme"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_RM_AFTER_INSTALL="share/icons/*/icon-theme.cache"
-TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_AUTO_UPDATE=false
 
 termux_step_make_install(){
 	./install.sh -d ${TERMUX_PREFIX}/share/icons -r
