@@ -48,12 +48,6 @@ jobs:
         with:
           name: bootstrap-archives-${{ github.sha }}
           path: ./
-      - name: Get checksums
-        id: get_checksums
-        run: |
-          find . -maxdepth 1 -type f -name "bootstrap-*.zip" -exec sha256sum {} \; | sed "s| ./| |g" | sort -k2 > bootstraps.sha256sum
-          checksums=$(printf 'SHA-256:\n```\n%s\n```\n' "$(sha256sum *.zip)")
-          echo "checksums=$checksums" >> $GITHUB_OUTPUT
       - name: Create new tag
         id: get_tag
         run: |
@@ -76,7 +70,6 @@ jobs:
           file_glob: true
           release_name: "Bootstrap archives for Termux application"
           tag: ${{ steps.get_tag.outputs.tag_name }}
-          body: ${{ steps.get_checksums.outputs.checksums }}
       - name: Publish bootstraps sha256sum to GitHub release
         uses: termux/upload-release-action@v4.0.0
         with:
