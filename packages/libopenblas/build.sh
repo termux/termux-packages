@@ -16,6 +16,17 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS='
 -DC_LAPACK=ON
 '
 
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=0
+
+	local v=$(echo ${TERMUX_PKG_VERSION#*:} | cut -d . -f 1)
+	if [ "${v}" != "${_SOVERSION}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
+
 termux_step_pre_configure() {
 	if [ "$TERMUX_ARCH" = "x86_64" ] || [ "$TERMUX_ARCH" = "i686" ]; then
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+='-DTARGET=CORE2'
