@@ -35,7 +35,7 @@ termux_pkg_upgrade_version() {
 
 	if [[ "${SKIP_VERSION_CHECK}" != "--skip-version-check" ]]; then
 		if ! termux_pkg_is_update_needed \
-			"${TERMUX_PKG_VERSION}" "${EPOCH}${LATEST_VERSION}"; then
+			"${TERMUX_PKG_VERSION#*:}" "${LATEST_VERSION}"; then
 			echo "INFO: No update needed. Already at version '${LATEST_VERSION}'."
 			return 0
 		fi
