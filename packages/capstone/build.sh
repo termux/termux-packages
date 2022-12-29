@@ -10,3 +10,15 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BREAKS="capstone-dev"
 TERMUX_PKG_REPLACES="capstone-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DINSTALL_LIB_DIR=$TERMUX_PREFIX/lib"
+
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=4
+
+	local v=$(sed -En 's/^set\(VERSION_MAJOR\s+"?([0-9]+).*/\1/p' \
+			CMakeLists.txt)
+	if [ "${v}" != "${_SOVERSION}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
