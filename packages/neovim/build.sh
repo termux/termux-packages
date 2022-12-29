@@ -22,6 +22,18 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 TERMUX_PKG_CONFFILES="share/nvim/sysinit.vim"
 
+termux_pkg_auto_update() {
+	# Get the latest release tag:
+	local tag
+	tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}")"
+	# check if this is not a numbered release:
+	if grep -qP "^v${TERMUX_PKG_UPDATE_VERSION_REGEXP}\$" <<<"$tag"; then
+		termux_pkg_upgrade_version "$tag"
+	else
+		echo "WARNING: Skipping auto-update: Not a numbered release($tag)"
+	fi
+}
+
 _patch_luv() {
 	# git submodule update --init deps/lua-compat-5.3 failed
 	cp -r $1/build/src/lua-compat-5.3/* $1/build/src/luv/deps/lua-compat-5.3/
