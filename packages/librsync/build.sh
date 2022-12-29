@@ -12,3 +12,14 @@ TERMUX_PKG_BUILD_DEPENDS="libpopt"
 TERMUX_PKG_BREAKS="librsync-dev"
 TERMUX_PKG_REPLACES="librsync-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DPERL_EXECUTABLE=$(command -v perl)"
+
+termux_step_post_get_source() {
+        # Do not forget to bump revision of reverse dependencies and rebuild them
+        # after SOVERSION is changed.
+        local _SOVERSION=2
+
+        local v=$(echo ${TERMUX_PKG_VERSION#*:} | cut -d . -f 1)
+        if [ "${v}" != "${_SOVERSION}" ]; then
+                termux_error_exit "SOVERSION guard check failed."
+        fi
+}
