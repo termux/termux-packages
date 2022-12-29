@@ -21,6 +21,16 @@ termux_step_post_get_source() {
 		termux_error_exit "Package '${TERMUX_PKG_NAME}' is not safe for on-device builds."
 	fi
 
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=1
+
+	local e=$(sed -En 's/^SHARED_VERSION="?([0-9]+):([0-9]+):([0-9]+).*/\1-\3/p' \
+				Makefile.am)
+	if [ ! "${e}" ] || [ "${_SOVERSION}" != "$(( "${e}" ))" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+
 	./autogen.sh
 }
 
