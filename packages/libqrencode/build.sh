@@ -10,3 +10,14 @@ TERMUX_PKG_DEPENDS="libandroid-support, libpng, zlib"
 TERMUX_PKG_BREAKS="libqrencode-dev"
 TERMUX_PKG_REPLACES="libqrencode-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DBUILD_SHARED_LIBS=ON"
+
+termux_step_post_get_source() {
+        # Do not forget to bump revision of reverse dependencies and rebuild them
+        # after SOVERSION is changed.
+        local _SOVERSION=4
+
+        local v=$(echo ${TERMUX_PKG_VERSION#*:} | cut -d . -f 1)
+        if [ "${v}" != "${_SOVERSION}" ]; then
+                termux_error_exit "SOVERSION guard check failed."
+        fi
+}
