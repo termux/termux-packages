@@ -11,6 +11,18 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_BUILD_IN_SRC=true
 
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=3
+
+	local e=$(sed -En 's/^LIBPLIST_SO_VERSION="?([0-9]+):([0-9]+):([0-9]+).*/\1-\3/p' \
+				configure.ac)
+	if [ ! "${e}" ] || [ "${_SOVERSION}" != "$(( "${e}" ))" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
+
 termux_step_configure() {
 	PKG_CONFIG_PATH=$TERMUX_PREFIX/lib/pkgconfig
 	./autogen.sh \
