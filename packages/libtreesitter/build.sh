@@ -9,6 +9,18 @@ TERMUX_PKG_SHA256=b355e968ec2d0241bbd96748e00a9038f83968f85d822ecb9940cbe4c42e18
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=0
+
+	local v=$(sed -En 's/^SONAME_MAJOR\s*:?=\s*([0-9]+).*/\1/p' \
+			Makefile)
+	if [ "${v}" != "${_SOVERSION}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
+
 termux_step_post_make_install() {
 	termux_setup_rust
 
