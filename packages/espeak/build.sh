@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Use eSpeak NG as the original eSpeak project is dead.
 TERMUX_PKG_VERSION="1.51"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/espeak-ng/espeak-ng/archive/${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=f0e028f695a8241c4fa90df7a8c8c5d68dcadbdbc91e758a97e594bbb0a3bdbf
 TERMUX_PKG_AUTO_UPDATE=true
@@ -49,7 +50,8 @@ termux_step_make() {
 
 termux_step_pre_configure() {
 	# Oz flag causes problems. See https://github.com/termux/termux-packages/issues/1680:
-	CFLAGS=${CFLAGS/Oz/Os}
+	CFLAGS=${CFLAGS/-Oz/-Os}
+	LDFLAGS+=" $($CC -print-libgcc-file-name)"
 }
 
 termux_step_make_install() {
