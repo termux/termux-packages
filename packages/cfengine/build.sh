@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://cfengine.com/
 TERMUX_PKG_DESCRIPTION="CFEngine is a configuration management technology"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@craigcomstock"
-TERMUX_PKG_VERSION=1:3.20.0
+TERMUX_PKG_VERSION=1:3.21.0
 TERMUX_PKG_SRCURL=https://github.com/cfengine/core.git
 TERMUX_PKG_GIT_BRANCH=${TERMUX_PKG_VERSION#*:}
 TERMUX_PKG_DEPENDS="libandroid-glob, liblmdb, libxml2, libyaml, openssl, pcre"
@@ -24,7 +24,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_post_get_source() {
 	local _MASTERFILES_VERSION=${TERMUX_PKG_VERSION#*:}
 	local _MASTERFILES_SRCURL=https://github.com/cfengine/masterfiles/archive/${_MASTERFILES_VERSION}.zip
-	local _MASTERFILES_SHA256=094f9361f693ad5949d7f9c7634d47104225e08589c72f54f3743e74b41ee4d2
+	local _MASTERFILES_SHA256=d157717e65121ef22a28f6f60168b651eb9bb59240de03d22bac6942dae8e14e
 	local _MASTERFILES_FILE=${TERMUX_PKG_CACHEDIR}/masterfiles-${_MASTERFILES_VERSION}.zip
 	termux_download \
 		${_MASTERFILES_SRCURL} \
