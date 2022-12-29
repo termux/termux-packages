@@ -18,3 +18,14 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DBUILD_DYNAMICETD3D_SUBPROJECT=ON
 -DOCTOVIS_QT5=OFF
 "
+
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=1.9
+
+	local v=$(echo ${TERMUX_PKG_VERSION#*:} | cut -d . -f 1-2)
+	if [ "${v}" != "${_SOVERSION}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
