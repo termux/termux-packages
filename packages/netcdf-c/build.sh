@@ -12,3 +12,15 @@ TERMUX_PKG_GROUPS="science"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-hdf5"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=19
+
+	local e=$(sed -En 's/.*\s+netCDF_SO_VERSION="?([0-9]+):([0-9]+):([0-9]+).*/\1-\3/p' \
+				configure.ac)
+	if [ ! "${e}" ] || [ "${_SOVERSION}" != "$(( "${e}" ))" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
