@@ -13,3 +13,19 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DBOOTSTRAP_DAEMON=off
 -DDHT_BOOTSTRAP=off
 "
+
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=2
+
+	local a
+	for a in CURRENT AGE; do
+		local _LT_${a}=$(sed -En 's/^'"${a}"'=([0-9]+).*/\1/p' \
+				so.version)
+	done
+	local v=$(( _LT_CURRENT - _LT_AGE ))
+	if [ ! "${_LT_CURRENT}" ] || [ "${v}" != "${_SOVERSION}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
