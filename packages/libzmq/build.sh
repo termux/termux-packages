@@ -12,6 +12,18 @@ TERMUX_PKG_BREAKS="libzmq-dev"
 TERMUX_PKG_REPLACES="libzmq-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-libsodium --disable-libunwind --disable-Werror"
 
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=5
+
+	local e=$(sed -En 's/^LTVER="?([0-9]+):([0-9]+):([0-9]+).*/\1-\3/p' \
+				configure.ac)
+	if [ ! "${e}" ] || [ "${_SOVERSION}" != "$(( "${e}" ))" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
+
 termux_step_pre_configure() {
 	./autogen.sh
 
