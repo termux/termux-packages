@@ -13,3 +13,15 @@ TERMUX_PKG_BREAKS="jq-dev"
 TERMUX_PKG_REPLACES="jq-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-oniguruma"
 TERMUX_PKG_BUILD_IN_SRC=true
+
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=1
+
+	local e=$(sed -En 's/^libjq_la_LDFLAGS\s*=.*\s+-version-info\s+([0-9]+):([0-9]+):([0-9]+).*/\1-\3/p' \
+			Makefile.am)
+	if [ ! "${e}" ] || [ "${_SOVERSION}" != "$(( "${e}" ))" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
