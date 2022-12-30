@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="A persistent huge storage service, compatible with the v
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.4.1
-TERMUX_PKG_SRCURL=https://github.com/OpenAtomFoundation/pika.git
+TERMUX_PKG_SRCURL=git+https://github.com/OpenAtomFoundation/pika
 TERMUX_PKG_DEPENDS="google-glog, libc++, libprotobuf, librocksdb"
 TERMUX_PKG_BUILD_IN_SRC=true
 

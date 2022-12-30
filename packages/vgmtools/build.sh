@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=a993f82c609f259bc4f53e0f965a171cb5cf9420
 TERMUX_PKG_VERSION=2022.12.28
-TERMUX_PKG_SRCURL=https://github.com/vgmrips/vgmtools.git
+TERMUX_PKG_SRCURL=git+https://github.com/vgmrips/vgmtools
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_DEPENDS="libandroid-glob, libc++, zlib"
 

@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="Apache-2.0, MIT"
 TERMUX_PKG_LICENSE_FILE="LICENSE-APACHE, LICENSE-MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.6.1
-TERMUX_PKG_SRCURL=https://github.com/dbrgn/tealdeer.git
+TERMUX_PKG_SRCURL=git+https://github.com/dbrgn/tealdeer
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {

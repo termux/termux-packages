@@ -5,6 +5,6 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.1.2
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
-TERMUX_PKG_SRCURL=https://github.com/krrishnarraj/clpeak.git
+TERMUX_PKG_SRCURL=git+https://github.com/krrishnarraj/clpeak
 TERMUX_PKG_BUILD_DEPENDS="opencl-headers, opencl-clhpp"
 TERMUX_PKG_DEPENDS="libc++, ocl-icd"

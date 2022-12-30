@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Cli manga downloader"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.0.5"
-TERMUX_PKG_SRCURL=https://github.com/metafates/mangal.git
+TERMUX_PKG_SRCURL=git+https://github.com/metafates/mangal
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 

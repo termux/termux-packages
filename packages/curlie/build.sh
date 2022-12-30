@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="The power of curl, the ease of use of httpie"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.6.9"
-TERMUX_PKG_SRCURL=https://github.com/rs/curlie.git
+TERMUX_PKG_SRCURL=git+https://github.com/rs/curlie
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 

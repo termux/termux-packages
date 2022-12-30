@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.4.0
 TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://github.com/gcla/termshark.git
+TERMUX_PKG_SRCURL=git+https://github.com/gcla/termshark
 TERMUX_PKG_DEPENDS="tshark"
 
 termux_step_make() {

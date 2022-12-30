@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=7f449bf8bd3b933891d12c30112268c4090e4d59
 TERMUX_PKG_VERSION=2021.03.12
-TERMUX_PKG_SRCURL=https://gitlab.xiph.org/xiph/rnnoise.git
+TERMUX_PKG_SRCURL=git+https://gitlab.xiph.org/xiph/rnnoise
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-examples

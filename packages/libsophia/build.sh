@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Advanced transactional MVCC key-value/row storage librar
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.2
-TERMUX_PKG_SRCURL=https://github.com/pmwkaa/sophia.git
+TERMUX_PKG_SRCURL=git+https://github.com/pmwkaa/sophia
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {

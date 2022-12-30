@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="WTFPL"
 TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=a7111e51eac3086264fcca0c7026de22b5ab55c7
 TERMUX_PKG_VERSION=2022.05.29
-TERMUX_PKG_SRCURL=https://github.com/samhocevar/zzuf.git
+TERMUX_PKG_SRCURL=git+https://github.com/samhocevar/zzuf
 TERMUX_PKG_GIT_BRANCH=master
 
 termux_step_post_get_source() {

@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Like awk, sed, cut, join, and sort for name-indexed data
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=6.5.0
-TERMUX_PKG_SRCURL=https://github.com/johnkerl/miller.git
+TERMUX_PKG_SRCURL=git+https://github.com/johnkerl/miller
 TERMUX_PKG_EXTRA_MAKE_ARGS="PREFIX=$TERMUX_PREFIX"
 TERMUX_PKG_AUTO_UPDATE=true
 

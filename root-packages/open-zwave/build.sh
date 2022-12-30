@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=3fff11d246a0d558d26110e1db6bd634a1b347c0
 _COMMIT_DATE=20221117
 TERMUX_PKG_VERSION=1.6-p${_COMMIT_DATE}
-TERMUX_PKG_SRCURL=https://github.com/OpenZWave/open-zwave.git
+TERMUX_PKG_SRCURL=git+https://github.com/OpenZWave/open-zwave
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_DEPENDS="libc++"
 # XXX: libusb is not linked against (unexpectedly?)
