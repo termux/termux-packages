@@ -206,7 +206,7 @@ lint_package() {
 			urls_ok=true
 			for url in "${TERMUX_PKG_SRCURL[@]}"; do
 				if [ -n "$url" ]; then
-					if ! grep -qP '^https://.+' <<< "$url"; then
+					if ! grep -qP '^git\+https://.+' <<< "$url" && ! grep -qP '^https://.+' <<< "$url"; then
 						echo "NON-HTTPS (acceptable)"
 						urls_ok=false
 						break
@@ -248,7 +248,7 @@ lint_package() {
 					echo "LENGTHS OF 'TERMUX_PKG_SRCURL' AND 'TERMUX_PKG_SHA256' ARE NOT EQUAL"
 					pkg_lint_error=true
 				fi
-			elif [ "${TERMUX_PKG_SRCURL: -4}" == ".git" ]; then
+			elif [ "${TERMUX_PKG_SRCURL:0:4}" == "git+" ]; then
 				echo "NOT SET (acceptable since TERMUX_PKG_SRCURL is git repo)"
 			else
 				echo "NOT SET"

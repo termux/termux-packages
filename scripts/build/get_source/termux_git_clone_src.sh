@@ -10,7 +10,7 @@ termux_git_clone_src() {
 		rm -rf $TMP_CHECKOUT
 		git clone --depth 1 \
 			--branch $TERMUX_PKG_GIT_BRANCH \
-			$TERMUX_PKG_SRCURL \
+			${TERMUX_PKG_SRCURL:4} \
 			$TMP_CHECKOUT
 
 		pushd $TMP_CHECKOUT

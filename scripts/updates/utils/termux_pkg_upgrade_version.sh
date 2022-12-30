@@ -54,7 +54,7 @@ termux_pkg_upgrade_version() {
 			"${TERMUX_PKG_BUILDER_DIR}/build.sh"
 
 		# Update checksum
-		if [[ "${TERMUX_PKG_SHA256[*]}" != "SKIP_CHECKSUM" ]] && [[ "${TERMUX_PKG_SRCURL: -4}" != ".git" ]]; then
+		if [[ "${TERMUX_PKG_SHA256[*]}" != "SKIP_CHECKSUM" ]] && [[ "${TERMUX_PKG_SRCURL:0:4}" != "git+" ]]; then
 			echo n | "${TERMUX_SCRIPTDIR}/scripts/bin/update-checksum" "${TERMUX_PKG_NAME}" || {
 				git checkout -- "${TERMUX_PKG_BUILDER_DIR}"
 				git pull --rebase
