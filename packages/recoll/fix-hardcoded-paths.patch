@@ -1,0 +1,200 @@
+--- a/common/rclconfig.cpp
++++ b/common/rclconfig.cpp
+@@ -1417,7 +1417,7 @@
+             // being used by recollindex instances. So explicitely test for /run/user/$uid, still
+             // leaving open the remote possibility that XDG_RUNTIME_DIR would be set to something
+             // else...
+-            rundir = path_cat("/run/user", lltodecstr(getuid()));
++            rundir = path_cat("@TERMUX_PREFIX@/var/run/user", lltodecstr(getuid()));
+             if (path_isdir(rundir)) {
+                 p = rundir.c_str();
+             }
+--- a/filters/rclcheckneedretry.sh
++++ b/filters/rclcheckneedretry.sh
+@@ -23,7 +23,7 @@
+ fi
+ 
+ # Bin dirs to be tested:
+-bindirs="/usr/bin /usr/local/bin $HOME/bin /opt/*/bin"
++bindirs="@TERMUX_PREFIX@/bin @TERMUX_PREFIX@/local/bin $HOME/bin @TERMUX_PREFIX@/opt/*/bin"
+ 
+ 
+ rfiledir=$HOME/.config/Recoll.org
+--- a/filters/rclkwd
++++ b/filters/rclkwd
+@@ -90,7 +90,7 @@
+ elif test z"$TMPDIR" != z ; then
+    ttdir=$TMPDIR
+ else
+-   ttdir=/tmp
++   ttdir=@TERMUX_PREFIX@/tmp
+ fi
+ tmpdir=$ttdir/rclkwd_tmp$$
+ mkdir $tmpdir || exit 1
+--- a/filters/rcllyx
++++ b/filters/rcllyx
+@@ -108,7 +108,7 @@
+ elif test z"$TMPDIR" != z ; then
+    ttdir=$TMPDIR
+ else
+-   ttdir=/tmp
++   ttdir=@TERMUX_PREFIX@/tmp
+ fi
+ 
+ tmpdir=$ttdir/rcllyx_tmp$$
+--- a/filters/rclman
++++ b/filters/rclman
+@@ -92,7 +92,7 @@
+ elif test z"$TMPDIR" != z ; then
+    ttdir=$TMPDIR
+ else
+-   ttdir=/tmp
++   ttdir=@TERMUX_PREFIX@/tmp
+ fi
+ tmpdir=$ttdir/rclman_tmp$$
+ mkdir $tmpdir || exit 1
+--- a/filters/rclocrcache.py
++++ b/filters/rclocrcache.py
+@@ -95,7 +95,7 @@
+     return p
+ 
+ 
+-_tmpdir = os.environ["TMPDIR"] if "TMPDIR" in os.environ else "/tmp"
++_tmpdir = os.environ["TMPDIR"] if "TMPDIR" in os.environ else "@TERMUX_PREFIX@/tmp"
+ _tmpdir = _catslash(_tmpdir)
+ _recoll_tmpdir = os.environ["RECOLL_TMPDIR"] if "RECOLL_TMPDIR" in os.environ else None
+ _recoll_tmpdir = _catslash(_recoll_tmpdir)
+--- a/filters/thunderbird-open-message.sh
++++ b/filters/thunderbird-open-message.sh
+@@ -13,7 +13,7 @@
+     fatal Usage: `basename $0` '<path to message/rfc822 file>'
+ }
+ 
+-tempdir=/tmp/recoll-nonexistent
++tempdir=@TERMUX_PREFIX@/tmp/recoll-nonexistent
+ cleanup()
+ {
+     rm -rf -- "$tempdir"
+--- a/index/recollindex.service
++++ b/index/recollindex.service
+@@ -5,7 +5,7 @@
+ 
+ [Service]
+ Type=simple
+-ExecStart=/usr/bin/recollindex -m -D -x -w 30 -c %h/.recoll/
++ExecStart=@TERMUX_PREFIX@/bin/recollindex -m -D -x -w 30 -c %h/.recoll/
+ Restart=on-failure
+ 
+ [Install]
+--- a/index/recollindex@.service
++++ b/index/recollindex@.service
+@@ -3,13 +3,13 @@
+ [Unit]
+ Description=Recollindex indexing for %i
+ After=network-online.target
+-RequiresMountsFor=/home/%i
++RequiresMountsFor=@TERMUX_HOME@
+ 
+ [Service]
+ Type=simple
+ Restart=on-failure
+ RestartSec=30
+-ExecStart=/usr/bin/recollindex -m -D -x -w 10 -c /home/%i/.recoll
++ExecStart=@TERMUX_PREFIX@/bin/recollindex -m -D -x -w 10 -c @TERMUX_HOME@/.recoll
+ User=%i
+ 
+ [Install]
+--- a/python/recoll/recoll/rclconfig.py
++++ b/python/recoll/recoll/rclconfig.py
+@@ -67,13 +67,13 @@
+                 self.datadir = os.path.join(os.path.dirname(sys.argv[0]), "..")
+                 #print("Mac datadir: [%s]" % self.datadir, file=sys.stderr)
+             else:
+-                dirs = ("/opt/local", "/opt", "/usr", "/usr/local")
++                dirs = ("@TERMUX_PREFIX@/opt/local", "@TERMUX_PREFIX@/opt", "@TERMUX_PREFIX@", "@TERMUX_PREFIX@/local")
+                 for dir in dirs:
+                     dd = os.path.join(dir, "share/recoll")
+                     if os.path.exists(dd):
+                         self.datadir = dd
+         if self.datadir is None:
+-            self.datadir = "/usr/share/recoll"
++            self.datadir = "@TERMUX_PREFIX@/share/recoll"
+         f = None
+         try:
+             f = open(os.path.join(self.datadir, "examples", "recoll.conf"), "r")
+--- a/sampleconf/mimemap
++++ b/sampleconf/mimemap
+@@ -252,19 +252,19 @@
+ .html = text/x-purple-html-log
+ 
+ # Special handling of aptosid manual menu system
+-[/usr/share/aptosid-manual]
++[@TERMUX_PREFIX@/share/aptosid-manual]
+ .htm = text/x-html-aptosid-man
+ .html = text/x-html-aptosid-man
+ 
+ # Special handling of sidux manual menu system
+-[/usr/share/sidux-manual]
++[@TERMUX_PREFIX@/share/sidux-manual]
+ .htm = text/x-html-sidux-man
+ .html = text/x-html-sidux-man
+ 
+ # Manual files. You may want to adjust the location for your system
+ # We can't use the default text/troff type because this doesn't say
+ # what macro set to use (groff -man)
+-[/usr/share/man]
++[@TERMUX_PREFIX@/share/man]
+ .0p = text/x-man
+ .1 = text/x-man
+ .1m = text/x-man
+--- a/sampleconf/recoll.conf
++++ b/sampleconf/recoll.conf
+@@ -770,7 +770,7 @@
+ # makes sense to have recollindex chdir to some temporary directory. If the
+ # value is empty, the current directory is not changed. If the
+ # value is (literal) tmp, we use the temporary directory as set by the
+-# environment (RECOLL_TMPDIR else TMPDIR else /tmp). If the value is an
++# environment (RECOLL_TMPDIR else TMPDIR else @TERMUX_PREFIX@/tmp). If the value is an
+ # absolute path to a directory, we go there.</descr></var>
+ idxrundir = tmp
+ 
+@@ -857,7 +857,7 @@
+ # command.</brief><descr>Some aspell packages may need an additional option
+ # (e.g. on Debian Jessie: --local-data-dir=/usr/lib/aspell). See Debian bug
+ # 772415.</descr></var>
+-#aspellAddCreateParam = --local-data-dir=/usr/lib/aspell
++#aspellAddCreateParam = --local-data-dir=@TERMUX_PREFIX@/lib/aspell
+ 
+ # <var name="aspellKeepStderr" type="bool">
+ #
+@@ -1103,7 +1103,7 @@
+ #[~/hungariandocs/plain]
+ #defaultcharset = iso-8859-2
+ 
+-[/usr/share/man]
++[@TERMUX_PREFIX@/share/man]
+ followLinks = 1
+ 
+ # <var name="mhmboxquirks" type="string">
+--- a/utils/appformime.cpp
++++ b/utils/appformime.cpp
+@@ -25,7 +25,7 @@
+ #include "smallut.h"
+ #include "appformime.h"
+ 
+-static const string topappsdir("/usr/share/applications");
++static const string topappsdir("@TERMUX_PREFIX@/share/applications");
+ static const string desktopext("desktop");
+ 
+ static DesktopDb *theDb;
+--- a/utils/rclutil.cpp
++++ b/utils/rclutil.cpp
+@@ -555,7 +555,7 @@
+ #ifdef _WIN32
+             stmpdir = path_wingetrcltmpdir();
+ #else
+-            stmpdir = "/tmp";
++            stmpdir = "@TERMUX_PREFIX@/tmp";
+ #endif
+         } else {
+             stmpdir = tmpdir;
