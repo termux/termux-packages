@@ -37,6 +37,7 @@ PACKAGES+=" protobuf"
 PACKAGES+=" python2"
 PACKAGES+=" re2c"                       # Needed by kphp-timelib
 PACKAGES+=" rust"
+PACKAGES+=" scdoc"
 PACKAGES+=" texinfo"
 PACKAGES+=" uuid-utils"
 PACKAGES+=" valac"
