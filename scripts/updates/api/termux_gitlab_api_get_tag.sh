@@ -13,10 +13,10 @@ termux_gitlab_api_get_tag() {
 
 	local project
 	project="$(echo "${PKG_SRCURL}" | cut -d'/' -f4-5)"
-	project="${project%.git}"
+	project="${project#git+}"
 
 	if [[ -z "${TAG_TYPE}" ]]; then # If not set, then decide on the basis of url.
-		if [[ "${PKG_SRCURL: -4}" == ".git" ]]; then
+		if [[ "${PKG_SRCURL:0:4}" == "git+" ]]; then
 			# Get newest tag.
 			TAG_TYPE="newest-tag"
 		else

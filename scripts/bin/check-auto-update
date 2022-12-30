@@ -121,14 +121,14 @@ check() {
 	local url="$2"
 	local return_code=0
 
-	if [[ ! $src_url =~ ^https?://${from_where}.com ]]; then
-		warn "Not a ${from_where} url: ${src_url}"
+	if [[ ! ${src_url#git+} =~ ^https?://${from_where}.com ]]; then
+		warn "Not a ${from_where} url: ${src_url#git+}"
 		return 1
 	fi
 
 	_check "$from_where" "$url" || return_code="$?"
 
-	if [[ "${url: -4}" != ".git" ]] && [[ "$return_code" == "2" ]]; then
+	if [[ "${url:0:4}" != "git+" ]] && [[ "$return_code" == "2" ]]; then
 		warn "No 'latest-release-tag' found. Checking for 'newest-tag'..."
 		return_code=3 # Set return code to 3 to indicate that TERMUX_PKG_UPDATE_TAG_TYPE='newest-tag'
 		# should also be written to build.sh if we find 'newest-tag' in next line.
