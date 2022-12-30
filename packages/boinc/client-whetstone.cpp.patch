@@ -1,0 +1,46 @@
+diff -uNr boinc/client/whetstone.cpp boinc.mod/client/whetstone.cpp
+--- boinc/client/whetstone.cpp	2022-12-02 17:15:26.000000000 +0800
++++ boinc.mod/client/whetstone.cpp	2022-12-30 12:50:30.379989028 +0800
+@@ -54,12 +54,12 @@
+ // don't do away with their computation.
+ // suggested by Ben Herndon
+ //
+-double extern_array[12];
++volatile double extern_array[12];
+ 
+ // #pragma intrinsic (sin, cos, tan, atan, sqrt, exp, log)
+ 
+ 
+-void pa(SPDP e[4], SPDP t, SPDP t2)
++volatile void pa(SPDP e[4], SPDP t, SPDP t2)
+       {
+      long j;
+      for(j=0;j<6;j++)
+@@ -73,7 +73,7 @@
+      return;
+ }
+ 
+-void po(SPDP e1[4], long j, long k, long l)
++volatile void po(SPDP e1[4], long j, long k, long l)
+       {
+      e1[j] = e1[k];
+      e1[k] = e1[l];
+@@ -81,7 +81,7 @@
+      return;
+ }
+ 
+-void p3(SPDP *x, SPDP *y, SPDP *z, SPDP t, SPDP t1, SPDP t2)
++volatile void p3(SPDP *x, SPDP *y, SPDP *z, SPDP t, SPDP t1, SPDP t2)
+       {
+      *x = *y;
+      *y = *z;
+@@ -93,7 +93,7 @@
+ 
+ // return an error if CPU time is less than min_cpu_time
+ //
+-int whetstone(double& flops, double& cpu_time, double min_cpu_time) {
++volatile int whetstone(double& flops, double& cpu_time, double min_cpu_time) {
+     long n1,n2,n3,n4,n5,n6,n7,n8,i,ix,n1mult;
+     SPDP x,y,z;
+     long j,k,l, jjj;
+
