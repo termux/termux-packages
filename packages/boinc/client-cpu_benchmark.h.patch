@@ -1,0 +1,28 @@
+diff -uNr boinc/client/cpu_benchmark.h boinc.mod/client/cpu_benchmark.h
+--- boinc/client/cpu_benchmark.h	2022-12-02 17:15:26.000000000 +0800
++++ boinc.mod/client/cpu_benchmark.h	2022-12-30 12:31:58.195989823 +0800
+@@ -24,8 +24,8 @@
+ #define BM_TYPE_FP       0
+ #define BM_TYPE_INT      1
+ 
+-extern int dhrystone(double& vax_mips, double& loops, double& cpu_time, double min_cpu_time);
+-extern int whetstone(double& flops, double& cpu_time, double min_cpu_time);
++extern volatile int dhrystone(double& vax_mips, double& loops, double& cpu_time, double min_cpu_time);
++extern volatile int whetstone(double& flops, double& cpu_time, double min_cpu_time);
+ extern void benchmark_wait_to_start(int which);
+ extern bool benchmark_time_to_stop(int which);
+ 
+@@ -38,11 +38,11 @@
+ #endif // ANDROID_NEON
+ 
+ namespace android_neon {
+-    int whetstone(double& flops, double& cpu_time, double min_cpu_time);
++    volatile int whetstone(double& flops, double& cpu_time, double min_cpu_time);
+ }
+ 
+ namespace android_vfp {
+-    int whetstone(double& flops, double& cpu_time, double min_cpu_time);
++    volatile int whetstone(double& flops, double& cpu_time, double min_cpu_time);
+ }
+ 
+ #endif // ANDROID

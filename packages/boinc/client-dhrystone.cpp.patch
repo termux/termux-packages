@@ -1,0 +1,80 @@
+diff -uNr boinc/client/dhrystone.cpp boinc.mod/client/dhrystone.cpp
+--- boinc/client/dhrystone.cpp	2022-12-02 17:15:26.000000000 +0800
++++ boinc.mod/client/dhrystone.cpp	2022-12-30 13:13:10.679988055 +0800
+@@ -63,20 +63,20 @@
+  */
+ 
+ 
+-void Proc_0();
+-void Proc_1(DS_DATA&, Rec_Pointer PtrParIn);
+-void Proc_2(DS_DATA&, One_Fifty *IntParIO);
+-void Proc_3(DS_DATA&, Rec_Pointer *PtrParOut);
+-void Proc_4(DS_DATA&);
+-void Proc_5(DS_DATA&);
+-void Proc_6(DS_DATA&, Enumeration EnumParIn, Enumeration *EnumParOut);
+-void Proc_7(One_Fifty IntParI1, One_Fifty IntParI2, One_Fifty *IntParOut);
+-void Proc_8(DS_DATA&, Arr_1_Dim Array1Par, Arr_2_Dim Array2Par, One_Fifty IntParI1, One_Fifty IntParI2);
++volatile void Proc_0();
++volatile void Proc_1(DS_DATA&, Rec_Pointer PtrParIn);
++volatile void Proc_2(DS_DATA&, One_Fifty *IntParIO);
++volatile void Proc_3(DS_DATA&, Rec_Pointer *PtrParOut);
++volatile void Proc_4(DS_DATA&);
++volatile void Proc_5(DS_DATA&);
++volatile void Proc_6(DS_DATA&, Enumeration EnumParIn, Enumeration *EnumParOut);
++volatile void Proc_7(One_Fifty IntParI1, One_Fifty IntParI2, One_Fifty *IntParOut);
++volatile void Proc_8(DS_DATA&, Arr_1_Dim Array1Par, Arr_2_Dim Array2Par, One_Fifty IntParI1, One_Fifty IntParI2);
+ Enumeration  Func_1(DS_DATA&, Capital_Letter , Capital_Letter );
+ bool      Func_2(DS_DATA&, Str_30 , Str_30 );
+ bool Func_3(Enumeration EnumParIn);
+ 
+-int dhrystone(
++volatile int dhrystone(
+    double& Vax_Mips, double& int_loops, double& int_time, double min_cpu_time
+ ){
+         One_Fifty       Int_1_Loc;
+@@ -181,7 +181,7 @@
+     return 0;
+ }
+ 
+-void Proc_1(DS_DATA& dd, REG Rec_Pointer Ptr_Val_Par)
++volatile void Proc_1(DS_DATA& dd, REG Rec_Pointer Ptr_Val_Par)
+ {
+   REG Rec_Pointer Next_Record = Ptr_Val_Par->Ptr_Comp;
+                                         /* == Ptr_Glob_Next */
+@@ -210,7 +210,7 @@
+     structassign (*Ptr_Val_Par, *Ptr_Val_Par->Ptr_Comp);
+ }
+ 
+-void Proc_2(DS_DATA& dd, One_Fifty *Int_Par_Ref)
++volatile void Proc_2(DS_DATA& dd, One_Fifty *Int_Par_Ref)
+ {
+   One_Fifty  Int_Loc;
+   Enumeration   Enum_Loc=Ident_1;
+@@ -227,7 +227,7 @@
+   while (Enum_Loc != Ident_1); /* true */
+ }
+ 
+-void Proc_3(DS_DATA& dd, Rec_Pointer *Ptr_Ref_Par)
++volatile void Proc_3(DS_DATA& dd, Rec_Pointer *Ptr_Ref_Par)
+ {
+   if (Ptr_Glob != NULL)
+     /* then, executed */
+@@ -235,7 +235,7 @@
+   Proc_7 (10, Int_Glob, &Ptr_Glob->variant.var_1.Int_Comp);
+ }
+ 
+-void Proc_4(DS_DATA& dd)
++volatile void Proc_4(DS_DATA& dd)
+ {
+   bool Bool_Loc;
+ 
+@@ -244,7 +244,7 @@
+   Ch_2_Glob = 'B';
+ }
+ 
+-void Proc_5(DS_DATA& dd)
++volatile void Proc_5(DS_DATA& dd)
+ {
+         Ch_1_Glob = 'A';
+         Bool_Glob = FALSE;
+
