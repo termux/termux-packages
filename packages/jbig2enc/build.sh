@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=ea6a40a2cbf05efb00f3418f2d0ad71232565beb
 TERMUX_PKG_VERSION=2019.09.08
 TERMUX_PKG_REVISION=3
-TERMUX_PKG_SRCURL=https://github.com/agl/jbig2enc.git
+TERMUX_PKG_SRCURL=git+https://github.com/agl/jbig2enc
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_DEPENDS="giflib, leptonica, libc++, libjpeg-turbo, libpng, libtiff, libwebp, python, zlib"
 

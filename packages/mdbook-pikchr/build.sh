@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="A mdbook preprocessor to render pikchr code blocks as im
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.1.5"
-TERMUX_PKG_SRCURL=https://github.com/podsvirov/mdbook-pikchr.git
+TERMUX_PKG_SRCURL=git+https://github.com/podsvirov/mdbook-pikchr
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 

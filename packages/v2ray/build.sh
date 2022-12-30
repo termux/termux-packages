@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="A platform for building proxies to bypass network restri
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=5.2.0
-TERMUX_PKG_SRCURL=https://github.com/v2fly/v2ray-core.git
+TERMUX_PKG_SRCURL=git+https://github.com/v2fly/v2ray-core
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_post_get_source() {

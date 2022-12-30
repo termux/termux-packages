@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="A significantly faster alternative to the classic Unix c
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.2.1
-TERMUX_PKG_SRCURL=https://github.com/Svetlitski/fcp.git
+TERMUX_PKG_SRCURL=git+https://github.com/Svetlitski/fcp
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {

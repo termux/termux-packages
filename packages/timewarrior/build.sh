@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Command-line time tracker"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.4.3
-TERMUX_PKG_SRCURL=https://github.com/GothenburgBitFactory/timewarrior.git
+TERMUX_PKG_SRCURL=git+https://github.com/GothenburgBitFactory/timewarrior
 TERMUX_PKG_DEPENDS="libandroid-glob, libc++"
 
 # Installation of man pages is broken as of version 1.4.3.

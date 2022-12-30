@@ -6,7 +6,7 @@ TERMUX_PKG_LICENSE_FILE="LICENSE.txt, linenoise-1.0/LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=1acf1ddabaf3576b4023c4f6f09c5a3e4b086fb8
 TERMUX_PKG_VERSION=2018.04.12
-TERMUX_PKG_SRCURL=https://github.com/npat-efault/picocom.git
+TERMUX_PKG_SRCURL=git+https://github.com/npat-efault/picocom
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_BUILD_IN_SRC=true
 

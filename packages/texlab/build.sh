@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="A cross-platform implementation of the Language Server P
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="5.0.0"
-TERMUX_PKG_SRCURL=https://github.com/latex-lsp/texlab.git
+TERMUX_PKG_SRCURL=git+https://github.com/latex-lsp/texlab
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 

@@ -5,7 +5,7 @@ TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=fbf5ca360337452ca5ef7437d64c2efd7d891aec
 TERMUX_PKG_VERSION=1.0.9
-TERMUX_PKG_SRCURL=https://github.com/gjk-cat/cat-prep.git
+TERMUX_PKG_SRCURL=git+https://github.com/gjk-cat/cat-prep
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_BUILD_IN_SRC=true
 

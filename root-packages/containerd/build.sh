@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="An open and reliable container runtime"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.6.14
-TERMUX_PKG_SRCURL=https://github.com/containerd/containerd.git
+TERMUX_PKG_SRCURL=git+https://github.com/containerd/containerd
 TERMUX_PKG_DEPENDS="runc"
 TERMUX_PKG_CONFFILES="etc/containerd/config.toml"
 

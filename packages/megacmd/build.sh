@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.5.1
 TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://github.com/meganz/MEGAcmd.git
+TERMUX_PKG_SRCURL=git+https://github.com/meganz/MEGAcmd
 TERMUX_PKG_GIT_BRANCH=${TERMUX_PKG_VERSION}_Linux
 # dbus is required for $PREFIX/var/lib/dbus/machine-id
 TERMUX_PKG_DEPENDS="c-ares, cryptopp, dbus, ffmpeg, freeimage, libc++, libcurl, libsodium, libsqlite, libuv, mediainfo, openssl, pcre, readline, zlib"

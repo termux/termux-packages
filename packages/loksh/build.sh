@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="A Linux port of OpenBSD's ksh"
 TERMUX_PKG_LICENSE="Public Domain"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=7.2
-TERMUX_PKG_SRCURL=https://github.com/dimkr/loksh.git
+TERMUX_PKG_SRCURL=git+https://github.com/dimkr/loksh
 TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
 TERMUX_PKG_DEPENDS="ncurses"
 

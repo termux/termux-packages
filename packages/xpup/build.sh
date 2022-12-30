@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=3c408621ad9b5693323acd7d1b455f78444e0c5f
 TERMUX_PKG_VERSION=2021.12.26
-TERMUX_PKG_SRCURL=https://github.com/ericchiang/xpup.git
+TERMUX_PKG_SRCURL=git+https://github.com/ericchiang/xpup
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_BUILD_IN_SRC=true
 
