@@ -1,0 +1,280 @@
+https://github.com/kpet/clvk/issues/491
+
+diff --git a/.github/workflows/presubmit.yml b/.github/workflows/presubmit.yml
+index 3e89b4d..5ba4c5d 100644
+--- a/.github/workflows/presubmit.yml
++++ b/.github/workflows/presubmit.yml
+@@ -183,14 +183,6 @@ jobs:
+         run: ${{ env.testbindir }}/api_tests${{ env.exe-ext }}
+         env:
+           CLVK_LOG: 2
+-      # TODO #477 - enable these tests
+-      # - name: API tests (physical addressing)
+-      #   if: ${{ matrix.compiler-available && matrix.android-abi == '' }}
+-      #   run: ${{ env.testbindir }}/api_tests${{ env.exe-ext }}
+-      #   env:
+-      #     CLVK_LOG: 2
+-      #     CLVK_SPIRV_ARCH: spir64
+-      #     CLVK_PHYSICAL_ADDRESSING: 1
+       - name: Offline compilation simple tests
+         if: ${{ matrix.android-abi == '' }}
+         run: |
+diff --git a/src/api.cpp b/src/api.cpp
+index e91fd13..6cda1b0 100644
+--- a/src/api.cpp
++++ b/src/api.cpp
+@@ -488,7 +488,7 @@ cl_int CLVK_API_CALL clGetDeviceInfo(cl_device_id dev,
+         size_ret = sizeof(val_fpconfig);
+         break;
+     case CL_DEVICE_ADDRESS_BITS:
+-        val_uint = (config.spirv_arch() == "spir64") ? 64 : 32;
++        val_uint = 32; // FIXME
+         copy_ptr = &val_uint;
+         size_ret = sizeof(val_uint);
+         break;
+diff --git a/src/config.def b/src/config.def
+index 1fe9ba9..fa33748 100644
+--- a/src/config.def
++++ b/src/config.def
+@@ -26,8 +26,6 @@ OPTION(uint32_t, log, 0u)
+ OPTION(bool, log_colour, false)
+ OPTION(std::string, log_dest, "")
+ OPTION(uint32_t, spirv_validation, 2u)
+-OPTION(std::string, spirv_arch, "spir")
+-OPTION(bool, physical_addressing, false)
+ 
+ #if COMPILER_AVAILABLE
+ OPTION(std::string, clspv_options, "")
+diff --git a/src/device.cpp b/src/device.cpp
+index f8111f3..3df9d3c 100644
+--- a/src/device.cpp
++++ b/src/device.cpp
+@@ -217,7 +217,6 @@ bool cvk_device::init_extensions() {
+         VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME,
+         VK_KHR_VULKAN_MEMORY_MODEL_EXTENSION_NAME,
+         VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME,
+-        VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME,
+     };
+ 
+     if (m_properties.apiVersion < VK_MAKE_VERSION(1, 2, 0)) {
+@@ -269,8 +268,6 @@ void cvk_device::init_features(VkInstance instance) {
+         VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_EXTENDED_TYPES_FEATURES_KHR;
+     m_features_vulkan_memory_model.sType =
+         VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_MEMORY_MODEL_FEATURES;
+-    m_features_buffer_device_address.sType =
+-        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES_KHR;
+ 
+     std::vector<std::tuple<uint32_t, const char*, VkBaseOutStructure*>>
+         coreversion_extension_features = {
+@@ -297,10 +294,6 @@ void cvk_device::init_features(VkInstance instance) {
+             VER_EXT_FEAT(VK_MAKE_VERSION(1, 2, 0),
+                          VK_KHR_VULKAN_MEMORY_MODEL_EXTENSION_NAME,
+                          m_features_vulkan_memory_model),
+-            VER_EXT_FEAT(VK_MAKE_VERSION(1, 2, 0),
+-                         VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME,
+-                         m_features_buffer_device_address),
+-
+ #undef VER_EXT_FEAT
+         };
+ 
+@@ -423,12 +416,6 @@ void cvk_device::init_compiler_options() {
+     m_device_compiler_options +=
+         " " + m_clvk_properties->get_compile_options() + " ";
+ 
+-    m_device_compiler_options += " -arch=" + config.spirv_arch() + " ";
+-
+-    if (config.physical_addressing()) {
+-        m_device_compiler_options += " -physical-storage-buffers ";
+-    }
+-
+     // Builtin options
+     auto native_builtins = m_clvk_properties->get_native_builtins();
+     if (!native_builtins.empty()) {
+@@ -966,8 +953,6 @@ bool cvk_device::supports_capability(spv::Capability capability) const {
+         return m_features_vulkan_memory_model.vulkanMemoryModel;
+     case spv::CapabilityShaderNonUniform:
+         return supports_non_uniform_decoration();
+-    case spv::CapabilityPhysicalStorageBufferAddresses:
+-        return m_features_buffer_device_address.bufferDeviceAddress;
+     // Capabilities that have not yet been mapped to Vulkan features:
+     default:
+         cvk_warn_fn("Capability %d not yet mapped to a feature.", capability);
+diff --git a/src/device.hpp b/src/device.hpp
+index 345d00c..1003500 100644
+--- a/src/device.hpp
++++ b/src/device.hpp
+@@ -550,8 +550,6 @@ private:
+         m_features_shader_subgroup_extended_types{};
+     VkPhysicalDeviceVulkanMemoryModelFeaturesKHR
+         m_features_vulkan_memory_model{};
+-    VkPhysicalDeviceBufferDeviceAddressFeaturesKHR
+-        m_features_buffer_device_address{};
+ 
+     VkDevice m_dev;
+     std::vector<const char*> m_vulkan_device_extensions;
+diff --git a/src/kernel.cpp b/src/kernel.cpp
+index bb8f5a6..622b2f8 100644
+--- a/src/kernel.cpp
++++ b/src/kernel.cpp
+@@ -325,8 +325,6 @@ bool cvk_kernel_argument_values::setup_descriptor_sets() {
+         case kernel_argument_kind::pod: // skip POD arguments
+         case kernel_argument_kind::pod_ubo:
+         case kernel_argument_kind::pod_pushconstant:
+-        case kernel_argument_kind::pointer_ubo:
+-        case kernel_argument_kind::pointer_pushconstant:
+             break;
+         case kernel_argument_kind::local: // nothing to do?
+             break;
+diff --git a/src/kernel.hpp b/src/kernel.hpp
+index 33985f2..bef09d4 100644
+--- a/src/kernel.hpp
++++ b/src/kernel.hpp
+@@ -253,19 +253,7 @@ struct cvk_kernel_argument_values {
+ 
+     cl_int set_arg(const kernel_argument& arg, size_t size, const void* value) {
+ 
+-        if (arg.is_pod_pointer()) {
+-            auto mem = *reinterpret_cast<const cl_mem*>(value);
+-            if (mem == NULL) {
+-                // OpenCL permits cl_mem to be NULL
+-                uint64_t null = 0;
+-                set_pod_data(arg.offset, arg.size, &null);
+-            } else {
+-                auto mem_downcast = icd_downcast(mem);
+-                auto buff = reinterpret_cast<const cvk_buffer*>(mem_downcast);
+-                auto dev_addr = buff->device_address();
+-                set_pod_data(arg.offset, arg.size, &dev_addr);
+-            }
+-        } else if (arg.is_pod()) {
++        if (arg.is_pod()) {
+             // If the argument is a vec3, OpenCL requires to call clSetKernelArg
+             // with a size of 4 times the element size. But clspv arg size is
+             // only 3 times the element size. When size and arg.size do not
+diff --git a/src/memory.hpp b/src/memory.hpp
+index 98df3ca..341da37 100644
+--- a/src/memory.hpp
++++ b/src/memory.hpp
+@@ -385,16 +385,6 @@ struct cvk_buffer : public cvk_mem {
+         return mapping;
+     }
+ 
+-    uint64_t device_address() const {
+-        VkBufferDeviceAddressInfo info{};
+-        info.buffer = vulkan_buffer();
+-        info.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
+-        info.pNext = NULL;
+-        auto device_address = vkGetBufferDeviceAddress(
+-            context()->device()->vulkan_device(), &info);
+-        return device_address + vulkan_buffer_offset();
+-    }
+-
+ private:
+     bool init();
+ 
+diff --git a/src/program.cpp b/src/program.cpp
+index 215b385..f53067d 100644
+--- a/src/program.cpp
++++ b/src/program.cpp
+@@ -107,10 +107,6 @@ spv_result_t parse_reflection(void* user_data,
+             return kernel_argument_kind::pod_ubo;
+         case NonSemanticClspvReflectionArgumentPodPushConstant:
+             return kernel_argument_kind::pod_pushconstant;
+-        case NonSemanticClspvReflectionArgumentPointerUniform:
+-            return kernel_argument_kind::pointer_ubo;
+-        case NonSemanticClspvReflectionArgumentPointerPushConstant:
+-            return kernel_argument_kind::pointer_pushconstant;
+         case NonSemanticClspvReflectionArgumentSampledImage:
+             return kernel_argument_kind::sampled_image;
+         case NonSemanticClspvReflectionArgumentStorageImage:
+@@ -243,8 +239,7 @@ spv_result_t parse_reflection(void* user_data,
+                 break;
+             }
+             case NonSemanticClspvReflectionArgumentPodStorageBuffer:
+-            case NonSemanticClspvReflectionArgumentPodUniform:
+-            case NonSemanticClspvReflectionArgumentPointerUniform: {
++            case NonSemanticClspvReflectionArgumentPodUniform: {
+                 // These arguments have descriptor set, binding, offset, size
+                 // and an optional arg info.
+                 auto kernel = parse_data->strings[inst->words[5]];
+@@ -266,8 +261,7 @@ spv_result_t parse_reflection(void* user_data,
+                 parse_data->binary->add_kernel_argument(kernel, std::move(arg));
+                 break;
+             }
+-            case NonSemanticClspvReflectionArgumentPodPushConstant:
+-            case NonSemanticClspvReflectionArgumentPointerPushConstant: {
++            case NonSemanticClspvReflectionArgumentPodPushConstant: {
+                 // These arguments have offset, size and an optional arg info.
+                 auto kernel = parse_data->strings[inst->words[5]];
+                 auto ordinal = parse_data->constants[inst->words[6]];
+@@ -1484,12 +1478,10 @@ bool cvk_entry_point::build_descriptor_sets_layout_bindings_for_arguments(
+             continue;
+         case kernel_argument_kind::pod:
+         case kernel_argument_kind::pod_ubo:
+-        case kernel_argument_kind::pointer_ubo:
+             if (!pod_found) {
+                 if (arg.kind == kernel_argument_kind::pod) {
+                     dt = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+-                } else if (arg.kind == kernel_argument_kind::pod_ubo ||
+-                           arg.kind == kernel_argument_kind::pointer_ubo) {
++                } else if (arg.kind == kernel_argument_kind::pod_ubo) {
+                     dt = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+                 }
+ 
+@@ -1501,7 +1493,6 @@ bool cvk_entry_point::build_descriptor_sets_layout_bindings_for_arguments(
+             }
+             break;
+         case kernel_argument_kind::pod_pushconstant:
+-        case kernel_argument_kind::pointer_pushconstant:
+             continue;
+         }
+ 
+diff --git a/src/program.hpp b/src/program.hpp
+index 95baac5..cb43aa6 100644
+--- a/src/program.hpp
++++ b/src/program.hpp
+@@ -42,8 +42,6 @@ enum class kernel_argument_kind
+     pod,
+     pod_ubo,
+     pod_pushconstant,
+-    pointer_ubo,
+-    pointer_pushconstant,
+     sampled_image,
+     storage_image,
+     sampler,
+@@ -77,20 +75,12 @@ struct kernel_argument {
+     bool is_pod() const {
+         return (kind == kernel_argument_kind::pod) ||
+                (kind == kernel_argument_kind::pod_ubo) ||
+-               (kind == kernel_argument_kind::pod_pushconstant) ||
+-               (kind == kernel_argument_kind::pointer_ubo) ||
+-               (kind == kernel_argument_kind::pointer_pushconstant);
++               (kind == kernel_argument_kind::pod_pushconstant);
+     }
+ 
+     bool is_pod_buffer() const {
+         return (kind == kernel_argument_kind::pod) ||
+-               (kind == kernel_argument_kind::pod_ubo) ||
+-               (kind == kernel_argument_kind::pointer_ubo);
+-    }
+-
+-    bool is_pod_pointer() const {
+-        return (kind == kernel_argument_kind::pointer_pushconstant) ||
+-               (kind == kernel_argument_kind::pointer_ubo);
++               (kind == kernel_argument_kind::pod_ubo);
+     }
+ 
+     bool is_vec3() const { return info.is_vec3(); }
+diff --git a/src/queue.cpp b/src/queue.cpp
+index 1418d48..ee322c2 100644
+--- a/src/queue.cpp
++++ b/src/queue.cpp
+@@ -509,8 +509,7 @@ void cvk_command_kernel::update_global_push_constants(
+     if (m_kernel->has_pod_arguments() &&
+         !m_kernel->has_pod_buffer_arguments()) {
+         for (auto& arg : m_kernel->arguments()) {
+-            if (arg.kind == kernel_argument_kind::pod_pushconstant ||
+-                arg.kind == kernel_argument_kind::pointer_pushconstant) {
++            if (arg.kind == kernel_argument_kind::pod_pushconstant) {
+                 CVK_ASSERT(arg.offset + arg.size <=
+                            m_argument_values->pod_data().size());
+ 
