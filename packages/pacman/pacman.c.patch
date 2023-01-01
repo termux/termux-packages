@@ -8,7 +8,7 @@ diff -uNr pacman-6.0.0/src/pacman/pacman.c pacman-termux/src/pacman/pacman.c
 -	if(myuid > 0 && needs_root()) {
 -		pm_printf(ALPM_LOG_ERROR, _("you cannot perform this operation unless you are root.\n"));
 +	if(myuid == 0) {
-+		pm_printf(ALPM_LOG_ERROR, _("blocking operation, you can not run from the root of the user.\n"));
++		pm_printf(ALPM_LOG_ERROR, _("operation blocked, you may not use pacman as root.\n"));
  		cleanup(EXIT_FAILURE);
  	}
  
