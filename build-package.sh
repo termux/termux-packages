@@ -170,11 +170,11 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_create_timestamp_file.sh"
 # shellcheck source=scripts/build/get_source/termux_step_get_source.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/get_source/termux_step_get_source.sh"
 
-# Run from termux_step_get_source if TERMUX_PKG_SRCURL ends with .git.
+# Run from termux_step_get_source if TERMUX_PKG_SRCURL begins with "git+".
 # shellcheck source=scripts/build/get_source/termux_step_get_source.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/get_source/termux_git_clone_src.sh"
 
-# Run from termux_step_get_source if TERMUX_PKG_SRCURL does not ends with .git.
+# Run from termux_step_get_source if TERMUX_PKG_SRCURL does not begin with "git+".
 # shellcheck source=scripts/build/get_source/termux_download_src_archive.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/get_source/termux_download_src_archive.sh"
 
