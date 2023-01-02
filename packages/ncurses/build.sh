@@ -2,18 +2,17 @@ TERMUX_PKG_HOMEPAGE=https://invisible-island.net/ncurses/
 TERMUX_PKG_DESCRIPTION="Library for text-based user interfaces in a terminal-independent manner"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=(6.3
+TERMUX_PKG_VERSION=(6.4
 		    9.30
 		    15
 		    0.26.5
 		    0.9.0)
-TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=(https://ftp.gnu.org/gnu/ncurses/ncurses-${TERMUX_PKG_VERSION[0]}.tar.gz
 		   https://fossies.org/linux/misc/rxvt-unicode-${TERMUX_PKG_VERSION[1]}.tar.bz2
 		   https://github.com/thestinger/termite/archive/v${TERMUX_PKG_VERSION[2]}.tar.gz
 		   https://github.com/kovidgoyal/kitty/archive/v${TERMUX_PKG_VERSION[3]}.tar.gz
 		   https://github.com/alacritty/alacritty/archive/refs/tags/v${TERMUX_PKG_VERSION[4]}.tar.gz)
-TERMUX_PKG_SHA256=(97fc51ac2b085d4cde31ef4d2c3122c21abc217e9090a43a30fc5ec21684e059
+TERMUX_PKG_SHA256=(6931283d9ac87c5073f30b6290c4c75f21632bb4fc3603ac8100812bed248159
 		   fe1c93d12f385876457a989fc3ae05c0915d2692efc59289d0f70fabe5b44d2d
 		   3ae9ebef28aad081c6c11351f086776e2fd9547563b2f900732b41c376bec05a
 		   7a1b444f1cc10e16ee0f20a804c0f80b52417eeabf60d9f25e37ef192503ba26
@@ -40,6 +39,7 @@ am_cv_langinfo_codeset=no
 --without-debug
 --without-tests
 --with-normal
+--with-pkg-config-libdir=$TERMUX_PREFIX/lib/pkgconfig
 --with-static
 --with-shared
 --with-termpath=$TERMUX_PREFIX/etc/termcap:$TERMUX_PREFIX/share/misc/termcap
@@ -51,7 +51,6 @@ share/man/man7
 "
 
 termux_step_pre_configure() {
-	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-pkg-config-libdir=$PKG_CONFIG_LIBDIR"
 	export CPPFLAGS+=" -fPIC"
 }
 
