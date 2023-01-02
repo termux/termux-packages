@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://luarocks.org/
 TERMUX_PKG_DESCRIPTION="Deployment and management system for Lua modules"
-TERMUX_PKG_LICENSE="BSD"
+TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.9.2
 TERMUX_PKG_SRCURL=https://luarocks.org/releases/luarocks-${TERMUX_PKG_VERSION}.tar.gz
