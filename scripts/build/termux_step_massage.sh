@@ -90,6 +90,7 @@ termux_step_massage() {
 	if [ -d "lib" ]; then
 		SYMBOLS="$($READELF -s $($TERMUX_HOST_PLATFORM-clang -print-libgcc-file-name) | grep "FUNC    GLOBAL HIDDEN" | awk '{print $8}')"
 		SYMBOLS+=" $(echo libandroid_{sem_{open,close,unlink},shm{ctl,get,at,dt}})"
+		SYMBOLS+=" $(echo backtrace{,_symbols{,_fd}})"
 		grep_pattern="$(create_grep_pattern $SYMBOLS)"
 		for lib in "$(find lib -name "*.so")"; do
 			if ! $READELF -h "$lib" &> /dev/null; then
