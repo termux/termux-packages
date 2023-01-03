@@ -20,9 +20,9 @@ termux_step_get_dependencies() {
 			local pkg_versioned="$PKG" build_dependency="false" force_build_dependency="$TERMUX_FORCE_BUILD_DEPENDENCIES"
 			[[ "${TERMUX_WITHOUT_DEPVERSION_BINDING}" == "false" ]] && pkg_versioned+="@$DEP_VERSION"
 			if [[ "$cyclic_dependence" == "false" ]]; then
-				[[ "$TERMUX_QUIET_BUILD" != "true" ]] && echo "Downloading dependency $pkg_versioned if necessary..."
+				[[ "$TERMUX_QUIET_BUILD" != "true" ]] && echo -n "Downloading dependency $pkg_versioned if necessary... "
 				if [[ "$TERMUX_FORCE_BUILD_DEPENDENCIES" == "true" && "$TERMUX_ON_DEVICE_BUILD" == "true" && "$DEP_ON_DEVICE_NOT_SUPPORTED" == "true" ]]; then
-					echo "Building dependency $PKG on device is not supported. It will be downloaded..."
+					echo -n "building dependency $PKG on device is not supported. It will be downloaded... "
 					force_build_dependency="false"
 				fi
 			else
@@ -30,17 +30,17 @@ termux_step_get_dependencies() {
 			fi
 			if [[ "$force_build_dependency" = "true" ]]; then
 				termux_force_check_package_dependency && continue || :
-				[[ "$TERMUX_QUIET_BUILD" != "true" ]] && echo "Force building dependency $PKG instead of downloading due to -I flag..."
+				[[ "$TERMUX_QUIET_BUILD" != "true" ]] && echo -n "force building dependency $PKG instead of downloading due to -I flag... "
 				build_dependency="true"
 			else
 				if termux_package__is_package_version_built "$PKG" "$DEP_VERSION"; then
-					[[ "$TERMUX_QUIET_BUILD" != "true" ]] && echo "Skipping already built dependency $pkg_versioned"
+					[[ "$TERMUX_QUIET_BUILD" != "true" ]] && echo "have already built dependency $pkg_versioned"
 					continue
 				fi
 				if ! TERMUX_WITHOUT_DEPVERSION_BINDING="$([[ "${cyclic_dependence}" == "true" ]] && echo "true" || echo "${TERMUX_WITHOUT_DEPVERSION_BINDING}")" termux_download_deb_pac $PKG $DEP_ARCH $DEP_VERSION $DEP_VERSION_PAC; then
 					[[ "$cyclic_dependence" == "true" || ( "$TERMUX_FORCE_BUILD_DEPENDENCIES" == "true" && "$TERMUX_ON_DEVICE_BUILD" == "true" ) ]] \
 						&& termux_error_exit "Download of $PKG$([[ "${TERMUX_WITHOUT_DEPVERSION_BINDING}" == "false" && "${cyclic_dependence}" == "false" ]] && echo "@$DEP_VERSION") from $TERMUX_REPO_URL failed"
-					echo "Download of $pkg_versioned from $TERMUX_REPO_URL failed, building instead"
+					echo "Download from $TERMUX_REPO_URL failed, building instead"
 					build_dependency="true"
 				fi
 			fi
@@ -49,7 +49,6 @@ termux_step_get_dependencies() {
 				termux_add_package_to_built_packages_list "$PKG"
 			fi
 			if [[ "$TERMUX_ON_DEVICE_BUILD" == "false" ]]; then
-				[[ "$TERMUX_QUIET_BUILD" != "true" ]] && echo "extracting $PKG to $TERMUX_COMMON_CACHEDIR-$DEP_ARCH..."
 				(
 					cd "$TERMUX_COMMON_CACHEDIR-$DEP_ARCH"
 					if [[ "$TERMUX_REPO_PKG_FORMAT" == "debian" ]]; then
@@ -70,13 +69,13 @@ termux_step_get_dependencies() {
 		else # Build dependencies
 			# Built dependencies are put in the default TERMUX_OUTPUT_DIR instead of the specified one
 			if [[ "$TERMUX_FORCE_BUILD_DEPENDENCIES" == "true" ]]; then
-				[[ "$TERMUX_QUIET_BUILD" != "true" ]] && echo "Force building dependency $PKG..."
+				[[ "$TERMUX_QUIET_BUILD" != "true" ]] && echo -n "force building dependency $PKG... "
 				read -r DEP_ARCH DEP_VERSION DEP_VERSION_PAC DEP_ON_DEVICE_NOT_SUPPORTED < <(termux_extract_dep_info $PKG "${PKG_DIR}")
 				[[ "$TERMUX_ON_DEVICE_BUILD" == "true" && "$DEP_ON_DEVICE_NOT_SUPPORTED" == "true" ]] \
 					&& termux_error_exit "Building $PKG on device is not supported. Consider passing -I flag to download it instead"
 				termux_force_check_package_dependency && continue
 			else
-				[[ "$TERMUX_QUIET_BUILD" != "true" ]] && echo "Building dependency $PKG if necessary..."
+				[[ "$TERMUX_QUIET_BUILD" != "true" ]] && echo -n "building dependency $PKG if necessary... "
 			fi
 			termux_run_build-package
 		fi
@@ -85,7 +84,7 @@ termux_step_get_dependencies() {
 
 termux_force_check_package_dependency() {
 	if termux_check_package_in_built_packages_list "$PKG" && termux_package__is_package_version_built "$PKG" "$DEP_VERSION"; then
-		[[ "$TERMUX_QUIET_BUILD" != "true" ]] && echo "Skipping already built dependency $PKG$([[ "${TERMUX_WITHOUT_DEPVERSION_BINDING}" == "false" ]] && echo "@$DEP_VERSION")"
+		[[ "$TERMUX_QUIET_BUILD" != "true" ]] && echo "skipping already built dependency $PKG$([[ "${TERMUX_WITHOUT_DEPVERSION_BINDING}" == "false" ]] && echo "@$DEP_VERSION")"
 		return 0
 	fi
 	return 1
