@@ -19,9 +19,9 @@
 # Returns `0` if supported, otherwise `1`.
 # .
 # .
-# pacakge__is_package_on_device_build_supported `package_dir`
+# package__is_package_on_device_build_supported `package_dir`
 ##
-pacakge__is_package_on_device_build_supported() {
+package__is_package_on_device_build_supported() {
 	[ $(. "${1}/build.sh"; echo "$TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED") != "true" ]
 	return $?
 }
@@ -41,9 +41,9 @@ pacakge__is_package_on_device_build_supported() {
 # Returns `0` if built, otherwise `1`.
 # .
 # .
-# pacakge__is_package_version_built `package_name` `package_version`
+# package__is_package_version_built `package_name` `package_version`
 ##
-pacakge__is_package_version_built() {
+package__is_package_version_built() {
 	[ -e "$TERMUX_BUILT_PACKAGES_DIRECTORY/$1" ] && [ "$(cat "$TERMUX_BUILT_PACKAGES_DIRECTORY/$1")" = "$2" ]
 	return $?
 }

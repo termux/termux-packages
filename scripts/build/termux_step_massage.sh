@@ -107,7 +107,7 @@ termux_step_massage() {
 		termux_create_pacman_subpackages
 	fi
 
-	# Remove unnecessary files in haskell pacakges:
+	# Remove unnecessary files in haskell packages:
 	if [[ "${TERMUX_PKG_NAME}" != "ghc-libs" ]] && [[ "${TERMUX_PKG_NAME}" != "ghc" ]]; then
 		test -d ./lib/ghc-* && rm -rf ./lib/ghc-* 2>/dev/null # Remove full ghc-* dir since cross compiler installs packages in "./lib/${TERMUX_ARCH}-android-ghc-X.Y.Z"
 	fi

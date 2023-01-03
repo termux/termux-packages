@@ -25,7 +25,7 @@ termux_step_get_dependencies() {
 			read DEP_ARCH DEP_VERSION DEP_VERSION_PAC <<< $(termux_extract_dep_info $PKG "${PKG_DIR}")
 			[ ! "$TERMUX_QUIET_BUILD" = true ] && echo "Downloading dependency $PKG@$DEP_VERSION if necessary..."
 			local force_build_dependency="$TERMUX_FORCE_BUILD_DEPENDENCIES"
-			if [ "$TERMUX_FORCE_BUILD_DEPENDENCIES" = "true" ] && [ "$TERMUX_ON_DEVICE_BUILD" = "true" ] && ! pacakge__is_package_on_device_build_supported "$PKG_DIR"; then
+			if [ "$TERMUX_FORCE_BUILD_DEPENDENCIES" = "true" ] && [ "$TERMUX_ON_DEVICE_BUILD" = "true" ] && ! package__is_package_on_device_build_supported "$PKG_DIR"; then
 				echo "Building dependency $PKG on device is not supported. It will be downloaded..."
 				force_build_dependency="false"
 			fi
@@ -35,7 +35,7 @@ termux_step_get_dependencies() {
 				termux_force_check_package_dependency && continue
 				build_dependency=true
 			else
-				if pacakge__is_package_version_built "$PKG" "$DEP_VERSION"; then
+				if package__is_package_version_built "$PKG" "$DEP_VERSION"; then
 					[ ! "$TERMUX_QUIET_BUILD" = true ] && echo "Skipping already built dependency $PKG@$DEP_VERSION"
 					continue
 				fi
@@ -83,7 +83,7 @@ termux_step_get_dependencies() {
 			# Built dependencies are put in the default TERMUX_OUTPUT_DIR instead of the specified one
 			if [ "$TERMUX_FORCE_BUILD_DEPENDENCIES" = "true" ]; then
 				[ ! "$TERMUX_QUIET_BUILD" = true ] && echo "Force building dependency $PKG..."
-				if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ] && ! pacakge__is_package_on_device_build_supported "$PKG_DIR"; then
+				if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ] && ! package__is_package_on_device_build_supported "$PKG_DIR"; then
 					echo "Building $PKG on device is not supported. Consider passing -I flag to download it instead"
 					return 1
 				fi
@@ -98,7 +98,7 @@ termux_step_get_dependencies() {
 }
 
 termux_force_check_package_dependency() {
-	if termux_check_package_in_built_packages_list "$PKG" && pacakge__is_package_version_built "$PKG" "$DEP_VERSION"; then
+	if termux_check_package_in_built_packages_list "$PKG" && package__is_package_version_built "$PKG" "$DEP_VERSION"; then
 		[ ! "$TERMUX_QUIET_BUILD" = true ] && echo "Skipping already built dependency $PKG@$DEP_VERSION"
 		return 0
 	fi
