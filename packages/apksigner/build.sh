@@ -8,13 +8,9 @@ TERMUX_PKG_DEPENDS="openjdk-17"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
+TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 
 termux_step_pre_configure() {
-	# Requires Android SDK, not available on device
-	if $TERMUX_ON_DEVICE_BUILD; then
-		termux_error_exit "Package '$TERMUX_PKG_NAME' is not available for on-device builds."
-	fi
-
 	# Version guard
 	if [ "${TERMUX_PKG_VERSION#*:}" != "${TERMUX_ANDROID_BUILD_TOOLS_VERSION}" ]; then
 		termux_error_exit "Version mismatch between TERMUX_PKG_VERSION and TERMUX_ANDROID_BUILD_TOOLS_VERSION."
