@@ -13,9 +13,9 @@ TERMUX_ANDROID_BUILD_TOOLS_VERSION=33.0.1
 : "${TERMUX_NDK_REVISION:="b"}"
 TERMUX_NDK_VERSION=$TERMUX_NDK_VERSION_NUM$TERMUX_NDK_REVISION
 # when changing the above:
-# update version and hashsum in packages
+# remove TERMUX_PKG_REVISION in:
 #   libc++, ndk-multilib, ndk-sysroot, vulkan-loader-android
-# and update SHA256 sums in scripts/setup-android-sdk.sh
+# update SHA256 sums in scripts/setup-android-sdk.sh
 # check all packages build and run correctly and bump if needed
 
 : "${TERMUX_JAVA_HOME:=/usr/lib/jvm/java-8-openjdk-amd64}"

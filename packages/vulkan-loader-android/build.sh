@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://source.android.com/devices/graphics/arch-vulkan
 TERMUX_PKG_DESCRIPTION="Vulkan Loader for Android"
 TERMUX_PKG_LICENSE="NCSA"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=25b
-TERMUX_PKG_SRCURL=https://dl.google.com/android/repository/android-ndk-r${TERMUX_PKG_VERSION}-linux.zip
-TERMUX_PKG_SHA256=403ac3e3020dd0db63a848dcaba6ceb2603bf64de90949d5c4361f848e44b005
+TERMUX_PKG_VERSION=$TERMUX_NDK_VERSION
 TERMUX_PKG_HOSTBUILD=true
+TERMUX_PKG_SKIP_SRC_EXTRACT=true
 
 # Desktop Vulkan Loader
 # https://github.com/KhronosGroup/Vulkan-Loader
@@ -45,7 +44,7 @@ termux_step_host_build() {
 
 termux_step_post_make_install() {
 	install -v -Dm644 \
-		"$TERMUX_PKG_SRCDIR/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libvulkan.so" \
+		"$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libvulkan.so" \
 		"$TERMUX_PREFIX/lib/libvulkan.so"
 
 	local vulkan_loader_version
