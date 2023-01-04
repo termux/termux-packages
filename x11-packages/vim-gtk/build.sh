@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="VIM License"
 TERMUX_PKG_MAINTAINER="@termux"
 
 # vim should only be updated every 50 releases on multiples of 50.
+# Update all of vim, vim-python and vim-gtk to the same version in one PR.
 TERMUX_PKG_VERSION=9.0.1100
 TERMUX_PKG_SRCURL=https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=b115e67a42f4ac76839eab44d2844df0adda32f078dbba62b715ec8da162c00b
