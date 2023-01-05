@@ -1,6 +1,6 @@
 diff -uNr debootstrap/functions debootstrap.mod/functions
---- debootstrap/functions	2021-08-19 14:49:19.000000000 +0300
-+++ debootstrap.mod/functions	2021-11-06 20:56:36.542688226 +0200
+--- debootstrap/functions	2022-10-19 01:48:32.000000000 +0300
++++ debootstrap.mod/functions	2023-01-05 11:26:45.296698565 +0200
 @@ -231,6 +231,9 @@
  }
  
@@ -11,7 +11,7 @@ diff -uNr debootstrap/functions debootstrap.mod/functions
  	if [ "$container" = lxc ]; then
  		CONTAINER="lxc"
  	elif grep -qs container=lxc-libvirt /proc/1/environ; then
-@@ -974,7 +977,7 @@
+@@ -978,7 +981,7 @@
  extract_dpkg_deb_data () {
  	local pkg="$1"
  
@@ -20,7 +20,7 @@ diff -uNr debootstrap/functions debootstrap.mod/functions
  }
  
  # Raw .deb extractors
-@@ -1016,7 +1019,7 @@
+@@ -1020,7 +1023,7 @@
  	esac
  
  	if in_path "$cat_cmd"; then
@@ -29,7 +29,7 @@ diff -uNr debootstrap/functions debootstrap.mod/functions
  	else
  		error 1 UNPACKCMDUNVL "Extracting %s requires the %s command, which is not available" "$pkg" "$cat_cmd"
  	fi
-@@ -1073,7 +1076,7 @@
+@@ -1077,7 +1080,7 @@
  ); }
  
  in_target_nofail () {
@@ -38,7 +38,7 @@ diff -uNr debootstrap/functions debootstrap.mod/functions
  		true
  	fi
  	return 0
-@@ -1085,7 +1088,7 @@
+@@ -1089,7 +1092,7 @@
  	msg="$2"
  	arg="$3"
  	shift; shift; shift
@@ -47,7 +47,34 @@ diff -uNr debootstrap/functions debootstrap.mod/functions
  		warning "$code" "$msg" "$arg"
  		# Try to point user at actual failing package.
  		msg="See %s for details"
-@@ -1249,7 +1252,6 @@
+@@ -1145,13 +1148,15 @@
+ setup_etc () {
+ 	mkdir -p "$TARGET/etc"
+ 
+-	conditional_cp /etc/resolv.conf "$TARGET"
+-	conditional_cp /etc/hostname "$TARGET"
++	conditional_cp @TERMUX_PREFIX@/etc/resolv.conf "$TARGET"
++	conditional_cp @TERMUX_PREFIX@/etc/hostname "$TARGET"
+ }
+ 
+ UMOUNT_DIRS=
+ 
+ umount_exit_function () {
++	return
++
+ 	local realdir dir
+ 	for dir in $UMOUNT_DIRS; do
+ 		realdir="$(in_target_nofail readlink -f "$dir")"
+@@ -1176,6 +1181,8 @@
+ }
+ 
+ setup_proc () {
++	return
++
+ 	case "$HOST_OS" in
+ 	    *freebsd*)
+ 		umount_on_exit /dev
+@@ -1255,7 +1262,6 @@
  			return 0
  		fi
  
@@ -55,3 +82,30 @@ diff -uNr debootstrap/functions debootstrap.mod/functions
  		;;
  	esac
  }
+@@ -1280,6 +1286,8 @@
+ 
+ # Create a device node if it does not exist. By default, the mode is 666.
+ mknod_if_needed () {
++	return
++
+ 	local device type major minor mode
+ 	device="$1"
+ 	type="$2"
+@@ -1294,6 +1302,8 @@
+ 
+ 
+ setup_devices_simple () {
++	return
++
+ 	# The list of devices that can be created in a container comes from
+ 	# src/core/cgroup.c in the systemd source tree.
+ 	mknod_if_needed "$TARGET/dev/null"        c 1 3
+@@ -1325,6 +1335,8 @@
+ }
+ 
+ setup_devices_bind () {
++	return
++
+ 	local device
+ 	mount -t tmpfs nodev "$TARGET/dev"
+ 	umount_on_exit /dev
