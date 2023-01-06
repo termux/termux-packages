@@ -84,6 +84,12 @@ termux_step_massage() {
 		termux_error_exit "Package contains hard links: $HARDLINKS"
 	fi
 
+	# Check for directory "$PREFIX/$PREFIX" which almost always indicates
+	# packaging error.
+	if [ -d "./${TERMUX_PREFIX#/}" ]; then
+		termux_error_exit "Package contains directory \"\$PREFIX/\$PREFIX\" ($TERMUX_PREFIX/${TERMUX_PREFIX#/})"
+	fi
+
 	# Check so that package is not affected by
 	# https://github.com/android/ndk/issues/1614, or
 	# https://github.com/termux/termux-packages/issues/9944
