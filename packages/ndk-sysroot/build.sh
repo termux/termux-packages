@@ -11,6 +11,10 @@ TERMUX_PKG_CONFLICTS="libutil-dev, libgcc, libandroid-support-dev"
 TERMUX_PKG_REPLACES="libutil-dev, libgcc, libandroid-support-dev, ndk-stl"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
+TERMUX_PKG_RM_AFTER_INSTALL="
+include/unicode
+include/vulkan
+"
 
 termux_step_extract_into_massagedir() {
 	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib \
@@ -18,12 +22,6 @@ termux_step_extract_into_massagedir() {
 
 	cp -Rf $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/include/* \
 		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include
-
-	# replace vulkan headers with upstream version
-	rm -rf $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/vulkan
-
-	# replace ICU headers with upstream version
-	rm -rf $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/unicode
 
 	patch -d $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/c++/v1  -p1 < $TERMUX_PKG_BUILDER_DIR/math-header.diff
 	# disable for now
