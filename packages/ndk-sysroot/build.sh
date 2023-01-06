@@ -23,7 +23,7 @@ termux_step_extract_into_massagedir() {
 	cp -Rf $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/include/* \
 		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include
 
-	patch -d $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/c++/v1  -p1 < $TERMUX_PKG_BUILDER_DIR/math-header.diff
+	patch -d $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/c++/v1 -p1 < $TERMUX_PKG_BUILDER_DIR/math-header.diff
 
 	cp $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/*.o \
 		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib
@@ -38,17 +38,19 @@ termux_step_extract_into_massagedir() {
 
 	cp $LIBATOMIC/libatomic.a $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/
 
-	cp $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/libcompiler_rt-extras.a $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/
+	cp $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/libcompiler_rt-extras.a \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/
 	# librt and libpthread are built into libc on android, so setup them as symlinks
 	# to libc for compatibility with programs that users try to build:
 	local _SYSTEM_LIBDIR=/system/lib64
 	if [ $TERMUX_ARCH_BITS = 32 ]; then _SYSTEM_LIBDIR=/system/lib; fi
-	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib
-	cd $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib
 	NDK_ARCH=$TERMUX_ARCH
 	test $NDK_ARCH == 'i686' && NDK_ARCH='i386'
+
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib
 	# clang 13 requires libunwind on Android.
-	cp $TERMUX_STANDALONE_TOOLCHAIN/lib64/clang/14.0.6/lib/linux/$NDK_ARCH/libunwind.a .
+	cp $TERMUX_STANDALONE_TOOLCHAIN/lib64/clang/14.0.6/lib/linux/$NDK_ARCH/libunwind.a \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib
 
 	for lib in librt.so libpthread.so libutil.so; do
 		echo 'INPUT(-lc)' > $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/$lib
