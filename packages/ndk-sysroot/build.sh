@@ -24,8 +24,6 @@ termux_step_extract_into_massagedir() {
 		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include
 
 	patch -d $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/c++/v1  -p1 < $TERMUX_PKG_BUILDER_DIR/math-header.diff
-	# disable for now
-	# patch -d $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/ -p1 < $TERMUX_PKG_BUILDER_DIR/gcc_fixes.diff
 
 	cp $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/*.o \
 		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib
