@@ -1,0 +1,38 @@
+--- a/src/core/api/qtbug-61521.cpp
++++ b/src/core/api/qtbug-61521.cpp
+@@ -40,6 +40,9 @@
+ #include <stdlib.h>
+ #include <malloc.h>
+ 
++#include <errno.h>
++#include <unistd.h>
++
+ #define SHIM_ALIAS_SYMBOL(fn) __attribute__((weak, alias(#fn)))
+ #define SHIM_SYMBOL_VERSION(fn) __asm__(".symver __" #fn "," #fn "@Qt_5")
+ #define SHIM_HIDDEN __attribute__ ((visibility ("hidden")))
+@@ -107,11 +110,25 @@
+ }
+ 
+ SHIM_HIDDEN void* ShimValloc(size_t size) {
++#ifdef __BIONIC__
++    return memalign(getpagesize(), size);
++#else
+     return  valloc(size);
++#endif
+ }
+ 
+ SHIM_HIDDEN void* ShimPvalloc(size_t size) {
++#ifdef __BIONIC__
++    size_t pagesize = getpagesize();
++    size_t bytes = __BIONIC_ALIGN(size, pagesize);
++    if (bytes < size) {
++        errno = ENOMEM;
++        return nullptr;
++    }
++    return memalign(pagesize, bytes);
++#else
+     return pvalloc(size);
++#endif
+ }
+ 
+ SHIM_HIDDEN int ShimPosixMemalign(void** r, size_t a, size_t s) {
