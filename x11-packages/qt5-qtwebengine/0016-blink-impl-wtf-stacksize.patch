@@ -1,0 +1,22 @@
+Origin: https://gitlab.alpinelinux.org/alpine/aports/-/blob/master/community/chromium/wtf-stacksize.patch
+
+--- a/src/3rdparty/chromium/third_party/blink/renderer/platform/wtf/stack_util.cc
++++ b/src/3rdparty/chromium/third_party/blink/renderer/platform/wtf/stack_util.cc
+@@ -29,7 +29,7 @@
+ // FIXME: On Mac OSX and Linux, this method cannot estimate stack size
+ // correctly for the main thread.
+ 
+-#elif defined(__GLIBC__) || defined(OS_ANDROID) || defined(OS_FREEBSD) || \
++#elif defined(OS_LINUX) || defined(OS_ANDROID) || defined(OS_FREEBSD) || \
+     defined(OS_FUCHSIA)
+   // pthread_getattr_np() can fail if the thread is not invoked by
+   // pthread_create() (e.g., the main thread of blink_unittests).
+@@ -97,7 +97,7 @@
+ }
+ 
+ void* GetStackStart() {
+-#if defined(__GLIBC__) || defined(OS_ANDROID) || defined(OS_FREEBSD) || \
++#if defined(OS_LINUX) || defined(OS_ANDROID) || defined(OS_FREEBSD) || \
+     defined(OS_FUCHSIA)
+   pthread_attr_t attr;
+   int error;
