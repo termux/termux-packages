@@ -9,7 +9,7 @@ TERMUX_PKG_SHA256=d7c6ead9d80d0f60d98d0414e9dc87f5e18a304e420f5cd21f1aa3210c1a15
 TERMUX_PKG_DEPENDS="libiconv, libjpeg-turbo, zlib"
 TERMUX_PKG_BUILD_DEPENDS="cups, libandroid-spawn, xorgproto"
 # openjdk-17-x is recommended because X11 separation is still very experimental.
-TERMUX_PKG_RECOMMENDS="openjdk-17-x"
+TERMUX_PKG_RECOMMENDS="ca-certificates-java, openjdk-17-x, resolv-conf"
 TERMUX_PKG_SUGGESTS="cups"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HAS_DEBUG=false
