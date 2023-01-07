@@ -5,8 +5,10 @@ TERMUX_PKG_MAINTAINER="@termux"
 _DATE=2022-12-02
 _TIME=19-19-22
 TERMUX_PKG_VERSION=${_DATE//-/.}.${_TIME//-/.}
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/minio/minio/archive/refs/tags/RELEASE.${_DATE}T${_TIME}Z.tar.gz
 TERMUX_PKG_SHA256=0cc787305e317951c8c2f6de1ae14938b750817b310b75e2265195ac00244eb1
+TERMUX_PKG_DEPENDS="resolv-conf"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
