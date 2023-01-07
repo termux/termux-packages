@@ -8,6 +8,7 @@ TERMUX_PKG_VERSION=3:${_MAJOR_VERSION}
 TERMUX_PKG_SRCURL=https://storage.googleapis.com/golang/go${_MAJOR_VERSION}.src.tar.gz
 TERMUX_PKG_SHA256=eda74db4ac494800a3e66ee784e495bfbb9b8e535df924a8b01b1a8028b7f368
 TERMUX_PKG_DEPENDS="clang"
+TERMUX_PKG_RECOMMENDS="resolv-conf"
 TERMUX_PKG_NO_STATICSPLIT=true
 
 termux_step_post_get_source() {
