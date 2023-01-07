@@ -4,10 +4,11 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="LICENSE-MIT, LICENSE-APACHE"
 TERMUX_PKG_MAINTAINER="Yaksh Bariya <yakshbari4@gmail.com>"
 TERMUX_PKG_VERSION="0.10.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/lycheeverse/lychee/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=f044d8a019a6bb3fdc553bf8e67bffa566494bccd85bad35130ae71faa7e1aaa
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="openssl"
+TERMUX_PKG_DEPENDS="openssl, resolv-conf"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
