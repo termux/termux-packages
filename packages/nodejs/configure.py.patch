@@ -1,16 +1,10 @@
-Revert https://github.com/nodejs/node/commit/938212f3e74a74d0b436941aa24e71425ff666c5
-
-Seems like host GCC compiler doesn't support this yet.
---- ./configure.py.orig	2022-10-06 06:09:46.883008809 +0530
-+++ ./configure.py	2022-10-06 06:10:31.483008792 +0530
-@@ -1245,10 +1245,6 @@
+--- ./configure.py.orig	2023-01-07 16:56:02.569241264 +0530
++++ ./configure.py	2023-01-07 16:56:12.326490692 +0530
+@@ -1261,7 +1261,6 @@
  
-   o['variables']['want_separate_host_toolset'] = int(cross_compiling)
- 
--  # Enable branch protection for arm64
--  if target_arch == 'arm64':
+   # Enable branch protection for arm64
+   if target_arch == 'arm64':
 -    o['cflags']+=['-msign-return-address=all']
--
+     o['variables']['arm_fpu'] = options.arm_fpu or 'neon'
+ 
    if options.node_snapshot_main is not None:
-     if options.shared:
-       # This should be possible to fix, but we will need to refactor the
