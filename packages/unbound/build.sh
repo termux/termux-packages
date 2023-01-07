@@ -3,9 +3,10 @@ TERMUX_PKG_DESCRIPTION="A validating, recursive, caching DNS resolver"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.17.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://nlnetlabs.nl/downloads/unbound/unbound-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=dcbc95d7891d9f910c66e4edc9f1f2fde4dea2eec18e3af9f75aed44a02f1341
-TERMUX_PKG_DEPENDS="libevent, libexpat, libnghttp2, openssl"
+TERMUX_PKG_DEPENDS="libevent, libexpat, libnghttp2, openssl, resolv-conf"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 # `pythonmodule` makes core lib/libunbound.so depend on python. Do not enable it.
