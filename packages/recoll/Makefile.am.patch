@@ -1,3 +1,30 @@
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -619,7 +619,7 @@
+ # php/00README.txt php/recoll/config.m4 php/recoll/make.sh
+ # php/recoll/php_recoll.h php/recoll/recoll.cpp php/sample/shell.php
+ 
+-OPTSFORPYTHON = $(shell test -f /etc/debian_version && echo --install-layout=deb)
++OPTSFORPYTHON =
+ 
+ if MAKEPYTHON
+ all-local:: recollpython
+@@ -627,13 +627,13 @@
+ clean-local:: recollpython-clean
+ recollpython: librecoll.la
+ 	(cd python/recoll; set -x; \
+-        for v in 2 3;do test -n "`which python$${v}`" && \
++        for v in 3;do test -n "`command -v python$${v}`" && \
+         libdir=$(libdir) python$${v} setup.py build; \
+         done \
+         )
+ recollpython-install:
+ 	(cd python/recoll; set -x; \
+-        for v in 2 3;do test -n "`which python$${v}`" && \
++        for v in 3;do test -n "`command -v python$${v}`" && \
+         python$${v} setup.py install \
+          --prefix=${prefix} --root=$${DESTDIR:-/} $(OPTSFORPYTHON); \
+         done; \
 --- a/Makefile.in
 +++ b/Makefile.in
 @@ -1145,7 +1145,7 @@
