@@ -1,248 +1,28 @@
 diff -uNr libxkbcommon-xkbcommon-1.3.0/meson.build libxkbcommon-xkbcommon-1.3.0.mod/meson.build
 --- libxkbcommon-xkbcommon-1.3.0/meson.build	2021-05-01 20:51:23.000000000 +0000
 +++ libxkbcommon-xkbcommon-1.3.0.mod/meson.build	2021-05-05 22:04:46.581405754 +0000
-@@ -527,244 +527,6 @@
+@@ -527,10 +527,12 @@
+ xkct_config.set('XKB_CONFIG_ROOT', XKBCONFIGROOT)
+ configure_file(input: 'test/xkeyboard-config-test.py.in',
                 output: 'xkeyboard-config-test',
                 configuration: xkct_config)
  
--# Tests
--test_env = environment()
--test_env.set('XKB_LOG_LEVEL', 'debug')
--test_env.set('XKB_LOG_VERBOSITY', '10')
--test_env.set('top_srcdir', meson.source_root())
--test_env.set('top_builddir', meson.build_root())
--test_env.set('HAVE_XKBCLI_INTERACTIVE_EVDEV', configh_data.get('HAVE_XKBCLI_INTERACTIVE_EVDEV', 0).to_string())
--test_env.set('HAVE_XKBCLI_INTERACTIVE_WAYLAND', configh_data.get('HAVE_XKBCLI_INTERACTIVE_WAYLAND', 0).to_string())
--test_env.set('HAVE_XKBCLI_INTERACTIVE_X11', configh_data.get('HAVE_XKBCLI_INTERACTIVE_X11', 0).to_string())
--test_env.set('HAVE_XKBCLI_LIST', configh_data.get('HAVE_XKBCLI_LIST', 0).to_string())
--
--test_configh_data = configuration_data()
--test_configh_data.set_quoted('TEST_XKB_CONFIG_ROOT', meson.source_root()/'test'/'data')
--configure_file(output: 'test-config.h', configuration: test_configh_data)
--
--# Some tests need to use unexported symbols, so we link them against
--# an internal copy of libxkbcommon with all symbols exposed.
--libxkbcommon_test_internal = static_library(
--    'xkbcommon-test-internal',
--    'test/common.c',
--    'test/test.h',
--    'test/evdev-scancodes.h',
--    'bench/bench.c',
--    'bench/bench.h',
--    libxkbcommon_sources,
--    include_directories: include_directories('src', 'include'),
--)
--test_dep = declare_dependency(
--    include_directories: include_directories('src', 'include'),
--    link_with: libxkbcommon_test_internal,
--)
--if get_option('enable-x11')
--    libxkbcommon_x11_internal = static_library(
--        'xkbcommon-x11-internal',
--        libxkbcommon_x11_sources,
--        include_directories: include_directories('src', 'include'),
--        link_with: libxkbcommon_test_internal,
--        dependencies: [
--            xcb_dep,
--            xcb_xkb_dep,
--        ],
--    )
--    x11_test_dep = declare_dependency(
--        link_with: libxkbcommon_x11_internal,
--        dependencies: [
--            test_dep,
--            xcb_dep,
--            xcb_xkb_dep,
--        ],
--    )
--endif
--test(
--    'keysym',
--    executable('test-keysym', 'test/keysym.c', dependencies: test_dep),
--    env: test_env,
--)
--test(
--    'keymap',
--    executable('test-keymap', 'test/keymap.c', dependencies: test_dep),
--    env: test_env,
--)
--test(
--    'filecomp',
--    executable('test-filecomp', 'test/filecomp.c', dependencies: test_dep),
--    env: test_env,
--)
--# TODO: This test currently uses some functions that don't exist on Windows.
--if cc.get_id() != 'msvc'
--  test(
--      'context',
--      executable('test-context', 'test/context.c', dependencies: test_dep),
--      env: test_env,
--  )
--endif
--test(
--    'rules-file',
--    executable('test-rules-file', 'test/rules-file.c', dependencies: test_dep),
--    env: test_env,
--)
--test(
--    'rules-file-includes',
--    executable('test-rules-file-includes', 'test/rules-file-includes.c', dependencies: test_dep),
--    env: test_env,
--)
--test(
--    'stringcomp',
--    executable('test-stringcomp', 'test/stringcomp.c', dependencies: test_dep),
--    env: test_env,
--)
--test(
--    'buffercomp',
--    executable('test-buffercomp', 'test/buffercomp.c', dependencies: test_dep),
--    env: test_env,
--)
--test(
--    'log',
--    executable('test-log', 'test/log.c', dependencies: test_dep),
--    env: test_env,
--)
--test(
--    'atom',
--    executable('test-atom', 'test/atom.c', dependencies: test_dep),
--    env: test_env,
--)
--test(
--    'utf8',
--    executable('test-utf8', 'test/utf8.c', dependencies: test_dep),
--    env: test_env,
--)
--test(
--    'state',
--    executable('test-state', 'test/state.c', dependencies: test_dep),
--    env: test_env,
--)
--test(
--    'keyseq',
--    executable('test-keyseq', 'test/keyseq.c', dependencies: test_dep),
--    env: test_env,
--)
--test(
--    'rulescomp',
--    executable('test-rulescomp', 'test/rulescomp.c', dependencies: test_dep),
--    env: test_env,
--)
--test(
--    'compose',
--    executable('test-compose', 'test/compose.c', dependencies: test_dep),
--    env: test_env,
--)
--test(
--    'utils',
--    executable('test-utils', 'test/utils.c', dependencies: test_dep),
--    env: test_env,
--)
--test(
--    'symbols-leak-test',
--    find_program('test/symbols-leak-test.py'),
--    env: test_env,
--    suite: ['python-tests'],
--)
--if get_option('enable-x11')
--    test(
--        'x11',
--        executable('test-x11', 'test/x11.c', dependencies: x11_test_dep),
--        env: test_env,
--    )
--    # test/x11comp is meant to be run, but it is (temporarily?) disabled.
--    # See: https://github.com/xkbcommon/libxkbcommon/issues/30
--    executable('test-x11comp', 'test/x11comp.c', dependencies: x11_test_dep)
--endif
--if get_option('enable-xkbregistry')
--    test(
--        'registry',
--        executable('test-registry', 'test/registry.c',
--                   include_directories: include_directories('src'),
--                   dependencies: dep_libxkbregistry),
--        env: test_env,
--    )
--endif
--if build_tools
--    test('tool-option-parsing',
--         find_program('test/tool-option-parsing.py'),
--         env: test_env,
--         suite: ['python-tests'])
--
--    # A set of keysyms to test for. Add one or two symbols to this array
--    # whenever the xorgproto gets updated to make sure we resolve them.
--    keysyms_to_test = [
--        'XF86Macro23',
--    ]
--
--    env = environment()
--    env.set('XKB_CONFIG_ROOT', meson.source_root()/'test'/'data')
--    foreach keysym: keysyms_to_test
--        test('keysym-test-@0@'.format(keysym),
--             find_program('test/test-keysym.py'),
--             env: env,
--             args: [keysym, '--tool', xkbcli_compile_keymap],
--             suite: ['python-tests'])
--    endforeach
--endif
--
--valgrind = find_program('valgrind', required: false)
--if valgrind.found()
--    add_test_setup('valgrind',
--        exe_wrapper: [valgrind,
--                       '--leak-check=full',
--                       '--track-origins=yes',
--                       '--gen-suppressions=all',
--                       '--error-exitcode=99'],
--        timeout_multiplier : 10)
--else
--    message('valgrind not found, disabling valgrind test setup')
--endif
--
--
--# Fuzzing target programs.
--executable('fuzz-keymap', 'fuzz/keymap/target.c', dependencies: test_dep)
--executable('fuzz-compose', 'fuzz/compose/target.c', dependencies: test_dep)
--
--
--# Benchmarks.
--bench_env = environment()
--bench_env.set('top_srcdir', meson.source_root())
--benchmark(
--    'key-proc',
--    executable('bench-key-proc', 'bench/key-proc.c', dependencies: test_dep),
--    env: bench_env,
--)
--benchmark(
--    'rules',
--    executable('bench-rules', 'bench/rules.c', dependencies: test_dep),
--    env: bench_env,
--)
--benchmark(
--    'rulescomp',
--    executable('bench-rulescomp', 'bench/rulescomp.c', dependencies: test_dep),
--    env: bench_env,
--)
--benchmark(
--    'compose',
--    executable('bench-compose', 'bench/compose.c', dependencies: test_dep),
--    env: bench_env,
--)
--benchmark(
--    'atom',
--    executable('bench-atom', 'bench/atom.c', dependencies: test_dep),
--    env: bench_env,
--)
--if get_option('enable-x11')
--  benchmark(
--      'x11',
--      executable('bench-x11', 'bench/x11.c', dependencies: x11_test_dep),
--      env: bench_env,
--  )
--endif
--
--
++if false
++
+ # Tests
+ test_env = environment()
+ test_env.set('XKB_LOG_LEVEL', 'debug')
+ test_env.set('XKB_LOG_VERBOSITY', '10')
+ test_env.set('top_srcdir', meson.current_source_dir())
+@@ -761,10 +763,11 @@
+       executable('bench-x11', 'bench/x11.c', dependencies: x11_test_dep),
+       env: bench_env,
+   )
+ endif
+ 
++endif
+ 
  # Documentation.
  if get_option('enable-docs')
      doxygen = find_program('doxygen', required: false)
+     if not doxygen.found()
