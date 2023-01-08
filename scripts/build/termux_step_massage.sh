@@ -90,6 +90,12 @@ termux_step_massage() {
 		termux_error_exit "Package contains directory \"\$PREFIX/\$PREFIX\" ($TERMUX_PREFIX/${TERMUX_PREFIX#/})"
 	fi
 
+	# Check for Debianish Python directory which indicates packaging error.
+	local _python_deb_install_layout_dir="lib/python3/dist-packages"
+	if [ -d "./${_python_deb_install_layout_dir}" ]; then
+		termux_error_exit "Package contains directory \"\$PREFIX/${_python_deb_install_layout_dir}\" ($TERMUX_PREFIX/${_python_deb_install_layout_dir})"
+	fi
+
 	# Check so that package is not affected by
 	# https://github.com/android/ndk/issues/1614, or
 	# https://github.com/termux/termux-packages/issues/9944
