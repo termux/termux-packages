@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.3.6
 TERMUX_PKG_SRCURL=https://github.com/hashicorp/terraform/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=b160c2ee6b4b24e93fb643e9a746a1fab940f11216689c95c08b5f006f8c1cf9
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="git"
 
 termux_step_make() {
