@@ -1,10 +1,20 @@
-+++ ./cmds/live.c	2019-08-26 14:48:20.538152232 +0300
-@@ -97,7 +97,7 @@
- 
- int command_live(int argc, char *argv[], struct opts *opts)
+--- a/cmds/live.c
++++ b/cmds/live.c
+@@ -237,7 +237,7 @@
+ int command_live(int argc, char *argv[], struct uftrace_opts *opts)
  {
--	char template[32] = "/tmp/uftrace-live-XXXXXX";
-+	char template[128] = "@TERMUX_PREFIX@/tmp/uftrace-live-XXXXXX";
+ #define LIVE_NAME "uftrace-live-XXXXXX"
+-	char template[32] = "/tmp/" LIVE_NAME;
++	char template[strlen("@TERMUX_PREFIX@") + 32] = "@TERMUX_PREFIX@/tmp/" LIVE_NAME;
  	int fd;
  	struct sigaction sa = {
  		.sa_flags = SA_RESETHAND,
+@@ -253,7 +253,7 @@
+ 			strcpy(template, LIVE_NAME);
+ 
+ 			if (errno != EPERM)
+-				pr_err("cannot access to /tmp");
++				pr_err("cannot access to @TERMUX_PREFIX@/tmp");
+ 
+ 			fd = mkstemp(template);
+ 
