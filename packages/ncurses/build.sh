@@ -7,6 +7,7 @@ TERMUX_PKG_VERSION=(6.4
 		    15
 		    0.26.5
 		    0.9.0)
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(https://ftp.gnu.org/gnu/ncurses/ncurses-${TERMUX_PKG_VERSION[0]}.tar.gz
 		   https://fossies.org/linux/misc/rxvt-unicode-${TERMUX_PKG_VERSION[1]}.tar.bz2
 		   https://github.com/thestinger/termite/archive/v${TERMUX_PKG_VERSION[2]}.tar.gz
@@ -85,10 +86,11 @@ termux_step_post_make_install() {
 	# Strip away 30 years of cruft to decrease size.
 	local TI=$TERMUX_PREFIX/share/terminfo
 	mv $TI $TERMUX_PKG_TMPDIR/full-terminfo
-	mkdir -p $TI/{a,d,e,n,k,l,p,r,s,t,v,x}
+	mkdir -p $TI/{a,d,e,g,n,k,l,p,r,s,t,v,x}
 	cp $TERMUX_PKG_TMPDIR/full-terminfo/a/ansi $TI/a/
 	cp $TERMUX_PKG_TMPDIR/full-terminfo/d/{dtterm,dumb} $TI/d/
 	cp $TERMUX_PKG_TMPDIR/full-terminfo/e/eterm-color $TI/e/
+	cp $TERMUX_PKG_TMPDIR/full-terminfo/g/gnome{,-256color} $TI/g/
 	cp $TERMUX_PKG_TMPDIR/full-terminfo/n/nsterm $TI/n/
 	cp $TERMUX_PKG_TMPDIR/full-terminfo/k/kitty{,+common,-direct} $TI/k/
 	cp $TERMUX_PKG_TMPDIR/full-terminfo/l/linux $TI/l/
