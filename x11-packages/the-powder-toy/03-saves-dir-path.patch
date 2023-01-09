@@ -38,19 +38,6 @@
  	std::ofstream stampsStream;
 --- a/src/Config.template.h
 +++ b/src/Config.template.h
-@@ -73,11 +73,7 @@
- #define IDENT_PLATFORM "WIN32"
- #endif
- #elif defined(LIN)
--#if defined(_64BIT)
--#define IDENT_PLATFORM "LIN64"
--#else
--#define IDENT_PLATFORM "LIN32"
--#endif
-+#define IDENT_PLATFORM "TERMUX"
- #elif defined(MACOSX)
- #define IDENT_PLATFORM "MACOSX"
- #else
 @@ -101,11 +97,11 @@
  #define STATICSCHEME "https://"
  #define ENFORCE_HTTPS
@@ -105,7 +92,7 @@
 -		if (!cwd.empty())
 -			Platform::OpenURI(cwd);
 -		else
--			fprintf(stderr, "cannot open data folder: getcwd(...) failed\n");
+-			fprintf(stderr, "cannot open data folder: Platform::GetCwd(...) failed\n");
 +		Platform::OpenURI("@TERMUX_HOME@/.powdertoy");
  	} });
  	scrollPanel->AddChild(dataFolderButton);
