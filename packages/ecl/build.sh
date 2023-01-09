@@ -2,15 +2,28 @@ TERMUX_PKG_HOMEPAGE=https://common-lisp.net/project/ecl/
 TERMUX_PKG_DESCRIPTION="ECL (Embeddable Common Lisp) is an interpreter of the Common Lisp language"
 TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="21.2.1"
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SRCURL=https://common-lisp.net/project/ecl/static/files/release/ecl-${TERMUX_PKG_VERSION}.tgz
+TERMUX_PKG_VERSION=2023.01.02
+TERMUX_PKG_SRCURL=git+https://gitlab.com/embeddable-common-lisp/ecl
+_COMMIT=fc30c62ea09b0eb2e99280d05554ce99e0bd83e5
+TERMUX_PKG_GIT_BRANCH=develop
 TERMUX_PKG_SHA256=b15a75dcf84b8f62e68720ccab1393f9611c078fcd3afdd639a1086cad010900
 TERMUX_PKG_DEPENDS="libandroid-support, libgmp, libgc, libffi"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_BLACKLISTED_ARCHES="i686, x86_64"
 TERMUX_PKG_HAS_DEBUG=false
+
+termux_step_post_get_source() {
+	git fetch --unshallow
+	git checkout $_COMMIT
+
+	local version="$(git log -1 --format=%cs | sed 's/-/./g')"
+	if [ "$version" != "$TERMUX_PKG_VERSION" ]; then
+		echo -n "ERROR: The specified version \"$TERMUX_PKG_VERSION\""
+		echo " is different from what is expected to be: \"$version\""
+		return 1
+	fi
+}
 
 # See https://gitlab.com/embeddable-common-lisp/ecl/-/blob/develop/INSTALL
 # for upstream cross build guide.
