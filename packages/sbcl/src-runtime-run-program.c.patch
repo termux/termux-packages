@@ -1,0 +1,11 @@
+--- a/src/runtime/run-program.c
++++ b/src/runtime/run-program.c
+@@ -144,7 +144,7 @@ void closefds_range(unsigned int first, unsigned int last)
+         unsigned int close_fd;
+         if (last == ~0U)
+         {
+-#ifdef SVR4
++#if defined(SVR4) || defined(LISP_FEATURE_ANDROID)
+             last = sysconf(_SC_OPEN_MAX)-1;
+ #else
+             last = getdtablesize()-1;

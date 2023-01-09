@@ -1,0 +1,19 @@
+--- a/src/code/run-program.lisp
++++ b/src/code/run-program.lisp
+@@ -1329,14 +1329,7 @@ Users Manual for details about the PROCESS structure.
+   (or sb-sys::*software-version*
+       (setf sb-sys::*software-version*
+             (possibly-base-stringize
+-             #+linux
+-             (with-open-file (f "/proc/sys/kernel/osrelease") (read-line f))
+-             #-linux
+              (string-trim '(#\newline)
+                           (%with-output-to-string (stream)
+-                           (run-program "/bin/uname"
+-                                        ;; "-r" on haiku just prints "1"
+-                                        ;; but "-v" prints some detail.
+-                                        #+haiku '("-v")
+-                                        #-haiku '("-r")
+-                                        :output stream)))))))
++                            (run-program "/data/data/com.termux/files/usr/bin/uname"
++                                         '("-r") :output stream)))))))

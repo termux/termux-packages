@@ -1,0 +1,27 @@
+--- a/src/code/android-os.lisp
++++ b/src/code/android-os.lisp
+@@ -19,24 +19,6 @@
+   "Return a string describing the supporting software."
+   "Android")
+
+-;;; FIXME: More duplicated logic here vrt. other oses. Abstract into
+-;;; uname-software-version?
+-(defun software-version ()
+-  "Return a string describing version of the supporting software, or NIL
+-  if not available."
+-  (or *software-version*
+-      (setf *software-version*
+-            (sb-alien:with-alien
+-                ((ptr (* char)
+-                      (sb-alien:alien-funcall
+-                       (sb-alien:extern-alien "software_version"
+-                                              (function (* sb-alien:char))))))
+-              (and (not (sb-alien:null-alien ptr))
+-                   (unwind-protect
+-                        (sb-alien:with-alien ((c-string sb-alien:c-string ptr))
+-                          c-string)
+-                     (sb-alien:free-alien ptr)))))))
+-
+ ;;; Return user time, system time, and number of page faults.
+ (defun get-system-info ()
+   (multiple-value-bind
