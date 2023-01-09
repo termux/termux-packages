@@ -2,28 +2,14 @@ TERMUX_PKG_HOMEPAGE=https://github.com/watchexec/watchexec
 TERMUX_PKG_DESCRIPTION="Executes commands in response to file modifications"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.20.6
-TERMUX_PKG_SRCURL=https://github.com/watchexec/watchexec/archive/refs/tags/cli-v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=fa490944bbc8eafdc585454d27ec6f75988ce7d159db8ee1244b1fc5bbd86935
+TERMUX_PKG_VERSION=1.21.0
+TERMUX_PKG_SRCURL=https://github.com/watchexec/watchexec/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=ff835eed2be68de97b08eaa2177d9cdcb721f6d727c6803a642ca94d11eec5fa
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_BUILD_IN_SRC=true
 
-termux_step_pre_configure() {
-	termux_setup_rust
-	: "${CARGO_HOME:=$HOME/.cargo}"
-	export CARGO_HOME
-
-	cd crates/cli
-	cargo fetch --target $CARGO_TARGET_NAME
-
-	local p=git-config-0.7.1-src-values-path.rs.diff
-	local d
-	for d in $CARGO_HOME/registry/src/github.com-*/git-config-*; do
-		patch --silent -p1 -d ${d} < $TERMUX_PKG_BUILDER_DIR/${p} || :
-	done
-}
-
 termux_step_make_install() {
+	termux_setup_rust
 	cargo install \
 		--jobs $TERMUX_MAKE_PROCESSES \
 		--path crates/cli \
