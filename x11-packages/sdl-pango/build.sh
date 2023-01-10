@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Connects Pango to SDL"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.1.2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/sdlpango/SDL_Pango-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=7f75d3b97acf707c696ea126424906204ebfa07660162de925173cdd0257eba4
 TERMUX_PKG_DEPENDS="fontconfig, freetype, glib, harfbuzz, pango, sdl"
