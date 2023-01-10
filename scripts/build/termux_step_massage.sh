@@ -84,6 +84,11 @@ termux_step_massage() {
 		termux_error_exit "Package contains hard links: $HARDLINKS"
 	fi
 
+	# Check for directory "$PREFIX/man" which indicates packaging error.
+	if [ -d "./man" ]; then
+		termux_error_exit "Package contains directory \"\$PREFIX/man\" ($TERMUX_PREFIX/man). Use \"\$PREFIX/share/man\" ($TERMUX_PREFIX/share/man) instead."
+	fi
+
 	# Check for directory "$PREFIX/$PREFIX" which almost always indicates
 	# packaging error.
 	if [ -d "./${TERMUX_PREFIX#/}" ]; then
