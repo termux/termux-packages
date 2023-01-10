@@ -9,6 +9,15 @@
  ifeq ($(findstring MINGW32, $(SYSNAME)),MINGW32)
    OS:=windows
    GPERF:=/usr/bin/gperf
+@@ -109,7 +109,7 @@
+ endif
+ 
+ # change to sdl-console to build a console version on Windows
+-SDL_PCNAME:=sdl
++SDL_PCNAME:=sdl12_compat
+ 
+ WINDRES:=windres
+ PKG_CONFIG:=pkg-config
 @@ -169,14 +169,14 @@
  macos_ARCH_CFLAGS:=-isysroot $(SDKROOT) -I$(SDKROOT)/usr/include -I$(HOSTROOT)/include -mmacosx-version-min=$(MINVER) -arch $(subst $() $(), -arch ,$(ARCHS)) -w -headerpad_max_install_names -DHAVE_STRCASESTR
  ios_ARCH_CFLAGS:=-isysroot $(SDKROOT) -I$(SDKROOT)/usr/include -I$(HOSTROOT)/include $(MINVEROPT) -arch $(subst $() $(), -arch ,$(ARCHS)) -w -fPIC -DHAVE_STRCASESTR -DUNLINK_ONLY

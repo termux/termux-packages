@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A free, award-winning drawing program for children ages 
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.9.28
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/tuxpaint/tuxpaint-${TERMUX_PKG_VERSION}-sdl1.tar.gz
 TERMUX_PKG_SHA256=6f846ef46ab219fda3326336e2ccc65cedaf6d2c42c2f3e603ab601145a1868b
 TERMUX_PKG_DEPENDS="fribidi, glib, libandroid-wordexp, libcairo, libimagequant, libpaper, libpng, librsvg, sdl, sdl-gfx, sdl-image, sdl-mixer, sdl-pango, sdl-ttf, tuxpaint-data, zlib"
