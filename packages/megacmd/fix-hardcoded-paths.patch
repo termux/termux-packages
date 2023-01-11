@@ -1,3 +1,18 @@
+--- a/sdk/src/posix/fs.cpp
++++ b/sdk/src/posix/fs.cpp
+@@ -1787,10 +1787,10 @@
+     uuid_unparse(uuid, uuid_str);
+     id->append(uuid_str);
+ #else
+-    int fd = open("/etc/machine-id", O_RDONLY);
++    int fd = open("@TERMUX_PREFIX@/etc/machine-id", O_RDONLY);
+     if (fd < 0)
+     {
+-        fd = open("/var/lib/dbus/machine-id", O_RDONLY);
++        fd = open("@TERMUX_PREFIX@/var/lib/dbus/machine-id", O_RDONLY);
+         if (fd < 0)
+         {
+             return;
 --- a/src/comunicationsmanagerfilesockets.cpp
 +++ b/src/comunicationsmanagerfilesockets.cpp
 @@ -42,8 +42,8 @@
@@ -41,3 +56,32 @@
              }
  
              struct sockaddr_un addr;
+--- a/src/megacmdshell/megacmdshellcommunications.cpp
++++ b/src/megacmdshell/megacmdshellcommunications.cpp
+@@ -137,7 +137,7 @@ string createAndRetrieveConfigFolder()
+         if (( getpwuid_r(22, pwdptr, pwdbuffer, pwdlinelen, &tempPwdPtr)) != 0)
+         {
+             cerr << "Couldnt get HOME folder" << endl;
+-            return "/tmp";
++            return "@TERMUX_PREFIX@/tmp";
+         }
+         else
+         {
+@@ -296,7 +296,7 @@
+     else
+     {
+         SOCKET thesock = socket(AF_UNIX, SOCK_STREAM, 0);
+-        char socket_path[60];
++        char socket_path[] = "@TERMUX_PREFIX@/tmp/megaCMD_XXXXXXXXXXXXXXXXXXXX/srv";
+         if (!socketValid(thesock))
+         {
+             cerr << "ERROR opening socket: " << ERRNO << endl;
+@@ -308,7 +308,7 @@
+         }
+ 
+         bzero(socket_path, sizeof( socket_path ) * sizeof( *socket_path ));
+-        sprintf(socket_path, "/tmp/megaCMD_%d/srv", getuid() );
++        sprintf(socket_path, "@TERMUX_PREFIX@/tmp/megaCMD_%d/srv", getuid() );
+ 
+         struct sockaddr_un addr;
+ 

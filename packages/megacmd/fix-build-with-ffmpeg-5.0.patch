@@ -1,0 +1,48 @@
+https://github.com/meganz/sdk/pull/2614
+
+From 678f182db9ef0121baf06a2945094b89413ae562 Mon Sep 17 00:00:00 2001
+From: Vasiliy Glazov <vascom2@gmail.com>
+Date: Mon, 4 Apr 2022 12:00:04 +0300
+Subject: [PATCH 1/2] Fix build with FFMPEG 5
+
+This change allow to build with FFMPEG 5.0.
+---
+ src/gfx/freeimage.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/gfx/freeimage.cpp b/src/gfx/freeimage.cpp
+index be173abea2..63a8c080e6 100644
+--- a/src/gfx/freeimage.cpp
++++ b/sdk/src/gfx/freeimage.cpp
+@@ -285,7 +285,7 @@ bool GfxProcFreeImage::readbitmapFfmpeg(FileAccess* fa, const LocalPath& imagePa
+ 
+     // Find decoder for video stream
+     AVCodecID codecId = codecParm->codec_id;
+-    AVCodec* decoder = avcodec_find_decoder(codecId);
++    auto decoder = avcodec_find_decoder(codecId);
+     if (!decoder)
+     {
+         LOG_warn << "Codec not found: " << codecId;
+
+From bfdfd3c32fe0475bcf77b050c0c147c7f2847578 Mon Sep 17 00:00:00 2001
+From: Vasiliy Glazov <vascom2@gmail.com>
+Date: Mon, 11 Apr 2022 11:25:25 +0300
+Subject: [PATCH 2/2] Fix build with recent FFMPEG
+
+Fix build with recent FFMPEG.
+---
+ src/gfx/freeimage.cpp | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/src/gfx/freeimage.cpp b/src/gfx/freeimage.cpp
+index 63a8c080e6..56cc6e3098 100644
+--- a/src/gfx/freeimage.cpp
++++ b/sdk/src/gfx/freeimage.cpp
+@@ -302,7 +302,6 @@ bool GfxProcFreeImage::readbitmapFfmpeg(FileAccess* fa, const LocalPath& imagePa
+ 
+     // Force seeking to key frames
+     formatContext->seek2any = false;
+-    videoStream->skip_to_keyframe = true;
+     if (decoder->capabilities & CAP_TRUNCATED)
+     {
+         codecContext->flags |= CAP_TRUNCATED;
