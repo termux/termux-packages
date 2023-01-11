@@ -1,0 +1,22 @@
+--- a/configure.ac
++++ b/configure.ac
+@@ -522,7 +522,7 @@
+     [enable_posix_threads=no],
+     [enable_posix_threads=yes])
+ if test x$enable_posix_threads != xno; then
+-    AC_CHECK_LIB(pthread, pthread_create, [HAVE_PTHREAD=yes], [HAVE_PTHREAD=no])
++    AC_CHECK_LIB(c, pthread_create, [HAVE_PTHREAD=yes], [HAVE_PTHREAD=no])
+ else
+     HAVE_PTHREAD=no
+ fi
+--- a/sdk/configure.ac
++++ b/sdk/configure.ac
+@@ -244,7 +244,7 @@
+     [enable_posix_threads=no],
+     [enable_posix_threads=yes])
+ if test x$enable_posix_threads != xno; then
+-    AC_CHECK_LIB(pthread, pthread_create, [HAVE_PTHREAD=yes], [HAVE_PTHREAD=no])
++    AC_CHECK_LIB(c, pthread_create, [HAVE_PTHREAD=yes], [HAVE_PTHREAD=no])
+ else
+     HAVE_PTHREAD=no
+ fi
