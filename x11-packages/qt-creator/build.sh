@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Integrated Development Environment for Qt"
 TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
 TERMUX_PKG_VERSION=4.15.2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/qt-creator/qt-creator/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=e23e76ea518cc65949f29e9eff18331a9a1da0817b292afbcbb4d5cdeada3c47
 TERMUX_PKG_DEPENDS="libc++, qt5-qtbase, qt5-qtdeclarative, qt5-qtxmlpatterns, qt5-qttools, qt5-qtx11extras, qt5-qtsvg, llvm, clang"
