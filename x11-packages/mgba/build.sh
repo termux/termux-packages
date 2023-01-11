@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.10.0
 TERMUX_PKG_SRCURL=https://github.com/mgba-emu/mgba/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=e2d66d9ce7c51b1ef3b339b04e871287bf166f6a1d7125ef112dbf53ab8bbd48
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="ffmpeg, libedit, libelf, liblua54, libpng, libsqlite, libzip, mesa, sdl2, zlib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DBUILD_GLES2=OFF
