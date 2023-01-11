@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="osm2pgsql imports OpenStreetMap (OSM) data into a Postgr
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.7.2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/openstreetmap/osm2pgsql/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=94c72ceb3c401c816499339f8765c62efbf40685a798dcdf9a4bf7dbedf6c7a5
 TERMUX_PKG_DEPENDS="boost, libbz2, libc++, libexpat, liblua54, postgresql, proj, zlib"
