@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # Version should be equal to TERMUX_NDK_{VERSION_NUM,REVISION} in
 # scripts/properties.sh
 TERMUX_PKG_VERSION=25c
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://dl.google.com/android/repository/android-ndk-r${TERMUX_PKG_VERSION}-linux.zip
 TERMUX_PKG_SHA256=769ee342ea75f80619d985c2da990c48b3d8eaf45f48783a2d48870d04b46108
 # This package has taken over <pty.h> from the previous libutil-dev
@@ -50,6 +51,21 @@ termux_step_post_get_source() {
 	popd
 }
 
+termux_step_pre_configure() {
+	# https://github.com/termux/termux-packages/issues/13188
+	_NF_SUPPL_FILES="
+		include/linux/netfilter/xt_CONNMARK.h
+		include/linux/netfilter/xt_DSCP.h
+		include/linux/netfilter/xt_MARK.h
+		include/linux/netfilter/xt_RATEEST.h
+		include/linux/netfilter/xt_TCPMSS.h
+		include/linux/netfilter_ipv4/ipt_ECN.h
+		include/linux/netfilter_ipv4/ipt_TTL.h
+		include/linux/netfilter_ipv6/ip6t_HL.h
+	"
+	_NF_SUPPL_PREFIX="$TERMUX_PREFIX/opt/ndk-sysroot-nf-suppl"
+}
+
 termux_step_make_install() {
 	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib \
 		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include
@@ -92,4 +108,23 @@ termux_step_make_install() {
 		echo 'INPUT(-lc)' > $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/$lib
 	done
 	unset lib
+
+	local f
+	for f in ${_NF_SUPPL_FILES}; do
+		local src="$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/${f}"
+		local dst="$TERMUX_PKG_MASSAGEDIR/${_NF_SUPPL_PREFIX}/${f}"
+		mkdir -p "$(dirname "${dst}")"
+		mv -T "${src}" "${dst}"
+	done
+}
+
+termux_step_create_debscripts() {
+	local f
+	for f in postinst prerm; do
+		cat "$TERMUX_PKG_BUILDER_DIR/${f}.in" | sed \
+			-e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
+			-e "s|@NF_SUPPL_FILES@|$(echo ${_NF_SUPPL_FILES})|g" \
+			-e "s|@NF_SUPPL_PREFIX@|${_NF_SUPPL_PREFIX}|g" \
+			> "${f}"
+	done
 }
