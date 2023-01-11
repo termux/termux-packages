@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/HOST-Oman/libraqm
 TERMUX_PKG_DESCRIPTION="Raqm is a small library that encapsulates the logic for complex text layout and provides a convenient API"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.9.0
+TERMUX_PKG_VERSION="0.10.0"
 TERMUX_PKG_SRCURL=https://github.com/HOST-Oman/libraqm/releases/download/v$TERMUX_PKG_VERSION/raqm-$TERMUX_PKG_VERSION.tar.xz
-TERMUX_PKG_SHA256=9ed6fdf41da6391fc9bf7038662cbe412c330aa6eb22b19704af2258e448107c
+TERMUX_PKG_SHA256=5eb7de71b3d1dca34103860f3e8c55ebc184a3dbdfdd573c21a258e46982f1e6
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="freetype, harfbuzz, fribidi"
 
