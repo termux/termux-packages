@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Extensible, customizable text editor-and more"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=28.2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/emacs/emacs-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=ee21182233ef3232dc97b486af2d86e14042dbb65bbc535df562c3a858232488
 TERMUX_PKG_DEPENDS="libgmp, libgnutls, libjansson, libxml2, ncurses, zlib"
