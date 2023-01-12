@@ -5,11 +5,13 @@ TERMUX_PKG_MAINTAINER="@termux"
 # When updating the package, also update terminfo for kitty by updating
 # ncurses' kitty sources in main repo
 TERMUX_PKG_VERSION=0.26.5
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/kovidgoyal/kitty/releases/download/v${TERMUX_PKG_VERSION}/kitty-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=5544a580314fec7711187ce28162909b5ecff6780071444fe96fb97f8be5c9ad
 # fontconfig is dlopen(3)ed:
 TERMUX_PKG_DEPENDS="dbus, fontconfig, harfbuzz, libpng, librsync, libx11, libxkbcommon, littlecms, mesa (>= 22.0.3), ncurses, openssl, python, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libxcursor, libxi, libxinerama, libxrandr, xorgproto"
+TERMUX_PKG_PYTHON_COMMON_DEPS="wheel"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_RM_AFTER_INSTALL="
 share/doc/kitty/html
@@ -23,17 +25,6 @@ termux_step_post_get_source() {
 }
 
 termux_step_pre_configure() {
-	_PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
-	termux_setup_python_crossenv
-	pushd $TERMUX_PYTHON_CROSSENV_SRCDIR
-	_CROSSENV_PREFIX=$TERMUX_PKG_BUILDDIR/python-crossenv-prefix
-	python${_PYTHON_VERSION} -m crossenv \
-		$TERMUX_PREFIX/bin/python${_PYTHON_VERSION} \
-		${_CROSSENV_PREFIX}
-	popd
-	. ${_CROSSENV_PREFIX}/bin/activate
-	build-pip install wheel
-
 	CFLAGS+=" $CPPFLAGS"
 
 	_NEED_DUMMY_LIBRT_A=
