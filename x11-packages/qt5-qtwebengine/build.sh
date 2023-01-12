@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Qt 5 Web Engine Library"
 TERMUX_PKG_LICENSE="LGPL-3.0, LGPL-2.1, BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@licy183"
 TERMUX_PKG_VERSION="5.15.12"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=git+https://github.com/qt/qtwebengine
 TERMUX_PKG_GIT_BRANCH=v$TERMUX_PKG_VERSION-lts
 TERMUX_PKG_DEPENDS="fontconfig, dbus, libc++, libjpeg-turbo, libminizip, libnss, libpng, libre2, libsnappy, libvpx, libwebp, libx11, libxml2, libxslt, libxkbfile, qt5-qtbase, qt5-qtdeclarative, zlib"
@@ -78,8 +78,10 @@ termux_step_post_make_install() {
 
 	# Remove dummy files
 	rm $TERMUX_PREFIX/lib/lib{{pthread,resolv}.a,rt.so}
+}
 
+termux_step_post_massage() {
 	# Replace version for cmake
 	local _QT_BASE_VERSION=$(. $TERMUX_SCRIPTDIR/x11-packages/qt5-qtbase/build.sh; echo $TERMUX_PKG_VERSION)
-	sed -e "s|$TERMUX_PKG_VERSION\ |$_QT_BASE_VERSION |" -i "${TERMUX_PREFIX}"/lib/cmake/*/*Config.cmake
+	sed -e "s|$TERMUX_PKG_VERSION\ |$_QT_BASE_VERSION |" -i lib/cmake/*/*Config.cmake
 }
