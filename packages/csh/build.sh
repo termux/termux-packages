@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="C Shell with process control from 3BSD"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=20110502
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://deb.debian.org/debian/pool/main/c/csh/csh_${TERMUX_PKG_VERSION}.orig.tar.gz
 TERMUX_PKG_SHA256=8bcba4fe796df1b9992e2d94e07ce6180abb24b55488384f9954aa61ecd8d68b
 TERMUX_PKG_DEPENDS="libandroid-glob, libbsd"
@@ -14,6 +15,7 @@ termux_step_post_get_source() {
 
 termux_step_pre_configure() {
 	CFLAGS="${CFLAGS/-Oz/-Os}"
+	LDFLAGS+=" -Wl,-z,muldefs"
 }
 
 termux_step_post_configure() {
