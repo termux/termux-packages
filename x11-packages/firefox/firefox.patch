@@ -232,32 +232,23 @@ diff -uNr firefox-105.0.3/toolkit/components/extensions/storage/moz.build firefo
      EXPORTS.mozilla.extensions.storage += [
          "ExtensionStorageComponents.h",
      ]
-diff -uNr firefox-105.0.3/toolkit/components/moz.build firefox-105.0.3.mod/toolkit/components/moz.build
---- firefox-105.0.3/toolkit/components/moz.build	2022-10-08 00:40:08.000000000 +0900
-+++ firefox-105.0.3.mod/toolkit/components/moz.build	2022-10-16 00:07:55.637517815 +0900
-@@ -95,7 +95,6 @@
-         "aboutconfig",
-         "narrate",
-         "reader",
--        "viaduct",
-         "uniffi-js",
-         "uniffi-bindgen-gecko-js/components",
-     ]
 --- a/toolkit/library/rust/shared/Cargo.toml
 +++ b/toolkit/library/rust/shared/Cargo.toml
-@@ -111,10 +111,11 @@
+@@ -113,11 +113,12 @@
  # This happens to work around issues the older code has with 1.65.
  fallible_collections = { version = "0.4", features = ["rust_1_57"] }
  
-+tabs = { version = "0.1" }
-+
- [target.'cfg(not(target_os = "android"))'.dependencies]
+-[target.'cfg(not(target_os = "android"))'.dependencies]
  viaduct = "0.1"
- webext_storage_bridge = { path = "../../../components/extensions/storage/webext_storage_bridge" }
--tabs = { version = "0.1" }
+-webext_storage_bridge = { path = "../../../components/extensions/storage/webext_storage_bridge" }
+ tabs = { version = "0.1" }
  
++[target.'cfg(not(target_os = "android"))'.dependencies]
++webext_storage_bridge = { path = "../../../components/extensions/storage/webext_storage_bridge" }
++
  [target.'cfg(target_os = "windows")'.dependencies]
  detect_win32k_conflicts = { path = "../../../xre/detect_win32k_conflicts" }
+ 
 --- a/toolkit/library/rust/shared/lib.rs
 +++ b/toolkit/library/rust/shared/lib.rs
 @@ -57,10 +57,8 @@
@@ -271,6 +262,14 @@ diff -uNr firefox-105.0.3/toolkit/components/moz.build firefox-105.0.3.mod/toolk
  mod reexport_tabs {
      tabs::uniffi_reexport_scaffolding!();
  }
+@@ -89,7 +87,6 @@
+ extern crate l10nregistry_ffi;
+ extern crate localization_ffi;
+ 
+-#[cfg(not(target_os = "android"))]
+ extern crate viaduct;
+ 
+ extern crate gecko_logger;
 diff -uNr firefox-105.0.3/toolkit/moz.configure firefox-105.0.3.mod/toolkit/moz.configure
 --- firefox-105.0.3/toolkit/moz.configure	2022-10-08 00:40:08.000000000 +0900
 +++ firefox-105.0.3.mod/toolkit/moz.configure	2022-10-18 01:42:19.379553089 +0900
