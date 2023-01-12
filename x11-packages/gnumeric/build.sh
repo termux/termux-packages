@@ -4,11 +4,12 @@ TERMUX_PKG_LICENSE="GPL-2.0, GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 _MAJOR_VERSION=1.12
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.53
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/gnumeric/${_MAJOR_VERSION}/gnumeric-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=5568e4c8dceabb9028f1361d1045522f95f0a71daa59e973cbdd2d39badd4f02
 TERMUX_PKG_DEPENDS="glib, goffice, gtk3, libcairo, libgsf, libxml2, pango, zlib"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner"
+TERMUX_PKG_PYTHON_COMMON_DEPS="wheel"
 TERMUX_PKG_RECOMMENDS="gnumeric-help"
 TERMUX_PKG_SUGGESTS="glpk"
 TERMUX_PKG_DISABLE_GIR=false
@@ -29,23 +30,12 @@ share/glib-2.0/schemas/gschemas.compiled
 termux_step_pre_configure() {
 	termux_setup_gir
 
-	_PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
-	termux_setup_python_crossenv
-	pushd $TERMUX_PYTHON_CROSSENV_SRCDIR
-	_CROSSENV_PREFIX=$TERMUX_PKG_BUILDDIR/python-crossenv-prefix
-	python${_PYTHON_VERSION} -m crossenv \
-		$TERMUX_PREFIX/bin/python${_PYTHON_VERSION} \
-		${_CROSSENV_PREFIX}
-	popd
-	. ${_CROSSENV_PREFIX}/bin/activate
-	build-pip install wheel
-
 	echo "Applying plugins-python-loader-Makefile.in.diff"
-	sed "s|@PYTHON_VERSION@|${_PYTHON_VERSION}|g" \
+	sed "s|@PYTHON_VERSION@|${TERMUX_PYTHON_VERSION}|g" \
 		$TERMUX_PKG_BUILDER_DIR/plugins-python-loader-Makefile.in.diff \
 		| patch --silent -p1
 
-	export PYTHON_GIOVERRIDESDIR=$TERMUX_PREFIX/lib/python${_PYTHON_VERSION}/site-packages/gi/overrides
+	export PYTHON_GIOVERRIDESDIR=$TERMUX_PREFIX/lib/python${TERMUX_PYTHON_VERSION}/site-packages/gi/overrides
 
 	CPPFLAGS+=" -D__USE_GNU"
 }
