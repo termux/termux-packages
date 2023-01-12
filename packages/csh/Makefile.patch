@@ -5,7 +5,7 @@
  #CFLAGS+=-g
  #CFLAGS+=-Wall
 -CFLAGS+=-I${.CURDIR} -I. ${DFLAGS}
-+CFLAGS+=-z muldefs -I${PREFIX}/include -L${PREFIX}/lib -L/system/lib ${DFLAGS}
++CFLAGS+=${CPPFLAGS} ${DFLAGS}
  SRCS=	alloc.c char.c const.c csh.c dir.c dol.c error.c exec.c exp.c file.c \
  	func.c glob.c hist.c init.c lex.c misc.c parse.c proc.c \
  	sem.c set.c str.c time.c
@@ -18,7 +18,7 @@
 -	${CC} ${CFLAGS} ${CPPFLAGS} -O0 -c $<
 -.endif
 +all:
-+	${CC} -o ${PROG} ${CFLAGS} -DBIONIC ${SRCS} -lbsd -landroid-glob -lc
++	${CC} -o ${PROG} ${CFLAGS} -DBIONIC ${SRCS} ${LDFLAGS} -lbsd -landroid-glob -lc
 +
 +clean:
 +	rm -f ${CLEANFILES}
