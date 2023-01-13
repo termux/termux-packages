@@ -1,0 +1,32 @@
+name: Command Not Found Rebuid
+
+on:
+  schedule:
+    - cron: "0 0 12 ? * SUN *" # Runs every Sunday
+  workflow_dispatch:
+        
+permissions: {} # none
+
+jobs:
+  rebuild-command-not-found:
+    permissions:
+      issues: write
+      contents: write
+    if: github.repository == 'termux/termux-packages'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+          token: ${{ secrets.GH_API_KEY }}
+      - name: Process package updates
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_API_KEY }}
+        run: |
+          git config --global user.name "Termux Github Actions"
+          git config --global user.email "contact@termux.dev"
+
+          ./scripts/bin/revbump command-not-found
+          git commit -m "rebuild(main/command-not-found): to update database"
+          git push
