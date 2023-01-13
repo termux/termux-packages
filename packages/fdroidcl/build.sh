@@ -7,6 +7,7 @@ TERMUX_PKG_REVISION=7
 TERMUX_PKG_SRCURL=https://github.com/mvdan/fdroidcl/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=532a8c4c93216cbf13378ff409c06a08d48e8baee6119a50ed43dc0ce9ec7879
 TERMUX_PKG_DEPENDS="android-tools"
+TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make() {
 	termux_setup_golang

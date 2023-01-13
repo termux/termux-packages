@@ -8,6 +8,7 @@ TERMUX_PKG_SRCURL=git+https://github.com/composer/composer
 TERMUX_PKG_DEPENDS="php"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
+TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make_install() {
 	composer install
