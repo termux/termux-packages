@@ -330,7 +330,7 @@ Any line in the commit **should not exceed 80 characters**. In case it does, con
     Commit summary should include a short description of the package. Optional extended commit message may include usage instructions for the package and/or reasons for inclusion.
   - `bump(<repo>/<package>)`: One or more package(s) was/were updated.
     Commit summary should include the newer version/tag to which the package was updated to. Optional extended commit message may include new list of features in the new version, and detailed list of changes in build scripts and/or patches
-  - `fix(<repo>/<package>): Fix a Termux specific bug in a package
+  - `fix(<repo>/<package>)`: Fix a Termux specific bug in a package
     Commit summary should contain a summary of old incorrect behaviour of the package. Extended commit message may contain a deeper analysis of the bug.
   - `dwnpkg(<repo>/<package>)`: One or more package(s) was/were downgraded due to build issues or potential bugs
     Commit summary should justify the downgrading of the package(s). If the summary can't completely describe the reason for downgrade, extended commit message should contain full reason for downgrade.
