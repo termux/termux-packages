@@ -20,7 +20,7 @@ jobs:
         with:
           fetch-depth: 1
           token: ${{ secrets.GH_API_KEY }}
-      - name: Process package updates
+      - name: Revbump main/command-not-found
         env:
           GITHUB_TOKEN: ${{ secrets.GH_API_KEY }}
         run: |
@@ -28,5 +28,6 @@ jobs:
           git config --global user.email "contact@termux.dev"
 
           ./scripts/bin/revbump command-not-found
+          git add .
           git commit -m "rebuild(main/command-not-found): to update database"
           git push
