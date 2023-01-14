@@ -6,7 +6,7 @@ _COMMIT=294b05f2be9342e7ecbccb4f8a5d560969407ace
 _COMMIT_DATE=20230111
 _COMMIT_TIME=164744
 TERMUX_PKG_VERSION="0.0.20230111.164744g294b05f2"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=git+https://github.com/kpet/clvk
 TERMUX_PKG_GIT_BRANCH=main
 TERMUX_PKG_BUILD_DEPENDS="vulkan-headers, vulkan-loader-android"
@@ -34,7 +34,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
 -DCLVK_BUILD_TESTS=OFF
 -DCLVK_VULKAN_IMPLEMENTATION=custom
 -DVulkan_INCLUDE_DIRS=${TERMUX_PREFIX}/include
--DVulkan_LIBRARIES=vulkan
 "
 
 # clvk libOpenCL.so has hardcoded clspv bin path at build time
@@ -124,6 +123,12 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
+	local _libvulkan=vulkan
+	if [ $TERMUX_PKG_API_LEVEL -lt 28 ]; then
+		_libvulkan="$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/28/libvulkan.so"
+	fi
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DVulkan_LIBRARIES=${_libvulkan}"
+
 	export CFLAGS+=" -flto=thin"
 	export CXXFLAGS+=" -flto=thin"
 
