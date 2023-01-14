@@ -21,14 +21,14 @@ TERMUX_PKG_CONFFILES="etc/pulse/client.conf etc/pulse/daemon.conf etc/pulse/defa
 
 termux_step_pre_configure() {
 	# Our aaudio sink module needs libaaudio.so from a later android api version:
-	local _ANDROID=""
-	if [ "$TERMUX_ARCH" = "arm" ]; then
-		_ANDROID="eabi"
+	if [ $TERMUX_PKG_API_LEVEL -lt 26 ]; then
+		local _libdir="$TERMUX_PKG_TMPDIR/libaaudio"
+		rm -rf "${_libdir}"
+		mkdir -p "${_libdir}"
+		cp "$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/26/libaaudio.so" \
+			"${_libdir}"
+		LDFLAGS+=" -L${_libdir}"
 	fi
-	mkdir $TERMUX_PKG_TMPDIR/libaaudio
-	cp $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$TERMUX_ARCH-linux-android$_ANDROID/26/libaaudio.so \
-		$TERMUX_PKG_TMPDIR/libaaudio/
-	LDFLAGS+=" -L$TERMUX_PKG_TMPDIR/libaaudio/"
 
 	mkdir $TERMUX_PKG_SRCDIR/src/modules/sles
 	cp $TERMUX_PKG_BUILDER_DIR/module-sles-sink.c $TERMUX_PKG_SRCDIR/src/modules/sles
