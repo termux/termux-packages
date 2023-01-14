@@ -4,13 +4,13 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Version 3.0.0 or higher does not work with vanilla wxWidgets.
 TERMUX_PKG_VERSION=2.4.2
-TERMUX_PKG_REVISION=5
-_FFMPEG_VERSION=4.4.2
+TERMUX_PKG_REVISION=6
+_FFMPEG_VERSION=4.4.3
 TERMUX_PKG_SRCURL=(https://github.com/audacity/audacity/archive/Audacity-${TERMUX_PKG_VERSION}.tar.gz
                    https://www.ffmpeg.org/releases/ffmpeg-${_FFMPEG_VERSION}.tar.xz)
 TERMUX_PKG_SHA256=(cdb4800c8e9d1d4ca19964caf8d24000f80286ebd8a4db566c2622449744c099
-                   af419a7f88adbc56c758ab19b4c708afbcae15ef09606b82b855291f6a6faa93)
-TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libc++, libexpat, libflac, libmp3lame, libogg, libsndfile, libsoxr, libvorbis, wxwidgets"
+                   6c5b6c195e61534766a0b5fe16acc919170c883362612816d0a1c7f4f947006e)
+TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libc++, libexpat, libflac, libmp3lame, libogg, libsndfile, libsoundtouch, libsoxr, libvorbis, wxwidgets"
 # Support for FFmpeg 5.0 is not backported:
 # https://github.com/audacity/audacity/issues/2445
 TERMUX_PKG_SUGGESTS="audacity-ffmpeg"
@@ -34,7 +34,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Daudacity_use_portmixer=local
 -Daudacity_use_portsmf=off
 -Daudacity_use_sbsms=off
--Daudacity_use_soundtouch=off
+-Daudacity_use_soundtouch=system
 -Daudacity_use_twolame=off
 "
 TERMUX_PKG_RM_AFTER_INSTALL="
@@ -108,4 +108,17 @@ termux_step_post_make_install() {
 
 termux_step_post_massage() {
 	rm -rf lib/pkgconfig
+}
+
+termux_step_create_debscripts() {
+	cat <<-EOF > ./postinst
+		#!$TERMUX_PREFIX/bin/sh
+		echo
+		echo "********"
+		echo "Audacity in this particular package does not (yet) support audio devices."
+		echo
+		echo "https://github.com/termux/termux-packages/issues/10412"
+		echo "********"
+		echo
+	EOF
 }
