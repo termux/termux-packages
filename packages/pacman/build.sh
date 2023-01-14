@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://archlinux.org/pacman/
 TERMUX_PKG_DESCRIPTION="A library-based package manager with dependency support"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="@Maxython"
+TERMUX_PKG_MAINTAINER="@Maxython <mixython@gmail.com>"
 TERMUX_PKG_VERSION=6.0.2
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://sources.archlinux.org/other/pacman/pacman-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=7d8e3e8c5121aec0965df71f59bedf46052c6cf14f96365c4411ec3de0a4c1a5
 TERMUX_PKG_DEPENDS="bash, libarchive, curl, gpgme, openssl, termux-licenses"
