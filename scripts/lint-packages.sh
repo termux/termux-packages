@@ -49,6 +49,23 @@ check_package_license() {
 	fi
 }
 
+check_package_name() {
+	local pkg_name=$1
+	echo -n "Package name '${pkg_name}': "
+	if [ "${#pkg_name}" -ge 2 ]; then
+		if grep -qP '^[0-9a-z][0-9a-z+\-\.]+$' <<< "${pkg_name}"; then
+			echo "PASS"
+			return 0
+		else
+			echo "INVALID (contains characters that are not allowed)"
+			return 1
+		fi
+	else
+		echo "INVALID (less than two characters long)"
+		return 1
+	fi
+}
+
 lint_package() {
 	local package_script
 	local package_name
@@ -60,6 +77,17 @@ lint_package() {
 	echo
 	echo "Package: $package_name"
 	echo
+
+	check_package_name "$package_name" || return 1
+	local subpkg_script
+	for subpkg_script in $(dirname "$package_script")/*.subpackage.sh; do
+		test ! -f "$subpkg_script" && continue
+		local subpkg_name=$(basename "${subpkg_script%.subpackage.sh}")
+		check_package_name "$subpkg_name" || return 1
+	done
+
+	echo
+
 	echo -n "Syntax check: "
 
 	local syntax_errors
