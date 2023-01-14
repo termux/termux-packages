@@ -18,6 +18,15 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-fts3
 "
 
+termux_step_post_get_source() {
+	# Version guard
+	local ver_s=${TERMUX_PKG_VERSION#*:}
+	local ver_t=$(. $TERMUX_SCRIPTDIR/packages/libsqlite-tcl/build.sh; echo ${TERMUX_PKG_VERSION#*:})
+	if [ "${ver_s}" != "${ver_t}" ]; then
+		termux_error_exit "Version mismatch between libsqlite and libsqlite-tcl."
+	fi
+}
+
 termux_step_pre_configure() {
 	CPPFLAGS+=" -Werror -DSQLITE_ENABLE_DBSTAT_VTAB=1 -DSQLITE_ENABLE_COLUMN_METADATA=1 -DSQLITE_ENABLE_UPDATE_DELETE_LIMIT=1"
 	LDFLAGS+=" -lm"
