@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/emacs/
 TERMUX_PKG_DESCRIPTION="Extensible, customizable text editor-and more"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
+# Update both emacs and emacs-x to the same version in one PR.
 TERMUX_PKG_VERSION=28.2
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/emacs/emacs-${TERMUX_PKG_VERSION}.tar.xz
@@ -73,6 +74,13 @@ termux_step_post_get_source() {
 	# build.sh script deletes specific files in $TERMUX_PREFIX.
 	if $TERMUX_ON_DEVICE_BUILD; then
 		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
+	fi
+
+	# Version guard
+	local ver_e=$(. $TERMUX_SCRIPTDIR/packages/emacs/build.sh; echo ${TERMUX_PKG_VERSION#*:})
+	local ver_x=${TERMUX_PKG_VERSION#*:}
+	if [ "${ver_e}" != "${ver_x}" ]; then
+		termux_error_exit "Version mismatch between emacs and emacs-x."
 	fi
 
 	# XXX: We have to start with new host build each time
