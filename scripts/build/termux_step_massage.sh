@@ -109,7 +109,7 @@ termux_step_massage() {
 		SYMBOLS+=" $(echo libandroid_{sem_{open,close,unlink},shm{ctl,get,at,dt}})"
 		SYMBOLS+=" $(echo backtrace{,_symbols{,_fd}})"
 		grep_pattern="$(create_grep_pattern $SYMBOLS)"
-		for lib in "$(find lib -name "*.so")"; do
+		for lib in $(find lib -name "*.so"); do
 			if ! $READELF -h "$lib" &> /dev/null; then
 				continue
 			fi
