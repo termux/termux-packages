@@ -18,5 +18,14 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_post_get_source() {
+	# Version guard
+	local ver_s=$(. $TERMUX_SCRIPTDIR/packages/libsqlite/build.sh; echo ${TERMUX_PKG_VERSION#*:})
+	local ver_t=${TERMUX_PKG_VERSION#*:}
+	if [ "${ver_s}" != "${ver_t}" ]; then
+		termux_error_exit "Version mismatch between libsqlite and libsqlite-tcl."
+	fi
+}
+
+termux_step_post_get_source() {
 	TERMUX_PKG_SRCDIR+="/tea"
 }
