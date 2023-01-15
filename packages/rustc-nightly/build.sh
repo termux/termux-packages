@@ -5,7 +5,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.68.0
 TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/2023-01-15/rustc-nightly-src.tar.xz
-TERMUX_PKG_SHA256=f9af928580d399be41a8562a7a62ba4289a13f7ed57074bf3413a7ca6ba342a6
+TERMUX_PKG_SHA256=549962dc017d89579abb6ce94ce5ac14baa669e5a9cd167efc6cce6e022e0321
 TERMUX_PKG_RM_AFTER_INSTALL="bin/llvm-* bin/llc bin/opt"
 
 termux_step_configure () {
