@@ -1,4 +1,4 @@
 TERMUX_SUBPKG_INCLUDE="bin/ld.gold bin/gold"
 TERMUX_SUBPKG_DESCRIPTION="gold linker"
 TERMUX_SUBPKG_DEPEND_ON_PARENT=no
-TERMUX_SUBPKG_DEPENDS="libc++, zlib"
+TERMUX_SUBPKG_DEPENDS="libc++, zlib, zstd"
