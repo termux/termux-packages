@@ -1,0 +1,109 @@
+--- a/frontend/menu.c	2023-01-14 16:15:08.057589352 -0300
++++ b/frontend/menu.c	2023-01-15 03:10:35.584654965 -0300
+@@ -131,18 +131,6 @@
+ static int min(int x, int y) { return x < y ? x : y; }
+ static int max(int x, int y) { return x > y ? x : y; }
+ 
+-void emu_make_path(char *buff, const char *end, int size)
+-{
+-	int pos, end_len;
+-
+-	end_len = strlen(end);
+-	pos = plat_get_root_dir(buff, size);
+-	strncpy(buff + pos, end, size - pos);
+-	buff[size - 1] = 0;
+-	if (pos + end_len > size - 1)
+-		printf("Warning: path truncated: %s\n", buff);
+-}
+-
+ static int emu_check_save_file(int slot, int *time)
+ {
+ 	char fname[MAXPATHLEN];
+@@ -481,9 +469,9 @@
+ static void make_cfg_fname(char *buf, size_t size, int is_game)
+ {
+ 	if (is_game)
+-		snprintf(buf, size, "." PCSX_DOT_DIR "cfg/%.32s-%.9s.cfg", get_cd_label(), CdromId);
++		snprintf(buf, size, PCSX_DOT_DIR "cfg/%.32s-%.9s.cfg", get_cd_label(), CdromId);
+ 	else
+-		snprintf(buf, size, "." PCSX_DOT_DIR "%s", cfgfile_basename);
++		snprintf(buf, size, PCSX_DOT_DIR "%s", cfgfile_basename);
+ }
+ 
+ static void keys_write_all(FILE *f);
+@@ -540,7 +528,7 @@
+ 	FILE *f;
+ 	int i, ret = -1;
+ 
+-	snprintf(path, sizeof(path), "." PCSX_DOT_DIR "lastcdimg.txt");
++	snprintf(path, sizeof(path), PCSX_DOT_DIR "lastcdimg.txt");
+ 	f = fopen(path, is_get ? "r" : "w");
+ 	if (f == NULL) {
+ 		ret = -1;
+@@ -697,14 +685,14 @@
+ 		if (memcard1_sel == 0)
+ 			strcpy(Config.Mcd1, "none");
+ 		else if (memcards[memcard1_sel] != NULL)
+-			snprintf(Config.Mcd1, sizeof(Config.Mcd1), ".%s%s",
++			snprintf(Config.Mcd1, sizeof(Config.Mcd1), "%s%s",
+ 				MEMCARD_DIR, memcards[memcard1_sel]);
+ 	}
+ 	if ((unsigned int)memcard2_sel < ARRAY_SIZE(memcards)) {
+ 		if (memcard2_sel == 0)
+ 			strcpy(Config.Mcd2, "none");
+ 		else if (memcards[memcard2_sel] != NULL)
+-			snprintf(Config.Mcd2, sizeof(Config.Mcd2), ".%s%s",
++			snprintf(Config.Mcd2, sizeof(Config.Mcd2), "%s%s",
+ 				MEMCARD_DIR, memcards[memcard2_sel]);
+ 	}
+ 	if (strcmp(mcd1_old, Config.Mcd1) || strcmp(mcd2_old, Config.Mcd2))
+@@ -1806,10 +1794,10 @@
+ {
+ 	strcpy(Config.Mcd1, "none");
+ 	if (memcard1_sel != 0)
+-		snprintf(Config.Mcd1, sizeof(Config.Mcd1), ".%s%s", MEMCARD_DIR, memcards[memcard1_sel]);
++		snprintf(Config.Mcd1, sizeof(Config.Mcd1), "%s%s", MEMCARD_DIR, memcards[memcard1_sel]);
+ 	strcpy(Config.Mcd2, "none");
+ 	if (memcard2_sel != 0)
+-		snprintf(Config.Mcd2, sizeof(Config.Mcd2), ".%s%s", MEMCARD_DIR, memcards[memcard2_sel]);
++		snprintf(Config.Mcd2, sizeof(Config.Mcd2), "%s%s", MEMCARD_DIR, memcards[memcard2_sel]);
+ 	LoadMcds(Config.Mcd1, Config.Mcd2);
+ 	draw_mc_bg();
+ }
+@@ -2489,7 +2477,7 @@
+ 	closedir(dir);
+ 
+ do_memcards:
+-	dir = opendir("." MEMCARD_DIR);
++	dir = opendir(MEMCARD_DIR);
+ 	if (dir == NULL) {
+ 		perror("scan_bios_plugins memcards opendir");
+ 		return;
+@@ -2509,7 +2497,7 @@
+ 		if (ent->d_type != DT_REG && ent->d_type != DT_LNK)
+ 			continue;
+ 
+-		snprintf(fname, sizeof(fname), "." MEMCARD_DIR "%s", ent->d_name);
++		snprintf(fname, sizeof(fname), MEMCARD_DIR "%s", ent->d_name);
+ 		if (stat(fname, &st) != 0) {
+ 			printf("bad memcard file: %s\n", ent->d_name);
+ 			continue;
+@@ -2532,7 +2520,7 @@
+ void menu_init(void)
+ {
+ 	char buff[MAXPATHLEN];
+-	int i;
++	int i, pos;
+ 
+ 	cpu_clock_st = cpu_clock = plat_target_cpu_clock_get();
+ 
+@@ -2553,7 +2541,8 @@
+ 		exit(1);
+ 	}
+ 
+-	emu_make_path(buff, "skin/background.png", sizeof(buff));
++	pos = plat_get_skin_dir(buff);
++	strcpy(buff + pos, "background.png");
+ 	readpng(g_menubg_src_ptr, buff, READPNG_BG, g_menuscreen_w, g_menuscreen_h);
+ 
+ 	i = plat_target.cpu_clock_set != NULL

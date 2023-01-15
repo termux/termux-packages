@@ -1,0 +1,41 @@
+--- a/configure	2022-03-14 19:04:27.000000000 -0300
++++ b/configure	2023-01-14 08:34:29.287718255 -0300
+@@ -69,13 +71,13 @@
+ CXX="${CXX-${CROSS_COMPILE}g++}"
+ AS="${AS-${CROSS_COMPILE}as}"
+ AR="${AS-${CROSS_COMPILE}ar}"
+-MAIN_LDLIBS="$LDLIBS -ldl -lm -lpthread"
++MAIN_LDLIBS="$LDLIBS -ldl -lm -lc"
+ config_mak="config.mak"
+ 
+ fail()
+ {
+   echo "$@"
+-  if test -n "$DUMP_CONFIG_LOG"; then cat config.log; fi
++  cat config.log
+   exit 1
+ }
+ 
+@@ -398,7 +400,7 @@
+     sound_drivers="$sound_drivers pulseaudio"
+     MAIN_LDLIBS="-lpulse $MAIN_LDLIBS"
+   fi
+-  if [ "$need_sdl" = "yes" ] || check_sdl `sdl-config --cflags --libs`; then
++  if [ "$need_sdl" = "yes" ] || check_sdl `bash @TERMUX_PREFIX@/bin/sdl-config --cflags --libs`; then
+     sound_drivers="$sound_drivers sdl"
+     need_sdl="yes"
+   fi
+@@ -417,10 +419,10 @@
+ fi
+ 
+ if [ "$need_sdl" = "yes" ]; then
+-  which sdl-config > /dev/null || \
++  which @TERMUX_PREFIX@/bin/sdl-config > /dev/null || \
+     fail "sdl-config is missing; please install libsdl (libsdl1.2-dev)"
+-  CFLAGS="$CFLAGS `sdl-config --cflags`"
+-  MAIN_LDLIBS="`sdl-config --libs` $MAIN_LDLIBS"
++  CFLAGS="$CFLAGS `bash @TERMUX_PREFIX@/bin/sdl-config --cflags`"
++  MAIN_LDLIBS="`bash @TERMUX_PREFIX@/bin/sdl-config --libs` $MAIN_LDLIBS"
+   check_sdl || fail "please install libsdl (libsdl1.2-dev)"
+ fi
+ 

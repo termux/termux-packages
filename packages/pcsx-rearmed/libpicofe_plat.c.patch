@@ -1,0 +1,70 @@
+--- a/frontend/libpicofe/linux/plat.c	2023-01-14 16:15:27.853589338 -0300
++++ b/frontend/libpicofe/linux/plat.c	2023-01-15 03:40:48.554912740 -0300
+@@ -22,6 +22,7 @@
+ #include <sys/stat.h>
+ 
+ #include "../plat.h"
++#include "../../main.h"
+ 
+ /* XXX: maybe unhardcode pagesize? */
+ #define HUGETLB_PAGESIZE (2 * 1024 * 1024)
+@@ -49,56 +50,10 @@
+ 	return strlen(dst);
+ }
+ 
+-static int plat_get_exe_dir(char *dst, int len)
++int plat_get_skin_dir(char *dst)
+ {
+-#ifdef PICO_DATA_DIR
+-	memcpy(dst, PICO_DATA_DIR, sizeof PICO_DATA_DIR);
+-	return sizeof(PICO_DATA_DIR) - 1;
+-#else
+-	int j, ret = readlink("/proc/self/exe", dst, len - 1);
+-	if (ret < 0) {
+-		perror("readlink");
+-		ret = 0;
+-	}
+-	dst[ret] = 0;
+-
+-	for (j = ret - 1; j > 0; j--)
+-		if (dst[j] == '/') {
+-			dst[++j] = 0;
+-			break;
+-		}
+-	return j;
+-#endif
+-}
+-
+-int plat_get_skin_dir(char *dst, int len)
+-{
+-	int ret = plat_get_exe_dir(dst, len);
+-	if (ret < 0)
+-		return ret;
+-
+-	memcpy(dst + ret, "skin/", sizeof "skin/");
+-	return ret + sizeof("skin/") - 1;
+-}
+-
+-#ifndef PICO_HOME_DIR
+-#define PICO_HOME_DIR "/.picodrive/"
+-#endif
+-int plat_get_root_dir(char *dst, int len)
+-{
+-#if !defined(NO_HOME_DIR) && !defined(__GP2X__) && !defined(PANDORA)
+-	const char *home = getenv("HOME");
+-	int ret;
+-
+-	if (home != NULL) {
+-		ret = snprintf(dst, len, "%s%s", home, PICO_HOME_DIR);
+-		if (ret >= len)
+-			ret = len - 1;
+-		mkdir(dst, 0755);
+-		return ret;
+-	}
+-#endif
+-	return plat_get_exe_dir(dst, len);
++	memcpy(dst, PCSX_DOT_DIR "skin/", sizeof(PCSX_DOT_DIR "skin/")); 
++	return sizeof(PCSX_DOT_DIR "skin/") - 1;
+ }
+ 
+ #ifdef __GP2X__

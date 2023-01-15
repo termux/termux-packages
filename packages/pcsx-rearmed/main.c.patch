@@ -1,0 +1,76 @@
+--- a/frontend/main.c	2023-01-14 16:15:08.053589352 -0300
++++ b/frontend/main.c	2023-01-14 20:12:40.282744859 -0300
+@@ -57,9 +57,9 @@
+ static void make_path(char *buf, size_t size, const char *dir, const char *fname)
+ {
+ 	if (fname)
+-		snprintf(buf, size, ".%s%s", dir, fname);
++		snprintf(buf, size, "%s%s", dir, fname);
+ 	else
+-		snprintf(buf, size, ".%s", dir);
++		snprintf(buf, size, "%s", dir);
+ }
+ #define MAKE_PATH(buf, dir, fname) \
+ 	make_path(buf, sizeof(buf), dir, fname)
+@@ -103,13 +103,13 @@
+ static void set_default_paths(void)
+ {
+ #ifndef NO_FRONTEND
+-	snprintf(Config.PatchesDir, sizeof(Config.PatchesDir), "." PATCHES_DIR);
++	snprintf(Config.PatchesDir, sizeof(Config.PatchesDir), PATCHES_DIR);
+ 	MAKE_PATH(Config.Mcd1, MEMCARD_DIR, "card1.mcd");
+ 	MAKE_PATH(Config.Mcd2, MEMCARD_DIR, "card2.mcd");
+-	strcpy(Config.BiosDir, "bios");
++	strcpy(Config.BiosDir, PCSX_DOT_DIR "bios");
+ #endif
+ 
+-	strcpy(Config.PluginsDir, "plugins");
++	strcpy(Config.PluginsDir, PCSX_DOT_DIR "plugins");
+ 	strcpy(Config.Gpu, "builtin_gpu");
+ 	strcpy(Config.Spu, "builtin_spu");
+ 	strcpy(Config.Cdr, "builtin_cdr");
+@@ -246,7 +246,7 @@
+ 
+ 			scrbuf = pl_prepare_screenshot(&w, &h, &bpp);
+ 			get_gameid_filename(buf, sizeof(buf),
+-				"screenshots/%.32s-%.9s.%d.png", ti);
++				SCREENSHOTS_DIR "%.32s-%.9s.%d.png", ti);
+ 			ret = -1;
+ 			if (scrbuf != 0 && bpp == 16)
+ 				ret = writepng(buf, scrbuf, w, h);
+@@ -483,7 +483,7 @@
+ 	create_profile_dir(CHEATS_DIR);
+ 	create_profile_dir(PATCHES_DIR);
+ 	create_profile_dir(PCSX_DOT_DIR "cfg");
+-	create_profile_dir("/screenshots/");
++	create_profile_dir(SCREENSHOTS_DIR);
+ }
+ 
+ static void check_memcards(void)
+@@ -493,7 +493,7 @@
+ 	int i;
+ 
+ 	for (i = 1; i <= 9; i++) {
+-		snprintf(buf, sizeof(buf), ".%scard%d.mcd", MEMCARD_DIR, i);
++		snprintf(buf, sizeof(buf), "%scard%d.mcd", MEMCARD_DIR, i);
+ 
+ 		f = fopen(buf, "rb");
+ 		if (f == NULL) {
+@@ -596,7 +596,7 @@
+ 		// FIXME: this recovery doesn't work, just delete bad config and bail out
+ 		// SysMessage("could not load plugins, retrying with defaults\n");
+ 		set_default_paths();
+-		snprintf(path, sizeof(path), "." PCSX_DOT_DIR "%s", cfgfile_basename);
++		snprintf(path, sizeof(path), PCSX_DOT_DIR "%s", cfgfile_basename);
+ 		remove(path);
+ 		SysMessage("Failed loading plugins!");
+ 		return 1;
+@@ -876,7 +876,7 @@
+ 		char path[MAXPATHLEN];
+ 		char dotdir[MAXPATHLEN];
+ 
+-		MAKE_PATH(dotdir, "/.pcsx/plugins/", NULL);
++		MAKE_PATH(dotdir, PCSX_DOT_DIR "plugins/", NULL);
+ 
+ 		strcpy(info.EmuName, "PCSX");
+ 		strncpy(info.CdromID, CdromId, 9);
