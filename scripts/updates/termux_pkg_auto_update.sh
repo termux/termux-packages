@@ -32,6 +32,10 @@ configured to use ${TERMUX_PKG_UPDATE_METHOD}'s method."
 		fi
 		;;
 	repology)
+		# https://github.com/termux/termux-packages/issues/14544
+		echo "WARNING: repology update method is currently disabled due to network error."
+		return 0
+		#
 		termux_repology_auto_update
 		;;
 	*)
