@@ -60,7 +60,7 @@ diff -uNr kirigami2-5.100.0/src/controls/SearchField.qml kirigami2-5.100.0.mod/s
 -    Accessible.name: qsTr("Search")
 -    Accessible.searchEdit: true
 -
-     focusSequence: "Ctrl+F"
+     focusSequence: StandardKey.Find
      inputMethodHints: Qt.ImhNoPredictiveText
      rightActions: [
 diff -uNr kirigami2-5.100.0/src/controls/SelectableLabel.qml kirigami2-5.100.0.mod/src/controls/SelectableLabel.qml
@@ -197,13 +197,13 @@ diff -uNr kirigami2-5.100.0/src/controls/templates/OverlayDrawer.qml kirigami2-5
 --- kirigami2-5.100.0/src/controls/templates/OverlayDrawer.qml	2022-11-05 20:28:40.000000000 +0800
 +++ kirigami2-5.100.0.mod/src/controls/templates/OverlayDrawer.qml	2022-12-03 12:58:46.000000000 +0800
 @@ -170,7 +170,6 @@
-             width: parent.height - Kirigami.Units.smallSpacing * 1.5
-             height: parent.height - Kirigami.Units.smallSpacing * 1.5
-             onClicked: root.drawerOpen = !root.drawerOpen;
+                 drawerHandle.displayToolTip = false
+                 Qt.callLater(() => root.drawerOpen = !root.drawerOpen)
+             }
 -            Accessible.name: root.drawerOpen ? root.handleOpenToolTip : root.handleClosedToolTip
              visible: !Kirigami.SettingstabletMode && !Kirigami.SettingshasTransientTouchInput
          }
- 
+         T2.ToolTip.visible: drawerHandle.displayToolTip && containsMouse
 diff -uNr kirigami2-5.100.0/src/controls/templates/SwipeListItem.qml kirigami2-5.100.0.mod/src/controls/templates/SwipeListItem.qml
 --- kirigami2-5.100.0/src/controls/templates/SwipeListItem.qml	2022-11-05 20:28:40.000000000 +0800
 +++ kirigami2-5.100.0.mod/src/controls/templates/SwipeListItem.qml	2022-12-03 12:58:52.000000000 +0800
