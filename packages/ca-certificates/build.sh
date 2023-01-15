@@ -20,9 +20,6 @@ termux_step_make_install() {
 		$TERMUX_PKG_SHA256
 	touch $CERTFILE
 
-	# CVE-2022-23491
-	sed -i '/^TrustCor /,/^-----END CERTIFICATE-----$/d' $CERTFILE
-
 	# Build java keystore which is split out into a ca-certificates-java subpackage:
 	local KEYUTIL_JAR=$TERMUX_PKG_CACHEDIR/keyutil-0.4.0.jar
 	termux_download \
