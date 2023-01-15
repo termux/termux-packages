@@ -9,9 +9,11 @@ TERMUX_PKG_SHA256=887e9b5ee7b8115d35099c730372b4158fd3e215955a06d68e20928b339646
 TERMUX_PKG_DEPENDS="libpng, mesa, pulseaudio, sdl, zlib"
 TERMUX_PKG_BUILD_DEPENDS="mesa-dev"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_REVISION=1
 
 termux_step_pre_configure() {
 	CFLAGS+=" -I$TERMUX_PREFIX/include"
+	termux_setup_no_integrated_as
 }
 
 termux_step_configure() {
