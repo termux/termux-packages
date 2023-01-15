@@ -1,87 +1,39 @@
---- ./rust/libnewsboat/src/utils.rs.orig	2021-05-17 17:24:43.019948076 +0000
-+++ ./rust/libnewsboat/src/utils.rs	2021-05-17 17:45:43.814961688 +0000
-@@ -891,6 +891,7 @@
+--- a/rust/libnewsboat/src/utils.rs
++++ b/rust/libnewsboat/src/utils.rs
+@@ -823,12 +823,15 @@
  
  // On FreeBSD, link with GNU libiconv; the iconv implementation in libc doesn't support //TRANSLIT
  // and WCHAR_T. This is also why we change the symbol names from "iconv" to "libiconv" below.
-+/*
++#[cfg_attr(target_os = "android", link(name = "iconv"))]
  #[cfg_attr(target_os = "freebsd", link(name = "iconv"))]
+ #[cfg_attr(target_os = "openbsd", link(name = "iconv"))]
  extern "C" {
++    #[cfg_attr(target_os = "android", link_name = "libiconv_open")]
      #[cfg_attr(target_os = "freebsd", link_name = "libiconv_open")]
-@@ -906,7 +907,7 @@
+     #[cfg_attr(target_os = "openbsd", link_name = "libiconv_open")]
+     pub fn iconv_open(tocode: *const c_char, fromcode: *const c_char) -> iconv_t;
++    #[cfg_attr(target_os = "android", link_name = "libiconv")]
+     #[cfg_attr(target_os = "freebsd", link_name = "libiconv")]
+     #[cfg_attr(target_os = "openbsd", link_name = "libiconv")]
+     pub fn iconv(
+@@ -838,6 +841,7 @@
+         outbuf: *mut *mut c_char,
+         outbytesleft: *mut size_t,
+     ) -> size_t;
++    #[cfg_attr(target_os = "android", link_name = "libiconv_close")]
      #[cfg_attr(target_os = "freebsd", link_name = "libiconv_close")]
+     #[cfg_attr(target_os = "openbsd", link_name = "libiconv_close")]
      pub fn iconv_close(cd: iconv_t) -> c_int;
- }
--
-+*/
- /// Annotates the target encoding (`tocode`) with `//TRANSLIT` if conversion between `fromcode` and
- /// `tocode` might require transliterating some characters.
- pub fn translit(tocode: &str, fromcode: &str) -> String {
-@@ -920,7 +921,7 @@
-     // However, in our case it's okay: even if multiple threads run this function, they will all
-     // arrive at the same result, so we don't care if those threads race to write that result into
-     // the variable.
--    static mut STATE: TranslitState = TranslitState::Unknown;
-+    static mut STATE: TranslitState = TranslitState::Unsupported;
- 
-     // TRANSLIT is not needed when converting to unicode encodings
-     if tocode == "utf-8" || tocode == "WCHAR_T" {
-@@ -931,6 +932,7 @@
- 
-     unsafe {
-         if STATE == TranslitState::Unknown {
-+            /*
-             // The three calls to expect() can't panic because the input strings come from either:
-             //
-             // - our code, and we won't deliberately put a NUL byte inside an encoding name; or
-@@ -968,6 +970,7 @@
-                 STATE = TranslitState::Supported;
-                 iconv_close(cd);
-             }
-+            */
-         }
-     }
- 
-@@ -987,6 +990,7 @@
- 
-     let tocode_translit = translit(tocode, fromcode);
- 
-+    /*
-     // Illegal and incomplete multi-byte sequences will be replaced by this
-     // placeholder. By default, we use an ASCII value for "question mark".
-     let question_mark = {
-@@ -1078,21 +1083,25 @@
- 
-         iconv_close(cd);
-     }
--
-+    */
+@@ -1014,6 +1018,12 @@
      result
  }
  
++#[cfg(target_os = "android")]
++fn get_locale_encoding() -> String {
++    String::from("UTF-8")
++}
++
++#[cfg(not(target_os = "android"))]
  fn get_locale_encoding() -> String {
      unsafe {
--        use libc::{nl_langinfo, CODESET};
-+        use libc::{setlocale, LC_CTYPE};
-         use std::ffi::CStr;
--
--        let codeset = CStr::from_ptr(nl_langinfo(CODESET));
--        // Codeset names are ASCII, so the below expect() should never panic.
--        codeset
--            .to_str()
--            .expect("Locale codeset name is not a valid UTF-8 string")
--            .to_owned()
-+        // reimplement from C version https://github.com/crystax/android-vendor-gnu-grep/blob/master/lib/nl_langinfo.c
-+        let mut locale = CStr::from_ptr(setlocale(LC_CTYPE, std::ptr::null())).to_str().expect("Null locale found").to_owned();
-+        locale = match locale.find(".") {
-+            Some(pos) => locale[(pos+1)..].to_string(),
-+            None => locale
-+        };
-+        locale = match locale.find("@") {
-+            Some(pos) => locale[..pos].to_string(),
-+            None => locale
-+        };
-+        locale
-     }
- }
- 
+         use libc::{nl_langinfo, CODESET};
