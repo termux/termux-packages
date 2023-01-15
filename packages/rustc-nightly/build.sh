@@ -3,10 +3,9 @@ TERMUX_PKG_DESCRIPTION="Rust compiler and utilities (nightly version)"
 TERMUX_PKG_DEPENDS="libc++, clang, openssl, lld, zlib, libllvm"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.61.0
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/2022-03-07/rustc-nightly-src.tar.xz
-TERMUX_PKG_SHA256=7c7eb8e20f62c1701a369c033ed2c06f1de8c35c3673658e12691243a1d41558
+TERMUX_PKG_VERSION=1.68.0
+TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/2023-01-15/rustc-nightly-src.tar.xz
+TERMUX_PKG_SHA256=f9af928580d399be41a8562a7a62ba4289a13f7ed57074bf3413a7ca6ba342a6
 TERMUX_PKG_RM_AFTER_INSTALL="bin/llvm-* bin/llc bin/opt"
 
 termux_step_configure () {
