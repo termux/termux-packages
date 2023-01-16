@@ -1,5 +1,5 @@
 --- a/frontend/menu.c	2023-01-14 16:15:08.057589352 -0300
-+++ b/frontend/menu.c	2023-01-15 03:10:35.584654965 -0300
++++ b/frontend/menu.c	2023-01-17 07:16:17.161202440 -0300
 @@ -131,18 +131,6 @@
  static int min(int x, int y) { return x < y ? x : y; }
  static int max(int x, int y) { return x > y ? x : y; }
@@ -31,16 +31,54 @@
  }
  
  static void keys_write_all(FILE *f);
-@@ -540,7 +528,7 @@
+@@ -534,39 +522,24 @@
+ 
+ static int menu_do_last_cd_img(int is_get)
+ {
+-	static const char *defaults[] = { "/media", "/mnt/sd", "/mnt" };
++	static const char *default_dir = "@TERMUX_BASE_DIR@";
+ 	char path[256];
+-	struct stat64 st;
  	FILE *f;
- 	int i, ret = -1;
+-	int i, ret = -1;
  
 -	snprintf(path, sizeof(path), "." PCSX_DOT_DIR "lastcdimg.txt");
 +	snprintf(path, sizeof(path), PCSX_DOT_DIR "lastcdimg.txt");
  	f = fopen(path, is_get ? "r" : "w");
  	if (f == NULL) {
- 		ret = -1;
-@@ -697,14 +685,14 @@
+-		ret = -1;
+-		goto out;
++		if (is_get)
++			strcpy(last_selected_fname, default_dir);
++		return 1;
+ 	}
+ 
+-	if (is_get) {
+-		ret = fread(last_selected_fname, 1, sizeof(last_selected_fname) - 1, f);
+-		last_selected_fname[ret] = 0;
+-		mystrip(last_selected_fname);
+-	}
++	if (is_get)
++		fread(last_selected_fname, 1, sizeof(last_selected_fname) - 1, f);
+ 	else
+ 		fprintf(f, "%s\n", last_selected_fname);
+ 	fclose(f);
+ 
+-out:
+-	if (is_get) {
+-		for (i = 0; last_selected_fname[0] == 0
+-		       || stat64(last_selected_fname, &st) != 0; i++)
+-		{
+-			if (i >= ARRAY_SIZE(defaults))
+-				break;
+-			strcpy(last_selected_fname, defaults[i]);
+-		}
+-	}
+-
+ 	return 0;
+ }
+ 
+@@ -697,14 +670,14 @@
  		if (memcard1_sel == 0)
  			strcpy(Config.Mcd1, "none");
  		else if (memcards[memcard1_sel] != NULL)
@@ -57,7 +95,7 @@
  				MEMCARD_DIR, memcards[memcard2_sel]);
  	}
  	if (strcmp(mcd1_old, Config.Mcd1) || strcmp(mcd2_old, Config.Mcd2))
-@@ -1806,10 +1794,10 @@
+@@ -1806,10 +1779,10 @@
  {
  	strcpy(Config.Mcd1, "none");
  	if (memcard1_sel != 0)
@@ -70,7 +108,7 @@
  	LoadMcds(Config.Mcd1, Config.Mcd2);
  	draw_mc_bg();
  }
-@@ -2489,7 +2477,7 @@
+@@ -2489,7 +2462,7 @@
  	closedir(dir);
  
  do_memcards:
@@ -79,7 +117,7 @@
  	if (dir == NULL) {
  		perror("scan_bios_plugins memcards opendir");
  		return;
-@@ -2509,7 +2497,7 @@
+@@ -2509,7 +2482,7 @@
  		if (ent->d_type != DT_REG && ent->d_type != DT_LNK)
  			continue;
  
@@ -88,7 +126,7 @@
  		if (stat(fname, &st) != 0) {
  			printf("bad memcard file: %s\n", ent->d_name);
  			continue;
-@@ -2532,7 +2520,7 @@
+@@ -2532,7 +2505,7 @@
  void menu_init(void)
  {
  	char buff[MAXPATHLEN];
@@ -97,7 +135,7 @@
  
  	cpu_clock_st = cpu_clock = plat_target_cpu_clock_get();
  
-@@ -2553,7 +2541,8 @@
+@@ -2553,7 +2526,8 @@
  		exit(1);
  	}
  
