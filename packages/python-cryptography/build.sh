@@ -5,7 +5,7 @@ TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE, LICENSE.APACHE, LICENSE.BSD, LICENSE.PSF"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="39.0.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/pyca/cryptography/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=7b62ed8e5e6e7ddcc9d92196b2acd8150c8098de3a058ef0abc9c720c971b0e4
 TERMUX_PKG_AUTO_UPDATE=true
@@ -31,6 +31,6 @@ termux_step_create_debscripts() {
 	cat <<- EOF > ./postinst
 	#!$TERMUX_PREFIX/bin/sh
 	echo "Installing dependencies through pip..."
-	pip3 install --no-binary $TERMUX_PKG_PYTHON_TARGET_DEPS
+	pip3 install $TERMUX_PKG_PYTHON_TARGET_DEPS
 	EOF
 }
