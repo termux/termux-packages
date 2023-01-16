@@ -26,6 +26,9 @@ export TERMUX_HOST_PLATFORM=aarch64-linux-android
 export TERMUX_ARCH_BITS=64
 export TERMUX_BUILD_TUPLE=x86_64-pc-linux-gnu
 export TERMUX_PKG_API_LEVEL=24
+export TERMUX_TOPDIR="$HOME/.termux-build"
+export TERMUX_PYTHON_CROSSENV_PREFIX="$TERMUX_TOPDIR/python-crossenv-prefix"
+export TERMUX_PYTHON_VERSION=$(. "$TERMUX_SCRIPTDIR/packages/python/build.sh"; echo "$_MAJOR_VERSION")
 export CC=gcc CXX=g++ LD=ld AR=ar STRIP=strip PKG_CONFIG=pkg-config
 export CPPFLAGS="" CFLAGS="" CXXFLAGS="" LDFLAGS=""
 mkdir -p "$TERMUX_PKG_TMPDIR"
@@ -50,9 +53,9 @@ mkdir -p "$TERMUX_PKG_TMPDIR"
 (. "$TERMUX_SCRIPTDIR"/scripts/build/setup/termux_setup_protobuf.sh
 	termux_setup_protobuf
 )
-(. "$TERMUX_SCRIPTDIR"/scripts/build/setup/termux_setup_python_pip.sh
-	termux_setup_python_pip
-)
+#(. "$TERMUX_SCRIPTDIR"/scripts/build/setup/termux_setup_python_pip.sh
+#	termux_setup_python_pip
+#)
 # Offline rust is not supported yet.
 #(. "$TERMUX_SCRIPTDIR"/scripts/build/setup/termux_setup_rust.sh
 #	termux_setup_rust
