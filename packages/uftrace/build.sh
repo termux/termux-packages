@@ -5,9 +5,8 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.13
 TERMUX_PKG_SRCURL=https://github.com/namhyung/uftrace/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=cffae82c68446c20cc3c7e87e71e57498805767a0d4085b4846f3c49f9e472d9
-# Hardcoded libpython${_PYTHON_VERSION}.so is dlopen(3)ed by uftrace.
-# Please revbump and rebuild when bumping _PYTHON_VERSION, where
-# _PYTHON_VERSION == _MAJOR_VERSION in build.sh of python package.
+# Hardcoded libpython${TERMUX_PYTHON_VERSION}.so is dlopen(3)ed by uftrace.
+# Please revbump and rebuild when bumping TERMUX_PYTHON_VERSION.
 # libandroid-{execinfo,spawn} are dlopen(3)ed.
 TERMUX_PKG_DEPENDS="capstone, libandroid-execinfo, libandroid-glob, libandroid-spawn, libc++, libdw, libelf, libluajit, ncurses, python"
 TERMUX_PKG_AUTO_UPDATE=true

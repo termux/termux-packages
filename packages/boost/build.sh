@@ -29,8 +29,7 @@ termux_step_make_install() {
 
 	CC= CXX= LDFLAGS= CXXFLAGS= ./bootstrap.sh
 	echo "using clang : $TERMUX_ARCH : $CXX : <linkflags>-L$TERMUX_PREFIX/lib ; " >> project-config.jam
-	local _PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
-	echo "using python : ${_PYTHON_VERSION} : $TERMUX_PREFIX/bin/python3 : $TERMUX_PREFIX/include/python${_PYTHON_VERSION} : $TERMUX_PREFIX/lib ;" >> project-config.jam
+	echo "using python : ${TERMUX_PYTHON_VERSION} : $TERMUX_PREFIX/bin/python3 : $TERMUX_PREFIX/include/python${TERMUX_PYTHON_VERSION} : $TERMUX_PREFIX/lib ;" >> project-config.jam
 
 	if [ "$TERMUX_ARCH" = arm ] || [ "$TERMUX_ARCH" = aarch64 ]; then
 		BOOSTARCH=arm

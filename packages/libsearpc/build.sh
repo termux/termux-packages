@@ -12,6 +12,5 @@ TERMUX_PKG_REPLACES="libsearpc-dev"
 
 termux_step_post_get_source() {
 	./autogen.sh
-	local _PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
-	export PYTHON="python${_PYTHON_VERSION}"
+	export PYTHON="python${TERMUX_PYTHON_VERSION}"
 }
