@@ -1,5 +1,5 @@
 --- a/frontend/libpicofe/linux/plat.c	2023-01-14 16:15:27.853589338 -0300
-+++ b/frontend/libpicofe/linux/plat.c	2023-01-15 03:40:48.554912740 -0300
++++ b/frontend/libpicofe/linux/plat.c	2023-01-16 00:01:24.412662379 -0300
 @@ -22,6 +22,7 @@
  #include <sys/stat.h>
  
@@ -8,7 +8,7 @@
  
  /* XXX: maybe unhardcode pagesize? */
  #define HUGETLB_PAGESIZE (2 * 1024 * 1024)
-@@ -49,56 +50,10 @@
+@@ -49,56 +50,12 @@
  	return strlen(dst);
  }
  
@@ -44,7 +44,8 @@
 -	memcpy(dst + ret, "skin/", sizeof "skin/");
 -	return ret + sizeof("skin/") - 1;
 -}
--
++	int len = sizeof(PCSX_DOT_DIR "skin/");
+ 
 -#ifndef PICO_HOME_DIR
 -#define PICO_HOME_DIR "/.picodrive/"
 -#endif
@@ -63,8 +64,8 @@
 -	}
 -#endif
 -	return plat_get_exe_dir(dst, len);
-+	memcpy(dst, PCSX_DOT_DIR "skin/", sizeof(PCSX_DOT_DIR "skin/")); 
-+	return sizeof(PCSX_DOT_DIR "skin/") - 1;
++	memcpy(dst, PCSX_DOT_DIR "skin/", len);
++	return len - 1;
  }
  
  #ifdef __GP2X__
