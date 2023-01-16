@@ -49,7 +49,7 @@ termux_setup_python_pip() {
 			python${TERMUX_PYTHON_VERSION} -m crossenv \
                 		"$TERMUX_PREFIX/bin/python${TERMUX_PYTHON_VERSION}" \
 				"${TERMUX_PYTHON_CROSSENV_PREFIX}"
-			popd
+			popd || true
 		fi
 		. "${TERMUX_PYTHON_CROSSENV_PREFIX}/bin/activate"
 	fi
