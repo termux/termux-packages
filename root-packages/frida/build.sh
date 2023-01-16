@@ -6,6 +6,7 @@ _MAJOR_VERSION=16
 _MINOR_VERSION=0
 _MICRO_VERSION=2
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.${_MINOR_VERSION}.${_MICRO_VERSION}
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
 TERMUX_PKG_SRCURL=git+https://github.com/frida/frida
 TERMUX_PKG_DEPENDS="libiconv"
@@ -21,10 +22,9 @@ TERMUX_PKG_REPLACES="frida-tools (<< 15.1.24-1), frida-server (<< 15.1.24)"
 termux_step_pre_configure () {
 	termux_setup_nodejs
 
-	_PYTHON_VERSION=$(source $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
-	export TERMUX_PKG_EXTRA_MAKE_ARGS+=" PYTHON=/usr/bin/python${_PYTHON_VERSION}"
+	export TERMUX_PKG_EXTRA_MAKE_ARGS+=" PYTHON=/usr/bin/python${TERMUX_PYTHON_VERSION}"
 	sed -e "s%@TERMUX_PREFIX@%$TERMUX_PREFIX%g" \
-		-e "s%@PYTHON_VERSION@%$_PYTHON_VERSION%g" \
+		-e "s%@PYTHON_VERSION@%$TERMUX_PYTHON_VERSION%g" \
 		$TERMUX_PKG_BUILDER_DIR/frida-python-version.diff | patch -Np1
 }
 

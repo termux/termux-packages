@@ -1,6 +1,6 @@
 TERMUX_SUBPKG_INCLUDE="share/inkscape/extensions"
 TERMUX_SUBPKG_DESCRIPTION="Inkscape extensions"
-TERMUX_SUBPKG_DEPENDS="python, python-numpy"
+TERMUX_SUBPKG_DEPENDS="python, python-numpy, python-pip"
 TERMUX_SUBPKG_PLATFORM_INDEPENDENT=true
 
 termux_step_create_subpkg_debscripts() {
