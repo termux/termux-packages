@@ -1,5 +1,5 @@
 --- a/frontend/main.c	2023-01-14 16:15:08.053589352 -0300
-+++ b/frontend/main.c	2023-01-14 20:12:40.282744859 -0300
++++ b/frontend/main.c	2023-01-17 15:57:47.596011448 -0300
 @@ -57,9 +57,9 @@
  static void make_path(char *buf, size_t size, const char *dir, const char *fname)
  {
@@ -12,7 +12,7 @@
  }
  #define MAKE_PATH(buf, dir, fname) \
  	make_path(buf, sizeof(buf), dir, fname)
-@@ -103,13 +103,13 @@
+@@ -103,13 +104,13 @@
  static void set_default_paths(void)
  {
  #ifndef NO_FRONTEND
@@ -29,7 +29,7 @@
  	strcpy(Config.Gpu, "builtin_gpu");
  	strcpy(Config.Spu, "builtin_spu");
  	strcpy(Config.Cdr, "builtin_cdr");
-@@ -246,7 +246,7 @@
+@@ -246,7 +247,7 @@
  
  			scrbuf = pl_prepare_screenshot(&w, &h, &bpp);
  			get_gameid_filename(buf, sizeof(buf),
@@ -38,7 +38,7 @@
  			ret = -1;
  			if (scrbuf != 0 && bpp == 16)
  				ret = writepng(buf, scrbuf, w, h);
-@@ -483,7 +483,7 @@
+@@ -483,7 +484,7 @@
  	create_profile_dir(CHEATS_DIR);
  	create_profile_dir(PATCHES_DIR);
  	create_profile_dir(PCSX_DOT_DIR "cfg");
@@ -47,7 +47,7 @@
  }
  
  static void check_memcards(void)
-@@ -493,7 +493,7 @@
+@@ -493,7 +494,7 @@
  	int i;
  
  	for (i = 1; i <= 9; i++) {
@@ -56,7 +56,7 @@
  
  		f = fopen(buf, "rb");
  		if (f == NULL) {
-@@ -596,7 +596,7 @@
+@@ -596,7 +597,7 @@
  		// FIXME: this recovery doesn't work, just delete bad config and bail out
  		// SysMessage("could not load plugins, retrying with defaults\n");
  		set_default_paths();
@@ -65,7 +65,16 @@
  		remove(path);
  		SysMessage("Failed loading plugins!");
  		return 1;
-@@ -876,7 +876,7 @@
+@@ -753,7 +754,7 @@
+ 
+ int get_state_filename(char *buf, int size, int i) {
+ 	return get_gameid_filename(buf, size,
+-		"." STATES_DIR "%.32s-%.9s.%3.3d", i);
++		STATES_DIR "%.32s-%.9s.%3.3d", i);
+ }
+ 
+ int emu_check_state(int slot)
+@@ -876,7 +877,7 @@
  		char path[MAXPATHLEN];
  		char dotdir[MAXPATHLEN];
  
