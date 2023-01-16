@@ -16,15 +16,14 @@ termux_step_post_get_source() {
 }
 
 termux_step_pre_configure() {
-	_PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
 	export UWSGI_PYTHON_NOLIB=true
 	export UWSGI_INCLUDES="$TERMUX_PREFIX/include"
 	export APPEND_CFLAGS="$CPPFLAGS
-		-I$TERMUX_PREFIX/include/python${_PYTHON_VERSION}
+		-I$TERMUX_PREFIX/include/python${TERMUX_PYTHON_VERSION}
 		-DOBSOLETE_LINUX_KERNEL
 		"
 	LDFLAGS+="
-		-lpython${_PYTHON_VERSION}
+		-lpython${TERMUX_PYTHON_VERSION}
 		-landroid-glob
 		-landroid-sysv-semaphore
 		"
