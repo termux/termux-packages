@@ -10,7 +10,7 @@ TERMUX_PKG_DEPENDS="clang, make, pkg-config, python (>= 3.11.1-1)"
 TERMUX_PKG_BREAKS="python (<< 3.11.1-1)"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, docutils, myst_parser, sphinx_copybutton, sphinx_inline_tabs, sphinxcontrib.towncrier, completion, setuptools"
+TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, docutils, myst_parser, sphinx_copybutton, sphinx_inline_tabs, sphinxcontrib.towncrier, completion"
 
 termux_step_post_make_install() {
 	( # creating pip documentation
