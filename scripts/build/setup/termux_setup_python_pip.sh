@@ -14,7 +14,7 @@ termux_setup_python_pip() {
 		fi
 		return
 	else
-		local _CROSSENV_VERSION=1.3.0
+		local _CROSSENV_VERSION=1.4.0
 		local _CROSSENV_TAR=crossenv-$_CROSSENV_VERSION.tar.gz
 		local _CROSSENV_FOLDER
 
@@ -29,7 +29,7 @@ termux_setup_python_pip() {
 			termux_download \
 				https://github.com/benfogle/crossenv/archive/refs/tags/v$_CROSSENV_VERSION.tar.gz \
 				$TERMUX_PKG_TMPDIR/$_CROSSENV_TAR \
-				a217a67f9201801c087b582b28c0318e014a17ffa89d355854d646e1b1094b80
+				28da6260fafd85b05fa539793c45ef804c700a0bb71172fadef429796d49ac4e
 
 			rm -Rf "$TERMUX_PKG_TMPDIR/crossenv-$_CROSSENV_VERSION"
 			tar xf $TERMUX_PKG_TMPDIR/$_CROSSENV_TAR -C $TERMUX_PKG_TMPDIR
