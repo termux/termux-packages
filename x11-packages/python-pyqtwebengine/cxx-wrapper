@@ -1,0 +1,19 @@
+#!/bin/bash
+
+shared=
+for f in "$@"; do
+	case "${f}" in
+		-shared )
+			shared=true
+			;;
+	esac
+done
+
+includes=
+libs=
+if test "${shared}"; then
+	libs="-L@TERMUX_PREFIX@/lib -lpython@PYTHON_VERSION@"
+else
+	includes="-I@TERMUX_PREFIX@/include/QtPrintSupport -I@TERMUX_PREFIX@/include/QtWebChannel"
+fi
+exec @CXX@ "$@" ${includes} ${libs}
