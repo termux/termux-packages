@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="The PyPA recommended tool for installing Python packages
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=22.3.1
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/pypa/pip/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=8d9f7cd8ad0d6f0c70e71704fd3f0f6538d70930454f1f21bbc2f8e94f6964ee
 TERMUX_PKG_DEPENDS="clang, make, pkg-config, python (>= 3.11.1-1)"
@@ -32,7 +32,7 @@ termux_step_create_debscripts() {
 	cat <<- POSTINST_EOF > ./postinst
 	#!$TERMUX_PREFIX/bin/bash
 	echo "pip setup..."
-	pip config set global.disable-pip-version-check true
+	pip config set --global global.disable-pip-version-check true
 	exit 0
 	POSTINST_EOF
 	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ]; then
@@ -42,9 +42,9 @@ termux_step_create_debscripts() {
 	# deleting conf of pip while removing it
 	cat <<- PRERM_EOF > ./prerm
 	#!$TERMUX_PREFIX/bin/bash
-	if [ -d ~/.config/pip ]; then
+	if [ -d $TERMUX_PREFIX/etc/pip.conf ]; then
 		echo "Removing the pip setting..."
-		rm -fr ~/.config/pip
+		rm -fr $TERMUX_PREFIX/etc/pip.conf
 	fi
 	exit 0
 	PRERM_EOF
