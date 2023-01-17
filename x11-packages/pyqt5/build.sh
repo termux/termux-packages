@@ -46,7 +46,7 @@ termux_step_pre_configure() {
 	chmod 0700 ${_bindir}/${_cxx}
 	export PATH=${_bindir}:$PATH
 
-	TERMUX_PKG_EXTRA_MAKE_ARGS+=" --target-dir=$PYTHONPATH"
+	TERMUX_PKG_EXTRA_MAKE_ARGS+=" --target-dir=$TERMUX_PREFIX/lib/python${TERMUX_PYTHON_VERSION}/site-packages"
 }
 
 termux_step_make() {
