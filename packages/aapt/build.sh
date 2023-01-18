@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 _TAG_VERSION=13.0.0
 _TAG_REVISION=6
 TERMUX_PKG_VERSION=${_TAG_VERSION}.${_TAG_REVISION}
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(https://android.googlesource.com/platform/frameworks/base
                    https://android.googlesource.com/platform/system/core
                    https://android.googlesource.com/platform/system/libbase
@@ -102,12 +103,21 @@ termux_step_make() {
 		-I$LIBLOG_INCDIR
 		-I$CORE_INCDIR"
 
+	# Build libbase:
+	cd $LIBBASE_SRCDIR
+	for f in $libbase_sources; do
+		$CXX $CXXFLAGS $CPPFLAGS $f -c
+	done
+	$CXX $CXXFLAGS *.o -shared $LDFLAGS \
+		-o $_TMP_LIBDIR/libandroid-base.so
+
 	# Build libcutils:
 	cd $LIBCUTILS_SRCDIR
 	for f in $libcutils_sources; do
 		$CXX $CXXFLAGS $CPPFLAGS $f -c
 	done
-	$CC $CFLAGS *.o -shared $LDFLAGS \
+	$CXX $CXXFLAGS *.o -shared $LDFLAGS \
+		-landroid-base \
 		-o $_TMP_LIBDIR/libandroid-cutils.so
 
 	# Build libutils:
@@ -116,16 +126,10 @@ termux_step_make() {
 		$CXX $CXXFLAGS $CPPFLAGS $f -c
 	done
 	$CXX $CXXFLAGS *.o -shared $LDFLAGS \
+		-landroid-base \
 		-landroid-cutils \
 		-o $_TMP_LIBDIR/libandroid-utils.so
 
-	# Build libbase:
-	cd $LIBBASE_SRCDIR
-	for f in $libbase_sources; do
-		$CXX $CXXFLAGS $CPPFLAGS $f -c
-	done
-	$CXX $CXXFLAGS *.o -shared $LDFLAGS \
-		-o $_TMP_LIBDIR/libandroid-base.so
 
 	# Build libziparchive:
 	cd $LIBZIPARCHIVE_SRCDIR
@@ -149,7 +153,9 @@ termux_step_make() {
 	$CXX $CXXFLAGS *.o -shared $LDFLAGS \
 		-landroid-base \
 		-landroid-cutils \
+		-landroid-utils \
 		-landroid-ziparchive \
+		-lz \
 		-o $_TMP_LIBDIR/libandroid-fw.so
 
 	CPPFLAGS+=" -I$ANDROIDFW_SRCDIR/include"
