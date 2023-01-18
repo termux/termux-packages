@@ -1,0 +1,47 @@
+Backport of
+
+https://github.com/TigerVNC/tigervnc/commit/736b50d04e1ba965696cd15d456dc2b7fc123150
+https://github.com/TigerVNC/tigervnc/commit/f2577107f7f55382c524d8c738a777e5cdd80f60
+
+--- a/unix/xserver/hw/vnc/xorg-version.h
++++ b/unix/xserver/hw/vnc/xorg-version.h
+@@ -54,8 +54,10 @@
+ #define XORG 119
+ #elif XORG_VERSION_CURRENT < ((1 * 10000000) + (20 * 100000) + (99 * 1000))
+ #define XORG 120
++#elif XORG_VERSION_CURRENT < ((1 * 10000000) + (21 * 100000) + (99 * 1000))
++#define XORG 121
+ #else
+-#error "X.Org newer than 1.20 is not supported"
++#error "X.Org newer than 1.21 is not supported"
+ #endif
+ 
+ #endif
+--- a/unix/xserver/hw/vnc/xvnc.c
++++ b/unix/xserver/hw/vnc/xvnc.c
+@@ -85,7 +85,6 @@
+ #undef VENDOR_RELEASE
+ #undef VENDOR_STRING
+ #include "version-config.h"
+-#include "site.h"
+ 
+ #define XVNCVERSION "TigerVNC 1.10.0"
+ #define XVNCCOPYRIGHT ("Copyright (C) 1999-2019 TigerVNC Team and many others (see README.rst)\n" \
+@@ -153,15 +152,14 @@
+ static Bool displaySpecified = FALSE;
+ static char displayNumStr[16];
+ 
+-static int vncVerbose = DEFAULT_LOG_VERBOSITY;
++static int vncVerbose = 0;
+ 
+ 
+ static void
+ vncPrintBanner(void)
+ {
+     ErrorF("\nXvnc %s - built %s\n%s", XVNCVERSION, buildtime, XVNCCOPYRIGHT);
+-    ErrorF("Underlying X server release %d, %s\n\n", VENDOR_RELEASE,
+-           VENDOR_STRING);
++    ErrorF("Underlying X server release %d\n\n", VENDOR_RELEASE);
+ }
+ 
+ static void
