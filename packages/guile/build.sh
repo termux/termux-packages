@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Portable, embeddable Scheme implementation written in C"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.0.8
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/guile/guile-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=f25ae0c26e911af1b5005292d4f56621879f74d6958b30741cf67d8b6feb2016
 TERMUX_PKG_DEPENDS="libandroid-support, libffi, libgc, libgmp, libltdl, libunistring"
@@ -25,6 +26,8 @@ termux_step_host_build() {
 termux_step_pre_configure() {
 	export GUILE_FOR_BUILD="$TERMUX_PKG_HOSTBUILD_DIR"/HOSTBUILDINSTALL/bin/guile
 	export LD_LIBRARY_PATH="$TERMUX_PKG_HOSTBUILD_DIR"/HOSTBUILDINSTALL/lib
+
+	export CC_FOR_BUILD="gcc -m${TERMUX_ARCH_BITS}"
 }
 
 termux_step_post_configure() {
