@@ -1,0 +1,33 @@
+--- a/tools/benchmark/benchmark_codec_jpeg.cc
++++ b/tools/benchmark/benchmark_codec_jpeg.cc
+@@ -82,7 +82,7 @@
+ // Not supported on Windows due to Linux-specific functions.
+ // Not supported in Android NDK before API 28.
+ #if !defined(_WIN32) && !defined(__EMSCRIPTEN__) && \
+-    (!defined(__ANDROID_API__) || __ANDROID_API__ >= 28)
++    (!defined(__ANDROID_API__) || __ANDROID_API__ >= 28 || defined(__TERMUX__))
+       const std::string basename = GetBaseName(filename);
+       TemporaryFile in_file(basename, "pnm");
+       TemporaryFile encoded_file(basename, "jpg");
+--- a/tools/benchmark/benchmark_file_io.cc
++++ b/tools/benchmark/benchmark_file_io.cc
+@@ -22,7 +22,7 @@
+ // <glob.h> is included in previous APIs but glob() function is not defined
+ // until API 28.
+ #if __has_include(<glob.h>) && \
+-    (!defined(__ANDROID_API__) || __ANDROID_API__ >= 28)
++    (!defined(__ANDROID_API__) || __ANDROID_API__ >= 28 || defined(__TERMUX__))
+ #undef HAS_GLOB
+ #define HAS_GLOB 1
+ #endif  // __has_include(<glob.h>)
+--- a/tools/benchmark/benchmark_utils.cc
++++ b/tools/benchmark/benchmark_utils.cc
+@@ -10,7 +10,7 @@
+ // Not supported on Windows due to Linux-specific functions.
+ // Not supported in Android NDK before API 28.
+ #if !defined(_WIN32) && !defined(__EMSCRIPTEN__) && \
+-    (!defined(__ANDROID_API__) || __ANDROID_API__ >= 28)
++    (!defined(__ANDROID_API__) || __ANDROID_API__ >= 28 || defined(__TERMUX__))
+ 
+ #include <libgen.h>
+ #include <spawn.h>
