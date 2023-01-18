@@ -4,7 +4,7 @@ termux_step_get_dependencies_python() {
 		termux_setup_python_pip
 
 		# installing python modules
-		LDFLAGS+=" -lpython${TERMUX_PYTHON_VERSION}"
+		LDFLAGS+=" -Wl,--as-needed,-lpython${TERMUX_PYTHON_VERSION}"
 		if [ "$TERMUX_SKIP_DEPCHECK" = "false" ]; then
 			local pip
 			local pip_pkgs="$TERMUX_PKG_PYTHON_COMMON_DEPS, "
