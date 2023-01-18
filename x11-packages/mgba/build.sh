@@ -17,6 +17,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DUSE_MINIZIP=OFF
 "
 
+TERMUX_DEBUG_BUILD=true
+
 termux_step_pre_configure() {
 	CPPFLAGS+=" -DHAVE_STRTOF_L"
 }
