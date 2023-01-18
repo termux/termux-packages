@@ -44,7 +44,7 @@ vi_cv_path_python3_pfx=$TERMUX_PREFIX
 vi_cv_var_python3_abiflags=
 vi_cv_var_python3_version=${TERMUX_PYTHON_VERSION}
 --enable-python3interp
---with-python3-config-dir=$TERMUX_PREFIX/lib/python${TERMUX_PYTHON_VERSION}/config-${TERMUX_PYTHON_VERSION}/
+--with-python3-config-dir=$TERMUX_PYTHON_HOME/config-${TERMUX_PYTHON_VERSION}/
 "
 TERMUX_PKG_DESCRIPTION+=" - with python support"
 # Remove share/vim/vim90 which is in vim-runtime built as a subpackage of vim:

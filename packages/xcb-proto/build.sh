@@ -12,5 +12,5 @@ TERMUX_PKG_CONFLICTS="xcbproto"
 TERMUX_PKG_REPLACES="xcbproto"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 PYTHON=python${TERMUX_PYTHON_VERSION}
-am_cv_python_pythondir=$TERMUX_PREFIX/lib/python${TERMUX_PYTHON_VERSION}/site-packages
+am_cv_python_pythondir=$TERMUX_PYTHON_HOME/site-packages
 "

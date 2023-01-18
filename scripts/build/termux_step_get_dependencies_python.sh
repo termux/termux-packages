@@ -29,7 +29,7 @@ termux_step_get_dependencies_python() {
 		fi
 
 		# adding and setting values ​​to work properly with python modules
-		export PYTHONPATH=$TERMUX_PREFIX/lib/python${TERMUX_PYTHON_VERSION}/site-packages
-		export PYTHON_SITE_PKG=$TERMUX_PREFIX/lib/python${TERMUX_PYTHON_VERSION}/site-packages
+		export PYTHONPATH=$TERMUX_PYTHON_HOME/site-packages
+		export PYTHON_SITE_PKG=$PYTHONPATH
 	fi
 }
