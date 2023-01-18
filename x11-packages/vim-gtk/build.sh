@@ -33,7 +33,7 @@ vim_cv_tty_group=world
 --enable-python3interp
 --with-features=huge
 --with-lua-prefix=$TERMUX_PREFIX
---with-python3-config-dir=$TERMUX_PREFIX/lib/python${TERMUX_PYTHON_VERSION}/config-${TERMUX_PYTHON_VERSION}/
+--with-python3-config-dir=$TERMUX_PYTHON_HOME/config-${TERMUX_PYTHON_VERSION}/
 --with-tlib=ncursesw
 --with-x"
 

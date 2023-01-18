@@ -132,6 +132,7 @@ termux_step_setup_variables() {
 	TERMUX_PKG_PYTHON_BUILD_DEPS="" # python modules to be installed via build-pip
 	TERMUX_PKG_PYTHON_COMMON_DEPS="" # python modules to be installed via pip3 or build-pip
 	TERMUX_PYTHON_CROSSENV_PREFIX=$TERMUX_TOPDIR/python-crossenv-prefix # python modules dependency location (only used in non-devices)
+	TERMUX_PYTHON_HOME=$TERMUX_PREFIX/lib/python${TERMUX_PYTHON_VERSION} # location of python libraries
 
 	unset CFLAGS CPPFLAGS LDFLAGS CXXFLAGS
 }

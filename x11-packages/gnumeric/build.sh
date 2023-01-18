@@ -35,7 +35,7 @@ termux_step_pre_configure() {
 		$TERMUX_PKG_BUILDER_DIR/plugins-python-loader-Makefile.in.diff \
 		| patch --silent -p1
 
-	export PYTHON_GIOVERRIDESDIR=$TERMUX_PREFIX/lib/python${TERMUX_PYTHON_VERSION}/site-packages/gi/overrides
+	export PYTHON_GIOVERRIDESDIR=$TERMUX_PYTHON_HOME/site-packages/gi/overrides
 
 	CPPFLAGS+=" -D__USE_GNU"
 }
