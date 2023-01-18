@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Common interface to speech synthesis"
 TERMUX_PKG_LICENSE="LGPL-2.1, GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.11.4"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SHA256=628d4446894b47f0df099123924c1070180b5b5b09c5b637ebe80d8578fba92f
 TERMUX_PKG_SRCURL=https://github.com/brailcom/speechd/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="dotconf, espeak, glib, libiconv, libltdl, libsndfile, pulseaudio, python, speechd-data"
@@ -30,4 +30,8 @@ termux_step_pre_configure() {
 	export am_cv_python_pythondir="${TERMUX_PREFIX}/lib/python${TERMUX_PYTHON_VERSION}/site-packages"
 	export am_cv_python_pyexecdir="$am_cv_python_pythondir"
 	./build.sh
+}
+
+termux_step_post_massage() {
+	find lib -name '*.la' -delete
 }
