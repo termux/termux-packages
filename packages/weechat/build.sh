@@ -2,6 +2,8 @@ TERMUX_PKG_HOMEPAGE=https://weechat.org/
 TERMUX_PKG_DESCRIPTION="Fast, light and extensible IRC chat client"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
+# `weechat-python-plugin` depends on libpython${TERMUX_PYTHON_VERSION}.so.
+# Please revbump and rebuild when bumping TERMUX_PYTHON_VERSION.
 TERMUX_PKG_VERSION="3.8"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_SRCURL=https://www.weechat.org/files/src/weechat-${TERMUX_PKG_VERSION}.tar.bz2
