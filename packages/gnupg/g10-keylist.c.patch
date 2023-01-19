@@ -1,0 +1,17 @@
+--- ./g10/keylist.c~	2022-11-25 16:05:09.000000000 +0100
++++ ./g10/keylist.c	2023-01-19 20:37:12.674592842 +0100
+@@ -329,12 +329,11 @@
+           else
+             s2k_char = '#';  /* Key not found.  */
+ 
+-          tty_fprintf (fp, "%s%c  %s/%s  %n",
++          tty_fprintf (fp, "%s%c  %s/%s  ",
+                        node->pkt->pkttype == PKT_PUBLIC_KEY ? "sec" : "ssb",
+                        s2k_char,
+                        pubkey_string (pk, pkstrbuf, sizeof pkstrbuf),
+-                       keystr_from_pk (pk),
+-                       &indent);
++                       keystr_from_pk (pk));
+           tty_fprintf (fp, _("created: %s"), datestr_from_pk (pk));
+           tty_fprintf (fp, "  ");
+           tty_fprintf (fp, _("expires: %s"), expirestr_from_pk (pk));
