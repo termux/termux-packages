@@ -63,5 +63,13 @@ termux_step_post_make_install() {
 	ln -sf libGLESv1_CM.so ${TERMUX_PREFIX}/lib/libGLESv1_CM.so.1
 	ln -sf libGLESv2.so ${TERMUX_PREFIX}/lib/libGLESv2.so.2
 
+	# Avoid hardlinks
+	local f1="$TERMUX_PREFIX/lib/dri/kms_swrast_dri.so"
+	local f2="$TERMUX_PREFIX/lib/dri/swrast_dri.so"
+	if [ -f "${f1}" ] && [ -f "${f2}" ] && \
+		[ $(stat -c "%i" "${f1}") == $(stat -c "%i" "${f2}") ]; then
+		ln -sfr "${f1}" "${f2}"
+	fi
+
 	patch -p1 -d $TERMUX_PREFIX/include < $TERMUX_PKG_BUILDER_DIR/egl-not-android.diff
 }
