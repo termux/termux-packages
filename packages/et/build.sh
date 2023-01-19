@@ -2,13 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://eternalterminal.dev
 TERMUX_PKG_DESCRIPTION="A remote shell that automatically reconnects without interrupting the session"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=6.2.2
+TERMUX_PKG_SRCURL=git+https://github.com/MisterTea/EternalTerminal
+TERMUX_PKG_GIT_BRANCH=et-v${TERMUX_PKG_VERSION}
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
-TERMUX_PKG_VERSION="6.2.1"
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SRCURL=https://github.com/MisterTea/EternalTerminal/archive/et-v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=fdf68a51cb8b62b3dbbacd1d2aeba5d5491e5142e65c97713c2f1ce61d4fdbed
-TERMUX_PKG_DEPENDS="libc++, protobuf, libsodium, openssl"
+TERMUX_PKG_DEPENDS="libc++, libsodium, openssl, protobuf, zlib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DDISABLE_VCPKG=1"
 
 termux_step_pre_configure() {
