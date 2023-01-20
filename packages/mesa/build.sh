@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="docs/license.rst"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=22.3.3
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://archive.mesa3d.org/mesa-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=bed799788bf2bd9ef079d97cd8e09348bf53cb086818578e40773b2b17812922
 TERMUX_PKG_DEPENDS="libandroid-shmem, libc++, libdrm, libexpat, libx11, libxext, libxfixes, libxshmfence, libxxf86vm, ncurses, zlib, zstd"
@@ -60,6 +61,24 @@ termux_step_post_make_install() {
 	ln -sf libEGL.so ${TERMUX_PREFIX}/lib/libEGL.so.1
 	ln -sf libGLESv1_CM.so ${TERMUX_PREFIX}/lib/libGLESv1_CM.so.1
 	ln -sf libGLESv2.so ${TERMUX_PREFIX}/lib/libGLESv2.so.2
+
+	# Avoid hard links
+	local f1
+	for f1 in $TERMUX_PREFIX/lib/dri/*; do
+		if [ ! -f "${f1}" ]; then
+			continue
+		fi
+		local f2
+		for f2 in $TERMUX_PREFIX/lib/dri/*; do
+			if [ -f "${f2}" ] && [ "${f1}" != "${f2}" ]; then
+				local s1=$(stat -c "%i" "${f1}")
+				local s2=$(stat -c "%i" "${f2}")
+				if [ "${s1}" = "${s2}" ]; then
+					ln -sfr "${f1}" "${f2}"
+				fi
+			fi
+		done
+	done
 
 	patch -p1 -d $TERMUX_PREFIX/include < $TERMUX_PKG_BUILDER_DIR/egl-not-android.diff
 }
