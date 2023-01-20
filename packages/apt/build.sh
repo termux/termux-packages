@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Front-end for the dpkg package manager"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.5.5
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://deb.debian.org/debian/pool/main/a/apt/apt_${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=711d22c529efca3e9943dad989e9715ebf097e630928daeedd2fbe587e0efd85
 # apt-key requires utilities from coreutils, findutils, gpgv, grep, sed.
@@ -71,10 +72,10 @@ termux_step_pre_configure() {
 
 termux_step_post_make_install() {
 	{
-		echo "# The main termux repository, behind cloudflare cache:"
-		echo "# deb https://packages-cf.termux.dev/apt/termux-main/ stable main"
-		echo "# The main termux repository:"
-		echo "deb https://packages.termux.dev/apt/termux-main/ stable main"
+		echo "# The main termux repository, with cloudflare cache"
+		echo "deb https://packages-cf.termux.dev/apt/termux-main/ stable main"
+		echo "# The main termux repository, without cloudflare cache"
+		echo "# deb https://packages.termux.dev/apt/termux-main/ stable main"
 	} > $TERMUX_PREFIX/etc/apt/sources.list
 
 	# apt-transport-tor
