@@ -2,11 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://www.wireshark.org/
 TERMUX_PKG_DESCRIPTION="Network protocol analyzer"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=4.0.2
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=4.0.3
 TERMUX_PKG_SRCURL=https://www.wireshark.org/download/src/all-versions/wireshark-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=f35915699f2f9b28ddb211202d40ec8984e5834d3c911483144a4984ba44411d
-TERMUX_PKG_DEPENDS="brotli, c-ares, glib, krb5, libc++, libgcrypt, libgnutls, liblua52, liblz4, libmaxminddb, libminizip, libnghttp2, libnl, libopus, libpcap, libsnappy, libssh, libxml2, pcre2, qt5-qtbase, qt5-qtmultimedia, speexdsp, zlib, zstd"
+TERMUX_PKG_SHA256=6c51e15bcc0afb93734e686dbff354ffd159f570bd2904bcbbad6f3feb7e9511
+TERMUX_PKG_DEPENDS="brotli, c-ares, glib, krb5, libandroid-support, libc++, libgcrypt, libgnutls, liblua52, liblz4, libmaxminddb, libminizip, libnghttp2, libnl, libopus, libpcap, libsnappy, libssh, libxml2, pcre2, qt5-qtbase, qt5-qtmultimedia, speexdsp, zlib, zstd"
 TERMUX_PKG_BUILD_DEPENDS="qt5-qtbase-cross-tools, qt5-qttools-cross-tools"
 TERMUX_PKG_CONFLICTS="tshark, wireshark, wireshark-cli, wireshark-gtk"
 TERMUX_PKG_PROVIDES="tshark, wireshark, wireshark-cli, wireshark-gtk"
@@ -41,6 +40,7 @@ termux_step_pre_configure() {
 				--target=*|--gcc-toolchain=*|--sysroot=* ) ;;
 				-fopenmp|-static-openmp ) ;;
 				-Wl,--fix-cortex-a8|-Wl,-z,nocopyreloc ) ;;
+				*-landroid-support* ) ;;
 				* ) args+=("\${a}") ;;
 			esac
 		done
