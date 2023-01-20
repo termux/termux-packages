@@ -42,6 +42,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLLVM_TARGETS_TO_BUILD='AArch64;ARM;WebAssembly;X86'
 "
 
+TERMUX_DEBUG_BUILD=true
+
 termux_step_post_get_source() {
 	# Certain packages are not safe to build on device because their
 	# build.sh script deletes specific files in $TERMUX_PREFIX.
