@@ -4,10 +4,10 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="docs/license.rst"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=22.3.3
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://archive.mesa3d.org/mesa-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=bed799788bf2bd9ef079d97cd8e09348bf53cb086818578e40773b2b17812922
-TERMUX_PKG_DEPENDS="libandroid-shmem, libc++, libdrm, libexpat, libx11, libxext, libxfixes, libxshmfence, libxxf86vm, ncurses, zlib, zstd"
+TERMUX_PKG_DEPENDS="libandroid-shmem, libc++, libdrm, libexpat, libglvnd, libx11, libxext, libxfixes, libxshmfence, libxxf86vm, ncurses, zlib, zstd"
 TERMUX_PKG_SUGGESTS="mesa-dev"
 TERMUX_PKG_BUILD_DEPENDS="libllvm-static, libxrandr, llvm, llvm-tools, mlir, xorgproto"
 TERMUX_PKG_CONFLICTS="libmesa, ndk-sysroot (<= 25b)"
@@ -20,7 +20,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dopengl=true
 -Degl=enabled
 -Degl-native-platform=x11
--Dgles1=enabled
+-Dgles1=disabled
 -Dgles2=enabled
 -Ddri3=enabled
 -Dglx=dri
@@ -30,6 +30,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dgallium-drivers=swrast
 -Dvulkan-drivers=
 -Dosmesa=true
+-Dglvnd=true
 "
 
 termux_step_pre_configure() {
@@ -54,14 +55,6 @@ termux_step_post_configure() {
 }
 
 termux_step_post_make_install() {
-	# A bunch of programs in the wild assume that the name of OpenGL shared
-	# library is `libGL.so.1` and try to dlopen(3) it. In fact `sdl2` does
-	# this. So please do not ever remove the symlink.
-	ln -sf libGL.so ${TERMUX_PREFIX}/lib/libGL.so.1
-	ln -sf libEGL.so ${TERMUX_PREFIX}/lib/libEGL.so.1
-	ln -sf libGLESv1_CM.so ${TERMUX_PREFIX}/lib/libGLESv1_CM.so.1
-	ln -sf libGLESv2.so ${TERMUX_PREFIX}/lib/libGLESv2.so.2
-
 	# Avoid hard links
 	local f1
 	for f1 in $TERMUX_PREFIX/lib/dri/*; do
@@ -80,5 +73,7 @@ termux_step_post_make_install() {
 		done
 	done
 
-	patch -p1 -d $TERMUX_PREFIX/include < $TERMUX_PKG_BUILDER_DIR/egl-not-android.diff
+	# Create symlinks
+	ln -sf libEGL_mesa.so ${TERMUX_PREFIX}/lib/libEGL_mesa.so.0
+	ln -sf libGLX_mesa.so ${TERMUX_PREFIX}/lib/libGLX_mesa.so.0
 }
