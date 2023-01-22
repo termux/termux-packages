@@ -10,10 +10,10 @@ PACKAGES+=" patch"				# Used for applying patches on source code.
 PACKAGES+=" python"				# Used buildorder.py core script.
 PACKAGES+=" unzip"				# Used to extract *.zip source archives.
 PACKAGES+=" jq"					# Used for parsing repo.json.
-PACKAGES+=" binutils-is-llvm"			# Used for checking symbols.
-PACKAGES+=" lrzip"
-PACKAGES+=" lzop"
-PACKAGES+=" lz4"
+PACKAGES+=" binutils-is-llvm"	# Used for checking symbols.
+PACKAGES+=" lrzip"				# Used for compressing into *.lrz archives in pacman package.
+PACKAGES+=" lzop"				# Used for compressing into *.lzop archives in pacman package.
+PACKAGES+=" lz4"				# Used for compressing into *.lz4 archives in pacman package.
 PACKAGES+=" zstd"		# Used to create diff tar
 
 # Tier 2: requirements for building many other packages.
