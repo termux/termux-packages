@@ -1,17 +1,15 @@
-diff --git a/compiler/main/DynFlags.hs b/compiler/main/DynFlags.hs
-index d222b3b..95a9942 100644
---- a/compiler/main/DynFlags.hs
-+++ b/compiler/main/DynFlags.hs
-@@ -4662,6 +4662,12 @@ default_PIC platform =
+--- ghc.orig/compiler/GHC/Driver/Session.hs	2022-11-07 01:10:29.000000000 +0530
++++ ghc.mod/compiler/GHC/Driver/Session.hs	2022-11-10 13:12:21.825682472 +0530
+@@ -3763,6 +3763,12 @@
      (OSDarwin,  ArchAArch64) -> [Opt_PIC]
      (OSLinux,   ArchAArch64) -> [Opt_PIC, Opt_ExternalDynamicRefs]
      (OSLinux,   ArchARM {})  -> [Opt_PIC, Opt_ExternalDynamicRefs]
-+    (OSLinux, ArchX86) -> [Opt_PIC, Opt_ExternalDynamicRefs]
-+    (OSLinux, ArchX86_64) -> [Opt_PIC, Opt_ExternalDynamicRefs]
-+    (OSUnknown, ArchARM {}) -> [Opt_PIC, Opt_ExternalDynamicRefs]
-+    (OSUnknown, ArchAArch64) -> [Opt_PIC, Opt_ExternalDynamicRefs]
-+    (OSUnknown, ArchX86) -> [Opt_PIC, Opt_ExternalDynamicRefs]
-+    (OSUnknown, ArchX86_64) -> [Opt_PIC, Opt_ExternalDynamicRefs]
++    (OSLinux,   ArchX86)     -> [Opt_PIC, Opt_ExternalDynamicRefs]
++    (OSLinux,   ArchX86_64)  -> [Opt_PIC, Opt_ExternalDynamicRefs]
++    (OSUnknown,   ArchAArch64) -> [Opt_PIC, Opt_ExternalDynamicRefs]
++    (OSUnknown,   ArchARM {})  -> [Opt_PIC, Opt_ExternalDynamicRefs]
++    (OSUnknown,   ArchX86)     -> [Opt_PIC, Opt_ExternalDynamicRefs]
++    (OSUnknown,   ArchX86_64)  -> [Opt_PIC, Opt_ExternalDynamicRefs]
      (OSOpenBSD, ArchX86_64)  -> [Opt_PIC] -- Due to PIE support in
-                                           -- OpenBSD since 5.3 release
-                                           -- (1 May 2013) we need to
+                                          -- OpenBSD since 5.3 release
+                                          -- (1 May 2013) we need to
