@@ -10,18 +10,7 @@ termux_pkg_is_update_needed() {
 
 	# Compare versions.
 	# shellcheck disable=SC2091
-	if $(
-		cat <<-EOF | python3 -
-			import sys
-
-			from pkg_resources import parse_version
-
-			if parse_version("${CURRENT_VERSION}") < parse_version("${LATEST_VERSION}"):
-			    sys.exit(0)
-			else:
-			    sys.exit(1)
-		EOF
-	); then
+	if dpkg --compare-versions "${LATEST_VERSION}" gt "${CURRENT_VERSION}"; then
 		return 0 # true. Update needed.
 	fi
 	return 1 # false. Update not needed.
