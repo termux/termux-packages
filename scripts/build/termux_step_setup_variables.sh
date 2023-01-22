@@ -13,6 +13,7 @@ termux_step_setup_variables() {
 	: "${TERMUX_SKIP_DEPCHECK:="false"}"
 	: "${TERMUX_TOPDIR:="$HOME/.termux-build"}"
 	: "${TERMUX_PACMAN_PACKAGE_COMPRESSION:="xz"}"
+	: "${TERMUX_COMPRESS_MULTITHREADED:="false"}"
 
 	if [ -z "${TERMUX_PACKAGE_FORMAT-}" ]; then
 		if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ] && [ -n "${TERMUX_APP_PACKAGE_MANAGER-}" ]; then
@@ -49,6 +50,12 @@ termux_step_setup_variables() {
 		TERMUX_ARCH_BITS=64
 	else
 		TERMUX_ARCH_BITS=32
+	fi
+
+	if [ "$TERMUX_COMPRESS_MULTITHREADED" = "true" ]; then
+		XZ_OPT+=" -T $TERMUX_MAKE_PROCESSES"
+		ZSTD_NBTHREADS="$TERMUX_MAKE_PROCESSES"
+		export XZ_OPT ZSTD_NBTHREADS
 	fi
 
 	TERMUX_HOST_PLATFORM="${TERMUX_ARCH}-linux-android"

@@ -59,7 +59,7 @@ termux_create_debian_subpackages() {
 		cd "$SUB_PKG_DIR/massage"
 		local SUB_PKG_INSTALLSIZE
 		SUB_PKG_INSTALLSIZE=$(du -sk . | cut -f 1)
-		XZ_OPT="-T $TERMUX_MAKE_PROCESSES" tar -cJf "$SUB_PKG_PACKAGE_DIR/data.tar.xz" .
+		tar -cJf "$SUB_PKG_PACKAGE_DIR/data.tar.xz" .
 
 		mkdir -p DEBIAN
 		cd DEBIAN
@@ -96,7 +96,7 @@ termux_create_debian_subpackages() {
 		termux_step_create_subpkg_debscripts
 
 		# Create control.tar.xz
-		XZ_OPT="-T $TERMUX_MAKE_PROCESSES" tar -cJf "$SUB_PKG_PACKAGE_DIR/control.tar.xz" -H gnu .
+		tar -cJf "$SUB_PKG_PACKAGE_DIR/control.tar.xz" -H gnu .
 
 		# Create the actual .deb file:
 		TERMUX_SUBPKG_DEBFILE=$TERMUX_OUTPUT_DIR/${SUB_PKG_NAME}${DEBUG}_${TERMUX_PKG_FULLVERSION}_${SUB_PKG_ARCH}.deb

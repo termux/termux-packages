@@ -18,7 +18,7 @@ on:
       packages:
         description: "A space-separated names of packages selected for rebuilding"
         required: true
-        
+
 permissions: {} # none
 
 jobs:
@@ -188,7 +188,7 @@ jobs:
         done
 
         if [ ! -z "$packages" ]; then
-          ./scripts/run-docker.sh ./build-package.sh -I -a ${{ matrix.target_arch }} $packages
+          ./scripts/run-docker.sh ./build-package.sh -I -a ${{ matrix.target_arch }} --multiz $packages
         fi
 
     - name: Generate build artifacts

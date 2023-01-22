@@ -403,6 +403,7 @@ _show_usage() {
 	echo "  -s Skip dependency check."
 	echo "  -o Specify directory where to put built packages. Default: output/."
 	echo "  --format Specify package output format (debian, pacman)."
+	echo "  --multiz Enable multithreading for xz/zstd/lrzip compression."
 	exit 1
 }
 
@@ -424,6 +425,7 @@ while (($# >= 1)); do
 				termux_error_exit "./build-package.sh: option '--format' requires an argument"
 			fi
 			;;
+		--multiz) export TERMUX_COMPRESS_MULTITHREADED=true;;
 		-a)
 			if [ $# -ge 2 ]; then
 				shift 1

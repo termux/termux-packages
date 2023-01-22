@@ -134,7 +134,7 @@ termux_create_pacman_subpackages() {
 				COMPRESS=(bzip2 -c -f)
 				PKG_FORMAT="bz2";;
 			"zstd")
-				COMPRESS=(zstd -T $TERMUX_MAKE_PROCESSES -c -z -q -)
+				COMPRESS=(zstd -c -z -q -)
 				PKG_FORMAT="zst";;
 			"lrzip")
 				COMPRESS=(lrzip -p $TERMUX_MAKE_PROCESSES -q)
@@ -149,7 +149,7 @@ termux_create_pacman_subpackages() {
 				COMPRESS=(lzip -c -f)
 				PKG_FORMAT="lz";;
 			"xz" | *)
-				COMPRESS=(xz -T $TERMUX_MAKE_PROCESSES -c -z -)
+				COMPRESS=(xz -c -z -)
 				PKG_FORMAT="xz";;
 		esac
 
