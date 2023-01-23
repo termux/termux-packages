@@ -3,10 +3,9 @@ TERMUX_PKG_DESCRIPTION="Dynamic instrumentation toolkit for developers, reverse-
 TERMUX_PKG_LICENSE="wxWindows"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 _MAJOR_VERSION=16
-_MINOR_VERSION=0
-_MICRO_VERSION=2
+_MINOR_VERSION=1
+_MICRO_VERSION=1
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.${_MINOR_VERSION}.${_MICRO_VERSION}
-TERMUX_PKG_REVISION=1
 TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
 TERMUX_PKG_SRCURL=git+https://github.com/frida/frida
 TERMUX_PKG_DEPENDS="libiconv"
@@ -18,6 +17,22 @@ TERMUX_PKG_CONFFILES="var/service/frida-server/run var/service/frida-server/down
 TERMUX_PKG_CONFLICTS="frida-tools (<< 15.1.24-1)"
 TERMUX_PKG_BREAKS="frida-server (<< 15.1.24)"
 TERMUX_PKG_REPLACES="frida-tools (<< 15.1.24-1), frida-server (<< 15.1.24)"
+TERMUX_PKG_HOSTBUILD=true
+
+termux_step_host_build() {
+	termux_setup_nodejs
+
+	# make and save frida-resource-compiler in hostbuild step,
+	# otherwise the one that is compiled in termux_step_make
+	# segfaults (seem to be some tool in termux's toolchain bin
+	# dir that causes it, removing our bin/ dir from PATH fixes
+	# the issue)
+	cd $TERMUX_PKG_SRCDIR
+	make core-linux-x86_64 ${TERMUX_PKG_EXTRA_MAKE_ARGS}
+	cp build/tmp-linux-x86_64/frida-core/tools/frida-resource-compiler \
+		$TERMUX_PKG_HOSTBUILD_DIR/
+}
+
 
 termux_step_pre_configure () {
 	termux_setup_nodejs
@@ -36,6 +51,8 @@ termux_step_make () {
 	else
 		arch=${TERMUX_ARCH}
 	fi
+
+	export PATH=$TERMUX_PKG_HOSTBUILD_DIR:$PATH
 
 	CC=gcc CXX=g++ make python-android-${arch} ${TERMUX_PKG_EXTRA_MAKE_ARGS}
 	CC=gcc CXX=g++ make tools-android-${arch} ${TERMUX_PKG_EXTRA_MAKE_ARGS}
