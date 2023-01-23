@@ -55,7 +55,7 @@ __termux_haskell_setup_build_script() {
 
 # Utility function to setup a GHC cross-compiler toolchain targeting Android.
 termux_setup_ghc_cross_compiler() {
-	local TERMUX_GHC_VERSION="8.10.7"
+	local TERMUX_GHC_VERSION=9.2.5
 	local GHC_PREFIX="ghc-cross-${TERMUX_GHC_VERSION}-${TERMUX_ARCH}"
 	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "false" ]]; then
 		local TERMUX_GHC_RUNTIME_FOLDER
@@ -83,10 +83,10 @@ termux_setup_ghc_cross_compiler() {
 		local CHECKSUMS
 		CHECKSUMS="$(
 			cat <<-EOF
-				aarch64:0912e8c6a8f4b362198c26129bb55f8e76edfcfbf38bfaf8b025a46429e6a887
-				arm:4f9acf98ee44eaebec6bce915507a934d1f880dd4c7ee679c075644e3bc41f78
-				i686:289a04baa67b8cbef401aebf8f5ffef90735e5a5b6e00ce39a50b82c134fe51b
-				x86_64:b43b4c8b80210c2b17ad4547d6d007163052edbd662495e0010b1c9b17d4f865
+				aarch64:47893a77abd35ce5f884bf9c67f8f0437dbcb297d5939e17a3ce7aa74c7d34b8
+				arm:dca3aa7a523054e5b472793afb0d750162052ffa762122c1200e5d832187bb86
+				i686:428c26a4c2a26737a9c031dbe7545c6514d9042cb28d926ffa8702c2930326c5
+				x86_64:1b27fa3dfa02cc9959b43a82b2881b55a1def397da7e7f7ff64406c666763f50
 			EOF
 		)"
 
