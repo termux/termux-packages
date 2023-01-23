@@ -8,6 +8,7 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/ImageMagick/ImageMagick/archive/refs/tags/${_VERSION}.tar.gz
 #TERMUX_PKG_SRCURL=https://imagemagick.org/archive/releases/ImageMagick-${_VERSION}.tar.xz
 TERMUX_PKG_SHA256=e0157354e0282d34968af6686830216b48d175b65720cd9650b4fae5af2f6251
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="fftw, fontconfig, freetype, gdk-pixbuf, glib, harfbuzz, imath, libandroid-support, libbz2, libc++, libcairo, libheif, libjpeg-turbo, libjxl, liblzma, libpng, librsvg, libtiff, libwebp, libx11, libxext, libxml2, littlecms, openexr, openjpeg, pango, zlib"
 TERMUX_PKG_BREAKS="imagemagick-dev, imagemagick-x"
 TERMUX_PKG_REPLACES="imagemagick-dev, imagemagick-x"
