@@ -313,22 +313,7 @@ termux_step_post_massage() {
 
 # Hook function to create {pre,post}install, {pre,post}rm-scripts and similar
 termux_step_create_debscripts() {
-	# Create debscripts for haskell packages.
-	if ls "${TERMUX_PKG_SRCDIR}"/*.cabal &>/dev/null && [ "${TERMUX_PKG_IS_HASKELL_LIB}" = true ]; then
-		cat <<-EOF >./postinst
-			#!${TERMUX_PREFIX}/bin/sh
-				sh ${TERMUX_PREFIX}/share/haskell/register/${TERMUX_PKG_NAME}.sh
-		EOF
-
-		cat <<-EOF >./prerm
-			#!${TERMUX_PREFIX}/bin/sh
-			if  [ "${TERMUX_PACKAGE_FORMAT}" = "pacman" ] || [ "\$1" = "remove" ] || [ "\$1" = "update" ]; then
-					sh ${TERMUX_PREFIX}/share/haskell/unregister/${TERMUX_PKG_NAME}.sh
-			fi
-		EOF
-	else
-		return 0
-	fi
+	return
 }
 
 # Convert Debian maintainer scripts into pacman-compatible installation hooks.
