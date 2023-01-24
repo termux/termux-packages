@@ -43,6 +43,27 @@
     <member name="GST_VIDEO_CODEC_FRAME_FLAG_FORCE_KEYFRAME_HEADERS" nick="force-keyframe-headers" value="8"/>
     <member name="GST_VIDEO_CODEC_FRAME_FLAG_CORRUPTED" nick="corrupted" value="16"/>
   </flags>
+  <flags name="GstNavigationModifierType" get-type="gst_navigation_modifier_type_get_type">
+    <member name="GST_NAVIGATION_MODIFIER_NONE" nick="none" value="0"/>
+    <member name="GST_NAVIGATION_MODIFIER_SHIFT_MASK" nick="shift-mask" value="1"/>
+    <member name="GST_NAVIGATION_MODIFIER_LOCK_MASK" nick="lock-mask" value="2"/>
+    <member name="GST_NAVIGATION_MODIFIER_CONTROL_MASK" nick="control-mask" value="4"/>
+    <member name="GST_NAVIGATION_MODIFIER_MOD1_MASK" nick="mod1-mask" value="8"/>
+    <member name="GST_NAVIGATION_MODIFIER_MOD2_MASK" nick="mod2-mask" value="16"/>
+    <member name="GST_NAVIGATION_MODIFIER_MOD3_MASK" nick="mod3-mask" value="32"/>
+    <member name="GST_NAVIGATION_MODIFIER_MOD4_MASK" nick="mod4-mask" value="64"/>
+    <member name="GST_NAVIGATION_MODIFIER_MOD5_MASK" nick="mod5-mask" value="128"/>
+    <member name="GST_NAVIGATION_MODIFIER_BUTTON1_MASK" nick="button1-mask" value="256"/>
+    <member name="GST_NAVIGATION_MODIFIER_BUTTON2_MASK" nick="button2-mask" value="512"/>
+    <member name="GST_NAVIGATION_MODIFIER_BUTTON3_MASK" nick="button3-mask" value="1024"/>
+    <member name="GST_NAVIGATION_MODIFIER_BUTTON4_MASK" nick="button4-mask" value="2048"/>
+    <member name="GST_NAVIGATION_MODIFIER_BUTTON5_MASK" nick="button5-mask" value="4096"/>
+    <member name="GST_NAVIGATION_MODIFIER_SUPER_MASK" nick="super-mask" value="67108864"/>
+    <member name="GST_NAVIGATION_MODIFIER_HYPER_MASK" nick="hyper-mask" value="134217728"/>
+    <member name="GST_NAVIGATION_MODIFIER_META_MASK" nick="meta-mask" value="268435456"/>
+    <member name="GST_NAVIGATION_MODIFIER_MASK" nick="mask" value="469770239"/>
+    <member name="GST_NAVIGATION_MODIFIER_META_MASK" nick="meta-mask" value="268435456"/>
+  </flags>
   <enum name="GstNavigationCommand" get-type="gst_navigation_command_get_type">
     <member name="GST_NAVIGATION_COMMAND_INVALID" nick="invalid" value="0"/>
     <member name="GST_NAVIGATION_COMMAND_MENU1" nick="menu1" value="1"/>
@@ -78,6 +99,11 @@
     <member name="GST_NAVIGATION_EVENT_MOUSE_MOVE" nick="mouse-move" value="5"/>
     <member name="GST_NAVIGATION_EVENT_COMMAND" nick="command" value="6"/>
     <member name="GST_NAVIGATION_EVENT_MOUSE_SCROLL" nick="mouse-scroll" value="7"/>
+    <member name="GST_NAVIGATION_EVENT_TOUCH_DOWN" nick="touch-down" value="8"/>
+    <member name="GST_NAVIGATION_EVENT_TOUCH_MOTION" nick="touch-motion" value="9"/>
+    <member name="GST_NAVIGATION_EVENT_TOUCH_UP" nick="touch-up" value="10"/>
+    <member name="GST_NAVIGATION_EVENT_TOUCH_FRAME" nick="touch-frame" value="11"/>
+    <member name="GST_NAVIGATION_EVENT_TOUCH_CANCEL" nick="touch-cancel" value="12"/>
   </enum>  <enum name="GstVideoAncillaryDID" get-type="gst_video_ancillary_did_get_type">
     <member name="GST_VIDEO_ANCILLARY_DID_UNDEFINED" nick="undefined" value="0"/>
     <member name="GST_VIDEO_ANCILLARY_DID_DELETION" nick="deletion" value="128"/>
@@ -326,6 +352,9 @@
     <member name="GST_VIDEO_FORMAT_BGRA64_BE" nick="bgra64-be" value="107"/>
     <member name="GST_VIDEO_FORMAT_ABGR64_LE" nick="abgr64-le" value="108"/>
     <member name="GST_VIDEO_FORMAT_ABGR64_BE" nick="abgr64-be" value="109"/>
+    <member name="GST_VIDEO_FORMAT_NV12_16L32S" nick="nv12-16l32s" value="110"/>
+    <member name="GST_VIDEO_FORMAT_NV12_8L128" nick="nv12-8l128" value="111"/>
+    <member name="GST_VIDEO_FORMAT_NV12_10BE_8L128" nick="nv12-10be-8l128" value="112"/>
   </enum>  <flags name="GstVideoFormatFlags" get-type="gst_video_format_flags_get_type">
     <member name="GST_VIDEO_FORMAT_FLAG_YUV" nick="yuv" value="1"/>
     <member name="GST_VIDEO_FORMAT_FLAG_RGB" nick="rgb" value="2"/>
@@ -336,6 +365,7 @@
     <member name="GST_VIDEO_FORMAT_FLAG_COMPLEX" nick="complex" value="64"/>
     <member name="GST_VIDEO_FORMAT_FLAG_UNPACK" nick="unpack" value="128"/>
     <member name="GST_VIDEO_FORMAT_FLAG_TILED" nick="tiled" value="256"/>
+    <member name="GST_VIDEO_FORMAT_FLAG_SUBTILES" nick="subtiles" value="512"/>
   </flags>
   <flags name="GstVideoPackFlags" get-type="gst_video_pack_flags_get_type">
     <member name="GST_VIDEO_PACK_FLAG_NONE" nick="none" value="0"/>
@@ -471,6 +501,7 @@
   <class name="GstVideoAggregatorParallelConvertPad" get-type="gst_video_aggregator_parallel_convert_pad_get_type" parents="GstVideoAggregatorConvertPad,GstVideoAggregatorPad,GstAggregatorPad,GstPad,GstObject,GInitiallyUnowned,GObject">
   </class>
   <class name="GstVideoAggregator" get-type="gst_video_aggregator_get_type" parents="GstAggregator,GstElement,GstObject,GInitiallyUnowned,GObject" abstract="1">
+    <property name="force-live" type="gboolean" flags="235"/>
   </class>
   <boxed name="GstVideoCodecState" get-type="gst_video_codec_state_get_type"/>
   <boxed name="GstVideoCodecFrame" get-type="gst_video_codec_frame_get_type"/>
