@@ -1,36 +1,25 @@
 # Always return true for libintl check.
 
---- misc.py.orig                      2022-05-24 23:37:10.802388776 +0530
-+++ ./mesonbuild/dependencies/misc.py 2022-05-24 23:39:14.342388729 +0530
-@@ -471,25 +471,18 @@
- class IntlBuiltinDependency(BuiltinDependency):
-     def __init__(self, name: str, env: 'Environment', kwargs: T.Dict[str, T.Any]):
+--- a/mesonbuild/dependencies/misc.py
++++ b/mesonbuild/dependencies/misc.py
+@@ -494,7 +494,7 @@
+         self.feature_since = ('0.59.0', "consider checking for `ngettext` with and without `find_library('intl')`")
+         code = '''#include <libintl.h>\n\nint main() {\n    gettext("Hello world");\n}'''
+ 
+-        if self.clib_compiler.links(code, env)[0]:
++        if True:
+             self.is_found = True
+ 
+ 
+@@ -503,10 +503,7 @@
          super().__init__(name, env, kwargs)
--
--        if self.clib_compiler.has_function('ngettext', '', env)[0]:
--            self.is_found = True
-+        self.is_found = True
-
-
- class IntlSystemDependency(SystemDependency):
-     def __init__(self, name: str, env: 'Environment', kwargs: T.Dict[str, T.Any]):
-         super().__init__(name, env, kwargs)
-+        self.is_found = True
-
+         self.feature_since = ('0.59.0', "consider checking for `ngettext` with and without `find_library('intl')`")
+ 
 -        h = self.clib_compiler.has_header('libintl.h', '', env)
 -        self.link_args = self.clib_compiler.find_library('intl', env, [], self.libtype)
 -
 -        if h[0] and self.link_args:
--            self.is_found = True
--
--            if self.static:
--                if not self._add_sub_dependency(iconv_factory(env, self.for_machine, {'static': True})):
--                    self.is_found = False
--                    return
-+        if self.static:
-+            if not self._add_sub_dependency(iconv_factory(env, self.for_machine, {'static': True})):
-+                self.is_found = False
-+                return
-
-
- @factory_methods({DependencyMethods.PKGCONFIG, DependencyMethods.CONFIG_TOOL, DependencyMethods.SYSTEM})
++        if True:
+             self.is_found = True
+ 
+             if self.static:
