@@ -4,7 +4,6 @@
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * Copyright by The HDF Group.                                               *
- * Copyright by the Board of Trustees of the University of Illinois.         *
  * All rights reserved.                                                      *
  *                                                                           *
  * This file is part of HDF5.  The full HDF5 copyright notice, including     *
@@ -14,7 +13,7 @@
  * If you do not have access to either file, you may request a copy from     *
  * help@hdfgroup.org.                                                        *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * Created:		Nov 14, 2022
+ * Created:		Jan 24, 2023
  *			u0_a101@localhost
  *
  * Purpose:		This machine-generated source code contains
@@ -28,14 +27,19 @@
  *-------------------------------------------------------------------------
  */
 
+#include "H5private.h"
+H5_GCC_DIAG_OFF("larger-than=")
+
+H5_CLANG_DIAG_OFF("overlength-strings")
+
 char H5libhdf5_settings[]=
 	"        SUMMARY OF THE HDF5 CONFIGURATION\n"
 	"        =================================\n"
 	"\n"
 	"General Information:\n"
 	"-------------------\n"
-	"                   HDF5 Version: 1.12.2\n"
-	"                  Configured on: 2022-11-14\n"
+	"                   HDF5 Version: 1.14.0\n"
+	"                  Configured on: 2023-01-24\n"
 	"                  Configured by: Unix Makefiles\n"
 	"                    Host system: Android-4.9.82-perf+\n"
 	"              Uname information: Android\n"
@@ -64,7 +68,7 @@ char H5libhdf5_settings[]=
 	"Languages:\n"
 	"----------\n"
 	"                              C: YES\n"
-	"                     C Compiler: /data/data/com.termux/files/usr/bin/clang 15.0.3\n"
+	"                     C Compiler: /data/data/com.termux/files/usr/bin/clang 15.0.7\n"
 	"                       CPPFLAGS: \n"
 	"                    H5_CPPFLAGS: \n"
 	"                    AM_CPPFLAGS: \n"
@@ -81,9 +85,10 @@ char H5libhdf5_settings[]=
 	"               AM Fortran Flags: \n"
 	"         Shared Fortran Library: YES\n"
 	"         Static Fortran Library: YES\n"
+	"               Module Directory: /data/data/com.termux/files/files/home/termux.libhdf5.build/mod\n"
 	"\n"
 	"                            C++: ON\n"
-	"                   C++ Compiler: /data/data/com.termux/files/usr/bin/clang++ 15.0.3\n"
+	"                   C++ Compiler: /data/data/com.termux/files/usr/bin/clang++ 15.0.7\n"
 	"                      C++ Flags:  -Oz -fstack-protector-strong -I/data/data/com.termux/files/usr/include\n"
 	"                   H5 C++ Flags: -Wall;-Warray-bounds;-Wcast-qual;-Wconversion;-Wdouble-promotion;-Wextra;-Wformat=2;-Wframe-larger-than=16384;-Wimplicit-fallthrough;-Wnull-dereference;-Wunused-const-variable;-Wwrite-strings;-Wpedantic;-Wvolatile-register-var;-Wno-c++-compat;-Wno-missing-noreturn\n"
 	"                   AM C++ Flags: \n"
@@ -102,24 +107,24 @@ char H5libhdf5_settings[]=
 	"Dimension scales w/ new references: \n"
 	"                  Build HDF5 Tests: OFF\n"
 	"                  Build HDF5 Tools: ON\n"
-	"       Build High-level HDF5 Tools: ON\n"
+	"                   Build GIF Tools: OFF\n"
 	"                      Threadsafety: OFF\n"
-	"               Default API mapping: v112\n"
+	"               Default API mapping: v114\n"
 	"    With deprecated public symbols: ON\n"
 	"            I/O filters (external):  DEFLATE\n"
-	"                               MPE: \n"
 	"                        Direct VFD: \n"
 	"                        Mirror VFD: \n"
+	"                     Subfiling VFD: \n"
 	"                (Read-Only) S3 VFD: \n"
 	"              (Read-Only) HDFS VFD: \n"
-	"                           dmalloc: \n"
 	"    Packages w/ extra debug output: \n"
 	"                       API Tracing: OFF\n"
 	"              Using memory checker: OFF\n"
-	"   Memory allocation sanity checks: OFF\n"
 	"            Function Stack Tracing: OFF\n"
 	"                  Use file locking: best-effort\n"
 	"         Strict File Format Checks: OFF\n"
 	"      Optimization Instrumentation: \n"
 ;
 
+H5_GCC_DIAG_ON("larger-than=")
+H5_CLANG_DIAG_OFF("overlength-strings")
