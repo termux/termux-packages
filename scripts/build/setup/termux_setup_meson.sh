@@ -1,6 +1,6 @@
 termux_setup_meson() {
 	termux_setup_ninja
-	local MESON_VERSION=0.61.2
+	local MESON_VERSION=1.0.0
 	local MESON_FOLDER
 
 	if [ "${TERMUX_PACKAGES_OFFLINE-false}" = "true" ]; then
@@ -16,16 +16,8 @@ termux_setup_meson() {
 		termux_download \
 			"https://github.com/mesonbuild/meson/releases/download/$MESON_VERSION/meson-$MESON_VERSION.tar.gz" \
 			"$MESON_TAR_FILE" \
-			0233a7f8d959079318f6052b0939c27f68a5de86ba601f25c9ee6869fb5f5889
+			aa50a4ba4557c25e7d48446abfde857957dcdf58385fffbe670ba0e8efacce05
 		tar xf "$MESON_TAR_FILE" -C "$TERMUX_PKG_TMPDIR"
-		if [ "$MESON_VERSION" = "0.61.2" ]; then
-			local MESON_0_61_2_GTKDOC_PATCH_FILE=$TERMUX_PKG_TMPDIR/meson-0.61.2-gtkdoc.patch
-			termux_download \
-				"https://github.com/mesonbuild/meson/commit/266e8acb5807b38a550cb5145cea0e19545a21d7.patch" \
-				"$MESON_0_61_2_GTKDOC_PATCH_FILE" \
-				79ecf0e16f613396f43621a928df6c17e6260aa190c320e5c01adad94abd07ad
-			patch --silent -p1 -d "$MESON_TMP_FOLDER" < "$MESON_0_61_2_GTKDOC_PATCH_FILE"
-		fi
 		shopt -s nullglob
 		local f
 		for f in "$TERMUX_SCRIPTDIR"/scripts/build/setup/meson-*.patch; do
