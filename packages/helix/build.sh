@@ -3,9 +3,10 @@ TERMUX_PKG_DESCRIPTION="A post-modern modal text editor written in rust"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.org>"
 TERMUX_PKG_VERSION="22.12"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="git+https://github.com/helix-editor/helix"
 TERMUX_PKG_GIT_BRANCH="${TERMUX_PKG_VERSION}"
-TERMUX_PKG_DEPENDS="libc++"
+TERMUX_PKG_SUGGESTS="helix-grammars"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
@@ -14,7 +15,7 @@ termux_step_make_install() {
 
 	cargo build --jobs "${TERMUX_MAKE_PROCESSES}" --target "${CARGO_TARGET_NAME}" --release
 
-	local datadir="${TERMUX_PREFIX}/share/${TERMUX_PKG_NAME}"
+	local datadir="${TERMUX_PREFIX}/opt/${TERMUX_PKG_NAME}"
 	mkdir -p "${datadir}"
 
 	cat >"${TERMUX_PREFIX}/bin/hx" <<-EOF
