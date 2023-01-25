@@ -16,7 +16,7 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
-	go build
+	go build -o nexttrace
 }
 
 termux_step_make_install() {
