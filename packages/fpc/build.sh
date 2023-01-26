@@ -17,6 +17,7 @@ __setup_wrapper_bin() {
 
 	ln -sf "$(command -v "${LD}")" "${WRAPPER_BIN}/${TERMUX_HOST_PLATFORM}-ld"
 	ln -sf "$(command -v "${AR}")" "${WRAPPER_BIN}/${TERMUX_HOST_PLATFORM}-ar"
+	ln -sf "$(command -v "${AS}")" "${WRAPPER_BIN}/${TERMUX_HOST_PLATFORM}-as"
 
 	export PATH="${WRAPPER_BIN}:${PATH}"
 }
