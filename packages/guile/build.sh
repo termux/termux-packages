@@ -1,12 +1,11 @@
 TERMUX_PKG_HOMEPAGE=http://www.gnu.org/software/guile/
 TERMUX_PKG_DESCRIPTION="Portable, embeddable Scheme implementation written in C"
-TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.0.8
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=3.0.9
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/guile/guile-$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=f25ae0c26e911af1b5005292d4f56621879f74d6958b30741cf67d8b6feb2016
-TERMUX_PKG_DEPENDS="libandroid-support, libffi, libgc, libgmp, libltdl, libunistring"
+TERMUX_PKG_SHA256=18525079ad29a0d46d15c76581b5d91c8702301bfd821666d2e1d13726162811
+TERMUX_PKG_DEPENDS="libandroid-support, libffi, libgc, libgmp, libiconv, libunistring, ncurses, readline"
 TERMUX_PKG_BUILD_DEPENDS="libtool"
 TERMUX_PKG_BREAKS="guile-dev"
 TERMUX_PKG_REPLACES="guile-dev"
