@@ -51,6 +51,6 @@ termux_step_pre_configure() {
 		"$("${CC}" --print-file-name crtend_android.o)" \
 		"${LIBDIR}"
 
-	sed "s|@LIBDIR@|${TERMUX_PREFIX} ${LIBDIR}|g" \
+	sed "s|@LIBDIR@|${TERMUX_PREFIX}/lib,${LIBDIR}|g" \
 		"${TERMUX_PKG_BUILDER_DIR}"/Makefile.diff | patch -p1
 }
