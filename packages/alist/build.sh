@@ -2,27 +2,26 @@ TERMUX_PKG_HOMEPAGE=https://alist.nn.ci
 TERMUX_PKG_DESCRIPTION="A file list program that supports multiple storage"
 TERMUX_PKG_LICENSE="AGPL-V3"
 TERMUX_PKG_MAINTAINER="2096779623 <admin@utermux.dev>"
-TERMUX_PKG_VERSION="3.9.1"
-TERMUX_PKG_SRCURL=https://github.com/alist-org/alist/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=db43130797448bda7c56fe1ccb3043f0d39faafdbf74e55109f99e17daf02fee
+TERMUX_PKG_VERSION=(3.9.1) # alist version
+TERMUX_PKG_VERSION+=(3.9.0) # alist-web version
+TERMUX_PKG_SRCURL=(https://github.com/alist-org/alist/archive/v${TERMUX_PKG_VERSION}.tar.gz
+		   https://github.com/alist-org/alist-web/releases/download/${TERMUX_PKG_VERSION[1]}/dist.tar.gz)
+TERMUX_PKG_SHA256=(db43130797448bda7c56fe1ccb3043f0d39faafdbf74e55109f99e17daf02fee
+		   f72953d765e29a36303379db8742a8ff039ba027d6862ac827458faad03ba08b)
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_AUTO_UPDATE=true
+# termux_pkg_upgrade_version couldn't check multiple versions now.
+TERMUX_PKG_AUTO_UPDATE=false
+
+termux_step_post_get_source() {
+	rm -rf public/dist
+	mv -f dist public
+}
 
 termux_step_make() {
 	termux_setup_golang
 
-	# Get alist-web:
-	local ldflags webTag
-	webTag=$(
-		wget -qO- -t1 -T2 "https://api.github.com/repos/alist-org/alist-web/releases/latest" \
-			| grep "tag_name" | head -n 1 | awk -F ":" '{print $2}' | sed 's/\"//g;s/,//g;s/ //g'
-	)
-	wget https://github.com/alist-org/alist-web/releases/download/${webTag}/dist.tar.gz
-	tar -zxvf dist.tar.gz
-	rm -rf public/dist
-	mv -f dist public
-	rm -rf dist.tar.gz
-
+	local ldflags
 	local _builtAt=$(date +'%F %T %z')
 	local _goVersion=$(go version | sed 's/go version //')
 	local _gitAuthor="Noah Hsu <i@nn.ci>"
@@ -36,7 +35,7 @@ termux_step_make() {
 	-X 'github.com/alist-org/alist/v3/internal/conf.GitAuthor=$_gitAuthor' \
 	-X 'github.com/alist-org/alist/v3/internal/conf.GitCommit=$_gitCommit' \
 	-X 'github.com/alist-org/alist/v3/internal/conf.Version=$TERMUX_PKG_VERSION' \
-	-X 'github.com/alist-org/alist/v3/internal/conf.WebVersion=$webTag' \
+	-X 'github.com/alist-org/alist/v3/internal/conf.WebVersion=${TERMUX_PKG_VERSION[1]}' \
 	"
 	go build -o "${TERMUX_PKG_NAME}" -ldflags="$ldflags" -tags=jsoniter
 }
