@@ -20,7 +20,7 @@ termux_step_post_get_source() {
 termux_step_make() {
 	termux_setup_rust
 	export RUSTFLAGS+=" -C lto=no"
-	export CARGO_BUILD_TARGET=${CARGO_TARGET_NAME}
+	#export CARGO_BUILD_TARGET=${CARGO_TARGET_NAME}
 
 	termux_setup_ninja
 	termux_setup_protobuf
