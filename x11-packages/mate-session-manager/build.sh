@@ -5,5 +5,5 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.26.0
 TERMUX_PKG_SRCURL=https://github.com/mate-desktop/mate-session-manager/releases/download/v$TERMUX_PKG_VERSION/mate-session-manager-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=5915a2f6583c0e5e58afb3abae3f4adbbe6a003c174a5b6e3d204b4e398a1816
-TERMUX_PKG_DEPENDS="dbus, dbus-glib, gdk-pixbuf, glib, gtk3, libcairo, libepoxy, libice, libsm, libx11, libxau, libxcomposite, libxext, libxrender, libxtst, mesa"
+TERMUX_PKG_DEPENDS="dbus, dbus-glib, gdk-pixbuf, glib, gtk3, libcairo, libepoxy, libice, libsm, libx11, libxau, libxcomposite, libxext, libxrender, libxtst, opengl"
 TERMUX_PKG_RM_AFTER_INSTALL="share/glib-2.0/schemas/gschemas.compiled"

@@ -6,8 +6,8 @@ TERMUX_PKG_VERSION="2.26.2"
 TERMUX_PKG_SRCURL=https://www.libsdl.org/release/SDL2-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=95d39bc3de037fbdfa722623737340648de4f180a601b0afad27645d150b99e0
 TERMUX_PKG_DEPENDS="libx11, libxcursor, libxext, libxfixes, libxi, libxrandr, libxss, pulseaudio"
-TERMUX_PKG_BUILD_DEPENDS="mesa"
-TERMUX_PKG_RECOMMENDS="mesa"
+TERMUX_PKG_BUILD_DEPENDS="opengl"
+TERMUX_PKG_RECOMMENDS="opengl"
 TERMUX_PKG_CONFLICTS="libsdl2"
 TERMUX_PKG_REPLACES="libsdl2"
 
