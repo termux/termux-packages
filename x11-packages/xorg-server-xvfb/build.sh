@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=21.1.6
 TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/xserver/xorg-server-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=1eb86ed674d042b6c8b1f9135e59395cbbca35ed551b122f73a7d8bb3bb22484
 
-TERMUX_PKG_DEPENDS="libandroid-shmem, libdrm, libpixman, libx11, libxau, libxfont2, libxinerama, libxkbfile, libxshmfence, mesa, openssl, xkeyboard-config, xorg-protocol-txt, xorg-xkbcomp"
+TERMUX_PKG_DEPENDS="libandroid-shmem, libdrm, libpixman, libx11, libxau, libxfont2, libxinerama, libxkbfile, libxshmfence, opengl, openssl, xkeyboard-config, xorg-protocol-txt, xorg-xkbcomp"
 TERMUX_PKG_CONFLICTS="xorg-xvfb"
 TERMUX_PKG_REPLACES="xorg-xvfb"
 

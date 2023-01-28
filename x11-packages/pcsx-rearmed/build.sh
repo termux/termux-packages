@@ -7,8 +7,8 @@ TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=git+https://github.com/notaz/pcsx_rearmed
 TERMUX_PKG_GIT_BRANCH=r${TERMUX_PKG_VERSION}
 TERMUX_PKG_SHA256=887e9b5ee7b8115d35099c730372b4158fd3e215955a06d68e20928b339646af
-TERMUX_PKG_DEPENDS="libpng, mesa, pulseaudio, sdl, zlib"
-TERMUX_PKG_BUILD_DEPENDS="mesa-dev, binutils-cross"
+TERMUX_PKG_DEPENDS="libpng, opengl, pulseaudio, sdl, zlib"
+TERMUX_PKG_BUILD_DEPENDS="binutils-cross"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {

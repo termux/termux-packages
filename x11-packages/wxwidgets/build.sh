@@ -7,7 +7,7 @@ TERMUX_PKG_VERSION=3.2.1
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/wxWidgets/wxWidgets/releases/download/v${TERMUX_PKG_VERSION}/wxWidgets-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=c229976bb413eb88e45cb5dfb68b27890d450149c09b331abd751e7ae0f5fa66
-TERMUX_PKG_DEPENDS="fontconfig, gdk-pixbuf, glib, glu, gtk3, libandroid-execinfo, libc++, libcairo, libcurl, libexpat, libiconv, libjpeg-turbo, libnotify, libpng, libsecret, libsm, libtiff, libx11, libxtst, libxxf86vm, mesa, pango, pcre2, sdl2, zlib"
+TERMUX_PKG_DEPENDS="fontconfig, gdk-pixbuf, glib, glu, gtk3, libandroid-execinfo, libc++, libcairo, libcurl, libexpat, libiconv, libjpeg-turbo, libnotify, libpng, libsecret, libsm, libtiff, libx11, libxtst, libxxf86vm, opengl, pango, pcre2, sdl2, zlib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-option-checking
 --disable-mediactrl
