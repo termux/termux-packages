@@ -1,19 +1,17 @@
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -177,6 +177,7 @@
+@@ -173,12 +173,13 @@
  
  if (NOT EXTERNAL_FMT)
      set(FMT_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/contrib/fmt/include")
 +    include_directories(${FMT_INCLUDE_DIR})
  endif()
  
- if (NOT EXTERNAL_RAPIDJSON)
-@@ -186,7 +187,7 @@
  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_BINARY_DIR})
  
  find_package(Osmium 2.17.3 REQUIRED COMPONENTS io)
--include_directories(SYSTEM ${OSMIUM_INCLUDE_DIRS} ${PROTOZERO_INCLUDE_DIR} ${FMT_INCLUDE_DIR} ${RAPIDJSON_INCLUDE_DIR})
-+include_directories(SYSTEM ${OSMIUM_INCLUDE_DIRS} ${PROTOZERO_INCLUDE_DIR} ${RAPIDJSON_INCLUDE_DIR})
+-include_directories(SYSTEM ${OSMIUM_INCLUDE_DIRS} ${PROTOZERO_INCLUDE_DIR} ${FMT_INCLUDE_DIR})
++include_directories(SYSTEM ${OSMIUM_INCLUDE_DIRS} ${PROTOZERO_INCLUDE_DIR})
  
  if (WITH_LUA)
      if (WITH_LUAJIT)
