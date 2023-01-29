@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Command-line media player"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Update both mpv and mpv-x to the same version in one PR.
-TERMUX_PKG_VERSION=0.35.0
+TERMUX_PKG_VERSION=0.35.1
 TERMUX_PKG_SRCURL=https://github.com/mpv-player/mpv/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=dc411c899a64548250c142bf1fa1aa7528f1b4398a24c86b816093999049ec00
+TERMUX_PKG_SHA256=41df981b7b84e33a2ef4478aaf81d6f4f5c8b9cd2c0d337ac142fc20b387d1a9
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="ffmpeg, libandroid-glob, libandroid-support, libarchive, libass, libcaca, libiconv, liblua52, libsixel, libuchardet, openal-soft, pulseaudio, rubberband, zlib"
 TERMUX_PKG_RM_AFTER_INSTALL="share/icons share/applications"
