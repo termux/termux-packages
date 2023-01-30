@@ -14,6 +14,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_type_complex_double=no ac_cv_search_clock
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
+TERMUX_DEBUG_BUILD=true
+
 termux_step_host_build() {
 	mkdir HOSTBUILDINSTALL
 
