@@ -18,7 +18,7 @@ termux_step_massage() {
 	# Remove world permissions and make sure that user still have read-write permissions.
 	chmod -Rf u+rw,g-rwx,o-rwx . || true
 
-	if [ "$TERMUX_DEBUG_BUILD" = "false" ]; then
+	if [ "$TERMUX_PKG_NO_STRIP" != "true" ] && [ "$TERMUX_DEBUG_BUILD" = "false" ]; then
 		# Strip binaries. file(1) may fail for certain unusual files, so disable pipefail.
 		set +e +o pipefail
 		find . \( -path "./bin/*" -o -path "./lib/*" -o -path "./libexec/*" \) -type f |
