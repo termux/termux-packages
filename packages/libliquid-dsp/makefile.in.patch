@@ -1,0 +1,15 @@
+--- a/makefile.in
++++ b/makefile.in
+@@ -1287,11 +1287,8 @@
+ 	@echo ""
+ 	mkdir -p $(DESTDIR)$(prefix)/include/liquid
+ 	mkdir -p $(DESTDIR)$(libdir)
+-	install -m 644 -p libliquid.${AR_LIB} $(DESTDIR)$(libdir)/libliquid.${AR_LIB}.${VERSION}
+-	install -m 644 -p libliquid.${SH_LIB} $(DESTDIR)$(libdir)/libliquid.${SH_LIB}.${VERSION}
++	install -m 644 -p ${ARCHIVE_LIB} ${SHARED_LIB} $(DESTDIR)$(libdir)
+ 	install -m 644 -p include/liquid.h $(DESTDIR)$(prefix)/include/liquid/liquid.h
+-	ln -sf libliquid.${SH_LIB}.${VERSION} $(DESTDIR)$(libdir)/libliquid.${SH_LIB}
+-	ln -sf libliquid.${SH_LIB}.${VERSION} $(DESTDIR)$(libdir)/libliquid.${SH_LIB}.1
+ 	@echo ""
+ 	@echo "---------------------------------------------------------"
+ 	@echo "  liquid-dsp was successfully installed.     "
