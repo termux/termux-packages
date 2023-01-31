@@ -1,8 +1,8 @@
 --- a/Makefile.inc
 +++ b/Makefile.inc
 @@ -212,12 +212,12 @@
-     $(if $(LINUXBREW),$(if $(HOMEBREW_PREFIX),,$(error LINUXBREW is defined but not HOMEBREW_PREFIX)))
-     ALTDEVROOT := $(if $(HOMEBREW_PREFIX),$(HOMEBREW_PREFIX),$(if $(wildcard /opt/homebrew/bin),/opt/homebrew,/usr/local))
+ else ifneq ($(NETBSD),)
+     ALTDEVROOT := /usr/pkg
  else
 -    ALTDEVROOT := /usr
 +    ALTDEVROOT := @TERMUX_PREFIX@
@@ -12,7 +12,7 @@
  
 -USELIB64  := $(if $(findstring linux-x86_64,$(LOCAL_OS)-$(MAIN_ARCH)),$(if $(LINUXBREW),,$(if $(wildcard /usr/lib64/libc.so*),true)))
 +USELIB64  :=
- SYSPREFIX ?= $(if $(MACOS)$(LINUXBREW),$(ALTDEVROOT),/usr)
+ SYSPREFIX ?= $(if $(MACOS)$(LINUXBREW)$(FREEBSD)$(OPENBSD)$(NETBSD)$(DRAGONFLYBSD),$(ALTDEVROOT),/usr)
  USRLIBDIR ?= $(if $(USELIB64),$(SYSPREFIX)/lib64,$(SYSPREFIX)/lib)
  ETCDIR    ?= $(if $(subst /usr,,$(SYSPREFIX)),$(SYSPREFIX)/etc,/etc)
 @@ -399,7 +399,7 @@
@@ -28,7 +28,7 @@
  
  # External libraries
  
--LDLIBS += -lstdc++ -lpthread $(if $(MACOS),,-lrt -latomic) -lm
+-LDLIBS += -lstdc++ -lpthread $(if $(MACOS)$(OPENBSD),,-lrt) -lm
 +LDLIBS += -lm
  
  # Global compilation flags.
