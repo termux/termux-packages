@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="A simple, fast, clean and dynamic language"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.0.72
+TERMUX_PKG_VERSION=0.0.81
 TERMUX_PKG_SRCURL=https://github.com/blade-lang/blade/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=541e8db24360e6bfda9bfb718a0a7bc884c8ca7ef1dc571be7ce9fddbc0b8f9d
+TERMUX_PKG_SHA256=a149db8c8d667d7834039f005c720bfbe0651e6f1e34ec9ec7ea74d425e73a82
 TERMUX_PKG_BUILD_DEPENDS="libcurl, openssl"
 TERMUX_PKG_HOSTBUILD=true
 
@@ -17,6 +17,7 @@ termux_step_host_build() {
 
 termux_step_pre_configure() {
 	PATH=$TERMUX_PKG_HOSTBUILD_DIR/blade:$PATH
+	export LD_LIBRARY_PATH=$TERMUX_PKG_HOSTBUILD_DIR/blade
 
 	_NEED_DUMMY_LIBPTHREAD_A=
 	_LIBPTHREAD_A=$TERMUX_PREFIX/lib/libpthread.a
