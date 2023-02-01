@@ -1,0 +1,346 @@
+--- a/support/export/cache.c
++++ b/support/export/cache.c
+@@ -406,7 +406,7 @@
+ 	size_t l = strlen(p);
+ 
+ 	if (*v == NULL) {
+-		f = setmntent("/etc/mtab", "r");
++		f = setmntent("@TERMUX_PREFIX@/etc/mtab", "r");
+ 		*v = f;
+ 	} else
+ 		f = *v;
+--- a/support/export/v4root.c
++++ b/support/export/v4root.c
+@@ -135,7 +135,7 @@
+ 	if (!warned) {
+ 		xlog(L_WARNING, "Kernel does not have pseudo root support.");
+ 		xlog(L_WARNING, "NFS v4 mounts will be disabled unless fsid=0");
+-		xlog(L_WARNING, "is specfied in /etc/exports file.");
++		xlog(L_WARNING, "is specfied in @TERMUX_PREFIX@/etc/exports file.");
+ 		warned++;
+ 	}
+ 	return 0;
+--- a/support/include/exportfs.h
++++ b/support/include/exportfs.h
+@@ -34,7 +34,7 @@
+ };
+ 
+ #ifndef EXP_LOCKFILE
+-#define EXP_LOCKFILE "/var/lib/nfs/export-lock"
++#define EXP_LOCKFILE "@TERMUX_PREFIX@/var/lib/nfs/export-lock"
+ #endif
+ 
+ typedef struct mclient {
+--- a/support/include/nfs_paths.h
++++ b/support/include/nfs_paths.h
+@@ -2,7 +2,7 @@
+ #define _NFS_PATHS_H
+ 
+ #ifndef _PATH_MOUNTED
+-#define _PATH_MOUNTED "/etc/fstab"
++#define _PATH_MOUNTED "@TERMUX_PREFIX@/etc/fstab"
+ #endif
+ #define MOUNTED_LOCK	_PATH_MOUNTED "~"
+ #define MOUNTED_TEMP	_PATH_MOUNTED ".tmp"
+--- a/support/include/nfslib.h
++++ b/support/include/nfslib.h
+@@ -25,16 +25,16 @@
+ #include "xlog.h"
+ 
+ #ifndef _PATH_EXPORTS
+-#define _PATH_EXPORTS		"/etc/exports"
++#define _PATH_EXPORTS		"@TERMUX_PREFIX@/etc/exports"
+ #endif
+ #ifndef _PATH_EXPORTS_D
+-#define _PATH_EXPORTS_D         "/etc/exports.d"
++#define _PATH_EXPORTS_D         "@TERMUX_PREFIX@/etc/exports.d"
+ #endif
+ #ifndef _EXT_EXPORT
+ #define _EXT_EXPORT             ".exports"
+ #endif
+ #ifndef _PATH_IDMAPDCONF
+-#define _PATH_IDMAPDCONF	"/etc/idmapd.conf"
++#define _PATH_IDMAPDCONF	"@TERMUX_PREFIX@/etc/idmapd.conf"
+ #endif
+ #ifndef _PATH_PROC_EXPORTS
+ #define	_PATH_PROC_EXPORTS	"/proc/fs/nfs/exports"
+--- a/support/nfsidmap/libnfsidmap.c
++++ b/support/nfsidmap/libnfsidmap.c
+@@ -72,13 +72,13 @@
+ gid_t nobody_gid = (gid_t)-1;
+ 
+ #ifndef PATH_PLUGINS
+-#define PATH_PLUGINS "/usr/lib/libnfsidmap"
++#define PATH_PLUGINS "@TERMUX_PREFIX@/lib/libnfsidmap"
+ #endif
+ #define PLUGIN_INIT_FUNC "libnfsidmap_plugin_init"
+ 
+ 
+ #ifndef PATH_IDMAPDCONF
+-#define PATH_IDMAPDCONF "/etc/idmapd.conf"
++#define PATH_IDMAPDCONF "@TERMUX_PREFIX@/etc/idmapd.conf"
+ #endif
+ 
+ #ifndef IDMAPD_DEFAULT_DOMAIN
+--- a/support/nfsidmap/libtest.c
++++ b/support/nfsidmap/libtest.c
+@@ -50,7 +50,7 @@
+ #include <nfsidmap.h>
+ 
+ #define QUIT_ON_ERROR 1
+-#define PATH_IDMAPDCONF "/etc/idmapd.conf"
++#define PATH_IDMAPDCONF "@TERMUX_PREFIX@/etc/idmapd.conf"
+ char *conf_path = PATH_IDMAPDCONF;
+ 
+ main(int ac, char **av)
+--- a/systemd/50-nfs.conf
++++ b/systemd/50-nfs.conf
+@@ -1,16 +1,16 @@
+ # Ensure all NFS systctl settings get applied when modules load
+ 
+ # sunrpc module supports "sunrpc.*" sysctls
+-install sunrpc /sbin/modprobe --ignore-install sunrpc $CMDLINE_OPTS && { /sbin/sysctl -q --pattern sunrpc --system; exit 0; }
++install sunrpc @TERMUX_PREFIX@/bin/modprobe --ignore-install sunrpc $CMDLINE_OPTS && { @TERMUX_PREFIX@/bin/sysctl -q --pattern sunrpc --system; exit 0; }
+ 
+ # rpcrdma module supports sunrpc.svc_rdma.*
+-install rpcrdma /sbin/modprobe --ignore-install rpcrdma $CMDLINE_OPTS && { /sbin/sysctl -q --pattern sunrpc.svc_rdma --system; exit 0; }
++install rpcrdma @TERMUX_PREFIX@/bin/modprobe --ignore-install rpcrdma $CMDLINE_OPTS && { @TERMUX_PREFIX@/bin/sysctl -q --pattern sunrpc.svc_rdma --system; exit 0; }
+ 
+ # lockd module supports "fs.nfs.nlm*" and "fs.nfs.nsm*" sysctls
+-install lockd /sbin/modprobe --ignore-install lockd $CMDLINE_OPTS && { /sbin/sysctl -q --pattern fs.nfs.n[sl]m --system; exit 0; }
++install lockd @TERMUX_PREFIX@/bin/modprobe --ignore-install lockd $CMDLINE_OPTS && { @TERMUX_PREFIX@/bin/sysctl -q --pattern fs.nfs.n[sl]m --system; exit 0; }
+ 
+ # nfsv4 module supports "fs.nfs.*" sysctls (nfs_callback_tcpport and idmap_cache_timeout)
+-install nfsv4 /sbin/modprobe --ignore-install nfsv4 $CMDLINE_OPTS && { /sbin/sysctl -q --pattern 'fs.nfs.(nfs_callback_tcpport|idmap_cache_timeout)' --system; exit 0; }
++install nfsv4 @TERMUX_PREFIX@/bin/modprobe --ignore-install nfsv4 $CMDLINE_OPTS && { @TERMUX_PREFIX@/bin/sysctl -q --pattern 'fs.nfs.(nfs_callback_tcpport|idmap_cache_timeout)' --system; exit 0; }
+ 
+ # nfs module supports "fs.nfs.*" sysctls
+-install nfs /sbin/modprobe --ignore-install nfs $CMDLINE_OPTS && { /sbin/sysctl -q --pattern fs.nfs --system; exit 0; }
++install nfs @TERMUX_PREFIX@/bin/modprobe --ignore-install nfs $CMDLINE_OPTS && { @TERMUX_PREFIX@/bin/sysctl -q --pattern fs.nfs --system; exit 0; }
+--- a/systemd/nfs-server-generator.c
++++ b/systemd/nfs-server-generator.c
+@@ -62,7 +62,7 @@
+ 	FILE		*fstab;
+ 	struct mntent	*mnt;
+ 
+-	fstab = setmntent("/etc/fstab", "r");
++	fstab = setmntent("@TERMUX_PREFIX@/etc/fstab", "r");
+ 	if (!fstab)
+ 		return 0;
+ 
+@@ -132,7 +132,7 @@
+ 		}
+ 	}
+ 
+-	fstab = setmntent("/etc/fstab", "r");
++	fstab = setmntent("@TERMUX_PREFIX@/etc/fstab", "r");
+ 	if (!fstab)
+ 		exit(1);
+ 
+--- a/systemd/rpc-pipefs-generator.c
++++ b/systemd/rpc-pipefs-generator.c
+@@ -106,7 +106,7 @@
+ 	FILE		*mtab;
+ 	struct mntent	*mnt;
+ 
+-	mtab = setmntent("/etc/mtab", "r");
++	mtab = setmntent("@TERMUX_PREFIX@/etc/mtab", "r");
+ 	if (!mtab)
+ 		return 0;
+ 
+--- a/tools/nfsdclddb/nfsdclddb.py
++++ b/tools/nfsdclddb/nfsdclddb.py
+@@ -234,9 +234,9 @@
+ def main():
+     parser = argparse.ArgumentParser()
+     parser.add_argument('-p', '--path',
+-                        default='/var/lib/nfs/nfsdcld/main.sqlite',
++                        default='@TERMUX_PREFIX@/var/lib/nfs/nfsdcld/main.sqlite',
+                         help='path to the database '
+-                        '(default: /var/lib/nfs/nfsdcld/main.sqlite)')
++                        '(default: @TERMUX_PREFIX@/var/lib/nfs/nfsdcld/main.sqlite)')
+     subparsers = parser.add_subparsers(help='sub-command help')
+     fix_parser = subparsers.add_parser('fix-table-names',
+                                        help='fix invalid table names')
+--- a/utils/blkmapd/device-discovery.c
++++ b/utils/blkmapd/device-discovery.c
+@@ -64,7 +64,7 @@
+ #define EVENT_BUFSIZE (1024 * EVENT_SIZE)
+ 
+ #define RPCPIPE_DIR	NFS_STATEDIR "/rpc_pipefs"
+-#define PID_FILE	"/run/blkmapd.pid"
++#define PID_FILE	"@TERMUX_PREFIX@/var/run/blkmapd.pid"
+ 
+ #define CONF_SAVE(w, f) do {			\
+ 	char *p = f;				\
+--- a/utils/gssd/gssd.h
++++ b/utils/gssd/gssd.h
+@@ -43,11 +43,11 @@
+ #endif
+ #define DNOTIFY_SIGNAL		(SIGRTMIN + 3)
+ 
+-#define GSSD_DEFAULT_CRED_DIR			"/tmp"
+-#define GSSD_USER_CRED_DIR			"/run/user/%U"
++#define GSSD_DEFAULT_CRED_DIR			"@TERMUX_PREFIX@/tmp"
++#define GSSD_USER_CRED_DIR			"@TERMUX_PREFIX@/var/run/user/%U"
+ #define GSSD_DEFAULT_CRED_PREFIX		"krb5cc"
+ #define GSSD_DEFAULT_MACHINE_CRED_SUFFIX	"machine"
+-#define GSSD_DEFAULT_KEYTAB_FILE		"/etc/krb5.keytab"
++#define GSSD_DEFAULT_KEYTAB_FILE		"@TERMUX_PREFIX@/etc/krb5.keytab"
+ #define GSSD_SERVICE_NAME			"nfs"
+ #define RPC_CHAN_BUF_SIZE			32768
+ 
+--- a/utils/mount/fstab.h
++++ b/utils/mount/fstab.h
+@@ -4,7 +4,7 @@
+ #include "nfs_mntent.h"
+ 
+ #ifndef _PATH_FSTAB
+-#define _PATH_FSTAB "/etc/fstab"
++#define _PATH_FSTAB "@TERMUX_PREFIX@/etc/fstab"
+ #endif
+ 
+ int mtab_is_a_symlink(void);
+--- a/utils/mount/mount.c
++++ b/utils/mount/mount.c
+@@ -468,7 +468,7 @@
+ 		    strcmp(mc->m.mnt_fsname, spec) != 0 ||
+ 		    strcmp(mc->m.mnt_type, fs_type) != 0) {
+ 			nfs_error(_("%s: permission denied: no match for %s "
+-				"found in /etc/fstab"), progname, mount_point);
++				"found in @TERMUX_PREFIX@/etc/fstab"), progname, mount_point);
+ 			goto out_usage;
+ 		}
+ 
+--- a/utils/mount/nfs4mount.c
++++ b/utils/mount/nfs4mount.c
+@@ -56,7 +56,7 @@
+ #if defined(VAR_LOCK_DIR)
+ #define DEFAULT_DIR VAR_LOCK_DIR
+ #else
+-#define DEFAULT_DIR "/var/lock/subsys"
++#define DEFAULT_DIR "@TERMUX_PREFIX@/var/lock/subsys"
+ #endif
+ 
+ extern char *progname;
+--- a/utils/mount/utils.c
++++ b/utils/mount/utils.c
+@@ -101,7 +101,7 @@
+ 	printf(_("\t-V\t\tPrint version\n"));
+ 	printf(_("\t-w\t\tMount file system read-write\n"));
+ 	printf(_("\t-f\t\tFake mount, do not actually mount\n"));
+-	printf(_("\t-n\t\tDo not update /etc/mtab\n"));
++	printf(_("\t-n\t\tDo not update @TERMUX_PREFIX@/etc/mtab\n"));
+ 	printf(_("\t-s\t\tTolerate sloppy mount options rather than fail\n"));
+ 	printf(_("\t-h\t\tPrint this help\n"));
+ 	printf(_("\tnfsoptions\tRefer to mount.nfs(8) or nfs(5)\n\n"));
+@@ -112,7 +112,7 @@
+ 	printf(_("usage: %s dir [-fvnrlh]\n"), progname);
+ 	printf(_("options:\n\t-f\tforce unmount\n"));
+ 	printf(_("\t-v\tverbose\n"));
+-	printf(_("\t-n\tDo not update /etc/mtab\n"));
++	printf(_("\t-n\tDo not update @TERMUX_PREFIX@/etc/mtab\n"));
+ 	printf(_("\t-r\tremount\n"));
+ 	printf(_("\t-l\tlazy unmount\n"));
+ 	printf(_("\t-h\tprint this help\n\n"));
+--- a/utils/nfsd/nfssvc.c
++++ b/utils/nfsd/nfssvc.c
+@@ -69,7 +69,7 @@
+ 	 * mount nfsdfs when nfsd.ko is plugged in. So, ignore the return
+ 	 * code from it and just check for the "threads" file afterward.
+ 	 */
+-	err = system("/bin/mount -t nfsd nfsd " NFSD_FS_DIR " >/dev/null 2>&1");
++	err = system("@TERMUX_PREFIX@/bin/mount -t nfsd nfsd " NFSD_FS_DIR " >/dev/null 2>&1");
+ 
+ 	err = stat(NFSD_THREAD_FILE, &statbuf);
+ 	if (err == 0)
+--- a/utils/nfsidmap/nfsidmap.c
++++ b/utils/nfsidmap/nfsidmap.c
+@@ -31,7 +31,7 @@
+ #endif
+ 
+ #ifndef PATH_IDMAPDCONF
+-#define PATH_IDMAPDCONF "/etc/idmapd.conf"
++#define PATH_IDMAPDCONF "@TERMUX_PREFIX@/etc/idmapd.conf"
+ #endif
+ 
+ #define UIDKEYS 0x1
+@@ -434,7 +434,7 @@
+ 
+ 	xlog_stderr(verbose);
+ 	if ((argc - optind) != 2) {
+-		xlog_warn("Bad arg count. Check /etc/request-key.conf");
++		xlog_warn("Bad arg count. Check @TERMUX_PREFIX@/etc/request-key.conf");
+ 		xlog_warn(USAGE, progname);
+ 		return EXIT_FAILURE;
+ 	}
+--- a/utils/statd/sm-notify.c
++++ b/utils/statd/sm-notify.c
+@@ -913,7 +913,7 @@
+ 	int fd;
+ 
+ 	(void)snprintf(pid, sizeof(pid), "%d\n", (int)getpid());
+-	fd = open("/run/sm-notify.pid", O_CREAT|O_EXCL|O_WRONLY, 0600);
++	fd = open("@TERMUX_PREFIX@/var/run/sm-notify.pid", O_CREAT|O_EXCL|O_WRONLY, 0600);
+ 	if (fd < 0)
+ 		return 0;
+ 
+--- a/utils/statd/start-statd
++++ b/utils/statd/start-statd
+@@ -4,21 +4,21 @@
+ # /run/rpc.statd.pid).
+ # It should run statd with whatever flags are apropriate for this
+ # site.
+-PATH="/sbin:/usr/sbin:/bin:/usr/bin"
++PATH="@TERMUX_PREFIX@/bin"
+ 
+ # Use flock to serialize the running of this script
+-exec 9> /run/rpc.statd.lock
++exec 9> @TERMUX_PREFIX@/var/run/rpc.statd.lock
+ flock -e 9
+ 
+-if [ -s /run/rpc.statd.pid ] &&
+-       [ 1`cat /run/rpc.statd.pid` -gt 1 ] &&
+-       kill -0 `cat /run/rpc.statd.pid` > /dev/null 2>&1
++if [ -s @TERMUX_PREFIX@/var/run/rpc.statd.pid ] &&
++       [ 1`cat @TERMUX_PREFIX@/var/run/rpc.statd.pid` -gt 1 ] &&
++       kill -0 `cat @TERMUX_PREFIX@/var/run/rpc.statd.pid` > /dev/null 2>&1
+ then
+     # statd already running - must have been slow to respond.
+     exit 0
+ fi
+ # First try systemd if it's installed.
+-if [ -d /run/systemd/system ]; then
++if [ -d @TERMUX_PREFIX@/var/run/systemd/system ]; then
+     # Quit only if the call worked.
+     if systemctl start rpc-statd.service; then
+         # Ensure systemd knows not to stop rpc.statd or its dependencies
+--- a/utils/statd/statd.c
++++ b/utils/statd/statd.c
+@@ -161,7 +161,7 @@
+ 	fprintf(stderr,"      -H                   Specify a high-availability callout program.\n");
+ }
+ 
+-static const char *pidfile = "/run/rpc.statd.pid";
++static const char *pidfile = "@TERMUX_PREFIX@/var/run/rpc.statd.pid";
+ 
+ int pidfd = -1;
+ static void create_pidfile(void)
+@@ -196,7 +196,7 @@
+ 	char *av[6];
+ 	int ac = 0;
+ 
+-	av[ac++] = "/usr/sbin/sm-notify";
++	av[ac++] = "@TERMUX_PREFIX@/bin/sm-notify";
+ 	if (run_mode & MODE_NODAEMON)
+ 		av[ac++] = "-d";
+ 	if (outport) {
+@@ -400,7 +400,7 @@
+ 	}
+ 
+ 	if (run_mode & MODE_NOTIFY_ONLY) {
+-		fprintf(stderr, "%s: -N deprecated, consider using /usr/sbin/sm-notify directly\n",
++		fprintf(stderr, "%s: -N deprecated, consider using @TERMUX_PREFIX@/bin/sm-notify directly\n",
+ 			name_p);
+ 		run_sm_notify(out_port);
+ 	}
