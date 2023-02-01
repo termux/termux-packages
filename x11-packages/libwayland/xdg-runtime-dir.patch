@@ -1,46 +1,53 @@
-diff -uNr wayland-1.17.0/cursor/os-compatibility.c wayland-1.17.0.mod/cursor/os-compatibility.c
---- wayland-1.17.0/cursor/os-compatibility.c	2019-03-21 02:55:25.000000000 +0200
-+++ wayland-1.17.0.mod/cursor/os-compatibility.c	2019-07-01 22:32:38.256153848 +0300
-@@ -111,8 +111,7 @@
+--- a/cursor/os-compatibility.c
++++ b/cursor/os-compatibility.c
+@@ -138,8 +138,12 @@ os_create_anonymous_file(off_t size)
+ 	{
+ 		path = getenv("XDG_RUNTIME_DIR");
+ 		if (!path || path[0] != '/') {
++#ifndef __ANDROID__
+ 			errno = ENOENT;
+ 			return -1;
++#else
++			path = "@TERMUX_PREFIX@/tmp";
++#endif
+ 		}
  
- 	path = getenv("XDG_RUNTIME_DIR");
- 	if (!path) {
--		errno = ENOENT;
--		return -1;
-+		path = "@TERMUX_PREFIX@/tmp";
- 	}
- 
- 	name = malloc(strlen(path) + sizeof(template));
-diff -uNr wayland-1.17.0/src/wayland-client.c wayland-1.17.0.mod/src/wayland-client.c
---- wayland-1.17.0/src/wayland-client.c	2019-03-21 02:55:25.000000000 +0200
-+++ wayland-1.17.0.mod/src/wayland-client.c	2019-07-01 22:33:25.633279646 +0300
-@@ -962,11 +962,7 @@
+ 		name_size = strlen(path) + sizeof(template);
+--- a/src/wayland-client.c
++++ b/src/wayland-client.c
+@@ -1077,11 +1077,15 @@ connect_to_socket(const char *name)
  
  	runtime_dir = getenv("XDG_RUNTIME_DIR");
- 	if (!runtime_dir && !path_is_absolute) {
--		wl_log("error: XDG_RUNTIME_DIR not set in the environment.\n");
--		/* to prevent programs reporting
--		 * "failed to create display: Success" */
--		errno = ENOENT;
--		return -1;
+ 	if (((!runtime_dir || runtime_dir[0] != '/') && !path_is_absolute)) {
++#ifndef __ANDROID__
+ 		wl_log("error: XDG_RUNTIME_DIR is invalid or not set in the environment.\n");
+ 		/* to prevent programs reporting
+ 		 * "failed to create display: Success" */
+ 		errno = ENOENT;
+ 		return -1;
++#else
 +		runtime_dir = "@TERMUX_PREFIX@/tmp";
++#endif
  	}
  
  	fd = wl_os_socket_cloexec(PF_LOCAL, SOCK_STREAM, 0);
-diff -uNr wayland-1.17.0/src/wayland-server.c wayland-1.17.0.mod/src/wayland-server.c
---- wayland-1.17.0/src/wayland-server.c	2019-03-21 02:55:25.000000000 +0200
-+++ wayland-1.17.0.mod/src/wayland-server.c	2019-07-01 22:34:05.100325582 +0300
-@@ -1427,12 +1427,7 @@
+--- a/src/wayland-server.c
++++ b/src/wayland-server.c
+@@ -1567,6 +1567,7 @@ wl_socket_init_for_display_name(struct w
+ 	if (name[0] != '/') {
+ 		runtime_dir = getenv("XDG_RUNTIME_DIR");
+ 		if (!runtime_dir || runtime_dir[0] != '/') {
++#ifndef __ANDROID__
+ 			wl_log("error: XDG_RUNTIME_DIR is invalid or not set in"
+ 			       " the environment\n");
  
- 	runtime_dir = getenv("XDG_RUNTIME_DIR");
- 	if (!runtime_dir) {
--		wl_log("error: XDG_RUNTIME_DIR not set in the environment\n");
--
--		/* to prevent programs reporting
--		 * "failed to add socket: Success" */
--		errno = ENOENT;
--		return -1;
-+		runtime_dir = "@TERMUX_PREFIX@/tmp";
+@@ -1574,6 +1575,9 @@ wl_socket_init_for_display_name(struct w
+ 			 * "failed to add socket: Success" */
+ 			errno = ENOENT;
+ 			return -1;
++#else
++			runtime_dir = "@TERMUX_PREFIX@/tmp";
++#endif
+ 		}
+ 		separator = "/";
  	}
- 
- 	s->addr.sun_family = AF_LOCAL;
