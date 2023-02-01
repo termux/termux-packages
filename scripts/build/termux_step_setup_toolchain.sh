@@ -5,9 +5,9 @@ termux_step_setup_toolchain() {
 	# Bump TERMUX_STANDALONE_TOOLCHAIN if a change is made in
 	# toolchain setup to ensure that everyone gets an updated
 	# toolchain
-	if [ "${TERMUX_NDK_VERSION}" = 25b ]; then
-		TERMUX_STANDALONE_TOOLCHAIN+="-v3"
-		termux_setup_toolchain_25b
+	if [ "${TERMUX_NDK_VERSION}" = 25c ]; then
+		TERMUX_STANDALONE_TOOLCHAIN+="-v0"
+		termux_setup_toolchain_25c
 	elif [ "${TERMUX_NDK_VERSION}" = 23c ]; then
 		TERMUX_STANDALONE_TOOLCHAIN+="-v3"
 		termux_setup_toolchain_23c

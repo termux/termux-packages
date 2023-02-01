@@ -4,10 +4,9 @@ TERMUX_PKG_LICENSE="NCSA"
 TERMUX_PKG_MAINTAINER="@termux"
 # Version should be equal to TERMUX_NDK_{VERSION_NUM,REVISION} in
 # scripts/properties.sh
-TERMUX_PKG_VERSION=25b
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION=25c
 TERMUX_PKG_SRCURL=https://dl.google.com/android/repository/android-ndk-r${TERMUX_PKG_VERSION}-linux.zip
-TERMUX_PKG_SHA256=403ac3e3020dd0db63a848dcaba6ceb2603bf64de90949d5c4361f848e44b005
+TERMUX_PKG_SHA256=769ee342ea75f80619d985c2da990c48b3d8eaf45f48783a2d48870d04b46108
 # This package has taken over <pty.h> from the previous libutil-dev
 # and iconv.h from libandroid-support-dev:
 TERMUX_PKG_CONFLICTS="libutil-dev, libgcc, libandroid-support-dev"
@@ -87,7 +86,7 @@ termux_step_make_install() {
 
 	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib
 	# clang 13 requires libunwind on Android.
-	cp toolchains/llvm/prebuilt/linux-x86_64/lib64/clang/14.0.6/lib/linux/$NDK_ARCH/libunwind.a \
+	cp toolchains/llvm/prebuilt/linux-x86_64/lib64/clang/14.0.7/lib/linux/$NDK_ARCH/libunwind.a \
 		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib
 	for lib in librt.so libpthread.so libutil.so; do
 		echo 'INPUT(-lc)' > $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/$lib
