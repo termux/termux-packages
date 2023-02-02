@@ -1,0 +1,39 @@
+--- a/agent/protect.c	2023-02-02 13:23:49.533499999 -0300
++++ b/agent/protect.c	2023-02-02 13:32:36.669499622 -0300
+@@ -576,16 +576,32 @@
+      and dummy values as placeholders.  */
+   {
+     char countbuf[35];
++    FILE *f;
+ 
+     snprintf (countbuf, sizeof countbuf, "%lu",
+ 	    s2k_count ? s2k_count : get_standard_s2k_count ());
++    f = fopen("/dev/null", "w");
++    saltpos = fprintf
++      (f, "(9:protected%d:%s((4:sha18:",
++       (int)strlen (modestr), modestr);
++    ivpos = fprintf
++      (f, "(9:protected%d:%s((4:sha18:_8bytes_%u:%s)%d:",
++       (int)strlen (modestr), modestr,
++       (unsigned int)strlen (countbuf), countbuf,
++       use_ocb? 12 : blklen);
++    encpos = fprintf
++      (f, "(9:protected%d:%s((4:sha18:_8bytes_%u:%s)%d:%*s)%d:",
++       (int)strlen (modestr), modestr,
++       (unsigned int)strlen (countbuf), countbuf,
++       use_ocb? 12 : blklen, use_ocb? 12 : blklen, "",
++       enclen);
++    fclose(f);
+     p = xtryasprintf
+-      ("(9:protected%d:%s((4:sha18:%n_8bytes_%u:%s)%d:%n%*s)%d:%n%*s)",
++      ("(9:protected%d:%s((4:sha18:_8bytes_%u:%s)%d:%*s)%d:%*s)",
+        (int)strlen (modestr), modestr,
+-       &saltpos,
+        (unsigned int)strlen (countbuf), countbuf,
+-       use_ocb? 12 : blklen, &ivpos, use_ocb? 12 : blklen, "",
+-       enclen, &encpos, enclen, "");
++       use_ocb? 12 : blklen, use_ocb? 12 : blklen, "",
++       enclen, enclen, "");
+     if (!p)
+       {
+         gpg_error_t tmperr = out_of_core ();

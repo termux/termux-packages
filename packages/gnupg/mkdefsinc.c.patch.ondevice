@@ -1,11 +1,22 @@
---- ./doc/mkdefsinc.c.orig	2017-03-17 09:34:37.000000000 +0100
-+++ ./doc/mkdefsinc.c	2021-12-27 23:14:49.542199850 +0100
-@@ -286,8 +286,8 @@
+--- a/doc/mkdefsinc.c	2023-02-02 09:59:08.889508783 -0300
++++ b/doc/mkdefsinc.c	2023-02-02 13:08:26.921500659 -0300
+@@ -268,6 +268,7 @@
+   else
+     {
+       const char *month = "?";
++      FILE *f;
+ 
+       switch (atoi (opt_date+5))
+         {
+@@ -286,8 +287,11 @@
          }
        n = strlen (opt_date) + strlen (month) + 2 + 1;
        p = xmalloc (n);
 -      snprintf (p, n, "%d %n%s %d",
 -                atoi (opt_date+8), &monthoff, month, atoi (opt_date));
++      f = fopen("/dev/null", "w");
++      monthoff = fprintf (f, "%d ", atoi (opt_date+8));
++      fclose(f);
 +      snprintf (p, n, "%d %s %d",
 +                atoi (opt_date+8), month, atoi (opt_date));
        xfree (opt_date);

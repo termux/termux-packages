@@ -1,25 +1,31 @@
---- ./g10/keylist.c~	2022-11-25 16:05:09.000000000 +0100
-+++ ./g10/keylist.c	2023-01-19 20:37:12.674592842 +0100
-@@ -307,7 +307,7 @@
-   char *serialno;
-   int s2k_char;
-   char pkstrbuf[PUBKEY_STRING_SIZE];
--  int indent;
-+  const int indent = 0;
+--- a/g10/keylist.c	2023-01-31 18:39:58.173441940 -0300
++++ b/g10/keylist.c	2023-02-02 13:46:36.569499021 -0300
+@@ -315,6 +315,7 @@
+           || node->pkt->pkttype == PKT_PUBLIC_SUBKEY)
+         {
+           int rc;
++	  FILE *f;
+           PKT_public_key *pk = node->pkt->pkt.public_key;
  
-   for (node = keyblock; node; node = node->next)
-     {
-@@ -329,12 +329,11 @@
+           serialno = NULL;
+@@ -329,12 +330,18 @@
            else
              s2k_char = '#';  /* Key not found.  */
  
 -          tty_fprintf (fp, "%s%c  %s/%s  %n",
-+          tty_fprintf (fp, "%s%c  %s/%s  ",
++	  f = fopen("/dev/null", "w");
++          indent = fprintf (f, "%s%c  %s/%s  ",
                         node->pkt->pkttype == PKT_PUBLIC_KEY ? "sec" : "ssb",
                         s2k_char,
                         pubkey_string (pk, pkstrbuf, sizeof pkstrbuf),
 -                       keystr_from_pk (pk),
 -                       &indent);
++                       keystr_from_pk (pk));
++	  fclose(f);
++          tty_fprintf (fp, "%s%c  %s/%s  ",
++                       node->pkt->pkttype == PKT_PUBLIC_KEY ? "sec" : "ssb",
++                       s2k_char,
++                       pubkey_string (pk, pkstrbuf, sizeof pkstrbuf),
 +                       keystr_from_pk (pk));
            tty_fprintf (fp, _("created: %s"), datestr_from_pk (pk));
            tty_fprintf (fp, "  ");
