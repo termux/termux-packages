@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<dump>
+  <boxed name="GspellLanguage" get-type="gspell_language_get_type"/>
+  <class name="GspellChecker" get-type="gspell_checker_get_type" parents="GObject">
+    <property name="language" type="GspellLanguage" flags="231"/>
+    <signal name="word-added-to-personal" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="word-added-to-session" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="session-cleared" return="void" when="last">
+    </signal>
+  </class>
+  <interface name="GspellNavigator" get-type="gspell_navigator_get_type">
+    <prerequisite name="GInitiallyUnowned"/>
+  </interface>
+  <class name="GspellCheckerDialog" get-type="gspell_checker_dialog_get_type" parents="GtkDialog,GtkWindow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="spell-navigator" type="GspellNavigator" flags="235"/>
+  </class>
+  <class name="GspellEntry" get-type="gspell_entry_get_type" parents="GObject">
+    <property name="entry" type="GtkEntry" flags="235"/>
+    <property name="inline-spell-checking" type="gboolean" flags="227"/>
+  </class>
+  <class name="GspellEntryBuffer" get-type="gspell_entry_buffer_get_type" parents="GObject">
+    <property name="buffer" type="GtkEntryBuffer" flags="235"/>
+    <property name="spell-checker" type="GspellChecker" flags="227"/>
+  </class>
+  <interface name="GspellLanguageChooser" get-type="gspell_language_chooser_get_type">
+    <property name="language" type="GspellLanguage" flags="227"/>
+    <property name="language-code" type="gchararray" flags="227"/>
+  </interface>
+  <class name="GspellLanguageChooserButton" get-type="gspell_language_chooser_button_get_type" parents="GtkButton,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkActionable"/>
+    <implements name="GtkActivatable"/>
+    <implements name="GspellLanguageChooser"/>
+  </class>
+  <class name="GspellLanguageChooserDialog" get-type="gspell_language_chooser_dialog_get_type" parents="GtkDialog,GtkWindow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GspellLanguageChooser"/>
+  </class>
+  <class name="GspellNavigatorTextView" get-type="gspell_navigator_text_view_get_type" parents="GInitiallyUnowned,GObject">
+    <implements name="GspellNavigator"/>
+    <property name="view" type="GtkTextView" flags="235"/>
+  </class>
+  <class name="GspellTextBuffer" get-type="gspell_text_buffer_get_type" parents="GObject">
+    <property name="buffer" type="GtkTextBuffer" flags="235"/>
+    <property name="spell-checker" type="GspellChecker" flags="227"/>
+  </class>
+  <class name="GspellTextView" get-type="gspell_text_view_get_type" parents="GObject">
+    <property name="view" type="GtkTextView" flags="235"/>
+    <property name="inline-spell-checking" type="gboolean" flags="227"/>
+    <property name="enable-language-menu" type="gboolean" flags="227"/>
+  </class>
+  <enum name="GspellCheckerError" get-type="gspell_checker_error_get_type">
+    <member name="GSPELL_CHECKER_ERROR_DICTIONARY" nick="dictionary" value="0"/>
+    <member name="GSPELL_CHECKER_ERROR_NO_LANGUAGE_SET" nick="no-language-set" value="1"/>
+  </enum>  <error-quark function="gspell_checker_error_quark" domain="gspell-checker-error-quark"/>
+</dump>
