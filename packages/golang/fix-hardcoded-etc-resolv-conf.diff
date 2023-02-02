@@ -20,25 +20,10 @@
 
  package net
 
---- a/src/net/conf_android.go
-+++ b/src/net/conf_android.go
-@@ -113,10 +113,10 @@ func initConfVal() {
+@@ -109,7 +109,7 @@
+ 		return
  	}
-
- 	if runtime.GOOS != "openbsd" {
--		confVal.nss = parseNSSConfFile("/etc/nsswitch.conf")
-+		confVal.nss = parseNSSConfFile("@TERMUX_PREFIX@/etc/nsswitch.conf")
- 	}
-
--	confVal.resolv = dnsReadConfig("/etc/resolv.conf")
-+	confVal.resolv = dnsReadConfig("@TERMUX_PREFIX@/etc/resolv.conf")
- 	if confVal.resolv.err != nil && !os.IsNotExist(confVal.resolv.err) &&
- 		!os.IsPermission(confVal.resolv.err) {
- 		// If we can't read the resolv.conf file, assume it
-@@ -126,7 +126,7 @@ func initConfVal() {
- 		confVal.forceCgoLookupHost = true
- 	}
-
+ 
 -	if _, err := os.Stat("/etc/mdns.allow"); err == nil {
 +	if _, err := os.Stat("@TERMUX_PREFIX@/etc/mdns.allow"); err == nil {
  		confVal.hasMDNSAllow = true
@@ -66,32 +51,21 @@
 
  // DNS client: see RFC 1035.
  // Has to be linked into package net for Dial.
---- a/src/net/dnsclient_android.go
-+++ b/src/net/dnsclient_android.go
-@@ -355,7 +355,7 @@ func (conf *resolverConfig) init() {
+@@ -349,7 +349,7 @@
+ var resolvConf resolverConfig
+ 
+ func getSystemDNSConfig() *dnsConfig {
+-	resolvConf.tryUpdate("/etc/resolv.conf")
++	resolvConf.tryUpdate("@TERMUX_PREFIX@/etc/resolv.conf")
+ 	return resolvConf.dnsConfig.Load()
+ }
+ 
+@@ -357,7 +357,7 @@
+ func (conf *resolverConfig) init() {
+ 	// Set dnsConfig and lastChecked so we don't parse
  	// resolv.conf twice the first time.
- 	conf.dnsConfig = systemConf().resolv
- 	if conf.dnsConfig == nil {
--		conf.dnsConfig = dnsReadConfig("/etc/resolv.conf")
-+		conf.dnsConfig = dnsReadConfig("@TERMUX_PREFIX@/etc/resolv.conf")
- 	}
+-	conf.dnsConfig.Store(dnsReadConfig("/etc/resolv.conf"))
++	conf.dnsConfig.Store(dnsReadConfig("@TERMUX_PREFIX@/etc/resolv.conf"))
  	conf.lastChecked = time.Now()
-
-@@ -427,7 +427,7 @@ func (r *Resolver) lookup(ctx context.Context, name string, qtype dnsmessage.Typ
- 		// For consistency with libc resolvers, report no such host.
- 		return dnsmessage.Parser{}, "", &DNSError{Err: errNoSuchHost.Error(), Name: name, IsNotFound: true}
- 	}
--	resolvConf.tryUpdate("/etc/resolv.conf")
-+	resolvConf.tryUpdate("@TERMUX_PREFIX@/etc/resolv.conf")
- 	resolvConf.mu.RLock()
- 	conf := resolvConf.dnsConfig
- 	resolvConf.mu.RUnlock()
-@@ -604,7 +604,7 @@ func (r *Resolver) goLookupIPCNAMEOrder(ctx context.Context, network, name strin
- 		// See comment in func lookup above about use of errNoSuchHost.
- 		return nil, dnsmessage.Name{}, &DNSError{Err: errNoSuchHost.Error(), Name: name, IsNotFound: true}
- 	}
--	resolvConf.tryUpdate("/etc/resolv.conf")
-+	resolvConf.tryUpdate("@TERMUX_PREFIX@/etc/resolv.conf")
- 	resolvConf.mu.RLock()
- 	conf := resolvConf.dnsConfig
- 	resolvConf.mu.RUnlock()
+ 
+ 	// Prepare ch so that only one update of resolverConfig may
