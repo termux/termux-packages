@@ -9,7 +9,8 @@ TERMUX_PKG_SHA256=f1acc15d0fd0cb431f4bf6eac32d5e932e40ea1186fe78e074254d6d003957
 TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_BREAKS="libvpx-dev"
 TERMUX_PKG_REPLACES="libvpx-dev"
-TERMUX_PKG_AUTO_UPDATE=true
+# Disable auto-update until 1.13.0 is released.
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 
 termux_step_configure() {
