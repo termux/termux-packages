@@ -1,0 +1,445 @@
+<?xml version="1.0"?>
+<dump>
+  <class name="GtkSourceCompletionContext" get-type="gtk_source_completion_context_get_type" parents="GInitiallyUnowned,GObject">
+    <property name="completion" type="GtkSourceCompletion" flags="235"/>
+    <property name="iter" type="GtkTextIter" flags="227"/>
+    <property name="activation" type="GtkSourceCompletionActivation" flags="231"/>
+    <signal name="cancelled" return="void" when="last" action="1">
+    </signal>
+  </class>
+  <interface name="GtkSourceCompletionProvider" get-type="gtk_source_completion_provider_get_type">
+  </interface>
+  <class name="GtkSourceCompletionWords" get-type="gtk_source_completion_words_get_type" parents="GObject">
+    <implements name="GtkSourceCompletionProvider"/>
+    <property name="name" type="gchararray" flags="231"/>
+    <property name="icon" type="GdkPixbuf" flags="231"/>
+    <property name="proposals-batch-size" type="guint" flags="231"/>
+    <property name="scan-batch-size" type="guint" flags="231"/>
+    <property name="minimum-word-size" type="guint" flags="231"/>
+    <property name="interactive-delay" type="gint" flags="231"/>
+    <property name="priority" type="gint" flags="231"/>
+    <property name="activation" type="GtkSourceCompletionActivation" flags="231"/>
+  </class>
+  <class name="GtkSourceBuffer" get-type="gtk_source_buffer_get_type" parents="GtkTextBuffer,GObject">
+    <property name="can-undo" type="gboolean" flags="225"/>
+    <property name="can-redo" type="gboolean" flags="225"/>
+    <property name="highlight-syntax" type="gboolean" flags="227"/>
+    <property name="highlight-matching-brackets" type="gboolean" flags="227"/>
+    <property name="max-undo-levels" type="gint" flags="227"/>
+    <property name="language" type="GtkSourceLanguage" flags="227"/>
+    <property name="style-scheme" type="GtkSourceStyleScheme" flags="227"/>
+    <property name="undo-manager" type="GtkSourceUndoManager" flags="231"/>
+    <property name="implicit-trailing-newline" type="gboolean" flags="231"/>
+    <signal name="highlight-updated" return="void" when="last">
+      <param type="GtkTextIter"/>
+      <param type="GtkTextIter"/>
+    </signal>
+    <signal name="source-mark-updated" return="void" when="last">
+      <param type="GtkTextMark"/>
+    </signal>
+    <signal name="undo" return="void" when="last">
+    </signal>
+    <signal name="redo" return="void" when="last">
+    </signal>
+    <signal name="bracket-matched" return="void" when="last">
+      <param type="GtkTextIter"/>
+      <param type="GtkSourceBracketMatchType"/>
+    </signal>
+  </class>
+  <class name="GtkSourceCompletion" get-type="gtk_source_completion_get_type" parents="GObject">
+    <implements name="GtkBuildable"/>
+    <property name="view" type="GtkSourceView" flags="235"/>
+    <property name="remember-info-visibility" type="gboolean" flags="231"/>
+    <property name="select-on-show" type="gboolean" flags="231"/>
+    <property name="show-headers" type="gboolean" flags="231"/>
+    <property name="show-icons" type="gboolean" flags="231"/>
+    <property name="accelerators" type="guint" flags="231"/>
+    <property name="auto-complete-delay" type="guint" flags="231"/>
+    <property name="provider-page-size" type="guint" flags="231"/>
+    <property name="proposal-page-size" type="guint" flags="231"/>
+    <signal name="show" return="void" when="last" action="1">
+    </signal>
+    <signal name="hide" return="void" when="last" action="1">
+    </signal>
+    <signal name="populate-context" return="void" when="last" action="1">
+      <param type="GtkSourceCompletionContext"/>
+    </signal>
+    <signal name="move-cursor" return="void" when="last" action="1">
+      <param type="GtkScrollStep"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="move-page" return="void" when="last" action="1">
+      <param type="GtkScrollStep"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="activate-proposal" return="void" when="last" action="1">
+    </signal>
+  </class>
+  <class name="GtkSourceCompletionInfo" get-type="gtk_source_completion_info_get_type" parents="GtkWindow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <signal name="before-show" return="void" when="last" action="1">
+    </signal>
+  </class>
+  <class name="GtkSourceCompletionItem" get-type="gtk_source_completion_item_get_type" parents="GObject">
+    <implements name="GtkSourceCompletionProposal"/>
+    <property name="label" type="gchararray" flags="227"/>
+    <property name="markup" type="gchararray" flags="227"/>
+    <property name="text" type="gchararray" flags="227"/>
+    <property name="icon" type="GdkPixbuf" flags="227"/>
+    <property name="icon-name" type="gchararray" flags="227"/>
+    <property name="gicon" type="GIcon" flags="227"/>
+    <property name="info" type="gchararray" flags="227"/>
+  </class>
+  <interface name="GtkSourceCompletionProposal" get-type="gtk_source_completion_proposal_get_type">
+    <signal name="changed" return="void" when="last" action="1">
+    </signal>
+  </interface>
+  <boxed name="GtkSourceEncoding" get-type="gtk_source_encoding_get_type"/>
+  <class name="GtkSourceFile" get-type="gtk_source_file_get_type" parents="GObject">
+    <property name="location" type="GFile" flags="231"/>
+    <property name="encoding" type="GtkSourceEncoding" flags="225"/>
+    <property name="newline-type" type="GtkSourceNewlineType" flags="225"/>
+    <property name="compression-type" type="GtkSourceCompressionType" flags="225"/>
+    <property name="read-only" type="gboolean" flags="225"/>
+  </class>
+  <class name="GtkSourceFileLoader" get-type="gtk_source_file_loader_get_type" parents="GObject">
+    <property name="buffer" type="GtkSourceBuffer" flags="235"/>
+    <property name="file" type="GtkSourceFile" flags="235"/>
+    <property name="location" type="GFile" flags="235"/>
+    <property name="input-stream" type="GInputStream" flags="235"/>
+  </class>
+  <class name="GtkSourceFileSaver" get-type="gtk_source_file_saver_get_type" parents="GObject">
+    <property name="buffer" type="GtkSourceBuffer" flags="235"/>
+    <property name="file" type="GtkSourceFile" flags="235"/>
+    <property name="location" type="GFile" flags="235"/>
+    <property name="encoding" type="GtkSourceEncoding" flags="231"/>
+    <property name="newline-type" type="GtkSourceNewlineType" flags="231"/>
+    <property name="compression-type" type="GtkSourceCompressionType" flags="231"/>
+    <property name="flags" type="GtkSourceFileSaverFlags" flags="231"/>
+  </class>
+  <class name="GtkSourceGutter" get-type="gtk_source_gutter_get_type" parents="GObject">
+    <property name="view" type="GtkSourceView" flags="11"/>
+    <property name="window-type" type="GtkTextWindowType" flags="11"/>
+    <property name="xpad" type="gint" flags="-2147483641"/>
+    <property name="ypad" type="gint" flags="-2147483641"/>
+  </class>
+  <class name="GtkSourceGutterRenderer" get-type="gtk_source_gutter_renderer_get_type" parents="GInitiallyUnowned,GObject" abstract="1">
+    <property name="visible" type="gboolean" flags="7"/>
+    <property name="xpad" type="gint" flags="7"/>
+    <property name="ypad" type="gint" flags="7"/>
+    <property name="xalign" type="gfloat" flags="7"/>
+    <property name="yalign" type="gfloat" flags="7"/>
+    <property name="view" type="GtkTextView" flags="1"/>
+    <property name="alignment-mode" type="GtkSourceGutterRendererAlignmentMode" flags="7"/>
+    <property name="window-type" type="GtkTextWindowType" flags="1"/>
+    <property name="size" type="gint" flags="7"/>
+    <property name="background-rgba" type="GdkRGBA" flags="3"/>
+    <property name="background-set" type="gboolean" flags="7"/>
+    <signal name="query-tooltip" return="gboolean" when="last">
+      <param type="GtkTextIter"/>
+      <param type="GdkRectangle"/>
+      <param type="gint"/>
+      <param type="gint"/>
+      <param type="GtkTooltip"/>
+    </signal>
+    <signal name="activate" return="void" when="last">
+      <param type="GtkTextIter"/>
+      <param type="GdkRectangle"/>
+      <param type="GdkEvent"/>
+    </signal>
+    <signal name="queue-draw" return="void" when="last">
+    </signal>
+    <signal name="query-data" return="void" when="last">
+      <param type="GtkTextIter"/>
+      <param type="GtkTextIter"/>
+      <param type="GtkSourceGutterRendererState"/>
+    </signal>
+    <signal name="query-activatable" return="gboolean" when="last">
+      <param type="GtkTextIter"/>
+      <param type="GdkRectangle"/>
+      <param type="GdkEvent"/>
+    </signal>
+  </class>
+  <class name="GtkSourceGutterRendererText" get-type="gtk_source_gutter_renderer_text_get_type" parents="GtkSourceGutterRenderer,GInitiallyUnowned,GObject">
+    <property name="markup" type="gchararray" flags="7"/>
+    <property name="text" type="gchararray" flags="7"/>
+  </class>
+  <class name="GtkSourceGutterRendererPixbuf" get-type="gtk_source_gutter_renderer_pixbuf_get_type" parents="GtkSourceGutterRenderer,GInitiallyUnowned,GObject">
+    <property name="pixbuf" type="GdkPixbuf" flags="3"/>
+    <property name="stock-id" type="gchararray" flags="-2147483645"/>
+    <property name="icon-name" type="gchararray" flags="3"/>
+    <property name="gicon" type="GIcon" flags="3"/>
+  </class>
+  <class name="GtkSourceLanguage" get-type="gtk_source_language_get_type" parents="GObject">
+    <property name="id" type="gchararray" flags="225"/>
+    <property name="name" type="gchararray" flags="225"/>
+    <property name="section" type="gchararray" flags="225"/>
+    <property name="hidden" type="gboolean" flags="225"/>
+  </class>
+  <class name="GtkSourceLanguageManager" get-type="gtk_source_language_manager_get_type" parents="GObject">
+    <property name="search-path" type="GStrv" flags="227"/>
+    <property name="language-ids" type="GStrv" flags="225"/>
+  </class>
+  <class name="GtkSourceView" get-type="gtk_source_view_get_type" parents="GtkTextView,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkScrollable"/>
+    <property name="completion" type="GtkSourceCompletion" flags="225"/>
+    <property name="show-line-numbers" type="gboolean" flags="227"/>
+    <property name="show-line-marks" type="gboolean" flags="227"/>
+    <property name="tab-width" type="guint" flags="227"/>
+    <property name="indent-width" type="gint" flags="227"/>
+    <property name="auto-indent" type="gboolean" flags="227"/>
+    <property name="insert-spaces-instead-of-tabs" type="gboolean" flags="227"/>
+    <property name="show-right-margin" type="gboolean" flags="227"/>
+    <property name="right-margin-position" type="guint" flags="227"/>
+    <property name="smart-home-end" type="GtkSourceSmartHomeEndType" flags="227"/>
+    <property name="highlight-current-line" type="gboolean" flags="227"/>
+    <property name="indent-on-tab" type="gboolean" flags="227"/>
+    <property name="draw-spaces" type="GtkSourceDrawSpacesFlags" flags="-2147483421"/>
+    <property name="background-pattern" type="GtkSourceBackgroundPatternType" flags="227"/>
+    <property name="smart-backspace" type="gboolean" flags="227"/>
+    <property name="space-drawer" type="GtkSourceSpaceDrawer" flags="225"/>
+    <signal name="undo" return="void" when="last" action="1">
+    </signal>
+    <signal name="redo" return="void" when="last" action="1">
+    </signal>
+    <signal name="smart-home-end" return="void" when="last">
+      <param type="GtkTextIter"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="show-completion" return="void" when="last" action="1">
+    </signal>
+    <signal name="line-mark-activated" return="void" when="last">
+      <param type="GtkTextIter"/>
+      <param type="GdkEvent"/>
+    </signal>
+    <signal name="move-lines" return="void" when="last" action="1">
+      <param type="gboolean"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="move-words" return="void" when="last" action="1">
+      <param type="gint"/>
+    </signal>
+    <signal name="move-to-matching-bracket" return="void" when="last" action="1">
+      <param type="gboolean"/>
+    </signal>
+    <signal name="change-number" return="void" when="last" action="1">
+      <param type="gint"/>
+    </signal>
+    <signal name="change-case" return="void" when="last" action="1">
+      <param type="GtkSourceChangeCaseType"/>
+    </signal>
+    <signal name="join-lines" return="void" when="last" action="1">
+    </signal>
+  </class>
+  <class name="GtkSourceMap" get-type="gtk_source_map_get_type" parents="GtkSourceView,GtkTextView,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkScrollable"/>
+    <property name="view" type="GtkSourceView" flags="227"/>
+    <property name="font-desc" type="PangoFontDescription" flags="227"/>
+  </class>
+  <class name="GtkSourceMark" get-type="gtk_source_mark_get_type" parents="GtkTextMark,GObject">
+    <property name="category" type="gchararray" flags="235"/>
+  </class>
+  <class name="GtkSourceMarkAttributes" get-type="gtk_source_mark_attributes_get_type" parents="GObject">
+    <property name="background" type="GdkRGBA" flags="227"/>
+    <property name="stock-id" type="gchararray" flags="-2147483421"/>
+    <property name="pixbuf" type="GdkPixbuf" flags="227"/>
+    <property name="icon-name" type="gchararray" flags="227"/>
+    <property name="gicon" type="GIcon" flags="227"/>
+    <signal name="query-tooltip-text" return="gchararray" when="last">
+      <param type="GtkSourceMark"/>
+    </signal>
+    <signal name="query-tooltip-markup" return="gchararray" when="last">
+      <param type="GtkSourceMark"/>
+    </signal>
+  </class>
+  <class name="GtkSourcePrintCompositor" get-type="gtk_source_print_compositor_get_type" parents="GObject">
+    <property name="buffer" type="GtkSourceBuffer" flags="235"/>
+    <property name="tab-width" type="guint" flags="227"/>
+    <property name="wrap-mode" type="GtkWrapMode" flags="227"/>
+    <property name="highlight-syntax" type="gboolean" flags="227"/>
+    <property name="print-line-numbers" type="guint" flags="227"/>
+    <property name="print-header" type="gboolean" flags="227"/>
+    <property name="print-footer" type="gboolean" flags="227"/>
+    <property name="body-font-name" type="gchararray" flags="227"/>
+    <property name="line-numbers-font-name" type="gchararray" flags="227"/>
+    <property name="header-font-name" type="gchararray" flags="227"/>
+    <property name="footer-font-name" type="gchararray" flags="227"/>
+    <property name="n-pages" type="gint" flags="225"/>
+  </class>
+  <class name="GtkSourceRegion" get-type="gtk_source_region_get_type" parents="GObject">
+    <property name="buffer" type="GtkTextBuffer" flags="235"/>
+  </class>
+  <class name="GtkSourceSearchContext" get-type="gtk_source_search_context_get_type" parents="GObject">
+    <property name="buffer" type="GtkSourceBuffer" flags="235"/>
+    <property name="settings" type="GtkSourceSearchSettings" flags="231"/>
+    <property name="highlight" type="gboolean" flags="231"/>
+    <property name="match-style" type="GtkSourceStyle" flags="231"/>
+    <property name="occurrences-count" type="gint" flags="225"/>
+    <property name="regex-error" type="gpointer" flags="225"/>
+  </class>
+  <class name="GtkSourceSearchSettings" get-type="gtk_source_search_settings_get_type" parents="GObject">
+    <property name="search-text" type="gchararray" flags="231"/>
+    <property name="case-sensitive" type="gboolean" flags="231"/>
+    <property name="at-word-boundaries" type="gboolean" flags="231"/>
+    <property name="wrap-around" type="gboolean" flags="231"/>
+    <property name="regex-enabled" type="gboolean" flags="231"/>
+  </class>
+  <class name="GtkSourceSpaceDrawer" get-type="gtk_source_space_drawer_get_type" parents="GObject">
+    <property name="enable-matrix" type="gboolean" flags="231"/>
+    <property name="matrix" type="GVariant" flags="231"/>
+  </class>
+  <class name="GtkSourceStyle" get-type="gtk_source_style_get_type" parents="GObject">
+    <property name="line-background" type="gchararray" flags="11"/>
+    <property name="line-background-set" type="gboolean" flags="11"/>
+    <property name="background" type="gchararray" flags="11"/>
+    <property name="background-set" type="gboolean" flags="11"/>
+    <property name="foreground" type="gchararray" flags="11"/>
+    <property name="foreground-set" type="gboolean" flags="11"/>
+    <property name="bold" type="gboolean" flags="11"/>
+    <property name="bold-set" type="gboolean" flags="11"/>
+    <property name="italic" type="gboolean" flags="11"/>
+    <property name="italic-set" type="gboolean" flags="11"/>
+    <property name="underline" type="gboolean" flags="-2147483637"/>
+    <property name="pango-underline" type="PangoUnderline" flags="11"/>
+    <property name="underline-set" type="gboolean" flags="11"/>
+    <property name="strikethrough" type="gboolean" flags="11"/>
+    <property name="strikethrough-set" type="gboolean" flags="11"/>
+    <property name="scale" type="gchararray" flags="11"/>
+    <property name="scale-set" type="gboolean" flags="11"/>
+    <property name="underline-color" type="gchararray" flags="11"/>
+    <property name="underline-color-set" type="gboolean" flags="11"/>
+  </class>
+  <class name="GtkSourceStyleScheme" get-type="gtk_source_style_scheme_get_type" parents="GObject">
+    <property name="id" type="gchararray" flags="11"/>
+    <property name="name" type="gchararray" flags="1"/>
+    <property name="description" type="gchararray" flags="1"/>
+    <property name="filename" type="gchararray" flags="1"/>
+  </class>
+  <interface name="GtkSourceStyleSchemeChooser" get-type="gtk_source_style_scheme_chooser_get_type">
+    <property name="style-scheme" type="GtkSourceStyleScheme" flags="3"/>
+  </interface>
+  <class name="GtkSourceStyleSchemeChooserButton" get-type="gtk_source_style_scheme_chooser_button_get_type" parents="GtkButton,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkActionable"/>
+    <implements name="GtkActivatable"/>
+    <implements name="GtkSourceStyleSchemeChooser"/>
+  </class>
+  <class name="GtkSourceStyleSchemeChooserWidget" get-type="gtk_source_style_scheme_chooser_widget_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkSourceStyleSchemeChooser"/>
+  </class>
+  <class name="GtkSourceStyleSchemeManager" get-type="gtk_source_style_scheme_manager_get_type" parents="GObject">
+    <property name="search-path" type="GStrv" flags="3"/>
+    <property name="scheme-ids" type="GStrv" flags="1"/>
+  </class>
+  <class name="GtkSourceTag" get-type="gtk_source_tag_get_type" parents="GtkTextTag,GObject">
+    <property name="draw-spaces" type="gboolean" flags="227"/>
+    <property name="draw-spaces-set" type="gboolean" flags="227"/>
+  </class>
+  <interface name="GtkSourceUndoManager" get-type="gtk_source_undo_manager_get_type">
+    <signal name="can-undo-changed" return="void" when="last" action="1">
+    </signal>
+    <signal name="can-redo-changed" return="void" when="last" action="1">
+    </signal>
+  </interface>
+  <enum name="GtkSourceBracketMatchType" get-type="gtk_source_bracket_match_type_get_type">
+    <member name="GTK_SOURCE_BRACKET_MATCH_NONE" nick="none" value="0"/>
+    <member name="GTK_SOURCE_BRACKET_MATCH_OUT_OF_RANGE" nick="out-of-range" value="1"/>
+    <member name="GTK_SOURCE_BRACKET_MATCH_NOT_FOUND" nick="not-found" value="2"/>
+    <member name="GTK_SOURCE_BRACKET_MATCH_FOUND" nick="found" value="3"/>
+  </enum>  <enum name="GtkSourceChangeCaseType" get-type="gtk_source_change_case_type_get_type">
+    <member name="GTK_SOURCE_CHANGE_CASE_LOWER" nick="lower" value="0"/>
+    <member name="GTK_SOURCE_CHANGE_CASE_UPPER" nick="upper" value="1"/>
+    <member name="GTK_SOURCE_CHANGE_CASE_TOGGLE" nick="toggle" value="2"/>
+    <member name="GTK_SOURCE_CHANGE_CASE_TITLE" nick="title" value="3"/>
+  </enum>  <flags name="GtkSourceSortFlags" get-type="gtk_source_sort_flags_get_type">
+    <member name="GTK_SOURCE_SORT_FLAGS_NONE" nick="none" value="0"/>
+    <member name="GTK_SOURCE_SORT_FLAGS_CASE_SENSITIVE" nick="case-sensitive" value="1"/>
+    <member name="GTK_SOURCE_SORT_FLAGS_REVERSE_ORDER" nick="reverse-order" value="2"/>
+    <member name="GTK_SOURCE_SORT_FLAGS_REMOVE_DUPLICATES" nick="remove-duplicates" value="4"/>
+  </flags>
+  <enum name="GtkSourceCompletionError" get-type="gtk_source_completion_error_get_type">
+    <member name="GTK_SOURCE_COMPLETION_ERROR_ALREADY_BOUND" nick="already-bound" value="0"/>
+    <member name="GTK_SOURCE_COMPLETION_ERROR_NOT_BOUND" nick="not-bound" value="1"/>
+  </enum>  <flags name="GtkSourceCompletionActivation" get-type="gtk_source_completion_activation_get_type">
+    <member name="GTK_SOURCE_COMPLETION_ACTIVATION_NONE" nick="none" value="0"/>
+    <member name="GTK_SOURCE_COMPLETION_ACTIVATION_INTERACTIVE" nick="interactive" value="1"/>
+    <member name="GTK_SOURCE_COMPLETION_ACTIVATION_USER_REQUESTED" nick="user-requested" value="2"/>
+  </flags>
+  <enum name="GtkSourceNewlineType" get-type="gtk_source_newline_type_get_type">
+    <member name="GTK_SOURCE_NEWLINE_TYPE_LF" nick="lf" value="0"/>
+    <member name="GTK_SOURCE_NEWLINE_TYPE_CR" nick="cr" value="1"/>
+    <member name="GTK_SOURCE_NEWLINE_TYPE_CR_LF" nick="cr-lf" value="2"/>
+  </enum>  <enum name="GtkSourceCompressionType" get-type="gtk_source_compression_type_get_type">
+    <member name="GTK_SOURCE_COMPRESSION_TYPE_NONE" nick="none" value="0"/>
+    <member name="GTK_SOURCE_COMPRESSION_TYPE_GZIP" nick="gzip" value="1"/>
+  </enum>  <enum name="GtkSourceFileLoaderError" get-type="gtk_source_file_loader_error_get_type">
+    <member name="GTK_SOURCE_FILE_LOADER_ERROR_TOO_BIG" nick="too-big" value="0"/>
+    <member name="GTK_SOURCE_FILE_LOADER_ERROR_ENCODING_AUTO_DETECTION_FAILED" nick="encoding-auto-detection-failed" value="1"/>
+    <member name="GTK_SOURCE_FILE_LOADER_ERROR_CONVERSION_FALLBACK" nick="conversion-fallback" value="2"/>
+  </enum>  <enum name="GtkSourceFileSaverError" get-type="gtk_source_file_saver_error_get_type">
+    <member name="GTK_SOURCE_FILE_SAVER_ERROR_INVALID_CHARS" nick="invalid-chars" value="0"/>
+    <member name="GTK_SOURCE_FILE_SAVER_ERROR_EXTERNALLY_MODIFIED" nick="externally-modified" value="1"/>
+  </enum>  <flags name="GtkSourceFileSaverFlags" get-type="gtk_source_file_saver_flags_get_type">
+    <member name="GTK_SOURCE_FILE_SAVER_FLAGS_NONE" nick="none" value="0"/>
+    <member name="GTK_SOURCE_FILE_SAVER_FLAGS_IGNORE_INVALID_CHARS" nick="ignore-invalid-chars" value="1"/>
+    <member name="GTK_SOURCE_FILE_SAVER_FLAGS_IGNORE_MODIFICATION_TIME" nick="ignore-modification-time" value="2"/>
+    <member name="GTK_SOURCE_FILE_SAVER_FLAGS_CREATE_BACKUP" nick="create-backup" value="4"/>
+  </flags>
+  <flags name="GtkSourceGutterRendererState" get-type="gtk_source_gutter_renderer_state_get_type">
+    <member name="GTK_SOURCE_GUTTER_RENDERER_STATE_NORMAL" nick="normal" value="0"/>
+    <member name="GTK_SOURCE_GUTTER_RENDERER_STATE_CURSOR" nick="cursor" value="1"/>
+    <member name="GTK_SOURCE_GUTTER_RENDERER_STATE_PRELIT" nick="prelit" value="2"/>
+    <member name="GTK_SOURCE_GUTTER_RENDERER_STATE_SELECTED" nick="selected" value="4"/>
+  </flags>
+  <enum name="GtkSourceGutterRendererAlignmentMode" get-type="gtk_source_gutter_renderer_alignment_mode_get_type">
+    <member name="GTK_SOURCE_GUTTER_RENDERER_ALIGNMENT_MODE_CELL" nick="cell" value="0"/>
+    <member name="GTK_SOURCE_GUTTER_RENDERER_ALIGNMENT_MODE_FIRST" nick="first" value="1"/>
+    <member name="GTK_SOURCE_GUTTER_RENDERER_ALIGNMENT_MODE_LAST" nick="last" value="2"/>
+  </enum>  <flags name="GtkSourceSpaceTypeFlags" get-type="gtk_source_space_type_flags_get_type">
+    <member name="GTK_SOURCE_SPACE_TYPE_NONE" nick="none" value="0"/>
+    <member name="GTK_SOURCE_SPACE_TYPE_SPACE" nick="space" value="1"/>
+    <member name="GTK_SOURCE_SPACE_TYPE_TAB" nick="tab" value="2"/>
+    <member name="GTK_SOURCE_SPACE_TYPE_NEWLINE" nick="newline" value="4"/>
+    <member name="GTK_SOURCE_SPACE_TYPE_NBSP" nick="nbsp" value="8"/>
+    <member name="GTK_SOURCE_SPACE_TYPE_ALL" nick="all" value="15"/>
+  </flags>
+  <flags name="GtkSourceSpaceLocationFlags" get-type="gtk_source_space_location_flags_get_type">
+    <member name="GTK_SOURCE_SPACE_LOCATION_NONE" nick="none" value="0"/>
+    <member name="GTK_SOURCE_SPACE_LOCATION_LEADING" nick="leading" value="1"/>
+    <member name="GTK_SOURCE_SPACE_LOCATION_INSIDE_TEXT" nick="inside-text" value="2"/>
+    <member name="GTK_SOURCE_SPACE_LOCATION_TRAILING" nick="trailing" value="4"/>
+    <member name="GTK_SOURCE_SPACE_LOCATION_ALL" nick="all" value="7"/>
+  </flags>
+  <enum name="GtkSourceViewGutterPosition" get-type="gtk_source_view_gutter_position_get_type">
+    <member name="GTK_SOURCE_VIEW_GUTTER_POSITION_LINES" nick="lines" value="-30"/>
+    <member name="GTK_SOURCE_VIEW_GUTTER_POSITION_MARKS" nick="marks" value="-20"/>
+  </enum>  <enum name="GtkSourceSmartHomeEndType" get-type="gtk_source_smart_home_end_type_get_type">
+    <member name="GTK_SOURCE_SMART_HOME_END_DISABLED" nick="disabled" value="0"/>
+    <member name="GTK_SOURCE_SMART_HOME_END_BEFORE" nick="before" value="1"/>
+    <member name="GTK_SOURCE_SMART_HOME_END_AFTER" nick="after" value="2"/>
+    <member name="GTK_SOURCE_SMART_HOME_END_ALWAYS" nick="always" value="3"/>
+  </enum>  <flags name="GtkSourceDrawSpacesFlags" get-type="gtk_source_draw_spaces_flags_get_type">
+    <member name="GTK_SOURCE_DRAW_SPACES_SPACE" nick="space" value="1"/>
+    <member name="GTK_SOURCE_DRAW_SPACES_TAB" nick="tab" value="2"/>
+    <member name="GTK_SOURCE_DRAW_SPACES_NEWLINE" nick="newline" value="4"/>
+    <member name="GTK_SOURCE_DRAW_SPACES_NBSP" nick="nbsp" value="8"/>
+    <member name="GTK_SOURCE_DRAW_SPACES_LEADING" nick="leading" value="16"/>
+    <member name="GTK_SOURCE_DRAW_SPACES_TEXT" nick="text" value="32"/>
+    <member name="GTK_SOURCE_DRAW_SPACES_TRAILING" nick="trailing" value="64"/>
+    <member name="GTK_SOURCE_DRAW_SPACES_ALL" nick="all" value="127"/>
+  </flags>
+  <enum name="GtkSourceBackgroundPatternType" get-type="gtk_source_background_pattern_type_get_type">
+    <member name="GTK_SOURCE_BACKGROUND_PATTERN_TYPE_NONE" nick="none" value="0"/>
+    <member name="GTK_SOURCE_BACKGROUND_PATTERN_TYPE_GRID" nick="grid" value="1"/>
+  </enum>  <error-quark function="gtk_source_completion_error_quark" domain="gtk-source-completion-error-quark"/>
+  <error-quark function="gtk_source_file_loader_error_quark" domain="gtk-source-file-loader-error"/>
+  <error-quark function="gtk_source_file_saver_error_quark" domain="gtk-source-file-saver-error"/>
+</dump>
