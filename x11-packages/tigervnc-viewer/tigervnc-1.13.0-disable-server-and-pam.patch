@@ -34,14 +34,14 @@ See https://bugs.gentoo.org/852830
 --- a/common/rfb/CMakeLists.txt
 +++ b/common/rfb/CMakeLists.txt
 @@ -75,7 +75,7 @@
- 
- set(RFB_LIBRARIES ${JPEG_LIBRARIES} ${PIXMAN_LIBRARY} os rdr)
+   target_sources(rfb PRIVATE WinPasswdValidator.cxx)
+ endif(WIN32)
  
 -if(UNIX AND NOT APPLE)
 +if(BUILD_SERVER AND UNIX AND NOT APPLE)
-   set(RFB_SOURCES ${RFB_SOURCES} UnixPasswordValidator.cxx
-     UnixPasswordValidator.h pam.c pam.h)
-   set(RFB_LIBRARIES ${RFB_LIBRARIES} ${PAM_LIBS})
+   target_sources(rfb PRIVATE UnixPasswordValidator.cxx pam.c)
+   target_link_libraries(rfb ${PAM_LIBS})
+ endif()
 --- a/unix/CMakeLists.txt
 +++ b/unix/CMakeLists.txt
 @@ -1,6 +1,8 @@
