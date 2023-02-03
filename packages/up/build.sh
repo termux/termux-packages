@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Helps interactively and incrementally explore textual da
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.4
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/akavel/up
 TERMUX_PKG_BUILD_IN_SRC=true
 

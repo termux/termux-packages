@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A Trojan proxy written in Go. An unidentifiable mechanis
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.10.6"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/p4gefau1t/trojan-go/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=925f02647dda944813f1eab0b71eac98b83eb5964ef5a6f63e89bc7eb4486c1f
 TERMUX_PKG_BUILD_IN_SRC=true

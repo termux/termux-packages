@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A terminal based graphical activity monitor inspired by 
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@medzikuser"
 TERMUX_PKG_VERSION="4.2.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/xxxserxxx/gotop/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=e9d9041903acb6bd3ffe94e0a02e69eea53f1128274da1bfe00fe44331ccceb1
 TERMUX_PKG_AUTO_UPDATE=true
