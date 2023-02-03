@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Jump helps you navigate in shell faster by learning your
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.51.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/gsamokovarov/jump/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=ce297cada71e1dca33cd7759e55b28518d2bf317cdced1f3b3f79f40fa1958b5
 

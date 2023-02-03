@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://github.com/ProtonMail/proton-bridge
 TERMUX_PKG_DESCRIPTION="ProtonMail Bridge application"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_VERSION=2.3.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/ProtonMail/proton-bridge
 TERMUX_PKG_GIT_BRANCH=br-${TERMUX_PKG_VERSION}
 TERMUX_PKG_MAINTAINER="Radomír Polách <rp@t4d.cz>"

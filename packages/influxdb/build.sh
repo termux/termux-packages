@@ -6,6 +6,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # pretty much different from that for 1.x.
 _GIT_BRANCH=1.8
 TERMUX_PKG_VERSION=${_GIT_BRANCH}.10
+TERMUX_PKG_REVISION=1
 _COMMIT=688e697c51fd5353725da078555adbeff0363d01
 TERMUX_PKG_SRCURL=https://github.com/influxdata/influxdb/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=4f53c61f548bab7cb805af0d02586263d9a348dc18baf90efb142b029e2e7097

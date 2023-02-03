@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="A terminal UI for tshark, inspired by Wireshark"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.4.0
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=git+https://github.com/gcla/termshark
 TERMUX_PKG_DEPENDS="tshark"
 
