@@ -1,27 +1,39 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/apache/arrow
-TERMUX_PKG_DESCRIPTION="Python library for Apache Arrow"
+TERMUX_PKG_DESCRIPTION="Python bindings for Apache Arrow"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Align the version with `libarrow-cpp` package.
-TERMUX_PKG_VERSION=10.0.1
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=11.0.0
 TERMUX_PKG_SRCURL=https://github.com/apache/arrow/archive/refs/tags/apache-arrow-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=28c3e0402bc1c3c1e047b6e26cedb8d1d89b2b9497d576af24b0b700eef11701
-TERMUX_PKG_DEPENDS="libarrow-cpp, libc++, python"
-TERMUX_PKG_BUILD_DEPENDS="python-numpy"
-TERMUX_PKG_PYTHON_COMMON_DEPS="Cython, wheel"
-
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
--DPYARROW_WITH_DATASET=ON
--DPYARROW_WITH_HDFS=ON
--DPYTHON_EXECUTABLE=python
--DPYTHON_INCLUDE_DIRS=$TERMUX_PREFIX/include/python${TERMUX_PYTHON_VERSION}
--DPYTHON_OTHER_LIBS=
--DNUMPY_INCLUDE_DIRS=$TERMUX_PYTHON_HOME/site-packages/numpy/core/include
--DARROW_PKG_CONFIG_INCLUDEDIR=$TERMUX_PREFIX/include
--DARROW_PKG_CONFIG_LIBDIR=$TERMUX_PREFIX/lib
-"
+TERMUX_PKG_SHA256=4a8c0c3d5b39ca81f4a636a41863f1cf5e0ed199f994bf5ead0854ca037eb741
+TERMUX_PKG_DEPENDS="libarrow-cpp (>= ${TERMUX_PKG_VERSION}), libc++, python, python-numpy"
+TERMUX_PKG_PYTHON_COMMON_DEPS="Cython, numpy, wheel"
+TERMUX_PKG_PROVIDES="python-pyarrow"
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
-	TERMUX_PKG_SRCDIR+="/python/pyarrow/src"
+	echo "Applying setup.py.diff"
+	sed -e "s|@VERSION@|${TERMUX_PKG_VERSION#*:}|g" \
+		$TERMUX_PKG_BUILDER_DIR/setup.py.diff \
+		| patch --silent -p1
+
+	TERMUX_PKG_SRCDIR+="/python"
+	TERMUX_PKG_BUILDDIR="$TERMUX_PKG_SRCDIR"
+
+	export PYARROW_CMAKE_OPTIONS="
+		-DCMAKE_PREFIX_PATH=$TERMUX_PREFIX/lib/cmake
+		-DNUMPY_INCLUDE_DIRS=$TERMUX_PYTHON_HOME/site-packages/numpy/core/include
+		"
+	export PYARROW_WITH_DATASET=1
+	export PYARROW_WITH_HDFS=1
+}
+
+termux_step_configure() {
+	# cmake is not intended to be invoked directly.
+	termux_setup_cmake
+	termux_setup_ninja
+}
+
+termux_step_make_install() {
+	pip install --no-deps --no-build-isolation . --prefix $TERMUX_PREFIX
 }
