@@ -19,6 +19,7 @@ PACKAGES+=" autoconf"
 PACKAGES+=" automake"
 PACKAGES+=" bc"
 PACKAGES+=" bison"
+PACKAGES+=" bsdtar"                     # Needed to create pacman packages
 PACKAGES+=" cmake"
 PACKAGES+=" ed"
 PACKAGES+=" flex"
@@ -42,7 +43,7 @@ PACKAGES+=" texinfo"
 PACKAGES+=" uuid-utils"
 PACKAGES+=" valac"
 PACKAGES+=" xmlto"                      # Needed by git's manpage generation
-PACKAGES+=" bsdtar"          # Needed to create pacman packages
+PACKAGES+=" zip"
 
 apt update
 apt dist-upgrade -y
