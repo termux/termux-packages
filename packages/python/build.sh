@@ -1,6 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://python.org/
 TERMUX_PKG_DESCRIPTION="Python 3 programming language intended to enable clear programs"
-TERMUX_PKG_LICENSE="PythonPL"
+# License: PSF-2.0
+TERMUX_PKG_LICENSE="custom"
+TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 _MAJOR_VERSION=3.11
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.1
@@ -8,9 +10,8 @@ TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=85879192f2cffd56cb16c092905949ebf3e5e394b7f764723529637901dfb58f
 TERMUX_PKG_DEPENDS="gdbm, libandroid-posix-semaphore, libandroid-support, libbz2, libcrypt, libexpat, libffi, liblzma, libsqlite, ncurses, ncurses-ui-libs, openssl, readline, zlib"
-TERMUX_PKG_RECOMMENDS="clang, make, pkg-config, python-pip"
+TERMUX_PKG_RECOMMENDS="python-pip"
 TERMUX_PKG_SUGGESTS="python-tkinter"
-# For python-pip, see https://github.com/termux/termux-packages/pull/13611.
 TERMUX_PKG_BREAKS="python2 (<= 2.7.15), python-dev"
 TERMUX_PKG_REPLACES="python-dev"
 # Let "python3" will be alias to this package.
@@ -68,6 +69,8 @@ termux_step_pre_configure() {
 	else
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-build-python=python$_MAJOR_VERSION"
 	fi
+
+	export LIBCRYPT_LIBS="-lcrypt"
 }
 
 termux_step_post_make_install() {
