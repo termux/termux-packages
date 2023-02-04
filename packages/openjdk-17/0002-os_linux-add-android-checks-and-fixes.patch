@@ -1,0 +1,43 @@
+From 5398fe8adfa82d34f801f7861968ca2d6495fdc4 Mon Sep 17 00:00:00 2001
+From: Duy Tran Khanh <40482367+khanhduytran0@users.noreply.github.com>
+Date: Sun, 6 Jun 2021 20:11:11 +0700
+Subject: [PATCH] os_linux: add android checks and fixes
+
+---
+ src/hotspot/os/linux/os_linux.cpp | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/src/hotspot/os/linux/os_linux.cpp b/src/hotspot/os/linux/os_linux.cpp
+index ae0c73dcb711..e8e66887cd5a 100644
+--- a/src/hotspot/os/linux/os_linux.cpp
++++ b/src/hotspot/os/linux/os_linux.cpp
+@@ -132,7 +132,7 @@
+ // for timer info max values which include all bits
+ #define ALL_64_BITS CONST64(0xFFFFFFFFFFFFFFFF)
+ 
+-#ifdef MUSL_LIBC
++#if defined(MUSL_LIBC) || defined(__ANDROID__)
+ // dlvsym is not a part of POSIX
+ // and musl libc doesn't implement it.
+ static void *dlvsym(void *handle,
+@@ -515,6 +515,7 @@ extern "C" void breakpoint() {
+ // detecting pthread library
+ 
+ void os::Linux::libpthread_init() {
++#ifndef __ANDROID__
+   // Save glibc and pthread version strings.
+ #if !defined(_CS_GNU_LIBC_VERSION) || \
+     !defined(_CS_GNU_LIBPTHREAD_VERSION)
+@@ -539,6 +540,9 @@ void os::Linux::libpthread_init() {
+   confstr(_CS_GNU_LIBPTHREAD_VERSION, str, n);
+   os::Linux::set_libpthread_version(str);
+ #endif
++#else
++  os::Linux::set_libpthread_version("NPTL");
++#endif
+ }
+ 
+ /////////////////////////////////////////////////////////////////////////////
+-- 
+2.44.0
+

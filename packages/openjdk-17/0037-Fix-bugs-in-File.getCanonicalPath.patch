@@ -1,5 +1,7 @@
+From d7ca77f10800afc2485fe162869cf23b4d0c90f7 Mon Sep 17 00:00:00 2001
 From: agnostic-apollo <agnosticapollo@gmail.com>
-Subject: Fix bugs in File.getCanonicalPath()
+Date: Thu, 28 Mar 2024 18:46:02 +0100
+Subject: [PATCH] Fix bugs in File.getCanonicalPath()
 
 1. If path length is `>= PATH_MAX` (4096) characters, return error.
 2. If any path component length is `> NAME_MAX` (255) characters, return
@@ -13,6 +15,7 @@ Subject: Fix bugs in File.getCanonicalPath()
  1 file changed, 87 insertions(+), 15 deletions(-)
 
 diff --git a/src/java.base/unix/native/libjava/canonicalize_md.c b/src/java.base/unix/native/libjava/canonicalize_md.c
+index 2bb896bf32d7..7210f305282f 100644
 --- a/src/java.base/unix/native/libjava/canonicalize_md.c
 +++ b/src/java.base/unix/native/libjava/canonicalize_md.c
 @@ -33,6 +33,7 @@
@@ -218,3 +221,5 @@ diff --git a/src/java.base/unix/native/libjava/canonicalize_md.c b/src/java.base
      }
  }
 -- 
+2.44.0
+

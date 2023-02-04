@@ -1,0 +1,37 @@
+From 5ac1dc92c8abd3289bd40da1b4e4793019e8a64b Mon Sep 17 00:00:00 2001
+From: Henrik Grimler <grimler@termux.dev>
+Date: Sun, 5 Feb 2023 09:14:50 +0100
+Subject: [PATCH] os: linux: add getloadavg implementation for android
+
+---
+ src/hotspot/os/linux/os_linux.cpp | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/src/hotspot/os/linux/os_linux.cpp b/src/hotspot/os/linux/os_linux.cpp
+index e815b0afd7c1..06a5d0bf8245 100644
+--- a/src/hotspot/os/linux/os_linux.cpp
++++ b/src/hotspot/os/linux/os_linux.cpp
+@@ -5234,7 +5234,20 @@ bool os::is_thread_cpu_time_supported() {
+ // Linux doesn't yet have a (official) notion of processor sets,
+ // so just return the system wide load average.
+ int os::loadavg(double loadavg[], int nelem) {
++#if defined(__ANDROID__) && __ANDROID_API__ < 29
++  if (nelem < 0) return -1;
++  if (nelem > 3) nelem = 3;
++
++  struct sysinfo si;
++  if (sysinfo(&si) == -1) return -1;
++
++  for (int i = 0; i < nelem; ++i) {
++    loadavg[i] = (double)(si.loads[i]) / (double)(1 << SI_LOAD_SHIFT);
++  }
++  return nelem;
++#else
+   return ::getloadavg(loadavg, nelem);
++#endif
+ }
+ 
+ void os::pause() {
+-- 
+2.44.0
+

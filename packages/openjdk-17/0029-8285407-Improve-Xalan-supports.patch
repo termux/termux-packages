@@ -1,4 +1,4 @@
-From 41ef2b249073450172e11163a4d05762364b1297 Mon Sep 17 00:00:00 2001
+From ab663ee74d6337dc7fdf6c986c41a241f1d3c2dc Mon Sep 17 00:00:00 2001
 From: Joe Wang <joehw@openjdk.org>
 Date: Fri, 13 May 2022 02:02:26 +0000
 Subject: [PATCH] 8285407: Improve Xalan supports
@@ -21,7 +21,7 @@ index 303b2b8ad8d8..ed4ce0948ed9 100644
   */
  /*
   * Licensed to the Apache Software Foundation (ASF) under one or more
-@@ -26,6 +25,7 @@
+@@ -26,6 +25,7 @@ import java.io.DataOutputStream;
  import java.io.IOException;
  
  import com.sun.org.apache.bcel.internal.Const;
@@ -29,7 +29,7 @@ index 303b2b8ad8d8..ed4ce0948ed9 100644
  
  /**
   * This class represents the constant pool, i.e., a table of constants, of
-@@ -37,6 +37,7 @@
+@@ -37,6 +37,7 @@ import com.sun.org.apache.bcel.internal.Const;
  
   * @see     Constant
   * @see     com.sun.org.apache.bcel.internal.generic.ConstantPoolGen
@@ -37,7 +37,7 @@ index 303b2b8ad8d8..ed4ce0948ed9 100644
   */
  public class ConstantPool implements Cloneable, Node {
  
-@@ -222,8 +223,16 @@ public String constantToString( final int index, final byte tag ) throws ClassFo
+@@ -222,8 +223,16 @@ public class ConstantPool implements Cloneable, Node {
       * @throws IOException
       */
      public void dump( final DataOutputStream file ) throws IOException {
@@ -67,7 +67,7 @@ index a1dadbfc4b61..806b40da1ed6 100644
   */
  /*
   * Licensed to the Apache Software Foundation (ASF) under one or more
-@@ -50,10 +50,10 @@
+@@ -50,10 +50,10 @@ import com.sun.org.apache.bcel.internal.classfile.ConstantUtf8;
   * JVM and that Double and Long constants need two slots.
   *
   * @see Constant
@@ -80,7 +80,7 @@ index a1dadbfc4b61..806b40da1ed6 100644
      private static final int DEFAULT_BUFFER_SIZE = 256;
      private int size;
      private Constant[] constants;
-@@ -83,7 +83,7 @@ private static class Index {
+@@ -83,7 +83,7 @@ public class ConstantPoolGen {
      public ConstantPoolGen(final Constant[] cs) {
          final StringBuilder sb = new StringBuilder(DEFAULT_BUFFER_SIZE);
  
@@ -89,7 +89,7 @@ index a1dadbfc4b61..806b40da1ed6 100644
          constants = new Constant[size];
  
          System.arraycopy(cs, 0, constants, 0, cs.length);
-@@ -212,9 +212,18 @@ public ConstantPoolGen() {
+@@ -212,9 +212,18 @@ public class ConstantPoolGen {
      /** Resize internal array of constants.
       */
      protected void adjustSize() {
@@ -108,3 +108,6 @@ index a1dadbfc4b61..806b40da1ed6 100644
              constants = new Constant[size];
              System.arraycopy(cs, 0, constants, 0, index);
          }
+-- 
+2.44.0
+

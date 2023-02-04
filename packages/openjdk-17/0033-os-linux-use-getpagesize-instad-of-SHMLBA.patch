@@ -1,0 +1,35 @@
+From d8ac751229b8d4795a04f1d8ec08d03d8916b5f9 Mon Sep 17 00:00:00 2001
+From: Henrik Grimler <grimler@termux.dev>
+Date: Sun, 5 Feb 2023 09:21:57 +0100
+Subject: [PATCH] os: linux: use getpagesize() instad of SHMLBA
+
+Since the latter is not defined on android.
+---
+ src/hotspot/os/linux/os_linux.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/hotspot/os/linux/os_linux.cpp b/src/hotspot/os/linux/os_linux.cpp
+index 06a5d0bf8245..4a48a8a69f76 100644
+--- a/src/hotspot/os/linux/os_linux.cpp
++++ b/src/hotspot/os/linux/os_linux.cpp
+@@ -3912,7 +3912,7 @@ void os::large_page_init() {
+ static char* shmat_with_alignment(int shmid, size_t bytes, size_t alignment) {
+   assert(is_aligned(bytes, alignment), "Must be divisible by the alignment");
+ 
+-  if (!is_aligned(alignment, SHMLBA)) {
++  if (!is_aligned(alignment, getpagesize())) {
+     assert(false, "Code below assumes that alignment is at least SHMLBA aligned");
+     return NULL;
+   }
+@@ -3948,7 +3948,7 @@ static char* shmat_with_alignment(int shmid, size_t bytes, size_t alignment) {
+ }
+ 
+ static char* shmat_at_address(int shmid, char* req_addr) {
+-  if (!is_aligned(req_addr, SHMLBA)) {
++  if (!is_aligned(req_addr, getpagesize())) {
+     assert(false, "Requested address needs to be SHMLBA aligned");
+     return NULL;
+   }
+-- 
+2.44.0
+
