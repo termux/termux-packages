@@ -50,7 +50,7 @@ termux_step_pre_configure() {
 	CC=$TERMUX_PKG_SRCDIR/wrappers-bin/android-wrapped-clang
 	CXX=$TERMUX_PKG_SRCDIR/wrappers-bin/android-wrapped-clang++
 
-	cat <<- EOF > $TERMUX_STANDALONE_TOOLCHAIN/devkit.info
+	cat <<- EOF > $TERMUX_PKG_TMPDIR/devkit.info
 	DEVKIT_NAME="Android"
 	DEVKIT_TOOLCHAIN_PATH="\$DEVKIT_ROOT"
 	DEVKIT_SYSROOT="\$DEVKIT_ROOT/sysroot"
@@ -75,7 +75,7 @@ termux_step_configure() {
 		--enable-option-checking=fatal \
 		--with-toolchain-type=gcc \
 		--with-jvm-variants=server \
-		--with-devkit="$TERMUX_STANDALONE_TOOLCHAIN" \
+		--with-devkit="$TERMUX_PKG_TMPDIR" \
 		--with-debug-level=release \
 		--with-cups-include="$TERMUX_PREFIX/include" \
 		--with-fontconfig-include="$TERMUX_PREFIX/include" \
