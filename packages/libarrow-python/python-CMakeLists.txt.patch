@@ -1,0 +1,19 @@
+--- a/python/CMakeLists.txt
++++ b/python/CMakeLists.txt
+@@ -260,6 +260,7 @@
+ 
+ # Python and Numpy libraries
+ find_package(Python3Alt REQUIRED)
++include_directories(SYSTEM ${NUMPY_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})
+ include(UseCython)
+ 
+ # PyArrow C++
+@@ -369,7 +370,7 @@
+   target_precompile_headers(arrow_python PUBLIC
+                             "$<$<COMPILE_LANGUAGE:CXX>:arrow/python/pch.h>")
+ endif()
+-target_link_libraries(arrow_python PUBLIC ${PYARROW_CPP_LINK_LIBS} Python3::NumPy)
++target_link_libraries(arrow_python PUBLIC ${PYARROW_CPP_LINK_LIBS})
+ target_compile_definitions(arrow_python PRIVATE ARROW_PYTHON_EXPORTING)
+ install(TARGETS arrow_python
+         ARCHIVE DESTINATION .
