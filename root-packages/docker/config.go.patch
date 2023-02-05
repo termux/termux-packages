@@ -35,6 +35,6 @@
  	// Can't find latest config file so check for the old one
 -	filename = filepath.Join(getHomeDir(), oldConfigfile)
 +	filename = filepath.Join("@TERMUX_HOME@/.docker", oldConfigfile)
- 	if file, err := os.Open(filename); err == nil {
+ 	if _, err := os.Stat(filename); err == nil {
  		printLegacyFileWarning = true
- 		defer file.Close()
+ 	}
