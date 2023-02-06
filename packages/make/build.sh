@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Update both make and make-guile to the same version in one PR.
 TERMUX_PKG_VERSION=4.4
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/make/make-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=581f4d4e872da74b3941c874215898a7d35802f03732bdccee1d4a7979105d18
 TERMUX_PKG_BREAKS="make-dev"
