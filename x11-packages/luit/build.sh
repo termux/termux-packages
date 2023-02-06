@@ -13,3 +13,4 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 cf_cv_working_poll=yes
 --with-locale-alias=$TERMUX_PREFIX/share/X11/locale/locale.alias
 "
+TERMUX_DEBUG_BUILD=true
