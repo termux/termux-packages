@@ -1,0 +1,21 @@
+In `make` 4.4, `fifo` is added and has been default value of `jobserver-style` option,
+and error EAGAIN will randomly happen if `pselect` is disabled. In Termux, `pselect` in
+make is disabled to solve issue #2983.
+
+Error msg is like `make: *** read jobs pipe: Try again.  Stop.`. It is originally happened
+on `termux-docker`, but can be reproduced on AVD (API 24, armv7a).
+
+This issue is fixed upstream when porting z/OS.
+
+Part of https://github.com/mirror/make/commit/11444fb001cf57f32fb5022cd934c3cf489e66b2
+--- a/src/posixos.c
++++ b/src/posixos.c
+@@ -612,7 +612,7 @@
+      go back and reap_children(), and try again.  */
+   errno = saved_errno;
+ 
+-  if (errno != EINTR && errno != EBADF)
++  if (errno != EINTR && errno != EBADF && errno != EAGAIN)
+     pfatal_with_name (_("read jobs pipe"));
+ 
+   if (errno == EBADF)
