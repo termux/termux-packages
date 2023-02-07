@@ -7,6 +7,7 @@ _COMMIT_DATE=20221010
 TERMUX_PKG_VERSION=1.2.12-p${_COMMIT_DATE}
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/libsdl-org/SDL_mixer
+TERMUX_PKG_SHA256=473a39b04f1a2ec29a22e3eafaafeee9704129f117044d17c591646648b540cd
 TERMUX_PKG_GIT_BRANCH=SDL-1.2
 TERMUX_PKG_DEPENDS="libflac, libvorbis, sdl"
 
@@ -20,5 +21,10 @@ termux_step_post_get_source() {
 		echo -n " different from what is expected to be; should end"
 		echo " with \"${pdate}\"."
 		return 1
+	fi
+
+	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum)
+	if [[ "${s}" != "${TERMUX_PKG_SHA256}  "* ]]; then
+		termux_error_exit "Checksum mismatch for source files."
 	fi
 }

@@ -7,6 +7,7 @@ _COMMIT_DATE=2021.08.20
 TERMUX_PKG_VERSION=2.2.1p${_COMMIT_DATE//./}
 TERMUX_PKG_REVISION=7
 TERMUX_PKG_SRCURL=git+https://github.com/cruppstahl/upscaledb
+TERMUX_PKG_SHA256=83e26f9f099897f347129470b494487bddf96c3d09ab4747251135d47d8b4256
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="boost, libc++, libsnappy, openssl, zlib"
@@ -29,6 +30,11 @@ termux_step_post_get_source() {
 		echo -n "ERROR: The specified commit date \"$_COMMIT_DATE\""
 		echo " is different from what is expected to be: \"$version\""
 		return 1
+	fi
+
+	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum)
+	if [[ "${s}" != "${TERMUX_PKG_SHA256}  "* ]]; then
+		termux_error_exit "Checksum mismatch for source files."
 	fi
 }
 

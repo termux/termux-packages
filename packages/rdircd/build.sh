@@ -6,6 +6,7 @@ _COMMIT=6e5f541361a1bdecd8f8aab7060cb4fb3d0b1869
 TERMUX_PKG_VERSION=2022.12.28
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/mk-fg/reliable-discord-client-irc-daemon
+TERMUX_PKG_SHA256=77fd6d3c7f0005c689c4ed3ee6522ed32fcfeb9aeb3289995b95e2f40adbad80
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_DEPENDS="python, python-pip"
 TERMUX_PKG_PYTHON_TARGET_DEPS="aiohttp"
@@ -21,6 +22,11 @@ termux_step_post_get_source() {
 		echo -n "ERROR: The specified version \"$TERMUX_PKG_VERSION\""
 		echo " is different from what is expected to be: \"$version\""
 		return 1
+	fi
+
+	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum)
+	if [[ "${s}" != "${TERMUX_PKG_SHA256}  "* ]]; then
+		termux_error_exit "Checksum mismatch for source files."
 	fi
 }
 

@@ -6,6 +6,7 @@ _COMMIT=47ca1d51be2bc1d437261d82157b84fe977ec934
 TERMUX_PKG_VERSION=2022.07.22
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=git+https://gitlab.com/opennota/findimagedupes
+TERMUX_PKG_SHA256=9232ececc4918e07255591512b18ac4cc1bcad0fbf43f095cd59af4ee95d3cf8
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_DEPENDS="file, libc++, libheif, libjpeg-turbo, libpng, libtiff"
 TERMUX_PKG_CONFLICTS="findimagedupes"
@@ -20,6 +21,11 @@ termux_step_post_get_source() {
 		echo -n "ERROR: The specified version \"$TERMUX_PKG_VERSION\""
 		echo " is different from what is expected to be: \"$version\""
 		return 1
+	fi
+
+	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum)
+	if [[ "${s}" != "${TERMUX_PKG_SHA256}  "* ]]; then
+		termux_error_exit "Checksum mismatch for source files."
 	fi
 }
 

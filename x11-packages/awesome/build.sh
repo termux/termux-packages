@@ -6,6 +6,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=ee0663459922a41f57fa2cc936da80d5857eedc9
 TERMUX_PKG_VERSION=2022.12.18
 TERMUX_PKG_SRCURL=git+https://github.com/awesomeWM/awesome
+TERMUX_PKG_SHA256=c934dbc49b7b47655e9c2e435a533664036a62d2adc1249cc362bded1bdf965b
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_DEPENDS="dbus, gdk-pixbuf, glib, libcairo, liblua54, libx11, libxcb, libxdg-basedir, libxkbcommon, lua-lgi, pango, startup-notification, xcb-util, xcb-util-cursor, xcb-util-keysyms, xcb-util-wm, xcb-util-xrm"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -22,6 +23,11 @@ termux_step_post_get_source() {
 		echo -n "ERROR: The specified version \"$TERMUX_PKG_VERSION\""
 		echo " is different from what is expected to be: \"$version\""
 		return 1
+	fi
+
+	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum)
+	if [[ "${s}" != "${TERMUX_PKG_SHA256}  "* ]]; then
+		termux_error_exit "Checksum mismatch for source files."
 	fi
 }
 
