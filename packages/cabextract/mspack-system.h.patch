@@ -1,0 +1,31 @@
+--- a/mspack/system.h
++++ b/mspack/system.h
+@@ -27,19 +27,25 @@
+ #else
+  /* but if no default system wanted, avoid using <string.h> entirely,
+   * to avoid linking to even these standard C library functions */
+-static inline int memcmp(const void *s1, const void *s2, size_t n) {
++static inline int mspack_memcmp(const void *s1, const void *s2, size_t n) {
+     const unsigned char *a = s1, *b = s2;
+     while (n--) if (*a++ != *b++) return a[-1] - b[-1];
+     return 0;
+ }
+-static inline void *memset(void *s, int c, size_t n) {
++#undef memcmp
++#define memcmp mspack_memcmp
++static inline void *mspack_memset(void *s, int c, size_t n) {
+     unsigned char *s2 = s, c2 = (unsigned char) c;
+     while (n--) *s2++ = c2;
+     return s;
+ }
+-static inline size_t strlen(const char *s) {
++#undef memset
++#define memset mspack_memset
++static inline size_t mspack_strlen(const char *s) {
+     size_t c = 0; while (*s++) c++; return c;
+ }
++#undef strlen
++#define strlen mspack_strlen
+ #endif
+ 
+ /* fix for problem with GCC 4 and glibc (thanks to Ville Skytta)
