@@ -1,9 +1,9 @@
 --- ./lib/os.js.orig	2022-05-21 13:09:26.332384353 +0530
 +++ ./lib/os.js	2022-05-21 13:10:15.732384334 +0530
 @@ -45,6 +45,7 @@
- const { validateInt32 } = require('internal/validators');
  
  const {
+   getAvailableParallelism,
 +  getNumCPUs,
    getCPUs,
    getFreeMem,
@@ -29,9 +29,9 @@
        path = StringPrototypeSlice(path, 0, -1);
    }
 @@ -351,6 +356,7 @@
- 
  module.exports = {
    arch,
+   availableParallelism: getAvailableParallelism,
 +  numcpus,
    cpus,
    endianness,
