@@ -7,6 +7,7 @@ _COMMIT_DATE=20220527
 TERMUX_PKG_VERSION=1.2.12-p${_COMMIT_DATE}
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=git+https://github.com/libsdl-org/SDL_image
+TERMUX_PKG_SHA256=ef86f404ff0dc42e66b10209f5b881b66ff594fc0dcce3730083ad829ffe5d73
 TERMUX_PKG_GIT_BRANCH=SDL-1.2
 TERMUX_PKG_DEPENDS="libjpeg-turbo, libpng, libtiff, libwebp, sdl"
 
@@ -20,5 +21,10 @@ termux_step_post_get_source() {
 		echo -n " different from what is expected to be; should end"
 		echo " with \"${pdate}\"."
 		return 1
+	fi
+
+	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum)
+	if [[ "${s}" != "${TERMUX_PKG_SHA256}  "* ]]; then
+		termux_error_exit "Checksum mismatch for source files."
 	fi
 }

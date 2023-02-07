@@ -6,6 +6,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=7cdc0c8d45bdc94fbbc0f0cb349904dbaf8efb56
 TERMUX_PKG_VERSION=2022.12.06
 TERMUX_PKG_SRCURL=git+https://github.com/magiblot/tvision
+TERMUX_PKG_SHA256=f3c9606933fcc182011d26657d0c3f41bed59a90113f9ff34467467e3eedf711
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_DEPENDS="libc++, ncurses"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -23,5 +24,10 @@ termux_step_post_get_source() {
 		echo -n "ERROR: The specified version \"$TERMUX_PKG_VERSION\""
 		echo " is different from what is expected to be: \"$version\""
 		return 1
+	fi
+
+	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum)
+	if [[ "${s}" != "${TERMUX_PKG_SHA256}  "* ]]; then
+		termux_error_exit "Checksum mismatch for source files."
 	fi
 }

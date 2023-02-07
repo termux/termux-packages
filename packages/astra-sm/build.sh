@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=44bcd2852b7f315233267f639730e0e21b9b6c22
 TERMUX_PKG_VERSION=2019.06.19
 TERMUX_PKG_SRCURL=git+https://github.com/OpenVisionE2/astra-sm
+TERMUX_PKG_SHA256=635bcda7c024adee99c540bcae10cba16946c54108817ac2f3a6f36305b29e85
 TERMUX_PKG_GIT_BRANCH=staging
 TERMUX_PKG_DEPENDS="libdvbcsa, liblua53"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -25,6 +26,11 @@ termux_step_post_get_source() {
 		echo -n "ERROR: The specified version \"$TERMUX_PKG_VERSION\""
 		echo " is different from what is expected to be: \"$version\""
 		return 1
+	fi
+
+	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum)
+	if [[ "${s}" != "${TERMUX_PKG_SHA256}  "* ]]; then
+		termux_error_exit "Checksum mismatch for source files."
 	fi
 }
 

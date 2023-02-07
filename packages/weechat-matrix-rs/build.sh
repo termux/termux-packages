@@ -6,6 +6,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=ca23e1745e6e2ba235550360e1def1457e2f3857
 TERMUX_PKG_VERSION=2022.10.04
 TERMUX_PKG_SRCURL="git+https://github.com/poljar/weechat-matrix-rs"
+TERMUX_PKG_SHA256=61d4d307167f274c1ee165a7021d5cda330a2331eb89e8add2f027becf8cae0c
 TERMUX_PKG_GIT_BRANCH=main
 TERMUX_PKG_DEPENDS="weechat, openssl"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -21,6 +22,11 @@ termux_step_post_get_source() {
 		echo -n "ERROR: The specified version \"$TERMUX_PKG_VERSION\""
 		echo " is different from what is expected to be: \"$version\""
 		return 1
+	fi
+
+	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum)
+	if [[ "${s}" != "${TERMUX_PKG_SHA256}  "* ]]; then
+		termux_error_exit "Checksum mismatch for source files."
 	fi
 }
 

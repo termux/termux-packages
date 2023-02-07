@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=d553430f9a04a09e3002868067763538f28e0cfa
 TERMUX_PKG_VERSION=20221211
 TERMUX_PKG_SRCURL=git+https://github.com/philburk/pforth
+TERMUX_PKG_SHA256=57f04445a91b23eda19f6bc1201ac1f6bc8662ff58baffd73faec4766038a588
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -18,6 +19,11 @@ termux_step_post_get_source() {
 		echo -n "ERROR: The specified version \"$TERMUX_PKG_VERSION\""
 		echo " is different from what is expected to be: \"$version\""
 		return 1
+	fi
+
+	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum)
+	if [[ "${s}" != "${TERMUX_PKG_SHA256}  "* ]]; then
+		termux_error_exit "Checksum mismatch for source files."
 	fi
 }
 

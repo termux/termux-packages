@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=4bf26bc839147551a00938aa2949012681a3e046
 TERMUX_PKG_VERSION=2021.11.04
 TERMUX_PKG_SRCURL=git+https://github.com/SimulIDE/SimulIDE
+TERMUX_PKG_SHA256=253fb33e504d2735f425d2bcefed384c3d090feb413920735dbff0415d27620a
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_DEPENDS="libc++, libelf, qt5-qtbase, qt5-qtmultimedia, qt5-qtscript, qt5-qtserialport, qt5-qtsvg"
 TERMUX_PKG_BUILD_DEPENDS="qt5-qtbase-cross-tools, qt5-qttools-cross-tools"
@@ -19,6 +20,11 @@ termux_step_post_get_source() {
 		echo -n "ERROR: The specified version \"$TERMUX_PKG_VERSION\""
 		echo " is different from what is expected to be: \"$version\""
 		return 1
+	fi
+
+	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum)
+	if [[ "${s}" != "${TERMUX_PKG_SHA256}  "* ]]; then
+		termux_error_exit "Checksum mismatch for source files."
 	fi
 }
 

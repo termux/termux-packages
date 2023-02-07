@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=cb07deb9d8c8fc5849f8752f6f0605f72f96fd9b
 TERMUX_PKG_VERSION=2022.05.26
 TERMUX_PKG_SRCURL=git+https://github.com/dmpop/tenki
+TERMUX_PKG_SHA256=7bdea2d3e09709d6562503833c4cd995aa40303a14c75f6a4338dfd40750d2ca
 TERMUX_PKG_GIT_BRANCH=main
 TERMUX_PKG_DEPENDS="apache2, php"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
@@ -18,6 +19,11 @@ termux_step_post_get_source() {
 		echo -n "ERROR: The specified version \"$TERMUX_PKG_VERSION\""
 		echo " is different from what is expected to be: \"$version\""
 		return 1
+	fi
+
+	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum)
+	if [[ "${s}" != "${TERMUX_PKG_SHA256}  "* ]]; then
+		termux_error_exit "Checksum mismatch for source files."
 	fi
 }
 
