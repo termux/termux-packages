@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/wiki/
 TERMUX_PKG_DESCRIPTION="Xorg server"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=21.1.6
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=21.1.7
 TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/xserver/xorg-server-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=1eb86ed674d042b6c8b1f9135e59395cbbca35ed551b122f73a7d8bb3bb22484
+TERMUX_PKG_SHA256=d9c60b2dd0ec52326ca6ab20db0e490b1ff4f566f59ca742d6532e92795877bb
 TERMUX_PKG_DEPENDS="libandroid-shmem, libdrm, libpciaccess, libpixman, libx11, libxau, libxcvt, libxfont2, libxinerama, libxkbfile, libxshmfence, opengl, openssl, xkeyboard-config, xorg-protocol-txt, xorg-xkbcomp"
 
 # Provided by xorg-protocol-txt (subpackage of xorg-server-xvfb):
