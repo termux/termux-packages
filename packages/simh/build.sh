@@ -5,9 +5,11 @@ TERMUX_PKG_LICENSE_FILE="LICENSE, slirp/COPYRIGHT"
 TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=370bfe006d9f9fb87885c31f943d151013cd529f
 TERMUX_PKG_VERSION=2022.01.16
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/simh/simh
+TERMUX_PKG_SHA256=5a55ff48f69feb8819f46e905803d83586faad0fb3347aa9e91e33b1f0f79c1f
 TERMUX_PKG_GIT_BRANCH=master
-TERMUX_PKG_DEPENDS="libandroid-glob"
+TERMUX_PKG_DEPENDS="libandroid-glob, libandroid-posix-semaphore"
 TERMUX_PKG_RECOMMENDS="resolv-conf"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_MAKE_ARGS="DONT_USE_ROMS=1 TESTS=0"
@@ -23,12 +25,17 @@ termux_step_post_get_source() {
 		return 1
 	fi
 
+	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum)
+	if [[ "${s}" != "${TERMUX_PKG_SHA256}  "* ]]; then
+		termux_error_exit "Checksum mismatch for source files."
+	fi
+
 	cp $TERMUX_PKG_BUILDER_DIR/LICENSE ./
 }
 
 termux_step_pre_configure() {
 	CFLAGS+=" -fwrapv"
-	LDFLAGS+=" -lm -landroid-glob"
+	LDFLAGS+=" -lm -landroid-glob -landroid-posix-semaphore"
 }
 
 termux_step_make() {
