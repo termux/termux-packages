@@ -113,13 +113,6 @@ termux_setup_toolchain_23c() {
 	export ac_cv_func_sigsetmask=no
 	export ac_cv_c_bigendian=no
 
-	# On Android 7, libutil functionality is provided by libc.
-	# But many programs still may search for libutil.
-	if [ ! -f $TERMUX_PREFIX/lib/libutil.so ]; then
-		mkdir -p "$TERMUX_PREFIX/lib"
-		echo 'INPUT(-lc)' > $TERMUX_PREFIX/lib/libutil.so
-	fi
-
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ] || [ -d $TERMUX_STANDALONE_TOOLCHAIN ]; then
 		return
 	fi
