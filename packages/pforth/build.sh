@@ -1,31 +1,13 @@
 TERMUX_PKG_HOMEPAGE=http://www.softsynth.com/pforth/
 TERMUX_PKG_DESCRIPTION="Portable Forth in C"
 TERMUX_PKG_LICENSE="Public Domain"
+TERMUX_PKG_LICENSE_FILE="license.txt"
 TERMUX_PKG_MAINTAINER="@termux"
-_COMMIT=d553430f9a04a09e3002868067763538f28e0cfa
-TERMUX_PKG_VERSION=20221211
-TERMUX_PKG_SRCURL=git+https://github.com/philburk/pforth
-TERMUX_PKG_SHA256=57f04445a91b23eda19f6bc1201ac1f6bc8662ff58baffd73faec4766038a588
-TERMUX_PKG_GIT_BRANCH=master
+TERMUX_PKG_VERSION=1:2.0.1
+TERMUX_PKG_SRCURL=https://github.com/philburk/pforth/archive/refs/tags/v${TERMUX_PKG_VERSION#*:}.tar.gz
+TERMUX_PKG_SHA256=f4c417d7d1f2c187716263484bdc534d3224b6d159e049d00828a89fa5d6894d
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_BUILD_IN_SRC=true
-
-termux_step_post_get_source() {
-	git fetch --unshallow
-	git checkout $_COMMIT
-
-	local version="$(git log -1 --format=%cs | sed 's/-//g')"
-	if [ "$version" != "$TERMUX_PKG_VERSION" ]; then
-		echo -n "ERROR: The specified version \"$TERMUX_PKG_VERSION\""
-		echo " is different from what is expected to be: \"$version\""
-		return 1
-	fi
-
-	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum)
-	if [[ "${s}" != "${TERMUX_PKG_SHA256}  "* ]]; then
-		termux_error_exit "Checksum mismatch for source files."
-	fi
-}
 
 termux_step_host_build() {
 	termux_setup_cmake
