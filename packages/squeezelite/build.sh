@@ -3,9 +3,10 @@ TERMUX_PKG_DESCRIPTION="A small headless Logitech Squeezebox emulator"
 TERMUX_PKG_LICENSE="GPL-3.0, BSD 2-Clause"
 TERMUX_PKG_LICENSE_FILE="LICENSE.txt"
 TERMUX_PKG_MAINTAINER="@termux"
-_COMMIT=226efa300c4cf037e8486bad635e9deb3104636f
-TERMUX_PKG_VERSION=1.9.9.1419
+_COMMIT=6394b3f987cfafdb49bb73a7381b0fbf234bc556
+TERMUX_PKG_VERSION=1.9.9.1422
 TERMUX_PKG_SRCURL=git+https://github.com/ralph-irving/squeezelite
+TERMUX_PKG_SHA256=5a41ab499e5d7b60de1affed4b53309eb7a0f6d71adecdef9ae95d85b859d12a
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_DEPENDS="libflac, libmad, libvorbis, mpg123, pulseaudio"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -13,6 +14,11 @@ TERMUX_PKG_BUILD_IN_SRC=true
 termux_step_post_get_source() {
 	git fetch --unshallow
 	git checkout $_COMMIT
+
+	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum)
+	if [[ "${s}" != "${TERMUX_PKG_SHA256}  "* ]]; then
+		termux_error_exit "Checksum mismatch for source files."
+	fi
 
 	local ver=()
 	local k
