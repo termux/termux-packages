@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://elinux.org/Can-utils
+TERMUX_PKG_DESCRIPTION="Linux-CAN / SocketCAN user space applications"
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@shaunmulligan"
+TERMUX_PKG_VERSION=0.0.1
+TERMUX_PKG_REVISION=2020.11.0
+TERMUX_PKG_SRCURL=git+https://github.com/shaunmulligan/can-utils.git
+TERMUX_PKG_GIT_BRANCH=master
+TERMUX_PKG_AUTO_UPDATE=true
