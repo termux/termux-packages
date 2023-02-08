@@ -6,6 +6,7 @@ TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 _MAJOR_VERSION=3.11
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=29e4b8f5f1658542a8c13e2dd277358c9c48f2b2f7318652ef1675e402b9d2af
 TERMUX_PKG_DEPENDS="gdbm, libandroid-posix-semaphore, libandroid-support, libbz2, libcrypt, libexpat, libffi, liblzma, libsqlite, ncurses, ncurses-ui-libs, openssl, readline, zlib"
@@ -98,7 +99,7 @@ termux_step_create_debscripts() {
 
 	if [[ -f "$TERMUX_PREFIX/bin/pip" && \
 	 ! (("$TERMUX_PACKAGE_FORMAT" = "debian" && -f $TERMUX_PREFIX/var/lib/dpkg/info/python-pip.list) || \
-	    ("$TERMUX_PACKAGE_FORMAT" = "pacman" && -d $TERMUX_PREFIX/var/lib/pacman/local/python-pip-*)) ]]; then
+	    ("$TERMUX_PACKAGE_FORMAT" = "pacman" && \$(ls $TERMUX_PREFIX/var/lib/pacman/local/python-pip-*))) ]]; then
 		echo "Removing pip..."
 		rm -f $TERMUX_PREFIX/bin/pip $TERMUX_PREFIX/bin/pip3* $TERMUX_PREFIX/bin/easy_install $TERMUX_PREFIX/bin/easy_install-3*
 		rm -Rf $TERMUX_PREFIX/lib/python${_MAJOR_VERSION}/site-packages/pip
