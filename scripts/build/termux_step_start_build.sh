@@ -104,10 +104,13 @@ termux_step_start_build() {
 		chmod u+x "$TERMUX_ELF_CLEANER"
 	fi
 
-	# On Android 7, libutil functionality is provided by libc.
-	# But many programs still may search for libutil.
-	if [ ! -f $TERMUX_PREFIX/lib/libutil.so ]; then
-		mkdir -p "$TERMUX_PREFIX/lib"
-		echo 'INPUT(-lc)' > $TERMUX_PREFIX/lib/libutil.so
-	fi
+	# Some packages search for libutil, libpthread and librt even
+	# though this functionality is provided by libc.  Provide
+	# library stubs so that such configure checks succeed.
+	mkdir -p "$TERMUX_PREFIX/lib"
+	for lib in libutil.so libpthread.so librt.so; do
+		if [ ! -f $TERMUX_PREFIX/lib/$lib ]; then
+			echo 'INPUT(-lc)' > $TERMUX_PREFIX/lib/$lib
+		fi
+	done
 }
