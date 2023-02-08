@@ -15,6 +15,7 @@ termux_setup_toolchain_25c() {
 	export READELF=llvm-readelf
 	export STRIP=llvm-strip
 	export NM=llvm-nm
+	export CXXFILT=llvm-cxxfilt
 
 	export TERMUX_HASKELL_LLVM_BACKEND="-fllvm --ghc-option=-fllvm"
 	if [ "${TERMUX_ARCH}" = "i686" ]; then
