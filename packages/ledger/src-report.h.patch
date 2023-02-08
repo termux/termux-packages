@@ -1,14 +1,16 @@
---- ./src/report.h~	2020-05-18 07:30:10.000000000 +0200
-+++ ./src/report.h	2022-10-05 19:35:44.216825319 +0200
-@@ -813,9 +813,8 @@
-    CTOR(report_t, pager_) {
-      if (! std::getenv("PAGER") && isatty(STDOUT_FILENO)) {
-        bool have_less = false;
--       if (exists(path("/opt/local/bin/less")) ||
--           exists(path("/usr/local/bin/less")) ||
--           exists(path("/usr/bin/less")))
-+       if (exists(path("@TERMUX_PREFIX@/bin/less")) ||
-+           exists(path("@TERMUX_PREFIX@/local/bin/less")))
-          have_less = true;
+diff --git a/src/report.h b/src/report.h
+index 6c33889c..6722fbf6 100644
+--- a/src/report.h
++++ b/src/report.h
+@@ -814,9 +814,8 @@ public:
+      if (isatty(STDOUT_FILENO)) {
+        if (! std::getenv("PAGER")) {
+          bool have_less = false;
+-         if (exists(path("/opt/local/bin/less")) ||
+-             exists(path("/usr/local/bin/less")) ||
+-             exists(path("/usr/bin/less")))
++         if (exists(path("@TERMUX_PREFIX@/bin/less")) ||
++             exists(path("@TERMUX_PREFIX@/local/bin/less")))
+            have_less = true;
  
-        if (have_less) {
+          if (have_less) {
