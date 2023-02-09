@@ -42,6 +42,7 @@ PACKAGES+=" texinfo"
 PACKAGES+=" uuid-utils"
 PACKAGES+=" valac"
 PACKAGES+=" xmlto"                      # Needed by git's manpage generation
+PACKAGES+=" bsdtar"          # Needed to create pacman packages
 
 apt update
 apt dist-upgrade -y
