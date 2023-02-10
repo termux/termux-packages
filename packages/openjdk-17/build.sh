@@ -20,7 +20,7 @@ termux_step_pre_configure() {
 }
 
 termux_step_configure() {
-	local jdk_ldflags="-L${TERMUX_PREFIX}/lib -Wl,-rpath=$TERMUX_PREFIX/opt/openjdk/lib -Wl,-rpath=${TERMUX_PREFIX}/lib -Wl,--enable-new-dtags"
+	local jdk_ldflags="-L${TERMUX_PREFIX}/lib -Wl,-rpath=$TERMUX_PREFIX/lib/jvm/java-17-openjdk/lib -Wl,-rpath=${TERMUX_PREFIX}/lib -Wl,--enable-new-dtags"
 	bash ./configure \
 		--disable-precompiled-headers \
 		--disable-warnings-as-errors \
@@ -63,15 +63,14 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	rm -rf $TERMUX_PREFIX/opt/openjdk
-	mkdir -p $TERMUX_PREFIX/opt/openjdk
+	mkdir -p $TERMUX_PREFIX/lib/jvm/java-17-openjdk
 	cp -r build/linux-${TERMUX_ARCH/i686/x86}-server-release/images/jdk/* \
-		$TERMUX_PREFIX/opt/openjdk/
-	find $TERMUX_PREFIX/opt/openjdk -name "*.debuginfo" -delete
+		$TERMUX_PREFIX/lib/jvm/java-17-openjdk/
+	find $TERMUX_PREFIX/lib/jvm/java-17-openjdk/ -name "*.debuginfo" -delete
 
 	# OpenJDK is not installed into /prefix/bin.
 	local i
-	for i in $TERMUX_PREFIX/opt/openjdk/bin/*; do
+	for i in $TERMUX_PREFIX/lib/jvm/java-17-openjdk/bin/*; do
 		if [ ! -f "$i" ]; then
 			continue
 		fi
@@ -80,7 +79,7 @@ termux_step_make_install() {
 
 	# Link manpages to location accessible by "man".
 	mkdir -p $TERMUX_PREFIX/share/man/man1
-	for i in $TERMUX_PREFIX/opt/openjdk/man/man1/*; do
+	for i in $TERMUX_PREFIX/lib/jvm/java-17-openjdk/man/man1/*; do
 		if [ ! -f "$i" ]; then
 			continue
 		fi
@@ -90,6 +89,6 @@ termux_step_make_install() {
 
 	# Dependent projects may need JAVA_HOME.
 	mkdir -p $TERMUX_PREFIX/etc/profile.d
-	echo "export JAVA_HOME=$TERMUX_PREFIX/opt/openjdk" > \
+	echo "export JAVA_HOME=$TERMUX_PREFIX/lib/jvm/java-17-openjdk/" > \
 		$TERMUX_PREFIX/etc/profile.d/java.sh
 }
