@@ -11,9 +11,7 @@ TERMUX_PKG_DEPENDS="libgpg-error"
 TERMUX_PKG_BUILD_DEPENDS="binutils-cross"
 TERMUX_PKG_BREAKS="libgcrypt-dev"
 TERMUX_PKG_REPLACES="libgcrypt-dev"
-# configure tries to detect pthreads by linking with -lpthread, which does not exist on Android:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
-ac_cv_lib_pthread_pthread_create=yes
 --disable-jent-support
 "
 

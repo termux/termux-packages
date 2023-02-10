@@ -34,12 +34,6 @@ termux_step_pre_configure() {
 	popd
 
 	LDFLAGS+=" -L${_lib} -l:libgetsubopt.a"
-
-	local f
-	for f in $(find . -name Makefile.in); do
-		sed -i -E 's/ -lpthread($| )/ /g' ${f}
-		sed -i -E 's/ -lrt($| )/ /g' ${f}
-	done
 }
 
 termux_step_make_install() {

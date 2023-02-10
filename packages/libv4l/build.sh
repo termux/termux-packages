@@ -11,11 +11,3 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-v4l-utils
 --disable-qv4l2
 "
-
-termux_step_pre_configure() {
-	local f
-	for f in lib/*/Makefile.in; do
-		sed -i '/_la_LDFLAGS = /s/ -lpthread//' ${f}
-		sed -i '/_la_LDFLAGS = /s/ -lrt / /' ${f}
-	done
-}

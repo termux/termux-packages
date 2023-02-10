@@ -156,11 +156,6 @@ termux_step_post_make_install() {
             "${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
                 -spec "${TERMUX_PKG_SRCDIR}/mkspecs/termux-cross"
 
-            ## Ensure that no '-lpthread' specified in makefile.
-            sed \
-                -i 's@-lpthread@@g' \
-                Makefile
-
             ## Fix build failure on at least 'i686'.
             sed \
                 -i 's@$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)@$(LINK) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS) $(LFLAGS) -lz@g' \
