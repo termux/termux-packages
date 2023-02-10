@@ -1,0 +1,33 @@
+--- a/src/physfs.c
++++ b/src/physfs.c
+@@ -1233,7 +1233,7 @@
+     if (!userDir) goto initFailed;
+ 
+     /* Platform layer is required to append a dirsep. */
+-    #ifndef __ANDROID__  /* it's an APK file, not a directory, on Android. */
++    #if 1  /* it's an APK file, not a directory, on Android. */
+     assert(baseDir[strlen(baseDir) - 1] == __PHYSFS_platformDirSeparator);
+     #endif
+     assert(userDir[strlen(userDir) - 1] == __PHYSFS_platformDirSeparator);
+--- a/src/physfs.h
++++ b/src/physfs.h
+@@ -495,7 +495,7 @@
+ PHYSFS_DECL void PHYSFS_getLinkedVersion(PHYSFS_Version *ver);
+ 
+ 
+-#ifdef __ANDROID__
++#if 0
+ typedef struct PHYSFS_AndroidInit
+ {
+     void *jnienv;
+--- a/src/physfs_platforms.h
++++ b/src/physfs_platforms.h
+@@ -40,7 +40,7 @@
+ #  define PHYSFS_PLATFORM_POSIX 1
+ #elif defined(macintosh)
+ #  error Classic Mac OS support was dropped from PhysicsFS 2.0. Move to OS X.
+-#elif defined(__ANDROID__)
++#elif 0
+  #  define PHYSFS_PLATFORM_LINUX 1
+  #  define PHYSFS_PLATFORM_ANDROID 1
+  #  define PHYSFS_PLATFORM_POSIX 1
