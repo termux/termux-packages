@@ -31,33 +31,6 @@ diff -uNr fossil-2.11/auto.def fossil-2.11.mod/auto.def
  
  }
  
-@@ -275,7 +241,7 @@
- cc-check-function-in-lib iconv iconv
- 
- # Helper for OpenSSL checking
--proc check-for-openssl {msg {cflags {}} {libs {-lssl -lcrypto -lpthread}}} {
-+proc check-for-openssl {msg {cflags {}} {libs {-lssl -lcrypto}}} {
-     msg-checking "Checking for $msg..."
-     set rc 0
-     if {[is_mingw]} {
-@@ -353,7 +319,7 @@
-         set msg "ssl in $ssldir"
-         set cflags "-I$ssldir/include"
-         set ldflags "-L$ssldir"
--        set ssllibs "$ssldir/libssl.a $ssldir/libcrypto.a -lpthread"
-+        set ssllibs "$ssldir/libssl.a $ssldir/libcrypto.a"
-         set found [check-for-openssl "ssl in source tree" "$cflags $ldflags" $ssllibs]
-     } else {
-         if {$ssldirs in {auto ""}} {
-@@ -501,7 +499,7 @@
-       # e.g. --with-sqlite=/usr/local. Try $sq3path/lib/libsqlite3*
-       # and $sq3path/include/sqlite3.h
-       define-append CFLAGS_INCLUDE -I$sq3path/include
--      define-append EXTRA_LDFLAGS -L$sq3path/lib -lsqlite3 -lpthread
-+      define-append EXTRA_LDFLAGS -L$sq3path/lib -lsqlite3
-       # ^^^ additional -lXXX flags are conservative estimates
-       msg-result "Using -lsqlite3 from $sq3path"
-     } else {
 @@ -479,23 +445,6 @@
              cc-with [list -cflags $cflags -libs $libs] {
                  if {$tclstubs} {

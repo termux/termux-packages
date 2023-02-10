@@ -31,13 +31,10 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
-	sed "s/-lpthread//g" -i configure
 	LDFLAGS+=" $($CC -print-libgcc-file-name)"
 }
 
 termux_step_post_configure() {
 	cp -r $TERMUX_PKG_HOSTBUILD_DIR/src/build_tools ./src
 	sed -i 's/ -shared / -Wl,-O1,--as-needed\0/g' ./libtool
-	find . -type f -name Makefile | xargs -n 1 \
-		sed -i "s/-lpthread//g; s/-pthread//g"
 }
