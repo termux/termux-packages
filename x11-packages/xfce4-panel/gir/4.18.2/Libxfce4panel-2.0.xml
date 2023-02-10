@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<dump>
+  <enum name="XfcePanelPluginMode" get-type="xfce_panel_plugin_mode_get_type">
+    <member name="XFCE_PANEL_PLUGIN_MODE_HORIZONTAL" nick="horizontal" value="0"/>
+    <member name="XFCE_PANEL_PLUGIN_MODE_VERTICAL" nick="vertical" value="1"/>
+    <member name="XFCE_PANEL_PLUGIN_MODE_DESKBAR" nick="deskbar" value="2"/>
+  </enum>  <enum name="XfceScreenPosition" get-type="xfce_screen_position_get_type">
+    <member name="XFCE_SCREEN_POSITION_NONE" nick="none" value="0"/>
+    <member name="XFCE_SCREEN_POSITION_NW_H" nick="nw-h" value="1"/>
+    <member name="XFCE_SCREEN_POSITION_N" nick="n" value="2"/>
+    <member name="XFCE_SCREEN_POSITION_NE_H" nick="ne-h" value="3"/>
+    <member name="XFCE_SCREEN_POSITION_NW_V" nick="nw-v" value="4"/>
+    <member name="XFCE_SCREEN_POSITION_W" nick="w" value="5"/>
+    <member name="XFCE_SCREEN_POSITION_SW_V" nick="sw-v" value="6"/>
+    <member name="XFCE_SCREEN_POSITION_NE_V" nick="ne-v" value="7"/>
+    <member name="XFCE_SCREEN_POSITION_E" nick="e" value="8"/>
+    <member name="XFCE_SCREEN_POSITION_SE_V" nick="se-v" value="9"/>
+    <member name="XFCE_SCREEN_POSITION_SW_H" nick="sw-h" value="10"/>
+    <member name="XFCE_SCREEN_POSITION_S" nick="s" value="11"/>
+    <member name="XFCE_SCREEN_POSITION_SE_H" nick="se-h" value="12"/>
+    <member name="XFCE_SCREEN_POSITION_FLOATING_H" nick="floating-h" value="13"/>
+    <member name="XFCE_SCREEN_POSITION_FLOATING_V" nick="floating-v" value="14"/>
+  </enum>  <class name="XfcePanelPlugin" get-type="xfce_panel_plugin_get_type" parents="GtkEventBox,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="XfcePanelPluginProvider"/>
+    <property name="name" type="gchararray" flags="235"/>
+    <property name="display-name" type="gchararray" flags="235"/>
+    <property name="comment" type="gchararray" flags="235"/>
+    <property name="arguments" type="GStrv" flags="235"/>
+    <property name="unique-id" type="gint" flags="235"/>
+    <property name="orientation" type="GtkOrientation" flags="225"/>
+    <property name="size" type="gint" flags="225"/>
+    <property name="icon-size" type="gint" flags="225"/>
+    <property name="dark-mode" type="gboolean" flags="227"/>
+    <property name="small" type="gboolean" flags="227"/>
+    <property name="screen-position" type="XfceScreenPosition" flags="225"/>
+    <property name="expand" type="gboolean" flags="227"/>
+    <property name="mode" type="XfcePanelPluginMode" flags="225"/>
+    <property name="nrows" type="guint" flags="225"/>
+    <property name="shrink" type="gboolean" flags="227"/>
+    <signal name="about" return="void" when="last">
+    </signal>
+    <signal name="configure-plugin" return="void" when="last">
+    </signal>
+    <signal name="free-data" return="void" when="last">
+    </signal>
+    <signal name="orientation-changed" return="void" when="last">
+      <param type="GtkOrientation"/>
+    </signal>
+    <signal name="mode-changed" return="void" when="last">
+      <param type="XfcePanelPluginMode"/>
+    </signal>
+    <signal name="nrows-changed" return="void" when="last">
+      <param type="guint"/>
+    </signal>
+    <signal name="remote-event" return="gboolean" when="last">
+      <param type="gchararray"/>
+      <param type="GValue"/>
+    </signal>
+    <signal name="removed" return="void" when="last">
+    </signal>
+    <signal name="save" return="void" when="last">
+    </signal>
+    <signal name="size-changed" return="gboolean" when="last">
+      <param type="gint"/>
+    </signal>
+    <signal name="screen-position-changed" return="void" when="last">
+      <param type="XfceScreenPosition"/>
+    </signal>
+  </class>
+  <class name="XfceArrowButton" get-type="xfce_arrow_button_get_type" parents="GtkToggleButton,GtkButton,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkActionable"/>
+    <implements name="GtkActivatable"/>
+    <property name="arrow-type" type="GtkArrowType" flags="227"/>
+    <signal name="arrow-type-changed" return="void" when="last">
+      <param type="GtkArrowType"/>
+    </signal>
+  </class>
+  <class name="XfcePanelImage" get-type="xfce_panel_image_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="source" type="gchararray" flags="227"/>
+    <property name="pixbuf" type="GdkPixbuf" flags="227"/>
+    <property name="size" type="gint" flags="227"/>
+  </class>
+  <interface name="XfcePanelPluginProvider" get-type="xfce_panel_plugin_provider_get_type">
+    <signal name="provider-signal" return="void" when="last">
+      <param type="guint"/>
+    </signal>
+  </interface>
+</dump>
