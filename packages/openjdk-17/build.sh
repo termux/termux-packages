@@ -15,12 +15,6 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HAS_DEBUG=false
 
 termux_step_pre_configure() {
-	# Certain packages are not safe to build on device because their
-	# build.sh script deletes specific files in $TERMUX_PREFIX.
-	if $TERMUX_ON_DEVICE_BUILD; then
-		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
-	fi
-
 	unset JAVA_HOME
 
 	# Provide fake gcc.
@@ -55,12 +49,6 @@ termux_step_pre_configure() {
 	DEVKIT_TOOLCHAIN_PATH="\$DEVKIT_ROOT"
 	DEVKIT_SYSROOT="\$DEVKIT_ROOT/sysroot"
 	EOF
-
-	# OpenJDK uses same makefile for host and target builds, so we can't
-	# easily patch usage of librt and libpthread. Using linker scripts
-	# instead.
-	echo 'INPUT(-lc)' > $TERMUX_PREFIX/lib/librt.so
-	echo 'INPUT(-lc)' > $TERMUX_PREFIX/lib/libpthread.so
 }
 
 termux_step_configure() {
@@ -98,9 +86,6 @@ termux_step_configure() {
 termux_step_make() {
 	cd build/linux-${TERMUX_ARCH/i686/x86}-server-release
 	make JOBS=1 images
-
-	# Delete created library stubs.
-	rm $TERMUX_PREFIX/lib/librt.so $TERMUX_PREFIX/lib/libpthread.so
 }
 
 termux_step_make_install() {
