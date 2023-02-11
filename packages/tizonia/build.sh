@@ -29,19 +29,6 @@ termux_step_pre_configure() {
 
 	export BOOST_ROOT=$TERMUX_PREFIX
 	LDFLAGS+=" -landroid-wordexp"
-
-	_NEED_DUMMY_LIBPTHREAD_A=
-	_LIBPTHREAD_A=$TERMUX_PREFIX/lib/libpthread.a
-	if [ ! -e $_LIBPTHREAD_A ]; then
-		_NEED_DUMMY_LIBPTHREAD_A=true
-		echo '!<arch>' > $_LIBPTHREAD_A
-	fi
-	_NEED_DUMMY_LIBRT_A=
-	_LIBRT_A=$TERMUX_PREFIX/lib/librt.a
-	if [ ! -e $_LIBRT_A ]; then
-		_NEED_DUMMY_LIBRT_A=true
-		echo '!<arch>' > $_LIBRT_A
-	fi
 }
 
 termux_step_configure_meson() {
@@ -57,13 +44,4 @@ termux_step_configure_meson() {
 		--buildtype minsize \
 		--strip \
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
-}
-
-termux_step_post_make_install() {
-	if [ $_NEED_DUMMY_LIBPTHREAD_A ]; then
-		rm -f $_LIBPTHREAD_A
-	fi
-	if [ $_NEED_DUMMY_LIBRT_A ]; then
-		rm -f $_LIBRT_A
-	fi
 }

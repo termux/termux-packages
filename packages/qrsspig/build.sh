@@ -11,20 +11,9 @@ TERMUX_PKG_BUILD_DEPENDS="boost-headers"
 
 termux_step_pre_configure() {
 	LDFLAGS+=" -llog"
-
-	_NEED_DUMMY_LIBPTHREAD_A=
-	_LIBPTHREAD_A=$TERMUX_PREFIX/lib/libpthread.a
-	if [ ! -e $_LIBPTHREAD_A ]; then
-		_NEED_DUMMY_LIBPTHREAD_A=true
-		echo '!<arch>' > $_LIBPTHREAD_A
-	fi
 }
 
 termux_step_post_make_install() {
 	install -Dm600 -t $TERMUX_PREFIX/etc/qrsspig \
 		$TERMUX_PKG_SRCDIR/etc/qrsspig.yaml
-
-	if [ $_NEED_DUMMY_LIBPTHREAD_A ]; then
-		rm -f $_LIBPTHREAD_A
-	fi
 }
