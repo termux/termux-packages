@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="CFEngine is a configuration management technology"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@craigcomstock"
 TERMUX_PKG_VERSION=1:3.21.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/cfengine/core
 TERMUX_PKG_GIT_BRANCH=${TERMUX_PKG_VERSION#*:}
 TERMUX_PKG_DEPENDS="libandroid-glob, liblmdb, libxml2, libyaml, openssl, pcre"
