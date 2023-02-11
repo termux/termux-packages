@@ -13,3 +13,13 @@
  }
  
  // angle=0 means orthographic.
+@@ -1908,7 +1912,9 @@
+               double *background, size_t nlightsin, triple *lights,
+               double *diffuse, double *specular, bool view, int oldpid)
+ {
++#ifdef HAVE_LIBGLUT
+   gettimeofday(&lasttime,NULL);
++#endif
+   Iconify=getSetting<bool>("iconify");
+ 
+   if(zoom == 0.0) zoom=1.0;
