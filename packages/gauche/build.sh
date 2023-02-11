@@ -41,18 +41,5 @@ termux_step_pre_configure() {
 	export BUILD_GOSH=$_PREFIX_FOR_BUILD/bin/gosh
 	export PATH=$PATH:$_PREFIX_FOR_BUILD/bin
 
-	_NEED_DUMMY_LIBPTHREAD_A=
-	_LIBPTHREAD_A=$TERMUX_PREFIX/lib/libpthread.a
-	if [ ! -e $_LIBPTHREAD_A ]; then
-		_NEED_DUMMY_LIBPTHREAD_A=true
-		echo '!<arch>' > $_LIBPTHREAD_A
-	fi
-
 	autoreconf -fi
-}
-
-termux_step_post_make_install() {
-	if [ $_NEED_DUMMY_LIBPTHREAD_A ]; then
-		rm -f $_LIBPTHREAD_A
-	fi
 }

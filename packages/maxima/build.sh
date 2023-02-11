@@ -43,15 +43,6 @@ termux_step_host_build() {
 	popd
 }
 
-termux_step_pre_configure() {
-	_NEED_DUMMY_LIBPTHREAD_A=
-	_LIBPTHREAD_A=$TERMUX_PREFIX/lib/libpthread.a
-	if [ ! -e $_LIBPTHREAD_A ]; then
-		_NEED_DUMMY_LIBPTHREAD_A=true
-		echo '!<arch>' > $_LIBPTHREAD_A
-	fi
-}
-
 termux_step_make() {
 	local _PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
 	
@@ -75,10 +66,4 @@ termux_step_make() {
 	done
 	make
 	rm -f $_PREFIX_FOR_BUILD/bin/gcc
-}
-
-termux_step_post_make_install() {
-	if [ $_NEED_DUMMY_LIBPTHREAD_A ]; then
-		rm -f $_LIBPTHREAD_A
-	fi
 }

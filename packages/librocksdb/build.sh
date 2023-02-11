@@ -25,18 +25,3 @@ termux_step_post_get_source() {
 		termux_error_exit "SOVERSION guard check failed."
 	fi
 }
-
-termux_step_pre_configure() {
-	_NEED_DUMMY_LIBPTHREAD_A=
-	_LIBPTHREAD_A=$TERMUX_PREFIX/lib/libpthread.a
-	if [ ! -e $_LIBPTHREAD_A ]; then
-		_NEED_DUMMY_LIBPTHREAD_A=true
-		echo '!<arch>' > $_LIBPTHREAD_A
-	fi
-}
-
-termux_step_post_make_install() {
-	if [ $_NEED_DUMMY_LIBPTHREAD_A ]; then
-		rm -f $_LIBPTHREAD_A
-	fi
-}

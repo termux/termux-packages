@@ -27,31 +27,9 @@ termux_step_pre_configure() {
 		-e 's/\([^A-Za-z0-9_]ANDROID\)\([^A-Za-z0-9_]\)/\1_NO_TERMUX\2/g' \
 		-e 's/\([^A-Za-z0-9_]ANDROID\)$/\1_NO_TERMUX/g'
 
-	_NEED_DUMMY_LIBPTHREAD_A=
-	_LIBPTHREAD_A=$TERMUX_PREFIX/lib/libpthread.a
-	if [ ! -e $_LIBPTHREAD_A ]; then
-		_NEED_DUMMY_LIBPTHREAD_A=true
-		echo '!<arch>' > $_LIBPTHREAD_A
-	fi
-	_NEED_DUMMY_LIBRT_A=
-	_LIBRT_A=$TERMUX_PREFIX/lib/librt.a
-	if [ ! -e $_LIBRT_A ]; then
-		_NEED_DUMMY_LIBRT_A=true
-		echo '!<arch>' > $_LIBRT_A
-	fi
-
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
 		-DPYTHON_DEFAULT_EXECUTABLE=python
 		-DPYTHON3_INCLUDE_PATH=$TERMUX_PREFIX/include/python${TERMUX_PYTHON_VERSION}
 		-DPYTHON3_NUMPY_INCLUDE_DIRS=$TERMUX_PYTHON_HOME/site-packages/numpy/core/include
 		"
-}
-
-termux_step_post_make_install() {
-	if [ $_NEED_DUMMY_LIBPTHREAD_A ]; then
-		rm -f $_LIBPTHREAD_A
-	fi
-	if [ $_NEED_DUMMY_LIBRT_A ]; then
-		rm -f $_LIBRT_A
-	fi
 }
