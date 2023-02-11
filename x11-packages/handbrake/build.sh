@@ -23,21 +23,8 @@ termux_step_pre_configure() {
 	sed -i -E '/(\/contrib|contrib\/)/d' make/include/main.defs
 
 	LDFLAGS+=" -liconv -lx265"
-
-	_NEED_DUMMY_LIBPTHREAD_A=
-	_LIBPTHREAD_A=$TERMUX_PREFIX/lib/libpthread.a
-	if [ ! -e $_LIBPTHREAD_A ]; then
-		_NEED_DUMMY_LIBPTHREAD_A=true
-		echo '!<arch>' > $_LIBPTHREAD_A
-	fi
 }
 
 termux_step_configure() {
 	$TERMUX_PKG_SRCDIR/configure $TERMUX_PKG_EXTRA_CONFIGURE_ARGS
-}
-
-termux_step_post_make_install() {
-	if [ $_NEED_DUMMY_LIBPTHREAD_A ]; then
-		rm -f $_LIBPTHREAD_A
-	fi
 }

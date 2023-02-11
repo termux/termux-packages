@@ -26,13 +26,6 @@ termux_step_post_get_source() {
 
 termux_step_pre_configure() {
 	CFLAGS+=" $CPPFLAGS"
-
-	_NEED_DUMMY_LIBRT_A=
-	_LIBRT_A=$TERMUX_PREFIX/lib/librt.a
-	if [ ! -e $_LIBRT_A ]; then
-		_NEED_DUMMY_LIBRT_A=true
-		echo '!<arch>' > $_LIBRT_A
-	fi
 }
 
 termux_step_make() {
@@ -43,10 +36,4 @@ termux_step_make() {
 
 termux_step_make_install() {
 	cp -rT linux-package $TERMUX_PREFIX
-}
-
-termux_step_post_make_install() {
-	if [ $_NEED_DUMMY_LIBRT_A ]; then
-		rm -f $_LIBRT_A
-	fi
 }
