@@ -1,10 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnutls.org/
 TERMUX_PKG_DESCRIPTION="Secure communications library implementing the SSL, TLS and DTLS protocols and technologies around them"
-TERMUX_PKG_LICENSE="LGPL-2.1"
+TERMUX_PKG_LICENSE="LGPL-2.1, GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.7.8
+TERMUX_PKG_VERSION=3.7.9
 TERMUX_PKG_SRCURL=https://www.gnupg.org/ftp/gcrypt/gnutls/v${TERMUX_PKG_VERSION:0:3}/gnutls-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=c58ad39af0670efe6a8aee5e3a8b2331a1200418b64b7c51977fb396d4617114
+TERMUX_PKG_SHA256=aaa03416cdbd54eb155187b359e3ec3ed52ec73df4df35a0edd49429ff64d844
 TERMUX_PKG_DEPENDS="libc++, libgmp, libnettle, ca-certificates, libidn2, libunistring, unbound"
 TERMUX_PKG_BREAKS="libgnutls-dev"
 TERMUX_PKG_REPLACES="libgnutls-dev"
