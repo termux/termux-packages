@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Tools and libraries to manipulate a wide range of multim
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=5.1.2
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://www.ffmpeg.org/releases/ffmpeg-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=619e706d662c8420859832ddc259cd4d4096a48a2ce1eefd052db9e440eef3dc
 TERMUX_PKG_DEPENDS="freetype, game-music-emu, libaom, libandroid-glob, libass, libbluray, libbz2, libdav1d, libgnutls, libiconv, liblzma, libmp3lame, libopus, librav1e, libsoxr, libtheora, libvorbis, libvpx, libvidstab, libwebp, libx264, libx265, libxml2, libzimg, littlecms, ocl-icd, xvidcore, zlib"
@@ -12,19 +12,19 @@ TERMUX_PKG_CONFLICTS="libav"
 TERMUX_PKG_BREAKS="ffmpeg-dev"
 TERMUX_PKG_REPLACES="ffmpeg-dev"
 
-termux_step_post_get_source() {
+termux_step_pre_configure() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them
-	# after SOVERSION is changed.
-	local _SOVER_avutil=57
-	local _SOVER_avcodec=59
-	local _SOVER_avformat=59
+	# after SOVERSION is changed. (These variables are also used afterwards.)
+	_FFMPEG_SOVER_avutil=57
+	_FFMPEG_SOVER_avcodec=59
+	_FFMPEG_SOVER_avformat=59
 
 	local f
 	for f in util codec format; do
 		local v=$(sh ffbuild/libversion.sh av${f} \
 				libav${f}/version.h libav${f}/version_major.h \
 				| sed -En 's/^libav'"${f}"'_VERSION_MAJOR=([0-9]+)$/\1/p')
-		if [ ! "${v}" ] || [ "$(eval echo \$_SOVER_av${f})" != "${v}" ]; then
+		if [ ! "${v}" ] || [ "$(eval echo \$_FFMPEG_SOVER_av${f})" != "${v}" ]; then
 			termux_error_exit "SOVERSION guard check failed for libav${f}.so."
 		fi
 	done
@@ -98,4 +98,19 @@ termux_step_configure() {
 		$_EXTRA_CONFIGURE_FLAGS \
 		--disable-libfdk-aac
 	# GPLed FFmpeg binaries linked against fdk-aac are not redistributable.
+}
+
+termux_step_post_massage() {
+	cd ${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/lib || exit 1
+	local f
+	for f in util codec format; do
+		local s=$(eval echo \$_FFMPEG_SOVER_av${f})
+		if [ ! "${s}" ]; then
+			termux_error_exit "Empty SOVERSION for libav${f}."
+		fi
+		# SOVERSION suffix is expected by some programs, e.g. Firefox.
+		if [ ! -e "./libav${f}.so.${s}" ]; then
+			ln -sf libav${f}.so libav${f}.so.${s}
+		fi
+	done
 }
