@@ -1,25 +1,22 @@
-diff -uNr pip-22.3.1/src/pip/_internal/commands/install.py pip-22.3.1/src/pip/_internal/commands/install.py.patch
---- pip-22.3.1/src/pip/_internal/commands/install.py	2022-11-05 18:25:43.000000000 +0300
-+++ pip-22.3.1/src/pip/_internal/commands/install.py.patch	2023-01-11 22:55:38.943540197 +0300
-@@ -346,6 +346,22 @@
+--- pip-23.0/src/pip/_internal/commands/install.py	2023-01-30 18:13:08.000000000 +0300
++++ pip-23.0/src/pip/_internal/commands/install.py.patch	2023-02-12 14:05:28.694888041 +0300
+@@ -361,6 +361,20 @@
                  options, reqs, LegacySetupPyOptionsCheckMode.INSTALL
              )
  
-+            # This prevents updating pip via pip, which is necessary as it breaks
-+            # the python-pip package in termux.
-+            # https://github.com/termux/termux-packages/pull/13611#issuecomment-1336105506
-+            for req in reqs:
-+                if req.name == "pip":
-+                    reqs.remove(req)
-+                    if len(reqs) == 0:
-+                        raise CommandError(
-+                            "Installing pip is forbidden, this will break the python-pip package (termux)."
-+                        )
-+                    else:
-+                        logger.warning(
-+                            "Skip installing pip, this will break the python-pip package (termux)."
-+                        )
-+                    break
++            reqs_list = [req.name for req in reqs]
++            while reqs_list.count("pip") != 0:
++                reqs_index = reqs_list.index("pip")
++                if len(reqs)-reqs_list.count("pip") == 0:
++                    raise CommandError(
++                       "Installing pip is forbidden, this will break the python-pip package (termux)."
++                    )
++                elif reqs_list.count("pip") == 1:
++                    logger.warning(
++                       "Skip installing pip, this will break the python-pip package (termux)."
++                    )
++                del reqs_list[reqs_index]
++                del reqs[reqs_index]
 +
              if "no-binary-enable-wheel-cache" in options.features_enabled:
                  # TODO: remove format_control from WheelCache when the deprecation cycle

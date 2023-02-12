@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="The PyPA recommended tool for installing Python packages
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=23.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/pypa/pip/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=49210e328c680089c5c6be283e1d757cc4349f2b59b252abccca28f701f6e6e3
 TERMUX_PKG_DEPENDS="clang, make, pkg-config, python (>= 3.11.1-1)"
