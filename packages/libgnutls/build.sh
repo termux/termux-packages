@@ -2,9 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://www.gnutls.org/
 TERMUX_PKG_DESCRIPTION="Secure communications library implementing the SSL, TLS and DTLS protocols and technologies around them"
 TERMUX_PKG_LICENSE="LGPL-2.1, GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.7.9
-TERMUX_PKG_SRCURL=https://www.gnupg.org/ftp/gcrypt/gnutls/v${TERMUX_PKG_VERSION:0:3}/gnutls-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=aaa03416cdbd54eb155187b359e3ec3ed52ec73df4df35a0edd49429ff64d844
+_MAJOR_VERSION=3.8
+TERMUX_PKG_VERSION=${_MAJOR_VERSION}.0
+TERMUX_PKG_SRCURL=https://www.gnupg.org/ftp/gcrypt/gnutls/v${_MAJOR_VERSION}/gnutls-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=0ea0d11a1660a1e63f960f157b197abe6d0c8cb3255be24e1fb3815930b9bdc5
 TERMUX_PKG_DEPENDS="libc++, libgmp, libnettle, ca-certificates, libidn2, libunistring, unbound"
 TERMUX_PKG_BREAKS="libgnutls-dev"
 TERMUX_PKG_REPLACES="libgnutls-dev"
@@ -23,6 +24,22 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-guile
 --disable-doc
 "
+
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=30
+
+	local a
+	for a in LT_CURRENT LT_AGE; do
+		local _${a}=$(sed -En 's/^\s*AC_SUBST\('"${a}"',\s*([0-9]+).*/\1/p' \
+				m4/hooks.m4)
+	done
+	local v=$(( _LT_CURRENT - _LT_AGE ))
+	if [ ! "${_LT_CURRENT}" ] || [ "${v}" != "${_SOVERSION}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
 
 termux_step_pre_configure() {
 	CFLAGS+=" -DNO_INLINE_GETPASS=1"
