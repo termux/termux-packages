@@ -6,7 +6,8 @@ TERMUX_PKG_VERSION=109.0
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://ftp.mozilla.org/pub/firefox/releases/${TERMUX_PKG_VERSION}/source/firefox-${TERMUX_PKG_VERSION}.source.tar.xz
 TERMUX_PKG_SHA256=0678a03b572b5992fb85f0923a25b236acf81e5ea2c08e549b63a56076a69351
-TERMUX_PKG_DEPENDS="at-spi2-atk, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libandroid-sysv-semaphore, libc++, libcairo, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libpixman, libsm, libvpx, libwebp, libx11, libxcb, libxcomposite, libxcursor, libxdamage, libxext, libxfixes, libxi, libxrandr, libxrender, libxtst, pango, pulseaudio"
+# ffmpeg and pulseaudio are dependencies through dlopen(3):
+TERMUX_PKG_DEPENDS="at-spi2-atk, ffmpeg, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libandroid-sysv-semaphore, libc++, libcairo, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libpixman, libsm, libvpx, libwebp, libx11, libxcb, libxcomposite, libxcursor, libxdamage, libxext, libxfixes, libxi, libxrandr, libxrender, libxtst, pango, pulseaudio"
 TERMUX_PKG_BUILD_DEPENDS="libcpufeatures"
 TERMUX_MAKE_PROCESSES=1
 
@@ -28,19 +29,6 @@ termux_step_pre_configure() {
 
 	CXXFLAGS+=" -U__ANDROID__"
 	LDFLAGS+=" -landroid-shmem -landroid-sysv-semaphore -llog"
-
-	_NEED_DUMMY_LIBPTHREAD_A=
-	_LIBPTHREAD_A=$TERMUX_PREFIX/lib/libpthread.a
-	if [ ! -e $_LIBPTHREAD_A ]; then
-		_NEED_DUMMY_LIBPTHREAD_A=true
-		echo '!<arch>' > $_LIBPTHREAD_A
-	fi
-	_NEED_DUMMY_LIBRT_A=
-	_LIBRT_A=$TERMUX_PREFIX/lib/librt.a
-	if [ ! -e $_LIBRT_A ]; then
-		_NEED_DUMMY_LIBRT_A=true
-		echo '!<arch>' > $_LIBRT_A
-	fi
 }
 
 termux_step_configure() {
@@ -82,11 +70,5 @@ termux_step_configure() {
 }
 
 termux_step_post_make_install() {
-	if [ $_NEED_DUMMY_LIBPTHREAD_A ]; then
-		rm -f $_LIBPTHREAD_A
-	fi
-	if [ $_NEED_DUMMY_LIBRT_A ]; then
-		rm -f $_LIBRT_A
-	fi
 	install -Dm600 $TERMUX_PKG_BUILDER_DIR/firefox.desktop $TERMUX_PREFIX/share/applications/firefox.desktop
 }
