@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.webmproject.org
 TERMUX_PKG_DESCRIPTION="VP8 & VP9 Codec SDK"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1:1.12.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="1:1.13.0"
 TERMUX_PKG_SRCURL=https://github.com/webmproject/libvpx/archive/v${TERMUX_PKG_VERSION:2}.tar.gz
-TERMUX_PKG_SHA256=f1acc15d0fd0cb431f4bf6eac32d5e932e40ea1186fe78e074254d6d003957bb
+TERMUX_PKG_SHA256=cb2a393c9c1fae7aba76b950bb0ad393ba105409fe1a147ccd61b0aaa1501066
 TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_BREAKS="libvpx-dev"
 TERMUX_PKG_REPLACES="libvpx-dev"
@@ -70,7 +69,7 @@ termux_step_configure() {
 termux_step_post_massage() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them
 	# after SOVERSION is changed.
-	local _SOVERSION_GUARD_FILES="lib/libvpx.so.7"
+	local _SOVERSION_GUARD_FILES="lib/libvpx.so.8"
 	local f
 	for f in ${_SOVERSION_GUARD_FILES}; do
 		if [ ! -e "${f}" ]; then
