@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Backend library for the Tox protocol"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.2.18
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/TokTok/toxcore
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libmsgpack, libsodium, libopus, libvpx"
