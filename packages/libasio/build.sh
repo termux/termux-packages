@@ -9,6 +9,5 @@ TERMUX_PKG_BUILD_DEPENDS="boost, boost-headers, openssl"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
 termux_step_pre_configure() {
-	sed --in-place -e 's/-lrt//' configure.ac
 	autoreconf -fi
 }
