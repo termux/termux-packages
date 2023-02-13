@@ -80,6 +80,7 @@ termux_setup_gir() {
 				unset LD_LIBRARY_PATH
 			EOF
 			sed 1d "$TERMUX_SCRIPTDIR/packages/ldd/ldd.in" >> "$ldd"
+			sed -i 's|@READELF@|'"$(command -v readelf)"'|g' "$ldd"
 			chmod 0700 "$ldd"
 		fi
 	fi

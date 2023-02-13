@@ -5,7 +5,7 @@ if [ "@ARCH_BITS@" == "64" ]; then
     KLIBPATH+=64
 fi
 
-system_libs=(libEGL.so libGLESv1_CM.so libGLESv2.so libGLESv3.so libOpenMAXAL.so libOpenSLES.so libandroid.so libc.so libcamera2ndk.so libdl.so libjnigraphics.so liblog.so libm.so libmediandk.so libstdc++.so libvulkan.so libz.so)
+system_libs=(libEGL.so libGLESv1_CM.so libGLESv2.so libGLESv3.so libOpenMAXAL.so libOpenSLES.so libaaudio.so libandroid.so libc.so libcamera2ndk.so libdl.so libjnigraphics.so liblog.so libm.so libmediandk.so libstdc++.so libvulkan.so libz.so)
 
 do_search() {
     local f="$1"
@@ -27,11 +27,11 @@ do_search() {
             IFS=: runpath+=($LD_LIBRARY_PATH)
         fi
     else
-        IFS=: runpath+=($(readelf -d "$f" | sed -n 's/^.*(RUNPATH).*\[\(.*\)\]$/\1/p'))
+        IFS=: runpath+=($(@READELF@ -d "$f" | sed -n 's/^.*(RUNPATH).*\[\(.*\)\]$/\1/p'))
     fi
     runpath+=("/system/$KLIBPATH")
     local needed
-    IFS=$'\n' needed=($(readelf -d "$f" | sed -n 's/^.*(NEEDED).*\[\(.*\)\]$/\1/p'))
+    IFS=$'\n' needed=($(@READELF@ -d "$f" | sed -n 's/^.*(NEEDED).*\[\(.*\)\]$/\1/p'))
     local libs=()
     local l
     for l in "${needed[@]}"; do
