@@ -28,7 +28,3 @@ termux_step_configure() {
 	python3 $TERMUX_PKG_SRCDIR/configure.py \
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
 }
-
-termux_step_post_configure() {
-	sed -i '/^LIB_LINKS_TO\s*=/s/\s-lrt//' Makefile
-}
