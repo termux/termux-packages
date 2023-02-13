@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="A Free SOCKS proxy server"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.4.8p3
-TERMUX_PKG_REVISION=6
+TERMUX_PKG_REVISION=7
 TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/sourceforge/socks-relay/srelay-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=efa38cb3e9e745a05ccb4b59fcf5d041184f15dbea8eb80c1b0ce809bb00c924
 TERMUX_PKG_DEPENDS="libcrypt"
@@ -15,6 +15,8 @@ etc/srelay.passwd
 "
 
 termux_step_pre_configure() {
+	autoreconf -fi
+
 	export CPPFLAGS="${CPPFLAGS} -DLINUX"
 }
 
