@@ -10,6 +10,14 @@ TERMUX_PKG_DEPENDS="fontconfig, dbus, libc++, libjpeg-turbo, libminizip, libnss,
 TERMUX_PKG_BUILD_DEPENDS="qt5-qtbase-cross-tools, qt5-qtdeclarative-cross-tools"
 TERMUX_PKG_NO_STATICSPLIT=true
 
+termux_step_pre_configure() {
+	# Certain packages are not safe to build on device because their
+	# build.sh script deletes specific files in $TERMUX_PREFIX.
+	if $TERMUX_ON_DEVICE_BUILD; then
+		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
+	fi
+}
+
 termux_step_configure() {
 	cd $TERMUX_PKG_SRCDIR
 	termux_setup_ninja
@@ -40,6 +48,7 @@ termux_step_configure() {
 	popd
 
 	# Dummy pthread, rt and resolve
+	# TODO: Patch the building system and do not dummy `librt.so`.
 	echo "INPUT(-llog -liconv -landroid-shmem)" > "$TERMUX_PREFIX/lib/librt.so"
 	echo '!<arch>' > "$TERMUX_PREFIX/lib/libpthread.a"
 	echo '!<arch>' > "$TERMUX_PREFIX/lib/libresolv.a"
