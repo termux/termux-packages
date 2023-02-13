@@ -32,6 +32,14 @@ termux_step_pre_configure() {
 	# about missing 'arch.h'.
 	TERMUX_MAKE_PROCESSES=1
 	CPPFLAGS+=" -I${TERMUX_STANDALONE_TOOLCHAIN}/sysroot/usr/include/c++/v1"
+
+	# Workaround for build break caused by `sha2.h` from `libmd` package:
+	if [ -e "$TERMUX_PREFIX/include/sha2.h" ]; then
+		local inc="$TERMUX_PKG_BUILDDIR/_include"
+		mkdir -p "${inc}"
+		ln -sf "$TERMUX_PKG_SRCDIR/base/sha2.h" "${inc}/"
+		CPPFLAGS="-I${inc} ${CPPFLAGS}"
+	fi
 }
 
 termux_step_make() {
