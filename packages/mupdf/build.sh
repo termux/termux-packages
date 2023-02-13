@@ -10,6 +10,11 @@ TERMUX_PKG_DEPENDS="freetype, gumbo-parser, harfbuzz, jbig2dec, leptonica, libc+
 TERMUX_PKG_EXTRA_MAKE_ARGS="prefix=$TERMUX_PREFIX build=release libs shared=yes tesseract=yes"
 TERMUX_PKG_BUILD_IN_SRC=true
 
+termux_step_post_get_source() {
+	mv pyproject.toml{,.unused}
+	mv setup.py{,.unused}
+}
+
 termux_step_pre_configure() {
 	rm -rf thirdparty/{freeglut,freetype,harfbuzz,jbig2dec,leptonica,libjpeg,openjpeg,tesseract,zlib}
 	export USE_SYSTEM_LIBS=yes
