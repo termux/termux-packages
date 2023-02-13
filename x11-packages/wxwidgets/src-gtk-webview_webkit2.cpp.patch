@@ -1,0 +1,30 @@
+--- a/src/gtk/webview_webkit2.cpp
++++ b/src/gtk/webview_webkit2.cpp
+@@ -166,27 +166,10 @@
+     {
+         switch (error->code)
+         {
+-            case SOUP_STATUS_CANCELLED:
+-                type = wxWEBVIEW_NAV_ERR_USER_CANCELLED;
+-                break;
+-
+-            case SOUP_STATUS_CANT_RESOLVE:
+             case SOUP_STATUS_NOT_FOUND:
+                 type = wxWEBVIEW_NAV_ERR_NOT_FOUND;
+                 break;
+ 
+-            case SOUP_STATUS_CANT_RESOLVE_PROXY:
+-            case SOUP_STATUS_CANT_CONNECT:
+-            case SOUP_STATUS_CANT_CONNECT_PROXY:
+-            case SOUP_STATUS_SSL_FAILED:
+-            case SOUP_STATUS_IO_ERROR:
+-                type = wxWEBVIEW_NAV_ERR_CONNECTION;
+-                break;
+-
+-            case SOUP_STATUS_MALFORMED:
+-                type = wxWEBVIEW_NAV_ERR_REQUEST;
+-                break;
+-
+             case SOUP_STATUS_BAD_REQUEST:
+                 type = wxWEBVIEW_NAV_ERR_REQUEST;
+                 break;
