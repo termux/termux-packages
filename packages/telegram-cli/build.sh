@@ -7,6 +7,7 @@ TERMUX_PKG_REVISION=6
 TERMUX_PKG_DEPENDS="libconfig, libevent, libjansson, openssl, readline, zlib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-liblua"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_SHA256=45b98f71f5f3421f85ead36b6690585a1a9efe7bc31f3dcd15d485a312f99b26
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_HOSTBUILD=true
 
@@ -18,6 +19,13 @@ termux_step_get_source() {
 	git checkout 6547c0b21b977b327b3c5e8142963f4bc246187a
 	git submodule update --init --recursive
 	mv * ../
+}
+
+termux_step_post_get_source() {
+	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum)
+	if [[ "${s}" != "${TERMUX_PKG_SHA256}  "* ]]; then
+		termux_error_exit "Checksum mismatch for source files."
+	fi
 }
 
 termux_step_host_build() {
