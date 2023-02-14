@@ -28,13 +28,13 @@ def die(msg):
     "Exit the process with an error message."
     sys.exit('ERROR: ' + msg)
 
-def parse_build_file_dependencies(path):
-    "Extract the dependencies of a build.sh or *.subpackage.sh file."
+def parse_build_file_dependencies_with_vars(path, vars):
+    "Extract the dependencies specified in the given variables of a build.sh or *.subpackage.sh file."
     dependencies = []
 
     with open(path, encoding="utf-8") as build_script:
         for line in build_script:
-            if line.startswith( ('TERMUX_PKG_DEPENDS', 'TERMUX_PKG_BUILD_DEPENDS', 'TERMUX_SUBPKG_DEPENDS', 'TERMUX_PKG_DEVPACKAGE_DEPENDS') ):
+            if line.startswith(vars):
                 dependencies_string = line.split('DEPENDS=')[1]
                 for char in "\"'\n":
                     dependencies_string = dependencies_string.replace(char, '')
@@ -48,6 +48,14 @@ def parse_build_file_dependencies(path):
 
     return set(dependencies)
 
+def parse_build_file_dependencies(path):
+    "Extract the dependencies of a build.sh or *.subpackage.sh file."
+    return parse_build_file_dependencies_with_vars(path, ('TERMUX_PKG_DEPENDS', 'TERMUX_PKG_BUILD_DEPENDS', 'TERMUX_SUBPKG_DEPENDS', 'TERMUX_PKG_DEVPACKAGE_DEPENDS'))
+
+def parse_build_file_antidependencies(path):
+    "Extract the antidependencies of a build.sh file."
+    return parse_build_file_dependencies_with_vars(path, 'TERMUX_PKG_ANTI_BUILD_DEPENDS')
+
 class TermuxPackage(object):
     "A main package definition represented by a directory with a build.sh file."
     def __init__(self, dir_path, fast_build_mode):
@@ -60,6 +68,7 @@ class TermuxPackage(object):
             raise Exception("build.sh not found for package '" + self.name + "'")
 
         self.deps = parse_build_file_dependencies(build_sh_path)
+        self.antideps = parse_build_file_antidependencies(build_sh_path)
 
         if os.getenv('TERMUX_ON_DEVICE_BUILD') == "true":
             always_deps = ['libc++']
@@ -78,6 +87,8 @@ class TermuxPackage(object):
             self.subpkgs.append(subpkg)
             self.deps.add(subpkg.name)
             self.deps |= subpkg.deps
+
+        self.deps -= self.antideps
 
         subpkg = TermuxSubPackage(self.dir + '/' + self.name + '-static' + '.subpackage.sh', self, virtual=True)
         self.subpkgs.append(subpkg)
