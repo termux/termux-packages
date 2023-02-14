@@ -5,7 +5,7 @@ TERMUX_PKG_LICENSE_FILE="llvm/LICENSE.TXT"
 TERMUX_PKG_MAINTAINER="@buttaface"
 LLVM_MAJOR_VERSION=15
 TERMUX_PKG_VERSION=${LLVM_MAJOR_VERSION}.0.7
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SHA256=8b5fcb24b4128cf04df1b0b9410ce8b1a729cb3c544e6da885d234280dedeac6
 TERMUX_PKG_SRCURL=https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/llvm-project-$TERMUX_PKG_VERSION.src.tar.xz
 TERMUX_PKG_HOSTBUILD=true
@@ -14,7 +14,8 @@ bin/ld64.lld.darwin*
 lib/libgomp.a
 lib/libiomp5.a
 "
-TERMUX_PKG_DEPENDS="libc++, ncurses, libffi, zlib, libxml2"
+TERMUX_PKG_DEPENDS="libc++, libffi, libxml2, ncurses, zlib, zstd"
+TERMUX_PKG_BUILD_DEPENDS="binutils-libs"
 # Replace gcc since gcc is deprecated by google on android and is not maintained upstream.
 # Conflict with clang versions earlier than 3.9.1-3 since they bundled llvm.
 TERMUX_PKG_CONFLICTS="gcc, clang (<< 3.9.1-3)"
@@ -56,6 +57,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DPERL_EXECUTABLE=$(command -v perl)
 -DLLVM_ENABLE_FFI=ON
 -DLLVM_INSTALL_UTILS=ON
+-DLLVM_BINUTILS_INCDIR=$TERMUX_PREFIX/include
 -DMLIR_INSTALL_AGGREGATE_OBJECTS=OFF
 -DMLIR_LINALG_ODS_YAML_GEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/mlir-linalg-ods-yaml-gen
 "
