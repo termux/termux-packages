@@ -1,0 +1,45 @@
+--- a/Makefile
++++ b/Makefile
+@@ -246,7 +246,7 @@ $(LLVM_BUILDDIR)/build.ninja:
+ 
+ # Build LLVM.
+ $(LLVM_BUILDDIR): $(LLVM_BUILDDIR)/build.ninja
+-	cd $(LLVM_BUILDDIR) && ninja $(NINJA_BUILD_TARGETS)
++	cd $(LLVM_BUILDDIR) && ninja -j`nproc` $(NINJA_BUILD_TARGETS)
+ 
+ ifneq ($(USE_SYSTEM_BINARYEN),1)
+ # Build Binaryen
+@@ -263,15 +263,15 @@ endif
+ wasi-libc: lib/wasi-libc/sysroot/lib/wasm32-wasi/libc.a
+ lib/wasi-libc/sysroot/lib/wasm32-wasi/libc.a:
+ 	@if [ ! -e lib/wasi-libc/Makefile ]; then echo "Submodules have not been downloaded. Please download them using:\n  git submodule update --init"; exit 1; fi
+-	cd lib/wasi-libc && make -j4 EXTRA_CFLAGS="-O2 -g -DNDEBUG -mnontrapping-fptoint -msign-ext" MALLOC_IMPL=none CC=$(CLANG) AR=$(LLVM_AR) NM=$(LLVM_NM)
++	cd lib/wasi-libc && make -j`nproc` EXTRA_CFLAGS="-O2 -g -DNDEBUG -mnontrapping-fptoint -msign-ext" MALLOC_IMPL=none CC=$(CLANG) AR=$(LLVM_AR) NM=$(LLVM_NM)
+ 
+ 
+ # Build the Go compiler.
+ tinygo:
+ 	@if [ ! -f "$(LLVM_BUILDDIR)/bin/llvm-config" ]; then echo "Fetch and build LLVM first by running:"; echo "  make llvm-source"; echo "  make $(LLVM_BUILDDIR)"; exit 1; fi
+-	CGO_CPPFLAGS="$(CGO_CPPFLAGS)" CGO_CXXFLAGS="$(CGO_CXXFLAGS)" CGO_LDFLAGS="$(CGO_LDFLAGS)" $(GOENVFLAGS) $(GO) build -buildmode exe -o build/tinygo$(EXE) -tags "byollvm osusergo" -ldflags="-X github.com/tinygo-org/tinygo/goenv.GitSha1=`git rev-parse --short HEAD`" .
++	CGO_CPPFLAGS="$(CGO_CPPFLAGS)" CGO_CXXFLAGS="$(CGO_CXXFLAGS)" CGO_LDFLAGS="$(CGO_LDFLAGS)" $(GOENVFLAGS) $(GO) build -buildmode pie -o build/tinygo$(EXE) -tags "byollvm osusergo" -ldflags="-X github.com/tinygo-org/tinygo/goenv.GitSha1=`git rev-parse --short HEAD`" .
+ test: wasi-libc
+-	CGO_CPPFLAGS="$(CGO_CPPFLAGS)" CGO_CXXFLAGS="$(CGO_CXXFLAGS)" CGO_LDFLAGS="$(CGO_LDFLAGS)" $(GO) test $(GOTESTFLAGS) -timeout=20m -buildmode exe -tags "byollvm osusergo" ./builder ./cgo ./compileopts ./compiler ./interp ./transform .
++	CGO_CPPFLAGS="$(CGO_CPPFLAGS)" CGO_CXXFLAGS="$(CGO_CXXFLAGS)" CGO_LDFLAGS="$(CGO_LDFLAGS)" $(GO) test $(GOTESTFLAGS) -timeout=20m -buildmode pie -tags "byollvm osusergo" ./builder ./cgo ./compileopts ./compiler ./interp ./transform .
+ 
+ # Standard library packages that pass tests on darwin, linux, wasi, and windows, but take over a minute in wasi
+ TEST_PACKAGES_SLOW = \
+@@ -417,11 +417,11 @@ tinygo-bench-wasi-fast:
+ 
+ # Test external packages in a large corpus.
+ test-corpus:
+-	CGO_CPPFLAGS="$(CGO_CPPFLAGS)" CGO_CXXFLAGS="$(CGO_CXXFLAGS)" CGO_LDFLAGS="$(CGO_LDFLAGS)" $(GO) test $(GOTESTFLAGS) -timeout=1h -buildmode exe -tags byollvm -run TestCorpus . -corpus=testdata/corpus.yaml
++	CGO_CPPFLAGS="$(CGO_CPPFLAGS)" CGO_CXXFLAGS="$(CGO_CXXFLAGS)" CGO_LDFLAGS="$(CGO_LDFLAGS)" $(GO) test $(GOTESTFLAGS) -timeout=1h -buildmode pie -tags byollvm -run TestCorpus . -corpus=testdata/corpus.yaml
+ test-corpus-fast:
+-	CGO_CPPFLAGS="$(CGO_CPPFLAGS)" CGO_CXXFLAGS="$(CGO_CXXFLAGS)" CGO_LDFLAGS="$(CGO_LDFLAGS)" $(GO) test $(GOTESTFLAGS) -timeout=1h -buildmode exe -tags byollvm -run TestCorpus -short . -corpus=testdata/corpus.yaml
++	CGO_CPPFLAGS="$(CGO_CPPFLAGS)" CGO_CXXFLAGS="$(CGO_CXXFLAGS)" CGO_LDFLAGS="$(CGO_LDFLAGS)" $(GO) test $(GOTESTFLAGS) -timeout=1h -buildmode pie -tags byollvm -run TestCorpus -short . -corpus=testdata/corpus.yaml
+ test-corpus-wasi: wasi-libc
+-	CGO_CPPFLAGS="$(CGO_CPPFLAGS)" CGO_CXXFLAGS="$(CGO_CXXFLAGS)" CGO_LDFLAGS="$(CGO_LDFLAGS)" $(GO) test $(GOTESTFLAGS) -timeout=1h -buildmode exe -tags byollvm -run TestCorpus . -corpus=testdata/corpus.yaml -target=wasi
++	CGO_CPPFLAGS="$(CGO_CPPFLAGS)" CGO_CXXFLAGS="$(CGO_CXXFLAGS)" CGO_LDFLAGS="$(CGO_LDFLAGS)" $(GO) test $(GOTESTFLAGS) -timeout=1h -buildmode pie -tags byollvm -run TestCorpus . -corpus=testdata/corpus.yaml -target=wasi
+ 
+ tinygo-baremetal:
+ 	# Regression tests that run on a baremetal target and don't fit in either main_test.go or smoketest.
