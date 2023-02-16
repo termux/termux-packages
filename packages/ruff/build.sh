@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="An extremely fast Python linter, written in Rust"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="../../LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.0.246
+TERMUX_PKG_VERSION=0.0.247
 TERMUX_PKG_SRCURL="https://github.com/charliermarsh/ruff/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=07ee2dc861cad70503a4d8cd7923e6905eaba8a750b7bf435fcc933b3f9d12c0
+TERMUX_PKG_SHA256=de91e9c87dc31f16b4148b21a91af4939ac762a43fe1f142811b96b8043bef22
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
@@ -22,4 +22,18 @@ termux_step_pre_configure() {
 	$AR cru libctermid.a ctermid.o
 
 	RUSTFLAGS+=" -C link-arg=$TERMUX_PKG_BUILDDIR/_lib/libctermid.a"
+
+	termux_setup_rust
+
+	: "${CARGO_HOME:=$HOME/.cargo}"
+	export CARGO_HOME
+
+	cd $TERMUX_PKG_SRCDIR
+	cargo fetch --target "${CARGO_TARGET_NAME}"
+
+	local _patch=$TERMUX_PKG_BUILDER_DIR/tikv-jemalloc-sys-0.5.3+5.3.0-patched-src-lib.rs.diff
+	local d
+	for d in $CARGO_HOME/registry/src/github.com-*/tikv-jemalloc-sys-*; do
+		patch --silent -p1 -d ${d} < ${_patch} || :
+	done
 }
