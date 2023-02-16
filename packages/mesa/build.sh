@@ -4,9 +4,10 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="docs/license.rst"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=22.3.5
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://archive.mesa3d.org/mesa-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=3eed2ecae2bc674494566faab9fcc9beb21cd804c7ba2b59a1694f3d7236e6a9
-TERMUX_PKG_DEPENDS="libandroid-shmem, libc++, libdrm, libexpat, libglvnd, libx11, libxext, libxfixes, libxshmfence, libxxf86vm, ncurses, zlib, zstd"
+TERMUX_PKG_DEPENDS="libandroid-shmem, libc++, libdrm, libexpat, libglvnd, libx11, libxext, libxfixes, libxshmfence, libxxf86vm, ncurses, zlib, zstd, libwayland, libwayland-protocols, vulkan-loader-android"
 TERMUX_PKG_SUGGESTS="mesa-dev"
 TERMUX_PKG_BUILD_DEPENDS="libllvm-static, libxrandr, llvm, llvm-tools, mlir, xorgproto"
 TERMUX_PKG_CONFLICTS="libmesa, ndk-sysroot (<= 25b)"
@@ -25,12 +26,23 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dglx=dri
 -Dllvm=enabled
 -Dshared-llvm=disabled
--Dplatforms=x11
--Dgallium-drivers=swrast
--Dvulkan-drivers=
+-Dplatforms=x11,wayland
+-Dgallium-drivers=swrast,zink
+-Dvulkan-drivers=[]
 -Dosmesa=true
 -Dglvnd=true
+-Dshared-glapi=enabled
+-Dshader-cache=enabled
 "
+#-Dlmsensors=disabled
+#-Dlibunwind=disabled
+#-Dgallium-vdpau=disabled
+#-Dgallium-omx=disabled
+#-Dgallium-va=disabled
+#-Dgallium-xa=disabled
+#-Dmicrosoft-clc=disabled
+#-Dvalgrind=disabled
+#-Dpower8=disabled
 
 termux_step_pre_configure() {
 	termux_setup_cmake

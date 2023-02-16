@@ -1,0 +1,11 @@
+--- src/meson.build	2023-02-16 17:00:22.031150576 +0300
++++ src/meson.build.patch	2023-02-17 14:06:37.623619113 +0300
+@@ -2069,7 +2069,7 @@
+ 
+ if with_platform_wayland
+   dep_wl_scanner = dependency('wayland-scanner', native: true)
+-  prog_wl_scanner = find_program(dep_wl_scanner.get_variable(pkgconfig : 'wayland_scanner'))
++  prog_wl_scanner = '@TERMUX_PREFIX@/opt/libwayland/cross/bin/wayland-scanner'
+   if dep_wl_scanner.version().version_compare('>= 1.15')
+     wl_scanner_arg = 'private-code'
+   else
