@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<dump>
+  <class name="DbusmenuMenuitem" get-type="dbusmenu_menuitem_get_type" parents="GObject">
+    <property name="id" type="gint" flags="235"/>
+    <signal name="property-changed" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="GVariant"/>
+    </signal>
+    <signal name="item-activated" return="void" when="last">
+      <param type="guint"/>
+    </signal>
+    <signal name="child-added" return="void" when="last">
+      <param type="GObject"/>
+      <param type="guint"/>
+    </signal>
+    <signal name="child-removed" return="void" when="last">
+      <param type="GObject"/>
+    </signal>
+    <signal name="child-moved" return="void" when="last">
+      <param type="GObject"/>
+      <param type="guint"/>
+      <param type="guint"/>
+    </signal>
+    <signal name="realized" return="void" when="last">
+    </signal>
+    <signal name="show-to-user" return="void" when="last">
+      <param type="guint"/>
+    </signal>
+    <signal name="about-to-show" return="gboolean" when="last">
+    </signal>
+    <signal name="event" return="gboolean" when="last" detailed="1">
+      <param type="gchararray"/>
+      <param type="GVariant"/>
+      <param type="guint"/>
+    </signal>
+  </class>
+  <class name="DbusmenuMenuitemProxy" get-type="dbusmenu_menuitem_proxy_get_type" parents="DbusmenuMenuitem,GObject">
+    <property name="menu-item" type="DbusmenuMenuitem" flags="235"/>
+  </class>
+  <class name="DbusmenuServer" get-type="dbusmenu_server_get_type" parents="GObject">
+    <property name="dbus-object" type="gchararray" flags="235"/>
+    <property name="root-node" type="DbusmenuMenuitem" flags="227"/>
+    <property name="version" type="guint" flags="225"/>
+    <property name="text-direction" type="DbusmenuTextDirection" flags="227"/>
+    <property name="status" type="DbusmenuStatus" flags="227"/>
+    <signal name="item-property-updated" return="void" when="last">
+      <param type="gint"/>
+      <param type="gchararray"/>
+      <param type="GVariant"/>
+    </signal>
+    <signal name="item-updated" return="void" when="last">
+      <param type="gint"/>
+    </signal>
+    <signal name="layout-updated" return="void" when="last">
+      <param type="guint"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="item-activation-requested" return="void" when="last">
+      <param type="gint"/>
+      <param type="guint"/>
+    </signal>
+  </class>
+  <class name="DbusmenuClient" get-type="dbusmenu_client_get_type" parents="GObject">
+    <property name="dbus-object" type="gchararray" flags="235"/>
+    <property name="dbus-name" type="gchararray" flags="235"/>
+    <property name="status" type="DbusmenuStatus" flags="225"/>
+    <property name="text-direction" type="DbusmenuTextDirection" flags="225"/>
+    <property name="group-events" type="gboolean" flags="227"/>
+    <signal name="layout-updated" return="void" when="last">
+    </signal>
+    <signal name="root-changed" return="void" when="last">
+      <param type="GObject"/>
+    </signal>
+    <signal name="new-menuitem" return="void" when="last">
+      <param type="GObject"/>
+    </signal>
+    <signal name="item-activate" return="void" when="last">
+      <param type="GObject"/>
+      <param type="guint"/>
+    </signal>
+    <signal name="event-result" return="void" when="last">
+      <param type="GObject"/>
+      <param type="gchararray"/>
+      <param type="GVariant"/>
+      <param type="guint"/>
+      <param type="gpointer"/>
+    </signal>
+    <signal name="icon-theme-dirs-changed" return="void" when="last">
+      <param type="gpointer"/>
+    </signal>
+  </class>
+</dump>
