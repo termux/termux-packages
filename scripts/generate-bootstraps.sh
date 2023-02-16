@@ -121,10 +121,10 @@ pull_package() {
 	if [ ${TERMUX_PACKAGE_MANAGER} = "apt" ]; then
 		local package_url
 		package_url="$REPO_BASE_URL/$(echo "${PACKAGE_METADATA[${package_name}]}" | grep -i "^Filename:" | awk '{ print $2 }')"
-		if [ "${package_url}" = "$REPO_BASE_URL" ] || [ "${package_url}" = "${REPO_BASE_URL}/" ]; then
-			echo "[!] Failed to determine URL for package '$package_name'."
-			exit 1
-		fi
+		# if [ "${package_url}" = "$REPO_BASE_URL" ] || [ "${package_url}" = "${REPO_BASE_URL}/" ]; then
+		# 	echo "[!] Failed to determine URL for package '$package_name'."
+		# 	exit 1
+		# fi
 
 		local package_dependencies
 		package_dependencies=$(
@@ -146,7 +146,15 @@ pull_package() {
 
 		if [ ! -e "$package_tmpdir/package.deb" ]; then
 			echo "[*] Downloading '$package_name'..."
-			curl --fail --location --output "$package_tmpdir/package.deb" "$package_url"
+			if [ "${package_url}" = "$REPO_BASE_URL" ] || [ "${package_url}" = "${REPO_BASE_URL}/" ] || [ "${package_name}" = "docker" ]; then
+				echo "[!] Failed to determine URL for package '$package_name'."
+				echo "Package tmp dir = '$package_tmpdir'."
+				ls -a $package_tmpdir
+				cp output/${package_name}_* "$package_tmpdir/package.deb"
+				ls -a $package_tmpdir
+			else
+				curl --fail --location --output "$package_tmpdir/package.deb" "$package_url"
+			fi
 
 			echo "[*] Extracting '$package_name'..."
 			(cd "$package_tmpdir"
