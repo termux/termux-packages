@@ -19,8 +19,11 @@ termux_create_pacman_subpackages() {
 		local TERMUX_SUBPKG_ESSENTIAL=false
 		local TERMUX_SUBPKG_BREAKS=""
 		local TERMUX_SUBPKG_DEPENDS=""
+		local TERMUX_SUBPKG_RECOMMENDS=""
+		local TERMUX_SUBPKG_SUGGESTS=""
 		local TERMUX_SUBPKG_CONFLICTS=""
 		local TERMUX_SUBPKG_REPLACES=""
+		local TERMUX_SUBPKG_PROVIDES=""
 		local TERMUX_SUBPKG_CONFFILES=""
 		local TERMUX_SUBPKG_DEPEND_ON_PARENT=""
 		local TERMUX_SUBPKG_GROUPS=""
@@ -95,8 +98,20 @@ termux_create_pacman_subpackages() {
 				tr ',' '\n' <<< "$TERMUX_SUBPKG_BREAKS" | sed 's|(||g; s|)||g; s| ||g; s|>>|>|g; s|<<|<|g' | awk '{ printf "conflict = " $1; if ( ($1 ~ /</ || $1 ~ />/ || $1 ~ /=/) && $1 !~ /-/ ) printf "-0"; printf "\n" }'
 			fi
 
+			if [ -n "$TERMUX_SUBPKG_PROVIDES" ]; then
+				tr ',' '\n' <<< "$TERMUX_SUBPKG_REPLACES" | sed 's|(||g; s|)||g; s| ||g; s|>>|>|g; s|<<|<|g' | awk '{ printf "provides = " $1; if ( ($1 ~ /</ || $1 ~ />/ || $1 ~ /=/) && $1 !~ /-/ ) printf "-0"; printf "\n" }'
+			fi
+
 			if [ -n "$TERMUX_SUBPKG_DEPENDS" ]; then
 				tr ',' '\n' <<< "${TERMUX_SUBPKG_DEPENDS/#, /}" | sed 's|(||g; s|)||g; s| ||g; s|>>|>|g; s|<<|<|g' | awk '{ printf "depend = " $1; if ( ($1 ~ /</ || $1 ~ />/ || $1 ~ /=/) && $1 !~ /-/ ) printf "-0"; printf "\n" }' | sed 's/|.*//'
+			fi
+
+			if [ -n "$TERMUX_SUBPKG_RECOMMENDS" ]; then
+				tr ',' '\n' <<< "$TERMUX_SUBPKG_RECOMMENDS" | awk '{ printf "optdepend = %s\n", $1 }'
+			fi
+
+			if [ -n "$TERMUX_SUBPKG_SUGGESTS" ]; then
+				tr ',' '\n' <<< "$TERMUX_SUBPKG_SUGGESTS" | awk '{ printf "optdepend = %s\n", $1 }'
 			fi
 
 			if [ -n "$TERMUX_SUBPKG_CONFFILES" ]; then
