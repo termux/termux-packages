@@ -3,8 +3,9 @@ TERMUX_PKG_DESCRIPTION="A persistent huge storage service, compatible with the v
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.4.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/OpenAtomFoundation/pika
-TERMUX_PKG_DEPENDS="google-glog, libc++, libprotobuf, librocksdb"
+TERMUX_PKG_DEPENDS="abseil-cpp, google-glog, libc++, libprotobuf, librocksdb"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 # ```
@@ -24,6 +25,8 @@ termux_step_pre_configure() {
 	termux_setup_protobuf
 
 	CPPFLAGS+=" -D_LIBCPP_ENABLE_CXX17_REMOVED_FEATURES"
+	CPPFLAGS+=" -DPROTOBUF_USE_DLLS"
+	LDFLAGS+=" $($TERMUX_SCRIPTDIR/packages/libprotobuf/interface_link_libraries.sh)"
 	export DISABLE_UPDATE_SB=1
 }
 
