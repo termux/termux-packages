@@ -4,10 +4,9 @@ TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # When updating the package, also update terminfo for kitty by updating
 # ncurses' kitty sources in main repo
-TERMUX_PKG_VERSION=0.26.5
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=0.27.1
 TERMUX_PKG_SRCURL=https://github.com/kovidgoyal/kitty/releases/download/v${TERMUX_PKG_VERSION}/kitty-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=5544a580314fec7711187ce28162909b5ecff6780071444fe96fb97f8be5c9ad
+TERMUX_PKG_SHA256=e57672c5ba1973be139548eb772ff13d79c29b0ed67cbbe4418c87b6f1b1a901
 # fontconfig is dlopen(3)ed:
 TERMUX_PKG_DEPENDS="dbus, fontconfig, harfbuzz, libpng, librsync, libx11, libxkbcommon, littlecms, ncurses, opengl, openssl, python, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libxcursor, libxi, libxinerama, libxrandr, xorgproto"
@@ -25,6 +24,8 @@ termux_step_post_get_source() {
 }
 
 termux_step_pre_configure() {
+	termux_setup_golang
+
 	CFLAGS+=" $CPPFLAGS"
 }
 
