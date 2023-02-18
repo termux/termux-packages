@@ -1,0 +1,26 @@
+--- mesa-22.3.5/src/gallium/drivers/zink/zink_kopper.c	2023-02-09 00:05:36.000000000 +0300
++++ mesa-22.3.5/src/gallium/drivers/zink/zink_kopper.c.patch	2023-02-19 14:30:42.745356546 +0300
+@@ -55,6 +55,11 @@
+ {
+     VkStructureType type = cdt->info.bos.sType;
+     switch (type) {
++/*#ifdef VK_USE_PLATFORM_ANDROID_KHR
++    case VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR:
++       cdt->type = KOPPER_ANDROID;
++       break;
++#endif*/
+ #ifdef VK_USE_PLATFORM_XCB_KHR
+     case VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR:
+        cdt->type = KOPPER_X11;
+@@ -84,6 +89,11 @@
+     init_dt_type(cdt);
+     VkStructureType type = cdt->info.bos.sType;
+     switch (type) {
++//#ifdef VK_USE_PLATFORM_ANDROID_KHR
++    case VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR:
++       error = vkCreateAndroidSurfaceKHR(screen->instance, &cdt->info.android, NULL, &surface);
++       break;
++//#endif
+ #ifdef VK_USE_PLATFORM_XCB_KHR
+     case VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR:
+        error = VKSCR(CreateXcbSurfaceKHR)(screen->instance, &cdt->info.xcb, NULL, &surface);

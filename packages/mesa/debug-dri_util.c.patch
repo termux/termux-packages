@@ -1,0 +1,33 @@
+--- src/src/gallium/frontends/dri/dri_util.c	2023-02-18 13:20:49.357340709 +0300
++++ src/src/gallium/frontends/dri/dri_util.c.patch	2023-02-20 14:23:18.195588371 +0300
+@@ -109,9 +109,13 @@
+     static const __DRIextension *emptyExtensionList[] = { NULL };
+     __DRIscreen *psp;
+ 
++    printf("ok3\n");
++
+     psp = calloc(1, sizeof(*psp));
+-    if (!psp)
++    if (!psp) {
++        printf("notok3.1\n");
+         return NULL;
++    }
+ 
+     assert(driver_extensions);
+     for (int i = 0; driver_extensions[i]; i++) {
+@@ -124,6 +128,7 @@
+     setupLoaderExtensions(psp, extensions);
+     // dri2 drivers require working invalidate
+     if (fd != -1 && !psp->dri2.useInvalidate) {
++       printf("notok3.2\n");
+        free(psp);
+        return NULL;
+     }
+@@ -142,6 +147,7 @@
+ 
+     *driver_configs = psp->driver->InitScreen(psp);
+     if (*driver_configs == NULL) {
++        printf("notok3.3\n");
+         free(psp);
+         return NULL;
+     }

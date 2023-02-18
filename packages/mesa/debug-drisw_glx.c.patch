@@ -1,0 +1,18 @@
+--- src/src/glx/drisw_glx.c	2023-02-18 13:20:49.617340709 +0300
++++ src/src/glx/drisw_glx.c.patch	2023-02-20 09:25:37.835037754 +0300
+@@ -977,12 +977,15 @@
+       goto handle_error;
+    }
+ 
++   printf("ok_value %d\n", screen);
+    if (psc->swrast->base.version >= 4) {
++      printf("ok2.1\n");
+       psc->driScreen =
+          psc->swrast->createNewScreen2(screen, loader_extensions_local,
+                                        extensions,
+                                        &driver_configs, psc);
+    } else {
++      printf("ok2.2\n");
+       psc->driScreen =
+          psc->swrast->createNewScreen(screen, loader_extensions_local,
+                                       &driver_configs, psc);

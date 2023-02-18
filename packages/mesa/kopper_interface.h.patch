@@ -1,0 +1,22 @@
+--- mesa-22.3.5/include/kopper_interface.h	2023-02-09 00:05:36.000000000 +0300
++++ mesa-22.3.5/include/kopper_interface.h.patch	2023-02-19 13:17:59.412860392 +0300
+@@ -36,6 +36,9 @@
+ 
+ #include <GL/internal/dri_interface.h>
+ #include <vulkan/vulkan.h>
++//#ifdef VK_USE_PLATFORM_ANDROID_KHR
++#include <vulkan/vulkan_android.h>
++//#endif
+ #ifdef VK_USE_PLATFORM_XCB_KHR
+ #include <xcb/xcb.h>
+ #include <vulkan/vulkan_xcb.h>
+@@ -85,6 +88,9 @@
+ struct kopper_loader_info {
+    union {
+       VkBaseOutStructure bos;
++//#ifdef VK_USE_PLATFORM_ANDROID_KHR
++      VkAndroidSurfaceCreateInfoKHR android;
++//#endif
+ #ifdef VK_USE_PLATFORM_XCB_KHR
+       VkXcbSurfaceCreateInfoKHR xcb;
+ #endif

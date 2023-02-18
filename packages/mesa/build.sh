@@ -7,9 +7,9 @@ TERMUX_PKG_VERSION=22.3.5
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://archive.mesa3d.org/mesa-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=3eed2ecae2bc674494566faab9fcc9beb21cd804c7ba2b59a1694f3d7236e6a9
-TERMUX_PKG_DEPENDS="libandroid-shmem, libc++, libdrm, libexpat, libglvnd, libx11, libxext, libxfixes, libxshmfence, libxxf86vm, ncurses, zlib, zstd, libwayland, libwayland-protocols, vulkan-loader-android"
+TERMUX_PKG_DEPENDS="libandroid-shmem, libc++, libdrm, libexpat, libglvnd, libx11, libxext, libxfixes, libxshmfence, libxxf86vm, ncurses, zlib, zstd, libwayland, vulkan-loader-android"
 TERMUX_PKG_SUGGESTS="mesa-dev"
-TERMUX_PKG_BUILD_DEPENDS="libllvm-static, libxrandr, llvm, llvm-tools, mlir, xorgproto"
+TERMUX_PKG_BUILD_DEPENDS="libllvm-static, libxrandr, llvm, llvm-tools, mlir, xorgproto, vulkan-headers, libwayland-protocols"
 TERMUX_PKG_CONFLICTS="libmesa, ndk-sysroot (<= 25b)"
 TERMUX_PKG_REPLACES="libmesa"
 
@@ -48,7 +48,7 @@ termux_step_pre_configure() {
 	termux_setup_cmake
 
 	CPPFLAGS+=" -D__USE_GNU"
-	LDFLAGS+=" -landroid-shmem"
+	LDFLAGS+=" -landroid-shmem -lvulkan"
 
 	_WRAPPER_BIN=$TERMUX_PKG_BUILDDIR/_wrapper/bin
 	mkdir -p $_WRAPPER_BIN

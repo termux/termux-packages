@@ -1,0 +1,11 @@
+--- src/src/gallium/drivers/zink/zink_screen.c	2023-02-18 13:20:49.307340709 +0300
++++ src/src/gallium/drivers/zink/zink_screen.c.patch	2023-02-20 21:48:23.558627668 +0300
+@@ -56,7 +56,7 @@
+ #include <unistd.h>
+ #if DETECT_OS_APPLE
+ #define VK_LIBNAME "libvulkan.1.dylib"
+-#elif DETECT_OS_ANDROID
++#elif DETECT_OS_ANDROID || defined(__ANDROID__)
+ #define VK_LIBNAME "libvulkan.so"
+ #else
+ #define VK_LIBNAME "libvulkan.so.1"

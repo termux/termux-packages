@@ -1,0 +1,68 @@
+--- src/src/glx/glxcmds.c	2023-02-18 13:20:49.617340709 +0300
++++ src/src/glx/glxcmds.c.patch	2023-02-20 09:10:41.537884661 +0300
+@@ -356,6 +356,7 @@
+    LockDisplay(dpy);
+    switch (code) {
+    case X_GLXCreateContext: {
++      printf("ok1.1\n");
+       xGLXCreateContextReq *req;
+ 
+       /* Send the glXCreateContext request */
+@@ -371,6 +372,7 @@
+    }
+ 
+    case X_GLXCreateNewContext: {
++      printf("ok1.2\n");
+       xGLXCreateNewContextReq *req;
+ 
+       /* Send the glXCreateNewContext request */
+@@ -387,6 +389,7 @@
+    }
+ 
+    case X_GLXvop_CreateContextWithConfigSGIX: {
++      printf("ok1.3\n");
+       xGLXVendorPrivateWithReplyReq *vpreq;
+       xGLXCreateContextWithConfigSGIXReq *req;
+ 
+@@ -408,6 +411,7 @@
+    }
+ 
+    default:
++      printf("ok1.4\n");
+       /* What to do here?  This case is the sign of an internal error.  It
+        * should never be reachable.
+        */
+@@ -430,6 +434,7 @@
+       int isDirect = __glXIsDirect(dpy, gc->xid, &error);
+ 
+       if (error != False || isDirect != gc->isDirect) {
++         printf("ok_error_1\n");
+          gc->vtable->destroy(gc);
+          gc = NULL;
+       }
+@@ -1625,10 +1630,12 @@
+    int list_size;
+    unsigned i;
+ 
++   printf("ok0.1\n");
+    if (!config) {
+        __glXSendError(dpy, GLXBadFBConfig, 0, X_GLXCreateNewContext, false);
+        return NULL;
+    }
++   printf("ok0.2\n");
+ 
+    config_list = (struct glx_config **)
+       glXGetFBConfigs(dpy, config->screen, &list_size);
+@@ -1639,10 +1646,12 @@
+    }
+    free(config_list);
+ 
++   printf("ok0.3\n");
+    if (i == list_size) {
+        __glXSendError(dpy, GLXBadFBConfig, 0, X_GLXCreateNewContext, false);
+        return NULL;
+    }
++   printf("ok0.4\n");
+ 
+    return CreateContext(dpy, config->fbconfigID, config, shareList,
+ 			allowDirect, X_GLXCreateNewContext, renderType);
