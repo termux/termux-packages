@@ -4,14 +4,14 @@ TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # This package depends on libpython${TERMUX_PYTHON_VERSION}.so.
 # Please revbump and rebuild when bumping TERMUX_PYTHON_VERSION.
-TERMUX_PKG_VERSION=12.1
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=13.1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/gdb/gdb-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=0e1793bf8f2b54d53f46dea84ccfd446f48f81b297b28c4f7fc017b818d69fed
-TERMUX_PKG_DEPENDS="libc++, liblzma, libexpat, readline, ncurses, libmpfr, python, zlib, libthread-db"
+TERMUX_PKG_SHA256=115ad5c18d69a6be2ab15882d365dda2a2211c14f480b3502c6eba576e2e95a0
+TERMUX_PKG_DEPENDS="libc++, libexpat, libiconv, liblzma, libmpfr, libthread-db, ncurses, python, readline, zlib, zstd"
 TERMUX_PKG_BREAKS="gdb-dev"
 TERMUX_PKG_REPLACES="gdb-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--disable-shared
 --disable-werror
 --with-system-readline
 --with-curses
@@ -36,4 +36,8 @@ termux_step_pre_configure() {
 	export gl_cv_func_getcwd_path_max=yes
 
 	LDFLAGS+=" $($CC -print-libgcc-file-name)"
+}
+
+termux_step_post_make_install() {
+	install -Dm700 -t $TERMUX_PREFIX/bin gdbserver/gdbserver
 }

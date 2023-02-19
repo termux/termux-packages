@@ -1,0 +1,22 @@
+--- a/gdb/aarch64-linux-nat.c
++++ b/gdb/aarch64-linux-nat.c
+@@ -445,7 +445,8 @@
+   gdb_assert (regno != -1);
+   gdb_assert (tdep->tls_register_count > 0);
+ 
+-  uint64_t tpidrs[tdep->tls_register_count] = { 0 };
++  uint64_t tpidrs[tdep->tls_register_count];
++  memset (tpidrs, 0, sizeof (tpidrs));
+   struct iovec iovec;
+   iovec.iov_base = tpidrs;
+   iovec.iov_len = sizeof (tpidrs);
+@@ -471,7 +472,8 @@
+   gdb_assert (regno != -1);
+   gdb_assert (tdep->tls_register_count > 0);
+ 
+-  uint64_t tpidrs[tdep->tls_register_count] = { 0 };
++  uint64_t tpidrs[tdep->tls_register_count];
++  memset (tpidrs, 0, sizeof (tpidrs));
+ 
+   for (int i = 0; i < tdep->tls_register_count; i++)
+     {
