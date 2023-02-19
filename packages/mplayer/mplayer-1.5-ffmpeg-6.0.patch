@@ -1,0 +1,19 @@
+--- a/libmpcodecs/ad_spdif.c
++++ b/libmpcodecs/ad_spdif.c
+@@ -23,6 +23,7 @@
+ #include "ad_internal.h"
+ #include "av_helpers.h"
+ #include "libavformat/avformat.h"
++#include "libavformat/mux.h"
+ #include "libavcodec/avcodec.h"
+ #include "libavutil/opt.h"
+ 
+@@ -112,7 +113,7 @@
+     lavf_ctx->oformat = av_guess_format(FILENAME_SPDIFENC, NULL, NULL);
+     if (!lavf_ctx->oformat)
+         goto fail;
+-    lavf_ctx->priv_data = av_mallocz(lavf_ctx->oformat->priv_data_size);
++    lavf_ctx->priv_data = av_mallocz(((FFOutputFormat *)lavf_ctx->oformat)->priv_data_size);
+     if (!lavf_ctx->priv_data)
+         goto fail;
+     lavf_ctx->pb = avio_alloc_context(spdif_ctx->pb_buffer, OUTBUF_SIZE, 1, spdif_ctx,
