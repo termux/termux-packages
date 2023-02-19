@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Efficient ID3 tag editor"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.9.3
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/kid3/kid3-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=69e3ed1a428c113d90bcbe6187ff9d4d79176d9929a4368a65feeffa1ea2e0a6
 TERMUX_PKG_DEPENDS="chromaprint, ffmpeg, id3lib, libc++, libflac, libogg, libvorbis, qt5-qtbase, qt5-qtdeclarative, qt5-qtmultimedia, readline, taglib"

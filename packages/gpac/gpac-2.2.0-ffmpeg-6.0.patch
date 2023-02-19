@@ -1,0 +1,22 @@
+--- a/src/filters/ff_mx.c
++++ b/src/filters/ff_mx.c
+@@ -503,7 +503,7 @@
+ 		evt.seg_size.is_init = 0;
+ 	}
+ 	evt.seg_size.media_range_start = ctx->offset_at_seg_start;
+-	evt.seg_size.media_range_end = ctx->muxer->pb ? (ctx->muxer->pb->written-1) : 0;
++	evt.seg_size.media_range_end = ctx->muxer->pb ? (ctx->muxer->pb->bytes_written-1) : 0;
+ 	ctx->offset_at_seg_start = evt.seg_size.media_range_end;
+ 
+ 	gf_filter_pid_send_event(pid, &evt);
+@@ -1013,8 +1013,8 @@
+ 		ff_codec_id = ffmpeg_codecid_from_gpac(codec_id, &ff_codec_tag);
+ 	}
+ 
+-	if (ctx->muxer->oformat && ctx->muxer->oformat->query_codec) {
+-		res = ctx->muxer->oformat->query_codec(ff_codec_id, 1);
++	if (ctx->muxer->oformat) {
++		res = avformat_query_codec(ctx->muxer->oformat, ff_codec_id, 1);
+ 		if (!res) {
+ 			GF_LOG(GF_LOG_ERROR, GF_LOG_CONTAINER, ("[FFMux] Codec %s not supported in container %s\n", gf_codecid_name(codec_id), ctx->muxer->oformat->name));
+ 			return GF_NOT_SUPPORTED;
