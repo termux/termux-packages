@@ -35,6 +35,9 @@ mkdir -p "$TERMUX_PKG_TMPDIR"
 
 # Build tools.
 . "$TERMUX_SCRIPTDIR"/scripts/build/termux_download.sh
+(. "$TERMUX_SCRIPTDIR"/scripts/build/setup/termux_setup_cargo_c.sh
+	termux_setup_cargo_c
+)
 (. "$TERMUX_SCRIPTDIR"/scripts/build/setup/termux_setup_cmake.sh
 	termux_setup_cmake
 )
