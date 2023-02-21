@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="The Glasgow Haskell Compiler libraries"
 TERMUX_PKG_LICENSE="BSD 2-Clause, BSD 3-Clause, LGPL-2.1"
 TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.org>"
 TERMUX_PKG_VERSION=9.2.5
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://downloads.haskell.org/~ghc/${TERMUX_PKG_VERSION}/ghc-${TERMUX_PKG_VERSION}-src.tar.xz"
 TERMUX_PKG_SHA256=0606797d1b38e2d88ee2243f38ec6b9a1aa93e9b578e95f0de9a9c0a4144021c
 TERMUX_PKG_DEPENDS="libiconv, libffi, ncurses, libgmp, libandroid-posix-semaphore"
@@ -23,6 +24,21 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_REPLACES="ghc-libs-static"
+
+# 'network' is used by 'libiserv'. This will enable over the network support in 'iserv-proxy' which is
+# used to cross-compile haskell-template.
+termux_step_post_get_source() {
+	mkdir -p "$TERMUX_PKG_SRCDIR"/libraries/network
+	local tar_file="$TERMUX_PKG_CACHEDIR/network.tar"
+	termux_download \
+		https://hackage.haskell.org/package/network-2.8.0.1/network-2.8.0.1.tar.gz \
+		"$tar_file" \
+		61f55dbfed0f0af721a8ea36079e9309fcc5a1be20783b44ae500d9e4399a846
+	tar xf "$tar_file" -C "$TERMUX_PKG_SRCDIR"/libraries/network --strip-components=1
+	# Alllow newer versions of 'bytestring':
+	sed -ri 's|(bytestring) == .*|\1|' "$TERMUX_PKG_SRCDIR"/libraries/network/network.cabal
+	# XXX: Please verify above command works when updating.
+}
 
 termux_step_pre_configure() {
 	termux_setup_ghc
@@ -56,6 +72,7 @@ termux_step_pre_configure() {
 		DYNAMIC_GHC_PROGRAMS = YES
 		SplitSections      = YES
 		StripLibraries     = YES
+		libraries/libiserv_CONFIGURE_OPTS += --flags=+network
 	EOF
 
 	patch -p1 <<-EOF
