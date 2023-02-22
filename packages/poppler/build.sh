@@ -3,13 +3,12 @@ TERMUX_PKG_DESCRIPTION="PDF rendering library"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Please align the version with `poppler-qt` package.
-TERMUX_PKG_VERSION=22.11.0
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=23.02.0
 # Do not forget to bump revision of reverse dependencies and rebuild them
 # when SOVERSION is changed.
-_POPPLER_SOVERSION=125
+_POPPLER_SOVERSION=126
 TERMUX_PKG_SRCURL=https://poppler.freedesktop.org/poppler-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=093ba9844ed774285517361c15e21a31ba4df278a499263d4403cca74f2da828
+TERMUX_PKG_SHA256=3315dda270fe2b35cf1f41d275948c39652fa863b90de0766f6b293d9a558fc9
 TERMUX_PKG_DEPENDS="fontconfig, freetype, glib, libc++, libcairo, libcurl, libiconv, libjpeg-turbo, libpng, libtiff, littlecms, openjpeg, zlib"
 TERMUX_PKG_BUILD_DEPENDS="boost, boost-headers, g-ir-scanner, openjpeg-tools"
 TERMUX_PKG_BREAKS="poppler-dev, poppler-qt (<< ${TERMUX_PKG_VERSION})"
