@@ -1,0 +1,40 @@
+--- a/src/base/process.cc
++++ b/src/base/process.cc
+@@ -54,11 +54,36 @@
+ #else  // _WIN32
+ #include <fcntl.h>
+ #include <signal.h>
+-#include <spawn.h>  // for posix_spawn().
++//#include <spawn.h>  // for posix_spawn().
+ #include <string.h>
+ #include <sys/stat.h>
+ 
+ #include <cerrno>
++
++#include <unistd.h>
++#include <sys/wait.h>
++static int
++posix_spawn(pid_t *pid, const char *path,
++  const /*posix_spawn_file_actions_t*/void *fa,
++  const /*posix_spawnattr_t*/void *sa,
++  char * const argv[], char * const envp[])
++{
++  pid_t p;
++  volatile int error = 0;
++
++  p = vfork();
++  if (p == -1) return errno;
++  else if (p == 0) {
++    execve(path, argv, envp != NULL ? envp : environ);
++    error = errno;
++    _exit(127);
++  }
++  if (error != 0)
++    waitpid(p, NULL, WNOHANG);
++  else if (pid != NULL)
++    *pid = p;
++  return (error);
++}
+ #endif  // !_WIN32
+ 
+ #ifdef __linux

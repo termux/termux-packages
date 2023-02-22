@@ -1,0 +1,39 @@
+--- a/src/gyp/common.gypi
++++ b/src/gyp/common.gypi
+@@ -225,6 +225,15 @@
+           ['target_platform=="Linux"', {
+             # OS_LINUX is defined always (target and host).
+             'defines': ['OS_LINUX',],
++            'target_conditions' : [
++              ['_toolset=="host"', {
++                'include_dirs': [],
++              }],
++              ['_toolset=="target"', {
++                'include_dirs': [ '@TERMUX_PREFIX@/include' ],
++                'library_dirs': [ '@TERMUX_PREFIX@/lib' ],
++              }]
++            ],
+           }],
+         ],
+       }],
+@@ -282,4 +291,20 @@
+       }],
+     ],
+   },
++  'conditions': [
++    ['target_platform=="Linux"', {
++      'make_global_settings': [
++        ['AR', '<!(which ar)'],
++        ['LD', '<!(which ld)'],
++        ['NM', '<!(which nm)'],
++        ['READELF', '<!(which readelf)'],
++        ['AR.host', '/usr/bin/ar'],
++        ['CC.host', '/usr/bin/gcc'],
++        ['CXX.host', '/usr/bin/g++'],
++        ['LD.host', '/usr/bin/ld'],
++        ['NM.host', '/usr/bin/nm'],
++        ['READELF.host', '/usr/bin/readelf'],
++      ],
++    }],
++  ],
+ }
