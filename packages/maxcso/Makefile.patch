@@ -1,0 +1,11 @@
+--- a/Makefile
++++ b/Makefile
+@@ -32,7 +32,7 @@
+ 
+ # TODO: Perhaps detect and use system libdeflate if available.
+ maxcso: $(SRC_CXX_OBJ) $(CLI_CXX_OBJ) $(ZOPFLI_C_OBJ) 7zip/7zip.a libdeflate/libdeflate.a
+-	$(CXX) -o $@ $(SRC_CXXFLAGS) $(CXXFLAGS) $^ -luv -llz4 -lz
++	$(CXX) -o $@ $(SRC_CXXFLAGS) $(CXXFLAGS) $^ $(LDFLAGS) -luv -llz4 -lz
+ 
+ 7zip/7zip.a:
+ 	$(MAKE) -C 7zip 7zip.a
