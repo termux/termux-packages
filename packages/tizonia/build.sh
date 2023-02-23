@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=0.22.0
 TERMUX_PKG_REVISION=11
 TERMUX_PKG_SRCURL=https://github.com/tizonia/tizonia-openmax-il/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=0750cae23ed600fb4b4699a392f43a5e03dcd0870383d64da4b8c28ea94a82f8
-TERMUX_PKG_DEPENDS="boost, dbus, libandroid-wordexp, libc++, libcurl, libflac, liblog4c, libmad, libmediainfo, libmp3lame, liboggz, libopus, libsndfile, libsqlite, libuuid (>> 2.38.1), libvpx, mpg123, opusfile, pulseaudio, python, taglib"
+TERMUX_PKG_DEPENDS="boost, dbus, libandroid-wordexp, libc++, libcurl, libflac, liblog4c, libmad, libmediainfo, libmp3lame, liboggz, libopus, libsndfile, libsqlite, libuuid, libvpx, mpg123, opusfile, pulseaudio, python, taglib"
 TERMUX_PKG_BUILD_DEPENDS="boost-headers, libev"
 TERMUX_PKG_HOSTBUILD=true
 
