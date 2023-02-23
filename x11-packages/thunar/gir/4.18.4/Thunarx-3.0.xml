@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<dump>
+  <interface name="ThunarxFileInfo" get-type="thunarx_file_info_get_type">
+    <signal name="changed" return="void" when="first">
+    </signal>
+    <signal name="renamed" return="void" when="first">
+    </signal>
+  </interface>
+  <boxed name="ThunarxFileInfoList" get-type="thunarx_file_info_list_get_type"/>
+  <class name="ThunarxMenu" get-type="thunarx_menu_get_type" parents="GObject">
+  </class>
+  <class name="ThunarxMenuItem" get-type="thunarx_menu_item_get_type" parents="GObject">
+    <property name="name" type="gchararray" flags="11"/>
+    <property name="label" type="gchararray" flags="3"/>
+    <property name="tooltip" type="gchararray" flags="3"/>
+    <property name="icon" type="gchararray" flags="3"/>
+    <property name="sensitive" type="gboolean" flags="3"/>
+    <property name="priority" type="gboolean" flags="3"/>
+    <property name="menu" type="ThunarxMenu" flags="3"/>
+    <signal name="activate" return="void" when="last">
+    </signal>
+  </class>
+  <interface name="ThunarxMenuProvider" get-type="thunarx_menu_provider_get_type">
+  </interface>
+  <interface name="ThunarxPreferencesProvider" get-type="thunarx_preferences_provider_get_type">
+  </interface>
+  <class name="ThunarxPropertyPage" get-type="thunarx_property_page_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="label" type="gchararray" flags="3"/>
+    <property name="label-widget" type="GtkWidget" flags="3"/>
+  </class>
+  <interface name="ThunarxPropertyPageProvider" get-type="thunarx_property_page_provider_get_type">
+  </interface>
+  <class name="ThunarxProviderFactory" get-type="thunarx_provider_factory_get_type" parents="GObject">
+  </class>
+  <interface name="ThunarxProviderPlugin" get-type="thunarx_provider_plugin_get_type">
+    <property name="resident" type="gboolean" flags="3"/>
+  </interface>
+  <class name="ThunarxRenamer" get-type="thunarx_renamer_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject" abstract="1">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="help-url" type="gchararray" flags="3"/>
+    <property name="name" type="gchararray" flags="11"/>
+    <signal name="changed" return="void" when="first">
+    </signal>
+  </class>
+  <interface name="ThunarxRenamerProvider" get-type="thunarx_renamer_provider_get_type">
+  </interface>
+  <class name="ThunarxProviderModule" get-type="thunarx_provider_module_get_type" parents="GTypeModule,GObject">
+    <implements name="GTypePlugin"/>
+    <implements name="ThunarxProviderPlugin"/>
+  </class>
+</dump>
