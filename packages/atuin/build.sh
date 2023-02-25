@@ -15,7 +15,7 @@ termux_step_pre_configure() {
 	export RUSTFLAGS="${RUSTFLAGS:-} -C link-args=$($CC -print-libgcc-file-name)"
 }
 
-termux_step_handle_hostbuild() {
+termux_step_host_build() {
 	export CC=""
 	export CFLAGS=""
 	export CPPFLAGS=""

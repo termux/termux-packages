@@ -10,7 +10,7 @@ TERMUX_PKG_DEPENDS="dash, git"
 TERMUX_PKG_CONFFILES="etc/gogs/app.ini"
 TERMUX_PKG_HOSTBUILD=true
 
-termux_step_handle_hostbuild() {
+termux_step_host_build() {
 	termux_setup_golang
 	export GOPATH=$TERMUX_PKG_HOSTBUILD_DIR
 	mkdir -p $TERMUX_PKG_HOSTBUILD_DIR
