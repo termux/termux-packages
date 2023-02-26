@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=23.2
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://deb.debian.org/debian/pool/main/p/picolisp/picolisp_${TERMUX_PKG_VERSION}.orig.tar.gz
 TERMUX_PKG_SHA256=d46bcfdaf9af3c0b0abe3ba5e81372e4119ef24fcfb538b3c40cd3d278998170
 TERMUX_PKG_DEPENDS="libcrypt, libffi, openssl, readline"
@@ -55,6 +55,8 @@ termux_step_make_install() {
 	cp -r ../test $TERMUX_PREFIX/lib/picolisp
 	cp -r ../doc $TERMUX_PREFIX/lib/picolisp
 	cp -r ../img $TERMUX_PREFIX/lib/picolisp
+
+	install -Dm644 -t $TERMUX_PREFIX/share/bash-completion/completions/pil ../lib/bash_completion
 }
 
 termux_step_create_debscripts() {
