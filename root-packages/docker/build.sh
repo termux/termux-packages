@@ -2,7 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://docker.com
 TERMUX_PKG_DESCRIPTION="Set of products that use OS-level virtualization to deliver software in packages called containers."
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=20.10.23
+# v20.10.23 is the last version confirmed to work.
+# Do not update it unless you tested it on your device.
+TERMUX_PKG_VERSION=1:20.10.23
 LIBNETWORK_COMMIT=05b93e0d3a95952f70c113b0bc5bdb538d7afdd7
 DOCKER_GITCOMMIT=7155243
 TERMUX_PKG_SRCURL=(https://github.com/moby/moby/archive/v${TERMUX_PKG_VERSION}.tar.gz
