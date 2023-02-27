@@ -21,7 +21,7 @@ termux_step_host_build() {
 	export CPPFLAGS=""
 	termux_setup_rust
 
-	mkdir -p $TERMUX_PKG_HOSTBUILD_DIR
+	cd "$TERMUX_PKG_SRCDIR"
 	cargo build \
 		--jobs $TERMUX_MAKE_PROCESSES \
 		--locked \
