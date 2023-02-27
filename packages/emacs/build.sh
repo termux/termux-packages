@@ -3,10 +3,13 @@ TERMUX_PKG_DESCRIPTION="Extensible, customizable text editor-and more"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Update both emacs and emacs-x to the same version in one PR.
-TERMUX_PKG_VERSION=28.2
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/emacs/emacs-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=ee21182233ef3232dc97b486af2d86e14042dbb65bbc535df562c3a858232488
+_VERSION=28.3
+TERMUX_PKG_VERSION=${_VERSION}-rc1
+TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/emacs/emacs-${_VERSION}.tar.xz
+if [[ $TERMUX_PKG_VERSION == *-rc* ]]; then
+	TERMUX_PKG_SRCURL=https://alpha.gnu.org/gnu/emacs/pretest/emacs-${TERMUX_PKG_VERSION#*:}.tar.xz
+fi
+TERMUX_PKG_SHA256=41c53433c8dc49bd017f421e09c97eda4e046f34967c872bec80b3495dfaa933
 TERMUX_PKG_DEPENDS="libgmp, libgnutls, libjansson, libxml2, ncurses, zlib"
 TERMUX_PKG_BREAKS="emacs-dev"
 TERMUX_PKG_REPLACES="emacs-dev"
@@ -62,11 +65,11 @@ TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/grep-changelog
 share/applications/emacs.desktop
-share/emacs/${TERMUX_PKG_VERSION}/etc/emacs.desktop
-share/emacs/${TERMUX_PKG_VERSION}/etc/emacs.icon
-share/emacs/${TERMUX_PKG_VERSION}/etc/images
-share/emacs/${TERMUX_PKG_VERSION}/etc/refcards
-share/emacs/${TERMUX_PKG_VERSION}/etc/tutorials/TUTORIAL.*
+share/emacs/${_VERSION}/etc/emacs.desktop
+share/emacs/${_VERSION}/etc/emacs.icon
+share/emacs/${_VERSION}/etc/images
+share/emacs/${_VERSION}/etc/refcards
+share/emacs/${_VERSION}/etc/tutorials/TUTORIAL.*
 share/icons
 share/man/man1/grep-changelog.1.gz
 "
@@ -101,10 +104,11 @@ termux_step_post_get_source() {
 }
 
 termux_step_host_build() {
+	local _VERSION=$(echo ${TERMUX_PKG_VERSION#*:} | cut -d - -f 1)
 	# Build a bootstrap-emacs binary to be used in termux_step_post_configure.
 	local NATIVE_PREFIX=$TERMUX_PKG_TMPDIR/emacs-native
-	mkdir -p $NATIVE_PREFIX/share/emacs/$TERMUX_PKG_VERSION
-	ln -s $TERMUX_PKG_SRCDIR/lisp $NATIVE_PREFIX/share/emacs/$TERMUX_PKG_VERSION/lisp
+	mkdir -p $NATIVE_PREFIX/share/emacs/${_VERSION}
+	ln -s $TERMUX_PKG_SRCDIR/lisp $NATIVE_PREFIX/share/emacs/${_VERSION}/lisp
 	( cd $TERMUX_PKG_SRCDIR; ./autogen.sh )
 	$TERMUX_PKG_SRCDIR/configure --prefix=$NATIVE_PREFIX --without-all --without-x
 	make -j $TERMUX_MAKE_PROCESSES
@@ -126,6 +130,7 @@ termux_step_post_make_install() {
 }
 
 termux_step_create_debscripts() {
+	local _VERSION=$(echo ${TERMUX_PKG_VERSION#*:} | cut -d - -f 1)
 	cat <<- EOF > ./postinst
 	#!$TERMUX_PREFIX/bin/sh
 	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" = "configure" ] || [ "\$1" = "abort-upgrade" ]; then
@@ -135,9 +140,9 @@ termux_step_create_debscripts() {
 		fi
 	fi
 
-	cd $TERMUX_PREFIX/share/emacs/$TERMUX_PKG_VERSION/lisp
+	cd $TERMUX_PREFIX/share/emacs/${_VERSION}/lisp
 	LC_ALL=C $TERMUX_PREFIX/bin/emacs -batch -l loadup --temacs=pdump
-	mv $TERMUX_PREFIX/bin/emacs*.pdmp $TERMUX_PREFIX/libexec/emacs/$TERMUX_PKG_VERSION/${TERMUX_ARCH}-linux-android*/
+	mv $TERMUX_PREFIX/bin/emacs*.pdmp $TERMUX_PREFIX/libexec/emacs/${_VERSION}/${TERMUX_ARCH}-linux-android*/
 	EOF
 
 	cat <<- EOF > ./prerm
