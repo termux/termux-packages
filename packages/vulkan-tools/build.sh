@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Vulkan Tools and Utilities"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # This package and vulkan-headers should be updated at same time. Otherwise, they do not compile successfully.
-TERMUX_PKG_VERSION="1.3.241"
+TERMUX_PKG_VERSION="1.3.242"
 TERMUX_PKG_SRCURL=https://github.com/KhronosGroup/Vulkan-Tools/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=e8bb61e6c4514cb60b85d74cd27204001a19492310e3055659778b1d33bb0078
+TERMUX_PKG_SHA256=a1548442e5ec1440bce219136c100e8505e8d1f4c24666cab9f26abb953a3725
 TERMUX_PKG_BUILD_DEPENDS="vulkan-headers (=${TERMUX_PKG_VERSION}), vulkan-loader-android"
 TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
