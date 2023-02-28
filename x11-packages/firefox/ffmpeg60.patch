@@ -1,0 +1,111 @@
+Delete me when FFmpeg 6.0 is supported upstream.
+
+--- a/dom/media/platforms/ffmpeg/FFmpegLibWrapper.cpp
++++ b/dom/media/platforms/ffmpeg/FFmpegLibWrapper.cpp
+@@ -66,6 +66,7 @@
+     AV_FUNC_57 = 1 << 4,
+     AV_FUNC_58 = 1 << 5,
+     AV_FUNC_59 = 1 << 6,
++    AV_FUNC_60 = 1 << 7,
+     AV_FUNC_AVUTIL_53 = AV_FUNC_53 | AV_FUNC_AVUTIL_MASK,
+     AV_FUNC_AVUTIL_54 = AV_FUNC_54 | AV_FUNC_AVUTIL_MASK,
+     AV_FUNC_AVUTIL_55 = AV_FUNC_55 | AV_FUNC_AVUTIL_MASK,
+@@ -73,8 +74,9 @@
+     AV_FUNC_AVUTIL_57 = AV_FUNC_57 | AV_FUNC_AVUTIL_MASK,
+     AV_FUNC_AVUTIL_58 = AV_FUNC_58 | AV_FUNC_AVUTIL_MASK,
+     AV_FUNC_AVUTIL_59 = AV_FUNC_59 | AV_FUNC_AVUTIL_MASK,
++    AV_FUNC_AVUTIL_60 = AV_FUNC_60 | AV_FUNC_AVUTIL_MASK,
+     AV_FUNC_AVCODEC_ALL = AV_FUNC_53 | AV_FUNC_54 | AV_FUNC_55 | AV_FUNC_56 |
+-                          AV_FUNC_57 | AV_FUNC_58 | AV_FUNC_59,
++                          AV_FUNC_57 | AV_FUNC_58 | AV_FUNC_59 | AV_FUNC_60,
+     AV_FUNC_AVUTIL_ALL = AV_FUNC_AVCODEC_ALL | AV_FUNC_AVUTIL_MASK
+   };
+ 
+@@ -100,6 +102,9 @@
+     case 59:
+       version = AV_FUNC_59;
+       break;
++    case 60:
++      version = AV_FUNC_60;
++      break;
+     default:
+       FFMPEG_LOG("Unknown avcodec version");
+       Unlink();
+@@ -155,10 +160,10 @@
+   AV_FUNC(avcodec_alloc_frame, (AV_FUNC_53 | AV_FUNC_54))
+   AV_FUNC(avcodec_get_frame_defaults, (AV_FUNC_53 | AV_FUNC_54))
+   AV_FUNC(avcodec_free_frame, AV_FUNC_54)
+-  AV_FUNC(avcodec_send_packet, AV_FUNC_58 | AV_FUNC_59)
+-  AV_FUNC(avcodec_receive_frame, AV_FUNC_58 | AV_FUNC_59)
++  AV_FUNC(avcodec_send_packet, AV_FUNC_58 | AV_FUNC_59 | AV_FUNC_60)
++  AV_FUNC(avcodec_receive_frame, AV_FUNC_58 | AV_FUNC_59 | AV_FUNC_60)
+   AV_FUNC(avcodec_default_get_buffer2,
+-          (AV_FUNC_55 | AV_FUNC_56 | AV_FUNC_57 | AV_FUNC_58 | AV_FUNC_59))
++          (AV_FUNC_55 | AV_FUNC_56 | AV_FUNC_57 | AV_FUNC_58 | AV_FUNC_59 | AV_FUNC_60))
+   AV_FUNC_OPTION(av_rdft_init, AV_FUNC_AVCODEC_ALL)
+   AV_FUNC_OPTION(av_rdft_calc, AV_FUNC_AVCODEC_ALL)
+   AV_FUNC_OPTION(av_rdft_end, AV_FUNC_AVCODEC_ALL)
+@@ -167,27 +172,27 @@
+   AV_FUNC(av_freep, AV_FUNC_AVUTIL_ALL)
+   AV_FUNC(av_frame_alloc,
+           (AV_FUNC_AVUTIL_55 | AV_FUNC_AVUTIL_56 | AV_FUNC_AVUTIL_57 |
+-           AV_FUNC_AVUTIL_58 | AV_FUNC_AVUTIL_59))
++           AV_FUNC_AVUTIL_58 | AV_FUNC_AVUTIL_59 | AV_FUNC_AVUTIL_60))
+   AV_FUNC(av_frame_free,
+           (AV_FUNC_AVUTIL_55 | AV_FUNC_AVUTIL_56 | AV_FUNC_AVUTIL_57 |
+-           AV_FUNC_AVUTIL_58 | AV_FUNC_AVUTIL_59))
++           AV_FUNC_AVUTIL_58 | AV_FUNC_AVUTIL_59 | AV_FUNC_AVUTIL_60))
+   AV_FUNC(av_frame_unref,
+           (AV_FUNC_AVUTIL_55 | AV_FUNC_AVUTIL_56 | AV_FUNC_AVUTIL_57 |
+-           AV_FUNC_AVUTIL_58 | AV_FUNC_AVUTIL_59))
++           AV_FUNC_AVUTIL_58 | AV_FUNC_AVUTIL_59 | AV_FUNC_AVUTIL_60))
+   AV_FUNC(av_image_check_size, AV_FUNC_AVUTIL_ALL)
+   AV_FUNC(av_image_get_buffer_size, AV_FUNC_AVUTIL_ALL)
+   AV_FUNC_OPTION(av_buffer_get_opaque, (AV_FUNC_AVUTIL_56 | AV_FUNC_AVUTIL_57 |
+-                                        AV_FUNC_AVUTIL_58 | AV_FUNC_AVUTIL_59))
++                                        AV_FUNC_AVUTIL_58 | AV_FUNC_AVUTIL_59 | AV_FUNC_AVUTIL_60))
+   AV_FUNC(av_buffer_create,
+           (AV_FUNC_AVUTIL_55 | AV_FUNC_AVUTIL_56 | AV_FUNC_AVUTIL_57 |
+-           AV_FUNC_AVUTIL_58 | AV_FUNC_AVUTIL_59))
++           AV_FUNC_AVUTIL_58 | AV_FUNC_AVUTIL_59 | AV_FUNC_AVUTIL_60))
+   AV_FUNC_OPTION(av_frame_get_colorspace,
+                  AV_FUNC_AVUTIL_55 | AV_FUNC_AVUTIL_56 | AV_FUNC_AVUTIL_57 |
+                      AV_FUNC_AVUTIL_58)
+   AV_FUNC_OPTION(av_frame_get_color_range,
+                  AV_FUNC_AVUTIL_55 | AV_FUNC_AVUTIL_56 | AV_FUNC_AVUTIL_57 |
+                      AV_FUNC_AVUTIL_58)
+-  AV_FUNC(av_strerror, AV_FUNC_AVUTIL_58 | AV_FUNC_AVUTIL_59)
++  AV_FUNC(av_strerror, AV_FUNC_AVUTIL_58 | AV_FUNC_AVUTIL_59 | AV_FUNC_AVUTIL_60)
+ 
+ #ifdef MOZ_WAYLAND
+   AV_FUNC_OPTION_SILENT(avcodec_get_hw_config, AV_FUNC_58 | AV_FUNC_59)
+--- a/dom/media/platforms/ffmpeg/FFmpegRuntimeLinker.cpp
++++ b/dom/media/platforms/ffmpeg/FFmpegRuntimeLinker.cpp
+@@ -38,6 +38,7 @@
+   "libavcodec.so", // OpenBSD hardly controls the major/minor library version
+                    // of ffmpeg and update it regulary on ABI/API changes
+ #else
++  "libavcodec.so.60",
+   "libavcodec.so.59",
+   "libavcodec.so.58",
+   "libavcodec-ffmpeg.so.58",
+@@ -160,6 +161,9 @@
+     case 59:
+       module = FFmpegDecoderModule<59>::Create(&sLibAV);
+       break;
++    case 60:
++      module = FFmpegDecoderModule<60>::Create(&sLibAV);
++      break;
+     default:
+       module = nullptr;
+   }
+--- a/dom/media/platforms/ffmpeg/moz.build
++++ b/dom/media/platforms/ffmpeg/moz.build
+@@ -15,6 +15,7 @@
+     "ffmpeg57",
+     "ffmpeg58",
+     "ffmpeg59",
++    "ffmpeg60",
+ ]
+ 
+ UNIFIED_SOURCES += [
