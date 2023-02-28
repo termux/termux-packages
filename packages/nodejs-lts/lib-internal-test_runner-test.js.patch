@@ -1,20 +1,21 @@
---- ./lib/internal/test_runner/test.js.orig	2022-10-05 20:33:27.680099607 +0530
-+++ ./lib/internal/test_runner/test.js	2022-10-05 20:35:19.150099564 +0530
-@@ -44,7 +44,7 @@
+--- ./lib/internal/test_runner/test.js.orig	2023-02-02 02:40:18.000000000 +0530
++++ ./lib/internal/test_runner/test.js	2023-02-10 18:46:00.132415180 +0530
+@@ -53,7 +53,7 @@
  } = require('internal/validators');
  const { setTimeout } = require('timers/promises');
  const { TIMEOUT_MAX } = require('internal/timers');
 -const { cpus } = require('os');
-+const { numcpus } = require('os');
++const { availableParallelism } = require('os');
  const { bigint: hrtime } = process.hrtime;
  const kCallbackAndPromisePresent = 'callbackAndPromisePresent';
  const kCancelledByParent = 'cancelledByParent';
-@@ -193,7 +193,7 @@
+@@ -217,8 +217,7 @@
+ 
        case 'boolean':
          if (concurrency) {
-           // TODO(cjihrig): Use uv_available_parallelism() once it lands.
+-          // TODO(cjihrig): Use uv_available_parallelism() once it lands.
 -          this.concurrency = parent === null ? MathMax(cpus().length - 1, 1) : Infinity;
-+          this.concurrency = parent === null ? MathMax(numcpus() - 1, 1) : Infinity;
++          this.concurrency = parent === null ? MathMax(availableParallelism() - 1, 1) : Infinity;
          } else {
            this.concurrency = 1;
          }

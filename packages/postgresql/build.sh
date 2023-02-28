@@ -6,7 +6,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=15.2
 TERMUX_PKG_SRCURL=https://ftp.postgresql.org/pub/source/v$TERMUX_PKG_VERSION/postgresql-$TERMUX_PKG_VERSION.tar.bz2
 TERMUX_PKG_SHA256=99a2171fc3d6b5b5f56b757a7a3cb85d509a38e4273805def23941ed2b8468c7
-TERMUX_PKG_DEPENDS="libandroid-execinfo, libandroid-shmem, libicu, libuuid (>> 2.38.1), libxml2, openssl, readline, zlib"
+TERMUX_PKG_DEPENDS="libandroid-execinfo, libandroid-shmem, libicu, libuuid, libxml2, openssl, readline, zlib"
 # - pgac_cv_prog_cc_ldflags__Wl___as_needed: Inform that the linker supports as-needed. It's
 #   not stricly necessary but avoids unnecessary linking of binaries.
 # - USE_UNNAMED_POSIX_SEMAPHORES: Avoid using System V semaphores which are disabled on Android.

@@ -1,0 +1,22 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -93,8 +93,6 @@
+ add_library(platform_wsi INTERFACE)
+ if(WIN32)
+     target_compile_definitions(platform_wsi INTERFACE VK_USE_PLATFORM_WIN32_KHR)
+-elseif(ANDROID)
+-    target_compile_definitions(platform_wsi INTERFACE VK_USE_PLATFORM_ANDROID_KHR)
+ elseif(APPLE)
+     target_compile_definitions(platform_wsi INTERFACE VK_USE_PLATFORM_MACOS_MVK VK_USE_PLATFORM_METAL_EXT)
+ elseif(UNIX AND NOT APPLE) # i.e.: Linux
+@@ -106,6 +104,10 @@
+ 
+     find_package(PkgConfig REQUIRED QUIET) # Use PkgConfig to find Linux system libraries
+ 
++    if(ANDROID)
++        target_compile_definitions(platform_wsi INTERFACE VK_USE_PLATFORM_ANDROID_KHR)
++    endif()
++
+     if(BUILD_WSI_XCB_SUPPORT)
+         pkg_check_modules(XCB REQUIRED QUIET IMPORTED_TARGET xcb)
+         target_compile_definitions(platform_wsi INTERFACE VK_USE_PLATFORM_XCB_KHR)

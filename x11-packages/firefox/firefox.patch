@@ -321,6 +321,15 @@ diff -uNr firefox-105.0.3/toolkit/moz.configure firefox-105.0.3.mod/toolkit/moz.
      return False
  
  
+@@ -2901,7 +2901,7 @@
+     "MOZ_NORMANDY",
+ )
+ def data_reporting(telemetry, healthreport, crashreporter, normandy):
+-    return telemetry or healthreport or crashreporter or normandy
++    return False
+ 
+ 
+ set_config("MOZ_DATA_REPORTING", True, when=data_reporting)
 @@ -2968,8 +2963,8 @@
  
  # Enable runtime logging
@@ -414,12 +423,3 @@ diff -uNr firefox-105.0.3/old-configure.in firefox-105.0.3.mod/old-configure.in
      CFLAGS=$_SAVE_CFLAGS
      AC_MSG_CHECKING([for -z noexecstack option to ld])
      _SAVE_LDFLAGS=$LDFLAGS
-@@ -1299,7 +1299,7 @@
- dnl If we have any service that uploads data (and requires data submission
- dnl policy alert), set MOZ_DATA_REPORTING.
- dnl We need SUBST for build system and DEFINE for xul preprocessor.
--if test -n "$MOZ_TELEMETRY_REPORTING" || test -n "$MOZ_SERVICES_HEALTHREPORT" || test -n "$MOZ_CRASHREPORTER"  || test -n "$MOZ_NORMANDY"; then
-+if false; then
-   MOZ_DATA_REPORTING=1
-   AC_DEFINE(MOZ_DATA_REPORTING)
-   AC_SUBST(MOZ_DATA_REPORTING)

@@ -1,27 +1,18 @@
 --- ./cli/scripts/docs/generate-man.sh.orig	2021-12-05 15:26:07.599604265 +0100
 +++ ./cli/scripts/docs/generate-man.sh	2021-12-05 15:28:20.809486509 +0100
-@@ -26,13 +26,13 @@
-   # update vendor
-   ./scripts/vendor update
-   # build gen-manpages
--  go build -mod=vendor -modfile=vendor.mod -tags manpages -o /tmp/gen-manpages ./man/generate.go
-+  go build -mod=vendor -modfile=vendor.mod -tags manpages -o build/gen-manpages ./man/generate.go
-   # build go-md2man
--  go build -mod=vendor -modfile=vendor.mod -o /tmp/go-md2man ./vendor/github.com/cpuguy83/go-md2man/v2
-+  go build -mod=vendor -modfile=vendor.mod -o build/go-md2man ./vendor/github.com/cpuguy83/go-md2man/v2
- )
+@@ -6,12 +6,12 @@
  
- mkdir -p man/man1
--(set -x ; /tmp/gen-manpages --root "." --target "$(pwd)/man/man1")
-+(set -x ; "$buildir"/build/gen-manpages --root "." --target "$(pwd)/man/man1")
+ if ! command -v go-md2man &> /dev/null; then
+ 	# yay, go install creates a binary named "v2" ¯\_(ツ)_/¯
+-	go build -o "/go/bin/go-md2man" ./vendor/github.com/cpuguy83/go-md2man/v2
++	go build -o "build/go-md2man" ./vendor/github.com/cpuguy83/go-md2man/v2
+ fi
  
- (
-   cd man
-@@ -45,6 +45,6 @@
-       continue
-     fi
-     mkdir -p "./man${num}"
--    (set -x ; /tmp/go-md2man -in "$FILE" -out "./man${num}/${name}")
-+    (set -x ; "$buildir"/build/go-md2man -in "$FILE" -out "./man${num}/${name}")
-   done
- )
+ # Generate man pages from cobra commands
+-go build -o /tmp/gen-manpages github.com/docker/cli/man
+-/tmp/gen-manpages --root "$(pwd)" --target "$(pwd)/man/man1"
++go build -o build/gen-manpages github.com/docker/cli/man
++build/gen-manpages --root "$(pwd)" --target "$(pwd)/man/man1"
+ 
+ # Generate legacy pages from markdown
+ ./man/md2man-all.sh -q

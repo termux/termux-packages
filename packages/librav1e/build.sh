@@ -20,14 +20,9 @@ termux_step_post_get_source() {
 	fi
 }
 
-termux_step_make_install(){
+termux_step_make_install() {
 	termux_setup_rust
-
-	termux_download \
-		https://github.com/lu-zero/cargo-c/releases/download/v0.9.14/cargo-c-x86_64-unknown-linux-musl.tar.gz \
-		$TERMUX_PKG_CACHEDIR/cargo-c-x86_64-unknown-linux-musl.tar.gz \
-		3babffbe9316d3ff00957ec19e82ecf07050c5c6ff8d70fe0d17f40db8ff3e56
-	tar -xzf $TERMUX_PKG_CACHEDIR/cargo-c-x86_64-unknown-linux-musl.tar.gz -C $HOME/.cargo/bin
+	termux_setup_cargo_c
 
 	export CARGO_BUILD_TARGET=$CARGO_TARGET_NAME
 

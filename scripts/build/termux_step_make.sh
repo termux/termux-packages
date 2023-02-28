@@ -9,7 +9,7 @@ termux_step_make() {
 	if test -f build.ninja; then
 		ninja -w dupbuild=warn -j $TERMUX_MAKE_PROCESSES
 	elif ls ./*.cabal &>/dev/null; then
-		termux-ghc-setup -j$TERMUX_MAKE_PROCESSES build
+		cabal build
 	elif ls ./*akefile &>/dev/null || [ ! -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
 		if [ -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
 			make -j $TERMUX_MAKE_PROCESSES $QUIET_BUILD

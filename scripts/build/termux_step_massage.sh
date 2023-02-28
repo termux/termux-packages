@@ -128,8 +128,8 @@ termux_step_massage() {
 	fi
 
 	# Remove unnecessary files in haskell packages:
-	if [[ "${TERMUX_PKG_NAME}" != "ghc-libs" ]] && [[ "${TERMUX_PKG_NAME}" != "ghc" ]]; then
-		test -d ./lib/ghc-* && rm -rf ./lib/ghc-* 2>/dev/null # Remove full ghc-* dir since cross compiler installs packages in "./lib/${TERMUX_ARCH}-android-ghc-X.Y.Z"
+	if ! [[ $TERMUX_PKG_NAME =~ ghc|ghc-libs ]]; then
+		test -f ./lib/ghc-*/settings && rm -rf ./lib/ghc-*/settings
 	fi
 
 	# .. remove empty directories (NOTE: keep this last):

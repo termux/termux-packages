@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/ellie/atuin
 TERMUX_PKG_DESCRIPTION="Magical shell history"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="12.0.0"
+TERMUX_PKG_VERSION="13.0.0"
 TERMUX_PKG_SRCURL=https://github.com/ellie/atuin/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=bfeeb14c3fd94862e2cb7c57ac2b77db78686b0afe49b5597ead9cca02dcc403
+TERMUX_PKG_SHA256=885cfe080cbc421b42b7a8b86d854f7e4abcb5c124f009f0871c9c72a3bc122e
 TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -15,13 +15,13 @@ termux_step_pre_configure() {
 	export RUSTFLAGS="${RUSTFLAGS:-} -C link-args=$($CC -print-libgcc-file-name)"
 }
 
-termux_step_handle_hostbuild() {
+termux_step_host_build() {
 	export CC=""
 	export CFLAGS=""
 	export CPPFLAGS=""
 	termux_setup_rust
 
-	mkdir -p $TERMUX_PKG_HOSTBUILD_DIR
+	cd "$TERMUX_PKG_SRCDIR"
 	cargo build \
 		--jobs $TERMUX_MAKE_PROCESSES \
 		--locked \

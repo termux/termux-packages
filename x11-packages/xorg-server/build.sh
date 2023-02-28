@@ -3,9 +3,12 @@ TERMUX_PKG_DESCRIPTION="Xorg server"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=21.1.7
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/xserver/xorg-server-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=d9c60b2dd0ec52326ca6ab20db0e490b1ff4f566f59ca742d6532e92795877bb
 TERMUX_PKG_DEPENDS="libandroid-shmem, libdrm, libpciaccess, libpixman, libx11, libxau, libxcvt, libxfont2, libxinerama, libxkbfile, libxshmfence, opengl, openssl, xkeyboard-config, xorg-protocol-txt, xorg-xkbcomp"
+TERMUX_PKG_RECOMMENDS="xf86-video-dummy, xf86-input-void"
+TERMUX_PKG_NO_STATICSPLIT=true
 
 # Provided by xorg-protocol-txt (subpackage of xorg-server-xvfb):
 TERMUX_PKG_RM_AFTER_INSTALL="lib/xorg/protocol.txt"
@@ -79,6 +82,7 @@ termux_step_pre_configure() {
 
 termux_step_post_make_install () {
 	rm -f "${TERMUX_PREFIX}/usr/share/X11/xkb/compiled"
+	install -Dm644 -t "$TERMUX_PREFIX/etc/X11/" "${TERMUX_PKG_BUILDER_DIR}/xorg.conf" 
 }
 
 ## The following is required for package 'tigervnc'.

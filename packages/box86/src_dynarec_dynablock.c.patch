@@ -24,9 +24,9 @@ diff -uNr box86/src/dynarec/dynablock.c box86.mod/src/dynarec/dynablock.c
  /* 
      return NULL if block is not found / cannot be created. 
 @@ -343,7 +352,11 @@
+ 
+     // fill the block
      block->x86_addr = (void*)addr;
-     if(need_lock)
-         pthread_mutex_lock(&my_context->mutex_dyndump);
 +#ifdef ANDROID
 +    if(sigsetjmp(dynarec_jmpbuf, 1)) {
 +#else
@@ -34,4 +34,4 @@ diff -uNr box86/src/dynarec/dynablock.c box86.mod/src/dynarec/dynablock.c
 +#endif
          printf_log(LOG_INFO, "FillBlock at %p triggered a segfault, cancelling\n", (void*)addr);
          if(need_lock)
-             pthread_mutex_unlock(&my_context->mutex_dyndump);
+             mutex_unlock(&my_context->mutex_dyndump);

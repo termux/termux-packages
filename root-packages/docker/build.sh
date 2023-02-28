@@ -2,12 +2,17 @@ TERMUX_PKG_HOMEPAGE=https://docker.com
 TERMUX_PKG_DESCRIPTION="Set of products that use OS-level virtualization to deliver software in packages called containers."
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=23.0.1
-DOCKER_GITCOMMIT=a5ee5b1
-TERMUX_PKG_SRCURL=(https://github.com/moby/moby/archive/v${TERMUX_PKG_VERSION}.tar.gz
-                   https://github.com/docker/cli/archive/v${TERMUX_PKG_VERSION}.tar.gz)
-TERMUX_PKG_SHA256=(c8e6c0ac5f0c772023e3430f80190e0f86644b6d94cac63118b03561385f7b56
-                   37bc1c71a782fc10d35aa6708c1b3c90a71f3947c33665cb0de68df25dc14d94)
+# v20.10.23 is the last version confirmed to work.
+# Do not update it unless you tested it on your device.
+TERMUX_PKG_VERSION=1:20.10.23
+LIBNETWORK_COMMIT=05b93e0d3a95952f70c113b0bc5bdb538d7afdd7
+DOCKER_GITCOMMIT=7155243
+TERMUX_PKG_SRCURL=(https://github.com/moby/moby/archive/v${TERMUX_PKG_VERSION:2}.tar.gz
+                   https://github.com/docker/cli/archive/v${TERMUX_PKG_VERSION:2}.tar.gz
+                   https://github.com/moby/libnetwork/archive/${LIBNETWORK_COMMIT}.tar.gz)
+TERMUX_PKG_SHA256=(61bb3f4f0c935ac9a719adbac69fca0d727b6b5c3eb889571e00b1cc3ff1e368
+                   55563b87050ce7b9b2124a9b882fdef4fa17e23f431ad502c8227101d5e789fd
+                   5c5e3aa7599e85036438a65016796aa11df4afb44d13b5927dcfb0ec5947a86b)
 TERMUX_PKG_DEPENDS="containerd, libdevmapper"
 TERMUX_PKG_CONFFILES="etc/docker/daemon.json"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -77,14 +82,14 @@ termux_step_make() {
 
 	# fix path locations to build with go
 	mkdir -p go/src/github.com/docker
-	mv -T moby go/src/github.com/docker/docker
-	mkdir moby
-	mv go moby
-	export GOPATH="${PWD}/moby/go"
-	cd "${GOPATH}/src/github.com/docker/docker"
+	mv libnetwork go/src/github.com/docker
+	mkdir libnetwork
+	mv go libnetwork
+	export GOPATH="${PWD}/libnetwork/go"
+	cd "${GOPATH}/src/github.com/docker/libnetwork"
 
 	# issue the build command
-	go build -o docker-proxy github.com/docker/docker/cmd/docker-proxy
+	go build -o docker-proxy github.com/docker/libnetwork/cmd/proxy
 	)
 	echo " Done!"
 
@@ -116,8 +121,8 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm 700 moby/go/src/github.com/docker/docker/bundles/dynbinary-daemon/dockerd ${TERMUX_PREFIX}/libexec/dockerd
-	install -Dm 700 moby/go/src/github.com/docker/docker/docker-proxy ${TERMUX_PREFIX}/bin/docker-proxy
+	install -Dm 700 moby/bundles/dynbinary-daemon/dockerd ${TERMUX_PREFIX}/libexec/dockerd
+	install -Dm 700 libnetwork/go/src/github.com/docker/libnetwork/docker-proxy ${TERMUX_PREFIX}/bin/docker-proxy
 	install -Dm 700 cli/go/src/github.com/docker/cli/build/docker-android-* ${TERMUX_PREFIX}/bin/docker
 	install -Dm 600 -t ${TERMUX_PREFIX}/share/man/man1 cli/go/src/github.com/docker/cli/man/man1/*
 	install -Dm 600 -t ${TERMUX_PREFIX}/share/man/man5 cli/go/src/github.com/docker/cli/man/man5/*

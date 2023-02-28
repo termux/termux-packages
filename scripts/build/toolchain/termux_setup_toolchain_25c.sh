@@ -17,11 +17,6 @@ termux_setup_toolchain_25c() {
 	export NM=llvm-nm
 	export CXXFILT=llvm-cxxfilt
 
-	export TERMUX_HASKELL_LLVM_BACKEND="-fllvm --ghc-option=-fllvm"
-	if [ "${TERMUX_ARCH}" = "i686" ]; then
-		TERMUX_HASKELL_LLVM_BACKEND=""
-	fi
-
 	export TERMUX_HASKELL_OPTIMISATION="-O"
 	if [ "${TERMUX_DEBUG_BUILD}" = true ]; then
 		TERMUX_HASKELL_OPTIMISATION="-O0"

@@ -84,6 +84,7 @@ termux_step_setup_variables() {
 		TERMUX_PKG_CACHEDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/cache
 	fi
 	TERMUX_CMAKE_BUILD=Ninja # Which cmake generator to use
+	TERMUX_PKG_ANTI_BUILD_DEPENDS=""
 	TERMUX_PKG_BREAKS="" # https://www.debian.org/doc/debian-policy/ch-relationships.html#s-binarydeps
 	TERMUX_PKG_BUILDDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/build
 	TERMUX_PKG_BUILD_DEPENDS=""
@@ -125,7 +126,7 @@ termux_step_setup_variables() {
 	TERMUX_PKG_TMPDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/tmp
 	TERMUX_PKG_SERVICE_SCRIPT=() # Fill with entries like: ("daemon name" 'script to execute'). Script is echoed with -e so can contain \n for multiple lines
 	TERMUX_PKG_GROUPS="" # https://wiki.archlinux.org/title/Pacman#Installing_package_groups
-	TERMUX_PKG_IS_HASKELL_LIB=true # by default assume haskell package is lib package as most of them will always be libs.
+	TERMUX_PKG_NO_SHEBANG_FIX=false # if true, skip fixing shebang accordingly to TERMUX_PREFIX
 	TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=false # if the package does not support compilation on a device, then this package should not be compiled on devices
 	TERMUX_PKG_SETUP_PYTHON=false # setting python to compile a package
 	TERMUX_PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION) # get the latest version of python
