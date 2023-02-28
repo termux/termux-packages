@@ -7,8 +7,8 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1:20.10.23
 LIBNETWORK_COMMIT=05b93e0d3a95952f70c113b0bc5bdb538d7afdd7
 DOCKER_GITCOMMIT=7155243
-TERMUX_PKG_SRCURL=(https://github.com/moby/moby/archive/v${TERMUX_PKG_VERSION}.tar.gz
-                   https://github.com/docker/cli/archive/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SRCURL=(https://github.com/moby/moby/archive/v${TERMUX_PKG_VERSION:2}.tar.gz
+                   https://github.com/docker/cli/archive/v${TERMUX_PKG_VERSION:2}.tar.gz
                    https://github.com/moby/libnetwork/archive/${LIBNETWORK_COMMIT}.tar.gz)
 TERMUX_PKG_SHA256=(61bb3f4f0c935ac9a719adbac69fca0d727b6b5c3eb889571e00b1cc3ff1e368
                    55563b87050ce7b9b2124a9b882fdef4fa17e23f431ad502c8227101d5e789fd
