@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="A syntax-highlighter for git and diff output"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.15.1"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/dandavison/delta/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=b9afd2f80ae1d57991a19832d6979c7080a568d42290a24e59d6a2a82cbc1728
 TERMUX_PKG_AUTO_UPDATE=true
@@ -22,6 +22,16 @@ termux_step_pre_configure() {
 	local _ORIG_CFLAGS="$CFLAGS"
 	termux_setup_rust
 	export CFLAGS="$_ORIG_CFLAGS"
+
+	: "${CARGO_HOME:=$HOME/.cargo}"
+	export CARGO_HOME
+
+	cargo fetch --target "${CARGO_TARGET_NAME}"
+
+	local f
+	for f in $CARGO_HOME/registry/src/github.com-*/libgit2-sys-*/build.rs; do
+		sed -i -E 's/\.range_version\(([^)]*)\.\.[^)]*\)/.atleast_version(\1)/g' "${f}"
+	done
 }
 
 termux_step_post_make_install() {
