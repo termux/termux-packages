@@ -1,9 +1,20 @@
 https://github.com/termux/termux-packages/issues/13594
+https://github.com/termux/termux-packages/issues/15363
 
 Please always test on arm (32-bit) arch if you modify or delete this patch.
 
 --- a/src/netxs/desktopio/directvt.hpp
 +++ b/src/netxs/desktopio/directvt.hpp
+@@ -165,7 +165,8 @@ namespace netxs::directvt
+                         log("dtvt: corrupted time data");
+                         return D{};
+                     }
+-                    auto temp = *reinterpret_cast<type const*>(data.data());
++                    auto temp = type{};
++                    ::memcpy(&temp, data.data(), sizeof(type));
+                     auto crop = time{ span{ temp }};
+                     if constexpr (!PeekOnly)
+                     {
 @@ -182,7 +182,9 @@ namespace netxs::directvt
                          log("dtvt: corrupted integer data");
                          return D{};
