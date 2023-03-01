@@ -4,9 +4,9 @@ TERMUX_PKG_DESCRIPTION="C library implementing Git core methods"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_LICENSE_FILE="COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.5.2
+TERMUX_PKG_VERSION=1.6.2
 TERMUX_PKG_SRCURL=https://github.com/libgit2/libgit2/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=57638ac0e319078f56a7e17570be754515e5b1276d3750904b4214c92e8fa196
+TERMUX_PKG_SHA256=d557fbf35557bb5df53cbf38ae0081edb4a36494ec0d19741fa673e509245f8f
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libssh2, openssl, pcre2, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libiconv, libpcreposix"
@@ -21,7 +21,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_post_get_source() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them
 	# after SOVERSION is changed.
-	local _SOVERSION=1.5
+	local _SOVERSION=1.6
 
 	local v=$(echo ${TERMUX_PKG_VERSION#*:} | cut -d . -f 1-2)
 	if [ "${v}" != "${_SOVERSION}" ]; then
@@ -32,6 +32,4 @@ termux_step_post_get_source() {
 termux_step_pre_configure() {
 	find "$TERMUX_PKG_SRCDIR" -name CMakeLists.txt | xargs -n 1 \
 		sed -i 's/\( PROPERTIES C_STANDARD\) 90/\1 99/g'
-
-	cp "$TERMUX_PKG_BUILDER_DIR"/getloadavg.c "$TERMUX_PKG_SRCDIR"/src/util/
 }
