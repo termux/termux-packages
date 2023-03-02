@@ -1,16 +1,18 @@
 TERMUX_PKG_HOMEPAGE=https://www.tianocore.org/
 TERMUX_PKG_DESCRIPTION="Open Virtual Machine Firmware"
-TERMUX_PKG_LICENSE="BSD"
+TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=20220719.209.gf0064ac3af
-TERMUX_PKG_SRCURL=(https://www.kraxel.org/repos/jenkins/edk2/edk2.git-aarch64-0-${TERMUX_PKG_VERSION}.EOL.no.nore.updates.noarch.rpm
-		   https://www.kraxel.org/repos/jenkins/edk2/edk2.git-arm-0-${TERMUX_PKG_VERSION}.EOL.no.nore.updates.noarch.rpm
-		   https://www.kraxel.org/repos/jenkins/edk2/edk2.git-ovmf-ia32-0-${TERMUX_PKG_VERSION}.EOL.no.nore.updates.noarch.rpm
-		   https://www.kraxel.org/repos/jenkins/edk2/edk2.git-ovmf-x64-0-${TERMUX_PKG_VERSION}.EOL.no.nore.updates.noarch.rpm)
-TERMUX_PKG_SHA256=(879d6166029c5b26c300e8702e85ca5329b9103612ba6abb6018cb72be752c3f
-		   1a70879806ea22ad2b167618e56fe3fc038905566e641197e2e35a48d7c76574
-		   399430845c0630b559aa2cb169625daf3796a60af8c501786d8bafe8416d880c
-		   bc42937c5c50b552dd7cd05ed535ed2b8aed30b04060032b7648ffeee2defb8e)
+_ED2K_VERSION=20221117gitfff6d81270b5
+_FEDORA_REPO_VERSION=14.fc39
+TERMUX_PKG_VERSION=$_ED2K_VERSION-$_FEDORA_REPO_VERSION
+TERMUX_PKG_SRCURL=(https://kojipkgs.fedoraproject.org/packages/edk2/$_ED2K_VERSION/$_FEDORA_REPO_VERSION/noarch/edk2-aarch64-$TERMUX_PKG_VERSION.noarch.rpm
+		   https://kojipkgs.fedoraproject.org/packages/edk2/$_ED2K_VERSION/$_FEDORA_REPO_VERSION/noarch/edk2-arm-$TERMUX_PKG_VERSION.noarch.rpm
+		   https://kojipkgs.fedoraproject.org/packages/edk2/$_ED2K_VERSION/$_FEDORA_REPO_VERSION/noarch/edk2-ovmf-ia32-$TERMUX_PKG_VERSION.noarch.rpm
+		   https://kojipkgs.fedoraproject.org/packages/edk2/$_ED2K_VERSION/$_FEDORA_REPO_VERSION/noarch/edk2-ovmf-$TERMUX_PKG_VERSION.noarch.rpm)
+TERMUX_PKG_SHA256=(deeea32e2ee7ffdd3a0b8a4a215dba50a0553128f7a21c27ec0929ed7a06d3e5
+		   dcc58da8c71fec992229ac629248802ffa71c4ef84ffa5b2df32dcf0fe56f6e4
+		   08ade311bde8b6a80b6aa138746949a6972a62c2976e0965a9be7127afac94f9
+		   5d4013dbdb7838227f3863514b61079a696e34f41492c66f437ec1a38afb06ea)
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
@@ -43,6 +45,10 @@ termux_step_make_install() {
 }
 
 termux_step_install_license() {
-	install -Dm600 $TERMUX_PKG_BUILDER_DIR/License.txt \
-		$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME/LICENSE.txt
+	mkdir -p $TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME
+	mv $TERMUX_PREFIX/share/licenses/edk2-ovmf/* $TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME/
+}
+
+termux_step_post_massage() {
+	rm -rf share/licenses
 }
