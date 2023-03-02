@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://github.com/ldc-developers/ldc
 TERMUX_PKG_DESCRIPTION="D programming language compiler, built with LLVM"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=(1.30.0)
+TERMUX_PKG_VERSION=(1.31.0)
 TERMUX_PKG_VERSION+=(14.0.3)  # LLVM version
-TERMUX_PKG_VERSION+=(2.100.1) # TOOLS version
-TERMUX_PKG_VERSION+=(1.30.0)  # DUB version
+TERMUX_PKG_VERSION+=(2.101.2) # TOOLS version
+TERMUX_PKG_VERSION+=(1.31.1)  # DUB version
 
 TERMUX_PKG_SRCURL=(https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc-${TERMUX_PKG_VERSION}-src.tar.gz
 		   https://github.com/ldc-developers/llvm-project/releases/download/ldc-v${TERMUX_PKG_VERSION[1]}/llvm-${TERMUX_PKG_VERSION[1]}.src.tar.xz
@@ -13,12 +13,12 @@ TERMUX_PKG_SRCURL=(https://github.com/ldc-developers/ldc/releases/download/v${TE
 		   https://github.com/dlang/tools/archive/v${TERMUX_PKG_VERSION[2]}.tar.gz
 		   https://github.com/dlang/dub/archive/v${TERMUX_PKG_VERSION[3]}.tar.gz
 		   https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc2-${TERMUX_PKG_VERSION}-linux-x86_64.tar.xz)
-TERMUX_PKG_SHA256=(fdbb376f08242d917922a6a22a773980217fafa310046fc5d6459490af23dacd
+TERMUX_PKG_SHA256=(f1c8ece9e1e35806c3441bf24fbe666cddd8eef375592c19cd8fee4701cd5458
 		   9638d8d0b6a43d9cdc53699bec19e6bc9bef98f5950b99e6b8c1ec373aee4fa7
 		   301137841d1e3401f59b3828d2a9ac86a1b826b89265d55541a2fd6ca2a595eb
-		   54bde9a979d70952690a517f90de8d76631fa9a2f7252af7278dafbcaaa42d54
-		   840cd65bf5f0dd06ca688f63b94d71fccd92b526bbf1d3892fe5535b1e85c10e
-		   5784d4cc47d0845af0897d3b7473a08dd0281a4cdabac0a486740840d014fde1)
+		   89fb5b1090ef66413928ef5036bd171fce1de24f91c60c9e7f66ab8954b39108
+		   dce1b3f7d21f6b111830d849e6f417853bab66d9036df212aec237c1f724bc4f
+		   7dbd44786c0772ec41890a8c03e22b0985d6ef547c40943dd56bc6be21cf4d98)
 # dub dlopen()s libcurl.so:
 TERMUX_PKG_DEPENDS="binutils-bin, binutils-is-llvm | binutils, clang, libc++, libcurl, zlib"
 TERMUX_PKG_BUILD_DEPENDS="binutils-cross"
@@ -56,9 +56,6 @@ termux_step_post_get_source() {
 
 	# Exclude MLIR
 	rm -Rf llvm/projects/mlir
-
-	LLVM_TRIPLE=${TERMUX_HOST_PLATFORM/-/--}
-	if [ $TERMUX_ARCH = arm ]; then LLVM_TRIPLE=${LLVM_TRIPLE/arm-/armv7a-}; fi
 }
 
 termux_step_host_build() {
@@ -78,6 +75,9 @@ termux_step_host_build() {
 
 # Just before CMake invokation for LLVM:
 termux_step_pre_configure() {
+	LLVM_TRIPLE=${TERMUX_HOST_PLATFORM/-/--}
+	if [ $TERMUX_ARCH = arm ]; then LLVM_TRIPLE=${LLVM_TRIPLE/arm-/armv7a-}; fi
+
 	PATH=$TERMUX_PREFIX/opt/binutils/cross/$TERMUX_HOST_PLATFORM/bin:$PATH
 
 	LLVM_INSTALL_DIR=$TERMUX_PKG_BUILDDIR/llvm-install
