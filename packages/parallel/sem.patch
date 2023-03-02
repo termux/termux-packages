@@ -11,7 +11,7 @@ index 873f294..4fa24cb 100644
      if(not -x $Global::shell and not which($Global::shell)) {
  	::error("Shell '$Global::shell' not found.");
  	wait_and_exit(255);
-@@ -2705,13 +2705,13 @@ sub init_globals() {
+@@ -2869,14 +2869,14 @@ sub init_globals() {
      $Global::trim = 'n';
      $Global::max_jobs_running = 0;
      $Global::job_already_run = '';
@@ -19,6 +19,7 @@ index 873f294..4fa24cb 100644
 -    $ENV{'PARALLEL_REMOTE_TMPDIR'} ||= "/tmp";
 +    $ENV{'TMPDIR'} ||= "@TERMUX_PREFIX@/tmp";
 +    $ENV{'PARALLEL_REMOTE_TMPDIR'} ||= "@TERMUX_PREFIX@/tmp";
+     # bug #55398: set $OLDPWD when using --wd
      $ENV{'OLDPWD'} = $ENV{'PWD'};
      if(not $ENV{HOME}) {
  	# $ENV{HOME} is sometimes not set if called from PHP
