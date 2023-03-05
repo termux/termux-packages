@@ -6,6 +6,7 @@ TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.org>"
 # "0.8.0-dev-698-g1ef84547a" < "0.8.0-dev-nightly-10-g1a07044c1", we need to bump
 # the epoch of the package version.
 TERMUX_PKG_VERSION="1:0.9.0-dev-1115+g446c353a5"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/neovim/neovim/archive/nightly.tar.gz"
 TERMUX_PKG_SHA256=81234dcd28afb9b8263547fe9484426218d1d3c59184a6d8dff648223fd8a77a
 TERMUX_PKG_DEPENDS="libiconv, libuv, luv, libmsgpack, libandroid-support, libvterm, libtermkey, libluajit, libunibilium, libtreesitter"
@@ -112,6 +113,11 @@ termux_step_host_build() {
 
 termux_step_pre_configure() {
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLUA_MATH_LIBRARY=$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libm.so"
+
+	# Only for 0.9.0-dev-1115+g446c353a5.
+	# Not using patch which would make Termux bot unnecessarily noisy.
+	sed -i '/^  list(APPEND MSGPACK_NAMES /s/ msgpackc / msgpack-c /' \
+		cmake/FindMsgpack.cmake
 }
 
 termux_step_post_make_install() {
