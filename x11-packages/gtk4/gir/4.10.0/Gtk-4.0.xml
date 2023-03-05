@@ -187,6 +187,9 @@
   <interface name="GtkAccessible" get-type="gtk_accessible_get_type">
     <property name="accessible-role" type="GtkAccessibleRole" flags="227"/>
   </interface>
+  <interface name="GtkAccessibleRange" get-type="gtk_accessible_range_get_type">
+    <prerequisite name="GtkAccessible"/>
+  </interface>
   <interface name="GtkActionable" get-type="gtk_actionable_get_type">
     <prerequisite name="GtkWidget"/>
     <property name="action-name" type="gchararray" flags="227"/>
@@ -210,69 +213,13 @@
     <signal name="value-changed" return="void" when="first" no-recurse="1">
     </signal>
   </class>
-  <interface name="GtkAppChooser" get-type="gtk_app_chooser_get_type">
-    <prerequisite name="GtkWidget"/>
-    <property name="content-type" type="gchararray" flags="235"/>
-  </interface>
-  <class name="GtkAppChooserButton" get-type="gtk_app_chooser_button_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
-    <implements name="GtkAccessible"/>
-    <implements name="GtkBuildable"/>
-    <implements name="GtkConstraintTarget"/>
-    <implements name="GtkAppChooser"/>
-    <property name="show-dialog-item" type="gboolean" flags="1073742055"/>
-    <property name="show-default-item" type="gboolean" flags="1073742055"/>
-    <property name="heading" type="gchararray" flags="1073742051"/>
-    <property name="modal" type="gboolean" flags="1073742055"/>
-    <signal name="activate" return="void" when="first" action="1">
-    </signal>
-    <signal name="changed" return="void" when="last">
-    </signal>
-    <signal name="custom-item-activated" return="void" when="first" detailed="1">
-      <param type="gchararray"/>
-    </signal>
-  </class>
-  <class name="GtkDialog" get-type="gtk_dialog_get_type" parents="GtkWindow,GtkWidget,GInitiallyUnowned,GObject">
-    <implements name="GtkAccessible"/>
-    <implements name="GtkBuildable"/>
-    <implements name="GtkConstraintTarget"/>
-    <implements name="GtkNative"/>
-    <implements name="GtkShortcutManager"/>
-    <implements name="GtkRoot"/>
-    <property name="use-header-bar" type="gint" flags="235"/>
-    <signal name="response" return="void" when="last">
-      <param type="gint"/>
-    </signal>
-    <signal name="close" return="void" when="last" action="1">
-    </signal>
-  </class>
-  <class name="GtkAppChooserDialog" get-type="gtk_app_chooser_dialog_get_type" parents="GtkDialog,GtkWindow,GtkWidget,GInitiallyUnowned,GObject">
-    <implements name="GtkAccessible"/>
-    <implements name="GtkBuildable"/>
-    <implements name="GtkConstraintTarget"/>
-    <implements name="GtkNative"/>
-    <implements name="GtkShortcutManager"/>
-    <implements name="GtkRoot"/>
-    <implements name="GtkAppChooser"/>
-    <property name="gfile" type="GFile" flags="235"/>
-    <property name="heading" type="gchararray" flags="1073742051"/>
-  </class>
-  <class name="GtkAppChooserWidget" get-type="gtk_app_chooser_widget_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
-    <implements name="GtkAccessible"/>
-    <implements name="GtkBuildable"/>
-    <implements name="GtkConstraintTarget"/>
-    <implements name="GtkAppChooser"/>
-    <property name="show-default" type="gboolean" flags="1073742055"/>
-    <property name="show-recommended" type="gboolean" flags="1073742055"/>
-    <property name="show-fallback" type="gboolean" flags="1073742055"/>
-    <property name="show-other" type="gboolean" flags="1073742055"/>
-    <property name="show-all" type="gboolean" flags="1073742055"/>
-    <property name="default-text" type="gchararray" flags="1073742051"/>
-    <signal name="application-selected" return="void" when="first">
-      <param type="GAppInfo"/>
-    </signal>
-    <signal name="application-activated" return="void" when="first">
-      <param type="GAppInfo"/>
-    </signal>
+  <class name="GtkAlertDialog" get-type="gtk_alert_dialog_get_type" parents="GObject">
+    <property name="modal" type="gboolean" flags="1073742051"/>
+    <property name="message" type="gchararray" flags="1073742051"/>
+    <property name="detail" type="gchararray" flags="1073742051"/>
+    <property name="buttons" type="GStrv" flags="1073742051"/>
+    <property name="cancel-button" type="gint" flags="1073742051"/>
+    <property name="default-button" type="gint" flags="1073742051"/>
   </class>
   <class name="GtkShortcutsWindow" get-type="gtk_shortcuts_window_get_type" parents="GtkWindow,GtkWidget,GInitiallyUnowned,GObject">
     <implements name="GtkAccessible"/>
@@ -308,33 +255,6 @@
     <property name="ratio" type="gfloat" flags="1073742051"/>
     <property name="obey-child" type="gboolean" flags="1073742051"/>
     <property name="child" type="GtkWidget" flags="1073742051"/>
-  </class>
-  <class name="GtkAssistantPage" get-type="gtk_assistant_page_get_type" parents="GObject">
-    <property name="child" type="GtkWidget" flags="235"/>
-    <property name="page-type" type="GtkAssistantPageType" flags="1073742051"/>
-    <property name="title" type="gchararray" flags="1073742051"/>
-    <property name="complete" type="gboolean" flags="1073741827"/>
-  </class>
-  <class name="GtkAssistant" get-type="gtk_assistant_get_type" parents="GtkWindow,GtkWidget,GInitiallyUnowned,GObject">
-    <implements name="GtkAccessible"/>
-    <implements name="GtkBuildable"/>
-    <implements name="GtkConstraintTarget"/>
-    <implements name="GtkNative"/>
-    <implements name="GtkShortcutManager"/>
-    <implements name="GtkRoot"/>
-    <property name="use-header-bar" type="gint" flags="235"/>
-    <property name="pages" type="GListModel" flags="225"/>
-    <signal name="close" return="void" when="last">
-    </signal>
-    <signal name="cancel" return="void" when="last">
-    </signal>
-    <signal name="prepare" return="void" when="last">
-      <param type="GtkWidget"/>
-    </signal>
-    <signal name="apply" return="void" when="last">
-    </signal>
-    <signal name="escape" return="void" when="first" action="1">
-    </signal>
   </class>
   <class name="GtkATContext" get-type="gtk_at_context_get_type" parents="GObject" abstract="1">
     <property name="accessible-role" type="GtkAccessibleRole" flags="231"/>
@@ -461,232 +381,12 @@
     <implements name="GtkBuildable"/>
     <implements name="GtkConstraintTarget"/>
     <implements name="GtkOrientable"/>
+    <property name="start-widget" type="GtkWidget" flags="1073742051"/>
+    <property name="center-widget" type="GtkWidget" flags="1073742051"/>
+    <property name="end-widget" type="GtkWidget" flags="1073742051"/>
     <property name="baseline-position" type="GtkBaselinePosition" flags="1073742051"/>
   </class>
   <class name="GtkCenterLayout" get-type="gtk_center_layout_get_type" parents="GtkLayoutManager,GObject">
-  </class>
-  <interface name="GtkCellEditable" get-type="gtk_cell_editable_get_type">
-    <prerequisite name="GtkWidget"/>
-    <property name="editing-canceled" type="gboolean" flags="1073742051"/>
-    <signal name="editing-done" return="void" when="last">
-    </signal>
-    <signal name="remove-widget" return="void" when="last">
-    </signal>
-  </interface>
-  <class name="GtkCellRenderer" get-type="gtk_cell_renderer_get_type" parents="GInitiallyUnowned,GObject" abstract="1">
-    <property name="mode" type="GtkCellRendererMode" flags="1073742051"/>
-    <property name="visible" type="gboolean" flags="1073742051"/>
-    <property name="sensitive" type="gboolean" flags="1073742051"/>
-    <property name="xalign" type="gfloat" flags="1073742051"/>
-    <property name="yalign" type="gfloat" flags="1073742051"/>
-    <property name="xpad" type="guint" flags="1073742051"/>
-    <property name="ypad" type="guint" flags="1073742051"/>
-    <property name="width" type="gint" flags="1073742051"/>
-    <property name="height" type="gint" flags="1073742051"/>
-    <property name="is-expander" type="gboolean" flags="1073742051"/>
-    <property name="is-expanded" type="gboolean" flags="1073742051"/>
-    <property name="cell-background" type="gchararray" flags="226"/>
-    <property name="cell-background-rgba" type="GdkRGBA" flags="227"/>
-    <property name="cell-background-set" type="gboolean" flags="1073742051"/>
-    <property name="editing" type="gboolean" flags="225"/>
-    <signal name="editing-canceled" return="void" when="first">
-    </signal>
-    <signal name="editing-started" return="void" when="first">
-      <param type="GtkCellEditable"/>
-      <param type="gchararray"/>
-    </signal>
-  </class>
-  <boxed name="GtkTreePath" get-type="gtk_tree_path_get_type"/>
-  <boxed name="GtkTreeRowReference" get-type="gtk_tree_row_reference_get_type"/>
-  <boxed name="GtkTreeIter" get-type="gtk_tree_iter_get_type"/>
-  <interface name="GtkTreeModel" get-type="gtk_tree_model_get_type">
-    <signal name="row-changed" return="void" when="last">
-      <param type="GtkTreePath"/>
-      <param type="GtkTreeIter"/>
-    </signal>
-    <signal name="row-inserted" return="void" when="first">
-      <param type="GtkTreePath"/>
-      <param type="GtkTreeIter"/>
-    </signal>
-    <signal name="row-has-child-toggled" return="void" when="last">
-      <param type="GtkTreePath"/>
-      <param type="GtkTreeIter"/>
-    </signal>
-    <signal name="row-deleted" return="void" when="first">
-      <param type="GtkTreePath"/>
-    </signal>
-    <signal name="rows-reordered" return="void" when="first">
-      <param type="GtkTreePath"/>
-      <param type="GtkTreeIter"/>
-      <param type="gpointer"/>
-    </signal>
-  </interface>
-  <class name="GtkCellArea" get-type="gtk_cell_area_get_type" parents="GInitiallyUnowned,GObject" abstract="1">
-    <implements name="GtkCellLayout"/>
-    <implements name="GtkBuildable"/>
-    <property name="focus-cell" type="GtkCellRenderer" flags="227"/>
-    <property name="edited-cell" type="GtkCellRenderer" flags="225"/>
-    <property name="edit-widget" type="GtkCellEditable" flags="225"/>
-    <signal name="apply-attributes" return="void" when="first">
-      <param type="GtkTreeModel"/>
-      <param type="GtkTreeIter"/>
-      <param type="gboolean"/>
-      <param type="gboolean"/>
-    </signal>
-    <signal name="add-editable" return="void" when="first">
-      <param type="GtkCellRenderer"/>
-      <param type="GtkCellEditable"/>
-      <param type="GdkRectangle"/>
-      <param type="gchararray"/>
-    </signal>
-    <signal name="remove-editable" return="void" when="first">
-      <param type="GtkCellRenderer"/>
-      <param type="GtkCellEditable"/>
-    </signal>
-    <signal name="focus-changed" return="void" when="first">
-      <param type="GtkCellRenderer"/>
-      <param type="gchararray"/>
-    </signal>
-  </class>
-  <class name="GtkCellAreaBox" get-type="gtk_cell_area_box_get_type" parents="GtkCellArea,GInitiallyUnowned,GObject">
-    <implements name="GtkCellLayout"/>
-    <implements name="GtkBuildable"/>
-    <implements name="GtkOrientable"/>
-    <property name="spacing" type="gint" flags="1073742051"/>
-  </class>
-  <class name="GtkCellAreaContext" get-type="gtk_cell_area_context_get_type" parents="GObject">
-    <property name="area" type="GtkCellArea" flags="235"/>
-    <property name="minimum-width" type="gint" flags="225"/>
-    <property name="natural-width" type="gint" flags="225"/>
-    <property name="minimum-height" type="gint" flags="225"/>
-    <property name="natural-height" type="gint" flags="225"/>
-  </class>
-  <interface name="GtkCellLayout" get-type="gtk_cell_layout_get_type">
-  </interface>
-  <class name="GtkCellRendererText" get-type="gtk_cell_renderer_text_get_type" parents="GtkCellRenderer,GInitiallyUnowned,GObject">
-    <property name="text" type="gchararray" flags="227"/>
-    <property name="markup" type="gchararray" flags="226"/>
-    <property name="attributes" type="PangoAttrList" flags="227"/>
-    <property name="single-paragraph-mode" type="gboolean" flags="1073742051"/>
-    <property name="width-chars" type="gint" flags="1073742051"/>
-    <property name="max-width-chars" type="gint" flags="1073742051"/>
-    <property name="wrap-width" type="gint" flags="1073742051"/>
-    <property name="alignment" type="PangoAlignment" flags="1073742051"/>
-    <property name="placeholder-text" type="gchararray" flags="227"/>
-    <property name="background" type="gchararray" flags="226"/>
-    <property name="foreground" type="gchararray" flags="226"/>
-    <property name="background-rgba" type="GdkRGBA" flags="227"/>
-    <property name="foreground-rgba" type="GdkRGBA" flags="227"/>
-    <property name="font" type="gchararray" flags="227"/>
-    <property name="font-desc" type="PangoFontDescription" flags="227"/>
-    <property name="family" type="gchararray" flags="227"/>
-    <property name="style" type="PangoStyle" flags="227"/>
-    <property name="variant" type="PangoVariant" flags="227"/>
-    <property name="weight" type="gint" flags="227"/>
-    <property name="stretch" type="PangoStretch" flags="227"/>
-    <property name="size" type="gint" flags="227"/>
-    <property name="size-points" type="gdouble" flags="227"/>
-    <property name="scale" type="gdouble" flags="227"/>
-    <property name="editable" type="gboolean" flags="227"/>
-    <property name="strikethrough" type="gboolean" flags="227"/>
-    <property name="underline" type="PangoUnderline" flags="227"/>
-    <property name="rise" type="gint" flags="227"/>
-    <property name="language" type="gchararray" flags="227"/>
-    <property name="ellipsize" type="PangoEllipsizeMode" flags="1073742051"/>
-    <property name="wrap-mode" type="PangoWrapMode" flags="1073742051"/>
-    <property name="background-set" type="gboolean" flags="227"/>
-    <property name="foreground-set" type="gboolean" flags="227"/>
-    <property name="family-set" type="gboolean" flags="227"/>
-    <property name="style-set" type="gboolean" flags="227"/>
-    <property name="variant-set" type="gboolean" flags="227"/>
-    <property name="weight-set" type="gboolean" flags="227"/>
-    <property name="stretch-set" type="gboolean" flags="227"/>
-    <property name="size-set" type="gboolean" flags="227"/>
-    <property name="scale-set" type="gboolean" flags="227"/>
-    <property name="editable-set" type="gboolean" flags="227"/>
-    <property name="strikethrough-set" type="gboolean" flags="227"/>
-    <property name="underline-set" type="gboolean" flags="227"/>
-    <property name="rise-set" type="gboolean" flags="227"/>
-    <property name="language-set" type="gboolean" flags="227"/>
-    <property name="ellipsize-set" type="gboolean" flags="227"/>
-    <property name="align-set" type="gboolean" flags="227"/>
-    <signal name="edited" return="void" when="last">
-      <param type="gchararray"/>
-      <param type="gchararray"/>
-    </signal>
-  </class>
-  <class name="GtkCellRendererAccel" get-type="gtk_cell_renderer_accel_get_type" parents="GtkCellRendererText,GtkCellRenderer,GInitiallyUnowned,GObject">
-    <property name="accel-key" type="guint" flags="1073742051"/>
-    <property name="accel-mods" type="GdkModifierType" flags="1073742051"/>
-    <property name="keycode" type="guint" flags="1073742051"/>
-    <property name="accel-mode" type="GtkCellRendererAccelMode" flags="1073742051"/>
-    <signal name="accel-edited" return="void" when="last">
-      <param type="gchararray"/>
-      <param type="guint"/>
-      <param type="GdkModifierType"/>
-      <param type="guint"/>
-    </signal>
-    <signal name="accel-cleared" return="void" when="last">
-      <param type="gchararray"/>
-    </signal>
-  </class>
-  <class name="GtkCellRendererCombo" get-type="gtk_cell_renderer_combo_get_type" parents="GtkCellRendererText,GtkCellRenderer,GInitiallyUnowned,GObject">
-    <property name="model" type="GtkTreeModel" flags="227"/>
-    <property name="text-column" type="gint" flags="1073742051"/>
-    <property name="has-entry" type="gboolean" flags="1073742051"/>
-    <signal name="changed" return="void" when="last">
-      <param type="gchararray"/>
-      <param type="GtkTreeIter"/>
-    </signal>
-  </class>
-  <class name="GtkCellRendererPixbuf" get-type="gtk_cell_renderer_pixbuf_get_type" parents="GtkCellRenderer,GInitiallyUnowned,GObject">
-    <property name="pixbuf" type="GdkPixbuf" flags="226"/>
-    <property name="pixbuf-expander-open" type="GdkPixbuf" flags="227"/>
-    <property name="pixbuf-expander-closed" type="GdkPixbuf" flags="227"/>
-    <property name="texture" type="GdkTexture" flags="227"/>
-    <property name="icon-size" type="GtkIconSize" flags="1073742051"/>
-    <property name="icon-name" type="gchararray" flags="227"/>
-    <property name="gicon" type="GIcon" flags="227"/>
-  </class>
-  <class name="GtkCellRendererProgress" get-type="gtk_cell_renderer_progress_get_type" parents="GtkCellRenderer,GInitiallyUnowned,GObject">
-    <implements name="GtkOrientable"/>
-    <property name="value" type="gint" flags="1073742051"/>
-    <property name="text" type="gchararray" flags="227"/>
-    <property name="pulse" type="gint" flags="1073742051"/>
-    <property name="text-xalign" type="gfloat" flags="227"/>
-    <property name="text-yalign" type="gfloat" flags="227"/>
-    <property name="inverted" type="gboolean" flags="1073742051"/>
-  </class>
-  <class name="GtkCellRendererSpin" get-type="gtk_cell_renderer_spin_get_type" parents="GtkCellRendererText,GtkCellRenderer,GInitiallyUnowned,GObject">
-    <property name="adjustment" type="GtkAdjustment" flags="227"/>
-    <property name="climb-rate" type="gdouble" flags="227"/>
-    <property name="digits" type="guint" flags="1073742051"/>
-  </class>
-  <class name="GtkCellRendererSpinner" get-type="gtk_cell_renderer_spinner_get_type" parents="GtkCellRenderer,GInitiallyUnowned,GObject">
-    <property name="active" type="gboolean" flags="1073741827"/>
-    <property name="pulse" type="guint" flags="1073741827"/>
-    <property name="size" type="GtkIconSize" flags="1073741827"/>
-  </class>
-  <class name="GtkCellRendererToggle" get-type="gtk_cell_renderer_toggle_get_type" parents="GtkCellRenderer,GInitiallyUnowned,GObject">
-    <property name="activatable" type="gboolean" flags="1073742051"/>
-    <property name="active" type="gboolean" flags="1073742051"/>
-    <property name="radio" type="gboolean" flags="1073742051"/>
-    <property name="inconsistent" type="gboolean" flags="1073742051"/>
-    <signal name="toggled" return="void" when="last">
-      <param type="gchararray"/>
-    </signal>
-  </class>
-  <class name="GtkCellView" get-type="gtk_cell_view_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
-    <implements name="GtkAccessible"/>
-    <implements name="GtkBuildable"/>
-    <implements name="GtkConstraintTarget"/>
-    <implements name="GtkCellLayout"/>
-    <implements name="GtkOrientable"/>
-    <property name="model" type="GtkTreeModel" flags="227"/>
-    <property name="cell-area" type="GtkCellArea" flags="235"/>
-    <property name="cell-area-context" type="GtkCellAreaContext" flags="235"/>
-    <property name="draw-sensitive" type="gboolean" flags="1073742051"/>
-    <property name="fit-model" type="gboolean" flags="1073742051"/>
   </class>
   <class name="GtkToggleButton" get-type="gtk_toggle_button_get_type" parents="GtkButton,GtkWidget,GInitiallyUnowned,GObject">
     <implements name="GtkAccessible"/>
@@ -714,42 +414,17 @@
     <signal name="toggled" return="void" when="first">
     </signal>
   </class>
-  <class name="GtkColorButton" get-type="gtk_color_button_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
-    <implements name="GtkAccessible"/>
-    <implements name="GtkBuildable"/>
-    <implements name="GtkConstraintTarget"/>
-    <implements name="GtkColorChooser"/>
-    <property name="title" type="gchararray" flags="227"/>
-    <property name="show-editor" type="gboolean" flags="1073742051"/>
+  <class name="GtkColorDialog" get-type="gtk_color_dialog_get_type" parents="GObject">
+    <property name="title" type="gchararray" flags="1073742051"/>
     <property name="modal" type="gboolean" flags="1073742051"/>
-    <signal name="activate" return="void" when="first" action="1">
-    </signal>
-    <signal name="color-set" return="void" when="first">
-    </signal>
+    <property name="with-alpha" type="gboolean" flags="1073742051"/>
   </class>
-  <interface name="GtkColorChooser" get-type="gtk_color_chooser_get_type">
-    <property name="rgba" type="GdkRGBA" flags="227"/>
-    <property name="use-alpha" type="gboolean" flags="1073742051"/>
-    <signal name="color-activated" return="void" when="first">
-      <param type="GdkRGBA"/>
-    </signal>
-  </interface>
-  <class name="GtkColorChooserDialog" get-type="gtk_color_chooser_dialog_get_type" parents="GtkDialog,GtkWindow,GtkWidget,GInitiallyUnowned,GObject">
+  <class name="GtkColorDialogButton" get-type="gtk_color_dialog_button_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
     <implements name="GtkAccessible"/>
     <implements name="GtkBuildable"/>
     <implements name="GtkConstraintTarget"/>
-    <implements name="GtkNative"/>
-    <implements name="GtkShortcutManager"/>
-    <implements name="GtkRoot"/>
-    <implements name="GtkColorChooser"/>
-    <property name="show-editor" type="gboolean" flags="227"/>
-  </class>
-  <class name="GtkColorChooserWidget" get-type="gtk_color_chooser_widget_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
-    <implements name="GtkAccessible"/>
-    <implements name="GtkBuildable"/>
-    <implements name="GtkConstraintTarget"/>
-    <implements name="GtkColorChooser"/>
-    <property name="show-editor" type="gboolean" flags="227"/>
+    <property name="dialog" type="GtkColorDialog" flags="1073742051"/>
+    <property name="rgba" type="GdkRGBA" flags="1073742051"/>
   </class>
   <class name="GtkSorter" get-type="gtk_sorter_get_type" parents="GObject">
     <signal name="changed" return="void" when="last">
@@ -799,310 +474,102 @@
     <property name="resizable" type="gboolean" flags="1073742051"/>
     <property name="expand" type="gboolean" flags="1073742051"/>
     <property name="fixed-width" type="gint" flags="1073742051"/>
+    <property name="id" type="gchararray" flags="1073741827"/>
   </class>
-  <interface name="GtkTreeSortable" get-type="gtk_tree_sortable_get_type">
-    <prerequisite name="GtkTreeModel"/>
-    <signal name="sort-column-changed" return="void" when="last">
-    </signal>
-  </interface>
-  <class name="GtkTreeViewColumn" get-type="gtk_tree_view_column_get_type" parents="GInitiallyUnowned,GObject">
-    <implements name="GtkCellLayout"/>
-    <implements name="GtkBuildable"/>
-    <property name="visible" type="gboolean" flags="1073742051"/>
-    <property name="resizable" type="gboolean" flags="1073742051"/>
-    <property name="x-offset" type="gint" flags="225"/>
-    <property name="width" type="gint" flags="225"/>
-    <property name="spacing" type="gint" flags="1073742051"/>
-    <property name="sizing" type="GtkTreeViewColumnSizing" flags="1073742051"/>
-    <property name="fixed-width" type="gint" flags="1073742051"/>
-    <property name="min-width" type="gint" flags="1073742051"/>
-    <property name="max-width" type="gint" flags="1073742051"/>
-    <property name="title" type="gchararray" flags="227"/>
-    <property name="expand" type="gboolean" flags="1073742051"/>
-    <property name="clickable" type="gboolean" flags="1073742051"/>
-    <property name="widget" type="GtkWidget" flags="227"/>
-    <property name="alignment" type="gfloat" flags="1073742051"/>
-    <property name="reorderable" type="gboolean" flags="1073742051"/>
-    <property name="sort-indicator" type="gboolean" flags="1073742051"/>
-    <property name="sort-order" type="GtkSortType" flags="1073742051"/>
-    <property name="sort-column-id" type="gint" flags="1073742051"/>
-    <property name="cell-area" type="GtkCellArea" flags="235"/>
-    <signal name="clicked" return="void" when="last">
-    </signal>
+  <class name="GtkColumnViewSorter" get-type="gtk_column_view_sorter_get_type" parents="GtkSorter,GObject">
+    <property name="primary-sort-column" type="GtkColumnViewColumn" flags="225"/>
+    <property name="primary-sort-order" type="GtkSortType" flags="225"/>
   </class>
-  <interface name="GtkEditable" get-type="gtk_editable_get_type">
-    <prerequisite name="GtkWidget"/>
-    <property name="cursor-position" type="gint" flags="225"/>
-    <property name="editable" type="gboolean" flags="1073742051"/>
-    <property name="enable-undo" type="gboolean" flags="1073742051"/>
-    <property name="max-width-chars" type="gint" flags="1073742051"/>
-    <property name="selection-bound" type="gint" flags="225"/>
-    <property name="text" type="gchararray" flags="1073742051"/>
-    <property name="width-chars" type="gint" flags="1073742051"/>
-    <property name="xalign" type="gfloat" flags="1073742051"/>
-    <signal name="changed" return="void" when="last">
-    </signal>
-    <signal name="insert-text" return="void" when="last">
-      <param type="gchararray"/>
-      <param type="gint"/>
-      <param type="gpointer"/>
-    </signal>
-    <signal name="delete-text" return="void" when="last">
-      <param type="gint"/>
-      <param type="gint"/>
-    </signal>
-  </interface>
-  <class name="GtkIMContext" get-type="gtk_im_context_get_type" parents="GObject" abstract="1">
-    <property name="input-purpose" type="GtkInputPurpose" flags="1073742051"/>
-    <property name="input-hints" type="GtkInputHints" flags="1073742051"/>
-    <signal name="preedit-start" return="void" when="last">
-    </signal>
-    <signal name="preedit-end" return="void" when="last">
-    </signal>
-    <signal name="preedit-changed" return="void" when="last">
-    </signal>
-    <signal name="commit" return="void" when="last">
-      <param type="gchararray"/>
-    </signal>
-    <signal name="retrieve-surrounding" return="gboolean" when="last">
-    </signal>
-    <signal name="delete-surrounding" return="gboolean" when="last">
-      <param type="gint"/>
-      <param type="gint"/>
-    </signal>
-  </class>
-  <class name="GtkEntryBuffer" get-type="gtk_entry_buffer_get_type" parents="GObject">
-    <property name="text" type="gchararray" flags="227"/>
-    <property name="length" type="guint" flags="225"/>
-    <property name="max-length" type="gint" flags="1073742051"/>
-    <signal name="inserted-text" return="void" when="first">
-      <param type="guint"/>
-      <param type="gchararray"/>
-      <param type="guint"/>
-    </signal>
-    <signal name="deleted-text" return="void" when="last">
-      <param type="guint"/>
-      <param type="guint"/>
-    </signal>
-  </class>
-  <class name="GtkListStore" get-type="gtk_list_store_get_type" parents="GObject">
-    <implements name="GtkTreeModel"/>
-    <implements name="GtkTreeDragSource"/>
-    <implements name="GtkTreeDragDest"/>
-    <implements name="GtkTreeSortable"/>
-    <implements name="GtkBuildable"/>
-  </class>
-  <class name="GtkTreeModelFilter" get-type="gtk_tree_model_filter_get_type" parents="GObject">
-    <implements name="GtkTreeModel"/>
-    <implements name="GtkTreeDragSource"/>
-    <property name="child-model" type="GtkTreeModel" flags="235"/>
-    <property name="virtual-root" type="GtkTreePath" flags="235"/>
-  </class>
-  <class name="GtkEntryCompletion" get-type="gtk_entry_completion_get_type" parents="GObject">
-    <implements name="GtkCellLayout"/>
-    <implements name="GtkBuildable"/>
-    <property name="model" type="GtkTreeModel" flags="227"/>
-    <property name="minimum-key-length" type="gint" flags="1073742051"/>
-    <property name="text-column" type="gint" flags="227"/>
-    <property name="inline-completion" type="gboolean" flags="1073742051"/>
-    <property name="popup-completion" type="gboolean" flags="1073742051"/>
-    <property name="popup-set-width" type="gboolean" flags="1073742051"/>
-    <property name="popup-single-match" type="gboolean" flags="1073742051"/>
-    <property name="inline-selection" type="gboolean" flags="1073742051"/>
-    <property name="cell-area" type="GtkCellArea" flags="235"/>
-    <signal name="insert-prefix" return="gboolean" when="last">
-      <param type="gchararray"/>
-    </signal>
-    <signal name="match-selected" return="gboolean" when="last">
-      <param type="GtkTreeModel"/>
-      <param type="GtkTreeIter"/>
-    </signal>
-    <signal name="cursor-on-match" return="gboolean" when="last">
-      <param type="GtkTreeModel"/>
-      <param type="GtkTreeIter"/>
-    </signal>
-    <signal name="no-matches" return="void" when="last">
-    </signal>
-  </class>
-  <class name="GtkImage" get-type="gtk_image_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
-    <implements name="GtkAccessible"/>
-    <implements name="GtkBuildable"/>
-    <implements name="GtkConstraintTarget"/>
-    <property name="paintable" type="GdkPaintable" flags="227"/>
-    <property name="file" type="gchararray" flags="227"/>
-    <property name="icon-size" type="GtkIconSize" flags="1073742051"/>
-    <property name="pixel-size" type="gint" flags="1073742051"/>
-    <property name="icon-name" type="gchararray" flags="227"/>
-    <property name="storage-type" type="GtkImageType" flags="225"/>
-    <property name="gicon" type="GIcon" flags="227"/>
-    <property name="resource" type="gchararray" flags="227"/>
-    <property name="use-fallback" type="gboolean" flags="1073742051"/>
-  </class>
-  <class name="GtkEntry" get-type="gtk_entry_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
-    <implements name="GtkAccessible"/>
-    <implements name="GtkBuildable"/>
-    <implements name="GtkConstraintTarget"/>
-    <implements name="GtkEditable"/>
-    <implements name="GtkCellEditable"/>
-    <property name="buffer" type="GtkEntryBuffer" flags="1073742055"/>
-    <property name="max-length" type="gint" flags="1073742051"/>
-    <property name="visibility" type="gboolean" flags="1073742051"/>
-    <property name="has-frame" type="gboolean" flags="1073742051"/>
-    <property name="invisible-char" type="guint" flags="1073742051"/>
-    <property name="activates-default" type="gboolean" flags="1073742051"/>
-    <property name="scroll-offset" type="gint" flags="1073742049"/>
-    <property name="truncate-multiline" type="gboolean" flags="1073742051"/>
-    <property name="overwrite-mode" type="gboolean" flags="1073742051"/>
-    <property name="text-length" type="guint" flags="225"/>
-    <property name="invisible-char-set" type="gboolean" flags="227"/>
-    <property name="progress-fraction" type="gdouble" flags="1073742051"/>
-    <property name="progress-pulse-step" type="gdouble" flags="1073742051"/>
-    <property name="primary-icon-paintable" type="GdkPaintable" flags="1073742051"/>
-    <property name="secondary-icon-paintable" type="GdkPaintable" flags="1073742051"/>
-    <property name="primary-icon-name" type="gchararray" flags="1073742051"/>
-    <property name="secondary-icon-name" type="gchararray" flags="1073742051"/>
-    <property name="primary-icon-gicon" type="GIcon" flags="1073742051"/>
-    <property name="secondary-icon-gicon" type="GIcon" flags="1073742051"/>
-    <property name="primary-icon-storage-type" type="GtkImageType" flags="225"/>
-    <property name="secondary-icon-storage-type" type="GtkImageType" flags="225"/>
-    <property name="primary-icon-activatable" type="gboolean" flags="1073742051"/>
-    <property name="secondary-icon-activatable" type="gboolean" flags="1073742051"/>
-    <property name="primary-icon-sensitive" type="gboolean" flags="1073742051"/>
-    <property name="secondary-icon-sensitive" type="gboolean" flags="1073742051"/>
-    <property name="primary-icon-tooltip-text" type="gchararray" flags="1073742051"/>
-    <property name="secondary-icon-tooltip-text" type="gchararray" flags="1073742051"/>
-    <property name="primary-icon-tooltip-markup" type="gchararray" flags="1073742051"/>
-    <property name="secondary-icon-tooltip-markup" type="gchararray" flags="1073742051"/>
-    <property name="im-module" type="gchararray" flags="1073742051"/>
-    <property name="placeholder-text" type="gchararray" flags="1073742051"/>
-    <property name="completion" type="GtkEntryCompletion" flags="1073742051"/>
-    <property name="input-purpose" type="GtkInputPurpose" flags="1073742051"/>
-    <property name="input-hints" type="GtkInputHints" flags="1073742051"/>
-    <property name="attributes" type="PangoAttrList" flags="1073742051"/>
-    <property name="tabs" type="PangoTabArray" flags="1073742051"/>
-    <property name="extra-menu" type="GMenuModel" flags="1073742051"/>
-    <property name="show-emoji-icon" type="gboolean" flags="1073742051"/>
-    <property name="enable-emoji-completion" type="gboolean" flags="1073742051"/>
-    <signal name="activate" return="void" when="last" action="1">
-    </signal>
-    <signal name="icon-press" return="void" when="last">
-      <param type="GtkEntryIconPosition"/>
-    </signal>
-    <signal name="icon-release" return="void" when="last">
-      <param type="GtkEntryIconPosition"/>
-    </signal>
-  </class>
-  <class name="GtkTreeView" get-type="gtk_tree_view_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
-    <implements name="GtkAccessible"/>
-    <implements name="GtkBuildable"/>
-    <implements name="GtkConstraintTarget"/>
-    <implements name="GtkScrollable"/>
-    <property name="model" type="GtkTreeModel" flags="227"/>
-    <property name="headers-visible" type="gboolean" flags="1073742051"/>
-    <property name="headers-clickable" type="gboolean" flags="1073742051"/>
-    <property name="expander-column" type="GtkTreeViewColumn" flags="227"/>
-    <property name="reorderable" type="gboolean" flags="1073742051"/>
-    <property name="enable-search" type="gboolean" flags="1073742051"/>
-    <property name="search-column" type="gint" flags="1073742051"/>
-    <property name="fixed-height-mode" type="gboolean" flags="1073742051"/>
-    <property name="hover-selection" type="gboolean" flags="1073742051"/>
-    <property name="hover-expand" type="gboolean" flags="1073742051"/>
-    <property name="show-expanders" type="gboolean" flags="1073742051"/>
-    <property name="level-indentation" type="gint" flags="1073742051"/>
-    <property name="rubber-banding" type="gboolean" flags="1073742051"/>
-    <property name="enable-grid-lines" type="GtkTreeViewGridLines" flags="1073742051"/>
-    <property name="enable-tree-lines" type="gboolean" flags="1073742051"/>
-    <property name="tooltip-column" type="gint" flags="1073742051"/>
-    <property name="activate-on-single-click" type="gboolean" flags="1073742051"/>
-    <signal name="row-activated" return="void" when="last" action="1">
-      <param type="GtkTreePath"/>
-      <param type="GtkTreeViewColumn"/>
-    </signal>
-    <signal name="test-expand-row" return="gboolean" when="last">
-      <param type="GtkTreeIter"/>
-      <param type="GtkTreePath"/>
-    </signal>
-    <signal name="test-collapse-row" return="gboolean" when="last">
-      <param type="GtkTreeIter"/>
-      <param type="GtkTreePath"/>
-    </signal>
-    <signal name="row-expanded" return="void" when="last">
-      <param type="GtkTreeIter"/>
-      <param type="GtkTreePath"/>
-    </signal>
-    <signal name="row-collapsed" return="void" when="last">
-      <param type="GtkTreeIter"/>
-      <param type="GtkTreePath"/>
-    </signal>
-    <signal name="columns-changed" return="void" when="last">
-    </signal>
-    <signal name="cursor-changed" return="void" when="last">
-    </signal>
-    <signal name="move-cursor" return="gboolean" when="last" action="1">
-      <param type="GtkMovementStep"/>
-      <param type="gint"/>
-      <param type="gboolean"/>
-      <param type="gboolean"/>
-    </signal>
-    <signal name="select-all" return="gboolean" when="last" action="1">
-    </signal>
-    <signal name="unselect-all" return="gboolean" when="last" action="1">
-    </signal>
-    <signal name="select-cursor-row" return="gboolean" when="last" action="1">
-      <param type="gboolean"/>
-    </signal>
-    <signal name="toggle-cursor-row" return="gboolean" when="last" action="1">
-    </signal>
-    <signal name="expand-collapse-cursor-row" return="gboolean" when="last" action="1">
-      <param type="gboolean"/>
-      <param type="gboolean"/>
-      <param type="gboolean"/>
-    </signal>
-    <signal name="select-cursor-parent" return="gboolean" when="last" action="1">
-    </signal>
-    <signal name="start-interactive-search" return="gboolean" when="last" action="1">
-    </signal>
-  </class>
-  <class name="GtkComboBox" get-type="gtk_combo_box_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
-    <implements name="GtkAccessible"/>
-    <implements name="GtkBuildable"/>
-    <implements name="GtkConstraintTarget"/>
-    <implements name="GtkCellLayout"/>
-    <implements name="GtkCellEditable"/>
-    <property name="model" type="GtkTreeModel" flags="1073742051"/>
-    <property name="active" type="gint" flags="1073742051"/>
-    <property name="has-frame" type="gboolean" flags="1073742051"/>
-    <property name="popup-shown" type="gboolean" flags="225"/>
-    <property name="button-sensitivity" type="GtkSensitivityType" flags="1073742051"/>
-    <property name="has-entry" type="gboolean" flags="235"/>
-    <property name="entry-text-column" type="gint" flags="1073742051"/>
-    <property name="popup-fixed-width" type="gboolean" flags="1073742051"/>
-    <property name="id-column" type="gint" flags="1073742051"/>
-    <property name="active-id" type="gchararray" flags="1073742051"/>
-    <property name="child" type="GtkWidget" flags="1073742051"/>
-    <signal name="activate" return="void" when="first" action="1">
-    </signal>
-    <signal name="changed" return="void" when="last">
-    </signal>
-    <signal name="move-active" return="void" when="last" action="1">
-      <param type="GtkScrollType"/>
-    </signal>
-    <signal name="popup" return="void" when="last" action="1">
-    </signal>
-    <signal name="popdown" return="gboolean" when="last" action="1">
-    </signal>
-    <signal name="format-entry-text" return="gchararray" when="last">
-      <param type="gchararray"/>
-    </signal>
-  </class>
-  <class name="GtkComboBoxText" get-type="gtk_combo_box_text_get_type" parents="GtkComboBox,GtkWidget,GInitiallyUnowned,GObject">
-    <implements name="GtkAccessible"/>
-    <implements name="GtkBuildable"/>
-    <implements name="GtkConstraintTarget"/>
-    <implements name="GtkCellLayout"/>
-    <implements name="GtkCellEditable"/>
-  </class>
-  <enum name="GtkLicense" get-type="gtk_license_get_type">
+  <enum name="GtkAssistantPageType" get-type="gtk_assistant_page_type_get_type">
+    <member name="GTK_ASSISTANT_PAGE_CONTENT" nick="content" value="0"/>
+    <member name="GTK_ASSISTANT_PAGE_INTRO" nick="intro" value="1"/>
+    <member name="GTK_ASSISTANT_PAGE_CONFIRM" nick="confirm" value="2"/>
+    <member name="GTK_ASSISTANT_PAGE_SUMMARY" nick="summary" value="3"/>
+    <member name="GTK_ASSISTANT_PAGE_PROGRESS" nick="progress" value="4"/>
+    <member name="GTK_ASSISTANT_PAGE_CUSTOM" nick="custom" value="5"/>
+  </enum>  <flags name="GtkCellRendererState" get-type="gtk_cell_renderer_state_get_type">
+    <member name="GTK_CELL_RENDERER_SELECTED" nick="selected" value="1"/>
+    <member name="GTK_CELL_RENDERER_PRELIT" nick="prelit" value="2"/>
+    <member name="GTK_CELL_RENDERER_INSENSITIVE" nick="insensitive" value="4"/>
+    <member name="GTK_CELL_RENDERER_SORTED" nick="sorted" value="8"/>
+    <member name="GTK_CELL_RENDERER_FOCUSED" nick="focused" value="16"/>
+    <member name="GTK_CELL_RENDERER_EXPANDABLE" nick="expandable" value="32"/>
+    <member name="GTK_CELL_RENDERER_EXPANDED" nick="expanded" value="64"/>
+  </flags>
+  <enum name="GtkCellRendererMode" get-type="gtk_cell_renderer_mode_get_type">
+    <member name="GTK_CELL_RENDERER_MODE_INERT" nick="inert" value="0"/>
+    <member name="GTK_CELL_RENDERER_MODE_ACTIVATABLE" nick="activatable" value="1"/>
+    <member name="GTK_CELL_RENDERER_MODE_EDITABLE" nick="editable" value="2"/>
+  </enum>  <enum name="GtkCellRendererAccelMode" get-type="gtk_cell_renderer_accel_mode_get_type">
+    <member name="GTK_CELL_RENDERER_ACCEL_MODE_GTK" nick="gtk" value="0"/>
+    <member name="GTK_CELL_RENDERER_ACCEL_MODE_OTHER" nick="other" value="1"/>
+  </enum>  <flags name="GtkDialogFlags" get-type="gtk_dialog_flags_get_type">
+    <member name="GTK_DIALOG_MODAL" nick="modal" value="1"/>
+    <member name="GTK_DIALOG_DESTROY_WITH_PARENT" nick="destroy-with-parent" value="2"/>
+    <member name="GTK_DIALOG_USE_HEADER_BAR" nick="use-header-bar" value="4"/>
+  </flags>
+  <enum name="GtkResponseType" get-type="gtk_response_type_get_type">
+    <member name="GTK_RESPONSE_NONE" nick="none" value="-1"/>
+    <member name="GTK_RESPONSE_REJECT" nick="reject" value="-2"/>
+    <member name="GTK_RESPONSE_ACCEPT" nick="accept" value="-3"/>
+    <member name="GTK_RESPONSE_DELETE_EVENT" nick="delete-event" value="-4"/>
+    <member name="GTK_RESPONSE_OK" nick="ok" value="-5"/>
+    <member name="GTK_RESPONSE_CANCEL" nick="cancel" value="-6"/>
+    <member name="GTK_RESPONSE_CLOSE" nick="close" value="-7"/>
+    <member name="GTK_RESPONSE_YES" nick="yes" value="-8"/>
+    <member name="GTK_RESPONSE_NO" nick="no" value="-9"/>
+    <member name="GTK_RESPONSE_APPLY" nick="apply" value="-10"/>
+    <member name="GTK_RESPONSE_HELP" nick="help" value="-11"/>
+  </enum>  <enum name="GtkFileChooserAction" get-type="gtk_file_chooser_action_get_type">
+    <member name="GTK_FILE_CHOOSER_ACTION_OPEN" nick="open" value="0"/>
+    <member name="GTK_FILE_CHOOSER_ACTION_SAVE" nick="save" value="1"/>
+    <member name="GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER" nick="select-folder" value="2"/>
+  </enum>  <enum name="GtkFileChooserError" get-type="gtk_file_chooser_error_get_type">
+    <member name="GTK_FILE_CHOOSER_ERROR_NONEXISTENT" nick="nonexistent" value="0"/>
+    <member name="GTK_FILE_CHOOSER_ERROR_BAD_FILENAME" nick="bad-filename" value="1"/>
+    <member name="GTK_FILE_CHOOSER_ERROR_ALREADY_EXISTS" nick="already-exists" value="2"/>
+    <member name="GTK_FILE_CHOOSER_ERROR_INCOMPLETE_HOSTNAME" nick="incomplete-hostname" value="3"/>
+  </enum>  <flags name="GtkFontChooserLevel" get-type="gtk_font_chooser_level_get_type">
+    <member name="GTK_FONT_CHOOSER_LEVEL_FAMILY" nick="family" value="0"/>
+    <member name="GTK_FONT_CHOOSER_LEVEL_STYLE" nick="style" value="1"/>
+    <member name="GTK_FONT_CHOOSER_LEVEL_SIZE" nick="size" value="2"/>
+    <member name="GTK_FONT_CHOOSER_LEVEL_VARIATIONS" nick="variations" value="4"/>
+    <member name="GTK_FONT_CHOOSER_LEVEL_FEATURES" nick="features" value="8"/>
+  </flags>
+  <enum name="GtkIconViewDropPosition" get-type="gtk_icon_view_drop_position_get_type">
+    <member name="GTK_ICON_VIEW_NO_DROP" nick="no-drop" value="0"/>
+    <member name="GTK_ICON_VIEW_DROP_INTO" nick="drop-into" value="1"/>
+    <member name="GTK_ICON_VIEW_DROP_LEFT" nick="drop-left" value="2"/>
+    <member name="GTK_ICON_VIEW_DROP_RIGHT" nick="drop-right" value="3"/>
+    <member name="GTK_ICON_VIEW_DROP_ABOVE" nick="drop-above" value="4"/>
+    <member name="GTK_ICON_VIEW_DROP_BELOW" nick="drop-below" value="5"/>
+  </enum>  <enum name="GtkButtonsType" get-type="gtk_buttons_type_get_type">
+    <member name="GTK_BUTTONS_NONE" nick="none" value="0"/>
+    <member name="GTK_BUTTONS_OK" nick="ok" value="1"/>
+    <member name="GTK_BUTTONS_CLOSE" nick="close" value="2"/>
+    <member name="GTK_BUTTONS_CANCEL" nick="cancel" value="3"/>
+    <member name="GTK_BUTTONS_YES_NO" nick="yes-no" value="4"/>
+    <member name="GTK_BUTTONS_OK_CANCEL" nick="ok-cancel" value="5"/>
+  </enum>  <flags name="GtkStyleContextPrintFlags" get-type="gtk_style_context_print_flags_get_type">
+    <member name="GTK_STYLE_CONTEXT_PRINT_NONE" nick="none" value="0"/>
+    <member name="GTK_STYLE_CONTEXT_PRINT_RECURSE" nick="recurse" value="1"/>
+    <member name="GTK_STYLE_CONTEXT_PRINT_SHOW_STYLE" nick="show-style" value="2"/>
+    <member name="GTK_STYLE_CONTEXT_PRINT_SHOW_CHANGE" nick="show-change" value="4"/>
+  </flags>
+  <flags name="GtkTreeModelFlags" get-type="gtk_tree_model_flags_get_type">
+    <member name="GTK_TREE_MODEL_ITERS_PERSIST" nick="iters-persist" value="1"/>
+    <member name="GTK_TREE_MODEL_LIST_ONLY" nick="list-only" value="2"/>
+  </flags>
+  <enum name="GtkTreeViewDropPosition" get-type="gtk_tree_view_drop_position_get_type">
+    <member name="GTK_TREE_VIEW_DROP_BEFORE" nick="before" value="0"/>
+    <member name="GTK_TREE_VIEW_DROP_AFTER" nick="after" value="1"/>
+    <member name="GTK_TREE_VIEW_DROP_INTO_OR_BEFORE" nick="into-or-before" value="2"/>
+    <member name="GTK_TREE_VIEW_DROP_INTO_OR_AFTER" nick="into-or-after" value="3"/>
+  </enum>  <enum name="GtkTreeViewColumnSizing" get-type="gtk_tree_view_column_sizing_get_type">
+    <member name="GTK_TREE_VIEW_COLUMN_GROW_ONLY" nick="grow-only" value="0"/>
+    <member name="GTK_TREE_VIEW_COLUMN_AUTOSIZE" nick="autosize" value="1"/>
+    <member name="GTK_TREE_VIEW_COLUMN_FIXED" nick="fixed" value="2"/>
+  </enum>  <enum name="GtkLicense" get-type="gtk_license_get_type">
     <member name="GTK_LICENSE_UNKNOWN" nick="unknown" value="0"/>
     <member name="GTK_LICENSE_CUSTOM" nick="custom" value="1"/>
     <member name="GTK_LICENSE_GPL_2_0" nick="gpl-2-0" value="2"/>
@@ -1121,20 +588,17 @@
     <member name="GTK_LICENSE_BSD_3" nick="bsd-3" value="15"/>
     <member name="GTK_LICENSE_APACHE_2_0" nick="apache-2-0" value="16"/>
     <member name="GTK_LICENSE_MPL_2_0" nick="mpl-2-0" value="17"/>
+  </enum>  <enum name="GtkAccessiblePlatformState" get-type="gtk_accessible_platform_state_get_type">
+    <member name="GTK_ACCESSIBLE_PLATFORM_STATE_FOCUSABLE" nick="focusable" value="0"/>
+    <member name="GTK_ACCESSIBLE_PLATFORM_STATE_FOCUSED" nick="focused" value="1"/>
+    <member name="GTK_ACCESSIBLE_PLATFORM_STATE_ACTIVE" nick="active" value="2"/>
   </enum>  <flags name="GtkApplicationInhibitFlags" get-type="gtk_application_inhibit_flags_get_type">
     <member name="GTK_APPLICATION_INHIBIT_LOGOUT" nick="logout" value="1"/>
     <member name="GTK_APPLICATION_INHIBIT_SWITCH" nick="switch" value="2"/>
     <member name="GTK_APPLICATION_INHIBIT_SUSPEND" nick="suspend" value="4"/>
     <member name="GTK_APPLICATION_INHIBIT_IDLE" nick="idle" value="8"/>
   </flags>
-  <enum name="GtkAssistantPageType" get-type="gtk_assistant_page_type_get_type">
-    <member name="GTK_ASSISTANT_PAGE_CONTENT" nick="content" value="0"/>
-    <member name="GTK_ASSISTANT_PAGE_INTRO" nick="intro" value="1"/>
-    <member name="GTK_ASSISTANT_PAGE_CONFIRM" nick="confirm" value="2"/>
-    <member name="GTK_ASSISTANT_PAGE_SUMMARY" nick="summary" value="3"/>
-    <member name="GTK_ASSISTANT_PAGE_PROGRESS" nick="progress" value="4"/>
-    <member name="GTK_ASSISTANT_PAGE_CUSTOM" nick="custom" value="5"/>
-  </enum>  <enum name="GtkBuilderError" get-type="gtk_builder_error_get_type">
+  <enum name="GtkBuilderError" get-type="gtk_builder_error_get_type">
     <member name="GTK_BUILDER_ERROR_INVALID_TYPE_FUNCTION" nick="invalid-type-function" value="0"/>
     <member name="GTK_BUILDER_ERROR_UNHANDLED_TAG" nick="unhandled-tag" value="1"/>
     <member name="GTK_BUILDER_ERROR_MISSING_ATTRIBUTE" nick="missing-attribute" value="2"/>
@@ -1153,23 +617,7 @@
   </enum>  <flags name="GtkBuilderClosureFlags" get-type="gtk_builder_closure_flags_get_type">
     <member name="GTK_BUILDER_CLOSURE_SWAPPED" nick="swapped" value="1"/>
   </flags>
-  <flags name="GtkCellRendererState" get-type="gtk_cell_renderer_state_get_type">
-    <member name="GTK_CELL_RENDERER_SELECTED" nick="selected" value="1"/>
-    <member name="GTK_CELL_RENDERER_PRELIT" nick="prelit" value="2"/>
-    <member name="GTK_CELL_RENDERER_INSENSITIVE" nick="insensitive" value="4"/>
-    <member name="GTK_CELL_RENDERER_SORTED" nick="sorted" value="8"/>
-    <member name="GTK_CELL_RENDERER_FOCUSED" nick="focused" value="16"/>
-    <member name="GTK_CELL_RENDERER_EXPANDABLE" nick="expandable" value="32"/>
-    <member name="GTK_CELL_RENDERER_EXPANDED" nick="expanded" value="64"/>
-  </flags>
-  <enum name="GtkCellRendererMode" get-type="gtk_cell_renderer_mode_get_type">
-    <member name="GTK_CELL_RENDERER_MODE_INERT" nick="inert" value="0"/>
-    <member name="GTK_CELL_RENDERER_MODE_ACTIVATABLE" nick="activatable" value="1"/>
-    <member name="GTK_CELL_RENDERER_MODE_EDITABLE" nick="editable" value="2"/>
-  </enum>  <enum name="GtkCellRendererAccelMode" get-type="gtk_cell_renderer_accel_mode_get_type">
-    <member name="GTK_CELL_RENDERER_ACCEL_MODE_GTK" nick="gtk" value="0"/>
-    <member name="GTK_CELL_RENDERER_ACCEL_MODE_OTHER" nick="other" value="1"/>
-  </enum>  <flags name="GtkDebugFlags" get-type="gtk_debug_flags_get_type">
+  <flags name="GtkDebugFlags" get-type="gtk_debug_flags_get_type">
     <member name="GTK_DEBUG_TEXT" nick="text" value="1"/>
     <member name="GTK_DEBUG_TREE" nick="tree" value="2"/>
     <member name="GTK_DEBUG_KEYBINDINGS" nick="keybindings" value="4"/>
@@ -1191,23 +639,10 @@
     <member name="GTK_DEBUG_ICONFALLBACK" nick="iconfallback" value="262144"/>
     <member name="GTK_DEBUG_INVERT_TEXT_DIR" nick="invert-text-dir" value="524288"/>
   </flags>
-  <flags name="GtkDialogFlags" get-type="gtk_dialog_flags_get_type">
-    <member name="GTK_DIALOG_MODAL" nick="modal" value="1"/>
-    <member name="GTK_DIALOG_DESTROY_WITH_PARENT" nick="destroy-with-parent" value="2"/>
-    <member name="GTK_DIALOG_USE_HEADER_BAR" nick="use-header-bar" value="4"/>
-  </flags>
-  <enum name="GtkResponseType" get-type="gtk_response_type_get_type">
-    <member name="GTK_RESPONSE_NONE" nick="none" value="-1"/>
-    <member name="GTK_RESPONSE_REJECT" nick="reject" value="-2"/>
-    <member name="GTK_RESPONSE_ACCEPT" nick="accept" value="-3"/>
-    <member name="GTK_RESPONSE_DELETE_EVENT" nick="delete-event" value="-4"/>
-    <member name="GTK_RESPONSE_OK" nick="ok" value="-5"/>
-    <member name="GTK_RESPONSE_CANCEL" nick="cancel" value="-6"/>
-    <member name="GTK_RESPONSE_CLOSE" nick="close" value="-7"/>
-    <member name="GTK_RESPONSE_YES" nick="yes" value="-8"/>
-    <member name="GTK_RESPONSE_NO" nick="no" value="-9"/>
-    <member name="GTK_RESPONSE_APPLY" nick="apply" value="-10"/>
-    <member name="GTK_RESPONSE_HELP" nick="help" value="-11"/>
+  <enum name="GtkDialogError" get-type="gtk_dialog_error_get_type">
+    <member name="GTK_DIALOG_ERROR_FAILED" nick="failed" value="0"/>
+    <member name="GTK_DIALOG_ERROR_CANCELLED" nick="cancelled" value="1"/>
+    <member name="GTK_DIALOG_ERROR_DISMISSED" nick="dismissed" value="2"/>
   </enum>  <enum name="GtkEditableProperties" get-type="gtk_editable_properties_get_type">
     <member name="GTK_EDITABLE_PROP_TEXT" nick="prop-text" value="0"/>
     <member name="GTK_EDITABLE_PROP_CURSOR_POSITION" nick="prop-cursor-position" value="1"/>
@@ -1609,6 +1044,7 @@
     <member name="GTK_ACCESSIBLE_ROLE_TREE_ITEM" nick="tree-item" value="75"/>
     <member name="GTK_ACCESSIBLE_ROLE_WIDGET" nick="widget" value="76"/>
     <member name="GTK_ACCESSIBLE_ROLE_WINDOW" nick="window" value="77"/>
+    <member name="GTK_ACCESSIBLE_ROLE_TOGGLE_BUTTON" nick="toggle-button" value="78"/>
   </enum>  <enum name="GtkAccessibleState" get-type="gtk_accessible_state_get_type">
     <member name="GTK_ACCESSIBLE_STATE_BUSY" nick="busy" value="0"/>
     <member name="GTK_ACCESSIBLE_STATE_CHECKED" nick="checked" value="1"/>
@@ -1684,16 +1120,7 @@
     <member name="GTK_EVENT_CONTROLLER_SCROLL_KINETIC" nick="kinetic" value="8"/>
     <member name="GTK_EVENT_CONTROLLER_SCROLL_BOTH_AXES" nick="both-axes" value="3"/>
   </flags>
-  <enum name="GtkFileChooserAction" get-type="gtk_file_chooser_action_get_type">
-    <member name="GTK_FILE_CHOOSER_ACTION_OPEN" nick="open" value="0"/>
-    <member name="GTK_FILE_CHOOSER_ACTION_SAVE" nick="save" value="1"/>
-    <member name="GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER" nick="select-folder" value="2"/>
-  </enum>  <enum name="GtkFileChooserError" get-type="gtk_file_chooser_error_get_type">
-    <member name="GTK_FILE_CHOOSER_ERROR_NONEXISTENT" nick="nonexistent" value="0"/>
-    <member name="GTK_FILE_CHOOSER_ERROR_BAD_FILENAME" nick="bad-filename" value="1"/>
-    <member name="GTK_FILE_CHOOSER_ERROR_ALREADY_EXISTS" nick="already-exists" value="2"/>
-    <member name="GTK_FILE_CHOOSER_ERROR_INCOMPLETE_HOSTNAME" nick="incomplete-hostname" value="3"/>
-  </enum>  <enum name="GtkFilterMatch" get-type="gtk_filter_match_get_type">
+  <enum name="GtkFilterMatch" get-type="gtk_filter_match_get_type">
     <member name="GTK_FILTER_MATCH_SOME" nick="some" value="0"/>
     <member name="GTK_FILTER_MATCH_NONE" nick="none" value="1"/>
     <member name="GTK_FILTER_MATCH_ALL" nick="all" value="2"/>
@@ -1701,14 +1128,12 @@
     <member name="GTK_FILTER_CHANGE_DIFFERENT" nick="different" value="0"/>
     <member name="GTK_FILTER_CHANGE_LESS_STRICT" nick="less-strict" value="1"/>
     <member name="GTK_FILTER_CHANGE_MORE_STRICT" nick="more-strict" value="2"/>
-  </enum>  <flags name="GtkFontChooserLevel" get-type="gtk_font_chooser_level_get_type">
-    <member name="GTK_FONT_CHOOSER_LEVEL_FAMILY" nick="family" value="0"/>
-    <member name="GTK_FONT_CHOOSER_LEVEL_STYLE" nick="style" value="1"/>
-    <member name="GTK_FONT_CHOOSER_LEVEL_SIZE" nick="size" value="2"/>
-    <member name="GTK_FONT_CHOOSER_LEVEL_VARIATIONS" nick="variations" value="4"/>
-    <member name="GTK_FONT_CHOOSER_LEVEL_FEATURES" nick="features" value="8"/>
-  </flags>
-  <flags name="GtkIconLookupFlags" get-type="gtk_icon_lookup_flags_get_type">
+  </enum>  <enum name="GtkFontLevel" get-type="gtk_font_level_get_type">
+    <member name="GTK_FONT_LEVEL_FAMILY" nick="family" value="0"/>
+    <member name="GTK_FONT_LEVEL_FACE" nick="face" value="1"/>
+    <member name="GTK_FONT_LEVEL_FONT" nick="font" value="2"/>
+    <member name="GTK_FONT_LEVEL_FEATURES" nick="features" value="3"/>
+  </enum>  <flags name="GtkIconLookupFlags" get-type="gtk_icon_lookup_flags_get_type">
     <member name="GTK_ICON_LOOKUP_FORCE_REGULAR" nick="force-regular" value="1"/>
     <member name="GTK_ICON_LOOKUP_FORCE_SYMBOLIC" nick="force-symbolic" value="2"/>
     <member name="GTK_ICON_LOOKUP_PRELOAD" nick="preload" value="4"/>
@@ -1716,13 +1141,6 @@
   <enum name="GtkIconThemeError" get-type="gtk_icon_theme_error_get_type">
     <member name="GTK_ICON_THEME_NOT_FOUND" nick="not-found" value="0"/>
     <member name="GTK_ICON_THEME_FAILED" nick="failed" value="1"/>
-  </enum>  <enum name="GtkIconViewDropPosition" get-type="gtk_icon_view_drop_position_get_type">
-    <member name="GTK_ICON_VIEW_NO_DROP" nick="no-drop" value="0"/>
-    <member name="GTK_ICON_VIEW_DROP_INTO" nick="drop-into" value="1"/>
-    <member name="GTK_ICON_VIEW_DROP_LEFT" nick="drop-left" value="2"/>
-    <member name="GTK_ICON_VIEW_DROP_RIGHT" nick="drop-right" value="3"/>
-    <member name="GTK_ICON_VIEW_DROP_ABOVE" nick="drop-above" value="4"/>
-    <member name="GTK_ICON_VIEW_DROP_BELOW" nick="drop-below" value="5"/>
   </enum>  <enum name="GtkImageType" get-type="gtk_image_type_get_type">
     <member name="GTK_IMAGE_EMPTY" nick="empty" value="0"/>
     <member name="GTK_IMAGE_ICON_NAME" nick="icon-name" value="1"/>
@@ -1733,13 +1151,6 @@
     <member name="GTK_INSCRIPTION_OVERFLOW_ELLIPSIZE_START" nick="ellipsize-start" value="1"/>
     <member name="GTK_INSCRIPTION_OVERFLOW_ELLIPSIZE_MIDDLE" nick="ellipsize-middle" value="2"/>
     <member name="GTK_INSCRIPTION_OVERFLOW_ELLIPSIZE_END" nick="ellipsize-end" value="3"/>
-  </enum>  <enum name="GtkButtonsType" get-type="gtk_buttons_type_get_type">
-    <member name="GTK_BUTTONS_NONE" nick="none" value="0"/>
-    <member name="GTK_BUTTONS_OK" nick="ok" value="1"/>
-    <member name="GTK_BUTTONS_CLOSE" nick="close" value="2"/>
-    <member name="GTK_BUTTONS_CANCEL" nick="cancel" value="3"/>
-    <member name="GTK_BUTTONS_YES_NO" nick="yes-no" value="4"/>
-    <member name="GTK_BUTTONS_OK_CANCEL" nick="ok-cancel" value="5"/>
   </enum>  <enum name="GtkNotebookTab" get-type="gtk_notebook_tab_get_type">
     <member name="GTK_NOTEBOOK_TAB_FIRST" nick="first" value="0"/>
     <member name="GTK_NOTEBOOK_TAB_LAST" nick="last" value="1"/>
@@ -1866,13 +1277,11 @@
     <member name="GTK_STRING_FILTER_MATCH_MODE_EXACT" nick="exact" value="0"/>
     <member name="GTK_STRING_FILTER_MATCH_MODE_SUBSTRING" nick="substring" value="1"/>
     <member name="GTK_STRING_FILTER_MATCH_MODE_PREFIX" nick="prefix" value="2"/>
-  </enum>  <flags name="GtkStyleContextPrintFlags" get-type="gtk_style_context_print_flags_get_type">
-    <member name="GTK_STYLE_CONTEXT_PRINT_NONE" nick="none" value="0"/>
-    <member name="GTK_STYLE_CONTEXT_PRINT_RECURSE" nick="recurse" value="1"/>
-    <member name="GTK_STYLE_CONTEXT_PRINT_SHOW_STYLE" nick="show-style" value="2"/>
-    <member name="GTK_STYLE_CONTEXT_PRINT_SHOW_CHANGE" nick="show-change" value="4"/>
-  </flags>
-  <flags name="GtkTextSearchFlags" get-type="gtk_text_search_flags_get_type">
+  </enum>  <enum name="GtkCollation" get-type="gtk_collation_get_type">
+    <member name="GTK_COLLATION_NONE" nick="none" value="0"/>
+    <member name="GTK_COLLATION_UNICODE" nick="unicode" value="1"/>
+    <member name="GTK_COLLATION_FILENAME" nick="filename" value="2"/>
+  </enum>  <flags name="GtkTextSearchFlags" get-type="gtk_text_search_flags_get_type">
     <member name="GTK_TEXT_SEARCH_VISIBLE_ONLY" nick="visible-only" value="1"/>
     <member name="GTK_TEXT_SEARCH_TEXT_ONLY" nick="text-only" value="2"/>
     <member name="GTK_TEXT_SEARCH_CASE_INSENSITIVE" nick="case-insensitive" value="4"/>
@@ -1890,19 +1299,6 @@
   </enum>  <enum name="GtkTextExtendSelection" get-type="gtk_text_extend_selection_get_type">
     <member name="GTK_TEXT_EXTEND_SELECTION_WORD" nick="word" value="0"/>
     <member name="GTK_TEXT_EXTEND_SELECTION_LINE" nick="line" value="1"/>
-  </enum>  <flags name="GtkTreeModelFlags" get-type="gtk_tree_model_flags_get_type">
-    <member name="GTK_TREE_MODEL_ITERS_PERSIST" nick="iters-persist" value="1"/>
-    <member name="GTK_TREE_MODEL_LIST_ONLY" nick="list-only" value="2"/>
-  </flags>
-  <enum name="GtkTreeViewDropPosition" get-type="gtk_tree_view_drop_position_get_type">
-    <member name="GTK_TREE_VIEW_DROP_BEFORE" nick="before" value="0"/>
-    <member name="GTK_TREE_VIEW_DROP_AFTER" nick="after" value="1"/>
-    <member name="GTK_TREE_VIEW_DROP_INTO_OR_BEFORE" nick="into-or-before" value="2"/>
-    <member name="GTK_TREE_VIEW_DROP_INTO_OR_AFTER" nick="into-or-after" value="3"/>
-  </enum>  <enum name="GtkTreeViewColumnSizing" get-type="gtk_tree_view_column_sizing_get_type">
-    <member name="GTK_TREE_VIEW_COLUMN_GROW_ONLY" nick="grow-only" value="0"/>
-    <member name="GTK_TREE_VIEW_COLUMN_AUTOSIZE" nick="autosize" value="1"/>
-    <member name="GTK_TREE_VIEW_COLUMN_FIXED" nick="fixed" value="2"/>
   </enum>  <class name="GtkConstraintGuide" get-type="gtk_constraint_guide_get_type" parents="GObject">
     <implements name="GtkConstraintTarget"/>
     <property name="min-width" type="gint" flags="1073741827"/>
@@ -2080,6 +1476,28 @@
     <signal name="activate" return="void" when="first" action="1">
     </signal>
   </class>
+  <interface name="GtkEditable" get-type="gtk_editable_get_type">
+    <prerequisite name="GtkWidget"/>
+    <property name="cursor-position" type="gint" flags="225"/>
+    <property name="editable" type="gboolean" flags="1073742051"/>
+    <property name="enable-undo" type="gboolean" flags="1073742051"/>
+    <property name="max-width-chars" type="gint" flags="1073742051"/>
+    <property name="selection-bound" type="gint" flags="225"/>
+    <property name="text" type="gchararray" flags="1073742051"/>
+    <property name="width-chars" type="gint" flags="1073742051"/>
+    <property name="xalign" type="gfloat" flags="1073742051"/>
+    <signal name="changed" return="void" when="last">
+    </signal>
+    <signal name="insert-text" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="gint"/>
+      <param type="gpointer"/>
+    </signal>
+    <signal name="delete-text" return="void" when="last">
+      <param type="gint"/>
+      <param type="gint"/>
+    </signal>
+  </interface>
   <class name="GtkEditableLabel" get-type="gtk_editable_label_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
     <implements name="GtkAccessible"/>
     <implements name="GtkBuildable"/>
@@ -2095,6 +1513,259 @@
     <implements name="GtkNative"/>
     <signal name="emoji-picked" return="void" when="last">
       <param type="gchararray"/>
+    </signal>
+  </class>
+  <class name="GtkIMContext" get-type="gtk_im_context_get_type" parents="GObject" abstract="1">
+    <property name="input-purpose" type="GtkInputPurpose" flags="1073742051"/>
+    <property name="input-hints" type="GtkInputHints" flags="1073742051"/>
+    <signal name="preedit-start" return="void" when="last">
+    </signal>
+    <signal name="preedit-end" return="void" when="last">
+    </signal>
+    <signal name="preedit-changed" return="void" when="last">
+    </signal>
+    <signal name="commit" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="retrieve-surrounding" return="gboolean" when="last">
+    </signal>
+    <signal name="delete-surrounding" return="gboolean" when="last">
+      <param type="gint"/>
+      <param type="gint"/>
+    </signal>
+  </class>
+  <class name="GtkEntryBuffer" get-type="gtk_entry_buffer_get_type" parents="GObject">
+    <property name="text" type="gchararray" flags="227"/>
+    <property name="length" type="guint" flags="225"/>
+    <property name="max-length" type="gint" flags="1073742051"/>
+    <signal name="inserted-text" return="void" when="first">
+      <param type="guint"/>
+      <param type="gchararray"/>
+      <param type="guint"/>
+    </signal>
+    <signal name="deleted-text" return="void" when="last">
+      <param type="guint"/>
+      <param type="guint"/>
+    </signal>
+  </class>
+  <boxed name="GtkTreePath" get-type="gtk_tree_path_get_type"/>
+  <boxed name="GtkTreeRowReference" get-type="gtk_tree_row_reference_get_type"/>
+  <boxed name="GtkTreeIter" get-type="gtk_tree_iter_get_type"/>
+  <interface name="GtkTreeModel" get-type="gtk_tree_model_get_type">
+    <signal name="row-changed" return="void" when="last">
+      <param type="GtkTreePath"/>
+      <param type="GtkTreeIter"/>
+    </signal>
+    <signal name="row-inserted" return="void" when="first">
+      <param type="GtkTreePath"/>
+      <param type="GtkTreeIter"/>
+    </signal>
+    <signal name="row-has-child-toggled" return="void" when="last">
+      <param type="GtkTreePath"/>
+      <param type="GtkTreeIter"/>
+    </signal>
+    <signal name="row-deleted" return="void" when="first">
+      <param type="GtkTreePath"/>
+    </signal>
+    <signal name="rows-reordered" return="void" when="first">
+      <param type="GtkTreePath"/>
+      <param type="GtkTreeIter"/>
+      <param type="gpointer"/>
+    </signal>
+  </interface>
+  <interface name="GtkTreeSortable" get-type="gtk_tree_sortable_get_type">
+    <prerequisite name="GtkTreeModel"/>
+    <signal name="sort-column-changed" return="void" when="last">
+    </signal>
+  </interface>
+  <class name="GtkListStore" get-type="gtk_list_store_get_type" parents="GObject">
+    <implements name="GtkTreeModel"/>
+    <implements name="GtkTreeDragSource"/>
+    <implements name="GtkTreeDragDest"/>
+    <implements name="GtkTreeSortable"/>
+    <implements name="GtkBuildable"/>
+  </class>
+  <interface name="GtkCellEditable" get-type="gtk_cell_editable_get_type">
+    <prerequisite name="GtkWidget"/>
+    <property name="editing-canceled" type="gboolean" flags="1073742051"/>
+    <signal name="editing-done" return="void" when="last">
+    </signal>
+    <signal name="remove-widget" return="void" when="last">
+    </signal>
+  </interface>
+  <class name="GtkCellRenderer" get-type="gtk_cell_renderer_get_type" parents="GInitiallyUnowned,GObject" abstract="1">
+    <property name="mode" type="GtkCellRendererMode" flags="1073742051"/>
+    <property name="visible" type="gboolean" flags="1073742051"/>
+    <property name="sensitive" type="gboolean" flags="1073742051"/>
+    <property name="xalign" type="gfloat" flags="1073742051"/>
+    <property name="yalign" type="gfloat" flags="1073742051"/>
+    <property name="xpad" type="guint" flags="1073742051"/>
+    <property name="ypad" type="guint" flags="1073742051"/>
+    <property name="width" type="gint" flags="1073742051"/>
+    <property name="height" type="gint" flags="1073742051"/>
+    <property name="is-expander" type="gboolean" flags="1073742051"/>
+    <property name="is-expanded" type="gboolean" flags="1073742051"/>
+    <property name="cell-background" type="gchararray" flags="226"/>
+    <property name="cell-background-rgba" type="GdkRGBA" flags="227"/>
+    <property name="cell-background-set" type="gboolean" flags="1073742051"/>
+    <property name="editing" type="gboolean" flags="225"/>
+    <signal name="editing-canceled" return="void" when="first">
+    </signal>
+    <signal name="editing-started" return="void" when="first">
+      <param type="GtkCellEditable"/>
+      <param type="gchararray"/>
+    </signal>
+  </class>
+  <class name="GtkCellArea" get-type="gtk_cell_area_get_type" parents="GInitiallyUnowned,GObject" abstract="1">
+    <implements name="GtkCellLayout"/>
+    <implements name="GtkBuildable"/>
+    <property name="focus-cell" type="GtkCellRenderer" flags="227"/>
+    <property name="edited-cell" type="GtkCellRenderer" flags="225"/>
+    <property name="edit-widget" type="GtkCellEditable" flags="225"/>
+    <signal name="apply-attributes" return="void" when="first">
+      <param type="GtkTreeModel"/>
+      <param type="GtkTreeIter"/>
+      <param type="gboolean"/>
+      <param type="gboolean"/>
+    </signal>
+    <signal name="add-editable" return="void" when="first">
+      <param type="GtkCellRenderer"/>
+      <param type="GtkCellEditable"/>
+      <param type="GdkRectangle"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="remove-editable" return="void" when="first">
+      <param type="GtkCellRenderer"/>
+      <param type="GtkCellEditable"/>
+    </signal>
+    <signal name="focus-changed" return="void" when="first">
+      <param type="GtkCellRenderer"/>
+      <param type="gchararray"/>
+    </signal>
+  </class>
+  <class name="GtkTreeViewColumn" get-type="gtk_tree_view_column_get_type" parents="GInitiallyUnowned,GObject">
+    <implements name="GtkCellLayout"/>
+    <implements name="GtkBuildable"/>
+    <property name="visible" type="gboolean" flags="1073742051"/>
+    <property name="resizable" type="gboolean" flags="1073742051"/>
+    <property name="x-offset" type="gint" flags="225"/>
+    <property name="width" type="gint" flags="225"/>
+    <property name="spacing" type="gint" flags="1073742051"/>
+    <property name="sizing" type="GtkTreeViewColumnSizing" flags="1073742051"/>
+    <property name="fixed-width" type="gint" flags="1073742051"/>
+    <property name="min-width" type="gint" flags="1073742051"/>
+    <property name="max-width" type="gint" flags="1073742051"/>
+    <property name="title" type="gchararray" flags="227"/>
+    <property name="expand" type="gboolean" flags="1073742051"/>
+    <property name="clickable" type="gboolean" flags="1073742051"/>
+    <property name="widget" type="GtkWidget" flags="227"/>
+    <property name="alignment" type="gfloat" flags="1073742051"/>
+    <property name="reorderable" type="gboolean" flags="1073742051"/>
+    <property name="sort-indicator" type="gboolean" flags="1073742051"/>
+    <property name="sort-order" type="GtkSortType" flags="1073742051"/>
+    <property name="sort-column-id" type="gint" flags="1073742051"/>
+    <property name="cell-area" type="GtkCellArea" flags="235"/>
+    <signal name="clicked" return="void" when="last">
+    </signal>
+  </class>
+  <class name="GtkTreeModelFilter" get-type="gtk_tree_model_filter_get_type" parents="GObject">
+    <implements name="GtkTreeModel"/>
+    <implements name="GtkTreeDragSource"/>
+    <property name="child-model" type="GtkTreeModel" flags="235"/>
+    <property name="virtual-root" type="GtkTreePath" flags="235"/>
+  </class>
+  <class name="GtkEntryCompletion" get-type="gtk_entry_completion_get_type" parents="GObject">
+    <implements name="GtkCellLayout"/>
+    <implements name="GtkBuildable"/>
+    <property name="model" type="GtkTreeModel" flags="227"/>
+    <property name="minimum-key-length" type="gint" flags="1073742051"/>
+    <property name="text-column" type="gint" flags="227"/>
+    <property name="inline-completion" type="gboolean" flags="1073742051"/>
+    <property name="popup-completion" type="gboolean" flags="1073742051"/>
+    <property name="popup-set-width" type="gboolean" flags="1073742051"/>
+    <property name="popup-single-match" type="gboolean" flags="1073742051"/>
+    <property name="inline-selection" type="gboolean" flags="1073742051"/>
+    <property name="cell-area" type="GtkCellArea" flags="235"/>
+    <signal name="insert-prefix" return="gboolean" when="last">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="match-selected" return="gboolean" when="last">
+      <param type="GtkTreeModel"/>
+      <param type="GtkTreeIter"/>
+    </signal>
+    <signal name="cursor-on-match" return="gboolean" when="last">
+      <param type="GtkTreeModel"/>
+      <param type="GtkTreeIter"/>
+    </signal>
+    <signal name="no-matches" return="void" when="last">
+    </signal>
+  </class>
+  <class name="GtkImage" get-type="gtk_image_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <property name="paintable" type="GdkPaintable" flags="227"/>
+    <property name="file" type="gchararray" flags="227"/>
+    <property name="icon-size" type="GtkIconSize" flags="1073742051"/>
+    <property name="pixel-size" type="gint" flags="1073742051"/>
+    <property name="icon-name" type="gchararray" flags="227"/>
+    <property name="storage-type" type="GtkImageType" flags="225"/>
+    <property name="gicon" type="GIcon" flags="227"/>
+    <property name="resource" type="gchararray" flags="227"/>
+    <property name="use-fallback" type="gboolean" flags="1073742051"/>
+  </class>
+  <class name="GtkEntry" get-type="gtk_entry_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkEditable"/>
+    <implements name="GtkCellEditable"/>
+    <property name="buffer" type="GtkEntryBuffer" flags="1073742055"/>
+    <property name="max-length" type="gint" flags="1073742051"/>
+    <property name="visibility" type="gboolean" flags="1073742051"/>
+    <property name="has-frame" type="gboolean" flags="1073742051"/>
+    <property name="invisible-char" type="guint" flags="1073742051"/>
+    <property name="activates-default" type="gboolean" flags="1073742051"/>
+    <property name="scroll-offset" type="gint" flags="1073742049"/>
+    <property name="truncate-multiline" type="gboolean" flags="1073742051"/>
+    <property name="overwrite-mode" type="gboolean" flags="1073742051"/>
+    <property name="text-length" type="guint" flags="225"/>
+    <property name="invisible-char-set" type="gboolean" flags="227"/>
+    <property name="progress-fraction" type="gdouble" flags="1073742051"/>
+    <property name="progress-pulse-step" type="gdouble" flags="1073742051"/>
+    <property name="primary-icon-paintable" type="GdkPaintable" flags="1073742051"/>
+    <property name="secondary-icon-paintable" type="GdkPaintable" flags="1073742051"/>
+    <property name="primary-icon-name" type="gchararray" flags="1073742051"/>
+    <property name="secondary-icon-name" type="gchararray" flags="1073742051"/>
+    <property name="primary-icon-gicon" type="GIcon" flags="1073742051"/>
+    <property name="secondary-icon-gicon" type="GIcon" flags="1073742051"/>
+    <property name="primary-icon-storage-type" type="GtkImageType" flags="225"/>
+    <property name="secondary-icon-storage-type" type="GtkImageType" flags="225"/>
+    <property name="primary-icon-activatable" type="gboolean" flags="1073742051"/>
+    <property name="secondary-icon-activatable" type="gboolean" flags="1073742051"/>
+    <property name="primary-icon-sensitive" type="gboolean" flags="1073742051"/>
+    <property name="secondary-icon-sensitive" type="gboolean" flags="1073742051"/>
+    <property name="primary-icon-tooltip-text" type="gchararray" flags="1073742051"/>
+    <property name="secondary-icon-tooltip-text" type="gchararray" flags="1073742051"/>
+    <property name="primary-icon-tooltip-markup" type="gchararray" flags="1073742051"/>
+    <property name="secondary-icon-tooltip-markup" type="gchararray" flags="1073742051"/>
+    <property name="im-module" type="gchararray" flags="1073742051"/>
+    <property name="placeholder-text" type="gchararray" flags="1073742051"/>
+    <property name="completion" type="GtkEntryCompletion" flags="-1073741597"/>
+    <property name="input-purpose" type="GtkInputPurpose" flags="1073742051"/>
+    <property name="input-hints" type="GtkInputHints" flags="1073742051"/>
+    <property name="attributes" type="PangoAttrList" flags="1073742051"/>
+    <property name="tabs" type="PangoTabArray" flags="1073742051"/>
+    <property name="extra-menu" type="GMenuModel" flags="1073742051"/>
+    <property name="show-emoji-icon" type="gboolean" flags="1073742051"/>
+    <property name="enable-emoji-completion" type="gboolean" flags="1073742051"/>
+    <signal name="activate" return="void" when="last" action="1">
+    </signal>
+    <signal name="icon-press" return="void" when="last">
+      <param type="GtkEntryIconPosition"/>
+    </signal>
+    <signal name="icon-release" return="void" when="last">
+      <param type="GtkEntryIconPosition"/>
     </signal>
   </class>
   <class name="GtkEventControllerFocus" get-type="gtk_event_controller_focus_get_type" parents="GtkEventController,GObject">
@@ -2173,71 +1844,22 @@
   <class name="GtkFileFilter" get-type="gtk_file_filter_get_type" parents="GtkFilter,GObject">
     <implements name="GtkBuildable"/>
     <property name="name" type="gchararray" flags="1073742051"/>
+    <property name="patterns" type="GStrv" flags="234"/>
+    <property name="mime-types" type="GStrv" flags="234"/>
+    <property name="suffixes" type="GStrv" flags="234"/>
   </class>
-  <interface name="GtkFileChooser" get-type="gtk_file_chooser_get_type">
-    <property name="action" type="GtkFileChooserAction" flags="227"/>
-    <property name="create-folders" type="gboolean" flags="227"/>
-    <property name="filter" type="GtkFileFilter" flags="227"/>
-    <property name="filters" type="GListModel" flags="225"/>
-    <property name="select-multiple" type="gboolean" flags="227"/>
-    <property name="shortcut-folders" type="GListModel" flags="225"/>
-  </interface>
-  <class name="GtkFileChooserDialog" get-type="gtk_file_chooser_dialog_get_type" parents="GtkDialog,GtkWindow,GtkWidget,GInitiallyUnowned,GObject">
-    <implements name="GtkAccessible"/>
-    <implements name="GtkBuildable"/>
-    <implements name="GtkConstraintTarget"/>
-    <implements name="GtkNative"/>
-    <implements name="GtkShortcutManager"/>
-    <implements name="GtkRoot"/>
-    <implements name="GtkFileChooser"/>
-  </class>
-  <class name="GtkNativeDialog" get-type="gtk_native_dialog_get_type" parents="GObject" abstract="1">
-    <property name="title" type="gchararray" flags="227"/>
-    <property name="visible" type="gboolean" flags="1073742051"/>
+  <class name="GtkFileDialog" get-type="gtk_file_dialog_get_type" parents="GObject">
+    <property name="accept-label" type="gchararray" flags="1073742051"/>
+    <property name="default-filter" type="GtkFileFilter" flags="1073742051"/>
+    <property name="filters" type="GListModel" flags="1073742051"/>
+    <property name="initial-file" type="GFile" flags="1073742051"/>
+    <property name="initial-folder" type="GFile" flags="1073742051"/>
+    <property name="initial-name" type="gchararray" flags="1073742051"/>
     <property name="modal" type="gboolean" flags="1073742051"/>
-    <property name="transient-for" type="GtkWindow" flags="1073742055"/>
-    <signal name="response" return="void" when="last">
-      <param type="gint"/>
-    </signal>
+    <property name="title" type="gchararray" flags="1073742051"/>
   </class>
-  <class name="GtkFileChooserNative" get-type="gtk_file_chooser_native_get_type" parents="GtkNativeDialog,GObject">
-    <implements name="GtkFileChooser"/>
-    <property name="accept-label" type="gchararray" flags="227"/>
-    <property name="cancel-label" type="gchararray" flags="227"/>
-  </class>
-  <class name="GtkFileChooserWidget" get-type="gtk_file_chooser_widget_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
-    <implements name="GtkAccessible"/>
-    <implements name="GtkBuildable"/>
-    <implements name="GtkConstraintTarget"/>
-    <implements name="GtkFileChooser"/>
-    <property name="search-mode" type="gboolean" flags="227"/>
-    <property name="subtitle" type="gchararray" flags="225"/>
-    <signal name="location-popup" return="void" when="first" action="1">
-      <param type="gchararray"/>
-    </signal>
-    <signal name="location-popup-on-paste" return="void" when="first" action="1">
-    </signal>
-    <signal name="location-toggle-popup" return="void" when="first" action="1">
-    </signal>
-    <signal name="up-folder" return="void" when="first" action="1">
-    </signal>
-    <signal name="down-folder" return="void" when="first" action="1">
-    </signal>
-    <signal name="home-folder" return="void" when="first" action="1">
-    </signal>
-    <signal name="desktop-folder" return="void" when="first" action="1">
-    </signal>
-    <signal name="quick-bookmark" return="void" when="first" action="1">
-      <param type="gint"/>
-    </signal>
-    <signal name="show-hidden" return="void" when="first" action="1">
-    </signal>
-    <signal name="search-shortcut" return="void" when="first" action="1">
-    </signal>
-    <signal name="recent-shortcut" return="void" when="first" action="1">
-    </signal>
-    <signal name="places-shortcut" return="void" when="first" action="1">
-    </signal>
+  <class name="GtkFileLauncher" get-type="gtk_file_launcher_get_type" parents="GObject">
+    <property name="file" type="GFile" flags="1073742051"/>
   </class>
   <class name="GtkFilterListModel" get-type="gtk_filter_list_model_get_type" parents="GObject">
     <implements name="GListModel"/>
@@ -2285,6 +1907,15 @@
     <property name="selection-mode" type="GtkSelectionMode" flags="1073742051"/>
     <property name="activate-on-single-click" type="gboolean" flags="1073742051"/>
     <property name="accept-unpaired-release" type="gboolean" flags="1073742051"/>
+    <signal name="child-activated" return="void" when="last">
+      <param type="GtkFlowBoxChild"/>
+    </signal>
+    <signal name="selected-children-changed" return="void" when="first">
+    </signal>
+    <signal name="activate-cursor-child" return="void" when="last" action="1">
+    </signal>
+    <signal name="toggle-cursor-child" return="void" when="last" action="1">
+    </signal>
     <signal name="move-cursor" return="gboolean" when="last" action="1">
       <param type="GtkMovementStep"/>
       <param type="gint"/>
@@ -2295,57 +1926,25 @@
     </signal>
     <signal name="unselect-all" return="void" when="last" action="1">
     </signal>
-    <signal name="child-activated" return="void" when="last">
-      <param type="GtkFlowBoxChild"/>
-    </signal>
-    <signal name="selected-children-changed" return="void" when="first">
-    </signal>
-    <signal name="activate-cursor-child" return="void" when="last" action="1">
-    </signal>
-    <signal name="toggle-cursor-child" return="void" when="last" action="1">
-    </signal>
   </class>
-  <class name="GtkFontButton" get-type="gtk_font_button_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+  <class name="GtkFontDialog" get-type="gtk_font_dialog_get_type" parents="GObject">
+    <property name="title" type="gchararray" flags="1073742051"/>
+    <property name="modal" type="gboolean" flags="1073742051"/>
+    <property name="language" type="PangoLanguage" flags="1073742051"/>
+    <property name="font-map" type="PangoFontMap" flags="1073742051"/>
+    <property name="filter" type="GtkFilter" flags="1073742051"/>
+  </class>
+  <class name="GtkFontDialogButton" get-type="gtk_font_dialog_button_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
     <implements name="GtkAccessible"/>
     <implements name="GtkBuildable"/>
     <implements name="GtkConstraintTarget"/>
-    <implements name="GtkFontChooser"/>
-    <property name="title" type="gchararray" flags="227"/>
-    <property name="modal" type="gboolean" flags="1073742051"/>
+    <property name="dialog" type="GtkFontDialog" flags="1073742051"/>
+    <property name="level" type="GtkFontLevel" flags="1073742051"/>
+    <property name="font-desc" type="PangoFontDescription" flags="1073742051"/>
+    <property name="font-features" type="gchararray" flags="1073742051"/>
+    <property name="language" type="PangoLanguage" flags="1073742051"/>
     <property name="use-font" type="gboolean" flags="1073742051"/>
     <property name="use-size" type="gboolean" flags="1073742051"/>
-    <signal name="activate" return="void" when="first" action="1">
-    </signal>
-    <signal name="font-set" return="void" when="first">
-    </signal>
-  </class>
-  <interface name="GtkFontChooser" get-type="gtk_font_chooser_get_type">
-    <property name="font" type="gchararray" flags="227"/>
-    <property name="font-desc" type="PangoFontDescription" flags="227"/>
-    <property name="font-features" type="gchararray" flags="225"/>
-    <property name="language" type="gchararray" flags="1073742051"/>
-    <property name="level" type="GtkFontChooserLevel" flags="1073742051"/>
-    <property name="preview-text" type="gchararray" flags="227"/>
-    <property name="show-preview-entry" type="gboolean" flags="1073742051"/>
-    <signal name="font-activated" return="void" when="first">
-      <param type="gchararray"/>
-    </signal>
-  </interface>
-  <class name="GtkFontChooserDialog" get-type="gtk_font_chooser_dialog_get_type" parents="GtkDialog,GtkWindow,GtkWidget,GInitiallyUnowned,GObject">
-    <implements name="GtkAccessible"/>
-    <implements name="GtkBuildable"/>
-    <implements name="GtkConstraintTarget"/>
-    <implements name="GtkNative"/>
-    <implements name="GtkShortcutManager"/>
-    <implements name="GtkRoot"/>
-    <implements name="GtkFontChooser"/>
-  </class>
-  <class name="GtkFontChooserWidget" get-type="gtk_font_chooser_widget_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
-    <implements name="GtkAccessible"/>
-    <implements name="GtkBuildable"/>
-    <implements name="GtkConstraintTarget"/>
-    <implements name="GtkFontChooser"/>
-    <property name="tweak-action" type="GAction" flags="225"/>
   </class>
   <class name="GtkFrame" get-type="gtk_frame_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
     <implements name="GtkAccessible"/>
@@ -2358,9 +1957,6 @@
   </class>
   <class name="GtkGesture" get-type="gtk_gesture_get_type" parents="GtkEventController,GObject" abstract="1">
     <property name="n-points" type="guint" flags="235"/>
-    <signal name="cancel" return="void" when="last">
-      <param type="GdkEventSequence"/>
-    </signal>
     <signal name="begin" return="void" when="last">
       <param type="GdkEventSequence"/>
     </signal>
@@ -2368,6 +1964,9 @@
       <param type="GdkEventSequence"/>
     </signal>
     <signal name="update" return="void" when="last">
+      <param type="GdkEventSequence"/>
+    </signal>
+    <signal name="cancel" return="void" when="last">
       <param type="GdkEventSequence"/>
     </signal>
     <signal name="sequence-state-changed" return="void" when="last">
@@ -2437,6 +2036,7 @@
     </signal>
   </class>
   <class name="GtkGestureStylus" get-type="gtk_gesture_stylus_get_type" parents="GtkGestureSingle,GtkGesture,GtkEventController,GObject">
+    <property name="stylus-only" type="gboolean" flags="1073741831"/>
     <signal name="motion" return="void" when="last">
       <param type="gdouble"/>
       <param type="gdouble"/>
@@ -2556,6 +2156,494 @@
     <property name="icon-name" type="gchararray" flags="235"/>
     <property name="is-symbolic" type="gboolean" flags="235"/>
   </class>
+  <class name="GtkIMContextSimple" get-type="gtk_im_context_simple_get_type" parents="GtkIMContext,GObject">
+  </class>
+  <interface name="GtkAppChooser" get-type="gtk_app_chooser_get_type">
+    <prerequisite name="GtkWidget"/>
+    <property name="content-type" type="gchararray" flags="235"/>
+  </interface>
+  <class name="GtkDialog" get-type="gtk_dialog_get_type" parents="GtkWindow,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkNative"/>
+    <implements name="GtkShortcutManager"/>
+    <implements name="GtkRoot"/>
+    <property name="use-header-bar" type="gint" flags="235"/>
+    <signal name="close" return="void" when="last" action="1">
+    </signal>
+    <signal name="response" return="void" when="last">
+      <param type="gint"/>
+    </signal>
+  </class>
+  <class name="GtkAppChooserDialog" get-type="gtk_app_chooser_dialog_get_type" parents="GtkDialog,GtkWindow,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkNative"/>
+    <implements name="GtkShortcutManager"/>
+    <implements name="GtkRoot"/>
+    <implements name="GtkAppChooser"/>
+    <property name="gfile" type="GFile" flags="235"/>
+    <property name="heading" type="gchararray" flags="1073742051"/>
+  </class>
+  <class name="GtkAppChooserWidget" get-type="gtk_app_chooser_widget_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkAppChooser"/>
+    <property name="show-default" type="gboolean" flags="1073742055"/>
+    <property name="show-recommended" type="gboolean" flags="1073742055"/>
+    <property name="show-fallback" type="gboolean" flags="1073742055"/>
+    <property name="show-other" type="gboolean" flags="1073742055"/>
+    <property name="show-all" type="gboolean" flags="1073742055"/>
+    <property name="default-text" type="gchararray" flags="1073742051"/>
+    <signal name="application-selected" return="void" when="first">
+      <param type="GAppInfo"/>
+    </signal>
+    <signal name="application-activated" return="void" when="first">
+      <param type="GAppInfo"/>
+    </signal>
+  </class>
+  <class name="GtkAppChooserButton" get-type="gtk_app_chooser_button_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkAppChooser"/>
+    <property name="show-dialog-item" type="gboolean" flags="1073742055"/>
+    <property name="show-default-item" type="gboolean" flags="1073742055"/>
+    <property name="heading" type="gchararray" flags="1073742051"/>
+    <property name="modal" type="gboolean" flags="1073742055"/>
+    <signal name="activate" return="void" when="first" action="1">
+    </signal>
+    <signal name="changed" return="void" when="last">
+    </signal>
+    <signal name="custom-item-activated" return="void" when="first" detailed="1">
+      <param type="gchararray"/>
+    </signal>
+  </class>
+  <class name="GtkAssistantPage" get-type="gtk_assistant_page_get_type" parents="GObject">
+    <property name="child" type="GtkWidget" flags="235"/>
+    <property name="page-type" type="GtkAssistantPageType" flags="1073742051"/>
+    <property name="title" type="gchararray" flags="1073742051"/>
+    <property name="complete" type="gboolean" flags="1073741827"/>
+  </class>
+  <class name="GtkAssistant" get-type="gtk_assistant_get_type" parents="GtkWindow,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkNative"/>
+    <implements name="GtkShortcutManager"/>
+    <implements name="GtkRoot"/>
+    <property name="use-header-bar" type="gint" flags="235"/>
+    <property name="pages" type="GListModel" flags="225"/>
+    <signal name="close" return="void" when="last">
+    </signal>
+    <signal name="cancel" return="void" when="last">
+    </signal>
+    <signal name="prepare" return="void" when="last">
+      <param type="GtkWidget"/>
+    </signal>
+    <signal name="apply" return="void" when="last">
+    </signal>
+    <signal name="escape" return="void" when="first" action="1">
+    </signal>
+  </class>
+  <class name="GtkCellAreaBox" get-type="gtk_cell_area_box_get_type" parents="GtkCellArea,GInitiallyUnowned,GObject">
+    <implements name="GtkCellLayout"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="spacing" type="gint" flags="1073742051"/>
+  </class>
+  <class name="GtkCellAreaContext" get-type="gtk_cell_area_context_get_type" parents="GObject">
+    <property name="area" type="GtkCellArea" flags="235"/>
+    <property name="minimum-width" type="gint" flags="225"/>
+    <property name="natural-width" type="gint" flags="225"/>
+    <property name="minimum-height" type="gint" flags="225"/>
+    <property name="natural-height" type="gint" flags="225"/>
+  </class>
+  <interface name="GtkCellLayout" get-type="gtk_cell_layout_get_type">
+  </interface>
+  <class name="GtkCellRendererText" get-type="gtk_cell_renderer_text_get_type" parents="GtkCellRenderer,GInitiallyUnowned,GObject">
+    <property name="text" type="gchararray" flags="227"/>
+    <property name="markup" type="gchararray" flags="226"/>
+    <property name="attributes" type="PangoAttrList" flags="227"/>
+    <property name="single-paragraph-mode" type="gboolean" flags="1073742051"/>
+    <property name="width-chars" type="gint" flags="1073742051"/>
+    <property name="max-width-chars" type="gint" flags="1073742051"/>
+    <property name="wrap-width" type="gint" flags="1073742051"/>
+    <property name="alignment" type="PangoAlignment" flags="1073742051"/>
+    <property name="placeholder-text" type="gchararray" flags="227"/>
+    <property name="background" type="gchararray" flags="226"/>
+    <property name="foreground" type="gchararray" flags="226"/>
+    <property name="background-rgba" type="GdkRGBA" flags="227"/>
+    <property name="foreground-rgba" type="GdkRGBA" flags="227"/>
+    <property name="font" type="gchararray" flags="227"/>
+    <property name="font-desc" type="PangoFontDescription" flags="227"/>
+    <property name="family" type="gchararray" flags="227"/>
+    <property name="style" type="PangoStyle" flags="227"/>
+    <property name="variant" type="PangoVariant" flags="227"/>
+    <property name="weight" type="gint" flags="227"/>
+    <property name="stretch" type="PangoStretch" flags="227"/>
+    <property name="size" type="gint" flags="227"/>
+    <property name="size-points" type="gdouble" flags="227"/>
+    <property name="scale" type="gdouble" flags="227"/>
+    <property name="editable" type="gboolean" flags="227"/>
+    <property name="strikethrough" type="gboolean" flags="227"/>
+    <property name="underline" type="PangoUnderline" flags="227"/>
+    <property name="rise" type="gint" flags="227"/>
+    <property name="language" type="gchararray" flags="227"/>
+    <property name="ellipsize" type="PangoEllipsizeMode" flags="1073742051"/>
+    <property name="wrap-mode" type="PangoWrapMode" flags="1073742051"/>
+    <property name="background-set" type="gboolean" flags="227"/>
+    <property name="foreground-set" type="gboolean" flags="227"/>
+    <property name="family-set" type="gboolean" flags="227"/>
+    <property name="style-set" type="gboolean" flags="227"/>
+    <property name="variant-set" type="gboolean" flags="227"/>
+    <property name="weight-set" type="gboolean" flags="227"/>
+    <property name="stretch-set" type="gboolean" flags="227"/>
+    <property name="size-set" type="gboolean" flags="227"/>
+    <property name="scale-set" type="gboolean" flags="227"/>
+    <property name="editable-set" type="gboolean" flags="227"/>
+    <property name="strikethrough-set" type="gboolean" flags="227"/>
+    <property name="underline-set" type="gboolean" flags="227"/>
+    <property name="rise-set" type="gboolean" flags="227"/>
+    <property name="language-set" type="gboolean" flags="227"/>
+    <property name="ellipsize-set" type="gboolean" flags="227"/>
+    <property name="align-set" type="gboolean" flags="227"/>
+    <signal name="edited" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+  </class>
+  <class name="GtkCellRendererAccel" get-type="gtk_cell_renderer_accel_get_type" parents="GtkCellRendererText,GtkCellRenderer,GInitiallyUnowned,GObject">
+    <property name="accel-key" type="guint" flags="1073742051"/>
+    <property name="accel-mods" type="GdkModifierType" flags="1073742051"/>
+    <property name="keycode" type="guint" flags="1073742051"/>
+    <property name="accel-mode" type="GtkCellRendererAccelMode" flags="1073742051"/>
+    <signal name="accel-edited" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="guint"/>
+      <param type="GdkModifierType"/>
+      <param type="guint"/>
+    </signal>
+    <signal name="accel-cleared" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+  </class>
+  <class name="GtkCellRendererCombo" get-type="gtk_cell_renderer_combo_get_type" parents="GtkCellRendererText,GtkCellRenderer,GInitiallyUnowned,GObject">
+    <property name="model" type="GtkTreeModel" flags="227"/>
+    <property name="text-column" type="gint" flags="1073742051"/>
+    <property name="has-entry" type="gboolean" flags="1073742051"/>
+    <signal name="changed" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="GtkTreeIter"/>
+    </signal>
+  </class>
+  <class name="GtkCellRendererPixbuf" get-type="gtk_cell_renderer_pixbuf_get_type" parents="GtkCellRenderer,GInitiallyUnowned,GObject">
+    <property name="pixbuf" type="GdkPixbuf" flags="226"/>
+    <property name="pixbuf-expander-open" type="GdkPixbuf" flags="227"/>
+    <property name="pixbuf-expander-closed" type="GdkPixbuf" flags="227"/>
+    <property name="texture" type="GdkTexture" flags="227"/>
+    <property name="icon-size" type="GtkIconSize" flags="1073742051"/>
+    <property name="icon-name" type="gchararray" flags="227"/>
+    <property name="gicon" type="GIcon" flags="227"/>
+  </class>
+  <class name="GtkCellRendererProgress" get-type="gtk_cell_renderer_progress_get_type" parents="GtkCellRenderer,GInitiallyUnowned,GObject">
+    <implements name="GtkOrientable"/>
+    <property name="value" type="gint" flags="1073742051"/>
+    <property name="text" type="gchararray" flags="227"/>
+    <property name="pulse" type="gint" flags="1073742051"/>
+    <property name="text-xalign" type="gfloat" flags="227"/>
+    <property name="text-yalign" type="gfloat" flags="227"/>
+    <property name="inverted" type="gboolean" flags="1073742051"/>
+  </class>
+  <class name="GtkCellRendererSpin" get-type="gtk_cell_renderer_spin_get_type" parents="GtkCellRendererText,GtkCellRenderer,GInitiallyUnowned,GObject">
+    <property name="adjustment" type="GtkAdjustment" flags="227"/>
+    <property name="climb-rate" type="gdouble" flags="227"/>
+    <property name="digits" type="guint" flags="1073742051"/>
+  </class>
+  <class name="GtkCellRendererSpinner" get-type="gtk_cell_renderer_spinner_get_type" parents="GtkCellRenderer,GInitiallyUnowned,GObject">
+    <property name="active" type="gboolean" flags="1073741827"/>
+    <property name="pulse" type="guint" flags="1073741827"/>
+    <property name="size" type="GtkIconSize" flags="1073741827"/>
+  </class>
+  <class name="GtkCellRendererToggle" get-type="gtk_cell_renderer_toggle_get_type" parents="GtkCellRenderer,GInitiallyUnowned,GObject">
+    <property name="activatable" type="gboolean" flags="1073742051"/>
+    <property name="active" type="gboolean" flags="1073742051"/>
+    <property name="radio" type="gboolean" flags="1073742051"/>
+    <property name="inconsistent" type="gboolean" flags="1073742051"/>
+    <signal name="toggled" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+  </class>
+  <class name="GtkCellView" get-type="gtk_cell_view_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkCellLayout"/>
+    <implements name="GtkOrientable"/>
+    <property name="model" type="GtkTreeModel" flags="227"/>
+    <property name="cell-area" type="GtkCellArea" flags="235"/>
+    <property name="cell-area-context" type="GtkCellAreaContext" flags="235"/>
+    <property name="draw-sensitive" type="gboolean" flags="1073742051"/>
+    <property name="fit-model" type="gboolean" flags="1073742051"/>
+  </class>
+  <class name="GtkColorButton" get-type="gtk_color_button_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkColorChooser"/>
+    <property name="title" type="gchararray" flags="227"/>
+    <property name="show-editor" type="gboolean" flags="1073742051"/>
+    <property name="modal" type="gboolean" flags="1073742051"/>
+    <signal name="activate" return="void" when="first" action="1">
+    </signal>
+    <signal name="color-set" return="void" when="first">
+    </signal>
+  </class>
+  <interface name="GtkColorChooser" get-type="gtk_color_chooser_get_type">
+    <property name="rgba" type="GdkRGBA" flags="227"/>
+    <property name="use-alpha" type="gboolean" flags="1073742051"/>
+    <signal name="color-activated" return="void" when="first">
+      <param type="GdkRGBA"/>
+    </signal>
+  </interface>
+  <class name="GtkColorChooserDialog" get-type="gtk_color_chooser_dialog_get_type" parents="GtkDialog,GtkWindow,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkNative"/>
+    <implements name="GtkShortcutManager"/>
+    <implements name="GtkRoot"/>
+    <implements name="GtkColorChooser"/>
+    <property name="show-editor" type="gboolean" flags="227"/>
+  </class>
+  <class name="GtkColorChooserWidget" get-type="gtk_color_chooser_widget_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkColorChooser"/>
+    <property name="show-editor" type="gboolean" flags="227"/>
+  </class>
+  <class name="GtkTreeView" get-type="gtk_tree_view_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkScrollable"/>
+    <property name="model" type="GtkTreeModel" flags="227"/>
+    <property name="headers-visible" type="gboolean" flags="1073742051"/>
+    <property name="headers-clickable" type="gboolean" flags="1073742051"/>
+    <property name="expander-column" type="GtkTreeViewColumn" flags="227"/>
+    <property name="reorderable" type="gboolean" flags="1073742051"/>
+    <property name="enable-search" type="gboolean" flags="1073742051"/>
+    <property name="search-column" type="gint" flags="1073742051"/>
+    <property name="fixed-height-mode" type="gboolean" flags="1073742051"/>
+    <property name="hover-selection" type="gboolean" flags="1073742051"/>
+    <property name="hover-expand" type="gboolean" flags="1073742051"/>
+    <property name="show-expanders" type="gboolean" flags="1073742051"/>
+    <property name="level-indentation" type="gint" flags="1073742051"/>
+    <property name="rubber-banding" type="gboolean" flags="1073742051"/>
+    <property name="enable-grid-lines" type="GtkTreeViewGridLines" flags="1073742051"/>
+    <property name="enable-tree-lines" type="gboolean" flags="1073742051"/>
+    <property name="tooltip-column" type="gint" flags="1073742051"/>
+    <property name="activate-on-single-click" type="gboolean" flags="1073742051"/>
+    <signal name="move-cursor" return="gboolean" when="last" action="1">
+      <param type="GtkMovementStep"/>
+      <param type="gint"/>
+      <param type="gboolean"/>
+      <param type="gboolean"/>
+    </signal>
+    <signal name="select-all" return="gboolean" when="last" action="1">
+    </signal>
+    <signal name="unselect-all" return="gboolean" when="last" action="1">
+    </signal>
+    <signal name="row-activated" return="void" when="last" action="1">
+      <param type="GtkTreePath"/>
+      <param type="GtkTreeViewColumn"/>
+    </signal>
+    <signal name="test-expand-row" return="gboolean" when="last">
+      <param type="GtkTreeIter"/>
+      <param type="GtkTreePath"/>
+    </signal>
+    <signal name="test-collapse-row" return="gboolean" when="last">
+      <param type="GtkTreeIter"/>
+      <param type="GtkTreePath"/>
+    </signal>
+    <signal name="row-expanded" return="void" when="last">
+      <param type="GtkTreeIter"/>
+      <param type="GtkTreePath"/>
+    </signal>
+    <signal name="row-collapsed" return="void" when="last">
+      <param type="GtkTreeIter"/>
+      <param type="GtkTreePath"/>
+    </signal>
+    <signal name="columns-changed" return="void" when="last">
+    </signal>
+    <signal name="cursor-changed" return="void" when="last">
+    </signal>
+    <signal name="select-cursor-row" return="gboolean" when="last" action="1">
+      <param type="gboolean"/>
+    </signal>
+    <signal name="toggle-cursor-row" return="gboolean" when="last" action="1">
+    </signal>
+    <signal name="expand-collapse-cursor-row" return="gboolean" when="last" action="1">
+      <param type="gboolean"/>
+      <param type="gboolean"/>
+      <param type="gboolean"/>
+    </signal>
+    <signal name="select-cursor-parent" return="gboolean" when="last" action="1">
+    </signal>
+    <signal name="start-interactive-search" return="gboolean" when="last" action="1">
+    </signal>
+  </class>
+  <class name="GtkComboBox" get-type="gtk_combo_box_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkCellLayout"/>
+    <implements name="GtkCellEditable"/>
+    <property name="model" type="GtkTreeModel" flags="1073742051"/>
+    <property name="active" type="gint" flags="1073742051"/>
+    <property name="has-frame" type="gboolean" flags="1073742051"/>
+    <property name="popup-shown" type="gboolean" flags="225"/>
+    <property name="button-sensitivity" type="GtkSensitivityType" flags="1073742051"/>
+    <property name="has-entry" type="gboolean" flags="235"/>
+    <property name="entry-text-column" type="gint" flags="1073742051"/>
+    <property name="popup-fixed-width" type="gboolean" flags="1073742051"/>
+    <property name="id-column" type="gint" flags="1073742051"/>
+    <property name="active-id" type="gchararray" flags="1073742051"/>
+    <property name="child" type="GtkWidget" flags="1073742051"/>
+    <signal name="activate" return="void" when="first" action="1">
+    </signal>
+    <signal name="changed" return="void" when="last">
+    </signal>
+    <signal name="move-active" return="void" when="last" action="1">
+      <param type="GtkScrollType"/>
+    </signal>
+    <signal name="popup" return="void" when="last" action="1">
+    </signal>
+    <signal name="popdown" return="gboolean" when="last" action="1">
+    </signal>
+    <signal name="format-entry-text" return="gchararray" when="last">
+      <param type="gchararray"/>
+    </signal>
+  </class>
+  <class name="GtkComboBoxText" get-type="gtk_combo_box_text_get_type" parents="GtkComboBox,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkCellLayout"/>
+    <implements name="GtkCellEditable"/>
+  </class>
+  <interface name="GtkFileChooser" get-type="gtk_file_chooser_get_type">
+    <property name="action" type="GtkFileChooserAction" flags="227"/>
+    <property name="create-folders" type="gboolean" flags="227"/>
+    <property name="filter" type="GtkFileFilter" flags="227"/>
+    <property name="filters" type="GListModel" flags="225"/>
+    <property name="select-multiple" type="gboolean" flags="227"/>
+    <property name="shortcut-folders" type="GListModel" flags="225"/>
+  </interface>
+  <class name="GtkFileChooserDialog" get-type="gtk_file_chooser_dialog_get_type" parents="GtkDialog,GtkWindow,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkNative"/>
+    <implements name="GtkShortcutManager"/>
+    <implements name="GtkRoot"/>
+    <implements name="GtkFileChooser"/>
+  </class>
+  <class name="GtkNativeDialog" get-type="gtk_native_dialog_get_type" parents="GObject" abstract="1">
+    <property name="title" type="gchararray" flags="227"/>
+    <property name="visible" type="gboolean" flags="1073742051"/>
+    <property name="modal" type="gboolean" flags="1073742051"/>
+    <property name="transient-for" type="GtkWindow" flags="1073742055"/>
+    <signal name="response" return="void" when="last">
+      <param type="gint"/>
+    </signal>
+  </class>
+  <class name="GtkFileChooserNative" get-type="gtk_file_chooser_native_get_type" parents="GtkNativeDialog,GObject">
+    <implements name="GtkFileChooser"/>
+    <property name="accept-label" type="gchararray" flags="227"/>
+    <property name="cancel-label" type="gchararray" flags="227"/>
+  </class>
+  <class name="GtkFileChooserWidget" get-type="gtk_file_chooser_widget_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkFileChooser"/>
+    <property name="search-mode" type="gboolean" flags="227"/>
+    <property name="subtitle" type="gchararray" flags="225"/>
+    <property name="show-time" type="gboolean" flags="225"/>
+    <signal name="location-popup" return="void" when="first" action="1">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="location-popup-on-paste" return="void" when="first" action="1">
+    </signal>
+    <signal name="location-toggle-popup" return="void" when="first" action="1">
+    </signal>
+    <signal name="up-folder" return="void" when="first" action="1">
+    </signal>
+    <signal name="down-folder" return="void" when="first" action="1">
+    </signal>
+    <signal name="home-folder" return="void" when="first" action="1">
+    </signal>
+    <signal name="desktop-folder" return="void" when="first" action="1">
+    </signal>
+    <signal name="quick-bookmark" return="void" when="first" action="1">
+      <param type="gint"/>
+    </signal>
+    <signal name="show-hidden" return="void" when="first" action="1">
+    </signal>
+    <signal name="search-shortcut" return="void" when="first" action="1">
+    </signal>
+    <signal name="recent-shortcut" return="void" when="first" action="1">
+    </signal>
+    <signal name="places-shortcut" return="void" when="first" action="1">
+    </signal>
+  </class>
+  <class name="GtkFontButton" get-type="gtk_font_button_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkFontChooser"/>
+    <property name="title" type="gchararray" flags="227"/>
+    <property name="modal" type="gboolean" flags="1073742051"/>
+    <property name="use-font" type="gboolean" flags="1073742051"/>
+    <property name="use-size" type="gboolean" flags="1073742051"/>
+    <signal name="activate" return="void" when="first" action="1">
+    </signal>
+    <signal name="font-set" return="void" when="first">
+    </signal>
+  </class>
+  <interface name="GtkFontChooser" get-type="gtk_font_chooser_get_type">
+    <property name="font" type="gchararray" flags="227"/>
+    <property name="font-desc" type="PangoFontDescription" flags="227"/>
+    <property name="font-features" type="gchararray" flags="225"/>
+    <property name="language" type="gchararray" flags="1073742051"/>
+    <property name="level" type="GtkFontChooserLevel" flags="1073742051"/>
+    <property name="preview-text" type="gchararray" flags="227"/>
+    <property name="show-preview-entry" type="gboolean" flags="1073742051"/>
+    <signal name="font-activated" return="void" when="first">
+      <param type="gchararray"/>
+    </signal>
+  </interface>
+  <class name="GtkFontChooserDialog" get-type="gtk_font_chooser_dialog_get_type" parents="GtkDialog,GtkWindow,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkNative"/>
+    <implements name="GtkShortcutManager"/>
+    <implements name="GtkRoot"/>
+    <implements name="GtkFontChooser"/>
+  </class>
+  <class name="GtkFontChooserWidget" get-type="gtk_font_chooser_widget_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkFontChooser"/>
+    <property name="tweak-action" type="GAction" flags="225"/>
+  </class>
   <class name="GtkTooltip" get-type="gtk_tooltip_get_type" parents="GObject">
   </class>
   <class name="GtkIconView" get-type="gtk_icon_view_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
@@ -2603,8 +2691,6 @@
     <signal name="activate-cursor-item" return="gboolean" when="last" action="1">
     </signal>
   </class>
-  <class name="GtkIMContextSimple" get-type="gtk_im_context_simple_get_type" parents="GtkIMContext,GObject">
-  </class>
   <class name="GtkIMMulticontext" get-type="gtk_im_multicontext_get_type" parents="GtkIMContext,GObject">
   </class>
   <class name="GtkInfoBar" get-type="gtk_info_bar_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
@@ -2614,10 +2700,10 @@
     <property name="message-type" type="GtkMessageType" flags="1073742055"/>
     <property name="show-close-button" type="gboolean" flags="1073742055"/>
     <property name="revealed" type="gboolean" flags="1073742051"/>
+    <signal name="close" return="void" when="last" action="1">
+    </signal>
     <signal name="response" return="void" when="last">
       <param type="gint"/>
-    </signal>
-    <signal name="close" return="void" when="last" action="1">
     </signal>
   </class>
   <class name="GtkInscription" get-type="gtk_inscription_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
@@ -2678,6 +2764,7 @@
     <implements name="GtkBuildable"/>
     <implements name="GtkConstraintTarget"/>
     <implements name="GtkOrientable"/>
+    <implements name="GtkAccessibleRange"/>
     <property name="value" type="gdouble" flags="1073742051"/>
     <property name="min-value" type="gdouble" flags="1073742051"/>
     <property name="max-value" type="gdouble" flags="1073742051"/>
@@ -2716,9 +2803,6 @@
     <property name="activate-on-single-click" type="gboolean" flags="1073741827"/>
     <property name="accept-unpaired-release" type="gboolean" flags="1073741827"/>
     <property name="show-separators" type="gboolean" flags="1073741827"/>
-    <signal name="row-activated" return="void" when="last">
-      <param type="GtkListBoxRow"/>
-    </signal>
     <signal name="move-cursor" return="void" when="last" action="1">
       <param type="GtkMovementStep"/>
       <param type="gint"/>
@@ -2728,6 +2812,9 @@
     <signal name="select-all" return="void" when="last" action="1">
     </signal>
     <signal name="unselect-all" return="void" when="last" action="1">
+    </signal>
+    <signal name="row-activated" return="void" when="last">
+      <param type="GtkListBoxRow"/>
     </signal>
     <signal name="toggle-cursor-row" return="void" when="last" action="1">
     </signal>
@@ -2841,6 +2928,7 @@
     <property name="has-frame" type="gboolean" flags="1073742051"/>
     <property name="primary" type="gboolean" flags="1073742051"/>
     <property name="child" type="GtkWidget" flags="1073742051"/>
+    <property name="active" type="gboolean" flags="1073742051"/>
     <signal name="activate" return="void" when="first" action="1">
     </signal>
   </class>
@@ -2996,6 +3084,7 @@
     <implements name="GtkBuildable"/>
     <implements name="GtkConstraintTarget"/>
     <implements name="GtkOrientable"/>
+    <implements name="GtkAccessibleRange"/>
     <property name="position" type="gint" flags="1073742051"/>
     <property name="position-set" type="gboolean" flags="1073742051"/>
     <property name="min-position" type="gint" flags="1073742049"/>
@@ -3140,6 +3229,7 @@
     <implements name="GtkBuildable"/>
     <implements name="GtkConstraintTarget"/>
     <implements name="GtkOrientable"/>
+    <implements name="GtkAccessibleRange"/>
     <property name="fraction" type="gdouble" flags="1073742051"/>
     <property name="pulse-step" type="gdouble" flags="1073742051"/>
     <property name="inverted" type="gboolean" flags="1073742051"/>
@@ -3151,6 +3241,7 @@
     <implements name="GtkAccessible"/>
     <implements name="GtkBuildable"/>
     <implements name="GtkConstraintTarget"/>
+    <implements name="GtkAccessibleRange"/>
     <implements name="GtkOrientable"/>
     <property name="adjustment" type="GtkAdjustment" flags="231"/>
     <property name="inverted" type="gboolean" flags="1073742051"/>
@@ -3178,6 +3269,8 @@
     </signal>
   </class>
   <boxed name="GtkRecentInfo" get-type="gtk_recent_info_get_type"/>
+  <class name="GtkSnapshot" get-type="gtk_snapshot_get_type" parents="GdkSnapshot,GObject">
+  </class>
   <class name="GtkRevealer" get-type="gtk_revealer_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
     <implements name="GtkAccessible"/>
     <implements name="GtkBuildable"/>
@@ -3196,6 +3289,7 @@
     <implements name="GtkAccessible"/>
     <implements name="GtkBuildable"/>
     <implements name="GtkConstraintTarget"/>
+    <implements name="GtkAccessibleRange"/>
     <implements name="GtkOrientable"/>
     <property name="digits" type="gint" flags="1073742051"/>
     <property name="draw-value" type="gboolean" flags="1073742051"/>
@@ -3206,10 +3300,12 @@
     <implements name="GtkAccessible"/>
     <implements name="GtkBuildable"/>
     <implements name="GtkConstraintTarget"/>
+    <implements name="GtkAccessibleRange"/>
     <implements name="GtkOrientable"/>
     <property name="value" type="gdouble" flags="1073742051"/>
     <property name="adjustment" type="GtkAdjustment" flags="227"/>
     <property name="icons" type="GStrv" flags="227"/>
+    <property name="active" type="gboolean" flags="225"/>
     <signal name="value-changed" return="void" when="last">
       <param type="gdouble"/>
     </signal>
@@ -3465,8 +3561,6 @@
     <property name="offset" type="guint" flags="1073742051"/>
     <property name="size" type="guint" flags="1073742051"/>
   </class>
-  <class name="GtkSnapshot" get-type="gtk_snapshot_get_type" parents="GdkSnapshot,GObject">
-  </class>
   <class name="GtkStackPage" get-type="gtk_stack_page_get_type" parents="GObject">
     <implements name="GtkAccessible"/>
     <property name="child" type="GtkWidget" flags="235"/>
@@ -3506,6 +3600,7 @@
     <implements name="GtkBuildable"/>
     <implements name="GtkConstraintTarget"/>
     <implements name="GtkOrientable"/>
+    <implements name="GtkAccessibleRange"/>
     <implements name="GtkEditable"/>
     <implements name="GtkCellEditable"/>
     <property name="adjustment" type="GtkAdjustment" flags="227"/>
@@ -3567,10 +3662,12 @@
   <class name="GtkStringList" get-type="gtk_string_list_get_type" parents="GObject">
     <implements name="GtkBuildable"/>
     <implements name="GListModel"/>
+    <property name="strings" type="GStrv" flags="234"/>
   </class>
   <class name="GtkStringSorter" get-type="gtk_string_sorter_get_type" parents="GtkSorter,GObject">
     <property name="expression" type="GtkExpression" flags="1073742051"/>
     <property name="ignore-case" type="gboolean" flags="1073742051"/>
+    <property name="collation" type="GtkCollation" flags="1073742051"/>
   </class>
   <interface name="GtkStyleProvider" get-type="gtk_style_provider_get_type">
     <signal name="gtk-private-changed" return="void" when="last">
@@ -3913,9 +4010,11 @@
     <implements name="GtkBuildable"/>
     <implements name="GtkConstraintTarget"/>
     <property name="child" type="GtkWidget" flags="1073742051"/>
+    <property name="hide-expander" type="gboolean" flags="1073741827"/>
+    <property name="indent-for-depth" type="gboolean" flags="1073741827"/>
+    <property name="indent-for-icon" type="gboolean" flags="1073741827"/>
     <property name="item" type="GObject" flags="1073742049"/>
     <property name="list-row" type="GtkTreeListRow" flags="1073742051"/>
-    <property name="indent-for-icon" type="gboolean" flags="1073741827"/>
   </class>
   <class name="GtkTreeListRowSorter" get-type="gtk_tree_list_row_sorter_get_type" parents="GtkSorter,GObject">
     <property name="sorter" type="GtkSorter" flags="1073742051"/>
@@ -3938,6 +4037,9 @@
     <implements name="GtkTreeSortable"/>
     <implements name="GtkBuildable"/>
   </class>
+  <class name="GtkUriLauncher" get-type="gtk_uri_launcher_get_type" parents="GObject">
+    <property name="uri" type="gchararray" flags="1073742051"/>
+  </class>
   <class name="GtkVideo" get-type="gtk_video_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
     <implements name="GtkAccessible"/>
     <implements name="GtkBuildable"/>
@@ -3959,6 +4061,7 @@
     <implements name="GtkAccessible"/>
     <implements name="GtkBuildable"/>
     <implements name="GtkConstraintTarget"/>
+    <implements name="GtkAccessibleRange"/>
     <implements name="GtkOrientable"/>
     <property name="use-symbolic" type="gboolean" flags="1073742055"/>
   </class>
@@ -4046,8 +4149,9 @@
   <error-quark function="gtk_css_parser_error_quark" domain="gtk-css-parser-error-quark"/>
   <error-quark function="gtk_builder_error_quark" domain="gtk-builder-error-quark"/>
   <error-quark function="gtk_constraint_vfl_parser_error_quark" domain="gtk-constraint-vfl-parser-error-quark"/>
-  <error-quark function="gtk_file_chooser_error_quark" domain="gtk-file-chooser-error-quark"/>
+  <error-quark function="gtk_dialog_error_quark" domain="gtk-dialog-error-quark"/>
   <error-quark function="gtk_icon_theme_error_quark" domain="gtk-icon-theme-error-quark"/>
+  <error-quark function="gtk_file_chooser_error_quark" domain="gtk-file-chooser-error-quark"/>
   <error-quark function="gtk_print_error_quark" domain="gtk-print-error-quark"/>
   <error-quark function="gtk_recent_manager_error_quark" domain="gtk-recent-manager-error-quark"/>
 </dump>
