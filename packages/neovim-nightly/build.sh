@@ -112,11 +112,6 @@ termux_step_host_build() {
 
 termux_step_pre_configure() {
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLUA_MATH_LIBRARY=$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libm.so"
-
-	# Only for 0.9.0-dev-1115+g446c353a5.
-	# Not using patch which would make Termux bot unnecessarily noisy.
-	sed -i '/^  list(APPEND MSGPACK_NAMES /s/ msgpackc / msgpack-c /' \
-		cmake/FindMsgpack.cmake
 }
 
 termux_step_post_make_install() {
