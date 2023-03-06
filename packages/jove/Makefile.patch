@@ -1,14 +1,14 @@
 --- a/Makefile
 +++ b/Makefile
 @@ -27,7 +27,7 @@
- # (prefixed with $DESTDIR, as most packaging systems desire)
- # All others must already exist.
+ # Hack for relocatable installs: set JSHAREDIR and JLIBDIR and JBINDIR to relative 
+ # paths, and set DESTDIR to an empty directory.
  
 -JOVEHOME = /usr/local
 +JOVEHOME = @TERMUX_PREFIX@
+ JREL =
  JSHAREDIR = $(JOVEHOME)/share/jove
  DSHAREDIR = $(DESTDIR)$(JSHAREDIR)
- JLIBDIR = $(JOVEHOME)/lib/jove
 @@ -35,7 +35,7 @@
  JBINDIR = $(JOVEHOME)/bin
  DBINDIR = $(DESTDIR)$(JBINDIR)
@@ -35,7 +35,7 @@
 @@ -65,7 +65,7 @@
  RPMHOME = $(HOME)/rpmbuild/SOURCES
  
- # DFLTSHELL is the default shell invoked by JOVE and TEACHJOVE.
+ # DFLTSHELL is the default shell invoked by JOVE.
 -DFLTSHELL = /bin/sh
 +DFLTSHELL = @TERMUX_PREFIX@/bin/sh
  
