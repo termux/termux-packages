@@ -1,0 +1,27 @@
+diff --git a/src/vrend_renderer.c b/src/vrend_renderer.c
+--- a/src/vrend_renderer.c
++++ b/src/vrend_renderer.c
+@@ -386,6 +386,14 @@ static struct global_renderer_state vrend_state;
+ 
+ static inline bool has_feature(enum features_id feature_id)
+ {
++#ifdef __ANDROID__
++   // On Adreno, this feature cannot be used.
++   // Maybe related to https://gitlab.freedesktop.org/virgl/virglrenderer/-/issues/223 
++   // and https://developer.qualcomm.com/forum/qdn-forums/software/adreno-gpu-sdk/34738
++   if (feature_id == feat_dual_src_blend) {
++      return false;
++   }
++#endif
+    int slot = feature_id / 64;
+    uint64_t mask = 1ull << (feature_id & 63);
+    bool retval = vrend_state.features[slot] & mask ? true : false;
+@@ -7444,7 +7452,7 @@ struct vrend_context *vrend_create_context(int id, uint32_t nlen, const char *de
+    grctx->shader_cfg.has_es31_compat = has_feature(feat_gles31_compatibility);
+    grctx->shader_cfg.has_conservative_depth = has_feature(feat_conservative_depth);
+    grctx->shader_cfg.use_integer = vrend_state.use_integer;
+-   grctx->shader_cfg.has_dual_src_blend = has_feature(feat_dual_src_blend);
++   grctx->shader_cfg.has_dual_src_blend = false;
+    grctx->shader_cfg.has_fbfetch_coherent = has_feature(feat_framebuffer_fetch);
+    grctx->shader_cfg.has_cull_distance = has_feature(feat_cull_distance);
+    grctx->shader_cfg.has_nopersective = has_feature(feat_shader_noperspective_interpolation);
