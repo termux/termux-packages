@@ -1,16 +1,16 @@
 --- a/zellij-server/src/pty.rs
 +++ b/zellij-server/src/pty.rs
-@@ -445,8 +445,8 @@ impl Pty {
-     }
-     pub fn get_default_terminal(&self, cwd: Option<PathBuf>) -> TerminalAction {
-         let shell = PathBuf::from(env::var("SHELL").unwrap_or_else(|_| {
--            log::warn!("Cannot read SHELL env, falling back to use /bin/sh");
--            "/bin/sh".to_string()
-+            log::warn!("Cannot read SHELL env, falling back to use @TERMUX_PREFIX@/bin/sh");
-+            "@TERMUX_PREFIX@/bin/sh".to_string()
-         }));
-         if !shell.exists() {
-             panic!("Cannot find shell {}", shell.display());
+@@ -466,8 +466,8 @@ impl Pty {
+             },
+             None => {
+                 let shell = PathBuf::from(env::var("SHELL").unwrap_or_else(|_| {
+-                    log::warn!("Cannot read SHELL env, falling back to use /bin/sh");
+-                    "/bin/sh".to_string()
++                    log::warn!("Cannot read SHELL env, falling back to use @TERMUX_PREFIX@/bin/sh");
++                    "@TERMUX_PREFIX@/bin/sh".to_string()
+                 }));
+                 TerminalAction::RunCommand(RunCommand {
+                     args: vec![],
 --- a/zellij-utils/src/consts.rs
 +++ b/zellij-utils/src/consts.rs
 @@ -13,7 +13,7 @@ pub const DEFAULT_SCROLL_BUFFER_SIZE: usize = 10_000;
