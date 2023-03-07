@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.getdnote.com/
 TERMUX_PKG_DESCRIPTION="This package contains the Dnote server. It comprises of the web interface, the web API, and the background jobs."
 TERMUX_PKG_LICENSE="AGPL-V3"
 TERMUX_PKG_MAINTAINER="Ravener <ravener.anime@gmail.com>"
-TERMUX_PKG_VERSION=2.0.1
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_VERSION=2.1.1
 TERMUX_PKG_SRCURL=https://github.com/dnote/dnote/archive/refs/tags/server-v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=28cc3bf93b3849b9a4a5e65e531f8a34d6be6048427d924c56ab8c7887676bad
+TERMUX_PKG_SHA256=5326694dd4c1721e52b871cebc3b99f9172d5e27c8eb71234cdf529bdcd14eee
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_SUGGESTS="postgresql"
 
