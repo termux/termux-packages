@@ -1,0 +1,14 @@
+diff --git a/vtest/vtest_shm.c b/vtest/vtest_shm.c
+--- a/vtest/vtest_shm.c
++++ b/vtest/vtest_shm.c
+@@ -68,6 +68,10 @@ int vtest_new_shm(uint32_t handle, size_t size)
+ 
+ int vtest_shm_check(void)
+ {
++#ifdef __ANDROID__
++    // On Android, sendmsg with fd seems not to work.
++    return 0;
++#endif
+     int mfd = memfd_create("test", MFD_ALLOW_SEALING);
+ 
+     if (mfd >= 0) {
