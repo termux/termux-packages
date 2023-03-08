@@ -142,6 +142,7 @@ PACKAGES+=" re2c"
 
 # Needed by composer.
 PACKAGES+=" php"
+PACKAGES+=" php-xml"
 PACKAGES+=" composer"
 
 # Needed by package rust.
