@@ -1,6 +1,5 @@
-diff -uNr pacman-6.0.0/etc/makepkg.conf.in pacman-termux/etc/makepkg.conf.in
---- pacman-6.0.0/etc/makepkg.conf.in	2021-05-20 06:38:45.938120000 +0300
-+++ pacman-termux/etc/makepkg.conf.in	2021-10-04 16:00:39.000000000 +0300
+--- pacman-6.0.2/etc/makepkg.conf.in	2023-03-10 01:35:19.647470082 +0300
++++ pacman-6.0.2/etc/makepkg.conf.in.patch	2023-03-10 01:37:36.035469985 +0300
 @@ -9,17 +9,17 @@
  #
  #-- The download utilities that makepkg should use to acquire sources
@@ -28,7 +27,16 @@ diff -uNr pacman-6.0.0/etc/makepkg.conf.in pacman-termux/etc/makepkg.conf.in
  
  #-- The package required by makepkg to download VCS sources
  #  Format: 'protocol::package'
-@@ -92,7 +92,7 @@
+@@ -33,7 +33,7 @@
+ # ARCHITECTURE, COMPILE FLAGS
+ #########################################################################
+ #
+-CARCH="@CARCH@"
++CARCH="@TERMUX_ARCH@"
+ CHOST="@CHOST@"
+ 
+ #-- Compiler and Linker Flags
+@@ -93,7 +93,7 @@
  OPTIONS=(strip docs libtool staticlibs emptydirs zipman purge !debug !lto)
  
  #-- File integrity checks to use. Valid: ck, md5, sha1, sha224, sha256, sha384, sha512, b2
@@ -37,7 +45,7 @@ diff -uNr pacman-6.0.0/etc/makepkg.conf.in pacman-termux/etc/makepkg.conf.in
  #-- Options to be used when stripping binaries. See `man strip' for details.
  STRIP_BINARIES="@STRIP_BINARIES@"
  #-- Options to be used when stripping shared libraries. See `man strip' for details.
-@@ -106,7 +106,7 @@
+@@ -107,7 +107,7 @@
  #-- Files to be removed from all packages (if purge is specified)
  PURGE_TARGETS=(usr/{,share}/info/dir .packlist *.pod)
  #-- Directory to store source code in for debug packages
