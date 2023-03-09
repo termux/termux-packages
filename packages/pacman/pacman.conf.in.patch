@@ -1,6 +1,6 @@
---- pacman-6.0.2/etc/pacman.conf.in	2023-02-20 20:18:56.884237085 +0300
-+++ pacman-6.0.2/etc/pacman.conf.in.patch	2023-02-20 20:23:08.036284798 +0300
-@@ -9,15 +9,15 @@
+--- pacman-6.0.2/etc/pacman.conf.in	2023-03-10 01:31:38.207470241 +0300
++++ pacman-6.0.2/etc/pacman.conf.in.patch	2023-03-10 01:33:13.819470172 +0300
+@@ -9,17 +9,17 @@
  [options]
  # The following paths are commented out with their default values listed.
  # If you wish to use different paths, uncomment and update the paths.
@@ -18,8 +18,11 @@
 +#XferCommand = @TERMUX_PREFIX@/bin/wget --passive-ftp -c -O %o %u
 +HoldPkg      = pacman
  #CleanMethod = KeepInstalled
- Architecture = auto
+-Architecture = auto
++Architecture = @TERMUX_ARCH@
  
+ # Pacman won't upgrade packages listed in IgnorePkg and members of IgnoreGroup
+ #IgnorePkg   =
 @@ -30,16 +30,17 @@
  
  # Misc options
