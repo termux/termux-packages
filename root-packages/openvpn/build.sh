@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="An easy-to-use, robust, and highly configurable VPN (Vir
 # License: GPL-2.0-with-OpenSSL-exception
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.6.0
+TERMUX_PKG_VERSION=2.6.1
 TERMUX_PKG_SRCURL=https://github.com/OpenVPN/openvpn/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=31a22d9746b6509c70e4de1be983917425730a4093f43dfe86ff57dc36824a69
+TERMUX_PKG_SHA256=ca5d20a0cb197003dc04a76cbd868147fb3f95201f15fc56f9dc72fafb27e94f
 TERMUX_PKG_DEPENDS="libcap-ng, liblz4, liblzo, net-tools, openssl"
 TERMUX_PKG_BUILD_IN_SRC=true
 
