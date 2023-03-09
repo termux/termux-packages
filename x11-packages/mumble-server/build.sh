@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Server module for Mumble, an open source voice-chat soft
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.5.517
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/mumble-voip/mumble
 TERMUX_PKG_DEPENDS="libc++, libcap, libdns-sd, libprotobuf, openssl, qt5-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="boost, boost-headers, qt5-qtbase-cross-tools"
@@ -20,13 +21,8 @@ termux_step_pre_configure() {
 	termux_setup_protobuf
 
 	LDFLAGS+=" -lcap"
-}
 
-termux_step_post_configure() {
-	if [ "$TERMUX_CMAKE_BUILD" == "Ninja" ]; then
-		sed -i s:${TERMUX_PREFIX//./\\.}'/bin/protoc[0-9.-]*:'$(command -v protoc):g \
-			build.ninja
-	fi
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -Dprotobuf_PROTOC_EXE=$(command -v protoc)"
 }
 
 termux_step_post_make_install() {
