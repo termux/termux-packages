@@ -1,0 +1,22 @@
+--- a/src/lib/OpenEXR/ImfSimd.h
++++ b/src/lib/OpenEXR/ImfSimd.h
+@@ -43,7 +43,7 @@
+     #define IMF_HAVE_F16C 1
+ #endif
+ 
+-#if defined(__ARM_NEON)
++#if defined(__ARM_NEON) && defined(__aarch64__)
+ #    define IMF_HAVE_NEON
+ #endif
+ 
+--- a/src/lib/OpenEXRCore/internal_zip.c
++++ b/src/lib/OpenEXRCore/internal_zip.c
+@@ -24,7 +24,7 @@
+ #    define IMF_HAVE_SSE4_1 1
+ #    include <smmintrin.h>
+ #endif
+-#if defined(__ARM_NEON)
++#if defined(__ARM_NEON) && defined(__aarch64__)
+ #    define IMF_HAVE_NEON 1
+ #    include <arm_neon.h>
+ #endif
