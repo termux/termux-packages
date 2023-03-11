@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/max-niederman/ttyper
+TERMUX_PKG_DESCRIPTION="Terminal-based typing test"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=1.0.0
+TERMUX_PKG_SRCURL=https://github.com/max-niederman/ttyper/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=44f436cfd45f25afad98c48236f053b9dfdf54102ab8a9b1102245442f8c9799
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_BUILD_IN_SRC=true
