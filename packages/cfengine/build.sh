@@ -2,10 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://cfengine.com/
 TERMUX_PKG_DESCRIPTION="CFEngine is a configuration management technology"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@craigcomstock"
-TERMUX_PKG_VERSION=1:3.21.0
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=1:3.21.1
 TERMUX_PKG_SRCURL=git+https://github.com/cfengine/core
-TERMUX_PKG_GIT_BRANCH=${TERMUX_PKG_VERSION#*:}
+TERMUX_PKG_SHA256=e8db72a1e8e6c13e41c4ce108e547ac205e4c38060e1c1a970800c932b17058a
+# "-build[n]" suffix in tag name is not a part of version string.
+_CFENGINE_GIT_TAG_SUFFIX=-build1
+TERMUX_PKG_GIT_BRANCH=${TERMUX_PKG_VERSION#*:}${_CFENGINE_GIT_TAG_SUFFIX}
 TERMUX_PKG_DEPENDS="libandroid-glob, liblmdb, libxml2, libyaml, openssl, pcre"
 # core doesn't work with out-of-tree builds
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -23,9 +25,15 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_post_get_source() {
-	local _MASTERFILES_VERSION=${TERMUX_PKG_VERSION#*:}
+	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum)
+	if [[ "${s}" != "${TERMUX_PKG_SHA256}  "* ]]; then
+		termux_error_exit "Checksum mismatch for source files."
+	fi
+
+	: ${_CFENGINE_GIT_TAG_SUFFIX:=}
+	local _MASTERFILES_VERSION=${TERMUX_PKG_VERSION#*:}${_CFENGINE_GIT_TAG_SUFFIX}
 	local _MASTERFILES_SRCURL=https://github.com/cfengine/masterfiles/archive/${_MASTERFILES_VERSION}.zip
-	local _MASTERFILES_SHA256=d157717e65121ef22a28f6f60168b651eb9bb59240de03d22bac6942dae8e14e
+	local _MASTERFILES_SHA256=8e86019ff2c867ae4cb46d7008b541c99dd22321ea456eab4c0c16136e9af712
 	local _MASTERFILES_FILE=${TERMUX_PKG_CACHEDIR}/masterfiles-${_MASTERFILES_VERSION}.zip
 	termux_download \
 		${_MASTERFILES_SRCURL} \
