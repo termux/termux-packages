@@ -1,0 +1,38 @@
+--- a/blink/demangle.c
++++ b/blink/demangle.c
+@@ -236,7 +236,9 @@ char *Demangle(char *p, const char *symbol, size_t n) {
+   sigset_t ss, oldss;
+   sn = strlen(symbol);
+   if (startswith(symbol, "_Z")) {
++#ifndef __ANDROID__
+     unassert(!pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &cs));
++#endif
+     unassert(!pthread_once_(&g_cxxfilt.once, InitCxxFilt));
+     LOCK(&g_cxxfilt.lock);
+     if (g_cxxfilt.pid != -1) {
+@@ -261,7 +263,9 @@ char *Demangle(char *p, const char *symbol, size_t n) {
+       r = 0;
+     }
+     UNLOCK(&g_cxxfilt.lock);
++#ifndef __ANDROID__
+     unassert(!pthread_setcancelstate(cs, 0));
++#endif
+   } else {
+     r = 0;
+   }
+--- a/blink/errfd.c
++++ b/blink/errfd.c
+@@ -35,10 +35,14 @@ int WriteErrorString(const char *buf) {
+ 
+ int WriteError(int fd, const char *buf, int len) {
+   int rc, cs;
++#ifndef __ANDROID__
+   unassert(!pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &cs));
++#endif
+   do rc = write(fd > 0 ? fd : g_errfd, buf, len);
+   while (rc == -1 && errno == EINTR);
++#ifndef __ANDROID__
+   unassert(!pthread_setcancelstate(cs, 0));
++#endif
+   return rc;
+ }

@@ -1,0 +1,14 @@
+--- a/blink/blink.c
++++ b/blink/blink.c
+@@ -253,6 +253,11 @@ _Noreturn static void PrintVersion(void) {
+ static void GetOpts(int argc, char *argv[]) {
+   int opt;
+   FLAG_nolinear = !CanHaveLinearMemory();
++  if (getenv("BLINK_NO_LINEAR") != NULL) {
++    if (strcmp(getenv("BLINK_NO_LINEAR"), "1")) {
++      FLAG_nolinear = true;
++    }
++  }
+ #ifndef DISABLE_OVERLAYS
+   FLAG_overlays = getenv("BLINK_OVERLAYS");
+   if (!FLAG_overlays) FLAG_overlays = DEFAULT_OVERLAYS;

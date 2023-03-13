@@ -1,0 +1,16 @@
+https://android.googlesource.com/platform/bionic/+/61c9c8027537b48395dd995ce33f7a92d6f31b92
+
+--- a/blink/ioctl.c
++++ b/blink/ioctl.c
+@@ -259,10 +259,12 @@ static int IoctlSiocatmark(struct Machine *m, int fildes, i64 addr) {
+   u8 *p;
+   int rc;
+   if (!(p = (u8 *)SchlepW(m, addr, 4))) return -1;
++#ifndef __ANDROID__
+   if ((rc = sockatmark(fildes)) != -1) {
+     Write32(p, rc);
+     rc = 0;
+   }
++#endif
+   return rc;
+ }
