@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <dump>
   <interface name="GAction" get-type="g_action_get_type">
-    <property name="enabled" type="gboolean" flags="225"/>
-    <property name="name" type="gchararray" flags="225"/>
+    <property name="enabled" type="gboolean" flags="225" default-value="TRUE"/>
+    <property name="name" type="gchararray" flags="225" default-value="NULL"/>
     <property name="parameter-type" type="GVariantType" flags="225"/>
     <property name="state" type="GVariant" flags="225"/>
     <property name="state-type" type="GVariantType" flags="225"/>
@@ -47,14 +47,14 @@
   <class name="GApplication" get-type="g_application_get_type" parents="GObject">
     <implements name="GActionGroup"/>
     <implements name="GActionMap"/>
-    <property name="application-id" type="gchararray" flags="231"/>
-    <property name="flags" type="GApplicationFlags" flags="227"/>
-    <property name="resource-base-path" type="gchararray" flags="227"/>
-    <property name="is-registered" type="gboolean" flags="225"/>
-    <property name="is-remote" type="gboolean" flags="225"/>
-    <property name="inactivity-timeout" type="guint" flags="227"/>
+    <property name="application-id" type="gchararray" flags="231" default-value="NULL"/>
+    <property name="flags" type="GApplicationFlags" flags="227" default-value="G_APPLICATION_FLAGS_NONE"/>
+    <property name="resource-base-path" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="is-registered" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="is-remote" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="inactivity-timeout" type="guint" flags="227" default-value="0"/>
     <property name="action-group" type="GActionGroup" flags="-2147483422"/>
-    <property name="is-busy" type="gboolean" flags="225"/>
+    <property name="is-busy" type="gboolean" flags="225" default-value="FALSE"/>
     <signal name="startup" return="void" when="first">
     </signal>
     <signal name="shutdown" return="void" when="last">
@@ -79,7 +79,7 @@
     <property name="arguments" type="GVariant" flags="234"/>
     <property name="options" type="GVariant" flags="234"/>
     <property name="platform-data" type="GVariant" flags="234"/>
-    <property name="is-remote" type="gboolean" flags="225"/>
+    <property name="is-remote" type="gboolean" flags="225" default-value="FALSE"/>
   </class>
   <interface name="GInitable" get-type="g_initable_get_type">
   </interface>
@@ -91,22 +91,22 @@
   </class>
   <class name="GFilterInputStream" get-type="g_filter_input_stream_get_type" parents="GInputStream,GObject" abstract="1">
     <property name="base-stream" type="GInputStream" flags="235"/>
-    <property name="close-base-stream" type="gboolean" flags="231"/>
+    <property name="close-base-stream" type="gboolean" flags="231" default-value="TRUE"/>
   </class>
   <class name="GBufferedInputStream" get-type="g_buffered_input_stream_get_type" parents="GFilterInputStream,GInputStream,GObject">
     <implements name="GSeekable"/>
-    <property name="buffer-size" type="guint" flags="231"/>
+    <property name="buffer-size" type="guint" flags="231" default-value="4096"/>
   </class>
   <class name="GOutputStream" get-type="g_output_stream_get_type" parents="GObject" abstract="1">
   </class>
   <class name="GFilterOutputStream" get-type="g_filter_output_stream_get_type" parents="GOutputStream,GObject" abstract="1">
     <property name="base-stream" type="GOutputStream" flags="235"/>
-    <property name="close-base-stream" type="gboolean" flags="235"/>
+    <property name="close-base-stream" type="gboolean" flags="235" default-value="TRUE"/>
   </class>
   <class name="GBufferedOutputStream" get-type="g_buffered_output_stream_get_type" parents="GFilterOutputStream,GOutputStream,GObject">
     <implements name="GSeekable"/>
-    <property name="buffer-size" type="guint" flags="231"/>
-    <property name="auto-grow" type="gboolean" flags="227"/>
+    <property name="buffer-size" type="guint" flags="231" default-value="4096"/>
+    <property name="auto-grow" type="gboolean" flags="227" default-value="FALSE"/>
   </class>
   <class name="GBytesIcon" get-type="g_bytes_icon_get_type" parents="GObject">
     <implements name="GIcon"/>
@@ -122,9 +122,9 @@
   <class name="GCharsetConverter" get-type="g_charset_converter_get_type" parents="GObject">
     <implements name="GConverter"/>
     <implements name="GInitable"/>
-    <property name="from-charset" type="gchararray" flags="235"/>
-    <property name="to-charset" type="gchararray" flags="235"/>
-    <property name="use-fallback" type="gboolean" flags="231"/>
+    <property name="from-charset" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="to-charset" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="use-fallback" type="gboolean" flags="231" default-value="FALSE"/>
   </class>
   <class name="GConverterInputStream" get-type="g_converter_input_stream_get_type" parents="GFilterInputStream,GInputStream,GObject">
     <implements name="GPollableInputStream"/>
@@ -140,12 +140,12 @@
   </interface>
   <class name="GDataInputStream" get-type="g_data_input_stream_get_type" parents="GBufferedInputStream,GFilterInputStream,GInputStream,GObject">
     <implements name="GSeekable"/>
-    <property name="byte-order" type="GDataStreamByteOrder" flags="163"/>
-    <property name="newline-type" type="GDataStreamNewlineType" flags="163"/>
+    <property name="byte-order" type="GDataStreamByteOrder" flags="163" default-value="G_DATA_STREAM_BYTE_ORDER_BIG_ENDIAN"/>
+    <property name="newline-type" type="GDataStreamNewlineType" flags="163" default-value="G_DATA_STREAM_NEWLINE_TYPE_LF"/>
   </class>
   <class name="GDataOutputStream" get-type="g_data_output_stream_get_type" parents="GFilterOutputStream,GOutputStream,GObject">
     <implements name="GSeekable"/>
-    <property name="byte-order" type="GDataStreamByteOrder" flags="163"/>
+    <property name="byte-order" type="GDataStreamByteOrder" flags="163" default-value="G_DATA_STREAM_BYTE_ORDER_BIG_ENDIAN"/>
   </class>
   <class name="GDBusActionGroup" get-type="g_dbus_action_group_get_type" parents="GObject">
     <implements name="GActionGroup"/>
@@ -164,13 +164,13 @@
     <implements name="GInitable"/>
     <implements name="GAsyncInitable"/>
     <property name="stream" type="GIOStream" flags="235"/>
-    <property name="address" type="gchararray" flags="234"/>
-    <property name="flags" type="GDBusConnectionFlags" flags="235"/>
-    <property name="guid" type="gchararray" flags="235"/>
-    <property name="unique-name" type="gchararray" flags="225"/>
-    <property name="closed" type="gboolean" flags="225"/>
-    <property name="exit-on-close" type="gboolean" flags="227"/>
-    <property name="capabilities" type="GDBusCapabilityFlags" flags="225"/>
+    <property name="address" type="gchararray" flags="234" default-value="NULL"/>
+    <property name="flags" type="GDBusConnectionFlags" flags="235" default-value="G_DBUS_CONNECTION_FLAGS_NONE"/>
+    <property name="guid" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="unique-name" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="closed" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="exit-on-close" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="capabilities" type="GDBusCapabilityFlags" flags="225" default-value="G_DBUS_CAPABILITY_FLAGS_NONE"/>
     <property name="authentication-observer" type="GDBusAuthObserver" flags="234"/>
     <signal name="closed" return="void" when="last">
       <param type="gboolean"/>
@@ -181,7 +181,7 @@
   </interface>
   <class name="GDBusInterfaceSkeleton" get-type="g_dbus_interface_skeleton_get_type" parents="GObject" abstract="1">
     <implements name="GDBusInterface"/>
-    <property name="g-flags" type="GDBusInterfaceSkeletonFlags" flags="227"/>
+    <property name="g-flags" type="GDBusInterfaceSkeletonFlags" flags="227" default-value="G_DBUS_INTERFACE_SKELETON_FLAGS_NONE"/>
     <signal name="g-authorize-method" return="gboolean" when="last">
       <param type="GDBusMethodInvocation"/>
     </signal>
@@ -196,7 +196,7 @@
   <class name="GDBusMenuModel" get-type="g_dbus_menu_model_get_type" parents="GMenuModel,GObject">
   </class>
   <class name="GDBusMessage" get-type="g_dbus_message_get_type" parents="GObject">
-    <property name="locked" type="gboolean" flags="225"/>
+    <property name="locked" type="gboolean" flags="225" default-value="FALSE"/>
   </class>
   <class name="GDBusMethodInvocation" get-type="g_dbus_method_invocation_get_type" parents="GObject">
   </class>
@@ -228,12 +228,12 @@
     <implements name="GInitable"/>
     <implements name="GAsyncInitable"/>
     <implements name="GDBusObjectManager"/>
-    <property name="bus-type" type="GBusType" flags="234"/>
+    <property name="bus-type" type="GBusType" flags="234" default-value="G_BUS_TYPE_NONE"/>
     <property name="connection" type="GDBusConnection" flags="235"/>
-    <property name="flags" type="GDBusObjectManagerClientFlags" flags="235"/>
-    <property name="object-path" type="gchararray" flags="235"/>
-    <property name="name" type="gchararray" flags="235"/>
-    <property name="name-owner" type="gchararray" flags="225"/>
+    <property name="flags" type="GDBusObjectManagerClientFlags" flags="235" default-value="G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE"/>
+    <property name="object-path" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="name" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="name-owner" type="gchararray" flags="225" default-value="NULL"/>
     <property name="get-proxy-type-func" type="gpointer" flags="235"/>
     <property name="get-proxy-type-user-data" type="gpointer" flags="235"/>
     <property name="get-proxy-type-destroy-notify" type="gpointer" flags="235"/>
@@ -254,16 +254,16 @@
   <class name="GDBusObjectManagerServer" get-type="g_dbus_object_manager_server_get_type" parents="GObject">
     <implements name="GDBusObjectManager"/>
     <property name="connection" type="GDBusConnection" flags="227"/>
-    <property name="object-path" type="gchararray" flags="235"/>
+    <property name="object-path" type="gchararray" flags="235" default-value="NULL"/>
   </class>
   <class name="GDBusObjectProxy" get-type="g_dbus_object_proxy_get_type" parents="GObject">
     <implements name="GDBusObject"/>
-    <property name="g-object-path" type="gchararray" flags="235"/>
+    <property name="g-object-path" type="gchararray" flags="235" default-value="NULL"/>
     <property name="g-connection" type="GDBusConnection" flags="235"/>
   </class>
   <class name="GDBusObjectSkeleton" get-type="g_dbus_object_skeleton_get_type" parents="GObject">
     <implements name="GDBusObject"/>
-    <property name="g-object-path" type="gchararray" flags="231"/>
+    <property name="g-object-path" type="gchararray" flags="231" default-value="NULL"/>
     <signal name="authorize-method" return="gboolean" when="last">
       <param type="GDBusInterfaceSkeleton"/>
       <param type="GDBusMethodInvocation"/>
@@ -274,13 +274,13 @@
     <implements name="GInitable"/>
     <implements name="GAsyncInitable"/>
     <property name="g-connection" type="GDBusConnection" flags="235"/>
-    <property name="g-bus-type" type="GBusType" flags="234"/>
-    <property name="g-name" type="gchararray" flags="235"/>
-    <property name="g-name-owner" type="gchararray" flags="225"/>
-    <property name="g-flags" type="GDBusProxyFlags" flags="235"/>
-    <property name="g-object-path" type="gchararray" flags="235"/>
-    <property name="g-interface-name" type="gchararray" flags="235"/>
-    <property name="g-default-timeout" type="gint" flags="231"/>
+    <property name="g-bus-type" type="GBusType" flags="234" default-value="G_BUS_TYPE_NONE"/>
+    <property name="g-name" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="g-name-owner" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="g-flags" type="GDBusProxyFlags" flags="235" default-value="G_DBUS_PROXY_FLAGS_NONE"/>
+    <property name="g-object-path" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="g-interface-name" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="g-default-timeout" type="gint" flags="231" default-value="-1"/>
     <property name="g-interface-info" type="GDBusInterfaceInfo" flags="227"/>
     <signal name="g-properties-changed" return="void" when="last">
       <param type="GVariant"/>
@@ -294,11 +294,11 @@
   </class>
   <class name="GDBusServer" get-type="g_dbus_server_get_type" parents="GObject">
     <implements name="GInitable"/>
-    <property name="address" type="gchararray" flags="235"/>
-    <property name="client-address" type="gchararray" flags="225"/>
-    <property name="flags" type="GDBusServerFlags" flags="235"/>
-    <property name="guid" type="gchararray" flags="235"/>
-    <property name="active" type="gboolean" flags="225"/>
+    <property name="address" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="client-address" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="flags" type="GDBusServerFlags" flags="235" default-value="G_DBUS_SERVER_FLAGS_NONE"/>
+    <property name="guid" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="active" type="gboolean" flags="225" default-value="FALSE"/>
     <property name="authentication-observer" type="GDBusAuthObserver" flags="235"/>
     <signal name="new-connection" return="gboolean" when="last">
       <param type="GDBusConnection"/>
@@ -306,7 +306,7 @@
   </class>
   <interface name="GDebugController" get-type="g_debug_controller_get_type">
     <prerequisite name="GInitable"/>
-    <property name="debug-enabled" type="gboolean" flags="1073742051"/>
+    <property name="debug-enabled" type="gboolean" flags="1073742051" default-value="FALSE"/>
   </interface>
   <class name="GDebugControllerDBus" get-type="g_debug_controller_dbus_get_type" parents="GObject">
     <implements name="GInitable"/>
@@ -331,15 +331,15 @@
     <property name="advertised-protocols" type="GStrv" flags="227"/>
     <property name="base-socket" type="GDatagramBased" flags="235"/>
     <property name="certificate" type="GTlsCertificate" flags="227"/>
-    <property name="ciphersuite-name" type="gchararray" flags="225"/>
+    <property name="ciphersuite-name" type="gchararray" flags="225" default-value="NULL"/>
     <property name="database" type="GTlsDatabase" flags="227"/>
     <property name="interaction" type="GTlsInteraction" flags="227"/>
-    <property name="negotiated-protocol" type="gchararray" flags="225"/>
+    <property name="negotiated-protocol" type="gchararray" flags="225" default-value="NULL"/>
     <property name="peer-certificate" type="GTlsCertificate" flags="225"/>
-    <property name="peer-certificate-errors" type="GTlsCertificateFlags" flags="225"/>
-    <property name="protocol-version" type="GTlsProtocolVersion" flags="225"/>
-    <property name="rehandshake-mode" type="GTlsRehandshakeMode" flags="-2147483417"/>
-    <property name="require-close-notify" type="gboolean" flags="231"/>
+    <property name="peer-certificate-errors" type="GTlsCertificateFlags" flags="225" default-value="G_TLS_CERTIFICATE_NO_FLAGS"/>
+    <property name="protocol-version" type="GTlsProtocolVersion" flags="225" default-value="G_TLS_PROTOCOL_VERSION_UNKNOWN"/>
+    <property name="rehandshake-mode" type="GTlsRehandshakeMode" flags="-2147483417" default-value="G_TLS_REHANDSHAKE_NEVER"/>
+    <property name="require-close-notify" type="gboolean" flags="231" default-value="TRUE"/>
     <signal name="accept-certificate" return="gboolean" when="last">
       <param type="GTlsCertificate"/>
       <param type="GTlsCertificateFlags"/>
@@ -350,17 +350,17 @@
     <prerequisite name="GDtlsConnection"/>
     <property name="accepted-cas" type="gpointer" flags="225"/>
     <property name="server-identity" type="GSocketConnectable" flags="231"/>
-    <property name="validation-flags" type="GTlsCertificateFlags" flags="231"/>
+    <property name="validation-flags" type="GTlsCertificateFlags" flags="231" default-value="G_TLS_CERTIFICATE_UNKNOWN_CA | G_TLS_CERTIFICATE_BAD_IDENTITY | G_TLS_CERTIFICATE_NOT_ACTIVATED | G_TLS_CERTIFICATE_EXPIRED | G_TLS_CERTIFICATE_REVOKED | G_TLS_CERTIFICATE_INSECURE | G_TLS_CERTIFICATE_GENERIC_ERROR"/>
   </interface>
   <interface name="GDtlsServerConnection" get-type="g_dtls_server_connection_get_type">
     <prerequisite name="GDatagramBased"/>
     <prerequisite name="GDtlsConnection"/>
-    <property name="authentication-mode" type="GTlsAuthenticationMode" flags="227"/>
+    <property name="authentication-mode" type="GTlsAuthenticationMode" flags="227" default-value="G_TLS_AUTHENTICATION_NONE"/>
   </interface>
   <class name="GEmblem" get-type="g_emblem_get_type" parents="GObject">
     <implements name="GIcon"/>
     <property name="icon" type="GObject" flags="235"/>
-    <property name="origin" type="GEmblemOrigin" flags="235"/>
+    <property name="origin" type="GEmblemOrigin" flags="235" default-value="G_EMBLEM_ORIGIN_UNKNOWN"/>
   </class>
   <interface name="GIcon" get-type="g_icon_get_type">
   </interface>
@@ -388,14 +388,14 @@
   <class name="GIOStream" get-type="g_io_stream_get_type" parents="GObject" abstract="1">
     <property name="input-stream" type="GInputStream" flags="225"/>
     <property name="output-stream" type="GOutputStream" flags="225"/>
-    <property name="closed" type="gboolean" flags="225"/>
+    <property name="closed" type="gboolean" flags="225" default-value="FALSE"/>
   </class>
   <class name="GFileIOStream" get-type="g_file_io_stream_get_type" parents="GIOStream,GObject">
     <implements name="GSeekable"/>
   </class>
   <class name="GFileMonitor" get-type="g_file_monitor_get_type" parents="GObject" abstract="1">
-    <property name="rate-limit" type="gint" flags="1073742051"/>
-    <property name="cancelled" type="gboolean" flags="225"/>
+    <property name="rate-limit" type="gint" flags="1073742051" default-value="800"/>
+    <property name="cancelled" type="gboolean" flags="225" default-value="FALSE"/>
     <signal name="changed" return="void" when="last">
       <param type="GFile"/>
       <param type="GFile"/>
@@ -410,35 +410,35 @@
     <implements name="GSeekable"/>
   </class>
   <class name="GInetAddress" get-type="g_inet_address_get_type" parents="GObject">
-    <property name="family" type="GSocketFamily" flags="235"/>
+    <property name="family" type="GSocketFamily" flags="235" default-value="G_SOCKET_FAMILY_INVALID"/>
     <property name="bytes" type="gpointer" flags="235"/>
-    <property name="is-any" type="gboolean" flags="225"/>
-    <property name="is-loopback" type="gboolean" flags="225"/>
-    <property name="is-link-local" type="gboolean" flags="225"/>
-    <property name="is-site-local" type="gboolean" flags="225"/>
-    <property name="is-multicast" type="gboolean" flags="225"/>
-    <property name="is-mc-global" type="gboolean" flags="225"/>
-    <property name="is-mc-link-local" type="gboolean" flags="225"/>
-    <property name="is-mc-node-local" type="gboolean" flags="225"/>
-    <property name="is-mc-org-local" type="gboolean" flags="225"/>
-    <property name="is-mc-site-local" type="gboolean" flags="225"/>
+    <property name="is-any" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="is-loopback" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="is-link-local" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="is-site-local" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="is-multicast" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="is-mc-global" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="is-mc-link-local" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="is-mc-node-local" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="is-mc-org-local" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="is-mc-site-local" type="gboolean" flags="225" default-value="FALSE"/>
   </class>
   <class name="GInetAddressMask" get-type="g_inet_address_mask_get_type" parents="GObject">
     <implements name="GInitable"/>
-    <property name="family" type="GSocketFamily" flags="225"/>
+    <property name="family" type="GSocketFamily" flags="225" default-value="G_SOCKET_FAMILY_INVALID"/>
     <property name="address" type="GInetAddress" flags="227"/>
-    <property name="length" type="guint" flags="227"/>
+    <property name="length" type="guint" flags="227" default-value="0"/>
   </class>
   <class name="GSocketAddress" get-type="g_socket_address_get_type" parents="GObject" abstract="1">
     <implements name="GSocketConnectable"/>
-    <property name="family" type="GSocketFamily" flags="225"/>
+    <property name="family" type="GSocketFamily" flags="225" default-value="G_SOCKET_FAMILY_INVALID"/>
   </class>
   <class name="GInetSocketAddress" get-type="g_inet_socket_address_get_type" parents="GSocketAddress,GObject">
     <implements name="GSocketConnectable"/>
     <property name="address" type="GInetAddress" flags="235"/>
-    <property name="port" type="guint" flags="235"/>
-    <property name="flowinfo" type="guint" flags="235"/>
-    <property name="scope-id" type="guint" flags="235"/>
+    <property name="port" type="guint" flags="235" default-value="0"/>
+    <property name="flowinfo" type="guint" flags="235" default-value="0"/>
+    <property name="scope-id" type="guint" flags="235" default-value="0"/>
   </class>
   <flags name="GAppInfoCreateFlags" get-type="g_app_info_create_flags_get_type">
     <member name="G_APP_INFO_CREATE_NONE" nick="none" value="0"/>
@@ -1006,7 +1006,7 @@
   <class name="GListStore" get-type="g_list_store_get_type" parents="GObject">
     <implements name="GListModel"/>
     <property name="item-type" type="GType" flags="235"/>
-    <property name="n-items" type="guint" flags="225"/>
+    <property name="n-items" type="guint" flags="225" default-value="0"/>
   </class>
   <interface name="GLoadableIcon" get-type="g_loadable_icon_get_type">
     <prerequisite name="GIcon"/>
@@ -1025,8 +1025,8 @@
     <implements name="GSeekable"/>
     <implements name="GPollableOutputStream"/>
     <property name="data" type="gpointer" flags="235"/>
-    <property name="size" type="gulong" flags="235"/>
-    <property name="data-size" type="gulong" flags="225"/>
+    <property name="size" type="gulong" flags="235" default-value="0"/>
+    <property name="data-size" type="gulong" flags="225" default-value="0"/>
     <property name="realloc-function" type="gpointer" flags="235"/>
     <property name="destroy-function" type="gpointer" flags="235"/>
   </class>
@@ -1054,15 +1054,15 @@
     </signal>
   </interface>
   <class name="GMountOperation" get-type="g_mount_operation_get_type" parents="GObject">
-    <property name="username" type="gchararray" flags="227"/>
-    <property name="password" type="gchararray" flags="227"/>
-    <property name="anonymous" type="gboolean" flags="227"/>
-    <property name="domain" type="gchararray" flags="227"/>
-    <property name="password-save" type="GPasswordSave" flags="227"/>
-    <property name="choice" type="gint" flags="227"/>
-    <property name="is-tcrypt-hidden-volume" type="gboolean" flags="227"/>
-    <property name="is-tcrypt-system-volume" type="gboolean" flags="227"/>
-    <property name="pim" type="guint" flags="227"/>
+    <property name="username" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="password" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="anonymous" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="domain" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="password-save" type="GPasswordSave" flags="227" default-value="G_PASSWORD_SAVE_NEVER"/>
+    <property name="choice" type="gint" flags="227" default-value="0"/>
+    <property name="is-tcrypt-hidden-volume" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="is-tcrypt-system-volume" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="pim" type="guint" flags="227" default-value="0"/>
     <signal name="ask-password" return="void" when="last">
       <param type="gchararray"/>
       <param type="gchararray"/>
@@ -1134,32 +1134,32 @@
   </class>
   <class name="GNetworkAddress" get-type="g_network_address_get_type" parents="GObject">
     <implements name="GSocketConnectable"/>
-    <property name="hostname" type="gchararray" flags="235"/>
-    <property name="port" type="guint" flags="235"/>
-    <property name="scheme" type="gchararray" flags="235"/>
+    <property name="hostname" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="port" type="guint" flags="235" default-value="0"/>
+    <property name="scheme" type="gchararray" flags="235" default-value="NULL"/>
   </class>
   <interface name="GNetworkMonitor" get-type="g_network_monitor_get_type">
     <prerequisite name="GInitable"/>
-    <property name="connectivity" type="GNetworkConnectivity" flags="225"/>
-    <property name="network-available" type="gboolean" flags="225"/>
-    <property name="network-metered" type="gboolean" flags="225"/>
+    <property name="connectivity" type="GNetworkConnectivity" flags="225" default-value="G_NETWORK_CONNECTIVITY_FULL"/>
+    <property name="network-available" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="network-metered" type="gboolean" flags="225" default-value="FALSE"/>
     <signal name="network-changed" return="void" when="last">
       <param type="gboolean"/>
     </signal>
   </interface>
   <class name="GNetworkService" get-type="g_network_service_get_type" parents="GObject">
     <implements name="GSocketConnectable"/>
-    <property name="service" type="gchararray" flags="235"/>
-    <property name="protocol" type="gchararray" flags="235"/>
-    <property name="domain" type="gchararray" flags="235"/>
-    <property name="scheme" type="gchararray" flags="227"/>
+    <property name="service" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="protocol" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="domain" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="scheme" type="gchararray" flags="227" default-value="NULL"/>
   </class>
   <class name="GNotification" get-type="g_notification_get_type" parents="GObject">
   </class>
   <class name="GPermission" get-type="g_permission_get_type" parents="GObject" abstract="1">
-    <property name="allowed" type="gboolean" flags="225"/>
-    <property name="can-acquire" type="gboolean" flags="225"/>
-    <property name="can-release" type="gboolean" flags="225"/>
+    <property name="allowed" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="can-acquire" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="can-release" type="gboolean" flags="225" default-value="FALSE"/>
   </class>
   <interface name="GPollableInputStream" get-type="g_pollable_input_stream_get_type">
     <prerequisite name="GInputStream"/>
@@ -1169,36 +1169,36 @@
   </interface>
   <interface name="GPowerProfileMonitor" get-type="g_power_profile_monitor_get_type">
     <prerequisite name="GInitable"/>
-    <property name="power-saver-enabled" type="gboolean" flags="1073742049"/>
+    <property name="power-saver-enabled" type="gboolean" flags="1073742049" default-value="FALSE"/>
   </interface>
   <class name="GPropertyAction" get-type="g_property_action_get_type" parents="GObject">
     <implements name="GAction"/>
-    <property name="name" type="gchararray" flags="235"/>
+    <property name="name" type="gchararray" flags="235" default-value="NULL"/>
     <property name="parameter-type" type="GVariantType" flags="225"/>
-    <property name="enabled" type="gboolean" flags="225"/>
+    <property name="enabled" type="gboolean" flags="225" default-value="TRUE"/>
     <property name="state-type" type="GVariantType" flags="225"/>
     <property name="state" type="GVariant" flags="225"/>
     <property name="object" type="GObject" flags="234"/>
-    <property name="property-name" type="gchararray" flags="234"/>
-    <property name="invert-boolean" type="gboolean" flags="235"/>
+    <property name="property-name" type="gchararray" flags="234" default-value="NULL"/>
+    <property name="invert-boolean" type="gboolean" flags="235" default-value="FALSE"/>
   </class>
   <interface name="GProxy" get-type="g_proxy_get_type">
   </interface>
   <class name="GProxyAddress" get-type="g_proxy_address_get_type" parents="GInetSocketAddress,GSocketAddress,GObject">
     <implements name="GSocketConnectable"/>
-    <property name="protocol" type="gchararray" flags="235"/>
-    <property name="destination-protocol" type="gchararray" flags="235"/>
-    <property name="destination-hostname" type="gchararray" flags="235"/>
-    <property name="destination-port" type="guint" flags="235"/>
-    <property name="username" type="gchararray" flags="235"/>
-    <property name="password" type="gchararray" flags="235"/>
-    <property name="uri" type="gchararray" flags="235"/>
+    <property name="protocol" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="destination-protocol" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="destination-hostname" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="destination-port" type="guint" flags="235" default-value="0"/>
+    <property name="username" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="password" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="uri" type="gchararray" flags="235" default-value="NULL"/>
   </class>
   <class name="GSocketAddressEnumerator" get-type="g_socket_address_enumerator_get_type" parents="GObject" abstract="1">
   </class>
   <class name="GProxyAddressEnumerator" get-type="g_proxy_address_enumerator_get_type" parents="GSocketAddressEnumerator,GObject">
-    <property name="uri" type="gchararray" flags="235"/>
-    <property name="default-port" type="guint" flags="235"/>
+    <property name="uri" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="default-port" type="guint" flags="235" default-value="0"/>
     <property name="connectable" type="GSocketConnectable" flags="235"/>
     <property name="proxy-resolver" type="GProxyResolver" flags="231"/>
   </class>
@@ -1219,12 +1219,12 @@
   <boxed name="GSettingsSchemaKey" get-type="g_settings_schema_key_get_type"/>
   <class name="GSettings" get-type="g_settings_get_type" parents="GObject">
     <property name="settings-schema" type="GSettingsSchema" flags="235"/>
-    <property name="schema" type="gchararray" flags="-2147483413"/>
-    <property name="schema-id" type="gchararray" flags="235"/>
+    <property name="schema" type="gchararray" flags="-2147483413" default-value="NULL"/>
+    <property name="schema-id" type="gchararray" flags="235" default-value="NULL"/>
     <property name="backend" type="GSettingsBackend" flags="235"/>
-    <property name="path" type="gchararray" flags="235"/>
-    <property name="has-unapplied" type="gboolean" flags="225"/>
-    <property name="delay-apply" type="gboolean" flags="225"/>
+    <property name="path" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="has-unapplied" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="delay-apply" type="gboolean" flags="225" default-value="FALSE"/>
     <signal name="changed" return="void" when="last" detailed="1">
       <param type="gchararray"/>
     </signal>
@@ -1241,9 +1241,9 @@
   </class>
   <class name="GSimpleAction" get-type="g_simple_action_get_type" parents="GObject">
     <implements name="GAction"/>
-    <property name="name" type="gchararray" flags="235"/>
+    <property name="name" type="gchararray" flags="235" default-value="NULL"/>
     <property name="parameter-type" type="GVariantType" flags="235"/>
-    <property name="enabled" type="gboolean" flags="227"/>
+    <property name="enabled" type="gboolean" flags="227" default-value="TRUE"/>
     <property name="state-type" type="GVariantType" flags="225"/>
     <property name="state" type="GVariant" flags="231"/>
     <signal name="activate" return="void" when="last">
@@ -1268,36 +1268,36 @@
   </class>
   <class name="GSimpleProxyResolver" get-type="g_simple_proxy_resolver_get_type" parents="GObject">
     <implements name="GProxyResolver"/>
-    <property name="default-proxy" type="gchararray" flags="227"/>
+    <property name="default-proxy" type="gchararray" flags="227" default-value="NULL"/>
     <property name="ignore-hosts" type="GStrv" flags="227"/>
   </class>
   <class name="GSocket" get-type="g_socket_get_type" parents="GObject">
     <implements name="GInitable"/>
     <implements name="GDatagramBased"/>
-    <property name="family" type="GSocketFamily" flags="235"/>
-    <property name="type" type="GSocketType" flags="235"/>
-    <property name="protocol" type="GSocketProtocol" flags="235"/>
-    <property name="fd" type="gint" flags="235"/>
-    <property name="blocking" type="gboolean" flags="227"/>
-    <property name="listen-backlog" type="gint" flags="227"/>
-    <property name="keepalive" type="gboolean" flags="227"/>
+    <property name="family" type="GSocketFamily" flags="235" default-value="G_SOCKET_FAMILY_INVALID"/>
+    <property name="type" type="GSocketType" flags="235" default-value="G_SOCKET_TYPE_STREAM"/>
+    <property name="protocol" type="GSocketProtocol" flags="235" default-value="G_SOCKET_PROTOCOL_UNKNOWN"/>
+    <property name="fd" type="gint" flags="235" default-value="-1"/>
+    <property name="blocking" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="listen-backlog" type="gint" flags="227" default-value="10"/>
+    <property name="keepalive" type="gboolean" flags="227" default-value="FALSE"/>
     <property name="local-address" type="GSocketAddress" flags="225"/>
     <property name="remote-address" type="GSocketAddress" flags="225"/>
-    <property name="timeout" type="guint" flags="227"/>
-    <property name="ttl" type="guint" flags="227"/>
-    <property name="broadcast" type="gboolean" flags="227"/>
-    <property name="multicast-loopback" type="gboolean" flags="227"/>
-    <property name="multicast-ttl" type="guint" flags="227"/>
+    <property name="timeout" type="guint" flags="227" default-value="0"/>
+    <property name="ttl" type="guint" flags="227" default-value="0"/>
+    <property name="broadcast" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="multicast-loopback" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="multicast-ttl" type="guint" flags="227" default-value="1"/>
   </class>
   <class name="GSocketClient" get-type="g_socket_client_get_type" parents="GObject">
-    <property name="family" type="GSocketFamily" flags="231"/>
-    <property name="type" type="GSocketType" flags="231"/>
-    <property name="protocol" type="GSocketProtocol" flags="231"/>
+    <property name="family" type="GSocketFamily" flags="231" default-value="G_SOCKET_FAMILY_INVALID"/>
+    <property name="type" type="GSocketType" flags="231" default-value="G_SOCKET_TYPE_STREAM"/>
+    <property name="protocol" type="GSocketProtocol" flags="231" default-value="G_SOCKET_PROTOCOL_DEFAULT"/>
     <property name="local-address" type="GSocketAddress" flags="231"/>
-    <property name="timeout" type="guint" flags="231"/>
-    <property name="enable-proxy" type="gboolean" flags="231"/>
-    <property name="tls" type="gboolean" flags="231"/>
-    <property name="tls-validation-flags" type="GTlsCertificateFlags" flags="-2147483417"/>
+    <property name="timeout" type="guint" flags="231" default-value="0"/>
+    <property name="enable-proxy" type="gboolean" flags="231" default-value="TRUE"/>
+    <property name="tls" type="gboolean" flags="231" default-value="FALSE"/>
+    <property name="tls-validation-flags" type="GTlsCertificateFlags" flags="-2147483417" default-value="G_TLS_CERTIFICATE_UNKNOWN_CA | G_TLS_CERTIFICATE_BAD_IDENTITY | G_TLS_CERTIFICATE_NOT_ACTIVATED | G_TLS_CERTIFICATE_EXPIRED | G_TLS_CERTIFICATE_REVOKED | G_TLS_CERTIFICATE_INSECURE | G_TLS_CERTIFICATE_GENERIC_ERROR"/>
     <property name="proxy-resolver" type="GProxyResolver" flags="231"/>
     <signal name="event" return="void" when="last">
       <param type="GSocketClientEvent"/>
@@ -1313,14 +1313,14 @@
   <class name="GSocketControlMessage" get-type="g_socket_control_message_get_type" parents="GObject" abstract="1">
   </class>
   <class name="GSocketListener" get-type="g_socket_listener_get_type" parents="GObject">
-    <property name="listen-backlog" type="gint" flags="231"/>
+    <property name="listen-backlog" type="gint" flags="231" default-value="10"/>
     <signal name="event" return="void" when="last">
       <param type="GSocketListenerEvent"/>
       <param type="GSocket"/>
     </signal>
   </class>
   <class name="GSocketService" get-type="g_socket_service_get_type" parents="GSocketListener,GObject">
-    <property name="active" type="gboolean" flags="231"/>
+    <property name="active" type="gboolean" flags="231" default-value="TRUE"/>
     <signal name="incoming" return="gboolean" when="last">
       <param type="GSocketConnection"/>
       <param type="GObject"/>
@@ -1329,33 +1329,33 @@
   <boxed name="GSrvTarget" get-type="g_srv_target_get_type"/>
   <class name="GSubprocess" get-type="g_subprocess_get_type" parents="GObject">
     <implements name="GInitable"/>
-    <property name="flags" type="GSubprocessFlags" flags="234"/>
+    <property name="flags" type="GSubprocessFlags" flags="234" default-value="G_SUBPROCESS_FLAGS_NONE"/>
     <property name="argv" type="GStrv" flags="234"/>
   </class>
   <class name="GSubprocessLauncher" get-type="g_subprocess_launcher_get_type" parents="GObject">
-    <property name="flags" type="GSubprocessFlags" flags="234"/>
+    <property name="flags" type="GSubprocessFlags" flags="234" default-value="G_SUBPROCESS_FLAGS_NONE"/>
   </class>
   <class name="GTask" get-type="g_task_get_type" parents="GObject">
     <implements name="GAsyncResult"/>
-    <property name="completed" type="gboolean" flags="225"/>
+    <property name="completed" type="gboolean" flags="225" default-value="FALSE"/>
   </class>
   <class name="GTcpConnection" get-type="g_tcp_connection_get_type" parents="GSocketConnection,GIOStream,GObject">
-    <property name="graceful-disconnect" type="gboolean" flags="227"/>
+    <property name="graceful-disconnect" type="gboolean" flags="227" default-value="FALSE"/>
   </class>
   <class name="GTcpWrapperConnection" get-type="g_tcp_wrapper_connection_get_type" parents="GTcpConnection,GSocketConnection,GIOStream,GObject">
     <property name="base-io-stream" type="GIOStream" flags="235"/>
   </class>
   <class name="GTestDBus" get-type="g_test_dbus_get_type" parents="GObject">
-    <property name="flags" type="GTestDBusFlags" flags="235"/>
+    <property name="flags" type="GTestDBusFlags" flags="235" default-value="G_TEST_DBUS_NONE"/>
   </class>
   <class name="GThemedIcon" get-type="g_themed_icon_get_type" parents="GObject">
     <implements name="GIcon"/>
-    <property name="name" type="gchararray" flags="234"/>
+    <property name="name" type="gchararray" flags="234" default-value="NULL"/>
     <property name="names" type="GStrv" flags="235"/>
-    <property name="use-default-fallbacks" type="gboolean" flags="235"/>
+    <property name="use-default-fallbacks" type="gboolean" flags="235" default-value="FALSE"/>
   </class>
   <class name="GThreadedSocketService" get-type="g_threaded_socket_service_get_type" parents="GSocketService,GSocketListener,GObject">
-    <property name="max-threads" type="gint" flags="235"/>
+    <property name="max-threads" type="gint" flags="235" default-value="10"/>
     <signal name="run" return="gboolean" when="last">
       <param type="GSocketConnection"/>
       <param type="GObject"/>
@@ -1365,35 +1365,35 @@
   </interface>
   <class name="GTlsCertificate" get-type="g_tls_certificate_get_type" parents="GObject" abstract="1">
     <property name="certificate" type="GByteArray" flags="235"/>
-    <property name="certificate-pem" type="gchararray" flags="235"/>
+    <property name="certificate-pem" type="gchararray" flags="235" default-value="NULL"/>
     <property name="private-key" type="GByteArray" flags="235"/>
-    <property name="private-key-pem" type="gchararray" flags="235"/>
+    <property name="private-key-pem" type="gchararray" flags="235" default-value="NULL"/>
     <property name="issuer" type="GTlsCertificate" flags="235"/>
-    <property name="pkcs11-uri" type="gchararray" flags="235"/>
-    <property name="private-key-pkcs11-uri" type="gchararray" flags="235"/>
+    <property name="pkcs11-uri" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="private-key-pkcs11-uri" type="gchararray" flags="235" default-value="NULL"/>
     <property name="not-valid-before" type="GDateTime" flags="225"/>
     <property name="not-valid-after" type="GDateTime" flags="225"/>
-    <property name="subject-name" type="gchararray" flags="225"/>
-    <property name="issuer-name" type="gchararray" flags="225"/>
+    <property name="subject-name" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="issuer-name" type="gchararray" flags="225" default-value="NULL"/>
     <property name="dns-names" type="GPtrArray" flags="225"/>
     <property name="ip-addresses" type="GPtrArray" flags="225"/>
     <property name="pkcs12-data" type="GByteArray" flags="234"/>
-    <property name="password" type="gchararray" flags="234"/>
+    <property name="password" type="gchararray" flags="234" default-value="NULL"/>
   </class>
   <class name="GTlsConnection" get-type="g_tls_connection_get_type" parents="GIOStream,GObject" abstract="1">
     <property name="base-io-stream" type="GIOStream" flags="235"/>
-    <property name="require-close-notify" type="gboolean" flags="231"/>
-    <property name="rehandshake-mode" type="GTlsRehandshakeMode" flags="-2147483417"/>
-    <property name="use-system-certdb" type="gboolean" flags="-2147483417"/>
+    <property name="require-close-notify" type="gboolean" flags="231" default-value="TRUE"/>
+    <property name="rehandshake-mode" type="GTlsRehandshakeMode" flags="-2147483417" default-value="G_TLS_REHANDSHAKE_SAFELY"/>
+    <property name="use-system-certdb" type="gboolean" flags="-2147483417" default-value="TRUE"/>
     <property name="database" type="GTlsDatabase" flags="227"/>
     <property name="interaction" type="GTlsInteraction" flags="227"/>
     <property name="certificate" type="GTlsCertificate" flags="227"/>
     <property name="peer-certificate" type="GTlsCertificate" flags="225"/>
-    <property name="peer-certificate-errors" type="GTlsCertificateFlags" flags="225"/>
+    <property name="peer-certificate-errors" type="GTlsCertificateFlags" flags="225" default-value="G_TLS_CERTIFICATE_NO_FLAGS"/>
     <property name="advertised-protocols" type="GStrv" flags="227"/>
-    <property name="negotiated-protocol" type="gchararray" flags="225"/>
-    <property name="protocol-version" type="GTlsProtocolVersion" flags="225"/>
-    <property name="ciphersuite-name" type="gchararray" flags="225"/>
+    <property name="negotiated-protocol" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="protocol-version" type="GTlsProtocolVersion" flags="225" default-value="G_TLS_PROTOCOL_VERSION_UNKNOWN"/>
+    <property name="ciphersuite-name" type="gchararray" flags="225" default-value="NULL"/>
     <signal name="accept-certificate" return="gboolean" when="last">
       <param type="GTlsCertificate"/>
       <param type="GTlsCertificateFlags"/>
@@ -1403,25 +1403,25 @@
     <prerequisite name="GTlsConnection"/>
     <property name="accepted-cas" type="gpointer" flags="225"/>
     <property name="server-identity" type="GSocketConnectable" flags="231"/>
-    <property name="use-ssl3" type="gboolean" flags="-2147483417"/>
-    <property name="validation-flags" type="GTlsCertificateFlags" flags="-2147483417"/>
+    <property name="use-ssl3" type="gboolean" flags="-2147483417" default-value="FALSE"/>
+    <property name="validation-flags" type="GTlsCertificateFlags" flags="-2147483417" default-value="G_TLS_CERTIFICATE_UNKNOWN_CA | G_TLS_CERTIFICATE_BAD_IDENTITY | G_TLS_CERTIFICATE_NOT_ACTIVATED | G_TLS_CERTIFICATE_EXPIRED | G_TLS_CERTIFICATE_REVOKED | G_TLS_CERTIFICATE_INSECURE | G_TLS_CERTIFICATE_GENERIC_ERROR"/>
   </interface>
   <class name="GTlsDatabase" get-type="g_tls_database_get_type" parents="GObject" abstract="1">
   </class>
   <interface name="GTlsFileDatabase" get-type="g_tls_file_database_get_type">
     <prerequisite name="GTlsDatabase"/>
-    <property name="anchors" type="gchararray" flags="231"/>
+    <property name="anchors" type="gchararray" flags="231" default-value="NULL"/>
   </interface>
   <class name="GTlsInteraction" get-type="g_tls_interaction_get_type" parents="GObject">
   </class>
   <class name="GTlsPassword" get-type="g_tls_password_get_type" parents="GObject">
-    <property name="flags" type="GTlsPasswordFlags" flags="227"/>
-    <property name="description" type="gchararray" flags="227"/>
-    <property name="warning" type="gchararray" flags="227"/>
+    <property name="flags" type="GTlsPasswordFlags" flags="227" default-value="G_TLS_PASSWORD_NONE"/>
+    <property name="description" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="warning" type="gchararray" flags="227" default-value="NULL"/>
   </class>
   <interface name="GTlsServerConnection" get-type="g_tls_server_connection_get_type">
     <prerequisite name="GTlsConnection"/>
-    <property name="authentication-mode" type="GTlsAuthenticationMode" flags="227"/>
+    <property name="authentication-mode" type="GTlsAuthenticationMode" flags="227" default-value="G_TLS_AUTHENTICATION_NONE"/>
   </interface>
   <class name="GUnixConnection" get-type="g_unix_connection_get_type" parents="GSocketConnection,GIOStream,GObject">
   </class>
@@ -1432,10 +1432,10 @@
   </class>
   <class name="GUnixSocketAddress" get-type="g_unix_socket_address_get_type" parents="GSocketAddress,GObject">
     <implements name="GSocketConnectable"/>
-    <property name="path" type="gchararray" flags="235"/>
+    <property name="path" type="gchararray" flags="235" default-value="NULL"/>
     <property name="path-as-array" type="GByteArray" flags="235"/>
-    <property name="abstract" type="gboolean" flags="235"/>
-    <property name="address-type" type="GUnixSocketAddressType" flags="235"/>
+    <property name="abstract" type="gboolean" flags="235" default-value="FALSE"/>
+    <property name="address-type" type="GUnixSocketAddressType" flags="235" default-value="G_UNIX_SOCKET_ADDRESS_PATH"/>
   </class>
   <class name="GVfs" get-type="g_vfs_get_type" parents="GObject">
   </class>
@@ -1447,20 +1447,20 @@
   </interface>
   <class name="GZlibCompressor" get-type="g_zlib_compressor_get_type" parents="GObject">
     <implements name="GConverter"/>
-    <property name="format" type="GZlibCompressorFormat" flags="235"/>
-    <property name="level" type="gint" flags="235"/>
+    <property name="format" type="GZlibCompressorFormat" flags="235" default-value="G_ZLIB_COMPRESSOR_FORMAT_ZLIB"/>
+    <property name="level" type="gint" flags="235" default-value="-1"/>
     <property name="file-info" type="GFileInfo" flags="227"/>
   </class>
   <class name="GZlibDecompressor" get-type="g_zlib_decompressor_get_type" parents="GObject">
     <implements name="GConverter"/>
-    <property name="format" type="GZlibCompressorFormat" flags="235"/>
+    <property name="format" type="GZlibCompressorFormat" flags="235" default-value="G_ZLIB_COMPRESSOR_FORMAT_ZLIB"/>
     <property name="file-info" type="GFileInfo" flags="225"/>
   </class>
   <class name="GSettingsBackend" get-type="g_settings_backend_get_type" parents="GObject" abstract="1">
   </class>
   <class name="GDesktopAppInfo" get-type="g_desktop_app_info_get_type" parents="GObject">
     <implements name="GAppInfo"/>
-    <property name="filename" type="gchararray" flags="11"/>
+    <property name="filename" type="gchararray" flags="11" default-value="NULL"/>
   </class>
   <interface name="GDesktopAppInfoLookup" get-type="g_desktop_app_info_lookup_get_type">
   </interface>
@@ -1472,8 +1472,8 @@
   <class name="GUnixInputStream" get-type="g_unix_input_stream_get_type" parents="GInputStream,GObject">
     <implements name="GPollableInputStream"/>
     <implements name="GFileDescriptorBased"/>
-    <property name="fd" type="gint" flags="235"/>
-    <property name="close-fd" type="gboolean" flags="227"/>
+    <property name="fd" type="gint" flags="235" default-value="-1"/>
+    <property name="close-fd" type="gboolean" flags="227" default-value="TRUE"/>
   </class>
   <boxed name="GUnixMountEntry" get-type="g_unix_mount_entry_get_type"/>
   <boxed name="GUnixMountPoint" get-type="g_unix_mount_point_get_type"/>
@@ -1486,8 +1486,8 @@
   <class name="GUnixOutputStream" get-type="g_unix_output_stream_get_type" parents="GOutputStream,GObject">
     <implements name="GPollableOutputStream"/>
     <implements name="GFileDescriptorBased"/>
-    <property name="fd" type="gint" flags="235"/>
-    <property name="close-fd" type="gboolean" flags="227"/>
+    <property name="fd" type="gint" flags="235" default-value="-1"/>
+    <property name="close-fd" type="gboolean" flags="227" default-value="TRUE"/>
   </class>
   <error-quark function="g_dbus_error_quark" domain="g-dbus-error-quark"/>
   <error-quark function="g_io_error_quark" domain="g-io-error-quark"/>
