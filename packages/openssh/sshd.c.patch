@@ -43,7 +43,7 @@ diff -u -r ../openssh-8.1p1/sshd.c ./sshd.c
  	if (rexeced_flag || inetd_flag)
  		rexec_flag = 0;
 +#ifndef __ANDROID__
- 	if (!test_flag && rexec_flag && !path_absolute(av[0]))
+ 	if (!test_flag && !do_dump_cfg && rexec_flag && !path_absolute(av[0]))
  		fatal("sshd re-exec requires execution with an absolute path");
 +#endif
  	if (rexeced_flag)
