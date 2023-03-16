@@ -12,6 +12,6 @@ TERMUX_PKG_GROUPS="util-linux"
 termux_step_make_install() {
       mkdir -p $TERMUX_PREFIX/opt/sqlmap
       mv $TERMUX_PKG_SRCDIR/sqlmap.py $TERMUX_PKG_SRCDIR/sqlmap
-      cp $TERMUX_PKG_SRCDIR/sqlmap $TERMUX_PREFIX/bin
-      cp $TERMUX_PKG_SRCDIR/* $TERMUX_PREFIX/opt/sqlmap
+      mv $TERMUX_PKG_SRCDIR/sqlmap $TERMUX_PREFIX/bin
+      mv $TERMUX_PKG_SRCDIR/* $TERMUX_PREFIX/opt/sqlmap
 }
