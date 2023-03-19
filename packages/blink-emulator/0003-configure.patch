@@ -1,0 +1,10 @@
+--- a/configure
++++ b/configure
+@@ -209,6 +209,7 @@ rm -f config.log
+ run() {
+   (
+     printf '%s\n' "$*"
++	if [ -n "$(echo $1 | grep noop)" ]; then exit 0; fi
+     if nice "$@"; then
+       exit 0
+     else
