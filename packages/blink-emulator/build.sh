@@ -5,7 +5,6 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.9.2"
 TERMUX_PKG_SRCURL=https://github.com/jart/blink/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=38757098cdc9822399fe6eedb9529cc8c79ee44396bbecddce65fb9b7bbb47f9
-TERMUX_PKG_BUILD_DEPENDS="ndk-sysroot"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
@@ -21,6 +20,7 @@ termux_step_configure() {
 	sed -i config.mk \
 		-e "s|^TMPDIR =.*|TMPDIR = ${TERMUX_PKG_TMPDIR}|" \
 		-e "s|^PREFIX =.*|PREFIX = ${TERMUX_PREFIX}|" \
+		-e "s|^CFLAGS =.*|& -isysroot ${TERMUX_STADALONE_TOOLCHAIN}/sysroot|" \
 		#-e "s|^LDLIBS =.*|LDLIBS = -L${TERMUX_PREFIX}/lib -lz -lm|" \
 		#-e "s|^ZLIB =.*|ZLIB =|"
 
