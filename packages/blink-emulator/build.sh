@@ -40,4 +40,8 @@ termux_step_configure() {
 	echo "========== config.mk =========="
 	cat config.mk
 	echo "========== config.mk =========="
+	echo "========== sched.h =========="
+	grep cpu_set_t -nHR $TERMUX_PREFIX/include
+	cat $TERMUX_PREFIX/include/sched.h
+	echo "========== sched.h =========="
 }
