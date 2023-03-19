@@ -21,7 +21,6 @@ termux_step_configure() {
 	sed -i config.mk \
 		-e "s|^TMPDIR =.*|TMPDIR = ${TERMUX_PKG_TMPDIR}|" \
 		-e "s|^PREFIX =.*|PREFIX = ${TERMUX_PREFIX}|" \
-		-e "s|^CONFIG_HOSTNAME =.*|CONFIG_HOSTNAME = localhost|" \
 		-e "s|^LDLIBS =.*|LDLIBS = -L${TERMUX_PREFIX}/lib -lz -lm|" \
 		-e "s|^ZLIB =.*|ZLIB =|"
 
