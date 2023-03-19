@@ -9,32 +9,25 @@ TERMUX_PKG_DEPENDS="zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
---prefix=${TERMUX_PREFIX}
---enable-ancillary
---enable-backtrace
---enable-bcd
---enable-disassembler
---enable-fork
---enable-jit
---enable-metal
---enable-mmx
---enable-nonposix
---enable-overlays
---enable-sockets
---enable-strace
---enable-threads
---enable-x87
-"
 
 termux_step_configure() {
 	# custom configure script that errors
 	# instead of ignores unknown arguments
 	# also run tests on host rather than target
 	# which gives wrong result
-	./configure ${TERMUX_PKG_EXTRA_CONFIGURE_ARGS} \
-		#--enable-bmi2 \
-		#--pedantic \
+	# we run this to generate config.mk
+	./configure
+
+	sed -i config.mk \
+		-e "s|^TMPDIR =.*|TMPDIR = ${TERMUX_PKG_TMPDIR}|" \
+		-e "s|^PREFIX =.*|PREFIX = ${TERMUX_PREFIX}|" \
+		-e "s|^CONFIG_HOSTNAME =.*|CONFIG_HOSTNAME = localhost|" \
+		-e "s|^LDLIBS =.*|LDLIBS = -L${TERMUX_PREFIX}/lib -lz -lm|" \
+		-e "s|^ZLIB =.*|ZLIB =|"
+
+	# replace config.h and enable all working features
+	cp -f config.h.in config.h
+	sed -i config.h -e "s|^// #define HAVE_|#define HAVE_|g"
 
 	echo "========== config.log =========="
 	cat config.log
