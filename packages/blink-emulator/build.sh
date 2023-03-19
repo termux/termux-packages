@@ -20,7 +20,7 @@ termux_step_configure() {
 	sed -i config.mk \
 		-e "s|^TMPDIR =.*|TMPDIR = ${TERMUX_PKG_TMPDIR}|" \
 		-e "s|^PREFIX =.*|PREFIX = ${TERMUX_PREFIX}|" \
-		-e "s|^CFLAGS =.*|& -isysroot ${TERMUX_STANDALONE_TOOLCHAIN}/sysroot|" \
+		-e "s|^CFLAGS =.*|& --sysroot ${TERMUX_STANDALONE_TOOLCHAIN}/sysroot|" \
 		#-e "s|^LDLIBS =.*|LDLIBS = -L${TERMUX_PREFIX}/lib -lz -lm|" \
 		#-e "s|^ZLIB =.*|ZLIB =|"
 
@@ -40,4 +40,6 @@ termux_step_configure() {
 	echo "========== config.mk =========="
 	cat config.mk
 	echo "========== config.mk =========="
+	grep cpu_set_t -nHR $TERMUX_PREFIX || echo "$TERMUX_PREFIX not found"
+	grep cpu_set_t -nHR $TERMUX_STANDALONE_TOOLCHAIN || echo "$TERMUX_STANDALONE_TOOLCHAIN not found"
 }
