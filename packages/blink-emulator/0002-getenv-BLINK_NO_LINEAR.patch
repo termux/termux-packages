@@ -1,6 +1,14 @@
 --- a/blink/blink.c
 +++ b/blink/blink.c
-@@ -253,6 +253,11 @@ _Noreturn static void PrintVersion(void) {
+@@ -116,6 +116,7 @@ _Alignas(1) static const char USAGE[] =
+ #endif
+ #if !defined(DISABLE_OVERLAYS) || !defined(NDEBUG)
+     "Environment:\n"
++    "  $BLINK_NO_LINEAR     set to 1 to enable memory safety (same as -m flag)\n"
+ #endif
+ #ifndef DISABLE_OVERLAYS
+     "  $BLINK_OVERLAYS      file system roots [default \":o\"]\n"
+@@ -253,6 +254,11 @@ _Noreturn static void PrintVersion(void) {
  static void GetOpts(int argc, char *argv[]) {
    int opt;
    FLAG_nolinear = !CanHaveLinearMemory();

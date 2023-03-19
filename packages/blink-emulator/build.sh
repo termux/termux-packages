@@ -25,13 +25,11 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-strace
 --enable-threads
 --enable-x87
---pedantic
 "
 
 termux_step_configure() {
-	./configure --help
 	echo "========== configure =========="
-	cat configure
+	grep "\--" -nH configure
 	echo "========== configure =========="
 	# custom configure script that errors
 	# instead of ignores unknown arguments
@@ -39,6 +37,7 @@ termux_step_configure() {
 	# which gives wrong result
 	./configure ${TERMUX_PKG_EXTRA_CONFIGURE_ARGS} \
 		#--enable-bmi2 \
+		#--pedantic \
 
 	echo "========== config.log =========="
 	cat config.log
