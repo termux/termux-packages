@@ -40,7 +40,4 @@ termux_step_configure() {
 	echo "========== config.mk =========="
 	cat config.mk
 	echo "========== config.mk =========="
-	echo "========== sched.h =========="
-	ls $TERMUX_PREFIX/include/*.h -l
-	echo "========== sched.h =========="
 }
