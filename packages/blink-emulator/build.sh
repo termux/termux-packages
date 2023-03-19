@@ -9,30 +9,37 @@ TERMUX_PKG_DEPENDS="zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--prefix=${TERMUX_PREFIX}
+--enable-ancillary
+--enable-backtrace
+--enable-bcd
+--enable-disassembler
+--enable-fork
+--enable-jit
+--enable-metal
+--enable-mmx
+--enable-nonposix
+--enable-overlays
+--enable-sockets
+--enable-strace
+--enable-threads
+--enable-x87
+--pedantic
+"
 
 termux_step_configure() {
+	./configure --help
+	echo "========== configure =========="
+	cat configure
+	echo "========== configure =========="
 	# custom configure script that errors
 	# instead of ignores unknown arguments
 	# also run tests on host rather than target
 	# which gives wrong result
-	./configure \
-		--prefix="${TERMUX_PREFIX}" \
-		--enable-ancillary \
-		--enable-backtrace \
-		--enable-bcd \
-		--enable-bmi2 \
-		--enable-disassembler \
-		--enable-fork \
-		--enable-jit \
-		--enable-metal \
-		--enable-mmx \
-		--enable-nonposix \
-		--enable-overlays \
-		--enable-sockets \
-		--enable-strace \
-		--enable-threads \
-		--enable-x87 \
-		--pedantic
+	./configure ${TERMUX_PKG_EXTRA_CONFIGURE_ARGS} \
+		#--enable-bmi2 \
+
 	echo "========== config.log =========="
 	cat config.log
 	echo "========== config.log =========="
