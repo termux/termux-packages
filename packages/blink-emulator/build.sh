@@ -28,9 +28,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_configure() {
-	echo "========== configure =========="
-	grep "\--" -nH configure
-	echo "========== configure =========="
 	# custom configure script that errors
 	# instead of ignores unknown arguments
 	# also run tests on host rather than target
@@ -42,6 +39,9 @@ termux_step_configure() {
 	echo "========== config.log =========="
 	cat config.log
 	echo "========== config.log =========="
+	echo "========== config.h =========="
+	cat config.h
+	echo "========== config.h =========="
 	echo "========== config.mk =========="
 	cat config.mk
 	echo "========== config.mk =========="
