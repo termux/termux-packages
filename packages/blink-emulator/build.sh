@@ -20,7 +20,7 @@ termux_step_configure() {
 	sed -i config.mk \
 		-e "s|^TMPDIR =.*|TMPDIR = ${TERMUX_PKG_TMPDIR}|" \
 		-e "s|^PREFIX =.*|PREFIX = ${TERMUX_PREFIX}|" \
-		-e "s|^CFLAGS =.*|& -isysroot ${TERMUX_STADALONE_TOOLCHAIN}/sysroot|" \
+		-e "s|^CFLAGS =.*|& -isysroot ${TERMUX_STANDALONE_TOOLCHAIN}/sysroot|" \
 		#-e "s|^LDLIBS =.*|LDLIBS = -L${TERMUX_PREFIX}/lib -lz -lm|" \
 		#-e "s|^ZLIB =.*|ZLIB =|"
 
