@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="The universal proxy platform"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="kay9925@outlook.com"
 TERMUX_PKG_VERSION="1.2-beta9"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/SagerNet/sing-box/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=03b5009e8886a8466bb82f86bc41ab614a211b393edc75eac6f9e7a832681d58
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -29,4 +30,18 @@ termux_step_make() {
 
 termux_step_make_install() {
 	install -Dm700 ./${TERMUX_PKG_NAME} ${TERMUX_PREFIX}/bin
+
+	install -Dm644 /dev/null "${TERMUX_PREFIX}/share/bash-completion/completions/sing-box.bash"
+	install -Dm644 /dev/null "${TERMUX_PREFIX}/share/fish/vendor_completions.d/sing-box.fish"
+	install -Dm644 /dev/null "${TERMUX_PREFIX}/share/zsh/site-functions/_sing-box"
+
+}
+
+termux_step_create_debscripts() {
+	cat <<- EOF > ./postinst
+		#!${TERMUX_PREFIX}/bin/sh
+		sing-box completion bash > ${TERMUX_PREFIX}/share/bash-completion/completions/sing-box.bash
+		sing-box completion fish > ${TERMUX_PREFIX}/share/fish/vendor_completions.d/sing-box.fish
+		sing-box completion zsh > ${TERMUX_PREFIX}/share/zsh/site-functions/_sing-box
+	EOF
 }
