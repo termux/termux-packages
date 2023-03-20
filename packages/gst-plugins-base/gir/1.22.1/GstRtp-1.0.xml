@@ -1,22 +1,22 @@
 <?xml version="1.0"?>
 <dump>
   <class name="GstRTPBasePayload" get-type="gst_rtp_base_payload_get_type" parents="GstElement,GstObject,GInitiallyUnowned,GObject" abstract="1">
-    <property name="mtu" type="guint" flags="227"/>
-    <property name="pt" type="guint" flags="227"/>
-    <property name="ssrc" type="guint" flags="227"/>
-    <property name="timestamp-offset" type="guint" flags="227"/>
-    <property name="seqnum-offset" type="gint" flags="227"/>
-    <property name="max-ptime" type="gint64" flags="227"/>
-    <property name="min-ptime" type="gint64" flags="227"/>
-    <property name="timestamp" type="guint" flags="225"/>
-    <property name="seqnum" type="guint" flags="225"/>
-    <property name="perfect-rtptime" type="gboolean" flags="227"/>
-    <property name="ptime-multiple" type="gint64" flags="227"/>
+    <property name="mtu" type="guint" flags="227" default-value="1400"/>
+    <property name="pt" type="guint" flags="227" default-value="96"/>
+    <property name="ssrc" type="guint" flags="227" default-value="4294967295"/>
+    <property name="timestamp-offset" type="guint" flags="227" default-value="4294967295"/>
+    <property name="seqnum-offset" type="gint" flags="227" default-value="-1"/>
+    <property name="max-ptime" type="gint64" flags="227" default-value="-1"/>
+    <property name="min-ptime" type="gint64" flags="227" default-value="0"/>
+    <property name="timestamp" type="guint" flags="225" default-value="0"/>
+    <property name="seqnum" type="guint" flags="225" default-value="0"/>
+    <property name="perfect-rtptime" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="ptime-multiple" type="gint64" flags="227" default-value="0"/>
     <property name="stats" type="GstStructure" flags="225"/>
-    <property name="source-info" type="gboolean" flags="3"/>
-    <property name="onvif-no-rate-control" type="gboolean" flags="227"/>
-    <property name="scale-rtptime" type="gboolean" flags="227"/>
-    <property name="auto-header-extension" type="gboolean" flags="227"/>
+    <property name="source-info" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="onvif-no-rate-control" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="scale-rtptime" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="auto-header-extension" type="gboolean" flags="227" default-value="TRUE"/>
     <signal name="add-extension" return="void" when="last" action="1">
       <param type="GstRTPHeaderExtension"/>
     </signal>
@@ -28,13 +28,13 @@
     </signal>
   </class>
   <class name="GstRTPBaseAudioPayload" get-type="gst_rtp_base_audio_payload_get_type" parents="GstRTPBasePayload,GstElement,GstObject,GInitiallyUnowned,GObject">
-    <property name="buffer-list" type="gboolean" flags="227"/>
+    <property name="buffer-list" type="gboolean" flags="227" default-value="FALSE"/>
   </class>
   <class name="GstRTPBaseDepayload" get-type="gst_rtp_base_depayload_get_type" parents="GstElement,GstObject,GInitiallyUnowned,GObject" abstract="1">
     <property name="stats" type="GstStructure" flags="225"/>
-    <property name="source-info" type="gboolean" flags="3"/>
-    <property name="max-reorder" type="gint" flags="3"/>
-    <property name="auto-header-extension" type="gboolean" flags="227"/>
+    <property name="source-info" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="max-reorder" type="gint" flags="3" default-value="100"/>
+    <property name="auto-header-extension" type="gboolean" flags="227" default-value="TRUE"/>
     <signal name="add-extension" return="void" when="last" action="1">
       <param type="GstRTPHeaderExtension"/>
     </signal>

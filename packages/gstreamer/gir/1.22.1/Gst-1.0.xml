@@ -671,17 +671,17 @@
   </flags>
   <boxed name="GstAtomicQueue" get-type="gst_atomic_queue_get_type"/>
   <class name="GstObject" get-type="gst_object_get_type" parents="GInitiallyUnowned,GObject" abstract="1">
-    <property name="name" type="gchararray" flags="8423"/>
-    <property name="parent" type="GstObject" flags="8419"/>
+    <property name="name" type="gchararray" flags="8423" default-value="NULL"/>
+    <property name="parent" type="GstObject" flags="8419" default-value="NULL"/>
     <signal name="deep-notify" return="void" when="first" no-recurse="1" detailed="1" no-hooks="1">
       <param type="GstObject"/>
       <param type="GParam"/>
     </signal>
   </class>
   <class name="GstClock" get-type="gst_clock_get_type" parents="GstObject,GInitiallyUnowned,GObject" abstract="1">
-    <property name="window-size" type="gint" flags="227"/>
-    <property name="window-threshold" type="gint" flags="227"/>
-    <property name="timeout" type="guint64" flags="227"/>
+    <property name="window-size" type="gint" flags="227" default-value="32"/>
+    <property name="window-threshold" type="gint" flags="227" default-value="4"/>
+    <property name="timeout" type="guint64" flags="227" default-value="100000000"/>
     <signal name="synced" return="void" when="last">
       <param type="gboolean"/>
     </signal>
@@ -689,8 +689,8 @@
   <class name="GstControlSource" get-type="gst_control_source_get_type" parents="GstObject,GInitiallyUnowned,GObject" abstract="1">
   </class>
   <class name="GstControlBinding" get-type="gst_control_binding_get_type" parents="GstObject,GInitiallyUnowned,GObject" abstract="1">
-    <property name="object" type="GstObject" flags="235"/>
-    <property name="name" type="gchararray" flags="235"/>
+    <property name="object" type="GstObject" flags="235" default-value="NULL"/>
+    <property name="name" type="gchararray" flags="235" default-value="NULL"/>
   </class>
   <boxed name="GstMiniObject" get-type="gst_mini_object_get_type"/>
   <boxed name="GstMemory" get-type="gst_memory_get_type"/>
@@ -712,22 +712,22 @@
   <boxed name="GstContext" get-type="gst_context_get_type"/>
   <boxed name="GstQuery" get-type="gst_query_get_type"/>
   <class name="GstDevice" get-type="gst_device_get_type" parents="GstObject,GInitiallyUnowned,GObject" abstract="1">
-    <property name="display-name" type="gchararray" flags="235"/>
-    <property name="caps" type="GstCaps" flags="235"/>
-    <property name="device-class" type="gchararray" flags="235"/>
+    <property name="display-name" type="gchararray" flags="235" default-value=""/>
+    <property name="caps" type="GstCaps" flags="235" default-value="NULL"/>
+    <property name="device-class" type="gchararray" flags="235" default-value=""/>
     <property name="properties" type="GstStructure" flags="235"/>
     <signal name="removed" return="void" when="last">
     </signal>
   </class>
   <class name="GstStream" get-type="gst_stream_get_type" parents="GstObject,GInitiallyUnowned,GObject">
-    <property name="stream-id" type="gchararray" flags="235"/>
-    <property name="stream-flags" type="GstStreamFlags" flags="231"/>
-    <property name="stream-type" type="GstStreamType" flags="231"/>
+    <property name="stream-id" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="stream-flags" type="GstStreamFlags" flags="231" default-value="GST_STREAM_FLAG_NONE"/>
+    <property name="stream-type" type="GstStreamType" flags="231" default-value="GST_STREAM_TYPE_UNKNOWN"/>
     <property name="tags" type="GstTagList" flags="227"/>
-    <property name="caps" type="GstCaps" flags="227"/>
+    <property name="caps" type="GstCaps" flags="227" default-value="NULL"/>
   </class>
   <class name="GstStreamCollection" get-type="gst_stream_collection_get_type" parents="GstObject,GInitiallyUnowned,GObject">
-    <property name="upstream-id" type="gchararray" flags="231"/>
+    <property name="upstream-id" type="gchararray" flags="231" default-value="NULL"/>
     <signal name="stream-notify" return="void" when="first" no-recurse="1" detailed="1" no-hooks="1">
       <param type="GstStream"/>
       <param type="GParam"/>
@@ -742,20 +742,20 @@
   <class name="GstTask" get-type="gst_task_get_type" parents="GstObject,GInitiallyUnowned,GObject">
   </class>
   <class name="GstPadTemplate" get-type="gst_pad_template_get_type" parents="GstObject,GInitiallyUnowned,GObject">
-    <property name="name-template" type="gchararray" flags="235"/>
-    <property name="direction" type="GstPadDirection" flags="235"/>
-    <property name="presence" type="GstPadPresence" flags="235"/>
-    <property name="caps" type="GstCaps" flags="235"/>
+    <property name="name-template" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="direction" type="GstPadDirection" flags="235" default-value="GST_PAD_UNKNOWN"/>
+    <property name="presence" type="GstPadPresence" flags="235" default-value="GST_PAD_ALWAYS"/>
+    <property name="caps" type="GstCaps" flags="235" default-value="NULL"/>
     <property name="gtype" type="GType" flags="235"/>
     <signal name="pad-created" return="void" when="last">
       <param type="GstPad"/>
     </signal>
   </class>
   <class name="GstPad" get-type="gst_pad_get_type" parents="GstObject,GInitiallyUnowned,GObject">
-    <property name="caps" type="GstCaps" flags="225"/>
-    <property name="direction" type="GstPadDirection" flags="235"/>
-    <property name="template" type="GstPadTemplate" flags="227"/>
-    <property name="offset" type="gint64" flags="227"/>
+    <property name="caps" type="GstCaps" flags="225" default-value="NULL"/>
+    <property name="direction" type="GstPadDirection" flags="235" default-value="GST_PAD_UNKNOWN"/>
+    <property name="template" type="GstPadTemplate" flags="227" default-value="NULL"/>
+    <property name="offset" type="gint64" flags="227" default-value="0"/>
     <signal name="linked" return="void" when="last">
       <param type="GstPad"/>
     </signal>
@@ -764,7 +764,7 @@
     </signal>
   </class>
   <class name="GstBus" get-type="gst_bus_get_type" parents="GstObject,GInitiallyUnowned,GObject">
-    <property name="enable-async" type="gboolean" flags="234"/>
+    <property name="enable-async" type="gboolean" flags="234" default-value="TRUE"/>
     <signal name="message" return="void" when="last" detailed="1">
       <param type="GstMessage"/>
     </signal>
@@ -793,8 +793,8 @@
   </class>
   <class name="GstBin" get-type="gst_bin_get_type" parents="GstElement,GstObject,GInitiallyUnowned,GObject">
     <implements name="GstChildProxy"/>
-    <property name="async-handling" type="gboolean" flags="227"/>
-    <property name="message-forward" type="gboolean" flags="227"/>
+    <property name="async-handling" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="message-forward" type="gboolean" flags="227" default-value="FALSE"/>
     <signal name="element-added" return="void" when="first">
       <param type="GstElement"/>
     </signal>
@@ -835,7 +835,7 @@
     </signal>
   </class>
   <class name="GstDeviceMonitor" get-type="gst_device_monitor_get_type" parents="GstObject,GInitiallyUnowned,GObject">
-    <property name="show-all" type="gboolean" flags="227"/>
+    <property name="show-all" type="gboolean" flags="227" default-value="FALSE"/>
   </class>
   <class name="GstDynamicTypeFactory" get-type="gst_dynamic_type_factory_get_type" parents="GstPluginFeature,GstObject,GInitiallyUnowned,GObject">
   </class>
@@ -867,9 +867,9 @@
   </fundamental>
   <class name="GstPipeline" get-type="gst_pipeline_get_type" parents="GstBin,GstElement,GstObject,GInitiallyUnowned,GObject">
     <implements name="GstChildProxy"/>
-    <property name="delay" type="guint64" flags="227"/>
-    <property name="auto-flush-bus" type="gboolean" flags="227"/>
-    <property name="latency" type="guint64" flags="227"/>
+    <property name="delay" type="guint64" flags="227" default-value="0"/>
+    <property name="auto-flush-bus" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="latency" type="guint64" flags="227" default-value="18446744073709551615"/>
   </class>
   <interface name="GstPreset" get-type="gst_preset_get_type">
   </interface>
@@ -883,7 +883,7 @@
   </class>
   <boxed name="GstPromise" get-type="gst_promise_get_type"/>
   <class name="GstSystemClock" get-type="gst_system_clock_get_type" parents="GstClock,GstObject,GInitiallyUnowned,GObject">
-    <property name="clock-type" type="GstClockType" flags="227"/>
+    <property name="clock-type" type="GstClockType" flags="227" default-value="GST_CLOCK_TYPE_MONOTONIC"/>
   </class>
   <interface name="GstTagSetter" get-type="gst_tag_setter_get_type">
     <prerequisite name="GstElement"/>
@@ -892,7 +892,7 @@
     <prerequisite name="GstElement"/>
   </interface>
   <class name="GstTracer" get-type="gst_tracer_get_type" parents="GstObject,GInitiallyUnowned,GObject" abstract="1">
-    <property name="params" type="gchararray" flags="231"/>
+    <property name="params" type="gchararray" flags="231" default-value="NULL"/>
   </class>
   <class name="GstTracerFactory" get-type="gst_tracer_factory_get_type" parents="GstPluginFeature,GstObject,GInitiallyUnowned,GObject">
   </class>

@@ -189,18 +189,18 @@
   <boxed name="GstAudioConverter" get-type="gst_audio_converter_get_type"/>
   <boxed name="GstAudioStreamAlign" get-type="gst_audio_stream_align_get_type"/>
   <class name="GstAudioAggregatorPad" get-type="gst_audio_aggregator_pad_get_type" parents="GstAggregatorPad,GstPad,GstObject,GInitiallyUnowned,GObject">
-    <property name="qos-messages" type="gboolean" flags="227"/>
+    <property name="qos-messages" type="gboolean" flags="227" default-value="FALSE"/>
   </class>
   <class name="GstAudioAggregatorConvertPad" get-type="gst_audio_aggregator_convert_pad_get_type" parents="GstAudioAggregatorPad,GstAggregatorPad,GstPad,GstObject,GInitiallyUnowned,GObject">
     <property name="converter-config" type="GstStructure" flags="227"/>
   </class>
   <class name="GstAudioAggregator" get-type="gst_audio_aggregator_get_type" parents="GstAggregator,GstElement,GstObject,GInitiallyUnowned,GObject" abstract="1">
-    <property name="output-buffer-duration" type="guint64" flags="227"/>
-    <property name="alignment-threshold" type="guint64" flags="227"/>
-    <property name="discont-wait" type="guint64" flags="4323"/>
-    <property name="output-buffer-duration-fraction" type="GstFraction" flags="1251"/>
-    <property name="ignore-inactive-pads" type="gboolean" flags="227"/>
-    <property name="force-live" type="gboolean" flags="235"/>
+    <property name="output-buffer-duration" type="guint64" flags="227" default-value="10000000"/>
+    <property name="alignment-threshold" type="guint64" flags="227" default-value="40000000"/>
+    <property name="discont-wait" type="guint64" flags="4323" default-value="1000000000"/>
+    <property name="output-buffer-duration-fraction" type="GstFraction" flags="1251" default-value="1/100"/>
+    <property name="ignore-inactive-pads" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="force-live" type="gboolean" flags="235" default-value="FALSE"/>
   </class>
   <class name="GstAudioRingBuffer" get-type="gst_audio_ring_buffer_get_type" parents="GstObject,GInitiallyUnowned,GObject" abstract="1">
   </class>
@@ -210,47 +210,47 @@
   </class>
   <class name="GstAudioCdSrc" get-type="gst_audio_cd_src_get_type" parents="GstPushSrc,GstBaseSrc,GstElement,GstObject,GInitiallyUnowned,GObject">
     <implements name="GstURIHandler"/>
-    <property name="mode" type="GstAudioCdSrcMode" flags="227"/>
-    <property name="device" type="gchararray" flags="227"/>
-    <property name="track" type="guint" flags="227"/>
+    <property name="mode" type="GstAudioCdSrcMode" flags="227" default-value="GST_AUDIO_CD_SRC_MODE_NORMAL"/>
+    <property name="device" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="track" type="guint" flags="227" default-value="1"/>
   </class>
   <class name="GstAudioDecoder" get-type="gst_audio_decoder_get_type" parents="GstElement,GstObject,GInitiallyUnowned,GObject" abstract="1">
-    <property name="min-latency" type="gint64" flags="227"/>
-    <property name="tolerance" type="gint64" flags="227"/>
-    <property name="plc" type="gboolean" flags="227"/>
-    <property name="max-errors" type="gint" flags="227"/>
+    <property name="min-latency" type="gint64" flags="227" default-value="0"/>
+    <property name="tolerance" type="gint64" flags="227" default-value="0"/>
+    <property name="plc" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="max-errors" type="gint" flags="227" default-value="-1"/>
   </class>
   <class name="GstAudioEncoder" get-type="gst_audio_encoder_get_type" parents="GstElement,GstObject,GInitiallyUnowned,GObject" abstract="1">
     <implements name="GstPreset"/>
-    <property name="perfect-timestamp" type="gboolean" flags="227"/>
-    <property name="mark-granule" type="gboolean" flags="225"/>
-    <property name="hard-resync" type="gboolean" flags="227"/>
-    <property name="tolerance" type="gint64" flags="227"/>
+    <property name="perfect-timestamp" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="mark-granule" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="hard-resync" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="tolerance" type="gint64" flags="227" default-value="40000000"/>
   </class>
   <class name="GstAudioBaseSink" get-type="gst_audio_base_sink_get_type" parents="GstBaseSink,GstElement,GstObject,GInitiallyUnowned,GObject">
-    <property name="buffer-time" type="gint64" flags="227"/>
-    <property name="latency-time" type="gint64" flags="227"/>
-    <property name="provide-clock" type="gboolean" flags="227"/>
-    <property name="slave-method" type="GstAudioBaseSinkSlaveMethod" flags="227"/>
-    <property name="can-activate-pull" type="gboolean" flags="227"/>
-    <property name="alignment-threshold" type="guint64" flags="227"/>
-    <property name="drift-tolerance" type="gint64" flags="227"/>
-    <property name="discont-wait" type="guint64" flags="227"/>
+    <property name="buffer-time" type="gint64" flags="227" default-value="200000"/>
+    <property name="latency-time" type="gint64" flags="227" default-value="10000"/>
+    <property name="provide-clock" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="slave-method" type="GstAudioBaseSinkSlaveMethod" flags="227" default-value="GST_AUDIO_BASE_SINK_SLAVE_SKEW"/>
+    <property name="can-activate-pull" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="alignment-threshold" type="guint64" flags="227" default-value="40000000"/>
+    <property name="drift-tolerance" type="gint64" flags="227" default-value="40000"/>
+    <property name="discont-wait" type="guint64" flags="227" default-value="1000000000"/>
   </class>
   <class name="GstAudioBaseSrc" get-type="gst_audio_base_src_get_type" parents="GstPushSrc,GstBaseSrc,GstElement,GstObject,GInitiallyUnowned,GObject">
-    <property name="buffer-time" type="gint64" flags="227"/>
-    <property name="latency-time" type="gint64" flags="227"/>
-    <property name="actual-buffer-time" type="gint64" flags="225"/>
-    <property name="actual-latency-time" type="gint64" flags="225"/>
-    <property name="provide-clock" type="gboolean" flags="227"/>
-    <property name="slave-method" type="GstAudioBaseSrcSlaveMethod" flags="227"/>
+    <property name="buffer-time" type="gint64" flags="227" default-value="200000"/>
+    <property name="latency-time" type="gint64" flags="227" default-value="10000"/>
+    <property name="actual-buffer-time" type="gint64" flags="225" default-value="-1"/>
+    <property name="actual-latency-time" type="gint64" flags="225" default-value="-1"/>
+    <property name="provide-clock" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="slave-method" type="GstAudioBaseSrcSlaveMethod" flags="227" default-value="GST_AUDIO_BASE_SRC_SLAVE_SKEW"/>
   </class>
   <class name="GstAudioSink" get-type="gst_audio_sink_get_type" parents="GstAudioBaseSink,GstBaseSink,GstElement,GstObject,GInitiallyUnowned,GObject">
   </class>
   <class name="GstAudioSrc" get-type="gst_audio_src_get_type" parents="GstAudioBaseSrc,GstPushSrc,GstBaseSrc,GstElement,GstObject,GInitiallyUnowned,GObject">
   </class>
   <interface name="GstStreamVolume" get-type="gst_stream_volume_get_type">
-    <property name="mute" type="gboolean" flags="227"/>
-    <property name="volume" type="gdouble" flags="227"/>
+    <property name="mute" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="volume" type="gdouble" flags="227" default-value="1.000000"/>
   </interface>
 </dump>

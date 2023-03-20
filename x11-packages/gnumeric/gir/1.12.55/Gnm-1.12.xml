@@ -13,21 +13,21 @@
     <implements name="GODataCacheSource"/>
     <property name="src-sheet" type="GnmSheet" flags="227"/>
     <property name="src-range" type="GnmRange" flags="227"/>
-    <property name="src-name" type="gchararray" flags="227"/>
+    <property name="src-name" type="gchararray" flags="227" default-value="NULL"/>
   </class>
   <class name="GnmSheetSlicer" get-type="gnm_sheet_slicer_get_type" parents="GODataSlicer,GObject">
     <property name="sheet" type="GnmSheet" flags="227"/>
     <property name="range" type="GnmRange" flags="227"/>
-    <property name="first-header-row" type="guint" flags="227"/>
-    <property name="first-data-col" type="guint" flags="227"/>
-    <property name="first-data-row" type="guint" flags="227"/>
-    <property name="show-headers-col" type="gboolean" flags="227"/>
-    <property name="show-headers-row" type="gboolean" flags="227"/>
-    <property name="show-stripes-col" type="gboolean" flags="227"/>
-    <property name="show-stripes-row" type="gboolean" flags="227"/>
-    <property name="show-last-col" type="gboolean" flags="227"/>
-    <property name="show-last-row" type="gboolean" flags="227"/>
-    <property name="layout" type="GnmSheetSlicerLayout" flags="227"/>
+    <property name="first-header-row" type="guint" flags="227" default-value="0"/>
+    <property name="first-data-col" type="guint" flags="227" default-value="0"/>
+    <property name="first-data-row" type="guint" flags="227" default-value="0"/>
+    <property name="show-headers-col" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="show-headers-row" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="show-stripes-col" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="show-stripes-row" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="show-last-col" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="show-last-row" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="layout" type="GnmSheetSlicerLayout" flags="227" default-value="GSS_LAYOUT_XL_OUTLINE"/>
   </class>
   <enum name="GnmSheetSlicerLayout" get-type="gnm_sheet_slicer_layout_get_type">
     <member name="GSS_LAYOUT_XL_OUTLINE" nick="xl-outline" value="0"/>
@@ -39,7 +39,7 @@
     <member name="GNM_SO_ANCHOR_ABSOLUTE" nick="absolute" value="2"/>
   </enum>  <boxed name="SheetObjectAnchor" get-type="sheet_object_anchor_get_type"/>
   <class name="SheetObject" get-type="sheet_object_get_type" parents="GObject">
-    <property name="name" type="gchararray" flags="227"/>
+    <property name="name" type="gchararray" flags="227" default-value="NULL"/>
     <signal name="bounds-changed" return="void" when="last">
     </signal>
     <signal name="unrealized" return="void" when="last">
@@ -68,16 +68,16 @@
     <implements name="GtkScrollable"/>
   </class>
   <class name="GnmPreviewGrid" get-type="gnm_preview_grid_get_type" parents="GocGroup,GocItem,GObject">
-    <property name="render-gridlines" type="gboolean" flags="226"/>
-    <property name="default-col-width" type="guint" flags="226"/>
-    <property name="default-row-height" type="guint" flags="226"/>
+    <property name="render-gridlines" type="gboolean" flags="226" default-value="FALSE"/>
+    <property name="default-col-width" type="guint" flags="226" default-value="0"/>
+    <property name="default-row-height" type="guint" flags="226" default-value="0"/>
     <property name="default-style" type="GnmStyle" flags="226"/>
     <property name="default-value" type="GnmValue" flags="226"/>
   </class>
   <class name="GnmApp" get-type="gnm_app_get_type" parents="GObject">
     <property name="file-history-list" type="gpointer" flags="225"/>
-    <property name="shutting-down" type="gboolean" flags="227"/>
-    <property name="initial-open-complete" type="gboolean" flags="227"/>
+    <property name="shutting-down" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="initial-open-complete" type="gboolean" flags="227" default-value="FALSE"/>
     <signal name="workbook-added" return="void" when="last">
       <param type="Workbook"/>
     </signal>
@@ -149,49 +149,49 @@
     <member name="GNM_SHEET_VISIBILITY_HIDDEN" nick="hidden" value="1"/>
     <member name="GNM_SHEET_VISIBILITY_VERY_HIDDEN" nick="very-hidden" value="2"/>
   </enum>  <class name="GnmSheet" get-type="gnm_sheet_get_type" parents="GObject">
-    <property name="sheet-type" type="GnmSheetType" flags="235"/>
+    <property name="sheet-type" type="GnmSheetType" flags="235" default-value="GNM_SHEET_DATA"/>
     <property name="workbook" type="Workbook" flags="235"/>
-    <property name="name" type="gchararray" flags="227"/>
-    <property name="text-is-rtl" type="gboolean" flags="227"/>
-    <property name="visibility" type="GnmSheetVisibility" flags="227"/>
-    <property name="display-formulas" type="gboolean" flags="227"/>
-    <property name="display-zeros" type="gboolean" flags="227"/>
-    <property name="display-grid" type="gboolean" flags="227"/>
-    <property name="display-column-header" type="gboolean" flags="227"/>
-    <property name="display-row-header" type="gboolean" flags="227"/>
-    <property name="display-outlines" type="gboolean" flags="227"/>
-    <property name="display-outlines-below" type="gboolean" flags="227"/>
-    <property name="display-outlines-right" type="gboolean" flags="227"/>
-    <property name="protected" type="gboolean" flags="227"/>
-    <property name="protected-allow-edit-objects" type="gboolean" flags="227"/>
-    <property name="protected-allow-edit-scenarios" type="gboolean" flags="227"/>
-    <property name="protected-allow-cell-formatting" type="gboolean" flags="227"/>
-    <property name="protected-allow-column-formatting" type="gboolean" flags="227"/>
-    <property name="protected-allow-row-formatting" type="gboolean" flags="227"/>
-    <property name="protected-allow-insert-columns" type="gboolean" flags="227"/>
-    <property name="protected-allow-insert-rows" type="gboolean" flags="227"/>
-    <property name="protected-allow-insert-hyperlinks" type="gboolean" flags="227"/>
-    <property name="protected-allow-delete-columns" type="gboolean" flags="227"/>
-    <property name="protected-allow-delete-rows" type="gboolean" flags="227"/>
-    <property name="protected-allow-select-locked-cells" type="gboolean" flags="227"/>
-    <property name="protected-allow-sort-ranges" type="gboolean" flags="227"/>
-    <property name="protected-allow-edit-auto-filters" type="gboolean" flags="227"/>
-    <property name="protected-allow-edit-pivottable" type="gboolean" flags="227"/>
-    <property name="protected-allow-select-unlocked-cells" type="gboolean" flags="227"/>
+    <property name="name" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="text-is-rtl" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="visibility" type="GnmSheetVisibility" flags="227" default-value="GNM_SHEET_VISIBILITY_VISIBLE"/>
+    <property name="display-formulas" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="display-zeros" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="display-grid" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="display-column-header" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="display-row-header" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="display-outlines" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="display-outlines-below" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="display-outlines-right" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="protected" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="protected-allow-edit-objects" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="protected-allow-edit-scenarios" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="protected-allow-cell-formatting" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="protected-allow-column-formatting" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="protected-allow-row-formatting" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="protected-allow-insert-columns" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="protected-allow-insert-rows" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="protected-allow-insert-hyperlinks" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="protected-allow-delete-columns" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="protected-allow-delete-rows" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="protected-allow-select-locked-cells" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="protected-allow-sort-ranges" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="protected-allow-edit-auto-filters" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="protected-allow-edit-pivottable" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="protected-allow-select-unlocked-cells" type="gboolean" flags="227" default-value="TRUE"/>
     <property name="conventions" type="GnmConventions" flags="227"/>
-    <property name="use-r1c1" type="gboolean" flags="227"/>
+    <property name="use-r1c1" type="gboolean" flags="227" default-value="FALSE"/>
     <property name="tab-foreground" type="GnmColor" flags="227"/>
     <property name="tab-background" type="GnmColor" flags="227"/>
-    <property name="zoom-factor" type="gdouble" flags="231"/>
-    <property name="columns" type="gint" flags="235"/>
-    <property name="rows" type="gint" flags="235"/>
+    <property name="zoom-factor" type="gdouble" flags="231" default-value="1.000000"/>
+    <property name="columns" type="gint" flags="235" default-value="256"/>
+    <property name="rows" type="gint" flags="235" default-value="65536"/>
     <signal name="detached-from-workbook" return="void" when="last">
       <param type="Workbook"/>
     </signal>
   </class>
   <class name="Workbook" get-type="workbook_get_type" parents="GODoc,GObject">
-    <property name="recalc-mode" type="gboolean" flags="227"/>
-    <property name="being-loaded" type="gboolean" flags="227"/>
+    <property name="recalc-mode" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="being-loaded" type="gboolean" flags="227" default-value="TRUE"/>
     <signal name="sheet-order-changed" return="void" when="last">
     </signal>
     <signal name="sheet-added" return="void" when="last">
@@ -211,9 +211,9 @@
   <boxed name="GnmFT" get-type="gnm_ft_get_type"/>
   <boxed name="GnmFuncGroup" get-type="gnm_func_group_get_type"/>
   <class name="GnmFunc" get-type="gnm_func_get_type" parents="GObject">
-    <property name="name" type="gchararray" flags="235"/>
-    <property name="translation-domain" type="gchararray" flags="227"/>
-    <property name="in-use" type="gboolean" flags="225"/>
+    <property name="name" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="translation-domain" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="in-use" type="gboolean" flags="225" default-value="FALSE"/>
     <signal name="load-stub" return="void" when="last">
     </signal>
     <signal name="link-dep" return="gint" when="last">
@@ -268,10 +268,10 @@
     <implements name="GtkOrientable"/>
     <implements name="GtkCellEditable"/>
     <implements name="GogDataEditor"/>
-    <property name="update-policy" type="GnmUpdateType" flags="227"/>
-    <property name="with-icon" type="gboolean" flags="227"/>
-    <property name="text" type="gchararray" flags="227"/>
-    <property name="flags" type="guint" flags="227"/>
+    <property name="update-policy" type="GnmUpdateType" flags="227" default-value="GNM_UPDATE_CONTINUOUS"/>
+    <property name="with-icon" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="text" type="gchararray" flags="227" default-value=""/>
+    <property name="flags" type="guint" flags="227" default-value="0"/>
     <property name="scg" type="SheetControlGUI" flags="227"/>
     <property name="wbcg" type="WBCGtk" flags="227"/>
     <property name="constant-format" type="GOFormat" flags="227"/>
@@ -290,8 +290,8 @@
   </enum>  <class name="WBCGtk" get-type="wbc_gtk_get_type" parents="WorkbookControl,GODocControl,GObject">
     <implements name="GOCmdContext"/>
     <implements name="GogDataAllocator"/>
-    <property name="autosave-prompt" type="gboolean" flags="227"/>
-    <property name="autosave-time" type="gint" flags="227"/>
+    <property name="autosave-prompt" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="autosave-time" type="gint" flags="227" default-value="0"/>
     <signal name="markup-changed" return="void" when="last">
     </signal>
   </class>
@@ -309,7 +309,7 @@
   </enum>  <boxed name="GnmSolverConstraint" get-type="gnm_solver_constraint_get_type"/>
   <class name="GnmSolverParameters" get-type="gnm_solver_param_get_type" parents="GObject">
     <property name="sheet" type="GnmSheet" flags="235"/>
-    <property name="problem-type" type="GnmSolverProblemType" flags="227"/>
+    <property name="problem-type" type="GnmSolverProblemType" flags="227" default-value="GNM_SOLVER_MAXIMIZE"/>
   </class>
   <class name="GnmSolverResult" get-type="gnm_solver_result_get_type" parents="GObject">
   </class>
@@ -317,14 +317,14 @@
     <property name="solver" type="GnmSolver" flags="235"/>
   </class>
   <class name="GnmSolver" get-type="gnm_solver_get_type" parents="GObject">
-    <property name="status" type="GnmSolverStatus" flags="227"/>
-    <property name="reason" type="gchararray" flags="227"/>
+    <property name="status" type="GnmSolverStatus" flags="227" default-value="GNM_SOLVER_STATUS_READY"/>
+    <property name="reason" type="gchararray" flags="227" default-value="NULL"/>
     <property name="params" type="GnmSolverParameters" flags="235"/>
     <property name="result" type="GnmSolverResult" flags="227"/>
     <property name="sensitivity" type="GnmSolverSensitivity" flags="227"/>
-    <property name="starttime" type="gdouble" flags="227"/>
-    <property name="endtime" type="gdouble" flags="227"/>
-    <property name="flip-sign" type="gboolean" flags="227"/>
+    <property name="starttime" type="gdouble" flags="227" default-value="-1.000000"/>
+    <property name="endtime" type="gdouble" flags="227" default-value="-1.000000"/>
+    <property name="flip-sign" type="gboolean" flags="227" default-value="FALSE"/>
     <signal name="prepare" return="gboolean" when="last">
       <param type="GObject"/>
       <param type="gpointer"/>
@@ -348,7 +348,7 @@
     </signal>
   </class>
   <class name="GnmSolverIteratorCompound" get-type="gnm_solver_iterator_compound_get_type" parents="GnmSolverIterator,GObject">
-    <property name="cycles" type="guint" flags="227"/>
+    <property name="cycles" type="guint" flags="227" default-value="4294967295"/>
   </class>
   <class name="GnmIterSolver" get-type="gnm_iter_solver_get_type" parents="GnmSolver,GObject">
   </class>
@@ -365,8 +365,8 @@
   </class>
   <class name="GnmSOFilled" get-type="gnm_so_filled_get_type" parents="SheetObject,GObject">
     <property name="style" type="GOStyle" flags="227"/>
-    <property name="is-oval" type="gboolean" flags="235"/>
-    <property name="text" type="gchararray" flags="227"/>
+    <property name="is-oval" type="gboolean" flags="235" default-value="FALSE"/>
+    <property name="text" type="gchararray" flags="227" default-value="NULL"/>
     <property name="markup" type="PangoAttrList" flags="227"/>
     <property name="document" type="GODoc" flags="225"/>
   </class>
@@ -378,10 +378,10 @@
   <class name="GnmSOPath" get-type="gnm_so_path_get_type" parents="SheetObject,GObject">
     <property name="style" type="GOStyle" flags="227"/>
     <property name="path" type="GOPath" flags="227"/>
-    <property name="text" type="gchararray" flags="227"/>
+    <property name="text" type="gchararray" flags="227" default-value="NULL"/>
     <property name="markup" type="PangoAttrList" flags="227"/>
     <property name="paths" type="GPtrArray" flags="227"/>
-    <property name="viewbox" type="gchararray" flags="225"/>
+    <property name="viewbox" type="gchararray" flags="225" default-value="NULL"/>
   </class>
   <class name="GnmSOPolygon" get-type="gnm_so_polygon_get_type" parents="SheetObject,GObject">
     <property name="style" type="GOStyle" flags="227"/>
@@ -396,10 +396,10 @@
     <member name="GNM_STF_FORMAT_RAW" nick="raw" value="1"/>
     <member name="GNM_STF_FORMAT_PRESERVE" nick="preserve" value="2"/>
   </enum>  <class name="GnmStfExport" get-type="gnm_stf_export_get_type" parents="GsfOutputCsv,GsfOutput,GObject">
-    <property name="charset" type="gchararray" flags="227"/>
-    <property name="locale" type="gchararray" flags="227"/>
-    <property name="transliterate-mode" type="GnmStfTransliterateMode" flags="227"/>
-    <property name="format" type="GnmStfFormatMode" flags="227"/>
+    <property name="charset" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="locale" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="transliterate-mode" type="GnmStfTransliterateMode" flags="227" default-value="GNM_STF_TRANSLITERATE_MODE_ESCAPE"/>
+    <property name="format" type="GnmStfFormatMode" flags="227" default-value="GNM_STF_FORMAT_AUTO"/>
   </class>
   <class name="GnmHLink" get-type="gnm_hlink_get_type" parents="GObject" abstract="1">
     <property name="sheet" type="GnmSheet" flags="234"/>
@@ -416,13 +416,13 @@
   </class>
   <class name="GnmItemBar" get-type="gnm_item_bar_get_type" parents="GocItem,GObject">
     <property name="pane" type="GnmPane" flags="226"/>
-    <property name="IsColHeader" type="gboolean" flags="226"/>
+    <property name="IsColHeader" type="gboolean" flags="226" default-value="FALSE"/>
   </class>
   <class name="GnmItemCursor" get-type="gnm_item_cursor_get_type" parents="GocItem,GObject">
     <property name="SheetControlGUI" type="SheetControlGUI" flags="226"/>
-    <property name="style" type="gint" flags="226"/>
-    <property name="button" type="gint" flags="226"/>
-    <property name="color" type="guint" flags="226"/>
+    <property name="style" type="gint" flags="226" default-value="0"/>
+    <property name="button" type="gint" flags="226" default-value="0"/>
+    <property name="color" type="guint" flags="226" default-value="255"/>
   </class>
   <class name="GnmItemEdit" get-type="gnm_item_edit_get_type" parents="GocItem,GObject">
     <property name="SheetControlGUI" type="SheetControlGUI" flags="226"/>
@@ -461,20 +461,20 @@
     <member name="GNM_SRS_SHEET" nick="sheet" value="1"/>
     <member name="GNM_SRS_RANGE" nick="range" value="2"/>
   </enum>  <class name="GnmSearchReplace" get-type="gnm_search_replace_get_type" parents="GOSearchReplace,GObject">
-    <property name="is-number" type="gboolean" flags="227"/>
-    <property name="search-strings" type="gboolean" flags="227"/>
-    <property name="search-other-values" type="gboolean" flags="227"/>
-    <property name="search-expressions" type="gboolean" flags="227"/>
-    <property name="search-expression-results" type="gboolean" flags="227"/>
-    <property name="search-comments" type="gboolean" flags="227"/>
-    <property name="search-scripts" type="gboolean" flags="227"/>
-    <property name="invert" type="gboolean" flags="227"/>
-    <property name="by-row" type="gboolean" flags="227"/>
-    <property name="query" type="gboolean" flags="227"/>
-    <property name="replace-keep-strings" type="gboolean" flags="227"/>
+    <property name="is-number" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="search-strings" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="search-other-values" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="search-expressions" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="search-expression-results" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="search-comments" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="search-scripts" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="invert" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="by-row" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="query" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="replace-keep-strings" type="gboolean" flags="227" default-value="FALSE"/>
     <property name="sheet" type="GnmSheet" flags="227"/>
-    <property name="scope" type="GnmSearchReplaceScope" flags="227"/>
-    <property name="range-text" type="gchararray" flags="227"/>
+    <property name="scope" type="GnmSearchReplaceScope" flags="227" default-value="GNM_SRS_SHEET"/>
+    <property name="range-text" type="gchararray" flags="227" default-value="NULL"/>
   </class>
   <class name="SheetControl" get-type="sheet_control_get_type" parents="GObject">
   </class>
@@ -487,8 +487,8 @@
   <boxed name="GnmFilterCondition" get-type="gnm_filter_condition_get_type"/>
   <boxed name="GnmFilter" get-type="gnm_filter_get_type"/>
   <class name="GnmComment" get-type="cell_comment_get_type" parents="SheetObject,GObject">
-    <property name="text" type="gchararray" flags="227"/>
-    <property name="author" type="gchararray" flags="227"/>
+    <property name="text" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="author" type="gchararray" flags="227" default-value="NULL"/>
     <property name="markup" type="PangoAttrList" flags="227"/>
   </class>
   <class name="SheetObjectComponent" get-type="sheet_object_component_get_type" parents="SheetObject,GObject">
@@ -501,32 +501,32 @@
   </class>
   <class name="SheetObjectImage" get-type="sheet_object_image_get_type" parents="SheetObject,GObject">
     <implements name="SheetObjectImageable"/>
-    <property name="image-type" type="gchararray" flags="225"/>
+    <property name="image-type" type="gchararray" flags="225" default-value="NULL"/>
     <property name="image" type="GOImage" flags="225"/>
     <property name="pixbuf" type="GdkPixbuf" flags="225"/>
   </class>
   <class name="SheetObjectWidget" get-type="sheet_object_widget_get_type" parents="SheetObject,GObject">
   </class>
   <class name="SheetWidgetAdjustment" get-type="sheet_widget_adjustment_get_type" parents="SheetObjectWidget,SheetObject,GObject">
-    <property name="horizontal" type="gboolean" flags="227"/>
+    <property name="horizontal" type="gboolean" flags="227" default-value="FALSE"/>
   </class>
   <class name="SheetWidgetFrame" get-type="sheet_widget_frame_get_type" parents="SheetObjectWidget,SheetObject,GObject">
-    <property name="text" type="gchararray" flags="227"/>
+    <property name="text" type="gchararray" flags="227" default-value="NULL"/>
   </class>
   <class name="SheetWidgetButton" get-type="sheet_widget_button_get_type" parents="SheetObjectWidget,SheetObject,GObject">
-    <property name="text" type="gchararray" flags="227"/>
+    <property name="text" type="gchararray" flags="227" default-value="NULL"/>
     <property name="markup" type="PangoAttrList" flags="227"/>
   </class>
   <class name="SheetWidgetCheckbox" get-type="sheet_widget_checkbox_get_type" parents="SheetObjectWidget,SheetObject,GObject">
-    <property name="active" type="gboolean" flags="227"/>
-    <property name="text" type="gchararray" flags="227"/>
+    <property name="active" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="text" type="gchararray" flags="227" default-value="NULL"/>
     <property name="markup" type="PangoAttrList" flags="227"/>
   </class>
   <class name="SheetWidgetToggleButton" get-type="sheet_widget_toggle_button_get_type" parents="SheetWidgetCheckbox,SheetObjectWidget,SheetObject,GObject">
   </class>
   <class name="SheetWidgetRadioButton" get-type="sheet_widget_radio_button_get_type" parents="SheetObjectWidget,SheetObject,GObject">
-    <property name="active" type="gboolean" flags="227"/>
-    <property name="text" type="gchararray" flags="227"/>
+    <property name="active" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="text" type="gchararray" flags="227" default-value="NULL"/>
     <property name="markup" type="PangoAttrList" flags="227"/>
     <property name="value" type="GnmValue" flags="227"/>
   </class>
@@ -569,19 +569,19 @@
   </class>
   <class name="WorkbookView" get-type="workbook_view_get_type" parents="GoView,GObject">
     <property name="auto-expr-func" type="GnmFunc" flags="227"/>
-    <property name="auto-expr-descr" type="gchararray" flags="227"/>
-    <property name="auto-expr-max-precision" type="gboolean" flags="227"/>
+    <property name="auto-expr-descr" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="auto-expr-max-precision" type="gboolean" flags="227" default-value="FALSE"/>
     <property name="auto-expr-value" type="GnmValue" flags="227"/>
     <property name="auto-expr-eval-pos" type="GnmEvalPos" flags="226"/>
-    <property name="show-horizontal-scrollbar" type="gboolean" flags="227"/>
-    <property name="show-vertical-scrollbar" type="gboolean" flags="227"/>
-    <property name="show-notebook-tabs" type="gboolean" flags="227"/>
-    <property name="show-function-cell-markers" type="gboolean" flags="227"/>
-    <property name="show-extension-markers" type="gboolean" flags="227"/>
-    <property name="do-auto-completion" type="gboolean" flags="227"/>
-    <property name="protected" type="gboolean" flags="227"/>
-    <property name="preferred-width" type="gint" flags="227"/>
-    <property name="preferred-height" type="gint" flags="227"/>
+    <property name="show-horizontal-scrollbar" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="show-vertical-scrollbar" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="show-notebook-tabs" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="show-function-cell-markers" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="show-extension-markers" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="do-auto-completion" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="protected" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="preferred-width" type="gint" flags="227" default-value="1024"/>
+    <property name="preferred-height" type="gint" flags="227" default-value="768"/>
     <property name="workbook" type="Workbook" flags="235"/>
   </class>
   <boxed name="GnmScenarioItem" get-type="gnm_scenario_item_get_type"/>
@@ -602,12 +602,12 @@
     <implements name="GtkActionable"/>
     <implements name="GtkActivatable"/>
     <implements name="GtkFontChooser"/>
-    <property name="title" type="gchararray" flags="3"/>
-    <property name="font-name" type="gchararray" flags="3"/>
-    <property name="use-font" type="gboolean" flags="3"/>
-    <property name="use-size" type="gboolean" flags="3"/>
-    <property name="show-style" type="gboolean" flags="3"/>
-    <property name="show-size" type="gboolean" flags="3"/>
+    <property name="title" type="gchararray" flags="3" default-value="Pick a Font"/>
+    <property name="font-name" type="gchararray" flags="3" default-value="Sans 12"/>
+    <property name="use-font" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="use-size" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="show-style" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="show-size" type="gboolean" flags="3" default-value="TRUE"/>
     <property name="dialog-type" type="GType" flags="3"/>
     <signal name="font-set" return="void" when="first">
     </signal>
@@ -660,8 +660,8 @@
     <implements name="AtkImplementorIface"/>
     <implements name="GtkBuildable"/>
     <implements name="GtkOrientable"/>
-    <property name="text" type="gchararray" flags="227"/>
-    <property name="wrap" type="GtkWrapMode" flags="227"/>
+    <property name="text" type="gchararray" flags="227" default-value=""/>
+    <property name="wrap" type="GtkWrapMode" flags="227" default-value="GTK_WRAP_WORD"/>
     <property name="attributes" type="PangoAttrList" flags="227"/>
     <signal name="changed" return="void" when="last">
     </signal>

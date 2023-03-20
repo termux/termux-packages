@@ -4,24 +4,24 @@
   <boxed name="SoupMessageHeaders" get-type="soup_message_headers_get_type"/>
   <boxed name="SoupMultipart" get-type="soup_multipart_get_type"/>
   <class name="SoupMessage" get-type="soup_message_get_type" parents="GObject" final="1">
-    <property name="method" type="gchararray" flags="227"/>
+    <property name="method" type="gchararray" flags="227" default-value="GET"/>
     <property name="uri" type="GUri" flags="227"/>
-    <property name="http-version" type="SoupHTTPVersion" flags="225"/>
-    <property name="flags" type="SoupMessageFlags" flags="227"/>
-    <property name="status-code" type="guint" flags="225"/>
-    <property name="reason-phrase" type="gchararray" flags="225"/>
+    <property name="http-version" type="SoupHTTPVersion" flags="225" default-value="SOUP_HTTP_1_1"/>
+    <property name="flags" type="SoupMessageFlags" flags="227" default-value="0"/>
+    <property name="status-code" type="guint" flags="225" default-value="0"/>
+    <property name="reason-phrase" type="gchararray" flags="225" default-value="NULL"/>
     <property name="first-party" type="GUri" flags="227"/>
     <property name="request-headers" type="SoupMessageHeaders" flags="225"/>
     <property name="response-headers" type="SoupMessageHeaders" flags="225"/>
     <property name="tls-peer-certificate" type="GTlsCertificate" flags="225"/>
-    <property name="tls-peer-certificate-errors" type="GTlsCertificateFlags" flags="225"/>
-    <property name="tls-protocol-version" type="GTlsProtocolVersion" flags="225"/>
-    <property name="tls-ciphersuite-name" type="gchararray" flags="225"/>
+    <property name="tls-peer-certificate-errors" type="GTlsCertificateFlags" flags="225" default-value="G_TLS_CERTIFICATE_NO_FLAGS"/>
+    <property name="tls-protocol-version" type="GTlsProtocolVersion" flags="225" default-value="G_TLS_PROTOCOL_VERSION_UNKNOWN"/>
+    <property name="tls-ciphersuite-name" type="gchararray" flags="225" default-value="NULL"/>
     <property name="remote-address" type="GSocketAddress" flags="225"/>
-    <property name="priority" type="SoupMessagePriority" flags="227"/>
+    <property name="priority" type="SoupMessagePriority" flags="227" default-value="SOUP_MESSAGE_PRIORITY_NORMAL"/>
     <property name="site-for-cookies" type="GUri" flags="3"/>
-    <property name="is-top-level-navigation" type="gboolean" flags="3"/>
-    <property name="is-options-ping" type="gboolean" flags="227"/>
+    <property name="is-top-level-navigation" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="is-options-ping" type="gboolean" flags="227" default-value="FALSE"/>
     <signal name="wrote-headers" return="void" when="first">
     </signal>
     <signal name="wrote-body-data" return="void" when="first">
@@ -67,12 +67,12 @@
     </signal>
   </class>
   <class name="SoupAuth" get-type="soup_auth_get_type" parents="GObject" abstract="1">
-    <property name="scheme-name" type="gchararray" flags="225"/>
-    <property name="realm" type="gchararray" flags="227"/>
-    <property name="authority" type="gchararray" flags="227"/>
-    <property name="is-for-proxy" type="gboolean" flags="227"/>
-    <property name="is-authenticated" type="gboolean" flags="225"/>
-    <property name="is-cancelled" type="gboolean" flags="225"/>
+    <property name="scheme-name" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="realm" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="authority" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="is-for-proxy" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="is-authenticated" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="is-cancelled" type="gboolean" flags="225" default-value="FALSE"/>
   </class>
   <class name="SoupAuthBasic" get-type="soup_auth_basic_get_type" parents="SoupAuth,GObject" final="1">
   </class>
@@ -88,8 +88,8 @@
   <class name="SoupCache" get-type="soup_cache_get_type" parents="GObject">
     <implements name="SoupSessionFeature"/>
     <implements name="SoupContentProcessor"/>
-    <property name="cache-dir" type="gchararray" flags="235"/>
-    <property name="cache-type" type="SoupCacheType" flags="235"/>
+    <property name="cache-dir" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="cache-type" type="SoupCacheType" flags="235" default-value="SOUP_CACHE_SINGLE_USER"/>
   </class>
   <class name="SoupContentDecoder" get-type="soup_content_decoder_get_type" parents="GObject" final="1">
     <implements name="SoupSessionFeature"/>
@@ -102,8 +102,8 @@
   <boxed name="SoupCookie" get-type="soup_cookie_get_type"/>
   <class name="SoupCookieJar" get-type="soup_cookie_jar_get_type" parents="GObject">
     <implements name="SoupSessionFeature"/>
-    <property name="read-only" type="gboolean" flags="235"/>
-    <property name="accept-policy" type="SoupCookieJarAcceptPolicy" flags="227"/>
+    <property name="read-only" type="gboolean" flags="235" default-value="FALSE"/>
+    <property name="accept-policy" type="SoupCookieJarAcceptPolicy" flags="227" default-value="SOUP_COOKIE_JAR_ACCEPT_ALWAYS"/>
     <signal name="changed" return="void" when="first">
       <param type="SoupCookie"/>
       <param type="SoupCookie"/>
@@ -111,11 +111,11 @@
   </class>
   <class name="SoupCookieJarDB" get-type="soup_cookie_jar_db_get_type" parents="SoupCookieJar,GObject" final="1">
     <implements name="SoupSessionFeature"/>
-    <property name="filename" type="gchararray" flags="235"/>
+    <property name="filename" type="gchararray" flags="235" default-value="NULL"/>
   </class>
   <class name="SoupCookieJarText" get-type="soup_cookie_jar_text_get_type" parents="SoupCookieJar,GObject" final="1">
     <implements name="SoupSessionFeature"/>
-    <property name="filename" type="gchararray" flags="235"/>
+    <property name="filename" type="gchararray" flags="235" default-value="NULL"/>
   </class>
   <class name="SoupHSTSEnforcer" get-type="soup_hsts_enforcer_get_type" parents="GObject">
     <implements name="SoupSessionFeature"/>
@@ -126,12 +126,12 @@
   </class>
   <class name="SoupHSTSEnforcerDB" get-type="soup_hsts_enforcer_db_get_type" parents="SoupHSTSEnforcer,GObject" final="1">
     <implements name="SoupSessionFeature"/>
-    <property name="filename" type="gchararray" flags="235"/>
+    <property name="filename" type="gchararray" flags="235" default-value="NULL"/>
   </class>
   <boxed name="SoupHSTSPolicy" get-type="soup_hsts_policy_get_type"/>
   <class name="SoupAuthDomain" get-type="soup_auth_domain_get_type" parents="GObject" abstract="1">
-    <property name="realm" type="gchararray" flags="235"/>
-    <property name="proxy" type="gboolean" flags="235"/>
+    <property name="realm" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="proxy" type="gboolean" flags="235" default-value="FALSE"/>
     <property name="filter" type="gpointer" flags="227"/>
     <property name="filter-data" type="gpointer" flags="227"/>
     <property name="generic-auth-callback" type="gpointer" flags="227"/>
@@ -147,13 +147,13 @@
   </class>
   <class name="SoupWebsocketConnection" get-type="soup_websocket_connection_get_type" parents="GObject" final="1">
     <property name="io-stream" type="GIOStream" flags="235"/>
-    <property name="connection-type" type="SoupWebsocketConnectionType" flags="235"/>
+    <property name="connection-type" type="SoupWebsocketConnectionType" flags="235" default-value="SOUP_WEBSOCKET_CONNECTION_UNKNOWN"/>
     <property name="uri" type="GUri" flags="235"/>
-    <property name="origin" type="gchararray" flags="235"/>
-    <property name="protocol" type="gchararray" flags="235"/>
-    <property name="state" type="SoupWebsocketState" flags="225"/>
-    <property name="max-incoming-payload-size" type="guint64" flags="231"/>
-    <property name="keepalive-interval" type="guint" flags="231"/>
+    <property name="origin" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="protocol" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="state" type="SoupWebsocketState" flags="225" default-value="SOUP_WEBSOCKET_STATE_OPEN"/>
+    <property name="max-incoming-payload-size" type="guint64" flags="231" default-value="131072"/>
+    <property name="keepalive-interval" type="guint" flags="231" default-value="0"/>
     <property name="extensions" type="gpointer" flags="235"/>
     <signal name="message" return="void" when="first">
       <param type="gint"/>
@@ -173,9 +173,9 @@
   <class name="SoupServer" get-type="soup_server_get_type" parents="GObject">
     <property name="tls-certificate" type="GTlsCertificate" flags="231"/>
     <property name="tls-database" type="GTlsDatabase" flags="231"/>
-    <property name="tls-auth-mode" type="GTlsAuthenticationMode" flags="231"/>
-    <property name="raw-paths" type="gboolean" flags="235"/>
-    <property name="server-header" type="gchararray" flags="231"/>
+    <property name="tls-auth-mode" type="GTlsAuthenticationMode" flags="231" default-value="G_TLS_AUTHENTICATION_NONE"/>
+    <property name="raw-paths" type="gboolean" flags="235" default-value="FALSE"/>
+    <property name="server-header" type="gchararray" flags="231" default-value="NULL"/>
     <signal name="request-started" return="void" when="first">
       <param type="SoupServerMessage"/>
     </signal>
@@ -191,7 +191,7 @@
   </class>
   <class name="SoupServerMessage" get-type="soup_server_message_get_type" parents="GObject" final="1">
     <property name="tls-peer-certificate" type="GTlsCertificate" flags="225"/>
-    <property name="tls-peer-certificate-errors" type="GTlsCertificateFlags" flags="225"/>
+    <property name="tls-peer-certificate-errors" type="GTlsCertificateFlags" flags="225" default-value="G_TLS_CERTIFICATE_NO_FLAGS"/>
     <signal name="wrote-headers" return="void" when="last">
     </signal>
     <signal name="wrote-body-data" return="void" when="last">
@@ -231,8 +231,8 @@
   <class name="SoupLogger" get-type="soup_logger_get_type" parents="GObject" final="1">
     <implements name="SoupSessionFeature"/>
     <implements name="SoupContentProcessor"/>
-    <property name="level" type="SoupLoggerLogLevel" flags="227"/>
-    <property name="max-body-size" type="gint" flags="231"/>
+    <property name="level" type="SoupLoggerLogLevel" flags="227" default-value="SOUP_LOGGER_LOG_MINIMAL"/>
+    <property name="max-body-size" type="gint" flags="231" default-value="-1"/>
   </class>
   <boxed name="SoupMessageMetrics" get-type="soup_message_metrics_get_type"/>
   <class name="SoupMultipartInputStream" get-type="soup_multipart_input_stream_get_type" parents="GFilterInputStream,GInputStream,GObject" final="1">
@@ -241,15 +241,15 @@
   </class>
   <class name="SoupSession" get-type="soup_session_get_type" parents="GObject">
     <property name="proxy-resolver" type="GProxyResolver" flags="227"/>
-    <property name="max-conns" type="gint" flags="235"/>
-    <property name="max-conns-per-host" type="gint" flags="235"/>
+    <property name="max-conns" type="gint" flags="235" default-value="10"/>
+    <property name="max-conns-per-host" type="gint" flags="235" default-value="2"/>
     <property name="tls-database" type="GTlsDatabase" flags="227"/>
-    <property name="timeout" type="guint" flags="227"/>
-    <property name="user-agent" type="gchararray" flags="227"/>
-    <property name="accept-language" type="gchararray" flags="227"/>
-    <property name="accept-language-auto" type="gboolean" flags="227"/>
+    <property name="timeout" type="guint" flags="227" default-value="0"/>
+    <property name="user-agent" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="accept-language" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="accept-language-auto" type="gboolean" flags="227" default-value="FALSE"/>
     <property name="remote-connectable" type="GSocketConnectable" flags="235"/>
-    <property name="idle-timeout" type="guint" flags="227"/>
+    <property name="idle-timeout" type="guint" flags="227" default-value="60"/>
     <property name="local-address" type="GInetSocketAddress" flags="235"/>
     <property name="tls-interaction" type="GTlsInteraction" flags="227"/>
     <signal name="request-queued" return="void" when="last">

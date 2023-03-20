@@ -34,53 +34,53 @@
     <member name="Never" nick="never" value="1"/>
     <member name="Always" nick="always" value="2"/>
   </enum>  <class name="GeglConfig" get-type="gegl_config_get_type" parents="GObject">
-    <property name="quality" type="gdouble" flags="231"/>
-    <property name="tile-cache-size" type="guint64" flags="227"/>
-    <property name="chunk-size" type="gint" flags="231"/>
-    <property name="swap" type="gchararray" flags="227"/>
-    <property name="swap-compression" type="gchararray" flags="227"/>
-    <property name="tile-width" type="gint" flags="227"/>
-    <property name="tile-height" type="gint" flags="227"/>
-    <property name="threads" type="gint" flags="231"/>
-    <property name="use-opencl" type="gboolean" flags="231"/>
-    <property name="queue-size" type="gint" flags="227"/>
-    <property name="application-license" type="gchararray" flags="231"/>
-    <property name="mipmap-rendering" type="gboolean" flags="231"/>
+    <property name="quality" type="gdouble" flags="231" default-value="1.000000"/>
+    <property name="tile-cache-size" type="guint64" flags="227" default-value="536870912"/>
+    <property name="chunk-size" type="gint" flags="231" default-value="1048576"/>
+    <property name="swap" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="swap-compression" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="tile-width" type="gint" flags="227" default-value="128"/>
+    <property name="tile-height" type="gint" flags="227" default-value="128"/>
+    <property name="threads" type="gint" flags="231" default-value="8"/>
+    <property name="use-opencl" type="gboolean" flags="231" default-value="FALSE"/>
+    <property name="queue-size" type="gint" flags="227" default-value="52428800"/>
+    <property name="application-license" type="gchararray" flags="231" default-value=""/>
+    <property name="mipmap-rendering" type="gboolean" flags="231" default-value="FALSE"/>
   </class>
   <class name="GeglStats" get-type="gegl_stats_get_type" parents="GObject">
-    <property name="tile-cache-total" type="guint64" flags="225"/>
-    <property name="tile-cache-total-max" type="guint64" flags="225"/>
-    <property name="tile-cache-total-uncompressed" type="guint64" flags="225"/>
-    <property name="tile-cache-hits" type="gint" flags="225"/>
-    <property name="tile-cache-misses" type="gint" flags="225"/>
-    <property name="swap-total" type="guint64" flags="225"/>
-    <property name="swap-total-uncompressed" type="guint64" flags="225"/>
-    <property name="swap-file-size" type="guint64" flags="225"/>
-    <property name="swap-busy" type="gboolean" flags="225"/>
-    <property name="swap-queued-total" type="guint64" flags="225"/>
-    <property name="swap-queue-full" type="gboolean" flags="225"/>
-    <property name="swap-queue-stalls" type="gint" flags="225"/>
-    <property name="swap-reading" type="gboolean" flags="225"/>
-    <property name="swap-read-total" type="guint64" flags="225"/>
-    <property name="swap-writing" type="gboolean" flags="225"/>
-    <property name="swap-write-total" type="guint64" flags="225"/>
-    <property name="zoom-total" type="guint64" flags="225"/>
-    <property name="tile-alloc-total" type="guint64" flags="225"/>
-    <property name="scratch-total" type="guint64" flags="225"/>
-    <property name="assigned-threads" type="gint" flags="225"/>
-    <property name="active-threads" type="gint" flags="225"/>
+    <property name="tile-cache-total" type="guint64" flags="225" default-value="0"/>
+    <property name="tile-cache-total-max" type="guint64" flags="225" default-value="0"/>
+    <property name="tile-cache-total-uncompressed" type="guint64" flags="225" default-value="0"/>
+    <property name="tile-cache-hits" type="gint" flags="225" default-value="0"/>
+    <property name="tile-cache-misses" type="gint" flags="225" default-value="0"/>
+    <property name="swap-total" type="guint64" flags="225" default-value="0"/>
+    <property name="swap-total-uncompressed" type="guint64" flags="225" default-value="0"/>
+    <property name="swap-file-size" type="guint64" flags="225" default-value="0"/>
+    <property name="swap-busy" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="swap-queued-total" type="guint64" flags="225" default-value="0"/>
+    <property name="swap-queue-full" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="swap-queue-stalls" type="gint" flags="225" default-value="0"/>
+    <property name="swap-reading" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="swap-read-total" type="guint64" flags="225" default-value="0"/>
+    <property name="swap-writing" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="swap-write-total" type="guint64" flags="225" default-value="0"/>
+    <property name="zoom-total" type="guint64" flags="225" default-value="0"/>
+    <property name="tile-alloc-total" type="guint64" flags="225" default-value="0"/>
+    <property name="scratch-total" type="guint64" flags="225" default-value="0"/>
+    <property name="assigned-threads" type="gint" flags="225" default-value="0"/>
+    <property name="active-threads" type="gint" flags="225" default-value="0"/>
   </class>
   <class name="GeglOperation" get-type="gegl_operation_get_type" parents="GObject">
   </class>
   <class name="GeglNode" get-type="gegl_node_get_type" parents="GObject">
     <implements name="GeglVisitable"/>
-    <property name="operation" type="gchararray" flags="231"/>
+    <property name="operation" type="gchararray" flags="231" default-value=""/>
     <property name="gegl-operation" type="GeglOperation" flags="231"/>
-    <property name="name" type="gchararray" flags="231"/>
-    <property name="dont-cache" type="gboolean" flags="231"/>
-    <property name="cache-policy" type="GeglCachePolicy" flags="231"/>
-    <property name="use-opencl" type="gboolean" flags="231"/>
-    <property name="passthrough" type="gboolean" flags="231"/>
+    <property name="name" type="gchararray" flags="231" default-value=""/>
+    <property name="dont-cache" type="gboolean" flags="231" default-value="FALSE"/>
+    <property name="cache-policy" type="GeglCachePolicy" flags="231" default-value="Auto"/>
+    <property name="use-opencl" type="gboolean" flags="231" default-value="TRUE"/>
+    <property name="passthrough" type="gboolean" flags="231" default-value="FALSE"/>
     <signal name="invalidated" return="void" when="last" no-recurse="1" no-hooks="1">
       <param type="GeglRectangle"/>
     </signal>
@@ -93,8 +93,8 @@
   </class>
   <class name="GeglProcessor" get-type="gegl_processor_get_type" parents="GObject">
     <property name="node" type="GeglNode" flags="230"/>
-    <property name="chunksize" type="gint" flags="235"/>
-    <property name="progress" type="gdouble" flags="227"/>
+    <property name="chunksize" type="gint" flags="235" default-value="1048576"/>
+    <property name="progress" type="gdouble" flags="227" default-value="0.000000"/>
     <property name="rectangle" type="gpointer" flags="227"/>
   </class>
   <boxed name="GeglRandom" get-type="gegl_random_get_type"/>
@@ -121,30 +121,30 @@
     <member name="Nearest" nick="nearest" value="2"/>
   </enum>  <boxed name="GeglRectangle" get-type="gegl_rectangle_get_type"/>
   <class name="GeglBuffer" get-type="gegl_buffer_get_type" parents="GeglTileHandler,GeglTileSource,GObject">
-    <property name="x" type="gint" flags="231"/>
-    <property name="y" type="gint" flags="231"/>
-    <property name="width" type="gint" flags="231"/>
-    <property name="height" type="gint" flags="231"/>
-    <property name="shift-x" type="gint" flags="235"/>
-    <property name="shift-y" type="gint" flags="235"/>
-    <property name="abyss-x" type="gint" flags="235"/>
-    <property name="abyss-y" type="gint" flags="235"/>
-    <property name="abyss-width" type="gint" flags="235"/>
-    <property name="abyss-height" type="gint" flags="235"/>
-    <property name="tile-width" type="gint" flags="235"/>
-    <property name="tile-height" type="gint" flags="235"/>
+    <property name="x" type="gint" flags="231" default-value="0"/>
+    <property name="y" type="gint" flags="231" default-value="0"/>
+    <property name="width" type="gint" flags="231" default-value="-1"/>
+    <property name="height" type="gint" flags="231" default-value="-1"/>
+    <property name="shift-x" type="gint" flags="235" default-value="0"/>
+    <property name="shift-y" type="gint" flags="235" default-value="0"/>
+    <property name="abyss-x" type="gint" flags="235" default-value="0"/>
+    <property name="abyss-y" type="gint" flags="235" default-value="0"/>
+    <property name="abyss-width" type="gint" flags="235" default-value="0"/>
+    <property name="abyss-height" type="gint" flags="235" default-value="0"/>
+    <property name="tile-width" type="gint" flags="235" default-value="128"/>
+    <property name="tile-height" type="gint" flags="235" default-value="128"/>
     <property name="format" type="gpointer" flags="231"/>
-    <property name="px-size" type="gint" flags="225"/>
-    <property name="pixels" type="gint" flags="225"/>
-    <property name="path" type="gchararray" flags="235"/>
+    <property name="px-size" type="gint" flags="225" default-value="0"/>
+    <property name="pixels" type="gint" flags="225" default-value="0"/>
+    <property name="path" type="gchararray" flags="235" default-value="NULL"/>
     <property name="backend" type="GeglTileBackend" flags="235"/>
-    <property name="initialized" type="gboolean" flags="235"/>
+    <property name="initialized" type="gboolean" flags="235" default-value="TRUE"/>
     <signal name="changed" return="void" when="last" no-recurse="1" no-hooks="1">
       <param type="GeglRectangle"/>
     </signal>
   </class>
   <class name="GeglColor" get-type="gegl_color_get_type" parents="GObject">
-    <property name="string" type="gchararray" flags="227"/>
+    <property name="string" type="gchararray" flags="227" default-value=""/>
   </class>
   <fundamental name="GeglParamColor" get-type="gegl_param_color_get_type" instantiatable="1" parents="GParam">
   </fundamental>
@@ -164,19 +164,19 @@
   </interface>
   <class name="GeglMetadataStore" get-type="gegl_metadata_store_get_type" parents="GObject" abstract="1">
     <implements name="GeglMetadata"/>
-    <property name="resolution-unit" type="GeglResolutionUnit" flags="1073742051"/>
-    <property name="resolution-x" type="gdouble" flags="1073742051"/>
-    <property name="resolution-y" type="gdouble" flags="1073742051"/>
-    <property name="file-module-name" type="gchararray" flags="1073742049"/>
-    <property name="title" type="gchararray" flags="1073742051"/>
-    <property name="artist" type="gchararray" flags="1073742051"/>
-    <property name="description" type="gchararray" flags="1073742051"/>
-    <property name="copyright" type="gchararray" flags="1073742051"/>
-    <property name="disclaimer" type="gchararray" flags="1073742051"/>
-    <property name="warning" type="gchararray" flags="1073742051"/>
-    <property name="comment" type="gchararray" flags="1073742051"/>
-    <property name="software" type="gchararray" flags="1073742051"/>
-    <property name="source" type="gchararray" flags="1073742051"/>
+    <property name="resolution-unit" type="GeglResolutionUnit" flags="1073742051" default-value="GEGL_RESOLUTION_UNIT_DPI"/>
+    <property name="resolution-x" type="gdouble" flags="1073742051" default-value="300.000000"/>
+    <property name="resolution-y" type="gdouble" flags="1073742051" default-value="300.000000"/>
+    <property name="file-module-name" type="gchararray" flags="1073742049" default-value="NULL"/>
+    <property name="title" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="artist" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="description" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="copyright" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="disclaimer" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="warning" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="comment" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="software" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="source" type="gchararray" flags="1073742051" default-value="NULL"/>
     <property name="timestamp" type="GDateTime" flags="1073742051"/>
     <signal name="changed" return="void" when="last" detailed="1">
       <param type="GParam"/>
@@ -208,18 +208,18 @@
   <class name="GeglTileSource" get-type="gegl_tile_source_get_type" parents="GObject">
   </class>
   <class name="GeglTileBackend" get-type="gegl_tile_backend_get_type" parents="GeglTileSource,GObject">
-    <property name="tile-width" type="gint" flags="235"/>
-    <property name="tile-height" type="gint" flags="235"/>
-    <property name="px-size" type="gint" flags="225"/>
-    <property name="tile-size" type="gint" flags="225"/>
+    <property name="tile-width" type="gint" flags="235" default-value="0"/>
+    <property name="tile-height" type="gint" flags="235" default-value="0"/>
+    <property name="px-size" type="gint" flags="225" default-value="0"/>
+    <property name="tile-size" type="gint" flags="225" default-value="0"/>
     <property name="format" type="gpointer" flags="235"/>
-    <property name="flush-on-destroy" type="gboolean" flags="227"/>
+    <property name="flush-on-destroy" type="gboolean" flags="227" default-value="TRUE"/>
   </class>
   <class name="GeglTileHandler" get-type="gegl_tile_handler_get_type" parents="GeglTileSource,GObject">
     <property name="source" type="GObject" flags="231"/>
   </class>
   <class name="GeglAudioFragment" get-type="gegl_audio_fragment_get_type" parents="GObject">
-    <property name="string" type="gchararray" flags="227"/>
+    <property name="string" type="gchararray" flags="227" default-value=""/>
   </class>
   <fundamental name="GeglParamAudioFragment" get-type="gegl_param_audio_fragment_get_type" instantiatable="1" parents="GParam">
   </fundamental>

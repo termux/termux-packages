@@ -10,12 +10,12 @@
   <class name="ThunarxMenu" get-type="thunarx_menu_get_type" parents="GObject">
   </class>
   <class name="ThunarxMenuItem" get-type="thunarx_menu_item_get_type" parents="GObject">
-    <property name="name" type="gchararray" flags="11"/>
-    <property name="label" type="gchararray" flags="3"/>
-    <property name="tooltip" type="gchararray" flags="3"/>
-    <property name="icon" type="gchararray" flags="3"/>
-    <property name="sensitive" type="gboolean" flags="3"/>
-    <property name="priority" type="gboolean" flags="3"/>
+    <property name="name" type="gchararray" flags="11" default-value="NULL"/>
+    <property name="label" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="tooltip" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="icon" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="sensitive" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="priority" type="gboolean" flags="3" default-value="TRUE"/>
     <property name="menu" type="ThunarxMenu" flags="3"/>
     <signal name="activate" return="void" when="last">
     </signal>
@@ -27,7 +27,7 @@
   <class name="ThunarxPropertyPage" get-type="thunarx_property_page_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
     <implements name="AtkImplementorIface"/>
     <implements name="GtkBuildable"/>
-    <property name="label" type="gchararray" flags="3"/>
+    <property name="label" type="gchararray" flags="3" default-value="NULL"/>
     <property name="label-widget" type="GtkWidget" flags="3"/>
   </class>
   <interface name="ThunarxPropertyPageProvider" get-type="thunarx_property_page_provider_get_type">
@@ -35,14 +35,14 @@
   <class name="ThunarxProviderFactory" get-type="thunarx_provider_factory_get_type" parents="GObject">
   </class>
   <interface name="ThunarxProviderPlugin" get-type="thunarx_provider_plugin_get_type">
-    <property name="resident" type="gboolean" flags="3"/>
+    <property name="resident" type="gboolean" flags="3" default-value="FALSE"/>
   </interface>
   <class name="ThunarxRenamer" get-type="thunarx_renamer_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject" abstract="1">
     <implements name="AtkImplementorIface"/>
     <implements name="GtkBuildable"/>
     <implements name="GtkOrientable"/>
-    <property name="help-url" type="gchararray" flags="3"/>
-    <property name="name" type="gchararray" flags="11"/>
+    <property name="help-url" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="name" type="gchararray" flags="11" default-value="NULL"/>
     <signal name="changed" return="void" when="first">
     </signal>
   </class>

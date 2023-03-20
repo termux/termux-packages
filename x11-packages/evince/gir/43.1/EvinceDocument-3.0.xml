@@ -7,40 +7,40 @@
   <class name="EvRenderContext" get-type="ev_render_context_get_type" parents="GObject">
   </class>
   <class name="EvDocument" get-type="ev_document_get_type" parents="GObject" abstract="1">
-    <property name="modified" type="gboolean" flags="227"/>
+    <property name="modified" type="gboolean" flags="227" default-value="FALSE"/>
   </class>
   <boxed name="EvRectangle" get-type="ev_rectangle_get_type"/>
   <boxed name="EvSourceLink" get-type="ev_source_link_get_type"/>
   <class name="EvAttachment" get-type="ev_attachment_get_type" parents="GObject">
-    <property name="name" type="gchararray" flags="234"/>
-    <property name="description" type="gchararray" flags="234"/>
-    <property name="mtime" type="gulong" flags="234"/>
-    <property name="ctime" type="gulong" flags="234"/>
-    <property name="size" type="guint" flags="234"/>
+    <property name="name" type="gchararray" flags="234" default-value="NULL"/>
+    <property name="description" type="gchararray" flags="234" default-value="NULL"/>
+    <property name="mtime" type="gulong" flags="234" default-value="0"/>
+    <property name="ctime" type="gulong" flags="234" default-value="0"/>
+    <property name="size" type="guint" flags="234" default-value="0"/>
     <property name="data" type="gpointer" flags="234"/>
   </class>
   <class name="EvAnnotation" get-type="ev_annotation_get_type" parents="GObject" abstract="1">
     <property name="page" type="EvPage" flags="234"/>
-    <property name="contents" type="gchararray" flags="227"/>
-    <property name="name" type="gchararray" flags="227"/>
-    <property name="modified" type="gchararray" flags="227"/>
+    <property name="contents" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="name" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="modified" type="gchararray" flags="227" default-value="NULL"/>
     <property name="color" type="gpointer" flags="227"/>
     <property name="rgba" type="GdkRGBA" flags="227"/>
     <property name="area" type="EvRectangle" flags="227"/>
   </class>
   <interface name="EvAnnotationMarkup" get-type="ev_annotation_markup_get_type">
     <prerequisite name="EvAnnotation"/>
-    <property name="can-have-popup" type="gboolean" flags="227"/>
-    <property name="has-popup" type="gboolean" flags="227"/>
-    <property name="label" type="gchararray" flags="227"/>
-    <property name="opacity" type="gdouble" flags="227"/>
-    <property name="popup-is-open" type="gboolean" flags="227"/>
+    <property name="can-have-popup" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="has-popup" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="label" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="opacity" type="gdouble" flags="227" default-value="1.000000"/>
+    <property name="popup-is-open" type="gboolean" flags="227" default-value="FALSE"/>
     <property name="rectangle" type="EvRectangle" flags="227"/>
   </interface>
   <class name="EvAnnotationText" get-type="ev_annotation_text_get_type" parents="EvAnnotation,GObject">
     <implements name="EvAnnotationMarkup"/>
-    <property name="icon" type="EvAnnotationTextIcon" flags="227"/>
-    <property name="is-open" type="gboolean" flags="227"/>
+    <property name="icon" type="EvAnnotationTextIcon" flags="227" default-value="EV_ANNOTATION_TEXT_ICON_NOTE"/>
+    <property name="is-open" type="gboolean" flags="227" default-value="FALSE"/>
   </class>
   <class name="EvAnnotationAttachment" get-type="ev_annotation_attachment_get_type" parents="EvAnnotation,GObject">
     <implements name="EvAnnotationMarkup"/>
@@ -48,7 +48,7 @@
   </class>
   <class name="EvAnnotationTextMarkup" get-type="ev_annotation_text_markup_get_type" parents="EvAnnotation,GObject">
     <implements name="EvAnnotationMarkup"/>
-    <property name="type" type="EvAnnotationTextMarkupType" flags="231"/>
+    <property name="type" type="EvAnnotationTextMarkupType" flags="231" default-value="EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT"/>
   </class>
   <interface name="EvAsyncRenderer" get-type="ev_async_renderer_get_type">
     <signal name="render-finished" return="void" when="last">
@@ -64,32 +64,32 @@
   <interface name="EvDocumentFind" get-type="ev_document_find_get_type">
   </interface>
   <class name="EvLinkDest" get-type="ev_link_dest_get_type" parents="GObject">
-    <property name="type" type="EvLinkDestType" flags="235"/>
-    <property name="page" type="gint" flags="235"/>
-    <property name="left" type="gdouble" flags="235"/>
-    <property name="top" type="gdouble" flags="235"/>
-    <property name="bottom" type="gdouble" flags="235"/>
-    <property name="right" type="gdouble" flags="235"/>
-    <property name="zoom" type="gdouble" flags="235"/>
-    <property name="change" type="guint" flags="235"/>
-    <property name="named" type="gchararray" flags="235"/>
-    <property name="page-label" type="gchararray" flags="235"/>
+    <property name="type" type="EvLinkDestType" flags="235" default-value="EV_LINK_DEST_TYPE_UNKNOWN"/>
+    <property name="page" type="gint" flags="235" default-value="0"/>
+    <property name="left" type="gdouble" flags="235" default-value="0.000000"/>
+    <property name="top" type="gdouble" flags="235" default-value="0.000000"/>
+    <property name="bottom" type="gdouble" flags="235" default-value="0.000000"/>
+    <property name="right" type="gdouble" flags="235" default-value="0.000000"/>
+    <property name="zoom" type="gdouble" flags="235" default-value="0.000000"/>
+    <property name="change" type="guint" flags="235" default-value="0"/>
+    <property name="named" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="page-label" type="gchararray" flags="235" default-value="NULL"/>
   </class>
   <class name="EvLinkAction" get-type="ev_link_action_get_type" parents="GObject">
-    <property name="type" type="EvLinkActionType" flags="235"/>
+    <property name="type" type="EvLinkActionType" flags="235" default-value="EV_LINK_ACTION_TYPE_GOTO_DEST"/>
     <property name="dest" type="EvLinkDest" flags="235"/>
-    <property name="uri" type="gchararray" flags="235"/>
-    <property name="filename" type="gchararray" flags="235"/>
-    <property name="params" type="gchararray" flags="235"/>
-    <property name="name" type="gchararray" flags="235"/>
+    <property name="uri" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="filename" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="params" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="name" type="gchararray" flags="235" default-value="NULL"/>
     <property name="show-list" type="gpointer" flags="235"/>
     <property name="hide-list" type="gpointer" flags="235"/>
     <property name="toggle-list" type="gpointer" flags="235"/>
     <property name="reset-fields" type="gpointer" flags="235"/>
-    <property name="exclude-reset-fields" type="gboolean" flags="235"/>
+    <property name="exclude-reset-fields" type="gboolean" flags="235" default-value="FALSE"/>
   </class>
   <class name="EvLink" get-type="ev_link_get_type" parents="GObject">
-    <property name="title" type="gchararray" flags="235"/>
+    <property name="title" type="gchararray" flags="235" default-value="NULL"/>
     <property name="action" type="EvLinkAction" flags="235"/>
   </class>
   <interface name="EvDocumentFonts" get-type="ev_document_fonts_get_type">
@@ -127,14 +127,14 @@
   <interface name="EvDocumentText" get-type="ev_document_text_get_type">
   </interface>
   <class name="EvTransitionEffect" get-type="ev_transition_effect_get_type" parents="GObject">
-    <property name="type" type="EvTransitionEffectType" flags="227"/>
-    <property name="alignment" type="EvTransitionEffectAlignment" flags="227"/>
-    <property name="direction" type="EvTransitionEffectDirection" flags="227"/>
-    <property name="duration" type="gint" flags="-2147483421"/>
-    <property name="duration-real" type="gdouble" flags="227"/>
-    <property name="angle" type="gint" flags="227"/>
-    <property name="scale" type="gdouble" flags="227"/>
-    <property name="rectangular" type="gboolean" flags="227"/>
+    <property name="type" type="EvTransitionEffectType" flags="227" default-value="EV_TRANSITION_EFFECT_REPLACE"/>
+    <property name="alignment" type="EvTransitionEffectAlignment" flags="227" default-value="EV_TRANSITION_ALIGNMENT_HORIZONTAL"/>
+    <property name="direction" type="EvTransitionEffectDirection" flags="227" default-value="EV_TRANSITION_DIRECTION_INWARD"/>
+    <property name="duration" type="gint" flags="-2147483421" default-value="0"/>
+    <property name="duration-real" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="angle" type="gint" flags="227" default-value="0"/>
+    <property name="scale" type="gdouble" flags="227" default-value="1.000000"/>
+    <property name="rectangular" type="gboolean" flags="227" default-value="FALSE"/>
   </class>
   <interface name="EvDocumentTransition" get-type="ev_document_transition_get_type">
   </interface>

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <dump>
   <class name="DbusmenuMenuitem" get-type="dbusmenu_menuitem_get_type" parents="GObject">
-    <property name="id" type="gint" flags="235"/>
+    <property name="id" type="gint" flags="235" default-value="-1"/>
     <signal name="property-changed" return="void" when="last">
       <param type="gchararray"/>
       <param type="GVariant"/>
@@ -38,11 +38,11 @@
     <property name="menu-item" type="DbusmenuMenuitem" flags="235"/>
   </class>
   <class name="DbusmenuServer" get-type="dbusmenu_server_get_type" parents="GObject">
-    <property name="dbus-object" type="gchararray" flags="235"/>
+    <property name="dbus-object" type="gchararray" flags="235" default-value="/com/canonical/dbusmenu"/>
     <property name="root-node" type="DbusmenuMenuitem" flags="227"/>
-    <property name="version" type="guint" flags="225"/>
-    <property name="text-direction" type="DbusmenuTextDirection" flags="227"/>
-    <property name="status" type="DbusmenuStatus" flags="227"/>
+    <property name="version" type="guint" flags="225" default-value="3"/>
+    <property name="text-direction" type="DbusmenuTextDirection" flags="227" default-value="DBUSMENU_TEXT_DIRECTION_NONE"/>
+    <property name="status" type="DbusmenuStatus" flags="227" default-value="DBUSMENU_STATUS_NORMAL"/>
     <signal name="item-property-updated" return="void" when="last">
       <param type="gint"/>
       <param type="gchararray"/>
@@ -61,11 +61,11 @@
     </signal>
   </class>
   <class name="DbusmenuClient" get-type="dbusmenu_client_get_type" parents="GObject">
-    <property name="dbus-object" type="gchararray" flags="235"/>
-    <property name="dbus-name" type="gchararray" flags="235"/>
-    <property name="status" type="DbusmenuStatus" flags="225"/>
-    <property name="text-direction" type="DbusmenuTextDirection" flags="225"/>
-    <property name="group-events" type="gboolean" flags="227"/>
+    <property name="dbus-object" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="dbus-name" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="status" type="DbusmenuStatus" flags="225" default-value="DBUSMENU_STATUS_NORMAL"/>
+    <property name="text-direction" type="DbusmenuTextDirection" flags="225" default-value="DBUSMENU_TEXT_DIRECTION_NONE"/>
+    <property name="group-events" type="gboolean" flags="227" default-value="FALSE"/>
     <signal name="layout-updated" return="void" when="last">
     </signal>
     <signal name="root-changed" return="void" when="last">

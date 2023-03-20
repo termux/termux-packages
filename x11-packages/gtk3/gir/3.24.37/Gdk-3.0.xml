@@ -3,18 +3,18 @@
   <class name="GdkDevice" get-type="gdk_device_get_type" parents="GObject" abstract="1">
     <property name="display" type="GdkDisplay" flags="235"/>
     <property name="device-manager" type="GdkDeviceManager" flags="235"/>
-    <property name="name" type="gchararray" flags="235"/>
+    <property name="name" type="gchararray" flags="235" default-value="NULL"/>
     <property name="associated-device" type="GdkDevice" flags="225"/>
-    <property name="type" type="GdkDeviceType" flags="235"/>
-    <property name="input-source" type="GdkInputSource" flags="1073742059"/>
-    <property name="input-mode" type="GdkInputMode" flags="1073742051"/>
-    <property name="has-cursor" type="gboolean" flags="235"/>
-    <property name="n-axes" type="guint" flags="225"/>
-    <property name="vendor-id" type="gchararray" flags="235"/>
-    <property name="product-id" type="gchararray" flags="235"/>
+    <property name="type" type="GdkDeviceType" flags="235" default-value="GDK_DEVICE_TYPE_MASTER"/>
+    <property name="input-source" type="GdkInputSource" flags="1073742059" default-value="GDK_SOURCE_MOUSE"/>
+    <property name="input-mode" type="GdkInputMode" flags="1073742051" default-value="GDK_MODE_DISABLED"/>
+    <property name="has-cursor" type="gboolean" flags="235" default-value="FALSE"/>
+    <property name="n-axes" type="guint" flags="225" default-value="0"/>
+    <property name="vendor-id" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="product-id" type="gchararray" flags="235" default-value="NULL"/>
     <property name="seat" type="GdkSeat" flags="227"/>
-    <property name="num-touches" type="guint" flags="235"/>
-    <property name="axes" type="GdkAxisFlags" flags="225"/>
+    <property name="num-touches" type="guint" flags="235" default-value="0"/>
+    <property name="axes" type="GdkAxisFlags" flags="225" default-value="0"/>
     <property name="tool" type="GdkDeviceTool" flags="225"/>
     <signal name="changed" return="void" when="last">
     </signal>
@@ -36,10 +36,10 @@
     </signal>
   </class>
   <class name="GdkDeviceTool" get-type="gdk_device_tool_get_type" parents="GObject">
-    <property name="serial" type="guint64" flags="11"/>
-    <property name="tool-type" type="GdkDeviceToolType" flags="11"/>
-    <property name="axes" type="GdkAxisFlags" flags="11"/>
-    <property name="hardware-id" type="guint64" flags="11"/>
+    <property name="serial" type="guint64" flags="11" default-value="0"/>
+    <property name="tool-type" type="GdkDeviceToolType" flags="11" default-value="GDK_DEVICE_TOOL_TYPE_UNKNOWN"/>
+    <property name="axes" type="GdkAxisFlags" flags="11" default-value="0"/>
+    <property name="hardware-id" type="guint64" flags="11" default-value="0"/>
   </class>
   <boxed name="GdkEvent" get-type="gdk_event_get_type"/>
   <boxed name="GdkEventSequence" get-type="gdk_event_sequence_get_type"/>
@@ -123,15 +123,15 @@
   <boxed name="GdkRectangle" get-type="gdk_rectangle_get_type"/>
   <class name="GdkMonitor" get-type="gdk_monitor_get_type" parents="GObject">
     <property name="display" type="GdkDisplay" flags="11"/>
-    <property name="manufacturer" type="gchararray" flags="1"/>
-    <property name="model" type="gchararray" flags="1"/>
-    <property name="scale-factor" type="gint" flags="1"/>
+    <property name="manufacturer" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="model" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="scale-factor" type="gint" flags="1" default-value="1"/>
     <property name="geometry" type="GdkRectangle" flags="1"/>
     <property name="workarea" type="GdkRectangle" flags="1"/>
-    <property name="width-mm" type="gint" flags="1"/>
-    <property name="height-mm" type="gint" flags="1"/>
-    <property name="refresh-rate" type="gint" flags="1"/>
-    <property name="subpixel-layout" type="GdkSubpixelLayout" flags="1"/>
+    <property name="width-mm" type="gint" flags="1" default-value="0"/>
+    <property name="height-mm" type="gint" flags="1" default-value="0"/>
+    <property name="refresh-rate" type="gint" flags="1" default-value="0"/>
+    <property name="subpixel-layout" type="GdkSubpixelLayout" flags="1" default-value="GDK_SUBPIXEL_LAYOUT_UNKNOWN"/>
     <signal name="invalidate" return="void" when="first">
     </signal>
   </class>
@@ -156,7 +156,7 @@
   </class>
   <class name="GdkScreen" get-type="gdk_screen_get_type" parents="GObject">
     <property name="font-options" type="gpointer" flags="227"/>
-    <property name="resolution" type="gdouble" flags="227"/>
+    <property name="resolution" type="gdouble" flags="227" default-value="-1.000000"/>
     <signal name="size-changed" return="void" when="last">
     </signal>
     <signal name="composited-changed" return="void" when="last">
@@ -170,7 +170,7 @@
   <boxed name="GdkColor" get-type="gdk_color_get_type"/>
   <boxed name="GdkRGBA" get-type="gdk_rgba_get_type"/>
   <class name="GdkCursor" get-type="gdk_cursor_get_type" parents="GObject" abstract="1">
-    <property name="cursor-type" type="GdkCursorType" flags="11"/>
+    <property name="cursor-type" type="GdkCursorType" flags="11" default-value="GDK_X_CURSOR"/>
     <property name="display" type="GdkDisplay" flags="11"/>
   </class>
   <interface name="GdkDevicePad" get-type="gdk_device_pad_get_type">

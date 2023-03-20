@@ -491,9 +491,9 @@
   <fundamental name="GstVideoMultiviewFlagsSet" get-type="gst_video_multiview_flagset_get_type" parents="GstFlagSet">
   </fundamental>
   <class name="GstVideoAggregatorPad" get-type="gst_video_aggregator_pad_get_type" parents="GstAggregatorPad,GstPad,GstObject,GInitiallyUnowned,GObject">
-    <property name="zorder" type="guint" flags="739"/>
-    <property name="repeat-after-eos" type="gboolean" flags="739"/>
-    <property name="max-last-buffer-repeat" type="guint64" flags="4323"/>
+    <property name="zorder" type="guint" flags="739" default-value="0"/>
+    <property name="repeat-after-eos" type="gboolean" flags="739" default-value="FALSE"/>
+    <property name="max-last-buffer-repeat" type="guint64" flags="4323" default-value="18446744073709551615"/>
   </class>
   <class name="GstVideoAggregatorConvertPad" get-type="gst_video_aggregator_convert_pad_get_type" parents="GstVideoAggregatorPad,GstAggregatorPad,GstPad,GstObject,GInitiallyUnowned,GObject">
     <property name="converter-config" type="GstStructure" flags="227"/>
@@ -501,22 +501,22 @@
   <class name="GstVideoAggregatorParallelConvertPad" get-type="gst_video_aggregator_parallel_convert_pad_get_type" parents="GstVideoAggregatorConvertPad,GstVideoAggregatorPad,GstAggregatorPad,GstPad,GstObject,GInitiallyUnowned,GObject">
   </class>
   <class name="GstVideoAggregator" get-type="gst_video_aggregator_get_type" parents="GstAggregator,GstElement,GstObject,GInitiallyUnowned,GObject" abstract="1">
-    <property name="force-live" type="gboolean" flags="235"/>
+    <property name="force-live" type="gboolean" flags="235" default-value="FALSE"/>
   </class>
   <boxed name="GstVideoCodecState" get-type="gst_video_codec_state_get_type"/>
   <boxed name="GstVideoCodecFrame" get-type="gst_video_codec_frame_get_type"/>
   <class name="GstVideoDecoder" get-type="gst_video_decoder_get_type" parents="GstElement,GstObject,GInitiallyUnowned,GObject" abstract="1">
-    <property name="qos" type="gboolean" flags="227"/>
-    <property name="max-errors" type="gint" flags="227"/>
-    <property name="min-force-key-unit-interval" type="guint64" flags="227"/>
-    <property name="discard-corrupted-frames" type="gboolean" flags="227"/>
-    <property name="automatic-request-sync-points" type="gboolean" flags="227"/>
-    <property name="automatic-request-sync-point-flags" type="GstVideoDecoderRequestSyncPointFlags" flags="227"/>
+    <property name="qos" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="max-errors" type="gint" flags="227" default-value="-1"/>
+    <property name="min-force-key-unit-interval" type="guint64" flags="227" default-value="0"/>
+    <property name="discard-corrupted-frames" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="automatic-request-sync-points" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="automatic-request-sync-point-flags" type="GstVideoDecoderRequestSyncPointFlags" flags="227" default-value="GST_VIDEO_DECODER_REQUEST_SYNC_POINT_DISCARD_INPUT | GST_VIDEO_DECODER_REQUEST_SYNC_POINT_CORRUPT_OUTPUT"/>
   </class>
   <class name="GstVideoEncoder" get-type="gst_video_encoder_get_type" parents="GstElement,GstObject,GInitiallyUnowned,GObject" abstract="1">
     <implements name="GstPreset"/>
-    <property name="qos" type="gboolean" flags="227"/>
-    <property name="min-force-key-unit-interval" type="guint64" flags="227"/>
+    <property name="qos" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="min-force-key-unit-interval" type="guint64" flags="227" default-value="0"/>
   </class>
   <class name="GstVideoFilter" get-type="gst_video_filter_get_type" parents="GstBaseTransform,GstElement,GstObject,GInitiallyUnowned,GObject" abstract="1">
   </class>
@@ -525,14 +525,14 @@
   <class name="GstVideoBufferPool" get-type="gst_video_buffer_pool_get_type" parents="GstBufferPool,GstObject,GInitiallyUnowned,GObject">
   </class>
   <class name="GstVideoSink" get-type="gst_video_sink_get_type" parents="GstBaseSink,GstElement,GstObject,GInitiallyUnowned,GObject">
-    <property name="show-preroll-frame" type="gboolean" flags="231"/>
+    <property name="show-preroll-frame" type="gboolean" flags="231" default-value="TRUE"/>
   </class>
   <interface name="GstNavigation" get-type="gst_navigation_get_type">
   </interface>
   <boxed name="GstVideoVBIParser" get-type="gst_video_vbi_parser_get_type"/>
   <boxed name="GstVideoVBIEncoder" get-type="gst_video_vbi_encoder_get_type"/>
   <interface name="GstVideoDirection" get-type="gst_video_direction_get_type">
-    <property name="video-direction" type="GstVideoOrientationMethod" flags="743"/>
+    <property name="video-direction" type="GstVideoOrientationMethod" flags="743" default-value="GST_VIDEO_ORIENTATION_IDENTITY"/>
   </interface>
   <interface name="GstVideoOrientation" get-type="gst_video_orientation_get_type">
   </interface>

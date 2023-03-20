@@ -3,8 +3,8 @@
   <class name="GnomeDesktopThumbnailFactory" get-type="gnome_desktop_thumbnail_factory_get_type" parents="GObject">
   </class>
   <class name="GnomeBGCrossfade" get-type="gnome_bg_crossfade_get_type" parents="GObject">
-    <property name="width" type="gint" flags="11"/>
-    <property name="height" type="gint" flags="11"/>
+    <property name="width" type="gint" flags="11" default-value="0"/>
+    <property name="height" type="gint" flags="11" default-value="0"/>
     <signal name="finished" return="void" when="last">
       <param type="GObject"/>
     </signal>
@@ -17,15 +17,15 @@
   </class>
   <class name="GnomeBGSlideShow" get-type="gnome_bg_slide_show_get_type" parents="GObject">
     <property name="file" type="GFile" flags="11"/>
-    <property name="start-time" type="gdouble" flags="1"/>
-    <property name="total-duration" type="gdouble" flags="1"/>
-    <property name="has-multiple-sizes" type="gboolean" flags="1"/>
+    <property name="start-time" type="gdouble" flags="1" default-value="0.000000"/>
+    <property name="total-duration" type="gdouble" flags="1" default-value="0.000000"/>
+    <property name="has-multiple-sizes" type="gboolean" flags="1" default-value="FALSE"/>
   </class>
   <class name="GnomeRRScreen" get-type="gnome_rr_screen_get_type" parents="GObject">
     <implements name="GInitable"/>
     <implements name="GAsyncInitable"/>
     <property name="gdk-screen" type="GdkScreen" flags="235"/>
-    <property name="dpms-mode" type="GnomeRRDpmsModeType" flags="227"/>
+    <property name="dpms-mode" type="GnomeRRDpmsModeType" flags="227" default-value="GNOME_RR_DPMS_UNKNOWN"/>
     <signal name="changed" return="void" when="first" no-recurse="1" no-hooks="1">
     </signal>
     <signal name="output-connected" return="void" when="first" no-recurse="1" no-hooks="1">
@@ -52,9 +52,9 @@
   <class name="GnomePnpIds" get-type="gnome_pnp_ids_get_type" parents="GObject">
   </class>
   <class name="GnomeWallClock" get-type="gnome_wall_clock_get_type" parents="GObject">
-    <property name="clock" type="gchararray" flags="1"/>
+    <property name="clock" type="gchararray" flags="1" default-value="NULL"/>
     <property name="timezone" type="GTimeZone" flags="1"/>
-    <property name="time-only" type="gboolean" flags="3"/>
+    <property name="time-only" type="gboolean" flags="3" default-value="FALSE"/>
   </class>
   <class name="GnomeXkbInfo" get-type="gnome_xkb_info_get_type" parents="GObject">
     <signal name="layouts-changed" return="void" when="first">

@@ -22,7 +22,7 @@
     <implements name="AtkImplementorIface"/>
     <implements name="GtkBuildable"/>
     <implements name="GtkOrientable"/>
-    <property name="range-style" type="IdoRangeStyle" flags="11"/>
+    <property name="range-style" type="IdoRangeStyle" flags="11" default-value="IDO_RANGE_STYLE_SMALL"/>
   </class>
   <class name="IdoScaleMenuItem" get-type="ido_scale_menu_item_get_type" parents="GtkMenuItem,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
     <implements name="AtkImplementorIface"/>
@@ -30,9 +30,9 @@
     <implements name="GtkActivatable"/>
     <implements name="GtkActionable"/>
     <property name="adjustment" type="GtkAdjustment" flags="3"/>
-    <property name="reverse-scroll-events" type="gboolean" flags="3"/>
-    <property name="accessory-style" type="IdoScaleMenuItemStyle" flags="3"/>
-    <property name="range-style" type="IdoRangeStyle" flags="11"/>
+    <property name="reverse-scroll-events" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="accessory-style" type="IdoScaleMenuItemStyle" flags="3" default-value="IDO_SCALE_MENU_ITEM_STYLE_NONE"/>
+    <property name="range-style" type="IdoRangeStyle" flags="11" default-value="IDO_RANGE_STYLE_DEFAULT"/>
     <signal name="value-changed" return="void" when="last">
       <param type="gdouble"/>
     </signal>
@@ -52,10 +52,10 @@
     <implements name="GtkActionable"/>
   </class>
   <class name="IdoTimeline" get-type="ido_timeline_get_type" parents="GObject">
-    <property name="fps" type="guint" flags="3"/>
-    <property name="duration" type="guint" flags="3"/>
-    <property name="loop" type="gboolean" flags="3"/>
-    <property name="direction" type="IdoTimelineDirection" flags="3"/>
+    <property name="fps" type="guint" flags="3" default-value="30"/>
+    <property name="duration" type="guint" flags="3" default-value="0"/>
+    <property name="loop" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="direction" type="IdoTimelineDirection" flags="3" default-value="IDO_TIMELINE_DIRECTION_FORWARD"/>
     <property name="screen" type="GdkScreen" flags="3"/>
     <signal name="started" return="void" when="last">
     </signal>
