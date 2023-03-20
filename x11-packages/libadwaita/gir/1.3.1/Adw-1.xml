@@ -153,6 +153,7 @@
     <property name="activatable-widget" type="GtkWidget" flags="1073742051"/>
     <property name="title-lines" type="gint" flags="1073742051" default-value="0"/>
     <property name="subtitle-lines" type="gint" flags="1073742051" default-value="0"/>
+    <property name="subtitle-selectable" type="gboolean" flags="1073742051" default-value="FALSE"/>
     <signal name="activated" return="void" when="last">
     </signal>
   </class>
@@ -169,6 +170,7 @@
     <property name="target" type="AdwAnimationTarget" flags="1073742055"/>
     <property name="value" type="gdouble" flags="225" default-value="0.000000"/>
     <property name="state" type="AdwAnimationState" flags="225" default-value="ADW_ANIMATION_IDLE"/>
+    <property name="follow-enable-animations-setting" type="gboolean" flags="1073742051" default-value="TRUE"/>
     <signal name="done" return="void" when="last">
     </signal>
   </class>
@@ -204,6 +206,18 @@
     <property name="show-initials" type="gboolean" flags="1073742051" default-value="FALSE"/>
     <property name="custom-image" type="GdkPaintable" flags="1073742051"/>
     <property name="size" type="gint" flags="1073742051" default-value="-1"/>
+  </class>
+  <class name="AdwBanner" get-type="adw_banner_get_type" parents="GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkActionable"/>
+    <property name="title" type="gchararray" flags="1073742051" default-value=""/>
+    <property name="button-label" type="gchararray" flags="1073742051" default-value=""/>
+    <property name="revealed" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="use-markup" type="gboolean" flags="1073742051" default-value="TRUE"/>
+    <signal name="button-clicked" return="void" when="last">
+    </signal>
   </class>
   <class name="AdwBin" get-type="adw_bin_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
     <implements name="GtkAccessible"/>
@@ -326,6 +340,8 @@
     <property name="expanded" type="gboolean" flags="1073742051" default-value="FALSE"/>
     <property name="enable-expansion" type="gboolean" flags="1073742051" default-value="TRUE"/>
     <property name="show-enable-switch" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="title-lines" type="gint" flags="1073742051" default-value="0"/>
+    <property name="subtitle-lines" type="gint" flags="1073742051" default-value="0"/>
   </class>
   <class name="AdwFlap" get-type="adw_flap_get_type" parents="GtkWidget,GInitiallyUnowned,GObject" final="1">
     <implements name="GtkAccessible"/>
@@ -435,9 +451,9 @@
     <property name="priority" type="AdwToastPriority" flags="1073742051" default-value="ADW_TOAST_PRIORITY_NORMAL"/>
     <property name="timeout" type="guint" flags="1073742051" default-value="5"/>
     <property name="custom-title" type="GtkWidget" flags="1073742051"/>
-    <signal name="dismissed" return="void" when="first">
-    </signal>
     <signal name="button-clicked" return="void" when="last">
+    </signal>
+    <signal name="dismissed" return="void" when="first">
     </signal>
   </class>
   <class name="AdwPreferencesWindow" get-type="adw_preferences_window_get_type" parents="AdwWindow,GtkWindow,GtkWidget,GInitiallyUnowned,GObject">
@@ -470,7 +486,7 @@
     <signal name="clicked" return="void" when="first" action="1">
     </signal>
   </class>
-  <class name="AdwSpringAnimation" get-type="adw_spring_animation_get_type" parents="AdwAnimation,GObject">
+  <class name="AdwSpringAnimation" get-type="adw_spring_animation_get_type" parents="AdwAnimation,GObject" final="1">
     <property name="value-from" type="gdouble" flags="1073742055" default-value="0.000000"/>
     <property name="value-to" type="gdouble" flags="1073742055" default-value="0.000000"/>
     <property name="spring-params" type="AdwSpringParams" flags="1073742055"/>
@@ -535,6 +551,7 @@
     </signal>
   </class>
   <class name="AdwTabPage" get-type="adw_tab_page_get_type" parents="GObject" final="1">
+    <implements name="GtkAccessible"/>
     <property name="child" type="GtkWidget" flags="235"/>
     <property name="parent" type="AdwTabPage" flags="1073742059"/>
     <property name="selected" type="gboolean" flags="225" default-value="FALSE"/>
@@ -547,6 +564,10 @@
     <property name="indicator-tooltip" type="gchararray" flags="1073742051" default-value=""/>
     <property name="indicator-activatable" type="gboolean" flags="1073742051" default-value="FALSE"/>
     <property name="needs-attention" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="keyword" type="gchararray" flags="1073742051" default-value=""/>
+    <property name="thumbnail-xalign" type="gfloat" flags="1073742051" default-value="0.000000"/>
+    <property name="thumbnail-yalign" type="gfloat" flags="1073742051" default-value="0.000000"/>
+    <property name="live-thumbnail" type="gboolean" flags="1073742051" default-value="FALSE"/>
   </class>
   <class name="AdwTabView" get-type="adw_tab_view_get_type" parents="GtkWidget,GInitiallyUnowned,GObject" final="1">
     <implements name="GtkAccessible"/>
@@ -596,9 +617,51 @@
     <property name="expand-tabs" type="gboolean" flags="1073742051" default-value="TRUE"/>
     <property name="inverted" type="gboolean" flags="1073742051" default-value="FALSE"/>
     <property name="is-overflowing" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="extra-drag-preload" type="gboolean" flags="1073742051" default-value="FALSE"/>
     <signal name="extra-drag-drop" return="gboolean" when="last">
       <param type="AdwTabPage"/>
       <param type="GValue"/>
+    </signal>
+    <signal name="extra-drag-value" return="GdkDragAction" when="last">
+      <param type="AdwTabPage"/>
+      <param type="GValue"/>
+    </signal>
+  </class>
+  <class name="AdwTabButton" get-type="adw_tab_button_get_type" parents="GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkActionable"/>
+    <property name="view" type="AdwTabView" flags="1073741827"/>
+    <signal name="activate" return="void" when="first" action="1">
+    </signal>
+    <signal name="clicked" return="void" when="first" action="1">
+    </signal>
+  </class>
+  <class name="AdwTabOverview" get-type="adw_tab_overview_get_type" parents="GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <property name="view" type="AdwTabView" flags="1073742051"/>
+    <property name="child" type="GtkWidget" flags="1073742051"/>
+    <property name="open" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="inverted" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="enable-search" type="gboolean" flags="1073742051" default-value="TRUE"/>
+    <property name="search-active" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="enable-new-tab" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="secondary-menu" type="GMenuModel" flags="1073742051"/>
+    <property name="show-start-title-buttons" type="gboolean" flags="1073742051" default-value="TRUE"/>
+    <property name="show-end-title-buttons" type="gboolean" flags="1073742051" default-value="TRUE"/>
+    <property name="extra-drag-preload" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <signal name="extra-drag-drop" return="gboolean" when="last">
+      <param type="AdwTabPage"/>
+      <param type="GValue"/>
+    </signal>
+    <signal name="extra-drag-value" return="GdkDragAction" when="last">
+      <param type="AdwTabPage"/>
+      <param type="GValue"/>
+    </signal>
+    <signal name="create-tab" return="AdwTabPage" when="last">
     </signal>
   </class>
   <class name="AdwTimedAnimation" get-type="adw_timed_animation_get_type" parents="AdwAnimation,GObject" final="1">
@@ -617,6 +680,7 @@
     <property name="child" type="GtkWidget" flags="1073742051"/>
   </class>
   <class name="AdwViewStackPage" get-type="adw_view_stack_page_get_type" parents="GObject" final="1">
+    <implements name="GtkAccessible"/>
     <property name="child" type="GtkWidget" flags="235"/>
     <property name="name" type="gchararray" flags="1073742051" default-value="NULL"/>
     <property name="title" type="gchararray" flags="1073742051" default-value="NULL"/>
