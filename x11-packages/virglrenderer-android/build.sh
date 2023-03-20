@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@licy183"
 TERMUX_PKG_VERSION=(0.10.4)
 TERMUX_PKG_VERSION+=(1.5.10) # libepoxy version
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=(https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/virglrenderer-${TERMUX_PKG_VERSION[0]}/virglrenderer-virglrenderer-${TERMUX_PKG_VERSION[0]}.tar.gz)
 TERMUX_PKG_SRCURL+=(https://github.com/anholt/libepoxy/archive/refs/tags/${TERMUX_PKG_VERSION[1]}.tar.gz)
 TERMUX_PKG_SHA256=(fd9a1b12473f4cda8d87e6ba1a6e5714a24355e16b69ed85df5c21bf48f797fa)
@@ -87,4 +87,5 @@ termux_step_install_license() {
 	mkdir -p $TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME
 	cp $TERMUX_PKG_SRCDIR/COPYING $TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME/COPYING-virglrenderer
 	cp $TERMUX_PKG_SRCDIR/libepoxy/COPYING $TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME/COPYING-libepoxy
+	cp $TERMUX_PKG_BUILDER_DIR/COPYING-gl4es $TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME/COPYING-gl4es
 }
