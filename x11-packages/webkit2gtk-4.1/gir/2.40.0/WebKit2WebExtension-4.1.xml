@@ -1,0 +1,991 @@
+<?xml version="1.0"?>
+<dump>
+  <class name="WebKitDOMObject" get-type="webkit_dom_object_get_type" parents="GObject">
+    <property name="core-object" type="gpointer" flags="234"/>
+  </class>
+  <class name="WebKitDOMNode" get-type="webkit_dom_node_get_type" parents="WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="node-name" type="gchararray" flags="225" default-value=""/>
+    <property name="node-value" type="gchararray" flags="227" default-value=""/>
+    <property name="node-type" type="guint" flags="225" default-value="0"/>
+    <property name="parent-node" type="WebKitDOMNode" flags="225"/>
+    <property name="child-nodes" type="WebKitDOMNodeList" flags="225"/>
+    <property name="first-child" type="WebKitDOMNode" flags="225"/>
+    <property name="last-child" type="WebKitDOMNode" flags="225"/>
+    <property name="previous-sibling" type="WebKitDOMNode" flags="225"/>
+    <property name="next-sibling" type="WebKitDOMNode" flags="225"/>
+    <property name="owner-document" type="WebKitDOMDocument" flags="225"/>
+    <property name="base-uri" type="gchararray" flags="225" default-value=""/>
+    <property name="text-content" type="gchararray" flags="227" default-value=""/>
+    <property name="parent-element" type="WebKitDOMElement" flags="225"/>
+  </class>
+  <class name="WebKitDOMAttr" get-type="webkit_dom_attr_get_type" parents="WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="name" type="gchararray" flags="225" default-value=""/>
+    <property name="specified" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="value" type="gchararray" flags="227" default-value=""/>
+    <property name="owner-element" type="WebKitDOMElement" flags="225"/>
+    <property name="namespace-uri" type="gchararray" flags="225" default-value=""/>
+    <property name="prefix" type="gchararray" flags="225" default-value=""/>
+    <property name="local-name" type="gchararray" flags="225" default-value=""/>
+  </class>
+  <class name="WebKitDOMBlob" get-type="webkit_dom_blob_get_type" parents="WebKitDOMObject,GObject">
+    <property name="size" type="guint64" flags="225" default-value="0"/>
+  </class>
+  <class name="WebKitDOMCharacterData" get-type="webkit_dom_character_data_get_type" parents="WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="data" type="gchararray" flags="227" default-value=""/>
+    <property name="length" type="gulong" flags="225" default-value="0"/>
+  </class>
+  <class name="WebKitDOMText" get-type="webkit_dom_text_get_type" parents="WebKitDOMCharacterData,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="whole-text" type="gchararray" flags="225" default-value=""/>
+  </class>
+  <class name="WebKitDOMCDATASection" get-type="webkit_dom_cdata_section_get_type" parents="WebKitDOMText,WebKitDOMCharacterData,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+  </class>
+  <class name="WebKitDOMCSSRule" get-type="webkit_dom_css_rule_get_type" parents="WebKitDOMObject,GObject">
+    <property name="type" type="guint" flags="225" default-value="0"/>
+    <property name="css-text" type="gchararray" flags="227" default-value=""/>
+    <property name="parent-style-sheet" type="WebKitDOMCSSStyleSheet" flags="225"/>
+    <property name="parent-rule" type="WebKitDOMCSSRule" flags="225"/>
+  </class>
+  <class name="WebKitDOMCSSRuleList" get-type="webkit_dom_css_rule_list_get_type" parents="WebKitDOMObject,GObject">
+    <property name="length" type="gulong" flags="225" default-value="0"/>
+  </class>
+  <class name="WebKitDOMCSSStyleDeclaration" get-type="webkit_dom_css_style_declaration_get_type" parents="WebKitDOMObject,GObject">
+    <property name="css-text" type="gchararray" flags="227" default-value=""/>
+    <property name="length" type="gulong" flags="225" default-value="0"/>
+    <property name="parent-rule" type="WebKitDOMCSSRule" flags="225"/>
+  </class>
+  <class name="WebKitDOMStyleSheet" get-type="webkit_dom_style_sheet_get_type" parents="WebKitDOMObject,GObject">
+    <property name="type" type="gchararray" flags="225" default-value=""/>
+    <property name="disabled" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="owner-node" type="WebKitDOMNode" flags="225"/>
+    <property name="parent-style-sheet" type="WebKitDOMStyleSheet" flags="225"/>
+    <property name="href" type="gchararray" flags="225" default-value=""/>
+    <property name="title" type="gchararray" flags="225" default-value=""/>
+    <property name="media" type="WebKitDOMMediaList" flags="225"/>
+  </class>
+  <class name="WebKitDOMCSSStyleSheet" get-type="webkit_dom_css_style_sheet_get_type" parents="WebKitDOMStyleSheet,WebKitDOMObject,GObject">
+    <property name="owner-rule" type="WebKitDOMCSSRule" flags="225"/>
+    <property name="css-rules" type="WebKitDOMCSSRuleList" flags="225"/>
+    <property name="rules" type="WebKitDOMCSSRuleList" flags="225"/>
+  </class>
+  <class name="WebKitDOMCSSValue" get-type="webkit_dom_css_value_get_type" parents="WebKitDOMObject,GObject">
+    <property name="css-text" type="gchararray" flags="227" default-value=""/>
+    <property name="css-value-type" type="guint" flags="225" default-value="0"/>
+  </class>
+  <class name="WebKitDOMClientRect" get-type="webkit_dom_client_rect_get_type" parents="WebKitDOMObject,GObject">
+    <property name="top" type="gfloat" flags="225" default-value="0.000000"/>
+    <property name="right" type="gfloat" flags="225" default-value="0.000000"/>
+    <property name="bottom" type="gfloat" flags="225" default-value="0.000000"/>
+    <property name="left" type="gfloat" flags="225" default-value="0.000000"/>
+    <property name="width" type="gfloat" flags="225" default-value="0.000000"/>
+    <property name="height" type="gfloat" flags="225" default-value="0.000000"/>
+  </class>
+  <class name="WebKitDOMClientRectList" get-type="webkit_dom_client_rect_list_get_type" parents="WebKitDOMObject,GObject">
+    <property name="length" type="gulong" flags="225" default-value="0"/>
+  </class>
+  <class name="WebKitDOMComment" get-type="webkit_dom_comment_get_type" parents="WebKitDOMCharacterData,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+  </class>
+  <class name="WebKitDOMDOMImplementation" get-type="webkit_dom_dom_implementation_get_type" parents="WebKitDOMObject,GObject">
+  </class>
+  <class name="WebKitDOMDOMSelection" get-type="webkit_dom_dom_selection_get_type" parents="WebKitDOMObject,GObject">
+    <property name="anchor-node" type="WebKitDOMNode" flags="225"/>
+    <property name="anchor-offset" type="gulong" flags="225" default-value="0"/>
+    <property name="focus-node" type="WebKitDOMNode" flags="225"/>
+    <property name="focus-offset" type="gulong" flags="225" default-value="0"/>
+    <property name="is-collapsed" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="range-count" type="gulong" flags="225" default-value="0"/>
+    <property name="type" type="gchararray" flags="225" default-value=""/>
+    <property name="base-node" type="WebKitDOMNode" flags="225"/>
+    <property name="base-offset" type="gulong" flags="225" default-value="0"/>
+    <property name="extent-node" type="WebKitDOMNode" flags="225"/>
+    <property name="extent-offset" type="gulong" flags="225" default-value="0"/>
+  </class>
+  <class name="WebKitDOMDOMTokenList" get-type="webkit_dom_dom_token_list_get_type" parents="WebKitDOMObject,GObject">
+    <property name="length" type="gulong" flags="225" default-value="0"/>
+    <property name="value" type="gchararray" flags="227" default-value=""/>
+  </class>
+  <class name="WebKitDOMDOMWindow" get-type="webkit_dom_dom_window_get_type" parents="WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="frame-element" type="WebKitDOMElement" flags="225"/>
+    <property name="offscreen-buffering" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="outer-height" type="glong" flags="225" default-value="0"/>
+    <property name="outer-width" type="glong" flags="225" default-value="0"/>
+    <property name="inner-height" type="glong" flags="225" default-value="0"/>
+    <property name="inner-width" type="glong" flags="225" default-value="0"/>
+    <property name="screen-x" type="glong" flags="225" default-value="0"/>
+    <property name="screen-y" type="glong" flags="225" default-value="0"/>
+    <property name="screen-left" type="glong" flags="225" default-value="0"/>
+    <property name="screen-top" type="glong" flags="225" default-value="0"/>
+    <property name="scroll-x" type="glong" flags="225" default-value="0"/>
+    <property name="scroll-y" type="glong" flags="225" default-value="0"/>
+    <property name="page-x-offset" type="glong" flags="225" default-value="0"/>
+    <property name="page-y-offset" type="glong" flags="225" default-value="0"/>
+    <property name="closed" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="length" type="gulong" flags="225" default-value="0"/>
+    <property name="name" type="gchararray" flags="227" default-value=""/>
+    <property name="status" type="gchararray" flags="227" default-value=""/>
+    <property name="default-status" type="gchararray" flags="227" default-value=""/>
+    <property name="self" type="WebKitDOMDOMWindow" flags="225"/>
+    <property name="window" type="WebKitDOMDOMWindow" flags="225"/>
+    <property name="frames" type="WebKitDOMDOMWindow" flags="225"/>
+    <property name="opener" type="WebKitDOMDOMWindow" flags="225"/>
+    <property name="parent" type="WebKitDOMDOMWindow" flags="225"/>
+    <property name="top" type="WebKitDOMDOMWindow" flags="225"/>
+    <property name="document" type="WebKitDOMDocument" flags="225"/>
+    <property name="device-pixel-ratio" type="gdouble" flags="225" default-value="0.000000"/>
+    <property name="orientation" type="glong" flags="225" default-value="0"/>
+  </class>
+  <class name="WebKitDOMElement" get-type="webkit_dom_element_get_type" parents="WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="tag-name" type="gchararray" flags="225" default-value=""/>
+    <property name="attributes" type="WebKitDOMNamedNodeMap" flags="225"/>
+    <property name="style" type="WebKitDOMCSSStyleDeclaration" flags="225"/>
+    <property name="id" type="gchararray" flags="227" default-value=""/>
+    <property name="namespace-uri" type="gchararray" flags="225" default-value=""/>
+    <property name="prefix" type="gchararray" flags="225" default-value=""/>
+    <property name="local-name" type="gchararray" flags="225" default-value=""/>
+    <property name="offset-left" type="gdouble" flags="225" default-value="0.000000"/>
+    <property name="offset-top" type="gdouble" flags="225" default-value="0.000000"/>
+    <property name="offset-width" type="gdouble" flags="225" default-value="0.000000"/>
+    <property name="offset-height" type="gdouble" flags="225" default-value="0.000000"/>
+    <property name="client-left" type="gdouble" flags="225" default-value="0.000000"/>
+    <property name="client-top" type="gdouble" flags="225" default-value="0.000000"/>
+    <property name="client-width" type="gdouble" flags="225" default-value="0.000000"/>
+    <property name="client-height" type="gdouble" flags="225" default-value="0.000000"/>
+    <property name="scroll-left" type="glong" flags="227" default-value="0"/>
+    <property name="scroll-top" type="glong" flags="227" default-value="0"/>
+    <property name="scroll-width" type="glong" flags="225" default-value="0"/>
+    <property name="scroll-height" type="glong" flags="225" default-value="0"/>
+    <property name="offset-parent" type="WebKitDOMElement" flags="225"/>
+    <property name="inner-html" type="gchararray" flags="227" default-value=""/>
+    <property name="outer-html" type="gchararray" flags="227" default-value=""/>
+    <property name="class-name" type="gchararray" flags="227" default-value=""/>
+    <property name="class-list" type="WebKitDOMDOMTokenList" flags="225"/>
+    <property name="webkit-region-overset" type="gchararray" flags="225" default-value=""/>
+    <property name="previous-element-sibling" type="WebKitDOMElement" flags="225"/>
+    <property name="next-element-sibling" type="WebKitDOMElement" flags="225"/>
+    <property name="children" type="WebKitDOMHTMLCollection" flags="225"/>
+    <property name="first-element-child" type="WebKitDOMElement" flags="225"/>
+    <property name="last-element-child" type="WebKitDOMElement" flags="225"/>
+    <property name="child-element-count" type="gulong" flags="225" default-value="0"/>
+  </class>
+  <class name="WebKitDOMHTMLElement" get-type="webkit_dom_html_element_get_type" parents="WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="title" type="gchararray" flags="227" default-value=""/>
+    <property name="lang" type="gchararray" flags="227" default-value=""/>
+    <property name="translate" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="dir" type="gchararray" flags="227" default-value=""/>
+    <property name="tab-index" type="glong" flags="227" default-value="0"/>
+    <property name="draggable" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="webkitdropzone" type="gchararray" flags="227" default-value=""/>
+    <property name="hidden" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="access-key" type="gchararray" flags="227" default-value=""/>
+    <property name="inner-text" type="gchararray" flags="227" default-value=""/>
+    <property name="outer-text" type="gchararray" flags="227" default-value=""/>
+    <property name="content-editable" type="gchararray" flags="227" default-value=""/>
+    <property name="is-content-editable" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="spellcheck" type="gboolean" flags="227" default-value="FALSE"/>
+  </class>
+  <class name="WebKitDOMEntityReference" get-type="webkit_dom_entity_reference_get_type" parents="WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+  </class>
+  <class name="WebKitDOMHTMLBaseFontElement" get-type="webkit_dom_html_base_font_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+  </class>
+  <class name="WebKitDOMDocument" get-type="webkit_dom_document_get_type" parents="WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="doctype" type="WebKitDOMDocumentType" flags="225"/>
+    <property name="implementation" type="WebKitDOMDOMImplementation" flags="225"/>
+    <property name="document-element" type="WebKitDOMElement" flags="225"/>
+    <property name="input-encoding" type="gchararray" flags="225" default-value=""/>
+    <property name="xml-encoding" type="gchararray" flags="225" default-value=""/>
+    <property name="xml-version" type="gchararray" flags="227" default-value=""/>
+    <property name="xml-standalone" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="document-uri" type="gchararray" flags="227" default-value=""/>
+    <property name="default-view" type="WebKitDOMDOMWindow" flags="225"/>
+    <property name="style-sheets" type="WebKitDOMStyleSheetList" flags="225"/>
+    <property name="content-type" type="gchararray" flags="225" default-value=""/>
+    <property name="title" type="gchararray" flags="227" default-value=""/>
+    <property name="dir" type="gchararray" flags="227" default-value=""/>
+    <property name="design-mode" type="gchararray" flags="227" default-value=""/>
+    <property name="referrer" type="gchararray" flags="225" default-value=""/>
+    <property name="domain" type="gchararray" flags="225" default-value=""/>
+    <property name="url" type="gchararray" flags="225" default-value=""/>
+    <property name="cookie" type="gchararray" flags="227" default-value=""/>
+    <property name="body" type="WebKitDOMHTMLElement" flags="225"/>
+    <property name="head" type="WebKitDOMHTMLHeadElement" flags="225"/>
+    <property name="images" type="WebKitDOMHTMLCollection" flags="225"/>
+    <property name="applets" type="WebKitDOMHTMLCollection" flags="225"/>
+    <property name="links" type="WebKitDOMHTMLCollection" flags="225"/>
+    <property name="forms" type="WebKitDOMHTMLCollection" flags="225"/>
+    <property name="anchors" type="WebKitDOMHTMLCollection" flags="225"/>
+    <property name="embeds" type="WebKitDOMHTMLCollection" flags="225"/>
+    <property name="plugins" type="WebKitDOMHTMLCollection" flags="225"/>
+    <property name="scripts" type="WebKitDOMHTMLCollection" flags="225"/>
+    <property name="last-modified" type="gchararray" flags="225" default-value=""/>
+    <property name="charset" type="gchararray" flags="227" default-value=""/>
+    <property name="ready-state" type="gchararray" flags="225" default-value=""/>
+    <property name="character-set" type="gchararray" flags="225" default-value=""/>
+    <property name="preferred-stylesheet-set" type="gchararray" flags="225" default-value=""/>
+    <property name="selected-stylesheet-set" type="gchararray" flags="227" default-value=""/>
+    <property name="active-element" type="WebKitDOMElement" flags="225"/>
+    <property name="compat-mode" type="gchararray" flags="225" default-value=""/>
+    <property name="webkit-is-full-screen" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="webkit-full-screen-keyboard-input-allowed" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="webkit-current-full-screen-element" type="WebKitDOMElement" flags="225"/>
+    <property name="webkit-fullscreen-enabled" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="webkit-fullscreen-element" type="WebKitDOMElement" flags="225"/>
+    <property name="pointer-lock-element" type="WebKitDOMElement" flags="225"/>
+    <property name="visibility-state" type="gchararray" flags="225" default-value=""/>
+    <property name="hidden" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="current-script" type="WebKitDOMHTMLScriptElement" flags="225"/>
+    <property name="origin" type="gchararray" flags="225" default-value=""/>
+    <property name="scrolling-element" type="WebKitDOMElement" flags="225"/>
+    <property name="children" type="WebKitDOMHTMLCollection" flags="225"/>
+    <property name="first-element-child" type="WebKitDOMElement" flags="225"/>
+    <property name="last-element-child" type="WebKitDOMElement" flags="225"/>
+    <property name="child-element-count" type="gulong" flags="225" default-value="0"/>
+  </class>
+  <class name="WebKitDOMDocumentFragment" get-type="webkit_dom_document_fragment_get_type" parents="WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="children" type="WebKitDOMHTMLCollection" flags="225"/>
+    <property name="first-element-child" type="WebKitDOMElement" flags="225"/>
+    <property name="last-element-child" type="WebKitDOMElement" flags="225"/>
+    <property name="child-element-count" type="gulong" flags="225" default-value="0"/>
+  </class>
+  <class name="WebKitDOMDocumentType" get-type="webkit_dom_document_type_get_type" parents="WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="name" type="gchararray" flags="225" default-value=""/>
+    <property name="entities" type="WebKitDOMNamedNodeMap" flags="225"/>
+    <property name="notations" type="WebKitDOMNamedNodeMap" flags="225"/>
+    <property name="internal-subset" type="gchararray" flags="225" default-value=""/>
+    <property name="public-id" type="gchararray" flags="225" default-value=""/>
+    <property name="system-id" type="gchararray" flags="225" default-value=""/>
+  </class>
+  <class name="WebKitDOMEvent" get-type="webkit_dom_event_get_type" parents="WebKitDOMObject,GObject">
+    <property name="type" type="gchararray" flags="225" default-value=""/>
+    <property name="target" type="WebKitDOMEventTarget" flags="225"/>
+    <property name="current-target" type="WebKitDOMEventTarget" flags="225"/>
+    <property name="event-phase" type="guint" flags="225" default-value="0"/>
+    <property name="bubbles" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="cancelable" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="time-stamp" type="guint" flags="225" default-value="0"/>
+    <property name="src-element" type="WebKitDOMEventTarget" flags="225"/>
+    <property name="return-value" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="cancel-bubble" type="gboolean" flags="227" default-value="FALSE"/>
+  </class>
+  <interface name="WebKitDOMEventTarget" get-type="webkit_dom_event_target_get_type">
+  </interface>
+  <class name="WebKitDOMFile" get-type="webkit_dom_file_get_type" parents="WebKitDOMBlob,WebKitDOMObject,GObject">
+    <property name="name" type="gchararray" flags="225" default-value=""/>
+  </class>
+  <class name="WebKitDOMFileList" get-type="webkit_dom_file_list_get_type" parents="WebKitDOMObject,GObject">
+    <property name="length" type="gulong" flags="225" default-value="0"/>
+  </class>
+  <class name="WebKitDOMHTMLAnchorElement" get-type="webkit_dom_html_anchor_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="charset" type="gchararray" flags="227" default-value=""/>
+    <property name="coords" type="gchararray" flags="227" default-value=""/>
+    <property name="hreflang" type="gchararray" flags="227" default-value=""/>
+    <property name="name" type="gchararray" flags="227" default-value=""/>
+    <property name="rel" type="gchararray" flags="227" default-value=""/>
+    <property name="rev" type="gchararray" flags="227" default-value=""/>
+    <property name="shape" type="gchararray" flags="227" default-value=""/>
+    <property name="target" type="gchararray" flags="227" default-value=""/>
+    <property name="type" type="gchararray" flags="227" default-value=""/>
+    <property name="text" type="gchararray" flags="227" default-value=""/>
+    <property name="href" type="gchararray" flags="227" default-value=""/>
+    <property name="protocol" type="gchararray" flags="227" default-value=""/>
+    <property name="host" type="gchararray" flags="227" default-value=""/>
+    <property name="hostname" type="gchararray" flags="227" default-value=""/>
+    <property name="port" type="gchararray" flags="227" default-value=""/>
+    <property name="pathname" type="gchararray" flags="227" default-value=""/>
+    <property name="search" type="gchararray" flags="227" default-value=""/>
+    <property name="hash" type="gchararray" flags="227" default-value=""/>
+  </class>
+  <class name="WebKitDOMHTMLAppletElement" get-type="webkit_dom_html_applet_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="align" type="gchararray" flags="227" default-value=""/>
+    <property name="alt" type="gchararray" flags="227" default-value=""/>
+    <property name="archive" type="gchararray" flags="227" default-value=""/>
+    <property name="code" type="gchararray" flags="227" default-value=""/>
+    <property name="code-base" type="gchararray" flags="227" default-value=""/>
+    <property name="height" type="gchararray" flags="227" default-value=""/>
+    <property name="hspace" type="glong" flags="227" default-value="0"/>
+    <property name="name" type="gchararray" flags="227" default-value=""/>
+    <property name="object" type="gchararray" flags="227" default-value=""/>
+    <property name="vspace" type="glong" flags="227" default-value="0"/>
+    <property name="width" type="gchararray" flags="227" default-value=""/>
+  </class>
+  <class name="WebKitDOMHTMLAreaElement" get-type="webkit_dom_html_area_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="alt" type="gchararray" flags="227" default-value=""/>
+    <property name="coords" type="gchararray" flags="227" default-value=""/>
+    <property name="no-href" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="shape" type="gchararray" flags="227" default-value=""/>
+    <property name="target" type="gchararray" flags="227" default-value=""/>
+    <property name="href" type="gchararray" flags="227" default-value=""/>
+    <property name="protocol" type="gchararray" flags="227" default-value=""/>
+    <property name="host" type="gchararray" flags="227" default-value=""/>
+    <property name="hostname" type="gchararray" flags="227" default-value=""/>
+    <property name="port" type="gchararray" flags="227" default-value=""/>
+    <property name="pathname" type="gchararray" flags="227" default-value=""/>
+    <property name="search" type="gchararray" flags="227" default-value=""/>
+    <property name="hash" type="gchararray" flags="227" default-value=""/>
+  </class>
+  <class name="WebKitDOMHTMLBRElement" get-type="webkit_dom_html_br_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="clear" type="gchararray" flags="227" default-value=""/>
+  </class>
+  <class name="WebKitDOMHTMLBaseElement" get-type="webkit_dom_html_base_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="href" type="gchararray" flags="227" default-value=""/>
+    <property name="target" type="gchararray" flags="227" default-value=""/>
+  </class>
+  <class name="WebKitDOMHTMLBodyElement" get-type="webkit_dom_html_body_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="a-link" type="gchararray" flags="227" default-value=""/>
+    <property name="background" type="gchararray" flags="227" default-value=""/>
+    <property name="bg-color" type="gchararray" flags="227" default-value=""/>
+    <property name="link" type="gchararray" flags="227" default-value=""/>
+    <property name="text" type="gchararray" flags="227" default-value=""/>
+    <property name="v-link" type="gchararray" flags="227" default-value=""/>
+  </class>
+  <class name="WebKitDOMHTMLButtonElement" get-type="webkit_dom_html_button_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="autofocus" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="disabled" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="form" type="WebKitDOMHTMLFormElement" flags="225"/>
+    <property name="type" type="gchararray" flags="227" default-value=""/>
+    <property name="name" type="gchararray" flags="227" default-value=""/>
+    <property name="value" type="gchararray" flags="227" default-value=""/>
+    <property name="will-validate" type="gboolean" flags="225" default-value="FALSE"/>
+  </class>
+  <class name="WebKitDOMHTMLCanvasElement" get-type="webkit_dom_html_canvas_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="width" type="glong" flags="227" default-value="0"/>
+    <property name="height" type="glong" flags="227" default-value="0"/>
+  </class>
+  <class name="WebKitDOMHTMLCollection" get-type="webkit_dom_html_collection_get_type" parents="WebKitDOMObject,GObject">
+    <property name="length" type="gulong" flags="225" default-value="0"/>
+  </class>
+  <class name="WebKitDOMHTMLDListElement" get-type="webkit_dom_html_d_list_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="compact" type="gboolean" flags="227" default-value="FALSE"/>
+  </class>
+  <class name="WebKitDOMHTMLDirectoryElement" get-type="webkit_dom_html_directory_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="compact" type="gboolean" flags="227" default-value="FALSE"/>
+  </class>
+  <class name="WebKitDOMHTMLDivElement" get-type="webkit_dom_html_div_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="align" type="gchararray" flags="227" default-value=""/>
+  </class>
+  <class name="WebKitDOMHTMLDocument" get-type="webkit_dom_html_document_get_type" parents="WebKitDOMDocument,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="width" type="glong" flags="225" default-value="0"/>
+    <property name="height" type="glong" flags="225" default-value="0"/>
+    <property name="dir" type="gchararray" flags="227" default-value=""/>
+    <property name="bg-color" type="gchararray" flags="227" default-value=""/>
+    <property name="fg-color" type="gchararray" flags="227" default-value=""/>
+    <property name="alink-color" type="gchararray" flags="227" default-value=""/>
+    <property name="link-color" type="gchararray" flags="227" default-value=""/>
+    <property name="vlink-color" type="gchararray" flags="227" default-value=""/>
+  </class>
+  <class name="WebKitDOMHTMLEmbedElement" get-type="webkit_dom_html_embed_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="align" type="gchararray" flags="227" default-value=""/>
+    <property name="height" type="glong" flags="227" default-value="0"/>
+    <property name="name" type="gchararray" flags="227" default-value=""/>
+    <property name="src" type="gchararray" flags="227" default-value=""/>
+    <property name="type" type="gchararray" flags="227" default-value=""/>
+    <property name="width" type="glong" flags="227" default-value="0"/>
+  </class>
+  <class name="WebKitDOMHTMLFieldSetElement" get-type="webkit_dom_html_field_set_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="form" type="WebKitDOMHTMLFormElement" flags="225"/>
+  </class>
+  <class name="WebKitDOMHTMLFontElement" get-type="webkit_dom_html_font_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="color" type="gchararray" flags="227" default-value=""/>
+    <property name="face" type="gchararray" flags="227" default-value=""/>
+    <property name="size" type="gchararray" flags="227" default-value=""/>
+  </class>
+  <class name="WebKitDOMHTMLFormElement" get-type="webkit_dom_html_form_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="accept-charset" type="gchararray" flags="227" default-value=""/>
+    <property name="action" type="gchararray" flags="227" default-value=""/>
+    <property name="enctype" type="gchararray" flags="227" default-value=""/>
+    <property name="encoding" type="gchararray" flags="227" default-value=""/>
+    <property name="method" type="gchararray" flags="227" default-value=""/>
+    <property name="name" type="gchararray" flags="227" default-value=""/>
+    <property name="target" type="gchararray" flags="227" default-value=""/>
+    <property name="elements" type="WebKitDOMHTMLCollection" flags="225"/>
+    <property name="length" type="glong" flags="225" default-value="0"/>
+  </class>
+  <class name="WebKitDOMHTMLFrameElement" get-type="webkit_dom_html_frame_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="frame-border" type="gchararray" flags="227" default-value=""/>
+    <property name="long-desc" type="gchararray" flags="227" default-value=""/>
+    <property name="margin-height" type="gchararray" flags="227" default-value=""/>
+    <property name="margin-width" type="gchararray" flags="227" default-value=""/>
+    <property name="name" type="gchararray" flags="227" default-value=""/>
+    <property name="no-resize" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="scrolling" type="gchararray" flags="227" default-value=""/>
+    <property name="src" type="gchararray" flags="227" default-value=""/>
+    <property name="content-document" type="WebKitDOMDocument" flags="225"/>
+    <property name="content-window" type="WebKitDOMDOMWindow" flags="225"/>
+    <property name="width" type="glong" flags="225" default-value="0"/>
+    <property name="height" type="glong" flags="225" default-value="0"/>
+  </class>
+  <class name="WebKitDOMHTMLFrameSetElement" get-type="webkit_dom_html_frame_set_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="cols" type="gchararray" flags="227" default-value=""/>
+    <property name="rows" type="gchararray" flags="227" default-value=""/>
+  </class>
+  <class name="WebKitDOMHTMLHRElement" get-type="webkit_dom_html_hr_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="align" type="gchararray" flags="227" default-value=""/>
+    <property name="no-shade" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="size" type="gchararray" flags="227" default-value=""/>
+    <property name="width" type="gchararray" flags="227" default-value=""/>
+  </class>
+  <class name="WebKitDOMHTMLHeadElement" get-type="webkit_dom_html_head_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="profile" type="gchararray" flags="227" default-value=""/>
+  </class>
+  <class name="WebKitDOMHTMLHeadingElement" get-type="webkit_dom_html_heading_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="align" type="gchararray" flags="227" default-value=""/>
+  </class>
+  <class name="WebKitDOMHTMLHtmlElement" get-type="webkit_dom_html_html_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="version" type="gchararray" flags="227" default-value=""/>
+  </class>
+  <class name="WebKitDOMHTMLIFrameElement" get-type="webkit_dom_html_iframe_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="align" type="gchararray" flags="227" default-value=""/>
+    <property name="frame-border" type="gchararray" flags="227" default-value=""/>
+    <property name="height" type="gchararray" flags="227" default-value=""/>
+    <property name="long-desc" type="gchararray" flags="227" default-value=""/>
+    <property name="margin-height" type="gchararray" flags="227" default-value=""/>
+    <property name="margin-width" type="gchararray" flags="227" default-value=""/>
+    <property name="name" type="gchararray" flags="227" default-value=""/>
+    <property name="scrolling" type="gchararray" flags="227" default-value=""/>
+    <property name="src" type="gchararray" flags="227" default-value=""/>
+    <property name="width" type="gchararray" flags="227" default-value=""/>
+    <property name="content-document" type="WebKitDOMDocument" flags="225"/>
+    <property name="content-window" type="WebKitDOMDOMWindow" flags="225"/>
+  </class>
+  <class name="WebKitDOMHTMLImageElement" get-type="webkit_dom_html_image_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="name" type="gchararray" flags="227" default-value=""/>
+    <property name="align" type="gchararray" flags="227" default-value=""/>
+    <property name="alt" type="gchararray" flags="227" default-value=""/>
+    <property name="border" type="gchararray" flags="227" default-value=""/>
+    <property name="height" type="glong" flags="227" default-value="0"/>
+    <property name="hspace" type="glong" flags="227" default-value="0"/>
+    <property name="is-map" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="long-desc" type="gchararray" flags="227" default-value=""/>
+    <property name="src" type="gchararray" flags="227" default-value=""/>
+    <property name="use-map" type="gchararray" flags="227" default-value=""/>
+    <property name="vspace" type="glong" flags="227" default-value="0"/>
+    <property name="width" type="glong" flags="227" default-value="0"/>
+    <property name="complete" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="lowsrc" type="gchararray" flags="227" default-value=""/>
+    <property name="natural-height" type="glong" flags="225" default-value="0"/>
+    <property name="natural-width" type="glong" flags="225" default-value="0"/>
+    <property name="x" type="glong" flags="225" default-value="0"/>
+    <property name="y" type="glong" flags="225" default-value="0"/>
+  </class>
+  <class name="WebKitDOMHTMLInputElement" get-type="webkit_dom_html_input_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="accept" type="gchararray" flags="227" default-value=""/>
+    <property name="alt" type="gchararray" flags="227" default-value=""/>
+    <property name="autofocus" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="default-checked" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="checked" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="disabled" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="form" type="WebKitDOMHTMLFormElement" flags="225"/>
+    <property name="files" type="WebKitDOMFileList" flags="225"/>
+    <property name="height" type="gulong" flags="227" default-value="0"/>
+    <property name="indeterminate" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="max-length" type="glong" flags="227" default-value="0"/>
+    <property name="multiple" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="name" type="gchararray" flags="227" default-value=""/>
+    <property name="read-only" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="size" type="gulong" flags="227" default-value="0"/>
+    <property name="src" type="gchararray" flags="227" default-value=""/>
+    <property name="type" type="gchararray" flags="227" default-value=""/>
+    <property name="default-value" type="gchararray" flags="227" default-value=""/>
+    <property name="value" type="gchararray" flags="227" default-value=""/>
+    <property name="width" type="gulong" flags="227" default-value="0"/>
+    <property name="will-validate" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="align" type="gchararray" flags="227" default-value=""/>
+    <property name="use-map" type="gchararray" flags="227" default-value=""/>
+    <property name="capture" type="gchararray" flags="227" default-value=""/>
+  </class>
+  <class name="WebKitDOMHTMLLIElement" get-type="webkit_dom_html_li_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="type" type="gchararray" flags="227" default-value=""/>
+    <property name="value" type="glong" flags="227" default-value="0"/>
+  </class>
+  <class name="WebKitDOMHTMLLabelElement" get-type="webkit_dom_html_label_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="form" type="WebKitDOMHTMLFormElement" flags="225"/>
+    <property name="html-for" type="gchararray" flags="227" default-value=""/>
+  </class>
+  <class name="WebKitDOMHTMLLegendElement" get-type="webkit_dom_html_legend_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="form" type="WebKitDOMHTMLFormElement" flags="225"/>
+    <property name="align" type="gchararray" flags="227" default-value=""/>
+  </class>
+  <class name="WebKitDOMHTMLLinkElement" get-type="webkit_dom_html_link_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="disabled" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="charset" type="gchararray" flags="227" default-value=""/>
+    <property name="href" type="gchararray" flags="227" default-value=""/>
+    <property name="hreflang" type="gchararray" flags="227" default-value=""/>
+    <property name="media" type="gchararray" flags="227" default-value=""/>
+    <property name="rel" type="gchararray" flags="227" default-value=""/>
+    <property name="rev" type="gchararray" flags="227" default-value=""/>
+    <property name="sizes" type="WebKitDOMDOMTokenList" flags="225"/>
+    <property name="target" type="gchararray" flags="227" default-value=""/>
+    <property name="type" type="gchararray" flags="227" default-value=""/>
+    <property name="sheet" type="WebKitDOMStyleSheet" flags="225"/>
+  </class>
+  <class name="WebKitDOMHTMLMapElement" get-type="webkit_dom_html_map_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="areas" type="WebKitDOMHTMLCollection" flags="225"/>
+    <property name="name" type="gchararray" flags="227" default-value=""/>
+  </class>
+  <class name="WebKitDOMHTMLMarqueeElement" get-type="webkit_dom_html_marquee_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+  </class>
+  <class name="WebKitDOMHTMLMenuElement" get-type="webkit_dom_html_menu_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="compact" type="gboolean" flags="227" default-value="FALSE"/>
+  </class>
+  <class name="WebKitDOMHTMLMetaElement" get-type="webkit_dom_html_meta_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="content" type="gchararray" flags="227" default-value=""/>
+    <property name="http-equiv" type="gchararray" flags="227" default-value=""/>
+    <property name="name" type="gchararray" flags="227" default-value=""/>
+    <property name="scheme" type="gchararray" flags="227" default-value=""/>
+  </class>
+  <class name="WebKitDOMHTMLModElement" get-type="webkit_dom_html_mod_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="cite" type="gchararray" flags="227" default-value=""/>
+    <property name="date-time" type="gchararray" flags="227" default-value=""/>
+  </class>
+  <class name="WebKitDOMHTMLOListElement" get-type="webkit_dom_html_o_list_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="compact" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="start" type="glong" flags="227" default-value="0"/>
+    <property name="type" type="gchararray" flags="227" default-value=""/>
+  </class>
+  <class name="WebKitDOMHTMLObjectElement" get-type="webkit_dom_html_object_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="form" type="WebKitDOMHTMLFormElement" flags="225"/>
+    <property name="code" type="gchararray" flags="227" default-value=""/>
+    <property name="align" type="gchararray" flags="227" default-value=""/>
+    <property name="archive" type="gchararray" flags="227" default-value=""/>
+    <property name="border" type="gchararray" flags="227" default-value=""/>
+    <property name="code-base" type="gchararray" flags="227" default-value=""/>
+    <property name="code-type" type="gchararray" flags="227" default-value=""/>
+    <property name="data" type="gchararray" flags="227" default-value=""/>
+    <property name="declare" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="height" type="gchararray" flags="227" default-value=""/>
+    <property name="hspace" type="glong" flags="227" default-value="0"/>
+    <property name="name" type="gchararray" flags="227" default-value=""/>
+    <property name="standby" type="gchararray" flags="227" default-value=""/>
+    <property name="type" type="gchararray" flags="227" default-value=""/>
+    <property name="use-map" type="gchararray" flags="227" default-value=""/>
+    <property name="vspace" type="glong" flags="227" default-value="0"/>
+    <property name="width" type="gchararray" flags="227" default-value=""/>
+    <property name="content-document" type="WebKitDOMDocument" flags="225"/>
+  </class>
+  <class name="WebKitDOMHTMLOptGroupElement" get-type="webkit_dom_html_opt_group_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="disabled" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="label" type="gchararray" flags="227" default-value=""/>
+  </class>
+  <class name="WebKitDOMHTMLOptionElement" get-type="webkit_dom_html_option_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="disabled" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="form" type="WebKitDOMHTMLFormElement" flags="225"/>
+    <property name="label" type="gchararray" flags="227" default-value=""/>
+    <property name="default-selected" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="selected" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="value" type="gchararray" flags="227" default-value=""/>
+    <property name="text" type="gchararray" flags="225" default-value=""/>
+    <property name="index" type="glong" flags="225" default-value="0"/>
+  </class>
+  <class name="WebKitDOMHTMLOptionsCollection" get-type="webkit_dom_html_options_collection_get_type" parents="WebKitDOMHTMLCollection,WebKitDOMObject,GObject">
+    <property name="selected-index" type="glong" flags="227" default-value="0"/>
+    <property name="length" type="gulong" flags="225" default-value="0"/>
+  </class>
+  <class name="WebKitDOMHTMLParagraphElement" get-type="webkit_dom_html_paragraph_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="align" type="gchararray" flags="227" default-value=""/>
+  </class>
+  <class name="WebKitDOMHTMLParamElement" get-type="webkit_dom_html_param_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="name" type="gchararray" flags="227" default-value=""/>
+    <property name="type" type="gchararray" flags="227" default-value=""/>
+    <property name="value" type="gchararray" flags="227" default-value=""/>
+    <property name="value-type" type="gchararray" flags="227" default-value=""/>
+  </class>
+  <class name="WebKitDOMHTMLPreElement" get-type="webkit_dom_html_pre_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="width" type="glong" flags="227" default-value="0"/>
+    <property name="wrap" type="gboolean" flags="227" default-value="FALSE"/>
+  </class>
+  <class name="WebKitDOMHTMLQuoteElement" get-type="webkit_dom_html_quote_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="cite" type="gchararray" flags="227" default-value=""/>
+  </class>
+  <class name="WebKitDOMHTMLScriptElement" get-type="webkit_dom_html_script_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="text" type="gchararray" flags="227" default-value=""/>
+    <property name="html-for" type="gchararray" flags="227" default-value=""/>
+    <property name="event" type="gchararray" flags="227" default-value=""/>
+    <property name="charset" type="gchararray" flags="227" default-value=""/>
+    <property name="defer" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="src" type="gchararray" flags="227" default-value=""/>
+    <property name="type" type="gchararray" flags="227" default-value=""/>
+  </class>
+  <class name="WebKitDOMHTMLSelectElement" get-type="webkit_dom_html_select_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="autofocus" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="disabled" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="form" type="WebKitDOMHTMLFormElement" flags="225"/>
+    <property name="multiple" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="name" type="gchararray" flags="227" default-value=""/>
+    <property name="size" type="glong" flags="227" default-value="0"/>
+    <property name="type" type="gchararray" flags="225" default-value=""/>
+    <property name="options" type="WebKitDOMHTMLOptionsCollection" flags="225"/>
+    <property name="length" type="gulong" flags="227" default-value="0"/>
+    <property name="selected-index" type="glong" flags="227" default-value="0"/>
+    <property name="value" type="gchararray" flags="227" default-value=""/>
+    <property name="will-validate" type="gboolean" flags="225" default-value="FALSE"/>
+  </class>
+  <class name="WebKitDOMHTMLStyleElement" get-type="webkit_dom_html_style_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="disabled" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="media" type="gchararray" flags="227" default-value=""/>
+    <property name="type" type="gchararray" flags="227" default-value=""/>
+    <property name="sheet" type="WebKitDOMStyleSheet" flags="225"/>
+  </class>
+  <class name="WebKitDOMHTMLTableCaptionElement" get-type="webkit_dom_html_table_caption_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="align" type="gchararray" flags="227" default-value=""/>
+  </class>
+  <class name="WebKitDOMHTMLTableCellElement" get-type="webkit_dom_html_table_cell_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="cell-index" type="glong" flags="225" default-value="0"/>
+    <property name="align" type="gchararray" flags="227" default-value=""/>
+    <property name="axis" type="gchararray" flags="227" default-value=""/>
+    <property name="bg-color" type="gchararray" flags="227" default-value=""/>
+    <property name="ch" type="gchararray" flags="227" default-value=""/>
+    <property name="ch-off" type="gchararray" flags="227" default-value=""/>
+    <property name="col-span" type="glong" flags="227" default-value="0"/>
+    <property name="row-span" type="glong" flags="227" default-value="0"/>
+    <property name="headers" type="gchararray" flags="227" default-value=""/>
+    <property name="height" type="gchararray" flags="227" default-value=""/>
+    <property name="no-wrap" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="v-align" type="gchararray" flags="227" default-value=""/>
+    <property name="width" type="gchararray" flags="227" default-value=""/>
+    <property name="abbr" type="gchararray" flags="227" default-value=""/>
+    <property name="scope" type="gchararray" flags="227" default-value=""/>
+  </class>
+  <class name="WebKitDOMHTMLTableColElement" get-type="webkit_dom_html_table_col_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="align" type="gchararray" flags="227" default-value=""/>
+    <property name="ch" type="gchararray" flags="227" default-value=""/>
+    <property name="ch-off" type="gchararray" flags="227" default-value=""/>
+    <property name="span" type="glong" flags="227" default-value="0"/>
+    <property name="v-align" type="gchararray" flags="227" default-value=""/>
+    <property name="width" type="gchararray" flags="227" default-value=""/>
+  </class>
+  <class name="WebKitDOMHTMLTableElement" get-type="webkit_dom_html_table_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="caption" type="WebKitDOMHTMLTableCaptionElement" flags="225"/>
+    <property name="t-head" type="WebKitDOMHTMLTableSectionElement" flags="225"/>
+    <property name="t-foot" type="WebKitDOMHTMLTableSectionElement" flags="225"/>
+    <property name="rows" type="WebKitDOMHTMLCollection" flags="225"/>
+    <property name="t-bodies" type="WebKitDOMHTMLCollection" flags="225"/>
+    <property name="align" type="gchararray" flags="227" default-value=""/>
+    <property name="bg-color" type="gchararray" flags="227" default-value=""/>
+    <property name="border" type="gchararray" flags="227" default-value=""/>
+    <property name="cell-padding" type="gchararray" flags="227" default-value=""/>
+    <property name="cell-spacing" type="gchararray" flags="227" default-value=""/>
+    <property name="rules" type="gchararray" flags="227" default-value=""/>
+    <property name="summary" type="gchararray" flags="227" default-value=""/>
+    <property name="width" type="gchararray" flags="227" default-value=""/>
+  </class>
+  <class name="WebKitDOMHTMLTableRowElement" get-type="webkit_dom_html_table_row_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="row-index" type="glong" flags="225" default-value="0"/>
+    <property name="section-row-index" type="glong" flags="225" default-value="0"/>
+    <property name="cells" type="WebKitDOMHTMLCollection" flags="225"/>
+    <property name="align" type="gchararray" flags="227" default-value=""/>
+    <property name="bg-color" type="gchararray" flags="227" default-value=""/>
+    <property name="ch" type="gchararray" flags="227" default-value=""/>
+    <property name="ch-off" type="gchararray" flags="227" default-value=""/>
+    <property name="v-align" type="gchararray" flags="227" default-value=""/>
+  </class>
+  <class name="WebKitDOMHTMLTableSectionElement" get-type="webkit_dom_html_table_section_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="align" type="gchararray" flags="227" default-value=""/>
+    <property name="ch" type="gchararray" flags="227" default-value=""/>
+    <property name="ch-off" type="gchararray" flags="227" default-value=""/>
+    <property name="v-align" type="gchararray" flags="227" default-value=""/>
+    <property name="rows" type="WebKitDOMHTMLCollection" flags="225"/>
+  </class>
+  <class name="WebKitDOMHTMLTextAreaElement" get-type="webkit_dom_html_text_area_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="autofocus" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="disabled" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="form" type="WebKitDOMHTMLFormElement" flags="225"/>
+    <property name="name" type="gchararray" flags="227" default-value=""/>
+    <property name="read-only" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="rows" type="glong" flags="227" default-value="0"/>
+    <property name="cols" type="glong" flags="227" default-value="0"/>
+    <property name="type" type="gchararray" flags="225" default-value=""/>
+    <property name="default-value" type="gchararray" flags="227" default-value=""/>
+    <property name="value" type="gchararray" flags="227" default-value=""/>
+    <property name="will-validate" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="selection-start" type="glong" flags="227" default-value="0"/>
+    <property name="selection-end" type="glong" flags="227" default-value="0"/>
+  </class>
+  <class name="WebKitDOMHTMLTitleElement" get-type="webkit_dom_html_title_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="text" type="gchararray" flags="227" default-value=""/>
+  </class>
+  <class name="WebKitDOMHTMLUListElement" get-type="webkit_dom_html_u_list_element_get_type" parents="WebKitDOMHTMLElement,WebKitDOMElement,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="compact" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="type" type="gchararray" flags="227" default-value=""/>
+  </class>
+  <class name="WebKitDOMUIEvent" get-type="webkit_dom_ui_event_get_type" parents="WebKitDOMEvent,WebKitDOMObject,GObject">
+    <property name="view" type="WebKitDOMDOMWindow" flags="225"/>
+    <property name="detail" type="glong" flags="225" default-value="0"/>
+    <property name="key-code" type="glong" flags="225" default-value="0"/>
+    <property name="char-code" type="glong" flags="225" default-value="0"/>
+    <property name="layer-x" type="glong" flags="225" default-value="0"/>
+    <property name="layer-y" type="glong" flags="225" default-value="0"/>
+    <property name="page-x" type="glong" flags="225" default-value="0"/>
+    <property name="page-y" type="glong" flags="225" default-value="0"/>
+  </class>
+  <class name="WebKitDOMKeyboardEvent" get-type="webkit_dom_keyboard_event_get_type" parents="WebKitDOMUIEvent,WebKitDOMEvent,WebKitDOMObject,GObject">
+    <property name="key-identifier" type="gchararray" flags="225" default-value=""/>
+    <property name="key-location" type="gulong" flags="225" default-value="0"/>
+    <property name="ctrl-key" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="shift-key" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="alt-key" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="meta-key" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="alt-graph-key" type="gboolean" flags="225" default-value="FALSE"/>
+  </class>
+  <class name="WebKitDOMMediaList" get-type="webkit_dom_media_list_get_type" parents="WebKitDOMObject,GObject">
+    <property name="media-text" type="gchararray" flags="227" default-value=""/>
+    <property name="length" type="gulong" flags="225" default-value="0"/>
+  </class>
+  <class name="WebKitDOMMouseEvent" get-type="webkit_dom_mouse_event_get_type" parents="WebKitDOMUIEvent,WebKitDOMEvent,WebKitDOMObject,GObject">
+    <property name="screen-x" type="glong" flags="225" default-value="0"/>
+    <property name="screen-y" type="glong" flags="225" default-value="0"/>
+    <property name="client-x" type="glong" flags="225" default-value="0"/>
+    <property name="client-y" type="glong" flags="225" default-value="0"/>
+    <property name="ctrl-key" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="shift-key" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="alt-key" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="meta-key" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="button" type="guint" flags="225" default-value="0"/>
+    <property name="related-target" type="WebKitDOMEventTarget" flags="225"/>
+    <property name="offset-x" type="glong" flags="225" default-value="0"/>
+    <property name="offset-y" type="glong" flags="225" default-value="0"/>
+    <property name="x" type="glong" flags="225" default-value="0"/>
+    <property name="y" type="glong" flags="225" default-value="0"/>
+    <property name="from-element" type="WebKitDOMNode" flags="225"/>
+    <property name="to-element" type="WebKitDOMNode" flags="225"/>
+  </class>
+  <class name="WebKitDOMNamedNodeMap" get-type="webkit_dom_named_node_map_get_type" parents="WebKitDOMObject,GObject">
+    <property name="length" type="gulong" flags="225" default-value="0"/>
+  </class>
+  <interface name="WebKitDOMNodeFilter" get-type="webkit_dom_node_filter_get_type">
+  </interface>
+  <class name="WebKitDOMNodeIterator" get-type="webkit_dom_node_iterator_get_type" parents="WebKitDOMObject,GObject">
+    <property name="root" type="WebKitDOMNode" flags="225"/>
+    <property name="what-to-show" type="gulong" flags="225" default-value="0"/>
+    <property name="filter" type="WebKitDOMNodeFilter" flags="225"/>
+    <property name="reference-node" type="WebKitDOMNode" flags="225"/>
+    <property name="pointer-before-reference-node" type="gboolean" flags="225" default-value="FALSE"/>
+  </class>
+  <class name="WebKitDOMNodeList" get-type="webkit_dom_node_list_get_type" parents="WebKitDOMObject,GObject">
+    <property name="length" type="gulong" flags="225" default-value="0"/>
+  </class>
+  <class name="WebKitDOMProcessingInstruction" get-type="webkit_dom_processing_instruction_get_type" parents="WebKitDOMCharacterData,WebKitDOMNode,WebKitDOMObject,GObject">
+    <implements name="WebKitDOMEventTarget"/>
+    <property name="target" type="gchararray" flags="225" default-value=""/>
+    <property name="sheet" type="WebKitDOMStyleSheet" flags="225"/>
+  </class>
+  <class name="WebKitDOMRange" get-type="webkit_dom_range_get_type" parents="WebKitDOMObject,GObject">
+    <property name="start-container" type="WebKitDOMNode" flags="225"/>
+    <property name="start-offset" type="glong" flags="225" default-value="0"/>
+    <property name="end-container" type="WebKitDOMNode" flags="225"/>
+    <property name="end-offset" type="glong" flags="225" default-value="0"/>
+    <property name="collapsed" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="common-ancestor-container" type="WebKitDOMNode" flags="225"/>
+    <property name="text" type="gchararray" flags="225" default-value=""/>
+  </class>
+  <class name="WebKitDOMStyleSheetList" get-type="webkit_dom_style_sheet_list_get_type" parents="WebKitDOMObject,GObject">
+    <property name="length" type="gulong" flags="225" default-value="0"/>
+  </class>
+  <class name="WebKitDOMTreeWalker" get-type="webkit_dom_tree_walker_get_type" parents="WebKitDOMObject,GObject">
+    <property name="root" type="WebKitDOMNode" flags="225"/>
+    <property name="what-to-show" type="gulong" flags="225" default-value="0"/>
+    <property name="filter" type="WebKitDOMNodeFilter" flags="225"/>
+    <property name="current-node" type="WebKitDOMNode" flags="225"/>
+  </class>
+  <class name="WebKitDOMWheelEvent" get-type="webkit_dom_wheel_event_get_type" parents="WebKitDOMMouseEvent,WebKitDOMUIEvent,WebKitDOMEvent,WebKitDOMObject,GObject">
+    <property name="wheel-delta-x" type="glong" flags="225" default-value="0"/>
+    <property name="wheel-delta-y" type="glong" flags="225" default-value="0"/>
+    <property name="wheel-delta" type="glong" flags="225" default-value="0"/>
+  </class>
+  <class name="WebKitDOMXPathExpression" get-type="webkit_dom_xpath_expression_get_type" parents="WebKitDOMObject,GObject">
+  </class>
+  <interface name="WebKitDOMXPathNSResolver" get-type="webkit_dom_xpath_ns_resolver_get_type">
+  </interface>
+  <class name="WebKitDOMXPathResult" get-type="webkit_dom_xpath_result_get_type" parents="WebKitDOMObject,GObject">
+    <property name="result-type" type="guint" flags="225" default-value="0"/>
+    <property name="number-value" type="gdouble" flags="225" default-value="0.000000"/>
+    <property name="string-value" type="gchararray" flags="225" default-value=""/>
+    <property name="boolean-value" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="single-node-value" type="WebKitDOMNode" flags="225"/>
+    <property name="invalid-iterator-state" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="snapshot-length" type="gulong" flags="225" default-value="0"/>
+  </class>
+  <enum name="WebKitConsoleMessageSource" get-type="webkit_console_message_source_get_type">
+    <member name="WEBKIT_CONSOLE_MESSAGE_SOURCE_JAVASCRIPT" nick="javascript" value="0"/>
+    <member name="WEBKIT_CONSOLE_MESSAGE_SOURCE_NETWORK" nick="network" value="1"/>
+    <member name="WEBKIT_CONSOLE_MESSAGE_SOURCE_CONSOLE_API" nick="console-api" value="2"/>
+    <member name="WEBKIT_CONSOLE_MESSAGE_SOURCE_SECURITY" nick="security" value="3"/>
+    <member name="WEBKIT_CONSOLE_MESSAGE_SOURCE_OTHER" nick="other" value="4"/>
+  </enum>  <enum name="WebKitConsoleMessageLevel" get-type="webkit_console_message_level_get_type">
+    <member name="WEBKIT_CONSOLE_MESSAGE_LEVEL_INFO" nick="info" value="0"/>
+    <member name="WEBKIT_CONSOLE_MESSAGE_LEVEL_LOG" nick="log" value="1"/>
+    <member name="WEBKIT_CONSOLE_MESSAGE_LEVEL_WARNING" nick="warning" value="2"/>
+    <member name="WEBKIT_CONSOLE_MESSAGE_LEVEL_ERROR" nick="error" value="3"/>
+    <member name="WEBKIT_CONSOLE_MESSAGE_LEVEL_DEBUG" nick="debug" value="4"/>
+  </enum>  <enum name="WebKitFormSubmissionStep" get-type="webkit_form_submission_step_get_type">
+    <member name="WEBKIT_FORM_SUBMISSION_WILL_SEND_DOM_EVENT" nick="send-dom-event" value="0"/>
+    <member name="WEBKIT_FORM_SUBMISSION_WILL_COMPLETE" nick="complete" value="1"/>
+  </enum>  <class name="WebKitScriptWorld" get-type="webkit_script_world_get_type" parents="GObject">
+    <signal name="window-object-cleared" return="void" when="last">
+      <param type="WebKitWebPage"/>
+      <param type="WebKitFrame"/>
+    </signal>
+  </class>
+  <class name="WebKitFrame" get-type="webkit_frame_get_type" parents="GObject">
+  </class>
+  <class name="WebKitUserMessage" get-type="webkit_user_message_get_type" parents="GInitiallyUnowned,GObject">
+    <property name="name" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="parameters" type="GVariant" flags="235"/>
+    <property name="fd-list" type="GUnixFDList" flags="235"/>
+  </class>
+  <class name="WebKitWebFormManager" get-type="webkit_web_form_manager_get_type" parents="GObject">
+    <signal name="form-controls-associated" return="void" when="last">
+      <param type="WebKitFrame"/>
+      <param type="GPtrArray"/>
+    </signal>
+    <signal name="will-send-submit-event" return="void" when="last">
+      <param type="JSCValue"/>
+      <param type="WebKitFrame"/>
+      <param type="WebKitFrame"/>
+    </signal>
+    <signal name="will-submit-form" return="void" when="last">
+      <param type="JSCValue"/>
+      <param type="WebKitFrame"/>
+      <param type="WebKitFrame"/>
+    </signal>
+  </class>
+  <class name="WebKitWebPage" get-type="webkit_web_page_get_type" parents="GObject">
+    <property name="uri" type="gchararray" flags="225" default-value="NULL"/>
+    <signal name="form-controls-associated" return="void" when="last">
+      <param type="GPtrArray"/>
+    </signal>
+    <signal name="will-submit-form" return="void" when="last">
+      <param type="WebKitDOMElement"/>
+      <param type="WebKitFormSubmissionStep"/>
+      <param type="WebKitFrame"/>
+      <param type="WebKitFrame"/>
+      <param type="GPtrArray"/>
+      <param type="GPtrArray"/>
+    </signal>
+    <signal name="document-loaded" return="void" when="last">
+    </signal>
+    <signal name="send-request" return="gboolean" when="last">
+      <param type="WebKitURIRequest"/>
+      <param type="WebKitURIResponse"/>
+    </signal>
+    <signal name="context-menu" return="gboolean" when="last">
+      <param type="WebKitContextMenu"/>
+      <param type="WebKitWebHitTestResult"/>
+    </signal>
+    <signal name="console-message-sent" return="void" when="last">
+      <param type="WebKitConsoleMessage"/>
+    </signal>
+    <signal name="form-controls-associated-for-frame" return="void" when="last">
+      <param type="GPtrArray"/>
+      <param type="WebKitFrame"/>
+    </signal>
+    <signal name="user-message-received" return="gboolean" when="last">
+      <param type="WebKitUserMessage"/>
+    </signal>
+  </class>
+  <class name="WebKitWebEditor" get-type="webkit_web_editor_get_type" parents="GObject">
+    <signal name="selection-changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="WebKitHitTestResult" get-type="webkit_hit_test_result_get_type" parents="GObject">
+    <property name="context" type="guint" flags="235" default-value="0"/>
+    <property name="link-uri" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="link-title" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="link-label" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="image-uri" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="media-uri" type="gchararray" flags="235" default-value="NULL"/>
+  </class>
+  <class name="WebKitWebHitTestResult" get-type="webkit_web_hit_test_result_get_type" parents="WebKitHitTestResult,GObject">
+    <property name="node" type="WebKitDOMNode" flags="235"/>
+  </class>
+  <class name="WebKitWebExtension" get-type="webkit_web_extension_get_type" parents="GObject">
+    <signal name="user-message-received" return="void" when="last">
+      <param type="WebKitUserMessage"/>
+    </signal>
+    <signal name="page-created" return="void" when="last">
+      <param type="WebKitWebPage"/>
+    </signal>
+  </class>
+  <boxed name="WebKitConsoleMessage" get-type="webkit_console_message_get_type"/>
+  <class name="WebKitContextMenu" get-type="webkit_context_menu_get_type" parents="GObject">
+  </class>
+  <class name="WebKitContextMenuItem" get-type="webkit_context_menu_item_get_type" parents="GInitiallyUnowned,GObject">
+  </class>
+  <class name="WebKitURIRequest" get-type="webkit_uri_request_get_type" parents="GObject">
+    <property name="uri" type="gchararray" flags="231" default-value="about:blank"/>
+  </class>
+  <class name="WebKitURIResponse" get-type="webkit_uri_response_get_type" parents="GObject">
+    <property name="uri" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="status-code" type="guint" flags="225" default-value="0"/>
+    <property name="content-length" type="guint64" flags="225" default-value="0"/>
+    <property name="mime-type" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="suggested-filename" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="http-headers" type="SoupMessageHeaders" flags="225"/>
+  </class>
+  <error-quark function="webkit_user_message_error_quark" domain="WebKitUserMessageError"/>
+</dump>
