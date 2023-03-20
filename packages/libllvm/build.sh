@@ -3,16 +3,16 @@ TERMUX_PKG_DESCRIPTION="Modular compiler and toolchain technologies library"
 TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_LICENSE_FILE="llvm/LICENSE.TXT"
 TERMUX_PKG_MAINTAINER="@buttaface"
-LLVM_MAJOR_VERSION=15
-TERMUX_PKG_VERSION=${LLVM_MAJOR_VERSION}.0.7
-TERMUX_PKG_REVISION=3
-TERMUX_PKG_SHA256=8b5fcb24b4128cf04df1b0b9410ce8b1a729cb3c544e6da885d234280dedeac6
+LLVM_MAJOR_VERSION=16
+TERMUX_PKG_VERSION=${LLVM_MAJOR_VERSION}.0.0
+TERMUX_PKG_SHA256=9a56d906a2c81f16f06efc493a646d497c53c2f4f28f0cb1f3c8da7f74350254
 TERMUX_PKG_SRCURL=https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/llvm-project-$TERMUX_PKG_VERSION.src.tar.xz
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/ld64.lld.darwin*
 lib/libgomp.a
 lib/libiomp5.a
+share/man/man1/lit.1
 "
 TERMUX_PKG_DEPENDS="libc++, libffi, libxml2, ncurses, zlib, zstd"
 TERMUX_PKG_BUILD_DEPENDS="binutils-libs"
@@ -41,12 +41,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLLDB_PYTHON_RELATIVE_PATH=lib/python${TERMUX_PYTHON_VERSION}/site-packages
 -DLLDB_PYTHON_EXE_RELATIVE_PATH=bin/python${TERMUX_PYTHON_VERSION}
 -DLLDB_PYTHON_EXT_SUFFIX=.cpython-${TERMUX_PYTHON_VERSION}.so
--DCLANG_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/clang-tblgen
--DCLANG_PSEUDO_GEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/clang-pseudo-gen
--DCLANG_TIDY_CONFUSABLE_CHARS_GEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/clang-tidy-confusable-chars-gen
--DLLDB_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/lldb-tblgen
--DLLVM_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/llvm-tblgen
--DMLIR_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/mlir-tblgen
+-DLLVM_NATIVE_TOOL_DIR=$TERMUX_PKG_HOSTBUILD_DIR/bin
+-DCROSS_TOOLCHAIN_FLAGS_LLVM_NATIVE=-DLLVM_NATIVE_TOOL_DIR=$TERMUX_PKG_HOSTBUILD_DIR/bin
 -DLIBOMP_ENABLE_SHARED=FALSE
 -DOPENMP_ENABLE_LIBOMPTARGET=OFF
 -DLLVM_ENABLE_SPHINX=ON
@@ -59,7 +55,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLLVM_INSTALL_UTILS=ON
 -DLLVM_BINUTILS_INCDIR=$TERMUX_PREFIX/include
 -DMLIR_INSTALL_AGGREGATE_OBJECTS=OFF
--DMLIR_LINALG_ODS_YAML_GEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/mlir-linalg-ods-yaml-gen
 "
 
 if [ x$TERMUX_ARCH_BITS = x32 ]; then
@@ -84,10 +79,6 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
-	mkdir openmp/runtime/src/android
-	cp $TERMUX_PKG_BUILDER_DIR/nl_types.h openmp/runtime/src/android
-	cp $TERMUX_PKG_BUILDER_DIR/nltypes_stubs.cpp openmp/runtime/src/android
-
 	# Add unknown vendor, otherwise it screws with the default LLVM triple
 	# detection.
 	export LLVM_DEFAULT_TARGET_TRIPLE=${CCTERMUX_HOST_PLATFORM/-/-unknown-}
@@ -121,7 +112,6 @@ termux_step_post_make_install() {
 
 	cp docs/man/* $TERMUX_PREFIX/share/man/man1
 	cp tools/clang/docs/man/{clang,diagtool}.1 $TERMUX_PREFIX/share/man/man1
-	ln -s $TERMUX_PKG_VERSION $TERMUX_PREFIX/lib/clang/$LLVM_MAJOR_VERSION
 	cd $TERMUX_PREFIX/bin
 
 	for tool in clang clang++ cc c++ cpp gcc g++ ${TERMUX_HOST_PLATFORM}-{clang,clang++,gcc,g++,cpp}; do

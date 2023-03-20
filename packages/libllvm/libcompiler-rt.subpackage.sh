@@ -15,7 +15,7 @@ TERMUX_SUBPKG_CONFLICTS="ndk-multilib (<< 23b-6)"
 
 termux_step_create_subpkg_debscripts() {
 	local RT_OPT_DIR=$TERMUX_PREFIX/opt/ndk-multilib/cross-compiler-rt
-	local RT_PATH=$TERMUX_PREFIX/lib/clang/$TERMUX_PKG_VERSION/lib/linux
+	local RT_PATH=$TERMUX_PREFIX/lib/clang/$LLVM_MAJOR_VERSION/lib/linux
 
 	cat <<- EOF > ./triggers
 	interest-noawait $RT_OPT_DIR

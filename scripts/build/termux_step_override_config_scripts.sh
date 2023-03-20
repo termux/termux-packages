@@ -26,7 +26,6 @@ termux_step_override_config_scripts() {
 		sed $TERMUX_SCRIPTDIR/packages/libllvm/llvm-config.in \
 			-e "s|@TERMUX_PKG_VERSION@|$LIBLLVM_VERSION|g" \
 			-e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
-			-e "s|@TERMUX_PKG_SRCDIR@|$TERMUX_TOPDIR/libllvm/src|g" \
 			-e "s|@LLVM_TARGET_ARCH@|$LLVM_TARGET_ARCH|g" \
 			-e "s|@LLVM_DEFAULT_TARGET_TRIPLE@|$LLVM_DEFAULT_TARGET_TRIPLE|g" \
 			-e "s|@TERMUX_ARCH@|$TERMUX_ARCH|g" > $TERMUX_PREFIX/bin/llvm-config
