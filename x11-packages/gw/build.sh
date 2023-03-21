@@ -37,3 +37,7 @@ termux_step_make_install() {
 	install -D -m644 "${TERMUX_PREFIX}/.gw.ini" "target/${CARGO_TARGET_NAME}/.gw.ini"
 
 }
+
+termux_step_post_make_install() {
+	gw --version
+}
