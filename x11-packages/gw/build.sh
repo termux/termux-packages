@@ -20,10 +20,10 @@ termux_step_make_install() {
 	git clone https://github.com/samtools/htslib.git
 	cd htslib
 	git submodule update --init --recursive
-	autoreconf -i && ./configure && make && make install
+	autoreconf -i && ./configure && make
 	cd .. 
 	CPPFLAGS+=" -I./htslib -I./lib/skia/include"
-	LDLIBS+=" -lEGL"
+	LDLIBS+=" -lEGL -llog"
 	LDFLAGS+=" -L./htslib"
 	sed -i 's/Release-x64/Release-arm64/g' Makefile
 	sed -i 's/linux/android/g' Makefile
