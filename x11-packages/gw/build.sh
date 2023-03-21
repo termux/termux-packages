@@ -22,9 +22,9 @@ termux_step_make_install() {
 	git submodule update --init --recursive
 	autoreconf -i && ./configure && make && make install
 	cd .. 
-	export CPPFLAGS="${CPPFLAGS} -I./htslib -I./lib/skia/include"
-	export LDLIBS="${LDLIBS} -lEGL"
-	export LDFLAGS="${LDFLAGS} -L./htslib"
+	CPPFLAGS+=" -I./htslib -I./lib/skia/include"
+	LDLIBS+=" -lEGL"
+	LDFLAGS+=" -L./htslib"
 	sed -i 's/Release-x64/Release-arm64/g' Makefile
 	sed -i 's/linux/android/g' Makefile
 	make prep
