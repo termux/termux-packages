@@ -3,7 +3,6 @@ TERMUX_PKG_DESCRIPTION="Genome browser"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="clealk@cardiff.ac.uk"
 TERMUX_PKG_VERSION=0.7.0
-TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/kcleal/gw/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=92599d100755a5a20dc15ebfb86fdf0818ccc87c6e0a2cc0a7c3061661ed3d25
 TERMUX_PKG_AUTO_UPDATE=true
@@ -36,8 +35,4 @@ termux_step_make_install() {
 	install -D -m755 "${TERMUX_PREFIX}/gw" "target/${CARGO_TARGET_NAME}/gw"
 	install -D -m644 "${TERMUX_PREFIX}/.gw.ini" "target/${CARGO_TARGET_NAME}/.gw.ini"
 
-}
-
-termux_step_post_make_install() {
-	gw --version
 }
