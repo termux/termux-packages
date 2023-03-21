@@ -1,0 +1,16 @@
+https://github.com/termux/termux-packages/issues/15706
+
+Do NOT delete this patch unless you know what you are doing.
+
+--- a/src/copy.c
++++ b/src/copy.c
+@@ -285,6 +285,9 @@
+ is_CLONENOTSUP (int err)
+ {
+   return err == ENOSYS || is_ENOTSUP (err)
++#ifdef __ANDROID__
++         || err == EACCES
++#endif
+          || err == EINVAL || err == EBADF
+          || err == EXDEV || err == ETXTBSY;
+ }
