@@ -10,7 +10,7 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS=glfw
 TERMUX_PKG_DEPENDS=x11-repo
-TERMUX_PKG_BUILD_DEPENDS="make, autotools, git, fontconfig, freefont"
+TERMUX_PKG_BUILD_DEPENDS="make, autotools, git, fontconfig, freetype-dev"
 TERMUX_PKG_DEPENDS="mesa, xfce, tigervnc"
 
 
@@ -19,7 +19,7 @@ termux_step_make_install() {
 	git clone https://github.com/kcleal/gw
 	cd gw
 	git clone https://github.com/samtools/htslib.git
-	cd htslib && autoreconf -i && ./configure && make
+	cd htslib && autoreconf -i && ./configure && make && make install
 	cd .. 
 	#export LD_LIBRARY_PATH="$(pwd)/htslib)"
 	export CPPFLAGS="${CPPFLAGS} -I./htslib -I./lib/skia/include"
