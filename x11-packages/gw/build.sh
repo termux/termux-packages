@@ -15,8 +15,8 @@ TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
 
 termux_step_make_install() {
 
-	git clone https://github.com/kcleal/gw
-	cd gw
+	
+	
 	git clone https://github.com/samtools/htslib.git
 	cd htslib
 	git submodule update --init --recursive
