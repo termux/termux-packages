@@ -8,7 +8,7 @@ TERMUX_PKG_SHA256=92599d100755a5a20dc15ebfb86fdf0818ccc87c6e0a2cc0a7c3061661ed3d
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS=glfw
 TERMUX_PKG_DEPENDS=x11-repo
-TERMUX_PKG_BUILD_DEPENDS="make, autotools, git, fontconfig, freetype-dev"
+TERMUX_PKG_BUILD_DEPENDS="make, autotools, git, fontconfig, freetype"
 TERMUX_PKG_DEPENDS="mesa"
 TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
 
@@ -18,20 +18,17 @@ termux_step_make_install() {
 	git clone https://github.com/kcleal/gw
 	cd gw
 	git clone https://github.com/samtools/htslib.git
-	cd htslib && autoreconf -i && ./configure && make && make install
+	cd htslib
+	git submodule update --init --recursive
+	autoreconf -i && ./configure && make && make install
 	cd .. 
-	#export LD_LIBRARY_PATH="$(pwd)/htslib)"
 	export CPPFLAGS="${CPPFLAGS} -I./htslib -I./lib/skia/include"
 	export LDLIBS="${LDLIBS} -lEGL"
-	export LDFLAGS="${LDFLAGS} -l./htslib"
+	export LDFLAGS="${LDFLAGS} -L./htslib"
 	sed -i 's/Release-x64/Release-arm64/g' Makefile
+	sed -i 's/linux/android/g' Makefile
 	make prep
-	ls
-	ls ./lib
-	ls ./lib/skia/out
 	make
-	#cp ./gw /bin
-	#cp ./.gw.ini /bin
 	install -D -m755 "${TERMUX_PREFIX}/gw" "target/${CARGO_TARGET_NAME}/gw"
 	install -D -m644 "${TERMUX_PREFIX}/.gw.ini" "target/${CARGO_TARGET_NAME}/.gw.ini"
 
