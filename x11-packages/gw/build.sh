@@ -8,7 +8,7 @@ TERMUX_PKG_SHA256=92599d100755a5a20dc15ebfb86fdf0818ccc87c6e0a2cc0a7c3061661ed3d
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS=glfw
 TERMUX_PKG_DEPENDS=x11-repo
-TERMUX_PKG_BUILD_DEPENDS="make, autotools, git, fontconfig, freetype"
+TERMUX_PKG_BUILD_DEPENDS="make, autoconf, git, fontconfig, freetype"
 TERMUX_PKG_DEPENDS="mesa"
 TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
 
