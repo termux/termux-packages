@@ -10,7 +10,7 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS=glfw
 TERMUX_PKG_DEPENDS=x11-repo
 TERMUX_PKG_BUILD_DEPENDS="make, autotools, git, fontconfig, freetype-dev"
-TERMUX_PKG_DEPENDS="mesa, xfce, tigervnc"
+TERMUX_PKG_DEPENDS="mesa, xfce4-dev-tools, tigervnc"
 TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
 
 
