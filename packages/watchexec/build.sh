@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/watchexec/watchexec
 TERMUX_PKG_DESCRIPTION="Executes commands in response to file modifications"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.21.1
+TERMUX_PKG_VERSION=1.22.0
 TERMUX_PKG_SRCURL=https://github.com/watchexec/watchexec/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=c41a2215505be5a71ecca8d47f30c1de1f0db3644a0da844ca70bc1ed05a0be3
+TERMUX_PKG_SHA256=d7cb6d2e024d078478704581c5e885c485b480776599e4a82b07bf8ef45eda4a
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_BUILD_IN_SRC=true
 
@@ -24,11 +24,17 @@ termux_step_make_install() {
 }
 
 termux_step_post_make_install() {
-	install -Dm644 -t "$TERMUX_PREFIX"/share/doc/watchexec/watchexec.1.html \
-		"$TERMUX_PKG_SRCDIR"/doc/watchexec.1.html
-	install -Dm644 -t "$TERMUX_PREFIX"/share/man/man1/watchexec.1 \
+	local f
+	for f in doc/watchexec.1.{md,pdf}; do
+		install -Dm600 -t "$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME" \
+			"$TERMUX_PKG_SRCDIR/${f}"
+	done
+	install -Dm600 -t "$TERMUX_PREFIX/share/man/man1" \
 		"$TERMUX_PKG_SRCDIR"/doc/watchexec.1
-	install -Dm644 "completions/zsh" \
+	install -Dm600 -T "completions/bash" \
+		"$TERMUX_PREFIX/share/bash-completion/completions/watchexec"
+	install -Dm600 -T "completions/zsh" \
 		"$TERMUX_PREFIX/share/zsh/site-functions/_watchexec"
-	install -Dm644 LICENSE "$TERMUX_PREFIX/share/licenses/watchexec/LICENSE"
+	install -Dm600 -T "completions/fish" \
+		"$TERMUX_PREFIX/share/fish/vendor_completions.d/watchexec.fish"
 }
