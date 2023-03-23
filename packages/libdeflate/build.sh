@@ -7,6 +7,6 @@ TERMUX_PKG_SRCURL=https://github.com/ebiggers/libdeflate/archive/refs/tags/v${TE
 TERMUX_PKG_SHA256=fa4615af671513fa2a53dc2e7a89ff502792e2bdfc046869ef35160fcc373763
 
 
-termux_step_pre_configure() {
+termux_step_configure_cmake() {
 	cmake -B build && cmake --build build
 }
