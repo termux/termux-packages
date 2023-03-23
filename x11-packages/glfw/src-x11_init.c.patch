@@ -1,83 +1,74 @@
 --- a/src/x11_init.c
 +++ b/src/x11_init.c
-@@ -571,7 +571,7 @@
+@@ -606,7 +606,7 @@
  //
  static GLFWbool initExtensions(void)
  {
 -#if defined(__OpenBSD__) || defined(__NetBSD__)
 +#if defined(__OpenBSD__) || defined(__NetBSD__) || defined(__ANDROID__)
-     _glfw.x11.vidmode.handle = _glfw_dlopen("libXxf86vm.so");
+     _glfw.x11.vidmode.handle = _glfwPlatformLoadModule("libXxf86vm.so");
  #else
-     _glfw.x11.vidmode.handle = _glfw_dlopen("libXxf86vm.so.1");
-@@ -595,7 +595,7 @@
+     _glfw.x11.vidmode.handle = _glfwPlatformLoadModule("libXxf86vm.so.1");
+@@ -630,7 +630,7 @@
  
  #if defined(__CYGWIN__)
-     _glfw.x11.xi.handle = _glfw_dlopen("libXi-6.so");
+     _glfw.x11.xi.handle = _glfwPlatformLoadModule("libXi-6.so");
 -#elif defined(__OpenBSD__) || defined(__NetBSD__)
 +#elif defined(__OpenBSD__) || defined(__NetBSD__) || defined(__ANDROID__)
-     _glfw.x11.xi.handle = _glfw_dlopen("libXi.so");
+     _glfw.x11.xi.handle = _glfwPlatformLoadModule("libXi.so");
  #else
-     _glfw.x11.xi.handle = _glfw_dlopen("libXi.so.6");
-@@ -627,7 +627,7 @@
+     _glfw.x11.xi.handle = _glfwPlatformLoadModule("libXi.so.6");
+@@ -662,7 +662,7 @@
  
  #if defined(__CYGWIN__)
-     _glfw.x11.randr.handle = _glfw_dlopen("libXrandr-2.so");
+     _glfw.x11.randr.handle = _glfwPlatformLoadModule("libXrandr-2.so");
 -#elif defined(__OpenBSD__) || defined(__NetBSD__)
 +#elif defined(__OpenBSD__) || defined(__NetBSD__) || defined(__ANDROID__)
-     _glfw.x11.randr.handle = _glfw_dlopen("libXrandr.so");
+     _glfw.x11.randr.handle = _glfwPlatformLoadModule("libXrandr.so");
  #else
-     _glfw.x11.randr.handle = _glfw_dlopen("libXrandr.so.2");
-@@ -721,7 +721,7 @@
+     _glfw.x11.randr.handle = _glfwPlatformLoadModule("libXrandr.so.2");
+@@ -756,7 +756,7 @@
  
  #if defined(__CYGWIN__)
-     _glfw.x11.xcursor.handle = _glfw_dlopen("libXcursor-1.so");
+     _glfw.x11.xcursor.handle = _glfwPlatformLoadModule("libXcursor-1.so");
 -#elif defined(__OpenBSD__) || defined(__NetBSD__)
 +#elif defined(__OpenBSD__) || defined(__NetBSD__) || defined(__ANDROID__)
-     _glfw.x11.xcursor.handle = _glfw_dlopen("libXcursor.so");
+     _glfw.x11.xcursor.handle = _glfwPlatformLoadModule("libXcursor.so");
  #else
-     _glfw.x11.xcursor.handle = _glfw_dlopen("libXcursor.so.1");
-@@ -738,7 +738,7 @@
+     _glfw.x11.xcursor.handle = _glfwPlatformLoadModule("libXcursor.so.1");
+@@ -779,7 +779,7 @@
  
  #if defined(__CYGWIN__)
-     _glfw.x11.xinerama.handle = _glfw_dlopen("libXinerama-1.so");
+     _glfw.x11.xinerama.handle = _glfwPlatformLoadModule("libXinerama-1.so");
 -#elif defined(__OpenBSD__) || defined(__NetBSD__)
 +#elif defined(__OpenBSD__) || defined(__NetBSD__) || defined(__ANDROID__)
-     _glfw.x11.xinerama.handle = _glfw_dlopen("libXinerama.so");
+     _glfw.x11.xinerama.handle = _glfwPlatformLoadModule("libXinerama.so");
  #else
-     _glfw.x11.xinerama.handle = _glfw_dlopen("libXinerama.so.1");
-@@ -791,7 +791,7 @@
+     _glfw.x11.xinerama.handle = _glfwPlatformLoadModule("libXinerama.so.1");
+@@ -834,7 +834,7 @@
+     {
+ #if defined(__CYGWIN__)
+         _glfw.x11.x11xcb.handle = _glfwPlatformLoadModule("libX11-xcb-1.so");
+-#elif defined(__OpenBSD__) || defined(__NetBSD__)
++#elif defined(__OpenBSD__) || defined(__NetBSD__) || defined(__ANDROID__)
+         _glfw.x11.x11xcb.handle = _glfwPlatformLoadModule("libX11-xcb.so");
+ #else
+         _glfw.x11.x11xcb.handle = _glfwPlatformLoadModule("libX11-xcb.so.1");
+@@ -849,7 +849,7 @@
  
  #if defined(__CYGWIN__)
-     _glfw.x11.x11xcb.handle = _glfw_dlopen("libX11-xcb-1.so");
+     _glfw.x11.xrender.handle = _glfwPlatformLoadModule("libXrender-1.so");
 -#elif defined(__OpenBSD__) || defined(__NetBSD__)
 +#elif defined(__OpenBSD__) || defined(__NetBSD__) || defined(__ANDROID__)
-     _glfw.x11.x11xcb.handle = _glfw_dlopen("libX11-xcb.so");
+     _glfw.x11.xrender.handle = _glfwPlatformLoadModule("libXrender.so");
  #else
-     _glfw.x11.x11xcb.handle = _glfw_dlopen("libX11-xcb.so.1");
-@@ -804,7 +804,7 @@
+     _glfw.x11.xrender.handle = _glfwPlatformLoadModule("libXrender.so.1");
+@@ -878,7 +878,7 @@
  
  #if defined(__CYGWIN__)
-     _glfw.x11.xrender.handle = _glfw_dlopen("libXrender-1.so");
+     _glfw.x11.xshape.handle = _glfwPlatformLoadModule("libXext-6.so");
 -#elif defined(__OpenBSD__) || defined(__NetBSD__)
 +#elif defined(__OpenBSD__) || defined(__NetBSD__) || defined(__ANDROID__)
-     _glfw.x11.xrender.handle = _glfw_dlopen("libXrender.so");
+     _glfw.x11.xshape.handle = _glfwPlatformLoadModule("libXext.so");
  #else
-     _glfw.x11.xrender.handle = _glfw_dlopen("libXrender.so.1");
-@@ -1147,7 +1147,7 @@
-         }
-     }
- 
--#if defined(__linux__)
-+#if defined(__linux__) && !defined(__ANDROID__)
-     if (!_glfwInitJoysticksLinux())
-         return GLFW_FALSE;
- #endif
-@@ -1240,7 +1240,7 @@
-     _glfwTerminateEGL();
-     _glfwTerminateGLX();
- 
--#if defined(__linux__)
-+#if defined(__linux__) && !defined(__ANDROID__)
-     _glfwTerminateJoysticksLinux();
- #endif
- 
+     _glfw.x11.xshape.handle = _glfwPlatformLoadModule("libXext.so.6");
