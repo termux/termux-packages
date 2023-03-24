@@ -11,7 +11,7 @@ TERMUX_PKG_BUILD_DEPENDS="fontconfig, freetype, libicu, libuuid, mesa-dev"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
-# htslib is not available for arm.
+# htslib is not available for arm (32 bit).
 TERMUX_PKG_BLACKLISTED_ARCHES="arm"
 
 termux_step_pre_configure() {
