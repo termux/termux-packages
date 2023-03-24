@@ -10,3 +10,14 @@ diff -uNr pytorch-v1.12.1/torch/csrc/init_flatbuffer_module.cpp pytorch-v1.12.1.
    void* p;
    ::posix_memalign(&p, FLATBUFFERS_MAX_ALIGNMENT, size);
    TORCH_INTERNAL_ASSERT(p, "Could not allocate memory for flatbuffer");
+--- a/third_party/pocketfft/pocketfft_hdronly.h.orig
++++ b/third_party/pocketfft/pocketfft_hdronly.h
+@@ -149,7 +149,7 @@
+ #endif
+ #endif
+ 
+-#if __cplusplus >= 201703L
++#if (__cplusplus >= 201703L) && !defined(__ANDROID__)
+ inline void *aligned_alloc(size_t align, size_t size)
+   {
+   // aligned_alloc() requires that the requested size is a multiple of "align"
