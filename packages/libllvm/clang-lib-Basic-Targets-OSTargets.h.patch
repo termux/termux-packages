@@ -1,0 +1,38 @@
+Fixes https://github.com/termux/termux-packages/issues/2469
+Breaks https://github.com/llvm/llvm-project/blob/main/clang/test/Preprocessor/init.c
+To revert, pass -U__ANDROID_API__
+
+--- llvm-project/clang/lib/Basic/Targets/OSTargets.h
++++ llvm-project.mod/clang/lib/Basic/Targets/OSTargets.h
+@@ -14,6 +14,16 @@
+ 
+ #include "Targets.h"
+ 
++#ifdef __ANDROID__
++#include <sys/system_properties.h>
++#endif
++
++#ifdef __TERMUX__
++#ifndef TERMUX_PKG_API_LEVEL
++#define TERMUX_PKG_API_LEVEL "24"
++#endif
++#endif
++
+ namespace clang {
+ namespace targets {
+ 
+@@ -379,6 +389,14 @@
+       this->PlatformName = "android";
+       this->PlatformMinVersion = Triple.getEnvironmentVersion();
+       const unsigned Maj = this->PlatformMinVersion.getMajor();
++      char host_api_version[PROP_VALUE_MAX];
++      const int len = __system_property_get("ro.build.version.sdk", host_api_version);
++      if (len < 1) {
++        memcpy(host_api_version, TERMUX_PKG_API_LEVEL, sizeof(host_api_version));
++      }
++      if (!Maj) {
++        Builder.defineMacro("__ANDROID_API__", host_api_version);
++      }
+       if (Maj) {
+         Builder.defineMacro("__ANDROID_MIN_SDK_VERSION__", Twine(Maj));
+         // This historical but ambiguous name for the minSdkVersion macro. Keep
