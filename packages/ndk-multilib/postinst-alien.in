@@ -1,0 +1,11 @@
+
+for triple in aarch64-linux-android arm-linux-androideabi i686-linux-android x86_64-linux-android; do
+	if [ x"$native_triple" = x"$triple" ]; then
+		continue
+	fi
+	for so in libc.so libdl.so liblog.so libm.so; do
+		@COMMAND@
+	done
+done
+
+exit 0
