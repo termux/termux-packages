@@ -3,13 +3,12 @@ TERMUX_PKG_DESCRIPTION="An open-source implementation of the OpenGL specificatio
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="docs/license.rst"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=23.0.1
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=23.0.2
 TERMUX_PKG_SRCURL=https://archive.mesa3d.org/mesa-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=e8e586856b55893abae9bdcdb98b41c081d909bb1faf372e6e7262307bf34adf
-TERMUX_PKG_DEPENDS="libandroid-shmem, libc++, libdrm, libexpat, libglvnd, libx11, libxext, libxfixes, libxshmfence, libxxf86vm, ncurses, zlib, zstd"
+TERMUX_PKG_SHA256=1b7d3399fc6f16f030361f925d33ebc7600cbf98094582f54775b6a1180529e7
+TERMUX_PKG_DEPENDS="libandroid-shmem, libc++, libdrm, libexpat, libglvnd, libwayland, libx11, libxext, libxfixes, libxshmfence, libxxf86vm, ncurses, zlib, zstd"
 TERMUX_PKG_SUGGESTS="mesa-dev"
-TERMUX_PKG_BUILD_DEPENDS="libllvm-static, libxrandr, llvm, llvm-tools, mlir, xorgproto"
+TERMUX_PKG_BUILD_DEPENDS="libllvm-static, libwayland-protocols, libxrandr, llvm, llvm-tools, mlir, xorgproto"
 TERMUX_PKG_CONFLICTS="libmesa, ndk-sysroot (<= 25b)"
 TERMUX_PKG_REPLACES="libmesa"
 
@@ -26,7 +25,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dglx=dri
 -Dllvm=enabled
 -Dshared-llvm=disabled
--Dplatforms=x11
+-Dplatforms=x11,wayland
 -Dgallium-drivers=swrast,virgl
 -Dvulkan-drivers=swrast
 -Dosmesa=true
@@ -47,6 +46,11 @@ termux_step_pre_configure() {
 			$TERMUX_PKG_BUILDER_DIR/cmake-wrapper.in \
 			> $_WRAPPER_BIN/cmake
 		chmod 0700 $_WRAPPER_BIN/cmake
+		sed "s|^export PKG_CONFIG_LIBDIR=|export PKG_CONFIG_LIBDIR=${TERMUX_PREFIX}/opt/libwayland/cross/lib/x86_64-linux-gnu/pkgconfig:|" \
+			"${TERMUX_STANDALONE_TOOLCHAIN}/bin/pkg-config" \
+			> "${_WRAPPER_BIN}/pkg-config"
+		chmod +x "${_WRAPPER_BIN}/pkg-config"
+		export PKG_CONFIG="${_WRAPPER_BIN}/pkg-config"
 	fi
 	export PATH=$_WRAPPER_BIN:$PATH
 }
