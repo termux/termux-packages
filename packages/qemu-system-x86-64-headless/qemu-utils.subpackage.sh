@@ -1,5 +1,5 @@
 TERMUX_SUBPKG_DESCRIPTION="A set of utilities for working with the QEMU emulators"
-TERMUX_SUBPKG_DEPENDS="glib, libbz2, libcap-ng, libcurl, libgnutls, libnettle, libnfs, libpixman, libssh, zlib, zstd"
+TERMUX_SUBPKG_DEPENDS="glib, libbz2, libcurl, libgmp, libgnutls, libnettle, libnfs, libpixman, libssh, zlib, zstd"
 TERMUX_SUBPKG_DEPEND_ON_PARENT=no
 
 TERMUX_SUBPKG_INCLUDE="
