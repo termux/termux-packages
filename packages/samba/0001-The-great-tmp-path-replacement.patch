@@ -230,59 +230,6 @@ diff -uNr samba-4.14.4/source3/winbindd/winbindd_pam.c samba-4.14.4.mod/source3/
  		}
  		if (strequal(type, "KEYRING")) {
  			gen_cc = talloc_asprintf(
-diff -uNr samba-4.14.4/source4/heimdal/lib/krb5/expand_path.c samba-4.14.4.mod/source4/heimdal/lib/krb5/expand_path.c
---- samba-4.14.4/source4/heimdal/lib/krb5/expand_path.c	2021-01-21 13:20:40.000000000 +0000
-+++ samba-4.14.4.mod/source4/heimdal/lib/krb5/expand_path.c	2021-05-06 11:30:43.346213897 +0000
-@@ -287,11 +287,11 @@
-     const char *p = NULL;
- 
-     if (issuid())
--	p = getenv("TEMP");
-+	p = getenv("TMPDIR");
-     if (p)
- 	*ret = strdup(p);
-     else
--	*ret = strdup("/tmp");
-+	*ret = strdup("@TERMUX_PREFIX@/tmp");
-     if (*ret == NULL)
- 	return ENOMEM;
-     return 0;
-diff -uNr samba-4.14.4/source4/heimdal/lib/krb5/krb5.h samba-4.14.4.mod/source4/heimdal/lib/krb5/krb5.h
---- samba-4.14.4/source4/heimdal/lib/krb5/krb5.h	2021-01-21 13:20:40.000000000 +0000
-+++ samba-4.14.4.mod/source4/heimdal/lib/krb5/krb5.h	2021-05-06 11:30:43.346213897 +0000
-@@ -351,7 +351,7 @@
- #ifdef KRB5_USE_PATH_TOKENS
- #define KRB5_DEFAULT_CCFILE_ROOT "%{TEMP}/krb5cc_"
- #else
--#define KRB5_DEFAULT_CCFILE_ROOT "/tmp/krb5cc_"
-+#define KRB5_DEFAULT_CCFILE_ROOT "@TERMUX_PREFIX@/tmp/krb5cc_"
- #endif
- 
- #define KRB5_DEFAULT_CCROOT "FILE:" KRB5_DEFAULT_CCFILE_ROOT
-diff -uNr samba-4.14.4/source4/heimdal/lib/krb5/krb5_locl.h samba-4.14.4.mod/source4/heimdal/lib/krb5/krb5_locl.h
---- samba-4.14.4/source4/heimdal/lib/krb5/krb5_locl.h	2021-01-21 13:20:40.000000000 +0000
-+++ samba-4.14.4.mod/source4/heimdal/lib/krb5/krb5_locl.h	2021-05-06 11:30:43.346213897 +0000
-@@ -303,7 +303,7 @@
- } krb5_context_data;
- 
- #ifndef KRB5_USE_PATH_TOKENS
--#define KRB5_DEFAULT_CCNAME_FILE "FILE:/tmp/krb5cc_%{uid}"
-+#define KRB5_DEFAULT_CCNAME_FILE "FILE:@TERMUX_PREFIX@/tmp/krb5cc_%{uid}"
- #else
- #define KRB5_DEFAULT_CCNAME_FILE "FILE:%{TEMP}/krb5cc_%{uid}"
- #endif
-diff -uNr samba-4.14.4/source4/heimdal/lib/krb5/krb5-v4compat.h samba-4.14.4.mod/source4/heimdal/lib/krb5/krb5-v4compat.h
---- samba-4.14.4/source4/heimdal/lib/krb5/krb5-v4compat.h	2021-01-21 13:20:40.000000000 +0000
-+++ samba-4.14.4.mod/source4/heimdal/lib/krb5/krb5-v4compat.h	2021-05-06 11:30:43.346213897 +0000
-@@ -108,7 +108,7 @@
- #ifdef KRB5_USE_PATH_TOKENS
- #define TKT_ROOT "%{TEMP}/tkt"
- #else
--#define TKT_ROOT "/tmp/tkt"
-+#define TKT_ROOT "@TERMUX_PREFIX@/tmp/tkt"
- #endif
- #endif
- 
 diff -uNr samba-4.14.4/source4/librpc/tests/binding_string.c samba-4.14.4.mod/source4/librpc/tests/binding_string.c
 --- samba-4.14.4/source4/librpc/tests/binding_string.c	2021-01-21 13:20:40.000000000 +0000
 +++ samba-4.14.4.mod/source4/librpc/tests/binding_string.c	2021-05-06 11:30:43.346213897 +0000
