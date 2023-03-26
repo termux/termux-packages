@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://mikefarah.gitbook.io/yq/
 TERMUX_PKG_DESCRIPTION="A lightweight and portable command-line YAML, JSON and XML processor"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="4.32.2"
+TERMUX_PKG_VERSION="4.33.1"
 TERMUX_PKG_SRCURL=https://github.com/mikefarah/yq/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=769b77a01fe8c389b17b3a5eb606a395540eb7ccdc533e2db2542baeceefcbc9
+TERMUX_PKG_SHA256=c38b8210fb5a80ac88314fa346ea31f3dc9324cae9fe93cb334cacf909e09bc3
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
