@@ -14,6 +14,7 @@ mutt_cv_c99_snprintf=yes
 mutt_cv_c99_vsnprintf=yes
 --disable-gpgme
 --enable-compressed
+--enable-debug
 --enable-hcache
 --enable-imap
 --enable-pop
