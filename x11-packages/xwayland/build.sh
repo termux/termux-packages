@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Wayland X11 server"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=23.1.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/xserver/xwayland-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=40e0a0c050446ac558ec0f54be4930ffef6be63c6ea980fb654f264ef065af9e
 TERMUX_PKG_DEPENDS="libandroid-shmem, libdrm, libepoxy, libpciaccess, libpixman, libwayland, libwayland-protocols, libx11, libxau, libxcvt, libxfont2, libxinerama, libxkbfile, libxshmfence, opengl, openssl, xkeyboard-config, xorg-protocol-txt, xorg-xkbcomp"
