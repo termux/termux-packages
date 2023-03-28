@@ -1,13 +1,13 @@
 diff --git a/clang/lib/Driver/ToolChain.cpp b/clang/lib/Driver/ToolChain.cpp
-index 469ef62f1a9d..218f5af748f4 100644
---- a/clang/lib/Driver/ToolChain.cpp
-+++ b/clang/lib/Driver/ToolChain.cpp
-@@ -632,7 +632,7 @@
+@@ -1060,7 +1060,10 @@
  
    switch (Type) {
    case ToolChain::CST_Libcxx:
 -    CmdArgs.push_back("-lc++");
-+    CmdArgs.push_back("-lc++_shared");
++    if (getTriple().isWindowsGNUEnvironment())
++      CmdArgs.push_back("-lc++");
++    else
++      CmdArgs.push_back("-lc++_shared");
      if (Args.hasArg(options::OPT_fexperimental_library))
        CmdArgs.push_back("-lc++experimental");
      break;
