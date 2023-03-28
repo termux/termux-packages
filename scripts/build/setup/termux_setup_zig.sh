@@ -1,5 +1,5 @@
 termux_setup_zig() {
-	local ZIG_VERSION=0.9.1
+	local ZIG_VERSION=0.10.1
 	local ZIG_FOLDER
 
 	if [ "${TERMUX_PACKAGES_OFFLINE-false}" = "true" ]; then
@@ -14,7 +14,7 @@ termux_setup_zig() {
 			local ZIG_TARBALL=$TERMUX_PKG_TMPDIR/zig-$ZIG_VERSION.zip
 			termux_download https://ziglang.org/download/$ZIG_VERSION/zig-linux-x86_64-$ZIG_VERSION.tar.xz \
 				"$ZIG_TARBALL" \
-				be8da632c1d3273f766b69244d80669fe4f5e27798654681d77c992f17c237d7
+				6699f0e7293081b42428f32c9d9c983854094bd15fee5489f12c4cf4518cc380
 			tar xf "$ZIG_TARBALL" -C "$ZIG_FOLDER" --strip-components=1
 		fi
 		export PATH=$ZIG_FOLDER:$PATH
