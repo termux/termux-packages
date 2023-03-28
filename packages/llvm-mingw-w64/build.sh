@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="MinGW-w64 toolchain based on LLVM"
 TERMUX_PKG_LICENSE="ISC"
 TERMUX_PKG_MAINTAINER="@licy183"
 # Bump llvm-mingw-w64* to the same version in one PR.
-TERMUX_PKG_VERSION=20220906
+TERMUX_PKG_VERSION=20230320
 TERMUX_PKG_SRCURL=https://github.com/mstorsjo/llvm-mingw/releases/download/$TERMUX_PKG_VERSION/llvm-mingw-$TERMUX_PKG_VERSION-ucrt-ubuntu-18.04-x86_64.tar.xz
-TERMUX_PKG_SHA256=ee00708bdd65eeaa88d5fa89ad7e3fa1d6bae8093ee4559748e431e55f7568ec
+TERMUX_PKG_SHA256=bc367753dea829d219be32e2e64e2d15d03158ce8e700ae5210ca3d78e6a07ea
 TERMUX_PKG_DEPENDS="clang, llvm, llvm-tools, llvm-mingw-w64-libcompiler-rt, llvm-mingw-w64-ucrt"
 TERMUX_PKG_RECOMMENDS="llvm-mingw-w64-tools"
 TERMUX_PKG_CONFLICTS="mingw-w64"
