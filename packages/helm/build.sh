@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION="3.11.2"
 TERMUX_PKG_SRCURL=https://github.com/helm/helm/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=c81a83eaa6a1a00cbcdbc9c39adfe18778d2bd5286fb94208f222e449c1c1c05
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_make() {
 	termux_setup_golang

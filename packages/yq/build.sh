@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL=https://github.com/mikefarah/yq/archive/refs/tags/v${TERMUX_PK
 TERMUX_PKG_SHA256=c38b8210fb5a80ac88314fa346ea31f3dc9324cae9fe93cb334cacf909e09bc3
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_make() {
 	termux_setup_golang

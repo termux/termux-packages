@@ -9,6 +9,7 @@ TERMUX_PKG_DEPENDS="libc++, qt5-qtbase, qt5-qtx11extras, qtxdg-tools, kwindowsys
 TERMUX_PKG_BUILD_DEPENDS="lxqt-build-tools, qt5-qtbase-cross-tools, qt5-qttools-cross-tools"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DWITH_LIBUDEV=OFF"
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure(){
 	LDFLAGS+=" -landroid-wordexp"

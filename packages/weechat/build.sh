@@ -6,6 +6,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # Please revbump and rebuild when bumping TERMUX_PYTHON_VERSION.
 TERMUX_PKG_VERSION="3.8"
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_SRCURL=https://www.weechat.org/files/src/weechat-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=a1b8f10141af0614e46d09781ac8433f746c0a4016e33f75ecbf56c9a568623e
 TERMUX_PKG_DEPENDS="libiconv, ncurses, libgcrypt, libcurl, libgnutls, libandroid-support, zlib, zstd"

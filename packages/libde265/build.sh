@@ -7,6 +7,7 @@ TERMUX_PKG_VERSION=1.0.11
 TERMUX_PKG_SRCURL=https://github.com/strukturag/libde265/releases/download/v$TERMUX_PKG_VERSION/libde265-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=2f8f12cabbdb15e53532b7c1eb964d4e15d444db1be802505e6ac97a25035bab
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-sherlock265 --disable-arm --disable-encoder"
 

@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION="2.25.1"
 TERMUX_PKG_SRCURL=https://github.com/cli/cli/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=d3b28da03f49600697d2e80c2393425bd382e340040c34641bf3569593c7fbe8
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_make() {
 	termux_setup_golang

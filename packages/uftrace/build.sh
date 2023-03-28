@@ -10,6 +10,7 @@ TERMUX_PKG_SHA256=88b59923fdd9804fd29da8a784cd1b39837b1b735fc3be4165b3932eca3661
 # libandroid-{execinfo,spawn} are dlopen(3)ed.
 TERMUX_PKG_DEPENDS="capstone, libandroid-execinfo, libandroid-glob, libandroid-spawn, libc++, libdw, libelf, libluajit, ncurses, python"
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 
 termux_step_pre_configure() {

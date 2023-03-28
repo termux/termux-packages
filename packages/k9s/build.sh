@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION="0.27.3"
 TERMUX_PKG_SRCURL=https://github.com/derailed/k9s/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=acd00a661e5cfe9fb81cd92ecaaf9e439231cc0d93ce04481ec0dcb5c517ffac
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_BUILD_DEPEDNS="mesa"
 
 termux_step_make() {

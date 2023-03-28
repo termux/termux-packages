@@ -7,6 +7,7 @@ TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/asciimoo/wuzz/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=721ea7343698e9f3c69e09eab86b9b1fef828057655f7cebc1de728c2f75151e
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_make() {
 	termux_setup_golang

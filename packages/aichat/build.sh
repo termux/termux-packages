@@ -7,6 +7,7 @@ TERMUX_PKG_VERSION="0.8.0"
 TERMUX_PKG_SRCURL=https://github.com/sigoden/aichat/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=9073d96afdab56ff51f392cffa8d04fd70d47602236bd10e58248de5594bfd2a
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_BUILD_IN_SRC=true
 
 # This package contains makefiles to run the tests. So, we need to override build steps.

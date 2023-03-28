@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL=https://github.com/rust-lang/mdBook/archive/refs/tags/v${TERMU
 TERMUX_PKG_SHA256=b7785a0e69a6628bedebb31257113ae659de3b561458cc635d30d07794284b14
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_make() {
 	termux_setup_rust

@@ -7,6 +7,7 @@ TERMUX_PKG_VERSION="0.10.0"
 TERMUX_PKG_SRCURL="https://github.com/charmbracelet/gum/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=6084bd89fdb51bbe58ef2a576e81f7d66471a48acc4d8aae41deff5cbb41a2ab
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_make() {
 	termux_setup_golang

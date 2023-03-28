@@ -8,6 +8,7 @@ TERMUX_PKG_SRCURL=https://github.com/restic/rest-server/archive/v${TERMUX_PKG_VE
 TERMUX_PKG_SHA256=cd9b35ad2224244207a967ebbc78d84f4298d725e95c1fa9341ed95a350ea68f
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_make() {
 	termux_setup_golang

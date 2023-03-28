@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION="0.2.25"
 TERMUX_PKG_SRCURL=https://github.com/emersion/hydroxide/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=99e37d131a97caa067fcd4fd6b5560b0d624249a5f82f81c6653e1b9733ab48c
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_make() {
 	termux_setup_golang

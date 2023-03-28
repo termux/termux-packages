@@ -9,6 +9,7 @@ TERMUX_PKG_SRCURL=https://github.com/docopt/docopt.cpp/archive/v${TERMUX_PKG_VER
 TERMUX_PKG_SHA256=28af5a0c482c6d508d22b14d588a3b0bd9ff97135f99c2814a5aa3cbff1d6632
 TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	LDFLAGS+=" $($CC -print-libgcc-file-name)"

@@ -9,6 +9,7 @@ TERMUX_PKG_SRCURL=https://github.com/brailcom/speechd/archive/${TERMUX_PKG_VERSI
 TERMUX_PKG_DEPENDS="dotconf, espeak, glib, libiconv, libltdl, libsndfile, pulseaudio, python, speechd-data"
 TERMUX_PKG_BUILD_DEPENDS="libiconv-static, libsndfile-static"
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_SETUP_PYTHON=true
 
 # Fails to find generated headers

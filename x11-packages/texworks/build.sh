@@ -9,6 +9,7 @@ TERMUX_PKG_SHA256=9fa2aa69bb34951d3249ea607ce3689b6fff9e1f31e353bd1a1cfe33dc9958
 TERMUX_PKG_DEPENDS="hunspell, libc++, liblua53, poppler-qt, qt5-qtbase, qt5-qtdeclarative, qt5-qtscript, zlib"
 TERMUX_PKG_BUILD_DEPENDS="git, qt5-qtbase-cross-tools, qt5-qtdeclarative-cross-tools, qt5-qttools-cross-tools"
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLUA_MATH_LIBRARY=

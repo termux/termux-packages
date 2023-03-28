@@ -8,6 +8,7 @@ TERMUX_PKG_SRCURL=https://github.com/str4d/rage/archive/refs/tags/v${TERMUX_PKG_
 TERMUX_PKG_SHA256=c3dbd44dbdcfa69808dbe4d291453b8187a2302593fde5e7a88e6affeaeb25bf
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_make() {
 	termux_setup_rust

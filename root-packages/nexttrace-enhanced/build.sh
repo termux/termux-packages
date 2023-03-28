@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL=https://github.com/OwO-Network/nexttrace-enhanced/archive/refs
 TERMUX_PKG_SHA256=b41580dc057913d263c87d10e16a20e9d9ddafd97ded1a9b51627e2bfb358f25
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	termux_setup_golang

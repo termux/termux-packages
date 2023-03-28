@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL=https://github.com/rkd77/elinks/releases/download/v${TERMUX_PK
 TERMUX_PKG_SHA256=4d65b78563af39ba1d0a9ab1c081e129ef2ed541009e6ff11c465ba9d8f0f234
 TERMUX_PKG_DEPENDS="libexpat, libiconv, libidn, openssl, libbz2, zlib"
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-256-colors

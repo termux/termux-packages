@@ -27,6 +27,7 @@ etc/apache2/magic
 "
 
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 # providing manual paths to libs because it picks up host libs on some systems
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="

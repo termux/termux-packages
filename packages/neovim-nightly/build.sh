@@ -27,6 +27,7 @@ TERMUX_PKG_CONFFILES="share/nvim/sysinit.vim"
 TERMUX_PKG_CONFLICTS="neovim"
 
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_pkg_auto_update() {
 	# Scrap and parse github release page to get version of nightly build.

@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION="0.9.7.1"
 TERMUX_PKG_SRCURL=https://github.com/soimort/translate-shell/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=f949f379779b9e746bccb20fcd180d041fb90da95816615575b49886032bcefa
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_DEPENDS="bash, curl, gawk, less, rlwrap"
 # hunspell - spell checking
 # mpv - text-to-speech functionality

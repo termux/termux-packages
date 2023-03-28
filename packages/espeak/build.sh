@@ -8,6 +8,7 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/espeak-ng/espeak-ng/archive/${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=f0e028f695a8241c4fa90df7a8c8c5d68dcadbdbc91e758a97e594bbb0a3bdbf
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_DEPENDS="libc++, pcaudiolib"
 TERMUX_PKG_BREAKS="espeak-dev"
 TERMUX_PKG_REPLACES="espeak-dev"

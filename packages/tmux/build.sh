@@ -8,6 +8,7 @@ TERMUX_PKG_VERSION=3.3a
 TERMUX_PKG_SRCURL="https://github.com/tmux/tmux/archive/${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=f9687493203f86d346791a9327cde9148b9b4be959381b1effc575a9364a043f
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 # Set default TERM to screen-256color, see: https://raw.githubusercontent.com/tmux/tmux/3.3/CHANGES
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-static --with-TERM=screen-256color"
 TERMUX_PKG_BUILD_IN_SRC=true

@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
 TERMUX_PKG_VERSION=4.3
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_SRCURL=https://distfiles.audacious-media-player.org/audacious-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=27584dc845c7e70db8c9267990945f17322a1ecc80ff8b452e9ca916a0ce9091
 TERMUX_PKG_DEPENDS="libc++, qt5-qtbase, dbus-glib"

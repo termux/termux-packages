@@ -9,6 +9,7 @@ TERMUX_PKG_SHA256=3161b5a5dd030fd721164faf80b4cadd5edd1be693d5e4c66b7adc3e82a640
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="fzf"
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	termux_setup_golang

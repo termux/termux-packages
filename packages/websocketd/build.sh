@@ -8,6 +8,7 @@ TERMUX_PKG_SRCURL=https://github.com/joewalnes/websocketd/archive/refs/tags/v${T
 TERMUX_PKG_SHA256=6b8fe0fad586d794e002340ee597059b2cfc734ba7579933263aef4743138fe5
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	termux_setup_golang

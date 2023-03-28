@@ -8,3 +8,4 @@ TERMUX_PKG_SHA256=e36f1fa191e42503165f31a7104669ac9f111cf390db8f28a9805514f4e323
 TERMUX_PKG_DEPENDS="libc++, qt5-qtbase, kwindowsystem, liblxqt, pulseaudio-glib"
 TERMUX_PKG_BUILD_DEPENDS="lxqt-build-tools, qt5-qtbase-cross-tools, qt5-qttools-cross-tools"
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false

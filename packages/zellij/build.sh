@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL="https://github.com/zellij-org/zellij/archive/refs/tags/v${TER
 TERMUX_PKG_SHA256=8255a92e40892856bc7dd7114958b8525a88dedab159b588f9907e4d4a2f27e9
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 # wasmer doesn't support these platforms yet
 TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"

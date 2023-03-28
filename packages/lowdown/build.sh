@@ -10,6 +10,7 @@ TERMUX_PKG_SHA256=a7c9dbbd40e3e9d9296ff6ef6ac54fec83b1abe54db7b6113cd9c0f692a20c
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_MAKE_INSTALL_TARGET="install install_libs" ## add "regress" target if one wanna run check
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_UPDATE_METHOD=repology
 
 termux_step_configure() {

@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.3.2
 TERMUX_PKG_SRCURL=git+https://github.com/rgburke/grv
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_DEPENDS="libgit2, ncurses, ncurses-ui-libs, readline"
 TERMUX_PKG_BUILD_IN_SRC=true
 

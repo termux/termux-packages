@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL="https://github.com/schachmat/wego/archive/refs/tags/${TERMUX_
 TERMUX_PKG_SHA256=cebfa622789aa8e7045657d81754cb502ba189f4b4bebd1a95192528e06969a6
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	termux_setup_golang

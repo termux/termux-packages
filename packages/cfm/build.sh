@@ -8,6 +8,7 @@ TERMUX_PKG_SRCURL="https://github.com/0l1v3rr/cli-file-manager/archive/refs/tags
 TERMUX_PKG_SHA256=1a955225a72e822b9a1a1e13edbb460770e7102206050560919de4420cb1474a
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	termux_setup_golang

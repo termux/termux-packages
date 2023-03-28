@@ -8,6 +8,7 @@ TERMUX_PKG_SRCURL=https://github.com/p4gefau1t/trojan-go/archive/refs/tags/v${TE
 TERMUX_PKG_SHA256=925f02647dda944813f1eab0b71eac98b83eb5964ef5a6f63e89bc7eb4486c1f
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	termux_setup_golang

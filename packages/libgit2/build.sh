@@ -8,6 +8,7 @@ TERMUX_PKG_VERSION="1.6.3"
 TERMUX_PKG_SRCURL=https://github.com/libgit2/libgit2/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=a8e2a09835eabb24ace2fd597a78af182e1e199a894e99a90e4c87c849fcd9c4
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_DEPENDS="libssh2, openssl, pcre2, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libiconv, libpcreposix"
 TERMUX_PKG_BREAKS="libgit2-dev"

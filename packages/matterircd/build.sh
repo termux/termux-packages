@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL=https://github.com/42wim/matterircd/archive/refs/tags/v${TERMU
 TERMUX_PKG_SHA256=f1a4bc836473459bf97fde2abcdbc45dccbf51af619b4a051f4202ac9b15ebe7
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	termux_setup_golang

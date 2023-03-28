@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL=https://github.com/errata-ai/vale/archive/refs/tags/v${TERMUX_
 TERMUX_PKG_SHA256=42e5744a4cf1a9c79392e2c124ba1c97b1dc27d8b547cbabe71d6151ccfb99a4
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	termux_setup_golang

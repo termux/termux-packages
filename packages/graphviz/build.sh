@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION="8.0.1"
 TERMUX_PKG_SRCURL=https://gitlab.com/graphviz/graphviz/-/archive/$TERMUX_PKG_VERSION/graphviz-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=0d60ffb256ed2b365abf5c50e9299bcc0c27b9e8ea4a02ed4cc42aa540ad3c13
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_DEPENDS="fontconfig, freetype, gdk-pixbuf, glib, harfbuzz, libandroid-glob, libc++, libcairo, libexpat, libgd, libltdl, librsvg, libwebp, pango, zlib"
 TERMUX_PKG_BREAKS="graphviz-dev"
 TERMUX_PKG_REPLACES="graphviz-dev"

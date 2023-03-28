@@ -8,6 +8,7 @@ TERMUX_PKG_VERSION=9.0.1
 TERMUX_PKG_SRCURL=https://github.com/haiwen/seafile/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=e1ea691d491215b439c01b3b5f1043851bc4232b30f7128f903b39b7c590b123
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_UPDATE_METHOD=repology
 TERMUX_PKG_DEPENDS="glib, libcurl, libevent, libjansson, libsearpc, libsqlite, libuuid, libwebsockets, openssl, python, zlib"
 TERMUX_PKG_BREAKS="seafile-client-dev, ccnet"

@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION="6.7.0"
 TERMUX_PKG_SRCURL=git+https://github.com/johnkerl/miller
 TERMUX_PKG_EXTRA_MAKE_ARGS="PREFIX=$TERMUX_PREFIX"
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	termux_setup_golang
