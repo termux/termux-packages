@@ -8,6 +8,7 @@ TERMUX_PKG_GIT_BRANCH=br-${TERMUX_PKG_VERSION}
 TERMUX_PKG_MAINTAINER="Radomír Polách <rp@t4d.cz>"
 TERMUX_PKG_DEPENDS=libsecret
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
 # The go-rfc5322 module cannot currently be compiled for 32-bit OSes:
 # https://github.com/ProtonMail/proton-bridge/blob/v2.1.1/BUILDS.md#prerequisites

@@ -7,6 +7,7 @@ TERMUX_PKG_VERSION="6.13.0"
 TERMUX_PKG_SRCURL="https://github.com/dartsim/dart/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=4da3ff8cee056252a558b05625a5ff29b21e71f2995e6d7f789abbf6261895f7
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
 # FIXME add ipopt, nlopt, snopt  after a proper FORTRAN compiler is
 # added (hence LAPACK)

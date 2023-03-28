@@ -23,6 +23,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 TERMUX_PKG_CONFFILES="etc/mpd.conf"
 TERMUX_PKG_SERVICE_SCRIPT=("mpd" "if [ -f \"$TERMUX_ANDROID_HOME/.mpd/mpd.conf\" ]; then CONFIG=\"$TERMUX_ANDROID_HOME/.mpd/mpd.conf\"; else CONFIG=\"$TERMUX_PREFIX/etc/mpd.conf\"; fi\nexec mpd --stdout --no-daemon \$CONFIG 2>&1")
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 
 termux_step_pre_configure() {

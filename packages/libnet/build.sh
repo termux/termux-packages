@@ -7,6 +7,7 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/libnet/libnet/releases/download/v$TERMUX_PKG_VERSION/libnet-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=caa4868157d9e5f32e9c7eac9461efeff30cb28357f7f6bf07e73933fb4edaa7
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_post_get_source() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them

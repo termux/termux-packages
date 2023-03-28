@@ -9,6 +9,7 @@ TERMUX_PKG_SHA256=16ed7f2e6f39a5c15a70609b776657b3152a6f4f91ac1a95f331d4ca79cb89
 TERMUX_PKG_DEPENDS="libc++, libicu, liblzma, libxapian, zstd"
 TERMUX_PKG_BUILD_DEPENDS="googletest, libuuid"
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_post_get_source() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them

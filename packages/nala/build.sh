@@ -9,6 +9,7 @@ TERMUX_PKG_DEPENDS="python-apt, python-pip"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_PYTHON_COMMON_DEPS="poetry"
 TERMUX_PKG_PYTHON_TARGET_DEPS="anyio, httpx, jsbeautifier, pexpect, python-debian, rich, tomli, typer, typing-extensions"
 

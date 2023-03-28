@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION="2.35.0"
 TERMUX_PKG_SRCURL=https://github.com/jfrog/jfrog-cli/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=0b5a46c1d46384ac7d7b8443aa40678c6d8c349d8a858398d5349d363b38a069
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_make() {
 	termux_setup_golang

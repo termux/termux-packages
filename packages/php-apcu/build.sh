@@ -9,6 +9,7 @@ TERMUX_PKG_SRCURL="https://github.com/krakjoe/apcu/archive/refs/tags/v$TERMUX_PK
 TERMUX_PKG_DEPENDS="php"
 TERMUX_PKG_SHA256=dfd3e1df434fe84439da499e06d0857fd06dea5572df910d830b1d6474393b08
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	$TERMUX_PREFIX/bin/phpize

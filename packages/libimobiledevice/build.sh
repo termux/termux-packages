@@ -8,6 +8,7 @@ TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/libimobiledevice/libimobiledevice/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=acbfb73eabee162e64c0d9de207d71c0a5f47c40cd5ad32a5097f734328ce10a
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_DEPENDS="usbmuxd, libusbmuxd, openssl"
 TERMUX_PKG_BUILD_IN_SRC=true
 

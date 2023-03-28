@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION=0.651
 TERMUX_PKG_SRCURL=https://github.com/ckolivas/lrzip/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=f4c84de778a059123040681fd47c17565fcc4fec0ccc68fcf32d97fad16cd892
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_DEPENDS="bash, libbz2, libc++, liblz4, liblzo, zlib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-asm=no

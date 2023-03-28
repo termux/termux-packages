@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION=1.0
 TERMUX_PKG_SRCURL=https://github.com/lilydjwg/stdoutisatty/archive/refs/tags/"$TERMUX_PKG_VERSION".tar.gz
 TERMUX_PKG_SHA256=fadc12401cd89e718d7b0127b882cf47335f436ffcc7b83a9fbf557befe5beb2
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 
 termux_step_post_make_install() {

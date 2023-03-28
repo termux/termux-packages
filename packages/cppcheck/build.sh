@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.10.3
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_UPDATE_METHOD=repology # Upstream only releases major versions theough GitHub. Other minor updates are released using git tags, better rely on repology for updated versiom
 TERMUX_PKG_SRCURL=https://github.com/danmar/cppcheck/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=8aae5e116daeaaf5d19f3efa61b91c06f161cb97412a1d1af6e1e20686e48967

@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL=https://github.com/cloudwego/hertz/archive/refs/tags/v${TERMUX
 TERMUX_PKG_SHA256=2fc3d721efa23e12b3f7a168b3d54d0b4301ccf34fd1cdc63b8c6b30a1a0c98b
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	cd "$TERMUX_PKG_SRCDIR"/cmd/hz

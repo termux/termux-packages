@@ -7,6 +7,7 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/getantibody/antibody/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=87bced5fba8cf5d587ea803d33dda72e8bcbd4e4c9991a9b40b2de4babbfc24f
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_make() {
 	termux_setup_golang

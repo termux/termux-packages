@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION="1.3.3"
 TERMUX_PKG_SRCURL=https://github.com/BLAKE3-team/BLAKE3/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=27d2bc4ee5945ba75434859521042c949463ee7514ff17aaef328e23ef83fec0
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_make() {
 	termux_setup_rust

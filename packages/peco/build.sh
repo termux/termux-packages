@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL=https://github.com/peco/peco/archive/refs/tags/v${TERMUX_PKG_V
 TERMUX_PKG_SHA256=8e32c8af533e03795f27feb4ee134960611d2fc0266528b1c512a6f1f065b164
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	termux_setup_golang

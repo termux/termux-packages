@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION="0.17.14"
 TERMUX_PKG_SRCURL=https://github.com/evanw/esbuild/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=0da72bfe575f7b1d6a74f9993405b1a42da84875a5d9eca2671af9f4dcf8f487
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {

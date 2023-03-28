@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION="0.8"
 TERMUX_PKG_SRCURL=https://github.com/martanne/vis/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=61b10d40f15c4db2ce16e9acf291dbb762da4cbccf0cf2a80b28d9ac998a39bd
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_DEPENDS="liblua53, libtermkey, lua-lpeg, ncurses"
 TERMUX_PKG_BUILD_IN_SRC=true
 

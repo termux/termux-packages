@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL=https://github.com/skeeto/passphrase2pgp/releases/download/v$T
 TERMUX_PKG_SHA256=dfed400dc3c5d5547a117dc91cc068bc1613daa0396089f6f66a51190b9889d7
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_make() {
 	termux_setup_golang

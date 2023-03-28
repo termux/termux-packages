@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL=https://github.com/anordal/shellharden/archive/v$TERMUX_PKG_VE
 TERMUX_PKG_SHA256=d17bf55bae4ed6aed9f0d5cea8efd11026623a47b6d840b826513ab5b48db3eb
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 
 termux_step_post_make_install() {

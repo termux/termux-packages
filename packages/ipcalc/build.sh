@@ -7,6 +7,7 @@ TERMUX_PKG_VERSION=0.51
 TERMUX_PKG_SRCURL=https://github.com/kjokjo/ipcalc/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=a4dbfaeb7511b81830793ab9936bae9d7b1b561ad33e29106faaaf97ba1c117e
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_make_install() {
 	cp $TERMUX_PKG_SRCDIR/ipcalc $TERMUX_PREFIX/bin/

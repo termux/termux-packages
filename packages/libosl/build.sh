@@ -9,6 +9,7 @@ TERMUX_PKG_SHA256=168e7c4afdf6a2d1dca1a1caa92e0a093688c98ce01272ab100fe89ec75fdd
 TERMUX_PKG_DEPENDS="libgmp"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_post_get_source() {
 	rm -f CMakeLists.txt

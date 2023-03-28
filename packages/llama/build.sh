@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION="1.4.0"
 TERMUX_PKG_SRCURL=https://github.com/antonmedv/llama/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=301f5dff2b8f27595a08a12626125d28313b5a92e97ccdaf4d0cb89111ebab9a
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {

@@ -9,6 +9,7 @@ TERMUX_PKG_SHA256=3ab7b2cc3cdf1705faa76d474419a2d9e8868c8b46a24c93a218bd6a5acb2d
 TERMUX_PKG_DEPENDS="kcptun-client, kcptun-server"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_make() {
 	termux_setup_golang

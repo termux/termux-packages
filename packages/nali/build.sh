@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL=https://github.com/zu1k/nali/archive/v${TERMUX_PKG_VERSION}.ta
 TERMUX_PKG_SHA256=443bb5d938c2abafd74a0e1d932eb5966b0f6d2aae7a784e4899c152efb818a1
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	termux_setup_golang

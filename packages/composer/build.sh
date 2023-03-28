@@ -9,6 +9,7 @@ TERMUX_PKG_DEPENDS="php"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_make_install() {
 	composer install

@@ -8,6 +8,7 @@ TERMUX_PKG_SRCURL=https://github.com/atanunq/viu/archive/refs/tags/v${TERMUX_PKG
 TERMUX_PKG_SHA256=9b359c2c7e78d418266654e4c94988b0495ddea62391fcf51512038dd3109146
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_make() {
 	termux_setup_rust

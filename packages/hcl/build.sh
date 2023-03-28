@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL=https://github.com/hashicorp/hcl/archive/refs/tags/v${TERMUX_P
 TERMUX_PKG_SHA256=5036af7e71f83eb716a28202dddd26913bc17aa3528296c628e01fe87be8c767
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 _HCL_TOOLS="hcldec hclfmt hclspecsuite"
 

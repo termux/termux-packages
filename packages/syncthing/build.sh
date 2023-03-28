@@ -8,6 +8,7 @@ TERMUX_PKG_VERSION=1.23.2
 TERMUX_PKG_SRCURL=https://github.com/syncthing/syncthing/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=036bff4610791aa278a40cdda530e412bf44958c7951b720160c31c87b03d61c
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_make() {
 	termux_setup_golang

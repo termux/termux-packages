@@ -7,6 +7,7 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/matsuyoshi30/germanium/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=69c818f06bbd7ea562afb5ed38b24fc2e9e9a447d5668d995314da5203e72de3
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_post_get_source() {

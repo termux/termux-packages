@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL="https://github.com/pressly/goose/archive/v${TERMUX_PKG_VERSIO
 TERMUX_PKG_SHA256=df6ac59600609ad1d18846f3b29e6b83764d396c247b4d0a0cadfa3f48a2e27c
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	termux_setup_golang

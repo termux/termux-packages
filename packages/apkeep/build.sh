@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL=https://github.com/EFForg/apkeep/archive/refs/tags/${TERMUX_PK
 TERMUX_PKG_SHA256=439815cc2eb75df1235bb1106135548af2465e47486df6d1742cd47c0bd687dc
 TERMUX_PKG_DEPENDS="openssl (>= 3.0.3)"
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {

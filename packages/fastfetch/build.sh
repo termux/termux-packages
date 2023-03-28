@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL=https://github.com/LinusDierheimer/fastfetch/archive/${TERMUX_
 TERMUX_PKG_SHA256=900b3c19f56fca59fd90ae2a033f40fec00185f2a0078dabdcc13a27635dd989
 TERMUX_PKG_DEPENDS="vulkan-headers, vulkan-loader-android, freetype"
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DTARGET_DIR_ROOT=${TERMUX_PREFIX}

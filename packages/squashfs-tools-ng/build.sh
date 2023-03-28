@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL="https://github.com/AgentD/squashfs-tools-ng/archive/v${TERMUX
 TERMUX_PKG_SHA256=e6f627a97ae0f484905de1718728a8879e8600b324d22d09a63cf92e9c9e1132
 TERMUX_PKG_DEPENDS="liblz4, liblzma, liblzo, zlib, zstd"
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 
 termux_step_pre_configure(){

@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL=https://github.com/rust-lang/rust-bindgen/archive/refs/tags/v$
 TERMUX_PKG_SHA256=9d987e7e2cefebed2c856ba36438e75af00aa08d4274fc15b8c20886065cb1f2
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 
 termux_step_pre_configure() {

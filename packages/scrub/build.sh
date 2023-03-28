@@ -7,6 +7,7 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/chaos/scrub/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=838b061b2e1932b342fb9695c5579cdff5d2d72506cb41d6d8032eba18aed969
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	./autogen.sh

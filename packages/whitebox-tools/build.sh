@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION="2.2.0"
 TERMUX_PKG_SRCURL="https://github.com/jblindsay/whitebox-tools/archive/refs/tags/v2.0.0.tar.gz"
 TERMUX_PKG_SHA256=18705fc948bdb2f96cd816e5a72d36b9cc460aa8c910383d23fdbd61641aab60
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {

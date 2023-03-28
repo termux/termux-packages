@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL="https://github.com/ismaelgv/rnr/archive/refs/tags/v$TERMUX_PK
 TERMUX_PKG_SHA256=cde8e5366552263300e60133b82f6a3868aeced2fe83abc91c2168085dff0998
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_make() {
 	termux_setup_rust

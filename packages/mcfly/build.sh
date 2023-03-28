@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL=https://github.com/cantino/mcfly/archive/refs/tags/v${TERMUX_P
 TERMUX_PKG_SHA256=be9273bc0dd3d4bd5d8e5db6a48f2a92611740905c115e080f7f57fd5637041d
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	if [ "$TERMUX_ARCH" == "x86_64" ]; then

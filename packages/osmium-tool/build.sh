@@ -10,3 +10,4 @@ TERMUX_PKG_DEPENDS="boost, libbz2, libc++, libexpat, liblz4, zlib"
 TERMUX_PKG_BUILD_DEPENDS="boost-headers, libosmium, libprotozero"
 TERMUX_PKG_GROUPS="science"
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false

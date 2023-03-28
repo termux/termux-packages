@@ -13,6 +13,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DBoost_INCLUDE_DIR=$TERMUX_PREFIX/include
 "
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_post_get_source() {
 	# Future-proof way of pretending not to be Android.

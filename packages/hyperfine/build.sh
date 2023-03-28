@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION="1.16.1"
 TERMUX_PKG_SRCURL=https://github.com/sharkdp/hyperfine/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=ffb3298945cbe2c068ca1a074946d55b9add83c9df720eda2ed7f3d94d7e65d2
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_post_make_install() {

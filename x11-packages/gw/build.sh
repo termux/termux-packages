@@ -9,6 +9,7 @@ TERMUX_PKG_SHA256=92599d100755a5a20dc15ebfb86fdf0818ccc87c6e0a2cc0a7c3061661ed3d
 TERMUX_PKG_DEPENDS="glfw, htslib, libc++, libjpeg-turbo, opengl"
 TERMUX_PKG_BUILD_DEPENDS="fontconfig, freetype, libicu, libuuid, mesa-dev"
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_BUILD_IN_SRC=true
 
 # htslib is not available for arm.

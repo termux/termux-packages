@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION="2.2.4"
 TERMUX_PKG_SRCURL=https://github.com/rdiff-backup/rdiff-backup/releases/download/v${TERMUX_PKG_VERSION/\~/}/rdiff-backup-${TERMUX_PKG_VERSION/\~/}.tar.gz
 TERMUX_PKG_SHA256=948151492a42c2ad47ca90dfb2d1cbe7a5bb90f2bc2b9b6f3ef4238a7bf0dbf5
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_DEPENDS="librsync, python"
 TERMUX_PKG_PYTHON_COMMON_DEPS="wheel"
 TERMUX_PKG_BUILD_IN_SRC=true

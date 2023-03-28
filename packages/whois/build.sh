@@ -14,6 +14,7 @@ HAVE_ICONV=1
 "
 
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	LDFLAGS+=" -liconv"

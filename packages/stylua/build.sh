@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION="0.17.0"
 TERMUX_PKG_SRCURL=https://github.com/JohnnyMorganz/StyLua/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=ec659abac6dbe18b7ac0d53e830ab7a14805b389aa0ff97c06cc7fbf3f341292
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {

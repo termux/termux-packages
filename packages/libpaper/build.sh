@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION="2.0.10"
 TERMUX_PKG_SRCURL="https://github.com/rrthomas/libpaper/releases/download/v${TERMUX_PKG_VERSION}/libpaper-${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=34938c376ad9ba706dd0f1b30e3de0cb5fe54b47e528ae8a7f1fee062dc42c72
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --sysconfdir=${TERMUX_PREFIX}/etc
 --enable-relocatable
