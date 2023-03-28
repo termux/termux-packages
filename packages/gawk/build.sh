@@ -9,6 +9,7 @@ TERMUX_PKG_DEPENDS="libandroid-support, libgmp, libmpfr, readline"
 TERMUX_PKG_BREAKS="gawk-dev"
 TERMUX_PKG_REPLACES="gawk-dev"
 TERMUX_PKG_ESSENTIAL=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_RM_AFTER_INSTALL="bin/gawk-* bin/igawk share/man/man1/igawk.1"
 TERMUX_PKG_GROUPS="base-devel"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="

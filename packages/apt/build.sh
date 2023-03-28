@@ -13,6 +13,7 @@ TERMUX_PKG_REPLACES="apt-transport-https, libapt-pkg, unstable-repo, game-repo, 
 TERMUX_PKG_PROVIDES="unstable-repo, game-repo, science-repo"
 TERMUX_PKG_SUGGESTS="gnupg"
 TERMUX_PKG_ESSENTIAL=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 TERMUX_PKG_CONFFILES="
 etc/apt/sources.list

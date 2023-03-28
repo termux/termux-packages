@@ -9,6 +9,7 @@ TERMUX_PKG_SHA256=3ee13d0f40148625306b90f9622f8c9660b8082884051b0cfe46f18492f889
 TERMUX_PKG_BREAKS="liblzma-dev"
 TERMUX_PKG_REPLACES="liblzma-dev"
 TERMUX_PKG_ESSENTIAL=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_post_massage() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them
