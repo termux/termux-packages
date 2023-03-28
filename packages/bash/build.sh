@@ -12,6 +12,7 @@ TERMUX_PKG_RECOMMENDS="command-not-found, bash-completion"
 TERMUX_PKG_BREAKS="bash-dev"
 TERMUX_PKG_REPLACES="bash-dev"
 TERMUX_PKG_ESSENTIAL=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_BUILD_IN_SRC=true
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-multibyte --without-bash-malloc --with-installed-readline"
