@@ -19,6 +19,13 @@ termux_setup_cmake() {
 				b1dfd11d50e2dfb3d18be86ca1a369da1c1131badc14b659491dd42be1fed704
 			rm -Rf "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-linux-x86_64"
 			tar xf "$TERMUX_CMAKE_TARFILE" -C "$TERMUX_PKG_TMPDIR"
+			shopt -s nullglob
+			local f
+			for f in "$TERMUX_SCRIPTDIR"/scripts/build/setup/cmake-*.patch; do
+				echo "[${FUNCNAME[0]}]: Applying $(basename "$f")"
+				patch --silent -p1 -d "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-linux-x86_64" < "$f"
+			done
+			shopt -u nullglob
 			mv "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-linux-x86_64" \
 				"$TERMUX_CMAKE_FOLDER"
 		fi
