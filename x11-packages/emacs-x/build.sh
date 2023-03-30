@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # Update both emacs and emacs-x to the same version in one PR.
 _VERSION=28.3
 TERMUX_PKG_VERSION=${_VERSION}-rc1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/emacs/emacs-${_VERSION}.tar.xz
 if [[ $TERMUX_PKG_VERSION == *-rc* ]]; then
 	TERMUX_PKG_SRCURL=https://alpha.gnu.org/gnu/emacs/pretest/emacs-${TERMUX_PKG_VERSION#*:}.tar.xz
@@ -57,13 +58,6 @@ TERMUX_PKG_HOSTBUILD=true
 # Remove some irrelevant files:
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/grep-changelog
-share/applications/emacs.desktop
-share/emacs/${_VERSION}/etc/emacs.desktop
-share/emacs/${_VERSION}/etc/emacs.icon
-share/emacs/${_VERSION}/etc/images
-share/emacs/${_VERSION}/etc/refcards
-share/emacs/${_VERSION}/etc/tutorials/TUTORIAL.*
-share/icons
 share/man/man1/grep-changelog.1.gz
 "
 
