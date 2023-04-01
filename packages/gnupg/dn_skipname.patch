@@ -1,0 +1,29 @@
+https://github.com/termux/termux-packages/issues/15852
+
+--- a/configure
++++ b/configure
+@@ -10702,6 +10702,9 @@
+ #include <netinet/in.h>
+ #include <arpa/nameser.h>
+ #include <resolv.h>
++#ifdef __ANDROID__
++int dn_skipname(const unsigned char *, const unsigned char *);
++#endif
+ int
+ main ()
+ {
+--- a/dirmngr/dns-stuff.c
++++ b/dirmngr/dns-stuff.c
+@@ -51,6 +51,12 @@
+ #include <string.h>
+ #include <unistd.h>
+ 
++#ifdef __ANDROID__
++# if !HAVE_SYSTEM_RESOLVER
++#  error HAVE_SYSTEM_RESOLVER must be true on Android
++# endif
++int dn_skipname(const unsigned char *, const unsigned char *);
++#endif
+ 
+ /* William Ahern's DNS library, included as a source copy.  */
+ #ifdef USE_LIBDNS
