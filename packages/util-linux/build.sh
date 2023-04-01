@@ -16,7 +16,6 @@ TERMUX_PKG_SHA256=60492a19b44e6cf9a3ddff68325b333b8b52b6c59ce3ebd6a0ecaa4c5117e8
 # libcrypt is required for only newgrp and sulogin, which are not built anyways
 TERMUX_PKG_DEPENDS="libcap-ng, libsmartcols, ncurses, zlib"
 TERMUX_PKG_ESSENTIAL=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_BREAKS="util-linux-dev"
 TERMUX_PKG_REPLACES="util-linux-dev"
 # Most android kernels are built without namespace support, so remove lsns

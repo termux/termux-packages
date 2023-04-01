@@ -10,7 +10,6 @@ TERMUX_PKG_DEPENDS="ncurses"
 TERMUX_PKG_BREAKS="procps-dev"
 TERMUX_PKG_REPLACES="procps-dev"
 TERMUX_PKG_ESSENTIAL=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_search_dlopen=
 --enable-sigwinch

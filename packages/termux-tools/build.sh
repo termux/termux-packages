@@ -7,7 +7,6 @@ TERMUX_PKG_SRCURL=https://github.com/termux/termux-tools/archive/refs/tags/v${TE
 TERMUX_PKG_SHA256=1ad74199e09876cdffee99cf69bb54d6c24e1bd497bdd0c5e9c46f13cd5d285b
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_ESSENTIAL=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_BREAKS="termux-keyring (<< 1.9)"
 TERMUX_PKG_CONFLICTS="procps (<< 3.3.15-2)"
 TERMUX_PKG_SUGGESTS="termux-api"
