@@ -1,0 +1,134 @@
+https://lists.gnupg.org/pipermail/gcrypt-devel/2022-December/005410.html
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -1211,7 +1211,8 @@ AC_CACHE_CHECK([whether GCC assembler is compatible for ARM assembly implementat
+                 /* Test if '.type' and '.size' are supported.  */
+                 ".size asmfunc,.-asmfunc;\n\t"
+                 ".type asmfunc,%function;\n\t"
+-              );]], [ asmfunc(); ] )],
++              );
++	      void asmfunc(void);]], [ asmfunc(); ] )],
+             [gcry_cv_gcc_arm_platform_as_ok=yes])
+         fi])
+ if test "$gcry_cv_gcc_arm_platform_as_ok" = "yes" ; then
+@@ -1238,7 +1239,8 @@ AC_CACHE_CHECK([whether GCC assembler is compatible for ARMv8/Aarch64 assembly i
+                 "eor x0, x0, x30, ror #12;\n\t"
+                 "add x0, x0, x30, asr #12;\n\t"
+                 "eor v0.16b, v0.16b, v31.16b;\n\t"
+-              );]], [ asmfunc(); ] )],
++              );
++	      void asmfunc(void);]], [ asmfunc(); ] )],
+             [gcry_cv_gcc_aarch64_platform_as_ok=yes])
+         fi])
+ if test "$gcry_cv_gcc_aarch64_platform_as_ok" = "yes" ; then
+@@ -1267,7 +1269,8 @@ AC_CACHE_CHECK([whether GCC assembler supports for CFI directives],
+                 ".cfi_restore_state\n\t"
+                 ".long 0\n\t"
+                 ".cfi_endproc\n\t"
+-            );]])],
++            );
++	    void asmfunc(void)]])],
+           [gcry_cv_gcc_asm_cfi_directives=yes])])
+ if test "$gcry_cv_gcc_asm_cfi_directives" = "yes" ; then
+    AC_DEFINE(HAVE_GCC_ASM_CFI_DIRECTIVES,1,
+@@ -1666,7 +1669,8 @@ if test $amd64_as_feature_detection = yes; then
+        [gcry_cv_gcc_as_const_division_ok],
+        [gcry_cv_gcc_as_const_division_ok=no
+         AC_LINK_IFELSE([AC_LANG_PROGRAM(
+-          [[__asm__(".text\n\tfn:\n\t xorl \$(123456789/12345678), %ebp;\n\t");]],
++          [[__asm__(".text\n\tfn:\n\t xorl \$(123456789/12345678), %ebp;\n\t");
++	    void fn(void);]],
+             [fn();])],
+           [gcry_cv_gcc_as_const_division_ok=yes])])
+   if test "$gcry_cv_gcc_as_const_division_ok" = "no" ; then
+@@ -1679,7 +1683,8 @@ if test $amd64_as_feature_detection = yes; then
+          [gcry_cv_gcc_as_const_division_with_wadivide_ok],
+          [gcry_cv_gcc_as_const_division_with_wadivide_ok=no
+           AC_LINK_IFELSE([AC_LANG_PROGRAM(
+-            [[__asm__(".text\n\tfn:\n\t xorl \$(123456789/12345678), %ebp;\n\t");]],
++            [[__asm__(".text\n\tfn:\n\t xorl \$(123456789/12345678), %ebp;\n\t");
++	      void fn(void);]],
+               [fn();])],
+             [gcry_cv_gcc_as_const_division_with_wadivide_ok=yes])])
+     if test "$gcry_cv_gcc_as_const_division_with_wadivide_ok" = "no" ; then
+@@ -1715,7 +1720,8 @@ if test $amd64_as_feature_detection = yes; then
+ 		 * and "-Wa,--divide" workaround failed, this causes assembly
+ 		 * to be disable on this machine. */
+ 		"xorl \$(123456789/12345678), %ebp;\n\t"
+-            );]], [ asmfunc(); ])],
++            );
++	    void asmfunc(void);]], [ asmfunc(); ])],
+           [gcry_cv_gcc_amd64_platform_as_ok=yes])
+         fi])
+   if test "$gcry_cv_gcc_amd64_platform_as_ok" = "yes" ; then
+@@ -1734,7 +1740,8 @@ if test $amd64_as_feature_detection = yes; then
+               ".globl asmfunc\n\t"
+               "asmfunc:\n\t"
+               "xorq \$(1234), %rbp;\n\t"
+-          );]], [ asmfunc(); ])],
++          );
++	  void asmfunc(void);]], [ asmfunc(); ])],
+         [gcry_cv_gcc_win64_platform_as_ok=yes])])
+     if test "$gcry_cv_gcc_win64_platform_as_ok" = "yes" ; then
+       AC_DEFINE(HAVE_COMPATIBLE_GCC_WIN64_PLATFORM_AS,1,
+@@ -1767,7 +1774,8 @@ AC_CACHE_CHECK([whether GCC assembler is compatible for Intel syntax assembly im
+                 "sub eax, [esp + 4];\n\t"
+                 "add dword ptr [esp + eax], 0b10101;\n\t"
+                 ".att_syntax prefix\n\t"
+-            );]], [ actest(); ])],
++            );
++	    void actest(void);]], [ actest(); ])],
+           [gcry_cv_gcc_platform_as_ok_for_intel_syntax=yes])
+         fi])
+ if test "$gcry_cv_gcc_platform_as_ok_for_intel_syntax" = "yes" ; then
+@@ -1832,6 +1840,7 @@ AC_CACHE_CHECK([whether GCC inline assembler supports NEON instructions],
+                 "vadd.u64 %q0, %q1;\n\t"
+                 "vadd.s64 %d3, %d2, %d3;\n\t"
+                 );
++	    void testfn(void);
+             ]], [ testfn(); ])],
+           [gcry_cv_gcc_inline_asm_neon=yes])
+         fi])
+@@ -1879,6 +1888,7 @@ AC_CACHE_CHECK([whether GCC inline assembler supports AArch32 Crypto Extension i
+ 
+                 "vmull.p64 q0, d0, d0;\n\t"
+                 );
++	    void testfn(void);
+             ]], [ testfn(); ])],
+           [gcry_cv_gcc_inline_asm_aarch32_crypto=yes])
+         fi])
+@@ -1907,6 +1917,7 @@ AC_CACHE_CHECK([whether GCC inline assembler supports AArch64 NEON instructions]
+                 "dup v0.8b, w0;\n\t"
+                 "ld4 {v0.8b,v1.8b,v2.8b,v3.8b},[x0],\#32;\n\t"
+                 );
++	    void testfn(void);
+             ]], [ testfn(); ])],
+           [gcry_cv_gcc_inline_asm_aarch64_neon=yes])
+         fi])
+@@ -1955,6 +1966,7 @@ AC_CACHE_CHECK([whether GCC inline assembler supports AArch64 Crypto Extension i
+                 "pmull v0.1q, v0.1d, v31.1d;\n\t"
+                 "pmull2 v0.1q, v0.2d, v31.2d;\n\t"
+                 );
++	    void testfn(void);
+             ]], [ testfn(); ])],
+           [gcry_cv_gcc_inline_asm_aarch64_crypto=yes])
+         fi])
+@@ -2050,6 +2062,7 @@ AC_CACHE_CHECK([whether GCC inline assembler supports PowerPC AltiVec/VSX/crypto
+ 		    "vshasigmad %v0, %v1, 0, 15;\n"
+ 		    "vpmsumd %v11, %v11, %v11;\n"
+ 		  );
++	    void testfn(void);
+             ]], [ testfn(); ] )],
+           [gcry_cv_gcc_inline_asm_ppc_altivec=yes])
+         fi])
+@@ -2075,6 +2088,7 @@ AC_CACHE_CHECK([whether GCC inline assembler supports PowerISA 3.00 instructions
+ 		    "testfn:\n"
+ 		    "stxvb16x %r1,%v12,%v30;\n"
+ 		  );
++	    void testfn(void);
+             ]], [ testfn(); ])],
+           [gcry_cv_gcc_inline_asm_ppc_arch_3_00=yes])
+         fi])
+
+
