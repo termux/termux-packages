@@ -17,6 +17,7 @@ TERMUX_PKG_SHA256=(e26085af8ac396f62add8a533c3a0ea8c8497d836f0689347ac5abd7b7a4e
 TERMUX_PKG_SRCURL=(http://www.cpan.org/src/5.0/perl-${TERMUX_PKG_VERSION}.tar.gz
 		   https://github.com/arsv/perl-cross/releases/download/${TERMUX_PKG_VERSION[1]}/perl-cross-${TERMUX_PKG_VERSION[1]}.tar.gz)
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_MAKE_PROCESSES=1
 TERMUX_PKG_RM_AFTER_INSTALL="bin/perl${TERMUX_PKG_VERSION}"
 
