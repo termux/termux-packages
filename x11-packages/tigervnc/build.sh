@@ -4,12 +4,12 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # No update anymore. v1.11.x requires support of PAM.
 TERMUX_PKG_VERSION=(1.10.1
-		    21.1.7)
-TERMUX_PKG_REVISION=37
+		    21.1.8)
+TERMUX_PKG_REVISION=38
 TERMUX_PKG_SRCURL=(https://github.com/TigerVNC/tigervnc/archive/v${TERMUX_PKG_VERSION}.tar.gz
 		   https://xorg.freedesktop.org/releases/individual/xserver/xorg-server-${TERMUX_PKG_VERSION[1]}.tar.xz)
 TERMUX_PKG_SHA256=(19fcc80d7d35dd58115262e53cac87d8903180261d94c2a6b0c19224f50b58c4
-		   d9c60b2dd0ec52326ca6ab20db0e490b1ff4f566f59ca742d6532e92795877bb)
+		   38aadb735650c8024ee25211c190bf8aad844c5f59632761ab1ef4c4d5aeb152)
 TERMUX_PKG_DEPENDS="libandroid-shmem, libc++, libgnutls, libjpeg-turbo, libpixman, libx11, libxau, libxdamage, libxdmcp, libxext, libxfixes, libxfont2, opengl, openssl, perl, xkeyboard-config, xorg-xauth, xorg-xkbcomp, zlib"
 TERMUX_PKG_BUILD_DEPENDS="xorg-font-util, xorg-server-xvfb, xorg-util-macros, xorgproto, xtrans"
 TERMUX_PKG_SUGGESTS="aterm, xorg-twm"
