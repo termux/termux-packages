@@ -16,6 +16,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure() {
+	autoreconf -fi
+
 	termux_setup_no_integrated_as
 	if [ "$TERMUX_ARCH" = arm ]; then
 		# See http://marc.info/?l=gnupg-devel&m=139136972631909&w=3
