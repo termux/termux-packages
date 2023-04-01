@@ -2,12 +2,13 @@ TERMUX_PKG_HOMEPAGE=https://www.samba.org/
 TERMUX_PKG_DESCRIPTION="SMB/CIFS fileserver"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=4.16.9
+TERMUX_PKG_VERSION=4.16.10
 TERMUX_PKG_SRCURL=https://download.samba.org/pub/samba/samba-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=93d10fa3e1b8392771644a350fd3ddb466753b78e26042309ce81601d1e540de
+TERMUX_PKG_SHA256=c077d698a2b871cf130afe2f6fa6aaf321a25eac611f22edae8a7f3e8c9c4d3f
 TERMUX_PKG_DEPENDS="krb5, libandroid-execinfo, libandroid-spawn, libbsd, libcap, libcrypt, libgnutls, libiconv, libicu, libpopt, libtalloc, libtasn1, libtirpc, ncurses, openssl, readline, tdb-tools, zlib"
 TERMUX_PKG_BUILD_DEPENDS="e2fsprogs"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 # These files are already present in the package tdb-tools
 TERMUX_PKG_RM_AFTER_INSTALL="
