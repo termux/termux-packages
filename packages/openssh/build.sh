@@ -36,6 +36,7 @@ ac_cv_func_getlastlogxbyname=no
 ac_cv_func_readpassphrase=no
 ac_cv_func_strnvis=no
 ac_cv_header_sys_un_h=yes
+ac_cv_lib_crypt_crypt=no
 ac_cv_search_getrrsetbyname=no
 ac_cv_func_bzero=yes
 "
