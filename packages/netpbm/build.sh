@@ -10,6 +10,7 @@ TERMUX_PKG_DEPENDS="libjpeg-turbo, libpng, libtiff, libx11, libxml2"
 TERMUX_PKG_BREAKS="netpbm-dev"
 TERMUX_PKG_REPLACES="netpbm-dev"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_configure() {
 	# Put the android libpng-config script in the path (before the host one):
