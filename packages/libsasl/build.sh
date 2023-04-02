@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Cyrus SASL - authentication abstraction library"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.1.28
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/cyrus-sasl-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=67f1945057d679414533a30fe860aeb2714f5167a8c03041e023a65f629a9351
 TERMUX_PKG_BREAKS="libsasl-dev"
@@ -24,12 +25,9 @@ ac_cv_header_syslog_h=no
 --enable-login
 "
 TERMUX_PKG_RM_AFTER_INSTALL="bin/pluginviewer"
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
-termux_step_post_configure() {
-	# Build wants to run makemd5 at build time:
-	gcc $TERMUX_PKG_SRCDIR/include/makemd5.c -o $TERMUX_PKG_BUILDDIR/include/makemd5
-	touch -d "next hour" $TERMUX_PKG_BUILDDIR/include/makemd5
+termux_step_pre_configure() {
+	autoreconf -fi
 }
 
 termux_step_post_massage() {
