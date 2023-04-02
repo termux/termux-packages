@@ -4,13 +4,13 @@ TERMUX_PKG_LICENSE="non-free"
 TERMUX_PKG_LICENSE_FILE="doc/copyright_summary"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1:10.73.43
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/netpbm/super_stable/${TERMUX_PKG_VERSION:2}/netpbm-${TERMUX_PKG_VERSION:2}.tgz
 TERMUX_PKG_SHA256=f9fd9a7f932258224d1925bfce61396a15e0fad93e3853d6324ac308d1adebf8
 TERMUX_PKG_DEPENDS="libjpeg-turbo, libpng, libtiff, libx11, libxml2"
 TERMUX_PKG_BREAKS="netpbm-dev"
 TERMUX_PKG_REPLACES="netpbm-dev"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_configure() {
 	# Put the android libpng-config script in the path (before the host one):
