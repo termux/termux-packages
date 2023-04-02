@@ -17,6 +17,9 @@ TERMUX_PKG_REPLACES="python-dev"
 # Let "python3" will be alias to this package.
 TERMUX_PKG_PROVIDES="python3"
 
+# https://github.com/termux/termux-packages/issues/15908
+TERMUX_MAKE_PROCESSES=1
+
 # Set ac_cv_func_wcsftime=no to avoid errors such as "character U+ca0025 is not in range [U+0000; U+10ffff]"
 # when executing e.g. "from time import time, strftime, localtime; print(strftime(str('%Y-%m-%d %H:%M'), localtime()))"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_file__dev_ptmx=yes ac_cv_file__dev_ptc=no ac_cv_func_wcsftime=no"
