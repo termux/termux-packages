@@ -332,6 +332,22 @@ index f43c08a..98e0284 100644
      Pwidth=(Width+7)/8;
      printer.fptr=out;
  
+diff --git a/converter/pbm/pbmtoppa/ppapbm.h b/converter/pbm/pbmtoppa/ppapbm.h
+index 1ffc093..453deae 100644
+--- a/converter/pbm/pbmtoppa/ppapbm.h
++++ b/converter/pbm/pbmtoppa/ppapbm.h
+@@ -26,4 +26,11 @@ int pbm_readline(pbm_stat*,unsigned char*);
+   /* reads a single line into char* */
+ void pbm_unreadline(pbm_stat*,void*); /* pushes a single line back */
+ 
++void *malloc2(int, int);
++void *malloc3(int, int, int);
++#define overflow2(a,b) __overflow2(a,b)
++void __overflow2(int, int);
++void overflow3(int, int, int);
++void overflow_add(int, int);
++
+ #endif
 diff --git a/converter/pbm/pbmtoxbm.c b/converter/pbm/pbmtoxbm.c
 index 14c6b85..362b70e 100644
 --- a/converter/pbm/pbmtoxbm.c
