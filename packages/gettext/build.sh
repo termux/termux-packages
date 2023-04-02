@@ -12,6 +12,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_have_decl_posix_spawn=no
 ac_cv_header_spawn_h=no
+gl_cv_terminfo_tparm=yes
 --disable-openmp
 --with-included-libcroco
 --with-included-libglib
