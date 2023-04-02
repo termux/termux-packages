@@ -8,7 +8,6 @@ TERMUX_PKG_SHA256=d8be783efd5cd4ae534cee4132338e3f40f182c3205d23b200094ec85faaae
 TERMUX_PKG_DEPENDS="gettext, libffi, libtasn1"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-trust-paths --disable-static"
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_post_get_source() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them
@@ -24,4 +23,8 @@ termux_step_post_get_source() {
 	if [ ! "${_LT_CURRENT}" ] || [ "${v}" != "${_SOVERSION}" ]; then
 		termux_error_exit "SOVERSION guard check failed."
 	fi
+}
+
+termux_step_pre_configure() {
+	autoreconf -fi
 }
