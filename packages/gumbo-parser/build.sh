@@ -6,7 +6,6 @@ TERMUX_PKG_VERSION=0.10.1
 TERMUX_PKG_SRCURL=https://github.com/google/gumbo-parser/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=28463053d44a5dfbc4b77bcf49c8cee119338ffa636cc17fc3378421d714efad
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_post_get_source() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them

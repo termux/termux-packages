@@ -6,7 +6,6 @@ TERMUX_PKG_VERSION="3.0.9"
 TERMUX_PKG_SRCURL=https://github.com/zlib-ng/minizip-ng/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=992693a532eb15b20d306e6aeea1a1a6501bd19dca993ebe9a95fd22d6b7fd74
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_DEPENDS="libbz2, libiconv, liblzma, openssl, zlib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCMAKE_INSTALL_INCLUDEDIR=include/minizip-ng
