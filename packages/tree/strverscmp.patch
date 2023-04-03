@@ -9,10 +9,13 @@
  
  /* 
  @deftypefun int strverscmp (const char *@var{s1}, const char *@var{s2})
-@@ -157,4 +157,4 @@
-       return state;
-     }
- }
--#endif
-\ No newline at end of file
-+#endif
+--- a/tree.h
++++ b/tree.h
+@@ -307,6 +307,6 @@
+ 
+ 
+ /* We use the strverscmp.c file if we're not linux: */
+-#ifndef __linux__
++#if defined(__ANDROID__) || !defined(__linux__)
+ int strverscmp (const char *s1, const char *s2);
+ #endif
