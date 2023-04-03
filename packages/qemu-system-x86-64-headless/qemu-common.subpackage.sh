@@ -3,7 +3,6 @@ TERMUX_SUBPKG_DEPENDS="glib, libbz2, libcap-ng, libcurl, libgmp, libgnutls, libn
 TERMUX_SUBPKG_DEPEND_ON_PARENT=no
 
 TERMUX_SUBPKG_INCLUDE="
-bin/qemu-ga
 bin/qemu-pr-helper
 bin/qemu-storage-daemon
 libexec/virtfs-proxy-helper
