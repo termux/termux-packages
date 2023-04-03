@@ -43,6 +43,9 @@ if $TERMUX_DEBUG_BUILD; then
 	CFLAGS+=" -gdwarf-4"
 fi
 
+# Avoid misdetection of sigaltstack with strict C99:
+# https://github.com/termux/termux-packages/issues/15852
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" emacs_cv_alternate_stack=yes"
 # Ensure use of system malloc:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" emacs_cv_sanitize_address=yes"
 # Prevent configure from adding -nopie:
