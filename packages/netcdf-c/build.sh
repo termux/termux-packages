@@ -12,7 +12,6 @@ TERMUX_PKG_GROUPS="science"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-hdf5"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_post_get_source() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them

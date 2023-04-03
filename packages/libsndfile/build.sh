@@ -6,7 +6,6 @@ TERMUX_PKG_VERSION="1.2.0"
 TERMUX_PKG_SRCURL=https://github.com/libsndfile/libsndfile/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=62dc4e2bcd45f6f0e89cbc3522cc90eb174dca0eef0a0d19ead289833b390cd7
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_DEPENDS="libflac, libogg, libopus, libvorbis"
 TERMUX_PKG_BREAKS="libsndfile-dev"
 TERMUX_PKG_REPLACES="libsndfile-dev"

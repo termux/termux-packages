@@ -7,7 +7,6 @@ TERMUX_PKG_VERSION="1.15.2"
 TERMUX_PKG_SRCURL=https://github.com/strukturag/libheif/releases/download/v${TERMUX_PKG_VERSION}/libheif-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=7a4c6077f45180926583e2087571371bdd9cb21b6e6fada85a6fbd544f26a0e2
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_DEPENDS="libaom, libc++, libdav1d, librav1e, libde265, libx265"
 
 termux_step_pre_configure() {

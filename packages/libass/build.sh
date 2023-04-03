@@ -6,7 +6,6 @@ TERMUX_PKG_VERSION="0.17.1"
 TERMUX_PKG_SRCURL=https://github.com/libass/libass/releases/download/$TERMUX_PKG_VERSION/libass-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=f0da0bbfba476c16ae3e1cfd862256d30915911f7abaa1b16ce62ee653192784
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_DEPENDS="fontconfig, fribidi, glib, harfbuzz"
 TERMUX_PKG_BREAKS="libass-dev"
 TERMUX_PKG_REPLACES="libass-dev"

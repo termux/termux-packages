@@ -10,7 +10,6 @@ TERMUX_PKG_BREAKS="proj-dev"
 TERMUX_PKG_REPLACES="proj-dev"
 TERMUX_PKG_GROUPS="science"
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_post_get_source() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them

@@ -7,7 +7,6 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/junegunn/fzf/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=ac665ac269eca320ca9268227142f01b10ad5d25364ff274658b5a9f709a7259
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 # Depend on findutils as fzf uses the -fstype option, which busybox
 # find does not support, when invoking find:

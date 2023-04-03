@@ -6,7 +6,6 @@ TERMUX_PKG_VERSION="1.7.2"
 TERMUX_PKG_SRCURL=https://github.com/hunspell/hunspell/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=69fa312d3586c988789266eaf7ffc9861d9f6396c31fc930a014d551b59bbd6e
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_DEPENDS="libc++, libiconv, ncurses, readline, hunspell-en-us"
 TERMUX_PKG_BREAKS="hunspell-dev"
 TERMUX_PKG_REPLACES="hunspell-dev"
