@@ -8,3 +8,7 @@ TERMUX_PKG_SRCURL=http://miniupnp.free.fr/files/libnatpmp-$TERMUX_PKG_VERSION.ta
 TERMUX_PKG_SHA256=e1aa9c4c4219bc06943d6b2130f664daee213fb262fcb94dd355815b8f4536b0
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_MAKE_ARGS="INSTALLPREFIX=$TERMUX_PREFIX"
+
+termux_step_post_get_source() {
+	mv setup.py{,.unused}
+}
