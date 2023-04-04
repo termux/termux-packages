@@ -8,7 +8,6 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/flexible-collision-library/fcl/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=90409e940b24045987506a6b239424a4222e2daf648c86dd146cbcb692ebdcbc
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_FORCE_CMAKE=true
 TERMUX_PKG_BUILD_DEPENDS="eigen"
 TERMUX_PKG_DEPENDS="libandroid-support, libc++, libccd, octomap-static"

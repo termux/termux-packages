@@ -8,7 +8,6 @@ TERMUX_PKG_SHA256=ddf84cd1d884001bac1a0277316c9f9eb360ccc82f36f3cdd6d6994ed62b23
 TERMUX_PKG_DEPENDS="libc++, qt5-qtbase, qt5-qtx11extras, glib, libxcb, libexif, menu-cache"
 TERMUX_PKG_BUILD_DEPENDS="lxqt-build-tools, qt5-qtbase-cross-tools, qt5-qttools-cross-tools"
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DGLIB_GIO_UNIX_INCLUDE_DIR=$TERMUX_PREFIX/include/gio-unix-2.0
 "
