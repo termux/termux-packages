@@ -10,6 +10,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-syslog 
 --mandir=$TERMUX_PREFIX/share/man
 "
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	autoreconf -vfi

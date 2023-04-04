@@ -10,6 +10,7 @@ TERMUX_PKG_DEPENDS="libandroid-support, libiconv, ncurses"
 TERMUX_PKG_BREAKS="stfl-dev"
 TERMUX_PKG_REPLACES="stfl-dev"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure(){
 	# mkmf.rb can't find header files for ruby at /usr/lib/ruby/include/ruby.h

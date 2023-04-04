@@ -24,6 +24,7 @@ ac_cv_header_syslog_h=no
 --enable-login
 "
 TERMUX_PKG_RM_AFTER_INSTALL="bin/pluginviewer"
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_post_configure() {
 	# Build wants to run makemd5 at build time:

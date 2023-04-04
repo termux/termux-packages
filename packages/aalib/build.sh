@@ -11,6 +11,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --infodir=$TERMUX_PREFIX/share/info
 --mandir=$TERMUX_PREFIX/share/man
 "
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	local _bin=$TERMUX_PKG_BUILDDIR/_wrapper/bin

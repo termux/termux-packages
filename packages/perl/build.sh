@@ -20,6 +20,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_MAKE_PROCESSES=1
 TERMUX_PKG_RM_AFTER_INSTALL="bin/perl${TERMUX_PKG_VERSION}"
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_post_get_source() {
 	# Certain packages are not safe to build on device because their

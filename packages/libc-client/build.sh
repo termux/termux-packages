@@ -8,6 +8,7 @@ TERMUX_PKG_SRCURL=https://www.mirrorservice.org/sites/ftp.cac.washington.edu/ima
 TERMUX_PKG_SHA256=53e15a2b5c1bc80161d42e9f69792a3fa18332b7b771910131004eb520004a28
 TERMUX_PKG_DEPENDS="libcrypt, openssl"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	CFLAGS+=" -fPIC $CPPFLAGS -DFNDELAY=O_NONBLOCK -DL_SET=SEEK_SET"

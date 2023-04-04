@@ -8,6 +8,7 @@ TERMUX_PKG_SHA256=4c14d3f4f946637fd6c3fa23ef7511fa505880946e151406d5e16f645d24e7
 TERMUX_PKG_DEPENDS="libtranscript, libunistring, ncurses"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-gettext"
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_post_get_source() {
 	sed -i 's/ -s / /g' Makefile.in

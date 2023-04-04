@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.1
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 # https://android.googlesource.com/platform/bionic/+/9ee6adb003eb5a9855ff6c47f9c150b415a11299
 # https://android.googlesource.com/platform/bionic/+/refs/tags/android-8.1.0_r81/libm/upstream-netbsd/lib/libm/complex/

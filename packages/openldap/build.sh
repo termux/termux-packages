@@ -19,6 +19,7 @@ ac_cv_func_memcmp_working=yes
 --enable-monitor
 --enable-mdb
 --enable-ldap"
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	CFLAGS+=" -DMDB_USE_ROBUST=0"

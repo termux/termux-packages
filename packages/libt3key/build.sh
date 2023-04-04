@@ -9,6 +9,7 @@ TERMUX_PKG_DEPENDS="libt3config, ncurses"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-gettext"
 TERMUX_PKG_HOSTBUILD=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_post_get_source() {
 	sed -i 's/ -s / /g' Makefile.in
