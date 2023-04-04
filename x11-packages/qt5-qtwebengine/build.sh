@@ -9,6 +9,7 @@ TERMUX_PKG_GIT_BRANCH=v$TERMUX_PKG_VERSION-lts
 TERMUX_PKG_DEPENDS="fontconfig, dbus, libc++, libjpeg-turbo, libminizip, libnss, libpng, libre2, libsnappy, libvpx, libwebp, libx11, libxml2, libxslt, libxkbfile, qt5-qtbase, qt5-qtdeclarative, zlib"
 TERMUX_PKG_BUILD_DEPENDS="qt5-qtbase-cross-tools, qt5-qtdeclarative-cross-tools"
 TERMUX_PKG_NO_STATICSPLIT=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	# Certain packages are not safe to build on device because their
