@@ -7,7 +7,6 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/openethereum/openethereum/archive/v${TERMUX_PKG_VERSION}.zip
 TERMUX_PKG_SHA256=fb4a3c9ac1e5ba2803098b3ba1c114a2a9a5397fed3cd65c4c966525cb6b075d
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_BUILD_IN_SRC=true
 
@@ -61,8 +60,8 @@ termux_step_configure() {
 		local libdir=target/$CARGO_TARGET_NAME/release/deps
 		mkdir -p $libdir
 		pushd $libdir
-		local libgcc="$($CC -print-libgcc-file-name)"
-		echo "INPUT($libgcc -l:libunwind.a)" > libgcc.so
+		RUSTFLAGS+=" -C link-arg=$($CC -print-libgcc-file-name)"
+		echo "INPUT(-l:libunwind.a)" > libgcc.so
 		popd
 	fi
 }
