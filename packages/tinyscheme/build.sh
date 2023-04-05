@@ -9,7 +9,6 @@ TERMUX_PKG_SHA256=17b0b1bffd22f3d49d5833e22a120b339039d2cfda0b46d6fc51dd2f01b407
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
-	AR+=" crs"
 	LD=$CC
 }
 
