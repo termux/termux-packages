@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL=https://nano-editor.org/dist/latest/nano-$TERMUX_PKG_VERSION.t
 TERMUX_PKG_SHA256=86f3442768bd2873cec693f83cdf80b4b444ad3cc14760b74361474fc87a4526
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+ac_cv_header_glob_h=no
 ac_cv_header_pwd_h=no
 --disable-libmagic
 --enable-utf8
