@@ -27,6 +27,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_lib_crypt_crypt=no
 gl_cv_have_weak=no
 "
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	CFLAGS+=" -DNO_INLINE_GETPASS=1"

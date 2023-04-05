@@ -8,6 +8,7 @@ TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/project/c-board/${TERMUX_PKG_
 TERMUX_PKG_SHA256=dd748039f3531653e1573577cd814741524e1b16e16e3a841ef512e5150da6a0
 TERMUX_PKG_DEPENDS="libandroid-support,libandroid-glob,gnuchess, ncurses, ncurses-ui-libs"
 TERMUX_PKG_GROUPS="games"
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	CFLAGS+=" -DLINE_MAX=_POSIX2_LINE_MAX -fcommon"

@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL=https://github.com/mruby/mruby/archive/${TERMUX_PKG_VERSION}.z
 TERMUX_PKG_SHA256=64a0dd8b65825f2e7cdac6699e818648dc73bfdfc68aa1bfd58417a35315e5cc
 TERMUX_PKG_DEPENDS="libandroid-complex-math, readline"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_make() {
 	export CC_FOR_TARGET="$CC"

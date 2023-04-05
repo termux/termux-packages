@@ -8,6 +8,7 @@ TERMUX_PKG_DEPENDS="ncurses"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-x11 --bindir=$TERMUX_PREFIX/bin --sysconfdir=$TERMUX_PREFIX/share/frogcomposband"
 TERMUX_PKG_RM_AFTER_INSTALL="share/angband/xtra share/angband/icons"
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure () {
 	./autogen.sh

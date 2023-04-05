@@ -16,6 +16,7 @@ INSTALL_NONROOT=1
 PREFIX=$TERMUX_PREFIX
 "
 TERMUX_PKG_HOSTBUILD=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_extract_src_archive() {
 	rm -Rf fte

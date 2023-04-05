@@ -8,3 +8,4 @@ TERMUX_PKG_SHA256=6301592b0020c14b456757ef5d434d49f6027b8e5f3a499d13362f205c486e
 # Prevent libandroid-spawn from being picked up
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_header_spawn_h=no"
 TERMUX_PKG_EXTRA_MAKE_ARGS="lispdir=${TERMUX_PREFIX}/share/emacs/site-lisp"
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false

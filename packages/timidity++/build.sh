@@ -18,6 +18,7 @@ lib_cv_va_copy=yes
 lib_cv___va_copy=yes
 lib_cv_va_val_copy=yes
 "
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	autoreconf -fi
