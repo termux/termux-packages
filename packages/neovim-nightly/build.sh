@@ -5,9 +5,9 @@ TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.org>"
 # Upstream now has version number like "0.8.0-dev-698-ga5920e98f", but actually
 # "0.8.0-dev-698-g1ef84547a" < "0.8.0-dev-nightly-10-g1a07044c1", we need to bump
 # the epoch of the package version.
-TERMUX_PKG_VERSION="1:0.9.0-dev-1326+g7c8c15507"
+TERMUX_PKG_VERSION="1:0.9.0-dev-1338+g9e7426718"
 TERMUX_PKG_SRCURL="https://github.com/neovim/neovim/archive/nightly.tar.gz"
-TERMUX_PKG_SHA256=81b78e3894842ad8e927eb8ffa57ef0fdc5874d3499ec05a30a91072e289ec3e
+TERMUX_PKG_SHA256=6145c2e35b813c0774dec18d6f5b2ab2997cd4fa0b9379aa1256305993954ff8
 TERMUX_PKG_DEPENDS="libiconv, libuv, luv, libmsgpack, libandroid-support, libvterm, libtermkey, libluajit, libunibilium, libtreesitter"
 TERMUX_PKG_HOSTBUILD=true
 
