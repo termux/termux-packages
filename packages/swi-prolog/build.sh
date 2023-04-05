@@ -64,6 +64,10 @@ termux_step_host_build() {
 	unset CXXFLAGS
 }
 
+termux_step_pre_configure() {
+	LDFLAGS+=" $($CC -print-libgcc-file-name)"
+}
+
 termux_step_post_make_install() {
 	# Remove host build because future builds may be
 	# of a different word size (e.g. 32bit or 64bit)
