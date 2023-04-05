@@ -8,6 +8,7 @@ TERMUX_PKG_SRCURL=https://www.w3.org/Tools/HTML-XML-utils/html-xml-utils-${TERMU
 TERMUX_PKG_SHA256=f20a46ac4ed30d028cd78476e5f20f5e2917a95cb7bce7df7f17d8fb3e4f79e7
 TERMUX_PKG_DEPENDS="libcurl, libidn2"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	aclocal

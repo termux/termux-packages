@@ -12,6 +12,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-utmp
 --disable-runtime-loading
 "
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	export LIBS="-lssl -lcrypto"

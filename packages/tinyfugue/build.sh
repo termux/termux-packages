@@ -13,6 +13,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-termcap=ncurses
 --disable-mailcheck
 "
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	# CFLAGS are passed utilities built for host, but GCC

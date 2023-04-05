@@ -10,6 +10,7 @@ TERMUX_PKG_DEPENDS="libburn, libisofs, readline"
 TERMUX_PKG_CONFLICTS="xorriso"
 TERMUX_PKG_BREAKS="libisoburn-dev"
 TERMUX_PKG_REPLACES="libisoburn-dev"
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 # We don't have tk.
 TERMUX_PKG_RM_AFTER_INSTALL="bin/xorriso-tcltk"

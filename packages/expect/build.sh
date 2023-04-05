@@ -9,6 +9,7 @@ TERMUX_PKG_SHA256=49a7da83b0bdd9f46d04a04deec19c7767bb9a323e40c4781f89caf760b92c
 TERMUX_PKG_DEPENDS="tcl"
 TERMUX_PKG_BREAKS="expect-dev"
 TERMUX_PKG_REPLACES="expect-dev"
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	autoconf
