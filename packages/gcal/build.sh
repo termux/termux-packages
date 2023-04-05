@@ -8,6 +8,7 @@ TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/gcal/gcal-${TERMUX_PKG_VERSION}
 TERMUX_PKG_SHA256=91b56c40b93eee9bda27ec63e95a6316d848e3ee047b5880ed71e5e8e60f61ab
 TERMUX_PKG_DEPENDS="ncurses"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--disable-threads
 ac_cv_header_spawn_h=no
 "
 TERMUX_PKG_ENABLE_CLANG16_PORTING=false
