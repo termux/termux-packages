@@ -1,0 +1,11 @@
+--- a/scan/scan_httpdate.c
++++ b/scan/scan_httpdate.c
+@@ -70,7 +70,7 @@
+   }
+ done:
+   x.tm_wday=x.tm_yday=x.tm_isdst=0;
+-#if defined(__dietlibc__) || defined(__GLIBC__)
++#if defined(__dietlibc__) || defined(__GLIBC__) || defined(__ANDROID__)
+   *t=timegm(&x);
+ #elif defined(__MINGW32__)
+   *t=mktime(&x);
