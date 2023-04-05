@@ -2,7 +2,7 @@ The bypassed test program is confirmed to exit success on device.
 
 --- a/configure.in
 +++ b/configure.in
-@@ -150,7 +150,7 @@
+@@ -150,14 +150,14 @@
  	elif test "$OS" = "SOLARIS"; then
  	    LDFLAGS="$LDFLAGS -lpthread"
  	fi
@@ -11,3 +11,11 @@ The bypassed test program is confirmed to exit success on device.
  [#include <pthread.h>
  void
  init_routine()
+ {
+     return;
+ }
+-main()
++int main()
+ {
+     pthread_once_t once_control = PTHREAD_ONCE_INIT;
+     pthread_once(&once_control, &init_routine);
