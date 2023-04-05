@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL=https://www.monetdb.org/downloads/sources/archive/MonetDB-${TE
 TERMUX_PKG_SHA256=1ade44980747ad0e3ea787683ca26a95304bdb299ba64040b152eea5671d2f42
 TERMUX_PKG_DEPENDS="libandroid-sysv-semaphore, libbz2, libcurl, libiconv, liblz4, liblzma, libxml2, netcdf-c, pcre, readline, zlib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DODBC=OFF
 -DTESTING=OFF
 "
 
