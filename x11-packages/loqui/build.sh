@@ -12,6 +12,7 @@ GLIB_GENMARSHAL=glib-genmarshal
 --disable-gtktest
 "
 TERMUX_PKG_RM_AFTER_INSTALL="lib/locale"
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	CFLAGS+=" -Wno-error=return-type"

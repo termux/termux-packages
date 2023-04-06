@@ -8,6 +8,7 @@ TERMUX_PKG_SRCURL=https://sourceforge.net/projects/florence/files/florence/${TER
 TERMUX_PKG_SHA256=422992fd07d285be73cce721a203e22cee21320d69b0fda1579ce62944c5091e
 TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gstreamer, gtk3, libcairo, librsvg, libx11, libxext, libxml2, libxtst, pango"
 TERMUX_MAKE_PROCESSES=1
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-static

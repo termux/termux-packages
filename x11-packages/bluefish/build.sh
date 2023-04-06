@@ -11,3 +11,4 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-update-databases
 --disable-python
 "
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false

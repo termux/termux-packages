@@ -14,6 +14,7 @@ ac_cv_func_setpgrp_void=yes
 "
 TERMUX_MAKE_PROCESSES=1
 TERMUX_PKG_HOSTBUILD=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_post_get_source() {
 	rm -f tools/wml/{wmllex,wmluiltok}.c
