@@ -24,9 +24,9 @@ diff -uNr firefox-105.0.3/build/autoconf/android.m4 firefox-105.0.3.mod/build/au
  case "$target" in
 -*-android*|*-linuxandroid*)
 +no-android)
-     dnl $android_* will be set for us by Python configure.
-     directory_include_args="-isystem $android_system -isystem $android_sysroot/usr/include"
- 
+     dnl $extra_android_flags will be set for us by Python configure.
+     LDFLAGS="$extra_android_flags $LDFLAGS"
+     CPPFLAGS="$extra_android_flags $CPPFLAGS"
 diff -uNr firefox-105.0.3/build/moz.configure/init.configure firefox-105.0.3.mod/build/moz.configure/init.configure
 --- firefox-105.0.3/build/moz.configure/init.configure	2022-10-08 00:40:07.000000000 +0900
 +++ firefox-105.0.3.mod/build/moz.configure/init.configure	2022-10-15 09:48:55.153535797 +0900
