@@ -42,6 +42,7 @@ opt/audacity/include
 opt/audacity/lib/pkgconfig
 opt/audacity/share
 "
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	local _FFMPEG_PREFIX=${TERMUX_PREFIX}/opt/${TERMUX_PKG_NAME}

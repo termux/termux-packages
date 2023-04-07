@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL=https://github.com/XmacsLabs/mogan/archive/refs/tags/v${TERMUX
 TERMUX_PKG_SHA256=0d474267b7a777ae0fb22705c8515bfc24eb2de15ed69aa758dc51377fc6d9f9
 TERMUX_PKG_DEPENDS="freetype, ghostscript, libandroid-complex-math, libandroid-execinfo, libandroid-spawn, libc++, libcurl, libiconv, libjpeg-turbo, libpng, libsqlite, mogan-data, qt5-qtbase, qt5-qtsvg, zlib"
 TERMUX_PKG_BUILD_DEPENDS="qt5-qtbase-cross-tools"
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	LDFLAGS+=" -landroid-complex-math -landroid-execinfo -landroid-spawn"

@@ -13,6 +13,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DwxWidgets_CONFIG_EXECUTABLE=$TERMUX_PREFIX/bin/wx-config
 -DDISABLE_DPKG=ON
 "
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	LDFLAGS+=" -Wl,-rpath=$TERMUX_PREFIX/lib/hugin"
