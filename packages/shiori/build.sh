@@ -3,10 +3,10 @@ TERMUX_PKG_DESCRIPTION="Simple bookmark manager built with Go"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Krishna Kanhaiya @kcubeterm"
 TERMUX_PKG_VERSION="1.5.4"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/go-shiori/shiori/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=0a31f0c10be29e11f42af18b32c49e8c966621f518f87cf938894d10aca6a3f3
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_make() {
 	termux_setup_golang
