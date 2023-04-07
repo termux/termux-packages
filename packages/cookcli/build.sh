@@ -17,7 +17,7 @@ TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 termux_step_make() {
 	termux_setup_swift
 
-	# This will check out the package dependencies, so one can be patched.
+	# This will check out the package dependencies, so one can be patched first.
 	$SWIFT_BINDIR/swift package update
 
 	patch -p1 < $TERMUX_PKG_BUILDER_DIR/cook-dependencies.diff
