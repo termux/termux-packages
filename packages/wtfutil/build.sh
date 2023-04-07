@@ -3,10 +3,10 @@ TERMUX_PKG_DESCRIPTION="The personal information dashboard for your terminal"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.43.0
+TERMUX_PKG_REVISION=1
 # Need metadata in Git repository
 TERMUX_PKG_SRCURL=git+https://github.com/wtfutil/wtf
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {

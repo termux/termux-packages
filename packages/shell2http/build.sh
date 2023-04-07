@@ -3,10 +3,10 @@ TERMUX_PKG_DESCRIPTION="Executing shell commands via HTTP server"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Krishna kanhaiya @kcubeterm"
 TERMUX_PKG_VERSION="1.16.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/msoap/shell2http/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=90aa95c7b7bdb068b5b4a44e3e6782cda6b8417efbd0551383fb4f102e04584c
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_make() {
 	termux_setup_golang
