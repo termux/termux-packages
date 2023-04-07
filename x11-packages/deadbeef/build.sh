@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="ZLIB, GPL-2.0, LGPL-2.1, BSD 3-Clause, MIT"
 TERMUX_PKG_LICENSE_FILE="COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.9.5
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/deadbeef/deadbeef-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=74c4478edccfee8a978d4adbeeb208f049bef63982f4df19ee208aaad8a6cd26
 TERMUX_PKG_DEPENDS="atk, dbus, ffmpeg, gdk-pixbuf, glib, gtk3, harfbuzz, libblocksruntime, libc++, libcairo, libcurl, libdispatch, libflac, libiconv, libjansson, libmad, libogg, libsamplerate, libsndfile, libvorbis, libwavpack, libx11, libzip, mpg123, opusfile, pango, pulseaudio, zlib"
@@ -19,6 +19,7 @@ ax_cv_c_flags__msse2=no
 termux_step_pre_configure() {
 	autoreconf -fi
 
+	CPPFLAGS+=" -D_FILE_OFFSET_BITS=64"
 	LDFLAGS+=" -lm $($CC -print-libgcc-file-name)"
 
 	rm -rf intl
