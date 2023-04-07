@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Modern and intuitive terminal-based text editor"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.0.11
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=git+https://github.com/zyedidia/micro
 
 termux_step_make() {

@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A simple command line notebook for programmers"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Ravener <ravener.anime@gmail.com>"
 TERMUX_PKG_VERSION=1:0.13.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/dnote/dnote/archive/refs/tags/cli-v${TERMUX_PKG_VERSION:2}.tar.gz
 TERMUX_PKG_SHA256=9f91af3da8def8603e272413a5b1b8412dc572341ea669cd56c78e90454b4b2a
 TERMUX_PKG_BUILD_IN_SRC=true
