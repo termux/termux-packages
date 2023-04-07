@@ -3,10 +3,10 @@ TERMUX_PKG_DESCRIPTION="A cross-platform strong encryption and not detectable pr
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Krishna kanhaiya @kcubeterm"
 TERMUX_PKG_VERSION="20230404"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/txthinking/brook/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=1b9a7c45dcc7935d1965049464c664e634cb6283d211208d8ce519138915c0cf
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_make() {
 	termux_setup_golang
