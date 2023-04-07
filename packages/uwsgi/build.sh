@@ -9,7 +9,6 @@ TERMUX_PKG_SHA256=35a30d83791329429bc04fe44183ce4ab512fcf6968070a7bfba42fc5a0552
 TERMUX_PKG_DEPENDS="libandroid-glob, libandroid-sysv-semaphore, libcap, libcrypt, libjansson, libuuid, libxml2, openssl, pcre, python"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 
 termux_step_post_get_source() {

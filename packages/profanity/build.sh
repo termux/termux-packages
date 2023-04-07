@@ -9,7 +9,6 @@ TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/profanity-im/profanity/releases/download/$TERMUX_PKG_VERSION/profanity-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=2b5075272e7ec9d9c991542e592b1d474fff88c61c66e7e23096ad306ed2c84a
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_DEPENDS="glib, gpgme, libandroid-support, libassuan, libcurl, libgcrypt, libgpg-error, libotr, libsignal-protocol-c, libsqlite, libstrophe, ncurses, python, readline"
 TERMUX_PKG_BREAKS="profanity-dev"
 TERMUX_PKG_REPLACES="profanity-dev"

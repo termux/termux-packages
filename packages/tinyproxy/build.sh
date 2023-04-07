@@ -7,7 +7,6 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/tinyproxy/tinyproxy/releases/download/${TERMUX_PKG_VERSION}/tinyproxy-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=d66388448215d0aeb90d0afdd58ed00386fb81abc23ebac9d80e194fceb40f7c
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-regexcheck"
 
 termux_step_pre_configure() {

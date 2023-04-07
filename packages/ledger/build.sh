@@ -6,7 +6,6 @@ TERMUX_PKG_VERSION="3.3.2"
 TERMUX_PKG_SRCURL=https://github.com/ledger/ledger/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=555296ee1e870ff04e2356676977dcf55ebab5ad79126667bc56464cb1142035
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_DEPENDS="boost, libc++, libedit, libmpfr, libgmp, python"
 TERMUX_PKG_BUILD_DEPENDS="boost-headers, utf8cpp"
 TERMUX_PKG_BREAKS="ledger-dev"

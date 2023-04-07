@@ -9,7 +9,6 @@ TERMUX_PKG_SRCURL=https://github.com/Imagick/imagick/archive/refs/tags/${TERMUX_
 TERMUX_PKG_SHA256=aa2e311efb7348350c7332876252720af6fb71210d13268de765bc41f51128f9
 TERMUX_PKG_DEPENDS="php, imagemagick"
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 
 termux_step_pre_configure() {

@@ -6,4 +6,3 @@ TERMUX_PKG_VERSION="1.2.1"
 TERMUX_PKG_SRCURL=https://github.com/Tessil/robin-map/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=2b54d2c1de2f73bea5c51d5dcbd64813a08caf1bfddcfdeee40ab74e9599e8e3
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false

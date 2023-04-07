@@ -6,7 +6,6 @@ TERMUX_PKG_VERSION=12.0
 TERMUX_PKG_SRCURL=https://github.com/steveicarus/iverilog/archive/v${TERMUX_PKG_VERSION/./_}.tar.gz
 TERMUX_PKG_SHA256=a68cb1ef7c017ef090ebedb2bc3e39ef90ecc70a3400afb4aa94303bc3beaa7d
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+_\d+"
 TERMUX_PKG_DEPENDS="libbz2, libc++, readline, zlib"
 TERMUX_PKG_BREAKS="iverilog-dev"

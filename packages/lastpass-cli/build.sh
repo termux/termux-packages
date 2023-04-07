@@ -6,7 +6,6 @@ TERMUX_PKG_VERSION=1.3.4
 TERMUX_PKG_SRCURL=https://github.com/lastpass/lastpass-cli/archive/v$TERMUX_PKG_VERSION/lastpass-cli-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=f747e42dac3441131f9ebf0c119f27c57e8701968de7718224c2cdeb91300b6b
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_DEPENDS="libcurl, libxml2, openssl, pinentry"
 TERMUX_PKG_SUGGESTS="termux-api"
 

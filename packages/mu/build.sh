@@ -6,7 +6,6 @@ TERMUX_PKG_VERSION="1.10.1"
 TERMUX_PKG_SRCURL=https://github.com/djcb/mu/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=1d792fe9baa76e2700ffb932e7755dc6cdf3de3b2df6f237d82fa3d6969c4446
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_DEPENDS="emacs, glib, libc++, libxapian, libgmime"
 
 termux_step_create_debscripts() {

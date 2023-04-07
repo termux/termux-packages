@@ -7,7 +7,6 @@ TERMUX_PKG_SRCURL=https://github.com/cathugger/mkp224o/archive/refs/tags/v${TERM
 TERMUX_PKG_SHA256=ba6953588b1a683bdaaf065fbbeebfa7a7db1413e8ba9c9a52e7c90d3a7fa348
 TERMUX_PKG_DEPENDS="libsodium"
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	autoconf -f

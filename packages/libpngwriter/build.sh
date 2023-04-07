@@ -7,7 +7,6 @@ TERMUX_PKG_SRCURL=https://github.com/pngwriter/pngwriter/archive/refs/tags/${TER
 TERMUX_PKG_SHA256=82d46eef109f434f95eba9cf5908710ae4e75f575fd3858178ad06e800152825
 TERMUX_PKG_DEPENDS="zlib,freetype,libpng"
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_post_make_install() {
 	mv "$TERMUX_PREFIX"/lib/libPNGwriter_shared.so libPNGwriter.so

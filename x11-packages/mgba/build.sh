@@ -7,7 +7,6 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/mgba-emu/mgba/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=5fc1d7ac139fe51ef71782d5de12d11246563cdebd685354b6188fdc82a84bdf
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_DEPENDS="ffmpeg, libedit, libelf, liblua54, libpng, libsqlite, libzip, opengl, sdl2, zlib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DBUILD_GLES2=OFF
