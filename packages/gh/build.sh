@@ -3,10 +3,10 @@ TERMUX_PKG_DESCRIPTION="GitHub’s official command line tool"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Krishna kanhaiya @kcubeterm"
 TERMUX_PKG_VERSION="2.26.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/cli/cli/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=3552c0be9b24cf1b04b19f3cddc30f067a9761bd8872b591e02bf3147de5dd0e
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_make() {
 	termux_setup_golang
