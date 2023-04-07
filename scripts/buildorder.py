@@ -44,6 +44,8 @@ def parse_build_file_dependencies_with_vars(path, vars):
                     # Replace parenthesis to ignore version qualifiers as in "gcc (>= 5.0)":
                     dependency_value = re.sub(r'\(.*?\)', '', dependency_value).strip()
                     arch = os.getenv('TERMUX_ARCH')
+                    if arch is None:
+                        arch = 'aarch64'
                     if arch == "x86_64":
                         arch = "x86-64"
                     dependency_value = re.sub(r'\${TERMUX_ARCH/_/-}', arch, dependency_value)
