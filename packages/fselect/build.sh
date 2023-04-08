@@ -6,7 +6,6 @@ TERMUX_PKG_VERSION="0.8.2"
 TERMUX_PKG_SRCURL=https://github.com/jhspetersson/fselect/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=db55c067630074724fbd3fbf85ebf3de1cf5b47166f80866b58c72f2ef2ffd48
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_post_make_install() {

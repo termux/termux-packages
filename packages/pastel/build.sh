@@ -7,7 +7,6 @@ TERMUX_PKG_VERSION="0.9.0"
 TERMUX_PKG_SRCURL=https://github.com/sharkdp/pastel/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=473c805de42f6849a4bb14ec103ca007441f355552bdb6ebc80b60dac1f3a95d
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {

@@ -7,7 +7,6 @@ TERMUX_PKG_SRCURL=https://github.com/dalance/procs/archive/refs/tags/v${TERMUX_P
 TERMUX_PKG_SHA256=fa5af0951dc8aa63c0590f8c5c1136594866057704cfb1cdfc22ac3cc49437c6
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 # This package contains makefiles to run the tests. So, we need to override build steps.
 termux_step_make() {

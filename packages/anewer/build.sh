@@ -7,7 +7,6 @@ TERMUX_PKG_SRCURL="https://github.com/ysf/anewer/archive/refs/tags/$TERMUX_PKG_V
 TERMUX_PKG_SHA256=0f7d85dcba7cee291f63b8475a74806d385be768a43c2bf039fc32198026d918
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_make() {
 	termux_setup_rust

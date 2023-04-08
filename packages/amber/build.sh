@@ -9,7 +9,6 @@ TERMUX_PKG_BUILD_IN_SRC=true
 # Depend on its subpackages.
 TERMUX_PKG_DEPENDS="ambr,ambs"
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_make() {
 	termux_setup_rust

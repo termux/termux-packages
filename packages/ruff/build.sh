@@ -7,7 +7,6 @@ TERMUX_PKG_VERSION="0.0.261"
 TERMUX_PKG_SRCURL="https://github.com/charliermarsh/ruff/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=77ee27c36e047b16f764cf6666a359f19b8428702a06cb424b0f1595f5e35b9c
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {

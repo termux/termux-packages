@@ -6,7 +6,6 @@ TERMUX_PKG_VERSION="0.1.6"
 TERMUX_PKG_SRCURL=https://github.com/dylanowen/mdbook-graphviz/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=ca108e79797adb45a0ecbfffe744b310c11b2bdaceca327c8c6d0d01921dc8ce
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_DEPENDS="graphviz"
 TERMUX_PKG_BUILD_IN_SRC=true
 
