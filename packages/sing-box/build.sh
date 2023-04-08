@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://sing-box.sagernet.org
 TERMUX_PKG_DESCRIPTION="The universal proxy platform"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="kay9925@outlook.com"
-TERMUX_PKG_VERSION="1.2.3"
+TERMUX_PKG_VERSION="1.3-beta1"
 TERMUX_PKG_SRCURL="https://github.com/SagerNet/sing-box/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=a12b81950deb181cf2c1783685e0dd66502376471db57e3787fad3f3e27fd48c
+TERMUX_PKG_SHA256=0c3652b1aab3659d5f45d9f3d3090c3385e0a11ef345942c71ba883d43bab9e2
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
