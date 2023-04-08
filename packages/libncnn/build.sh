@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A high-performance neural network inference framework op
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="20230223"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/Tencent/ncnn
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -23,5 +24,11 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCMAKE_EXE_LINKER_FLAGS=-ldl
 "
 
+TERMUX_PKG_BUILD_DEPENDS="glslang"
 TERMUX_PKG_DEPENDS="libc++, libprotobuf, vulkan-headers, vulkan-tools"
 TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, pybind11"
+
+termux_step_pre_configure() {
+	termux_setup_cmake
+	termux_setup_ninja
+}
