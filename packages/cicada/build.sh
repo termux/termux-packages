@@ -6,7 +6,6 @@ TERMUX_PKG_VERSION="0.9.36"
 TERMUX_PKG_SRCURL=https://github.com/mitnk/cicada/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=f9baa7f6240182a388934756a0dcb98923ca9ab0be35524f07cc484e350bcfa1
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
 
@@ -17,8 +16,8 @@ termux_step_pre_configure() {
 		local libdir=target/x86_64-linux-android/release/deps
 		mkdir -p $libdir
 		pushd $libdir
-		local libgcc="$($CC -print-libgcc-file-name)"
-		echo "INPUT($libgcc -l:libunwind.a)" > libgcc.so
+		RUSTFLAGS+=" -C link-arg=$($CC -print-libgcc-file-name)"
+		echo "INPUT(-l:libunwind.a)" > libgcc.so
 		popd
 	fi
 }
