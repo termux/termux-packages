@@ -7,7 +7,6 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/TaKO8Ki/gobang/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=923210d500f070ac862c73d1a43a10520ee8c54f6692bbce99bbd073dfa72653
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
@@ -17,8 +16,8 @@ termux_step_pre_configure() {
 		local libdir=target/$CARGO_TARGET_NAME/release/deps
 		mkdir -p $libdir
 		pushd $libdir
-		local libgcc="$($CC -print-libgcc-file-name)"
-		echo "INPUT($libgcc -l:libunwind.a)" > libgcc.so
+		RUSTFLAGS+=" -C link-arg=$($CC -print-libgcc-file-name)"
+		echo "INPUT(-l:libunwind.a)" > libgcc.so
 		popd
 	fi
 }
