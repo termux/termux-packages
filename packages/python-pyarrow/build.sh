@@ -37,3 +37,10 @@ termux_step_configure() {
 termux_step_make_install() {
 	pip install --no-deps --no-build-isolation . --prefix $TERMUX_PREFIX
 }
+
+termux_step_post_make_install() {
+	local f="$TERMUX_PYTHON_HOME/site-packages/pyarrow/_generated_version.py"
+	if [ ! -e "${f}" ]; then
+		echo "version = '${TERMUX_PKG_VERSION#*:}'" > "${f}"
+	fi
+}
