@@ -3,11 +3,11 @@ TERMUX_PKG_DESCRIPTION="An open source visual routing tool that pursues light we
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.3.2-beta.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/OwO-Network/nexttrace-enhanced/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=b41580dc057913d263c87d10e16a20e9d9ddafd97ded1a9b51627e2bfb358f25
+TERMUX_PKG_SHA256=b651a3af52fcd34f149537ea5486f394b30a8bb840d112861048400ee69cf76c
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	termux_setup_golang
