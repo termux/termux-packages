@@ -12,3 +12,7 @@ TERMUX_PKG_BLACKLISTED_ARCHES="i686"
 
 TERMUX_PKG_DEPENDS="xorg-server, xrdp, libxfont2"
 TERMUX_PKG_BUILD_DEPENDS="nasm, xorgproto"
+
+termux_step_make_install(){
+	make DESTDIR=$TERMUX_PREFIX install
+}
