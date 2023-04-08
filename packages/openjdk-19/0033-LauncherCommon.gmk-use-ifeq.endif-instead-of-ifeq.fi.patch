@@ -1,0 +1,27 @@
+From 600346dd6b206c237b698a115dd73a83693437ba Mon Sep 17 00:00:00 2001
+From: Duy Tran Khanh <40482367+khanhduytran0@users.noreply.github.com>
+Date: Wed, 9 Jun 2021 08:15:49 +0700
+Subject: [PATCH 33/34] LauncherCommon.gmk: use `ifeq...endif` instead of
+ `ifeq...fi`
+
+gmk is not C/C++ :trollface:
+---
+ make/common/modules/LauncherCommon.gmk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/make/common/modules/LauncherCommon.gmk b/make/common/modules/LauncherCommon.gmk
+index 2ac6a5c35965..b157a56c9b38 100644
+--- a/make/common/modules/LauncherCommon.gmk
++++ b/make/common/modules/LauncherCommon.gmk
+@@ -52,7 +52,7 @@ LAUNCHER_CFLAGS += -I$(TOPDIR)/src/java.base/share/native/launcher \
+ 
+ ifeq ($(call isTargetOs, ios), true)
+   LAUNCHER_CFLAGS += -I$(TOPDIR)/src/java.base/macosx/native/libjli
+-fi
++endif
+ 
+ MACOSX_PLIST_DIR := $(TOPDIR)/src/java.base/macosx/native/launcher
+ JAVA_MANIFEST := $(TOPDIR)/src/java.base/windows/native/launcher/java.manifest
+-- 
+2.30.2
+

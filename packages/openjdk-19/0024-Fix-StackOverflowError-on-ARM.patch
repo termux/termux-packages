@@ -1,17 +1,17 @@
-From 41b658386efad9d3023a023e3b4bfaf5f814250d Mon Sep 17 00:00:00 2001
+From 3309fc8be9a46b549dc9f9851c3e7dc4e33a9782 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?=E6=BA=AF=E6=B4=84?= <1840686745@qq.com>
 Date: Thu, 26 Aug 2021 03:53:25 +0800
-Subject: [PATCH] Fix StackOverflowError on ARM (#2)
+Subject: [PATCH 24/34] Fix StackOverflowError on ARM
 
 ---
  src/hotspot/os_cpu/linux_arm/os_linux_arm.cpp | 6 ++++++
  1 file changed, 6 insertions(+)
 
 diff --git a/src/hotspot/os_cpu/linux_arm/os_linux_arm.cpp b/src/hotspot/os_cpu/linux_arm/os_linux_arm.cpp
-index ff462ad27..f0314a729 100644
+index dc06e2b3b1e9..f8f07fd7dbc6 100644
 --- a/src/hotspot/os_cpu/linux_arm/os_linux_arm.cpp
 +++ b/src/hotspot/os_cpu/linux_arm/os_linux_arm.cpp
-@@ -85,8 +85,14 @@
+@@ -83,8 +83,14 @@
  #endif
  
  address os::current_stack_pointer() {
