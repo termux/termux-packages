@@ -7,17 +7,6 @@ TERMUX_PKG_SRCURL=https://github.com/Michael-F-Bryan/mdbook-linkcheck/archive/re
 TERMUX_PKG_SHA256=3194243acf12383bd328a9440ab1ae304e9ba244d3bd7f85f1c23b0745c4847a
 TERMUX_PKG_BUILD_IN_SRC=true
 
-termux_step_pre_configure() {
-	if [ "$TERMUX_ARCH" == "i686" ]; then
-		local libdir=target/i686-linux-android/release/deps
-		mkdir -p $libdir
-		pushd $libdir
-		local libgcc="$($CC -print-libgcc-file-name)"
-		echo "INPUT($libgcc -l:libunwind.a)" > libgcc.so
-		popd
-	fi
-}
-
 termux_step_make() {
 	termux_setup_rust
 	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
