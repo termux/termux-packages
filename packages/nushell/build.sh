@@ -6,7 +6,6 @@ TERMUX_PKG_VERSION="0.78.0"
 TERMUX_PKG_SRCURL=https://github.com/nushell/nushell/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=eff55bf4e0739113cfdc890c0ed90f46ebbfd722b49f7ce65e76b347733bc654
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_DEPENDS="openssl, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--features=extra"
@@ -23,8 +22,8 @@ termux_step_pre_configure() {
 		RUSTFLAGS+=" -C link-arg=-latomic"
 	elif [ $TERMUX_ARCH = "x86_64" ]; then
 		pushd $_CARGO_TARGET_LIBDIR
-		local libgcc="$($CC -print-libgcc-file-name)"
-		echo "INPUT($libgcc -l:libunwind.a)" >libgcc.so
+		RUSTFLAGS+=" -C link-arg=$($CC -print-libgcc-file-name)"
+		echo "INPUT(-l:libunwind.a)" >libgcc.so
 		popd
 	fi
 
