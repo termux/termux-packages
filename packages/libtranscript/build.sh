@@ -8,7 +8,6 @@ TERMUX_PKG_SRCURL=https://os.ghalkes.nl/dist/libtranscript-${TERMUX_PKG_VERSION}
 TERMUX_PKG_SHA256=1f8c19f257da5d6fad0ed9a7e5bd2442819e910a19907c38e115116a3955f5fa
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-gettext"
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_post_get_source() {
 	sed -i 's/ -s / /g' Makefile.in
