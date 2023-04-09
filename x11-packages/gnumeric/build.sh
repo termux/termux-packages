@@ -37,6 +37,8 @@ termux_step_pre_configure() {
 	export PYTHON_GIOVERRIDESDIR=$TERMUX_PYTHON_HOME/site-packages/gi/overrides
 	export PYTHON_CONFIG=$TERMUX_PREFIX/bin/python-config
 
+	unset PYTHONPATH
+
 	CPPFLAGS+=" -D__USE_GNU"
 }
 
