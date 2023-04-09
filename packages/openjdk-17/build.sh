@@ -13,6 +13,7 @@ TERMUX_PKG_RECOMMENDS="ca-certificates-java, openjdk-17-x, resolv-conf"
 TERMUX_PKG_SUGGESTS="cups"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HAS_DEBUG=false
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	unset JAVA_HOME
@@ -49,6 +50,8 @@ termux_step_pre_configure() {
 	DEVKIT_TOOLCHAIN_PATH="\$DEVKIT_ROOT"
 	DEVKIT_SYSROOT="\$DEVKIT_ROOT/sysroot"
 	EOF
+
+	cp -rT $TERMUX_STANDALONE_TOOLCHAIN/sysroot $TERMUX_PKG_TMPDIR/sysroot
 }
 
 termux_step_configure() {
