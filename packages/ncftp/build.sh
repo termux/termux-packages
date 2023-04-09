@@ -10,9 +10,10 @@ TERMUX_PKG_SRCURL=https://www.ncftp.com/downloads/ncftp/ncftp-${TERMUX_PKG_VERSI
 TERMUX_PKG_SHA256=5f200687c05d0807690d9fb770327b226f02dd86155b49e750853fce4e31098d
 TERMUX_PKG_DEPENDS="ncurses, resolv-conf"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
+	autoreconf -fi -Iautoconf_local
+
 	CFLAGS+=" -fcommon"
 
 	export ac_cv_path_TAR=$TERMUX_PREFIX/bin/tar
