@@ -118,5 +118,12 @@ termux_step_configure_autotools() {
 }
 
 termux_step_configure_autotools_failure_hook() {
-	false
+	echo
+	echo
+	for f in $(find . -type f -name config.log); do
+		echo "[${f}]"
+		cat "${f}"
+	done
+	echo
+	echo
 }
