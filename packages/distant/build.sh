@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL=https://github.com/chipsenkbeil/distant/archive/refs/tags/v${T
 TERMUX_PKG_SHA256=c6c43b7eb868dec5743cbd1c48dfec106cf57129ceef9370f412273f4c7f8975
 TERMUX_PKG_DEPENDS="libssh2, openssl, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	export OPENSSL_NO_VENDOR=1
