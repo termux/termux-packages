@@ -18,7 +18,6 @@ etc/nginx/nginx.conf
 etc/nginx/scgi_params
 etc/nginx/uwsgi_params
 etc/nginx/win-utf"
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	# Certain packages are not safe to build on device because their
