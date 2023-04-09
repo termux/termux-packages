@@ -10,7 +10,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-socket-dir
 --enable-colors256
 "
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	# Run autoreconf since we have patched configure.ac
