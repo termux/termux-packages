@@ -1,0 +1,11 @@
+--- a/Source/bmalloc/libpas/src/libpas/pas_thread_local_cache.c
++++ b/Source/bmalloc/libpas/src/libpas/pas_thread_local_cache.c
+@@ -214,6 +214,8 @@ static void dump_thread_diagnostics(pthr
+ #endif
+ #if PAS_PLATFORM(PLAYSTATION)
+     getname_result = pthread_get_name_np(thread, thread_name);
++#elif defined __ANDROID__ && __ANDROID_API__ < 26
++    getname_result = -1;
+ #else
+     getname_result = pthread_getname_np(thread, thread_name, sizeof(thread_name));
+ #endif
