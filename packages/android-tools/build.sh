@@ -8,7 +8,6 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/nmeum/android-tools/releases/download/$TERMUX_PKG_VERSION/android-tools-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=f88ec5686937f7fb2f689c3b0506123f2399276a14673164b0f95454a4c7b97a
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 TERMUX_PKG_DEPENDS="abseil-cpp, brotli, libc++, liblz4, libprotobuf, libusb, pcre2, zlib, zstd"
 TERMUX_PKG_BUILD_DEPENDS="googletest"
 
