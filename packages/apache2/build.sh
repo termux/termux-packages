@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://httpd.apache.org
 TERMUX_PKG_DESCRIPTION="Apache Web Server"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1:2.4.56
+TERMUX_PKG_VERSION=1:2.4.57
 TERMUX_PKG_SRCURL=https://www.apache.org/dist/httpd/httpd-${TERMUX_PKG_VERSION:2}.tar.bz2
-TERMUX_PKG_SHA256=d8d45f1398ba84edd05bb33ca7593ac2989b17cb9c7a0cafe5442d41afdb2d7c
+TERMUX_PKG_SHA256=dbccb84aee95e095edfbb81e5eb926ccd24e6ada55dcd83caecb262e5cf94d2a
 TERMUX_PKG_DEPENDS="apr, apr-util, libandroid-support, libcrypt, libnghttp2, libuuid, openssl, pcre2, zlib"
 TERMUX_PKG_BREAKS="apache2-dev"
 TERMUX_PKG_REPLACES="apache2-dev"
@@ -27,7 +27,6 @@ etc/apache2/magic
 "
 
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 # providing manual paths to libs because it picks up host libs on some systems
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
