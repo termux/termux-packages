@@ -8,7 +8,6 @@ TERMUX_PKG_SHA256=1f9b61fef6420589b8d546c9b504364063e43de675b94020e215c35469852f
 TERMUX_PKG_DEPENDS="libc++, qt5-qtbase, libqtxdg, kwindowsystem, liblxqt, lxqt-globalkeys"
 TERMUX_PKG_BUILD_DEPENDS="lxqt-build-tools, qt5-qtbase-cross-tools, qt5-qttools-cross-tools"
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 # TODO runner math depends on muparser
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DRUNNER_MATH=OFF"
