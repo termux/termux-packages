@@ -9,7 +9,6 @@ TERMUX_PKG_SHA256=0750cae23ed600fb4b4699a392f43a5e03dcd0870383d64da4b8c28ea94a82
 TERMUX_PKG_DEPENDS="boost, dbus, libandroid-wordexp, libc++, libcurl, libflac, liblog4c, libmad, libmediainfo, libmp3lame, liboggz, libopus, libsndfile, libsqlite, libuuid, libvpx, mpg123, opusfile, pulseaudio, python, taglib"
 TERMUX_PKG_BUILD_DEPENDS="boost-headers, libev"
 TERMUX_PKG_HOSTBUILD=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_host_build() {
 	local _PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
