@@ -9,7 +9,6 @@ TERMUX_PKG_DEPENDS="fftw, libsndfile, pulseaudio"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --without-alsa
 "
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	autoreconf -fi
