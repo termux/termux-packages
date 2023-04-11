@@ -7,7 +7,6 @@ TERMUX_PKG_SRCURL=https://salsa.debian.org/debian/netcat-openbsd/-/archive/debia
 TERMUX_PKG_SHA256=25fb463ba60d2c54f3f44ddd45d122e9a95b9cc2a2f4dfb264b5b2d0adfc9265
 TERMUX_PKG_DEPENDS="libbsd"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	local p
