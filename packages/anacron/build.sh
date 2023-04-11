@@ -7,7 +7,6 @@ TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/anacron/anacron-${TERMUX_PKG
 TERMUX_PKG_SHA256=5ceee6f22cd089bdaf1c0841200dbe5726babaf9e2c432bb17c1fc95da5ca99f
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_MAKE_ARGS="PREFIX=$TERMUX_PREFIX"
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_post_get_source() {
 	cp $TERMUX_PKG_BUILDER_DIR/obstack.h ./
