@@ -11,7 +11,6 @@ TERMUX_PKG_DEPENDS="ncurses"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_REMOVE_AFTER_INSTALL="share/applications/vitetris.desktop"
 TERMUX_PKG_GROUPS="games"
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_configure() {
 	"$TERMUX_PKG_SRCDIR/configure" \
