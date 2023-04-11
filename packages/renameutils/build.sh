@@ -7,7 +7,6 @@ TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://savannah.nongnu.org/download/renameutils/renameutils-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=cbd2f002027ccf5a923135c3f529c6d17fabbca7d85506a394ca37694a9eb4a3
 TERMUX_PKG_DEPENDS="libandroid-wordexp, readline"
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	LDFLAGS+=" -landroid-wordexp"
