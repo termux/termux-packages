@@ -11,7 +11,6 @@ TERMUX_PKG_DEPENDS="libiconv, libvorbis, libflac, libogg"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-ogg123
 "
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	LDFLAGS+=" -lm"
