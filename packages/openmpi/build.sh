@@ -16,7 +16,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_header_ifaddrs_h=no
 ac_cv_member_struct_ifreq_ifr_hwaddr=no
 "
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure () {
 	# rindex is an obsolete version of strrchr which is not available in Android:
