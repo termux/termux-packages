@@ -7,7 +7,6 @@ TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/dict/dictd/dictd-${T
 TERMUX_PKG_SHA256=e4f1a67d16894d8494569d7dc9442c15cc38c011f2b9631c7f1cc62276652a1b
 TERMUX_PKG_DEPENDS="libmaa, zlib"
 TERMUX_PKG_CONFFILES="etc/dict.conf"
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_post_make_install() {
 	install -Dm600 $TERMUX_PKG_BUILDER_DIR/dict.conf $TERMUX_PREFIX/etc/dict.conf
