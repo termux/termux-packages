@@ -1,0 +1,15 @@
+https://github.com/termux/termux-packages/issues/15852
+
+--- a/source3/lib/system_smbd.c
++++ b/source3/lib/system_smbd.c
+@@ -166,6 +166,10 @@
+ 	return ret;
+ }
+ #endif /* HAVE_GETGRSET */
++#else /* HAVE_GETGROUPLIST */
++#ifdef __ANDROID__
++int getgrouplist(const char *, gid_t, gid_t *, int *);
++#endif
+ #endif /* HAVE_GETGROUPLIST */
+ 
+ static int sys_getgrouplist(const char *user, gid_t gid, gid_t *groups, int *grpcnt)

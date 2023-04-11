@@ -8,7 +8,6 @@ TERMUX_PKG_SHA256=c077d698a2b871cf130afe2f6fa6aaf321a25eac611f22edae8a7f3e8c9c4d
 TERMUX_PKG_DEPENDS="krb5, libandroid-execinfo, libandroid-spawn, libbsd, libcap, libcrypt, libgnutls, libiconv, libicu, libpopt, libtalloc, libtasn1, libtirpc, ncurses, openssl, readline, tdb-tools, zlib"
 TERMUX_PKG_BUILD_DEPENDS="e2fsprogs"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 # These files are already present in the package tdb-tools
 TERMUX_PKG_RM_AFTER_INSTALL="
