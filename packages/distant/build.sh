@@ -2,12 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://github.com/chipsenkbeil/distant
 TERMUX_PKG_DESCRIPTION="Library and tooling that supports remote filesystem and process"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.20.0-alpha.3
+TERMUX_PKG_VERSION=0.20.0-alpha.4
 TERMUX_PKG_SRCURL=https://github.com/chipsenkbeil/distant/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=c6c43b7eb868dec5743cbd1c48dfec106cf57129ceef9370f412273f4c7f8975
+TERMUX_PKG_SHA256=9bace1cc4492285c4932db0d2faea99af5b603c138d23a902ac460c03bc78ef0
 TERMUX_PKG_DEPENDS="libssh2, openssl, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	export OPENSSL_NO_VENDOR=1
