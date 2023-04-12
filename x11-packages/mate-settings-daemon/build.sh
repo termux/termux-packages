@@ -12,4 +12,3 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --without-libmatemixer
 "
 TERMUX_PKG_RM_AFTER_INSTALL="share/glib-2.0/schemas/gschemas.compiled"
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
