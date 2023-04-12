@@ -18,7 +18,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-openssl
 "
 TERMUX_PKG_EXTRA_MAKE_ARGS="PREFIX=$TERMUX_PREFIX"
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	autoreconf -fi
