@@ -20,7 +20,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-ssl-key-dir=$TERMUX_PREFIX/etc/ssl/private
 "
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	export TCC=$CC
