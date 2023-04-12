@@ -9,7 +9,6 @@ TERMUX_PKG_SRCURL="https://downloads.sourceforge.net/project/freeimage/Source%20
 TERMUX_PKG_SHA256=f41379682f9ada94ea7b34fe86bf9ee00935a3147be41b6569c9605a53e438fd
 TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	cp -f "${TERMUX_PKG_BUILDER_DIR}/license-bsd-2-clause.txt" "${TERMUX_PKG_SRCDIR}"
