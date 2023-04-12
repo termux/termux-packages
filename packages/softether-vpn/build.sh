@@ -16,7 +16,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_RM_AFTER_INSTALL="lib/systemd"
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_post_get_source() {
 	mv libsodium-${TERMUX_PKG_VERSION[1]}-RELEASE libsodium
