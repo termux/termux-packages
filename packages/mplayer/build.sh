@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="The Movie Player"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.5
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://ftp-osl.osuosl.org/pub/gentoo/distfiles/MPlayer-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=650cd55bb3cb44c9b39ce36dac488428559799c5f18d16d98edb2b7256cbbf85
 TERMUX_PKG_DEPENDS="ffmpeg, fontconfig, freetype, fribidi, liba52, libass, libbluray, libdvdnav, libdvdread, libiconv, libjpeg-turbo, liblzo, libmad, libmp3lame, libogg, libpng, libtheora, libtwolame, libvorbis, libx11, libx264, libxext, libxss, libxv, mpg123, ncurses, openal-soft, pulseaudio, xvidcore, zlib"
@@ -19,7 +19,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 TERMUX_PKG_EXTRA_MAKE_ARGS="INSTALLSTRIP="
 TERMUX_PKG_BLACKLISTED_ARCHES="i686"
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_post_get_source() {
 	local FFMPEG_BUILD_SH=$TERMUX_SCRIPTDIR/packages/ffmpeg/build.sh
