@@ -11,7 +11,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_header_spawn_h=no
 gl_cv_have_weak=no
 "
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_post_configure() {
 	# zile uses help2man to build the zile.1 man page, which would require
