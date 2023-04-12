@@ -23,7 +23,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --without-python3
 "
 TERMUX_PKG_RM_AFTER_INSTALL="share/sounds/purple lib/purple-2/libmsn.so"
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	# For arpa:
