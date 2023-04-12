@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://tinyfugue.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="Flexible, screen-oriented MUD client, for use with any type of MUD"
+# License: GPL-2.0-or-later
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=5.0b8
@@ -13,7 +14,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-termcap=ncurses
 --disable-mailcheck
 "
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 termux_step_pre_configure() {
 	# CFLAGS are passed utilities built for host, but GCC
