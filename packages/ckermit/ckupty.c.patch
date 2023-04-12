@@ -1,5 +1,16 @@
 --- a/ckupty.c
 +++ b/ckupty.c
+@@ -67,6 +67,10 @@
+ 
+ /* These will no doubt need adjustment... */
+ 
++#ifdef __ANDROID__
++#include <pty.h>
++#endif
++
+ #ifndef NEXT
+ #define HAVE_SETSID
+ #endif /* NEXT */
 @@ -181,7 +181,9 @@
  #endif /* WANT_UTMP */
  
