@@ -1,0 +1,36 @@
+https://github.com/Ettercap/ettercap/commit/40534662043b7d831d1f6c70448afa9d374a9b63
+
+From 40534662043b7d831d1f6c70448afa9d374a9b63 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 23 Mar 2023 10:23:14 -0700
+Subject: [PATCH] sslstrip: Enhance the libcurl version check to consider
+ version 8+
+
+Lately curl has released version 8 and hence LIBCURL_VERSION_MAJOR is
+reset to 0, current check assumes major version to be 7 at max and hence
+on systems with libcurl 8+ this check breaks and build fails
+
+Fixes
+
+TOPDIR/build/tmp/work/cortexa15t2hf-neon-yoe-linux-gnueabi/ettercap/0.8.3.1-r0/git/plug-ins/sslstrip/sslstrip.c:57:2: error: libcurl 7.26.0 or up is needed
+ ^
+1 error generated.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ plug-ins/sslstrip/sslstrip.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/plug-ins/sslstrip/sslstrip.c b/plug-ins/sslstrip/sslstrip.c
+index 327bf58af..d9b67c8b6 100644
+--- a/plug-ins/sslstrip/sslstrip.c
++++ b/plug-ins/sslstrip/sslstrip.c
+@@ -51,7 +51,7 @@
+ 
+ #include <curl/curl.h>
+ 
+-#if (LIBCURL_VERSION_MAJOR < 7) || (LIBCURL_VERSION_MINOR < 26)
++#if (LIBCURL_VERSION_MAJOR < 7) || (LIBCURL_VERSION_MAJOR == 7 && LIBCURL_VERSION_MINOR < 26)
+ #error libcurl 7.26.0 or up is needed
+ #endif
+ 
