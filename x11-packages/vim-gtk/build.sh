@@ -5,9 +5,9 @@ TERMUX_PKG_MAINTAINER="@termux"
 
 # vim should only be updated every 50 releases on multiples of 50.
 # Update all of vim, vim-python and vim-gtk to the same version in one PR.
-TERMUX_PKG_VERSION=9.0.1400
+TERMUX_PKG_VERSION=9.0.1450
 TERMUX_PKG_SRCURL=https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=b22586082b5c9c3d31e6830f787b425d114b23d9b6a195bcbd9c2c2a4a30ac49
+TERMUX_PKG_SHA256=432373dd7c5eb5f8c8b9ea5b9d98c0ac73d7ccdb8c4f4076310a5353692e8fe5
 
 TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libcairo, libcanberra, libice, libiconv, liblua52, libsm, libx11, libxt, ncurses, pango, python"
 TERMUX_PKG_CONFLICTS="vim, vim-python, vim-runtime"
