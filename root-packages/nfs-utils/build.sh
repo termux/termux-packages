@@ -27,6 +27,8 @@ lib/udev
 termux_step_pre_configure() {
 	autoreconf -fi
 
+	CPPFLAGS+=" -D__USE_GNU"
+
 	local _lib="$TERMUX_PKG_BUILDDIR/_lib"
 	rm -rf "${_lib}"
 	mkdir -p "${_lib}"
