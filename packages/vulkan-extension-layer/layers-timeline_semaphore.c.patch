@@ -1,0 +1,26 @@
+https://github.com/termux/termux-packages/issues/15852
+
+--- a/layers/timeline_semaphore.c
++++ b/layers/timeline_semaphore.c
+@@ -354,18 +354,21 @@
+ 
+ /**/
+ 
++VKAPI_ATTR
+ static void *default_alloc_func(void *pUserData, size_t size, size_t align,
+                                 VkSystemAllocationScope allocationScope)
+ {
+     return malloc(size);
+ }
+ 
++VKAPI_ATTR
+ static void *default_realloc_func(void *pUserData, void *pOriginal, size_t size,
+                                   size_t align, VkSystemAllocationScope allocationScope)
+ {
+     return realloc(pOriginal, size);
+ }
+ 
++VKAPI_ATTR
+ static void default_free_func(void *pUserData, void *pMemory)
+ {
+     free(pMemory);
