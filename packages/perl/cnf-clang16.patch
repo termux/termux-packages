@@ -1,0 +1,15 @@
+https://github.com/termux/termux-packages/issues/15852
+
+This is a BAD practice and should not be mimicked in other places.
+
+--- a/cnf/configure_func.sh
++++ b/cnf/configure_func.sh
+@@ -7,7 +7,7 @@
+ 		try_start
+ 		funcincludes "$3" "$4" "$includes"
+ 		try_add "int main(void) { $2($3); return 0; }"
+-		try_link -O0 -fno-builtin
++		try_link -O0 -fno-builtin -Wno-implicit-function-declaration
+ 		resdef $1 'found' 'missing'
+ 	fi
+ }
