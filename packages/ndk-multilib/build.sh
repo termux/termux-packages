@@ -31,6 +31,12 @@ prepare_libs() {
 	cp $BASEDIR/lib{c++_static,c++abi}.a $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/$SUFFIX/lib
 	echo 'INPUT(-lc++_static -lc++abi)' > $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/$SUFFIX/lib/libc++_shared.a
 
+	local f
+	for f in lib{c,dl,log,m}.so lib{c,dl,m}.a; do
+		ln -sfT $TERMUX_PREFIX/opt/ndk-multilib/$SUFFIX/lib/${f} \
+			$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/$SUFFIX/lib/${f}
+	done
+
 	if [ $ARCH == "x86" ]; then
 		LIBATOMIC=toolchains/llvm/prebuilt/linux-x86_64/lib64/clang/*/lib/linux/i386
 	elif [ $ARCH == "arm64" ]; then
@@ -59,10 +65,12 @@ termux_step_make_install() {
 	add_cross_compiler_rt
 }
 
-termux_step_post_make_install() {
-	local p
-	for p in ndk-multilib-native-{static,stubs}; do
-		install -Dm600 /dev/null $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/doc/${p}/.placeholder
+termux_step_post_massage() {
+	local triple f
+	for triple in aarch64-linux-android arm-linux-androideabi i686-linux-android x86_64-linux-android; do
+		for f in lib{c,dl,log,m}.so lib{c,dl,m}.a; do
+			rm -f ${triple}/lib/${f}
+		done
 	done
 }
 

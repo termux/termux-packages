@@ -1,19 +1,38 @@
 TERMUX_SUBPKG_DESCRIPTION="Install native stubs for shared libs from NDK"
-TERMUX_SUBPKG_INCLUDE="
-share/doc/ndk-multilib-native-stubs/
-"
+TERMUX_SUBPKG_PLATFORM_INDEPENDENT=false
+TERMUX_SUBPKG_INCLUDE=
 
-termux_step_create_subpkg_debscripts() {
-	local f
-	for f in postinst prerm; do
-		sed -e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
-			-e "s|@TERMUX_PACKAGE_FORMAT@|${TERMUX_PACKAGE_FORMAT}|g" \
-			$TERMUX_PKG_BUILDER_DIR/postinst-header.in > "${f}"
-	done
-	sed 's|@COMMAND@|ln -sf "'$TERMUX_PREFIX'/opt/ndk-multilib/$triple/lib/$so" "'$TERMUX_PREFIX'/\$triple/lib"|' \
-		$TERMUX_PKG_BUILDER_DIR/postinst-native-stubs.in >> postinst
-	sed 's|@COMMAND@|rm -f "'$TERMUX_PREFIX'/$triple/lib/$so"|' \
-		$TERMUX_PKG_BUILDER_DIR/postinst-native-stubs.in >> prerm
-	chmod 0700 postinst prerm
-}
-
+case "$TERMUX_ARCH" in
+	aarch64 )
+		TERMUX_SUBPKG_INCLUDE+="
+			aarch64-linux-android/lib/libc.so
+			aarch64-linux-android/lib/libdl.so
+			aarch64-linux-android/lib/liblog.so
+			aarch64-linux-android/lib/libm.so
+		"
+		;& # fallthrough
+	arm )
+		TERMUX_SUBPKG_INCLUDE+="
+			arm-linux-androideabi/lib/libc.so
+			arm-linux-androideabi/lib/libdl.so
+			arm-linux-androideabi/lib/liblog.so
+			arm-linux-androideabi/lib/libm.so
+		"
+		;;
+	x86_64 )
+		TERMUX_SUBPKG_INCLUDE+="
+			x86_64-linux-android/lib/libc.so
+			x86_64-linux-android/lib/libdl.so
+			x86_64-linux-android/lib/liblog.so
+			x86_64-linux-android/lib/libm.so
+		"
+		;& # fallthrough
+	i686 )
+		TERMUX_SUBPKG_INCLUDE+="
+			i686-linux-android/lib/libc.so
+			i686-linux-android/lib/libdl.so
+			i686-linux-android/lib/liblog.so
+			i686-linux-android/lib/libm.so
+		"
+		;;
+esac
