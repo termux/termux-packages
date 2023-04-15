@@ -1,6 +1,6 @@
 diff -uNr debootstrap/functions debootstrap.mod/functions
 --- debootstrap/functions	2022-10-19 01:48:32.000000000 +0300
-+++ debootstrap.mod/functions	2023-01-05 11:26:45.296698565 +0200
++++ debootstrap.mod/functions	2023-04-15 20:45:39.860454598 +0300
 @@ -231,6 +231,9 @@
  }
  
@@ -47,7 +47,25 @@ diff -uNr debootstrap/functions debootstrap.mod/functions
  		warning "$code" "$msg" "$arg"
  		# Try to point user at actual failing package.
  		msg="See %s for details"
-@@ -1145,13 +1148,15 @@
+@@ -1115,11 +1118,14 @@
+ ###################################################### standard setup stuff
+ 
+ conditional_cp () {
+-	if [ ! -e "$2/$1" ]; then
++	local dst
++	dst="${2}$(echo "$1" | sed 's|^@TERMUX_PREFIX@||g')"
++
++	if [ ! -e "$dst" ]; then
+ 		if [ -L "$1" ] && [ -e "$1" ]; then
+-			cat "$1" >"$2/$1"
++			cat "$1" >"$dst"
+ 		elif [ -e "$1" ]; then
+-			cp "$1" "$2/$1"
++			cp "$1" "$dst"
+ 		fi
+ 	fi
+ }
+@@ -1145,13 +1151,15 @@
  setup_etc () {
  	mkdir -p "$TARGET/etc"
  
@@ -65,7 +83,7 @@ diff -uNr debootstrap/functions debootstrap.mod/functions
  	local realdir dir
  	for dir in $UMOUNT_DIRS; do
  		realdir="$(in_target_nofail readlink -f "$dir")"
-@@ -1176,6 +1181,8 @@
+@@ -1176,6 +1184,8 @@
  }
  
  setup_proc () {
@@ -74,7 +92,7 @@ diff -uNr debootstrap/functions debootstrap.mod/functions
  	case "$HOST_OS" in
  	    *freebsd*)
  		umount_on_exit /dev
-@@ -1255,7 +1262,6 @@
+@@ -1255,7 +1265,6 @@
  			return 0
  		fi
  
@@ -82,7 +100,7 @@ diff -uNr debootstrap/functions debootstrap.mod/functions
  		;;
  	esac
  }
-@@ -1280,6 +1286,8 @@
+@@ -1280,6 +1289,8 @@
  
  # Create a device node if it does not exist. By default, the mode is 666.
  mknod_if_needed () {
@@ -91,7 +109,7 @@ diff -uNr debootstrap/functions debootstrap.mod/functions
  	local device type major minor mode
  	device="$1"
  	type="$2"
-@@ -1294,6 +1302,8 @@
+@@ -1294,6 +1305,8 @@
  
  
  setup_devices_simple () {
@@ -100,7 +118,7 @@ diff -uNr debootstrap/functions debootstrap.mod/functions
  	# The list of devices that can be created in a container comes from
  	# src/core/cgroup.c in the systemd source tree.
  	mknod_if_needed "$TARGET/dev/null"        c 1 3
-@@ -1325,6 +1335,8 @@
+@@ -1325,6 +1338,8 @@
  }
  
  setup_devices_bind () {
