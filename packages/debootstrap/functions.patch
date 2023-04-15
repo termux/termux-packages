@@ -53,7 +53,7 @@ diff -uNr debootstrap/functions debootstrap.mod/functions
  conditional_cp () {
 -	if [ ! -e "$2/$1" ]; then
 +	local dst
-+	dst="${2}$(echo "$1" | sed 's|^@TERMUX_PREFIX@||g')"
++	dst="${2}/$(echo "$1" | sed 's|^@TERMUX_PREFIX@||g')"
 +
 +	if [ ! -e "$dst" ]; then
  		if [ -L "$1" ] && [ -e "$1" ]; then
