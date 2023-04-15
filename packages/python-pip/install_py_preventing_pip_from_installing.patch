@@ -1,8 +1,8 @@
---- pip-23.0/src/pip/_internal/commands/install.py	2023-01-30 18:13:08.000000000 +0300
-+++ pip-23.0/src/pip/_internal/commands/install.py.patch	2023-02-12 14:05:28.694888041 +0300
-@@ -361,6 +361,20 @@
-                 options, reqs, LegacySetupPyOptionsCheckMode.INSTALL
-             )
+--- pip-23.1/src/pip/_internal/commands/install.py	2023-04-16 00:05:42.665257200 +0100
++++ pip-23.1.mod/src/pip/_internal/commands/install.py	2023-04-16 00:09:42.989257317 +0100
+@@ -342,6 +342,20 @@
+             reqs = self.get_requirements(args, options, finder, session)
+             check_legacy_setup_py_options(options, reqs)
  
 +            reqs_list = [req.name for req in reqs]
 +            while reqs_list.count("pip") != 0:
@@ -18,6 +18,6 @@
 +                del reqs_list[reqs_index]
 +                del reqs[reqs_index]
 +
-             if "no-binary-enable-wheel-cache" in options.features_enabled:
-                 # TODO: remove format_control from WheelCache when the deprecation cycle
-                 # is over
+             wheel_cache = WheelCache(options.cache_dir)
+ 
+             # Only when installing is it permitted to use PEP 660.
