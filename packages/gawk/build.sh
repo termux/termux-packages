@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Programming language designed for text processing"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=5.2.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/gawk/gawk-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=673553b91f9e18cc5792ed51075df8d510c9040f550a6f74e09c9add243a7e4f
 TERMUX_PKG_DEPENDS="libandroid-support, libgmp, libmpfr, readline"
