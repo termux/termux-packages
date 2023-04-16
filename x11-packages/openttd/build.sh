@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="An engine for running Transport Tycoon Deluxe"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=13.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/OpenTTD/OpenTTD/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=36bc7e290c690d250354c70f9223e0504096210486be0d1bf188c74709439cda
 TERMUX_PKG_DEPENDS="fontconfig, freetype, libc++, libicu, liblzma, liblzo, libpng, openttd-gfx, openttd-msx, openttd-sfx, sdl2, zlib"

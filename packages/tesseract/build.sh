@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Tesseract is probably the most accurate open source OCR 
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=5.3.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/tesseract-ocr/tesseract/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=3761768c02b99358e5118bfabfecc979fa84a399da5fa54c49dd477d926fef43
 TERMUX_PKG_AUTO_UPDATE=true
