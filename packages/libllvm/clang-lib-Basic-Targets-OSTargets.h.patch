@@ -21,17 +21,14 @@ To revert, pass -U__ANDROID_API__
  namespace clang {
  namespace targets {
  
-@@ -379,6 +389,14 @@
+@@ -378,6 +388,11 @@
        this->PlatformName = "android";
        this->PlatformMinVersion = Triple.getEnvironmentVersion();
        const unsigned Maj = this->PlatformMinVersion.getMajor();
-+      char host_api_version[PROP_VALUE_MAX];
-+      const int len = __system_property_get("ro.build.version.sdk", host_api_version);
-+      if (len < 1) {
-+        memcpy(host_api_version, TERMUX_PKG_API_LEVEL, sizeof(host_api_version));
-+      }
 +      if (!Maj) {
-+        Builder.defineMacro("__ANDROID_API__", host_api_version);
++        char host_api_version[PROP_VALUE_MAX];
++        const int len = __system_property_get("ro.build.version.sdk", host_api_version);
++        Builder.defineMacro("__ANDROID_API__", len < 1 ? TERMUX_PKG_API_LEVEL : host_api_version);
 +      }
        if (Maj) {
          Builder.defineMacro("__ANDROID_MIN_SDK_VERSION__", Twine(Maj));
