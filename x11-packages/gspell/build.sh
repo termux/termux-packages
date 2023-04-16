@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 _MAJOR_VERSION=1.12
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/gspell/${_MAJOR_VERSION}/gspell-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=40d2850f1bb6e8775246fa1e39438b36caafbdbada1d28a19fa1ca07e1ff82ad
 TERMUX_PKG_DEPENDS="atk, enchant, gdk-pixbuf, glib, gtk3, harfbuzz, libcairo, libicu, pango, zlib"
