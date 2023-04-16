@@ -2,15 +2,16 @@ TERMUX_PKG_HOMEPAGE=https://sing-box.sagernet.org
 TERMUX_PKG_DESCRIPTION="The universal proxy platform"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="kay9925@outlook.com"
-TERMUX_PKG_VERSION="1.2.3"
+TERMUX_PKG_VERSION="1.2.5"
 TERMUX_PKG_SRCURL="https://github.com/SagerNet/sing-box/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=a12b81950deb181cf2c1783685e0dd66502376471db57e3787fad3f3e27fd48c
+TERMUX_PKG_SHA256=88d85e8b8a29b165e67b63e4742473d12c49444a659b82ef302113d84bba53ca
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make() {
 	termux_setup_golang
 
-	local tags="with_quic,with_grpc,with_dhcp,with_wireguard,with_shadowsocksr,with_ech,with_utls,with_reality_server,with_clash_api,with_v2ray_api,with_gvisor"
+	local tags="with_gvisor,with_quic,with_wireguard,with_utls,with_clash_api"
 	local ldflags="\
 	-w -s \
 	-X 'github.com/sagernet/sing-box/constant.Version=${TERMUX_PKG_VERSION}' \
