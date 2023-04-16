@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://lxqt.github.io
 TERMUX_PKG_DESCRIPTION="The LXQt desktop panel"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
-TERMUX_PKG_VERSION="1.2.1"
+TERMUX_PKG_VERSION="1.3.0"
 TERMUX_PKG_SRCURL="https://github.com/lxqt/lxqt-panel/releases/download/${TERMUX_PKG_VERSION}/lxqt-panel-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=4b380bf7ca00e66b88fc5bb8e23bda0be1ddccc2ea99d3f68e8f86e7c9ca0498
+TERMUX_PKG_SHA256=431b399445c8b01b4989cb9521739e88d99236eaf43c9dcd29a99696038fd8d2
 TERMUX_PKG_DEPENDS="kwindowsystem, libc++, libdbusmenu-qt, liblxqt, libsysstat, libxcb, libxkbcommon, libxtst, libxtst, lxmenu-data, lxqt-globalkeys, pulseaudio, qt5-qtbase, qt5-qtx11extras, xcb-util, xcb-util-image"
 TERMUX_PKG_BUILD_DEPENDS="lxqt-build-tools, qt5-qtbase-cross-tools, qt5-qttools-cross-tools"
 # TODO
