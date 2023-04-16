@@ -11,7 +11,8 @@ TERMUX_PKG_AUTO_UPDATE=true
 termux_step_make() {
 	termux_setup_golang
 
-	local tags="with_quic,with_grpc,with_dhcp,with_wireguard,with_shadowsocksr,with_ech,with_utls,with_reality_server,with_clash_api,with_v2ray_api,with_gvisor"
+#	local tags="with_quic,with_grpc,with_dhcp,with_wireguard,with_shadowsocksr,with_ech,with_utls,with_reality_server,with_clash_api,with_v2ray_api,with_gvisor"
+	local tags="with_gvisor,with_quic,with_wireguard,with_utls,with_clash_api"
 	local ldflags="\
 	-w -s \
 	-X 'github.com/sagernet/sing-box/constant.Version=${TERMUX_PKG_VERSION}' \
