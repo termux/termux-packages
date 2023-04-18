@@ -9,15 +9,6 @@
  ifeq ($(findstring MINGW32, $(SYSNAME)),MINGW32)
    OS:=windows
    GPERF:=/usr/bin/gperf
-@@ -109,7 +109,7 @@
- endif
- 
- # change to sdl-console to build a console version on Windows
--SDL_PCNAME:=sdl
-+SDL_PCNAME:=sdl12_compat
- 
- WINDRES:=windres
- PKG_CONFIG:=pkg-config
 @@ -169,14 +169,14 @@
  macos_ARCH_CFLAGS:=-isysroot $(SDKROOT) -I$(SDKROOT)/usr/include -I$(HOSTROOT)/include -mmacosx-version-min=$(MINVER) -arch $(subst $() $(), -arch ,$(ARCHS)) -w -headerpad_max_install_names -DHAVE_STRCASESTR
  ios_ARCH_CFLAGS:=-isysroot $(SDKROOT) -I$(SDKROOT)/usr/include -I$(HOSTROOT)/include $(MINVEROPT) -arch $(subst $() $(), -arch ,$(ARCHS)) -w -fPIC -DHAVE_STRCASESTR -DUNLINK_ONLY
@@ -44,14 +35,12 @@
  PREFIX:=$($(OS)_PREFIX)
  
  # Root directory to place files when creating packages.
-@@ -242,8 +242,8 @@
+@@ -242,7 +242,7 @@
  MAGIC_PREFIX:=$(DESTDIR)$(LIBDIR)/lib$(LIBDIRSUFFIX)/tuxpaint/plugins
  
  # Docs and man page:
 -DOC_PREFIX:=$(DESTDIR)$(PREFIX)/share/doc/tuxpaint-$(VER_VERSION)
--DEVDOC_PREFIX:=$(DESTDIR)$(PREFIX)/share/doc/tuxpaint-$(VER_VERSION)/tuxpaint-dev
 +DOC_PREFIX:=$(DESTDIR)$(PREFIX)/share/tuxpaint/doc
-+DEVDOC_PREFIX:=$(DESTDIR)$(PREFIX)/share/tuxpaint/doc/tuxpaint-dev
  MAN_PREFIX:=$(DESTDIR)$(PREFIX)/share/man
  DEVMAN_PREFIX:=$(DESTDIR)$(PREFIX)/share/man
  
@@ -93,11 +82,11 @@
  
  # Install the support files for macOS application bundle
 @@ -1332,7 +1318,7 @@
- macos_MAGIC_SDL_LIBS:=-L/usr/local/lib $(shell $(PKG_CONFIG) $(SDL_PCNAME) --libs) -lSDL_image -lSDL_ttf $(SDL_MIXER_LIB)
- ios_MAGIC_SDL_LIBS:=$(shell $(PKG_CONFIG) $(SDL_PCNAME) --libs) -lSDL_image -lSDL_ttf $(SDL_MIXER_LIB)
- beos_MAGIC_SDL_LIBS:=-L/usr/local/lib $(shell $(PKG_CONFIG) $(SDL_PCNAME) --libs) -lSDL_image -lSDL_ttf $(SDL_MIXER_LIB)
--linux_MAGIC_SDL_LIBS:=-L/usr/local/lib $(shell $(PKG_CONFIG) $(SDL_PCNAME) --libs) -lSDL_image -lSDL_ttf $(SDL_MIXER_LIB)
-+linux_MAGIC_SDL_LIBS:=-L@TERMUX_PREFIX@/lib $(shell $(PKG_CONFIG) $(SDL_PCNAME) --libs) -lSDL_image -lSDL_ttf $(SDL_MIXER_LIB)
+ macos_MAGIC_SDL_LIBS:=-L/usr/local/lib $(shell $(PKG_CONFIG) $(SDL_PCNAME) --libs) -lSDL2_image -lSDL2_ttf $(SDL_MIXER_LIB)
+ ios_MAGIC_SDL_LIBS:=$(shell $(PKG_CONFIG) $(SDL_PCNAME) --libs) -lSDL2_image -lSDL2_ttf $(SDL_MIXER_LIB)
+ beos_MAGIC_SDL_LIBS:=-L/usr/local/lib $(shell $(PKG_CONFIG) $(SDL_PCNAME) --libs) -lSDL2_image -lSDL2_ttf $(SDL_MIXER_LIB)
+-linux_MAGIC_SDL_LIBS:=-L/usr/local/lib $(shell $(PKG_CONFIG) $(SDL_PCNAME) --libs) -lSDL2_image -lSDL2_ttf $(SDL_MIXER_LIB)
++linux_MAGIC_SDL_LIBS:=-L@TERMUX_PREFIX@/lib $(shell $(PKG_CONFIG) $(SDL_PCNAME) --libs) -lSDL2_image -lSDL2_ttf $(SDL_MIXER_LIB)
  MAGIC_SDL_LIBS:=$($(OS)_MAGIC_SDL_LIBS)
  
  windows_MAGIC_ARCH_LINKS=-lintl $(PNG)
