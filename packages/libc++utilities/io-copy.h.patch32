@@ -1,0 +1,11 @@
+--- a/io/copy.h
++++ b/io/copy.h
+@@ -155,7 +155,7 @@
+         output.flush();
+         const auto totalBytes = static_cast<std::streamoff>(count);
+         while (count) {
+-            const auto bytesCopied = ::sendfile64(output.fileDescriptor(), input.fileDescriptor(), nullptr, std::min(count, bufferSize));
++            const auto bytesCopied = ::sendfile64(output.fileDescriptor(), input.fileDescriptor(), nullptr, count < bufferSize ? count : bufferSize);
+             if (bytesCopied < 0) {
+                 throw std::ios_base::failure(argsToString("sendfile64() failed: ", std::strerror(errno)));
+             }
