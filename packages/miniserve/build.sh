@@ -6,7 +6,6 @@ TERMUX_PKG_VERSION="0.23.1"
 TERMUX_PKG_SRCURL=https://github.com/svenstaro/miniserve/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=2812e5f700612576587a76ba5ea51a3eb7f60b1dd1b580cd9a015ad2feac5b8f
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS=libbz2
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
@@ -17,12 +16,17 @@ termux_step_pre_configure() {
 	: "${CARGO_HOME:=$HOME/.cargo}"
 	export CARGO_HOME
 
-	rm -rf $CARGO_HOME/registry/src/github.com-*/rustix-*
+	rm -rf $CARGO_HOME/registry/src/github.com-*/socket2-*
 	cargo fetch --target "${CARGO_TARGET_NAME}"
 
-	for d in $CARGO_HOME/registry/src/github.com-*/rustix-*; do
-		patch --silent -p1 -d ${d} < $TERMUX_PKG_BUILDER_DIR/0001-upstream-fix-libc-removing-unsafe-on-makedev.diff || :
-	done
+	if [ $TERMUX_ARCH_BITS = 32 ]; then
+		local p="socket2-0.5.2-src-sys-unix.rs.diff32"
+		local d
+		for d in $CARGO_HOME/registry/src/github.com-*/socket2-*; do
+			patch --silent -p1 -d ${d} \
+				< "$TERMUX_PKG_BUILDER_DIR/${p}" || :
+		done
+	fi
 
 	rm -f Makefile
 }
