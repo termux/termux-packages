@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="ZLIB"
 TERMUX_PKG_LICENSE_FILE="COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.0.4
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.ferzkopp.net/Software/SDL2_gfx/SDL2_gfx-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=63e0e01addedc9df2f85b93a248f06e8a04affa014a835c2ea34bfe34e576262
 TERMUX_PKG_DEPENDS="sdl2"
@@ -12,9 +13,5 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure() {
-	mkdir -p m4
-	cp $TERMUX_PREFIX/share/aclocal/sdl2.m4 m4/
-	autoreconf -fi -Im4
-
 	LDFLAGS+=" -lm"
 }
