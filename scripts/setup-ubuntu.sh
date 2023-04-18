@@ -247,6 +247,9 @@ PACKAGES+=" triehash"
 # Needed by aspell dictionaries.
 PACKAGES+=" aspell"
 
+# Needed by package gdb.
+PACKAGES+=" guile-3.0-dev"
+
 # Needed by package kphp.
 PACKAGES+=" python3-jsonschema"
 
