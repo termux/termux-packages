@@ -31,11 +31,11 @@
    }
    # now we save every scheme that is fully covered by the stuff we have
 @@ -1637,7 +1630,7 @@
-   set_var_from_alternatives( \$tex_prefix,
+   set_var_from_alternatives("TEX_PREFIX", \$tex_prefix,
      ($opt_in_place ? abs_path($::installerdir) : undef),
      $tlprefixenv,
 -    (win32() ? getenv('SystemDrive') . '/texlive' : '/usr/local/texlive'));
 +    (win32() ? getenv('SystemDrive') . '/texlive' : '@TERMUX_PREFIX@/local/texlive'));
-   set_var_from_alternatives( \$vars{'TEXDIR'},
-     $vars{'TEXDIR'},
-     ($vars{'instopt_portable'} || $opt_in_place)
+   #
+   set_var_from_alternatives("TEXDIR", \$vars{'TEXDIR'},
+     $opt_texdir,

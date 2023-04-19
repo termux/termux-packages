@@ -3,8 +3,9 @@ TERMUX_PKG_DESCRIPTION="Wrapper around texlive's install-tl script"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 TERMUX_PKG_VERSION=20220403
-TERMUX_PKG_SRCURL=https://ftp.math.utah.edu/pub/tex/historic/systems/texlive/${TERMUX_PKG_VERSION:0:4}/install-tl-unx.tar.gz
-TERMUX_PKG_SHA256=e67edec49df6b7c4a987a7d5a9b31bcf41258220f9ac841c7a836080cd334fb5
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL=https://ftp.math.utah.edu/pub/tex/historic/systems/texlive/${TERMUX_PKG_VERSION:0:4}/tlnet-final/install-tl-unx.tar.gz
+TERMUX_PKG_SHA256=7e25bcca79e570043ce09f08beabdfbcb6fa82906379d69bee55fbdd78ad02b4
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_DEPENDS="perl, texlive-bin (>= 20200406-4), gnupg, curl, lz4, xz-utils"
 TERMUX_PKG_REPLACES="texlive"
@@ -48,6 +49,10 @@ termux_step_make_install() {
 	mkdir -p $TERMUX_PREFIX/etc/profile.d/
 	echo "export PATH=\$PATH:$TERMUX_PREFIX/bin/texlive" \
 		> $TERMUX_PREFIX/etc/profile.d/texlive.sh
+}
+
+termux_step_post_massage() {
+	find ./opt/texlive/install-tl -name '*.orig' -delete
 }
 
 termux_step_create_debscripts() {
