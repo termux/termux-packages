@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.18.0
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/lfortran/lfortran
-TERMUX_PKG_DEPENDS="clang, libc++, libllvm, zlib"
+TERMUX_PKG_DEPENDS="clang, libandroid-complex-math, libc++, ncurses, zlib, zstd"
 TERMUX_PKG_BUILD_DEPENDS="libllvm-static"
 TERMUX_PKG_SUGGESTS="libkokkos"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -38,5 +38,5 @@ termux_step_pre_configure() {
 
 	( cd $TERMUX_PKG_SRCDIR && sh build0.sh )
 
-	LDFLAGS+=" -lm"
+	LDFLAGS+=" -landroid-complex-math -lm"
 }
