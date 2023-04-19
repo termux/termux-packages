@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Emscripten: An LLVM-to-WebAssembly Compiler"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@truboxl"
 TERMUX_PKG_VERSION="3.1.36"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/emscripten-core/emscripten
 TERMUX_PKG_GIT_BRANCH=${TERMUX_PKG_VERSION}
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
@@ -242,6 +243,8 @@ termux_step_make() {
 		-j "${TERMUX_MAKE_PROCESSES}" \
 		--target install
 
+	local _OLD_LDFLAGS="$LDFLAGS"
+	LDFLAGS="-Wl,-rpath=$TERMUX_PREFIX/opt/emscripten-binaryen/lib $LDFLAGS"
 	cmake \
 		-G Ninja \
 		-S "${TERMUX_PKG_CACHEDIR}/binaryen-${_BINARYEN_COMMIT}" \
@@ -251,6 +254,7 @@ termux_step_make() {
 		--build "${TERMUX_PKG_BUILDDIR}/build-binaryen" \
 		-j "${TERMUX_MAKE_PROCESSES}" \
 		--target install
+	LDFLAGS="$_OLD_LDFLAGS"
 }
 
 termux_step_make_install() {
