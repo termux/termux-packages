@@ -6,7 +6,8 @@ TERMUX_PKG_VERSION="3.1.37"
 TERMUX_PKG_SRCURL=git+https://github.com/emscripten-core/emscripten
 TERMUX_PKG_GIT_BRANCH=${TERMUX_PKG_VERSION}
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
-TERMUX_PKG_RECOMMENDS="emscripten-llvm, emscripten-binaryen, python, nodejs-lts | nodejs"
+TERMUX_PKG_DEPENDS="emscripten-binaryen, emscripten-llvm"
+TERMUX_PKG_RECOMMENDS="nodejs-lts | nodejs, python"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_AUTO_UPDATE=true
@@ -82,12 +83,11 @@ _LLVM_BUILD_ARGS="
 -DLLVM_INCLUDE_TESTS=OFF
 -DLLVM_INSTALL_TOOLCHAIN_ONLY=ON
 -DLLVM_LINK_LLVM_DYLIB=ON
--DLLVM_TABLEGEN=${TERMUX_PKG_HOSTBUILD_DIR}/bin/llvm-tblgen
+-DLLVM_NATIVE_TOOL_DIR=${TERMUX_PKG_HOSTBUILD_DIR}/bin
 
 -DCLANG_DEFAULT_LINKER=lld
 -DCLANG_ENABLE_ARCMT=OFF
 -DCLANG_ENABLE_STATIC_ANALYZER=OFF
--DCLANG_TABLEGEN=${TERMUX_PKG_HOSTBUILD_DIR}/bin/clang-tblgen
 
 -DCOMPILER_RT_BUILD_CRT=OFF
 -DCOMPILER_RT_BUILD_LIBFUZZER=OFF
@@ -205,10 +205,10 @@ termux_step_host_build() {
 		-S "${TERMUX_PKG_CACHEDIR}/llvm-project-${_LLVM_COMMIT}/llvm" \
 		-DCMAKE_BUILD_TYPE=Release \
 		-DLLVM_ENABLE_PROJECTS=clang
-	cmake \
-		--build "${TERMUX_PKG_HOSTBUILD_DIR}" \
+	ninja \
+		-C "${TERMUX_PKG_HOSTBUILD_DIR}" \
 		-j "${TERMUX_MAKE_PROCESSES}" \
-		--target llvm-tblgen clang-tblgen
+		llvm-tblgen clang-tblgen
 }
 
 termux_step_make() {
@@ -237,10 +237,10 @@ termux_step_make() {
 		-S "${TERMUX_PKG_CACHEDIR}/llvm-project-${_LLVM_COMMIT}/llvm" \
 		-B "${TERMUX_PKG_BUILDDIR}/build-llvm" \
 		${_LLVM_BUILD_ARGS}
-	cmake \
-		--build "${TERMUX_PKG_BUILDDIR}/build-llvm" \
+	ninja \
+		-C "${TERMUX_PKG_BUILDDIR}/build-llvm" \
 		-j "${TERMUX_MAKE_PROCESSES}" \
-		--target install
+		install
 
 	local _OLD_LDFLAGS="$LDFLAGS"
 	LDFLAGS="-Wl,-rpath=$TERMUX_PREFIX/opt/emscripten-binaryen/lib $LDFLAGS"
@@ -249,10 +249,10 @@ termux_step_make() {
 		-S "${TERMUX_PKG_CACHEDIR}/binaryen-${_BINARYEN_COMMIT}" \
 		-B "${TERMUX_PKG_BUILDDIR}/build-binaryen" \
 		${_BINARYEN_BUILD_ARGS}
-	cmake \
-		--build "${TERMUX_PKG_BUILDDIR}/build-binaryen" \
+	ninja \
+		-C "${TERMUX_PKG_BUILDDIR}/build-binaryen" \
 		-j "${TERMUX_MAKE_PROCESSES}" \
-		--target install
+		install
 	LDFLAGS="$_OLD_LDFLAGS"
 }
 
