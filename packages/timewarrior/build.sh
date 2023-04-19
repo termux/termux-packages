@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://timewarrior.net/
 TERMUX_PKG_DESCRIPTION="Command-line time tracker"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.4.3
+TERMUX_PKG_VERSION=1.5.0
 TERMUX_PKG_SRCURL=git+https://github.com/GothenburgBitFactory/timewarrior
 TERMUX_PKG_DEPENDS="libandroid-glob, libc++"
 
