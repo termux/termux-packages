@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/wasmerio/wasmer
 TERMUX_PKG_DESCRIPTION="A fast and secure WebAssembly runtime"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.1.1
+TERMUX_PKG_VERSION=3.2.0
 TERMUX_PKG_SRCURL=https://github.com/wasmerio/wasmer/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=84b4dce118f7903412672069b52c4046cbbda136889d2d2f7d2bbaa52c91f90d
+TERMUX_PKG_SHA256=50bccd4e3155bee881fb165ceea82234c730a79f2345988b757596dbe20e912b
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_NO_STATICSPLIT=true
 
@@ -26,6 +26,8 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
+	set -x
+
 	# https://github.com/wasmerio/wasmer/blob/master/Makefile
 	# Makefile only does host builds
 	# Dropping host build due to https://github.com/wasmerio/wasmer/issues/2822
@@ -82,9 +84,13 @@ termux_step_make() {
 		--release \
 		--manifest-path wapm-cli/Cargo.toml \
 		--features telemetry,update-notifications
+
+	set +x
 }
 
 termux_step_make_install() {
+	set -x
+
 	# make install-wasmer
 	install -Dm755 -t "$TERMUX_PREFIX/bin" "target/$CARGO_TARGET_NAME/release/wasmer"
 
@@ -131,6 +137,8 @@ termux_step_make_install() {
 	install -Dm644 "$TERMUX_PKG_TMPDIR/wasmer.sh" "$TERMUX_PREFIX/etc/profile.d/wasmer.sh"
 
 	unset WASMER_INSTALL_PREFIX
+
+	set +x
 }
 
 termux_step_create_debscripts() {
