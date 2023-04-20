@@ -350,7 +350,7 @@ if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
 	# Target architecture must be same as for environment used currently.
 	case "$TERMUX_APP_PACKAGE_MANAGER" in
 		"apt") TERMUX_ARCH=$(dpkg --print-architecture);;
-		"pacman") TERMUX_ARCH=$(pacman-conf | grep Architecture | sed 's/Architecture = //g');;
+		"pacman") TERMUX_ARCH=$(pacman-conf Architecture);;
 	esac
 	export TERMUX_ARCH
 fi
