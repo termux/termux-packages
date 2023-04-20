@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://traceroute.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://traceroute.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="A new modern implementation of traceroute(8) utility for Linux systems"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

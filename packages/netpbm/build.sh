@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://netpbm.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://netpbm.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="Toolkit for manipulation of graphic images of different formats"
 TERMUX_PKG_LICENSE="non-free"
 TERMUX_PKG_LICENSE_FILE="doc/copyright_summary"

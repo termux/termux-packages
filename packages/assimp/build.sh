@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://assimp.sourceforge.net/index.html
+TERMUX_PKG_HOMEPAGE=https://assimp.sourceforge.net/index.html
 TERMUX_PKG_DESCRIPTION="Library to import various well-known 3D model formats in an uniform manner"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="@termux"

@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://id3lib.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://id3lib.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="A software library for manipulating ID3v1/v1.1 and ID3v2 tags"
 TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

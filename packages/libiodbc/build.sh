@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://www.iodbc.org/
+TERMUX_PKG_HOMEPAGE=https://www.iodbc.org/
 TERMUX_PKG_DESCRIPTION="Independent Open DataBase Connectivity for Linux, MacOS X and Unix systems"
 TERMUX_PKG_LICENSE="LGPL-2.0, BSD 3-Clause"
 TERMUX_PKG_LICENSE_FILE="LICENSE, LICENSE.BSD, LICENSE.LGPL"

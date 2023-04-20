@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://e2fsprogs.sourceforge.net
+TERMUX_PKG_HOMEPAGE=https://e2fsprogs.sourceforge.net
 TERMUX_PKG_DESCRIPTION="EXT 2/3/4 filesystem utilities"
 TERMUX_PKG_LICENSE="GPL-2.0, LGPL-2.0"
 TERMUX_PKG_LICENSE_FILE="NOTICE"

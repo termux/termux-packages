@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://sdlpango.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://sdlpango.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="Connects Pango to SDL"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"

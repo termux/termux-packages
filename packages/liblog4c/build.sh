@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://log4c.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://log4c.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="A C library for flexible logging to files, syslog and other destinations"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"

@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://liblo.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://liblo.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="A lightweight library that provides an easy to use implementation of the OSC protocol"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"

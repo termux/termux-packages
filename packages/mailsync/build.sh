@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://mailsync.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://mailsync.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="A way of synchronizing a collection of mailboxes"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

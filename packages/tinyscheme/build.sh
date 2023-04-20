@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://tinyscheme.sourceforge.net/home.html
+TERMUX_PKG_HOMEPAGE=https://tinyscheme.sourceforge.net/home.html
 TERMUX_PKG_DESCRIPTION="Very small scheme implementation"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"

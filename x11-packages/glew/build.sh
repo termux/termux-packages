@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://glew.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://glew.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="The OpenGL Extension Wrangler Library"
 TERMUX_PKG_LICENSE="BSD, GPL-2.0, MIT"
 TERMUX_PKG_MAINTAINER="@termux"

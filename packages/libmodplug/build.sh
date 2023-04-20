@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://modplug-xmms.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://modplug-xmms.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="The ModPlug mod file playing library"
 TERMUX_PKG_LICENSE="Public Domain"
 TERMUX_PKG_LICENSE_FILE="COPYING"

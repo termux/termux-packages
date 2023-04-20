@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://htmlcxx.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://htmlcxx.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="A simple non-validating css1 and html parser for C++"
 TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

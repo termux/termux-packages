@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://arj.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://arj.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="Open-source version of arj archiver"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

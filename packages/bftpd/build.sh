@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://bftpd.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://bftpd.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="Small, easy-to-configure FTP server"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
