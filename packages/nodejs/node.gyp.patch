@@ -1,6 +1,6 @@
---- ./node.gyp.orig	2023-02-02 00:11:22.000000000 +0530
-+++ ./node.gyp	2023-02-10 18:02:18.543233332 +0530
-@@ -155,7 +155,8 @@
+--- ./node.gyp.orig	2023-04-11 01:28:53.000000000 +0530
++++ ./node.gyp	2023-04-20 18:05:13.232655507 +0530
+@@ -156,7 +156,8 @@
        ],
  
        'sources': [
@@ -10,49 +10,18 @@
        ],
  
        'dependencies': [
-@@ -449,6 +450,7 @@
- 
+@@ -451,6 +452,7 @@
        'include_dirs': [
          'src',
-+        'deps/cares/src/lib',
+         'deps/postject',
++	'deps/cares/src/lib',
          '<(SHARED_INTERMEDIATE_DIR)' # for node_natives.h
        ],
        'dependencies': [
-@@ -894,300 +896,6 @@
+@@ -905,272 +907,6 @@
          },
        ],
      }, # node_lib_target_name
--    { # fuzz_url
--      'target_name': 'fuzz_url',
--      'type': 'executable',
--      'dependencies': [
--        '<(node_lib_target_name)',
--      ],
--      'includes': [
--        'node.gypi'
--      ],
--      'include_dirs': [
--        'src',
--      ],
--      'defines': [
--        'NODE_ARCH="<(target_arch)"',
--        'NODE_PLATFORM="<(OS)"',
--        'NODE_WANT_INTERNALS=1',
--      ],
--      'sources': [
--        'src/node_snapshot_stub.cc',
--        'test/fuzzers/fuzz_url.cc',
--      ],
--      'conditions': [
--        ['OS=="linux"', {
--          'ldflags': [ '-fsanitize=fuzzer' ]
--        }],
--        # Ensure that ossfuzz flag has been set and that we are on Linux
--        [ 'OS!="linux" or ossfuzz!="true"', {
--          'type': 'none',
--        }],
--      ],
--    }, # fuzz_url
 -    { # fuzz_env
 -      'target_name': 'fuzz_env',
 -      'type': 'executable',
@@ -104,6 +73,7 @@
 -        'deps/histogram/histogram.gyp:histogram',
 -        'deps/uvwasi/uvwasi.gyp:uvwasi',
 -        'deps/simdutf/simdutf.gyp:simdutf',
+-        'deps/ada/ada.gyp:ada',
 -      ],
 -
 -      'includes': [
@@ -144,7 +114,7 @@
 -        'test/cctest/test_sockaddr.cc',
 -        'test/cctest/test_traced_value.cc',
 -        'test/cctest/test_util.cc',
--        'test/cctest/test_url.cc',
+-        'test/cctest/test_dataqueue.cc',
 -      ],
 -
 -      'conditions': [
@@ -200,6 +170,7 @@
 -        '<(node_lib_target_name)',
 -        'deps/histogram/histogram.gyp:histogram',
 -        'deps/uvwasi/uvwasi.gyp:uvwasi',
+-        'deps/ada/ada.gyp:ada',
 -      ],
 -
 -      'includes': [
@@ -269,6 +240,7 @@
 -        '<(node_lib_target_name)',
 -        'deps/histogram/histogram.gyp:histogram',
 -        'deps/uvwasi/uvwasi.gyp:uvwasi',
+-        'deps/ada/ada.gyp:ada',
 -      ],
 -
 -      'includes': [
