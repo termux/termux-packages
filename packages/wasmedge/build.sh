@@ -4,9 +4,10 @@ TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE, LICENSE.spdx"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.11.2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/WasmEdge/WasmEdge/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=aa1d484707aecd66833cf75f8428372203f4f470f47c44ff174d7ef1706ffe76
-TERMUX_PKG_DEPENDS="libc++, libllvm, zlib"
+TERMUX_PKG_DEPENDS="libc++, libllvm, zlib, zstd"
 TERMUX_PKG_BUILD_DEPENDS="boost-headers, boost-static, libllvm-static, libpolly, lld, llvm"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DWASMEDGE_FORCE_DISABLE_LTO=ON
@@ -15,6 +16,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 # WASMEDGE_BUILD_AOT_RUNTIME is not supported on 32-bit archs.
 # See https://github.com/WasmEdge/WasmEdge/blob/2414c83047f2bf8fe241716be6ef8c0de34dc245/lib/aot/compiler.cpp#L4874
 if [ $TERMUX_ARCH_BITS = 32 ]; then
+	TERMUX_PKG_DEPENDS="libc++"
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DWASMEDGE_BUILD_AOT_RUNTIME=OFF"
 fi
 
