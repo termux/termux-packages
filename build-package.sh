@@ -1,5 +1,4 @@
 #!/bin/bash
-# shellcheck disable=SC1117
 
 # Setting the TMPDIR variable
 : "${TMPDIR:=/tmp}"
@@ -18,7 +17,7 @@ fi
 
 set -e -o pipefail -u
 
-cd "$(realpath "$(dirname "$0")")"
+cd "$(realpath "$(dirname "$1")")"
 TERMUX_SCRIPTDIR=$(pwd)
 export TERMUX_SCRIPTDIR
 
