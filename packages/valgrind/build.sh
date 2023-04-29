@@ -2,9 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://valgrind.org/
 TERMUX_PKG_DESCRIPTION="Instrumentation framework for building dynamic analysis tools"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.20.0
+TERMUX_PKG_VERSION=3.21.0
 TERMUX_PKG_SRCURL=http://sourceware.org/pub/valgrind/valgrind-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=8536c031dbe078d342f121fa881a9ecd205cb5a78e639005ad570011bdb9f3c6
+TERMUX_PKG_SHA256=10ce1618bb3e33fad16eb79552b0a3e1211762448a0d7fce11c8a6243b9ac971
+TERMUX_PKG_BUILD_DEPENDS="binutils-cross"
 TERMUX_PKG_BREAKS="valgrind-dev"
 TERMUX_PKG_REPLACES="valgrind-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-tmpdir=$TERMUX_PREFIX/tmp"
@@ -23,6 +24,13 @@ termux_step_pre_configure() {
 		# http://lists.busybox.net/pipermail/buildroot/2013-November/082270.html:
 		# "valgrind uses inline assembly that is not Thumb compatible":
 		CFLAGS=${CFLAGS/-mthumb/}
+		# ```
+		# <inline asm>:1:41: error: expected '%<type>' or "<type>"
+		# .pushsection ".debug_gdb_scripts", "MS",@progbits,1
+		#                                         ^
+		# ```
+		# See also https://github.com/llvm/llvm-project/issues/24438.
+		termux_setup_no_integrated_as
 	fi
 
 	autoreconf -fi
