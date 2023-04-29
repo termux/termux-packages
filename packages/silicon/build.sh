@@ -8,7 +8,7 @@ TERMUX_PKG_SRCURL=https://github.com/Aloxaf/silicon/archive/refs/tags/v${TERMUX_
 TERMUX_PKG_SHA256=784a6f99001f2000422b676e637fe83a5dc27f5fc55ad33e227c882ce20e6439
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_BUILD_DEPENDS="fontconfig, freetype, harfbuzz"
+TERMUX_PKG_DEPENDS="fontconfig, freetype, harfbuzz"
 
 termux_step_pre_configure() {
 	termux_setup_rust
