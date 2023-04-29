@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/maaslalani/slides
 TERMUX_PKG_DESCRIPTION="Slides in your terminal"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Yaksh Bariya <yakshbari4@gmail.com>"
+TERMUX_PKG_MAINTAINER="Yaksh Bariya <thunder-coding@termux.dev>"
 TERMUX_PKG_VERSION="0.9.0"
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/maaslalani/slides/archive/v$TERMUX_PKG_VERSION.tar.gz

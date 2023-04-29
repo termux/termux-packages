@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://fly.io
 TERMUX_PKG_DESCRIPTION="Command line tools for fly.io services"
 TERMUX_PKG_LICENSE="Apache-2.0"
-TERMUX_PKG_MAINTAINER="Yaksh Bariya <yakshbari4@gmail.com>"
+TERMUX_PKG_MAINTAINER="Yaksh Bariya <thunder-coding@termux.dev>"
 TERMUX_PKG_VERSION="0.0.548"
 TERMUX_PKG_SRCURL=https://github.com/superfly/flyctl/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=06844bbc4e430a68399e25786414aaee029ef1238252be2f221b7056703de695
