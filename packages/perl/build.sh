@@ -11,6 +11,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # - subversion
 TERMUX_PKG_VERSION=(5.36.1
                     1.4.1)
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=(68203665d8ece02988fc77dc92fccbb297a83a4bb4b8d07558442f978da54cc1
                    3e14bb4f28c83586c668c5f9f6b4e57b138b4ec2fae0271086e29d4e352670ca)
 TERMUX_PKG_SRCURL=(http://www.cpan.org/src/5.0/perl-${TERMUX_PKG_VERSION}.tar.gz
