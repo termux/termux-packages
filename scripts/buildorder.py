@@ -75,7 +75,7 @@ def parse_build_file_excluded_arches(path):
                 for char in "\"'\n":
                     arches_string = arches_string.replace(char, '')
                 for arches_value in re.split(',', arches_string):
-                    arches.append(arches_value)
+                    arches.append(arches_value.strip())
 
     return set(arches)
 
