@@ -6,6 +6,15 @@ termux_step_massage() {
 	# Remove lib/charset.alias which is installed by gettext-using packages:
 	rm -f lib/charset.alias
 
+	# Remove cache file created by update-desktop-database:
+	rm -f share/applications/mimeinfo.cache
+
+	# Remove cache file created by glib-compile-schemas:
+	rm -f share/glib-2.0/schemas/gschemas.compiled
+
+	# Remove cache file created by gtk-update-icon-cache:
+	rm -f share/icons/hicolor/icon-theme.cache
+
 	# Remove locale files we're not interested in::
 	rm -Rf share/locale
 
