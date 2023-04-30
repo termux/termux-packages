@@ -33,10 +33,3 @@ termux_step_make_install() {
 	cd build
 	ninja install
 }
-
-termux_step_post_massage() {
-	# Check if `update_cache()` is disabled:
-	if [ -e "share/mime/mime.cache" ]; then
-		termux_error_exit "Cache file found in package. Please disable updating cache."
-	fi
-}

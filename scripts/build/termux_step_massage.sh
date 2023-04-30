@@ -18,6 +18,12 @@ termux_step_massage() {
 	# Remove locale files we're not interested in::
 	rm -Rf share/locale
 
+	# `update-mime-database` updates NOT ONLY "$PREFIX/share/mime/mime.cache".
+	# Simply removing this specific file does not solve the issue.
+	if [ -e "share/mime/mime.cache" ]; then
+		termux_error_exit "MIME cache found in package. Please disable \`update-mime-database\`."
+	fi
+
 	# Remove old kept libraries (readline):
 	find . -name '*.old' -print0 | xargs -0 -r rm -f
 
