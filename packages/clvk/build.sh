@@ -13,16 +13,13 @@ TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_SUGGESTS="ocl-icd"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
--DLLVM_TABLEGEN=${TERMUX_PKG_HOSTBUILD_DIR}/bin/llvm-tblgen
--DCLANG_TABLEGEN=${TERMUX_PKG_HOSTBUILD_DIR}/bin/clang-tblgen
-"
 
 # https://github.com/kpet/clvk/blob/main/CMakeLists.txt
 
 # Upstream prefers building with Khronos Vulkan Loader
 # We use NDK stub to properly test if it works on Android
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DLLVM_NATIVE_TOOL_DIR=${TERMUX_PKG_HOSTBUILD_DIR}/bin
 -DCLVK_VULKAN_IMPLEMENTATION=custom
 -DVulkan_INCLUDE_DIRS=${TERMUX_PREFIX}/include
 "
@@ -112,10 +109,10 @@ termux_step_host_build() {
 		-S "${TERMUX_PKG_SRCDIR}/external/clspv/third_party/llvm/llvm" \
 		-DCMAKE_BUILD_TYPE=Release \
 		-DLLVM_ENABLE_PROJECTS=clang
-	cmake \
-		--build "${TERMUX_PKG_HOSTBUILD_DIR}" \
+	ninja \
+		-C "${TERMUX_PKG_HOSTBUILD_DIR}" \
 		-j "${TERMUX_MAKE_PROCESSES}" \
-		--target llvm-tblgen clang-tblgen
+		llvm-tblgen clang-tblgen
 }
 
 termux_step_pre_configure() {
