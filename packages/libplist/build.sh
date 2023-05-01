@@ -3,18 +3,19 @@ TERMUX_PKG_DESCRIPTION="A small portable C library to handle Apple Property List
 TERMUX_PKG_LICENSE="GPL-2.0, LGPL-2.1"
 TERMUX_PKG_LICENSE_FILE="COPYING, COPYING.LESSER"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.2.0
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SRCURL=https://github.com/libimobiledevice/libplist/archive/$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=7e654bdd5d8b96f03240227ed09057377f06ebad08e1c37d0cfa2abe6ba0cee2
+TERMUX_PKG_VERSION=2.3.0
+TERMUX_PKG_SRCURL=https://github.com/libimobiledevice/libplist/releases/download/${TERMUX_PKG_VERSION}/libplist-${TERMUX_PKG_VERSION}.tar.bz2
+TERMUX_PKG_SHA256=4e8580d3f39d3dfa13cefab1a13f39ea85c4b0202e9305c5c8f63818182cac61
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libc++"
-TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--without-cython
+"
 
 termux_step_post_get_source() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them
 	# after SOVERSION is changed.
-	local _SOVERSION=3
+	local _SOVERSION=4
 
 	local e=$(sed -En 's/^LIBPLIST_SO_VERSION="?([0-9]+):([0-9]+):([0-9]+).*/\1-\3/p' \
 				configure.ac)
@@ -23,11 +24,6 @@ termux_step_post_get_source() {
 	fi
 }
 
-termux_step_configure() {
-	PKG_CONFIG_PATH=$TERMUX_PREFIX/lib/pkgconfig
-	./autogen.sh \
-		--prefix=$TERMUX_PREFIX \
-		--without-cython \
-		--host=$TERMUX_HOST_PLATFORM
+termux_step_pre_configure() {
+	autoreconf -fi
 }
-
