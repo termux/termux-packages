@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Python bindings for QScintilla"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Align the version with `qscintilla` package.
-TERMUX_PKG_VERSION=2.13.4
+TERMUX_PKG_VERSION=2.14.0
 TERMUX_PKG_SRCURL=https://www.riverbankcomputing.com/static/Downloads/QScintilla/${TERMUX_PKG_VERSION}/QScintilla_src-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=890c261f31e116f426b0ea03a136d44fc89551ebfd126d7b0bdf8a7197879986
+TERMUX_PKG_SHA256=449353928340300804c47b3785c3e62096f918a723d5eed8a5439764e6507f4c
 TERMUX_PKG_DEPENDS="libc++, pyqt5, python, qscintilla (>= ${TERMUX_PKG_VERSION}), qt5-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="qt5-qtbase-cross-tools"
 TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, PyQt-builder"
