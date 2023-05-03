@@ -1,11 +1,12 @@
 TERMUX_PKG_HOMEPAGE=https://www.bacula.org
 TERMUX_PKG_DESCRIPTION="Bacula backup software"
 TERMUX_PKG_LICENSE="AGPL-V3"
+TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="Matlink <matlink@matlink.fr>"
-TERMUX_PKG_VERSION=13.0.2
+TERMUX_PKG_VERSION=13.0.3
 TERMUX_PKG_SRCURL=https://sourceforge.net/projects/bacula/files/bacula/${TERMUX_PKG_VERSION}/bacula-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=6e08bcbe6a4ab070e17e9e9c4e9bc4e944d2e5bd376521ca342c6fe96a20687d
-TERMUX_PKG_DEPENDS="libc++, openssl, liblzo"
+TERMUX_PKG_SHA256=0949c32be1090585e88e4c01d828002e87603136d87c598a29dff42bb3ed2a40
+TERMUX_PKG_DEPENDS="libc++, liblzo, openssl, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_CONFFILES=etc/bacula/bacula-fd.conf
 TERMUX_PKG_SERVICE_SCRIPT=("bacula-fd" "${TERMUX_PREFIX}/bin/bacula-fd")
