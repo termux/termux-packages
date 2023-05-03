@@ -8,5 +8,4 @@ TERMUX_PKG_SHA256=07d3f712f4dbd0a33251fd1dee14e21afdc9f92090fc768c11ab0ac556adbe
 TERMUX_PKG_DEPENDS="glib, gtk2, libcairo, pango"
 TERMUX_PKG_RM_AFTER_INSTALL="
 lib/locale
-share/icons/hicolor/icon-theme.cache
 "

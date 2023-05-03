@@ -12,7 +12,6 @@ TERMUX_PKG_RECOMMENDS="clang, make"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-gtk3 --enable-vte"
 
 TERMUX_PKG_RM_AFTER_INSTALL="
-share/icons/hicolor/icon-theme.cache
 share/icons/Tango/icon-theme.cache
 "
 

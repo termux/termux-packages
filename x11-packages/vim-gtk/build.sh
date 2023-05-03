@@ -41,8 +41,6 @@ TERMUX_PKG_RM_AFTER_INSTALL="
 share/vim/vim90/spell/en.ascii*
 share/vim/vim90/print
 share/vim/vim90/tools
-share/applications/mimeinfo.cache
-share/icons/hicolor/icon-theme.cache
 "
 
 TERMUX_PKG_CONFFILES="share/vim/vimrc"

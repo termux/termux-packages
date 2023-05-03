@@ -7,4 +7,3 @@ TERMUX_PKG_SRCURL=https://github.com/ib/xarchiver/archive/${TERMUX_PKG_VERSION}.
 TERMUX_PKG_SHA256=929e8609d769ab97a18494ef75bef443e244a62b045f637078fe5df87bbcf9ff
 TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3"
 TERMUX_PKG_RECOMMENDS="arj, binutils-is-llvm | binutils, bzip2, cpio, gzip, lz4, lzip, lzop, p7zip, tar, unar, unrar, unzip, xz-utils, zip, zstd"
-TERMUX_PKG_RM_AFTER_INSTALL="share/icons/hicolor/icon-theme.cache"

@@ -11,7 +11,6 @@ TERMUX_PKG_DISABLE_GIR=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-introspection=yes
 "
-TERMUX_PKG_RM_AFTER_INSTALL="share/glib-2.0/schemas/gschemas.compiled"
 
 termux_step_pre_configure() {
 	termux_setup_gir
