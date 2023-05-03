@@ -3,9 +3,10 @@ TERMUX_PKG_DESCRIPTION="A set of simple scripts that provide basic desktop integ
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.1.3
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://gitlab.freedesktop.org/xdg/xdg-utils/-/archive/v${TERMUX_PKG_VERSION}/xdg-utils-v${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=deac55c48aa2902023c96a4bea2f1778441ce9c59e60ed52c6ce5d8b3e90ba64
-TERMUX_PKG_DEPENDS="desktop-file-utils, file, make, perl, shared-mime-info, xorg-xprop"
+TERMUX_PKG_DEPENDS="desktop-file-utils, file, make, perl, shared-mime-info, which, xorg-xprop"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 TERMUX_PKG_RM_AFTER_INSTALL="
