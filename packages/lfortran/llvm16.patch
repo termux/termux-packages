@@ -28,6 +28,15 @@
          builder->SetInsertPoint(bb);
      }
  
+@@ -4718,7 +4718,7 @@
+         start_new_block(blockstart);
+         llvm::BasicBlock *blockend = llvm::BasicBlock::Create(context, blockend_name);
+         llvm::Function *fn = blockstart->getParent();
+-        fn->getBasicBlockList().push_back(blockend);
++        fn->insert(fn->end(), blockend);
+         builder->SetInsertPoint(blockstart);
+         loop_or_block_end.push_back(blockend);
+         loop_or_block_end_names.push_back(blockend_name);
 --- a/src/libasr/codegen/evaluator.cpp
 +++ b/src/libasr/codegen/evaluator.cpp
 @@ -1,5 +1,6 @@
