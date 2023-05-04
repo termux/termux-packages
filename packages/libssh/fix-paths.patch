@@ -23,23 +23,29 @@ diff -uNr libssh-0.9.0/src/options.c libssh-0.9.0.mod/src/options.c
                      ssh_set_error_oom(session);
                      return -1;
 @@ -1449,7 +1449,7 @@
-     session->opts.knownhosts = tmp;
  
-     if (session->opts.global_knownhosts == NULL) {
--        tmp = strdup("/etc/ssh/ssh_known_hosts");
-+        tmp = strdup("@TERMUX_PREFIX@/etc/ssh/ssh_known_hosts");
-     } else {
-         tmp = ssh_path_expand_escape(session, session->opts.global_knownhosts);
-     }
+     if ((session->opts.exp_flags & SSH_OPT_EXP_FLAG_GLOBAL_KNOWNHOSTS) == 0) {
+         if (session->opts.global_knownhosts == NULL) {
+-            tmp = strdup("/etc/ssh/ssh_known_hosts");
++            tmp = strdup("@TERMUX_PREFIX@/etc/ssh/ssh_known_hosts");
+         } else {
+             tmp = ssh_path_expand_escape(session,
+                                          session->opts.global_knownhosts);
 diff -uNr libssh-0.9.0/src/socket.c libssh-0.9.0.mod/src/socket.c
 --- libssh-0.9.0/src/socket.c	2019-06-27 11:34:16.000000000 +0300
 +++ libssh-0.9.0.mod/src/socket.c	2019-06-29 17:26:21.278467080 +0300
-@@ -908,7 +908,7 @@
+@@ -925,11 +925,11 @@
      if (shell == NULL || shell[0] == '\0') {
-         /* Fall back to bash. There are issues with dash or
-          * whatever people tend to link to /bin/sh */
--        shell = "/bin/bash";
-+        shell = "@TERMUX_PREFIX@/bin/bash";
+         /* Fall back to the /bin/sh only if the bash is not available. But there are 
+          * issues with dash or whatever people tend to link to /bin/sh */
+-        rc = access("/bin/bash", 0);
++        rc = access("@TERMUX_PREFIX@/bin/bash", 0);
+         if (rc != 0) {
+-            shell = "/bin/sh";
++            shell = "@TERMUX_PREFIX@/bin/sh";
+         } else {
+-            shell = "/bin/bash";
++            shell = "@TERMUX_PREFIX@/bin/bash";
+         }
      }
      args[0] = shell;
- 
