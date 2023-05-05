@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="OpenGL demonstration and test programs"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Rafael Kitover <rkitover@gmail.com>"
 TERMUX_PKG_VERSION=9.0.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mesa.freedesktop.org/archive/demos/mesa-demos-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=3046a3d26a7b051af7ebdd257a5f23bfeb160cad6ed952329cdff1e9f1ed496b
 TERMUX_PKG_DEPENDS="freeglut, glu, libx11, libxext, opengl"
@@ -40,9 +41,18 @@ termux_step_post_make_install() {
 	if [ $TERMUX_ARCH_BITS = 64 ]; then
 		_system_lib+=64
 	fi
-	patchelf --set-rpath ${_system_lib} \
-		--output $TERMUX_PREFIX/bin/eglinfo-system \
+	# As of PatchELF version 0.18.0, the `eglinfo-system` is known to be
+	# broken if stripped afterwards. Place the binary under `$PREFIX/opt`
+	# to avoid being stripped.
+	local _opt_prefix=$TERMUX_PREFIX/opt/eglinfo-system
+	local _libdir=${_opt_prefix}/lib
+	mkdir -p ${_libdir} ${_opt_prefix}/bin
+	ln -sf ${_system_lib}/libEGL.so ${_libdir}/libEGL.so
+	ln -sf libEGL.so ${_libdir}/libEGL.so.1
+	patchelf --set-rpath ${_libdir} \
+		--output ${_opt_prefix}/bin/eglinfo \
 		$TERMUX_PREFIX/bin/eglinfo
+	ln -sf ${_opt_prefix}/bin/eglinfo $TERMUX_PREFIX/bin/eglinfo-system
 }
 
 termux_step_install_license() {
