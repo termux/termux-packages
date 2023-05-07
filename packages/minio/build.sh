@@ -2,20 +2,16 @@ TERMUX_PKG_HOMEPAGE=https://min.io/
 TERMUX_PKG_DESCRIPTION="Multi-Cloud Object Storage"
 TERMUX_PKG_LICENSE="AGPL-V3"
 TERMUX_PKG_MAINTAINER="@termux"
-_DATE=2022-12-02
-_TIME=19-19-22
+_DATE=2023-05-04
+_TIME=21-44-30
 TERMUX_PKG_VERSION=${_DATE//-/.}.${_TIME//-/.}
-TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/minio/minio/archive/refs/tags/RELEASE.${_DATE}T${_TIME}Z.tar.gz
-TERMUX_PKG_SHA256=0cc787305e317951c8c2f6de1ae14938b750817b310b75e2265195ac00244eb1
+TERMUX_PKG_SHA256=b906049e51f4870edaa2f7f91b4745a54cbc051588d2fa3a9a33f5256c13c454
 TERMUX_PKG_DEPENDS="resolv-conf"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	termux_setup_golang
-
-	go install -v golang.org/x/tools/cmd/stringer@latest
-	go install -v github.com/tinylib/msgp@f3635b96e4838a6c773babb65ef35297fe5fe2f9
 }
 
 termux_step_make() {
