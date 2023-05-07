@@ -23,7 +23,7 @@ termux_step_post_get_source() {
 termux_step_configure() {
 	termux_setup_rust
 	export CARGO_BUILD_TARGET=${CARGO_TARGET_NAME}
-        export PYO3_CROSS_LIB_DIR=$TERMUX_PREFIX/lib
+	export PYO3_CROSS_LIB_DIR=$TERMUX_PREFIX/lib
 }
 
 termux_step_create_debscripts() {

@@ -13,7 +13,7 @@ TERMUX_PKG_RECOMMENDS="ninja"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_post_get_source() {
-      	git fetch --unshallow
+	git fetch --unshallow
 	git checkout $_COMMIT
 
 	local version="$(git log -1 --format=%cs | sed 's/-/./g')"

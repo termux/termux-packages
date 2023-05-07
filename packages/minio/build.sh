@@ -14,25 +14,25 @@ TERMUX_PKG_BUILD_IN_SRC=true
 termux_step_pre_configure() {
 	termux_setup_golang
 
-        go install -v golang.org/x/tools/cmd/stringer@latest
-        go install -v github.com/tinylib/msgp@f3635b96e4838a6c773babb65ef35297fe5fe2f9
+	go install -v golang.org/x/tools/cmd/stringer@latest
+	go install -v github.com/tinylib/msgp@f3635b96e4838a6c773babb65ef35297fe5fe2f9
 }
 
 termux_step_make() {
-        local _COMMITID=$(git ls-remote https://github.com/minio/minio refs/tags/RELEASE.${_DATE}T${_TIME}Z | cut -f1)
-        local _SHORTCOMMITID=$(git ls-remote https://github.com/minio/minio refs/tags/RELEASE.${_DATE}T${_TIME}Z | head -c 12)
+	local _COMMITID=$(git ls-remote https://github.com/minio/minio refs/tags/RELEASE.${_DATE}T${_TIME}Z | cut -f1)
+	local _SHORTCOMMITID=$(git ls-remote https://github.com/minio/minio refs/tags/RELEASE.${_DATE}T${_TIME}Z | head -c 12)
 
-        MINIOLDFLAGS="\
-        -w -s \
-        -X 'github.com/minio/minio/cmd.Version=${_DATE}T${_TIME}Z' \
-        -X 'github.com/minio/minio/cmd.CopyrightYear=$(date +%Y)' \
-        -X 'github.com/minio/minio/cmd.ReleaseTag=RELEASE.${_DATE}T${_TIME}Z'\
-        -X 'github.com/minio/minio/cmd.CommitID=${_COMMITID}' \
-        -X 'github.com/minio/minio/cmd.ShortCommitID=${_SHORTCOMMITID}' \
-        -X 'github.com/minio/minio/cmd.GOPATH=$(go env GOPATH)' \
-        -X 'github.com/minio/minio/cmd.GOROOT=$(go env GOROOT)' \
-        "
-        CGO_ENABLED=0 go build -tags kqueue -trimpath --ldflags="$MINIOLDFLAGS" -o minio
+	MINIOLDFLAGS="\
+	-w -s \
+	-X 'github.com/minio/minio/cmd.Version=${_DATE}T${_TIME}Z' \
+	-X 'github.com/minio/minio/cmd.CopyrightYear=$(date +%Y)' \
+	-X 'github.com/minio/minio/cmd.ReleaseTag=RELEASE.${_DATE}T${_TIME}Z'\
+	-X 'github.com/minio/minio/cmd.CommitID=${_COMMITID}' \
+	-X 'github.com/minio/minio/cmd.ShortCommitID=${_SHORTCOMMITID}' \
+	-X 'github.com/minio/minio/cmd.GOPATH=$(go env GOPATH)' \
+	-X 'github.com/minio/minio/cmd.GOROOT=$(go env GOROOT)' \
+	"
+	CGO_ENABLED=0 go build -tags kqueue -trimpath --ldflags="$MINIOLDFLAGS" -o minio
 }
 termux_step_make_install() {
 	install -Dm700 -t "${TERMUX_PREFIX}"/bin minio

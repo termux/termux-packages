@@ -8,17 +8,17 @@ TERMUX_PKG_SHA256=5b7cab965af67abd581af167d00399397f8596799a72425c55d96a6e0126b3
 TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make() {
-        termux_setup_golang
-        cd "$TERMUX_PKG_SRCDIR"
-        mkdir -p "${TERMUX_PKG_BUILDDIR}/src/github.com/bufbuild"
-        cp -a "${TERMUX_PKG_SRCDIR}" "${TERMUX_PKG_BUILDDIR}/src/github.com/bufbuild/buf"
-        cd "${TERMUX_PKG_BUILDDIR}/src/github.com/bufbuild/buf"
+	termux_setup_golang
+	cd "$TERMUX_PKG_SRCDIR"
+	mkdir -p "${TERMUX_PKG_BUILDDIR}/src/github.com/bufbuild"
+	cp -a "${TERMUX_PKG_SRCDIR}" "${TERMUX_PKG_BUILDDIR}/src/github.com/bufbuild/buf"
+	cd "${TERMUX_PKG_BUILDDIR}/src/github.com/bufbuild/buf"
 
-        go mod download 
-        go build -ldflags "-s -w" -trimpath ./cmd/buf
+	go mod download 
+	go build -ldflags "-s -w" -trimpath ./cmd/buf
 }
 
 termux_step_make_install() {
-        install -Dm700 ${TERMUX_PKG_BUILDDIR}/src/github.com/bufbuild/buf/buf \
-                 $TERMUX_PREFIX/bin/buf
+	install -Dm700 ${TERMUX_PKG_BUILDDIR}/src/github.com/bufbuild/buf/buf \
+		 $TERMUX_PREFIX/bin/buf
 }
