@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.qemu.org
 TERMUX_PKG_DESCRIPTION="A generic and open source machine emulator and virtualizer"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1:7.2.0
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=1:8.0.0
 TERMUX_PKG_SRCURL=https://download.qemu.org/qemu-${TERMUX_PKG_VERSION:2}.tar.xz
-TERMUX_PKG_SHA256=5b49ce2687744dad494ae90a898c52204a3406e84d072482a1e1be854eeb2157
+TERMUX_PKG_SHA256=bb60f0341531181d6cc3969dd19a013d0427a87f918193970d9adb91131e56d0
 TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libbz2, libcairo, libcurl, libepoxy, libgmp, libgnutls, libiconv, libjpeg-turbo, liblzo, libnettle, libnfs, libpixman, libpng, libslirp, libspice-server, libssh, libusb, libusbredir, libx11, mesa, ncurses, pulseaudio, qemu-common, resolv-conf, sdl2, sdl2-image, virglrenderer, zlib, zstd"
 
 # Required by configuration script, but I can't find any binary that uses it.
@@ -22,13 +21,14 @@ bin/qemu-nbd
 bin/qemu-pr-helper
 bin/qemu-storage-daemon
 include/*
-libexec/virtfs-proxy-helper
 libexec/qemu-bridge-helper
+libexec/virtfs-proxy-helper
 share/applications
-share/icons
 share/doc
-share/man/man1/qemu.1*
+share/icons
 share/man/man1/qemu-img.1*
+share/man/man1/qemu-storage-daemon.1*
+share/man/man1/qemu.1*
 share/man/man1/virtfs-proxy-helper.1*
 share/man/man7
 share/man/man8/qemu-ga.8*
@@ -151,7 +151,7 @@ termux_step_configure() {
 
 termux_step_post_make_install() {
 	local i
-	for i in aarch64 arm i386 riscv32 riscv64 x86_64; do
+	for i in aarch64 arm i386 m68k ppc ppc64 riscv32 riscv64 x86_64; do
 		ln -sfr \
 			"${TERMUX_PREFIX}"/share/man/man1/qemu.1 \
 			"${TERMUX_PREFIX}"/share/man/man1/qemu-system-${i}.1
