@@ -10,8 +10,9 @@ TERMUX_PKG_BREAKS="libmp3lame-dev"
 TERMUX_PKG_REPLACES="libmp3lame-dev"
 
 termux_step_post_make_install() {
-	mkdir -p $TERMUX_PKG_CONFIG_LIBDIR
-	cat <<-EOF > $TERMUX_PKG_CONFIG_LIBDIR/lame.pc
+	local _pkgconfig_dir=$TERMUX_PREFIX/lib/pkgconfig
+	mkdir -p ${_pkgconfig_dir}
+	cat <<-EOF > ${_pkgconfig_dir}/lame.pc
 		prefix=$TERMUX_PREFIX
 		exec_prefix=\${prefix}
 		libdir=\${exec_prefix}/lib

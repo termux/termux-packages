@@ -22,8 +22,9 @@ termux_post_configure() {
 }
 
 termux_step_post_make_install() {
-	mkdir -p $TERMUX_PKG_CONFIG_LIBDIR
-	cat > $TERMUX_PKG_CONFIG_LIBDIR/mad.pc <<-EOF
+	local _pkgconfig_dir=$TERMUX_PREFIX/lib/pkgconfig
+	mkdir -p ${_pkgconfig_dir}
+	cat > ${_pkgconfig_dir}/mad.pc <<-EOF
 		prefix=$TERMUX_PREFIX
 		exec_prefix=\${prefix}
 		libdir=$TERMUX_PREFIX/lib
