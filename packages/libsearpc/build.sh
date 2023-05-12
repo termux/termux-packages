@@ -9,6 +9,9 @@ TERMUX_PKG_SHA256=cd00197fcc40b45b1d5e892b2d08dfa5947f737e0d80f3ef26419334e75b0b
 TERMUX_PKG_DEPENDS="glib, libjansson, python"
 TERMUX_PKG_BREAKS="libsearpc-dev"
 TERMUX_PKG_REPLACES="libsearpc-dev"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--enable-compile-demo=no
+"
 
 termux_step_post_get_source() {
 	./autogen.sh

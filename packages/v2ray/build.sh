@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.v2fly.org/
 TERMUX_PKG_DESCRIPTION="A platform for building proxies to bypass network restrictions"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=5.2.1
+TERMUX_PKG_VERSION=5.4.1
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/v2fly/v2ray-core
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -14,15 +14,15 @@ termux_step_post_get_source() {
 	chmod +w $GOPATH -R
 	rm -rf $TERMUX_PREFIX/share/v2ray/
 	mkdir -p $TERMUX_PREFIX/share/v2ray/
-	termux_download https://github.com/v2fly/geoip/releases/download/202301120046/geoip.dat \
+	termux_download https://github.com/v2fly/geoip/releases/download/202303230043/geoip.dat \
 		$TERMUX_PREFIX/share/v2ray/geoip.dat \
-		1af779bf9ba759be7590be3b3baf83d7e5c686b003f6f39dd3ab0e847eaedb72
-	termux_download https://github.com/v2fly/domain-list-community/releases/download/20230115062500/dlc.dat \
+		7086861a6016319264248baea07b3fee74d44521f46ead4338f14cb2dd4779a6
+	termux_download https://github.com/v2fly/domain-list-community/releases/download/20230324131400/dlc.dat \
 		$TERMUX_PREFIX/share/v2ray/geosite.dat \
-		da45c5ca07a05b746d6e67c5d0ea3d80101c6cf8f5c112f68ea94c33c3d97cf4
-	termux_download https://github.com/v2fly/geoip/releases/download/202301120046/geoip-only-cn-private.dat \
+		7b20a6e466e985f0c6301fb77b00f56367987dd85ef7ea01cb4a72b11d118f89
+	termux_download https://github.com/v2fly/geoip/releases/download/202303230043/geoip-only-cn-private.dat \
 		$TERMUX_PREFIX/share/v2ray/geoip-only-cn-private.dat \
-		850ce49fc34abaab94fffcd7f9c45ce087cd873a793fb67c8fa850f3facf8afa
+		ed3d13a5cf8c9629d5f74b9ee2dd645b90760bae3939b5de8f6b5eb415cfca07
 }
 
 termux_step_make() {

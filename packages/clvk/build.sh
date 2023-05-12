@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://github.com/kpet/clvk
 TERMUX_PKG_DESCRIPTION="Experimental implementation of OpenCL on Vulkan"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-_COMMIT=9635d8e0c1d3bfe800434b5422c5c49fa6dc638a
-_COMMIT_DATE=20230124
-_COMMIT_TIME=132813
-TERMUX_PKG_VERSION="0.0.20230124.132813g9635d8e0"
+_COMMIT=df7cd1b735b26eed9e1f5251f63d97b60aa6e912
+_COMMIT_DATE=20230510
+_COMMIT_TIME=170022
+TERMUX_PKG_VERSION="0.0.20230510.170022gdf7cd1b7"
 TERMUX_PKG_SRCURL=git+https://github.com/kpet/clvk
 TERMUX_PKG_GIT_BRANCH=main
 TERMUX_PKG_BUILD_DEPENDS="vulkan-headers, vulkan-loader-android"
@@ -20,33 +20,31 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 
 # https://github.com/kpet/clvk/blob/main/CMakeLists.txt
 
-# clvk prefers Khronos Vulkan Loader instead of NDK stub
-# Sticking with NDK should expose more Vulkan limitations in Android
-# As noted in build test, failure comes when linking with API 24 libvulkan.so
-# clvk will not work on Android versions older than Android 9 (API 28)
+# Upstream prefers building with Khronos Vulkan Loader
+# We use NDK stub to properly test if it works on Android
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
+-DCLVK_VULKAN_IMPLEMENTATION=custom
+-DVulkan_INCLUDE_DIRS=${TERMUX_PREFIX}/include
+"
+
+# Explicitly enable build tests to check undefined symbols even when
+# its default
 #
 # [1877/1888] Linking CXX executable api_tests
 # FAILED: api_tests
 # ...
 # libOpenCL.so: error: undefined reference to 'vkGetPhysicalDeviceFeatures2'
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
--DCLVK_BUILD_TESTS=OFF
--DCLVK_VULKAN_IMPLEMENTATION=custom
--DVulkan_INCLUDE_DIRS=${TERMUX_PREFIX}/include
-"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCLVK_BUILD_TESTS=ON"
 
-# clvk libOpenCL.so has hardcoded clspv bin path at build time
-# clvk cant automatically find clspv from PATH env var
-# and rely on CLVK_CLSPV_BIN env var
 # Use CLVK_CLSPV_ONLINE_COMPILER=ON to combine clspv with clvk
+# May look into separate clspv if clvk libOpenCL.so can find from PATH
+# instead of setting CLVK_CLSPV_BIN
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCLVK_CLSPV_ONLINE_COMPILER=ON"
 
 # clvk currently does not have proper versioning nor releases
 # Use dates and commits as versioning for now
 termux_pkg_auto_update() {
-	local latest_commit_date_tz latest_commit_date latest_commit_time latest_version
 	local latest_commit=$(curl -s https://api.github.com/repos/kpet/clvk/commits | jq .[].sha | head -1 | sed -e 's|\"||g')
-
 	if [[ -z "${latest_commit}" ]]; then
 		echo "WARN: Unable to get latest commit from upstream. Try again later." >&2
 		return 0
@@ -57,23 +55,22 @@ termux_pkg_auto_update() {
 		return 0
 	fi
 
-	latest_commit_date_tz=$(curl -s "https://api.github.com/repos/kpet/clvk/commits/${latest_commit}" | jq .commit.committer.date | sed -e 's|\"||g')
-
+	local latest_commit_date_tz=$(curl -s "https://api.github.com/repos/kpet/clvk/commits/${latest_commit}" | jq .commit.committer.date | sed -e 's|\"||g')
 	if [[ -z "${latest_commit_date_tz}" ]]; then
 		termux_error_exit "ERROR: Unable to get latest commit date info"
 	fi
 
-	latest_commit_date=$(echo "${latest_commit_date_tz}" | sed -e 's|\(.*\)T\(.*\)Z|\1|' -e 's|\-||g')
-	latest_commit_time=$(echo "${latest_commit_date_tz}" | sed -e 's|\(.*\)T\(.*\)Z|\2|' -e 's|\:||g')
+	local latest_commit_date=$(echo "${latest_commit_date_tz}" | sed -e 's|\(.*\)T\(.*\)Z|\1|' -e 's|\-||g')
+	local latest_commit_time=$(echo "${latest_commit_date_tz}" | sed -e 's|\(.*\)T\(.*\)Z|\2|' -e 's|\:||g')
 
 	# https://github.com/termux/termux-packages/issues/11827
 	# really fix it by including longer date time info into versioning
 	# always check this in case upstream change the version format
-	latest_version="0.0.${latest_commit_date}.${latest_commit_time}g${latest_commit:0:8}"
+	local latest_version="0.0.${latest_commit_date}.${latest_commit_time}g${latest_commit:0:8}"
 
-	# rough estimate weekly push
-	current_date=$(date "+%Y%m%d")
-	current_date_diff=$((current_date-_COMMIT_DATE))
+	local current_date_epoch=$(date "+%s")
+	local _COMMIT_DATE_epoch=$(date -d "${_COMMIT_DATE}" "+%s")
+	local current_date_diff=$(((current_date_epoch-_COMMIT_DATE_epoch)/(60*60*24)))
 	if [[ "${current_date_diff}" -lt 7 ]]; then
 		echo "INFO: Queuing updates after 7 days since last push, currently its ${current_date_diff}"
 		return 0
@@ -123,7 +120,7 @@ termux_step_host_build() {
 
 termux_step_pre_configure() {
 	local _libvulkan=vulkan
-	if [ $TERMUX_PKG_API_LEVEL -lt 28 ]; then
+	if [[ "${TERMUX_PKG_API_LEVEL}" -lt 28 ]]; then
 		_libvulkan="$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/28/libvulkan.so"
 	fi
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DVulkan_LIBRARIES=${_libvulkan}"

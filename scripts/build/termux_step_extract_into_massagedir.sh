@@ -4,7 +4,7 @@ termux_step_extract_into_massagedir() {
 	# Build diff tar with what has changed during the build:
 	cd $TERMUX_PREFIX
 	tar -N "$TERMUX_BUILD_TS_FILE" \
-		--exclude='lib/libutil.so' --exclude='tmp' \
+		--exclude='tmp' \
 		-czf "$TARBALL_ORIG" .
 
 	# Extract tar in order to massage it

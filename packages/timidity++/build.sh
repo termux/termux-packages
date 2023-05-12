@@ -1,8 +1,9 @@
-TERMUX_PKG_HOMEPAGE=http://timidity.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://timidity.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="MIDI-to-WAVE converter and player"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.15.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/timidity/TiMidity++-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=9eaf4fadb0e19eb8e35cd4ac16142d604c589e43d0e8798237333697e6381d39
 TERMUX_PKG_CONFFILES="
@@ -17,10 +18,13 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 lib_cv_va_copy=yes
 lib_cv___va_copy=yes
 lib_cv_va_val_copy=yes
+ac_cv_header_sys_time_h=yes
 "
 
 termux_step_pre_configure() {
 	autoreconf -fi
+
+	CPPFLAGS+=" -DSTDC_HEADERS"
 }
 
 termux_step_post_configure() {

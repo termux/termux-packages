@@ -1,0 +1,28 @@
+https://github.com/protocolbuffers/protobuf/issues/11996
+
+Fix run-time error on aarch64:
+
+```
+$ protoc
+CANNOT LINK EXECUTABLE "protoc": cannot locate symbol "_ZN6google8protobuf8internal20VarintParseSlowArm32EPKcPjm" referenced by "/data/data/com.termux/files/usr/lib/libprotoc.so"...
+Aborted
+```
+
+--- a/src/google/protobuf/parse_context.cc
++++ b/src/google/protobuf/parse_context.cc
+@@ -730,6 +730,7 @@
+ constexpr uint64_t kFirstResultBitChunk8 = 8 * 7;
+ constexpr uint64_t kValidBitsForInvalidVarint = 0x60;
+ 
++PROTOBUF_EXPORT
+ PROTOBUF_NOINLINE const char* VarintParseSlowArm64(const char* p, uint64_t* out,
+                                                    uint64_t first8) {
+   SlowPathEncodedInfo info = ComputeLengthAndUpdateP(p);
+@@ -768,6 +769,7 @@
+ 
+ // See comments in VarintParseSlowArm64 for a description of the algorithm.
+ // Differences in the 32 bit version are noted below.
++PROTOBUF_EXPORT
+ PROTOBUF_NOINLINE const char* VarintParseSlowArm32(const char* p, uint32_t* out,
+                                                    uint64_t first8) {
+   // This also skips the slop bytes.

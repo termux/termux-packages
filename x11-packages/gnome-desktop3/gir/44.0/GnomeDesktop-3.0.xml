@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<dump>
+  <class name="GnomeDesktopThumbnailFactory" get-type="gnome_desktop_thumbnail_factory_get_type" parents="GObject">
+  </class>
+  <class name="GnomeBGCrossfade" get-type="gnome_bg_crossfade_get_type" parents="GObject">
+    <property name="width" type="gint" flags="11" default-value="0"/>
+    <property name="height" type="gint" flags="11" default-value="0"/>
+    <signal name="finished" return="void" when="last">
+      <param type="GObject"/>
+    </signal>
+  </class>
+  <class name="GnomeBG" get-type="gnome_bg_get_type" parents="GObject">
+    <signal name="changed" return="void" when="last">
+    </signal>
+    <signal name="transitioned" return="void" when="last">
+    </signal>
+  </class>
+  <class name="GnomeBGSlideShow" get-type="gnome_bg_slide_show_get_type" parents="GObject">
+    <property name="file" type="GFile" flags="11"/>
+    <property name="start-time" type="gdouble" flags="1" default-value="0.000000"/>
+    <property name="total-duration" type="gdouble" flags="1" default-value="0.000000"/>
+    <property name="has-multiple-sizes" type="gboolean" flags="1" default-value="FALSE"/>
+  </class>
+  <class name="GnomeRRScreen" get-type="gnome_rr_screen_get_type" parents="GObject">
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <property name="gdk-screen" type="GdkScreen" flags="235"/>
+    <property name="dpms-mode" type="GnomeRRDpmsModeType" flags="227" default-value="GNOME_RR_DPMS_UNKNOWN"/>
+    <signal name="changed" return="void" when="first" no-recurse="1" no-hooks="1">
+    </signal>
+    <signal name="output-connected" return="void" when="first" no-recurse="1" no-hooks="1">
+      <param type="gpointer"/>
+    </signal>
+    <signal name="output-disconnected" return="void" when="first" no-recurse="1" no-hooks="1">
+      <param type="gpointer"/>
+    </signal>
+  </class>
+  <boxed name="GnomeRROutput" get-type="gnome_rr_output_get_type"/>
+  <boxed name="GnomeRRCrtc" get-type="gnome_rr_crtc_get_type"/>
+  <boxed name="GnomeRRMode" get-type="gnome_rr_mode_get_type"/>
+  <enum name="GnomeRRDpmsModeType" get-type="gnome_rr_dpms_mode_get_type">
+    <member name="GNOME_RR_DPMS_ON" nick="on" value="0"/>
+    <member name="GNOME_RR_DPMS_STANDBY" nick="standby" value="1"/>
+    <member name="GNOME_RR_DPMS_SUSPEND" nick="suspend" value="2"/>
+    <member name="GNOME_RR_DPMS_OFF" nick="off" value="3"/>
+    <member name="GNOME_RR_DPMS_UNKNOWN" nick="unknown" value="4"/>
+  </enum>  <class name="GnomeRROutputInfo" get-type="gnome_rr_output_info_get_type" parents="GObject">
+  </class>
+  <class name="GnomeRRConfig" get-type="gnome_rr_config_get_type" parents="GObject">
+    <property name="screen" type="GnomeRRScreen" flags="202"/>
+  </class>
+  <class name="GnomePnpIds" get-type="gnome_pnp_ids_get_type" parents="GObject">
+  </class>
+  <class name="GnomeWallClock" get-type="gnome_wall_clock_get_type" parents="GObject">
+    <property name="clock" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="timezone" type="GTimeZone" flags="1"/>
+    <property name="time-only" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="force-seconds" type="gboolean" flags="3" default-value="FALSE"/>
+  </class>
+  <class name="GnomeXkbInfo" get-type="gnome_xkb_info_get_type" parents="GObject">
+    <signal name="layouts-changed" return="void" when="first">
+    </signal>
+  </class>
+  <class name="GnomeIdleMonitor" get-type="gnome_idle_monitor_get_type" parents="GObject">
+    <implements name="GInitable"/>
+  </class>
+  <error-quark function="gnome_rr_error_quark" domain="gnome-rr-error-quark"/>
+</dump>

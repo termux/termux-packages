@@ -19,8 +19,11 @@ termux_create_debian_subpackages() {
 		local TERMUX_SUBPKG_ESSENTIAL=false
 		local TERMUX_SUBPKG_BREAKS=""
 		local TERMUX_SUBPKG_DEPENDS=""
+		local TERMUX_SUBPKG_RECOMMENDS=""
+		local TERMUX_SUBPKG_SUGGESTS=""
 		local TERMUX_SUBPKG_CONFLICTS=""
 		local TERMUX_SUBPKG_REPLACES=""
+		local TERMUX_SUBPKG_PROVIDES=""
 		local TERMUX_SUBPKG_CONFFILES=""
 		local TERMUX_SUBPKG_DEPEND_ON_PARENT=""
 		local SUB_PKG_MASSAGE_DIR=$SUB_PKG_DIR/massage/$TERMUX_PREFIX
@@ -57,6 +60,13 @@ termux_create_debian_subpackages() {
 		[ "$TERMUX_SUBPKG_PLATFORM_INDEPENDENT" = "true" ] && SUB_PKG_ARCH=all
 
 		cd "$SUB_PKG_DIR/massage"
+		# Check that files were actually installed, else don't subpackage.
+		if [ "$SUB_PKG_ARCH" = "all" ] && [ "$(find . -type f -print | head -n1)" = "" ]; then
+			echo "No files in subpackage '$SUB_PKG_NAME' when built for $SUB_PKG_ARCH with package '$TERMUX_PKG_NAME', so"
+			echo "the subpackage was not created. If unexpected, check to make sure the files are where you expect."
+			cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"
+			continue
+		fi
 		local SUB_PKG_INSTALLSIZE
 		SUB_PKG_INSTALLSIZE=$(du -sk . | cut -f 1)
 		tar -cJf "$SUB_PKG_PACKAGE_DIR/data.tar.xz" .
@@ -87,7 +97,10 @@ termux_create_debian_subpackages() {
 		test ! -z "$TERMUX_SUBPKG_DEPENDS" && echo "Depends: ${TERMUX_SUBPKG_DEPENDS/#, /}" >> control
 		test ! -z "$TERMUX_SUBPKG_BREAKS" && echo "Breaks: $TERMUX_SUBPKG_BREAKS" >> control
 		test ! -z "$TERMUX_SUBPKG_CONFLICTS" && echo "Conflicts: $TERMUX_SUBPKG_CONFLICTS" >> control
+		test ! -z "$TERMUX_SUBPKG_RECOMMENDS" && echo "Recommends: $TERMUX_SUBPKG_RECOMMENDS" >> control
 		test ! -z "$TERMUX_SUBPKG_REPLACES" && echo "Replaces: $TERMUX_SUBPKG_REPLACES" >> control
+		test ! -z "$TERMUX_SUBPKG_PROVIDES" && echo "Provides: $TERMUX_SUBPKG_PROVIDES" >> control
+		test ! -z "$TERMUX_SUBPKG_SUGGESTS" && echo "Suggests: $TERMUX_SUBPKG_SUGGESTS" >> control
 		echo "Description: $TERMUX_SUBPKG_DESCRIPTION" >> control
 
 		for f in $TERMUX_SUBPKG_CONFFILES; do echo "$TERMUX_PREFIX/$f" >> conffiles; done

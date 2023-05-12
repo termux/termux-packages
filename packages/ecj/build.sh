@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://www.eclipse.org/jdt/core/
+TERMUX_PKG_HOMEPAGE=https://www.eclipse.org/jdt/core/
 TERMUX_PKG_DESCRIPTION="Eclipse Compiler for Java"
 TERMUX_PKG_LICENSE="EPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

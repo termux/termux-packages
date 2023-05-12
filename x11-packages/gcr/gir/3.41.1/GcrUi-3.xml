@@ -5,7 +5,7 @@
   </interface>
   <interface name="GcrRenderer" get-type="gcr_renderer_get_type">
     <property name="attributes" type="GckAttributes" flags="227"/>
-    <property name="label" type="gchararray" flags="227"/>
+    <property name="label" type="gchararray" flags="227" default-value=""/>
     <signal name="data-changed" return="void" when="last">
     </signal>
   </interface>
@@ -14,7 +14,7 @@
     <implements name="GcrComparable"/>
     <implements name="GcrCertificate"/>
     <property name="certificate" type="GcrCertificate" flags="227"/>
-    <property name="label" type="gchararray" flags="227"/>
+    <property name="label" type="gchararray" flags="227" default-value=""/>
     <property name="attributes" type="GckAttributes" flags="227"/>
   </class>
   <class name="GcrCertificateWidget" get-type="gcr_certificate_widget_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
@@ -28,7 +28,7 @@
     <implements name="GtkTreeSortable"/>
     <property name="collection" type="GcrCollection" flags="227"/>
     <property name="columns" type="gpointer" flags="235"/>
-    <property name="mode" type="GcrCollectionModelMode" flags="235"/>
+    <property name="mode" type="GcrCollectionModelMode" flags="235" default-value="GCR_COLLECTION_MODEL_TREE"/>
   </class>
   <class name="GcrComboSelector" get-type="gcr_combo_selector_get_type" parents="GtkComboBox,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
     <implements name="AtkImplementorIface"/>
@@ -48,7 +48,7 @@
   </class>
   <class name="GcrFailureRenderer" get-type="gcr_failure_renderer_get_type" parents="GObject">
     <implements name="GcrRenderer"/>
-    <property name="label" type="gchararray" flags="227"/>
+    <property name="label" type="gchararray" flags="227" default-value=""/>
     <property name="attributes" type="GckAttributes" flags="227"/>
   </class>
   <class name="GcrImportButton" get-type="gcr_import_button_get_type" parents="GtkButton,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
@@ -74,10 +74,10 @@
     <implements name="AtkImplementorIface"/>
     <implements name="GtkBuildable"/>
     <implements name="GcrPrompt"/>
-    <property name="password-visible" type="gboolean" flags="225"/>
-    <property name="confirm-visible" type="gboolean" flags="225"/>
-    <property name="warning-visible" type="gboolean" flags="225"/>
-    <property name="choice-visible" type="gboolean" flags="225"/>
+    <property name="password-visible" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="confirm-visible" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="warning-visible" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="choice-visible" type="gboolean" flags="225" default-value="FALSE"/>
   </class>
   <class name="GcrSecureEntryBuffer" get-type="gcr_secure_entry_buffer_get_type" parents="GtkEntryBuffer,GObject">
   </class>
@@ -91,15 +91,15 @@
   <class name="GcrUnlockOptionsWidget" get-type="gcr_unlock_options_widget_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
     <implements name="AtkImplementorIface"/>
     <implements name="GtkBuildable"/>
-    <property name="choice" type="gchararray" flags="227"/>
-    <property name="ttl" type="guint" flags="227"/>
+    <property name="choice" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="ttl" type="guint" flags="227" default-value="0"/>
   </class>
   <class name="GcrViewerWidget" get-type="gcr_viewer_widget_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
     <implements name="AtkImplementorIface"/>
     <implements name="GtkBuildable"/>
     <implements name="GtkOrientable"/>
     <property name="parser" type="GcrParser" flags="225"/>
-    <property name="display-name" type="gchararray" flags="227"/>
+    <property name="display-name" type="gchararray" flags="227" default-value="NULL"/>
     <signal name="added" return="void" when="last">
       <param type="GObject"/>
       <param type="GcrParsed"/>

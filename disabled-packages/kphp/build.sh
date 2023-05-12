@@ -32,12 +32,6 @@ termux_step_post_get_source() {
 termux_step_pre_configure() {
 	LDFLAGS+=" -landroid-execinfo"
 
-	_NEED_DUMMY_LIBPTHREAD_A=
-	_LIBPTHREAD_A=$TERMUX_PREFIX/lib/libpthread.a
-	if [ ! -e $_LIBPTHREAD_A ]; then
-		_NEED_DUMMY_LIBPTHREAD_A=true
-		echo '!<arch>' > $_LIBPTHREAD_A
-	fi
 	CFLAGS="-I$TERMUX_PREFIX/include/openssl-1.1 $CFLAGS"
 	CPPFLAGS="-I$TERMUX_PREFIX/include/openssl-1.1 $CPPFLAGS"
 	CXXFLAGS="-I$TERMUX_PREFIX/include/openssl-1.1 $CXXFLAGS"
@@ -62,10 +56,4 @@ termux_step_post_configure() {
 			-o ${bin}/${exe}
 	done
 	export PATH=$bin:$PATH
-}
-
-termux_step_post_make_install() {
-	if [ $_NEED_DUMMY_LIBPTHREAD_A ]; then
-		rm -f $_LIBPTHREAD_A
-	fi
 }

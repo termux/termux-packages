@@ -6,6 +6,7 @@ termux_setup_gir() {
 		args="${args// --enable-introspection=yes / --enable-introspection=no }"
 		args="${args// --enable-vala / --disable-vala }"
 		args="${args// --enable-vala=yes / --enable-vala=no }"
+		args="${args// -DENABLE_GIR=ON / -DENABLE_GIR=OFF }"
 		args="${args// -DENABLE_GOBJECT_INTROSPECTION=ON / -DENABLE_GOBJECT_INTROSPECTION=OFF }"
 		args="${args// -DENABLE_INTROSPECTION=ON / -DENABLE_INTROSPECTION=OFF }"
 		args="${args// -Dbuild_introspection_data=true / -Dbuild_introspection_data=false }"
@@ -80,6 +81,7 @@ termux_setup_gir() {
 				unset LD_LIBRARY_PATH
 			EOF
 			sed 1d "$TERMUX_SCRIPTDIR/packages/ldd/ldd.in" >> "$ldd"
+			sed -i 's|@READELF@|'"$(command -v readelf)"'|g' "$ldd"
 			chmod 0700 "$ldd"
 		fi
 	fi

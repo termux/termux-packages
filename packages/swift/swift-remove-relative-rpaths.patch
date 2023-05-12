@@ -1,0 +1,69 @@
+diff --git a/llbuild/products/llbuildSwift/CMakeLists.txt b/llbuild/products/llbuildSwift/CMakeLists.txt
+index aabc3f2e..168f939c 100644
+--- a/llbuild/products/llbuildSwift/CMakeLists.txt
++++ b/llbuild/products/llbuildSwift/CMakeLists.txt
+@@ -64,8 +64,8 @@ else()
+     Foundation)
+   if(NOT CMAKE_SYSTEM_NAME STREQUAL Windows)
+     target_link_options(llbuildSwift PRIVATE "SHELL:-no-toolchain-stdlib-rpath")
+-    set_target_properties(llbuildSwift PROPERTIES
+-      INSTALL_RPATH "$ORIGIN:$ORIGIN/../../$<LOWER_CASE:${CMAKE_SYSTEM_NAME}>")
++#    set_target_properties(llbuildSwift PROPERTIES
++ #     INSTALL_RPATH "$ORIGIN:$ORIGIN/../../$<LOWER_CASE:${CMAKE_SYSTEM_NAME}>")
+   endif()
+ endif()
+ set_target_properties(llbuildSwift PROPERTIES
+diff --git a/sourcekit-lsp/Utilities/build-script-helper.py b/sourcekit-lsp/Utilities/build-script-helper.py
+index bd31bec..737c8c3 100755
+--- a/sourcekit-lsp/Utilities/build-script-helper.py
++++ b/sourcekit-lsp/Utilities/build-script-helper.py
+@@ -124,7 +124,7 @@ def get_swiftpm_options(swift_exec: str, args: argparse.Namespace) -> List[str]:
+             'android-', args.cross_compile_host)):
+         swiftpm_args += [
+             '-Xlinker', '-landroid-spawn',
+-            '-Xlinker', '-rpath', '-Xlinker', '$ORIGIN/../lib/swift/android',
++            #'-Xlinker', '-rpath', '-Xlinker', '$ORIGIN/../lib/swift/android',
+             # SwiftPM will otherwise try to compile against GNU strerror_r on
+             # Android and fail.
+             '-Xswiftc', '-Xcc', '-Xswiftc', '-U_GNU_SOURCE',
+diff --git a/swift-corelibs-foundation/Sources/Tools/plutil/CMakeLists.txt b/swift-corelibs-foundation/Sources/Tools/plutil/CMakeLists.txt
+index b1c84350..35413f0b 100644
+--- a/swift-corelibs-foundation/Sources/Tools/plutil/CMakeLists.txt
++++ b/swift-corelibs-foundation/Sources/Tools/plutil/CMakeLists.txt
+@@ -27,8 +27,8 @@ if(NOT CMAKE_SYSTEM_NAME MATCHES "Darwin|Windows")
+   set_target_properties(plutil PROPERTIES BUILD_RPATH ${CMAKE_MATCH_1})
+ endif()
+ 
+-set_target_properties(plutil PROPERTIES
+-  INSTALL_RPATH "$ORIGIN/../lib/swift/$<LOWER_CASE:${CMAKE_SYSTEM_NAME}>")
++#set_target_properties(plutil PROPERTIES
++ # INSTALL_RPATH "$ORIGIN/../lib/swift/$<LOWER_CASE:${CMAKE_SYSTEM_NAME}>")
+ 
+ 
+ set_property(GLOBAL APPEND PROPERTY Foundation_EXPORTS plutil)
+diff --git a/swift-driver/Utilities/build-script-helper.py b/swift-driver/Utilities/build-script-helper.py
+index ce6523d5..e8d63bdd 100755
+--- a/swift-driver/Utilities/build-script-helper.py
++++ b/swift-driver/Utilities/build-script-helper.py
+@@ -101,7 +101,7 @@ def get_swiftpm_options(args):
+         'android-', args.cross_compile_hosts[0])):
+       swiftpm_args += [
+         '-Xlinker', '-landroid-spawn',
+-        '-Xlinker', '-rpath', '-Xlinker', '$ORIGIN/../lib/swift/android',
++        #'-Xlinker', '-rpath', '-Xlinker', '$ORIGIN/../lib/swift/android',
+         # SwiftPM will otherwise try to compile against GNU strerror_r on
+         # Android and fail.
+         '-Xswiftc', '-Xcc', '-Xswiftc', '-U_GNU_SOURCE',
+diff --git a/swiftpm/Utilities/bootstrap b/swiftpm/Utilities/bootstrap
+index 92c368a86..e9d43b599 100755
+--- a/swiftpm/Utilities/bootstrap
++++ b/swiftpm/Utilities/bootstrap
+@@ -785,7 +785,7 @@ def get_swiftpm_flags(args):
+     platform_path = None
+     for path in args.target_info["paths"]["runtimeLibraryPaths"]:
+         platform_path = re.search(r"(lib/swift/([^/]+))$", path)
+-        if platform_path:
++        if not platform_path:
+             build_flags.extend(
+                 [
+                     "-Xlinker",

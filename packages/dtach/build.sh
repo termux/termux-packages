@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://dtach.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://dtach.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="Emulates the detach feature of screen"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

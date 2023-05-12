@@ -2,12 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://www.nushell.sh
 TERMUX_PKG_DESCRIPTION="A new type of shell operating on structured data"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.75.0"
+TERMUX_PKG_VERSION="0.79.0"
 TERMUX_PKG_SRCURL=https://github.com/nushell/nushell/archive/$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=c023d55b694b82b185a88e9e195f382870ecda2049e6833b375449791056ec0f
+TERMUX_PKG_SHA256=cbabc26ce509c672db943f3ac6d44d1e3efbafc3b5929411ac209afe14848ef7
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="openssl, zlib"
-TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--features=extra"
 
@@ -23,8 +22,8 @@ termux_step_pre_configure() {
 		RUSTFLAGS+=" -C link-arg=-latomic"
 	elif [ $TERMUX_ARCH = "x86_64" ]; then
 		pushd $_CARGO_TARGET_LIBDIR
-		local libgcc="$($CC -print-libgcc-file-name)"
-		echo "INPUT($libgcc -l:libunwind.a)" >libgcc.so
+		RUSTFLAGS+=" -C link-arg=$($CC -print-libgcc-file-name)"
+		echo "INPUT(-l:libunwind.a)" >libgcc.so
 		popd
 	fi
 

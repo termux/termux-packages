@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Light-weight cryptographic and SSL/TLS library"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_SRCURL=git+https://github.com/ARMmbed/mbedtls
-TERMUX_PKG_VERSION=3.3.0
+TERMUX_PKG_VERSION=3.4.0
 TERMUX_PKG_GIT_BRANCH=mbedtls-$TERMUX_PKG_VERSION
 TERMUX_PKG_BREAKS="mbedtls-dev"
 TERMUX_PKG_REPLACES="mbedtls-dev"
@@ -19,9 +19,9 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_post_get_source() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them
 	# after SOVERSION is changed.
-	local _SOVER_crypto=13
+	local _SOVER_crypto=14
 	local _SOVER_tls=19
-	local _SOVER_x509=4
+	local _SOVER_x509=5
 
 	local f
 	for f in crypto tls x509; do

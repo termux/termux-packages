@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://w3m.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://w3m.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="Text based Web browser and pager"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"

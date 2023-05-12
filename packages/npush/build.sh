@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://npush.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://npush.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="Curses-based logic game similar to Sokoban and Boulder Dash"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Dmitry Marakasov <amdmi3@amdmi3.ru>"

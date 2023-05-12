@@ -1,20 +1,19 @@
 --- a/make.lua	2022-03-30 20:11:02.703964364 +0530
 +++ b/make.lua	2022-03-30 20:12:54.763964322 +0530
 @@ -4,6 +4,9 @@
-
- lm.bindir = "bin"
+     }
+ end
 
 +lm.flags = "@FLAGS@"
 +lm.ldflags = "@LDFLAGS@"
 +
- ---@diagnostic disable-next-line: codestyle-check
- lm.EXE_DIR = ""
+ local includeCodeFormat = true
 
-@@ -144,6 +147,5 @@
+ require "make.detect_platform"
+@@ -109,5 +112,5 @@
  }
 
  lm:default {
--    "bee-test",
 -    "unit-test",
 +  "all",
  }

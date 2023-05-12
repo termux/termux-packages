@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://freeglut.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://freeglut.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="Provides functionality for small OpenGL programs"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"

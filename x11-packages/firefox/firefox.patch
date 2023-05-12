@@ -24,9 +24,9 @@ diff -uNr firefox-105.0.3/build/autoconf/android.m4 firefox-105.0.3.mod/build/au
  case "$target" in
 -*-android*|*-linuxandroid*)
 +no-android)
-     dnl $android_* will be set for us by Python configure.
-     directory_include_args="-isystem $android_system -isystem $android_sysroot/usr/include"
- 
+     dnl $extra_android_flags will be set for us by Python configure.
+     LDFLAGS="$extra_android_flags $LDFLAGS"
+     CPPFLAGS="$extra_android_flags $CPPFLAGS"
 diff -uNr firefox-105.0.3/build/moz.configure/init.configure firefox-105.0.3.mod/build/moz.configure/init.configure
 --- firefox-105.0.3/build/moz.configure/init.configure	2022-10-08 00:40:07.000000000 +0900
 +++ firefox-105.0.3.mod/build/moz.configure/init.configure	2022-10-15 09:48:55.153535797 +0900
@@ -91,7 +91,7 @@ diff -uNr firefox-105.0.3/dom/media/CubebUtils.cpp firefox-105.0.3.mod/dom/media
  
 -#if (defined(XP_LINUX) && !defined(MOZ_WIDGET_ANDROID)) || \
 +#if (defined(XP_LINUX) && !defined(__TERMUX__)) || \
-     defined(XP_MACOSX) || (defined(XP_WIN) && !defined(_ARM64_))
+     defined(XP_MACOSX) || defined(XP_WIN)
  #  define MOZ_CUBEB_REMOTING
  #endif
 diff -uNr firefox-105.0.3/dom/media/moz.build firefox-105.0.3.mod/dom/media/moz.build
@@ -321,6 +321,15 @@ diff -uNr firefox-105.0.3/toolkit/moz.configure firefox-105.0.3.mod/toolkit/moz.
      return False
  
  
+@@ -2901,7 +2901,7 @@
+     "MOZ_NORMANDY",
+ )
+ def data_reporting(telemetry, healthreport, crashreporter, normandy):
+-    return telemetry or healthreport or crashreporter or normandy
++    return False
+ 
+ 
+ set_config("MOZ_DATA_REPORTING", True, when=data_reporting)
 @@ -2968,8 +2963,8 @@
  
  # Enable runtime logging
@@ -414,12 +423,3 @@ diff -uNr firefox-105.0.3/old-configure.in firefox-105.0.3.mod/old-configure.in
      CFLAGS=$_SAVE_CFLAGS
      AC_MSG_CHECKING([for -z noexecstack option to ld])
      _SAVE_LDFLAGS=$LDFLAGS
-@@ -1299,7 +1299,7 @@
- dnl If we have any service that uploads data (and requires data submission
- dnl policy alert), set MOZ_DATA_REPORTING.
- dnl We need SUBST for build system and DEFINE for xul preprocessor.
--if test -n "$MOZ_TELEMETRY_REPORTING" || test -n "$MOZ_SERVICES_HEALTHREPORT" || test -n "$MOZ_CRASHREPORTER"  || test -n "$MOZ_NORMANDY"; then
-+if false; then
-   MOZ_DATA_REPORTING=1
-   AC_DEFINE(MOZ_DATA_REPORTING)
-   AC_SUBST(MOZ_DATA_REPORTING)

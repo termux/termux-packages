@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Collection of libraries providing APIs to netlink protoc
 TERMUX_PKG_LICENSE="LGPL-2.1, GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.7.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/thom311/libnl/releases/download/libnl${TERMUX_PKG_VERSION//./_}/libnl-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=9fe43ccbeeea72c653bdcf8c93332583135cda46a79507bfd0a483bb57f65939
 TERMUX_PKG_AUTO_UPDATE=true
@@ -33,5 +33,23 @@ termux_step_post_get_source() {
 }
 
 termux_step_pre_configure() {
+	local _inc="$TERMUX_PKG_SRCDIR/_getsubopt/include"
+	rm -rf "${_inc}"
+	mkdir -p "${_inc}"
+	cp "$TERMUX_PKG_BUILDER_DIR/getsubopt.h" "${_inc}"
+
+	CPPFLAGS+=" -I${_inc}"
+
+	local _lib="$TERMUX_PKG_BUILDDIR/_getsubopt/lib"
+	rm -rf "${_lib}"
+	mkdir -p "${_lib}"
+	pushd "${_lib}"/..
+	$CC $CFLAGS $CPPFLAGS "$TERMUX_PKG_BUILDER_DIR/getsubopt.c" \
+		-fvisibility=hidden -c -o ./getsubopt.o
+	$AR cru "${_lib}"/libgetsubopt.a ./getsubopt.o
+	popd
+
+	LDFLAGS+=" -L${_lib} -l:libgetsubopt.a"
+
 	CFLAGS+=" -Dsockaddr_storage=__kernel_sockaddr_storage"
 }

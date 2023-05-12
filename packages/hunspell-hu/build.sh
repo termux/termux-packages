@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://magyarispell.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://magyarispell.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="Hungarian dictionary for hunspell"
 TERMUX_PKG_LICENSE="MPL-2.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"

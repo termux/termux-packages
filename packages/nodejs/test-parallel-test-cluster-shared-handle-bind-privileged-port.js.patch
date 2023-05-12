@@ -1,0 +1,22 @@
+--- ./test/parallel/test-cluster-shared-handle-bind-privileged-port.js.orig	2023-04-29 17:47:19.747195574 +0530
++++ ./test/parallel/test-cluster-shared-handle-bind-privileged-port.js	2023-04-29 17:56:19.539332466 +0530
+@@ -21,6 +21,19 @@
+ 
+ 'use strict';
+ const common = require('../common');
++const {readFileSync} = require('fs');
++
++if (common.isLinux || process.platform === 'android') {
++  try {
++    const unprivilegedPortStart = parseInt(readFileSync('/proc/sys/net/ipv4/ip_unprivileged_port_start'));
++    if (unprivilegedPortStart <= 42) {
++      common.skip('Port 42 is unprivileged');
++    }
++  } catch {
++    // Do nothing, feature doesn't exist, minimum is 1024 so 42 is usable.
++    // Continue...
++  }
++}
+ 
+ // Skip on OS X Mojave. https://github.com/nodejs/node/issues/21679
+ if (common.isOSX)

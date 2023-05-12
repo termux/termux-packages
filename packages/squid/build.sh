@@ -3,10 +3,9 @@ TERMUX_PKG_DESCRIPTION="Full-featured Web proxy cache server"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 _MAJOR_VERSION=5
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}.7
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=${_MAJOR_VERSION}.9
 TERMUX_PKG_SRCURL=https://squid.mirror.globo.tech/archive/${_MAJOR_VERSION}/squid-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=6b0753aaba4c9c4efd333e67124caecf7ad6cc2d38581f19d2f0321f5b7ecd81
+TERMUX_PKG_SHA256=3fe5c2007da2757446af91b6ef974f154b208120a9a39396ea681e5c4abb04b5
 TERMUX_PKG_DEPENDS="libc++, libcrypt, libexpat, libgnutls, libltdl, libnettle, libxml2, openldap, resolv-conf"
 
 #disk-io uses XSI message queue which are not available on Android.

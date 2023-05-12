@@ -1,13 +1,12 @@
 TERMUX_PKG_HOMEPAGE=http://www.nongnu.org/nmh/
 TERMUX_PKG_DESCRIPTION="Powerful electronic mail handling system"
-TERMUX_PKG_LICENSE="BSD"
+TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.7.1
-TERMUX_PKG_REVISION=9
-TERMUX_PKG_SRCURL=http://download.savannah.nongnu.org/releases/nmh/nmh-$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=f1fb94bbf7d95fcd43277c7cfda55633a047187f57afc6c1bb9321852bd07c11
-TERMUX_PKG_DEPENDS="gdbm, libdb, libiconv, libsasl, openssl"
-TERMUX_PKG_BUILD_DEPENDS="ncurses"
+TERMUX_PKG_VERSION=1.8
+TERMUX_PKG_SRCURL=https://download-mirror.savannah.gnu.org/releases/nmh/nmh-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=366ce0ce3f9447302f5567009269c8bb3882d808f33eefac85ba367e875c8615
+TERMUX_PKG_DEPENDS="gdbm, libcurl, libiconv, libsasl, ncurses, openssl, readline"
+TERMUX_PKG_BUILD_IN_SRC=true
 
 # We don't have complete sendmail utility.
 # Using here a one from busybox, even if it may not work.

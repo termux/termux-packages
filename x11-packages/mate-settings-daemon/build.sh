@@ -11,4 +11,3 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --without-libcanberra
 --without-libmatemixer
 "
-TERMUX_PKG_RM_AFTER_INSTALL="share/glib-2.0/schemas/gschemas.compiled"

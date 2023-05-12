@@ -142,13 +142,14 @@ PACKAGES+=" re2c"
 
 # Needed by composer.
 PACKAGES+=" php"
+PACKAGES+=" php-xml"
 PACKAGES+=" composer"
 
 # Needed by package rust.
 PACKAGES+=" libssl-dev" # Needed to build Rust
-PACKAGES+=" llvm-13-dev"
-PACKAGES+=" llvm-13-tools"
-PACKAGES+=" clang-13"
+PACKAGES+=" llvm-14-dev"
+PACKAGES+=" llvm-14-tools"
+PACKAGES+=" clang-14"
 
 # Needed for package smalltalk.
 PACKAGES+=" libsigsegv-dev"
@@ -222,6 +223,7 @@ PACKAGES+=" python-setuptools"
 PACKAGES+=" python3-xcbgen"
 PACKAGES+=" sassc"
 PACKAGES+=" texlive-extra-utils"
+PACKAGES+=" unifdef"
 PACKAGES+=" wayland-scanner++"
 PACKAGES+=" xfce4-dev-tools"
 PACKAGES+=" xfonts-utils"
@@ -244,6 +246,9 @@ PACKAGES+=" triehash"
 
 # Needed by aspell dictionaries.
 PACKAGES+=" aspell"
+
+# Needed by package gdb.
+PACKAGES+=" guile-3.0-dev"
 
 # Needed by package kphp.
 PACKAGES+=" python3-jsonschema"

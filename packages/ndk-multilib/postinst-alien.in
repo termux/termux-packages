@@ -1,0 +1,13 @@
+
+for triple in aarch64-linux-android arm-linux-androideabi i686-linux-android x86_64-linux-android; do
+	if [ x"$native_triple" = x"$triple" ] ||
+	   { [ x"$native_triple" = x"aarch64-linux-android" ] && [ "$triple" = "arm-linux-androideabi" ]; } ||
+	   { [ x"$native_triple" = x"x86_64-linux-android" ] && [ "$triple" = "i686-linux-android" ]; }; then
+		continue
+	fi
+	for so in libc.so libdl.so liblog.so libm.so libc.a libdl.a libm.a; do
+		@COMMAND@
+	done
+done
+
+exit 0

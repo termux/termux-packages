@@ -103,4 +103,14 @@ termux_step_start_build() {
 			7c29143b9cffb3a9a580f39a7966b2bb36c5fc099da6f4c98dcdedacb14f08a2
 		chmod u+x "$TERMUX_ELF_CLEANER"
 	fi
+
+	# Some packages search for libutil, libpthread and librt even
+	# though this functionality is provided by libc.  Provide
+	# library stubs so that such configure checks succeed.
+	mkdir -p "$TERMUX_PREFIX/lib"
+	for lib in libutil.so libpthread.so librt.so; do
+		if [ ! -f $TERMUX_PREFIX/lib/$lib ]; then
+			echo 'INPUT(-lc)' > $TERMUX_PREFIX/lib/$lib
+		fi
+	done
 }

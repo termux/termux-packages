@@ -1,0 +1,51 @@
+--- a/cube/CMakeLists.txt
++++ b/cube/CMakeLists.txt
+@@ -121,8 +121,6 @@
+         set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /guard:cf")
+         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /guard:cf")
+     endif()
+-elseif(ANDROID)
+-    add_definitions(-DVK_USE_PLATFORM_ANDROID_KHR)
+ elseif(APPLE)
+     add_definitions(-DVK_USE_PLATFORM_METAL_EXT)
+ elseif(UNIX AND NOT APPLE) # i.e. Linux
+--- a/cube/cube.c
++++ b/cube/cube.c
+@@ -48,7 +48,7 @@
+ #define APP_NAME_STR_LEN 80
+ #endif  // _WIN32
+ 
+-#ifdef ANDROID
++#if defined(ANDROID) && !defined(__TERMUX__)
+ #include "vulkan_wrapper.h"
+ #else
+ #include <vulkan/vulkan.h>
+@@ -98,7 +98,7 @@
+     fflush(stdout);
+ }
+ 
+-#elif defined __ANDROID__
++#elif defined(__ANDROID__) && !defined(__TERMUX__)
+ #include <android/log.h>
+ #define ERR_EXIT(err_msg, err_class)                                           \
+     do {                                                                       \
+@@ -567,7 +567,7 @@
+     if (!demo->suppress_popups) MessageBox(NULL, message, "Alert", MB_OK);
+     in_callback = false;
+ 
+-#elif defined(ANDROID)
++#elif defined(ANDROID) && !defined(__TERMUX__)
+ 
+     if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT) {
+         __android_log_print(ANDROID_LOG_INFO, APP_SHORT_NAME, "%s", message);
+--- a/cube/cube.cpp
++++ b/cube/cube.cpp
+@@ -1098,7 +1098,7 @@
+         demo.in_callback = false;
+     }
+ 
+-#elif defined(ANDROID)
++#elif defined(ANDROID) && !defined(__TERMUX__)
+ 
+     if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT) {
+         __android_log_print(ANDROID_LOG_INFO, APP_SHORT_NAME, "%s", message.str());

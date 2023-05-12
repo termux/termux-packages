@@ -12,6 +12,8 @@ TERMUX_PKG_DEPENDS="ncurses, resolv-conf"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
+	autoreconf -fi -Iautoconf_local
+
 	CFLAGS+=" -fcommon"
 
 	export ac_cv_path_TAR=$TERMUX_PREFIX/bin/tar

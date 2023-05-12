@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://xmlstar.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://xmlstar.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="Command line XML toolkit"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"

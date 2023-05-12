@@ -32,6 +32,8 @@
 #include "../src/namespace.h"
 #include <complex.h>
 
+long double complex casinl(long double complex);
+
 long double complex
 casinhl(long double complex z)
 {

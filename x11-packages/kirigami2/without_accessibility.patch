@@ -2,19 +2,17 @@ Qt build on Termux doesn't have accessibility feature. It needs to be removed.
 diff -uNr kirigami2-5.100.0/src/controls/Avatar.qml kirigami2-5.100.0.mod/src/controls/Avatar.qml
 --- kirigami2-5.100.0/src/controls/Avatar.qml	2022-11-05 20:28:40.000000000 +0800
 +++ kirigami2-5.100.0.mod/src/controls/Avatar.qml	2022-12-03 12:57:42.000000000 +0800
-@@ -159,12 +159,6 @@
+@@ -159,10 +159,6 @@
  
      activeFocusOnTab: !!actions.main
  
 -    Accessible.role: !!actions.main ? Accessible.Button : Accessible.Graphic
 -    Accessible.name: !!actions.main ? qsTr("%1 — %2").arg(name).arg(actions.main.text) : name
 -    Accessible.focusable: !!actions.main
--    Accessible.onPressAction: {
--        avatarRoot.actions.main.trigger()
--    }
-     Keys.onEnterPressed: if (!!avatarRoot.actions.main.trigger()) avatarRoot.actions.main.trigger()
-     Keys.onSpacePressed: if (!!avatarRoot.actions.main.trigger()) avatarRoot.actions.main.trigger()
- 
+-    Accessible.onPressAction: __triggerMainAction()
+     Keys.onReturnPressed: event => __triggerMainAction()
+     Keys.onEnterPressed: event => __triggerMainAction()
+     Keys.onSpacePressed: event => __triggerMainAction()
 diff -uNr kirigami2-5.100.0/src/controls/FormLayout.qml kirigami2-5.100.0.mod/src/controls/FormLayout.qml
 --- kirigami2-5.100.0/src/controls/FormLayout.qml	2022-11-05 20:28:40.000000000 +0800
 +++ kirigami2-5.100.0.mod/src/controls/FormLayout.qml	2022-12-03 12:57:40.000000000 +0800
@@ -180,7 +178,7 @@ diff -uNr kirigami2-5.100.0/src/controls/swipenavigator/templates/PageTab.qml ki
 -    Accessible.focusable: true
 -    Accessible.onPressAction: control.clicked()
 -
-     Keys.onPressed: {
+     Keys.onPressed: event => {
          if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return) {
              control.clicked()
 diff -uNr kirigami2-5.100.0/src/controls/templates/AbstractListItem.qml kirigami2-5.100.0.mod/src/controls/templates/AbstractListItem.qml

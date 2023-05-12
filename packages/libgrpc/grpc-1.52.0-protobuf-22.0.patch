@@ -1,0 +1,58 @@
+--- a/include/grpcpp/impl/codegen/config_protobuf.h
++++ b/include/grpcpp/impl/codegen/config_protobuf.h
+@@ -69,7 +69,7 @@
+ #include <google/protobuf/util/json_util.h>
+ #include <google/protobuf/util/type_resolver_util.h>
+ #define GRPC_CUSTOM_JSONUTIL ::google::protobuf::util
+-#define GRPC_CUSTOM_UTIL_STATUS ::google::protobuf::util::Status
++#define GRPC_CUSTOM_UTIL_STATUS ::absl::Status
+ #endif
+ 
+ namespace grpc {
+--- a/src/compiler/config_protobuf.h
++++ b/src/compiler/config_protobuf.h
+@@ -50,7 +50,7 @@
+ #endif
+ 
+ #ifndef GRPC_CUSTOM_CSHARP_GETCLASSNAME
+-#include <google/protobuf/compiler/csharp/csharp_names.h>
++#include <google/protobuf/compiler/csharp/names.h>
+ #define GRPC_CUSTOM_CSHARP_GETCLASSNAME \
+   ::google::protobuf::compiler::csharp::GetClassName
+ #define GRPC_CUSTOM_CSHARP_GETFILENAMESPACE \
+--- a/src/compiler/objective_c_generator.cc
++++ b/src/compiler/objective_c_generator.cc
+@@ -22,7 +22,8 @@
+ #include <set>
+ #include <sstream>
+ 
+-#include <google/protobuf/compiler/objectivec/objectivec_helpers.h>
++#include <google/protobuf/compiler/objectivec/helpers.h>
++#include <google/protobuf/compiler/objectivec/names.h>
+ 
+ #include "src/compiler/config.h"
+ #include "src/compiler/objective_c_generator_helpers.h"
+--- a/src/compiler/objective_c_generator_helpers.h
++++ b/src/compiler/objective_c_generator_helpers.h
+@@ -21,7 +21,8 @@
+ 
+ #include <map>
+ 
+-#include <google/protobuf/compiler/objectivec/objectivec_helpers.h>
++#include <google/protobuf/compiler/objectivec/helpers.h>
++#include <google/protobuf/compiler/objectivec/names.h>
+ 
+ #include "src/compiler/config.h"
+ #include "src/compiler/generator_helpers.h"
+--- a/src/compiler/objective_c_plugin.cc
++++ b/src/compiler/objective_c_plugin.cc
+@@ -20,7 +20,8 @@
+ 
+ #include <memory>
+ 
+-#include <google/protobuf/compiler/objectivec/objectivec_helpers.h>
++#include <google/protobuf/compiler/objectivec/helpers.h>
++#include <google/protobuf/compiler/objectivec/names.h>
+ 
+ #include "src/compiler/config.h"
+ #include "src/compiler/objective_c_generator.h"

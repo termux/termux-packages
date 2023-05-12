@@ -1,0 +1,223 @@
+From 821cefb965d8c05e2791b031eb6448bd67d36572 Mon Sep 17 00:00:00 2001
+From: CosineMath <boat_jvm@qq.com>
+Date: Wed, 22 Sep 2021 00:11:10 +0800
+Subject: [PATCH 2/6] android: build and use egl platform on Android without
+ libdrm and libgbm.
+
+---
+ src/vrend_renderer.c   |  2 +-
+ src/vrend_renderer.h   |  5 +++++
+ src/vrend_winsys.c     | 14 +++++++++-----
+ src/vrend_winsys.h     |  2 ++
+ src/vrend_winsys_egl.c | 21 ++++++++++++++++-----
+ 5 files changed, 33 insertions(+), 11 deletions(-)
+
+diff --git a/src/vrend_renderer.c b/src/vrend_renderer.c
+index 4b7ee369..78dbe4b9 100644
+--- a/src/vrend_renderer.c
++++ b/src/vrend_renderer.c
+@@ -12283,7 +12283,7 @@ vrend_renderer_pipe_resource_set_type(struct vrend_context *ctx,
+ 
+    /* resource is still untyped */
+    if (!res->pipe_resource) {
+-#ifdef HAVE_EPOXY_EGL_H
++#if defined(HAVE_EPOXY_EGL_H) && !defined(EGL_WITHOUT_GBM)
+       const struct vrend_renderer_resource_create_args create_args = {
+          .target = PIPE_TEXTURE_2D,
+          .format = args->format,
+diff --git a/src/vrend_renderer.h b/src/vrend_renderer.h
+index 2aedf50e..c8ca418c 100644
+--- a/src/vrend_renderer.h
++++ b/src/vrend_renderer.h
+@@ -32,7 +32,12 @@
+ #include "vrend_debug.h"
+ #include "vrend_tweaks.h"
+ #include "vrend_iov.h"
++#ifdef EGL_WITHOUT_GBM
++#define VIRGL_GBM_MAX_PLANES 4
++#include "virglrenderer.h"
++#else
+ #include "vrend_winsys_gbm.h"
++#endif
+ #include "virgl_hw.h"
+ #include <epoxy/gl.h>
+ 
+diff --git a/src/vrend_winsys.c b/src/vrend_winsys.c
+index 6a73b7fd..eea16ec8 100644
+--- a/src/vrend_winsys.c
++++ b/src/vrend_winsys.c
+@@ -52,6 +52,7 @@ int vrend_winsys_init(uint32_t flags, int preferred_fd)
+ {
+    if (flags & VIRGL_RENDERER_USE_EGL) {
+ #ifdef HAVE_EPOXY_EGL_H
++#ifndef EGL_WITHOUT_GBM
+       /*
+        * If the user specifies a preferred DRM fd and we can't use it, fail. If the user doesn't
+        * specify an fd, it's possible to initialize EGL without one.
+@@ -59,15 +60,16 @@ int vrend_winsys_init(uint32_t flags, int preferred_fd)
+       gbm = virgl_gbm_init(preferred_fd);
+       if (preferred_fd > 0 && !gbm)
+          return -1;
+-
++#endif
+       egl = virgl_egl_init(gbm, flags & VIRGL_RENDERER_USE_SURFACELESS,
+                            flags & VIRGL_RENDERER_USE_GLES);
+       if (!egl) {
++#ifndef EGL_WITHOUT_GBM
+          if (gbm) {
+             virgl_gbm_fini(gbm);
+             gbm = NULL;
+          }
+-
++#endif
+          return -1;
+       }
+ 
+@@ -99,10 +101,12 @@ void vrend_winsys_cleanup(void)
+       virgl_egl_destroy(egl);
+       egl = NULL;
+       use_context = CONTEXT_NONE;
++#ifndef EGL_WITHOUT_GBM
+       if (gbm) {
+          virgl_gbm_fini(gbm);
+          gbm = NULL;
+       }
++#endif
+    } else if (use_context == CONTEXT_EGL_EXTERNAL) {
+       free(egl);
+       egl = NULL;
+@@ -201,7 +205,7 @@ int vrend_winsys_has_gl_colorspace(void)
+ 
+ int vrend_winsys_get_fourcc_for_texture(uint32_t tex_id, uint32_t format, int *fourcc)
+ {
+-#ifdef HAVE_EPOXY_EGL_H
++#if defined(HAVE_EPOXY_EGL_H) && !defined(EGL_WITHOUT_GBM)
+    if (use_context == CONTEXT_EGL)
+       return virgl_egl_get_fourcc_for_texture(egl, tex_id, format, fourcc);
+ #else
+@@ -214,7 +218,7 @@ int vrend_winsys_get_fourcc_for_texture(uint32_t tex_id, uint32_t format, int *f
+ 
+ int vrend_winsys_get_fd_for_texture(uint32_t tex_id, int *fd)
+ {
+-#ifdef HAVE_EPOXY_EGL_H
++#if defined(HAVE_EPOXY_EGL_H) && !defined(EGL_WITHOUT_GBM)
+    if (!egl)
+       return -1;
+ 
+@@ -228,7 +232,7 @@ int vrend_winsys_get_fd_for_texture(uint32_t tex_id, int *fd)
+ 
+ int vrend_winsys_get_fd_for_texture2(uint32_t tex_id, int *fd, int *stride, int *offset)
+ {
+-#ifdef HAVE_EPOXY_EGL_H
++#if defined(HAVE_EPOXY_EGL_H) && !defined(EGL_WITHOUT_GBM)
+    if (!egl)
+       return -1;
+ 
+diff --git a/src/vrend_winsys.h b/src/vrend_winsys.h
+index 5e605403..61891817 100644
+--- a/src/vrend_winsys.h
++++ b/src/vrend_winsys.h
+@@ -28,7 +28,9 @@
+ #include "config.h"
+ 
+ #ifdef HAVE_EPOXY_EGL_H
++#ifndef EGL_WITHOUT_GBM
+ #include "vrend_winsys_gbm.h"
++#endif
+ #include "vrend_winsys_egl.h"
+ #endif
+ 
+diff --git a/src/vrend_winsys_egl.c b/src/vrend_winsys_egl.c
+index 4b38d5ea..68adaa43 100644
+--- a/src/vrend_winsys_egl.c
++++ b/src/vrend_winsys_egl.c
+@@ -36,7 +36,9 @@
+ #include <poll.h>
+ #include <stdbool.h>
+ #include <unistd.h>
++#ifdef HAVE_LIBDRM
+ #include <xf86drm.h>
++#endif
+ 
+ #include "util/u_memory.h"
+ 
+@@ -44,7 +46,9 @@
+ #include "vrend_winsys.h"
+ #include "vrend_winsys_egl.h"
+ #include "virgl_hw.h"
++#ifndef EGL_WITHOUT_GBM
+ #include "vrend_winsys_gbm.h"
++#endif
+ #include "virgl_util.h"
+ 
+ #define EGL_KHR_SURFACELESS_CONTEXT            BIT(0)
+@@ -297,13 +301,15 @@ struct virgl_egl *virgl_egl_init(struct virgl_gbm *gbm, bool surfaceless, bool g
+ 
+    if (surfaceless)
+       conf_att[1] = EGL_PBUFFER_BIT;
++#ifndef EGL_WITHOUT_GBM
+    else if (!gbm)
+       goto fail;
+ 
+    egl->gbm = gbm;
++#endif
+    egl->different_gpu = false;
+    const char *client_extensions = eglQueryString (NULL, EGL_EXTENSIONS);
+-
++#ifndef EGL_WITHOUT_GBM
+ #ifdef ENABLE_MINIGBM_ALLOCATION
+    if (virgl_egl_get_display(egl)) {
+      /* Make -Wdangling-else happy. */
+@@ -325,15 +331,16 @@ struct virgl_egl *virgl_egl_init(struct virgl_gbm *gbm, bool surfaceless, bool g
+    } else {
+       egl->egl_display = eglGetDisplay((EGLNativeDisplayType)egl->gbm->device);
+    }
+-
++#endif
+    if (!egl->egl_display) {
++#ifndef EGL_WITHOUT_GBM
+       /*
+        * Don't fallback to the default display if the fd provided by (*get_drm_fd)
+        * can't be used.
+        */
+       if (egl->gbm && egl->gbm->fd < 0)
+          goto fail;
+-
++#endif
+       egl->egl_display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+       if (!egl->egl_display)
+          goto fail;
+@@ -430,8 +437,12 @@ struct virgl_egl *virgl_egl_init_external(EGLDisplay egl_display)
+       return NULL;
+    }
+ 
++#ifndef EGL_WITHOUT_GBM
+    gbm = virgl_gbm_init(-1);
+    egl->gbm = gbm;
++#else
++   egl->gbm = NULL;
++#endif
+ 
+    return egl;
+ }
+@@ -470,7 +481,7 @@ virgl_renderer_gl_context virgl_egl_get_current_context(UNUSED struct virgl_egl
+    EGLContext egl_ctx = eglGetCurrentContext();
+    return (virgl_renderer_gl_context)egl_ctx;
+ }
+-
++#ifndef EGL_WITHOUT_GBM
+ int virgl_egl_get_fourcc_for_texture(struct virgl_egl *egl, uint32_t tex_id, uint32_t format, int *fourcc)
+ {
+    int ret = EINVAL;
+@@ -569,7 +580,7 @@ int virgl_egl_get_fd_for_texture(struct virgl_egl *egl, uint32_t tex_id, int *fd
+    eglDestroyImageKHR(egl->egl_display, image);
+    return ret;
+ }
+-
++#endif
+ bool virgl_has_egl_khr_gl_colorspace(struct virgl_egl *egl)
+ {
+    return has_bit(egl->extension_bits, EGL_KHR_GL_COLORSPACE);
+-- 
+2.34.1
+

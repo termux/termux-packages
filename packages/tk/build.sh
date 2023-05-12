@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://tcl.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://tcl.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="A windowing toolkit for use with tcl"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="license.terms"

@@ -7,4 +7,3 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/mate-desktop/libmateweather/releases/download/v$TERMUX_PKG_VERSION/libmateweather-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=a7fd9713099c88826fb67249771cd0cdb92ee9d4784068b1a165840b84607b15
 TERMUX_PKG_DEPENDS="atk, gdk-pixbuf, glib, gtk3, harfbuzz, libcairo, libsoup, libxml2, pango"
-TERMUX_PKG_RM_AFTER_INSTALL="share/glib-2.0/schemas/gschemas.compiled"

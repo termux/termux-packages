@@ -3,12 +3,20 @@ TERMUX_PKG_DESCRIPTION="Qt 5 Web Engine Library"
 TERMUX_PKG_LICENSE="LGPL-3.0, LGPL-2.1, BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@licy183"
 TERMUX_PKG_VERSION="5.15.12"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=git+https://github.com/qt/qtwebengine
 TERMUX_PKG_GIT_BRANCH=v$TERMUX_PKG_VERSION-lts
 TERMUX_PKG_DEPENDS="fontconfig, dbus, libc++, libjpeg-turbo, libminizip, libnss, libpng, libre2, libsnappy, libvpx, libwebp, libx11, libxml2, libxslt, libxkbfile, qt5-qtbase, qt5-qtdeclarative, zlib"
-TERMUX_PKG_BUILD_DEPENDS="qt5-qtbase-cross-tools, qt5-qtdeclarative-cross-tools"
+TERMUX_PKG_BUILD_DEPENDS="libdrm, qt5-qtbase-cross-tools, qt5-qtdeclarative-cross-tools"
 TERMUX_PKG_NO_STATICSPLIT=true
+
+termux_step_pre_configure() {
+	# Certain packages are not safe to build on device because their
+	# build.sh script deletes specific files in $TERMUX_PREFIX.
+	if $TERMUX_ON_DEVICE_BUILD; then
+		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
+	fi
+}
 
 termux_step_configure() {
 	cd $TERMUX_PKG_SRCDIR
@@ -40,6 +48,7 @@ termux_step_configure() {
 	popd
 
 	# Dummy pthread, rt and resolve
+	# TODO: Patch the building system and do not dummy `librt.so`.
 	echo "INPUT(-llog -liconv -landroid-shmem)" > "$TERMUX_PREFIX/lib/librt.so"
 	echo '!<arch>' > "$TERMUX_PREFIX/lib/libpthread.a"
 	echo '!<arch>' > "$TERMUX_PREFIX/lib/libresolv.a"

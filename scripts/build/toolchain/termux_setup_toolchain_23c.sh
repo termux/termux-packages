@@ -16,11 +16,6 @@ termux_setup_toolchain_23c() {
 	export STRIP=llvm-strip
 	export NM=llvm-nm
 
-	export TERMUX_HASKELL_LLVM_BACKEND="-fllvm --ghc-option=-fllvm"
-	if [ "${TERMUX_ARCH}" = "i686" ]; then
-		TERMUX_HASKELL_LLVM_BACKEND=""
-	fi
-
 	export TERMUX_HASKELL_OPTIMISATION="-O"
 	if [ "${TERMUX_DEBUG_BUILD}" = true ]; then
 		TERMUX_HASKELL_OPTIMISATION="-O0"
@@ -113,14 +108,20 @@ termux_setup_toolchain_23c() {
 	export ac_cv_func_sigsetmask=no
 	export ac_cv_c_bigendian=no
 
-	# On Android 7, libutil functionality is provided by libc.
-	# But many programs still may search for libutil.
-	if [ ! -f $TERMUX_PREFIX/lib/libutil.so ]; then
-		mkdir -p "$TERMUX_PREFIX/lib"
-		echo 'INPUT(-lc)' > $TERMUX_PREFIX/lib/libutil.so
+	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
+		return
 	fi
 
-	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ] || [ -d $TERMUX_STANDALONE_TOOLCHAIN ]; then
+	if [ -d $TERMUX_STANDALONE_TOOLCHAIN ]; then
+		for HOST_PLAT in aarch64-linux-android armv7a-linux-androideabi i686-linux-android x86_64-linux-android arm-linux-androideabi; do
+			if [ "$TERMUX_PKG_ENABLE_CLANG16_PORTING" = "true" ]; then
+				cp $TERMUX_STANDALONE_TOOLCHAIN/bin/$HOST_PLAT-clang.16-porting \
+					$TERMUX_STANDALONE_TOOLCHAIN/bin/$HOST_PLAT-clang
+			else
+				cp $TERMUX_STANDALONE_TOOLCHAIN/bin/$HOST_PLAT-clang.no-16-porting \
+					$TERMUX_STANDALONE_TOOLCHAIN/bin/$HOST_PLAT-clang
+			fi
+		done
 		return
 	fi
 
@@ -163,6 +164,22 @@ termux_setup_toolchain_23c() {
 		$_TERMUX_TOOLCHAIN_TMPDIR/bin/arm-linux-androideabi-clang++
 	cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/armv7a-linux-androideabi-cpp \
 		$_TERMUX_TOOLCHAIN_TMPDIR/bin/arm-linux-androideabi-cpp
+
+	for HOST_PLAT in aarch64-linux-android armv7a-linux-androideabi i686-linux-android x86_64-linux-android arm-linux-androideabi; do
+		mv $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang \
+			$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang.no-16-porting
+		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang.no-16-porting \
+			$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang.16-porting
+		sed -i 's/"\$@"/--start-no-unused-arguments -Werror=implicit-function-declaration -Werror=implicit-int -Werror=int-conversion -Werror=incompatible-function-pointer-types --end-no-unused-arguments \0/g' \
+			$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang.16-porting
+		if [ "$TERMUX_PKG_ENABLE_CLANG16_PORTING" = "true" ]; then
+			cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang.16-porting \
+				$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang
+		else
+			cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang.no-16-porting \
+				$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang
+		fi
+	done
 
 	# Create a pkg-config wrapper. We use path to host pkg-config to
 	# avoid picking up a cross-compiled pkg-config later on.

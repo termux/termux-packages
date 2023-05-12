@@ -1,0 +1,58 @@
+diff -uNr a/setup_lnx.sh b/setup_lnx.sh
+--- a/setup_lnx.sh	2021-11-07 05:58:58.000000000 +0900
++++ b/setup_lnx.sh	2023-03-02 16:21:38.915372974 +0900
+@@ -38,10 +38,7 @@
+ 
+ DISTRO=
+ 
+-lsb_command=`which lsb_release 2> /dev/null`
+-if [ -z "$lsb_command" ]; then
+-  lsb_command=`which lsb_release 2> /dev/null`
+-fi
++lsb_command=
+ 
+ #Outputs from lsb_command:
+ 
+@@ -70,6 +67,8 @@
+   DISTRO=centos
+ fi
+ 
++DISTRO=termux
++
+ #Find and install packages
+ if [ "$DISTRO" == "arch" ]; then
+   echo "ArchLinux detected."
+@@ -136,22 +135,21 @@
+ echo "Building 'QB64'"
+ cp -r ./internal/source/* ./internal/temp/
+ pushd internal/c >/dev/null
+-g++ -no-pie -w qbx.cpp libqb/os/lnx/libqb_setup.o parts/video/font/ttf/os/lnx/src.o parts/core/os/lnx/src.a -lGL -lGLU -lX11 -lpthread -ldl -lrt -D FREEGLUT_STATIC -o ../../qb64
++g++ -w qbx.cpp libqb/os/lnx/libqb_setup.o parts/video/font/ttf/os/lnx/src.o parts/core/os/lnx/src.a $LDFLAGS -lGL -lGLU -lX11 -lpthread -ldl -lrt -D FREEGLUT_STATIC -o ../../qb64
+ popd
+ 
+ if [ -e "./qb64" ]; then
+   echo "Done compiling!!"
+ 
+   echo "Creating ./run_qb64.sh script..."
+-  _pwd=`pwd`
+-  echo "#!/bin/sh" > ./run_qb64.sh
++  echo "#!@TERMUX_PREFIX@/bin/sh" > ./run_qb64.sh
+   echo "cd $_pwd" >> ./run_qb64.sh
+   echo "./qb64 &" >> ./run_qb64.sh
+   
+   chmod +x ./run_qb64.sh
+   #chmod -R 777 ./
+   echo "Adding QB64 menu entry..."
+-  cat > ~/.local/share/applications/qb64.desktop <<EOF
++  cat > @TERMUX_PREFIX@/share/applications/qb64.desktop <<EOF
+ [Desktop Entry]
+ Name=QB64 Programming IDE
+ GenericName=QB64 Programming IDE
+@@ -165,7 +163,6 @@
+ EOF
+ 
+   echo "Running QB64..."
+-  ./qb64 &
+   echo "QB64 is located in this folder:"
+   echo "`pwd`"
+   echo "There is a ./run_qb64.sh script in this folder that should let you run qb64 if using the executable directly isn't working."

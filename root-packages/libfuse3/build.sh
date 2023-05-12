@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/libfuse/libfuse
 TERMUX_PKG_DESCRIPTION="FUSE (Filesystem in Userspace) is an interface for userspace programs to export a filesystem to the Linux kernel"
 TERMUX_PKG_LICENSE="LGPL-2.1, GPL-2.0"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
-TERMUX_PKG_VERSION=3.13.1
+TERMUX_PKG_VERSION=3.14.1
 TERMUX_PKG_SRCURL=https://github.com/libfuse/libfuse/archive/fuse-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=96399b09b91bc717a9e96ffea660d611e6a342547c1abd4d0e858b3dca9d5a13
+TERMUX_PKG_SHA256=99688d68a753ee97eed51d536b216b8ae5d7fe0236c1a45d439357903bfd4d88
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Ddisable-mtab=true

@@ -1,0 +1,11 @@
+--- a/lib/bash_completion
++++ b/lib/bash_completion
+@@ -10,7 +10,7 @@
+     do
+         test "${A:0:1}" = "-" || ARGS[${#ARGS[@]}]="${A//\\ / }"
+     done
+-    COMPREPLY=($(${COMP_WORDS[0]} ${ARGS[@]} /usr/lib/picolisp/lib/complete.l "${COMP_WORDS[$COMP_CWORD]}" -bye + 2>&1))
++    COMPREPLY=($(${COMP_WORDS[0]} ${ARGS[@]} @TERMUX_PREFIX@/lib/picolisp/lib/complete.l "${COMP_WORDS[$COMP_CWORD]}" -bye + 2>&1))
+     return 0
+ } &&
+ complete -o nospace  -F _pil  picolisp  &&

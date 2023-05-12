@@ -2,13 +2,13 @@ TERMUX_PKG_HOMEPAGE=https://cooklang.org
 TERMUX_PKG_DESCRIPTION="A suite of tools to create shopping lists and maintain food recipes"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
-TERMUX_PKG_MAINTAINER="@buttaface"
+TERMUX_PKG_MAINTAINER="@finagolfin"
 TERMUX_PKG_VERSION=0.1.6
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/CookLang/CookCLI/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=0ad919c950dad9375adaceb79a1cfc407a3ac776a8190de2a82fef30a02a5504
-TERMUX_PKG_DEPENDS="swift"
-TERMUX_PKG_BUILD_DEPENDS="swift"
+TERMUX_PKG_DEPENDS="swift-runtime-${TERMUX_ARCH/_/-}"
+TERMUX_PKG_BUILD_DEPENDS="swift-sdk-${TERMUX_ARCH/_/-}"
 TERMUX_PKG_BLACKLISTED_ARCHES="i686"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
@@ -16,7 +16,7 @@ TERMUX_PKG_AUTO_UPDATE=true
 termux_step_make() {
 	termux_setup_swift
 
-	# This will check out the package dependencies, so one can be patched.
+	# This will check out the package dependencies, so one can be patched first.
 	$SWIFT_BINDIR/swift package update
 
 	patch -p1 < $TERMUX_PKG_BUILDER_DIR/cook-dependencies.diff
@@ -24,7 +24,7 @@ termux_step_make() {
 	local SWIFT_FLAGS=""
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 		SWIFT_FLAGS="--destination $SWIFT_CROSSCOMPILE_CONFIG "
-		SWIFT_FLAGS+="-Xlinker -rpath -Xlinker \$ORIGIN/../lib:\$ORIGIN/../lib/swift/android"
+		SWIFT_FLAGS+="-Xlinker -rpath -Xlinker \$ORIGIN/../lib"
 		export PKG_CONFIG_PATH=$PKG_CONFIG_LIBDIR
 	fi
 	$SWIFT_BINDIR/swift build -c release -j $TERMUX_MAKE_PROCESSES $SWIFT_FLAGS

@@ -4,11 +4,11 @@ https://github.com/meganz/MEGAcmd/issues/507
 --- a/sdk/include/megaapi_impl.h
 +++ b/sdk/include/megaapi_impl.h
 @@ -3296,7 +3296,7 @@
-     void setMaxBufferSize(unsigned int bufferSize);
-     void setMaxOutputSize(unsigned int outputSize);
+     // Get the actual buffer state for debugging purposes
+     std::string bufferStatus() const;
  
 -    static const unsigned int MAX_BUFFER_SIZE = 2097152;
 +    static const unsigned int MAX_BUFFER_SIZE = (1 << 25);
-     static const unsigned int MAX_OUTPUT_SIZE = 16384;
+     static const unsigned int MAX_OUTPUT_SIZE = MAX_BUFFER_SIZE / 10;
  
- protected:
+ private:

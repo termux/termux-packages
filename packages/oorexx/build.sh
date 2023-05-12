@@ -34,21 +34,8 @@ termux_step_pre_configure() {
 		-Wl,-soname=librexxapi.so.${_SOVERSION} \
 		-o $dummylibdir/librexxapi.so
 	export DLDFLAGS="-L./.libs -L${dummylibdir}"
-
-	_NEED_DUMMY_LIBPTHREAD_A=
-	_LIBPTHREAD_A=$TERMUX_PREFIX/lib/libpthread.a
-	if [ ! -e $_LIBPTHREAD_A ]; then
-		_NEED_DUMMY_LIBPTHREAD_A=true
-		echo '!<arch>' > $_LIBPTHREAD_A
-	fi
 }
 
 termux_step_post_configure() {
 	sed -i 's:\./\(rexximage\):\1:' Makefile
-}
-
-termux_step_post_make_install() {
-	if [ $_NEED_DUMMY_LIBPTHREAD_A ]; then
-		rm -f $_LIBPTHREAD_A
-	fi
 }

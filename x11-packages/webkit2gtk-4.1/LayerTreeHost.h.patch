@@ -1,0 +1,13 @@
+https://bugs.webkit.org/show_bug.cgi?id=255718
+
+--- a/Source/WebKit/WebProcess/WebPage/CoordinatedGraphics/LayerTreeHost.h
++++ b/Source/WebKit/WebProcess/WebPage/CoordinatedGraphics/LayerTreeHost.h
+@@ -176,7 +176,7 @@
+ };
+ 
+ #if !USE(COORDINATED_GRAPHICS)
+-inline LayerTreeHost::LayerTreeHost(WebPage& webPage) : m_webPage(webPage) { }
++inline LayerTreeHost::LayerTreeHost(WebPage& webPage, WebCore::PlatformDisplayID displayID) : m_webPage(webPage), m_displayID(displayID) { }
+ inline LayerTreeHost::~LayerTreeHost() { }
+ inline void LayerTreeHost::setLayerFlushSchedulingEnabled(bool) { }
+ inline void LayerTreeHost::setShouldNotifyAfterNextScheduledLayerFlush(bool) { }

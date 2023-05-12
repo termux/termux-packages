@@ -10,3 +10,7 @@ TERMUX_PKG_DEPENDS="gdal, json-c, libc++, libgeos, libiconv, libprotobuf-c, libx
 # both configure script and Makefile(s) look for files in current
 # directory rather than srcdir, so need to build in source
 TERMUX_PKG_BUILD_IN_SRC=true
+
+termux_step_pre_configure() {
+	CXXFLAGS+=" -std=c++14"
+}

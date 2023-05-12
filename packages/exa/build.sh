@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="A modern replacement for ls"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.10.1
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=https://github.com/ogham/exa/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=ff0fa0bfc4edef8bdbbb3cabe6fdbd5481a71abbbcc2159f402dea515353ae7c
 TERMUX_PKG_AUTO_UPDATE=true
@@ -12,6 +12,16 @@ TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	termux_setup_rust
+
+	: "${CARGO_HOME:=$HOME/.cargo}"
+	export CARGO_HOME
+
+	cargo fetch --target "${CARGO_TARGET_NAME}"
+
+	local f
+	for f in $CARGO_HOME/registry/src/github.com-*/libgit2-sys-*/build.rs; do
+		sed -i -E 's/\.range_version\(([^)]*)\.\.[^)]*\)/.atleast_version(\1)/g' "${f}"
+	done
 
 	CFLAGS="$CPPFLAGS"
 }

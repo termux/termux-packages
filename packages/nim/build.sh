@@ -3,9 +3,10 @@ TERMUX_PKG_DESCRIPTION="Nim programming language compiler"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="copying.txt"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.6.10
+TERMUX_PKG_VERSION=1.6.12
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://nim-lang.org/download/nim-$TERMUX_PKG_VERSION.tar.xz
-TERMUX_PKG_SHA256=13d7702f8b57087babe8cd051c13bc56a3171418ba867b49c6bbd09b29d24fea
+TERMUX_PKG_SHA256=acef0b0ab773604d4d7394b68519edb74fb30f46912294b28bc27e0c7b4b4dc2
 TERMUX_PKG_DEPENDS="clang, git, libandroid-glob, openssl"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -55,7 +56,7 @@ termux_step_make() {
 			koch) nim_flags="--opt:size" ;;
 			*) nim_flags= ;;
 		esac
-		nim --cc:clang --clang.exe=$CC --clang.linkerexe=$CC $nim_flags --define:termux -d:release -d:sslVersion=1.1 --os:android --cpu:$NIM_ARCH  -t:"$CPPFLAGS $CFLAGS" -l:"$LDFLAGS -landroid-glob" -d:tempDir:$TERMUX_PREFIX/tmp c $(basename $cmd).nim
+		nim --cc:clang --clang.exe=$CC --clang.linkerexe=$CC $nim_flags --define:termux -d:release -d:sslVersion=3 --os:android --cpu:$NIM_ARCH  -t:"$CPPFLAGS $CFLAGS" -l:"$LDFLAGS -landroid-glob" -d:tempDir:$TERMUX_PREFIX/tmp c $(basename $cmd).nim
 		popd
 	done
 }

@@ -10,20 +10,20 @@ diff -uNr coreutils-8.32/lib/getusershell.c coreutils-8.32.mod/lib/getusershell.
  };
  
  /* Index of the next shell in 'default_shells' to return.
-diff -uNr coreutils-8.32/lib/tempname.c coreutils-8.32.mod/lib/tempname.c
---- coreutils-8.32/lib/tempname.c	2020-01-01 16:19:26.000000000 +0200
-+++ coreutils-8.32.mod/lib/tempname.c	2020-05-05 14:13:10.984279966 +0300
-@@ -33,7 +33,7 @@
- 
- #include <stdio.h>
- #ifndef P_tmpdir
--# define P_tmpdir "/tmp"
-+# define P_tmpdir "@TERMUX_PREFIX@/tmp"
+diff -uNr coreutils-9.2/lib/tmpdir.c coreutils-9.2.mod/lib/tmpdir.c
+--- coreutils-9.2/lib/tmpdir.c	2023-03-13 18:12:12.000000000 +0000
++++ coreutils-9.2.mod/lib/tmpdir.c	2023-03-23 06:56:30.519517214 +0000
+@@ -35,7 +35,7 @@
+ # ifdef _P_tmpdir /* native Windows */
+ #  define P_tmpdir _P_tmpdir
+ # else
+-#  define P_tmpdir "/tmp"
++#  define P_tmpdir "@TERMUX_PREFIX@/tmp"
+ # endif
  #endif
- #ifndef TMP_MAX
- # define TMP_MAX 238328
-@@ -149,8 +149,8 @@
-     {
+ 
+@@ -135,8 +135,8 @@
+ #endif
        if (direxists (P_tmpdir))
          dir = P_tmpdir;
 -      else if (strcmp (P_tmpdir, "/tmp") != 0 && direxists ("/tmp"))

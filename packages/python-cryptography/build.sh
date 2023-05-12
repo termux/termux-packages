@@ -4,9 +4,9 @@ TERMUX_PKG_DESCRIPTION="Provides cryptographic recipes and primitives to Python 
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE, LICENSE.APACHE, LICENSE.BSD, LICENSE.PSF"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=39.0.1
+TERMUX_PKG_VERSION="40.0.2"
 TERMUX_PKG_SRCURL=https://github.com/pyca/cryptography/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=e9a4fe4d32e3161dccf9172086e1c2c96e49854fde5f9a220d40c84b9faa9b87
+TERMUX_PKG_SHA256=501826c7ff839e5d5f31d451996057229b093094c296667fa32219356911380d
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="openssl, python, python-pip"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -23,7 +23,7 @@ termux_step_post_get_source() {
 termux_step_configure() {
 	termux_setup_rust
 	export CARGO_BUILD_TARGET=${CARGO_TARGET_NAME}
-        export PYO3_CROSS_LIB_DIR=$TERMUX_PREFIX/lib
+	export PYO3_CROSS_LIB_DIR=$TERMUX_PREFIX/lib
 }
 
 termux_step_create_debscripts() {

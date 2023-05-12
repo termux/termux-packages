@@ -1,0 +1,67 @@
+diff --git a/thirdparty/brotli/dec/bit_reader.h b/thirdparty/brotli/dec/bit_reader.h
+index 3906455..468482e 100644
+--- a/thirdparty/brotli/dec/bit_reader.h
++++ b/thirdparty/brotli/dec/bit_reader.h
+@@ -15,6 +15,8 @@
+ #include "../common/platform.h"
+ #include <brotli/types.h>
+ 
++#define BROTLI_INTERNAL __attribute__ ((visibility ("hidden")))
++
+ #if defined(__cplusplus) || defined(c_plusplus)
+ extern "C" {
+ #endif
+diff --git a/thirdparty/brotli/dec/decode.c b/thirdparty/brotli/dec/decode.c
+index 2fe58a7..9208640 100644
+--- a/thirdparty/brotli/dec/decode.c
++++ b/thirdparty/brotli/dec/decode.c
+@@ -2017,9 +2017,11 @@ CommandPostDecodeLiterals:
+     if (s->distance_code - s->max_distance - 1 < compound_dictionary_size) {
+       int address = compound_dictionary_size -
+           (s->distance_code - s->max_distance);
++#ifdef BROTLI_DECODER_ERROR_COMPOUND_DICTIONARY
+       if (!InitializeCompoundDictionaryCopy(s, address, i)) {
+         return BROTLI_FAILURE(BROTLI_DECODER_ERROR_COMPOUND_DICTIONARY);
+       }
++#endif
+       pos += CopyFromCompoundDictionary(s, pos);
+       if (pos >= s->ringbuffer_size) {
+         s->state = BROTLI_STATE_COMMAND_POST_WRITE_1;
+@@ -2083,9 +2085,11 @@ CommandPostDecodeLiterals:
+             pos, s->distance_code, i, s->meta_block_remaining_len));
+         return BROTLI_FAILURE(BROTLI_DECODER_ERROR_FORMAT_DICTIONARY);
+       }
++#ifdef BROTLI_DECODER_ERROR_DICTIONARY_NOT_SET
+       if (BROTLI_PREDICT_FALSE(!words->data)) {
+         return BROTLI_FAILURE(BROTLI_DECODER_ERROR_DICTIONARY_NOT_SET);
+       }
++#endif
+       if (transform_idx < (int)transforms->num_transforms) {
+         const uint8_t* word = &words->data[offset];
+         int len = i;
+diff --git a/thirdparty/brotli/dec/huffman.h b/thirdparty/brotli/dec/huffman.h
+index a8fbc45..36aa5fe 100644
+--- a/thirdparty/brotli/dec/huffman.h
++++ b/thirdparty/brotli/dec/huffman.h
+@@ -12,6 +12,8 @@
+ #include "../common/platform.h"
+ #include <brotli/types.h>
+ 
++#define BROTLI_INTERNAL __attribute__ ((visibility ("hidden")))
++
+ #if defined(__cplusplus) || defined(c_plusplus)
+ extern "C" {
+ #endif
+diff --git a/thirdparty/brotli/dec/state.h b/thirdparty/brotli/dec/state.h
+index 81e6bb6..37f51d5 100644
+--- a/thirdparty/brotli/dec/state.h
++++ b/thirdparty/brotli/dec/state.h
+@@ -18,6 +18,8 @@
+ #include "bit_reader.h"
+ #include "huffman.h"
+ 
++#define BROTLI_INTERNAL __attribute__ ((visibility ("hidden")))
++
+ #if defined(__cplusplus) || defined(c_plusplus)
+ extern "C" {
+ #endif

@@ -17,6 +17,6 @@
          if fd is not None:
 -            plugins = init_plugins(config, config.get('gui', 'qt'))
 +            plugins = init_plugins(config, config.get('gui', 'text'))
-             d = daemon.Daemon(config, fd)
+             d = daemon.Daemon(config, fd, start_network=False)
              try:
                  d.run_gui(config, plugins)

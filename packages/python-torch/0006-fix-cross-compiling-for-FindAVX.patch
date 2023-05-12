@@ -1,0 +1,17 @@
+--- a/cmake/Modules/FindAVX.cmake.orig
++++ b/cmake/Modules/FindAVX.cmake
+@@ -49,12 +49,14 @@
+   SET(CMAKE_REQUIRED_FLAGS_SAVE ${CMAKE_REQUIRED_FLAGS})
+   FOREACH(__FLAG ${flags})
+     IF(NOT ${lang}_${type}_FOUND)
++      IF(NOT CMAKE_CROSSCOMPILING)
+       SET(CMAKE_REQUIRED_FLAGS ${__FLAG})
+       IF(lang STREQUAL "CXX")
+         CHECK_CXX_SOURCE_RUNS("${${type}_CODE}" ${lang}_HAS_${type}_${__FLAG_I})
+       ELSE()
+         CHECK_C_SOURCE_RUNS("${${type}_CODE}" ${lang}_HAS_${type}_${__FLAG_I})
+       ENDIF()
++      ENDIF()
+       IF(${lang}_HAS_${type}_${__FLAG_I})
+         SET(${lang}_${type}_FOUND TRUE CACHE BOOL "${lang} ${type} support")
+         SET(${lang}_${type}_FLAGS "${__FLAG}" CACHE STRING "${lang} ${type} flags")

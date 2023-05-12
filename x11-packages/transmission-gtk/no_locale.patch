@@ -1,11 +1,11 @@
---- ./libtransmission/utils.c.orig	2020-05-14 20:22:41.415540431 +0200
-+++ ./libtransmission/utils.c	2020-05-14 20:23:46.340145553 +0200
-@@ -1627,7 +1627,7 @@
-     char buf[128];
-     tr_snprintf(buf, sizeof(buf), "%.*f", DBL_DIG, x);
+--- a/libtransmission/utils.cc
++++ b/libtransmission/utils.cc
+@@ -482,7 +482,7 @@
+     auto const [out, len] = fmt::format_to_n(std::data(buf), std::size(buf) - 1, "{:.{}f}", x, DBL_DIG);
+     *out = '\0';
  
--    if ((pt = strstr(buf, localeconv()->decimal_point)) != NULL)
-+    if ((pt = strstr(buf, ".")) != NULL)
+-    if (auto* const pt = strstr(std::data(buf), localeconv()->decimal_point); pt != nullptr)
++    if (auto* const pt = strstr(std::data(buf), "."); pt != nullptr)
      {
-         pt[precision != 0 ? precision + 1 : 0] = '\0';
+         pt[decimal_places != 0 ? decimal_places + 1 : 0] = '\0';
      }

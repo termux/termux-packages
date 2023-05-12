@@ -1,6 +1,6 @@
---- pacman-6.0.2/etc/pacman.conf.in	2022-10-03 05:52:04.000000000 +0300
-+++ pacman-6.0.2/etc/pacman.conf.in.patch	2023-01-22 13:13:23.023498582 +0300
-@@ -9,15 +9,15 @@
+--- pacman-6.0.2/etc/pacman.conf.in	2023-03-10 01:31:38.207470241 +0300
++++ pacman-6.0.2/etc/pacman.conf.in.patch	2023-03-10 01:33:13.819470172 +0300
+@@ -9,17 +9,17 @@
  [options]
  # The following paths are commented out with their default values listed.
  # If you wish to use different paths, uncomment and update the paths.
@@ -18,8 +18,11 @@
 +#XferCommand = @TERMUX_PREFIX@/bin/wget --passive-ftp -c -O %o %u
 +HoldPkg      = pacman
  #CleanMethod = KeepInstalled
- Architecture = auto
+-Architecture = auto
++Architecture = @TERMUX_ARCH@
  
+ # Pacman won't upgrade packages listed in IgnorePkg and members of IgnoreGroup
+ #IgnorePkg   =
 @@ -30,16 +30,17 @@
  
  # Misc options
@@ -43,7 +46,7 @@
  
  #
  # REPOSITORIES
-@@ -60,18 +61,20 @@
+@@ -60,18 +61,30 @@
  # uncommented to enable the repo.
  #
  
@@ -63,19 +66,29 @@
 -#SigLevel = Optional TrustAll
 -#Server = file:///home/custompkgs
 +[main]
-+Server = https://service.termux-pacman.dev/main/$arch
++Server = https://s3.amazonaws.com/termux-pacman.us/$repo/$arch
++#Server = https://service.termux-pacman.dev/$repo/$arch
 +
 +[x11]
-+Server = https://service.termux-pacman.dev/x11/$arch
++Server = https://s3.amazonaws.com/termux-pacman.us/$repo/$arch
++#Server = https://service.termux-pacman.dev/$repo/$arch
 +
 +[root]
-+Server = https://service.termux-pacman.dev/root/$arch
++Server = https://s3.amazonaws.com/termux-pacman.us/$repo/$arch
++#Server = https://service.termux-pacman.dev/$repo/$arch
 +
 +[tur]
-+Server = https://service.termux-pacman.dev/tur/$arch
++Server = https://s3.amazonaws.com/termux-pacman.us/$repo/$arch
++#Server = https://service.termux-pacman.dev/$repo/$arch
 +
 +[tur-continuous]
-+Server = https://service.termux-pacman.dev/tur-continuous/$arch
++Server = https://s3.amazonaws.com/termux-pacman.us/$repo/$arch
++#Server = https://service.termux-pacman.dev/$repo/$arch
 +
 +[tur-multilib]
-+Server = https://service.termux-pacman.dev/tur-multilib/$arch
++Server = https://s3.amazonaws.com/termux-pacman.us/$repo/$arch
++#Server = https://service.termux-pacman.dev/$repo/$arch
++
++#[gpkg-dev]
++#Server = https://s3.amazonaws.com/termux-pacman.us/$repo/$arch
++#Server = https://service.termux-pacman.dev/$repo/$arch

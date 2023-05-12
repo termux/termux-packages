@@ -2,15 +2,14 @@ TERMUX_PKG_HOMEPAGE=https://github.com/junegunn/fzf
 TERMUX_PKG_DESCRIPTION="Command-line fuzzy finder"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.37.0"
+TERMUX_PKG_VERSION="0.40.0"
 TERMUX_PKG_SRCURL=https://github.com/junegunn/fzf/archive/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=0044809beda82ba1a6936d5472cb749eef34785e8ecd4694936e39bf0ca9258b
-TERMUX_PKG_DEPENDS="ncurses-utils,tmux"
+TERMUX_PKG_SHA256=9597f297a6811d300f619fff5aadab8003adbcc1566199a43886d2ea09109a65
 TERMUX_PKG_AUTO_UPDATE=true
 
 # Depend on findutils as fzf uses the -fstype option, which busybox
 # find does not support, when invoking find:
-TERMUX_PKG_DEPENDS="bash, findutils"
+TERMUX_PKG_DEPENDS="bash, findutils, ncurses-utils, tmux"
 
 termux_step_pre_configure() {
 	# Certain packages are not safe to build on device because their

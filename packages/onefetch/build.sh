@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/o2sh/onefetch
 TERMUX_PKG_DESCRIPTION="A command-line Git information tool written in Rust"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@ELWAER-M"
-TERMUX_PKG_VERSION="2.15.1"
+TERMUX_PKG_VERSION="2.17.1"
 TERMUX_PKG_SRCURL=https://github.com/o2sh/onefetch/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=53b1c3acff1e557d3ff9f9a5f6ebbc1a6a5748912a6b96cb6ae0e35e9b5954a7
+TERMUX_PKG_SHA256=37b6e6c2623b78cce807d03e5a3e9f21a4b86c6164abbcfa9846379e7f6ea9b1
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libgit2"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -28,6 +28,11 @@ termux_step_pre_configure() {
 
 	for d in $CARGO_HOME/registry/src/github.com-*/git-config*; do
 		patch --silent -p1 -d ${d} < $TERMUX_PKG_BUILDER_DIR/0002-rust-git-config-path.diff || :
+	done
+
+	local f
+	for f in $CARGO_HOME/registry/src/github.com-*/libgit2-sys-*/build.rs; do
+		sed -i -E 's/\.range_version\(([^)]*)\.\.[^)]*\)/.atleast_version(\1)/g' "${f}"
 	done
 }
 

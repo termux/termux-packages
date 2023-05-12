@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://panotools.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://panotools.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="Part of the Panorama Tools by Helmut Dersch"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

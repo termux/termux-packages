@@ -1,0 +1,115 @@
+https://github.com/TigerVNC/tigervnc/commit/38c6848b30cb1908171f2b4628e345fbf6727b39
+
+Patch for vncserver.in is omitted.
+
+From 38c6848b30cb1908171f2b4628e345fbf6727b39 Mon Sep 17 00:00:00 2001
+From: Pierre Ossman <ossman@cendio.se>
+Date: Fri, 18 Sep 2020 10:44:32 +0200
+Subject: [PATCH] Tolerate specifying -BoolParam 0 and similar
+
+This is needed by vncserver which doesn't know which parameters are
+boolean, and it cannot use the -Param=Value form as that isn't tolerated
+by the Xorg code.
+---
+ unix/vncserver/vncserver.in    |  8 ++++----
+ unix/xserver/hw/vnc/RFBGlue.cc | 16 ++++++++++++++++
+ unix/xserver/hw/vnc/RFBGlue.h  |  1 +
+ unix/xserver/hw/vnc/xvnc.c     | 14 ++++++++++++++
+ vncviewer/vncviewer.cxx        | 20 ++++++++++++++++++++
+ 5 files changed, 55 insertions(+), 4 deletions(-)
+
+diff --git a/unix/xserver/hw/vnc/RFBGlue.cc b/unix/xserver/hw/vnc/RFBGlue.cc
+index f108fae43..7c32bea8f 100644
+--- a/unix/xserver/hw/vnc/RFBGlue.cc
++++ b/unix/xserver/hw/vnc/RFBGlue.cc
+@@ -143,6 +143,22 @@ const char* vncGetParamDesc(const char *name)
+   return param->getDescription();
+ }
+ 
++int vncIsParamBool(const char *name)
++{
++  VoidParameter *param;
++  BoolParameter *bparam;
++
++  param = rfb::Configuration::getParam(name);
++  if (param == NULL)
++    return false;
++
++  bparam = dynamic_cast<BoolParameter*>(param);
++  if (bparam == NULL)
++    return false;
++
++  return true;
++}
++
+ int vncGetParamCount(void)
+ {
+   int count;
+diff --git a/unix/xserver/hw/vnc/RFBGlue.h b/unix/xserver/hw/vnc/RFBGlue.h
+index 112405b84..695cea105 100644
+--- a/unix/xserver/hw/vnc/RFBGlue.h
++++ b/unix/xserver/hw/vnc/RFBGlue.h
+@@ -41,6 +41,7 @@ int vncSetParam(const char *name, const char *value);
+ int vncSetParamSimple(const char *nameAndValue);
+ char* vncGetParam(const char *name);
+ const char* vncGetParamDesc(const char *name);
++int vncIsParamBool(const char *name);
+ 
+ int vncGetParamCount(void);
+ char *vncGetParamList(void);
+diff --git a/unix/xserver/hw/vnc/xvnc.c b/unix/xserver/hw/vnc/xvnc.c
+index 4eb0b0b13..5744acac8 100644
+--- a/unix/xserver/hw/vnc/xvnc.c
++++ b/unix/xserver/hw/vnc/xvnc.c
+@@ -618,6 +618,20 @@ ddxProcessArgument(int argc, char *argv[], int i)
+         exit(0);
+     }
+ 
++    /* We need to resolve an ambiguity for booleans */
++    if (argv[i][0] == '-' && i+1 < argc &&
++        vncIsParamBool(&argv[i][1])) {
++        if ((strcasecmp(argv[i+1], "0") == 0) ||
++            (strcasecmp(argv[i+1], "1") == 0) ||
++            (strcasecmp(argv[i+1], "true") == 0) ||
++            (strcasecmp(argv[i+1], "false") == 0) ||
++            (strcasecmp(argv[i+1], "yes") == 0) ||
++            (strcasecmp(argv[i+1], "no") == 0)) {
++            vncSetParam(&argv[i][1], argv[i+1]);
++            return 2;
++        }
++    }
++
+     if (vncSetParamSimple(argv[i]))
+ 	return 1;
+     
+diff --git a/vncviewer/vncviewer.cxx b/vncviewer/vncviewer.cxx
+index d4dd3063c..77ba3d3f4 100644
+--- a/vncviewer/vncviewer.cxx
++++ b/vncviewer/vncviewer.cxx
+@@ -556,6 +556,26 @@ int main(int argc, char** argv)
+   }
+ 
+   for (int i = 1; i < argc;) {
++    /* We need to resolve an ambiguity for booleans */
++    if (argv[i][0] == '-' && i+1 < argc) {
++        VoidParameter *param;
++
++        param = Configuration::getParam(&argv[i][1]);
++        if ((param != NULL) &&
++            (dynamic_cast<BoolParameter*>(param) != NULL)) {
++          if ((strcasecmp(argv[i+1], "0") == 0) ||
++              (strcasecmp(argv[i+1], "1") == 0) ||
++              (strcasecmp(argv[i+1], "true") == 0) ||
++              (strcasecmp(argv[i+1], "false") == 0) ||
++              (strcasecmp(argv[i+1], "yes") == 0) ||
++              (strcasecmp(argv[i+1], "no") == 0)) {
++              param->setParam(argv[i+1]);
++              i += 2;
++              continue;
++          }
++      }
++    }
++
+     if (Configuration::setParam(argv[i])) {
+       i++;
+       continue;

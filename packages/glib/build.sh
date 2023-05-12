@@ -2,17 +2,17 @@ TERMUX_PKG_HOMEPAGE=https://developer.gnome.org/glib/
 TERMUX_PKG_DESCRIPTION="Library providing core building blocks for libraries and applications written in C"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
-_MAJOR_VERSION=2.74
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}.5
+_MAJOR_VERSION=2.76
+TERMUX_PKG_VERSION=${_MAJOR_VERSION}.2
 TERMUX_PKG_SRCURL=https://ftp.gnome.org/pub/gnome/sources/glib/${_MAJOR_VERSION}/glib-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=ceba83a5999ceb31a4c4fc9921207cb9ffffd2ab1d6ec03c162d3f608a5c14c8
+TERMUX_PKG_SHA256=24f3847857b1d8674cdb0389a36edec0f13c666cd3ce727ecd340eb9da8aca9e
 TERMUX_PKG_DEPENDS="libandroid-support, libffi, libiconv, pcre2, resolv-conf, zlib"
 TERMUX_PKG_BREAKS="glib-dev"
 TERMUX_PKG_REPLACES="glib-dev"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-Druntime_dir=$TERMUX_PREFIX/var/run
 -Dlibmount=disabled
--Diconv=external
 "
 
 TERMUX_PKG_RM_AFTER_INSTALL="

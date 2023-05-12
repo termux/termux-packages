@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=2.4.3
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://mirrors.edge.kernel.org/pub/linux/utils/cryptsetup/v${TERMUX_PKG_VERSION:0:3}/cryptsetup-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=fc0df945188172264ec5bf1d0bda08264fadc8a3f856d47eba91f31fe354b507
-TERMUX_PKG_DEPENDS="json-c, libblkid, libdevmapper, libgcrypt, libuuid (>> 2.38.1), openssl, libiconv, argon2"
+TERMUX_PKG_DEPENDS="json-c, libblkid, libdevmapper, libgcrypt, libuuid, openssl, libiconv, argon2"
 TERMUX_PKG_BREAKS="cryptsetup-dev, cryptsetup (<< 2.4.3-1)"
 TERMUX_PKG_REPLACES="cryptsetup-dev, cryptsetup (<< 2.4.3-1)"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -17,17 +17,4 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 
 termux_step_pre_configure() {
 	export LDFLAGS+=" -liconv"
-
-	_NEED_DUMMY_LIBRT_A=
-	_LIBRT_A=$TERMUX_PREFIX/lib/librt.a
-	if [ ! -e $_LIBRT_A ]; then
-		_NEED_DUMMY_LIBRT_A=true
-		echo '!<arch>' > $_LIBRT_A
-	fi
-}
-
-termux_step_post_make_install() {
-	if [ $_NEED_DUMMY_LIBRT_A ]; then
-		rm -f $_LIBRT_A
-	fi
 }

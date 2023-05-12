@@ -2,9 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://github.com/showwin/speedtest-go/
 TERMUX_PKG_DESCRIPTION="Command line interface to test internet speed using speedtest.net"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.3.1"
+TERMUX_PKG_VERSION="1.6.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/showwin/speedtest-go/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=8ab904f4e631a0b4c56731ce5cf2e915bbf83626b7a93454b5a9fcbc3fb7cd21
+TERMUX_PKG_SHA256=fd3f11152e1e21d842c91f898567e7943eea5c49a554fa83c21d9bb68cc94e72
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 

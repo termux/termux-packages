@@ -2,11 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://emscripten.org
 TERMUX_PKG_DESCRIPTION="Emscripten: An LLVM-to-WebAssembly Compiler"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@truboxl"
-TERMUX_PKG_VERSION="3.1.31"
+TERMUX_PKG_VERSION="3.1.38"
 TERMUX_PKG_SRCURL=git+https://github.com/emscripten-core/emscripten
 TERMUX_PKG_GIT_BRANCH=${TERMUX_PKG_VERSION}
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
-TERMUX_PKG_RECOMMENDS="emscripten-llvm, emscripten-binaryen, python, nodejs-lts | nodejs"
+TERMUX_PKG_DEPENDS="emscripten-binaryen, emscripten-llvm"
+TERMUX_PKG_RECOMMENDS="nodejs-lts | nodejs, python"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_AUTO_UPDATE=true
@@ -52,13 +53,13 @@ opt/emscripten/LICENSE
 
 # https://github.com/emscripten-core/emscripten/issues/11362
 # can switch to stable LLVM to save space once above is fixed
-_LLVM_COMMIT=1142e6c7c795de7f80774325a07ed49bc95a48c9
-_LLVM_TGZ_SHA256=103e2a4a59f5078e9bbd64e88ceda473352b9fc69da3017bedb05720059d0ff7
+_LLVM_COMMIT=004bf170c6cbaa049601bcf92f86a9459aec2dc2
+_LLVM_TGZ_SHA256=e4148ef1dfd97880ba95b82d6c6349e0add16af60aabd8d8a7deb427d68c6f04
 
 # https://github.com/emscripten-core/emscripten/issues/12252
 # upstream says better bundle the right binaryen revision for now
-_BINARYEN_COMMIT=07362b354b42b3c8cda2eff58fcaa9e74a2b2d18
-_BINARYEN_TGZ_SHA256=8f0b1a90d4ee22668eafc26e3d0df4a69fd276f64add7fa780a6cb597b8a6114
+_BINARYEN_COMMIT=ee738ac1f838a090cac74ba8981e2104b6c02d44
+_BINARYEN_TGZ_SHA256=9f1b4d2feb1c0d0577b8bfe7c20fe0da8c659d502739abe58dd5791d1ed8708b
 
 # https://github.com/emscripten-core/emsdk/blob/main/emsdk.py
 # https://chromium.googlesource.com/emscripten-releases/+/refs/heads/main/src/build.py
@@ -82,12 +83,11 @@ _LLVM_BUILD_ARGS="
 -DLLVM_INCLUDE_TESTS=OFF
 -DLLVM_INSTALL_TOOLCHAIN_ONLY=ON
 -DLLVM_LINK_LLVM_DYLIB=ON
--DLLVM_TABLEGEN=${TERMUX_PKG_HOSTBUILD_DIR}/bin/llvm-tblgen
+-DLLVM_NATIVE_TOOL_DIR=${TERMUX_PKG_HOSTBUILD_DIR}/bin
 
 -DCLANG_DEFAULT_LINKER=lld
 -DCLANG_ENABLE_ARCMT=OFF
 -DCLANG_ENABLE_STATIC_ANALYZER=OFF
--DCLANG_TABLEGEN=${TERMUX_PKG_HOSTBUILD_DIR}/bin/clang-tblgen
 
 -DCOMPILER_RT_BUILD_CRT=OFF
 -DCOMPILER_RT_BUILD_LIBFUZZER=OFF
@@ -205,10 +205,10 @@ termux_step_host_build() {
 		-S "${TERMUX_PKG_CACHEDIR}/llvm-project-${_LLVM_COMMIT}/llvm" \
 		-DCMAKE_BUILD_TYPE=Release \
 		-DLLVM_ENABLE_PROJECTS=clang
-	cmake \
-		--build "${TERMUX_PKG_HOSTBUILD_DIR}" \
+	ninja \
+		-C "${TERMUX_PKG_HOSTBUILD_DIR}" \
 		-j "${TERMUX_MAKE_PROCESSES}" \
-		--target llvm-tblgen clang-tblgen
+		llvm-tblgen clang-tblgen
 }
 
 termux_step_make() {
@@ -237,20 +237,23 @@ termux_step_make() {
 		-S "${TERMUX_PKG_CACHEDIR}/llvm-project-${_LLVM_COMMIT}/llvm" \
 		-B "${TERMUX_PKG_BUILDDIR}/build-llvm" \
 		${_LLVM_BUILD_ARGS}
-	cmake \
-		--build "${TERMUX_PKG_BUILDDIR}/build-llvm" \
+	ninja \
+		-C "${TERMUX_PKG_BUILDDIR}/build-llvm" \
 		-j "${TERMUX_MAKE_PROCESSES}" \
-		--target install
+		install
 
+	local _OLD_LDFLAGS="$LDFLAGS"
+	LDFLAGS="-Wl,-rpath=$TERMUX_PREFIX/opt/emscripten-binaryen/lib $LDFLAGS"
 	cmake \
 		-G Ninja \
 		-S "${TERMUX_PKG_CACHEDIR}/binaryen-${_BINARYEN_COMMIT}" \
 		-B "${TERMUX_PKG_BUILDDIR}/build-binaryen" \
 		${_BINARYEN_BUILD_ARGS}
-	cmake \
-		--build "${TERMUX_PKG_BUILDDIR}/build-binaryen" \
+	ninja \
+		-C "${TERMUX_PKG_BUILDDIR}/build-binaryen" \
 		-j "${TERMUX_MAKE_PROCESSES}" \
-		--target install
+		install
+	LDFLAGS="$_OLD_LDFLAGS"
 }
 
 termux_step_make_install() {

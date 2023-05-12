@@ -1,0 +1,11 @@
+--- a/lib/libv4lconvert/control/libv4lcontrol.c
++++ b/lib/libv4lconvert/control/libv4lcontrol.c
+@@ -715,7 +715,7 @@
+ 		if (shm_name[i] == '/')
+ 			shm_name[i] = '-';
+ 
+-#ifndef ANDROID
++#ifndef __ANDROID__
+ 	/* Open the shared memory object identified by shm_name */
+ 	shm_fd = shm_open(shm_name, (O_CREAT | O_EXCL | O_RDWR), (S_IREAD | S_IWRITE));
+ 	if (shm_fd >= 0)

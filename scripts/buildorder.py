@@ -5,6 +5,8 @@ import json, os, re, sys
 
 from itertools import filterfalse
 
+termux_arch = os.getenv('TERMUX_ARCH') or 'aarch64'
+
 def unique_everseen(iterable, key=None):
     """List unique elements, preserving order. Remember all elements ever seen.
     See https://docs.python.org/3/library/itertools.html#itertools-recipes
@@ -28,13 +30,13 @@ def die(msg):
     "Exit the process with an error message."
     sys.exit('ERROR: ' + msg)
 
-def parse_build_file_dependencies(path):
-    "Extract the dependencies of a build.sh or *.subpackage.sh file."
+def parse_build_file_dependencies_with_vars(path, vars):
+    "Extract the dependencies specified in the given variables of a build.sh or *.subpackage.sh file."
     dependencies = []
 
     with open(path, encoding="utf-8") as build_script:
         for line in build_script:
-            if line.startswith( ('TERMUX_PKG_DEPENDS', 'TERMUX_PKG_BUILD_DEPENDS', 'TERMUX_SUBPKG_DEPENDS', 'TERMUX_PKG_DEVPACKAGE_DEPENDS') ):
+            if line.startswith(vars):
                 dependencies_string = line.split('DEPENDS=')[1]
                 for char in "\"'\n":
                     dependencies_string = dependencies_string.replace(char, '')
@@ -43,10 +45,39 @@ def parse_build_file_dependencies(path):
                 for dependency_value in re.split(',|\\|', dependencies_string):
                     # Replace parenthesis to ignore version qualifiers as in "gcc (>= 5.0)":
                     dependency_value = re.sub(r'\(.*?\)', '', dependency_value).strip()
+                    arch = os.getenv('TERMUX_ARCH')
+                    if arch is None:
+                        arch = 'aarch64'
+                    if arch == "x86_64":
+                        arch = "x86-64"
+                    dependency_value = re.sub(r'\${TERMUX_ARCH/_/-}', arch, dependency_value)
 
                     dependencies.append(dependency_value)
 
     return set(dependencies)
+
+def parse_build_file_dependencies(path):
+    "Extract the dependencies of a build.sh or *.subpackage.sh file."
+    return parse_build_file_dependencies_with_vars(path, ('TERMUX_PKG_DEPENDS', 'TERMUX_PKG_BUILD_DEPENDS', 'TERMUX_SUBPKG_DEPENDS', 'TERMUX_PKG_DEVPACKAGE_DEPENDS'))
+
+def parse_build_file_antidependencies(path):
+    "Extract the antidependencies of a build.sh file."
+    return parse_build_file_dependencies_with_vars(path, 'TERMUX_PKG_ANTI_BUILD_DEPENDS')
+
+def parse_build_file_excluded_arches(path):
+    "Extract the excluded arches specified in a build.sh file."
+    arches = []
+
+    with open(path, encoding="utf-8") as build_script:
+        for line in build_script:
+            if line.startswith('TERMUX_PKG_BLACKLISTED_ARCHES'):
+                arches_string = line.split('ARCHES=')[1]
+                for char in "\"'\n":
+                    arches_string = arches_string.replace(char, '')
+                for arches_value in re.split(',', arches_string):
+                    arches.append(arches_value.strip())
+
+    return set(arches)
 
 class TermuxPackage(object):
     "A main package definition represented by a directory with a build.sh file."
@@ -60,6 +91,8 @@ class TermuxPackage(object):
             raise Exception("build.sh not found for package '" + self.name + "'")
 
         self.deps = parse_build_file_dependencies(build_sh_path)
+        self.antideps = parse_build_file_antidependencies(build_sh_path)
+        self.excluded_arches = parse_build_file_excluded_arches(build_sh_path)
 
         if os.getenv('TERMUX_ON_DEVICE_BUILD') == "true":
             always_deps = ['libc++']
@@ -78,6 +111,8 @@ class TermuxPackage(object):
             self.subpkgs.append(subpkg)
             self.deps.add(subpkg.name)
             self.deps |= subpkg.deps
+
+        self.deps -= self.antideps
 
         subpkg = TermuxSubPackage(self.dir + '/' + self.name + '-static' + '.subpackage.sh', self, virtual=True)
         self.subpkgs.append(subpkg)
@@ -150,6 +185,9 @@ def read_packages_from_directories(directories, fast_build_mode, full_buildmode)
             dir_path = package_dir + '/' + pkgdir_name
             if os.path.isfile(dir_path + '/build.sh'):
                 new_package = TermuxPackage(package_dir + '/' + pkgdir_name, fast_build_mode)
+
+                if termux_arch in new_package.excluded_arches:
+                    continue
 
                 if new_package.name in pkgs_map:
                     die('Duplicated package: ' + new_package.name)

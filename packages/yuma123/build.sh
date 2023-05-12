@@ -9,12 +9,6 @@ TERMUX_PKG_SHA256=e304b253236a279f10b133fdd19f366f271581ebf12647cea84667fcfada1f
 TERMUX_PKG_DEPENDS="libssh2, libxml2, openssl, readline"
 
 termux_step_pre_configure() {
-	local f
-	for f in netconf/src/*/Makefile.am; do
-		sed -i '/_la_LDFLAGS = /s/ -lrt$//' ${f}
-		sed -i '/_la_LDFLAGS = /s/ -lrt / /' ${f}
-	done
-
 	autoreconf -fi
 
 	CPPFLAGS+=" -D__USE_BSD"

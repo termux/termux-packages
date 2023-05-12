@@ -1,0 +1,132 @@
+From 2da3dd9c2f8e1b594394a4a38da00f17dbb922c8 Mon Sep 17 00:00:00 2001
+From: CosineMath <boat_jvm@qq.com>
+Date: Tue, 21 Sep 2021 23:49:00 +0800
+Subject: [PATCH 1/6] meson: add new option 'egl_without_gbm' to enable
+ building without libgbm. Enable building without libdrm.
+
+---
+ config.h.meson    |  2 ++
+ meson.build       | 23 +++++++++++++++++++----
+ meson_options.txt |  7 +++++++
+ src/meson.build   |  9 +++++++--
+ 4 files changed, 35 insertions(+), 6 deletions(-)
+
+diff --git a/config.h.meson b/config.h.meson
+index b25a86b2..63130a14 100644
+--- a/config.h.meson
++++ b/config.h.meson
+@@ -55,3 +55,5 @@
+ #mesondefine PIPE_ARCH_S390
+ #mesondefine PIPE_ARCH_ARM
+ #mesondefine PIPE_ARCH_AARCH64
++#mesondefine EGL_WITHOUT_GBM
++#mesondefine HAVE_LIBDRM
+diff --git a/meson.build b/meson.build
+index ddb74daa..5aa99b53 100644
+--- a/meson.build
++++ b/meson.build
+@@ -66,7 +66,7 @@ add_project_arguments(cc.get_supported_arguments(flags), language : 'c')
+ 
+ prog_python = import('python').find_installation('python3')
+ 
+-libdrm_dep = dependency('libdrm', version : '>=2.4.50')
++libdrm_dep = dependency('libdrm', version : '>=2.4.50', required : false)
+ thread_dep = dependency('threads')
+ epoxy_dep = dependency('epoxy', version: '>= 1.5.4')
+ m_dep = cc.find_library('m', required : false)
+@@ -183,6 +183,10 @@ if get_option('buildtype') == 'debug'
+    add_global_arguments('-DDEBUG=1', language : 'c')
+ endif
+ 
++if libdrm_dep.found()
++  conf_data.set('HAVE_LIBDRM', 1)
++endif
++
+ platforms = get_option('platforms')
+ 
+ require_egl = platforms.contains('egl')
+@@ -195,8 +199,13 @@ with_glx = require_glx or auto_egl_glx
+ have_egl = false
+ have_glx = false
+ 
++egl_without_gbm = get_option('egl_without_gbm')
++
+ with_minigbm_allocation = get_option('minigbm_allocation')
+ if with_minigbm_allocation
++   if egl_without_gbm
++      error('Cannot build gbm allocation without gbm')
++   endif
+    conf_data.set('ENABLE_MINIGBM_ALLOCATION', 1)
+    _gbm_ver = '18.0.0'
+ else
+@@ -205,8 +214,14 @@ endif
+ 
+ if with_egl
+    if cc.has_header('epoxy/egl.h', dependencies: epoxy_dep) and epoxy_dep.get_pkgconfig_variable('epoxy_has_egl') == '1'
+-      gbm_dep = dependency('gbm', version: '>= ' + _gbm_ver, required: require_egl)
+-      have_egl = gbm_dep.found()
++      if egl_without_gbm
++         gbm_dep = dependency('', required : false)
++         have_egl = true
++         conf_data.set('EGL_WITHOUT_GBM', 1)
++      else
++         gbm_dep = dependency('gbm', version: '>= ' + _gbm_ver, required: require_egl)
++         have_egl = gbm_dep.found()
++      endif
+       if (have_egl)
+          conf_data.set('HAVE_EPOXY_EGL_H', 1)
+       else
+@@ -316,7 +331,7 @@ summary({'prefix': get_option('prefix'),
+         'libdir': get_option('libdir'),
+         }, section: 'Directories')
+ summary({'c_args': (' ').join(get_option('c_args')),
+-        'egl': have_egl,
++        'egl': (have_egl ? 'yes' : 'no') + (egl_without_gbm ? ' (no gbm)' : ''),
+         'glx': have_glx,
+         'minigbm_alloc': with_minigbm_allocation,
+         'venus': with_venus,
+diff --git a/meson_options.txt b/meson_options.txt
+index cb774064..3e43e676 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -31,6 +31,13 @@ option(
+   description : 'Platforms support, set to auto to enable all.'
+ )
+ 
++option(
++  'egl_without_gbm',
++  type : 'boolean',
++  value : 'false',
++  description : 'Build egl platform without gbm'
++)
++
+ option(
+   'minigbm_allocation',
+   type : 'boolean',
+diff --git a/src/meson.build b/src/meson.build
+index d78ac8c9..e9c97f72 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -64,12 +64,17 @@ virglrenderer_sources = [
+ ]
+ 
+ vrend_winsys_egl_sources = [
+-   'vrend_winsys_gbm.c',
+-   'vrend_winsys_gbm.h',
+    'vrend_winsys_egl.c',
+    'vrend_winsys_egl.h',
+ ]
+ 
++if not egl_without_gbm
++   vrend_winsys_egl_sources += [
++      'vrend_winsys_gbm.c',
++      'vrend_winsys_gbm.h',
++   ]
++endif
++
+ vrend_winsys_glx_sources = [
+    'vrend_winsys_glx.c',
+    'vrend_winsys_glx.h',
+-- 
+2.34.1
+

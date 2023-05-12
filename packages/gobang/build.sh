@@ -16,8 +16,8 @@ termux_step_pre_configure() {
 		local libdir=target/$CARGO_TARGET_NAME/release/deps
 		mkdir -p $libdir
 		pushd $libdir
-		local libgcc="$($CC -print-libgcc-file-name)"
-		echo "INPUT($libgcc -l:libunwind.a)" > libgcc.so
+		RUSTFLAGS+=" -C link-arg=$($CC -print-libgcc-file-name)"
+		echo "INPUT(-l:libunwind.a)" > libgcc.so
 		popd
 	fi
 }

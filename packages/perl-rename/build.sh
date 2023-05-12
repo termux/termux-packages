@@ -3,13 +3,20 @@ TERMUX_PKG_DESCRIPTION="renames multiple files using perl expressions."
 TERMUX_PKG_LICENSE="Artistic-License-2.0, GPL-2.0" # https://metacpan.org/pod/Software::License::Perl_5
 TERMUX_PKG_MAINTAINER="@ELWAER-M"
 TERMUX_PKG_VERSION=1.12
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://cpan.metacpan.org/authors/id/P/PE/PEDERST/rename-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=bca72eda72a8e826c0050738a5f5a69a289785aeb2ffc6d71f389da04fbcedd2
 TERMUX_PKG_DEPENDS="perl"
+TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+PREFIX=$TERMUX_PREFIX
+INSTALLSITEMAN1DIR=$TERMUX_PREFIX/share/man/man1
+INSTALLSITEMAN3DIR=$TERMUX_PREFIX/share/man/man3
+"
 
 termux_step_configure() {
-	perl Makefile.PL PREFIX=$TERMUX_PREFIX
+	perl Makefile.PL $TERMUX_PKG_EXTRA_CONFIGURE_ARGS
 }
 
 termux_step_post_massage() {

@@ -1,0 +1,40 @@
+Mitigates https://github.com/termux/termux-packages/issues/15425
+
+--- a/config/speechd.conf
++++ b/config/speechd.conf
+@@ -45,8 +45,9 @@
+ # By default, Speech Dispatcher is configured to shut itself down after a period of
+ # time if no clients are connected. The timeout value is in seconds, and is started when
+ # the last client disconnects. A value of 0 disables the timeout.
++# Note for Termux: timeout is disabled by default, for a reason.
+ 
+-# Timeout 5
++# Timeout 0
+ 
+ # -----LOGGING CONFIGURATION-----
+ 
+--- a/src/api/c/libspeechd.c
++++ b/src/api/c/libspeechd.c
+@@ -620,9 +620,11 @@ void spd_close(SPDConnection * connectio
+ 		free(connection->td);
+ 	}
+ 
++#ifndef __ANDROID__
+ 	/* close the socket */
+ 	if (connection->stream != NULL)
+ 		fclose(connection->stream);
++#endif
+ 	connection->stream = NULL;
+ 
+ 	pthread_mutex_unlock(&connection->ssip_mutex);
+--- a/src/server/configuration.c
++++ b/src/server/configuration.c
+@@ -516,7 +516,7 @@ void load_default_global_set_options()
+ 	if (!SpeechdOptions.localhost_access_only_set)
+ 		SpeechdOptions.localhost_access_only = 1;
+ 	if (!SpeechdOptions.server_timeout_set)
+-		SpeechdOptions.server_timeout = 5;
++		SpeechdOptions.server_timeout = 0;
+ 	
+ 
+ 	logfile = stderr;

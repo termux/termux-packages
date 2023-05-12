@@ -2,14 +2,15 @@ TERMUX_PKG_HOMEPAGE=https://apr.apache.org/
 TERMUX_PKG_DESCRIPTION="Apache Portable Runtime Library"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.7.2
+TERMUX_PKG_VERSION=1.7.4
 TERMUX_PKG_SRCURL=https://dlcdn.apache.org/apr/apr-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=75e77cc86776c030c0a5c408dfbd0bf2a0b75eed5351e52d5439fa1e5509a43e
-TERMUX_PKG_DEPENDS="libuuid (>> 2.38.1)"
+TERMUX_PKG_SHA256=fc648de983f3a2a6c9e78dea1f180639bd2fad6c06d556d4367a701fe5c35577
+TERMUX_PKG_DEPENDS="libuuid"
+# libcrypt build-dependency is needed to build apache2.
+TERMUX_PKG_BUILD_DEPENDS="libcrypt"
 TERMUX_PKG_BREAKS="apr-dev"
 TERMUX_PKG_REPLACES="apr-dev"
 TERMUX_PKG_BUILD_IN_SRC=true
-# "ac_cv_search_crypt=" to avoid needlessly linking to libcrypt.
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-installbuilddir=$TERMUX_PREFIX/share/apr-1/build
 ac_cv_func_getrandom=no
@@ -36,5 +37,10 @@ ac_cv_sizeof_ssize_t=$(( TERMUX_ARCH_BITS==32 ? 4 : 8 ))
 ac_cv_sizeof_size_t=$(( TERMUX_ARCH_BITS==32 ? 4 : 8 ))
 ac_cv_sizeof_off_t=$(( TERMUX_ARCH_BITS==32 ? 4 : 8 ))
 ac_cv_sizeof_struct_iovec=$(( TERMUX_ARCH_BITS==32 ? 8 : 16 ))
-ac_cv_search_crypt="
+"
 TERMUX_PKG_RM_AFTER_INSTALL="lib/apr.exp"
+
+termux_step_post_configure() {
+	# Avoid overlinking
+	sed -i 's/ -shared / -Wl,--as-needed\0/g' ./libtool
+}

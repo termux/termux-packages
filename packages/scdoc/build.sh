@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://git.sr.ht/~sircmpwn/scdoc
 TERMUX_PKG_DESCRIPTION="Small man page generator"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Yaksh Bariya <yakshbari4@gmail.com>"
+TERMUX_PKG_MAINTAINER="Yaksh Bariya <thunder-coding@termux.dev>"
 TERMUX_PKG_VERSION=1.11.2
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://git.sr.ht/~sircmpwn/scdoc/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=e9ff9981b5854301789a6778ee64ef1f6d1e5f4829a9dd3e58a9a63eacc2e6f0
 TERMUX_PKG_BUILD_IN_SRC=true

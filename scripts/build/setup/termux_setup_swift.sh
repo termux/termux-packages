@@ -19,13 +19,15 @@ termux_setup_swift() {
 			termux_download \
 				https://download.swift.org/swift-$TERMUX_SWIFT_VERSION-release/ubuntu2204/swift-$TERMUX_SWIFT_VERSION-$SWIFT_RELEASE/$SWIFT_BIN.tar.gz \
 				$SWIFT_TAR \
-				312a18d0d2f207620349e3a373200f369fc1a6aad1b7f2365d55aa8a10881a59
+				352575d5f14d59978d27449b61ca4d6e5f638b83258fac0d66cd7d99034e2760
 
 			(cd $TERMUX_PKG_TMPDIR ; tar xf $SWIFT_TAR ; mv $SWIFT_BIN $SWIFT_FOLDER; rm $SWIFT_TAR)
 		fi
 		export SWIFT_BINDIR="$SWIFT_FOLDER/usr/bin"
 		export SWIFT_CROSSCOMPILE_CONFIG="$SWIFT_FOLDER/usr/android-$TERMUX_ARCH.json"
 		if [ ! -z ${TERMUX_STANDALONE_TOOLCHAIN+x} ]; then
+			local MULTILIB_DIR="$TERMUX_ARCH-linux-android"
+			test $TERMUX_ARCH == 'arm' && MULTILIB_DIR+="eabi"
 			cat <<- EOF > $SWIFT_CROSSCOMPILE_CONFIG
 			{ "version": 1,
 			"target": "${SWIFT_TARGET_TRIPLE}",
@@ -34,7 +36,7 @@ termux_setup_swift() {
 			"extra-cc-flags": [ "-fPIC" ],
 			"extra-swiftc-flags": [ "-resource-dir", "${TERMUX_PREFIX}/lib/swift",
 			   "-Xcc", "-I${TERMUX_PREFIX}/include",
-			   "-L${TERMUX_PREFIX}/lib",
+			   "-L${TERMUX_PREFIX}/opt/ndk-multilib/$MULTILIB_DIR/lib", "-L${TERMUX_PREFIX}/lib",
 			   "-tools-directory", "${TERMUX_STANDALONE_TOOLCHAIN}/bin", ],
 			"extra-cpp-flags": [ "-lstdc++" ] }
 			EOF

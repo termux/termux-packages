@@ -1,19 +1,19 @@
 TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="X.org 100dpi fonts"
-TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.0.3
-TERMUX_PKG_REVISION=27
-TERMUX_PKG_SRCURL=("https://xorg.freedesktop.org/releases/individual/font/font-adobe-100dpi-1.0.3.tar.bz2"
-                   "https://xorg.freedesktop.org/releases/individual/font/font-adobe-utopia-100dpi-1.0.4.tar.bz2"
-                   "https://xorg.freedesktop.org/releases/individual/font/font-bh-100dpi-1.0.3.tar.bz2"
-                   "https://xorg.freedesktop.org/releases/individual/font/font-bh-lucidatypewriter-100dpi-1.0.3.tar.bz2"
-                   "https://xorg.freedesktop.org/releases/individual/font/font-bitstream-100dpi-1.0.3.tar.bz2")
-TERMUX_PKG_SHA256=("b2c08433eab5cb202470aa9f779efefce8d9cab2534f34f3aa4a31d05671c054"
-                   "d16f5e3f227cc6dd07a160a71f443559682dbc35f1c056a5385085aaec4fada5"
-                   "23c07162708e4b79eb33095c8bfa62c783717a9431254bbf44863734ea239481"
-                   "62a83363c2536095fda49d260d21e0847675676e4e3415054064cbdffa641fbb"
-                   "ebe0d7444e3d7c8da7642055ac2206f0190ee060700d99cd876f8fc9964cb6ce")
+TERMUX_PKG_VERSION=1.0.4
+_FONT_ADOBE_UTOPIA_VERSION=${TERMUX_PKG_VERSION%.*}.$((${TERMUX_PKG_VERSION##*.}+1))
+TERMUX_PKG_SRCURL=(https://xorg.freedesktop.org/releases/individual/font/font-adobe-100dpi-${TERMUX_PKG_VERSION}.tar.xz
+                   https://xorg.freedesktop.org/releases/individual/font/font-adobe-utopia-100dpi-${_FONT_ADOBE_UTOPIA_VERSION}.tar.xz
+                   https://xorg.freedesktop.org/releases/individual/font/font-bh-100dpi-${TERMUX_PKG_VERSION}.tar.xz
+                   https://xorg.freedesktop.org/releases/individual/font/font-bh-lucidatypewriter-100dpi-${TERMUX_PKG_VERSION}.tar.xz
+                   https://xorg.freedesktop.org/releases/individual/font/font-bitstream-100dpi-${TERMUX_PKG_VERSION}.tar.xz)
+TERMUX_PKG_SHA256=(b67aff445e056328d53f9732d39884f55dd8d303fc25af3dbba33a8ba35a9ccf
+                   fb84ec297a906973548ca59b7c6daeaad21244bec5d3fb1e7c93df5ef43b024b
+                   fd8f5efe8491faabdd2744808d3d4eafdae5c83e617017c7fddd2716d049ab1e
+                   76ec09eda4094a29d47b91cf59c3eba229c8f7d1ca6bae2abbb3f925e33de8f2
+                   2d1cc682efe4f7ebdf5fbd88961d8ca32b2729968728633dea20a1627690c1a7)
 TERMUX_PKG_DEPENDS="fontconfig-utils, xorg-font-util, xorg-fonts-alias, xorg-fonts-encodings, xorg-mkfontscale"
 TERMUX_PKG_CONFLICTS="xorg-fonts-lite"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
@@ -32,7 +32,7 @@ termux_step_make_install() {
 	local i
 	for i in {0..4}; do
 		local file=$(basename "${TERMUX_PKG_SRCURL[i]}")
-		local dir="${TERMUX_PKG_SRCDIR}/${file%%.tar.bz2}"
+		local dir="${TERMUX_PKG_SRCDIR}/${file%%.tar.*}"
 
 		pushd "${dir}"
 		./configure \
@@ -45,8 +45,8 @@ termux_step_make_install() {
 	done
 }
 
-termux_step_post_make_install() {
-	rm -f "${TERMUX_PREFIX}"/share/fonts/100dpi/fonts.*
+termux_step_post_massage() {
+	rm -f share/fonts/100dpi/fonts.*
 }
 
 termux_step_install_license() {

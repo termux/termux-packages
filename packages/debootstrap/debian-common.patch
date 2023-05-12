@@ -1,0 +1,11 @@
+diff -uNr debootstrap/scripts/debian-common debootstrap.mod/scripts/debian-common
+--- debootstrap/scripts/debian-common	2022-10-17 12:44:53.000000000 +0300
++++ debootstrap.mod/scripts/debian-common	2023-04-15 22:05:56.570730747 +0300
+@@ -16,6 +16,7 @@
+ 		#required="$required $(get_debs Priority: important)"
+ 		#  ^^ should be getting debconf here somehow maybe
+ 		base="$(get_debs Priority: important)"
++		base="$(without "$base" "init systemd systemd-sysv")"
+ 	elif doing_variant buildd; then
+ 		base="apt build-essential"
+ 	elif doing_variant minbase; then

@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A remote shell that automatically reconnects without int
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.2.4"
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=git+https://github.com/MisterTea/EternalTerminal
 TERMUX_PKG_GIT_BRANCH=et-v${TERMUX_PKG_VERSION}
 TERMUX_PKG_AUTO_UPDATE=true

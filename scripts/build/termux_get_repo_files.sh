@@ -13,14 +13,9 @@ termux_get_repo_files() {
 
 		local download_attempts=6
 		while ((download_attempts > 0)); do
-			if termux_download "${repo_base}/Release" \
-				"$RELEASE_FILE" SKIP_CHECKSUM && \
-				termux_download "${repo_base}/Release.gpg" \
-				"${RELEASE_FILE}.gpg" SKIP_CHECKSUM; then
-
-				if ! gpg --verify "${RELEASE_FILE}.gpg" "$RELEASE_FILE"; then
-					termux_error_exit "failed to verify gpg signature of $RELEASE_FILE"
-				fi
+			if termux_download "${repo_base}/Release" "$RELEASE_FILE" SKIP_CHECKSUM && \
+				termux_download "${repo_base}/Release.gpg" "${RELEASE_FILE}.gpg" SKIP_CHECKSUM && \
+				gpg --verify "${RELEASE_FILE}.gpg" "$RELEASE_FILE"; then
 
 				local failed=false
 				for arch in all $TERMUX_ARCH; do

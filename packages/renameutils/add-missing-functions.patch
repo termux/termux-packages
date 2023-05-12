@@ -93,3 +93,55 @@ diff -uNr renameutils-0.12.0/src/editformats/Makefile.in renameutils-0.12.0.mod/
  
  all: all-am
  
+--- a/src/editformats/destination-only.c
++++ b/src/editformats/destination-only.c
+@@ -36,6 +36,8 @@
+ #include "xalloc.h"		/* Gnulib */
+ #include "qcmd.h"
+ 
++#include "getsubopt.h"
++
+ static bool parse_options(char *options);
+ static char *option_generator(const char *text, int state);
+ static void output(FILE *out, LList *files);
+--- a/src/editformats/dual-column.c
++++ b/src/editformats/dual-column.c
+@@ -43,6 +43,8 @@
+ #include "xalloc.h"			/* Gnulib */
+ #include "qcmd.h"
+ 
++#include "getsubopt.h"
++
+ static void reset_options();
+ static bool parse_options(char *options);
+ static char *option_generator(const char *text, int state);
+--- a/src/editformats/single-column.c
++++ b/src/editformats/single-column.c
+@@ -36,6 +36,8 @@
+ #include "common/llist.h"
+ #include "qcmd.h"
+ 
++#include "getsubopt.h"
++
+ static bool parse_options(char *options);
+ static char *option_generator(const char *text, int state);
+ static void output(FILE *out, LList *files);
+--- a/src/getsubopt.h
++++ b/src/getsubopt.h
+@@ -0,0 +1,16 @@
++#ifndef _GETSUBOPT_H
++#define _GETSUBOPT_H
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++#if defined __ANDROID__ && __ANDROID_API__ < 26
++int getsubopt(char **, char *const *, char **);
++#endif
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* _GETSUBOPT_H */

@@ -1,0 +1,726 @@
+Based on https://github.com/alexvorxx/VirGL-Overlay-Rebuild/commit/e365e02209f5337eae21a53f3c463f5a3c122aa6 
+and https://github.com/alexvorxx/VirGL-Overlay-Rebuild/commit/d3052d9ee353d43867fa2fcf15ef072fcdaae2c4
+---
+ src/gl4es-decompress.c | 477 +++++++++++++++++++++++++++++++++++++++++
+ src/gl4es-decompress.h |  29 +++
+ src/meson.build        |   1 +
+ src/vrend_formats.c    |   4 +-
+ src/vrend_renderer.c   | 106 ++++++++-
+ 5 files changed, 612 insertions(+), 5 deletions(-)
+ create mode 100644 src/gl4es-decompress.c
+ create mode 100644 src/gl4es-decompress.h
+
+diff --git a/src/gl4es-decompress.c b/src/gl4es-decompress.c
+new file mode 100644
+index 00000000..6ceb43a4
+--- /dev/null
++++ b/src/gl4es-decompress.c
+@@ -0,0 +1,477 @@
++// Origin: https://github.com/alexvorxx/VirGL-Overlay-Rebuild/commit/d3052d9ee353d43867fa2fcf15ef072fcdaae2c4
++
++#include <stdint.h>
++#include <stddef.h>
++#include <stdlib.h>
++#include <string.h>
++#include <epoxy/gl.h>
++
++#include "gl4es-decompress.h"
++
++/*
++DXT1/DXT3/DXT5 texture decompression
++The original code is from Benjamin Dobell, see below for details. Compared to
++the original this one adds DXT3 decompression, is valid C89, and is x64 
++compatible as it uses fixed size integers everywhere. It also uses a different
++PackRGBA order.
++---
++Copyright (c) 2012, Matth�us G. "Anteru" Chajdas (http://anteru.net)
++Permission is hereby granted, free of charge, to any person obtaining a copy of
++this software and associated documentation files (the "Software"), to deal in 
++the Software without restriction, including without limitation the rights to 
++use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies 
++of the Software, and to permit persons to whom the Software is furnished to do 
++so, subject to the following conditions:
++The above copyright notice and this permission notice shall be included in all 
++copies or substantial portions of the Software.
++THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
++IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
++FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
++AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
++LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
++OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
++SOFTWARE.
++---
++Copyright (C) 2009 Benjamin Dobell, Glass Echidna
++Permission is hereby granted, free of charge, to any person obtaining a copy of
++this software and associated documentation files (the "Software"), to deal in 
++the Software without restriction, including without limitation the rights to 
++use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies 
++of the Software, and to permit persons to whom the Software is furnished to do 
++so, subject to the following conditions:
++The above copyright notice and this permission notice shall be included in all 
++copies or substantial portions of the Software.
++THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
++IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
++FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
++AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
++LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
++OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
++SOFTWARE.
++---
++*/
++static uint32_t PackRGBA (uint8_t r, uint8_t g, uint8_t b, uint8_t a)
++{
++	return r | (g << 8) | (b << 16) | (a << 24);
++}
++
++static void DecompressBlockDXT1Internal (const uint8_t* block,
++	uint32_t* output,
++	uint32_t outputStride,
++	int transparent0, int* simpleAlpha, int *complexAlpha,
++	const uint8_t* alphaValues)
++{
++	uint32_t temp, code;
++
++	uint16_t color0, color1;
++	uint8_t r0, g0, b0, r1, g1, b1;
++
++	int i, j;
++
++	color0 = *(const uint16_t*)(block);
++	color1 = *(const uint16_t*)(block + 2);
++
++	temp = (color0 >> 11) * 255 + 16;
++	r0 = (uint8_t)((temp/32 + temp)/32);
++	temp = ((color0 & 0x07E0) >> 5) * 255 + 32;
++	g0 = (uint8_t)((temp/64 + temp)/64);
++	temp = (color0 & 0x001F) * 255 + 16;
++	b0 = (uint8_t)((temp/32 + temp)/32);
++
++	temp = (color1 >> 11) * 255 + 16;
++	r1 = (uint8_t)((temp/32 + temp)/32);
++	temp = ((color1 & 0x07E0) >> 5) * 255 + 32;
++	g1 = (uint8_t)((temp/64 + temp)/64);
++	temp = (color1 & 0x001F) * 255 + 16;
++	b1 = (uint8_t)((temp/32 + temp)/32);
++
++	code = *(const uint32_t*)(block + 4);
++
++	if (color0 > color1) {
++		for (j = 0; j < 4; ++j) {
++			for (i = 0; i < 4; ++i) {
++				uint32_t finalColor, positionCode;
++				uint8_t alpha;
++
++				alpha = alphaValues [j*4+i];
++
++				finalColor = 0;
++				positionCode = (code >>  2*(4*j+i)) & 0x03;
++
++				switch (positionCode) {
++				case 0:
++					finalColor = PackRGBA(r0, g0, b0, alpha);
++					break;
++				case 1:
++					finalColor = PackRGBA(r1, g1, b1, alpha);
++					break;
++				case 2:
++					finalColor = PackRGBA((2*r0+r1)/3, (2*g0+g1)/3, (2*b0+b1)/3, alpha);
++					break;
++				case 3:
++					finalColor = PackRGBA((r0+2*r1)/3, (g0+2*g1)/3, (b0+2*b1)/3, alpha);
++					break;
++				}
++				if(transparent0 && (finalColor==0xff000000)) {
++					alpha=0;
++					finalColor = 0;
++				}
++				if(!alpha)
++					*simpleAlpha = 1;
++				else if(alpha<0xff)
++					*complexAlpha = 1;
++				output [j*outputStride + i] = finalColor;
++			}
++		}
++	} else {
++		for (j = 0; j < 4; ++j) {
++			for (i = 0; i < 4; ++i) {
++				uint32_t finalColor, positionCode;
++				uint8_t alpha;
++
++				alpha = alphaValues [j*4+i];
++
++				finalColor = 0;
++				positionCode = (code >>  2*(4*j+i)) & 0x03;
++
++				switch (positionCode) {
++				case 0:
++					finalColor = PackRGBA(r0, g0, b0, alpha);
++					break;
++				case 1:
++					finalColor = PackRGBA(r1, g1, b1, alpha);
++					break;
++				case 2:
++					finalColor = PackRGBA((r0+r1)/2, (g0+g1)/2, (b0+b1)/2, alpha);
++					break;
++				case 3:
++					finalColor = PackRGBA(0, 0, 0, alpha);
++					break;
++				}
++
++				if(transparent0 && (finalColor==0xff000000)) {
++					alpha = 0;
++					finalColor = 0;
++				}
++				if(!alpha)
++					*simpleAlpha = 1;
++				else if(alpha<0xff)
++					*complexAlpha = 1;
++
++				output [j*outputStride + i] = finalColor;
++			}
++		}
++	}
++}
++
++/*
++void DecompressBlockDXT1(): Decompresses one block of a DXT1 texture and stores the resulting pixels at the appropriate offset in 'image'.
++uint32_t x:						x-coordinate of the first pixel in the block.
++uint32_t y:						y-coordinate of the first pixel in the block.
++uint32_t width: 				width of the texture being decompressed.
++const uint8_t *blockStorage:	pointer to the block to decompress.
++uint32_t *image:				pointer to image where the decompressed pixel data should be stored.
++*/ 
++void DecompressBlockDXT1(uint32_t x, uint32_t y, uint32_t width,
++	const uint8_t* blockStorage,
++	int transparent0, int* simpleAlpha, int *complexAlpha,
++	uint32_t* image)
++{
++	static const uint8_t const_alpha [] = {
++		255, 255, 255, 255,
++		255, 255, 255, 255,
++		255, 255, 255, 255,
++		255, 255, 255, 255
++	};
++
++	DecompressBlockDXT1Internal (blockStorage,
++		image + x + (y * width), width, transparent0, simpleAlpha, complexAlpha, const_alpha);
++}
++
++/*
++void DecompressBlockDXT5(): Decompresses one block of a DXT5 texture and stores the resulting pixels at the appropriate offset in 'image'.
++uint32_t x:						x-coordinate of the first pixel in the block.
++uint32_t y:						y-coordinate of the first pixel in the block.
++uint32_t width: 				width of the texture being decompressed.
++const uint8_t *blockStorage:	pointer to the block to decompress.
++uint32_t *image:				pointer to image where the decompressed pixel data should be stored.
++*/ 
++void DecompressBlockDXT5(uint32_t x, uint32_t y, uint32_t width,
++	const uint8_t* blockStorage,
++	int transparent0, int* simpleAlpha, int *complexAlpha,
++	uint32_t* image)
++{
++	uint8_t alpha0, alpha1;
++	const uint8_t* bits;
++	uint32_t alphaCode1;
++	uint16_t alphaCode2;
++
++	uint16_t color0, color1;
++	uint8_t r0, g0, b0, r1, g1, b1;
++
++	int i, j;
++
++	uint32_t temp, code;
++
++	alpha0 = *(blockStorage);
++	alpha1 = *(blockStorage + 1);
++
++	bits = blockStorage + 2;
++	alphaCode1 = bits[2] | (bits[3] << 8) | (bits[4] << 16) | (bits[5] << 24);
++	alphaCode2 = bits[0] | (bits[1] << 8);
++
++	color0 = *(const uint16_t*)(blockStorage + 8);
++	color1 = *(const uint16_t*)(blockStorage + 10);	
++
++	temp = (color0 >> 11) * 255 + 16;
++	r0 = (uint8_t)((temp/32 + temp)/32);
++	temp = ((color0 & 0x07E0) >> 5) * 255 + 32;
++	g0 = (uint8_t)((temp/64 + temp)/64);
++	temp = (color0 & 0x001F) * 255 + 16;
++	b0 = (uint8_t)((temp/32 + temp)/32);
++
++	temp = (color1 >> 11) * 255 + 16;
++	r1 = (uint8_t)((temp/32 + temp)/32);
++	temp = ((color1 & 0x07E0) >> 5) * 255 + 32;
++	g1 = (uint8_t)((temp/64 + temp)/64);
++	temp = (color1 & 0x001F) * 255 + 16;
++	b1 = (uint8_t)((temp/32 + temp)/32);
++
++	code = *(const uint32_t*)(blockStorage + 12);
++
++	for (j = 0; j < 4; j++) {
++		for (i = 0; i < 4; i++) {
++			uint8_t finalAlpha;
++			int alphaCode, alphaCodeIndex;
++			uint8_t colorCode;
++			uint32_t finalColor;
++
++			alphaCodeIndex = 3*(4*j+i);
++			if (alphaCodeIndex <= 12) {
++				alphaCode = (alphaCode2 >> alphaCodeIndex) & 0x07;
++			} else if (alphaCodeIndex == 15) {
++				alphaCode = (alphaCode2 >> 15) | ((alphaCode1 << 1) & 0x06);
++			} else /* alphaCodeIndex >= 18 && alphaCodeIndex <= 45 */ {
++				alphaCode = (alphaCode1 >> (alphaCodeIndex - 16)) & 0x07;
++			}
++
++			if (alphaCode == 0) {
++				finalAlpha = alpha0;
++			} else if (alphaCode == 1) {
++				finalAlpha = alpha1;
++			} else {
++				if (alpha0 > alpha1) {
++					finalAlpha = (uint8_t)(((8-alphaCode)*alpha0 + (alphaCode-1)*alpha1)/7);
++				} else {
++					if (alphaCode == 6) {
++						finalAlpha = 0;
++					} else if (alphaCode == 7) {
++						finalAlpha = 255;
++					} else {
++						finalAlpha = (uint8_t)(((6-alphaCode)*alpha0 + (alphaCode-1)*alpha1)/5);
++					}
++				}
++			}
++
++			colorCode = (code >> 2*(4*j+i)) & 0x03; 
++			finalColor = 0;
++
++			switch (colorCode) {
++			case 0:
++				finalColor = PackRGBA(r0, g0, b0, finalAlpha);
++				break;
++			case 1:
++				finalColor = PackRGBA(r1, g1, b1, finalAlpha);
++				break;
++			case 2:
++				finalColor = PackRGBA((2*r0+r1)/3, (2*g0+g1)/3, (2*b0+b1)/3, finalAlpha);
++				break;
++			case 3:
++				finalColor = PackRGBA((r0+2*r1)/3, (g0+2*g1)/3, (b0+2*b1)/3, finalAlpha);
++				break;
++			}
++
++			if(finalAlpha==0) *simpleAlpha = 1;
++			else if(finalAlpha<0xff) *complexAlpha = 1;
++
++			image [i + x + (width* (y+j))] = finalColor; 
++		}
++	}
++}
++
++/*
++void DecompressBlockDXT3(): Decompresses one block of a DXT3 texture and stores the resulting pixels at the appropriate offset in 'image'.
++uint32_t x:						x-coordinate of the first pixel in the block.
++uint32_t y:						y-coordinate of the first pixel in the block.
++uint32_t height:				height of the texture being decompressed.
++const uint8_t *blockStorage:	pointer to the block to decompress.
++uint32_t *image:				pointer to image where the decompressed pixel data should be stored.
++*/ 
++void DecompressBlockDXT3(uint32_t x, uint32_t y, uint32_t width,
++	const uint8_t* blockStorage,
++	int transparent0, int* simpleAlpha, int *complexAlpha,
++	uint32_t* image)
++{
++	int i;
++
++	uint8_t alphaValues [16] = { 0 };
++
++	for (i = 0; i < 4; ++i) {
++		const uint16_t* alphaData = (const uint16_t*) (blockStorage);
++
++		alphaValues [i*4 + 0] = (((*alphaData) >> 0) & 0xF ) * 17;
++		alphaValues [i*4 + 1] = (((*alphaData) >> 4) & 0xF ) * 17;
++		alphaValues [i*4 + 2] = (((*alphaData) >> 8) & 0xF ) * 17;
++		alphaValues [i*4 + 3] = (((*alphaData) >> 12) & 0xF) * 17;
++
++		blockStorage += 2;
++	}
++
++	DecompressBlockDXT1Internal (blockStorage,
++		image + x + (y * width), width, transparent0, simpleAlpha, complexAlpha, alphaValues);
++}
++
++static int inline nlevel(int size, int level) {
++    if(size) {
++        size>>=level;
++        if(!size) size=1;
++    }
++    return size;
++}
++
++// return the max level for that WxH size
++static int inline maxlevel(int w, int h) {
++    int mlevel = 0;
++    while(w!=1 || h!=1) {
++        w>>=1; h>>=1;
++        if(!w) w=1;
++        if(!h) h=1;
++        ++mlevel;
++    }
++    return mlevel;
++}
++
++static GLboolean isDXTc(GLenum format) {
++    switch (format) {
++        case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:
++        case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT:
++        case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:
++        case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
++        case GL_COMPRESSED_SRGB_S3TC_DXT1_EXT:
++        case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT:
++        case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT:
++        case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT:
++            return 1;
++    }
++    return 0;
++}
++
++GLboolean isDXTcSRGB(GLenum format) {
++    switch (format) {
++        case GL_COMPRESSED_SRGB_S3TC_DXT1_EXT:
++        case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT:
++        case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT:
++        case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT:
++            return 1;
++    }
++    return 0;
++}
++
++GLboolean isDXTcAlpha(GLenum format) {
++    switch (format) {
++        case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT:
++        case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:
++        case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
++        case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT:
++        case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT:
++        case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT:
++            return 1;
++    }
++    return 0;
++}
++
++static GLboolean isNotCompressed(GLenum format) {
++    switch(format) {
++        case GL_RGBA:
++        case GL_RGB:
++        case GL_RGBA8:
++        case GL_RGB8:
++        case GL_RGB5:
++        case GL_RGB565:
++            return true;
++    }
++    return false;
++}
++
++static GLenum compressedMinMipmap(GLenum param)
++{
++    switch(param) {
++        case GL_NEAREST_MIPMAP_NEAREST:
++        case GL_NEAREST_MIPMAP_LINEAR:
++            return GL_NEAREST;
++        case GL_LINEAR_MIPMAP_NEAREST:
++        case GL_LINEAR_MIPMAP_LINEAR:
++            return GL_LINEAR;
++        default:
++            return param;
++    }
++}
++
++GLvoid *uncompressDXTc(GLsizei width, GLsizei height, GLenum format, GLsizei imageSize,
++                        int transparent0, int* simpleAlpha, int* complexAlpha, const GLvoid *data)
++{
++    // uncompress a DXTc image
++    // get pixel size of uncompressed image => fixed RGBA
++    int pixelsize = 4;
++
++/*	if (format==COMPRESSED_RGB_S3TC_DXT1_EXT)
++        pixelsize = 3;*/
++    // check with the size of the input data stream if the stream is in fact uncompressed
++    if (imageSize == width*height*pixelsize || data==NULL) {
++        // uncompressed stream
++        return (GLvoid*)data;
++    }
++    // alloc memory
++    GLvoid *pixels = malloc(((width+3)&~3)*((height+3)&~3)*pixelsize);
++    // uncompress loop
++    int blocksize;
++    switch (format) {
++        case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:
++        case GL_COMPRESSED_SRGB_S3TC_DXT1_EXT:
++        case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT:
++        case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT:
++            blocksize = 8;
++            break;
++        case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:
++        case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
++        case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT:
++        case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT:
++        case GL_RGBA_DXT5_S3TC:
++            blocksize = 16;
++            break;
++    }
++    uintptr_t src = (uintptr_t) data;
++    for (int y=0; y<height; y+=4) {
++        for (int x=0; x<width; x+=4) {
++            switch(format) {
++                case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:
++                case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT:
++                case GL_COMPRESSED_SRGB_S3TC_DXT1_EXT:
++                case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT:
++                    DecompressBlockDXT1(x, y, width, (uint8_t*)src, transparent0, simpleAlpha, complexAlpha, pixels);
++                    break;
++                case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:
++                case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT:
++                    DecompressBlockDXT3(x, y, width, (uint8_t*)src, transparent0, simpleAlpha, complexAlpha, pixels);
++                    break;
++                case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
++                case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT:
++                case GL_RGBA_DXT5_S3TC:
++                    DecompressBlockDXT5(x, y, width, (uint8_t*)src, transparent0, simpleAlpha, complexAlpha, pixels);
++                    break;
++            }
++            src+=blocksize;
++        }
++    }
++    return pixels;
++}
+diff --git a/src/gl4es-decompress.h b/src/gl4es-decompress.h
+new file mode 100644
+index 00000000..742500da
+--- /dev/null
++++ b/src/gl4es-decompress.h
+@@ -0,0 +1,29 @@
++#ifndef _GL4ES_DECOMPRESS_H_
++#define _GL4ES_DECOMPRESS_H_
++
++#include <stdint.h>
++#include <epoxy/gl.h>
++
++void DecompressBlockDXT1(uint32_t x, uint32_t y, uint32_t width,
++	const uint8_t* blockStorage,
++	int transparent0, int* simpleAlpha, int *complexAlpha,
++	uint32_t* image);
++
++void DecompressBlockDXT3(uint32_t x, uint32_t y, uint32_t width,
++	const uint8_t* blockStorage,
++	int transparent0, int* simpleAlpha, int *complexAlpha,
++	uint32_t* image);
++
++void DecompressBlockDXT5(uint32_t x, uint32_t y, uint32_t width,
++	const uint8_t* blockStorage,
++	int transparent0, int* simpleAlpha, int *complexAlpha,
++	uint32_t* image);
++
++GLboolean isDXTcSRGB(GLenum format);
++
++GLboolean isDXTcAlpha(GLenum format);
++
++GLvoid *uncompressDXTc(GLsizei width, GLsizei height, GLenum format, GLsizei imageSize,
++                       int transparent0, int* simpleAlpha, int* complexAlpha, const GLvoid *data);
++
++#endif // _GL4ES_DECOMPRESS_H_
+diff --git a/src/meson.build b/src/meson.build
+index e9c97f72..34b2983f 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -55,6 +55,7 @@ vrend_sources = [
+    'vrend_tweaks.h',
+    'vrend_winsys.c',
+    'vrend_winsys.h',
++   'gl4es-decompress.c',
+ ]
+ 
+ virglrenderer_sources = [
+diff --git a/src/vrend_formats.c b/src/vrend_formats.c
+index fde607c2..0fa94960 100644
+--- a/src/vrend_formats.c
++++ b/src/vrend_formats.c
+@@ -534,6 +534,8 @@ static void vrend_add_compressed_formats(struct vrend_format_table *table, int n
+ #define add_formats(x) vrend_add_formats((x), ARRAY_SIZE((x)))
+ #define add_compressed_formats(x) vrend_add_compressed_formats((x), ARRAY_SIZE((x)))
+ 
++extern int dxtn_decompress;
++
+ void vrend_build_format_list_common(void)
+ {
+   add_formats(base_rgba_formats);
+@@ -564,7 +566,7 @@ void vrend_build_format_list_common(void)
+   /* compressed */
+   if (epoxy_has_gl_extension("GL_S3_s3tc") ||
+       epoxy_has_gl_extension("GL_EXT_texture_compression_s3tc") ||
+-      epoxy_has_gl_extension("GL_ANGLE_texture_compression_dxt")) {
++      epoxy_has_gl_extension("GL_ANGLE_texture_compression_dxt") || dxtn_decompress) {
+      add_compressed_formats(dxtn_formats);
+      add_compressed_formats(dxtn_srgb_formats);
+   }
+diff --git a/src/vrend_renderer.c b/src/vrend_renderer.c
+index 6608bb6d..dba5f65a 100644
+--- a/src/vrend_renderer.c
++++ b/src/vrend_renderer.c
+@@ -68,6 +68,17 @@
+ #include <vrend_video.h>
+ #endif
+ 
++#include "gl4es-decompress.h"
++const int dxtn_decompress = 1;
++static void CheckGlError( const char* pFunctionName )
++{
++   GLint error = glGetError();
++   if( error != GL_NO_ERROR )
++   {
++      printf("%s returned glError 0x%x\n", pFunctionName, error);
++   }
++}
++
+ /*
+  * VIRGL_RENDERER_CAPSET_VIRGL has version 0 and 1, but they are both
+  * virgl_caps_v1 and are exactly the same.
+@@ -8465,6 +8479,9 @@ static int vrend_renderer_transfer_write_iov(struct vrend_context *ctx,
+ {
+    void *data;
+ 
++   GLvoid *decompressed_data;
++   short decompress_success = 0;
++
+    if ((is_only_bit(res->storage_bits, VREND_STORAGE_GUEST_MEMORY) ||
+        has_bit(res->storage_bits, VREND_STORAGE_HOST_SYSTEM_MEMORY)) && res->iov) {
+       return vrend_copy_iovec(iov, num_iovs, info->offset,
+@@ -8653,10 +8670,65 @@ static int vrend_renderer_transfer_write_iov(struct vrend_context *ctx,
+             else
+                vrend_scale_depth(data, send_size, depth_scale);
+          }
++         if (compressed && dxtn_decompress) {
++            // from gl4es code
++            int simpleAlpha = 0;
++            int complexAlpha = 0;
++            int transparent0 = (glformat == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT ||
++                                 glformat == GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT) ? 1 : 0;
++
++            if(isDXTcAlpha(glformat))
++               simpleAlpha = complexAlpha = 1;
++
++            if (data) {
++               if ((info->box->width & 3) || (info->box->height & 3)) {
++                     GLvoid *tmp;
++                     GLsizei nw = info->box->width;
++                     GLsizei nh = info->box->height;
++                     int y_tmp;
++                     if (nw < 4) nw = 4;
++                     if (nh < 4) nh = 4;
++                     tmp = uncompressDXTc(nw, nh, glformat, comp_size, transparent0,
++                                          &simpleAlpha, &complexAlpha, data);
++                     decompressed_data = malloc(4 * info->box->width * info->box->height);
++
++                     for (y_tmp = 0; y_tmp < info->box->height; y_tmp ++)
++                        memcpy(decompressed_data + y_tmp * info->box->width * 4, tmp + y_tmp * nw * 4,
++                              info->box->width * 4);
++                     free(tmp);
++               } else {
++                     decompressed_data = uncompressDXTc(info->box->width, info->box->height, glformat,
++                                                      comp_size, transparent0, &simpleAlpha, &complexAlpha, data);
++               }
++            }
++
++            if((gltype != GL_UNSIGNED_BYTE) && isDXTcSRGB(glformat)) {
++
++               if(simpleAlpha && !complexAlpha) {
++                     glformat = GL_RGBA;
++                     gltype = GL_UNSIGNED_SHORT_5_5_5_1;
++               } else if(complexAlpha || simpleAlpha) {
++                     glformat = GL_RGBA;
++                     gltype = GL_UNSIGNED_SHORT_4_4_4_4;
++               } else {
++                     glformat = GL_RGB;
++                     gltype = GL_UNSIGNED_SHORT_5_6_5;
++               }
++            } else {
++               glformat = GL_RGBA;
++            }
++            decompress_success = 1;
++         }
+          if (res->target == GL_TEXTURE_CUBE_MAP) {
+             GLenum ctarget = GL_TEXTURE_CUBE_MAP_POSITIVE_X + info->box->z;
+             if (compressed) {
+-               glCompressedTexSubImage2D(ctarget, info->level, x, y,
++               if (dxtn_decompress) {
++                  glTexImage2D(ctarget, info->level, glformat, info->box->width,
++                              info->box->height, 0, glformat, gltype, decompressed_data);
++                  CheckGlError("glTexImage2D");
++               }
++               else
++                  glCompressedTexSubImage2D(ctarget, info->level, x, y,
+                                          info->box->width, info->box->height,
+                                          glformat, comp_size, data);
+             } else {
+@@ -8665,7 +8737,14 @@ static int vrend_renderer_transfer_write_iov(struct vrend_context *ctx,
+             }
+          } else if (res->target == GL_TEXTURE_3D || res->target == GL_TEXTURE_2D_ARRAY || res->target == GL_TEXTURE_CUBE_MAP_ARRAY) {
+             if (compressed) {
+-               glCompressedTexSubImage3D(res->target, info->level, x, y, info->box->z,
++               if (dxtn_decompress) {
++                  glTexImage3D(res->target, info->level, glformat,
++                              info->box->width, info->box->height, info->box->depth,
++                              0, glformat, gltype, decompressed_data);
++                  CheckGlError("glTexImage3D");
++               }
++               else
++                  glCompressedTexSubImage3D(res->target, info->level, x, y, info->box->z,
+                                          info->box->width, info->box->height, info->box->depth,
+                                          glformat, comp_size, data);
+             } else {
+@@ -8674,7 +8753,12 @@ static int vrend_renderer_transfer_write_iov(struct vrend_context *ctx,
+                                glformat, gltype, data);
+             }
+          } else if (res->target == GL_TEXTURE_1D) {
+-            if (vrend_state.use_gles) {
++            if (compressed && dxtn_decompress) {
++               glTexImage1D(res->target, info->level, glformat, info->box->width,
++                           0, glformat, gltype, decompressed_data);
++               CheckGlError("glTexImage1D");
++            }
++            else if (vrend_state.use_gles) {
+                /* Covers both compressed and none compressed. */
+                report_gles_missing_func(ctx, "gl[Compressed]TexSubImage1D");
+             } else if (compressed) {
+@@ -8687,7 +8771,18 @@ static int vrend_renderer_transfer_write_iov(struct vrend_context *ctx,
+             }
+          } else {
+             if (compressed) {
+-               glCompressedTexSubImage2D(res->target, info->level, x, res->target == GL_TEXTURE_1D_ARRAY ? info->box->z : y,
++               if (dxtn_decompress) {
++                  glTexImage2D(res->target, info->level, glformat, info->box->width,
++                              info->box->height, 0, glformat, gltype, NULL);
++                  CheckGlError("glTexImage2D");
++                  glTexSubImage2D(res->target, info->level, x, res->target == GL_TEXTURE_1D_ARRAY ? info->box->z : y,
++                                 info->box->width,
++                                 res->target == GL_TEXTURE_1D_ARRAY ? info->box->depth : info->box->height,
++                                 glformat, gltype, decompressed_data);
++                  CheckGlError("glTexSubImage2D");
++               }
++               else
++                  glCompressedTexSubImage2D(res->target, info->level, x, res->target == GL_TEXTURE_1D_ARRAY ? info->box->z : y,
+                                          info->box->width, info->box->height,
+                                          glformat, comp_size, data);
+             } else {
+@@ -8710,6 +8805,9 @@ static int vrend_renderer_transfer_write_iov(struct vrend_context *ctx,
+ 
+       glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+ 
++      if (decompress_success)
++         free(decompressed_data);
++
+       if (need_temp)
+          free(data);
+    }
+-- 
+2.34.1
+

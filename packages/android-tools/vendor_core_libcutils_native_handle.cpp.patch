@@ -1,0 +1,18 @@
+--- a/vendor/core/libcutils/native_handle.cpp
++++ b/vendor/core/libcutils/native_handle.cpp
+@@ -23,13 +23,13 @@
+ #include <unistd.h>
+ 
+ // Needs to come after stdlib includes to capture the __BIONIC__ definition
+-#ifdef __BIONIC__
++#if 0
+ #include <android/fdsan.h>
+ #endif
+ 
+ namespace {
+ 
+-#if !defined(__BIONIC__)
++#if 1
+ // fdsan stubs when not linked against bionic
+ #define ANDROID_FDSAN_OWNER_TYPE_NATIVE_HANDLE 0
+ 

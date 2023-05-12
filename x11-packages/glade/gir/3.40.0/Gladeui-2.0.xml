@@ -10,9 +10,9 @@
     <implements name="GtkOrientable"/>
     <implements name="GladeEditable"/>
     <property name="property-def" type="gpointer" flags="11"/>
-    <property name="use-command" type="gboolean" flags="3"/>
-    <property name="disable-check" type="gboolean" flags="7"/>
-    <property name="custom-text" type="gchararray" flags="3"/>
+    <property name="use-command" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="disable-check" type="gboolean" flags="7" default-value="FALSE"/>
+    <property name="custom-text" type="gchararray" flags="3" default-value="NULL"/>
     <signal name="value-changed" return="void" when="last">
       <param type="GladeProperty"/>
     </signal>
@@ -91,41 +91,41 @@
     <prerequisite name="GtkWidget"/>
   </interface>
   <class name="GladeWidgetAdaptor" get-type="glade_widget_adaptor_get_type" parents="GObject">
-    <property name="name" type="gchararray" flags="11"/>
+    <property name="name" type="gchararray" flags="11" default-value="NULL"/>
     <property name="type" type="GType" flags="11"/>
-    <property name="title" type="gchararray" flags="3"/>
-    <property name="generic-name" type="gchararray" flags="11"/>
-    <property name="icon-name" type="gchararray" flags="11"/>
-    <property name="catalog" type="gchararray" flags="11"/>
-    <property name="book" type="gchararray" flags="11"/>
-    <property name="special-child-type" type="gchararray" flags="11"/>
+    <property name="title" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="generic-name" type="gchararray" flags="11" default-value="NULL"/>
+    <property name="icon-name" type="gchararray" flags="11" default-value="widget-gtk-frame"/>
+    <property name="catalog" type="gchararray" flags="11" default-value="NULL"/>
+    <property name="book" type="gchararray" flags="11" default-value="NULL"/>
+    <property name="special-child-type" type="gchararray" flags="11" default-value="NULL"/>
     <property name="cursor" type="gpointer" flags="1"/>
-    <property name="query" type="gboolean" flags="3"/>
+    <property name="query" type="gboolean" flags="3" default-value="FALSE"/>
   </class>
   <class name="GladeWidgetAction" get-type="glade_widget_action_get_type" parents="GObject">
     <property name="definition" type="gpointer" flags="10"/>
-    <property name="sensitive" type="gboolean" flags="3"/>
-    <property name="visible" type="gboolean" flags="3"/>
+    <property name="sensitive" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="visible" type="gboolean" flags="3" default-value="TRUE"/>
   </class>
   <boxed name="GladeWidgetActionDef" get-type="glade_widget_action_def_get_type"/>
   <class name="GladeSignal" get-type="glade_signal_get_type" parents="GObject">
     <property name="class" type="gpointer" flags="11"/>
-    <property name="detail" type="gchararray" flags="3"/>
-    <property name="handler" type="gchararray" flags="3"/>
-    <property name="userdata" type="gchararray" flags="3"/>
-    <property name="support-warning" type="gchararray" flags="3"/>
-    <property name="after" type="gboolean" flags="3"/>
-    <property name="swapped" type="gboolean" flags="3"/>
+    <property name="detail" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="handler" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="userdata" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="support-warning" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="after" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="swapped" type="gboolean" flags="3" default-value="FALSE"/>
   </class>
   <class name="GladeProperty" get-type="glade_property_get_type" parents="GObject">
     <property name="class" type="gpointer" flags="11"/>
-    <property name="enabled" type="gboolean" flags="3"/>
-    <property name="sensitive" type="gboolean" flags="3"/>
-    <property name="i18n-translatable" type="gboolean" flags="3"/>
-    <property name="i18n-context" type="gchararray" flags="3"/>
-    <property name="i18n-comment" type="gchararray" flags="3"/>
-    <property name="state" type="gint" flags="1"/>
-    <property name="precision" type="gint" flags="3"/>
+    <property name="enabled" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="sensitive" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="i18n-translatable" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="i18n-context" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="i18n-comment" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="state" type="gint" flags="1" default-value="0"/>
+    <property name="precision" type="gint" flags="3" default-value="2"/>
     <signal name="value-changed" return="void" when="last">
       <param type="gpointer"/>
       <param type="gpointer"/>
@@ -138,23 +138,23 @@
   </class>
   <class name="GladeWidget" get-type="glade_widget_get_type" parents="GInitiallyUnowned,GObject">
     <implements name="_GladeDrag"/>
-    <property name="name" type="gchararray" flags="7"/>
-    <property name="internal" type="gchararray" flags="7"/>
-    <property name="anarchist" type="gboolean" flags="11"/>
+    <property name="name" type="gchararray" flags="7" default-value="NULL"/>
+    <property name="internal" type="gchararray" flags="7" default-value="NULL"/>
+    <property name="anarchist" type="gboolean" flags="11" default-value="FALSE"/>
     <property name="adaptor" type="GladeWidgetAdaptor" flags="11"/>
     <property name="object" type="GObject" flags="7"/>
     <property name="project" type="GladeProject" flags="7"/>
     <property name="properties" type="gpointer" flags="11"/>
     <property name="parent" type="GladeWidget" flags="7"/>
-    <property name="internal-name" type="gchararray" flags="10"/>
+    <property name="internal-name" type="gchararray" flags="10" default-value="NULL"/>
     <property name="template" type="GladeWidget" flags="10"/>
-    <property name="template-exact" type="gboolean" flags="10"/>
-    <property name="reason" type="gint" flags="11"/>
-    <property name="toplevel-width" type="gint" flags="3"/>
-    <property name="toplevel-height" type="gint" flags="3"/>
-    <property name="support-warning" type="gchararray" flags="1"/>
-    <property name="visible" type="gboolean" flags="1"/>
-    <property name="composite" type="gboolean" flags="3"/>
+    <property name="template-exact" type="gboolean" flags="10" default-value="FALSE"/>
+    <property name="reason" type="gint" flags="11" default-value="0"/>
+    <property name="toplevel-width" type="gint" flags="3" default-value="-1"/>
+    <property name="toplevel-height" type="gint" flags="3" default-value="-1"/>
+    <property name="support-warning" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="visible" type="gboolean" flags="1" default-value="FALSE"/>
+    <property name="composite" type="gboolean" flags="3" default-value="FALSE"/>
     <signal name="button-press-event" return="gboolean" when="last">
       <param type="GdkEvent"/>
     </signal>
@@ -181,12 +181,12 @@
     <implements name="GtkBuildable"/>
     <implements name="GtkOrientable"/>
     <implements name="GladeEditable"/>
-    <property name="property-name" type="gchararray" flags="3"/>
-    <property name="packing" type="gboolean" flags="3"/>
-    <property name="use-command" type="gboolean" flags="3"/>
-    <property name="editor-type" type="gchararray" flags="10"/>
-    <property name="custom-text" type="gchararray" flags="3"/>
-    <property name="disable-check" type="gboolean" flags="3"/>
+    <property name="property-name" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="packing" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="use-command" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="editor-type" type="gchararray" flags="10" default-value="NULL"/>
+    <property name="custom-text" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="disable-check" type="gboolean" flags="3" default-value="FALSE"/>
     <signal name="pre-commit" return="void" when="last">
       <param type="gpointer"/>
     </signal>
@@ -211,17 +211,17 @@
   <class name="GladeProject" get-type="glade_project_get_type" parents="GObject">
     <implements name="GtkTreeModel"/>
     <implements name="GtkTreeDragSource"/>
-    <property name="modified" type="gboolean" flags="1"/>
-    <property name="has-selection" type="gboolean" flags="1"/>
-    <property name="path" type="gchararray" flags="1"/>
-    <property name="read-only" type="gboolean" flags="1"/>
+    <property name="modified" type="gboolean" flags="1" default-value="FALSE"/>
+    <property name="has-selection" type="gboolean" flags="1" default-value="FALSE"/>
+    <property name="path" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="read-only" type="gboolean" flags="1" default-value="FALSE"/>
     <property name="add-item" type="GladeWidgetAdaptor" flags="1"/>
-    <property name="pointer-mode" type="GladePointerMode" flags="1"/>
-    <property name="translation-domain" type="gchararray" flags="3"/>
+    <property name="pointer-mode" type="GladePointerMode" flags="1" default-value="GLADE_POINTER_SELECT"/>
+    <property name="translation-domain" type="gchararray" flags="3" default-value="NULL"/>
     <property name="template" type="GladeWidget" flags="3"/>
-    <property name="resource-path" type="gchararray" flags="3"/>
-    <property name="license" type="gchararray" flags="3"/>
-    <property name="css-provider-path" type="gchararray" flags="3"/>
+    <property name="resource-path" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="license" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="css-provider-path" type="gchararray" flags="3" default-value="NULL"/>
     <signal name="add-signal-handler" return="void" when="last">
       <param type="GladeWidget"/>
       <param type="GladeSignal"/>
@@ -290,26 +290,26 @@
     <implements name="AtkImplementorIface"/>
     <implements name="GtkBuildable"/>
     <implements name="GtkOrientable"/>
-    <property name="show-info" type="gboolean" flags="-2147483647"/>
+    <property name="show-info" type="gboolean" flags="-2147483647" default-value="FALSE"/>
     <property name="widget" type="GladeWidget" flags="3"/>
-    <property name="show-class-field" type="gboolean" flags="3"/>
-    <property name="class-field" type="gchararray" flags="1"/>
-    <property name="show-boder" type="gboolean" flags="3"/>
+    <property name="show-class-field" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="class-field" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="show-boder" type="gboolean" flags="3" default-value="TRUE"/>
     <property name="signal-editor" type="GladeSignalEditor" flags="1"/>
   </class>
   <class name="GladePalette" get-type="glade_palette_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
     <implements name="AtkImplementorIface"/>
     <implements name="GtkBuildable"/>
     <implements name="GtkOrientable"/>
-    <property name="item-appearance" type="GladeItemAppearance" flags="3"/>
-    <property name="use-small-item-icons" type="gboolean" flags="3"/>
-    <property name="show-selector-button" type="gboolean" flags="3"/>
+    <property name="item-appearance" type="GladeItemAppearance" flags="3" default-value="GLADE_ITEM_ICON_ONLY"/>
+    <property name="use-small-item-icons" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="show-selector-button" type="gboolean" flags="3" default-value="TRUE"/>
     <property name="project" type="GladeProject" flags="3"/>
     <signal name="refresh" return="void" when="last">
     </signal>
   </class>
   <class name="GladeClipboard" get-type="glade_clipboard_get_type" parents="GObject">
-    <property name="has-selection" type="gboolean" flags="1"/>
+    <property name="has-selection" type="gboolean" flags="1" default-value="FALSE"/>
   </class>
   <class name="GladeApp" get-type="glade_app_get_type" parents="GObject">
     <signal name="doc-search" return="void" when="last">
@@ -383,8 +383,8 @@
   <fundamental name="GladeParamObjects" get-type="glade_param_objects_get_type" instantiatable="1" parents="GParam">
   </fundamental>
   <class name="GladeCellRendererIcon" get-type="glade_cell_renderer_icon_get_type" parents="GtkCellRendererPixbuf,GtkCellRenderer,GInitiallyUnowned,GObject">
-    <property name="activatable" type="gboolean" flags="3"/>
-    <property name="active" type="gboolean" flags="3"/>
+    <property name="activatable" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="active" type="gboolean" flags="3" default-value="FALSE"/>
     <signal name="activate" return="void" when="last">
       <param type="gchararray"/>
     </signal>
@@ -487,18 +487,18 @@
     <implements name="GtkBuildable"/>
     <implements name="GtkOrientable"/>
     <implements name="GladeEditable"/>
-    <property name="page-type" type="GladeEditorPageType" flags="10"/>
+    <property name="page-type" type="GladeEditorPageType" flags="10" default-value="GLADE_PAGE_GENERAL"/>
   </class>
   <class name="GladePropertyLabel" get-type="glade_property_label_get_type" parents="GtkEventBox,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
     <implements name="AtkImplementorIface"/>
     <implements name="GtkBuildable"/>
     <implements name="GladeEditable"/>
     <property name="property" type="GladeProperty" flags="3"/>
-    <property name="property-name" type="gchararray" flags="3"/>
-    <property name="append-colon" type="gboolean" flags="3"/>
-    <property name="packing" type="gboolean" flags="3"/>
-    <property name="custom-text" type="gchararray" flags="3"/>
-    <property name="custom-tooltip" type="gchararray" flags="3"/>
+    <property name="property-name" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="append-colon" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="packing" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="custom-text" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="custom-tooltip" type="gchararray" flags="3" default-value="NULL"/>
   </class>
   <class name="GladeNamedIconChooserDialog" get-type="glade_named_icon_chooser_dialog_get_type" parents="GtkDialog,GtkWindow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
     <implements name="AtkImplementorIface"/>

@@ -1,0 +1,12 @@
+--- src/thirdparty/oidn/mkl-dnn/src/common/primitive_attr.cpp	2023-03-01 03:38:07.000000000 +0300
++++ src/thirdparty/oidn/mkl-dnn/src/common/primitive_attr.cpp.patch	2023-03-05 19:11:07.289053596 +0300
+@@ -21,6 +21,9 @@
+ #include "type_helpers.hpp"
+ #include "utils.hpp"
+ 
++#undef user
++#define user mkldnn::impl::scratchpad_mode::user
++
+ using namespace mkldnn::impl;
+ using namespace mkldnn::impl::status;
+ using namespace mkldnn::impl::utils;

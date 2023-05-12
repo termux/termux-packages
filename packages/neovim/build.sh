@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Ambitious Vim-fork focused on extensibility and agility 
 TERMUX_PKG_LICENSE="Apache-2.0, VIM License"
 TERMUX_PKG_LICENSE_FILE="LICENSE.txt"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.8.3
+TERMUX_PKG_VERSION=0.9.0
 TERMUX_PKG_SRCURL=https://github.com/neovim/neovim/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=adf45ff160e1d89f519b6114732eba03485ae469beb27919b0f7a4f6b44233c1
+TERMUX_PKG_SHA256=39d79107c54d2f3babcad2cd157c399241c04f6e75e98c18e8afaf2bb5e82937
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
 TERMUX_PKG_DEPENDS="libiconv, libuv, luv, libmsgpack, libandroid-support, libvterm (>= 1:0.3-0), libtermkey, libluajit, libunibilium, libtreesitter"
@@ -27,7 +27,7 @@ termux_pkg_auto_update() {
 	local tag
 	tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}")"
 	# check if this is not a numbered release:
-	if grep -qP "^v${TERMUX_PKG_UPDATE_VERSION_REGEXP}\$" <<<"$tag"; then
+	if grep -qP "^${TERMUX_PKG_UPDATE_VERSION_REGEXP}\$" <<<"$tag"; then
 		termux_pkg_upgrade_version "$tag"
 	else
 		echo "WARNING: Skipping auto-update: Not a numbered release($tag)"

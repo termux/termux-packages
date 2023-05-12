@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://biblatex-biber.sourceforge.net
+TERMUX_PKG_HOMEPAGE=https://biblatex-biber.sourceforge.net
 TERMUX_PKG_DESCRIPTION="A Unicode-capable BibTeX replacement for biblatex users"
 TERMUX_PKG_LICENSE="Artistic-License-2.0"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"

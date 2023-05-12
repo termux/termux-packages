@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/parallel/
 TERMUX_PKG_DESCRIPTION="GNU Parallel is a shell tool for executing jobs in parallel using one or more machines"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=20230122
+TERMUX_PKG_VERSION=20230422
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/parallel/parallel-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=9c7c44070cca3118e72380086cb6cc3662be27c3e56b6ac93449cd4ef3edc204
+TERMUX_PKG_SHA256=9106593d09dc4de0e094b7b14390a309d8fcb1d27104a53814d16937dcbae3c2
 TERMUX_PKG_DEPENDS="perl"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 

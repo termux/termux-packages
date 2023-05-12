@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Structured Terminal Forms Language/Library"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.24
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://grimler.se/termux/stfl-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=d4a7aa181a475aaf8a8914a8ccb2a7ff28919d4c8c0f8a061e17a0c36869c090
 TERMUX_PKG_DEPENDS="libandroid-support, libiconv, ncurses"
@@ -18,6 +18,8 @@ termux_step_pre_configure(){
 	# /usr/bin/ld: ../libstfl.a(public.o): Relocations in generic ELF (EM: 183)
 	# /usr/bin/ld: ../libstfl.a: error adding symbols: file in wrong format
 	sed -i 's/FOUND_PERL5 = 1/FOUND_PERL5 = 0/g' Makefile.cfg
+
+	CPPFLAGS+=" -DNCURSES_WIDECHAR"
 }
 
 termux_step_configure() {

@@ -1,0 +1,17 @@
+--- a/src/paths.rs
++++ b/src/paths.rs
+@@ -91,12 +91,13 @@
+         if cfg!(target_os = "macos") {
+             std::env::temp_dir().join(SOCKET_FILE_STR)
+         } else if cfg!(any(
++            target_os = "android",
+             target_os = "freebsd",
+             target_os = "dragonfly",
+             target_os = "openbsd",
+             target_os = "netbsd"
+         )) {
+-            PathBuf::from("/var").join("run").join(SOCKET_FILE_STR)
++            PathBuf::from("@TERMUX_PREFIX@/var").join("run").join(SOCKET_FILE_STR)
+         } else {
+             PathBuf::from("/run").join(SOCKET_FILE_STR)
+         }

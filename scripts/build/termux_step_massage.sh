@@ -6,8 +6,23 @@ termux_step_massage() {
 	# Remove lib/charset.alias which is installed by gettext-using packages:
 	rm -f lib/charset.alias
 
+	# Remove cache file created by update-desktop-database:
+	rm -f share/applications/mimeinfo.cache
+
+	# Remove cache file created by glib-compile-schemas:
+	rm -f share/glib-2.0/schemas/gschemas.compiled
+
+	# Remove cache file created by gtk-update-icon-cache:
+	rm -f share/icons/hicolor/icon-theme.cache
+
 	# Remove locale files we're not interested in::
 	rm -Rf share/locale
+
+	# `update-mime-database` updates NOT ONLY "$PREFIX/share/mime/mime.cache".
+	# Simply removing this specific file does not solve the issue.
+	if [ -e "share/mime/mime.cache" ]; then
+		termux_error_exit "MIME cache found in package. Please disable \`update-mime-database\`."
+	fi
 
 	# Remove old kept libraries (readline):
 	find . -name '*.old' -print0 | xargs -0 -r rm -f
@@ -128,8 +143,8 @@ termux_step_massage() {
 	fi
 
 	# Remove unnecessary files in haskell packages:
-	if [[ "${TERMUX_PKG_NAME}" != "ghc-libs" ]] && [[ "${TERMUX_PKG_NAME}" != "ghc" ]]; then
-		test -d ./lib/ghc-* && rm -rf ./lib/ghc-* 2>/dev/null # Remove full ghc-* dir since cross compiler installs packages in "./lib/${TERMUX_ARCH}-android-ghc-X.Y.Z"
+	if ! [[ $TERMUX_PKG_NAME =~ ghc|ghc-libs ]]; then
+		test -f ./lib/ghc-*/settings && rm -rf ./lib/ghc-*/settings
 	fi
 
 	# .. remove empty directories (NOTE: keep this last):

@@ -1,0 +1,20 @@
+https://github.com/termux/termux-packages/issues/15632
+
+--- a/misc.c
++++ b/misc.c
+@@ -2749,6 +2749,7 @@ subprocess(const char *tag, const char *
+ 			    pw->pw_name, (u_int)pw->pw_gid, strerror(errno));
+ 			_exit(1);
+ 		}
++#ifndef __ANDROID__
+ 		if (setresgid(pw->pw_gid, pw->pw_gid, pw->pw_gid) == -1) {
+ 			error("%s: setresgid %u: %s", tag, (u_int)pw->pw_gid,
+ 			    strerror(errno));
+@@ -2759,6 +2760,7 @@ subprocess(const char *tag, const char *
+ 			    strerror(errno));
+ 			_exit(1);
+ 		}
++#endif
+ 		/* stdin is pointed to /dev/null at this point */
+ 		if ((flags & SSH_SUBPROCESS_STDOUT_DISCARD) != 0 &&
+ 		    dup2(STDIN_FILENO, STDERR_FILENO) == -1) {

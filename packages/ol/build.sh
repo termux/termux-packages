@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://yuriy-chumak.github.io/ol/
+TERMUX_PKG_DESCRIPTION="Purely functional dialect of Lisp"
+TERMUX_PKG_LICENSE="LGPL-3.0, MIT"
+TERMUX_PKG_MAINTAINER="Yuriy Chumak <yuriy.chumak@mail.com>"
+TERMUX_PKG_VERSION=2.4
+TERMUX_PKG_SRCURL=https://github.com/yuriy-chumak/ol/archive/${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=019978ddcf0befc8b8de9f50899c9dd0f47a3e18cf9556bc72a75ae2d1d965d4
+TERMUX_PKG_BUILD_DEPENDS="vim"
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_EXTRA_MAKE_ARGS="PREFIX=$TERMUX_PREFIX"

@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="A fast, compliant alternative implementation of Python"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@licy183"
 _MAJOR_VERSION=2.7
-TERMUX_PKG_VERSION=7.3.10
+TERMUX_PKG_VERSION=7.3.11
 TERMUX_PKG_SRCURL=https://downloads.python.org/pypy/pypy$_MAJOR_VERSION-v$TERMUX_PKG_VERSION-src.tar.bz2
-TERMUX_PKG_SHA256=35e2cf4519cb51c4d5ffb4493ee24f0c7f42b4b04944903ca4b33981a04a3bc5
+TERMUX_PKG_SHA256=1117afb66831da4ea6f39d8d2084787a74689fd0229de0be301f9ed9b255093c
 TERMUX_PKG_DEPENDS="gdbm, libandroid-posix-semaphore, libandroid-support, libbz2, libcrypt, libexpat, libffi, liblzma, libsqlite, libxml2, ncurses, ncurses-ui-libs, openssl, readline, zlib"
 TERMUX_PKG_BUILD_DEPENDS="binutils, clang, dash, make, ndk-multilib, pkg-config, python2, tk, xorgproto"
 TERMUX_PKG_RECOMMENDS="clang, make, pkg-config"
@@ -74,8 +74,8 @@ termux_step_pre_configure() {
 	if [ ! -f "$TERMUX_PKG_CACHEDIR/termux_termux-docker_$HOST_ARCH.tar" ]; then
 		(
 			cd $TERMUX_PKG_CACHEDIR
-			$DOCKER_PULL termux/termux-docker:$HOST_ARCH
-			mv termux_termux-docker.tar termux_termux-docker_$HOST_ARCH.tar
+			$DOCKER_PULL ghcr.io/termux-user-repository/termux-docker:$HOST_ARCH
+			mv termux-user-repository_termux-docker.tar termux_termux-docker_$HOST_ARCH.tar
 		)
 	fi
 
@@ -91,8 +91,8 @@ termux_step_pre_configure() {
 		if [ ! -f "$TERMUX_PKG_CACHEDIR/termux_termux-docker_$TERMUX_ARCH.tar" ]; then
 			(
 				cd $TERMUX_PKG_CACHEDIR
-				$DOCKER_PULL termux/termux-docker:$TERMUX_ARCH
-				mv termux_termux-docker.tar termux_termux-docker_$TERMUX_ARCH.tar
+				$DOCKER_PULL ghcr.io/termux-user-repository/termux-docker:$TERMUX_ARCH
+				mv termux-user-repository_termux-docker.tar termux_termux-docker_$TERMUX_ARCH.tar
 			)
 		fi
 	fi
@@ -179,6 +179,8 @@ termux_step_configure() {
 		$PROOT_TARGET ln -sf $TERMUX_PREFIX/bin/dash /system/bin/sh
 		# Get dependencies
 		$PROOT_TARGET apt install -o Dpkg::Options::=--force-confnew -yq $BUILD_DEP
+		# `pip2` is set up in the postinst script of `python2`, but it will segfault on aarch64. Install it manually.
+		$PROOT_TARGET python2 -m ensurepip
 		# Use the target rootfs providing $TERMUX_PREFIX
 		mv $TERMUX_PREFIX $TERMUX_PREFIX.backup
 		ln -s $HOST_ROOTFS_BASE/$TARGET_ROOTFS_BASE/$TERMUX_PREFIX $TERMUX_PREFIX

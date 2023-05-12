@@ -1,16 +1,24 @@
 --- a/Makefile
 +++ b/Makefile
-@@ -20,10 +20,10 @@
- install:
- 	mkdir -p $(DESTDIR)$(PREFIX)/$(BINDIR)
- 	mkdir -p $(DESTDIR)$(PREFIX)/$(MANDIR)/man1
--	mkdir -p $(DESTDIR)/etc/soju
--	mkdir -p $(DESTDIR)/var/lib/soju
-+	mkdir -p $(DESTDIR)$(PREFIX)/etc/soju
-+	mkdir -p $(DESTDIR)$(PREFIX)/var/lib/soju
- 	cp -f soju sojuctl $(DESTDIR)$(PREFIX)/$(BINDIR)
- 	cp -f doc/soju.1 $(DESTDIR)$(PREFIX)/$(MANDIR)/man1
--	[ -f $(DESTDIR)/etc/soju/config ] || cp -f config.in $(DESTDIR)/etc/soju/config
-+	cp -f config.in $(DESTDIR)$(PREFIX)/etc/soju/config
+@@ -5,10 +5,10 @@
+ PREFIX ?= /usr/local
+ BINDIR ?= bin
+ MANDIR ?= share/man
+-SYSCONFDIR ?= /etc
+-RUNDIR ?= /run
++SYSCONFDIR = @TERMUX_PREFIX@/etc
++RUNDIR = @TERMUX_PREFIX@/var/run
  
- .PHONY: soju sojuctl clean install
+-sharedstatedir := /var/lib
++sharedstatedir := @TERMUX_PREFIX@/var/lib
+ config_path := $(SYSCONFDIR)/soju/config
+ admin_socket_path := $(RUNDIR)/soju/admin
+ goflags := $(GOFLAGS) -ldflags=" \
+@@ -36,6 +36,6 @@
+ 	mkdir -p $(DESTDIR)$(sharedstatedir)/soju
+ 	cp -f $(commands) $(DESTDIR)$(PREFIX)/$(BINDIR)
+ 	cp -f $(man_pages) $(DESTDIR)$(PREFIX)/$(MANDIR)/man1
+-	[ -f $(DESTDIR)$(config_path) ] || cp -f config.in $(DESTDIR)$(config_path)
++	cp -f config.in $(DESTDIR)$(config_path)
+ 
+ .PHONY: soju sojudb sojuctl clean install

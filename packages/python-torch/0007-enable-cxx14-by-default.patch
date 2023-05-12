@@ -1,0 +1,13 @@
+Enable C++14 by default, because protobuf only supports C++14 and newer.
+
+--- a/third_party/onnx/CMakeLists.txt.orig
++++ b/third_party/onnx/CMakeLists.txt
+@@ -58,7 +58,7 @@
+ # Required to use /std:c++17 or higher on Windows
+ # For other platforms, set C++11 as standard for the whole project
+ if(NOT MSVC)
+-  set(CMAKE_CXX_STANDARD 11)
++  set(CMAKE_CXX_STANDARD 14)
+ else()
+   string(APPEND CMAKE_CXX_FLAGS " /std:c++17")
+ endif()

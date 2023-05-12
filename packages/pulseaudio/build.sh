@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_SRCURL=git+https://github.com/pulseaudio/pulseaudio
 TERMUX_PKG_VERSION=16.1
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_DEPENDS="dbus, libandroid-execinfo, libandroid-glob, libc++, libltdl, libsndfile, libsoxr, libwebrtc-audio-processing, speexdsp"
 TERMUX_PKG_BREAKS="libpulseaudio-dev, libpulseaudio"
 TERMUX_PKG_REPLACES="libpulseaudio-dev, libpulseaudio"
@@ -55,4 +55,12 @@ termux_step_post_make_install() {
 		-e '/^load-module module-detect$/s/^/#/'
 	echo "load-module module-sles-sink" >> $TERMUX_PREFIX/etc/pulse/default.pa
 	echo "#load-module module-aaudio-sink" >> $TERMUX_PREFIX/etc/pulse/default.pa
+}
+
+termux_step_post_massage() {
+	# Some programs, e.g. Firefox, try to dlopen(3) `libpulse.so.0`.
+	cd ${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/lib || exit 1
+	if [ ! -e "./libpulse.so.0" ]; then
+		ln -sf libpulse.so libpulse.so.0
+	fi
 }

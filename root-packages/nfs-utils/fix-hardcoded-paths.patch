@@ -93,30 +93,6 @@
  char *conf_path = PATH_IDMAPDCONF;
  
  main(int ac, char **av)
---- a/systemd/50-nfs.conf
-+++ b/systemd/50-nfs.conf
-@@ -1,16 +1,16 @@
- # Ensure all NFS systctl settings get applied when modules load
- 
- # sunrpc module supports "sunrpc.*" sysctls
--install sunrpc /sbin/modprobe --ignore-install sunrpc $CMDLINE_OPTS && { /sbin/sysctl -q --pattern sunrpc --system; exit 0; }
-+install sunrpc @TERMUX_PREFIX@/bin/modprobe --ignore-install sunrpc $CMDLINE_OPTS && { @TERMUX_PREFIX@/bin/sysctl -q --pattern sunrpc --system; exit 0; }
- 
- # rpcrdma module supports sunrpc.svc_rdma.*
--install rpcrdma /sbin/modprobe --ignore-install rpcrdma $CMDLINE_OPTS && { /sbin/sysctl -q --pattern sunrpc.svc_rdma --system; exit 0; }
-+install rpcrdma @TERMUX_PREFIX@/bin/modprobe --ignore-install rpcrdma $CMDLINE_OPTS && { @TERMUX_PREFIX@/bin/sysctl -q --pattern sunrpc.svc_rdma --system; exit 0; }
- 
- # lockd module supports "fs.nfs.nlm*" and "fs.nfs.nsm*" sysctls
--install lockd /sbin/modprobe --ignore-install lockd $CMDLINE_OPTS && { /sbin/sysctl -q --pattern fs.nfs.n[sl]m --system; exit 0; }
-+install lockd @TERMUX_PREFIX@/bin/modprobe --ignore-install lockd $CMDLINE_OPTS && { @TERMUX_PREFIX@/bin/sysctl -q --pattern fs.nfs.n[sl]m --system; exit 0; }
- 
- # nfsv4 module supports "fs.nfs.*" sysctls (nfs_callback_tcpport and idmap_cache_timeout)
--install nfsv4 /sbin/modprobe --ignore-install nfsv4 $CMDLINE_OPTS && { /sbin/sysctl -q --pattern 'fs.nfs.(nfs_callback_tcpport|idmap_cache_timeout)' --system; exit 0; }
-+install nfsv4 @TERMUX_PREFIX@/bin/modprobe --ignore-install nfsv4 $CMDLINE_OPTS && { @TERMUX_PREFIX@/bin/sysctl -q --pattern 'fs.nfs.(nfs_callback_tcpport|idmap_cache_timeout)' --system; exit 0; }
- 
- # nfs module supports "fs.nfs.*" sysctls
--install nfs /sbin/modprobe --ignore-install nfs $CMDLINE_OPTS && { /sbin/sysctl -q --pattern fs.nfs --system; exit 0; }
-+install nfs @TERMUX_PREFIX@/bin/modprobe --ignore-install nfs $CMDLINE_OPTS && { @TERMUX_PREFIX@/bin/sysctl -q --pattern fs.nfs --system; exit 0; }
 --- a/systemd/nfs-server-generator.c
 +++ b/systemd/nfs-server-generator.c
 @@ -62,7 +62,7 @@

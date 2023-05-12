@@ -1,0 +1,26 @@
+--- a/vendor/extras/libjsonpb/parse/jsonpb.cpp
++++ b/vendor/extras/libjsonpb/parse/jsonpb.cpp
+@@ -50,8 +50,10 @@
+   if (!status.ok()) {
+ #if GOOGLE_PROTOBUF_VERSION < 3016000
+     return MakeError<std::string>(status.error_message().as_string());
+-#else
++#elif GOOGLE_PROTOBUF_VERSION < 4022000
+     return MakeError<std::string>(status.message().as_string());
++#else
++    return MakeError<std::string>(status.ToString());
+ #endif
+   }
+   return ErrorOr<std::string>(std::move(json));
+@@ -67,8 +69,10 @@
+   if (!status.ok()) {
+ #if GOOGLE_PROTOBUF_VERSION < 3016000
+     return MakeError<std::monostate>(status.error_message().as_string());
+-#else
++#elif GOOGLE_PROTOBUF_VERSION < 4022000
+     return MakeError<std::monostate>(status.message().as_string());
++#else
++    return MakeError<std::monostate>(status.ToString());
+ #endif
+   }
+   if (!message->ParseFromString(binary)) {

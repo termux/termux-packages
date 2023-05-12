@@ -1,0 +1,13 @@
+--- ./test/parallel/test-cluster-bind-privileged-port.js.orig	2023-04-27 18:55:33.412729481 +0530
++++ ./test/parallel/test-cluster-bind-privileged-port.js	2023-04-27 18:57:07.626113300 +0530
+@@ -25,8 +25,9 @@
+ const cluster = require('cluster');
+ const net = require('net');
+ const { readFileSync } = require('fs');
++const { platform } = require('os');
+ 
+-if (common.isLinux) {
++if (common.isLinux || platform() === 'android') {
+   try {
+     const unprivilegedPortStart = parseInt(readFileSync('/proc/sys/net/ipv4/ip_unprivileged_port_start'));
+     if (unprivilegedPortStart <= 42) {
