@@ -43,23 +43,19 @@ TERMUX_PREFIX="${TERMUX_BASE_DIR}/usr"
 TERMUX_REPO_PACKAGE="com.termux"
 
 # Termux repo urls.
-TERMUX_REPO_URL=(
-	https://packages-cf.termux.dev/apt/termux-main
-	https://packages-cf.termux.dev/apt/termux-root
-	https://packages-cf.termux.dev/apt/termux-x11
-)
+TERMUX_REPO_URL=()
+TERMUX_REPO_DISTRIBUTION=()
+TERMUX_REPO_COMPONENT=()
 
-TERMUX_REPO_DISTRIBUTION=(
-	stable
-	root
-	x11
-)
-
-TERMUX_REPO_COMPONENT=(
-	main
-	stable
-	main
-)
+for url in $(jq -r '.[] | .url' ${TERMUX_SCRIPTDIR}/repo.json); do
+	TERMUX_REPO_URL+=("$url")
+done
+for distribution in $(jq -r '.[] | .distribution' ${TERMUX_SCRIPTDIR}/repo.json); do
+	TERMUX_REPO_DISTRIBUTION+=("$distribution")
+done
+for component in $(jq -r '.[] | .component' ${TERMUX_SCRIPTDIR}/repo.json); do
+	TERMUX_REPO_COMPONENT+=("$component")
+done
 
 # Allow to override setup.
 for f in "${HOME}/.config/termux/termuxrc.sh" "${HOME}/.termux/termuxrc.sh" "${HOME}/.termuxrc"; do
