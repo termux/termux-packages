@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://mupdf.com/
 TERMUX_PKG_DESCRIPTION="Lightweight PDF and XPS viewer (library)"
 TERMUX_PKG_LICENSE="AGPL-V3"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.22.0
+TERMUX_PKG_VERSION=1.22.1
 TERMUX_PKG_SRCURL=https://mupdf.com/downloads/archive/mupdf-${TERMUX_PKG_VERSION}-source.tar.gz
-TERMUX_PKG_SHA256=5cae91c6332fa6cb08f1258addd27b736c4663f92698c8897b382c453534ee60
+TERMUX_PKG_SHA256=d62f3c0e456ebbc42e71f5a47f0f8cd12cec2bf0a8d72b79e35fa35a6538b25a
 TERMUX_PKG_DEPENDS="freetype, gumbo-parser, harfbuzz, jbig2dec, leptonica, libc++, libjpeg-turbo, openjpeg, tesseract, zlib"
 TERMUX_PKG_EXTRA_MAKE_ARGS="prefix=$TERMUX_PREFIX build=release libs shared=yes tesseract=yes"
 TERMUX_PKG_BUILD_IN_SRC=true
