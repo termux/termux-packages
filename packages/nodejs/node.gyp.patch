@@ -1,6 +1,6 @@
---- ./node.gyp.orig	2023-04-11 01:28:53.000000000 +0530
-+++ ./node.gyp	2023-04-20 18:05:13.232655507 +0530
-@@ -156,7 +156,8 @@
+--- ./node.gyp.orig	2023-05-03 17:24:04.000000000 +0530
++++ ./node.gyp	2023-05-14 17:13:12.911648794 +0530
+@@ -464,7 +464,8 @@
        ],
  
        'sources': [
@@ -10,7 +10,7 @@
        ],
  
        'dependencies': [
-@@ -451,6 +452,7 @@
+@@ -759,6 +760,7 @@
        'include_dirs': [
          'src',
          'deps/postject',
@@ -18,7 +18,7 @@
          '<(SHARED_INTERMEDIATE_DIR)' # for node_natives.h
        ],
        'dependencies': [
-@@ -905,272 +907,6 @@
+@@ -945,294 +947,6 @@
          },
        ],
      }, # node_lib_target_name
@@ -58,6 +58,10 @@
 -        # Ensure that ossfuzz flag has been set and that we are on Linux
 -        [ 'OS!="linux" or ossfuzz!="true"', {
 -          'type': 'none',
+-        }],
+-        # Avoid excessive LTO
+-        ['enable_lto=="true"', {
+-          'ldflags': [ '-fno-lto' ],
 -        }],
 -      ],
 -    }, # fuzz_env
@@ -125,6 +129,8 @@
 -          'sources': [
 -            'test/cctest/test_crypto_clienthello.cc',
 -            'test/cctest/test_node_crypto.cc',
+-            'test/cctest/test_quic_cid.cc',
+-            'test/cctest/test_quic_tokens.cc',
 -          ]
 -        }],
 -        ['v8_enable_inspector==1', {
@@ -158,6 +164,10 @@
 -            'winmm.lib',
 -            'Ws2_32.lib',
 -          ],
+-        }],
+-        # Avoid excessive LTO
+-        ['enable_lto=="true"', {
+-          'ldflags': [ '-fno-lto' ],
 -        }],
 -      ],
 -    }, # cctest
@@ -212,6 +222,10 @@
 -            'Ws2_32.lib',
 -          ],
 -        }],
+-        # Avoid excessive LTO
+-        ['enable_lto=="true"', {
+-          'ldflags': [ '-fno-lto' ],
+-        }],
 -      ],
 -    }, # embedtest
 -
@@ -229,6 +243,10 @@
 -          'sources': [
 -            'test/overlapped-checker/main_unix.c'
 -          ],
+-        }],
+-        # Avoid excessive LTO
+-        ['enable_lto=="true"', {
+-          'ldflags': [ '-fno-lto' ],
 -        }],
 -      ]
 -    }, # overlapped-checker
@@ -285,6 +303,10 @@
 -            'winmm.lib',
 -            'Ws2_32.lib',
 -          ],
+-        }],
+-        # Avoid excessive LTO
+-        ['enable_lto=="true"', {
+-          'ldflags': [ '-fno-lto' ],
 -        }],
 -      ],
 -    }, # node_mksnapshot
