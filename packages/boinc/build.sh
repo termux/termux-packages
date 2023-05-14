@@ -18,9 +18,8 @@ etc/boinc-client.conf
 "
 
 termux_step_pre_configure() {
-	# for benchmark purposes
-	export CFLAGS="${CFLAGS/-Oz/-Os} -flto -fPIC"
-	export CXXFLAGS="${CXXFLAGS/-Oz/-Os} -flto -fPIC"
+	export CFLAGS+=" -fPIC"
+	export CXXFLAGS+=" -fPIC"
 	export LDFLAGS+=" -landroid-shmem -landroid-execinfo $(${CC} -print-libgcc-file-name)"
 	./_autosetup
 }
