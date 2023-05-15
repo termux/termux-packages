@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Open-source software for volunteer computing"
 TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=7.22.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/BOINC/boinc/archive/client_release/${TERMUX_PKG_VERSION:0:4}/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=0a62f24dce703779e04f91f5c613974dcb98df61adb599b7076d461eb26dfbaf
 TERMUX_PKG_DEPENDS="libandroid-execinfo, libandroid-shmem, libc++, libcurl, openssl, zlib"
