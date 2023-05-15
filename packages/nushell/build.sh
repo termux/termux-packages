@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A new type of shell operating on structured data"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.82.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/nushell/nushell/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=587847feeb9fc06eb2a9da5ff05ffea5238fe5928ebea944c042838d8ad136e8
 TERMUX_PKG_AUTO_UPDATE=true
@@ -25,6 +26,9 @@ termux_step_pre_configure() {
 		RUSTFLAGS+=" -C link-arg=$($CC -print-libgcc-file-name)"
 		echo "INPUT(-l:libunwind.a)" >libgcc.so
 		popd
+	fi
+	if [ $TERMUX_ARCH != "arm" ]; then
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --features=dataframe"
 	fi
 
 	: "${CARGO_HOME:=$HOME/.cargo}"
