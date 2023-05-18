@@ -76,15 +76,6 @@ index a217ecc..1d8d3b1 100644
  	selinux/libsepol/src/services.c
  	selinux/libsepol/src/sidtab.c
  	selinux/libsepol/src/symtab.c
-@@ -90,7 +132,7 @@
- 
- target_include_directories(libsepol PUBLIC
- 	selinux/libsepol/include)
--if(NOT APPLE)
-+if(NOT APPLE AND NOT ANDROID)
- 	target_compile_definitions(libsepol PRIVATE
- 		-DHAVE_REALLOCARRAY)
- endif()
 @@ -135,7 +147,7 @@ target_compile_definitions(fastboot PRIV
  target_link_libraries(fastboot
  	libsparse libzip libcutils liblog libfsmgr libutil
