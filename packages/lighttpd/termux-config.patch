@@ -1,0 +1,81 @@
+diff -uNr lighttpd-1.4.70/doc/config/conf.d/cgi.conf lighttpd-1.4.70.mod/doc/config/conf.d/cgi.conf
+--- lighttpd-1.4.70/doc/config/conf.d/cgi.conf	2023-05-10 10:20:55.000000000 +0300
++++ lighttpd-1.4.70.mod/doc/config/conf.d/cgi.conf	2023-05-20 02:06:09.029759138 +0300
+@@ -12,11 +12,11 @@
+ ##
+ ## For PHP don't forget to set cgi.fix_pathinfo = 1 in the php.ini.
+ ##
+-cgi.assign                 = ( ".pl"  => "/usr/bin/perl",
+-                               ".cgi" => "/usr/bin/perl",
+-                               ".rb"  => "/usr/bin/ruby",
+-                               ".erb" => "/usr/bin/eruby",
+-                               ".py"  => "/usr/bin/python" )
++cgi.assign                 = ( ".pl"  => "@TERMUX_PREFIX@/bin/perl",
++                               ".cgi" => "@TERMUX_PREFIX@/bin/perl",
++                               ".rb"  => "@TERMUX_PREFIX@/bin/ruby",
++                               ".erb" => "@TERMUX_PREFIX@/bin/eruby",
++                               ".py"  => "@TERMUX_PREFIX@/bin/python" )
+ 
+ ##
+ ## to get the old cgi-bin behavior of apache
+diff -uNr lighttpd-1.4.70/doc/config/conf.d/rrdtool.conf lighttpd-1.4.70.mod/doc/config/conf.d/rrdtool.conf
+--- lighttpd-1.4.70/doc/config/conf.d/rrdtool.conf	2023-05-10 10:20:55.000000000 +0300
++++ lighttpd-1.4.70.mod/doc/config/conf.d/rrdtool.conf	2023-05-20 02:06:39.849970067 +0300
+@@ -10,7 +10,7 @@
+ ##
+ ## Path to the rrdtool binary.
+ ##
+-rrdtool.binary             = "/usr/bin/rrdtool"
++rrdtool.binary             = "@TERMUX_PREFIX@/bin/rrdtool"
+ 
+ ##
+ ## Path to the rrdtool database. You can override this in conditionals.
+diff -uNr lighttpd-1.4.70/doc/config/lighttpd.conf lighttpd-1.4.70.mod/doc/config/lighttpd.conf
+--- lighttpd-1.4.70/doc/config/lighttpd.conf	2023-05-10 10:20:55.000000000 +0300
++++ lighttpd-1.4.70.mod/doc/config/lighttpd.conf	2023-05-20 02:05:06.785348712 +0300
+@@ -13,11 +13,11 @@
+ ## if you add a variable here. Add the corresponding variable in the
+ ## chroot example as well.
+ ##
+-var.log_root    = "/var/log/lighttpd"
+-var.server_root = "/srv/www"
+-var.state_dir   = "/run"
+-var.home_dir    = "/var/lib/lighttpd"
+-var.conf_dir    = "/etc/lighttpd"
++var.log_root    = "@TERMUX_PREFIX@/var/log/lighttpd"
++var.server_root = "@TERMUX_PREFIX@/var/www"
++var.state_dir   = "@TERMUX_PREFIX@/var/run"
++var.home_dir    = "@TERMUX_PREFIX@/var/lib/lighttpd"
++var.conf_dir    = "@TERMUX_PREFIX@/etc/lighttpd"
+ 
+ ## 
+ ## run the server chrooted.
+@@ -58,7 +58,7 @@
+ ## used in:
+ ## conf.d/deflate.conf
+ ##
+-var.cache_dir   = "/var/cache/lighttpd"
++var.cache_dir   = "@TERMUX_PREFIX@/var/cache/lighttpd"
+ 
+ ##
+ ## Base directory for sockets.
+@@ -85,7 +85,7 @@
+ ##  Basic Configuration
+ ## ---------------------
+ ##
+-server.port = 80
++server.port = 8080
+ 
+ ##
+ ## bind to a specific IP
+@@ -97,8 +97,8 @@
+ ## Run as a different username/groupname.
+ ## This requires root permissions during startup. 
+ ##
+-server.username  = "lighttpd"
+-server.groupname = "lighttpd"
++#server.username  = "lighttpd"
++#server.groupname = "lighttpd"
+ 
+ ##
+ ## Enable lighttpd to serve requests on sockets received from systemd
