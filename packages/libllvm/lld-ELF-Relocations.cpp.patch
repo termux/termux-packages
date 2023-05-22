@@ -1,0 +1,14 @@
+Work around threading issue on some AArch64 devices, see llvm/llvm-project#62165 for more info.
+diff --git a/lld/ELF/Relocations.cpp b/lld/ELF/Relocations.cpp
+index 2f7fcd664c6a..f9cf5e7c1a29 100644
+--- a/lld/ELF/Relocations.cpp
++++ b/lld/ELF/Relocations.cpp
+@@ -1522,7 +1522,7 @@ template <class ELFT> void elf::scanRelocations() {
+   // for -z nocombreloc. MIPS and PPC64 use global states which are not suitable
+   // for parallelism.
+   bool serial = !config->zCombreloc || config->emachine == EM_MIPS ||
+-                config->emachine == EM_PPC64;
++                config->emachine == EM_PPC64 || config->emachine == EM_AARCH64;
+   parallel::TaskGroup tg;
+   for (ELFFileBase *f : ctx.objectFiles) {
+     auto fn = [f]() {
