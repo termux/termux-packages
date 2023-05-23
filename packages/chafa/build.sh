@@ -4,6 +4,6 @@ TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="Yonle <yonle@lecturify.net>"
 TERMUX_PKG_VERSION=1.12.5
 TERMUX_PKG_SRCURL="https://github.com/hpjansson/chafa/releases/download/${TERMUX_PKG_VERSION}/chafa-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+TERMUX_PKG_SHA256=0f5490d52a500a6b386f15cc04c6e8702afd0285d422b9575b332e0c683957f2
 TERMUX_PKG_DEPENDS="freetype, glib, imagemagick, libcairo, libjpeg-turbo, librsvg, libtiff, libwebp"
 
