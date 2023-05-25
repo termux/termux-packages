@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.cloudwego.io
 TERMUX_PKG_DESCRIPTION="A high-performance and strong-extensibility Go HTTP framework that helps developers build microservices"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.6.3"
+TERMUX_PKG_VERSION="0.6.4"
 TERMUX_PKG_SRCURL=https://github.com/cloudwego/hertz/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=ce119b722b505d7bfbff70e35abdb96152e6c36c8e7944ae166d61158f739ef5
+TERMUX_PKG_SHA256=c568fcafa94168ca10fc6a9bad192d724e3ec3f687200df2e26fc4f1917a28d3
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
