@@ -1,0 +1,33 @@
+https://github.com/dajobe/raptor/pull/58
+
+From 4dbc4c1da2a033c497d84a1291c46f416a9cac51 Mon Sep 17 00:00:00 2001
+From: David Anes <david.anes@suse.com>
+Date: Thu, 4 May 2023 11:54:02 +0200
+Subject: [PATCH] Remove the access to entities 'checked' private symbol for
+ libxml2 2.11.0
+
+Since version 2.11.0, some private symbols that were never intended
+as public API/ABI have been removed from libxml2, therefore the field
+'checked' is no longer present and raptor fails to build in this
+scenario.
+---
+ src/raptor_libxml.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/raptor_libxml.c b/src/raptor_libxml.c
+index 538c2c8e..8bcee139 100644
+--- a/src/raptor_libxml.c
++++ b/src/raptor_libxml.c
+@@ -246,10 +246,11 @@ raptor_libxml_getEntity(void* user_data, const xmlChar *name)
+     
+     ret->owner = 1;
+ 
+-#if LIBXML_VERSION >= 20627
++#if LIBXML_VERSION >= 20627 && LIBXML_VERSION < 21100
+     /* Checked field was released in 2.6.27 on 2006-10-25
+      * http://git.gnome.org/browse/libxml2/commit/?id=a37a6ad91a61d168ecc4b29263def3363fff4da6
+      *
++     * and was later removed in version 2.11.0
+      */
+ 
+     /* Mark this entity as having been checked - never do this again */
