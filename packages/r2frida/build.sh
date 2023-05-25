@@ -5,23 +5,18 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="5.8.6"
 TERMUX_PKG_SRCURL=https://github.com/nowsecure/r2frida/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=c65979581dc514e58639b5c9492ed21780370446fad6d8cfcaaffe25e86366f1
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS=--with-precompiled-agent
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="radare2"
 TERMUX_PKG_BUILD_DEPENDS="radare2"
+TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686, x86_64"
 
 termux_step_pre_configure () {
-	if [ $TERMUX_ARCH != "aarch64" ]; then
-		termux_error_exit "Unsupported arch: $TERMUX_ARCH"
-	fi
 	unset CXXFLAGS
 	unset CPPFLAGS
 	unset LDFLAGS
 	unset CFLAGS
-}
-
-termux_step_configure () {
-	./configure --prefix="${TERMUX_PREFIX}" --with-precompiled-agent
 }
 
 termux_step_make() {
@@ -29,8 +24,7 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	cp -f src/r2frida-compile /data/data/com.termux/files/usr/bin
-	mkdir -p /data/data/com.termux/files/usr/lib/radare2/last
-	cp -f io_frida.so /data/data/com.termux/files/usr/lib/radare2/last
+	cp -f src/r2frida-compile ${TERMUX_PREFIX}/bin
+	mkdir -p ${TERMUX_PREFIX}/lib/radare2/last
+	cp -f io_frida.so ${TERMUX_PREFIX}/lib/radare2/last
 }
-
