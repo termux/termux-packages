@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/LinusDierheimer/fastfetch
 TERMUX_PKG_DESCRIPTION="A neofetch-like tool for fetching system information and displaying them in a pretty way"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.11.0"
+TERMUX_PKG_VERSION="1.11.1"
 TERMUX_PKG_SRCURL=https://github.com/LinusDierheimer/fastfetch/archive/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=900b3c19f56fca59fd90ae2a033f40fec00185f2a0078dabdcc13a27635dd989
+TERMUX_PKG_SHA256=efe0a64b6a5d54a182869ebb3c9fa7f80a04f14867dbc749fe154c59b77b9b6b
 TERMUX_PKG_DEPENDS="vulkan-headers, vulkan-loader-android, freetype"
 TERMUX_PKG_AUTO_UPDATE=true
 
