@@ -21,7 +21,14 @@ termux_setup_swift() {
 				$SWIFT_TAR \
 				2eb8105db0288443bda214b4b84d898970d1fecf08f0f5dcd5bd45bef528a4f7
 
-			(cd $TERMUX_PKG_TMPDIR ; tar xf $SWIFT_TAR ; mv $SWIFT_BIN $SWIFT_FOLDER; rm $SWIFT_TAR)
+			cd $TERMUX_PKG_TMPDIR
+			echo "got here"
+			tar xf $SWIFT_TAR
+			echo "got here"
+			mv $SWIFT_BIN $SWIFT_FOLDER
+			echo "got here"
+			rm $SWIFT_TAR
+			echo "got here last"
 		fi
 		export SWIFT_BINDIR="$SWIFT_FOLDER/usr/bin"
 		export SWIFT_CROSSCOMPILE_CONFIG="$SWIFT_FOLDER/usr/android-$TERMUX_ARCH.json"
@@ -41,6 +48,7 @@ termux_setup_swift() {
 			"extra-cpp-flags": [ "-lstdc++" ] }
 			EOF
 		fi
+			echo "got here lastest"
 	else
 		if [[ "${TERMUX_APP_PACKAGE_MANAGER}" == "apt" && "$(dpkg-query -W -f '${db:Status-Status}\n' swift 2>/dev/null)" != "installed" ]] ||
 		   [[ "${TERMUX_APP_PACKAGE_MANAGER}" == "pacman" && ! "$(pacman -Q swift 2>/dev/null)" ]]; then

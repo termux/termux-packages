@@ -9,7 +9,7 @@ TERMUX_PKG_SHA256=f65381a9dfea4579323e5aff04d4224f2d8f505fcc6e3e83022e734d4f5457
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_DEPENDS="clang, libandroid-glob, libandroid-posix-semaphore, libandroid-spawn, libcurl, libicu, libicu-static, libsqlite, libuuid, libxml2, libdispatch, llbuild, swift-sdk-${TERMUX_ARCH/_/-}"
 TERMUX_PKG_BUILD_DEPENDS="rsync"
-TERMUX_PKG_BLACKLISTED_ARCHES="i686"
+TERMUX_PKG_BLACKLISTED_ARCHES="i686,x86_64,arm"
 TERMUX_PKG_NO_STATICSPLIT=true
 # Building swift uses CMake, but the standard
 # termux_step_configure_cmake function is not used. Instead, we set
