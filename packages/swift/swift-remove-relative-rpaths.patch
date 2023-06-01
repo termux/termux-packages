@@ -58,12 +58,12 @@ diff --git a/swiftpm/Utilities/bootstrap b/swiftpm/Utilities/bootstrap
 index 92c368a86..e9d43b599 100755
 --- a/swiftpm/Utilities/bootstrap
 +++ b/swiftpm/Utilities/bootstrap
-@@ -785,7 +785,7 @@ def get_swiftpm_flags(args):
-     platform_path = None
-     for path in args.target_info["paths"]["runtimeLibraryPaths"]:
-         platform_path = re.search(r"(lib/swift/([^/]+))$", path)
--        if platform_path:
-+        if not platform_path:
-             build_flags.extend(
-                 [
-                     "-Xlinker",
+@@ -744,7 +744,7 @@ def get_swiftpm_env_cmd(args):
+     env_cmd.append("SWIFTCI_USE_LOCAL_DEPS=1")
+     env_cmd.append("SWIFTPM_MACOS_DEPLOYMENT_TARGET=%s" % g_macos_deployment_target)
+ 
+-    if not '-macosx' in args.build_target and args.command == 'install':
++    if not '-android' in args.build_target and args.command == 'install':
+         env_cmd.append("SWIFTCI_INSTALL_RPATH_OS=%s" % args.platform_path.group(2))
+ 
+     if args.bootstrap:

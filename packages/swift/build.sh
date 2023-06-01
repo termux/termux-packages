@@ -2,11 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://swift.org/
 TERMUX_PKG_DESCRIPTION="Swift is a high-performance system programming language"
 TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_MAINTAINER="@finagolfin"
-TERMUX_PKG_VERSION=5.8
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=5.8.1
 SWIFT_RELEASE="RELEASE"
 TERMUX_PKG_SRCURL=https://github.com/apple/swift/archive/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE.tar.gz
-TERMUX_PKG_SHA256=16c68b4c4872651d4fc7e361df7731b7cc2592b293473d41bd331cd1a1fc3887
+TERMUX_PKG_SHA256=f65381a9dfea4579323e5aff04d4224f2d8f505fcc6e3e83022e734d4f54575f
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_DEPENDS="clang, libandroid-glob, libandroid-posix-semaphore, libandroid-spawn, libcurl, libicu, libicu-static, libsqlite, libuuid, libxml2, libdispatch, llbuild, swift-sdk-${TERMUX_ARCH/_/-}"
 TERMUX_PKG_BUILD_DEPENDS="rsync"
@@ -35,24 +34,24 @@ termux_step_post_get_source() {
 	mv .temp swift
 
 	declare -A library_checksums
-	library_checksums[swift-cmark]=e3de63c4a6672e13e7b7aa80dcbe2361fbac507851440a0ac61e20f1cb470119
-	library_checksums[llvm-project]=8435ea5e39d34c74b1a2600376eff4b217f9933830e23d6cf67521513fce7706
-	library_checksums[swift-experimental-string-processing]=ff4507448e31a011d51b3143ef1ba9e8694886dab4cd89ca202f42b79d1c9e0c
-	library_checksums[swift-syntax]=24ed18b53c4339caff746be184c16d75bd394ed10c9cebddfa776c83a47b5d9b
-	library_checksums[swift-corelibs-libdispatch]=391d2bcaea22c4aa980400c3a29b3d9991641aa62253b693c0b79c302eafd5a0
-	library_checksums[swift-corelibs-foundation]=ff7e5903c80364a1531ab4af7e6fe861998a069e425d6a842fa6ca0236504a9c
-	library_checksums[swift-corelibs-xctest]=b5a007afd43d702d31a1bfc165e3ded0142b0526a56b1a532351b8d751b2499f
-	library_checksums[swift-llbuild]=6345ae69ac9b8bb61b61f14871b322f83b1d08f70c261bd9a2f86a998c394c0c
+	library_checksums[swift-cmark]=89ad876b686192b806c61b390b076cf3cbb6459af6acdd3e93cd1e3d8a74c7f6
+	library_checksums[llvm-project]=f4b6a4b1589d48fa2295d2709b99d1bfbbc6bfb2778dc72a4d72da3c25ff5d92
+	library_checksums[swift-experimental-string-processing]=83714d2178d2a02de35e75dbe11ff2443695a65aaf1136e5a7b9f152716e75a6
+	library_checksums[swift-syntax]=5885ad4e0ac448c6d4be85b17c5dd28e825aedf3664cf1b928017fb81938f52a
+	library_checksums[swift-corelibs-libdispatch]=ec27aabf9b0500ad2abcc53b8902a7673d9871106097851ce226e2aa817d1b0e
+	library_checksums[swift-corelibs-foundation]=b71505ae557a15481c05bbfaaeee83047e109c285ce4c4c7e06ba79b1aea3f2c
+	library_checksums[swift-corelibs-xctest]=194180362ba8a18f60f4cc371ada705be2a51d317364055b17024bf9ae405e26
+	library_checksums[swift-llbuild]=2df6fa3d92a351df97f228148405462e3aebcd4f0077b17e0ee5f5514575aa68
 	library_checksums[swift-argument-parser]=a4d4c08cf280615fe6e00752ef60e28e76f07c25eb4706a9269bf38135cd9c3f
 	library_checksums[Yams]=ec1ad699c30f0db45520006c63a88cc1c946a7d7b36dff32a96460388c0a4af2
 	library_checksums[swift-collections]=575cf0f88d9068411f9acc6e3ca5d542bef1cc9e87dc5d69f7b5a1d5aec8c6b6
 	library_checksums[swift-crypto]=84cec042505e1c5bf3dd14a1bb18d0c06c5a9435b7b10a69709101b602285ff5
 	library_checksums[swift-system]=865b8c380455eef27e73109835142920c60ae4c4f4178a3d12ad04acc83f1371
-	library_checksums[swift-driver]=1ae19fe5c953df382d174ef4f99b3c7511d32a0037cb043ebd5f681c3d2504dd
-	library_checksums[swift-tools-support-core]=6651c7f798f291386ac2d9e4be35cf25b26db4669d2ef3ad215ff3631f8850d6
-	library_checksums[swift-package-manager]=2cc1b39452e5b615170d5d9ba4fdef81e8e644124af11e3affb8e385c2219f32
-	library_checksums[indexstore-db]=f02a8646ce03cd89cc3db18ee460a1395c1f2285ee656e15c8c24c21f14eca31
-	library_checksums[sourcekit-lsp]=cb74c4212e2387a5e8d8fba0ba96dad79191294275366e6c8b2cce9c07d9ea61
+	library_checksums[swift-driver]=576ba0b330f2dc1fde6979dcecfccbb13c43d76b118bc8b43ecef9e62332df84
+	library_checksums[swift-tools-support-core]=914c697ded28be930f5afc844bc5712d2f47c14c83fae945ecca0f49af200f70
+	library_checksums[swift-package-manager]=51967163d971aac66f9667d2a9387da3c25b70118bc1e82cef309759f7b1d272
+	library_checksums[indexstore-db]=d9ff209be9a43109a80f1b2948fd34f203e1d55a944b1a2ea34439a75e218dc1
+	library_checksums[sourcekit-lsp]=abc341ac3e05c01fe93949cdd72ee9aefc3b785a9f91ead32169764a1af6625e
 
 	for library in "${!library_checksums[@]}"; do \
 		GH_ORG="apple"
