@@ -20,6 +20,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-unbound-root-key-file=$TERMUX_PREFIX/etc/unbound/root.key
 --with-included-libtasn1
 --enable-local-libopts
+--without-brotli
 --without-p11-kit
 --disable-guile
 --disable-doc
