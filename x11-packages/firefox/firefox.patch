@@ -359,11 +359,10 @@ diff -uNr firefox-105.0.3/toolkit/moz.configure firefox-105.0.3.mod/toolkit/moz.
  )
  
  # Smart card support
-diff -uNr firefox-105.0.3/toolkit/xre/glxtest.cpp firefox-105.0.3.mod/toolkit/xre/glxtest.cpp
---- firefox-105.0.3/toolkit/xre/glxtest.cpp	2022-10-08 00:25:42.000000000 +0900
-+++ firefox-105.0.3.mod/toolkit/xre/glxtest.cpp	2022-10-17 19:31:36.885513927 +0900
-@@ -1175,7 +1175,9 @@
-   glxtest_bufsize = bufsize;
+--- a/toolkit/xre/glxtest/glxtest.cpp
++++ b/toolkit/xre/glxtest/glxtest.cpp
+@@ -946,7 +946,9 @@
+   log("GLX_TEST: childgltest start\n");
  
    // Get a list of all GPUs from the PCI bus.
 +#if !defined(__TERMUX__)
@@ -371,7 +370,7 @@ diff -uNr firefox-105.0.3/toolkit/xre/glxtest.cpp firefox-105.0.3.mod/toolkit/xr
 +#endif
  
  #ifdef MOZ_WAYLAND
-   if (IsWaylandEnabled()) {
+   if (aWayland) {
 diff -uNr firefox-105.0.3/js/src/ctypes/libffi/src/closures.c firefox-105.0.3.mod/js/src/ctypes/libffi/src/closures.c
 --- firefox-105.0.3/js/src/ctypes/libffi/src/closures.c	2022-10-07 22:37:49.000000000 +0900
 +++ firefox-105.0.3.mod/js/src/ctypes/libffi/src/closures.c	2022-10-17 19:42:34.472896402 +0900
