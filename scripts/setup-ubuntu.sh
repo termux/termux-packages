@@ -135,6 +135,7 @@ PACKAGES+=" ruby"
 
 # Needed by host build of package nodejs.
 PACKAGES+=" libc-ares-dev"
+PACKAGES+=" libc-ares-dev:i386"
 PACKAGES+=" libicu-dev"
 
 # Needed by php.
