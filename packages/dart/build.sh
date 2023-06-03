@@ -18,7 +18,7 @@ termux_step_get_source() {
 
 	git clone --depth=1 https://chromium.googlesource.com/chromium/tools/depot_tools.git
 	mkdir -p depot_tools/fakebin
-	ln -sfr /usr/bin/python2 depot_tools/fakebin/python
+	ln -sfr /usr/bin/python depot_tools/fakebin/python
 	export PATH="$(pwd)/depot_tools/fakebin:$(pwd)/depot_tools:${PATH}"
 
 	fetch dart
@@ -47,19 +47,19 @@ termux_step_make_install() {
 	rm -f ./out/*/args.gn
 
 	if [ $TERMUX_ARCH = "arm" ]; then
-		python2 ./tools/build.py --no-goma --mode release --arch=arm --os=android create_sdk
+		python3 ./tools/build.py --no-goma --mode release --arch=arm --os=android create_sdk
 		chmod +x ./out/ReleaseAndroidARM/dart-sdk/bin/*
 		cp -r ./out/ReleaseAndroidARM/dart-sdk ${TERMUX_PREFIX}/lib
 	elif [ $TERMUX_ARCH = "i686" ]; then
-		python2 ./tools/build.py --no-goma --mode release --arch=ia32 --os=android create_sdk
+		python3 ./tools/build.py --no-goma --mode release --arch=ia32 --os=android create_sdk
 		chmod +x ./out/ReleaseAndroidIA32/dart-sdk/bin/*
 		cp -r ./out/ReleaseAndroidIA32/dart-sdk ${TERMUX_PREFIX}/lib
 	elif [ $TERMUX_ARCH = "aarch64" ]; then
-		python2 ./tools/build.py --no-goma --mode release --arch=arm64c --os=android create_sdk
+		python3 ./tools/build.py --no-goma --mode release --arch=arm64c --os=android create_sdk
 		chmod +x ./out/ReleaseAndroidARM64C/dart-sdk/bin/*
 		cp -r ./out/ReleaseAndroidARM64C/dart-sdk ${TERMUX_PREFIX}/lib
 	elif [ $TERMUX_ARCH = "x86_64" ]; then
-		python2 ./tools/build.py --no-goma --mode release --arch=x64c --os=android create_sdk
+		python3 ./tools/build.py --no-goma --mode release --arch=x64c --os=android create_sdk
 		chmod +x ./out/ReleaseAndroidX64C/dart-sdk/bin/*
 		cp -r ./out/ReleaseAndroidX64C/dart-sdk ${TERMUX_PREFIX}/lib
 	else
