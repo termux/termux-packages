@@ -40,7 +40,6 @@ termux_step_configure() {
 	export CXX_host=g++
 	export LINK_host=g++
 
-	LDFLAGS+=" -ldl"
 	# See note above TERMUX_PKG_DEPENDS why we do not use a shared libuv
 	# When building with ninja, build.ninja is geenrated for both Debug and Release builds.
 	./configure \
