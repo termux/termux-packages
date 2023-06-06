@@ -137,6 +137,7 @@ PACKAGES+=" ruby"
 PACKAGES+=" libc-ares-dev"
 PACKAGES+=" libc-ares-dev:i386"
 PACKAGES+=" libicu-dev"
+PACKAGES+=" libicu-dev:i386"
 
 # Needed by php.
 PACKAGES+=" re2c"
