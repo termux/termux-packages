@@ -1,0 +1,26 @@
+diff --git a/tools/gyp/pylib/gyp/generator/ninja.py b/tools/gyp/pylib/gyp/generator/ninja.py
+index 3db3771ac9..2e0a021703 100644
+--- a/tools/gyp/pylib/gyp/generator/ninja.py
++++ b/tools/gyp/pylib/gyp/generator/ninja.py
+@@ -42,7 +42,7 @@ generator_default_variables = {
+     # the start of a string, while $| is used for variables that can appear
+     # anywhere in a string.
+     "INTERMEDIATE_DIR": "$!INTERMEDIATE_DIR",
+-    "SHARED_INTERMEDIATE_DIR": "$!PRODUCT_DIR/gen",
++    "SHARED_INTERMEDIATE_DIR": "$!PRODUCT_DIR/$|OBJ/gen",
+     "PRODUCT_DIR": "$!PRODUCT_DIR",
+     "CONFIGURATION_NAME": "$|CONFIGURATION_NAME",
+     # Special variables that may be used by gyp 'rule' targets.
+@@ -285,6 +285,12 @@ class NinjaWriter:
+         CONFIGURATION_NAME = "$|CONFIGURATION_NAME"
+         path = path.replace(CONFIGURATION_NAME, self.config_name)
+ 
++        obj = "obj"
++        if self.toolset != "target":
++            obj += "." + self.toolset
++
++        path = path.replace("$|OBJ", obj)
++
+         return path
+ 
+     def ExpandRuleVariables(self, path, root, dirname, source, ext, name):
