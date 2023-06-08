@@ -1,23 +1,24 @@
-diff -uNr jhead-3.06.0.1/makefile jhead-3.06.0.1.mod/makefile
---- jhead-3.06.0.1/makefile	2021-04-14 13:02:45.000000000 +0100
-+++ jhead-3.06.0.1.mod/makefile	2022-07-22 22:16:22.465375000 +0100
-@@ -3,8 +3,8 @@
+diff --git a/makefile b/makefile
+index eb71bba..b96b2ba 100644
+--- a/makefile
++++ b/makefile
+@@ -1,7 +1,7 @@
  #--------------------------------
- OBJ=obj
- SRC=.
+ # jhead makefile for Unix
+ #--------------------------------
+-PREFIX=$(DESTDIR)/usr/local
++PREFIX?=$(DESTDIR)/usr/local
+ BINDIR=$(PREFIX)/bin
+ DOCDIR=$(PREFIX)/share/doc/jhead
+ MANDIR=$(PREFIX)/share/man/man1
+@@ -10,8 +10,8 @@ SRC=.
+ 
+ DPKG_BUILDFLAGS := $(shell command -v dpkg-buildflags 2> /dev/null)
+ ifdef DPKG_BUILDFLAGS
 -CFLAGS:=$(shell dpkg-buildflags --get CFLAGS)
 -LDFLAGS:=$(shell dpkg-buildflags --get LDFLAGS)
 +CFLAGS?=$(shell dpkg-buildflags --get CFLAGS)
 +LDFLAGS?=$(shell dpkg-buildflags --get LDFLAGS)
+ endif
  
- all: objdir jhead
- 
-@@ -24,5 +24,6 @@
- 	rm -f $(objs) jhead
- 
- install:
--	mkdir -p ${DESTDIR}/usr/bin/
--	cp jhead ${DESTDIR}/usr/bin/
-+	install -Dm700 jhead ${DESTDIR}$(PREFIX)/bin/
-+	mkdir -p ${DESTDIR}$(PREFIX)/share/man/man1/
-+	install -m600 jhead.1 ${DESTDIR}$(PREFIX)/share/man/man1/
+ # To enable electric fence, set ELECTRIC_FENCE=1
