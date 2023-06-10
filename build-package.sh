@@ -462,7 +462,8 @@ while (($# >= 1)); do
 				termux_error_exit "./build-package.sh: option '-o' requires an argument"
 			fi
 			;;
-		-c) TERMUX_CONTINUE_BUILD=true;;
+		-c|--continue) TERMUX_CONTINUE_BUILD=true;;
+		-C|--cache) export TERMUX_CACHE_ENABLED=true;;
 		-*) termux_error_exit "./build-package.sh: illegal option '$1'";;
 		*) PACKAGE_LIST+=("$1");;
 	esac

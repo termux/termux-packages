@@ -166,6 +166,7 @@ termux_setup_toolchain_25c() {
 	cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/armv7a-linux-androideabi-cpp \
 		$_TERMUX_TOOLCHAIN_TMPDIR/bin/arm-linux-androideabi-cpp
 
+
 	for HOST_PLAT in aarch64-linux-android armv7a-linux-androideabi i686-linux-android x86_64-linux-android arm-linux-androideabi; do
 		mv $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang \
 			$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang.no-16-porting
@@ -181,6 +182,14 @@ termux_setup_toolchain_25c() {
 				$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang
 		fi
 	done
+
+	if [ "$TERMUX_CACHE_ENABLED" = "true" ]; then
+		sed -i 's|"$bin_dir/clang"|ccache "$bin_dir/clang"|g' \
+			$_TERMUX_TOOLCHAIN_TMPDIR/bin/*-{clang,clang++,cpp,gcc,g++}
+		sed -i 's|"$bin_dir/clang++"|ccache "$bin_dir/clang++"|g' \
+			$_TERMUX_TOOLCHAIN_TMPDIR/bin/*-{clang,clang++,cpp,gcc,g++}
+	fi
+
 
 	# Create a pkg-config wrapper. We use path to host pkg-config to
 	# avoid picking up a cross-compiled pkg-config later on.

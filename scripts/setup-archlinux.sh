@@ -23,7 +23,10 @@ PACKAGES+=" intltool" # Used by qalc build.
 PACKAGES+=" jre8-openjdk-headless"
 PACKAGES+=" jq" # Required for parsing repo.json
 PACKAGES+=" re2c" # Needed by kphp-timelib
-PACKAGES+=" libjpeg-turbo" # Needed by ghostscript.
+PACKAGES+=" libjpeg-turbo" # Needed by ghostscript
+PACKAGES+=" lib32-icu"
+PACKAGES+=" lib32-openssl"
+PACKAGES+=" lib32-zlib"
 PACKAGES+=" libtool"
 PACKAGES+=" lua" # Needed to build luarocks package.
 PACKAGES+=" lzip"
@@ -61,3 +64,4 @@ echo
 echo "- ncurses5-compat-libs"
 echo "- makedepend"
 echo "- python2"
+echo "- lib32-c-ares"
