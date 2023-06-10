@@ -39,6 +39,10 @@ termux_step_configure() {
 	export CC_host=gcc
 	export CXX_host=g++
 	export LINK_host=g++
+	if [ "$TERMUX_CACHE_ENABLED" = true ]; then
+		CC_host="ccache gcc"
+		CXX_host="ccache g++"
+	fi
 
 	# See note above TERMUX_PKG_DEPENDS why we do not use a shared libuv
 	# When building with ninja, build.ninja is geenrated for both Debug and Release builds.
