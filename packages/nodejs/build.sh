@@ -63,6 +63,10 @@ termux_step_configure() {
 	export CC_host=gcc
 	export CXX_host=g++
 	export LINK_host=g++
+	if [ "$TERMUX_CACHE_ENABLED" = true ]; then
+		CC_host="ccache gcc"
+		CXX_host="ccache g++"
+	fi
 
 	LDFLAGS+=" -ldl"
 	# See note above TERMUX_PKG_DEPENDS why we do not use a shared libuv.
