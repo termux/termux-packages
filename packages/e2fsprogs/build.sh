@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0, LGPL-2.0"
 TERMUX_PKG_LICENSE_FILE="NOTICE"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.47.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.kernel.org/pub/linux/kernel/people/tytso/e2fsprogs/v$TERMUX_PKG_VERSION/e2fsprogs-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=144af53f2bbd921cef6f8bea88bb9faddca865da3fbc657cc9b4d2001097d5db
 TERMUX_PKG_CONFFILES="etc/mke2fs.conf"
@@ -18,6 +19,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-relative-symlinks
 --disable-defrag
 --disable-e2initrd-helper
+--disable-fsck
 --disable-libuuid
 --disable-libblkid
 --disable-uuidd
