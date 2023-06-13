@@ -10,4 +10,5 @@ TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_post_get_source() {
 	TERMUX_PKG_SRCDIR+=/fclones
+	TERMUX_PKG_BUILDDIR="$TERMUX_PKG_SRCDIR"
 }
