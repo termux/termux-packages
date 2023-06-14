@@ -3,7 +3,7 @@
 # Push to GitHub registry with:
 #	docker push ghcr.io/termux/package-builder
 # This is done after changing this file or any of the
-# scripts/setup-{ubuntu,android-sdk}.sh setup scripts.
+# scripts/setup-{ubuntu,android-sdk,cgct}.sh setup scripts.
 FROM ubuntu:22.04
 
 # Fix locale to avoid warnings:
@@ -14,7 +14,7 @@ COPY ./setup-ubuntu.sh ./setup-android-sdk.sh ./setup-cgct.sh ./properties.sh ./
 RUN mkdir /tmp/build
 COPY ./build/termux_download.sh /tmp/build/
 
-# Setup needed packages and the Android SDK and NDK:
+# Setup needed packages and the Android SDK and NDK and the CGCT:
 RUN apt-get update && \
 	apt-get -yq upgrade && \
 	apt-get install -yq sudo lsb-release software-properties-common && \

@@ -11,6 +11,7 @@ termux_step_setup_variables() {
 	: "${TERMUX_CONTINUE_BUILD:="false"}"
 	: "${TERMUX_QUIET_BUILD:="false"}"
 	: "${TERMUX_SKIP_DEPCHECK:="false"}"
+	: "${TERMUX_GLOBAL_LIBRARY:="false"}"
 	: "${TERMUX_TOPDIR:="$HOME/.termux-build"}"
 	: "${TERMUX_PACMAN_PACKAGE_COMPRESSION:="xz"}"
 
@@ -28,15 +29,29 @@ termux_step_setup_variables() {
 		*) termux_error_exit "Unsupported package format \"${TERMUX_PACKAGE_FORMAT-}\". Only 'debian' and 'pacman' formats are supported";;
 	esac
 
+	# Default package library base
+	if [ -z "${TERMUX_PACKAGE_LIBRARY-}" ]; then
+		export TERMUX_PACKAGE_LIBRARY="bionic"
+	fi
+
+	if [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
+		export TERMUX_PREFIX="$TERMUX_PREFIX/glibc"
+		if ! package__is_package_name_have_glibc_prefix "$TERMUX_PKG_NAME"; then
+			TERMUX_PKG_NAME="${TERMUX_PKG_NAME}-glibc"
+		fi
+	fi
+
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
 		# For on-device builds cross-compiling is not supported so we can
 		# store information about built packages under $TERMUX_TOPDIR.
 		TERMUX_BUILT_PACKAGES_DIRECTORY="$TERMUX_TOPDIR/.built-packages"
 		TERMUX_NO_CLEAN="true"
 
-		# On-device builds without termux-exec are unsupported.
-		if ! grep -q "${TERMUX_PREFIX}/lib/libtermux-exec.so" <<< "${LD_PRELOAD-x}"; then
-			termux_error_exit "On-device builds without termux-exec are not supported."
+		if [ "$TERMUX_PACKAGE_LIBRARY" = "bionic" ]; then
+			# On-device builds without termux-exec are unsupported.
+			if ! grep -q "${TERMUX_PREFIX}/lib/libtermux-exec.so" <<< "${LD_PRELOAD-x}"; then
+				termux_error_exit "On-device builds without termux-exec are not supported."
+			fi
 		fi
 	else
 		TERMUX_BUILT_PACKAGES_DIRECTORY="/data/data/.built-packages"
@@ -51,15 +66,47 @@ termux_step_setup_variables() {
 		TERMUX_ARCH_BITS=32
 	fi
 
-	TERMUX_HOST_PLATFORM="${TERMUX_ARCH}-linux-android"
-	if [ "$TERMUX_ARCH" = "arm" ]; then TERMUX_HOST_PLATFORM="${TERMUX_HOST_PLATFORM}eabi"; fi
-
-	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ] && [ ! -d "$NDK" ]; then
-		termux_error_exit 'NDK not pointing at a directory!'
+	if [ "$TERMUX_PACKAGE_LIBRARY" = "bionic" ]; then
+		TERMUX_HOST_PLATFORM="${TERMUX_ARCH}-linux-android"
+	else
+		TERMUX_HOST_PLATFORM="${TERMUX_ARCH}-linux-gnu"
+	fi
+	if [ "$TERMUX_ARCH" = "arm" ]; then
+		TERMUX_HOST_PLATFORM="${TERMUX_HOST_PLATFORM}eabi"
+		if [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
+			TERMUX_HOST_PLATFORM="${TERMUX_HOST_PLATFORM}hf"
+		fi
 	fi
 
-	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ] && ! grep -s -q "Pkg.Revision = $TERMUX_NDK_VERSION_NUM" "$NDK/source.properties"; then
-		termux_error_exit "Wrong NDK version - we need $TERMUX_NDK_VERSION"
+	if [ "$TERMUX_PACKAGE_LIBRARY" = "bionic" ]; then
+		if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ] && [ ! -d "$NDK" ]; then
+			termux_error_exit 'NDK not pointing at a directory!'
+		fi
+
+		if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ] && ! grep -s -q "Pkg.Revision = $TERMUX_NDK_VERSION_NUM" "$NDK/source.properties"; then
+			termux_error_exit "Wrong NDK version - we need $TERMUX_NDK_VERSION"
+		fi
+	elif [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
+		if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
+			if [ -n "${LD_PRELOAD-}" ]; then
+				unset LD_PRELOAD
+			fi
+			if ! $(echo "$PATH" | grep -q "$TERMUX_PREFIX"); then
+				if [ -d "${TERMUX_PREFIX}/bin" ]; then
+					export PATH="${TERMUX_PREFIX}/bin:${PATH}"
+				else
+					termux_error_exit "Glibc components are not installed, run './scripts/setup-termux-glibc.sh'"
+				fi
+			fi
+		else
+			if ! $(echo "$PATH" | grep -q "${CGCT_DIR}/${TERMUX_ARCH}/bin"); then
+				if [ -d "${CGCT_DIR}/${TERMUX_ARCH}/bin" ]; then
+					export PATH="${CGCT_DIR}/${TERMUX_ARCH}/bin:${PATH}"
+				else
+					termux_error_exit "The cgct tools were not found, run './scripts/setup-cgct.sh'"
+				fi
+			fi
+		fi
 	fi
 
 	# The build tuple that may be given to --build configure flag:

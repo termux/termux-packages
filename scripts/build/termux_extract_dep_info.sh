@@ -3,7 +3,7 @@
 termux_extract_dep_info() {
 	PKG=$1
 	PKG_DIR=$2
-	if [ "$PKG" != "$(basename ${PKG_DIR})" ]; then
+	if [ "$PKG" != "$(basename ${PKG_DIR})" ] && [ "${PKG/-glibc/}" != "$(basename ${PKG_DIR})" ]; then
 		# We are dealing with a subpackage
 		TERMUX_ARCH=$(
 			# set TERMUX_SUBPKG_PLATFORM_INDEPENDENT to
