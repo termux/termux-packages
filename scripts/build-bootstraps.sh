@@ -93,12 +93,28 @@ build_package() {
 # Extract *.deb files to the bootstrap root.
 extract_debs() {
 
+	local current_arch "$1"
+
 	local current_package_name
 	local data_archive
 	local control_archive
 	local package_tmpdir
 	local deb
 	local file
+	local built_marker_dir_for_arch
+
+	if [[ " ${TERMUX_DEFAULT_ARCHITECTURES[*]} " != *" $current_arch "* ]]; then
+		echo "Unsupported architecture '$current_arch'" 1>&2
+		echo "Supported architectures: '${TERMUX_DEFAULT_ARCHITECTURES[*]}'" 1>&2
+		return 1
+	fi
+
+	built_marker_dir_for_arch="$(readlink "$TERMUX_BUILT_PACKAGES_DIRECTORY")"
+	if [[ "$TERMUX_BUILT_PACKAGES_DIRECTORY-$current_arch" != "$built_marker_dir_for_arch" ]]; then
+		echo "Specified architecture '$current_arch' is not the currently built one" 1>&2
+		echo "Markers of currently built packages are put under: '$built_marker_dir_for_arch'" 1>&2
+		return 1
+	fi
 
 	cd "$TERMUX_BUILT_DEBS_DIRECTORY"
 
@@ -112,7 +128,7 @@ extract_debs() {
 		echo "\""
 	fi
 
-	for deb in *.deb; do
+	for deb in *_${current_arch}.deb *_all.deb; do
 
 		current_package_name="$(echo "$deb" | sed -E 's/^([^_]+).*/\1/' )"
 		echo "current_package_name: '$current_package_name'"
@@ -454,7 +470,7 @@ main() {
 		done
 
 		# Extract all debs.
-		extract_debs || return $?
+		extract_debs "$package_arch" || return $?
 
 		# Create bootstrap archive.
 		create_bootstrap_archive "$package_arch" || return $?
