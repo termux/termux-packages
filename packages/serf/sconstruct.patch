@@ -8,24 +8,6 @@
                    )
  
  env.Append(BUILDERS = {
-@@ -166,7 +167,7 @@
- match = re.search('SERF_MAJOR_VERSION ([0-9]+).*'
-                   'SERF_MINOR_VERSION ([0-9]+).*'
-                   'SERF_PATCH_VERSION ([0-9]+)',
--                  env.File('serf.h').get_contents(),
-+                  str(env.File('serf.h').get_contents()),
-                   re.DOTALL)
- MAJOR, MINOR, PATCH = [int(x) for x in match.groups()]
- env.Append(MAJOR=str(MAJOR))
-@@ -183,7 +184,7 @@
- 
- unknown = opts.UnknownVariables()
- if unknown:
--  print 'Warning: Used unknown variables:', ', '.join(unknown.keys())
-+  print('Warning: Used unknown variables:', ', '.join(unknown.keys()))
- 
- apr = str(env['APR'])
- apu = str(env['APU'])
 @@ -216,7 +217,8 @@
  # from current_version, so don't use the PATCH level to avoid that build and
  # runtime patch levels have to be identical.
@@ -36,3 +18,19 @@
  
  LIBNAME = 'libserf-%d' % (MAJOR,)
  if sys.platform != 'win32':
+@@ -257,7 +259,6 @@
+   env = conf.Finish()
+ 
+   if have_gcc:
+-    env.Append(CFLAGS=['-std=c89'])
+     env.Append(CCFLAGS=['-Wdeclaration-after-statement',
+                         '-Wmissing-prototypes',
+                         '-Wall'])
+@@ -266,7 +267,6 @@
+     env.Append(CCFLAGS=['-g'])
+     env.Append(CPPDEFINES=['DEBUG', '_DEBUG'])
+   else:
+-    env.Append(CCFLAGS=['-O2'])
+     env.Append(CPPDEFINES=['NDEBUG'])
+ 
+   ### works for Mac OS. probably needs to change
