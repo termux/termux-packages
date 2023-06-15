@@ -1,3 +1,5 @@
+# Please do NOT depend on this package; do NOT include this package in
+# `TERMUX_PKG_{DEPENDS,RECOMMENDS}` of other packages.
 TERMUX_PKG_HOMEPAGE=https://android.googlesource.com/platform/frameworks/base/+/master/native/android
 TERMUX_PKG_DESCRIPTION="Stub libandroid.so needed on Termux Docker"
 TERMUX_PKG_LICENSE="NCSA"
