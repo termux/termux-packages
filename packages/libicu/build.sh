@@ -6,10 +6,10 @@ TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_LICENSE_FILE="../LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 # Never forget to always bump revision of reverse dependencies and rebuild them
-# when bumping version.
-TERMUX_PKG_VERSION=73.1
+# when bumping "major" version.
+TERMUX_PKG_VERSION=73.2
 TERMUX_PKG_SRCURL=https://github.com/unicode-org/icu/releases/download/release-${TERMUX_PKG_VERSION//./-}/icu4c-${TERMUX_PKG_VERSION//./_}-src.tgz
-TERMUX_PKG_SHA256=a457431de164b4aa7eca00ed134d00dfbf88a77c6986a10ae7774fc076bb8c45
+TERMUX_PKG_SHA256=818a80712ed3caacd9b652305e01afc7fa167e6f2e94996da44b90c2ab604ce1
 TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_BREAKS="libicu-dev"
 TERMUX_PKG_REPLACES="libicu-dev"
