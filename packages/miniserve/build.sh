@@ -16,13 +16,13 @@ termux_step_pre_configure() {
 	: "${CARGO_HOME:=$HOME/.cargo}"
 	export CARGO_HOME
 
-	rm -rf $CARGO_HOME/registry/src/github.com-*/socket2-*
+	rm -rf $CARGO_HOME/registry/src/*/socket2-*
 	cargo fetch --target "${CARGO_TARGET_NAME}"
 
 	if [ $TERMUX_ARCH_BITS = 32 ]; then
 		local p="socket2-0.5.2-src-sys-unix.rs.diff32"
 		local d
-		for d in $CARGO_HOME/registry/src/github.com-*/socket2-*; do
+		for d in $CARGO_HOME/registry/src/*/socket2-*; do
 			patch --silent -p1 -d ${d} \
 				< "$TERMUX_PKG_BUILDER_DIR/${p}" || :
 		done

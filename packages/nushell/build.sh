@@ -30,10 +30,10 @@ termux_step_pre_configure() {
 	: "${CARGO_HOME:=$HOME/.cargo}"
 	export CARGO_HOME
 
-	rm -rf $CARGO_HOME/registry/src/github.com-*/pwd-*
+	rm -rf $CARGO_HOME/registry/src/*/pwd-*
 	cargo fetch --target "${CARGO_TARGET_NAME}"
 
-	for d in $CARGO_HOME/registry/src/github.com-*/pwd-*; do
+	for d in $CARGO_HOME/registry/src/*/pwd-*; do
 		patch --silent -p1 -d ${d} < $TERMUX_PKG_BUILDER_DIR/crates-pwd-for-android.diff || :
 	done
 

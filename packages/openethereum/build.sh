@@ -69,7 +69,7 @@ termux_step_configure() {
 termux_step_make() {
 	cargo fetch --target $CARGO_TARGET_NAME
 	patch --silent -p1 \
-		-d $CARGO_HOME/registry/src/github.com-*/parity-rocksdb-sys-0.5.6/rocksdb \
+		-d $CARGO_HOME/registry/src/*/parity-rocksdb-sys-0.5.6/rocksdb \
 		< $TERMUX_PKG_BUILDER_DIR/parity-rocksdb-sys-0.5.6-mutex.diff
 	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release --features final
 	for applet in evmbin ethstore-cli ethkey-cli; do

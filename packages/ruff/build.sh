@@ -33,7 +33,7 @@ termux_step_pre_configure() {
 
 	local _patch=$TERMUX_PKG_BUILDER_DIR/tikv-jemalloc-sys-0.5.3+5.3.0-patched-src-lib.rs.diff
 	local d
-	for d in $CARGO_HOME/registry/src/index.crates.io-*/tikv-jemalloc-sys-*; do
+	for d in $CARGO_HOME/registry/src/*/tikv-jemalloc-sys-*; do
 		patch --silent -p1 -d ${d} < ${_patch} || :
 	done
 }

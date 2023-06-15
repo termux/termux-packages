@@ -18,20 +18,20 @@ termux_step_pre_configure() {
 	: "${CARGO_HOME:=$HOME/.cargo}"
 	export CARGO_HOME
 
-	rm -rf "${CARGO_HOME}"/registry/src/github.com-*/git-config*
-	rm -rf $CARGO_HOME/registry/src/github.com-*/rustix-*
+	rm -rf "${CARGO_HOME}"/registry/src/*/git-config*
+	rm -rf $CARGO_HOME/registry/src/*/rustix-*
 	cargo fetch --target "${CARGO_TARGET_NAME}"
 
-	for d in $CARGO_HOME/registry/src/github.com-*/rustix-*; do
+	for d in $CARGO_HOME/registry/src/*/rustix-*; do
 		patch --silent -p1 -d ${d} < $TERMUX_PKG_BUILDER_DIR/0001-upstream-fix-libc-removing-unsafe-on-makedev.diff || :
 	done
 
-	for d in $CARGO_HOME/registry/src/github.com-*/git-config*; do
+	for d in $CARGO_HOME/registry/src/*/git-config*; do
 		patch --silent -p1 -d ${d} < $TERMUX_PKG_BUILDER_DIR/0002-rust-git-config-path.diff || :
 	done
 
 	local f
-	for f in $CARGO_HOME/registry/src/github.com-*/libgit2-sys-*/build.rs; do
+	for f in $CARGO_HOME/registry/src/*/libgit2-sys-*/build.rs; do
 		sed -i -E 's/\.range_version\(([^)]*)\.\.[^)]*\)/.atleast_version(\1)/g' "${f}"
 	done
 }
