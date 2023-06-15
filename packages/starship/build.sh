@@ -20,7 +20,7 @@ termux_step_pre_configure() {
 
 	local p="cmake-0.1.50-src-lib.rs.diff"
 	local d
-	for d in $CARGO_HOME/registry/src/index.crates.io-*/cmake-*; do
+	for d in $CARGO_HOME/registry/src/*/cmake-*; do
 		patch --silent -p1 -d ${d} \
 			< "$TERMUX_PKG_BUILDER_DIR/${p}" || :
 	done

@@ -25,13 +25,13 @@ termux_step_pre_configure() {
 	cargo fetch --target $CARGO_TARGET_NAME
 
 	local d p
-	for d in $CARGO_HOME/registry/src/github.com-*/libbpf-sys-*; do
+	for d in $CARGO_HOME/registry/src/*/libbpf-sys-*; do
 		for p in libbpf-sys-0.6.0-1-libbpf-include-linux-{compiler,types}.h.diff; do
 			patch --silent -p1 -d ${d} \
 				< "$TERMUX_PKG_BUILDER_DIR/${p}" || :
 		done
 	done
-	for d in $CARGO_HOME/registry/src/github.com-*/nix-*; do
+	for d in $CARGO_HOME/registry/src/*/nix-*; do
 		for p in nix-{0.22.0,0.23.1}-src-sys-statfs.rs.diff; do
 			patch --silent -p1 -d ${d} \
 				< "$TERMUX_PKG_BUILDER_DIR/${p}" || :
