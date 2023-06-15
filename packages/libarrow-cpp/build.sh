@@ -3,10 +3,9 @@ TERMUX_PKG_DESCRIPTION="C++ libraries for Apache Arrow"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Align the version with `libarrow-python` package.
-TERMUX_PKG_VERSION=12.0.0
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=12.0.1
 TERMUX_PKG_SRCURL=https://github.com/apache/arrow/archive/refs/tags/apache-arrow-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=f25901c486e1e79cde8b78b3e7b1d889919f942549996003a7341a8ee86addaa
+TERMUX_PKG_SHA256=f01b76a42ceb30409e7b1953ef64379297dd0c08502547cae6aaafd2c4a4d92e
 TERMUX_PKG_DEPENDS="libandroid-execinfo, libc++, liblz4, libprotobuf, libre2, libsnappy, utf8proc, zlib, zstd"
 TERMUX_PKG_BUILD_DEPENDS="rapidjson"
 TERMUX_PKG_BREAKS="libarrow-python (<< ${TERMUX_PKG_VERSION})"
