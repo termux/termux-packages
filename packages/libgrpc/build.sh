@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_SRCURL=git+https://github.com/grpc/grpc
 TERMUX_PKG_VERSION=1.56.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_DEPENDS="abseil-cpp, c-ares, ca-certificates, libc++, libprotobuf, libre2, openssl, protobuf, zlib"
 TERMUX_PKG_BREAKS="libgrpc-dev"
 TERMUX_PKG_REPLACES="libgrpc-dev"
