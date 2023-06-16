@@ -2,11 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://cfengine.com/
 TERMUX_PKG_DESCRIPTION="CFEngine is a configuration management technology"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@craigcomstock"
-TERMUX_PKG_VERSION=1:3.21.1
+TERMUX_PKG_VERSION=1:3.21.2
 TERMUX_PKG_SRCURL=git+https://github.com/cfengine/core
-TERMUX_PKG_SHA256=e8db72a1e8e6c13e41c4ce108e547ac205e4c38060e1c1a970800c932b17058a
+TERMUX_PKG_SHA256=6b487e189b5ccf46409af470cd3d4928c128a3ab042d7980de4c3fc20a6e9a44
 # "-build[n]" suffix in tag name is not a part of version string.
-_CFENGINE_GIT_TAG_SUFFIX=-build1
+_CFENGINE_GIT_TAG_SUFFIX=
 TERMUX_PKG_GIT_BRANCH=${TERMUX_PKG_VERSION#*:}${_CFENGINE_GIT_TAG_SUFFIX}
 TERMUX_PKG_DEPENDS="libandroid-glob, liblmdb, libxml2, libyaml, openssl, pcre"
 # core doesn't work with out-of-tree builds
@@ -33,7 +33,7 @@ termux_step_post_get_source() {
 	: ${_CFENGINE_GIT_TAG_SUFFIX:=}
 	local _MASTERFILES_VERSION=${TERMUX_PKG_VERSION#*:}${_CFENGINE_GIT_TAG_SUFFIX}
 	local _MASTERFILES_SRCURL=https://github.com/cfengine/masterfiles/archive/${_MASTERFILES_VERSION}.zip
-	local _MASTERFILES_SHA256=8e86019ff2c867ae4cb46d7008b541c99dd22321ea456eab4c0c16136e9af712
+	local _MASTERFILES_SHA256=12daf020acf2fe10623051711850af7658f007488a2dc9ab113fcd7eb199b5e7
 	local _MASTERFILES_FILE=${TERMUX_PKG_CACHEDIR}/masterfiles-${_MASTERFILES_VERSION}.zip
 	termux_download \
 		${_MASTERFILES_SRCURL} \
