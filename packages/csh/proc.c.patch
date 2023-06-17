@@ -21,7 +21,7 @@
      if (WIFSTOPPED(w)) {
  	pp->p_flags |= PSTOPPED;
 -	pp->p_reason = w.w_stopsig;
-+	pp->p_reason = w;
++	pp->p_reason = WSTOPSIG(w);
      }
      else {
  	if (pp->p_flags & (PTIME | PPTIME) || adrof(STRtime))
@@ -38,11 +38,11 @@
 +	    if (w)
  		pp->p_flags |= PDUMPED;
 -	    pp->p_reason = w.w_termsig;
-+	    pp->p_reason = w;
++	    pp->p_reason = WTERMSIG(w);
  	}
  	else {
 -	    pp->p_reason = w.w_retcode;
-+	    pp->p_reason = w;
++	    pp->p_reason = WEXITSTATUS(w);
  	    if (pp->p_reason != 0)
  		pp->p_flags |= PAEXITED;
  	    else
