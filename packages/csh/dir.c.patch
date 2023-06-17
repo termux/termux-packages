@@ -1,0 +1,11 @@
+--- a/bin/csh/dir.c
++++ b/bin/csh/dir.c
+@@ -848,7 +848,7 @@
+     if (p1 && *p1 == '/' &&
+ 	(Strncmp(p1, cp, len) != 0 || (cp[len] != '/' && cp[len] != '\0'))) {
+ 	static ino_t home_ino;
+-	static dev_t home_dev = NODEV;
++	static dev_t home_dev = (dev_t)-1;
+ 	static Char *home_ptr = NULL;
+ 	struct stat statbuf;
+ 
