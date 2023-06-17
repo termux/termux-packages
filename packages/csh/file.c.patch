@@ -1,15 +1,24 @@
---- a/file.c
-+++ b/file.c
-@@ -82,7 +82,7 @@
- static void	 beep(void);
- static void	 print_recognized_stuff(Char *);
- static void	 extract_dir_and_name(Char *, Char *, Char *);
--static Char	*getentry(DIR *, int);
-+static Char	*getentry(DIR *);
- static void	 free_items(Char **, int);
- static int	 tsearch(Char *, COMMAND, int);
- static int	 recognize(Char *, Char *, int, int);
-@@ -363,26 +363,20 @@
+--- a/bin/csh/file.c
++++ b/bin/csh/file.c
+@@ -43,7 +43,7 @@
+ #include <sys/ioctl.h>
+ #include <sys/param.h>
+ #include <sys/stat.h>
+-#include <sys/tty.h>
++#include <linux/tty.h>
+ 
+ #include <dirent.h>
+ #include <pwd.h>
+@@ -93,7 +93,7 @@
+ static void beep(void);
+ static void print_recognized_stuff(Char *);
+ static void extract_dir_and_name(Char *, Char *, Char *);
+-static Char *getentry(DIR *, int);
++static Char *getentry(DIR *);
+ static void free_items(Char **, size_t);
+ static size_t tsearch(Char *, COMMAND, size_t);
+ static int recognize(Char *, Char *, size_t, size_t);
+@@ -428,26 +428,20 @@
  
      p = Strrchr(path, '/');
      if (p == NULL) {
@@ -20,7 +29,7 @@
      else {
 -	copyn(name, ++p, MAXNAMLEN);
 +	copyn(name, ++p, NAME_MAX);
- 	copyn(dir, path, p - path);
+ 	copyn(dir, path, (size_t)(p - path));
      }
  }
  
@@ -28,8 +37,8 @@
 -getentry(DIR *dir_fd, int looking_for_lognames)
 +getentry(DIR *dir_fd)
  {
--    struct passwd *pw;
      struct dirent *dirp;
+-    struct passwd *pw;
  
 -    if (looking_for_lognames) {
 -	if ((pw = getpwent()) == NULL)
@@ -39,22 +48,28 @@
      if ((dirp = readdir(dir_fd)) != NULL)
  	return (str2short(dirp->d_name));
      return (NULL);
-@@ -416,36 +410,27 @@
+@@ -479,11 +473,11 @@
+ static size_t
+ tsearch(Char *word, COMMAND command, size_t max_word_length)
  {
+-    Char dir[MAXPATHLEN + 1], extended_name[MAXNAMLEN + 1];
+-    Char name[MAXNAMLEN + 1], tilded_dir[MAXPATHLEN + 1];
++    Char dir[MAXPATHLEN + 1], extended_name[NAME_MAX + 1];
++    Char name[NAME_MAX + 1], tilded_dir[MAXPATHLEN + 1];
      DIR *dir_fd;
-     int numitems = 0, ignoring = TRUE, nignored = 0;
--    int name_length, looking_for_lognames;
-+    int name_length;
-     Char    tilded_dir[MAXPATHLEN], dir[MAXPATHLEN];
--    Char    name[MAXNAMLEN + 1], extended_name[MAXNAMLEN + 1];
-+    Char    name[NAME_MAX + 1], extended_name[NAME_MAX + 1];
-     Char   *entry;
-     Char   **items = NULL;
-     size_t  maxitems = 0;
+     Char *entry;
+-    int ignoring, looking_for_lognames;
++    int ignoring;
+     size_t name_length, nignored, numitems;
+     Char **items = NULL;
+     size_t maxitems = 0;
+@@ -492,29 +486,20 @@
+     ignoring = TRUE;
+     nignored = 0;
  
 -    looking_for_lognames = (*word == '~') && (Strchr(word, '/') == NULL);
 -    if (looking_for_lognames) {
--	(void) setpwent();
+-	(void)setpwent();
 -	copyn(name, &word[1], MAXNAMLEN);	/* name sans ~ */
 -	dir_fd = NULL;
 -    }
@@ -68,10 +83,10 @@
 -    }
 +    extract_dir_and_name(word, dir, name);
 +    if (tilde(tilded_dir, dir) == 0)
-+	return (0);
++        return (0);
 +    dir_fd = opendir(*tilded_dir ? short2str(tilded_dir) : ".");
 +    if (dir_fd == NULL)
-+	return (0);
++        return (0);
  
  again:				/* search for matches */
      name_length = Strlen(name);
@@ -85,22 +100,22 @@
 +	if (name_length == 0 && entry[0] == '.')
  	    continue;
  	if (command == LIST) {
- 	    if (numitems >= maxitems) {
-@@ -458,7 +443,7 @@
- 	    }
- 	    items[numitems] = (Char *) xmalloc((size_t) (Strlen(entry) + 1) *
- 					       sizeof(Char));
+ 	    if ((size_t)numitems >= maxitems) {
+@@ -526,7 +511,7 @@
+  	    }
+ 	    items[numitems] = xmalloc((size_t) (Strlen(entry) + 1) *
+ 	        sizeof(Char));
 -	    copyn(items[numitems], entry, MAXNAMLEN);
 +	    copyn(items[numitems], entry, NAME_MAX);
  	    numitems++;
  	}
  	else {			/* RECOGNIZE command */
-@@ -472,25 +457,16 @@
+@@ -540,25 +525,16 @@
      if (ignoring && numitems == 0 && nignored > 0) {
  	ignoring = FALSE;
  	nignored = 0;
 -	if (looking_for_lognames)
--	    (void) setpwent();
+-	    (void)setpwent();
 -	else
 -	    rewinddir(dir_fd);
 +	rewinddir(dir_fd);
@@ -108,10 +123,10 @@
      }
  
 -    if (looking_for_lognames)
--	(void) endpwent();
+-	(void)endpwent();
 -    else
--	(void) closedir(dir_fd);
-+    (void) closedir(dir_fd);
+-	(void)closedir(dir_fd);
++    (void)closedir(dir_fd);
      if (numitems == 0)
  	return (0);
      if (command == RECOGNIZE) {
@@ -125,22 +140,22 @@
  	/* add extended name */
  	catn(word, extended_name, max_word_length);
  	return (numitems);
-@@ -498,8 +474,7 @@
+@@ -566,8 +542,7 @@
      else {			/* LIST */
- 	qsort((ptr_t) items, numitems, sizeof(*items),
- 		(int (*)(const void *, const void *)) sortscmp);
+ 	qsort(items, numitems, sizeof(items[0]), 
+ 		(int (*) (const void *, const void *)) sortscmp);
 -	print_by_column(looking_for_lognames ? NULL : tilded_dir,
 -			items, numitems);
 +	print_by_column(tilded_dir, items, numitems);
  	if (items != NULL)
- 	    FREE_ITEMS(items);
+ 	    FREE_ITEMS(items, numitems);
      }
-@@ -518,7 +493,7 @@
- recognize(Char *extended_name, Char *entry, int name_length, int numitems)
+@@ -586,7 +561,7 @@
+ recognize(Char *extended_name, Char *entry, size_t name_length, size_t numitems)
  {
      if (numitems == 1)		/* 1st match */
 -	copyn(extended_name, entry, MAXNAMLEN);
 +	copyn(extended_name, entry, NAME_MAX);
      else {			/* 2nd & subsequent matches */
- 	Char *x, *ent;
- 	int len = 0;
+ 	Char *ent, *x;
+ 	size_t len = 0;
