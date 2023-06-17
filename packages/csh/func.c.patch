@@ -1,11 +1,12 @@
---- a/func.c
-+++ b/func.c
-@@ -1063,7 +1063,7 @@
-     (void) umask(i);
- }
- 
--typedef quad_t RLIM_TYPE;
-+typedef int64_t RLIM_TYPE;
- 
- static struct limits {
-     int     limconst;
+--- a/bin/csh/func.c
++++ b/bin/csh/func.c
+@@ -1105,9 +1105,7 @@
+     { RLIMIT_RSS,	"memoryuse",	1024,	"kbytes" },
+     { RLIMIT_MEMLOCK,	"memorylocked",	1024,	"kbytes" },
+     { RLIMIT_NPROC,	"maxproc",	1,	"" },
+-    { RLIMIT_NTHR,	"maxthread",	1,	"" },
+     { RLIMIT_NOFILE,	"openfiles",	1,	"" },
+-    { RLIMIT_SBSIZE,	"sbsize",	1,	"bytes" },
+     { RLIMIT_AS,	"vmemoryuse",	1024,	"kbytes" },
+     { -1,		NULL,		0,	NULL }
+ };
