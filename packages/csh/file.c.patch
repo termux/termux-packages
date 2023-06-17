@@ -1,17 +1,6 @@
 --- a/file.c
 +++ b/file.c
-@@ -30,6 +30,10 @@
-  * SUCH DAMAGE.
-  */
- 
-+#ifdef BIONIC
-+#define MAXNAMLEN 1024
-+#endif
-+
- #ifdef FILEC
- 
- #include <sys/param.h>
-@@ -82,7 +86,7 @@
+@@ -82,7 +82,7 @@
  static void	 beep(void);
  static void	 print_recognized_stuff(Char *);
  static void	 extract_dir_and_name(Char *, Char *, Char *);
@@ -20,7 +9,19 @@
  static void	 free_items(Char **, int);
  static int	 tsearch(Char *, COMMAND, int);
  static int	 recognize(Char *, Char *, int, int);
-@@ -373,16 +377,10 @@
+@@ -363,26 +363,20 @@
+ 
+     p = Strrchr(path, '/');
+     if (p == NULL) {
+-	copyn(name, path, MAXNAMLEN);
++	copyn(name, path, NAME_MAX);
+ 	dir[0] = '\0';
+     }
+     else {
+-	copyn(name, ++p, MAXNAMLEN);
++	copyn(name, ++p, NAME_MAX);
+ 	copyn(dir, path, p - path);
+     }
  }
  
  static Char *
@@ -38,14 +39,15 @@
      if ((dirp = readdir(dir_fd)) != NULL)
  	return (str2short(dirp->d_name));
      return (NULL);
-@@ -416,36 +414,27 @@
+@@ -416,36 +410,27 @@
  {
      DIR *dir_fd;
      int numitems = 0, ignoring = TRUE, nignored = 0;
 -    int name_length, looking_for_lognames;
 +    int name_length;
      Char    tilded_dir[MAXPATHLEN], dir[MAXPATHLEN];
-     Char    name[MAXNAMLEN + 1], extended_name[MAXNAMLEN + 1];
+-    Char    name[MAXNAMLEN + 1], extended_name[MAXNAMLEN + 1];
++    Char    name[NAME_MAX + 1], extended_name[NAME_MAX + 1];
      Char   *entry;
      Char   **items = NULL;
      size_t  maxitems = 0;
@@ -84,7 +86,16 @@
  	    continue;
  	if (command == LIST) {
  	    if (numitems >= maxitems) {
-@@ -472,25 +461,16 @@
+@@ -458,7 +443,7 @@
+ 	    }
+ 	    items[numitems] = (Char *) xmalloc((size_t) (Strlen(entry) + 1) *
+ 					       sizeof(Char));
+-	    copyn(items[numitems], entry, MAXNAMLEN);
++	    copyn(items[numitems], entry, NAME_MAX);
+ 	    numitems++;
+ 	}
+ 	else {			/* RECOGNIZE command */
+@@ -472,25 +457,16 @@
      if (ignoring && numitems == 0 && nignored > 0) {
  	ignoring = FALSE;
  	nignored = 0;
@@ -114,7 +125,7 @@
  	/* add extended name */
  	catn(word, extended_name, max_word_length);
  	return (numitems);
-@@ -498,8 +478,7 @@
+@@ -498,8 +474,7 @@
      else {			/* LIST */
  	qsort((ptr_t) items, numitems, sizeof(*items),
  		(int (*)(const void *, const void *)) sortscmp);
@@ -124,3 +135,12 @@
  	if (items != NULL)
  	    FREE_ITEMS(items);
      }
+@@ -518,7 +493,7 @@
+ recognize(Char *extended_name, Char *entry, int name_length, int numitems)
+ {
+     if (numitems == 1)		/* 1st match */
+-	copyn(extended_name, entry, MAXNAMLEN);
++	copyn(extended_name, entry, NAME_MAX);
+     else {			/* 2nd & subsequent matches */
+ 	Char *x, *ent;
+ 	int len = 0;
