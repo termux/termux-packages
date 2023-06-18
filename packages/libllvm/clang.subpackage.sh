@@ -40,7 +40,7 @@ share/man/man1/scan-build.1.gz
 share/scan-*
 "
 TERMUX_SUBPKG_DESCRIPTION="C language frontend for LLVM"
-TERMUX_SUBPKG_DEPENDS="libcompiler-rt, lld, llvm, ndk-sysroot"
+TERMUX_SUBPKG_DEPENDS="libcompiler-rt, binutils-is-llvm, ndk-sysroot"
 TERMUX_SUBPKG_BREAKS="libllvm (<< 16.0.0), clangd"
 TERMUX_SUBPKG_REPLACES="libllvm (<< 16.0.0), clangd"
 TERMUX_SUBPKG_GROUPS="base-devel"
