@@ -3,9 +3,12 @@ TERMUX_PKG_DESCRIPTION="A validating, recursive, caching DNS resolver"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.17.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://nlnetlabs.nl/downloads/unbound/unbound-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=ee4085cecce12584e600f3d814a28fa822dfaacec1f94c84bfd67f8a5571a5f4
-TERMUX_PKG_DEPENDS="libevent, libexpat, libnghttp2, openssl, resolv-conf"
+TERMUX_PKG_DEPENDS="libevent, libnghttp2, openssl, resolv-conf"
+TERMUX_PKG_BREAKS="unbound (<< 1.17.1-1)"
+TERMUX_PKG_REPLACES="unbound (<< 1.17.1-1)"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PYTHON_COMMON_DEPS="wheel"
 
