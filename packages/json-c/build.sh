@@ -8,3 +8,6 @@ TERMUX_PKG_SRCURL=https://s3.amazonaws.com/json-c_releases/releases/json-c-${TER
 TERMUX_PKG_SHA256=8e45ac8f96ec7791eaf3bb7ee50e9c2100bbbc87b8d0f1d030c5ba8a0288d96b
 TERMUX_PKG_BREAKS="json-c-dev"
 TERMUX_PKG_REPLACES="json-c-dev"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DDISABLE_WERROR=ON
+"
