@@ -1,6 +1,6 @@
 --- a/bin/csh/proc.c
 +++ b/bin/csh/proc.c
-@@ -40,6 +40,7 @@
+@@ -40,12 +40,13 @@
  
  #include <sys/types.h>
  #include <sys/wait.h>
@@ -8,6 +8,13 @@
  
  #include <errno.h>
  #include <stdarg.h>
+ #include <stdlib.h>
+ #include <string.h>
+-#include <unistd.h>
++#include <bsd/unistd.h>
+ 
+ #include "csh.h"
+ #include "dir.h"
 @@ -95,7 +96,7 @@
  
  loop:
@@ -17,16 +24,3 @@
         (setintr && (intty || insource) ? WNOHANG | WUNTRACED : WNOHANG), &ru);
  
      if (pid <= 0) {
-@@ -846,11 +847,7 @@
- 	    if (eq(*v, STRml)) {
- 		flag |= FANCY | JOBDIR;
- 	    } else if (eq(*v, STRmZ)) {
--		if (v[1] && v[1][0]) {
--		    setproctitle("%s", short2str(v[1]));
--		} else {
--		    setproctitle(NULL);
--		}
-+		perror("-Z unavailable on Android.");
- 		return;
- 	    } else {
- 		stderror(ERR_JOBS);
