@@ -3,15 +3,16 @@ TERMUX_PKG_DESCRIPTION="Server module for Mumble, an open source voice-chat soft
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.5.517
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=git+https://github.com/mumble-voip/mumble
-TERMUX_PKG_DEPENDS="libc++, libcap, libdns-sd, libprotobuf, openssl, qt5-qtbase"
+TERMUX_PKG_DEPENDS="libc++, libcap, libprotobuf, openssl, qt5-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="boost, boost-headers, qt5-qtbase-cross-tools"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dclient=OFF
 -Dice=OFF
 -Doverlay=OFF
 -Dwarnings-as-errors=OFF
+-Dzeroconf=OFF
 "
 TERMUX_PKG_RM_AFTER_INSTALL="
 etc/systemd
