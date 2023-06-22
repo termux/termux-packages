@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=3.0.18
 TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://download.videolan.org/pub/videolan/vlc/${TERMUX_PKG_VERSION}/vlc-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=57094439c365d8aa8b9b41fa3080cc0eef2befe6025bb5cef722accc625aedec
-TERMUX_PKG_DEPENDS="avahi, chromaprint, dbus, ffmpeg, fluidsynth, fontconfig, freetype, fribidi, gdk-pixbuf, glib, gst-plugins-base, gstreamer, harfbuzz, liba52, libandroid-shmem, libandroid-spawn, libaom, libarchive, libass, libbluray, libc++, libcaca, libcairo, libcddb, libdav1d, libdvbpsi, libdvdnav, libdvdread, libebml, libflac, libgcrypt, libgnutls, libgpg-error, libice, libiconv, libidn, libjpeg-turbo, liblua52, libmad, libmatroska, libnfs, libogg, libopus, libpng, librsvg, libsecret, libsm, libsoxr, libssh2, libtheora, libtwolame, libvorbis, libvpx, libx11, libx264, libx265, libxcb, libxml2, mpg123, ncurses, opengl, pulseaudio, qt5-qtbase, qt5-qtsvg, qt5-qtx11extras, samba, taglib, xcb-util-keysyms, zlib"
+TERMUX_PKG_DEPENDS="avahi, chromaprint, dbus, ffmpeg, fluidsynth, fontconfig, freetype, fribidi, glib, gst-plugins-base, gstreamer, harfbuzz, liba52, libandroid-shmem, libandroid-spawn, libaom, libarchive, libass, libbluray, libc++, libcaca, libcairo, libcddb, libdav1d, libdvbpsi, libdvdnav, libdvdread, libebml, libflac, libgcrypt, libgnutls, libgpg-error, libiconv, libidn, libjpeg-turbo, liblua52, libmad, libmatroska, libnfs, libogg, libopus, libpng, librsvg, libsecret, libsoxr, libssh2, libtheora, libtwolame, libvorbis, libvpx, libx11, libx264, libx265, libxcb, libxml2, mpg123, ncurses, opengl, pulseaudio, qt5-qtbase, qt5-qtsvg, qt5-qtx11extras, samba, taglib, xcb-util-keysyms, zlib"
 TERMUX_PKG_BUILD_DEPENDS="qt5-qtbase-cross-tools, xorgproto"
 TERMUX_PKG_CONFLICTS="vlc"
 TERMUX_PKG_REPLACES="vlc"
@@ -84,4 +84,9 @@ termux_step_pre_configure() {
 
 	local _libgcc="$($CC -print-libgcc-file-name)"
 	LDFLAGS+=" -L$(dirname $_libgcc) -l:$(basename $_libgcc)"
+}
+
+termux_step_post_configure() {
+	# Avoid overlinking
+	sed -i 's/ -shared / -Wl,--as-needed\0/g' ./libtool
 }
