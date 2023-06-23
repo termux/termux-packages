@@ -3,11 +3,13 @@ TERMUX_PKG_DESCRIPTION="Open Source Computer Vision Library"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=4.7.0
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=https://github.com/opencv/opencv/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=8df0079cdbe179748a18d44731af62a245a45ebf5085223dc03133954c662973
-TERMUX_PKG_DEPENDS="abseil-cpp, ffmpeg, libc++, libjpeg-turbo, libopenblas, libpng, libprotobuf, libtiff, libwebp, openjpeg, openjpeg-tools, zlib"
-TERMUX_PKG_BUILD_DEPENDS="python-numpy-static"
+TERMUX_PKG_DEPENDS="abseil-cpp, ffmpeg, libc++, libjpeg-turbo, libopenblas, libpng, libtiff, libwebp, openjpeg, openjpeg-tools, zlib"
+# For static libprotobuf see
+# https://github.com/termux/termux-packages/issues/16979
+TERMUX_PKG_BUILD_DEPENDS="libutf8-range, protobuf-static, python-numpy-static"
 TERMUX_PKG_PYTHON_COMMON_DEPS="Cython, wheel"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DANDROID_NO_TERMUX=OFF
@@ -23,7 +25,7 @@ termux_step_pre_configure() {
 	termux_setup_protobuf
 
 	CXXFLAGS+=" -std=c++14"
-	CPPFLAGS+=" -DPROTOBUF_USE_DLLS"
+	LDFLAGS+=" -lutf8_range -lutf8_validity"
 	LDFLAGS+=" $($TERMUX_SCRIPTDIR/packages/libprotobuf/interface_link_libraries.sh)"
 	LDFLAGS+=" -llog"
 
@@ -37,4 +39,14 @@ termux_step_pre_configure() {
 		-DPYTHON3_INCLUDE_PATH=$TERMUX_PREFIX/include/python${TERMUX_PYTHON_VERSION}
 		-DPYTHON3_NUMPY_INCLUDE_DIRS=$TERMUX_PYTHON_HOME/site-packages/numpy/core/include
 		"
+
+	mv $TERMUX_PREFIX/lib/libprotobuf.so{,.tmp}
+}
+
+termux_step_post_make_install() {
+	mv $TERMUX_PREFIX/lib/libprotobuf.so{.tmp,}
+}
+
+termux_step_post_massage() {
+	rm -f lib/libprotobuf.so
 }
