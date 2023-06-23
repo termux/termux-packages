@@ -1,15 +1,23 @@
---- ./deps/uv/uv.gyp.orig	2022-11-14 07:56:05.000000000 +0530
-+++ ./deps/uv/uv.gyp	2022-11-25 18:51:25.022527139 +0530
-@@ -40,7 +40,7 @@
-     {
+--- ./deps/uv/uv.gyp.orig	2023-06-20 18:41:27.000000000 +0530
++++ ./deps/uv/uv.gyp	2023-06-23 19:59:00.665947296 +0530
+@@ -137,7 +137,6 @@
+     'uv_sources_android': [
+       'src/unix/linux.c',
+       'src/unix/procfs-exepath.c',
+-      'src/unix/pthread-fixes.c',
+       'src/unix/random-getentropy.c',
+       'src/unix/random-getrandom.c',
+       'src/unix/random-sysctl-linux.c',
+@@ -157,7 +156,7 @@
        'target_name': 'libuv',
+       'toolsets': ['host', 'target'],
        'type': '<(uv_library)',
 -      'include_dirs': [
 +      'include_dirs+': [
          'include',
          'src/',
        ],
-@@ -55,7 +55,7 @@
+@@ -172,7 +171,7 @@
            '<@(shared_unix_defines)',
            '<@(shared_zos_defines)',
          ],
@@ -18,11 +26,19 @@
          'conditions': [
            ['OS == "linux"', {
              'defines': [ '_POSIX_C_SOURCE=200112' ],
-@@ -267,6 +267,7 @@
-             'src/unix/random-sysctl-linux.c',
-             'src/unix/epoll.c',
+@@ -305,6 +304,7 @@
+             '_XOPEN_SOURCE=500',
+             '_REENTRANT',
            ],
 +          'defines': [ '__USE_GNU' ],
            'link_settings': {
-             'libraries': [ '-ldl' ],
-           },
+             'libraries': [
+               '-lkstat',
+@@ -399,7 +399,6 @@
+         }],
+         ['OS=="zos"', {
+           'sources': [
+-            'src/unix/pthread-fixes.c',
+             'src/unix/os390.c',
+             'src/unix/os390-syscalls.c'
+           ]
