@@ -5,10 +5,11 @@ TERMUX_PKG_MAINTAINER="Michal Bednarski @michalbednarski"
 # Just bump commit and version when needed:
 _COMMIT=2d7c70eec7e2688e465c7bfba60c927fad0abfb1
 TERMUX_PKG_VERSION=5.1.107
-TERMUX_PKG_REVISION=59
+TERMUX_PKG_REVISION=60
 TERMUX_PKG_SRCURL=https://github.com/termux/proot/archive/${_COMMIT}.zip
 TERMUX_PKG_SHA256=1bdc610dd38aad27af9a1d42b108adcdf8605d2089ed708db31dd65dcbf7f19a
 TERMUX_PKG_DEPENDS="libtalloc"
+TERMUX_PKG_SUGGESTS="proot-distro"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_MAKE_ARGS="-C src"
 

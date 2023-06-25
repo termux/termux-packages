@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/aperezdc/signify
+TERMUX_PKG_DESCRIPTION="Lightweight cryptographic signing and verifying tool"
+TERMUX_PKG_LICENSE="ISC"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=31
+TERMUX_PKG_SRCURL=https://github.com/aperezdc/signify/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=8111af7424f4cc69dab5cd43a14ccd607ca2d171ac77dd3ae288264a53254e5f
+TERMUX_PKG_DEPENDS="libbsd"
+TERMUX_PKG_BUILD_DEPENDS="libbsd"
+TERMUX_PKG_BUILD_IN_SRC=true

@@ -1,0 +1,38 @@
+--- a/tools/install.py
++++ b/tools/install.py
+@@ -140,10 +140,9 @@ def subdir_files(path, dest, action):
+   for subdir, files_in_path in ret.items():
+     action(files_in_path, subdir + '/')
+ 
+-def files(action):
++def files(action, output_prefix):
+   is_windows = sys.platform == 'win32'
+   output_file = 'node'
+-  output_prefix = 'out/Release/'
+ 
+   if is_windows:
+     output_file += '.exe'
+@@ -319,7 +318,9 @@ def run(args):
+ 
+   if len(args) > 3:
+     node_prefix = args[3]
+-
++  output_prefix = 'out/Release/'
++  if len(args) > 4:
++    output_prefix = args[4]
+   # install_path thus becomes the base target directory.
+   install_path = dst_dir + node_prefix + '/'
+ 
+@@ -334,10 +335,10 @@ def run(args):
+       return
+   else:
+     if cmd == 'install':
+-      files(install)
++      files(install, output_prefix)
+       return
+     if cmd == 'uninstall':
+-      files(uninstall)
++      files(uninstall, output_prefix)
+       return
+ 
+   raise RuntimeError('Bad command: %s\n' % cmd)

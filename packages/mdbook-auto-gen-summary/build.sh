@@ -31,7 +31,7 @@ termux_step_pre_configure() {
 
 	local _patch=$TERMUX_PKG_BUILDER_DIR/filetime-src-unix-utimes.rs.diff
 	local d
-	for d in $CARGO_HOME/registry/src/github.com-*/filetime-*; do
+	for d in $CARGO_HOME/registry/src/*/filetime-*; do
 		patch --silent -p1 -d ${d} < ${_patch} || :
 	done
 }

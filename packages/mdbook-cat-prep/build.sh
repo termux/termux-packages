@@ -9,6 +9,9 @@ TERMUX_PKG_SRCURL=git+https://github.com/gjk-cat/cat-prep
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_BUILD_IN_SRC=true
 
+# https://github.com/termux/termux-packages/issues/16756
+TERMUX_RUST_VERSION=1.68.2
+
 termux_step_post_get_source() {
 	git fetch --unshallow
 	git checkout $_COMMIT
@@ -29,7 +32,7 @@ termux_step_pre_configure() {
 
 	local _patch=$TERMUX_PKG_BUILDER_DIR/mdbook-src-renderer-html_handlebars-helpers-navigation.rs.diff
 	local d
-	for d in $CARGO_HOME/registry/src/github.com-*/mdbook-*; do
+	for d in $CARGO_HOME/registry/src/*/mdbook-*; do
 		patch --silent -p1 -d ${d} < ${_patch} || :
 	done
 }

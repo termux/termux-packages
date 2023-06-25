@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://nodejs.org/
 TERMUX_PKG_DESCRIPTION="Open Source, cross-platform JavaScript runtime environment"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Yaksh Bariya <thunder-coding@termux.dev>"
-TERMUX_PKG_VERSION=19.9.0
+TERMUX_PKG_VERSION=20.2.0
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=c7fce9d46ca6ce0d8990433cbf601bb9279c0eaed8705b357018cf50be9bed29
+TERMUX_PKG_SHA256=22523df2316c35569714ff1f69b053c2e286ced460898417dee46945efcdf989
 # Note that we do not use a shared libuv to avoid an issue with the Android
 # linker, which does not use symbols of linked shared libraries when resolving
 # symbols on dlopen(). See https://github.com/termux/termux-packages/issues/462.
@@ -83,6 +83,10 @@ termux_step_configure() {
 		$TERMUX_PKG_SRCDIR/out/tools/v8_gypfiles/bytecode_builtins_list_generator.host.mk \
 		$TERMUX_PKG_SRCDIR/out/tools/v8_gypfiles/v8_libbase.host.mk \
 		$TERMUX_PKG_SRCDIR/out/tools/v8_gypfiles/gen-regexp-special-case.host.mk
+}
+
+termux_step_make_install() {
+	python ./tools/install.py install '' $TERMUX_PREFIX
 }
 
 termux_step_create_debscripts() {

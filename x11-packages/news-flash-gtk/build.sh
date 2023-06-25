@@ -23,7 +23,7 @@ termux_step_pre_configure() {
 
 	local p=$TERMUX_PKG_BUILDER_DIR/webkit2gtk-sys.diff
 	local d
-	for d in $CARGO_HOME/registry/src/github.com-*/webkit2gtk-sys-*; do
+	for d in $CARGO_HOME/registry/src/*/webkit2gtk-sys-*; do
 		echo "Applying $(basename ${p}) to $(basename ${d})"
 		patch --silent -p1 -d ${d} < ${p} || :
 	done

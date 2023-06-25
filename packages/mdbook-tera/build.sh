@@ -17,7 +17,7 @@ termux_step_pre_configure() {
 
 	local _patch=$TERMUX_PKG_BUILDER_DIR/mdbook-src-renderer-html_handlebars-helpers-navigation.rs.diff
 	local d
-	for d in $CARGO_HOME/registry/src/github.com-*/mdbook-*; do
+	for d in $CARGO_HOME/registry/src/*/mdbook-*; do
 		patch --silent -p1 -d ${d} < ${_patch} || :
 	done
 }

@@ -2,8 +2,8 @@ TERMUX_SUBPKG_DESCRIPTION="Additional utilities for Geth (like abigen, bootnode,
 
 TERMUX_SUBPKG_INCLUDE="
 bin/abidump
+bin/abigen
 bin/bootnode
-bin/checkpoint-admin
 bin/clef
 bin/devp2p
 bin/ethkey
