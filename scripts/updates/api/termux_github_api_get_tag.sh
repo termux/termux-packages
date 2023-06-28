@@ -79,12 +79,17 @@ termux_github_api_get_tag() {
 	fi
 
 	local response
-	response="$(curl "${curl_opts[@]}" "${api_url}")"
-
 	local http_code
-	http_code="${response##*|}"
-	# Why printf "%s\n"? Because echo interpolates control characters, which jq does not like.
-	response="$(printf "%s\n" "${response%|*}")"
+	local retries=10
+	while [[ "${retries}" != "0" ]]; do
+		response="$(curl "${curl_opts[@]}" "${api_url}")"
+		http_code="${response##*|}"
+		# Why printf "%s\n"? Because echo interpolates control characters, which jq does not like.
+		response="$(printf "%s\n" "${response%|*}")"
+		if [[ "${http_code}" != "000" ]]; then break; fi
+		sleep 3
+		retries=$((retries-1))
+	done
 
 	local tag_name
 	if [[ "${http_code}" == "200" ]]; then
