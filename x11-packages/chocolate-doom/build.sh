@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.chocolate-doom.org
 TERMUX_PKG_DESCRIPTION="Historically-accurate Doom, Heretic, Hexen, and Strife ports."
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="@wmcbtech30"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.0.1
 TERMUX_PKG_REVISION=10
 TERMUX_PKG_SRCURL=https://github.com/chocolate-doom/chocolate-doom/archive/refs/tags/chocolate-doom-${TERMUX_PKG_VERSION}.tar.gz
