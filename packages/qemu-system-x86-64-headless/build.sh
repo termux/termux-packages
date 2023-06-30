@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A generic and open source machine emulator and virtualiz
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1:8.0.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.qemu.org/qemu-${TERMUX_PKG_VERSION:2}.tar.xz
 TERMUX_PKG_SHA256=bb60f0341531181d6cc3969dd19a013d0427a87f918193970d9adb91131e56d0
 TERMUX_PKG_DEPENDS="glib, libbz2, libcurl, libgmp, libgnutls, libiconv, libjpeg-turbo, liblzo, libnettle, libnfs, libpixman, libpng, libslirp, libspice-server, libssh, libusb, libusbredir, ncurses, pulseaudio, qemu-common, resolv-conf, zlib, zstd"
