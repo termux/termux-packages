@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Python Imaging Library"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=9.5.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=dca5045b139c65eda32895e743b51c0a697984c34b385d84576275d57b36027f
 TERMUX_PKG_SRCURL=https://github.com/python-pillow/Pillow/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="freetype, libimagequant, libjpeg-turbo, libraqm, libtiff, libwebp, libxcb, littlecms, openjpeg, python, zlib"
