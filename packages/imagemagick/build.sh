@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="ImageMagick"
 TERMUX_PKG_MAINTAINER="@termux"
 _VERSION=7.1.1-11
 TERMUX_PKG_VERSION=${_VERSION//-/.}
+TERMUX_PKG_REVISION=1
 #TERMUX_PKG_SRCURL=https://github.com/ImageMagick/ImageMagick/archive/refs/tags/${_VERSION}.tar.gz
 TERMUX_PKG_SRCURL=https://imagemagick.org/archive/releases/ImageMagick-${_VERSION}.tar.xz
 TERMUX_PKG_SHA256=4a8b0fb3a498bd7ac294e4f6f463597d19267a012d38e48c8d6a822735bf797e
