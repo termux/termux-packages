@@ -16,3 +16,10 @@ termux_step_pre_configure() {
 	# with system ones (in /system/lib64 or /system/lib):
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCMAKE_SYSTEM_NAME=Linux"
 }
+
+termux_step_post_massage() {
+	# Check if SONAME is properly set:
+	if ! readelf -d lib/libjpeg.so | grep -q '(SONAME).*\[libjpeg\.so\.'; then
+		termux_error_exit "SONAME for libjpeg.so is not properly set."
+	fi
+}
