@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Cross-platform C libraries that allow you to easily impl
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.9.14
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/LibVNC/libvncserver/archive/LibVNCServer-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=83104e4f7e28b02f8bf6b010d69b626fae591f887e949816305daebae527c9a5
 TERMUX_PKG_DEPENDS="libgcrypt, libgnutls, libjpeg-turbo, liblzo, libpng, zlib"
