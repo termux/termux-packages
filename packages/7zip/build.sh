@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.7-zip.org
 TERMUX_PKG_DESCRIPTION="7-Zip file archiver with a high compression ratio"
 TERMUX_PKG_LICENSE="LGPL-2.1, BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=22.01
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=23.01
 TERMUX_PKG_SRCURL=https://www.7-zip.org/a/7z${TERMUX_PKG_VERSION//./}-src.tar.xz
-TERMUX_PKG_SHA256=393098730c70042392af808917e765945dc2437dee7aae3cfcc4966eb920fbc5
+TERMUX_PKG_SHA256=356071007360e5a1824d9904993e8b2480b51b570e8c9faf7c0f58ebe4bf9f74
 TERMUX_PKG_BUILD_IN_SRC=true
 
 # The original "termux_extract_src_archive" always strips the first components
