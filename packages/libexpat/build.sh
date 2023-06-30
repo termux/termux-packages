@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="XML parsing C library"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.5.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/libexpat/libexpat/releases/download/R_${TERMUX_PKG_VERSION//./_}/expat-$TERMUX_PKG_VERSION.tar.bz2
 TERMUX_PKG_SHA256=6f0e6e01f7b30025fa05c85fdad1e5d0ec7fd35d9f61b22f34998de11969ff67
 TERMUX_PKG_AUTO_UPDATE=true
@@ -26,6 +27,15 @@ termux_step_post_get_source() {
 	fi
 }
 
-termux_step_post_make_install() {
-	sed  -r 's/.[0-9]+(\.[0-9]+)*//' -i $TERMUX_PREFIX/lib/cmake/expat-$TERMUX_PKG_VERSION/expat-noconfig.cmake
+termux_step_pre_configure() {
+	# SOVERSION suffix is needed for SONAME of shared libs to avoid conflict
+	# with system ones (in /system/lib64 or /system/lib):
+	sed -i 's/^\(linux\*android\)\*)/\1-notermux)/' configure
+}
+
+termux_step_post_massage() {
+	# Check if SONAME is properly set:
+	if ! readelf -d lib/libexpat.so | grep -q '(SONAME).*\[libexpat\.so\.'; then
+		termux_error_exit "SONAME for libexpat.so is not properly set."
+	fi
 }
