@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Motif widget toolkit"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.3.8
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/motif/Motif%20${TERMUX_PKG_VERSION}%20Source%20Code/motif-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=859b723666eeac7df018209d66045c9853b50b4218cecadb794e2359619ebce7
 TERMUX_PKG_DEPENDS="fontconfig, freetype, libandroid-support, libice, libiconv, libjpeg-turbo, libpng, libsm, libx11, libxext, libxft, libxmu, libxt"
