@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=199472ad6a4ecee6c8583fb5a504a2e99712b4fc
 TERMUX_PKG_VERSION=1:3.50.09
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/wjaguar/mtPaint/archive/${_COMMIT}.zip
 TERMUX_PKG_SHA256=a5bcf9e98959506817cf39aafcf07a0403a4aab405031a46603f0eb7ca80f028
 TERMUX_PKG_DEPENDS="atk, freetype, gdk-pixbuf, glib, gtk3, harfbuzz, libandroid-glob, libcairo, libiconv, libjpeg-turbo, libpng, libtiff, libwebp, libx11, littlecms, openjpeg, pango, zlib"
