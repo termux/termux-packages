@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2:5.9.20221106.0
 TERMUX_PKG_SRCURL=https://github.com/universal-ctags/ctags/archive/p${TERMUX_PKG_VERSION:2}.tar.gz
 TERMUX_PKG_SHA256=8e647fa314a33088d7e8384a9aca3903ce91dfe8805676d4219051d5353cf0ab
-TERMUX_PKG_DEPENDS="libiconv, libjansson, libxml2, libyaml"
+TERMUX_PKG_DEPENDS="libiconv, libjansson, libxml2 (>= 2.11.4-2), libyaml"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-tmpdir=$TERMUX_PREFIX/tmp --disable-static"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true

@@ -7,7 +7,7 @@ TERMUX_PKG_VERSION=1:10.73.43
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/netpbm/super_stable/${TERMUX_PKG_VERSION:2}/netpbm-${TERMUX_PKG_VERSION:2}.tgz
 TERMUX_PKG_SHA256=f9fd9a7f932258224d1925bfce61396a15e0fad93e3853d6324ac308d1adebf8
-TERMUX_PKG_DEPENDS="libjpeg-turbo, libpng, libtiff, libx11, libxml2"
+TERMUX_PKG_DEPENDS="libjpeg-turbo, libpng, libtiff, libx11, libxml2 (>= 2.11.4-2)"
 TERMUX_PKG_BREAKS="netpbm-dev"
 TERMUX_PKG_REPLACES="netpbm-dev"
 TERMUX_PKG_BUILD_IN_SRC=true

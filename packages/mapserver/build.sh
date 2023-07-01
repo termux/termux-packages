@@ -7,7 +7,7 @@ TERMUX_PKG_VERSION=8.0.1
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://download.osgeo.org/mapserver/mapserver-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=79d23595ef95d61d3d728ae5e60850a3dbfbf58a46953b4fdc8e6e0ffe5748ba
-TERMUX_PKG_DEPENDS="freetype, gdal, libc++, libcairo, libcurl, libgeos, libiconv, libjpeg-turbo, libpng, libprotobuf-c, libxml2, proj"
+TERMUX_PKG_DEPENDS="freetype, gdal, libc++, libcairo, libcurl, libgeos, libiconv, libjpeg-turbo, libpng, libprotobuf-c, libxml2 (>= 2.11.4-2), proj"
 TERMUX_PKG_BREAKS="mapserver-dev"
 TERMUX_PKG_REPLACES="mapserver-dev"
 TERMUX_PKG_GROUPS="science"

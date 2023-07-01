@@ -7,7 +7,7 @@ TERMUX_PKG_VERSION=20230101
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/fontforge/fontforge/releases/download/${TERMUX_PKG_VERSION}/fontforge-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=ca82ec4c060c4dda70ace5478a41b5e7b95eb035fe1c4cf85c48f996d35c60f8
-TERMUX_PKG_DEPENDS="freetype, giflib, glib, gtk3, libc++, libcairo, libiconv, libjpeg-turbo, libpng, libtiff, libxml2, pango, readline, woff2, zlib"
+TERMUX_PKG_DEPENDS="freetype, giflib, glib, gtk3, libc++, libcairo, libiconv, libjpeg-turbo, libpng, libtiff, libxml2 (>= 2.11.4-2), pango, readline, woff2, zlib"
 TERMUX_PKG_CONFLICTS="fontforge"
 TERMUX_PKG_REPLACES="fontforge"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="

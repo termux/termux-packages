@@ -7,7 +7,7 @@ TERMUX_PKG_REVISION=56
 TERMUX_PKG_SRCURL=http://openbox.org/dist/openbox/openbox-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=8b4ac0760018c77c0044fab06a4f0c510ba87eae934d9983b10878483bde7ef7
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-session-management"
-TERMUX_PKG_DEPENDS="bash, fontconfig, freetype, gdk-pixbuf, glib, harfbuzz, imlib2, libcairo, libice, librsvg, libsm, libx11, libxcursor, libxext, libxft, libxinerama, libxml2, libxrandr, libxrender, pango, startup-notification"
+TERMUX_PKG_DEPENDS="bash, fontconfig, freetype, gdk-pixbuf, glib, harfbuzz, imlib2, libcairo, libice, librsvg, libsm, libx11, libxcursor, libxext, libxft, libxinerama, libxml2 (>= 2.11.4-2), libxrandr, libxrender, pango, startup-notification"
 
 # Configuration utility.
 TERMUX_PKG_RECOMMENDS="obconf"

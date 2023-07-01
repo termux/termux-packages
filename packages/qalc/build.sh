@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION="4.6.1"
 TERMUX_PKG_SRCURL=https://github.com/Qalculate/libqalculate/releases/download/v$TERMUX_PKG_VERSION/libqalculate-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=ed087bfdedea0fd0eb26eb37a25e4c55caccfe96d83933a3573c93241458cab3
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="libc++, libcurl, libgmp, libiconv, libmpfr, libxml2, readline"
+TERMUX_PKG_DEPENDS="libc++, libcurl, libgmp, libiconv, libmpfr, libxml2 (>= 2.11.4-2), readline"
 TERMUX_PKG_BREAKS="qalc-dev"
 TERMUX_PKG_REPLACES="qalc-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-icu"

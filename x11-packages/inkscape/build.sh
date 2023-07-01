@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=1.2.2
 TERMUX_PKG_REVISION=7
 TERMUX_PKG_SRCURL=https://media.inkscape.org/dl/resources/file/inkscape-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=a0c7fd0d03c0a21535e648ef301dcf80dd7cfc1f3545e51065fbf1ba3ee8a5c4
-TERMUX_PKG_DEPENDS="boost, double-conversion, fontconfig, freetype, gdk-pixbuf, glib, gsl, gtk3, gtkmm3, harfbuzz, libatkmm-1.6, libc++, libcairo, libcairomm-1.0, libgc, libglibmm-2.4, libiconv, libjpeg-turbo, libpangomm-1.4, libpng, libsigc++-2.0, libsoup, libx11, libxml2, libxslt, littlecms, pango, poppler, potrace, readline, zlib"
+TERMUX_PKG_DEPENDS="boost, double-conversion, fontconfig, freetype, gdk-pixbuf, glib, gsl, gtk3, gtkmm3, harfbuzz, libatkmm-1.6, libc++, libcairo, libcairomm-1.0, libgc, libglibmm-2.4, libiconv, libjpeg-turbo, libpangomm-1.4, libpng, libsigc++-2.0, libsoup, libx11, libxml2 (>= 2.11.4-2), libxslt, littlecms, pango, poppler, potrace, readline, zlib"
 TERMUX_PKG_BUILD_DEPENDS="boost-headers"
 TERMUX_PKG_RECOMMENDS="inkscape-extensions, inkscape-tutorials"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="

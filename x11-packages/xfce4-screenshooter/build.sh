@@ -6,7 +6,7 @@ _MAJOR_VERSION=1.10
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.4
 TERMUX_PKG_SRCURL=https://archive.xfce.org/src/apps/xfce4-screenshooter/${_MAJOR_VERSION}/xfce4-screenshooter-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=a2f199687e54e16a936d5636d660d42b6b9a5d548cdd0f04bd69213554806494
-TERMUX_PKG_DEPENDS="atk, exo, gdk-pixbuf, glib, gtk3, harfbuzz, libcairo, libice, libsm, libsoup3, libx11, libxext, libxfce4ui, libxfce4util, libxfixes, libxml2, pango, xfce4-panel, xfconf, zlib"
+TERMUX_PKG_DEPENDS="atk, exo, gdk-pixbuf, glib, gtk3, harfbuzz, libcairo, libice, libsm, libsoup3, libx11, libxext, libxfce4ui, libxfce4util, libxfixes, libxml2 (>= 2.11.4-2), pango, xfce4-panel, xfconf, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_prog_HELP2MAN=

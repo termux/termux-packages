@@ -8,6 +8,6 @@ TERMUX_PKG_VERSION=${_MAJOR_VERSION}.38
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/libxslt/${_MAJOR_VERSION}/libxslt-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=1f32450425819a09acaff2ab7a5a7f8a2ec7956e505d7beeb45e843d0e1ecab1
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-python"
-TERMUX_PKG_DEPENDS="libgcrypt, libgpg-error, libxml2"
+TERMUX_PKG_DEPENDS="libgcrypt, libgpg-error, libxml2 (>= 2.11.4-2)"
 TERMUX_PKG_BREAKS="libxslt-dev"
 TERMUX_PKG_REPLACES="libxslt-dev"
