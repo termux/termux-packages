@@ -6,7 +6,7 @@ _MAJOR_VERSION=2.42
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.2
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/libxml++/${_MAJOR_VERSION}/libxml++-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=a433987f54cc1ecaa84af26af047a62df9e884574e0d686e5ddc6f70441c152b
-TERMUX_PKG_DEPENDS="libc++, libglibmm-2.4, libxml2"
+TERMUX_PKG_DEPENDS="libc++, libglibmm-2.4, libxml2 (>= 2.11.4-2)"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dvalidation=false
 -Dbuild-examples=false

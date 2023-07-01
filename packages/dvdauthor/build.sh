@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=0.7.2
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/dvdauthor/dvdauthor-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=3020a92de9f78eb36f48b6f22d5a001c47107826634a785a62dfcd080f612eb7
-TERMUX_PKG_DEPENDS="fontconfig, freetype, fribidi, graphicsmagick, libdvdread, libpng, libxml2"
+TERMUX_PKG_DEPENDS="fontconfig, freetype, fribidi, graphicsmagick, libdvdread, libpng, libxml2 (>= 2.11.4-2)"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_prog_MAGICKCONFIG=GraphicsMagick-config
 "

@@ -9,7 +9,7 @@ TERMUX_PKG_SHA256=58d1e7608c12404f0229a3d9a4953d0d00c18040504498b483305bcb3de907
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag" # As of 2022-05-11T00:08:00 no github releases are available.
-TERMUX_PKG_DEPENDS="libc++, c-ares, libgnutls, libxml2, zlib"
+TERMUX_PKG_DEPENDS="libc++, c-ares, libgnutls, libxml2 (>= 2.11.4-2), zlib"
 # sqlite3 is only used for loading cookies from firefox or chrome:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --without-openssl

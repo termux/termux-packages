@@ -6,7 +6,7 @@ _MAJOR_VERSION=4.8
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.4
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/gtksourceview/${_MAJOR_VERSION}/gtksourceview-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=7ec9d18fb283d1f84a3a3eff3b7a72b09a10c9c006597b3fbabbb5958420a87d
-TERMUX_PKG_DEPENDS="atk, fribidi, glib, gtk3, libcairo, libxml2, pango"
+TERMUX_PKG_DEPENDS="atk, fribidi, glib, gtk3, libcairo, libxml2 (>= 2.11.4-2), pango"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner"
 TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
