@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://opencv.org/
 TERMUX_PKG_DESCRIPTION="Open Source Computer Vision Library"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=4.7.0
-TERMUX_PKG_REVISION=7
+TERMUX_PKG_VERSION=4.8.0
 TERMUX_PKG_SRCURL=https://github.com/opencv/opencv/archive/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=8df0079cdbe179748a18d44731af62a245a45ebf5085223dc03133954c662973
+TERMUX_PKG_SHA256=cbf47ecc336d2bff36b0dcd7d6c179a9bb59e805136af6b9670ca944aef889bd
 TERMUX_PKG_DEPENDS="abseil-cpp, ffmpeg, libc++, libjpeg-turbo, libopenblas, libpng, libtiff, libwebp, openjpeg, openjpeg-tools, zlib"
 # For static libprotobuf see
 # https://github.com/termux/termux-packages/issues/16979
