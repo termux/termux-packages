@@ -2,8 +2,8 @@ TERMUX_PKG_HOMEPAGE=https://github.com/Tencent/ncnn
 TERMUX_PKG_DESCRIPTION="A high-performance neural network inference framework optimized for the mobile platform"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="20230223"
-TERMUX_PKG_REVISION=1
+_COMMIT=4b97730b0d033b4dc2a790e5c35745e0dbf51569
+TERMUX_PKG_VERSION="20230627"
 TERMUX_PKG_SRCURL=git+https://github.com/Tencent/ncnn
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -27,6 +27,12 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 TERMUX_PKG_BUILD_DEPENDS="glslang"
 TERMUX_PKG_DEPENDS="libc++, libprotobuf, vulkan-headers, vulkan-tools"
 TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, pybind11"
+
+termux_step_post_get_source() {
+	git fetch --unshallow
+	git checkout "${_COMMIT}"
+	git submodule update --init --recursive
+}
 
 termux_step_pre_configure() {
 	termux_setup_cmake
