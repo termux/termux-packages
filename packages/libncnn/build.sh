@@ -6,6 +6,7 @@ _COMMIT=4b97730b0d033b4dc2a790e5c35745e0dbf51569
 TERMUX_PKG_VERSION="20230627"
 TERMUX_PKG_SRCURL=git+https://github.com/Tencent/ncnn
 TERMUX_PKG_GIT_BRANCH=master
+TERMUX_PKG_SHA256=a81ee5b6df97830919f8ed8554c99a4f223976ed82eee0cc9f214de0ce53dd2a
 TERMUX_PKG_DEPENDS="abseil-cpp, glslang, libc++, vulkan-loader"
 TERMUX_PKG_BUILD_DEPENDS="protobuf-static, python, vulkan-headers, vulkan-loader-android"
 TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, pybind11"
@@ -33,7 +34,22 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_post_get_source() {
 	git fetch --unshallow
 	git checkout "${_COMMIT}"
-	git submodule update --init --recursive
+	git submodule update --init --recursive --depth=1
+	git clean -ffxd
+
+	local version=$(git log -1 --format=%cs | sed -e "s|-||g")
+	if [[ "${version}" != "${TERMUX_PKG_VERSION}" ]]; then
+		termux_error_exit <<- EOL
+		Version mismatch detected!
+		build.sh: ${TERMUX_PKG_VERSION}
+		git repo: ${version}
+		EOL
+	fi
+
+	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum)
+	if [[ "${s}" != "${TERMUX_PKG_SHA256}  "* ]]; then
+		termux_error_exit "Checksum mismatch for source files"
+	fi
 }
 
 termux_step_pre_configure() {
