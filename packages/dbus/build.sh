@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Freedesktop.org message bus system"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.15.6
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://dbus.freedesktop.org/releases/dbus/dbus-$TERMUX_PKG_VERSION.tar.xz"
 TERMUX_PKG_SHA256=f97f5845f9c4a5a1fb3df67dfa9e16b5a3fd545d348d6dc850cb7ccc9942bd8c
 TERMUX_PKG_DEPENDS="libexpat, libx11"
