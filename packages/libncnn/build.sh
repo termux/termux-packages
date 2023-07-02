@@ -40,4 +40,81 @@ termux_step_post_get_source() {
 termux_step_pre_configure() {
 	termux_setup_cmake
 	termux_setup_ninja
+	termux_setup_protobuf
+
+	CXXFLAGS+=" -std=c++14"
+	LDFLAGS+=" $("${TERMUX_SCRIPTDIR}/packages/libprotobuf/interface_link_libraries.sh")"
+	LDFLAGS+=" -lutf8_range -lutf8_validity"
+	LDFLAGS+=" -landroid -ljnigraphics -llog"
+
+	mv -v "${TERMUX_PREFIX}"/lib/libprotobuf.so{,.tmp}
+}
+
+termux_step_post_make_install() {
+	# the build system can only build static or shared
+	# at a given time
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
+	-DNCNN_BUILD_TOOLS=ON
+	-DNCNN_SHARED_LIB=ON
+	"
+	termux_step_configure
+	termux_step_make
+	termux_step_make_install
+
+	pushd python
+	pip install --no-deps . --prefix "${TERMUX_PREFIX}"
+	popd
+
+	mv -v "${TERMUX_PREFIX}"/lib/libprotobuf.so{.tmp,}
+
+	return
+
+	# below are testing tools that should not be packaged
+	# as they can be >100MB
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
+	-DNCNN_BUILD_BENCHMARK=ON
+	-DNCNN_BUILD_EXAMPLES=ON
+	-DNCNN_BUILD_TESTS=ON
+	-DNCNN_SHARED_LIB=OFF
+	"
+	termux_step_configure
+	termux_step_make
+
+	local tools_dir="${TERMUX_PREFIX}/lib/ncnn"
+
+	local benchmarks=$(find benchmark -mindepth 1 -maxdepth 1 -type f | sort)
+	for benchmark in ${benchmarks}; do
+		case "$(basename "${benchmark}")" in
+			*[Cc][Mm]ake*) continue ;;
+			*.cpp*) continue ;;
+			*.md) continue ;;
+			*.*) install -v -Dm644 "${benchmark}" -t "${tools_dir}/benchmark" ;;
+			*) install -v -Dm755 "${benchmark}" -t "${tools_dir}/benchmark" ;;
+		esac
+	done
+
+	local examples=$(find examples -mindepth 1 -maxdepth 1 -type f | sort)
+	for example in ${examples}; do
+		case "$(basename "${example}")" in
+			*[Cc][Mm]ake*) continue ;;
+			*.cpp*) continue ;;
+			*.*) install -v -Dm644 "${example}" -t "${tools_dir}/examples" ;;
+			*) install -v -Dm755 "${example}" -t "${tools_dir}/examples" ;;
+		esac
+	done
+
+	local tests=$(find tests -mindepth 1 -maxdepth 1 -type f | sort)
+	for test in ${tests}; do
+		case "$(basename "${test}")" in
+			*[Cc][Mm]ake*) continue ;;
+			*.cpp*) continue ;;
+			*.h) continue ;;
+			*.py) continue ;;
+			*) install -v -Dm755 "${test}" -t "${tools_dir}/tests" ;;
+		esac
+	done
+}
+
+termux_step_post_massage() {
+	rm -f lib/libprotobuf.so
 }
