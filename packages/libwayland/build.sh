@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Wayland protocol library"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.21.0
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://gitlab.freedesktop.org/wayland/wayland/-/releases/${TERMUX_PKG_VERSION}/downloads/wayland-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=6dc64d7fc16837a693a51cfdb2e568db538bfdc9f457d4656285bb9594ef11ac
 TERMUX_PKG_DEPENDS="libandroid-support, libexpat, libffi, libxml2 (>= 2.11.4-2)"
