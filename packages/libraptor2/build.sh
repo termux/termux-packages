@@ -7,7 +7,7 @@ TERMUX_PKG_VERSION=2.0.16
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://download.librdf.org/source/raptor2-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=089db78d7ac982354bdbf39d973baf09581e6904ac4c92a98c5caadb3de44680
-TERMUX_PKG_DEPENDS="libcurl, libicu, libxml2 (>= 2.11.4-2), libxslt, yajl"
+TERMUX_PKG_DEPENDS="libcurl, libicu, libxml2, libxslt, yajl"
 TERMUX_PKG_BUILD_DEPENDS="icu-devtools"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-icu-config=icu-config

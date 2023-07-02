@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=1.0.2
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/patchedsoul/news-flash/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=bc4ce6aa7cd26409d5d9a7ffa539214c9907c7b263eb88f46d8bbab7546fd323
-TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libcairo, libhandy-0.0, libsqlite, libxml2 (>= 2.11.4-2), openssl-1.1, pango, webkit2gtk-4.1"
+TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libcairo, libhandy-0.0, libsqlite, libxml2, openssl-1.1, pango, webkit2gtk-4.1"
 TERMUX_PKG_BUILD_DEPENDS="libsoup"
 TERMUX_PKG_BUILD_IN_SRC=true
 

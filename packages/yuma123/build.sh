@@ -7,7 +7,7 @@ TERMUX_PKG_VERSION=2.13
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/yuma123/yuma123_${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=e304b253236a279f10b133fdd19f366f271581ebf12647cea84667fcfada1f0c
-TERMUX_PKG_DEPENDS="libssh2, libxml2 (>= 2.11.4-2), openssl, readline"
+TERMUX_PKG_DEPENDS="libssh2, libxml2, openssl, readline"
 
 termux_step_pre_configure() {
 	autoreconf -fi

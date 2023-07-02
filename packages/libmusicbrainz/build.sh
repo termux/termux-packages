@@ -13,7 +13,7 @@ TERMUX_PKG_SRCURL=(https://github.com/metabrainz/libmusicbrainz/releases/downloa
 TERMUX_PKG_SHA256=(6749259e89bbb273f3f5ad7acdffb7c47a2cf8fcaeab4c4695484cef5f4c6b46
                    c8d6681e38c56f172892c85ddc0852e1fd4b53b4209e7f4ebf17f7e2eae71d92
                    05c54bc115030c89e463a4fb28d3a3f8215879528ba5ca70d676d3d21bf3af52)
-TERMUX_PKG_DEPENDS="libc++, libneon, libxml2 (>= 2.11.4-2)"
+TERMUX_PKG_DEPENDS="libc++, libneon, libxml2"
 TERMUX_PKG_HOSTBUILD=true
 
 termux_step_post_get_source() {

@@ -11,7 +11,7 @@ if [[ $TERMUX_PKG_VERSION == *-rc* ]]; then
 	TERMUX_PKG_SRCURL=https://alpha.gnu.org/gnu/emacs/pretest/emacs-${TERMUX_PKG_VERSION#*:}.tar.xz
 fi
 TERMUX_PKG_SHA256=41c53433c8dc49bd017f421e09c97eda4e046f34967c872bec80b3495dfaa933
-TERMUX_PKG_DEPENDS="libgmp, libgnutls, libjansson, libxml2 (>= 2.11.4-2), ncurses, zlib"
+TERMUX_PKG_DEPENDS="libgmp, libgnutls, libjansson, libxml2, ncurses, zlib"
 TERMUX_PKG_BREAKS="emacs-dev"
 TERMUX_PKG_REPLACES="emacs-dev"
 TERMUX_PKG_SERVICE_SCRIPT=("emacsd" 'exec emacs --fg-daemon 2>&1')

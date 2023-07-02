@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=2019.05
 TERMUX_PKG_REVISION=13
 TERMUX_PKG_SRCURL=https://files.openscad.org/openscad-$TERMUX_PKG_VERSION.src.tar.gz
 TERMUX_PKG_SHA256=0a16c4263ce52380819dd91c609a719d38f12f6b8c4da0e828dcbe5b70996f59
-TERMUX_PKG_DEPENDS="boost, double-conversion, fontconfig, freetype, glib, harfbuzz, libc++, libgmp, libmpfr, libxml2 (>= 2.11.4-2), libzip"
+TERMUX_PKG_DEPENDS="boost, double-conversion, fontconfig, freetype, glib, harfbuzz, libc++, libgmp, libmpfr, libxml2, libzip"
 TERMUX_PKG_BUILD_DEPENDS="boost-headers, cgal, eigen"
 TERMUX_PKG_GROUPS="science"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="

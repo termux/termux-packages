@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=0.21.1
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/gettext/gettext-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=50dbc8f39797950aa2c98e939947c527e5ac9ebd2c1b99dd7b06ba33a6767ae6
-TERMUX_PKG_DEPENDS="libc++, libiconv, libunistring, libxml2 (>= 2.11.4-2), ncurses"
+TERMUX_PKG_DEPENDS="libc++, libiconv, libunistring, libxml2, ncurses"
 TERMUX_PKG_BREAKS="gettext-dev"
 TERMUX_PKG_REPLACES="gettext-dev"
 TERMUX_PKG_BUILD_IN_SRC=true

@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=4.0.6
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.wireshark.org/download/src/all-versions/wireshark-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=0079097a1b17ebc7250a73563f984c13327dac5016b7d53165810fbcca4bd884
-TERMUX_PKG_DEPENDS="brotli, c-ares, glib, krb5, libandroid-support, libc++, libgcrypt, libgnutls, liblua52, liblz4, libmaxminddb, libminizip, libnghttp2, libnl, libopus, libpcap, libsnappy, libssh, libxml2 (>= 2.11.4-2), pcre2, qt5-qtbase, qt5-qtmultimedia, speexdsp, zlib, zstd"
+TERMUX_PKG_DEPENDS="brotli, c-ares, glib, krb5, libandroid-support, libc++, libgcrypt, libgnutls, liblua52, liblz4, libmaxminddb, libminizip, libnghttp2, libnl, libopus, libpcap, libsnappy, libssh, libxml2, pcre2, qt5-qtbase, qt5-qtmultimedia, speexdsp, zlib, zstd"
 TERMUX_PKG_BUILD_DEPENDS="qt5-qtbase-cross-tools, qt5-qttools-cross-tools"
 TERMUX_PKG_CONFLICTS="tshark, wireshark, wireshark-cli, wireshark-gtk"
 TERMUX_PKG_PROVIDES="tshark, wireshark, wireshark-cli, wireshark-gtk"
