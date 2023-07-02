@@ -6,7 +6,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # libsoup-3.0 is packaged as libsoup3.
 _MAJOR_VERSION=2.74
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.3
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/libsoup/${_MAJOR_VERSION}/libsoup-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=e4b77c41cfc4c8c5a035fcdc320c7bc6cfb75ef7c5a034153df1413fa1d92f13
 TERMUX_PKG_DEPENDS="brotli, glib, libpsl, libsqlite, libxml2 (>= 2.11.4-2), zlib"
