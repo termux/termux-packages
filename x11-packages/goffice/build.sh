@@ -7,7 +7,7 @@ TERMUX_PKG_VERSION=${_MAJOR_VERSION}.55
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/goffice/${_MAJOR_VERSION}/goffice-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=16a221191855a6a6c0d06b1ef8e481cf3f52041a654ec96d35817045ba1a99af
-TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libcairo, libgsf, librsvg, libspectre, libxml2 (>= 2.11.4-2), libxslt, pango, zlib"
+TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libcairo, libgsf, librsvg, libspectre, libxml2, libxslt, pango, zlib"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner"
 TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="

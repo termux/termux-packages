@@ -11,7 +11,7 @@ if [[ $TERMUX_PKG_VERSION == *-rc* ]]; then
 	TERMUX_PKG_SRCURL=https://alpha.gnu.org/gnu/emacs/pretest/emacs-${TERMUX_PKG_VERSION#*:}.tar.xz
 fi
 TERMUX_PKG_SHA256=41c53433c8dc49bd017f421e09c97eda4e046f34967c872bec80b3495dfaa933
-TERMUX_PKG_DEPENDS="fontconfig, freetype, gdk-pixbuf, giflib, glib, harfbuzz, libgmp, libgnutls, libice, libjansson, libjpeg-turbo, libpng, librsvg, libsm, libtiff, libx11, libxaw, libxcb, libxext, libxfixes, libxft, libxinerama, libxml2 (>= 2.11.4-2), libxmu, libxpm, libxrandr, libxrender, libxt, littlecms, ncurses, zlib"
+TERMUX_PKG_DEPENDS="fontconfig, freetype, gdk-pixbuf, giflib, glib, harfbuzz, libgmp, libgnutls, libice, libjansson, libjpeg-turbo, libpng, librsvg, libsm, libtiff, libx11, libxaw, libxcb, libxext, libxfixes, libxft, libxinerama, libxml2, libxmu, libxpm, libxrandr, libxrender, libxt, littlecms, ncurses, zlib"
 TERMUX_PKG_CONFLICTS="emacs"
 TERMUX_PKG_REPLACES="emacs"
 TERMUX_PKG_PROVIDES="emacs"

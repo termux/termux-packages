@@ -8,7 +8,7 @@ TERMUX_PKG_VERSION="3.6.7"
 TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL="https://github.com/DCMTK/dcmtk/archive/refs/tags/DCMTK-$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=17705dcdb2047d1266bb4e92dbf4aa6d4967819e8e3e94f39b7df697661b4860
-TERMUX_PKG_DEPENDS="libc++, libiconv, libpng, libtiff, libxml2 (>= 2.11.4-2), openssl, zlib"
+TERMUX_PKG_DEPENDS="libc++, libiconv, libpng, libtiff, libxml2, openssl, zlib"
 # As of 3.6.7, libsndfile and openjpeg are detected but not linked against
 TERMUX_PKG_BUILD_DEPENDS="libsndfile, openjpeg"
 TERMUX_PKG_BUILD_IN_SRC=true

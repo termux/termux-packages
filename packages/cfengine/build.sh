@@ -9,7 +9,7 @@ TERMUX_PKG_SHA256=6b487e189b5ccf46409af470cd3d4928c128a3ab042d7980de4c3fc20a6e9a
 # "-build[n]" suffix in tag name is not a part of version string.
 _CFENGINE_GIT_TAG_SUFFIX=
 TERMUX_PKG_GIT_BRANCH=${TERMUX_PKG_VERSION#*:}${_CFENGINE_GIT_TAG_SUFFIX}
-TERMUX_PKG_DEPENDS="libandroid-glob, liblmdb, libxml2 (>= 2.11.4-2), libyaml, openssl, pcre"
+TERMUX_PKG_DEPENDS="libandroid-glob, liblmdb, libxml2, libyaml, openssl, pcre"
 # core doesn't work with out-of-tree builds
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="

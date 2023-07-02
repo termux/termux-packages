@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=5.0.1
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://www.gaia-gis.it/gaia-sins/libspatialite-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=eecbc94311c78012d059ebc0fae86ea5ef6eecb13303e6e82b3753c1b3409e98
-TERMUX_PKG_DEPENDS="libgeos, proj, libfreexl, libsqlite, libxml2 (>= 2.11.4-2), librttopo"
+TERMUX_PKG_DEPENDS="libgeos, proj, libfreexl, libsqlite, libxml2, librttopo"
 TERMUX_PKG_GROUPS="science"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-minizip"
 # Can't find generated config file spatialite/gaiaconfig.h

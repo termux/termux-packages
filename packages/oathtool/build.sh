@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=2.6.7
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=http://download.savannah.nongnu.org/releases/oath-toolkit/oath-toolkit-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=36eddfce8f2f36347fb257dbf878ba0303a2eaafe24eaa071d5cd302261046a9
-TERMUX_PKG_DEPENDS="libxml2 (>= 2.11.4-2), xmlsec"
+TERMUX_PKG_DEPENDS="libxml2, xmlsec"
 TERMUX_PKG_BREAKS="oathtool-dev"
 TERMUX_PKG_REPLACES="oathtool-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-pam"
