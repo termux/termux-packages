@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="SQLite extension to support spatial data types and opera
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=5.0.1
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://www.gaia-gis.it/gaia-sins/libspatialite-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=eecbc94311c78012d059ebc0fae86ea5ef6eecb13303e6e82b3753c1b3409e98
 TERMUX_PKG_DEPENDS="libgeos, proj, libfreexl, libsqlite, libxml2 (>= 2.11.4-2), librttopo"
