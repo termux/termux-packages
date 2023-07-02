@@ -10,7 +10,6 @@ TERMUX_PKG_DEPENDS="abseil-cpp, glslang, libc++, vulkan-loader"
 TERMUX_PKG_BUILD_DEPENDS="protobuf-static, python, vulkan-headers, vulkan-loader-android"
 TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, pybind11"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DNCNN_BUILD_BENCHMARK=OFF
 -DNCNN_BUILD_EXAMPLES=OFF
