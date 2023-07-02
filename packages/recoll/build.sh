@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Full-text search for your desktop"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.34.7
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.lesbonscomptes.com/recoll/recoll-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=5e769e4d78d85c586feb4c73a9d58eeab8c2efd1665653a0b2ab802fe73fca0c
 TERMUX_PKG_DEPENDS="aspell, file, libc++, libiconv, libxapian, libxml2 (>= 2.11.4-2), libxslt, zlib"
