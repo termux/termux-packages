@@ -4,9 +4,9 @@ TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # NOTE: as of 1.12.0 compilation fails when package zstd is
 # present in TERMUX_PREFIX.
-TERMUX_PKG_VERSION="1.23.5"
+TERMUX_PKG_VERSION="1.23.6"
 TERMUX_PKG_SRCURL=https://github.com/syncthing/syncthing/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=d87f02b3e970c0f08c59166851b40ee5c647efcb2d70b5f0410416987cd42294
+TERMUX_PKG_SHA256=8b4d127c6893375165bbbc31865735b7cccc99e1bb019f6dab7a6020ba6b621b
 TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make() {
