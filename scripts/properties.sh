@@ -3,6 +3,15 @@
 # coreutils and are clearly not a default part of most Linux installations,
 # or sourcing any other script in our build directories.
 
+# Allow to override setup.
+for f in "${HOME}/.config/termux/termuxrc.sh" "${HOME}/.termux/termuxrc.sh" "${HOME}/.termuxrc"; do
+	if [ -f "$f" ]; then
+		echo "Using builder configuration from '$f'..."
+		. "$f"
+		break
+	fi
+done
+
 TERMUX_SDK_REVISION=9123335
 TERMUX_ANDROID_BUILD_TOOLS_VERSION=33.0.1
 # when changing the above:
@@ -57,12 +66,4 @@ for component in $(jq -r '.[] | .component' ${TERMUX_SCRIPTDIR}/repo.json); do
 	TERMUX_REPO_COMPONENT+=("$component")
 done
 
-# Allow to override setup.
-for f in "${HOME}/.config/termux/termuxrc.sh" "${HOME}/.termux/termuxrc.sh" "${HOME}/.termuxrc"; do
-	if [ -f "$f" ]; then
-		echo "Using builder configuration from '$f'..."
-		. "$f"
-		break
-	fi
-done
 unset f
