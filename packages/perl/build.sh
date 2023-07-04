@@ -9,11 +9,10 @@ TERMUX_PKG_MAINTAINER="@termux"
 # - libregexp-assemble-perl
 # - psutils
 # - subversion
-TERMUX_PKG_VERSION=(5.36.1
-                    1.4.1)
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SHA256=(68203665d8ece02988fc77dc92fccbb297a83a4bb4b8d07558442f978da54cc1
-                   3e14bb4f28c83586c668c5f9f6b4e57b138b4ec2fae0271086e29d4e352670ca)
+TERMUX_PKG_VERSION=(5.38.0
+                    1.5)
+TERMUX_PKG_SHA256=(213ef58089d2f2c972ea353517dc60ec3656f050dcc027666e118b508423e517
+                   d744a390939e2ebb9a12f6725b4d9c19255a141d90031eff90ea183fdfcbf211)
 TERMUX_PKG_SRCURL=(http://www.cpan.org/src/5.0/perl-${TERMUX_PKG_VERSION}.tar.gz
 		   https://github.com/arsv/perl-cross/releases/download/${TERMUX_PKG_VERSION[1]}/perl-cross-${TERMUX_PKG_VERSION[1]}.tar.gz)
 TERMUX_PKG_BUILD_IN_SRC=true
