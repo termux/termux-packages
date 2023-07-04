@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 _MAJOR_VERSION=44
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.3
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/evince/${_MAJOR_VERSION}/evince-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=3b8ba1581a47a6e9f57f6b6aa08f0fb67549c60121aa24e31140e93947b83622
 TERMUX_PKG_DEPENDS="atk, djvulibre, gdk-pixbuf, glib, gnome-desktop3, gst-plugins-base, gst-plugins-good, gstreamer, gtk3, libarchive, libcairo, libgxps, libhandy, libsecret, libspectre, libtiff, libxml2, pango, poppler, poppler-data, texlive-bin"
