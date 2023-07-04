@@ -4,10 +4,9 @@ TERMUX_PKG_LICENSE="PHP-3.01"
 TERMUX_PKG_LICENSE_FILE=LICENSE
 TERMUX_PKG_MAINTAINER="@termux"
 # Please revbump php-* extensions along with "minor" bump (e.g. 8.1.x to 8.2.0)
-TERMUX_PKG_VERSION=8.2.7
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=8.2.8
 TERMUX_PKG_SRCURL=https://github.com/php/php-src/archive/php-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=18884adf2b7052f5ec7122ae4e38a8fdc0d2b95f805e040d4a5051568aa160d1
+TERMUX_PKG_SHA256=ec2a218e95901f7fbf5650bc6c0179bf993b25e9c53271d4df372f0d72c5274d
 # Build native php for phar to build (see pear-Makefile.frag.patch):
 TERMUX_PKG_HOSTBUILD=true
 # Build the native php without xml support as we only need phar:
