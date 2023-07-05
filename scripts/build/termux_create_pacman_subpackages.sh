@@ -26,6 +26,7 @@ termux_create_pacman_subpackages() {
 		local TERMUX_SUBPKG_PROVIDES=""
 		local TERMUX_SUBPKG_CONFFILES=""
 		local TERMUX_SUBPKG_DEPEND_ON_PARENT=""
+		local TERMUX_SUBPKG_EXCLUDED_ARCHES=""
 		local TERMUX_SUBPKG_GROUPS=""
 		local SUB_PKG_MASSAGE_DIR=$SUB_PKG_DIR/massage/$TERMUX_PREFIX
 		local SUB_PKG_PACKAGE_DIR=$SUB_PKG_DIR/package
@@ -52,6 +53,13 @@ termux_create_pacman_subpackages() {
 			fi
 		done
 		shopt -u globstar
+
+		# Do not create subpackage for specific arches.
+		# Using TERMUX_ARCH instead of SUB_PKG_ARCH (defined below) is intentional.
+		if [ "$TERMUX_SUBPKG_EXCLUDED_ARCHES" != "${TERMUX_SUBPKG_EXCLUDED_ARCHES/$TERMUX_ARCH}" ]; then
+			echo "Skipping creating subpackage '$SUB_PKG_NAME' for arch $TERMUX_ARCH"
+			continue
+		fi
 
 		local SUB_PKG_ARCH=$TERMUX_ARCH
 		[ "$TERMUX_SUBPKG_PLATFORM_INDEPENDENT" = "true" ] && SUB_PKG_ARCH=any
