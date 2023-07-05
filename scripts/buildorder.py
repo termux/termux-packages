@@ -65,12 +65,12 @@ def parse_build_file_antidependencies(path):
     return parse_build_file_dependencies_with_vars(path, 'TERMUX_PKG_ANTI_BUILD_DEPENDS')
 
 def parse_build_file_excluded_arches(path):
-    "Extract the excluded arches specified in a build.sh file."
+    "Extract the excluded arches specified in a build.sh or *.subpackage.sh file."
     arches = []
 
     with open(path, encoding="utf-8") as build_script:
         for line in build_script:
-            if line.startswith('TERMUX_PKG_BLACKLISTED_ARCHES'):
+            if line.startswith(('TERMUX_PKG_BLACKLISTED_ARCHES', 'TERMUX_SUBPKG_EXCLUDED_ARCHES')):
                 arches_string = line.split('ARCHES=')[1]
                 for char in "\"'\n":
                     arches_string = arches_string.replace(char, '')
@@ -107,6 +107,8 @@ class TermuxPackage(object):
             if not filename.endswith('.subpackage.sh'):
                 continue
             subpkg = TermuxSubPackage(self.dir + '/' + filename, self)
+            if termux_arch in subpkg.excluded_arches:
+                continue
 
             self.subpkgs.append(subpkg)
             self.deps.add(subpkg.name)
@@ -146,8 +148,10 @@ class TermuxSubPackage:
         self.name = os.path.basename(subpackage_file_path).split('.subpackage.sh')[0]
         self.parent = parent
         self.deps = set([parent.name])
+        self.excluded_arches = set()
         if not virtual:
             self.deps |= parse_build_file_dependencies(subpackage_file_path)
+            self.excluded_arches |= parse_build_file_excluded_arches(subpackage_file_path)
         self.dir = parent.dir
 
         self.needed_by = set()  # Populated outside constructor, reverse of deps.
@@ -196,6 +200,8 @@ def read_packages_from_directories(directories, fast_build_mode, full_buildmode)
                 all_packages.append(new_package)
 
                 for subpkg in new_package.subpkgs:
+                    if termux_arch in subpkg.excluded_arches:
+                        continue
                     if subpkg.name in pkgs_map:
                         die('Duplicated package: ' + subpkg.name)
                     elif fast_build_mode:
