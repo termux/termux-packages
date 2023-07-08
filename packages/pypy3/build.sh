@@ -42,6 +42,11 @@ termux_step_pre_configure() {
 		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
 	fi
 
+	local p="$TERMUX_PKG_BUILDER_DIR/9999-add-ANDROID_API_LEVEL-for-sysconfigdata.diff"
+	echo "Applying $(basename "${p}")"
+	sed 's|@TERMUX_PKG_API_LEVEL@|'"${TERMUX_PKG_API_LEVEL}"'|g' "${p}" \
+		| patch --silent -p1
+
 	DOCKER_PULL="python $TERMUX_PKG_CACHEDIR/docker_pull.py"
 	UNDOCKER="python $TERMUX_PKG_CACHEDIR/undocker.py"
 	PROOT="$TERMUX_PKG_CACHEDIR/proot"
