@@ -1,0 +1,11 @@
+This variable is needed when compiling packages using pip
+
+--- a/lib_pypy/_sysconfigdata.py
++++ b/lib_pypy/_sysconfigdata.py
+@@ -87,3 +87,6 @@
+     # rpython/translator/platform/darwin.py and Lib/_osx_support.py
+     build_time_vars['MACOSX_DEPLOYMENT_TARGET'] = '10.9'
+ 
++# Termux Fix: Add ANDROID_API_LEVEL
++build_time_vars["ANDROID_API_LEVEL"] = @TERMUX_PKG_API_LEVEL@
++
