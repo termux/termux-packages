@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/angeldollface/mandy
+TERMUX_PKG_DESCRIPTION="A hypersonic static-site generator written in Rust."
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="0.2.0"
+TERMUX_PKG_SRCURL=https://github.com/angeldollface/mandy/archive/v.$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SHA256=3e3228ec2db5b96316942a54a3dc6b471bc6268c2e436b66794fa476ccadead3
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_BUILD_IN_SRC=true
