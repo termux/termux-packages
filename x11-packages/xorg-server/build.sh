@@ -8,7 +8,7 @@ TERMUX_PKG_SHA256=38aadb735650c8024ee25211c190bf8aad844c5f59632761ab1ef4c4d5aeb1
 TERMUX_PKG_DEPENDS="libandroid-shmem, libdrm, libpciaccess, libpixman, libx11, libxau, libxcvt, libxfont2, libxinerama, libxkbfile, libxshmfence, opengl, openssl, xkeyboard-config, xorg-protocol-txt, xorg-xkbcomp"
 
 # Needed for Xephyr
-TERMUX_PKG_BUILD_DEPENDS="xcb-util, xcb-util-image, xcb-util-keysyms, xcb-util-renderutil, xcb-util,wm"
+TERMUX_PKG_BUILD_DEPENDS="xcb-util, xcb-util-image, xcb-util-keysyms, xcb-util-renderutil, xcb-util-wm"
 
 TERMUX_PKG_RECOMMENDS="xf86-video-dummy, xf86-input-void"
 TERMUX_PKG_NO_STATICSPLIT=true
