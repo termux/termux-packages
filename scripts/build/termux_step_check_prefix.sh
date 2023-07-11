@@ -2,7 +2,10 @@ termux_step_check_prefix() {
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
 		new_files=$(find $TERMUX_PREFIX \
 				 -path $TERMUX_PREFIX/tmp -prune -o \
-				 -path $TERMUX_PREFIX/var/run -prune \
+				 -path $TERMUX_PREFIX/var/run -prune -o \
+				 -path $TERMUX_PREFIX/var/log/sv -prune -o \
+				 -path $TERMUX_PREFIX/etc/lvm/backup -prune -o \
+				 -path $TERMUX_PREFIX/etc/lvm/archive -prune -o \
 				 -newer "$TERMUX_BUILD_TS_FILE" -type f \
 				 -print)
 	else
