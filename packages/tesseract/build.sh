@@ -2,12 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://github.com/tesseract-ocr/tesseract
 TERMUX_PKG_DESCRIPTION="Tesseract is probably the most accurate open source OCR engine available"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=5.3.1
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=5.3.2
 TERMUX_PKG_SRCURL=https://github.com/tesseract-ocr/tesseract/archive/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=3761768c02b99358e5118bfabfecc979fa84a399da5fa54c49dd477d926fef43
+TERMUX_PKG_SHA256=b99d30fed47360d7168c3e25d194a7416ceb1d9e4b232c7f121cc5f77084d3e7
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="fontconfig, glib, harfbuzz, leptonica, libandroid-glob, libandroid-posix-semaphore, libc++, libcairo, libcurl, libicu, pango"
+TERMUX_PKG_DEPENDS="fontconfig, glib, harfbuzz, leptonica, libandroid-glob, libandroid-posix-semaphore, libarchive, libc++, libcairo, libcurl, libicu, pango"
 TERMUX_PKG_BUILD_DEPENDS="libcpufeatures"
 TERMUX_PKG_BREAKS="tesseract-dev"
 TERMUX_PKG_REPLACES="tesseract-dev"
@@ -17,6 +16,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DUSE_SYSTEM_ICU=on
 -DTESSDATA_PREFIX=$TERMUX_PREFIX/share
 -DOPENMP_BUILD=ON
+-DLEPT_TIFF_RESULT=0
 "
 
 termux_step_post_get_source() {
