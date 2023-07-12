@@ -2,13 +2,23 @@ TERMUX_PKG_HOMEPAGE=https://github.com/qt/qtwebengine
 TERMUX_PKG_DESCRIPTION="Qt 5 Web Engine Library"
 TERMUX_PKG_LICENSE="LGPL-3.0, LGPL-2.1, BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@licy183"
-TERMUX_PKG_VERSION="5.15.12"
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION="5.15.14"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/qt/qtwebengine
 TERMUX_PKG_GIT_BRANCH=v$TERMUX_PKG_VERSION-lts
-TERMUX_PKG_DEPENDS="fontconfig, dbus, libc++, libjpeg-turbo, libminizip, libnss, libpng, libre2, libsnappy, libvpx, libwebp, libx11, libxml2, libxslt, libxkbfile, qt5-qtbase, qt5-qtdeclarative, zlib"
+TERMUX_PKG_DEPENDS="dbus, fontconfig, libc++, libexpat, libjpeg-turbo, libminizip, libnspr, libnss, libpng, libsnappy, libvpx, libwebp, libx11, libxkbfile, qt5-qtbase, qt5-qtdeclarative, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libdrm, qt5-qtbase-cross-tools, qt5-qtdeclarative-cross-tools"
 TERMUX_PKG_NO_STATICSPLIT=true
+TERMUX_PKG_HOSTBUILD=true
+
+termux_step_host_build() {
+	# Generate ffmpeg headers for i686
+	mkdir -p fake-bin
+	ln -s $(command -v clang-14) fake-bin/clang
+	ln -s $(command -v clang++-14) fake-bin/clang++
+	
+	PATH="$PWD/fake-bin:$PATH" python2 $TERMUX_PKG_SRCDIR/src/3rdparty/chromium/third_party/ffmpeg/chromium/scripts/build_ffmpeg.py --config-only linux noasm-ia32
+}
 
 termux_step_pre_configure() {
 	# Certain packages are not safe to build on device because their
@@ -54,7 +64,12 @@ termux_step_configure() {
 	echo '!<arch>' > "$TERMUX_PREFIX/lib/libresolv.a"
 
 	# Copy ffmpeg headers for i686. They are generated without asm.
-	cp -Rf $TERMUX_PKG_BUILDER_DIR/ffmpeg-headers/* src/3rdparty/chromium/third_party/ffmpeg/chromium/config/
+	rm -rf src/3rdparty/chromium/third_party/ffmpeg/chromium/config/{Chrome,Chromium}/linux-noasm/ia32
+	mkdir -p src/3rdparty/chromium/third_party/ffmpeg/chromium/config/{Chrome,Chromium}/linux-noasm/ia32
+	cp -Rfv $TERMUX_PKG_HOSTBUILD_DIR/build.ia32.linux-noasm/Chrome/* src/3rdparty/chromium/third_party/ffmpeg/chromium/config/Chrome/linux-noasm/ia32
+	cp -Rfv $TERMUX_PKG_HOSTBUILD_DIR/build.ia32.linux-noasm/Chromium/* src/3rdparty/chromium/third_party/ffmpeg/chromium/config/Chromium/linux-noasm/ia32
+	cp -fv src/3rdparty/chromium/third_party/ffmpeg/chromium/config/Chrome/linux-noasm/{x64,ia32}/libavutil/ffversion.h
+	cp -fv src/3rdparty/chromium/third_party/ffmpeg/chromium/config/Chromium/linux-noasm/{x64,ia32}/libavutil/ffversion.h
 
 	# Do not run ninja -v, unless NINJAFLAGS is set
 	: ${NINJAFLAGS:=" "}

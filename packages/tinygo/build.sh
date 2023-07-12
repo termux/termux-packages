@@ -3,12 +3,12 @@ TERMUX_PKG_DESCRIPTION="Go compiler for microcontrollers, WASM, CLI tools"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.27.0"
+TERMUX_PKG_VERSION="0.28.1"
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/tinygo-org/tinygo
 TERMUX_PKG_GIT_BRANCH="v${TERMUX_PKG_VERSION}"
-TERMUX_PKG_DEPENDS="libc++"
-TERMUX_PKG_RECOMMENDS="binaryen, tinygo-common"
+TERMUX_PKG_DEPENDS="libc++, tinygo-common"
+TERMUX_PKG_RECOMMENDS="binaryen"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
@@ -53,8 +53,9 @@ termux_step_host_build() {
 		LLVM_BUILDDIR="${TERMUX_PKG_HOSTBUILD_DIR}"
 
 	# build whatever llvm-config think is missing
-	ninja -C "${TERMUX_PKG_HOSTBUILD_DIR}" \
-		-j"${TERMUX_MAKE_PROCESSES}" \
+	ninja \
+		-C "${TERMUX_PKG_HOSTBUILD_DIR}" \
+		-j "${TERMUX_MAKE_PROCESSES}" \
 		${_LLVM_EXTRA_BUILD_TARGETS}
 
 	echo "========== llvm-config =========="
@@ -70,20 +71,29 @@ termux_step_host_build() {
 		LLVM_NM="${TERMUX_PKG_HOSTBUILD_DIR}/bin/llvm-nm" \
 		USE_SYSTEM_BINARYEN=1
 	popd
+}
 
-	local PATCHELF_BUILD_SH="${TERMUX_SCRIPTDIR}/packages/patchelf/build.sh"
-	local PATCHELF_SRCURL=$(. "${PATCHELF_BUILD_SH}"; echo $TERMUX_PKG_SRCURL)
-	local PATCHELF_SHA256=$(. "${PATCHELF_BUILD_SH}"; echo $TERMUX_PKG_SHA256)
-	local PATCHELF_TARFILE="${TERMUX_PKG_CACHEDIR}/$(basename "${PATCHELF_SRCURL}")"
-	termux_download "${PATCHELF_SRCURL}" "${PATCHELF_TARFILE}" "${PATCHELF_SHA256}"
-	local PATCHELF_SRCDIR="${TERMUX_PKG_HOSTBUILD_DIR}/_patchelf"
-	mkdir -p "${PATCHELF_SRCDIR}"
-	tar xf "${PATCHELF_TARFILE}" -C "${PATCHELF_SRCDIR}" --strip-components=1
-	pushd "${PATCHELF_SRCDIR}"
-	./bootstrap.sh
-	./configure
-	make -j "${TERMUX_MAKE_PROCESSES}"
-	popd
+termux_step_pre_configure() {
+	# https://github.com/termux/termux-packages/issues/16358
+	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "true" ]]; then
+		echo "WARN: ld.lld wrapper is not working for on-device builds. Skipping."
+		return
+	fi
+
+	local _WRAPPER_BIN=${TERMUX_PKG_BUILDDIR}/_wrapper/bin
+	mkdir -p "${_WRAPPER_BIN}"
+	ln -fs "${TERMUX_STANDALONE_TOOLCHAIN}/bin/lld" "${_WRAPPER_BIN}/ld.lld"
+	cat <<- EOF > "${_WRAPPER_BIN}/ld.lld.sh"
+	#!/bin/bash
+	tmpfile=\$(mktemp)
+	python ${TERMUX_PKG_BUILDER_DIR}/fix-rpath.py -rpath=${TERMUX_PREFIX}/lib \$@ > \${tmpfile}
+	args=\$(cat \${tmpfile})
+	rm -f \${tmpfile}
+	${_WRAPPER_BIN}/ld.lld \${args}
+	EOF
+	chmod +x "${_WRAPPER_BIN}/ld.lld.sh"
+	rm -f "${TERMUX_STANDALONE_TOOLCHAIN}/bin/ld.lld"
+	ln -fs "${_WRAPPER_BIN}/ld.lld.sh" "${TERMUX_STANDALONE_TOOLCHAIN}/bin/ld.lld"
 }
 
 termux_step_make() {
@@ -92,25 +102,23 @@ termux_step_make() {
 	termux_setup_ninja
 
 	# from packages/libllvm/build.sh
-	export _LLVM_DEFAULT_TARGET_TRIPLE=${CCTERMUX_HOST_PLATFORM/-/-unknown-}
-	export _LLVM_TARGET_ARCH
-	if [[ "${TERMUX_ARCH}" == "arm" ]]; then
-		_LLVM_TARGET_ARCH=ARM
-	elif [[ "${TERMUX_ARCH}" == "aarch64" ]]; then
-		_LLVM_TARGET_ARCH=AArch64
-	elif [[ "${TERMUX_ARCH}" == "i686" ]] || [[ "${TERMUX_ARCH}" == "x86_64" ]]; then
-		_LLVM_TARGET_ARCH=X86
-	else
-		termux_error_exit "Invalid arch: ${TERMUX_ARCH}"
-	fi
+	local _LLVM_DEFAULT_TARGET_TRIPLE=${CCTERMUX_HOST_PLATFORM/-/-unknown-}
+	local _LLVM_TARGET_ARCH
+	case "${TERMUX_ARCH}" in
+		aarch64) _LLVM_TARGET_ARCH=AArch64 ;;
+		arm) _LLVM_TARGET_ARCH=ARM ;;
+		i686|x86_64) _LLVM_TARGET_ARCH=X86 ;;
+		*) termux_error_exit "Invalid arch: ${TERMUX_ARCH}" ;;
+	esac
 
 	_LLVM_OPTION+=" -DLLVM_TARGET_ARCH=${_LLVM_TARGET_ARCH}"
 	_LLVM_OPTION+=" -DLLVM_HOST_TRIPLE=${_LLVM_DEFAULT_TARGET_TRIPLE}"
 
 	make llvm-build LLVM_OPTION="$(echo ${_LLVM_OPTION})"
 
-	ninja -C llvm-build \
-		-j"${TERMUX_MAKE_PROCESSES}" \
+	ninja \
+		-C llvm-build \
+		-j "${TERMUX_MAKE_PROCESSES}" \
 		${_LLVM_EXTRA_BUILD_TARGETS}
 
 	# replace Android llvm-config with wrapper around host build
@@ -130,12 +138,15 @@ termux_step_make() {
 	# skip make wasi-libc, NDK doesnt support wasm32-unknown-wasi
 	# skip make binaryen
 
-	# TODO investigate later, fix excessive runpath entries
-	readelf -dW build/release/tinygo/bin/tinygo | grep RUNPATH
-	"${TERMUX_PKG_HOSTBUILD_DIR}/_patchelf/src/patchelf" \
-		--set-rpath "${TERMUX_PREFIX}/lib" \
-		build/release/tinygo/bin/tinygo
-	readelf -dW build/release/tinygo/bin/tinygo | grep RUNPATH
+	# check excessive runpath entries
+	local tinygo_readelf=$(readelf -dW build/release/tinygo/bin/tinygo)
+	local tinygo_runpath=$(echo "${tinygo_readelf}" | grep RUNPATH | sed -e "s|.*\[\(.*\)\]|\1|")
+	if [[ "${tinygo_runpath}" != "${TERMUX_PREFIX}/lib" ]]; then
+		termux_error_exit <<- EOL
+		Excessive RUNPATH found. Check readelf output below:
+		${tinygo_readelf}
+		EOL
+	fi
 }
 
 termux_step_make_install() {

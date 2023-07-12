@@ -99,6 +99,7 @@ PACKAGES+=" swig"
 PACKAGES+=" libdbus-1-dev"
 
 # Needed by package below.
+PACKAGES+=" clang-15"
 PACKAGES+=" libelf-dev"
 
 # Needed by package ghostscript.
@@ -135,7 +136,9 @@ PACKAGES+=" ruby"
 
 # Needed by host build of package nodejs.
 PACKAGES+=" libc-ares-dev"
+PACKAGES+=" libc-ares-dev:i386"
 PACKAGES+=" libicu-dev"
+PACKAGES+=" libicu-dev:i386"
 
 # Needed by php.
 PACKAGES+=" re2c"

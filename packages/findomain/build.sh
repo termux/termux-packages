@@ -17,7 +17,7 @@ termux_step_pre_configure() {
 
 	cargo fetch --target "${CARGO_TARGET_NAME}"
 
-	for d in $CARGO_HOME/registry/src/github.com-*/trust-dns-resolver-*; do
+	for d in $CARGO_HOME/registry/src/*/trust-dns-resolver-*; do
 		sed -e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|" \
 			$TERMUX_PKG_BUILDER_DIR/trust-dns-resolver.diff \
 			| patch --silent -p1 -d ${d} || :

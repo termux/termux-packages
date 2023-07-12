@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Universal ctags: Source code index builder"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2:5.9.20221106.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/universal-ctags/ctags/archive/p${TERMUX_PKG_VERSION:2}.tar.gz
 TERMUX_PKG_SHA256=8e647fa314a33088d7e8384a9aca3903ce91dfe8805676d4219051d5353cf0ab
 TERMUX_PKG_DEPENDS="libiconv, libjansson, libxml2, libyaml"

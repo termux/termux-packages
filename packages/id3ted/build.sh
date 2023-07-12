@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://muennich.github.io/id3ted/
-TERMUX_PKG_DESCRIPTION="A comand line id3 tag editor"
+TERMUX_PKG_DESCRIPTION="A command line id3 tag editor"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.0

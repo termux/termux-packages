@@ -188,10 +188,10 @@ diff -uNr firefox-105.0.3/mozglue/misc/ConditionVariable_posix.cpp firefox-105.0
 --- firefox-105.0.3/mozglue/misc/ConditionVariable_posix.cpp	2022-10-07 22:37:53.000000000 +0900
 +++ firefox-105.0.3.mod/mozglue/misc/ConditionVariable_posix.cpp	2022-10-15 23:45:03.008285261 +0900
 @@ -23,7 +23,7 @@
- // Android 32-bit & macOS 10.12 has the clock functions, but not
+ // Android 4.4 or earlier & macOS 10.12 has the clock functions, but not
  // pthread_condattr_setclock.
  #if defined(HAVE_CLOCK_MONOTONIC) && \
--    !(defined(__ANDROID__) && !defined(__LP64__)) && !defined(__APPLE__)
+-    !(defined(__ANDROID__) && __ANDROID_API__ < 21) && !defined(__APPLE__)
 +    defined(__TERMUX__)
  #  define CV_USE_CLOCK_API
  #endif
@@ -300,18 +300,15 @@ diff -uNr firefox-105.0.3/toolkit/moz.configure firefox-105.0.3.mod/toolkit/moz.
          die("Cannot enable OpenSL on %s", target.os)
      return any("opensl" in value for value in values) or None
  
- set_config("MOZ_PDF_PRINTING", pdf_printing)
-@@ -1167,9 +1166,7 @@
+@@ -2054,6 +2054,8 @@
+         set_config("MOZ_JPEG_CFLAGS", jpeg_flags.cflags)
+         set_config("MOZ_JPEG_LIBS", jpeg_flags.ldflags)
  
- @depends(target, tree_freetype, freetype2_info)
- def enable_cairo_ft(target, tree_freetype, freetype2_info):
--    # Avoid defining MOZ_ENABLE_CAIRO_FT on Windows platforms because
--    # "cairo-ft-font.c" includes <dlfcn.h>, which only exists on posix platforms
--    return freetype2_info or (tree_freetype and target.os != "WINNT")
-+    return
- 
- 
- set_config("MOZ_ENABLE_CAIRO_FT", True, when=enable_cairo_ft)
++        set_config("MOZ_SYSTEM_JPEG", True)
++
+     @depends("--with-system-jpeg", target, neon_flags)
+     def in_tree_jpeg_arm(system_jpeg, target, neon_flags):
+         if system_jpeg:
 @@ -2776,8 +2773,6 @@
  # ==============================================================
  @depends(target)
@@ -354,16 +351,15 @@ diff -uNr firefox-105.0.3/toolkit/moz.configure firefox-105.0.3.mod/toolkit/moz.
          "Can't find header linux/joystick.h, needed for gamepad support."
          " Please install Linux kernel headers."
      ),
--    when=target_is_linux & compile_environment,
+-    when=target_has_linux_kernel & compile_environment,
 +    when=False,
  )
  
  # Smart card support
-diff -uNr firefox-105.0.3/toolkit/xre/glxtest.cpp firefox-105.0.3.mod/toolkit/xre/glxtest.cpp
---- firefox-105.0.3/toolkit/xre/glxtest.cpp	2022-10-08 00:25:42.000000000 +0900
-+++ firefox-105.0.3.mod/toolkit/xre/glxtest.cpp	2022-10-17 19:31:36.885513927 +0900
-@@ -1175,7 +1175,9 @@
-   glxtest_bufsize = bufsize;
+--- a/toolkit/xre/glxtest/glxtest.cpp
++++ b/toolkit/xre/glxtest/glxtest.cpp
+@@ -946,7 +946,9 @@
+   log("GLX_TEST: childgltest start\n");
  
    // Get a list of all GPUs from the PCI bus.
 +#if !defined(__TERMUX__)
@@ -371,7 +367,7 @@ diff -uNr firefox-105.0.3/toolkit/xre/glxtest.cpp firefox-105.0.3.mod/toolkit/xr
 +#endif
  
  #ifdef MOZ_WAYLAND
-   if (IsWaylandEnabled()) {
+   if (aWayland) {
 diff -uNr firefox-105.0.3/js/src/ctypes/libffi/src/closures.c firefox-105.0.3.mod/js/src/ctypes/libffi/src/closures.c
 --- firefox-105.0.3/js/src/ctypes/libffi/src/closures.c	2022-10-07 22:37:49.000000000 +0900
 +++ firefox-105.0.3.mod/js/src/ctypes/libffi/src/closures.c	2022-10-17 19:42:34.472896402 +0900

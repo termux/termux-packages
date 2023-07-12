@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Python bindings for Apache Arrow"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Align the version with `libarrow-cpp` package.
-TERMUX_PKG_VERSION=12.0.0
+TERMUX_PKG_VERSION=12.0.1
 TERMUX_PKG_SRCURL=https://github.com/apache/arrow/archive/refs/tags/apache-arrow-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=f25901c486e1e79cde8b78b3e7b1d889919f942549996003a7341a8ee86addaa
+TERMUX_PKG_SHA256=f01b76a42ceb30409e7b1953ef64379297dd0c08502547cae6aaafd2c4a4d92e
 TERMUX_PKG_DEPENDS="libarrow-cpp (>= ${TERMUX_PKG_VERSION}), libc++, python, python-numpy"
 TERMUX_PKG_PYTHON_COMMON_DEPS="Cython, numpy, wheel"
 TERMUX_PKG_PROVIDES="libarrow-python"
@@ -26,6 +26,7 @@ termux_step_pre_configure() {
 		"
 	export PYARROW_WITH_DATASET=1
 	export PYARROW_WITH_HDFS=1
+	export PYARROW_WITH_ORC=1
 	export PYARROW_WITH_PARQUET=1
 }
 

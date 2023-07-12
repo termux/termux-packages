@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://pytorch.org/
 TERMUX_PKG_DESCRIPTION="Tensors and Dynamic neural networks in Python"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.0.0
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION=2.0.1
 TERMUX_PKG_SRCURL=git+https://github.com/pytorch/pytorch
 TERMUX_PKG_DEPENDS="ffmpeg, libc++, libopenblas, libprotobuf, libzmq, opencv, python, python-numpy, python-pip"
+TERMUX_PKG_BUILD_DEPENDS="vulkan-headers, vulkan-loader-android"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, pyyaml, typing_extensions"
 TERMUX_PKG_PYTHON_BUILD_DEPS="numpy"
@@ -40,6 +40,9 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DUSE_NNPACK=OFF
 -DCXX_AVX512_FOUND=OFF
 -DCXX_AVX2_FOUND=OFF
+-DUSE_VULKAN=ON
+-DANDROID_NDK=${NDK}
+-DANDROID_NDK_HOST_SYSTEM_NAME=linux-$HOSTTYPE
 "
 
 TERMUX_PKG_RM_AFTER_INSTALL="
@@ -53,15 +56,13 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
-	find "$TERMUX_PKG_SRCDIR" -name CMakeLists.txt -o -name '*.cmake' | \
+	export PYTHONPATH="${PYTHONPATH}:${TERMUX_PKG_SRCDIR}"
+	find "$TERMUX_PKG_SRCDIR" -name CMakeLists.txt -o -name '*.cmake' ! -name 'VulkanCodegen*' | \
 		xargs -n 1 sed -i \
 		-e 's/\([^A-Za-z0-9_]ANDROID\)\([^A-Za-z0-9_]\)/\1_NO_TERMUX\2/g' \
 		-e 's/\([^A-Za-z0-9_]ANDROID\)$/\1_NO_TERMUX/g'
 
 	termux_setup_protobuf
-	export CFLAGS+=" -DPROTOBUF_USE_DLLS=1"
-	export CPPFLAGS+=" -DPROTOBUF_USE_DLLS=1"
-	export CXXFLAGS+=" -DPROTOBUF_USE_DLLS=1"
 
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
 	-DPYTHON_EXECUTABLE=$(command -v python3)

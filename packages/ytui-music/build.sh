@@ -28,10 +28,10 @@ termux_step_pre_configure() {
 		a7cbd6674191c93ed82c87da7173366b7f56c5998a650b1054de4e4fa3974d69
 	echo "Applying $(dirname "${p}")"
 	local d
-	for d in $CARGO_HOME/registry/src/github.com-*/libmpv-sys-*; do
+	for d in $CARGO_HOME/registry/src/*/libmpv-sys-*; do
 		patch --silent -f -p2 -d ${d} < "${p}" || :
 	done
-	for d in $CARGO_HOME/registry/src/github.com-*/libmpv-[0-9]*; do
+	for d in $CARGO_HOME/registry/src/*/libmpv-[0-9]*; do
 		patch --silent -f -p1 -d ${d} < "${p}" || :
 	done
 }

@@ -80,11 +80,11 @@ diff --git a/swiftpm/Utilities/bootstrap b/swiftpm/Utilities/bootstrap
 index 085056de..1ded1a90 100755
 --- a/swiftpm/Utilities/bootstrap
 +++ b/swiftpm/Utilities/bootstrap
-@@ -764,6 +764,7 @@ def get_swiftpm_flags(args):
-     if 'ANDROID_DATA' in os.environ or (args.cross_compile_hosts and re.match(
-         'android-', args.cross_compile_hosts)):
+@@ -827,6 +827,7 @@ def get_swiftpm_flags(args):
+     # Don't use GNU strerror_r on Android.
+     if '-android' in args.build_target:
          build_flags.extend(["-Xswiftc", "-Xcc", "-Xswiftc", "-U_GNU_SOURCE"])
 +        build_flags.extend(["-Xlinker", "-landroid-spawn"])
  
-     if platform.system() == "OpenBSD":
-         build_flags.extend(["-Xcc", "-I/usr/local/include"])
+     cross_compile_hosts = args.cross_compile_hosts
+     if cross_compile_hosts:

@@ -23,12 +23,12 @@ termux_step_pre_configure() {
 
 	local d
 	local p=termios-0.2.2.diff
-	for d in $CARGO_HOME/registry/src/github.com-*/termios-0.2.2; do
+	for d in $CARGO_HOME/registry/src/*/termios-0.2.2; do
 		patch --silent -p1 -d ${d} \
 			< "$TERMUX_PKG_BUILDER_DIR/${p}" || :
 	done
 	p=service-manager-0.2.0.diff
-	for d in $CARGO_HOME/registry/src/github.com-*/service-manager-*; do
+	for d in $CARGO_HOME/registry/src/*/service-manager-*; do
 		patch --silent -p1 -d ${d} \
 			< "$TERMUX_PKG_BUILDER_DIR/${p}" || :
 	done

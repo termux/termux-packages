@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/facebookincubator/below
 TERMUX_PKG_DESCRIPTION="An interactive tool to view and record historical system data"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.6.3
+TERMUX_PKG_VERSION=0.7.0
 TERMUX_PKG_SRCURL=https://github.com/facebookincubator/below/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=a1b54744108dabc908c4d533ee2a4d029c6f21c48b6896e248e695b9e248e8ca
+TERMUX_PKG_SHA256=76cd049ff2744c24171b5d05ce6536fc01dc3791486e437d4acec8a54d0b04b5
 TERMUX_PKG_DEPENDS="libelf, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 
@@ -25,13 +25,13 @@ termux_step_pre_configure() {
 	cargo fetch --target $CARGO_TARGET_NAME
 
 	local d p
-	for d in $CARGO_HOME/registry/src/github.com-*/libbpf-sys-*; do
+	for d in $CARGO_HOME/registry/src/*/libbpf-sys-*; do
 		for p in libbpf-sys-0.6.0-1-libbpf-include-linux-{compiler,types}.h.diff; do
 			patch --silent -p1 -d ${d} \
 				< "$TERMUX_PKG_BUILDER_DIR/${p}" || :
 		done
 	done
-	for d in $CARGO_HOME/registry/src/github.com-*/nix-*; do
+	for d in $CARGO_HOME/registry/src/*/nix-*; do
 		for p in nix-{0.22.0,0.23.1}-src-sys-statfs.rs.diff; do
 			patch --silent -p1 -d ${d} \
 				< "$TERMUX_PKG_BUILDER_DIR/${p}" || :
@@ -44,6 +44,10 @@ termux_step_pre_configure() {
 	for lib in lib{elf,z}.so; do
 		ln -sf $TERMUX_PREFIX/lib/${lib} $_CARGO_TARGET_LIBDIR/
 	done
+
+	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
+		export CLANG=/usr/bin/clang-15
+	fi
 }
 
 termux_step_make() {
