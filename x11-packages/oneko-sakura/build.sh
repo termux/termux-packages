@@ -11,5 +11,5 @@ TERMUX_PKG_GROUPS="games"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {
-	install -Dm700 -t "${TERMUX_PREFIX}"/bin "$TERMUX_PKG_SRCDIR"/oneko
+	install -Dm700 -t "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}"/bin "$TERMUX_PKG_SRCDIR"/oneko
 }
