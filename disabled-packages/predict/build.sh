@@ -44,24 +44,24 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm700 -t $TERMUX_PREFIX/bin predict{,-g1yyh}
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin predict{,-g1yyh}
 	local d
 	for d in clients/kep_reload utils/{fodtrack,geosat,moontracker}; do
 		local p=$(basename ${d})
-		install -Dm700 -t $TERMUX_PREFIX/bin ${d}/${p}
+		install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin ${d}/${p}
 	done
-	install -Dm600 -t $TERMUX_PREFIX/etc utils/fodtrack/fodtrack.conf
-	install -Dm600 -t $TERMUX_PREFIX/share/man/man1 \
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc utils/fodtrack/fodtrack.conf
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man1 \
 		docs/man/predict.1 \
 		debian/{kep_reload,moontracker}.1
 	local p
 	for p in geosat predict-g1yyh; do
 		install -Dm600 -T debian/${p}.man \
-			$TERMUX_PREFIX/share/man/man1/${p}.1
+			$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man1/${p}.1
 	done
-	install -Dm600 -t $TERMUX_PREFIX/share/man/man5 \
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man5 \
 		utils/fodtrack/fodtrack.conf.5
-	install -Dm600 -t $TERMUX_PREFIX/share/man/man8 \
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man8 \
 		utils/fodtrack/fodtrack.8
-	install -Dm600 -t $TERMUX_PREFIX/share/predict/default default/*
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/predict/default default/*
 }
