@@ -26,9 +26,9 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm700 -t $TERMUX_PREFIX/bin "$TERMUX_PKG_BUILDDIR/src/slex"
-	install -Dm600 -t $TERMUX_PREFIX/share/games/slex "$TERMUX_PKG_BUILDDIR/dat/nhdat"
-	install -Dm600 -t $TERMUX_PREFIX/share/doc/slex "$TERMUX_PKG_SRCDIR/dat/license"
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin "$TERMUX_PKG_BUILDDIR/src/slex"
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/games/slex "$TERMUX_PKG_BUILDDIR/dat/nhdat"
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/doc/slex "$TERMUX_PKG_SRCDIR/dat/license"
 }
 
 termux_step_create_debscripts() {
