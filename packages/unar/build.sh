@@ -28,11 +28,11 @@ termux_step_pre_configure() {
 }
 
 termux_step_make_install() {
-	install -Dm700 -t $TERMUX_PREFIX/bin lsar unar
-	install -Dm600 -t $TERMUX_PREFIX/share/man/man1 Extra/*.1
-	mkdir -p $TERMUX_PREFIX/share/bash-completion/completions
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin lsar unar
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man1 Extra/*.1
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/bash-completion/completions
 	for c in lsar unar; do
 		install -Dm600 Extra/${c}.bash_completion \
-			$TERMUX_PREFIX/share/bash-completion/completions/${c}
+			$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/bash-completion/completions/${c}
 	done
 }
