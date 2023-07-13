@@ -20,5 +20,5 @@ termux_step_make() {
 
 termux_step_make_install() {
 	install -Dm700 ${TERMUX_PKG_BUILDDIR}/src/github.com/bufbuild/buf/buf \
-		 $TERMUX_PREFIX/bin/buf
+		 $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/buf
 }
