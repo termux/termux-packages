@@ -29,6 +29,6 @@ termux_step_pre_configure() {
 }
 
 termux_step_make_install() {
-	install -Dm700 -t $TERMUX_PREFIX/bin asy
-	cp -rT base $TERMUX_PREFIX/share/asymptote
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin asy
+	cp -rT base $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/asymptote
 }
