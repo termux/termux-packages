@@ -15,6 +15,6 @@ termux_step_pre_configure() {
 }
 
 termux_step_make_install() {
-	install -Dm700 -t $TERMUX_PREFIX/bin ./bin/sshping
-	install -Dm600 -t $TERMUX_PREFIX/share/man/man8 ./doc/sshping.8
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin ./bin/sshping
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man8 ./doc/sshping.8
 }
