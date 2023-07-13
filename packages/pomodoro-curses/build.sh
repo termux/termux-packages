@@ -9,7 +9,7 @@ TERMUX_PKG_DEPENDS="libinih, ncurses"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {
-	install -Dm700 -t $TERMUX_PREFIX/bin bin/pomodoro_curses
-	install -Dm600 -t $TERMUX_PREFIX/share/man/man1 doc/pomodoro_curses.1
-	install -Dm600 -t $TERMUX_PREFIX/share/pomodoro-curses config-sample.ini
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin bin/pomodoro_curses
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man1 doc/pomodoro_curses.1
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/pomodoro-curses config-sample.ini
 }
