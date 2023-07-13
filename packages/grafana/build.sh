@@ -46,8 +46,8 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm700 -t $TERMUX_PREFIX/bin bin/*/grafana-server bin/*/grafana-cli
-	local sharedir=$TERMUX_PREFIX/share/grafana
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin bin/*/grafana-server bin/*/grafana-cli
+	local sharedir=$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/grafana
 	mkdir -p $sharedir
 	for d in conf public; do
 		cp -rT $d $sharedir/$d
