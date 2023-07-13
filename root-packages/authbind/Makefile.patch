@@ -1,5 +1,5 @@
---- a/Makefile
-+++ b/Makefile
+--- ../work/Makefile	2021-12-17 18:34:02.000000000 +0000
++++ ./Makefile	2023-07-13 09:18:16.189548917 +0000
 @@ -16,28 +16,28 @@
  # along with this program; if not, write to the Free Software Foundation,
  # Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. 
@@ -38,21 +38,35 @@
  		-Wall -Wwrite-strings -Wpointer-arith -Wimplicit \
  		-Wnested-externs -Wmissing-prototypes -Wstrict-prototypes
  CPPFLAGS=	-DMAJOR_VER='"$(MAJOR)"' -DMINOR_VER='"$(MINOR)"' \
-@@ -59,13 +59,11 @@
+@@ -59,19 +59,17 @@
  all:			$(TARGETS)
  
  install:		$(TARGETS)
 -		$(INSTALL_DIR) $(lib_dir) $(man1_dir) $(man8_dir)
-+		$(INSTALL_DIR) $(lib_dir) $(libexec_dir) $(man1_dir) $(man8_dir)
- 		$(INSTALL_PROGRAM) $(BINTARGETS) $(bin_dir)/.
- 		$(INSTALL_FILE) $(LIBTARGET) $(lib_dir)/.
+-		$(INSTALL_PROGRAM) $(BINTARGETS) $(bin_dir)/.
+-		$(INSTALL_FILE) $(LIBTARGET) $(lib_dir)/.
 -		$(STRIP) --strip-unneeded $(lib_dir)/$(LIBTARGET)
- 		ln -sf $(LIBTARGET) $(lib_dir)/$(LIBCANON)
- 		$(INSTALL_PROGRAM) $(HELPER) $(libexec_dir)/.
+-		ln -sf $(LIBTARGET) $(lib_dir)/$(LIBCANON)
+-		$(INSTALL_PROGRAM) $(HELPER) $(libexec_dir)/.
 -		chmod u+s $(libexec_dir)/$(HELPER)
- 		$(INSTALL_DIR) $(etc_dir) \
- 			$(etc_dir)/byport $(etc_dir)/byaddr $(etc_dir)/byuid
+-		$(INSTALL_DIR) $(etc_dir) \
+-			$(etc_dir)/byport $(etc_dir)/byaddr $(etc_dir)/byuid
++		$(INSTALL_DIR) $(DESTDIR)$(lib_dir) $(DESTDIR)$(libexec_dir) $(DESTDIR)$(man1_dir) $(DESTDIR)$(man8_dir)
++		$(INSTALL_PROGRAM) $(BINTARGETS) $(DESTDIR)$(bin_dir)/
++		$(INSTALL_FILE) $(LIBTARGET) $(DESTDIR)$(lib_dir)/
++		ln -sf $(LIBTARGET) $(DESTDIR)$(lib_dir)/$(LIBCANON)
++		$(INSTALL_PROGRAM) $(HELPER) $(DESTDIR)$(libexec_dir)/
++		$(INSTALL_DIR) $(DESTDIR)$(etc_dir) \
++			$(DESTDIR)$(etc_dir)/byport $(DESTDIR)$(etc_dir)/byaddr $(DESTDIR)$(etc_dir)/byuid
  
+ install_man:		$(MANPAGES_1) $(MANPAGES_8)
+-		$(INSTALL_FILE) $(MANPAGES_1) $(man1_dir)/.
+-		$(INSTALL_FILE) $(MANPAGES_8) $(man8_dir)/.
++		$(INSTALL_FILE) $(MANPAGES_1) $(DESTDIR)$(man1_dir)/
++		$(INSTALL_FILE) $(MANPAGES_8) $(DESTDIR)$(man8_dir)/
+ 
+ libauthbind.o:		libauthbind.c authbind.h
+ 		$(CC) -D_REENTRANT $(CFLAGS) $(CPPFLAGS) -c -o $@ -fPIC $<
 @@ -82,7 +80,7 @@
  helper.o authbind.o:	authbind.h
  
