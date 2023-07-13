@@ -1,0 +1,21 @@
+--- ./Makefile.orig	2023-07-13 09:23:39.730623501 +0000
++++ ./Makefile	2023-07-13 09:24:03.930701438 +0000
+@@ -224,12 +224,12 @@
+ 	$(CONFIG_COMMAND)
+ 
+ install:
+-	mkdir -p $(PREFIX)/bin
+-	install -m 0755 o//blink/blink $(PREFIX)/bin/blink
+-	install -m 0755 o//blink/blinkenlights $(PREFIX)/bin/blinkenlights
+-	mkdir -p $(PREFIX)/share/man/man1
+-	install -m 0644 blink/blink.1 $(PREFIX)/share/man/man1/blink.1
+-	install -m 0644 blink/blinkenlights.1 $(PREFIX)/share/man/man1/blinkenlights.1
++	mkdir -p $(DESTDIR)$(PREFIX)/bin
++	install -m 0755 o//blink/blink $(DESTDIR)$(PREFIX)/bin/blink
++	install -m 0755 o//blink/blinkenlights $(DESTDIR)$(PREFIX)/bin/blinkenlights
++	mkdir -p $(DESTDIR)$(PREFIX)/share/man/man1
++	install -m 0644 blink/blink.1 $(DESTDIR)$(PREFIX)/share/man/man1/blink.1
++	install -m 0644 blink/blinkenlights.1 $(DESTDIR)$(PREFIX)/share/man/man1/blinkenlights.1
+ 
+ clean:
+ 	rm -f $(OBJS) o/$(MODE)/blink/blink o/$(MODE)/blink/blinkenlights o/$(MODE)/blink/blink.a o/$(MODE)/third_party/libz/zlib.a
