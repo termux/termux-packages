@@ -38,7 +38,7 @@ termux_step_post_make_install() {
 		$TERMUX_PKG_HOSTBUILD_DIR/debug/atuin gen-completions -s $sh -o completions/
 	done
 
-	install -Dm600 completions/atuin.bash $TERMUX_PREFIX/share/bash-completion/completions/atuin.bash
-	install -Dm600 completions/_atuin $TERMUX_PREFIX/share/zsh/site-functions/_atuin
-	install -Dm600 completions/atuin.fish $TERMUX_PREFIX/share/fish/vendor_completions.d/atuin.fish
+	install -Dm600 completions/atuin.bash $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/bash-completion/completions/atuin.bash
+	install -Dm600 completions/_atuin $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/zsh/site-functions/_atuin
+	install -Dm600 completions/atuin.fish $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/fish/vendor_completions.d/atuin.fish
 }
