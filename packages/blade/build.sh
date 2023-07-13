@@ -22,9 +22,9 @@ termux_step_pre_configure() {
 
 termux_step_make_install() {
 	pushd blade
-	install -Dm700 -t $TERMUX_PREFIX/bin blade
-	install -Dm600 -t $TERMUX_PREFIX/lib libblade.so
-	local sharedir=$TERMUX_PREFIX/share/blade
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin blade
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib libblade.so
+	local sharedir=$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/blade
 	mkdir -p $sharedir
 	cp -r benchmarks includes libs tests $sharedir/
 	popd
