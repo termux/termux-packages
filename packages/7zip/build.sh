@@ -46,12 +46,12 @@ termux_step_make() {
 
 termux_step_make_install() {
 	install -Dm0755 \
-		-t "$TERMUX_PREFIX"/bin \
+		-t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/bin \
 		"$TERMUX_PKG_BUILDDIR"/CPP/7zip/Bundles/Alone2/b/c/7zz
 	install -Dm0644 \
-		-t "$TERMUX_PREFIX"/share/doc/"$TERMUX_PKG_NAME" \
+		-t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/doc/"$TERMUX_PKG_NAME" \
 		"$TERMUX_PKG_BUILDDIR"/DOC/{7zC,7zFormat,lzma,Methods,readme,src-history}.txt
 	install -Dm0644 \
-		-t "$TERMUX_PREFIX"/share/LICENSES/"$TERMUX_PKG_NAME" \
+		-t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/LICENSES/"$TERMUX_PKG_NAME" \
 		"$TERMUX_PKG_BUILDDIR"/DOC/{copying,License}.txt
 }
