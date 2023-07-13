@@ -33,12 +33,12 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm700 $TERMUX_PKG_SRCDIR/dnote-server $TERMUX_PREFIX/bin/dnote-server
+	install -Dm700 $TERMUX_PKG_SRCDIR/dnote-server ${TERMUX_PKG_MASSAGEDIR}/$TERMUX_PREFIX/bin/dnote-server
 }
 
 termux_step_install_license() {
-	install -Dm600 -t "${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}" \
+	install -Dm600 -t "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}" \
 		"${TERMUX_PKG_SRCDIR}/licenses/AGPLv3.txt"
-	install -Dm600 -t "${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}" \
+	install -Dm600 -t "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}" \
 		"${TERMUX_PKG_SRCDIR}/LICENSE"
 }
