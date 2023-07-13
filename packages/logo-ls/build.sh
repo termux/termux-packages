@@ -20,7 +20,7 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm700 -t "${TERMUX_PREFIX}"/bin logo-ls
+	install -Dm700 -t "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}"/bin logo-ls
 }
 
 termux_step_create_debscripts() {                   
