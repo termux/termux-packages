@@ -10,11 +10,11 @@ TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {
-	install -Dm700 -t $TERMUX_PREFIX/bin vconfig
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin vconfig
 	local f
 	for f in network/{if-post-down.d/vlan,if-pre-up.d/vlan,if-up.d/ip}; do
-		install -Dm700 -T debian/${f} $TERMUX_PREFIX/etc/${f}
+		install -Dm700 -T debian/${f} $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/${f}
 	done
-	install -Dm600 -t $TERMUX_PREFIX/share/man/man5 debian/vlan-interfaces.5
-	install -Dm600 -t $TERMUX_PREFIX/share/man/man8 vconfig.8
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man5 debian/vlan-interfaces.5
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man8 vconfig.8
 }
