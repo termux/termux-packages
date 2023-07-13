@@ -40,11 +40,11 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm700 ./"${TERMUX_PKG_NAME}" "${TERMUX_PREFIX}"/bin
+	install -Dm700 ./"${TERMUX_PKG_NAME}" "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}"/bin
 
-	install -Dm644 /dev/null "${TERMUX_PREFIX}/share/bash-completion/completions/alist.bash"
-	install -Dm644 /dev/null "${TERMUX_PREFIX}/share/zsh/site-functions/_alist"
-	install -Dm644 /dev/null "${TERMUX_PREFIX}/share/fish/vendor_completions.d/alist.fish"
+	install -Dm644 /dev/null "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/share/bash-completion/completions/alist.bash"
+	install -Dm644 /dev/null "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/share/zsh/site-functions/_alist"
+	install -Dm644 /dev/null "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/share/fish/vendor_completions.d/alist.fish"
 }
 
 termux_step_create_debscripts() {
