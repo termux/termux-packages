@@ -25,12 +25,12 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm700 -t "${TERMUX_PREFIX}"/bin "$TERMUX_PKG_SRCDIR"/corgi
+	install -Dm700 -t "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}"/bin "$TERMUX_PKG_SRCDIR"/corgi
 }
 
 termux_step_post_make_install() {
-	mkdir -p "$TERMUX_PREFIX"/etc/profile.d
-	cat <<- EOF > "$TERMUX_PREFIX"/etc/profile.d/corgi.sh
+	mkdir -p "${TERMUX_PKG_MASSAGEDIR}/$TERMUX_PREFIX"/etc/profile.d
+	cat <<- EOF > "${TERMUX_PKG_MASSAGEDIR}/$TERMUX_PREFIX"/etc/profile.d/corgi.sh
 	#!$TERMUX_PREFIX/bin/sh
 	export HISTFILE=\$SHELL
 	EOF
