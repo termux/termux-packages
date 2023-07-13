@@ -29,10 +29,10 @@ termux_step_make() {
 termux_step_make_install() {
 	cd "$TERMUX_PKG_BUILDDIR/build/android-termux"
 	for f in bin/*; do
-		install -Dm700 -t $TERMUX_PREFIX/bin $f
+		install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin $f
 	done
 	for f in lib/*.a; do
-		install -Dm600 -t $TERMUX_PREFIX/lib $f
+		install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib $f
 	done
-	cp -a "$TERMUX_PKG_SRCDIR/include" $TERMUX_PREFIX/
+	cp -a "$TERMUX_PKG_SRCDIR/include" $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/
 }
