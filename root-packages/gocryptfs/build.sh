@@ -28,8 +28,8 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm700 -t $TERMUX_PREFIX/bin ./gocryptfs
-	install -Dm700 -t $TERMUX_PREFIX/bin ./gocryptfs-xray/gocryptfs-xray
-	install -Dm600 -t $TERMUX_PREFIX/share/man/man1 \
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin ./gocryptfs
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin ./gocryptfs-xray/gocryptfs-xray
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man1 \
 		./Documentation/gocryptfs{,-xray}.1
 }
