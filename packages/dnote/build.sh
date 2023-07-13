@@ -21,16 +21,16 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm700 $TERMUX_PKG_SRCDIR/dnote $TERMUX_PREFIX/bin/dnote
+	install -Dm700 $TERMUX_PKG_SRCDIR/dnote $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/dnote
 	install -Dm600 "$TERMUX_PKG_SRCDIR"/pkg/cli/dnote-completion.bash \
-		"$TERMUX_PREFIX"/share/bash-completion/completions/dnote
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/bash-completion/completions/dnote
 	install -Dm600 "$TERMUX_PKG_SRCDIR"/pkg/cli/dnote-completion.zsh \
-		"$TERMUX_PREFIX"/share/zsh/site-functions/_dnote
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/zsh/site-functions/_dnote
 }
 
 termux_step_install_license() {
-	install -Dm600 -t "${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}" \
+	install -Dm600 -t "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}" \
 		"${TERMUX_PKG_SRCDIR}/licenses/GPLv3.txt"
-	install -Dm600 -t "${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}" \
+	install -Dm600 -t "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}" \
 		"${TERMUX_PKG_SRCDIR}/LICENSE"
 }
