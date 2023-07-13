@@ -25,5 +25,5 @@ termux_step_post_make_install() {
 
 	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
 
-	install -Dm700 -t $TERMUX_PREFIX/bin target/${CARGO_TARGET_NAME}/release/tree-sitter
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin target/${CARGO_TARGET_NAME}/release/tree-sitter
 }
