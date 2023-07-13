@@ -9,5 +9,5 @@ TERMUX_PKG_DEPENDS="glib, gtk3, libvte, pango"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {
-	install -Dm700 -t $TERMUX_PREFIX/bin ./kermit
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin ./kermit
 }
