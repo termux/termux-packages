@@ -53,7 +53,7 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	local pkgconfig_dir=$TERMUX_PREFIX/lib/pkgconfig
+	local pkgconfig_dir=$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/pkgconfig
 	mkdir -p $pkgconfig_dir
 	sed \
 		-e "s|%prefix%|${TERMUX_PREFIX}|g" \
@@ -64,13 +64,13 @@ termux_step_make_install() {
 		-e 's|%NSPR_VERSION%|4.25|g' \
 		nss/pkg/pkg-config/nss.pc.in > $pkgconfig_dir/nss.pc
 	cd dist
-	install -Dm600 -t $TERMUX_PREFIX/include/nss public/nss/*
-	install -Dm600 -t $TERMUX_PREFIX/include/nss/private private/nss/*
-	install -Dm600 -t $TERMUX_PREFIX/include/dbm public/dbm/*
-	install -Dm600 -t $TERMUX_PREFIX/include/dbm/private private/dbm/*
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/nss public/nss/*
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/nss/private private/nss/*
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/dbm public/dbm/*
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/dbm/private private/dbm/*
 	pushd *.OBJ
-	install -Dm700 -t $TERMUX_PREFIX/bin bin/*
-	install -Dm600 -t $TERMUX_PREFIX/lib lib/*
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin bin/*
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib lib/*
 	for f in $_LIBNSS_SIGN_LIBS; do
 		if [ ! -e lib/$f ]; then
 			echo "ERROR: \"lib/$f\" not found."
