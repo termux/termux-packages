@@ -12,6 +12,6 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_MAKE_ARGS="T=" # In case if environment variable `T` is defined
 
 termux_step_make_install() {
-	install -Dm700 -t $TERMUX_PREFIX/bin "$TERMUX_PKG_BUILDDIR/stunclient"
-	install -Dm700 -t $TERMUX_PREFIX/bin "$TERMUX_PKG_BUILDDIR/stunserver"
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin "$TERMUX_PKG_BUILDDIR/stunclient"
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin "$TERMUX_PKG_BUILDDIR/stunserver"
 }
