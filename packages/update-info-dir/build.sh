@@ -9,8 +9,8 @@ TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {
-	install -Dm700 -t $TERMUX_PREFIX/bin update-info-dir
-	install -Dm600 -t $TERMUX_PREFIX/share/man/man8 update-info-dir.8
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin update-info-dir
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man8 update-info-dir.8
 }
 
 termux_step_create_debscripts() {
