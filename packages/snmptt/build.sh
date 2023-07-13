@@ -19,12 +19,12 @@ termux_step_pre_configure() {
 }
 
 termux_step_make_install() {
-	install -Dm700 -t $TERMUX_PREFIX/bin \
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin \
 		snmptt snmptt-net-snmp-test \
 		snmpttconvert snmpttconvertmib \
 		snmptthandler snmptthandler-embedded
-	install -Dm600 -t $TERMUX_PREFIX/share/snmptt/examples examples/*
-	install -Dm600 -t $TERMUX_PREFIX/etc/snmptt snmptt.ini
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/snmptt/examples examples/*
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/snmptt snmptt.ini
 	install -Dm600 -T examples/snmptt.conf.generic \
-		$TERMUX_PREFIX/etc/snmptt/snmptt.conf
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/snmptt/snmptt.conf
 }
