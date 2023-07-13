@@ -16,6 +16,6 @@ termux_step_make() {
 termux_step_make_install() {
 	install -Dm600 -T \
 		./build/Procyon.Decompiler/libs/procyon-decompiler-${TERMUX_PKG_VERSION}.jar \
-		$TERMUX_PREFIX/share/java/procyon-decompiler.jar
-	install -Dm700 -t $TERMUX_PREFIX/bin procyon-decompiler
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/java/procyon-decompiler.jar
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin procyon-decompiler
 }
