@@ -17,8 +17,8 @@ termux_step_make() {
 termux_step_make_install() {
 	local f
 	for f in openpgpkey sshfp tlsa; do
-		install -Dm700 -t $TERMUX_PREFIX/bin ${f}
-		install -Dm600 -t $TERMUX_PREFIX/share/man/man1 ${f}.1
+		install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin ${f}
+		install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man1 ${f}.1
 	done
 }
 
