@@ -16,5 +16,5 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm700 -T udpgw $TERMUX_PREFIX/bin/badvpn-udpgw
+	install -Dm700 -T udpgw $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/badvpn-udpgw
 }
