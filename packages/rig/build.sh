@@ -10,7 +10,7 @@ TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {
-	install -Dm700 -t $TERMUX_PREFIX/bin rig
-	install -Dm600 -t $TERMUX_PREFIX/share/man/man6 rig.6
-	install -Dm600 -t $TERMUX_PREFIX/share/rig data/*.idx
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin rig
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man6 rig.6
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/rig data/*.idx
 }
