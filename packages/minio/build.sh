@@ -31,5 +31,5 @@ termux_step_make() {
 	CGO_ENABLED=0 go build -tags kqueue -trimpath --ldflags="$MINIOLDFLAGS" -o minio
 }
 termux_step_make_install() {
-	install -Dm700 -t "${TERMUX_PREFIX}"/bin minio
+	install -Dm700 -t "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}"/bin minio
 }
