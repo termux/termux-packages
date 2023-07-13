@@ -16,12 +16,12 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm700 -t $TERMUX_PREFIX/bin target/${CARGO_TARGET_NAME}/release/csview
-	install -Dm600 -t $TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME README.*
-	install -Dm600 "completions/fish/csview.fish" "$TERMUX_PREFIX/share/fish/vendor_completions.d/csview.fish"
-	install -Dm600 "completions/zsh/_csview" "$TERMUX_PREFIX/share/zsh/site-functions/_csview"
-	install -Dm600 "completions/bash/csview.bash" "$TERMUX_PREFIX/share/bash-completion/completions/csview"
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin target/${CARGO_TARGET_NAME}/release/csview
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME README.*
+	install -Dm600 "completions/fish/csview.fish" "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/fish/vendor_completions.d/csview.fish"
+	install -Dm600 "completions/zsh/_csview" "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/zsh/site-functions/_csview"
+	install -Dm600 "completions/bash/csview.bash" "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/bash-completion/completions/csview"
 
 	# https://github.com/elves/elvish/issues/1564#issuecomment-1166333636
-	install -Dm600 "completions/elvish/csview.elv" -t $TERMUX_PREFIX/share/elvish/lib
+	install -Dm600 "completions/elvish/csview.elv" -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/elvish/lib
 }
