@@ -10,9 +10,9 @@ TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {
-	install -Dm700 -t $TERMUX_PREFIX/bin ani-cli
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin ani-cli
 
-	local mpv_android=$TERMUX_PREFIX/opt/ani-cli/bin/mpv
+	local mpv_android=$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/opt/ani-cli/bin/mpv
 	mkdir -p $(dirname $mpv_android)
 	rm -rf $mpv_android
 	sed 's|@TERMUX_PREFIX@|'"$TERMUX_PREFIX"'|g' \
