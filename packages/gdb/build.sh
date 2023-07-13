@@ -45,5 +45,5 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_make_install() {
-	install -Dm700 -t $TERMUX_PREFIX/bin gdbserver/gdbserver
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin gdbserver/gdbserver
 }
