@@ -225,9 +225,9 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm600 -t $TERMUX_PREFIX/lib \
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib \
 		$_TMP_LIBDIR/libandroid-{cutils,utils,base,ziparchive,fw}.so
-	install -Dm700 -t $TERMUX_PREFIX/bin \
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin \
 		$_TMP_BINDIR/{aapt,aapt2,zipalign,aidl}
 
 	# Create an android.jar with AndroidManifest.xml and resources.arsc:
