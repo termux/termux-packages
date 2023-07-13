@@ -31,6 +31,6 @@ termux_step_pre_configure() {
 }
 
 termux_step_make_install() {
-	install -Dm700 -t $TERMUX_PREFIX/bin output/bin/pika
-	install -Dm600 -t $TERMUX_PREFIX/share/pika conf/pika.conf
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin output/bin/pika
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/pika conf/pika.conf
 }
