@@ -17,15 +17,17 @@ termux_step_make() {
 	local SHARDS_VERSION=0.17.3
 	local MOLINILLO_VERSION=0.2.0
 	local MOLINILLO_URL=https://github.com/crystal-lang/crystal-molinillo/archive/v$MOLINILLO_VERSION.tar.gz
+	local MOLINILLO_TARFILE=$TERMUX_PKG_TMPDIR/crystal-molinillo-$MOLINILLO_VERSION.tar.gz
+	local MOLINILLO_SHA256=e231cf2411a6a11a1538983c7fb52b19e650acc3338bd3cdf6fdb13d6463861a
 
 	termux_setup_crystal
 
-	CC="$CC_FOR_BUILD" LLVM_CONFIG="$TERMUX_PREFIX/bin/llvm-config" \
-		make crystal target=$TERMUX_HOST_PLATFORM release=1 FLAGS=-Dwithout_iconv
+	# CC="$CC_FOR_BUILD" LLVM_CONFIG="$TERMUX_PREFIX/bin/llvm-config" \
+	# 	make crystal target=$TERMUX_HOST_PLATFORM release=1 FLAGS=-Dwithout_iconv
 
-	$CC .build/crystal.o -o .build/crystal $LDFLAGS -rdynamic src/llvm/ext/llvm_ext.o \
-		$("$TERMUX_PREFIX/bin/llvm-config" --libs --system-libs --ldflags 2> /dev/null) \
-		-lstdc++ -lpcre2-8 -lm -lgc -levent -ldl
+	# $CC .build/crystal.o -o .build/crystal $LDFLAGS -rdynamic src/llvm/ext/llvm_ext.o \
+	# 	$("$TERMUX_PREFIX/bin/llvm-config" --libs --system-libs --ldflags 2> /dev/null) \
+	# 	-lstdc++ -lpcre2-8 -lm -lgc -levent -ldl
 
 	git clone --depth 1 --single-branch \
 		--branch v$SHARDS_VERSION \
@@ -33,7 +35,8 @@ termux_step_make() {
 
 	cd shards
 	mkdir -p lib/molinillo
-	curl -L "$MOLINILLO_URL" | tar -xzf - -C lib/molinillo --strip-components=1
+	termux_download "$MOLINILLO_URL" "$MOLINILLO_TARFILE" "$MOLINILLO_SHA256"
+	tar xzf "$MOLINILLO_TARFILE" --strip-components=1 -C lib/molinillo
 	CC="$CC_FOR_BUILD" make SHARDS=false release=1 \
 		FLAGS="--cross-compile --target aarch64-linux-android -Dwithout_iconv"
 	$CC bin/shards.o -o bin/shards $LDFLAGS -rdynamic \
