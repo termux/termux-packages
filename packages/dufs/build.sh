@@ -15,11 +15,11 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_make_install() {
-	install -Dm755 -t $TERMUX_PREFIX/bin target/${CARGO_TARGET_NAME}/release/dufs
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin target/${CARGO_TARGET_NAME}/release/dufs
 
-	install -Dm644 /dev/null "$TERMUX_PREFIX"/share/bash-completion/completions/dufs
-	install -Dm644 /dev/null "$TERMUX_PREFIX"/share/zsh/site-functions/_dufs
-	install -Dm644 /dev/null "$TERMUX_PREFIX"/share/fish/vendor_completions.d/dufs.fish
+	install -Dm644 /dev/null "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/bash-completion/completions/dufs
+	install -Dm644 /dev/null "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/zsh/site-functions/_dufs
+	install -Dm644 /dev/null "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/fish/vendor_completions.d/dufs.fish
 }
 
 termux_step_create_debscripts() {
