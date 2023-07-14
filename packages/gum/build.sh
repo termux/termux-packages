@@ -17,12 +17,12 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm755 -t "${TERMUX_PREFIX}/bin" "${TERMUX_PKG_SRCDIR}/gum"
+	install -Dm700 -t "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/bin" "${TERMUX_PKG_SRCDIR}/gum"
 
-	install -Dm644 /dev/null $TERMUX_PREFIX/share/man/man1/gum.1
-	install -Dm644 /dev/null $TERMUX_PREFIX/share/bash-completion/completions/gum
-	install -Dm644 /dev/null $TERMUX_PREFIX/share/zsh/site-functions/_gum
-	install -Dm644 /dev/null $TERMUX_PREFIX/share/fish/vendor_completions.d/gum.fish
+	install -Dm644 /dev/null $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man1/gum.1
+	install -Dm644 /dev/null $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/bash-completion/completions/gum
+	install -Dm644 /dev/null $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/zsh/site-functions/_gum
+	install -Dm644 /dev/null $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/fish/vendor_completions.d/gum.fish
 }
 
 termux_step_create_debscripts() {
