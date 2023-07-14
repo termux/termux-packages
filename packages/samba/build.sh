@@ -152,12 +152,12 @@ termux_step_make_install() {
 }
 
 termux_step_post_make_install() {
-	install -Dm700 -t "$TERMUX_PREFIX/bin" \
+	install -Dm700 -t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin" \
 		"$TERMUX_PKG_SRCDIR/examples/scripts/nmb/findsmb"
-	mkdir -p "$TERMUX_PREFIX/share/doc/samba"
+	mkdir -p "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/doc/samba"
 	sed -e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
 		"$TERMUX_PKG_BUILDER_DIR/smb.conf.example.in" \
-		> "$TERMUX_PREFIX/share/doc/samba/smb.conf.example"
+		> "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/doc/samba/smb.conf.example"
 }
 
 termux_step_post_massage() {
