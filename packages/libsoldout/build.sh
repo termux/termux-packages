@@ -15,11 +15,11 @@ termux_step_configure() {
 }
 
 termux_step_make_install() {
-	install -dm700 "$TERMUX_PREFIX"/{lib,bin,include/$TERMUX_PKG_NAME,share/{doc/$TERMUX_PKG_NAME,man/man{1,3}}}
-	install -pm600 -t "$TERMUX_PREFIX"/share/doc/"$TERMUX_PKG_NAME" README CHANGES
-	install -pm600 -t "$TERMUX_PREFIX/share/man/man3" *.3
-	install -pm600 -t "$TERMUX_PREFIX/share/man/man1" *.1
-	install -pm600 -t "$TERMUX_PREFIX/include/$TERMUX_PKG_NAME" *.h
-	install -pm700 -t "$TERMUX_PREFIX/lib" libsoldout.{a,so,so.*}
-	install -pm700 -t "$TERMUX_PREFIX/bin" mkd2{html,latex,man}
+	install -dm700 "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/{lib,bin,include/$TERMUX_PKG_NAME,share/{doc/$TERMUX_PKG_NAME,man/man{1,3}}}
+	install -pm600 -t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/doc/"$TERMUX_PKG_NAME" README CHANGES
+	install -pm600 -t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man3" *.3
+	install -pm600 -t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man1" *.1
+	install -pm600 -t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/$TERMUX_PKG_NAME" *.h
+	install -pm700 -t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib" libsoldout.{a,so,so.*}
+	install -pm700 -t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin" mkd2{html,latex,man}
 }
