@@ -19,6 +19,6 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm755 -t $TERMUX_PREFIX/bin/ npush
-	install -Dm644 -t $TERMUX_PREFIX/share/npush/levels levels/* 
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/ npush
+	install -Dm644 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/npush/levels levels/*
 }
