@@ -17,13 +17,13 @@ termux_step_make() {
 
 termux_step_post_make_install() {
 	install -Dm700 "$TERMUX_PKG_SRCDIR/exercism/exercism" \
-		"$TERMUX_PREFIX/bin/exercism"
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/exercism"
 
 	# shell completions
 	install -Dm644 "$TERMUX_PKG_SRCDIR/shell/exercism_completion.bash" \
-		"$TERMUX_PREFIX"/share/bash-completion/completions/exercism
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/bash-completion/completions/exercism
 	install -Dm644 "$TERMUX_PKG_SRCDIR/shell/exercism_completion.zsh" \
-		"$TERMUX_PREFIX"/share/zsh/site-functions/_exercism
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/zsh/site-functions/_exercism
 	install -Dm644 "$TERMUX_PKG_SRCDIR/shell/exercism.fish" \
-		"$TERMUX_PREFIX"/share/fish/vendor_completions.d/exercism.fish
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/fish/vendor_completions.d/exercism.fish
 }
