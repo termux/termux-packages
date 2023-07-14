@@ -1,5 +1,5 @@
---- ./Makefile.orig	2021-11-12 18:58:14.000000000 +0000
-+++ ./Makefile	2022-03-11 12:00:02.007006320 +0000
+--- ../work/Makefile	2021-11-12 18:58:14.000000000 +0000
++++ ./Makefile	2023-07-14 08:15:21.116028772 +0000
 @@ -1,19 +1,15 @@
 -ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
 -       CFLAGS=-O0 -fno-builtin-malloc -g -Wall -DUSE_SEMAPHORE -fPIC
@@ -11,10 +11,13 @@
  LIBS= -lpthread
  
 -prefix=$(DESTDIR)/usr
-+prefix?=$(DESTDIR)/usr
- BIN_INSTALL_DIR= $(prefix)/bin
- LIB_INSTALL_DIR= $(prefix)/lib
- MAN_INSTALL_DIR= $(prefix)/share/man/man3
+-BIN_INSTALL_DIR= $(prefix)/bin
+-LIB_INSTALL_DIR= $(prefix)/lib
+-MAN_INSTALL_DIR= $(prefix)/share/man/man3
++prefix?=/usr
++BIN_INSTALL_DIR= $(DESTDIR)$(prefix)/bin
++LIB_INSTALL_DIR= $(DESTDIR)$(prefix)/lib
++MAN_INSTALL_DIR= $(DESTDIR)$(prefix)/share/man/man3
  
  
 -CC= cc
