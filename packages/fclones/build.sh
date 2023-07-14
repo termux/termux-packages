@@ -17,5 +17,5 @@ termux_step_make_install() {
 		--locked \
 		--no-track \
 		--target $CARGO_TARGET_NAME \
-		--root $TERMUX_PREFIX
+		--root $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX
 }
