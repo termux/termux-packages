@@ -20,7 +20,7 @@ termux_step_make_install() {
 	termux_setup_golang
 
 	TERMUX_GOLANG_DIRNAME=${GOOS}_$GOARCH
-	TERMUX_GODIR=$TERMUX_PREFIX/lib/go
+	TERMUX_GODIR=$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/go
 	local LINKER=/system/bin/linker
 	if [ "${TERMUX_ARCH}" == "x86_64" ] || [ "${TERMUX_ARCH}" == "aarch64" ]; then
 		LINKER+=64
