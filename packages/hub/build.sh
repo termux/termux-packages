@@ -39,8 +39,8 @@ termux_step_make() {
 
 termux_step_make_install() {
 	cd "${GOPATH}/src/github.com/github/hub"
-	install -Dm700 ./bin/hub "$TERMUX_PREFIX"/bin/hub
+	install -Dm700 ./bin/hub "${TERMUX_PKG_MASSAGEDIR}/$TERMUX_PREFIX"/bin/hub
 
-	install -D -m 600 -t "$TERMUX_PREFIX"/share/man/man1 \
+	install -D -m 600 -t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/man/man1 \
 		"$TERMUX_PKG_HOSTBUILD_DIR"/gopath/src/github.com/github/hub/share/man/man1/*.1
 }
