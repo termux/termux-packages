@@ -22,6 +22,6 @@ termux_step_make_install() {
 	termux_setup_cargo_c
 	cargo cinstall \
 		--target $CARGO_TARGET_NAME \
-		--prefix $TERMUX_PREFIX \
+		--prefix $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX \
 		--jobs $TERMUX_MAKE_PROCESSES
 }
