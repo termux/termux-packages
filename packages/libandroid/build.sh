@@ -14,7 +14,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 termux_step_post_make_install() {
 	install -v -Dm644 \
 		"toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libandroid.so" \
-		"$TERMUX_PREFIX/lib/libandroid.so"
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/libandroid.so"
 }
 
 termux_step_create_debscripts() {
