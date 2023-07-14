@@ -42,20 +42,20 @@ termux_step_make() {
 termux_step_make_install() {
 	cd $TERMUX_PKG_SRCDIR/src
 
-	install -Dm755 -t $TERMUX_PREFIX/bin ../bin/{picolisp,pil}
-	install -Dm755 -t $TERMUX_PREFIX/lib/picolisp/bin ../bin/{balance,httpGate,psh,ssl,sysdefs-gen,vip,watchdog}
-	install -Dm644 -t $TERMUX_PREFIX/lib/picolisp ../{ext.l,lib.css,lib.l}
-	install -Dm644 -t $TERMUX_PREFIX/share/man/man1 ../man/man1/*.1
+	install -Dm755 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin ../bin/{picolisp,pil}
+	install -Dm755 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/picolisp/bin ../bin/{balance,httpGate,psh,ssl,sysdefs-gen,vip,watchdog}
+	install -Dm644 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/picolisp ../{ext.l,lib.css,lib.l}
+	install -Dm644 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man1 ../man/man1/*.1
 
-	install -d -m755 $TERMUX_PREFIX/lib/picolisp/lib
-	cp -r ../lib $TERMUX_PREFIX/lib/picolisp
-	cp -r ../loc $TERMUX_PREFIX/lib/picolisp
-	cp -r ../src $TERMUX_PREFIX/lib/picolisp
-	cp -r ../test $TERMUX_PREFIX/lib/picolisp
-	cp -r ../doc $TERMUX_PREFIX/lib/picolisp
-	cp -r ../img $TERMUX_PREFIX/lib/picolisp
+	install -d -m755 $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/picolisp/lib
+	cp -r ../lib $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/picolisp
+	cp -r ../loc $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/picolisp
+	cp -r ../src $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/picolisp
+	cp -r ../test $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/picolisp
+	cp -r ../doc $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/picolisp
+	cp -r ../img $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/picolisp
 
-	install -Dm644 ../lib/bash_completion $TERMUX_PREFIX/share/bash-completion/completions/pil
+	install -Dm644 ../lib/bash_completion $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/bash-completion/completions/pil
 }
 
 termux_step_create_debscripts() {
