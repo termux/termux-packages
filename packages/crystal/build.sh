@@ -22,12 +22,12 @@ termux_step_make() {
 
 	termux_setup_crystal
 
-	# CC="$CC_FOR_BUILD" LLVM_CONFIG="$TERMUX_PREFIX/bin/llvm-config" \
-	# 	make crystal target=$TERMUX_HOST_PLATFORM release=1 FLAGS=-Dwithout_iconv
+	CC="$CC_FOR_BUILD" LLVM_CONFIG="$TERMUX_PREFIX/bin/llvm-config" \
+		make crystal target=$TERMUX_HOST_PLATFORM release=1 FLAGS=-Dwithout_iconv
 
-	# $CC .build/crystal.o -o .build/crystal $LDFLAGS -rdynamic src/llvm/ext/llvm_ext.o \
-	# 	$("$TERMUX_PREFIX/bin/llvm-config" --libs --system-libs --ldflags 2> /dev/null) \
-	# 	-lstdc++ -lpcre2-8 -lm -lgc -levent -ldl
+	$CC .build/crystal.o -o .build/crystal $LDFLAGS -rdynamic src/llvm/ext/llvm_ext.o \
+		$("$TERMUX_PREFIX/bin/llvm-config" --libs --system-libs --ldflags 2> /dev/null) \
+		-lstdc++ -lpcre2-8 -lm -lgc -levent -ldl
 
 	git clone --depth 1 --single-branch \
 		--branch v$SHARDS_VERSION \
