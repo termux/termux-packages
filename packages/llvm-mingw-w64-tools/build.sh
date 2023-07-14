@@ -13,8 +13,8 @@ termux_step_configure() {
 }
 
 termux_step_make() {
-	mkdir -p $TERMUX_PREFIX/opt/llvm-mingw-w64
 	local _INSTALL_PREFIX=$TERMUX_PREFIX/opt/llvm-mingw-w64
+	mkdir -p $_INSTALL_PREFIX
 	local _INCLUDE_DIR="$_INSTALL_PREFIX/generic-w64-mingw32/include"
 
 	# Build gendef
@@ -22,9 +22,9 @@ termux_step_make() {
 	mkdir -p build && cd build
 	../configure --host=$TERMUX_HOST_PLATFORM --prefix="$_INSTALL_PREFIX"
 	make -j $TERMUX_MAKE_PROCESSES
-	make install-strip
-	mkdir -p "$_INSTALL_PREFIX/share/gendef"
-	install -m644 ../COPYING "$_INSTALL_PREFIX/share/gendef"
+	make install-strip DESTDIR="$TERMUX_PKG_MASSAGEDIR"
+	mkdir -p "$TERMUX_PKG_MASSAGEDIR/$_INSTALL_PREFIX/share/gendef"
+	install -m644 ../COPYING "$TERMUX_PKG_MASSAGEDIR/$_INSTALL_PREFIX/share/gendef"
 	popd
 
 	# Build widl
@@ -35,36 +35,38 @@ termux_step_make() {
 				--target=x86_64-w64-mingw32 \
 				--with-widl-includedir="$_INCLUDE_DIR" 
 	make -j $TERMUX_MAKE_PROCESSES
-	make install-strip
-	mkdir -p "$_INSTALL_PREFIX/share/widl"
-	install -m644 ../../../COPYING "$_INSTALL_PREFIX/share/widl"
+	make install-strip DESTDIR="$TERMUX_PKG_MASSAGEDIR"
+	mkdir -p "$TERMUX_PKG_MASSAGEDIR/$_INSTALL_PREFIX/share/widl"
+	install -m644 ../../../COPYING "$TERMUX_PKG_MASSAGEDIR/$_INSTALL_PREFIX/share/widl"
 	popd
 
 	# The build above produced x86_64-w64-mingw32-widl, add symlinks to it
 	# with other prefixes.
 	local _arch
 	for _arch in aarch64 armv7 i686; do
-		ln -sf x86_64-w64-mingw32-widl $_INSTALL_PREFIX/bin/$_arch-w64-mingw32-widl
+		ln -sf x86_64-w64-mingw32-widl $TERMUX_PKG_MASSAGEDIR/$_INSTALL_PREFIX/bin/$_arch-w64-mingw32-widl
 	done
 	for _arch in aarch64 armv7 i686 x86_64; do
-		ln -sf x86_64-w64-mingw32-widl $_INSTALL_PREFIX/bin/$_arch-w64-mingw32uwp-widl
+		ln -sf x86_64-w64-mingw32-widl $TERMUX_PKG_MASSAGEDIR/$_INSTALL_PREFIX/bin/$_arch-w64-mingw32uwp-widl
 	done
 }
 
 termux_step_make_install() {
 	local _INSTALL_PREFIX=$TERMUX_PREFIX/opt/llvm-mingw-w64
-	mkdir -p $TERMUX_PREFIX/bin
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin
 
 	# Symlinks tools to $PREFIX/bin
 	local _tool
 	for _tool in gendef {aarch64,armv7,i686,x86_64}-w64-mingw32{,uwp}-widl; do
-		ln -sr $_INSTALL_PREFIX/bin/$_tool $TERMUX_PREFIX/bin/$_tool
+		ln -sr $_INSTALL_PREFIX/bin/$_tool $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/$_tool
 	done
 }
 
 termux_step_install_license() {
-	mkdir -p $TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME
 
-	cp $TERMUX_PREFIX/opt/llvm-mingw-w64/share/gendef/COPYING $TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME/COPYING-gendef
-	cp $TERMUX_PREFIX/opt/llvm-mingw-w64/share/widl/COPYING $TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME/COPYING-widl
+	cp $TERMUX_PREFIX/opt/llvm-mingw-w64/share/gendef/COPYING \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME/COPYING-gendef
+	cp $TERMUX_PREFIX/opt/llvm-mingw-w64/share/widl/COPYING \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME/COPYING-widl
 }
