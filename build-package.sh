@@ -75,6 +75,10 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_download.sh"
 # shellcheck source=scripts/build/setup/termux_setup_cargo_c.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_cargo_c.sh"
 
+# Utility function for setting up Crystal toolchain.
+# shellcheck source=scripts/build/setup/termux_setup_crystal.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_crystal.sh"
+
 # Utility function for setting up GHC toolchain.
 # shellcheck source=scripts/build/setup/termux_setup_ghc.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_ghc.sh"
