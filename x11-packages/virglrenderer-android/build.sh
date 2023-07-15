@@ -4,11 +4,12 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@licy183"
 TERMUX_PKG_VERSION=(0.10.4)
 TERMUX_PKG_VERSION+=(1.5.10) # libepoxy version
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=(https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/virglrenderer-${TERMUX_PKG_VERSION[0]}/virglrenderer-virglrenderer-${TERMUX_PKG_VERSION[0]}.tar.gz)
 TERMUX_PKG_SRCURL+=(https://github.com/anholt/libepoxy/archive/refs/tags/${TERMUX_PKG_VERSION[1]}.tar.gz)
 TERMUX_PKG_SHA256=(fd9a1b12473f4cda8d87e6ba1a6e5714a24355e16b69ed85df5c21bf48f797fa)
 TERMUX_PKG_SHA256+=(a7ced37f4102b745ac86d6a70a9da399cc139ff168ba6b8002b4d8d43c900c15)
+TERMUX_PKG_DEPENDS="angle-android"
 
 TERMUX_PKG_HOSTBUILD=true
 
@@ -66,8 +67,6 @@ termux_step_host_build() {
         -Degl_without_gbm=true \
         -Dplatforms=egl
 	ninja -C virglrenderer-build install -j $TERMUX_MAKE_PROCESSES
-
-	# TODO: Build angle?
 }
 
 termux_step_configure() {
@@ -80,7 +79,10 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	ln -sfr $TERMUX_PREFIX/opt/virglrenderer-android/bin/virgl_test_server $TERMUX_PREFIX/bin/virgl_test_server_android
+	sed "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
+		$TERMUX_PKG_BUILDER_DIR/virgl_test_server_android.in > \
+		$TERMUX_PREFIX/bin/virgl_test_server_android
+	chmod +x $TERMUX_PREFIX/bin/virgl_test_server_android
 }
 
 termux_step_install_license() {
