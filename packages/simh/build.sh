@@ -30,11 +30,11 @@ termux_step_make_install() {
 	for f in BIN/*; do
 		if [ -f "$f" ]; then
 			local b="$(basename "$f")"
-			install -Dm700 -T "$f" $TERMUX_PREFIX/bin/simh-"$b"
+			install -Dm700 -T "$f" $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/simh-"$b"
 		fi
 	done
 	for f in */*.bin; do
-		install -Dm600 -T "$f" $TERMUX_PREFIX/share/simh/"$f"
+		install -Dm600 -T "$f" $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/simh/"$f"
 	done
 	shopt -u nullglob
 }
