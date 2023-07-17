@@ -10,5 +10,5 @@ TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 
 termux_step_post_make_install() {
 	cd "$TERMUX_PKG_SRCDIR"
-	install -Dm600 -t $TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME README.*
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME README.*
 }
