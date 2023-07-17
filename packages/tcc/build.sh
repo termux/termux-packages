@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=6a24b762d3e1086dcffd002c68cb5ca3a33a5c6d
 _COMMIT_DATE=20230415
 TERMUX_PKG_VERSION=1:0.9.27-p${_COMMIT_DATE}
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://repo.or.cz/tinycc.git
 TERMUX_PKG_SHA256=467792219d0172f594ec71bcd6bac9dbb25308cbe9f708bab455b717148b491b
 TERMUX_PKG_GIT_BRANCH=mob
@@ -97,9 +98,10 @@ termux_step_make() {
 
 	rm -f tcc
 	make -j ${TERMUX_MAKE_PROCESSES} tcc
+}
 
-	make install
-
+termux_step_post_make_install() {
+	mkdir -p "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}"/lib/tcc/crt
 	for file in crtbegin_dynamic.o crtbegin_so.o crtend_android.o crtend_so.o; do
 		install -Dm600 \
 			"${TERMUX_STANDALONE_TOOLCHAIN}/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/$file" \
