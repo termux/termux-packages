@@ -8,6 +8,6 @@ TERMUX_PKG_SHA256=f73452aed80e2f9a7764883e9353aa7f40e65d3c199ad1f3be60fd58b58eaf
 TERMUX_PKG_CONFLICTS="moreutils"
 
 termux_step_post_make_install() {
-	install -Dm600 -t $TERMUX_PREFIX/share/man/man1 \
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man1 \
 		$TERMUX_PKG_SRCDIR/ts.1
 }
