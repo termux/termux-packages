@@ -105,6 +105,6 @@ termux_step_post_make_install() {
 	for file in crtbegin_dynamic.o crtbegin_so.o crtend_android.o crtend_so.o; do
 		install -Dm600 \
 			"${TERMUX_STANDALONE_TOOLCHAIN}/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/$file" \
-			"${TERMUX_PREFIX}/lib/tcc/crt/$file"
+			"${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/lib/tcc/crt/$file"
 	done
 }
