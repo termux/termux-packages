@@ -7,11 +7,12 @@ TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
 termux_step_make_install() {
-	mkdir -p $TERMUX_PREFIX/etc/apt/sources.list.d
-	echo "deb https://tur.kcubeterm.com tur-packages tur tur-on-device tur-continuous" > $TERMUX_PREFIX/etc/apt/sources.list.d/tur.list
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/apt/sources.list.d
+	echo "deb https://tur.kcubeterm.com tur-packages tur tur-on-device tur-continuous" > $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/apt/sources.list.d/tur.list
 	## tur gpg key
-	mkdir -p $TERMUX_PREFIX/etc/apt/trusted.gpg.d
-	install -Dm600 $TERMUX_PKG_BUILDER_DIR/tur.gpg $TERMUX_PREFIX/etc/apt/trusted.gpg.d/
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/apt/trusted.gpg.d
+	install -Dm600 $TERMUX_PKG_BUILDER_DIR/tur.gpg \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/apt/trusted.gpg.d/
 }
 
 termux_step_create_debscripts() {
