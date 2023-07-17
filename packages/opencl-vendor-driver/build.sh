@@ -23,8 +23,8 @@ TERMUX_PKG_SKIP_SRC_EXTRACT=true
 
 termux_step_make_install() {
 	echo "${TERMUX_PREFIX}/opt/vendor/lib/libOpenCL.so" > vendor.icd
-	install -Dm644 vendor.icd "${TERMUX_PREFIX}/etc/OpenCL/vendors/vendor.icd"
-	install -Dm644 /dev/null "${TERMUX_PREFIX}/opt/vendor/lib/libOpenCL.so"
+	install -Dm644 vendor.icd "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/etc/OpenCL/vendors/vendor.icd"
+	install -Dm644 /dev/null "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/opt/vendor/lib/libOpenCL.so"
 }
 
 termux_step_create_debscripts() {
