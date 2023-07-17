@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="SMB/CIFS fileserver"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=4.16.10
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://download.samba.org/pub/samba/samba-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=c077d698a2b871cf130afe2f6fa6aaf321a25eac611f22edae8a7f3e8c9c4d3f
 TERMUX_PKG_DEPENDS="krb5, libandroid-execinfo, libandroid-spawn, libbsd, libcap, libcrypt, libgnutls, libiconv, libicu, libpopt, libtalloc, libtasn1, libtirpc, ncurses, openssl, readline, tdb-tools, zlib"
@@ -162,10 +162,10 @@ termux_step_post_make_install() {
 
 termux_step_post_massage() {
 	# keep empty dirs which were deleted in massage
-	mkdir -p "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/var/lib/samba/bind-dns" "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/var/lib/samba/private"
+	mkdir -p "var/lib/samba/bind-dns" "var/lib/samba/private"
 	for dir in cache lock log run; do
-		mkdir -p "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/var/$dir/samba"
+		mkdir -p "var/$dir/samba"
 	done
 	# 755 - as opposed to 700 - because testparm throws up a warning otherwise
-	chmod 755 "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/var/lock/samba" "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/var/lib/samba" "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/var/cache/samba"
+	chmod 755 "var/lock/samba" "var/lib/samba" "var/cache/samba"
 }
