@@ -1,0 +1,18 @@
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1417,6 +1417,7 @@
+ bsdcat_test_LDADD=libarchive_fe.la
+ 
+ cat/test/list.h: Makefile
++	$(MKDIR_P) cat/test
+ 	cat $(top_srcdir)/cat/test/test_*.c | grep '^DEFINE_TEST' > cat/test/list.h
+ 
+ if BUILD_BSDCAT
+@@ -1520,6 +1521,7 @@
+ bsdunzip_test_LDADD=libarchive_fe.la
+ 
+ unzip/test/list.h: Makefile
++	$(MKDIR_P) unzip/test
+ 	cat $(top_srcdir)/unzip/test/test_*.c | grep '^DEFINE_TEST' > unzip/test/list.h
+ 
+ if BUILD_BSDUNZIP
