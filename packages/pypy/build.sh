@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@licy183"
 _MAJOR_VERSION=2.7
 TERMUX_PKG_VERSION=7.3.12
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://downloads.python.org/pypy/pypy$_MAJOR_VERSION-v$TERMUX_PKG_VERSION-src.tar.bz2
 TERMUX_PKG_SHA256=dd61d88da274c2ce2cec77667d4a3df9a652bcc50e26f90991d4dd0af66bccf4
 TERMUX_PKG_DEPENDS="gdbm, libandroid-posix-semaphore, libandroid-support, libbz2, libcrypt, libexpat, libffi, liblzma, libsqlite, ncurses, ncurses-ui-libs, openssl, zlib"
@@ -251,7 +252,7 @@ termux_step_make() {
 
 	# Build cffi imports
 	TARGET_CFLAGS="-I$TERMUX_PREFIX/include -Wno-incompatible-function-pointer-types -Wno-implicit-function-declaration"
-	TARGET_LDFLAGS="-L$TERMUX_PREFIX/lib -Wl,-rpath=$TERMUX_PREFIX/lib"
+	TARGET_LDFLAGS="-L$TERMUX_PREFIX/lib -fno-termux-rpath -Wl,-rpath=$TERMUX_PREFIX/lib"
 	$PROOT_TARGET env \
 				TERMUX_STANDALONE_TOOLCHAIN=$TERMUX_STANDALONE_TOOLCHAIN \
 				CFLAGS="$TARGET_CFLAGS" \
