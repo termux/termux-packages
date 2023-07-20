@@ -94,7 +94,7 @@ diff -uNr pypy2.7-v7.3.6-src/rpython/translator/platform/__init__.py pypy2.7-v7.
 +
 +def _update_link_flags_for_termux(ldflags):
 +    assert isinstance(ldflags, tuple)
-+    ldflags += ("-fopenmp", "-static-openmp",
++    ldflags += ("-fopenmp", "-static-openmp", "-fno-termux-rpath",
 +                "-Wl,--enable-new-dtags", "-Wl,--as-needed",
 +                "-Wl,-z,relro,-z,now", "-Wl,-rpath=@TERMUX_PREFIX@/lib", )
 +    return ldflags
