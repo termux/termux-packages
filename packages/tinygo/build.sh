@@ -4,18 +4,20 @@ TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.28.1"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=git+https://github.com/tinygo-org/tinygo
 TERMUX_PKG_GIT_BRANCH="v${TERMUX_PKG_VERSION}"
+TERMUX_PKG_SHA256=fbf83a67f5b0d57742616b7591b8de26cabd234cee3d27c800440f1b22f868ab
 TERMUX_PKG_DEPENDS="libc++, tinygo-common"
 TERMUX_PKG_RECOMMENDS="binaryen"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
-TERMUX_PKG_AUTO_UPDATE=true
 
 _LLVM_OPTION="
+-DCMAKE_BUILD_TYPE=MinSizeRel
 -DGENERATOR_IS_MULTI_CONFIG=ON
+-DLLVM_ENABLE_LTO=Thin
 -DLLVM_TABLEGEN=${TERMUX_PKG_HOSTBUILD_DIR}/bin/llvm-tblgen
 -DCLANG_TABLEGEN=${TERMUX_PKG_HOSTBUILD_DIR}/bin/clang-tblgen
 "
@@ -39,8 +41,18 @@ lib/libLLVMXRay.a
 "
 
 termux_step_post_get_source() {
+	# https://github.com/tinygo-org/tinygo/blob/release/Makefile
 	# https://github.com/espressif/llvm-project
 	make llvm-source GO=:
+
+	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum)
+	if [[ "${s}" != "${TERMUX_PKG_SHA256}  "* ]]; then
+		termux_error_exit "
+		Checksum mismatch for source files!
+		Expected = ${TERMUX_PKG_SHA256}
+		Actual   = ${s}
+		"
+	fi
 }
 
 termux_step_host_build() {
@@ -102,7 +114,7 @@ termux_step_make() {
 	termux_setup_ninja
 
 	# from packages/libllvm/build.sh
-	local _LLVM_DEFAULT_TARGET_TRIPLE=${CCTERMUX_HOST_PLATFORM/-/-unknown-}
+	local _LLVM_TARGET_TRIPLE=${TERMUX_HOST_PLATFORM/-/-unknown-}${TERMUX_PKG_API_LEVEL}
 	local _LLVM_TARGET_ARCH
 	case "${TERMUX_ARCH}" in
 		aarch64) _LLVM_TARGET_ARCH=AArch64 ;;
@@ -110,9 +122,10 @@ termux_step_make() {
 		i686|x86_64) _LLVM_TARGET_ARCH=X86 ;;
 		*) termux_error_exit "Invalid arch: ${TERMUX_ARCH}" ;;
 	esac
-
-	_LLVM_OPTION+=" -DLLVM_TARGET_ARCH=${_LLVM_TARGET_ARCH}"
-	_LLVM_OPTION+=" -DLLVM_HOST_TRIPLE=${_LLVM_DEFAULT_TARGET_TRIPLE}"
+	_LLVM_OPTION+="
+	-DLLVM_HOST_TRIPLE=${_LLVM_TARGET_TRIPLE}
+	-DLLVM_TARGET_ARCH=${_LLVM_TARGET_ARCH}
+	"
 
 	make llvm-build LLVM_OPTION="$(echo ${_LLVM_OPTION})"
 
@@ -140,17 +153,17 @@ termux_step_make() {
 
 	# check excessive runpath entries
 	local tinygo_readelf=$(readelf -dW build/release/tinygo/bin/tinygo)
-	local tinygo_runpath=$(echo "${tinygo_readelf}" | grep RUNPATH | sed -e "s|.*\[\(.*\)\]|\1|")
+	local tinygo_runpath=$(echo "${tinygo_readelf}" | sed -ne "s|.*RUNPATH.*\[\(.*\)\].*|\1|p")
 	if [[ "${tinygo_runpath}" != "${TERMUX_PREFIX}/lib" ]]; then
-		termux_error_exit <<- EOL
+		termux_error_exit "
 		Excessive RUNPATH found. Check readelf output below:
 		${tinygo_readelf}
-		EOL
+		"
 	fi
 }
 
 termux_step_make_install() {
 	mkdir -p "${TERMUX_PREFIX}/lib/tinygo"
 	cp -fr "${TERMUX_PKG_SRCDIR}/build/release/tinygo" "${TERMUX_PREFIX}/lib"
-	ln -sv "../lib/tinygo/bin/tinygo" "${TERMUX_PREFIX}/bin/tinygo"
+	ln -fsvT "../lib/tinygo/bin/tinygo" "${TERMUX_PREFIX}/bin/tinygo"
 }
