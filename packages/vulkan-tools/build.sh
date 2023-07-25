@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Vulkan Tools and Utilities"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # This package and vulkan-headers should be updated at same time. Otherwise, they do not compile successfully.
-TERMUX_PKG_VERSION="1.3.258"
+TERMUX_PKG_VERSION="1.3.259"
 TERMUX_PKG_SRCURL=https://github.com/KhronosGroup/Vulkan-Tools/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=6be802a3d933ba60b145c6c0d95062fec206db592206ec092c059951125251b1
+TERMUX_PKG_SHA256=7fd28fa6ac5f008902424fc5942008b54b793d2181ce56dc4cda6fe0199b3d42
 TERMUX_PKG_DEPENDS="libc++, libx11, libxcb, libwayland, vulkan-loader"
 TERMUX_PKG_BUILD_DEPENDS="libwayland-protocols, vulkan-headers (=${TERMUX_PKG_VERSION}), vulkan-loader-generic (=${TERMUX_PKG_VERSION})"
 TERMUX_PKG_AUTO_UPDATE=true
