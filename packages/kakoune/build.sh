@@ -2,13 +2,21 @@ TERMUX_PKG_HOMEPAGE=https://github.com/mawww/kakoune
 TERMUX_PKG_DESCRIPTION="Code editor heavily inspired by Vim"
 TERMUX_PKG_LICENSE="Unlicense"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2022.10.31"
+TERMUX_PKG_VERSION="2023.07.29"
 TERMUX_PKG_SRCURL=https://github.com/mawww/kakoune/releases/download/v$TERMUX_PKG_VERSION/kakoune-$TERMUX_PKG_VERSION.tar.bz2
-TERMUX_PKG_SHA256=fb317b62c9048ddc7567fe83dfc409c252ef85778b24bd2863be2762d4e4e58b
+TERMUX_PKG_SHA256=6a73782f3f791c4eede7ffbbfeec24370b3b62e519301120912736ac5bd789e2
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_MAKE_ARGS=" -C src debug=no "
+
+termux_step_pre_configure() {
+	# This patch should be no longer needed when NDK bumps to r26
+	local _file="$TERMUX_PKG_BUILDER_DIR/src-display_buffer.hh.patch"
+	if [ -f $_file && "$TERMUX_NDK_VERSION" != 25c ]; then
+		termux_error_exit "Please remove $_file"
+	fi
+}
 
 termux_step_create_debscripts() {
 	cat <<- EOF > ./postinst
