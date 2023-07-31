@@ -2,25 +2,25 @@ TERMUX_PKG_HOMEPAGE=https://github.com/termux/termux-x11
 TERMUX_PKG_DESCRIPTION="Termux X11 add-on application. Still in early development."
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Twaik Yont @twaik"
-TERMUX_PKG_VERSION=1.02.07
-TERMUX_PKG_SRCURL=https://github.com/termux/termux-x11/archive/62bf17ddf8a8cacd945f8ef3fa9e91cec42fa39c.tar.gz
-TERMUX_PKG_SHA256=9d9fcc0312304b2dc335454224f4b26768f927dff289472ef0a489099c223126
+TERMUX_PKG_VERSION=undefined
+TERMUX_PKG_SRCURL=https://github.com/termux/termux-x11/archive/05e5c98889adbbd9a1aaad72108b6dfdefdfa656.tar.gz
+TERMUX_PKG_SHA256=76a8d0a0f4d063d9685091c18292b7b2947424a7ed1b8491bdcc21e7d6d5d2c4
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="xkeyboard-config"
-_JDK_VERSION=11.0.19.7.1
-_GRADLE_VERSION=7.5
+_JDK_VERSION=17.0.7.7.1
+_GRADLE_VERSION=8.1.1
 
 termux_step_make() {
 	# Download and use a new enough gradle version to avoid the process hanging after running:
 	termux_download \
 		https://corretto.aws/downloads/resources/$_JDK_VERSION/amazon-corretto-$_JDK_VERSION-linux-x64.tar.gz \
 		$TERMUX_PKG_CACHEDIR/amazon-corretto-$_JDK_VERSION-linux-x64.tar.gz \
-		d3b7de2a0916da0d3826d980e9718a64932a160c33e8dfa6dbff2a91fef56976
+		8d23e0f1249f2852caa76b7ae8770847e005e4310a70a46b7c1a816c34ff9195
 	termux_download \
 		https://services.gradle.org/distributions/gradle-$_GRADLE_VERSION-all.zip \
 		$TERMUX_PKG_CACHEDIR/gradle-$_GRADLE_VERSION-all.zip \
-		97a52d145762adc241bad7fd18289bf7f6801e08ece6badf80402fe2b9f250b1
+		5625a0ae20fe000d9225d000b36909c7a0e0e8dda61c19b12da769add847c975
 	mkdir $TERMUX_PKG_TMPDIR/gradle
 	mkdir $TERMUX_PKG_TMPDIR/gradle-jdk
 	
