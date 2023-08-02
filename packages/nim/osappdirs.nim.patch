@@ -1,0 +1,12 @@
+diff '--color=auto' -ruN nim-2.0.0/lib/std/private/osappdirs.nim nim-2.0.0.mod/lib/std/private/osappdirs.nim
+--- nim-2.0.0/lib/std/private/osappdirs.nim     2023-08-01 11:01:01.000000000 +1000
++++ nim-2.0.0.mod/lib/std/private/osappdirs.nim 2023-08-02 21:24:16.860918174 +1000
+@@ -168,7 +168,7 @@
+           let buffer = newWideCString(size.int)
+           if getTempPath(size, buffer) > 0:
+             result = $buffer
+-      elif defined(android): result = "/data/local/tmp"
++      elif defined(android): result = "@TERMUX_PREFIX@/tmp"
+       else:
+         getTempDirImpl(result)
+     if result.len == 0:
