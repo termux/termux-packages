@@ -1,0 +1,64 @@
+From 41cdf31269fc0aafec7b37f6965dcc83e65b9dd4 Mon Sep 17 00:00:00 2001
+From: ailin-nemui <ailin-nemui@users.noreply.github.com>
+Date: Tue, 18 Jul 2023 22:05:28 +0000
+Subject: [PATCH] Merge pull request #1474 from ailin-nemui/perl5380
+
+fix usage of $type in ExtUtils::ParseXS 3.50
+
+(cherry picked from commit da49ec62e6cc949d3e5359b88abbd0b038d3e23a)
+---
+ src/perl/common/typemap | 2 +-
+ src/perl/irc/typemap    | 2 +-
+ src/perl/textui/typemap | 2 +-
+ src/perl/ui/typemap     | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/perl/common/typemap b/src/perl/common/typemap
+index 5b7e0c32..9b6c6668 100644
+--- a/src/perl/common/typemap
++++ b/src/perl/common/typemap
+@@ -28,5 +28,5 @@ T_IrssiObj
+ 	$arg = iobject_bless((SERVER_REC *)$var);
+ 
+ T_PlainObj
+-	$arg = plain_bless($var, \"$type\");
++	$arg = plain_bless($var, \"$ntype\");
+ 
+diff --git a/src/perl/irc/typemap b/src/perl/irc/typemap
+index 9bf87647..c8a9b678 100644
+--- a/src/perl/irc/typemap
++++ b/src/perl/irc/typemap
+@@ -36,5 +36,5 @@ T_DccObj
+ 	$arg = simple_iobject_bless((DCC_REC *)$var);
+ 
+ T_PlainObj
+-	$arg = plain_bless($var, \"$type\");
++	$arg = plain_bless($var, \"$ntype\");
+ 
+diff --git a/src/perl/textui/typemap b/src/perl/textui/typemap
+index 7710c2d2..e597c586 100644
+--- a/src/perl/textui/typemap
++++ b/src/perl/textui/typemap
+@@ -18,7 +18,7 @@ T_BufferLineWrapper
+ OUTPUT
+ 
+ T_PlainObj
+-	$arg = plain_bless($var, \"$type\");
++	$arg = plain_bless($var, \"$ntype\");
+ 
+ T_BufferLineWrapper
+ 	$arg = perl_buffer_line_bless($var);
+diff --git a/src/perl/ui/typemap b/src/perl/ui/typemap
+index 4afb273d..98355191 100644
+--- a/src/perl/ui/typemap
++++ b/src/perl/ui/typemap
+@@ -13,5 +13,5 @@ T_PlainObj
+ OUTPUT
+ 
+ T_PlainObj
+-	$arg = plain_bless($var, \"$type\");
++	$arg = plain_bless($var, \"$ntype\");
+ 
+-- 
+2.41.0
+
