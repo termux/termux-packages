@@ -1,6 +1,6 @@
-diff -uNr firefox-105.0.3/browser/moz.configure firefox-105.0.3.mod/browser/moz.configure
---- firefox-105.0.3/browser/moz.configure	2022-10-07 22:37:47.000000000 +0900
-+++ firefox-105.0.3.mod/browser/moz.configure	2022-10-15 22:21:38.317020036 +0900
+diff -uNr firefox-116.0.2/browser/moz.configure firefox-116.0.2.mod/browser/moz.configure
+--- firefox-116.0.2/browser/moz.configure	2023-08-07 13:57:14.000000000 +0800
++++ firefox-116.0.2.mod/browser/moz.configure	2023-08-09 07:45:54.642140496 +0800
 @@ -5,11 +5,11 @@
  # file, You can obtain one at http://mozilla.org/MPL/2.0/.
  
@@ -13,11 +13,11 @@ diff -uNr firefox-105.0.3/browser/moz.configure firefox-105.0.3.mod/browser/moz.
 -imply_option("MOZ_NORMANDY", True)
 +imply_option("MOZ_NORMANDY", False)
  
- with only_when(target_is_linux & compile_environment):
+ with only_when(target_has_linux_kernel & compile_environment):
      option(env="MOZ_NO_PIE_COMPAT", help="Enable non-PIE wrapper")
-diff -uNr firefox-105.0.3/build/autoconf/android.m4 firefox-105.0.3.mod/build/autoconf/android.m4
---- firefox-105.0.3/build/autoconf/android.m4	2022-10-07 22:37:47.000000000 +0900
-+++ firefox-105.0.3.mod/build/autoconf/android.m4	2022-10-15 09:48:55.153535797 +0900
+diff -uNr firefox-116.0.2/build/autoconf/android.m4 firefox-116.0.2.mod/build/autoconf/android.m4
+--- firefox-116.0.2/build/autoconf/android.m4	2023-08-07 13:57:14.000000000 +0800
++++ firefox-116.0.2.mod/build/autoconf/android.m4	2023-08-09 07:45:54.650140496 +0800
 @@ -6,7 +6,7 @@
  [
  
@@ -25,23 +25,23 @@ diff -uNr firefox-105.0.3/build/autoconf/android.m4 firefox-105.0.3.mod/build/au
 -*-android*|*-linuxandroid*)
 +no-android)
      dnl $extra_android_flags will be set for us by Python configure.
-     LDFLAGS="$extra_android_flags $LDFLAGS"
-     CPPFLAGS="$extra_android_flags $CPPFLAGS"
-diff -uNr firefox-105.0.3/build/moz.configure/init.configure firefox-105.0.3.mod/build/moz.configure/init.configure
---- firefox-105.0.3/build/moz.configure/init.configure	2022-10-08 00:40:07.000000000 +0900
-+++ firefox-105.0.3.mod/build/moz.configure/init.configure	2022-10-15 09:48:55.153535797 +0900
-@@ -466,7 +466,7 @@
-     # which presumably has a cleaner and leaner output. Let's refine later.
-     os = os.replace("/", "_")
+     dnl $_topsrcdir/build/android is a hack for versions of rustc < 1.68
+     LDFLAGS="$extra_android_flags -L$_topsrcdir/build/android $LDFLAGS"
+diff -uNr firefox-116.0.2/build/moz.configure/init.configure firefox-116.0.2.mod/build/moz.configure/init.configure
+--- firefox-116.0.2/build/moz.configure/init.configure	2023-08-07 13:57:14.000000000 +0800
++++ firefox-116.0.2.mod/build/moz.configure/init.configure	2023-08-09 07:45:54.650140496 +0800
+@@ -500,7 +500,7 @@
+     abi = None
+     sub_configure_alias = triplet
      if "android" in os:
 -        canonical_os = "Android"
 +        canonical_os = "GNU"
          canonical_kernel = "Linux"
      elif os.startswith("linux"):
          canonical_os = "GNU"
-diff -uNr firefox-105.0.3/build/moz.configure/pkg.configure firefox-105.0.3.mod/build/moz.configure/pkg.configure
---- firefox-105.0.3/build/moz.configure/pkg.configure	2022-10-07 22:37:47.000000000 +0900
-+++ firefox-105.0.3.mod/build/moz.configure/pkg.configure	2022-10-15 09:48:55.153535797 +0900
+diff -uNr firefox-116.0.2/build/moz.configure/pkg.configure firefox-116.0.2.mod/build/moz.configure/pkg.configure
+--- firefox-116.0.2/build/moz.configure/pkg.configure	2023-08-07 13:57:14.000000000 +0800
++++ firefox-116.0.2.mod/build/moz.configure/pkg.configure	2023-08-09 07:45:54.650140496 +0800
 @@ -56,7 +56,7 @@
  @imports(_from="os", _import="environ")
  @imports(_from="os", _import="pathsep")
@@ -51,10 +51,10 @@ diff -uNr firefox-105.0.3/build/moz.configure/pkg.configure firefox-105.0.3.mod/
          return namespace(
              PKG_CONFIG_PATH="",
              PKG_CONFIG_SYSROOT_DIR=sysroot_path,
-diff -uNr firefox-105.0.3/build/moz.configure/toolchain.configure firefox-105.0.3.mod/build/moz.configure/toolchain.configure
---- firefox-105.0.3/build/moz.configure/toolchain.configure	2022-10-08 00:40:07.000000000 +0900
-+++ firefox-105.0.3.mod/build/moz.configure/toolchain.configure	2022-10-15 17:25:19.398719772 +0900
-@@ -1175,7 +1175,7 @@
+diff -uNr firefox-116.0.2/build/moz.configure/toolchain.configure firefox-116.0.2.mod/build/moz.configure/toolchain.configure
+--- firefox-116.0.2/build/moz.configure/toolchain.configure	2023-08-07 13:57:13.000000000 +0800
++++ firefox-116.0.2.mod/build/moz.configure/toolchain.configure	2023-08-09 07:45:54.654140496 +0800
+@@ -1255,7 +1255,7 @@
      ):
          wrapper = list(compiler_wrapper or ())
          flags = []
@@ -63,7 +63,7 @@ diff -uNr firefox-105.0.3/build/moz.configure/toolchain.configure firefox-105.0.
              if host_or_target.kernel == "Darwin":
                  # While --sysroot and -isysroot are roughly equivalent, when not using
                  # -isysroot on mac, clang takes the SDKROOT environment variable into
-@@ -1763,17 +1761,7 @@
+@@ -1980,17 +1980,7 @@
  
  @depends(cxx_compiler, target)
  def needs_libstdcxx_newness_check(cxx_compiler, target):
@@ -82,10 +82,10 @@ diff -uNr firefox-105.0.3/build/moz.configure/toolchain.configure firefox-105.0.
  
  
  def die_on_old_libstdcxx():
-diff -uNr firefox-105.0.3/dom/media/CubebUtils.cpp firefox-105.0.3.mod/dom/media/CubebUtils.cpp
---- firefox-105.0.3/dom/media/CubebUtils.cpp	2022-10-08 00:40:07.000000000 +0900
-+++ firefox-105.0.3.mod/dom/media/CubebUtils.cpp	2022-10-15 21:46:22.863734976 +0900
-@@ -61,7 +61,7 @@
+diff -uNr firefox-116.0.2/dom/media/CubebUtils.cpp firefox-116.0.2.mod/dom/media/CubebUtils.cpp
+--- firefox-116.0.2/dom/media/CubebUtils.cpp	2023-08-07 13:57:15.000000000 +0800
++++ firefox-116.0.2.mod/dom/media/CubebUtils.cpp	2023-08-09 07:45:54.654140496 +0800
+@@ -57,7 +57,7 @@
  #define PREF_AUDIOIPC_STACK_SIZE "media.audioipc.stack_size"
  #define PREF_AUDIOIPC_SHM_AREA_SIZE "media.audioipc.shm_area_size"
  
@@ -94,10 +94,10 @@ diff -uNr firefox-105.0.3/dom/media/CubebUtils.cpp firefox-105.0.3.mod/dom/media
      defined(XP_MACOSX) || defined(XP_WIN)
  #  define MOZ_CUBEB_REMOTING
  #endif
-diff -uNr firefox-105.0.3/dom/media/moz.build firefox-105.0.3.mod/dom/media/moz.build
---- firefox-105.0.3/dom/media/moz.build	2022-10-08 00:40:07.000000000 +0900
-+++ firefox-105.0.3.mod/dom/media/moz.build	2022-10-15 21:24:09.117086889 +0900
-@@ -318,7 +318,7 @@
+diff -uNr firefox-116.0.2/dom/media/moz.build firefox-116.0.2.mod/dom/media/moz.build
+--- firefox-116.0.2/dom/media/moz.build	2023-08-07 13:57:15.000000000 +0800
++++ firefox-116.0.2.mod/dom/media/moz.build	2023-08-09 07:45:54.658140496 +0800
+@@ -323,7 +323,7 @@
      "XiphExtradata.cpp",
  ]
  
@@ -106,9 +106,9 @@ diff -uNr firefox-105.0.3/dom/media/moz.build firefox-105.0.3.mod/dom/media/moz.
      UNIFIED_SOURCES += ["UnderrunHandlerLinux.cpp"]
  else:
      UNIFIED_SOURCES += ["UnderrunHandlerNoop.cpp"]
-diff -uNr firefox-105.0.3/dom/media/systemservices/VideoEngine.cpp firefox-105.0.3.mod/dom/media/systemservices/VideoEngine.cpp
---- firefox-105.0.3/dom/media/systemservices/VideoEngine.cpp	2022-10-08 00:40:07.000000000 +0900
-+++ firefox-105.0.3.mod/dom/media/systemservices/VideoEngine.cpp	2022-10-15 09:48:55.153535797 +0900
+diff -uNr firefox-116.0.2/dom/media/systemservices/VideoEngine.cpp firefox-116.0.2.mod/dom/media/systemservices/VideoEngine.cpp
+--- firefox-116.0.2/dom/media/systemservices/VideoEngine.cpp	2023-08-07 13:57:15.000000000 +0800
++++ firefox-116.0.2.mod/dom/media/systemservices/VideoEngine.cpp	2023-08-09 07:45:54.658140496 +0800
 @@ -24,7 +24,7 @@
  #define LOG(args) MOZ_LOG(gVideoEngineLog, mozilla::LogLevel::Debug, args)
  #define LOG_ENABLED() MOZ_LOG_TEST(gVideoEngineLog, mozilla::LogLevel::Debug)
@@ -118,9 +118,9 @@ diff -uNr firefox-105.0.3/dom/media/systemservices/VideoEngine.cpp firefox-105.0
  int VideoEngine::SetAndroidObjects() {
    LOG(("%s", __PRETTY_FUNCTION__));
  
-diff -uNr firefox-105.0.3/dom/system/OSFileConstants.cpp firefox-105.0.3.mod/dom/system/OSFileConstants.cpp
---- firefox-105.0.3/dom/system/OSFileConstants.cpp	2022-10-08 00:25:40.000000000 +0900
-+++ firefox-105.0.3.mod/dom/system/OSFileConstants.cpp	2022-10-15 09:48:55.157535800 +0900
+diff -uNr firefox-116.0.2/dom/system/OSFileConstants.cpp firefox-116.0.2.mod/dom/system/OSFileConstants.cpp
+--- firefox-116.0.2/dom/system/OSFileConstants.cpp	2023-08-07 13:57:16.000000000 +0800
++++ firefox-116.0.2.mod/dom/system/OSFileConstants.cpp	2023-08-09 07:45:54.658140496 +0800
 @@ -32,7 +32,7 @@
  #  else
  #    include "sys/statvfs.h"
@@ -139,21 +139,54 @@ diff -uNr firefox-105.0.3/dom/system/OSFileConstants.cpp firefox-105.0.3.mod/dom
      // The size of |posix_spawn_file_actions_t|.
      {"OSFILE_SIZEOF_POSIX_SPAWN_FILE_ACTIONS_T",
       JS::Int32Value(sizeof(posix_spawn_file_actions_t))},
-diff -uNr firefox-105.0.3/ipc/chromium/src/base/lock_impl_posix.cc firefox-105.0.3.mod/ipc/chromium/src/base/lock_impl_posix.cc
---- firefox-105.0.3/ipc/chromium/src/base/lock_impl_posix.cc	2022-10-07 22:37:49.000000000 +0900
-+++ firefox-105.0.3.mod/ipc/chromium/src/base/lock_impl_posix.cc	2022-10-15 13:56:29.736757665 +0900
+diff -uNr firefox-116.0.2/ipc/chromium/src/base/lock_impl_posix.cc firefox-116.0.2.mod/ipc/chromium/src/base/lock_impl_posix.cc
+--- firefox-116.0.2/ipc/chromium/src/base/lock_impl_posix.cc	2023-08-07 13:57:17.000000000 +0800
++++ firefox-116.0.2.mod/ipc/chromium/src/base/lock_impl_posix.cc	2023-08-09 07:47:27.314140502 +0800
 @@ -22,7 +22,7 @@
  // Lock::PriorityInheritanceAvailable still must be checked as the code may
  // compile but the underlying platform still may not correctly support priority
  // inheritance locks.
--#if defined(OS_NACL) || defined(OS_ANDROID)
-+#if defined(OS_NACL) || defined(__TERMUX__)
+-#if defined(ANDROID)
++#if defined(ANDROID) || defined(__TERMUX__)
  #  define PRIORITY_INHERITANCE_LOCKS_POSSIBLE() 0
  #else
  #  define PRIORITY_INHERITANCE_LOCKS_POSSIBLE() 1
-diff -uNr firefox-105.0.3/memory/build/malloc_decls.h firefox-105.0.3.mod/memory/build/malloc_decls.h
---- firefox-105.0.3/memory/build/malloc_decls.h	2022-10-07 22:37:53.000000000 +0900
-+++ firefox-105.0.3.mod/memory/build/malloc_decls.h	2022-10-15 09:48:55.157535800 +0900
+diff -uNr firefox-116.0.2/js/src/ctypes/libffi/src/closures.c firefox-116.0.2.mod/js/src/ctypes/libffi/src/closures.c
+--- firefox-116.0.2/js/src/ctypes/libffi/src/closures.c	2023-08-07 13:57:18.000000000 +0800
++++ firefox-116.0.2.mod/js/src/ctypes/libffi/src/closures.c	2023-08-09 07:45:54.686140496 +0800
+@@ -112,7 +112,7 @@
+ #else /* !NetBSD with PROT_MPROTECT */
+ 
+ #if !FFI_MMAP_EXEC_WRIT && !FFI_EXEC_TRAMPOLINE_TABLE
+-# if __linux__ && !defined(__ANDROID__)
++# if __linux__ && !defined(__TERMUX__)
+ /* This macro indicates it may be forbidden to map anonymous memory
+    with both write and execute permission.  Code compiled when this
+    option is defined will attempt to map such pages once, but if it
+diff -uNr firefox-116.0.2/memory/build/Mutex.h firefox-116.0.2.mod/memory/build/Mutex.h
+--- firefox-116.0.2/memory/build/Mutex.h	2023-08-07 13:57:23.000000000 +0800
++++ firefox-116.0.2.mod/memory/build/Mutex.h	2023-08-09 07:45:54.662140496 +0800
+@@ -57,7 +57,7 @@
+     }
+ #elif defined(XP_DARWIN)
+     mMutex = OS_UNFAIR_LOCK_INIT;
+-#elif defined(XP_LINUX) && !defined(ANDROID)
++#elif defined(XP_LINUX) && !defined(__TERMUX__)
+     pthread_mutexattr_t attr;
+     if (pthread_mutexattr_init(&attr) != 0) {
+       return false;
+@@ -171,7 +171,7 @@
+ 
+ #  if defined(XP_DARWIN)
+ #    define STATIC_MUTEX_INIT OS_UNFAIR_LOCK_INIT
+-#  elif defined(XP_LINUX) && !defined(ANDROID)
++#  elif defined(XP_LINUX) && !defined(__TERMUX__)
+ #    define STATIC_MUTEX_INIT PTHREAD_ADAPTIVE_MUTEX_INITIALIZER_NP
+ #  else
+ #    define STATIC_MUTEX_INIT PTHREAD_MUTEX_INITIALIZER
+diff -uNr firefox-116.0.2/memory/build/malloc_decls.h firefox-116.0.2.mod/memory/build/malloc_decls.h
+--- firefox-116.0.2/memory/build/malloc_decls.h	2023-08-07 13:57:21.000000000 +0800
++++ firefox-116.0.2.mod/memory/build/malloc_decls.h	2023-08-09 07:45:54.662140496 +0800
 @@ -39,7 +39,7 @@
  // consistent declare certain functions as `throw()`, though.
  
@@ -163,30 +196,21 @@ diff -uNr firefox-105.0.3/memory/build/malloc_decls.h firefox-105.0.3.mod/memory
  #    undef NOTHROW_MALLOC_DECL
  #    define NOTHROW_MALLOC_DECL MALLOC_DECL
  // Some places don't care about the distinction.
-diff -uNr firefox-105.0.3/memory/build/Mutex.h firefox-105.0.3.mod/memory/build/Mutex.h
---- firefox-105.0.3/memory/build/Mutex.h	2022-10-08 00:40:08.000000000 +0900
-+++ firefox-105.0.3.mod/memory/build/Mutex.h	2022-10-15 09:48:55.157535800 +0900
-@@ -55,7 +55,7 @@
-     }
- #elif defined(XP_DARWIN)
-     mMutex = OS_UNFAIR_LOCK_INIT;
--#elif defined(XP_LINUX) && !defined(ANDROID)
-+#elif defined(XP_LINUX) && !defined(__TERMUX__)
-     pthread_mutexattr_t attr;
-     if (pthread_mutexattr_init(&attr) != 0) {
-       return false;
-@@ -169,7 +169,7 @@
+diff -uNr firefox-116.0.2/modules/zlib/src/gzguts.h firefox-116.0.2.mod/modules/zlib/src/gzguts.h
+--- firefox-116.0.2/modules/zlib/src/gzguts.h	2023-08-07 13:57:22.000000000 +0800
++++ firefox-116.0.2.mod/modules/zlib/src/gzguts.h	2023-08-09 07:45:54.690140496 +0800
+@@ -3,6 +3,8 @@
+  * For conditions of distribution and use, see copyright notice in zlib.h
+  */
  
- #  if defined(XP_DARWIN)
- #    define STATIC_MUTEX_INIT OS_UNFAIR_LOCK_INIT
--#  elif defined(XP_LINUX) && !defined(ANDROID)
-+#  elif defined(XP_LINUX) && !defined(__TERMUX__)
- #    define STATIC_MUTEX_INIT PTHREAD_ADAPTIVE_MUTEX_INITIALIZER_NP
- #  else
- #    define STATIC_MUTEX_INIT PTHREAD_MUTEX_INITIALIZER
-diff -uNr firefox-105.0.3/mozglue/misc/ConditionVariable_posix.cpp firefox-105.0.3.mod/mozglue/misc/ConditionVariable_posix.cpp
---- firefox-105.0.3/mozglue/misc/ConditionVariable_posix.cpp	2022-10-07 22:37:53.000000000 +0900
-+++ firefox-105.0.3.mod/mozglue/misc/ConditionVariable_posix.cpp	2022-10-15 23:45:03.008285261 +0900
++#include <unistd.h>
++
+ #ifdef _LARGEFILE64_SOURCE
+ #  ifndef _LARGEFILE_SOURCE
+ #    define _LARGEFILE_SOURCE 1
+diff -uNr firefox-116.0.2/mozglue/misc/ConditionVariable_posix.cpp firefox-116.0.2.mod/mozglue/misc/ConditionVariable_posix.cpp
+--- firefox-116.0.2/mozglue/misc/ConditionVariable_posix.cpp	2023-08-07 13:57:22.000000000 +0800
++++ firefox-116.0.2.mod/mozglue/misc/ConditionVariable_posix.cpp	2023-08-09 07:45:54.666140496 +0800
 @@ -23,7 +23,7 @@
  // Android 4.4 or earlier & macOS 10.12 has the clock functions, but not
  // pthread_condattr_setclock.
@@ -196,9 +220,9 @@ diff -uNr firefox-105.0.3/mozglue/misc/ConditionVariable_posix.cpp firefox-105.0
  #  define CV_USE_CLOCK_API
  #endif
  
-diff -uNr firefox-105.0.3/mozglue/misc/StackWalk.cpp firefox-105.0.3.mod/mozglue/misc/StackWalk.cpp
---- firefox-105.0.3/mozglue/misc/StackWalk.cpp	2022-10-08 00:25:41.000000000 +0900
-+++ firefox-105.0.3.mod/mozglue/misc/StackWalk.cpp	2022-10-15 09:48:55.157535800 +0900
+diff -uNr firefox-116.0.2/mozglue/misc/StackWalk.cpp firefox-116.0.2.mod/mozglue/misc/StackWalk.cpp
+--- firefox-116.0.2/mozglue/misc/StackWalk.cpp	2023-08-07 13:57:22.000000000 +0800
++++ firefox-116.0.2.mod/mozglue/misc/StackWalk.cpp	2023-08-09 07:45:54.670140496 +0800
 @@ -692,7 +692,7 @@
    stackEnd = __libc_stack_end;
  #    elif defined(XP_DARWIN)
@@ -208,9 +232,9 @@ diff -uNr firefox-105.0.3/mozglue/misc/StackWalk.cpp firefox-105.0.3.mod/mozglue
    pthread_attr_t sattr;
    pthread_attr_init(&sattr);
    pthread_getattr_np(pthread_self(), &sattr);
-diff -uNr firefox-105.0.3/nsprpub/pr/src/pthreads/ptsynch.c firefox-105.0.3.mod/nsprpub/pr/src/pthreads/ptsynch.c
---- firefox-105.0.3/nsprpub/pr/src/pthreads/ptsynch.c	2022-10-07 22:37:53.000000000 +0900
-+++ firefox-105.0.3.mod/nsprpub/pr/src/pthreads/ptsynch.c	2022-10-15 09:48:55.157535800 +0900
+diff -uNr firefox-116.0.2/nsprpub/pr/src/pthreads/ptsynch.c firefox-116.0.2.mod/nsprpub/pr/src/pthreads/ptsynch.c
+--- firefox-116.0.2/nsprpub/pr/src/pthreads/ptsynch.c	2023-08-07 13:57:22.000000000 +0800
++++ firefox-116.0.2.mod/nsprpub/pr/src/pthreads/ptsynch.c	2023-08-09 07:45:54.670140496 +0800
 @@ -953,7 +953,7 @@
  #if (defined(__GNU_LIBRARY__) && !defined(_SEM_SEMUN_UNDEFINED)) \
      || (defined(FREEBSD) && __FreeBSD_version < 1200059) \
@@ -220,9 +244,36 @@ diff -uNr firefox-105.0.3/nsprpub/pr/src/pthreads/ptsynch.c firefox-105.0.3.mod/
  /* union semun is defined by including <sys/sem.h> */
  #else
  /* according to X/OPEN we have to define it ourselves */
-diff -uNr firefox-105.0.3/toolkit/components/extensions/storage/moz.build firefox-105.0.3.mod/toolkit/components/extensions/storage/moz.build
---- firefox-105.0.3/toolkit/components/extensions/storage/moz.build	2022-10-07 22:38:01.000000000 +0900
-+++ firefox-105.0.3.mod/toolkit/components/extensions/storage/moz.build	2022-10-15 15:38:46.759393613 +0900
+diff -uNr firefox-116.0.2/nsprpub/pr/src/pthreads/ptthread.c firefox-116.0.2.mod/nsprpub/pr/src/pthreads/ptthread.c
+--- firefox-116.0.2/nsprpub/pr/src/pthreads/ptthread.c	2023-08-07 13:57:23.000000000 +0800
++++ firefox-116.0.2.mod/nsprpub/pr/src/pthreads/ptthread.c	2023-08-09 07:45:54.690140496 +0800
+@@ -37,6 +37,10 @@
+ #endif
+ #endif
+ 
++#if defined(_POSIX_THREAD_PRIORITY_SCHEDULING) && defined(__TERMUX__)
++#undef _POSIX_THREAD_PRIORITY_SCHEDULING
++#endif
++
+ /*
+  * Record whether or not we have the privilege to set the scheduling
+  * policy and priority of threads.  0 means that privilege is available.
+diff -uNr firefox-116.0.2/old-configure.in firefox-116.0.2.mod/old-configure.in
+--- firefox-116.0.2/old-configure.in	2023-08-07 13:57:23.000000000 +0800
++++ firefox-116.0.2.mod/old-configure.in	2023-08-09 07:45:54.694140496 +0800
+@@ -204,9 +204,6 @@
+     AC_MSG_CHECKING([for --noexecstack option to as])
+     _SAVE_CFLAGS=$CFLAGS
+     CFLAGS="$CFLAGS -Wa,--noexecstack"
+-    AC_TRY_COMPILE(,,AC_MSG_RESULT([yes])
+-                     [ASFLAGS="$ASFLAGS -Wa,--noexecstack"],
+-                     AC_MSG_RESULT([no]))
+     CFLAGS=$_SAVE_CFLAGS
+     AC_MSG_CHECKING([for -z noexecstack option to ld])
+     _SAVE_LDFLAGS=$LDFLAGS
+diff -uNr firefox-116.0.2/toolkit/components/extensions/storage/moz.build firefox-116.0.2.mod/toolkit/components/extensions/storage/moz.build
+--- firefox-116.0.2/toolkit/components/extensions/storage/moz.build	2023-08-07 13:57:31.000000000 +0800
++++ firefox-116.0.2.mod/toolkit/components/extensions/storage/moz.build	2023-08-09 07:45:54.674140496 +0800
 @@ -17,7 +17,7 @@
  # a delegate for consumers to use instead. Android Components can then provide
  # an implementation of the delegate that's backed by the Rust component. For
@@ -232,10 +283,11 @@ diff -uNr firefox-105.0.3/toolkit/components/extensions/storage/moz.build firefo
      EXPORTS.mozilla.extensions.storage += [
          "ExtensionStorageComponents.h",
      ]
---- a/toolkit/library/rust/shared/Cargo.toml
-+++ b/toolkit/library/rust/shared/Cargo.toml
-@@ -113,11 +113,12 @@
- # This happens to work around issues the older code has with 1.65.
+diff -uNr firefox-116.0.2/toolkit/library/rust/shared/Cargo.toml firefox-116.0.2.mod/toolkit/library/rust/shared/Cargo.toml
+--- firefox-116.0.2/toolkit/library/rust/shared/Cargo.toml	2023-08-07 13:57:32.000000000 +0800
++++ firefox-116.0.2.mod/toolkit/library/rust/shared/Cargo.toml	2023-08-09 07:45:54.674140496 +0800
+@@ -106,11 +106,12 @@
+ # Since we're building with at least rustc 1.63, enable rust 1.57 features (use of try_reserve methods).
  fallible_collections = { version = "0.4", features = ["rust_1_57"] }
  
 -[target.'cfg(not(target_os = "android"))'.dependencies]
@@ -249,9 +301,10 @@ diff -uNr firefox-105.0.3/toolkit/components/extensions/storage/moz.build firefo
  [target.'cfg(target_os = "windows")'.dependencies]
  detect_win32k_conflicts = { path = "../../../xre/detect_win32k_conflicts" }
  
---- a/toolkit/library/rust/shared/lib.rs
-+++ b/toolkit/library/rust/shared/lib.rs
-@@ -57,10 +57,8 @@
+diff -uNr firefox-116.0.2/toolkit/library/rust/shared/lib.rs firefox-116.0.2.mod/toolkit/library/rust/shared/lib.rs
+--- firefox-116.0.2/toolkit/library/rust/shared/lib.rs	2023-08-07 13:57:32.000000000 +0800
++++ firefox-116.0.2.mod/toolkit/library/rust/shared/lib.rs	2023-08-09 07:45:54.678140496 +0800
+@@ -52,10 +52,8 @@
  #[cfg(not(target_os = "android"))]
  extern crate webext_storage_bridge;
  
@@ -262,7 +315,7 @@ diff -uNr firefox-105.0.3/toolkit/components/extensions/storage/moz.build firefo
  mod reexport_tabs {
      tabs::uniffi_reexport_scaffolding!();
  }
-@@ -89,7 +87,6 @@
+@@ -84,7 +82,6 @@
  extern crate l10nregistry_ffi;
  extern crate localization_ffi;
  
@@ -270,10 +323,10 @@ diff -uNr firefox-105.0.3/toolkit/components/extensions/storage/moz.build firefo
  extern crate viaduct;
  
  extern crate gecko_logger;
-diff -uNr firefox-105.0.3/toolkit/moz.configure firefox-105.0.3.mod/toolkit/moz.configure
---- firefox-105.0.3/toolkit/moz.configure	2022-10-08 00:40:08.000000000 +0900
-+++ firefox-105.0.3.mod/toolkit/moz.configure	2022-10-18 01:42:19.379553089 +0900
-@@ -173,7 +173,7 @@
+diff -uNr firefox-116.0.2/toolkit/moz.configure firefox-116.0.2.mod/toolkit/moz.configure
+--- firefox-116.0.2/toolkit/moz.configure	2023-08-07 13:57:32.000000000 +0800
++++ firefox-116.0.2.mod/toolkit/moz.configure	2023-08-09 07:45:54.682140496 +0800
+@@ -172,7 +172,7 @@
  @depends(target)
  def midir_linux_support(target):
      return (
@@ -282,7 +335,7 @@ diff -uNr firefox-105.0.3/toolkit/moz.configure firefox-105.0.3.mod/toolkit/moz.
      )
  
  
-@@ -225,7 +225,7 @@
+@@ -231,7 +231,7 @@
  
  @depends("--enable-audio-backends", target)
  def imply_aaudio(values, target):
@@ -291,7 +344,7 @@ diff -uNr firefox-105.0.3/toolkit/moz.configure firefox-105.0.3.mod/toolkit/moz.
          die("Cannot enable AAudio on %s", target.os)
      return any("aaudio" in value for value in values) or None
  
-@@ -259,7 +259,7 @@
+@@ -265,7 +265,7 @@
  
  @depends("--enable-audio-backends", target)
  def imply_opensl(values, target):
@@ -300,7 +353,7 @@ diff -uNr firefox-105.0.3/toolkit/moz.configure firefox-105.0.3.mod/toolkit/moz.
          die("Cannot enable OpenSL on %s", target.os)
      return any("opensl" in value for value in values) or None
  
-@@ -2054,6 +2054,8 @@
+@@ -2188,6 +2188,8 @@
          set_config("MOZ_JPEG_CFLAGS", jpeg_flags.cflags)
          set_config("MOZ_JPEG_LIBS", jpeg_flags.ldflags)
  
@@ -309,7 +362,7 @@ diff -uNr firefox-105.0.3/toolkit/moz.configure firefox-105.0.3.mod/toolkit/moz.
      @depends("--with-system-jpeg", target, neon_flags)
      def in_tree_jpeg_arm(system_jpeg, target, neon_flags):
          if system_jpeg:
-@@ -2776,8 +2773,6 @@
+@@ -2973,8 +2975,6 @@
  # ==============================================================
  @depends(target)
  def oxidized_breakpad(target):
@@ -318,7 +371,7 @@ diff -uNr firefox-105.0.3/toolkit/moz.configure firefox-105.0.3.mod/toolkit/moz.
      return False
  
  
-@@ -2901,7 +2901,7 @@
+@@ -3076,7 +3076,7 @@
      "MOZ_NORMANDY",
  )
  def data_reporting(telemetry, healthreport, crashreporter, normandy):
@@ -327,7 +380,7 @@ diff -uNr firefox-105.0.3/toolkit/moz.configure firefox-105.0.3.mod/toolkit/moz.
  
  
  set_config("MOZ_DATA_REPORTING", True, when=data_reporting)
-@@ -2968,8 +2963,8 @@
+@@ -3182,8 +3182,8 @@
  
  # Enable runtime logging
  # ==============================================================
@@ -338,7 +391,7 @@ diff -uNr firefox-105.0.3/toolkit/moz.configure firefox-105.0.3.mod/toolkit/moz.
  
  # This will enable logging of addref, release, ctor, dtor.
  # ==============================================================
-@@ -3157,7 +3152,7 @@
+@@ -3373,7 +3373,7 @@
      option(
          env="MOZ_LINKER",
          default=depends(target.os, when="--enable-jemalloc")(
@@ -347,7 +400,7 @@ diff -uNr firefox-105.0.3/toolkit/moz.configure firefox-105.0.3.mod/toolkit/moz.
          ),
          help="{Enable|Disable} custom dynamic linker",
      )
-@@ -3189,7 +3184,7 @@
+@@ -3405,7 +3405,7 @@
          "Can't find header linux/joystick.h, needed for gamepad support."
          " Please install Linux kernel headers."
      ),
@@ -356,8 +409,9 @@ diff -uNr firefox-105.0.3/toolkit/moz.configure firefox-105.0.3.mod/toolkit/moz.
  )
  
  # Smart card support
---- a/toolkit/xre/glxtest/glxtest.cpp
-+++ b/toolkit/xre/glxtest/glxtest.cpp
+diff -uNr firefox-116.0.2/toolkit/xre/glxtest/glxtest.cpp firefox-116.0.2.mod/toolkit/xre/glxtest/glxtest.cpp
+--- firefox-116.0.2/toolkit/xre/glxtest/glxtest.cpp	2023-08-07 13:57:32.000000000 +0800
++++ firefox-116.0.2.mod/toolkit/xre/glxtest/glxtest.cpp	2023-08-09 07:45:54.682140496 +0800
 @@ -946,7 +946,9 @@
    log("GLX_TEST: childgltest start\n");
  
@@ -368,54 +422,3 @@ diff -uNr firefox-105.0.3/toolkit/moz.configure firefox-105.0.3.mod/toolkit/moz.
  
  #ifdef MOZ_WAYLAND
    if (aWayland) {
-diff -uNr firefox-105.0.3/js/src/ctypes/libffi/src/closures.c firefox-105.0.3.mod/js/src/ctypes/libffi/src/closures.c
---- firefox-105.0.3/js/src/ctypes/libffi/src/closures.c	2022-10-07 22:37:49.000000000 +0900
-+++ firefox-105.0.3.mod/js/src/ctypes/libffi/src/closures.c	2022-10-17 19:42:34.472896402 +0900
-@@ -112,7 +112,7 @@
- #else /* !NetBSD with PROT_MPROTECT */
- 
- #if !FFI_MMAP_EXEC_WRIT && !FFI_EXEC_TRAMPOLINE_TABLE
--# if __linux__ && !defined(__ANDROID__)
-+# if __linux__ && !defined(__TERMUX__)
- /* This macro indicates it may be forbidden to map anonymous memory
-    with both write and execute permission.  Code compiled when this
-    option is defined will attempt to map such pages once, but if it
-diff -uNr firefox-105.0.3/modules/zlib/src/gzguts.h firefox-105.0.3.mod/modules/zlib/src/gzguts.h
---- firefox-105.0.3/modules/zlib/src/gzguts.h	2022-10-07 22:37:53.000000000 +0900
-+++ firefox-105.0.3.mod/modules/zlib/src/gzguts.h	2022-10-17 23:15:15.124694789 +0900
-@@ -3,6 +3,8 @@
-  * For conditions of distribution and use, see copyright notice in zlib.h
-  */
- 
-+#include <unistd.h>
-+
- #ifdef _LARGEFILE64_SOURCE
- #  ifndef _LARGEFILE_SOURCE
- #    define _LARGEFILE_SOURCE 1
-diff -uNr firefox-105.0.3/nsprpub/pr/src/pthreads/ptthread.c firefox-105.0.3.mod/nsprpub/pr/src/pthreads/ptthread.c
---- firefox-105.0.3/nsprpub/pr/src/pthreads/ptthread.c	2022-10-07 22:37:53.000000000 +0900
-+++ firefox-105.0.3.mod/nsprpub/pr/src/pthreads/ptthread.c	2022-10-17 23:22:02.822992745 +0900
-@@ -37,6 +37,10 @@
- #endif
- #endif
- 
-+#if defined(_POSIX_THREAD_PRIORITY_SCHEDULING) && defined(__TERMUX__)
-+#undef _POSIX_THREAD_PRIORITY_SCHEDULING
-+#endif
-+
- /*
-  * Record whether or not we have the privilege to set the scheduling
-  * policy and priority of threads.  0 means that privilege is available.
-diff -uNr firefox-105.0.3/old-configure.in firefox-105.0.3.mod/old-configure.in
---- firefox-105.0.3/old-configure.in	2022-10-07 22:37:53.000000000 +0900
-+++ firefox-105.0.3.mod/old-configure.in	2022-10-18 11:44:37.005989967 +0900
-@@ -242,9 +242,6 @@
-     AC_MSG_CHECKING([for --noexecstack option to as])
-     _SAVE_CFLAGS=$CFLAGS
-     CFLAGS="$CFLAGS -Wa,--noexecstack"
--    AC_TRY_COMPILE(,,AC_MSG_RESULT([yes])
--                     [ASFLAGS="$ASFLAGS -Wa,--noexecstack"],
--                     AC_MSG_RESULT([no]))
-     CFLAGS=$_SAVE_CFLAGS
-     AC_MSG_CHECKING([for -z noexecstack option to ld])
-     _SAVE_LDFLAGS=$LDFLAGS
