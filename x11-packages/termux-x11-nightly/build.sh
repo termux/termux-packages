@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Termux X11 add-on application. Still in early developmen
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Twaik Yont @twaik"
 TERMUX_PKG_VERSION=1.03.00
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/termux/termux-x11/archive/05e5c98889adbbd9a1aaad72108b6dfdefdfa656.tar.gz
 TERMUX_PKG_SHA256=76a8d0a0f4d063d9685091c18292b7b2947424a7ed1b8491bdcc21e7d6d5d2c4
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
@@ -50,4 +51,11 @@ termux_step_make_install() {
 	cp $TERMUX_PKG_SRCDIR/termux-x11 $TERMUX_PREFIX/bin/termux-x11
 	cp $TERMUX_PKG_SRCDIR/shell-loader/build/outputs/apk/debug/shell-loader-debug.apk \
 		$TERMUX_PREFIX/libexec/termux-x11/loader.apk
+}
+
+termux_step_create_debscripts() {
+	cat <<- EOF > postinst
+		#!${TERMUX_PREFIX}/bin/sh
+		chmod -w $TERMUX_PREFIX/libexec/termux-x11/loader.apk
+	EOF
 }
