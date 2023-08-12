@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A rule-based tunnel in Go"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Philipp Schmitt <philipp@schmitt.co>"
 TERMUX_PKG_VERSION="1.17.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/Dreamacro/clash/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=cd30a27f801652151eea129e9cb00e4a3ee28d45982dad835f4546691796d9d7
 TERMUX_PKG_DEPENDS="resolv-conf"
