@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A Matrix-WhatsApp puppeting bridge"
 TERMUX_PKG_LICENSE="AGPL-V3"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.9.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/mautrix/whatsapp/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=95d3c82910bdaafcc4f3352bb2db013dbfda2ead61ca32f6993dbd6cf330fcf4
 TERMUX_PKG_DEPENDS="libolm"
