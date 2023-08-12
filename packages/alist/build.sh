@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="AGPL-V3"
 TERMUX_PKG_MAINTAINER="2096779623 <admin@utermux.dev>"
 TERMUX_PKG_VERSION=(3.25.1) # alist version
 TERMUX_PKG_VERSION+=(3.25.1) # alist-web version
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(https://github.com/alist-org/alist/archive/v${TERMUX_PKG_VERSION}.tar.gz
 		   https://github.com/alist-org/alist-web/releases/download/${TERMUX_PKG_VERSION[1]}/dist.tar.gz)
 TERMUX_PKG_SHA256=(d29ea9ea0bc0d6649a5cc4c589c977463cbf105ad7d5ad8fcfed3276520d3d4a
