@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A fast reverse proxy to expose a local server behind a N
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="2096779623 <admin@utermux.dev>"
 TERMUX_PKG_VERSION="0.51.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/fatedier/frp/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=23b8f91fc1f86feb2ef4e7af4cf509be46360e0d16c3f71036f7206394417ddb
 # Depend on its subpackages.
