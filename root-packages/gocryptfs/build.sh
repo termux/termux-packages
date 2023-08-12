@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="An encrypted overlay filesystem written in Go"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.4.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/rfjakob/gocryptfs/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=a36d47f546b7deb87e291066a09d324015dbada123de355f41d035ba7a9d6b2b
 TERMUX_PKG_DEPENDS="openssl"
