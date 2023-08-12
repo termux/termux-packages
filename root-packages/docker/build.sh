@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # v20.10.x is the last version confirmed to work.
 # Do not update it further unless you tested it on your device.
 TERMUX_PKG_VERSION=1:20.10.24
+TERMUX_PKG_REVISION=1
 LIBNETWORK_COMMIT=0d7f33e190f5c52414e18d7d76310554b704ba9c
 DOCKER_GITCOMMIT=297e128
 TERMUX_PKG_SRCURL=(https://github.com/moby/moby/archive/v${TERMUX_PKG_VERSION:2}.tar.gz
