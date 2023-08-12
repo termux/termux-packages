@@ -1,0 +1,180 @@
+From 6cdcc2a78208b1d30b37fb06780160fcad48aab4 Mon Sep 17 00:00:00 2001
+From: Matt Holt <mholt@users.noreply.github.com>
+Date: Wed, 9 Aug 2023 10:34:28 -0600
+Subject: [PATCH] ci: Update to Go 1.21 (#5719)
+
+* ci: Update to Go 1.21
+
+* Bump quic-go to v0.37.4
+
+* Check EnableFullDuplex err
+
+* Linter bug suppression
+
+See https://github.com/timakin/bodyclose/issues/52
+
+---------
+
+Co-authored-by: Francis Lavoie <lavofr@gmail.com>
+---
+ .github/workflows/ci.yml          | 6 +++---
+ .github/workflows/cross-build.yml | 6 +++---
+ .github/workflows/lint.yml        | 2 +-
+ .github/workflows/release.yml     | 6 +++---
+ go.mod                            | 2 +-
+ go.sum                            | 4 ++--
+ modules/caddyhttp/duplex_go120.go | 3 ++-
+ modules/caddyhttp/duplex_go121.go | 5 +++--
+ modules/caddyhttp/server.go       | 5 ++++-
+ 9 files changed, 22 insertions(+), 17 deletions(-)
+
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index 3ab72421d46..deebc7d7a98 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -24,7 +24,7 @@ jobs:
+           - windows-latest
+         go: 
+           - '1.20'
+-          # - '1.21'
++          - '1.21'
+ 
+         include:
+         # Set the minimum Go patch version for the given Go minor
+@@ -32,8 +32,8 @@ jobs:
+         - go: '1.20'
+           GO_SEMVER: '~1.20.6'
+ 
+-        # - go: '1.21'
+-        #   GO_SEMVER: '~1.21.0'
++        - go: '1.21'
++          GO_SEMVER: '~1.21.0'
+ 
+         # Set some variables per OS, usable via ${{ matrix.VAR }}
+         # CADDY_BIN_PATH: the path to the compiled Caddy binary, for artifact publishing
+diff --git a/.github/workflows/cross-build.yml b/.github/workflows/cross-build.yml
+index 4d04cfa7d06..678ac178b04 100644
+--- a/.github/workflows/cross-build.yml
++++ b/.github/workflows/cross-build.yml
+@@ -28,13 +28,13 @@ jobs:
+           - 'darwin'
+           - 'netbsd'
+         go: 
+-          - '1.20'
++          - '1.21'
+ 
+         include:
+         # Set the minimum Go patch version for the given Go minor
+         # Usable via ${{ matrix.GO_SEMVER }}
+-        - go: '1.20'
+-          GO_SEMVER: '~1.20.6'
++        - go: '1.21'
++          GO_SEMVER: '~1.21.0'
+ 
+     runs-on: ubuntu-latest
+     continue-on-error: true
+diff --git a/.github/workflows/lint.yml b/.github/workflows/lint.yml
+index 964e48f06e2..a2b569d05af 100644
+--- a/.github/workflows/lint.yml
++++ b/.github/workflows/lint.yml
+@@ -31,7 +31,7 @@ jobs:
+       - uses: actions/checkout@v3
+       - uses: actions/setup-go@v4
+         with:
+-          go-version: '~1.20.6'
++          go-version: '~1.21.0'
+           check-latest: true
+ 
+           # Workaround for https://github.com/golangci/golangci-lint-action/issues/135
+diff --git a/.github/workflows/release.yml b/.github/workflows/release.yml
+index 0e9e29ec5f6..ec9c97260f3 100644
+--- a/.github/workflows/release.yml
++++ b/.github/workflows/release.yml
+@@ -13,13 +13,13 @@ jobs:
+         os: 
+           - ubuntu-latest
+         go: 
+-          - '1.20'
++          - '1.21'
+ 
+         include:
+         # Set the minimum Go patch version for the given Go minor
+         # Usable via ${{ matrix.GO_SEMVER }}
+-        - go: '1.20'
+-          GO_SEMVER: '~1.20.6'
++        - go: '1.21'
++          GO_SEMVER: '~1.21.0'
+ 
+     runs-on: ${{ matrix.os }}
+     # https://github.com/sigstore/cosign/issues/1258#issuecomment-1002251233
+diff --git a/go.mod b/go.mod
+index 78c354e63ab..f2a1cd671d8 100644
+--- a/go.mod
++++ b/go.mod
+@@ -17,7 +17,7 @@ require (
+ 	github.com/mastercactapus/proxyprotocol v0.0.4
+ 	github.com/mholt/acmez v1.2.0
+ 	github.com/prometheus/client_golang v1.14.0
+-	github.com/quic-go/quic-go v0.37.3
++	github.com/quic-go/quic-go v0.37.4
+ 	github.com/smallstep/certificates v0.24.3-rc.5
+ 	github.com/smallstep/nosql v0.6.0
+ 	github.com/smallstep/truststore v0.12.1
+diff --git a/go.sum b/go.sum
+index 245a07d6d25..daa4bdc4f7a 100644
+--- a/go.sum
++++ b/go.sum
+@@ -863,8 +863,8 @@ github.com/quic-go/qpack v0.4.0 h1:Cr9BXA1sQS2SmDUWjSofMPNKmvF6IiIfDRmgU0w1ZCo=
+ github.com/quic-go/qpack v0.4.0/go.mod h1:UZVnYIfi5GRk+zI9UMaCPsmZ2xKJP7XBUvVyT1Knj9A=
+ github.com/quic-go/qtls-go1-20 v0.3.1 h1:O4BLOM3hwfVF3AcktIylQXyl7Yi2iBNVy5QsV+ySxbg=
+ github.com/quic-go/qtls-go1-20 v0.3.1/go.mod h1:X9Nh97ZL80Z+bX/gUXMbipO6OxdiDi58b/fMC9mAL+k=
+-github.com/quic-go/quic-go v0.37.3 h1:pkHH3xaMNUNAh6OtgEV/0K6Fz+YIJXhPzgd/ShiRDm4=
+-github.com/quic-go/quic-go v0.37.3/go.mod h1:YsbH1r4mSHPJcLF4k4zruUkLBqctEMBDR6VPvcYjIsU=
++github.com/quic-go/quic-go v0.37.4 h1:ke8B73yMCWGq9MfrCCAw0Uzdm7GaViC3i39dsIdDlH4=
++github.com/quic-go/quic-go v0.37.4/go.mod h1:YsbH1r4mSHPJcLF4k4zruUkLBqctEMBDR6VPvcYjIsU=
+ github.com/rcrowley/go-metrics v0.0.0-20181016184325-3113b8401b8a/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=
+ github.com/rogpeppe/fastuuid v0.0.0-20150106093220-6724a57986af/go.mod h1:XWv6SoW27p1b0cqNHllgS5HIMJraePCO15w5zCzIWYg=
+ github.com/rogpeppe/fastuuid v1.1.0/go.mod h1:jVj6XXZzXRy/MSR5jhDC/2q6DgLz+nrA6LYCDYWNEvQ=
+diff --git a/modules/caddyhttp/duplex_go120.go b/modules/caddyhttp/duplex_go120.go
+index 462f2c0c151..065ccf2824e 100644
+--- a/modules/caddyhttp/duplex_go120.go
++++ b/modules/caddyhttp/duplex_go120.go
+@@ -20,6 +20,7 @@ import (
+ 	"net/http"
+ )
+ 
+-func enableFullDuplex(w http.ResponseWriter) {
++func enableFullDuplex(w http.ResponseWriter) error {
+ 	// Do nothing, Go 1.20 and earlier do not support full duplex
++	return nil
+ }
+diff --git a/modules/caddyhttp/duplex_go121.go b/modules/caddyhttp/duplex_go121.go
+index 4f3851c12de..a17d3afe738 100644
+--- a/modules/caddyhttp/duplex_go121.go
++++ b/modules/caddyhttp/duplex_go121.go
+@@ -20,6 +20,7 @@ import (
+ 	"net/http"
+ )
+ 
+-func enableFullDuplex(w http.ResponseWriter) {
+-	http.NewResponseController(w).EnableFullDuplex()
++func enableFullDuplex(w http.ResponseWriter) error {
++	//nolint:bodyclose
++	return http.NewResponseController(w).EnableFullDuplex()
+ }
+diff --git a/modules/caddyhttp/server.go b/modules/caddyhttp/server.go
+index b31e6e52936..daef7770e5b 100644
+--- a/modules/caddyhttp/server.go
++++ b/modules/caddyhttp/server.go
+@@ -291,7 +291,10 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+ 	if s.EnableFullDuplex {
+ 		// TODO: Remove duplex_go12*.go abstraction once our
+ 		// minimum Go version is 1.21 or later
+-		enableFullDuplex(w)
++		err := enableFullDuplex(w)
++		if err != nil {
++			s.accessLogger.Warn("failed to enable full duplex", zap.Error(err))
++		}
+ 	}
+ 
+ 	// encode the request for logging purposes before
