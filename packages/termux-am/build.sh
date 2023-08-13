@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Android Oreo-compatible am command reimplementation"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="Michal Bednarski @michalbednarski"
 TERMUX_PKG_VERSION=0.4
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/termux/TermuxAm/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=f13e7de6682b2a8303ac69e6a908fc7bd2ae091b3941eb33ecc35f47ea77a435
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
@@ -34,4 +35,12 @@ termux_step_make_install() {
 	cp $TERMUX_PKG_SRCDIR/am-libexec-packaged $TERMUX_PREFIX/bin/am
 	mkdir -p $TERMUX_PREFIX/libexec/termux-am
 	cp $TERMUX_PKG_SRCDIR/app/build/outputs/apk/release/app-release-unsigned.apk $TERMUX_PREFIX/libexec/termux-am/am.apk
+}
+
+termux_step_create_debscripts() {
+	# https://github.com/termux/termux-packages/issues/16255
+	cat <<- EOL > postinst
+	#!${TERMUX_PREFIX}/bin/sh
+	chmod -w ${TERMUX_PREFIX}/libexec/termux-am/am.apk
+	EOL
 }
