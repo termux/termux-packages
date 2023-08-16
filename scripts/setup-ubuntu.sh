@@ -92,9 +92,6 @@ PACKAGES+=" gegl"
 # Needed by package libidn2.
 PACKAGES+=" gengetopt"
 
-# Needed by package proxmark3-git.
-PACKAGES+=" swig"
-
 # Needed by package dbus-glib.
 PACKAGES+=" libdbus-1-dev"
 
