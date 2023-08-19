@@ -22,7 +22,7 @@ etc/boinc-client.conf
 
 termux_pkg_auto_update() {
 	local api_url="https://api.github.com/repos/BOINC/boinc/git/refs/tags"
-	local latest_refs_tags=$(curl "${api_url}" | jq .[].ref | sed -ne "s|.*client_release.*/\(.*\)\"|\1|p")
+	local latest_refs_tags=$(curl -s "${api_url}" | jq .[].ref | sed -ne "s|.*client_release.*/\(.*\)\"|\1|p")
 	if [[ -z "${latest_refs_tags}" ]]; then
 		echo "WARN: Unable to get latest refs tags from upstream. Try again later." >&2
 		return
