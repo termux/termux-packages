@@ -292,6 +292,12 @@ PACKAGES+=" libwebp7 libwebp7:i386 libwebp-dev"
 PACKAGES+=" libwebpdemux2 libwebpdemux2:i386"
 PACKAGES+=" libwebpmux3 libwebpmux3:i386"
 
+# Required by CGCT
+PACKAGES+=" libdebuginfod-dev"
+
+# Needed to set up CGCT and also to set up other packages
+PACKAGES+=" patchelf"
+
 # Do not require sudo if already running as root.
 if [ "$(id -u)" = "0" ]; then
 	SUDO=""
