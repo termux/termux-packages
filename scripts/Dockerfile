@@ -10,7 +10,7 @@ FROM ubuntu:22.04
 ENV LANG en_US.UTF-8
 
 # Needed for setup:
-COPY ./setup-ubuntu.sh ./setup-android-sdk.sh ./properties.sh ./openjdk-r-ppa.gpg /tmp/
+COPY ./setup-ubuntu.sh ./setup-android-sdk.sh ./setup-cgct.sh ./properties.sh ./openjdk-r-ppa.gpg /tmp/
 RUN mkdir /tmp/build
 COPY ./build/termux_download.sh /tmp/build/
 
@@ -23,6 +23,7 @@ RUN apt-get update && \
 	chmod 0440 /etc/sudoers.d/builder && \
 	su - builder -c /tmp/setup-ubuntu.sh && \
 	su - builder -c /tmp/setup-android-sdk.sh && \
+	su - builder -c /tmp/setup-cgct.sh && \
 	# Removed unused parts to make a smaller Docker image:
 	apt-get remove -yq --autoremove lsb-release software-properties-common && \
 	apt-get clean && \
