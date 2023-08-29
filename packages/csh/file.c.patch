@@ -18,19 +18,7 @@
  static void free_items(Char **, size_t);
  static size_t tsearch(Char *, COMMAND, size_t);
  static int recognize(Char *, Char *, size_t, size_t);
-@@ -428,26 +428,20 @@
- 
-     p = Strrchr(path, '/');
-     if (p == NULL) {
--	copyn(name, path, MAXNAMLEN);
-+	copyn(name, path, NAME_MAX);
- 	dir[0] = '\0';
-     }
-     else {
--	copyn(name, ++p, MAXNAMLEN);
-+	copyn(name, ++p, NAME_MAX);
- 	copyn(dir, path, (size_t)(p - path));
-     }
+@@ -438,16 +438,10 @@
  }
  
  static Char *
@@ -48,14 +36,8 @@
      if ((dirp = readdir(dir_fd)) != NULL)
  	return (str2short(dirp->d_name));
      return (NULL);
-@@ -479,11 +473,11 @@
- static size_t
- tsearch(Char *word, COMMAND command, size_t max_word_length)
- {
--    Char dir[MAXPATHLEN + 1], extended_name[MAXNAMLEN + 1];
--    Char name[MAXNAMLEN + 1], tilded_dir[MAXPATHLEN + 1];
-+    Char dir[MAXPATHLEN + 1], extended_name[NAME_MAX + 1];
-+    Char name[NAME_MAX + 1], tilded_dir[MAXPATHLEN + 1];
+@@ -483,7 +477,7 @@
+     Char name[MAXNAMLEN + 1], tilded_dir[MAXPATHLEN + 1];
      DIR *dir_fd;
      Char *entry;
 -    int ignoring, looking_for_lognames;
@@ -101,15 +83,6 @@
  	    continue;
  	if (command == LIST) {
  	    if ((size_t)numitems >= maxitems) {
-@@ -526,7 +511,7 @@
-  	    }
- 	    items[numitems] = xmalloc((size_t) (Strlen(entry) + 1) *
- 	        sizeof(Char));
--	    copyn(items[numitems], entry, MAXNAMLEN);
-+	    copyn(items[numitems], entry, NAME_MAX);
- 	    numitems++;
- 	}
- 	else {			/* RECOGNIZE command */
 @@ -540,25 +525,16 @@
      if (ignoring && numitems == 0 && nignored > 0) {
  	ignoring = FALSE;
@@ -150,12 +123,3 @@
  	if (items != NULL)
  	    FREE_ITEMS(items, numitems);
      }
-@@ -586,7 +561,7 @@
- recognize(Char *extended_name, Char *entry, size_t name_length, size_t numitems)
- {
-     if (numitems == 1)		/* 1st match */
--	copyn(extended_name, entry, MAXNAMLEN);
-+	copyn(extended_name, entry, NAME_MAX);
-     else {			/* 2nd & subsequent matches */
- 	Char *ent, *x;
- 	size_t len = 0;
