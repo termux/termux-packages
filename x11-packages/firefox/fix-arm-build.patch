@@ -1,42 +1,6 @@
-diff -uNr firefox-105.0.3/media/libtremor/lib/moz.build firefox-105.0.3.mod/media/libtremor/lib/moz.build
---- firefox-105.0.3/media/libtremor/lib/moz.build	2022-10-07 22:37:53.000000000 +0900
-+++ firefox-105.0.3.mod/media/libtremor/lib/moz.build	2022-10-18 10:03:55.374417146 +0900
-@@ -24,7 +24,7 @@
- if CONFIG['OS_ARCH'] == 'AIX':
-     DEFINES['alloca'] = '__alloca'
- 
--if CONFIG['CPU_ARCH'] == 'arm' and CONFIG['CC_TYPE'] in ('clang', 'gcc') and not CONFIG['MOZ_THUMB2']:
-+if False:
-     DEFINES['_ARM_ASSEM_'] = True
- 
- LOCAL_INCLUDES += [
-diff -uNr firefox-105.0.3/media/libtheora/moz.build firefox-105.0.3.mod/media/libtheora/moz.build
---- firefox-105.0.3/media/libtheora/moz.build	2022-10-07 22:37:52.000000000 +0900
-+++ firefox-105.0.3.mod/media/libtheora/moz.build	2022-10-18 19:22:09.234888656 +0900
-@@ -79,7 +79,7 @@
-         ]
- 
- if CONFIG['GNU_AS']:
--    if CONFIG['CPU_ARCH'] == 'arm':
-+    if False:
-         SOURCES += [
-             'lib/arm/armcpu.c',
-             'lib/arm/armstate.c',
-diff -uNr firefox-105.0.3/media/openmax_dl/dl/moz.build firefox-105.0.3.mod/media/openmax_dl/dl/moz.build
---- firefox-105.0.3/media/openmax_dl/dl/moz.build	2022-10-07 22:37:52.000000000 +0900
-+++ firefox-105.0.3.mod/media/openmax_dl/dl/moz.build	2022-10-18 19:18:02.701803029 +0900
-@@ -4,7 +4,7 @@
- # License, v. 2.0. If a copy of the MPL was not distributed with this
- # file, You can obtain one at http://mozilla.org/MPL/2.0/.
- 
--if CONFIG['CPU_ARCH'] == 'arm' and CONFIG['BUILD_ARM_NEON']:
-+if False:
-     Library('openmax_dl')
- 
-     EXPORTS.dl.api += [
-diff -uNr firefox-105.0.3/dom/media/webaudio/FFTBlock.h firefox-105.0.3.mod/dom/media/webaudio/FFTBlock.h
---- firefox-105.0.3/dom/media/webaudio/FFTBlock.h	2022-10-07 22:37:48.000000000 +0900
-+++ firefox-105.0.3.mod/dom/media/webaudio/FFTBlock.h	2022-10-18 19:51:54.958774520 +0900
+diff -uNr firefox-117.0/dom/media/webaudio/FFTBlock.h firefox-117.0.mod/dom/media/webaudio/FFTBlock.h
+--- firefox-117.0/dom/media/webaudio/FFTBlock.h	2023-08-25 02:33:48.000000000 +0800
++++ firefox-117.0.mod/dom/media/webaudio/FFTBlock.h	2023-08-30 19:58:43.046671773 +0800
 @@ -7,6 +7,10 @@
  #ifndef FFTBlock_h_
  #define FFTBlock_h_
@@ -48,9 +12,9 @@ diff -uNr firefox-105.0.3/dom/media/webaudio/FFTBlock.h firefox-105.0.3.mod/dom/
  #ifdef BUILD_ARM_NEON
  #  include <cmath>
  #  include "mozilla/arm.h"
-diff -uNr firefox-105.0.3/gfx/cairo/libpixman/src/pixman-arm.c firefox-105.0.3.mod/gfx/cairo/libpixman/src/pixman-arm.c
---- firefox-105.0.3/gfx/cairo/libpixman/src/pixman-arm.c	2022-10-07 22:37:48.000000000 +0900
-+++ firefox-105.0.3.mod/gfx/cairo/libpixman/src/pixman-arm.c	2022-10-18 21:07:50.671222933 +0900
+diff -uNr firefox-117.0/gfx/cairo/libpixman/src/pixman-arm.c firefox-117.0.mod/gfx/cairo/libpixman/src/pixman-arm.c
+--- firefox-117.0/gfx/cairo/libpixman/src/pixman-arm.c	2023-08-25 02:33:49.000000000 +0800
++++ firefox-117.0.mod/gfx/cairo/libpixman/src/pixman-arm.c	2023-08-30 19:58:43.050671773 +0800
 @@ -34,6 +34,12 @@
      ARM_IWMMXT		= (1 << 4)
  } arm_cpu_features_t;
@@ -64,21 +28,33 @@ diff -uNr firefox-105.0.3/gfx/cairo/libpixman/src/pixman-arm.c firefox-105.0.3.m
  #if defined(USE_ARM_SIMD) || defined(USE_ARM_NEON) || defined(USE_ARM_IWMMXT)
  
  #if defined(_MSC_VER)
-diff -uNr firefox-105.0.3/third_party/aom/aom_ports/arm_cpudetect.c firefox-105.0.3.mod/third_party/aom/aom_ports/arm_cpudetect.c
---- firefox-105.0.3/third_party/aom/aom_ports/arm_cpudetect.c	2022-10-07 22:38:00.000000000 +0900
-+++ firefox-105.0.3.mod/third_party/aom/aom_ports/arm_cpudetect.c	2022-10-18 21:18:47.042008616 +0900
-@@ -87,7 +87,7 @@
-   return flags & mask;
- }
+diff -uNr firefox-117.0/media/libtheora/moz.build firefox-117.0.mod/media/libtheora/moz.build
+--- firefox-117.0/media/libtheora/moz.build	2023-08-25 02:33:53.000000000 +0800
++++ firefox-117.0.mod/media/libtheora/moz.build	2023-08-30 19:58:43.038671773 +0800
+@@ -79,7 +79,7 @@
+         ]
  
--#elif defined(__ANDROID__) /* end _MSC_VER */
-+#elif defined(__ANDROID__) && !defined(__TERMUX__) /* end _MSC_VER */
- #include <cpu-features.h>
+ if CONFIG['GNU_AS']:
+-    if CONFIG['CPU_ARCH'] == 'arm':
++    if False:
+         SOURCES += [
+             'lib/arm/armcpu.c',
+             'lib/arm/armstate.c',
+diff -uNr firefox-117.0/media/libtremor/lib/moz.build firefox-117.0.mod/media/libtremor/lib/moz.build
+--- firefox-117.0/media/libtremor/lib/moz.build	2023-08-25 02:33:54.000000000 +0800
++++ firefox-117.0.mod/media/libtremor/lib/moz.build	2023-08-30 19:58:43.038671773 +0800
+@@ -24,7 +24,7 @@
+ if CONFIG['OS_ARCH'] == 'AIX':
+     DEFINES['alloca'] = '__alloca'
  
- int aom_arm_cpu_caps(void) {
-diff -uNr firefox-105.0.3/media/libvpx/libvpx/vpx_ports/arm_cpudetect.c firefox-105.0.3.mod/media/libvpx/libvpx/vpx_ports/arm_cpudetect.c
---- firefox-105.0.3/media/libvpx/libvpx/vpx_ports/arm_cpudetect.c	2022-10-07 22:37:53.000000000 +0900
-+++ firefox-105.0.3.mod/media/libvpx/libvpx/vpx_ports/arm_cpudetect.c	2022-10-18 21:24:56.338944820 +0900
+-if CONFIG['CPU_ARCH'] == 'arm' and CONFIG['CC_TYPE'] in ('clang', 'gcc') and not CONFIG['MOZ_THUMB2']:
++if False:
+     DEFINES['_ARM_ASSEM_'] = True
+ 
+ LOCAL_INCLUDES += [
+diff -uNr firefox-117.0/media/libvpx/libvpx/vpx_ports/arm_cpudetect.c firefox-117.0.mod/media/libvpx/libvpx/vpx_ports/arm_cpudetect.c
+--- firefox-117.0/media/libvpx/libvpx/vpx_ports/arm_cpudetect.c	2023-08-25 02:33:53.000000000 +0800
++++ firefox-117.0.mod/media/libvpx/libvpx/vpx_ports/arm_cpudetect.c	2023-08-30 19:58:43.054671773 +0800
 @@ -91,7 +91,7 @@
    return flags & mask;
  }
@@ -88,3 +64,27 @@ diff -uNr firefox-105.0.3/media/libvpx/libvpx/vpx_ports/arm_cpudetect.c firefox-
  #include <cpu-features.h>
  
  int arm_cpu_caps(void) {
+diff -uNr firefox-117.0/media/openmax_dl/dl/moz.build firefox-117.0.mod/media/openmax_dl/dl/moz.build
+--- firefox-117.0/media/openmax_dl/dl/moz.build	2023-08-25 02:33:54.000000000 +0800
++++ firefox-117.0.mod/media/openmax_dl/dl/moz.build	2023-08-30 19:58:43.042671773 +0800
+@@ -4,7 +4,7 @@
+ # License, v. 2.0. If a copy of the MPL was not distributed with this
+ # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ 
+-if CONFIG['CPU_ARCH'] == 'arm' and CONFIG['BUILD_ARM_NEON']:
++if False:
+     Library('openmax_dl')
+ 
+     EXPORTS.dl.api += [
+diff -uNr firefox-117.0/third_party/aom/aom_ports/arm_cpudetect.c firefox-117.0.mod/third_party/aom/aom_ports/arm_cpudetect.c
+--- firefox-117.0/third_party/aom/aom_ports/arm_cpudetect.c	2023-08-25 02:34:00.000000000 +0800
++++ firefox-117.0.mod/third_party/aom/aom_ports/arm_cpudetect.c	2023-08-30 19:58:43.050671773 +0800
+@@ -87,7 +87,7 @@
+   return flags & mask;
+ }
+ 
+-#elif defined(__ANDROID__) /* end _MSC_VER */
++#elif defined(__ANDROID__) && !defined(__TERMUX__) /* end _MSC_VER */
+ #include <cpu-features.h>
+ 
+ int aom_arm_cpu_caps(void) {
