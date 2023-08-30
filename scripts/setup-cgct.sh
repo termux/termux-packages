@@ -5,7 +5,6 @@
 
 set -e -u
 
-: "${CGCT_DIR:="/data/data/${TERMUX_APP_PACKAGE}/cgct"}"
 ARCH="x86_64"
 REPO_URL="https://service.termux-pacman.dev/gpkg-dev/${ARCH}"
 VERSION_OF_CBT="2.41-0"

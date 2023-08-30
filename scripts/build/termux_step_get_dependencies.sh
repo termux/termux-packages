@@ -50,7 +50,7 @@ termux_step_get_dependencies() {
 				fi
 			fi
 			if $build_dependency; then
-				TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh -I $(test "${TERMUX_FORCE_BUILD_DEPENDENCIES}" = "true" && echo "-F" || true) --format $TERMUX_PACKAGE_FORMAT "${PKG_DIR}"
+				termux_run_build-package
 				continue
 			fi
 			termux_add_package_to_built_packages_list "$PKG"
@@ -58,14 +58,19 @@ termux_step_get_dependencies() {
 				[ ! "$TERMUX_QUIET_BUILD" = true ] && echo "extracting $PKG to $TERMUX_COMMON_CACHEDIR-$DEP_ARCH..."
 				(
 					cd $TERMUX_COMMON_CACHEDIR-$DEP_ARCH
-					ar x ${PKG}_${DEP_VERSION}_${DEP_ARCH}.deb data.tar.xz
-					if tar -tf data.tar.xz|grep "^./$">/dev/null; then
-						# Strip prefixed ./, to avoid possible
-						# permission errors from tar
-						tar -xf data.tar.xz --strip-components=1 \
-							--no-overwrite-dir -C /
-					else
-						tar -xf data.tar.xz --no-overwrite-dir -C /
+					if [ "$TERMUX_REPO_PKG_FORMAT" = "debian" ]; then
+						ar x ${PKG}_${DEP_VERSION}_${DEP_ARCH}.deb data.tar.xz
+						if tar -tf data.tar.xz|grep "^./$">/dev/null; then
+							# Strip prefixed ./, to avoid possible
+							# permission errors from tar
+							tar -xf data.tar.xz --strip-components=1 \
+								--no-overwrite-dir -C /
+						else
+							tar -xf data.tar.xz --no-overwrite-dir -C /
+						fi
+					elif [ "$TERMUX_REPO_PKG_FORMAT" = "pacman" ]; then
+						tar -xJf "${PKG}-${DEP_VERSION_PAC}-${DEP_ARCH}.pkg.tar.xz" \
+							--force-local --no-overwrite-dir -C / data
 					fi
 				)
 			fi
@@ -92,7 +97,7 @@ termux_step_get_dependencies() {
 			else
 				[ ! "$TERMUX_QUIET_BUILD" = true ] && echo "Building dependency $PKG if necessary..."
 			fi
-			TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh -s $(test "${TERMUX_FORCE_BUILD_DEPENDENCIES}" = "true" && echo "-F" || true) --format $TERMUX_PACKAGE_FORMAT "${PKG_DIR}"
+			termux_run_build-package
 		done<<<$(./scripts/buildorder.py "$TERMUX_PKG_BUILDER_DIR" $TERMUX_PACKAGES_DIRECTORIES || echo "ERROR")
 	fi
 }
@@ -103,4 +108,17 @@ termux_force_check_package_dependency() {
 		return 0
 	fi
 	return 1
+}
+
+termux_run_build-package() {
+	local set_library
+	if [ "$TERMUX_GLOBAL_LIBRARY" = "true" ]; then
+		set_library="$TERMUX_PACKAGE_LIBRARY -L"
+	else
+		set_library="bionic"
+		if package__is_package_name_have_glibc_prefix "$PKG"; then
+			set_library="glibc"
+		fi
+	fi
+	TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh -s $(test "${TERMUX_FORCE_BUILD_DEPENDENCIES}" = "true" && echo "-F" || true) --format $TERMUX_PACKAGE_FORMAT --library $set_library "${PKG_DIR}"
 }

@@ -1,7 +1,12 @@
 termux_step_massage() {
 	[ "$TERMUX_PKG_METAPACKAGE" = "true" ] && return
 
-	cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"
+	cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX_CLASSICAL"
+
+	local ADDING_PREFIX=""
+	if [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
+		ADDING_PREFIX="glibc/"
+	fi
 
 	# Remove lib/charset.alias which is installed by gettext-using packages:
 	rm -f lib/charset.alias
@@ -29,50 +34,59 @@ termux_step_massage() {
 
 	# Move over sbin to bin:
 	for file in sbin/*; do if test -f "$file"; then mv "$file" bin/; fi; done
+	if [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
+		for file in glibc/sbin/*; do if test -f "$file"; then mv "$file" glibc/bin/; fi; done
+	fi
 
 	# Remove world permissions and make sure that user still have read-write permissions.
 	chmod -Rf u+rw,g-rwx,o-rwx . || true
 
-	if [ "$TERMUX_PKG_NO_STRIP" != "true" ] && [ "$TERMUX_DEBUG_BUILD" = "false" ]; then
-		# Strip binaries. file(1) may fail for certain unusual files, so disable pipefail.
-		set +e +o pipefail
-		find . \( -path "./bin/*" -o -path "./lib/*" -o -path "./libexec/*" \) -type f |
-			xargs -r file | grep -E "ELF .+ (executable|shared object)" | cut -f 1 -d : |
-			xargs -r "$STRIP" --strip-unneeded --preserve-dates
-		set -e -o pipefail
-	fi
+	if [ "$TERMUX_PACKAGE_LIBRARY" = "bionic" ]; then
+		if [ "$TERMUX_PKG_NO_STRIP" != "true" ] && [ "$TERMUX_DEBUG_BUILD" = "false" ]; then
+			# Strip binaries. file(1) may fail for certain unusual files, so disable pipefail.
+			set +e +o pipefail
+			find . \( -path "./bin/*" -o -path "./lib/*" -o -path "./libexec/*" \) -type f |
+				xargs -r file | grep -E "ELF .+ (executable|shared object)" | cut -f 1 -d : |
+				xargs -r "$STRIP" --strip-unneeded --preserve-dates
+			set -e -o pipefail
+		fi
 
-	if [ "$TERMUX_PKG_NO_ELF_CLEANER" != "true" ]; then
-		# Remove entries unsupported by Android's linker:
-		find . \( -path "./bin/*" -o -path "./lib/*" -o -path "./libexec/*" -o -path "./opt/*" \) -type f -print0 | xargs -r -0 \
-			"$TERMUX_ELF_CLEANER" --api-level $TERMUX_PKG_API_LEVEL
+		if [ "$TERMUX_PKG_NO_ELF_CLEANER" != "true" ]; then
+			# Remove entries unsupported by Android's linker:
+			find . \( -path "./bin/*" -o -path "./lib/*" -o -path "./libexec/*" -o -path "./opt/*" \) -type f -print0 | xargs -r -0 \
+				"$TERMUX_ELF_CLEANER" --api-level $TERMUX_PKG_API_LEVEL
+		fi
 	fi
 
 	if [ "$TERMUX_PKG_NO_SHEBANG_FIX" != "true" ]; then
 		# Fix shebang paths:
 		while IFS= read -r -d '' file; do
 			if head -c 100 "$file" | head -n 1 | grep -E "^#!.*/bin/.*" | grep -q -E -v "^#! ?/system"; then
-				sed --follow-symlinks -i -E "1 s@^#\!(.*)/bin/(.*)@#\!$TERMUX_PREFIX/bin/\2@" "$file"
+				if [ "$TERMUX_PACKAGE_LIBRARY" = "bionic" ]; then
+					sed --follow-symlinks -i -E "1 s@^#\!(.*)/bin/(.*)@#\!$TERMUX_PREFIX/bin/\2@" "$file"
+				elif [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
+					sed --follow-symlinks -i -E "1 s@^#\!(.*)/bin/(.*)@#\!$TERMUX_PREFIX_CLASSICAL/bin/\2@" "$file"
+				fi
 			fi
 		done < <(find -L . -type f -print0)
 	fi
 
 	# Delete the info directory file.
-	rm -rf ./share/info/dir
+	rm -rf ./${ADDING_PREFIX}share/info/dir
 
 	# Mostly specific to X11-related packages.
-	rm -f ./share/icons/hicolor/icon-theme.cache
+	rm -f ./${ADDING_PREFIX}share/icons/hicolor/icon-theme.cache
 
 	test ! -z "$TERMUX_PKG_RM_AFTER_INSTALL" && rm -Rf $TERMUX_PKG_RM_AFTER_INSTALL
 
 	find . -type d -empty -delete # Remove empty directories
 
-	if [ -d share/man ]; then
+	if [ -d ./${ADDING_PREFIX}share/man ]; then
 		# Remove non-english man pages:
-		find share/man -mindepth 1 -maxdepth 1 -type d ! -name man\* | xargs -r rm -rf
+		find ./${ADDING_PREFIX}share/man -mindepth 1 -maxdepth 1 -type d ! -name man\* | xargs -r rm -rf
 
 		# Compress man pages with gzip:
-		find share/man -type f ! -iname \*.gz -print0 | xargs -r -0 gzip
+		find ./${ADDING_PREFIX}share/man -type f ! -iname \*.gz -print0 | xargs -r -0 gzip
 
 		# Update man page symlinks, e.g. unzstd.1 -> zstd.1:
 		while IFS= read -r -d '' file; do
@@ -80,13 +94,13 @@ termux_step_massage() {
 			_link_value=$(readlink $file)
 			rm $file
 			ln -s $_link_value.gz $file.gz
-		done < <(find share/man -type l ! -iname \*.gz -print0)
+		done < <(find ./${ADDING_PREFIX}share/man -type l ! -iname \*.gz -print0)
 	fi
 
 	# Check so files were actually installed. Exclude
 	# share/doc/$TERMUX_PKG_NAME/ as a license file is always
 	# installed there.
-	if [ "$(find . -path "./share/doc/$TERMUX_PKG_NAME" -prune -o -type f -print | head -n1)" = "" ]; then
+	if [ "$(find . -path "./${ADDING_PREFIX}share/doc/$TERMUX_PKG_NAME" -prune -o -type f -print | head -n1)" = "" ]; then
 		if [ -f "$TERMUX_PKG_SRCDIR"/configure.ac -o -f "$TERMUX_PKG_SRCDIR"/configure.in ]; then
 			termux_error_exit "No files in package. Maybe you need to run autoreconf -fi before configuring."
 		else
@@ -97,11 +111,29 @@ termux_step_massage() {
 	local HARDLINKS
 	HARDLINKS="$(find . -type f -links +1)"
 	if [ -n "$HARDLINKS" ]; then
-		termux_error_exit "Package contains hard links: $HARDLINKS"
+		if [ "$TERMUX_PACKAGE_LIBRARY" = "bionic" ]; then
+			termux_error_exit "Package contains hard links: $HARDLINKS"
+		elif [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
+			local declare hard_list
+			for i in $HARDLINKS; do
+				hard_list[$(ls -i "$i" | awk '{printf $1}')]+="$i "
+			done
+			local root_file
+			for i in ${!hard_list[@]}; do
+				root_file=""
+				for j in ${hard_list[$i]}; do
+					if [ -z "$root_file" ]; then
+						root_file="$j"
+						continue
+					fi
+					ln -sf "${TERMUX_PREFIX_CLASSICAL}/${root_file:2}" "${j}"
+				done
+			done
+		fi
 	fi
 
 	# Check for directory "$PREFIX/man" which indicates packaging error.
-	if [ -d "./man" ]; then
+	if [ -d "./${ADDING_PREFIX}man" ]; then
 		termux_error_exit "Package contains directory \"\$PREFIX/man\" ($TERMUX_PREFIX/man). Use \"\$PREFIX/share/man\" ($TERMUX_PREFIX/share/man) instead."
 	fi
 
@@ -112,7 +144,7 @@ termux_step_massage() {
 	fi
 
 	# Check for Debianish Python directory which indicates packaging error.
-	local _python_deb_install_layout_dir="lib/python3/dist-packages"
+	local _python_deb_install_layout_dir="${ADDING_PREFIX}lib/python3/dist-packages"
 	if [ -d "./${_python_deb_install_layout_dir}" ]; then
 		termux_error_exit "Package contains directory \"\$PREFIX/${_python_deb_install_layout_dir}\" ($TERMUX_PREFIX/${_python_deb_install_layout_dir})"
 	fi
@@ -120,7 +152,7 @@ termux_step_massage() {
 	# Check so that package is not affected by
 	# https://github.com/android/ndk/issues/1614, or
 	# https://github.com/termux/termux-packages/issues/9944
-	if [ -d "lib" ]; then
+	if [ "$TERMUX_PACKAGE_LIBRARY" = "bionic" ] && [ -d "lib" ]; then
 		SYMBOLS="$($READELF -s $($TERMUX_HOST_PLATFORM-clang -print-libgcc-file-name) | grep "FUNC    GLOBAL HIDDEN" | awk '{print $8}')"
 		SYMBOLS+=" $(echo libandroid_{sem_{open,close,unlink},shm{ctl,get,at,dt}})"
 		SYMBOLS+=" $(echo backtrace{,_symbols{,_fd}})"
@@ -144,7 +176,7 @@ termux_step_massage() {
 
 	# Remove unnecessary files in haskell packages:
 	if ! [[ $TERMUX_PKG_NAME =~ ghc|ghc-libs ]]; then
-		test -f ./lib/ghc-*/settings && rm -rf ./lib/ghc-*/settings
+		test -f ./${ADDING_PREFIX}lib/ghc-*/settings && rm -rf ./${ADDING_PREFIX}lib/ghc-*/settings
 	fi
 
 	# .. remove empty directories (NOTE: keep this last):

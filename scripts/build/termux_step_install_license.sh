@@ -22,6 +22,7 @@ termux_step_install_license() {
 			cp -f "${TERMUX_PKG_SRCDIR}/${LICENSE}" "$TARGET"
 		done < <(echo "$TERMUX_PKG_LICENSE_FILE" | sed "s/,/\n/g")
 	else
+		local TO_LICENSE
 		while read -r LICENSE; do
 			# These licenses contain copyright information, so
 			# we cannot use a generic license file
@@ -61,10 +62,15 @@ termux_step_install_license() {
 					fi
 				done
 			elif [ -f "$TERMUX_SCRIPTDIR/packages/termux-licenses/LICENSES/${LICENSE}.txt" ]; then
+				if [ "$TERMUX_PACKAGE_LIBRARY" = "bionic" ]; then
+					TO_LICENSE="../../LICENSES/${LICENSE}.txt"
+				elif [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
+					TO_LICENSE="../../../../share/LICENSES/${LICENSE}.txt"
+				fi
 				if [[ $COUNTER -gt 0 ]]; then
-					ln -sf "../../LICENSES/${LICENSE}.txt" "$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME/LICENSE.${COUNTER}"
+					ln -sf "$TO_LICENSE" "$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME/LICENSE.${COUNTER}"
 				else
-					ln -sf "../../LICENSES/${LICENSE}.txt" "$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME/LICENSE"
+					ln -sf "$TO_LICENSE" "$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME/LICENSE"
 				fi
 				COUNTER=$((COUNTER + 1))
 			fi

@@ -20,7 +20,10 @@ Add or increment TERMUX_PKG_REVISION of all the packages that have <package> in 
 """
 
 REPO_PATH = os.path.join("/".join(os.path.realpath(sys.argv[0]).split("/")[:-3]), "repo.json")
-FOLDERS = [os.path.join("/".join(os.path.realpath(sys.argv[0]).split("/")[:-3]),folder) for folder in list(json.load(open(REPO_PATH)).keys())]
+FOLDERS = []
+for folder in list(json.load(open(REPO_PATH)).keys()):
+    if folder != "pkg_format":
+        FOLDERS.append(folder)
 
 
 def is_dep(DEP: str, line: str) -> bool:
