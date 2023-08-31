@@ -10,6 +10,11 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_CONFLICTS="termux-tools (<< 0.51)"
 _GRADLE_VERSION=6.5.1
 
+termux_step_post_get_source() {
+	sed -i'' -E -e "s|\@TERMUX_PREFIX\@|${TERMUX_PREFIX}|g" "$TERMUX_PKG_SRCDIR/am-libexec-packaged"
+	sed -i'' -E -e "s|\@TERMUX_APP_PACKAGE\@|${TERMUX_APP_PACKAGE}|g" "$TERMUX_PKG_SRCDIR/app/src/main/java/com/termux/termuxam/FakeContext.java"
+}
+
 termux_step_make() {
 	# Download and use a new enough gradle version to avoid the process hanging after running:
 	termux_download \
