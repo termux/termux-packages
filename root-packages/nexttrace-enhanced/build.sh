@@ -1,11 +1,11 @@
-TERMUX_PKG_HOMEPAGE=https://github.com/OwO-Network/nexttrace-enhanced
+TERMUX_PKG_HOMEPAGE=https://github.com/nxtrace/Ntrace-V1
 TERMUX_PKG_DESCRIPTION="An open source visual routing tool that pursues light weight"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.3.2-beta.1"
+TERMUX_PKG_VERSION="1.2.0.1"
 TERMUX_PKG_REVISION=2
-TERMUX_PKG_SRCURL=https://github.com/OwO-Network/nexttrace-enhanced/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=b651a3af52fcd34f149537ea5486f394b30a8bb840d112861048400ee69cf76c
+TERMUX_PKG_SRCURL=https://github.com/nxtrace/Ntrace-V1/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=eaca3cadd415a7b4435db56d8eaec93b9f7f56dfc3867cdf22368f65ad76494e
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
