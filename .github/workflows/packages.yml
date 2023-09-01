@@ -154,7 +154,7 @@ jobs:
 
     - name: Free additional disk space (if necessary)
       run: |
-        if grep -q '^clvk$\|^dart$\|^rust$\|^rustc-nightly$' ./built_termux-main_packages.txt || \
+        if grep -q '^clvk$\|^dart$\|^rust$\|^rustc-nightly$\|^zig$' ./built_termux-main_packages.txt || \
           grep -q '^firefox$' ./built_termux-x11_packages.txt; then
           echo "Free additional disk space on host"
           sudo apt purge -yq $(dpkg -l | grep '^ii' | awk '{ print $2 }' | grep -P '(cabal-|dotnet-|ghc-|libmono|php|aspnetcore)') \
