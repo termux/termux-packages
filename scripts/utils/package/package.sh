@@ -96,13 +96,11 @@ package__add_prefix_glibc_to_package_names() {
 			fi
 			packages+=" "
 			if ! package__is_package_name_have_glibc_prefix "${__pkg}"; then
-				# Maybe glibc-based static packages won't exist :/
-				#if $(echo "${__pkg}" | grep -q -e "-static"); then
-				#	packages+="${__pkg/-static/}-glibc-static"
-				#else
-				#	packages+="${__pkg}-glibc"
-				#fi
-				packages+="${__pkg/-static/}-glibc"
+				if $(echo "${__pkg}" | grep -q -e "-static"); then
+					packages+="${__pkg/-static/}-glibc-static"
+				else
+					packages+="${__pkg}-glibc"
+				fi
 			else
 				packages+="${__pkg}"
 			fi
