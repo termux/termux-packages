@@ -38,6 +38,7 @@ termux_setup_toolchain_gnu() {
 
 	export PKG_CONFIG=pkg-config
 	export PKGCONFIG=$PKG_CONFIG
+ 	export PKG_CONFIG_LIBDIR="$TERMUX_PKG_CONFIG_LIBDIR"
 
 	export CXXFLAGS="$CFLAGS -Wp,-D_GLIBCXX_ASSERTIONS"
 }
