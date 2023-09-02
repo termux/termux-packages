@@ -1,6 +1,8 @@
+diff --git a/Makefile b/Makefile
+index f6c0527..4834f3c 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -246,7 +246,7 @@ $(LLVM_BUILDDIR)/build.ninja:
+@@ -248,7 +248,7 @@ $(LLVM_BUILDDIR)/build.ninja:
  
  # Build LLVM.
  $(LLVM_BUILDDIR): $(LLVM_BUILDDIR)/build.ninja
@@ -9,26 +11,28 @@
  
  ifneq ($(USE_SYSTEM_BINARYEN),1)
  # Build Binaryen
-@@ -263,15 +263,15 @@ endif
+@@ -265,7 +265,7 @@ endif
  wasi-libc: lib/wasi-libc/sysroot/lib/wasm32-wasi/libc.a
  lib/wasi-libc/sysroot/lib/wasm32-wasi/libc.a:
  	@if [ ! -e lib/wasi-libc/Makefile ]; then echo "Submodules have not been downloaded. Please download them using:\n  git submodule update --init"; exit 1; fi
 -	cd lib/wasi-libc && make -j4 EXTRA_CFLAGS="-O2 -g -DNDEBUG -mnontrapping-fptoint -msign-ext" MALLOC_IMPL=none CC=$(CLANG) AR=$(LLVM_AR) NM=$(LLVM_NM)
 +	cd lib/wasi-libc && make -j`nproc` EXTRA_CFLAGS="-O2 -g -DNDEBUG -mnontrapping-fptoint -msign-ext" MALLOC_IMPL=none CC=$(CLANG) AR=$(LLVM_AR) NM=$(LLVM_NM)
  
- 
+ # Check for Node.js used during WASM tests.
+ NODEJS_VERSION := $(word 1,$(subst ., ,$(shell node -v | cut -c 2-)))
+@@ -281,9 +281,9 @@ endif
  # Build the Go compiler.
  tinygo:
  	@if [ ! -f "$(LLVM_BUILDDIR)/bin/llvm-config" ]; then echo "Fetch and build LLVM first by running:"; echo "  make llvm-source"; echo "  make $(LLVM_BUILDDIR)"; exit 1; fi
 -	CGO_CPPFLAGS="$(CGO_CPPFLAGS)" CGO_CXXFLAGS="$(CGO_CXXFLAGS)" CGO_LDFLAGS="$(CGO_LDFLAGS)" $(GOENVFLAGS) $(GO) build -buildmode exe -o build/tinygo$(EXE) -tags "byollvm osusergo" -ldflags="-X github.com/tinygo-org/tinygo/goenv.GitSha1=`git rev-parse --short HEAD`" .
 +	CGO_CPPFLAGS="$(CGO_CPPFLAGS)" CGO_CXXFLAGS="$(CGO_CXXFLAGS)" CGO_LDFLAGS="$(CGO_LDFLAGS)" $(GOENVFLAGS) $(GO) build -buildmode pie -o build/tinygo$(EXE) -tags "byollvm osusergo" -ldflags="-X github.com/tinygo-org/tinygo/goenv.GitSha1=`git rev-parse --short HEAD`" .
- test: wasi-libc
+ test: wasi-libc check-nodejs-version
 -	CGO_CPPFLAGS="$(CGO_CPPFLAGS)" CGO_CXXFLAGS="$(CGO_CXXFLAGS)" CGO_LDFLAGS="$(CGO_LDFLAGS)" $(GO) test $(GOTESTFLAGS) -timeout=20m -buildmode exe -tags "byollvm osusergo" ./builder ./cgo ./compileopts ./compiler ./interp ./transform .
 +	CGO_CPPFLAGS="$(CGO_CPPFLAGS)" CGO_CXXFLAGS="$(CGO_CXXFLAGS)" CGO_LDFLAGS="$(CGO_LDFLAGS)" $(GO) test $(GOTESTFLAGS) -timeout=20m -buildmode pie -tags "byollvm osusergo" ./builder ./cgo ./compileopts ./compiler ./interp ./transform .
  
  # Standard library packages that pass tests on darwin, linux, wasi, and windows, but take over a minute in wasi
  TEST_PACKAGES_SLOW = \
-@@ -417,11 +417,11 @@ tinygo-bench-wasi-fast:
+@@ -440,11 +440,11 @@ tinygo-bench-wasi-fast:
  
  # Test external packages in a large corpus.
  test-corpus:
