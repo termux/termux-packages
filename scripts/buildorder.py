@@ -152,6 +152,8 @@ class TermuxSubPackage:
             raise Exception("SubPackages should have a parent")
 
         self.name = os.path.basename(subpackage_file_path).split('.subpackage.sh')[0]
+        if "gpkg" in subpackage_file_path.split("/")[-3].split("-") and "glibc" not in self.name.split("-"):
+            self.name += "-glibc"
         self.parent = parent
         self.deps = set([parent.name])
         self.excluded_arches = set()
