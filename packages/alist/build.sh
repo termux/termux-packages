@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=(3.27.0) # alist version
 TERMUX_PKG_VERSION+=(3.27.0) # alist-web version
 TERMUX_PKG_SRCURL=(https://github.com/alist-org/alist/archive/v${TERMUX_PKG_VERSION}.tar.gz
 		   https://github.com/alist-org/alist-web/releases/download/${TERMUX_PKG_VERSION[1]}/dist.tar.gz)
-TERMUX_PKG_SHA256=(62f533ae96520d082011093ceb020d2f2f6344f9f7d831042a52e329bf715f29
+TERMUX_PKG_SHA256=(16951897713db635d7cd5707e2851032f5f6f74fa6dd2de59d7f1520098b35ab
 		   3bd34d984f850a55770c6a104e6f3333fa74ff1bc2dfbaea0c2a4cdbb624bb07)
 TERMUX_PKG_BUILD_IN_SRC=true
 # termux_pkg_upgrade_version couldn't check multiple versions now.
