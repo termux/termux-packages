@@ -46,12 +46,6 @@ export CGCT_DIR="/data/data/${TERMUX_APP_PACKAGE}/cgct"
 # has packages that were built with same package name.
 TERMUX_REPO_PACKAGE="com.termux"
 
-# Getting the format of packages in repos
-TERMUX_REPO_PKG_FORMAT=$(jq -r '.pkg_format' ${TERMUX_SCRIPTDIR}/repo.json)
-if [ "$TERMUX_REPO_PKG_FORMAT" = "null" ]; then
-	TERMUX_REPO_PKG_FORMAT="debian"
-fi
-
 # Termux repo urls.
 TERMUX_REPO_URL=()
 TERMUX_REPO_DISTRIBUTION=()
