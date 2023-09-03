@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+: "${TERMUX_SCRIPTDIR:="$(realpath "$(dirname "$(readlink -f "$0")")/..")"}"
+
 . $(dirname "$(realpath "$0")")/properties.sh
 . $(dirname "$(realpath "$0")")/build/termux_download.sh
 
