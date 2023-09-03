@@ -3,8 +3,6 @@
 # coreutils and are clearly not a default part of most Linux installations,
 # or sourcing any other script in our build directories.
 
-: "${TERMUX_SCRIPTDIR:?TERMUX_SCRIPTDIR not set for properties.sh}"
-
 TERMUX_SDK_REVISION=9123335
 TERMUX_ANDROID_BUILD_TOOLS_VERSION=33.0.1
 # when changing the above:

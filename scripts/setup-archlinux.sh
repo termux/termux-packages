@@ -52,7 +52,6 @@ else
 fi
 $SUDO pacman -Syq --needed --noconfirm $PACKAGES
 
-: "${TERMUX_SCRIPTDIR:="$(realpath "$(dirname "$(readlink -f "$0")")/..")"}"
 . $(dirname "$(realpath "$0")")/properties.sh
 $SUDO mkdir -p $TERMUX_PREFIX
 $SUDO chown -R $(whoami) /data
