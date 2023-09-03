@@ -59,6 +59,10 @@ fi
 
 export TERMUX_PACKAGES_DIRECTORIES=$(jq --raw-output 'del(.pkg_format) | keys | .[]' ${TERMUX_SCRIPTDIR}/repo.json)
 export TERMUX_REPO_PKG_FORMAT=$(jq --raw-output '.pkg_format' ${TERMUX_SCRIPTDIR}/repo.json)
+if [ "$TERMUX_REPO_PKG_FORMAT" = "null" ]; then
+	export TERMUX_REPO_PKG_FORMAT="debian"
+fi
+
 
 # Special variable for internal use. It forces script to ignore
 # lock file.
