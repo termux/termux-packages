@@ -17,6 +17,6 @@ index 2ad4509..4d0b060 100644
 +      if (D.CCCIsCXX())
 +        CmdArgs.push_back("-lm");
 +
-       if (WantPthread && !isAndroid)
-         CmdArgs.push_back("-lpthread");
- 
+       // LLVM support for atomics on 32-bit SPARC V8+ is incomplete, so
+       // forcibly link with libatomic as a workaround.
+       // TODO: Issue #41880 and D118021.
