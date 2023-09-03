@@ -58,11 +58,7 @@ if [ ! -e "$TERMUX_BUILD_LOCK_FILE" ]; then
 fi
 
 export TERMUX_PACKAGES_DIRECTORIES=$(jq --raw-output 'del(.pkg_format) | keys | .[]' ${TERMUX_SCRIPTDIR}/repo.json)
-export TERMUX_REPO_PKG_FORMAT=$(jq --raw-output '.pkg_format' ${TERMUX_SCRIPTDIR}/repo.json)
-if [ "$TERMUX_REPO_PKG_FORMAT" = "null" ]; then
-	export TERMUX_REPO_PKG_FORMAT="debian"
-fi
-
+export TERMUX_REPO_PKG_FORMAT=$(jq --raw-output '.pkg_format // "debian"' ${TERMUX_SCRIPTDIR}/repo.json)
 
 # Special variable for internal use. It forces script to ignore
 # lock file.
