@@ -15,6 +15,7 @@ Options:
   --bindir          Directory containing LLVM executables.
   --includedir      Directory containing LLVM headers.
   --libdir          Directory containing LLVM libraries.
+  --cmakedir        Directory containing LLVM CMake modules.
   --cppflags        C preprocessor flags for files that include LLVM headers.
   --cflags          C compiler flags for files that include LLVM headers.
   --cxxflags        C++ compiler flags for files that include LLVM headers.
@@ -43,7 +44,7 @@ prefix=@TERMUX_PREFIX@
 has_rtti=NO
 CPPFLAGS="-I${prefix}/include -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS"
 CFLAGS="${CPPFLAGS} ${CFLAGS}"
-CXXFLAGS="${CFLAGS} -std=c++17 -fno-exceptions"
+CXXFLAGS="${CFLAGS} -std=c++17 -fno-exceptions -funwind-tables"
 if [ "$has_rtti" != "YES" ]; then CXXFLAGS="$CXXFLAGS -fno-rtti"; fi
 LDFLAGS="-L${prefix}/lib"
 LIBFILE="${prefix}/lib/libLLVM-${version/.*/}.so"
@@ -54,8 +55,8 @@ analysis arc arccodegen arcdesc arcdisassembler arcinfo arm armasmparser armcode
 armdesc armdisassembler arminfo armutils asmparser asmprinter avr avrasmparser \
 avrcodegen avrdesc avrdisassembler avrinfo binaryformat bitreader bitstreamreader \
 bitwriter bpf bpfasmparser bpfcodegen bpfdesc bpfdisassembler bpfinfo cfguard codegen \
-core coroutines coverage csky cskyasmparser cskycodegen cskydesc cskydisassembler \
-cskyinfo debuginfocodeview debuginfodwarf debuginfogsym debuginfologicalview \
+codegentypes core coroutines coverage csky cskyasmparser cskycodegen cskydesc cskydisassembler \
+cskyinfo debuginfobtf debuginfocodeview debuginfodwarf debuginfogsym debuginfologicalview \
 debuginfomsf debuginfopdb demangle dlltooldriver dwarflinker dwarflinkerparallel \
 dwp engine executionengine extensions filecheck frontendhlsl frontendopenacc \
 frontendopenmp fuzzercli fuzzmutate globalisel hexagon hexagonasmparser hexagoncodegen \
@@ -110,10 +111,10 @@ static_libs="-lLLVMWindowsManifest -lLLVMXRay -lLLVMLibDriver -lLLVMDlltoolDrive
 -lLLVMMCA -lLLVMMCDisassembler -lLLVMLTO -lLLVMCFGuard -lLLVMFrontendOpenACC -lLLVMFrontendHLSL \
 -lLLVMExtensions -lPolly -lPollyISL -lLLVMPasses -lLLVMCoroutines -lLLVMipo -lLLVMInstrumentation \
 -lLLVMVectorize -lLLVMLinker -lLLVMFrontendOpenMP -lLLVMDWARFLinkerParallel -lLLVMDWARFLinker \
--lLLVMGlobalISel -lLLVMMIRParser -lLLVMAsmPrinter -lLLVMSelectionDAG -lLLVMCodeGen \
+-lLLVMGlobalISel -lLLVMMIRParser -lLLVMAsmPrinter -lLLVMSelectionDAG -lLLVMCodeGen -lLLVMCodeGenTypes \
 -lLLVMObjCARCOpts -lLLVMIRPrinter -lLLVMInterfaceStub -lLLVMFileCheck -lLLVMFuzzMutate \
 -lLLVMTarget -lLLVMScalarOpts -lLLVMInstCombine -lLLVMAggressiveInstCombine -lLLVMTransformUtils \
--lLLVMBitWriter -lLLVMAnalysis -lLLVMProfileData -lLLVMSymbolize -lLLVMDebugInfoPDB \
+-lLLVMBitWriter -lLLVMAnalysis -lLLVMProfileData -lLLVMSymbolize -lLLVMDebugInfoBTF -lLLVMDebugInfoPDB \
 -lLLVMDebugInfoMSF -lLLVMDebugInfoDWARF -lLLVMObject -lLLVMTextAPI -lLLVMMCParser \
 -lLLVMIRReader -lLLVMAsmParser -lLLVMMC -lLLVMDebugInfoCodeView -lLLVMBitReader \
 -lLLVMFuzzerCLI -lLLVMCore -lLLVMRemarks -lLLVMBitstreamReader -lLLVMBinaryFormat \
