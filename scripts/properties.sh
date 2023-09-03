@@ -18,11 +18,7 @@ TERMUX_NDK_VERSION=$TERMUX_NDK_VERSION_NUM$TERMUX_NDK_REVISION
 # and update SHA256 sums in scripts/setup-android-sdk.sh
 # check all packages build and run correctly and bump if needed
 
-# : "${TERMUX_SCRIPTDIR:="$(realpath "$(dirname "$(readlink -f "$0")")/..")"}"
-if [ -z "${TERMUX_SCRIPTDIR:-}" ]; then
-	echo 'Warning: TERMUX_SCRIPTDIR not set for properties.sh'
- 	TERMUX_SCRIPTDIR="$(realpath ../..)"
-fi
+: "${TERMUX_SCRIPTDIR:=$(pwd)}"
 
 : "${TERMUX_JAVA_HOME:=/usr/lib/jvm/java-8-openjdk-amd64}"
 export JAVA_HOME=${TERMUX_JAVA_HOME}
