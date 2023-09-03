@@ -15,7 +15,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 
 # WASMEDGE_BUILD_AOT_RUNTIME is not supported on i686
 # https://github.com/WasmEdge/WasmEdge/blob/f6d99c87fef0db160d17ccf3f7f3cd87cbd56e68/lib/aot/compiler.cpp#L5032
-if [[ "${TERMUX_ARCH_BITS}" == "i686" ]]; then
+if [[ "${TERMUX_ARCH}" == "i686" ]]; then
 	TERMUX_PKG_DEPENDS="libc++"
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DWASMEDGE_BUILD_AOT_RUNTIME=OFF"
 fi
