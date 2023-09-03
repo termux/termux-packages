@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# setup CGCT - Cross Gnu Compiler for Termux
+# compile glibc-based binaries for Termux
 
 . $(dirname "$(realpath "$0")")/properties.sh
 . $(dirname "$(realpath "$0")")/build/termux_download.sh
@@ -16,8 +18,8 @@ if [ "$ARCH" != "$(uname -m)" ]; then
 fi
 
 declare -A CGCT=(
-	["cbt"]="cbt-${VERSION_OF_CBT}-${ARCH}.pkg.tar.xz"
-	["cgt"]="cgt-${VERSION_OF_CGT}-${ARCH}.pkg.tar.xz"
+	["cbt"]="cbt-${VERSION_OF_CBT}-${ARCH}.pkg.tar.xz" # Cross Binutils for Termux
+	["cgt"]="cgt-${VERSION_OF_CGT}-${ARCH}.pkg.tar.xz" # Cross GCC for Termux
 )
 
 : "${TERMUX_PKG_TMPDIR:="/tmp"}"
