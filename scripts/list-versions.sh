@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 SCRIPT_DIR=$(dirname "$(realpath "$0")")
+: "${TERMUX_SCRIPTDIR:="$(realpath "$SCRIPT_DIR/..")"}"
 . "$SCRIPT_DIR"/properties.sh
 
 check_package() { # path

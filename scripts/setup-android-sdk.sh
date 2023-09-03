@@ -3,6 +3,7 @@
 set -e -u
 
 : "${TERMUX_PKG_TMPDIR:="/tmp"}"
+: "${TERMUX_SCRIPTDIR:="$(realpath "$(dirname "$(readlink -f "$0")")/..")"}"
 
 # Install desired parts of the Android SDK:
 . $(cd "$(dirname "$0")"; pwd)/properties.sh

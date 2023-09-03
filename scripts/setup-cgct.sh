@@ -2,6 +2,7 @@
 # setup CGCT - Cross Gnu Compiler for Termux
 # compile glibc-based binaries for Termux
 
+: "${TERMUX_SCRIPTDIR:="$(realpath "$(dirname "$(readlink -f "$0")")/..")"}"
 . $(dirname "$(realpath "$0")")/properties.sh
 . $(dirname "$(realpath "$0")")/build/termux_download.sh
 

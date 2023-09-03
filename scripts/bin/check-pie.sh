@@ -1,6 +1,7 @@
 #!/bin/sh
 # check-pie.sh - script to detect non-PIE binaries (which does not work on Android)
 
+: "${TERMUX_SCRIPTDIR:="$(realpath "$(dirname "$(readlink -f "$0")")/../..")"}"
 . $(dirname "$(realpath "$0")")/properties.sh
 
 cd ${TERMUX_PREFIX}/bin

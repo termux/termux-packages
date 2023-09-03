@@ -115,6 +115,7 @@ lint_package() {
 		TERMUX_PKG_API_LEVEL=24
 
 		if [ -f "$REPO_DIR/scripts/properties.sh" ]; then
+			: "${TERMUX_SCRIPTDIR:=$REPO_DIR}"
 			. "$REPO_DIR/scripts/properties.sh"
 		fi
 
