@@ -21,7 +21,7 @@ TERMUX_NDK_VERSION=$TERMUX_NDK_VERSION_NUM$TERMUX_NDK_REVISION
 # : "${TERMUX_SCRIPTDIR:="$(realpath "$(dirname "$(readlink -f "$0")")/..")"}"
 if [ -z "${TERMUX_SCRIPTDIR:-}" ]; then
 	echo 'Warning: TERMUX_SCRIPTDIR not set for properties.sh'
- 	TERMUX_SCRIPTDIR="$(realpath "$(dirname "$(readlink -f "$0")")/..")"
+ 	TERMUX_SCRIPTDIR="$(realpath ../..)"
 fi
 
 : "${TERMUX_JAVA_HOME:=/usr/lib/jvm/java-8-openjdk-amd64}"
