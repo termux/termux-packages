@@ -1,6 +1,6 @@
---- ../emacs-27/src/filelock.c	2019-11-28 09:41:28.000000000 +0100
-+++ ./src/filelock.c	2019-11-28 15:07:18.792543698 +0100
-@@ -63,11 +63,11 @@
+--- ./src/filelock.c.org	2023-09-04 19:19:14.282110171 +0200
++++ ./src/filelock.c	2023-09-04 19:21:09.469561631 +0200
+@@ -62,11 +62,11 @@
  /* A file whose last-modified time is just after the most recent boot.
     Define this to be NULL to disable checking for this file.  */
  #ifndef BOOT_TIME_FILE
@@ -8,13 +8,13 @@
 +#define BOOT_TIME_FILE "@TERMUX_PREFIX@/var/run/random-seed"
  #endif
  
- #if !defined WTMP_FILE && !defined WINDOWSNT
+ #if !defined WTMP_FILE && !defined WINDOWSNT && defined BOOT_TIME
 -#define WTMP_FILE "/var/log/wtmp"
 +#define WTMP_FILE "@TERMUX_PREFIX@/var/log/wtmp"
  #endif
  
  /* Normally use a symbolic link to represent a lock.
-@@ -127,14 +127,14 @@
+@@ -126,14 +126,14 @@
  static time_t boot_time;
  static bool boot_time_initialized;
  
@@ -31,7 +31,7 @@
    int counter;
  #endif
  
-@@ -170,7 +170,7 @@
+@@ -169,7 +169,7 @@
  	}
      }
  
@@ -40,7 +40,7 @@
    /* The utmp routines maintain static state.  Don't touch that state
       if we are going to dump, since it might not survive dumping.  */
    if (will_dump_p ())
-@@ -229,7 +229,7 @@
+@@ -228,7 +228,7 @@
  #endif
  }
  
