@@ -36,6 +36,8 @@ termux_setup_toolchain_gnu() {
 		"x86_64"|"i686") CFLAGS+=" -mtune=generic -fcf-protection";;
 	esac
 
+ 	export CCTERMUX_HOST_PLATFORM=$TERMUX_HOST_PLATFORM
+
 	export PKG_CONFIG=pkg-config
 	export PKGCONFIG=$PKG_CONFIG
  	export PKG_CONFIG_LIBDIR="$TERMUX_PKG_CONFIG_LIBDIR"
