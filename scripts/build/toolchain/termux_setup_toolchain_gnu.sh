@@ -26,7 +26,7 @@ termux_setup_toolchain_gnu() {
 	elif [ "$TERMUX_ARCH" = "arm" ]; then
 		CFLAGS+=" -march=armv7-a -mfloat-abi=hard -mfpu=neon"
 	elif [ "$TERMUX_ARCH" = "x86_64" ]; then
-		CFLAGS+=" -march=x86-64"
+		CFLAGS+=" -fPIC -march=x86-64"
 	elif [ "$TERMUX_ARCH" = "i686" ]; then
 		CFLAGS+=" -march=i686"
 	fi
