@@ -1,0 +1,12 @@
+diff -uNr zig-bootstrap-0.11.0/zig/lib/libc/musl/src/unistd/access.c zig-bootstrap-0.11.0.mod/zig/lib/libc/musl/src/unistd/access.c
+--- zig-bootstrap-0.11.0/zig/lib/libc/musl/src/unistd/access.c	2023-08-11 09:21:14.000000000 +0800
++++ zig-bootstrap-0.11.0.mod/zig/lib/libc/musl/src/unistd/access.c	2023-09-06 11:41:47.373124956 +0800
+@@ -4,7 +4,7 @@
+ 
+ int access(const char *filename, int amode)
+ {
+-#ifdef SYS_access
++#if defined(SYS_access) && !defined(__x86_64__)
+ 	return syscall(SYS_access, filename, amode);
+ #else
+ 	return syscall(SYS_faccessat, AT_FDCWD, filename, amode, 0);

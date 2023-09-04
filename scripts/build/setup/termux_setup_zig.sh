@@ -10,6 +10,13 @@ termux_setup_zig() {
 	fi
 	local ZIG_PKG_VERSION=$(. "${TERMUX_SCRIPTDIR}/packages/zig/build.sh"; echo ${TERMUX_PKG_VERSION})
 
+	# zig 0.9.1 android triples never worked and uses musl
+	export ZIG_TARGET_NAME="${TERMUX_ARCH}-linux-musl"
+	case "${TERMUX_ARCH}" in
+	arm) ZIG_TARGET_NAME="arm-linux-musleabihf" ;;
+	i686) ZIG_TARGET_NAME="x86-linux-musl" ;;
+	esac
+
 	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "true" ]]; then
 		if [[ "$(cat "${TERMUX_BUILT_PACKAGES_DIRECTORY}/zig" 2>/dev/null)" != "${ZIG_PKG_VERSION}" && -z "$(command -v zig)" ]]; then
 			cat <<- EOL
@@ -31,6 +38,11 @@ termux_setup_zig() {
 		mkdir -p "${ZIG_FOLDER}"
 		termux_download "${ZIG_TXZ_URL}" "${ZIG_TXZ_FILE}" "${ZIG_TXZ_SHA256}"
 		tar -xf "${ZIG_TXZ_FILE}" -C "${ZIG_FOLDER}" --strip-components=1
+
+		echo "termux_setup_zig: Applying patches from packages/zig"
+		for p in "${TERMUX_SCRIPTDIR}"/packages/zig/zig-*.patch; do
+			patch -d "${ZIG_FOLDER}" -p2 -i "${p}"
+		done
 	fi
 
 	export PATH="${ZIG_FOLDER}:${PATH}"
