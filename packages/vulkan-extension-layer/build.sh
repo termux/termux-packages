@@ -2,11 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://github.com/KhronosGroup/Vulkan-ExtensionLayer
 TERMUX_PKG_DESCRIPTION="Vulkan Extension Layer"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.3.261"
+TERMUX_PKG_VERSION="1.3.263"
 TERMUX_PKG_SRCURL=https://github.com/KhronosGroup/Vulkan-ExtensionLayer/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=970944aebdc8cabcfc381ea722e67576e243bc3cde7ec71e6f2dd9e026d50b2a
+TERMUX_PKG_SHA256=7396834f65401055762e852df61378a1a0a410d1c3214cca4b2201fc251b1392
 TERMUX_PKG_DEPENDS="libc++, vulkan-loader"
-TERMUX_PKG_BUILD_DEPENDS="vulkan-headers (=${TERMUX_PKG_VERSION}), vulkan-loader-generic (=${TERMUX_PKG_VERSION})"
+TERMUX_PKG_BUILD_DEPENDS="vulkan-headers (=${TERMUX_PKG_VERSION}), vulkan-loader-generic (=${TERMUX_PKG_VERSION}), vulkan-utility-libraries (=${TERMUX_PKG_VERSION})"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="vulkan-loader"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
