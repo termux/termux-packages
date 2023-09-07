@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="zig/LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.11.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/ziglang/zig-bootstrap/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=046cede54ae0627c6ac98a1b3915242b35bc550ac7aaec3ec4cef6904c95019e
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -20,13 +21,6 @@ termux_step_make() {
 	# zig 0.11.0+ uses 3 stages bootstrapping build system
 	# which NDK cant be used anymore
 	unset AS CC CFLAGS CPP CPPFLAGS CXX CXXFLAGS LD LDFLAGS
-
-	# zig 0.9.1 android triples never worked and uses musl
-	export ZIG_TARGET_NAME="${TERMUX_ARCH}-linux-musl"
-	case "${TERMUX_ARCH}" in
-	arm) ZIG_TARGET_NAME="arm-linux-musleabihf" ;;
-	i686) ZIG_TARGET_NAME="x86-linux-musl" ;;
-	esac
 
 	# build.patch skipped various steps to make CI build <6 hours
 	./build "${ZIG_TARGET_NAME}" baseline
