@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/nxtrace/Ntrace-V1
 TERMUX_PKG_DESCRIPTION="An open source visual routing tool that pursues light weight"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.2.0.3"
+TERMUX_PKG_VERSION="1.2.1"
 TERMUX_PKG_SRCURL=https://github.com/nxtrace/Ntrace-V1/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=261d88ff2a4e03979bf53923485bb27ed6ebbd5318ba52a9659b6c831e24e78b
+TERMUX_PKG_SHA256=f04511d1111e94df342a317db89ec21b7746f5c74bdca0b25d92cad57e4cc109
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
