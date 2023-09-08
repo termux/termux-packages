@@ -5,7 +5,6 @@ termux_setup_toolchain_gnu() {
 
 	export CC=$TERMUX_HOST_PLATFORM-gcc
 	export CXX=$TERMUX_HOST_PLATFORM-g++
-	export CPP="$TERMUX_HOST_PLATFORM-c++ -E"
 	export AR=$TERMUX_HOST_PLATFORM-gcc-ar
 	export RANLIB=$TERMUX_HOST_PLATFORM-gcc-ranlib
 	export NM=$TERMUX_HOST_PLATFORM-gcc-nm
