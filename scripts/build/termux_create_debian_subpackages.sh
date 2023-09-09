@@ -18,7 +18,7 @@ termux_create_debian_subpackages() {
 		local SUB_PKG_NAME
 		SUB_PKG_NAME=$(basename "$subpackage" .subpackage.sh)
 		if [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ] && ! package__is_package_name_have_glibc_prefix "$SUB_PKG_NAME"; then
-			SUB_PKG_NAME="${SUB_PKG_NAME}-glibc"
+			SUB_PKG_NAME="$(package__add_prefix_glibc_to_package_name ${SUB_PKG_NAME})"
 		fi
 		# Default value is same as main package, but sub package may override:
 		local TERMUX_SUBPKG_PLATFORM_INDEPENDENT=$TERMUX_PKG_PLATFORM_INDEPENDENT
@@ -109,13 +109,13 @@ termux_create_debian_subpackages() {
 		fi
 
 		if [ "$TERMUX_GLOBAL_LIBRARY" = "true" ] && [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
-			test ! -z "$TERMUX_SUBPKG_DEPENDS" && TERMUX_SUBPKG_DEPENDS=$(package__add_prefix_glibc_to_package_names "$TERMUX_SUBPKG_DEPENDS")
-			test ! -z "$TERMUX_SUBPKG_BREAKS" && TERMUX_SUBPKG_BREAKS=$(package__add_prefix_glibc_to_package_names "$TERMUX_SUBPKG_BREAKS")
-			test ! -z "$TERMUX_SUBPKG_CONFLICTS" && TERMUX_SUBPKG_CONFLICTS=$(package__add_prefix_glibc_to_package_names "$TERMUX_SUBPKG_CONFLICTS")
-			test ! -z "$TERMUX_SUBPKG_RECOMMENDS" && TERMUX_SUBPKG_RECOMMENDS=$(package__add_prefix_glibc_to_package_names "$TERMUX_SUBPKG_RECOMMENDS")
-			test ! -z "$TERMUX_SUBPKG_REPLACES" && TERMUX_SUBPKG_REPLACES=$(package__add_prefix_glibc_to_package_names "$TERMUX_SUBPKG_REPLACES")
-			test ! -z "$TERMUX_SUBPKG_PROVIDES" && TERMUX_SUBPKG_PROVIDES=$(package__add_prefix_glibc_to_package_names "$TERMUX_SUBPKG_PROVIDES")
-			test ! -z "$TERMUX_SUBPKG_SUGGESTS" && TERMUX_SUBPKG_SUGGESTS=$(package__add_prefix_glibc_to_package_names "$TERMUX_SUBPKG_SUGGESTS")
+			test ! -z "$TERMUX_SUBPKG_DEPENDS" && TERMUX_SUBPKG_DEPENDS=$(package__add_prefix_glibc_to_package_list "$TERMUX_SUBPKG_DEPENDS")
+			test ! -z "$TERMUX_SUBPKG_BREAKS" && TERMUX_SUBPKG_BREAKS=$(package__add_prefix_glibc_to_package_list "$TERMUX_SUBPKG_BREAKS")
+			test ! -z "$TERMUX_SUBPKG_CONFLICTS" && TERMUX_SUBPKG_CONFLICTS=$(package__add_prefix_glibc_to_package_list "$TERMUX_SUBPKG_CONFLICTS")
+			test ! -z "$TERMUX_SUBPKG_RECOMMENDS" && TERMUX_SUBPKG_RECOMMENDS=$(package__add_prefix_glibc_to_package_list "$TERMUX_SUBPKG_RECOMMENDS")
+			test ! -z "$TERMUX_SUBPKG_REPLACES" && TERMUX_SUBPKG_REPLACES=$(package__add_prefix_glibc_to_package_list "$TERMUX_SUBPKG_REPLACES")
+			test ! -z "$TERMUX_SUBPKG_PROVIDES" && TERMUX_SUBPKG_PROVIDES=$(package__add_prefix_glibc_to_package_list "$TERMUX_SUBPKG_PROVIDES")
+			test ! -z "$TERMUX_SUBPKG_SUGGESTS" && TERMUX_SUBPKG_SUGGESTS=$(package__add_prefix_glibc_to_package_list "$TERMUX_SUBPKG_SUGGESTS")
 		fi
 
 		[ "$TERMUX_SUBPKG_ESSENTIAL" = "true" ] && echo "Essential: yes" >> control

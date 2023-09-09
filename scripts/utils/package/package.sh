@@ -75,6 +75,29 @@ package__is_package_name_have_glibc_prefix() {
 
 
 ##
+# Adds the prefix `-glibc` to the package name
+# .
+# .
+# **Parameters:**
+# `package_name` - Package name.
+# .
+# **Returns:**
+# Returns a modified package name.
+# .
+# .
+# package__add_prefix_glibc_to_package_name `package_name`
+##
+package__add_prefix_glibc_to_package_name() {
+	if [[ "${1}" = *"-static" ]]; then
+		echo "${1/-static/-glibc-static}"
+	else
+		echo "${1}-glibc"
+	fi
+}
+
+
+
+##
 # Adds the prefix `-glibc` to the list of package names if necessary.
 # .
 # .
@@ -85,9 +108,9 @@ package__is_package_name_have_glibc_prefix() {
 # Returns a modified list of package names.
 # .
 # .
-# package__add_prefix_glibc_to_package_names `package_list`
+# package__add_prefix_glibc_to_package_list `package_list`
 ##
-package__add_prefix_glibc_to_package_names() {
+package__add_prefix_glibc_to_package_list() {
 	local packages=""
 	for __pkg in ${1//,/}; do
 		if ! $(echo "${__pkg}" | grep -q -e '(' -e ')' -e '|'); then
@@ -96,11 +119,7 @@ package__add_prefix_glibc_to_package_names() {
 			fi
 			packages+=" "
 			if ! package__is_package_name_have_glibc_prefix "${__pkg}"; then
-				if $(echo "${__pkg}" | grep -q -e "-static"); then
-					packages+="${__pkg/-static/}-glibc-static"
-				else
-					packages+="${__pkg}-glibc"
-				fi
+				packages+="$(package__add_prefix_glibc_to_package_name ${__pkg})"
 			else
 				packages+="${__pkg}"
 			fi
