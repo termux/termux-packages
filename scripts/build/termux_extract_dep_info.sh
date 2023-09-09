@@ -15,7 +15,11 @@ termux_extract_dep_info() {
 			if [ "$TERMUX_INSTALL_DEPS" = "false" ] || \
 				   [ "$TERMUX_PKG_NO_STATICSPLIT" = "true" ] || \
 				   [ "${PKG/-static/}-static" != "${PKG}" ]; then
-				source ${PKG_DIR}/${PKG}.subpackage.sh
+				if [ -f "${PKG_DIR}/${PKG}.subpackage.sh" ]; then
+					source ${PKG_DIR}/${PKG}.subpackage.sh
+				else
+					source ${PKG_DIR}/${PKG/-glibc/}.subpackage.sh
+				fi
 			fi
 			if [ "$TERMUX_SUBPKG_PLATFORM_INDEPENDENT" = "true" ]; then
 				echo all

@@ -38,7 +38,7 @@ termux_step_setup_variables() {
 	if [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
 		export TERMUX_PREFIX="$TERMUX_PREFIX/glibc"
 		if ! package__is_package_name_have_glibc_prefix "$TERMUX_PKG_NAME"; then
-			TERMUX_PKG_NAME="${TERMUX_PKG_NAME}-glibc"
+			TERMUX_PKG_NAME="$(package__add_prefix_glibc_to_package_name ${TERMUX_PKG_NAME})"
 		fi
 	fi
 
