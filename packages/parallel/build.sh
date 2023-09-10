@@ -16,6 +16,10 @@ termux_pkg_auto_update() {
 	local api_url_r=$(curl -s "${api_url}/")
 	local r1=$(echo "${api_url_r}" | sed -nE 's|<.*>parallel-(.*).tar.bz2<.*>.*|\1|p')
 	local latest_version=$(echo "${r1}" | sed -nE 's|([0-9]+)|\1|p' | tail -n1)
+	if [[ "${latest_version}" == "${TERMUX_PKG_VERSION}" ]]; then
+		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
+		return
+	fi
 
 	[[ -z "${api_url_r}" ]] && e=1
 	[[ -z "${r1}" ]] && e=1
@@ -27,11 +31,6 @@ termux_pkg_auto_update() {
 		r1=${r1}
 		latest_version=${latest_version}
 		EOL
-		return
-	fi
-
-	if [[ "${latest_version}" == "${TERMUX_PKG_VERSION}" ]]; then
-		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
 		return
 	fi
 
