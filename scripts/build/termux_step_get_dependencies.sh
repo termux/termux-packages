@@ -122,5 +122,9 @@ termux_run_build-package() {
 			set_library="glibc"
 		fi
 	fi
-	TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh -s $(test "${TERMUX_FORCE_BUILD_DEPENDENCIES}" = "true" && echo "-F" || true) $(test "${TERMUX_WITHOUT_DEPVERSION_BINDING}" = "true" && echo "-w") --format $TERMUX_PACKAGE_FORMAT --library $set_library "${PKG_DIR}"
+	TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh \
+ 		$(test "${TERMUX_INSTALL_DEPS}" = "true" && echo "-I" || true) \
+ 		$(test "${TERMUX_FORCE_BUILD_DEPENDENCIES}" = "true" && echo "-F" || true) \
+   		$(test "${TERMUX_WITHOUT_DEPVERSION_BINDING}" = "true" && echo "-w") \
+     		--format $TERMUX_PACKAGE_FORMAT --library $set_library "${PKG_DIR}"
 }
