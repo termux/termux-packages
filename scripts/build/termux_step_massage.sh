@@ -61,12 +61,8 @@ termux_step_massage() {
 	if [ "$TERMUX_PKG_NO_SHEBANG_FIX" != "true" ]; then
 		# Fix shebang paths:
 		while IFS= read -r -d '' file; do
-			if head -c 100 "$file" | head -n 1 | grep -E "^#!.*/bin/.*" | grep -q -E -v "^#! ?/system"; then
-				if [ "$TERMUX_PACKAGE_LIBRARY" = "bionic" ]; then
-					sed --follow-symlinks -i -E "1 s@^#\!(.*)/bin/(.*)@#\!$TERMUX_PREFIX/bin/\2@" "$file"
-				elif [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
-					sed --follow-symlinks -i -E "1 s@^#\!(.*)/bin/(.*)@#\!$TERMUX_PREFIX_CLASSICAL/bin/\2@" "$file"
-				fi
+			if head -c 100 "$file" | head -n 1 | grep -E "^#!.*/bin/.*" | grep -q -E -v -e "^#! ?/system" -e "^#! ?$TERMUX_PREFIX_CLASSICAL"; then
+				sed --follow-symlinks -i -E "1 s@^#\!(.*)/bin/(.*)@#\!$TERMUX_PREFIX/bin/\2@" "$file"
 			fi
 		done < <(find -L . -type f -print0)
 	fi
