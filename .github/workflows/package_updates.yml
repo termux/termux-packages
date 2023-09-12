@@ -25,6 +25,12 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.TERMUXBOT2_TOKEN }}
+      - name: Free additional disk space
+        run: |
+          sudo apt purge -yq $(dpkg -l | grep '^ii' | awk '{ print $2 }' | grep -P '(aspnetcore|cabal-|dotnet-|ghc-|libmono|php)') \
+            firefox google-chrome-stable microsoft-edge-stable mono-runtime-common monodoc-manual ruby
+          sudo apt autoremove -yq
+          sudo rm -fr /opt/hostedtoolcache /usr/local /usr/share/dotnet /usr/share/swift
       - name: Process package updates
         env:
           GITHUB_TOKEN: ${{ secrets.TERMUXBOT2_TOKEN }}
