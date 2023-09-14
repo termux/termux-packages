@@ -50,7 +50,7 @@ termux_setup_toolchain_gnu() {
 		if ! $(echo "$PATH" | grep -q "^$TERMUX_STANDALONE_TOOLCHAIN/bin:"); then
 			export PATH="$TERMUX_STANDALONE_TOOLCHAIN/bin:$PATH"
 		fi
-  		if ! $(echo "$PATH" | grep -q ":$TERMUX_PREFIX/bin$"); then
+  		if ! $(echo "$PATH" | grep -q ":$TERMUX_PREFIX/bin"); then
 			export PATH="$PATH:$TERMUX_PREFIX/bin"
 		fi
 	fi
