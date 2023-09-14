@@ -3,16 +3,16 @@ TERMUX_PKG_DESCRIPTION="Go compiler for microcontrollers, WASM, CLI tools"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.28.1"
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION="0.29.0"
 TERMUX_PKG_SRCURL=git+https://github.com/tinygo-org/tinygo
 TERMUX_PKG_GIT_BRANCH="v${TERMUX_PKG_VERSION}"
-TERMUX_PKG_SHA256=fbf83a67f5b0d57742616b7591b8de26cabd234cee3d27c800440f1b22f868ab
+TERMUX_PKG_SHA256=1a0dc330f08c28b9adb3e06ef42c586f1257b979618ea0f5f5a0467588743bba
 TERMUX_PKG_DEPENDS="libc++, tinygo-common"
 TERMUX_PKG_RECOMMENDS="binaryen"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
+TERMUX_PKG_AUTO_UPDATE=true
 
 _LLVM_OPTION="
 -DCMAKE_BUILD_TYPE=MinSizeRel
@@ -39,6 +39,57 @@ lib/libLLVMOrcJIT.a
 lib/libLLVMLineEditor.a
 lib/libLLVMXRay.a
 "
+
+termux_pkg_auto_update() {
+	local latest_tag
+	latest_tag=$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}" "${TERMUX_PKG_UPDATE_TAG_TYPE}")
+
+	if [[ -z "${latest_tag}" ]]; then
+		termux_error_exit "ERROR: Unable to get tag from ${TERMUX_PKG_SRCURL}"
+	fi
+
+	if [[ "${latest_tag}" == "${TERMUX_PKG_VERSION}" ]]; then
+		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
+		return
+	fi
+
+	local uptime_now=$(uptime -p)
+	local uptime_y=$(echo "${uptime_now}" | sed -nE "s|.* ([0-9]+) year.*|\1|p")
+	local uptime_w=$(echo "${uptime_now}" | sed -nE "s|.* ([0-9]+) week.*|\1|p")
+	local uptime_d=$(echo "${uptime_now}" | sed -nE "s|.* ([0-9]+) day.*|\1|p")
+	local uptime_h=$(echo "${uptime_now}" | sed -nE "s|.* ([0-9]+) hour.*|\1|p")
+	local uptime_m=$(echo "${uptime_now}" | sed -nE "s|.* ([0-9]+) minute.*|\1|p")
+	[[ -z "${uptime_y}" ]] && uptime_y=0
+	[[ -z "${uptime_w}" ]] && uptime_w=0
+	[[ -z "${uptime_d}" ]] && uptime_d=0
+	[[ -z "${uptime_h}" ]] && uptime_h=0
+	[[ -z "${uptime_m}" ]] && uptime_m=0
+	local uptime_m_sum=$((uptime_y*365*24*60+uptime_w*7*24*60+uptime_d*24*60+uptime_h*60+uptime_m))
+	local uptime_h_limit=1
+	local uptime_m_limit=$((uptime_h_limit*60))
+	if [[ "${uptime_m_sum}" -gt "${uptime_m_limit}" ]]; then
+		cat <<- EOL >&2
+		WARN: Uptime exceeds time limit! Deferring update.
+		Current uptime: ${uptime_now}
+		Limit (hour):   ${uptime_h_limit}
+		EOL
+		return
+	fi
+
+	local tmpdir=$(mktemp -d)
+	git clone --branch "${latest_tag}" --depth=1 --recursive \
+		"${TERMUX_PKG_SRCDIR#git+}" "${tmpdir}"
+	make -C "${tmpdir}" llvm-source GO=:
+	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum | cut -d" " -f1)
+
+	sed \
+		-e "s|^TERMUX_PKG_SHA256=.*|TERMUX_PKG_SHA256=${s}|" \
+		-i "${TERMUX_PKG_BUILDER_DIR}/build.sh"
+
+	rm -fr "${tmpdir}"
+
+	termux_pkg_upgrade_version "${latest_tag}"
+}
 
 termux_step_post_get_source() {
 	# https://github.com/tinygo-org/tinygo/blob/release/Makefile
@@ -70,11 +121,11 @@ termux_step_host_build() {
 		-j "${TERMUX_MAKE_PROCESSES}" \
 		${_LLVM_EXTRA_BUILD_TARGETS}
 
-	echo "========== llvm-config =========="
+	echo "===== llvm-config ====="
 	file "${TERMUX_PKG_HOSTBUILD_DIR}/bin/llvm-config"
 	"${TERMUX_PKG_HOSTBUILD_DIR}/bin/llvm-config" --cppflags
 	"${TERMUX_PKG_HOSTBUILD_DIR}/bin/llvm-config" --ldflags --libs --system-libs
-	echo "========== llvm-config =========="
+	echo "===== llvm-config ====="
 
 	make build/release \
 		LLVM_BUILDDIR="${TERMUX_PKG_HOSTBUILD_DIR}" \
@@ -117,10 +168,10 @@ termux_step_make() {
 	local _LLVM_TARGET_TRIPLE=${TERMUX_HOST_PLATFORM/-/-unknown-}${TERMUX_PKG_API_LEVEL}
 	local _LLVM_TARGET_ARCH
 	case "${TERMUX_ARCH}" in
-		aarch64) _LLVM_TARGET_ARCH=AArch64 ;;
-		arm) _LLVM_TARGET_ARCH=ARM ;;
-		i686|x86_64) _LLVM_TARGET_ARCH=X86 ;;
-		*) termux_error_exit "Invalid arch: ${TERMUX_ARCH}" ;;
+	aarch64) _LLVM_TARGET_ARCH="AArch64" ;;
+	arm) _LLVM_TARGET_ARCH="ARM" ;;
+	i686|x86_64) _LLVM_TARGET_ARCH="X86" ;;
+	*) termux_error_exit "Invalid arch: ${TERMUX_ARCH}" ;;
 	esac
 	_LLVM_OPTION+="
 	-DLLVM_HOST_TRIPLE=${_LLVM_TARGET_TRIPLE}

@@ -1,8 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://emscripten.org
 TERMUX_PKG_DESCRIPTION="Emscripten: An LLVM-to-WebAssembly Compiler"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="@truboxl"
-TERMUX_PKG_VERSION="3.1.44"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="3.1.45"
 TERMUX_PKG_SRCURL=git+https://github.com/emscripten-core/emscripten
 TERMUX_PKG_GIT_BRANCH=${TERMUX_PKG_VERSION}
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
@@ -55,13 +55,13 @@ opt/emscripten/LICENSE
 
 # https://github.com/emscripten-core/emscripten/issues/11362
 # can switch to stable LLVM to save space once above is fixed
-_LLVM_COMMIT=a8cbd27d1f238e104a5d5ca345d93bc1f4d4ab1f
-_LLVM_TGZ_SHA256=bea774cf5fff3f246f27bfe054bf53e37ff27e40a70cdf604abff07d005dcdda
+_LLVM_COMMIT=f740bcb3707a17ed4ccd52157089011a586cc2a6
+_LLVM_TGZ_SHA256=7ff7fdce276655c4956af5276789215eb373dacd2ab4c9e2670478cca3b8bb22
 
 # https://github.com/emscripten-core/emscripten/issues/12252
 # upstream says better bundle the right binaryen revision for now
-_BINARYEN_COMMIT=e2f5d79fd0f9bd12d69733e98b534ce63592bd57
-_BINARYEN_TGZ_SHA256=49f6492ad57aed662c04a4416047f16a7e65489912e88f78cd00aedc5bd72892
+_BINARYEN_COMMIT=afca5f51a46750927ac9263297d24b224915e558
+_BINARYEN_TGZ_SHA256=c6e111fb4da03e756a6f40b8ba6f75890ab644530b98f84a75b2778da8767b0e
 
 # https://github.com/emscripten-core/emsdk/blob/main/emsdk.py
 # https://chromium.googlesource.com/emscripten-releases/+/refs/heads/main/src/build.py
@@ -121,12 +121,13 @@ termux_pkg_auto_update() {
 
 	if [[ "${latest_tag}" == "${TERMUX_PKG_VERSION}" ]]; then
 		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
-		return 0
+		return
 	fi
 
 	# https://github.com/emscripten-core/emscripten/blob/main/docs/packaging.md
 	# https://github.com/archlinux/svntogit-community/tree/packages/emscripten/trunk
 	# below generates commit hash for the deps according to emscripten releases
+	local tmpdir=$(mktemp -d)
 	local releases_tags release_tag deps_revision deps_json llvm_commit binaryen_commit llvm_tgz_sha256 binaryen_tgz_sha256
 	releases_tags=$(curl -s https://raw.githubusercontent.com/emscripten-core/emsdk/main/emscripten-releases-tags.json)
 	release_tag=$(echo "${releases_tags}" | python3 -c "import json,sys;print(json.load(sys.stdin)[\"releases\"][\"${latest_tag}\"])")
@@ -134,14 +135,16 @@ termux_pkg_auto_update() {
 	deps_json=$(echo -e "{\n${deps_revision}EOL" | sed -e "s|,EOL|\n}|")
 	llvm_commit=$(echo "${deps_json}" | python3 -c "import json,sys;print(json.load(sys.stdin)[\"llvm_project_revision\"])")
 	binaryen_commit=$(echo "${deps_json}" | python3 -c "import json,sys;print(json.load(sys.stdin)[\"binaryen_revision\"])")
-	curl -LC - "https://github.com/llvm/llvm-project/archive/${llvm_commit}.tar.gz" -o "${TMPDIR:-/tmp}/${llvm_commit}.tar.gz"
-	curl -LC - "https://github.com/WebAssembly/binaryen/archive/${binaryen_commit}.tar.gz" -o "${TMPDIR:-/tmp}/${binaryen_commit}.tar.gz"
-	llvm_tgz_sha256=$(sha256sum "${TMPDIR:-/tmp}/${llvm_commit}.tar.gz" | sed -e "s| .*$||")
-	binaryen_tgz_sha256=$(sha256sum "${TMPDIR:-/tmp}/${binaryen_commit}.tar.gz" | sed -e "s| .*$||")
+	curl -LC - "https://github.com/llvm/llvm-project/archive/${llvm_commit}.tar.gz" -o "${tmpdir}/${llvm_commit}.tar.gz"
+	curl -LC - "https://github.com/WebAssembly/binaryen/archive/${binaryen_commit}.tar.gz" -o "${tmpdir}/${binaryen_commit}.tar.gz"
+	llvm_tgz_sha256=$(sha256sum "${tmpdir}/${llvm_commit}.tar.gz" | sed -e "s| .*$||")
+	binaryen_tgz_sha256=$(sha256sum "${tmpdir}/${binaryen_commit}.tar.gz" | sed -e "s| .*$||")
 
-	echo "INFO: Generated *.tar.gz checksum for:"
-	echo "_LLVM_COMMIT     ${llvm_commit} = ${llvm_tgz_sha256}"
-	echo "_BINARYEN_COMMIT ${binaryen_commit} = ${binaryen_tgz_sha256}"
+	cat <<- EOL
+	INFO: Generated *.tar.gz checksum for:
+	_LLVM_COMMIT     ${llvm_commit} = ${llvm_tgz_sha256}
+	_BINARYEN_COMMIT ${binaryen_commit} = ${binaryen_tgz_sha256}
+	EOL
 
 	sed -i "${TERMUX_PKG_BUILDER_DIR}/build.sh" \
 		-e "s|^_LLVM_COMMIT=.*|_LLVM_COMMIT=${llvm_commit}|" \
@@ -149,7 +152,7 @@ termux_pkg_auto_update() {
 		-e "s|^_BINARYEN_COMMIT=.*|_BINARYEN_COMMIT=${binaryen_commit}|" \
 		-e "s|^_BINARYEN_TGZ_SHA256=.*|_BINARYEN_TGZ_SHA256=${binaryen_tgz_sha256}|"
 
-	rm -f "${TMPDIR:-/tmp}/${llvm_commit}.tar.gz" "${TMPDIR:-/tmp}/${binaryen_commit}.tar.gz"
+	rm -fr "${tmpdir}"
 
 	termux_pkg_upgrade_version "$latest_tag"
 }
@@ -251,18 +254,19 @@ termux_step_make() {
 	termux_setup_ninja
 
 	# from packages/libllvm/build.sh
-	local _LLVM_DEFAULT_TARGET_TRIPLE=${CCTERMUX_HOST_PLATFORM/-/-unknown-}
+	local _LLVM_TARGET_TRIPLE=${TERMUX_HOST_PLATFORM/-/-unknown-}${TERMUX_PKG_API_LEVEL}
 	local _LLVM_TARGET_ARCH
 	case "${TERMUX_ARCH}" in
-		aarch64) _LLVM_TARGET_ARCH=AArch64 ;;
-		arm) _LLVM_TARGET_ARCH=ARM ;;
-		i686|x86_64) _LLVM_TARGET_ARCH=X86 ;;
-		*) termux_error_exit "Invalid arch: ${TERMUX_ARCH}" ;;
+	aarch64) _LLVM_TARGET_ARCH=AArch64 ;;
+	arm) _LLVM_TARGET_ARCH=ARM ;;
+	i686|x86_64) _LLVM_TARGET_ARCH=X86 ;;
+	*) termux_error_exit "Invalid arch: ${TERMUX_ARCH}" ;;
 	esac
-
-	_LLVM_BUILD_ARGS+=" -DLLVM_TARGET_ARCH=${_LLVM_TARGET_ARCH}"
-	_LLVM_BUILD_ARGS+=" -DLLVM_TARGETS_TO_BUILD=WebAssembly;${_LLVM_TARGET_ARCH}"
-	_LLVM_BUILD_ARGS+=" -DLLVM_HOST_TRIPLE=${_LLVM_DEFAULT_TARGET_TRIPLE}"
+	_LLVM_BUILD_ARGS+="
+	-DLLVM_HOST_TRIPLE=${_LLVM_TARGET_TRIPLE}
+	-DLLVM_TARGET_ARCH=${_LLVM_TARGET_ARCH}
+	-DLLVM_TARGETS_TO_BUILD=WebAssembly;${_LLVM_TARGET_ARCH}
+	"
 
 	cmake \
 		-G Ninja \
@@ -331,9 +335,14 @@ termux_step_make_install() {
 	ln -fs "lld"     "${TERMUX_PREFIX}/opt/emscripten-llvm/bin/wasm-ld"
 
 	# termux_step_massage strip does not cover opt dir
-	for path in "${TERMUX_PREFIX}"/opt/emscripten-{llvm,binaryen}/{bin,lib}; do
-		find "${path}" -type f -exec "${STRIP}" "{}" \;
-	done
+	find "${TERMUX_PREFIX}/opt" \( \
+		-path "*/emscripten-llvm/bin/*" -o \
+		-path "*/emscripten-llvm/lib/*" -o \
+		-path "*/emscripten-binaryen/bin/*" -o \
+		-path "*/emscripten-binaryen/lib/*" \
+	\) -type f -print0 | \
+		xargs -0 -r file | grep -E "ELF .+ (executable|shared object)" | \
+		cut -d":" -f1 | xargs -r "${STRIP}" --strip-unneeded --preserve-dates
 
 	popd
 }

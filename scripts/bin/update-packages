@@ -22,7 +22,7 @@ export TERMUX_SCRIPTDIR
 TERMUX_SCRIPTDIR=$(realpath "$(dirname "$0")/../..") # Root of repository.
 
 export TERMUX_PACKAGES_DIRECTORIES
-TERMUX_PACKAGES_DIRECTORIES=$(jq --raw-output 'keys | .[]' "${TERMUX_SCRIPTDIR}"/repo.json)
+TERMUX_PACKAGES_DIRECTORIES=$(jq --raw-output 'del(.pkg_format) | keys | .[]' "${TERMUX_SCRIPTDIR}"/repo.json)
 
 # Define few more variables used by scripts.
 # shellcheck source=scripts/properties.sh
@@ -189,7 +189,7 @@ _update_dependencies() {
 echo "INFO: Running update for: $*"
 
 if [[ "$1" == "@all" ]]; then
-	for repo_dir in $(jq --raw-output 'keys | .[]' "${TERMUX_SCRIPTDIR}/repo.json"); do
+	for repo_dir in $(jq --raw-output 'del(.pkg_format) | keys | .[]' "${TERMUX_SCRIPTDIR}/repo.json"); do
 		for pkg_dir in "${repo_dir}"/*; do
 			! _should_update "${pkg_dir}" && continue # Skip if not needed.
 			# Update all its dependencies first.
@@ -206,7 +206,7 @@ if [[ "$1" == "@all" ]]; then
 else
 	for pkg in "$@"; do
 		if [ ! -d "${pkg}" ]; then # If only package name is given, try to find it's directory.
-			for repo_dir in $(jq --raw-output 'keys | .[]' "${TERMUX_SCRIPTDIR}/repo.json"); do
+			for repo_dir in $(jq --raw-output 'del(.pkg_format) | keys | .[]' "${TERMUX_SCRIPTDIR}/repo.json"); do
 				if [ -d "${repo_dir}/${pkg}" ]; then
 					pkg="${repo_dir}/${pkg}"
 					break

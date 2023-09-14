@@ -8,6 +8,7 @@ TERMUX_PKG_VERSION=(${_MAIN_VERSION}.20230527
 		    15
 		    0.26.5
 		    0.11.0)
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(https://ftp.gnu.org/gnu/ncurses/ncurses-${_MAIN_VERSION}.tar.gz
 		   https://fossies.org/linux/misc/rxvt-unicode-${TERMUX_PKG_VERSION[1]}.tar.bz2
 		   https://github.com/thestinger/termite/archive/v${TERMUX_PKG_VERSION[2]}.tar.gz
@@ -133,13 +134,6 @@ termux_step_post_make_install() {
 		(cd pkgconfig; ln -sfr ncursesw.pc ${lib}.pc)
 	done
 
-	# Some packages want these:
-	cd $TERMUX_PREFIX/include/
-	rm -Rf ncurses{,w}
-	mkdir ncurses{,w}
-	ln -s ../{ncurses.h,termcap.h,panel.h,unctrl.h,menu.h,form.h,tic.h,nc_tparm.h,term.h,eti.h,term_entry.h,ncurses_dll.h,curses.h} ncurses
-	ln -s ../{ncurses.h,termcap.h,panel.h,unctrl.h,menu.h,form.h,tic.h,nc_tparm.h,term.h,eti.h,term_entry.h,ncurses_dll.h,curses.h} ncursesw
-
 	# Strip away 30 years of cruft to decrease size.
 	local TI=$TERMUX_PREFIX/share/terminfo
 	mv $TI $TERMUX_PKG_TMPDIR/full-terminfo
@@ -162,4 +156,17 @@ termux_step_post_make_install() {
 	tic -x -o $TI $TERMUX_PKG_SRCDIR/termite-${TERMUX_PKG_VERSION[2]}/termite.terminfo
 	tic -x -o $TI $TERMUX_PKG_SRCDIR/kitty-${TERMUX_PKG_VERSION[3]}/terminfo/kitty.terminfo
 	tic -x -o $TI $TERMUX_PKG_SRCDIR/alacritty-${TERMUX_PKG_VERSION[4]}/extra/alacritty.info
+}
+
+termux_step_post_massage() {
+	# Some packages want these:
+	cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include" || exit 1
+	rm -Rf ncurses{,w}
+	mkdir ncurses{,w}
+
+	local _file
+	for _file in *.h; do
+		ln -s ../$_file ncurses
+		ln -s ../$_file ncursesw
+	done
 }

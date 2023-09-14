@@ -6,6 +6,8 @@ import json, os, re, sys
 from itertools import filterfalse
 
 termux_arch = os.getenv('TERMUX_ARCH') or 'aarch64'
+termux_global_library = os.getenv('TERMUX_GLOBAL_LIBRARY') or 'false'
+termux_pkg_library = os.getenv('TERMUX_PACKAGE_LIBRARY') or 'bionic'
 
 def unique_everseen(iterable, key=None):
     """List unique elements, preserving order. Remember all elements ever seen.
@@ -84,6 +86,9 @@ class TermuxPackage(object):
     def __init__(self, dir_path, fast_build_mode):
         self.dir = dir_path
         self.name = os.path.basename(self.dir)
+        self.pkgs_cache = []
+        if "gpkg" in self.dir.split("/")[-2].split("-") and "glibc" not in self.name.split("-"):
+            self.name = self.name.replace("-static", "-glibc-static") if "static" == self.name.split("-")[-1] else f"{self.name}-glibc"
 
         # search package build.sh
         build_sh_path = os.path.join(self.dir, 'build.sh')
@@ -94,7 +99,7 @@ class TermuxPackage(object):
         self.antideps = parse_build_file_antidependencies(build_sh_path)
         self.excluded_arches = parse_build_file_excluded_arches(build_sh_path)
 
-        if os.getenv('TERMUX_ON_DEVICE_BUILD') == "true":
+        if os.getenv('TERMUX_ON_DEVICE_BUILD') == "true" and termux_pkg_library == "bionic":
             always_deps = ['libc++']
             for dependency_name in always_deps:
                 if dependency_name not in self.deps and self.name not in always_deps:
@@ -134,9 +139,17 @@ class TermuxPackage(object):
         "All the dependencies of the package, both direct and indirect."
         result = []
         for dependency_name in sorted(self.deps):
-            dependency_package = pkgs_map[dependency_name]
-            result += dependency_package.recursive_dependencies(pkgs_map)
-            result += [dependency_package]
+            if termux_global_library == "true" and termux_pkg_library == "glibc" and "glibc" not in dependency_name.split("-"):
+                if "static" == dependency_name.split("-")[-1]:
+                    mod_dependency_name = dependency_name.replace("-static", "-glibc-static")
+                else:
+                    mod_dependency_name = f"{dependency_name}-glibc"
+                dependency_name = mod_dependency_name if mod_dependency_name in pkgs_map else dependency_name
+            if dependency_name not in self.pkgs_cache:
+                self.pkgs_cache.append(dependency_name)
+                dependency_package = pkgs_map[dependency_name]
+                result += dependency_package.recursive_dependencies(pkgs_map)
+                result += [dependency_package]
         return unique_everseen(result)
 
 class TermuxSubPackage:
@@ -146,6 +159,8 @@ class TermuxSubPackage:
             raise Exception("SubPackages should have a parent")
 
         self.name = os.path.basename(subpackage_file_path).split('.subpackage.sh')[0]
+        if "gpkg" in subpackage_file_path.split("/")[-3].split("-") and "glibc" not in self.name.split("-"):
+            self.name = self.name.replace("-static", "-glibc-static") if "static" == self.name.split("-")[-1] else f"{self.name}-glibc"
         self.parent = parent
         self.deps = set([parent.name])
         self.excluded_arches = set()
@@ -182,7 +197,10 @@ def read_packages_from_directories(directories, fast_build_mode, full_buildmode)
         # Ignore directories and get all folders from repo.json file
         with open ('repo.json') as f:
             data = json.load(f)
-        directories = [d for d in data.keys()]
+        directories = []
+        for d in data.keys():
+            if d != "pkg_format":
+                directories.append(d)
 
     for package_dir in directories:
         for pkgdir_name in sorted(os.listdir(package_dir)):
@@ -278,6 +296,8 @@ def generate_target_buildorder(target_path, pkgs_map, fast_build_mode):
         target_path = target_path[:-1]
 
     package_name = os.path.basename(target_path)
+    if "gpkg" in target_path.split("/")[-2].split("-") and "glibc" not in package_name.split("-"):
+        package_name += "-glibc"
     package = pkgs_map[package_name]
     # Do not depend on any sub package
     if fast_build_mode:
@@ -328,7 +348,10 @@ def main():
         build_order = generate_target_buildorder(package, pkgs_map, fast_build_mode)
 
     for pkg in build_order:
-        print("%-30s %s" % (pkg.name, pkg.dir))
+        pkg_name = pkg.name
+        if termux_global_library == "true" and termux_pkg_library == "glibc" and "glibc" not in pkg_name.split("-"):
+            pkg_name = pkg_name.replace("-static", "-glibc-static") if "static" == pkg_name.split("-")[-1] else f"{pkg_name}-glibc"
+        print("%-30s %s" % (pkg_name, pkg.dir))
 
 if __name__ == '__main__':
     main()

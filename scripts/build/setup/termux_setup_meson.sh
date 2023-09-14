@@ -107,5 +107,9 @@ termux_setup_meson() {
 	echo "cpu_family = '$MESON_CPU_FAMILY'" >> $TERMUX_MESON_CROSSFILE
 	echo "cpu = '$MESON_CPU'" >> $TERMUX_MESON_CROSSFILE
 	echo "endian = 'little'" >> $TERMUX_MESON_CROSSFILE
-	echo "system = 'android'" >> $TERMUX_MESON_CROSSFILE
+ 	if [ "$TERMUX_PACKAGE_LIBRARY" = "bionic" ]; then
+		echo "system = 'android'" >> $TERMUX_MESON_CROSSFILE
+  	elif [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
+		echo "system = 'linux'" >> $TERMUX_MESON_CROSSFILE
+     	fi
 }

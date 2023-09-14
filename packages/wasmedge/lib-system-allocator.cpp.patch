@@ -1,0 +1,12 @@
+diff -uNr WasmEdge-0.13.3/lib/system/allocator.cpp WasmEdge-0.13.3.mod/lib/system/allocator.cpp
+--- WasmEdge-0.13.3/lib/system/allocator.cpp	2023-07-25 18:13:24.000000000 +0800
++++ WasmEdge-0.13.3.mod/lib/system/allocator.cpp	2023-09-02 11:04:52.146376442 +0800
+@@ -10,7 +10,7 @@
+ #if WASMEDGE_OS_WINDOWS
+ #include "system/winapi.h"
+ #elif defined(HAVE_MMAP) && defined(__x86_64__) || defined(__aarch64__) ||     \
+-    defined(__arm__) || (defined(__riscv) && __riscv_xlen == 64)
++    defined(__arm__) || (defined(__riscv) && __riscv_xlen == 64) || defined(__i386__)
+ #include <sys/mman.h>
+ #else
+ #include <cctype>

@@ -2,13 +2,26 @@ TERMUX_PKG_HOMEPAGE=https://www.mozilla.org/firefox
 TERMUX_PKG_DESCRIPTION="Mozilla Firefox web browser"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=116.0.2
+TERMUX_PKG_VERSION=117.0
 TERMUX_PKG_SRCURL=https://ftp.mozilla.org/pub/firefox/releases/${TERMUX_PKG_VERSION}/source/firefox-${TERMUX_PKG_VERSION}.source.tar.xz
-TERMUX_PKG_SHA256=6708ab24a748de336aff4789f97f248452a46117e86bb6b4b9746768e52fb114
+TERMUX_PKG_SHA256=fa524cb9a63334d74ef996f3cbaf1559b5836f6c8ef6e890fa20846029242ac7
 # ffmpeg and pulseaudio are dependencies through dlopen(3):
 TERMUX_PKG_DEPENDS="ffmpeg, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libc++, libcairo, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libpixman, libsm, libvpx, libwebp, libx11, libxcb, libxcomposite, libxdamage, libxext, libxfixes, libxrandr, libxtst, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libcpufeatures, libice, libsm"
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_MAKE_PROCESSES=1
+
+termux_pkg_auto_update() {
+	# https://archive.mozilla.org/pub/firefox/releases/latest/README.txt
+	local api_url="https://download.mozilla.org/?product=firefox-latest&os=linux64&lang=en-US"
+	local latest_version=$(curl -s "${api_url}" | sed -nE "s/.*firefox-(.*).tar.bz2.*/\1/p")
+	if [[ -z "${latest_version}" ]];  then
+		echo "WARN: Unable to get latest version from upstream! Try again later." >&2
+		return
+	fi
+
+	termux_pkg_upgrade_version "${latest_version}"
+}
 
 termux_step_post_get_source() {
 	local f="media/ffvpx/config_unix_aarch64.h"
