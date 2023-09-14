@@ -47,8 +47,11 @@ termux_setup_toolchain_gnu() {
  	export PKG_CONFIG_LIBDIR="$TERMUX_PKG_CONFIG_LIBDIR"
 
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
-		if ! $(echo "$PATH" | grep -q "^$TERMUX_STANDALONE_TOOLCHAIN/bin:$TERMUX_PREFIX/bin"); then
-			export PATH="$TERMUX_STANDALONE_TOOLCHAIN/bin:$TERMUX_PREFIX/bin:$PATH"
+		if ! $(echo "$PATH" | grep -q "^$TERMUX_STANDALONE_TOOLCHAIN/bin:"); then
+			export PATH="$TERMUX_STANDALONE_TOOLCHAIN/bin:$PATH"
+		fi
+  		if ! $(echo "$PATH" | grep -q ":$TERMUX_PREFIX/bin$"); then
+			export PATH="$PATH:$TERMUX_PREFIX/bin"
 		fi
 	fi
 
