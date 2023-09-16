@@ -12,6 +12,13 @@ TERMUX_PKG_BUILD_IN_SRC=true
 termux_step_pre_configure() {
 	termux_setup_rust
 
+	# ld: error: undefined symbol: __atomic_is_lock_free
+	# ld: error: undefined symbol: __atomic_fetch_or_8
+	# ld: error: undefined symbol: __atomic_load
+	if [[ "${TERMUX_ARCH}" == "i686" ]]; then
+		RUSTFLAGS+=" -C link-arg=$(${CC} -print-libgcc-file-name)"
+	fi
+
 	: "${CARGO_HOME:=$HOME/.cargo}"
 	export CARGO_HOME
 
