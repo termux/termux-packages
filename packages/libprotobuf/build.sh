@@ -8,7 +8,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # - update SHA256 checksum for $_PROTOBUF_ZIP in
 #     $TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_protobuf.sh
 # - ALWAYS bump revision of reverse dependencies and rebuild them.
-TERMUX_PKG_VERSION=4:24.3
+TERMUX_PKG_VERSION=3:24.3
 TERMUX_PKG_SRCURL=https://github.com/protocolbuffers/protobuf/archive/v${TERMUX_PKG_VERSION#*:}.tar.gz
 TERMUX_PKG_SHA256=07d69502e58248927b58c7d7e7424135272ba5b2852a753ab6b67e62d2d29355
 TERMUX_PKG_AUTO_UPDATE=false
