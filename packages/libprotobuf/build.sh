@@ -10,7 +10,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # - ALWAYS bump revision of reverse dependencies and rebuild them.
 TERMUX_PKG_VERSION=4:24.3
 TERMUX_PKG_SRCURL=https://github.com/protocolbuffers/protobuf/archive/v${TERMUX_PKG_VERSION#*:}.tar.gz
-TERMUX_PKG_SHA256=def8683aafc1ebaddbc777da252dfdc8e324a197757e3bfcd8b4de90d4b8cf6a
+TERMUX_PKG_SHA256=07d69502e58248927b58c7d7e7424135272ba5b2852a753ab6b67e62d2d29355
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="abseil-cpp, libc++, zlib"
 TERMUX_PKG_BREAKS="libprotobuf-dev, protobuf-static (<< ${TERMUX_PKG_VERSION#*:})"
