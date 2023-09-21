@@ -4,9 +4,9 @@ TERMUX_PKG_LICENSE="NCSA"
 TERMUX_PKG_MAINTAINER="@termux"
 # Version should be equal to TERMUX_NDK_{VERSION_NUM,REVISION} in
 # scripts/properties.sh
-TERMUX_PKG_VERSION=25c
+TERMUX_PKG_VERSION=26b
 TERMUX_PKG_SRCURL=https://dl.google.com/android/repository/android-ndk-r${TERMUX_PKG_VERSION}-linux.zip
-TERMUX_PKG_SHA256=769ee342ea75f80619d985c2da990c48b3d8eaf45f48783a2d48870d04b46108
+TERMUX_PKG_SHA256=ad73c0370f0b0a87d1671ed2fd5a9ac9acfd1eb5c43a7fbfbd330f85d19dd632
 # This package has taken over <pty.h> from the previous libutil-dev
 # and iconv.h from libandroid-support-dev:
 TERMUX_PKG_CONFLICTS="libutil-dev, libgcc, libandroid-support-dev"
@@ -65,29 +65,20 @@ termux_step_make_install() {
 	cp toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/*.o \
 		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib
 
-	if [ $TERMUX_ARCH == "i686" ]; then
-		LIBATOMIC=toolchains/llvm/prebuilt/linux-x86_64/lib64/clang/*/lib/linux/i386
-	elif [ $TERMUX_ARCH == "arm64" ]; then
-		LIBATOMIC=toolchains/llvm/prebuilt/linux-x86_64/lib64/clang/*/lib/linux/aarch64
-	else
-		LIBATOMIC=toolchains/llvm/prebuilt/linux-x86_64/lib64/clang/*/lib/linux/$TERMUX_ARCH
-	fi
-
-	cp $LIBATOMIC/libatomic.a $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/
-
 	cp toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/libcompiler_rt-extras.a \
 		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/
-	# librt and libpthread are built into libc on android, so setup them as symlinks
-	# to libc for compatibility with programs that users try to build:
-	local _SYSTEM_LIBDIR=/system/lib64
-	if [ $TERMUX_ARCH_BITS = 32 ]; then _SYSTEM_LIBDIR=/system/lib; fi
+
 	NDK_ARCH=$TERMUX_ARCH
 	test $NDK_ARCH == 'i686' && NDK_ARCH='i386'
 
-	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib
 	# clang 13 requires libunwind on Android.
-	cp toolchains/llvm/prebuilt/linux-x86_64/lib64/clang/14.0.7/lib/linux/$NDK_ARCH/libunwind.a \
+	cp toolchains/llvm/prebuilt/linux-x86_64/lib/clang/17/lib/linux/$NDK_ARCH/libatomic.a \
 		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib
+	cp toolchains/llvm/prebuilt/linux-x86_64/lib/clang/17/lib/linux/$NDK_ARCH/libunwind.a \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib
+
+	# librt and libpthread are built into libc on android, so setup them as symlinks
+	# to libc for compatibility with programs that users try to build:
 	for lib in librt.so libpthread.so libutil.so; do
 		echo 'INPUT(-lc)' > $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/$lib
 	done
