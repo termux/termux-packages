@@ -1,0 +1,26 @@
+diff -uNr sysroot.orig/usr/include/syslog.h sysroot/usr/include/syslog.h
+--- sysroot.orig/usr/include/syslog.h	2019-02-12 16:12:24.000000000 +0000
++++ sysroot/usr/include/syslog.h	2019-03-20 13:19:44.315965728 +0000
+@@ -158,4 +158,22 @@
+  */
+ void vsyslog(int __priority, const char* __fmt, va_list __args) __printflike(2, 0);
+ 
++static __inline__ void android_polyfill_syslog_r(int syslog_priority, void* d, const char* format, ...)
++{
++  (void) d;
++  va_list myargs;
++  va_start(myargs, format);
++  vsyslog(syslog_priority, format, myargs);
++  va_end(myargs);
++}
++
++static __inline__ void android_polyfill_vsyslog_r(int syslog_priority, void* d, const char* fmt, va_list ap)
++{
++  (void) d;
++  vsyslog(syslog_priority, fmt, ap);
++}
++
++#define syslog_r android_polyfill_syslog_r
++#define vsyslog_r android_polyfill_vsyslog_r
++
+ __END_DECLS

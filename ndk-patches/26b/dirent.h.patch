@@ -1,0 +1,12 @@
+--- ./usr/include/dirent.h.orig
++++ ./usr/include/dirent.h
+@@ -57,6 +57,9 @@
+ #define DT_SOCK 12
+ #define DT_WHT 14
+ 
++#define IFTODT(x) ((x)>>12 & 0xF)
++#define DTTOIF(x) ((x)<<12)
++
+ #if defined(__LP64__)
+ #define __DIRENT64_INO_T ino_t
+ #else
