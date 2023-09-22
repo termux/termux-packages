@@ -8,7 +8,7 @@ TERMUX_PKG_SRCURL=git+https://github.com/tinygo-org/tinygo
 TERMUX_PKG_GIT_BRANCH="v${TERMUX_PKG_VERSION}"
 TERMUX_PKG_SHA256=1a0dc330f08c28b9adb3e06ef42c586f1257b979618ea0f5f5a0467588743bba
 TERMUX_PKG_DEPENDS="libc++, tinygo-common"
-TERMUX_PKG_RECOMMENDS="binaryen"
+TERMUX_PKG_RECOMMENDS="binaryen, golang"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
@@ -43,13 +43,12 @@ lib/libLLVMXRay.a
 termux_pkg_auto_update() {
 	local latest_tag
 	latest_tag=$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}" "${TERMUX_PKG_UPDATE_TAG_TYPE}")
-
-	if [[ -z "${latest_tag}" ]]; then
-		termux_error_exit "ERROR: Unable to get tag from ${TERMUX_PKG_SRCURL}"
-	fi
-
 	if [[ "${latest_tag}" == "${TERMUX_PKG_VERSION}" ]]; then
 		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
+		return
+	fi
+	if [[ -z "${latest_tag}" ]]; then
+		echo "WARN: Auto update failure!" >&2
 		return
 	fi
 
@@ -78,7 +77,7 @@ termux_pkg_auto_update() {
 
 	local tmpdir=$(mktemp -d)
 	git clone --branch "${latest_tag}" --depth=1 --recursive \
-		"${TERMUX_PKG_SRCDIR#git+}" "${tmpdir}"
+		"${TERMUX_PKG_SRCURL#git+}" "${tmpdir}"
 	make -C "${tmpdir}" llvm-source GO=:
 	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum | cut -d" " -f1)
 
