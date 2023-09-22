@@ -1,8 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://www.mozilla.org/firefox
-TERMUX_PKG_DESCRIPTION="Mozilla Firefox web browser"
+TERMUX_PKG_DESCRIPTION="Unofficial Firefox web browser"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="117.0.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://ftp.mozilla.org/pub/firefox/releases/${TERMUX_PKG_VERSION}/source/firefox-${TERMUX_PKG_VERSION}.source.tar.xz
 TERMUX_PKG_SHA256=7ea4203b5cf9e59f80043597e2c9020291754fcab784a337586b5f5e1370c416
 # ffmpeg and pulseaudio are dependencies through dlopen(3):
@@ -90,7 +91,7 @@ termux_step_configure() {
 		--with-system-webp \
 		--with-system-zlib \
 		--without-wasm-sandboxed-libraries \
-		--with-branding=browser/branding/official \
+		--with-branding=browser/branding/unofficial \
 		--disable-sandbox \
 		--disable-tests \
 		--disable-accessibility \
