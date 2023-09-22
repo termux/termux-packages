@@ -41,42 +41,35 @@ lib/libLLVMXRay.a
 "
 
 termux_pkg_auto_update() {
+	local e=0
 	local latest_tag
 	latest_tag=$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}" "${TERMUX_PKG_UPDATE_TAG_TYPE}")
 	if [[ "${latest_tag}" == "${TERMUX_PKG_VERSION}" ]]; then
 		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
 		return
 	fi
-	if [[ -z "${latest_tag}" ]]; then
-		echo "WARN: Auto update failure!" >&2
-		return
-	fi
+	[[ -z "${latest_tag}" ]] && e=1
 
-	local uptime_now=$(uptime -p)
-	local uptime_y=$(echo "${uptime_now}" | sed -nE "s|.* ([0-9]+) year.*|\1|p")
-	local uptime_w=$(echo "${uptime_now}" | sed -nE "s|.* ([0-9]+) week.*|\1|p")
-	local uptime_d=$(echo "${uptime_now}" | sed -nE "s|.* ([0-9]+) day.*|\1|p")
-	local uptime_h=$(echo "${uptime_now}" | sed -nE "s|.* ([0-9]+) hour.*|\1|p")
-	local uptime_m=$(echo "${uptime_now}" | sed -nE "s|.* ([0-9]+) minute.*|\1|p")
-	[[ -z "${uptime_y}" ]] && uptime_y=0
-	[[ -z "${uptime_w}" ]] && uptime_w=0
-	[[ -z "${uptime_d}" ]] && uptime_d=0
-	[[ -z "${uptime_h}" ]] && uptime_h=0
-	[[ -z "${uptime_m}" ]] && uptime_m=0
-	local uptime_m_sum=$((uptime_y*365*24*60+uptime_w*7*24*60+uptime_d*24*60+uptime_h*60+uptime_m))
+	local uptime_now=$(cat /proc/uptime)
+	local uptime_s="${uptime_now//.*}"
 	local uptime_h_limit=1
-	local uptime_m_limit=$((uptime_h_limit*60))
-	if [[ "${uptime_m_sum}" -gt "${uptime_m_limit}" ]]; then
+	local uptime_s_limit=$((uptime_h_limit*60*60))
+	[[ -z "${uptime_s}" ]] && e=1
+	[[ "${uptime_s}" == 0 ]] && e=1
+	[[ "${uptime_s}" -gt "${uptime_s_limit}" ]] && e=1
+	if [[ "${e}" != 0 ]]; then
 		cat <<- EOL >&2
-		WARN: Uptime exceeds time limit! Deferring update.
-		Current uptime: ${uptime_now}
-		Limit (hour):   ${uptime_h_limit}
+		WARN: Auto update failure!
+		latest_tag=${latest_tag}
+		uptime_now=${uptime_now}
+		uptime_s=${uptime_s}
+		uptime_s_limit=${uptime_s_limit}
 		EOL
 		return
 	fi
 
 	local tmpdir=$(mktemp -d)
-	git clone --branch "${latest_tag}" --depth=1 --recursive \
+	git clone --branch "v${latest_tag}" --depth=1 --recursive \
 		"${TERMUX_PKG_SRCURL#git+}" "${tmpdir}"
 	make -C "${tmpdir}" llvm-source GO=:
 	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum | cut -d" " -f1)
