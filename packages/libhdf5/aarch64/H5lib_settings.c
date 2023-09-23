@@ -32,7 +32,7 @@ H5_GCC_DIAG_OFF("larger-than=")
 
 H5_CLANG_DIAG_OFF("overlength-strings")
 
-char H5libhdf5_settings[]=
+const char H5libhdf5_settings[]=
 	"        SUMMARY OF THE HDF5 CONFIGURATION\n"
 	"        =================================\n"
 	"\n"
