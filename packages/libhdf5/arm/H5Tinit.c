@@ -148,7 +148,7 @@ H5T__init_native(void)
     * Implicit bit? yes
     */
     if(NULL == (dt = H5T__alloc()))
-        HGOTO_ERROR(H5E_DATATYPE, H5E_NOSPACE, FAIL, "datatype allocation failed")
+        HGOTO_ERROR(H5E_DATATYPE, H5E_NOSPACE, FAIL, "datatype allocation failed");
     dt->shared->state = H5T_STATE_IMMUTABLE;
     dt->shared->type = H5T_FLOAT;
     dt->shared->size = 4;
@@ -166,7 +166,7 @@ dt->shared->u.atomic.u.f.msize = 23;
 dt->shared->u.atomic.u.f.norm = H5T_NORM_IMPLIED;
 dt->shared->u.atomic.u.f.pad = H5T_PAD_ZERO;
     if((H5T_NATIVE_FLOAT_g = H5I_register(H5I_DATATYPE, dt, FALSE)) < 0)
-        HGOTO_ERROR(H5E_DATATYPE, H5E_CANTINIT, FAIL, "can't register ID for built-in datatype")
+        HGOTO_ERROR(H5E_DATATYPE, H5E_CANTINIT, FAIL, "can't register ID for built-in datatype");
     H5T_NATIVE_FLOAT_ALIGN_g = 4;
 
    /*
@@ -177,7 +177,7 @@ dt->shared->u.atomic.u.f.pad = H5T_PAD_ZERO;
     * Implicit bit? yes
     */
     if(NULL == (dt = H5T__alloc()))
-        HGOTO_ERROR(H5E_DATATYPE, H5E_NOSPACE, FAIL, "datatype allocation failed")
+        HGOTO_ERROR(H5E_DATATYPE, H5E_NOSPACE, FAIL, "datatype allocation failed");
     dt->shared->state = H5T_STATE_IMMUTABLE;
     dt->shared->type = H5T_FLOAT;
     dt->shared->size = 8;
@@ -195,7 +195,7 @@ dt->shared->u.atomic.u.f.msize = 52;
 dt->shared->u.atomic.u.f.norm = H5T_NORM_IMPLIED;
 dt->shared->u.atomic.u.f.pad = H5T_PAD_ZERO;
     if((H5T_NATIVE_DOUBLE_g = H5I_register(H5I_DATATYPE, dt, FALSE)) < 0)
-        HGOTO_ERROR(H5E_DATATYPE, H5E_CANTINIT, FAIL, "can't register ID for built-in datatype")
+        HGOTO_ERROR(H5E_DATATYPE, H5E_CANTINIT, FAIL, "can't register ID for built-in datatype");
     H5T_NATIVE_DOUBLE_ALIGN_g = 8;
 
    /*
@@ -206,7 +206,7 @@ dt->shared->u.atomic.u.f.pad = H5T_PAD_ZERO;
     * Implicit bit? yes
     */
     if(NULL == (dt = H5T__alloc()))
-        HGOTO_ERROR(H5E_DATATYPE, H5E_NOSPACE, FAIL, "datatype allocation failed")
+        HGOTO_ERROR(H5E_DATATYPE, H5E_NOSPACE, FAIL, "datatype allocation failed");
     dt->shared->state = H5T_STATE_IMMUTABLE;
     dt->shared->type = H5T_FLOAT;
     dt->shared->size = 8;
@@ -224,7 +224,7 @@ dt->shared->u.atomic.u.f.msize = 52;
 dt->shared->u.atomic.u.f.norm = H5T_NORM_IMPLIED;
 dt->shared->u.atomic.u.f.pad = H5T_PAD_ZERO;
     if((H5T_NATIVE_LDOUBLE_g = H5I_register(H5I_DATATYPE, dt, FALSE)) < 0)
-        HGOTO_ERROR(H5E_DATATYPE, H5E_CANTINIT, FAIL, "can't register ID for built-in datatype")
+        HGOTO_ERROR(H5E_DATATYPE, H5E_CANTINIT, FAIL, "can't register ID for built-in datatype");
     H5T_NATIVE_LDOUBLE_ALIGN_g = 8;
 
     /* Set the native order for this machine */
