@@ -3,10 +3,10 @@ TERMUX_PKG_DESCRIPTION="Go compiler for microcontrollers, WASM, CLI tools"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.29.0"
+TERMUX_PKG_VERSION="0.30.0"
 TERMUX_PKG_SRCURL=git+https://github.com/tinygo-org/tinygo
 TERMUX_PKG_GIT_BRANCH="v${TERMUX_PKG_VERSION}"
-TERMUX_PKG_SHA256=4b9a30b339cc203a0dc88c8ebc4cfa8eacc7575507e5a64c1140a93f4973c879
+TERMUX_PKG_SHA256=4ecb1764af87efcd90fcc66cb3b25d7cf3c038fceb87d032155170a4a3c65614
 TERMUX_PKG_DEPENDS="libc++, tinygo-common"
 TERMUX_PKG_RECOMMENDS="binaryen, golang"
 TERMUX_PKG_NO_STATICSPLIT=true
@@ -23,20 +23,22 @@ _LLVM_OPTION="
 "
 
 _LLVM_EXTRA_BUILD_TARGETS="
-lib/libLLVMFuzzerCLI.a
-lib/libLLVMFuzzMutate.a
-lib/libLLVMFileCheck.a
-lib/libLLVMInterfaceStub.a
-lib/libLLVMMIRParser.a
 lib/libLLVMDWARFLinker.a
+lib/libLLVMDWARFLinkerParallel.a
+lib/libLLVMDWP.a
+lib/libLLVMDebugInfoGSYM.a
+lib/libLLVMDebugInfoLogicalView.a
+lib/libLLVMFileCheck.a
 lib/libLLVMFrontendOpenACC.a
+lib/libLLVMFuzzMutate.a
+lib/libLLVMFuzzerCLI.a
+lib/libLLVMInterfaceStub.a
+lib/libLLVMJITLink.a
+lib/libLLVMLineEditor.a
+lib/libLLVMMIRParser.a
 lib/libLLVMObjCopy.a
 lib/libLLVMObjectYAML.a
-lib/libLLVMDebugInfoGSYM.a
-lib/libLLVMDWP.a
-lib/libLLVMJITLink.a
 lib/libLLVMOrcJIT.a
-lib/libLLVMLineEditor.a
 lib/libLLVMXRay.a
 "
 
@@ -57,6 +59,7 @@ termux_pkg_auto_update() {
 	[[ -z "${uptime_s}" ]] && e=1
 	[[ "${uptime_s}" == 0 ]] && e=1
 	[[ "${uptime_s}" -gt "${uptime_s_limit}" ]] && e=1
+
 	if [[ "${e}" != 0 ]]; then
 		cat <<- EOL >&2
 		WARN: Auto update failure!
@@ -83,6 +86,7 @@ termux_pkg_auto_update() {
 
 	rm -fr "${tmpdir}"
 
+	echo "INFO: Generated checksum: ${s}"
 	termux_pkg_upgrade_version "${latest_tag}"
 }
 
@@ -214,5 +218,5 @@ termux_step_make() {
 termux_step_make_install() {
 	mkdir -p "${TERMUX_PREFIX}/lib/tinygo"
 	cp -fr "${TERMUX_PKG_SRCDIR}/build/release/tinygo" "${TERMUX_PREFIX}/lib"
-	ln -fsvT "../lib/tinygo/bin/tinygo" "${TERMUX_PREFIX}/bin/tinygo"
+	ln -fsv "../lib/tinygo/bin/tinygo" "${TERMUX_PREFIX}/bin/tinygo"
 }
