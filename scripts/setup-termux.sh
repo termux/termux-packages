@@ -46,6 +46,7 @@ PACKAGES+=" xmlto"                      # Needed by git's manpage generation
 PACKAGES+=" zip"
 
 # Definition of a package manager
+export TERMUX_SCRIPTDIR=$(dirname "$(realpath "$0")")/../
 . $(dirname "$(realpath "$0")")/properties.sh
 source "$TERMUX_PREFIX/bin/termux-setup-package-manager" || true
 
