@@ -58,5 +58,7 @@ termux_setup_python_pip() {
 				"${TERMUX_PYTHON_CROSSENV_PREFIX}"
 		fi
 		. "${TERMUX_PYTHON_CROSSENV_PREFIX}/bin/activate"
+
+		export PATH="${PATH}:${TERMUX_PYTHON_CROSSENV_PREFIX}/build/bin"
 	fi
 }
