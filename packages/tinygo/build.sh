@@ -6,7 +6,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.29.0"
 TERMUX_PKG_SRCURL=git+https://github.com/tinygo-org/tinygo
 TERMUX_PKG_GIT_BRANCH="v${TERMUX_PKG_VERSION}"
-TERMUX_PKG_SHA256=1a0dc330f08c28b9adb3e06ef42c586f1257b979618ea0f5f5a0467588743bba
+TERMUX_PKG_SHA256=4b9a30b339cc203a0dc88c8ebc4cfa8eacc7575507e5a64c1140a93f4973c879
 TERMUX_PKG_DEPENDS="libc++, tinygo-common"
 TERMUX_PKG_RECOMMENDS="binaryen, golang"
 TERMUX_PKG_NO_STATICSPLIT=true
@@ -72,7 +72,10 @@ termux_pkg_auto_update() {
 	git clone --branch "v${latest_tag}" --depth=1 --recursive \
 		"${TERMUX_PKG_SRCURL#git+}" "${tmpdir}"
 	make -C "${tmpdir}" llvm-source GO=:
-	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum | cut -d" " -f1)
+	local s=$(
+		find "${tmpdir}" -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | \
+		cut -d" " -f1 | LC_ALL=C sort | sha256sum | cut -d" " -f1
+	)
 
 	sed \
 		-e "s|^TERMUX_PKG_SHA256=.*|TERMUX_PKG_SHA256=${s}|" \
@@ -88,8 +91,11 @@ termux_step_post_get_source() {
 	# https://github.com/espressif/llvm-project
 	make llvm-source GO=:
 
-	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum)
-	if [[ "${s}" != "${TERMUX_PKG_SHA256}  "* ]]; then
+	local s=$(
+		find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | \
+		cut -d" " -f1 | LC_ALL=C sort | sha256sum | cut -d" " -f1
+	)
+	if [[ "${s}" != "${TERMUX_PKG_SHA256}" ]]; then
 		termux_error_exit "
 		Checksum mismatch for source files!
 		Expected = ${TERMUX_PKG_SHA256}
