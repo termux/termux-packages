@@ -22,7 +22,7 @@ termux_pkg_auto_update() {
 
 	local uptime_now=$(cat /proc/uptime)
 	local uptime_s="${uptime_now//.*}"
-	local uptime_h_limit=1
+	local uptime_h_limit=2
 	local uptime_s_limit=$((uptime_h_limit*60*60))
 	[[ -z "${uptime_s}" ]] && e=1
 	[[ "${uptime_s}" == 0 ]] && e=1
@@ -33,7 +33,6 @@ termux_pkg_auto_update() {
 		WARN: Auto update failure!
 		api_url_r=${api_url_r}
 		latest_version=${latest_version}
-		latest_tag=${latest_tag}
 		uptime_now=${uptime_now}
 		uptime_s=${uptime_s}
 		uptime_s_limit=${uptime_s_limit}
