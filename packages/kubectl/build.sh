@@ -34,12 +34,12 @@ termux_step_make() {
 	#chmod +w "$TERMUX_PKG_SRCDIR"/_output
 	#rm -rf "$TERMUX_PKG_SRCDIR"/_output
 
-	cd "$TERMUX_PKG_SRCDIR"/cmd/kubectl
-	go build .
+	make -C "$TERMUX_PKG_SRCDIR" \
+		WHAT=cmd/kubectl
 }
 
 termux_step_make_install() {
-	install -Dm700 "$TERMUX_PKG_SRCDIR"/cmd/kubectl/kubectl \
+	install -Dm700 "$TERMUX_PKG_SRCDIR"/_output/bin/kubectl \
 		"$TERMUX_PREFIX"/bin/kubectl
 
 	#mkdir -p "$TERMUX_PREFIX"/share/man/man1
