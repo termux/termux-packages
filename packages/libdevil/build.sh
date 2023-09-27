@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://openil.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://openil.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="A cross-platform image library utilizing a simple syntax"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
