@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Tensors and Dynamic neural networks in Python"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.0.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/pytorch/pytorch
 TERMUX_PKG_DEPENDS="ffmpeg, libc++, libopenblas, libprotobuf, libzmq, opencv, python, python-numpy, python-pip"
 TERMUX_PKG_BUILD_DEPENDS="vulkan-headers, vulkan-loader-android"
