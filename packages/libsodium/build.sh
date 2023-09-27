@@ -13,7 +13,7 @@ TERMUX_PKG_REPLACES="libsodium-dev"
 termux_step_post_get_source() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them
 	# after SOVERSION is changed.
-	local _SOVERSION=26-3
+	local _SOVERSION=26
 
 	local e=$(sed -En 's/^SODIUM_LIBRARY_VERSION=([0-9]+):([0-9]+):([0-9]+).*/\1-\3/p' \
 				configure.ac)
