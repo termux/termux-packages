@@ -3,8 +3,8 @@ TERMUX_PKG_DESCRIPTION="A framework for secure peer-to-peer networking"
 TERMUX_PKG_LICENSE="AGPL-V3"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_SRCURL=git+https://git.gnunet.org/git/gnunet
-TERMUX_PKG_VERSION=0.19.4
-TERMUX_PKG_SHA256=e631013cb0672d245d5ad535729339d47d482984fa2a29edf8ade1ef46640464
+TERMUX_PKG_VERSION="0.20.0"
+TERMUX_PKG_SHA256=d8d8863ca50ee9bcd23f42f045f45651c18763bc02e381fe7f988599bcab667f
 TERMUX_PKG_DEPENDS="libcurl, libgcrypt, libgnutls, libgpg-error, libidn2, libjansson, libltdl, libmicrohttpd, libsodium, libsqlite, libunistring, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_have_decl_struct_in6_ifreq=yes"
