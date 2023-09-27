@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://www.unixodbc.org/
+TERMUX_PKG_HOMEPAGE=https://www.unixodbc.org/
 TERMUX_PKG_DESCRIPTION="An Open Source ODBC sub-system and an ODBC SDK for Linux, Mac OSX, and UNIX"
 TERMUX_PKG_LICENSE="LGPL-2.1, GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

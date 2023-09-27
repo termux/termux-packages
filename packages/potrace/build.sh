@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://potrace.sourceforge.net
+TERMUX_PKG_HOMEPAGE=https://potrace.sourceforge.net
 TERMUX_PKG_DESCRIPTION="Tool for transforming a bitmap into a smooth, scalable image"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

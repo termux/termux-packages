@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://zthread.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://zthread.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="An advanced object-oriented, cross-platform, C++ threading and synchronization library"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="LICENSE"

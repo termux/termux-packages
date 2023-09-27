@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://stedolan.github.io/jq/
+TERMUX_PKG_HOMEPAGE=https://stedolan.github.io/jq/
 TERMUX_PKG_DESCRIPTION="Command-line JSON processor"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
