@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.mozilla.org/firefox
 TERMUX_PKG_DESCRIPTION="Mozilla Firefox web browser"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="117.0.1"
+TERMUX_PKG_VERSION="118.0"
 TERMUX_PKG_SRCURL=https://ftp.mozilla.org/pub/firefox/releases/${TERMUX_PKG_VERSION}/source/firefox-${TERMUX_PKG_VERSION}.source.tar.xz
-TERMUX_PKG_SHA256=7ea4203b5cf9e59f80043597e2c9020291754fcab784a337586b5f5e1370c416
+TERMUX_PKG_SHA256=d0f996116ae234dc7bd59e0d77ddefe268179d7500d16a9488309c826547c97c
 # ffmpeg and pulseaudio are dependencies through dlopen(3):
 TERMUX_PKG_DEPENDS="ffmpeg, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libc++, libcairo, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libpixman, libsm, libvpx, libwebp, libx11, libxcb, libxcomposite, libxdamage, libxext, libxfixes, libxrandr, libxtst, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libcpufeatures, libice, libsm"
@@ -55,8 +55,12 @@ termux_step_pre_configure() {
 
 	# https://github.com/rust-lang/rust/issues/49853
 	# https://github.com/rust-lang/rust/issues/45854
-	# Out of memory when building gkrust on Arm
-	[[ "${TERMUX_ARCH}" == "arm" ]] && RUSTFLAGS+=" -C debuginfo=0"
+	# Out of memory when building gkrust
+	# CI shows (signal: 9, SIGKILL: kill)
+	case "${TERMUX_ARCH}" in
+	aarch64) RUSTFLAGS+=" -C debuginfo=0" ;;
+	arm) RUSTFLAGS+=" -C debuginfo=0" ;;
+	esac
 
 	cargo install cbindgen
 
