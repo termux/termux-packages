@@ -1,0 +1,64 @@
+--- a/Makefile
++++ b/Makefile
+@@ -16,28 +16,28 @@
+ # along with this program; if not, write to the Free Software Foundation,
+ # Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. 
+ 
+-prefix=/usr/local
++prefix=@TERMUX_PREFIX@
+ 
+ bin_dir=$(prefix)/bin
+-lib_dir=$(prefix)/lib/authbind
+-libexec_dir=$(lib_dir)
++lib_dir=$(prefix)/lib
++libexec_dir=$(prefix)/libexec/authbind
+ 
+ share_dir=$(prefix)/share
+ man_dir=$(share_dir)/man
+ man1_dir=$(man_dir)/man1
+ man8_dir=$(man_dir)/man8
+ 
+-etc_dir=/etc/authbind
++etc_dir=@TERMUX_PREFIX@/etc/authbind
+ 
+-INSTALL_FILE	?= install -o root -g root -m 644 
+-INSTALL_PROGRAM ?= install -o root -g root -m 755 -s
+-INSTALL_DIR	?= install -o root -g root -m 755 -d
++INSTALL_FILE	?= install -m 644 
++INSTALL_PROGRAM ?= install -m 755
++INSTALL_DIR	?= install -m 755 -d
+ STRIP		?= strip
+ 
+ OPTIMISE=	-O2
+-LDFLAGS=	-g
++LDFLAGS?=	-g
+ LIBS=		-ldl -lc
+-CFLAGS=		-g $(OPTIMISE) \
++CFLAGS+=	\
+ 		-Wall -Wwrite-strings -Wpointer-arith -Wimplicit \
+ 		-Wnested-externs -Wmissing-prototypes -Wstrict-prototypes
+ CPPFLAGS=	-DMAJOR_VER='"$(MAJOR)"' -DMINOR_VER='"$(MINOR)"' \
+@@ -59,13 +59,11 @@
+ all:			$(TARGETS)
+ 
+ install:		$(TARGETS)
+-		$(INSTALL_DIR) $(lib_dir) $(man1_dir) $(man8_dir)
++		$(INSTALL_DIR) $(lib_dir) $(libexec_dir) $(man1_dir) $(man8_dir)
+ 		$(INSTALL_PROGRAM) $(BINTARGETS) $(bin_dir)/.
+ 		$(INSTALL_FILE) $(LIBTARGET) $(lib_dir)/.
+-		$(STRIP) --strip-unneeded $(lib_dir)/$(LIBTARGET)
+ 		ln -sf $(LIBTARGET) $(lib_dir)/$(LIBCANON)
+ 		$(INSTALL_PROGRAM) $(HELPER) $(libexec_dir)/.
+-		chmod u+s $(libexec_dir)/$(HELPER)
+ 		$(INSTALL_DIR) $(etc_dir) \
+ 			$(etc_dir)/byport $(etc_dir)/byaddr $(etc_dir)/byuid
+ 
+@@ -82,7 +80,7 @@
+ helper.o authbind.o:	authbind.h
+ 
+ $(LIBTARGET):		libauthbind.o
+-		$(LD) -shared -soname $(LIBCANON) -o $@ $< $(LIBS)
++		$(CC) -shared -Wl,-soname=$(LIBCANON) -o $@ $< $(LIBS)
+ 
+ clean distclean:
+ 		rm -f $(TARGETS) *.o *~ ./#*# *.bak *.new core

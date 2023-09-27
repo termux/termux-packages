@@ -2,12 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://www.erlang.org/
 TERMUX_PKG_DESCRIPTION="General-purpose concurrent functional programming language"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=24.2
+TERMUX_PKG_VERSION="26.1"
 TERMUX_PKG_SRCURL=https://github.com/erlang/otp/archive/OTP-$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=0b9c9ba7d8b40f6c77d529e07561b10f0914d2bfe9023294d7eda85b62936792
+TERMUX_PKG_SHA256=09864524516bd26be040ae9ee09d70ce38ded2bcec041bc36081313b5031dfe8
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_AUTO_UPDATE_TAG_REGEXP="\d+(\.\d+)+"
-TERMUX_PKG_DEPENDS="openssl, ncurses, zlib"
+TERMUX_PKG_UPDATE_VERSION_REGEXP='\d+(\.\d+)+'
+TERMUX_PKG_DEPENDS="libc++, openssl, ncurses, zlib"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -17,6 +17,17 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-termcap
 erl_xcomp_sysroot=${TERMUX_PREFIX}
 "
+termux_pkg_auto_update() {
+	# Get latest release tag:
+	local tag
+	tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}")"
+	# check if this is not an intermediate release candidate:
+	if grep -qP "^OTP-${TERMUX_PKG_UPDATE_VERSION_REGEXP}\$" <<<"$tag"; then
+		termux_pkg_upgrade_version "$tag"
+	else
+		echo "WARNING: Skipping auto-update: Not stable release($tag)"
+	fi
+}
 
 termux_step_post_get_source() {
 	# We need a host build every time, because we dont know the full output of host build and have no idea to cache it.

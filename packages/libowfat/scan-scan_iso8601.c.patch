@@ -1,0 +1,11 @@
+--- a/scan/scan_iso8601.c
++++ b/scan/scan_iso8601.c
+@@ -51,7 +51,7 @@
+ #else
+   x.tm_wday=x.tm_yday=x.tm_isdst=x.tm_gmtoff=0;
+ #endif
+-#if defined(__dietlibc__) || defined(__GLIBC__)
++#if defined(__dietlibc__) || defined(__GLIBC__) || defined(__ANDROID__)
+   t->tv_sec=timegm(&x);
+ #elif defined(__MINGW32__)
+   t->tv_sec=mktime(&x);

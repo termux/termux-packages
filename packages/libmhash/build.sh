@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://mhash.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="A thread-safe hash library which provides a uniform interface to hash algorithms"
 TERMUX_PKG_LICENSE="LGPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.9.9.9
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/sourceforge/mhash/mhash-${TERMUX_PKG_VERSION}.tar.bz2

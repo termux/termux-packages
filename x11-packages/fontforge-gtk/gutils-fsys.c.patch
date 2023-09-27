@@ -1,0 +1,38 @@
+--- a/gutils/fsys.c
++++ b/gutils/fsys.c
+@@ -167,6 +167,9 @@
+     if ( dir!=NULL )
+ 	return( copy(dir) );
+ 
++#ifdef __ANDROID__
++return( copy("@TERMUX_HOME@") );
++#else
+     uid = getuid();
+     while ( (pw=getpwent())!=NULL ) {
+ 	if ( pw->pw_uid==uid ) {
+@@ -177,6 +180,7 @@
+     }
+     endpwent();
+ return( NULL );
++#endif /* __ANDROID__ */
+ #endif
+ }
+ 
+@@ -887,6 +891,9 @@
+ 	if( home!=NULL )
+ return home;
+ 
++#ifdef __ANDROID__
++return( "@TERMUX_HOME@" );
++#else
+ 	uid = getuid();
+ 	while( (pw=getpwent())!=NULL ) {
+ 	if ( pw->pw_uid==uid ) {
+@@ -897,6 +904,7 @@
+ 	}
+ 	endpwent();
+ return NULL;
++#endif /* __ANDROID__ */
+ #endif
+ }
+ 

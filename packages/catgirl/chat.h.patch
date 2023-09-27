@@ -1,0 +1,15 @@
+--- a/chat.h
++++ b/chat.h
+@@ -39,6 +39,12 @@
+ #include <time.h>
+ #include <wchar.h>
+ 
++#ifdef __ANDROID__
++static void *(*volatile explicit_memset)(void *, int, size_t) = memset;
++#undef explicit_bzero
++#define explicit_bzero(s, n) explicit_memset(s, 0, n)
++#endif
++
+ #define ARRAY_LEN(a) (sizeof(a) / sizeof(a[0]))
+ #define BIT(x) x##Bit, x = 1 << x##Bit, x##Bit_ = x##Bit
+ 

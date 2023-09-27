@@ -1,0 +1,24 @@
+--- a/libs/pbd/pthread_utils.cc
++++ b/libs/pbd/pthread_utils.cc
+@@ -346,7 +371,9 @@
+ 	pthread_attr_setschedpolicy (&attr, policy);
+ 	pthread_attr_setschedparam (&attr, &parm);
+ 	pthread_attr_setscope (&attr, PTHREAD_SCOPE_SYSTEM);
++#if !defined __ANDROID__ || __ANDROID_API__ >= 28
+ 	pthread_attr_setinheritsched (&attr, PTHREAD_EXPLICIT_SCHED);
++#endif
+ 	pthread_attr_setstacksize (&attr, stacksize + pbd_stack_size ());
+ 	rv = pthread_create (thread, &attr, start_routine, arg);
+ 	pthread_attr_destroy (&attr);
+--- a/libs/zita-convolver/zita-convolver.cc
++++ b/libs/zita-convolver/zita-convolver.cc
+@@ -625,7 +625,9 @@
+ 	pthread_attr_setschedpolicy (&attr, policy);
+ 	pthread_attr_setschedparam (&attr, &parm);
+ 	pthread_attr_setscope (&attr, PTHREAD_SCOPE_SYSTEM);
++#if !defined __ANDROID__ || __ANDROID_API__ >= 28
+ 	pthread_attr_setinheritsched (&attr, PTHREAD_EXPLICIT_SCHED);
++#endif
+ 	pthread_attr_setstacksize (&attr, 0x10000); // 64kB
+ 	pthread_create (&_pthr, &attr, static_main, this);
+ 	pthread_attr_destroy (&attr);

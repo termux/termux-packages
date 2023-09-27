@@ -1,0 +1,59 @@
+------------------------------------------------------------------------
+r12592 | wh11204 | 2021-12-18 17:13:26 +0900 (Sat, 18 Dec 2021) | 10 lines
+
+* Fix scale factor detection for wxWidgets >= 3.1.4 (ticket #1132).
+wxWidgets changed the value returned by wxWindow::GetContentScaleFactor() in 3.1.0. In
+3.1.4 they restored the pre-3.1.0 behaviour and created a new method GetDPIScaleFactor()
+returning what GetContentScaleFactor() was returning until then.
+
+This change broke HiDPI detection when using wxWidgets >= 3.1.4. BTW, it was already broken in
+32-bit C::B because it was not DPI-aware; this has been fixed in [r12591].
+
+Update developer list in Thanks section of the About dialog.
+
+------------------------------------------------------------------------
+Index: src/sdk/globals.cpp
+===================================================================
+--- src/sdk/globals.cpp	(revision 12591)
++++ src/sdk/globals.cpp	(revision 12592)
+@@ -1186,7 +1186,11 @@
+ 
+ double cbGetContentScaleFactor(const wxWindow &window)
+ {
++#if wxCHECK_VERSION(3, 1, 4)
++    return window.GetDPIScaleFactor();
++#else
+     return window.GetContentScaleFactor();
++#endif
+ }
+ 
+ #ifdef __WXGTK__
+Index: src/src/dlgabout.cpp
+===================================================================
+--- src/src/dlgabout.cpp	(revision 12591)
++++ src/src/dlgabout.cpp	(revision 12592)
+@@ -101,6 +101,7 @@
+         "Damien Moore        : Developer\n"
+         "Micah Ng            : Developer\n"
+         "BlueHazzard         : Developer\n"
++        "Miguel Gimenez      : Developer\n"
+         "Ricardo Garcia      : All-hands person\n"
+         "Paul A. Jimenez     : Help and AStyle plugins\n"
+         "Thomas Lorblanches  : CodeStat and Profiler plugins\n"
+@@ -132,7 +133,6 @@
+         "Alexandr Efremo     : Providing OpenSuSe packages\n"
+         "Huki                : Misc. Code-Completion improvements\n"
+         "stahta01            : Misc. patches for several enhancements\n"
+-        "Miguel Gimenez      : Misc. patches for several enhancements\n"
+         "\n"
+         "All contributors that provided patches.\n"
+         "The wxWidgets project (http://www.wxwidgets.org).\n"
+@@ -171,7 +171,7 @@
+     if (!desktopEnv.empty())
+         items.push_back({_("Desktop environment"), desktopEnv });
+ 
+-    items.push_back({_("Scaling factor"), wxString::Format("%f", GetContentScaleFactor())});
++    items.push_back({_("Scaling factor"), wxString::Format("%f", cbGetContentScaleFactor(*this))});
+     items.push_back({_("Detected scaling factor"),
+                      wxString::Format("%f", cbGetActualContentScaleFactor(*this))});
+     const wxSize displayPPI = wxGetDisplayPPI();

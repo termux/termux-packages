@@ -1,0 +1,36 @@
+diff --git a/src/vrend_winsys_egl.c b/src/vrend_winsys_egl.c
+--- a/src/vrend_winsys_egl.c
++++ b/src/vrend_winsys_egl.c
+@@ -351,14 +351,14 @@ struct virgl_egl *virgl_egl_init(struct virgl_gbm *gbm, bool surfaceless, bool g
+       goto fail;
+ 
+    extensions = eglQueryString(egl->egl_display, EGL_EXTENSIONS);
+-#ifdef VIRGL_EGL_DEBUG
++// #ifdef VIRGL_EGL_DEBUG
+    vrend_printf( "EGL major/minor: %d.%d\n", major, minor);
+    vrend_printf( "EGL version: %s\n",
+            eglQueryString(egl->egl_display, EGL_VERSION));
+    vrend_printf( "EGL vendor: %s\n",
+            eglQueryString(egl->egl_display, EGL_VENDOR));
+    vrend_printf( "EGL extensions: %s\n", extensions);
+-#endif
++// #endif
+ 
+    if (virgl_egl_init_extensions(egl, extensions))
+       goto fail;
+@@ -424,13 +424,13 @@ struct virgl_egl *virgl_egl_init_external(EGLDisplay egl_display)
+    egl->egl_display = egl_display;
+ 
+    extensions = eglQueryString(egl->egl_display, EGL_EXTENSIONS);
+-#ifdef VIRGL_EGL_DEBUG
++// #ifdef VIRGL_EGL_DEBUG
+    vrend_printf( "EGL version: %s\n",
+            eglQueryString(egl->egl_display, EGL_VERSION));
+    vrend_printf( "EGL vendor: %s\n",
+            eglQueryString(egl->egl_display, EGL_VENDOR));
+    vrend_printf( "EGL extensions: %s\n", extensions);
+-#endif
++// #endif
+ 
+    if (virgl_egl_init_extensions(egl, extensions)) {
+       free(egl);

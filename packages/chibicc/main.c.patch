@@ -1,0 +1,11 @@
+--- a/main.c
++++ b/main.c
+@@ -378,7 +378,7 @@
+ }
+ 
+ static char *create_tmpfile(void) {
+-  char *path = strdup("/tmp/chibicc-XXXXXX");
++  char *path = strdup("@TERMUX_PREFIX@/tmp/chibicc-XXXXXX");
+   int fd = mkstemp(path);
+   if (fd == -1)
+     error("mkstemp failed: %s", strerror(errno));

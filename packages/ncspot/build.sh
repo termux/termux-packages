@@ -2,17 +2,18 @@ TERMUX_PKG_HOMEPAGE=https://github.com/hrkfdn/ncspot
 TERMUX_PKG_DESCRIPTION="An ncurses Spotify client written in Rust"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.9.3
-TERMUX_PKG_SRCURL=https://github.com/hrkfdn/ncspot/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=ed873d007ce356e8c6eed56226533b686682a98d2a37487668416539d4e10e78
+TERMUX_PKG_VERSION="0.13.4"
+TERMUX_PKG_SRCURL=https://github.com/hrkfdn/ncspot/archive/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=ca2cd3ca21d7ed0410f3327cf3c1b6db990dfbb5bd2ef0d15f3fb0a1b5fe6ee9
 TERMUX_PKG_DEPENDS="dbus, pulseaudio"
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
-termux_step_make() {
-	termux_setup_rust
-	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
-}
+TERMUX_PKG_CONFLICTS="ncspot-mpris"
 
-termux_step_make_install() {
-	install -Dm755 -t $TERMUX_PREFIX/bin target/${CARGO_TARGET_NAME}/release/ncspot
-}
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--no-default-features
+--features cursive/termion-backend,share_clipboard,pulseaudio_backend
+"
+# NOTE: ncurses-rs runs a test while building which fails while cross compiling:
+# therefore, we use cursive/termion-backend instead.

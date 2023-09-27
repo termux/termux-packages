@@ -1,0 +1,13 @@
+diff --git a/multiarc/src/formats/rar/unrar/os.hpp b/multiarc/src/formats/rar/unrar/os.hpp
+index 055993b..20baae5 100644
+--- a/multiarc/src/formats/rar/unrar/os.hpp
++++ b/multiarc/src/formats/rar/unrar/os.hpp
+@@ -177,7 +177,7 @@
+ #define SAVE_LINKS
+ #endif
+ 
+-#if defined(__linux) || defined(__FreeBSD__) || defined(__DragonFly__)
++#if (defined(__linux) && !defined(__ANDROID__)) || defined(__FreeBSD__) || defined(__DragonFly__)
+ #include <sys/time.h>
+ #define USE_LUTIMES
+ #endif

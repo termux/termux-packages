@@ -1,0 +1,12 @@
+diff -uNr feh-3.0/src/events.c feh-3.0.mod/src/events.c
+--- feh-3.0/src/events.c	2018-11-09 18:17:58.000000000 +0200
++++ feh-3.0.mod/src/events.c	2018-11-23 23:29:54.923941949 +0200
+@@ -124,7 +124,7 @@
+ 
+ 	free(confpath);
+ 
+-	if (!conf && ((conf = fopen("/etc/feh/buttons", "r")) == NULL))
++	if (!conf && ((conf = fopen("@TERMUX_PREFIX@/etc/feh/buttons", "r")) == NULL))
+ 		return;
+ 
+ 	while (fgets(line, sizeof(line), conf)) {

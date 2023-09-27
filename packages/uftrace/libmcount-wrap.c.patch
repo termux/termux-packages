@@ -1,47 +1,34 @@
-diff -uNr uftrace-0.9.3/libmcount/wrap.c uftrace-0.9.3.mod/libmcount/wrap.c
---- uftrace-0.9.3/libmcount/wrap.c	2019-07-13 17:25:47.000000000 +0300
-+++ uftrace-0.9.3.mod/libmcount/wrap.c	2019-09-03 20:46:52.430226391 +0300
-@@ -216,7 +216,6 @@
- /*
-  * hooking functions
-  */
--static int (*real_backtrace)(void **buffer, int sz);
- static void (*real_cxa_throw)(void *exc, void *type, void *dest);
- static void (*real_cxa_rethrow)(void);
- static void * (*real_cxa_begin_catch)(void *exc);
-@@ -241,7 +240,6 @@
+--- a/libmcount/wrap.c	2022-04-15 17:55:05.279817913 +0000
++++ b/libmcount/wrap.c	2022-04-15 19:45:32.879129081 +0000
+@@ -273,7 +272,12 @@
  
  void mcount_hook_functions(void)
  {
--	real_backtrace		= dlsym(RTLD_NEXT, "backtrace");
- 	real_cxa_throw		= dlsym(RTLD_NEXT, "__cxa_throw");
- 	real_cxa_rethrow	= dlsym(RTLD_NEXT, "__cxa_rethrow");
- 	real_cxa_begin_catch	= dlsym(RTLD_NEXT, "__cxa_begin_catch");
-@@ -258,22 +256,7 @@
- 
- __visible_default int backtrace(void **buffer, int sz)
- {
--	int ret;
--	struct mcount_thread_data *mtdp;
--
--	if (unlikely(real_backtrace == NULL))
--		mcount_hook_functions();
--
--	mtdp = get_thread_data();
--	if (!check_thread_data(mtdp))
--		mcount_rstack_restore(mtdp);
--
--	ret = real_backtrace(buffer, sz);
--
--	if (!check_thread_data(mtdp))
--		mcount_rstack_reset(mtdp);
--
--	return ret;
-+	return 0;
- }
- 
- __visible_default void __cxa_throw(void *exception, void *type, void *dest)
-@@ -324,7 +307,8 @@
++#if !defined __ANDROID__ || __ANDROID_API__ >= 33
+ 	real_backtrace = dlsym(RTLD_NEXT, "backtrace");
++#else
++	void *libandroid_execinfo = dlopen("libandroid-execinfo.so", RTLD_NOW);
++	real_backtrace = dlsym(libandroid_execinfo, "backtrace");
++#endif
+ 	real_cxa_throw = dlsym(RTLD_NEXT, "__cxa_throw");
+ 	real_cxa_rethrow = dlsym(RTLD_NEXT, "__cxa_rethrow");
+ 	real_cxa_begin_catch = dlsym(RTLD_NEXT, "__cxa_begin_catch");
+@@ -281,8 +285,14 @@
+ 	real_dlopen = dlsym(RTLD_NEXT, "dlopen");
+ 	real_pthread_exit = dlsym(RTLD_NEXT, "pthread_exit");
+ 	real_unwind_resume = dlsym(RTLD_NEXT, "_Unwind_Resume");
++#if !defined __ANDROID__ || __ANDROID_API__ >= 28
+ 	real_posix_spawn = dlsym(RTLD_NEXT, "posix_spawn");
+ 	real_posix_spawnp = dlsym(RTLD_NEXT, "posix_spawnp");
++#else
++	void *libandroid_spawn = dlopen("libandroid-spawn.so", RTLD_NOW);
++	real_posix_spawn = dlsym(libandroid_spawn, "posix_spawn");
++	real_posix_spawnp = dlsym(libandroid_spawn, "posix_spawnp");
++#endif
+ 	real_execve = dlsym(RTLD_NEXT, "execve");
+ 	real_execvpe = dlsym(RTLD_NEXT, "execvpe");
+ 	real_fexecve = dlsym(RTLD_NEXT, "fexecve");
+@@ -338,7 +320,8 @@
  	real_cxa_rethrow();
  }
  
@@ -51,7 +38,7 @@ diff -uNr uftrace-0.9.3/libmcount/wrap.c uftrace-0.9.3.mod/libmcount/wrap.c
  {
  	struct mcount_thread_data *mtdp;
  
-@@ -345,7 +329,7 @@
+@@ -360,7 +343,7 @@
  		mcount_rstack_restore(mtdp);
  	}
  

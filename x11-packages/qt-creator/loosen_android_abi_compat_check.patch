@@ -1,0 +1,14 @@
+Android or not, let Qt consider it compatible as long as other criteria met
+--- src/src/plugins/projectexplorer/abi.cpp	2021-05-24 17:41:06.487058000 +0000
++++ src.mod/src/plugins/projectexplorer/abi.cpp	2021-05-24 17:44:21.724678000 +0000
+@@ -654,10 +654,6 @@
+         isCompat = true;
+     }
+ 
+-    // Make Android matching more strict than the generic Linux matches so far:
+-    if (isCompat && (osFlavor() == AndroidLinuxFlavor || other.osFlavor() == AndroidLinuxFlavor))
+-        isCompat = (architecture() == other.architecture()) &&  (osFlavor() == other.osFlavor());
+-
+     if (!isCompat && wordWidth() == other.wordWidth()
+             && compatibleMSVCFlavors(osFlavor(), other.osFlavor())) {
+         isCompat = true;

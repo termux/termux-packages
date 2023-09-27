@@ -1,0 +1,108 @@
+--- a/configure.in
++++ b/configure.in
+@@ -776,42 +776,6 @@
+     LAME_CFLAGS="$lame_ii"
+   fi
+   CPPFLAGS="$save_CPPFLAGS"
+-
+-  AC_MSG_CHECKING([lame version])
+-  ac_save_CFLAGS="$CFLAGS"
+-  ac_save_LIBS="$LIBS"
+-  CFLAGS="$CFLAGS $LAME_CFLAGS"
+-  LIBS="$LIBS $LAME_LIBS"
+-  AC_RUN_IFELSE([AC_LANG_SOURCE([[
+-#include <stdio.h>
+-
+-#ifdef HAVE_LAME_INC
+-#include <lame/lame.h>
+-#else
+-#include <lame.h>
+-#endif
+-
+-int main () {
+-  lame_version_t lv;
+-  get_lame_version_numerical(&lv);
+-  if(lv.alpha || lv.beta) lv.minor--;
+-  printf("%d%d\n", lv.major, lv.minor);
+-  return 0;
+-}
+-]])],
+-    [lame_version="`./conftest$ac_exeext`"],
+-    [AC_MSG_RESULT([failed])
+-     TC_PKG_ERROR(lame, lame.h, yes, lame, [http://www.mp3dev.org/],
+-      [cannot compile and run a test program])],,
+-    [AC_MSG_RESULT([cross compiling; assumed OK...])])
+-  CFLAGS="$ac_save_CFLAGS"
+-  LIBS="$ac_save_LIBS"
+-
+-  if test 393 -ge "$lame_version" ; then
+-    have_lame="no"
+-    TC_PKG_ERROR(lame, lame.h, yes, lame, [http://www.mp3dev.org/],
+-      [lame version < 3.93])
+-  fi
+ fi
+ TC_PKG_HAVE(lame, LAME)
+ 
+@@ -820,62 +784,12 @@
+ dnl
+ TC_PKG_CHECK(xvid, no, xvid, no, xvid.h, xvidcore, xvid_global, xvid,
+  [http://www.xvid.org/])
+-if test x"$have_xvid" = x"yes" ; then
+-  AC_MSG_CHECKING([xvid version >= 1.0])
+-  AC_RUN_IFELSE([AC_LANG_SOURCE([[
+-#include <stdio.h>
+-#include <xvid.h>
+-
+-int main() {
+-	printf("%s\n", (XVID_API >= XVID_MAKE_API(4, 0)) ?"yes" :"no");
+-	return 0;
+-}
+-]])],
+-    [xvid_version_ok="`./conftest$ac_exeext`"],
+-    [AC_MSG_RESULT([failed])
+-     TC_PKG_ERROR(xvid, xvid.h, yes, xvid, [http://www.xvid.org/],
+-      [cannot compile and run a test program])],,
+-    [AC_MSG_RESULT([cross compiling; assumed OK...])])
+-  if test x"$xvid_version_ok" = x"yes"; then
+-    XVID_LIBS="-lxvidcore"
+-  else
+-    have_xvid="no"
+-    TC_PKG_ERROR(xvid, xvid.h, yes, xvid, [http://www.xvid.org/],
+-      [XviD version < 1.0])
+-  fi
+-fi
+ TC_PKG_HAVE(xvid, XVID)
+ 
+ dnl
+ dnl x264
+ dnl
+ TC_PKG_CONFIG_CHECK(x264, no, X264, x264, [http://developers.videolan.org/x264.html])
+-if test x"$have_x264" = x"yes" ; then
+-  AC_MSG_CHECKING([x264 version])
+-  AC_RUN_IFELSE([AC_LANG_SOURCE([[
+-#include <stdio.h>
+-#include <stdint.h>  /* required by x264.h */
+-#include <x264.h>
+-
+-int main() {
+-	printf("%d\n", X264_BUILD);
+-	return 0;
+-}
+-]])],
+-    [x264_version="`./conftest$ac_exeext`"],
+-    [AC_MSG_RESULT([failed])
+-     TC_PKG_ERROR(x264, x264.h, yes, x264,
+-                  [http://developers.videolan.org/x264.html],
+-                  [cannot compile and run a test program])],
+-    [AC_MSG_RESULT([cross compiling; assumed OK...])
+-     x264_version=54])
+-  if test 54 -gt "$x264_version"; then
+-    have_x264="no"
+-    TC_PKG_ERROR(x264, x264.h, yes, x264,
+-                 [http://developers.videolan.org/x264.html],
+-                 [x264 version too old (must be at least 54)])
+-  fi
+-fi
+ TC_PKG_HAVE(x264, X264)
+ 
+ dnl

@@ -1,0 +1,58 @@
+--- a/configure
++++ b/configure
+@@ -16092,7 +16092,7 @@
+ fi
+ 
+ 
+-GLIB_COMPILE_RESOURCES=`$PKG_CONFIG --variable=glib_compile_resources gio-2.0`
++GLIB_COMPILE_RESOURCES=glib-compile-resources
+ 
+ 
+ 
+@@ -17237,7 +17237,7 @@
+ 			 -Werror=missing-prototypes -Werror=nested-externs \
+ 			 -Werror=implicit-function-declaration \
+ 			 -Wmissing-declarations -Wno-pointer-sign \
+-			 -Werror=format-security -Wbitwise -Wcast-to-as \
++			 -Wno-error=format-security -Wbitwise -Wcast-to-as \
+ 			 -Wdefault-bitfield-sign -Wdo-while -Wparen-string \
+ 			 -Wptr-subtraction-blows -Wreturn-void -Wtypesign \
+ 			 -Wstrict-prototypes -Wno-error=format-nonliteral "
+@@ -18611,7 +18611,6 @@
+ have_python=no
+ have_python_gi=no
+ introspection_py_msg=no
+-PYTHON_GIOVERRIDESDIR=
+ if test "x$PYTHON" != x; then
+ 
+ printf "%s\n" "#define PYTHON_INTERPRETER \"$PYTHON\"" >>confdefs.h
+@@ -18620,10 +18619,9 @@
+ 
+     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for python module gi" >&5
+ printf %s "checking for python module gi... " >&6; }
+-    if $PYTHON -c 'import gi' 2>/dev/null; then
++    if true; then
+         have_python_gi=yes
+ 	introspection_py_msg="Yes."
+-	PYTHON_GIOVERRIDESDIR=`$PYTHON -c 'import gi; import os.path; print(os.path.dirname(gi.__file__)+"/overrides")'`
+     fi
+     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $have_python_gi" >&5
+ printf "%s\n" "$have_python_gi" >&6; }
+@@ -18662,7 +18660,7 @@
+ 	if test "x$with_native_win32" = xyes ; then
+ 	    PY_INCLUDES="-I$PY_PREFIX/include"
+ 	else
+-	    PY_INCLUDES=`$PYTHON-config --includes`
++	    PY_INCLUDES=`$PYTHON_CONFIG --includes`
+ 	fi
+     else
+ 	PY_INCLUDES="-I$PY_INCLUDE_DIR"
+@@ -18777,7 +18775,7 @@
+ 	    PY_LIBS="-L$PY_LIB_DIR"
+ 	    PY_DASHLPYTHON=FIXME
+ 	else
+-	    PY_LIBS=`$PYTHON-config --ldflags`
++	    PY_LIBS=`$PYTHON_CONFIG --ldflags`
+ 	    PY_DASHLPYTHON=`$PYTHON -c 'import sysconfig; print(sysconfig.get_config_var("BLDLIBRARY"), end="");'`
+ 	fi
+     else

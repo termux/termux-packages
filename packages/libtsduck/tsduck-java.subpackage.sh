@@ -1,0 +1,3 @@
+TERMUX_SUBPKG_INCLUDE="share/tsduck/java/"
+TERMUX_SUBPKG_DESCRIPTION="Java bindings for TSDuck"
+TERMUX_SUBPKG_DEPENDS="openjdk-17"

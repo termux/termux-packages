@@ -1,9 +1,13 @@
 termux_create_pacman_subpackages() {
 	# Sub packages:
-	if [ "$TERMUX_PKG_NO_STATICSPLIT" = "false" ] && [[ -n $(shopt -s globstar; shopt -s nullglob; echo lib/**/*.a) ]]; then
+	local _ADD_PREFIX=""
+	if [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
+		_ADD_PREFIX="glibc/"
+	fi
+	if [ "$TERMUX_PKG_NO_STATICSPLIT" = "false" ] && [[ -n $(shopt -s globstar; shopt -s nullglob; echo ${_ADD_PREFIX}lib/**/*.a) ]]; then
 		# Add virtual -static sub package if there are include files:
 		local _STATIC_SUBPACKAGE_FILE=$TERMUX_PKG_TMPDIR/${TERMUX_PKG_NAME}-static.subpackage.sh
-		echo TERMUX_SUBPKG_INCLUDE=\"lib/**/*.a lib/**/*.la\" > "$_STATIC_SUBPACKAGE_FILE"
+		echo TERMUX_SUBPKG_INCLUDE=\"$(find ${_ADD_PREFIX}lib -name '*.a' -o -name '*.la') $TERMUX_PKG_STATICSPLIT_EXTRA_PATTERNS\" > "$_STATIC_SUBPACKAGE_FILE"
 		echo "TERMUX_SUBPKG_DESCRIPTION=\"Static libraries for ${TERMUX_PKG_NAME}\"" >> "$_STATIC_SUBPACKAGE_FILE"
 	fi
 
@@ -13,20 +17,31 @@ termux_create_pacman_subpackages() {
 		test ! -f "$subpackage" && continue
 		local SUB_PKG_NAME
 		SUB_PKG_NAME=$(basename "$subpackage" .subpackage.sh)
+		if [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ] && ! package__is_package_name_have_glibc_prefix "$SUB_PKG_NAME"; then
+			SUB_PKG_NAME="$(package__add_prefix_glibc_to_package_name ${SUB_PKG_NAME})"
+		fi
 		# Default value is same as main package, but sub package may override:
 		local TERMUX_SUBPKG_PLATFORM_INDEPENDENT=$TERMUX_PKG_PLATFORM_INDEPENDENT
 		local SUB_PKG_DIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/subpackages/$SUB_PKG_NAME
 		local TERMUX_SUBPKG_ESSENTIAL=false
 		local TERMUX_SUBPKG_BREAKS=""
 		local TERMUX_SUBPKG_DEPENDS=""
+		local TERMUX_SUBPKG_RECOMMENDS=""
+		local TERMUX_SUBPKG_SUGGESTS=""
 		local TERMUX_SUBPKG_CONFLICTS=""
 		local TERMUX_SUBPKG_REPLACES=""
+		local TERMUX_SUBPKG_PROVIDES=""
 		local TERMUX_SUBPKG_CONFFILES=""
 		local TERMUX_SUBPKG_DEPEND_ON_PARENT=""
+		local TERMUX_SUBPKG_EXCLUDED_ARCHES=""
 		local TERMUX_SUBPKG_GROUPS=""
-		local SUB_PKG_MASSAGE_DIR=$SUB_PKG_DIR/massage/$TERMUX_PREFIX
+		local SUB_PKG_MASSAGE_DIR=$SUB_PKG_DIR/massage/$TERMUX_PREFIX_CLASSICAL
 		local SUB_PKG_PACKAGE_DIR=$SUB_PKG_DIR/package
 		mkdir -p "$SUB_PKG_MASSAGE_DIR" "$SUB_PKG_PACKAGE_DIR"
+
+		# Override termux_step_create_subpkg_debscripts
+		# shellcheck source=/dev/null
+		source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_create_subpkg_debscripts.sh"
 
 		# shellcheck source=/dev/null
 		source "$subpackage"
@@ -46,10 +61,24 @@ termux_create_pacman_subpackages() {
 		done
 		shopt -u globstar
 
+		# Do not create subpackage for specific arches.
+		# Using TERMUX_ARCH instead of SUB_PKG_ARCH (defined below) is intentional.
+		if [ "$TERMUX_SUBPKG_EXCLUDED_ARCHES" != "${TERMUX_SUBPKG_EXCLUDED_ARCHES/$TERMUX_ARCH}" ]; then
+			echo "Skipping creating subpackage '$SUB_PKG_NAME' for arch $TERMUX_ARCH"
+			continue
+		fi
+
 		local SUB_PKG_ARCH=$TERMUX_ARCH
 		[ "$TERMUX_SUBPKG_PLATFORM_INDEPENDENT" = "true" ] && SUB_PKG_ARCH=any
 
 		cd "$SUB_PKG_DIR/massage"
+		# Check that files were actually installed, else don't subpackage.
+		if [ "$SUB_PKG_ARCH" = "any" ] && [ "$(find . -type f -print | head -n1)" = "" ]; then
+			echo "No files in subpackage '$SUB_PKG_NAME' when built for $SUB_PKG_ARCH with package '$TERMUX_PKG_NAME', so"
+			echo "the subpackage was not created. If unexpected, check to make sure the files are where you expect."
+			cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX_CLASSICAL"
+			continue
+		fi
 		local SUB_PKG_INSTALLSIZE
 		SUB_PKG_INSTALLSIZE=$(du -bs . | cut -f 1)
 
@@ -67,6 +96,16 @@ termux_create_pacman_subpackages() {
 			TERMUX_SUBPKG_DEPENDS+=", $TERMUX_PKG_DEPENDS"
 		fi
 
+		if [ "$TERMUX_GLOBAL_LIBRARY" = "true" ] && [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
+			test ! -z "$TERMUX_SUBPKG_DEPENDS" && TERMUX_SUBPKG_DEPENDS=$(package__add_prefix_glibc_to_package_list "$TERMUX_SUBPKG_DEPENDS")
+			test ! -z "$TERMUX_SUBPKG_BREAKS" && TERMUX_SUBPKG_BREAKS=$(package__add_prefix_glibc_to_package_list "$TERMUX_SUBPKG_BREAKS")
+			test ! -z "$TERMUX_SUBPKG_CONFLICTS" && TERMUX_SUBPKG_CONFLICTS=$(package__add_prefix_glibc_to_package_list "$TERMUX_SUBPKG_CONFLICTS")
+			test ! -z "$TERMUX_SUBPKG_RECOMMENDS" && TERMUX_SUBPKG_RECOMMENDS=$(package__add_prefix_glibc_to_package_list "$TERMUX_SUBPKG_RECOMMENDS")
+			test ! -z "$TERMUX_SUBPKG_REPLACES" && TERMUX_SUBPKG_REPLACES=$(package__add_prefix_glibc_to_package_list "$TERMUX_SUBPKG_REPLACES")
+			test ! -z "$TERMUX_SUBPKG_PROVIDES" && TERMUX_SUBPKG_PROVIDES=$(package__add_prefix_glibc_to_package_list "$TERMUX_SUBPKG_PROVIDES")
+			test ! -z "$TERMUX_SUBPKG_SUGGESTS" && TERMUX_SUBPKG_SUGGESTS=$(package__add_prefix_glibc_to_package_list "$TERMUX_SUBPKG_SUGGESTS")
+		fi
+
 		# Package metadata.
 		{
 			echo "pkgname = $SUB_PKG_NAME"
@@ -80,23 +119,35 @@ termux_create_pacman_subpackages() {
 			echo "arch = $SUB_PKG_ARCH"
 
 			if [ -n "$TERMUX_SUBPKG_REPLACES" ]; then
-				tr ',' '\n' <<< "$TERMUX_SUBPKG_REPLACES" | sed 's|(||g; s|)||g; s| ||g; s|>>|>|g; s|<<|<|g' | awk '{ printf "replaces = %s\n", $1 }'
+				tr ',' '\n' <<< "$TERMUX_SUBPKG_REPLACES" | sed 's|(||g; s|)||g; s| ||g; s|>>|>|g; s|<<|<|g' | awk '{ printf "replaces = " $1; if ( ($1 ~ /</ || $1 ~ />/ || $1 ~ /=/) && $1 !~ /-/ ) printf "-0"; printf "\n" }'
 			fi
 
 			if [ -n "$TERMUX_SUBPKG_CONFLICTS" ]; then
-				tr ',' '\n' <<< "$TERMUX_SUBPKG_CONFLICTS" | sed 's|(||g; s|)||g; s| ||g; s|>>|>|g; s|<<|<|g' | awk '{ printf "conflict = %s\n", $1 }'
+				tr ',' '\n' <<< "$TERMUX_SUBPKG_CONFLICTS" | sed 's|(||g; s|)||g; s| ||g; s|>>|>|g; s|<<|<|g' | awk '{ printf "conflict = " $1; if ( ($1 ~ /</ || $1 ~ />/ || $1 ~ /=/) && $1 !~ /-/ ) printf "-0"; printf "\n" }'
 			fi
 
 			if [ -n "$TERMUX_SUBPKG_BREAKS" ]; then
-				tr ',' '\n' <<< "$TERMUX_SUBPKG_BREAKS" | sed 's|(||g; s|)||g; s| ||g; s|>>|>|g; s|<<|<|g' | awk '{ printf "conflict = %s\n", $1 }'
+				tr ',' '\n' <<< "$TERMUX_SUBPKG_BREAKS" | sed 's|(||g; s|)||g; s| ||g; s|>>|>|g; s|<<|<|g' | awk '{ printf "conflict = " $1; if ( ($1 ~ /</ || $1 ~ />/ || $1 ~ /=/) && $1 !~ /-/ ) printf "-0"; printf "\n" }'
+			fi
+
+			if [ -n "$TERMUX_SUBPKG_PROVIDES" ]; then
+				tr ',' '\n' <<< "$TERMUX_SUBPKG_REPLACES" | sed 's|(||g; s|)||g; s| ||g; s|>>|>|g; s|<<|<|g' | awk '{ printf "provides = " $1; if ( ($1 ~ /</ || $1 ~ />/ || $1 ~ /=/) && $1 !~ /-/ ) printf "-0"; printf "\n" }'
 			fi
 
 			if [ -n "$TERMUX_SUBPKG_DEPENDS" ]; then
-				tr ',' '\n' <<< "${TERMUX_SUBPKG_DEPENDS/#, /}" | sed 's|(||g; s|)||g; s| ||g; s|>>|>|g; s|<<|<|g' | awk '{ printf "depend = %s\n", $1 }' | sed 's/|.*//'
+				tr ',' '\n' <<< "${TERMUX_SUBPKG_DEPENDS/#, /}" | sed 's|(||g; s|)||g; s| ||g; s|>>|>|g; s|<<|<|g' | awk '{ printf "depend = " $1; if ( ($1 ~ /</ || $1 ~ />/ || $1 ~ /=/) && $1 !~ /-/ ) printf "-0"; printf "\n" }' | sed 's/|.*//'
+			fi
+
+			if [ -n "$TERMUX_SUBPKG_RECOMMENDS" ]; then
+				tr ',' '\n' <<< "$TERMUX_SUBPKG_RECOMMENDS" | awk '{ printf "optdepend = %s\n", $1 }'
+			fi
+
+			if [ -n "$TERMUX_SUBPKG_SUGGESTS" ]; then
+				tr ',' '\n' <<< "$TERMUX_SUBPKG_SUGGESTS" | awk '{ printf "optdepend = %s\n", $1 }'
 			fi
 
 			if [ -n "$TERMUX_SUBPKG_CONFFILES" ]; then
-				tr ',' '\n' <<< "$TERMUX_SUBPKG_CONFFILES" | awk '{ printf "backup = '"${TERMUX_PREFIX:1}"'/%s\n", $1 }'
+				tr ',' '\n' <<< "$TERMUX_SUBPKG_CONFFILES" | awk '{ printf "backup = '"${TERMUX_PREFIX_CLASSICAL:1}"'/%s\n", $1 }'
 			fi
 
 			if [ -n "$TERMUX_SUBPKG_GROUPS" ]; then
@@ -161,6 +212,6 @@ termux_create_pacman_subpackages() {
 		shopt -u dotglob globstar
 
 		# Go back to main package:
-		cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"
+		cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX_CLASSICAL"
 	done
 }

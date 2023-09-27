@@ -5,9 +5,11 @@ TERMUX_PKG_LICENSE="BSD"
 # this hack to be able to find the license file.
 TERMUX_PKG_LICENSE_FILE="../LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=70.1
+# Never forget to always bump revision of reverse dependencies and rebuild them
+# when bumping "major" version.
+TERMUX_PKG_VERSION=73.2
 TERMUX_PKG_SRCURL=https://github.com/unicode-org/icu/releases/download/release-${TERMUX_PKG_VERSION//./-}/icu4c-${TERMUX_PKG_VERSION//./_}-src.tgz
-TERMUX_PKG_SHA256=8d205428c17bf13bb535300669ed28b338a157b1c01ae66d31d0d3e2d47c3fd5
+TERMUX_PKG_SHA256=818a80712ed3caacd9b652305e01afc7fa167e6f2e94996da44b90c2ab604ce1
 TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_BREAKS="libicu-dev"
 TERMUX_PKG_REPLACES="libicu-dev"

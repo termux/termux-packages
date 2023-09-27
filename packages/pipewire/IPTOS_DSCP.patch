@@ -1,0 +1,13 @@
+--- a/src/modules/module-rtp-sink.c
++++ b/src/modules/module-rtp-sink.c
+@@ -668,6 +668,10 @@ static int make_socket(struct sockaddr_s
+ 		pw_log_warn("setsockopt(SO_PRIORITY) failed: %m");
+ #endif
+ 	if (dscp > 0) {
++#ifdef __ANDROID__
++#define IPTOS_DSCP_MASK 0xfc
++#define IPTOS_DSCP(x) ((x) & IPTOS_DSCP_MASK)
++#endif
+ 		val = IPTOS_DSCP(dscp << 2);
+ 		if (setsockopt(fd, IPPROTO_IP, IP_TOS, &val, sizeof(val)) < 0)
+ 			pw_log_warn("setsockopt(IP_TOS) failed: %m");

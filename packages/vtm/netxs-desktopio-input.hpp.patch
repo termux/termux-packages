@@ -1,0 +1,16 @@
+--- a/src/netxs/desktopio/input.hpp
++++ b/src/netxs/desktopio/input.hpp
+@@ -505,7 +505,13 @@
+             {
+                 auto operator()(mapkey const& k) const
+                 {
++                    // Termux change: The original hash function will return an ui64 integer, but
++                    // std::size_t is an ui32 integer on 32-bit Android system. 
++#ifndef __LP64__
++                    return std::size_t{ (ui32)k.vk | ((ui32)k.sc << 8) | ((ui32)k.sc << 16) };
++#else
+                     return std::size_t{ (ui64)k.vk | ((ui64)k.sc << 16) | ((ui64)k.sc << 32) };
++#endif
+                 }
+             };
+         };

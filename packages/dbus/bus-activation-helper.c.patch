@@ -1,0 +1,12 @@
+--- a/bus/activation-helper.c
++++ b/bus/activation-helper.c
+@@ -294,7 +294,8 @@
+ static dbus_bool_t
+ switch_user (char *user, DBusError *error)
+ {
+-#ifndef ACTIVATION_LAUNCHER_TEST
++/* Termux is a single-user environment. */
++#if !defined ACTIVATION_LAUNCHER_TEST && !defined __ANDROID__
+   struct passwd *pw;
+ 
+   /* find user */

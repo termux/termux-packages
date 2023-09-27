@@ -1,0 +1,19 @@
+Borrowed from https://github.com/gentoo/gentoo/raw/e70f62a2157efbb0914a18c5a4f412c79df45995/app-office/texstudio/files/texstudio-3.0.5-quazip1.patch
+
+--- a/texstudio.pro
++++ b/texstudio.pro
+@@ -370,11 +370,9 @@
+         PKGCONFIG += quazip1-qt6
+     }
+     !versionGreaterOrEqual($$QT_VERSION, "6.0.0") {
+-            message(System quazip5)
+-            isEmpty(QUAZIP_LIB): QUAZIP_LIB = -lquazip5
+-            isEmpty(QUAZIP_INCLUDE): QUAZIP_INCLUDE = $${PREFIX}/include/quazip5
+-            INCLUDEPATH += $${QUAZIP_INCLUDE}
+-            LIBS += $${QUAZIP_LIB}
++            message(System QuaZip)
++            CONFIG += link_pkgconfig
++            PKGCONFIG += quazip1-qt5
+     }
+ }
+ 

@@ -1,0 +1,102 @@
+--- a/src/vde_router/vde_router.c
++++ b/src/vde_router/vde_router.c
+@@ -31,6 +31,10 @@
+ #include <getopt.h>
+ #include <libgen.h>
+ 
++#ifdef __ANDROID__
++#include <signal.h>
++#endif
++
+ static char *mgmt;
+ static int mgmtmode=0700;
+ static char *progname;
+@@ -1123,7 +1127,11 @@
+ 		selected->dhcpd_started = 1;
+ 		pthread_create(&selected->dhcpd, 0, dhcp_server_loop, dhcpd_settings);
+ 	} else if (selected->dhcpd_started) {
++#ifndef __ANDROID__
+ 		pthread_cancel(selected->dhcpd);
++#else
++		pthread_kill(selected->dhcpd, SIGUSR2);
++#endif
+ 		selected->dhcpd_started = 0;
+ 	}
+ 	return 0;
+@@ -1176,7 +1184,11 @@
+ 		}
+ 		pthread_create(&olsr_thread, 0, vder_olsr_loop, olsr_settings);
+ 	} else {
++#ifndef __ANDROID__
+ 		pthread_cancel(olsr_thread);
++#else
++		pthread_kill(olsr_thread, SIGUSR2);
++#endif
+ 		/* stop */
+ 	}
+ 	return 0;
+--- a/src/vde_router/vder_dhcp.c
++++ b/src/vde_router/vder_dhcp.c
+@@ -6,6 +6,14 @@
+ #include <unistd.h>
+ #include <sys/time.h>
+ 
++#ifdef __ANDROID__
++#include <string.h>
++static void thread_signal_handler(int signum)
++{
++	pthread_exit(0);
++}
++#endif
++
+ static struct vder_dhcp_negotiation *Negotiation_list;
+ static struct vder_udp_socket *udpsock;
+ static struct vder_dhcpd_settings Settings;
+@@ -204,6 +212,15 @@
+ 
+ void *dhcp_server_loop(void *ptr_settings)
+ {
++#ifdef __ANDROID__
++	struct sigaction actions;
++	memset(&actions, 0, sizeof(actions));
++	sigemptyset(&actions.sa_mask);
++	actions.sa_flags = 0;
++	actions.sa_handler = thread_signal_handler;
++	sigaction(SIGUSR2, &actions, NULL);
++#endif
++
+ 	uint32_t from_ip;
+ 	uint16_t from_port;
+ 
+--- a/src/vde_router/vder_olsr.c
++++ b/src/vde_router/vder_olsr.c
+@@ -13,6 +13,13 @@
+ #include <unistd.h>
+ #include <sys/time.h>
+ 
++#ifdef __ANDROID__
++#include <string.h>
++static void thread_signal_handler(int signum)
++{
++	pthread_exit(0);
++}
++#endif
+ 
+ #define OLSR_MSG_INTERVAL 2000
+ #define DGRAM_MAX_SIZE 1800
+@@ -696,6 +703,15 @@
+ 
+ void *vder_olsr_loop(void *olsr_settings)
+ {
++#ifdef __ANDROID__
++	struct sigaction actions;
++	memset(&actions, 0, sizeof(actions));
++	sigemptyset(&actions.sa_mask);
++	actions.sa_flags = 0;
++	actions.sa_handler = thread_signal_handler;
++	sigaction(SIGUSR2, &actions, NULL);
++#endif
++
+ 	uint32_t from_ip;
+ 	uint16_t from_port;
+ 	unsigned char buffer[DGRAM_MAX_SIZE];

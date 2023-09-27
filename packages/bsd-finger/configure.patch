@@ -1,0 +1,40 @@
+--- a/configure
++++ b/configure
+@@ -4,7 +4,7 @@
+ # Do not edit.
+ #
+ 
+-PREFIX='/usr'
++PREFIX='@TERMUX_PREFIX@'
+ #EXECPREFIX='$PREFIX'
+ INSTALLROOT=''
+ BINMODE='755'
+@@ -54,8 +54,8 @@
+ fi
+ 
+ BINDIR="$EXECPREFIX/bin"
+-SBINDIR="$EXECPREFIX/sbin"
+-MANDIR="$PREFIX/man"
++SBINDIR="$EXECPREFIX/bin"
++MANDIR="$PREFIX/share/man"
+ 
+ echo "Directories: $BINDIR $SBINDIR $MANDIR "
+ 
+@@ -92,7 +92,7 @@
+     echo -n 'Checking if C compiler works... '
+     if (
+           $CC __conftest.c -o __conftest || exit 1
+-          ./__conftest || exit 1
++          ./__conftest || :
+        ) >/dev/null 2>&1; then
+          echo 'yes'
+      else
+@@ -242,7 +242,7 @@
+ EOF
+ if (
+       $CC $CFLAGS  __conftest.c $LIBBSD -o __conftest || exit 1
+-      ./__conftest || exit 1
++      ./__conftest || :
+    ) >/dev/null 2>&1; then
+     echo 'ok'
+ else

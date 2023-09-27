@@ -1,0 +1,18 @@
+diff --git a/lib/util.c b/lib/util.c
+index 0a1403f..1209201 100644
+--- a/lib/util.c
++++ b/lib/util.c
+@@ -333,8 +333,13 @@ int set_cpu(uint32_t core)
+ 	CPU_ZERO(&cpuset);
+ 	CPU_SET(core, &cpuset);
+ 
++#if defined(__ANDROID__) //
++	if (sched_setaffinity(pthread_gettid_np(pthread_self()),
++			      sizeof(cpu_set_t), &cpuset) == -1) {
++#else
+ 	if (pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t),
+ 				   &cpuset) != 0) {
++#endif 
+ 		return EXIT_FAILURE;
+ 	}
+ 	return EXIT_SUCCESS;

@@ -1,0 +1,20 @@
+--- a/dtool/src/dtoolutil/filename.cxx
++++ b/dtool/src/dtoolutil/filename.cxx
+@@ -561,7 +561,7 @@
+ 
+ #else
+     // Posix case.
+-    temp_directory = "/tmp";
++    temp_directory = "@TERMUX_PREFIX@/tmp";
+ #endif  // WIN32
+ 
+     if (temp_directory.empty()) {
+@@ -668,7 +668,7 @@
+ #elif defined(__FreeBSD__)
+     common_appdata_directory = "/usr/local/share";
+ #else
+-    common_appdata_directory = "/usr/share";
++    common_appdata_directory = "@TERMUX_PREFIX@/share";
+ #endif  // WIN32
+ 
+     if (common_appdata_directory.empty()) {

@@ -1,0 +1,46 @@
+--- ./releng/setup-env.sh.orig	2023-07-08 11:27:56.712118591 +0000
++++ ./releng/setup-env.sh	2023-07-08 11:32:05.717812811 +0000
+@@ -650,7 +650,7 @@
+     host_cxxlibs="c++_static c++abi"
+     case $host_arch in
+       x86)
+-        android_api=19
++        android_api=24
+         android_abi="x86"
+         android_target="i686-none-linux-android${android_api}"
+         host_clang_arch="i386"
+@@ -660,14 +660,14 @@
+         c_like_flags+=("-mfpmath=sse" "-mstackrealign")
+         ;;
+       x86_64)
+-        android_api=21
++        android_api=24
+         android_abi="x86_64"
+         android_target="x86_64-none-linux-android${android_api}"
+         host_clang_arch="x86_64"
+         host_compiler_triplet="x86_64-linux-android"
+         ;;
+       arm)
+-        android_api=19
++        android_api=24
+         android_abi="armeabi-v7a"
+         android_target="armv7-none-linux-androideabi${android_api}"
+         host_clang_arch="arm"
+@@ -678,7 +678,7 @@
+         linker_flags+=("-Wl,--fix-cortex-a8")
+         ;;
+       arm64)
+-        android_api=21
++        android_api=24
+         android_abi="arm64-v8a"
+         android_target="aarch64-none-linux-android${android_api}"
+         host_clang_arch="aarch64"
+@@ -806,7 +806,7 @@
+     ar=("$qnx_toolchain_prefix-ar")
+     nm=("$qnx_toolchain_prefix-nm")
+     ranlib=("$qnx_toolchain_prefix-ranlib")
+-    strip=("$qnx_toolchain_prefix-strip" "--strip-all")
++    strip=("$qnx_toolchain_prefix-strip" "--strip-unneeded --preserve-dates")
+ 
+     readelf=("$qnx_toolchain_prefix-readelf")
+     objcopy=("$qnx_toolchain_prefix-objcopy")

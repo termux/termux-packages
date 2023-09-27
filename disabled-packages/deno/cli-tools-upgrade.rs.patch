@@ -1,0 +1,23 @@
+--- ./cli/tools/upgrade.rs.orig	2022-01-20 19:18:16.459123964 +0530
++++ ./cli/tools/upgrade.rs	2022-01-20 19:27:18.071118123 +0530
+@@ -22,6 +22,7 @@
+ 
+ const RELEASE_URL: &str = "https://github.com/denoland/deno/releases";
+ 
++#[cfg(not(target_os = "android"))]
+ pub async fn upgrade(upgrade_flags: UpgradeFlags) -> Result<(), AnyError> {
+   let mut client_builder = Client::builder();
+ 
+@@ -135,6 +136,12 @@
+   Ok(())
+ }
+ 
++#[cfg(target_os = "android")]
++pub async fn upgrade(upgrade_flags: UpgradeFlags) -> Result<(), AnyError> {
++  println!("You are currently using Deno packaged by the Termux repo. To upgrade Deno, wait for the packagers to update it. This is done to prevent you from breaking your installation.");
++  std::process::exit(1);
++}
++
+ async fn get_latest_release_version(
+   client: &Client,
+ ) -> Result<String, AnyError> {

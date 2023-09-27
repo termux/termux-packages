@@ -7,7 +7,9 @@
 [![Join the chat at https://gitter.im/termux/termux](https://badges.gitter.im/termux/termux.svg)](https://gitter.im/termux/termux)
 [![Join the Termux discord server](https://img.shields.io/discord/641256914684084234.svg?label=&logo=discord&logoColor=ffffff&color=5865F2)](https://discord.gg/HXpF69X)
 
-<img src=".github/static/powered-by-fosshost.png" alt="Powered by FossHost" width="128px"></img>
+[![Repository status](https://repology.org/badge/repository-big/termux.svg)](https://repology.org/repository/termux)
+
+<img src=".github/static/hosted-by-hetzner.png" alt="Hosted by Hetzner" width="128px"></img>
 
 This project contains scripts and patches to build packages for the [Termux](https://github.com/termux/termux-app)
 Android application.
@@ -15,9 +17,6 @@ Android application.
 Quick how-to about Termux package management is available at [Package Management](https://github.com/termux/termux-packages/wiki/Package-Management). It also has info on how to fix **`repository is under maintenance or down`** errors when running `apt` or `pkg` commands.
 
 ## Contributing
-
-**@termux is looking for help with fixing issues, adding new packages and maintaining
-existing ones. It would be very helpful if you submit a pull request with bug fixes.**
 
 Read [CONTRIBUTING.md](/CONTRIBUTING.md) and [Developer's Wiki](https://github.com/termux/termux-packages/wiki) for more details.
 

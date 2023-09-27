@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://ccrypt.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://ccrypt.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="Secure encryption and decryption of files and streams utility"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

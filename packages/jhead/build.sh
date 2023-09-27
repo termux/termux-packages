@@ -2,12 +2,8 @@ TERMUX_PKG_HOMEPAGE=http://www.sentex.net/~mwandel/jhead/
 TERMUX_PKG_DESCRIPTION="Exif Jpeg header manipulation tool"
 TERMUX_PKG_LICENSE="Public Domain"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.04
-TERMUX_PKG_SRCURL=http://www.sentex.net/~mwandel/jhead/jhead-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=ef89bbcf4f6c25ed88088cf242a47a6aedfff4f08cc7dc205bf3e2c0f10a03c9
+TERMUX_PKG_VERSION=3.08
+TERMUX_PKG_SRCURL=https://github.com/Matthias-Wandel/jhead/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=999a81b489c7b2a7264118f194359ecf4c1b714996a2790ff6d5d2f3940f1e9f
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
-
-termux_step_make_install() {
-	install -Dm700 jhead $TERMUX_PREFIX/bin/jhead
-	install -Dm600 jhead.1 $TERMUX_PREFIX/share/man/man1/jhead.1
-}

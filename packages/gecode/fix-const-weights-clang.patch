@@ -1,0 +1,25 @@
+From c810c96b1ce5d3692e93439f76c4fa7d3daf9fbb Mon Sep 17 00:00:00 2001
+From: Jason N <admin@cyderize.org>
+Date: Thu, 18 Jun 2020 15:02:16 +1000
+Subject: [PATCH] Make elements and weights in OverweightValues non-const
+
+---
+ gecode/set/int/weights.hpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/gecode/set/int/weights.hpp b/gecode/set/int/weights.hpp
+index 24a097f160..179dc6e603 100644
+--- a/gecode/set/int/weights.hpp
++++ b/gecode/set/int/weights.hpp
+@@ -49,9 +49,9 @@ namespace Gecode { namespace Set { namespace Int {
+     /// The value iterator
+     I iter;
+     /// A superset of the elements found in the iterator
+-    const SharedArray<int> elements;
++    SharedArray<int> elements;
+     /// Weights for all the possible elements
+-    const SharedArray<int> weights;
++    SharedArray<int> weights;
+     /// The current index into the elements and weights
+     int index;
+     /// Move to the next element

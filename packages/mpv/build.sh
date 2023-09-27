@@ -1,41 +1,51 @@
 TERMUX_PKG_HOMEPAGE=https://mpv.io/
 TERMUX_PKG_DESCRIPTION="Command-line media player"
-TERMUX_PKG_LICENSE="GPL-3.0"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.34.1
-TERMUX_PKG_REVISION=1
+# Update both mpv and mpv-x to the same version in one PR.
+TERMUX_PKG_VERSION=0.36.0
 TERMUX_PKG_SRCURL=https://github.com/mpv-player/mpv/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=32ded8c13b6398310fa27767378193dc1db6d78b006b70dbcbd3123a1445e746
+TERMUX_PKG_SHA256=29abc44f8ebee013bb2f9fe14d80b30db19b534c679056e4851ceadf5a5e8bf6
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="ffmpeg, libandroid-glob, libandroid-support, libarchive, libcaca, libiconv, liblua52, pulseaudio, openal-soft, zlib"
+TERMUX_PKG_DEPENDS="ffmpeg, libandroid-glob, libandroid-support, libarchive, libass, libcaca, libiconv, liblua52, libsixel, libuchardet, openal-soft, pulseaudio, rubberband, zlib"
 TERMUX_PKG_RM_AFTER_INSTALL="share/icons share/applications"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-Dlibmpv=true
+-Dlua=lua52
+-Ddvdnav=disabled
+-Dlcms2=disabled
+-Dlibbluray=disabled
+-Dvapoursynth=disabled
+-Dzimg=disabled
+-Dopenal=enabled
+-Ddrm=disabled
+-Dgbm=disabled
+-Dgl=disabled
+-Djpeg=disabled
+-Dvdpau=disabled
+-Dvaapi=disabled
+-Dvulkan=disabled
+-Dwayland=disabled
+-Dx11=disabled
+-Dxv=disabled
+-Dandroid-media-ndk=disabled
+"
+
+termux_step_post_get_source() {
+	# Version guard
+	local ver_m=${TERMUX_PKG_VERSION#*:}
+	local ver_x=$(. $TERMUX_SCRIPTDIR/x11-packages/mpv-x/build.sh; echo ${TERMUX_PKG_VERSION#*:})
+	if [ "${ver_m}" != "${ver_x}" ]; then
+		termux_error_exit "Version mismatch between mpv and mpv-x."
+	fi
+}
 
 termux_step_pre_configure() {
 	LDFLAGS+=" -landroid-glob"
 }
 
-termux_step_make_install() {
-	cd $TERMUX_PKG_SRCDIR
-
-	./bootstrap.py
-
-	./waf configure \
-		--prefix=$TERMUX_PREFIX \
-		--disable-gl \
-		--disable-jpeg \
-		--disable-lcms2 \
-		--enable-libarchive \
-		--enable-libmpv-shared \
-		--enable-lua \
-		--enable-pulse \
-		--enable-openal \
-		--enable-caca \
-		--disable-alsa \
-		--disable-x11
-
-	./waf -v install
-
-	# Use opensles audio out be default:
-	mkdir -p $TERMUX_PREFIX/etc/mpv
-	cp $TERMUX_PKG_BUILDER_DIR/mpv.conf $TERMUX_PREFIX/etc/mpv/mpv.conf
+termux_step_post_make_install() {
+	# Use opensles audio out by default:
+	install -Dm600 -t $TERMUX_PREFIX/etc/mpv/ $TERMUX_PKG_BUILDER_DIR/mpv.conf
+	install -Dm600 -t $TERMUX_PREFIX/share/mpv/scripts/ $TERMUX_PKG_SRCDIR/TOOLS/lua/*
 }

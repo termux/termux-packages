@@ -1,3 +1,5 @@
+#!/usr/bin/bash
+
 termux_download() {
 	if [ $# != 3 ]; then
 		termux_error_exit "termux_download(): Invalid arguments - expected \$URL \$DESTINATION \$CHECKSUM"

@@ -1,0 +1,41 @@
+--- a/final/output/tty/fterm.cpp
++++ b/final/output/tty/fterm.cpp
+@@ -1263,8 +1263,10 @@
+ {
+   // Init current locale
+ 
++#ifndef __ANDROID__
+   static const auto& data = FTermData::getInstance();
+   const auto& termtype = data.getTermType();
++#endif
+   const char* locale_name = std::setlocale (LC_ALL, "");
+   std::setlocale (LC_NUMERIC, "");
+ 
+@@ -1275,6 +1277,7 @@
+   if ( locale_xterm )
+     locale_name = std::setlocale (LC_ALL, locale_xterm);
+ 
++#ifndef __ANDROID__
+   // TeraTerm can not show UTF-8 character
+   if ( data.isTermType(FTermType::tera_term)
+     && ! std::strcmp(nl_langinfo(CODESET), "UTF-8") )
+@@ -1289,6 +1292,7 @@
+   if ( termtype.substr(0, 3) == "sun"
+     && ! std::strcmp(nl_langinfo(CODESET), "UTF-8") )
+     locale_name = std::setlocale (LC_ALL, "C");
++#endif
+ 
+   // Try to found a meaningful content for locale_name
+   if ( locale_name )
+@@ -1364,7 +1368,11 @@
+   static const auto& fsys = FSystem::getInstance();
+ 
+   if ( fsys->isTTY(stdout_no)
++#ifndef __ANDROID__
+     && ! std::strcmp(nl_langinfo(CODESET), "UTF-8") )
++#else
++    )
++#endif
+   {
+     data.setUTF8Console(true);
+     data.setTermEncoding (Encoding::UTF8);

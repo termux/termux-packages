@@ -1,0 +1,12 @@
+--- a/third_party/bzip2/CMakeLists.txt.orig
++++ b/third_party/bzip2/CMakeLists.txt
+@@ -40,7 +40,7 @@
+     BUILD_BYPRODUCTS ${BZIP_LIBRARIES}
+     BUILD_IN_SOURCE 1
+-    CONFIGURE_COMMAND ""
+-    BUILD_COMMAND make VERBOSE=1 "CFLAGS=-fPIC -fvisibility=hidden -Wall -Winline -O2 -g -D_FILE_OFFSET_BITS=64"
++    CONFIGURE_COMMAND bash -c "sed -i 's/all: libbz2.a bzip2 bzip2recover test/all: libbz2.a bzip2 bzip2recover/' Makefile" # Do not run test for bzip2
++    BUILD_COMMAND make VERBOSE=1 "CFLAGS=$ENV{CFLAGS} -fPIC -fvisibility=hidden -Wall -Winline -O2 -g -D_FILE_OFFSET_BITS=64" "CC=$ENV{CC}" "AR=$ENV{AR}" "RANLIB=$ENV{RANLIB}" "LDFLAGS=$ENV{LDFLAGS}"
+     INSTALL_COMMAND make install PREFIX=${INSTALL_DIR}
+     DOWNLOAD_NO_PROGRESS ON
+     LOG_DOWNLOAD ON

@@ -1,0 +1,52 @@
+--- ../Makefile.orig	2018-05-15 18:08:02.956789845 +0000
++++ ./Makefile	2018-05-15 18:29:20.181951320 +0000
+@@ -13,13 +13,13 @@
+ CROSS_COMPILE=
+ 
+ # Support for compressed pci.ids (yes/no, default: detect)
+-ZLIB=
++ZLIB=yes
+ 
+ # Support for resolving ID's by DNS (yes/no, default: detect)
+-DNS=
++DNS=no
+ 
+ # Build libpci as a shared library (yes/no; or local for testing; requires GCC)
+-SHARED=no
++SHARED=yes
+ 
+ # Use libkmod to resolve kernel modules on Linux (yes/no, default: detect)
+ LIBKMOD=
+@@ -32,9 +32,9 @@
+ ABI_VERSION=3
+ 
+ # Installation directories
+-PREFIX=/usr/local
++PREFIX?=/usr/local
+ BINDIR=$(PREFIX)/bin
+-SBINDIR=$(PREFIX)/sbin
++SBINDIR=$(PREFIX)/bin
+ SHAREDIR=$(PREFIX)/share
+ IDSDIR=$(SHAREDIR)
+ MANDIR:=$(shell if [ -d $(PREFIX)/share/man ] ; then echo $(PREFIX)/share/man ; else echo $(PREFIX)/man ; fi)
+@@ -45,14 +45,14 @@
+ INSTALL=install
+ DIRINSTALL=install -d
+ ifdef CROSS_COMPILE
+-STRIP=--strip-program $(CROSS_COMPILE)-strip
+-CC=$(CROSS_COMPILE)gcc
++STRIP=
++CC?=$(CROSS_COMPILE)gcc
+ else
+-STRIP=-s
+-CC=cc
++STRIP=
++CC?=cc
+ endif
+-AR=$(CROSS_COMPILE)ar
+-RANLIB=$(CROSS_COMPILE)ranlib
++AR?=$(CROSS_COMPILE)ar
++RANLIB?=$(CROSS_COMPILE)ranlib
+ DLLTOOL=$(CROSS_COMPILE)dlltool
+ WINDRES=$(CROSS_COMPILE)windres
+ 

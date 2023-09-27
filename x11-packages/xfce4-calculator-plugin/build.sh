@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://docs.xfce.org/panel-plugins/xfce4-calculator-plugin/start
+TERMUX_PKG_DESCRIPTION="xfce4-calculator-plugin is a calculator plugin for the Xfce4 panel."
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
+_MAJOR_VERSION=0.7
+TERMUX_PKG_VERSION=${_MAJOR_VERSION}.2
+TERMUX_PKG_SRCURL=https://archive.xfce.org/src/panel-plugins/xfce4-calculator-plugin/${_MAJOR_VERSION}/xfce4-calculator-plugin-$TERMUX_PKG_VERSION.tar.bz2
+TERMUX_PKG_SHA256=d1f622bea41a90c1686bf9f13c488ab28e995e2762b84712dea9027e0c94028b
+TERMUX_PKG_DEPENDS="atk, gdk-pixbuf, glib, gtk3, harfbuzz, libcairo, libxfce4ui, libxfce4util, pango, xfce4-panel, zlib"

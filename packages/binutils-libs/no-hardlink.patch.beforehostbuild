@@ -1,0 +1,45 @@
+--- a/binutils/Makefile.in
++++ b/binutils/Makefile.in
+@@ -2014,7 +2014,7 @@
+ 	    k=`echo $$j | sed '$(transform)'`; \
+ 	    if [ "$(bindir)/$$k" != "$(tooldir)/bin/$$j" ]; then \
+ 	      rm -f $(DESTDIR)$(tooldir)/bin/$$j$(EXEEXT); \
+-	      ln $(DESTDIR)$(bindir)/$$k$(EXEEXT) $(DESTDIR)$(tooldir)/bin/$$j$(EXEEXT) >/dev/null 2>/dev/null \
++	      ln -sr $(DESTDIR)$(bindir)/$$k$(EXEEXT) $(DESTDIR)$(tooldir)/bin/$$j$(EXEEXT) >/dev/null 2>/dev/null \
+ 		|| $(INSTALL_PROGRAM_ENV) $(LIBTOOL) --mode=install $(INSTALL_PROGRAM) $$i$(EXEEXT) $(DESTDIR)$(tooldir)/bin/$$j$(EXEEXT); \
+ 	    fi; \
+ 	  else true; \
+--- a/gas/Makefile.in
++++ b/gas/Makefile.in
+@@ -2126,7 +2126,7 @@
+ 	n=`echo as | sed '$(transform)'`; \
+ 	if [ "$(bindir)/$$n$(EXEEXT)" != "$(tooldir)/bin/as$(EXEEXT)" ]; then \
+ 	  rm -f $(DESTDIR)$(tooldir)/bin/as$(EXEEXT); \
+-	  ln $(DESTDIR)$(bindir)/$$n$(EXEEXT) $(DESTDIR)$(tooldir)/bin/as$(EXEEXT) >/dev/null 2>/dev/null \
++	  ln -sr $(DESTDIR)$(bindir)/$$n$(EXEEXT) $(DESTDIR)$(tooldir)/bin/as$(EXEEXT) >/dev/null 2>/dev/null \
+ 	    || $(INSTALL_PROGRAM_ENV) $(LIBTOOL) --mode=install $(INSTALL_PROGRAM) as-new$(EXEEXT) $(DESTDIR)$(tooldir)/bin/as$(EXEEXT); \
+ 	else \
+ 	  true ; \
+--- a/ld/Makefile.in
++++ b/ld/Makefile.in
+@@ -2673,17 +2673,17 @@
+ 	n=`echo $(installed_linker) | sed '$(transform)'`; \
+ 	if test "$(bindir)" != "$(tooldir)/bin"; then \
+ 	  rm -f $(DESTDIR)$(tooldir)/bin/$(installed_linker)$(EXEEXT); \
+-	  ln $(DESTDIR)$(bindir)/$$n$(EXEEXT) $(DESTDIR)$(tooldir)/bin/$(installed_linker)$(EXEEXT) >/dev/null 2>/dev/null \
++	  ln -sr $(DESTDIR)$(bindir)/$$n$(EXEEXT) $(DESTDIR)$(tooldir)/bin/$(installed_linker)$(EXEEXT) >/dev/null 2>/dev/null \
+ 	  || $(INSTALL_PROGRAM_ENV) $(LIBTOOL) --mode=install $(INSTALL_PROGRAM) ld-new$(EXEEXT) $(DESTDIR)$(tooldir)/bin/$(installed_linker)$(EXEEXT); \
+ 	fi; \
+ 	if test "x$(install_as_default)" = "xyes"; then \
+ 	  ld=`echo ld | sed '$(transform)'`; \
+ 	  rm -f $(DESTDIR)$(bindir)/$$ld$(EXEEXT); \
+-	  ln $(DESTDIR)$(bindir)/$$n$(EXEEXT) $(DESTDIR)$(bindir)/$$ld$(EXEEXT) >/dev/null 2>/dev/null \
++	  ln -sr $(DESTDIR)$(bindir)/$$n$(EXEEXT) $(DESTDIR)$(bindir)/$$ld$(EXEEXT) >/dev/null 2>/dev/null \
+ 	  || $(INSTALL_PROGRAM_ENV) $(LIBTOOL) --mode=install $(INSTALL_PROGRAM) ld-new$(EXEEXT) $(DESTDIR)$(bindir)/$$ld$(EXEEXT); \
+ 	  if test "$(bindir)" != "$(tooldir)/bin"; then \
+ 	    rm -f $(DESTDIR)$(tooldir)/bin/ld$(EXEEXT); \
+-	    ln $(DESTDIR)$(bindir)/$$n$(EXEEXT) $(DESTDIR)$(tooldir)/bin/ld$(EXEEXT) >/dev/null 2>/dev/null \
++	    ln -sr $(DESTDIR)$(bindir)/$$n$(EXEEXT) $(DESTDIR)$(tooldir)/bin/ld$(EXEEXT) >/dev/null 2>/dev/null \
+ 	    || $(INSTALL_PROGRAM_ENV) $(LIBTOOL) --mode=install $(INSTALL_PROGRAM) ld-new$(EXEEXT) $(DESTDIR)$(tooldir)/bin/ld$(EXEEXT); \
+ 	  fi; \
+ 	fi

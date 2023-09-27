@@ -1,5 +1,5 @@
---- ./rust/libnewsboat/src/filterparser.rs.orig	2021-05-17 15:52:16.226226704 +0000
-+++ ./rust/libnewsboat/src/filterparser.rs	2021-05-17 15:53:32.474081081 +0000
+--- a/rust/libnewsboat/src/filterparser.rs
++++ b/rust/libnewsboat/src/filterparser.rs
 @@ -1,6 +1,5 @@
  //! Parses filter expressions.
  
@@ -22,22 +22,21 @@
      }
  }
  
-@@ -425,19 +424,19 @@
-             let err = match error {
+@@ -423,18 +422,18 @@
                  Error::TrailingCharacters(pos, tail) => fmt!(
-                     // The "%{}" thing is a number, a zero-based offset into a string.
--                    &gettext("Parse error: trailing characters after position %{}: %s"),
-+                    "Parse error: trailing characters after position %{}: %s",
-                     PRIu64,
-                     pos as u64,
+                     // The first %s is an integer offset at which trailing characters start, the
+                     // second %s is the tail itself.
+-                    &gettext("Parse error: trailing characters after position %s: %s"),
++                    "Parse error: trailing characters after position %s: %s",
+                     &pos.to_string(),
                      tail
                  ),
                  Error::AtPos(pos, expected) => fmt!(
-                     // The "%{}" thing is a number, a zero-based offset into a string.
--                    &gettext("Parse error at position %{}: expected %s"),
-+                    "Parse error at position %{}: expected %s",
-                     PRIu64,
-                     pos as u64,
+                     // The first %s is a zero-based offset into the string, the second %s is the
+                     // description of what the program expected at that point.
+-                    &gettext("Parse error at position %s: expected %s"),
++                    "Parse error at position %s: expected %s",
+                     &pos.to_string(),
                      &translate_expected(expected)
                  ),
 -                Error::Internal => fmt!(&gettext("Internal parse error")),

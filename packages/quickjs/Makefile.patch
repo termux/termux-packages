@@ -18,12 +18,12 @@
  ifdef CONFIG_WERROR
  CFLAGS+=-Werror
  endif
-@@ -177,7 +177,7 @@
- HOST_LIBS=-lm -ldl -lpthread
- LIBS=-lm
- ifndef CONFIG_WIN32
--LIBS+=-ldl -lpthread
-+LIBS+=-ldl
- endif
- 
- $(OBJDIR):
+@@ -112,7 +112,7 @@
+ CFLAGS_SMALL=$(CFLAGS) -Os
+ CFLAGS_OPT=$(CFLAGS) -O2
+ CFLAGS_NOLTO:=$(CFLAGS_OPT)
+-LDFLAGS=-g
++LDFLAGS+=-g
+ ifdef CONFIG_LTO
+ CFLAGS_SMALL+=-flto
+ CFLAGS_OPT+=-flto

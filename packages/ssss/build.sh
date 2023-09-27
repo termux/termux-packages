@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/MrJoy/ssss
 TERMUX_PKG_DESCRIPTION="Simple command-line implementation of Shamir's Secret Sharing Scheme"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.5.7
 TERMUX_PKG_SRCURL=https://github.com/MrJoy/ssss/archive/releases/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=dbb1f03797cb3fa69594530f9b2c36010f66705b9d5fbbc27293dce72b9c9473

@@ -1,0 +1,19 @@
+diff -uNr hwinfo-21.60/src/isdn/isa_probe.c hwinfo-21.60.mod/src/isdn/isa_probe.c
+--- hwinfo-21.60/src/isdn/isa_probe.c	2018-10-17 16:23:47.000000000 +0300
++++ hwinfo-21.60.mod/src/isdn/isa_probe.c	2019-06-26 13:35:29.558758182 +0300
+@@ -1,7 +1,14 @@
+ #if defined(__i386__)
+ 
+ #include <stdio.h>
+-#include <sys/io.h>
++#include <sys/syscall.h>
++#include <unistd.h>
++#define iopl(level) ((int)syscall(SYS_iopl, level))
++static __inline__ unsigned char inb(unsigned short port) {
++	unsigned char ret;
++	__asm__ __volatile__("inb %1, %0" : "=a" (ret) : "dN" (port));
++	return ret;
++}
+ 
+ #include "hd.h"
+ #include "hd_int.h"

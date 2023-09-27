@@ -1,0 +1,148 @@
+diff -uNr i3-4.16/i3-dump-log/main.c i3-4.16.mod/i3-dump-log/main.c
+--- i3-4.16/i3-dump-log/main.c	2018-11-04 15:47:34.000000000 +0200
++++ i3-4.16.mod/i3-dump-log/main.c	2019-03-20 17:12:26.815477041 +0200
+@@ -91,6 +91,44 @@
+     va_end(args);
+ }
+ 
++static int shm_open(const char *name, int oflag, mode_t mode) {
++    size_t namelen;
++    char *fname;
++    int fd;
++
++    /* Construct the filename.  */
++    while (name[0] == '/') ++name;
++
++    if (name[0] == '\0') {
++        /* The name "/" is not supported.  */
++        errno = EINVAL;
++        return -1;
++    }
++
++    namelen = strlen(name);
++    fname = (char *) alloca(sizeof("@TERMUX_PREFIX@/tmp/") - 1 + namelen + 1);
++    memcpy(fname, "@TERMUX_PREFIX@/tmp/", sizeof("@TERMUX_PREFIX@/tmp/") - 1);
++    memcpy(fname + sizeof("@TERMUX_PREFIX@/tmp/") - 1, name, namelen + 1);
++
++    fd = open(fname, oflag, mode);
++    if (fd != -1) {
++        /* We got a descriptor.  Now set the FD_CLOEXEC bit.  */
++        int flags = fcntl(fd, F_GETFD, 0);
++        flags |= FD_CLOEXEC;
++        flags = fcntl(fd, F_SETFD, flags);
++
++        if (flags == -1) {
++            /* Something went wrong.  We cannot return the descriptor.  */
++            int save_errno = errno;
++            close(fd);
++            fd = -1;
++            errno = save_errno;
++        }
++    }
++
++    return fd;
++}
++
+ int main(int argc, char *argv[]) {
+     int o, option_index = 0;
+     bool verbose = false;
+diff -uNr i3-4.16/src/log.c i3-4.16.mod/src/log.c
+--- i3-4.16/src/log.c	2018-11-04 15:47:34.000000000 +0200
++++ i3-4.16.mod/src/log.c	2019-03-20 17:11:22.943719028 +0200
+@@ -118,6 +118,65 @@
+     atexit(purge_zerobyte_logfile);
+ }
+ 
++static int shm_unlink(const char *name) {
++    size_t namelen;
++    char *fname;
++
++    /* Construct the filename.  */
++    while (name[0] == '/') ++name;
++
++    if (name[0] == '\0') {
++        /* The name "/" is not supported.  */
++        errno = EINVAL;
++        return -1;
++    }
++
++    namelen = strlen(name);
++    fname = (char *) alloca(sizeof("@TERMUX_PREFIX@/tmp/") - 1 + namelen + 1);
++    memcpy(fname, "@TERMUX_PREFIX@/tmp/", sizeof("@TERMUX_PREFIX@/tmp/") - 1);
++    memcpy(fname + sizeof("@TERMUX_PREFIX@/tmp/") - 1, name, namelen + 1);
++
++    return unlink(fname);
++}
++
++static int shm_open(const char *name, int oflag, mode_t mode) {
++    size_t namelen;
++    char *fname;
++    int fd;
++
++    /* Construct the filename.  */
++    while (name[0] == '/') ++name;
++
++    if (name[0] == '\0') {
++        /* The name "/" is not supported.  */
++        errno = EINVAL;
++        return -1;
++    }
++
++    namelen = strlen(name);
++    fname = (char *) alloca(sizeof("@TERMUX_PREFIX@/tmp/") - 1 + namelen + 1);
++    memcpy(fname, "@TERMUX_PREFIX@/tmp/", sizeof("@TERMUX_PREFIX@/tmp/") - 1);
++    memcpy(fname + sizeof("@TERMUX_PREFIX@/tmp/") - 1, name, namelen + 1);
++
++    fd = open(fname, oflag, mode);
++    if (fd != -1) {
++        /* We got a descriptor.  Now set the FD_CLOEXEC bit.  */
++        int flags = fcntl(fd, F_GETFD, 0);
++        flags |= FD_CLOEXEC;
++        flags = fcntl(fd, F_SETFD, flags);
++
++        if (flags == -1) {
++            /* Something went wrong.  We cannot return the descriptor.  */
++            int save_errno = errno;
++            close(fd);
++            fd = -1;
++            errno = save_errno;
++        }
++    }
++
++    return fd;
++}
++
+ /*
+  * Opens the logbuffer.
+  *
+diff -uNr i3-4.16/src/main.c i3-4.16.mod/src/main.c
+--- i3-4.16/src/main.c	2018-11-04 15:47:34.000000000 +0200
++++ i3-4.16.mod/src/main.c	2019-03-20 17:08:46.144848996 +0200
+@@ -155,6 +155,27 @@
+     }
+ }
+ 
++static int shm_unlink(const char *name) {
++    size_t namelen;
++    char *fname;
++
++    /* Construct the filename.  */
++    while (name[0] == '/') ++name;
++
++    if (name[0] == '\0') {
++        /* The name "/" is not supported.  */
++        errno = EINVAL;
++        return -1;
++    }
++
++    namelen = strlen(name);
++    fname = (char *) alloca(sizeof("@TERMUX_PREFIX@/tmp/") - 1 + namelen + 1);
++    memcpy(fname, "@TERMUX_PREFIX@/tmp/", sizeof("@TERMUX_PREFIX@/tmp/") - 1);
++    memcpy(fname + sizeof("@TERMUX_PREFIX@/tmp/") - 1, name, namelen + 1);
++
++    return unlink(fname);
++}
++
+ /*
+  * Exit handler which destroys the main_loop. Will trigger cleanup handlers.
+  *

@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://cc65.github.io/
-TERMUX_PKG_DESCRIPTION="A free compiler for 6502 based system."
+TERMUX_PKG_DESCRIPTION="A free compiler for 6502 based system"
 TERMUX_PKG_LICENSE="ZLIB"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.19
@@ -9,12 +9,17 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
 
 termux_step_host_build() {
-    cd $TERMUX_PKG_SRCDIR
-    make clean
-    make
+	cd $TERMUX_PKG_SRCDIR
+	make clean
+	make
+}
+
+termux_step_pre_configure() {
+	# hostbuild step have to be run everytime currently
+	rm -Rf $TERMUX_PKG_HOSTBUILD_DIR
 }
 
 termux_step_make() {
-    make clean -C src
-    make bin
+	make clean -C src
+	make bin
 }

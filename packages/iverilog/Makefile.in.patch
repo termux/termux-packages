@@ -1,6 +1,5 @@
-diff -uNr iverilog-10_2/Makefile.in iverilog-10_2.mod/Makefile.in
---- iverilog-10_2/Makefile.in	2017-08-24 18:22:49.000000000 +0300
-+++ iverilog-10_2.mod/Makefile.in	2019-02-25 20:18:55.327140615 +0200
+--- a/Makefile.in
++++ b/Makefile.in
 @@ -67,8 +67,8 @@
  dllib=@DLLIB@
  
@@ -10,5 +9,23 @@ diff -uNr iverilog-10_2/Makefile.in iverilog-10_2.mod/Makefile.in
 +HOSTCC = gcc
 +HOSTCFLAGS = @WARNING_FLAGS@ @WARNING_FLAGS_CC@
  
- CC = @CC@
- CXX = @CXX@
+ BUILDCC = @CC_FOR_BUILD@
+ BUILDEXT = @BUILD_EXEEXT@
+@@ -130,7 +130,7 @@
+ ifeq (@MINGW32@,yes)
+ all: dosify$(BUILDEXT)
+ dosify$(BUILDEXT): $(srcdir)/dosify.c
+-	$(BUILDCC) $(CFLAGS) -o dosify$(BUILDEXT) $(srcdir)/dosify.c
++	$(BUILDCC) $(CFLAGS_FOR_BUILD) -o dosify$(BUILDEXT) $(srcdir)/dosify.c
+ endif
+ 
+ # This rule rules the compiler in the trivial hello.vl program to make
+@@ -241,7 +241,7 @@
+ endif
+ 
+ version.exe: $(srcdir)/version.c $(srcdir)/version_base.h version_tag.h
+-	$(BUILDCC) $(CFLAGS) -o version.exe -I. -I$(srcdir) $(srcdir)/version.c
++	$(BUILDCC) $(CFLAGS_FOR_BUILD) -o version.exe -I. -I$(srcdir) $(srcdir)/version.c
+ 
+ %.o: %.cc config.h
+ 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) @DEPENDENCY_FLAG@ -c $< -o $*.o

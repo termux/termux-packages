@@ -61,8 +61,8 @@ diff -u -r ../lib.orig/ares_library_init.c ./src/lib/ares_library_init.c
 --- ../lib.orig/ares_library_init.c	2020-11-21 20:32:59.251385702 +0000
 +++ ./src/lib/ares_library_init.c	2020-11-21 20:37:15.703215185 +0000
 @@ -30,10 +30,6 @@
- fpGetBestRoute2_t ares_fpGetBestRoute2 = ZERO_NULL;
- #endif
+ 
+ /* library-private global and unique instance vars */
  
 -#if defined(ANDROID) || defined(__ANDROID__)
 -#include "ares_android.h"
@@ -72,8 +72,8 @@ diff -u -r ../lib.orig/ares_library_init.c ./src/lib/ares_library_init.c
  
  static unsigned int ares_initialized;
 @@ -174,10 +170,6 @@
-   if (ares_init_flags & ARES_LIB_INIT_WIN32)
-     ares_win32_cleanup();
+ 
+   /* NOTE: ARES_LIB_INIT_WIN32 flag no longer used */
  
 -#if defined(ANDROID) || defined(__ANDROID__)
 -  ares_library_cleanup_android();

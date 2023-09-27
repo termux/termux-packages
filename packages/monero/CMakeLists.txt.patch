@@ -1,0 +1,20 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -244,7 +244,7 @@
+     file(REMOVE_RECURSE "${TEST_PROJECT}")
+   endforeach()
+ endfunction()
+-if (NOT (CMAKE_SYSTEM_NAME MATCHES "kOpenBSD.*|OpenBSD.*") AND NOT OSSFUZZ)
++if (NOT (CMAKE_SYSTEM_NAME MATCHES "Android|kOpenBSD.*|OpenBSD.*") AND NOT OSSFUZZ)
+   forbid_undefined_symbols()
+ endif()
+ 
+@@ -993,7 +993,7 @@
+   endif(ARM)
+ 
+   # random crash on startup when asan is on if pie is enabled
+-  if(NOT SANITIZE AND ANDROID AND NOT BUILD_GUI_DEPS STREQUAL "ON" OR IOS)
++  if(NOT SANITIZE AND FALSE AND NOT BUILD_GUI_DEPS STREQUAL "ON" OR IOS)
+     #From Android 5: "only position independent executables (PIE) are supported" 
+     message(STATUS "Enabling PIE executable")
+     set(PIC_FLAG "")

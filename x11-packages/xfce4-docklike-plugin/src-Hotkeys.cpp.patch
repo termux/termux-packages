@@ -1,0 +1,48 @@
+--- a/src/Hotkeys.cpp
++++ b/src/Hotkeys.cpp
+@@ -9,6 +9,15 @@
+ 
+ #define ModifierChange 85 //? this event type isn't listed in libX11
+ 
++#ifdef __ANDROID__
++#include <signal.h>
++#include <string.h>
++static void threadSignalHandler(int signum)
++{
++	pthread_exit(0);
++}
++#endif
++
+ namespace Hotkeys
+ {
+ 	int mGrabbedKeys;
+@@ -113,8 +122,17 @@
+ 
+ 	void* threadedXIKeyListenner(void* data)
+ 	{
++#ifndef __ANDROID__
+ 		pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+ 		pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
++#else
++		struct sigaction actions;
++		memset(&actions, 0, sizeof(actions));
++		sigemptyset(&actions.sa_mask);
++		actions.sa_flags = 0;
++		actions.sa_handler = threadSignalHandler;
++		sigaction(SIGUSR2, &actions, NULL);
++#endif
+ 
+ 		Display* display = XOpenDisplay(NULL);
+ 
+@@ -159,7 +177,11 @@
+ 				pthread_create(&mThread, NULL, threadedXIKeyListenner, NULL);
+ 			else if (mThread)
+ 			{
++#ifndef __ANDROID__
+ 				pthread_cancel(mThread); //also close the XDisplay in the thread
++#else
++				pthread_kill(mThread, SIGUSR2);
++#endif
+ 				void* ret = NULL;
+ 				pthread_join(mThread, &ret);
+ 				mThread = 0;

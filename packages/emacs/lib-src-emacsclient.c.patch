@@ -1,15 +1,37 @@
---- ./lib-src/emacsclient.c.orig	2020-07-29 23:40:41.000000000 +0200
-+++ ./lib-src/emacsclient.c	2020-09-14 21:36:04.883963456 +0200
-@@ -1411,7 +1411,7 @@
- 	        tmpdirlen = min (n - 1, socknamesize);
+diff --git a/lib-src/emacsclient.c b/lib-src/emacsclient.c
+index 73c8e45a8653..a6c548f05306 100644
+--- a/lib-src/emacsclient.c
++++ b/lib-src/emacsclient.c
+@@ -1485,23 +1485,17 @@ set_local_socket (char const *server_name)
+ 	}
+       else
+ 	{
+-	  char const *tmpdir = egetenv ("TMPDIR");
+-	  if (tmpdir)
+-	    tmpdirlen = snprintf (sockname, socknamesize, "%s", tmpdir);
+-	  else
+-	    {
+ # ifdef DARWIN_OS
+ #  ifndef _CS_DARWIN_USER_TEMP_DIR
+ #   define _CS_DARWIN_USER_TEMP_DIR 65537
+ #  endif
+-	      size_t n = confstr (_CS_DARWIN_USER_TEMP_DIR,
++	    size_t n = confstr (_CS_DARWIN_USER_TEMP_DIR,
+ 				  sockname, socknamesize);
+-	      if (0 < n && n < (size_t) -1)
+-	        tmpdirlen = min (n - 1, socknamesize);
++	    if (0 < n && n < (size_t) -1)
++	      tmpdirlen = min (n - 1, socknamesize);
  # endif
- 	      if (tmpdirlen < 0)
+-	      if (tmpdirlen < 0)
 -		tmpdirlen = snprintf (sockname, socknamesize, "/tmp");
-+		tmpdirlen = snprintf (sockname, socknamesize, "@TERMUX_PREFIX@/tmp");
- 	    }
- 	  socknamelen = local_sockname (sockname, socknamesize, tmpdirlen,
+-	    }
++	    if (tmpdirlen < 0)
++	      tmpdirlen = snprintf (sockname, socknamesize, "@TERMUX_PREFIX@/var/run");
+ 	  sock_status = local_sockname (s, sockname, tmpdirlen,
  					uid, server_name);
-@@ -1495,7 +1495,7 @@
+ 	  tmpdir_used = true;
+@@ -1563,7 +1557,7 @@ set_local_socket (char const *server_name)
  	  uintmax_t id = uid;
  	  char sockdirname[socknamesize];
  	  int sockdirnamelen = snprintf (sockdirname, sizeof sockdirname,

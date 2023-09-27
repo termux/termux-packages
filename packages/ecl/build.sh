@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://common-lisp.net/project/ecl/
-TERMUX_PKG_DESCRIPTION="ECL (Embeddable Common Lisp) is an interpreter of the Common Lisp language."
+TERMUX_PKG_DESCRIPTION="ECL (Embeddable Common Lisp) is an interpreter of the Common Lisp language"
 TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="21.2.1"
@@ -17,19 +17,20 @@ TERMUX_PKG_HAS_DEBUG=false
 
 # ECL needs itself during build, so we need to build it for the host first.
 termux_step_host_build() {
-	srcdir=$TERMUX_PKG_SRCDIR/src
-	hostprefix=$TERMUX_PKG_HOSTBUILD_DIR/prefix
-	mkdir $hostprefix
+	local _PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
+
+	local srcdir=$TERMUX_PKG_SRCDIR/src
+	mkdir $_PREFIX_FOR_BUILD
 	autoreconf -fi $srcdir/gmp
 	$srcdir/configure ABI=${TERMUX_ARCH_BITS} \
 		CFLAGS=-m${TERMUX_ARCH_BITS} LDFLAGS=-m${TERMUX_ARCH_BITS} \
-		--prefix=$hostprefix --srcdir=$srcdir --disable-c99complex
+		--prefix=$_PREFIX_FOR_BUILD --srcdir=$srcdir --disable-c99complex
 	make
 	make install
 }
 
 termux_step_pre_configure() {
-	srcdir=$TERMUX_PKG_SRCDIR/src
+	local srcdir=$TERMUX_PKG_SRCDIR/src
 	autoreconf -fi $srcdir
 }
 
@@ -43,7 +44,7 @@ termux_step_configure() {
 	crossconfig="$TERMUX_PKG_SRCDIR/src/util/$crossconfig.cross_config"
 	export ECL_TO_RUN=$TERMUX_PKG_HOSTBUILD_DIR/prefix/bin/ecl
 
-	srcdir=$TERMUX_PKG_SRCDIR/src
+	local srcdir=$TERMUX_PKG_SRCDIR/src
 	$srcdir/configure \
 		--srcdir=$srcdir \
 		--prefix=$TERMUX_PREFIX \

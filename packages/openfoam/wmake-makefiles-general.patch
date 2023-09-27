@@ -1,6 +1,6 @@
---- ../OpenFOAM-v1906/wmake/makefiles/general	2019-06-26 16:16:55.000000000 +0200
-+++ ./wmake/makefiles/general	2019-09-01 18:21:57.531631905 +0200
-@@ -52,8 +52,8 @@
+--- ./wmake/makefiles/general.orig	2022-12-21 16:16:18.000000000 +0000
++++ ./wmake/makefiles/general	2022-12-31 10:44:17.369395701 +0000
+@@ -58,8 +58,8 @@
  LIB_PLATFORMS   = $(WM_PROJECT_DIR)/platforms/$(WM_OPTIONS)/lib
  OBJECTS_DIR     = $(MAKE_DIR)/$(WM_OPTIONS)
  
@@ -9,16 +9,16 @@
 +SYS_INC         = -I@TERMUX_PREFIX@/include
 +SYS_LIBS        = -L@TERMUX_PREFIX@/lib
  
- PROJECT_INC     = \
-     -I$(LIB_SRC)/$(WM_PROJECT)/lnInclude \
-@@ -61,8 +61,8 @@
+ # Add linkage for openmp into the system libraries
+ ifneq (,$(findstring +openmp,$(WM_COMPILE_CONTROL)))
+@@ -67,8 +67,8 @@
+ endif
  
- PROJECT_LIBS    = -l$(WM_PROJECT)
- 
+ # These are set by Make/options
 -EXE_INC         =
 -EXE_LIBS        =
 +EXE_INC         = -I@TERMUX_PREFIX@/include
 +EXE_LIBS        = -L@TERMUX_PREFIX@/lib
  LIB_LIBS        =
  
- 
+ # Project include/libraries

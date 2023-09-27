@@ -1,0 +1,23 @@
+--- pip-23.1/src/pip/_internal/commands/install.py	2023-04-16 00:05:42.665257200 +0100
++++ pip-23.1.mod/src/pip/_internal/commands/install.py	2023-04-16 00:09:42.989257317 +0100
+@@ -342,6 +342,20 @@
+             reqs = self.get_requirements(args, options, finder, session)
+             check_legacy_setup_py_options(options, reqs)
+ 
++            reqs_list = [req.name for req in reqs]
++            while reqs_list.count("pip") != 0:
++                reqs_index = reqs_list.index("pip")
++                if len(reqs)-reqs_list.count("pip") == 0:
++                    raise CommandError(
++                       "Installing pip is forbidden, this will break the python-pip package (termux)."
++                    )
++                elif reqs_list.count("pip") == 1:
++                    logger.warning(
++                       "Skip installing pip, this will break the python-pip package (termux)."
++                    )
++                del reqs_list[reqs_index]
++                del reqs[reqs_index]
++
+             wheel_cache = WheelCache(options.cache_dir)
+ 
+             # Only when installing is it permitted to use PEP 660.

@@ -1,0 +1,22 @@
+excinfo.h is not available on Termux environment
+Add an extra macro check for __ANDROID__ so it's excluded
+--- src/src/plugins/debugger/shared/backtrace.cpp	2020-07-07 06:44:20.000000000 +0000
++++ src.mod/src/plugins/debugger/shared/backtrace.cpp	2021-05-24 10:38:54.023502983 +0000
+@@ -27,7 +27,7 @@
+ #include <QDebug>
+ #include <QProcess>
+ 
+-#if defined(Q_OS_LINUX)
++#if defined(Q_OS_LINUX) && !defined(__ANDROID__)
+ #include <stdio.h>
+ #include <signal.h>
+ #include <execinfo.h>
+@@ -40,7 +40,7 @@
+ {
+     if (maxdepth == -1)
+         maxdepth = 200;
+-#if defined(Q_OS_LINUX)
++#if defined(Q_OS_LINUX) && !defined(__ANDROID__)
+     void *bt[200] = {nullptr};
+     qDebug() << "BACKTRACE:";
+     int size = backtrace(bt, sizeof(bt) / sizeof(bt[0]));

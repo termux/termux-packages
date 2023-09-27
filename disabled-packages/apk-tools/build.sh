@@ -6,6 +6,7 @@
 TERMUX_PKG_HOMEPAGE=https://wiki.alpinelinux.org/wiki/Alpine_Linux_package_management
 TERMUX_PKG_DESCRIPTION="Alpine Linux package management tools"
 TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.10.4
 TERMUX_PKG_SRCURL=https://github.com/alpinelinux/apk-tools/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=c08aa725a0437a6a83c5364a1a3a468e4aef5d1d09523369074779021397281c

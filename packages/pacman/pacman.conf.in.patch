@@ -1,7 +1,6 @@
-diff -uNr pacman-6.0.0/etc/pacman.conf.in pacman-termux/etc/pacman.conf.in
---- pacman-6.0.0/etc/pacman.conf.in	2021-05-20 06:38:45.938120000 +0300
-+++ pacman-termux/etc/pacman.conf.in	2021-11-05 17:39:44.301346062 +0300
-@@ -9,20 +9,20 @@
+--- pacman-6.0.2/etc/pacman.conf.in	2023-03-10 01:31:38.207470241 +0300
++++ pacman-6.0.2/etc/pacman.conf.in.patch	2023-03-10 01:33:13.819470172 +0300
+@@ -9,17 +9,17 @@
  [options]
  # The following paths are commented out with their default values listed.
  # If you wish to use different paths, uncomment and update the paths.
@@ -19,14 +18,12 @@ diff -uNr pacman-6.0.0/etc/pacman.conf.in pacman-termux/etc/pacman.conf.in
 +#XferCommand = @TERMUX_PREFIX@/bin/wget --passive-ftp -c -O %o %u
 +HoldPkg      = pacman
  #CleanMethod = KeepInstalled
- Architecture = auto
+-Architecture = auto
++Architecture = @TERMUX_ARCH@
  
  # Pacman won't upgrade packages listed in IgnorePkg and members of IgnoreGroup
  #IgnorePkg   =
- #IgnoreGroup =
- 
- #NoUpgrade   =
-@@ -30,16 +30,21 @@
+@@ -30,16 +30,17 @@
  
  # Misc options
  #UseSyslog
@@ -43,20 +40,16 @@ diff -uNr pacman-6.0.0/etc/pacman.conf.in pacman-termux/etc/pacman.conf.in
 -#RemoteFileSigLevel = Optional
 +# By default, pacman accepts packages signed by keys that its local keyring
 +# trusts (see pacman-key and its man page), as well as unsigned packages.
-+SigLevel    = Never
++SigLevel    = DatabaseRequired
 +LocalFileSigLevel = Optional
 +#RemoteFileSigLevel = Required
-+
-+# NOTE: You must run `pacman-key --init` before first using pacman; the local
-+# keyring can then be populated with the keys of all official Arch Linux ARM
-+# packagers with `pacman-key --populate archlinuxarm`.
  
  #
  # REPOSITORIES
-@@ -60,18 +65,15 @@
+@@ -60,18 +61,23 @@
  # uncommented to enable the repo.
  #
-
+ 
 -# An example of a disabled remote package repository with multiple servers
 -# available. To enable, uncomment the following lines. You can add preferred
 -# servers immediately after the header and they will be used before the
@@ -72,15 +65,23 @@ diff -uNr pacman-6.0.0/etc/pacman.conf.in pacman-termux/etc/pacman.conf.in
 -#[custom]
 -#SigLevel = Optional TrustAll
 -#Server = file:///home/custompkgs
-+# The testing repositories are disabled by default. To enable, uncomment the
-+# repo name header and Include lines. You can add preferred servers immediately
-+# after the header, and they will be used before the default mirrors.
-+
 +[main]
-+Server = https://s3.amazonaws.com/termux-main.pacman/$arch
++Include = @TERMUX_PREFIX@/etc/pacman.d/serverlist
 +
 +[x11]
-+Server = https://s3.amazonaws.com/termux-x11.pacman/$arch
++Include = @TERMUX_PREFIX@/etc/pacman.d/serverlist
 +
 +[root]
-+Server = https://s3.amazonaws.com/termux-root.pacman/$arch
++Include = @TERMUX_PREFIX@/etc/pacman.d/serverlist
++
++[tur]
++Include = @TERMUX_PREFIX@/etc/pacman.d/serverlist
++
++[tur-continuous]
++Include = @TERMUX_PREFIX@/etc/pacman.d/serverlist
++
++[tur-multilib]
++Include = @TERMUX_PREFIX@/etc/pacman.d/serverlist
++
++[gpkg]
++Include = @TERMUX_PREFIX@/etc/pacman.d/serverlist

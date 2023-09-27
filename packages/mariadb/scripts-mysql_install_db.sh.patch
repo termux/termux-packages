@@ -1,13 +1,18 @@
-diff -u -r ../mariadb-10.4.12/scripts/mysql_install_db.sh ./scripts/mysql_install_db.sh
---- ../mariadb-10.4.12/scripts/mysql_install_db.sh	2020-01-26 20:43:53.000000000 +0000
-+++ ./scripts/mysql_install_db.sh	2020-02-15 23:19:05.141979000 +0000
-@@ -466,42 +466,8 @@
+diff -uNr mariadb-10.8.4/scripts/mysql_install_db.sh mariadb-10.8.4.mod/scripts/mysql_install_db.sh
+--- mariadb-10.8.4/scripts/mysql_install_db.sh	2022-08-10 17:30:23.000000000 +0530
++++ mariadb-10.8.4.mod/scripts/mysql_install_db.sh	2022-08-22 14:51:13.609730054 +0530
+@@ -484,47 +484,8 @@
      fi
      chmod 700 "$dir"
    fi
 -  if test -n "$user"
 -  then
--    chown $user "$dir"
+-    if test -z "$group"
+-    then
+-      chown $user $dir
+-    else
+-      chown $user:$group $dir
+-    fi
 -    if test $? -ne 0
 -    then
 -      echo "Cannot change ownership of the database directories to the '$user'"
@@ -41,6 +46,6 @@ diff -u -r ../mariadb-10.4.12/scripts/mysql_install_db.sh ./scripts/mysql_instal
 -  args="$args --user=$user"
 -fi
 -
- if test -f "$ldata/mysql/user.frm"
- then
-     echo "mysql.user table already exists!"
+ #To be enabled if/when we enable --group as an option to mariadbd
+ #if test -n "$group"
+ #then

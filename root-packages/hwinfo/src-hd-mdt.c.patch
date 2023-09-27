@@ -1,0 +1,13 @@
+diff -uNr hwinfo-21.60/src/hd/mdt.c hwinfo-21.60.mod/src/hd/mdt.c
+--- hwinfo-21.60/src/hd/mdt.c	2018-10-17 16:23:47.000000000 +0300
++++ hwinfo-21.60.mod/src/hd/mdt.c	2019-06-26 13:35:03.021913541 +0300
+@@ -15,7 +15,8 @@
+ #include <sys/stat.h>
+ #include <sys/ioctl.h>
+ #include <sys/mman.h>
+-#include <sys/io.h>
++#include <sys/syscall.h>
++#define iopl(level) ((int)syscall(SYS_iopl, level))
+ #include <sys/time.h>
+ #include <x86emu.h>
+ 

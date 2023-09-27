@@ -5,5 +5,9 @@ termux_step_finish_build() {
 	mkdir -p "$TERMUX_BUILT_PACKAGES_DIRECTORY"
 	echo "$TERMUX_PKG_FULLVERSION" > "$TERMUX_BUILT_PACKAGES_DIRECTORY/$TERMUX_PKG_NAME"
 
+	for subpackage in "$TERMUX_PKG_BUILDER_DIR"/*.subpackage.sh; do
+		local subpkg_name="$(basename $subpackage | sed 's@\.subpackage\.sh@@g')"
+		echo "$TERMUX_PKG_FULLVERSION" > "$TERMUX_BUILT_PACKAGES_DIRECTORY/${subpkg_name}"
+	done
 	exit 0
 }

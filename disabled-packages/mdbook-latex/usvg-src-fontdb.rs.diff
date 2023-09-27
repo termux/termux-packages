@@ -1,0 +1,24 @@
+--- a/src/fontdb.rs
++++ b/src/fontdb.rs
+@@ -523,6 +523,21 @@
+     paths
+ }
+ 
++#[cfg(target_os = "android")]
++fn load_all_fonts() -> Vec<FontPath> {
++    let mut paths = Vec::new();
++    load_fonts_from("@TERMUX_PREFIX@/share/fonts/", &mut paths);
++    load_fonts_from("@TERMUX_PREFIX@/local/share/fonts/", &mut paths);
++    load_fonts_from("/system/fonts/", &mut paths);
++
++    if let Ok(ref home) = std::env::var("HOME") {
++        let path = Path::new(home).join("/.local/share/fonts");
++        load_fonts_from(path.to_str().unwrap(), &mut paths);
++    }
++
++    paths
++}
++
+ #[cfg(target_os = "windows")]
+ fn load_all_fonts() -> Vec<FontPath> {
+     let mut paths = Vec::new();

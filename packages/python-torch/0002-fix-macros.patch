@@ -1,0 +1,12 @@
+diff -uNr pytorch/c10/macros/Macros.h pytorch.mod/c10/macros/Macros.h
+--- pytorch/c10/macros/Macros.h	2022-10-04 19:55:33.000000000 +0900
++++ pytorch.mod/c10/macros/Macros.h	2022-10-04 23:41:33.513647184 +0900
+@@ -390,7 +390,7 @@
+ #include <TargetConditionals.h>
+ #endif
+ 
+-#if defined(__ANDROID__)
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ #define C10_ANDROID 1
+ #define C10_MOBILE 1
+ #elif (                   \

@@ -1,0 +1,60 @@
+--- a/configure.ac
++++ b/configure.ac
+@@ -1186,6 +1186,7 @@
+   fribidi_in_path=yes
+   ac_save_LIBS="$LIBS"
+   LIBS="$LIBS $Bidi_LIBS"
++  if false; then
+   AC_TRY_RUN([#include <stdlib.h>
+ #include <fribidi/fribidi.h>
+ int main()
+@@ -1198,12 +1199,14 @@
+ 	return 0;
+ }
+ ], [:], [fribidi_in_path=no])
++  fi
+   LIBS="$ac_save_LIBS"
+   if test ! x"$fribidi_in_path" = xyes; then
+     ac_save_CFLAGS="$CFLAGS"
+     ac_save_LIBS="$LIBS"
+     CFLAGS="$CFLAGS $Bidi_CFLAGS"
+     LIBS="$LIBS $Bidi_LIBS"
++  if false; then
+   AC_TRY_RUN([#include <stdlib.h>
+ #include <fribidi/fribidi.h>
+ int main()
+@@ -1216,6 +1219,7 @@
+ 	return 0;
+ }
+ ], [:], [with_bidi=no; problem_bidi=": Bad fribidi version, see config.log"])
++    fi
+     CFLAGS="$ac_save_CFLAGS"
+     LIBS="$ac_save_LIBS"
+   fi
+@@ -1233,11 +1237,13 @@
+   Bidi_LIBS=
+ else
+   AC_DEFINE(HAVE_BIDI)
++  if false; then
+   AC_TRY_RUN([#include <fribidi/fribidi.h>
+     int main(int c, char **v) {
+       return FRIBIDI_CHARSET_NOT_FOUND * 0;
+     }
+   ], [AC_DEFINE(FRIBIDI_CHARSET_SPELLING)])
++  fi
+ fi
+ AH_VERBATIM([_FRIBIDI_CHARSET_SPELLING],
+ [#ifdef FRIBIDI_CHARSET_SPELLING
+@@ -1422,10 +1428,12 @@
+ fi
+ 
+ # Define some compatibility macros needed for config.h.
++if false; then
+ mg_DEFINE_IF_NOT([#include <X11/keysym.h>],
+   [defined XK_Page_Up && defined XK_Page_Down],
+   [COMPAT_OLD_KEYSYMDEF], [$X_CFLAGS],
+   [Old AIX systems (3.2.5) don't define some common keysyms.])
++fi
+ AH_VERBATIM([_COMPAT_OLD_KEYSYMDEF],
+ [#ifdef COMPAT_OLD_KEYSYMDEF
+ #  define XK_Page_Up   XK_Prior

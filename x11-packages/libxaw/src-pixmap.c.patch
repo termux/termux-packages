@@ -1,0 +1,21 @@
+diff -uNr libXaw-1.0.13/src/Pixmap.c libXaw-1.0.13.mod/src/Pixmap.c
+--- libXaw-1.0.13/src/Pixmap.c	2015-05-01 08:06:05.000000000 +0300
++++ libXaw-1.0.13.mod/src/Pixmap.c	2018-06-19 20:42:12.691693246 +0300
+@@ -651,7 +651,7 @@
+ }
+ 
+ #ifndef PROJECT_ROOT
+-#define PROJECT_ROOT	"/usr/X11R6"
++#define PROJECT_ROOT	"@TERMUX_PREFIX@/X11R6"
+ #endif
+ 
+ static char *pixmap_path = NULL;
+@@ -664,7 +664,7 @@
+     XrmRepresentation rep_type;
+     XrmValue value;
+     static char *default_path =
+-	"%H/%T/%N:%P/include/X11/%T/%N:/usr/X11R6/include/X11/%T/%N:/usr/include/X11/%T/%N:%N";
++	"%H/%T/%N:%P/include/X11/%T/%N:@TERMUX_PREFIX@/X11R6/include/X11/%T/%N:@TERMUX_PREFIX@/include/X11/%T/%N:%N";
+ 
+     xrm_name[0] = XrmPermStringToQuark("pixmapFilePath");
+     xrm_name[1] = NULLQUARK;

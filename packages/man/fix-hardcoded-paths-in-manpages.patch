@@ -1,0 +1,113 @@
+--- a/apropos.1
++++ b/apropos.1
+@@ -372,12 +372,12 @@
+ is specified.
+ .El
+ .Sh FILES
+-.Bl -tag -width "/etc/man.conf" -compact
++.Bl -tag -width "@TERMUX_PREFIX@/etc/man.conf" -compact
+ .It Pa mandoc.db
+ name of the
+ .Xr makewhatis 8
+ keyword database
+-.It Pa /etc/man.conf
++.It Pa @TERMUX_PREFIX@/etc/man.conf
+ default
+ .Xr man 1
+ configuration file
+--- a/makewhatis.8
++++ b/makewhatis.8
+@@ -154,7 +154,7 @@
+ A database of manpages relative to the directory of the file.
+ This file is portable across architectures and systems, so long as the
+ manpage hierarchy it indexes does not change.
+-.It Pa /etc/man.conf
++.It Pa @TERMUX_PREFIX@/etc/man.conf
+ The default
+ .Xr man 1
+ configuration file.
+--- a/man.1
++++ b/man.1
+@@ -224,7 +224,7 @@
+ entries in the
+ .Xr man.conf 5
+ file, or with
+-.Pa /usr/share/man : Ns Pa /usr/X11R6/man : Ns Pa /usr/local/man
++.Pa @TERMUX_PREFIX@/share/man
+ by default.
+ Within each of these, directories are searched in the order provided.
+ Within each directory, the search proceeds according to the following
+@@ -333,8 +333,8 @@
+ is used.
+ .El
+ .Sh FILES
+-.Bl -tag -width /etc/man.conf -compact
+-.It Pa /etc/man.conf
++.Bl -tag -width @TERMUX_PREFIX@/etc/man.conf -compact
++.It Pa @TERMUX_PREFIX@/etc/man.conf
+ default
+ .Nm
+ configuration file
+--- a/man.conf.5
++++ b/man.conf.5
+@@ -104,7 +104,7 @@
+ .El
+ .Sh FILES
+ .Bl -tag -width /etc/examples/man.conf -compact
+-.It Pa /etc/man.conf
++.It Pa @TERMUX_PREFIX@/etc/man.conf
+ .El
+ .Sh EXAMPLES
+ The following configuration file reproduces the defaults:
+@@ -112,9 +112,7 @@
+ .Nm
+ file at all.
+ .Bd -literal -offset indent
+-manpath /usr/share/man
+-manpath /usr/X11R6/man
+-manpath /usr/local/man
++manpath @TERMUX_PREFIX@/share/man
+ .Ed
+ .Sh SEE ALSO
+ .Xr apropos 1 ,
+--- a/mandoc.1
++++ b/mandoc.1
+@@ -1016,7 +1016,7 @@
+ When running with
+ .Fl W Cm base ,
+ the search is restricted to the base system, by default to
+-.Pa /usr/share/man : Ns Pa /usr/X11R6/man .
++.Pa @TERMUX_PREFIX@/share/man .
+ This path can be configured at compile time using the
+ .Dv MANPATH_BASE
+ preprocessor macro.
+@@ -1033,7 +1033,7 @@
+ environment variable, the
+ .Xr man.conf 5
+ file and falling back to the default of
+-.Pa /usr/share/man : Ns Pa /usr/X11R6/man : Ns Pa /usr/local/man ,
++.Pa @TERMUX_PREFIX@/share/man ,
+ also configurable at compile time using the
+ .Dv MANPATH_DEFAULT
+ preprocessor macro.
+--- a/mandoc.db.5
++++ b/mandoc.db.5
+@@ -186,16 +186,9 @@
+ followed by the number 0.
+ .El
+ .Sh FILES
+-.Bl -tag -width /usr/share/man/mandoc.db -compact
+-.It Pa /usr/share/man/mandoc.db
++.Bl -tag -width @TERMUX_PREFIX@/share/man/mandoc.db -compact
++.It Pa @TERMUX_PREFIX@/share/man/mandoc.db
+ The manual page database for the base system.
+-.It Pa /usr/X11R6/man/mandoc.db
+-The same for the
+-.Xr X 7
+-Window System.
+-.It Pa /usr/local/man/mandoc.db
+-The same for
+-.Xr packages 7 .
+ .El
+ .Pp
+ A program to dump

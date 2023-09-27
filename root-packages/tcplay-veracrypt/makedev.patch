@@ -1,0 +1,28 @@
+--- a/tcplay.c	2020-10-16 18:39:11.830645021 +0300
++++ b/tcplay.c	2020-10-16 18:40:49.622279293 +0300
+@@ -58,6 +58,7 @@
+ #include "tcplay.h"
+ #include "humanize.h"
+ 
++#define MKDEV(ma,mi)    (((dev_t)mi & 0xff) | ((dev_t)ma << 8) | (((dev_t)mi & ~0xff) << 12))
+ 
+ /* XXX TODO:
+  *  - LRW-benbi support? needs further work in dm-crypt and even opencrypto
+@@ -1398,7 +1399,7 @@
+ xlate_maj_min(const char *start_path __unused, int max_depth __unused,
+     char *buf, size_t bufsz, uint32_t maj, uint32_t min)
+ {
+-	dev_t dev = makedev(maj, min);
++	dev_t dev = MKDEV(maj, min);
+ 
+ 	snprintf(buf, bufsz, "/dev/%s", devname(dev, S_IFCHR));
+ 	return 1;
+@@ -1409,7 +1410,7 @@
+ xlate_maj_min(const char *start_path, int max_depth, char *buf, size_t bufsz,
+     uint32_t maj, uint32_t min)
+ {
+-	dev_t dev = makedev(maj, min);
++	dev_t dev = MKDEV(maj, min);
+ 	char path[PATH_MAX];
+ 	struct stat sb;
+ 	struct dirent *ent;

@@ -1,0 +1,32 @@
+https://bugs.launchpad.net/hugin/+bug/1213585
+https://bugs.debian.org/667430
+
+--- a/include/zthread/Guard.h
++++ b/include/zthread/Guard.h
+@@ -108,7 +108,7 @@
+   }
+ 
+   template <class LockType>
+-  static void createScope(LockHolder<LockType>& l, unsigned long ms) {
++  static bool createScope(LockHolder<LockType>& l, unsigned long ms) {
+ 
+     if(Scope1::createScope(l, ms))
+       if(!Scope2::createScope(l, ms)) {
+@@ -428,7 +428,7 @@
+   template <class U, class V>
+   Guard(Guard<U, V>& g) : LockHolder<LockType>(g) {
+ 
+-    LockingPolicy::shareScope(*this, extract(g));
++    LockingPolicy::shareScope(*this, this->extract(g));
+     
+   }
+ 
+@@ -458,7 +458,7 @@
+   template <class U, class V>
+   Guard(Guard<U, V>& g, LockType& lock) : LockHolder<LockType>(lock) {
+ 
+-    LockingPolicy::transferScope(*this, extract(g));
++    LockingPolicy::transferScope(*this, this->extract(g));
+ 
+   }
+ 

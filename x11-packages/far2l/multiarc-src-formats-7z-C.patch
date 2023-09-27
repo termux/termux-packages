@@ -1,0 +1,99 @@
+diff --git a/multiarc/src/formats/7z/C/Aes.c b/multiarc/src/formats/7z/C/Aes.c
+index 27e32e6..115832e 100755
+--- a/multiarc/src/formats/7z/C/Aes.c
++++ b/multiarc/src/formats/7z/C/Aes.c
+@@ -56,6 +56,7 @@ static Byte InvS[256];
+ #ifdef MY_CPU_X86_OR_AMD64
+   #define USE_HW_AES
+ #elif defined(MY_CPU_ARM_OR_ARM64) && defined(MY_CPU_LE)
++ #if (__ARM_ARCH > 7)
+   #if defined(__clang__)
+     #if (__clang_major__ >= 8) // fix that check
+       #define USE_HW_AES
+@@ -69,6 +70,7 @@ static Byte InvS[256];
+       #define USE_HW_AES
+     #endif
+   #endif
++ #endif
+ #endif
+ 
+ #ifdef USE_HW_AES
+diff --git a/multiarc/src/formats/7z/C/AesOpt.c b/multiarc/src/formats/7z/C/AesOpt.c
+index 6e793af..7ba2b1e 100755
+--- a/multiarc/src/formats/7z/C/AesOpt.c
++++ b/multiarc/src/formats/7z/C/AesOpt.c
+@@ -516,7 +516,7 @@ VAES_COMPAT_STUB (AesCtr_Code_HW)
+ 
+ 
+ #elif defined(MY_CPU_ARM_OR_ARM64) && defined(MY_CPU_LE)
+- #if defined(__ARM_NEON) || defined(__ARM_NEON__)
++ #if (__ARM_ARCH > 7)
+   #if defined(__clang__)
+     #if (__clang_major__ >= 8) // fix that check
+       #define USE_HW_AES
+diff --git a/multiarc/src/formats/7z/C/Sha1.c b/multiarc/src/formats/7z/C/Sha1.c
+index 9665b5b..4faf0d7 100755
+--- a/multiarc/src/formats/7z/C/Sha1.c
++++ b/multiarc/src/formats/7z/C/Sha1.c
+@@ -33,6 +33,7 @@ This code is based on public domain code of Steve Reid from Wei Dai's Crypto++ l
+     #endif
+   #endif
+ #elif defined(MY_CPU_ARM_OR_ARM64)
++ #if (__ARM_ARCH > 7)
+   #ifdef _MSC_VER
+     #if _MSC_VER >= 1910 && _MSC_VER >= 1929 && _MSC_FULL_VER >= 192930037
+       #define _SHA_SUPPORTED
+@@ -46,6 +47,7 @@ This code is based on public domain code of Steve Reid from Wei Dai's Crypto++ l
+       #define _SHA_SUPPORTED
+     #endif
+   #endif
++ #endif
+ #endif
+ 
+ void MY_FAST_CALL Sha1_UpdateBlocks(UInt32 state[5], const Byte *data, size_t numBlocks);
+diff --git a/multiarc/src/formats/7z/C/Sha1Opt.c b/multiarc/src/formats/7z/C/Sha1Opt.c
+index 61da0b1..ecf4187 100755
+--- a/multiarc/src/formats/7z/C/Sha1Opt.c
++++ b/multiarc/src/formats/7z/C/Sha1Opt.c
+@@ -213,7 +213,7 @@ void MY_FAST_CALL Sha1_UpdateBlocks_HW(UInt32 state[5], const Byte *data, size_t
+ #endif // USE_HW_SHA
+ 
+ #elif defined(MY_CPU_ARM_OR_ARM64)
+- #if defined(__ARM_NEON) || defined(__ARM_NEON__)
++ #if (__ARM_ARCH > 7)
+   #if defined(__clang__)
+     #if (__clang_major__ >= 8) // fix that check
+       #define USE_HW_SHA
+diff --git a/multiarc/src/formats/7z/C/Sha256.c b/multiarc/src/formats/7z/C/Sha256.c
+index 8b3983e..72a746f 100755
+--- a/multiarc/src/formats/7z/C/Sha256.c
++++ b/multiarc/src/formats/7z/C/Sha256.c
+@@ -33,6 +33,7 @@ This code is based on public domain code from Wei Dai's Crypto++ library. */
+     #endif
+   #endif
+ #elif defined(MY_CPU_ARM_OR_ARM64)
++ #if (__ARM_ARCH > 7)
+   #ifdef _MSC_VER
+     #if _MSC_VER >= 1910
+       #define _SHA_SUPPORTED
+@@ -46,6 +47,7 @@ This code is based on public domain code from Wei Dai's Crypto++ library. */
+       #define _SHA_SUPPORTED
+     #endif
+   #endif
++ #endif
+ #endif
+ 
+ void MY_FAST_CALL Sha256_UpdateBlocks(UInt32 state[8], const Byte *data, size_t numBlocks);
+diff --git a/multiarc/src/formats/7z/C/Sha256Opt.c b/multiarc/src/formats/7z/C/Sha256Opt.c
+index 2022aba..1790a37 100755
+--- a/multiarc/src/formats/7z/C/Sha256Opt.c
++++ b/multiarc/src/formats/7z/C/Sha256Opt.c
+@@ -213,7 +213,7 @@ void MY_FAST_CALL Sha256_UpdateBlocks_HW(UInt32 state[8], const Byte *data, size
+ #endif // USE_HW_SHA
+ 
+ #elif defined(MY_CPU_ARM_OR_ARM64)
+- #if defined(__ARM_NEON) || defined(__ARM_NEON__)
++ #if (__ARM_ARCH > 7)
+   #if defined(__clang__)
+     #if (__clang_major__ >= 8) // fix that check
+       #define USE_HW_SHA

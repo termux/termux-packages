@@ -1,7 +1,7 @@
-diff -u -r ../ttyrec-1.0.8/ttyrec.c ./ttyrec.c
---- ../ttyrec-1.0.8/ttyrec.c	2006-06-11 17:52:50.000000000 +0200
-+++ ./ttyrec.c	2014-06-26 11:01:31.614213029 +0200
-@@ -48,7 +48,7 @@
+diff -uNr ttyrec-1.0.8/ttyrec.c ttyrec-1.0.8/ttyrec.c.patch
+--- ttyrec-1.0.8/ttyrec.c	2022-10-14 23:15:59.670392769 +0300
++++ ttyrec-1.0.8/ttyrec.c.patch	2022-10-14 23:25:00.418452092 +0300
+@@ -48,12 +48,13 @@
  #include <sys/ioctl.h>
  #include <sys/time.h>
  #include <sys/file.h>
@@ -10,7 +10,13 @@ diff -u -r ../ttyrec-1.0.8/ttyrec.c ./ttyrec.c
  #include <stdio.h>
  #include <time.h>
  #include <unistd.h>
-@@ -74,6 +74,35 @@
+ #include <string.h>
+ #include <stdlib.h>
++#include <sys/wait.h>
+ 
+ #if defined(SVR4)
+ #include <fcntl.h>
+@@ -74,6 +75,35 @@
  #include <libutil.h>
  #endif
  
@@ -46,7 +52,7 @@ diff -u -r ../ttyrec-1.0.8/ttyrec.c ./ttyrec.c
  #if defined(SVR4) && !defined(CDEL)
  #if defined(_POSIX_VDISABLE)
  #define CDEL _POSIX_VDISABLE
-@@ -156,7 +185,7 @@
+@@ -156,7 +186,7 @@
  
  	shell = getenv("SHELL");
  	if (shell == NULL)
@@ -55,7 +61,7 @@ diff -u -r ../ttyrec-1.0.8/ttyrec.c ./ttyrec.c
  
  	getmaster();
  	fixtty();
-@@ -203,11 +232,7 @@
+@@ -203,15 +233,11 @@
  void
  finish()
  {
@@ -66,4 +72,9 @@ diff -u -r ../ttyrec-1.0.8/ttyrec.c ./ttyrec.c
 -#endif /* !SVR4 */
  	register int pid;
  	register int die = 0;
+ 
+-	while ((pid = wait3((int *)&status, WNOHANG, 0)) > 0)
++	while ((pid = wait4(-1, (int *)&status, WNOHANG, 0)) > 0)
+ 		if (pid == child)
+ 			die = 1;
  

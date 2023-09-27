@@ -1,0 +1,22 @@
+https://github.com/termux/termux-packages/issues/15852
+
+--- a/configure
++++ b/configure
+@@ -369,7 +369,7 @@
+ }
+ CAN_DO()
+ {
+-	echo "main() { $1; }" > _conf.c
++	echo "int main() { $1; }" > _conf.c
+ 	$MT_TESTCOMP _conf.c -o _conf.tmp > /dev/null 2>&1
+ }
+ HAVE_FUNC()
+@@ -413,7 +413,7 @@
+ 	DEFS="$DEFS -DHAVE__SFA"
+ fi
+ 
+-if HAVE_FUNC "mkdtemp"
++if true
+ then
+ 	DEFS="$DEFS -DHAVE_MKDTEMP"
+ fi

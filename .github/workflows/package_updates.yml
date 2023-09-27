@@ -2,26 +2,47 @@ name: Package updates
 
 on:
   schedule:
-    - cron:  '0 */6 * * *'
+    - cron: "0 */6 * * *"
   workflow_dispatch:
+    inputs:
+      packages:
+        description: "A space-seperated list of packages to update. Defaults to all packages"
+        default: "@all"
+        required: false
+        
+permissions: {} # none
 
 jobs:
   update-packages:
+    permissions:
+      issues: write
+      contents: write
     if: github.repository == 'termux/termux-packages'
     runs-on: ubuntu-latest
     steps:
-    - name: Clone repository
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-        token: ${{ secrets.GH_API_KEY }}
-    - name: Process package updates
-      env:
-        GITHUB_API_TOKEN: ${{ secrets.GH_API_KEY }}
-        BUILD_PACKAGES: "true"
-        GIT_COMMIT_PACKAGES: "true"
-        GIT_PUSH_PACKAGES: "true"
-      run: |
-        git config --global user.name "Termux Github Actions"
-        git config --global user.email "contact@termux.com"
-        bash ./scripts/bin/update-packages
+      - name: Clone repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.TERMUXBOT2_TOKEN }}
+      - name: Free additional disk space
+        run: |
+          sudo apt purge -yq $(dpkg -l | grep '^ii' | awk '{ print $2 }' | grep -P '(aspnetcore|cabal-|dotnet-|ghc-|libmono|php)') \
+            firefox google-chrome-stable microsoft-edge-stable mono-runtime-common monodoc-manual ruby
+          sudo apt autoremove -yq
+          sudo rm -fr /opt/hostedtoolcache /usr/local /usr/share/dotnet /usr/share/swift
+      - name: Process package updates
+        env:
+          GITHUB_TOKEN: ${{ secrets.TERMUXBOT2_TOKEN }}
+          BUILD_PACKAGES: "true"
+          GIT_COMMIT_PACKAGES: "true"
+          GIT_PUSH_PACKAGES: "true"
+        run: |
+          git config --global user.name "Termux Github Actions"
+          git config --global user.email "contact@termux.dev"
+
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            ./scripts/bin/update-packages ${{ github.event.inputs.packages }}
+          else
+            ./scripts/bin/update-packages "@all"
+          fi

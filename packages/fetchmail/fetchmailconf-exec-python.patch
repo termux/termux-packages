@@ -1,0 +1,22 @@
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -207,7 +207,7 @@
+ 		Doxyfile
+ 
+ fetchmailconf:
+-	( echo '#! /bin/sh' && echo 'exec @PYTHON@ @pythondir@/fetchmailconf.py "$$@"' ) >$@ && chmod +x $@
++	( echo '#! /bin/sh' && echo 'exec python @pythondir@/fetchmailconf.py "$$@"' ) >$@ && chmod +x $@
+ 
+ FAQ: fetchmail-FAQ.html $(srcdir)/dist-tools/html2txt
+ 	AWK=$(AWK) $(SHELL) $(srcdir)/dist-tools/html2txt $(srcdir)/fetchmail-FAQ.html >$@
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -2375,7 +2375,7 @@
+ 	$(srcdir)/specgen.sh $(VERSION) >fetchmail.spec
+ 
+ fetchmailconf:
+-	( echo '#! /bin/sh' && echo 'exec @PYTHON@ @pythondir@/fetchmailconf.py "$$@"' ) >$@ && chmod +x $@
++	( echo '#! /bin/sh' && echo 'exec python @pythondir@/fetchmailconf.py "$$@"' ) >$@ && chmod +x $@
+ 
+ FAQ: fetchmail-FAQ.html $(srcdir)/dist-tools/html2txt
+ 	AWK=$(AWK) $(SHELL) $(srcdir)/dist-tools/html2txt $(srcdir)/fetchmail-FAQ.html >$@

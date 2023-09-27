@@ -1,0 +1,13 @@
+--- a/Makefile
++++ b/Makefile
+@@ -72,8 +72,8 @@
+ 
+ ifeq ($(PLATFORM),native)
+ ifeq ($(CFG),release)
+-	CXX_FLAGS := -D_POSIX_SOURCE -Os -std=c++17 -MMD -Wall -Wextra $(WERR_) -Wold-style-cast -Wnon-virtual-dtor -fno-exceptions -fno-rtti
+-	LXXFLAGS := -lm -s -flto
++	CXX_FLAGS := $(CXXFLAGS) $(CPPFLAGS) -D_POSIX_SOURCE -std=c++17 -MMD -Wall -Wextra $(WERR_) -Wold-style-cast -Wnon-virtual-dtor -fno-exceptions -fno-rtti
++	LXXFLAGS := $(LDFLAGS) -lm -s -flto
+ else ifeq ($(CFG),debug)
+ 	CXX_FLAGS := -D_POSIX_SOURCE -DWIZ_DEBUG -g -std=c++17 -MMD -Wall -Wextra $(WERR_) -Wold-style-cast -Wnon-virtual-dtor -fno-exceptions -fno-rtti
+ 	LXXFLAGS := -lm

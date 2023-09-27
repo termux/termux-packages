@@ -1,5 +1,5 @@
 termux_setup_protobuf() {
-	local _PROTOBUF_VERSION=$(bash -c ". $TERMUX_SCRIPTDIR/packages/libprotobuf/build.sh; echo \${TERMUX_PKG_VERSION:2}")
+	local _PROTOBUF_VERSION=$(bash -c ". $TERMUX_SCRIPTDIR/packages/libprotobuf/build.sh; echo \${TERMUX_PKG_VERSION#*:}")
 	local _PROTOBUF_ZIP=protoc-$_PROTOBUF_VERSION-linux-x86_64.zip
 	local _PROTOBUF_FOLDER
 
@@ -14,7 +14,7 @@ termux_setup_protobuf() {
 			termux_download \
 				https://github.com/protocolbuffers/protobuf/releases/download/v$_PROTOBUF_VERSION/$_PROTOBUF_ZIP \
 				$TERMUX_PKG_TMPDIR/$_PROTOBUF_ZIP \
-				4b18a69b3093432ee0531bc9bf3c4114f81bde1670ade2875f694180ac8bd7f6
+				b3cff4d4076efe2965e8560cae6307c429349eda0af7755950d6ea5db6d72870
 
 			rm -Rf "$TERMUX_PKG_TMPDIR/protoc-$_PROTOBUF_VERSION-linux-x86_64"
 			unzip $TERMUX_PKG_TMPDIR/$_PROTOBUF_ZIP -d $TERMUX_PKG_TMPDIR/protobuf-$_PROTOBUF_VERSION

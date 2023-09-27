@@ -2,6 +2,12 @@
 # clean.sh - clean everything.
 set -e -u
 
+TERMUX_SCRIPTDIR=$(cd "$(realpath "$(dirname "$0")")"; pwd)
+
+# Store pid of current process in a file for docker__run_docker_exec_trap
+. "$TERMUX_SCRIPTDIR/scripts/utils/docker/docker.sh"; docker__create_docker_exec_pid_file
+
+
 # Checking if script is running on Android with 2 different methods.
 # Needed for safety to prevent execution of potentially dangerous
 # operations such as 'rm -rf /data/*' on Android device.
@@ -35,13 +41,14 @@ fi
 	fi
 
 	if [ -d "$TERMUX_TOPDIR" ]; then
-		chmod +w -R "$TERMUX_TOPDIR"
+		chmod +w -R "$TERMUX_TOPDIR" || true
 	fi
 
 	if $TERMUX_ON_DEVICE_BUILD; then
 		# For on-device build cleanup /data shouldn't be erased.
 		rm -Rf "$TERMUX_TOPDIR"
 	else
-		rm -Rf /data/* "$TERMUX_TOPDIR"
+		find /data -mindepth 1 ! -regex '^/data/data/com.termux/cgct\(/.*\)?' -delete 2> /dev/null || true
+		rm -Rf "$TERMUX_TOPDIR"
 	fi
 } 5< "$TERMUX_BUILD_LOCK_FILE"

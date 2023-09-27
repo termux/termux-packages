@@ -1,0 +1,169 @@
+<?xml version="1.0"?>
+<dump>
+  <class name="XdpPortal" get-type="xdp_portal_get_type" parents="GObject">
+    <signal name="spawn-exited" return="void" when="first">
+      <param type="guint"/>
+      <param type="guint"/>
+    </signal>
+    <signal name="session-state-changed" return="void" when="first">
+      <param type="gboolean"/>
+      <param type="XdpLoginSessionState"/>
+    </signal>
+    <signal name="update-available" return="void" when="first">
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="update-progress" return="void" when="first">
+      <param type="guint"/>
+      <param type="guint"/>
+      <param type="guint"/>
+      <param type="XdpUpdateStatus"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="location-updated" return="void" when="first">
+      <param type="gdouble"/>
+      <param type="gdouble"/>
+      <param type="gdouble"/>
+      <param type="gdouble"/>
+      <param type="gdouble"/>
+      <param type="gdouble"/>
+      <param type="gchararray"/>
+      <param type="gint64"/>
+      <param type="gint64"/>
+    </signal>
+    <signal name="notification-action-invoked" return="void" when="first">
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+      <param type="GVariant"/>
+    </signal>
+  </class>
+  <enum name="XdpUserInformationFlags" get-type="xdp_user_information_flags_get_type">
+    <member name="XDP_USER_INFORMATION_FLAG_NONE" nick="none" value="0"/>
+  </enum>  <flags name="XdpBackgroundFlags" get-type="xdp_background_flags_get_type">
+    <member name="XDP_BACKGROUND_FLAG_NONE" nick="none" value="0"/>
+    <member name="XDP_BACKGROUND_FLAG_AUTOSTART" nick="autostart" value="1"/>
+    <member name="XDP_BACKGROUND_FLAG_ACTIVATABLE" nick="activatable" value="2"/>
+  </flags>
+  <enum name="XdpCameraFlags" get-type="xdp_camera_flags_get_type">
+    <member name="XDP_CAMERA_FLAG_NONE" nick="none" value="0"/>
+  </enum>  <flags name="XdpLauncherType" get-type="xdp_launcher_type_get_type">
+    <member name="XDP_LAUNCHER_APPLICATION" nick="application" value="1"/>
+    <member name="XDP_LAUNCHER_WEBAPP" nick="webapp" value="2"/>
+  </flags>
+  <enum name="XdpEmailFlags" get-type="xdp_email_flags_get_type">
+    <member name="XDP_EMAIL_FLAG_NONE" nick="none" value="0"/>
+  </enum>  <flags name="XdpOpenFileFlags" get-type="xdp_open_file_flags_get_type">
+    <member name="XDP_OPEN_FILE_FLAG_NONE" nick="none" value="0"/>
+    <member name="XDP_OPEN_FILE_FLAG_MULTIPLE" nick="multiple" value="1"/>
+  </flags>
+  <enum name="XdpSaveFileFlags" get-type="xdp_save_file_flags_get_type">
+    <member name="XDP_SAVE_FILE_FLAG_NONE" nick="none" value="0"/>
+  </enum>  <flags name="XdpInhibitFlags" get-type="xdp_inhibit_flags_get_type">
+    <member name="XDP_INHIBIT_FLAG_LOGOUT" nick="logout" value="1"/>
+    <member name="XDP_INHIBIT_FLAG_USER_SWITCH" nick="user-switch" value="2"/>
+    <member name="XDP_INHIBIT_FLAG_SUSPEND" nick="suspend" value="4"/>
+    <member name="XDP_INHIBIT_FLAG_IDLE" nick="idle" value="8"/>
+  </flags>
+  <enum name="XdpLoginSessionState" get-type="xdp_login_session_state_get_type">
+    <member name="XDP_LOGIN_SESSION_RUNNING" nick="running" value="1"/>
+    <member name="XDP_LOGIN_SESSION_QUERY_END" nick="query-end" value="2"/>
+    <member name="XDP_LOGIN_SESSION_ENDING" nick="ending" value="3"/>
+  </enum>  <enum name="XdpSessionMonitorFlags" get-type="xdp_session_monitor_flags_get_type">
+    <member name="XDP_SESSION_MONITOR_FLAG_NONE" nick="none" value="0"/>
+  </enum>  <enum name="XdpLocationAccuracy" get-type="xdp_location_accuracy_get_type">
+    <member name="XDP_LOCATION_ACCURACY_NONE" nick="none" value="0"/>
+    <member name="XDP_LOCATION_ACCURACY_COUNTRY" nick="country" value="1"/>
+    <member name="XDP_LOCATION_ACCURACY_CITY" nick="city" value="2"/>
+    <member name="XDP_LOCATION_ACCURACY_NEIGHBORHOOD" nick="neighborhood" value="3"/>
+    <member name="XDP_LOCATION_ACCURACY_STREET" nick="street" value="4"/>
+    <member name="XDP_LOCATION_ACCURACY_EXACT" nick="exact" value="5"/>
+  </enum>  <enum name="XdpLocationMonitorFlags" get-type="xdp_location_monitor_flags_get_type">
+    <member name="XDP_LOCATION_MONITOR_FLAG_NONE" nick="none" value="0"/>
+  </enum>  <enum name="XdpNotificationFlags" get-type="xdp_notification_flags_get_type">
+    <member name="XDP_NOTIFICATION_FLAG_NONE" nick="none" value="0"/>
+  </enum>  <flags name="XdpOpenUriFlags" get-type="xdp_open_uri_flags_get_type">
+    <member name="XDP_OPEN_URI_FLAG_NONE" nick="none" value="0"/>
+    <member name="XDP_OPEN_URI_FLAG_ASK" nick="ask" value="1"/>
+    <member name="XDP_OPEN_URI_FLAG_WRITABLE" nick="writable" value="2"/>
+  </flags>
+  <enum name="XdpPrintFlags" get-type="xdp_print_flags_get_type">
+    <member name="XDP_PRINT_FLAG_NONE" nick="none" value="0"/>
+  </enum>  <flags name="XdpOutputType" get-type="xdp_output_type_get_type">
+    <member name="XDP_OUTPUT_MONITOR" nick="monitor" value="1"/>
+    <member name="XDP_OUTPUT_WINDOW" nick="window" value="2"/>
+    <member name="XDP_OUTPUT_VIRTUAL" nick="virtual" value="4"/>
+  </flags>
+  <flags name="XdpDeviceType" get-type="xdp_device_type_get_type">
+    <member name="XDP_DEVICE_NONE" nick="none" value="0"/>
+    <member name="XDP_DEVICE_KEYBOARD" nick="keyboard" value="1"/>
+    <member name="XDP_DEVICE_POINTER" nick="pointer" value="2"/>
+    <member name="XDP_DEVICE_TOUCHSCREEN" nick="touchscreen" value="4"/>
+  </flags>
+  <enum name="XdpSessionType" get-type="xdp_session_type_get_type">
+    <member name="XDP_SESSION_SCREENCAST" nick="screencast" value="0"/>
+    <member name="XDP_SESSION_REMOTE_DESKTOP" nick="remote-desktop" value="1"/>
+  </enum>  <enum name="XdpSessionState" get-type="xdp_session_state_get_type">
+    <member name="XDP_SESSION_INITIAL" nick="initial" value="0"/>
+    <member name="XDP_SESSION_ACTIVE" nick="active" value="1"/>
+    <member name="XDP_SESSION_CLOSED" nick="closed" value="2"/>
+  </enum>  <flags name="XdpScreencastFlags" get-type="xdp_screencast_flags_get_type">
+    <member name="XDP_SCREENCAST_FLAG_NONE" nick="none" value="0"/>
+    <member name="XDP_SCREENCAST_FLAG_MULTIPLE" nick="multiple" value="1"/>
+  </flags>
+  <flags name="XdpCursorMode" get-type="xdp_cursor_mode_get_type">
+    <member name="XDP_CURSOR_MODE_HIDDEN" nick="hidden" value="1"/>
+    <member name="XDP_CURSOR_MODE_EMBEDDED" nick="embedded" value="2"/>
+    <member name="XDP_CURSOR_MODE_METADATA" nick="metadata" value="4"/>
+  </flags>
+  <enum name="XdpPersistMode" get-type="xdp_persist_mode_get_type">
+    <member name="XDP_PERSIST_MODE_NONE" nick="none" value="0"/>
+    <member name="XDP_PERSIST_MODE_TRANSIENT" nick="transient" value="1"/>
+    <member name="XDP_PERSIST_MODE_PERSISTENT" nick="persistent" value="2"/>
+  </enum>  <flags name="XdpRemoteDesktopFlags" get-type="xdp_remote_desktop_flags_get_type">
+    <member name="XDP_REMOTE_DESKTOP_FLAG_NONE" nick="none" value="0"/>
+    <member name="XDP_REMOTE_DESKTOP_FLAG_MULTIPLE" nick="multiple" value="1"/>
+  </flags>
+  <enum name="XdpButtonState" get-type="xdp_button_state_get_type">
+    <member name="XDP_BUTTON_RELEASED" nick="released" value="0"/>
+    <member name="XDP_BUTTON_PRESSED" nick="pressed" value="1"/>
+  </enum>  <enum name="XdpDiscreteAxis" get-type="xdp_discrete_axis_get_type">
+    <member name="XDP_AXIS_HORIZONTAL_SCROLL" nick="horizontal-scroll" value="0"/>
+    <member name="XDP_AXIS_VERTICAL_SCROLL" nick="vertical-scroll" value="1"/>
+  </enum>  <enum name="XdpKeyState" get-type="xdp_key_state_get_type">
+    <member name="XDP_KEY_RELEASED" nick="released" value="0"/>
+    <member name="XDP_KEY_PRESSED" nick="pressed" value="1"/>
+  </enum>  <flags name="XdpScreenshotFlags" get-type="xdp_screenshot_flags_get_type">
+    <member name="XDP_SCREENSHOT_FLAG_NONE" nick="none" value="0"/>
+    <member name="XDP_SCREENSHOT_FLAG_INTERACTIVE" nick="interactive" value="1"/>
+  </flags>
+  <flags name="XdpSpawnFlags" get-type="xdp_spawn_flags_get_type">
+    <member name="XDP_SPAWN_FLAG_NONE" nick="none" value="0"/>
+    <member name="XDP_SPAWN_FLAG_CLEARENV" nick="clearenv" value="1"/>
+    <member name="XDP_SPAWN_FLAG_LATEST" nick="latest" value="2"/>
+    <member name="XDP_SPAWN_FLAG_SANDBOX" nick="sandbox" value="4"/>
+    <member name="XDP_SPAWN_FLAG_NO_NETWORK" nick="no-network" value="8"/>
+    <member name="XDP_SPAWN_FLAG_WATCH" nick="watch" value="16"/>
+  </flags>
+  <enum name="XdpUpdateStatus" get-type="xdp_update_status_get_type">
+    <member name="XDP_UPDATE_STATUS_RUNNING" nick="running" value="0"/>
+    <member name="XDP_UPDATE_STATUS_EMPTY" nick="empty" value="1"/>
+    <member name="XDP_UPDATE_STATUS_DONE" nick="done" value="2"/>
+    <member name="XDP_UPDATE_STATUS_FAILED" nick="failed" value="3"/>
+  </enum>  <enum name="XdpUpdateMonitorFlags" get-type="xdp_update_monitor_flags_get_type">
+    <member name="XDP_UPDATE_MONITOR_FLAG_NONE" nick="none" value="0"/>
+  </enum>  <enum name="XdpUpdateInstallFlags" get-type="xdp_update_install_flags_get_type">
+    <member name="XDP_UPDATE_INSTALL_FLAG_NONE" nick="none" value="0"/>
+  </enum>  <flags name="XdpWallpaperFlags" get-type="xdp_wallpaper_flags_get_type">
+    <member name="XDP_WALLPAPER_FLAG_NONE" nick="none" value="0"/>
+    <member name="XDP_WALLPAPER_FLAG_BACKGROUND" nick="background" value="1"/>
+    <member name="XDP_WALLPAPER_FLAG_LOCKSCREEN" nick="lockscreen" value="2"/>
+    <member name="XDP_WALLPAPER_FLAG_PREVIEW" nick="preview" value="4"/>
+  </flags>
+  <boxed name="XdpParent" get-type="xdp_parent_get_type"/>
+  <class name="XdpSession" get-type="xdp_session_get_type" parents="GObject">
+    <signal name="closed" return="void" when="cleanup" no-recurse="1" no-hooks="1">
+    </signal>
+  </class>
+</dump>

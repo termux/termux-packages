@@ -1,0 +1,32 @@
+--- a/Makefile
++++ b/Makefile
+@@ -20,15 +20,15 @@
+ 
+ 
+ PREFIX = 
+-BINDIR = $(PREFIX)/usr/sbin
+-MANDIR = $(PREFIX)/usr/man
+-CFLAGS = -Wall -pedantic -O2
++BINDIR = $(PREFIX)/bin
++MANDIR = $(PREFIX)/share/man
++CFLAGS ?= -Wall -pedantic -O2
+ #CFLAGS = -Wall -O2 -g -DDEBUG
+ 
+ # If you change these, please update the man-pages too
+ # Only absolute paths here, please
+-SPOOLDIR = /var/spool/anacron
+-ANACRONTAB = /etc/anacrontab
++SPOOLDIR = @TERMUX_PREFIX@/var/spool/anacron
++ANACRONTAB = @TERMUX_PREFIX@/etc/anacrontab
+ 
+ RELEASE = 2.3
+ package_name = anacron-$(RELEASE)
+@@ -64,7 +64,7 @@
+ 
+ .PHONY: installdirs
+ installdirs:
+-	$(INSTALL_DIR) $(BINDIR) $(PREFIX)$(SPOOLDIR) \
++	$(INSTALL_DIR) $(BINDIR) $(SPOOLDIR) \
+ 		$(MANDIR)/man5 $(MANDIR)/man8
+ 
+ .PHONY: install

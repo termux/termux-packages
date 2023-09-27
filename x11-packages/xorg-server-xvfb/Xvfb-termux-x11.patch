@@ -1,0 +1,94 @@
+diff --git a/hw/vfb/InitOutput.c b/hw/vfb/InitOutput.c
+index 48efb61b2..59a0fb3ec 100644
+--- a/hw/vfb/InitOutput.c
++++ b/hw/vfb/InitOutput.c
+@@ -753,9 +753,35 @@ vfbRRScreenSetSize(ScreenPtr  pScreen,
+                    CARD32     mmWidth,
+                    CARD32     mmHeight)
+ {
++    vfbScreenInfoPtr pvfb = &vfbScreens[pScreen->myNum];
++    rrScrPrivPtr pScrPriv = rrGetScrPriv(pScreen);
+     // Prevent screen updates while we change things around
+     SetRootClip(pScreen, ROOT_CLIP_NONE);
+ 
++    if (fbmemtype == NORMAL_MEMORY_FB) {
++        pvfb->width = width;
++        pvfb->height = height;
++        pvfb->paddedBytesWidth = PixmapBytePad(pvfb->width, pvfb->depth);
++        pvfb->bitsPerPixel = vfbBitsPerPixel(pvfb->depth);
++        if (pvfb->bitsPerPixel >= 8)
++            pvfb->paddedWidth = pvfb->paddedBytesWidth / (pvfb->bitsPerPixel / 8);
++        else
++            pvfb->paddedWidth = pvfb->paddedBytesWidth * 8;
++
++        pvfb->sizeInBytes = pvfb->paddedBytesWidth * pvfb->height;
++        pvfb->sizeInBytes += SIZEOF(XWDheader) + XWD_WINDOW_NAME_LEN +
++            pvfb->ncolors * SIZEOF(XWDColor);
++
++        pvfb->pXWDHeader = (XWDFileHeader *) realloc(pvfb->pXWDHeader, pvfb->sizeInBytes);
++        pvfb->pXWDCmap = (XWDColor *) ((char *) pvfb->pXWDHeader
++                                       + SIZEOF(XWDheader)
++                                       + XWD_WINDOW_NAME_LEN);
++        pvfb->pfbMemory = (char *) (pvfb->pXWDCmap + pvfb->ncolors);
++        pScreen->ModifyPixmapHeader(pScreen->GetScreenPixmap(pScreen), 
++                                       width, height, -1, -1, 
++                                       pvfb->paddedBytesWidth, pvfb->pfbMemory);
++    }
++
+     pScreen->width = width;
+     pScreen->height = height;
+     pScreen->mmWidth = mmWidth;
+@@ -765,9 +791,10 @@ vfbRRScreenSetSize(ScreenPtr  pScreen,
+     SetRootClip(pScreen, ROOT_CLIP_FULL);
+ 
+     RRScreenSizeNotify (pScreen);
++    update_desktop_dimensions();
+     RRTellChanged(pScreen);
+ 
+-    return TRUE;
++    return RROutputSetPhysicalSize(pScrPriv->outputs[pScreen->myNum], mmWidth, mmHeight);
+ }
+ 
+ static Bool
+@@ -803,6 +830,7 @@ vfbRandRInit(ScreenPtr pScreen)
+     xRRModeInfo modeInfo;
+     char       name[64];
+ #endif
++    int mmWidth, mmHeight;
+ 
+     if (!RRScreenInit (pScreen))
+        return FALSE;
+@@ -818,7 +846,13 @@ vfbRandRInit(ScreenPtr pScreen)
+     pScrPriv->rrOutputValidateMode = vfbRROutputValidateMode;
+     pScrPriv->rrModeDestroy = NULL;
+ 
+-    RRScreenSetSizeRange (pScreen,
++    mmWidth = pScreen->width * 25.4 / monitorResolution;
++    mmHeight = pScreen->height * 25.4 / monitorResolution;
++
++    if (fbmemtype == NORMAL_MEMORY_FB)
++        RRScreenSetSizeRange (pScreen, 1, 1, 32767, 32767);
++    else
++        RRScreenSetSizeRange (pScreen,
+                          1, 1,
+                          pScreen->width, pScreen->height);
+ 
+@@ -850,6 +884,8 @@ vfbRandRInit(ScreenPtr pScreen)
+        return FALSE;
+     if (!RROutputSetConnection (output, RR_Connected))
+        return FALSE;
++    if (!RROutputSetPhysicalSize (output, mmWidth, mmHeight))
++       return FALSE;
+     RRCrtcNotify (crtc, mode, 0, 0, RR_Rotate_0, NULL, 1, &output);
+ #endif
+     return TRUE;
+@@ -958,6 +994,9 @@ InitOutput(ScreenInfo * screen_info, int argc, char **argv)
+     int i;
+     int NumFormats = 0;
+ 
++    if (!monitorResolution)
++               monitorResolution = 96;
++
+     /* initialize pixmap formats */
+ 
+     /* must have a pixmap depth to match every screen depth */

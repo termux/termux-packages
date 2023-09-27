@@ -1,0 +1,11 @@
+TERMUX_PKG_HOMEPAGE=https://pugixml.org/
+TERMUX_PKG_DESCRIPTION="Light-weight, simple and fast XML parser for C++ with XPath support"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=1.13
+TERMUX_PKG_SRCURL=https://github.com/zeux/pugixml/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=5c5ad5d7caeb791420408042a7d88c2c6180781bf218feca259fd9d840a888e1
+TERMUX_PKG_DEPENDS="libc++"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DBUILD_SHARED_LIBS=ON
+"

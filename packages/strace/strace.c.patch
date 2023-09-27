@@ -1,7 +1,7 @@
-diff -uNr strace-4.24/strace.c strace-4.24.mod/strace.c
---- strace-4.24/src/strace.c	2018-07-11 03:00:57.000000000 +0300
-+++ strace-4.24.mod/src/strace.c	2018-10-03 01:15:15.105370170 +0300
-@@ -442,11 +442,7 @@
+diff -uNr strace-6.5/src/strace.c strace-6.5.mod/src/strace.c
+--- strace-6.5/src/strace.c	2023-06-30 16:00:00.000000000 +0800
++++ strace-6.5.mod/src/strace.c	2023-09-02 09:37:22.940907755 +0800
+@@ -627,11 +627,7 @@
  static void
  swap_uid(void)
  {
@@ -10,12 +10,12 @@ diff -uNr strace-4.24/strace.c strace-4.24.mod/strace.c
 -	if (euid != uid && setreuid(euid, uid) < 0) {
 -		perror_msg_and_die("setreuid");
 -	}
-+    return;
++	return;
  }
  
  static FILE *
-@@ -1182,25 +1178,6 @@
- 		}
+@@ -1505,26 +1501,6 @@
+ 			perror_msg_and_die("ptrace(PTRACE_TRACEME, ...)");
  	}
  
 -	if (username != NULL) {
@@ -23,19 +23,20 @@ diff -uNr strace-4.24/strace.c strace-4.24.mod/strace.c
 -		 * It is important to set groups before we
 -		 * lose privileges on setuid.
 -		 */
--		if (initgroups(username, run_gid) < 0) {
+-		if (initgroups(username, run_gid) < 0)
 -			perror_msg_and_die("initgroups");
--		}
--		if (setregid(run_gid, params->run_egid) < 0) {
+-		if (setregid(run_gid, params->run_egid) < 0)
 -			perror_msg_and_die("setregid");
--		}
--		if (setreuid(run_uid, params->run_euid) < 0) {
+-
+-		/*
+-		 * If there is a seccomp filter to be installed, this should
+-		 * be done before CAP_SYS_ADMIN is dropped by setreuid.
+-		 */
+-		maybe_init_seccomp_filter();
+-
+-		if (setreuid(run_uid, params->run_euid) < 0)
 -			perror_msg_and_die("setreuid");
--		}
--	} else if (geteuid() != 0)
--		if (setreuid(run_uid, run_uid) < 0) {
--			perror_msg_and_die("setreuid");
--		}
+-	}
 -
  	if (!daemonized_tracer) {
  		/*

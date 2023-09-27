@@ -1,0 +1,39 @@
+diff -uNr git-2.36.1/common-main.c git-2.36.1.mod/common-main.c
+--- git-2.36.1/common-main.c      2022-06-24 14:42:50.227057300 +0800
++++ git-2.36.1.mod/common-main.c  2022-06-24 14:37:29.198791200 +0800
+@@ -2,6 +2,9 @@
+ #include "exec-cmd.h"
+ #include "attr.h"
+ 
++#include <android/fdsan.h>
++#include <dlfcn.h>
++
+ /*
+  * Many parts of Git have subprograms communicate via pipe, expect the
+  * upstream of a pipe to die with SIGPIPE when the downstream of a
+@@ -23,11 +26,25 @@
+ 	signal(SIGPIPE, SIG_DFL);
+ }
+ 
++static inline void termux_disable_fdsan() {
++	// For Android 11+.
++	void *lib_handle = dlopen("libc.so", RTLD_LAZY);
++	if (lib_handle) {
++		void (*set_fdsan_error_level)(enum android_fdsan_error_level newlevel) = dlsym(lib_handle, "android_fdsan_set_error_level");
++		if (set_fdsan_error_level) {
++			set_fdsan_error_level(ANDROID_FDSAN_ERROR_LEVEL_DISABLED);
++		}
++		dlclose(lib_handle);
++	}
++}
++
+ int main(int argc, const char **argv)
+ {
+ 	int result;
+ 	struct strbuf tmp = STRBUF_INIT;
+ 
++	termux_disable_fdsan();
++
+ 	trace2_initialize_clock();
+ 
+ 	/*

@@ -1,0 +1,17 @@
+--- a/apps/snmpnetstat/main.c
++++ b/apps/snmpnetstat/main.c
+@@ -57,6 +57,14 @@
+ #include "winstub.h"
+ #endif
+ 
++#if defined __ANDROID__ && __ANDROID_API__ < 28
++#define getprotoent() (NULL)
++#define sethostent(s) ((void)0)
++#define setnetent(s) ((void)0)
++#define setprotoent(s) ((void)0)
++#define endprotoent() ((void)0)
++#endif
++
+ int             aflag;          /* show all sockets (including servers) */
+ int             bflag;          /* show bytes instead of packets */
+ int             dflag;          /* show i/f dropped packets */

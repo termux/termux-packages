@@ -1,0 +1,25 @@
+--- a/configure.ac
++++ b/configure.ac
+@@ -410,6 +410,7 @@
+     ])
+ ])
+ AM_CONDITIONAL(HAVE_ANDROID, test "${HAVE_ANDROID}" = "1")
++AM_CONDITIONAL(HAVE_ANDROID_NO_TERMUX, false)
+ 
+ dnl Tizen (minimum SDK version: 2.3)
+ AS_IF([test "$SYS" = linux],[
+@@ -1676,12 +1677,12 @@
+     [disable LUA scripting support (default enabled)])])
+ if test "${enable_lua}" != "no"
+ then
+-  PKG_CHECK_MODULES(LUA, lua5.2,
++  PKG_CHECK_MODULES(LUA, lua52,
+     [ have_lua=yes ],
+     [
+     AC_MSG_WARN([${LUA_PKG_ERRORS}, trying lua 5.1 instead])
+ 
+-    PKG_CHECK_MODULES(LUA, lua5.1,
++    PKG_CHECK_MODULES(LUA, lua51,
+       [ have_lua=yes ],
+       [
+       AC_MSG_WARN([${LUA_PKG_ERRORS}, trying lua >= 5.1 instead])

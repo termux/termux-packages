@@ -1,0 +1,18 @@
+--- a/Source/JavaScriptCore/jit/ThunkGenerators.cpp
++++ b/Source/JavaScriptCore/jit/ThunkGenerators.cpp
+@@ -652,6 +652,15 @@
+     static MathThunk UnaryDoubleOpWrapper(function) = &function##Thunk;
+ 
+ #elif CPU(X86) && COMPILER(GCC_OR_CLANG) && OS(LINUX) && defined(__PIC__)
++#ifdef __ANDROID__
++asm(
++    ".text\n"
++    "__x86.get_pc_thunk.bx:\n"
++    "    movl (%esp), %ebx\n"
++    "    ret\n"
++    ".previous\n"
++);
++#endif
+ #define defineUnaryDoubleOpWrapper(function) \
+     asm( \
+         ".text\n" \

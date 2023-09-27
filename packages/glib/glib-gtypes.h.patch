@@ -1,0 +1,13 @@
+--- a/glib/gtypes.h
++++ b/glib/gtypes.h
+@@ -429,6 +429,10 @@
+ #endif
+ #endif
+ 
++#if defined __clang__ && defined __arm__
++#undef _GLIB_HAVE_BUILTIN_OVERFLOW_CHECKS
++#endif
++
+ #ifdef _GLIB_HAVE_BUILTIN_OVERFLOW_CHECKS
+ 
+ #define g_uint_checked_add(dest, a, b) \

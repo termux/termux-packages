@@ -1,0 +1,32 @@
+diff -uNr xrdp-0.9.8/keygen/Makefile.am xrdp-0.9.8.mod/keygen/Makefile.am
+--- xrdp-0.9.8/keygen/Makefile.am	2018-03-26 09:14:14.000000000 +0300
++++ xrdp-0.9.8.mod/keygen/Makefile.am	2018-12-27 16:00:33.310095623 +0200
+@@ -19,11 +19,8 @@
+ 
+ install-data-hook:
+ 	umask 077 && \
+-	if [ ! -f $(DESTDIR)$(xrdpsysconfdir)/rsakeys.ini ]; then \
+-	  ./xrdp-keygen xrdp $(DESTDIR)$(xrdpsysconfdir)/rsakeys.ini; \
+-	fi && \
+ 	if [ ! -f $(DESTDIR)$(xrdpsysconfdir)/cert.pem ]; then \
+-	  $(OPENSSL) req -x509 -newkey rsa:2048 -sha256 -nodes \
++	  openssl req -x509 -newkey rsa:2048 -sha256 -nodes \
+ 	    -keyout $(DESTDIR)$(xrdpsysconfdir)/key.pem -out \
+ 	    $(DESTDIR)$(xrdpsysconfdir)/cert.pem -days 365 \
+ 	    -subj /C=US/ST=CA/L=Sunnyvale/O=xrdp/CN=www.xrdp.org \
+diff -uNr xrdp-0.9.8/keygen/Makefile.in xrdp-0.9.8.mod/keygen/Makefile.in
+--- xrdp-0.9.8/keygen/Makefile.in	2018-09-25 09:19:20.000000000 +0300
++++ xrdp-0.9.8.mod/keygen/Makefile.in	2018-12-27 16:00:45.470269522 +0200
+@@ -681,11 +681,8 @@
+ 
+ install-data-hook:
+ 	umask 077 && \
+-	if [ ! -f $(DESTDIR)$(xrdpsysconfdir)/rsakeys.ini ]; then \
+-	  ./xrdp-keygen xrdp $(DESTDIR)$(xrdpsysconfdir)/rsakeys.ini; \
+-	fi && \
+ 	if [ ! -f $(DESTDIR)$(xrdpsysconfdir)/cert.pem ]; then \
+-	  $(OPENSSL) req -x509 -newkey rsa:2048 -sha256 -nodes \
++	  openssl req -x509 -newkey rsa:2048 -sha256 -nodes \
+ 	    -keyout $(DESTDIR)$(xrdpsysconfdir)/key.pem -out \
+ 	    $(DESTDIR)$(xrdpsysconfdir)/cert.pem -days 365 \
+ 	    -subj /C=US/ST=CA/L=Sunnyvale/O=xrdp/CN=www.xrdp.org \

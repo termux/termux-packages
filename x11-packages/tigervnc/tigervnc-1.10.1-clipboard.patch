@@ -1,0 +1,47 @@
+From 331a27addf46d39635fb4d195ae2f94058689832 Mon Sep 17 00:00:00 2001
+From: Pierre Ossman <ossman@cendio.se>
+Date: Fri, 21 Aug 2020 15:52:45 +0200
+Subject: [PATCH] Call correct wrappers for clipboard handling
+
+We incorrectly called the underlying functions instead of the safe
+wrappers for the new clipboard functions. This had the effect of a)
+crashing the entire server if one of these functions failed, and b) not
+respecting the settings disabling the clipboard.
+---
+ common/rfb/VNCServerST.cxx | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/common/rfb/VNCServerST.cxx b/common/rfb/VNCServerST.cxx
+index 35f65a2e..f09715a4 100644
+--- a/common/rfb/VNCServerST.cxx
++++ b/common/rfb/VNCServerST.cxx
+@@ -339,7 +339,7 @@ void VNCServerST::requestClipboard()
+   if (clipboardClient == NULL)
+     return;
+ 
+-  clipboardClient->requestClipboard();
++  clipboardClient->requestClipboardOrClose();
+ }
+ 
+ void VNCServerST::announceClipboard(bool available)
+@@ -353,7 +353,7 @@ void VNCServerST::announceClipboard(bool available)
+ 
+   for (ci = clients.begin(); ci != clients.end(); ci = ci_next) {
+     ci_next = ci; ci_next++;
+-    (*ci)->announceClipboard(available);
++    (*ci)->announceClipboardOrClose(available);
+   }
+ }
+ 
+@@ -367,7 +367,7 @@ void VNCServerST::sendClipboardData(const char* data)
+   for (ci = clipboardRequestors.begin();
+        ci != clipboardRequestors.end(); ci = ci_next) {
+     ci_next = ci; ci_next++;
+-    (*ci)->sendClipboardData(data);
++    (*ci)->sendClipboardDataOrClose(data);
+   }
+ 
+   clipboardRequestors.clear();
+-- 
+2.39.2
+

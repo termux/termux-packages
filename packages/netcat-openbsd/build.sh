@@ -1,11 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://packages.debian.org/sid/netcat-openbsd
 TERMUX_PKG_DESCRIPTION="TCP/IP swiss army knife. OpenBSD variant."
-TERMUX_PKG_LICENSE="BSD"
+TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.217-2
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=1.219-1
 TERMUX_PKG_SRCURL=https://salsa.debian.org/debian/netcat-openbsd/-/archive/debian/${TERMUX_PKG_VERSION}/netcat-openbsd-debian-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=bb6427c49015c8d485c013898b08808192bf5719c40a79676162e5c2d971a34e
+TERMUX_PKG_SHA256=25fb463ba60d2c54f3f44ddd45d122e9a95b9cc2a2f4dfb264b5b2d0adfc9265
 TERMUX_PKG_DEPENDS="libbsd"
 TERMUX_PKG_BUILD_IN_SRC=true
 
@@ -35,6 +34,6 @@ termux_step_make_install() {
 }
 
 termux_step_install_license() {
-	mkdir -p $TERMUX_PREFIX/share/doc/netcat-openbsd
-	head -n28 netcat.c | tail -n+2 > $TERMUX_PREFIX/share/doc/netcat-openbsd/LICENSE
+	mkdir -p $TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME
+	head -n28 netcat.c | tail -n+2 > $TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME/LICENSE
 }

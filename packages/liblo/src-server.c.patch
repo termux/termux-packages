@@ -1,0 +1,11 @@
+--- a/src/server.c
++++ b/src/server.c
+@@ -2013,7 +2013,7 @@
+ 
+                     tmp = (char*) malloc(strlen(it->path + len) + 1);
+                     strcpy(tmp, it->path + len);
+-#if defined(WIN32) || defined(_MSC_VER)
++#if defined(WIN32) || defined(_MSC_VER) || defined(__ANDROID__)
+                     sec = strchr(tmp, '/');
+ #else
+                     sec = index(tmp, '/');

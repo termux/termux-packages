@@ -1,0 +1,76 @@
+diff -u -r ./caputils/ws80211_utils.c ../src.orig/caputils/ws80211_utils.c
+--- ../src.orig/caputils/ws80211_utils.c	2019-05-24 19:55:35.079986585 +0200
++++ ./caputils/ws80211_utils.c	2019-05-24 20:07:54.523314540 +0200
+@@ -915,7 +915,7 @@
+ 	return -1;
+ }
+ 
+-const char *network_manager_path = "/usr/sbin/NetworkManager"; /* Is this correct? */
++const char *network_manager_path = "@TERMUX_PREFIX@/bin/NetworkManager"; /* Is this correct? */
+ const char *ws80211_get_helper_path(void) {
+ 	if (g_file_test(network_manager_path, G_FILE_TEST_IS_EXECUTABLE)) {
+ 		return network_manager_path;
+diff -u -r ./epan/dissectors/packet-snort.c ../src.orig/epan/dissectors/packet-snort.c
+--- ../src.orig/epan/dissectors/packet-snort.c	2019-05-24 19:55:37.506653234 +0200
++++ ./epan/dissectors/packet-snort.c	2019-05-24 19:58:06.739985483 +0200
+@@ -115,8 +115,8 @@
+ 
+ /* Snort binary and config file */
+ #ifndef _WIN32
+-static const char *pref_snort_binary_filename = "/usr/sbin/snort";
+-static const char *pref_snort_config_filename = "/etc/snort/snort.conf";
++static const char *pref_snort_binary_filename = "@TERMUX_PREFIX@/sbin/snort";
++static const char *pref_snort_config_filename = "@TERMUX_PREFIX@/etc/snort/snort.conf";
+ #else
+ /* Default locations from Snort Windows installer */
+ static const char *pref_snort_binary_filename = "C:\\Snort\\bin\\snort.exe";
+diff -u -r ./epan/maxmind_db.c ../src.orig/epan/maxmind_db.c
+--- ../src.orig/epan/maxmind_db.c	2019-05-24 19:55:38.339986562 +0200
++++ ./epan/maxmind_db.c	2019-05-24 19:56:21.946652912 +0200
+@@ -86,8 +86,8 @@
+     { "C:\\ProgramData\\GeoIP" },
+     { "C:\\GeoIP" },
+ #else
+-    { "/usr/share/GeoIP" },
+-    { "/var/lib/GeoIP" },
++    { "@TERMUX_PREFIX@/share/GeoIP" },
++    { "@TERMUX_PREFIX@/var/lib/GeoIP" },
+ #endif
+     { NULL }
+ };
+diff -u -r ./epan/oids.c ../src.orig/epan/oids.c
+--- ../src.orig/epan/oids.c	2019-05-24 19:55:38.343319895 +0200
++++ ./epan/oids.c	2019-05-24 19:59:00.456651758 +0200
+@@ -1275,7 +1275,7 @@
+ 	g_string_append_printf(path_str, "%s", path);
+ 	g_free (path);
+ #else
+-	g_string_append(path_str, "/usr/share/snmp/mibs");
++	g_string_append(path_str, "@TERMUX_PREFIX@/share/snmp/mibs");
+ 	if (!smi_init_done)
+ 		smiInit(NULL);
+ 	path = smiGetPath();
+diff -u -r ./tools/lemon/lemon.c ../src.orig/tools/lemon/lemon.c
+--- ../src.orig/tools/lemon/lemon.c	2019-05-24 19:55:35.359986584 +0200
++++ ./tools/lemon/lemon.c	2019-05-24 19:59:39.699984806 +0200
+@@ -3414,7 +3414,7 @@
+     *cp = c;
+   }else{
+     pathlist = getenv("PATH");
+-    if( pathlist==0 ) pathlist = ".:/bin:/usr/bin";
++    if( pathlist==0 ) pathlist = ".:@TERMUX_PREFIX@/bin:@TERMUX_PREFIX@/bin/applets";
+     pathbuf = (char *) malloc( lemonStrlen(pathlist) + 1 );
+     path = (char *)malloc( lemonStrlen(pathlist)+lemonStrlen(name)+2 );
+     MemoryCheck(pathbuf); MemoryCheck(path);  /* Fail on allocation failure. */
+diff -u -r ./wsutil/filesystem.c ../src.orig/wsutil/filesystem.c
+--- ../src.orig/wsutil/filesystem.c	2019-05-24 19:55:38.793319892 +0200
++++ ./wsutil/filesystem.c	2019-05-24 20:02:00.729983781 +0200
+@@ -1138,7 +1138,7 @@
+ #ifdef _WIN32
+     return get_datafile_dir();
+ #else
+-    return "/etc";
++    return "@TERMUX_PREFIX@/etc";
+ #endif
+ }
+ 

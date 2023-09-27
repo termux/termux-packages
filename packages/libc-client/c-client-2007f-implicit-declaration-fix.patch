@@ -1,0 +1,37 @@
+https://github.com/termux/termux-packages/issues/15852
+Borrowed from https://github.com/gentoo/gentoo/blob/d8d6bf974cfa15d18d473b7de3a24558fa001669/net-libs/c-client/files/c-client-2007f-implicit-declaration-fix.patch
+
+This patch solves build issues with -Werror=implicit-function-declaration
+enabled.
+
+- safe_flock is a function from flocklnx.c but header file for consumers
+  is missing, the simplest was to add function prototype to other
+  header file.
+- utime.h is needed also in multiple places but os_slx.h header file is
+  used in all of them
+
+Bug: https://bugs.gentoo.org/870478
+
+diff --git a/src/osdep/unix/os_slx.h b/src/osdep/unix/os_slx.h
+index b5f39ff..adad223 100644
+--- a/src/osdep/unix/os_slx.h
++++ b/src/osdep/unix/os_slx.h
+@@ -46,6 +46,7 @@
+ #include <sys/types.h>
+ #include <dirent.h>
+ #include <time.h>		/* for struct tm */
++#include <utime.h>
+ #include <fcntl.h>
+ #include <syslog.h>
+ #include <sys/file.h>
+@@ -57,6 +58,7 @@
+ 
+ #define direct dirent
+ 
++int safe_flock(int, int);
+ #define flock safe_flock
+ 
+ 
+-- 
+2.35.1
+

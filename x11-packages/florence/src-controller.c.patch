@@ -1,0 +1,19 @@
+--- a/src/controller.c
++++ b/src/controller.c
+@@ -24,6 +24,7 @@
+ #include "settings.h"
+ #include "tools.h"
+ #include "lib/florence.h"
++#include <sys/wait.h>
+ #include <cairo-xlib.h>
+ #include <X11/Xlib.h>
+ #include <X11/Xutil.h>
+@@ -46,7 +47,7 @@
+ 	cairo_paint(context);
+ 	cairo_set_operator(context, CAIRO_OPERATOR_SOURCE);
+ 	style_render_svg(context, handle, w, h, FALSE, NULL);
+-	wait();
++	wait(NULL);
+ 	END_FUNC
+ }
+ 

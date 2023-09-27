@@ -1,6 +1,5 @@
-diff -uNr iverilog-10_2/vvp/Makefile.in iverilog-10_2.mod/vvp/Makefile.in
---- iverilog-10_2/vvp/Makefile.in	2017-08-24 18:22:49.000000000 +0300
-+++ iverilog-10_2.mod/vvp/Makefile.in	2019-02-25 20:18:31.607079821 +0200
+--- a/vvp/Makefile.in
++++ b/vvp/Makefile.in
 @@ -32,8 +32,8 @@
  includedir = @includedir@
  
@@ -10,5 +9,14 @@ diff -uNr iverilog-10_2/vvp/Makefile.in iverilog-10_2.mod/vvp/Makefile.in
 +HOSTCC = gcc
 +HOSTCFLAGS = @WARNING_FLAGS@ @WARNING_FLAGS_CC@
  
- CC = @CC@
- CXX = @CXX@
+ BUILDCC = @CC_FOR_BUILD@
+ BUILDEXT = @BUILD_EXEEXT@
+@@ -130,7 +130,7 @@
+ 	mv $*.d dep/$*.d
+ 
+ tables.cc: $(srcdir)/draw_tt.c
+-	$(BUILDCC) $(CFLAGS) -o draw_tt$(BUILDEXT) $(srcdir)/draw_tt.c
++	$(BUILDCC) $(CFLAGS_FOR_BUILD) -o draw_tt$(BUILDEXT) $(srcdir)/draw_tt.c
+ 	./draw_tt$(BUILDEXT) > tables.cc
+ 	rm draw_tt$(BUILDEXT)
+ 

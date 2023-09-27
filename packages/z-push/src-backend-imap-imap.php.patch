@@ -1,0 +1,11 @@
+--- a/src/backend/imap/imap.php
++++ b/src/backend/imap/imap.php
+@@ -35,7 +35,7 @@
+ // Add the path for Andrew's Web Libraries to include_path
+ // because it is required for the emails with ics attachments
+ // @see https://jira.z-hub.io/browse/ZP-1149
+-set_include_path(get_include_path() . PATH_SEPARATOR . '/usr/share/awl/inc' . PATH_SEPARATOR . dirname(__FILE__) . '/');
++set_include_path(get_include_path() . PATH_SEPARATOR . '@TERMUX_PREFIX@/share/awl/inc' . PATH_SEPARATOR . dirname(__FILE__) . '/');
+ 
+ class BackendIMAP extends BackendDiff implements ISearchProvider {
+     private $wasteID;

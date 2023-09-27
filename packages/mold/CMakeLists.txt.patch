@@ -1,0 +1,12 @@
+diff -uNr mold/CMakeLists.txt mold.mod/CMakeLists.txt
+--- mold/CMakeLists.txt	2022-11-13 08:14:59.000000000 +0800
++++ mold.mod/CMakeLists.txt	2022-11-13 22:04:13.999990287 +0800
+@@ -214,7 +214,7 @@
+ 
+   # Remove the default `lib` prefix
+   set_target_properties(mold-wrapper PROPERTIES PREFIX "")
+-  target_link_libraries(mold-wrapper PRIVATE ${CMAKE_DL_LIBS})
++  target_link_libraries(mold-wrapper PRIVATE ${CMAKE_DL_LIBS} android-spawn)
+   target_sources(mold-wrapper PRIVATE elf/mold-wrapper.c)
+ endif()
+ 

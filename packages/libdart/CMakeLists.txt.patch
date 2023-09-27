@@ -1,0 +1,29 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index a3389d89fc62..7c1952f5d584 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -334,15 +334,6 @@ if(TARGET dart)
+     add_subdirectory(unittests EXCLUDE_FROM_ALL)
+   endif()
+ 
+-  # Add example subdirectories and an "examples" target.
+-  if(MSVC)
+-    add_subdirectory(examples)
+-  else()
+-    add_subdirectory(examples EXCLUDE_FROM_ALL)
+-    get_property(examples GLOBAL PROPERTY DART_EXAMPLES)
+-    add_custom_target(examples DEPENDS ${examples})
+-  endif()
+-
+   if(DART_VERBOSE)
+     message(STATUS "")
+     message(STATUS "[ Examples ]")
+@@ -456,7 +447,7 @@ install(
+ # Generate the DART pkg-config
+ set(PC_CONFIG_IN ${DART_SOURCE_DIR}/cmake/dart.pc.in)
+ set(PC_CONFIG_OUT ${DART_BINARY_DIR}/cmake/dart.pc)
+-set(PC_CONFIG_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/pkgconfig)
++set(PC_CONFIG_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+ file(RELATIVE_PATH
+   RELATIVE_PATH_TO_INSTALL_PREFIX
+   "${PC_CONFIG_INSTALL_DIR}"

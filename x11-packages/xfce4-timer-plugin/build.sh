@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://docs.xfce.org/panel-plugins/xfce4-timer-plugin/start
+TERMUX_PKG_DESCRIPTION="alarm and timer module for Xfce panel"
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="Yisus7u7 <dev.yisus@hotmail.com>"
+_MAJOR_VERSION=1.7
+TERMUX_PKG_VERSION=${_MAJOR_VERSION}.2
+TERMUX_PKG_SRCURL=https://archive.xfce.org/src/panel-plugins/xfce4-timer-plugin/${_MAJOR_VERSION}/xfce4-timer-plugin-${TERMUX_PKG_VERSION}.tar.bz2
+TERMUX_PKG_SHA256=feb3b8c2d39505e816683540a3226bd7bda870ccbcb4c7d0f6abfeeff5c58b7d
+TERMUX_PKG_DEPENDS="atk, gdk-pixbuf, glib, gtk3, harfbuzz, libcairo, libxfce4ui, libxfce4util, pango, xfce4-panel, zlib"
+TERMUX_PKG_BUILD_IN_SRC=true

@@ -2,10 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://git-scm.com/
 TERMUX_PKG_DESCRIPTION="Fast, scalable, distributed revision control system"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.34.1
-TERMUX_PKG_SRCURL=https://www.kernel.org/pub/software/scm/git/git-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=3a0755dd1cfab71a24dd96df3498c29cd0acd13b04f3d08bf933e81286db802c
+TERMUX_PKG_VERSION=2.42.0
+TERMUX_PKG_SRCURL=https://mirrors.kernel.org/pub/software/scm/git/git-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=3278210e9fd2994b8484dd7e3ddd9ea8b940ef52170cdb606daa94d887c93b0d
 TERMUX_PKG_DEPENDS="libcurl, libiconv, less, openssl, pcre2, zlib"
+TERMUX_PKG_SUGGESTS="perl"
 
 ## This requires a working $TERMUX_PREFIX/bin/sh on the host building:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -50,7 +51,7 @@ termux_step_pre_configure() {
 
 	# Setup perl so that the build process can execute it:
 	rm -f $TERMUX_PREFIX/bin/perl
-	ln -s $(which perl) $TERMUX_PREFIX/bin/perl
+	ln -s $(command -v perl) $TERMUX_PREFIX/bin/perl
 
 	# Force fresh perl files (otherwise files from earlier builds
 	# remains without bumped modification times, so are not picked
@@ -61,21 +62,14 @@ termux_step_pre_configure() {
 	CPPFLAGS="-I$TERMUX_PKG_SRCDIR $CPPFLAGS"
 }
 
-termux_step_make() {
-	make -j $TERMUX_MAKE_PROCESSES $TERMUX_PKG_EXTRA_MAKE_ARGS
-	make -j $TERMUX_MAKE_PROCESSES -C contrib/subtree $TERMUX_PKG_EXTRA_MAKE_ARGS
-}
-
-termux_step_make_install() {
-	make $TERMUX_PKG_EXTRA_MAKE_ARGS install
-	make -C contrib/subtree $TERMUX_PKG_EXTRA_MAKE_ARGS install
-
+termux_step_post_make_install() {
 	# Installing man requires asciidoc and xmlto, so git uses separate make targets for man pages
 	make -j $TERMUX_MAKE_PROCESSES install-man
-	make -j $TERMUX_MAKE_PROCESSES -C contrib/subtree install-man
-}
 
-termux_step_post_make_install() {
+	make -j $TERMUX_MAKE_PROCESSES -C contrib/subtree $TERMUX_PKG_EXTRA_MAKE_ARGS
+	make -C contrib/subtree $TERMUX_PKG_EXTRA_MAKE_ARGS ${TERMUX_PKG_MAKE_INSTALL_TARGET}
+	make -j $TERMUX_MAKE_PROCESSES -C contrib/subtree install-man
+
 	mkdir -p $TERMUX_PREFIX/etc/bash_completion.d/
 	cp $TERMUX_PKG_SRCDIR/contrib/completion/git-completion.bash \
 	   $TERMUX_PKG_SRCDIR/contrib/completion/git-prompt.sh \

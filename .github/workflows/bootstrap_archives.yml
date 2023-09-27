@@ -5,8 +5,16 @@ on:
     - cron: "0 0 * * 0"
   workflow_dispatch:
 
+permissions: {} # none
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
 jobs:
   build:
+    permissions:
+      contents: read # actions/upload-artifact doesn't need contents: write
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -15,37 +23,32 @@ jobs:
           - arm
           - i686
           - x86_64
+    if: github.repository == 'termux/termux-packages'
     steps:
       - name: Git clone
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Create bootstrap archive
         run: ./scripts/generate-bootstraps.sh --architectures ${{ matrix.arch }}
       - name: Store artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: bootstrap-archives-${{ github.sha }}
           path: "*.zip"
   publish:
+    permissions:
+      contents: write # for git push
     needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Git clone
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Fetch bootstrap archives
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: bootstrap-archives-${{ github.sha }}
           path: ./
-      - name: Get checksums
-        id: get_checksums
-        run: |
-          checksums=$(printf 'SHA-256:\n```\n%s\n```\n' "$(sha256sum *.zip)")
-          checksums="${checksums//'%'/'%25'}"
-          checksums="${checksums//$'\n'/'%0A'}"
-          checksums="${checksums//$'\r'/'%0D'}"
-          echo "::set-output name=checksums::$checksums"
       - name: Create new tag
         id: get_tag
         run: |
@@ -56,16 +59,16 @@ jobs:
           else
             tag_rev=1
           fi
-          new_tag="${new_tag}-r${tag_rev}"
+          new_tag="${new_tag}-r${tag_rev}+apt-android-7"
           git tag "$new_tag"
           git push --tags
-          echo "::set-output name=tag_name::$new_tag"
-      - name: Publish GitHub release
-        uses: svenstaro/upload-release-action@v2
+          echo "tag_name=$new_tag" >> $GITHUB_OUTPUT
+      - name: Publish bootstrap zips to GitHub release
+        uses: termux/upload-release-action@v4.1.0
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: "*.zip"
           file_glob: true
           release_name: "Bootstrap archives for Termux application"
           tag: ${{ steps.get_tag.outputs.tag_name }}
-          body: ${{ steps.get_checksums.outputs.checksums }}
+          checksums: sha256,sha512,md5

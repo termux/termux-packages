@@ -1,0 +1,40 @@
+diff -uNr pngwriter-0.7.0/CMakeLists.txt pngwriter-0.7.0.mod/CMakeLists.txt
+--- pngwriter-0.7.0/CMakeLists.txt	2018-01-22 21:10:17.000000000 +0800
++++ pngwriter-0.7.0.mod/CMakeLists.txt	2022-06-02 16:29:52.288479333 +0800
+@@ -70,16 +70,27 @@
+ 
+ # Targets #####################################################################
+ #
++
++INCLUDE_DIRECTORIES(@TERMUX_PREFIX@/include/freetype2)
++
+ add_library(PNGwriter
+     src/pngwriter.cc
+     src/pngwriter.h
+ )
+ 
++add_library(PNGwriter_shared SHARED
++	src/pngwriter.cc
++	src/pngwriter.h
++)
++
+ target_link_libraries(PNGwriter PUBLIC PNG::PNG)
+ target_link_libraries(PNGwriter PUBLIC ZLIB::ZLIB)
++target_link_libraries(PNGwriter_shared PUBLIC PNG::PNG)
++target_link_libraries(PNGwriter_shared PUBLIC ZLIB::ZLIB)
+ if(NOT WIN32)
+     # automatically added on windows
+     target_link_libraries(PNGwriter PRIVATE m)
++    target_link_libraries(PNGwriter_shared PRIVATE m)
+ endif()
+ 
+ if(PNGwriter_HAVE_FREETYPE)
+@@ -148,6 +159,8 @@
+     INCLUDES DESTINATION include
+ )
+ 
++install(TARGETS PNGwriter_shared LIBRARY DESTINATION lib)
++
+ # CMake package file for find_package(PNGwriter::PNGwriter) in depending projects
+ install(EXPORT PNGwriterTargets
+     FILE PNGwriterTargets.cmake

@@ -2,10 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://github.com/xxxserxxx/gotop
 TERMUX_PKG_DESCRIPTION="A terminal based graphical activity monitor inspired by gtop and vtop"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@medzikuser"
-TERMUX_PKG_VERSION=4.1.2
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="4.2.0"
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/xxxserxxx/gotop/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=81518fecfdab4f4c25a4713e24d9c033ba8311bbd3e2c0435ba76349028356da
+TERMUX_PKG_SHA256=e9d9041903acb6bd3ffe94e0a02e69eea53f1128274da1bfe00fe44331ccceb1
+TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make_install() {
 	termux_setup_golang

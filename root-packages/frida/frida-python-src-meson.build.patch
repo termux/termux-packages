@@ -1,0 +1,13 @@
+--- ./frida-python/src/meson.build.orig	2022-10-30 12:19:58.354222018 +0100
++++ ./frida-python/src/meson.build	2022-10-30 12:20:52.214220615 +0100
+@@ -9,8 +9,8 @@
+   name_prefix: '',
+   name_suffix: 'so',
+   c_args: frida_component_cflags,
+-  include_directories: include_directories(python_incdir),
+-  link_args: extra_link_args,
++  include_directories: include_directories('@TERMUX_PREFIX@/include', python_incdir),
++  link_args: extra_link_args + ['../frida-core/lib/selinux/libfrida-selinux.a'],
+   dependencies: [frida_core_dep] + os_deps,
+   install: true,
+   install_dir: python_site_packages,

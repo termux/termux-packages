@@ -1,0 +1,38 @@
+--- a/netconf/man/netconfd.1
++++ b/netconf/man/netconfd.1
+@@ -102,7 +102,7 @@
+ The name of the configuration file to use.
+ Any parameter except this one can be set in the config file.
+ The default config file 
+-.I /etc/yuma/netconfd.conf
++.I @TERMUX_PREFIX@/etc/yuma/netconfd.conf
+ will not be checked if this parameter is present.
+ .IP --\fBdatapath\fP=list
+ Internal file search path for configuration data files.
+@@ -250,7 +250,7 @@
+ .IP --\fBncxserver-sockname\fP=path
+ Overrides the default /tmp/ncxserver.sock UNIX
+ socket name netconfd listens on for incoming connections.
+-You have to add corresponding entry to /etc/ssh/sshd_config e.g.:
++You have to add corresponding entry to @TERMUX_PREFIX@/etc/ssh/sshd_config e.g.:
+ .nf
+ \&...
+ Port 1830
+@@ -260,7 +260,7 @@
+ .IP --\fBport\fP=number
+ Specifies the TCP ports that the server will accept
+ connections from.  These ports must also be configured
+-in the /etc/ssh/sshd_config file for the SSH master
++in the @TERMUX_PREFIX@/etc/ssh/sshd_config file for the SSH master
+ server to accept the connection and invoke the netconf
+ subsystem.
+ 
+@@ -485,7 +485,7 @@
+ .SH CONFIGURATION FILES
+ .IP \fBnetconfd.conf\fP
+ YANG config file
+-The default is: \fB/etc/yuma/netconfd.conf\fP
++The default is: \fB@TERMUX_PREFIX@/etc/yuma/netconfd.conf\fP
+     
+ An ASCII configuration file format is supported to
+ store command line parameters. 

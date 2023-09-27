@@ -1,0 +1,40 @@
+From 218166246e29a39e2eac8d3f06976038571b0603 Mon Sep 17 00:00:00 2001
+From: r-value <i@rvalue.moe>
+Date: Thu, 30 Dec 2021 17:14:47 +0800
+Subject: [PATCH] Fix meson build with meson 0.60.0+
+
+`i18n.merge_file` has been ignoring positional arguments for a time
+and explicitly rejects with error since meson 0.60.0
+---
+ data/meson.build | 2 +-
+ src/meson.build  | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/data/meson.build b/data/meson.build
+index bfc9caa..8e42134 100644
+--- a/data/meson.build
++++ b/data/meson.build
+@@ -1,6 +1,6 @@
+ appdatadir = join_paths(datadir, 'metainfo')
+ appdata_file = 'org.gnome.font-viewer.appdata.xml'
+-merged_appdata = i18n.merge_file(appdata_file,
++merged_appdata = i18n.merge_file(
+   input: appdata_file + '.in',
+   output: appdata_file,
+   po_dir: '../po',
+diff --git a/src/meson.build b/src/meson.build
+index f863d45..826c59b 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -39,7 +39,7 @@ desktop_file = 'org.gnome.font-viewer.desktop'
+ desktop_conf = configuration_data()
+ desktop_conf.set('VERSION', meson.project_version())
+ desktop_conf.set('APPLICATION_ID', application_id)
+-i18n.merge_file(desktop_file,
++i18n.merge_file(
+   input: configure_file(input: desktop_file + '.in.in',
+     output: desktop_file + '.in',
+     configuration: desktop_conf),
+-- 
+GitLab
+

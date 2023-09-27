@@ -1,13 +1,14 @@
-diff --git a/lib/kernel/src/os.erl b/lib/kernel/src/os.erl
-index 96b5da9..e166e89 100644
---- a/lib/kernel/src/os.erl
-+++ b/lib/kernel/src/os.erl
-@@ -313,7 +313,7 @@ mk_cmd(_,Cmd) ->
-     %% We use an absolute path here because we do not want the path to be
-     %% searched in case a stale NFS handle is somewhere in the path before
-     %% the sh command.
--    {"/bin/sh -s unix:cmd", [out],
-+    {"@TERMUX_PREFIX@/bin/sh -s unix:cmd", [out],
-      %% We insert a new line after the command, in case the command
-      %% contains a comment character.
-      %%
+--- ./lib/kernel/src/os.erl	2022-05-17 19:29:45.000000000 +0000
++++ ./lib/kernel/src/os.erl	2022-05-18 14:34:43.819497497 +0000
+@@ -317,9 +317,9 @@
+     %% Check if the default shell is located in /bin/sh as expected usually
+     %% or in /system/bin/sh as implemented on Android. The raw option is
+     %% used to bypass the file server and speed up the file access.
+-    Shell = case file:read_file_info("/bin/sh",[raw]) of
++    Shell = case file:read_file_info("@TERMUX_PREFIX@/bin/sh",[raw]) of
+                 {ok,#file_info{type=regular}} ->
+-                    "/bin/sh";
++                    "@TERMUX_PREFIX@/bin/sh";
+                 _ ->
+                     case file:read_file_info("/system/bin/sh",[raw]) of
+                         {ok,#file_info{type=regular}} ->

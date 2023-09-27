@@ -1,0 +1,11 @@
+TERMUX_PKG_HOMEPAGE="https://codemadness.org/sfeed-simple-feed-parser.html"
+TERMUX_PKG_DESCRIPTION="Shell-script/crontab oriented feed aggregator and parser utility (curses-based reader included)"
+TERMUX_PKG_LICENSE="ISC"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=1.8
+TERMUX_PKG_SRCURL="https://codemadness.org/releases/sfeed/sfeed-$TERMUX_PKG_VERSION.tar.gz"
+TERMUX_PKG_SHA256=173cffaee785110a73c7e02822d7a8de10307e8a2351fca17eebfdb9483ac7b3
+TERMUX_PKG_DEPENDS="ncurses"
+TERMUX_PKG_RECOMMENDS="curl"
+TERMUX_PKG_SUGGESTS="lynx, termux-tools"
+TERMUX_PKG_BUILD_IN_SRC=true

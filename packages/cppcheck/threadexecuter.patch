@@ -1,11 +1,12 @@
---- ./cli/threadexecutor.cpp.orig	2021-10-26 21:30:46.557469590 +0530
-+++ ./cli/threadexecutor.cpp	2021-10-26 21:32:35.957469548 +0530
-@@ -149,7 +149,7 @@
+diff -uNr cppcheck-2.9/cli/processexecutor.cpp cppcheck-2.9.mod/cli/processexecutor.cpp
+--- cppcheck-2.9/cli/processexecutor.cpp	2022-08-28 20:43:18.000000000 +0800
++++ cppcheck-2.9.mod/cli/processexecutor.cpp	2022-08-29 21:18:31.413328864 +0800
+@@ -193,7 +193,7 @@
  
- bool ThreadExecutor::checkLoadAverage(size_t nchildren)
+ bool ProcessExecutor::checkLoadAverage(size_t nchildren)
  {
--#if defined(__CYGWIN__) || defined(__QNX__) || defined(__HAIKU__)  // getloadavg() is unsupported on Cygwin, Qnx, Haiku.
-+#if defined(__CYGWIN__) || defined(__QNX__) || defined(__HAIKU__) || defined(__ANDROID__) // getloadavg() is unsupported on Cygwin, Qnx, Haiku, Android.
+-#if defined(__QNX__) || defined(__HAIKU__)  // getloadavg() is unsupported on Qnx, Haiku.
++#if defined(__QNX__) || defined(__HAIKU__) || defined(__ANDROID__)  // getloadavg() is unsupported on Qnx, Haiku, Android.
+     (void)nchildren;
      return true;
  #else
-     if (!nchildren || !mSettings.loadAverage) {

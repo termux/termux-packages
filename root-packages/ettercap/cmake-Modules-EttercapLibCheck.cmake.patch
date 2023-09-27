@@ -1,0 +1,15 @@
+--- ../EttercapLibCheck.cmake.orig	2019-08-27 19:47:07.065638380 +0200
++++ ./cmake/Modules/EttercapLibCheck.cmake	2019-08-27 19:48:04.867210840 +0200
+@@ -261,10 +261,8 @@
+     set(EC_LIBS ${EC_LIBS} ${HAVE_RESOLV})
+     set(HAVE_DN_EXPAND 1 CACHE PATH "Found dn_expand")
+ else()
+-    if(OS_BSD)
+-        # FreeBSD has dn_expand built in libc
+-        check_function_exists(dn_expand HAVE_DN_EXPAND)
+-    endif()
++    # FreeBSD and Android has dn_expand built in libc
++    check_function_exists(dn_expand HAVE_DN_EXPAND)
+ endif()
+ 
+ find_package(PCRE)

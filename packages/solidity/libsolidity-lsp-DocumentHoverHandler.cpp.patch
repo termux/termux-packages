@@ -1,0 +1,23 @@
+```
+[...]/src/libsolidity/lsp/DocumentHoverHandler.cpp:66:27: error: chosen constructor is explicit in copy-initialization
+        MarkdownBuilder markdown{};
+                                 ^
+[...]/sysroot/usr/include/c++/v1/sstream:884:14: note: explicit constructor declared here
+    explicit basic_stringstream(ios_base::openmode __wch = ios_base::in | ios_base::out);
+             ^
+[...]/src/libsolidity/lsp/DocumentHoverHandler.cpp:38:15: note: in implicit initialization of field 'result' with omitted initializer
+        stringstream result;
+                     ^
+```
+
+--- a/libsolidity/lsp/DocumentHoverHandler.cpp
++++ b/libsolidity/lsp/DocumentHoverHandler.cpp
+@@ -35,7 +35,7 @@
+ 
+ struct MarkdownBuilder
+ {
+-	stringstream result;
++	stringstream result{};
+ 
+ 	MarkdownBuilder& solidityCode(string const& _code)
+ 	{

@@ -1,0 +1,15 @@
+--- a/src/piper_proc.cc
++++ b/src/piper_proc.cc
+@@ -41,6 +41,12 @@
+ #include <sys/wait.h>
+ #include <unistd.h>
+ 
++#if defined __ANDROID__ && __ANDROID_API__ < 26
++extern "C" {
++int futimes(int, const struct timeval[2]);
++}
++#endif
++
+ #include "base/fs_util.hh"
+ #include "base/lnav_log.hh"
+ #include "config.h"

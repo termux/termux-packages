@@ -1,0 +1,35 @@
+diff --git a/swift/utils/swift_build_support/swift_build_support/targets.py b/swift/utils/swift_build_support/swift_build_support/targets.py
+index 7ebcdc070c1..5a6ed88182e 100644
+--- a/swift/utils/swift_build_support/swift_build_support/targets.py
++++ b/swift/utils/swift_build_support/swift_build_support/targets.py
+@@ -158,6 +158,7 @@ class AndroidPlatform(Platform):
+ 
+         flags += '-sdk %s/sysroot ' % (android_toolchain_path)
+         flags += '-tools-directory %s/bin' % (android_toolchain_path)
++        flags += ' -Xlinker -rpath -Xlinker @TERMUX_PREFIX@/lib'
+         return flags
+ 
+     def cmake_options(self, args):
+@@ -167,12 +168,11 @@ class AndroidPlatform(Platform):
+         options.define('CMAKE_SYSTEM_PROCESSOR', args.android_arch if not
+                        args.android_arch == 'armv7'
+                        else 'armv7-a')
+-        options.define('CMAKE_ANDROID_NDK:PATH', args.android_ndk)
++        options.define('CMAKE_ANDROID_STANDALONE_TOOLCHAIN:PATH', args.android_ndk)
+         return options
+ 
+     def ndk_toolchain_path(self, args):
+-        return '%s/toolchains/llvm/prebuilt/%s' % (
+-            args.android_ndk, StdlibDeploymentTarget.host_target().name)
++        return args.android_ndk
+ 
+     def swiftpm_config(self, args, output_dir, swift_toolchain, resource_path):
+         config_file = '%s/swiftpm-android-%s.json' % (output_dir, args.android_arch)
+@@ -196,6 +196,7 @@ class AndroidPlatform(Platform):
+         spm_json += '    "-tools-directory", "%s/bin",\n' % (
+                     self.ndk_toolchain_path(args))
+         spm_json += '    "-Xcc", "-I%s/usr/include",\n' % args.cross_compile_deps_path
++        spm_json += '    "-Xlinker", "-rpath", "-Xlinker", "@TERMUX_PREFIX@/lib",\n'
+         spm_json += '    "-L%s/usr/lib"\n' % args.cross_compile_deps_path
+         spm_json += '  ],\n'
+ 

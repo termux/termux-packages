@@ -1,0 +1,53 @@
+--- a/src/transcode.c
++++ b/src/transcode.c
+@@ -41,6 +41,7 @@
+ 
+ #include <ctype.h>
+ #include <math.h>
++#include <stdatomic.h>
+ 
+ #include "cmdline.h"
+ 
+@@ -215,6 +216,7 @@
+ /*************************************************************************/
+ 
+ static pthread_t event_thread_id = (pthread_t)0;
++static atomic_flag event_thread_cancel;
+ static const char *signame = "unknown signal";
+ 
+ static void tc_stop_all(void)
+@@ -271,7 +273,7 @@
+ 
+     /* Loop waiting for external events */
+     for (;;) {
+-        pthread_testcancel();
++        if (!atomic_flag_test_and_set(&event_thread_cancel)) pthread_exit(NULL);
+ 
+         tc_socket_wait();
+ 
+@@ -283,7 +285,7 @@
+             if (tc_probe_pid > 0)
+                 kill(tc_probe_pid, SIGTERM);
+         }
+-        pthread_testcancel();
++        if (!atomic_flag_test_and_set(&event_thread_cancel)) pthread_exit(NULL);
+     }
+     return NULL;
+ }
+@@ -305,7 +307,7 @@
+         void *thread_status = NULL;
+ 
+ //        pthread_kill(event_thread_id, SIGINT);
+-        pthread_cancel(event_thread_id);
++        atomic_flag_clear(&event_thread_cancel);
+         pthread_join(event_thread_id, &thread_status);
+     }
+ }
+@@ -2721,6 +2723,7 @@
+             tc_error("failed to initialize socket handler");
+     
+     // now we start the signal handler thread
++    atomic_flag_test_and_set(&event_thread_cancel);
+     if (pthread_create(&event_thread_id, NULL, event_thread, &sigs_to_block) != 0)
+         tc_error("failed to start signal handler thread");
+ 

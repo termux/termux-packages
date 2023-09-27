@@ -2,8 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/sulkasormi/frogcomposband/
 TERMUX_PKG_DESCRIPTION="Open world Angband variant with many additions"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_SRCURL=https://github.com/sulkasormi/frogcomposband.git
+TERMUX_PKG_SRCURL=git+https://github.com/sulkasormi/frogcomposband
 TERMUX_PKG_VERSION=7.1.salmiak
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_DEPENDS="ncurses"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-x11 --bindir=$TERMUX_PREFIX/bin --sysconfdir=$TERMUX_PREFIX/share/frogcomposband"
@@ -20,5 +21,5 @@ termux_step_post_make_install () {
 
 termux_step_install_license() {
 	install -Dm600 $TERMUX_PKG_BUILDER_DIR/LICENSE \
-		$TERMUX_PREFIX/share/doc/frogcomposband/LICENSE
+		$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME/LICENSE
 }

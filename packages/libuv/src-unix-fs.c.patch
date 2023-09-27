@@ -24,6 +24,6 @@ diff -uNr libuv-v1.34.1/src/unix/fs.c libuv-v1.34.1.mod/src/unix/fs.c
 -#ifdef __linux__
 +#if defined(__linux__) && !defined(__ANDROID__)
 +  /* The statx system call is prevented by seccomp on Android. */
-   static int no_statx;
+   static _Atomic int no_statx;
    struct uv__statx statxbuf;
    int dirfd;

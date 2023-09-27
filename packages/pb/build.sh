@@ -1,0 +1,14 @@
+TERMUX_PKG_HOMEPAGE=https://tildegit.org/tomasino/pb
+TERMUX_PKG_DESCRIPTION="A helper utility for using 0x0 pastebin services"
+TERMUX_PKG_LICENSE="GPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=2022.11.03
+TERMUX_PKG_SRCURL=https://tildegit.org/tomasino/pb/archive/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=2e77a24d40933135e11712dc6e8d96cf6a67219ee7b4dffcdb21cbe556ddb904
+TERMUX_PKG_PLATFORM_INDEPENDENT=true
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_EXTRA_MAKE_ARGS="PREFIX=$TERMUX_PREFIX"
+
+termux_step_make() {
+	:
+}

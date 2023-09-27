@@ -1,11 +1,13 @@
 TERMUX_PKG_HOMEPAGE=https://gpac.wp.imt.fr/
 TERMUX_PKG_DESCRIPTION="An open-source multimedia framework focused on modularity and standards compliance"
+# License: LGPL-2.1-or-later
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.0.1
-TERMUX_PKG_SRCURL=https://github.com/gpac/gpac/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=3b0ffba73c68ea8847027c23f45cd81d705110ec47cf3c36f60e669de867e0af
-TERMUX_PKG_DEPENDS="zlib"
+TERMUX_PKG_VERSION=2.2.1
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL=https://github.com/gpac/gpac/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=8173ecc4143631d7f2c59f77e1144b429ccadb8de0d53a4e254389fb5948d8b8
+TERMUX_PKG_DEPENDS="ffmpeg, freetype, liba52, libjpeg-turbo, liblzma, libmad, libnghttp2, libogg, libpng, libtheora, libvorbis, openjpeg, openssl, pulseaudio, xvidcore, zlib"
 TERMUX_PKG_EXTRA_MAKE_ARGS="STRIP=:"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-x11"
 

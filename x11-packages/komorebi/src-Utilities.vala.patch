@@ -1,0 +1,32 @@
+--- a/src/Utilities.vala
++++ b/src/Utilities.vala
+@@ -114,7 +114,7 @@
+ 
+ 
+ 		Gtk.IconTheme _IconTheme = Gtk.IconTheme.get_default ();
+-		_IconTheme.prepend_search_path("/usr/share/pixmaps/");
++		_IconTheme.prepend_search_path("@TERMUX_PREFIX@/share/pixmaps/");
+ 
+ 
+ 		try {
+@@ -238,7 +238,7 @@
+ 		new GLib.Settings("org.gnome.desktop.background").set_boolean("show-desktop-icons", false);
+ 
+ 		// Check if we have nemo installed
+-		SettingsSchemaSource settingsSchemaSource = new SettingsSchemaSource.from_directory ("/usr/share/glib-2.0/schemas", null, false);
++		SettingsSchemaSource settingsSchemaSource = new SettingsSchemaSource.from_directory ("@TERMUX_PREFIX@/share/glib-2.0/schemas", null, false);
+ 		SettingsSchema settingsSchema = settingsSchemaSource.lookup ("org.nemo.desktop", false);
+ 
+ 		if (settingsSchema != null)
+@@ -367,10 +367,7 @@
+ 	/* A dirty way to check if gstreamer is installed */
+ 	public bool canPlayVideos() {
+ 
+-		if(	File.new_for_path("/usr/lib/gstreamer-1.0/libgstlibav.so").query_exists() ||
+-			File.new_for_path("/usr/lib64/gstreamer-1.0/libgstlibav.so").query_exists() ||
+-			File.new_for_path("/usr/lib/i386-linux-gnu/gstreamer-1.0/libgstlibav.so").query_exists() ||
+-			File.new_for_path("/usr/lib/x86_64-linux-gnu/gstreamer-1.0/libgstlibav.so").query_exists())
++		if(	File.new_for_path("@TERMUX_PREFIX@/lib/gstreamer-1.0/libgstlibav.so").query_exists())
+ 			return true;
+ 
+ 		return false;

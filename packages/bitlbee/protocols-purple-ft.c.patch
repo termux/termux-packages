@@ -1,0 +1,20 @@
+--- a/protocols/purple/ft.c
++++ b/protocols/purple/ft.c
+@@ -108,7 +108,7 @@
+ 
+ 		xfer->ui_data = px;
+ 		px->xfer = xfer;
+-		px->fn = mktemp(g_strdup("/tmp/bitlbee-purple-ft.XXXXXX"));
++		px->fn = mktemp(g_strdup("@TERMUX_PREFIX@/tmp/bitlbee-purple-ft.XXXXXX"));
+ 		px->fd = -1;
+ 		px->ic = purple_ic_by_pa(xfer->account);
+ 
+@@ -285,7 +285,7 @@
+ 	px->ft = ft;
+ 	px->ft->free = prpl_xfer_free;
+ 
+-	dir = g_strdup("/tmp/bitlbee-purple-ft.XXXXXX");
++	dir = g_strdup("@TERMUX_PREFIX@/tmp/bitlbee-purple-ft.XXXXXX");
+ 	if (!mkdtemp(dir)) {
+ 		imcb_error(ic, "Could not create temporary file for file transfer");
+ 		g_free(px);

@@ -1,0 +1,19 @@
+https://github.com/termux/termux-packages/issues/14467
+https://github.com/meganz/MEGAcmd/issues/395
+
+--- a/src/megacmdcommonutils.h
++++ b/src/megacmdcommonutils.h
+@@ -16,6 +16,13 @@
+  * program.
+  */
+ 
++#ifdef HAVE_CONFIG_H
++#include "mega/config.h"
++#endif
++#ifndef HAVE_LIBUV
++#error HAVE_LIBUV not defined.
++#endif
++
+ #ifndef MEGACMDCOMMONUTILS_H
+ #define MEGACMDCOMMONUTILS_H
+ 

@@ -6,7 +6,7 @@ diff -u -r ../php-5.6.16/ext/standard/php_fopen_wrapper.c ./ext/standard/php_fop
 @@ -312,7 +312,7 @@
  		}
  
- #if HAVE_UNISTD_H
+ #ifdef HAVE_UNISTD_H
 -		dtablesize = getdtablesize();
 +		dtablesize = sysconf(_SC_OPEN_MAX);
  #else

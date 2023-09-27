@@ -1,0 +1,35 @@
+# Use reallocarray from BSD, its available in bionic with __ANDROID_API__ >= 29.
+
+--- meson.build.orig	2022-05-24 11:10:00.415154895 +0530
++++ ./src/pipewire/meson.build	2022-05-24 11:10:28.705154884 +0530
+@@ -47,6 +47,7 @@
+ ]
+
+ pipewire_sources = [
++  '@TERMUX_PKG_BUILDER_DIR@/reallocarray.c',
+   'buffers.c',
+   'impl-core.c',
+   'impl-client.c',
+
+--- meson.build.orig	2022-05-24 12:11:59.965153476 +0530
++++ ./src/modules/meson.build	2022-05-24 12:13:02.385153453 +0530
+@@ -326,7 +326,8 @@
+ )
+
+ pipewire_module_client_node = shared_library('pipewire-module-client-node',
+-  [ 'module-client-node.c',
++  [ '@TERMUX_PKG_BUILDER_DIR@/reallocarray.c',
++    'module-client-node.c',
+     'module-client-node/remote-node.c',
+     'module-client-node/client-node.c',
+     'module-client-node/protocol-native.c',
+@@ -395,7 +396,8 @@
+ )
+
+ pipewire_module_session_manager = shared_library('pipewire-module-session-manager',
+-  [ 'module-session-manager.c',
++  [ '@TERMUX_PKG_BUILDER_DIR@/reallocarray.c',
++    'module-session-manager.c',
+     'module-session-manager/client-endpoint/client-endpoint.c',
+     'module-session-manager/client-endpoint/endpoint-stream.c',
+     'module-session-manager/client-endpoint/endpoint.c',

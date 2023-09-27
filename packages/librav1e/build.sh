@@ -2,21 +2,27 @@ TERMUX_PKG_HOMEPAGE=https://github.com/xiph/rav1e/
 TERMUX_PKG_DESCRIPTION="An AV1 encoder library focused on speed and safety"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.5.1
+TERMUX_PKG_VERSION="0.6.6"
 TERMUX_PKG_SRCURL=https://github.com/xiph/rav1e/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=7b3060e8305e47f10b79f3a3b3b6adc3a56d7a58b2cb14e86951cc28e1b089fd
+TERMUX_PKG_SHA256=723696e93acbe03666213fbc559044f3cae5b8b888b2ddae667402403cff51e5
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_AUTO_UPDATE_TAG_REGEXP="\d+\.\d+\.\d+"
+TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
 TERMUX_PKG_BUILD_IN_SRC=true
 
-termux_step_make_install(){
-	termux_setup_rust
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=0
 
-	termux_download \
-		https://github.com/lu-zero/cargo-c/releases/download/v0.9.5/cargo-c-linux.tar.gz \
-		$TERMUX_PKG_CACHEDIR/cargo-c-linux.tar.gz \
-		b16717417b5e07f7aabcff1227d94689a8a8bcbcac7df6999135ab86c762066f
-	tar -xzf $TERMUX_PKG_CACHEDIR/cargo-c-linux.tar.gz -C $HOME/.cargo/bin
+	local v=$(echo ${TERMUX_PKG_VERSION#*:} | cut -d . -f 1)
+	if [ "${v}" != "${_SOVERSION}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
+
+termux_step_make_install() {
+	termux_setup_rust
+	termux_setup_cargo_c
 
 	export CARGO_BUILD_TARGET=$CARGO_TARGET_NAME
 

@@ -1,0 +1,12 @@
+diff -uNr iceauth-1.0.8/process.c iceauth-1.0.8.mod/process.c
+--- iceauth-1.0.8/process.c	2018-03-05 06:06:49.000000000 +0200
++++ iceauth-1.0.8.mod/process.c	2020-01-05 15:31:47.723588417 +0200
+@@ -686,7 +686,7 @@
+ 			 ProgramName, temp_name);
+ 	    } else {
+ 		(void) unlink (iceauth_filename);
+-#if defined(WIN32) || defined(__UNIXOS2__)
++#if defined(WIN32) || defined(__UNIXOS2__) || defined(__ANDROID__)
+ 		if (rename(temp_name, iceauth_filename) == -1)
+ #else
+ 		/* Attempt to rename() if link() fails, since this may be on a FS that does not support hard links */

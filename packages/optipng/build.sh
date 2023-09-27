@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://optipng.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://optipng.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="PNG optimizer that recompresses image files to a smaller size, without losing any information"
 TERMUX_PKG_LICENSE="ZLIB"
 TERMUX_PKG_MAINTAINER="@termux"

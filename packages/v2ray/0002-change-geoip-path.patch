@@ -1,0 +1,30 @@
+diff -uNr v2ray-core/app/router/router.go v2ray-core.mod/app/router/router.go
+--- v2ray-core/app/router/router.go	2022-09-25 10:30:47.861994012 +0800
++++ v2ray-core.mod/app/router/router.go	2022-09-25 10:37:55.281993849 +0800
+@@ -176,7 +176,7 @@
+ 
+ 			for _, geo := range v.Geoip {
+ 				if geo.Code != "" {
+-					filepath := "geoip.dat"
++					filepath := "@TERMUX_PREFIX@/share/v2ray/geoip.dat"
+ 					if geo.FilePath != "" {
+ 						filepath = geo.FilePath
+ 					} else {
+@@ -193,7 +193,7 @@
+ 
+ 			for _, geo := range v.SourceGeoip {
+ 				if geo.Code != "" {
+-					filepath := "geoip.dat"
++					filepath := "@TERMUX_PREFIX@/share/v2ray/geoip.dat"
+ 					if geo.FilePath != "" {
+ 						filepath = geo.FilePath
+ 					} else {
+@@ -210,7 +210,7 @@
+ 
+ 			for _, geo := range v.GeoDomain {
+ 				if geo.Code != "" {
+-					filepath := "geosite.dat"
++					filepath := "@TERMUX_PREFIX@/share/v2ray/geosite.dat"
+ 					if geo.FilePath != "" {
+ 						filepath = geo.FilePath
+ 					}

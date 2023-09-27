@@ -1,0 +1,13 @@
+https://github.com/termux/termux-packages/issues/16191
+
+--- a/mu/mu-cmd-server.cc
++++ b/mu/mu-cmd-server.cc
+@@ -77,7 +77,7 @@
+ 	if (tty) // for testing.
+ 		::printf("[%x]", num);
+ 	else
+-		::printf(COOKIE_PRE "%x" COOKIE_POST, num);
++		::printf("%s%x%s", COOKIE_PRE, num, COOKIE_POST);
+ }
+ 
+ static void

@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://unqlite.org/
+TERMUX_PKG_DESCRIPTION="Transactional embedded database engine"
+TERMUX_PKG_LICENSE="BSD 2-Clause, Sleepycat"
+TERMUX_PKG_LICENSE_FILE="LICENSE, src/jx9_license.txt"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=1.1.9
+TERMUX_PKG_SRCURL=https://github.com/symisc/unqlite/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=33d5b5e7b2ca223942e77d31112d2e20512bc507808414451c8a98a7be5e15c0
+TERMUX_PKG_NO_STATICSPLIT=true

@@ -1,0 +1,232 @@
+Don't generate files.h at build-time using an execution test.
+
+The *_LOC variables are never used in the build itself, but only in the
+built code; this means that they don't need to be known to ./configure at
+all.
+
+Since the previous method made acct not cross-compilable at all, this is
+much preferred.
+
+Author:  Diego Elio Pettenò <flameeyes@gmail.com>
+Upstream: https://savannah.gnu.org/patch/?7473
+
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -69,11 +69,6 @@ SYS_LASTCOMM = @SYS_LASTCOMM@
+ SYS_AC = @SYS_AC@
+ SYS_SA = @SYS_SA@
+ 
+-WTMP_FILE_LOC = @WTMP_FILE_LOC@
+-ACCT_FILE_LOC = @ACCT_FILE_LOC@
+-SAVACCT_FILE_LOC = @SAVACCT_FILE_LOC@
+-USRACCT_FILE_LOC = @USRACCT_FILE_LOC@
+-
+ compare-ac: ac
+ 	@echo
+ 	@echo "Running tests for ac"
+--- a/configure.ac
++++ b/configure.ac
+@@ -229,97 +229,6 @@ AC_CHECK_HEADER(sys/acct.h,
+ 		AC_EGREP_HEADER([comp_t],[sys/acct.h],[AC_DEFINE(HAVE_COMP_T, 1, Define if <sys/acct.h> uses the COMP_T type.)])
+   ) ]
+ )
+-dnl
+-dnl find out where utmp/pacct are stored
+-dnl
+-AC_RUN_IFELSE([AC_LANG_PROGRAM([[
+-#include <stdio.h>
+-#include <stdlib.h>
+-#include <sys/types.h>
+-#include <stdint.h>	/* GNU/kFreeBSD */
+-#include <sys/acct.h>
+-#include <utmp.h>
+-
+-#ifndef WTMP_FILE
+-#  if defined(__FreeBSD__) || defined (__NetBSD__) || defined(__linux__) \
+-        || defined(__FreeBSD_kernel__) || defined(__GLIBC__)
+-#    define WTMP_FILE "/var/log/account/wtmp"
+-#  else
+-#    if defined(sun) || defined(AMIX)
+-#      define WTMP_FILE "/var/adm/wtmp"
+-#    else
+-#      if defined(sgi) || defined(SVR4)
+-#        define WTMP_FILE "/usr/adm/wtmp"
+-#      else
+-#        define WTMP_FILE "/usr/adm/wtmp"
+-#      endif
+-#    endif
+-#  endif
+-#endif
+-
+-#ifndef ACCT_FILE
+-#  if defined(__FreeBSD__) || defined(__linux__) \
+-        || defined(__FreeBSD_kernel__) || defined(__GLIBC__)
+-#    define ACCT_FILE "/var/log/account/pacct"
+-#  else
+-#    if defined(__NetBSD__)
+-#      define ACCT_FILE "/var/log/account/acct"
+-#    else
+-#      if defined(sun) || defined(AMIX)
+-#        define ACCT_FILE "/var/adm/pacct"
+-#      else
+-#        if defined(sgi) || defined(SVR4) || defined(M_XENIX)
+-#          define ACCT_FILE "/usr/adm/pacct"
+-#        else
+-#          define ACCT_FILE "/usr/adm/acct"
+-#        endif
+-#      endif
+-#    endif
+-#  endif
+-#endif
+-
+-#ifndef SAVACCT_FILE
+-#  if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__linux__) \
+-        || defined(__FreeBSD_kernel__) || defined(__GLIBC__)
+-#    define SAVACCT_FILE "/var/log/account/savacct"
+-#  else
+-#    if defined(sun) || defined(AMIX)
+-#      define SAVACCT_FILE "/var/adm/savacct"
+-#    else
+-#      if defined(sgi) || defined(SVR4)
+-#        define SAVACCT_FILE "/usr/adm/savacct"
+-#      else
+-#        define SAVACCT_FILE "/usr/adm/savacct"
+-#      endif
+-#    endif
+-#  endif
+-#endif
+-
+-#ifndef USRACCT_FILE
+-#  if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__linux__) \
+-        || defined(__FreeBSD_kernel__) || defined(__GLIBC__)
+-#    define USRACCT_FILE "/var/log/account/usracct"
+-#  else
+-#    if defined(sun) || defined(AMIX)
+-#      define USRACCT_FILE "/var/adm/usracct"
+-#    else
+-#      if defined(sgi) || defined(SVR4)
+-#        define USRACCT_FILE "/usr/adm/usracct"
+-#      else
+-#        define USRACCT_FILE "/usr/adm/usracct"
+-#      endif
+-#    endif
+-#  endif
+-#endif
+-]], [[
+-  FILE *fp;
+-  fp = fopen ("locs", "w");
+-  fprintf (fp, "WTMP_FILE_LOC=%s\n", WTMP_FILE);
+-  fprintf (fp, "ACCT_FILE_LOC=%s\n", ACCT_FILE);
+-  fprintf (fp, "SAVACCT_FILE_LOC=%s\n", SAVACCT_FILE);
+-  fprintf (fp, "USRACCT_FILE_LOC=%s\n", USRACCT_FILE);
+-  fclose (fp);
+-]])],[. ./locs; rm locs],[echo "Error -- could not locate your wtmp and acct files."; exit 1],[echo "Sorry -- you cannot cross-compile this package (FIXME)."; exit 1 ])
+ 
+ dnl types
+ AC_TYPE_PID_T dnl for sys/acct.h
+@@ -363,12 +272,6 @@ AC_SUBST(ACCTON_MAN)
+ AC_SUBST(LASTCOMM_MAN)
+ AC_SUBST(SA_MAN)
+ 
+-dnl Substitutions for file locations
+-AC_SUBST(WTMP_FILE_LOC)
+-AC_SUBST(ACCT_FILE_LOC)
+-AC_SUBST(SAVACCT_FILE_LOC)
+-AC_SUBST(USRACCT_FILE_LOC)
+-
+ dnl Dump the makefiles and etc.
+ AC_CONFIG_FILES([Makefile lib/Makefile files.h version.h])
+ AC_OUTPUT
+--- a/files.h.in
++++ b/files.h.in
+@@ -30,10 +30,86 @@
+ 
+ #include <utmp.h>
+ 
+-#define WTMP_FILE_LOC "@WTMP_FILE_LOC@"
+-#define ACCT_FILE_LOC "@ACCT_FILE_LOC@"
+-#define SAVACCT_FILE_LOC "@SAVACCT_FILE_LOC@"
+-#define USRACCT_FILE_LOC "@USRACCT_FILE_LOC@"
++#ifndef WTMP_FILE
++#  if defined(__FreeBSD__) || defined (__NetBSD__) || defined(__linux__) \
++        || defined(__FreeBSD_kernel__) || defined(__GLIBC__)
++#    define WTMP_FILE "/var/log/wtmp"
++#  else
++#    if defined(sun) || defined(AMIX)
++#      define WTMP_FILE "/var/adm/wtmp"
++#    else
++#      if defined(sgi) || defined(SVR4)
++#        define WTMP_FILE "/usr/adm/wtmp"
++#      else
++#        define WTMP_FILE "/usr/adm/wtmp"
++#      endif
++#    endif
++#  endif
++#endif
++
++#ifndef ACCT_FILE
++#  if defined(__FreeBSD__) || defined(__linux__) \
++        || defined(__FreeBSD_kernel__) || defined(__GLIBC__)
++#    define ACCT_FILE "/var/account/pacct"
++#  else
++#    if defined(__NetBSD__)
++#      define ACCT_FILE "/var/log/account/acct"
++#    else
++#      if defined(sun) || defined(AMIX)
++#        define ACCT_FILE "/var/adm/pacct"
++#      else
++#        if defined(sgi) || defined(SVR4) || defined(M_XENIX)
++#          define ACCT_FILE "/usr/adm/pacct"
++#        else
++#          define ACCT_FILE "/usr/adm/acct"
++#        endif
++#      endif
++#    endif
++#  endif
++#endif
++
++#ifndef SAVACCT_FILE
++#  if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__linux__) \
++        || defined(__FreeBSD_kernel__) || defined(__GLIBC__)
++#    define SAVACCT_FILE "/var/account/savacct"
++#  else
++#    if defined(sun) || defined(AMIX)
++#      define SAVACCT_FILE "/var/adm/savacct"
++#    else
++#      if defined(sgi) || defined(SVR4)
++#        define SAVACCT_FILE "/usr/adm/savacct"
++#      else
++#        define SAVACCT_FILE "/usr/adm/savacct"
++#      endif
++#    endif
++#  endif
++#endif
++
++#ifndef USRACCT_FILE
++#  if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__linux__) \
++        || defined(__FreeBSD_kernel__) || defined(__GLIBC__)
++#    define USRACCT_FILE "/var/account/usracct"
++#  else
++#    if defined(sun) || defined(AMIX)
++#      define USRACCT_FILE "/var/adm/usracct"
++#    else
++#      if defined(sgi) || defined(SVR4)
++#        define USRACCT_FILE "/usr/adm/usracct"
++#      else
++#        define USRACCT_FILE "/usr/adm/usracct"
++#      endif
++#    endif
++#  endif
++#endif
++
++#if !defined(WTMP_FILE) || !defined(ACCT_FILE) || !defined(SAVACCT_FILE) \
++    || !defined(USRACCT_FILE)
++#error Could not locate your wtmp and acct files.
++#endif
++#define WTMP_FILE_LOC WTMP_FILE
++#define ACCT_FILE_LOC ACCT_FILE
++#define SAVACCT_FILE_LOC SAVACCT_FILE
++#define USRACCT_FILE_LOC USRACCT_FILE
+
+ /* Workaround for a kernel includes problem */
+ #if defined(__linux__) && defined(__alpha__)

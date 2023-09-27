@@ -2,11 +2,18 @@ TERMUX_PKG_HOMEPAGE=https://duckdb.org/
 TERMUX_PKG_DESCRIPTION="An in-process SQL OLAP database management system"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.3.1
-TERMUX_PKG_SRCURL=https://github.com/duckdb/duckdb/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=ae2367d0a393be59e137ffa975f48f60b113b2a72aacc24fbc59afa0cbc3a511
-TERMUX_PKG_DEPENDS="libc++"
+TERMUX_PKG_VERSION=0.8.1
+# we clone to retain the .git directory, to ensure the version in the built executable is correctly populated
+TERMUX_PKG_SRCURL=git+https://github.com/duckdb/duckdb
+TERMUX_PKG_DEPENDS="libc++, openssl"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DBUILD_ICU_EXTENSION=TRUE 
+-DBUILD_PARQUET_EXTENSION=TRUE 
+-DBUILD_HTTPFS_EXTENSION=TRUE 
+-DBUILD_JSON_EXTENSION=TRUE
+"
 
 termux_step_pre_configure() {
 	LDFLAGS+=" -llog"
+	CXXFLAGS+=" -D_GLIBCXX_USE_CXX11_ABI=1"
 }

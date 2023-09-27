@@ -100,10 +100,10 @@ met these conditions:
 
 - **Not installable through cpan, gem, npm, or pip**
 
-  These packages should be installable through `cpan`, `gem`, `npm`, `pip` and
+  These packages should be installed through `cpan`, `gem`, `npm`, `pip` and
   so on.
 
-  Packaging modules for Perl, Ruby, Node.js, Python is problematic, especially
+  Packaging modules for Perl, Ruby, Node.js, is problematic, especially
   when it comes to cross-compiling native extensions.
 
 - **Not taking too much disk space**
@@ -124,7 +124,7 @@ met these conditions:
   present ones.
 
   The more useless packages in repositories, the less overall packaging and
-  service quality - *remembering that our resources are limited?*
+  service quality - _remembering that our resources are limited?_
 
 - **Not serving hacking, phishing, spamming, spying, ddos functionality**
 
@@ -132,12 +132,22 @@ met these conditions:
   purposes, including but not limited to pentesting, phishing, bruteforce,
   sms/call bombing, DDoS attaks, OSINT.
 
+**Important**: standalone library packages are of interest mostly for developers
+and we will not package them unless required as dependency for another package.
+This is not a strong rule, but needed to ensure that repository is clean and
+provides content useful for average Termux user.
+
 Packages that require root permission to get working or rely on features that
 are available only with SELinux permissive mode or require custom firmware
-are handled in a dedicated repository: https://github.com/termux/termux-root-packages.
+are handled in a dedicated
+[apt repository](https://packages-cf.termux.dev/apt/termux-root/) whose build
+recipes you can find in [root-packages directory](/root-packages).
 Remember that Termux is designed primarily for non-root use and we may
 remove functionality requiring root from packages if it interfere with
 non-root usage or cause build time issues.
+
+Packages that do not comply with this policy may be requested in User Repository:
+https://github.com/termux-user-repository/tur
 
 ## Submitting pull requests
 
@@ -146,6 +156,7 @@ provide some help with fixing your pull request or give some recommendations,
 but that DOES NOT mean they will do all work instead of you.
 
 **Minimal requirements:**
+
 - Experience with Linux distribution like Debian (preferred), Arch, Fedora, etc.
 - Experience with compiling software from source.
 - Good shell scripting skills.
@@ -198,6 +209,7 @@ request with new package. Pay attention to things listed below.
    other ways to manipulate content referenced through variables.
 
    Examples:
+
    ```
    TERMUX_PKG_VERSION=1.0
    TERMUX_PKG_SRCURL=https://example.com/archive/package-${TERMUX_PKG_VERSION}.tar.gz
@@ -229,6 +241,7 @@ request with new package. Pay attention to things listed below.
    format internals.
 
    Patch is usually created by
+
    ```
    diff -uNr sourcedir sourcedir.mod > filename.patch
    ```
@@ -237,23 +250,26 @@ request with new package. Pay attention to things listed below.
 
    Software often relies on paths defined by Filesystem Hierarchy Standard:
 
-   * `/bin`
-   * `/etc`
-   * `/home`
-   * `/run`
-   * `/sbin`
-   * `/tmp`
-   * `/usr`
-   * `/var`
+   - `/bin`
+   - `/etc`
+   - `/home`
+   - `/run`
+   - `/sbin`
+   - `/tmp`
+   - `/usr`
+   - `/var`
 
    These paths do not exist in Termux and have been replaced by prefixed
    equivalents. Termux installation prefix is
+
    ```
    /data/data/com.termux/files/usr
    ```
+
    and can be considered as virtual rootfs.
 
    Home directory is stored outside of prefix:
+
    ```
    /data/data/com.termux/files/home
    ```
@@ -276,18 +292,18 @@ request with new package. Pay attention to things listed below.
    package builds using GNU Autotools. Therefore you do not need to
    specify flags like
 
-   * `--prefix`
-   * `--host`
-   * `--build`
-   * `--disable-nls`
-   * `--disable-rpath`
+   - `--prefix`
+   - `--host`
+   - `--build`
+   - `--disable-nls`
+   - `--disable-rpath`
 
    and some others.
 
    Additional options to `./configure` can be passed through variable
    `TERMUX_PKG_EXTRA_CONFIGURE_ARGS`.
 
-***
+---
 
 # Working with packages
 
@@ -295,6 +311,154 @@ All software available in Termux repositories aims to be compatible with Android
 OS and is built by Android NDK. This often introduces compatibility issues as
 Android (specifically Termux) is not a standard platform. Do not expect there
 are exist package recipes available out-of-box.
+
+## Commit guidelines
+
+Commit messages should describe the changes done, so that maintainers can understand what was done, and to what package or scope, without having to look at the code changes. One good (but not mandatory) way to make sure the commit message fulfills these requirements is to write it on the format:
+
+```
+<commitType>(<repo>/<package>): (Summary of change(s) made/Short description of the change)
+
+[An optional but **highly recommended** commit message describing the changes made in the commit]
+
+[Fixes (termux/repo)#<issue number>]
+[Closes (termux/repo)#<pr number>]
+```
+
+Where:
+
+- `<repo>` may be one of `main`, `root` or `x11`. It is the repository in which the package resides.
+  Other definition for this property can be done as the name property of the package directory as defined in `repo.json` file after removing the 'termux-' prefix (if any).
+- `<package>` is the actual name of the package.
+
+Any line in the commit **should not exceed 80 characters**. In case it does, consider using different wordings or language style which better summarizes the changes done.
+
+- `<commitType>` describes the type of commit. Types of commits:
+  - `addpkg(<repo>/<package>)`: A new package was added.
+    Commit summary should include a short description of the package. Optional extended commit message may include usage instructions for the package and/or reasons for inclusion.
+  - `bump(<repo>/<package>)`: One or more package(s) was/were updated.
+    Commit summary should include the newer version/tag to which the package was updated to. Optional extended commit message may include new list of features in the new version, and detailed list of changes in build scripts and/or patches
+  - `fix(<repo>/<package>)`: Fix a Termux specific bug in a package
+    Commit summary should contain a summary of old incorrect behaviour of the package. Extended commit message may contain a deeper analysis of the bug.
+  - `dwnpkg(<repo>/<package>)`: One or more package(s) was/were downgraded due to build issues or potential bugs
+    Commit summary should justify the downgrading of the package(s). If the summary can't completely describe the reason for downgrade, extended commit message should contain full reason for downgrade.
+  - `disable(<repo>/<package>)`: A package was disabled. The short description should contain the reason for disabling of the package.
+    If the reason doesn't fit well in the sunmary, extended commit message should contain the complete reason for disabling.
+  - `enhance(<repo>/<package>)`: Enable a feature in a package that was earlier not enabled.
+    Optional (but highly recommended) extended commit message may contain detailed summary of the enabled feature(s) and a basic use case
+  - `chore`: Any housekeeping change or a change which does not affect the user in any way.
+  - `rebuild`: Rebuild a package to link against newer version of shared library
+    Special cases:
+    - When mass rebuilding packages depending on a major package (e.g. openssl), consider using this format:
+      ```
+      rebuild(deps:main/openssl): link against OpenSSL 3.0
+      ```
+  - `scripts(path/to/script)`: Any change affecting our build scripts or other scripts which are not a part of build recipies including toolchain setup scripts.
+  - `ci(action_file_without_extension)`: Any change that affects GitHub Actions yaml file(s) and/or scripts used exclusively by it.
+
+Examples of good commit messages:
+
+1. ```
+   bump(main/nodejs): v18.2.0
+   ```
+
+2. ```
+   dwnpkg(main/htop): v2.2.0
+
+   v3.x needs access to /proc/stat which is now restricted by Android
+   ```
+
+3. ```
+   enhance,bump(main/nodejs): v18.2.0 and use shared libuv
+
+   # Describe the technical reasons of how using shared libuv is beneficial
+   ```
+
+4. ```
+   disable(main/nodejs): use LTS version instead
+
+   PS: This won't ever happen. Just an example :P
+   ```
+
+5. ```
+   ci(package_updates): panic on invalid versions
+   ```
+
+6. ```
+   chore,scripts(bin/revbump): support passing path to build.sh
+
+   Earlier only package directories defined in `repo.json` could be revbumped.
+   Now you can pass the path to build.sh
+   ```
+
+7. ```
+   fix(main/nodejs{,-lts}): test failures for `process.report`
+
+   This shows an example when scope can be minimised if they belong to the
+   same repository, and have same initials as well as are very similar in
+   nature.
+
+   The same can also be used for liblua as main/liblua{51,52,53,54}
+   ```
+
+8. ```
+   fix(main/vim{,-python},x11/vim-gtk): cursor flickering under certain rare conditions
+
+   Although the above commit message is quite long and also exceeds the
+   recommended length of a line in commit message. Such commits may be accepted
+   in cases where the changes are very similar for all three packages.
+   ```
+
+### Special notes for newbies who're just getting started with Open Source
+
+In order to encourage new contributors and help them contribute to open source, the above mentioned commit requirements should be optionally relaxed. In cases where commit messages need to be changed, the PR may be **Squashed and Merged** or may be merged manually from the command line.
+
+#### Notes for merging PRs from command line
+
+1. It is recommended to use the [GitHub CLI (`gh`)](https://cli.github.com) in order to fetch the contributor's branch.
+
+   ```sh
+   gh pr checkout <PR Number>
+   ```
+
+2. After checking out the branch, amend the commit message and optionally rebase against the master branch (if necessary).
+
+   When merging manually make sure that you give proper credits for the original patch to it's author by adding a `Co-authored-by: ` line. See https://docs.github.com/en/pull-requests/committing-changes-to-your-project/creating-and-editing-commits/creating-a-commit-with-multiple-authors for more details. Also add a `Closes #<PR number>`.
+
+   **Note** that the `Closes` and `Co-authored-by` lines are needed only when the PR author has disabled ability for maintainers to push to their branches. If possible, it is recommended to force-push to user's branch and then push the change to master branch since GitHub UI then will detect a merge.
+
+   ```sh
+   git fetch
+   git rebase origin/master
+
+   git commit --amend # Will open up your editor to amend the commit message
+
+   # If possible push to PR author's branch
+   # Note: no need to configure remote branch if you checked
+   # out using GitHub CLI.
+   # git push -f
+   ```
+
+3. Note down the branch name
+
+   ```sh
+   git branch
+   ```
+
+4. Merge the branch manually
+
+   ```sh
+   git switch master
+
+   # Note depending upon your git configuration, the default
+   # merge strategy may vary. It is recommended to pass the
+   # merge strategy as a flag to git.
+   git merge <branch name>
+   ```
+
+5. Congratulate the user on sending their (probably) first OSS contribution!
+
+6. Note that sometimes GitHub UI may fail to detect the merge, in such cases make sure that you tell the contributor that their PR was merged manually and they'll recieve their due credits in the repository contribution graph.
 
 ## Basics
 
@@ -318,6 +482,7 @@ TERMUX_PKG_DEPENDS="libiconv, ncurses"
 ```
 
 It can contain some additional variables:
+
 - `TERMUX_PKG_BUILD_IN_SRC=true`
 
   Use this variable if package supports in-tree builds only, for example if
@@ -426,6 +591,7 @@ Here are few things you may to try:
    by patch.
 
    Regenerate patch file, e.g. with:
+
    ```
    diff -uNr package-1.0 package-1.0.mod > previously-failed-patch-file.patch
    ```
@@ -464,7 +630,7 @@ TERMUX_PKG_VERSION=1:5.0.0
 ```
 
 Note that if you are not @termux collaborator, pull request must contain a
-*description* why you are submitting a package downgrade. All pull requests
+_description_ why you are submitting a package downgrade. All pull requests
 which submit package downgrading without any serious reason will be rejected.
 
 ## Common build issues
@@ -475,6 +641,7 @@ No files in package. Maybe you need to run autoreconf -fi before configuring?
 
 Means that build system cannot find the Makefile. Depending on project, there
 are some tips for trying:
+
 - Set `TERMUX_PKG_BUILD_IN_SRC=true` - applicable to Makefile-only projects.
 - Run `./autogen.sh` or `autoreconf -fi` in `termux_step_pre_configure`. This
   is applicable to projects that use Autotools.

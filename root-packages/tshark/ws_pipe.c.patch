@@ -1,0 +1,11 @@
+--- ../ws_pipe.c.orig	2019-05-22 16:09:41.223921507 +0200
++++ ./wsutil/ws_pipe.c	2019-05-22 16:10:12.694633273 +0200
+@@ -108,7 +108,7 @@
+         close(dir_fd);
+     } else {
+         /* Slow fallback in case /proc is not mounted */
+-        for (int fd = STDERR_FILENO + 1; fd < getdtablesize(); fd++) {
++        for (int fd = STDERR_FILENO + 1; fd < sysconf(_SC_OPEN_MAX); fd++) {
+             fcntl(fd, F_SETFD, FD_CLOEXEC);
+         }
+     }

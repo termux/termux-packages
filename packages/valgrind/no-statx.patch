@@ -1,7 +1,7 @@
 diff -uNr valgrind-3.16.1/coregrind/m_aspacemgr/aspacemgr-common.c valgrind-3.16.1.mod/coregrind/m_aspacemgr/aspacemgr-common.c
---- valgrind-3.16.1/coregrind/m_aspacemgr/aspacemgr-common.c	2019-12-27 16:51:44.000000000 +0200
-+++ valgrind-3.16.1.mod/coregrind/m_aspacemgr/aspacemgr-common.c	2020-10-01 18:18:17.072570786 +0300
-@@ -319,6 +319,7 @@
+--- ./coregrind/m_aspacemgr/aspacemgr-common.c.orig	2021-10-10 16:17:32.000000000 +0200
++++ ./coregrind/m_aspacemgr/aspacemgr-common.c	2022-01-02 11:31:30.967514202 +0100
+@@ -330,6 +330,7 @@
  #  if defined(VGO_linux) || defined(VGO_darwin)
     SysRes          res;
  #  if defined(VGO_linux)
@@ -9,14 +9,15 @@ diff -uNr valgrind-3.16.1/coregrind/m_aspacemgr/aspacemgr-common.c valgrind-3.16
     /* First try with statx. */
     struct vki_statx bufx;
     const char* file_name = "";
-@@ -330,6 +331,7 @@
+@@ -341,6 +342,7 @@
        *mode = (UInt)bufx.stx_mode;
        return True;
     }
 +#endif
- #  endif
+ #  endif // VGO_linux only
+ 
  #  if defined(VGO_linux) && defined(__NR_fstat64)
-    /* fstat64 is second candidate as it can cope with minor and major device
+
 diff -uNr valgrind-3.16.1/coregrind/m_libcfile.c valgrind-3.16.1.mod/coregrind/m_libcfile.c
 --- valgrind-3.16.1/coregrind/m_libcfile.c	2019-12-27 16:51:44.000000000 +0200
 +++ valgrind-3.16.1.mod/coregrind/m_libcfile.c	2020-10-01 18:20:40.369886417 +0300

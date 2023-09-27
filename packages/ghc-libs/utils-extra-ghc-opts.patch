@@ -1,0 +1,17 @@
+--- ghc-8.10.7/rules/package-config.mk	2022-02-09 09:22:35.911445951 +0530
++++ ghc-8.10.7-patch/rules/package-config.mk	2022-02-11 09:40:05.957999047 +0530
+@@ -55,6 +55,14 @@
+ $1_$2_MORE_HC_OPTS += -rtsopts
+ endif
+ 
++ifneq "$3" "0"
++ifneq (,$(findstring utils/,$1))
++# Found a package that needs to be built in the utils directory
++$1_$2_MORE_HC_OPTS += -optl-Wl,-rpath=@TERMUX_PREFIX@/lib
++$1_$2_MORE_HC_OPTS += -optl-Wl,--enable-new-dtags
++endif
++endif
++
+ # Used by pretty_commands.mk
+ label_$1_$2_CC=CC
+ label_$1_$2_AS=AS

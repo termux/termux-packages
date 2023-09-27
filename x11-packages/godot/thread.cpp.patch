@@ -1,0 +1,23 @@
+--- src/thirdparty/oidn/common/thread.cpp	2023-03-01 03:38:07.000000000 +0300
++++ src/thirdparty/oidn/common/thread.cpp.patch	2023-03-05 19:31:55.549053120 +0300
+@@ -26,6 +26,20 @@
+ #include "thread.h"
+ #include <fstream>
+ 
++#if defined(__BIONIC__)
++static inline int pthread_setaffinity_np(pthread_t thread, size_t cpusetsize,
++                                         cpu_set_t *cpuset) {
++  assert(pthread_equal(pthread_self(), thread));
++  return sched_setaffinity(0, cpusetsize, cpuset);
++}
++
++static inline int pthread_getaffinity_np(pthread_t thread, size_t cpusetsize,
++                                         cpu_set_t *cpuset) {
++  assert(pthread_equal(pthread_self(), thread));
++  return sched_getaffinity(0, cpusetsize, cpuset);
++}
++#endif
++
+ namespace oidn {
+ 
+ #if defined(_WIN32)

@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://zeronet.io/
 TERMUX_PKG_DESCRIPTION="Decentralized websites using Bitcoin crypto and BitTorrent network"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.7.1
 TERMUX_PKG_REVISION=8
 TERMUX_PKG_SRCURL=https://github.com/HelloZeroNet/ZeroNet/archive/v$TERMUX_PKG_VERSION.tar.gz

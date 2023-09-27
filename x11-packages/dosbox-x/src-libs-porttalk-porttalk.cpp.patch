@@ -1,0 +1,11 @@
+--- a/src/libs/porttalk/porttalk.cpp
++++ b/src/libs/porttalk/porttalk.cpp
+@@ -236,7 +236,7 @@
+ }
+ #endif
+ 
+-#ifdef LINUX
++#if defined LINUX && !defined __ANDROID__
+ # if defined(__i386__) || defined(__amd64__) || defined(__x86_64__)
+ // This Linux ioperm only works up to port 0x3FF
+ #include <sys/perm.h>

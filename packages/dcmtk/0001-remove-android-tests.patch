@@ -1,0 +1,122 @@
+diff --git a/CMake/GenerateDCMTKConfigure.cmake b/CMake/GenerateDCMTKConfigure.cmake
+index 11e49b269..23bc19f25 100644
+--- a/CMake/GenerateDCMTKConfigure.cmake
++++ b/CMake/GenerateDCMTKConfigure.cmake
+@@ -1425,9 +1425,6 @@ function(INSPECT_FUNDAMENTAL_ARITHMETIC_TYPES)
+         if(NOT RESULT)
+           message(STATUS "${OUTPUT}")
+           if(CMAKE_CROSSCOMPILING)
+-            if(ANDROID)
+-              DCMTK_ANDROID_PULL(DCMTK_ANDROID_EMULATOR_INSTANCE "${ARITH_H_FILE}" DESTINATION "${ARITH_H_DESTINATION}")
+-            endif()
+           endif()
+         else()
+           message(FATAL_ERROR "${OUTPUT}")
+diff --git a/CMake/dcmtkMacros.cmake b/CMake/dcmtkMacros.cmake
+index 6cbce0a91..5d39f22cb 100644
+--- a/CMake/dcmtkMacros.cmake
++++ b/CMake/dcmtkMacros.cmake
+@@ -11,8 +11,6 @@ function(DCMTK_ADD_TESTS MODULE)
+             if(WIN32)
+                 WINE_COMMAND(TEST_COMMAND "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${MODULE}_tests${CMAKE_EXECUTABLE_SUFFIX}")
+                 string(REPLACE "\\" "\\\\" TEST_COMMAND "${TEST_COMMAND}")
+-            elseif(ANDROID)
+-                set(TEST_COMMAND "${ANDROID_TEMPORARY_FILES_LOCATION}/${MODULE}_tests")
+             else()
+                 # not reachable, handled by not defining DCMTK_RUN_CTEST_SCRIPT
+             endif()
+diff --git a/CMake/dcmtkPrepare.cmake b/CMake/dcmtkPrepare.cmake
+index 2f83c5acb..ddbc59a0b 100644
+--- a/CMake/dcmtkPrepare.cmake
++++ b/CMake/dcmtkPrepare.cmake
+@@ -259,10 +259,6 @@ if(CMAKE_CROSSCOMPILING)
+   if(WIN32)
+     include("${DCMTK_CMAKE_INCLUDE}CMake/dcmtkUseWine.cmake")
+     DCMTK_SETUP_WINE()
+-  elseif(ANDROID)
+-    include("${DCMTK_CMAKE_INCLUDE}CMake/dcmtkUseAndroidSDK.cmake")
+-    # Ensure the configuration variables for the Android device emulator exist in the cache.
+-    DCMTK_SETUP_ANDROID_EMULATOR()
+   endif()
+ endif()
+ 
+@@ -279,10 +275,6 @@ include("${DCMTK_CMAKE_INCLUDE}CMake/dcmtkMacros.cmake")
+ 
+ if(CMAKE_CROSSCOMPILING)
+   unset(DCMTK_UNIT_TESTS_UNSUPPORTED_WARN_ONCE CACHE)
+-  if(ANDROID)
+-    unset(DCMTK_TRY_RUN_ANDROID_RUNTIME_INSTALLED CACHE)
+-    DCMTK_ANDROID_START_EMULATOR(DCMTK_ANDROID_EMULATOR_INSTANCE)
+-  endif()
+ endif()
+ 
+ #-----------------------------------------------------------------------------
+diff --git a/CMake/dcmtkTryRun.cmake b/CMake/dcmtkTryRun.cmake
+index 86f7bd8b2..93d5f1426 100644
+--- a/CMake/dcmtkTryRun.cmake
++++ b/CMake/dcmtkTryRun.cmake
+@@ -54,26 +54,6 @@ function(DCMTK_TRY_RUN_CROSS RUN_RESULT_VAR COMPILE_RESULT_VAR bindir srcfile)
+         if(WIN32)
+             WINE_COMMAND(CMD "${OUTPUT_EXECUTABLE}" ${DCMTK_TRY_RUN_ARGS})
+             WINE_DETACHED("${RUN_RESULT_VAR}" "${DCMTK_TRY_RUN_RUN_OUTPUT_VARIABLE}" "${DCMTK_TRY_RUN_RUN_OUTPUT_VARIABLE}" "${WINE_WINE_PROGRAM}" ${CMD})
+-        elseif(ANDROID)
+-            DCMTK_ANDROID_WAIT_FOR_EMULATOR(DCMTK_ANDROID_EMULATOR_INSTANCE)
+-            if(NOT DCMTK_TRY_RUN_ANDROID_RUNTIME_INSTALLED)
+-                DCMTK_ANDROID_FIND_RUNTIME_LIBRARIES(ANDROID_RUNTIME_LIBRARIES)
+-                set(ANDROID_RUNTIME_LIBRARIES ${ANDROID_RUNTIME_LIBRARIES} CACHE INTERNAL "")
+-                DCMTK_ANDROID_PUSH(DCMTK_ANDROID_EMULATOR_INSTANCE ${ANDROID_RUNTIME_LIBRARIES} DESTINATION "${ANDROID_TEMPORARY_FILES_LOCATION}")
+-                set(DCMTK_TRY_RUN_ANDROID_RUNTIME_INSTALLED TRUE CACHE INTERNAL "")
+-            endif()
+-            DCMTK_ANDROID_PUSH(DCMTK_ANDROID_EMULATOR_INSTANCE "${OUTPUT_EXECUTABLE}" DESTINATION "${ANDROID_TEMPORARY_FILES_LOCATION}/${OUTPUT_EXECUTABLE_NAME}")
+-            DCMTK_ANDROID_SHELL(DCMTK_ANDROID_EMULATOR_INSTANCE
+-                COMMAND chmod 755 "${ANDROID_TEMPORARY_FILES_LOCATION}/${OUTPUT_EXECUTABLE_NAME}"
+-                OUTPUT_QUIET
+-                ERROR_QUIET
+-            )
+-            DCMTK_ANDROID_SHELL(DCMTK_ANDROID_EMULATOR_INSTANCE
+-                COMMAND "LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:${ANDROID_TEMPORARY_FILES_LOCATION}" "${ANDROID_TEMPORARY_FILES_LOCATION}/${OUTPUT_EXECUTABLE_NAME}" ${DCMTK_TRY_RUN_ARGS}
+-                RESULT_VARIABLE "${RUN_RESULT_VAR}"
+-                OUTPUT_VARIABLE "${DCMTK_TRY_RUN_RUN_OUTPUT_VARIABLE}"
+-                ERROR_VARIABLE "${DCMTK_TRY_RUN_RUN_OUTPUT_VARIABLE}"
+-            )
+         else()
+             message(WARNING "Emulation for your target platform is not available, please fill in the required configure test results manually.")
+             try_run("${RUN_RESULT_VAR}" "${COMPILE_RESULT_VAR}" "${bindir}" "${srcfile}" ${ARGN})
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 9f8d268f3..de245c852 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -58,8 +58,6 @@ INSPECT_FUNDAMENTAL_ARITHMETIC_TYPES()
+ if(CMAKE_CROSSCOMPILING)
+   if(WIN32)
+     set(DCMTK_RUN_CTEST_SCRIPT "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/dcmtkCTestRunWine.cmake" CACHE INTERNAL "path to the CMake script for launching a unit test as a detached Wine process in the prepared wineprefix")
+-  elseif(ANDROID)
+-    set(DCMTK_RUN_CTEST_SCRIPT "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/dcmtkCTestRunAndroid.cmake" CACHE INTERNAL "path to the CMake script for launching a unit test via the android emulator")
+   else()
+     message(WARNING "Emulation for your target platform is not available, CTest will not be able to execute the unit tests!")
+   endif()
+@@ -121,24 +119,6 @@ if(CMAKE_CROSSCOMPILING)
+     configure_file("${DCMTK_SOURCE_DIR}/CMake/CTest/dcmtkCTestRunWine.cmake.in"
+       "${DCMTK_RUN_CTEST_SCRIPT}" ESCAPE_QUOTES @ONLY
+     )
+-  elseif(ANDROID)
+-    DCMTK_ANDROID_STOP_EMULATOR(DCMTK_ANDROID_EMULATOR_INSTANCE)
+-    # Prepare setting environment variable DCMDICTPATH
+-    set(DICTIONARIES ${DCMTK_DICOM_DICTIONARIES})
+-    list(GET DICTIONARIES 0 DCMDICTPATH)
+-    list(REMOVE_AT DICTIONARIES 0)
+-    get_filename_component(DCMDICTPATH "${DCMDICTPATH}" NAME)
+-    set(DCMDICTPATH "${ANDROID_TEMPORARY_FILES_LOCATION}/${DCMDICTPATH}")
+-    foreach(DICTIONARY ${DICTIONARIES})
+-        get_filename_component(FILE "${DICTIONARY}" NAME)
+-        set(DCMDICTPATH "${DCMDICTPATH}:${ANDROID_TEMPORARY_FILES_LOCATION}/${FILE}")
+-    endforeach()
+-    configure_file("${DCMTK_SOURCE_DIR}/CMake/CTest/CTestCustomAndroid.cmake.in"
+-      "${DCMTK_BINARY_DIR}/CTestCustom.cmake" ESCAPE_QUOTES @ONLY
+-    )
+-    configure_file("${DCMTK_SOURCE_DIR}/CMake/CTest/dcmtkCTestRunAndroid.cmake.in"
+-      "${DCMTK_RUN_CTEST_SCRIPT}" ESCAPE_QUOTES @ONLY
+-    )
+   else()
+     # Nothing to do
+   endif()

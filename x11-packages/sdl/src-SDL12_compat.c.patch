@@ -1,0 +1,14 @@
+--- a/src/SDL12_compat.c
++++ b/src/SDL12_compat.c
+@@ -1143,7 +1143,11 @@
+     }
+ #elif defined(__unix__)
+     #include <dlfcn.h>
++#ifdef __ANDROID__
++    #define SDL20_LIBNAME "libSDL2-2.0.so"
++#else
+     #define SDL20_LIBNAME "libSDL2-2.0.so.0"
++#endif
+     #define SDL20_REQUIRED_VER SDL_VERSIONNUM(2,0,7)
+     static void *Loaded_SDL20 = NULL;
+     #define LoadSDL20Library() ((Loaded_SDL20 = dlopen(SDL20_LIBNAME, RTLD_LOCAL|RTLD_NOW)) != NULL)

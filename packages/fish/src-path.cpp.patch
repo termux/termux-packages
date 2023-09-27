@@ -12,46 +12,48 @@ An example of this:-
 This can cause weird bugs when a script tries to execute with hardcoded paths, it might get errors about command not found even if it exists, because fish is checking it at the wrong place.
 
 This patch has been tested to fix the bug
---- ./src/path.cpp.orig	2021-12-08 12:51:35.296728931 +0530
-+++ ./src/path.cpp	2021-12-08 12:57:44.166728790 +0530
-@@ -38,10 +38,20 @@
+diff --git a/src/path.cpp b/src/path.cpp
+index d5a649e0e..ad4e84278 100644
+--- a/src/path.cpp
++++ b/src/path.cpp
+@@ -30,7 +30,7 @@
+ #include "wutil.h"  // IWYU pragma: keep
  
- static bool path_get_path_core(const wcstring &cmd, wcstring *out_path,
-                                const maybe_t<env_var_t> &bin_path_var) {
-+    // Map /bin and /usr/bin to @TERMUX_PREFIX@
+ // PREFIX is defined at build time.
+-static const wcstring_list_t kDefaultPath({L"/bin", L"/usr/bin", PREFIX L"/bin"});
++static const wcstring_list_t kDefaultPath({PREFIX L"/bin"});
+ 
+ static get_path_result_t path_get_path_core(const wcstring &cmd, const wcstring_list_t &pathsv) {
+     const get_path_result_t noent_res{ENOENT, wcstring{}};
+@@ -52,11 +52,19 @@ static get_path_result_t path_get_path_c
+         return noent_res;
+     }
+ 
 +    wcstring _cmd;
-+    
-+    if (string_prefixes_string(L"/bin", cmd)) {
-+      _cmd = L"@TERMUX_PREFIX@" + cmd;
-+    } else if (string_prefixes_string(L"/usr/bin", cmd)) {
-+      _cmd = L"@TERMUX_BASE_DIR@" + cmd;
++    if (string_prefixes_string(L"/bin/", cmd)) {
++        _cmd = L"@TERMUX_PREFIX@" + cmd;
++    } else if (string_prefixes_string(L"/usr/bin/", cmd)) {
++        _cmd = L"@TERMUX_BASE_DIR@" + cmd;
 +    } else {
-+      _cmd = cmd;
++        _cmd = cmd;
 +    }
      // If the command has a slash, it must be an absolute or relative path and thus we don't bother
      // looking for a matching command.
 -    if (cmd.find(L'/') != wcstring::npos) {
--        std::string narrow = wcs2string(cmd);
+-        int merr = test_path(cmd);
+-        return get_path_result_t{merr, cmd};
 +    if (_cmd.find(L'/') != wcstring::npos) {
-+        std::string narrow = wcs2string(_cmd);
-         if (access(narrow.c_str(), X_OK) != 0) {
-             return false;
-         }
-@@ -51,7 +61,7 @@
-             return false;
-         }
-         if (S_ISREG(buff.st_mode)) {
--            if (out_path) out_path->assign(cmd);
-+            if (out_path) out_path->assign(_cmd);
-             return true;
-         }
-         errno = EACCES;
-@@ -68,7 +78,7 @@
-     int err = ENOENT;
-     for (auto next_path : *pathsv) {
++        int merr = test_path(_cmd);
++        return get_path_result_t{merr, _cmd};
+     }
+ 
+     get_path_result_t best = noent_res;
+@@ -66,7 +74,7 @@ static get_path_result_t path_get_path_core(const wcstring &cmd, const wcstring_
+     for (const auto &next_path : pathsv) {
          if (next_path.empty()) continue;
--        append_path_component(next_path, cmd);
-+        append_path_component(next_path, _cmd);
-         std::string narrow = wcs2string(next_path);
-         if (access(narrow.c_str(), X_OK) == 0) {
-             struct stat buff;
+         proposed_path = next_path;
+-        append_path_component(proposed_path, cmd);
++        append_path_component(proposed_path, _cmd);
+         int merr = test_path(proposed_path);
+         if (merr == 0) {
+             // We found one.

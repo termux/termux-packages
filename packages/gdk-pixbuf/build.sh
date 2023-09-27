@@ -1,15 +1,26 @@
-TERMUX_PKG_HOMEPAGE=https://developer.gnome.org/gdk-pixbuf/
+TERMUX_PKG_HOMEPAGE=https://wiki.gnome.org/Projects/GdkPixbuf
 TERMUX_PKG_DESCRIPTION="Library for image loading and manipulation"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.42.6
-TERMUX_PKG_REVISION=3
-TERMUX_PKG_SRCURL=https://gitlab.gnome.org/GNOME/gdk-pixbuf/-/archive/${TERMUX_PKG_VERSION}/gdk-pixbuf-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=c4f3a84a04bc7c5f4fbd97dce7976ab648c60628f72ad4c7b79edce2bbdb494d
+_MAJOR_VERSION=2.42
+TERMUX_PKG_VERSION=${_MAJOR_VERSION}.10
+TERMUX_PKG_REVISION=2
+TERMUX_PKG_SRCURL=https://ftp.gnome.org/pub/GNOME/sources/gdk-pixbuf/${_MAJOR_VERSION}/gdk-pixbuf-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=ee9b6c75d13ba096907a2e3c6b27b61bcd17f5c7ebeab5a5b439d2f2e39fe44b
 TERMUX_PKG_DEPENDS="glib, libpng, libtiff, libjpeg-turbo, zstd"
+TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner"
 TERMUX_PKG_BREAKS="gdk-pixbuf-dev"
 TERMUX_PKG_REPLACES="gdk-pixbuf-dev"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-Dgio_sniffing=false"
+TERMUX_PKG_DISABLE_GIR=false
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-Dgtk_doc=false
+-Dintrospection=enabled
+-Dgio_sniffing=false
+"
+
+termux_step_pre_configure() {
+	termux_setup_gir
+}
 
 termux_step_create_debscripts() {
 	for i in postinst postrm triggers; do

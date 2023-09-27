@@ -1,0 +1,32 @@
+Origin: https://github.com/archlinux/svntogit-packages/blob/packages/ffmpeg/trunk/add-av_stream_get_first_dts-for-chromium.patch
+diff '--color=auto' -rupN ffmpeg.orig/libavformat/avformat.h ffmpeg/libavformat/avformat.h
+--- ffmpeg.orig/libavformat/avformat.h	2022-08-19 17:42:47.323422603 +0200
++++ ffmpeg/libavformat/avformat.h	2022-08-19 17:42:51.347130436 +0200
+@@ -1128,6 +1128,10 @@ struct AVCodecParserContext *av_stream_g
+  */
+ int64_t    av_stream_get_end_pts(const AVStream *st);
+ 
++// Chromium: We use the internal field first_dts vvv
++int64_t    av_stream_get_first_dts(const AVStream *st);
++// Chromium: We use the internal field first_dts ^^^
++
+ #define AV_PROGRAM_RUNNING 1
+ 
+ /**
+diff '--color=auto' -rupN ffmpeg.orig/libavformat/mux_utils.c ffmpeg/libavformat/mux_utils.c
+--- ffmpeg.orig/libavformat/mux_utils.c	2022-08-19 17:42:47.346758108 +0200
++++ ffmpeg/libavformat/mux_utils.c	2022-08-19 17:47:28.549589002 +0200
+@@ -37,6 +37,13 @@ int64_t av_stream_get_end_pts(const AVSt
+         return AV_NOPTS_VALUE;
+ }
+ 
++// Chromium: We use the internal field first_dts vvv
++int64_t av_stream_get_first_dts(const AVStream *st)
++{
++  return cffstream(st)->first_dts;
++}
++// Chromium: We use the internal field first_dts ^^^
++
+ int avformat_query_codec(const AVOutputFormat *ofmt, enum AVCodecID codec_id,
+                          int std_compliance)
+ {

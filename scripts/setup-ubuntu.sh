@@ -20,6 +20,10 @@ PACKAGES+=" git"
 PACKAGES+=" lzip"
 PACKAGES+=" tar"
 PACKAGES+=" unzip"
+PACKAGES+=" lrzip"
+PACKAGES+=" lzop"
+PACKAGES+=" lz4"
+PACKAGES+=" zstd"
 
 # Used by common build systems.
 PACKAGES+=" autoconf"
@@ -50,6 +54,8 @@ PACKAGES+=" pandoc"
 PACKAGES+=" python3-docutils"
 PACKAGES+=" python3-recommonmark"
 PACKAGES+=" python3-sphinx"
+PACKAGES+=" python3-sphinx-rtd-theme"
+PACKAGES+=" python3-sphinxcontrib.qthelp"
 PACKAGES+=" scdoc"
 PACKAGES+=" texinfo"
 PACKAGES+=" xmlto"
@@ -58,11 +64,18 @@ PACKAGES+=" xmltoman"
 # Needed by python modules (e.g. asciinema) and some build systems.
 PACKAGES+=" python3.9"
 PACKAGES+=" python3.10"
+PACKAGES+=" python3.11"
 PACKAGES+=" python3-pip"
 PACKAGES+=" python3-setuptools"
+PACKAGES+=" python-wheel-common"
+PACKAGES+=" python3.10-venv"
+PACKAGES+=" python3.11-venv"
 
 # Needed by package bc.
 PACKAGES+=" ed"
+
+# Needed by gnunet.
+PACKAGES+=" recutils"
 
 # Provides utility hexdump which is needed by package bitcoin.
 PACKAGES+=" bsdmainutils"
@@ -73,42 +86,70 @@ PACKAGES+=" valac"
 # Needed by package libgcrypt.
 PACKAGES+=" fig2dev"
 
+# Needed by package gimp.
+PACKAGES+=" gegl"
+
 # Needed by package libidn2.
 PACKAGES+=" gengetopt"
 
-# Needed by package proxmark3-git.
-PACKAGES+=" swig"
-
 # Needed by package dbus-glib.
 PACKAGES+=" libdbus-1-dev"
+
+# Needed by package below.
+PACKAGES+=" clang-15"
+PACKAGES+=" libelf-dev"
 
 # Needed by package ghostscript.
 PACKAGES+=" libexpat1-dev"
 PACKAGES+=" libjpeg-dev"
 
-# Needed by package luarocks.
+# Needed by package gimp3.
+PACKAGES+=" librsvg2-dev"
+
+# Needed by package news-flash-gtk.
+PACKAGES+=" libsqlite3-dev"
+
+# Needed by package fennel.
 PACKAGES+=" lua5.3"
+
+# Needed by package vlc.
+PACKAGES+=" lua5.2"
+
+# Needed by package luarocks.
+PACKAGES+=" lua5.1"
 
 # Used bt host build of package mariadb.
 PACKAGES+=" libncurses5-dev"
 
-# Needed by packages mkvtoolnix and ruby.
+# Needed to build neovim >= 8.0.0
+PACKAGES+=" lua-lpeg"
+PACKAGES+=" lua-mpack"
+
+# Needed by host build of package ruby.
+PACKAGES+=" libyaml-dev"
+
+# Needed by package mkvtoolnix.
 PACKAGES+=" ruby"
 
 # Needed by host build of package nodejs.
 PACKAGES+=" libc-ares-dev"
+PACKAGES+=" libc-ares-dev:i386"
 PACKAGES+=" libicu-dev"
+PACKAGES+=" libicu-dev:i386"
 
 # Needed by php.
 PACKAGES+=" re2c"
 
 # Needed by composer.
 PACKAGES+=" php"
+PACKAGES+=" php-xml"
 PACKAGES+=" composer"
 
 # Needed by package rust.
 PACKAGES+=" libssl-dev" # Needed to build Rust
-PACKAGES+=" clang-10"
+PACKAGES+=" llvm-14-dev"
+PACKAGES+=" llvm-14-tools"
+PACKAGES+=" clang-14"
 
 # Needed for package smalltalk.
 PACKAGES+=" libsigsegv-dev"
@@ -129,11 +170,11 @@ PACKAGES+=" lld"
 # Needed by wrk.
 PACKAGES+=" luajit"
 
-# Needed by libduktape (2.5.0 still uses python2 unfortunately)
-PACKAGES+=" python-yaml"
+# Needed by libduktape
+PACKAGES+=" bc"
 
 # Java.
-PACKAGES+=" openjdk-8-jdk openjdk-16-jdk"
+PACKAGES+=" openjdk-8-jdk openjdk-18-jdk"
 
 # needed by ovmf
 PACKAGES+=" libarchive-tools"
@@ -146,6 +187,10 @@ PACKAGES+=" rsync"
 
 # Needed by megacmd
 PACKAGES+=" wget"
+
+# Needed by codeblocks
+PACKAGES+=" libwxgtk3.0-gtk3-dev"
+PACKAGES+=" libgtk-3-dev"
 
 # Needed by packages in unstable repository.
 PACKAGES+=" comerr-dev"
@@ -161,8 +206,6 @@ PACKAGES+=" libjansson-dev"
 PACKAGES+=" libparse-yapp-perl"
 PACKAGES+=" libreadline-dev"
 PACKAGES+=" libunistring-dev"
-PACKAGES+=" llvm-10-dev"
-PACKAGES+=" llvm-10-tools"
 
 # Needed by packages in X11 repository.
 PACKAGES+=" alex"
@@ -180,10 +223,12 @@ PACKAGES+=" python-setuptools"
 PACKAGES+=" python3-xcbgen"
 PACKAGES+=" sassc"
 PACKAGES+=" texlive-extra-utils"
+PACKAGES+=" unifdef"
 PACKAGES+=" wayland-scanner++"
 PACKAGES+=" xfce4-dev-tools"
 PACKAGES+=" xfonts-utils"
 PACKAGES+=" xutils-dev"
+PACKAGES+=" desktop-file-utils"
 
 # Needed by packages in science repository
 PACKAGES+=" protobuf-c-compiler"
@@ -193,14 +238,65 @@ PACKAGES+=" sqlite3"
 PACKAGES+=" cvs"
 PACKAGES+=" python3-yaml"
 
+# Needed by gobject-introspection (termux_setup_gir).
+PACKAGES+=" bash-static"
+
 # Needed by apt.
 PACKAGES+=" triehash"
 
 # Needed by aspell dictionaries.
 PACKAGES+=" aspell"
 
+# Needed by package gdb.
+PACKAGES+=" guile-3.0-dev"
+
 # Needed by package kphp.
 PACKAGES+=" python3-jsonschema"
+
+# Needed by package lilypond.
+PACKAGES+=" fontforge-nox"
+PACKAGES+=" guile-3.0"
+PACKAGES+=" python3-fontforge"
+PACKAGES+=" texlive-metapost"
+
+# Needed by package motif.
+PACKAGES+=" libfl-dev"
+PACKAGES+=" libxft-dev"
+PACKAGES+=" libxt-dev"
+PACKAGES+=" xbitmaps"
+
+# Needed by proxmark3/proxmark3-git
+PACKAGES+=" gcc-arm-none-eabi"
+
+# Needed by pypy
+PACKAGES+=" qemu-user-static"
+
+# Required by cava
+PACKAGES+=" xxd"
+
+# Required by samba
+PACKAGES+=" libjson-perl"
+
+# Required for parsing repo.json
+PACKAGES+=" jq"
+
+# Required by txikijs's hostbuild step
+PACKAGES+=" libcurl4-openssl-dev"
+
+# Required by openjdk-17
+PACKAGES+=" openjdk-17-jre openjdk-17-jdk"
+
+# Required by qt5-qtwebengine
+PACKAGES+=" libnss3 libnss3:i386 libnss3-dev"
+PACKAGES+=" libwebp7 libwebp7:i386 libwebp-dev"
+PACKAGES+=" libwebpdemux2 libwebpdemux2:i386"
+PACKAGES+=" libwebpmux3 libwebpmux3:i386"
+
+# Required by CGCT
+PACKAGES+=" libdebuginfod-dev"
+
+# Needed to set up CGCT and also to set up other packages
+PACKAGES+=" patchelf"
 
 # Do not require sudo if already running as root.
 if [ "$(id -u)" = "0" ]; then
@@ -211,34 +307,18 @@ fi
 
 # Allow 32-bit packages.
 $SUDO dpkg --add-architecture i386
+# Add ppa repo to be able to get openjdk-17 on ubuntu 22.04
+$SUDO cp $(dirname "$(realpath "$0")")/openjdk-r-ppa.gpg /etc/apt/trusted.gpg.d/
+echo "deb https://ppa.launchpadcontent.net/openjdk-r/ppa/ubuntu/ jammy main" | $SUDO tee /etc/apt/sources.list.d/openjdk-r-ubuntu-ppa-jammy.list > /dev/null
 $SUDO apt-get -yq update
-
-# Newer Python versions for host builds
-if dpkg --compare-versions $(lsb_release -rs) lt 21.04; then
-	$SUDO add-apt-repository -y ppa:deadsnakes/ppa
-	INSTALL_NEW_PIP3=true
-	PACKAGES+=" python3.10-distutils"
-else
-	INSTALL_NEW_PIP3=false
-fi
 
 $SUDO env DEBIAN_FRONTEND=noninteractive \
 	apt-get install -yq --no-install-recommends $PACKAGES
-
-if $INSTALL_NEW_PIP3; then
-	curl -L --output /tmp/get-pip.py https://bootstrap.pypa.io/pip/get-pip.py
-	$SUDO python3.10 /tmp/get-pip.py
-	rm -f /tmp/get-pip.py
-fi
 
 # Pip for python2.
 curl -L --output /tmp/py2-get-pip.py https://bootstrap.pypa.io/pip/2.7/get-pip.py
 $SUDO python2 /tmp/py2-get-pip.py
 rm -f /tmp/py2-get-pip.py
-
-# Install Nodejs. Needed by Gitea.
-curl -fsSL https://deb.nodesource.com/setup_lts.x | $SUDO bash -
-$SUDO apt install -y nodejs
 
 $SUDO locale-gen --purge en_US.UTF-8
 echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US:en"\n' | $SUDO tee -a /etc/default/locale

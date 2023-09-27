@@ -1,0 +1,318 @@
+--- a/scripts/xdg-desktop-menu.in
++++ b/scripts/xdg-desktop-menu.in
+@@ -32,7 +32,7 @@
+ {
+ #    echo Update desktop database: $mode
+     if [ "$mode" = "system" ] ; then
+-        for x in `echo $PATH | sed 's/:/ /g'` /opt/gnome/bin; do
++        for x in `echo $PATH | sed 's/:/ /g'` @TERMUX_PREFIX@/opt/gnome/bin; do
+            if [ -x $x/update-desktop-database ] ; then
+               DEBUG 1 "Running $x/update-desktop-database"
+               eval '$x/update-desktop-database'$xdg_redirect_output
+@@ -67,7 +67,7 @@
+ 
+     for MIME in $mimetypes ; do
+         xdg_default_dirs="$XDG_DATA_DIRS"
+-        [ -n "$xdg_default_dirs" ] || xdg_default_dirs=/usr/local/share/:/usr/share/
++        [ -n "$xdg_default_dirs" ] || xdg_default_dirs=@TERMUX_PREFIX@/local/share/:@TERMUX_PREFIX@/share/
+         if [ x"$mode" = x"user" ] ; then
+             xdg_user_dir="$XDG_DATA_HOME"
+             [ -n "$xdg_user_dir" ] || xdg_user_dir="$HOME/.local/share"
+@@ -110,7 +110,7 @@
+     xdg_user_dir="$xdg_user_dir/$xdg_dir_name"
+ 
+     xdg_system_dirs="$XDG_CONFIG_DIRS"
+-    [ -n "$xdg_system_dirs" ] || xdg_system_dirs=/etc/xdg
++    [ -n "$xdg_system_dirs" ] || xdg_system_dirs=@TERMUX_PREFIX@/etc/xdg
+     xdg_global_dir=
+     for x in `echo $xdg_system_dirs | sed 's/:/ /g'` ; do
+         if [ -w $x/$xdg_dir_name ] ; then
+@@ -158,7 +158,7 @@
+         return
+     fi
+ 
+-    if [ $action = "install" ] && [ -f "/etc/xdg/menus/gnome-applications.menu" ] ; then
++    if [ $action = "install" ] && [ -f "@TERMUX_PREFIX@/etc/xdg/menus/gnome-applications.menu" ] ; then
+         # Work around for Debian Gnome
+         gnome_xdg_dir=`echo "$xdg_dir" | sed -e 's^/applications-merged^/gnome-applications-merged^'`
+         if [ ! -e "$gnome_xdg_dir" ] ; then
+@@ -167,7 +167,7 @@
+             eval 'ln -s "applications-merged" "$gnome_xdg_dir"'$xdg_redirect_output
+         fi
+     fi
+-    if [ $action = "install" ] && [ -f "/etc/mandrake-release" ] ; then
++    if [ $action = "install" ] && [ -f "@TERMUX_PREFIX@/etc/mandrake-release" ] ; then
+         # Work around for Mandriva 2006
+         mandrake_xdg_dir=`echo "$xdg_dir" | sed -e 's^/applications-merged^/applications-mdk-merged^'`
+         if [ ! -e "$mandrake_xdg_dir" ] ; then
+@@ -176,7 +176,7 @@
+             eval 'ln -s "applications-merged" "$mandrake_xdg_dir"'$xdg_redirect_output
+         fi
+     fi
+-    if [ $action = "install" -a x"$mode" = x"user" ] && [ -d "/etc/xdg/menus/kde-applications-merged" ] ; then
++    if [ $action = "install" -a x"$mode" = x"user" ] && [ -d "@TERMUX_PREFIX@/etc/xdg/menus/kde-applications-merged" ] ; then
+         # Work around for Fedora Core 5 + patched KDE
+         kde_xdg_dir=`echo "$xdg_dir" | sed -e 's^/applications-merged^/kde-applications-merged^'`
+         if [ ! -e "$kde_xdg_dir" ] ; then
+@@ -185,7 +185,7 @@
+             eval 'ln -s "applications-merged" "$kde_xdg_dir"'$xdg_redirect_output
+         fi
+     fi
+-    if [ $action = "install" -a x"$mode" = x"system" ] && [ -d "/etc/xdg/menus/kde-applications-merged" ] && [ ! -d "/etc/xdg/menus/applications-merged" ] ; then
++    if [ $action = "install" -a x"$mode" = x"system" ] && [ -d "@TERMUX_PREFIX@/etc/xdg/menus/kde-applications-merged" ] && [ ! -d "@TERMUX_PREFIX@/etc/xdg/menus/applications-merged" ] ; then
+         # Work around for Kubuntu 6.06
+         kde_xdg_dir=`echo "$xdg_dir" | sed -e 's^/applications-merged^/kde-applications-merged^'`
+         DEBUG 1 "Kubuntu Workaround: Link '$xdg_dir' to 'kde-applications-merged'"
+@@ -196,7 +196,7 @@
+ 
+     DEBUG 1 "Updating $orig_menu_file ($action)"
+ 
+-    test "${TMPDIR+set}" = set || TMPDIR=/tmp
++    test "${TMPDIR+set}" = set || TMPDIR=@TERMUX_PREFIX@/tmp
+     tmpfile=`mktemp $TMPDIR/tmp.XXXXXXXXXX`
+     orig_desktop_files=
+     if [ -r "$orig_menu_file" ] ; then
+@@ -246,7 +246,7 @@
+ 
+     if [ -n "$new_desktop_files" ] ; then
+         # Install/update
+-        test "${TMPDIR+set}" = set || TMPDIR=/tmp
++        test "${TMPDIR+set}" = set || TMPDIR=@TERMUX_PREFIX@/tmp
+         tmpfile=`mktemp $TMPDIR/tmp.XXXXXXXXXX`
+         (
+             echo '<!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"'
+@@ -292,7 +292,7 @@
+ 
+     # Uninstall .directory files only if no longer referenced
+     if [ $action = "uninstall" ] ; then
+-        test "${TMPDIR+set}" = set || TMPDIR=/tmp
++        test "${TMPDIR+set}" = set || TMPDIR=@TERMUX_PREFIX@/tmp
+         tmpfile=`mktemp $TMPDIR/tmp.XXXXXXXXXX`
+         for menu_file in $xdg_dir/*; do
+             if grep 'generated and managed by @NAME@' "$menu_file" > /dev/null 2> /dev/null; then
+@@ -475,7 +475,7 @@
+ xdg_user_dir="$xdg_user_dir/$xdg_dir_name"
+ 
+ xdg_system_dirs="$XDG_DATA_DIRS"
+-[ -n "$xdg_system_dirs" ] || xdg_system_dirs=/usr/local/share/:/usr/share/
++[ -n "$xdg_system_dirs" ] || xdg_system_dirs=@TERMUX_PREFIX@/local/share/:@TERMUX_PREFIX@/share/
+ xdg_global_dir=
+ for x in `echo $xdg_system_dirs | sed 's/:/ /g'` ; do
+     if [ -w $x/$xdg_dir_name ] ; then
+@@ -542,7 +542,7 @@
+ xdg_user_dir="$xdg_user_dir/$xdg_dir_name"
+ 
+ xdg_system_dirs="$XDG_DATA_DIRS"
+-[ -n "$xdg_system_dirs" ] || xdg_system_dirs=/usr/local/share/:/usr/share/
++[ -n "$xdg_system_dirs" ] || xdg_system_dirs=@TERMUX_PREFIX@/local/share/:@TERMUX_PREFIX@/share/
+ xdg_global_dir=
+ for x in `echo $xdg_system_dirs | sed 's/:/ /g'` ; do
+     if [ -w $x/$xdg_dir_name ] ; then
+@@ -556,7 +556,7 @@
+ [ -w $kde_global_dir ] || kde_global_dir=
+ 
+ gnome_user_dir="$HOME/.gnome/apps"
+-gnome_global_dir="/usr/share/gnome/apps"
++gnome_global_dir="@TERMUX_PREFIX@/share/gnome/apps"
+ [ -w $gnome_global_dir ] || gnome_global_dir=
+ 
+ DEBUG 3 "Install locations for *.desktop files:"
+--- a/scripts/xdg-icon-resource.in
++++ b/scripts/xdg-icon-resource.in
+@@ -37,7 +37,7 @@
+     [ -n "$GTK_UPDATE_ICON_CACHE" ] && return;
+ 
+     GTK_UPDATE_ICON_CACHE="-"
+-    for x in `echo "$PATH:/opt/gnome/bin" | sed 's/:/ /g'`; do
++    for x in `echo "$PATH:@TERMUX_PREFIX@/opt/gnome/bin" | sed 's/:/ /g'`; do
+         DEBUG 3 "Checking $x for gtk-update-icon-cache"
+         if [ -x "$x/gtk-update-icon-cache" ] ; then
+             DEBUG 1 "Found $x/gtk-update-icon-cache"
+@@ -222,7 +222,7 @@
+ xdg_global_dir=
+ xdg_global_prefix=
+ xdg_system_dirs="$XDG_DATA_DIRS"
+-[ -n "$xdg_system_dirs" ] || xdg_system_dirs="/usr/local/share/:/usr/share/"
++[ -n "$xdg_system_dirs" ] || xdg_system_dirs="@TERMUX_PREFIX@/local/share/:@TERMUX_PREFIX@/share/"
+ for x in `echo "$xdg_system_dirs" | sed 's/:/ /g'`; do
+    if [ -w "$x/$xdg_dir_name" ] ; then
+       xdg_global_prefix="$x/icons"
+--- a/scripts/xdg-mime.in
++++ b/scripts/xdg-mime.in
+@@ -39,7 +39,7 @@
+          eval 'kbuildsycoca${KDE_SESSION_VERSION}'$xdg_redirect_output
+       fi
+    fi
+-   for x in `echo "$PATH:/opt/gnome/bin" | sed 's/:/ /g'`; do
++   for x in `echo "$PATH:@TERMUX_PREFIX@/opt/gnome/bin" | sed 's/:/ /g'`; do
+       if [ -x $x/update-mime-database ] ; then
+          DEBUG 1 "Running $x/update-mime-database $1"
+          eval '$x/update-mime-database $1'$xdg_redirect_output
+@@ -100,7 +100,7 @@
+         mimetype --brief --dereference "$1"
+     else
+         DEBUG 1 "Running file --brief --dereference --mime-type \"$1\""
+-        /usr/bin/file --brief --dereference --mime-type "$1" 2> /dev/null
++        @TERMUX_PREFIX@/bin/file --brief --dereference --mime-type "$1" 2> /dev/null
+     fi
+ 
+     if [ $? -eq 0 ]; then
+@@ -318,7 +318,7 @@
+     [ -n "$xdg_user_dir" ] || xdg_user_dir="$HOME/.local/share"
+ 
+     xdg_system_dirs="$XDG_DATA_DIRS"
+-    [ -n "$xdg_system_dirs" ] || xdg_system_dirs=/usr/local/share/:/usr/share/
++    [ -n "$xdg_system_dirs" ] || xdg_system_dirs=@TERMUX_PREFIX@/local/share/:@TERMUX_PREFIX@/share/
+ 
+     preference=-1
+     desktop_file=""
+@@ -397,11 +397,11 @@
+     xdg_config_home="$XDG_CONFIG_HOME"
+     [ -n "$xdg_config_home" ] || xdg_config_home="$HOME/.config"
+     xdg_config_dirs="$XDG_CONFIG_DIRS"
+-    [ -n "$xdg_config_dirs" ] || xdg_config_dirs="/etc/xdg"
++    [ -n "$xdg_config_dirs" ] || xdg_config_dirs="@TERMUX_PREFIX@/etc/xdg"
+     xdg_user_dir="$XDG_DATA_HOME"
+     [ -n "$xdg_user_dir" ] || xdg_user_dir="$HOME/.local/share"
+     xdg_system_dirs="$XDG_DATA_DIRS"
+-    [ -n "$xdg_system_dirs" ] || xdg_system_dirs=/usr/local/share/:/usr/share/
++    [ -n "$xdg_system_dirs" ] || xdg_system_dirs=@TERMUX_PREFIX@/local/share/:@TERMUX_PREFIX@/share/
+ 
+     local oldifs="$IFS" dir
+ 
+@@ -584,7 +584,7 @@
+     detectDE
+ 
+     if [ x"$DE" = x"" ]; then
+-        if [ -x /usr/bin/file ]; then
++        if [ -x @TERMUX_PREFIX@/bin/file ]; then
+             DE=generic
+         fi
+     fi
+@@ -702,7 +702,7 @@
+ xdg_user_dir="$xdg_user_dir/$xdg_dir_name"
+ 
+ xdg_system_dirs="$XDG_DATA_DIRS"
+-[ -n "$xdg_system_dirs" ] || xdg_system_dirs=/usr/local/share/:/usr/share/
++[ -n "$xdg_system_dirs" ] || xdg_system_dirs=@TERMUX_PREFIX@/local/share/:@TERMUX_PREFIX@/share/
+ for x in `echo $xdg_system_dirs | sed 's/:/ /g'`; do
+     if [ -w $x/$xdg_dir_name ] ; then
+         [ x"$mode" = x"system" ] && xdg_base_dir="$x/mime"
+@@ -734,7 +734,7 @@
+ # TODO: Gnome legacy support
+ # See http://forums.fedoraforum.org/showthread.php?t=26875
+ gnome_user_dir="$HOME/.gnome/apps"
+-gnome_global_dir=/usr/share/gnome/apps
++gnome_global_dir=@TERMUX_PREFIX@/share/gnome/apps
+ [ -w $gnome_global_dir ] || gnome_global_dir=
+ DEBUG 3 "gnome_user_dir: $gnome_user_dir"
+ DEBUG 3 "gnome_global_dir: $gnome_global_dir"
+--- a/scripts/xdg-open.in
++++ b/scripts/xdg-open.in
+@@ -89,8 +89,8 @@
+         file=${file%%#*}
+         file=$(echo "$file" | sed -r 's/\?.*$//')
+         local printf=printf
+-        if [ -x /usr/bin/printf ]; then
+-            printf=/usr/bin/printf
++        if [ -x @TERMUX_PREFIX@/bin/printf ]; then
++            printf=@TERMUX_PREFIX@/bin/printf
+         fi
+         file=$($printf "$(echo "$file" | sed -e 's@%\([a-f0-9A-F]\{2\}\)@\\x\1@g')")
+     fi
+@@ -342,7 +342,7 @@
+         [ -n "$xdg_user_dir" ] || xdg_user_dir="$HOME/.local/share"
+ 
+         xdg_system_dirs="$XDG_DATA_DIRS"
+-        [ -n "$xdg_system_dirs" ] || xdg_system_dirs=/usr/local/share/:/usr/share/
++        [ -n "$xdg_system_dirs" ] || xdg_system_dirs=@TERMUX_PREFIX@/local/share/:@TERMUX_PREFIX@/share/
+ 
+ DEBUG 3 "$xdg_user_dir:$xdg_system_dirs"
+         for x in `echo "$xdg_user_dir:$xdg_system_dirs" | sed 's/:/ /g'`; do
+--- a/scripts/xdg-screensaver.in
++++ b/scripts/xdg-screensaver.in
+@@ -31,7 +31,7 @@
+    # We can securely move files in /tmp with mv -T
+    DEBUG 1 "mv -T available"
+    MV="mv -T"
+-   screensaver_file="/tmp/xdg-screensaver-$USER-"`echo $DISPLAY | sed 's/:/-/g'`
++   screensaver_file="@TERMUX_PREFIX@/tmp/xdg-screensaver-$USER-"`echo $DISPLAY | sed 's/:/-/g'`
+ else
+    # No secure moves available, use home dir
+    DEBUG 1 "mv -T not available"
+@@ -126,7 +126,7 @@
+   if [ -n "$DISPLAY" -a "$1" = "suspend" ] ; then
+       # Save DPMS state
+       if xset -q | grep 'DPMS is Enabled' > /dev/null 2> /dev/null; then
+-          test "${TMPDIR+set}" = set || TMPDIR=/tmp
++          test "${TMPDIR+set}" = set || TMPDIR=@TERMUX_PREFIX@/tmp
+           tmpfile=`mktemp $TMPDIR/tmp.XXXXXXXXXX`
+           $MV "$tmpfile" "$screensaver_file.dpms"
+           # Disable DPMS
+@@ -139,7 +139,7 @@
+ cleanup_suspend()
+ {
+   lockfile
+-  test "${TMPDIR+set}" = set || TMPDIR=/tmp
++  test "${TMPDIR+set}" = set || TMPDIR=@TERMUX_PREFIX@/tmp
+   tmpfile=`mktemp $TMPDIR/tmp.XXXXXXXXXX`
+   grep -v "$window_id:$xprop_pid\$" "$screensaver_file" > "$tmpfile" 2> /dev/null
+   $MV "$tmpfile" "$screensaver_file"
+@@ -191,7 +191,7 @@
+   fi
+   lockfile
+ 
+-  test "${TMPDIR+set}" = set || TMPDIR=/tmp
++  test "${TMPDIR+set}" = set || TMPDIR=@TERMUX_PREFIX@/tmp
+   tmpfile=`mktemp $TMPDIR/tmp.XXXXXXXXXX`
+   # Filter stale entries from the xdg-screensaver status file
+   # Return if $window_id is being tracked already
+@@ -435,7 +435,7 @@
+ screensaver_suspend_loop()
+ {
+   lockfile
+-  test "${TMPDIR+set}" = set || TMPDIR=/tmp
++  test "${TMPDIR+set}" = set || TMPDIR=@TERMUX_PREFIX@/tmp
+   tmpfile=`mktemp $TMPDIR/tmp.XXXXXXXXXX`
+   # Filter stale entries from the xdg-screensaver status file
+   cat "$screensaver_file" 2> /dev/null | (
+--- a/scripts/xdg-settings.in
++++ b/scripts/xdg-settings.in
+@@ -374,7 +374,7 @@
+ 
+ get_browser_xfce()
+ {
+-    search="${XDG_CONFIG_HOME:-$HOME/.config}:${XDG_CONFIG_DIRS:-/etc/xdg}"
++    search="${XDG_CONFIG_HOME:-$HOME/.config}:${XDG_CONFIG_DIRS:-@TERMUX_PREFIX@/etc/xdg}"
+     IFS=:
+     for dir in $search; do
+         unset IFS
+@@ -407,7 +407,7 @@
+     # "Type" must be "X-XFCE-Helper"
+     # "X-XFCE-Category" must be "WebBrowser" (for web browsers, anyway)
+     # "X-XFCE-Commands" and "X-XFCE-CommandsWithParameter" must be set
+-    search="${XDG_DATA_HOME:-$HOME/.local/share}:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
++    search="${XDG_DATA_HOME:-$HOME/.local/share}:${XDG_DATA_DIRS:-@TERMUX_PREFIX@/local/share:@TERMUX_PREFIX@/share}"
+     IFS=:
+     for dir in $search; do
+         unset IFS
+--- a/scripts/xdg-utils-common.in
++++ b/scripts/xdg-utils-common.in
+@@ -22,7 +22,7 @@
+ # map a binary to a .desktop file
+ binary_to_desktop_file()
+ {
+-    search="${XDG_DATA_HOME:-$HOME/.local/share}:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
++    search="${XDG_DATA_HOME:-$HOME/.local/share}:${XDG_DATA_DIRS:-@TERMUX_PREFIX@/local/share:@TERMUX_PREFIX@/share}"
+     binary="`which "$1"`"
+     binary="`readlink -f "$binary"`"
+     base="`basename "$binary"`"
+@@ -52,7 +52,7 @@
+ # map a .desktop file to a binary
+ desktop_file_to_binary()
+ {
+-    search="${XDG_DATA_HOME:-$HOME/.local/share}:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
++    search="${XDG_DATA_HOME:-$HOME/.local/share}:${XDG_DATA_DIRS:-@TERMUX_PREFIX@/local/share:@TERMUX_PREFIX@/share}"
+     desktop="`basename "$1"`"
+     IFS=:
+     for dir in $search; do

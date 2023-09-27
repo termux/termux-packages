@@ -2,21 +2,20 @@ TERMUX_PKG_HOMEPAGE=https://mariadb.org
 TERMUX_PKG_DESCRIPTION="A drop-in replacement for mysql server"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2:10.6.4
-TERMUX_PKG_REVISION=6
-TERMUX_PKG_SRCURL=http://ftp.hosteurope.de/mirror/archive.mariadb.org/mariadb-${TERMUX_PKG_VERSION:2}/source/mariadb-${TERMUX_PKG_VERSION:2}.tar.gz
-TERMUX_PKG_SHA256=75bf9b147a95d38160d01a73b098d50a1960563b46d16a235971fff64d99643c
-TERMUX_PKG_DEPENDS="libc++, libiconv, liblzma, ncurses, libedit, openssl, pcre2, libcrypt, libandroid-support, libandroid-glob, zlib, liblz4"
+TERMUX_PKG_VERSION=2:10.11.4
+TERMUX_PKG_SRCURL=https://mirror.netcologne.de/mariadb/mariadb-${TERMUX_PKG_VERSION#*:}/source/mariadb-${TERMUX_PKG_VERSION#*:}.tar.gz
+TERMUX_PKG_SHA256=ce8dac125568cc5f40da74c17212767c92d8faed81066580b526a485a591127d
+TERMUX_PKG_DEPENDS="libandroid-support, libc++, libcrypt, libedit, liblz4, liblzma, ncurses, openssl, pcre2, zlib"
 TERMUX_PKG_BREAKS="mariadb-dev"
 TERMUX_PKG_REPLACES="mariadb-dev"
 TERMUX_PKG_SERVICE_SCRIPT=("mysqld" "exec mysqld --basedir=$TERMUX_PREFIX --datadir=$TERMUX_PREFIX/var/lib/mysql 2>&1")
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
--DBISON_EXECUTABLE=$(which bison)
--DGETCONF=$(which getconf)
+-DBISON_EXECUTABLE=$(command -v bison)
+-DGETCONF=$(command -v getconf)
 -DBUILD_CONFIG=mysql_release
--DCAT_EXECUTABLE=$(which cat)
--DGIT_EXECUTABLE=$(which git)
+-DCAT_EXECUTABLE=$(command -v cat)
+-DGIT_EXECUTABLE=$(command -v git)
 -DGSSAPI_FOUND=NO
 -DGRN_WITH_LZ4=yes
 -DENABLED_LOCAL_INFILE=ON
@@ -56,6 +55,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DINSTALL_SYSCONFDIR=$TERMUX_PREFIX/etc
 "
 TERMUX_PKG_HOSTBUILD=true
+TERMUX_CMAKE_BUILD="Unix Makefiles"
 TERMUX_PKG_CONFLICTS="mysql"
 
 TERMUX_PKG_RM_AFTER_INSTALL="
@@ -65,11 +65,6 @@ share/mysql/mysql-test
 mysql-test
 sql-bench
 "
-
-# i686 build fails due to:
-#  /home/builder/.termux-build/mariadb/src/include/my_pthread.h:822:10: error: use of undeclared identifier 'my_atomic_add32'
-#    (void) my_atomic_add32_explicit(value, 1, MY_MEMORY_ORDER_RELAXED);
-TERMUX_PKG_BLACKLISTED_ARCHES="i686"
 
 termux_step_host_build() {
 	termux_setup_cmake
@@ -94,11 +89,9 @@ termux_step_pre_configure() {
 		CPPFLAGS+=" -D__off64_t_defined"
 	fi
 
-	if [ $TERMUX_ARCH = "i686" ]; then
-		# Avoid undefined reference to __atomic_load_8:
-		CFLAGS+=" -latomic"
-	fi
 	sed -i 's/^\s*END[(][)]/ENDIF()/g' $TERMUX_PKG_SRCDIR/libmariadb/cmake/ConnectorName.cmake
+
+	export PATH=$TERMUX_PKG_HOSTBUILD_DIR/strings:$PATH
 }
 
 termux_step_post_massage() {
@@ -109,7 +102,7 @@ termux_step_create_debscripts() {
 	echo "if [ ! -e "$TERMUX_PREFIX/var/lib/mysql" ]; then" > postinst
 	echo "  echo 'Initializing mysql data directory...'" >> postinst
 	echo "  mkdir -p $TERMUX_PREFIX/var/lib/mysql" >> postinst
-	echo "  $TERMUX_PREFIX/bin/mysql_install_db --user=\$(whoami) --datadir=$TERMUX_PREFIX/var/lib/mysql --basedir=$TERMUX_PREFIX" >> postinst
+	echo "  $TERMUX_PREFIX/bin/mysql_install_db --user=root --auth-root-authentication-method=normal --datadir=$TERMUX_PREFIX/var/lib/mysql --basedir=$TERMUX_PREFIX" >> postinst
 	echo "fi" >> postinst
 	echo "exit 0" >> postinst
 	chmod 0755 postinst

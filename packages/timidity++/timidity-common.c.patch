@@ -1,0 +1,11 @@
+--- a/timidity/common.c
++++ b/timidity/common.c
+@@ -192,7 +192,7 @@
+   tmpdir = getenv("TMPDIR");
+ #endif
+   if(tmpdir == NULL || strlen(tmpdir) == 0)
+-    tmpdir = PATH_STRING "tmp" PATH_STRING;
++    tmpdir = "@TERMUX_PREFIX@/tmp/";
+   if(IS_PATH_SEP(tmpdir[strlen(tmpdir) - 1]))
+     snprintf(filename, sizeof(filename), "%sXXXXXX.%s", tmpdir, ext);
+   else

@@ -1,0 +1,162 @@
+Qt on Termux doesn't have OpenGL. This dirty patch comments out all OpenGL related code so
+it can be compiled. However, this means the Kirigami 2 might not function completely or
+correctly.
+diff -uNr kirigami2-5.99.0/src/scenegraph/shadowedborderrectanglematerial.cpp kirigami2-5.99.0.mod/src/scenegraph/shadowedborderrectanglematerial.cpp
+--- kirigami2-5.99.0/src/scenegraph/shadowedborderrectanglematerial.cpp	2022-10-01 22:20:15.000000000 +0800
++++ kirigami2-5.99.0.mod/src/scenegraph/shadowedborderrectanglematerial.cpp	2022-11-12 15:46:43.598160969 +0800
+@@ -1,13 +1,14 @@
+ /*
++ *
+  *  SPDX-FileCopyrightText: 2020 Arjen Hiemstra <ahiemstra@heimr.nl>
+  *
+  *  SPDX-License-Identifier: LGPL-2.0-or-later
+  */
+ 
+ #include "shadowedborderrectanglematerial.h"
+-
++#ifndef __ANDROID__
+ #include <QOpenGLContext>
+-
++#endif
+ QSGMaterialType ShadowedBorderRectangleMaterial::staticType;
+ 
+ ShadowedBorderRectangleMaterial::ShadowedBorderRectangleMaterial()
+@@ -54,8 +55,10 @@
+ void ShadowedBorderRectangleShader::initialize()
+ {
+     ShadowedRectangleShader::initialize();
++#ifndef __ANDROID__
+     m_borderWidthLocation = program()->uniformLocation("borderWidth");
+     m_borderColorLocation = program()->uniformLocation("borderColor");
++#endif
+ }
+ 
+ void ShadowedBorderRectangleShader::updateState(const QSGMaterialShader::RenderState &state, QSGMaterial *newMaterial, QSGMaterial *oldMaterial)
+diff -uNr kirigami2-5.99.0/src/scenegraph/shadowedbordertexturematerial.cpp kirigami2-5.99.0.mod/src/scenegraph/shadowedbordertexturematerial.cpp
+--- kirigami2-5.99.0/src/scenegraph/shadowedbordertexturematerial.cpp	2022-10-01 22:20:15.000000000 +0800
++++ kirigami2-5.99.0.mod/src/scenegraph/shadowedbordertexturematerial.cpp	2022-11-12 15:49:05.098160915 +0800
+@@ -5,9 +5,9 @@
+  */
+ 
+ #include "shadowedbordertexturematerial.h"
+-
++#ifndef __ANDROID__
+ #include <QOpenGLContext>
+-
++#endif
+ QSGMaterialType ShadowedBorderTextureMaterial::staticType;
+ 
+ ShadowedBorderTextureMaterial::ShadowedBorderTextureMaterial()
+@@ -56,7 +56,9 @@
+ void ShadowedBorderTextureShader::initialize()
+ {
+     ShadowedBorderRectangleShader::initialize();
++#ifndef __ANDROID__
+     program()->setUniformValue("textureSource", 0);
++#endif
+ }
+ 
+ void ShadowedBorderTextureShader::updateState(const QSGMaterialShader::RenderState &state, QSGMaterial *newMaterial, QSGMaterial *oldMaterial)
+diff -uNr kirigami2-5.99.0/src/scenegraph/shadowedrectanglematerial.cpp kirigami2-5.99.0.mod/src/scenegraph/shadowedrectanglematerial.cpp
+--- kirigami2-5.99.0/src/scenegraph/shadowedrectanglematerial.cpp	2022-10-01 22:20:15.000000000 +0800
++++ kirigami2-5.99.0.mod/src/scenegraph/shadowedrectanglematerial.cpp	2022-11-12 15:44:07.888161028 +0800
+@@ -5,9 +5,9 @@
+  */
+ 
+ #include "shadowedrectanglematerial.h"
+-
++#ifndef __ANDROID__
+ #include <QOpenGLContext>
+-
++#endif
+ QSGMaterialType ShadowedRectangleMaterial::staticType;
+ 
+ ShadowedRectangleMaterial::ShadowedRectangleMaterial()
+@@ -60,6 +60,7 @@
+ void ShadowedRectangleShader::initialize()
+ {
+     QSGMaterialShader::initialize();
++#ifndef __ANDROID
+     m_matrixLocation = program()->uniformLocation("matrix");
+     m_aspectLocation = program()->uniformLocation("aspect");
+     m_opacityLocation = program()->uniformLocation("opacity");
+@@ -68,10 +69,12 @@
+     m_colorLocation = program()->uniformLocation("color");
+     m_shadowColorLocation = program()->uniformLocation("shadowColor");
+     m_offsetLocation = program()->uniformLocation("offset");
++#endif
+ }
+ 
+ void ShadowedRectangleShader::updateState(const QSGMaterialShader::RenderState &state, QSGMaterial *newMaterial, QSGMaterial *oldMaterial)
+ {
++#ifndef __ANDROID__
+     auto p = program();
+ 
+     if (state.isMatrixDirty()) {
+@@ -91,6 +94,7 @@
+         p->setUniformValue(m_shadowColorLocation, material->shadowColor);
+         p->setUniformValue(m_offsetLocation, material->offset);
+     }
++#endif
+ }
+ #else
+ bool ShadowedRectangleShader::updateUniformData(RenderState &state, QSGMaterial *newMaterial, QSGMaterial *oldMaterial)
+@@ -134,6 +138,7 @@
+     const auto shaderRoot = QStringLiteral(":/org/kde/kirigami/shaders/");
+ 
+ #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
++#ifndef __ANDROID__
+     auto header = QOpenGLContext::currentContext()->isOpenGLES() ? QStringLiteral("header_es.glsl") : QStringLiteral("header_desktop.glsl");
+ 
+     setShaderSourceFiles(QOpenGLShader::Vertex, {shaderRoot + header, shaderRoot + QStringLiteral("shadowedrectangle.vert")});
+@@ -144,7 +149,7 @@
+         shaderFile = shader + QStringLiteral("_lowpower.frag");
+         sdfFile = QStringLiteral("sdf_lowpower.glsl");
+     }
+-
++#endif
+     setShaderSourceFiles(QOpenGLShader::Fragment, {shaderRoot + header, shaderRoot + sdfFile, shaderRoot + shaderFile});
+ #else
+     setShaderFileName(QSGMaterialShader::VertexStage, shaderRoot + QStringLiteral("shadowedrectangle.vert.qsb"));
+diff -uNr kirigami2-5.99.0/src/scenegraph/shadowedrectanglematerial.h kirigami2-5.99.0.mod/src/scenegraph/shadowedrectanglematerial.h
+--- kirigami2-5.99.0/src/scenegraph/shadowedrectanglematerial.h	2022-10-01 22:20:15.000000000 +0800
++++ kirigami2-5.99.0.mod/src/scenegraph/shadowedrectanglematerial.h	2022-11-12 15:44:59.748161008 +0800
+@@ -9,7 +9,7 @@
+ #include <QColor>
+ #include <QSGMaterial>
+ #include <QSGMaterialShader>
+-
++#include <QVector2D>
+ /**
+  * A material rendering a rectangle with a shadow.
+  *
+diff -uNr kirigami2-5.99.0/src/scenegraph/shadowedtexturematerial.cpp kirigami2-5.99.0.mod/src/scenegraph/shadowedtexturematerial.cpp
+--- kirigami2-5.99.0/src/scenegraph/shadowedtexturematerial.cpp	2022-10-01 22:20:15.000000000 +0800
++++ kirigami2-5.99.0.mod/src/scenegraph/shadowedtexturematerial.cpp	2022-11-12 15:47:57.478160941 +0800
+@@ -5,9 +5,9 @@
+  */
+ 
+ #include "shadowedtexturematerial.h"
+-
++#ifndef __ANDROID__
+ #include <QOpenGLContext>
+-
++#endif
+ QSGMaterialType ShadowedTextureMaterial::staticType;
+ 
+ ShadowedTextureMaterial::ShadowedTextureMaterial()
+@@ -56,7 +56,9 @@
+ void ShadowedTextureShader::initialize()
+ {
+     ShadowedRectangleShader::initialize();
++#ifndef __ANDROID__
+     program()->setUniformValue("textureSource", 0);
++#endif
+ }
+ 
+ void ShadowedTextureShader::updateState(const QSGMaterialShader::RenderState &state, QSGMaterial *newMaterial, QSGMaterial *oldMaterial)
+@@ -82,3 +84,4 @@
+     }
+ }
+ #endif
++

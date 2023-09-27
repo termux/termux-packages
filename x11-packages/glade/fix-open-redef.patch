@@ -1,0 +1,21 @@
+diff -uNr glade-GLADE_3_38_2/src/main.c glade-GLADE_3_38_2.mod/src/main.c
+--- glade-GLADE_3_38_2/src/main.c	2020-11-20 22:06:30.000000000 +0200
++++ glade-GLADE_3_38_2.mod/src/main.c	2021-08-16 00:35:48.479806643 +0300
+@@ -110,7 +110,7 @@
+ }
+ 
+ static void
+-open (GApplication  *application,
++glade_open (GApplication  *application,
+       GFile        **files,
+       gint           n_files,
+       const gchar   *hint)
+@@ -191,7 +191,7 @@
+   g_signal_connect (app, "handle-local-options", G_CALLBACK (handle_local_options), NULL);
+   g_signal_connect (app, "startup", G_CALLBACK (startup), NULL);
+   g_signal_connect (app, "activate", G_CALLBACK (activate), NULL);
+-  g_signal_connect (app, "open", G_CALLBACK (open), NULL);
++  g_signal_connect (app, "open", G_CALLBACK (glade_open), NULL);
+ 
+   status = g_application_run (G_APPLICATION (app), argc, argv);
+   g_object_unref (app);

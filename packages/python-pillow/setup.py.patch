@@ -1,0 +1,32 @@
+diff -uNr Pillow-9.2.0/setup.py Pillow-9.2.0.mod/setup.py
+--- Pillow-9.2.0/setup.py	2022-07-01 22:19:51.000000000 +0900
++++ Pillow-9.2.0.mod/setup.py	2022-10-13 23:03:54.800557858 +0900
+@@ -497,8 +497,8 @@
+                 for d in os.environ[k].split(os.path.pathsep):
+                     _add_directory(library_dirs, d)
+ 
+-        _add_directory(library_dirs, os.path.join(sys.prefix, "lib"))
+-        _add_directory(include_dirs, os.path.join(sys.prefix, "include"))
++        _add_directory(library_dirs, os.path.join("%TERMUX_PREFIX%", "lib"))
++        _add_directory(include_dirs, os.path.join("%TERMUX_PREFIX%", "include"))
+ 
+         #
+         # add platform directories
+@@ -567,7 +567,7 @@
+             or sys.platform.startswith("gnu")
+             or sys.platform.startswith("freebsd")
+         ):
+-            for dirname in _find_library_dirs_ldconfig():
++            for dirname in []:
+                 _add_directory(library_dirs, dirname)
+             if sys.platform.startswith("linux") and os.environ.get(
+                 "ANDROID_ROOT", None
+@@ -595,7 +595,7 @@
+         # FIXME: check /opt/stuff directories here?
+ 
+         # standard locations
+-        if not self.disable_platform_guessing:
++        if False:
+             _add_directory(library_dirs, "/usr/local/lib")
+             _add_directory(include_dirs, "/usr/local/include")
+ 

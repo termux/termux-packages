@@ -1,0 +1,11 @@
+--- ../diffpp.in.orig	2022-02-22 20:04:42.190819348 +0000
++++ ./scripts/diffpp.in	2022-02-22 20:05:18.550692024 +0000
+@@ -69,7 +69,7 @@
+ open(FP, $file) || die "$program: couldn't open file `$file' for input: $!\n";
+ @orig_file = <FP>;
+ close(FP);
+-$[ = 1;
++{ no warnings; $[ = 1; }
+ $orig_line_num = 1;
+ $orig_num_lines = @orig_file;
+ 

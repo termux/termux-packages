@@ -1,0 +1,42 @@
+diff --git a/SABnzbd.py b/SABnzbd.py
+index ffd999892..662358479 100755
+--- a/SABnzbd.py
++++ b/SABnzbd.py
+@@ -16,6 +16,7 @@
+ # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ 
+ import sys
++sys.path.insert(0,"@TERMUX_PREFIX@/share/sabnzbd")
+ 
+ if sys.hexversion < 0x03070000:
+     print("Sorry, requires Python 3.7 or above")
+@@ -366,19 +367,7 @@ def fix_webname(name):
+ 
+ def get_user_profile_paths():
+     """Get the default data locations on Windows"""
+-    if sabnzbd.DAEMON:
+-        # In daemon mode, do not try to access the user profile
+-        # just assume that everything defaults to the program dir
+-        sabnzbd.DIR_LCLDATA = sabnzbd.DIR_PROG
+-        sabnzbd.DIR_HOME = sabnzbd.DIR_PROG
+-        if sabnzbd.WIN32:
+-            # Ignore Win32 "logoff" signal
+-            # This should work, but it doesn't
+-            # Instead the signal_handler will ignore the "logoff" signal
+-            # signal.signal(5, signal.SIG_IGN)
+-            pass
+-        return
+-    elif sabnzbd.WIN32:
++    if sabnzbd.WIN32:
+         try:
+             path = shell.SHGetFolderPath(0, shellcon.CSIDL_LOCAL_APPDATA, None, 0)
+             sabnzbd.DIR_LCLDATA = os.path.join(path, DEF_WORKDIR)
+@@ -965,7 +954,7 @@ def main():
+ 
+     sabnzbd.MY_FULLNAME = os.path.normpath(os.path.abspath(sabnzbd.MY_FULLNAME))
+     sabnzbd.MY_NAME = os.path.basename(sabnzbd.MY_FULLNAME)
+-    sabnzbd.DIR_PROG = os.path.dirname(sabnzbd.MY_FULLNAME)
++    sabnzbd.DIR_PROG = "@TERMUX_PREFIX@/share/sabnzbd"
+     sabnzbd.DIR_INTERFACES = real_path(sabnzbd.DIR_PROG, DEF_INTERFACES)
+     sabnzbd.DIR_LANGUAGE = real_path(sabnzbd.DIR_PROG, DEF_LANGUAGE)
+     org_dir = os.getcwd()

@@ -1,0 +1,75 @@
+diff -uNr qemu-5.2.0/linux-user/aarch64/signal.c qemu-5.2.0.mod/linux-user/aarch64/signal.c
+--- qemu-5.2.0/linux-user/aarch64/signal.c	2020-12-08 18:59:44.000000000 +0200
++++ qemu-5.2.0.mod/linux-user/aarch64/signal.c	2020-12-11 14:04:52.426979119 +0200
+@@ -38,7 +38,7 @@
+     target_stack_t tuc_stack;
+     target_sigset_t tuc_sigmask;
+     /* glibc uses a 1024-bit sigset_t */
+-    char __unused[1024 / 8 - sizeof(target_sigset_t)];
++    char __qemu_unused[1024 / 8 - sizeof(target_sigset_t)];
+     /* last for future expansion */
+     struct target_sigcontext tuc_mcontext;
+ };
+diff -uNr qemu-5.2.0/linux-user/arm/signal.c qemu-5.2.0.mod/linux-user/arm/signal.c
+--- qemu-5.2.0/linux-user/arm/signal.c	2020-12-08 18:59:44.000000000 +0200
++++ qemu-5.2.0.mod/linux-user/arm/signal.c	2020-12-11 14:04:52.426979119 +0200
+@@ -59,7 +59,7 @@
+     target_stack_t tuc_stack;
+     struct target_sigcontext tuc_mcontext;
+     target_sigset_t  tuc_sigmask;       /* mask last for extensibility */
+-    char __unused[128 - sizeof(target_sigset_t)];
++    char __qemu_unused[128 - sizeof(target_sigset_t)];
+     abi_ulong tuc_regspace[128] __attribute__((__aligned__(8)));
+ };
+ 
+diff -uNr qemu-5.2.0/linux-user/riscv/signal.c qemu-5.2.0.mod/linux-user/riscv/signal.c
+--- qemu-5.2.0/linux-user/riscv/signal.c	2020-12-08 18:59:44.000000000 +0200
++++ qemu-5.2.0.mod/linux-user/riscv/signal.c	2020-12-11 14:05:42.471408487 +0200
+@@ -41,7 +41,7 @@
+     struct target_ucontext *uc_link;
+     target_stack_t uc_stack;
+     target_sigset_t uc_sigmask;
+-    uint8_t   __unused[1024 / 8 - sizeof(target_sigset_t)];
++    uint8_t   __qemu_unused[1024 / 8 - sizeof(target_sigset_t)];
+     struct target_sigcontext uc_mcontext QEMU_ALIGNED(16);
+ };
+ 
+diff -uNr qemu-5.2.0/linux-user/syscall_defs.h qemu-5.2.0.mod/linux-user/syscall_defs.h
+--- qemu-5.2.0/linux-user/syscall_defs.h	2020-12-08 18:59:44.000000000 +0200
++++ qemu-5.2.0.mod/linux-user/syscall_defs.h	2020-12-11 14:04:52.430979153 +0200
+@@ -1929,7 +1929,7 @@
+        abi_ulong    target_st_mtime_nsec;
+        abi_ulong    target_st_ctime;
+        abi_ulong    target_st_ctime_nsec;
+-       abi_long     __unused[3];
++       abi_long     __qemu_unused[3];
+ };
+ 
+ #elif defined(TARGET_SH4)
+@@ -2016,7 +2016,7 @@
+ 	abi_ulong	target_st_ctime;
+ 	abi_ulong       target_st_ctime_nsec;
+ 
+-	abi_long	__unused[3];
++	abi_long	__qemu_unused[3];
+ };
+ #elif defined(TARGET_S390X)
+ struct target_stat {
+@@ -2037,7 +2037,7 @@
+     abi_ulong  target_st_ctime_nsec;
+     abi_ulong  st_blksize;
+     abi_long       st_blocks;
+-    abi_ulong  __unused[3];
++    abi_ulong  __qemu_unused[3];
+ };
+ #elif defined(TARGET_AARCH64)
+ #define TARGET_STAT_HAVE_NSEC
+@@ -2060,7 +2060,7 @@
+     abi_ulong  target_st_mtime_nsec;
+     abi_long  target_st_ctime;
+     abi_ulong  target_st_ctime_nsec;
+-    unsigned int __unused[2];
++    unsigned int __qemu_unused[2];
+ };
+ #elif defined(TARGET_XTENSA)
+ #define TARGET_STAT_HAVE_NSEC

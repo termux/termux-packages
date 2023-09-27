@@ -1,0 +1,22 @@
+diff -uNr gl4es/CMakeLists.txt gl4es.mod/CMakeLists.txt
+--- gl4es/CMakeLists.txt        2021-10-13 23:49:59.659443188 +0800
++++ gl4es.mod/CMakeLists.txt    2021-10-13 23:48:57.547443233 +0800
+@@ -13,6 +13,7 @@
+ option(BCMHOST "Set to ON if targeting an RPi(2) device" ${BCMHOST})
+ option(ODROID "Set to ON if targeting an ODroid device" ${ODROID})
+ option(ANDROID "Set to ON if targeting an Android device" ${ANDROID})
++option(TERMUX "Set to ON if targeting Termux environment" ${TERMUX})
+ option(CHIP "Set to ON if targeting an C.H.I.P. device" ${CHIP})
+ option(AMIGAOS4 "Set to ON if targeting an AmigaOS4/Warp3D platform (activate NOEGL and NOX11)" ${AMIGAOS4})
+ option(NOX11 "Set to ON to not use X11 (creation of context has to be done outside gl4es)" ${NOX11})
+@@ -99,6 +100,10 @@
+     find_library(log-lib log)
+ endif()
+
++if(TERMUX)
++    add_definitions(-DNO_GBM -DDEFAULT_ES=2)
++endif()
++
+ #PocketCHIP
+ if(CHIP)
+     add_definitions(-DCHIP)

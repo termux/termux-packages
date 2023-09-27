@@ -1,0 +1,43 @@
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -862,7 +858,7 @@
+ .SUFFIXES:	.c .pri
+ 
+ .pri.c:		$< prim2cl.fs
+-		$(FORTHK) prim2cl.fs -e "file $< altogether bye" >$@
++		$(PREFORTH) prim2cl.fs -e "file $< altogether bye" >$@
+ 
+ .c.so:		$<
+ 		$(GCC) -shared $(CFLAGS) $(CPPFLAGS) $< -o $@
+@@ -877,15 +873,15 @@
+ 		$(CP) gforth.tags $@
+ 
+ install.TAGS:	TAGS install-tags.fs
+-		sed 's;^\$(srcdir)/;;' TAGS|./gforth -e 's" '$(datadir)/gforth/$(VERSION)/'"' $(srcdir)/install-tags.fs -e bye >install.TAGS
++		sed 's;^\$(srcdir)/;;' TAGS|$(PREFORTH) -e 's" '$(datadir)/gforth/$(VERSION)/'"' $(srcdir)/install-tags.fs -e bye >install.TAGS
+ 
+ gforth.TAGS:	@kernel_fi@ gforth$(EC)$(EXE) $(GFORTH_FI_SRC) prim.TAGS kernel.TAGS
+-		$(FORTHK) etags.fs except.fs startup.fs -e bye
++		$(PREFORTH) etags.fs except.fs startup.fs -e bye
+ 		cat TAGS prim.TAGS kernel.TAGS >gforth.TAGS
+ 		rm TAGS
+ 
+ gforth.tags:	@kernel_fi@ gforth$(EC)$(EXE) $(GFORTH_FI_SRC) prim.tags kernel.tags
+-		$(FORTHK) tags.fs except.fs startup.fs -e bye
++		$(PREFORTH) tags.fs except.fs startup.fs -e bye
+ 		cat tags prim.tags kernel.tags >gforth.tags
+ 		rm tags
+ 
+@@ -915,10 +911,10 @@
+ #Documentation
+ 
+ doc/doc.fd:	doc/makedoc.fs $(GFORTH_FI_SRC) code.fs objects.fs oof.fs moofglos.fs
+-		$(FORTHK) -e "s\" doc/doc.fd\"" doc/makedoc.fs except.fs startup.fs code.fs objects.fs oof.fs moofglos.fs regexp.fs fft.fs -e bye
++		$(PREFORTH) -e "s\" doc/doc.fd\"" doc/makedoc.fs except.fs startup.fs code.fs objects.fs oof.fs moofglos.fs regexp.fs fft.fs -e bye
+ 
+ doc/crossdoc.fd:	$(KERN_SRC) kernel/version.fs $(FORTH_GEN0)
+-		$(FORTHK) -e 's" mach32l.fs"' kernel/main.fs -e bye
++		$(PREFORTH) -e 's" mach32l.fs"' kernel/main.fs -e bye
+ 
+ doc/gforth.texi: doc/gforth.ds prim.b ds2texi.fs prims2x.fs \
+ 		doc/doc.fd doc/crossdoc.fd

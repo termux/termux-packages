@@ -1,8 +1,8 @@
---- ../cache/ncmpcpp-0.8/src/settings.cpp	2017-05-21 14:10:48.000000000 +0000
-+++ ./src/settings.cpp	2017-05-24 02:02:40.462100405 +0000
-@@ -265,17 +265,17 @@
+--- a/src/settings.cpp
++++ b/src/settings.cpp
+@@ -237,18 +237,18 @@
  	// keep the same order of variables as in configuration file
- 	p.add("ncmpcpp_directory", &ncmpcpp_directory, "~/.ncmpcpp/", adjust_directory);
+ 	p.add("ncmpcpp_directory", &ncmpcpp_directory, "~/.config/ncmpcpp/", adjust_directory);
  	p.add("lyrics_directory", &lyrics_directory, "~/.lyrics/", adjust_directory);
 -	p.add<void>("mpd_host", nullptr, "localhost", [](std::string host) {
 +	p.add<void>("mpd_host", nullptr, "@TERMUX_PREFIX@/var/run/mpd.socket", [](std::string host) {
@@ -16,8 +16,9 @@
 +	p.add("mpd_music_dir", &mpd_music_dir, "/sdcard/Music", adjust_directory);
  	p.add("mpd_connection_timeout", &mpd_connection_timeout, "5");
  	p.add("mpd_crossfade_time", &crossfade_time, "5");
--	p.add("visualizer_fifo_path", &visualizer_fifo_path, "/tmp/mpd.fifo", adjust_path);
-+	p.add("visualizer_fifo_path", &visualizer_fifo_path, "@TERMUX_PREFIX@/var/run/mpd.fifo", adjust_path);
+ 	p.add("random_exclude_pattern", &random_exclude_pattern, "");
+-	p.add("visualizer_data_source", &visualizer_data_source, "/tmp/mpd.fifo", adjust_path);
++	p.add("visualizer_data_source", &visualizer_data_source, "@TERMUX_PREFIX@/var/run/mpd.fifo", adjust_path);
  	p.add("visualizer_output_name", &visualizer_output_name, "Visualizer feed");
  	p.add("visualizer_in_stereo", &visualizer_in_stereo, "yes", yes_no);
- 	p.add("visualizer_sync_interval", &visualizer_sync_interval, "30",
+ 	p.add("visualizer_type", &visualizer_type,

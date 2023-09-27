@@ -1,0 +1,8 @@
+TERMUX_PKG_HOMEPAGE=https://upx.github.io/
+TERMUX_PKG_DESCRIPTION="the Ultimate Packer for eXecutables"
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=4.0.2
+TERMUX_PKG_SRCURL=https://github.com/upx/upx/releases/download/v${TERMUX_PKG_VERSION}/upx-${TERMUX_PKG_VERSION}-src.tar.xz
+TERMUX_PKG_SHA256=1221e725b1a89e06739df27fae394d6bc88aedbe12f137c630ec772522cbc76f
+TERMUX_PKG_DEPENDS="libc++"

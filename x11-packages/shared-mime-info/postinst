@@ -1,0 +1,14 @@
+#!@TERMUX_PREFIX@/bin/sh
+set -e
+PREFIX="@TERMUX_PREFIX@"
+
+if [ "${1}" = "triggered" ]; then
+	if [ -x "${PREFIX}/bin/update-mime-database" ]; then
+		update-mime-database "${PREFIX}/share/mime"
+	fi
+	exit 0
+fi
+
+if [ -x "${PREFIX}/bin/update-mime-database" ]; then
+	update-mime-database "${PREFIX}/share/mime"
+fi

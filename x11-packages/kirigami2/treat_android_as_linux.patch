@@ -1,0 +1,35 @@
+diff -uNr kirigami2-5.99.0/CMakeLists.txt kirigami2-5.99.0.mod/CMakeLists.txt
+--- kirigami2-5.99.0/CMakeLists.txt	2022-10-01 22:20:15.000000000 +0800
++++ kirigami2-5.99.0.mod/CMakeLists.txt	2022-11-12 15:52:38.878160833 +0800
+@@ -114,7 +114,7 @@
+ )
+ 
+ #use dbus on linux, bsd etc, but not android and apple stuff
+-if (UNIX AND NOT ANDROID AND NOT(APPLE) AND NOT(DISABLE_DBUS))
++if (UNIX AND NOT(APPLE) AND NOT(DISABLE_DBUS))
+     find_package(Qt${QT_MAJOR_VERSION}DBus)
+     add_definitions(-DKIRIGAMI_ENABLE_DBUS)
+ endif()
+@@ -136,9 +133,7 @@
+ )
+ 
+ add_subdirectory(src)
+-if (NOT ANDROID)
+-    add_subdirectory(templates)
+-endif()
++add_subdirectory(templates)
+ 
+ if (BUILD_EXAMPLES)
+     add_subdirectory(examples)
+diff -uNr kirigami2-5.99.0/src/libkirigami/CMakeLists.txt kirigami2-5.99.0.mod/src/libkirigami/CMakeLists.txt
+--- kirigami2-5.99.0/src/libkirigami/CMakeLists.txt	2022-10-01 22:20:15.000000000 +0800
++++ kirigami2-5.99.0.mod/src/libkirigami/CMakeLists.txt	2022-11-12 15:53:01.618160825 +0800
+@@ -16,7 +16,7 @@
+ set(libkirigami_extra_sources "")
+ 
+ #use dbus on linux, bsd etc, but not android and apple stuff
+-if (UNIX AND NOT ANDROID AND NOT(APPLE) AND NOT(DISABLE_DBUS))
++if (UNIX AND NOT(APPLE) AND NOT(DISABLE_DBUS))
+     qt_add_dbus_interface(libkirigami_extra_sources org.kde.KWin.TabletModeManager.xml tabletmodemanager_interface)
+     qt_add_dbus_interface(libkirigami_extra_sources org.kde.KWin.VirtualKeyboard.xml virtualkeyboard_interface)
+     set(LIBKIRIGAMKI_EXTRA_LIBS Qt${QT_MAJOR_VERSION}::DBus)

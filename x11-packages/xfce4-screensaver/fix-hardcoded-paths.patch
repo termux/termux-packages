@@ -1,0 +1,24 @@
+diff -uNr xfce4-screensaver-4.18.0/savers/slideshow.c xfce4-screensaver-4.18.0.mod/savers/slideshow.c
+--- xfce4-screensaver-4.18.0/savers/slideshow.c	2023-03-16 21:52:37.000000000 +0200
++++ xfce4-screensaver-4.18.0.mod/savers/slideshow.c	2023-04-04 10:48:13.782421620 +0300
+@@ -97,7 +97,7 @@
+     if (location == NULL) {
+         location = xdg_user_dir_lookup ("PICTURES");
+         if (location == NULL ||
+-                strcmp (location, "/tmp") == 0 ||
++                strcmp (location, "@TERMUX_PREFIX@/tmp") == 0 ||
+                 strcmp (location, g_get_home_dir ()) == 0) {
+             free (location);
+             location = g_build_filename (g_get_home_dir (), "Pictures", NULL);
+diff -uNr xfce4-screensaver-4.18.0/savers/xdg-user-dir-lookup.c xfce4-screensaver-4.18.0.mod/savers/xdg-user-dir-lookup.c
+--- xfce4-screensaver-4.18.0/savers/xdg-user-dir-lookup.c	2020-07-09 21:07:03.000000000 +0300
++++ xfce4-screensaver-4.18.0.mod/savers/xdg-user-dir-lookup.c	2023-04-04 10:48:34.366548329 +0300
+@@ -192,7 +192,7 @@
+     home_dir = getenv ("HOME");
+ 
+     if (home_dir == NULL)
+-        return g_strdup ("/tmp");
++        return g_strdup ("@TERMUX_PREFIX@/tmp");
+ 
+     /* Special case desktop for historical compatibility */
+     if (strcmp(type, "DESKTOP") == 0) {

@@ -90,6 +90,7 @@
 +
 +static u_int
 +res_randomid(void) {
++	struct timeval now;
 +#ifdef ANDROID_CHANGES
 +	int status = 0;
 +	u_int output = 0;
@@ -98,7 +99,6 @@
 +		return output;
 +	}
 +#endif /* ANDROID_CHANGES */
-+	struct timeval now;
 +	gettimeofday(&now, NULL);
 +	return (0xffff & (now.tv_sec ^ now.tv_usec ^ getpid()));
 +}

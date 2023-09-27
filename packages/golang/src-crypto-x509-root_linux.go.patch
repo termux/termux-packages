@@ -1,0 +1,11 @@
+diff -uNr go/src/crypto/x509/root_linux.go go.mod/src/crypto/x509/root_linux.go
+--- go/src/crypto/x509/root_linux.go	2023-04-26 18:32:01.000000000 +0300
++++ go.mod/src/crypto/x509/root_linux.go	2023-05-16 13:39:01.837185844 +0300
+@@ -6,6 +6,7 @@
+ 
+ // Possible certificate files; stop after finding one.
+ var certFiles = []string{
++	"@TERMUX_PREFIX@/etc/tls/cert.pem",                  // Termux
+ 	"/etc/ssl/certs/ca-certificates.crt",                // Debian/Ubuntu/Gentoo etc.
+ 	"/etc/pki/tls/certs/ca-bundle.crt",                  // Fedora/RHEL 6
+ 	"/etc/ssl/ca-bundle.pem",                            // OpenSUSE

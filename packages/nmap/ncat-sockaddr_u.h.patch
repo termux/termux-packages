@@ -1,0 +1,14 @@
+--- a/ncat/sockaddr_u.h
++++ b/ncat/sockaddr_u.h
+@@ -74,6 +74,11 @@
+ #endif
+ #if HAVE_SYS_UN_H
+ # include <sys/un.h>
++# ifndef SUN_LEN
++#  include <string.h>
++#  define SUN_LEN(ptr) ((sizeof(*(ptr)) - sizeof((ptr)->sun_path)) \
++                        + strlen((ptr)->sun_path))
++# endif
+ #endif
+ #if HAVE_LINUX_VM_SOCKETS_H
+ #include <linux/vm_sockets.h>

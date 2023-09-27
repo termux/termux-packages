@@ -1,0 +1,25 @@
+--- a/configure.ac
++++ b/configure.ac
+@@ -210,11 +210,11 @@
+ 	# Check for ARM NEON support
+ 	original_saved_CXXFLAGS=$CXXFLAGS
+ 	have_neon=no
+-	CXXFLAGS="-mfpu=neon -march=native $CXXFLAGS"
++	CXXFLAGS="-mfpu=neon $CXXFLAGS"
+ 
+ 	# Check if can compile neon code using intrinsics, require GCC >= 4.3 for autovectorization.
+ 	AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
+-	#if defined(__GNUC__) && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 3))
++	#if !defined(__clang__) && defined(__GNUC__) && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 3))
+ 	#error "Need GCC >= 4.3 for neon autovectorization"
+ 	#endif
+ 	#include <arm_neon.h>
+@@ -225,7 +225,7 @@
+ 	CXXFLAGS=$original_saved_CXXFLAGS
+ 	if test "x$have_neon" = "xyes" ; then
+ 		echo "****** NEON support enabled ******"
+-		CPPFLAGS="-mfpu=neon -march=native -mtune=native $CPPFLAGS"
++		CPPFLAGS="-mfpu=neon $CPPFLAGS"
+ 		AC_DEFINE(SOUNDTOUCH_USE_NEON,1,[Use ARM NEON extension])
+ 	fi
+ fi

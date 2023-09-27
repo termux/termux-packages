@@ -1,0 +1,11 @@
+--- ./src/util/aligned_alloc.h.orig	2022-05-05 17:25:50.859381350 +0530
++++ ./src/util/aligned_alloc.h	2022-05-05 17:25:56.879381347 +0530
+@@ -18,7 +18,7 @@
+ #ifndef IMPL_ALIGNED_ALLOC
+ #ifdef _WIN32
+ #define IMPL_ALIGNED_ALLOC IMPL_ALIGNED_ALLOC_WIN32
+-#elif defined(__APPLE__)
++#elif defined(__APPLE__) || defined(__ANDROID__)
+ // Note that aligned_alloc() is only available at runtime starting from
+ // OSX 10.15, so use posix_memalign() instead which is more portable.
+ #define IMPL_ALIGNED_ALLOC IMPL_ALIGNED_ALLOC_POSIX

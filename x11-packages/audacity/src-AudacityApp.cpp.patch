@@ -1,0 +1,20 @@
+--- a/src/AudacityApp.cpp
++++ b/src/AudacityApp.cpp
+@@ -964,7 +964,7 @@
+ #define WL(lang,sublang)
+ #endif
+ 
+-#if wxCHECK_VERSION(3, 0, 1)
++#if wxCHECK_VERSION(3, 0, 1) && !defined __ANDROID__
+ wxLanguageInfo userLangs[] =
+ {
+    // Bosnian is defined in wxWidgets already
+@@ -1270,7 +1270,7 @@
+    //
+    // TODO:  The whole Language initialization really need to be reworked.
+    //        It's all over the place.
+-#if wxCHECK_VERSION(3, 0, 1)
++#if wxCHECK_VERSION(3, 0, 1) && !defined __ANDROID__
+    for (size_t i = 0, cnt = WXSIZEOF(userLangs); i < cnt; i++)
+    {
+       wxLocale::AddLanguage(userLangs[i]);

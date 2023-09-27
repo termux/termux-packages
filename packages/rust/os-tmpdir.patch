@@ -1,8 +1,9 @@
---- ../rustc-1.29.2-src/src/libstd/sys/unix/os.rs	2018-10-19 14:12:31.000000000 -0700
-+++ ./library/std/src/sys/unix/os.rs	2018-10-19 14:11:20.000000000 -0700
-@@ -488,7 +488,7 @@
+diff -uNr rustc-1.57.0-src/library/std/src/sys/unix/os.rs rustc-1.57.0-src.mod/library/std/src/sys/unix/os.rs
+--- rustc-1.57.0-src/library/std/src/sys/unix/os.rs	2021-11-29 20:27:11.000000000 +0100
++++ rustc-1.57.0-src.mod/library/std/src/sys/unix/os.rs	2021-12-04 09:04:53.000000000 +0100
+@@ -570,7 +570,7 @@
  pub fn temp_dir() -> PathBuf {
-     ::env::var_os("TMPDIR").map(PathBuf::from).unwrap_or_else(|| {
+     crate::env::var_os("TMPDIR").map(PathBuf::from).unwrap_or_else(|| {
          if cfg!(target_os = "android") {
 -            PathBuf::from("/data/local/tmp")
 +            PathBuf::from("@TERMUX_PREFIX@/tmp")

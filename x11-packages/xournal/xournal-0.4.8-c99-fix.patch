@@ -1,0 +1,65 @@
+https://github.com/termux/termux-packages/issues/15852
+Borrowed from https://github.com/gentoo/gentoo/blob/0e2d85999128ffd8df2b17b1ba1379b81ad69ea0/app-text/xournal/files/xournal-0.4.8-c99-fix.patch
+
+Bug: https://bugs.gentoo.org/875158
+
+Patch: https://src.fedoraproject.org/rpms/xournal/raw/dacd5bf30ec95debca62946868d9450f68ea54de/f/xournal-c99-1.patch
+Patch: https://src.fedoraproject.org/rpms/xournal/raw/dacd5bf30ec95debca62946868d9450f68ea54de/f/xournal-c99-2.patch
+Author: Denis Auroux <auroux@users.sourceforge.net>
+Date:   Sun Jan 24 15:48:16 2021 -0500
+
+    Fix implicit function declarations by including config.h in ttsubset/*.c
+
+--- a/src/ttsubset/list.c
++++ b/src/ttsubset/list.c
+@@ -44,6 +44,10 @@
+  *
+  */
+ 
++#ifdef HAVE_CONFIG_H
++#  include <config.h>
++#endif
++
+ #include <stdlib.h>
+ #include <assert.h>
+ #ifdef MALLOC_TRACE
+--- a/src/ttsubset/sft.c
++++ b/src/ttsubset/sft.c
+@@ -43,6 +43,10 @@
+  * @version 1.0
+  */
+ 
++#ifdef HAVE_CONFIG_H
++#  include <config.h>
++#endif
++
+ #include <assert.h>
+ #include <stdlib.h>
+ #include <string.h>
+--- a/src/ttsubset/ttcr.c
++++ b/src/ttsubset/ttcr.c
+@@ -44,6 +44,10 @@
+  *
+  */
+ 
++#ifdef HAVE_CONFIG_H
++#  include <config.h>
++#endif
++
+ #include <sys/types.h>
+ #ifdef HAVE_UNISTD_H
+ #include <unistd.h>
+
+Add missing include directives for make_dashed, set_cursor_busy.
+
+--- a/src/xo-image.c
++++ b/src/xo-image.c
+@@ -25,6 +25,8 @@
+ #include "xo-support.h"
+ #include "xo-image.h"
+ #include "xo-misc.h"
++#include "xo-selection.h"
++#include "xo-paint.h"
+ 
+ // create pixbuf from buffer, or return NULL on failure
+ GdkPixbuf *pixbuf_from_buffer(const gchar *buf, gsize buflen)

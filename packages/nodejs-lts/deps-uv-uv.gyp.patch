@@ -1,5 +1,5 @@
---- ./deps/uv/uv.gyp	2021-09-12 08:37:13.451586303 +0530
-+++ ./deps/uv/uv.gyp.mod	2021-09-12 08:37:58.344924108 +0530
+--- ./deps/uv/uv.gyp	2023-01-06 04:16:46.000000000 +0530
++++ ./deps/uv/uv.gyp.mod	2023-01-10 19:53:16.953276157 +0530
 @@ -40,7 +40,7 @@
      {
        'target_name': 'libuv',
@@ -18,11 +18,11 @@
          'conditions': [
            ['OS == "linux"', {
              'defines': [ '_POSIX_C_SOURCE=200112' ],
-@@ -262,6 +262,7 @@
-             'src/unix/procfs-exepath.c',
-             'src/unix/random-getrandom.c',
+@@ -267,6 +266,7 @@
              'src/unix/random-sysctl-linux.c',
-+            'src/unix/epoll.c',
+             'src/unix/epoll.c',
            ],
++          'defines': [ '__USE_GNU' ],
            'link_settings': {
              'libraries': [ '-ldl' ],
+           },

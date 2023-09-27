@@ -1,22 +1,30 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/protocolbuffers/protobuf
 TERMUX_PKG_DESCRIPTION="Protocol buffers C++ library"
-TERMUX_PKG_LICENSE="BSD 3-Clause"
-# TERMUX_PKG_SRCDIR is overriden below so we need to specify license file
-TERMUX_PKG_LICENSE_FILE="../LICENSE"
+# utf8_range is licensed under MIT
+TERMUX_PKG_LICENSE="BSD 3-Clause, MIT"
+TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2:3.19.3
-TERMUX_PKG_SRCURL=https://github.com/protocolbuffers/protobuf/archive/v${TERMUX_PKG_VERSION:2}.tar.gz
-TERMUX_PKG_SHA256=390191a0d7884b3e52bb812c440ad1497b9d484241f37bb8e2ccc8c2b72d6c36
-TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="libc++, zlib"
-TERMUX_PKG_BREAKS="libprotobuf-dev"
+# When bumping version:
+# - update SHA256 checksum for $_PROTOBUF_ZIP in
+#     $TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_protobuf.sh
+# - ALWAYS bump revision of reverse dependencies and rebuild them.
+TERMUX_PKG_VERSION=2:22.4
+TERMUX_PKG_SRCURL=https://github.com/protocolbuffers/protobuf/archive/v${TERMUX_PKG_VERSION#*:}.tar.gz
+TERMUX_PKG_SHA256=def8683aafc1ebaddbc777da252dfdc8e324a197757e3bfcd8b4de90d4b8cf6a
+TERMUX_PKG_AUTO_UPDATE=false
+TERMUX_PKG_DEPENDS="abseil-cpp, libc++, zlib"
+TERMUX_PKG_BREAKS="libprotobuf-dev, protobuf-static (<< ${TERMUX_PKG_VERSION#*:})"
 TERMUX_PKG_REPLACES="libprotobuf-dev"
 TERMUX_PKG_FORCE_CMAKE=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-Dprotobuf_ABSL_PROVIDER=package
 -Dprotobuf_BUILD_TESTS=OFF
 -DBUILD_SHARED_LIBS=ON
+-DCMAKE_INSTALL_LIBDIR=lib
 "
+TERMUX_PKG_NO_STATICSPLIT=true
 
-termux_step_pre_configure() {
-	TERMUX_PKG_SRCDIR+="/cmake/"
+termux_step_post_make_install() {
+	install -Dm600 -t $TERMUX_PREFIX/share/doc/libutf8-range \
+		$TERMUX_PKG_SRCDIR/third_party/utf8_range/LICENSE
 }

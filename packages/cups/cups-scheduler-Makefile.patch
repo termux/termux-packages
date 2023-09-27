@@ -1,6 +1,6 @@
 --- src/scheduler/Makefile	2020-04-27 18:04:29.000000000 +0000
 +++ src-mod/scheduler/Makefile	2020-07-05 14:20:05.730000000 +0000
-@@ -163,48 +163,11 @@
+@@ -164,49 +164,11 @@
  	$(INSTALL_DIR) -m 1770 -g $(CUPS_GROUP) $(REQUESTS)/tmp
  	echo Creating $(CACHEDIR)...
  	$(INSTALL_DIR) -m 770 -g $(CUPS_GROUP) $(CACHEDIR)
@@ -31,22 +31,22 @@
  		echo Installing SMF manifest in $(SMFMANIFESTDIR)...;\
  		$(INSTALL_DIR) $(BUILDROOT)/$(SMFMANIFESTDIR); \
  		$(INSTALL_SCRIPT) cups.xml $(BUILDROOT)$(SMFMANIFESTDIR)/cups.xml; \
--	fi
+ 	fi
 -	if test "x$(SYSTEMD_DIR)" != x; then \
 -		echo Installing systemd configuration files...; \
 -		$(INSTALL_DIR) $(BUILDROOT)$(SYSTEMD_DIR); \
--		$(INSTALL_DATA) org.cups.cupsd.path $(BUILDROOT)$(SYSTEMD_DIR); \
--		$(INSTALL_DATA) org.cups.cupsd.service $(BUILDROOT)$(SYSTEMD_DIR); \
--		$(INSTALL_DATA) org.cups.cupsd.socket $(BUILDROOT)$(SYSTEMD_DIR); \
--		$(INSTALL_DATA) org.cups.cups-lpdAT.service $(BUILDROOT)$(SYSTEMD_DIR)/org.cups.cups-lpd@.service; \
--		$(INSTALL_DATA) org.cups.cups-lpd.socket $(BUILDROOT)$(SYSTEMD_DIR); \
--	elif test "x$(XINETD)" != x; then \
+-		$(INSTALL_DATA) cups.path $(BUILDROOT)$(SYSTEMD_DIR); \
+-		$(INSTALL_DATA) cups.service $(BUILDROOT)$(SYSTEMD_DIR); \
+-		$(INSTALL_DATA) cups.socket $(BUILDROOT)$(SYSTEMD_DIR); \
+-		$(INSTALL_DATA) cups-lpdAT.service $(BUILDROOT)$(SYSTEMD_DIR)/cups-lpd@.service; \
+-		$(INSTALL_DATA) cups-lpd.socket $(BUILDROOT)$(SYSTEMD_DIR); \
+-	fi
+-	if test "x$(XINETD)" != x; then \
 -		echo Installing xinetd configuration file for cups-lpd...; \
 -		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(XINETD); \
 -		$(INSTALL_DATA) cups-lpd.xinetd $(BUILDROOT)$(XINETD)/cups-lpd; \
 -	fi
 -
-+	fi	
  
  #
  # Install programs...

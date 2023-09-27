@@ -1,0 +1,228 @@
+diff -uNr qemu-5.1.0/linux-user/elfload.c qemu-5.1.0.mod/linux-user/elfload.c
+--- qemu-5.1.0/linux-user/elfload.c	2020-08-11 22:17:15.000000000 +0300
++++ qemu-5.1.0.mod/linux-user/elfload.c	2020-09-05 17:01:16.823064611 +0300
+@@ -2331,7 +2331,7 @@
+                       abi_ulong guest_hiaddr)
+ {
+     /* In order to use host shmat, we must be able to honor SHMLBA.  */
+-    uintptr_t align = MAX(SHMLBA, qemu_host_page_size);
++    uintptr_t align = MAX(/* SHMLBA */ getpagesize(), qemu_host_page_size);
+ 
+     if (have_guest_base) {
+         pgb_have_guest_base(image_name, guest_loaddr, guest_hiaddr, align);
+diff -uNr qemu-5.1.0/linux-user/syscall.c qemu-5.1.0.mod/linux-user/syscall.c
+--- qemu-5.1.0/linux-user/syscall.c	2020-09-05 16:58:00.063849385 +0300
++++ qemu-5.1.0.mod/linux-user/syscall.c	2020-09-05 17:02:57.910949156 +0300
+@@ -45,7 +45,7 @@
+ #include <poll.h>
+ #include <sys/times.h>
+ #include <sys/shm.h>
+-#include <sys/sem.h>
++#include <linux/sem.h>
+ #include <sys/statfs.h>
+ #include <utime.h>
+ #include <sys/sysinfo.h>
+@@ -78,12 +78,17 @@
+ #endif
+ 
+ #define termios host_termios
++#define termios2 host_termios2
++#define ktermios host_ktermios
+ #define winsize host_winsize
+ #define termio host_termio
+ #define sgttyb host_sgttyb /* same as target */
+ #define tchars host_tchars /* same as target */
+ #define ltchars host_ltchars /* same as target */
+ 
++#undef __ASM_GENERIC_TERMBITS_H
++#include <asm/termbits.h>
++
+ #include <linux/termios.h>
+ #include <linux/unistd.h>
+ #include <linux/cdrom.h>
+@@ -264,6 +269,59 @@
+ #define __NR__llseek __NR_lseek
+ #endif
+ 
++_syscall0(int, vhangup)
++#ifdef __NR_msgctl
++_syscall3(int, msgctl, int, msqid, int, cmd, struct msqid_ds *, buf)
++#else
++static int
++msgctl (int msqid, int cmd, struct msqid_ds *buf)
++{
++    return syscall (__NR_ipc, IPCOP_msgctl, msqid, cmd | 0x100, 0, buf);
++}
++#endif
++
++#ifdef __NR_semget
++_syscall3(int, semget, key_t, key, int, nsems, int, semflg)
++#else
++static int
++semget (key_t key, int nsems, int semflg)
++{
++    return syscall (__NR_ipc, IPCOP_semget, key, nsems, semflg, NULL);
++}
++#endif
++
++_syscall2(int, setdomainname, const char *, name, size_t, len)
++#ifdef __NR_msgget
++_syscall2(int, msgget, key_t, key, int, msgflg)
++#else
++static int
++msgget (key_t key, int msgflg)
++{
++    return syscall(__NR_ipc, 5, IPCOP_msgget, key, msgflg, 0, NULL);
++}
++#endif
++
++#ifdef _NSIG_WORDS
++static int sigorset(sigset_t *dest, const sigset_t *a, const sigset_t *b)
++{
++    int i;
++    if (!dest || !a || !b)
++        return -1;
++    for (i = 0; i < _NSIG_WORDS; i++)
++        dest->sig[i] = a->sig[i] | b->sig[i];
++    return 0;
++}
++#else
++static int sigorset(sigset_t *dest, const sigset_t *a, const sigset_t *b)
++{
++    int i;
++    if (!dest || !a || !b)
++        return -1;
++    *dest = *a | *b;
++    return 0;
++}
++#endif
++
+ /* Newer kernel ports have llseek() instead of _llseek() */
+ #if defined(TARGET_NR_llseek) && !defined(TARGET_NR__llseek)
+ #define TARGET_NR__llseek TARGET_NR_llseek
+@@ -837,6 +895,9 @@
+ #ifdef TARGET_NR_mq_timedreceive
+ safe_syscall5(int, mq_timedreceive, int, mqdes, char *, msg_ptr,
+               size_t, len, unsigned *, prio, const struct timespec *, timeout)
++_syscall1(int, mq_unlink, const char *, name)
++_syscall4(__kernel_mqd_t, mq_open, const char *, name, int, oflag, mode_t, mode,
++          struct mq_attr *, attr)
+ #endif
+ /* We do ioctl like this rather than via safe_syscall3 to preserve the
+  * "third argument might be integer or pointer or not present" behaviour of
+@@ -1328,7 +1389,7 @@
+ #endif
+ 
+ #if defined(TARGET_NR_mq_open) && defined(__NR_mq_open)
+-#include <mqueue.h>
++#include <linux/mqueue.h>
+ 
+ static inline abi_long copy_from_user_mq_attr(struct mq_attr *attr,
+                                               abi_ulong target_mq_attr_addr)
+@@ -3632,6 +3693,8 @@
+     return 0;
+ }
+ 
++#define semid_ds __kernel_legacy_semid_ds
++
+ static inline abi_long target_to_host_semid_ds(struct semid_ds *host_sd,
+                                                abi_ulong target_addr)
+ {
+@@ -3711,6 +3774,16 @@
+ 	abi_ulong __buf;
+ };
+ 
++#ifdef __NR_semctl
++_syscall4(int, semctl, int, semid, int, semnum, int, cmd, union semun, arg4)
++#else
++static int semctl(int semid, int semnum, int cmd, union semun arg4)
++{
++    return syscall(__NR_ipc, IPCOP_semctl, semid, semnum, cmd | 0x100,
++          arg4.__buf);
++}
++#endif
++
+ static inline abi_long target_to_host_semarray(int semid, unsigned short **host_array,
+                                                abi_ulong target_addr)
+ {
+@@ -3841,7 +3914,7 @@
+ 	case GETPID:
+ 	case GETNCNT:
+ 	case GETZCNT:
+-            ret = get_errno(semctl(semid, semnum, cmd, NULL));
++            ret = get_errno(semctl(semid, semnum, cmd, (union semun) {.buf = NULL}));
+             break;
+     }
+ 
+@@ -3961,7 +4034,7 @@
+     host_md->msg_stime = tswapal(target_md->msg_stime);
+     host_md->msg_rtime = tswapal(target_md->msg_rtime);
+     host_md->msg_ctime = tswapal(target_md->msg_ctime);
+-    host_md->__msg_cbytes = tswapal(target_md->__msg_cbytes);
++    host_md->msg_cbytes = tswapal(target_md->__msg_cbytes);
+     host_md->msg_qnum = tswapal(target_md->msg_qnum);
+     host_md->msg_qbytes = tswapal(target_md->msg_qbytes);
+     host_md->msg_lspid = tswapal(target_md->msg_lspid);
+@@ -3982,7 +4055,7 @@
+     target_md->msg_stime = tswapal(host_md->msg_stime);
+     target_md->msg_rtime = tswapal(host_md->msg_rtime);
+     target_md->msg_ctime = tswapal(host_md->msg_ctime);
+-    target_md->__msg_cbytes = tswapal(host_md->__msg_cbytes);
++    target_md->__msg_cbytes = tswapal(host_md->msg_cbytes);
+     target_md->msg_qnum = tswapal(host_md->msg_qnum);
+     target_md->msg_qbytes = tswapal(host_md->msg_qbytes);
+     target_md->msg_lspid = tswapal(host_md->msg_lspid);
+@@ -4348,7 +4421,7 @@
+         abi_ulong mmap_start;
+ 
+         /* In order to use the host shmat, we need to honor host SHMLBA.  */
+-        mmap_start = mmap_find_vma(0, shm_info.shm_segsz, MAX(SHMLBA, shmlba));
++        mmap_start = mmap_find_vma(0, shm_info.shm_segsz, MAX(/* SHMLBA */ getpagesize(), shmlba));
+ 
+         if (mmap_start == -1) {
+             errno = ENOMEM;
+@@ -5415,6 +5488,9 @@
+ 
+ #endif
+ 
++#undef winsize
++#undef termio
++
+ IOCTLEntry ioctl_entries[] = {
+ #define IOCTL(cmd, access, ...) \
+     { TARGET_ ## cmd, cmd, #cmd, access, 0, {  __VA_ARGS__ } },
+@@ -8185,7 +8261,7 @@
+         unlock_user(p, arg1, 0);
+         return ret;
+ #endif
+-#ifdef TARGET_NR_stime /* not on alpha */
++#if 0 //def TARGET_NR_stime /* not on alpha */
+     case TARGET_NR_stime:
+         {
+             struct timespec ts;
+@@ -8249,7 +8325,7 @@
+         }
+         return ret;
+ #endif
+-#if defined(TARGET_NR_futimesat)
++#if 0 && defined(TARGET_NR_futimesat)
+     case TARGET_NR_futimesat:
+         {
+             struct timeval *tvp, tv[2];
+@@ -12008,7 +12084,7 @@
+     /* Not implemented for now... */
+ /*     case TARGET_NR_mq_notify: */
+ /*         break; */
+-
++#if 0
+     case TARGET_NR_mq_getsetattr:
+         {
+             struct mq_attr posix_mq_attr_in, posix_mq_attr_out;
+@@ -12026,6 +12102,7 @@
+         }
+         return ret;
+ #endif
++#endif
+ 
+ #ifdef CONFIG_SPLICE
+ #ifdef TARGET_NR_tee

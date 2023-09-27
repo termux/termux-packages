@@ -1,0 +1,59 @@
+--- a/gtk/rgutils.cc
++++ b/gtk/rgutils.cc
+@@ -120,46 +120,10 @@
+        std::cerr << "Empty command for RunAsSudoUserCommand" << std::endl;
+        return true;
+     }
+-    bool getuidbyname = false;
+-    // try pkexec first, then sudo
+-    sudo_user = getenv("PKEXEC_UID");
+     
+-    if (sudo_user == NULL) {
+-       sudo_user = getenv("SUDO_UID");
+-    }
+-    if (sudo_user == NULL) {
+-       sudo_user = getenv("USER");
+-       getuidbyname = true;
+-    }
+-    if (sudo_user == NULL) {
+-       return false;
+-    }
+-    if(strncmp("root", sudo_user, strlen("root")) == 0){
+-        return false;
+-    }
+-    if(!getuidbyname){
+-        pwd = getpwuid(atoi(sudo_user));
+-    }
+-    else{
+-         pwd = getpwnam(sudo_user);
+-    }
+-    sudo_user = pwd->pw_name;
+ #if 0 // does not work for some reason
+-    if(FileExists("/usr/bin/pkexec") && sudo_user != NULL)
+-    {
+-       prefix.push_back("/usr/bin/pkexec");
+-       prefix.push_back("--user");
+-       prefix.push_back(sudo_user);
+-    }
+ #endif
+-    if(FileExists("/usr/bin/sudo") && sudo_user != NULL)
+-    {
+-       prefix.push_back("/usr/bin/sudo");
+-       prefix.push_back("-u");
+-       prefix.push_back(sudo_user);
+-    }
+-    // insert the prefix string
+-    cmd.insert(cmd.begin(), prefix.begin(), prefix.end());
++
+ 
+ #if 0
+     for(std::vector<const gchar*>::iterator it = cmd.begin();
+@@ -209,7 +173,7 @@
+ 
+    g_free(_str);
+    if (colp == NULL) {
+-      _str = g_strdup("");
++      _str = g_strdup("USER");
+       return _str;
+    }
+    _str = gdk_rgba_to_string(colp);

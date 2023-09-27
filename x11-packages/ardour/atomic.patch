@@ -1,0 +1,77 @@
+--- a/libs/vst3/pluginterfaces/base/funknown.cpp
++++ b/libs/vst3/pluginterfaces/base/funknown.cpp
+@@ -44,7 +44,9 @@
+ #endif
+ 
+ #if SMTG_OS_LINUX
++#ifndef __ANDROID__
+ #include <ext/atomicity.h>
++#endif
+ /* UUID */
+ #include <string>
+ #include <boost/uuid/uuid.hpp>
+@@ -77,14 +79,18 @@
+ //------------------------------------------------------------------------
+ namespace FUnknownPrivate {
+ //------------------------------------------------------------------------
+-int32 PLUGIN_API atomicAdd (int32& var, int32 d)
++int32 PLUGIN_API atomicAdd (_Steinberg_int32_atomic_t& var, int32 d)
+ {
+ #if SMTG_OS_WINDOWS
+ 	return InterlockedExchangeAdd ((volatile long int*)&var, d) + d;
+ #elif SMTG_OS_MACOS
+ 	return OSAtomicAdd32Barrier (d, (int32_t*)&var);
+ #elif SMTG_OS_LINUX
++#ifndef __ANDROID__
+ 	__gnu_cxx::__atomic_add (&var, d);
++#else
++	atomic_fetch_add (&var, d);
++#endif
+ 	return var;
+ #else
+ #warning implement me!
+--- a/libs/vst3/pluginterfaces/base/funknown.h
++++ b/libs/vst3/pluginterfaces/base/funknown.h
+@@ -21,6 +21,10 @@
+ #include "pluginterfaces/base/smartpointer.h"
+ #include <string.h>
+ 
++#ifdef __ANDROID__
++#include <atomic>
++#endif
++
+ //------------------------------------------------------------------------
+ /*! \defgroup pluginBase Basic Interfaces
+ */
+@@ -83,13 +87,18 @@
+ //  FUnknown implementation macros
+ //------------------------------------------------------------------------
+ 
++#ifdef __ANDROID__
++typedef std::atomic<::Steinberg::int32> _Steinberg_int32_atomic_t;
++#else
++typedef ::Steinberg::int32 _Steinberg_int32_atomic_t;
++#endif
+ #define DECLARE_FUNKNOWN_METHODS                                                                      \
+ public:	                                                                                              \
+ 	virtual ::Steinberg::tresult PLUGIN_API queryInterface (const ::Steinberg::TUID _iid, void** obj) SMTG_OVERRIDE; \
+ 	virtual ::Steinberg::uint32 PLUGIN_API addRef () SMTG_OVERRIDE;                                   \
+ 	virtual ::Steinberg::uint32 PLUGIN_API release () SMTG_OVERRIDE;                                  \
+ protected :                                                                                           \
+-	::Steinberg::int32 __funknownRefCount;                                                            \
++	_Steinberg_int32_atomic_t __funknownRefCount;                                                            \
+ public:
+ 
+ //------------------------------------------------------------------------
+@@ -116,7 +125,11 @@
+ }
+ 
+ //------------------------------------------------------------------------
++#ifndef __ANDROID__
+ #define FUNKNOWN_CTOR	{ __funknownRefCount = 1; }
++#else
++#define FUNKNOWN_CTOR	{ __funknownRefCount = { 1 }; }
++#endif
+ #define FUNKNOWN_DTOR
+ 
+ //------------------------------------------------------------------------

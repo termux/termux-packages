@@ -1,0 +1,44 @@
+--- a/test/test_setattr.c
++++ b/test/test_setattr.c
+@@ -20,6 +20,7 @@
+ #include <stddef.h>
+ #include <unistd.h>
+ #include <pthread.h>
++#include <fuse_i.h>
+ 
+ #ifndef __linux__
+ #include <limits.h>
+@@ -128,6 +129,15 @@ static struct fuse_lowlevel_ops tfs_oper = {
+ static void* run_fs(void *data) {
+     struct fuse_session *se = (struct fuse_session*) data;
+     assert(fuse_session_loop(se) == 0);
++
++    if (atomic_flag_test_and_set(&se->cancel)) {
++        *se->retval = 1;
++        pthread_exit((void *)se->retval);
++    }
++
++    atomic_flag_clear(&se->cancel);
++    *se->retval = 0;
++
+     return NULL;
+ }
+ 
+@@ -164,13 +174,16 @@ int main(int argc, char *argv[]) {
+     assert(fuse_session_mount(se, fuse_opts.mountpoint) == 0);
+ 
+     /* Start file-system thread */
++    atomic_flag_test_and_set(&se->cancel);
+     assert(pthread_create(&fs_thread, NULL, run_fs, (void *)se) == 0);
+ 
+     /* Do test */
+     test_fs(fuse_opts.mountpoint);
+ 
+     /* Stop file system */
+-    assert(pthread_cancel(fs_thread) == 0);
++    assert(pthread_join(fs_thread, (void **)&se->retval) == 0);
++    assert(*se->retval == 1);
++    assert(atomic_flag_test_and_set(&se->cancel) == 1);
+ 
+     fuse_session_unmount(se);
+     assert(got_fh == 1);

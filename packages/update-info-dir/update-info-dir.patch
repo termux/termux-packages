@@ -1,0 +1,35 @@
+--- a/update-info-dir
++++ b/update-info-dir
+@@ -4,7 +4,7 @@
+ # Copyright 2009, 2014 Norbert Preining
+ # GPLv2
+ 
+-INFODIR=/usr/share/info
++INFODIR=@TERMUX_PREFIX@/share/info
+ 
+ set -e
+ 
+@@ -14,13 +14,7 @@
+ # the dir file. Unset LANGUAGE and reload /etc/environment to get
+ # the system wide settings. See bug #536476
+ unset LANGUAGE
+-unset LANG
+-if [ -r /etc/environment ] ; then
+-  . /etc/environment
+-fi
+-if [ -r /etc/default/locale ] ; then
+-  . /etc/default/locale
+-fi
++export LANG=C.UTF-8
+ 
+ Help ()
+ {
+@@ -28,7 +22,7 @@
+ SYNOPSIS: update-info-dir [-h,--help] [info-directory]
+ 
+ (re-)creates the index of available documentation in info format
+-(the file /usr/share/info/dir) which is usually presented by info browsers
++(the file @TERMUX_PREFIX@/share/info/dir) which is usually presented by info browsers
+ on startup."
+ 
+     exit 0

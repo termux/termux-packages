@@ -1,0 +1,37 @@
+--- a/qtgraphicaleffects.pro
++++ b/qtgraphicaleffects.pro
+@@ -1,5 +1,4 @@
+ requires(qtHaveModule(quick))
+-requires(contains(QT_CONFIG, opengl))
+ 
+ qtHaveModule(quick) {
+     QT_FOR_CONFIG += quick-private
+--- a/src/effects/private/qgfxshaderbuilder.cpp
++++ b/src/effects/private/qgfxshaderbuilder.cpp
+@@ -65,13 +65,18 @@
+     // The following code makes the assumption that an OpenGL context the GUI
+     // thread will get the same capabilities as the render thread's OpenGL
+     // context. Not 100% accurate, but it works...
++#ifndef QT_NO_OPENGL
+     QOpenGLContext context;
+     if (!context.create()) {
++#else
++    if (true) {
++#endif
+         qDebug() << "failed to acquire GL context to resolve capabilities, using defaults..";
+         m_maxBlurSamples = 8; // minimum number of varyings in the ES 2.0 spec.
+         return;
+     }
+ 
++#ifndef QT_NO_OPENGL
+     QOffscreenSurface surface;
+     // In very odd cases, we can get incompatible configs here unless we pass the
+     // GL context's format on to the offscreen format.
+@@ -102,6 +107,7 @@
+         qDebug() << "failed to acquire GL context to resolve capabilities, using defaults..";
+         m_maxBlurSamples = 8; // minimum number of varyings in the ES 2.0 spec.
+     }
++#endif
+ }
+ 
+ /*

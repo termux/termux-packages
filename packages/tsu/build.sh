@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=8.6.0
 _COMMIT=800b448becafb0186eecc366c50442ed9f8bb944
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_SRCURL=https://github.com/cswl/tsu.git
+TERMUX_PKG_SRCURL=git+https://github.com/cswl/tsu
 TERMUX_PKG_GIT_BRANCH=v8
 
 termux_step_post_get_source() {

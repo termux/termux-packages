@@ -1,0 +1,24 @@
+diff --git a/conf/zmap.conf b/conf/zmap.conf
+index 817c184..b390da7 100644
+--- a/conf/zmap.conf
++++ b/conf/zmap.conf
+@@ -16,7 +16,7 @@
+ ### RFC1918, IANA reserved, and multicast networks,
+ ### in addition to those who have opted out of your
+ ### network scans.
+-blocklist-file "/etc/zmap/blocklist.conf"
++blocklist-file "@TERMUX_PERFIX@/etc/zmap/blocklist.conf"
+ 
+ ### Optionally print a summary at the end
+ #summary
+--- a/src/constants.h
++++ b/src/constants.h
+@@ -10,7 +10,7 @@
+ #define ZMAP_CONSTANTS_H
+ 
+ #ifndef ZMAP_DEFAULT_BLOCKLIST
+-#define ZMAP_DEFAULT_BLOCKLIST "/etc/zmap/blocklist.conf"
++#define ZMAP_DEFAULT_BLOCKLIST "@TERMUX_PREFIX@/etc/zmap/blocklist.conf"
+ #endif
+ 
+ #endif /* ZMAP_CONSTANTS_H */

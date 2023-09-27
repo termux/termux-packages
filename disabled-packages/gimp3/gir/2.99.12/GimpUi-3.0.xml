@@ -1,0 +1,628 @@
+<?xml version="1.0"?>
+<dump>
+  <enum name="GimpAspectType" get-type="gimp_aspect_type_get_type">
+    <member name="GIMP_ASPECT_SQUARE" nick="square" value="0"/>
+    <member name="GIMP_ASPECT_PORTRAIT" nick="portrait" value="1"/>
+    <member name="GIMP_ASPECT_LANDSCAPE" nick="landscape" value="2"/>
+  </enum>  <enum name="GimpChainPosition" get-type="gimp_chain_position_get_type">
+    <member name="GIMP_CHAIN_TOP" nick="top" value="0"/>
+    <member name="GIMP_CHAIN_LEFT" nick="left" value="1"/>
+    <member name="GIMP_CHAIN_BOTTOM" nick="bottom" value="2"/>
+    <member name="GIMP_CHAIN_RIGHT" nick="right" value="3"/>
+  </enum>  <enum name="GimpColorAreaType" get-type="gimp_color_area_type_get_type">
+    <member name="GIMP_COLOR_AREA_FLAT" nick="flat" value="0"/>
+    <member name="GIMP_COLOR_AREA_SMALL_CHECKS" nick="small-checks" value="1"/>
+    <member name="GIMP_COLOR_AREA_LARGE_CHECKS" nick="large-checks" value="2"/>
+  </enum>  <enum name="GimpColorSelectorChannel" get-type="gimp_color_selector_channel_get_type">
+    <member name="GIMP_COLOR_SELECTOR_HUE" nick="hue" value="0"/>
+    <member name="GIMP_COLOR_SELECTOR_SATURATION" nick="saturation" value="1"/>
+    <member name="GIMP_COLOR_SELECTOR_VALUE" nick="value" value="2"/>
+    <member name="GIMP_COLOR_SELECTOR_RED" nick="red" value="3"/>
+    <member name="GIMP_COLOR_SELECTOR_GREEN" nick="green" value="4"/>
+    <member name="GIMP_COLOR_SELECTOR_BLUE" nick="blue" value="5"/>
+    <member name="GIMP_COLOR_SELECTOR_ALPHA" nick="alpha" value="6"/>
+    <member name="GIMP_COLOR_SELECTOR_LCH_LIGHTNESS" nick="lch-lightness" value="7"/>
+    <member name="GIMP_COLOR_SELECTOR_LCH_CHROMA" nick="lch-chroma" value="8"/>
+    <member name="GIMP_COLOR_SELECTOR_LCH_HUE" nick="lch-hue" value="9"/>
+  </enum>  <enum name="GimpColorSelectorModel" get-type="gimp_color_selector_model_get_type">
+    <member name="GIMP_COLOR_SELECTOR_MODEL_RGB" nick="rgb" value="0"/>
+    <member name="GIMP_COLOR_SELECTOR_MODEL_LCH" nick="lch" value="1"/>
+    <member name="GIMP_COLOR_SELECTOR_MODEL_HSV" nick="hsv" value="2"/>
+  </enum>  <enum name="GimpIntComboBoxLayout" get-type="gimp_int_combo_box_layout_get_type">
+    <member name="GIMP_INT_COMBO_BOX_LAYOUT_ICON_ONLY" nick="icon-only" value="0"/>
+    <member name="GIMP_INT_COMBO_BOX_LAYOUT_ABBREVIATED" nick="abbreviated" value="1"/>
+    <member name="GIMP_INT_COMBO_BOX_LAYOUT_FULL" nick="full" value="2"/>
+  </enum>  <enum name="GimpPageSelectorTarget" get-type="gimp_page_selector_target_get_type">
+    <member name="GIMP_PAGE_SELECTOR_TARGET_LAYERS" nick="layers" value="0"/>
+    <member name="GIMP_PAGE_SELECTOR_TARGET_IMAGES" nick="images" value="1"/>
+  </enum>  <enum name="GimpSizeEntryUpdatePolicy" get-type="gimp_size_entry_update_policy_get_type">
+    <member name="GIMP_SIZE_ENTRY_UPDATE_NONE" nick="none" value="0"/>
+    <member name="GIMP_SIZE_ENTRY_UPDATE_SIZE" nick="size" value="1"/>
+    <member name="GIMP_SIZE_ENTRY_UPDATE_RESOLUTION" nick="resolution" value="2"/>
+  </enum>  <enum name="GimpZoomType" get-type="gimp_zoom_type_get_type">
+    <member name="GIMP_ZOOM_IN" nick="in" value="0"/>
+    <member name="GIMP_ZOOM_OUT" nick="out" value="1"/>
+  </enum>  <class name="GimpBrowser" get-type="gimp_browser_get_type" parents="GtkPaned,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <signal name="search" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="gint"/>
+    </signal>
+  </class>
+  <class name="GimpBusyBox" get-type="gimp_busy_box_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="message" type="gchararray" flags="231"/>
+  </class>
+  <class name="GimpButton" get-type="gimp_button_get_type" parents="GtkButton,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkActionable"/>
+    <implements name="GtkActivatable"/>
+    <signal name="extended-clicked" return="void" when="first">
+      <param type="GdkModifierType"/>
+    </signal>
+  </class>
+  <class name="GimpCellRendererColor" get-type="gimp_cell_renderer_color_get_type" parents="GtkCellRenderer,GInitiallyUnowned,GObject">
+    <property name="color" type="GimpRGB" flags="227"/>
+    <property name="opaque" type="gboolean" flags="231"/>
+    <property name="icon-size" type="gint" flags="231"/>
+  </class>
+  <class name="GimpCellRendererToggle" get-type="gimp_cell_renderer_toggle_get_type" parents="GtkCellRendererToggle,GtkCellRenderer,GInitiallyUnowned,GObject">
+    <property name="icon-name" type="gchararray" flags="231"/>
+    <property name="icon-size" type="gint" flags="231"/>
+    <property name="override-background" type="gboolean" flags="231"/>
+    <signal name="clicked" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="GdkModifierType"/>
+    </signal>
+  </class>
+  <class name="GimpChainButton" get-type="gimp_chain_button_get_type" parents="GtkGrid,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="position" type="GimpChainPosition" flags="235"/>
+    <property name="icon-size" type="GtkIconSize" flags="231"/>
+    <property name="active" type="gboolean" flags="231"/>
+    <signal name="toggled" return="void" when="first">
+    </signal>
+  </class>
+  <class name="GimpColorArea" get-type="gimp_color_area_get_type" parents="GtkDrawingArea,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="color" type="GimpRGB" flags="231"/>
+    <property name="type" type="GimpColorAreaType" flags="231"/>
+    <property name="drag-mask" type="GdkModifierType" flags="226"/>
+    <property name="draw-border" type="gboolean" flags="227"/>
+    <signal name="color-changed" return="void" when="first">
+    </signal>
+  </class>
+  <class name="GimpColorButton" get-type="gimp_color_button_get_type" parents="GimpButton,GtkButton,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkActionable"/>
+    <implements name="GtkActivatable"/>
+    <property name="title" type="gchararray" flags="231"/>
+    <property name="color" type="GimpRGB" flags="231"/>
+    <property name="type" type="GimpColorAreaType" flags="231"/>
+    <property name="continuous-update" type="gboolean" flags="7"/>
+    <property name="area-width" type="gint" flags="6"/>
+    <property name="area-height" type="gint" flags="6"/>
+    <property name="color-config" type="GimpColorConfig" flags="3"/>
+    <signal name="color-changed" return="void" when="first">
+    </signal>
+  </class>
+  <class name="GimpColorDisplay" get-type="gimp_color_display_get_type" parents="GObject">
+    <implements name="GimpConfigInterface"/>
+    <property name="enabled" type="gboolean" flags="231"/>
+    <property name="color-config" type="GimpColorConfig" flags="235"/>
+    <property name="color-managed" type="GimpColorManaged" flags="235"/>
+    <signal name="changed" return="void" when="first">
+    </signal>
+  </class>
+  <class name="GimpColorDisplayStack" get-type="gimp_color_display_stack_get_type" parents="GObject">
+    <signal name="changed" return="void" when="first">
+    </signal>
+    <signal name="added" return="void" when="first">
+      <param type="GimpColorDisplay"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="removed" return="void" when="first">
+      <param type="GimpColorDisplay"/>
+    </signal>
+    <signal name="reordered" return="void" when="first">
+      <param type="GimpColorDisplay"/>
+      <param type="gint"/>
+    </signal>
+  </class>
+  <class name="GimpColorHexEntry" get-type="gimp_color_hex_entry_get_type" parents="GtkEntry,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkEditable"/>
+    <implements name="GtkCellEditable"/>
+    <signal name="color-changed" return="void" when="first">
+    </signal>
+  </class>
+  <class name="GimpColorSelector" get-type="gimp_color_selector_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <signal name="color-changed" return="void" when="first">
+      <param type="GimpRGB"/>
+      <param type="GimpRGB"/>
+    </signal>
+    <signal name="channel-changed" return="void" when="first">
+      <param type="GimpColorSelectorChannel"/>
+    </signal>
+    <signal name="model-visible-changed" return="void" when="first">
+      <param type="GimpColorSelectorModel"/>
+      <param type="gboolean"/>
+    </signal>
+  </class>
+  <class name="GimpColorNotebook" get-type="gimp_color_notebook_get_type" parents="GimpColorSelector,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+  </class>
+  <class name="GimpColorProfileChooserDialog" get-type="gimp_color_profile_chooser_dialog_get_type" parents="GtkFileChooserDialog,GtkDialog,GtkWindow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkFileChooser"/>
+  </class>
+  <class name="GimpColorProfileComboBox" get-type="gimp_color_profile_combo_box_get_type" parents="GtkComboBox,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkCellLayout"/>
+    <implements name="GtkCellEditable"/>
+    <property name="dialog" type="GtkDialog" flags="235"/>
+    <property name="model" type="GimpColorProfileStore" flags="227"/>
+  </class>
+  <class name="GimpColorProfileStore" get-type="gimp_color_profile_store_get_type" parents="GtkListStore,GObject">
+    <implements name="GtkTreeModel"/>
+    <implements name="GtkTreeDragSource"/>
+    <implements name="GtkTreeDragDest"/>
+    <implements name="GtkTreeSortable"/>
+    <implements name="GtkBuildable"/>
+    <property name="history" type="GFile" flags="235"/>
+  </class>
+  <class name="GimpColorProfileView" get-type="gimp_color_profile_view_get_type" parents="GtkTextView,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkScrollable"/>
+  </class>
+  <class name="GimpLabeled" get-type="gimp_labeled_get_type" parents="GtkGrid,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="label" type="gchararray" flags="227"/>
+    <signal name="mnemonic-widget-changed" return="void" when="first">
+      <param type="GtkWidget"/>
+    </signal>
+  </class>
+  <class name="GimpLabelSpin" get-type="gimp_label_spin_get_type" parents="GimpLabeled,GtkGrid,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="value" type="gdouble" flags="227"/>
+    <property name="lower" type="gdouble" flags="231"/>
+    <property name="upper" type="gdouble" flags="231"/>
+    <property name="digits" type="gint" flags="227"/>
+    <signal name="value-changed" return="void" when="first">
+    </signal>
+  </class>
+  <class name="GimpScaleEntry" get-type="gimp_scale_entry_get_type" parents="GimpLabelSpin,GimpLabeled,GtkGrid,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+  </class>
+  <class name="GimpColorScaleEntry" get-type="gimp_color_scale_entry_get_type" parents="GimpScaleEntry,GimpLabelSpin,GimpLabeled,GtkGrid,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+  </class>
+  <class name="GimpColorSelection" get-type="gimp_color_selection_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="config" type="GimpColorConfig" flags="2"/>
+    <signal name="color-changed" return="void" when="first">
+    </signal>
+  </class>
+  <class name="GimpDialog" get-type="gimp_dialog_get_type" parents="GtkDialog,GtkWindow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="help-func" type="gpointer" flags="235"/>
+    <property name="help-id" type="gchararray" flags="231"/>
+    <property name="parent" type="GtkWidget" flags="234"/>
+  </class>
+  <class name="GimpIntComboBox" get-type="gimp_int_combo_box_get_type" parents="GtkComboBox,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkCellLayout"/>
+    <implements name="GtkCellEditable"/>
+    <property name="ellipsize" type="PangoEllipsizeMode" flags="227"/>
+    <property name="label" type="gchararray" flags="227"/>
+    <property name="layout" type="GimpIntComboBoxLayout" flags="227"/>
+    <property name="value" type="gint" flags="227"/>
+  </class>
+  <class name="GimpEnumComboBox" get-type="gimp_enum_combo_box_get_type" parents="GimpIntComboBox,GtkComboBox,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkCellLayout"/>
+    <implements name="GtkCellEditable"/>
+    <property name="model" type="GimpEnumStore" flags="227"/>
+  </class>
+  <class name="GimpEnumLabel" get-type="gimp_enum_label_get_type" parents="GtkLabel,GtkMisc,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="enum-type" type="GType" flags="235"/>
+    <property name="enum-value" type="gint" flags="230"/>
+  </class>
+  <class name="GimpIntStore" get-type="gimp_int_store_get_type" parents="GtkListStore,GObject">
+    <implements name="GtkTreeModel"/>
+    <implements name="GtkTreeDragSource"/>
+    <implements name="GtkTreeDragDest"/>
+    <implements name="GtkTreeSortable"/>
+    <implements name="GtkBuildable"/>
+    <property name="user-data-type" type="GType" flags="235"/>
+  </class>
+  <class name="GimpEnumStore" get-type="gimp_enum_store_get_type" parents="GimpIntStore,GtkListStore,GObject">
+    <implements name="GtkTreeModel"/>
+    <implements name="GtkTreeDragSource"/>
+    <implements name="GtkTreeDragDest"/>
+    <implements name="GtkTreeSortable"/>
+    <implements name="GtkBuildable"/>
+    <property name="enum-type" type="GType" flags="235"/>
+  </class>
+  <class name="GimpFrame" get-type="gimp_frame_get_type" parents="GtkFrame,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+  </class>
+  <class name="GimpHintBox" get-type="gimp_hint_box_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="icon-name" type="gchararray" flags="235"/>
+    <property name="hint" type="gchararray" flags="235"/>
+  </class>
+  <class name="GimpIntRadioFrame" get-type="gimp_int_radio_frame_get_type" parents="GimpFrame,GtkFrame,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="value" type="gint" flags="1073742051"/>
+    <property name="store" type="GimpIntStore" flags="1073742051"/>
+  </class>
+  <class name="GimpLabelColor" get-type="gimp_label_color_get_type" parents="GimpLabeled,GtkGrid,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="value" type="GimpRGB" flags="231"/>
+    <property name="editable" type="gboolean" flags="227"/>
+    <signal name="value-changed" return="void" when="first">
+    </signal>
+  </class>
+  <class name="GimpLabelEntry" get-type="gimp_label_entry_get_type" parents="GimpLabeled,GtkGrid,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="value" type="gchararray" flags="227"/>
+    <signal name="value-changed" return="void" when="first">
+    </signal>
+  </class>
+  <class name="GimpLabelIntWidget" get-type="gimp_label_int_widget_get_type" parents="GimpLabeled,GtkGrid,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="value" type="gint" flags="227"/>
+    <property name="widget" type="GtkWidget" flags="235"/>
+    <signal name="value-changed" return="void" when="first">
+    </signal>
+  </class>
+  <class name="GimpMemsizeEntry" get-type="gimp_memsize_entry_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <signal name="value-changed" return="void" when="first">
+    </signal>
+  </class>
+  <class name="GimpNumberPairEntry" get-type="gimp_number_pair_entry_get_type" parents="GtkEntry,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkEditable"/>
+    <implements name="GtkCellEditable"/>
+    <property name="left-number" type="gdouble" flags="227"/>
+    <property name="right-number" type="gdouble" flags="227"/>
+    <property name="default-left-number" type="gdouble" flags="227"/>
+    <property name="default-right-number" type="gdouble" flags="227"/>
+    <property name="user-override" type="gboolean" flags="227"/>
+    <property name="separators" type="gchararray" flags="235"/>
+    <property name="default-text" type="gchararray" flags="227"/>
+    <property name="allow-simplification" type="gboolean" flags="227"/>
+    <property name="min-valid-value" type="gdouble" flags="227"/>
+    <property name="max-valid-value" type="gdouble" flags="227"/>
+    <property name="ratio" type="gdouble" flags="227"/>
+    <property name="aspect" type="GimpAspectType" flags="227"/>
+    <signal name="numbers-changed" return="void" when="first">
+    </signal>
+    <signal name="ratio-changed" return="void" when="first">
+    </signal>
+  </class>
+  <class name="GimpOffsetArea" get-type="gimp_offset_area_get_type" parents="GtkDrawingArea,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <signal name="offsets-changed" return="void" when="first">
+      <param type="gint"/>
+      <param type="gint"/>
+    </signal>
+  </class>
+  <class name="GimpPageSelector" get-type="gimp_page_selector_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="n-pages" type="gint" flags="227"/>
+    <property name="target" type="GimpPageSelectorTarget" flags="227"/>
+    <signal name="activate" return="void" when="first" action="1">
+    </signal>
+    <signal name="selection-changed" return="void" when="first">
+    </signal>
+  </class>
+  <class name="GimpPathEditor" get-type="gimp_path_editor_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <signal name="path-changed" return="void" when="first">
+    </signal>
+    <signal name="writable-changed" return="void" when="first">
+    </signal>
+  </class>
+  <class name="GimpPickButton" get-type="gimp_pick_button_get_type" parents="GtkButton,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkActionable"/>
+    <implements name="GtkActivatable"/>
+    <signal name="color-picked" return="void" when="first">
+      <param type="GimpRGB"/>
+    </signal>
+  </class>
+  <class name="GimpPreview" get-type="gimp_preview_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject" abstract="1">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="update" type="gboolean" flags="231"/>
+    <signal name="invalidated" return="void" when="first">
+    </signal>
+  </class>
+  <class name="GimpPreviewArea" get-type="gimp_preview_area_get_type" parents="GtkDrawingArea,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="check-size" type="GimpCheckSize" flags="227"/>
+    <property name="check-type" type="GimpCheckType" flags="227"/>
+    <property name="check-custom-color1" type="GimpRGB" flags="227"/>
+    <property name="check-custom-color2" type="GimpRGB" flags="227"/>
+  </class>
+  <class name="GimpRuler" get-type="gimp_ruler_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="orientation" type="GtkOrientation" flags="227"/>
+    <property name="unit" type="GimpUnit" flags="227"/>
+    <property name="lower" type="gdouble" flags="227"/>
+    <property name="upper" type="gdouble" flags="227"/>
+    <property name="position" type="gdouble" flags="227"/>
+    <property name="max-size" type="gdouble" flags="227"/>
+  </class>
+  <class name="GimpScrolledPreview" get-type="gimp_scrolled_preview_get_type" parents="GimpPreview,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject" abstract="1">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+  </class>
+  <class name="GimpSizeEntry" get-type="gimp_size_entry_get_type" parents="GtkGrid,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <signal name="value-changed" return="void" when="first">
+    </signal>
+    <signal name="refval-changed" return="void" when="first">
+    </signal>
+    <signal name="unit-changed" return="void" when="first">
+    </signal>
+  </class>
+  <class name="GimpSpinButton" get-type="gimp_spin_button_get_type" parents="GtkSpinButton,GtkEntry,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkEditable"/>
+    <implements name="GtkCellEditable"/>
+    <implements name="GtkOrientable"/>
+  </class>
+  <class name="GimpSpinScale" get-type="gimp_spin_scale_get_type" parents="GimpSpinButton,GtkSpinButton,GtkEntry,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkEditable"/>
+    <implements name="GtkCellEditable"/>
+    <implements name="GtkOrientable"/>
+    <property name="label" type="gchararray" flags="227"/>
+  </class>
+  <class name="GimpStringComboBox" get-type="gimp_string_combo_box_get_type" parents="GtkComboBox,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkCellLayout"/>
+    <implements name="GtkCellEditable"/>
+    <property name="id-column" type="gint" flags="235"/>
+    <property name="label-column" type="gint" flags="235"/>
+    <property name="ellipsize" type="PangoEllipsizeMode" flags="227"/>
+  </class>
+  <class name="GimpUnitComboBox" get-type="gimp_unit_combo_box_get_type" parents="GtkComboBox,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkCellLayout"/>
+    <implements name="GtkCellEditable"/>
+  </class>
+  <class name="GimpUnitStore" get-type="gimp_unit_store_get_type" parents="GObject">
+    <implements name="GtkTreeModel"/>
+    <property name="num-values" type="gint" flags="235"/>
+    <property name="has-pixels" type="gboolean" flags="227"/>
+    <property name="has-percent" type="gboolean" flags="227"/>
+    <property name="short-format" type="gchararray" flags="227"/>
+    <property name="long-format" type="gchararray" flags="227"/>
+  </class>
+  <class name="GimpZoomModel" get-type="gimp_zoom_model_get_type" parents="GObject">
+    <property name="value" type="gdouble" flags="227"/>
+    <property name="minimum" type="gdouble" flags="227"/>
+    <property name="maximum" type="gdouble" flags="227"/>
+    <property name="fraction" type="gchararray" flags="225"/>
+    <property name="percentage" type="gchararray" flags="225"/>
+    <signal name="zoomed" return="void" when="last">
+      <param type="gdouble"/>
+      <param type="gdouble"/>
+    </signal>
+  </class>
+  <class name="GimpAspectPreview" get-type="gimp_aspect_preview_get_type" parents="GimpPreview,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="drawable" type="GimpDrawable" flags="235"/>
+  </class>
+  <class name="GimpSelectButton" get-type="gimp_select_button_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+  </class>
+  <class name="GimpBrushSelectButton" get-type="gimp_brush_select_button_get_type" parents="GimpSelectButton,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="title" type="gchararray" flags="235"/>
+    <property name="brush-name" type="gchararray" flags="227"/>
+    <property name="brush-opacity" type="gdouble" flags="227"/>
+    <property name="brush-spacing" type="gint" flags="227"/>
+    <property name="brush-paint-mode" type="gint" flags="227"/>
+    <signal name="brush-set" return="void" when="first">
+      <param type="gchararray"/>
+      <param type="gdouble"/>
+      <param type="gint"/>
+      <param type="gint"/>
+      <param type="gint"/>
+      <param type="gint"/>
+      <param type="gpointer"/>
+      <param type="gboolean"/>
+    </signal>
+  </class>
+  <class name="GimpDrawablePreview" get-type="gimp_drawable_preview_get_type" parents="GimpScrolledPreview,GimpPreview,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="drawable" type="GimpDrawable" flags="235"/>
+  </class>
+  <class name="GimpFontSelectButton" get-type="gimp_font_select_button_get_type" parents="GimpSelectButton,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="title" type="gchararray" flags="235"/>
+    <property name="font-name" type="gchararray" flags="227"/>
+    <signal name="font-set" return="void" when="first">
+      <param type="gchararray"/>
+      <param type="gboolean"/>
+    </signal>
+  </class>
+  <class name="GimpGradientSelectButton" get-type="gimp_gradient_select_button_get_type" parents="GimpSelectButton,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="title" type="gchararray" flags="235"/>
+    <property name="gradient-name" type="gchararray" flags="227"/>
+    <signal name="gradient-set" return="void" when="first">
+      <param type="gchararray"/>
+      <param type="gint"/>
+      <param type="gpointer"/>
+      <param type="gboolean"/>
+    </signal>
+  </class>
+  <class name="GimpImageComboBox" get-type="gimp_image_combo_box_get_type" parents="GimpIntComboBox,GtkComboBox,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkCellLayout"/>
+    <implements name="GtkCellEditable"/>
+  </class>
+  <class name="GimpDrawableComboBox" get-type="gimp_drawable_combo_box_get_type" parents="GimpIntComboBox,GtkComboBox,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkCellLayout"/>
+    <implements name="GtkCellEditable"/>
+  </class>
+  <class name="GimpChannelComboBox" get-type="gimp_channel_combo_box_get_type" parents="GimpIntComboBox,GtkComboBox,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkCellLayout"/>
+    <implements name="GtkCellEditable"/>
+  </class>
+  <class name="GimpLayerComboBox" get-type="gimp_layer_combo_box_get_type" parents="GimpIntComboBox,GtkComboBox,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkCellLayout"/>
+    <implements name="GtkCellEditable"/>
+  </class>
+  <class name="GimpVectorsComboBox" get-type="gimp_vectors_combo_box_get_type" parents="GimpIntComboBox,GtkComboBox,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkCellLayout"/>
+    <implements name="GtkCellEditable"/>
+  </class>
+  <class name="GimpPaletteSelectButton" get-type="gimp_palette_select_button_get_type" parents="GimpSelectButton,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="title" type="gchararray" flags="235"/>
+    <property name="palette-name" type="gchararray" flags="227"/>
+    <signal name="palette-set" return="void" when="first">
+      <param type="gchararray"/>
+      <param type="gboolean"/>
+    </signal>
+  </class>
+  <class name="GimpPatternSelectButton" get-type="gimp_pattern_select_button_get_type" parents="GimpSelectButton,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="title" type="gchararray" flags="235"/>
+    <property name="pattern-name" type="gchararray" flags="227"/>
+    <signal name="pattern-set" return="void" when="first">
+      <param type="gchararray"/>
+      <param type="gint"/>
+      <param type="gint"/>
+      <param type="gint"/>
+      <param type="gpointer"/>
+      <param type="gboolean"/>
+    </signal>
+  </class>
+  <class name="GimpProcBrowserDialog" get-type="gimp_proc_browser_dialog_get_type" parents="GimpDialog,GtkDialog,GtkWindow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <signal name="selection-changed" return="void" when="last">
+    </signal>
+    <signal name="row-activated" return="void" when="last">
+    </signal>
+  </class>
+  <class name="GimpProcedureDialog" get-type="gimp_procedure_dialog_get_type" parents="GimpDialog,GtkDialog,GtkWindow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="procedure" type="GimpProcedure" flags="235"/>
+    <property name="config" type="GimpProcedureConfig" flags="231"/>
+  </class>
+  <class name="GimpProgressBar" get-type="gimp_progress_bar_get_type" parents="GtkProgressBar,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+  </class>
+  <class name="GimpSaveProcedureDialog" get-type="gimp_save_procedure_dialog_get_type" parents="GimpProcedureDialog,GimpDialog,GtkDialog,GtkWindow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+  </class>
+  <class name="GimpZoomPreview" get-type="gimp_zoom_preview_get_type" parents="GimpScrolledPreview,GimpPreview,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="drawable" type="GimpDrawable" flags="235"/>
+    <property name="model" type="GimpZoomModel" flags="235"/>
+  </class>
+  <error-quark function="gimp_widgets_error_quark" domain="gimp-widgets-error-quark"/>
+</dump>

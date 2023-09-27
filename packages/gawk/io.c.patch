@@ -19,15 +19,6 @@ diff -u -r ../gawk-4.2.1/io.c ./io.c
  		_exit(errno == ENOENT ? 127 : 126);
  
  	case -1:
-@@ -2364,7 +2364,7 @@
- 
- 	/* stderr does NOT get dup'ed onto child's stdout */
- #ifdef __EMX__
--	pid = spawnl(P_NOWAIT, "/bin/sh", "sh", "-c", str, NULL);
-+	pid = spawnl(P_NOWAIT, "@TERMUX_PREFIX@/bin/sh", "sh", "-c", str, NULL);
- #else  /* __MINGW32__ */
- 	pid = spawnl(P_NOWAIT, getenv("ComSpec"), "cmd.exe", "/c",
- 		     qcmd = quote_cmd(str), NULL);
 @@ -2422,7 +2422,7 @@
  			fatal(_("close of pipe failed (%s)"), strerror(errno));
  		/* stderr does NOT get dup'ed onto child's stdout */
@@ -37,15 +28,6 @@ diff -u -r ../gawk-4.2.1/io.c ./io.c
  		_exit(errno == ENOENT ? 127 : 126);
  	}
  #endif /* NOT __EMX__, NOT __MINGW32__ */
-@@ -2634,7 +2634,7 @@
- 	os_close_on_exec(save_stdout, cmd, "pipe", "from"); /* saved stdout of the parent process */
- 
- #ifdef __EMX__
--	pid = spawnl(P_NOWAIT, "/bin/sh", "sh", "-c", cmd, NULL);
-+	pid = spawnl(P_NOWAIT, "@TERMUX_PREFIX@/bin/sh", "sh", "-c", cmd, NULL);
- #else  /* __MINGW32__ */
- 	pid = spawnl(P_NOWAIT, getenv("ComSpec"), "cmd.exe", "/c",
- 		     qcmd = quote_cmd(cmd), NULL);
 @@ -2659,7 +2659,7 @@
  		if (close(p[0]) == -1 || close(p[1]) == -1)
  			fatal(_("close of pipe failed (%s)"), strerror(errno));

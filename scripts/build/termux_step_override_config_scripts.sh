@@ -1,5 +1,13 @@
 termux_step_override_config_scripts() {
-	if [ "$TERMUX_ON_DEVICE_BUILD" == true ] || [ "$TERMUX_INSTALL_DEPS" == false ]; then
+	if [ "$TERMUX_ON_DEVICE_BUILD" = true ]; then
+		return
+	fi
+
+	# Make $TERMUX_PREFIX/bin/sh executable on the builder, so that build
+	# scripts can assume that it works on both builder and host later on:
+	ln -sf /bin/sh "$TERMUX_PREFIX/bin/sh"
+
+	if [ "$TERMUX_INSTALL_DEPS" = false ]; then
 		return
 	fi
 
@@ -18,7 +26,6 @@ termux_step_override_config_scripts() {
 		sed $TERMUX_SCRIPTDIR/packages/libllvm/llvm-config.in \
 			-e "s|@TERMUX_PKG_VERSION@|$LIBLLVM_VERSION|g" \
 			-e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
-			-e "s|@TERMUX_PKG_SRCDIR@|$TERMUX_TOPDIR/libllvm/src|g" \
 			-e "s|@LLVM_TARGET_ARCH@|$LLVM_TARGET_ARCH|g" \
 			-e "s|@LLVM_DEFAULT_TARGET_TRIPLE@|$LLVM_DEFAULT_TARGET_TRIPLE|g" \
 			-e "s|@TERMUX_ARCH@|$TERMUX_ARCH|g" > $TERMUX_PREFIX/bin/llvm-config

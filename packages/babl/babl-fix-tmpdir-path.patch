@@ -1,0 +1,26 @@
+diff -uNr babl-0.1.90/babl/babl-cache.c babl-0.1.90.mod/babl/babl-cache.c
+--- babl-0.1.90/babl/babl-cache.c	2022-02-22 05:30:17.000000000 +0800
++++ babl-0.1.90.mod/babl/babl-cache.c	2022-05-17 14:46:33.685024500 +0800
+@@ -29,7 +29,7 @@
+ #ifdef _WIN32
+ #define FALLBACK_CACHE_PATH  "C:/babl-fishes.txt"
+ #else
+-#define FALLBACK_CACHE_PATH  "/tmp/babl-fishes.txt"
++#define FALLBACK_CACHE_PATH  "@TERMUX_PREFIX@/tmp/babl-fishes.txt"
+ #endif
+ 
+ static int
+diff -uNr babl-0.1.90/babl/babl-internal.c babl-0.1.90.mod/babl/babl-internal.c
+--- babl-0.1.90/babl/babl-internal.c	2022-02-22 05:30:17.000000000 +0800
++++ babl-0.1.90.mod/babl/babl-internal.c	2022-05-17 14:46:32.543949000 +0800
+@@ -65,8 +65,8 @@
+ {
+   char buf[512];
+ 
+-  snprintf (buf, sizeof (buf), "echo bt>/tmp/babl.gdb;"
+-           "gdb -q --batch -x /tmp/babl.gdb --pid=%i | grep 'in ''babl_die' -A40", getpid ());
++  snprintf (buf, sizeof (buf), "echo bt>@TERMUX_PREFIX@/tmp/babl.gdb;"
++           "gdb -q --batch -x @TERMUX_PREFIX@/tmp/babl.gdb --pid=%i | grep 'in ''babl_die' -A40", getpid ());
+   return system (buf);
+ }
+ 

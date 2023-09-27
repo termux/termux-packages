@@ -1,0 +1,28 @@
+--- a/src/rest/gnunet-rest-server.c
++++ b/src/rest/gnunet-rest-server.c
+@@ -29,6 +29,25 @@
+ #include "gnunet_rest_plugin.h"
+ #include "gnunet_mhd_compat.h"
+ 
++#if defined __ANDROID__ && __ANDROID_API__ < 28
++static int
++getlogin_r (char *buf, size_t size)
++{
++  char *login = getlogin ();
++  if (login == NULL)
++  {
++    return errno;
++  }
++  size_t login_length = strlen (login) + 1;
++  if (login_length > size)
++  {
++    return ERANGE;
++  }
++  memcpy (buf, login, login_length);
++  return 0;
++}
++#endif
++
+ /**
+  * Default Socks5 listen port.
+  */

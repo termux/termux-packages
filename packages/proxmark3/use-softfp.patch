@@ -1,0 +1,11 @@
+--- a/client/deps/hardnested/Makefile
++++ b/client/deps/hardnested/Makefile
+@@ -60,7 +60,7 @@
+ endif
+ ifeq ($(IS_SIMD_ARCH), arm)
+ 	SUPPORTS_AVX512=False
+-	HARD_SWITCH_NEON = -mfpu=neon
++	HARD_SWITCH_NEON = -mfpu=neon -mfloat-abi=softfp -mthumb
+ 	HARD_SWITCH_NOSIMD = -DNOSIMD_BUILD
+ endif
+ ifeq "$(SUPPORTS_AVX512)" "True"

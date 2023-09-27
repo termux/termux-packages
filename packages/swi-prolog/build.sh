@@ -1,16 +1,17 @@
 TERMUX_PKG_HOMEPAGE=https://swi-prolog.org/
 TERMUX_PKG_DESCRIPTION="Most popular and complete prolog implementation"
-TERMUX_PKG_LICENSE="ISC"
+TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 # Use "development" versions.
-TERMUX_PKG_VERSION=8.5.2
+TERMUX_PKG_VERSION=9.1.11
 TERMUX_PKG_SRCURL=https://www.swi-prolog.org/download/devel/src/swipl-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=4f582b70e5aef59ca95338a1cac3630360f3c2fe6623a0701bd49b46079a5aa4
-TERMUX_PKG_DEPENDS="libarchive, libcrypt, libgmp, libjpeg-turbo, libyaml, ncurses, ncurses-ui-libs, pcre, readline, ossp-uuid, zlib"
+TERMUX_PKG_SHA256=2a668333faebc19431989bd08f5d0f9716af29eb914a092a795bf3705925a289
+TERMUX_PKG_DEPENDS="libarchive, libcrypt, libgmp, libyaml, ncurses, openssl, ossp-uuid, readline, zlib, pcre2"
 TERMUX_PKG_FORCE_CMAKE=true
 TERMUX_PKG_HOSTBUILD=true
-
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DHAVE_WEAK_ATTRIBUTE_EXITCODE=0
+-DHAVE_WEAK_ATTRIBUTE_EXITCODE__TRYRUN_OUTPUT=
 -DINSTALL_DOCUMENTATION=OFF
 -DUSE_GMP=ON
 -DSWIPL_NATIVE_FRIEND=${TERMUX_PKG_HOSTBUILD_DIR}
@@ -61,6 +62,10 @@ termux_step_host_build() {
 	unset LDFLAGS
 	unset CFLAGS
 	unset CXXFLAGS
+}
+
+termux_step_pre_configure() {
+	LDFLAGS+=" $($CC -print-libgcc-file-name)"
 }
 
 termux_step_post_make_install() {

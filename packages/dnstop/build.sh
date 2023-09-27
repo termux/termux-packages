@@ -2,9 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://github.com/measurement-factory/dnstop
 TERMUX_PKG_DESCRIPTION="A libpcap application that displays various tables of DNS traffic on your network"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-_COMMIT=1fc98eb479513f4be68ba500aec18934d24e8fd6
-TERMUX_PKG_VERSION=2021.03.29
-TERMUX_PKG_SRCURL=https://github.com/measurement-factory/dnstop.git
+_COMMIT=2ec80df727aee31bbaaf9cccd8adbd16ca539bb3
+TERMUX_PKG_VERSION=2022.10.19
+TERMUX_PKG_SRCURL=git+https://github.com/measurement-factory/dnstop
+TERMUX_PKG_SHA256=5b3e58944a0ff03e9836133c974387269f47d4ef8fdeb7100faa66f74ed56624
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_DEPENDS="libpcap, ncurses"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -19,6 +20,12 @@ termux_step_post_get_source() {
 		echo " is different from what is expected to be: \"$version\""
 		return 1
 	fi
+
+	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum)
+	if [[ "${s}" != "${TERMUX_PKG_SHA256}  "* ]]; then
+		termux_error_exit "Checksum mismatch for source files."
+	fi
+
 	sed -i "s/@VERSION@/$version/g" dnstop.c
 }
 

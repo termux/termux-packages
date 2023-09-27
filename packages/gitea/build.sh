@@ -1,27 +1,41 @@
 TERMUX_PKG_HOMEPAGE=https://gitea.io
 TERMUX_PKG_DESCRIPTION="Git with a cup of tea, painless self-hosted git service"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
-TERMUX_PKG_VERSION=1.14.6
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="1.20.4"
 TERMUX_PKG_SRCURL=https://github.com/go-gitea/gitea/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=6953049817b86dafa3b8327b7a1b463ef7880f617a9574f03a4b4eb1ea4b6c4d
+TERMUX_PKG_SHA256=a3cf283fc409ead98e45488d8b7e6d4dad0c1ac7df7166702d292ff37a0753a1
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="dash, git"
 TERMUX_PKG_CONFFILES="etc/gitea/app.ini"
 
-termux_step_make() {
+termux_step_pre_configure() {
+	termux_setup_nodejs
 	termux_setup_golang
+}
+
+termux_step_make() {
 	export GOPATH=$TERMUX_PKG_BUILDDIR
 
 	mkdir -p "$GOPATH"/src/code.gitea.io
 	cp -a "$TERMUX_PKG_SRCDIR" "$GOPATH"/src/code.gitea.io/gitea
 	cd "$GOPATH"/src/code.gitea.io/gitea
 
+	go mod init || :
+	go mod tidy
+
+	# Effectively a backport of https://github.com/lib/pq/commit/6a102c04ac8dc082f1684b0488275575c374cb4c.
+	for f in "$GOPATH"/pkg/mod/github.com/lib/pq@*/user_posix.go; do
+		chmod 0755 "$(dirname "$f")"
+		chmod 0644 "$f"
+		sed -i '/^\/\/ +build /s/ linux / linux,!android /g' "$f"
+	done
+
 	LDFLAGS=""
 	LDFLAGS+=" -X code.gitea.io/gitea/modules/setting.CustomConf=$TERMUX_PREFIX/etc/gitea/app.ini"
 	LDFLAGS+=" -X code.gitea.io/gitea/modules/setting.AppWorkPath=$TERMUX_PREFIX/var/lib/gitea"
 	LDFLAGS+=" -X code.gitea.io/gitea/modules/setting.CustomPath=$TERMUX_PREFIX/var/lib/gitea"
-	GITEA_VERSION=v"$TERMUX_PKG_VERSION" TAGS="bindata sqlite" make all
+	GITEA_VERSION=v"$TERMUX_PKG_VERSION" TAGS="bindata sqlite sqlite_unlock_notify" make all
 }
 
 termux_step_make_install() {

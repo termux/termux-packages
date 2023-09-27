@@ -1,0 +1,45 @@
+--- a/gtk/gsynaptic.cc
++++ b/gtk/gsynaptic.cc
+@@ -185,12 +185,12 @@
+       vector<string> filenames = lister->getPolicyArchives(true);
+       for (int i=0;i<filenames.size();i++) {
+ 	 stat(filenames[i].c_str(), &st);
+-	 if(filenames[i] != "/var/lib/dpkg/status")
++	 if(filenames[i] != "@TERMUX_PREFIX@/var/lib/dpkg/status")
+ 	    lastUpdate = max(lastUpdate, (int)st.st_mtime);
+       }
+       
+       // new apt uses this
+-      string update_stamp = _config->FindDir("Dir::State","var/lib/apt");
++      string update_stamp = _config->FindDir("Dir::State","@TERMUX_PREFIX@/var/lib/apt");
+       update_stamp += "update-stamp";
+       if(FileExists(update_stamp)) {
+ 	 stat(update_stamp.c_str(), &st);
+@@ -309,9 +309,6 @@
+ //    *) if not, show message and fail
+ void check_and_aquire_lock()
+ {
+-   if (getuid() != 0) 
+-      return;
+-
+    GtkWidget *dia;
+    gchar *msg = NULL;
+    pid_t LockedApp, runsNonInteractive;
+@@ -429,17 +426,6 @@
+    if (_config->FindB("help") == true)
+       ShowHelp(CmdL);
+ 
+-   if (getuid() != 0) {
+-      RGUserDialog userDialog;
+-      userDialog.warning(g_strdup_printf("<b><big>%s</big></b>\n\n%s",
+-                                         _("Starting \"Synaptic Package Manager\" without "
+-                                           "administrative privileges"),
+-				         _("You will not be able to apply "
+-				           "any changes, but you can still "
+-					   "export the marked changes or "
+-					   "create a download script "
+-					   "for them.")));
+-   }
+ 
+    if (!RInitConfiguration("synaptic.conf")) {
+       RGUserDialog userDialog;

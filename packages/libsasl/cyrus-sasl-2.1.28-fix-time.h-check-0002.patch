@@ -1,0 +1,15 @@
+https://github.com/termux/termux-packages/issues/15852
+
+--- a/plugins/digestmd5.c
++++ b/plugins/digestmd5.c
+@@ -85,6 +85,10 @@
+ #else /* Unix */
+ # include <netinet/in.h>
+ #endif /* WIN32 */
++ 
++#ifdef HAVE_TIME_H
++# include <time.h>
++#endif
+ 
+ #include <sasl.h>
+ #include <saslplug.h>

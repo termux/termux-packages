@@ -1,17 +1,18 @@
-TERMUX_PKG_HOMEPAGE=http://w3m.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://w3m.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="Text based Web browser and pager"
-TERMUX_PKG_LICENSE="BSD"
+TERMUX_PKG_LICENSE="custom"
+TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 _MAJOR_VERSION=0.5.3
-_MINOR_VERSION=20190105
+_MINOR_VERSION=20230121
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.${_MINOR_VERSION}
-TERMUX_PKG_REVISION=6
 # The upstream w3m project is dead, but every linux distribution uses
 # this maintained fork in debian:
 TERMUX_PKG_SRCURL=https://github.com/tats/w3m/archive/v${_MAJOR_VERSION}+git${_MINOR_VERSION}.tar.gz
-TERMUX_PKG_SHA256=0467bb5429b75749205a3f57b9f5e8abba49929272aeab6fce94ff17953f0784
+TERMUX_PKG_SHA256=fdc7d55d3c0104db26aa9759db34f37e5eee03f44c868796e3bbfb8935c96e39
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="libgc, ncurses, openssl, zlib"
+TERMUX_PKG_RECOMMENDS="libsixel"
 TERMUX_PKG_SUGGESTS="perl"
 
 # ac_cv_func_bcopy=yes to avoid w3m defining it's own bcopy function, which

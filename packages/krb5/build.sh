@@ -1,12 +1,11 @@
 TERMUX_PKG_HOMEPAGE=https://web.mit.edu/kerberos
 TERMUX_PKG_DESCRIPTION="The Kerberos network authentication system"
-TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="../NOTICE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.19.2
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=1.21
 TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/krb5-$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=10453fee4e3a8f8ce6129059e5c050b8a65dab1c257df68b99b3112eaa0cdf6a
+TERMUX_PKG_SHA256=69f8aaff85484832df67a4bbacd99b9259bd95aab8c651fbbe65cdc9620ea93b
 TERMUX_PKG_DEPENDS="libandroid-support, libandroid-glob, libresolv-wrapper, readline, openssl, libdb"
 TERMUX_PKG_BREAKS="krb5-dev"
 TERMUX_PKG_REPLACES="krb5-dev"

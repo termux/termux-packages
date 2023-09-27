@@ -1,0 +1,28 @@
+diff -uNr libxkbcommon-xkbcommon-1.3.0/meson.build libxkbcommon-xkbcommon-1.3.0.mod/meson.build
+--- libxkbcommon-xkbcommon-1.3.0/meson.build	2021-05-01 20:51:23.000000000 +0000
++++ libxkbcommon-xkbcommon-1.3.0.mod/meson.build	2021-05-05 22:04:46.581405754 +0000
+@@ -527,10 +527,12 @@
+ xkct_config.set('XKB_CONFIG_ROOT', XKBCONFIGROOT)
+ configure_file(input: 'test/xkeyboard-config-test.py.in',
+                output: 'xkeyboard-config-test',
+                configuration: xkct_config)
+ 
++if false
++
+ # Tests
+ test_env = environment()
+ test_env.set('XKB_LOG_LEVEL', 'debug')
+ test_env.set('XKB_LOG_VERBOSITY', '10')
+ test_env.set('top_srcdir', meson.current_source_dir())
+@@ -761,10 +763,11 @@
+       executable('bench-x11', 'bench/x11.c', dependencies: x11_test_dep),
+       env: bench_env,
+   )
+ endif
+ 
++endif
+ 
+ # Documentation.
+ if get_option('enable-docs')
+     doxygen = find_program('doxygen', required: false)
+     if not doxygen.found()

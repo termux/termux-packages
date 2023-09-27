@@ -1,18 +1,16 @@
-diff -u -r ../newsboat-2.20.1/rust/libnewsboat/src/cliargsparser.rs ./rust/libnewsboat/src/cliargsparser.rs
---- ../newsboat-2.20.1/rust/libnewsboat/src/cliargsparser.rs	2020-06-24 09:51:43.000000000 +0000
-+++ ./rust/libnewsboat/src/cliargsparser.rs	2020-08-12 07:29:06.630175000 +0000
-@@ -1,5 +1,4 @@
- use clap::{App, Arg};
+--- a/rust/libnewsboat/src/cliargsparser.rs
++++ b/rust/libnewsboat/src/cliargsparser.rs
+@@ -1,4 +1,3 @@
 -use gettextrs::gettext;
+ use lexopt::{Parser, ValueExt};
  use libc::{EXIT_FAILURE, EXIT_SUCCESS};
- use std::path::PathBuf;
- 
-@@ -286,7 +285,7 @@
-                 }
-                 _ => {
-                     args.display_msg = fmt!(
--                        &gettext("%s: %s: invalid loglevel value"),
-+                        "%s: %s: invalid loglevel value",
-                         &opts[0],
-                         log_level_str
-                     );
+ use std::ffi::{OsStr, OsString};
+@@ -205,7 +204,7 @@
+                     }
+                     Err(()) => {
+                         return Err(CliParseError::InvalidLogLevel(fmt!(
+-                            &gettext("%s: %s: invalid loglevel value"),
++                            "%s: %s: invalid loglevel value",
+                             &args.program_name,
+                             log_level_str.to_string_lossy().to_string()
+                         )));

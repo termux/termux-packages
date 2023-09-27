@@ -40,6 +40,16 @@ termux_step_create_pacman_package() {
 	local BUILD_DATE
 	BUILD_DATE=$(date +%s)
 
+	if [ "$TERMUX_GLOBAL_LIBRARY" = "true" ] && [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
+		test ! -z "$TERMUX_PKG_DEPENDS" && TERMUX_PKG_DEPENDS=$(package__add_prefix_glibc_to_package_list "$TERMUX_PKG_DEPENDS")
+		test ! -z "$TERMUX_PKG_BREAKS" && TERMUX_PKG_BREAKS=$(package__add_prefix_glibc_to_package_list "$TERMUX_PKG_BREAKS")
+		test ! -z "$TERMUX_PKG_CONFLICTS" && TERMUX_PKG_CONFLICTS=$(package__add_prefix_glibc_to_package_list "$TERMUX_PKG_CONFLICTS")
+		test ! -z "$TERMUX_PKG_RECOMMENDS" && TERMUX_PKG_RECOMMENDS=$(package__add_prefix_glibc_to_package_list "$TERMUX_PKG_RECOMMENDS")
+		test ! -z "$TERMUX_PKG_REPLACES" && TERMUX_PKG_REPLACES=$(package__add_prefix_glibc_to_package_list "$TERMUX_PKG_REPLACES")
+		test ! -z "$TERMUX_PKG_PROVIDES" && TERMUX_PKG_PROVIDES=$(package__add_prefix_glibc_to_package_list "$TERMUX_PKG_PROVIDES")
+		test ! -z "$TERMUX_PKG_SUGGESTS" && TERMUX_PKG_SUGGESTS=$(package__add_prefix_glibc_to_package_list "$TERMUX_PKG_SUGGESTS")
+	fi
+
 	# Package metadata.
 	{
 		echo "pkgname = $TERMUX_PKG_NAME"
@@ -57,23 +67,23 @@ termux_step_create_pacman_package() {
 		fi
 
 		if [ -n "$TERMUX_PKG_REPLACES" ]; then
-			tr ',' '\n' <<< "$TERMUX_PKG_REPLACES" | sed 's|(||g; s|)||g; s| ||g; s|>>|>|g; s|<<|<|g' | awk '{ printf "replaces = %s\n", $1 }'
+			tr ',' '\n' <<< "$TERMUX_PKG_REPLACES" | sed 's|(||g; s|)||g; s| ||g; s|>>|>|g; s|<<|<|g' | awk '{ printf "replaces = " $1; if ( ($1 ~ /</ || $1 ~ />/ || $1 ~ /=/) && $1 !~ /-/ ) printf "-0"; printf "\n" }'
 		fi
 
 		if [ -n "$TERMUX_PKG_CONFLICTS" ]; then
-			tr ',' '\n' <<< "$TERMUX_PKG_CONFLICTS" | sed 's|(||g; s|)||g; s| ||g; s|>>|>|g; s|<<|<|g' | awk '{ printf "conflict = %s\n", $1 }'
+			tr ',' '\n' <<< "$TERMUX_PKG_CONFLICTS" | sed 's|(||g; s|)||g; s| ||g; s|>>|>|g; s|<<|<|g' | awk '{ printf "conflict = " $1; if ( ($1 ~ /</ || $1 ~ />/ || $1 ~ /=/) && $1 !~ /-/ ) printf "-0"; printf "\n" }'
 		fi
 
 		if [ -n "$TERMUX_PKG_BREAKS" ]; then
-			tr ',' '\n' <<< "$TERMUX_PKG_BREAKS" | sed 's|(||g; s|)||g; s| ||g; s|>>|>|g; s|<<|<|g' | awk '{ printf "conflict = %s\n", $1 }'
+			tr ',' '\n' <<< "$TERMUX_PKG_BREAKS" | sed 's|(||g; s|)||g; s| ||g; s|>>|>|g; s|<<|<|g' | awk '{ printf "conflict = " $1; if ( ($1 ~ /</ || $1 ~ />/ || $1 ~ /=/) && $1 !~ /-/ ) printf "-0"; printf "\n" }'
 		fi
 
 		if [ -n "$TERMUX_PKG_PROVIDES" ]; then
-			tr ',' '\n' <<< "$TERMUX_PKG_PROVIDES" | sed 's|(||g; s|)||g; s| ||g; s|>>|>|g; s|<<|<|g' | awk '{ printf "provides = %s\n", $1 }'
+			tr ',' '\n' <<< "$TERMUX_PKG_PROVIDES" | sed 's|(||g; s|)||g; s| ||g; s|>>|>|g; s|<<|<|g' | awk '{ printf "provides = " $1; if ( ($1 ~ /</ || $1 ~ />/ || $1 ~ /=/) && $1 !~ /-/ ) printf "-0"; printf "\n" }'
 		fi
 
 		if [ -n "$TERMUX_PKG_DEPENDS" ]; then
-			tr ',' '\n' <<< "$TERMUX_PKG_DEPENDS" | sed 's|(||g; s|)||g; s| ||g; s|>>|>|g; s|<<|<|g' | awk '{ printf "depend = %s\n", $1 }' | sed 's/|.*//'
+			tr ',' '\n' <<< "$TERMUX_PKG_DEPENDS" | sed 's|(||g; s|)||g; s| ||g; s|>>|>|g; s|<<|<|g' | awk '{ printf "depend = " $1; if ( ($1 ~ /</ || $1 ~ />/ || $1 ~ /=/) && $1 !~ /-/ ) printf "-0"; printf "\n" }' | sed 's/|.*//'
 		fi
 
 		if [ -n "$TERMUX_PKG_RECOMMENDS" ]; then
@@ -85,7 +95,7 @@ termux_step_create_pacman_package() {
 		fi
 
 		if [ -n "$TERMUX_PKG_BUILD_DEPENDS" ]; then
-			tr ',' '\n' <<< "$TERMUX_PKG_BUILD_DEPENDS" | sed 's|(||g; s|)||g; s| ||g; s|>>|>|g; s|<<|<|g' | awk '{ printf "makedepend = %s\n", $1 }'
+			tr ',' '\n' <<< "$TERMUX_PKG_BUILD_DEPENDS" | sed 's|(||g; s|)||g; s| ||g; s|>>|>|g; s|<<|<|g' | awk '{ printf "makedepend = " $1; if ( ($1 ~ /</ || $1 ~ />/ || $1 ~ /=/) && $1 !~ /-/ ) printf "-0"; printf "\n" }'
 		fi
 
 		if [ -n "$TERMUX_PKG_CONFFILES" ]; then

@@ -1,0 +1,12 @@
+--- a/src/third_party/gettext/gettext.h
++++ b/src/third_party/gettext/gettext.h
+@@ -49,6 +49,9 @@
+ #include <libintl.h>
+ CLANG_DIAG_ON("-Wreserved-id-macro")
+ #else
++#ifdef __ANDROID__
++#include <locale.h>
++#endif
+ #include <libintl.h>
+ #endif
+ 

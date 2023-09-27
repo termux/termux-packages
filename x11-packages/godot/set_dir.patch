@@ -1,0 +1,89 @@
+diff --git a/modules/gltf/editor/editor_scene_importer_blend.cpp b/modules/gltf/editor/editor_scene_importer_blend.cpp
+index 7dcdc8e..13e872c 100644
+--- a/modules/gltf/editor/editor_scene_importer_blend.cpp
++++ b/modules/gltf/editor/editor_scene_importer_blend.cpp
+@@ -502,12 +502,12 @@ bool EditorFileSystemImportFormatSupportQueryBlend::query() {
+ 		}
+ 
+ #elif defined(UNIX_ENABLED)
+-		if (_autodetect_path("/usr/bin")) {
++		if (_autodetect_path("@TERMUX_PREFIX@/bin")) {
+ 			// Good.
+-		} else if (_autodetect_path("/usr/local/bin")) {
++		} else if (_autodetect_path("@TERMUX_PREFIX@/local/bin")) {
+ 			// Good
+ 		} else {
+-			_autodetect_path("/opt/blender/bin");
++			_autodetect_path("@TERMUX_PREFIX@/opt/blender/bin");
+ 		}
+ #endif
+ 		if (auto_detected_path != "") {
+diff --git a/modules/mono/editor/GodotTools/GodotTools/Build/DotNetFinder.cs b/modules/mono/editor/GodotTools/GodotTools/Build/DotNetFinder.cs
+index b437c7e..882b22c 100644
+--- a/modules/mono/editor/GodotTools/GodotTools/Build/DotNetFinder.cs
++++ b/modules/mono/editor/GodotTools/GodotTools/Build/DotNetFinder.cs
+@@ -21,13 +21,13 @@ namespace GodotTools.Build
+             {
+                 if (RuntimeInformation.OSArchitecture == Architecture.X64)
+                 {
+-                    string dotnet_x64 = "/usr/local/share/dotnet/x64/dotnet"; // Look for x64 version, when running under Rosetta 2.
++                    string dotnet_x64 = "@TERMUX_PREFIX@/share/dotnet/x64/dotnet"; // Look for x64 version, when running under Rosetta 2.
+                     if (File.Exists(dotnet_x64))
+                     {
+                         return dotnet_x64;
+                     }
+                 }
+-                string dotnet = "/usr/local/share/dotnet/dotnet"; // Look for native version.
++                string dotnet = "@TERMUX_PREFIX@/share/dotnet/dotnet"; // Look for native version.
+                 if (File.Exists(dotnet))
+                 {
+                     return dotnet;
+diff --git a/modules/mono/editor/hostfxr_resolver.cpp b/modules/mono/editor/hostfxr_resolver.cpp
+index 786272b..2ddab17 100644
+--- a/modules/mono/editor/hostfxr_resolver.cpp
++++ b/modules/mono/editor/hostfxr_resolver.cpp
+@@ -211,7 +211,7 @@ bool get_default_installation_dir(String &r_dotnet_root) {
+ 
+ 	return true;
+ #else
+-	r_dotnet_root = "/usr/share/dotnet";
++	r_dotnet_root = "@TERMUX_PREFIX@/share/dotnet";
+ 	return true;
+ #endif
+ }
+diff --git a/thirdparty/openxr/src/common/platform_utils.hpp b/thirdparty/openxr/src/common/platform_utils.hpp
+index 85d5cda..0803317 100644
+--- a/thirdparty/openxr/src/common/platform_utils.hpp
++++ b/thirdparty/openxr/src/common/platform_utils.hpp
+@@ -118,7 +118,7 @@ static inline bool PlatformUtilsSetEnv(const char* name, const char* value) {
+ }
+ 
+ // Prefix for the Apple global runtime JSON file name
+-static const std::string rt_dir_prefix = "/usr/local/share/openxr/";
++static const std::string rt_dir_prefix = "@TERMUX_PREFIX@/local/share/openxr/";
+ static const std::string rt_filename = "/active_runtime.json";
+ 
+ static inline bool PlatformGetGlobalRuntimeFileName(uint16_t major_version, std::string& file_name) {
+diff --git a/thirdparty/openxr/src/loader/manifest_file.cpp b/thirdparty/openxr/src/loader/manifest_file.cpp
+index 1b0ef07..b1baded 100644
+--- a/thirdparty/openxr/src/loader/manifest_file.cpp
++++ b/thirdparty/openxr/src/loader/manifest_file.cpp
+@@ -40,15 +40,15 @@
+ #include <vector>
+ 
+ #ifndef FALLBACK_CONFIG_DIRS
+-#define FALLBACK_CONFIG_DIRS "/etc/xdg"
++#define FALLBACK_CONFIG_DIRS "@TERMUX_PREFIX@/etc/xdg"
+ #endif  // !FALLBACK_CONFIG_DIRS
+ 
+ #ifndef FALLBACK_DATA_DIRS
+-#define FALLBACK_DATA_DIRS "/usr/local/share:/usr/share"
++#define FALLBACK_DATA_DIRS "@TERMUX_PREFIX@/share"
+ #endif  // !FALLBACK_DATA_DIRS
+ 
+ #ifndef SYSCONFDIR
+-#define SYSCONFDIR "/etc"
++#define SYSCONFDIR "@TERMUX_PREFIX@/etc"
+ #endif  // !SYSCONFDIR
+ 
+ #ifdef XR_USE_PLATFORM_ANDROID

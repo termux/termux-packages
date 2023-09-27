@@ -6,8 +6,8 @@ termux_setup_rust() {
 	fi
 
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
-		if [[ "$(dpkg --version 2>/dev/null)" && "$(dpkg-query -W -f '${db:Status-Status}\n' rust 2>/dev/null)" != "installed" ]] ||
-                   [[ "$(pacman -V 2>/dev/null)" && ! "$(pacman -Q rust 2>/dev/null)" ]]; then
+		if [[ "$TERMUX_APP_PACKAGE_MANAGER" = "apt" && "$(dpkg-query -W -f '${db:Status-Status}\n' rust 2>/dev/null)" != "installed" ]] ||
+                   [[ "$TERMUX_APP_PACKAGE_MANAGER" = "pacman" && ! "$(pacman -Q rust 2>/dev/null)" ]]; then
 			echo "Package 'rust' is not installed."
 			echo "You can install it with"
 			echo
@@ -28,7 +28,7 @@ termux_setup_rust() {
 	local ENV_NAME=CARGO_TARGET_${CARGO_TARGET_NAME^^}_LINKER
 	ENV_NAME=${ENV_NAME//-/_}
 	export $ENV_NAME=$CC
-	export TARGET_CFLAGS="$CFLAGS $CPPFLAGS"
+	export TARGET_CFLAGS="${CFLAGS-} $CPPFLAGS"
 	# This was getting applied for the host build of Rust macros or whatever, so
 	# unset it.
 	unset CFLAGS

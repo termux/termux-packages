@@ -1,0 +1,25 @@
+diff -Naur dunst-1.8.1/config.mk dunst-1.8.1.mod/config.mk
+--- dunst-1.8.1/config.mk	2022-03-02 18:55:25.000000000 +0800
++++ dunst-1.8.1.mod/config.mk	2022-04-24 22:04:03.598737233 +0800
+@@ -1,5 +1,5 @@
+ # paths
+-PREFIX ?= /usr/local
++PREFIX ?= @TERMUX_PREFIX@/local
+ BINDIR ?= ${PREFIX}/bin
+ SYSCONFDIR ?= ${PREFIX}/etc/xdg
+ SYSCONFFILE ?= ${SYSCONFDIR}/dunst/dunstrc
+@@ -23,12 +23,12 @@
+ 
+ # Disable systemd service file installation,
+ # if you don't want to use systemd albeit installed
+-#SYSTEMD ?= 0
++SYSTEMD ?= 0
+ 
+ # Disable dependency on wayland. This will force dunst to use
+ # xwayland on wayland compositors
+ # You can also use "make WAYLAND=0" to build without wayland
+-# WAYLAND ?= 0
++WAYLAND ?= 0
+ 
+ ifneq (0, ${WAYLAND})
+ ENABLE_WAYLAND= -DENABLE_WAYLAND

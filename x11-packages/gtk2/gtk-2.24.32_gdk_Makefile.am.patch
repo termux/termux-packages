@@ -1,0 +1,13 @@
+diff -uNr gtk-2.24.32/gdk/Makefile.am gtk-2.24.32.mod/gdk/Makefile.am
+--- gtk-2.24.32/gdk/Makefile.am	2018-01-08 23:35:39.000000000 +0200
++++ gtk-2.24.32.mod/gdk/Makefile.am	2018-12-29 03:45:17.280782385 +0200
+@@ -328,8 +328,7 @@
+ install-exec-local: gdkconfig.h
+ 	$(mkinstalldirs) $(DESTDIR)$(configexecincludedir)
+ 	file=$(DESTDIR)$(configexecincludedir)/gdkconfig.h; \
+-	if test -r $$file && cmp -s gdkconfig.h $$file; then :; \
+-	else $(INSTALL_DATA) gdkconfig.h $$file; fi
++	$(INSTALL_DATA) gdkconfig.h $$file
+ 
+ install-exec-hook:
+ if DISABLE_EXPLICIT_DEPS

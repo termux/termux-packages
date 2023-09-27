@@ -2,8 +2,6 @@
 ##
 ##  Package update helper script which sets new SHA-256 for source bundle.
 ##
-##  Copyright 2020 Leonid Pliushch <leonid.pliushch@gmail.com>
-##
 ##  Licensed under the Apache License, Version 2.0 (the "License");
 ##  you may not use this file except in compliance with the License.
 ##  You may obtain a copy of the License at
@@ -36,8 +34,21 @@ if git status >/dev/null 2>&1; then
 fi
 
 for package in "${@}"; do
-	package="${package%%/}"
-	buildsh_path="${REPO_ROOT}/packages/${package}/build.sh"
+	buildsh_path=
+	repo=
+	if [ -d "${package}" ] && [ -f "${package}/build.sh" ]; then
+		buildsh_path="${package}/build.sh"
+		package=$(basename ${package})
+	else
+		for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' $REPO_ROOT/repo.json); do
+			if [ -d "${repo_path}/${package}" ] && [ -f "${repo_path}/${package}/build.sh" ]; then
+				repo=$(jq --raw-output '.["'$repo_path'"].name' $REPO_ROOT/repo.json)
+				repo=${repo#"termux-"}
+				buildsh_path="${repo_path}/${package}/build.sh"
+				package=$(basename ${package})
+			fi
+		done
+	fi
 
 	if [ ! -f "${buildsh_path}" ]; then
 		echo "${package}: skipping as no build.sh found"
@@ -82,13 +93,13 @@ for package in "${@}"; do
 			git --no-pager diff --patch "${buildsh_path}"
 			echo "--------------------"
 			echo
-			echo "${package}: update to $(. "${buildsh_path}"; echo "${TERMUX_PKG_VERSION}" | cut -d: -f2-)"
+			echo "bump(${repo}/${package}): $(. "${buildsh_path}"; echo "${TERMUX_PKG_VERSION}" | cut -d: -f2-)"
 			echo
 			read -re -p "Do you want to commit changes ? (y/n) " CHOICE
 			echo
 			if [[ ${CHOICE} =~ (Y|y) ]]; then
 				git add "${buildsh_path}"
-				git commit -m "${package}: update to $(. "${buildsh_path}"; echo "${TERMUX_PKG_VERSION}" | cut -d: -f2-)"
+				git commit -m "bump(${repo}/${package}): $(. "${buildsh_path}"; echo "${TERMUX_PKG_VERSION}" | cut -d: -f2-)"
 			else
 				echo "Not committing to Git!"
 			fi

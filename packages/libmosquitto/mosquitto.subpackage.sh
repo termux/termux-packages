@@ -1,4 +1,4 @@
-TERMUX_SUBPKG_DEPENDS="libuuid"
+TERMUX_SUBPKG_DEPENDS="libwebsockets"
 TERMUX_SUBPKG_INCLUDE="
 bin/
 share/man/

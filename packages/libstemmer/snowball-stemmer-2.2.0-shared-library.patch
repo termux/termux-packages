@@ -1,0 +1,59 @@
+This is based on a patch taken from alpinelinux, however, duplicated
+libstemmer.o and stemwords targets were removed and the patch was
+rebased on top of v2.2.0 tag.
+
+Created shared library contains a lot of relocations, which slow down loading.
+It is known issue and probably the main reason why upstream does not support
+shared library yet [1].
+
+[1] https://github.com/snowballstem/snowball/issues/34#issuecomment-203200078
+
+Alpinelinux-patch: https://git.alpinelinux.org/aports/tree/community/snowball/libstemmer-library.patch?id=28f9d9e192876c43fd96bc5856cd9d8a50dd49c0
+Upstream-issue: https://github.com/snowballstem/snowball/issues/34
+
+diff --git a/GNUmakefile b/GNUmakefile
+index 98eb1fa..9b539ec 100644
+--- a/GNUmakefile
++++ b/GNUmakefile
+@@ -4,6 +4,8 @@
+ # which hard-code it.
+ SNOWBALL_VERSION = 2.2.0
+ 
++MAJOR_VERSION := $(shell echo $(SNOWBALL_VERSION) | cut -d. -f1)
++
+ ifeq ($(OS),Windows_NT)
+ EXEEXT = .exe
+ endif
+@@ -170,12 +172,17 @@ C_OTHER_OBJECTS = $(C_OTHER_SOURCES:.c=.o)
+ JAVA_CLASSES = $(JAVA_SOURCES:.java=.class)
+ JAVA_RUNTIME_CLASSES=$(JAVARUNTIME_SOURCES:.java=.class)
+ 
+-CFLAGS=-O2 -W -Wall -Wmissing-prototypes -Wmissing-declarations
+-CPPFLAGS=
++CFLAGS+=-fPIC -W -Wall -Wmissing-prototypes -Wmissing-declarations
++CPPFLAGS+=
+ 
+ INCLUDES=-Iinclude
+ 
+-all: snowball$(EXEEXT) libstemmer.a stemwords$(EXEEXT) $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_OTHER_OBJECTS)
++all: snowball$(EXEEXT) libstemmer.a libstemmer.so stemwords$(EXEEXT) $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_OTHER_OBJECTS)
++
++libstemmer.so: libstemmer/libstemmer.o $(RUNTIME_OBJECTS) $(C_LIB_OBJECTS)
++	$(CC) $(CFLAGS) -shared $(LDFLAGS) -Wl,-soname,$@.$(MAJOR_VERSION),-version-script,libstemmer/symbol.map -o $@.$(SNOWBALL_VERSION) $^
++	ln -s $@.$(SNOWBALL_VERSION) $@.$(MAJOR_VERSION)
++	ln -s $@.$(SNOWBALL_VERSION) $@
+ 
+ algorithms.mk: libstemmer/mkalgorithms.pl libstemmer/modules.txt
+ 	libstemmer/mkalgorithms.pl algorithms.mk libstemmer/modules.txt
+diff --git a/libstemmer/symbol.map b/libstemmer/symbol.map
+new file mode 100644
+index 0000000..7a3d423
+--- /dev/null
++++ b/libstemmer/symbol.map
+@@ -0,0 +1,6 @@
++SB_STEMMER_0 {
++    global:
++        sb_stemmer_*;
++    local:
++        *;
++};

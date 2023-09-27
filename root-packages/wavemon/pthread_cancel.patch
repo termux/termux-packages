@@ -1,0 +1,161 @@
+--- a/info_scr.c
++++ b/info_scr.c
+@@ -30,12 +30,28 @@ static struct iw_nl80211_linkstat *ls_tm
+ 				  *ls_new = NULL;
+ static pthread_mutex_t linkstat_mutex;
+ 
++#ifdef __ANDROID__
++static void thread_signal_handler(int signum)
++{
++	pthread_exit(0);
++}
++#endif
++
+ /** Sampling pthread - shared by info and histogram screen. */
+ static void *sampling_loop(void *arg)
+ {
+ 	const bool do_not_swap_pointers = (bool)arg;
+ 	sigset_t blockmask;
+ 
++#ifdef __ANDROID__
++	struct sigaction actions;
++	memset(&actions, 0, sizeof(actions));
++	sigemptyset(&actions.sa_mask);
++	actions.sa_flags = 0;
++	actions.sa_handler = thread_signal_handler;
++	sigaction(SIGUSR2, &actions, NULL);
++#endif
++
+ 	/* See comment in iw_scan.c for rationale of blocking SIGWINCH. */
+ 	sigemptyset(&blockmask);
+ 	sigaddset(&blockmask, SIGWINCH);
+@@ -48,12 +64,23 @@ static void *sampling_loop(void *arg)
+ 
+ 			if (do_not_swap_pointers)
+ 				continue;
++#ifndef __ANDROID__
+ 			pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
++#else
++			sigset_t pthread_cancel_block;
++			sigemptyset(&pthread_cancel_block);
++			sigaddset(&pthread_cancel_block, SIGUSR2);
++			sigprocmask(SIG_BLOCK, &pthread_cancel_block, NULL);
++#endif
+ 			pthread_mutex_lock(&linkstat_mutex);
+ 			ls_new = ls_tmp;
+ 			ls_tmp = NULL;
+ 			pthread_mutex_unlock(&linkstat_mutex);
++#ifndef __ANDROID__
+ 			pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
++#else
++			sigprocmask(SIG_UNBLOCK, &pthread_cancel_block, NULL);
++#endif
+ 		}
+ 	} while (usleep(conf.stat_iv * 1000) == 0);
+ 	return NULL;
+@@ -77,7 +104,11 @@ void sampling_init(bool do_not_swap_poin
+ 
+ void sampling_stop(void)
+ {
++#ifndef __ANDROID__
+ 	pthread_cancel(sampling_thread);
++#else
++	pthread_kill(sampling_thread, SIGUSR2);
++#endif
+ 	pthread_join(sampling_thread, NULL);
+ }
+ 
+--- a/iw_scan.c
++++ b/iw_scan.c
+@@ -397,16 +397,34 @@ static void _write_warning_msg(struct sc
+ 
+ 	va_start(argp, format);
+ 
++#ifndef __ANDROID__
+ 	pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
++#else
++	sigset_t pthread_cancel_block;
++	sigemptyset(&pthread_cancel_block);
++	sigaddset(&pthread_cancel_block, SIGUSR2);
++	sigprocmask(SIG_BLOCK, &pthread_cancel_block, NULL);
++#endif
+ 	pthread_mutex_lock(&sr->mutex);
+ 
+ 	_clear_scan_result(sr);
+ 	vsnprintf(sr->msg, sizeof(sr->msg), format, argp);
+ 
+ 	pthread_mutex_unlock(&sr->mutex);
++#ifndef __ANDROID__
+ 	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
++#else
++	sigprocmask(SIG_UNBLOCK, &pthread_cancel_block, NULL);
++#endif
+ }
+ 
++#ifdef __ANDROID__
++static void thread_signal_handler(int signum)
++{
++	pthread_exit(0);
++}
++#endif
++
+ /** The actual scan thread. */
+ void *do_scan(void *sr_ptr)
+ {
+@@ -414,6 +432,15 @@ void *do_scan(void *sr_ptr)
+ 	sigset_t blockmask;
+ 	int ret = 0;
+ 
++#ifdef __ANDROID__
++	struct sigaction actions;
++	memset(&actions, 0, sizeof(actions));
++	sigemptyset(&actions.sa_mask);
++	actions.sa_flags = 0;
++	actions.sa_handler = thread_signal_handler;
++	sigaction(SIGUSR2, &actions, NULL);
++#endif
++
+ 	/* SIGWINCH is supposed to be handled in the main thread. */
+ 	sigemptyset(&blockmask);
+ 	sigaddset(&blockmask, SIGWINCH);
+@@ -465,7 +492,14 @@ void *do_scan(void *sr_ptr)
+ 					compute_channel_stats(tmp);
+ 					sort_scan_list(&tmp->head);
+ 
++#ifndef __ANDROID__
+ 					pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
++#else
++					sigset_t pthread_cancel_block;
++					sigemptyset(&pthread_cancel_block);
++					sigaddset(&pthread_cancel_block, SIGUSR2);
++					sigprocmask(SIG_BLOCK, &pthread_cancel_block, NULL);
++#endif
+ 					pthread_mutex_lock(&sr->mutex);
+ 
+ 					_clear_scan_result(sr);
+@@ -475,7 +509,11 @@ void *do_scan(void *sr_ptr)
+ 					memcpy(&(sr->num), &(tmp->num), sizeof(tmp->num));
+ 
+ 					pthread_mutex_unlock(&sr->mutex);
++#ifndef __ANDROID__
+ 					pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
++#else
++					sigprocmask(SIG_UNBLOCK, &pthread_cancel_block, NULL);
++#endif
+ 				}
+ 				free(tmp);
+ 			}
+--- a/scan_scr.c
++++ b/scan_scr.c
+@@ -299,7 +299,11 @@ void scr_aplst_fini(void)
+ 	/* Unlock mutex in case it was taken when scr_aplst_loop got interrupted by a SIGWINCH.
+ 	 * We are ignoring the error (EPERM) here if the main thread did not acquire the mutex. */
+ 	pthread_mutex_unlock(&sr.mutex);
++#ifndef __ANDROID__
+ 	pthread_cancel(scan_thread);
++#else
++	pthread_kill(scan_thread, SIGUSR2);
++#endif
+ 	pthread_join(scan_thread, NULL);
+ 	delwin(w_aplst);
+ }

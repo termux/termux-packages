@@ -22,6 +22,6 @@
        char *str;
 -      char *argv[] = { "/bin/sh", "-c", NULL, NULL };
 +      char *argv[] = { "@TERMUX_PREFIX@/bin/sh", "-c", NULL, NULL };
-       expand_string (ctx, value, &str);
-       argv[2] = str;
-       if (mu_spawnvp (argv[0], argv, &status))
+       if (expand_string (ctx, value, &str))
+ 	status = 1;
+       else

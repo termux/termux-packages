@@ -1,7 +1,7 @@
---- src/Makefile	2018-02-23 06:49:41.666712787 +0000
-+++ src/src/Makefile	2018-02-23 06:49:53.650717771 +0000
+--- a/src/Makefile
++++ b/src/Makefile
 @@ -2,7 +2,7 @@
- name = scim
+ name = sc-im
  
  # The base directory where everything should be installed.
 -prefix  = /usr/local
@@ -9,7 +9,7 @@
  
  EXDIR   = $(prefix)/bin
  HELPDIR = $(prefix)/share/$(name)
-@@ -13,10 +13,11 @@
+@@ -20,10 +20,11 @@
  
  # Change these to your liking or use `make CC=gcc` etc
  #CC   = cc
@@ -31,9 +31,23 @@
  # Used for date formatting with C-d shortcut using you local d_fmt
  CFLAGS += -DUSELOCALE
  # Comment out to enable mouse support on virtual terminal.
-@@ -166,6 +167,9 @@
- gram.c : gram.y
- 	$(YACC) -d $<
+@@ -134,10 +135,10 @@
+   endif
+ 
+   # NOTE: lua support
+-  ifneq ($(shell pkg-config --exists lua || echo 'no'),no) # Check for user's default lua
+-    CFLAGS += -DXLUA $(shell pkg-config --cflags lua)
++  ifneq ($(shell pkg-config --exists lua51 || echo 'no'),no) # Check for user's default lua
++    CFLAGS += -DXLUA $(shell pkg-config --cflags lua51)
+     ifneq ($(shell uname -s),Darwin)
+-      LDLIBS += $(shell pkg-config --libs lua) -Wl,--export-dynamic
++      LDLIBS += $(shell pkg-config --libs lua51) -Wl,--export-dynamic
+     else
+       LDLIBS += $(shell pkg-config --libs lua) -rdynamic
+     endif
+@@ -213,6 +214,9 @@
+ statres.h : gram.y sres.sed
+ 	sed -f sres.sed < $< > $@
  
 +gram.y :
 +	$(YACC) gram.y

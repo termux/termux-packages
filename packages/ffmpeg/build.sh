@@ -2,20 +2,36 @@ TERMUX_PKG_HOMEPAGE=https://ffmpeg.org
 TERMUX_PKG_DESCRIPTION="Tools and libraries to manipulate a wide range of multimedia formats and protocols"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-# NOTE: mpv has to be rebuilt and version bumped after updating ffmpeg.
-TERMUX_PKG_VERSION=5.0
+TERMUX_PKG_VERSION=6.0
+TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=https://www.ffmpeg.org/releases/ffmpeg-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=51e919f7d205062c0fd4fae6243a84850391115104ccf1efc451733bc0ac7298
-TERMUX_PKG_DEPENDS="libaom, libass, libbz2, libdav1d, libiconv, librav1e, libsoxr, libx264, libx265, xvidcore, libvorbis, libmp3lame, libopus, libvpx, libgnutls, libandroid-glob, freetype, zlib, liblzma, libvidstab, libwebp, libxml2"
+TERMUX_PKG_SHA256=57be87c22d9b49c112b6d24bc67d42508660e6b718b3db89c44e47e289137082
+TERMUX_PKG_DEPENDS="freetype, game-music-emu, libaom, libandroid-glob, libass, libbluray, libbz2, libdav1d, libgnutls, libiconv, liblzma, libmp3lame, libopencore-amr, libopus, librav1e, libsoxr, libsrt, libssh, libtheora, libvo-amrwbenc, libvorbis, libvpx, libvidstab, libwebp, libx264, libx265, libxml2, libzimg, littlecms, ocl-icd, xvidcore, zlib"
+TERMUX_PKG_BUILD_DEPENDS="opencl-headers"
 TERMUX_PKG_CONFLICTS="libav"
 TERMUX_PKG_BREAKS="ffmpeg-dev"
 TERMUX_PKG_REPLACES="ffmpeg-dev"
 
+termux_step_pre_configure() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed. (These variables are also used afterwards.)
+	_FFMPEG_SOVER_avutil=58
+	_FFMPEG_SOVER_avcodec=60
+	_FFMPEG_SOVER_avformat=60
+
+	local f
+	for f in util codec format; do
+		local v=$(sh ffbuild/libversion.sh av${f} \
+				libav${f}/version.h libav${f}/version_major.h \
+				| sed -En 's/^libav'"${f}"'_VERSION_MAJOR=([0-9]+)$/\1/p')
+		if [ ! "${v}" ] || [ "$(eval echo \$_FFMPEG_SOVER_av${f})" != "${v}" ]; then
+			termux_error_exit "SOVERSION guard check failed for libav${f}.so."
+		fi
+	done
+}
 
 termux_step_configure() {
 	cd $TERMUX_PKG_BUILDDIR
-
-	export ASFLAGS="-no-integrated-as"
 
 	local _EXTRA_CONFIGURE_FLAGS=""
 	if [ $TERMUX_ARCH = "arm" ]; then
@@ -52,25 +68,57 @@ termux_step_configure() {
 		--enable-cross-compile \
 		--enable-gnutls \
 		--enable-gpl \
+		--enable-version3 \
+		--enable-jni \
+		--enable-lcms2 \
 		--enable-libaom \
 		--enable-libass \
+		--enable-libbluray \
 		--enable-libdav1d \
-		--enable-libmp3lame \
 		--enable-libfreetype \
-		--enable-libvorbis \
+		--enable-libgme \
+		--enable-libmp3lame \
+		--enable-libopencore-amrnb \
+		--enable-libopencore-amrwb \
 		--enable-libopus \
 		--enable-librav1e \
 		--enable-libsoxr \
-		--enable-libx264 \
-		--enable-libx265 \
-		--enable-libxvid \
+		--enable-libsrt \
+		--enable-libssh \
+		--enable-libtheora \
 		--enable-libvidstab \
+		--enable-libvo-amrwbenc \
+		--enable-libvorbis \
 		--enable-libvpx \
 		--enable-libwebp \
+		--enable-libx264 \
+		--enable-libx265 \
 		--enable-libxml2 \
+		--enable-libxvid \
+		--enable-libzimg \
+		--enable-mediacodec \
+		--enable-opencl \
 		--enable-shared \
 		--prefix="$TERMUX_PREFIX" \
 		--target-os=android \
 		--extra-libs="-landroid-glob" \
-		$_EXTRA_CONFIGURE_FLAGS
+		--disable-vulkan \
+		$_EXTRA_CONFIGURE_FLAGS \
+		--disable-libfdk-aac
+	# GPLed FFmpeg binaries linked against fdk-aac are not redistributable.
+}
+
+termux_step_post_massage() {
+	cd ${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/lib || exit 1
+	local f
+	for f in util codec format; do
+		local s=$(eval echo \$_FFMPEG_SOVER_av${f})
+		if [ ! "${s}" ]; then
+			termux_error_exit "Empty SOVERSION for libav${f}."
+		fi
+		# SOVERSION suffix is expected by some programs, e.g. Firefox.
+		if [ ! -e "./libav${f}.so.${s}" ]; then
+			ln -sf libav${f}.so libav${f}.so.${s}
+		fi
+	done
 }

@@ -3,16 +3,16 @@ diff -uNr imlib2-1.6.1/src/bin/imlib2_show.c imlib2-1.6.1.mod/src/bin/imlib2_sho
 +++ imlib2-1.6.1.mod/src/bin/imlib2_show.c	2019-12-16 14:53:36.307439115 +0200
 @@ -12,6 +12,11 @@
  
- #include "Imlib2.h"
+ #include "prog_x11.h"
  
 +static int android_mblen(const char *s, size_t n)
 +{
 +    return mbtowc(0, s, n);
 +}
 +
- Display            *disp;
- Window              win;
+ static Window       win;
  
+ void                progress(Imlib_Image * im, char percent, int update_x,
 @@ -1262,7 +1267,7 @@
                         char                tmp[16];
                         int                 len;

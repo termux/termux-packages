@@ -1,0 +1,891 @@
+#!@TERMUX_PREFIX@/bin/env perl
+#
+#  Copyright (C) 2009-2010 D. R. Commander.  All Rights Reserved.
+#  Copyright (C) 2005-2006 Sun Microsystems, Inc.  All Rights Reserved.
+#  Copyright (C) 2002-2003 Constantin Kaplinsky.  All Rights Reserved.
+#  Copyright (C) 2002-2005 RealVNC Ltd.
+#  Copyright (C) 1999 AT&T Laboratories Cambridge.  All Rights Reserved.
+#
+#  This is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This software is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this software; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
+#  USA.
+#
+
+#
+# vncserver - wrapper script to start an X VNC server.
+#
+
+# First make sure we're operating in a sane environment.
+$exedir = "";
+$slashndx = rindex($0, "/");
+if($slashndx>=0) {
+    $exedir = substr($0, 0, $slashndx+1);
+}
+
+$vncClasses = "";
+
+&SanityCheck();
+
+#
+# Global variables.  You may want to configure some of these for
+# your site
+#
+
+$geometry = "1024x768";
+#$depth = 16;
+$vncJavaFiles = (((-d "$vncClasses") && "$vncClasses") ||
+                 ((-d "@TERMUX_PREFIX@/share/vnc/classes") && "@TERMUX_PREFIX@/share/vnc/classes") ||
+                 ((-d "@TERMUX_PREFIX@/vnc/classes") && "@TERMUX_PREFIX@/vnc/classes"));
+
+$vncUserDir = "$ENV{HOME}/.vnc";
+$vncUserConfig = "$vncUserDir/config";
+
+$vncSystemConfigDir = "@TERMUX_PREFIX@/etc/tigervnc";
+$vncSystemConfigDefaultsFile = "$vncSystemConfigDir/vncserver-config-defaults";
+$vncSystemConfigMandatoryFile = "$vncSystemConfigDir/vncserver-config-mandatory";
+
+$skipxstartup = 0;
+$xauthorityFile = "$ENV{XAUTHORITY}" || "$ENV{HOME}/.Xauthority";
+
+$xstartupFile = $vncUserDir . "/xstartup";
+$defaultXStartup
+    = ("#!@TERMUX_PREFIX@/bin/sh\n".
+       "## This file is executed during VNC server\n".
+       "## startup.\n\n".
+       "# Launch terminal emulator Aterm.\n".
+       "# Requires package 'aterm'.\n".
+       "aterm -geometry 80x24+10+10 -ls &\n\n".
+       "# Launch Tab Window Manager.\n".
+       "# Requires package 'xorg-twm'.\n".
+       "twm &\n");
+
+$defaultConfig
+    = ("## Supported server options to pass to vncserver upon invocation can be listed\n".
+       "## in this file. See the following manpages for more: vncserver(1) Xvnc(1).\n".
+       "## Several common ones are shown below. Uncomment and modify to your liking.\n".
+       "##\n".
+       "# securitytypes=vncauth,tlsvnc\n".
+       "# desktop=sandbox\n".
+       "# geometry=2000x1200\n".
+       "# localhost\n".
+       "# alwaysshared\n");
+
+chop($host = `uname -n`);
+
+if (-d "@TERMUX_PREFIX@/etc/X11/fontpath.d") {
+    $fontPath = "catalogue:@TERMUX_PREFIX@/etc/X11/fontpath.d";
+}
+
+@fontpaths = ('@TERMUX_PREFIX@/share/X11/fonts', '@TERMUX_PREFIX@/share/fonts', '@TERMUX_PREFIX@/share/fonts/X11/');
+if (! -l "@TERMUX_PREFIX@/lib/X11") {push(@fontpaths, '@TERMUX_PREFIX@/lib/X11/fonts');}
+if (! -l "@TERMUX_PREFIX@/X11") {push(@fontpaths, '@TERMUX_PREFIX@X11/lib/X11/fonts');}
+if (! -l "@TERMUX_PREFIX@/X11R6") {push(@fontpaths, '@TERMUX_PREFIX@/X11R6/lib/X11/fonts');}
+push(@fontpaths, '@TERMUX_PREFIX@/share/fonts/default');
+
+@fonttypes = ('misc',
+             '75dpi',
+             '100dpi',
+             'Speedo',
+             'Type1');
+
+foreach $_fpath (@fontpaths) {
+    foreach $_ftype (@fonttypes) {
+        if (-f "$_fpath/$_ftype/fonts.dir") {
+            if (! -l "$_fpath/$_ftype") {
+                $defFontPath .= "$_fpath/$_ftype,";
+            }
+        }
+    }
+}
+
+if ($defFontPath) {
+    if (substr($defFontPath, -1, 1) == ',') {
+        chop $defFontPath;
+    }
+}
+
+if ($fontPath eq "") {
+    $fontPath = $defFontPath;
+}
+
+# Check command line options
+
+&ParseOptions("-geometry",1,"-depth",1,"-pixelformat",1,"-name",1,"-kill",1,
+	      "-help",0,"-h",0,"--help",0,"-fp",1,"-list",0,"-fg",0,"-autokill",0,"-noxstartup",0,"-xstartup",1);
+
+&Usage() if ($opt{'-help'} || $opt{'-h'} || $opt{'--help'});
+
+&Kill() if ($opt{'-kill'});
+
+&List() if ($opt{'-list'});
+
+# Uncomment this line if you want default geometry, depth and pixelformat
+# to match the current X display:
+# &GetXDisplayDefaults();
+
+if ($opt{'-geometry'}) {
+    $geometry = $opt{'-geometry'};
+}
+if ($opt{'-depth'}) {
+    $depth = $opt{'-depth'};
+    $pixelformat = "";
+}
+if ($opt{'-pixelformat'}) {
+    $pixelformat = $opt{'-pixelformat'};
+}
+if ($opt{'-noxstartup'}) {
+    $skipxstartup = 1;
+}
+if ($opt{'-xstartup'}) {
+    $xstartupFile = $opt{'-xstartup'};
+}
+if ($opt{'-fp'}) {
+    $fontPath = $opt{'-fp'};
+    $fpArgSpecified = 1;
+}
+
+&CheckGeometryAndDepth();
+
+# Create the user's vnc directory if necessary.
+if (!(-e $vncUserDir)) {
+    if (!mkdir($vncUserDir,0755)) {
+	die "$prog: Could not create $vncUserDir.\n";
+    }
+}
+
+# Find display number.
+if ((@ARGV > 0) && ($ARGV[0] =~ /^:(\d+)$/)) {
+    $displayNumber = $1;
+    shift(@ARGV);
+    if (!&CheckDisplayNumber($displayNumber)) {
+	die "A VNC server is already running as :$displayNumber\n";
+    }
+} elsif ((@ARGV > 0) && ($ARGV[0] !~ /^-/) && ($ARGV[0] !~ /^\+/)) {
+    &Usage();
+} else {
+    $displayNumber = &GetDisplayNumber();
+}
+
+$vncPort = 5900 + $displayNumber;
+
+if ($opt{'-name'}) {
+    $desktopName = $opt{'-name'};
+} else {
+    $desktopName = "$host:$displayNumber ($ENV{USER})";
+}
+
+my %default_opts;
+my %config;
+
+# We set some reasonable defaults. Config file settings
+# override these where present.
+$default_opts{desktop} = &quotedString($desktopName);
+$default_opts{httpd} = $vncJavaFiles if ($vncJavaFiles);
+$default_opts{auth} = $xauthorityFile;
+$default_opts{geometry} = $geometry if ($geometry);
+$default_opts{depth} = $depth if ($depth);
+$default_opts{pixelformat} = $pixelformat if ($pixelformat);
+$default_opts{rfbwait} = 30000;
+$default_opts{rfbauth} = "$vncUserDir/passwd";
+$default_opts{rfbport} = $vncPort;
+$default_opts{fp} = $fontPath if ($fontPath);
+$default_opts{pn} = undef;
+
+# Load user-overrideable system defaults
+LoadConfig($vncSystemConfigDefaultsFile);
+
+# Then the user's settings
+LoadConfig($vncUserConfig);
+
+# And then override anything set above if mandatory settings exist.
+# WARNING: "Mandatory" is used loosely here! As the man page says,
+# there is nothing stopping someone from EASILY subverting the
+# settings in $vncSystemConfigMandatoryFile by simply passing
+# CLI args to vncserver, which trump config files! To properly
+# hard force policy in a non-subvertible way would require major
+# development work that touches Xvnc itself.
+LoadConfig($vncSystemConfigMandatoryFile, 1);
+
+#
+# Check whether VNC authentication is enabled, and if so, prompt the user to
+# create a VNC password if they don't already have one.
+#
+
+$securityTypeArgSpecified = 0;
+$vncAuthEnabled = 0;
+$passwordArgSpecified = 0;
+@vncAuthStrings = ("vncauth", "tlsvnc", "x509vnc");
+
+# ...first we check our configuration files' settings
+if ($config{'securitytypes'}) {
+  $securityTypeArgSpecified = 1;
+  foreach $arg2 (split(',', $config{'securitytypes'})) {
+    if (grep {$_ eq lc($arg2)} @vncAuthStrings) {
+      $vncAuthEnabled = 1;
+    }
+  }
+}
+
+# ...and finally we check CLI args, which in the case of the topic at
+# hand (VNC auth or not), override anything found in configuration files
+# (even so-called "mandatory" settings).
+for ($i = 0; $i < @ARGV; ++$i) {
+    # -SecurityTypes can be followed by a space or "="
+    my @splitargs = split('=', $ARGV[$i]);
+    if (@splitargs <= 1 && $i < @ARGV - 1) {
+        push(@splitargs, $ARGV[$i + 1]);
+    }
+    if (lc(@splitargs[0]) eq "-securitytypes") {
+        if (@splitargs > 1) {
+            $securityTypeArgSpecified = 1;
+        }
+        foreach $arg2 (split(',', @splitargs[1])) {
+            if (grep {$_ eq lc($arg2)} @vncAuthStrings) {
+                $vncAuthEnabled = 1;
+            }
+        }
+    }
+    if ((lc(@splitargs[0]) eq "-password")
+     || (lc(@splitargs[0]) eq "-passwordfile"
+     || (lc(@splitargs[0]) eq "-rfbauth"))) {
+        $passwordArgSpecified = 1;
+    }
+}
+
+if ((!$securityTypeArgSpecified || $vncAuthEnabled) && !$passwordArgSpecified) {
+    ($z,$z,$mode) = stat("$vncUserDir/passwd");
+    if (!(-e "$vncUserDir/passwd") || ($mode & 077)) {
+        warn "\nYou will require a password to access your desktops.\n\n";
+        system($exedir."vncpasswd -q $vncUserDir/passwd");
+        if (($? >> 8) != 0) {
+            exit 1;
+        }
+    }
+}
+
+$desktopLog = "$vncUserDir/$host:$displayNumber.log";
+unlink($desktopLog);
+
+# Make an X server cookie and set up the Xauthority file
+# mcookie is a part of util-linux, usually only GNU/Linux systems have it.
+$cookie = `mcookie`;
+# Fallback for non GNU/Linux OS - use /dev/urandom on systems that have it,
+# otherwise use perl's random number generator, seeded with the sum
+# of the current time, our PID and part of the encrypted form of the password.
+if ($cookie eq "" && open(URANDOM, '<', '/dev/urandom')) {
+  my $randata;
+  if (sysread(URANDOM, $randata, 16) == 16) {
+    $cookie = unpack 'h*', $randata;
+  }
+  close(URANDOM);
+}
+if ($cookie eq "") {
+  srand(time+$$+unpack("L",`cat $vncUserDir/passwd`));
+  for (1..16) {
+    $cookie .= sprintf("%02x", int(rand(256)) % 256);
+  }
+}
+
+open(XAUTH, "|xauth -f $xauthorityFile source -");
+print XAUTH "add $host:$displayNumber . $cookie\n";
+print XAUTH "add $host/unix:$displayNumber . $cookie\n";
+close(XAUTH);
+
+# Now start the X VNC Server
+
+# We build up our Xvnc command with options
+$cmd = $exedir."Xvnc :$displayNumber";
+
+foreach my $k (sort keys %config) {
+  $cmd .= " -$k $config{$k}" if defined($config{$k});
+  delete $default_opts{$k}; # file options take precedence
+}
+
+foreach my $k (sort keys %default_opts) {
+  $cmd .= " -$k $default_opts{$k}" if defined($default_opts{$k});
+}
+
+# Add color database stuff here, e.g.:
+# $cmd .= " -co @TERMUX_PREFIX@/lib/X11/rgb";
+
+foreach $arg (@ARGV) {
+  $cmd .= " " . &quotedString($arg);
+}
+$cmd .= " >> " . &quotedString($desktopLog) . " 2>&1";
+
+# Run $cmd and record the process ID.
+$pidFile = "$vncUserDir/$host:$displayNumber.pid";
+system("$cmd & echo \$! >$pidFile");
+
+# Give Xvnc a chance to start up
+
+sleep(3);
+if ($fontPath ne $defFontPath) {
+    unless (kill 0, `cat $pidFile`) {
+        if ($fpArgSpecified) {
+	    warn "\nWARNING: The first attempt to start Xvnc failed, probably because the font\n";
+	    warn "path you specified using the -fp argument is incorrect.  Attempting to\n";
+	    warn "determine an appropriate font path for this system and restart Xvnc using\n";
+	    warn "that font path ...\n";
+        } else {
+	    warn "\nWARNING: The first attempt to start Xvnc failed, possibly because the font\n";
+	    warn "catalog is not properly configured.  Attempting to determine an appropriate\n";
+	    warn "font path for this system and restart Xvnc using that font path ...\n";
+        }
+	$cmd =~ s@-fp [^ ]+@@;
+	$cmd .= " -fp $defFontPath" if ($defFontPath);
+	system("$cmd & echo \$! >$pidFile");
+	sleep(3);
+    }
+}
+unless (kill 0, `cat $pidFile`) {
+    warn "Could not start Xvnc.\n\n";
+    unlink $pidFile;
+    open(LOG, "<$desktopLog");
+    while (<LOG>) { print; }
+    close(LOG);
+    die "\n";
+}
+
+warn "\nNew '$desktopName' desktop is $host:$displayNumber\n\n";
+
+# Create the user's xstartup script if necessary.
+if (! $skipxstartup) {
+    if (!(-e "$xstartupFile")) {
+	warn "Creating default startup script $xstartupFile\n";
+	open(XSTARTUP, ">$xstartupFile");
+        print XSTARTUP $defaultXStartup;
+        close(XSTARTUP);
+        chmod 0755, "$xstartupFile";
+    }
+}
+
+# Create the user's config file if necessary.
+if (!(-e "$vncUserDir/config")) {
+    warn "Creating default config $vncUserDir/config\n";
+    open(VNCUSERCONFIG, ">$vncUserDir/config");
+    print VNCUSERCONFIG $defaultConfig;
+    close(VNCUSERCONFIG);
+    chmod 0644, "$vncUserDir/config";
+}
+
+# Run the X startup script.
+if (! $skipxstartup) {
+    warn "Starting applications specified in $xstartupFile\n";
+}
+warn "Log file is $desktopLog\n\n";
+
+# If the unix domain socket exists then use that (DISPLAY=:n) otherwise use
+# TCP (DISPLAY=host:n)
+
+if (-e "@TERMUX_PREFIX@/tmp/.X11-unix/X$displayNumber" ||
+    -e "@TERMUX_PREFIX@/spool/sockets/X11/$displayNumber")
+{
+    $ENV{DISPLAY}= ":$displayNumber";
+} else {
+    $ENV{DISPLAY}= "$host:$displayNumber";
+}
+$ENV{VNCDESKTOP}= $desktopName;
+
+if ($opt{'-fg'}) {
+    if (! $skipxstartup) {
+        system("$xstartupFile >> " . &quotedString($desktopLog) . " 2>&1");
+    }
+    if (kill 0, `cat $pidFile`) {
+        $opt{'-kill'} = ':'.$displayNumber;
+        &Kill();
+    }
+} else {
+    if ($opt{'-autokill'}) {
+    	if (! $skipxstartup) {
+            system("($xstartupFile; $0 -kill :$displayNumber) >> "
+	     . &quotedString($desktopLog) . " 2>&1 &");
+    	}
+    } else {
+    	if (! $skipxstartup) {
+            system("$xstartupFile >> " . &quotedString($desktopLog)
+	     . " 2>&1 &");
+    	}
+    }
+}
+
+exit;
+
+###############################################################################
+# Functions
+###############################################################################
+
+#
+# Populate the global %config hash with settings from a specified
+# vncserver configuration file if it exists
+#
+# Args: 1. file path
+#       2. optional boolean flag to enable warning when a previously
+#          set configuration setting is being overridden
+#
+sub LoadConfig {
+  local ($configFile, $warnoverride) = @_;
+  local ($toggle) = undef;
+
+  if (stat($configFile)) {
+    if (open(IN, $configFile)) {
+      while (<IN>) {
+        next if /^#/;
+        if (my ($k, $v) = /^\s*(\w+)\s*=\s*(.+)$/) {
+          $k = lc($k); # must normalize key case
+          if ($warnoverride && $config{$k}) {
+            print("Warning: $configFile is overriding previously defined '$k' to be '$v'\n");
+          }
+          $config{$k} = $v;
+        } elsif ($_ =~ m/^\s*(\S+)/) {
+          # We can't reasonably warn on override of toggles (e.g. AlwaysShared)
+          # because it would get crazy to do so. We'd have to check if the
+          # current config file being loaded defined the logical opposite setting
+          # (NeverShared vs. AlwaysShared, etc etc).
+          $toggle = lc($1); # must normalize key case
+          $config{$toggle} = undef;
+        }
+      }
+      close(IN);
+    }
+  }
+}
+
+#
+# CheckGeometryAndDepth simply makes sure that the geometry and depth values
+# are sensible.
+#
+
+sub CheckGeometryAndDepth
+{
+    if ($geometry =~ /^(\d+)x(\d+)$/) {
+	$width = $1; $height = $2;
+
+	if (($width<1) || ($height<1)) {
+	    die "$prog: geometry $geometry is invalid\n";
+	}
+
+	$geometry = "${width}x$height";
+    } else {
+	die "$prog: geometry $geometry is invalid\n";
+    }
+
+    if ($depth && (($depth < 8) || ($depth > 32))) {
+	die "Depth must be between 8 and 32\n";
+    }
+}
+
+
+#
+# GetDisplayNumber gets the lowest available display number.  A display number
+# n is taken if something is listening on the VNC server port (5900+n) or the
+# X server port (6000+n).
+#
+
+sub GetDisplayNumber
+{
+    foreach $n (1..99) {
+	if (&CheckDisplayNumber($n)) {
+	    return $n+0; # Bruce Mah's workaround for bug in perl 5.005_02
+	}
+    }
+
+    die "$prog: no free display number on $host.\n";
+}
+
+
+#
+# CheckDisplayNumber checks if the given display number is available.  A
+# display number n is taken if something is listening on the VNC server port
+# (5900+n) or the X server port (6000+n).
+#
+
+sub CheckDisplayNumber
+{
+    local ($n) = @_;
+
+    socket(S, $AF_INET, $SOCK_STREAM, 0) || die "$prog: socket failed: $!\n";
+    eval 'setsockopt(S, &SOL_SOCKET, &SO_REUSEADDR, pack("l", 1))';
+    if (!bind(S, pack('S n x12', $AF_INET, 6000 + $n))) {
+	close(S);
+	return 0;
+    }
+    close(S);
+
+    socket(S, $AF_INET, $SOCK_STREAM, 0) || die "$prog: socket failed: $!\n";
+    eval 'setsockopt(S, &SOL_SOCKET, &SO_REUSEADDR, pack("l", 1))';
+    if (!bind(S, pack('S n x12', $AF_INET, 5900 + $n))) {
+	close(S);
+	return 0;
+    }
+    close(S);
+
+    if (-e "@TERMUX_PREFIX@/tmp/.X$n-lock") {
+	warn "\nWarning: $host:$n is taken because of @TERMUX_PREFIX@/tmp/.X$n-lock\n";
+	warn "Remove this file if there is no X server $host:$n\n";
+	return 0;
+    }
+
+    if (-e "@TERMUX_PREFIX@/tmp/.X11-unix/X$n") {
+	warn "\nWarning: $host:$n is taken because of @TERMUX_PREFIX@/tmp/.X11-unix/X$n\n";
+	warn "Remove this file if there is no X server $host:$n\n";
+	return 0;
+    }
+
+    if (-e "@TERMUX_PREFIX@/spool/sockets/X11/$n") {
+	warn("\nWarning: $host:$n is taken because of ".
+             "@TERMUX_PREFIX@/spool/sockets/X11/$n\n");
+	warn "Remove this file if there is no X server $host:$n\n";
+	return 0;
+    }
+
+    return 1;
+}
+
+
+#
+# GetXDisplayDefaults uses xdpyinfo to find out the geometry, depth and pixel
+# format of the current X display being used.  If successful, it sets the
+# options as appropriate so that the X VNC server will use the same settings
+# (minus an allowance for window manager decorations on the geometry).  Using
+# the same depth and pixel format means that the VNC server won't have to
+# translate pixels when the desktop is being viewed on this X display (for
+# TrueColor displays anyway).
+#
+
+sub GetXDisplayDefaults
+{
+    local (@lines, @matchlines, $width, $height, $defaultVisualId, $i,
+	   $red, $green, $blue);
+
+    $wmDecorationWidth = 4;	# a guess at typical size for window manager
+    $wmDecorationHeight = 24;	# decoration size
+
+    return if (!defined($ENV{DISPLAY}));
+
+    @lines = `xdpyinfo 2>/dev/null`;
+
+    return if ($? != 0);
+
+    @matchlines = grep(/dimensions/, @lines);
+    if (@matchlines) {
+	($width, $height) = ($matchlines[0] =~ /(\d+)x(\d+) pixels/);
+
+	$width -= $wmDecorationWidth;
+	$height -= $wmDecorationHeight;
+
+	$geometry = "${width}x$height";
+    }
+
+    @matchlines = grep(/default visual id/, @lines);
+    if (@matchlines) {
+	($defaultVisualId) = ($matchlines[0] =~ /id:\s+(\S+)/);
+
+	for ($i = 0; $i < @lines; $i++) {
+	    if ($lines[$i] =~ /^\s*visual id:\s+$defaultVisualId$/) {
+		if (($lines[$i+1] !~ /TrueColor/) ||
+		    ($lines[$i+2] !~ /depth/) ||
+		    ($lines[$i+4] !~ /red, green, blue masks/))
+		{
+		    return;
+		}
+		last;
+	    }
+	}
+
+	return if ($i >= @lines);
+
+	($depth) = ($lines[$i+2] =~ /depth:\s+(\d+)/);
+	($red,$green,$blue)
+	    = ($lines[$i+4]
+	       =~ /masks:\s+0x([0-9a-f]+), 0x([0-9a-f]+), 0x([0-9a-f]+)/);
+
+	$red = hex($red);
+	$green = hex($green);
+	$blue = hex($blue);
+
+	if ($red > $blue) {
+	    $red = int(log($red) / log(2)) - int(log($green) / log(2));
+	    $green = int(log($green) / log(2)) - int(log($blue) / log(2));
+	    $blue = int(log($blue) / log(2)) + 1;
+	    $pixelformat = "rgb$red$green$blue";
+	} else {
+	    $blue = int(log($blue) / log(2)) - int(log($green) / log(2));
+	    $green = int(log($green) / log(2)) - int(log($red) / log(2));
+	    $red = int(log($red) / log(2)) + 1;
+	    $pixelformat = "bgr$blue$green$red";
+	}
+    }
+}
+
+
+#
+# quotedString returns a string which yields the original string when parsed
+# by a shell.
+#
+
+sub quotedString
+{
+    local ($in) = @_;
+
+    $in =~ s/\'/\'\"\'\"\'/g;
+
+    return "'$in'";
+}
+
+
+#
+# removeSlashes turns slashes into underscores for use as a file name.
+#
+
+sub removeSlashes
+{
+    local ($in) = @_;
+
+    $in =~ s|/|_|g;
+
+    return "$in";
+}
+
+
+#
+# Usage
+#
+
+sub Usage
+{
+    die("\nusage: $prog [:<number>] [-name <desktop-name>] [-depth <depth>]\n".
+	"                 [-geometry <width>x<height>]\n".
+	"                 [-pixelformat rgbNNN|bgrNNN]\n".
+	"                 [-fp <font-path>]\n".
+	"                 [-fg]\n".
+	"                 [-autokill]\n".
+	"                 [-noxstartup]\n".
+	"                 [-xstartup <file>]\n".
+	"                 <Xvnc-options>...\n\n".
+	"       $prog -kill <X-display>\n\n".
+	"       $prog -list\n\n");
+}
+
+
+#
+# List
+#
+
+sub List
+{
+    opendir(dir, $vncUserDir);
+    my @filelist = readdir(dir);
+    closedir(dir);
+    print "\nTigerVNC server sessions:\n\n";
+    print "X DISPLAY #\tPROCESS ID\n";
+    foreach my $file (@filelist) {
+	if ($file =~ /$host:(\d+)$\.pid/) {
+	    chop($tmp_pid = `cat $vncUserDir/$file`);
+	    if (kill 0, $tmp_pid) {
+		print ":".$1."\t\t".`cat $vncUserDir/$file`;
+	    } else {
+		unlink ($vncUserDir . "/" . $file);
+	    }
+	}
+    }
+    exit 1;
+}
+
+
+#
+# Kill
+#
+
+sub Kill
+{
+    $opt{'-kill'} =~ s/(:\d+)\.\d+$/$1/; # e.g. turn :1.0 into :1
+
+    if ($opt{'-kill'} =~ /^:\d+$/) {
+	$pidFile = "$vncUserDir/$host$opt{'-kill'}.pid";
+    } else {
+	if ($opt{'-kill'} !~ /^$host:/) {
+	    die "\nCan't tell if $opt{'-kill'} is on $host\n".
+		"Use -kill :<number> instead\n\n";
+	}
+	$pidFile = "$vncUserDir/$opt{'-kill'}.pid";
+    }
+
+    if (! -r $pidFile) {
+	die "\nCan't find file $pidFile\n".
+	    "You'll have to kill the Xvnc process manually\n\n";
+    }
+
+    $SIG{'HUP'} = 'IGNORE';
+    chop($pid = `cat $pidFile`);
+    warn "Killing Xvnc process ID $pid\n";
+
+    if (kill 0, $pid) {
+	system("kill $pid");
+	sleep(1);
+	if (kill 0, $pid) {
+	    print "Xvnc seems to be deadlocked.  Kill the process manually and then re-run\n";
+	    print "    ".$0." -kill ".$opt{'-kill'}."\n";
+	    print "to clean up the socket files.\n";
+	    exit
+	}
+
+    } else {
+	warn "Xvnc process ID $pid already killed\n";
+	$opt{'-kill'} =~ s/://;
+
+	if (-e "@TERMUX_PREFIX@/tmp/.X11-unix/X$opt{'-kill'}") {
+	    print "Xvnc did not appear to shut down cleanly.";
+	    print " Removing @TERMUX_PREFIX@/tmp/.X11-unix/X$opt{'-kill'}\n";
+	    unlink "@TERMUX_PREFIX@/tmp/.X11-unix/X$opt{'-kill'}";
+	}
+	if (-e "@TERMUX_PREFIX@/tmp/.X$opt{'-kill'}-lock") {
+	    print "Xvnc did not appear to shut down cleanly.";
+	    print " Removing @TERMUX_PREFIX@/tmp/.X$opt{'-kill'}-lock\n";
+	    unlink "@TERMUX_PREFIX@/tmp/.X$opt{'-kill'}-lock";
+	}
+    }
+
+    unlink $pidFile;
+    exit;
+}
+
+
+#
+# ParseOptions takes a list of possible options and a boolean indicating
+# whether the option has a value following, and sets up an associative array
+# %opt of the values of the options given on the command line. It removes all
+# the arguments it uses from @ARGV and returns them in @optArgs.
+#
+
+sub ParseOptions
+{
+    local (@optval) = @_;
+    local ($opt, @opts, %valFollows, @newargs);
+
+    while (@optval) {
+	$opt = shift(@optval);
+	push(@opts,$opt);
+	$valFollows{$opt} = shift(@optval);
+    }
+
+    @optArgs = ();
+    %opt = ();
+
+    arg: while (defined($arg = shift(@ARGV))) {
+	foreach $opt (@opts) {
+	    if ($arg eq $opt) {
+		push(@optArgs, $arg);
+		if ($valFollows{$opt}) {
+		    if (@ARGV == 0) {
+			&Usage();
+		    }
+		    $opt{$opt} = shift(@ARGV);
+		    push(@optArgs, $opt{$opt});
+		} else {
+		    $opt{$opt} = 1;
+		}
+		next arg;
+	    }
+	}
+	push(@newargs,$arg);
+    }
+
+    @ARGV = @newargs;
+}
+
+
+# Routine to make sure we're operating in a sane environment.
+sub SanityCheck
+{
+    local ($cmd);
+
+    # Get the program name
+    ($prog) = ($0 =~ m|([^/]+)$|);
+
+    #
+    # Check we have all the commands we'll need on the path.
+    #
+
+ cmd:
+    foreach $cmd ("uname","xauth") {
+	for (split(/:/,$ENV{PATH})) {
+	    if (-x "$_/$cmd") {
+		next cmd;
+	    }
+	}
+	die "$prog: couldn't find \"$cmd\" on your PATH.\n";
+    }
+
+    if($exedir eq "") {
+      cmd2:
+	foreach $cmd ("Xvnc","vncpasswd") {
+	    for (split(/:/,$ENV{PATH})) {
+		if (-x "$_/$cmd") {
+		    $vncClasses = "$_/../vnc/classes";
+		    next cmd2;
+		}
+	    }
+	    die "$prog: couldn't find \"$cmd\" on your PATH.\n";
+	}
+    }
+    else {
+      cmd3:
+	foreach $cmd ($exedir."Xvnc",$exedir."vncpasswd") {
+	    for (split(/:/,$ENV{PATH})) {
+		if (-x "$cmd") {
+		    $vncClasses = $exedir."../vnc/classes";
+		    next cmd3;
+		}
+	    }
+	    die "$prog: couldn't find \"$cmd\".\n";
+	}
+    }
+
+    if (!defined($ENV{HOME})) {
+	die "$prog: The HOME environment variable is not set.\n";
+    }
+
+    #
+    # Find socket constants. 'use Socket' is a perl5-ism, so we wrap it in an
+    # eval, and if it fails we try 'require "sys/socket.ph"'.  If this fails,
+    # we just guess at the values.  If you find perl moaning here, just
+    # hard-code the values of AF_INET and SOCK_STREAM.  You can find these out
+    # for your platform by looking in @TERMUX_PREFIX@/include/sys/socket.h and related
+    # files.
+    #
+
+    chop($os = `uname`);
+    chop($osrev = `uname -r`);
+
+    eval 'use Socket';
+    if ($@) {
+	eval 'require "sys/socket.ph"';
+	if ($@) {
+	    if (($os eq "SunOS") && ($osrev !~ /^4/)) {
+		$AF_INET = 2;
+		$SOCK_STREAM = 2;
+	    } else {
+		$AF_INET = 2;
+		$SOCK_STREAM = 1;
+	    }
+	} else {
+	    $AF_INET = &AF_INET;
+	    $SOCK_STREAM = &SOCK_STREAM;
+	}
+    } else {
+	$AF_INET = &AF_INET;
+	$SOCK_STREAM = &SOCK_STREAM;
+    }
+}

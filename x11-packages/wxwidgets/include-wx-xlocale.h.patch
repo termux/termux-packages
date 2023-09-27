@@ -1,0 +1,27 @@
+--- a/include/wx/xlocale.h
++++ b/include/wx/xlocale.h
+@@ -239,6 +239,10 @@
+     //       MSVC++8 does not have _strto[u]ll_l functions;
+     //       thus we take the minimal set of functions provided in both environments:
+ 
++    #if defined __ANDROID__ && __ANDROID_API__ < 26
++        #define strtoul_l(nptr,endptr,base,loc) strtoul(nptr,endptr,base)
++    #endif
++
+     #define wxCRT_Strtod_lA wxXLOCALE_IDENT(strtod_l)
+     #define wxCRT_Strtol_lA wxXLOCALE_IDENT(strtol_l)
+     #define wxCRT_Strtoul_lA wxXLOCALE_IDENT(strtoul_l)
+@@ -297,6 +301,13 @@
+ 
+         // stdlib functions for numeric <-> string conversion
+         // (see notes above about missing functions)
++
++        #if defined __ANDROID__ && __ANDROID_API__ < 26
++            #define wcstod_l(nptr,endptr,loc) wcstod(nptr,endptr)
++            #define wcstol_l(nptr,endptr,base,loc) wcstol(nptr,endptr,base)
++            #define wcstoul_l(nptr,endptr,base,loc) wcstoul(nptr,endptr,base)
++        #endif
++
+         #define wxCRT_Strtod_lW wxXLOCALE_IDENT(wcstod_l)
+         #define wxCRT_Strtol_lW wxXLOCALE_IDENT(wcstol_l)
+         #define wxCRT_Strtoul_lW wxXLOCALE_IDENT(wcstoul_l)

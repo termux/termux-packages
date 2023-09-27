@@ -1,0 +1,11 @@
+--- a/Source/util.h
++++ b/Source/util.h
+@@ -131,7 +131,7 @@
+   friend int fseek(S_t*s, long int offset, int origin)
+   {
+     if ((unsigned long) offset != (size_t) offset) return 1; // long int will usually fit in our size_t
+-    size_t newpos, invalid = 0;
++    size_t newpos = 0, invalid = 0;
+     switch(origin)
+     {
+     case SEEK_SET: newpos = (size_t) offset, invalid = offset < 0; break;

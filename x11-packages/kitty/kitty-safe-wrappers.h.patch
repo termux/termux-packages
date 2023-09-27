@@ -1,0 +1,13 @@
+--- a/kitty/safe-wrappers.h
++++ b/kitty/safe-wrappers.h
+@@ -8,6 +8,10 @@
+ #include "data-types.h"
+ #include <fcntl.h>
+ #include <sys/mman.h>
++#ifdef __ANDROID__
++int shm_open(const char *, int, mode_t);
++int shm_unlink(const char *);
++#endif
+ 
+ 
+ static inline int

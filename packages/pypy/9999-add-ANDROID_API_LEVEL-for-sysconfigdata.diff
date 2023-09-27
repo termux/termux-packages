@@ -1,0 +1,11 @@
+This variable is needed when compiling packages using pip
+
+--- a/lib_pypy/_sysconfigdata.py
++++ b/lib_pypy/_sysconfigdata.py
+@@ -8,3 +8,6 @@
+     }
+ else:
+     build_time_vars = {}
++
++# Termux Fix: Add ANDROID_API_LEVEL
++build_time_vars["ANDROID_API_LEVEL"] = @TERMUX_PKG_API_LEVEL@

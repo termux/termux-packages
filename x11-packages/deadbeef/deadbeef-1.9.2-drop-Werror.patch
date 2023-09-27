@@ -1,0 +1,56 @@
+Borrowed from https://github.com/gentoo/gentoo/blob/1020fac5527ad96643ca8874fe8c4254a4bf7153/media-sound/deadbeef/files/deadbeef-1.9.2-drop-Werror.patch
+
+diff --git a/configure.ac b/configure.ac
+index e11ae7e..8e3c590 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -337,7 +337,7 @@ AS_IF([test "${have_iconv}" = "yes"], [
+     AC_DEFINE(HAVE_LIBICONV,1,[Use libiconv instead of glibc iconv])
+ ])
+ 
+-AX_CHECK_COMPILER_FLAGS(-msse2, HAVE_SSE2=1, [], -Werror)
++AX_CHECK_COMPILER_FLAGS(-msse2, HAVE_SSE2=1, [])
+ AS_IF([test "${HAVE_SSE2}"], [
+     AC_DEFINE(HAVE_SSE2,1,[Support SSE2 instructions])
+ ])
+diff --git a/plugins/gtkui/Makefile.am b/plugins/gtkui/Makefile.am
+index 739cdbb..cc0dce9 100644
+--- a/plugins/gtkui/Makefile.am
++++ b/plugins/gtkui/Makefile.am
+@@ -94,7 +94,7 @@ ddb_gui_GTK2_la_LDFLAGS = -module -avoid-version
+ 
+ ddb_gui_GTK2_la_LIBADD = $(LDADD) $(GTK2_DEPS_LIBS) $(SM_LIBADD) ../libparser/libparser.la ../../shared/libtrkpropertiesutil.la ../../shared/libeqpreset.la ../../shared/libdeletefromdisk.la ../../shared/libtftintutil.la ../../analyzer/libanalyzer.la ../../scope/libscope.la $(JANSSON_LIBS) $(DISPATCH_LIBS)
+ 
+-ddb_gui_GTK2_la_CFLAGS = -std=c99 -Werror -DGLIB_DISABLE_DEPRECATION_WARNINGS -DGDK_DISABLE_DEPRECATION_WARNINGS -DGTK_DISABLE_DEPRECATION_WARNINGS $(GTK2_DEPS_CFLAGS) $(SM_CFLAGS) $(JANSSON_CFLAGS) $(DISPATCH_CFLAGS) -DDDB_WARN_DEPRECATED=1
++ddb_gui_GTK2_la_CFLAGS = -std=c99 -DGLIB_DISABLE_DEPRECATION_WARNINGS -DGDK_DISABLE_DEPRECATION_WARNINGS -DGTK_DISABLE_DEPRECATION_WARNINGS $(GTK2_DEPS_CFLAGS) $(SM_CFLAGS) $(JANSSON_CFLAGS) $(DISPATCH_CFLAGS) -DDDB_WARN_DEPRECATED=1
+ 
+ endif
+ 
+@@ -105,7 +105,7 @@ ddb_gui_GTK3_la_LDFLAGS = -module -avoid-version
+ 
+ ddb_gui_GTK3_la_SOURCES = $(GTKUI_SOURCES_GTK3)
+ ddb_gui_GTK3_la_LIBADD = $(LDADD) $(GTK3_DEPS_LIBS) $(SM_LIBADD) ../libparser/libparser.la ../../shared/libtrkpropertiesutil.la ../../shared/libeqpreset.la ../../shared/libdeletefromdisk.la ../../shared/libtftintutil.la ../../analyzer/libanalyzer.la ../../scope/libscope.la $(JANSSON_LIBS) $(DISPATCH_LIBS)
+-ddb_gui_GTK3_la_CFLAGS = -std=c99 -Werror -DGLIB_DISABLE_DEPRECATION_WARNINGS -DGDK_DISABLE_DEPRECATION_WARNINGS -DGTK_DISABLE_DEPRECATION_WARNINGS $(GTK3_DEPS_CFLAGS) $(SM_CFLAGS) $(JANSSON_CFLAGS) $(DISPATCH_CFLAGS) -DDDB_WARN_DEPRECATED=1
++ddb_gui_GTK3_la_CFLAGS = -std=c99 -DGLIB_DISABLE_DEPRECATION_WARNINGS -DGDK_DISABLE_DEPRECATION_WARNINGS -DGTK_DISABLE_DEPRECATION_WARNINGS $(GTK3_DEPS_CFLAGS) $(SM_CFLAGS) $(JANSSON_CFLAGS) $(DISPATCH_CFLAGS) -DDDB_WARN_DEPRECATED=1
+ ddb_gui_GTK3_la_OBJCFLAGS = $(GTK3_DEPS_CFLAGS) $(SM_CFLAGS) $(JANSSON_CFLAGS)
+ 
+ nodist_ddb_gui_GTK3_la_SOURCES = gtkui-gresources.c
+diff --git a/plugins/gtkui/Makefile.in b/plugins/gtkui/Makefile.in
+index 319bda2..66baad7 100644
+--- a/plugins/gtkui/Makefile.in
++++ b/plugins/gtkui/Makefile.in
+@@ -723,12 +723,12 @@ sdk_HEADERS = gtkui_api.h
+ @HAVE_GTK2_TRUE@ddb_gui_GTK2_la_SOURCES = $(GTKUI_SOURCES_GTK2)
+ @HAVE_GTK2_TRUE@ddb_gui_GTK2_la_LDFLAGS = -module -avoid-version
+ @HAVE_GTK2_TRUE@ddb_gui_GTK2_la_LIBADD = $(LDADD) $(GTK2_DEPS_LIBS) $(SM_LIBADD) ../libparser/libparser.la ../../shared/libtrkpropertiesutil.la ../../shared/libeqpreset.la ../../shared/libdeletefromdisk.la ../../shared/libtftintutil.la ../../analyzer/libanalyzer.la ../../scope/libscope.la $(JANSSON_LIBS) $(DISPATCH_LIBS)
+-@HAVE_GTK2_TRUE@ddb_gui_GTK2_la_CFLAGS = -std=c99 -Werror -DGLIB_DISABLE_DEPRECATION_WARNINGS -DGDK_DISABLE_DEPRECATION_WARNINGS -DGTK_DISABLE_DEPRECATION_WARNINGS $(GTK2_DEPS_CFLAGS) $(SM_CFLAGS) $(JANSSON_CFLAGS) $(DISPATCH_CFLAGS) -DDDB_WARN_DEPRECATED=1
++@HAVE_GTK2_TRUE@ddb_gui_GTK2_la_CFLAGS = -std=c99 -DGLIB_DISABLE_DEPRECATION_WARNINGS -DGDK_DISABLE_DEPRECATION_WARNINGS -DGTK_DISABLE_DEPRECATION_WARNINGS $(GTK2_DEPS_CFLAGS) $(SM_CFLAGS) $(JANSSON_CFLAGS) $(DISPATCH_CFLAGS) -DDDB_WARN_DEPRECATED=1
+ @HAVE_GTK3_TRUE@GTKUI_SOURCES_GTK3 = deadbeefapp.c deadbeefapp.h $(GTKUI_SOURCES)
+ @HAVE_GTK3_TRUE@ddb_gui_GTK3_la_LDFLAGS = -module -avoid-version
+ @HAVE_GTK3_TRUE@ddb_gui_GTK3_la_SOURCES = $(GTKUI_SOURCES_GTK3)
+ @HAVE_GTK3_TRUE@ddb_gui_GTK3_la_LIBADD = $(LDADD) $(GTK3_DEPS_LIBS) $(SM_LIBADD) ../libparser/libparser.la ../../shared/libtrkpropertiesutil.la ../../shared/libeqpreset.la ../../shared/libdeletefromdisk.la ../../shared/libtftintutil.la ../../analyzer/libanalyzer.la ../../scope/libscope.la $(JANSSON_LIBS) $(DISPATCH_LIBS)
+-@HAVE_GTK3_TRUE@ddb_gui_GTK3_la_CFLAGS = -std=c99 -Werror -DGLIB_DISABLE_DEPRECATION_WARNINGS -DGDK_DISABLE_DEPRECATION_WARNINGS -DGTK_DISABLE_DEPRECATION_WARNINGS $(GTK3_DEPS_CFLAGS) $(SM_CFLAGS) $(JANSSON_CFLAGS) $(DISPATCH_CFLAGS) -DDDB_WARN_DEPRECATED=1
++@HAVE_GTK3_TRUE@ddb_gui_GTK3_la_CFLAGS = -std=c99 -DGLIB_DISABLE_DEPRECATION_WARNINGS -DGDK_DISABLE_DEPRECATION_WARNINGS -DGTK_DISABLE_DEPRECATION_WARNINGS $(GTK3_DEPS_CFLAGS) $(SM_CFLAGS) $(JANSSON_CFLAGS) $(DISPATCH_CFLAGS) -DDDB_WARN_DEPRECATED=1
+ @HAVE_GTK3_TRUE@ddb_gui_GTK3_la_OBJCFLAGS = $(GTK3_DEPS_CFLAGS) $(SM_CFLAGS) $(JANSSON_CFLAGS)
+ @HAVE_GTK3_TRUE@nodist_ddb_gui_GTK3_la_SOURCES = gtkui-gresources.c
+ @HAVE_GTK3_TRUE@BUILT_SOURCES = gtkui-gresources.c

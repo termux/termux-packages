@@ -1,0 +1,24 @@
+https://github.com/lanoxx/tilda/pull/481
+
+From 4db8680584d3f7e14668e4105c710669338a2f0d Mon Sep 17 00:00:00 2001
+From: xtkoba <69125751+xtkoba@users.noreply.github.com>
+Date: Sun, 24 Apr 2022 11:32:41 +0900
+Subject: [PATCH] Fix OOB write in `start_default_shell()`
+
+---
+ src/tilda_terminal.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/tilda_terminal.c b/src/tilda_terminal.c
+index 84baab74..c9f613aa 100644
+--- a/src/tilda_terminal.c
++++ b/src/tilda_terminal.c
+@@ -573,7 +573,7 @@ start_default_shell (tilda_term *tt)
+          */
+         flags |= G_SPAWN_FILE_AND_ARGV_ZERO;
+     } else {
+-        argv = malloc(1 * sizeof(void *));
++        argv = malloc(2 * sizeof(void *));
+         argv[0] = default_command;
+         argv[1] = NULL;
+     }

@@ -1,0 +1,18 @@
+--- a/third/slash/slash/src/posix.cc
++++ b/third/slash/slash/src/posix.cc
+@@ -471,11 +471,15 @@
+ }
+ 
+ void Pthread_cancel(pthread_t tid) {
++#ifndef __ANDROID__
+   int rc;
+ 
+   if ((rc = pthread_cancel(tid)) != 0) {
+     log_err("Pthread_cancel error: %s\n", strerror(rc));
+   }
++#else
++  log_err("Pthread_cancel error: %s\n", strerror(ENOSYS));
++#endif
+ }
+ 
+ void Pthread_join(pthread_t tid, void **thread_return) {

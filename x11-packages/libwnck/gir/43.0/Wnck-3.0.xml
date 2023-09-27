@@ -1,0 +1,202 @@
+<?xml version="1.0"?>
+<dump>
+  <class name="WnckScreen" get-type="wnck_screen_get_type" parents="GObject">
+    <signal name="active-window-changed" return="void" when="last">
+      <param type="WnckWindow"/>
+    </signal>
+    <signal name="active-workspace-changed" return="void" when="last">
+      <param type="WnckWorkspace"/>
+    </signal>
+    <signal name="window-stacking-changed" return="void" when="last">
+    </signal>
+    <signal name="window-opened" return="void" when="last">
+      <param type="WnckWindow"/>
+    </signal>
+    <signal name="window-closed" return="void" when="last">
+      <param type="WnckWindow"/>
+    </signal>
+    <signal name="workspace-created" return="void" when="last">
+      <param type="WnckWorkspace"/>
+    </signal>
+    <signal name="workspace-destroyed" return="void" when="last">
+      <param type="WnckWorkspace"/>
+    </signal>
+    <signal name="application-opened" return="void" when="last">
+      <param type="WnckApplication"/>
+    </signal>
+    <signal name="application-closed" return="void" when="last">
+      <param type="WnckApplication"/>
+    </signal>
+    <signal name="class-group-opened" return="void" when="last">
+      <param type="WnckClassGroup"/>
+    </signal>
+    <signal name="class-group-closed" return="void" when="last">
+      <param type="WnckClassGroup"/>
+    </signal>
+    <signal name="background-changed" return="void" when="last">
+    </signal>
+    <signal name="showing-desktop-changed" return="void" when="last">
+    </signal>
+    <signal name="viewports-changed" return="void" when="last">
+    </signal>
+    <signal name="window-manager-changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="WnckHandle" get-type="wnck_handle_get_type" parents="GObject">
+    <property name="client-type" type="WnckClientType" flags="231" default-value="WNCK_CLIENT_TYPE_APPLICATION"/>
+  </class>
+  <class name="WnckWindow" get-type="wnck_window_get_type" parents="GObject">
+    <signal name="name-changed" return="void" when="last">
+    </signal>
+    <signal name="state-changed" return="void" when="last">
+      <param type="WnckWindowState"/>
+      <param type="WnckWindowState"/>
+    </signal>
+    <signal name="workspace-changed" return="void" when="last">
+    </signal>
+    <signal name="icon-changed" return="void" when="last">
+    </signal>
+    <signal name="actions-changed" return="void" when="last">
+      <param type="WnckWindowActions"/>
+      <param type="WnckWindowActions"/>
+    </signal>
+    <signal name="geometry-changed" return="void" when="last">
+    </signal>
+    <signal name="class-changed" return="void" when="last">
+    </signal>
+    <signal name="role-changed" return="void" when="last">
+    </signal>
+    <signal name="type-changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="WnckApplication" get-type="wnck_application_get_type" parents="GObject">
+    <signal name="name-changed" return="void" when="last">
+    </signal>
+    <signal name="icon-changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="WnckClassGroup" get-type="wnck_class_group_get_type" parents="GObject">
+    <signal name="name-changed" return="void" when="last">
+    </signal>
+    <signal name="icon-changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="WnckWorkspace" get-type="wnck_workspace_get_type" parents="GObject">
+    <signal name="name-changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="WnckPager" get-type="wnck_pager_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="handle" type="WnckHandle" flags="1073742059"/>
+  </class>
+  <class name="WnckTasklist" get-type="wnck_tasklist_get_type" parents="GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="handle" type="WnckHandle" flags="1073742059"/>
+    <signal name="task-enter-notify" return="void" when="last">
+      <param type="gpointer"/>
+    </signal>
+    <signal name="task-leave-notify" return="void" when="last">
+      <param type="gpointer"/>
+    </signal>
+  </class>
+  <class name="WnckSelector" get-type="wnck_selector_get_type" parents="GtkMenuBar,GtkMenuShell,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="handle" type="WnckHandle" flags="1073742059"/>
+  </class>
+  <class name="WnckActionMenu" get-type="wnck_action_menu_get_type" parents="GtkMenu,GtkMenuShell,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="window" type="gpointer" flags="11"/>
+  </class>
+  <enum name="WnckPagerDisplayMode" get-type="wnck_pager_display_mode_get_type">
+    <member name="WNCK_PAGER_DISPLAY_NAME" nick="name" value="0"/>
+    <member name="WNCK_PAGER_DISPLAY_CONTENT" nick="content" value="1"/>
+  </enum>  <enum name="WnckPagerScrollMode" get-type="wnck_pager_scroll_mode_get_type">
+    <member name="WNCK_PAGER_SCROLL_2D" nick="2d" value="0"/>
+    <member name="WNCK_PAGER_SCROLL_1D" nick="1d" value="1"/>
+    <member name="WNCK_PAGER_SCROLL_NONE" nick="none" value="2"/>
+  </enum>  <enum name="WnckTasklistGroupingType" get-type="wnck_tasklist_grouping_type_get_type">
+    <member name="WNCK_TASKLIST_NEVER_GROUP" nick="never-group" value="0"/>
+    <member name="WNCK_TASKLIST_AUTO_GROUP" nick="auto-group" value="1"/>
+    <member name="WNCK_TASKLIST_ALWAYS_GROUP" nick="always-group" value="2"/>
+  </enum>  <enum name="WnckClientType" get-type="wnck_client_type_get_type">
+    <member name="WNCK_CLIENT_TYPE_APPLICATION" nick="application" value="1"/>
+    <member name="WNCK_CLIENT_TYPE_PAGER" nick="pager" value="2"/>
+  </enum>  <flags name="WnckWindowState" get-type="wnck_window_state_get_type">
+    <member name="WNCK_WINDOW_STATE_MINIMIZED" nick="minimized" value="1"/>
+    <member name="WNCK_WINDOW_STATE_MAXIMIZED_HORIZONTALLY" nick="maximized-horizontally" value="2"/>
+    <member name="WNCK_WINDOW_STATE_MAXIMIZED_VERTICALLY" nick="maximized-vertically" value="4"/>
+    <member name="WNCK_WINDOW_STATE_SHADED" nick="shaded" value="8"/>
+    <member name="WNCK_WINDOW_STATE_SKIP_PAGER" nick="skip-pager" value="16"/>
+    <member name="WNCK_WINDOW_STATE_SKIP_TASKLIST" nick="skip-tasklist" value="32"/>
+    <member name="WNCK_WINDOW_STATE_STICKY" nick="sticky" value="64"/>
+    <member name="WNCK_WINDOW_STATE_HIDDEN" nick="hidden" value="128"/>
+    <member name="WNCK_WINDOW_STATE_FULLSCREEN" nick="fullscreen" value="256"/>
+    <member name="WNCK_WINDOW_STATE_DEMANDS_ATTENTION" nick="demands-attention" value="512"/>
+    <member name="WNCK_WINDOW_STATE_URGENT" nick="urgent" value="1024"/>
+    <member name="WNCK_WINDOW_STATE_ABOVE" nick="above" value="2048"/>
+    <member name="WNCK_WINDOW_STATE_BELOW" nick="below" value="4096"/>
+  </flags>
+  <flags name="WnckWindowActions" get-type="wnck_window_actions_get_type">
+    <member name="WNCK_WINDOW_ACTION_MOVE" nick="move" value="1"/>
+    <member name="WNCK_WINDOW_ACTION_RESIZE" nick="resize" value="2"/>
+    <member name="WNCK_WINDOW_ACTION_SHADE" nick="shade" value="4"/>
+    <member name="WNCK_WINDOW_ACTION_STICK" nick="stick" value="8"/>
+    <member name="WNCK_WINDOW_ACTION_MAXIMIZE_HORIZONTALLY" nick="maximize-horizontally" value="16"/>
+    <member name="WNCK_WINDOW_ACTION_MAXIMIZE_VERTICALLY" nick="maximize-vertically" value="32"/>
+    <member name="WNCK_WINDOW_ACTION_CHANGE_WORKSPACE" nick="change-workspace" value="64"/>
+    <member name="WNCK_WINDOW_ACTION_CLOSE" nick="close" value="128"/>
+    <member name="WNCK_WINDOW_ACTION_UNMAXIMIZE_HORIZONTALLY" nick="unmaximize-horizontally" value="256"/>
+    <member name="WNCK_WINDOW_ACTION_UNMAXIMIZE_VERTICALLY" nick="unmaximize-vertically" value="512"/>
+    <member name="WNCK_WINDOW_ACTION_UNSHADE" nick="unshade" value="1024"/>
+    <member name="WNCK_WINDOW_ACTION_UNSTICK" nick="unstick" value="2048"/>
+    <member name="WNCK_WINDOW_ACTION_MINIMIZE" nick="minimize" value="4096"/>
+    <member name="WNCK_WINDOW_ACTION_UNMINIMIZE" nick="unminimize" value="8192"/>
+    <member name="WNCK_WINDOW_ACTION_MAXIMIZE" nick="maximize" value="16384"/>
+    <member name="WNCK_WINDOW_ACTION_UNMAXIMIZE" nick="unmaximize" value="32768"/>
+    <member name="WNCK_WINDOW_ACTION_FULLSCREEN" nick="fullscreen" value="65536"/>
+    <member name="WNCK_WINDOW_ACTION_ABOVE" nick="above" value="131072"/>
+    <member name="WNCK_WINDOW_ACTION_BELOW" nick="below" value="262144"/>
+  </flags>
+  <enum name="WnckWindowType" get-type="wnck_window_type_get_type">
+    <member name="WNCK_WINDOW_NORMAL" nick="normal" value="0"/>
+    <member name="WNCK_WINDOW_DESKTOP" nick="desktop" value="1"/>
+    <member name="WNCK_WINDOW_DOCK" nick="dock" value="2"/>
+    <member name="WNCK_WINDOW_DIALOG" nick="dialog" value="3"/>
+    <member name="WNCK_WINDOW_TOOLBAR" nick="toolbar" value="4"/>
+    <member name="WNCK_WINDOW_MENU" nick="menu" value="5"/>
+    <member name="WNCK_WINDOW_UTILITY" nick="utility" value="6"/>
+    <member name="WNCK_WINDOW_SPLASHSCREEN" nick="splashscreen" value="7"/>
+  </enum>  <enum name="WnckWindowGravity" get-type="wnck_window_gravity_get_type">
+    <member name="WNCK_WINDOW_GRAVITY_CURRENT" nick="current" value="0"/>
+    <member name="WNCK_WINDOW_GRAVITY_NORTHWEST" nick="northwest" value="1"/>
+    <member name="WNCK_WINDOW_GRAVITY_NORTH" nick="north" value="2"/>
+    <member name="WNCK_WINDOW_GRAVITY_NORTHEAST" nick="northeast" value="3"/>
+    <member name="WNCK_WINDOW_GRAVITY_WEST" nick="west" value="4"/>
+    <member name="WNCK_WINDOW_GRAVITY_CENTER" nick="center" value="5"/>
+    <member name="WNCK_WINDOW_GRAVITY_EAST" nick="east" value="6"/>
+    <member name="WNCK_WINDOW_GRAVITY_SOUTHWEST" nick="southwest" value="7"/>
+    <member name="WNCK_WINDOW_GRAVITY_SOUTH" nick="south" value="8"/>
+    <member name="WNCK_WINDOW_GRAVITY_SOUTHEAST" nick="southeast" value="9"/>
+    <member name="WNCK_WINDOW_GRAVITY_STATIC" nick="static" value="10"/>
+  </enum>  <flags name="WnckWindowMoveResizeMask" get-type="wnck_window_move_resize_mask_get_type">
+    <member name="WNCK_WINDOW_CHANGE_X" nick="x" value="1"/>
+    <member name="WNCK_WINDOW_CHANGE_Y" nick="y" value="2"/>
+    <member name="WNCK_WINDOW_CHANGE_WIDTH" nick="width" value="4"/>
+    <member name="WNCK_WINDOW_CHANGE_HEIGHT" nick="height" value="8"/>
+  </flags>
+  <enum name="WnckMotionDirection" get-type="wnck_motion_direction_get_type">
+    <member name="WNCK_MOTION_UP" nick="up" value="-1"/>
+    <member name="WNCK_MOTION_DOWN" nick="down" value="-2"/>
+    <member name="WNCK_MOTION_LEFT" nick="left" value="-3"/>
+    <member name="WNCK_MOTION_RIGHT" nick="right" value="-4"/>
+  </enum>  <class name="WnckImageMenuItem" get-type="wnck_image_menu_item_get_type" parents="GtkMenuItem,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkActivatable"/>
+    <implements name="GtkActionable"/>
+  </class>
+</dump>

@@ -3,9 +3,10 @@ TERMUX_PKG_DESCRIPTION="A Standard ML implementation"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=5.9
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/polyml/polyml/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=5aa452a49f2ac0278668772af4ea0b9bf30c93457e60ff7f264c5aec2023c83e
-TERMUX_PKG_DEPENDS="libc++, libffi, libgmp"
+TERMUX_PKG_DEPENDS="libandroid-posix-semaphore, libc++, libffi, libgmp"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-pic
@@ -13,10 +14,10 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_host_build() {
-	_PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
+	local _PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
 	mkdir -p $_PREFIX_FOR_BUILD
 
-	TERMUX_ORIG_PATH=$PATH
+	local TERMUX_ORIG_PATH=$PATH
 	mkdir -p native
 	pushd native
 	export PATH=$(pwd):$TERMUX_ORIG_PATH
@@ -69,6 +70,8 @@ termux_step_pre_configure() {
 		_NEED_DUMMY_LIBSTDCXX_SO=true
 		echo 'INPUT(-lc++_shared)' > $_LIBSTDCXX_SO
 	fi
+
+	LDFLAGS+=" -landroid-posix-semaphore $($CC -print-libgcc-file-name)"
 }
 
 termux_step_post_make_install() {

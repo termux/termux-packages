@@ -1,0 +1,13 @@
+--- a/common/server/signals.cpp
++++ b/common/server/signals.cpp
+@@ -224,6 +224,10 @@
+ }
+ 
+ 
++#ifdef __ANDROID__
++#define valloc(size) memalign(sysconf(_SC_PAGESIZE),size)
++#endif
++
+ void set_debug_handlers() {
+   stack_t stack;
+   int res = sigaltstack(nullptr, &stack);

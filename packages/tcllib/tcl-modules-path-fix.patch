@@ -1,0 +1,112 @@
+diff --git a/modules/amazon-s3/S3.tcl b/modules/amazon-s3/S3.tcl
+index dfdaf42..4df498d 100644
+--- a/modules/amazon-s3/S3.tcl
++++ b/modules/amazon-s3/S3.tcl
+@@ -136,9 +136,9 @@ proc S3::contenttype {fname} {
+ 	}
+     } else {
+ 	# Assume something like Unix.
+-	if {[file readable /etc/mime.types]} {
++	if {[file readable @TERMUX_PREFIX@/etc/mime.types]} {
+ 	    set extension [string trim [file extension $fname] "."]
+-	    set f [open /etc/mime.types r]
++	    set f [open @TERMUX_PREFIX@/etc/mime.types r]
+ 	    while {-1 != [gets $f line] && ![info exists c]} {
+ 		set line [string trim $line]
+ 		if {[string match "#*" $line]} continue
+diff --git a/modules/bench/libbench.tcl b/modules/bench/libbench.tcl
+index ebf9f71..440094c 100644
+--- a/modules/bench/libbench.tcl
++++ b/modules/bench/libbench.tcl
+@@ -125,7 +125,7 @@ proc bench_tmpfile {} {
+     set base "tclbench[incr BENCH(uniqid)].dat"
+     if {[info exists tcl_platform(platform)]} {
+ 	if {$tcl_platform(platform) == "unix"} {
+-	    return "/tmp/$base"
++	    return "@TERMUX_PREFIX@/tmp/$base"
+ 	} elseif {$tcl_platform(platform) == "windows"} {
+ 	    return [file join $env(TEMP) $base]
+ 	} else {
+@@ -133,7 +133,7 @@ proc bench_tmpfile {} {
+ 	}
+     } else {
+ 	# The Good Ol' Days (?) when only Unix support existed
+-	return "/tmp/$base"
++	return "@TERMUX_PREFIX@/tmp/$base"
+     }
+ }
+ 
+@@ -152,7 +152,7 @@ proc bench_rm {args} {
+ 	if {[info tclversion] > 7.4} {
+ 	    catch {file delete $file}
+ 	} else {
+-	    catch {exec /bin/rm $file}
++	    catch {exec @TERMUX_PREFIX@/bin/rm $file}
+ 	}
+     }
+ }
+diff --git a/modules/dns/dns.tcl b/modules/dns/dns.tcl
+index 316458b..c512de1 100644
+--- a/modules/dns/dns.tcl
++++ b/modules/dns/dns.tcl
+@@ -53,8 +53,8 @@ namespace eval ::dns {
+             cafile     ""
+             cadir      ""
+         }
+-        if {[file exists /etc/ssl/certs/ca-certificates.crt]} {
+-            set options(cafile) /etc/ssl/certs/ca-certificates.crt
++        if {[file exists @TERMUX_PREFIX@/etc/ssl/certs/ca-certificates.crt]} {
++            set options(cafile) @TERMUX_PREFIX@/etc/ssl/certs/ca-certificates.crt
+         }
+         variable log [logger::init dns]
+         ${log}::setlevel $options(loglevel)
+@@ -1392,8 +1392,8 @@ switch -exact $::tcl_platform(platform) {
+     unix {
+         proc ::dns::nameservers {} {
+             set nameservers {}
+-            if {[file readable /etc/resolv.conf]} {
+-                set f [open /etc/resolv.conf r]
++            if {[file readable @TERMUX_PREFIX@/etc/resolv.conf]} {
++                set f [open @TERMUX_PREFIX@/etc/resolv.conf r]
+                 while {![eof $f]} {
+                     gets $f line
+                     if {[regexp {^\s*nameserver\s+(.*)$} $line -> ns]} {
+diff --git a/modules/doctools/mpformats/_html.tcl b/modules/doctools/mpformats/_html.tcl
+index 8999b6d..4cd056a 100644
+--- a/modules/doctools/mpformats/_html.tcl
++++ b/modules/doctools/mpformats/_html.tcl
+@@ -130,7 +130,7 @@ proc stable {}         {return [markup "<table [border] cellspacing=0 cellpaddin
+ proc link   {text url} {return [markup "<a href=\"$url\">"]$text[markup </a>]}
+ 
+ proc tcl_cmd {cmd} {return "[markup <b>]\[$cmd][markup </b>]"}
+-proc wget    {url} {exec /usr/bin/wget -q -O - $url 2>/dev/null}
++proc wget    {url} {exec @TERMUX_PREFIX@/usr/bin/wget -q -O - $url 2>/dev/null}
+ 
+ proc url {tag text url} {
+     set body {
+diff --git a/modules/ftpd/ftpd.tcl b/modules/ftpd/ftpd.tcl
+index 7e93f8e..ee46142 100644
+--- a/modules/ftpd/ftpd.tcl
++++ b/modules/ftpd/ftpd.tcl
+@@ -354,7 +354,7 @@ proc ::ftpd::unixAuth {user pass} {
+     # fully qualified email address.
+ 
+     if {([llength $passwords] == 0) && (![catch {package require crypt}])} {
+-        foreach file [list /etc/passwd /etc/shadow] {
++        foreach file [list @TERMUX_PREFIX@/etc/passwd @TERMUX_PREFIX@/etc/shadow] {
+             if {([file exists $file]) && ([file readable $file])} {
+                 set fh [open $file r]
+                 set data [read $fh [file size $file]]
+diff --git a/modules/fumagic/cfront.tcl b/modules/fumagic/cfront.tcl
+index d9f0372..103eb24 100644
+--- a/modules/fumagic/cfront.tcl
++++ b/modules/fumagic/cfront.tcl
+@@ -922,7 +922,7 @@ if {!$::fileutil::magic::cfront::debug} {
+     }
+ }
+ 
+-#set script [magic::compile {} /usr/share/misc/file/magic]
++#set script [magic::compile {} @TERMUX_PREFIX@/usr/share/misc/file/magic]
+ #puts "\# types:[array names magic::types]"
+ #puts "\# quals:[array names magic::quals]"
+ #puts "Script: $script"

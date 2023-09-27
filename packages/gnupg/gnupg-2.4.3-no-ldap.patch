@@ -1,0 +1,37 @@
+https://dev.gnupg.org/rG9ae3cfcabec9252c22d67b7a15c36f0a8cf22f0f
+
+From 9ae3cfcabec9252c22d67b7a15c36f0a8cf22f0f Mon Sep 17 00:00:00 2001
+From: NIIBE Yutaka <gniibe@fsij.org>
+Date: Wed, 5 Jul 2023 09:29:54 +0900
+Subject: [PATCH] dirmngr: Enable the call of ks_ldap_help_variables when
+ USE_LDAP.
+
+* dirmngr/server.c [USE_LDAP] (cmd_ad_query): Conditionalize.
+
+--
+
+Cherry-pick master commit of:
+	dc13361524c1477b2106c7385f2059f9ea111b84
+
+Signed-off-by: NIIBE Yutaka <gniibe@fsij.org>
+---
+ dirmngr/server.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/dirmngr/server.c b/dirmngr/server.c
+index 51a149c..ee61f63 100644
+--- a/dirmngr/server.c
++++ b/dirmngr/server.c
+@@ -2776,7 +2776,9 @@ cmd_ad_query (assuan_context_t ctx, char *line)
+ 
+   if (opt_help)
+     {
++#if USE_LDAP
+       ks_ldap_help_variables (ctrl);
++#endif
+       err = 0;
+       goto leave;
+     }
+-- 
+2.41.0
+

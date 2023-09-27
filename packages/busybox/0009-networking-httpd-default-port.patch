@@ -1,24 +1,6 @@
---- ./networking/httpd.c.orig	2021-08-19 16:49:06.730314230 +0200
-+++ ./networking/httpd.c	2021-08-19 16:49:06.756980906 +0200
-@@ -270,7 +270,7 @@
- //usage:     "\n	-i		Inetd mode"
- //usage:     "\n	-f		Don't daemonize"
- //usage:     "\n	-v[v]		Verbose"
--//usage:     "\n	-p [IP:]PORT	Bind to IP:PORT (default *:80)"
-+//usage:     "\n	-p [IP:]PORT	Bind to IP:PORT (default *:8080)"
- //usage:	IF_FEATURE_HTTPD_SETUID(
- //usage:     "\n	-u USER[:GRP]	Set uid/gid after binding to port")
- //usage:	IF_FEATURE_HTTPD_BASIC_AUTH(
-@@ -538,7 +538,7 @@
- 	SET_PTR_TO_GLOBALS(xzalloc(sizeof(G))); \
- 	IF_FEATURE_HTTPD_BASIC_AUTH(g_realm = "Web Server Authentication";) \
- 	IF_FEATURE_HTTPD_RANGES(range_start = -1;) \
--	bind_addr_or_port = "80"; \
-+	bind_addr_or_port = "8080"; \
- 	index_page = index_html; \
- 	file_size = -1; \
- } while (0)
-@@ -1030,7 +1030,7 @@
+--- ./networking/httpd.c.orig	2022-03-01 20:22:51.797986436 +0000
++++ ./networking/httpd.c	2022-03-01 20:25:18.869664006 +0000
+@@ -1043,7 +1043,7 @@
  	if (!errno && n && n <= 0xffff)
  		n = create_and_bind_stream_or_die(NULL, n);
  	else
@@ -27,12 +9,12 @@
  	xlisten(n, 9);
  	return n;
  }
-@@ -2279,7 +2279,7 @@
- 		if (proxy_entry) {
- 			if (verbose > 1)
- 				bb_error_msg("proxy:%s", urlcopy);
--			lsa = host2sockaddr(proxy_entry->host_port, 80);
-+			lsa = host2sockaddr(proxy_entry->host_port, 8080);
- 			if (!lsa)
- 				send_headers_and_exit(HTTP_INTERNAL_SERVER_ERROR);
- 			proxy_fd = socket(lsa->u.sa.sa_family, SOCK_STREAM, 0);
+@@ -2286,7 +2286,7 @@
+ 
+ 		if (verbose > 1)
+ 			bb_error_msg("proxy:%s", urlp);
+-		lsa = host2sockaddr(proxy_entry->host_port, 80);
++		lsa = host2sockaddr(proxy_entry->host_port, 8080);
+ 		if (!lsa)
+ 			send_headers_and_exit(HTTP_INTERNAL_SERVER_ERROR);
+ 		proxy_fd = socket(lsa->u.sa.sa_family, SOCK_STREAM, 0);

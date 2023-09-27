@@ -1,0 +1,13 @@
+--- a/netconf/src/yangrpc/example/yangrpc-example.c
++++ b/netconf/src/yangrpc/example/yangrpc-example.c
+@@ -52,8 +52,8 @@
+     char public_key[1024];
+     boolean autoload = TRUE;
+ 
+-    sprintf(private_key,"/home/%s/.ssh/id_rsa",user);
+-    sprintf(public_key,"/home/%s/.ssh/id_rsa.pub",user);
++    sprintf(private_key,"@TERMUX_HOME@/.ssh/id_rsa",user);
++    sprintf(public_key,"@TERMUX_HOME@/.ssh/id_rsa.pub",user);
+ 
+     while ((optc = getopt_long (argc, argv, "a:s:p:u:P:k:K", long_options, NULL)) != -1) {
+         switch (optc) {

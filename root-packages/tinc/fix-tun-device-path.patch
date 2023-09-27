@@ -1,0 +1,132 @@
+diff -uNr tinc-1.0.35/doc/sample-config/tinc.conf tinc-1.0.35.mod/doc/sample-config/tinc.conf
+--- tinc-1.0.35/doc/sample-config/tinc.conf	2018-09-22 18:36:01.000000000 +0300
++++ tinc-1.0.35.mod/doc/sample-config/tinc.conf	2019-06-20 21:20:43.561237994 +0300
+@@ -18,5 +18,5 @@
+ # The tap device tinc will use.
+ # /dev/tap0 for ethertap, FreeBSD or OpenBSD
+ # /dev/tun0 for Solaris
+-# /dev/net/tun for Linux tun/tap
+-Device = /dev/net/tun
++# /dev/tun for Linux tun/tap
++Device = /dev/tun
+diff -uNr tinc-1.0.35/doc/tinc.conf.5.in tinc-1.0.35.mod/doc/tinc.conf.5.in
+--- tinc-1.0.35/doc/tinc.conf.5.in	2018-09-22 18:36:01.000000000 +0300
++++ tinc-1.0.35.mod/doc/tinc.conf.5.in	2019-06-20 21:20:52.547895168 +0300
+@@ -26,7 +26,7 @@
+ .Pp
+ The effect of this is that the daemon will set its configuration root to
+ .Pa @sysconfdir@/tinc/ Ns Ar NETNAME Ns Pa / ,
+-where 
++where
+ .Ar NETNAME
+ is your argument to the
+ .Fl n
+@@ -42,7 +42,7 @@
+ .Nm tinc
+ now looks for files in
+ .Pa @sysconfdir@/tinc/ ,
+-instead of 
++instead of
+ .Pa @sysconfdir@/tinc/ Ns Ar NETNAME Ns Pa / ;
+ the configuration file should be
+ .Pa @sysconfdir@/tinc/tinc.conf ,
+@@ -64,15 +64,15 @@
+ choose something that will give unique and easy to remember names to your tinc daemon(s).
+ You could try things like hostnames, owner surnames or location names.
+ .Sh PUBLIC/PRIVATE KEYS
+-You should use 
++You should use
+ .Ic tincd -K
+ to generate public/private keypairs.
+ It will generate two keys.
+ The private key should be stored in a separate file
+ .Pa @sysconfdir@/tinc/ Ns Ar NETNAME Ns Pa /rsa_key.priv
+-\-\- where 
++\-\- where
+ .Ar NETNAME
+-stands for the network (see 
++stands for the network (see
+ .Sx NETWORKS )
+ above.
+ The public key should be stored in the host configuration file
+@@ -92,7 +92,7 @@
+ .Pp
+ The variable names are case insensitive, and any spaces, tabs,
+ newlines and carriage returns are ignored.
+-Note: it is not required that you put in the 
++Note: it is not required that you put in the
+ .Li =
+ sign, but doing so improves readability.
+ If you leave it out, remember to replace it with at least one space character.
+@@ -182,7 +182,7 @@
+ in which case it will send an ICMP Time Exceeded packet back.
+ .Pp
+ Do not use this option if you use switch mode and want to use IPv6.
+-.It Va Device Li = Ar device Po Pa /dev/tap0 , Pa /dev/net/tun No or other depending on platform Pc
++.It Va Device Li = Ar device Po Pa /dev/tap0 , Pa /dev/tun No or other depending on platform Pc
+ The virtual network device to use.
+ .Nm tinc
+ will automatically detect what kind of device it is.
+@@ -215,7 +215,7 @@
+ Packets are read from and written to this multicast socket.
+ This can be used to connect to UML, QEMU or KVM instances listening on the same multicast address.
+ Do NOT connect multiple
+-.Nm tinc 
++.Nm tinc
+ daemons to the same multicast address, this will very likely cause routing loops.
+ Also note that this can cause decrypted VPN packets to be sent out on a real network if misconfigured.
+ .It uml Pq not compiled in by default
+@@ -356,7 +356,7 @@
+ This is the name which identifies this tinc daemon.
+ It must be unique for the virtual private network this daemon will connect to.
+ The Name may only consist of alphanumeric and underscore characters.
+-If 
++If
+ .Va Name
+ starts with a
+ .Li $ ,
+@@ -601,7 +601,7 @@
+ .Pp
+ The scripts are started without command line arguments, but can make use of certain environment variables.
+ Under UNIX like operating systems the names of environment variables must be preceded by a
+-.Li $ 
++.Li $
+ in scripts.
+ Under Windows, in
+ .Pa .bat
+diff -uNr tinc-1.0.35/doc/tinc.info tinc-1.0.35.mod/doc/tinc.info
+--- tinc-1.0.35/doc/tinc.info	2018-10-06 18:28:40.000000000 +0300
++++ tinc-1.0.35.mod/doc/tinc.info	2019-06-20 21:20:07.714609331 +0300
+@@ -517,7 +517,7 @@
+    If you use Linux and do not have udev installed, you may need to
+ create the following device file if it does not exist:
+ 
+-     mknod -m 600 /dev/net/tun c 10 200
++     mknod -m 600 /dev/tun c 10 200
+ 
+ 
+ File: tinc.info,  Node: Other files,  Prev: Device files,  Up: System files
+diff -uNr tinc-1.0.35/doc/tinc.texi tinc-1.0.35.mod/doc/tinc.texi
+--- tinc-1.0.35/doc/tinc.texi	2018-10-05 15:36:35.000000000 +0300
++++ tinc-1.0.35.mod/doc/tinc.texi	2019-06-20 21:21:03.604550169 +0300
+@@ -564,7 +564,7 @@
+ you may need to create the following device file if it does not exist:
+ 
+ @example
+-mknod -m 600 /dev/net/tun c 10 200
++mknod -m 600 /dev/tun c 10 200
+ @end example
+ 
+ 
+diff -uNr tinc-1.0.35/src/linux/device.c tinc-1.0.35.mod/src/linux/device.c
+--- tinc-1.0.35/src/linux/device.c	2018-09-23 18:29:09.000000000 +0300
++++ tinc-1.0.35.mod/src/linux/device.c	2019-06-20 21:21:10.351209726 +0300
+@@ -22,7 +22,7 @@
+ 
+ #ifdef HAVE_LINUX_IF_TUN_H
+ #include <linux/if_tun.h>
+-#define DEFAULT_DEVICE "/dev/net/tun"
++#define DEFAULT_DEVICE "/dev/tun"
+ #else
+ #define DEFAULT_DEVICE "/dev/tap0"
+ #endif

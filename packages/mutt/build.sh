@@ -1,11 +1,12 @@
 TERMUX_PKG_HOMEPAGE=http://www.mutt.org/
 TERMUX_PKG_DESCRIPTION="Mail client with patches from neomutt"
+# License: GPL-2.0-or-later
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.1.4
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION=2.2.10
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=ftp://ftp.mutt.org/pub/mutt/mutt-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=3361b682ea23df88961fa9835196698aefd2ebf0aba494599b29d1c4b1b4db79
+TERMUX_PKG_SHA256=4d773f22422f79096f7b94b57bee45654ad9a25165dbb36463c58295b4cd3d88
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses, gdbm, openssl, libsasl, mime-support, zlib, libiconv"
 TERMUX_PKG_BUILD_IN_SRC=true
 
@@ -14,6 +15,7 @@ mutt_cv_c99_snprintf=yes
 mutt_cv_c99_vsnprintf=yes
 --disable-gpgme
 --enable-compressed
+--enable-debug
 --enable-hcache
 --enable-imap
 --enable-pop
@@ -24,6 +26,15 @@ mutt_cv_c99_vsnprintf=yes
 --without-idn
 --with-sasl
 --with-ssl
+"
+
+# fget{c,s}_unlocked were added in API level 28.
+# AC_CHECK_FUNCS(fget{c,s}_unlocked) finds them in libc, even though
+# it is not defined in stdio.h, so we need to override the check or
+# else compilation on device fails
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
+ac_cv_func_fgetc_unlocked=no
+ac_cv_func_fgets_unlocked=no
 "
 
 if $TERMUX_DEBUG_BUILD; then
@@ -47,7 +58,7 @@ termux_step_post_configure() {
 }
 
 termux_step_post_make_install() {
-	cp $TERMUX_PKG_SRCDIR/doc/mutt.man $TERMUX_PREFIX/share/man/man1/mutt.1.man
+	cp doc/mutt.man $TERMUX_PREFIX/share/man/man1/mutt.1.man
 	mkdir -p $TERMUX_PREFIX/share/examples/mutt/
-	cp $TERMUX_PKG_SRCDIR/contrib/gpg.rc $TERMUX_PREFIX/share/examples/mutt/gpg.rc
+	cp contrib/gpg.rc $TERMUX_PREFIX/share/examples/mutt/
 }

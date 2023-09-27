@@ -13,20 +13,6 @@
      /* Close our logfiles */
      tgdb_close_logfiles();
  
-@@ -1577,10 +1577,10 @@
-     masterfd = pty_pair_get_masterfd(pty_pair);
-     if (masterfd == -1)
-         return -1;
--
-+#if !defined(__ANDROID__)
-     if (tty_off_xon_xoff(slavefd) == -1)
--        return -1;
--
-+      return -1;
-+#endif
-     /* The 16 is because I don't know how many char's the directory separator 
-      * is going to be, I expect it to be 1, but who knows. */
-     length = strlen(cgdb_home_dir) + strlen(readline_history_filename) + 16;
 @@ -1768,12 +1768,12 @@
          clog_error(CLOG_CGDB, "Unable to init readline");
          cgdb_cleanup_and_exit(-1);

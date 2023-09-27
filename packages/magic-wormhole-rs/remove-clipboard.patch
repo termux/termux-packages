@@ -1,0 +1,96 @@
+--- a/cli/Cargo.toml
++++ b/cli/Cargo.toml
+@@ -23,5 +23,4 @@ dialoguer = "0.10.0"
+ color-eyre = "0.6.0"
+ number_prefix = "0.4.0"
+ ctrlc = "3.2.1"
+-cli-clipboard = "0.4.0"
+ qr2term = "0.3.0"
+--- a/cli/src/main.rs
++++ b/cli/src/main.rs
+@@ -8,7 +8,6 @@ use std::{
+ 
+ use async_std::{fs::OpenOptions, sync::Arc};
+ use clap::{Args, CommandFactory, Parser, Subcommand};
+-use cli_clipboard::{ClipboardContext, ClipboardProvider};
+ use color_eyre::{eyre, eyre::Context};
+ use console::{style, Term};
+ use futures::{future::Either, Future, FutureExt};
+@@ -283,12 +282,6 @@ async fn main() -> eyre::Result<()> {
+             .try_init()?;
+     }
+ 
+-    let mut clipboard = ClipboardContext::new()
+-        .map_err(|err| {
+-            log::warn!("Failed to initialize clipboard support: {}", err);
+-        })
+-        .ok();
+-
+     let concat_file_name = |file_path: &Path, file_name: Option<_>| {
+         // TODO this has gotten out of hand (it ugly)
+         // The correct solution would be to make `file_name` an Option everywhere and
+@@ -337,7 +330,6 @@ async fn main() -> eyre::Result<()> {
+                     true,
+                     transfer::APP_CONFIG,
+                     Some(&sender_print_code),
+-                    clipboard.as_mut(),
+                 )),
+                 ctrl_c(),
+             )
+@@ -375,7 +367,6 @@ async fn main() -> eyre::Result<()> {
+                     true,
+                     transfer::APP_CONFIG,
+                     Some(&sender_print_code),
+-                    clipboard.as_mut(),
+                 ));
+                 match futures::future::select(connect_fut, ctrl_c()).await {
+                     Either::Left((result, _)) => result?,
+@@ -421,7 +412,6 @@ async fn main() -> eyre::Result<()> {
+                     false,
+                     transfer::APP_CONFIG,
+                     None,
+-                    clipboard.as_mut(),
+                 ));
+                 match futures::future::select(connect_fut, ctrl_c()).await {
+                     Either::Left((result, _)) => result?,
+@@ -496,7 +486,6 @@ async fn main() -> eyre::Result<()> {
+                     true,
+                     app_config,
+                     Some(&server_print_code),
+-                    clipboard.as_mut(),
+                 ));
+                 let (wormhole, _code, relay_hints) =
+                     match futures::future::select(connect_fut, ctrl_c()).await {
+@@ -532,7 +521,6 @@ async fn main() -> eyre::Result<()> {
+                 false,
+                 app_config,
+                 None,
+-                clipboard.as_mut(),
+             )
+             .await?;
+ 
+@@ -618,7 +606,6 @@ async fn parse_and_connect(
+     print_code: Option<
+         &dyn Fn(&mut Term, &magic_wormhole::Code, &Option<url::Url>) -> eyre::Result<()>,
+     >,
+-    clipboard: Option<&mut ClipboardContext>,
+ ) -> eyre::Result<(Wormhole, magic_wormhole::Code, Vec<transit::RelayHint>)> {
+     // TODO handle relay servers with multiple endpoints better
+     let mut relay_hints: Vec<transit::RelayHint> = common_args
+@@ -666,15 +653,8 @@ async fn parse_and_connect(
+             let (server_welcome, connector) =
+                 magic_wormhole::Wormhole::connect_without_code(app_config, numwords).await?;
+             print_welcome(term, &server_welcome)?;
+-            /* Print code and also copy it to clipboard */
++            /* Print code */
+             if is_send {
+-                if let Some(clipboard) = clipboard {
+-                    match clipboard.set_contents(server_welcome.code.to_string()) {
+-                        Ok(()) => log::info!("Code copied to clipboard"),
+-                        Err(err) => log::warn!("Failed to copy code to clipboard: {}", err),
+-                    }
+-                }
+-
+                 print_code.expect("`print_code` must be `Some` when `is_send` is `true`")(
+                     term,
+                     &server_welcome.code,

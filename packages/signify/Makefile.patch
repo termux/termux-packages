@@ -1,0 +1,12 @@
+diff -uNr signify-31/Makefile signify-31.mod/Makefile
+--- signify-31/Makefile	2022-03-13 21:29:52.000000000 +0000
++++ signify-31.mod/Makefile	2023-06-10 15:30:29.000000000 +0000
+@@ -148,6 +148,8 @@
+ signify: $O $(LIBBSD_DEPS)
+ 	$(CC) $(LDFLAGS) -o $@ $^ $(LIBBSD_LDFLAGS) $(LDLIBS)
+ 
++sha2.o: override CFLAGS += -DBYTE_ORDER=LITTLE_ENDIAN
++signify.o: override CFLAGS += -Wno-implicit-function-declaration
+ zsig.o signify.o bcrypt_pbkdf.o: override CFLAGS += -Wno-pointer-sign
+ 
+ clean-signify:

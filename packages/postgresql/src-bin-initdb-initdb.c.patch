@@ -1,7 +1,7 @@
-diff -u -r ../postgresql-11.0/src/bin/initdb/initdb.c ./src/bin/initdb/initdb.c
---- ../postgresql-11.0/src/bin/initdb/initdb.c	2018-10-15 21:12:02.000000000 +0000
-+++ ./src/bin/initdb/initdb.c	2018-10-18 17:54:16.149615230 +0000
-@@ -120,8 +120,8 @@
+diff -uNr postgresql-15.0/src/bin/initdb/initdb.c postgresql-15.0.mod/src/bin/initdb/initdb.c
+--- postgresql-15.0/src/bin/initdb/initdb.c	2022-10-10 23:57:37.000000000 +0300
++++ postgresql-15.0.mod/src/bin/initdb/initdb.c	2022-10-21 17:08:03.387801295 +0300
+@@ -124,8 +124,8 @@
  
  /* values to be obtained from arguments */
  static char *pg_data = NULL;
@@ -12,3 +12,14 @@ diff -u -r ../postgresql-11.0/src/bin/initdb/initdb.c ./src/bin/initdb/initdb.c
  static char *lc_collate = NULL;
  static char *lc_ctype = NULL;
  static char *lc_monetary = NULL;
+@@ -849,7 +849,9 @@
+ static const char *
+ choose_dsm_implementation(void)
+ {
+-#if defined(HAVE_SHM_OPEN) && !defined(__sun__)
++#if defined(__ANDROID__)
++    return "mmap";
++#elif defined(HAVE_SHM_OPEN) && !defined(__sun__)
+ 	int			ntries = 10;
+ 	pg_prng_state prng_state;
+ 

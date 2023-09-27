@@ -1,18 +1,22 @@
-TERMUX_PKG_HOMEPAGE=http://valgrind.org/
+TERMUX_PKG_HOMEPAGE=https://valgrind.org/
 TERMUX_PKG_DESCRIPTION="Instrumentation framework for building dynamic analysis tools"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.17.0
-TERMUX_PKG_SRCURL=ftp://sourceware.org/pub/valgrind/valgrind-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=ad3aec668e813e40f238995f60796d9590eee64a16dff88421430630e69285a2
+TERMUX_PKG_VERSION=3.21.0
+TERMUX_PKG_SRCURL=http://sourceware.org/pub/valgrind/valgrind-${TERMUX_PKG_VERSION}.tar.bz2
+TERMUX_PKG_SHA256=10ce1618bb3e33fad16eb79552b0a3e1211762448a0d7fce11c8a6243b9ac971
+TERMUX_PKG_BUILD_DEPENDS="binutils-cross"
 TERMUX_PKG_BREAKS="valgrind-dev"
 TERMUX_PKG_REPLACES="valgrind-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-tmpdir=$TERMUX_PREFIX/tmp"
 
 termux_step_pre_configure() {
+	CFLAGS=${CFLAGS/-fstack-protector-strong/}
+
 	if [ "$TERMUX_ARCH" == "aarch64" ]; then
 		cp $TERMUX_PKG_BUILDER_DIR/aarch64-setjmp.S $TERMUX_PKG_SRCDIR
-		autoreconf -if
+		patch --silent -p1 < $TERMUX_PKG_BUILDER_DIR/coregrindmake.am.diff
+		patch --silent -p1 < $TERMUX_PKG_BUILDER_DIR/memcheckmake.am.diff
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-only64bit"
 	elif [ "$TERMUX_ARCH" == "arm" ]; then
 		# valgrind doesn't like arm; armv7 works, though.
@@ -20,7 +24,14 @@ termux_step_pre_configure() {
 		# http://lists.busybox.net/pipermail/buildroot/2013-November/082270.html:
 		# "valgrind uses inline assembly that is not Thumb compatible":
 		CFLAGS=${CFLAGS/-mthumb/}
+		# ```
+		# <inline asm>:1:41: error: expected '%<type>' or "<type>"
+		# .pushsection ".debug_gdb_scripts", "MS",@progbits,1
+		#                                         ^
+		# ```
+		# See also https://github.com/llvm/llvm-project/issues/24438.
+		termux_setup_no_integrated_as
 	fi
 
-	CFLAGS=${CFLAGS/-fstack-protector-strong/}
+	autoreconf -fi
 }

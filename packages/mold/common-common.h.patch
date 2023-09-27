@@ -1,0 +1,15 @@
+--- a/common/common.h
++++ b/common/common.h
+@@ -501,6 +501,12 @@
+     // Even though std::aligned_alloc is defined in C++17, MSVC doesn't
+     // seem to provide that function.
+     entries = (Entry *)_aligned_malloc(sz, alignof(Entry));
++#elif defined(__ANDROID__) && __ANDROID_API__ < 26
++    {
++      void *ptr = nullptr;
++      posix_memalign(&ptr, alignof(Entry), sz);
++      entries = (Entry *)ptr;
++    }
+ #else
+     entries = (Entry *)std::aligned_alloc(alignof(Entry), sz);
+ #endif

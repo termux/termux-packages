@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://cscope.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://cscope.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="A developers tool for browsing program code"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"

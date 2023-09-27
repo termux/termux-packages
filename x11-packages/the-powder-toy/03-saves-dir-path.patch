@@ -1,0 +1,109 @@
+--- a/src/client/Client.cpp
++++ b/src/client/Client.cpp
+@@ -68,7 +68,8 @@
+ {
+ 	//Read config
+ 	std::ifstream configFile;
+-	configFile.open("powder.pref", std::ios::binary);
++	Platform::MakeDirectory("@TERMUX_HOME@/.powdertoy");
++	configFile.open("@TERMUX_HOME@/.powdertoy/powder.pref", std::ios::binary);
+ 	if (configFile)
+ 	{
+ 		try
+@@ -777,7 +778,8 @@
+ void Client::WritePrefs()
+ {
+ 	std::ofstream configFile;
+-	configFile.open("powder.pref", std::ios::trunc);
++	Platform::MakeDirectory("@TERMUX_HOME@/.powdertoy");
++	configFile.open("@TERMUX_HOME@/.powdertoy/powder.pref", std::ios::trunc);
+ 
+ 	if (configFile)
+ 	{
+@@ -956,6 +958,7 @@
+ 	ByteString saveID = ByteString::Build(Format::Hex(Format::Width(lastStampTime, 8)), Format::Hex(Format::Width(lastStampName, 2)));
+ 	ByteString filename = STAMPS_DIR PATH_SEP + saveID + ".stm";
+ 
++	Platform::MakeDirectory("@TERMUX_HOME@/.powdertoy");
+ 	Platform::MakeDirectory(STAMPS_DIR);
+ 
+ 	Json::Value stampInfo;
+@@ -991,6 +994,7 @@
+ 
+ void Client::updateStamps()
+ {
++	Platform::MakeDirectory("@TERMUX_HOME@/.powdertoy");
+ 	Platform::MakeDirectory(STAMPS_DIR);
+ 
+ 	std::ofstream stampsStream;
+--- a/src/Config.template.h
++++ b/src/Config.template.h
+@@ -101,11 +97,11 @@
+ #define STATICSCHEME "https://"
+ #define ENFORCE_HTTPS
+ 
+-#define LOCAL_SAVE_DIR "Saves"
++#define LOCAL_SAVE_DIR "@TERMUX_HOME@/.powdertoy/saves"
+ 
+-#define STAMPS_DIR "stamps"
++#define STAMPS_DIR "@TERMUX_HOME@/.powdertoy/stamps"
+ 
+-#define BRUSH_DIR "Brushes"
++#define BRUSH_DIR "@TERMUX_HOME@/.powdertoy/brushes"
+ 
+ #ifndef M_GRAV
+ #define M_GRAV 6.67300e-1
+--- a/src/gui/game/GameController.cpp
++++ b/src/gui/game/GameController.cpp
+@@ -741,7 +741,7 @@
+ #if !defined(MACOSX) && !defined(NO_INSTALL_CHECK)
+ 		if (Client::Ref().IsFirstRun())
+ 		{
+-			Install();
++			//Install();
+ 		}
+ #endif
+ 		firstTick = false;
+@@ -1202,6 +1202,7 @@
+ 			gameSave->authors = localSaveInfo;
+ 
+ 			gameModel->SetSaveFile(&tempSave, gameView->ShiftBehaviour());
++			Platform::MakeDirectory("@TERMUX_HOME@/.powdertoy");
+ 			Platform::MakeDirectory(LOCAL_SAVE_DIR);
+ 			std::vector<char> saveData = gameSave->Serialise();
+ 			if (saveData.size() == 0)
+--- a/src/gui/game/GameModel.cpp
++++ b/src/gui/game/GameModel.cpp
+@@ -479,6 +479,7 @@
+ 	brushList.push_back(new TriangleBrush(ui::Point(4, 4)));
+ 
+ 	//Load more from brushes folder
++	Platform::MakeDirectory("@TERMUX_HOME@/.powdertoy");
+ 	std::vector<ByteString> brushFiles = Platform::DirectorySearch(BRUSH_DIR, "", { ".ptb" });
+ 	for (size_t i = 0; i < brushFiles.size(); i++)
+ 	{
+--- a/src/gui/options/OptionsView.cpp
++++ b/src/gui/options/OptionsView.cpp
+@@ -319,11 +319,7 @@
+ 	currentY+=20;
+ 	ui::Button * dataFolderButton = new ui::Button(ui::Point(8, currentY), ui::Point(90, 16), "Open Data Folder");
+ 	dataFolderButton->SetActionCallback({ [] {
+-		ByteString cwd = Platform::GetCwd();
+-		if (!cwd.empty())
+-			Platform::OpenURI(cwd);
+-		else
+-			fprintf(stderr, "cannot open data folder: Platform::GetCwd(...) failed\n");
++		Platform::OpenURI("@TERMUX_HOME@/.powdertoy");
+ 	} });
+ 	scrollPanel->AddChild(dataFolderButton);
+ 
+--- a/src/gui/save/LocalSaveActivity.cpp
++++ b/src/gui/save/LocalSaveActivity.cpp
+@@ -103,6 +103,7 @@
+ 
+ void LocalSaveActivity::saveWrite(ByteString finalFilename)
+ {
++	Platform::MakeDirectory("@TERMUX_HOME@/.powdertoy");
+ 	Platform::MakeDirectory(LOCAL_SAVE_DIR);
+ 	GameSave *gameSave = save.GetGameSave();
+ 	Json::Value localSaveInfo;

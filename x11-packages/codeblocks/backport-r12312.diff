@@ -1,0 +1,48 @@
+------------------------------------------------------------------------
+r12312 | mortenmacfly | 2021-04-03 14:14:39 +0900 (Sat, 03 Apr 2021) | 1 line
+
+* applied patch #1079 Don't call wxChoice::GetString() with wxNOT_FOUND (thanks Miguel Gimenez)
+------------------------------------------------------------------------
+Index: src/plugins/contrib/FileManager/FileExplorerUpdater.cpp
+===================================================================
+--- src/plugins/contrib/FileManager/FileExplorerUpdater.cpp	(revision 12311)
++++ src/plugins/contrib/FileManager/FileExplorerUpdater.cpp	(revision 12312)
+@@ -150,10 +150,16 @@
+     m_path=wxString(m_fe->GetFullPath(ti).c_str());
+     m_wildcard=wxString(m_fe->m_WildCards->GetValue().c_str());
+     m_vcs_type=wxString(m_fe->m_VCS_Type->GetLabel().c_str());
+-    m_vcs_commit_string=wxString(m_fe->m_VCS_Control->GetString(m_fe->m_VCS_Control->GetSelection()).c_str());
++    const int selection = m_fe->m_VCS_Control->GetSelection();
++    if (selection == wxNOT_FOUND)
++        m_vcs_commit_string.clear();
++    else
++        m_vcs_commit_string = wxString(m_fe->m_VCS_Control->GetString(selection).c_str());
++
+     m_vcs_changes_only = m_fe->m_VCS_ChangesOnly->IsChecked();
+-    if (m_vcs_type != wxEmptyString)
++    if (!m_vcs_type.empty())
+         m_repo_path=wxString(m_fe->GetRootFolder().c_str());
++
+     GetTreeState(ti);
+     if (Create()==wxTHREAD_NO_ERROR)
+     {
+@@ -1262,11 +1268,17 @@
+     m_source_path=wxString(source_path.c_str());
+     m_destination_path=wxString(destination_path.c_str());
+     m_vcs_type=wxString(m_fe->m_VCS_Type->GetLabel().c_str());
+-    m_vcs_commit_string=wxString(m_fe->m_VCS_Control->GetString(m_fe->m_VCS_Control->GetSelection()).c_str());
++    const int selection = m_fe->m_VCS_Control->GetSelection();
++    if (selection == wxNOT_FOUND)
++        m_vcs_commit_string.clear();
++    else
++        m_vcs_commit_string = wxString(m_fe->m_VCS_Control->GetString(selection).c_str());
++
+     m_vcs_op = wxString(op.c_str());
+     m_vcs_comp_commit = wxString(comp_commit.c_str());
+-    if (m_vcs_type != wxEmptyString)
++    if (!m_vcs_type.empty())
+         m_repo_path=wxString(m_fe->GetRootFolder().c_str());
++
+     if (Create()==wxTHREAD_NO_ERROR)
+     {
+         SetPriority(20);

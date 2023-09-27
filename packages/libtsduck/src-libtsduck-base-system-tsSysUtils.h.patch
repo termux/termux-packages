@@ -1,0 +1,11 @@
+--- a/src/libtsduck/base/system/tsSysUtils.h
++++ b/src/libtsduck/base/system/tsSysUtils.h
+@@ -144,6 +144,8 @@
+     #elif defined(TS_WINDOWS)
+         // Second parameter of ::DeviceIoControl().
+         typedef ::DWORD ioctl_request_t;
++    #elif defined(TS_ANDROID)
++        typedef int ioctl_request_t;
+     #else
+         // Extract the type of the second parameter of ::ioctl().
+         // It is "unsigned long" on most Linux systems but "int" on Alpine Linux.

@@ -1,0 +1,11 @@
+--- a/wscript
++++ b/wscript
+@@ -1608,6 +1604,8 @@
+     bld.env['LOCALEDIR'] = os.path.join(bld.env['DATADIR'], 'locale')
+     bld.env['lwrcase_dirname'] = lwrcase_dirname
+ 
++    bld.env.append_value('LINKFLAGS', '-Wl,-rpath=' + bld.env['LIBDIR'])
++
+     autowaf.set_recursive()
+ 
+     if sys.platform == 'darwin':

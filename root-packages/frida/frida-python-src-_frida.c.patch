@@ -1,0 +1,21 @@
+--- ./frida-python/src/_frida.c.orig	2022-10-30 12:17:34.324226166 +0100
++++ ./frida-python/src/_frida.c	2022-10-30 12:19:10.690889989 +0100
+@@ -46,6 +46,8 @@
+ # include <crt_externs.h>
+ #endif
+ 
++#include <frida-selinux.h>
++
+ #define PyUnicode_FromUTF8String(str) PyUnicode_DecodeUTF8 (str, strlen (str), "strict")
+ #define MOD_INIT(name) PyMODINIT_FUNC PyInit_##name (void)
+ #define MOD_DEF(ob, name, doc, methods) \
+@@ -1856,6 +1858,9 @@
+ static int
+ PyDeviceManager_init (PyDeviceManager * self, PyObject * args, PyObject * kw)
+ {
++  printf ("patching selinux policy\n");
++  frida_selinux_patch_policy ();
++
+   if (PyGObject_tp_init ((PyObject *) self, args, kw) < 0)
+     return -1;
+ 

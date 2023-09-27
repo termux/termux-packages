@@ -1,0 +1,25 @@
+--- ../tvheadend-4.2.8/src/input/mpegts/iptv/iptv_file.c	2019-01-12 08:58:47.000000000 +0000
++++ ./src/input/mpegts/iptv/iptv_file.c	2022-08-15 17:38:51.347255192 +0000
+@@ -45,7 +45,11 @@
+   ssize_t r;
+   int fd = fp->fd, pause = 0;
+   char buf[32*1024];
++#ifndef PLATFORM_DARWIN
++#if !ENABLE_ANDROID
+   off_t off = 0;
++#endif
++#endif
+   int64_t mono;
+   int e;
+ 
+@@ -81,9 +85,9 @@
+ #ifndef PLATFORM_DARWIN
+ #if !ENABLE_ANDROID
+     posix_fadvise(fd, off, r, POSIX_FADV_DONTNEED);
++    off += r;
+ #endif
+ #endif
+-    off += r;
+   }
+   pthread_mutex_unlock(&iptv_lock);
+   return NULL;

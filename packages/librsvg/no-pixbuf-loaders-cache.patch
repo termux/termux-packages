@@ -1,22 +1,20 @@
-diff -uNr librsvg-2.46.4/gdk-pixbuf-loader/Makefile.am librsvg-2.46.4.mod/gdk-pixbuf-loader/Makefile.am
---- librsvg-2.46.4/gdk-pixbuf-loader/Makefile.am	2019-08-22 10:39:24.000000000 +0300
-+++ librsvg-2.46.4.mod/gdk-pixbuf-loader/Makefile.am	2020-01-13 23:51:44.231919334 +0200
-@@ -47,10 +47,7 @@
+--- a/gdk-pixbuf-loader/Makefile.am
++++ b/gdk-pixbuf-loader/Makefile.am
+@@ -48,10 +48,7 @@
  	$(AM_LDFLAGS)
  rsvg_loader_LDADD = \
  	$(GDK_PIXBUF_LIBS)
 -EXTRA_rsvg_loader_DEPENDENCIES = libpixbufloader-svg.la gdk-pixbuf-loaders
 -
 -gdk-pixbuf-loaders: Makefile
--	$(AM_V_GEN) ( $(GDK_PIXBUF_QUERYLOADERS) ./libpixbufloader-svg.la && $(GDK_PIXBUF_QUERYLOADERS)) > gdk-pixbuf.loaders 2>/dev/null
+-	$(AM_V_GEN) ( $(GDK_PIXBUF_QUERYLOADERS) ./libpixbufloader-svg.la && GDK_PIXBUF_MODULEDIR=$(gdk_pixbuf_moduledir) $(GDK_PIXBUF_QUERYLOADERS)) > gdk-pixbuf.loaders 2>/dev/null
 +EXTRA_rsvg_loader_DEPENDENCIES = libpixbufloader-svg.la
  
  if CROSS_COMPILING
  RUN_QUERY_LOADER_TEST=false
-diff -uNr librsvg-2.46.4/gdk-pixbuf-loader/Makefile.in librsvg-2.46.4.mod/gdk-pixbuf-loader/Makefile.in
---- librsvg-2.46.4/gdk-pixbuf-loader/Makefile.in	2019-11-21 18:53:18.000000000 +0200
-+++ librsvg-2.46.4.mod/gdk-pixbuf-loader/Makefile.in	2020-01-13 23:52:08.176024176 +0200
-@@ -483,7 +483,7 @@
+--- a/gdk-pixbuf-loader/Makefile.in
++++ b/gdk-pixbuf-loader/Makefile.in
+@@ -455,7 +455,7 @@
  @ENABLE_PIXBUF_LOADER_TRUE@rsvg_loader_LDADD = \
  @ENABLE_PIXBUF_LOADER_TRUE@	$(GDK_PIXBUF_LIBS)
  
@@ -25,12 +23,12 @@ diff -uNr librsvg-2.46.4/gdk-pixbuf-loader/Makefile.in librsvg-2.46.4.mod/gdk-pi
  @CROSS_COMPILING_FALSE@@ENABLE_PIXBUF_LOADER_TRUE@RUN_QUERY_LOADER_TEST = test -z "$(DESTDIR)"
  @CROSS_COMPILING_TRUE@@ENABLE_PIXBUF_LOADER_TRUE@RUN_QUERY_LOADER_TEST = false
  @ENABLE_PIXBUF_LOADER_TRUE@thumbnailerdir = $(datadir)/thumbnailers/
-@@ -894,9 +894,6 @@
+@@ -865,9 +865,6 @@
  .PRECIOUS: Makefile
  
  
 -@ENABLE_PIXBUF_LOADER_TRUE@gdk-pixbuf-loaders: Makefile
--@ENABLE_PIXBUF_LOADER_TRUE@	$(AM_V_GEN) ( $(GDK_PIXBUF_QUERYLOADERS) ./libpixbufloader-svg.la && $(GDK_PIXBUF_QUERYLOADERS)) > gdk-pixbuf.loaders 2>/dev/null
+-@ENABLE_PIXBUF_LOADER_TRUE@	$(AM_V_GEN) ( $(GDK_PIXBUF_QUERYLOADERS) ./libpixbufloader-svg.la && GDK_PIXBUF_MODULEDIR=$(gdk_pixbuf_moduledir) $(GDK_PIXBUF_QUERYLOADERS)) > gdk-pixbuf.loaders 2>/dev/null
 -
  # The following bit is stolen from gdk-pixbuf/gdk-pixbuf/Makefile.am:
  #

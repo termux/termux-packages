@@ -10,6 +10,24 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BREAKS="libyaml-dev"
 TERMUX_PKG_REPLACES="libyaml-dev"
 
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after RELEASE / SOVERSION is changed.
+	local _RELEASE=0
+	local _SOVERSION=2
+
+	local a
+	for a in YAML_RELEASE YAML_CURRENT YAML_AGE; do
+		local _${a}=$(sed -En 's/^m4_define\(\['"${a}"'\],\s*([0-9]+).*/\1/p' \
+				configure.ac)
+	done
+	local v=$(( _YAML_CURRENT - _YAML_AGE ))
+	if [ "${_RELEASE}" != "${_YAML_RELEASE}" ] || \
+		[ ! "${_YAML_CURRENT}" ] || [ "${_SOVERSION}" != "${v}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
+
 termux_step_pre_configure() {
 	./bootstrap
 }

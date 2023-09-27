@@ -1,0 +1,20 @@
+--- a/src/fte-unix.mak
++++ b/src/fte-unix.mak
+@@ -128,7 +128,7 @@
+ #OPTIMIZE = -O2 -s
+ 
+ CCFLAGS  = $(CPPOPTIONS) $(OPTIMIZE) $(NOEXCEPTION) $(INCDIRS) -DUNIX $(UOS)
+-LDFLAGS  = $(OPTIMIZE) $(LIBDIRS)
++LDFLAGS  += $(OPTIMIZE) $(LIBDIRS)
+ 
+ 
+ .SUFFIXES: .cpp .o .moc
+@@ -180,7 +180,7 @@
+ #DEFAULT_FTE_CONFIG = ../config/main.fte
+ 
+ defcfg.cnf: $(DEFAULT_FTE_CONFIG) cfte
+-	./cfte $(DEFAULT_FTE_CONFIG) defcfg.cnf
++	cfte $(DEFAULT_FTE_CONFIG) defcfg.cnf
+ 
+ xfte: .depend $(OBJS) $(XOBJS)
+ 	$(LD) -o $@ $(LDFLAGS) $(OBJS) $(XOBJS) $(XLIBS)

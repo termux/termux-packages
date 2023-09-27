@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.isc.org/downloads/bind/
 TERMUX_PKG_DESCRIPTION="Clients provided with BIND"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=9.16.11
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SRCURL="ftp://ftp.isc.org/isc/bind9/${TERMUX_PKG_VERSION}/bind-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=0111f64dd7d8f515cfa129e181cce96ff82070d1b27f11a21f6856110d0699c1
+TERMUX_PKG_VERSION=9.16.41
+TERMUX_PKG_SRCURL="https://ftp.isc.org/isc/bind9/${TERMUX_PKG_VERSION}/bind-${TERMUX_PKG_VERSION}.tar.xz"
+TERMUX_PKG_SHA256=71904366aa1e04e2075c79a8906b92af936e3bfa4d7e8df5fd964fcf9e94f45c
 TERMUX_PKG_DEPENDS="openssl, readline, resolv-conf, zlib, libuv"
 TERMUX_PKG_BREAKS="dnsutils-dev"
 TERMUX_PKG_REPLACES="dnsutils-dev"
@@ -24,6 +23,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-randomdev=/dev/random
 --with-readline=-lreadline
 --with-eddsa=no
+ax_cv_have_func_attribute_constructor=yes
+ax_cv_have_func_attribute_destructor=yes
 "
 
 termux_step_pre_configure() {

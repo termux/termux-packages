@@ -1,0 +1,13 @@
+https://github.com/termux/termux-packages/issues/15852
+
+--- a/shellinabox/launcher.c
++++ b/shellinabox/launcher.c
+@@ -86,7 +86,7 @@
+ #include <util.h>
+ #endif
+ 
+-#ifdef HAVE_UTMP_H
++#if defined HAVE_UTMP_H || (defined HAVE_LOGIN_TTY && defined __ANDROID__)
+ #include <utmp.h>
+ #endif
+ 

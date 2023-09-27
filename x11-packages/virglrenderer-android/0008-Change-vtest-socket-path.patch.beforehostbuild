@@ -1,0 +1,32 @@
+diff --git a/vtest/vtest_protocol.h b/vtest/vtest_protocol.h
+--- a/vtest/vtest_protocol.h
++++ b/vtest/vtest_protocol.h
+@@ -25,7 +25,7 @@
+ #ifndef VTEST_PROTOCOL
+ #define VTEST_PROTOCOL
+ 
+-#define VTEST_DEFAULT_SOCKET_NAME "/tmp/.virgl_test"
++#define VTEST_DEFAULT_SOCKET_NAME "@TERMUX_PREFIX@/tmp/.virgl_test"
+ 
+ #ifdef VIRGL_RENDERER_UNSTABLE_APIS
+ #define VTEST_PROTOCOL_VERSION 3
+--- a/vtest/vtest_server.c
++++ b/vtest/vtest_server.c
+@@ -373,6 +373,7 @@
+ static void vtest_server_open_socket(void)
+ {
+    struct sockaddr_un un;
++   const char* socket_name = os_get_option("VTEST_RENDERER_SOCKET_NAME");
+ 
+    server.socket = socket(PF_UNIX, SOCK_STREAM, 0);
+    if (server.socket < 0) {
+@@ -382,7 +383,8 @@
+    memset(&un, 0, sizeof(un));
+    un.sun_family = AF_UNIX;
+ 
+-   snprintf(un.sun_path, sizeof(un.sun_path), "%s", server.socket_name);
++   snprintf(un.sun_path, sizeof(un.sun_path), "%s", socket_name ?
++      socket_name : server.socket_name);
+ 
+    unlink(un.sun_path);
+ 

@@ -1,0 +1,50 @@
+diff -uNr lxc-3.1.0/src/lxc/pam/pam_cgfs.c lxc-3.1.0.mod/src/lxc/pam/pam_cgfs.c
+--- lxc-3.1.0/src/lxc/pam/pam_cgfs.c	2018-12-14 01:13:51.000000000 +0200
++++ lxc-3.1.0.mod/src/lxc/pam/pam_cgfs.c	2019-07-13 20:47:50.341249255 +0300
+@@ -1749,7 +1749,7 @@
+ 	oldv = *lastslash;
+ 	*lastslash = '\0';
+ 
+-	fpath = must_make_path(path, "cpuset.cpus", NULL);
++	fpath = must_make_path(path, "cpus", NULL);
+ 	posscpus = read_file(fpath);
+ 	if (!posscpus) {
+ 		pam_cgfs_debug("Could not read file: %s\n", fpath);
+@@ -1767,7 +1767,7 @@
+ 		cpulist = posscpus;
+ 
+ 		/* No isolated cpus but we weren't already initialized by
+-		 * someone. We should simply copy the parents cpuset.cpus
++		 * someone. We should simply copy the parents cpus
+ 		 * values.
+ 		 */
+ 		if (!am_initialized) {
+@@ -1792,7 +1792,7 @@
+ 		cpulist = posscpus;
+ 
+ 		/* No isolated cpus but we weren't already initialized by
+-		 * someone. We should simply copy the parents cpuset.cpus
++		 * someone. We should simply copy the parents cpus
+ 		 * values.
+ 		 */
+ 		if (!am_initialized) {
+@@ -1851,7 +1851,7 @@
+ 
+ 	free(fpath);
+ 
+-	fpath = must_make_path(path, "cpuset.cpus", NULL);
++	fpath = must_make_path(path, "cpus", NULL);
+ 	ret = lxc_write_to_file(fpath, cpulist, strlen(cpulist), false, 0660);
+ 	if (ret < 0) {
+ 		pam_cgfs_debug("Could not write cpu list to: %s\n", fpath);
+@@ -2020,8 +2020,8 @@
+ 	}
+ 
+ 	/* copy parent's settings */
+-	if (!cg_copy_parent_file(cgpath, "cpuset.mems")) {
+-		pam_cgfs_debug("%s", "Failed to copy \"cpuset.mems\" settings\n");
++	if (!cg_copy_parent_file(cgpath, "mems")) {
++		pam_cgfs_debug("%s", "Failed to copy \"mems\" settings\n");
+ 		free(cgpath);
+ 		free(clonechildrenpath);
+ 		return false;

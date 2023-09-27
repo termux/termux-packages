@@ -2,9 +2,10 @@ TERMUX_PKG_HOMEPAGE=http://www.gnustep.org
 TERMUX_PKG_DESCRIPTION="A library of general-purpose, non-graphical Objective C objects"
 TERMUX_PKG_LICENSE="GPL-2.0, LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.28.0
-TERMUX_PKG_SRCURL=http://ftp.gnustep.org/pub/gnustep/core/gnustep-base-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=c7d7c6e64ac5f5d0a4d5c4369170fc24ed503209e91935eb0e2979d1601039ed
+TERMUX_PKG_VERSION=1.29.0
+TERMUX_PKG_REVISION=3
+TERMUX_PKG_SRCURL=https://github.com/gnustep/libs-base/releases/download/base-${TERMUX_PKG_VERSION//./_}/gnustep-base-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=fa58eda665c3e0b9c420dc32bb3d51247a407c944d82e5eed1afe8a2b943ef37
 TERMUX_PKG_DEPENDS="gnustep-make, libc++, libffi, libgmp, libgnutls, libiconv, libicu, libxml2, libxslt, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -39,24 +40,16 @@ ac_cv_func_setpgrp_void=yes
 termux_step_pre_configure() {
 	local bin="$TERMUX_PKG_BUILDDIR/bin"
 	mkdir -p "$bin"
-	local sh="$(which sh)"
-	for cmd in CPP CC CXX; do
+	local sh="$(command -v sh)"
+	for cmd in CC CPP CXX; do
 		local wrapper="$bin/$(basename $(eval echo \${$cmd}))"
 		cat > "$wrapper" <<-EOF
 			#!${sh}
 			unset LD_PRELOAD
 			unset LD_LIBRARY_PATH
-			exec $(which $(eval echo \${$cmd})) "\$@"
+			exec $(command -v $(eval echo \${$cmd})) "\$@"
 		EOF
 		chmod 0700 "$wrapper"
-	done
-	for p in gnustep; do
-		local conf="$bin/${p}-config"
-		cat > "$conf" <<-EOF
-			#!${sh}
-			exec sh "$TERMUX_PREFIX/bin/${p}-config" "\$@"
-		EOF
-		chmod 0700 "$conf"
 	done
 	export PATH="$bin":$PATH
 

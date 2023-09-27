@@ -1,0 +1,35 @@
+.TH XEMBED 1 tabbed\-VERSION
+.SH NAME
+xembed \- XEmbed foreground process
+.SH SYNOPSIS
+.B xembed
+.I flag command
+.RI [ "argument ..." ]
+.SH DESCRIPTION
+If the environment variable XEMBED is set, and
+.B xembed
+is in the foreground of its controlling tty, it will execute
+.IP
+command flag $XEMBED [argument ...]
+.LP
+Otherwise it will execute
+.IP
+command [argument ...]
+.LP
+.SH EXAMPLE
+In a terminal emulator within a
+.B tabbed
+session, the shell alias
+.IP
+$ alias surf='xembed -e surf'
+.LP
+will cause `surf' to open in a new tab, unless it is run in the background,
+i.e. `surf &', in which case it will instead open in a new window.
+.SH AUTHORS
+See the LICENSE file for the authors.
+.SH LICENSE
+See the LICENSE file for the terms of redistribution.
+.SH SEE ALSO
+.BR tabbed (1)
+.SH BUGS
+Please report them.

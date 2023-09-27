@@ -2,21 +2,20 @@ TERMUX_PKG_HOMEPAGE=https://packages.debian.org/apt
 TERMUX_PKG_DESCRIPTION="Front-end for the dpkg package manager"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.3.14
+TERMUX_PKG_VERSION=2.7.6
 TERMUX_PKG_SRCURL=https://deb.debian.org/debian/pool/main/a/apt/apt_${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=b90a3ced152ecd389a55da1115e04565bfcbf5f58a808cdb71f6b52d4d2f0bdf
+TERMUX_PKG_SHA256=8683f54eff0bf54e51e025b348bd0774d0fd437799616f48512956cf15c05f67
 # apt-key requires utilities from coreutils, findutils, gpgv, grep, sed.
-TERMUX_PKG_DEPENDS="coreutils, dpkg, findutils, gpgv, grep, libandroid-glob, libbz2, libc++, libcurl, libgnutls, liblz4, liblzma, sed, termux-keyring, termux-licenses, xxhash, zlib"
+TERMUX_PKG_DEPENDS="coreutils, dpkg, findutils, gpgv, grep, libandroid-glob, libbz2, libc++, libcurl, libgnutls, liblz4, liblzma, sed, termux-keyring, termux-licenses, xxhash, zlib, zstd"
 TERMUX_PKG_BUILD_DEPENDS="docbook-xsl"
-TERMUX_PKG_CONFLICTS="apt-transport-https, libapt-pkg"
+TERMUX_PKG_CONFLICTS="apt-transport-https, libapt-pkg, unstable-repo, game-repo, science-repo"
 TERMUX_PKG_REPLACES="apt-transport-https, libapt-pkg, unstable-repo, game-repo, science-repo"
 TERMUX_PKG_PROVIDES="unstable-repo, game-repo, science-repo"
-TERMUX_PKG_SUGGESTS="gnupg, x11-repo"
+TERMUX_PKG_SUGGESTS="gnupg"
 TERMUX_PKG_ESSENTIAL=true
 
 TERMUX_PKG_CONFFILES="
 etc/apt/sources.list
-etc/apt/trusted.gpg
 "
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -27,6 +26,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DDPKG_DATADIR=$TERMUX_PREFIX/share/dpkg
 -DUSE_NLS=OFF
 -DWITH_DOC=OFF
+-DWITH_DOC_MANPAGES=ON
 "
 
 # ubuntu uses instead $PREFIX/lib instead of $PREFIX/libexec to
@@ -70,11 +70,19 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_make_install() {
-	printf "# The main termux repository:\ndeb https://packages.termux.org/apt/termux-main/ stable main\n" > $TERMUX_PREFIX/etc/apt/sources.list
-	cp $TERMUX_PKG_BUILDER_DIR/trusted.gpg $TERMUX_PREFIX/etc/apt/
+	{
+		echo "# The main termux repository, with cloudflare cache"
+		echo "deb https://packages-cf.termux.dev/apt/termux-main/ stable main"
+		echo "# The main termux repository, without cloudflare cache"
+		echo "# deb https://packages.termux.dev/apt/termux-main/ stable main"
+	} > $TERMUX_PREFIX/etc/apt/sources.list
 
 	# apt-transport-tor
 	ln -sfr $TERMUX_PREFIX/lib/apt/methods/http $TERMUX_PREFIX/lib/apt/methods/tor
 	ln -sfr $TERMUX_PREFIX/lib/apt/methods/http $TERMUX_PREFIX/lib/apt/methods/tor+http
 	ln -sfr $TERMUX_PREFIX/lib/apt/methods/https $TERMUX_PREFIX/lib/apt/methods/tor+https
+	# Workaround for "empty" subpackage:
+	local dir=$TERMUX_PREFIX/share/apt-transport-tor
+	mkdir -p $dir
+	touch $dir/.placeholder
 }

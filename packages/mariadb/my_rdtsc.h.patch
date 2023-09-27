@@ -18,6 +18,6 @@ diff -uNr mariadb-10.5.5/include/my_rdtsc.h mariadb-10.5.5.mod/include/my_rdtsc.
  {
 -# if __has_builtin(__builtin_readcyclecounter) && !defined (__aarch64__)
 +# if __has_builtin(__builtin_readcyclecounter) && !defined (__aarch64__) && !defined(__ANDROID__)
+   #define MY_TIMER_ROUTINE_CYCLES MY_TIMER_ROUTINE_AARCH64
    return __builtin_readcyclecounter();
- # elif defined _WIN32 || defined __i386__ || defined __x86_64__
-   return __rdtsc();
+ # elif defined _M_IX86  || defined _M_X64  || defined __i386__ || defined __x86_64__

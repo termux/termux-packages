@@ -1,0 +1,24 @@
+diff --git a/sourcekit-lsp/Utilities/build-script-helper.py b/sourcekit-lsp/Utilities/build-script-helper.py
+index 17ad9e3..953fffd 100755
+--- a/sourcekit-lsp/Utilities/build-script-helper.py
++++ b/sourcekit-lsp/Utilities/build-script-helper.py
+@@ -142,6 +142,7 @@ def get_swiftpm_options(swift_exec: str, args: argparse.Namespace) -> List[str]:
+         elif re.match('android-', args.cross_compile_host):
+             print('Cross-compiling for %s' % args.cross_compile_host)
+             swiftpm_args += ['--destination', args.cross_compile_config]
++            swiftpm_args += ['--pkg-config-path', os.path.join(os.path.split(args.cross_compile_config)[0], 'lib/pkgconfig')]
+         else:
+             fatal_error("cannot cross-compile for %s" % args.cross_compile_host)
+ 
+diff --git a/swiftpm/Utilities/bootstrap b/swiftpm/Utilities/bootstrap
+index 085056de..1ded1a90 100755
+--- a/swiftpm/Utilities/bootstrap
++++ b/swiftpm/Utilities/bootstrap
+@@ -827,6 +827,7 @@ def get_swiftpm_flags(args):
+     if '-android' in args.build_target:
+         build_flags.extend(["-Xswiftc", "-Xcc", "-Xswiftc", "-U_GNU_SOURCE"])
+         build_flags.extend(["-Xlinker", "-landroid-spawn"])
++        build_flags.extend(["--pkg-config-path", os.path.join(os.path.split(args.cross_compile_config)[0], 'lib/pkgconfig')])
+ 
+     cross_compile_hosts = args.cross_compile_hosts
+     if cross_compile_hosts:

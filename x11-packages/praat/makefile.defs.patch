@@ -1,0 +1,28 @@
+diff -uNr praat-6.2.23/makefile.defs praat-6.2.23.mod/makefile.defs
+--- praat-6.2.23/makefile.defs	1970-01-01 09:00:00.000000000 +0900
++++ praat-6.2.23.mod/makefile.defs	2022-10-20 18:01:48.926769740 +0900
+@@ -0,0 +1,23 @@
++# File: makefile.defs.linux.termux
++
++# System: Android via termux
++
++CC ?= gcc
++CXX ?= g++
++LINK ?= $(CXX) -Wl,-rpath=@TERMUX_PREFIX@/lib
++
++PKG_CONFIG ?= "pkg-config"
++
++COMMONFLAGS = -DPA_LITTLE_ENDIAN -D_FILE_OFFSET_BITS=64 -DUNIX -Dlinux -DHAVE_PULSEAUDIO `$(PKG_CONFIG) --cflags gtk+-3.0` \
++	-Wreturn-type -Wunused -Wunused-parameter -Wuninitialized -O1 -g1
++
++CFLAGS = -std=gnu99 $(COMMONFLAGS) -Werror=missing-prototypes -Werror=implicit
++
++CXXFLAGS = -std=c++17 $(COMMONFLAGS) -Wshadow
++
++EXECUTABLE = praat
++
++LIBS = `$(PKG_CONFIG) --libs gtk+-3.0` -lm -lpulse
++
++ICON =
++MAIN_ICON =
+

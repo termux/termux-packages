@@ -1,0 +1,92 @@
+--- a/src/contrib/conn_pool.c
++++ b/src/contrib/conn_pool.c
+@@ -63,10 +63,26 @@
+ 	return fd;
+ }
+ 
++#ifdef __ANDROID__
++static void thread_signal_handler(int signum)
++{
++	pthread_exit(0);
++}
++#endif
++
+ static void *closing_thread(void *_arg)
+ {
+ 	conn_pool_t *pool = _arg;
+ 
++#ifdef __ANDROID__
++	struct sigaction actions;
++	memset(&actions, 0, sizeof(actions));
++	sigemptyset(&actions.sa_mask);
++	actions.sa_flags = 0;
++	actions.sa_handler = thread_signal_handler;
++	sigaction(SIGUSR2, &actions, NULL);
++#endif
++
+ 	while (true) {
+ 		knot_time_t now = knot_time(), next = 0;
+ 		knot_timediff_t timeout = conn_pool_timeout(pool, 0);
+@@ -117,7 +133,11 @@
+ void conn_pool_deinit(conn_pool_t *pool)
+ {
+ 	if (pool != NULL) {
++#ifndef __ANDROID__
+ 		pthread_cancel(pool->closing_thread);
++#else
++		pthread_kill(pool->closing_thread, SIGUSR2);
++#endif
+ 		pthread_join(pool->closing_thread, NULL);
+ 
+ 		int fd;
+--- a/src/knot/common/stats.c
++++ b/src/knot/common/stats.c
+@@ -249,8 +249,24 @@
+ 	free(file_name);
+ }
+ 
++#ifdef __ANDROID__
++static void thread_signal_handler(int signum)
++{
++	pthread_exit(0);
++}
++#endif
++
+ static void *dumper(void *data)
+ {
++#ifdef __ANDROID__
++	struct sigaction actions;
++	memset(&actions, 0, sizeof(actions));
++	sigemptyset(&actions.sa_mask);
++	actions.sa_flags = 0;
++	actions.sa_handler = thread_signal_handler;
++	sigaction(SIGUSR2, &actions, NULL);
++#endif
++
+ 	while (true) {
+ 		assert(stats.timer > 0);
+ 		sleep(stats.timer);
+@@ -291,7 +307,11 @@
+ 		}
+ 	// Stop current dumping.
+ 	} else if (stats.active_dumper) {
++#ifndef __ANDROID__
+ 		pthread_cancel(stats.dumper);
++#else
++		pthread_kill(stats.dumper, SIGUSR2);
++#endif
+ 		pthread_join(stats.dumper, NULL);
+ 		stats.active_dumper = false;
+ 	}
+@@ -300,7 +320,11 @@
+ void stats_deinit(void)
+ {
+ 	if (stats.active_dumper) {
++#ifndef __ANDROID__
+ 		pthread_cancel(stats.dumper);
++#else
++		pthread_kill(stats.dumper, SIGUSR2);
++#endif
+ 		pthread_join(stats.dumper, NULL);
+ 	}
+ 

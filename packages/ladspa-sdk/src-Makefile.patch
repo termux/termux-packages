@@ -1,0 +1,78 @@
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -4,9 +4,9 @@
+ #
+ # Change these if you want to install somewhere else.
+ 
+-INSTALL_PLUGINS_DIR	=	/usr/lib/ladspa/
+-INSTALL_INCLUDE_DIR	=	/usr/include/
+-INSTALL_BINARY_DIR	=	/usr/bin/
++INSTALL_PLUGINS_DIR	=	@TERMUX_PREFIX@/lib/ladspa/
++INSTALL_INCLUDE_DIR	=	@TERMUX_PREFIX@/include/
++INSTALL_BINARY_DIR	=	@TERMUX_PREFIX@/bin/
+ 
+ ###############################################################################
+ #
+@@ -15,10 +15,11 @@
+ 
+ INCLUDES	=	-I.
+ LIBRARIES	=	-ldl -lm -lsndfile
+-CFLAGS		=	$(INCLUDES) -Wall -Werror -O2 -fPIC 		\
++COMMON_FLAGS	=	$(INCLUDES) $(CPPFLAGS) -Wall -Werror -fPIC 	\
+ 			-DDEFAULT_LADSPA_PATH=$(INSTALL_PLUGINS_DIR)
++CFLAGS		+=	$(COMMON_FLAGS)
+ BINFLAGS	=	-fPIE -pie
+-CXXFLAGS	=	$(CFLAGS)
++CXXFLAGS	+=	$(COMMON_FLAGS)
+ PLUGINS		=	../plugins/amp.so				\
+ 			../plugins/delay.so				\
+ 			../plugins/filter.so				\
+@@ -27,8 +28,8 @@
+ PROGRAMS	=	../bin/analyseplugin				\
+ 			../bin/applyplugin 				\
+ 			../bin/listplugins
+-CC		=	cc
+-CPP		=	c++
++CC		?=	cc
++CXX		?=	c++
+ 
+ ###############################################################################
+ #
+@@ -47,11 +48,11 @@
+ 		-Wl,--version-script=gcc_exports.map			
+ 
+ ../plugins/%.so:	plugins/%.cpp ladspa.h gcc_exports.map
+-	$(CPP) $(CXXFLAGS) -o plugins/$*.o -c plugins/$*.cpp
+-	$(CPP)	-o ../plugins/$*.so					\
++	$(CXX) $(CXXFLAGS) -o plugins/$*.o -c plugins/$*.cpp
++	$(CXX)	-o ../plugins/$*.so					\
+ 		plugins/$*.o						\
+ 		-shared							\
+-		$(CXXFLAGS)						\
++		$(CXXFLAGS) $(LDFLAGS)						\
+ 		-fvisibility=hidden					\
+ 		-fvisibility-inlines-hidden				\
+ 		-s							\
+@@ -109,19 +110,19 @@
+ 	$(CC) $(CFLAGS) $(BINFLAGS)					\
+ 		-o ../bin/applyplugin					\
+ 		applyplugin.o load.o default.o				\
+-		$(LIBRARIES)
++		$(LDFLAGS) $(LIBRARIES)
+ 
+ ../bin/analyseplugin:	analyseplugin.o load.o default.o
+ 	$(CC) $(CFLAGS) $(BINFLAGS)					\
+ 		-o ../bin/analyseplugin 				\
+ 		analyseplugin.o load.o default.o			\
+-		$(LIBRARIES)
++		$(LDFLAGS) $(LIBRARIES)
+ 
+ ../bin/listplugins:	listplugins.o search.o
+ 	$(CC) $(CFLAGS) $(BINFLAGS)					\
+ 		-o ../bin/listplugins	 				\
+ 		listplugins.o search.o					\
+-		$(LIBRARIES)
++		$(LDFLAGS) $(LIBRARIES)
+ 
+ ###############################################################################
+ #

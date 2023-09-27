@@ -1,6 +1,5 @@
-diff -uNr pacman-6.0.0/scripts/makepkg.sh.in pacman-termux/scripts/makepkg.sh.in
---- pacman-6.0.0/scripts/makepkg.sh.in	2021-05-20 06:38:45.954786500 +0300
-+++ pacman-termux/scripts/makepkg.sh.in	2021-10-04 16:00:39.000000000 +0300
+--- pacman-6.0.1/scripts/makepkg.sh.in	2022-06-24 13:01:22.036039817 +0300
++++ pacman-termux/scripts/makepkg.sh.in	2022-06-24 13:13:23.866039541 +0300
 @@ -26,7 +26,7 @@
  
  # makepkg uses quite a few external programs during its execution. You
@@ -69,16 +68,17 @@ diff -uNr pacman-6.0.0/scripts/makepkg.sh.in pacman-termux/scripts/makepkg.sh.in
  
  	write_kv_pair "pkgname" "$pkgname"
  	write_kv_pair "pkgbase" "$pkgbase"
-@@ -939,7 +934,7 @@
+@@ -939,7 +934,8 @@
  
  run_single_packaging() {
  	local pkgdir="$pkgdirbase/$pkgname"
 -	mkdir "$pkgdir"
++	local terdir="$pkgdir@TERMUX_BASE_DIR@"
 +	mkdir -p "$terdir"
  	if [[ -n $1 ]] || (( PKGFUNC )); then
  		run_package $1
  	fi
-@@ -1071,7 +1066,7 @@
+@@ -1071,7 +1067,7 @@
  		-d|--nodeps)      NODEPS=1 ;;
  		-e|--noextract)   NOEXTRACT=1 ;;
  		-f|--force)       FORCE=1 ;;
@@ -87,7 +87,7 @@ diff -uNr pacman-6.0.0/scripts/makepkg.sh.in pacman-termux/scripts/makepkg.sh.in
  		# generating integrity checks does not depend on architecture
  		-g|--geninteg)    BUILDPKG=0 GENINTEG=1 IGNOREARCH=1;;
  		--holdver)        HOLDVER=1 ;;
-@@ -1186,17 +1181,10 @@
+@@ -1186,17 +1182,10 @@
  	exit $E_FS_PERMISSIONS
  fi
  
@@ -108,12 +108,12 @@ diff -uNr pacman-6.0.0/scripts/makepkg.sh.in pacman-termux/scripts/makepkg.sh.in
  fi
  
  unset pkgname "${pkgbuild_schema_strings[@]}" "${pkgbuild_schema_arrays[@]}"
-@@ -1252,6 +1240,13 @@
+@@ -1252,6 +1241,13 @@
  # set pkgdir to something "sensible" for (not recommended) use during build()
  pkgdir="$pkgdirbase/$pkgbase"
  
 +# the second pkgdir but from the termux system directory
-+terdir="$pkgdir/@TERMUX_BASE_DIR@"
++terdir="$pkgdir@TERMUX_BASE_DIR@"
 +
 +# adding home and prefix to compile correctly
 +prefix="@TERMUX_PREFIX@"
@@ -122,7 +122,7 @@ diff -uNr pacman-6.0.0/scripts/makepkg.sh.in pacman-termux/scripts/makepkg.sh.in
  if (( GENINTEG )); then
  	mkdir -p "$srcdir"
  	chmod a-s "$srcdir"
-@@ -1320,10 +1315,10 @@
+@@ -1320,10 +1316,10 @@
  fi
  
  # Run the bare minimum in fakeroot
@@ -135,7 +135,7 @@ diff -uNr pacman-6.0.0/scripts/makepkg.sh.in pacman-termux/scripts/makepkg.sh.in
  		exit $E_OK
  	fi
  
-@@ -1338,7 +1333,7 @@
+@@ -1338,7 +1334,7 @@
  
  	create_debug_package
  
@@ -144,7 +144,7 @@ diff -uNr pacman-6.0.0/scripts/makepkg.sh.in pacman-termux/scripts/makepkg.sh.in
  	exit $E_OK
  fi
  
-@@ -1365,7 +1360,7 @@
+@@ -1365,7 +1361,7 @@
  	check_source_integrity all
  	cd_safe "$startdir"
  
@@ -153,7 +153,7 @@ diff -uNr pacman-6.0.0/scripts/makepkg.sh.in pacman-termux/scripts/makepkg.sh.in
  
  	if [[ $SIGNPKG = 'y' ]]; then
  		msg "$(gettext "Signing package...")"
-@@ -1467,7 +1462,7 @@
+@@ -1467,7 +1463,7 @@
  		cd_safe "$startdir"
  	fi
  

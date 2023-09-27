@@ -1,0 +1,11 @@
+--- a/gtk/gtkscale.c
++++ b/gtk/gtkscale.c
+@@ -1471,7 +1471,7 @@ gtk_scale_add_mark (GtkScale        *sca
+   mark->position = position;
+  
+   priv->marks = g_slist_insert_sorted_with_data (priv->marks, mark,
+-                                                 (GCompareFunc) compare_marks,
++                                                 (GCompareDataFunc) compare_marks,
+                                                  GINT_TO_POINTER (
+                                                    gtk_range_get_inverted (GTK_RANGE (scale)) 
+                                                    ));

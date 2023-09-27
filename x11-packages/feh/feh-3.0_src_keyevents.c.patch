@@ -1,0 +1,12 @@
+diff -uNr feh-3.0/src/keyevents.c feh-3.0.mod/src/keyevents.c
+--- feh-3.0/src/keyevents.c	2018-11-09 18:17:58.000000000 +0200
++++ feh-3.0.mod/src/keyevents.c	2018-11-23 23:30:45.083952428 +0200
+@@ -226,7 +226,7 @@
+ 
+ 	free(confpath);
+ 
+-	if (!conf && ((conf = fopen("/etc/feh/keys", "r")) == NULL))
++	if (!conf && ((conf = fopen("@TERMUX_PREFIX@/etc/feh/keys", "r")) == NULL))
+ 		return;
+ 
+ 	while (fgets(line, sizeof(line), conf)) {

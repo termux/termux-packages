@@ -1,0 +1,27 @@
+--- ./configure.ac.orig	2022-02-26 19:25:29.371616100 +0530
++++ ./configure.ac	2022-02-26 19:25:42.591616095 +0530
+@@ -913,6 +913,15 @@
+       fi
+     ])
+ 
++  AC_ARG_WITH(ssl-key-dir,
++    AS_HELP_STRING([--with-ssl-key-dir=DIR],[SSL key path]),
++    [
++      if test "x$withval" != "xno" ; then
++	alpine_SSLKEYS=$withval
++      fi
++    ])
++
++
+   dnl setup globals so tests below work
+   if test -n "$alpine_SSLINCLUDE" ; then
+     CPPFLAGS="-I$alpine_SSLINCLUDE $CPPFLAGS"
+@@ -1964,7 +1964,7 @@
+ #endif
+ 
+ extern void *base;
+-extern sortf(const void *, const void *);
++extern int sortf(const void *, const void *);
+ int sortf(a, b)
+   const void *a;
+   const void *b; { return 0; }

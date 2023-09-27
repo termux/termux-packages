@@ -1,0 +1,23 @@
+--- a/third_party/swiftshader/CMakeLists.txt
++++ b/third_party/swiftshader/CMakeLists.txt
+@@ -30,8 +30,7 @@
+ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+     set(LINUX TRUE)
+ elseif(CMAKE_SYSTEM_NAME MATCHES "Android")
+-    set(ANDROID TRUE)
+-    set(CMAKE_CXX_FLAGS "-DANDROID_NDK_BUILD")
++    set(LINUX TRUE)
+ elseif(WIN32)
+ elseif(APPLE)
+ elseif(FUCHSIA)
+@@ -770,6 +770,10 @@
+     set(OS_LIBS "${COCOA_FRAMEWORK}" "${QUARTZ_FRAMEWORK}" "${CORE_FOUNDATION_FRAMEWORK}" "${IOSURFACE_FRAMEWORK}" "${METAL_FRAMEWORK}")
+ endif()
+ 
++if(CMAKE_SYSTEM_NAME MATCHES "Android")
++    list(APPEND OS_LIBS "android-shmem")
++endif()
++
+ ###########################################################
+ # SwiftShader Targets
+ ###########################################################

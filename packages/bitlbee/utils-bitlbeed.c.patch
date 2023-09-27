@@ -1,0 +1,20 @@
+--- a/utils/bitlbeed.c
++++ b/utils/bitlbeed.c
+@@ -333,7 +333,7 @@
+ 			       "  -l  Specify a logfile. (Default: none)\n"
+ 			       "  -r  Rate limiting: Ignore a host for z seconds when it connects for more\n"
+ 			       "      than y times in x seconds. (Default: 600,5,900. Disable: 0,0,0)\n"
+-			       "  -u  Use a local socket, by default /tmp/bitlbee (override with -i <filename>)\n"
++			       "  -u  Use a local socket, by default @TERMUX_PREFIX@/tmp/bitlbee (override with -i <filename>)\n"
+ 			       "  -d  Don't fork for listening (for debugging purposes)\n"
+ 			       "  -h  This information\n", argv[0]);
+ 			return(NULL);
+@@ -341,7 +341,7 @@
+ 	}
+ 
+ 	if (set->interface == NULL) {
+-		set->interface = (set->local) ? "/tmp/bitlbee" : "0.0.0.0";
++		set->interface = (set->local) ? "@TERMUX_PREFIX@/tmp/bitlbee" : "0.0.0.0";
+ 	}
+ 
+ 	if (optind == argc) {

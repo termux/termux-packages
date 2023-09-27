@@ -1,0 +1,12 @@
+diff -uNr xrdp-0.9.15/common/os_calls.c xrdp-0.9.15.mod/common/os_calls.c
+--- xrdp-0.9.15/common/os_calls.c	2020-12-28 14:03:43.000000000 +0000
++++ xrdp-0.9.15.mod/common/os_calls.c	2021-02-09 20:54:21.613711012 +0000
+@@ -2799,7 +2799,7 @@
+ int
+ g_getlogin(char *name, unsigned int len)
+ {
+-#if defined(_WIN32)
++#if defined(_WIN32) || defined(__ANDROID__)
+     return -1;
+ #else
+     return getlogin_r(name, len);

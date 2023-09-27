@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://ninvaders.sourceforge.net
+TERMUX_PKG_HOMEPAGE=https://ninvaders.sourceforge.net
 TERMUX_PKG_DESCRIPTION="Space Invaders clone based on ncurses for ASCII output"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

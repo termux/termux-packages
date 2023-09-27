@@ -1,0 +1,20 @@
+--- a/src/openscad.cc
++++ b/src/openscad.cc
+@@ -262,7 +262,7 @@
+ 
+ 	if (exit_if_not_found) {
+ 		PRINTB("Unknown color scheme '%s'. Valid schemes:", color_scheme);
+-		PRINT(boost::join(ColorMap::inst()->colorSchemeNames(), "\n"));
++		PRINT(boost::algorithm::join(ColorMap::inst()->colorSchemeNames(), "\n"));
+ 		exit(1);
+ 	} else {
+ 		PRINTB("Unknown color scheme '%s', using default '%s'.", arg_colorscheme % ColorMap::inst()->defaultColorSchemeName());
+@@ -883,7 +883,7 @@
+ 		("imgsize", po::value<string>(), "=width,height of exported png")
+ 		("render", po::value<string>()->implicit_value(""), "for full geometry evaluation when exporting png")
+ 		("preview", po::value<string>()->implicit_value(""), "[=throwntogether] -for ThrownTogether preview png")
+-		("view", po::value<CommaSeparatedVector>(), ("=view options: " + boost::join(viewOptions.names(), " | ")).c_str())
++		("view", po::value<CommaSeparatedVector>(), ("=view options: " + boost::algorithm::join(viewOptions.names(), " | ")).c_str())
+ 		("projection", po::value<string>(), "=(o)rtho or (p)erspective when exporting png")
+ 		("csglimit", po::value<unsigned int>(), "=n -stop rendering at n CSG elements when exporting png")
+ 		("colorscheme", po::value<string>(), ("=colorscheme: " +

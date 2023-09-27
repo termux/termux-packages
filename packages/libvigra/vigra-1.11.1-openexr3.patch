@@ -1,0 +1,41 @@
+https://src.fedoraproject.org/rpms/vigra/raw/rawhide/f/vigra-openexr3.patch
+
+Index: vigra-1.11.1/CMakeLists.txt
+===================================================================
+--- vigra-1.11.1.orig/CMakeLists.txt
++++ vigra-1.11.1/CMakeLists.txt
+@@ -107,7 +107,22 @@ VIGRA_FIND_PACKAGE(FFTW3F NAMES libfftw3
+ 
+ 
+ IF(WITH_OPENEXR)
++    FIND_PACKAGE(Imath CONFIG)
++    IF(TARGET Imath::Imath)
++        FIND_PACKAGE(OpenEXR CONFIG)
++        SET(OPENEXR_LIBRARIES
++		    OpenEXR::OpenEXR
++		    OpenEXR::Iex
++			OpenEXR::IlmThread
++			Imath::Imath
++		)
++		get_target_property(OPENEXR_INCLUDE_DIR OpenEXR::OpenEXRConfig INTERFACE_INCLUDE_DIRECTORIES)
++		get_target_property(IMATH_INCLUDE_DIR Imath::ImathConfig INTERFACE_INCLUDE_DIRECTORIES)
++		include_directories(${OPENEXR_INCLUDE_DIR} ${IMATH_INCLUDE_DIR})
++		set(OPENEXR_FOUND TRUE)
++	ELSE()
+     VIGRA_FIND_PACKAGE(OpenEXR)
++	ENDIF()
+ ENDIF()
+ 
+ IF(WITH_HDF5)
+Index: vigra-1.11.1/src/impex/CMakeLists.txt
+===================================================================
+--- vigra-1.11.1.orig/src/impex/CMakeLists.txt
++++ vigra-1.11.1/src/impex/CMakeLists.txt
+@@ -85,6 +85,7 @@ IF(TIFF_FOUND)
+ ENDIF(TIFF_FOUND)
+ 
+ IF(OPENEXR_FOUND)
++  cmake_policy(SET CMP0028 NEW)
+   TARGET_LINK_LIBRARIES(vigraimpex ${OPENEXR_LIBRARIES})
+ ENDIF(OPENEXR_FOUND)
+ 

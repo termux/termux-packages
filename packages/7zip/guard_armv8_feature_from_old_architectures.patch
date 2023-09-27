@@ -1,0 +1,25 @@
+From: YOKOTA Hiroshi <yokota.hgml@gmail.com>
+Date: Wed, 13 Oct 2021 07:59:13 +0900
+Subject: Guard ARM v8 feature from old architecture
+
+Forwarded: not-needed
+---
+ C/7zCrc.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/C/7zCrc.c b/C/7zCrc.c
+index c7ec353..230d8a5 100755
+--- a/C/7zCrc.c
++++ b/C/7zCrc.c
+@@ -81,8 +81,9 @@ UInt32 MY_FAST_CALL CrcUpdateT1(UInt32 v, const void *data, size_t size, const U
+         #define USE_ARM64_CRC
+     #endif
+     #endif
+-  #elif (defined(__clang__) && (__clang_major__ >= 3)) \
+-     || (defined(__GNUC__) && (__GNUC__ > 4))
++  #elif ( (defined(__clang__) && (__clang_major__ >= 3)) ||	 \
++          (defined(__GNUC__)  && (__GNUC__ > 4)        )    ) && \
++        (__ARM_ARCH >= 8)
+       #if !defined(__ARM_FEATURE_CRC32)
+         #define __ARM_FEATURE_CRC32 1
+           #if (!defined(__clang__) || (__clang_major__ > 3)) // fix these numbers

@@ -1,0 +1,17 @@
+diff --git a/cli-20.10.1/vendor/github.com/containerd/containerd/platforms/database.go b/cli/vendor/github.com/containerd/containerd/platforms/database.go
+index 6ede940..d010005 100644
+--- a/cli-20.10.1/vendor/github.com/containerd/containerd/platforms/database.go
++++ b/cli/vendor/github.com/containerd/containerd/platforms/database.go
+@@ -25,7 +25,11 @@ import (
+ //
+ // The OS value should be normalized before calling this function.
+ func isLinuxOS(os string) bool {
+-	return os == "linux"
++	switch os {
++	case "linux", "android":
++		return true
++	}
++	return false
+ }
+ 
+ // These function are generated from https://golang.org/src/go/build/syslist.go.

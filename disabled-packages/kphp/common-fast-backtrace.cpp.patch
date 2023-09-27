@@ -1,0 +1,11 @@
+--- a/common/fast-backtrace.cpp
++++ b/common/fast-backtrace.cpp
+@@ -53,7 +53,7 @@
+ #error "Unsupported arch"
+ #endif
+ 
+-#if defined(__APPLE__)
++#if defined(__aarch64__) || defined(__APPLE__)
+ int fast_backtrace_without_recursions(void **, int) noexcept {
+   return 0;
+ }

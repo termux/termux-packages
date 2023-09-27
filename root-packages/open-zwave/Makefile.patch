@@ -1,0 +1,24 @@
+--- ../Makefile.orig	2020-04-17 15:36:09.952403604 +0200
++++ ./cpp/build/Makefile	2020-04-17 15:37:27.535654652 +0200
+@@ -21,11 +21,6 @@
+ #what flags we will use for linking in debug mode
+ DEBUG_LDFLAGS	:= -g
+ 
+-#default Libraries we should link with
+-ifneq ($(UNAME),FreeBSD)
+-LIBS += -lresolv
+-endif
+-
+ top_srcdir := $(abspath $(dir $(lastword $(MAKEFILE_LIST)))../../)
+ 
+ include $(top_srcdir)/cpp/build/support.mk
+@@ -132,9 +132,7 @@
+ endif
+ endif # USE_HID
+ 
+-ifeq ($(BITBAKE_ENV),1)
+ ar_option := "rc"
+-endif
+ 
+ cclasses := $(notdir $(wildcard $(top_srcdir)/cpp/src/command_classes/*.cpp))
+ vclasses := $(notdir $(wildcard $(top_srcdir)/cpp/src/value_classes/*.cpp))

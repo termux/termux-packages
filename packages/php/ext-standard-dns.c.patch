@@ -1,6 +1,17 @@
 diff -u -r ../php-5.6.15/ext/standard/dns.c ./ext/standard/dns.c
 --- ../php-5.6.15/ext/standard/dns.c	2015-10-29 05:55:01.000000000 -0400
 +++ ./ext/standard/dns.c	2015-11-10 16:05:47.473119979 -0500
+@@ -57,6 +57,10 @@
+ #endif
+ #endif
+ 
++#ifdef __ANDROID__
++int __dn_skipname(const unsigned char *, const unsigned char *);
++#endif
++
+ #ifndef MAXHOSTNAMELEN
+ #define MAXHOSTNAMELEN 255
+ #endif
 @@ -938,7 +938,7 @@
  
  			/* Skip QD entries, they're only used by dn_expand later on */

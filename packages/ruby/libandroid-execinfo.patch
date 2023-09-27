@@ -1,0 +1,14 @@
+--- a/configure.ac
++++ b/configure.ac
+@@ -3112,6 +3112,11 @@
+     ])
+     ])
+ AS_CASE(["$target_cpu-$target_os"],
++[*-android*], [
++    AC_CHECK_HEADERS([execinfo.h])
++    AS_IF([test "x$ac_cv_header_execinfo_h" = xyes], [
++	AC_CHECK_LIB([android-execinfo], [backtrace])
++    ])],
+ [*-darwin*], [
+     AC_CHECK_HEADERS([libproc.h])
+     AC_CHECK_HEADERS([execinfo.h])

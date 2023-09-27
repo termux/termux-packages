@@ -3,7 +3,6 @@
 set -e -u
 
 REPO_DIR=$(realpath "$(dirname "$0")/../")
-PACKAGES_DIR="$REPO_DIR/packages"
 
 check_package_license() {
 	local pkg_licenses=$1
@@ -33,7 +32,7 @@ check_package_license() {
 			PythonPL|PythonSoftFoundation|QTPL-1.0|RPL-1.5|Real-1.0|RicohPL);;
 			SUNPublic-1.0|Scala|SimPL-2.0|Sleepycat|Sybase-1.0|TMate|UPL-1.0);;
 			Unicode-DFS-2015|Unlicense|UoI-NCSA|"VIM License"|VovidaPL-1.0|W3C);;
-			WTFPL|Xnet|ZLIB|ZPL-2.0|wxWindows);;
+			WTFPL|Xnet|ZLIB|ZPL-2.0|wxWindows|X11);;
 
 			*)
 				license_ok=false
@@ -50,6 +49,23 @@ check_package_license() {
 	fi
 }
 
+check_package_name() {
+	local pkg_name=$1
+	echo -n "Package name '${pkg_name}': "
+	if [ "${#pkg_name}" -ge 2 ]; then
+		if grep -qP '^[0-9a-z][0-9a-z+\-\.]+$' <<< "${pkg_name}"; then
+			echo "PASS"
+			return 0
+		else
+			echo "INVALID (contains characters that are not allowed)"
+			return 1
+		fi
+	else
+		echo "INVALID (less than two characters long)"
+		return 1
+	fi
+}
+
 lint_package() {
 	local package_script
 	local package_name
@@ -61,6 +77,17 @@ lint_package() {
 	echo
 	echo "Package: $package_name"
 	echo
+
+	check_package_name "$package_name" || return 1
+	local subpkg_script
+	for subpkg_script in $(dirname "$package_script")/*.subpackage.sh; do
+		test ! -f "$subpkg_script" && continue
+		local subpkg_name=$(basename "${subpkg_script%.subpackage.sh}")
+		check_package_name "$subpkg_name" || return 1
+	done
+
+	echo
+
 	echo -n "Syntax check: "
 
 	local syntax_errors
@@ -207,7 +234,7 @@ lint_package() {
 			urls_ok=true
 			for url in "${TERMUX_PKG_SRCURL[@]}"; do
 				if [ -n "$url" ]; then
-					if ! grep -qP '^https://.+' <<< "$url"; then
+					if ! grep -qP '^git\+https://.+' <<< "$url" && ! grep -qP '^https://.+' <<< "$url"; then
 						echo "NON-HTTPS (acceptable)"
 						urls_ok=false
 						break
@@ -249,7 +276,7 @@ lint_package() {
 					echo "LENGTHS OF 'TERMUX_PKG_SRCURL' AND 'TERMUX_PKG_SHA256' ARE NOT EQUAL"
 					pkg_lint_error=true
 				fi
-			elif [ "${TERMUX_PKG_SRCURL: -4}" == ".git" ]; then
+			elif [ "${TERMUX_PKG_SRCURL:0:4}" == "git+" ]; then
 				echo "NOT SET (acceptable since TERMUX_PKG_SRCURL is git repo)"
 			else
 				echo "NOT SET"
@@ -454,7 +481,9 @@ linter_main() {
 }
 
 if [ $# -eq 0 ]; then
-	linter_main "$PACKAGES_DIR"/*/build.sh || exit 1
+	for repo_dir in $(jq --raw-output 'del(.pkg_format) | keys | .[]' $REPO_DIR/repo.json); do
+		linter_main $repo_dir/*/build.sh
+	done || exit 1
 else
 	linter_main "$@" || exit 1
 fi

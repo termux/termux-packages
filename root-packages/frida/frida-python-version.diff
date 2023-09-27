@@ -1,0 +1,21 @@
+--- ../frida-python-src-meson.build.orig	2020-03-25 07:54:47.948054199 +0100
++++ ./frida-python/src/meson.build	2020-03-25 08:44:34.189059770 +0100
+@@ -1,4 +1,4 @@
+-extra_link_args = []
++extra_link_args = ['-L@TERMUX_PREFIX@/lib', '-lpython@PYTHON_VERSION@']
+ if host_os_family == 'darwin'
+   extra_link_args += ['-Wl,-exported_symbol,_' + python_plugin_export_name]
+ elif host_os_family != 'windows'
+--- ./Makefile.linux.mk.orig	2023-07-08 18:12:09.428217335 +0000
++++ ./Makefile.linux.mk	2023-07-08 18:14:09.617238973 +0000
+@@ -320,8 +320,8 @@
+ 			--prefix $$(FRIDA)/build/$1-$$* \
+ 			--libdir $$(FRIDA)/build/$1-$$*/lib \
+ 			$$(FRIDA_FLAGS_COMMON) \
+-			-Dpython=$$(PYTHON) \
+-			-Dpython_incdir=$$(PYTHON_INCDIR) \
++			-Dpython=/usr/bin/python@PYTHON_VERSION@ \
++			-Dpython_incdir=@TERMUX_PREFIX@/include/python@PYTHON_VERSION@ \
+ 			frida-python $$$$builddir || exit 1; \
+ 	fi; \
+ 	$$(MESON) install -C $$$$builddir || exit 1

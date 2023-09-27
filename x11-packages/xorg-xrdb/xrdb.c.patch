@@ -1,0 +1,20 @@
+--- xrdb-1.1.1/xrdb.c	2018-03-10 07:59:09.000000000 +0530
++++ xrdb/xrdb.c	2019-01-30 13:02:44.618344843 +0530
+@@ -1085,7 +1085,7 @@
+         strcpy(tmpname2, "xrdbD_XXXXXX");
+         strcpy(tmpname3, "\\temp\\xrdbD_XXXXXX");
+ #else
+-        strcpy(tmpname2, "/tmp/xrdbD_XXXXXX");
++        strcpy(tmpname2, "@TERMUX_PREFIX@/tmp/xrdbD_XXXXXX");
+ #endif
+         (void) mktemp(tmpname2);
+     }
+@@ -1104,7 +1104,7 @@
+ #ifdef WIN32
+         strcpy(tmpname, "\\temp\\xrdb_XXXXXX");
+ #else
+-        strcpy(tmpname, "/tmp/xrdb_XXXXXX");
++        strcpy(tmpname, "@TERMUX_PREFIX@/tmp/xrdb_XXXXXX");
+ #endif
+ #ifndef HAVE_MKSTEMP
+         (void) mktemp(tmpname);

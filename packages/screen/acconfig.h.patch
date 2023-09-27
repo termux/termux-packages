@@ -1,0 +1,13 @@
+--- a/acconfig.h
++++ b/acconfig.h
+@@ -191,7 +191,9 @@
+  * If screen is installed with permissions to update /etc/utmp (such
+  * as if it is installed set-uid root), define UTMPOK.
+  */
+-#define UTMPOK
++#ifndef __ANDROID__
++# define UTMPOK
++#endif
+ 
+ /* Set LOGINDEFAULT to one (1)
+  * if you want entries added to /etc/utmp by default, else set it to

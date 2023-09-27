@@ -1,0 +1,24 @@
+--- a/Source/WebKit/NetworkProcess/cache/NetworkCacheBlobStorage.cpp
++++ b/Source/WebKit/NetworkProcess/cache/NetworkCacheBlobStorage.cpp
+@@ -99,8 +99,10 @@ BlobStorage::Blob BlobStorage::add(const
+         if (FileSystem::makeSafeToUseMemoryMapForPath(blobPath)) {
+             auto existingData = mapFile(blobPath);
+             if (bytesEqual(existingData, data)) {
++#ifndef __ANDROID__
+                 if (!FileSystem::hardLink(blobPath, path))
+                     WTFLogAlways("Failed to create hard link from %s to %s", blobPath.utf8().data(), path.utf8().data());
++#endif
+                 return { existingData, hash };
+             }
+         }
+@@ -111,8 +113,10 @@ BlobStorage::Blob BlobStorage::add(const
+     if (mappedData.isNull())
+         return { };
+ 
++#ifndef __ANDROID__
+     if (!FileSystem::hardLink(blobPath, path))
+         WTFLogAlways("Failed to create hard link from %s to %s", blobPath.utf8().data(), path.utf8().data());
++#endif
+ 
+     m_approximateSize += mappedData.size();
+ 

@@ -1,0 +1,14 @@
+diff -Naur cbonsai-v1.3.1/Makefile cbonsai-v1.3.1.mod/Makefile
+--- cbonsai-v1.3.1/Makefile	2021-08-15 05:04:52.000000000 +0800
++++ cbonsai-v1.3.1.mod/Makefile	2022-10-10 18:52:40.996402685 +0800
+@@ -1,9 +1,8 @@
+ .POSIX:
+-CC	= cc
+ PKG_CONFIG	?= pkg-config
+ CFLAGS	+= -Wall -Wextra -Wshadow -Wpointer-arith -Wcast-qual -pedantic $(shell $(PKG_CONFIG) --cflags ncursesw panelw)
+ LDLIBS	= $(shell $(PKG_CONFIG) --libs ncursesw panelw || echo "-lncursesw -ltinfo -lpanelw")
+-PREFIX	= /usr/local
++PREFIX	= @TERMUX_PREFIX@
+ MANDIR	= $(PREFIX)/share/man
+ 
+ cbonsai: cbonsai.c

@@ -1,0 +1,40 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index b105b9a5..c7a3aada 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -567,9 +567,18 @@ endif()
+ 
+ if(ODE_WITH_LIBCCD)
+ 	if(ODE_WITH_LIBCCD_SYSTEM)
+-		find_package(ccd)
+-		target_compile_definitions(ode PRIVATE -DdLIBCCD_ENABLED -DdLIBCCD_SYSTEM)
+-		target_link_libraries(ODE ccd::ccd)
++		find_package(ccd REQUIRED)
++		target_compile_definitions(ODE PRIVATE -DdLIBCCD_ENABLED -DdLIBCCD_SYSTEM)
++		target_include_directories(
++			ODE
++			PRIVATE
++			$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/libccd/src/custom>
++		)
++		if(TARGET ccd::ccd)
++			target_link_libraries(ODE PRIVATE ccd::ccd)
++		else()
++			target_link_libraries(ODE PRIVATE ccd)
++		endif()
+ 	else()
+ 		target_compile_definitions(ODE PRIVATE -DdLIBCCD_ENABLED -DdLIBCCD_INTERNAL)
+ 		target_include_directories(
+diff --git a/ode-config.cmake.in b/ode-config.cmake.in
+index 210b558a..fdccbc3d 100644
+--- a/ode-config.cmake.in
++++ b/ode-config.cmake.in
+@@ -11,3 +11,9 @@ set(ODE_DEFINITIONS "")
+ set(ODE_INCLUDE_DIRS "${PACKAGE_PREFIX_DIR}/include")
+ set(ODE_LIBRARY_DIRS "${PACKAGE_PREFIX_DIR}/lib")
+ set(ODE_LIBRARIES "ODE::ODE")
++
++include(CMakeFindDependencyMacro)
++
++if(ODE_WITH_LIBCCD_SYSTEM)
++	find_dependency(ccd)
++endif()

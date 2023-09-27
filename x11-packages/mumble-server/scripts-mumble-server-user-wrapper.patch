@@ -1,0 +1,40 @@
+--- a/auxiliary_files/run_scripts/mumble-server-user-wrapper.in
++++ b/auxiliary_files/run_scripts/mumble-server-user-wrapper.in
+@@ -6,7 +6,7 @@
+ # Mumble source tree or at <https://www.mumble.info/LICENSE>.
+ 
+ DIR=$HOME/mumble-server
+-SYSDIR=/usr/share/doc/mumble-server/examples
++SYSDIR=@TERMUX_PREFIX@/share/doc/mumble-server/examples
+ 
+ if [ $UID == 0 ] || [ $EUID == 0 ]; then
+   echo "You should never run this script as root. If you want a system-wide install, see "
+@@ -44,7 +44,7 @@
+ DBUSFILE=$DIR/.dbus.sh
+ 
+ if [ $DO_KILL == 1 ]; then
+-	if pkill -U $UID -u $EUID -o -x -f "/usr/sbin/@MUMBLE_SERVER_BINARY_NAME@ -ini $DIR/mumble-server.ini"; then
++	if pkill -U $UID -u $EUID -o -x -f "@TERMUX_PREFIX@/bin/@MUMBLE_SERVER_BINARY_NAME@ -ini $DIR/mumble-server.ini"; then
+ 		echo "Termination signal sent"
+ 	else
+ 		echo "Mumble server process not found; not terminated"
+@@ -82,11 +82,11 @@
+ 
+ if [ "X$SETPW" != "X" ]; then
+ 	echo "Setting superuser password to \"$SETPW\""
+-	/usr/sbin/@MUMBLE_SERVER_BINARY_NAME@ -ini $DIR/mumble-server.ini -supw $SETPW
++	@TERMUX_PREFIX@/bin/@MUMBLE_SERVER_BINARY_NAME@ -ini $DIR/mumble-server.ini -supw $SETPW
+ 	exit 0
+ fi
+ 
+-PID=$(pgrep -U $UID -u $EUID -o -x -f "/usr/sbin/@MUMBLE_SERVER_BINARY_NAME@ -ini $DIR/mumble-server.ini")
++PID=$(pgrep -U $UID -u $EUID -o -x -f "@TERMUX_PREFIX@/bin/@MUMBLE_SERVER_BINARY_NAME@ -ini $DIR/mumble-server.ini")
+ 
+ if [ $DO_STATUS == 1 ]; then
+ 	if [ "X$PID" != "X" ]; then
+@@ -117,4 +117,4 @@
+ fi
+ 
+ echo "Starting Mumble server"
+-exec /usr/sbin/@MUMBLE_SERVER_BINARY_NAME@ -ini $DIR/mumble-server.ini
++exec @TERMUX_PREFIX@/bin/@MUMBLE_SERVER_BINARY_NAME@ -ini $DIR/mumble-server.ini

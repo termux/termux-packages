@@ -1,7 +1,7 @@
 termux_step_get_source() {
 	: "${TERMUX_PKG_SRCURL:=""}"
 
-	if [ "${TERMUX_PKG_SRCURL: -4}" == ".git" ]; then
+	if [ "${TERMUX_PKG_SRCURL:0:4}" == "git+" ]; then
 		termux_git_clone_src
 	else
 		if [ -z "${TERMUX_PKG_SRCURL}" ] || [ "${TERMUX_PKG_SKIP_SRC_EXTRACT-false}" = "true" ] || [ "$TERMUX_PKG_METAPACKAGE" = "true" ]; then

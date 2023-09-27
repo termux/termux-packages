@@ -1,0 +1,89 @@
+diff -uNr pypy2.7-v7.3.6-src/lib-python/2.7/aifc.py pypy2.7-v7.3.6-src.mod/lib-python/2.7/aifc.py
+--- pypy2.7-v7.3.6-src/lib-python/2.7/aifc.py           2021-10-03 14:36:11.000000000 +0800
++++ pypy2.7-v7.3.6-src.mod/lib-python/2.7/aifc.py       2022-01-17 23:53:50.375397500 +0800
+@@ -971,7 +971,7 @@
+ if __name__ == '__main__':
+     import sys
+     if not sys.argv[1:]:
+-        sys.argv.append('/usr/demos/data/audio/bach.aiff')
++        sys.argv.append('@TERMUX_PREFIX@/demos/data/audio/bach.aiff')
+     fn = sys.argv[1]
+     f = open(fn, 'r')
+     try:
+
+diff -uNr pypy2.7-v7.3.6-src/lib-python/2.7/mailcap.py pypy2.7-v7.3.6-src.mod/lib-python/2.7/mailcap.py
+--- pypy2.7-v7.3.6-src/lib-python/2.7/mailcap.py        2021-10-03 14:36:11.000000000 +0800
++++ pypy2.7-v7.3.6-src.mod/lib-python/2.7/mailcap.py    2022-01-17 23:57:37.136118200 +0800
+@@ -44,7 +44,8 @@
+             # Don't bother with getpwuid()
+             home = '.' # Last resort
+         mailcaps = [home + '/.mailcap', '/etc/mailcap',
+-                '/usr/etc/mailcap', '/usr/local/etc/mailcap']
++                '/usr/etc/mailcap', '/usr/local/etc/mailcap',
++                '@TERMUX_PREFIX@/etc/mailcap']
+     return mailcaps
+
+
+
+diff -uNr pypy2.7-v7.3.6-src/lib-python/2.7/mimetypes.py pypy2.7-v7.3.6-src.mod/lib-python/2.7/mimetypes.py
+--- pypy2.7-v7.3.6-src/lib-python/2.7/mimetypes.py      2021-10-03 14:36:11.000000000 +0800
++++ pypy2.7-v7.3.6-src.mod/lib-python/2.7/mimetypes.py  2022-01-18 00:00:35.296584100 +0800
+@@ -47,6 +47,7 @@
+     "/usr/local/lib/netscape/mime.types",
+     "/usr/local/etc/httpd/conf/mime.types",     # Apache 1.2
+     "/usr/local/etc/mime.types",                # Apache 1.3
++    "@TERMUX_PREFIX@/etc/mime.types",           # Termux
+     ]
+
+ inited = False
+
+diff -uNr pypy2.7-v7.3.6-src/lib-python/2.7/subprocess.py pypy2.7-v7.3.6-src.mod/lib-python/2.7/subprocess.py
+--- pypy2.7-v7.3.6-src/lib-python/2.7/subprocess.py     2021-10-03 14:36:11.000000000 +0800
++++ pypy2.7-v7.3.6-src.mod/lib-python/2.7/subprocess.py 2022-01-17 22:21:06.651605000 +0800
+@@ -941,7 +941,7 @@
+                 args = list(args)
+
+             if shell:
+-                args = ["/bin/sh", "-c"] + args
++                args = ["@TERMUX_PREFIX@/bin/sh", "-c"] + args
+                 if executable:
+                     args[0] = executable
+
+diff -uNr pypy2.7-v7.3.6-src/lib-python/2.7/tempfile.py pypy2.7-v7.3.6-src.mod/lib-python/2.7/tempfile.py
+--- pypy2.7-v7.3.6-src/lib-python/2.7/tempfile.py       2021-10-03 14:36:11.000000000 +0800
++++ pypy2.7-v7.3.6-src.mod/lib-python/2.7/tempfile.py   2022-01-17 22:41:01.258679000 +0800
+@@ -163,7 +163,7 @@
+     elif _os.name == 'nt':
+         dirlist.extend([ r'c:\temp', r'c:\tmp', r'\temp', r'\tmp' ])
+     else:
+-        dirlist.extend([ '/tmp', '/var/tmp', '/usr/tmp' ])
++        dirlist.extend([ '@TERMUX_PREFIX@/tmp' ])
+
+     # As a last resort, the current directory.
+     try:
+
+diff -uNr pypy2.7-v7.3.6-src/lib-python/2.7/uuid.py pypy2.7-v7.3.6-src.mod/lib-python/2.7/uuid.py
+--- pypy2.7-v7.3.6-src/lib-python/2.7/uuid.py           2021-10-03 14:36:11.000000000 +0800
++++ pypy2.7-v7.3.6-src.mod/lib-python/2.7/uuid.py       2022-01-18 00:06:31.330416000 +0800
+@@ -314,7 +314,7 @@
+ def _popen(command, args):
+     import os
+     path = os.environ.get("PATH", os.defpath).split(os.pathsep)
+-    path.extend(('/sbin', '/usr/sbin'))
++    path.extend(('@TERMUX_PREFIX@/bin',))
+     for dir in path:
+         executable = os.path.join(dir, command)
+         if (os.path.exists(executable) and
+
+diff -uNr pypy2.7-v7.3.6-src/lib-python/2.7/posixpath.py pypy2.7-v7.3.6-src.mod/lib-python/2.7/posixpath.py
+--- pypy2.7-v7.3.6-src/lib-python/2.7/posixpath.py      2021-10-03 14:36:11.000000000 +0800
++++ pypy2.7-v7.3.6-src.mod/lib-python/2.7/posixpath.py  2022-01-18 00:04:00.434242900 +0800
+@@ -32,7 +32,7 @@
+ extsep = '.'
+ sep = '/'
+ pathsep = ':'
+-defpath = ':/bin:/usr/bin'
++defpath = ':@TERMUX_PREFIX@/bin'
+ altsep = None
+ devnull = '/dev/null'
+

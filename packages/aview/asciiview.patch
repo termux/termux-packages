@@ -1,0 +1,40 @@
+--- ./asciiview.orig	2022-03-11 08:12:07.366680669 +0100
++++ ./asciiview	2022-03-11 08:12:28.626681326 +0100
+@@ -3,11 +3,11 @@
+ clear()
+ {
+   kill $! 2>/dev/null
+-  rm -f /tmp/aview$$.pgm 2>/dev/null
++  rm -f @TERMUX_PREFIX@/tmp/aview$$.pgm 2>/dev/null
+ }
+ myconvert()
+ {
+-   if anytopnm $1 >/tmp/aview$$.pgm 2>/dev/null ; then
++   if anytopnm $1 >@TERMUX_PREFIX@/tmp/aview$$.pgm 2>/dev/null ; then
+      exit
+    elif convert -colorspace gray $1 pgm:- 2>/dev/null ; then
+      exit
+@@ -51,8 +51,8 @@
+   esac
+ done
+ trap clear 0
+-mkfifo /tmp/aview$$.pgm
+-outfile=/tmp/aview$$.pgm
++mkfifo @TERMUX_PREFIX@/tmp/aview$$.pgm
++outfile=@TERMUX_PREFIX@/tmp/aview$$.pgm
+ for name in $filenames ; do
+ if test -r $name ; then
+ case $name in
+@@ -61,10 +61,10 @@
+   aaflip $options $name
+   ;;
+ *)
+-  myconvert $name >/tmp/aview$$.pgm &
++  myconvert $name >@TERMUX_PREFIX@/tmp/aview$$.pgm &
+   pid=$!
+   PATH="$PATH:."
+-  aview  $options /tmp/aview$$.pgm
++  aview  $options @TERMUX_PREFIX@/tmp/aview$$.pgm
+   kill $pid 2>/dev/null
+ esac
+ else

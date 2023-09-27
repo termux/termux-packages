@@ -1,0 +1,11 @@
+TERMUX_PKG_HOMEPAGE=http://bhepple.freeshell.org/gjots
+TERMUX_PKG_DESCRIPTION="A hierarchical note jotter"
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=3.2.1
+TERMUX_PKG_SRCURL=https://sourceforge.net/projects/gjots2/files/gjots2/${TERMUX_PKG_VERSION}/gjots2-${TERMUX_PKG_VERSION}.tgz
+TERMUX_PKG_SHA256=815d66f3d344ffb3dca4d8d4a1e69229160cee9c9d940d50d899d2b5ec5d9e11
+TERMUX_PKG_DEPENDS="gtksourceview4, pygobject, python"
+TERMUX_PKG_PYTHON_COMMON_DEPS="wheel"
+TERMUX_PKG_PLATFORM_INDEPENDENT=true
+TERMUX_PKG_BUILD_IN_SRC=true

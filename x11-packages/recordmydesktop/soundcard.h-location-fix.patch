@@ -1,0 +1,24 @@
+diff -uNr recordmydesktop-0.3.8.1/src/rmd_opendev.c recordmydesktop-0.3.8.1.mod/src/rmd_opendev.c
+--- recordmydesktop-0.3.8.1/src/rmd_opendev.c	2008-12-13 18:10:49.000000000 +0200
++++ recordmydesktop-0.3.8.1.mod/src/rmd_opendev.c	2020-02-11 14:32:05.694620898 +0200
+@@ -31,7 +31,7 @@
+     #include <alsa/asoundlib.h>
+ #else
+     #include <sys/ioctl.h>
+-    #include <sys/soundcard.h>
++    #include <linux/soundcard.h>
+ #endif
+ 
+ #include <stdlib.h>
+diff -uNr recordmydesktop-0.3.8.1/src/rmd_types.h recordmydesktop-0.3.8.1.mod/src/rmd_types.h
+--- recordmydesktop-0.3.8.1/src/rmd_types.h	2008-12-13 16:16:57.000000000 +0200
++++ recordmydesktop-0.3.8.1.mod/src/rmd_types.h	2020-02-11 14:31:49.222538398 +0200
+@@ -42,7 +42,7 @@
+     #define DEFAULT_AUDIO_DEVICE "hw:0,0"
+ #else
+     #include <sys/ioctl.h>
+-    #include <sys/soundcard.h>
++    #include <linux/soundcard.h>
+ 
+     #define DEFAULT_AUDIO_DEVICE "/dev/dsp"
+ #endif

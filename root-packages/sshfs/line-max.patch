@@ -1,0 +1,20 @@
+--- ./sshfs.c~	2021-06-08 10:52:08.000000000 +0200
++++ ./sshfs.c	2021-12-17 08:54:19.055115082 +0100
+@@ -4026,7 +4026,7 @@
+ 	*idmap = g_hash_table_new(NULL, NULL);
+ 	*r_idmap = g_hash_table_new(NULL, NULL);
+ 	FILE *fp;
+-	char line[LINE_MAX];
++	char line[PATH_MAX];
+ 	unsigned int lineno = 0;
+ 	uid_t local_uid = getuid();
+ 
+@@ -4052,7 +4052,7 @@
+ 		exit(1);
+ 	}
+ 
+-	while (fgets(line, LINE_MAX, fp) != NULL) {
++	while (fgets(line, PATH_MAX, fp) != NULL) {
+ 		lineno++;
+ 		uint32_t remote_id;
+ 		char *name;

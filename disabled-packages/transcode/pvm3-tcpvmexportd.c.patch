@@ -1,0 +1,20 @@
+--- a/pvm3/tcpvmexportd.c
++++ b/pvm3/tcpvmexportd.c
+@@ -91,7 +91,7 @@
+ 	fprintf(stderr,"\t -c name        name of slave function req in slave mode [none]\n");
+ 	fprintf(stderr,"\t -x parameters  multiplex parameters [none]\n");
+ 	fprintf(stderr,"\t -t type        elab video or audio frame (video|audio|system|multisystem) [video]\n");
+-	fprintf(stderr,"\t -f name        out file name [/tmp/my_file_name]\n");
++	fprintf(stderr,"\t -f name        out file name [@TERMUX_PREFIX@/tmp/my_file_name]\n");
+ 	fprintf(stderr,"\t -1 param       first parameter to pass to the slave function [null]\n");
+ 	fprintf(stderr,"\t -2 param       second parameter to pass to the slave function [null]\n");
+ 	fprintf(stderr,"\t -3 param       third parameter to pass to the slave function [null]\n");
+@@ -188,7 +188,7 @@
+ 	char s_cmd;
+ 	char *p_argv[]={"-s",(char*)0,(char*)0,(char*)0,(char*)0,(char*)0,(char*)0,(char*)0,(char*)0,(char*)0,(char*)0};
+ 	int s_slave=0,s_cont=1,s_file_dest;
+-	char *p_tmp_file="/tmp/my_file_name";
++	char *p_tmp_file="@TERMUX_PREFIX@/tmp/my_file_name";
+ 	pvm_config_env *p_pvm_conf;
+ 	pvm_config_filelist *p_my_filelist=NULL;
+ 	char s_hostname[MAX_BUF];

@@ -1,0 +1,29 @@
+--- a/predict.c
++++ b/predict.c
+@@ -2027,7 +2027,7 @@
+ 		exit(-1);
+ 	}
+ 	
+-	if ((type=SOCK_STREAM && listen(s,qlen))<0)
++	if (type==SOCK_STREAM && listen(sd,qlen)<0)
+ 	{
+ 		bailout("Listen fail");
+ 		exit(-1);
+@@ -2283,7 +2283,7 @@
+ 			/* Send request to predict with output
+ 			   directed to a temporary file under /tmp */
+ 
+-			strcpy(tempname,"/tmp/XXXXXX\0");
++			strcpy(tempname,"@TERMUX_PREFIX@/tmp/XXXXXX\0");
+ 			i=mkstemp(tempname);
+ 
+ 			sprintf(buff,"%s -f %s -t %s -q %s -o %s\n",predict_name,satname,tlefile,qthfile,tempname);
+@@ -2330,7 +2330,7 @@
+ 			/* Send request to predict with output
+ 			   directed to a temporary file under /tmp */
+ 
+-			strcpy(tempname,"/tmp/XXXXXX\0");
++			strcpy(tempname,"@TERMUX_PREFIX@/tmp/XXXXXX\0");
+ 			i=mkstemp(tempname);
+ 
+ 			sprintf(buff,"%s -p %s -t %s -q %s -o %s\n",predict_name, satname,tlefile,qthfile,tempname);

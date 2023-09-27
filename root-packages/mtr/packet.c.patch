@@ -1,0 +1,18 @@
+--- ./packet/packet.c.orig	2021-09-10 21:20:26.554615393 +0200
++++ ./packet/packet.c	2021-09-10 21:22:52.034900909 +0200
+@@ -44,15 +44,6 @@
+     cap_t cap;
+ #endif
+ 
+-    /*  Drop any suid permissions granted  */
+-    if (setgid(getgid()) || setuid(getuid())) {
+-        return -1;
+-    }
+-
+-    if (geteuid() != getuid() || getegid() != getgid()) {
+-        return -1;
+-    }
+-
+     /*
+        Drop all process capabilities.
+        This will revoke anything granted by a commandline 'setcap'

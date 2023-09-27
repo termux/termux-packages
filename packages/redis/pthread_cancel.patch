@@ -1,11 +1,72 @@
---- ./src/debug.c.orig	2021-05-01 14:39:04.609215050 +0000
-+++ ./src/debug.c	2021-05-01 14:39:20.555895312 +0000
-@@ -1706,7 +1706,7 @@
+--- a/src/bio.c
++++ b/src/bio.c
+@@ -295,7 +295,11 @@ void bioKillThreads(void) {
+ 
+     for (j = 0; j < BIO_NUM_OPS; j++) {
+         if (bio_threads[j] == pthread_self()) continue;
++#ifndef __ANDROID__
+         if (bio_threads[j] && pthread_cancel(bio_threads[j]) == 0) {
++#else
++        if (bio_threads[j] && pthread_kill(bio_threads[j], SIGUSR2) == 0) {
++#endif
+             if ((err = pthread_join(bio_threads[j],NULL)) != 0) {
+                 serverLog(LL_WARNING,
+                     "Bio thread for job type #%d can not be joined: %s",
+--- a/src/debug.c
++++ b/src/debug.c
+@@ -1708,7 +1708,11 @@ int memtest_test_linux_anonymous_maps(vo
  
  static void killMainThread(void) {
      int err;
--    if (pthread_self() != server.main_thread_id && pthread_cancel(server.main_thread_id) == 0) {
-+    if (pthread_self() != server.main_thread_id && pthread_kill(server.main_thread_id, 0) == 0) {
++#ifndef __ANDROID__
+     if (pthread_self() != server.main_thread_id && pthread_cancel(server.main_thread_id) == 0) {
++#else
++    if (pthread_self() != server.main_thread_id && pthread_kill(server.main_thread_id, SIGUSR2) == 0) {
++#endif
          if ((err = pthread_join(server.main_thread_id,NULL)) != 0) {
              serverLog(LL_WARNING, "main thread can not be joined: %s", strerror(err));
          } else {
+--- a/src/networking.c
++++ b/src/networking.c
+@@ -3606,7 +3606,11 @@ void killIOThreads(void) {
+     int err, j;
+     for (j = 0; j < server.io_threads_num; j++) {
+         if (io_threads[j] == pthread_self()) continue;
++#ifndef __ANDROID__
+         if (io_threads[j] && pthread_cancel(io_threads[j]) == 0) {
++#else
++        if (io_threads[j] && pthread_kill(io_threads[j], SIGUSR2) == 0) {
++#endif
+             if ((err = pthread_join(io_threads[j],NULL)) != 0) {
+                 serverLog(LL_WARNING,
+                     "IO thread(tid:%lu) can not be joined: %s",
+--- a/src/server.c
++++ b/src/server.c
+@@ -3144,12 +3144,27 @@ void resetServerStats(void) {
+     server.aof_delayed_fsync = 0;
+ }
+ 
++#ifdef __ANDROID__
++static void threadSignalHandler(int signum) {
++    pthread_exit(0);
++}
++#endif
++
+ /* Make the thread killable at any time, so that kill threads functions
+  * can work reliably (default cancelability type is PTHREAD_CANCEL_DEFERRED).
+  * Needed for pthread_cancel used by the fast memory test used by the crash report. */
+ void makeThreadKillable(void) {
++#ifndef __ANDROID__
+     pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
++#else
++    struct sigaction actions;
++    memset(&actions, 0, sizeof(actions));
++    sigemptyset(&actions.sa_mask);
++    actions.sa_flags = 0;
++    actions.sa_handler = threadSignalHandler;
++    sigaction(SIGUSR2, &actions, NULL);
++#endif
+ }
+ 
+ void initServer(void) {

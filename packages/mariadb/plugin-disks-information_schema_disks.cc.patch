@@ -1,0 +1,13 @@
+--- a/plugin/disks/information_schema_disks.cc
++++ b/plugin/disks/information_schema_disks.cc
+@@ -224,8 +224,10 @@ static int disks_fill_table(THD* pThd, T
+ #endif
+         // Try to keep to real storage by excluding
+         // read only mounts, and mount points that aren't directories
++#if !defined __ANDROID__ || __ANDROID_API__ >= 26
+         if (hasmntopt(pEnt, MNTOPT_RO) != NULL)
+             continue;
++#endif
+         if (stat(path, &f))
+             continue;
+         if (!S_ISDIR(f.st_mode))

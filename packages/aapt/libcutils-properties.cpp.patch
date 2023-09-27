@@ -1,0 +1,17 @@
+--- a/core/libcutils/properties.cpp
++++ b/core/libcutils/properties.cpp
+@@ -106,6 +106,7 @@
+     data->callback(name, value, data->cookie);
+ }
+ 
++#if defined __ANDROID__ && __ANDROID_API__ >= 26
+ static void property_list_callback(const prop_info* pi, void* data) {
+     __system_property_read_callback(pi, trampoline, data);
+ }
+@@ -114,5 +115,6 @@
+     callback_data data = {fn, cookie};
+     return __system_property_foreach(property_list_callback, &data);
+ }
++#endif
+ 
+ #endif

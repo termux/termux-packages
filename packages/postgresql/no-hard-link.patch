@@ -1,5 +1,18 @@
---- ./src/backend/access/transam/timeline.c	2021-05-11 02:11:42.000000000 +0530
-+++ ./src/backend/access/transam/timeline.c.mod	2021-06-17 13:56:32.191999896 +0530
+diff -uNr postgresql-15.0/contrib/basic_archive/basic_archive.c postgresql-15.0.mod/contrib/basic_archive/basic_archive.c
+--- postgresql-15.0/contrib/basic_archive/basic_archive.c	2022-10-10 22:57:37.000000000 +0200
++++ postgresql-15.0.mod/contrib/basic_archive/basic_archive.c	2022-10-14 15:49:45.037458815 +0200
+@@ -284,7 +284,7 @@
+ 	 * Sync the temporary file to disk and move it to its final destination.
+ 	 * This will fail if destination already exists.
+ 	 */
+-	(void) durable_rename_excl(temp, destination, ERROR);
++	(void) durable_link_or_rename(temp, destination, ERROR);
+ 
+ 	ereport(DEBUG1,
+ 			(errmsg("archived \"%s\" via basic_archive", file)));
+diff -uNr postgresql-15.0/src/backend/access/transam/timeline.c postgresql-15.0.mod/src/backend/access/transam/timeline.c
+--- postgresql-15.0/src/backend/access/transam/timeline.c	2022-10-10 22:57:37.000000000 +0200
++++ postgresql-15.0.mod/src/backend/access/transam/timeline.c	2022-10-14 15:20:34.736940580 +0200
 @@ -446,7 +446,7 @@
  	 * Perform the rename using link if available, paranoidly trying to avoid
  	 * overwriting an existing file (there shouldn't be one).
@@ -18,25 +31,26 @@
  }
  
  /*
---- ./src/backend/access/transam/xlog.c	2021-05-11 02:11:42.000000000 +0530
-+++ ./src/backend/access/transam/xlog.c.mod	2021-06-17 13:58:47.831999844 +0530
-@@ -3624,11 +3624,11 @@
+diff -uNr postgresql-15.0/src/backend/access/transam/xlog.c postgresql-15.0.mod/src/backend/access/transam/xlog.c
+--- postgresql-15.0/src/backend/access/transam/xlog.c	2022-10-10 22:57:37.000000000 +0200
++++ postgresql-15.0.mod/src/backend/access/transam/xlog.c	2022-10-14 15:53:55.126687831 +0200
+@@ -3327,10 +3327,10 @@
  	 * Perform the rename using link if available, paranoidly trying to avoid
  	 * overwriting an existing file (there shouldn't be one).
  	 */
 -	if (durable_rename_excl(tmppath, path, LOG) != 0)
 +	if (durable_link_or_rename(tmppath, path, LOG) != 0)
  	{
- 		if (use_lock)
- 			LWLockRelease(ControlFileLock);
+ 		LWLockRelease(ControlFileLock);
 -		/* durable_rename_excl already emitted log message */
 +		/* durable_link_or_rename already emitted log message */
  		return false;
  	}
  
---- ./src/backend/storage/file/fd.c	2021-05-11 02:11:42.000000000 +0530
-+++ ./src/backend/storage/file/fd.c.mod	2021-06-17 14:06:02.861999678 +0530
-@@ -767,7 +767,7 @@
+diff -uNr postgresql-15.0/src/backend/storage/file/fd.c postgresql-15.0.mod/src/backend/storage/file/fd.c
+--- postgresql-15.0/src/backend/storage/file/fd.c	2022-10-10 22:57:37.000000000 +0200
++++ postgresql-15.0.mod/src/backend/storage/file/fd.c	2022-10-14 15:20:34.736940580 +0200
+@@ -808,7 +808,7 @@
  }
  
  /*
@@ -45,7 +59,7 @@
   *
   * Similar to durable_rename(), except that this routine tries (but does not
   * guarantee) not to overwrite the target file.
-@@ -785,7 +785,7 @@
+@@ -826,7 +826,7 @@
   * valid upon return.
   */
  int
@@ -54,9 +68,10 @@
  {
  	/*
  	 * Ensure that, if we crash directly after the rename/link, a file with
---- ./src/include/pg_config_manual.h	2021-05-11 02:11:42.000000000 +0530
-+++ ./src/include/pg_config_manual.h.mod	2021-06-17 14:09:25.941999601 +0530
-@@ -138,7 +138,7 @@
+diff -uNr postgresql-15.0/src/include/pg_config_manual.h postgresql-15.0.mod/src/include/pg_config_manual.h
+--- postgresql-15.0/src/include/pg_config_manual.h	2022-10-10 22:57:37.000000000 +0200
++++ postgresql-15.0.mod/src/include/pg_config_manual.h	2022-10-14 15:20:34.736940580 +0200
+@@ -155,7 +155,7 @@
  /*
   * Define this if your operating system supports link()
   */
@@ -65,9 +80,10 @@
  #define HAVE_WORKING_LINK 1
  #endif
  
---- ./src/include/storage/fd.h	2021-05-11 02:11:42.000000000 +0530
-+++ ./src/include/storage/fd.h.mod	2021-06-17 14:13:22.074549249 +0530
-@@ -157,7 +157,7 @@
+diff -uNr postgresql-15.0/src/include/storage/fd.h postgresql-15.0.mod/src/include/storage/fd.h
+--- postgresql-15.0/src/include/storage/fd.h	2022-10-10 22:57:37.000000000 +0200
++++ postgresql-15.0.mod/src/include/storage/fd.h	2022-10-14 15:20:34.736940580 +0200
+@@ -187,7 +187,7 @@
  extern int	fsync_fname_ext(const char *fname, bool isdir, bool ignore_perm, int elevel);
  extern int	durable_rename(const char *oldfile, const char *newfile, int loglevel);
  extern int	durable_unlink(const char *fname, int loglevel);

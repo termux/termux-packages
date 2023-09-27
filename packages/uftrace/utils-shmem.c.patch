@@ -1,0 +1,12 @@
+diff -uNr uftrace-0.14/utils/shmem.c uftrace-0.14.mod/utils/shmem.c
+--- uftrace-0.14/utils/shmem.c	2023-06-20 13:58:52.000000000 +0800
++++ uftrace-0.14.mod/utils/shmem.c	2023-06-22 11:30:14.618587925 +0800
+@@ -17,7 +17,7 @@
+ 		const char *tmpdir;
+ 		tmpdir = getenv("TMPDIR");
+ 		if (!tmpdir)
+-			tmpdir = "/tmp";
++			tmpdir = "@TERMUX_PREFIX@/tmp";
+ 
+ 		snprintf(uftrace_dir, sizeof(uftrace_dir), "%s/uftrace", tmpdir);
+ 	}

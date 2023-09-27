@@ -1,0 +1,13 @@
+https://github.com/termux/termux-packages/issues/15852
+
+--- a/telepathy-glib/protocol.c
++++ b/telepathy-glib/protocol.c
+@@ -1791,7 +1791,7 @@
+         i++;
+     }
+ 
+-  param_specs = g_ptr_array_new_full (i, tp_value_array_free);
++  param_specs = g_ptr_array_new_full (i, (GDestroyNotify)tp_value_array_free);
+ 
+   for (key = keys; key != NULL && *key != NULL; key++)
+     {

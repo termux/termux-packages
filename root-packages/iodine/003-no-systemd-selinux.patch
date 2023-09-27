@@ -1,0 +1,23 @@
+diff -uNr iodine-0.7.0/src/osflags iodine-0.7.0.mod/src/osflags
+--- iodine-0.7.0/src/osflags	2014-06-16 23:28:43.000000000 +0300
++++ iodine-0.7.0.mod/src/osflags	2019-05-02 14:52:08.768570062 +0300
+@@ -20,9 +20,6 @@
+ 		;;
+ 		Linux)
+ 			FLAGS="";
+-			[ -e /usr/include/selinux/selinux.h ] && FLAGS="$FLAGS -lselinux";
+-			"$PKG_CONFIG" --exists libsystemd-daemon && FLAGS="$FLAGS $($PKG_CONFIG --libs libsystemd-daemon)";
+-			"$PKG_CONFIG" --exists libsystemd && FLAGS="$FLAGS $($PKG_CONFIG --libs libsystemd)";
+ 			echo $FLAGS;
+ 		;;
+ 	esac
+@@ -40,9 +37,6 @@
+ 		;;
+ 		Linux)
+ 			FLAGS="-D_GNU_SOURCE"
+-			[ -e /usr/include/selinux/selinux.h ] && FLAGS="$FLAGS -DHAVE_SETCON";
+-			"$PKG_CONFIG" --exists libsystemd-daemon && FLAGS="$FLAGS -DHAVE_SYSTEMD";
+-			"$PKG_CONFIG" --exists libsystemd && FLAGS="$FLAGS -DHAVE_SYSTEMD";
+ 			echo $FLAGS;
+ 		;;
+ 		GNU/kFreeBSD|GNU)

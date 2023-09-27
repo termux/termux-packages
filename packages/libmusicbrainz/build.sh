@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="The MusicBrainz Client Library"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=()
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_VERSION+=(5.1.0)
 TERMUX_PKG_VERSION+=(2.9.12) # libxml2 version
 TERMUX_PKG_VERSION+=(0.32.1) # libneon version
@@ -21,7 +22,7 @@ termux_step_post_get_source() {
 }
 
 termux_step_host_build() {
-	_PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
+	local _PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
 	mkdir -p $_PREFIX_FOR_BUILD
 	export PKG_CONFIG_PATH=$_PREFIX_FOR_BUILD/lib/pkgconfig
 

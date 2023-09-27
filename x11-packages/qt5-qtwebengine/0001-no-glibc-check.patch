@@ -1,0 +1,77 @@
+--- a/src/buildtools/configure.json
++++ b/src/buildtools/configure.json
+@@ -264,18 +264,6 @@
+             "label": "system gn",
+             "type": "detectGn"
+         },
+-        "webengine-glibc": {
+-            "label": "glibc > 2.16",
+-            "type": "compile",
+-            "test": {
+-                "include": "features.h",
+-                "tail": [
+-                    "#if __GLIBC__ < 2 || __GLIBC_MINOR__ < 17",
+-                    "#error glibc versions below 2.17 are not supported",
+-                    "#endif"
+-                ]
+-            }
+-        },
+         "webengine-gperf": {
+             "label": "gperf",
+             "type": "detectGperf"
+@@ -379,7 +367,6 @@
+                          && (!config.sanitizer || features.webengine-sanitizer)
+                          && (!config.linux || features.pkg-config)
+                          && (!config.linux || features.webengine-host-pkg-config)
+-                         && (!config.linux || features.webengine-system-glibc)
+                          && (!config.linux || features.webengine-system-khr)
+                          && (!config.linux || features.webengine-system-nss)
+                          && (!config.linux || features.webengine-system-dbus)
+@@ -517,11 +504,6 @@
+             "condition": "config.unix && !config.darwin && libs.webengine-nss",
+             "output": [ "privateFeature" ]
+         },
+-        "webengine-system-glibc": {
+-            "label": "glibc",
+-            "condition": "config.linux && tests.webengine-glibc",
+-            "output": [ "privateFeature" ]
+-        },
+         "webengine-system-x11" : {
+             "label": "x11",
+             "condition": "config.unix && libs.webengine-x11",
+@@ -782,8 +764,7 @@
+                         "webengine-system-fontconfig",
+                         "webengine-system-dbus",
+                         "webengine-system-nss",
+-                        "webengine-system-khr",
+-                        "webengine-system-glibc"
++                        "webengine-system-khr"
+                     ]
+                 },
+                 {
+--- a/src/buildtools/config/support.pri
++++ b/src/buildtools/config/support.pri
+@@ -26,7 +26,6 @@
+     !qtwebengine_checkForSanitizer(QtWebEngine):return(false)
+     linux:!qtwebengine_checkForPkgCfg(QtWebEngine):return(false)
+     linux:!qtwebengine_checkForHostPkgCfg(QtWebEngine):return(false)
+-    linux:!qtwebengine_checkForGlibc(QtWebEngine):return(false)
+     linux:!qtwebengine_checkForKhronos(QtWebEngine):return(false)
+     linux:!qtwebengine_checkForPackage(QtWebEngine,nss):return(false)
+     linux:!qtwebengine_checkForPackage(QtWebEngine,dbus):return(false)
+@@ -187,15 +186,6 @@
+         return(false)
+     }
+     return(true)
+-}
+-
+-defineTest(qtwebengine_checkForGlibc) {
+-    module = $$1
+-    !qtConfig(webengine-system-glibc) {
+-        qtwebengine_skipBuild("A suitable version >= 2.27 of libc required to build $${module} could not be found.")
+-        return(false)
+-    }
+-    return(true)
+ }
+ 
+ defineTest(qtwebengine_checkForKhronos) {

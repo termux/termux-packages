@@ -1,11 +1,11 @@
 --- a/src/grep_proc.cc
 +++ b/src/grep_proc.cc
-@@ -163,7 +163,7 @@
-     if (setvbuf(stdout, outbuf, _IOFBF, BUFSIZ * 2) < 0) {
+@@ -172,7 +172,7 @@
          perror("setvbuf");
      }
--    lnav_log_file = make_optional_from_nullable(fopen("/tmp/lnav.grep.err", "a"));
-+    lnav_log_file = make_optional_from_nullable(fopen("@TERMUX_PREFIX@/tmp/lnav.grep.err", "a"));
+     lnav_log_file
+-        = make_optional_from_nullable(fopen("/tmp/lnav.grep.err", "a"));
++        = make_optional_from_nullable(fopen("@TERMUX_PREFIX@/tmp/lnav.grep.err", "a"));
      line_value.reserve(BUFSIZ * 2);
      while (!this->gp_queue.empty()) {
          LineType start_line = this->gp_queue.front().first;

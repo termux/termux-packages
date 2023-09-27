@@ -4,18 +4,17 @@
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * Copyright by The HDF Group.                                               *
- * Copyright by the Board of Trustees of the University of Illinois.         *
  * All rights reserved.                                                      *
  *                                                                           *
  * This file is part of HDF5.  The full HDF5 copyright notice, including     *
  * terms governing use, modification, and redistribution, is contained in    *
  * the COPYING file, which can be found at the root of the source code       *
- * distribution tree, or in https://support.hdfgroup.org/ftp/HDF5/releases.  *
+ * distribution tree, or in https://www.hdfgroup.org/licenses.               *
  * If you do not have access to either file, you may request a copy from     *
  * help@hdfgroup.org.                                                        *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * Created:		Apr 20, 2019
- *			u0_a172@localhost
+ * Created:		Jan 24, 2023
+ *			u0_a101@localhost
  *
  * Purpose:		This machine-generated source code contains
  *			information about the library build configuration
@@ -28,33 +27,38 @@
  *-------------------------------------------------------------------------
  */
 
-char H5libhdf5_settings[]=
+#include "H5private.h"
+H5_GCC_DIAG_OFF("larger-than=")
+
+H5_CLANG_DIAG_OFF("overlength-strings")
+
+const char H5libhdf5_settings[]=
 	"        SUMMARY OF THE HDF5 CONFIGURATION\n"
 	"        =================================\n"
 	"\n"
 	"General Information:\n"
 	"-------------------\n"
-	"                   HDF5 Version: 1.10.5\n"
-	"                  Configured on: 2019-04-20\n"
+	"                   HDF5 Version: 1.14.0\n"
+	"                  Configured on: 2023-01-24\n"
 	"                  Configured by: Unix Makefiles\n"
-	"                    Host system: Linux-4.4.111-SoLdieR9312\n"
-	"              Uname information: Linux\n"
+	"                    Host system: Android-4.9.82-perf+\n"
+	"              Uname information: Android\n"
 	"                       Byte sex: little-endian\n"
 	"             Installation point: /data/data/com.termux/files/usr\n"
 	"\n"
 	"Compiling Options:\n"
 	"------------------\n"
-	"                     Build Mode: RelWithDebInfo\n"
-	"              Debugging Symbols: \n"
-	"                        Asserts: \n"
-	"                      Profiling: \n"
-	"             Optimization Level: \n"
+	"                     Build Mode: Release\n"
+	"              Debugging Symbols: OFF\n"
+	"                        Asserts: OFF\n"
+	"                      Profiling: OFF\n"
+	"             Optimization Level: OFF\n"
 	"\n"
 	"Linking Options:\n"
 	"----------------\n"
 	"                      Libraries: \n"
 	"  Statically Linked Executables: OFF\n"
-	"                        LDFLAGS: \n"
+	"                        LDFLAGS: -Wl,--as-needed -L/data/data/com.termux/files/usr/lib\n"
 	"                     H5_LDFLAGS: \n"
 	"                     AM_LDFLAGS: \n"
 	"                Extra libraries: m;dl\n"
@@ -63,13 +67,13 @@ char H5libhdf5_settings[]=
 	"\n"
 	"Languages:\n"
 	"----------\n"
-	"                              C: yes\n"
-	"                     C Compiler: /data/data/com.termux/files/usr/bin/cc 8.0.0\n"
+	"                              C: YES\n"
+	"                     C Compiler: /data/data/com.termux/files/usr/bin/clang 15.0.7\n"
 	"                       CPPFLAGS: \n"
 	"                    H5_CPPFLAGS: \n"
 	"                    AM_CPPFLAGS: \n"
-	"                         CFLAGS: -std=c99 \n"
-	"                      H5_CFLAGS: \n"
+	"                         CFLAGS:  -std=c99 -Oz -fstack-protector-strong -I/data/data/com.termux/files/usr/include\n"
+	"                      H5_CFLAGS: -Wall;-Warray-bounds;-Wcast-qual;-Wconversion;-Wdouble-promotion;-Wextra;-Wformat=2;-Wframe-larger-than=16384;-Wimplicit-fallthrough;-Wnull-dereference;-Wunused-const-variable;-Wwrite-strings;-Wpedantic;-Wvolatile-register-var;-Wno-c++-compat;-Wbad-function-cast;-Wimplicit-function-declaration;-Wincompatible-pointer-types;-Wmissing-declarations;-Wpacked;-Wshadow;-Wswitch;-Wno-error=incompatible-pointer-types-discards-qualifiers;-Wunused-function;-Wunused-variable;-Wunused-parameter;-Wcast-align;-Wformat;-Wno-missing-noreturn\n"
 	"                      AM_CFLAGS: \n"
 	"               Shared C Library: YES\n"
 	"               Static C Library: YES\n"
@@ -81,37 +85,46 @@ char H5libhdf5_settings[]=
 	"               AM Fortran Flags: \n"
 	"         Shared Fortran Library: YES\n"
 	"         Static Fortran Library: YES\n"
+	"               Module Directory: /data/data/com.termux/files/files/home/termux.libhdf5.build/mod\n"
 	"\n"
 	"                            C++: ON\n"
-	"                   C++ Compiler: /data/data/com.termux/files/usr/bin/c++ 8.0.0\n"
-	"                      C++ Flags: \n"
-	"                   H5 C++ Flags: \n"
+	"                   C++ Compiler: /data/data/com.termux/files/usr/bin/clang++ 15.0.7\n"
+	"                      C++ Flags:  -Oz -fstack-protector-strong -I/data/data/com.termux/files/usr/include\n"
+	"                   H5 C++ Flags: -Wall;-Warray-bounds;-Wcast-qual;-Wconversion;-Wdouble-promotion;-Wextra;-Wformat=2;-Wframe-larger-than=16384;-Wimplicit-fallthrough;-Wnull-dereference;-Wunused-const-variable;-Wwrite-strings;-Wpedantic;-Wvolatile-register-var;-Wno-c++-compat;-Wno-missing-noreturn\n"
 	"                   AM C++ Flags: \n"
 	"             Shared C++ Library: YES\n"
 	"             Static C++ Library: YES\n"
 	"\n"
 	"                            JAVA: OFF\n"
-	"                   JAVA Compiler:  \n"
+	"                 JAVA Compiler:  \n"
 	"\n"
 	"Features:\n"
 	"---------\n"
-	"                   Parallel HDF5: OFF\n"
-	"Parallel Filtered Dataset Writes: \n"
-	"              Large Parallel I/O: \n"
-	"              High-level library: ON\n"
-	"                    Threadsafety: OFF\n"
-	"             Default API mapping: v110\n"
-	"  With deprecated public symbols: ON\n"
-	"          I/O filters (external): \n"
-	"                             MPE: \n"
-	"                      Direct VFD: \n"
-	"                         dmalloc: \n"
-	"  Packages w/ extra debug output: \n"
-	"                     API Tracing: OFF\n"
-	"            Using memory checker: OFF\n"
-	" Memory allocation sanity checks: OFF\n"
-	"          Function Stack Tracing: OFF\n"
-	"       Strict File Format Checks: OFF\n"
-	"    Optimization Instrumentation: \n"
+	"                     Parallel HDF5: OFF\n"
+	"  Parallel Filtered Dataset Writes: \n"
+	"                Large Parallel I/O: \n"
+	"                High-level library: ON\n"
+	"Dimension scales w/ new references: \n"
+	"                  Build HDF5 Tests: OFF\n"
+	"                  Build HDF5 Tools: ON\n"
+	"                   Build GIF Tools: OFF\n"
+	"                      Threadsafety: OFF\n"
+	"               Default API mapping: v114\n"
+	"    With deprecated public symbols: ON\n"
+	"            I/O filters (external):  DEFLATE\n"
+	"                        Direct VFD: \n"
+	"                        Mirror VFD: \n"
+	"                     Subfiling VFD: \n"
+	"                (Read-Only) S3 VFD: \n"
+	"              (Read-Only) HDFS VFD: \n"
+	"    Packages w/ extra debug output: \n"
+	"                       API Tracing: OFF\n"
+	"              Using memory checker: OFF\n"
+	"            Function Stack Tracing: OFF\n"
+	"                  Use file locking: best-effort\n"
+	"         Strict File Format Checks: OFF\n"
+	"      Optimization Instrumentation: \n"
 ;
 
+H5_GCC_DIAG_ON("larger-than=")
+H5_CLANG_DIAG_OFF("overlength-strings")

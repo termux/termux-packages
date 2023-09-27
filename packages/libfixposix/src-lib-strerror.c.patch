@@ -1,0 +1,12 @@
+--- a/src/lib/strerror.c
++++ b/src/lib/strerror.c
+@@ -24,6 +24,9 @@
+ 
+ #include <lfp/strerror.h>
+ 
++#ifdef __ANDROID__
++#undef __USE_GNU
++#endif
+ #include <string.h>
+ 
+ #if defined(HAVE___XPG_STRERROR_R)

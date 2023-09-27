@@ -1,0 +1,14 @@
+--- a/support/reexport/backend_sqlite.c
++++ b/support/reexport/backend_sqlite.c
+@@ -10,6 +10,11 @@
+ #include <sys/random.h>
+ #include <unistd.h>
+ 
++#if defined __ANDROID__ && __ANDROID_API__ < 28
++#include <syscall.h>
++#define getrandom(buf,buflen,flags) syscall(SYS_getrandom,buf,buflen,flags)
++#endif
++
+ #include "conffile.h"
+ #include "reexport_backend.h"
+ #include "xlog.h"

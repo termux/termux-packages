@@ -1,0 +1,13 @@
+--- a/src/platform.c
++++ b/src/platform.c
+@@ -50,6 +50,10 @@
+ #if defined(__linux__)
+ /* memfd_create was introduced in glibc 2.27 */
+ #if !defined(__GLIBC__) || (__GLIBC__ >= 2 && __GLIBC_MINOR__ >= 27)
++#if defined __ANDROID__ && __ANDROID_API__ < 30
++#include <syscall.h>
++#define memfd_create(name,flags) syscall(SYS_memfd_create,name,flags)
++#endif
+ #define HAS_MEMFD 1
+ #endif
+ #endif

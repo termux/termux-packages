@@ -2,13 +2,13 @@ TERMUX_PKG_HOMEPAGE=https://getcomposer.org/
 TERMUX_PKG_DESCRIPTION="Dependency Manager for PHP"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@PuneetGopinath"
-TERMUX_PKG_VERSION=2.1.6
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="2.6.3"
 TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
-TERMUX_PKG_SRCURL=https://github.com/composer/composer.git
+TERMUX_PKG_SRCURL=git+https://github.com/composer/composer
 TERMUX_PKG_DEPENDS="php"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
+TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make_install() {
 	composer install

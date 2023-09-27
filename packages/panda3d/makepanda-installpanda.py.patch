@@ -1,0 +1,32 @@
+--- a/makepanda/installpanda.py
++++ b/makepanda/installpanda.py
+@@ -119,7 +119,7 @@
+     something like "lib" or "lib64" or in some cases, something
+     similar to "lib/x86_64-linux-gnu". """
+ 
+-    if sys.platform in ("darwin", "win32", "cygwin"):
++    if True:
+         return "lib"
+ 
+     # This one's a bit tricky.  Some systems require us to install
+@@ -182,7 +182,7 @@
+     # Write the Config.prc file.
+     Configrc = ReadFile(outputdir+"/etc/Config.prc")
+     Configrc = Configrc.replace("model-path    $THIS_PRC_DIR/..", "model-path    "+prefix+"/share/panda3d")
+-    if (sys.platform.startswith("freebsd")):
++    if True:
+         WriteFile(destdir+prefix+"/etc/Config.prc", Configrc)
+         oscmd("cp "+outputdir+"/etc/Confauto.prc "+destdir+prefix+"/etc/Confauto.prc")
+     else:
+@@ -220,11 +220,6 @@
+         if os.path.isdir(outputdir+"/panda3d.dist-info"):
+             oscmd("cp -R "+outputdir+"/panda3d.dist-info "+destdir+python_version["platlib"])
+ 
+-    if (sys.platform.startswith("freebsd")):
+-        oscmd("echo '"+libdir+"/panda3d'>    "+destdir+"/usr/local/libdata/ldconfig/panda3d")
+-    else:
+-        oscmd("echo '"+libdir+"/panda3d'>    "+destdir+"/etc/ld.so.conf.d/panda3d.conf")
+-
+     for base in os.listdir(outputdir+"/lib"):
+         if (not base.endswith(".a")) or base == "libp3pystub.a":
+             # We really need to specify -R in order not to follow symlinks on non-GNU
