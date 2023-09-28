@@ -38,12 +38,21 @@
      // Look for an environment variable override for the settings file location
 --- a/src/layer/layer_settings_util.cpp
 +++ b/src/layer/layer_settings_util.cpp
-@@ -50,7 +50,7 @@
- std::string GetEnvSettingName(const char *layer_key, const char *setting_key, TrimMode trim_mode) {
+@@ -48,7 +48,7 @@
+ }
+ 
+ static const char *GetDefaultPrefix() {
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+     return "vulkan.";
+ #else
+     return "";
+@@ -59,7 +59,7 @@
      std::stringstream result;
+     const std::string prefix = (requested_prefix == nullptr || trim_mode != TRIM_NAMESPACE) ? GetDefaultPrefix() : requested_prefix;
  
 -#if defined(__ANDROID__)
 +#if defined(__ANDROID__) && !defined(__TERMUX__)
+     const std::string full_prefix = std::string("debug.") + prefix + ".";
      switch (trim_mode) {
          default:
-         case TRIM_NONE: {
