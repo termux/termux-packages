@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Systems programming language focused on safety, speed an
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.72.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/rustc-$TERMUX_PKG_VERSION-src.tar.xz
 TERMUX_PKG_SHA256=aea58d962ff1c19521b9f587aad88285f0fd35b6b6738b031a7a15bb1b70a7c3
 _LLVM_MAJOR_VERSION=$(. $TERMUX_SCRIPTDIR/packages/libllvm/build.sh; echo $LLVM_MAJOR_VERSION)
@@ -59,6 +60,11 @@ termux_step_pre_configure() {
 	# >>> referenced by rand.c
 	$CC $CPPFLAGS -c $TERMUX_PKG_BUILDER_DIR/getloadavg.c
 	$AR rcu $RUST_LIBDIR/libgetloadavg.a getloadavg.o
+
+	# https://github.com/termux/termux-packages/issues/17962
+	# Android 8.x and older: CANNOT LINK EXECUTABLE "rustc": cannot locate symbol "syncfs"
+	"${CC}" ${CPPFLAGS} -c "${TERMUX_PKG_BUILDER_DIR}/syncfs.c"
+	"${AR}" rcu "${RUST_LIBDIR}/libsyncfs.a" syncfs.o
 }
 
 termux_step_configure() {
@@ -90,7 +96,7 @@ termux_step_configure() {
 	local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
 	export ${env_host}_OPENSSL_DIR=$TERMUX_PREFIX
 	export RUST_LIBDIR=$TERMUX_PKG_BUILDDIR/_lib
-	export CARGO_TARGET_${env_host}_RUSTFLAGS="-L$RUST_LIBDIR -C link-arg=-l:libgetloadavg.a"
+	export CARGO_TARGET_${env_host}_RUSTFLAGS="-L${RUST_LIBDIR} -C link-arg=-l:libgetloadavg.a -C link-arg=-l:libsyncfs.a"
 
 	if [ "$TERMUX_ARCH" = "aarch64" ] || [ "$TERMUX_ARCH" = "x86_64" ]; then
 		export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C link-arg=$($CC -print-libgcc-file-name) -C link-arg=-l:libunwind.a"
