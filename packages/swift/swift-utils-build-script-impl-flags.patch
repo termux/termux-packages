@@ -2,7 +2,7 @@ diff --git a/swift/utils/build-script-impl b/swift/utils/build-script-impl
 index b1d060328bc..218c9215260 100755
 --- a/swift/utils/build-script-impl
 +++ b/swift/utils/build-script-impl
-@@ -1854,6 +1854,9 @@ for host in "${ALL_HOSTS[@]}"; do
+@@ -1769,6 +1769,9 @@ for host in "${ALL_HOSTS[@]}"; do
                          "${cmake_options[@]}"
                          -DLLVM_TABLEGEN=$(build_directory "${LOCAL_HOST}" llvm)/bin/llvm-tblgen
                          -DSWIFT_INCLUDE_TEST_BINARIES:BOOL=FALSE
@@ -12,10 +12,24 @@ index b1d060328bc..218c9215260 100755
                      )
                  fi
  
+@@ -1784,6 +1784,13 @@ for host in "${ALL_HOSTS[@]}"; do
+                     native_swift_tools_path="${NATIVE_SWIFT_TOOLS_PATH}"
+                 fi
+ 
++                if [[ $(is_cross_tools_host ${host}) && "${host}" != "macosx-"* ]] ; then
++                    cmake_options=(
++                        "${cmake_options[@]}"
++                        -DCMAKE_Swift_COMPILER:PATH="${native_swift_tools_path}/swiftc"
++                    )
++                fi
++
+                 if [ "${BUILD_LLVM}" == "0" ] ; then
+                     cmake_options=(
+                         "${cmake_options[@]}"
 @@ -2035,6 +2035,7 @@ for host in "${ALL_HOSTS[@]}"; do
-                     -DSWIFT_BUILD_RUNTIME_WITH_HOST_COMPILER:BOOL=$(true_false "${BUILD_RUNTIME_WITH_HOST_COMPILER}")
                      -DLIBDISPATCH_CMAKE_BUILD_TYPE:STRING="${LIBDISPATCH_BUILD_TYPE}"
                      -DSWIFT_PATH_TO_SWIFT_SYNTAX_SOURCE:PATH="${SWIFT_SYNTAX_SOURCE_DIR}"
+                     -DSWIFT_ENABLE_BACKTRACING:BOOL=$(true_false "${SWIFT_ENABLE_BACKTRACING}")
 +                    -DSWIFT_CLANG_RESOURCE_DIR_SYMLINK_INSTALL_TARGET:STRING="../clang/${TERMUX_CLANG_VERSION}"
                      "${swift_cmake_options[@]}"
                  )

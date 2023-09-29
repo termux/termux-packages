@@ -1,0 +1,19 @@
+diff --git a/swiftpm/Sources/Build/BuildDescription/ProductBuildDescription.swift b/swiftpm/Sources/Build/BuildDescription/ProductBuildDescription.swift
+index 9e2529d00..ef22cbefa 100644
+--- a/swiftpm/Sources/Build/BuildDescription/ProductBuildDescription.swift
++++ b/swiftpm/Sources/Build/BuildDescription/ProductBuildDescription.swift
+@@ -308,14 +308,6 @@ public final class ProductBuildDescription: SPMBuildCore.ProductBuildDescription
+         args += self.buildParameters.linkerFlags
+         args += self.stripInvalidArguments(self.buildParameters.swiftCompilerFlags)
+ 
+-        // Add toolchain's libdir at the very end (even after the user -Xlinker arguments).
+-        //
+-        // This will allow linking to libraries shipped in the toolchain.
+-        let toolchainLibDir = try buildParameters.toolchain.toolchainLibDir
+-        if self.fileSystem.isDirectory(toolchainLibDir) {
+-            args += ["-L", toolchainLibDir.pathString]
+-        }
+-
+         // Library search path for the toolchain's copy of SwiftSyntax.
+         #if BUILD_MACROS_AS_DYLIBS
+         if product.type == .macro {

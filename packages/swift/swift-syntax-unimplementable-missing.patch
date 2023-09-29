@@ -1,0 +1,32 @@
+commit 1a7d44a11d4f06882c4a563b67e1f1b864c4c794
+Author: John McCall <rjmccall@apple.com>
+Date:   Tue Jul 18 13:21:12 2023 -0400
+
+    Diagnose attempts to reabstract variadic function types in unimplementable ways.
+
+diff --git a/swift/include/swift/AST/CASTBridging.h b/swift/include/swift/AST/CASTBridging.h
+index 69f017855d7..6cb23ad4c85 100644
+--- a/swift/include/swift/AST/CASTBridging.h
++++ b/swift/include/swift/AST/CASTBridging.h
+@@ -190,6 +190,7 @@ typedef enum ENUM_EXTENSIBILITY_ATTR(closed) BridgedTypeAttrKind : long {
+   BridgedTypeAttrKind_opened,
+   BridgedTypeAttrKind_pack_element,
+   BridgedTypeAttrKind_pseudogeneric,
++  BridgedTypeAttrKind_unimplementable,
+   BridgedTypeAttrKind_yields,
+   BridgedTypeAttrKind_yield_once,
+   BridgedTypeAttrKind_yield_many,
+diff --git a/swift/lib/ASTGen/Sources/ASTGen/Types.swift b/swift/lib/ASTGen/Sources/ASTGen/Types.swift
+index 34a185fe13f..89eec154f03 100644
+--- a/swift/lib/ASTGen/Sources/ASTGen/Types.swift
++++ b/swift/lib/ASTGen/Sources/ASTGen/Types.swift
+@@ -222,7 +222,8 @@ extension ASTGenVisitor {
+           case .autoclosure, .escaping, .noescape, .noDerivative, .async,
+             .sendable, .unchecked, ._local, ._noMetadata, .pack_owned,
+             .pack_guaranteed, .pack_inout, .pack_out, .pseudogeneric,
+-            .yields, .yield_once, .yield_many, .thin, .thick, .count:
++            .yields, .yield_once, .yield_many, .thin, .thick, .count,
++            .unimplementable:
+             TypeAttributes_addSimpleAttr(typeAttributes, typeAttrKind, atLoc, attrLoc)
+ 
+           case .opened, .pack_element, .differentiable, .convention,
