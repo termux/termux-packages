@@ -1,16 +1,3 @@
-diff --git a/cmark/src/CMakeLists.txt b/cmark/src/CMakeLists.txt
-index faabffa..65e23cc 100644
---- a/cmark/src/CMakeLists.txt
-+++ b/cmark/src/CMakeLists.txt
-@@ -162,7 +162,7 @@ if(CMARK_SHARED OR CMARK_STATIC)
-   set(CMARK_TARGETS_FILE ${CMAKE_CURRENT_BINARY_DIR}/cmarkTargets.cmake)
-   export(TARGETS ${CMARK_INSTALL} FILE ${CMARK_TARGETS_FILE})
- 
--  if(CMARK_THREADING AND NOT APPLE AND NOT MSVC)
-+  if(CMARK_THREADING AND NOT APPLE AND NOT MSVC AND NOT ANDROID)
-     if(CMARK_SHARED)
-       target_link_libraries(${LIBRARY} pthread)
-     endif(CMARK_SHARED)
 diff --git a/llvm-project/clang/runtime/CMakeLists.txt b/llvm-project/clang/runtime/CMakeLists.txt
 index 61b1c60bf590..5b0d10a67699 100644
 --- a/llvm-project/clang/runtime/CMakeLists.txt
@@ -44,19 +31,6 @@ index 1bcfc0734785..ddb77c91b22d 100644
  
  install(DIRECTORY ../../include/indexstore
    COMPONENT IndexStore
-diff --git a/llvm-project/llvm/CMakeLists.txt b/llvm-project/llvm/CMakeLists.txt
-index a888c4177fa5..6788a62fa8bd 100644
---- a/llvm-project/llvm/CMakeLists.txt
-+++ b/llvm-project/llvm/CMakeLists.txt
-@@ -625,7 +625,7 @@ option (LLVM_ENABLE_SPHINX "Use Sphinx to generate llvm documentation." OFF)
- option (LLVM_ENABLE_OCAMLDOC "Build OCaml bindings documentation." ON)
- option (LLVM_ENABLE_BINDINGS "Build bindings." ON)
- 
--if(UNIX)
-+if(UNIX AND CMAKE_SIZEOF_VOID_P GREATER_EQUAL 8)
-   set(LLVM_ENABLE_ONDISK_CAS_default ON)
- else()
-   set(LLVM_ENABLE_ONDISK_CAS_default OFF)
 diff --git a/llvm-project/cmake/Modules/HandleCompilerRT.cmake b/llvm-project/cmake/Modules/HandleCompilerRT.cmake
 index ac9e0871489d..b495cbfb5c2e 100644
 --- a/llvm-project/cmake/Modules/HandleCompilerRT.cmake

@@ -3,9 +3,6 @@ TERMUX_SUBPKG_INCLUDE="
 lib/swift/android/aarch64/*.swiftdoc
 lib/swift/android/aarch64/*.swiftmodule
 lib/swift/android/aarch64/glibc.modulemap
-lib/swift/android/aarch64/libcxxshim.h
-lib/swift/android/aarch64/libcxxshim.modulemap
-lib/swift/android/aarch64/libswiftCompatibilityBytecodeLayouts.a
 lib/swift/android/aarch64/libswiftCxx.a
 lib/swift/android/aarch64/SwiftGlibc.h
 lib/swift/android/aarch64/swiftrt.o

@@ -1,0 +1,14 @@
+diff --git a/products/libllbuild/include/llbuild/buildsystem.h b/products/libllbuild/include/llbuild/buildsystem.h
+index d75b9cc3..3c7ccc7b 100644
+--- a/products/libllbuild/include/llbuild/buildsystem.h
++++ b/products/libllbuild/include/llbuild/buildsystem.h
+@@ -40,6 +40,9 @@ typedef HANDLE FD;
+ #else
+ #include <sys/types.h>
+ #endif // defined(__linux__) || defined(__GNU__)
++#if defined(__ANDROID__)
++#include <signal.h>
++#endif
+ #include <unistd.h>
+ typedef pid_t llbuild_pid_t;
+ typedef int FD;

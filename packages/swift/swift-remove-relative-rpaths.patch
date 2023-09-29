@@ -7,9 +7,9 @@ index aabc3f2e..168f939c 100644
    if(NOT CMAKE_SYSTEM_NAME STREQUAL Windows)
      target_link_options(llbuildSwift PRIVATE "SHELL:-no-toolchain-stdlib-rpath")
 -    set_target_properties(llbuildSwift PROPERTIES
--      INSTALL_RPATH "$ORIGIN:$ORIGIN/../../$<LOWER_CASE:${CMAKE_SYSTEM_NAME}>")
+-      INSTALL_RPATH "$ORIGIN/../../$<LOWER_CASE:${CMAKE_SYSTEM_NAME}>")
 +#    set_target_properties(llbuildSwift PROPERTIES
-+ #     INSTALL_RPATH "$ORIGIN:$ORIGIN/../../$<LOWER_CASE:${CMAKE_SYSTEM_NAME}>")
++ #     INSTALL_RPATH "$ORIGIN/../../$<LOWER_CASE:${CMAKE_SYSTEM_NAME}>")
    endif()
  endif()
  set_target_properties(llbuildSwift PROPERTIES
@@ -58,7 +58,7 @@ diff --git a/swiftpm/Utilities/bootstrap b/swiftpm/Utilities/bootstrap
 index 92c368a86..e9d43b599 100755
 --- a/swiftpm/Utilities/bootstrap
 +++ b/swiftpm/Utilities/bootstrap
-@@ -744,7 +744,7 @@ def get_swiftpm_env_cmd(args):
+@@ -746,7 +746,7 @@ def get_swiftpm_env_cmd(args):
      env_cmd.append("SWIFTCI_USE_LOCAL_DEPS=1")
      env_cmd.append("SWIFTPM_MACOS_DEPLOYMENT_TARGET=%s" % g_macos_deployment_target)
  

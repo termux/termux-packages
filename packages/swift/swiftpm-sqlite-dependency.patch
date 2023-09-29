@@ -14,11 +14,11 @@ diff --git a/swiftpm/Utilities/bootstrap b/swiftpm/Utilities/bootstrap
 index 085056de..1ded1a90 100755
 --- a/swiftpm/Utilities/bootstrap
 +++ b/swiftpm/Utilities/bootstrap
-@@ -827,6 +827,7 @@ def get_swiftpm_flags(args):
-     if '-android' in args.build_target:
-         build_flags.extend(["-Xswiftc", "-Xcc", "-Xswiftc", "-U_GNU_SOURCE"])
-         build_flags.extend(["-Xlinker", "-landroid-spawn"])
-+        build_flags.extend(["--pkg-config-path", os.path.join(os.path.split(args.cross_compile_config)[0], 'lib/pkgconfig')])
+@@ -834,6 +834,7 @@ def get_swiftpm_flags(args):
+             build_flags += ["--arch", "x86_64", "--arch", "arm64"]
+         elif cross_compile_hosts.startswith('android-'):
+             build_flags.extend(["--destination", args.cross_compile_config])
++            build_flags.extend(["--pkg-config-path", os.path.join(os.path.split(args.cross_compile_config)[0], "lib/pkgconfig")])
+         else:
+             error("cannot cross-compile for %s" % cross_compile_hosts)
  
-     cross_compile_hosts = args.cross_compile_hosts
-     if cross_compile_hosts:
