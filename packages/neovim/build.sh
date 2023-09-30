@@ -8,7 +8,7 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/neovim/neovim/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=39d79107c54d2f3babcad2cd157c399241c04f6e75e98c18e8afaf2bb5e82937
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
+TERMUX_PKG_UPDATE_VERSION_REGEXP="^\d+\.\d+\.\d+$"
 TERMUX_PKG_DEPENDS="libiconv, libuv, luv, libmsgpack, libandroid-support, libvterm (>= 1:0.3-0), libtermkey, libluajit, libunibilium, libtreesitter"
 TERMUX_PKG_HOSTBUILD=true
 
@@ -26,13 +26,9 @@ TERMUX_PKG_CONFFILES="share/nvim/sysinit.vim"
 termux_pkg_auto_update() {
 	# Get the latest release tag:
 	local tag
-	tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}")"
-	# check if this is not a numbered release:
-	if grep -qP "^${TERMUX_PKG_UPDATE_VERSION_REGEXP}\$" <<<"$tag"; then
-		termux_pkg_upgrade_version "$tag"
-	else
-		echo "WARNING: Skipping auto-update: Not a numbered release($tag)"
-	fi
+	tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}" \
+		latest-regex "${TERMUX_PKG_UPDATE_VERSION_REGEXP}")"
+	termux_pkg_upgrade_version "$tag"
 }
 
 _patch_luv() {
