@@ -182,6 +182,9 @@ PACKAGES+=" libarchive-tools"
 # Needed by cavif-rs
 PACKAGES+=" nasm"
 
+# Needed by debianutils
+PACKAGES+=" po4a"
+
 # Needed by dgsh
 PACKAGES+=" rsync"
 
