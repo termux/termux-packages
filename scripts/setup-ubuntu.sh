@@ -302,6 +302,9 @@ PACKAGES+=" libdebuginfod-dev"
 # Needed to set up CGCT and also to set up other packages
 PACKAGES+=" patchelf"
 
+# Needed by lldb for python integration
+PACKAGES+=" swig"
+
 # Do not require sudo if already running as root.
 if [ "$(id -u)" = "0" ]; then
 	SUDO=""
