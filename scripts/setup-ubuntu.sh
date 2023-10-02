@@ -58,6 +58,7 @@ PACKAGES+=" python3-sphinx-rtd-theme"
 PACKAGES+=" python3-sphinxcontrib.qthelp"
 PACKAGES+=" scdoc"
 PACKAGES+=" texinfo"
+PACKAGES+=" txt2man"
 PACKAGES+=" xmlto"
 PACKAGES+=" xmltoman"
 
