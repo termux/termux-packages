@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=20221030-3.1
 TERMUX_PKG_SRCURL=https://thrysoee.dk/editline/libedit-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=f0925a5adf4b1bf116ee19766b7daa766917aec198747943b1c4edf67a4be2bb
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses"
 TERMUX_PKG_BREAKS="libedit-dev"
 TERMUX_PKG_REPLACES="libedit-dev"
