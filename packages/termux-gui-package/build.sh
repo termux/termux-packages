@@ -9,6 +9,8 @@ TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_SRCURL="https://github.com/tareksander/termux-gui-package/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256="79a231f6550bde39c0bdd4eca0fce91b21df9c817345072c4859567437e485bf"
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 TERMUX_PKG_PYTHON_TARGET_DEPS="termuxgui"
 
 termux_step_create_debscripts() {
