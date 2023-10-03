@@ -7,6 +7,8 @@ TERMUX_PKG_VERSION=0.0.14
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/Yawning/obfs4/archive/obfs4proxy-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=a4b7520e732b0f168832f6f2fdf1be57f3e2cce0612e743d3f6b51341a740903
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_METHOD=repology
 TERMUX_PKG_BUILD_IN_SRC=true
 
 ## obfs4proxy is a pluggable transport plugin for Tor, so
