@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.0.git20211120"
 TERMUX_PKG_SRCURL=https://github.com/tfenne/pipebuffer/archive/9af1e18b38b9a62b054047e4131d4077cce101ae.tar.gz
 TERMUX_PKG_SHA256=cc73135fa4f3bec90ab762271122dd7671bfc9f664a9c4bda9734b661372ac6d
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
