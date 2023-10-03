@@ -66,11 +66,13 @@ PACKAGES+=" xmltoman"
 PACKAGES+=" python3.9"
 PACKAGES+=" python3.10"
 PACKAGES+=" python3.11"
+PACKAGES+=" python3.12"
 PACKAGES+=" python3-pip"
 PACKAGES+=" python3-setuptools"
 PACKAGES+=" python-wheel-common"
 PACKAGES+=" python3.10-venv"
 PACKAGES+=" python3.11-venv"
+PACKAGES+=" python3.12-venv"
 
 # Needed by package bc.
 PACKAGES+=" ed"
