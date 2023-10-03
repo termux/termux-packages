@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE="https://github.com/tweag/ormolu"
+TERMUX_PKG_DESCRIPTION="A formatter for Haskell source code"
+TERMUX_PKG_LICENSE="BSD 3-Clause"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="0.4.0.0"
+TERMUX_PKG_SRCURL="https://hackage.haskell.org/package/ormolu-${TERMUX_PKG_VERSION}/ormolu-${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256="4902ff5472398620b8c8fe363773a3aa4d111d68f20ed125e72f0ae5935b91aa"
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_DEPENDS="ghc-libs, haskell-ansi-terminal, haskell-diff, haskell-cabal, haskell-syb, haskell-optparse-applicative, haskell-ghc-lib-parser, haskell-dlist, haskell-gitrev"
+TERMUX_PKG_IS_HASKELL_LIB=false

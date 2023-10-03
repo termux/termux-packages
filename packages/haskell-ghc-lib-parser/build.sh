@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE="https://github.com/digital-asset/ghc-lib"
+TERMUX_PKG_DESCRIPTION="The GHC API, decoupled from GHC versions"
+TERMUX_PKG_LICENSE="BSD 3-Clause"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="9.2.2.20220307"
+TERMUX_PKG_SRCURL="https://hackage.haskell.org/package/ghc-lib-parser-${TERMUX_PKG_VERSION}/ghc-lib-parser-${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256="86f4b23dbc245c48d3f159911c221150458e6ea87b6cfa65f7306393639f6b88"
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_DEPENDS="ghc-libs"

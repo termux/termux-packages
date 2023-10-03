@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE="https://github.com/ekmett/ansi-wl-pprint"
+TERMUX_PKG_DESCRIPTION="The Wadler/Leijen Pretty Printer for colored ANSI terminal output"
+TERMUX_PKG_LICENSE="BSD 3-Clause"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="0.6.9"
+TERMUX_PKG_SRCURL="https://hackage.haskell.org/package/ansi-wl-pprint-${TERMUX_PKG_VERSION}/ansi-wl-pprint-${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256="a7b2e8e7cd3f02f2954e8b17dc60a0ccd889f49e2068ebb15abfa1d42f7a4eac"
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_DEPENDS="ghc-libs, haskell-ansi-terminal"
