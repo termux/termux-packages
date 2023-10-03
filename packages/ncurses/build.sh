@@ -25,6 +25,8 @@ TERMUX_PKG_SHA256=(ca4a28ed4d38a7b79e1cd883e3d2755839072a7e4fe8cf265be1ef4ae79b6
 		   3ae9ebef28aad081c6c11351f086776e2fd9547563b2f900732b41c376bec05a
 		   1e9c66ed6025b80e143bcde89f3265b51c15d0b71a05d7c6c1dc580a2f00fee7
 		   0fb3370c662f5b87d1b9a487aef999195212b192e08f6f68a572fed8fd637e07)
+TERMUX_PKG_AUTO_UPDATE=false
+
 # ncurses-utils: tset/reset/clear are moved to package 'ncurses'.
 TERMUX_PKG_BREAKS="ncurses-dev, ncurses-utils (<< 6.1.20190511-4)"
 TERMUX_PKG_REPLACES="ncurses-dev, ncurses-utils (<< 6.1.20190511-4)"
