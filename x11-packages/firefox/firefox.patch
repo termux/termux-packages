@@ -67,11 +67,11 @@
  #define PREF_AUDIOIPC_STACK_SIZE "media.audioipc.stack_size"
  #define PREF_AUDIOIPC_SHM_AREA_SIZE "media.audioipc.shm_area_size"
  
--#if (defined(XP_LINUX) && !defined(MOZ_WIDGET_ANDROID)) || \
-+#if (defined(XP_LINUX) && !defined(__TERMUX__)) || \
-     defined(XP_MACOSX) || defined(XP_WIN)
+-#if defined(XP_LINUX) || defined(XP_MACOSX) || defined(XP_WIN)
++#if (defined(XP_LINUX) && !defined(__TERMUX__)) || defined(XP_MACOSX) || defined(XP_WIN)
  #  define MOZ_CUBEB_REMOTING
  #endif
+ 
 --- a/dom/media/moz.build
 +++ b/dom/media/moz.build
 @@ -321,7 +321,7 @@
