@@ -6,6 +6,8 @@ TERMUX_PKG_REVISION=2
 TERMUX_PKG_MAINTAINER="Oliver Schmidhauser @Neo-Oli"
 TERMUX_PKG_SRCURL=https://github.com/signalapp/libsignal-protocol-c/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=c22e7690546e24d46210ca92dd808f17c3102e1344cd2f9a370136a96d22319d
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 TERMUX_PKG_DEPENDS="openssl"
 
 termux_step_pre_configure() {
