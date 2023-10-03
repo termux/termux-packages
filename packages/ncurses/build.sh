@@ -12,7 +12,7 @@ _SNAPSHOT_COMMIT=8bd5a3d98fc741bdcc9e5fada1a3d5980e1ea22a
 TERMUX_PKG_VERSION=(6.4.20231001
 		    9.31
 		    15
-		    0.26.5
+		    0.30.0
 		    0.11.0)
 TERMUX_PKG_SRCURL=(https://github.com/ThomasDickey/ncurses-snapshots/archive/${_SNAPSHOT_COMMIT}.tar.gz
 		   https://fossies.org/linux/misc/rxvt-unicode-${TERMUX_PKG_VERSION[1]}.tar.bz2
@@ -22,7 +22,7 @@ TERMUX_PKG_SRCURL=(https://github.com/ThomasDickey/ncurses-snapshots/archive/${_
 TERMUX_PKG_SHA256=(ca4a28ed4d38a7b79e1cd883e3d2755839072a7e4fe8cf265be1ef4ae79b6bc2
 		   aaa13fcbc149fe0f3f391f933279580f74a96fd312d6ed06b8ff03c2d46672e8
 		   3ae9ebef28aad081c6c11351f086776e2fd9547563b2f900732b41c376bec05a
-		   7a1b444f1cc10e16ee0f20a804c0f80b52417eeabf60d9f25e37ef192503ba26
+		   1e9c66ed6025b80e143bcde89f3265b51c15d0b71a05d7c6c1dc580a2f00fee7
 		   0fb3370c662f5b87d1b9a487aef999195212b192e08f6f68a572fed8fd637e07)
 # ncurses-utils: tset/reset/clear are moved to package 'ncurses'.
 TERMUX_PKG_BREAKS="ncurses-dev, ncurses-utils (<< 6.1.20190511-4)"
