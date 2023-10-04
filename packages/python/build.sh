@@ -5,6 +5,7 @@ TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.11.6
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=0fab78fa7f133f4f38210c6260d90d7c0d5c7198446419ce057ec7ac2e6f5f38
 TERMUX_PKG_AUTO_UPDATE=false
@@ -103,18 +104,20 @@ termux_step_create_debscripts() {
 
 	if [[ -f "$TERMUX_PREFIX/bin/pip" && \
 	 ! (("$TERMUX_PACKAGE_FORMAT" = "debian" && -f $TERMUX_PREFIX/var/lib/dpkg/info/python-pip.list) || \
-	    ("$TERMUX_PACKAGE_FORMAT" = "pacman" && \$(ls $TERMUX_PREFIX/var/lib/pacman/local/python-pip-*))) ]]; then
+	    ("$TERMUX_PACKAGE_FORMAT" = "pacman" && \$(ls $TERMUX_PREFIX/var/lib/pacman/local/python-pip-* 2>/dev/null))) ]]; then
 		echo "Removing pip..."
 		rm -f $TERMUX_PREFIX/bin/pip $TERMUX_PREFIX/bin/pip3* $TERMUX_PREFIX/bin/easy_install $TERMUX_PREFIX/bin/easy_install-3*
 		rm -Rf $TERMUX_PREFIX/lib/python${_MAJOR_VERSION}/site-packages/pip
 		rm -Rf ${TERMUX_PREFIX}/lib/python${_MAJOR_VERSION}/site-packages/pip-*.dist-info
 	fi
 
-	echo ""
-	echo "== Note: pip is now separate from python =="
-	echo "To install, enter the following command:"
-	echo "   pkg install python-pip"
-	echo ""
+	if [ ! -f "$TERMUX_PREFIX/bin/pip" ]; then
+		echo
+		echo "== Note: pip is now separate from python =="
+		echo "To install, enter the following command:"
+		echo "   pkg install python-pip"
+		echo
+	fi
 
 	exit 0
 	POSTINST_EOF
