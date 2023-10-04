@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION="1:1.12.13"
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL="https://github.com/termux/distfiles/releases/download/2021.01.04/cvs-${TERMUX_PKG_VERSION:2}+real-26.tar.xz"
 TERMUX_PKG_SHA256=0eda91f5e8091b676c90b2a171f24f9293acb552f4e4f77b590ae8d92a547256
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="zlib, libandroid-support"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 cvs_cv_func_printf_ptr=yes
