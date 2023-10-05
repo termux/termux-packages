@@ -174,9 +174,6 @@ PACKAGES+=" luajit"
 # Needed by libduktape
 PACKAGES+=" bc"
 
-# Java.
-PACKAGES+=" openjdk-8-jdk openjdk-18-jdk"
-
 # needed by ovmf
 PACKAGES+=" libarchive-tools"
 
