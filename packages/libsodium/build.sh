@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Network communication, cryptography and signaturing libr
 TERMUX_PKG_LICENSE="ISC"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.0.19"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/jedisct1/libsodium/archive/${TERMUX_PKG_VERSION}-RELEASE.tar.gz
 TERMUX_PKG_SHA256=4fb996013283f482f46a457c8ff2c1495e797788e78e8ec56b1aa1b19253bf75
 TERMUX_PKG_AUTO_UPDATE=true
@@ -19,5 +20,11 @@ termux_step_post_get_source() {
 				configure.ac)
 	if [ ! "${e}" ] || [ "${_SOVERSION}" != "$(( "${e}" ))" ]; then
 		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
+
+termux_step_pre_configure() {
+	if [ "$TERMUX_ARCH" = "aarch64" ]; then
+		export CFLAGS_ARMCRYPTO="-march=armv8-a+crypto+aes"
 	fi
 }
