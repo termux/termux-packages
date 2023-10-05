@@ -30,6 +30,9 @@ termux_step_post_get_source() {
 	# This port uses perl-cross: http://arsv.github.io/perl-cross/
 	cp -rf perl-cross-${TERMUX_PKG_VERSION[1]}/* .
 
+	#DELETEME
+	cp -rf cnf/diffs/perl5-5.39.{2,3}
+
 	# Remove old installation to force fresh:
 	rm -rf $TERMUX_PREFIX/lib/perl5
 	rm -f $TERMUX_PREFIX/lib/libperl.so
