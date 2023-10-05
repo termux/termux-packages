@@ -1,6 +1,6 @@
 diff -uNr zig-bootstrap-0.11.0/zig/lib/std/os/linux.zig zig-bootstrap-0.11.0.mod/zig/lib/std/os/linux.zig
 --- zig-bootstrap-0.11.0/zig/lib/std/os/linux.zig	2023-08-11 09:21:14.000000000 +0800
-+++ zig-bootstrap-0.11.0.mod/zig/lib/std/os/linux.zig	2023-09-05 10:51:44.683837753 +0800
++++ zig-bootstrap-0.11.0.mod/zig/lib/std/os/linux.zig	2023-09-27 11:00:54.962817163 +0800
 @@ -590,7 +590,7 @@
  }
  
@@ -10,3 +10,21 @@ diff -uNr zig-bootstrap-0.11.0/zig/lib/std/os/linux.zig zig-bootstrap-0.11.0.mod
          return syscall2(.access, @intFromPtr(path), mode);
      } else {
          return syscall4(.faccessat, @as(usize, @bitCast(@as(isize, AT.FDCWD))), @intFromPtr(path), mode, 0);
+@@ -604,7 +604,7 @@
+ pub fn pipe(fd: *[2]i32) usize {
+     if (comptime (native_arch.isMIPS() or native_arch.isSPARC())) {
+         return syscall_pipe(fd);
+-    } else if (@hasField(SYS, "pipe")) {
++    } else if (@hasField(SYS, "pipe") and (comptime builtin.cpu.arch != .x86_64)) {
+         return syscall1(.pipe, @intFromPtr(fd));
+     } else {
+         return syscall2(.pipe2, @intFromPtr(fd), 0);
+@@ -1446,7 +1446,7 @@
+ }
+ 
+ pub fn statx(dirfd: i32, path: [*]const u8, flags: u32, mask: u32, statx_buf: *Statx) usize {
+-    if (@hasField(SYS, "statx")) {
++    if (@hasField(SYS, "statx") and (comptime builtin.cpu.arch != .aarch64) and (comptime builtin.cpu.arch != .arm) and (comptime builtin.cpu.arch != .riscv64) and (comptime builtin.cpu.arch != .x86) and (comptime builtin.cpu.arch != .x86_64)) {
+         return syscall5(
+             .statx,
+             @as(usize, @bitCast(@as(isize, dirfd))),

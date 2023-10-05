@@ -1,6 +1,6 @@
-diff -uNr firefox-117.0/dom/media/webaudio/FFTBlock.h firefox-117.0.mod/dom/media/webaudio/FFTBlock.h
---- firefox-117.0/dom/media/webaudio/FFTBlock.h	2023-08-25 02:33:48.000000000 +0800
-+++ firefox-117.0.mod/dom/media/webaudio/FFTBlock.h	2023-08-30 19:58:43.046671773 +0800
+diff -uNr firefox-118.0/dom/media/webaudio/FFTBlock.h firefox-118.0.mod/dom/media/webaudio/FFTBlock.h
+--- firefox-118.0/dom/media/webaudio/FFTBlock.h	2023-09-19 01:41:16.000000000 +0800
++++ firefox-118.0.mod/dom/media/webaudio/FFTBlock.h	2023-09-28 02:38:09.187038018 +0800
 @@ -7,6 +7,10 @@
  #ifndef FFTBlock_h_
  #define FFTBlock_h_
@@ -12,9 +12,9 @@ diff -uNr firefox-117.0/dom/media/webaudio/FFTBlock.h firefox-117.0.mod/dom/medi
  #ifdef BUILD_ARM_NEON
  #  include <cmath>
  #  include "mozilla/arm.h"
-diff -uNr firefox-117.0/gfx/cairo/libpixman/src/pixman-arm.c firefox-117.0.mod/gfx/cairo/libpixman/src/pixman-arm.c
---- firefox-117.0/gfx/cairo/libpixman/src/pixman-arm.c	2023-08-25 02:33:49.000000000 +0800
-+++ firefox-117.0.mod/gfx/cairo/libpixman/src/pixman-arm.c	2023-08-30 19:58:43.050671773 +0800
+diff -uNr firefox-118.0/gfx/cairo/libpixman/src/pixman-arm.c firefox-118.0.mod/gfx/cairo/libpixman/src/pixman-arm.c
+--- firefox-118.0/gfx/cairo/libpixman/src/pixman-arm.c	2023-09-19 01:41:17.000000000 +0800
++++ firefox-118.0.mod/gfx/cairo/libpixman/src/pixman-arm.c	2023-09-28 02:38:09.187038018 +0800
 @@ -34,6 +34,12 @@
      ARM_IWMMXT		= (1 << 4)
  } arm_cpu_features_t;
@@ -28,10 +28,10 @@ diff -uNr firefox-117.0/gfx/cairo/libpixman/src/pixman-arm.c firefox-117.0.mod/g
  #if defined(USE_ARM_SIMD) || defined(USE_ARM_NEON) || defined(USE_ARM_IWMMXT)
  
  #if defined(_MSC_VER)
-diff -uNr firefox-117.0/media/libtheora/moz.build firefox-117.0.mod/media/libtheora/moz.build
---- firefox-117.0/media/libtheora/moz.build	2023-08-25 02:33:53.000000000 +0800
-+++ firefox-117.0.mod/media/libtheora/moz.build	2023-08-30 19:58:43.038671773 +0800
-@@ -79,7 +79,7 @@
+diff -uNr firefox-118.0/media/libtheora/moz.build firefox-118.0.mod/media/libtheora/moz.build
+--- firefox-118.0/media/libtheora/moz.build	2023-09-19 01:41:21.000000000 +0800
++++ firefox-118.0.mod/media/libtheora/moz.build	2023-09-28 02:38:09.191038018 +0800
+@@ -80,7 +80,7 @@
          ]
  
  if CONFIG['GNU_AS']:
@@ -40,21 +40,9 @@ diff -uNr firefox-117.0/media/libtheora/moz.build firefox-117.0.mod/media/libthe
          SOURCES += [
              'lib/arm/armcpu.c',
              'lib/arm/armstate.c',
-diff -uNr firefox-117.0/media/libtremor/lib/moz.build firefox-117.0.mod/media/libtremor/lib/moz.build
---- firefox-117.0/media/libtremor/lib/moz.build	2023-08-25 02:33:54.000000000 +0800
-+++ firefox-117.0.mod/media/libtremor/lib/moz.build	2023-08-30 19:58:43.038671773 +0800
-@@ -24,7 +24,7 @@
- if CONFIG['OS_ARCH'] == 'AIX':
-     DEFINES['alloca'] = '__alloca'
- 
--if CONFIG['CPU_ARCH'] == 'arm' and CONFIG['CC_TYPE'] in ('clang', 'gcc') and not CONFIG['MOZ_THUMB2']:
-+if False:
-     DEFINES['_ARM_ASSEM_'] = True
- 
- LOCAL_INCLUDES += [
-diff -uNr firefox-117.0/media/libvpx/libvpx/vpx_ports/arm_cpudetect.c firefox-117.0.mod/media/libvpx/libvpx/vpx_ports/arm_cpudetect.c
---- firefox-117.0/media/libvpx/libvpx/vpx_ports/arm_cpudetect.c	2023-08-25 02:33:53.000000000 +0800
-+++ firefox-117.0.mod/media/libvpx/libvpx/vpx_ports/arm_cpudetect.c	2023-08-30 19:58:43.054671773 +0800
+diff -uNr firefox-118.0/media/libvpx/libvpx/vpx_ports/arm_cpudetect.c firefox-118.0.mod/media/libvpx/libvpx/vpx_ports/arm_cpudetect.c
+--- firefox-118.0/media/libvpx/libvpx/vpx_ports/arm_cpudetect.c	2023-09-19 01:41:21.000000000 +0800
++++ firefox-118.0.mod/media/libvpx/libvpx/vpx_ports/arm_cpudetect.c	2023-09-28 02:38:30.015038019 +0800
 @@ -91,7 +91,7 @@
    return flags & mask;
  }
@@ -64,9 +52,9 @@ diff -uNr firefox-117.0/media/libvpx/libvpx/vpx_ports/arm_cpudetect.c firefox-11
  #include <cpu-features.h>
  
  int arm_cpu_caps(void) {
-diff -uNr firefox-117.0/media/openmax_dl/dl/moz.build firefox-117.0.mod/media/openmax_dl/dl/moz.build
---- firefox-117.0/media/openmax_dl/dl/moz.build	2023-08-25 02:33:54.000000000 +0800
-+++ firefox-117.0.mod/media/openmax_dl/dl/moz.build	2023-08-30 19:58:43.042671773 +0800
+diff -uNr firefox-118.0/media/openmax_dl/dl/moz.build firefox-118.0.mod/media/openmax_dl/dl/moz.build
+--- firefox-118.0/media/openmax_dl/dl/moz.build	2023-09-19 01:41:22.000000000 +0800
++++ firefox-118.0.mod/media/openmax_dl/dl/moz.build	2023-09-28 02:38:30.015038019 +0800
 @@ -4,7 +4,7 @@
  # License, v. 2.0. If a copy of the MPL was not distributed with this
  # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -76,9 +64,9 @@ diff -uNr firefox-117.0/media/openmax_dl/dl/moz.build firefox-117.0.mod/media/op
      Library('openmax_dl')
  
      EXPORTS.dl.api += [
-diff -uNr firefox-117.0/third_party/aom/aom_ports/arm_cpudetect.c firefox-117.0.mod/third_party/aom/aom_ports/arm_cpudetect.c
---- firefox-117.0/third_party/aom/aom_ports/arm_cpudetect.c	2023-08-25 02:34:00.000000000 +0800
-+++ firefox-117.0.mod/third_party/aom/aom_ports/arm_cpudetect.c	2023-08-30 19:58:43.050671773 +0800
+diff -uNr firefox-118.0/third_party/aom/aom_ports/arm_cpudetect.c firefox-118.0.mod/third_party/aom/aom_ports/arm_cpudetect.c
+--- firefox-118.0/third_party/aom/aom_ports/arm_cpudetect.c	2023-09-19 01:41:28.000000000 +0800
++++ firefox-118.0.mod/third_party/aom/aom_ports/arm_cpudetect.c	2023-09-28 02:38:30.019038019 +0800
 @@ -87,7 +87,7 @@
    return flags & mask;
  }

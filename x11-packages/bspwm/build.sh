@@ -6,5 +6,7 @@ TERMUX_PKG_VERSION=0.9.10
 TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL="https://github.com/baskerville/bspwm/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256="0d0f5e465b9c27a5c2143c86189392fa297fad55253b9ed8f6854473d3928f8f"
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 TERMUX_PKG_DEPENDS="libxcb, sxhkd, xcb-util, xcb-util-keysyms, xcb-util-wm"
 TERMUX_PKG_BUILD_IN_SRC=true

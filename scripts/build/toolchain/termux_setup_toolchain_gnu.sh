@@ -28,7 +28,7 @@ termux_setup_toolchain_gnu() {
 		CFLAGS+=" -march=armv7-a -mfloat-abi=hard -mfpu=neon"
 		PATH_DYNAMIC_LINKER+="ld-linux-armhf.so.3"
 	elif [ "$TERMUX_ARCH" = "x86_64" ]; then
-		CFLAGS+=" -fPIC -march=x86-64"
+		CFLAGS+=" -march=x86-64 -fPIC"
 		PATH_DYNAMIC_LINKER+="ld-linux-x86-64.so.2"
 	elif [ "$TERMUX_ARCH" = "i686" ]; then
 		CFLAGS+=" -march=i686"

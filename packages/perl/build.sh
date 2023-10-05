@@ -11,6 +11,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # - subversion
 TERMUX_PKG_VERSION=(5.38.0
                     1.5)
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=(213ef58089d2f2c972ea353517dc60ec3656f050dcc027666e118b508423e517
                    d744a390939e2ebb9a12f6725b4d9c19255a141d90031eff90ea183fdfcbf211)
 TERMUX_PKG_SRCURL=(http://www.cpan.org/src/5.0/perl-${TERMUX_PKG_VERSION}.tar.gz
@@ -72,6 +73,9 @@ termux_step_post_make_install() {
 	cd $TERMUX_PREFIX/share/man/man1
 	rm perlbug.1
 	ln -s perlthanks.1 perlbug.1
+	cd $TERMUX_PREFIX/bin
+	rm perlbug
+	ln -s perlthanks perlbug
 
 	cd $TERMUX_PREFIX/lib
 	ln -f -s perl5/${TERMUX_PKG_VERSION}/${TERMUX_ARCH}-android/CORE/libperl.so libperl.so

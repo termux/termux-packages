@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="OpenCL driver from system vendor"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.3
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_RECOMMENDS="binutils | binutils-is-llvm, ocl-icd, patchelf"
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 

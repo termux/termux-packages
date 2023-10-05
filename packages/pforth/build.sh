@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://www.softsynth.com/pforth/
+TERMUX_PKG_HOMEPAGE=https://www.softsynth.com/pforth/
 TERMUX_PKG_DESCRIPTION="Portable Forth in C"
 TERMUX_PKG_LICENSE="Public Domain"
 TERMUX_PKG_LICENSE_FILE="license.txt"

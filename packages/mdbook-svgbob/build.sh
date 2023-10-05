@@ -5,6 +5,8 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.2.1
 TERMUX_PKG_SRCURL=https://github.com/boozook/mdbook-svgbob/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=cd5c6a58db33e87db04a1f9a5773de860b81cf75bafbe7a9fdb3f4b9f85cbbdc
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {

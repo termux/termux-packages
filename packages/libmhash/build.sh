@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://mhash.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://mhash.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="A thread-safe hash library which provides a uniform interface to hash algorithms"
 TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

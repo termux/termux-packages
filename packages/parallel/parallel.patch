@@ -1,17 +1,16 @@
-diff --git a/parallel b/parallel
-index 873f294..4fa24cb 100644
---- a/src/parallel
-+++ b/src/parallel
-@@ -2131,7 +2131,7 @@ sub parse_options(@) {
-     if($opt::bug) { ::die_bug("test-bug"); }
-     $Global::debug = $opt::D;
+diff -uNr parallel/src/parallel parallel.mod/src/parallel
+--- parallel/src/parallel	2023-09-28 21:55:48.803300511 +0800
++++ parallel.mod/src/parallel	2023-09-28 21:58:17.203300520 +0800
+@@ -2241,7 +2241,7 @@
+     ## Shell
+     #
      $Global::shell = $ENV{'PARALLEL_SHELL'} || parent_shell($$)
 -	|| $ENV{'SHELL'} || "/bin/sh";
 +	|| $ENV{'SHELL'} || "@TERMUX_PREFIX@/bin/sh";
      if(not -x $Global::shell and not which($Global::shell)) {
  	::error("Shell '$Global::shell' not found.");
  	wait_and_exit(255);
-@@ -2869,14 +2869,14 @@ sub init_globals() {
+@@ -2917,14 +2917,14 @@
      $Global::trim = 'n';
      $Global::max_jobs_running = 0;
      $Global::job_already_run = '';
@@ -30,7 +29,7 @@ index 873f294..4fa24cb 100644
      }
      # no warnings to allow for undefined $XDG_*
      no warnings 'uninitialized';
-@@ -4688,7 +4688,7 @@ sub _run_gnu_parallel() {
+@@ -4972,7 +4972,7 @@
      unlink $stderrname;
  
      my $pid = ::open3($stdin_fh,$stdout_fh,$stderr_fh,
@@ -39,3 +38,14 @@ index 873f294..4fa24cb 100644
      if(my $writerpid = fork()) {
  	close $stdin_fh;
  	@stdout = <$stdout_fh>;
+@@ -8632,7 +8632,9 @@
+     #	  'threads' => #threads
+     #	  'active' => #taskset_threads }
+     # Use GNU/Linux
+-    return sct_gnu_linux($_[0]);
++    #return sct_gnu_linux($_[0]);
++    # Use Hurd which uses nproc
++    return sct_hurd($_[0]);
+ }
+ 
+ sub sct_freebsd($) {

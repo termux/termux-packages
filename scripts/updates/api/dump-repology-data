@@ -2,7 +2,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2022 Aditya Alok (aka. @MrAdityaAlok) <alok@termux.org>
+# Copyright (c) 2022 Aditya Alok <alok@termux.dev>
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -28,8 +28,8 @@ from requests import get as requests_get
 
 def get_repology_data(last_project):
     repology_data = requests_get(
-        f"https://repology.org/api/v1/projects/{last_project}?inrepo=termux&outdated=True&families_newest=2-"
-    ).json()  # NOTE: We are using 2- so that api will return a package as outdated if it is so in 2 or more
+        f"https://repology.org/api/v1/projects/{last_project}?inrepo=termux&outdated=True&families_newest=2-", timeout=60
+    ).json()  # NOTE: We are using `families_newest=2-` so that api will return a package as outdated if it is so in 2 or more
     # repo family. This helps us avoid false positives.
 
     return repology_data

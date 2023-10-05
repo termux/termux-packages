@@ -58,6 +58,7 @@ PACKAGES+=" python3-sphinx-rtd-theme"
 PACKAGES+=" python3-sphinxcontrib.qthelp"
 PACKAGES+=" scdoc"
 PACKAGES+=" texinfo"
+PACKAGES+=" txt2man"
 PACKAGES+=" xmlto"
 PACKAGES+=" xmltoman"
 
@@ -182,6 +183,9 @@ PACKAGES+=" libarchive-tools"
 # Needed by cavif-rs
 PACKAGES+=" nasm"
 
+# Needed by debianutils
+PACKAGES+=" po4a"
+
 # Needed by dgsh
 PACKAGES+=" rsync"
 
@@ -297,6 +301,9 @@ PACKAGES+=" libdebuginfod-dev"
 
 # Needed to set up CGCT and also to set up other packages
 PACKAGES+=" patchelf"
+
+# Needed by lldb for python integration
+PACKAGES+=" swig"
 
 # Do not require sudo if already running as root.
 if [ "$(id -u)" = "0" ]; then

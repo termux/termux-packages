@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://quassel-irc.org/
+TERMUX_PKG_DESCRIPTION="Quassel IRC is a modern, cross-platform, distributed IRC client"
+TERMUX_PKG_LICENSE="GPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=0.14.0
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL=https://github.com/quassel/quassel/releases/download/$TERMUX_PKG_VERSION/quassel-$TERMUX_PKG_VERSION.tar.xz
+TERMUX_PKG_SHA256=090777f37a6ae1057a046d5c2896ce5e4bef2382377e3ba52c63efe6b5fe4e10
+TERMUX_PKG_DEPENDS="boost, dbus, qt5-qtbase, qt5-qtsvg, qt5-qtx11extras, qt5-qtmultimedia, qt5-qtwebengine, libdbusmenu-qt, libnotify, sqlite, zlib"
+TERMUX_PKG_BUILD_DEPENDS="boost-headers, qt5-qtbase-cross-tools, qt5-qttools-cross-tools"

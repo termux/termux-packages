@@ -5,6 +5,8 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.4.1
 TERMUX_PKG_SRCURL="https://github.com/persiancal/jcal/archive/v$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=b55edc605eda0a5b25b8009391dcaeb3c8ba88d1fb3337a071f555983a114c12
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {

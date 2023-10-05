@@ -3,15 +3,15 @@ TERMUX_PKG_DESCRIPTION="Extensible, customizable text editor-and more"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Update both emacs and emacs-x to the same version in one PR.
-_VERSION=28.3
-TERMUX_PKG_VERSION=${_VERSION}-rc1
+_VERSION=29.1
+TERMUX_PKG_VERSION=${_VERSION}
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/emacs/emacs-${_VERSION}.tar.xz
 if [[ $TERMUX_PKG_VERSION == *-rc* ]]; then
 	TERMUX_PKG_SRCURL=https://alpha.gnu.org/gnu/emacs/pretest/emacs-${TERMUX_PKG_VERSION#*:}.tar.xz
 fi
-TERMUX_PKG_SHA256=41c53433c8dc49bd017f421e09c97eda4e046f34967c872bec80b3495dfaa933
-TERMUX_PKG_DEPENDS="libgmp, libgnutls, libjansson, libxml2, ncurses, zlib"
+TERMUX_PKG_SHA256=d2f881a5cc231e2f5a03e86f4584b0438f83edd7598a09d24a21bd8d003e2e01
+TERMUX_PKG_DEPENDS="libgmp, libgnutls, libjansson, libsqlite, libxml2, ncurses, zlib, libtreesitter"
 TERMUX_PKG_BREAKS="emacs-dev"
 TERMUX_PKG_REPLACES="emacs-dev"
 TERMUX_PKG_SERVICE_SCRIPT=("emacsd" 'exec emacs --fg-daemon 2>&1')
@@ -28,6 +28,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-tiff=no
 --with-xml2
 --with-xpm=no
+--with-tree-sitter
 --without-dbus
 --without-gconf
 --without-gsettings
@@ -122,6 +123,8 @@ termux_step_post_configure() {
 	cp $TERMUX_PKG_HOSTBUILD_DIR/src/bootstrap-emacs $TERMUX_PKG_BUILDDIR/src/bootstrap-emacs
 	cp $TERMUX_PKG_HOSTBUILD_DIR/lib-src/make-docfile $TERMUX_PKG_BUILDDIR/lib-src/make-docfile
 	cp $TERMUX_PKG_HOSTBUILD_DIR/lib-src/make-fingerprint $TERMUX_PKG_BUILDDIR/lib-src/make-fingerprint
+	cp -r $TERMUX_PKG_SRCDIR/lisp/* $TERMUX_PKG_BUILDDIR/lisp
+	cp -r $TERMUX_PKG_SRCDIR/etc $TERMUX_PKG_BUILDDIR
 	# Update timestamps so that the binaries does not get rebuilt:
 	touch -d "next hour" $TERMUX_PKG_BUILDDIR/src/bootstrap-emacs \
 		$TERMUX_PKG_BUILDDIR/lib-src/make-docfile \
@@ -129,6 +132,7 @@ termux_step_post_configure() {
 }
 
 termux_step_post_make_install() {
+	mkdir -p $TERMUX_PREFIX/share/emacs/${_VERSION}/lisp/emacs-lisp/
 	install -Dm600 $TERMUX_PKG_BUILDER_DIR/site-start.el \
 		$TERMUX_PREFIX/share/emacs/site-lisp/site-start.el
 }

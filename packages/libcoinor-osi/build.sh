@@ -2,9 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://github.com/coin-or/Osi
 TERMUX_PKG_DESCRIPTION="An abstract base class to a generic linear programming (LP) solver"
 TERMUX_PKG_LICENSE="EPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1:0.108.7
+TERMUX_PKG_VERSION=1:0.108.8
 TERMUX_PKG_SRCURL=https://github.com/coin-or/Osi/archive/refs/tags/releases/${TERMUX_PKG_VERSION#*:}.tar.gz
-TERMUX_PKG_SHA256=f1bc53a498585f508d3f8d74792440a30a83c8bc934d0c8ecf8cd8bc0e486228
+TERMUX_PKG_SHA256=8b01a49190cb260d4ce95aa7e3948a56c0917b106f138ec0a8544fadca71cf6a
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_METHOD=repology
 TERMUX_PKG_DEPENDS="libc++, libcoinor-utils"
 
 termux_step_pre_configure() {

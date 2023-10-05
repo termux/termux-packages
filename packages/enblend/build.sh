@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://enblend.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://enblend.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="A tool for compositing images using a Burt&Adelson multiresolution spline"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

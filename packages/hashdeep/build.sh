@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://md5deep.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://md5deep.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="Programs to compute hashsums of arbitrary number of files recursively"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

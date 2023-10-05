@@ -1,0 +1,11 @@
+--- a/cmake/QuasselMacros.cmake
++++ b/cmake/QuasselMacros.cmake
+@@ -416,6 +416,6 @@
+     else()
+         add_compile_options("SHELL:${cxx_flags}")
+     endif()
+-    set(CMAKE_CXX_FLAGS "" PARENT_SCOPE)
+-    set(CMAKE_CXX_FLAGS_${upper_build_type} "" PARENT_SCOPE)
++    set(CMAKE_CXX_FLAGS "$ENV{CXXFLAGS} $ENV{CPPFLAGS}" PARENT_SCOPE)
++    set(CMAKE_CXX_FLAGS_${upper_build_type} "$ENV{CXXFLAGS} $ENV{CPPFLAGS}" PARENT_SCOPE)
+ endfunction()

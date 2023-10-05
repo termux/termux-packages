@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.mozilla.org/firefox
 TERMUX_PKG_DESCRIPTION="Mozilla Firefox web browser"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=117.0
+TERMUX_PKG_VERSION="118.0.1"
 TERMUX_PKG_SRCURL=https://ftp.mozilla.org/pub/firefox/releases/${TERMUX_PKG_VERSION}/source/firefox-${TERMUX_PKG_VERSION}.source.tar.xz
-TERMUX_PKG_SHA256=fa524cb9a63334d74ef996f3cbaf1559b5836f6c8ef6e890fa20846029242ac7
+TERMUX_PKG_SHA256=a3f4da56d13605d615a740c739e3504261649d040bc473ae2ed609336d79fd95
 # ffmpeg and pulseaudio are dependencies through dlopen(3):
 TERMUX_PKG_DEPENDS="ffmpeg, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libc++, libcairo, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libpixman, libsm, libvpx, libwebp, libx11, libxcb, libxcomposite, libxdamage, libxext, libxfixes, libxrandr, libxtst, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libcpufeatures, libice, libsm"
@@ -13,10 +13,30 @@ TERMUX_MAKE_PROCESSES=1
 
 termux_pkg_auto_update() {
 	# https://archive.mozilla.org/pub/firefox/releases/latest/README.txt
+	local e=0
 	local api_url="https://download.mozilla.org/?product=firefox-latest&os=linux64&lang=en-US"
-	local latest_version=$(curl -s "${api_url}" | sed -nE "s/.*firefox-(.*).tar.bz2.*/\1/p")
-	if [[ -z "${latest_version}" ]];  then
-		echo "WARN: Unable to get latest version from upstream! Try again later." >&2
+	local api_url_r=$(curl -s "${api_url}")
+	local latest_version=$(echo "${api_url_r}" | sed -nE "s/.*firefox-(.*).tar.bz2.*/\1/p")
+	[[ -z "${api_url_r}" ]] && e=1
+	[[ -z "${latest_version}" ]] && e=1
+
+	local uptime_now=$(cat /proc/uptime)
+	local uptime_s="${uptime_now//.*}"
+	local uptime_h_limit=2
+	local uptime_s_limit=$((uptime_h_limit*60*60))
+	[[ -z "${uptime_s}" ]] && e=1
+	[[ "${uptime_s}" == 0 ]] && e=1
+	[[ "${uptime_s}" -gt "${uptime_s_limit}" ]] && e=1
+
+	if [[ "${e}" != 0 ]]; then
+		cat <<- EOL >&2
+		WARN: Auto update failure!
+		api_url_r=${api_url_r}
+		latest_version=${latest_version}
+		uptime_now=${uptime_now}
+		uptime_s=${uptime_s}
+		uptime_s_limit=${uptime_s_limit}
+		EOL
 		return
 	fi
 
@@ -30,8 +50,18 @@ termux_step_post_get_source() {
 }
 
 termux_step_pre_configure() {
-	termux_setup_rust
 	termux_setup_nodejs
+	termux_setup_rust
+
+	# https://github.com/rust-lang/rust/issues/49853
+	# https://github.com/rust-lang/rust/issues/45854
+	# Out of memory when building gkrust
+	# CI shows (signal: 9, SIGKILL: kill)
+	case "${TERMUX_ARCH}" in
+	aarch64) RUSTFLAGS+=" -C debuginfo=0" ;;
+	arm) RUSTFLAGS+=" -C debuginfo=0" ;;
+	esac
+
 	cargo install cbindgen
 
 	sed -i -e "s|%TERMUX_CARGO_TARGET_NAME%|$CARGO_TARGET_NAME|" $TERMUX_PKG_SRCDIR/build/moz.configure/rust.configure
@@ -82,5 +112,5 @@ termux_step_configure() {
 }
 
 termux_step_post_make_install() {
-	install -Dm600 $TERMUX_PKG_BUILDER_DIR/firefox.desktop $TERMUX_PREFIX/share/applications/firefox.desktop
+	install -Dm644 -t "${TERMUX_PREFIX}/share/applications" "${TERMUX_PKG_BUILDER_DIR}/firefox.desktop"
 }

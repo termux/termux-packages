@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://wvware.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://wvware.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="A library which allows access to Microsoft Word files"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

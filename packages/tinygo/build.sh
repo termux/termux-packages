@@ -3,12 +3,12 @@ TERMUX_PKG_DESCRIPTION="Go compiler for microcontrollers, WASM, CLI tools"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.29.0"
+TERMUX_PKG_VERSION="0.30.0"
 TERMUX_PKG_SRCURL=git+https://github.com/tinygo-org/tinygo
 TERMUX_PKG_GIT_BRANCH="v${TERMUX_PKG_VERSION}"
-TERMUX_PKG_SHA256=1a0dc330f08c28b9adb3e06ef42c586f1257b979618ea0f5f5a0467588743bba
+TERMUX_PKG_SHA256=4ecb1764af87efcd90fcc66cb3b25d7cf3c038fceb87d032155170a4a3c65614
 TERMUX_PKG_DEPENDS="libc++, tinygo-common"
-TERMUX_PKG_RECOMMENDS="binaryen"
+TERMUX_PKG_RECOMMENDS="binaryen, golang"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
@@ -23,64 +23,62 @@ _LLVM_OPTION="
 "
 
 _LLVM_EXTRA_BUILD_TARGETS="
-lib/libLLVMFuzzerCLI.a
-lib/libLLVMFuzzMutate.a
-lib/libLLVMFileCheck.a
-lib/libLLVMInterfaceStub.a
-lib/libLLVMMIRParser.a
 lib/libLLVMDWARFLinker.a
+lib/libLLVMDWARFLinkerParallel.a
+lib/libLLVMDWP.a
+lib/libLLVMDebugInfoGSYM.a
+lib/libLLVMDebugInfoLogicalView.a
+lib/libLLVMFileCheck.a
 lib/libLLVMFrontendOpenACC.a
+lib/libLLVMFuzzMutate.a
+lib/libLLVMFuzzerCLI.a
+lib/libLLVMInterfaceStub.a
+lib/libLLVMJITLink.a
+lib/libLLVMLineEditor.a
+lib/libLLVMMIRParser.a
 lib/libLLVMObjCopy.a
 lib/libLLVMObjectYAML.a
-lib/libLLVMDebugInfoGSYM.a
-lib/libLLVMDWP.a
-lib/libLLVMJITLink.a
 lib/libLLVMOrcJIT.a
-lib/libLLVMLineEditor.a
 lib/libLLVMXRay.a
 "
 
 termux_pkg_auto_update() {
+	local e=0
 	local latest_tag
 	latest_tag=$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}" "${TERMUX_PKG_UPDATE_TAG_TYPE}")
-
-	if [[ -z "${latest_tag}" ]]; then
-		termux_error_exit "ERROR: Unable to get tag from ${TERMUX_PKG_SRCURL}"
-	fi
-
 	if [[ "${latest_tag}" == "${TERMUX_PKG_VERSION}" ]]; then
 		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
 		return
 	fi
+	[[ -z "${latest_tag}" ]] && e=1
 
-	local uptime_now=$(uptime -p)
-	local uptime_y=$(echo "${uptime_now}" | sed -nE "s|.* ([0-9]+) year.*|\1|p")
-	local uptime_w=$(echo "${uptime_now}" | sed -nE "s|.* ([0-9]+) week.*|\1|p")
-	local uptime_d=$(echo "${uptime_now}" | sed -nE "s|.* ([0-9]+) day.*|\1|p")
-	local uptime_h=$(echo "${uptime_now}" | sed -nE "s|.* ([0-9]+) hour.*|\1|p")
-	local uptime_m=$(echo "${uptime_now}" | sed -nE "s|.* ([0-9]+) minute.*|\1|p")
-	[[ -z "${uptime_y}" ]] && uptime_y=0
-	[[ -z "${uptime_w}" ]] && uptime_w=0
-	[[ -z "${uptime_d}" ]] && uptime_d=0
-	[[ -z "${uptime_h}" ]] && uptime_h=0
-	[[ -z "${uptime_m}" ]] && uptime_m=0
-	local uptime_m_sum=$((uptime_y*365*24*60+uptime_w*7*24*60+uptime_d*24*60+uptime_h*60+uptime_m))
+	local uptime_now=$(cat /proc/uptime)
+	local uptime_s="${uptime_now//.*}"
 	local uptime_h_limit=1
-	local uptime_m_limit=$((uptime_h_limit*60))
-	if [[ "${uptime_m_sum}" -gt "${uptime_m_limit}" ]]; then
+	local uptime_s_limit=$((uptime_h_limit*60*60))
+	[[ -z "${uptime_s}" ]] && e=1
+	[[ "${uptime_s}" == 0 ]] && e=1
+	[[ "${uptime_s}" -gt "${uptime_s_limit}" ]] && e=1
+
+	if [[ "${e}" != 0 ]]; then
 		cat <<- EOL >&2
-		WARN: Uptime exceeds time limit! Deferring update.
-		Current uptime: ${uptime_now}
-		Limit (hour):   ${uptime_h_limit}
+		WARN: Auto update failure!
+		latest_tag=${latest_tag}
+		uptime_now=${uptime_now}
+		uptime_s=${uptime_s}
+		uptime_s_limit=${uptime_s_limit}
 		EOL
 		return
 	fi
 
 	local tmpdir=$(mktemp -d)
-	git clone --branch "${latest_tag}" --depth=1 --recursive \
-		"${TERMUX_PKG_SRCDIR#git+}" "${tmpdir}"
+	git clone --branch "v${latest_tag}" --depth=1 --recursive \
+		"${TERMUX_PKG_SRCURL#git+}" "${tmpdir}"
 	make -C "${tmpdir}" llvm-source GO=:
-	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum | cut -d" " -f1)
+	local s=$(
+		find "${tmpdir}" -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | \
+		cut -d" " -f1 | LC_ALL=C sort | sha256sum | cut -d" " -f1
+	)
 
 	sed \
 		-e "s|^TERMUX_PKG_SHA256=.*|TERMUX_PKG_SHA256=${s}|" \
@@ -88,6 +86,7 @@ termux_pkg_auto_update() {
 
 	rm -fr "${tmpdir}"
 
+	echo "INFO: Generated checksum: ${s}"
 	termux_pkg_upgrade_version "${latest_tag}"
 }
 
@@ -96,8 +95,11 @@ termux_step_post_get_source() {
 	# https://github.com/espressif/llvm-project
 	make llvm-source GO=:
 
-	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum)
-	if [[ "${s}" != "${TERMUX_PKG_SHA256}  "* ]]; then
+	local s=$(
+		find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | \
+		cut -d" " -f1 | LC_ALL=C sort | sha256sum | cut -d" " -f1
+	)
+	if [[ "${s}" != "${TERMUX_PKG_SHA256}" ]]; then
 		termux_error_exit "
 		Checksum mismatch for source files!
 		Expected = ${TERMUX_PKG_SHA256}
@@ -216,5 +218,5 @@ termux_step_make() {
 termux_step_make_install() {
 	mkdir -p "${TERMUX_PREFIX}/lib/tinygo"
 	cp -fr "${TERMUX_PKG_SRCDIR}/build/release/tinygo" "${TERMUX_PREFIX}/lib"
-	ln -fsvT "../lib/tinygo/bin/tinygo" "${TERMUX_PREFIX}/bin/tinygo"
+	ln -fsv "../lib/tinygo/bin/tinygo" "${TERMUX_PREFIX}/bin/tinygo"
 }

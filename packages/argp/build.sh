@@ -5,6 +5,8 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.5.0
 TERMUX_PKG_SRCURL=https://github.com/argp-standalone/argp-standalone/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=c29eae929dfebd575c38174f2c8c315766092cec99a8f987569d0cad3c6d64f6
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 
 termux_step_pre_configure() {
 	autoreconf -fi

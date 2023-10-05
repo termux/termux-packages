@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION=17.0
 TERMUX_PKG_REVISION=27
 TERMUX_PKG_SRCURL=https://github.com/termux/openjdk-mobile-termux/archive/ec285598849a27f681ea6269342cf03cf382eb56.tar.gz
 TERMUX_PKG_SHA256=d7c6ead9d80d0f60d98d0414e9dc87f5e18a304e420f5cd21f1aa3210c1a1528
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="libiconv, libjpeg-turbo, zlib"
 TERMUX_PKG_BUILD_DEPENDS="cups, libandroid-spawn, xorgproto"
 # openjdk-17-x is recommended because X11 separation is still very experimental.

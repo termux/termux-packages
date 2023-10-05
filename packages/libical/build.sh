@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://libical.github.io/libical/
+TERMUX_PKG_HOMEPAGE=https://libical.github.io/libical/
 TERMUX_PKG_DESCRIPTION="Libical is an Open Source implementation of the iCalendar protocols and protocol data units"
 TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
