@@ -316,6 +316,7 @@ fi
 $SUDO dpkg --add-architecture i386
 # Add ppa repo to be able to get openjdk-17 on ubuntu 22.04
 $SUDO cp $(dirname "$(realpath "$0")")/openjdk-r-ppa.gpg /etc/apt/trusted.gpg.d/
+$SUDO chmod a+r /etc/apt/trusted.gpg.d/openjdk-r-ppa.gpg
 echo "deb https://ppa.launchpadcontent.net/openjdk-r/ppa/ubuntu/ jammy main" | $SUDO tee /etc/apt/sources.list.d/openjdk-r-ubuntu-ppa-jammy.list > /dev/null
 $SUDO apt-get -yq update
 
