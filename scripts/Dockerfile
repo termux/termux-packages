@@ -21,6 +21,7 @@ RUN apt-get update && \
 	useradd -u 1001 -U -m -s /bin/bash builder && \
 	echo "builder ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/builder && \
 	chmod 0440 /etc/sudoers.d/builder && \
+	chmod a+rx /tmp/*.sh /tmp/build/termux_download.sh && \
 	su - builder -c /tmp/setup-ubuntu.sh && \
 	su - builder -c /tmp/setup-android-sdk.sh && \
 	su - builder -c /tmp/setup-cgct.sh && \
