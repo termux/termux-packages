@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A Stable & Secure Tunnel based on KCP with N:M multiplex
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="20230811"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/xtaci/kcptun/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=dd88c7ddb85cc74ff22940ba2dc22f65d3b6737153b225d611abb801a0694c4d
 TERMUX_PKG_REPLACES="kcptun-client, kcptun-server"
