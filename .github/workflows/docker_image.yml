@@ -50,16 +50,18 @@ jobs:
         # ghcr.io seem to be unstable sometimes. It may suddenly drop connection
         # during docker push when some layers are already uploaded. The workaround
         # is to retry again 1 or 2 more times.
-        for image in package-builder package-builder-cgct; do
-          for t in 1 2 3; do
-            if docker push "ghcr.io/termux/${image}:latest"; then
-              break
-            else
-              if [ "$t" = "3" ]; then
-                echo "Giving up after 3 attempts"
-                exit 1
+        for registry in "ghcr.io/" ""; do
+          for image in package-builder package-builder-cgct; do
+            for t in 1 2 3; do
+              if docker push "${registry}termux/${image}:latest"; then
+                break
+              else
+                if [ "$t" = "3" ]; then
+                  echo "Giving up after 3 attempts"
+                  exit 1
+                fi
+                sleep 20
               fi
-              sleep 20
-            fi
+            done
           done
         done
