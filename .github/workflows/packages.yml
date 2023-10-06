@@ -26,9 +26,6 @@ jobs:
     permissions:
       contents: read # actions/upload-artifact doesn't need contents: write
     runs-on: ubuntu-22.04
-    env:
-      ANDROID_HOME: "/opt/termux/android-sdk"
-      NDK: "/opt/termux/android-ndk"
     strategy:
       matrix:
         target_arch: [aarch64, arm, i686, x86_64]
@@ -178,6 +175,12 @@ jobs:
         done
 
         if [ ! -z "$packages" ]; then
+          if grep -q 'rust' <<< "${packages}"; then
+            sudo apt purge -yq $(dpkg -l | grep '^ii' | awk '{ print $2 }' | grep -P '(aspnetcore|cabal-|dotnet-|ghc-|libmono|php)') \
+              firefox google-chrome-stable microsoft-edge-stable mono-runtime-common monodoc-manual ruby
+            sudo apt autoremove -yq
+            sudo rm -fr /opt/hostedtoolcache /usr/share/dotnet /usr/share/swift
+          fi
           if grep -q ' clvk\|dart\|libllvm\|rust\|rustc-nightly\|swift\|tinygo\|wasmer\|zig\|firefox ' <<< "$packages"; then
             ./scripts/setup-ubuntu.sh
             sudo apt install ninja-build
