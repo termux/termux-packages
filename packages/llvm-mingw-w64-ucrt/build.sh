@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.mingw-w64.org/
 TERMUX_PKG_DESCRIPTION="MinGW-w64 runtime for LLVM-MinGW"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_MAINTAINER="@licy183"
-TERMUX_PKG_VERSION=20230320
-TERMUX_PKG_SRCURL=https://github.com/mstorsjo/llvm-mingw/releases/download/$TERMUX_PKG_VERSION/llvm-mingw-$TERMUX_PKG_VERSION-ucrt-ubuntu-18.04-x86_64.tar.xz
-TERMUX_PKG_SHA256=bc367753dea829d219be32e2e64e2d15d03158ce8e700ae5210ca3d78e6a07ea
+TERMUX_PKG_VERSION=20231003
+TERMUX_PKG_SRCURL=https://github.com/mstorsjo/llvm-mingw/releases/download/$TERMUX_PKG_VERSION/llvm-mingw-$TERMUX_PKG_VERSION-ucrt-ubuntu-20.04-x86_64.tar.xz
+TERMUX_PKG_SHA256=df6b9bcfac48c926aa8f6ccd6179ae7b8eeccd9f5fdf4a2c10b601b6b58e4c83
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_NO_STATICSPLIT=true
 
