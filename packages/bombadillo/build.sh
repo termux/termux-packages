@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="A non-web client for the terminal, supporting Gopher, Ge
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.4.0
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://tildegit.org/sloum/bombadillo/archive/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=e0daed1d9d0fe7cbea52bc3e6ecff327749b54e792774e6b985e0d64b7a36437
+TERMUX_PKG_REVISION=2
+TERMUX_PKG_SRCURL=https://deb.debian.org/debian/pool/main/b/bombadillo/bombadillo_${TERMUX_PKG_VERSION}.orig.tar.gz
+TERMUX_PKG_SHA256=d52a753e7a77c5ab486f536a7c488e61c68a8c11a5e455143d281b3d8306afa0
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
