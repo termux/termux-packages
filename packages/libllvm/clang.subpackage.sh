@@ -22,6 +22,7 @@ include/clang*
 lib/clang/*/include/*.h
 lib/clang/*/include/module.modulemap
 lib/clang/*/include/cuda_wrappers/
+lib/clang/*/include/llvm_libc_wrappers/
 lib/clang/*/include/openmp_wrappers/
 lib/clang/*/include/orc/
 lib/clang/*/include/ppc_wrappers/
