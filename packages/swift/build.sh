@@ -103,7 +103,6 @@ termux_step_host_build() {
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 		termux_setup_cmake
 		termux_setup_ninja
-		termux_setup_swift
 
 		local CLANG=$(command -v clang)
 		local CLANGXX=$(command -v clang++)
