@@ -175,20 +175,14 @@ jobs:
         done
 
         if [ ! -z "$packages" ]; then
-          if grep -q ' rust\|swift ' <<< "${packages}"; then
+          if grep -q ' \(clvk\|dart\|libllvm\|rust\|rustc-nightly\|swift\|tinygo\|wasmer\|zig\|firefox\)\( \|$\)' <<< "$packages"; then
+            ./scripts/setup-ubuntu.sh
+            sudo apt install ninja-build
             sudo apt purge -yq $(dpkg -l | grep '^ii' | awk '{ print $2 }' | grep -P '(aspnetcore|cabal-|dotnet-|ghc-|libmono|php)') \
               firefox google-chrome-stable microsoft-edge-stable mono-runtime-common monodoc-manual ruby
             sudo apt autoremove -yq
             sudo rm -fr /opt/hostedtoolcache /usr/share/dotnet /usr/share/swift
-          fi
-          if grep -q ' clvk\|dart\|libllvm\|rust\|rustc-nightly\|swift\|tinygo\|wasmer\|zig\|firefox ' <<< "$packages"; then
-            ./scripts/setup-ubuntu.sh
-            sudo apt install ninja-build
-            # github CI is often running out of disk space for large packages,
-            # so these df checks will let us know how much there was.
-            df -h
             NDK=$ANDROID_NDK_ROOT ANDROID_HOME=$ANDROID_SDK_ROOT ./build-package.sh -I -a ${{ matrix.target_arch }} $packages
-            df -h
           else
             ./scripts/run-docker.sh ./build-package.sh -I -a ${{ matrix.target_arch }} $packages
           fi

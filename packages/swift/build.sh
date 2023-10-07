@@ -29,7 +29,7 @@ test $SWIFT_ARCH == 'arm' && SWIFT_ARCH='armv7'
 
 termux_step_post_get_source() {
 	# The Swift build-script requires a particular organization of source
-	# directories, which the following sets up.
+	# directories, which the following downloads and sets up.
 	mkdir .temp
 	mv [a-zA-Z]* .temp/
 	mv .temp swift
