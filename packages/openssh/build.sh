@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION=9.5p1
 TERMUX_PKG_SRCURL=https://github.com/openssh/openssh-portable/archive/refs/tags/V_$(sed 's/\./_/g; s/p/_P/g' <<< $TERMUX_PKG_VERSION).tar.gz
 TERMUX_PKG_SHA256=41760d6bfea3e6e35c6acc40d24f14863cfdc92c6e56ae9401db9c658cbd93b5
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 TERMUX_PKG_DEPENDS="krb5, ldns, libandroid-support, libedit, openssh-sftp-server, openssl, termux-auth, zlib"
 TERMUX_PKG_CONFLICTS="dropbear"
 # --disable-strip to prevent host "install" command to use "-s", which won't work for target binaries:
