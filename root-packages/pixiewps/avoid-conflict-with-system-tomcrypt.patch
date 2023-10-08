@@ -1,0 +1,36 @@
+Avoid build error if there are system tomcrypt headers.
+
+diff -u -r ../orig-src/src/crypto/tc/tomcrypt.h ./src/crypto/tc/tomcrypt.h
+--- ../orig-src/src/crypto/tc/tomcrypt.h	2018-01-25 21:05:41.000000000 +0000
++++ ./src/crypto/tc/tomcrypt.h	2023-10-08 06:06:38.771483149 +0000
+@@ -19,7 +19,7 @@
+ #include <limits.h>
+ 
+ /* use configuration data */
+-#include <tomcrypt_custom.h>
++#include "tomcrypt_custom.h"
+ 
+ #ifdef __cplusplus
+ extern "C" {
+@@ -79,16 +79,16 @@
+    CRYPT_HASH_OVERFLOW      /* Hash applied to too many bits */
+ };
+ 
+-#include <tomcrypt_cfg.h>
+-#include <tomcrypt_macros.h>
+-#include <tomcrypt_cipher.h>
+-#include <tomcrypt_hash.h>
++#include "tomcrypt_cfg.h"
++#include "tomcrypt_macros.h"
++#include "tomcrypt_cipher.h"
++#include "tomcrypt_hash.h"
+ /* #include <tomcrypt_mac.h> */
+ /* #include <tomcrypt_prng.h> */
+ /* #include <tomcrypt_pk.h> */
+ /* #include <tomcrypt_math.h> */
+ /* #include <tomcrypt_misc.h> */
+-#include <tomcrypt_argchk.h>
++#include "tomcrypt_argchk.h"
+ /* #include <tomcrypt_pkcs.h> */
+ 
+ #ifdef __cplusplus
