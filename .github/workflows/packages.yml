@@ -4,6 +4,8 @@ on:
   push:
     branches:
     - master
+    - dev
+    - 'dev/**'
     paths:
     - 'packages/**'
     - 'root-packages/**'
@@ -18,7 +20,7 @@ on:
       packages:
         description: "A space-separated names of packages selected for rebuilding"
         required: true
-        
+
 permissions: {} # none
 
 jobs:
@@ -227,7 +229,7 @@ jobs:
     concurrency: ${{ github.workflow }}
     permissions:
       contents: read
-    if: github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request' && github.ref != 'refs/heads/dev' && !startsWith(github.ref, 'refs/heads/dev/')
     needs: build
     runs-on: ubuntu-latest
     steps:
