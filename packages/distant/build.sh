@@ -2,9 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://github.com/chipsenkbeil/distant
 TERMUX_PKG_DESCRIPTION="Library and tooling that supports remote filesystem and process"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.20.0-alpha.4
+TERMUX_PKG_VERSION="0.20.0"
 TERMUX_PKG_SRCURL=https://github.com/chipsenkbeil/distant/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=9bace1cc4492285c4932db0d2faea99af5b603c138d23a902ac460c03bc78ef0
+TERMUX_PKG_SHA256=28044639adb3a7984a1c2e721debbaa472e6d826795c5d2f7c434c563e261007
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libssh2, openssl, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 
@@ -14,6 +15,8 @@ termux_step_pre_configure() {
 	export OPENSSL_LIB_DIR=$TERMUX_PREFIX/lib
 	export LIBSSH2_SYS_USE_PKG_CONFIG=1
 	export PKG_CONFIG_ALLOW_CROSS=1
+
+    sed -i "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" ${TERMUX_PKG_SRCDIR}/src/constants.rs
 
 	termux_setup_rust
 	: "${CARGO_HOME:=$HOME/.cargo}"

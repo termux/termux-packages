@@ -1,0 +1,56 @@
+diff --git a/swift-corelibs-libdispatch/dispatch/dispatch.h b/swift-corelibs-libdispatch/dispatch/dispatch.h
+index 0c7bdd4..35cb91d 100644
+--- a/swift-corelibs-libdispatch/dispatch/dispatch.h
++++ b/swift-corelibs-libdispatch/dispatch/dispatch.h
+@@ -39,6 +39,9 @@
+ #include <stdarg.h>
+ #include <string.h>
+ #if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
++#if defined(__ANDROID__)
++#include <signal.h>
++#endif
+ #include <unistd.h>
+ #endif
+ #include <fcntl.h>
+diff --git a/llbuild/products/libllbuild/include/llbuild/buildsystem.h b/llbuild/products/libllbuild/include/llbuild/buildsystem.h
+index d75b9cc3..3c7ccc7b 100644
+--- a/llbuild/products/libllbuild/include/llbuild/buildsystem.h
++++ b/llbuild/products/libllbuild/include/llbuild/buildsystem.h
+@@ -40,6 +40,9 @@ typedef HANDLE FD;
+ #else
+ #include <sys/types.h>
+ #endif // defined(__linux__) || defined(__GNU__)
++#if defined(__ANDROID__)
++#include <signal.h>
++#endif
+ #include <unistd.h>
+ typedef pid_t llbuild_pid_t;
+ typedef int FD;
+diff --git a/swift-tools-support-core/Sources/TSCclibc/include/indexstore_functions.h b/swift-tools-support-core/Sources/TSCclibc/include/indexstore_functions.h
+index fb8ddab..4553ab0 100644
+--- a/swift-tools-support-core/Sources/TSCclibc/include/indexstore_functions.h
++++ b/swift-tools-support-core/Sources/TSCclibc/include/indexstore_functions.h
+@@ -17,6 +17,9 @@
+ #include <stdbool.h>
+ #include <stddef.h>
+ #include <stdint.h>
++#if defined(__ANDROID__)
++#include <signal.h>
++#endif
+ #include <time.h>
+ 
+ /**
+diff --git a/swift-crypto/Sources/CCryptoBoringSSL/include/CCryptoBoringSSL_asn1.h b/swift-crypto/Sources/CCryptoBoringSSL/include/CCryptoBoringSSL_asn1.h
+index 652fb89..c10e8ce 100644
+--- a/swift-crypto/Sources/CCryptoBoringSSL/include/CCryptoBoringSSL_asn1.h
++++ b/swift-crypto/Sources/CCryptoBoringSSL/include/CCryptoBoringSSL_asn1.h
+@@ -60,6 +60,9 @@
+ 
+ #include "CCryptoBoringSSL_base.h"
+ 
++#if defined(__ANDROID__)
++#include <signal.h>
++#endif
+ #include <time.h>
+ 
+ #include "CCryptoBoringSSL_bio.h"

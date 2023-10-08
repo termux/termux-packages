@@ -7,6 +7,7 @@ TERMUX_PKG_VERSION=2021.02.22
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=git+https://github.com/edghyhdz/crypto_monitor
 TERMUX_PKG_SHA256=df67d1a0de5f547cab78dbc977609d1b24f5c2ed8e3fc0619734d3e36ac4a1bc
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_GIT_BRANCH=main
 TERMUX_PKG_DEPENDS="libc++, libcurl, ncurses-ui-libs, openssl"
 TERMUX_PKG_BUILD_DEPENDS="boost, boost-headers"

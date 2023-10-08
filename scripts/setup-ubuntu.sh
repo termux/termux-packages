@@ -148,9 +148,9 @@ PACKAGES+=" composer"
 
 # Needed by package rust.
 PACKAGES+=" libssl-dev" # Needed to build Rust
-PACKAGES+=" llvm-14-dev"
-PACKAGES+=" llvm-14-tools"
-PACKAGES+=" clang-14"
+PACKAGES+=" llvm-15-dev"
+PACKAGES+=" llvm-15-tools"
+PACKAGES+=" clang-15"
 
 # Needed for package smalltalk.
 PACKAGES+=" libsigsegv-dev"
@@ -173,9 +173,6 @@ PACKAGES+=" luajit"
 
 # Needed by libduktape
 PACKAGES+=" bc"
-
-# Java.
-PACKAGES+=" openjdk-8-jdk openjdk-18-jdk"
 
 # needed by ovmf
 PACKAGES+=" libarchive-tools"
@@ -316,6 +313,7 @@ fi
 $SUDO dpkg --add-architecture i386
 # Add ppa repo to be able to get openjdk-17 on ubuntu 22.04
 $SUDO cp $(dirname "$(realpath "$0")")/openjdk-r-ppa.gpg /etc/apt/trusted.gpg.d/
+$SUDO chmod a+r /etc/apt/trusted.gpg.d/openjdk-r-ppa.gpg
 echo "deb https://ppa.launchpadcontent.net/openjdk-r/ppa/ubuntu/ jammy main" | $SUDO tee /etc/apt/sources.list.d/openjdk-r-ubuntu-ppa-jammy.list > /dev/null
 $SUDO apt-get -yq update
 
