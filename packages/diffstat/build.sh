@@ -11,3 +11,5 @@ TERMUX_PKG_SRCURL=https://github.com/ThomasDickey/diffstat-snapshots/archive/ref
 #TERMUX_PKG_SRCURL=https://invisible-mirror.net/archives/diffstat/diffstat-${TERMUX_PKG_VERSION}.tgz
 #TERMUX_PKG_SRCURL=https://invisible-island.net/datafiles/release/diffstat.tar.gz
 TERMUX_PKG_SHA256=7198e0f1ee6b95fb6ef7b6b0dfbeba2761abfb143ab1b57343859eeba4172ffc
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
