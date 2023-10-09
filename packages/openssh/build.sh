@@ -119,6 +119,5 @@ termux_pkg_auto_update() {
 	local latest_tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}" newest-tag)"
 	[[ -z "${latest_tag}" ]] && termux_error_exit "ERROR: Unable to get tag from ${TERMUX_PKG_SRCURL}"
 	local version="$(echo ${latest_tag} | sed -E 's/V_([0-9]+)_([0-9]+)_P([0-9]+)/\1.\2p\3/')"
-	echo $version
 	termux_pkg_upgrade_version $version
 }
