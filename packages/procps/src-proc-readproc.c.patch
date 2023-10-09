@@ -1,0 +1,19 @@
+diff -u -r ../orig-src/proc/readproc.c ./proc/readproc.c
+--- ../orig-src/proc/readproc.c	2023-10-08 11:10:27.966080673 +0000
++++ ./proc/readproc.c	2023-10-08 11:57:27.196890251 +0000
+@@ -1017,6 +1017,15 @@
+       p->wchan = (KLONG)~0ull;
+     }
+ 
++    // Termux patch to use argv0 instead of executable name,
++    // since that will soon (at time of writing) always be
++    // /system/bin/linker64.
++    char** cmdline_vec = file2strvec(path, "cmdline");
++    if (cmdline_vec) {
++	snprintf(p->cmd, sizeof(p->cmd), "%s", cmdline_vec[0]);
++    	free(*cmdline_vec);
++    }
++
+     /* some number->text resolving which is time consuming */
+     if (flags & PROC_FILLUSR){
+         memcpy(p->euser, pwcache_get_user(p->euid), sizeof p->euser);

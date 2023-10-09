@@ -1,0 +1,15 @@
+Needed until NDK 26 is used
+diff --git a/dispatch/dispatch.h b/dispatch/dispatch.h
+index 0c7bdd4..35cb91d 100644
+--- a/dispatch/dispatch.h
++++ b/dispatch/dispatch.h
+@@ -39,6 +39,9 @@
+ #include <stdarg.h>
+ #include <string.h>
+ #if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
++#if defined(__ANDROID__)
++#include <signal.h>
++#endif
+ #include <unistd.h>
+ #endif
+ #include <fcntl.h>
