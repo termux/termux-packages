@@ -5,8 +5,8 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=25c
 TERMUX_PKG_SRCURL=https://dl.google.com/android/repository/android-ndk-r${TERMUX_PKG_VERSION}-linux.zip
 TERMUX_PKG_SHA256=769ee342ea75f80619d985c2da990c48b3d8eaf45f48783a2d48870d04b46108
-TERMUX_PKG_CONFLICTS="libandroid (<< 25c-1)"
-TERMUX_PKG_REPLACES="libandroid (<< 25c-1)"
+TERMUX_PKG_CONFLICTS="libandroid"
+TERMUX_PKG_REPLACES="libandroid"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_post_make_install() {
