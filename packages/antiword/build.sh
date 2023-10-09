@@ -7,6 +7,7 @@ TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/rsdoiel/antiword/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 #TERMUX_PKG_SRCURL=http://www.winfield.demon.nl/linux/antiword-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=9cdb4845d119a407bd59f53a355d70b195d08da09e32d07b950c644864348619
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_MAKE_INSTALL_TARGET="global_install"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/kantiword"
