@@ -34,6 +34,15 @@
    glib_conf.set('HAVE_FUTEX_TIME64', 1)
  endif
  
+@@ -977,7 +975,7 @@
+                  syscall (SYS_pidfd_open, 0, 0);
+                  waitid (P_PIDFD, 0, &child_info, WEXITED | WNOHANG);
+                  return 0;
+-               }''', name : 'pidfd_open(2) system call')
++               }''', name : 'pidfd_open(2) system call') and host_system != 'android'
+   glib_conf.set('HAVE_PIDFD', 1)
+ endif
+ 
 @@ -2137,7 +2135,7 @@
  libintl_deps = []
  libintl_prefix = '#include <libintl.h>'
