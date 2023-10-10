@@ -5,6 +5,8 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.9.1
 TERMUX_PKG_SRCURL=https://github.com/gnustep/tools-make/archive/make-${TERMUX_PKG_VERSION//./_}.tar.gz
 TERMUX_PKG_SHA256=78ef0f68402c379979a9a46499ac308fe5c1512aa198138c87649ee611aedf41
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP='(?<=make-)\d+\_\d+\_\d+'
 TERMUX_PKG_DEPENDS="libobjc2"
 
 termux_step_pre_configure() {
