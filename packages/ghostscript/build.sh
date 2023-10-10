@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="10.02.0"
 TERMUX_PKG_SRCURL=https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs${TERMUX_PKG_VERSION//.}/ghostpdl-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=15662eb7cc0aba5ef260ba83e40bb062a04c96c78ef717c80e8f983ebab3cce9
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="fontconfig, freetype, jbig2dec, libandroid-support, libc++, libiconv, libidn, libjpeg-turbo, libpng, libtiff, littlecms, openjpeg, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libexpat"
 TERMUX_PKG_BUILD_IN_SRC=true
