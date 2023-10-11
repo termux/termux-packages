@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.19.0
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/lfortran/lfortran
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="clang, libandroid-complex-math, libc++, ncurses, zlib, zstd"
 TERMUX_PKG_BUILD_DEPENDS="libllvm-static"
 TERMUX_PKG_SUGGESTS="libkokkos"

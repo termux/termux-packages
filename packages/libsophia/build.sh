@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.2
 TERMUX_PKG_SRCURL=git+https://github.com/pmwkaa/sophia
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {
