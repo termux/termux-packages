@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/mozilla/sops
 TERMUX_PKG_DESCRIPTION="Simple and flexible tool for managing secrets"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="Philipp Schmitt @pschmitt"
-TERMUX_PKG_VERSION="3.8.0"
+TERMUX_PKG_VERSION="3.8.1"
 TERMUX_PKG_SRCURL="https://github.com/mozilla/sops/archive/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=14fa25f2d6177c5444934612398426a8de3caf59348eae8cc228291cf750288a
+TERMUX_PKG_SHA256=5ca70fb4f96797d09012c705a5bb935835896de7bcd063b98d498912b0e645a0
 TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make_install() {
