@@ -1,0 +1,34 @@
+--- a/src/netxs/desktopio/controls.hpp
++++ b/src/netxs/desktopio/controls.hpp
+@@ -2696,7 +2696,31 @@
+                 auto min_y = frame.coor[updown] - basis.coor[updown];
+                 auto max_y = frame.size[updown] + min_y;
+                 auto bound = [xy = updown](auto& o){ return o ? o->base::region.coor[xy] + o->base::region.size[xy] : -dot_mx.y; };
++#ifndef __ANDROID__
+                 auto start = std::ranges::lower_bound(base::subset, min_y, {}, bound);
++#else
++#ifdef __cpp_lib_ranges
++#error "Please remove this patch"
++#endif
++                auto start = base::subset.begin();
++                {
++                    auto count = std::distance(start, base::subset.end());
++
++                    while (count != 0)
++                    {
++                        auto step = count / 2;
++                        auto it = start;
++                        std::advance(it, step);
++                        if (std::less{}(std::invoke(bound, *it), min_y))
++                        {
++                            start = ++it;
++                            count -= step + 1;
++                        }
++                        else
++                            count = step;
++                    }
++                }
++#endif
+                 while (start != base::subset.end())
+                 {
+                     if (auto& object = *start++)

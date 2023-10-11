@@ -1,0 +1,34 @@
+--- a/src/netxs/desktopio/richtext.hpp
++++ b/src/netxs/desktopio/richtext.hpp
+@@ -1745,7 +1745,31 @@
+                 twod coor;
+             };
+             auto bound = [](auto& r) { return r.coord.y; };
++#ifndef __ANDROID__
+             auto found = std::ranges::lower_bound(ropes, anker.y, {}, bound);
++#else
++#ifdef __cpp_lib_ranges
++#error "Please remove this patch"
++#endif
++            auto found = ropes.begin();
++            {
++                auto count = std::distance(found, ropes.end());
++
++                while (count != 0)
++                {
++                    auto step = count / 2;
++                    auto it = found;
++                    std::advance(it, step);
++                    if (std::less{}(std::invoke(bound, *it), anker.y))
++                    {
++                        found = ++it;
++                        count -= step + 1;
++                    }
++                    else
++                        count = step;
++                }
++            }
++#endif
+             if (found != ropes.end()) return entry{ found->id(), found->coord };
+             else                      return entry{ 0,     twod{ 0, si32max } };
+         }
