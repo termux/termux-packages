@@ -4,11 +4,12 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Marlin Sööse <marlin.soose@laro.se>"
 TERMUX_PKG_VERSION=()
 TERMUX_PKG_VERSION+=(5.47.0)
-TERMUX_PKG_VERSION+=(21.2.1) # ECL version
+TERMUX_PKG_VERSION+=(23.9.9) # ECL version
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(https://downloads.sourceforge.net/sourceforge/maxima/Maxima-source/$TERMUX_PKG_VERSION-source/maxima-$TERMUX_PKG_VERSION.tar.gz
                    https://common-lisp.net/project/ecl/static/files/release/ecl-${TERMUX_PKG_VERSION[1]}.tgz)
 TERMUX_PKG_SHA256=(9104021b24fd53e8c03a983509cb42e937a925e8c0c85c335d7709a14fd40f7a
-                   b15a75dcf84b8f62e68720ccab1393f9611c078fcd3afdd639a1086cad010900)
+                   c51bdab4ca6c1173dd3fe9cfe9727bcefb97bb0a3d6434b627ca6bdaeb33f880)
 TERMUX_PKG_DEPENDS="ecl"
 TERMUX_PKG_BLACKLISTED_ARCHES="i686, x86_64"
 TERMUX_PKG_BUILD_IN_SRC="true"
