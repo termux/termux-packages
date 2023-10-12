@@ -181,6 +181,10 @@ termux_setup_toolchain_23c() {
 		fi
 	done
 
+	if [ "$TERMUX_CACHE_ENABLED" = "true" ]; then
+		sed -i 's|"$bin_dir/clang"|ccache "$bin_dir/clang"|g' \
+			$_TERMUX_TOOLCHAIN_TMPDIR/bin/*-{clang,clang++,cpp,gcc,g++}
+	fi
 	# Create a pkg-config wrapper. We use path to host pkg-config to
 	# avoid picking up a cross-compiled pkg-config later on.
 	local _HOST_PKGCONFIG
