@@ -1,0 +1,36 @@
+--- ./cli/vendor/github.com/docker/docker/client/client_unix.go.orig	2023-10-13 11:34:03.733258431 +0000
++++ ./cli/vendor/github.com/docker/docker/client/client_unix.go	2023-10-13 11:34:38.976659923 +0000
+@@ -4,7 +4,7 @@
+ package client // import "github.com/docker/docker/client"
+ 
+ // DefaultDockerHost defines os specific default if DOCKER_HOST is unset
+-const DefaultDockerHost = "unix:///var/run/docker.sock"
++const DefaultDockerHost = "unix://@TERMUX_PREFIX@/var/run/docker.sock"
+ 
+ const defaultProto = "unix"
+-const defaultAddr = "/var/run/docker.sock"
++const defaultAddr = "@TERMUX_PREFIX@/var/run/docker.sock"
+diff -u -r ./cli/man.orig/docker.1.md ./cli/man/docker.1.md
+--- ./cli/man.orig/docker.1.md	2023-10-13 08:18:41.760376085 +0000
++++ ./cli/man/docker.1.md	2023-10-13 11:38:56.880518798 +0000
+@@ -26,7 +26,7 @@
+ **-D**, **--debug**=*true*|*false*
+   Enable debug mode. Default is false.
+ 
+-**-H**, **--host**=[*unix:///var/run/docker.sock*]: tcp://[host]:[port][path] to bind or
++**-H**, **--host**=[*unix://@TERMUX_PREFIX@/var/run/docker.sock*]: tcp://[host]:[port][path] to bind or
+ unix://[/path/to/socket] to use.
+   The socket(s) to bind to in daemon mode specified using one or more
+   tcp://host:port/path, unix:///path/to/socket, fd://* or fd://socketfd.
+diff -u -r ./cli/man.orig/dockerd.8.md ./cli/man/dockerd.8.md
+--- ./cli/man.orig/dockerd.8.md	2023-10-13 08:18:41.760376085 +0000
++++ ./cli/man/dockerd.8.md	2023-10-13 11:38:56.880518798 +0000
+@@ -238,7 +238,7 @@
+   Group to assign the unix socket specified by -H when running in daemon mode.
+   use '' (the empty string) to disable setting of a group. Default is `docker`.
+ 
+-**-H**, **--host**=[*unix:///var/run/docker.sock*]: tcp://[host:port] to bind or
++**-H**, **--host**=[*unix://@TERMUX_PREFIX@/var/run/docker.sock*]: tcp://[host:port] to bind or
+ unix://[/path/to/socket] to use.
+   The socket(s) to bind to in daemon mode specified using one or more
+   tcp://host:port, unix:///path/to/socket, fd://* or fd://socketfd.

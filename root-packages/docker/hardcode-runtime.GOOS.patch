@@ -1,0 +1,4249 @@
+diff -ur ../v20.10.16.orig/moby/api/server/middleware/version.go ./moby/api/server/middleware/version.go
+--- ../v20.10.16.orig/moby/api/server/middleware/version.go	2023-10-13 12:56:04.128082487 +0000
++++ ./moby/api/server/middleware/version.go	2023-10-13 12:58:55.765224225 +0000
+@@ -4,7 +4,7 @@
+ 	"context"
+ 	"fmt"
+ 	"net/http"
+-	"runtime"
++	_ "runtime"
+ 
+ 	"github.com/docker/docker/api/server/httputils"
+ 	"github.com/docker/docker/api/types/versions"
+diff -ur ../v20.10.16.orig/moby/api/server/router/build/build_routes.go ./moby/api/server/router/build/build_routes.go
+--- ../v20.10.16.orig/moby/api/server/router/build/build_routes.go	2023-10-13 12:56:04.128082487 +0000
++++ ./moby/api/server/router/build/build_routes.go	2023-10-13 12:58:55.765224225 +0000
+@@ -9,7 +9,7 @@
+ 	"fmt"
+ 	"io"
+ 	"net/http"
+-	"runtime"
++	_ "runtime"
+ 	"strconv"
+ 	"strings"
+ 	"sync"
+diff -ur ../v20.10.16.orig/moby/builder/builder-next/adapters/containerimage/pull.go ./moby/builder/builder-next/adapters/containerimage/pull.go
+--- ../v20.10.16.orig/moby/builder/builder-next/adapters/containerimage/pull.go	2023-10-13 12:56:04.131415829 +0000
++++ ./moby/builder/builder-next/adapters/containerimage/pull.go	2023-10-13 12:58:58.328564681 +0000
+@@ -6,7 +6,7 @@
+ 	"fmt"
+ 	"io"
+ 	"path"
+-	"runtime"
++	_ "runtime"
+ 	"sync"
+ 	"time"
+ 
+diff -ur ../v20.10.16.orig/moby/builder/builder-next/worker/worker.go ./moby/builder/builder-next/worker/worker.go
+--- ../v20.10.16.orig/moby/builder/builder-next/worker/worker.go	2023-10-13 12:56:04.131415829 +0000
++++ ./moby/builder/builder-next/worker/worker.go	2023-10-13 12:58:58.648565570 +0000
+@@ -5,7 +5,7 @@
+ 	"fmt"
+ 	"io"
+ 	nethttp "net/http"
+-	"runtime"
++	_ "runtime"
+ 	"strings"
+ 	"time"
+ 
+diff -ur ../v20.10.16.orig/moby/builder/dockerfile/copy.go ./moby/builder/dockerfile/copy.go
+--- ../v20.10.16.orig/moby/builder/dockerfile/copy.go	2023-10-13 12:56:04.131415829 +0000
++++ ./moby/builder/dockerfile/copy.go	2023-10-13 12:58:57.631896079 +0000
+@@ -9,7 +9,7 @@
+ 	"net/url"
+ 	"os"
+ 	"path/filepath"
+-	"runtime"
++	_ "runtime"
+ 	"sort"
+ 	"strings"
+ 	"time"
+diff -ur ../v20.10.16.orig/moby/builder/dockerfile/dispatchers.go ./moby/builder/dockerfile/dispatchers.go
+--- ../v20.10.16.orig/moby/builder/dockerfile/dispatchers.go	2023-10-13 12:56:04.131415829 +0000
++++ ./moby/builder/dockerfile/dispatchers.go	2023-10-13 12:58:57.631896079 +0000
+@@ -10,7 +10,7 @@
+ import (
+ 	"bytes"
+ 	"fmt"
+-	"runtime"
++	_ "runtime"
+ 	"sort"
+ 	"strings"
+ 
+diff -ur ../v20.10.16.orig/moby/builder/dockerfile/evaluator.go ./moby/builder/dockerfile/evaluator.go
+--- ../v20.10.16.orig/moby/builder/dockerfile/evaluator.go	2023-10-13 12:56:04.131415829 +0000
++++ ./moby/builder/dockerfile/evaluator.go	2023-10-13 12:58:57.631896079 +0000
+@@ -21,7 +21,7 @@
+ 
+ import (
+ 	"reflect"
+-	"runtime"
++	_ "runtime"
+ 	"strconv"
+ 	"strings"
+ 
+diff -ur ../v20.10.16.orig/moby/builder/dockerfile/imagecontext.go ./moby/builder/dockerfile/imagecontext.go
+--- ../v20.10.16.orig/moby/builder/dockerfile/imagecontext.go	2023-10-13 12:56:04.131415829 +0000
++++ ./moby/builder/dockerfile/imagecontext.go	2023-10-13 12:58:57.631896079 +0000
+@@ -2,7 +2,7 @@
+ 
+ import (
+ 	"context"
+-	"runtime"
++	_ "runtime"
+ 
+ 	"github.com/containerd/containerd/platforms"
+ 	"github.com/docker/docker/api/types/backend"
+diff -ur ../v20.10.16.orig/moby/builder/dockerfile/internals.go ./moby/builder/dockerfile/internals.go
+--- ../v20.10.16.orig/moby/builder/dockerfile/internals.go	2023-10-13 12:56:04.131415829 +0000
++++ ./moby/builder/dockerfile/internals.go	2023-10-13 12:58:57.631896079 +0000
+@@ -11,7 +11,7 @@
+ 	"os"
+ 	"path"
+ 	"path/filepath"
+-	"runtime"
++	_ "runtime"
+ 	"strings"
+ 
+ 	"github.com/docker/docker/api/types"
+diff -ur ../v20.10.16.orig/moby/builder/remotecontext/detect.go ./moby/builder/remotecontext/detect.go
+--- ../v20.10.16.orig/moby/builder/remotecontext/detect.go	2023-10-13 12:56:04.131415829 +0000
++++ ./moby/builder/remotecontext/detect.go	2023-10-13 12:58:57.335228587 +0000
+@@ -5,7 +5,7 @@
+ 	"fmt"
+ 	"io"
+ 	"os"
+-	"runtime"
++	_ "runtime"
+ 	"strings"
+ 
+ 	"github.com/containerd/continuity/driver"
+Only in ./moby: bundles
+diff -ur ../v20.10.16.orig/moby/cmd/dockerd/config.go ./moby/cmd/dockerd/config.go
+--- ../v20.10.16.orig/moby/cmd/dockerd/config.go	2023-10-13 12:56:04.131415829 +0000
++++ ./moby/cmd/dockerd/config.go	2023-10-13 12:58:58.985233172 +0000
+@@ -1,7 +1,7 @@
+ package main
+ 
+ import (
+-	"runtime"
++	_ "runtime"
+ 
+ 	"github.com/docker/docker/daemon"
+ 	"github.com/docker/docker/daemon/config"
+diff -ur ../v20.10.16.orig/moby/cmd/dockerd/daemon.go ./moby/cmd/dockerd/daemon.go
+--- ../v20.10.16.orig/moby/cmd/dockerd/daemon.go	2023-10-13 12:56:04.131415829 +0000
++++ ./moby/cmd/dockerd/daemon.go	2023-10-13 12:58:58.985233172 +0000
+@@ -7,7 +7,7 @@
+ 	"net"
+ 	"os"
+ 	"path/filepath"
+-	"runtime"
++	_ "runtime"
+ 	"strings"
+ 	"time"
+ 
+diff -ur ../v20.10.16.orig/moby/container/container.go ./moby/container/container.go
+--- ../v20.10.16.orig/moby/container/container.go	2023-10-13 12:56:04.134749172 +0000
++++ ./moby/container/container.go	2023-10-13 12:58:57.031894412 +0000
+@@ -8,7 +8,7 @@
+ 	"io"
+ 	"os"
+ 	"path/filepath"
+-	"runtime"
++	_ "runtime"
+ 	"strings"
+ 	"sync"
+ 	"syscall"
+diff -ur ../v20.10.16.orig/moby/daemon/cluster/cluster.go ./moby/daemon/cluster/cluster.go
+--- ../v20.10.16.orig/moby/daemon/cluster/cluster.go	2023-10-13 12:56:04.134749172 +0000
++++ ./moby/daemon/cluster/cluster.go	2023-10-13 12:58:58.648565570 +0000
+@@ -45,7 +45,7 @@
+ 	"net"
+ 	"os"
+ 	"path/filepath"
+-	"runtime"
++	_ "runtime"
+ 	"sync"
+ 	"time"
+ 
+diff -ur ../v20.10.16.orig/moby/daemon/commit.go ./moby/daemon/commit.go
+--- ../v20.10.16.orig/moby/daemon/commit.go	2023-10-13 12:56:04.134749172 +0000
++++ ./moby/daemon/commit.go	2023-10-13 12:58:58.328564681 +0000
+@@ -2,7 +2,7 @@
+ 
+ import (
+ 	"fmt"
+-	"runtime"
++	_ "runtime"
+ 	"strings"
+ 	"time"
+ 
+diff -ur ../v20.10.16.orig/moby/daemon/container.go ./moby/daemon/container.go
+--- ../v20.10.16.orig/moby/daemon/container.go	2023-10-13 12:56:04.134749172 +0000
++++ ./moby/daemon/container.go	2023-10-13 12:58:58.328564681 +0000
+@@ -5,7 +5,7 @@
+ 	"os"
+ 	"path"
+ 	"path/filepath"
+-	"runtime"
++	_ "runtime"
+ 	"strings"
+ 	"time"
+ 
+diff -ur ../v20.10.16.orig/moby/daemon/create.go ./moby/daemon/create.go
+--- ../v20.10.16.orig/moby/daemon/create.go	2023-10-13 12:56:04.134749172 +0000
++++ ./moby/daemon/create.go	2023-10-13 12:58:58.328564681 +0000
+@@ -3,7 +3,7 @@
+ import (
+ 	"fmt"
+ 	"net"
+-	"runtime"
++	_ "runtime"
+ 	"strings"
+ 	"time"
+ 
+diff -ur ../v20.10.16.orig/moby/daemon/daemon_unix.go ./moby/daemon/daemon_unix.go
+--- ../v20.10.16.orig/moby/daemon/daemon_unix.go	2023-10-13 12:56:04.134749172 +0000
++++ ./moby/daemon/daemon_unix.go	2023-10-13 12:58:58.328564681 +0000
+@@ -10,7 +10,7 @@
+ 	"net"
+ 	"os"
+ 	"path/filepath"
+-	"runtime"
++	_ "runtime"
+ 	"runtime/debug"
+ 	"strconv"
+ 	"strings"
+diff -ur ../v20.10.16.orig/moby/daemon/exec/exec.go ./moby/daemon/exec/exec.go
+--- ../v20.10.16.orig/moby/daemon/exec/exec.go	2023-10-13 12:56:04.134749172 +0000
++++ ./moby/daemon/exec/exec.go	2023-10-13 12:58:55.765224225 +0000
+@@ -2,7 +2,7 @@
+ 
+ import (
+ 	"context"
+-	"runtime"
++	_ "runtime"
+ 	"sync"
+ 
+ 	"github.com/containerd/containerd/cio"
+diff -ur ../v20.10.16.orig/moby/daemon/exec.go ./moby/daemon/exec.go
+--- ../v20.10.16.orig/moby/daemon/exec.go	2023-10-13 12:56:04.134749172 +0000
++++ ./moby/daemon/exec.go	2023-10-13 12:58:58.328564681 +0000
+@@ -4,7 +4,7 @@
+ 	"context"
+ 	"fmt"
+ 	"io"
+-	"runtime"
++	_ "runtime"
+ 	"strings"
+ 	"time"
+ 
+diff -ur ../v20.10.16.orig/moby/daemon/health.go ./moby/daemon/health.go
+--- ../v20.10.16.orig/moby/daemon/health.go	2023-10-13 12:56:04.134749172 +0000
++++ ./moby/daemon/health.go	2023-10-13 12:58:58.328564681 +0000
+@@ -4,7 +4,7 @@
+ 	"bytes"
+ 	"context"
+ 	"fmt"
+-	"runtime"
++	_ "runtime"
+ 	"strings"
+ 	"sync"
+ 	"time"
+diff -ur ../v20.10.16.orig/moby/daemon/images/image_builder.go ./moby/daemon/images/image_builder.go
+--- ../v20.10.16.orig/moby/daemon/images/image_builder.go	2023-10-13 12:56:04.134749172 +0000
++++ ./moby/daemon/images/image_builder.go	2023-10-13 12:58:57.941896940 +0000
+@@ -3,7 +3,7 @@
+ import (
+ 	"context"
+ 	"io"
+-	"runtime"
++	_ "runtime"
+ 
+ 	"github.com/containerd/containerd/platforms"
+ 	"github.com/docker/distribution/reference"
+diff -ur ../v20.10.16.orig/moby/daemon/images/image_unix.go ./moby/daemon/images/image_unix.go
+--- ../v20.10.16.orig/moby/daemon/images/image_unix.go	2023-10-13 12:56:04.134749172 +0000
++++ ./moby/daemon/images/image_unix.go	2023-10-13 12:58:57.941896940 +0000
+@@ -4,7 +4,7 @@
+ package images // import "github.com/docker/docker/daemon/images"
+ 
+ import (
+-	"runtime"
++	_ "runtime"
+ 
+ 	"github.com/sirupsen/logrus"
+ )
+diff -ur ../v20.10.16.orig/moby/daemon/images/service.go ./moby/daemon/images/service.go
+--- ../v20.10.16.orig/moby/daemon/images/service.go	2023-10-13 12:56:04.134749172 +0000
++++ ./moby/daemon/images/service.go	2023-10-13 12:58:57.945230282 +0000
+@@ -3,7 +3,7 @@
+ import (
+ 	"context"
+ 	"os"
+-	"runtime"
++	_ "runtime"
+ 
+ 	"github.com/containerd/containerd/content"
+ 	"github.com/containerd/containerd/leases"
+diff -ur ../v20.10.16.orig/moby/daemon/kill.go ./moby/daemon/kill.go
+--- ../v20.10.16.orig/moby/daemon/kill.go	2023-10-13 12:56:04.138082514 +0000
++++ ./moby/daemon/kill.go	2023-10-13 12:58:58.328564681 +0000
+@@ -3,7 +3,7 @@
+ import (
+ 	"context"
+ 	"fmt"
+-	"runtime"
++	_ "runtime"
+ 	"syscall"
+ 	"time"
+ 
+diff -ur ../v20.10.16.orig/moby/daemon/logger/awslogs/cloudwatchlogs.go ./moby/daemon/logger/awslogs/cloudwatchlogs.go
+--- ../v20.10.16.orig/moby/daemon/logger/awslogs/cloudwatchlogs.go	2023-10-13 12:56:04.138082514 +0000
++++ ./moby/daemon/logger/awslogs/cloudwatchlogs.go	2023-10-13 12:58:56.431892744 +0000
+@@ -5,7 +5,7 @@
+ 	"fmt"
+ 	"os"
+ 	"regexp"
+-	"runtime"
++	_ "runtime"
+ 	"sort"
+ 	"strconv"
+ 	"strings"
+diff -ur ../v20.10.16.orig/moby/daemon/logger/loggerutils/logfile.go ./moby/daemon/logger/loggerutils/logfile.go
+--- ../v20.10.16.orig/moby/daemon/logger/loggerutils/logfile.go	2023-10-13 12:56:04.138082514 +0000
++++ ./moby/daemon/logger/loggerutils/logfile.go	2023-10-13 12:58:56.101891827 +0000
+@@ -7,7 +7,7 @@
+ 	"fmt"
+ 	"io"
+ 	"os"
+-	"runtime"
++	_ "runtime"
+ 	"strconv"
+ 	"strings"
+ 	"sync"
+diff -ur ../v20.10.16.orig/moby/daemon/start.go ./moby/daemon/start.go
+--- ../v20.10.16.orig/moby/daemon/start.go	2023-10-13 12:56:04.138082514 +0000
++++ ./moby/daemon/start.go	2023-10-13 12:58:58.328564681 +0000
+@@ -2,7 +2,7 @@
+ 
+ import (
+ 	"context"
+-	"runtime"
++	_ "runtime"
+ 	"time"
+ 
+ 	"github.com/docker/docker/api/types"
+diff -ur ../v20.10.16.orig/moby/daemon/stats_collector.go ./moby/daemon/stats_collector.go
+--- ../v20.10.16.orig/moby/daemon/stats_collector.go	2023-10-13 12:56:04.138082514 +0000
++++ ./moby/daemon/stats_collector.go	2023-10-13 12:58:58.328564681 +0000
+@@ -1,7 +1,7 @@
+ package daemon // import "github.com/docker/docker/daemon"
+ 
+ import (
+-	"runtime"
++	_ "runtime"
+ 	"time"
+ 
+ 	"github.com/docker/docker/daemon/stats"
+diff -ur ../v20.10.16.orig/moby/daemon/stats.go ./moby/daemon/stats.go
+--- ../v20.10.16.orig/moby/daemon/stats.go	2023-10-13 12:56:04.138082514 +0000
++++ ./moby/daemon/stats.go	2023-10-13 12:58:58.328564681 +0000
+@@ -4,7 +4,7 @@
+ 	"context"
+ 	"encoding/json"
+ 	"errors"
+-	"runtime"
++	_ "runtime"
+ 	"time"
+ 
+ 	"github.com/docker/docker/api/types"
+diff -ur ../v20.10.16.orig/moby/distribution/config.go ./moby/distribution/config.go
+--- ../v20.10.16.orig/moby/distribution/config.go	2023-10-13 12:56:04.138082514 +0000
++++ ./moby/distribution/config.go	2023-10-13 12:58:57.335228587 +0000
+@@ -5,7 +5,7 @@
+ 	"encoding/json"
+ 	"fmt"
+ 	"io"
+-	"runtime"
++	_ "runtime"
+ 
+ 	"github.com/docker/distribution"
+ 	"github.com/docker/distribution/manifest/schema2"
+diff -ur ../v20.10.16.orig/moby/distribution/push_v2.go ./moby/distribution/push_v2.go
+--- ../v20.10.16.orig/moby/distribution/push_v2.go	2023-10-13 12:56:04.138082514 +0000
++++ ./moby/distribution/push_v2.go	2023-10-13 12:58:57.335228587 +0000
+@@ -5,7 +5,7 @@
+ 	"fmt"
+ 	"io"
+ 	"os"
+-	"runtime"
++	_ "runtime"
+ 	"sort"
+ 	"strings"
+ 	"sync"
+diff -ur ../v20.10.16.orig/moby/distribution/xfer/download.go ./moby/distribution/xfer/download.go
+--- ../v20.10.16.orig/moby/distribution/xfer/download.go	2023-10-13 12:56:04.138082514 +0000
++++ ./moby/distribution/xfer/download.go	2023-10-13 12:58:57.031894412 +0000
+@@ -5,7 +5,7 @@
+ 	"errors"
+ 	"fmt"
+ 	"io"
+-	"runtime"
++	_ "runtime"
+ 	"time"
+ 
+ 	"github.com/docker/distribution"
+Only in ./moby: .gopath
+diff -ur ../v20.10.16.orig/moby/image/rootfs.go ./moby/image/rootfs.go
+--- ../v20.10.16.orig/moby/image/rootfs.go	2023-10-13 12:56:04.141415857 +0000
++++ ./moby/image/rootfs.go	2023-10-13 12:58:56.735226920 +0000
+@@ -1,7 +1,7 @@
+ package image // import "github.com/docker/docker/image"
+ 
+ import (
+-	"runtime"
++	_ "runtime"
+ 
+ 	"github.com/docker/docker/layer"
+ 	"github.com/sirupsen/logrus"
+diff -ur ../v20.10.16.orig/moby/image/tarexport/load.go ./moby/image/tarexport/load.go
+--- ../v20.10.16.orig/moby/image/tarexport/load.go	2023-10-13 12:56:04.141415857 +0000
++++ ./moby/image/tarexport/load.go	2023-10-13 12:58:57.031894412 +0000
+@@ -8,7 +8,7 @@
+ 	"os"
+ 	"path/filepath"
+ 	"reflect"
+-	"runtime"
++	_ "runtime"
+ 
+ 	"github.com/containerd/containerd/platforms"
+ 	"github.com/docker/distribution"
+diff -ur ../v20.10.16.orig/moby/image/tarexport/save.go ./moby/image/tarexport/save.go
+--- ../v20.10.16.orig/moby/image/tarexport/save.go	2023-10-13 12:56:04.141415857 +0000
++++ ./moby/image/tarexport/save.go	2023-10-13 12:58:57.031894412 +0000
+@@ -7,7 +7,7 @@
+ 	"os"
+ 	"path"
+ 	"path/filepath"
+-	"runtime"
++	_ "runtime"
+ 	"time"
+ 
+ 	"github.com/docker/distribution"
+diff -ur ../v20.10.16.orig/moby/layer/filestore_unix.go ./moby/layer/filestore_unix.go
+--- ../v20.10.16.orig/moby/layer/filestore_unix.go	2023-10-13 12:56:04.144749199 +0000
++++ ./moby/layer/filestore_unix.go	2023-10-13 12:58:56.431892744 +0000
+@@ -3,7 +3,7 @@
+ 
+ package layer // import "github.com/docker/docker/layer"
+ 
+-import "runtime"
++import _ "runtime"
+ 
+ // setOS writes the "os" file to the layer filestore
+ func (fm *fileMetadataTransaction) setOS(os string) error {
+diff -ur ../v20.10.16.orig/moby/libcontainerd/remote/client.go ./moby/libcontainerd/remote/client.go
+--- ../v20.10.16.orig/moby/libcontainerd/remote/client.go	2023-10-13 12:56:04.148082541 +0000
++++ ./moby/libcontainerd/remote/client.go	2023-10-13 12:58:56.735226920 +0000
+@@ -7,7 +7,7 @@
+ 	"os"
+ 	"path/filepath"
+ 	"reflect"
+-	"runtime"
++	_ "runtime"
+ 	"strings"
+ 	"sync"
+ 	"syscall"
+diff -ur ../v20.10.16.orig/moby/oci/defaults.go ./moby/oci/defaults.go
+--- ../v20.10.16.orig/moby/oci/defaults.go	2023-10-13 12:56:04.148082541 +0000
++++ ./moby/oci/defaults.go	2023-10-13 12:58:55.765224225 +0000
+@@ -2,7 +2,7 @@
+ 
+ import (
+ 	"os"
+-	"runtime"
++	_ "runtime"
+ 
+ 	"github.com/docker/docker/oci/caps"
+ 	specs "github.com/opencontainers/runtime-spec/specs-go"
+diff -ur ../v20.10.16.orig/moby/pkg/archive/archive.go ./moby/pkg/archive/archive.go
+--- ../v20.10.16.orig/moby/pkg/archive/archive.go	2023-10-13 12:56:04.148082541 +0000
++++ ./moby/pkg/archive/archive.go	2023-10-13 12:58:56.101891827 +0000
+@@ -11,7 +11,7 @@
+ 	"io"
+ 	"os"
+ 	"path/filepath"
+-	"runtime"
++	_ "runtime"
+ 	"strconv"
+ 	"strings"
+ 	"syscall"
+diff -ur ../v20.10.16.orig/moby/pkg/archive/diff.go ./moby/pkg/archive/diff.go
+--- ../v20.10.16.orig/moby/pkg/archive/diff.go	2023-10-13 12:56:04.148082541 +0000
++++ ./moby/pkg/archive/diff.go	2023-10-13 12:58:56.101891827 +0000
+@@ -6,7 +6,7 @@
+ 	"io"
+ 	"os"
+ 	"path/filepath"
+-	"runtime"
++	_ "runtime"
+ 	"strings"
+ 
+ 	"github.com/docker/docker/pkg/idtools"
+diff -ur ../v20.10.16.orig/moby/pkg/platform/platform.go ./moby/pkg/platform/platform.go
+--- ../v20.10.16.orig/moby/pkg/platform/platform.go	2023-10-13 12:56:04.148082541 +0000
++++ ./moby/pkg/platform/platform.go	2023-10-13 12:58:55.768557568 +0000
+@@ -1,7 +1,7 @@
+ package platform // import "github.com/docker/docker/pkg/platform"
+ 
+ import (
+-	"runtime"
++	_ "runtime"
+ 
+ 	"github.com/sirupsen/logrus"
+ )
+diff -ur ../v20.10.16.orig/moby/pkg/system/lcow_unsupported.go ./moby/pkg/system/lcow_unsupported.go
+--- ../v20.10.16.orig/moby/pkg/system/lcow_unsupported.go	2023-10-13 12:56:04.148082541 +0000
++++ ./moby/pkg/system/lcow_unsupported.go	2023-10-13 12:58:55.765224225 +0000
+@@ -3,7 +3,7 @@
+ 
+ package system // import "github.com/docker/docker/pkg/system"
+ import (
+-	"runtime"
++	_ "runtime"
+ 	"strings"
+ 
+ 	specs "github.com/opencontainers/image-spec/specs-go/v1"
+diff -ur ../v20.10.16.orig/moby/pkg/system/path.go ./moby/pkg/system/path.go
+--- ../v20.10.16.orig/moby/pkg/system/path.go	2023-10-13 12:56:04.148082541 +0000
++++ ./moby/pkg/system/path.go	2023-10-13 12:58:55.765224225 +0000
+@@ -3,7 +3,7 @@
+ import (
+ 	"fmt"
+ 	"path/filepath"
+-	"runtime"
++	_ "runtime"
+ 	"strings"
+ )
+ 
+diff -ur ../v20.10.16.orig/moby/pkg/tarsum/fileinfosums.go ./moby/pkg/tarsum/fileinfosums.go
+--- ../v20.10.16.orig/moby/pkg/tarsum/fileinfosums.go	2023-10-13 12:56:04.148082541 +0000
++++ ./moby/pkg/tarsum/fileinfosums.go	2023-10-13 12:58:56.098558485 +0000
+@@ -1,7 +1,7 @@
+ package tarsum // import "github.com/docker/docker/pkg/tarsum"
+ 
+ import (
+-	"runtime"
++	_ "runtime"
+ 	"sort"
+ 	"strings"
+ )
+diff -ur ../v20.10.16.orig/moby/plugin/v2/plugin_linux.go ./moby/plugin/v2/plugin_linux.go
+--- ../v20.10.16.orig/moby/plugin/v2/plugin_linux.go	2023-10-13 12:56:04.148082541 +0000
++++ ./moby/plugin/v2/plugin_linux.go	2023-10-13 12:58:56.101891827 +0000
+@@ -3,7 +3,7 @@
+ import (
+ 	"os"
+ 	"path/filepath"
+-	"runtime"
++	_ "runtime"
+ 	"strings"
+ 
+ 	"github.com/docker/docker/api/types"
+diff -ur ../v20.10.16.orig/moby/runconfig/hostconfig_unix.go ./moby/runconfig/hostconfig_unix.go
+--- ../v20.10.16.orig/moby/runconfig/hostconfig_unix.go	2023-10-13 12:56:04.151415884 +0000
++++ ./moby/runconfig/hostconfig_unix.go	2023-10-13 12:58:55.765224225 +0000
+@@ -5,7 +5,7 @@
+ 
+ import (
+ 	"fmt"
+-	"runtime"
++	_ "runtime"
+ 
+ 	"github.com/docker/docker/api/types/container"
+ 	"github.com/docker/docker/pkg/sysinfo"
+diff -ur ../v20.10.16.orig/moby/vendor/archive/tar/stat_unix.go ./moby/vendor/archive/tar/stat_unix.go
+--- ../v20.10.16.orig/moby/vendor/archive/tar/stat_unix.go	2023-10-13 12:56:04.151415884 +0000
++++ ./moby/vendor/archive/tar/stat_unix.go	2023-10-13 12:58:55.765224225 +0000
+@@ -8,7 +8,7 @@
+ 
+ import (
+ 	"io/fs"
+-	"runtime"
++	_ "runtime"
+ 	"syscall"
+ )
+ 
+diff -ur ../v20.10.16.orig/moby/vendor/cloud.google.com/go/compute/metadata/metadata.go ./moby/vendor/cloud.google.com/go/compute/metadata/metadata.go
+--- ../v20.10.16.orig/moby/vendor/cloud.google.com/go/compute/metadata/metadata.go	2023-10-13 12:56:04.151415884 +0000
++++ ./moby/vendor/cloud.google.com/go/compute/metadata/metadata.go	2023-10-13 12:58:55.765224225 +0000
+@@ -28,7 +28,7 @@
+ 	"net/http"
+ 	"net/url"
+ 	"os"
+-	"runtime"
++	_ "runtime"
+ 	"strings"
+ 	"sync"
+ 	"time"
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/aws/aws-sdk-go/aws/credentials/processcreds/provider.go ./moby/vendor/github.com/aws/aws-sdk-go/aws/credentials/processcreds/provider.go
+--- ../v20.10.16.orig/moby/vendor/github.com/aws/aws-sdk-go/aws/credentials/processcreds/provider.go	2023-10-13 12:56:04.151415884 +0000
++++ ./moby/vendor/github.com/aws/aws-sdk-go/aws/credentials/processcreds/provider.go	2023-10-13 12:58:56.101891827 +0000
+@@ -84,7 +84,7 @@
+ 	"io/ioutil"
+ 	"os"
+ 	"os/exec"
+-	"runtime"
++	_ "runtime"
+ 	"strings"
+ 	"time"
+ 
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/aws/aws-sdk-go/internal/shareddefaults/shared_config.go ./moby/vendor/github.com/aws/aws-sdk-go/internal/shareddefaults/shared_config.go
+--- ../v20.10.16.orig/moby/vendor/github.com/aws/aws-sdk-go/internal/shareddefaults/shared_config.go	2023-10-13 12:56:04.151415884 +0000
++++ ./moby/vendor/github.com/aws/aws-sdk-go/internal/shareddefaults/shared_config.go	2023-10-13 12:58:55.765224225 +0000
+@@ -3,7 +3,7 @@
+ import (
+ 	"os"
+ 	"path/filepath"
+-	"runtime"
++	_ "runtime"
+ )
+ 
+ // SharedCredentialsFilename returns the SDK's default file path
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/archive/tar.go ./moby/vendor/github.com/containerd/containerd/archive/tar.go
+--- ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/archive/tar.go	2023-10-13 12:56:04.151415884 +0000
++++ ./moby/vendor/github.com/containerd/containerd/archive/tar.go	2023-10-13 12:58:56.101891827 +0000
+@@ -22,7 +22,7 @@
+ 	"io"
+ 	"os"
+ 	"path/filepath"
+-	"runtime"
++	_ "runtime"
+ 	"strings"
+ 	"sync"
+ 	"syscall"
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/client.go ./moby/vendor/github.com/containerd/containerd/client.go
+--- ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/client.go	2023-10-13 12:56:04.151415884 +0000
++++ ./moby/vendor/github.com/containerd/containerd/client.go	2023-10-13 12:58:56.435226086 +0000
+@@ -22,7 +22,7 @@
+ 	"encoding/json"
+ 	"fmt"
+ 	"net/http"
+-	"runtime"
++	_ "runtime"
+ 	"strconv"
+ 	"strings"
+ 	"sync"
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/content/local/writer.go ./moby/vendor/github.com/containerd/containerd/content/local/writer.go
+--- ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/content/local/writer.go	2023-10-13 12:56:04.151415884 +0000
++++ ./moby/vendor/github.com/containerd/containerd/content/local/writer.go	2023-10-13 12:58:55.765224225 +0000
+@@ -21,7 +21,7 @@
+ 	"io"
+ 	"os"
+ 	"path/filepath"
+-	"runtime"
++	_ "runtime"
+ 	"time"
+ 
+ 	"github.com/containerd/containerd/content"
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/install.go ./moby/vendor/github.com/containerd/containerd/install.go
+--- ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/install.go	2023-10-13 12:56:04.151415884 +0000
++++ ./moby/vendor/github.com/containerd/containerd/install.go	2023-10-13 12:58:56.435226086 +0000
+@@ -21,7 +21,7 @@
+ 	"context"
+ 	"os"
+ 	"path/filepath"
+-	"runtime"
++	_ "runtime"
+ 	"strings"
+ 
+ 	"github.com/containerd/containerd/archive"
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/oci/spec.go ./moby/vendor/github.com/containerd/containerd/oci/spec.go
+--- ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/oci/spec.go	2023-10-13 12:56:04.151415884 +0000
++++ ./moby/vendor/github.com/containerd/containerd/oci/spec.go	2023-10-13 12:58:56.101891827 +0000
+@@ -19,7 +19,7 @@
+ import (
+ 	"context"
+ 	"path/filepath"
+-	"runtime"
++	_ "runtime"
+ 
+ 	"github.com/containerd/containerd/namespaces"
+ 	"github.com/containerd/containerd/platforms"
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/platforms/database.go ./moby/vendor/github.com/containerd/containerd/platforms/database.go
+--- ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/platforms/database.go	2023-10-13 12:56:04.151415884 +0000
++++ ./moby/vendor/github.com/containerd/containerd/platforms/database.go	2023-10-13 12:58:55.765224225 +0000
+@@ -17,7 +17,7 @@
+ package platforms
+ 
+ import (
+-	"runtime"
++	_ "runtime"
+ 	"strings"
+ )
+ 
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/containerd/go-runc/io_unix.go ./moby/vendor/github.com/containerd/go-runc/io_unix.go
+--- ../v20.10.16.orig/moby/vendor/github.com/containerd/go-runc/io_unix.go	2023-10-13 12:56:04.151415884 +0000
++++ ./moby/vendor/github.com/containerd/go-runc/io_unix.go	2023-10-13 12:58:55.765224225 +0000
+@@ -22,7 +22,7 @@
+ 	"github.com/pkg/errors"
+ 	"github.com/sirupsen/logrus"
+ 	"golang.org/x/sys/unix"
+-	"runtime"
++	_ "runtime"
+ )
+ 
+ // NewPipeIO creates pipe pairs to be used with runc
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/docker/go-connections/tlsconfig/certpool_go17.go ./moby/vendor/github.com/docker/go-connections/tlsconfig/certpool_go17.go
+--- ../v20.10.16.orig/moby/vendor/github.com/docker/go-connections/tlsconfig/certpool_go17.go	2023-10-13 12:56:04.151415884 +0000
++++ ./moby/vendor/github.com/docker/go-connections/tlsconfig/certpool_go17.go	2023-10-13 12:58:55.765224225 +0000
+@@ -4,7 +4,7 @@
+ 
+ import (
+ 	"crypto/x509"
+-	"runtime"
++	_ "runtime"
+ )
+ 
+ // SystemCertPool returns a copy of the system cert pool,
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/docker/libnetwork/controller.go ./moby/vendor/github.com/docker/libnetwork/controller.go
+--- ../v20.10.16.orig/moby/vendor/github.com/docker/libnetwork/controller.go	2023-10-13 12:56:04.151415884 +0000
++++ ./moby/vendor/github.com/docker/libnetwork/controller.go	2023-10-13 12:58:56.431892744 +0000
+@@ -47,7 +47,7 @@
+ 	"fmt"
+ 	"net"
+ 	"path/filepath"
+-	"runtime"
++	_ "runtime"
+ 	"strings"
+ 	"sync"
+ 	"time"
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/docker/libnetwork/network.go ./moby/vendor/github.com/docker/libnetwork/network.go
+--- ../v20.10.16.orig/moby/vendor/github.com/docker/libnetwork/network.go	2023-10-13 12:56:04.154749226 +0000
++++ ./moby/vendor/github.com/docker/libnetwork/network.go	2023-10-13 12:58:56.431892744 +0000
+@@ -4,7 +4,7 @@
+ 	"encoding/json"
+ 	"fmt"
+ 	"net"
+-	"runtime"
++	_ "runtime"
+ 	"strings"
+ 	"sync"
+ 	"time"
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/docker/swarmkit/manager/manager.go ./moby/vendor/github.com/docker/swarmkit/manager/manager.go
+--- ../v20.10.16.orig/moby/vendor/github.com/docker/swarmkit/manager/manager.go	2023-10-13 12:56:04.154749226 +0000
++++ ./moby/vendor/github.com/docker/swarmkit/manager/manager.go	2023-10-13 12:58:56.101891827 +0000
+@@ -8,7 +8,7 @@
+ 	"net"
+ 	"os"
+ 	"path/filepath"
+-	"runtime"
++	_ "runtime"
+ 	"sync"
+ 	"syscall"
+ 	"time"
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/google/certificate-transparency-go/x509/cert_pool.go ./moby/vendor/github.com/google/certificate-transparency-go/x509/cert_pool.go
+--- ../v20.10.16.orig/moby/vendor/github.com/google/certificate-transparency-go/x509/cert_pool.go	2023-10-13 12:56:04.154749226 +0000
++++ ./moby/vendor/github.com/google/certificate-transparency-go/x509/cert_pool.go	2023-10-13 12:58:55.768557568 +0000
+@@ -7,7 +7,7 @@
+ import (
+ 	"encoding/pem"
+ 	"errors"
+-	"runtime"
++	_ "runtime"
+ )
+ 
+ // CertPool is a set of certificates.
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/google/certificate-transparency-go/x509/verify.go ./moby/vendor/github.com/google/certificate-transparency-go/x509/verify.go
+--- ../v20.10.16.orig/moby/vendor/github.com/google/certificate-transparency-go/x509/verify.go	2023-10-13 12:56:04.154749226 +0000
++++ ./moby/vendor/github.com/google/certificate-transparency-go/x509/verify.go	2023-10-13 12:58:55.768557568 +0000
+@@ -11,7 +11,7 @@
+ 	"net"
+ 	"net/url"
+ 	"reflect"
+-	"runtime"
++	_ "runtime"
+ 	"strconv"
+ 	"strings"
+ 	"time"
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/mistifyio/go-zfs/utils.go ./moby/vendor/github.com/mistifyio/go-zfs/utils.go
+--- ../v20.10.16.orig/moby/vendor/github.com/mistifyio/go-zfs/utils.go	2023-10-13 12:56:04.154749226 +0000
++++ ./moby/vendor/github.com/mistifyio/go-zfs/utils.go	2023-10-13 12:58:55.765224225 +0000
+@@ -7,7 +7,7 @@
+ 	"io"
+ 	"os/exec"
+ 	"regexp"
+-	"runtime"
++	_ "runtime"
+ 	"strconv"
+ 	"strings"
+ 
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/moby/buildkit/solver/llbsolver/ops/file.go ./moby/vendor/github.com/moby/buildkit/solver/llbsolver/ops/file.go
+--- ../v20.10.16.orig/moby/vendor/github.com/moby/buildkit/solver/llbsolver/ops/file.go	2023-10-13 12:56:04.154749226 +0000
++++ ./moby/vendor/github.com/moby/buildkit/solver/llbsolver/ops/file.go	2023-10-13 12:58:56.735226920 +0000
+@@ -6,7 +6,7 @@
+ 	"encoding/json"
+ 	"fmt"
+ 	"path"
+-	"runtime"
++	_ "runtime"
+ 	"sort"
+ 	"sync"
+ 
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/moby/buildkit/util/resolver/resolver.go ./moby/vendor/github.com/moby/buildkit/util/resolver/resolver.go
+--- ../v20.10.16.orig/moby/vendor/github.com/moby/buildkit/util/resolver/resolver.go	2023-10-13 12:56:04.154749226 +0000
++++ ./moby/vendor/github.com/moby/buildkit/util/resolver/resolver.go	2023-10-13 12:58:56.735226920 +0000
+@@ -8,7 +8,7 @@
+ 	"net/http"
+ 	"os"
+ 	"path/filepath"
+-	"runtime"
++	_ "runtime"
+ 	"strings"
+ 	"time"
+ 
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/moby/buildkit/util/winlayers/applier.go ./moby/vendor/github.com/moby/buildkit/util/winlayers/applier.go
+--- ../v20.10.16.orig/moby/vendor/github.com/moby/buildkit/util/winlayers/applier.go	2023-10-13 12:56:04.154749226 +0000
++++ ./moby/vendor/github.com/moby/buildkit/util/winlayers/applier.go	2023-10-13 12:58:56.431892744 +0000
+@@ -5,7 +5,7 @@
+ 	"context"
+ 	"io"
+ 	"io/ioutil"
+-	"runtime"
++	_ "runtime"
+ 	"strings"
+ 	"sync"
+ 
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/tonistiigi/fsutil/copy/copy.go ./moby/vendor/github.com/tonistiigi/fsutil/copy/copy.go
+--- ../v20.10.16.orig/moby/vendor/github.com/tonistiigi/fsutil/copy/copy.go	2023-10-13 12:56:04.154749226 +0000
++++ ./moby/vendor/github.com/tonistiigi/fsutil/copy/copy.go	2023-10-13 12:58:55.765224225 +0000
+@@ -5,7 +5,7 @@
+ 	"io/ioutil"
+ 	"os"
+ 	"path/filepath"
+-	"runtime"
++	_ "runtime"
+ 	"strings"
+ 	"sync"
+ 	"time"
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/tonistiigi/fsutil/followlinks.go ./moby/vendor/github.com/tonistiigi/fsutil/followlinks.go
+--- ../v20.10.16.orig/moby/vendor/github.com/tonistiigi/fsutil/followlinks.go	2023-10-13 12:56:04.154749226 +0000
++++ ./moby/vendor/github.com/tonistiigi/fsutil/followlinks.go	2023-10-13 12:58:56.101891827 +0000
+@@ -4,7 +4,7 @@
+ 	"io/ioutil"
+ 	"os"
+ 	"path/filepath"
+-	"runtime"
++	_ "runtime"
+ 	"sort"
+ 	strings "strings"
+ 
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/tonistiigi/fsutil/stat.go ./moby/vendor/github.com/tonistiigi/fsutil/stat.go
+--- ../v20.10.16.orig/moby/vendor/github.com/tonistiigi/fsutil/stat.go	2023-10-13 12:56:04.154749226 +0000
++++ ./moby/vendor/github.com/tonistiigi/fsutil/stat.go	2023-10-13 12:58:56.101891827 +0000
+@@ -3,7 +3,7 @@
+ import (
+ 	"os"
+ 	"path/filepath"
+-	"runtime"
++	_ "runtime"
+ 
+ 	"github.com/pkg/errors"
+ 	"github.com/tonistiigi/fsutil/types"
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/tonistiigi/fsutil/validator.go ./moby/vendor/github.com/tonistiigi/fsutil/validator.go
+--- ../v20.10.16.orig/moby/vendor/github.com/tonistiigi/fsutil/validator.go	2023-10-13 12:56:04.154749226 +0000
++++ ./moby/vendor/github.com/tonistiigi/fsutil/validator.go	2023-10-13 12:58:56.101891827 +0000
+@@ -3,7 +3,7 @@
+ import (
+ 	"os"
+ 	"path"
+-	"runtime"
++	_ "runtime"
+ 	"sort"
+ 	"strings"
+ 	"syscall"
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/vbatts/tar-split/archive/tar/stat_unix.go ./moby/vendor/github.com/vbatts/tar-split/archive/tar/stat_unix.go
+--- ../v20.10.16.orig/moby/vendor/github.com/vbatts/tar-split/archive/tar/stat_unix.go	2023-10-13 12:56:04.154749226 +0000
++++ ./moby/vendor/github.com/vbatts/tar-split/archive/tar/stat_unix.go	2023-10-13 12:58:55.765224225 +0000
+@@ -9,7 +9,7 @@
+ import (
+ 	"os"
+ 	"os/user"
+-	"runtime"
++	_ "runtime"
+ 	"strconv"
+ 	"sync"
+ 	"syscall"
+diff -ur ../v20.10.16.orig/moby/vendor/go.etcd.io/bbolt/db.go ./moby/vendor/go.etcd.io/bbolt/db.go
+--- ../v20.10.16.orig/moby/vendor/go.etcd.io/bbolt/db.go	2023-10-13 12:56:04.154749226 +0000
++++ ./moby/vendor/go.etcd.io/bbolt/db.go	2023-10-13 12:58:55.765224225 +0000
+@@ -6,7 +6,7 @@
+ 	"hash/fnv"
+ 	"log"
+ 	"os"
+-	"runtime"
++	_ "runtime"
+ 	"sort"
+ 	"sync"
+ 	"time"
+diff -ur ../v20.10.16.orig/moby/vendor/golang.org/x/net/internal/socket/sys_posix.go ./moby/vendor/golang.org/x/net/internal/socket/sys_posix.go
+--- ../v20.10.16.orig/moby/vendor/golang.org/x/net/internal/socket/sys_posix.go	2023-10-13 12:56:04.154749226 +0000
++++ ./moby/vendor/golang.org/x/net/internal/socket/sys_posix.go	2023-10-13 12:58:55.768557568 +0000
+@@ -10,7 +10,7 @@
+ 	"encoding/binary"
+ 	"errors"
+ 	"net"
+-	"runtime"
++	_ "runtime"
+ 	"strconv"
+ 	"sync"
+ 	"time"
+diff -ur ../v20.10.16.orig/moby/vendor/golang.org/x/net/ipv4/batch.go ./moby/vendor/golang.org/x/net/ipv4/batch.go
+--- ../v20.10.16.orig/moby/vendor/golang.org/x/net/ipv4/batch.go	2023-10-13 12:56:04.158082569 +0000
++++ ./moby/vendor/golang.org/x/net/ipv4/batch.go	2023-10-13 12:58:56.101891827 +0000
+@@ -6,7 +6,7 @@
+ 
+ import (
+ 	"net"
+-	"runtime"
++	_ "runtime"
+ 
+ 	"golang.org/x/net/internal/socket"
+ )
+diff -ur ../v20.10.16.orig/moby/vendor/golang.org/x/net/ipv4/header.go ./moby/vendor/golang.org/x/net/ipv4/header.go
+--- ../v20.10.16.orig/moby/vendor/golang.org/x/net/ipv4/header.go	2023-10-13 12:56:04.158082569 +0000
++++ ./moby/vendor/golang.org/x/net/ipv4/header.go	2023-10-13 12:58:56.101891827 +0000
+@@ -8,7 +8,7 @@
+ 	"encoding/binary"
+ 	"fmt"
+ 	"net"
+-	"runtime"
++	_ "runtime"
+ 
+ 	"golang.org/x/net/internal/socket"
+ )
+diff -ur ../v20.10.16.orig/moby/vendor/golang.org/x/net/ipv6/batch.go ./moby/vendor/golang.org/x/net/ipv6/batch.go
+--- ../v20.10.16.orig/moby/vendor/golang.org/x/net/ipv6/batch.go	2023-10-13 12:56:04.158082569 +0000
++++ ./moby/vendor/golang.org/x/net/ipv6/batch.go	2023-10-13 12:58:56.101891827 +0000
+@@ -6,7 +6,7 @@
+ 
+ import (
+ 	"net"
+-	"runtime"
++	_ "runtime"
+ 
+ 	"golang.org/x/net/internal/socket"
+ )
+diff -ur ../v20.10.16.orig/moby/vendor/golang.org/x/net/ipv6/sockopt_posix.go ./moby/vendor/golang.org/x/net/ipv6/sockopt_posix.go
+--- ../v20.10.16.orig/moby/vendor/golang.org/x/net/ipv6/sockopt_posix.go	2023-10-13 12:56:04.158082569 +0000
++++ ./moby/vendor/golang.org/x/net/ipv6/sockopt_posix.go	2023-10-13 12:58:56.101891827 +0000
+@@ -8,7 +8,7 @@
+ 
+ import (
+ 	"net"
+-	"runtime"
++	_ "runtime"
+ 	"unsafe"
+ 
+ 	"golang.org/x/net/bpf"
+diff -ur ../v20.10.16.orig/moby/vendor/golang.org/x/oauth2/google/default.go ./moby/vendor/golang.org/x/oauth2/google/default.go
+--- ../v20.10.16.orig/moby/vendor/golang.org/x/oauth2/google/default.go	2023-10-13 12:56:04.158082569 +0000
++++ ./moby/vendor/golang.org/x/oauth2/google/default.go	2023-10-13 12:58:56.101891827 +0000
+@@ -12,7 +12,7 @@
+ 	"net/http"
+ 	"os"
+ 	"path/filepath"
+-	"runtime"
++	_ "runtime"
+ 
+ 	"cloud.google.com/go/compute/metadata"
+ 	"golang.org/x/oauth2"
+diff -ur ../v20.10.16.orig/moby/vendor/golang.org/x/oauth2/google/sdk.go ./moby/vendor/golang.org/x/oauth2/google/sdk.go
+--- ../v20.10.16.orig/moby/vendor/golang.org/x/oauth2/google/sdk.go	2023-10-13 12:56:04.158082569 +0000
++++ ./moby/vendor/golang.org/x/oauth2/google/sdk.go	2023-10-13 12:58:56.101891827 +0000
+@@ -15,7 +15,7 @@
+ 	"os"
+ 	"os/user"
+ 	"path/filepath"
+-	"runtime"
++	_ "runtime"
+ 	"strings"
+ 	"time"
+ 
+diff -ur ../v20.10.16.orig/moby/vendor/google.golang.org/grpc/credentials/alts/utils.go ./moby/vendor/google.golang.org/grpc/credentials/alts/utils.go
+--- ../v20.10.16.orig/moby/vendor/google.golang.org/grpc/credentials/alts/utils.go	2023-10-13 12:56:04.158082569 +0000
++++ ./moby/vendor/google.golang.org/grpc/credentials/alts/utils.go	2023-10-13 12:58:55.768557568 +0000
+@@ -28,7 +28,7 @@
+ 	"os"
+ 	"os/exec"
+ 	"regexp"
+-	"runtime"
++	_ "runtime"
+ 	"strings"
+ 
+ 	"google.golang.org/grpc/codes"
+diff -ur ../v20.10.16.orig/moby/volume/mounts/parser.go ./moby/volume/mounts/parser.go
+--- ../v20.10.16.orig/moby/volume/mounts/parser.go	2023-10-13 12:56:04.158082569 +0000
++++ ./moby/volume/mounts/parser.go	2023-10-13 12:58:56.101891827 +0000
+@@ -2,7 +2,7 @@
+ 
+ import (
+ 	"errors"
+-	"runtime"
++	_ "runtime"
+ 
+ 	"github.com/docker/docker/api/types/mount"
+ )
+diff -ur ../v20.10.16.orig/moby/volume/mounts/windows_parser.go ./moby/volume/mounts/windows_parser.go
+--- ../v20.10.16.orig/moby/volume/mounts/windows_parser.go	2023-10-13 12:56:04.158082569 +0000
++++ ./moby/volume/mounts/windows_parser.go	2023-10-13 12:58:56.101891827 +0000
+@@ -5,7 +5,7 @@
+ 	"fmt"
+ 	"os"
+ 	"regexp"
+-	"runtime"
++	_ "runtime"
+ 	"strings"
+ 
+ 	"github.com/docker/docker/api/types/mount"
+diff -ur ../v20.10.16.orig/moby/volume/service/store.go ./moby/volume/service/store.go
+--- ../v20.10.16.orig/moby/volume/service/store.go	2023-10-13 12:56:04.158082569 +0000
++++ ./moby/volume/service/store.go	2023-10-13 12:58:56.431892744 +0000
+@@ -6,7 +6,7 @@
+ 	"net"
+ 	"os"
+ 	"path/filepath"
+-	"runtime"
++	_ "runtime"
+ 	"sync"
+ 	"time"
+ 
+diff -ur ../v20.10.16.orig/moby/api/server/middleware/version.go ./moby/api/server/middleware/version.go
+--- ../v20.10.16.orig/moby/api/server/middleware/version.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/api/server/middleware/version.go	2023-10-13 12:38:55.933766325 +0000
+@@ -44,9 +44,9 @@
+ // WrapHandler returns a new handler function wrapping the previous one in the request chain.
+ func (v VersionMiddleware) WrapHandler(handler func(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error) func(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error {
+ 	return func(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error {
+-		w.Header().Set("Server", fmt.Sprintf("Docker/%s (%s)", v.serverVersion, runtime.GOOS))
++		w.Header().Set("Server", fmt.Sprintf("Docker/%s (%s)", v.serverVersion, "linux"))
+ 		w.Header().Set("API-Version", v.defaultVersion)
+-		w.Header().Set("OSType", runtime.GOOS)
++		w.Header().Set("OSType", "linux")
+ 
+ 		apiVersion := vars["version"]
+ 		if apiVersion == "" {
+diff -ur ../v20.10.16.orig/moby/api/server/middleware/version_test.go ./moby/api/server/middleware/version_test.go
+--- ../v20.10.16.orig/moby/api/server/middleware/version_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/api/server/middleware/version_test.go	2023-10-13 12:38:55.933766325 +0000
+@@ -86,7 +86,7 @@
+ 
+ 	hdr := resp.Result().Header
+ 	assert.Check(t, is.Contains(hdr.Get("Server"), "Docker/"+defaultVersion))
+-	assert.Check(t, is.Contains(hdr.Get("Server"), runtime.GOOS))
++	assert.Check(t, is.Contains(hdr.Get("Server"), "linux"))
+ 	assert.Check(t, is.Equal(hdr.Get("API-Version"), defaultVersion))
+-	assert.Check(t, is.Equal(hdr.Get("OSType"), runtime.GOOS))
++	assert.Check(t, is.Equal(hdr.Get("OSType"), "linux"))
+ }
+diff -ur ../v20.10.16.orig/moby/api/server/router/build/build_routes.go ./moby/api/server/router/build/build_routes.go
+--- ../v20.10.16.orig/moby/api/server/router/build/build_routes.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/api/server/router/build/build_routes.go	2023-10-13 12:38:55.933766325 +0000
+@@ -63,7 +63,7 @@
+ 		BuildID:        r.FormValue("buildid"),
+ 	}
+ 
+-	if runtime.GOOS != "windows" && options.SecurityOpt != nil {
++	if "linux" != "windows" && options.SecurityOpt != nil {
+ 		return nil, errdefs.InvalidParameter(errors.New("The daemon on this platform does not support setting security options on build"))
+ 	}
+ 
+diff -ur ../v20.10.16.orig/moby/builder/builder-next/adapters/containerimage/pull.go ./moby/builder/builder-next/adapters/containerimage/pull.go
+--- ../v20.10.16.orig/moby/builder/builder-next/adapters/containerimage/pull.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/builder/builder-next/adapters/containerimage/pull.go	2023-10-13 12:38:55.937099667 +0000
+@@ -564,7 +564,7 @@
+ 	}()
+ 
+ 	r := image.NewRootFS()
+-	rootFS, release, err := p.is.DownloadManager.Download(ctx, *r, runtime.GOOS, layers, pkgprogress.ChanOutput(pchan))
++	rootFS, release, err := p.is.DownloadManager.Download(ctx, *r, "linux", layers, pkgprogress.ChanOutput(pchan))
+ 	stopProgress()
+ 	if err != nil {
+ 		return nil, err
+diff -ur ../v20.10.16.orig/moby/builder/builder-next/exporter/writer.go ./moby/builder/builder-next/exporter/writer.go
+--- ../v20.10.16.orig/moby/builder/builder-next/exporter/writer.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/builder/builder-next/exporter/writer.go	2023-10-13 12:38:55.937099667 +0000
+@@ -22,7 +22,7 @@
+ func emptyImageConfig() ([]byte, error) {
+ 	img := ocispec.Image{}
+ 	img.Architecture = runtime.GOARCH
+-	img.OS = runtime.GOOS
++	img.OS = "linux"
+ 	img.RootFS.Type = "layers"
+ 	img.Config.WorkingDir = "/"
+ 	img.Config.Env = []string{"PATH=" + system.DefaultPathEnvUnix}
+diff -ur ../v20.10.16.orig/moby/builder/builder-next/worker/worker.go ./moby/builder/builder-next/worker/worker.go
+--- ../v20.10.16.orig/moby/builder/builder-next/worker/worker.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/builder/builder-next/worker/worker.go	2023-10-13 12:38:55.937099667 +0000
+@@ -354,7 +354,7 @@
+ 	}()
+ 
+ 	r := image.NewRootFS()
+-	rootFS, release, err := w.DownloadManager.Download(ctx, *r, runtime.GOOS, layers, &discardProgress{})
++	rootFS, release, err := w.DownloadManager.Download(ctx, *r, "linux", layers, &discardProgress{})
+ 	if err != nil {
+ 		return nil, err
+ 	}
+diff -ur ../v20.10.16.orig/moby/builder/dockerfile/copy.go ./moby/builder/dockerfile/copy.go
+--- ../v20.10.16.orig/moby/builder/dockerfile/copy.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/builder/dockerfile/copy.go	2023-10-13 12:38:55.937099667 +0000
+@@ -94,7 +94,7 @@
+ 	}
+ 	if platform.OS == "" {
+ 		// This is a failsafe just in case. Shouldn't be hit.
+-		platform.OS = runtime.GOOS
++		platform.OS = "linux"
+ 	}
+ 
+ 	return copier{
+@@ -114,7 +114,7 @@
+ 	// Work in platform-specific filepath semantics
+ 	// TODO: This OS switch for paths is NOT correct and should not be supported.
+ 	// Maintained for backwards compatibility
+-	pathOS := runtime.GOOS
++	pathOS := "linux"
+ 	if o.platform != nil {
+ 		pathOS = o.platform.OS
+ 	}
+@@ -556,7 +556,7 @@
+ }
+ 
+ func copyFile(archiver Archiver, source, dest *copyEndpoint, identity *idtools.Identity) error {
+-	if runtime.GOOS == "windows" && dest.driver.OS() == "linux" {
++	if "linux" == "windows" && dest.driver.OS() == "linux" {
+ 		// LCOW
+ 		if err := dest.driver.MkdirAll(dest.driver.Dir(dest.path), 0755); err != nil {
+ 			return errors.Wrapf(err, "failed to create new directory")
+diff -ur ../v20.10.16.orig/moby/builder/dockerfile/dispatchers.go ./moby/builder/dockerfile/dispatchers.go
+--- ../v20.10.16.orig/moby/builder/dockerfile/dispatchers.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/builder/dockerfile/dispatchers.go	2023-10-13 12:38:55.937099667 +0000
+@@ -257,7 +257,7 @@
+ 		// TODO: scratch should not have an os. It should be nil image.
+ 		// Windows supports scratch. What is not supported is running containers
+ 		// from it.
+-		if runtime.GOOS == "windows" {
++		if "linux" == "windows" {
+ 			if platform == nil || platform.OS == "linux" {
+ 				if !system.LCOWSupported() {
+ 					return nil, errors.New("Linux containers are not supported on this system")
+diff -ur ../v20.10.16.orig/moby/builder/dockerfile/dispatchers_test.go ./moby/builder/dockerfile/dispatchers_test.go
+--- ../v20.10.16.orig/moby/builder/dockerfile/dispatchers_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/builder/dockerfile/dispatchers_test.go	2023-10-13 12:38:55.937099667 +0000
+@@ -116,7 +116,7 @@
+ 	}
+ 	err := initializeStage(sb, cmd)
+ 
+-	if runtime.GOOS == "windows" && !system.LCOWSupported() {
++	if "linux" == "windows" && !system.LCOWSupported() {
+ 		assert.Check(t, is.Error(err, "Linux containers are not supported on this system"))
+ 		return
+ 	}
+@@ -124,7 +124,7 @@
+ 	assert.NilError(t, err)
+ 	assert.Check(t, sb.state.hasFromImage())
+ 	assert.Check(t, is.Equal("", sb.state.imageID))
+-	expected := "PATH=" + system.DefaultPathEnv(runtime.GOOS)
++	expected := "PATH=" + system.DefaultPathEnv("linux")
+ 	assert.Check(t, is.DeepEqual([]string{expected}, sb.state.runConfig.Env))
+ }
+ 
+@@ -230,7 +230,7 @@
+ 	sb := newDispatchRequest(b, '`', nil, NewBuildArgs(make(map[string]*string)), newStagesBuildResults())
+ 	sb.state.baseImage = &mockImage{}
+ 	workingDir := "/app"
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		workingDir = "C:\\app"
+ 	}
+ 	cmd := &instructions.WorkdirCommand{
+@@ -258,7 +258,7 @@
+ 	assert.NilError(t, err)
+ 
+ 	var expectedCommand strslice.StrSlice
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		expectedCommand = strslice.StrSlice(append([]string{"cmd"}, "/S", "/C", command))
+ 	} else {
+ 		expectedCommand = strslice.StrSlice(append([]string{"/bin/sh"}, "-c", command))
+@@ -317,7 +317,7 @@
+ 	assert.Assert(t, sb.state.runConfig.Entrypoint != nil)
+ 
+ 	var expectedEntrypoint strslice.StrSlice
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		expectedEntrypoint = strslice.StrSlice(append([]string{"cmd"}, "/S", "/C", entrypointCmd))
+ 	} else {
+ 		expectedEntrypoint = strslice.StrSlice(append([]string{"/bin/sh"}, "-c", entrypointCmd))
+@@ -373,7 +373,7 @@
+ }
+ 
+ func TestStopSignal(t *testing.T) {
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		t.Skip("Windows does not support stopsignal")
+ 		return
+ 	}
+@@ -441,10 +441,10 @@
+ 	origCmd := strslice.StrSlice([]string{"cmd", "in", "from", "image"})
+ 
+ 	var cmdWithShell strslice.StrSlice
+-	if runtime.GOOS == "windows" {
+-		cmdWithShell = strslice.StrSlice([]string{strings.Join(append(getShell(runConfig, runtime.GOOS), []string{"echo foo"}...), " ")})
++	if "linux" == "windows" {
++		cmdWithShell = strslice.StrSlice([]string{strings.Join(append(getShell(runConfig, "linux"), []string{"echo foo"}...), " ")})
+ 	} else {
+-		cmdWithShell = strslice.StrSlice(append(getShell(runConfig, runtime.GOOS), "echo foo"))
++		cmdWithShell = strslice.StrSlice(append(getShell(runConfig, "linux"), "echo foo"))
+ 	}
+ 
+ 	envVars := []string{"|1", "one=two"}
+@@ -576,7 +576,7 @@
+ 	b := newBuilderWithMockBackend()
+ 	sb := newDispatchRequest(b, '`', nil, NewBuildArgs(make(map[string]*string)), newStagesBuildResults())
+ 	sb.state.baseImage = &mockImage{}
+-	sb.state.operatingSystem = runtime.GOOS
++	sb.state.operatingSystem = "linux"
+ 
+ 	t.Run("ADD with chmod", func(t *testing.T) {
+ 		cmd := &instructions.AddCommand{SourcesAndDest: []string{".", "."}, Chmod: "0655"}
+diff -ur ../v20.10.16.orig/moby/builder/dockerfile/dispatchers_unix_test.go ./moby/builder/dockerfile/dispatchers_unix_test.go
+--- ../v20.10.16.orig/moby/builder/dockerfile/dispatchers_unix_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/builder/dockerfile/dispatchers_unix_test.go	2023-10-13 12:38:55.937099667 +0000
+@@ -18,7 +18,7 @@
+ 	}
+ 
+ 	for _, test := range testCases {
+-		normalized, err := normalizeWorkdir(runtime.GOOS, test.current, test.requested)
++		normalized, err := normalizeWorkdir("linux", test.current, test.requested)
+ 
+ 		if test.expectedError != "" && err == nil {
+ 			t.Fatalf("NormalizeWorkdir should return an error %s, got nil", test.expectedError)
+diff -ur ../v20.10.16.orig/moby/builder/dockerfile/evaluator.go ./moby/builder/dockerfile/evaluator.go
+--- ../v20.10.16.orig/moby/builder/dockerfile/evaluator.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/builder/dockerfile/evaluator.go	2023-10-13 12:38:55.937099667 +0000
+@@ -217,7 +217,7 @@
+ 	s.imageID = image.ImageID()
+ 	s.operatingSystem = image.OperatingSystem()
+ 	if s.operatingSystem == "" { // In case it isn't set
+-		s.operatingSystem = runtime.GOOS
++		s.operatingSystem = "linux"
+ 	}
+ 	if !system.IsOSSupported(s.operatingSystem) {
+ 		return system.ErrNotSupportedOperatingSystem
+diff -ur ../v20.10.16.orig/moby/builder/dockerfile/evaluator_test.go ./moby/builder/dockerfile/evaluator_test.go
+--- ../v20.10.16.orig/moby/builder/dockerfile/evaluator_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/builder/dockerfile/evaluator_test.go	2023-10-13 12:38:55.937099667 +0000
+@@ -25,7 +25,7 @@
+ }
+ 
+ func TestDispatch(t *testing.T) {
+-	if runtime.GOOS != "windows" {
++	if "linux" != "windows" {
+ 		skip.If(t, os.Getuid() != 0, "skipping test that requires root")
+ 	}
+ 	testCases := []dispatchTestCase{
+diff -ur ../v20.10.16.orig/moby/builder/dockerfile/imagecontext.go ./moby/builder/dockerfile/imagecontext.go
+--- ../v20.10.16.orig/moby/builder/dockerfile/imagecontext.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/builder/dockerfile/imagecontext.go	2023-10-13 12:38:55.937099667 +0000
+@@ -82,7 +82,7 @@
+ 
+ 		// Windows does not support scratch except for LCOW
+ 		os := platform.OS
+-		if runtime.GOOS == "windows" {
++		if "linux" == "windows" {
+ 			os = "linux"
+ 		}
+ 
+diff -ur ../v20.10.16.orig/moby/builder/dockerfile/imagecontext_test.go ./moby/builder/dockerfile/imagecontext_test.go
+--- ../v20.10.16.orig/moby/builder/dockerfile/imagecontext_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/builder/dockerfile/imagecontext_test.go	2023-10-13 12:38:55.937099667 +0000
+@@ -90,7 +90,7 @@
+ 	assert.Assert(t, ok)
+ 
+ 	expectedPlatform := platforms.DefaultSpec()
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		expectedPlatform.OS = "linux"
+ 	}
+ 	assert.Equal(t, expectedPlatform.OS, image.OS)
+diff -ur ../v20.10.16.orig/moby/builder/dockerfile/internals.go ./moby/builder/dockerfile/internals.go
+--- ../v20.10.16.orig/moby/builder/dockerfile/internals.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/builder/dockerfile/internals.go	2023-10-13 12:38:55.937099667 +0000
+@@ -448,7 +448,7 @@
+ func (b *Builder) create(runConfig *container.Config) (string, error) {
+ 	logrus.Debugf("[BUILDER] Command to be executed: %v", runConfig.Cmd)
+ 
+-	isWCOW := runtime.GOOS == "windows" && b.platform != nil && b.platform.OS == "windows"
++	isWCOW := "linux" == "windows" && b.platform != nil && b.platform.OS == "windows"
+ 	hostConfig := hostConfigFromOptions(b.options, isWCOW)
+ 	container, err := b.containerManager.Create(runConfig, hostConfig)
+ 	if err != nil {
+diff -ur ../v20.10.16.orig/moby/builder/dockerfile/internals_test.go ./moby/builder/dockerfile/internals_test.go
+--- ../v20.10.16.orig/moby/builder/dockerfile/internals_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/builder/dockerfile/internals_test.go	2023-10-13 12:38:55.937099667 +0000
+@@ -51,7 +51,7 @@
+ 	defer cleanup()
+ 
+ 	expectedError := "path outside the build context: ../../Dockerfile ()"
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		expectedError = "failed to resolve scoped path ../../Dockerfile ()"
+ 	}
+ 
+@@ -68,7 +68,7 @@
+ }
+ 
+ func readAndCheckDockerfile(t *testing.T, testName, contextDir, dockerfilePath, expectedError string) {
+-	if runtime.GOOS != "windows" {
++	if "linux" != "windows" {
+ 		skip.If(t, os.Getuid() != 0, "skipping test that requires root")
+ 	}
+ 	tarStream, err := archive.Tar(contextDir, archive.Uncompressed)
+@@ -111,9 +111,9 @@
+ 		},
+ 		{
+ 			doc:       "Set the command to a comment",
+-			modifiers: []runConfigModifier{withCmdComment("comment", runtime.GOOS)},
++			modifiers: []runConfigModifier{withCmdComment("comment", "linux")},
+ 			expected: &container.Config{
+-				Cmd: append(defaultShellForOS(runtime.GOOS), "#(nop) ", "comment"),
++				Cmd: append(defaultShellForOS("linux"), "#(nop) ", "comment"),
+ 				Env: defaultEnv,
+ 			},
+ 		},
+diff -ur ../v20.10.16.orig/moby/builder/dockerfile/mockbackend_test.go ./moby/builder/dockerfile/mockbackend_test.go
+--- ../v20.10.16.orig/moby/builder/dockerfile/mockbackend_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/builder/dockerfile/mockbackend_test.go	2023-10-13 12:38:55.937099667 +0000
+@@ -99,7 +99,7 @@
+ }
+ 
+ func (i *mockImage) OperatingSystem() string {
+-	return runtime.GOOS
++	return "linux"
+ }
+ 
+ func (i *mockImage) MarshalJSON() ([]byte, error) {
+diff -ur ../v20.10.16.orig/moby/builder/remotecontext/detect.go ./moby/builder/remotecontext/detect.go
+--- ../v20.10.16.orig/moby/builder/remotecontext/detect.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/builder/remotecontext/detect.go	2023-10-13 12:38:55.937099667 +0000
+@@ -177,7 +177,7 @@
+ func FullPath(remote builder.Source, path string) (string, error) {
+ 	fullPath, err := remote.Root().ResolveScopedPath(path, true)
+ 	if err != nil {
+-		if runtime.GOOS == "windows" {
++		if "linux" == "windows" {
+ 			return "", fmt.Errorf("failed to resolve scoped path %s (%s): %s. Possible cause is a forbidden path outside the build context", path, fullPath, err)
+ 		}
+ 		return "", fmt.Errorf("forbidden path outside the build context: %s (%s)", path, fullPath) // backwards compat with old error
+diff -ur ../v20.10.16.orig/moby/builder/remotecontext/git/gitutils_test.go ./moby/builder/remotecontext/git/gitutils_test.go
+--- ../v20.10.16.orig/moby/builder/remotecontext/git/gitutils_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/builder/remotecontext/git/gitutils_test.go	2023-10-13 12:38:55.937099667 +0000
+@@ -245,7 +245,7 @@
+ 	assert.NilError(t, os.Mkdir(subDir, 0755))
+ 	assert.NilError(t, os.WriteFile(filepath.Join(subDir, "Dockerfile"), []byte("FROM scratch\nEXPOSE 5000"), 0644))
+ 
+-	if runtime.GOOS != "windows" {
++	if "linux" != "windows" {
+ 		assert.NilError(t, os.Symlink("../subdir", filepath.Join(gitDir, "parentlink")))
+ 		assert.NilError(t, os.Symlink("/subdir", filepath.Join(gitDir, "absolutelink")))
+ 	}
+@@ -297,7 +297,7 @@
+ 		{"test:subdir", "FROM busybox" + eol + "EXPOSE 5000", false, false},
+ 	}
+ 
+-	if runtime.GOOS != "windows" {
++	if "linux" != "windows" {
+ 		// Windows GIT (2.7.1 x64) does not support parentlink/absolutelink. Sample output below
+ 		// 	git --work-tree .\repo --git-dir .\repo\.git add -A
+ 		//	error: readlink("absolutelink"): Function not implemented
+diff -ur ../v20.10.16.orig/moby/client/client_test.go ./moby/client/client_test.go
+--- ../v20.10.16.orig/moby/client/client_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/client/client_test.go	2023-10-13 12:38:55.937099667 +0000
+@@ -20,7 +20,7 @@
+ )
+ 
+ func TestNewClientWithOpsFromEnv(t *testing.T) {
+-	skip.If(t, runtime.GOOS == "windows")
++	skip.If(t, "linux" == "windows")
+ 
+ 	testcases := []struct {
+ 		doc             string
+diff -ur ../v20.10.16.orig/moby/cmd/dockerd/config.go ./moby/cmd/dockerd/config.go
+--- ../v20.10.16.orig/moby/cmd/dockerd/config.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/cmd/dockerd/config.go	2023-10-13 12:38:55.937099667 +0000
+@@ -55,7 +55,7 @@
+ 	_ = flags.MarkDeprecated("restart", "Please use a restart policy on docker run")
+ 
+ 	// Windows doesn't support setting the storage driver - there is no choice as to which ones to use.
+-	if runtime.GOOS != "windows" {
++	if "linux" != "windows" {
+ 		flags.StringVarP(&conf.GraphDriver, "storage-driver", "s", "", "Storage driver to use")
+ 	}
+ 
+diff -ur ../v20.10.16.orig/moby/cmd/dockerd/daemon.go ./moby/cmd/dockerd/daemon.go
+--- ../v20.10.16.orig/moby/cmd/dockerd/daemon.go	2023-10-13 12:33:13.519478219 +0000
++++ ./moby/cmd/dockerd/daemon.go	2023-10-13 12:38:55.937099667 +0000
+@@ -113,7 +113,7 @@
+ 	}
+ 
+ 	// return human-friendly error before creating files
+-	if runtime.GOOS == "linux" && os.Geteuid() != 0 {
++	if "linux" == "linux" && os.Geteuid() != 0 {
+ 		return fmt.Errorf("dockerd needs to be started with root privileges. To run dockerd in rootless mode as an unprivileged user, see https://docs.docker.com/go/rootless/")
+ 	}
+ 
+diff -ur ../v20.10.16.orig/moby/cmd/dockerd/daemon.go.orig ./moby/cmd/dockerd/daemon.go.orig
+--- ../v20.10.16.orig/moby/cmd/dockerd/daemon.go.orig	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/cmd/dockerd/daemon.go.orig	2023-10-13 12:38:55.940433010 +0000
+@@ -113,7 +113,7 @@
+ 	}
+ 
+ 	// return human-friendly error before creating files
+-	if runtime.GOOS == "linux" && os.Geteuid() != 0 {
++	if "linux" == "linux" && os.Geteuid() != 0 {
+ 		return fmt.Errorf("dockerd needs to be started with root privileges. To run dockerd in rootless mode as an unprivileged user, see https://docs.docker.com/go/rootless/")
+ 	}
+ 
+diff -ur ../v20.10.16.orig/moby/cmd/dockerd/daemon_unix.go ./moby/cmd/dockerd/daemon_unix.go
+--- ../v20.10.16.orig/moby/cmd/dockerd/daemon_unix.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/cmd/dockerd/daemon_unix.go	2023-10-13 12:38:55.743765794 +0000
+@@ -26,7 +26,7 @@
+ 
+ func getDefaultDaemonConfigDir() (string, error) {
+ 	if !honorXDG {
+-		return "/etc/docker", nil
++		return "@TERMUX_PREFIX@/etc/docker", nil
+ 	}
+ 	// NOTE: CLI uses ~/.docker while the daemon uses ~/.config/docker, because
+ 	// ~/.docker was not designed to store daemon configurations.
+diff -ur ../v20.10.16.orig/moby/container/container.go ./moby/container/container.go
+--- ../v20.10.16.orig/moby/container/container.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/container/container.go	2023-10-13 12:38:55.940433010 +0000
+@@ -152,7 +152,7 @@
+ 	// host OS if not, to ensure containers created before multiple-OS
+ 	// support are migrated
+ 	if container.OS == "" {
+-		container.OS = runtime.GOOS
++		container.OS = "linux"
+ 	}
+ 
+ 	return container.readHostConfig()
+@@ -265,7 +265,7 @@
+ func (container *Container) SetupWorkingDirectory(rootIdentity idtools.Identity) error {
+ 	// TODO: LCOW Support. This will need revisiting.
+ 	// We will need to do remote filesystem operations here.
+-	if container.OS != runtime.GOOS {
++	if container.OS != "linux" {
+ 		return nil
+ 	}
+ 
+@@ -477,7 +477,7 @@
+ func (container *Container) AddMountPointWithVolume(destination string, vol volume.Volume, rw bool) {
+ 	operatingSystem := container.OS
+ 	if operatingSystem == "" {
+-		operatingSystem = runtime.GOOS
++		operatingSystem = "linux"
+ 	}
+ 	volumeParser := volumemounts.NewParser(operatingSystem)
+ 	container.MountPoints[destination] = &volumemounts.MountPoint{
+@@ -734,12 +734,12 @@
+ 	// Setup environment
+ 	os := container.OS
+ 	if os == "" {
+-		os = runtime.GOOS
++		os = "linux"
+ 	}
+ 
+ 	// Figure out what size slice we need so we can allocate this all at once.
+ 	envSize := len(container.Config.Env)
+-	if runtime.GOOS != "windows" || (runtime.GOOS == "windows" && os == "linux") {
++	if "linux" != "windows" || ("linux" == "windows" && os == "linux") {
+ 		envSize += 2 + len(linkedEnv)
+ 	}
+ 	if tty {
+@@ -747,7 +747,7 @@
+ 	}
+ 
+ 	env := make([]string, 0, envSize)
+-	if runtime.GOOS != "windows" || (runtime.GOOS == "windows" && os == "linux") {
++	if "linux" != "windows" || ("linux" == "windows" && os == "linux") {
+ 		env = append(env, "PATH="+system.DefaultPathEnv(os))
+ 		env = append(env, "HOSTNAME="+container.Config.Hostname)
+ 		if tty {
+diff -ur ../v20.10.16.orig/moby/daemon/cluster/cluster.go ./moby/daemon/cluster/cluster.go
+--- ../v20.10.16.orig/moby/daemon/cluster/cluster.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/daemon/cluster/cluster.go	2023-10-13 12:38:55.940433010 +0000
+@@ -69,7 +69,7 @@
+ 	swarmRequestTimeout            = 20 * time.Second
+ 	stateFile                      = "docker-state.json"
+ 	defaultAddr                    = "0.0.0.0:2377"
+-	isWindows                      = runtime.GOOS == "windows"
++	isWindows                      = "linux" == "windows"
+ 	initialReconnectDelay          = 100 * time.Millisecond
+ 	maxReconnectDelay              = 30 * time.Second
+ 	contextPrefix                  = "com.docker.swarm"
+diff -ur ../v20.10.16.orig/moby/daemon/commit.go ./moby/daemon/commit.go
+--- ../v20.10.16.orig/moby/daemon/commit.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/daemon/commit.go	2023-10-13 12:38:55.940433010 +0000
+@@ -125,7 +125,7 @@
+ 
+ 	// It is not possible to commit a running container on Windows
+ 	if isWindows && container.IsRunning() {
+-		return "", errors.Errorf("%+v does not support commit of a running container", runtime.GOOS)
++		return "", errors.Errorf("%+v does not support commit of a running container", "linux")
+ 	}
+ 
+ 	if container.IsDead() {
+diff -ur ../v20.10.16.orig/moby/daemon/container.go ./moby/daemon/container.go
+--- ../v20.10.16.orig/moby/daemon/container.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/daemon/container.go	2023-10-13 12:38:55.940433010 +0000
+@@ -300,7 +300,7 @@
+ 		return err
+ 	}
+ 	if !hostConfig.Isolation.IsValid() {
+-		return errors.Errorf("invalid isolation '%s' on %s", hostConfig.Isolation, runtime.GOOS)
++		return errors.Errorf("invalid isolation '%s' on %s", hostConfig.Isolation, "linux")
+ 	}
+ 	return nil
+ }
+@@ -379,7 +379,7 @@
+ 	}
+ 	wd := config.WorkingDir
+ 	switch {
+-	case runtime.GOOS != platform:
++	case "linux" != platform:
+ 		// LCOW. Force Unix semantics
+ 		wd = strings.Replace(wd, string(os.PathSeparator), "/", -1)
+ 		if !path.IsAbs(wd) {
+diff -ur ../v20.10.16.orig/moby/daemon/create.go ./moby/daemon/create.go
+--- ../v20.10.16.orig/moby/daemon/create.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/daemon/create.go	2023-10-13 12:38:55.940433010 +0000
+@@ -61,7 +61,7 @@
+ 		return containertypes.ContainerCreateCreatedBody{}, errdefs.InvalidParameter(errors.New("Config cannot be empty in order to create a container"))
+ 	}
+ 
+-	os := runtime.GOOS
++	os := "linux"
+ 	var img *image.Image
+ 	if opts.params.Config.Image != "" {
+ 		var err error
+@@ -130,7 +130,7 @@
+ 		err   error
+ 	)
+ 
+-	os := runtime.GOOS
++	os := "linux"
+ 	if opts.params.Config.Image != "" {
+ 		img, err = daemon.imageService.GetImage(opts.params.Config.Image, opts.params.Platform)
+ 		if err != nil {
+diff -ur ../v20.10.16.orig/moby/daemon/create_windows.go ./moby/daemon/create_windows.go
+--- ../v20.10.16.orig/moby/daemon/create_windows.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/daemon/create_windows.go	2023-10-13 12:38:55.940433010 +0000
+@@ -15,7 +15,7 @@
+ // createContainerOSSpecificSettings performs host-OS specific container create functionality
+ func (daemon *Daemon) createContainerOSSpecificSettings(container *container.Container, config *containertypes.Config, hostConfig *containertypes.HostConfig) error {
+ 
+-	if container.OS == runtime.GOOS {
++	if container.OS == "linux" {
+ 		// Make sure the host config has the default daemon isolation if not specified by caller.
+ 		if containertypes.Isolation.IsDefault(containertypes.Isolation(hostConfig.Isolation)) {
+ 			hostConfig.Isolation = daemon.defaultIsolation
+diff -ur ../v20.10.16.orig/moby/daemon/daemon.go ./moby/daemon/daemon.go
+--- ../v20.10.16.orig/moby/daemon/daemon.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/daemon/daemon.go	2023-10-13 12:38:55.940433010 +0000
+@@ -894,7 +894,7 @@
+ 	d.graphDrivers = make(map[string]string)
+ 	layerStores := make(map[string]layer.Store)
+ 	if isWindows {
+-		d.graphDrivers[runtime.GOOS] = "windowsfilter"
++		d.graphDrivers["linux"] = "windowsfilter"
+ 		if system.LCOWSupported() {
+ 			d.graphDrivers["linux"] = "lcow"
+ 		}
+@@ -905,7 +905,7 @@
+ 		} else {
+ 			logrus.Infof("Setting the storage driver from the $DOCKER_DRIVER environment variable (%s)", driverName)
+ 		}
+-		d.graphDrivers[runtime.GOOS] = driverName // May still be empty. Layerstore init determines instead.
++		d.graphDrivers["linux"] = driverName // May still be empty. Layerstore init determines instead.
+ 	}
+ 
+ 	d.RegistryService = registryService
+@@ -969,7 +969,7 @@
+ 		}
+ 
+ 		var rt types.Runtime
+-		if runtime.GOOS != "windows" {
++		if "linux" != "windows" {
+ 			rtPtr, err := d.getRuntime(config.GetDefaultRuntimeName())
+ 			if err != nil {
+ 				return nil, err
+@@ -1019,11 +1019,11 @@
+ 
+ 	// Configure and validate the kernels security support. Note this is a Linux/FreeBSD
+ 	// operation only, so it is safe to pass *just* the runtime OS graphdriver.
+-	if err := configureKernelSecuritySupport(config, d.graphDrivers[runtime.GOOS]); err != nil {
++	if err := configureKernelSecuritySupport(config, d.graphDrivers["linux"]); err != nil {
+ 		return nil, err
+ 	}
+ 
+-	imageRoot := filepath.Join(config.Root, "image", d.graphDrivers[runtime.GOOS])
++	imageRoot := filepath.Join(config.Root, "image", d.graphDrivers["linux"])
+ 	ifs, err := image.NewFSStoreBackend(filepath.Join(imageRoot, "imagedb"))
+ 	if err != nil {
+ 		return nil, err
+@@ -1084,7 +1084,7 @@
+ 	sysInfo := d.RawSysInfo(false)
+ 	// Check if Devices cgroup is mounted, it is hard requirement for container security,
+ 	// on Linux.
+-	if runtime.GOOS == "linux" && !sysInfo.CgroupDevicesEnabled && !sys.RunningInUserNS() {
++	if "linux" == "linux" && !sysInfo.CgroupDevicesEnabled && !sys.RunningInUserNS() {
+ 		return nil, errors.New("Devices cgroup isn't mounted")
+ 	}
+ 
+@@ -1328,7 +1328,7 @@
+ 		// The mount path reported by the graph driver should always be trusted on Windows, since the
+ 		// volume path for a given mounted layer may change over time.  This should only be an error
+ 		// on non-Windows operating systems.
+-		if runtime.GOOS != "windows" {
++		if "linux" != "windows" {
+ 			daemon.Unmount(container)
+ 			return fmt.Errorf("Error: driver %s is returning inconsistent paths for container %s ('%s' then '%s')",
+ 				daemon.imageService.GraphDriverForOS(container.OS), container.ID, container.BaseFS, dir)
+diff -ur ../v20.10.16.orig/moby/daemon/daemon_test.go ./moby/daemon/daemon_test.go
+--- ../v20.10.16.orig/moby/daemon/daemon_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/daemon/daemon_test.go	2023-10-13 12:38:55.940433010 +0000
+@@ -304,8 +304,8 @@
+ func TestValidateContainerIsolation(t *testing.T) {
+ 	d := Daemon{}
+ 
+-	_, err := d.verifyContainerSettings(runtime.GOOS, &containertypes.HostConfig{Isolation: containertypes.Isolation("invalid")}, nil, false)
+-	assert.Check(t, is.Error(err, "invalid isolation 'invalid' on "+runtime.GOOS))
++	_, err := d.verifyContainerSettings("linux", &containertypes.HostConfig{Isolation: containertypes.Isolation("invalid")}, nil, false)
++	assert.Check(t, is.Error(err, "invalid isolation 'invalid' on "+"linux"))
+ }
+ 
+ func TestFindNetworkErrorType(t *testing.T) {
+diff -ur ../v20.10.16.orig/moby/daemon/daemon_unix.go ./moby/daemon/daemon_unix.go
+--- ../v20.10.16.orig/moby/daemon/daemon_unix.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/daemon/daemon_unix.go	2023-10-13 12:38:55.940433010 +0000
+@@ -537,7 +537,7 @@
+ 		return warnings, fmt.Errorf("CPU cfs quota can not be less than 1ms (i.e. 1000)")
+ 	}
+ 	if resources.CPUPercent > 0 {
+-		warnings = append(warnings, fmt.Sprintf("%s does not support CPU percent. Percent discarded.", runtime.GOOS))
++		warnings = append(warnings, fmt.Sprintf("%s does not support CPU percent. Percent discarded.", "linux"))
+ 		resources.CPUPercent = 0
+ 	}
+ 
+@@ -571,7 +571,7 @@
+ 		return warnings, fmt.Errorf("Range of blkio weight is from 10 to 1000")
+ 	}
+ 	if resources.IOMaximumBandwidth != 0 || resources.IOMaximumIOps != 0 {
+-		return warnings, fmt.Errorf("Invalid QoS settings: %s does not support Maximum IO Bandwidth or Maximum IO IOps", runtime.GOOS)
++		return warnings, fmt.Errorf("Invalid QoS settings: %s does not support Maximum IO Bandwidth or Maximum IO IOps", "linux")
+ 	}
+ 	if len(resources.BlkioWeightDevice) > 0 && !sysInfo.BlkioWeightDevice {
+ 		warnings = append(warnings, "Your kernel does not support Block I/O weight_device or the cgroup is not mounted. Weight-device discarded.")
+@@ -712,7 +712,7 @@
+ 		return warnings, fmt.Errorf("Unknown runtime specified %s", hostConfig.Runtime)
+ 	}
+ 
+-	parser := volumemounts.NewParser(runtime.GOOS)
++	parser := volumemounts.NewParser("linux")
+ 	for dest := range hostConfig.Tmpfs {
+ 		if err := parser.ValidateTmpfsMountDestination(dest); err != nil {
+ 			return warnings, err
+@@ -1167,7 +1167,7 @@
+ }
+ 
+ func setupRemappedRoot(config *config.Config) (*idtools.IdentityMapping, error) {
+-	if runtime.GOOS != "linux" && config.RemappedRoot != "" {
++	if "linux" != "linux" && config.RemappedRoot != "" {
+ 		return nil, fmt.Errorf("User namespaces are only supported on Linux")
+ 	}
+ 
+diff -ur ../v20.10.16.orig/moby/daemon/exec/exec.go ./moby/daemon/exec/exec.go
+--- ../v20.10.16.orig/moby/daemon/exec/exec.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/daemon/exec/exec.go	2023-10-13 12:38:55.940433010 +0000
+@@ -68,7 +68,7 @@
+ func (c *Config) InitializeStdio(iop *cio.DirectIO) (cio.IO, error) {
+ 	c.StreamConfig.CopyToPipe(iop)
+ 
+-	if c.StreamConfig.Stdin() == nil && !c.Tty && runtime.GOOS == "windows" {
++	if c.StreamConfig.Stdin() == nil && !c.Tty && "linux" == "windows" {
+ 		if iop.Stdin != nil {
+ 			if err := iop.Stdin.Close(); err != nil {
+ 				logrus.Errorf("error closing exec stdin: %+v", err)
+diff -ur ../v20.10.16.orig/moby/daemon/exec.go ./moby/daemon/exec.go
+--- ../v20.10.16.orig/moby/daemon/exec.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/daemon/exec.go	2023-10-13 12:38:55.940433010 +0000
+@@ -216,7 +216,7 @@
+ 	}
+ 
+ 	p := &specs.Process{}
+-	if runtime.GOOS != "windows" {
++	if "linux" != "windows" {
+ 		ctr, err := daemon.containerdCli.LoadContainer(ctx, ec.ContainerID)
+ 		if err != nil {
+ 			return err
+diff -ur ../v20.10.16.orig/moby/daemon/health.go ./moby/daemon/health.go
+--- ../v20.10.16.orig/moby/daemon/health.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/daemon/health.go	2023-10-13 12:38:55.940433010 +0000
+@@ -379,10 +379,10 @@
+ 	if len(cntr.Config.Shell) != 0 {
+ 		return cntr.Config.Shell
+ 	}
+-	if runtime.GOOS != "windows" {
++	if "linux" != "windows" {
+ 		return []string{"/bin/sh", "-c"}
+ 	}
+-	if cntr.OS != runtime.GOOS {
++	if cntr.OS != "linux" {
+ 		return []string{"/bin/sh", "-c"}
+ 	}
+ 	return []string{"cmd", "/S", "/C"}
+diff -ur ../v20.10.16.orig/moby/daemon/images/image_builder.go ./moby/daemon/images/image_builder.go
+--- ../v20.10.16.orig/moby/daemon/images/image_builder.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/daemon/images/image_builder.go	2023-10-13 12:38:55.940433010 +0000
+@@ -196,8 +196,8 @@
+ // leaking of layers.
+ func (i *ImageService) GetImageAndReleasableLayer(ctx context.Context, refOrID string, opts backend.GetImageAndLayerOptions) (builder.Image, builder.ROLayer, error) {
+ 	if refOrID == "" { // ie FROM scratch
+-		os := runtime.GOOS
+-		if runtime.GOOS == "windows" {
++		os := "linux"
++		if "linux" == "windows" {
+ 			os = "linux"
+ 		}
+ 		if opts.Platform != nil {
+diff -ur ../v20.10.16.orig/moby/daemon/images/image_import.go ./moby/daemon/images/image_import.go
+--- ../v20.10.16.orig/moby/daemon/images/image_import.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/daemon/images/image_import.go	2023-10-13 12:38:55.940433010 +0000
+@@ -36,7 +36,7 @@
+ 
+ 	// Default the operating system if not supplied.
+ 	if os == "" {
+-		os = runtime.GOOS
++		os = "linux"
+ 	}
+ 
+ 	if repository != "" {
+diff -ur ../v20.10.16.orig/moby/daemon/images/image_unix.go ./moby/daemon/images/image_unix.go
+--- ../v20.10.16.orig/moby/daemon/images/image_unix.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/daemon/images/image_unix.go	2023-10-13 12:38:55.943766352 +0000
+@@ -16,19 +16,19 @@
+ 		err                error
+ 	)
+ 
+-	// Safe to index by runtime.GOOS as Unix hosts don't support multiple
++	// Safe to index by "linux" as Unix hosts don't support multiple
+ 	// container operating systems.
+-	rwlayer, err := i.layerStores[runtime.GOOS].GetRWLayer(containerID)
++	rwlayer, err := i.layerStores["linux"].GetRWLayer(containerID)
+ 	if err != nil {
+ 		logrus.Errorf("Failed to compute size of container rootfs %v: %v", containerID, err)
+ 		return sizeRw, sizeRootfs
+ 	}
+-	defer i.layerStores[runtime.GOOS].ReleaseRWLayer(rwlayer)
++	defer i.layerStores["linux"].ReleaseRWLayer(rwlayer)
+ 
+ 	sizeRw, err = rwlayer.Size()
+ 	if err != nil {
+ 		logrus.Errorf("Driver %s couldn't return diff size of container %s: %s",
+-			i.layerStores[runtime.GOOS].DriverName(), containerID, err)
++			i.layerStores["linux"].DriverName(), containerID, err)
+ 		// FIXME: GetSize should return an error. Not changing it now in case
+ 		// there is a side-effect.
+ 		sizeRw = -1
+diff -ur ../v20.10.16.orig/moby/daemon/images/service.go ./moby/daemon/images/service.go
+--- ../v20.10.16.orig/moby/daemon/images/service.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/daemon/images/service.go	2023-10-13 12:38:55.943766352 +0000
+@@ -103,7 +103,7 @@
+ 	return DistributionServices{
+ 		DownloadManager:   i.downloadManager,
+ 		V2MetadataService: metadata.NewV2MetadataService(i.distributionMetadataStore),
+-		LayerStore:        i.layerStores[runtime.GOOS],
++		LayerStore:        i.layerStores["linux"],
+ 		ImageStore:        i.imageStore,
+ 		ReferenceStore:    i.referenceStore,
+ 	}
+diff -ur ../v20.10.16.orig/moby/daemon/info.go ./moby/daemon/info.go
+--- ../v20.10.16.orig/moby/daemon/info.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/daemon/info.go	2023-10-13 12:38:55.943766352 +0000
+@@ -104,7 +104,7 @@
+ 					"ApiVersion":    api.DefaultVersion,
+ 					"MinAPIVersion": api.MinVersion,
+ 					"GoVersion":     runtime.Version(),
+-					"Os":            runtime.GOOS,
++					"Os":            "linux",
+ 					"Arch":          runtime.GOARCH,
+ 					"BuildTime":     dockerversion.BuildTime,
+ 					"KernelVersion": kernelVersion,
+@@ -119,7 +119,7 @@
+ 		APIVersion:    api.DefaultVersion,
+ 		MinAPIVersion: api.MinVersion,
+ 		GoVersion:     runtime.Version(),
+-		Os:            runtime.GOOS,
++		Os:            "linux",
+ 		Arch:          runtime.GOARCH,
+ 		BuildTime:     dockerversion.BuildTime,
+ 		KernelVersion: kernelVersion,
+@@ -278,7 +278,7 @@
+ 		operatingSystem = s
+ 	}
+ 	// Don't do containerized check on Windows
+-	if runtime.GOOS != "windows" {
++	if "linux" != "windows" {
+ 		if inContainer, err := operatingsystem.IsContainerized(); err != nil {
+ 			logrus.Errorf("Could not determine if daemon is containerized: %v", err)
+ 			operatingSystem += " (error determining if containerized)"
+diff -ur ../v20.10.16.orig/moby/daemon/kill.go ./moby/daemon/kill.go
+--- ../v20.10.16.orig/moby/daemon/kill.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/daemon/kill.go	2023-10-13 12:38:55.943766352 +0000
+@@ -44,7 +44,7 @@
+ 	}
+ 
+ 	if sig != 0 && !signal.ValidSignalForPlatform(syscall.Signal(sig)) {
+-		return fmt.Errorf("The %s daemon does not support signal %d", runtime.GOOS, sig)
++		return fmt.Errorf("The %s daemon does not support signal %d", "linux", sig)
+ 	}
+ 
+ 	// If no signal is passed, or SIGKILL, perform regular Kill (SIGKILL + wait())
+diff -ur ../v20.10.16.orig/moby/daemon/logger/awslogs/cloudwatchlogs.go ./moby/daemon/logger/awslogs/cloudwatchlogs.go
+--- ../v20.10.16.orig/moby/daemon/logger/awslogs/cloudwatchlogs.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/daemon/logger/awslogs/cloudwatchlogs.go	2023-10-13 12:38:55.943766352 +0000
+@@ -385,7 +385,7 @@
+ 			currentAgent := r.HTTPRequest.Header.Get(userAgentHeader)
+ 			r.HTTPRequest.Header.Set(userAgentHeader,
+ 				fmt.Sprintf("Docker %s (%s) %s",
+-					dockerversion.Version, runtime.GOOS, currentAgent))
++					dockerversion.Version, "linux", currentAgent))
+ 		},
+ 	})
+ 	return client, nil
+diff -ur ../v20.10.16.orig/moby/daemon/logger/awslogs/cloudwatchlogs_test.go ./moby/daemon/logger/awslogs/cloudwatchlogs_test.go
+--- ../v20.10.16.orig/moby/daemon/logger/awslogs/cloudwatchlogs_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/daemon/logger/awslogs/cloudwatchlogs_test.go	2023-10-13 12:38:55.943766352 +0000
+@@ -137,7 +137,7 @@
+ 	}
+ 	buildHandlerList.Run(request)
+ 	expectedUserAgentString := fmt.Sprintf("Docker %s (%s) %s/%s (%s; %s; %s)",
+-		dockerversion.Version, runtime.GOOS, aws.SDKName, aws.SDKVersion, runtime.Version(), runtime.GOOS, runtime.GOARCH)
++		dockerversion.Version, "linux", aws.SDKName, aws.SDKVersion, runtime.Version(), "linux", runtime.GOARCH)
+ 	userAgent := request.HTTPRequest.Header.Get("User-Agent")
+ 	if userAgent != expectedUserAgentString {
+ 		t.Errorf("Wrong User-Agent string, expected \"%s\" but was \"%s\"",
+diff -ur ../v20.10.16.orig/moby/daemon/logger/loggerutils/logfile.go ./moby/daemon/logger/loggerutils/logfile.go
+--- ../v20.10.16.orig/moby/daemon/logger/loggerutils/logfile.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/daemon/logger/loggerutils/logfile.go	2023-10-13 12:38:55.943766352 +0000
+@@ -610,7 +610,7 @@
+ func watchFile(name string) (filenotify.FileWatcher, error) {
+ 	var fileWatcher filenotify.FileWatcher
+ 
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		// FileWatcher on Windows files is based on the syscall notifications which has an issue because of file caching.
+ 		// It is based on ReadDirectoryChangesW() which doesn't detect writes to the cache. It detects writes to disk only.
+ 		// Because of the OS lazy writing, we don't get notifications for file writes and thereby the watcher
+diff -ur ../v20.10.16.orig/moby/daemon/logger/splunk/splunk_test.go ./moby/daemon/logger/splunk/splunk_test.go
+--- ../v20.10.16.orig/moby/daemon/logger/splunk/splunk_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/daemon/logger/splunk/splunk_test.go	2023-10-13 12:38:55.943766352 +0000
+@@ -926,7 +926,7 @@
+ 	// 1 to verify connection and 10 to verify that we have sent messages with required frequency,
+ 	// but because frequency is too small (to keep test quick), instead of 11, use 9 if context switches will be slow
+ 	expectedRequests := 9
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		// sometimes in Windows, this test fails with number of requests showing 8. So be more conservative.
+ 		expectedRequests = 7
+ 	}
+diff -ur ../v20.10.16.orig/moby/daemon/oci_windows.go ./moby/daemon/oci_windows.go
+--- ../v20.10.16.orig/moby/daemon/oci_windows.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/daemon/oci_windows.go	2023-10-13 12:38:55.943766352 +0000
+@@ -116,7 +116,7 @@
+ 		if !mount.Writable {
+ 			m.Options = append(m.Options, "ro")
+ 		}
+-		if img.OS != runtime.GOOS {
++		if img.OS != "linux" {
+ 			m.Type = "bind"
+ 			m.Options = append(m.Options, "rbind")
+ 			m.Options = append(m.Options, fmt.Sprintf("uvmpath=/tmp/gcs/%s/binds", c.ID))
+diff -ur ../v20.10.16.orig/moby/daemon/start.go ./moby/daemon/start.go
+--- ../v20.10.16.orig/moby/daemon/start.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/daemon/start.go	2023-10-13 12:38:55.943766352 +0000
+@@ -47,7 +47,7 @@
+ 	}
+ 
+ 	// Windows does not have the backwards compatibility issue here.
+-	if runtime.GOOS != "windows" {
++	if "linux" != "windows" {
+ 		// This is kept for backward compatibility - hostconfig should be passed when
+ 		// creating a container, not during start.
+ 		if hostConfig != nil {
+diff -ur ../v20.10.16.orig/moby/daemon/stats_collector.go ./moby/daemon/stats_collector.go
+--- ../v20.10.16.orig/moby/daemon/stats_collector.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/daemon/stats_collector.go	2023-10-13 12:38:55.943766352 +0000
+@@ -14,7 +14,7 @@
+ // and will start processing stats when they are started.
+ func (daemon *Daemon) newStatsCollector(interval time.Duration) *stats.Collector {
+ 	// FIXME(vdemeester) move this elsewhere
+-	if runtime.GOOS == "linux" {
++	if "linux" == "linux" {
+ 		meminfo, err := system.ReadMemInfo()
+ 		if err == nil && meminfo.MemTotal > 0 {
+ 			daemon.machineMemory = uint64(meminfo.MemTotal)
+diff -ur ../v20.10.16.orig/moby/daemon/stats.go ./moby/daemon/stats.go
+--- ../v20.10.16.orig/moby/daemon/stats.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/daemon/stats.go	2023-10-13 12:38:55.943766352 +0000
+@@ -152,7 +152,7 @@
+ 	}
+ 
+ 	// We already have the network stats on Windows directly from HCS.
+-	if !container.Config.NetworkDisabled && runtime.GOOS != "windows" {
++	if !container.Config.NetworkDisabled && "linux" != "windows" {
+ 		if stats.Networks, err = daemon.getNetworkStats(container); err != nil {
+ 			return nil, err
+ 		}
+diff -ur ../v20.10.16.orig/moby/daemon/volumes_unit_test.go ./moby/daemon/volumes_unit_test.go
+--- ../v20.10.16.orig/moby/daemon/volumes_unit_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/daemon/volumes_unit_test.go	2023-10-13 12:38:55.943766352 +0000
+@@ -21,7 +21,7 @@
+ 		{"foobar:baz", "", "", true},
+ 	}
+ 
+-	parser := volumemounts.NewParser(runtime.GOOS)
++	parser := volumemounts.NewParser("linux")
+ 
+ 	for _, c := range cases {
+ 		id, mode, err := parser.ParseVolumesFrom(c.spec)
+diff -ur ../v20.10.16.orig/moby/distribution/config.go ./moby/distribution/config.go
+--- ../v20.10.16.orig/moby/distribution/config.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/distribution/config.go	2023-10-13 12:38:55.943766352 +0000
+@@ -157,15 +157,15 @@
+ 
+ 	// fail immediately on Windows when downloading a non-Windows image
+ 	// and vice versa. Exception on Windows if Linux Containers are enabled.
+-	if runtime.GOOS == "windows" && unmarshalledConfig.OS == "linux" && !system.LCOWSupported() {
++	if "linux" == "windows" && unmarshalledConfig.OS == "linux" && !system.LCOWSupported() {
+ 		return nil, fmt.Errorf("image operating system %q cannot be used on this platform", unmarshalledConfig.OS)
+-	} else if runtime.GOOS != "windows" && unmarshalledConfig.OS == "windows" {
++	} else if "linux" != "windows" && unmarshalledConfig.OS == "windows" {
+ 		return nil, fmt.Errorf("image operating system %q cannot be used on this platform", unmarshalledConfig.OS)
+ 	}
+ 
+ 	os := unmarshalledConfig.OS
+ 	if os == "" {
+-		os = runtime.GOOS
++		os = "linux"
+ 	}
+ 	if !system.IsOSSupported(os) {
+ 		return nil, system.ErrNotSupportedOperatingSystem
+diff -ur ../v20.10.16.orig/moby/distribution/pull_v2.go ./moby/distribution/pull_v2.go
+--- ../v20.10.16.orig/moby/distribution/pull_v2.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/distribution/pull_v2.go	2023-10-13 12:38:55.943766352 +0000
+@@ -564,7 +564,7 @@
+ 	// the history does, but unfortunately that's a string, so search through
+ 	// all the history until hopefully we find one which indicates the OS.
+ 	// supertest2014/nyan is an example of a registry image with schemav1.
+-	configOS := runtime.GOOS
++	configOS := "linux"
+ 	if system.LCOWSupported() {
+ 		type config struct {
+ 			Os string `json:"os,omitempty"`
+@@ -691,7 +691,7 @@
+ 		configPlatform   *specs.Platform // for LCOW when registering downloaded layers
+ 	)
+ 
+-	layerStoreOS := runtime.GOOS
++	layerStoreOS := "linux"
+ 	if platform != nil {
+ 		layerStoreOS = platform.OS
+ 	}
+@@ -704,7 +704,7 @@
+ 	// which aren't suitable for NTFS. At some point in the future, if a similar
+ 	// check to block Windows images being pulled on Linux is implemented, it
+ 	// may be necessary to perform the same type of serialisation.
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		configJSON, configRootFS, configPlatform, err = receiveConfig(p.config.ImageStore, configChan, configErrChan)
+ 		if err != nil {
+ 			return "", err
+@@ -1079,7 +1079,7 @@
+ 		}
+ 	}
+ 
+-	if imgs[len(imgs)-1].Parent != "" && runtime.GOOS != "windows" {
++	if imgs[len(imgs)-1].Parent != "" && "linux" != "windows" {
+ 		// Windows base layer can point to a base layer parent that is not in manifest.
+ 		return errors.New("invalid parent ID in the base layer of the image")
+ 	}
+diff -ur ../v20.10.16.orig/moby/distribution/pull_v2_test.go ./moby/distribution/pull_v2_test.go
+--- ../v20.10.16.orig/moby/distribution/pull_v2_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/distribution/pull_v2_test.go	2023-10-13 12:38:55.943766352 +0000
+@@ -77,7 +77,7 @@
+ // if the base layer configuration specifies a parent.
+ func TestFixManifestLayersBaseLayerParent(t *testing.T) {
+ 	// TODO Windows: Fix this unit text
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		t.Skip("Needs fixing on Windows")
+ 	}
+ 	duplicateLayerManifest := schema1.Manifest{
+@@ -122,7 +122,7 @@
+ // TestValidateManifest verifies the validateManifest function
+ func TestValidateManifest(t *testing.T) {
+ 	// TODO Windows: Fix this unit text
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		t.Skip("Needs fixing on Windows")
+ 	}
+ 	expectedDigest, err := reference.ParseNormalizedNamed("repo@sha256:02fee8c3220ba806531f606525eceb83f4feb654f62b207191b1c9209188dedd")
+@@ -200,10 +200,10 @@
+ 	if strings.HasPrefix(result, "unknown") {
+ 		t.Fatal("expected formatPlatform to show a known platform")
+ 	}
+-	if !strings.HasPrefix(result, runtime.GOOS) {
++	if !strings.HasPrefix(result, "linux") {
+ 		t.Fatal("expected formatPlatform to show the current platform")
+ 	}
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		if !strings.HasPrefix(result, "windows") {
+ 			t.Fatal("expected formatPlatform to show windows platform")
+ 		}
+diff -ur ../v20.10.16.orig/moby/distribution/push_v2.go ./moby/distribution/push_v2.go
+--- ../v20.10.16.orig/moby/distribution/push_v2.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/distribution/push_v2.go	2023-10-13 12:38:55.947099694 +0000
+@@ -182,7 +182,7 @@
+ 
+ 	putOptions := []distribution.ManifestServiceOption{distribution.WithTag(ref.Tag())}
+ 	if _, err = manSvc.Put(ctx, manifest, putOptions...); err != nil {
+-		if runtime.GOOS == "windows" || p.config.TrustKey == nil || p.config.RequireSchema2 {
++		if "linux" == "windows" || p.config.TrustKey == nil || p.config.RequireSchema2 {
+ 			logrus.Warnf("failed to upload schema2 manifest: %v", err)
+ 			return err
+ 		}
+diff -ur ../v20.10.16.orig/moby/distribution/xfer/download.go ./moby/distribution/xfer/download.go
+--- ../v20.10.16.orig/moby/distribution/xfer/download.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/distribution/xfer/download.go	2023-10-13 12:38:55.947099694 +0000
+@@ -119,7 +119,7 @@
+ 	// Assume that the operating system is the host OS if blank, and validate it
+ 	// to ensure we don't cause a panic by an invalid index into the layerstores.
+ 	if os == "" {
+-		os = runtime.GOOS
++		os = "linux"
+ 	}
+ 	if !system.IsOSSupported(os) {
+ 		return image.RootFS{}, nil, system.ErrNotSupportedOperatingSystem
+diff -ur ../v20.10.16.orig/moby/distribution/xfer/download_test.go ./moby/distribution/xfer/download_test.go
+--- ../v20.10.16.orig/moby/distribution/xfer/download_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/distribution/xfer/download_test.go	2023-10-13 12:38:55.947099694 +0000
+@@ -263,13 +263,13 @@
+ 
+ func TestSuccessfulDownload(t *testing.T) {
+ 	// TODO Windows: Fix this unit text
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		t.Skip("Needs fixing on Windows")
+ 	}
+ 
+ 	layerStore := &mockLayerStore{make(map[layer.ChainID]*mockLayer)}
+ 	lsMap := make(map[string]layer.Store)
+-	lsMap[runtime.GOOS] = layerStore
++	lsMap["linux"] = layerStore
+ 	ldm := NewLayerDownloadManager(lsMap, maxDownloadConcurrency, func(m *LayerDownloadManager) { m.waitDuration = time.Millisecond })
+ 
+ 	progressChan := make(chan progress.Progress)
+@@ -295,7 +295,7 @@
+ 	}
+ 	firstDescriptor.diffID = l.DiffID()
+ 
+-	rootFS, releaseFunc, err := ldm.Download(context.Background(), *image.NewRootFS(), runtime.GOOS, descriptors, progress.ChanOutput(progressChan))
++	rootFS, releaseFunc, err := ldm.Download(context.Background(), *image.NewRootFS(), "linux", descriptors, progress.ChanOutput(progressChan))
+ 	if err != nil {
+ 		t.Fatalf("download error: %v", err)
+ 	}
+@@ -333,7 +333,7 @@
+ func TestCancelledDownload(t *testing.T) {
+ 	layerStore := &mockLayerStore{make(map[layer.ChainID]*mockLayer)}
+ 	lsMap := make(map[string]layer.Store)
+-	lsMap[runtime.GOOS] = layerStore
++	lsMap["linux"] = layerStore
+ 	ldm := NewLayerDownloadManager(lsMap, maxDownloadConcurrency, func(m *LayerDownloadManager) { m.waitDuration = time.Millisecond })
+ 	progressChan := make(chan progress.Progress)
+ 	progressDone := make(chan struct{})
+@@ -352,7 +352,7 @@
+ 	}()
+ 
+ 	descriptors := downloadDescriptors(nil)
+-	_, _, err := ldm.Download(ctx, *image.NewRootFS(), runtime.GOOS, descriptors, progress.ChanOutput(progressChan))
++	_, _, err := ldm.Download(ctx, *image.NewRootFS(), "linux", descriptors, progress.ChanOutput(progressChan))
+ 	if err != context.Canceled {
+ 		t.Fatal("expected download to be cancelled")
+ 	}
+@@ -396,7 +396,7 @@
+ 			t.Parallel()
+ 			layerStore := &mockLayerStore{make(map[layer.ChainID]*mockLayer)}
+ 			lsMap := make(map[string]layer.Store)
+-			lsMap[runtime.GOOS] = layerStore
++			lsMap["linux"] = layerStore
+ 			ldm := NewLayerDownloadManager(
+ 				lsMap,
+ 				maxDownloadConcurrency,
+@@ -418,7 +418,7 @@
+ 			descriptors := downloadDescriptors(&currentDownloads)
+ 			descriptors[4].(*mockDownloadDescriptor).simulateRetries = tc.simulateRetries
+ 
+-			_, _, err := ldm.Download(context.Background(), *image.NewRootFS(), runtime.GOOS, descriptors, progress.ChanOutput(progressChan))
++			_, _, err := ldm.Download(context.Background(), *image.NewRootFS(), "linux", descriptors, progress.ChanOutput(progressChan))
+ 			if tc.expectedErr == "" {
+ 				assert.NilError(t, err)
+ 			} else {
+diff -ur ../v20.10.16.orig/moby/dockerversion/useragent.go ./moby/dockerversion/useragent.go
+--- ../v20.10.16.orig/moby/dockerversion/useragent.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/dockerversion/useragent.go	2023-10-13 12:38:55.947099694 +0000
+@@ -24,7 +24,7 @@
+ 	if kernelVersion, err := kernel.GetKernelVersion(); err == nil {
+ 		httpVersion = append(httpVersion, useragent.VersionInfo{Name: "kernel", Version: kernelVersion.String()})
+ 	}
+-	httpVersion = append(httpVersion, useragent.VersionInfo{Name: "os", Version: runtime.GOOS})
++	httpVersion = append(httpVersion, useragent.VersionInfo{Name: "os", Version: "linux"})
+ 	httpVersion = append(httpVersion, useragent.VersionInfo{Name: "arch", Version: runtime.GOARCH})
+ 
+ 	dockerUA := useragent.AppendVersions("", httpVersion...)
+diff -ur ../v20.10.16.orig/moby/image/image.go ./moby/image/image.go
+--- ../v20.10.16.orig/moby/image/image.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/image/image.go	2023-10-13 12:38:55.947099694 +0000
+@@ -118,7 +118,7 @@
+ func (img *Image) OperatingSystem() string {
+ 	os := img.OS
+ 	if os == "" {
+-		os = runtime.GOOS
++		os = "linux"
+ 	}
+ 	return os
+ }
+diff -ur ../v20.10.16.orig/moby/image/image_test.go ./moby/image/image_test.go
+--- ../v20.10.16.orig/moby/image/image_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/image/image_test.go	2023-10-13 12:38:55.947099694 +0000
+@@ -63,7 +63,7 @@
+ 		Domainname: "domain",
+ 		User:       "root",
+ 	}
+-	os := runtime.GOOS
++	os := "linux"
+ 
+ 	img := &Image{
+ 		V1Image: V1Image{
+diff -ur ../v20.10.16.orig/moby/image/rootfs.go ./moby/image/rootfs.go
+--- ../v20.10.16.orig/moby/image/rootfs.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/image/rootfs.go	2023-10-13 12:38:55.947099694 +0000
+@@ -45,7 +45,7 @@
+ 
+ // ChainID returns the ChainID for the top layer in RootFS.
+ func (r *RootFS) ChainID() layer.ChainID {
+-	if runtime.GOOS == "windows" && r.Type == typeLayersWithBase {
++	if "linux" == "windows" && r.Type == typeLayersWithBase {
+ 		logrus.Warnf("Layer type is unsupported on this platform. DiffIDs: '%v'", r.DiffIDs)
+ 		return ""
+ 	}
+diff -ur ../v20.10.16.orig/moby/image/store_test.go ./moby/image/store_test.go
+--- ../v20.10.16.orig/moby/image/store_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/image/store_test.go	2023-10-13 12:38:55.947099694 +0000
+@@ -35,7 +35,7 @@
+ 	assert.NilError(t, err)
+ 
+ 	mlgrMap := make(map[string]LayerGetReleaser)
+-	mlgrMap[runtime.GOOS] = &mockLayerGetReleaser{}
++	mlgrMap["linux"] = &mockLayerGetReleaser{}
+ 	is, err := NewImageStore(fs, mlgrMap)
+ 	assert.NilError(t, err)
+ 
+@@ -154,7 +154,7 @@
+ 	fsBackend, cleanup := defaultFSStoreBackend(t)
+ 
+ 	mlgrMap := make(map[string]LayerGetReleaser)
+-	mlgrMap[runtime.GOOS] = &mockLayerGetReleaser{}
++	mlgrMap["linux"] = &mockLayerGetReleaser{}
+ 	store, err := NewImageStore(fsBackend, mlgrMap)
+ 	assert.NilError(t, err)
+ 
+diff -ur ../v20.10.16.orig/moby/image/tarexport/load.go ./moby/image/tarexport/load.go
+--- ../v20.10.16.orig/moby/image/tarexport/load.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/image/tarexport/load.go	2023-10-13 12:38:55.947099694 +0000
+@@ -92,9 +92,9 @@
+ 		// On Windows, validate the platform, defaulting to windows if not present.
+ 		os := img.OS
+ 		if os == "" {
+-			os = runtime.GOOS
++			os = "linux"
+ 		}
+-		if runtime.GOOS == "windows" {
++		if "linux" == "windows" {
+ 			if (os != "windows") && (os != "linux") {
+ 				return fmt.Errorf("configuration for this image has an unsupported operating system: %s", os)
+ 			}
+@@ -220,7 +220,7 @@
+ }
+ 
+ func (l *tarexporter) legacyLoad(tmpDir string, outStream io.Writer, progressOutput progress.Output) error {
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		return errors.New("Windows does not support legacy loading of images")
+ 	}
+ 
+@@ -303,7 +303,7 @@
+ 		return err
+ 	}
+ 	if img.OS == "" {
+-		img.OS = runtime.GOOS
++		img.OS = "linux"
+ 	}
+ 
+ 	var parentID image.ID
+@@ -414,12 +414,12 @@
+ 
+ func checkCompatibleOS(imageOS string) error {
+ 	// always compatible if the images OS matches the host OS; also match an empty image OS
+-	if imageOS == runtime.GOOS || imageOS == "" {
++	if imageOS == "linux" || imageOS == "" {
+ 		return nil
+ 	}
+ 	// On non-Windows hosts, for compatibility, fail if the image is Windows.
+-	if runtime.GOOS != "windows" && imageOS == "windows" {
+-		return fmt.Errorf("cannot load %s image on %s", imageOS, runtime.GOOS)
++	if "linux" != "windows" && imageOS == "windows" {
++		return fmt.Errorf("cannot load %s image on %s", imageOS, "linux")
+ 	}
+ 
+ 	p, err := platforms.Parse(imageOS)
+diff -ur ../v20.10.16.orig/moby/image/tarexport/save.go ./moby/image/tarexport/save.go
+--- ../v20.10.16.orig/moby/image/tarexport/save.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/image/tarexport/save.go	2023-10-13 12:38:55.947099694 +0000
+@@ -156,7 +156,7 @@
+ 	}
+ 	os := img.OS
+ 	if os == "" {
+-		os = runtime.GOOS
++		os = "linux"
+ 	}
+ 	if !system.IsOSSupported(os) {
+ 		return fmt.Errorf("os %q is not supported", os)
+@@ -175,7 +175,7 @@
+ 		if descr.layerRef != nil {
+ 			os := descr.image.OS
+ 			if os == "" {
+-				os = runtime.GOOS
++				os = "linux"
+ 			}
+ 			l.lss[os].Release(descr.layerRef)
+ 		}
+@@ -375,7 +375,7 @@
+ 	layerPath := filepath.Join(outDir, legacyLayerFileName)
+ 	operatingSystem := legacyImg.OS
+ 	if operatingSystem == "" {
+-		operatingSystem = runtime.GOOS
++		operatingSystem = "linux"
+ 	}
+ 	l, err := s.lss[operatingSystem].Get(id)
+ 	if err != nil {
+diff -ur ../v20.10.16.orig/moby/integration/daemon/daemon_test.go ./moby/integration/daemon/daemon_test.go
+--- ../v20.10.16.orig/moby/integration/daemon/daemon_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/integration/daemon/daemon_test.go	2023-10-13 12:38:55.950433038 +0000
+@@ -16,7 +16,7 @@
+ )
+ 
+ func TestLiveRestore(t *testing.T) {
+-	skip.If(t, runtime.GOOS == "windows", "cannot start multiple daemons on windows")
++	skip.If(t, "linux" == "windows", "cannot start multiple daemons on windows")
+ 
+ 	t.Run("volume references", testLiveRestoreVolumeReferences)
+ }
+diff -ur ../v20.10.16.orig/moby/integration/image/remove_unix_test.go ./moby/integration/image/remove_unix_test.go
+--- ../v20.10.16.orig/moby/integration/image/remove_unix_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/integration/image/remove_unix_test.go	2023-10-13 12:38:55.950433038 +0000
+@@ -46,7 +46,7 @@
+ 	client := d.NewClientT(t)
+ 
+ 	layerStores := make(map[string]layer.Store)
+-	layerStores[runtime.GOOS], _ = layer.NewStoreFromOptions(layer.StoreOptions{
++	layerStores["linux"], _ = layer.NewStoreFromOptions(layer.StoreOptions{
+ 		Root:                      d.Root,
+ 		MetadataStorePathTemplate: filepath.Join(d.RootDir(), "image", "%s", "layerdb"),
+ 		GraphDriver:               d.StorageDriver(),
+@@ -54,7 +54,7 @@
+ 		IDMapping:                 &idtools.IdentityMapping{},
+ 		PluginGetter:              nil,
+ 		ExperimentalEnabled:       false,
+-		OS:                        runtime.GOOS,
++		OS:                        "linux",
+ 	})
+ 	i := images.NewImageService(images.ImageServiceConfig{
+ 		LayerStores: layerStores,
+diff -ur ../v20.10.16.orig/moby/integration/internal/container/container.go ./moby/integration/internal/container/container.go
+--- ../v20.10.16.orig/moby/integration/internal/container/container.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/integration/internal/container/container.go	2023-10-13 12:38:55.950433038 +0000
+@@ -27,7 +27,7 @@
+ func create(ctx context.Context, t *testing.T, client client.APIClient, ops ...func(*TestContainerConfig)) (container.ContainerCreateCreatedBody, error) {
+ 	t.Helper()
+ 	cmd := []string{"top"}
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		cmd = []string{"sleep", "240"}
+ 	}
+ 	config := &TestContainerConfig{
+diff -ur ../v20.10.16.orig/moby/integration/plugin/graphdriver/external_test.go ./moby/integration/plugin/graphdriver/external_test.go
+--- ../v20.10.16.orig/moby/integration/plugin/graphdriver/external_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/integration/plugin/graphdriver/external_test.go	2023-10-13 12:38:55.950433038 +0000
+@@ -44,7 +44,7 @@
+ }
+ 
+ func TestExternalGraphDriver(t *testing.T) {
+-	skip.If(t, runtime.GOOS == "windows")
++	skip.If(t, "linux" == "windows")
+ 	skip.If(t, testEnv.IsRemoteDaemon, "cannot run daemon when remote daemon")
+ 	skip.If(t, !requirement.HasHubConnectivity(t))
+ 	skip.If(t, testEnv.IsRootless, "rootless mode doesn't support external graph driver")
+@@ -404,7 +404,7 @@
+ }
+ 
+ func TestGraphdriverPluginV2(t *testing.T) {
+-	skip.If(t, runtime.GOOS == "windows")
++	skip.If(t, "linux" == "windows")
+ 	skip.If(t, testEnv.IsRemoteDaemon, "cannot run daemon when remote daemon")
+ 	skip.If(t, !requirement.HasHubConnectivity(t))
+ 	skip.If(t, os.Getenv("DOCKER_ENGINE_GOARCH") != "amd64")
+diff -ur ../v20.10.16.orig/moby/integration/plugin/logging/read_test.go ./moby/integration/plugin/logging/read_test.go
+--- ../v20.10.16.orig/moby/integration/plugin/logging/read_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/integration/plugin/logging/read_test.go	2023-10-13 12:38:55.950433038 +0000
+@@ -17,7 +17,7 @@
+ 
+ // TestReadPluginNoRead tests that reads are supported even if the plugin isn't capable.
+ func TestReadPluginNoRead(t *testing.T) {
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		t.Skip("no unix domain sockets on Windows")
+ 	}
+ 	t.Parallel()
+
+diff -ur ../v20.10.16.orig/moby/integration-cli/docker_api_containers_test.go ./moby/integration-cli/docker_api_containers_test.go
+--- ../v20.10.16.orig/moby/integration-cli/docker_api_containers_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/integration-cli/docker_api_containers_test.go	2023-10-13 12:38:55.947099694 +0000
+@@ -1993,7 +1993,7 @@
+ 	// for the sake of making test pass in earlier versions
+ 	// bug fixed in https://github.com/moby/moby/pull/34684
+ 	if !versions.LessThan(testEnv.DaemonAPIVersion(), "1.32") {
+-		if runtime.GOOS == "linux" {
++		if "linux" == "linux" {
+ 			selinuxSharedLabel = "z"
+ 		}
+ 	}
+diff -ur ../v20.10.16.orig/moby/integration-cli/docker_api_images_test.go ./moby/integration-cli/docker_api_images_test.go
+--- ../v20.10.16.orig/moby/integration-cli/docker_api_images_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/integration-cli/docker_api_images_test.go	2023-10-13 12:38:55.947099694 +0000
+@@ -59,7 +59,7 @@
+ }
+ 
+ func (s *DockerSuite) TestAPIImagesSaveAndLoad(c *testing.T) {
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		// Note we parse kernel.GetKernelVersion rather than osversion.Build()
+ 		// as test binaries aren't manifested, so would otherwise report build 9200.
+ 		v, err := kernel.GetKernelVersion()
+@@ -141,7 +141,7 @@
+ }
+ 
+ func (s *DockerSuite) TestAPIImagesImportBadSrc(c *testing.T) {
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		// Note we parse kernel.GetKernelVersion rather than osversion.Build()
+ 		// as test binaries aren't manifested, so would otherwise report build 9200.
+ 		v, err := kernel.GetKernelVersion()
+diff -ur ../v20.10.16.orig/moby/integration-cli/docker_api_stats_test.go ./moby/integration-cli/docker_api_stats_test.go
+--- ../v20.10.16.orig/moby/integration-cli/docker_api_stats_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/integration-cli/docker_api_stats_test.go	2023-10-13 12:38:55.947099694 +0000
+@@ -125,11 +125,11 @@
+ 	}
+ 
+ 	countParam := "-c"
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		countParam = "-n" // Ping count parameter is -n on Windows
+ 	}
+ 	pingout, err := exec.Command("ping", contIP, countParam, strconv.Itoa(numPings)).CombinedOutput()
+-	if err != nil && runtime.GOOS == "linux" {
++	if err != nil && "linux" == "linux" {
+ 		// If it fails then try a work-around, but just for linux.
+ 		// If this fails too then go back to the old error for reporting.
+ 		//
+diff -ur ../v20.10.16.orig/moby/integration-cli/docker_api_test.go ./moby/integration-cli/docker_api_test.go
+--- ../v20.10.16.orig/moby/integration-cli/docker_api_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/integration-cli/docker_api_test.go	2023-10-13 12:38:55.947099694 +0000
+@@ -34,7 +34,7 @@
+ }
+ 
+ func (s *DockerSuite) TestAPIClientVersionOldNotSupported(c *testing.T) {
+-	if testEnv.OSType != runtime.GOOS {
++	if testEnv.OSType != "linux" {
+ 		c.Skip("Daemon platform doesn't match test platform")
+ 	}
+ 	if api.MinVersion == api.DefaultVersion {
+diff -ur ../v20.10.16.orig/moby/integration-cli/docker_cli_attach_test.go ./moby/integration-cli/docker_cli_attach_test.go
+--- ../v20.10.16.orig/moby/integration-cli/docker_cli_attach_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/integration-cli/docker_cli_attach_test.go	2023-10-13 12:38:55.947099694 +0000
+@@ -113,7 +113,7 @@
+ 		}
+ 
+ 		expected := "the input device is not a TTY"
+-		if runtime.GOOS == "windows" {
++		if "linux" == "windows" {
+ 			expected += ".  If you are using mintty, try prefixing the command with 'winpty'"
+ 		}
+ 		if out, _, err := runCommandWithOutput(cmd); err == nil {
+diff -ur ../v20.10.16.orig/moby/integration-cli/docker_cli_build_test.go ./moby/integration-cli/docker_cli_build_test.go
+--- ../v20.10.16.orig/moby/integration-cli/docker_cli_build_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/integration-cli/docker_cli_build_test.go	2023-10-13 12:38:55.950433038 +0000
+@@ -945,7 +945,7 @@
+ 	defer os.RemoveAll(tempDir)
+ 
+ 	var symlinkTarget string
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		var driveLetter string
+ 		if abs, err := filepath.Abs(tempDir); err != nil {
+ 			c.Fatal(err)
+@@ -3556,7 +3556,7 @@
+ 	result.Assert(c, icmd.Success)
+ 
+ 	// Windows to non-Windows should have a security warning
+-	if runtime.GOOS == "windows" && testEnv.OSType != "windows" && !strings.Contains(result.Stdout(), "SECURITY WARNING:") {
++	if "linux" == "windows" && testEnv.OSType != "windows" && !strings.Contains(result.Stdout(), "SECURITY WARNING:") {
+ 		c.Fatalf("Stdout contains unexpected output: %q", result.Stdout())
+ 	}
+ 
+diff -ur ../v20.10.16.orig/moby/integration-cli/docker_cli_cp_utils_test.go ./moby/integration-cli/docker_cli_cp_utils_test.go
+--- ../v20.10.16.orig/moby/integration-cli/docker_cli_cp_utils_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/integration-cli/docker_cli_cp_utils_test.go	2023-10-13 12:38:55.950433038 +0000
+@@ -105,7 +105,7 @@
+ 			assert.NilError(c, os.Symlink(fd.contents, path))
+ 		}
+ 
+-		if fd.filetype != ftSymlink && runtime.GOOS != "windows" {
++		if fd.filetype != ftSymlink && "linux" != "windows" {
+ 			assert.NilError(c, os.Chown(path, fd.uid, fd.gid))
+ 		}
+ 	}
+diff -ur ../v20.10.16.orig/moby/integration-cli/docker_cli_exec_test.go ./moby/integration-cli/docker_cli_exec_test.go
+--- ../v20.10.16.orig/moby/integration-cli/docker_cli_exec_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/integration-cli/docker_cli_exec_test.go	2023-10-13 12:38:55.950433038 +0000
+@@ -181,7 +181,7 @@
+ 		}
+ 
+ 		expected := "the input device is not a TTY"
+-		if runtime.GOOS == "windows" {
++		if "linux" == "windows" {
+ 			expected += ".  If you are using mintty, try prefixing the command with 'winpty'"
+ 		}
+ 		if out, _, err := runCommandWithOutput(cmd); err == nil {
+diff -ur ../v20.10.16.orig/moby/integration-cli/docker_cli_pull_local_test.go ./moby/integration-cli/docker_cli_pull_local_test.go
+--- ../v20.10.16.orig/moby/integration-cli/docker_cli_pull_local_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/integration-cli/docker_cli_pull_local_test.go	2023-10-13 12:38:55.950433038 +0000
+@@ -313,7 +313,7 @@
+ 				},
+ 				Platform: manifestlist.PlatformSpec{
+ 					Architecture: runtime.GOARCH,
+-					OS:           runtime.GOOS,
++					OS:           "linux",
+ 				},
+ 			},
+ 		},
+diff -ur ../v20.10.16.orig/moby/integration-cli/docker_cli_run_test.go ./moby/integration-cli/docker_cli_run_test.go
+--- ../v20.10.16.orig/moby/integration-cli/docker_cli_run_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/integration-cli/docker_cli_run_test.go	2023-10-13 12:38:55.950433038 +0000
+@@ -2530,7 +2530,7 @@
+ 		}
+ 
+ 		expected := "the input device is not a TTY"
+-		if runtime.GOOS == "windows" {
++		if "linux" == "windows" {
+ 			expected += ".  If you are using mintty, try prefixing the command with 'winpty'"
+ 		}
+ 		if out, _, err := runCommandWithOutput(cmd); err == nil {
+diff -ur ../v20.10.16.orig/moby/integration-cli/docker_cli_start_test.go ./moby/integration-cli/docker_cli_start_test.go
+--- ../v20.10.16.orig/moby/integration-cli/docker_cli_start_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/integration-cli/docker_cli_start_test.go	2023-10-13 12:38:55.950433038 +0000
+@@ -193,7 +193,7 @@
+ 	// Note we parse kernel.GetKernelVersion rather than system.GetOSVersion
+ 	// as test binaries aren't manifested, so would otherwise report the wrong
+ 	// build number.
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		v, err := kernel.GetKernelVersion()
+ 		assert.NilError(c, err)
+ 		build, _ := strconv.Atoi(strings.Split(strings.SplitN(v.String(), " ", 3)[2][1:], ".")[0])
+diff -ur ../v20.10.16.orig/moby/integration-cli/fixtures_linux_daemon_test.go ./moby/integration-cli/fixtures_linux_daemon_test.go
+--- ../v20.10.16.orig/moby/integration-cli/fixtures_linux_daemon_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/integration-cli/fixtures_linux_daemon_test.go	2023-10-13 12:38:55.950433038 +0000
+@@ -23,7 +23,7 @@
+ 
+ 	// if no match, must build in docker, which is significantly slower
+ 	// (slower mostly because of the vfs graphdriver)
+-	if testEnv.OSType != runtime.GOOS {
++	if testEnv.OSType != "linux" {
+ 		ensureSyscallTestBuild(c)
+ 		return
+ 	}
+@@ -41,7 +41,7 @@
+ 		assert.NilError(c, err, string(out))
+ 	}
+ 
+-	if runtime.GOOS == "linux" && runtime.GOARCH == "amd64" {
++	if "linux" == "linux" && runtime.GOARCH == "amd64" {
+ 		out, err := exec.Command(gcc, "-s", "-m32", "-nostdlib", "-static", "../contrib/syscall-test/exit32.s", "-o", tmp+"/"+"exit32-test").CombinedOutput()
+ 		assert.NilError(c, err, string(out))
+ 	}
+@@ -86,7 +86,7 @@
+ 
+ 	// if no match, must build in docker, which is significantly slower
+ 	// (slower mostly because of the vfs graphdriver)
+-	if testEnv.OSType != runtime.GOOS {
++	if testEnv.OSType != "linux" {
+ 		ensureNNPTestBuild(c)
+ 		return
+ 	}
+diff -ur ../v20.10.16.orig/moby/layer/filestore_unix.go ./moby/layer/filestore_unix.go
+--- ../v20.10.16.orig/moby/layer/filestore_unix.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/layer/filestore_unix.go	2023-10-13 12:38:55.950433038 +0000
+@@ -12,5 +12,5 @@
+ 
+ // getOS reads the "os" file from the layer filestore
+ func (fms *fileMetadataStore) getOS(layer ChainID) (string, error) {
+-	return runtime.GOOS, nil
++	return "linux", nil
+ }
+diff -ur ../v20.10.16.orig/moby/layer/layer_test.go ./moby/layer/layer_test.go
+--- ../v20.10.16.orig/moby/layer/layer_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/layer/layer_test.go	2023-10-13 12:38:55.950433038 +0000
+@@ -69,7 +69,7 @@
+ 
+ 	graph, graphcleanup := newTestGraphDriver(t)
+ 
+-	ls, err := newStoreFromGraphDriver(td, graph, runtime.GOOS)
++	ls, err := newStoreFromGraphDriver(td, graph, "linux")
+ 	if err != nil {
+ 		t.Fatal(err)
+ 	}
+@@ -299,7 +299,7 @@
+ 
+ func TestLayerRelease(t *testing.T) {
+ 	// TODO Windows: Figure out why this is failing
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		t.Skip("Failing on Windows")
+ 	}
+ 	ls, _, cleanup := newTestStore(t)
+@@ -348,7 +348,7 @@
+ 
+ func TestStoreRestore(t *testing.T) {
+ 	// TODO Windows: Figure out why this is failing
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		t.Skip("Failing on Windows")
+ 	}
+ 	ls, _, cleanup := newTestStore(t)
+@@ -395,7 +395,7 @@
+ 		t.Fatal(err)
+ 	}
+ 
+-	ls2, err := newStoreFromGraphDriver(ls.(*layerStore).store.root, ls.(*layerStore).driver, runtime.GOOS)
++	ls2, err := newStoreFromGraphDriver(ls.(*layerStore).store.root, ls.(*layerStore).driver, "linux")
+ 	if err != nil {
+ 		t.Fatal(err)
+ 	}
+@@ -463,7 +463,7 @@
+ 
+ func TestTarStreamStability(t *testing.T) {
+ 	// TODO Windows: Figure out why this is failing
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		t.Skip("Failing on Windows")
+ 	}
+ 	ls, _, cleanup := newTestStore(t)
+@@ -692,7 +692,7 @@
+ 
+ func TestTarStreamVerification(t *testing.T) {
+ 	// TODO Windows: Figure out why this is failing
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		t.Skip("Failing on Windows")
+ 	}
+ 	ls, tmpdir, cleanup := newTestStore(t)
+diff -ur ../v20.10.16.orig/moby/layer/migration_test.go ./moby/layer/migration_test.go
+--- ../v20.10.16.orig/moby/layer/migration_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/layer/migration_test.go	2023-10-13 12:38:55.950433038 +0000
+@@ -41,7 +41,7 @@
+ 
+ func TestLayerMigration(t *testing.T) {
+ 	// TODO Windows: Figure out why this is failing
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		t.Skip("Failing on Windows")
+ 	}
+ 	td, err := os.MkdirTemp("", "migration-test-")
+@@ -88,7 +88,7 @@
+ 	}
+ 
+ 	root := filepath.Join(td, "layers")
+-	ls, err := newStoreFromGraphDriver(root, graph, runtime.GOOS)
++	ls, err := newStoreFromGraphDriver(root, graph, "linux")
+ 	if err != nil {
+ 		t.Fatal(err)
+ 	}
+@@ -177,7 +177,7 @@
+ 
+ func TestLayerMigrationNoTarsplit(t *testing.T) {
+ 	// TODO Windows: Figure out why this is failing
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		t.Skip("Failing on Windows")
+ 	}
+ 	td, err := os.MkdirTemp("", "migration-test-")
+@@ -213,7 +213,7 @@
+ 	}
+ 
+ 	root := filepath.Join(td, "layers")
+-	ls, err := newStoreFromGraphDriver(root, graph, runtime.GOOS)
++	ls, err := newStoreFromGraphDriver(root, graph, "linux")
+ 	if err != nil {
+ 		t.Fatal(err)
+ 	}
+diff -ur ../v20.10.16.orig/moby/layer/mount_test.go ./moby/layer/mount_test.go
+--- ../v20.10.16.orig/moby/layer/mount_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/layer/mount_test.go	2023-10-13 12:38:55.953766380 +0000
+@@ -13,7 +13,7 @@
+ 
+ func TestMountInit(t *testing.T) {
+ 	// TODO Windows: Figure out why this is failing
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		t.Skip("Failing on Windows")
+ 	}
+ 	ls, _, cleanup := newTestStore(t)
+@@ -72,7 +72,7 @@
+ 
+ func TestMountSize(t *testing.T) {
+ 	// TODO Windows: Figure out why this is failing
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		t.Skip("Failing on Windows")
+ 	}
+ 	ls, _, cleanup := newTestStore(t)
+@@ -121,7 +121,7 @@
+ 
+ func TestMountChanges(t *testing.T) {
+ 	// TODO Windows: Figure out why this is failing
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		t.Skip("Failing on Windows")
+ 	}
+ 	ls, _, cleanup := newTestStore(t)
+@@ -208,7 +208,7 @@
+ 
+ func TestMountApply(t *testing.T) {
+ 	// TODO Windows: Figure out why this is failing
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		t.Skip("Failing on Windows")
+ 	}
+ 	ls, _, cleanup := newTestStore(t)
+diff -ur ../v20.10.16.orig/moby/libcontainerd/remote/client.go ./moby/libcontainerd/remote/client.go
+--- ../v20.10.16.orig/moby/libcontainerd/remote/client.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/libcontainerd/remote/client.go	2023-10-13 12:38:55.953766380 +0000
+@@ -208,7 +208,7 @@
+ 		},
+ 	}
+ 
+-	if runtime.GOOS != "windows" {
++	if "linux" != "windows" {
+ 		taskOpts = append(taskOpts, func(_ context.Context, _ *containerd.Client, info *containerd.TaskInfo) error {
+ 			c.v2runcoptionsMu.Lock()
+ 			opts, ok := c.v2runcoptions[id]
+diff -ur ../v20.10.16.orig/moby/oci/defaults.go ./moby/oci/defaults.go
+--- ../v20.10.16.orig/moby/oci/defaults.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/oci/defaults.go	2023-10-13 12:38:55.953766380 +0000
+@@ -14,7 +14,7 @@
+ 
+ // DefaultSpec returns the default spec used by docker for the current Platform
+ func DefaultSpec() specs.Spec {
+-	return DefaultOSSpec(runtime.GOOS)
++	return DefaultOSSpec("linux")
+ }
+ 
+ // DefaultOSSpec returns the spec for a given OS
+@@ -185,7 +185,7 @@
+ 	}
+ 
+ 	// For LCOW support, populate a blank Windows spec
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		s.Windows = &specs.Windows{}
+ 	}
+ 
+diff -ur ../v20.10.16.orig/moby/opts/env_test.go ./moby/opts/env_test.go
+--- ../v20.10.16.orig/moby/opts/env_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/opts/env_test.go	2023-10-13 12:38:55.953766380 +0000
+@@ -94,7 +94,7 @@
+ 		},
+ 	}
+ 
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		// Environment variables are case in-sensitive on Windows
+ 		tests = append(tests, testCase{
+ 			value:    "PaTh",
+diff -ur ../v20.10.16.orig/moby/pkg/archive/archive.go ./moby/pkg/archive/archive.go
+--- ../v20.10.16.orig/moby/pkg/archive/archive.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/pkg/archive/archive.go	2023-10-13 12:38:55.953766380 +0000
+@@ -661,7 +661,7 @@
+ 	}
+ 
+ 	// Lchown is not supported on Windows.
+-	if Lchown && runtime.GOOS != "windows" {
++	if Lchown && "linux" != "windows" {
+ 		if chownOpts == nil {
+ 			chownOpts = &idtools.Identity{UID: hdr.Uid, GID: hdr.Gid}
+ 		}
+diff -ur ../v20.10.16.orig/moby/pkg/archive/archive_test.go ./moby/pkg/archive/archive_test.go
+--- ../v20.10.16.orig/moby/pkg/archive/archive_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/pkg/archive/archive_test.go	2023-10-13 12:38:55.953766380 +0000
+@@ -28,7 +28,7 @@
+ 
+ func init() {
+ 	tmp = "/tmp/"
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		tmp = os.Getenv("TEMP") + `\`
+ 	}
+ }
+@@ -129,7 +129,7 @@
+ }
+ 
+ func TestDecompressStreamXz(t *testing.T) {
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		t.Skip("Xz not present in msys2")
+ 	}
+ 	testDecompressStream(t, "xz", "xz -f")
+@@ -234,7 +234,7 @@
+ 
+ func TestCmdStreamBad(t *testing.T) {
+ 	// TODO Windows: Figure out why this is failing in CI but not locally
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		t.Skip("Failing on Windows CI machines")
+ 	}
+ 	badCmd := exec.Command("sh", "-c", "echo hello; echo >&2 error couldn\\'t reverse the phase pulser; exit 1")
+@@ -278,7 +278,7 @@
+ 	// Translate back to Unix semantics as next exec.Command is run under sh
+ 	srcFileU := srcFile
+ 	tarFileU := tarFile
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		tarFileU = "/tmp/" + filepath.Base(filepath.Dir(tarFile)) + "/src.tar"
+ 		srcFileU = "/tmp/" + filepath.Base(filepath.Dir(srcFile)) + "/src"
+ 	}
+@@ -306,7 +306,7 @@
+ }
+ 
+ func TestUntarPath(t *testing.T) {
+-	skip.If(t, runtime.GOOS != "windows" && os.Getuid() != 0, "skipping test that requires root")
++	skip.If(t, "linux" != "windows" && os.Getuid() != 0, "skipping test that requires root")
+ 	tmpFolder, err := os.MkdirTemp("", "docker-archive-test")
+ 	assert.NilError(t, err)
+ 	defer os.RemoveAll(tmpFolder)
+@@ -323,7 +323,7 @@
+ 	// Translate back to Unix semantics as next exec.Command is run under sh
+ 	srcFileU := srcFile
+ 	tarFileU := tarFile
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		tarFileU = "/tmp/" + filepath.Base(filepath.Dir(tarFile)) + "/src.tar"
+ 		srcFileU = "/tmp/" + filepath.Base(filepath.Dir(srcFile)) + "/src"
+ 	}
+@@ -356,7 +356,7 @@
+ 	// Translate back to Unix semantics as next exec.Command is run under sh
+ 	srcFileU := srcFile
+ 	tarFileU := tarFile
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		tarFileU = "/tmp/" + filepath.Base(filepath.Dir(tarFile)) + "/src.tar"
+ 		srcFileU = "/tmp/" + filepath.Base(filepath.Dir(srcFile)) + "/src"
+ 	}
+@@ -392,7 +392,7 @@
+ 	// Translate back to Unix semantics as next exec.Command is run under sh
+ 	srcFileU := srcFile
+ 	tarFileU := tarFile
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		tarFileU = "/tmp/" + filepath.Base(filepath.Dir(tarFile)) + "/src.tar"
+ 		srcFileU = "/tmp/" + filepath.Base(filepath.Dir(srcFile)) + "/src"
+ 	}
+@@ -437,7 +437,7 @@
+ }
+ 
+ func TestCopyWithTarInexistentDestWillCreateIt(t *testing.T) {
+-	skip.If(t, runtime.GOOS != "windows" && os.Getuid() != 0, "skipping test that requires root")
++	skip.If(t, "linux" != "windows" && os.Getuid() != 0, "skipping test that requires root")
+ 	tempFolder, err := os.MkdirTemp("", "docker-archive-test")
+ 	if err != nil {
+ 		t.Fatal(nil)
+@@ -955,7 +955,7 @@
+ }
+ 
+ func TestUntarHardlinkToSymlink(t *testing.T) {
+-	skip.If(t, runtime.GOOS != "windows" && os.Getuid() != 0, "skipping test that requires root")
++	skip.If(t, "linux" != "windows" && os.Getuid() != 0, "skipping test that requires root")
+ 	for i, headers := range [][]*tar.Header{
+ 		{
+ 			{
+@@ -1249,7 +1249,7 @@
+ // TestPrefixHeaderReadable tests that files that could be created with the
+ // version of this package that was built with <=go17 are still readable.
+ func TestPrefixHeaderReadable(t *testing.T) {
+-	skip.If(t, runtime.GOOS != "windows" && os.Getuid() != 0, "skipping test that requires root")
++	skip.If(t, "linux" != "windows" && os.Getuid() != 0, "skipping test that requires root")
+ 	skip.If(t, sys.RunningInUserNS(), "skipping test that requires more than 010000000 UIDs, which is unlikely to be satisfied when running in userns")
+ 	// https://gist.github.com/stevvooe/e2a790ad4e97425896206c0816e1a882#file-out-go
+ 	var testFile = []byte("\x1f\x8b\x08\x08\x44\x21\x68\x59\x00\x03\x74\x2e\x74\x61\x72\x00\x4b\xcb\xcf\x67\xa0\x35\x30\x80\x00\x86\x06\x10\x47\x01\xc1\x37\x40\x00\x54\xb6\xb1\xa1\xa9\x99\x09\x48\x25\x1d\x40\x69\x71\x49\x62\x91\x02\xe5\x76\xa1\x79\x84\x21\x91\xd6\x80\x72\xaf\x8f\x82\x51\x30\x0a\x46\x36\x00\x00\xf0\x1c\x1e\x95\x00\x06\x00\x00")
+@@ -1308,7 +1308,7 @@
+ }
+ 
+ func readFileFromArchive(t *testing.T, archive io.ReadCloser, name string, expectedCount int, doc string) string {
+-	skip.If(t, runtime.GOOS != "windows" && os.Getuid() != 0, "skipping test that requires root")
++	skip.If(t, "linux" != "windows" && os.Getuid() != 0, "skipping test that requires root")
+ 	destDir, err := os.MkdirTemp("", "docker-test-destDir")
+ 	assert.NilError(t, err)
+ 	defer os.RemoveAll(destDir)
+diff -ur ../v20.10.16.orig/moby/pkg/archive/changes_other.go ./moby/pkg/archive/changes_other.go
+--- ../v20.10.16.orig/moby/pkg/archive/changes_other.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/pkg/archive/changes_other.go	2023-10-13 12:38:55.953766380 +0000
+@@ -58,7 +58,7 @@
+ 		// See https://github.com/golang/go/issues/9168 - bug in filepath.Join.
+ 		// Temporary workaround. If the returned path starts with two backslashes,
+ 		// trim it down to a single backslash. Only relevant on Windows.
+-		if runtime.GOOS == "windows" {
++		if "linux" == "windows" {
+ 			if strings.HasPrefix(relPath, `\\`) {
+ 				relPath = relPath[1:]
+ 			}
+diff -ur ../v20.10.16.orig/moby/pkg/archive/changes_test.go ./moby/pkg/archive/changes_test.go
+--- ../v20.10.16.orig/moby/pkg/archive/changes_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/pkg/archive/changes_test.go	2023-10-13 12:38:55.953766380 +0000
+@@ -24,7 +24,7 @@
+ }
+ 
+ func copyDir(src, dst string) error {
+-	if runtime.GOOS != "windows" {
++	if "linux" != "windows" {
+ 		return exec.Command("cp", "-a", src, dst).Run()
+ 	}
+ 
+@@ -187,7 +187,7 @@
+ // See https://github.com/docker/docker/pull/13590
+ func TestChangesWithChangesGH13590(t *testing.T) {
+ 	// TODO Windows. Needs further investigation to identify the failure
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		t.Skip("needs more investigation")
+ 	}
+ 	baseLayer, err := os.MkdirTemp("", "docker-changes-test.")
+@@ -358,7 +358,7 @@
+ 	// that differences are ordered in the way the test is currently written, hence
+ 	// this is in the middle of the list of changes rather than at the start or
+ 	// end. Potentially can be addressed later.
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		expectedChanges = append(expectedChanges, Change{filepath.FromSlash("/dir3"), ChangeModify})
+ 	}
+ 
+@@ -400,7 +400,7 @@
+ 	// Access/Modify/Change/Birth date to the source (~3/100th sec different).
+ 	// Needs further investigation as to why, but I currently believe this is
+ 	// just the way NTFS works. I don't think it's a bug in this test or archive.
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		t.Skip("needs further investigation")
+ 	}
+ 	src, err := os.MkdirTemp("", "docker-changes-test")
+@@ -436,7 +436,7 @@
+ func TestChangesSizeWithHardlinks(t *testing.T) {
+ 	// TODO Windows. Needs further investigation. Likely in ChangeSizes not
+ 	// coping correctly with hardlinks on Windows.
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		t.Skip("needs further investigation")
+ 	}
+ 	srcDir, err := os.MkdirTemp("", "docker-test-srcDir")
+@@ -498,7 +498,7 @@
+ }
+ 
+ func checkChanges(expectedChanges, changes []Change, t *testing.T) {
+-	skip.If(t, runtime.GOOS != "windows" && os.Getuid() != 0, "skipping test that requires root")
++	skip.If(t, "linux" != "windows" && os.Getuid() != 0, "skipping test that requires root")
+ 	sort.Sort(changesByPath(expectedChanges))
+ 	sort.Sort(changesByPath(changes))
+ 	for i := 0; i < max(len(changes), len(expectedChanges)); i++ {
+diff -ur ../v20.10.16.orig/moby/pkg/archive/diff.go ./moby/pkg/archive/diff.go
+--- ../v20.10.16.orig/moby/pkg/archive/diff.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/pkg/archive/diff.go	2023-10-13 12:38:55.953766380 +0000
+@@ -67,7 +67,7 @@
+ 		// specific or Linux-specific, this warning should be changed to an error
+ 		// to cater for the situation where someone does manage to upload a Linux
+ 		// image but have it tagged as Windows inadvertently.
+-		if runtime.GOOS == "windows" {
++		if "linux" == "windows" {
+ 			if strings.Contains(hdr.Name, ":") {
+ 				logrus.Warnf("Windows: Ignoring %s (is this a Linux image?)", hdr.Name)
+ 				continue
+@@ -239,7 +239,7 @@
+ 	dest = filepath.Clean(dest)
+ 
+ 	// We need to be able to set any perms
+-	if runtime.GOOS != "windows" {
++	if "linux" != "windows" {
+ 		oldmask, err := system.Umask(0)
+ 		if err != nil {
+ 			return 0, err
+diff -ur ../v20.10.16.orig/moby/pkg/chrootarchive/archive_test.go ./moby/pkg/chrootarchive/archive_test.go
+--- ../v20.10.16.orig/moby/pkg/chrootarchive/archive_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/pkg/chrootarchive/archive_test.go	2023-10-13 12:38:55.953766380 +0000
+@@ -173,7 +173,7 @@
+ }
+ 
+ func TestChrootTarUntarWithSymlink(t *testing.T) {
+-	skip.If(t, runtime.GOOS == "windows", "FIXME: figure out why this is failing")
++	skip.If(t, "linux" == "windows", "FIXME: figure out why this is failing")
+ 	skip.If(t, os.Getuid() != 0, "skipping test that requires root")
+ 	tmpdir, err := os.MkdirTemp("", "docker-TestChrootTarUntarWithSymlink")
+ 	if err != nil {
+@@ -197,7 +197,7 @@
+ }
+ 
+ func TestChrootCopyWithTar(t *testing.T) {
+-	skip.If(t, runtime.GOOS == "windows", "FIXME: figure out why this is failing")
++	skip.If(t, "linux" == "windows", "FIXME: figure out why this is failing")
+ 	skip.If(t, os.Getuid() != 0, "skipping test that requires root")
+ 	tmpdir, err := os.MkdirTemp("", "docker-TestChrootCopyWithTar")
+ 	if err != nil {
+@@ -289,7 +289,7 @@
+ }
+ 
+ func TestChrootUntarPath(t *testing.T) {
+-	skip.If(t, runtime.GOOS == "windows", "FIXME: figure out why this is failing")
++	skip.If(t, "linux" == "windows", "FIXME: figure out why this is failing")
+ 	skip.If(t, os.Getuid() != 0, "skipping test that requires root")
+ 	tmpdir, err := os.MkdirTemp("", "docker-TestChrootUntarPath")
+ 	if err != nil {
+diff -ur ../v20.10.16.orig/moby/pkg/containerfs/containerfs.go ./moby/pkg/containerfs/containerfs.go
+--- ../v20.10.16.orig/moby/pkg/containerfs/containerfs.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/pkg/containerfs/containerfs.go	2023-10-13 12:38:55.953766380 +0000
+@@ -29,7 +29,7 @@
+ // field to determine the OS.
+ type Driver interface {
+ 	// OS returns the OS where the rootfs is located. Essentially,
+-	// runtime.GOOS for everything aside from LCOW, which is "linux"
++	// "linux" for everything aside from LCOW, which is "linux"
+ 	OS() string
+ 
+ 	// Architecture returns the hardware architecture where the
+@@ -79,7 +79,7 @@
+ }
+ 
+ func (l *local) OS() string {
+-	return runtime.GOOS
++	return "linux"
+ }
+ 
+ func (l *local) Architecture() string {
+diff -ur ../v20.10.16.orig/moby/pkg/filenotify/poller_test.go ./moby/pkg/filenotify/poller_test.go
+--- ../v20.10.16.orig/moby/pkg/filenotify/poller_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/pkg/filenotify/poller_test.go	2023-10-13 12:38:55.953766380 +0000
+@@ -36,7 +36,7 @@
+ }
+ 
+ func TestPollerEvent(t *testing.T) {
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		t.Skip("No chmod on Windows")
+ 	}
+ 	w := NewPollingWatcher()
+diff -ur ../v20.10.16.orig/moby/pkg/fileutils/fileutils_test.go ./moby/pkg/fileutils/fileutils_test.go
+--- ../v20.10.16.orig/moby/pkg/fileutils/fileutils_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/pkg/fileutils/fileutils_test.go	2023-10-13 12:38:55.953766380 +0000
+@@ -129,7 +129,7 @@
+ // Reading a symlink to a directory must return the directory
+ func TestReadSymlinkedDirectoryExistingDirectory(t *testing.T) {
+ 	// TODO Windows: Port this test
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		t.Skip("Needs porting to Windows")
+ 	}
+ 	var err error
+@@ -175,7 +175,7 @@
+ // Reading a symlink to a file must fail
+ func TestReadSymlinkedDirectoryToFile(t *testing.T) {
+ 	// TODO Windows: Port this test
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		t.Skip("Needs porting to Windows")
+ 	}
+ 	var err error
+@@ -373,7 +373,7 @@
+ 		{"**/.foo", "bar.foo", false},
+ 	}
+ 
+-	if runtime.GOOS != "windows" {
++	if "linux" != "windows" {
+ 		tests = append(tests, []matchesTestCase{
+ 			{"a\\*b", "a*b", true},
+ 		}...)
+@@ -573,7 +573,7 @@
+ 	for _, tt := range matchTests {
+ 		pattern := tt.pattern
+ 		s := tt.s
+-		if runtime.GOOS == "windows" {
++		if "linux" == "windows" {
+ 			if strings.Contains(pattern, "\\") {
+ 				// no escape allowed on windows.
+ 				continue
+diff -ur ../v20.10.16.orig/moby/pkg/ioutils/fswriters_test.go ./moby/pkg/ioutils/fswriters_test.go
+--- ../v20.10.16.orig/moby/pkg/ioutils/fswriters_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/pkg/ioutils/fswriters_test.go	2023-10-13 12:38:55.953766380 +0000
+@@ -14,7 +14,7 @@
+ 
+ func init() {
+ 	// Windows does not support full Linux file mode
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		testMode = 0666
+ 	}
+ }
+diff -ur ../v20.10.16.orig/moby/pkg/platform/platform.go ./moby/pkg/platform/platform.go
+--- ../v20.10.16.orig/moby/pkg/platform/platform.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/pkg/platform/platform.go	2023-10-13 12:38:55.953766380 +0000
+@@ -19,5 +19,5 @@
+ 	if err != nil {
+ 		logrus.Errorf("Could not read system architecture info: %v", err)
+ 	}
+-	OSType = runtime.GOOS
++	OSType = "linux"
+ }
+diff -ur ../v20.10.16.orig/moby/pkg/system/lcow_unsupported.go ./moby/pkg/system/lcow_unsupported.go
+--- ../v20.10.16.orig/moby/pkg/system/lcow_unsupported.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/pkg/system/lcow_unsupported.go	2023-10-13 12:38:55.953766380 +0000
+@@ -25,5 +25,5 @@
+ 
+ // IsOSSupported determines if an operating system is supported by the host.
+ func IsOSSupported(os string) bool {
+-	return strings.EqualFold(runtime.GOOS, os)
++	return strings.EqualFold("linux", os)
+ }
+diff -ur ../v20.10.16.orig/moby/pkg/system/path.go ./moby/pkg/system/path.go
+--- ../v20.10.16.orig/moby/pkg/system/path.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/pkg/system/path.go	2023-10-13 12:38:55.953766380 +0000
+@@ -13,8 +13,8 @@
+ // executables. Each directory is separated from the next by a colon
+ // ':' character .
+ func DefaultPathEnv(os string) string {
+-	if runtime.GOOS == "windows" {
+-		if os != runtime.GOOS {
++	if "linux" == "windows" {
++		if os != "linux" {
+ 			return defaultUnixPathEnv
+ 		}
+ 		// Deliberately empty on Windows containers on Windows as the default path will be set by
+@@ -47,7 +47,7 @@
+ // /a			--> \a
+ // d:\			--> Fail
+ func CheckSystemDriveAndRemoveDriveLetter(path string, driver PathVerifier) (string, error) {
+-	if runtime.GOOS != "windows" || LCOWSupported() {
++	if "linux" != "windows" || LCOWSupported() {
+ 		return path, nil
+ 	}
+ 
+diff -ur ../v20.10.16.orig/moby/pkg/tarsum/fileinfosums.go ./moby/pkg/tarsum/fileinfosums.go
+--- ../v20.10.16.orig/moby/pkg/tarsum/fileinfosums.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/pkg/tarsum/fileinfosums.go	2023-10-13 12:38:55.953766380 +0000
+@@ -42,8 +42,8 @@
+ 	// We do case insensitive matching on Windows as c:\APP and c:\app are
+ 	// the same. See issue #33107.
+ 	for i := range fis {
+-		if (runtime.GOOS == "windows" && strings.EqualFold(fis[i].Name(), name)) ||
+-			(runtime.GOOS != "windows" && fis[i].Name() == name) {
++		if ("linux" == "windows" && strings.EqualFold(fis[i].Name(), name)) ||
++			("linux" != "windows" && fis[i].Name() == name) {
+ 			return fis[i]
+ 		}
+ 	}
+diff -ur ../v20.10.16.orig/moby/plugin/v2/plugin_linux.go ./moby/plugin/v2/plugin_linux.go
+--- ../v20.10.16.orig/moby/plugin/v2/plugin_linux.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/plugin/v2/plugin_linux.go	2023-10-13 12:38:55.953766380 +0000
+@@ -114,7 +114,7 @@
+ 	}
+ 
+ 	envs := make([]string, 1, len(p.PluginObj.Settings.Env)+1)
+-	envs[0] = "PATH=" + system.DefaultPathEnv(runtime.GOOS)
++	envs[0] = "PATH=" + system.DefaultPathEnv("linux")
+ 	envs = append(envs, p.PluginObj.Settings.Env...)
+ 
+ 	args := append(p.PluginObj.Config.Entrypoint, p.PluginObj.Settings.Args...)
+diff -ur ../v20.10.16.orig/moby/runconfig/config_test.go ./moby/runconfig/config_test.go
+--- ../v20.10.16.orig/moby/runconfig/config_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/runconfig/config_test.go	2023-10-13 12:38:55.953766380 +0000
+@@ -27,7 +27,7 @@
+ 		image    string
+ 	)
+ 
+-	if runtime.GOOS != "windows" {
++	if "linux" != "windows" {
+ 		image = "ubuntu"
+ 		fixtures = []f{
+ 			{"fixtures/unix/container_config_1_14.json", strslice.StrSlice{}},
+@@ -89,7 +89,7 @@
+ 	}
+ 
+ 	// Process isolation (Valid on Windows only)
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		if _, _, _, err := callDecodeContainerConfigIsolation("process"); err != nil {
+ 			t.Fatal("process isolation should have succeeded")
+ 		}
+@@ -102,7 +102,7 @@
+ 	}
+ 
+ 	// Hyper-V Containers isolation (Valid on Windows only)
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		if _, _, _, err := callDecodeContainerConfigIsolation("hyperv"); err != nil {
+ 			t.Fatal("hyperv isolation should have succeeded")
+ 		}
+diff -ur ../v20.10.16.orig/moby/runconfig/hostconfig_unix.go ./moby/runconfig/hostconfig_unix.go
+--- ../v20.10.16.orig/moby/runconfig/hostconfig_unix.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/runconfig/hostconfig_unix.go	2023-10-13 12:38:55.953766380 +0000
+@@ -56,7 +56,7 @@
+ 		return nil
+ 	}
+ 	if !hc.Isolation.IsValid() {
+-		return fmt.Errorf("Invalid isolation: %q - %s only supports 'default'", hc.Isolation, runtime.GOOS)
++		return fmt.Errorf("Invalid isolation: %q - %s only supports 'default'", hc.Isolation, "linux")
+ 	}
+ 	return nil
+ }
+@@ -69,11 +69,11 @@
+ 	}
+ 
+ 	if hc.IOMaximumBandwidth != 0 {
+-		return fmt.Errorf("Invalid QoS settings: %s does not support configuration of maximum bandwidth", runtime.GOOS)
++		return fmt.Errorf("Invalid QoS settings: %s does not support configuration of maximum bandwidth", "linux")
+ 	}
+ 
+ 	if hc.IOMaximumIOps != 0 {
+-		return fmt.Errorf("Invalid QoS settings: %s does not support configuration of maximum IOPs", runtime.GOOS)
++		return fmt.Errorf("Invalid QoS settings: %s does not support configuration of maximum IOPs", "linux")
+ 	}
+ 	return nil
+ }
+diff -ur ../v20.10.16.orig/moby/vendor/archive/tar/stat_unix.go ./moby/vendor/archive/tar/stat_unix.go
+--- ../v20.10.16.orig/moby/vendor/archive/tar/stat_unix.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/archive/tar/stat_unix.go	2023-10-13 12:38:55.953766380 +0000
+@@ -33,7 +33,7 @@
+ 	// Best effort at populating Devmajor and Devminor.
+ 	if h.Typeflag == TypeChar || h.Typeflag == TypeBlock {
+ 		dev := uint64(sys.Rdev) // May be int32 or uint32
+-		switch runtime.GOOS {
++		switch "linux" {
+ 		case "aix":
+ 			var major, minor uint32
+ 			major = uint32((dev & 0x3fffffff00000000) >> 32)
+diff -ur ../v20.10.16.orig/moby/vendor/cloud.google.com/go/compute/metadata/metadata.go ./moby/vendor/cloud.google.com/go/compute/metadata/metadata.go
+--- ../v20.10.16.orig/moby/vendor/cloud.google.com/go/compute/metadata/metadata.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/cloud.google.com/go/compute/metadata/metadata.go	2023-10-13 12:38:55.953766380 +0000
+@@ -197,7 +197,7 @@
+ // returns true, testOnGCE tries a bit harder to reach its metadata
+ // server.
+ func systemInfoSuggestsGCE() bool {
+-	if runtime.GOOS != "linux" {
++	if "linux" != "linux" {
+ 		// We don't have any non-Linux clues available, at least yet.
+ 		return false
+ 	}
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/aws/aws-sdk-go/aws/corehandlers/user_agent.go ./moby/vendor/github.com/aws/aws-sdk-go/aws/corehandlers/user_agent.go
+--- ../v20.10.16.orig/moby/vendor/github.com/aws/aws-sdk-go/aws/corehandlers/user_agent.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/aws/aws-sdk-go/aws/corehandlers/user_agent.go	2023-10-13 12:38:55.953766380 +0000
+@@ -13,7 +13,7 @@
+ var SDKVersionUserAgentHandler = request.NamedHandler{
+ 	Name: "core.SDKVersionUserAgentHandler",
+ 	Fn: request.MakeAddToUserAgentHandler(aws.SDKName, aws.SDKVersion,
+-		runtime.Version(), runtime.GOOS, runtime.GOARCH),
++		runtime.Version(), "linux", runtime.GOARCH),
+ }
+ 
+ const execEnvVar = `AWS_EXECUTION_ENV`
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/aws/aws-sdk-go/aws/credentials/processcreds/provider.go ./moby/vendor/github.com/aws/aws-sdk-go/aws/credentials/processcreds/provider.go
+--- ../v20.10.16.orig/moby/vendor/github.com/aws/aws-sdk-go/aws/credentials/processcreds/provider.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/aws/aws-sdk-go/aws/credentials/processcreds/provider.go	2023-10-13 12:38:55.957099723 +0000
+@@ -298,7 +298,7 @@
+ func (p *ProcessProvider) prepareCommand() error {
+ 
+ 	var cmdArgs []string
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		cmdArgs = []string{"cmd.exe", "/C"}
+ 	} else {
+ 		cmdArgs = []string{"sh", "-c"}
+@@ -387,7 +387,7 @@
+ 
+ 	out := output.Bytes()
+ 
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		// windows adds slashes to quotes
+ 		out = []byte(strings.Replace(string(out), `\"`, `"`, -1))
+ 	}
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/aws/aws-sdk-go/internal/shareddefaults/shared_config.go ./moby/vendor/github.com/aws/aws-sdk-go/internal/shareddefaults/shared_config.go
+--- ../v20.10.16.orig/moby/vendor/github.com/aws/aws-sdk-go/internal/shareddefaults/shared_config.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/aws/aws-sdk-go/internal/shareddefaults/shared_config.go	2023-10-13 12:38:55.957099723 +0000
+@@ -31,7 +31,7 @@
+ // UserHomeDir returns the home directory for the user the process is
+ // running under.
+ func UserHomeDir() string {
+-	if runtime.GOOS == "windows" { // Windows
++	if "linux" == "windows" { // Windows
+ 		return os.Getenv("USERPROFILE")
+ 	}
+ 
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/cilium/ebpf/internal/unix/types_other.go ./moby/vendor/github.com/cilium/ebpf/internal/unix/types_other.go
+--- ../v20.10.16.orig/moby/vendor/github.com/cilium/ebpf/internal/unix/types_other.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/cilium/ebpf/internal/unix/types_other.go	2023-10-13 12:38:55.957099723 +0000
+@@ -8,7 +8,7 @@
+ 	"syscall"
+ )
+ 
+-var errNonLinux = fmt.Errorf("unsupported platform %s/%s", runtime.GOOS, runtime.GOARCH)
++var errNonLinux = fmt.Errorf("unsupported platform %s/%s", "linux", runtime.GOARCH)
+ 
+ const (
+ 	ENOENT = syscall.ENOENT
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/archive/tar.go ./moby/vendor/github.com/containerd/containerd/archive/tar.go
+--- ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/archive/tar.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/containerd/containerd/archive/tar.go	2023-10-13 12:38:55.957099723 +0000
+@@ -351,7 +351,7 @@
+ 	}
+ 
+ 	// Lchown is not supported on Windows.
+-	if runtime.GOOS != "windows" {
++	if "linux" != "windows" {
+ 		if err := os.Lchown(path, hdr.Uid, hdr.Gid); err != nil {
+ 			return err
+ 		}
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/client.go ./moby/vendor/github.com/containerd/containerd/client.go
+--- ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/client.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/containerd/containerd/client.go	2023-10-13 12:38:55.957099723 +0000
+@@ -179,7 +179,7 @@
+ 	c := &Client{
+ 		defaultns: copts.defaultns,
+ 		conn:      conn,
+-		runtime:   fmt.Sprintf("%s.%s", plugin.RuntimePlugin, runtime.GOOS),
++		runtime:   fmt.Sprintf("%s.%s", plugin.RuntimePlugin, "linux"),
+ 	}
+ 
+ 	// check namespace labels for default runtime
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/container_checkpoint_opts.go ./moby/vendor/github.com/containerd/containerd/container_checkpoint_opts.go
+--- ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/container_checkpoint_opts.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/containerd/containerd/container_checkpoint_opts.go	2023-10-13 12:38:55.957099723 +0000
+@@ -88,7 +88,7 @@
+ 		return err
+ 	}
+ 	desc.Platform = &imagespec.Platform{
+-		OS:           runtime.GOOS,
++		OS:           "linux",
+ 		Architecture: runtime.GOARCH,
+ 	}
+ 	index.Manifests = append(index.Manifests, desc)
+@@ -108,7 +108,7 @@
+ 			return err
+ 		}
+ 		desc.Platform = &imagespec.Platform{
+-			OS:           runtime.GOOS,
++			OS:           "linux",
+ 			Architecture: runtime.GOARCH,
+ 		}
+ 		index.Manifests = append(index.Manifests, desc)
+@@ -132,7 +132,7 @@
+ 
+ 	}
+ 	rw.Platform = &imagespec.Platform{
+-		OS:           runtime.GOOS,
++		OS:           "linux",
+ 		Architecture: runtime.GOARCH,
+ 	}
+ 	index.Manifests = append(index.Manifests, rw)
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/content/local/writer.go ./moby/vendor/github.com/containerd/containerd/content/local/writer.go
+--- ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/content/local/writer.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/containerd/containerd/content/local/writer.go	2023-10-13 12:38:55.957099723 +0000
+@@ -163,7 +163,7 @@
+ 	// This removes write and exec, only allowing read per the creation umask.
+ 	//
+ 	// NOTE: Windows does not support this operation
+-	if runtime.GOOS != "windows" {
++	if "linux" != "windows" {
+ 		if err := os.Chmod(target, (fi.Mode()&os.ModePerm)&^0333); err != nil {
+ 			log.G(ctx).WithField("ref", w.ref).Errorf("failed to make readonly")
+ 		}
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/install.go ./moby/vendor/github.com/containerd/containerd/install.go
+--- ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/install.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/containerd/containerd/install.go	2023-10-13 12:38:55.957099723 +0000
+@@ -51,7 +51,7 @@
+ 	}
+ 
+ 	var binDir, libDir string
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		binDir = "Files\\bin"
+ 		libDir = "Files\\lib"
+ 	} else {
+@@ -76,7 +76,7 @@
+ 				result = result || d == libDir
+ 			}
+ 
+-			if runtime.GOOS == "windows" {
++			if "linux" == "windows" {
+ 				hdr.Name = strings.Replace(hdr.Name, "Files", "", 1)
+ 			}
+ 			if result && !config.Replace {
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/mount/lookup_unsupported.go ./moby/vendor/github.com/containerd/containerd/mount/lookup_unsupported.go
+--- ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/mount/lookup_unsupported.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/containerd/containerd/mount/lookup_unsupported.go	2023-10-13 12:38:55.957099723 +0000
+@@ -25,5 +25,5 @@
+ 
+ // Lookup returns the mount info corresponds to the path.
+ func Lookup(dir string) (Info, error) {
+-	return Info{}, fmt.Errorf("mount.Lookup is not implemented on %s/%s", runtime.GOOS, runtime.GOARCH)
++	return Info{}, fmt.Errorf("mount.Lookup is not implemented on %s/%s", "linux", runtime.GOARCH)
+ }
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/mount/mountinfo_unsupported.go ./moby/vendor/github.com/containerd/containerd/mount/mountinfo_unsupported.go
+--- ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/mount/mountinfo_unsupported.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/containerd/containerd/mount/mountinfo_unsupported.go	2023-10-13 12:38:55.957099723 +0000
+@@ -25,10 +25,10 @@
+ 
+ // Self retrieves a list of mounts for the current running process.
+ func Self() ([]Info, error) {
+-	return nil, fmt.Errorf("mountinfo.Self is not implemented on %s/%s", runtime.GOOS, runtime.GOARCH)
++	return nil, fmt.Errorf("mountinfo.Self is not implemented on %s/%s", "linux", runtime.GOARCH)
+ }
+ 
+ // PID collects the mounts for a specific process ID.
+ func PID(pid int) ([]Info, error) {
+-	return nil, fmt.Errorf("mountinfo.PID is not implemented on %s/%s", runtime.GOOS, runtime.GOARCH)
++	return nil, fmt.Errorf("mountinfo.PID is not implemented on %s/%s", "linux", runtime.GOARCH)
+ }
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/oci/spec.go ./moby/vendor/github.com/containerd/containerd/oci/spec.go
+--- ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/oci/spec.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/containerd/containerd/oci/spec.go	2023-10-13 12:38:55.957099723 +0000
+@@ -70,7 +70,7 @@
+ 		err = populateDefaultWindowsSpec(ctx, s, id)
+ 	} else {
+ 		err = populateDefaultUnixSpec(ctx, s, id)
+-		if err == nil && runtime.GOOS == "windows" {
++		if err == nil && "linux" == "windows" {
+ 			// To run LCOW we have a Linux and Windows section. Add an empty one now.
+ 			s.Windows = &specs.Windows{}
+ 		}
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/platforms/cpuinfo.go ./moby/vendor/github.com/containerd/containerd/platforms/cpuinfo.go
+--- ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/platforms/cpuinfo.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/containerd/containerd/platforms/cpuinfo.go	2023-10-13 12:38:55.957099723 +0000
+@@ -42,8 +42,8 @@
+ // So we don't need to access the ARM registers to detect platform information
+ // by ourselves. We can just parse these information from /proc/cpuinfo
+ func getCPUInfo(pattern string) (info string, err error) {
+-	if !isLinuxOS(runtime.GOOS) {
+-		return "", errors.Wrapf(errdefs.ErrNotImplemented, "getCPUInfo for OS %s", runtime.GOOS)
++	if !isLinuxOS("linux") {
++		return "", errors.Wrapf(errdefs.ErrNotImplemented, "getCPUInfo for OS %s", "linux")
+ 	}
+ 
+ 	cpuinfo, err := os.Open("/proc/cpuinfo")
+@@ -74,7 +74,7 @@
+ }
+ 
+ func getCPUVariant() string {
+-	if runtime.GOOS == "windows" || runtime.GOOS == "darwin" {
++	if "linux" == "windows" || "linux" == "darwin" {
+ 		// Windows/Darwin only supports v7 for ARM32 and v8 for ARM64 and so we can use
+ 		// runtime.GOARCH to determine the variants
+ 		var variant string
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/platforms/database.go ./moby/vendor/github.com/containerd/containerd/platforms/database.go
+--- ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/platforms/database.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/containerd/containerd/platforms/database.go	2023-10-13 12:38:55.957099723 +0000
+@@ -68,7 +68,7 @@
+ 
+ func normalizeOS(os string) string {
+ 	if os == "" {
+-		return runtime.GOOS
++		return "linux"
+ 	}
+ 	os = strings.ToLower(os)
+ 
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/platforms/defaults.go ./moby/vendor/github.com/containerd/containerd/platforms/defaults.go
+--- ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/platforms/defaults.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/containerd/containerd/platforms/defaults.go	2023-10-13 12:38:55.957099723 +0000
+@@ -30,7 +30,7 @@
+ // DefaultSpec returns the current platform's default platform specification.
+ func DefaultSpec() specs.Platform {
+ 	return specs.Platform{
+-		OS:           runtime.GOOS,
++		OS:           "linux",
+ 		Architecture: runtime.GOARCH,
+ 		// The Variant field will be empty if arch != ARM.
+ 		Variant: cpuVariant,
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/platforms/platforms.go ./moby/vendor/github.com/containerd/containerd/platforms/platforms.go
+--- ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/platforms/platforms.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/containerd/containerd/platforms/platforms.go	2023-10-13 12:38:55.957099723 +0000
+@@ -201,7 +201,7 @@
+ 			p.Variant = ""
+ 		}
+ 		if isKnownArch(p.Architecture) {
+-			p.OS = runtime.GOOS
++			p.OS = "linux"
+ 			return p, nil
+ 		}
+ 
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/plugin/plugin_go18.go ./moby/vendor/github.com/containerd/containerd/plugin/plugin_go18.go
+--- ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/plugin/plugin_go18.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/containerd/containerd/plugin/plugin_go18.go	2023-10-13 12:38:55.957099723 +0000
+@@ -34,7 +34,7 @@
+ 	}
+ 	pattern := filepath.Join(abs, fmt.Sprintf(
+ 		"*-%s-%s.%s",
+-		runtime.GOOS,
++		"linux",
+ 		runtime.GOARCH,
+ 		getLibExt(),
+ 	))
+@@ -53,7 +53,7 @@
+ // getLibExt returns a platform specific lib extension for
+ // the platform that containerd is running on
+ func getLibExt() string {
+-	switch runtime.GOOS {
++	switch "linux" {
+ 	case "windows":
+ 		return "dll"
+ 	default:
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/task.go ./moby/vendor/github.com/containerd/containerd/task.go
+--- ../v20.10.16.orig/moby/vendor/github.com/containerd/containerd/task.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/containerd/containerd/task.go	2023-10-13 12:38:55.957099723 +0000
+@@ -591,7 +591,7 @@
+ 			Size:      d.Size_,
+ 			Digest:    d.Digest,
+ 			Platform: &v1.Platform{
+-				OS:           goruntime.GOOS,
++				OS:           "linux",
+ 				Architecture: goruntime.GOARCH,
+ 			},
+ 			Annotations: d.Annotations,
+@@ -609,7 +609,7 @@
+ 		return err
+ 	}
+ 	rw.Platform = &v1.Platform{
+-		OS:           goruntime.GOOS,
++		OS:           "linux",
+ 		Architecture: goruntime.GOARCH,
+ 	}
+ 	index.Manifests = append(index.Manifests, rw)
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/containerd/continuity/sysx/xattr_unsupported.go ./moby/vendor/github.com/containerd/continuity/sysx/xattr_unsupported.go
+--- ../v20.10.16.orig/moby/vendor/github.com/containerd/continuity/sysx/xattr_unsupported.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/containerd/continuity/sysx/xattr_unsupported.go	2023-10-13 12:38:55.957099723 +0000
+@@ -24,7 +24,7 @@
+ 	"runtime"
+ )
+ 
+-var errUnsupported = errors.New("extended attributes unsupported on " + runtime.GOOS)
++var errUnsupported = errors.New("extended attributes unsupported on " + "linux")
+ 
+ // Listxattr calls syscall listxattr and reads all content
+ // and returns a string array
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/containerd/go-runc/io_unix.go ./moby/vendor/github.com/containerd/go-runc/io_unix.go
+--- ../v20.10.16.orig/moby/vendor/github.com/containerd/go-runc/io_unix.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/containerd/go-runc/io_unix.go	2023-10-13 12:38:55.957099723 +0000
+@@ -51,7 +51,7 @@
+ 		if err = unix.Fchown(int(stdin.r.Fd()), uid, gid); err != nil {
+ 			// TODO: revert with proper darwin solution, skipping for now
+ 			// as darwin chown is returning EINVAL on anonymous pipe
+-			if runtime.GOOS == "darwin" {
++			if "linux" == "darwin" {
+ 				logrus.WithError(err).Debug("failed to chown stdin, ignored")
+ 			} else {
+ 				return nil, errors.Wrap(err, "failed to chown stdin")
+@@ -66,7 +66,7 @@
+ 		if err = unix.Fchown(int(stdout.w.Fd()), uid, gid); err != nil {
+ 			// TODO: revert with proper darwin solution, skipping for now
+ 			// as darwin chown is returning EINVAL on anonymous pipe
+-			if runtime.GOOS == "darwin" {
++			if "linux" == "darwin" {
+ 				logrus.WithError(err).Debug("failed to chown stdout, ignored")
+ 			} else {
+ 				return nil, errors.Wrap(err, "failed to chown stdout")
+@@ -81,7 +81,7 @@
+ 		if err = unix.Fchown(int(stderr.w.Fd()), uid, gid); err != nil {
+ 			// TODO: revert with proper darwin solution, skipping for now
+ 			// as darwin chown is returning EINVAL on anonymous pipe
+-			if runtime.GOOS == "darwin" {
++			if "linux" == "darwin" {
+ 				logrus.WithError(err).Debug("failed to chown stderr, ignored")
+ 			} else {
+ 				return nil, errors.Wrap(err, "failed to chown stderr")
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/docker/go-connections/tlsconfig/certpool_go17.go ./moby/vendor/github.com/docker/go-connections/tlsconfig/certpool_go17.go
+--- ../v20.10.16.orig/moby/vendor/github.com/docker/go-connections/tlsconfig/certpool_go17.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/docker/go-connections/tlsconfig/certpool_go17.go	2023-10-13 12:38:55.957099723 +0000
+@@ -11,7 +11,7 @@
+ // returns an error if failed to load or empty pool on windows.
+ func SystemCertPool() (*x509.CertPool, error) {
+ 	certpool, err := x509.SystemCertPool()
+-	if err != nil && runtime.GOOS == "windows" {
++	if err != nil && "linux" == "windows" {
+ 		return x509.NewCertPool(), nil
+ 	}
+ 	return certpool, err
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/docker/libnetwork/controller.go ./moby/vendor/github.com/docker/libnetwork/controller.go
+--- ../v20.10.16.orig/moby/vendor/github.com/docker/libnetwork/controller.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/docker/libnetwork/controller.go	2023-10-13 12:38:55.957099723 +0000
+@@ -1103,7 +1103,7 @@
+ 	c.Unlock()
+ 
+ 	sandboxID := stringid.GenerateRandomID()
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		sandboxID = containerID
+ 	}
+ 
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/docker/libnetwork/network.go ./moby/vendor/github.com/docker/libnetwork/network.go
+--- ../v20.10.16.orig/moby/vendor/github.com/docker/libnetwork/network.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/docker/libnetwork/network.go	2023-10-13 12:38:55.957099723 +0000
+@@ -1082,7 +1082,7 @@
+ 	// Cleanup the load balancer. On Windows this call is required
+ 	// to remove remote loadbalancers in VFP, and must be performed before
+ 	// dataplane network deletion.
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		c.cleanupServiceBindings(n.ID())
+ 	}
+ 
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/docker/swarmkit/manager/manager.go ./moby/vendor/github.com/docker/swarmkit/manager/manager.go
+--- ../v20.10.16.orig/moby/vendor/github.com/docker/swarmkit/manager/manager.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/docker/swarmkit/manager/manager.go	2023-10-13 12:38:55.960433065 +0000
+@@ -327,7 +327,7 @@
+ 	}
+ 
+ 	// don't create a socket directory if we're on windows. we used named pipe
+-	if runtime.GOOS != "windows" {
++	if "linux" != "windows" {
+ 		err := os.MkdirAll(filepath.Dir(addr), 0700)
+ 		if err != nil {
+ 			return errors.Wrap(err, "failed to create socket directory")
+@@ -338,7 +338,7 @@
+ 
+ 	// A unix socket may fail to bind if the file already
+ 	// exists. Try replacing the file.
+-	if runtime.GOOS != "windows" {
++	if "linux" != "windows" {
+ 		unwrappedErr := err
+ 		if op, ok := unwrappedErr.(*net.OpError); ok {
+ 			unwrappedErr = op.Err
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/google/certificate-transparency-go/x509/cert_pool.go ./moby/vendor/github.com/google/certificate-transparency-go/x509/cert_pool.go
+--- ../v20.10.16.orig/moby/vendor/github.com/google/certificate-transparency-go/x509/cert_pool.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/google/certificate-transparency-go/x509/cert_pool.go	2023-10-13 12:38:55.960433065 +0000
+@@ -30,7 +30,7 @@
+ // Any mutations to the returned pool are not written to disk and do
+ // not affect any other pool.
+ func SystemCertPool() (*CertPool, error) {
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		// Issue 16736, 18609:
+ 		return nil, errors.New("crypto/x509: system root pool is not available on Windows")
+ 	}
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/google/certificate-transparency-go/x509/verify.go ./moby/vendor/github.com/google/certificate-transparency-go/x509/verify.go
+--- ../v20.10.16.orig/moby/vendor/github.com/google/certificate-transparency-go/x509/verify.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/google/certificate-transparency-go/x509/verify.go	2023-10-13 12:38:55.960433065 +0000
+@@ -848,7 +848,7 @@
+ 	}
+ 
+ 	// Use Windows's own verification and chain building.
+-	if opts.Roots == nil && runtime.GOOS == "windows" {
++	if opts.Roots == nil && "linux" == "windows" {
+ 		return c.systemVerify(&opts)
+ 	}
+ 
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/ishidawataru/sctp/sctp_unsupported.go ./moby/vendor/github.com/ishidawataru/sctp/sctp_unsupported.go
+--- ../v20.10.16.orig/moby/vendor/github.com/ishidawataru/sctp/sctp_unsupported.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/ishidawataru/sctp/sctp_unsupported.go	2023-10-13 12:38:55.960433065 +0000
+@@ -23,7 +23,7 @@
+ 	"syscall"
+ )
+ 
+-var ErrUnsupported = errors.New("SCTP is unsupported on " + runtime.GOOS + "/" + runtime.GOARCH)
++var ErrUnsupported = errors.New("SCTP is unsupported on " + "linux" + "/" + runtime.GOARCH)
+ 
+ func setsockopt(fd int, optname, optval, optlen uintptr) (uintptr, uintptr, error) {
+ 	return 0, 0, ErrUnsupported
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/mistifyio/go-zfs/utils.go ./moby/vendor/github.com/mistifyio/go-zfs/utils.go
+--- ../v20.10.16.orig/moby/vendor/github.com/mistifyio/go-zfs/utils.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/mistifyio/go-zfs/utils.go	2023-10-13 12:38:55.960433065 +0000
+@@ -122,7 +122,7 @@
+ 		return err
+ 	}
+ 
+-	if runtime.GOOS == "solaris" {
++	if "linux" == "solaris" {
+ 		return nil
+ 	}
+ 
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/moby/buildkit/frontend/gateway/container.go ./moby/vendor/github.com/moby/buildkit/frontend/gateway/container.go
+--- ../v20.10.16.orig/moby/vendor/github.com/moby/buildkit/frontend/gateway/container.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/moby/buildkit/frontend/gateway/container.go	2023-10-13 12:38:55.960433065 +0000
+@@ -44,7 +44,7 @@
+ 	ctx, cancel := context.WithCancel(ctx)
+ 	eg, ctx := errgroup.WithContext(ctx)
+ 	platform := opspb.Platform{
+-		OS:           runtime.GOOS,
++		OS:           "linux",
+ 		Architecture: runtime.GOARCH,
+ 	}
+ 	if req.Platform != nil {
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/moby/buildkit/solver/llbsolver/ops/file.go ./moby/vendor/github.com/moby/buildkit/solver/llbsolver/ops/file.go
+--- ../v20.10.16.orig/moby/vendor/github.com/moby/buildkit/solver/llbsolver/ops/file.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/moby/buildkit/solver/llbsolver/ops/file.go	2023-10-13 12:38:55.960433065 +0000
+@@ -197,7 +197,7 @@
+ }
+ 
+ func containsWildcards(name string) bool {
+-	isWindows := runtime.GOOS == "windows"
++	isWindows := "linux" == "windows"
+ 	for i := 0; i < len(name); i++ {
+ 		ch := name[i]
+ 		if ch == '\\' && !isWindows {
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/moby/buildkit/util/resolver/resolver.go ./moby/vendor/github.com/moby/buildkit/util/resolver/resolver.go
+--- ../v20.10.16.orig/moby/vendor/github.com/moby/buildkit/util/resolver/resolver.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/moby/buildkit/util/resolver/resolver.go	2023-10-13 12:38:55.960433065 +0000
+@@ -88,7 +88,7 @@
+ 	if len(c.RootCAs) > 0 {
+ 		systemPool, err := x509.SystemCertPool()
+ 		if err != nil {
+-			if runtime.GOOS == "windows" {
++			if "linux" == "windows" {
+ 				systemPool = x509.NewCertPool()
+ 			} else {
+ 				return nil, errors.Wrapf(err, "unable to get system cert pool")
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/moby/buildkit/util/rootless/specconv/specconv_nonlinux.go ./moby/vendor/github.com/moby/buildkit/util/rootless/specconv/specconv_nonlinux.go
+--- ../v20.10.16.orig/moby/vendor/github.com/moby/buildkit/util/rootless/specconv/specconv_nonlinux.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/moby/buildkit/util/rootless/specconv/specconv_nonlinux.go	2023-10-13 12:38:55.960433065 +0000
+@@ -16,5 +16,5 @@
+ //
+ // See docs/rootless.md for the supported runc revision.
+ func ToRootless(spec *specs.Spec) error {
+-	return errors.Errorf("not implemented on on %s", runtime.GOOS)
++	return errors.Errorf("not implemented on on %s", "linux")
+ }
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/moby/buildkit/util/winlayers/applier.go ./moby/vendor/github.com/moby/buildkit/util/winlayers/applier.go
+--- ../v20.10.16.orig/moby/vendor/github.com/moby/buildkit/util/winlayers/applier.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/moby/buildkit/util/winlayers/applier.go	2023-10-13 12:38:55.960433065 +0000
+@@ -22,7 +22,7 @@
+ )
+ 
+ func NewFileSystemApplierWithWindows(cs content.Provider, a diff.Applier) diff.Applier {
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		return a
+ 	}
+ 
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/moby/sys/mountinfo/mountinfo_unsupported.go ./moby/vendor/github.com/moby/sys/mountinfo/mountinfo_unsupported.go
+--- ../v20.10.16.orig/moby/vendor/github.com/moby/sys/mountinfo/mountinfo_unsupported.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/moby/sys/mountinfo/mountinfo_unsupported.go	2023-10-13 12:38:55.960433065 +0000
+@@ -7,7 +7,7 @@
+ 	"runtime"
+ )
+ 
+-var errNotImplemented = fmt.Errorf("not implemented on %s/%s", runtime.GOOS, runtime.GOARCH)
++var errNotImplemented = fmt.Errorf("not implemented on %s/%s", "linux", runtime.GOARCH)
+ 
+ func parseMountTable(_ FilterFunc) ([]*Info, error) {
+ 	return nil, errNotImplemented
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/sirupsen/logrus/text_formatter.go ./moby/vendor/github.com/sirupsen/logrus/text_formatter.go
+--- ../v20.10.16.orig/moby/vendor/github.com/sirupsen/logrus/text_formatter.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/sirupsen/logrus/text_formatter.go	2023-10-13 12:38:55.960433065 +0000
+@@ -112,7 +112,7 @@
+ }
+ 
+ func (f *TextFormatter) isColored() bool {
+-	isColored := f.ForceColors || (f.isTerminal && (runtime.GOOS != "windows"))
++	isColored := f.ForceColors || (f.isTerminal && ("linux" != "windows"))
+ 
+ 	if f.EnvironmentOverrideColors {
+ 		switch force, ok := os.LookupEnv("CLICOLOR_FORCE"); {
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/tonistiigi/fsutil/copy/copy.go ./moby/vendor/github.com/tonistiigi/fsutil/copy/copy.go
+--- ../v20.10.16.orig/moby/vendor/github.com/tonistiigi/fsutil/copy/copy.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/tonistiigi/fsutil/copy/copy.go	2023-10-13 12:38:55.960433065 +0000
+@@ -334,7 +334,7 @@
+ }
+ 
+ func containsWildcards(name string) bool {
+-	isWindows := runtime.GOOS == "windows"
++	isWindows := "linux" == "windows"
+ 	for i := 0; i < len(name); i++ {
+ 		ch := name[i]
+ 		if ch == '\\' && !isWindows {
+@@ -398,7 +398,7 @@
+ // handle UUID paths in windows.
+ func rel(basepath, targpath string) (string, error) {
+ 	// filepath.Rel can't handle UUID paths in windows
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		pfx := basepath + `\`
+ 		if strings.HasPrefix(targpath, pfx) {
+ 			p := strings.TrimPrefix(targpath, pfx)
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/tonistiigi/fsutil/followlinks.go ./moby/vendor/github.com/tonistiigi/fsutil/followlinks.go
+--- ../v20.10.16.orig/moby/vendor/github.com/tonistiigi/fsutil/followlinks.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/tonistiigi/fsutil/followlinks.go	2023-10-13 12:38:55.960433065 +0000
+@@ -119,7 +119,7 @@
+ }
+ 
+ func containsWildcards(name string) bool {
+-	isWindows := runtime.GOOS == "windows"
++	isWindows := "linux" == "windows"
+ 	for i := 0; i < len(name); i++ {
+ 		ch := name[i]
+ 		if ch == '\\' && !isWindows {
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/tonistiigi/fsutil/stat.go ./moby/vendor/github.com/tonistiigi/fsutil/stat.go
+--- ../v20.10.16.orig/moby/vendor/github.com/tonistiigi/fsutil/stat.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/tonistiigi/fsutil/stat.go	2023-10-13 12:38:55.960433065 +0000
+@@ -40,7 +40,7 @@
+ 		return nil, err
+ 	}
+ 
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		permPart := stat.Mode & uint32(os.ModePerm)
+ 		noPermPart := stat.Mode &^ uint32(os.ModePerm)
+ 		// Add the x bit: make everything +x from windows
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/tonistiigi/fsutil/validator.go ./moby/vendor/github.com/tonistiigi/fsutil/validator.go
+--- ../v20.10.16.orig/moby/vendor/github.com/tonistiigi/fsutil/validator.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/tonistiigi/fsutil/validator.go	2023-10-13 12:38:55.960433065 +0000
+@@ -28,7 +28,7 @@
+ 	if v.parentDirs == nil {
+ 		v.parentDirs = make([]parent, 1, 10)
+ 	}
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		p = strings.Replace(p, "\\", "", -1)
+ 	}
+ 	if p != path.Clean(p) {
+diff -ur ../v20.10.16.orig/moby/vendor/github.com/vbatts/tar-split/archive/tar/stat_unix.go ./moby/vendor/github.com/vbatts/tar-split/archive/tar/stat_unix.go
+--- ../v20.10.16.orig/moby/vendor/github.com/vbatts/tar-split/archive/tar/stat_unix.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/github.com/vbatts/tar-split/archive/tar/stat_unix.go	2023-10-13 12:38:55.960433065 +0000
+@@ -53,7 +53,7 @@
+ 	// Best effort at populating Devmajor and Devminor.
+ 	if h.Typeflag == TypeChar || h.Typeflag == TypeBlock {
+ 		dev := uint64(sys.Rdev) // May be int32 or uint32
+-		switch runtime.GOOS {
++		switch "linux" {
+ 		case "linux":
+ 			// Copied from golang.org/x/sys/unix/dev_linux.go.
+ 			major := uint32((dev & 0x00000000000fff00) >> 8)
+diff -ur ../v20.10.16.orig/moby/vendor/go.etcd.io/bbolt/db.go ./moby/vendor/go.etcd.io/bbolt/db.go
+--- ../v20.10.16.orig/moby/vendor/go.etcd.io/bbolt/db.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/go.etcd.io/bbolt/db.go	2023-10-13 12:38:55.960433065 +0000
+@@ -28,7 +28,7 @@
+ // syncing changes to a file.  This is required as some operating systems,
+ // such as OpenBSD, do not have a unified buffer cache (UBC) and writes
+ // must be synchronized using the msync(2) syscall.
+-const IgnoreNoSync = runtime.GOOS == "openbsd"
++const IgnoreNoSync = "linux" == "openbsd"
+ 
+ // Default values if not set in a DB instance.
+ const (
+@@ -965,7 +965,7 @@
+ 	// Truncate and fsync to ensure file size metadata is flushed.
+ 	// https://github.com/boltdb/bolt/issues/284
+ 	if !db.NoGrowSync && !db.readOnly {
+-		if runtime.GOOS != "windows" {
++		if "linux" != "windows" {
+ 			if err := db.file.Truncate(int64(sz)); err != nil {
+ 				return fmt.Errorf("file resize error: %s", err)
+ 			}
+diff -ur ../v20.10.16.orig/moby/vendor/golang.org/x/net/http2/server.go ./moby/vendor/golang.org/x/net/http2/server.go
+--- ../v20.10.16.orig/moby/vendor/golang.org/x/net/http2/server.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/golang.org/x/net/http2/server.go	2023-10-13 12:38:55.960433065 +0000
+@@ -679,7 +679,7 @@
+ 	// build tags, so I can't make an http2_windows.go file with
+ 	// Windows-specific stuff. Fix that and move this, once we
+ 	// have a way to bundle this into std's net/http somehow.
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		if oe, ok := err.(*net.OpError); ok && oe.Op == "read" {
+ 			if se, ok := oe.Err.(*os.SyscallError); ok && se.Syscall == "wsarecv" {
+ 				const WSAECONNABORTED = 10053
+diff -ur ../v20.10.16.orig/moby/vendor/golang.org/x/net/internal/socket/socket.go ./moby/vendor/golang.org/x/net/internal/socket/socket.go
+--- ../v20.10.16.orig/moby/vendor/golang.org/x/net/internal/socket/socket.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/golang.org/x/net/internal/socket/socket.go	2023-10-13 12:38:55.963766408 +0000
+@@ -13,7 +13,7 @@
+ 	"unsafe"
+ )
+ 
+-var errNotImplemented = errors.New("not implemented on " + runtime.GOOS + "/" + runtime.GOARCH)
++var errNotImplemented = errors.New("not implemented on " + "linux" + "/" + runtime.GOARCH)
+ 
+ // An Option represents a sticky socket option.
+ type Option struct {
+diff -ur ../v20.10.16.orig/moby/vendor/golang.org/x/net/internal/socket/sys_bsdvar.go ./moby/vendor/golang.org/x/net/internal/socket/sys_bsdvar.go
+--- ../v20.10.16.orig/moby/vendor/golang.org/x/net/internal/socket/sys_bsdvar.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/golang.org/x/net/internal/socket/sys_bsdvar.go	2023-10-13 12:38:55.963766408 +0000
+@@ -12,10 +12,10 @@
+ )
+ 
+ func probeProtocolStack() int {
+-	if (runtime.GOOS == "netbsd" || runtime.GOOS == "openbsd") && runtime.GOARCH == "arm" {
++	if ("linux" == "netbsd" || "linux" == "openbsd") && runtime.GOARCH == "arm" {
+ 		return 8
+ 	}
+-	if runtime.GOOS == "aix" {
++	if "linux" == "aix" {
+ 		return 1
+ 	}
+ 	var p uintptr
+diff -ur ../v20.10.16.orig/moby/vendor/golang.org/x/net/internal/socket/sys_posix.go ./moby/vendor/golang.org/x/net/internal/socket/sys_posix.go
+--- ../v20.10.16.orig/moby/vendor/golang.org/x/net/internal/socket/sys_posix.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/golang.org/x/net/internal/socket/sys_posix.go	2023-10-13 12:38:55.963766408 +0000
+@@ -32,7 +32,7 @@
+ func marshalSockaddr(ip net.IP, port int, zone string) []byte {
+ 	if ip4 := ip.To4(); ip4 != nil {
+ 		b := make([]byte, sizeofSockaddrInet)
+-		switch runtime.GOOS {
++		switch "linux" {
+ 		case "android", "illumos", "linux", "solaris", "windows":
+ 			NativeEndian.PutUint16(b[:2], uint16(sysAF_INET))
+ 		default:
+@@ -45,7 +45,7 @@
+ 	}
+ 	if ip6 := ip.To16(); ip6 != nil && ip.To4() == nil {
+ 		b := make([]byte, sizeofSockaddrInet6)
+-		switch runtime.GOOS {
++		switch "linux" {
+ 		case "android", "illumos", "linux", "solaris", "windows":
+ 			NativeEndian.PutUint16(b[:2], uint16(sysAF_INET6))
+ 		default:
+@@ -67,7 +67,7 @@
+ 		return nil, errors.New("invalid address")
+ 	}
+ 	var af int
+-	switch runtime.GOOS {
++	switch "linux" {
+ 	case "android", "illumos", "linux", "solaris", "windows":
+ 		af = int(NativeEndian.Uint16(b[:2]))
+ 	default:
+diff -ur ../v20.10.16.orig/moby/vendor/golang.org/x/net/ipv4/batch.go ./moby/vendor/golang.org/x/net/ipv4/batch.go
+--- ../v20.10.16.orig/moby/vendor/golang.org/x/net/ipv4/batch.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/golang.org/x/net/ipv4/batch.go	2023-10-13 12:38:55.963766408 +0000
+@@ -75,7 +75,7 @@
+ 	if !c.ok() {
+ 		return 0, errInvalidConn
+ 	}
+-	switch runtime.GOOS {
++	switch "linux" {
+ 	case "linux":
+ 		n, err := c.RecvMsgs([]socket.Message(ms), flags)
+ 		if err != nil {
+@@ -109,7 +109,7 @@
+ 	if !c.ok() {
+ 		return 0, errInvalidConn
+ 	}
+-	switch runtime.GOOS {
++	switch "linux" {
+ 	case "linux":
+ 		n, err := c.SendMsgs([]socket.Message(ms), flags)
+ 		if err != nil {
+@@ -141,7 +141,7 @@
+ 	if !c.ok() {
+ 		return 0, errInvalidConn
+ 	}
+-	switch runtime.GOOS {
++	switch "linux" {
+ 	case "linux":
+ 		n, err := c.RecvMsgs([]socket.Message(ms), flags)
+ 		if err != nil {
+@@ -175,7 +175,7 @@
+ 	if !c.ok() {
+ 		return 0, errInvalidConn
+ 	}
+-	switch runtime.GOOS {
++	switch "linux" {
+ 	case "linux":
+ 		n, err := c.SendMsgs([]socket.Message(ms), flags)
+ 		if err != nil {
+diff -ur ../v20.10.16.orig/moby/vendor/golang.org/x/net/ipv4/header.go ./moby/vendor/golang.org/x/net/ipv4/header.go
+--- ../v20.10.16.orig/moby/vendor/golang.org/x/net/ipv4/header.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/golang.org/x/net/ipv4/header.go	2023-10-13 12:38:55.963766408 +0000
+@@ -66,7 +66,7 @@
+ 	b[0] = byte(Version<<4 | (hdrlen >> 2 & 0x0f))
+ 	b[1] = byte(h.TOS)
+ 	flagsAndFragOff := (h.FragOff & 0x1fff) | int(h.Flags<<13)
+-	switch runtime.GOOS {
++	switch "linux" {
+ 	case "darwin", "dragonfly", "netbsd":
+ 		socket.NativeEndian.PutUint16(b[2:4], uint16(h.TotalLen))
+ 		socket.NativeEndian.PutUint16(b[6:8], uint16(flagsAndFragOff))
+@@ -125,7 +125,7 @@
+ 	h.Checksum = int(binary.BigEndian.Uint16(b[10:12]))
+ 	h.Src = net.IPv4(b[12], b[13], b[14], b[15])
+ 	h.Dst = net.IPv4(b[16], b[17], b[18], b[19])
+-	switch runtime.GOOS {
++	switch "linux" {
+ 	case "darwin", "dragonfly", "netbsd":
+ 		h.TotalLen = int(socket.NativeEndian.Uint16(b[2:4])) + hdrlen
+ 		h.FragOff = int(socket.NativeEndian.Uint16(b[6:8]))
+diff -ur ../v20.10.16.orig/moby/vendor/golang.org/x/net/ipv4/helper.go ./moby/vendor/golang.org/x/net/ipv4/helper.go
+--- ../v20.10.16.orig/moby/vendor/golang.org/x/net/ipv4/helper.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/golang.org/x/net/ipv4/helper.go	2023-10-13 12:38:55.963766408 +0000
+@@ -19,7 +19,7 @@
+ 	errHeaderTooShort    = errors.New("header too short")
+ 	errExtHeaderTooShort = errors.New("extension header too short")
+ 	errInvalidConnType   = errors.New("invalid conn type")
+-	errNotImplemented    = errors.New("not implemented on " + runtime.GOOS + "/" + runtime.GOARCH)
++	errNotImplemented    = errors.New("not implemented on " + "linux" + "/" + runtime.GOARCH)
+ 
+ 	// See https://www.freebsd.org/doc/en/books/porters-handbook/versions.html.
+ 	freebsdVersion  uint32
+diff -ur ../v20.10.16.orig/moby/vendor/golang.org/x/net/ipv4/sys_freebsd.go ./moby/vendor/golang.org/x/net/ipv4/sys_freebsd.go
+--- ../v20.10.16.orig/moby/vendor/golang.org/x/net/ipv4/sys_freebsd.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/golang.org/x/net/ipv4/sys_freebsd.go	2023-10-13 12:38:55.963766408 +0000
+@@ -46,7 +46,7 @@
+ 	if freebsdVersion >= 1000000 {
+ 		sockOpts[ssoMulticastInterface] = &sockOpt{Option: socket.Option{Level: iana.ProtocolIP, Name: sysIP_MULTICAST_IF, Len: sizeofIPMreqn}, typ: ssoTypeIPMreqn}
+ 	}
+-	if runtime.GOOS == "freebsd" && runtime.GOARCH == "386" {
++	if "linux" == "freebsd" && runtime.GOARCH == "386" {
+ 		archs, _ := syscall.Sysctl("kern.supported_archs")
+ 		for _, s := range strings.Fields(archs) {
+ 			if s == "amd64" {
+diff -ur ../v20.10.16.orig/moby/vendor/golang.org/x/net/ipv6/batch.go ./moby/vendor/golang.org/x/net/ipv6/batch.go
+--- ../v20.10.16.orig/moby/vendor/golang.org/x/net/ipv6/batch.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/golang.org/x/net/ipv6/batch.go	2023-10-13 12:38:55.963766408 +0000
+@@ -66,7 +66,7 @@
+ 	if !c.ok() {
+ 		return 0, errInvalidConn
+ 	}
+-	switch runtime.GOOS {
++	switch "linux" {
+ 	case "linux":
+ 		n, err := c.RecvMsgs([]socket.Message(ms), flags)
+ 		if err != nil {
+@@ -97,7 +97,7 @@
+ 	if !c.ok() {
+ 		return 0, errInvalidConn
+ 	}
+-	switch runtime.GOOS {
++	switch "linux" {
+ 	case "linux":
+ 		n, err := c.SendMsgs([]socket.Message(ms), flags)
+ 		if err != nil {
+diff -ur ../v20.10.16.orig/moby/vendor/golang.org/x/net/ipv6/helper.go ./moby/vendor/golang.org/x/net/ipv6/helper.go
+--- ../v20.10.16.orig/moby/vendor/golang.org/x/net/ipv6/helper.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/golang.org/x/net/ipv6/helper.go	2023-10-13 12:38:55.963766408 +0000
+@@ -15,7 +15,7 @@
+ 	errMissingAddress  = errors.New("missing address")
+ 	errHeaderTooShort  = errors.New("header too short")
+ 	errInvalidConnType = errors.New("invalid conn type")
+-	errNotImplemented  = errors.New("not implemented on " + runtime.GOOS + "/" + runtime.GOARCH)
++	errNotImplemented  = errors.New("not implemented on " + "linux" + "/" + runtime.GOARCH)
+ )
+ 
+ func boolint(b bool) int {
+diff -ur ../v20.10.16.orig/moby/vendor/golang.org/x/net/ipv6/sockopt_posix.go ./moby/vendor/golang.org/x/net/ipv6/sockopt_posix.go
+--- ../v20.10.16.orig/moby/vendor/golang.org/x/net/ipv6/sockopt_posix.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/golang.org/x/net/ipv6/sockopt_posix.go	2023-10-13 12:38:55.963766408 +0000
+@@ -58,7 +58,7 @@
+ 		return nil, 0, errNotImplemented
+ 	}
+ 	mi := (*ipv6Mtuinfo)(unsafe.Pointer(&b[0]))
+-	if mi.Addr.Scope_id == 0 || runtime.GOOS == "aix" {
++	if mi.Addr.Scope_id == 0 || "linux" == "aix" {
+ 		// AIX kernel might return a wrong address.
+ 		return nil, int(mi.Mtu), nil
+ 	}
+diff -ur ../v20.10.16.orig/moby/vendor/golang.org/x/net/ipv6/sys_freebsd.go ./moby/vendor/golang.org/x/net/ipv6/sys_freebsd.go
+--- ../v20.10.16.orig/moby/vendor/golang.org/x/net/ipv6/sys_freebsd.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/golang.org/x/net/ipv6/sys_freebsd.go	2023-10-13 12:38:55.963766408 +0000
+@@ -47,7 +47,7 @@
+ )
+ 
+ func init() {
+-	if runtime.GOOS == "freebsd" && runtime.GOARCH == "386" {
++	if "linux" == "freebsd" && runtime.GOARCH == "386" {
+ 		archs, _ := syscall.Sysctl("kern.supported_archs")
+ 		for _, s := range strings.Fields(archs) {
+ 			if s == "amd64" {
+diff -ur ../v20.10.16.orig/moby/vendor/golang.org/x/oauth2/google/default.go ./moby/vendor/golang.org/x/oauth2/google/default.go
+--- ../v20.10.16.orig/moby/vendor/golang.org/x/oauth2/google/default.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/golang.org/x/oauth2/google/default.go	2023-10-13 12:38:55.963766408 +0000
+@@ -139,7 +139,7 @@
+ 
+ func wellKnownFile() string {
+ 	const f = "application_default_credentials.json"
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		return filepath.Join(os.Getenv("APPDATA"), "gcloud", f)
+ 	}
+ 	return filepath.Join(guessUnixHomeDir(), ".config", "gcloud", f)
+diff -ur ../v20.10.16.orig/moby/vendor/golang.org/x/oauth2/google/sdk.go ./moby/vendor/golang.org/x/oauth2/google/sdk.go
+--- ../v20.10.16.orig/moby/vendor/golang.org/x/oauth2/google/sdk.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/golang.org/x/oauth2/google/sdk.go	2023-10-13 12:38:55.963766408 +0000
+@@ -178,7 +178,7 @@
+ // sdkConfigPath tries to guess where the gcloud config is located.
+ // It can be overridden during tests.
+ var sdkConfigPath = func() (string, error) {
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		return filepath.Join(os.Getenv("APPDATA"), "gcloud"), nil
+ 	}
+ 	homeDir := guessUnixHomeDir()
+diff -ur ../v20.10.16.orig/moby/vendor/golang.org/x/sys/cpu/cpu_arm64.go ./moby/vendor/golang.org/x/sys/cpu/cpu_arm64.go
+--- ../v20.10.16.orig/moby/vendor/golang.org/x/sys/cpu/cpu_arm64.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/golang.org/x/sys/cpu/cpu_arm64.go	2023-10-13 12:38:55.963766408 +0000
+@@ -38,7 +38,7 @@
+ }
+ 
+ func archInit() {
+-	switch runtime.GOOS {
++	switch "linux" {
+ 	case "freebsd":
+ 		readARM64Registers()
+ 	case "linux", "netbsd":
+diff -ur ../v20.10.16.orig/moby/vendor/golang.org/x/sys/cpu/cpu_x86.go ./moby/vendor/golang.org/x/sys/cpu/cpu_x86.go
+--- ../v20.10.16.orig/moby/vendor/golang.org/x/sys/cpu/cpu_x86.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/golang.org/x/sys/cpu/cpu_x86.go	2023-10-13 12:38:55.963766408 +0000
+@@ -89,7 +89,7 @@
+ 		// Check if XMM and YMM registers have OS support.
+ 		osSupportsAVX = isSet(1, eax) && isSet(2, eax)
+ 
+-		if runtime.GOOS == "darwin" {
++		if "linux" == "darwin" {
+ 			// Darwin doesn't save/restore AVX-512 mask registers correctly across signal handlers.
+ 			// Since users can't rely on mask register contents, let's not advertise AVX-512 support.
+ 			// See issue 49233.
+diff -ur ../v20.10.16.orig/moby/vendor/golang.org/x/sys/unix/sockcmsg_unix_other.go ./moby/vendor/golang.org/x/sys/unix/sockcmsg_unix_other.go
+--- ../v20.10.16.orig/moby/vendor/golang.org/x/sys/unix/sockcmsg_unix_other.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/golang.org/x/sys/unix/sockcmsg_unix_other.go	2023-10-13 12:38:55.963766408 +0000
+@@ -17,7 +17,7 @@
+ 
+ 	// dragonfly needs to check ABI version at runtime, see cmsgAlignOf in
+ 	// sockcmsg_dragonfly.go
+-	switch runtime.GOOS {
++	switch "linux" {
+ 	case "aix":
+ 		// There is no alignment on AIX.
+ 		salign = 1
+@@ -34,7 +34,7 @@
+ 			salign = 8
+ 		}
+ 		// NetBSD aarch64 requires 128-bit alignment.
+-		if runtime.GOOS == "netbsd" && runtime.GOARCH == "arm64" {
++		if "linux" == "netbsd" && runtime.GOARCH == "arm64" {
+ 			salign = 16
+ 		}
+ 	case "zos":
+diff -ur ../v20.10.16.orig/moby/vendor/golang.org/x/sys/unix/syscall_bsd.go ./moby/vendor/golang.org/x/sys/unix/syscall_bsd.go
+--- ../v20.10.16.orig/moby/vendor/golang.org/x/sys/unix/syscall_bsd.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/golang.org/x/sys/unix/syscall_bsd.go	2023-10-13 12:38:55.963766408 +0000
+@@ -276,7 +276,7 @@
+ 	if err != nil {
+ 		return
+ 	}
+-	if (runtime.GOOS == "darwin" || runtime.GOOS == "ios") && len == 0 {
++	if ("linux" == "darwin" || "linux" == "ios") && len == 0 {
+ 		// Accepted socket has no address.
+ 		// This is likely due to a bug in xnu kernels,
+ 		// where instead of ECONNABORTED error socket
+@@ -300,7 +300,7 @@
+ 	}
+ 	// TODO(jsing): DragonFly has a "bug" (see issue 3349), which should be
+ 	// reported upstream.
+-	if runtime.GOOS == "dragonfly" && rsa.Addr.Family == AF_UNSPEC && rsa.Addr.Len == 0 {
++	if "linux" == "dragonfly" && rsa.Addr.Family == AF_UNSPEC && rsa.Addr.Len == 0 {
+ 		rsa.Addr.Family = AF_UNIX
+ 		rsa.Addr.Len = SizeofSockaddrUnix
+ 	}
+diff -ur ../v20.10.16.orig/moby/vendor/google.golang.org/grpc/credentials/alts/utils.go ./moby/vendor/google.golang.org/grpc/credentials/alts/utils.go
+--- ../v20.10.16.orig/moby/vendor/google.golang.org/grpc/credentials/alts/utils.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/google.golang.org/grpc/credentials/alts/utils.go	2023-10-13 12:38:55.963766408 +0000
+@@ -52,7 +52,7 @@
+ 
+ var (
+ 	// The following two variables will be reassigned in tests.
+-	runningOS          = runtime.GOOS
++	runningOS          = "linux"
+ 	manufacturerReader = func() (io.Reader, error) {
+ 		switch runningOS {
+ 		case "linux":
+diff -ur ../v20.10.16.orig/moby/vendor/gotest.tools/v3/fs/file.go ./moby/vendor/gotest.tools/v3/fs/file.go
+--- ../v20.10.16.orig/moby/vendor/gotest.tools/v3/fs/file.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/gotest.tools/v3/fs/file.go	2023-10-13 12:38:55.963766408 +0000
+@@ -58,7 +58,7 @@
+ 
+ func cleanPrefix(prefix string) string {
+ 	// windows requires both / and \ are replaced
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		prefix = strings.Replace(prefix, string(os.PathSeparator), "-", -1)
+ 	}
+ 	return strings.Replace(prefix, "/", "-", -1)
+diff -ur ../v20.10.16.orig/moby/vendor/gotest.tools/v3/fs/report.go ./moby/vendor/gotest.tools/v3/fs/report.go
+--- ../v20.10.16.orig/moby/vendor/gotest.tools/v3/fs/report.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/vendor/gotest.tools/v3/fs/report.go	2023-10-13 12:38:55.963766408 +0000
+@@ -147,7 +147,7 @@
+ 	p := eqResource(x.resource, y.resource)
+ 	xTarget := x.target
+ 	yTarget := y.target
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		xTarget = strings.ToLower(xTarget)
+ 		yTarget = strings.ToLower(yTarget)
+ 	}
+diff -ur ../v20.10.16.orig/moby/volume/local/local_test.go ./moby/volume/local/local_test.go
+--- ../v20.10.16.orig/moby/volume/local/local_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/volume/local/local_test.go	2023-10-13 12:38:55.963766408 +0000
+@@ -30,7 +30,7 @@
+ }
+ 
+ func TestRemove(t *testing.T) {
+-	skip.If(t, runtime.GOOS == "windows", "FIXME: investigate why this test fails on CI")
++	skip.If(t, "linux" == "windows", "FIXME: investigate why this test fails on CI")
+ 	rootDir, err := os.MkdirTemp("", "local-volume-test")
+ 	if err != nil {
+ 		t.Fatal(err)
+@@ -177,7 +177,7 @@
+ }
+ 
+ func TestCreateWithOpts(t *testing.T) {
+-	skip.If(t, runtime.GOOS == "windows")
++	skip.If(t, "linux" == "windows")
+ 	skip.If(t, os.Getuid() != 0, "requires mounts")
+ 	rootDir, err := os.MkdirTemp("", "local-volume-test")
+ 	if err != nil {
+diff -ur ../v20.10.16.orig/moby/volume/mounts/parser.go ./moby/volume/mounts/parser.go
+--- ../v20.10.16.orig/moby/volume/mounts/parser.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/volume/mounts/parser.go	2023-10-13 12:38:55.963766408 +0000
+@@ -8,9 +8,9 @@
+ )
+ 
+ const (
+-	// OSLinux is the same as runtime.GOOS on linux
++	// OSLinux is the same as "linux" on linux
+ 	OSLinux = "linux"
+-	// OSWindows is the same as runtime.GOOS on windows
++	// OSWindows is the same as "linux" on windows
+ 	OSWindows = "windows"
+ )
+ 
+@@ -40,7 +40,7 @@
+ 	case OSWindows:
+ 		return &windowsParser{}
+ 	}
+-	if runtime.GOOS == OSWindows {
++	if "linux" == OSWindows {
+ 		return &lcowParser{}
+ 	}
+ 	return &linuxParser{}
+diff -ur ../v20.10.16.orig/moby/volume/mounts/parser_test.go ./moby/volume/mounts/parser_test.go
+--- ../v20.10.16.orig/moby/volume/mounts/parser_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/volume/mounts/parser_test.go	2023-10-13 12:38:55.963766408 +0000
+@@ -440,7 +440,7 @@
+ 		t.Fatal(err)
+ 	}
+ 	defer os.RemoveAll(testDir)
+-	parser := NewParser(runtime.GOOS)
++	parser := NewParser("linux")
+ 	cases := []c{
+ 		{mount.Mount{Type: mount.TypeBind, Source: testDir, Target: testDestinationPath, ReadOnly: true}, MountPoint{Type: mount.TypeBind, Source: testDir, Destination: testDestinationPath, Propagation: parser.DefaultPropagationMode()}},
+ 		{mount.Mount{Type: mount.TypeBind, Source: testDir, Target: testDestinationPath}, MountPoint{Type: mount.TypeBind, Source: testDir, Destination: testDestinationPath, RW: true, Propagation: parser.DefaultPropagationMode()}},
+@@ -516,12 +516,12 @@
+ 	currentFileInfoProvider = &mockFiProviderWithError{err: testErr}
+ 
+ 	p := "/bananas"
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		p = `c:\bananas`
+ 	}
+ 	m := mount.Mount{Type: mount.TypeBind, Source: p, Target: p}
+ 
+-	parser := NewParser(runtime.GOOS)
++	parser := NewParser("linux")
+ 
+ 	_, err := parser.ParseMountSpec(m)
+ 	assert.Assert(t, err != nil)
+diff -ur ../v20.10.16.orig/moby/volume/mounts/validate_test.go ./moby/volume/mounts/validate_test.go
+--- ../v20.10.16.orig/moby/volume/mounts/validate_test.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/volume/mounts/validate_test.go	2023-10-13 12:38:55.963766408 +0000
+@@ -47,7 +47,7 @@
+ 		{mount.Mount{Type: mount.TypeBind, Source: testDir, Target: "/foo"}, nil},
+ 		{mount.Mount{Type: "invalid", Target: "/foo"}, errors.New("mount type unknown")},
+ 	}
+-	parser := NewParser(runtime.GOOS)
++	parser := NewParser("linux")
+ 	for i, x := range cases {
+ 		err := parser.ValidateMountConfig(&x.input)
+ 		if err == nil && x.expected == nil {
+@@ -57,7 +57,7 @@
+ 			t.Errorf("expected %q, got %q, case: %d", x.expected, err, i)
+ 		}
+ 	}
+-	if runtime.GOOS == "windows" {
++	if "linux" == "windows" {
+ 		parser = &lcowParser{}
+ 		for i, x := range lcowCases {
+ 			err := parser.ValidateMountConfig(&x.input)
+diff -ur ../v20.10.16.orig/moby/volume/mounts/windows_parser.go ./moby/volume/mounts/windows_parser.go
+--- ../v20.10.16.orig/moby/volume/mounts/windows_parser.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/volume/mounts/windows_parser.go	2023-10-13 12:38:55.963766408 +0000
+@@ -442,7 +442,7 @@
+ }
+ 
+ func (p *windowsParser) ConvertTmpfsOptions(opt *mount.TmpfsOptions, readOnly bool) (string, error) {
+-	return "", fmt.Errorf("%s does not support tmpfs", runtime.GOOS)
++	return "", fmt.Errorf("%s does not support tmpfs", "linux")
+ }
+ func (p *windowsParser) DefaultCopyMode() bool {
+ 	return false
+diff -ur ../v20.10.16.orig/moby/volume/service/store.go ./moby/volume/service/store.go
+--- ../v20.10.16.orig/moby/volume/service/store.go	2023-08-30 21:43:39.000000000 +0000
++++ ./moby/volume/service/store.go	2023-10-13 12:38:55.963766408 +0000
+@@ -566,7 +566,7 @@
+ 
+ 	// volume name validation is specific to the host os and not on container image
+ 	// windows/lcow should have an equivalent volumename validation logic so we create a parser for current host OS
+-	parser := volumemounts.NewParser(runtime.GOOS)
++	parser := volumemounts.NewParser("linux")
+ 	err := parser.ValidateVolumeName(name)
+ 	if err != nil {
+ 		return nil, err

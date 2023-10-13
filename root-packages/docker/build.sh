@@ -59,21 +59,10 @@ termux_step_make() {
 	set -e
 	cd moby
 
-	# apply some patches in a batch
-	xargs sed -i "s_\(/etc/docker\)_${TERMUX_PREFIX}\1_g" < <(grep -R /etc/docker | cut -d':' -f1 | sort | uniq)
-	xargs sed -i "s_\(/run/docker/plugins\)_${TERMUX_PREFIX}/var\1_g" < <(grep -R '/run/docker/plugins' | cut -d':' -f1 | sort | uniq)
-	xargs sed -i 's/[a-zA-Z0-9]*\.GOOS/"linux"/g' < <(grep -R '[a-zA-Z0-9]*\.GOOS' | cut -d':' -f1 | sort | uniq)
-
 	# issue the build command
 	export DOCKER_GITCOMMIT
 	export DOCKER_BUILDTAGS='exclude_graphdriver_btrfs exclude_graphdriver_devicemapper exclude_graphdriver_quota selinux exclude_graphdriver_aufs'
-	# horrible, but effective way to apply patches on the fly while compiling
-	while ! IFS='' files=$(AUTO_GOPATH=1 PREFIX='' hack/make.sh dynbinary 2>&1 1>/dev/null); do
-		if ! xargs sed -i 's/\("runtime"\)/_ \1/' < <(echo $files | grep runtime | cut -d':' -f1 | cut -c38-); then
-			echo $files;
-			exit 1
-		fi
-	done
+	AUTO_GOPATH=1 PREFIX='' hack/make.sh dynbinary
 	)
 	echo " Done!"
 
@@ -107,9 +96,6 @@ termux_step_make() {
 	mv go cli
 	export GOPATH="${PWD}/cli/go"
 	cd "${GOPATH}/src/github.com/docker/cli"
-
-	# apply some patches in a batch
-	xargs sed -i "s_\(/var/run/docker\.sock\)_${TERMUX_PREFIX}\1_g" < <(grep -R /var/run/docker\.sock | cut -d':' -f1 | sort | uniq)
 
 	# issue the build command
 	export VERSION=v${TERMUX_PKG_VERSION}-ce
