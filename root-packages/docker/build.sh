@@ -31,8 +31,8 @@ termux_step_get_source() {
 	mkdir -p "$TERMUX_PKG_CACHEDIR"
 	mkdir -p "$TERMUX_PKG_SRCDIR"
 	for i in $(seq 0 $(( ${#PKG_SRCURL[@]} - 1 ))); do
-		local file="${TERMUX_PKG_CACHEDIR}/$(basename ${PKG_SRCURL[$i]})"
-		rm -rf "$file"
+		# Archives from moby/moby and docker/cli have same name, so cache them as {moby,cli}-v...
+		local file="${TERMUX_PKG_CACHEDIR}/$(echo ${PKG_SRCURL[$i]}|cut -d"/" -f 5)-$(basename ${PKG_SRCURL[$i]})"
 		termux_download "${PKG_SRCURL[$i]}" "$file" "${PKG_SHA256[$i]}"
 		tar xf "$file" -C "$TERMUX_PKG_SRCDIR"
 	done
