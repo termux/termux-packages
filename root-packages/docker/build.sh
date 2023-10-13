@@ -61,7 +61,7 @@ termux_step_make() {
 
 	# apply some patches in a batch
 	xargs sed -i "s_\(/etc/docker\)_${TERMUX_PREFIX}\1_g" < <(grep -R /etc/docker | cut -d':' -f1 | sort | uniq)
-	xargs sed -i 's_\(/run/docker/plugins\)_/data/docker\1_g' < <(grep -R '/run/docker/plugins' | cut -d':' -f1 | sort | uniq)
+	xargs sed -i "s_\(/run/docker/plugins\)_${TERMUX_PREFIX}/var\1_g" < <(grep -R '/run/docker/plugins' | cut -d':' -f1 | sort | uniq)
 	xargs sed -i 's/[a-zA-Z0-9]*\.GOOS/"linux"/g' < <(grep -R '[a-zA-Z0-9]*\.GOOS' | cut -d':' -f1 | sort | uniq)
 
 	# issue the build command
@@ -109,7 +109,7 @@ termux_step_make() {
 	cd "${GOPATH}/src/github.com/docker/cli"
 
 	# apply some patches in a batch
-	xargs sed -i 's_/var/\(run/docker\.sock\)_/data/docker/\1_g' < <(grep -R /var/run/docker\.sock | cut -d':' -f1 | sort | uniq)
+	xargs sed -i "s_\(/var/run/docker\.sock\)_${TERMUX_PREFIX}\1_g" < <(grep -R /var/run/docker\.sock | cut -d':' -f1 | sort | uniq)
 
 	# issue the build command
 	export VERSION=v${TERMUX_PKG_VERSION}-ce
@@ -129,7 +129,10 @@ termux_step_make_install() {
 	install -Dm 600 -t ${TERMUX_PREFIX}/share/man/man1 cli/go/src/github.com/docker/cli/man/man1/*
 	install -Dm 600 -t ${TERMUX_PREFIX}/share/man/man5 cli/go/src/github.com/docker/cli/man/man5/*
 	install -Dm 600 -t ${TERMUX_PREFIX}/share/man/man8 cli/go/src/github.com/docker/cli/man/man8/*
-	install -Dm 600 ${TERMUX_PKG_BUILDER_DIR}/daemon.json ${TERMUX_PREFIX}/etc/docker/daemon.json
+	mkdir -p "${TERMUX_PREFIX}"/etc/docker
+	sed -e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
+		"${TERMUX_PKG_BUILDER_DIR}"/daemon.json > "${TERMUX_PREFIX}"/etc/docker/daemon.json
+        chmod 600 "${TERMUX_PREFIX}"/etc/docker/daemon.json
 	sed -e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
 	       "${TERMUX_PKG_BUILDER_DIR}/dockerd.sh" > "${TERMUX_PREFIX}/bin/dockerd"
 	chmod 700 "${TERMUX_PREFIX}/bin/dockerd"
