@@ -58,14 +58,7 @@
  #
  ###############################################################################
  
-@@ -81,16 +81,19 @@
- # This setting can deny access to control of the daemon. Not effective if
- # systemd socket activation is in use.
- #
-+# For local connections only
-+#bind_to_address		"localhost"
-+#
- # For network
+@@ -85,12 +85,12 @@
  #bind_to_address		"any"
  #
  # And for Unix Socket
@@ -81,7 +74,7 @@
  #
  # Suppress all messages below the given threshold.  Use "verbose" for
  # troubleshooting. Available setting arguments are "notice", "info", "verbose",
-@@ -135,12 +138,12 @@
+@@ -135,12 +135,12 @@
  # If this setting is set to "yes", MPD will discover audio files by following
  # symbolic links outside of the configured music_directory.
  #
@@ -96,7 +89,7 @@
  #
  ###############################################################################
  
-@@ -213,28 +216,6 @@
+@@ -213,28 +213,6 @@
  # blocks. Setting this block is optional, though the server will only attempt
  # autodetection for one sound card.
  #
@@ -125,7 +118,7 @@
  #
  # An example of a shout output (for streaming to Icecast):
  #
-@@ -265,7 +246,8 @@
+@@ -265,7 +243,8 @@
  #	type		"recorder"
  #	name		"My recorder"
  #	encoder		"vorbis"		# optional, vorbis or lame
@@ -135,7 +128,7 @@
  ##	quality		"5.0"			# do not define if bitrate is defined
  #	bitrate		"128"			# do not define if quality is defined
  #	format		"44100:16:1"
-@@ -285,6 +267,14 @@
+@@ -285,6 +264,14 @@
  #	max_clients	"0"			# optional 0=no limit
  #}
  #
@@ -150,7 +143,7 @@
  # An example of a pulseaudio output (streaming to a remote pulseaudio server)
  #
  #audio_output {
-@@ -295,55 +277,31 @@
+@@ -295,56 +282,31 @@
  ##	media_role	"media_role"		#optional
  #}
  #
@@ -173,6 +166,7 @@
 -##	device		"Digital Audio (S/PDIF) (High Definition Audio Device)" # optional
 -#		or
 -##	device		"0"		# optional
+-##	mixer_type	"hardware"	# optional
 -## Exclusive mode blocks all other audio source, and get best audio quality without resampling.
 -##	exclusive	"no"		# optional
 -## Enumerate all devices in log.

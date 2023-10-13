@@ -10,7 +10,7 @@ set -e -u
 ARCH="x86_64"
 REPO_URL="https://service.termux-pacman.dev/gpkg-dev/${ARCH}"
 VERSION_OF_CBT="2.41-1"
-VERSION_OF_CGT="13.2.0-2"
+VERSION_OF_CGT="13.2.0-3"
 
 if [ "$ARCH" != "$(uname -m)" ]; then
 	echo "Error: the requested CGCT is not supported on your architecture"
