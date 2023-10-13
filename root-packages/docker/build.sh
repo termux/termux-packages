@@ -10,7 +10,7 @@ DOCKER_GITCOMMIT=12df1c1
 TERMUX_PKG_SRCURL=(https://github.com/moby/moby/archive/v${TERMUX_PKG_VERSION:2}.tar.gz
                    https://github.com/docker/cli/archive/v${TERMUX_PKG_VERSION:2}.tar.gz
                    https://github.com/moby/libnetwork/archive/${LIBNETWORK_COMMIT}.tar.gz)
-TERMUX_PKG_DEPENDS="containerd, libdevmapper"
+TERMUX_PKG_DEPENDS="containerd, libdevmapper, resolv-conf"
 TERMUX_PKG_SHA256=(47315270a5f8c3274231be7f2ed86b5f081c80ee952d7fdab66065ca1e06871a
                    73ed25a12dc9e470d8346030f6ca060ce8b28d821f3f3854b004e7e2ae60f2e6
                    4ab6f6c97db834c2eedc053d06c4d32d268f33051b8148098b4a0e8eee51e97b)
