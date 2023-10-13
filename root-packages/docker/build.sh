@@ -47,11 +47,13 @@ termux_step_get_source() {
 	done
 }
 
-termux_step_make() {
+termux_step_pre_configure() {
 	# setup go build environment
 	termux_setup_golang
 	export GO111MODULE=auto
+}
 
+termux_step_make() {
 	# BUILD DOCKERD DAEMON
 	echo -n "Building dockerd daemon..."
 	(
