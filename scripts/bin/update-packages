@@ -154,9 +154,13 @@ _should_update() {
 		termux_error_exit "ERROR: directory '${pkg_dir}' is not a package."
 	fi
 
+	if { [[ "${PACKAGES_OPT_OUT:-}" == "true" ]] && grep -q '^TERMUX_PKG_AUTO_UPDATE=false$' "${pkg_dir}/build.sh"; } || \
+			{ [[ "${PACKAGES_OPT_OUT:-}" != "true" ]] && ! grep -q '^TERMUX_PKG_AUTO_UPDATE=true$' "${pkg_dir}/build.sh"; }; then
+		return 1 # Skip.
+	fi
+
 	# shellcheck disable=SC2076
-	if ! grep -q '^TERMUX_PKG_AUTO_UPDATE=true$' "${pkg_dir}/build.sh" ||
-		[[ " ${_ALREADY_SEEN[*]} ${!_FAILED_UPDATES[*]} " =~ " $(basename "${pkg_dir}") " ]]; then
+	if [[ " ${_ALREADY_SEEN[*]} ${!_FAILED_UPDATES[*]} " =~ " $(basename "${pkg_dir}") " ]]; then
 		return 1 # Skip.
 	fi
 	if [[ "${GITHUB_ACTIONS:-}" == "true" ]] && _gh_check_issue_exists "$(basename "${pkg_dir}")"; then
