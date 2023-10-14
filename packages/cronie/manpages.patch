@@ -1,6 +1,6 @@
-diff -uNr cronie-1.5.7/man/cron.8 cronie-1.5.7.mod/man/cron.8
---- cronie-1.5.7/man/cron.8	2017-09-14 11:34:58.000000000 +0000
-+++ cronie-1.5.7.mod/man/cron.8	2021-05-03 18:31:02.488787206 +0000
+diff -uNr cronie-1.7.0/man/cron.8 cronie-1.7.0.mod/man/cron.8
+--- cronie-1.7.0/man/cron.8	2023-03-13 16:20:25.000000000 +0800
++++ cronie-1.7.0.mod/man/cron.8	2023-10-14 11:42:57.650891547 +0800
 @@ -27,7 +27,7 @@
  crond \- daemon to execute scheduled commands
  .SH SYNOPSIS
@@ -53,12 +53,12 @@ diff -uNr cronie-1.5.7/man/cron.8 cronie-1.5.7.mod/man/cron.8
  log after the daemon is started.  The inotify support checks for changes
  in all crontables and accesses the hard disk only when a change is
  detected.
-@@ -88,21 +72,12 @@
- used when inotify can not be initialized.
+@@ -89,20 +73,12 @@
  .PP
  .I Cron
--checks these files and directories:
--.TP
+ checks these files and directories:
++checks these directories:
+ .TP
 -.IR /etc/crontab
 -system crontab.  Nowadays the file is empty by default.  Originally it
 -was usually used to run daily, weekly, monthly jobs.  By default these
@@ -67,8 +67,7 @@ diff -uNr cronie-1.5.7/man/cron.8 cronie-1.5.7.mod/man/cron.8
 -configuration file.  See
 -.BR anacrontab (5)
 -for more details.
-+checks these directories:
- .TP
+-.TP
 -.IR /etc/cron.d/
 +.IR @TERMUX_PREFIX@/etc/cron.d/
  directory that contains system cronjobs stored for different users.
@@ -78,7 +77,7 @@ diff -uNr cronie-1.5.7/man/cron.8 cronie-1.5.7.mod/man/cron.8
  directory that contains user crontables created by the
  .IR crontab
  command.
-@@ -129,18 +104,6 @@
+@@ -129,18 +105,6 @@
  It is possible to use different time zones for crontables.  See
  .BR crontab (5)
  for more information.
@@ -97,7 +96,7 @@ diff -uNr cronie-1.5.7/man/cron.8 cronie-1.5.7.mod/man/cron.8
  .SH "OPTIONS"
  .TP
  .B "\-h"
-@@ -163,11 +126,7 @@
+@@ -163,11 +127,7 @@
  .TP
  .B "\-n"
  Tells the daemon to run in the foreground.  This can be useful when
@@ -108,9 +107,9 @@ diff -uNr cronie-1.5.7/man/cron.8 cronie-1.5.7.mod/man/cron.8
 -module.
 +starting it out of init.
  .TP
- .B "\-p"
- Allows
-@@ -177,9 +136,6 @@
+ .B "\-f"
+ the same as -n, consistent with other crond implementations.
+@@ -180,9 +140,6 @@
  .B "\-P"
  Don't set PATH.  PATH is instead inherited from the environment.
  .TP
@@ -120,7 +119,7 @@ diff -uNr cronie-1.5.7/man/cron.8 cronie-1.5.7.mod/man/cron.8
  .B "\-s"
  This option will direct
  .I Cron
-@@ -205,46 +161,6 @@
+@@ -208,46 +165,6 @@
  .I Cron
  was built to use
  .IR syslog (3).
@@ -167,9 +166,9 @@ diff -uNr cronie-1.5.7/man/cron.8 cronie-1.5.7.mod/man/cron.8
  .SH CAVEATS
  All
  .BR crontab
-diff -uNr cronie-1.5.7/man/cronnext.1 cronie-1.5.7.mod/man/cronnext.1
---- cronie-1.5.7/man/cronnext.1	2019-04-08 14:00:11.000000000 +0000
-+++ cronie-1.5.7.mod/man/cronnext.1	2021-05-03 18:31:02.488787206 +0000
+diff -uNr cronie-1.7.0/man/cronnext.1 cronie-1.7.0.mod/man/cronnext.1
+--- cronie-1.7.0/man/cronnext.1	2023-03-13 16:20:25.000000000 +0800
++++ cronie-1.7.0.mod/man/cronnext.1	2023-10-14 11:43:40.254891531 +0800
 @@ -33,10 +33,9 @@
  .TP
  .B \-s
@@ -177,15 +176,15 @@ diff -uNr cronie-1.5.7/man/cronnext.1 cronie-1.5.7.mod/man/cronnext.1
 -.I /etc/crontab
 +.I @TERMUX_PREFIX@/etc/crontab
  file.  The system crontab usually contains the hourly, daily, weekly and
--montly crontabs, which might be better dealt with
+-monthly crontabs, which might be better dealt with
 -.BR anacron (8).
-+montly crontabs.
++monthly crontabs.
  .TP
  .BI \-a
  Use the crontabs installed in the system in addition to the ones passed as
-diff -uNr cronie-1.5.7/man/crontab.1 cronie-1.5.7.mod/man/crontab.1
---- cronie-1.5.7/man/crontab.1	2021-03-19 10:15:42.000000000 +0000
-+++ cronie-1.5.7.mod/man/crontab.1	2021-05-03 18:35:47.696788900 +0000
+diff -uNr cronie-1.7.0/man/crontab.1 cronie-1.7.0.mod/man/crontab.1
+--- cronie-1.7.0/man/crontab.1	2023-03-13 16:20:25.000000000 +0800
++++ cronie-1.7.0.mod/man/crontab.1	2023-10-14 11:54:12.386891290 +0800
 @@ -27,8 +27,6 @@
  crontab \- maintains crontab files for individual users
  .SH SYNOPSIS
@@ -277,7 +276,7 @@ diff -uNr cronie-1.5.7/man/crontab.1 cronie-1.5.7.mod/man/crontab.1
  directory is used.
  .PP
  When listing a crontab on a terminal the output will be colorized unless
-@@ -121,16 +64,6 @@
+@@ -134,16 +77,6 @@
  .PP
  .SH "OPTIONS"
  .TP
@@ -294,7 +293,7 @@ diff -uNr cronie-1.5.7/man/crontab.1 cronie-1.5.7.mod/man/crontab.1
  .B "\-T"
  Test the crontab file syntax without installing it. 
  Once an issue is found, the validation is interrupted, so this will not return all the existing issues at the same execution.
-@@ -161,74 +94,11 @@
+@@ -174,74 +107,11 @@
  documentation of MLS_LEVEL in
  .BR crontab (5).
  .TP

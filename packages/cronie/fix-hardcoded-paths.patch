@@ -1,19 +1,31 @@
-diff -uNr cronie-1.5.5/configure cronie-1.5.5.mod/configure
---- cronie-1.5.5/configure	2019-10-31 18:15:15.000000000 +0200
-+++ cronie-1.5.5.mod/configure	2020-07-08 23:00:30.440689636 +0300
-@@ -5281,7 +5281,7 @@
+diff -uNr cronie-1.7.0/anacron/global.h cronie-1.7.0.mod/anacron/global.h
+--- cronie-1.7.0/anacron/global.h	2023-07-26 04:41:47.000000000 +0800
++++ cronie-1.7.0.mod/anacron/global.h	2023-10-14 11:21:23.674892041 +0800
+@@ -33,7 +33,7 @@
+ #define DEBUG_LEVEL LOG_DEBUG     /* only used when DEBUG is defined */
+ 
+ /* Mail interface.  (All MTAs should supply this command) */
+-#define SENDMAIL "/usr/sbin/sendmail"
++#define SENDMAIL "@TERMUX_PREFIX@/bin/sendmail"
+ 
+ /* End of user-configurable section */
+ 
+diff -uNr cronie-1.7.0/configure cronie-1.7.0.mod/configure
+--- cronie-1.7.0/configure	2023-10-13 17:00:09.000000000 +0800
++++ cronie-1.7.0.mod/configure	2023-10-14 11:17:58.102892119 +0800
+@@ -5961,7 +5961,7 @@
  
  
  
--$as_echo "#define MAILARG \"/usr/sbin/sendmail\"" >>confdefs.h
-+$as_echo "#define MAILARG \"@TERMUX_PREFIX@/bin/sendmail\"" >>confdefs.h
+-printf "%s\n" "#define MAILARG \"/usr/sbin/sendmail\"" >>confdefs.h
++printf "%s\n" "#define MAILARG \"@TERMUX_PREFIX@/bin/sendmail\"" >>confdefs.h
  
  
  
-diff -uNr cronie-1.5.5/src/cron.c cronie-1.5.5.mod/src/cron.c
---- cronie-1.5.5/src/cron.c	2019-04-15 11:33:30.000000000 +0300
-+++ cronie-1.5.5.mod/src/cron.c	2020-07-08 22:58:28.492184173 +0300
-@@ -299,7 +299,7 @@
+diff -uNr cronie-1.7.0/src/cron.c cronie-1.7.0.mod/src/cron.c
+--- cronie-1.7.0/src/cron.c	2023-07-26 04:41:47.000000000 +0800
++++ cronie-1.7.0.mod/src/cron.c	2023-10-14 11:19:16.262892089 +0800
+@@ -302,7 +302,7 @@
  
  	log_it("CRON", getpid(), "STARTUP", PACKAGE_VERSION, 0);
  
@@ -22,10 +34,10 @@ diff -uNr cronie-1.5.5/src/cron.c cronie-1.5.5.mod/src/cron.c
  		SyslogOutput=1;
  		log_it("CRON", pid, "INFO","Syslog will be used instead of sendmail.", 0);
  	}
-diff -uNr cronie-1.5.5/src/crontab.c cronie-1.5.5.mod/src/crontab.c
---- cronie-1.5.5/src/crontab.c	2019-10-31 16:50:32.000000000 +0200
-+++ cronie-1.5.5.mod/src/crontab.c	2020-07-08 23:28:56.896277856 +0300
-@@ -466,7 +466,7 @@
+diff -uNr cronie-1.7.0/src/crontab.c cronie-1.7.0.mod/src/crontab.c
+--- cronie-1.7.0/src/crontab.c	2023-03-13 16:20:25.000000000 +0800
++++ cronie-1.7.0.mod/src/crontab.c	2023-10-14 11:19:43.314892079 +0800
+@@ -613,7 +613,7 @@
  	if ((getuid() == geteuid()) && (getgid() == getegid())) {
  		tmpdir = getenv("TMPDIR");
  	}
@@ -33,11 +45,11 @@ diff -uNr cronie-1.5.5/src/crontab.c cronie-1.5.5.mod/src/crontab.c
 +	return tmpdir ? tmpdir : "@TERMUX_PREFIX@/tmp";
  }
  
- static char *host_specific_filename(const char *prefix, const char *suffix)
-diff -uNr cronie-1.5.5/src/pathnames.h cronie-1.5.5.mod/src/pathnames.h
---- cronie-1.5.5/src/pathnames.h	2017-01-17 17:53:50.000000000 +0200
-+++ cronie-1.5.5.mod/src/pathnames.h	2020-07-08 23:28:41.980210171 +0300
-@@ -46,15 +46,15 @@
+ static char *host_specific_filename(const char *prefix, const char *suffix) {
+diff -uNr cronie-1.7.0/src/pathnames.h cronie-1.7.0.mod/src/pathnames.h
+--- cronie-1.7.0/src/pathnames.h	2023-03-13 16:20:25.000000000 +0800
++++ cronie-1.7.0.mod/src/pathnames.h	2023-10-14 11:20:45.206892055 +0800
+@@ -50,15 +50,15 @@
  #define REBOOT_LOCK     PIDDIR "cron.reboot"
  
  #ifndef _PATH_BSHELL
@@ -45,9 +57,9 @@ diff -uNr cronie-1.5.5/src/pathnames.h cronie-1.5.5.mod/src/pathnames.h
 +# define _PATH_BSHELL "@TERMUX_PREFIX@/bin/sh"
  #endif
  
- #ifndef _PATH_DEFPATH
--# define _PATH_DEFPATH "/usr/bin:/bin"
-+# define _PATH_DEFPATH "@TERMUX_PREFIX@/bin"
+ #ifndef _PATH_STDPATH
+-# define _PATH_STDPATH "/usr/bin:/bin:/usr/sbin:/sbin"
++# define _PATH_STDPATH "@TERMUX_PREFIX@/bin"
  #endif
  
  #ifndef _PATH_TMP
