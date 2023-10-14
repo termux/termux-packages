@@ -1,0 +1,14 @@
+--- a/src/crypto-nettle.c
++++ b/src/crypto-nettle.c
+@@ -24,6 +24,11 @@
+ // TODO: This is linux specific
+ #include <sys/random.h>
+ 
++#if defined(__ANDROID__) && __ANDROID_API__ < 28
++#include <syscall.h>
++#define getrandom(buf,buflen,flags) syscall(SYS_getrandom,buf,buflen,flags)
++#endif
++
+ #define UDIV_UP(a, b) (((a) + (b) - 1) / (b))
+ 
+ struct vec;
