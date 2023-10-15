@@ -2,7 +2,7 @@
 
 set -e -u
 
-REPO_DIR=$(realpath "$(dirname "$0")/../")
+TERMUX_SCRIPTDIR=$(realpath "$(dirname "$0")/../")
 
 check_package_license() {
 	local pkg_licenses=$1
@@ -114,8 +114,8 @@ lint_package() {
 		# Using API 24 here.
 		TERMUX_PKG_API_LEVEL=24
 
-		if [ -f "$REPO_DIR/scripts/properties.sh" ]; then
-			. "$REPO_DIR/scripts/properties.sh"
+		if [ -f "$TERMUX_SCRIPTDIR/scripts/properties.sh" ]; then
+			. "$TERMUX_SCRIPTDIR/scripts/properties.sh"
 		fi
 
 		. "$package_script"
@@ -462,7 +462,7 @@ linter_main() {
 	if $problems_found; then
 		echo "================================================================"
 		echo
-		echo "A problem has been found in '$(realpath --relative-to="$REPO_DIR" "$package_script")'."
+		echo "A problem has been found in '$(realpath --relative-to="$TERMUX_SCRIPTDIR" "$package_script")'."
 		echo "Checked $package_counter packages before the first error was detected."
 		echo
 		echo "================================================================"
@@ -481,7 +481,7 @@ linter_main() {
 }
 
 if [ $# -eq 0 ]; then
-	for repo_dir in $(jq --raw-output 'del(.pkg_format) | keys | .[]' $REPO_DIR/repo.json); do
+	for repo_dir in $(jq --raw-output 'del(.pkg_format) | keys | .[]' $TERMUX_SCRIPTDIR/repo.json); do
 		linter_main $repo_dir/*/build.sh
 	done || exit 1
 else
