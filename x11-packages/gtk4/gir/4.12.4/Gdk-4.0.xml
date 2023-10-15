@@ -3,14 +3,6 @@
   <class name="GdkAppLaunchContext" get-type="gdk_app_launch_context_get_type" parents="GAppLaunchContext,GObject">
     <property name="display" type="GdkDisplay" flags="235"/>
   </class>
-  <boxed name="GdkRGBA" get-type="gdk_rgba_get_type"/>
-  <class name="GdkTexture" get-type="gdk_texture_get_type" parents="GObject" abstract="1">
-    <implements name="GdkPaintable"/>
-    <implements name="GIcon"/>
-    <implements name="GLoadableIcon"/>
-    <property name="width" type="gint" flags="1073742059" default-value="1"/>
-    <property name="height" type="gint" flags="1073742059" default-value="1"/>
-  </class>
   <class name="GdkCairoContext" get-type="gdk_cairo_context_get_type" parents="GdkDrawContext,GObject" abstract="1">
   </class>
   <class name="GdkClipboard" get-type="gdk_clipboard_get_type" parents="GObject">
@@ -137,7 +129,6 @@
     <signal name="resume-events" return="void" when="last">
     </signal>
   </class>
-  <boxed name="GdkRectangle" get-type="gdk_rectangle_get_type"/>
   <class name="GdkMonitor" get-type="gdk_monitor_get_type" parents="GObject">
     <property name="description" type="gchararray" flags="225" default-value="NULL"/>
     <property name="display" type="GdkDisplay" flags="235"/>
@@ -163,6 +154,7 @@
     <property name="width" type="gint" flags="225" default-value="0"/>
     <property name="height" type="gint" flags="225" default-value="0"/>
     <property name="scale-factor" type="gint" flags="225" default-value="1"/>
+    <property name="scale" type="gdouble" flags="225" default-value="1.000000"/>
     <signal name="layout" return="void" when="first">
       <param type="gint"/>
       <param type="gint"/>
@@ -222,6 +214,9 @@
   </class>
   <interface name="GdkDragSurface" get-type="gdk_drag_surface_get_type">
     <prerequisite name="GdkSurface"/>
+    <signal name="compute-size" return="void" when="last">
+      <param type="GdkDragSurfaceSize"/>
+    </signal>
   </interface>
   <class name="GdkDrawContext" get-type="gdk_draw_context_get_type" parents="GObject" abstract="1">
     <property name="display" type="GdkDisplay" flags="235"/>
@@ -260,7 +255,11 @@
     <member name="GDK_DRAG_CANCEL_NO_TARGET" nick="no-target" value="0"/>
     <member name="GDK_DRAG_CANCEL_USER_CANCELLED" nick="user-cancelled" value="1"/>
     <member name="GDK_DRAG_CANCEL_ERROR" nick="error" value="2"/>
-  </enum>  <enum name="GdkGravity" get-type="gdk_gravity_get_type">
+  </enum>  <flags name="GdkGLAPI" get-type="gdk_gl_api_get_type">
+    <member name="GDK_GL_API_GL" nick="gl" value="1"/>
+    <member name="GDK_GL_API_GLES" nick="gles" value="2"/>
+  </flags>
+  <enum name="GdkGravity" get-type="gdk_gravity_get_type">
     <member name="GDK_GRAVITY_NORTH_WEST" nick="north-west" value="1"/>
     <member name="GDK_GRAVITY_NORTH" nick="north" value="2"/>
     <member name="GDK_GRAVITY_NORTH_EAST" nick="north-east" value="3"/>
@@ -346,7 +345,17 @@
     <member name="GDK_MEMORY_R32G32B32_FLOAT" nick="r32g32b32-float" value="15"/>
     <member name="GDK_MEMORY_R32G32B32A32_FLOAT_PREMULTIPLIED" nick="r32g32b32a32-float-premultiplied" value="16"/>
     <member name="GDK_MEMORY_R32G32B32A32_FLOAT" nick="r32g32b32a32-float" value="17"/>
-    <member name="GDK_MEMORY_N_FORMATS" nick="n-formats" value="18"/>
+    <member name="GDK_MEMORY_G8A8_PREMULTIPLIED" nick="g8a8-premultiplied" value="18"/>
+    <member name="GDK_MEMORY_G8A8" nick="g8a8" value="19"/>
+    <member name="GDK_MEMORY_G8" nick="g8" value="20"/>
+    <member name="GDK_MEMORY_G16A16_PREMULTIPLIED" nick="g16a16-premultiplied" value="21"/>
+    <member name="GDK_MEMORY_G16A16" nick="g16a16" value="22"/>
+    <member name="GDK_MEMORY_G16" nick="g16" value="23"/>
+    <member name="GDK_MEMORY_A8" nick="a8" value="24"/>
+    <member name="GDK_MEMORY_A16" nick="a16" value="25"/>
+    <member name="GDK_MEMORY_A16_FLOAT" nick="a16-float" value="26"/>
+    <member name="GDK_MEMORY_A32_FLOAT" nick="a32-float" value="27"/>
+    <member name="GDK_MEMORY_N_FORMATS" nick="n-formats" value="28"/>
   </enum>  <enum name="GdkEventType" get-type="gdk_event_type_get_type">
     <member name="GDK_DELETE" nick="delete" value="0"/>
     <member name="GDK_MOTION_NOTIFY" nick="motion-notify" value="1"/>
@@ -423,10 +432,6 @@
     <member name="GDK_FRAME_CLOCK_PHASE_RESUME_EVENTS" nick="resume-events" value="32"/>
     <member name="GDK_FRAME_CLOCK_PHASE_AFTER_PAINT" nick="after-paint" value="64"/>
   </flags>
-  <flags name="GdkGLAPI" get-type="gdk_gl_api_get_type">
-    <member name="GDK_GL_API_GL" nick="gl" value="1"/>
-    <member name="GDK_GL_API_GLES" nick="gles" value="2"/>
-  </flags>
   <enum name="GdkSubpixelLayout" get-type="gdk_subpixel_layout_get_type">
     <member name="GDK_SUBPIXEL_LAYOUT_UNKNOWN" nick="unknown" value="0"/>
     <member name="GDK_SUBPIXEL_LAYOUT_NONE" nick="none" value="1"/>
@@ -457,7 +462,7 @@
     <member name="GDK_SEAT_CAPABILITY_KEYBOARD" nick="keyboard" value="8"/>
     <member name="GDK_SEAT_CAPABILITY_TABLET_PAD" nick="tablet-pad" value="16"/>
     <member name="GDK_SEAT_CAPABILITY_ALL_POINTING" nick="all-pointing" value="7"/>
-    <member name="GDK_SEAT_CAPABILITY_ALL" nick="all" value="15"/>
+    <member name="GDK_SEAT_CAPABILITY_ALL" nick="all" value="31"/>
   </flags>
   <enum name="GdkTextureError" get-type="gdk_texture_error_get_type">
     <member name="GDK_TEXTURE_ERROR_TOO_LARGE" nick="too-large" value="0"/>
@@ -493,6 +498,7 @@
     <member name="GDK_TOPLEVEL_STATE_BOTTOM_RESIZABLE" nick="bottom-resizable" value="8192"/>
     <member name="GDK_TOPLEVEL_STATE_LEFT_TILED" nick="left-tiled" value="16384"/>
     <member name="GDK_TOPLEVEL_STATE_LEFT_RESIZABLE" nick="left-resizable" value="32768"/>
+    <member name="GDK_TOPLEVEL_STATE_SUSPENDED" nick="suspended" value="65536"/>
   </flags>
   <enum name="GdkTitlebarGesture" get-type="gdk_titlebar_gesture_get_type">
     <member name="GDK_TITLEBAR_GESTURE_DOUBLE_CLICK" nick="double-click" value="1"/>
@@ -503,10 +509,28 @@
     <property name="api" type="GdkGLAPI" flags="1073742049" default-value="0"/>
     <property name="shared-context" type="GdkGLContext" flags="-2147483413"/>
   </class>
+  <class name="GdkTexture" get-type="gdk_texture_get_type" parents="GObject" abstract="1">
+    <implements name="GdkPaintable"/>
+    <implements name="GIcon"/>
+    <implements name="GLoadableIcon"/>
+    <property name="width" type="gint" flags="1073742059" default-value="1"/>
+    <property name="height" type="gint" flags="1073742059" default-value="1"/>
+  </class>
   <class name="GdkGLTexture" get-type="gdk_gl_texture_get_type" parents="GdkTexture,GObject">
     <implements name="GdkPaintable"/>
     <implements name="GIcon"/>
     <implements name="GLoadableIcon"/>
+  </class>
+  <class name="GdkGLTextureBuilder" get-type="gdk_gl_texture_builder_get_type" parents="GObject">
+    <property name="context" type="GdkGLContext" flags="1073742051"/>
+    <property name="format" type="GdkMemoryFormat" flags="1073742051" default-value="GDK_MEMORY_R8G8B8A8_PREMULTIPLIED"/>
+    <property name="has-mipmap" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="height" type="gint" flags="1073742051" default-value="0"/>
+    <property name="id" type="guint" flags="1073742051" default-value="0"/>
+    <property name="sync" type="gpointer" flags="1073742051"/>
+    <property name="update-region" type="CairoRegion" flags="1073742051"/>
+    <property name="update-texture" type="GdkTexture" flags="1073742051"/>
+    <property name="width" type="gint" flags="1073742051" default-value="0"/>
   </class>
   <class name="GdkMemoryTexture" get-type="gdk_memory_texture_get_type" parents="GdkTexture,GObject">
     <implements name="GdkPaintable"/>
@@ -524,6 +548,8 @@
     <property name="autohide" type="gboolean" flags="235" default-value="FALSE"/>
     <property name="parent" type="GdkSurface" flags="235"/>
   </interface>
+  <boxed name="GdkRectangle" get-type="gdk_rectangle_get_type"/>
+  <boxed name="GdkRGBA" get-type="gdk_rgba_get_type"/>
   <class name="GdkSnapshot" get-type="gdk_snapshot_get_type" parents="GObject" abstract="1">
   </class>
   <boxed name="GdkTextureDownloader" get-type="gdk_texture_downloader_get_type"/>
@@ -549,7 +575,7 @@
     <signal name="images-updated" return="void" when="last">
     </signal>
   </class>
-  <error-quark function="gdk_texture_error_quark" domain="gdk-texture-error-quark"/>
   <error-quark function="gdk_gl_error_quark" domain="gdk-gl-error-quark"/>
+  <error-quark function="gdk_texture_error_quark" domain="gdk-texture-error-quark"/>
   <error-quark function="gdk_vulkan_error_quark" domain="gdk-vulkan-error-quark"/>
 </dump>
