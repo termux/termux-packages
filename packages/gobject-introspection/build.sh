@@ -41,7 +41,7 @@ termux_step_pre_configure() {
 
 termux_pkg_auto_update() {
 	local LATEST_VERSION="$(termux_repology_api_get_latest_version "${TERMUX_PKG_NAME}")"
-	if [[ "LATEST_VERSION" == "null" ]]; then
+	if [[ "$LATEST_VERSION" == "null" ]]; then
 		echo "INFO: Already up to date."
 		return 0
 	fi
