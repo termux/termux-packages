@@ -18,10 +18,10 @@ ARCH=$(getprop ro.product.cpu.abi)
 
 # Set the appropriate source URL based on the architecture
 if [ "$ARCH" == "arm64-v8a" ]; then
-    TERMUX_PKG_SRCURL=https://github.com/rizinorg/rizin/releases/download/v0.6.2/rizin-$TERMUX_PKG_VERSION-android-aarch64.tar.gz
+    TERMUX_PKG_SRCURL=https://github.com/rizinorg/rizin/releases/download/$TERMUX_PKG_VERSION/rizin-$TERMUX_PKG_VERSION-android-aarch64.tar.gz
     TERMUX_PKG_SHA256=3a9c924031e0e0f3923b8adbe3e833a7dffb2d87a0fabadcf49504a2770a67f5
 elif [ "$ARCH" == "armeabi-v7a" ]; then
-    TERMUX_PKG_SRCURL=https://github.com/rizinorg/rizin/releases/download/v0.6.2/rizin-$TERMUX_PKG_VERSION-android-arm.tar.gz
+    TERMUX_PKG_SRCURL=https://github.com/rizinorg/rizin/releases/download/$TERMUX_PKG_VERSION/rizin-$TERMUX_PKG_VERSION-android-arm.tar.gz
     TERMUX_PKG_SHA256=cc3c2943dde9e05b1b308402999f484cb71f23107407d2263712e4d66785256a
 else
     echo "Unsupported architecture: $ARCH"
@@ -30,7 +30,6 @@ fi
 
 # The original "termux_extract_src_archive" always strips the first components
 # but the source of 7zip is directly under the root directory of the tar file
-# rizin > rizin
 
 termux_extract_src_archive() {
 	local file="$TERMUX_PKG_CACHEDIR/$(basename "$TERMUX_PKG_SRCURL")"
