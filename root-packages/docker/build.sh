@@ -15,6 +15,7 @@ TERMUX_PKG_SHA256=(47315270a5f8c3274231be7f2ed86b5f081c80ee952d7fdab66065ca1e068
                    73ed25a12dc9e470d8346030f6ca060ce8b28d821f3f3854b004e7e2ae60f2e6
                    4ab6f6c97db834c2eedc053d06c4d32d268f33051b8148098b4a0e8eee51e97b)
 TERMUX_PKG_CONFFILES="etc/docker/daemon.json"
+TERMUX_PKG_SERVICE_SCRIPT=("dockerd" "exec su -c \"PATH=\$PATH $TERMUX_PREFIX/bin/dockerd 2>&1\"")
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 
@@ -122,6 +123,18 @@ termux_step_make_install() {
 	sed -e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
 	       "${TERMUX_PKG_BUILDER_DIR}/dockerd.sh" > "${TERMUX_PREFIX}/bin/dockerd"
 	chmod 700 "${TERMUX_PREFIX}/bin/dockerd"
+}
+
+termux_step_post_make_install() {
+	# Running sv down dockerd kills just the "su" process but
+	# leaves dockerd running (even though it is running in the
+	# foreground). This finish script works around that.
+	mkdir -p $TERMUX_PREFIX/var/service/dockerd/
+	{
+		echo "#!$TERMUX_PREFIX/bin/sh"
+		echo "su -c pkill dockerd"
+	} > $TERMUX_PREFIX/var/service/dockerd/finish
+	chmod u+x $TERMUX_PREFIX/var/service/dockerd/finish
 }
 
 termux_step_create_debscripts() {
