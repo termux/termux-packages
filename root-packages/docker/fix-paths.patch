@@ -1,341 +1,187 @@
-diff -ur ../v20.10.16.orig/moby/daemon/config/config_test.go ./moby/daemon/config/config_test.go
---- ../v20.10.16.orig/moby/daemon/config/config_test.go	2023-08-30 21:43:39.000000000 +0000
-+++ ./moby/daemon/config/config_test.go	2023-10-13 12:38:55.743765794 +0000
-@@ -525,7 +525,7 @@
- func TestReloadDefaultConfigNotExist(t *testing.T) {
- 	skip.If(t, os.Getuid() != 0, "skipping test that requires root")
- 	reloaded := false
--	configFile := "/etc/docker/daemon.json"
-+	configFile := "@TERMUX_PREFIX@/etc/docker/daemon.json"
- 	flags := pflag.NewFlagSet("test", pflag.ContinueOnError)
- 	flags.String("config-file", configFile, "")
- 	err := Reload(configFile, flags, func(c *Config) {
-diff -ur ../v20.10.16.orig/moby/daemon/daemon_linux.go ./moby/daemon/daemon_linux.go
---- ../v20.10.16.orig/moby/daemon/daemon_linux.go	2023-08-30 21:43:39.000000000 +0000
-+++ ./moby/daemon/daemon_linux.go	2023-10-13 12:38:55.840432731 +0000
-@@ -21,7 +21,7 @@
+diff -ur ../src.orig/moby/daemon/daemon_linux.go ./moby/daemon/daemon_linux.go
+--- ../src.orig/moby/daemon/daemon_linux.go	2023-08-29 19:14:17.000000000 +0000
++++ ./moby/daemon/daemon_linux.go	2023-10-15 10:01:18.840040920 +0000
+@@ -24,7 +24,7 @@
  // plugin socket files are created here and they cannot exceed max
  // path length of 108 bytes.
- func getPluginExecRoot(root string) string {
+ func getPluginExecRoot(_ *config.Config) string {
 -	return "/run/docker/plugins"
 +	return "@TERMUX_PREFIX@/var/run/docker/plugins"
  }
  
  func (daemon *Daemon) cleanupMountsByID(id string) error {
-diff -ur ../v20.10.16.orig/moby/integration/plugin/authz/authz_plugin_test.go ./moby/integration/plugin/authz/authz_plugin_test.go
---- ../v20.10.16.orig/moby/integration/plugin/authz/authz_plugin_test.go	2023-08-30 21:43:39.000000000 +0000
-+++ ./moby/integration/plugin/authz/authz_plugin_test.go	2023-10-13 12:38:55.743765794 +0000
-@@ -56,15 +56,15 @@
- 	ctrl = &authorizationController{}
- 	teardown := setupTest(t)
+diff -ur ../src.orig/moby/pkg/plugins/discovery_unix.go ./moby/pkg/plugins/discovery_unix.go
+--- ../src.orig/moby/pkg/plugins/discovery_unix.go	2023-08-29 19:14:17.000000000 +0000
++++ ./moby/pkg/plugins/discovery_unix.go	2023-10-15 10:03:23.583731494 +0000
+@@ -15,7 +15,7 @@
+ 		return filepath.Join(configHome, "docker/plugins")
+ 	}
  
--	err := os.MkdirAll("/etc/docker/plugins", 0755)
-+	err := os.MkdirAll("@TERMUX_PREFIX@/etc/docker/plugins", 0755)
- 	assert.NilError(t, err)
- 
--	fileName := fmt.Sprintf("/etc/docker/plugins/%s.spec", testAuthZPlugin)
-+	fileName := fmt.Sprintf("@TERMUX_PREFIX@/etc/docker/plugins/%s.spec", testAuthZPlugin)
- 	err = os.WriteFile(fileName, []byte(server.URL), 0644)
- 	assert.NilError(t, err)
- 
- 	return func() {
--		err := os.RemoveAll("/etc/docker/plugins")
-+		err := os.RemoveAll("@TERMUX_PREFIX@/etc/docker/plugins")
- 		assert.NilError(t, err)
- 
- 		teardown()
-diff -ur ../v20.10.16.orig/moby/integration/plugin/graphdriver/external_test.go ./moby/integration/plugin/graphdriver/external_test.go
---- ../v20.10.16.orig/moby/integration/plugin/graphdriver/external_test.go	2023-08-30 21:43:39.000000000 +0000
-+++ ./moby/integration/plugin/graphdriver/external_test.go	2023-10-13 12:38:55.950433038 +0000
-@@ -79,7 +79,7 @@
- 
- 	sserver.Close()
- 	jserver.Close()
--	err := os.RemoveAll("/etc/docker/plugins")
-+	err := os.RemoveAll("@TERMUX_PREFIX@/etc/docker/plugins")
- 	assert.NilError(t, err)
+-	return "/etc/docker/plugins"
++	return "@TERMUX_PREFIX@/etc/docker/plugins"
  }
  
-@@ -344,10 +344,10 @@
- 		respond(w, &graphDriverResponse{Size: size})
- 	})
+ func rootlessLibPluginsPath() string {
+@@ -24,7 +24,7 @@
+ 		return filepath.Join(libHome, "docker/plugins")
+ 	}
  
--	err = os.MkdirAll("/etc/docker/plugins", 0755)
-+	err = os.MkdirAll("@TERMUX_PREFIX@/etc/docker/plugins", 0755)
- 	assert.NilError(t, err)
- 
--	specFile := "/etc/docker/plugins/" + name + "." + ext
-+	specFile := "@TERMUX_PREFIX@/etc/docker/plugins/" + name + "." + ext
- 	err = os.WriteFile(specFile, b, 0644)
- 	assert.NilError(t, err)
- }
-diff -ur ../v20.10.16.orig/moby/integration/plugin/logging/cmd/close_on_start/main.go ./moby/integration/plugin/logging/cmd/close_on_start/main.go
---- ../v20.10.16.orig/moby/integration/plugin/logging/cmd/close_on_start/main.go	2023-08-30 21:43:39.000000000 +0000
-+++ ./moby/integration/plugin/logging/cmd/close_on_start/main.go	2023-10-13 12:38:55.840432731 +0000
-@@ -14,7 +14,7 @@
+-	return "/usr/lib/docker/plugins"
++	return "@TERMUX_PREFIX@/lib/docker/plugins"
  }
  
- func main() {
--	l, err := net.Listen("unix", "/run/docker/plugins/plugin.sock")
-+	l, err := net.Listen("unix", "@TERMUX_PREFIX@/var/run/docker/plugins/plugin.sock")
- 	if err != nil {
- 		panic(err)
- 	}
-diff -ur ../v20.10.16.orig/moby/integration/plugin/logging/cmd/discard/main.go ./moby/integration/plugin/logging/cmd/discard/main.go
---- ../v20.10.16.orig/moby/integration/plugin/logging/cmd/discard/main.go	2023-08-30 21:43:39.000000000 +0000
-+++ ./moby/integration/plugin/logging/cmd/discard/main.go	2023-10-13 12:38:55.840432731 +0000
-@@ -7,7 +7,7 @@
- )
- 
- func main() {
--	l, err := net.Listen("unix", "/run/docker/plugins/plugin.sock")
-+	l, err := net.Listen("unix", "@TERMUX_PREFIX@/var/run/docker/plugins/plugin.sock")
- 	if err != nil {
- 		panic(err)
- 	}
-diff -ur ../v20.10.16.orig/moby/integration/plugin/logging/cmd/dummy/main.go ./moby/integration/plugin/logging/cmd/dummy/main.go
---- ../v20.10.16.orig/moby/integration/plugin/logging/cmd/dummy/main.go	2023-08-30 21:43:39.000000000 +0000
-+++ ./moby/integration/plugin/logging/cmd/dummy/main.go	2023-10-13 12:38:55.840432731 +0000
-@@ -7,7 +7,7 @@
- )
- 
- func main() {
--	l, err := net.Listen("unix", "/run/docker/plugins/plugin.sock")
-+	l, err := net.Listen("unix", "@TERMUX_PREFIX@/var/run/docker/plugins/plugin.sock")
- 	if err != nil {
- 		panic(err)
- 	}
-diff -ur ../v20.10.16.orig/moby/integration/plugin/volumes/cmd/dummy/main.go ./moby/integration/plugin/volumes/cmd/dummy/main.go
---- ../v20.10.16.orig/moby/integration/plugin/volumes/cmd/dummy/main.go	2023-08-30 21:43:39.000000000 +0000
-+++ ./moby/integration/plugin/volumes/cmd/dummy/main.go	2023-10-13 12:38:55.840432731 +0000
-@@ -7,7 +7,7 @@
- )
- 
- func main() {
--	l, err := net.Listen("unix", "/run/docker/plugins/plugin.sock")
-+	l, err := net.Listen("unix", "@TERMUX_PREFIX@/var/run/docker/plugins/plugin.sock")
- 	if err != nil {
- 		panic(err)
- 	}
-diff -ur ../v20.10.16.orig/moby/integration-cli/docker_cli_daemon_test.go ./moby/integration-cli/docker_cli_daemon_test.go
---- ../v20.10.16.orig/moby/integration-cli/docker_cli_daemon_test.go	2023-08-30 21:43:39.000000000 +0000
-+++ ./moby/integration-cli/docker_cli_daemon_test.go	2023-10-13 12:38:55.743765794 +0000
-@@ -558,11 +558,11 @@
- 
- func (s *DockerDaemonSuite) TestDaemonKeyGeneration(c *testing.T) {
- 	// TODO: skip or update for Windows daemon
--	os.Remove("/etc/docker/key.json")
-+	os.Remove("@TERMUX_PREFIX@/etc/docker/key.json")
- 	s.d.Start(c)
- 	s.d.Stop(c)
- 
--	k, err := libtrust.LoadKeyFile("/etc/docker/key.json")
-+	k, err := libtrust.LoadKeyFile("@TERMUX_PREFIX@/etc/docker/key.json")
- 	if err != nil {
- 		c.Fatalf("Error opening key file")
- 	}
-@@ -1194,12 +1194,12 @@
- 		Y   string `json:"y"`
+ // SpecsPaths returns
+@@ -37,5 +37,5 @@
+ 		return []string{rootlessConfigPluginsPath(), rootlessLibPluginsPath()}
  	}
  
--	os.Remove("/etc/docker/key.json")
-+	os.Remove("@TERMUX_PREFIX@/etc/docker/key.json")
- 	s.d.Start(c)
- 	s.d.Stop(c)
- 
- 	config := &Config{}
--	bytes, err := os.ReadFile("/etc/docker/key.json")
-+	bytes, err := os.ReadFile("@TERMUX_PREFIX@/etc/docker/key.json")
- 	if err != nil {
- 		c.Fatalf("Error reading key.json file: %s", err)
- 	}
-@@ -1219,11 +1219,11 @@
- 	}
- 
- 	// write back
--	if err := os.WriteFile("/etc/docker/key.json", newBytes, 0400); err != nil {
-+	if err := os.WriteFile("@TERMUX_PREFIX@/etc/docker/key.json", newBytes, 0400); err != nil {
- 		c.Fatalf("Error os.WriteFile: %s", err)
- 	}
- 
--	defer os.Remove("/etc/docker/key.json")
-+	defer os.Remove("@TERMUX_PREFIX@/etc/docker/key.json")
- 
- 	if err := s.d.StartWithError(); err == nil {
- 		c.Fatalf("It should not be successful to start daemon with wrong key: %v", err)
-diff -ur ../v20.10.16.orig/moby/integration-cli/docker_cli_external_volume_driver_test.go ./moby/integration-cli/docker_cli_external_volume_driver_test.go
---- ../v20.10.16.orig/moby/integration-cli/docker_cli_external_volume_driver_test.go	2023-08-30 21:43:39.000000000 +0000
-+++ ./moby/integration-cli/docker_cli_external_volume_driver_test.go	2023-10-13 12:38:55.743765794 +0000
-@@ -257,10 +257,10 @@
- 		send(w, `{"Capabilities": { "Scope": "global" }}`)
- 	})
- 
--	err := os.MkdirAll("/etc/docker/plugins", 0755)
-+	err := os.MkdirAll("@TERMUX_PREFIX@/etc/docker/plugins", 0755)
- 	assert.NilError(c, err)
- 
--	err = os.WriteFile("/etc/docker/plugins/"+name+".spec", []byte(s.Server.URL), 0644)
-+	err = os.WriteFile("@TERMUX_PREFIX@/etc/docker/plugins/"+name+".spec", []byte(s.Server.URL), 0644)
- 	assert.NilError(c, err)
- 	return s
+-	return []string{"/etc/docker/plugins", "/usr/lib/docker/plugins"}
++	return []string{"@TERMUX_PREFIX@/etc/docker/plugins", "@TERMUX_PREFIX@/lib/docker/plugins"}
  }
-@@ -268,7 +268,7 @@
- func (s *DockerExternalVolumeSuite) TearDownSuite(c *testing.T) {
- 	s.volumePlugin.Close()
+diff -ur ../src.orig/moby/registry/config_unix.go ./moby/registry/config_unix.go
+--- ../src.orig/moby/registry/config_unix.go	2023-08-29 19:14:17.000000000 +0000
++++ ./moby/registry/config_unix.go	2023-10-15 10:03:57.087162563 +0000
+@@ -6,7 +6,7 @@
+ // defaultCertsDir is the platform-specific default directory where certificates
+ // are stored. On Linux, it may be overridden through certsDir, for example, when
+ // running in rootless mode.
+-const defaultCertsDir = "/etc/docker/certs.d"
++const defaultCertsDir = "@TERMUX_PREFIX@/etc/docker/certs.d"
  
--	err := os.RemoveAll("/etc/docker/plugins")
-+	err := os.RemoveAll("@TERMUX_PREFIX@/etc/docker/plugins")
- 	assert.NilError(c, err)
- }
- 
-@@ -358,7 +358,7 @@
- 
- // Make sure a request to use a down driver doesn't block other requests
- func (s *DockerExternalVolumeSuite) TestExternalVolumeDriverLookupNotBlocked(c *testing.T) {
--	specPath := "/etc/docker/plugins/down-driver.spec"
-+	specPath := "@TERMUX_PREFIX@/etc/docker/plugins/down-driver.spec"
- 	err := os.WriteFile(specPath, []byte("tcp://127.0.0.7:9999"), 0644)
- 	assert.NilError(c, err)
- 	defer os.RemoveAll(specPath)
-diff -ur ../v20.10.16.orig/moby/integration-cli/docker_cli_network_unix_test.go ./moby/integration-cli/docker_cli_network_unix_test.go
---- ../v20.10.16.orig/moby/integration-cli/docker_cli_network_unix_test.go	2023-08-30 21:43:39.000000000 +0000
-+++ ./moby/integration-cli/docker_cli_network_unix_test.go	2023-10-13 12:38:55.743765794 +0000
-@@ -196,14 +196,14 @@
+ // cleanPath is used to ensure that a directory name is valid on the target
+ // platform. It will be passed in something *similar* to a URL such as
+diff -ur ../src.orig/moby/registry/endpoint_v1.go ./moby/registry/endpoint_v1.go
+--- ../src.orig/moby/registry/endpoint_v1.go	2023-08-29 19:14:17.000000000 +0000
++++ ./moby/registry/endpoint_v1.go	2023-10-15 10:04:25.853913718 +0000
+@@ -63,7 +63,7 @@
+ 		if endpoint.IsSecure {
+ 			// If registry is secure and HTTPS failed, show user the error and tell them about `--insecure-registry`
+ 			// in case that's what they need. DO NOT accept unknown CA certificates, and DO NOT fallback to HTTP.
+-			return invalidParamf("invalid registry endpoint %s: %v. If this private registry supports only HTTP or HTTPS with an unknown CA certificate, please add `--insecure-registry %s` to the daemon's arguments. In the case of HTTPS, if you have access to the registry's CA certificate, no need for the flag; simply place the CA certificate at /etc/docker/certs.d/%s/ca.crt", endpoint, err, endpoint.URL.Host, endpoint.URL.Host)
++			return invalidParamf("invalid registry endpoint %s: %v. If this private registry supports only HTTP or HTTPS with an unknown CA certificate, please add `--insecure-registry %s` to the daemon's arguments. In the case of HTTPS, if you have access to the registry's CA certificate, no need for the flag; simply place the CA certificate at @TERMUX_PREFIX@/etc/docker/certs.d/%s/ca.crt", endpoint, err, endpoint.URL.Host, endpoint.URL.Host)
  		}
- 	})
  
--	err := os.MkdirAll("/etc/docker/plugins", 0755)
-+	err := os.MkdirAll("@TERMUX_PREFIX@/etc/docker/plugins", 0755)
- 	assert.NilError(c, err)
+ 		// If registry is insecure and HTTPS failed, fallback to HTTP.
+--- ./moby/daemon/config/config_linux.go.orig	2023-10-15 12:14:20.361907078 +0000
++++ ./moby/daemon/config/config_linux.go	2023-10-15 12:14:57.242040016 +0000
+@@ -232,9 +232,9 @@
+ 		cfg.ExecRoot = filepath.Join(runtimeDir, "docker")
+ 		cfg.Pidfile = filepath.Join(runtimeDir, "docker.pid")
+ 	} else {
+-		cfg.Root = "/var/lib/docker"
+-		cfg.ExecRoot = "/var/run/docker"
+-		cfg.Pidfile = "/var/run/docker.pid"
++		cfg.Root = "@TERMUX_PREFIX@/var/lib/docker"
++		cfg.ExecRoot = "@TERMUX_PREFIX@/var/run/docker"
++		cfg.Pidfile = "@TERMUX_PREFIX@/var/run/docker.pid"
+ 	}
  
--	fileName := fmt.Sprintf("/etc/docker/plugins/%s.spec", netDrv)
-+	fileName := fmt.Sprintf("@TERMUX_PREFIX@/etc/docker/plugins/%s.spec", netDrv)
- 	err = os.WriteFile(fileName, []byte(url), 0644)
- 	assert.NilError(c, err)
- 
--	ipamFileName := fmt.Sprintf("/etc/docker/plugins/%s.spec", ipamDrv)
-+	ipamFileName := fmt.Sprintf("@TERMUX_PREFIX@/etc/docker/plugins/%s.spec", ipamDrv)
- 	err = os.WriteFile(ipamFileName, []byte(url), 0644)
- 	assert.NilError(c, err)
- }
-@@ -215,7 +215,7 @@
- 
- 	s.server.Close()
- 
--	err := os.RemoveAll("/etc/docker/plugins")
-+	err := os.RemoveAll("@TERMUX_PREFIX@/etc/docker/plugins")
- 	assert.NilError(c, err)
- }
- 
-diff -ur ../v20.10.16.orig/moby/integration-cli/docker_cli_swarm_test.go ./moby/integration-cli/docker_cli_swarm_test.go
---- ../v20.10.16.orig/moby/integration-cli/docker_cli_swarm_test.go	2023-08-30 21:43:39.000000000 +0000
-+++ ./moby/integration-cli/docker_cli_swarm_test.go	2023-10-13 12:38:55.743765794 +0000
-@@ -776,14 +776,14 @@
- 		}
- 	})
- 
--	err := os.MkdirAll("/etc/docker/plugins", 0755)
-+	err := os.MkdirAll("@TERMUX_PREFIX@/etc/docker/plugins", 0755)
- 	assert.NilError(c, err)
- 
--	fileName := fmt.Sprintf("/etc/docker/plugins/%s.spec", netDrv)
-+	fileName := fmt.Sprintf("@TERMUX_PREFIX@/etc/docker/plugins/%s.spec", netDrv)
- 	err = os.WriteFile(fileName, []byte(url), 0644)
- 	assert.NilError(c, err)
- 
--	ipamFileName := fmt.Sprintf("/etc/docker/plugins/%s.spec", ipamDrv)
-+	ipamFileName := fmt.Sprintf("@TERMUX_PREFIX@/etc/docker/plugins/%s.spec", ipamDrv)
- 	err = os.WriteFile(ipamFileName, []byte(url), 0644)
- 	assert.NilError(c, err)
- }
-@@ -795,7 +795,7 @@
- 	setupRemoteGlobalNetworkPlugin(c, mux, s.server.URL, globalNetworkPlugin, globalIPAMPlugin)
- 	defer func() {
- 		s.server.Close()
--		err := os.RemoveAll("/etc/docker/plugins")
-+		err := os.RemoveAll("@TERMUX_PREFIX@/etc/docker/plugins")
- 		assert.NilError(c, err)
- 	}()
- 
-diff -ur ../v20.10.16.orig/moby/pkg/plugins/discovery.go ./moby/pkg/plugins/discovery.go
---- ../v20.10.16.orig/moby/pkg/plugins/discovery.go	2023-08-30 21:43:39.000000000 +0000
-+++ ./moby/pkg/plugins/discovery.go	2023-10-13 12:38:55.840432731 +0000
-@@ -16,7 +16,7 @@
- var (
- 	// ErrNotFound plugin not found
- 	ErrNotFound = errors.New("plugin not found")
--	socketsPath = "/run/docker/plugins"
-+	socketsPath = "@TERMUX_PREFIX@/var/run/docker/plugins"
+ 	return nil
+--- ../src.orig/libnetwork/cmd/dnet/dnet.go	2023-07-24 09:20:29.000000000 +0000
++++ ./libnetwork/cmd/dnet/dnet.go	2023-10-15 12:24:24.423989925 +0000
+@@ -45,9 +45,9 @@
+ 	// DefaultHTTPPort is the default http port used by dnet
+ 	DefaultHTTPPort = 2385
+ 	// DefaultUnixSocket exported
+-	DefaultUnixSocket = "/var/run/dnet.sock"
++	DefaultUnixSocket = "@TERMUX_PREFIX@/var/run/dnet.sock"
+ 	cfgFileEnv        = "LIBNETWORK_CFG"
+-	defaultCfgFile    = "/etc/default/libnetwork.toml"
++	defaultCfgFile    = "@TERMUX_PREFIX@/etc/default/libnetwork.toml"
+ 	defaultHeartbeat  = time.Duration(10) * time.Second
+ 	ttlFactor         = 2
  )
+@@ -408,11 +408,11 @@
+ 		fmt.Fprint(w, "null")
+ 	})
  
- // localRegistry defines a registry that is local (using unix socket).
-diff -ur ../v20.10.16.orig/moby/pkg/plugins/discovery_unix.go ./moby/pkg/plugins/discovery_unix.go
---- ../v20.10.16.orig/moby/pkg/plugins/discovery_unix.go	2023-08-30 21:43:39.000000000 +0000
-+++ ./moby/pkg/plugins/discovery_unix.go	2023-10-13 12:38:55.743765794 +0000
-@@ -3,4 +3,4 @@
+-	if err := os.MkdirAll("/etc/docker/plugins", 0755); err != nil {
++	if err := os.MkdirAll("@TERMUX_PREFIX@/etc/docker/plugins", 0755); err != nil {
+ 		return err
+ 	}
+ 
+-	return ioutil.WriteFile("/etc/docker/plugins/test.spec", []byte(server.URL), 0644)
++	return ioutil.WriteFile("@TERMUX_PREFIX@/etc/docker/plugins/test.spec", []byte(server.URL), 0644)
+ }
+ 
+ func newDnetConnection(val string) (*dnetConnection, error) {
+--- ../src.orig/libnetwork/vendor/github.com/docker/docker/pkg/plugins/discovery_unix.go	2023-07-24 09:20:29.000000000 +0000
++++ ./libnetwork/vendor/github.com/docker/docker/pkg/plugins/discovery_unix.go	2023-10-15 15:24:26.488911057 +0000
+@@ -2,4 +2,4 @@
  
  package plugins // import "github.com/docker/docker/pkg/plugins"
  
 -var specsPaths = []string{"/etc/docker/plugins", "/usr/lib/docker/plugins"}
-+var specsPaths = []string{"@TERMUX_PREFIX@/etc/docker/plugins", "/usr/lib/docker/plugins"}
-diff -ur ../v20.10.16.orig/moby/pkg/plugins/plugins.go ./moby/pkg/plugins/plugins.go
---- ../v20.10.16.orig/moby/pkg/plugins/plugins.go	2023-08-30 21:43:39.000000000 +0000
-+++ ./moby/pkg/plugins/plugins.go	2023-10-13 12:38:55.840432731 +0000
-@@ -3,8 +3,8 @@
- //
- // Docker discovers plugins by looking for them in the plugin directory whenever
- // a user or container tries to use one by name. UNIX domain socket files must
--// be located under /run/docker/plugins, whereas spec files can be located
--// either under /etc/docker/plugins or /usr/lib/docker/plugins. This is handled
-+// be located under @TERMUX_PREFIX@/var/run/docker/plugins, whereas spec files can be located
-+// either under @TERMUX_PREFIX@/etc/docker/plugins or /usr/lib/docker/plugins. This is handled
- // by the Registry interface, which lets you list all plugins or get a plugin by
- // its name if it exists.
- //
-diff -ur ../v20.10.16.orig/moby/plugin/v2/plugin.go ./moby/plugin/v2/plugin.go
---- ../v20.10.16.orig/moby/plugin/v2/plugin.go	2023-08-30 21:43:39.000000000 +0000
-+++ ./moby/plugin/v2/plugin.go	2023-10-13 12:38:55.840432731 +0000
-@@ -34,7 +34,7 @@
- 	addr           net.Addr
- }
++var specsPaths = []string{"@TERMUX_PREFIX@/etc/docker/plugins", "@TERMUX_PREFIX@/lib/docker/plugins"}
+--- ../src.orig/moby/vendor/github.com/containerd/containerd/defaults/defaults_unix.go	2023-08-29 19:14:17.000000000 +0000
++++ ./moby/vendor/github.com/containerd/containerd/defaults/defaults_unix.go	2023-10-15 15:35:57.440889933 +0000
+@@ -22,19 +22,19 @@
+ const (
+ 	// DefaultRootDir is the default location used by containerd to store
+ 	// persistent data
+-	DefaultRootDir = "/var/lib/containerd"
++	DefaultRootDir = "@TERMUX_PREFIX@/var/lib/containerd"
+ 	// DefaultStateDir is the default location used by containerd to store
+ 	// transient data
+-	DefaultStateDir = "/run/containerd"
++	DefaultStateDir = "@TERMUX_PREFIX@/var/run/containerd"
+ 	// DefaultAddress is the default unix socket address
+-	DefaultAddress = "/run/containerd/containerd.sock"
++	DefaultAddress = "@TERMUX_PREFIX@/var/run/containerd/containerd.sock"
+ 	// DefaultDebugAddress is the default unix socket address for pprof data
+-	DefaultDebugAddress = "/run/containerd/debug.sock"
++	DefaultDebugAddress = "@TERMUX_PREFIX@/var/run/containerd/debug.sock"
+ 	// DefaultFIFODir is the default location used by client-side cio library
+ 	// to store FIFOs.
+-	DefaultFIFODir = "/run/containerd/fifo"
++	DefaultFIFODir = "@TERMUX_PREFIX@/var/run/containerd/fifo"
+ 	// DefaultRuntime is the default linux runtime
+ 	DefaultRuntime = "io.containerd.runc.v2"
+ 	// DefaultConfigDir is the default location for config files.
+-	DefaultConfigDir = "/etc/containerd"
++	DefaultConfigDir = "@TERMUX_PREFIX@/etc/containerd"
+ )
+--- ../src.orig/moby/libnetwork/sandbox_dns_unix.go	2023-10-15 12:18:16.389408457 +0000
++++ ./moby/libnetwork/sandbox_dns_unix.go	2023-10-15 15:42:18.478461451 +0000
+@@ -20,7 +20,7 @@
+ )
  
--const defaultPluginRuntimeDestination = "/run/docker/plugins"
-+const defaultPluginRuntimeDestination = "@TERMUX_PREFIX@/var/run/docker/plugins"
+ const (
+-	defaultPrefix = "/var/lib/docker/network/files"
++	defaultPrefix = "@TERMUX_PREFIX@/var/lib/docker/network/files"
+ 	dirPerm       = 0o755
+ 	filePerm      = 0o644
+ )
+--- ../src.orig/moby/libnetwork/datastore/datastore.go	2023-08-29 19:14:17.000000000 +0000
++++ ./moby/libnetwork/datastore/datastore.go	2023-10-15 15:41:27.971678453 +0000
+@@ -119,7 +119,7 @@
+ 	// SwarmScope is not indicating a datastore location. It is defined here
+ 	// along with the other two scopes just for consistency.
+ 	SwarmScope    = "swarm"
+-	defaultPrefix = "/var/lib/docker/network/files"
++	defaultPrefix = "@TERMUX_PREFIX@/var/lib/docker/network/files"
+ )
  
- // ErrInadequateCapability indicates that the plugin did not have the requested capability.
- type ErrInadequateCapability struct {
-diff -ur ../v20.10.16.orig/moby/registry/config_unix.go ./moby/registry/config_unix.go
---- ../v20.10.16.orig/moby/registry/config_unix.go	2023-08-30 21:43:39.000000000 +0000
-+++ ./moby/registry/config_unix.go	2023-10-13 12:38:55.747099138 +0000
-@@ -12,7 +12,7 @@
+ const (
+--- ../src.orig/moby/libnetwork/osl/namespace_linux.go	2023-08-29 19:14:17.000000000 +0000
++++ ./moby/libnetwork/osl/namespace_linux.go	2023-10-15 15:39:22.891386251 +0000
+@@ -23,7 +23,7 @@
+ 	"golang.org/x/sys/unix"
+ )
  
- // CertsDir is the directory where certificates are stored
- func CertsDir() string {
--	d := "/etc/docker/certs.d"
-+	d := "@TERMUX_PREFIX@/etc/docker/certs.d"
+-const defaultPrefix = "/var/run/docker"
++const defaultPrefix = "@TERMUX_PREFIX@/var/run/docker"
  
- 	if rootless.RunningWithRootlessKit() {
- 		configHome, err := homedir.GetConfigHome()
-diff -ur ../v20.10.16.orig/moby/registry/endpoint_v1.go ./moby/registry/endpoint_v1.go
---- ../v20.10.16.orig/moby/registry/endpoint_v1.go	2023-08-30 21:43:39.000000000 +0000
-+++ ./moby/registry/endpoint_v1.go	2023-10-13 12:38:55.747099138 +0000
-@@ -49,7 +49,7 @@
- 		if endpoint.IsSecure {
- 			// If registry is secure and HTTPS failed, show user the error and tell them about `--insecure-registry`
- 			// in case that's what they need. DO NOT accept unknown CA certificates, and DO NOT fallback to HTTP.
--			return fmt.Errorf("invalid registry endpoint %s: %v. If this private registry supports only HTTP or HTTPS with an unknown CA certificate, please add `--insecure-registry %s` to the daemon's arguments. In the case of HTTPS, if you have access to the registry's CA certificate, no need for the flag; simply place the CA certificate at /etc/docker/certs.d/%s/ca.crt", endpoint, err, endpoint.URL.Host, endpoint.URL.Host)
-+			return fmt.Errorf("invalid registry endpoint %s: %v. If this private registry supports only HTTP or HTTPS with an unknown CA certificate, please add `--insecure-registry %s` to the daemon's arguments. In the case of HTTPS, if you have access to the registry's CA certificate, no need for the flag; simply place the CA certificate at @TERMUX_PREFIX@/etc/docker/certs.d/%s/ca.crt", endpoint, err, endpoint.URL.Host, endpoint.URL.Host)
- 		}
+ func init() {
+ 	// Lock main() to the initial thread to exclude the goroutines spawned
+--- ../src.orig/libnetwork/osl/namespace_linux.go	2023-07-24 09:20:29.000000000 +0000
++++ ./libnetwork/osl/namespace_linux.go	2023-10-15 15:50:42.480754012 +0000
+@@ -23,7 +23,7 @@
+ 	"github.com/vishvananda/netns"
+ )
  
- 		// If registry is insecure and HTTPS failed, fallback to HTTP.
---- ./cli/opts/hosts.go.orig	2023-10-14 14:17:30.958200718 +0000
-+++ ./cli/opts/hosts.go	2023-10-14 14:17:42.821512899 +0000
-@@ -17,7 +17,7 @@
- 	defaultTLSHTTPPort = "2376" // Default TLS encrypted HTTP Port
- 	// defaultUnixSocket Path for the unix socket.
- 	// Docker daemon by default always listens on the default unix socket
--	defaultUnixSocket = "/var/run/docker.sock"
-+	defaultUnixSocket = "@TERMUX_PREFIX@/var/run/docker.sock"
- 	// defaultTCPHost constant defines the default host string used by docker on Windows
- 	defaultTCPHost = "tcp://" + defaultHTTPHost + ":" + defaultHTTPPort
- 	// DefaultTLSHost constant defines the default host string used by docker for TLS sockets
+-const defaultPrefix = "/var/run/docker"
++const defaultPrefix = "@TERMUX_PREFIX@/var/run/docker"
+ 
+ func init() {
+ 	reexec.Register("set-ipv6", reexecSetIPv6)

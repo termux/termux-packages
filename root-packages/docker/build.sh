@@ -2,17 +2,15 @@ TERMUX_PKG_HOMEPAGE=https://docker.com
 TERMUX_PKG_DESCRIPTION="Set of products that use OS-level virtualization to deliver software in packages called containers."
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-# v20.10.x is the last version confirmed to work.
-# Do not update it further unless you tested it on your device.
-TERMUX_PKG_VERSION=1:20.10.26
+TERMUX_PKG_VERSION=1:24.0.6
 LIBNETWORK_COMMIT=67e0588f1ddfaf2faf4c8cae8b7ea2876434d91c
-DOCKER_GITCOMMIT=12df1c1
+DOCKER_GITCOMMIT=ed223bc
 TERMUX_PKG_SRCURL=(https://github.com/moby/moby/archive/v${TERMUX_PKG_VERSION:2}.tar.gz
                    https://github.com/docker/cli/archive/v${TERMUX_PKG_VERSION:2}.tar.gz
                    https://github.com/moby/libnetwork/archive/${LIBNETWORK_COMMIT}.tar.gz)
 TERMUX_PKG_DEPENDS="containerd, libdevmapper, resolv-conf"
-TERMUX_PKG_SHA256=(47315270a5f8c3274231be7f2ed86b5f081c80ee952d7fdab66065ca1e06871a
-                   73ed25a12dc9e470d8346030f6ca060ce8b28d821f3f3854b004e7e2ae60f2e6
+TERMUX_PKG_SHA256=(29a8ee54e9ea008b40eebca42dec8b67ab257eb8ac175f67e79c110e4187d7d2
+                   c1a4a580ced3633e489c5c9869a20198415da44df7023fdc200d425cdf5fa652
                    4ab6f6c97db834c2eedc053d06c4d32d268f33051b8148098b4a0e8eee51e97b)
 TERMUX_PKG_CONFFILES="etc/docker/daemon.json"
 TERMUX_PKG_SERVICE_SCRIPT=("dockerd" "exec su -c \"PATH=\$PATH $TERMUX_PREFIX/bin/dockerd 2>&1\"")
