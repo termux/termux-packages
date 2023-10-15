@@ -3,12 +3,14 @@ TERMUX_PKG_DESCRIPTION="Poppler Qt wrapper"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Please align the version with `poppler` package.
-TERMUX_PKG_VERSION=23.07.0
+TERMUX_PKG_VERSION="23.10.0"
 # Do not forget to bump revision of reverse dependencies and rebuild them
 # when SOVERSION is changed.
-_POPPLER_SOVERSION=130
+_POPPLER_SOVERSION=132
 TERMUX_PKG_SRCURL=https://poppler.freedesktop.org/poppler-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=f29b4b4bf47572611176454c8f21506d71d27eca5011a39aa44038b30b957db0
+TERMUX_PKG_SHA256=31a3dfdea79f4922402d313737415a44d44dc14d6b317f959a77c5bba0647dd9
+# The package must be updated at the same time as poppler, auto updater script does not support that.
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="libc++, poppler (>= ${TERMUX_PKG_VERSION}), qt5-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="boost, boost-headers, qt5-qtbase-cross-tools"
 #texlive needs the xpdf headers
@@ -35,7 +37,7 @@ termux_step_pre_configure() {
 	if [ "${sover_main}" != "${_POPPLER_SOVERSION}" ]; then
 		termux_error_exit "SOVERSION mismatch with \"poppler\" package."
 	fi
-	local sover_cmake=$(sed -En 's/^.*set_target_properties\(poppler PROPERTIES .* SOVERSION ([0-9]+).*$/\1/p' CMakeLists.txt)
+	local sover_cmake=$(sed -En 's/^set\(POPPLER_SOVERSION_NUMBER "([0-9]+)"\)$/\1/p' CMakeLists.txt)
 	if [ "${sover_cmake}" != "${_POPPLER_SOVERSION}" ]; then
 		termux_error_exit "SOVERSION guard check failed (CMakeLists.txt: \"${sover_cmake}\")."
 	fi
