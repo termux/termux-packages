@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://rizin.re
 TERMUX_PKG_DESCRIPTION="UNIX-like reverse engineering framework and command-line toolset"
-TERMUX_PKG_LICENSE="LGPL-3.0"
+TERMUX_PKG_LICENSE="GPL-3.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=v0.6.2
 TERMUX_PKG_BUILD_IN_SRC=true
