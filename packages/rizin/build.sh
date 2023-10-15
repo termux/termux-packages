@@ -40,7 +40,3 @@ termux_extract_src_archive() {
 	/data/data/com.termux/files/usr/bin/find "/data/data/com.termux/files/usr/bin/bin/" -type f -name 'rz-*' -exec /data/data/com.termux/files/usr/bin/chmod +x {} \;
 	/data/data/com.termux/files/usr/bin/find "/data/data/com.termux/files/usr/bin/bin/" -type f -name 'rizin' -exec /data/data/com.termux/files/usr/bin/chmod +x {} \;
 }
-
-termux_step_finish_build() {
-    export PATH="/data/data/com.termux/files/usr/bin/bin:/data/data/com.termux/files/usr/bin:$PATH"
-}
