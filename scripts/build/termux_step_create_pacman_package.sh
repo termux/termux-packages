@@ -99,7 +99,7 @@ termux_step_create_pacman_package() {
 		fi
 
 		if [ -n "$TERMUX_PKG_CONFFILES" ]; then
-			tr ',' '\n' <<< "$TERMUX_PKG_CONFFILES" | awk '{ printf "backup = '"${TERMUX_PREFIX:1}"'/%s\n", $1 }'
+			tr ',' '\n' <<< "$TERMUX_PKG_CONFFILES" | awk '{ printf "backup = '"${TERMUX_PREFIX_CLASSICAL:1}"'/%s\n", $1 }'
 		fi
 
 		if [ -n "$TERMUX_PKG_GROUPS" ]; then
