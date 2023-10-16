@@ -28,7 +28,7 @@ diff -u -r ../orig-src/llvm/lib/Support/Unix/Path.inc ./llvm/lib/Support/Unix/Pa
 +        nread = getdelim(&cmd, &len, '\0', cmdfile); // 2nd read to skip linker
 +        fclose(cmdfile);
 +        if (nread > 0) {
-+          if (char *real_path = realpath(cmd, nullptr)) {
++          if (real_path = realpath(cmd, nullptr)) {
 +            free(cmd);
 +            std::string ret = std::string(real_path);
 +            free(real_path);
