@@ -42,7 +42,7 @@ termux_step_create_debian_package() {
 	echo "Description: $TERMUX_PKG_DESCRIPTION" >> DEBIAN/control
 
 	# Create DEBIAN/conffiles (see https://www.debian.org/doc/debian-policy/ap-pkg-conffiles.html):
-	for f in $TERMUX_PKG_CONFFILES; do echo "$TERMUX_PREFIX/$f" >> DEBIAN/conffiles; done
+	for f in $TERMUX_PKG_CONFFILES; do echo "$TERMUX_PREFIX_CLASSICAL/$f" >> DEBIAN/conffiles; done
 
 	# Allow packages to create arbitrary control files.
 	# XXX: Should be done in a better way without a function?

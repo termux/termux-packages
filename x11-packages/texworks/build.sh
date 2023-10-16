@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_LICENSE_FILE="COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.6.8"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/TeXworks/texworks/archive/refs/tags/release-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=9fa2aa69bb34951d3249ea607ce3689b6fff9e1f31e353bd1a1cfe33dc995837
 TERMUX_PKG_DEPENDS="hunspell, libc++, liblua53, poppler-qt, qt5-qtbase, qt5-qtdeclarative, qt5-qtscript, zlib"
