@@ -1,7 +1,7 @@
 diff -u -r ../orig-src/llvm/lib/Support/Unix/Path.inc ./llvm/lib/Support/Unix/Path.inc
 --- ../orig-src/llvm/lib/Support/Unix/Path.inc	2023-09-29 21:36:47.056335287 +0000
 +++ ./llvm/lib/Support/Unix/Path.inc	2023-09-29 21:40:31.091417185 +0000
-@@ -250,6 +250,45 @@
+@@ -250,6 +250,44 @@
    // If we don't have procfs mounted, fall back to argv[0]
    if (getprogpath(exe_path, argv0) != NULL)
      return exe_path;
@@ -9,11 +9,11 @@ diff -u -r ../orig-src/llvm/lib/Support/Unix/Path.inc ./llvm/lib/Support/Unix/Pa
 +  if (char *real_path = realpath("/proc/self/exe", nullptr)) {
 +    if (char *real_linker_path = realpath(
 +#ifdef __LP64__
-+           "/system/bin/linker64",
++            "/system/bin/linker64",
 +#else
 +            "/system/bin/linker",
 +#endif
-+           nullptr)) {
++            nullptr)) {
 +      if (strcmp(real_path, real_linker_path) != 0) {
 +        free(real_linker_path);
 +        std::string ret = std::string(real_path);
@@ -38,8 +38,7 @@ diff -u -r ../orig-src/llvm/lib/Support/Unix/Path.inc ./llvm/lib/Support/Unix/Pa
 +        }
 +        free(cmd);
 +      }
-+    }
-+    free(real_path);
++    } else free(real_path);
 +  }
 +  // Fall back to the classical detection.
 +  char exe_path[PATH_MAX];
