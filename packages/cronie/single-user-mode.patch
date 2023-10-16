@@ -1,29 +1,30 @@
 diff -uNr cronie-1.5.7/src/cron.c cronie-1.5.7.mod/src/cron.c
 --- cronie-1.5.7/src/cron.c	2021-01-22 11:29:39.000000000 +0000
 +++ cronie-1.5.7.mod/src/cron.c	2021-05-03 18:37:15.040789324 +0000
-@@ -186,7 +186,9 @@
+@@ -188,7 +188,9 @@
  	fprintf(stderr, " -p         permit any crontab\n");
  	fprintf(stderr, " -P         inherit PATH from environment instead of using default value");
- 	fprintf(stderr, "            of \"%s\"\n", _PATH_DEFPATH);
+ 	fprintf(stderr, "            of \"%s\"\n", _PATH_STDPATH);
 +#ifndef __ANDROID__
  	fprintf(stderr, " -c         enable clustering support\n");
 +#endif
  	fprintf(stderr, " -s         log into syslog instead of sending mails\n");
  	fprintf(stderr, " -V         print version and exit\n");
  	fprintf(stderr, " -x <flag>  print debug information\n");
-@@ -691,7 +693,11 @@
+@@ -699,7 +701,11 @@
  static void parse_args(int argc, char *argv[]) {
  	int argch;
  
+-	while (-1 != (argch = getopt(argc, argv, "hnfpsiPx:m:cV"))) {
 +#ifdef __ANDROID__
 +	while (-1 != (argch = getopt(argc, argv, "hnfpsiPx:m:V"))) {
 +#else
- 	while (-1 != (argch = getopt(argc, argv, "hnfpsiPx:m:cV"))) {
++ 	while (-1 != (argch = getopt(argc, argv, "hnfpsiPx:m:cV"))) {
 +#endif
  		switch (argch) {
  			case 'x':
  				if (!set_debug_flags(optarg))
-@@ -716,9 +722,11 @@
+@@ -724,9 +730,11 @@
  			case 'm':
  				strncpy(MailCmd, optarg, MAX_COMMAND);
  				break;
