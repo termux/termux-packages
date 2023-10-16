@@ -48,6 +48,7 @@ PACKAGES+=" scons"
 # Used to generate package documentation.
 PACKAGES+=" asciidoc"
 PACKAGES+=" asciidoctor"
+PACKAGES+=" go-md2man"
 PACKAGES+=" groff"
 PACKAGES+=" help2man"
 PACKAGES+=" pandoc"

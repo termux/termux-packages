@@ -2,9 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://gi.readthedocs.io/
 TERMUX_PKG_DESCRIPTION="Uniform machine readable API"
 TERMUX_PKG_LICENSE="LGPL-2.0, GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.76.1
+TERMUX_PKG_VERSION="1.78.1"
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/gobject-introspection/${TERMUX_PKG_VERSION%.*}/gobject-introspection-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=196178bf64345501dcdc4d8469b36aa6fe80489354efe71cb7cb8ab82a3738bf
+TERMUX_PKG_SHA256=bd7babd99af7258e76819e45ba4a6bc399608fe762d83fde3cac033c50841bb4
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="glib, libffi"
 TERMUX_PKG_SUGGESTS="g-ir-scanner"
 TERMUX_PKG_DISABLE_GIR=false
@@ -36,4 +37,16 @@ termux_step_pre_configure() {
 		-I$TERMUX_PREFIX/include/python${TERMUX_PYTHON_VERSION}
 		-I$TERMUX_PREFIX/include/python${TERMUX_PYTHON_VERSION}/cpython
 		"
+}
+
+termux_pkg_auto_update() {
+	local LATEST_VERSION="$(termux_repology_api_get_latest_version "${TERMUX_PKG_NAME}")"
+	if [[ "$LATEST_VERSION" == "null" ]]; then
+		echo "INFO: Already up to date."
+		return 0
+	fi
+	if termux_pkg_is_update_needed "${TERMUX_PKG_VERSION#*:}" "${LATEST_VERSION}"; then
+		mv "$TERMUX_PKG_BUILDER_DIR/gir/${TERMUX_PKG_VERSION##*:}" "$TERMUX_PKG_BUILDER_DIR/gir/${LATEST_VERSION##*:}"
+	fi
+	termux_repology_auto_update
 }
