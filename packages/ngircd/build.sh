@@ -6,6 +6,8 @@ TERMUX_PKG_VERSION=26.1
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL="https://github.com/ngircd/ngircd/releases/download/rel-${TERMUX_PKG_VERSION}/ngircd-26.tar.xz"
 TERMUX_PKG_SHA256=56dcc6483058699fcdd8e54f5010eecee09824b93bad7ed5f18818e550d855c6
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_SED_REGEXP='s/^[^-]*-//;s/-.*//'
 TERMUX_PKG_DEPENDS="zlib, openssl"
 
 # Termux does not use /sbin. Place the binary to $PATH/bin instead
