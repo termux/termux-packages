@@ -6,6 +6,7 @@ TERMUX_PKG_SRCURL=git+https://git.gnunet.org/git/gnunet
 TERMUX_PKG_VERSION=0.19.4
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=e631013cb0672d245d5ad535729339d47d482984fa2a29edf8ade1ef46640464
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="libcurl, libgcrypt, libgnutls, libgpg-error, libidn2, libjansson, libltdl, libmicrohttpd, libsodium, libsqlite, libunistring, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_have_decl_struct_in6_ifreq=yes"

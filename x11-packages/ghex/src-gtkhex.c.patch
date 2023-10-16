@@ -1,0 +1,29 @@
++++ ghex/src/gtkhex.c
+@@ -1940,7 +1940,7 @@
+ 			ret = GDK_EVENT_STOP;
+ 			break;
+ 
+-		case GDK_KEY_Home:
++		case GDK_KEY_Home: {
+ 			gint64 line_beg = self->cursor_pos;
+ 
+ 			while (line_beg % self->cpl != 0)
+@@ -1949,8 +1949,9 @@
+ 			hex_widget_set_cursor (self, line_beg);
+ 			ret = GDK_EVENT_STOP;
+ 			break;
++		}
+ 
+-		case GDK_KEY_End:
++		case GDK_KEY_End: {
+ 			gint64 line_end = self->cursor_pos;
+ 
+ 			while (line_end % self->cpl != self->cpl - 1)
+@@ -1959,6 +1960,7 @@
+ 			hex_widget_set_cursor (self, MIN (line_end, payload_size));
+ 			ret = GDK_EVENT_STOP;
+ 			break;
++		}
+ 
+ 		default:
+ 			if (self->active_view == VIEW_HEX)
