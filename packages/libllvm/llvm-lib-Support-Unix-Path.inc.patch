@@ -1,7 +1,7 @@
 diff -u -r ../orig-src/llvm/lib/Support/Unix/Path.inc ./llvm/lib/Support/Unix/Path.inc
 --- ../orig-src/llvm/lib/Support/Unix/Path.inc	2023-09-29 21:36:47.056335287 +0000
 +++ ./llvm/lib/Support/Unix/Path.inc	2023-09-29 21:40:31.091417185 +0000
-@@ -250,6 +250,42 @@
+@@ -250,6 +250,46 @@
    // If we don't have procfs mounted, fall back to argv[0]
    if (getprogpath(exe_path, argv0) != NULL)
      return exe_path;
@@ -12,29 +12,33 @@ diff -u -r ../orig-src/llvm/lib/Support/Unix/Path.inc ./llvm/lib/Support/Unix/Pa
 +#define LINKERPATH "/system/bin/linker"
 +#endif
 +  if (char *real_path = realpath("/proc/self/exe", nullptr)) {
-+    if (strcmp(real_path, LINKERPATH) != 0) {
-+      std::string ret = std::string(real_path);
-+      free(real_path);
-+      return ret;
-+    }
-+    free(real_path);
-+  }
-+  if (FILE *cmdfile = fopen("/proc/self/cmdline", "r")) {
-+    char *cmd = nullptr;
-+    size_t len = 0;
-+    ssize_t nread = getdelim(&cmd, &len, '\0', cmdfile);
-+    if (nread == strlen(LINKERPATH) && !memcmp(cmd, LINKERPATH, strlen(LINKERPATH)))
-+      nread = getdelim(&cmd, &len, '\0', cmdfile);
-+    fclose(cmdfile);
-+    if (nread > 0) {
-+      if (char *real_path = realpath(cmd, nullptr)) {
-+        free(cmd);
++    if (char *real_linker_path = realpath(LINKERPATH, nullptr)) {
++      if (strcmp(real_path, real_linker_path) != 0) {
++        free(real_linker_path);
 +        std::string ret = std::string(real_path);
 +        free(real_path);
 +        return ret;
 +      }
++      free(real_linker_path);
++      free(real_path);
++      if (FILE *cmdfile = fopen("/proc/self/cmdline", "r")) {
++        char *cmd = nullptr;
++        size_t len = 0;
++        ssize_t nread = getdelim(&cmd, &len, '\0', cmdfile);
++        nread = getdelim(&cmd, &len, '\0', cmdfile); // 2nd read to skip linker
++        fclose(cmdfile);
++        if (nread > 0) {
++          if (char *real_path = realpath(cmd, nullptr)) {
++            free(cmd);
++            std::string ret = std::string(real_path);
++            free(real_path);
++            return ret;
++          }
++        }
++        free(cmd);
++      }
 +    }
-+    free(cmd);
++    free(real_path);
 +  }
 +#undef LINKERPATH
 +  // Fall back to the classical detection.
