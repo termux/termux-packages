@@ -16,7 +16,16 @@
  find_package(OpenSSL REQUIRED)
  
  # check dependencies versions
-@@ -238,7 +236,7 @@
+@@ -169,6 +167,8 @@
+   endif()
+   message("Searching for lua")
+   find_package(Lua)
++  set(LUA_LIBRARIES "lua5.4")
++  set(LUA_FOUND TRUE)
+   if(LUA_FOUND)
+     if(NOT LUA_VERSION_STRING VERSION_GREATER_EQUAL "5.3.0")
+       message("Lua is disabled because a version lower than 5.3.0 was found")
+@@ -238,7 +238,7 @@
  configure_file(contrib/initscripts/mympd.sysVinit.in contrib/initscripts/mympd.sysVinit @ONLY)
  configure_file(contrib/initscripts/mympd.openrc.in contrib/initscripts/mympd.openrc @ONLY)
  
@@ -25,7 +34,7 @@
    # set strict global compile flags
    add_compile_options(
      "-fdata-sections"
-@@ -329,8 +327,7 @@
+@@ -329,8 +329,7 @@
      add_compile_options("-g")
    endif()
    # IPO/LTO support
