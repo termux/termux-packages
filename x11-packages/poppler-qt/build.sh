@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Please align the version with `poppler` package.
 TERMUX_PKG_VERSION="23.10.0"
+TERMUX_PKG_REVISION=1
 # Do not forget to bump revision of reverse dependencies and rebuild them
 # when SOVERSION is changed.
 _POPPLER_SOVERSION=132
@@ -11,7 +12,7 @@ TERMUX_PKG_SRCURL=https://poppler.freedesktop.org/poppler-${TERMUX_PKG_VERSION}.
 TERMUX_PKG_SHA256=31a3dfdea79f4922402d313737415a44d44dc14d6b317f959a77c5bba0647dd9
 # The package must be updated at the same time as poppler, auto updater script does not support that.
 TERMUX_PKG_AUTO_UPDATE=false
-TERMUX_PKG_DEPENDS="libc++, poppler (>= ${TERMUX_PKG_VERSION}), qt5-qtbase"
+TERMUX_PKG_DEPENDS="freetype, libc++, littlecms, poppler (>= ${TERMUX_PKG_VERSION}), qt5-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="boost, boost-headers, qt5-qtbase-cross-tools"
 #texlive needs the xpdf headers
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
