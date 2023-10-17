@@ -17,6 +17,9 @@ termux_step_massage() {
 	# Remove cache file created by glib-compile-schemas:
 	rm -f share/glib-2.0/schemas/gschemas.compiled
 
+ 	# Removing the pacman log that is often included in the package:
+  	rm -f var/log/pacman.log
+
 	# Remove cache file created by gtk-update-icon-cache:
 	rm -f share/icons/hicolor/icon-theme.cache
 
