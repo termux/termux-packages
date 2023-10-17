@@ -1,0 +1,28 @@
++++ bluefish/src/bookmark.c
+@@ -1144,6 +1144,8 @@
+ 		bmark_activate(bfwin, get_bmark_at_iter(model, &iter), TRUE);
+ }
+ 
++gint bmark_margin_get_initial_bookmark(Tdocument * doc, guint offset, gpointer * bmark);
++
+ static void
+ bmark_previous_lcb(GtkWidget * widget, Tbfwin * bfwin)
+ {
+@@ -1159,7 +1161,7 @@
+ 	gtk_text_buffer_get_iter_at_mark(CURDOC(bfwin)->buffer, &titer, insert);
+ 	/*gtk_text_iter_set_line_offset(&titer, 0); */
+ 	gtk_text_iter_backward_line(&titer);
+-	line = bmark_margin_get_initial_bookmark(CURDOC(bfwin), &titer, (gpointer) & bmark);
++	line = bmark_margin_get_initial_bookmark(CURDOC(bfwin), gtk_text_iter_get_line(&titer), (gpointer) & bmark);
+ 	DEBUG_MSG("bmark_previous_lcb, got initial bookmark at line %d, cursor is at line %d\n", line,
+ 			  gtk_text_iter_get_line(&titer));
+ 	if (-1 == line)
+@@ -1185,7 +1187,7 @@
+ 	insert = gtk_text_buffer_get_insert(CURDOC(bfwin)->buffer);
+ 	gtk_text_buffer_get_iter_at_mark(CURDOC(bfwin)->buffer, &titer, insert);
+ 	gtk_text_iter_forward_to_line_end(&titer);
+-	line = bmark_margin_get_initial_bookmark(CURDOC(bfwin), &titer, (gpointer) & bmark);
++	line = bmark_margin_get_initial_bookmark(CURDOC(bfwin), gtk_text_iter_get_line(&titer), (gpointer) & bmark);
+ 	if (-1 == line)
+ 		return;
+ 	if (line <= gtk_text_iter_get_line(&titer)) {

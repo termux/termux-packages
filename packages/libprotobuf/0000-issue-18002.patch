@@ -1,0 +1,37 @@
+https://github.com/protocolbuffers/protobuf/commit/4329fde9cf3fab7d1b3a9abe0fbeee1ad8a8b111.patch
+https://github.com/termux/termux-packages/issues/18002
+
+Omitted patching files:
+src/google/protobuf/reflection_mode.cc
+src/google/protobuf/reflection_mode.h
+
+diff --git a/src/google/protobuf/arena.cc b/src/google/protobuf/arena.cc
+index 51afdbdafe5..6577a366921 100644
+--- a/src/google/protobuf/arena.cc
++++ b/src/google/protobuf/arena.cc
+@@ -519,7 +519,7 @@ ThreadSafeArena::ThreadCache& ThreadSafeArena::thread_cache() {
+       new internal::ThreadLocalStorage<ThreadCache>();
+   return *thread_cache_->Get();
+ }
+-#elif defined(PROTOBUF_USE_DLLS)
++#elif defined(PROTOBUF_USE_DLLS) && defined(_MSC_VER)
+ ThreadSafeArena::ThreadCache& ThreadSafeArena::thread_cache() {
+   static PROTOBUF_THREAD_LOCAL ThreadCache thread_cache;
+   return thread_cache;
+diff --git a/src/google/protobuf/thread_safe_arena.h b/src/google/protobuf/thread_safe_arena.h
+index e6e3b7faece..f53993a8528 100644
+--- a/src/google/protobuf/thread_safe_arena.h
++++ b/src/google/protobuf/thread_safe_arena.h
+@@ -260,9 +260,9 @@ class PROTOBUF_EXPORT ThreadSafeArena {
+   // iOS does not support __thread keyword so we use a custom thread local
+   // storage class we implemented.
+   static ThreadCache& thread_cache();
+-#elif defined(PROTOBUF_USE_DLLS)
+-  // Thread local variables cannot be exposed through DLL interface but we can
+-  // wrap them in static functions.
++#elif defined(PROTOBUF_USE_DLLS) && defined(_MSC_VER)
++  // Thread local variables cannot be exposed through MSVC DLL interface but we
++  // can wrap them in static functions.
+   static ThreadCache& thread_cache();
+ #else
+   PROTOBUF_CONSTINIT static PROTOBUF_THREAD_LOCAL ThreadCache thread_cache_;
