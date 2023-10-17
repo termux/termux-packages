@@ -14,12 +14,16 @@ termux_step_post_get_source() {
 	# Avoid duplicate definition of `struct user` (defined in <sys/user.h>):
 	find . -type f -name '*.[ch]' | xargs -n 1 \
 		sed -i -E 's/(struct user)($|[^_])/\1_\2/g'
-	#sed -i 's:"mbedtls/base64.h":<mbedtls/base64.h>:g' $TERMUX_PKG_SRCDIR/src/handlers/ircv3.c
-	#sed -i 's:"mbedtls/ctr_drbg.h":<mbedtls/ctr_drbg.h>:g' $TERMUX_PKG_SRCDIR/src/io.c
 	sed -i 's:CC       = cc::g' $TERMUX_PKG_SRCDIR/Makefile
 	sed -i 's:CFLAGS   =:CFLAGS   +=:g' $TERMUX_PKG_SRCDIR/Makefile
 	sed -i 's:LDFLAGS  =:LDFLAGS  +=:g' $TERMUX_PKG_SRCDIR/Makefile
 	sed -i "s:\$(DESTDIR)\$(PREFIX):${TERMUX_PREFIX}:" $TERMUX_PKG_SRCDIR/Makefile
+}
+
+termux_step_pre_configure() {
+	CPPFLAGS+=" -DMBEDTLS_ALLOW_PRIVATE_ACCESS"
+	CFLAGS+=" $CPPFLAGS"
+	LDFLAGS+=" -lmbedtls -lmbedx509 -lmbedcrypto"
 }
 
 termux_step_configure() {
