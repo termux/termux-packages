@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION="1.6-alpha"
 TERMUX_PKG_REVISION=7
 TERMUX_PKG_SRCURL=https://github.com/lanoxx/tilda/archive/a8f70a8b9300992dc13185112a251b90850fd96e.tar.gz
 TERMUX_PKG_SHA256=83c3bdccd9f41183cf656c11f925cf383f7cf0cbafbd56f51d8a1e2983bb7739
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="glib, gtk3, libvte, libconfuse, libx11, gettext"
 TERMUX_PKG_BUILD_IN_SRC=true
 
