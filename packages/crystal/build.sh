@@ -2,8 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://crystal-lang.org
 TERMUX_PKG_DESCRIPTION="Fast and statically typed, compiled language with Ruby-like syntax"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@HertzDevil"
-TERMUX_PKG_VERSION="1.9.2"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="1.10.1"
 TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
 TERMUX_PKG_SRCURL=git+https://github.com/crystal-lang/crystal
 TERMUX_PKG_AUTO_UPDATE=true
@@ -23,7 +22,7 @@ termux_step_make() {
 
 	termux_setup_crystal
 
-	CC="$CC_FOR_BUILD" LLVM_CONFIG="$TERMUX_PREFIX/bin/llvm-config" \
+	CC="$CC_FOR_BUILD" ANDROID_PLATFORM="$TERMUX_PKG_API_LEVEL" LLVM_CONFIG="$TERMUX_PREFIX/bin/llvm-config" \
 		make crystal target=$TERMUX_HOST_PLATFORM release=1 FLAGS=-Dwithout_iconv
 
 	$CC .build/crystal.o -o .build/crystal $LDFLAGS -rdynamic src/llvm/ext/llvm_ext.o \
@@ -38,8 +37,9 @@ termux_step_make() {
 	mkdir -p lib/molinillo
 	termux_download "$MOLINILLO_URL" "$MOLINILLO_TARFILE" "$MOLINILLO_SHA256"
 	tar xzf "$MOLINILLO_TARFILE" --strip-components=1 -C lib/molinillo
-	CC="$CC_FOR_BUILD" make SHARDS=false release=1 \
-		FLAGS="--cross-compile --target aarch64-linux-android -Dwithout_iconv"
+	CC="$CC_FOR_BUILD" ANDROID_PLATFORM="$TERMUX_PKG_API_LEVEL" \
+		make SHARDS=false release=1 \
+		FLAGS="--cross-compile --target $TERMUX_HOST_PLATFORM -Dwithout_iconv"
 	$CC bin/shards.o -o bin/shards $LDFLAGS -rdynamic \
 		-lyaml -lpcre2-8 -lgc -levent -ldl
 }
