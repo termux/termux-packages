@@ -3,12 +3,14 @@ TERMUX_PKG_DESCRIPTION="The Unicode Character Database (UCD)"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="copyright.html"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=15.0.0
+TERMUX_PKG_VERSION=15.1.0
 TERMUX_PKG_SRCURL=(https://unicode.org/Public/zipped/${TERMUX_PKG_VERSION}/UCD.zip
                    https://unicode.org/Public/zipped/${TERMUX_PKG_VERSION}/Unihan.zip)
-TERMUX_PKG_SHA256=(5fbde400f3e687d25cc9b0a8d30d7619e76cb2f4c3e85ba9df8ec1312cb6718c
-                   24b154691fc97cb44267b925d62064297086b3f896b57a8181c7b6d42702a026)
+TERMUX_PKG_SHA256=(cb1c663d053926500cd501229736045752713a066bd75802098598b7a7056177
+                   a0226610e324bcf784ac380e11f4cbf533ee1e6b3d028b0991bf8c0dc3f85853)
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
+#The package contains multiple SRCURL and SHA256, this is not supported by auto-updater script
+TERMUX_PKG_AUTO_UPDATE=false
 
 termux_step_get_source() {
 	local i
