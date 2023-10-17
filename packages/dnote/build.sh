@@ -5,13 +5,15 @@ TERMUX_PKG_MAINTAINER="Ravener <ravener.anime@gmail.com>"
 TERMUX_PKG_VERSION="1:0.15.0"
 TERMUX_PKG_SRCURL=https://github.com/dnote/dnote/archive/refs/tags/cli-v${TERMUX_PKG_VERSION:2}.tar.gz
 TERMUX_PKG_SHA256=830bab81de2fd252859de9dccdc55bf3f04a3c2a753c7bf3a2615a1db7e6e442
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_BREAKS=dnote-client
 TERMUX_PKG_REPLACES=dnote-client
 
 termux_step_pre_configure() {
 	termux_setup_golang
-	go mod download 
+	go mod download
 }
 
 termux_step_make() {
@@ -32,4 +34,15 @@ termux_step_install_license() {
 		"${TERMUX_PKG_SRCDIR}/licenses/GPLv3.txt"
 	install -Dm600 -t "${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}" \
 		"${TERMUX_PKG_SRCDIR}/LICENSE"
+}
+
+termux_pkg_auto_update() {
+	# Get latest release tag:
+	local tag
+	tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}")"
+	if grep -qP "^cli-v${TERMUX_PKG_UPDATE_VERSION_REGEXP}\$" <<<"$tag"; then
+		termux_pkg_upgrade_version "$tag"
+	else
+		echo "WARNING: Skipping auto-update: Not a CLI release($tag)"
+	fi
 }
