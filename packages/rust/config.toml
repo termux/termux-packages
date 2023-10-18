@@ -6,7 +6,7 @@ link-shared = true
 
 [build]
 host = ["@triple@"]
-target = ["@triple@", "wasm32-unknown-unknown"]
+target = ["@triple@", "wasm32-unknown-unknown", "wasm32-wasi"]
 rustc = "@RUSTC@"
 cargo = "@CARGO@"
 
@@ -37,6 +37,9 @@ android-ndk = "@TERMUX_STANDALONE_TOOLCHAIN@"
 llvm-config = "@TERMUX_PREFIX@/bin/llvm-config"
 ar = "llvm-ar"
 profiler = true
+
+[target.wasm32-wasi]
+wasi-root = "@TERMUX_PREFIX@/share/wasi-sysroot"
 
 [dist]
 src-tarball = false
