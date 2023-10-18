@@ -3,15 +3,19 @@ TERMUX_PKG_DESCRIPTION="Systems programming language focused on safety, speed an
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.73.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/rustc-${TERMUX_PKG_VERSION}-src.tar.xz
 TERMUX_PKG_SHA256=6eaf672dbea2e6596af8c999f5e6924b9af4bb8b02166bfe0b928e68aa75ae62
 _LLVM_MAJOR_VERSION=$(. $TERMUX_SCRIPTDIR/packages/libllvm/build.sh; echo $LLVM_MAJOR_VERSION)
 _LLVM_MAJOR_VERSION_NEXT=$((_LLVM_MAJOR_VERSION + 1))
 TERMUX_PKG_DEPENDS="clang, libc++, libllvm (<< ${_LLVM_MAJOR_VERSION_NEXT}), lld, openssl, zlib"
+TERMUX_PKG_BUILD_DEPENDS="wasi-libc"
+TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/llc
 bin/llvm-*
 bin/opt
+share/wasi-sysroot
 "
 
 termux_step_pre_configure() {
@@ -37,6 +41,10 @@ termux_step_pre_configure() {
 	ln -sf $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/libc++_static.a \
 		$RUST_LIBDIR/libc++_shared.a
 
+	# NDK r26 multiple ld.lld: error: undefined symbol: __cxa_*
+	ln -fst "${RUST_LIBDIR}" \
+		"${TERMUX_STANDALONE_TOOLCHAIN}/sysroot/usr/lib/${TERMUX_HOST_PLATFORM}/libc++abi.a"
+
 	# https://github.com/termux/termux-packages/issues/11640
 	# https://github.com/termux/termux-packages/issues/11658
 	# The build system somehow tries to link binaries against a wrong libc,
@@ -58,16 +66,6 @@ termux_step_pre_configure() {
 	# Fresh build conflict: liblzma -> rust
 	# ld: error: /data/data/com.termux/files/usr/lib/liblzma.a(liblzma_la-common.o) is incompatible with elf64-x86-64
 	mv "${TERMUX_PREFIX}"/lib/liblzma.a{,.tmp} || :
-
-	# ld: error: undefined symbol: getloadavg
-	# >>> referenced by rand.c
-	$CC $CPPFLAGS -c $TERMUX_PKG_BUILDER_DIR/getloadavg.c
-	$AR rcu $RUST_LIBDIR/libgetloadavg.a getloadavg.o
-
-	# https://github.com/termux/termux-packages/issues/17962
-	# Android 8.x and older: CANNOT LINK EXECUTABLE "rustc": cannot locate symbol "syncfs"
-	"${CC}" ${CPPFLAGS} -c "${TERMUX_PKG_BUILDER_DIR}/syncfs.c"
-	"${AR}" rcu "${RUST_LIBDIR}/libsyncfs.a" syncfs.o
 }
 
 termux_step_configure() {
@@ -99,11 +97,16 @@ termux_step_configure() {
 	local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
 	export ${env_host}_OPENSSL_DIR=$TERMUX_PREFIX
 	export RUST_LIBDIR=$TERMUX_PKG_BUILDDIR/_lib
-	export CARGO_TARGET_${env_host}_RUSTFLAGS="-L${RUST_LIBDIR} -C link-arg=-l:libgetloadavg.a -C link-arg=-l:libsyncfs.a"
+	export CARGO_TARGET_${env_host}_RUSTFLAGS="-L${RUST_LIBDIR}"
 
-	if [ "$TERMUX_ARCH" = "aarch64" ] || [ "$TERMUX_ARCH" = "x86_64" ]; then
-		export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C link-arg=$($CC -print-libgcc-file-name) -C link-arg=-l:libunwind.a"
-	fi
+	# NDK r26
+	export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C link-arg=-l:libc++abi.a"
+
+	# x86_64: __lttf2
+	case "${TERMUX_ARCH}" in
+	x86_64)
+		export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C link-arg=$(${CC} -print-libgcc-file-name)" ;;
+	esac
 
 	export X86_64_UNKNOWN_LINUX_GNU_OPENSSL_LIB_DIR=/usr/lib/x86_64-linux-gnu
 	export X86_64_UNKNOWN_LINUX_GNU_OPENSSL_INCLUDE_DIR=/usr/include
@@ -135,8 +138,10 @@ termux_step_make_install() {
 
 	$TERMUX_PKG_SRCDIR/x.py install --stage 1 --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME
 	$TERMUX_PKG_SRCDIR/x.py install --stage 1 std --target wasm32-unknown-unknown
+	$TERMUX_PKG_SRCDIR/x.py install --stage 1 std --target wasm32-wasi
 	$TERMUX_PKG_SRCDIR/x.py dist rustc-dev --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME
 	$TERMUX_PKG_SRCDIR/x.py dist rustc-dev --host $CARGO_TARGET_NAME --target wasm32-unknown-unknown
+	$TERMUX_PKG_SRCDIR/x.py dist rustc-dev --host $CARGO_TARGET_NAME --target wasm32-wasi
 	tar xvf build/dist/rustc-dev-$TERMUX_PKG_VERSION-$CARGO_TARGET_NAME.tar.gz
 	./rustc-dev-$TERMUX_PKG_VERSION-$CARGO_TARGET_NAME/install.sh --prefix=$TERMUX_PREFIX
 
