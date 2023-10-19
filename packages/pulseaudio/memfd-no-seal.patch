@@ -1,0 +1,15 @@
+--- a/src/pulsecore/shm.c
++++ b/src/pulsecore/shm.c
+@@ -164,7 +164,12 @@
+ #endif
+ #ifdef HAVE_MEMFD
+     case PA_MEM_TYPE_SHARED_MEMFD:
++#ifndef __ANDROID__
+         fd = memfd_create("pulseaudio", MFD_ALLOW_SEALING|MFD_CLOEXEC|MFD_NOEXEC_SEAL);
++#else
++        // Many Android's Kernel version doesn't support `MFD_NOEXEC_SEAL`, which is added in Kernel 6.3
++        fd = memfd_create("pulseaudio", MFD_ALLOW_SEALING|MFD_CLOEXEC);
++#endif
+         break;
+ #endif
+     default:
