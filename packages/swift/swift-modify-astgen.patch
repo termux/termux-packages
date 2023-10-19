@@ -222,7 +222,7 @@ index 5b935d4cebb..2f7c14fd1a2 100644
 @@ -119,6 +119,15 @@ void SwiftDiagnostic_finish(BridgedDiagnostic diagPtr) {
  BridgedIdentifier
  SwiftASTContext_getIdentifier(void *ctx, const unsigned char *_Nullable str,
-                               long len) {
+                               SwiftInt len) {
 +  if (len == 1 && str[0] == '_')
 +    return BridgedIdentifier();
 +

@@ -139,28 +139,27 @@ diff --git a/swift/cmake/modules/AddPureSwift.cmake b/swift/cmake/modules/AddPur
 index 6c79fdcf351ce..953c607947fc0 100644
 --- a/swift/cmake/modules/AddPureSwift.cmake
 +++ b/swift/cmake/modules/AddPureSwift.cmake
-@@ -2,18 +2,14 @@ include(macCatalystUtils)
+@@ -2,17 +2,15 @@ include(macCatalystUtils)
  
  # Workaround a cmake bug, see the corresponding function in swift-syntax
  function(force_target_link_libraries TARGET)
 -  cmake_parse_arguments(ARGS "" "" "PUBLIC" ${ARGN})
 -
 -  foreach(DEPENDENCY ${ARGS_PUBLIC})
--    target_link_libraries(${TARGET} PRIVATE
--      ${DEPENDENCY}
--    )
+-    target_link_libraries(${TARGET} PRIVATE ${DEPENDENCY})
 -    add_dependencies(${TARGET} ${DEPENDENCY})
 +  target_link_libraries(${TARGET} ${ARGN})
  
 +  cmake_parse_arguments(ARGS "PUBLIC;PRIVATE;INTERFACE" "" "" ${ARGN})
 +  foreach(DEPENDENCY ${ARGS_UNPARSED_ARGUMENTS})
-     add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/forced-${DEPENDENCY}-dep.swift
-       COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_CURRENT_BINARY_DIR}/forced-${DEPENDENCY}-dep.swift
+     string(REGEX REPLACE [<>:\"/\\|?*] _ sanitized ${DEPENDENCY})
+     add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/forced-${sanitized}-dep.swift
+       COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_CURRENT_BINARY_DIR}/forced-${sanitized}-dep.swift
        DEPENDS ${DEPENDENCY}
 -      )
 +    )
      target_sources(${TARGET} PRIVATE
-       ${CMAKE_CURRENT_BINARY_DIR}/forced-${DEPENDENCY}-dep.swift
+       ${CMAKE_CURRENT_BINARY_DIR}/forced-${sanitized}-dep.swift
      )
 @@ -46,21 +44,7 @@ function(_add_host_swift_compile_options name)
      $<$<COMPILE_LANGUAGE:Swift>:-runtime-compatibility-version>
@@ -508,7 +507,7 @@ index 7a6f55c80406f..3c580fd824fb0 100644
    set(SWIFT_SYNTAX_MODULES
      SwiftBasicFormat
      SwiftParser
-@@ -32,104 +30,39 @@ if (SWIFT_SWIFT_PARSER)
+@@ -32,130 +30,43 @@ if (SWIFT_SWIFT_PARSER)
      SwiftCompilerPluginMessageHandling
    )
  
@@ -523,11 +522,17 @@ index 7a6f55c80406f..3c580fd824fb0 100644
 -
 -  # Determine the SwiftSyntax shared library files that were built as
 -  # part of earlyswiftsyntax.
--  list(TRANSFORM SWIFT_SYNTAX_MODULES PREPEND ${CMAKE_SHARED_LIBRARY_PREFIX}
+-  list(TRANSFORM SWIFT_SYNTAX_MODULES PREPEND "${CMAKE_SHARED_LIBRARY_PREFIX}"
 -       OUTPUT_VARIABLE SWIFT_SYNTAX_SHARED_LIBRARIES)
 -  list(TRANSFORM SWIFT_SYNTAX_SHARED_LIBRARIES APPEND
--       ${CMAKE_SHARED_LIBRARY_SUFFIX}
+-       "${CMAKE_SHARED_LIBRARY_SUFFIX}"
 -       OUTPUT_VARIABLE SWIFT_SYNTAX_SHARED_LIBRARIES)
+-
+-  list(TRANSFORM SWIFT_SYNTAX_MODULES PREPEND "${CMAKE_IMPORT_LIBRARY_PREFIX}"
+-    OUTPUT_VARIABLE SWIFT_SYNTAX_IMPORT_LIBRARIES)
+-  list(TRANSFORM SWIFT_SYNTAX_IMPORT_LIBRARIES APPEND
+-    "${CMAKE_IMPORT_LIBRARY_SUFFIX}" OUTPUT_VARIABLE
+-    SWIFT_SYNTAX_IMPORT_LIBRARIES)
 -
 -  # Interface library to collect swiftinterfaces and swiftmodules from
 -  # SwiftSyntax
@@ -547,59 +552,57 @@ index 7a6f55c80406f..3c580fd824fb0 100644
 -      )
 -    endif()
 -
--    add_custom_command(
--      OUTPUT "${SWIFT_HOST_LIBRARIES_DEST_DIR}/${sharedlib}"
--      DEPENDS "${SWIFT_SYNTAX_LIBRARIES_BUILD_DIR}/${sharedlib}"
--      COMMAND ${CMAKE_COMMAND} -E copy_if_different ${SWIFT_SYNTAX_LIBRARIES_BUILD_DIR}/${sharedlib} ${SWIFT_HOST_LIBRARIES_DEST_DIR}/${sharedlib}
--      ${add_origin_rpath}
--    )
--
--    add_custom_target(copy_swiftSyntaxLibrary_${sharedlib}
--      DEPENDS "${SWIFT_HOST_LIBRARIES_DEST_DIR}/${sharedlib}"
--      COMMENT "Copying ${sharedlib}"
--    )
--
--    swift_install_in_component(
--      PROGRAMS "${SWIFT_HOST_LIBRARIES_DEST_DIR}/${sharedlib}"
--      DESTINATION "lib${LLVM_LIBDIR_SUFFIX}/swift/host"
--      COMPONENT compiler
--    )
+-    if(CMAKE_SYSTEM_NAME MATCHES Windows)
+-      add_custom_command(OUTPUT ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${sharedlib}
+-                         DEPENDS "${SWIFT_PATH_TO_EARLYSWIFTSYNTAX_BUILD_DIR}/bin/${sharedlib}"
+-                         COMMAND ${CMAKE_COMMAND} -E copy_if_different ${SWIFT_PATH_TO_EARLYSWIFTSYNTAX_BUILD_DIR}/bin/${sharedlib} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${sharedlib})
+-      add_custom_target(copy_swiftSyntaxLibrary_${sharedlib}
+-                        DEPENDS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${sharedlib}
+-                        COMMENT "copying ${sharedlib}")
+-      swift_install_in_component(PROGRAMS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${sharedlib}
+-                                 DESTINATION bin
+-                                 COMPONENT compiler)
+-    else()
+-      add_custom_command(OUTPUT "${SWIFT_HOST_LIBRARIES_DEST_DIR}/${sharedlib}"
+-                         DEPENDS "${SWIFT_SYNTAX_LIBRARIES_BUILD_DIR}/${sharedlib}"
+-                         COMMAND ${CMAKE_COMMAND} -E copy_if_different ${SWIFT_SYNTAX_LIBRARIES_BUILD_DIR}/${sharedlib} ${SWIFT_HOST_LIBRARIES_DEST_DIR}/${sharedlib}
+-                         ${add_origin_rpath})
+-      add_custom_target(copy_swiftSyntaxLibrary_${sharedlib}
+-                        DEPENDS "${SWIFT_HOST_LIBRARIES_DEST_DIR}/${sharedlib}"
+-                        COMMENT "Copying ${sharedlib}")
+-      swift_install_in_component(PROGRAMS "${SWIFT_HOST_LIBRARIES_DEST_DIR}/${sharedlib}"
+-                                 DESTINATION "lib${LLVM_LIBDIR_SUFFIX}/swift/host"
+-                                 COMPONENT compiler)
+-    endif()
 -
 -    add_dependencies(swiftSyntaxLibraries copy_swiftSyntaxLibrary_${sharedlib})
-+  if(CMAKE_SYSTEM_NAME MATCHES Windows)
+-  endforeach()
+-
++  # Install shared runtime libraries
+   if(CMAKE_SYSTEM_NAME MATCHES Windows)
+-    foreach(implib ${SWIFT_SYNTAX_IMPORT_LIBRARIES})
+-      add_custom_command(OUTPUT ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/swift/windows/${SWIFT_HOST_VARIANT_ARCH}/${implib}
+-        DEPENDS ${SWIFT_PATH_TO_EARLYSWIFTSYNTAX_BUILD_DIR}/lib/swift/host/${implib}
+-        COMMAND "${CMAKE_COMMAND}" -E copy_if_different ${SWIFT_PATH_TO_EARLYSWIFTSYNTAX_BUILD_DIR}/lib/swift/host/${implib} ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/swift/windows/${SWIFT_HOST_VARIANT_ARCH}/${implib})
+-      add_custom_target(copy_swiftSyntaxLibrary_${implib}
+-        DEPENDS ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/swift/windows/${SWIFT_HOST_VARIANT_ARCH}/${implib}
+-        COMMENT "Copying ${implib}")
+-      swift_install_in_component(PROGRAMS ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/swift/windows/${SWIFT_HOST_VARIANT_ARCH}/${implib}
+-        DESTINATION lib
+-        COMPONENT compiler)
+-      add_dependencies(swiftSyntaxLibraries copy_swiftSyntaxLibrary_${implib})
+-    endforeach()
 +    swift_install_in_component(TARGETS ${SWIFT_SYNTAX_MODULES}
++                               RUNTIME
 +                               DESTINATION "bin"
-+                               COMPONENT compiler)
++                               COMPONENT swift-syntax-lib)
 +  else()
 +    swift_install_in_component(TARGETS ${SWIFT_SYNTAX_MODULES}
++                               LIBRARY
 +                               DESTINATION "lib${LLVM_LIBDIR_SUFFIX}/swift/host"
-+                               COMPONENT compiler)
-+  endif()
-+
-+  # Install import libraries in Windows.
-+  if(CMAKE_SYSTEM_NAME MATCHES Windows)
-+    list(TRANSFORM SWIFT_SYNTAX_MODULES
-+         PREPEND "${CMAKE_IMPORT_LIBRARY_PREFIX}"
-+         OUTPUT_VARIABLE SWIFT_SYNTAX_IMPORT_LIBRARIES)
-+    list(TRANSFORM SWIFT_SYNTAX_IMPORT_LIBRARIES
-+         APPEND "${CMAKE_IMPORT_LIBRARY_SUFFIX}"
-+         OUTPUT_VARIABLE SWIFT_SYNTAX_IMPORT_LIBRARIES)
-+    list(TRANSFORM SWIFT_SYNTAX_IMPORT_LIBRARIES
-+         PREPEND "${SWIFT_HOST_LIBRARIES_DEST_DIR}/"
-+         OUTPUT_VARIABLE SWIFT_SYNTAX_IMPORT_LIBRARIES)
-+    swift_install_in_component(PROGRAMS "${SWIFT_SYNTAX_IMPORT_LIBRARIES}"
-+                               DESTINATION lib
-+                               COMPONENT compiler)
-+  endif()
-+
-+  foreach(module ${SWIFT_SYNTAX_MODULES})
-+    set(module_dir "${module}.swiftmodule")
-+    set(module_file "${SWIFT_HOST_LIBRARIES_DEST_DIR}/${module_dir}/${SWIFT_HOST_MODULE_TRIPLE}.swiftinterface")
-+    swift_install_in_component(FILES "${module_file}"
-+                               DESTINATION "lib${LLVM_LIBDIR_SUFFIX}/swift/host/${module_dir}"
-+                               COMPONENT compiler)
-   endforeach()
--
++                               COMPONENT swift-syntax-lib)
+   endif()
+ 
 -  # Copy all of the Swift modules from earlyswiftsyntax so they can be found
 -  # in the same relative place within the build directory as in the final
 -  # toolchain.
@@ -636,9 +639,31 @@ index 7a6f55c80406f..3c580fd824fb0 100644
 -      DESTINATION "lib${LLVM_LIBDIR_SUFFIX}/swift/host/${module_dir}"
 -      COMPONENT compiler
 -    )
--
++  # Install import libraries in Windows.
++  if(CMAKE_SYSTEM_NAME MATCHES Windows)
++    list(TRANSFORM SWIFT_SYNTAX_MODULES
++         PREPEND "${CMAKE_IMPORT_LIBRARY_PREFIX}"
++         OUTPUT_VARIABLE SWIFT_SYNTAX_IMPORT_LIBRARIES)
++    list(TRANSFORM SWIFT_SYNTAX_IMPORT_LIBRARIES
++         APPEND "${CMAKE_IMPORT_LIBRARY_SUFFIX}"
++         OUTPUT_VARIABLE SWIFT_SYNTAX_IMPORT_LIBRARIES)
++    list(TRANSFORM SWIFT_SYNTAX_IMPORT_LIBRARIES
++         PREPEND "${SWIFT_HOST_LIBRARIES_DEST_DIR}/"
++         OUTPUT_VARIABLE SWIFT_SYNTAX_IMPORT_LIBRARIES)
++    swift_install_in_component(PROGRAMS "${SWIFT_SYNTAX_IMPORT_LIBRARIES}"
++                               DESTINATION lib
++                               COMPONENT swift-syntax-lib)
++  endif()
+ 
 -    add_dependencies(swiftSyntaxLibraries copy_swiftSyntaxModule_${module_dir})
--  endforeach()
++  # Install Swift module interface files.
++  foreach(module ${SWIFT_SYNTAX_MODULES})
++    set(module_dir "${module}.swiftmodule")
++    set(module_file "${SWIFT_HOST_LIBRARIES_DEST_DIR}/${module_dir}/${SWIFT_HOST_MODULE_TRIPLE}.swiftinterface")
++    swift_install_in_component(FILES "${module_file}"
++                               DESTINATION "lib${LLVM_LIBDIR_SUFFIX}/swift/host/${module_dir}"
++                               COMPONENT swift-syntax-lib)
+   endforeach()
 -
 -  # Add copied SwiftSyntax libraries to global dependencies.
 -  list(APPEND LLVM_COMMON_DEPENDS swiftSyntaxLibraries)
@@ -1112,11 +1137,13 @@ diff --git a/swift/tools/driver/CMakeLists.txt b/swift/tools/driver/CMakeLists.t
 index f08e56ee3c2f1..1b350f229d4a5 100644
 --- a/swift/tools/driver/CMakeLists.txt
 +++ b/swift/tools/driver/CMakeLists.txt
-@@ -4,7 +4,7 @@
+@@ -4,9 +4,7 @@
  # Add additional libraries to which we need to link when the Swift Swift
  # parser is built in.
  function(add_swift_parser_link_libraries target)
 -  if(SWIFT_SWIFT_PARSER)
+-    target_link_directories(${target} PRIVATE
+-      ${SWIFT_PATH_TO_SWIFT_SDK}/usr/lib/swift/${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_LIB_SUBDIR}/${SWIFT_HOST_VARIANT_ARCH})
 +  if(SWIFT_BUILD_SWIFT_SYNTAX)
      target_link_libraries(${target}
                            PRIVATE swiftCore)

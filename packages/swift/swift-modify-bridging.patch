@@ -11,8 +11,8 @@ index 9647ddf561f14..4f181c1d1f916 100644
 --- a/swift/include/swift/AST/CASTBridging.h
 +++ b/swift/include/swift/AST/CASTBridging.h
 @@ -42,27 +42,46 @@ SWIFT_BEGIN_NULLABILITY_ANNOTATIONS
- typedef long SwiftInt;
- typedef unsigned long SwiftUInt;
+ 
+ SWIFT_BEGIN_NULLABILITY_ANNOTATIONS
  
 +typedef struct {
 +  const unsigned char *_Nullable data;
@@ -21,7 +21,7 @@ index 9647ddf561f14..4f181c1d1f916 100644
 +
  typedef struct {
    const void *_Nullable data;
-   long numElements;
+   SwiftInt numElements;
  } BridgedArrayRef;
  
 +typedef struct BridgedASTContext {
@@ -65,7 +65,7 @@ index 9647ddf561f14..4f181c1d1f916 100644
 +  BridgedSourceLoc TrailingCommaLoc;
  } BridgedTupleTypeElement;
  
- typedef enum ENUM_EXTENSIBILITY_ATTR(open) BridgedRequirementReprKind : long {
+ typedef enum ENUM_EXTENSIBILITY_ATTR(open) BridgedRequirementReprKind : SwiftInt {
 @@ -84,7 +103,7 @@ typedef enum ENUM_EXTENSIBILITY_ATTR(open) BridgedRequirementReprKind : long {
  } BridgedRequirementReprKind;
  
@@ -88,7 +88,7 @@ index 9647ddf561f14..4f181c1d1f916 100644
 +  void *raw;
 +} BridgedDiagnosticEngine;
  
- typedef enum ENUM_EXTENSIBILITY_ATTR(open) BridgedMacroDefinitionKind : long {
+ typedef enum ENUM_EXTENSIBILITY_ATTR(open) BridgedMacroDefinitionKind : SwiftInt {
    /// An expanded macro.
 @@ -176,11 +200,37 @@ typedef enum ENUM_EXTENSIBILITY_ATTR(closed) BridgedTypeAttrKind : long {
    BridgedTypeAttrKind_Count
@@ -137,7 +137,7 @@ index 9647ddf561f14..4f181c1d1f916 100644
 -                                         BridgedDiagnosticSeverity severity,
 -                                         const void *_Nullable sourceLoc,
 -                                         const unsigned char *_Nullable text,
--                                         long textLen);
+-                                         SwiftInt textLen);
 +BridgedDiagnostic Diagnostic_create(BridgedDiagnosticEngine cDiags,
 +                                    BridgedDiagnosticSeverity severity,
 +                                    BridgedSourceLoc cLoc, BridgedString cText);
@@ -153,7 +153,7 @@ index 9647ddf561f14..4f181c1d1f916 100644
 -                                  const void *_Nullable replaceStartLoc,
 -                                  const void *_Nullable replaceEndLoc,
 -                                  const unsigned char *_Nullable newText,
--                                  long newTextLen);
+-                                  SwiftInt newTextLen);
 +void Diagnostic_fixItReplace(BridgedDiagnostic cDiag,
 +                             BridgedSourceLoc cStartLoc,
 +                             BridgedSourceLoc cEndLoc,
@@ -165,7 +165,7 @@ index 9647ddf561f14..4f181c1d1f916 100644
  
 -BridgedIdentifier
 -SwiftASTContext_getIdentifier(void *ctx, const unsigned char *_Nullable str,
--                              long len);
+-                              SwiftInt len);
 +BridgedIdentifier ASTContext_getIdentifier(BridgedASTContext cContext,
 +                                           BridgedString cStr);
  
@@ -214,13 +214,13 @@ index 9647ddf561f14..4f181c1d1f916 100644
  
 -void *SwiftStringLiteralExpr_create(void *ctx,
 -                                    const unsigned char *_Nullable string,
--                                    long len, void *TokenLoc);
+-                                    SwiftInt len, void *TokenLoc);
 +void *StringLiteralExpr_create(BridgedASTContext cContext, BridgedString cStr,
 +                               BridgedSourceLoc cTokenLoc);
  
 -void *SwiftIntegerLiteralExpr_create(void *ctx,
 -                                     const unsigned char *_Nullable string,
--                                     long len, void *TokenLoc);
+-                                     SwiftInt len, void *TokenLoc);
 +void *IntegerLiteralExpr_create(BridgedASTContext cContext, BridgedString cStr,
 +                                BridgedSourceLoc cTokenLoc);
  
@@ -250,7 +250,7 @@ index 9647ddf561f14..4f181c1d1f916 100644
 -void *IfStmt_create(void *ctx, void *ifLoc, void *cond, void *_Nullable then,
 -                    void *_Nullable elseLoc, void *_Nullable elseStmt);
 -
--typedef enum ENUM_EXTENSIBILITY_ATTR(open) ASTNodeKind : long {
+-typedef enum ENUM_EXTENSIBILITY_ATTR(open) ASTNodeKind : SwiftInt {
 -  ASTNodeKindExpr,
 -  ASTNodeKindStmt,
 -  ASTNodeKindDecl
@@ -270,7 +270,7 @@ index 9647ddf561f14..4f181c1d1f916 100644
 -                       void *rbloc);
 +BridgedSourceLoc SourceLoc_advanced(BridgedSourceLoc cLoc, long len);
  
--void *BridgedSourceLoc_advanced(void *loc, long len);
+-void *BridgedSourceLoc_advanced(void *loc, SwiftInt len);
 +void *ParamDecl_create(BridgedASTContext cContext, BridgedSourceLoc cLoc,
 +                       BridgedSourceLoc cArgLoc, BridgedIdentifier argName,
 +                       BridgedSourceLoc cParamLoc, BridgedIdentifier paramName,
@@ -385,7 +385,7 @@ index 9647ddf561f14..4f181c1d1f916 100644
 -                              BridgedArrayRef reqs, void *rAngleLoc);
 -void *GenericTypeParamDecl_create(void *ctx, void *declContext,
 -                                  BridgedIdentifier name, void *nameLoc,
--                                  void *_Nullable eachLoc, long index,
+-                                  void *_Nullable eachLoc, SwiftInt index,
 +                                           BridgedSourceLoc cNameLoc,
 +                                           BridgedDeclContext cDeclContext);
 +
@@ -493,7 +493,7 @@ diff --git a/swift/lib/AST/CASTBridging.cpp b/swift/lib/AST/CASTBridging.cpp
 index b76dcfa8e5cc8..76b9b484e8f80 100644
 --- a/swift/lib/AST/CASTBridging.cpp
 +++ b/swift/lib/AST/CASTBridging.cpp
-@@ -15,46 +15,91 @@
+@@ -15,50 +15,91 @@
  
  using namespace swift;
  
@@ -548,6 +548,8 @@ index b76dcfa8e5cc8..76b9b484e8f80 100644
  
 -namespace {
 -  struct BridgedDiagnosticImpl {
+-    typedef llvm::MallocAllocator Allocator;
+-
 -    InFlightDiagnostic inFlight;
 -    std::vector<StringRef> textBlobs;
 -
@@ -558,8 +560,10 @@ index b76dcfa8e5cc8..76b9b484e8f80 100644
 -
 -    ~BridgedDiagnosticImpl() {
 -      inFlight.flush();
+-
+-      Allocator allocator;
 -      for (auto text: textBlobs) {
--        free((void*)text.data());
+-        allocator.Deallocate(text.data(), text.size());
 -      }
 -    }
 -  };
@@ -597,16 +601,18 @@ index b76dcfa8e5cc8..76b9b484e8f80 100644
 -                                         BridgedDiagnosticSeverity severity,
 -                                         const void *sourceLocPtr,
 -                                         const unsigned char *textPtr,
--                                         long textLen) {
+-                                         SwiftInt textLen) {
 -  StringRef origText{
 -    reinterpret_cast<const char *>(textPtr), size_t(textLen)};
+-  BridgedDiagnosticImpl::Allocator alloc;
+-  StringRef text = origText.copy(alloc);
 +BridgedDiagnostic Diagnostic_create(BridgedDiagnosticEngine cDiags,
 +                                    BridgedDiagnosticSeverity severity,
 +                                    BridgedSourceLoc cLoc,
 +                                    BridgedString cText) {
 +  StringRef origText = convertString(cText);
-   llvm::MallocAllocator mallocAlloc;
-   StringRef text = origText.copy(mallocAlloc);
++  llvm::MallocAllocator mallocAlloc;
++  StringRef text = origText.copy(mallocAlloc);
  
 -  SourceLoc loc = getSourceLocFromPointer(sourceLocPtr);
 +  SourceLoc loc = convertSourceLoc(cLoc);
@@ -645,7 +651,7 @@ index b76dcfa8e5cc8..76b9b484e8f80 100644
 -                                  const void *replaceStartLocPtr,
 -                                  const void *replaceEndLocPtr,
 -                                  const unsigned char *newTextPtr,
--                                  long newTextLen) {
+-                                  SwiftInt newTextLen) {
 +void Diagnostic_fixItReplace(BridgedDiagnostic cDiag,
 +                             BridgedSourceLoc cStartLoc,
 +                             BridgedSourceLoc cEndLoc,
@@ -658,9 +664,11 @@ index b76dcfa8e5cc8..76b9b484e8f80 100644
  
 -  StringRef origReplaceText{
 -    reinterpret_cast<const char *>(newTextPtr), size_t(newTextLen)};
+-  BridgedDiagnosticImpl::Allocator alloc;
+-  StringRef replaceText = origReplaceText.copy(alloc);
 +  StringRef origReplaceText = convertString(cReplaceText);
-   llvm::MallocAllocator mallocAlloc;
-   StringRef replaceText = origReplaceText.copy(mallocAlloc);
++  llvm::MallocAllocator mallocAlloc;
++  StringRef replaceText = origReplaceText.copy(mallocAlloc);
  
 -  BridgedDiagnosticImpl *impl = static_cast<BridgedDiagnosticImpl *>(diagPtr);
 -  impl->textBlobs.push_back(replaceText);
@@ -681,7 +689,7 @@ index b76dcfa8e5cc8..76b9b484e8f80 100644
  
 -BridgedIdentifier
 -SwiftASTContext_getIdentifier(void *ctx, const unsigned char *_Nullable str,
--                              long len) {
+-                              SwiftInt len) {
 -  if (len == 1 && str[0] == '_')
 +BridgedIdentifier ASTContext_getIdentifier(BridgedASTContext cContext,
 +                                           BridgedString cStr) {
@@ -739,7 +747,7 @@ index b76dcfa8e5cc8..76b9b484e8f80 100644
 +                            std::move(importPath).get());
  }
  
--void *BridgedSourceLoc_advanced(void *loc, long len) {
+-void *BridgedSourceLoc_advanced(void *loc, SwiftInt len) {
 -  SourceLoc l = getSourceLocFromPointer(loc).getAdvancedLoc(len);
 -  return const_cast<void *>(l.getOpaquePointerValue());
 +BridgedSourceLoc SourceLoc_advanced(BridgedSourceLoc cLoc, long len) {
@@ -854,7 +862,7 @@ index b76dcfa8e5cc8..76b9b484e8f80 100644
  
 -void *SwiftStringLiteralExpr_create(void *ctx,
 -                                    const unsigned char *_Nullable string,
--                                    long len, void *TokenLoc) {
+-                                    SwiftInt len, void *TokenLoc) {
 -  ASTContext &Context = *static_cast<ASTContext *>(ctx);
 -  auto stringRef = Context.AllocateCopy(
 -      StringRef{reinterpret_cast<const char *>(string), size_t(len)});
@@ -869,7 +877,7 @@ index b76dcfa8e5cc8..76b9b484e8f80 100644
  
 -void *SwiftIntegerLiteralExpr_create(void *ctx,
 -                                     const unsigned char *_Nullable string,
--                                     long len, void *TokenLoc) {
+-                                     SwiftInt len, void *TokenLoc) {
 -  ASTContext &Context = *static_cast<ASTContext *>(ctx);
 -  auto stringRef = Context.AllocateCopy(
 -      StringRef{reinterpret_cast<const char *>(string), size_t(len)});
@@ -1610,7 +1618,7 @@ index b76dcfa8e5cc8..76b9b484e8f80 100644
  
 -void *GenericTypeParamDecl_create(void *ctx, void *declContext,
 -                                  BridgedIdentifier name, void *nameLoc,
--                                  void *_Nullable eachLoc, long index,
+-                                  void *_Nullable eachLoc, SwiftInt index,
 +void *GenericTypeParamDecl_create(BridgedASTContext cContext,
 +                                  BridgedDeclContext cDeclContext,
 +                                  BridgedIdentifier name,
@@ -1764,7 +1772,7 @@ index 815bb696b137b..d1f60d3a94df3 100644
 +    let equalLoc = bridgedSourceLoc(for: node.initializer.equal)
      var nameText = node.identifier.text
 -    let name = nameText.withUTF8 { buf in
--      return SwiftASTContext_getIdentifier(ctx, buf.baseAddress, buf.count)
+-      return SwiftASTContext_getIdentifier(ctx, buf.baseAddress, SwiftInt(buf.count))
 +    let name = nameText.withBridgedString { bridgedName in
 +      return ASTContext_getIdentifier(ctx, bridgedName)
      }
@@ -1781,7 +1789,7 @@ index 815bb696b137b..d1f60d3a94df3 100644
 +    let loc = bridgedSourceLoc(for: node)
      var nameText = node.identifier.text
 -    let name = nameText.withUTF8 { buf in
--      return SwiftASTContext_getIdentifier(ctx, buf.baseAddress, buf.count)
+-      return SwiftASTContext_getIdentifier(ctx, buf.baseAddress, SwiftInt(buf.count))
 +    let name = nameText.withBridgedString { bridgedName in
 +      return ASTContext_getIdentifier(ctx, bridgedName)
      }
@@ -1795,7 +1803,7 @@ index 815bb696b137b..d1f60d3a94df3 100644
 +    let loc = bridgedSourceLoc(for: node)
      var nameText = node.identifier.text
 -    let name = nameText.withUTF8 { buf in
--      return SwiftASTContext_getIdentifier(ctx, buf.baseAddress, buf.count)
+-      return SwiftASTContext_getIdentifier(ctx, buf.baseAddress, SwiftInt(buf.count))
 +    let name = nameText.withBridgedString { bridgedName in
 +      return ASTContext_getIdentifier(ctx, bridgedName)
      }
@@ -1833,7 +1841,7 @@ index 815bb696b137b..d1f60d3a94df3 100644
        // Swift AST represents "_" as nil.
        var text = nodeFirstName.text
 -      firstName = text.withUTF8 { buf in
--        SwiftASTContext_getIdentifier(ctx, buf.baseAddress, buf.count)
+-        SwiftASTContext_getIdentifier(ctx, buf.baseAddress, SwiftInt(buf.count))
 +      firstName = text.withBridgedString { bridgedName in
 +        ASTContext_getIdentifier(ctx, bridgedName)
        }
@@ -1844,7 +1852,7 @@ index 815bb696b137b..d1f60d3a94df3 100644
      if let nodeSecondName = node.secondName {
        var text = nodeSecondName.text
 -      secondName = text.withUTF8 { buf in
--        SwiftASTContext_getIdentifier(ctx, buf.baseAddress, buf.count)
+-        SwiftASTContext_getIdentifier(ctx, buf.baseAddress, SwiftInt(buf.count))
 +      secondName = text.withBridgedString { bridgedName in
 +        ASTContext_getIdentifier(ctx, bridgedName)
        }
@@ -1867,7 +1875,7 @@ index 815bb696b137b..d1f60d3a94df3 100644
  
      var nameText = node.identifier.text
 -    let name = nameText.withUTF8 { buf in
--      return SwiftASTContext_getIdentifier(ctx, buf.baseAddress, buf.count)
+-      return SwiftASTContext_getIdentifier(ctx, buf.baseAddress, SwiftInt(buf.count))
 +    let name = nameText.withBridgedString { bridgedName in
 +      return ASTContext_getIdentifier(ctx, bridgedName)
      }
@@ -1918,7 +1926,7 @@ index 7071029c43983..4d299cc6f19eb 100644
 -  let diag = mutableMessage.withUTF8 { messageBuffer in
 -    SwiftDiagnostic_create(
 -      diagEnginePtr, bridgedSeverity, sourceLoc(at: position),
--      messageBuffer.baseAddress, messageBuffer.count
+-      messageBuffer.baseAddress, SwiftInt(messageBuffer.count)
 +  let diag = mutableMessage.withBridgedString { bridgedMessage in
 +    Diagnostic_create(
 +      bridgedDiagEngine, bridgedSeverity, bridgedSourceLoc(at: position),
@@ -1974,7 +1982,7 @@ index 7071029c43983..4d299cc6f19eb 100644
 +    newText.withBridgedString { bridgedMessage in
 +      Diagnostic_fixItReplace(
          diag, replaceStartLoc, replaceEndLoc,
--        textBuffer.baseAddress, textBuffer.count
+-        textBuffer.baseAddress, SwiftInt(textBuffer.count)
 +        bridgedMessage
        )
      }
@@ -2000,7 +2008,7 @@ index 7071029c43983..4d299cc6f19eb 100644
 -      SwiftDiagnostic_create(
 -        cxxDiagnosticEngine, bridgedSeverity,
 -        cxxSourceLocation(for: node, at: position),
--        messageBuffer.baseAddress, messageBuffer.count
+-        messageBuffer.baseAddress, SwiftInt(messageBuffer.count)
 +    let diag = mutableMessage.withBridgedString { bridgedMessage in
 +      Diagnostic_create(
 +        bridgedDiagEngine, bridgedSeverity,
@@ -2071,7 +2079,7 @@ index 7071029c43983..4d299cc6f19eb 100644
 +      newText.withBridgedString { bridgedMessage in
 +        Diagnostic_fixItReplace(
            diag, replaceStartLoc, replaceEndLoc,
--          textBuffer.baseAddress, textBuffer.count
+-          textBuffer.baseAddress, SwiftInt(textBuffer.count)
 +          bridgedMessage
          )
        }
@@ -2173,7 +2181,7 @@ index 38097c72cc218..432a1e77cbee2 100644
  
      var text = node.identifier.text
 -    let id = text.withUTF8 { buf in
--      return SwiftASTContext_getIdentifier(ctx, buf.baseAddress, buf.count)
+-      return SwiftASTContext_getIdentifier(ctx, buf.baseAddress, SwiftInt(buf.count))
 +    let id = text.withBridgedString { bridgedText in
 +      return ASTContext_getIdentifier(ctx, bridgedText)
      }
@@ -2188,7 +2196,7 @@ index 38097c72cc218..432a1e77cbee2 100644
  
      var text = node.identifier.text
 -    let id = text.withUTF8 { buf in
--      return SwiftASTContext_getIdentifier(ctx, buf.baseAddress, buf.count)
+-      return SwiftASTContext_getIdentifier(ctx, buf.baseAddress, SwiftInt(buf.count))
 +    let id = text.withBridgedString { bridgedText in
 +      return ASTContext_getIdentifier(ctx, bridgedText)
      }
@@ -2203,7 +2211,7 @@ index 38097c72cc218..432a1e77cbee2 100644
      let base = visit(node.base!).rawValue
      var nameText = node.name.text
 -    let name = nameText.withUTF8 { buf in
--      return SwiftASTContext_getIdentifier(ctx, buf.baseAddress, buf.count)
+-      return SwiftASTContext_getIdentifier(ctx, buf.baseAddress, SwiftInt(buf.count))
 +    let name = nameText.withBridgedString { bridgedName in
 +      return ASTContext_getIdentifier(ctx, bridgedName)
      }
@@ -2214,7 +2222,7 @@ index 38097c72cc218..432a1e77cbee2 100644
          return nil
        }
 -      return name.withUTF8 { buf in
--        SwiftASTContext_getIdentifier(ctx, buf.baseAddress, buf.count)
+-        SwiftASTContext_getIdentifier(ctx, buf.baseAddress, SwiftInt(buf.count))
 +      return name.withBridgedString { bridgedName in
 +        ASTContext_getIdentifier(ctx, bridgedName)
        }
@@ -2266,7 +2274,7 @@ index 22163381143b0..46b4b3bf90419 100644
    func visit(_ node: GenericParameterSyntax) -> ASTNode {
      var nodeName = node.name.text
 -    let name = nodeName.withUTF8 { buf in
--      return SwiftASTContext_getIdentifier(ctx, buf.baseAddress, buf.count)
+-      return SwiftASTContext_getIdentifier(ctx, buf.baseAddress, SwiftInt(buf.count))
 +    let name = nodeName.withBridgedString { bridgedName in
 +      return ASTContext_getIdentifier(ctx, bridgedName)
      }
@@ -2280,7 +2288,7 @@ index 22163381143b0..46b4b3bf90419 100644
 @@ -37,7 +35,7 @@ extension ASTGenVisitor {
      return .decl(
        GenericTypeParamDecl_create(
-         self.ctx, self.declContext, name, nameLoc, eachLoc, genericParameterIndex,
+         self.ctx, self.declContext, name, nameLoc, eachLoc, SwiftInt(genericParameterIndex),
 -        eachLoc != nil))
 +        eachLoc.raw != nil))
    }
@@ -2317,7 +2325,7 @@ index 1653d09ac348d..21d538df2d939 100644
      var segment = node.segments.first!.as(StringSegmentSyntax.self)!.content.text
      return .expr(
 -      segment.withUTF8 { buf in
--        return SwiftStringLiteralExpr_create(ctx, buf.baseAddress, buf.count, loc)
+-        return SwiftStringLiteralExpr_create(ctx, buf.baseAddress, SwiftInt(buf.count), loc)
 +      segment.withBridgedString { bridgedSegment in
 +        return StringLiteralExpr_create(ctx, bridgedSegment, loc)
        })
@@ -2329,7 +2337,7 @@ index 1653d09ac348d..21d538df2d939 100644
      var segment = node.digits.text
      return .expr(
 -      segment.withUTF8 { buf in
--        return SwiftIntegerLiteralExpr_create(ctx, buf.baseAddress, buf.count, loc)
+-        return SwiftIntegerLiteralExpr_create(ctx, buf.baseAddress, SwiftInt(buf.count), loc)
 +      segment.withBridgedString { bridgedSegment in
 +        return IntegerLiteralExpr_create(ctx, bridgedSegment, loc)
        })
@@ -2442,7 +2450,7 @@ index ee90ad3990f2f..e14c14db41ded 100644
 -      SwiftDiagnostic_create(
 -        cxxDiagnosticEngine, bridgedSeverity,
 -        cxxSourceLocation(at: position),
--        messageBuffer.baseAddress, messageBuffer.count)
+-        messageBuffer.baseAddress, SwiftInt(messageBuffer.count))
 +    let diag = mutableMessage.withBridgedString { bridgedMessage in
 +      Diagnostic_create(
 +        bridgedDiagEngine, bridgedSeverity,
@@ -2469,7 +2477,7 @@ index ee90ad3990f2f..e14c14db41ded 100644
        var newText = change.newText
 -      newText.withUTF8 { textBuffer in
 -        SwiftDiagnostic_fixItReplace(
--          diag, startLoc, endLoc, textBuffer.baseAddress, textBuffer.count)
+-          diag, startLoc, endLoc, textBuffer.baseAddress, SwiftInt(textBuffer.count))
 +      newText.withBridgedString { bridgedFixItText in
 +        Diagnostic_fixItReplace(
 +          diag, startLoc, endLoc, bridgedFixItText)
@@ -2674,7 +2682,7 @@ index 82bbca53bf4b2..34a185fe13fbf 100644
  
      var text = node.name.text
 -    let id = text.withUTF8 { buf in
--      return SwiftASTContext_getIdentifier(ctx, buf.baseAddress, buf.count)
+-      return SwiftASTContext_getIdentifier(ctx, buf.baseAddress, SwiftInt(buf.count))
 +    let id = text.withBridgedString { bridgedText in
 +      return ASTContext_getIdentifier(ctx, bridgedText)
      }
@@ -2695,7 +2703,7 @@ index 82bbca53bf4b2..34a185fe13fbf 100644
  
        var nameText = nameToken.text
 -      let name = nameText.withUTF8 { buf in
--        return SwiftASTContext_getIdentifier(ctx, buf.baseAddress, buf.count)
+-        return SwiftASTContext_getIdentifier(ctx, buf.baseAddress, SwiftInt(buf.count))
 +      let name = nameText.withBridgedString { bridgedName in
 +        return ASTContext_getIdentifier(ctx, bridgedName)
        }
@@ -2862,7 +2870,7 @@ index 82bbca53bf4b2..34a185fe13fbf 100644
      for element in elementList {
        var nameText = element.name?.text
 -      let name = nameText?.withUTF8 { buf in
--        return SwiftASTContext_getIdentifier(ctx, buf.baseAddress, buf.count)
+-        return SwiftASTContext_getIdentifier(ctx, buf.baseAddress, SwiftInt(buf.count))
 -      }
 -      let nameLoc = element.name.map { self.base.advanced(by: $0.position.utf8Offset).raw }
 +      let name = nameText?.withBridgedString { bridgedName in
@@ -2871,7 +2879,7 @@ index 82bbca53bf4b2..34a185fe13fbf 100644
 +      let nameLoc = bridgedSourceLoc(for: element.name)
        var secondNameText = element.secondName?.text
 -      let secondName = secondNameText?.withUTF8 { buf in
--        return SwiftASTContext_getIdentifier(ctx, buf.baseAddress, buf.count)
+-        return SwiftASTContext_getIdentifier(ctx, buf.baseAddress, SwiftInt(buf.count))
 -      }
 -      let secondNameLoc = element.secondName.map {
 -        self.base.advanced(by: $0.position.utf8Offset).raw
