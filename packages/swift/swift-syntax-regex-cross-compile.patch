@@ -108,22 +108,33 @@ diff --git a/swift/tools/swift-plugin-server/CMakeLists.txt b/swift/tools/swift-
 index a21b79ed260..5b591a30514 100644
 --- a/swift/tools/swift-plugin-server/CMakeLists.txt
 +++ b/swift/tools/swift-plugin-server/CMakeLists.txt
-@@ -11,16 +11,21 @@ if (SWIFT_BUILD_SWIFT_SYNTAX)
+@@ -1,28 +1,19 @@
+ if (SWIFT_BUILD_SWIFT_SYNTAX)
+-  # _swiftCSwiftPluginServer is just a C support library for swift-plugin-server
+-  # Don't bother to create '.a' for that.
+-  add_swift_host_library(_swiftCSwiftPluginServer OBJECT
+-    Sources/CSwiftPluginServer/PluginServer.cpp
+-  )
+-  target_link_libraries(_swiftCSwiftPluginServer PRIVATE
+-    swiftDemangling
++  add_swift_host_tool(swift-plugin-server SWIFT_COMPONENT compiler Sources/CSwiftPluginServer/PluginServer.cpp)
++  add_pure_swift_host_library(SwiftPluginServer STATIC
++    Sources/swift-plugin-server/swift-plugin-server.swift
+   )
+-  target_include_directories(_swiftCSwiftPluginServer PUBLIC
++  target_include_directories(SwiftPluginServer PUBLIC
      Sources/CSwiftPluginServer/include
    )
- 
+-
 -  add_pure_swift_host_tool(swift-plugin-server
-+  add_swift_host_tool(swift-plugin-server SWIFT_COMPONENT compiler)
-+  add_pure_swift_host_library(SwiftPluginServer STATIC
-     Sources/swift-plugin-server/swift-plugin-server.swift
+-    Sources/swift-plugin-server/swift-plugin-server.swift
 -    DEPENDENCIES
-+  )
-+  target_include_directories(SwiftPluginServer PUBLIC
-+    Sources/CSwiftPluginServer/include
-+  )
++  target_link_libraries(SwiftPluginServer PRIVATE SwiftCompilerPluginMessageHandling)
 +  target_link_libraries(swift-plugin-server PRIVATE
        swiftDemangling
-       $<TARGET_OBJECTS:_swiftCSwiftPluginServer>
+-      $<TARGET_OBJECTS:_swiftCSwiftPluginServer>
+-    SWIFT_COMPONENT
+-      compiler
 -    SWIFT_DEPENDENCIES
        SwiftSyntaxMacros
        SwiftSyntaxMacroExpansion
