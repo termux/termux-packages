@@ -6,7 +6,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 _VERSION=4.12
 _DATE=201906051800
 TERMUX_PKG_VERSION=1:${_VERSION}
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://archive.eclipse.org/eclipse/downloads/drops${_VERSION:0:1}/R-${_VERSION}-${_DATE}/ecj-${_VERSION}.jar
 TERMUX_PKG_SHA256=69dad18a1fcacd342a7d44c5abf74f50e7529975553a24c64bce0b29b86af497
 TERMUX_PKG_AUTO_UPDATE=false
@@ -89,6 +89,7 @@ termux_step_make() {
 termux_step_create_debscripts() {
 	cat <<- EOF > ./postinst
 	#!${TERMUX_PREFIX}/bin/bash
+	chmod -w $TERMUX_PREFIX/share/dex/ecj.jar
 	rm -f $TERMUX_PREFIX/share/dex/oat/*/ecj.{art,oat,odex,vdex} >/dev/null 2>&1
 	exit 0
 	EOF
