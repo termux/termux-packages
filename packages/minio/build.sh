@@ -2,12 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://min.io/
 TERMUX_PKG_DESCRIPTION="Multi-Cloud Object Storage"
 TERMUX_PKG_LICENSE="AGPL-V3"
 TERMUX_PKG_MAINTAINER="@termux"
-_DATE=2023-05-04
-_TIME=21-44-30
-TERMUX_PKG_VERSION=${_DATE//-/.}.${_TIME//-/.}
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://github.com/minio/minio/archive/refs/tags/RELEASE.${_DATE}T${_TIME}Z.tar.gz
-TERMUX_PKG_SHA256=b906049e51f4870edaa2f7f91b4745a54cbc051588d2fa3a9a33f5256c13c454
+TERMUX_PKG_VERSION="2023.10.16.04.13.43"
+_VERSION=$(sed 's/\./T/3;s/\./-/g' <<< $TERMUX_PKG_VERSION)
+TERMUX_PKG_SRCURL=https://github.com/minio/minio/archive/refs/tags/RELEASE.${_VERSION}Z.tar.gz
+TERMUX_PKG_SHA256=3d92dd8d5947df83025eb9d103dd5eef033ea3200b83334e7ab109e2a4b19824
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_SED_REGEXP='s/T/-/g;s/[^0-9-]//g;s/-/./g'
 TERMUX_PKG_DEPENDS="resolv-conf"
 TERMUX_PKG_BUILD_IN_SRC=true
 
@@ -16,14 +16,14 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
-	local _COMMITID=$(git ls-remote https://github.com/minio/minio refs/tags/RELEASE.${_DATE}T${_TIME}Z | cut -f1)
-	local _SHORTCOMMITID=$(git ls-remote https://github.com/minio/minio refs/tags/RELEASE.${_DATE}T${_TIME}Z | head -c 12)
+	local _COMMITID=$(git ls-remote https://github.com/minio/minio refs/tags/RELEASE.${_VERSION}Z | cut -f1)
+	local _SHORTCOMMITID=$(git ls-remote https://github.com/minio/minio refs/tags/RELEASE.${_VERSION}Z | head -c 12)
 
 	MINIOLDFLAGS="\
 	-w -s \
-	-X 'github.com/minio/minio/cmd.Version=${_DATE}T${_TIME}Z' \
+	-X 'github.com/minio/minio/cmd.Version=${_VERSION}Z' \
 	-X 'github.com/minio/minio/cmd.CopyrightYear=$(date +%Y)' \
-	-X 'github.com/minio/minio/cmd.ReleaseTag=RELEASE.${_DATE}T${_TIME}Z'\
+	-X 'github.com/minio/minio/cmd.ReleaseTag=RELEASE.${_VERSION}Z'\
 	-X 'github.com/minio/minio/cmd.CommitID=${_COMMITID}' \
 	-X 'github.com/minio/minio/cmd.ShortCommitID=${_SHORTCOMMITID}' \
 	-X 'github.com/minio/minio/cmd.GOPATH=$(go env GOPATH)' \
