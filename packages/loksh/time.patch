@@ -1,0 +1,13 @@
++++ loksh/c_sh.c
+@@ -21,6 +21,11 @@
+ static void p_tv(struct shf *, int, struct timeval *, int, char *, char *);
+ static void p_ts(struct shf *, int, struct timespec *, int, char *, char *);
+ 
++#define TIMEVAL_TO_TIMESPEC(tv, ts) {     \
++    (ts)->tv_sec = (tv)->tv_sec;          \
++    (ts)->tv_nsec = (tv)->tv_usec * 1000; \
++}
++
+ /* :, false and true */
+ int
+ c_label(char **wp)

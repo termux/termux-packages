@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://github.com/dimkr/loksh
 TERMUX_PKG_DESCRIPTION="A Linux port of OpenBSD's ksh"
 TERMUX_PKG_LICENSE="Public Domain"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=7.3
+TERMUX_PKG_VERSION="7.4"
 TERMUX_PKG_SRCURL=git+https://github.com/dimkr/loksh
 TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
 TERMUX_PKG_DEPENDS="ncurses"
@@ -27,4 +27,6 @@ termux_step_post_get_source() {
 	for f in ${_LOLIBC_HEADERS}; do
 		sed -i "s:#include_next :#include :g" ${f}
 	done
+
+	CFLAGS+=" -D__USE_GNU"
 }
