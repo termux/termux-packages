@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION=20230313
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/TeX-Live/texlive-source/archive/refs/heads/tags/texlive-${TERMUX_PKG_VERSION:0:4}.0.tar.gz
 TERMUX_PKG_SHA256=b14ec8c6873ae04d77cd1de239b660e30f3d6f0e97449aee67e3300ea4a259fd
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="freetype, harfbuzz, harfbuzz-icu, libc++, libcairo, libgd, libgmp, libgraphite, libiconv, libicu, liblua52, libmpfr, libpaper, libpixman, libpng, teckit, zlib, zziplib"
 # libpcre, glib, fonconfig are dependencies to libcairo. pkg-config gives an error if they are missing
 # libuuid, libxml2 are needed by fontconfig
