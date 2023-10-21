@@ -7,6 +7,7 @@ _COMMIT=663db8f64d73dceca6a2a18cdb705ad846daa272
 TERMUX_PKG_VERSION=1.9.9.1430
 TERMUX_PKG_SRCURL=git+https://github.com/ralph-irving/squeezelite
 TERMUX_PKG_SHA256=f59c029c033854cc4d52d72061cdbfac25efc4f4423ae78ec0a40ff52f305a43
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_DEPENDS="libflac, libmad, libvorbis, mpg123, pulseaudio"
 TERMUX_PKG_BUILD_IN_SRC=true
