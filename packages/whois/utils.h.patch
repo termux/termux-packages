@@ -1,0 +1,17 @@
+https://github.com/rfc1036/whois/pull/156
+diff --git a/utils.h b/utils.h
+index 7cb0947..8ef179d 100644
+--- a/utils.h
++++ b/utils.h
+@@ -17,7 +17,11 @@
+ /* Portability macros */
+ #ifdef __GNUC__
+ # define NORETURN __attribute__((noreturn))
++#ifndef __clang__
+ # define MALLOC_FREE __attribute__((malloc(free)))
++#else
++# define MALLOC_FREE
++#endif
+ # define NONNULL __attribute__((returns_nonnull))
+ #else
+ # define NORETURN
