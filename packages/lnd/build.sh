@@ -2,12 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://github.com/lightningnetwork/lnd
 TERMUX_PKG_DESCRIPTION="Lightning Network Daemon"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.16.2-beta
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="0.17.0-beta"
 TERMUX_PKG_SRCURL=(https://github.com/lightningnetwork/lnd/archive/v${TERMUX_PKG_VERSION}.tar.gz
                    https://github.com/lightningnetwork/lnd/releases/download/v${TERMUX_PKG_VERSION}/vendor.tar.gz)
-TERMUX_PKG_SHA256=(358310e2f7745e7b9f0a6de69aee7764677d6b55842ab9df343acd612f8c69f2
-                   2d1cd328be014e96d7295199479bb35e080ed48af1561f4e5bcb2d4af3f456eb)
+TERMUX_PKG_SHA256=(9aeb1e37e7ffb8726ac8f34c546455305f50fa1a011669462e567740bde26cec
+                   4b465f4b334b3516b1150dfde6be6fa78c53938af6e253a456c234f1799a4512)
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="bitcoin"
 TERMUX_PKG_SERVICE_SCRIPT=("lnd" 'exec lnd 2>&1')
 TERMUX_PKG_BUILD_IN_SRC=true
