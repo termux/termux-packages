@@ -3,20 +3,21 @@ TERMUX_PKG_DESCRIPTION="Wayland protocol library"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.22.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://gitlab.freedesktop.org/wayland/wayland/-/releases/${TERMUX_PKG_VERSION}/downloads/wayland-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=1540af1ea698a471c2d8e9d288332c7e0fd360c8f1d12936ebb7e7cbc2425842
 TERMUX_PKG_DEPENDS="libandroid-support, libexpat, libffi, libxml2"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
--Dtests=false
 -Ddocumentation=false
+-Dtests=false
 "
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="
--Dlibraries=false
--Dtests=false
 -Ddocumentation=false
 -Ddtd_validation=false
---prefix $TERMUX_PREFIX/opt/$TERMUX_PKG_NAME/cross
+-Dlibraries=false
+-Dtests=false
+--prefix ${TERMUX_PREFIX}/opt/${TERMUX_PKG_NAME}/cross
 "
 
 termux_step_host_build() {
@@ -25,10 +26,9 @@ termux_step_host_build() {
 	termux_setup_meson
 	unset AR CC CFLAGS CPPFLAGS CXX CXXFLAGS LD LDFLAGS PKG_CONFIG STRIP
 
-	$TERMUX_MESON $TERMUX_PKG_SRCDIR . \
-		$TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS
-	ninja -j $TERMUX_MAKE_PROCESSES
-	ninja install
+	${TERMUX_MESON} ${TERMUX_PKG_SRCDIR} . \
+		${TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS}
+	ninja -j "${TERMUX_MAKE_PROCESSES}" install
 }
 
 termux_step_pre_configure() {
