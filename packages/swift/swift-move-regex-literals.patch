@@ -863,7 +863,7 @@ index a2229bc6fbc24..b8342fb909bc2 100644
 +    if diagLoc.raw != nil, let errorLoc = error.location {
        let offset = str.utf8.distance(from: str.startIndex, to: errorLoc)
 -      diagLoc = _diagLoc.advanced(by: offset)
-+      diagLoc = SourceLoc_advanced(diagLoc, SwiftInt(offset))
++      diagLoc = SourceLoc_advanced(diagLoc, offset)
 +    }
 +
 +    var message = error.message
