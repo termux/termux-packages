@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A small font loading and glyph rasterization library"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.1.6
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://codeberg.org/dnkl/fcft/archive/${TERMUX_PKG_VERSION[0]}.tar.gz
 TERMUX_PKG_SHA256=95797f945faf407cb658efe6e5dcf0cc3ab08ef01e159383f9cf7cf5ee257506
 TERMUX_PKG_DEPENDS="fontconfig, freetype, harfbuzz, libpixman, libwayland, libxkbcommon, utf8proc"
