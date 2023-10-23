@@ -29,6 +29,24 @@ etc/testssl/README.md
 etc/testssl/tls_data.txt
 "
 
+termux_pkg_auto_update() {
+	# Get latest release tag:
+	local api_url="https://api.github.com/repos/drwetter/testssl.sh/git/refs/tags"
+	local latest_refs_tags=$(curl -s "${api_url}" | jq .[].ref | grep -oP ${TERMUX_PKG_UPDATE_VERSION_REGEXP} | sort)
+	if [[ -z "${latest_refs_tags}" ]]; then
+		echo "WARN: Unable to get latest refs tags from upstream. Try again later." >&2
+		return
+	fi
+
+	local latest_version=$(echo "${latest_refs_tags}" | tail -n1)
+	if [[ "${latest_version}" == "${TERMUX_PKG_VERSION}" ]]; then
+		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
+		return
+	fi
+
+	termux_pkg_upgrade_version "${latest_version}"
+}
+
 termux_step_make_install() {
 	install -Dm 755 -t "$TERMUX_PREFIX/bin" testssl.sh
 	ln -sfr "$TERMUX_PREFIX/bin/testssl.sh" "$TERMUX_PREFIX/bin/testssl"
