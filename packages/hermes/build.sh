@@ -11,6 +11,6 @@ TERMUX_PKG_SHA256=bd8fd158381813483123eb1ab553ed08db68e4949f314c99ee8fa79fa8f3e7
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DIMPORT_HERMESC:PATH=$TERMUX_PKG_SRCDIR/../build/ImportHermesc.cmake"
 
-termux_step_pre_configure(
-    autoreconf -fi
-)
+termux_step_pre_configure(){
+    autoreconf -fi    
+}
