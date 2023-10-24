@@ -12,5 +12,5 @@ TERMUX_PKG_BUILD_IN_SRC=true
 termux_step_pre_configure(){
     cd "$TERMUX_PKG_SRCDIR"
     cmake -B ./build_host_hermesc && cmake --build ./build_host_hermesc --target hermesc
-    TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DIMPORT_HERMESC:PATH=$TERMUX_PKG_SRCDIR/build_host_hermesc/ImportHermesc.cmake"
+    TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DIMPORT_HERMESC:PATH=$TERMUX_PKG_SRCDIR/ImportHermesc.cmake"
 }
