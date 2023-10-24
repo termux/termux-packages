@@ -9,5 +9,5 @@ TERMUX_PKG_DEPENDS="libicu, readline"
 TERMUX_PKG_SRCURL=https://github.com/facebook/hermes/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=bd8fd158381813483123eb1ab553ed08db68e4949f314c99ee8fa79fa8f3e7ed
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DIMPORT_HERMESC:PATH=$TERMUX_PKG_SRCDIR/../build/ImportHermesc.cmake"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DIMPORT_HERMESC:PATH=/home/builder/.termux-build/hermes/build/ImportHermesc.cmake"
 
