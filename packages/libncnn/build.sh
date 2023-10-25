@@ -8,6 +8,7 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/Tencent/ncnn
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_SHA256=a81ee5b6df97830919f8ed8554c99a4f223976ed82eee0cc9f214de0ce53dd2a
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="abseil-cpp, glslang, libc++, vulkan-loader"
 TERMUX_PKG_BUILD_DEPENDS="protobuf-static, python, vulkan-headers, vulkan-loader-android"
 TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, pybind11"
