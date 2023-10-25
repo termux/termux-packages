@@ -14,16 +14,16 @@ LICENSE/LICENSE_SOLARIZED
 LICENSE/LICENSE_STIX
 LICENSE/LICENSE_YORICK"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.7.2
+TERMUX_PKG_VERSION=3.8.0
 TERMUX_PKG_SRCURL=https://github.com/matplotlib/matplotlib/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=be06fea01c57517dbed17dd1aa8f2b3f5750c54203553f9d2096cf2e43a23b1e
+TERMUX_PKG_SHA256=83e97200421dc8b0022eba92f03174d9bf80c966df25a6f03f44608bfe36a7ac
 TERMUX_PKG_DEPENDS="freetype, libc++, python, python-numpy, python-pillow, python-pip"
 TERMUX_PKG_PYTHON_TARGET_DEPS="'contourpy>=1.0.1', 'cycler>=0.10', 'fonttools>=4.22.0', 'kiwisolver>=1.0.1', 'packaging>=20.0', 'pyparsing>=2.3.1,<3.1', 'python-dateutil>=2.7'"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_PYTHON_COMMON_DEPS="Cython, numpy, setuptools_scm, setuptools_scm_git_archive, wheel"
+TERMUX_PKG_PYTHON_COMMON_DEPS="'certifi>=2020.06.20', 'numpy>=1.25', 'pybind11>=2.6', 'setuptools>=42', 'setuptools_scm>=7', wheel"
 
-termux_step_pre_configure() {
-	export MATHLIB=m
+termux_step_make_install() {
+	pip install --no-deps --no-build-isolation . --prefix $TERMUX_PREFIX
 }
 
 termux_step_create_debscripts() {
