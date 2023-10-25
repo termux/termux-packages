@@ -9,6 +9,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.6.21
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=git+https://github.com/containerd/containerd
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="runc"
 TERMUX_PKG_CONFFILES="etc/containerd/config.toml"
 
