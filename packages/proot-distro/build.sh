@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Termux official utility for managing proot'ed Linux dist
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=4.0.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/termux/proot-distro/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=bbb9118d20be831c6ee02c9d9da65c9ac8a7ca9075c4d9fe0972c11e5c23dc49
 TERMUX_PKG_DEPENDS="bash, bzip2, coreutils, curl, findutils, gzip, ncurses-utils, proot (>= 5.1.107-32), sed, tar, termux-tools, xz-utils"
@@ -22,18 +23,29 @@ termux_step_create_debscripts() {
 	cat <<- EOF > ./preinst
 	#!${TERMUX_PREFIX}/bin/bash
 	set -e
-	if [ -e "${TERMUX_PREFIX}/etc/proot-distro/manjaro-aarch64.sh" ] && \
-		[ -e "${TERMUX_PREFIX}/var/lib/proot-distro/installed-rootfs/manjaro-aarch64" ] && \
-		! [ -e "${TERMUX_PREFIX}/etc/proot-distro/manjaro.sh" ] && \
-		! [ -e "${TERMUX_PREFIX}/var/lib/proot-distro/installed-rootfs/manjaro" ]; then
+	PD_PLUGINS_DIR="${TERMUX_PREFIX}/etc/proot-distro"
+	PD_ROOTFS_DIR="${TERMUX_PREFIX}/var/lib/proot-distro/installed-rootfs"
 
-		mv "${TERMUX_PREFIX}/etc/proot-distro/manjaro-aarch64.sh" \
-			"${TERMUX_PREFIX}/etc/proot-distro/manjaro.sh"
+	if [ -e "\${PD_PLUGINS_DIR}/manjaro-aarch64.sh" ] && ! [ -e "\${PD_PLUGINS_DIR}/manjaro.sh" ]; then
+		mv "\${PD_PLUGINS_DIR}/manjaro-aarch64.sh" "\${PD_PLUGINS_DIR}/manjaro.sh"
+	fi
 
-		mv "${TERMUX_PREFIX}/var/lib/proot-distro/installed-rootfs/manjaro-aarch64" \
-			"${TERMUX_PREFIX}/var/lib/proot-distro/installed-rootfs/manjaro"
+	if [ -e "\${PD_ROOTFS_DIR}/manjaro-aarch64" ] && ! [ -e "\${PD_ROOTFS_DIR}/manjaro" ]; then
+		echo "PRoot-Distro upgrade note: renaming the distribution manjaro-aarch64 to manjaro..."
 
-		echo "PRoot-Distro upgrade note: the distribution manjaro-aarch64 now available as manjaro."
+		mv "\${PD_ROOTFS_DIR}/manjaro-aarch64" "\${PD_ROOTFS_DIR}/manjaro"
+
+		echo "PRoot-Distro upgrade note: fixing link2symlink extension files for manjaro, this will take few minutes..."
+
+		# rewrite l2s proot symlinks
+		find "\${PD_ROOTFS_DIR}/manjaro" -type l | while read -r symlink_file_name; do
+			symlink_current_target=\$(readlink "\${symlink_file_name}")
+			if [ "\${symlink_current_target:0:\${#PD_ROOTFS_DIR}}" != "\${PD_ROOTFS_DIR}" ]; then
+				continue
+			fi
+			symlink_new_target=\$(sed -E "s@(\${PD_ROOTFS_DIR})/([^/]+)/(.*)@\1/manjaro/\3@g" <<< "\${symlink_current_target}")
+			ln -sf "\${symlink_new_target}" "\${symlink_file_name}"
+		done
 	fi
 	EOF
 }
