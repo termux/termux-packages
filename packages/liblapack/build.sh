@@ -12,5 +12,3 @@ TERMUX_PKG_DEPENDS="flang, libopenblas, clang"
 TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="FC=flang-new"
-
-
