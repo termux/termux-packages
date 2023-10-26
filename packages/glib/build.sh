@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Library providing core building blocks for libraries and
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.78.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://ftp.gnome.org/pub/gnome/sources/glib/${TERMUX_PKG_VERSION%.*}/glib-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=915bc3d0f8507d650ead3832e2f8fb670fce59aac4d7754a7dab6f1e6fed78b2
 TERMUX_PKG_AUTO_UPDATE=true
@@ -28,6 +29,13 @@ TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="
 -Dlibmount=disabled
 -Dtests=false
 --prefix ${TERMUX_PREFIX}/opt/${TERMUX_PKG_NAME}/cross
+"
+TERMUX_PKG_NO_SHEBANG_FIX_FILES="
+opt/glib/cross/bin/gdbus-codegen
+opt/glib/cross/bin/glib-genmarshal
+opt/glib/cross/bin/glib-gettextize
+opt/glib/cross/bin/glib-mkenums
+opt/glib/cross/bin/gtester-report
 "
 
 termux_step_host_build() {
