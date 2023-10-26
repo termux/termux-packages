@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.netlib.org/lapack/
 TERMUX_PKG_DESCRIPTION="Linear Algebra PACKage"
 TERMUX_PKG_GROUPS="science"
-TERMUX_PKG_LICENSE="BSD-3-Clause-Open-MPI"
+TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="Adam Jozef Labus <adam.labuznik@gmail.com>"
 TERMUX_PKG_VERSION=3.11.0
