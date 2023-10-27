@@ -61,9 +61,25 @@ termux_step_massage() {
 		fi
 	fi
 
+	local pattern=""
+	for file in ${TERMUX_PKG_NO_SHEBANG_FIX_FILES}; do
+		if [[ -z "${pattern}" ]]; then
+			pattern="${file}"
+			continue
+		fi
+		pattern+='|'"${file}"
+	done
+	if [[ -n "${pattern}" ]]; then
+		pattern='(|./)('"${pattern}"')$'
+	fi
+
 	if [ "$TERMUX_PKG_NO_SHEBANG_FIX" != "true" ]; then
 		# Fix shebang paths:
 		while IFS= read -r -d '' file; do
+			if [[ -n "${pattern}" ]] && [[ -n "$(echo "${file}" | grep -E "${pattern}")" ]]; then
+				echo "INFO: Skip shebang fix for ${file}"
+				continue
+			fi
 			if head -c 100 "$file" | head -n 1 | grep -E "^#!.*/bin/.*" | grep -q -E -v -e "^#! ?/system" -e "^#! ?$TERMUX_PREFIX_CLASSICAL"; then
 				sed --follow-symlinks -i -E "1 s@^#\!(.*)/bin/(.*)@#\!$TERMUX_PREFIX/bin/\2@" "$file"
 			fi

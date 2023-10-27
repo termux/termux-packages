@@ -158,6 +158,7 @@ termux_step_setup_variables() {
 	TERMUX_PKG_METAPACKAGE=false
 	TERMUX_PKG_NO_ELF_CLEANER=false # set this to true to disable running of termux-elf-cleaner on built binaries
 	TERMUX_PKG_NO_SHEBANG_FIX=false # if true, skip fixing shebang accordingly to TERMUX_PREFIX
+	TERMUX_PKG_NO_SHEBANG_FIX_FILES="" # files to be excluded from fixing shebang
 	TERMUX_PKG_NO_STRIP=false # set this to true to disable stripping binaries
 	TERMUX_PKG_NO_STATICSPLIT=false
 	TERMUX_PKG_STATICSPLIT_EXTRA_PATTERNS=""
@@ -175,7 +176,6 @@ termux_step_setup_variables() {
 	TERMUX_PKG_TMPDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/tmp
 	TERMUX_PKG_SERVICE_SCRIPT=() # Fill with entries like: ("daemon name" 'script to execute'). Script is echoed with -e so can contain \n for multiple lines
 	TERMUX_PKG_GROUPS="" # https://wiki.archlinux.org/title/Pacman#Installing_package_groups
-	TERMUX_PKG_NO_SHEBANG_FIX=false # if true, skip fixing shebang accordingly to TERMUX_PREFIX
 	TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=false # if the package does not support compilation on a device, then this package should not be compiled on devices
 	TERMUX_PKG_SETUP_PYTHON=false # setting python to compile a package
 	TERMUX_PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION) # get the latest version of python
