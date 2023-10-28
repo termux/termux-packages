@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.mozilla.org/firefox
 TERMUX_PKG_DESCRIPTION="Mozilla Firefox web browser"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="118.0.2"
+TERMUX_PKG_VERSION="119.0"
 TERMUX_PKG_SRCURL=https://ftp.mozilla.org/pub/firefox/releases/${TERMUX_PKG_VERSION}/source/firefox-${TERMUX_PKG_VERSION}.source.tar.xz
-TERMUX_PKG_SHA256=89626520f2f0f782f37c074b94690e0f08dcf416be2b992f4aad68df5d727b21
+TERMUX_PKG_SHA256=f63e44194548f246e1396508800739a24c0517e65e920002a6f67ee099be39dd
 # ffmpeg and pulseaudio are dependencies through dlopen(3):
 TERMUX_PKG_DEPENDS="ffmpeg, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libc++, libcairo, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libpixman, libsm, libvpx, libwebp, libx11, libxcb, libxcomposite, libxdamage, libxext, libxfixes, libxrandr, libxtst, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libcpufeatures, libice, libsm"
@@ -58,8 +58,7 @@ termux_step_pre_configure() {
 	# Out of memory when building gkrust
 	# CI shows (signal: 9, SIGKILL: kill)
 	case "${TERMUX_ARCH}" in
-	aarch64) RUSTFLAGS+=" -C debuginfo=0" ;;
-	arm) RUSTFLAGS+=" -C debuginfo=0" ;;
+	aarch64|arm|i686|x86_64) RUSTFLAGS+=" -C debuginfo=1" ;;
 	esac
 
 	cargo install cbindgen
@@ -69,7 +68,8 @@ termux_step_pre_configure() {
 	export HOST_CC=$(command -v clang)
 	export HOST_CXX=$(command -v clang++)
 
-	CXXFLAGS+=" -U__ANDROID__"
+	# https://reviews.llvm.org/D141184
+	CXXFLAGS+=" -U__ANDROID__ -D_LIBCPP_HAS_NO_C11_ALIGNED_ALLOC"
 	LDFLAGS+=" -landroid-shmem -llog"
 }
 
