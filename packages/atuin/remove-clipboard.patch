@@ -1,0 +1,43 @@
+Revert https://github.com/atuinsh/atuin/pull/1249
+
+--- a/atuin/Cargo.toml
++++ b/atuin/Cargo.toml
+@@ -72,7 +72,6 @@
+ colored = "2.0.4"
+ ratatui = "0.23"
+ tracing = "0.1"
+-cli-clipboard = "0.4.0"
+ 
+ 
+ [dependencies.tracing-subscriber]
+--- a/atuin/src/command/client/search/interactive.rs
++++ b/atuin/src/command/client/search/interactive.rs
+@@ -39,7 +39,6 @@
+ 
+ const RETURN_ORIGINAL: usize = usize::MAX;
+ const RETURN_QUERY: usize = usize::MAX - 1;
+-const COPY_QUERY: usize = usize::MAX - 2;
+ 
+ struct State {
+     history_count: i64,
+@@ -142,9 +141,6 @@
+ 
+                 return Some(self.results_state.selected());
+             }
+-            KeyCode::Char('y') if ctrl => {
+-                return Some(COPY_QUERY);
+-            }
+             KeyCode::Char(c @ '1'..='9') if modfr => {
+                 let c = c.to_digit(10)? as usize;
+                 return Some(self.results_state.selected() + c);
+@@ -711,10 +707,6 @@
+         Ok(command)
+     } else if index == RETURN_ORIGINAL {
+         Ok(String::new())
+-    } else if index == COPY_QUERY {
+-        let cmd = results.swap_remove(app.results_state.selected()).command;
+-        cli_clipboard::set_contents(cmd).unwrap();
+-        Ok(String::new())
+     } else {
+         // Either:
+         // * index == RETURN_QUERY, in which case we should return the input
