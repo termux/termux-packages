@@ -1,20 +1,3 @@
-diff -uNr firefox-118.0/browser/moz.configure firefox-118.0.mod/browser/moz.configure
---- firefox-118.0/browser/moz.configure	2023-09-19 01:41:14.000000000 +0800
-+++ firefox-118.0.mod/browser/moz.configure	2023-09-28 02:38:09.135038018 +0800
-@@ -5,11 +5,11 @@
- # file, You can obtain one at http://mozilla.org/MPL/2.0/.
- 
- imply_option("MOZ_PLACES", True)
--imply_option("MOZ_SERVICES_HEALTHREPORT", True)
-+imply_option("MOZ_SERVICES_HEALTHREPORT", False)
- imply_option("MOZ_SERVICES_SYNC", True)
- imply_option("MOZ_DEDICATED_PROFILES", True)
- imply_option("MOZ_BLOCK_PROFILE_DOWNGRADE", True)
--imply_option("MOZ_NORMANDY", True)
-+imply_option("MOZ_NORMANDY", False)
- 
- with only_when(target_has_linux_kernel & compile_environment):
-     option(env="MOZ_NO_PIE_COMPAT", help="Enable non-PIE wrapper")
 diff -uNr firefox-118.0/build/autoconf/android.m4 firefox-118.0.mod/build/autoconf/android.m4
 --- firefox-118.0/build/autoconf/android.m4	2023-09-19 01:41:14.000000000 +0800
 +++ firefox-118.0.mod/build/autoconf/android.m4	2023-09-28 02:38:09.135038018 +0800
@@ -262,29 +245,25 @@ diff -uNr firefox-118.0/toolkit/components/extensions/storage/moz.build firefox-
      EXPORTS.mozilla.extensions.storage += [
          "ExtensionStorageComponents.h",
      ]
-diff -uNr firefox-118.0/toolkit/library/rust/shared/Cargo.toml firefox-118.0.mod/toolkit/library/rust/shared/Cargo.toml
---- firefox-118.0/toolkit/library/rust/shared/Cargo.toml	2023-09-19 02:27:27.000000000 +0800
-+++ firefox-118.0.mod/toolkit/library/rust/shared/Cargo.toml	2023-09-28 02:38:09.167038018 +0800
-@@ -106,11 +106,12 @@
+diff -ur firefox-119.0/toolkit/library/rust/shared/Cargo.toml firefox-119.0.mod/toolkit/library/rust/shared/Cargo.toml
+--- firefox-119.0/toolkit/library/rust/shared/Cargo.toml	2023-10-20 03:54:43.000000000 +0800
++++ firefox-119.0.mod/toolkit/library/rust/shared/Cargo.toml	2023-10-28 22:05:59.432479691 +0800
+@@ -104,7 +104,6 @@
  # Since we're building with at least rustc 1.63, enable rust 1.57 features (use of try_reserve methods).
  fallible_collections = { version = "0.4", features = ["rust_1_57"] }
  
 -[target.'cfg(not(target_os = "android"))'.dependencies]
  viaduct = "0.1"
--webext_storage_bridge = { path = "../../../components/extensions/storage/webext_storage_bridge" }
+ webext_storage_bridge = { path = "../../../components/extensions/storage/webext_storage_bridge" }
  tabs = { version = "0.1" }
+diff -ur firefox-119.0/toolkit/library/rust/shared/lib.rs firefox-119.0.mod/toolkit/library/rust/shared/lib.rs
+--- firefox-119.0/toolkit/library/rust/shared/lib.rs	2023-10-20 03:54:43.000000000 +0800
++++ firefox-119.0.mod/toolkit/library/rust/shared/lib.rs	2023-10-30 23:17:58.911573513 +0800
+@@ -50,21 +50,16 @@
  
-+[target.'cfg(not(target_os = "android"))'.dependencies]
-+webext_storage_bridge = { path = "../../../components/extensions/storage/webext_storage_bridge" }
-+
- [target.'cfg(target_os = "windows")'.dependencies]
- detect_win32k_conflicts = { path = "../../../xre/detect_win32k_conflicts" }
+ extern crate audio_thread_priority;
  
-diff -uNr firefox-118.0/toolkit/library/rust/shared/lib.rs firefox-118.0.mod/toolkit/library/rust/shared/lib.rs
---- firefox-118.0/toolkit/library/rust/shared/lib.rs	2023-09-19 02:27:27.000000000 +0800
-+++ firefox-118.0.mod/toolkit/library/rust/shared/lib.rs	2023-09-28 02:38:09.171038018 +0800
-@@ -52,10 +52,8 @@
- #[cfg(not(target_os = "android"))]
+-#[cfg(not(target_os = "android"))]
  extern crate webext_storage_bridge;
  
 -#[cfg(not(target_os = "android"))]
@@ -294,7 +273,15 @@ diff -uNr firefox-118.0/toolkit/library/rust/shared/lib.rs firefox-118.0.mod/too
  mod reexport_tabs {
      tabs::uniffi_reexport_scaffolding!();
  }
-@@ -84,7 +82,6 @@
+ 
+-#[cfg(not(target_os = "android"))]
+ extern crate suggest;
+ 
+-#[cfg(not(target_os = "android"))]
+ mod reexport_suggest {
+     suggest::uniffi_reexport_scaffolding!();
+ }
+@@ -93,7 +88,6 @@
  extern crate l10nregistry_ffi;
  extern crate localization_ffi;
  
@@ -341,26 +328,6 @@ diff -uNr firefox-118.0/toolkit/moz.configure firefox-118.0.mod/toolkit/moz.conf
      @depends("--with-system-jpeg", target, neon_flags)
      def in_tree_jpeg_arm(system_jpeg, target, neon_flags):
          if system_jpeg:
-@@ -3016,7 +3018,7 @@
-     "MOZ_NORMANDY",
- )
- def data_reporting(telemetry, healthreport, crashreporter, normandy):
--    return telemetry or healthreport or crashreporter or normandy
-+    return False
- 
- 
- set_config("MOZ_DATA_REPORTING", True, when=data_reporting)
-@@ -3122,8 +3124,8 @@
- 
- # Enable runtime logging
- # ==============================================================
--set_define("MOZ_LOGGING", True)
--set_define("FORCE_PR_LOG", True)
-+set_define("MOZ_LOGGING", 0)
-+set_define("FORCE_PR_LOG", 0)
- 
- # This will enable logging of addref, release, ctor, dtor.
- # ==============================================================
 @@ -3313,7 +3315,7 @@
      option(
          env="MOZ_LINKER",
