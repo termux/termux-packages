@@ -1,25 +1,20 @@
---- ./src/lib/ares_init.c.orig	2020-11-21 21:53:22.660574509 +0100
-+++ ./src/lib/ares_init.c	2020-11-21 21:53:35.487337300 +0100
-@@ -1541,20 +1541,8 @@
-    * We'll only run this if we don't have any dns servers
-    * because this will get the same ones (if it works). */
-   if (status != ARES_EOF) {
--    char propname[PROP_NAME_MAX];
--    char propvalue[PROP_VALUE_MAX]="";
--    for (i = 1; i <= MAX_DNS_PROPERTIES; i++) {
--      snprintf(propname, sizeof(propname), "%s%u", DNS_PROP_NAME_PREFIX, i);
--      if (__system_property_get(propname, propvalue) < 1) {
--        status = ARES_EOF;
--        break;
--      }
--
--      status = config_nameserver(&servers, &nservers, propvalue);
--      if (status != ARES_SUCCESS)
--        break;
--      status = ARES_EOF;
--    }
-+    config_nameserver(&servers, &nservers, "8.8.4.4");
-+    status = ARES_EOF;
+--- a/src/lib/ares_init.c
++++ b/src/lib/ares_init.c	
+@@ -1351,7 +1351,7 @@
+   }
+ #endif
+ 
+-#  ifdef HAVE___SYSTEM_PROPERTY_GET
++#  if 0
+   /* Old way using the system property still in place as
+    * a fallback. Older android versions can still use this.
+    * it's possible for older apps not not have added the new
+@@ -1377,6 +1377,8 @@
+     }
    }
  #  endif /* HAVE___SYSTEM_PROPERTY_GET */
++  config_nameserver(&servers, &nservers, "8.8.4.4");
++  status = ARES_EOF;
  #elif defined(CARES_USE_LIBRESOLV)
+   struct __res_state res;
+   int                result;
