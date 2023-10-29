@@ -3,9 +3,10 @@ TERMUX_PKG_HOMEPAGE=https://sdl2pango.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="SDL2 library for internationalized text rendering"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.1.2
+TERMUX_PKG_VERSION="2.1.5"
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/tuxpaint-sdl2/SDL2_Pango/SDL2_Pango-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=32eae8044c8ccd454dcf1948e669e63f9806fa7aa30a3de3125da23e4d37826a
+TERMUX_PKG_SRCURL=https://github.com/markuskimius/SDL2_Pango/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=3b3fe6008445feb1fca61b17b9d950d688e49dcca60dbbf8667c0f980ddfc563
 TERMUX_PKG_DEPENDS="glib, pango, sdl2"
 
 termux_step_pre_configure() {
