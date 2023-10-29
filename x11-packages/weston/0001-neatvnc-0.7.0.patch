@@ -1,0 +1,32 @@
+https://gitlab.freedesktop.org/wayland/weston/-/commit/8895b15f3dfc555a869e310ff6e16ff5dced1336
+--- a/libweston/backend-vnc/meson.build
++++ b/libweston/backend-vnc/meson.build
+@@ -3,7 +3,7 @@ if not get_option('backend-vnc')
+ endif
+ 
+ config_h.set('BUILD_VNC_COMPOSITOR', '1')
+-dep_neatvnc = dependency('neatvnc', version: ['>= 0.6.0', '< 0.7.0'], required: false, fallback: ['neatvnc', 'neatvnc_dep'])
++dep_neatvnc = dependency('neatvnc', version: ['>= 0.7.0', '< 0.8.0'], required: false, fallback: ['neatvnc', 'neatvnc_dep'])
+ if not dep_neatvnc.found()
+ 	error('VNC backend requires neatvnc which was not found. Or, you can use \'-Dbackend-vnc=false\'.')
+ endif
+--- a/libweston/backend-vnc/vnc.c
++++ b/libweston/backend-vnc/vnc.c
+@@ -1248,8 +1248,15 @@ vnc_backend_create(struct weston_compositor *compositor,
+ 		goto err_output;
+ 	}
+ 
+-	ret = nvnc_enable_auth(backend->server, config->server_key,
+-			       config->server_cert, vnc_handle_auth,
++	ret = nvnc_set_tls_creds(backend->server, config->server_key,
++				 config->server_cert);
++	if (ret) {
++		weston_log("Failed set TLS credentials\n");
++		goto err_output;
++	}
++
++	ret = nvnc_enable_auth(backend->server, NVNC_AUTH_REQUIRE_AUTH |
++			       NVNC_AUTH_REQUIRE_ENCRYPTION, vnc_handle_auth,
+ 			       NULL);
+ 	if (ret) {
+ 		weston_log("Failed to enable TLS support\n");

@@ -1,0 +1,49 @@
+--- a/shared/xalloc.h
++++ b/shared/xalloc.h
+@@ -42,6 +42,10 @@
+ 	static const char oommsg[] = ": out of memory\n";
+ 	size_t written __attribute__((unused));
+ 
++#ifdef __ANDROID__
++	const char *program_invocation_short_name = getprogname();
++#endif
++
+ 	if (p)
+ 		return p;
+ 
+--- a/clients/touch-calibrator.c
++++ b/clients/touch-calibrator.c
+@@ -870,6 +870,10 @@
+ {
+ 	va_list argp;
+ 
++#ifdef __ANDROID__
++	const char *program_invocation_short_name = getprogname();
++#endif
++
+ 	va_start(argp, fmt);
+ 	fprintf(stderr, "%s error: ", program_invocation_short_name);
+ 	vfprintf(stderr, fmt, argp);
+@@ -879,6 +883,9 @@
+ static void
+ help(void)
+ {
++#ifdef __ANDROID__
++	const char *program_invocation_short_name = getprogname();
++#endif
+ 	fprintf(stderr, "Compute a touchscreen calibration matrix for "
+ 		"a Wayland compositor by\n"
+ 		"having the user touch points on the screen.\n\n");
+--- a/clients/desktop-shell.c
++++ b/clients/desktop-shell.c
+@@ -1172,6 +1172,10 @@
+ 	struct weston_config_section *s;
+ 	char *type;
+ 
++#ifdef __ANDROID__
++	const char *program_invocation_short_name = getprogname();
++#endif
++
+ 	background = xzalloc(sizeof *background);
+ 	background->owner = output;
+ 	background->base.configure = background_configure;

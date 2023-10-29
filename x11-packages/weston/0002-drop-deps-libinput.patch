@@ -1,0 +1,128 @@
+--- a/meson.build
++++ b/meson.build
+@@ -139,7 +139,6 @@
+ dep_wayland_server = dependency('wayland-server', version: '>= 1.20.0')
+ dep_wayland_client = dependency('wayland-client', version: '>= 1.20.0')
+ dep_pixman = dependency('pixman-1', version: '>= 0.25.2')
+-dep_libinput = dependency('libinput', version: '>= 1.2.0')
+ dep_libevdev = dependency('libevdev')
+ dep_libm = cc.find_library('m')
+ dep_libdl = cc.find_library('dl')
+--- a/compositor/meson.build
++++ b/compositor/meson.build
+@@ -12,7 +12,6 @@
+ deps_weston = [
+ 	dep_libshared,
+ 	dep_libweston_public,
+-	dep_libinput,
+ 	dep_libevdev,
+ 	dep_libdl,
+ 	dep_threads,
+--- a/libweston/meson.build
++++ b/libweston/meson.build
+@@ -217,27 +217,6 @@
+ )
+ dep_session_helper = declare_dependency(link_with: lib_session_helper)
+ 
+-
+-lib_libinput_backend = static_library(
+-	'libinput-backend',
+-	[
+-		'libinput-device.c',
+-		'libinput-seat.c',
+-		tablet_unstable_v2_server_protocol_h
+-	],
+-	dependencies: [
+-		dep_libweston_private,
+-		dep_libinput,
+-		dependency('libudev', version: '>= 136')
+-	],
+-	include_directories: common_inc,
+-	install: false
+-)
+-dep_libinput_backend = declare_dependency(
+-	link_with: lib_libinput_backend,
+-	include_directories: include_directories('.')
+-)
+-
+ dep_vertex_clipping = declare_dependency(
+ 	sources: 'vertex-clipping.c',
+ 	include_directories: include_directories('.')
+--- a/compositor/main.c
++++ b/compositor/main.c
+@@ -41,7 +41,9 @@
+ #include <sys/stat.h>
+ #include <sys/wait.h>
+ #include <sys/socket.h>
++#ifndef __ANDROID__
+ #include <libinput.h>
++#endif
+ #include <libevdev/libevdev.h>
+ #include <linux/input.h>
+ #include <sys/time.h>
+@@ -1038,6 +1040,7 @@
+ 	return 0;
+ }
+ 
++#ifndef __ANDROID__
+ static int
+ save_touch_device_calibration(struct weston_compositor *compositor,
+ 			      struct weston_touch_device *device,
+@@ -1095,6 +1098,7 @@
+ 
+ 	return ret;
+ }
++#endif
+ 
+ static int
+ weston_compositor_init_config(struct weston_compositor *ec,
+@@ -1153,12 +1157,14 @@
+ 			compositor->use_color_manager = true;
+ 	}
+ 
++#ifndef __ANDROID__
+ 	/* weston.ini [libinput] */
+ 	s = weston_config_get_section(config, "libinput", NULL, NULL);
+ 	weston_config_section_get_bool(s, "touchscreen_calibrator", &cal, 0);
+ 	if (cal)
+ 		weston_compositor_enable_touch_calibrator(ec,
+ 						save_touch_device_calibration);
++#endif
+ 
+ 	return 0;
+ }
+@@ -1873,6 +1879,7 @@
+ 						&wet->heads_changed_listener);
+ }
+ 
++#ifndef __ANDROID__
+ static void
+ configure_input_device_accel(struct weston_config_section *s,
+ 		struct libinput_device *device)
+@@ -2074,6 +2081,7 @@
+ 
+ 	configure_input_device_scroll(s, device);
+ }
++#endif
+ 
+ static int
+ drm_backend_output_configure(struct weston_output *output,
+@@ -2923,6 +2931,7 @@
+ load_drm_backend(struct weston_compositor *c, int *argc, char **argv,
+ 		 struct weston_config *wc, enum weston_renderer_type renderer)
+ {
++#ifndef __ANDROID__
+ 	struct weston_drm_backend_config config = {{ 0, }};
+ 	struct weston_config_section *section;
+ 	struct wet_compositor *wet = to_wet_compositor(c);
+@@ -2990,6 +2999,10 @@
+ 	free(config.specific_device);
+ 
+ 	return ret;
++#else
++	weston_log("error: drm_backend is not avaiable on Android.\n");
++	abort();
++#endif
+ }
+ 
+ static int
