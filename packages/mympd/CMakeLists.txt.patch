@@ -1,6 +1,6 @@
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -74,7 +74,6 @@
+@@ -67,7 +67,6 @@
  # cmake modules
  include(CheckCCompilerFlag)
  include(CheckCSourceCompiles)
@@ -8,7 +8,7 @@
  include(GNUInstallDirs)
  
  # custom cmake modules
-@@ -132,7 +131,6 @@
+@@ -126,7 +125,6 @@
  # required dependencies
  find_package(Threads REQUIRED)
  find_package(PCRE2 REQUIRED)
@@ -16,7 +16,7 @@
  find_package(OpenSSL REQUIRED)
  
  # check dependencies versions
-@@ -169,6 +167,8 @@
+@@ -163,6 +161,8 @@
    endif()
    message("Searching for lua")
    find_package(Lua)
@@ -25,7 +25,7 @@
    if(LUA_FOUND)
      if(NOT LUA_VERSION_STRING VERSION_GREATER_EQUAL "5.3.0")
        message("Lua is disabled because a version lower than 5.3.0 was found")
-@@ -246,7 +246,7 @@
+@@ -260,7 +260,7 @@
      "-fstack-protector-strong"
      "-pedantic"
      "-Wall"
@@ -34,13 +34,13 @@
      "-Wextra"
      "-Wformat"
      "-Wformat-security"
-@@ -329,8 +329,7 @@
+@@ -349,8 +349,7 @@
      add_compile_options("-g")
    endif()
    # IPO/LTO support
 -  check_ipo_supported()
 -  set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
 +  set(CMAKE_INTERPROCEDURAL_OPTIMIZATION FALSE)
- elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
-   add_compile_options(
-     "-ggdb"
+ else()
+   # if CMAKE_BUILD_TYPE is not Debug, Release, RelWithDebInfo or MinSizeRel
+   # do not alter compile options
