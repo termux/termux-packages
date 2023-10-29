@@ -65,7 +65,8 @@ termux_step_configure() {
 			-Dar="$ORIG_AR" \
 			-Duseshrplib \
 			-Duseithreads \
-			-Dusemultiplicity
+			-Dusemultiplicity \
+			-Doptimize="-O2"
 	)
 }
 
