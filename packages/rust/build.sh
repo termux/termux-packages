@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Systems programming language focused on safety, speed an
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.73.0
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/rustc-${TERMUX_PKG_VERSION}-src.tar.xz
 TERMUX_PKG_SHA256=6eaf672dbea2e6596af8c999f5e6924b9af4bb8b02166bfe0b928e68aa75ae62
 _LLVM_MAJOR_VERSION=$(. $TERMUX_SCRIPTDIR/packages/libllvm/build.sh; echo $LLVM_MAJOR_VERSION)
@@ -41,9 +41,10 @@ termux_step_pre_configure() {
 	ln -sf $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/libc++_static.a \
 		$RUST_LIBDIR/libc++_shared.a
 
+	# https://github.com/termux/termux-packages/issues/18379
 	# NDK r26 multiple ld.lld: error: undefined symbol: __cxa_*
 	ln -fst "${RUST_LIBDIR}" \
-		"${TERMUX_STANDALONE_TOOLCHAIN}/sysroot/usr/lib/${TERMUX_HOST_PLATFORM}/libc++abi.a"
+		"${TERMUX_STANDALONE_TOOLCHAIN}/sysroot/usr/lib/${TERMUX_HOST_PLATFORM}/libc++_shared.so"
 
 	# https://github.com/termux/termux-packages/issues/11640
 	# https://github.com/termux/termux-packages/issues/11658
@@ -99,14 +100,14 @@ termux_step_configure() {
 	export RUST_LIBDIR=$TERMUX_PKG_BUILDDIR/_lib
 	export CARGO_TARGET_${env_host}_RUSTFLAGS="-L${RUST_LIBDIR}"
 
-	# NDK r26
-	export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C link-arg=-l:libc++abi.a"
-
 	# x86_64: __lttf2
 	case "${TERMUX_ARCH}" in
 	x86_64)
 		export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C link-arg=$(${CC} -print-libgcc-file-name)" ;;
 	esac
+
+	# NDK r26
+	export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C link-arg=-lc++_shared"
 
 	export X86_64_UNKNOWN_LINUX_GNU_OPENSSL_LIB_DIR=/usr/lib/x86_64-linux-gnu
 	export X86_64_UNKNOWN_LINUX_GNU_OPENSSL_INCLUDE_DIR=/usr/include
