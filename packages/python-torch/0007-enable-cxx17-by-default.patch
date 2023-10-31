@@ -1,4 +1,4 @@
-Enable C++14 by default, because protobuf only supports C++14 and newer.
+Enable C++17 by default, because torch needs at least C++17 to build since 2.1.0.
 
 --- a/third_party/onnx/CMakeLists.txt.orig
 +++ b/third_party/onnx/CMakeLists.txt
@@ -7,7 +7,7 @@ Enable C++14 by default, because protobuf only supports C++14 and newer.
  # For other platforms, set C++11 as standard for the whole project
  if(NOT MSVC)
 -  set(CMAKE_CXX_STANDARD 11)
-+  set(CMAKE_CXX_STANDARD 14)
++  set(CMAKE_CXX_STANDARD 17)
  else()
    string(APPEND CMAKE_CXX_FLAGS " /std:c++17")
  endif()
