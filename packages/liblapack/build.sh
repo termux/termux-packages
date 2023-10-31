@@ -11,4 +11,4 @@ TERMUX_PKG_DEPENDS="flang, libopenblas, clang"
 #Because of flang
 TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
 
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DCMAKE_Fortran_COMPILER=\"$PREFIX/bin/flang-new\""
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DCMAKE_Fortran_COMPILER=flang-new"
