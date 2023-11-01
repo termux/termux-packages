@@ -28,10 +28,9 @@ termux_pkg_auto_update() {
 	local api_url="https://api.github.com/repos/kpet/clvk/commits"
 	local latest_commit=$(curl -s "${api_url}"| jq .[].sha | head -n1 | sed -e 's|\"||g')
 	if [[ -z "${latest_commit}" ]]; then
-		echo "WARN: Unable to get latest commit from upstream. Try again later." >&2
+		echo "WARN: Unable to get latest commit from upstream" >&2
 		return
 	fi
-
 	if [[ "${latest_commit}" == "${_COMMIT}" ]]; then
 		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
 		return
@@ -53,8 +52,11 @@ termux_pkg_auto_update() {
 	local current_date_diff=$(((current_date_epoch-_COMMIT_DATE_epoch)/(60*60*24)))
 	local cooldown_days=14
 	if [[ "${current_date_diff}" -lt "${cooldown_days}" ]]; then
-		echo "INFO: Queuing updates after ${cooldown_days} days since last push"
-		echo "INFO: Currently its ${current_date_diff}"
+		cat <<- EOL
+		INFO: Queuing updates since last push
+		Cooldown (days) = ${cooldown_days}
+		Days since      = ${current_date_diff}
+		EOL
 		return
 	fi
 
@@ -75,10 +77,11 @@ termux_pkg_auto_update() {
 		"
 	fi
 
-	sed -i "${TERMUX_PKG_BUILDER_DIR}/build.sh" \
+	sed \
 		-e "s|^_COMMIT=.*|_COMMIT=${latest_commit}|" \
 		-e "s|^_COMMIT_DATE=.*|_COMMIT_DATE=${latest_commit_date}|" \
-		-e "s|^_COMMIT_TIME=.*|_COMMIT_TIME=${latest_commit_time}|"
+		-e "s|^_COMMIT_TIME=.*|_COMMIT_TIME=${latest_commit_time}|" \
+		-i "${TERMUX_PKG_BUILDER_DIR}/build.sh"
 
 	termux_pkg_upgrade_version "${latest_version}" --skip-version-check
 }
@@ -95,6 +98,14 @@ termux_step_host_build() {
 	termux_setup_cmake
 	termux_setup_ninja
 
+	local _LLVM_TARGET_ARCH
+	case "${TERMUX_ARCH}" in
+	aarch64) _LLVM_TARGET_ARCH="AArch64" ;;
+	arm) _LLVM_TARGET_ARCH="ARM" ;;
+	i686|x86_64) _LLVM_TARGET_ARCH="X86" ;;
+	*) termux_error_exit "Invalid arch: ${TERMUX_ARCH}" ;;
+	esac
+
 	cmake \
 		-G Ninja \
 		-S "${TERMUX_PKG_SRCDIR}/external/clspv/third_party/llvm/llvm" \
@@ -103,7 +114,8 @@ termux_step_host_build() {
 		-DLLVM_INCLUDE_EXAMPLES=OFF \
 		-DLLVM_INCLUDE_TESTS=OFF \
 		-DLLVM_INCLUDE_UTILS=OFF \
-		-DLLVM_ENABLE_PROJECTS=clang
+		-DLLVM_ENABLE_PROJECTS=clang \
+		-DLLVM_TARGETS_TO_BUILD="${_LLVM_TARGET_ARCH}"
 	ninja \
 		-C "${TERMUX_PKG_HOSTBUILD_DIR}" \
 		-j "${TERMUX_MAKE_PROCESSES}" \
@@ -112,7 +124,7 @@ termux_step_host_build() {
 
 termux_step_pre_configure() {
 	local _libvulkan=vulkan
-	if [[ "${TERMUX_PKG_API_LEVEL}" -lt 28 ]]; then
+	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "false" && "${TERMUX_PKG_API_LEVEL}" -lt 28 ]]; then
 		_libvulkan="${TERMUX_STANDALONE_TOOLCHAIN}/sysroot/usr/lib/${TERMUX_HOST_PLATFORM}/28/libvulkan.so"
 	fi
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DVulkan_LIBRARIES=${_libvulkan}"
@@ -121,9 +133,9 @@ termux_step_pre_configure() {
 	local _LLVM_TARGET_TRIPLE=${TERMUX_HOST_PLATFORM/-/-unknown-}${TERMUX_PKG_API_LEVEL}
 	local _LLVM_TARGET_ARCH
 	case "${TERMUX_ARCH}" in
-	aarch64) _LLVM_TARGET_ARCH=AArch64 ;;
-	arm) _LLVM_TARGET_ARCH=ARM ;;
-	i686|x86_64) _LLVM_TARGET_ARCH=X86 ;;
+	aarch64) _LLVM_TARGET_ARCH="AArch64" ;;
+	arm) _LLVM_TARGET_ARCH="ARM" ;;
+	i686|x86_64) _LLVM_TARGET_ARCH="X86" ;;
 	*) termux_error_exit "Invalid arch: ${TERMUX_ARCH}" ;;
 	esac
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
@@ -142,10 +154,10 @@ termux_step_pre_configure() {
 
 termux_step_make_install() {
 	# clvk does not have proper install rule yet
-	install -Dm644 "${TERMUX_PKG_BUILDDIR}/libOpenCL.so" "${TERMUX_PREFIX}/lib/clvk/libOpenCL.so"
+	install -Dm644 -t "${TERMUX_PREFIX}/lib/clvk" "${TERMUX_PKG_BUILDDIR}/libOpenCL.so"
 
 	echo "${TERMUX_PREFIX}/lib/clvk/libOpenCL.so" > "${TERMUX_PKG_TMPDIR}/clvk.icd"
-	install -Dm644 "${TERMUX_PKG_TMPDIR}/clvk.icd" "${TERMUX_PREFIX}/etc/OpenCL/vendors/clvk.icd"
+	install -Dm644 -t "${TERMUX_PREFIX}/etc/OpenCL/vendors" "${TERMUX_PKG_TMPDIR}/clvk.icd"
 }
 
 # https://github.com/kpet/clvk/blob/main/CMakeLists.txt
