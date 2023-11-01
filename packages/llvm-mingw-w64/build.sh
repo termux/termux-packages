@@ -3,9 +3,10 @@ TERMUX_PKG_DESCRIPTION="MinGW-w64 toolchain based on LLVM"
 TERMUX_PKG_LICENSE="ISC"
 TERMUX_PKG_MAINTAINER="@licy183"
 # Bump llvm-mingw-w64* to the same version in one PR.
-TERMUX_PKG_VERSION=20231017
+TERMUX_PKG_VERSION="20231031"
 TERMUX_PKG_SRCURL=https://github.com/mstorsjo/llvm-mingw/releases/download/$TERMUX_PKG_VERSION/llvm-mingw-$TERMUX_PKG_VERSION-ucrt-ubuntu-20.04-x86_64.tar.xz
-TERMUX_PKG_SHA256=4ca5290be640e6d9c00d676e3f3e8ddebac045ee512534c96fcf5bf70852afef
+TERMUX_PKG_SHA256=95a4fb16425ce3234a2bf94c6d7c6c1fbf6833a4fa80d84c82ccf2ad533f0737
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="clang, llvm, llvm-tools, llvm-mingw-w64-libcompiler-rt, llvm-mingw-w64-ucrt"
 TERMUX_PKG_RECOMMENDS="llvm-mingw-w64-tools"
 TERMUX_PKG_CONFLICTS="mingw-w64"
