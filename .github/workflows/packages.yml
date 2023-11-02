@@ -177,7 +177,7 @@ jobs:
         done
 
         if [ ! -z "$packages" ]; then
-          if grep -q ' \(clvk\|dart\|libllvm\|rust\|rustc-nightly\|swift\|tinygo\|wasmer\|zig\|firefox\)\( \|$\)' <<< "$packages"; then
+          if grep -q '\(^\|\s\)\(clvk\|dart\|libllvm\|rust\|rustc-nightly\|swift\|tinygo\|wasmer\|zig\|firefox\)$' <<< "$packages"; then
             ./scripts/setup-ubuntu.sh
             sudo apt install ninja-build
             sudo apt purge -yq $(dpkg -l | grep '^ii' | awk '{ print $2 }' | grep -P '(aspnetcore|cabal-|dotnet-|ghc-|libmono|php)') \
