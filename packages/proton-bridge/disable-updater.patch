@@ -1,0 +1,77 @@
+--- cache/tmp-checkout/internal/updater/updater.go	2023-11-02 08:43:50.875810511 +0200
++++ src/internal/updater/updater.go	2023-11-02 12:51:01.408228041 +0200
+@@ -18,16 +18,12 @@
+ package updater
+ 
+ import (
+-	"bytes"
+ 	"context"
+-	"encoding/json"
+-	"fmt"
+ 	"io"
+ 
+ 	"github.com/Masterminds/semver/v3"
+ 	"github.com/ProtonMail/gopenpgp/v2/crypto"
+ 	"github.com/pkg/errors"
+-	"github.com/sirupsen/logrus"
+ )
+ 
+ var (
+@@ -62,56 +58,9 @@
+ }
+ 
+ func (u *Updater) GetVersionInfo(ctx context.Context, downloader Downloader, channel Channel) (VersionInfo, error) {
+-	b, err := downloader.DownloadAndVerify(
+-		ctx,
+-		u.verifier,
+-		u.getVersionFileURL(),
+-		u.getVersionFileURL()+".sig",
+-	)
+-	if err != nil {
+-		return VersionInfo{}, err
+-	}
+-
+-	var versionMap VersionMap
+-
+-	if err := json.Unmarshal(b, &versionMap); err != nil {
+-		return VersionInfo{}, err
+-	}
+-
+-	version, ok := versionMap[channel]
+-	if !ok {
+-		return VersionInfo{}, errors.New("no updates available for this channel")
+-	}
+-
+-	return version, nil
++	return VersionInfo{}, errors.New("no updates available for this channel")
+ }
+ 
+ func (u *Updater) InstallUpdate(ctx context.Context, downloader Downloader, update VersionInfo) error {
+-	if u.installer.IsAlreadyInstalled(update.Version) {
+-		return ErrUpdateAlreadyInstalled
+-	}
+-
+-	b, err := downloader.DownloadAndVerify(
+-		ctx,
+-		u.verifier,
+-		update.Package,
+-		update.Package+".sig",
+-	)
+-	if err != nil {
+-		return ErrDownloadVerify
+-	}
+-
+-	if err := u.installer.InstallUpdate(update.Version, bytes.NewReader(b)); err != nil {
+-		logrus.WithError(err).Error("Failed to install update")
+-		return ErrInstall
+-	}
+-
+ 	return nil
+ }
+-
+-// getVersionFileURL returns the URL of the version file.
+-// For example:
+-//   - https://protonmail.com/download/bridge/version_linux.json
+-func (u *Updater) getVersionFileURL() string {
+-	return fmt.Sprintf("%v/%v/version_%v.json", Host, u.product, u.platform)
+-}

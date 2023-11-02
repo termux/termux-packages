@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://github.com/ProtonMail/proton-bridge
 TERMUX_PKG_DESCRIPTION="ProtonMail Bridge application"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_VERSION="3.6.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/ProtonMail/proton-bridge
 TERMUX_PKG_GIT_BRANCH=v${TERMUX_PKG_VERSION}
 TERMUX_PKG_MAINTAINER="Radomír Polách <rp@t4d.cz>"
@@ -22,6 +23,5 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm700 "${TERMUX_PKG_SRCDIR}"/proton-bridge \
-		"${TERMUX_PREFIX}"/bin/proton-bridge
+	install -Dm700 "${TERMUX_PKG_SRCDIR}"/bridge "${TERMUX_PREFIX}"/bin/proton-bridge
 }
