@@ -1,0 +1,24 @@
+From: agnostic-apollo <agnosticapollo@gmail.com>
+Subject: Fix build with lld 17
+
+Original Author: Dimitry Andric <dim@FreeBSD.org>
+
+https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=274109
+---
+ make/hotspot/lib/JvmMapfile.gmk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/make/hotspot/lib/JvmMapfile.gmk b/make/hotspot/lib/JvmMapfile.gmk
+index 181e0db5c0e..c3936c74c74 100644
+--- a/make/hotspot/lib/JvmMapfile.gmk
++++ b/make/hotspot/lib/JvmMapfile.gmk
+@@ -53,7 +53,7 @@ endif
+ # platform dependent.
+ 
+ ifeq ($(call isTargetOs, android linux), true)
+-  DUMP_SYMBOLS_CMD := $(NM) --defined-only *.o
++  DUMP_SYMBOLS_CMD := $(NM) --extern-only --defined-only *.o
+   ifneq ($(FILTER_SYMBOLS_PATTERN), )
+     FILTER_SYMBOLS_PATTERN := $(FILTER_SYMBOLS_PATTERN)|
+   endif
+-- 
