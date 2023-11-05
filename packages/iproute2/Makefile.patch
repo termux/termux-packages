@@ -1,5 +1,6 @@
---- a/Makefile
-+++ b/Makefile
+diff -uNr iproute2-6.6.0/Makefile iproute2-6.6.0.mod/Makefile
+--- iproute2-6.6.0/Makefile	2023-11-05 10:27:42.014313998 +0800
++++ iproute2-6.6.0.mod/Makefile	2023-11-05 10:33:54.362313856 +0800
 @@ -14,18 +14,18 @@
  MAKEFLAGS += --no-print-directory
  endif
@@ -8,9 +9,9 @@
 -SBINDIR?=/sbin
 -CONF_ETC_DIR?=/etc/iproute2
 +PREFIX?=$(PREFIX)/usr
-+SBINDIR?=$(PREFIX)/sbin
++SBINDIR?=$(PREFIX)/bin
 +CONF_ETC_DIR?=$(PREFIX)/etc/iproute2
- CONF_USR_DIR?=$(PREFIX)/lib/iproute2
+ CONF_USR_DIR?=$(LIBDIR)/iproute2
 -NETNS_RUN_DIR?=/var/run/netns
 -NETNS_ETC_DIR?=/etc/netns
 +NETNS_RUN_DIR?=$(PREFIX)/var/run/netns
@@ -22,7 +23,7 @@
 -ARPDDIR?=/var/lib/arpd
 -KERNEL_INCLUDE?=/usr/include
 +ARPDDIR?=$(PREFIX)/var/lib/arpd
-+KERNEL_INCLUDE?=$(PREFIX)/usr/include
++KERNEL_INCLUDE?=$(PREFIX)/include
  BASH_COMPDIR?=$(DATADIR)/bash-completion/completions
  
  # Path to db_185.h include
