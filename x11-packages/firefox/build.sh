@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Mozilla Firefox web browser"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="119.0.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://ftp.mozilla.org/pub/firefox/releases/${TERMUX_PKG_VERSION}/source/firefox-${TERMUX_PKG_VERSION}.source.tar.xz
 TERMUX_PKG_SHA256=48cc43cab060e97467e9a17617f511a177e7b91b7e77e408425351a2cbb07f70
 # ffmpeg and pulseaudio are dependencies through dlopen(3):
@@ -113,4 +114,12 @@ termux_step_configure() {
 
 termux_step_post_make_install() {
 	install -Dm644 -t "${TERMUX_PREFIX}/share/applications" "${TERMUX_PKG_BUILDER_DIR}/firefox.desktop"
+
+	# https://github.com/termux/termux-packages/issues/18429
+	# https://phabricator.services.mozilla.com/D181687
+	# Android 8.x and older not support "-z pack-relative-relocs" / DT_RELR
+	local r=$("${READELF}" -d "${TERMUX_PREFIX}/bin/firefox")
+	if [[ -n "$(echo "${r}" | grep "(RELR)")" ]]; then
+		termux_error_exit "DT_RELR is unsupported on Android 8.x and older\n${r}"
+	fi
 }

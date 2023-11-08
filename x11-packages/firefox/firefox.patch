@@ -289,10 +289,10 @@ diff -ur firefox-119.0/toolkit/library/rust/shared/lib.rs firefox-119.0.mod/tool
  extern crate viaduct;
  
  extern crate gecko_logger;
-diff -uNr firefox-118.0/toolkit/moz.configure firefox-118.0.mod/toolkit/moz.configure
---- firefox-118.0/toolkit/moz.configure	2023-09-19 02:27:27.000000000 +0800
-+++ firefox-118.0.mod/toolkit/moz.configure	2023-09-28 02:38:09.171038018 +0800
-@@ -172,7 +172,7 @@
+diff -uNr firefox-119.0.1/toolkit/moz.configure firefox-119.0.1.mod/toolkit/moz.configure
+--- firefox-119.0.1/toolkit/moz.configure	2023-11-07 03:17:38.000000000 +0800
++++ firefox-119.0.1.mod/toolkit/moz.configure	2023-11-08 15:44:35.208664429 +0800
+@@ -174,7 +174,7 @@
  @depends(target)
  def midir_linux_support(target):
      return (
@@ -301,7 +301,7 @@ diff -uNr firefox-118.0/toolkit/moz.configure firefox-118.0.mod/toolkit/moz.conf
      )
  
  
-@@ -231,7 +231,7 @@
+@@ -234,7 +234,7 @@
  
  @depends("--enable-audio-backends", target)
  def imply_aaudio(values, target):
@@ -310,7 +310,7 @@ diff -uNr firefox-118.0/toolkit/moz.configure firefox-118.0.mod/toolkit/moz.conf
          die("Cannot enable AAudio on %s", target.os)
      return any("aaudio" in value for value in values) or None
  
-@@ -265,7 +265,7 @@
+@@ -268,7 +268,7 @@
  
  @depends("--enable-audio-backends", target)
  def imply_opensl(values, target):
@@ -319,7 +319,15 @@ diff -uNr firefox-118.0/toolkit/moz.configure firefox-118.0.mod/toolkit/moz.conf
          die("Cannot enable OpenSL on %s", target.os)
      return any("opensl" in value for value in values) or None
  
-@@ -2147,6 +2147,8 @@
+@@ -1523,6 +1523,7 @@
+         # packed relative relocations rather than elfhack.
+         if android_version:
+             return android_version >= 30
++        return False
+         return have_arc4random
+ 
+     @depends(
+@@ -2250,6 +2251,8 @@
          set_config("MOZ_JPEG_CFLAGS", jpeg_flags.cflags)
          set_config("MOZ_JPEG_LIBS", jpeg_flags.ldflags)
  
@@ -328,7 +336,7 @@ diff -uNr firefox-118.0/toolkit/moz.configure firefox-118.0.mod/toolkit/moz.conf
      @depends("--with-system-jpeg", target, neon_flags)
      def in_tree_jpeg_arm(system_jpeg, target, neon_flags):
          if system_jpeg:
-@@ -3313,7 +3315,7 @@
+@@ -3418,7 +3421,7 @@
      option(
          env="MOZ_LINKER",
          default=depends(target.os, when="--enable-jemalloc")(
@@ -337,7 +345,7 @@ diff -uNr firefox-118.0/toolkit/moz.configure firefox-118.0.mod/toolkit/moz.conf
          ),
          help="{Enable|Disable} custom dynamic linker",
      )
-@@ -3345,7 +3347,7 @@
+@@ -3450,7 +3453,7 @@
          "Can't find header linux/joystick.h, needed for gamepad support."
          " Please install Linux kernel headers."
      ),
@@ -345,7 +353,7 @@ diff -uNr firefox-118.0/toolkit/moz.configure firefox-118.0.mod/toolkit/moz.conf
 +    when=False,
  )
  
- # Smart card support
+ 
 diff -uNr firefox-118.0/toolkit/xre/glxtest/glxtest.cpp firefox-118.0.mod/toolkit/xre/glxtest/glxtest.cpp
 --- firefox-118.0/toolkit/xre/glxtest/glxtest.cpp	2023-09-19 01:41:31.000000000 +0800
 +++ firefox-118.0.mod/toolkit/xre/glxtest/glxtest.cpp	2023-09-28 02:38:09.175038018 +0800
