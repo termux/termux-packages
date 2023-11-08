@@ -1,0 +1,77 @@
+diff -uNr mogan-1.1.6/xmake.lua mogan-1.1.6.mod/xmake.lua
+--- mogan-1.1.6/xmake.lua	2023-09-29 02:12:08.000000000 +0800
++++ mogan-1.1.6.mod/xmake.lua	2023-11-15 19:12:40.537079639 +0800
+@@ -37,7 +37,7 @@
+     add_rules("mode.releasedbg", "mode.release", "mode.debug")
+ end
+ 
+-if is_plat("linux") and (linuxos.name() == "debian" or linuxos.name() == "ubuntu" or linuxos.name() == "uos") then
++if false and (is_plat("linux") and (linuxos.name() == "debian" or linuxos.name() == "ubuntu" or linuxos.name() == "uos")) then
+     add_requires("apt::libcurl4-openssl-dev", {alias="libcurl"})
+     add_requires("apt::libsqlite3-dev", {alias="sqlite3"})
+     add_requires("apt::libpng-dev", {alias="libpng"})
+@@ -55,24 +55,25 @@
+     end
+ else
+     if not is_plat("wasm") then
+-        add_requires("libiconv 1.17", {system=false})
+-        add_requires("libcurl 7.84.0", {system=false})
++        add_requires("pkgconfig::libcurl", {alias="libcurl", system=true})
+     end
+-    add_requires("libpng 1.6.37", {system=false})
+-    add_requires("libjpeg v9e", {system=false})
+-    add_requires("freetype 2.12.1", {system=false})
++    add_requires("pkgconfig::libpng", {alias="libpng", system=true})
++    add_requires("pkgconfig::libjpeg", {alias="libjpeg", system=true})
++    add_requires("pkgconfig::freetype2", {alias="freetype", system=true})
+     if is_plat ("macosx") then
+         add_requires("sqlite3", {system=true})
+     else
+-        add_requires("sqlite3 3.39.0+200", {system=false})
++        add_requires("pkgconfig::sqlite3", {alias="sqlite3", system=true})
+     end
+ end
+ 
+ local PDFHUMMUS_VERSION = "4.5.10"
+ if not is_plat("wasm") then
+     add_requires("pdfhummus "..PDFHUMMUS_VERSION, {system=false,configs={libpng=true,libjpeg=true}})
++if is_plat("mingw") then
+     add_requires("nowide_standalone 11.2.0", {system=false})
+ end
++end
+ 
+ local XMACS_VERSION="1.1.6"
+ local INSTALL_DIR="build/package"
+@@ -292,7 +293,9 @@
+     add_packages("sqlite3")
+ 
+     if not is_plat("wasm") then
++        if is_plat("mingw") then
+         add_packages("nowide_standalone")
++        end
+         add_packages("pdfhummus")
+         add_packages("libiconv")
+         add_packages("libcurl")
+@@ -464,6 +467,10 @@
+     end
+     add_mxflags("-fno-objc-arc")
+     add_cxxflags("-include src/System/config.h")
++    add_links("android-complex-math")
++    add_links("android-execinfo")
++    add_links("android-spawn")
++    add_links("iconv")
+ end 
+ 
+ option("libdl") do
+@@ -638,9 +645,9 @@
+                 end
+             end
+             if is_plat("macosx") or is_plat("linux")  then
+-                os.mkdir (path.join(target:installdir(), "share/Xmacs/plugins/shell/bin"))
++                os.mkdir (path.join(target:installdir(), "libexec/Xmacs/plugins/shell/bin"))
+                 os.mv (path.join(target:installdir(), "bin/tm_shell"),
+-                       path.join(target:installdir(), "share/Xmacs/plugins/shell/bin"))
++                       path.join(target:installdir(), "libexec/Xmacs/plugins/shell/bin"))
+             end
+             if is_plat("macosx") then
+                 os.cp ("packages/macos/Info.plist", path.join(target:installdir(), "../Info.plist"))
