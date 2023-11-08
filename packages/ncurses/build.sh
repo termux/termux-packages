@@ -12,18 +12,18 @@ _SNAPSHOT_COMMIT=8bd5a3d98fc741bdcc9e5fada1a3d5980e1ea22a
 TERMUX_PKG_VERSION=(6.4.20231001
 		    9.31
 		    15
-		    0.30.0
+		    0.30.1
 		    0.11.0)
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=(https://github.com/ThomasDickey/ncurses-snapshots/archive/${_SNAPSHOT_COMMIT}.tar.gz
 		   https://fossies.org/linux/misc/rxvt-unicode-${TERMUX_PKG_VERSION[1]}.tar.bz2
 		   https://github.com/thestinger/termite/archive/v${TERMUX_PKG_VERSION[2]}.tar.gz
-		   https://github.com/kovidgoyal/kitty/archive/v${TERMUX_PKG_VERSION[3]}.tar.gz
+		   https://github.com/kovidgoyal/kitty/releases/download/v${TERMUX_PKG_VERSION[3]}/kitty-${TERMUX_PKG_VERSION[3]}.tar.xz
 		   https://github.com/alacritty/alacritty/archive/refs/tags/v${TERMUX_PKG_VERSION[4]}.tar.gz)
 TERMUX_PKG_SHA256=(ca4a28ed4d38a7b79e1cd883e3d2755839072a7e4fe8cf265be1ef4ae79b6bc2
 		   aaa13fcbc149fe0f3f391f933279580f74a96fd312d6ed06b8ff03c2d46672e8
 		   3ae9ebef28aad081c6c11351f086776e2fd9547563b2f900732b41c376bec05a
-		   1e9c66ed6025b80e143bcde89f3265b51c15d0b71a05d7c6c1dc580a2f00fee7
+		   42c4ccfb601f830fbf42b7cb23d545f0f775010f26abe1b969b8346290e9d68b
 		   0fb3370c662f5b87d1b9a487aef999195212b192e08f6f68a572fed8fd637e07)
 TERMUX_PKG_AUTO_UPDATE=false
 
