@@ -133,6 +133,10 @@ source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_rust.sh"
 # shellcheck source=scripts/build/setup/termux_setup_swift.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_swift.sh"
 
+# Utility function to setup a current xmake build system.
+# shellcheck source=scripts/build/setup/termux_setup_xmake.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_xmake.sh"
+
 # Utility function for zig-using packages to setup a zig toolchain.
 # shellcheck source=scripts/build/setup/termux_setup_zig.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_zig.sh"
