@@ -1,14 +1,14 @@
 --- a/cube/CMakeLists.txt
 +++ b/cube/CMakeLists.txt
-@@ -121,8 +121,6 @@
-         set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /guard:cf")
-         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /guard:cf")
-     endif()
+@@ -84,8 +84,6 @@
+ 
+ if(WIN32)
+     add_definitions(-DVK_USE_PLATFORM_WIN32_KHR -DWIN32_LEAN_AND_MEAN)
 -elseif(ANDROID)
 -    add_definitions(-DVK_USE_PLATFORM_ANDROID_KHR)
  elseif(APPLE)
      add_definitions(-DVK_USE_PLATFORM_METAL_EXT)
- elseif(UNIX AND NOT APPLE) # i.e. Linux
+ elseif(CMAKE_SYSTEM_NAME MATCHES "Linux|BSD")
 --- a/cube/cube.c
 +++ b/cube/cube.c
 @@ -48,7 +48,7 @@
