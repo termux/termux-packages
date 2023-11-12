@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="bionic libc, libm, libdl and dynamic linker for ubuntu h
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="8.0.0-r51"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=6b42a86fc2ec58f86862a8f09a5465af0758ce24f2ca8c3cabb3bb6a81d96525
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -53,6 +54,9 @@ termux_step_get_source() {
 
     sed -i '1s|.*|\#!'${TERMUX_PKG_SRCDIR}'/prebuilts/python/linux-x86/2.7.5/bin/python2|' ${TERMUX_PKG_SRCDIR}/bionic/libc/fs_config_generator.py
     sed -i '1s|.*|\#!'${TERMUX_PKG_SRCDIR}'/prebuilts/python/linux-x86/2.7.5/bin/python2|' ${TERMUX_PKG_SRCDIR}/external/clang/clang-version-inc.py
+    sed -i '/selinux/d' ${TERMUX_PKG_SRCDIR}/system/core/debuggerd/Android.bp
+    sed -i '/selinux/d' ${TERMUX_PKG_SRCDIR}/system/core/debuggerd/crash_dump.cpp
+    sed -i '/selinux/d' ${TERMUX_PKG_SRCDIR}/system/core/debuggerd/debuggerd.cpp
 }
 
 termux_step_configure() {
@@ -65,7 +69,7 @@ termux_step_make() {
         cd ${TERMUX_PKG_SRCDIR}
         source build/envsetup.sh;
         lunch aosp_${_ARCH}-eng;
-        make JAVA_NOT_REQUIRED=true linker libc libm libdl
+        make JAVA_NOT_REQUIRED=true linker libc libm libdl debuggerd crash_dump
     "
 }
 
