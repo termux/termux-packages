@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A popular libre and open source media player and multime
 TERMUX_PKG_LICENSE="GPL-2.0, LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.0.20"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.videolan.org/pub/videolan/vlc/${TERMUX_PKG_VERSION}/vlc-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=adc7285b4d2721cddf40eb5270cada2aaa10a334cb546fd55a06353447ba29b5
 TERMUX_PKG_AUTO_UPDATE=true
