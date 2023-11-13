@@ -8,6 +8,7 @@ TERMUX_PKG_VERSION=${_MAIN_VERSION}.${_PATCH_VERSION}
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/bash/bash-${_MAIN_VERSION}.tar.gz
 TERMUX_PKG_SHA256=a139c166df7ff4471c5e0733051642ee5556c1cc8a4a78f145583c5c81ab32fb
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="libandroid-support, libiconv, readline (>= 8.0), termux-tools"
 TERMUX_PKG_RECOMMENDS="command-not-found, bash-completion"
 TERMUX_PKG_BREAKS="bash-dev"
