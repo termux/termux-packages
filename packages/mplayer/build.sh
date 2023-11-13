@@ -33,6 +33,7 @@ termux_step_post_get_source() {
 }
 
 termux_step_configure_autotools() {
+	export CFLAGS+=" -include limits.h"
 	sh "$TERMUX_PKG_SRCDIR/configure" \
 		--target=$TERMUX_HOST_PLATFORM \
 		--prefix=$TERMUX_PREFIX \
