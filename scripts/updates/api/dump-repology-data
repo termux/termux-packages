@@ -54,6 +54,10 @@ def get_outdated_packages():
             break
 
         for package_name, package_data in repology_data.items():
+            for repo_data in package_data:
+                if repo_data["repo"] == "termux":
+                    package_name = repo_data["visiblename"]
+                    break
             if package_name in termux_outdated_packages:
                 # Skip if package is already in the dict.
                 continue
