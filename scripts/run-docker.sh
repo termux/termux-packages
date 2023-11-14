@@ -53,6 +53,7 @@ $SUDO docker start $CONTAINER_NAME >/dev/null 2>&1 || {
 		$SEC_OPT \
 		--tty \
 		$TERMUX_BUILDER_IMAGE_NAME
+    $SUDO docker exec $DOCKER_TTY $CONTAINER_NAME sudo ln -s /data/data/com.termux/files/usr/opt/bionic-host /system
 	if [ "$UNAME" != Darwin ]; then
 		if [ $(id -u) -ne 1001 -a $(id -u) -ne 0 ]; then
 			echo "Changed builder uid/gid... (this may take a while)"
