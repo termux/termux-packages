@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="bionic libc, libm, libdl and dynamic linker for ubuntu h
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="8.0.0-r51"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SHA256=6b42a86fc2ec58f86862a8f09a5465af0758ce24f2ca8c3cabb3bb6a81d96525
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -69,11 +69,12 @@ termux_step_make() {
         cd ${TERMUX_PKG_SRCDIR}
         source build/envsetup.sh;
         lunch aosp_${_ARCH}-eng;
-        make JAVA_NOT_REQUIRED=true linker libc libm libdl debuggerd crash_dump
+        make JAVA_NOT_REQUIRED=true linker libc libm libdl libicuuc debuggerd crash_dump
     "
 }
 
 termux_step_make_install() {
-    mkdir -p ${TERMUX_PREFIX}/opt/bionic-cross
-    cp -r ${TERMUX_PKG_SRCDIR}/out/target/product/generic*/system/* ${TERMUX_PREFIX}/opt/bionic-cross/
+    mkdir -p ${TERMUX_PREFIX}/opt/bionic-host/usr/icu
+    cp ${TERMUX_PKG_SRCDIR}/external/icu/icu4c/source/stubdata/icudt58l.dat ${TERMUX_PREFIX}/opt/bionic-host/usr/icu/
+    cp -r ${TERMUX_PKG_SRCDIR}/out/target/product/generic*/system/* ${TERMUX_PREFIX}/opt/bionic-host/
 }
