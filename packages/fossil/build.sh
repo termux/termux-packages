@@ -3,9 +3,10 @@ TERMUX_PKG_DESCRIPTION="DSCM with built-in wiki, http interface and server, tick
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_LICENSE_FILE="COPYRIGHT-BSD2.txt"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.22
+TERMUX_PKG_VERSION="2.23"
 TERMUX_PKG_SRCURL=https://www.fossil-scm.org/home/tarball/version-$TERMUX_PKG_VERSION/fossil-src-$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=b90c40beb75308b0eba46b5add6e54a7a9e65ac90ce86ec8d78ae2a4bb8bae60
+TERMUX_PKG_SHA256=a94aec2609331cd6890c6725b55aea43041011863f3d84fdc380415af75233e4
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libsqlite, openssl, zlib"
 
 termux_step_pre_configure() {
