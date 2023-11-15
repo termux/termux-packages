@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.rust-lang.org/
 TERMUX_PKG_DESCRIPTION="Systems programming language focused on safety, speed and concurrency"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.74.1"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="1.75.0"
 TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/rustc-${TERMUX_PKG_VERSION}-src.tar.xz
-TERMUX_PKG_SHA256=b98c09d968529212fb29eec7d6d3e9bdaa869810679b7fb86a1ca69469d75f5e
+TERMUX_PKG_SHA256=4526f786d673e4859ff2afa0bab2ba13c918b796519a25c1acce06dba9542340
 _LLVM_MAJOR_VERSION=$(. $TERMUX_SCRIPTDIR/packages/libllvm/build.sh; echo $LLVM_MAJOR_VERSION)
 _LLVM_MAJOR_VERSION_NEXT=$((_LLVM_MAJOR_VERSION + 1))
 TERMUX_PKG_DEPENDS="clang, libc++, libllvm (<< ${_LLVM_MAJOR_VERSION_NEXT}), lld, openssl, zlib"
@@ -22,11 +21,12 @@ termux_step_pre_configure() {
 	termux_setup_cmake
 	termux_setup_rust
 
-	TERMUX_PKG_RECOMMENDS="rust-std-${CARGO_TARGET_NAME/_/-}"
+	# default rust-std package to be installed
+	TERMUX_PKG_DEPENDS+=", rust-std-${CARGO_TARGET_NAME/_/-}"
 
-	local p="$TERMUX_PKG_BUILDER_DIR/src-bootstrap-cc_detect.rs.diff"
+	local p="${TERMUX_PKG_BUILDER_DIR}/src-bootstrap-src-utils-cc_detect.rs.diff"
 	echo "Applying $(basename "${p}")"
-	sed 's|@TERMUX_PKG_API_LEVEL@|'"${TERMUX_PKG_API_LEVEL}"'|g' "${p}" \
+	sed "s|@TERMUX_PKG_API_LEVEL@|${TERMUX_PKG_API_LEVEL}|g" "${p}" \
 		| patch --silent -p1
 
 	export RUST_LIBDIR=$TERMUX_PKG_BUILDDIR/_lib
@@ -79,7 +79,7 @@ termux_step_configure() {
 	# like 30 to 40 + minutes ... so lets get it right
 
 	# upstream only tests build ver one version behind $TERMUX_PKG_VERSION
-	local BOOTSTRAP_VERSION=1.74.0
+	local BOOTSTRAP_VERSION=1.74.1
 	rustup install $BOOTSTRAP_VERSION
 	rustup default $BOOTSTRAP_VERSION-x86_64-unknown-linux-gnu
 	export PATH=$HOME/.rustup/toolchains/$BOOTSTRAP_VERSION-x86_64-unknown-linux-gnu/bin:$PATH
