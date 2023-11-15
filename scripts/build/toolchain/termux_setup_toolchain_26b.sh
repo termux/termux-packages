@@ -182,6 +182,11 @@ termux_setup_toolchain_26b() {
 		fi
 	done
 
+	# rust 1.75.0+ expects this directory to be present
+	rm -fr "${_TERMUX_TOOLCHAIN_TMPDIR}"/toolchains
+	mkdir -p "${_TERMUX_TOOLCHAIN_TMPDIR}"/toolchains/llvm/prebuilt
+	ln -fs ../../.. "${_TERMUX_TOOLCHAIN_TMPDIR}"/toolchains/llvm/prebuilt/linux-x86_64
+
 	# Create a pkg-config wrapper. We use path to host pkg-config to
 	# avoid picking up a cross-compiled pkg-config later on.
 	local _HOST_PKGCONFIG
