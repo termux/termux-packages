@@ -2,9 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://git-scm.com/
 TERMUX_PKG_DESCRIPTION="Fast, scalable, distributed revision control system"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.42.0
+TERMUX_PKG_VERSION="2.42.1"
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/pub/software/scm/git/git-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=3278210e9fd2994b8484dd7e3ddd9ea8b940ef52170cdb606daa94d887c93b0d
+TERMUX_PKG_SHA256=8e46fa96bf35a65625d85fde50391e39bc0620d1bb39afb70b96c4a237a1a4f7
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libcurl, libiconv, less, openssl, pcre2, zlib"
 TERMUX_PKG_SUGGESTS="perl"
 
@@ -84,6 +85,7 @@ termux_step_post_make_install() {
 	# Remove duplicated binaries in bin/ with symlink to the one in libexec/git-core:
 	(cd $TERMUX_PREFIX/bin; ln -s -f ../libexec/git-core/git git)
 	(cd $TERMUX_PREFIX/bin; ln -s -f ../libexec/git-core/git-upload-pack git-upload-pack)
+	(cd $TERMUX_PREFIX/libexec/git-core; ln -s -f git-gui git-citool)
 }
 
 termux_step_post_massage() {
