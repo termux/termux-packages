@@ -1,0 +1,16 @@
+https://github.com/gentoo/gentoo/commit/6fb7d0a7131b5a5938b12673f4b260d66cc1a527
+
+--- a/deps/v8/src/base/bit-field.h
++++ b/deps/v8/src/base/bit-field.h
+@@ -39,8 +39,11 @@
+   static constexpr int kLastUsedBit = kShift + kSize - 1;
+   static constexpr U kNumValues = U{1} << kSize;
+ 
++  #pragma clang diagnostic push
++  #pragma clang diagnostic ignored "-Wenum-constexpr-conversion"
+   // Value for the field with all bits set.
+   static constexpr T kMax = static_cast<T>(kNumValues - 1);
++  #pragma clang diagnostic pop
+ 
+   template <class T2, int size2>
+   using Next = BitField<T2, kShift + kSize, size2, U>;
