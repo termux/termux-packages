@@ -2,7 +2,23 @@ diff --git a/swift/utils/build-script-impl b/swift/utils/build-script-impl
 index b1d060328bc..218c9215260 100755
 --- a/swift/utils/build-script-impl
 +++ b/swift/utils/build-script-impl
-@@ -1769,6 +1769,9 @@ for host in "${ALL_HOSTS[@]}"; do
+@@ -1726,6 +1726,7 @@
+                     )
+                 fi
+ 
++                cross_c_flags=""
+                 if [[ ! "${SKIP_BUILD_ANDROID}" ]] ||
+                    [[ $(is_cross_tools_host ${host}) && "${host}" == "android-"* ]]; then
+                     cmake_options=(
+@@ -1733,6 +1734,7 @@
+                         -DSWIFT_ANDROID_DEPLOY_DEVICE_PATH:STRING="${ANDROID_DEPLOY_DEVICE_PATH}"
+                         -DSWIFT_SDK_ANDROID_ARCHITECTURES:STRING="${ANDROID_ARCH}"
+                     )
++                    cross_c_flags="--target=$CCTERMUX_HOST_PLATFORM"
+                 fi
+ 
+                 if [[ ! "${SKIP_BUILD_WASM}" ]]; then
+@@ -1785,6 +1788,9 @@
                          "${cmake_options[@]}"
                          -DLLVM_TABLEGEN=$(build_directory "${LOCAL_HOST}" llvm)/bin/llvm-tblgen
                          -DSWIFT_INCLUDE_TEST_BINARIES:BOOL=FALSE
@@ -12,7 +28,7 @@ index b1d060328bc..218c9215260 100755
                      )
                  fi
  
-@@ -1784,6 +1784,13 @@ for host in "${ALL_HOSTS[@]}"; do
+@@ -1800,6 +1806,13 @@
                      native_swift_tools_path="${NATIVE_SWIFT_TOOLS_PATH}"
                  fi
  
@@ -26,7 +42,18 @@ index b1d060328bc..218c9215260 100755
                  if [ "${BUILD_LLVM}" == "0" ] ; then
                      cmake_options=(
                          "${cmake_options[@]}"
-@@ -2035,6 +2035,7 @@ for host in "${ALL_HOSTS[@]}"; do
+@@ -1820,8 +1833,8 @@
+ 
+                 cmake_options=(
+                     "${cmake_options[@]}"
+-                    -DCMAKE_C_FLAGS="$(swift_c_flags ${host})"
+-                    -DCMAKE_CXX_FLAGS="$(swift_c_flags ${host})"
++                    -DCMAKE_C_FLAGS="$(swift_c_flags ${host}) ${cross_c_flags}"
++                    -DCMAKE_CXX_FLAGS="$(swift_c_flags ${host}) ${cross_c_flags}"
+                     -DCMAKE_C_FLAGS_RELWITHDEBINFO="-O2 -DNDEBUG"
+                     -DCMAKE_CXX_FLAGS_RELWITHDEBINFO="-O2 -DNDEBUG"
+                     -DCMAKE_BUILD_TYPE:STRING="${SWIFT_BUILD_TYPE}"
+@@ -1878,6 +1891,7 @@
                      -DLIBDISPATCH_CMAKE_BUILD_TYPE:STRING="${LIBDISPATCH_BUILD_TYPE}"
                      -DSWIFT_PATH_TO_SWIFT_SYNTAX_SOURCE:PATH="${SWIFT_SYNTAX_SOURCE_DIR}"
                      -DSWIFT_ENABLE_BACKTRACING:BOOL=$(true_false "${SWIFT_ENABLE_BACKTRACING}")

@@ -25,7 +25,7 @@ diff --git a/swift/cmake/modules/AddPureSwift.cmake b/swift/cmake/modules/AddPur
 index dc58b8fa0f6..37e9f817471 100644
 --- a/swift/cmake/modules/AddPureSwift.cmake
 +++ b/swift/cmake/modules/AddPureSwift.cmake
-@@ -44,6 +44,12 @@ function(_add_host_swift_compile_options name)
+@@ -44,6 +44,13 @@ function(_add_host_swift_compile_options name)
      $<$<COMPILE_LANGUAGE:Swift>:none>)
  
    target_compile_options(${name} PRIVATE $<$<COMPILE_LANGUAGE:Swift>:-target;${SWIFT_HOST_TRIPLE}>)
@@ -34,6 +34,7 @@ index dc58b8fa0f6..37e9f817471 100644
 +    target_compile_options(${name} PRIVATE $<$<COMPILE_LANGUAGE:Swift>:-resource-dir;${SWIFTLIB_DIR};>
 +        $<$<COMPILE_LANGUAGE:Swift>:-sdk;${SWIFT_SDK_ANDROID_ARCH_${SWIFT_HOST_VARIANT_ARCH}_PATH};>
 +        $<$<COMPILE_LANGUAGE:Swift>:-tools-directory;${tools_path};>)
++    add_dependencies(${name} swift-stdlib-android-${SWIFT_HOST_VARIANT_ARCH})
 +  endif()
    _add_host_variant_swift_sanitizer_flags(${name})
  endfunction()
