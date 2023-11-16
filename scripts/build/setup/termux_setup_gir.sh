@@ -27,6 +27,15 @@ termux_setup_gir() {
 	# Used by gi-cross-launcher:
 	export TERMUX_PKG_GIR_PRE_GENERATED_DUMP_DIR="$TERMUX_PKG_BUILDER_DIR/gir/${TERMUX_PKG_VERSION##*:}"
 
+        ## Generating dumps is pretty easy.
+	### 1. Install all package dependencies to your linux PC.
+        ### 2. `export GI_SCANNER_DEBUG=save-temps`.
+        ### 3. Compile package (configure+make, meson+ninja, cmake+ninja, etc.)
+        ### 4. Go to build folder. There will be folder/s like `tmp-introspectedXXXXXXXX` 
+	###    where every X is random letter or number. These folder contain a '.c' file and 'dump.xml'.
+   	### 5. You should take 'dump.xml' and rename it to the same name as '.c' file but keep '.xml' extension.
+     	### 6. Put this xml to "$TERMUX_PKG_BUILDER_DIR/gir/${TERMUX_PKG_VERSION##*:}" folder of the package.
+
 	local _GIR_CROSS_FOLDER="$TERMUX_COMMON_CACHEDIR/gir-cross"
 	local bin="$_GIR_CROSS_FOLDER/bin"
 	export GI_CROSS_LAUNCHER="$bin/gi-cross-launcher"
