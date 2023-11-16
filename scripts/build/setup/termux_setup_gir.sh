@@ -35,6 +35,7 @@ termux_setup_gir() {
 		if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
 			unset TERMUX_G_IR_COMPILER
 
+			mkdir -p "$bin"
 			sed -e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
 				"$TERMUX_SCRIPTDIR/packages/gobject-introspection/gi-cross-launcher-on-device.in" \
 				> "$GI_CROSS_LAUNCHER"
