@@ -1,20 +1,15 @@
 --- a/compiler/rustc_driver_impl/src/lib.rs
 +++ b/compiler/rustc_driver_impl/src/lib.rs
-@@ -1296,7 +1296,7 @@
-     }
- }
- 
+@@ -87,10 +87,10 @@
+ #[macro_use]
+ mod print;
+ mod session_diagnostics;
 -#[cfg(all(unix, any(target_env = "gnu", target_os = "macos")))]
 +#[cfg(all(unix, any(target_env = "gnu", target_os = "macos"), not(target_os = "android")))]
- mod signal_handler {
-     extern "C" {
-         fn backtrace_symbols_fd(
-@@ -1340,7 +1340,7 @@
-     }
- }
+ mod signal_handler;
  
 -#[cfg(not(all(unix, any(target_env = "gnu", target_os = "macos"))))]
 +#[cfg(not(all(unix, any(target_env = "gnu", target_os = "macos"), not(target_os = "android"))))]
  mod signal_handler {
-     pub(super) fn install() {}
- }
+     /// On platforms which don't support our signal handler's requirements,
+     /// simply use the default signal handler provided by std.
