@@ -4,9 +4,9 @@ TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # When updating the package, also update terminfo for kitty by updating
 # ncurses' kitty sources in main repo
-TERMUX_PKG_VERSION=0.30.1
+TERMUX_PKG_VERSION="0.31.0"
 TERMUX_PKG_SRCURL=https://github.com/kovidgoyal/kitty/releases/download/v${TERMUX_PKG_VERSION}/kitty-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=42c4ccfb601f830fbf42b7cb23d545f0f775010f26abe1b969b8346290e9d68b
+TERMUX_PKG_SHA256=d122497134abab8e25dfcb6b127af40cfe641980e007f696732f70ed298198f5
 # fontconfig is dlopen(3)ed:
 TERMUX_PKG_DEPENDS="dbus, fontconfig, harfbuzz, libpng, librsync, libx11, libxkbcommon, littlecms, ncurses, opengl, openssl, python, xxhash, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libxcursor, libxi, libxinerama, libxrandr, xorgproto"
@@ -70,6 +70,8 @@ termux_step_host_build() {
 	${TERMUX_MESON} \
 		${TERMUX_PKG_HOSTBUILD_DIR}/build-xkbcommon . \
 		--prefix "${TERMUX_PKG_HOSTBUILD_DIR}" \
+		-Denable-bash-completion=false \
+		-Denable-wayland=false \
 		-Denable-docs=false
 	ninja \
 		-C ${TERMUX_PKG_HOSTBUILD_DIR}/build-xkbcommon \

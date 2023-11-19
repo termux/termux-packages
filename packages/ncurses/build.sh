@@ -12,7 +12,7 @@ _SNAPSHOT_COMMIT=8bd5a3d98fc741bdcc9e5fada1a3d5980e1ea22a
 TERMUX_PKG_VERSION=(6.4.20231001
 		    9.31
 		    15
-		    0.30.1
+		    0.31.0
 		    0.11.0)
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=(https://github.com/ThomasDickey/ncurses-snapshots/archive/${_SNAPSHOT_COMMIT}.tar.gz
@@ -23,7 +23,7 @@ TERMUX_PKG_SRCURL=(https://github.com/ThomasDickey/ncurses-snapshots/archive/${_
 TERMUX_PKG_SHA256=(ca4a28ed4d38a7b79e1cd883e3d2755839072a7e4fe8cf265be1ef4ae79b6bc2
 		   aaa13fcbc149fe0f3f391f933279580f74a96fd312d6ed06b8ff03c2d46672e8
 		   3ae9ebef28aad081c6c11351f086776e2fd9547563b2f900732b41c376bec05a
-		   42c4ccfb601f830fbf42b7cb23d545f0f775010f26abe1b969b8346290e9d68b
+		   d122497134abab8e25dfcb6b127af40cfe641980e007f696732f70ed298198f5
 		   0fb3370c662f5b87d1b9a487aef999195212b192e08f6f68a572fed8fd637e07)
 TERMUX_PKG_AUTO_UPDATE=false
 
