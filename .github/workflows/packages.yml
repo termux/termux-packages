@@ -176,7 +176,7 @@ jobs:
           repo=$(jq --raw-output '.["'${repo_path}'"].name' repo.json)
 
           if [ -f ./built_${repo}_packages.txt ]; then
-            packages="$packages $(cat ./built_${repo}_packages.txt)"
+            packages="$packages $(cat ./built_${repo}_packages.txt | tr '\n' ' ')"
           fi
         done
 
