@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Debian package management system"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.22.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/debian/pool/main/d/dpkg/dpkg_${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=5a4824e9869494e501953c7466ab1960a7fa23d9b0b911b8a6f113094e0226cf
 TERMUX_PKG_AUTO_UPDATE=false
@@ -21,6 +22,7 @@ dpkg_cv_c99_snprintf=yes
 HAVE_SETEXECFILECON_FALSE=#
 --host=${TERMUX_ARCH}-linux
 --without-selinux
+DPKG_PAGER=less
 "
 
 TERMUX_PKG_RM_AFTER_INSTALL="
