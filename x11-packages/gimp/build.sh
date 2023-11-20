@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="GNU Image Manipulation Program"
 TERMUX_PKG_LICENSE="GPL-3.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.10.36"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.gimp.org/mirror/pub/gimp/v${TERMUX_PKG_VERSION%.*}/gimp-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=3d3bc3c69a4bdb3aea9ba2d5385ed98ea03953f3857aafd1d6976011ed7cdbb2
 TERMUX_PKG_DEPENDS="aalib, atk, babl, fontconfig, freetype, gdk-pixbuf, gegl, gexiv2, ghostscript, gimp-data, glib, glib-networking, gtk2, harfbuzz, hicolor-icon-theme, json-glib, libandroid-execinfo, libandroid-shmem, libc++, libcairo, libheif, libjpeg-turbo, libjxl, libmypaint, libpng, librsvg, libtiff, libwebp, libxcursor, libxmu, libxpm, littlecms, mypaint-brushes, openexr, openjpeg, pango, poppler, poppler-data, zlib"

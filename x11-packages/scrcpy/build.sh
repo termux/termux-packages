@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Provides display and control of Android devices connecte
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/Genymobile/scrcpy/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=9c96ce84129e6a4c15da8b907e4576c945732e666fcc52cf94ff402b9dd10c2c
 TERMUX_PKG_DEPENDS="ffmpeg, libusb, sdl2"
