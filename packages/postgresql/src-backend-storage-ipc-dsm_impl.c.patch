@@ -1,8 +1,8 @@
---- a/src/bin/initdb/initdb.c
-+++ b/src/bin/initdb/initdb.c
-@@ -81,6 +81,64 @@
- #include "mb/pg_wchar.h"
- #include "miscadmin.h"
+--- a/src/backend/storage/ipc/dsm_impl.c
++++ b/src/backend/storage/ipc/dsm_impl.c
+@@ -69,6 +69,65 @@
+ #include "utils/guc.h"
+ #include "utils/memutils.h"
  
 +static int shm_open(const char *name, int oflag, mode_t mode) {
 +    size_t namelen;
@@ -62,27 +62,7 @@
 +
 +    return unlink(fname);
 +}
- 
- /* Ideally this would be in a .h file, but it hardly seems worth the trouble */
- extern const char *select_default_timezone(const char *share_path);
-@@ -135,8 +193,8 @@
- 
- /* values to be obtained from arguments */
- static char *pg_data = NULL;
--static char *encoding = NULL;
--static char *locale = NULL;
-+static char *encoding = "UTF-8";
-+static char *locale = "en_US.UTF-8";
- static char *lc_collate = NULL;
- static char *lc_ctype = NULL;
- static char *lc_monetary = NULL;
-@@ -1006,6 +1064,9 @@
- static const char *
- choose_dsm_implementation(void)
- {
-+#if defined(__ANDROID__)
-+    return "mmap";
-+#endif
- #if defined(HAVE_SHM_OPEN) && !defined(__sun__)
- 	int			ntries = 10;
- 	pg_prng_state prng_state;
++
+ #ifdef USE_DSM_POSIX
+ static bool dsm_impl_posix(dsm_op op, dsm_handle handle, Size request_size,
+ 						   void **impl_private, void **mapped_address,

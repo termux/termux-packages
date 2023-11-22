@@ -3,12 +3,13 @@ TERMUX_PKG_DESCRIPTION="Object-relational SQL database"
 TERMUX_PKG_LICENSE="PostgreSQL"
 TERMUX_PKG_LICENSE_FILE="COPYRIGHT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=15.3
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="16.1"
 TERMUX_PKG_SRCURL=https://ftp.postgresql.org/pub/source/v$TERMUX_PKG_VERSION/postgresql-$TERMUX_PKG_VERSION.tar.bz2
-TERMUX_PKG_SHA256=ffc7d4891f00ffbf5c3f4eab7fbbced8460b8c0ee63c5a5167133b9e6599d932
+TERMUX_PKG_SHA256=ce3c4d85d19b0121fe0d3f8ef1fa601f71989e86f8a66f7dc3ad546dd5564fec
 TERMUX_PKG_DEPENDS="libandroid-execinfo, libandroid-shmem, libicu, libuuid, libxml2, openssl, readline, zlib"
-# - pgac_cv_prog_cc_ldflags__Wl___as_needed: Inform that the linker supports as-needed. It's
+# - pgac_cv_prog_cc_LDFLAGS_EX_BE__Wl___export_dynamic: Needed to fix PostgreSQL 16 that
+#   causes initdb failure: cannot locate symbol
+# - pgac_cv_prog_cc_LDFLAGS__Wl___as_needed: Inform that the linker supports as-needed. It's
 #   not stricly necessary but avoids unnecessary linking of binaries.
 # - USE_UNNAMED_POSIX_SEMAPHORES: Avoid using System V semaphores which are disabled on Android.
 # - ZIC=...: The zic tool is used to build the time zone database bundled with postgresql.
@@ -17,15 +18,20 @@ TERMUX_PKG_DEPENDS="libandroid-execinfo, libandroid-shmem, libicu, libuuid, libx
 #   There exists a --with-system-tzdata configure flag, but that does not work here as Android
 #   uses a custom combined tzdata file.
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
-pgac_cv_prog_cc_ldflags__Wl___as_needed=yes
-USE_UNNAMED_POSIX_SEMAPHORES=1
 --with-icu
 --with-libxml
 --with-openssl
 --with-uuid=e2fs
-ZIC=$TERMUX_PKG_HOSTBUILD_DIR/src/timezone/zic
+USE_UNNAMED_POSIX_SEMAPHORES=1
+ZIC=${TERMUX_PKG_HOSTBUILD_DIR}/src/timezone/zic
+pgac_cv_prog_cc_LDFLAGS_EX_BE__Wl___export_dynamic=yes
+pgac_cv_prog_cc_LDFLAGS__Wl___as_needed=yes
 "
-TERMUX_PKG_RM_AFTER_INSTALL="lib/libecpg* bin/ecpg share/man/man1/ecpg.1"
+TERMUX_PKG_RM_AFTER_INSTALL="
+bin/ecpg
+lib/libecpg*
+share/man/man1/ecpg.1
+"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_BREAKS="postgresql-contrib (<= 10.3-1), postgresql-dev"
 TERMUX_PKG_REPLACES="postgresql-contrib (<= 10.3-1), postgresql-dev"
@@ -35,7 +41,7 @@ termux_step_host_build() {
 	# Build a native zic binary which we have patched to
 	# use symlinks instead of hard links.
 	$TERMUX_PKG_SRCDIR/configure --without-readline
-	make
+	make -j "${TERMUX_MAKE_PROCESSES}"
 }
 
 termux_step_pre_configure() {
@@ -51,21 +57,22 @@ termux_step_post_make_install() {
 	make -C doc/src/sgml install-man
 
 	for contrib in \
-		hstore \
+		btree_gist \
 		citext \
 		dblink \
+		fuzzystrmatch \
+		hstore \
 		pageinspect \
+		pg_freespacemap \
+		pg_stat_statements \
+		pg_trgm \
 		pgcrypto \
 		pgrowlocks \
-		pg_freespacemap \
-		pg_stat_statements\
-		pg_trgm \
 		postgres_fdw \
-		fuzzystrmatch \
+		tablefunc \
 		unaccent \
 		uuid-ossp \
-		btree_gist \
 		; do
-		(cd contrib/$contrib && make -s -j $TERMUX_MAKE_PROCESSES install)
+		(make -C contrib/${contrib} -s -j ${TERMUX_MAKE_PROCESSES} install)
 	done
 }
