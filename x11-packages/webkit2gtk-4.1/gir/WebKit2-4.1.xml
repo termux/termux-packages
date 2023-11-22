@@ -120,6 +120,15 @@
     <member name="WEBKIT_FAVICON_DATABASE_ERROR_NOT_INITIALIZED" nick="not-initialized" value="0"/>
     <member name="WEBKIT_FAVICON_DATABASE_ERROR_FAVICON_NOT_FOUND" nick="favicon-not-found" value="1"/>
     <member name="WEBKIT_FAVICON_DATABASE_ERROR_FAVICON_UNKNOWN" nick="favicon-unknown" value="2"/>
+  </enum>  <enum name="WebKitFeatureStatus" get-type="webkit_feature_status_get_type">
+    <member name="WEBKIT_FEATURE_STATUS_EMBEDDER" nick="embedder" value="0"/>
+    <member name="WEBKIT_FEATURE_STATUS_UNSTABLE" nick="unstable" value="1"/>
+    <member name="WEBKIT_FEATURE_STATUS_INTERNAL" nick="internal" value="2"/>
+    <member name="WEBKIT_FEATURE_STATUS_DEVELOPER" nick="developer" value="3"/>
+    <member name="WEBKIT_FEATURE_STATUS_TESTABLE" nick="testable" value="4"/>
+    <member name="WEBKIT_FEATURE_STATUS_PREVIEW" nick="preview" value="5"/>
+    <member name="WEBKIT_FEATURE_STATUS_STABLE" nick="stable" value="6"/>
+    <member name="WEBKIT_FEATURE_STATUS_MATURE" nick="mature" value="7"/>
   </enum>  <flags name="WebKitFindOptions" get-type="webkit_find_options_get_type">
     <member name="WEBKIT_FIND_OPTIONS_NONE" nick="none" value="0"/>
     <member name="WEBKIT_FIND_OPTIONS_CASE_INSENSITIVE" nick="case-insensitive" value="1"/>
@@ -280,6 +289,9 @@
       <param type="gpointer"/>
     </signal>
   </class>
+  <class name="WebKitClipboardPermissionRequest" get-type="webkit_clipboard_permission_request_get_type" parents="GObject">
+    <implements name="WebKitPermissionRequest"/>
+  </class>
   <class name="WebKitContextMenu" get-type="webkit_context_menu_get_type" parents="GObject">
   </class>
   <class name="WebKitContextMenuItem" get-type="webkit_context_menu_item_get_type" parents="GInitiallyUnowned,GObject">
@@ -331,6 +343,8 @@
       <param type="gchararray"/>
     </signal>
   </class>
+  <boxed name="WebKitFeature" get-type="webkit_feature_get_type"/>
+  <boxed name="WebKitFeatureList" get-type="webkit_feature_list_get_type"/>
   <class name="WebKitFileChooserRequest" get-type="webkit_file_chooser_request_get_type" parents="GObject">
     <property name="filter" type="GtkFileFilter" flags="225"/>
     <property name="mime-types" type="GStrv" flags="225"/>
@@ -443,14 +457,14 @@
   <class name="WebKitSettings" get-type="webkit_settings_get_type" parents="GObject">
     <property name="enable-javascript" type="gboolean" flags="231" default-value="TRUE"/>
     <property name="auto-load-images" type="gboolean" flags="231" default-value="TRUE"/>
-    <property name="load-icons-ignoring-image-load-setting" type="gboolean" flags="231" default-value="FALSE"/>
+    <property name="load-icons-ignoring-image-load-setting" type="gboolean" flags="-2147483417" default-value="FALSE"/>
     <property name="enable-offline-web-application-cache" type="gboolean" flags="231" default-value="TRUE"/>
     <property name="enable-html5-local-storage" type="gboolean" flags="231" default-value="TRUE"/>
     <property name="enable-html5-database" type="gboolean" flags="231" default-value="TRUE"/>
     <property name="enable-xss-auditor" type="gboolean" flags="-2147483417" default-value="TRUE"/>
     <property name="enable-frame-flattening" type="gboolean" flags="-2147483417" default-value="FALSE"/>
     <property name="enable-plugins" type="gboolean" flags="-2147483417" default-value="FALSE"/>
-    <property name="enable-java" type="gboolean" flags="231" default-value="FALSE"/>
+    <property name="enable-java" type="gboolean" flags="-2147483417" default-value="FALSE"/>
     <property name="javascript-can-open-windows-automatically" type="gboolean" flags="231" default-value="FALSE"/>
     <property name="enable-hyperlink-auditing" type="gboolean" flags="231" default-value="TRUE"/>
     <property name="default-font-family" type="gchararray" flags="231" default-value="sans-serif"/>
@@ -549,6 +563,8 @@
     <property name="service-worker-registrations-directory" type="gchararray" flags="-2147483413" default-value="NULL"/>
     <property name="dom-cache-directory" type="gchararray" flags="-2147483413" default-value="NULL"/>
     <property name="is-ephemeral" type="gboolean" flags="235" default-value="FALSE"/>
+    <property name="origin-storage-ratio" type="gdouble" flags="234" default-value="-1.000000"/>
+    <property name="total-storage-ratio" type="gdouble" flags="234" default-value="-1.000000"/>
   </class>
   <boxed name="WebKitITPFirstParty" get-type="webkit_itp_first_party_get_type"/>
   <boxed name="WebKitITPThirdParty" get-type="webkit_itp_third_party_get_type"/>
