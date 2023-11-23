@@ -1,5 +1,5 @@
 --- openssh-portable-V_9_5_P1/sshd.c	2023-10-04 07:34:10.000000000 +0300
-+++ openssh-portable-V_9_5_P1.mod/sshd.c	2023-11-23 16:35:38.034843728 +0200
++++ openssh-portable-V_9_5_P1.mod/sshd.c	2023-11-23 16:50:25.113650157 +0200
 @@ -454,6 +454,7 @@
  		if (chdir("/") == -1)
  			fatal("chdir(\"/\"): %s", strerror(errno));
@@ -69,6 +69,15 @@
  
  	if (rexec_flag) {
  		if (rexec_argc < 0)
+@@ -2047,7 +2058,7 @@
+ 	already_daemon = daemonized();
+ 	if (!(debug_flag || inetd_flag || no_daemon_flag || already_daemon)) {
+ 
+-		if (daemon(0, 0) == -1)
++		if (daemon(1, 0) == -1)
+ 			fatal("daemon() failed: %.200s", strerror(errno));
+ 
+ 		disconnect_controlling_tty();
 @@ -2055,12 +2066,14 @@
  	/* Reinitialize the log (because of the fork above). */
  	log_init(__progname, options.log_level, options.log_facility, log_stderr);
