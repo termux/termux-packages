@@ -1,6 +1,5 @@
-diff -uNr openssh-portable-V_9_5_P1/sshd.c openssh-portable-V_9_5_P1.mod/sshd.c
 --- openssh-portable-V_9_5_P1/sshd.c	2023-10-04 07:34:10.000000000 +0300
-+++ openssh-portable-V_9_5_P1.mod/sshd.c	2023-11-23 16:29:34.274542842 +0200
++++ openssh-portable-V_9_5_P1.mod/sshd.c	2023-11-23 16:35:38.034843728 +0200
 @@ -454,6 +454,7 @@
  		if (chdir("/") == -1)
  			fatal("chdir(\"/\"): %s", strerror(errno));
@@ -70,3 +69,18 @@ diff -uNr openssh-portable-V_9_5_P1/sshd.c openssh-portable-V_9_5_P1.mod/sshd.c
  
  	if (rexec_flag) {
  		if (rexec_argc < 0)
+@@ -2055,12 +2066,14 @@
+ 	/* Reinitialize the log (because of the fork above). */
+ 	log_init(__progname, options.log_level, options.log_facility, log_stderr);
+ 
++#ifndef __ANDROID__
+ 	/*
+ 	 * Chdir to the root directory so that the current disk can be
+ 	 * unmounted if desired.
+ 	 */
+ 	if (chdir("/") == -1)
+ 		error("chdir(\"/\"): %s", strerror(errno));
++#endif
+ 
+ 	/* ignore SIGPIPE */
+ 	ssh_signal(SIGPIPE, SIG_IGN);
