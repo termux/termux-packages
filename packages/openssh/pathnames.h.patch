@@ -1,0 +1,36 @@
+diff -uNr openssh-portable-V_9_5_P1/pathnames.h openssh-portable-V_9_5_P1.mod/pathnames.h
+--- openssh-portable-V_9_5_P1/pathnames.h	2023-10-04 07:34:10.000000000 +0300
++++ openssh-portable-V_9_5_P1.mod/pathnames.h	2023-11-23 16:29:34.257875879 +0200
+@@ -115,7 +115,7 @@
+  * ~/.rhosts and /etc/hosts.equiv if rhosts authentication is enabled.
+  */
+ #define _PATH_SSH_HOSTS_EQUIV		SSHDIR "/shosts.equiv"
+-#define _PATH_RHOSTS_EQUIV		"/etc/hosts.equiv"
++#define _PATH_RHOSTS_EQUIV		"@TERMUX_PREFIX@/etc/hosts.equiv"
+ 
+ /*
+  * Default location of askpass
+@@ -141,12 +141,12 @@
+ 
+ /* xauth for X11 forwarding */
+ #ifndef _PATH_XAUTH
+-#define _PATH_XAUTH			"/usr/X11R6/bin/xauth"
++#define _PATH_XAUTH			"@TERMUX_PREFIX@/bin/xauth"
+ #endif
+ 
+ /* UNIX domain socket for X11 server; displaynum will replace %u */
+ #ifndef _PATH_UNIX_X
+-#define _PATH_UNIX_X "/tmp/.X11-unix/X%u"
++#define _PATH_UNIX_X "@TERMUX_PREFIX@/tmp/.X11-unix/X%u"
+ #endif
+ 
+ /* for scp */
+@@ -166,7 +166,7 @@
+ 
+ /* for passwd change */
+ #ifndef _PATH_PASSWD_PROG
+-#define _PATH_PASSWD_PROG             "/usr/bin/passwd"
++#define _PATH_PASSWD_PROG             "@TERMUX_PREFIX@/bin/passwd"
+ #endif
+ 
+ #ifndef _PATH_LS

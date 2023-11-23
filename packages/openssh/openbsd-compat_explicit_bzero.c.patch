@@ -1,0 +1,25 @@
+diff -uNr openssh-portable-V_9_5_P1/openbsd-compat/explicit_bzero.c openssh-portable-V_9_5_P1.mod/openbsd-compat/explicit_bzero.c
+--- openssh-portable-V_9_5_P1/openbsd-compat/explicit_bzero.c	2023-10-04 07:34:10.000000000 +0300
++++ openssh-portable-V_9_5_P1.mod/openbsd-compat/explicit_bzero.c	2023-11-23 16:29:34.267876057 +0200
+@@ -36,10 +36,10 @@
+ #else /* HAVE_MEMSET_S */
+ 
+ /*
+- * Indirect bzero through a volatile pointer to hopefully avoid
++ * Indirect memset through a volatile pointer to hopefully avoid
+  * dead-store optimisation eliminating the call.
+  */
+-static void (* volatile ssh_bzero)(void *, size_t) = bzero;
++static void* (* volatile ssh_memset)(void *, int, size_t) = memset;
+ 
+ void
+ explicit_bzero(void *p, size_t n)
+@@ -57,7 +57,7 @@
+ # endif
+ #endif
+ 
+-	ssh_bzero(p, n);
++	ssh_memset(p, 0, n);
+ }
+ 
+ #endif /* HAVE_MEMSET_S */
