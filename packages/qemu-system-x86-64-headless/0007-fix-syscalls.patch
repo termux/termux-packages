@@ -209,6 +209,15 @@ diff -uNr qemu-5.1.0/linux-user/syscall.c qemu-5.1.0.mod/linux-user/syscall.c
      case TARGET_NR_futimesat:
          {
              struct timeval *tvp, tv[2];
+@@ -9247,7 +9323,7 @@
+         if (!(p = lock_user_string(arg2))) {
+             return -TARGET_EFAULT;
+         }
+-        ret = get_errno(faccessat(arg1, p, arg3, arg4));
++        ret = get_errno(faccessat(arg1, p, arg3, 0)); // https://github.com/termux/proot/discussions/291
+         unlock_user(p, arg2, 0);
+         return ret;
+ #endif
 @@ -12008,7 +12084,7 @@
      /* Not implemented for now... */
  /*     case TARGET_NR_mq_notify: */
