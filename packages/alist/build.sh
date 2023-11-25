@@ -2,11 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://alist.nn.ci
 TERMUX_PKG_DESCRIPTION="A file list program that supports multiple storage"
 TERMUX_PKG_LICENSE="AGPL-V3"
 TERMUX_PKG_MAINTAINER="2096779623 <admin@utermux.dev>"
-TERMUX_PKG_VERSION=(3.29.0) # alist version
+TERMUX_PKG_VERSION=(3.29.1) # alist version
 TERMUX_PKG_VERSION+=(3.29.0) # alist-web version
 TERMUX_PKG_SRCURL=(https://github.com/alist-org/alist/archive/v${TERMUX_PKG_VERSION}.tar.gz
 		   https://github.com/alist-org/alist-web/releases/download/${TERMUX_PKG_VERSION[1]}/dist.tar.gz)
-TERMUX_PKG_SHA256=(f87020c6919001611b2aca5332b4f25e262b661c10dd39aaa52b724023469be9
+TERMUX_PKG_SHA256=(b7d1929d9aef511b263673dba8e5b787f695e1b4fa4555fe562f8060ee0bdea4
 		   ece9d3fd45f18eaa7376e5fc077ebeae8f67b7bcf6004a29ae58392bfc2a3d13)
 TERMUX_PKG_BUILD_IN_SRC=true
 # termux_pkg_upgrade_version couldn't check multiple versions now.
