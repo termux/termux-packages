@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_SRCURL=git+https://github.com/grpc/grpc
 TERMUX_PKG_VERSION="1.59.2"
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
 TERMUX_PKG_DEPENDS="abseil-cpp, c-ares, ca-certificates, libc++, libre2, openssl, python, zlib"
 TERMUX_PKG_BUILD_DEPENDS="gflags, gflags-static"
 TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, 'setuptools==65.4.1', 'Cython<3'"
