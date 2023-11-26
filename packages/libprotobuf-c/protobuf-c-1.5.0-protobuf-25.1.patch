@@ -1,6 +1,7 @@
---- a/protoc-c/c_field.cc
-+++ b/protoc-c/c_field.cc
-@@ -231,7 +231,7 @@
+diff -uNr protobuf-c-1.5.0/protoc-c/c_field.cc protobuf-c-1.5.0.mod/protoc-c/c_field.cc
+--- protobuf-c-1.5.0/protoc-c/c_field.cc	2023-11-26 07:21:25.000000000 +0800
++++ protobuf-c-1.5.0.mod/protoc-c/c_field.cc	2023-11-26 11:44:02.078006952 +0800
+@@ -236,7 +236,7 @@
  
  const FieldGenerator& FieldGeneratorMap::get(
      const FieldDescriptor* field) const {
@@ -9,14 +10,15 @@
    return *field_generators_[field->index()];
  }
  
---- a/protoc-c/c_helpers.cc
-+++ b/protoc-c/c_helpers.cc
+diff -uNr protobuf-c-1.5.0/protoc-c/c_helpers.cc protobuf-c-1.5.0.mod/protoc-c/c_helpers.cc
+--- protobuf-c-1.5.0/protoc-c/c_helpers.cc	2023-11-26 07:21:25.000000000 +0800
++++ protobuf-c-1.5.0.mod/protoc-c/c_helpers.cc	2023-11-26 11:42:41.850006983 +0800
 @@ -286,7 +286,7 @@
  
  std::set<std::string> MakeKeywordsMap() {
    std::set<std::string> result;
--  for (int i = 0; i < GOOGLE_ARRAYSIZE(kKeywordList); i++) {
-+  for (int i = 0; i < ABSL_ARRAYSIZE(kKeywordList); i++) {
+-  for (size_t i = 0; i < GOOGLE_ARRAYSIZE(kKeywordList); i++) {
++  for (size_t i = 0; i < ABSL_ARRAYSIZE(kKeywordList); i++) {
      result.insert(kKeywordList[i]);
    }
    return result;
@@ -29,14 +31,15 @@
    return std::string(dest.get(), len);
  }
  
---- a/protoc-c/c_message.cc
-+++ b/protoc-c/c_message.cc
+diff -uNr protobuf-c-1.5.0/protoc-c/c_message.cc protobuf-c-1.5.0.mod/protoc-c/c_message.cc
+--- protobuf-c-1.5.0/protoc-c/c_message.cc	2023-11-26 07:21:25.000000000 +0800
++++ protobuf-c-1.5.0.mod/protoc-c/c_message.cc	2023-11-26 11:43:11.254006971 +0800
 @@ -499,7 +499,7 @@
  	  // NOTE: not supported by protobuf
  	  vars["maybe_static"] = "";
  	  vars["field_dv_ctype"] = "{ ... }";
--	  GOOGLE_LOG(DFATAL) << "Messages can't have default values!";
-+	  ABSL_LOG(ERROR) << "Messages can't have default values!";
+-	  GOOGLE_LOG(FATAL) << "Messages can't have default values!";
++	  ABSL_LOG(FATAL) << "Messages can't have default values!";
  	  break;
  	case FieldDescriptor::CPPTYPE_STRING:
  	  if (fd->type() == FieldDescriptor::TYPE_BYTES || opt.string_as_bytes())
@@ -44,13 +47,14 @@
  	    break;
  	  }
  	default:
--	  GOOGLE_LOG(DFATAL) << "Unknown CPPTYPE";
-+	  ABSL_LOG(ERROR) << "Unknown CPPTYPE";
+-	  GOOGLE_LOG(FATAL) << "Unknown CPPTYPE";
++	  ABSL_LOG(FATAL) << "Unknown CPPTYPE";
  	  break;
  	}
  	if (!already_defined)
---- a/protoc-c/c_primitive_field.cc
-+++ b/protoc-c/c_primitive_field.cc
+diff -uNr protobuf-c-1.5.0/protoc-c/c_primitive_field.cc protobuf-c-1.5.0.mod/protoc-c/c_primitive_field.cc
+--- protobuf-c-1.5.0/protoc-c/c_primitive_field.cc	2023-11-26 07:21:25.000000000 +0800
++++ protobuf-c-1.5.0.mod/protoc-c/c_primitive_field.cc	2023-11-26 11:43:46.002006958 +0800
 @@ -99,7 +99,7 @@
      case FieldDescriptor::TYPE_STRING  :
      case FieldDescriptor::TYPE_BYTES   :
@@ -64,8 +68,8 @@
      case FieldDescriptor::CPPTYPE_BOOL:
        return descriptor_->default_value_bool() ? "1" : "0";
      default:
--      GOOGLE_LOG(DFATAL) << "unexpected CPPTYPE in c_primitive_field";
-+      ABSL_LOG(ERROR) << "unexpected CPPTYPE in c_primitive_field";
+-      GOOGLE_LOG(FATAL) << "unexpected CPPTYPE in c_primitive_field";
++      ABSL_LOG(FATAL) << "unexpected CPPTYPE in c_primitive_field";
        return "UNEXPECTED_CPPTYPE";
    }
  }
