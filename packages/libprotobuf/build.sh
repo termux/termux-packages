@@ -8,10 +8,9 @@ TERMUX_PKG_MAINTAINER="@termux"
 # - update SHA256 checksum for $_PROTOBUF_ZIP in
 #     $TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_protobuf.sh
 # - ALWAYS bump revision of reverse dependencies and rebuild them.
-TERMUX_PKG_VERSION=2:22.4
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=2:25.1
 TERMUX_PKG_SRCURL=https://github.com/protocolbuffers/protobuf/archive/v${TERMUX_PKG_VERSION#*:}.tar.gz
-TERMUX_PKG_SHA256=def8683aafc1ebaddbc777da252dfdc8e324a197757e3bfcd8b4de90d4b8cf6a
+TERMUX_PKG_SHA256=9bd87b8280ef720d3240514f884e56a712f2218f0d693b48050c836028940a42
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="abseil-cpp, libc++, zlib"
 TERMUX_PKG_BREAKS="libprotobuf-dev, protobuf-static (<< ${TERMUX_PKG_VERSION#*:})"
@@ -28,16 +27,4 @@ TERMUX_PKG_NO_STATICSPLIT=true
 termux_step_post_make_install() {
 	install -Dm600 -t $TERMUX_PREFIX/share/doc/libutf8-range \
 		$TERMUX_PKG_SRCDIR/third_party/utf8_range/LICENSE
-
-	# https://github.com/termux/termux-packages/issues/18002
-	local r=$("${READELF}" -sW "${TERMUX_PREFIX}"/lib/libprotobuf.so)
-	local s="__emutls_t._ZN6google8protobuf8internal15ThreadSafeArena13thread_cache_E"
-	local g=$(echo "${r}" | grep "${s}")
-	if [[ -z "${g}" ]]; then
-		termux_error_exit "
-		Not found symbol: ${s}
-		${READELF} output:
-		${r}
-		"
-	fi
 }
