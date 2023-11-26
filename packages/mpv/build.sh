@@ -3,11 +3,11 @@ TERMUX_PKG_DESCRIPTION="Command-line media player"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Update both mpv and mpv-x to the same version in one PR.
-TERMUX_PKG_VERSION=0.36.0
+TERMUX_PKG_VERSION="0.37.0"
 TERMUX_PKG_SRCURL=https://github.com/mpv-player/mpv/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=29abc44f8ebee013bb2f9fe14d80b30db19b534c679056e4851ceadf5a5e8bf6
-TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="ffmpeg, libandroid-glob, libandroid-support, libarchive, libass, libcaca, libiconv, liblua52, libsixel, libuchardet, openal-soft, pulseaudio, rubberband, zlib"
+TERMUX_PKG_SHA256=1d2d4adbaf048a2fa6ee134575032c4b2dad9a7efafd5b3e69b88db935afaddf
+TERMUX_PKG_AUTO_UPDATE=false
+TERMUX_PKG_DEPENDS="ffmpeg, libandroid-glob, libandroid-support, libarchive, libass, libcaca, libiconv, liblua52, libsixel, libuchardet, openal-soft, pulseaudio, rubberband, zlib, libplacebo"
 TERMUX_PKG_RM_AFTER_INSTALL="share/icons share/applications"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dlibmpv=true
@@ -42,6 +42,7 @@ termux_step_post_get_source() {
 
 termux_step_pre_configure() {
 	LDFLAGS+=" -landroid-glob"
+	sed -i "s/host_machine.system() == 'android'/false/" ${TERMUX_PKG_SRCDIR}/meson.build
 }
 
 termux_step_post_make_install() {
