@@ -3,10 +3,9 @@ TERMUX_PKG_DESCRIPTION="Protocol buffers C++ library (static)"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 # Please align the version with `libprotobuf` package.
-TERMUX_PKG_VERSION=22.4
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=25.1
 TERMUX_PKG_SRCURL=https://github.com/protocolbuffers/protobuf/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=def8683aafc1ebaddbc777da252dfdc8e324a197757e3bfcd8b4de90d4b8cf6a
+TERMUX_PKG_SHA256=9bd87b8280ef720d3240514f884e56a712f2218f0d693b48050c836028940a42
 TERMUX_PKG_DEPENDS="protobuf (>= 2:${TERMUX_PKG_VERSION})"
 TERMUX_PKG_BUILD_DEPENDS="libc++, zlib"
 TERMUX_PKG_BREAKS="libprotobuf (<< 2:21.12)"
