@@ -2,8 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/chmln/sd
 TERMUX_PKG_DESCRIPTION="An intuitive find & replace CLI"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.7.6
+TERMUX_PKG_VERSION="1.0.0"
 TERMUX_PKG_SRCURL=git+https://github.com/chmln/sd
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
