@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="List of standard media types and their usual file extens
 TERMUX_PKG_LICENSE="Public Domain"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="10.1.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://salsa.debian.org/debian/media-types/-/archive/${TERMUX_PKG_VERSION}/media-types-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=d24e54447bf7cdf6dcea4d55faeb74c8156b7aed0757b962f94a5b1f1ab0de5c
 TERMUX_PKG_AUTO_UPDATE=true
