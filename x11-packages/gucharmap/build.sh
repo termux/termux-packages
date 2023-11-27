@@ -17,7 +17,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure() {
-	termux_setup_gir
+	TERMUX_PKG_VERSION=. termux_setup_gir
 
 	local _WRAPPER_BIN="${TERMUX_PKG_BUILDDIR}/_wrapper/bin"
 	mkdir -p "${_WRAPPER_BIN}"
@@ -29,16 +29,4 @@ termux_step_pre_configure() {
 		export PKG_CONFIG="${_WRAPPER_BIN}/pkg-config"
 	fi
 	export PATH="${_WRAPPER_BIN}:${PATH}"
-}
-
-termux_pkg_auto_update() {
-	local LATEST_VERSION="$(termux_repology_api_get_latest_version "${TERMUX_PKG_NAME}")"
-	if [[ "$LATEST_VERSION" == "null" ]]; then
-		echo "INFO: Already up to date."
-		return 0
-	fi
-	if termux_pkg_is_update_needed "${TERMUX_PKG_VERSION#*:}" "${LATEST_VERSION}"; then
-		mv "$TERMUX_PKG_BUILDER_DIR/gir/${TERMUX_PKG_VERSION##*:}" "$TERMUX_PKG_BUILDER_DIR/gir/${LATEST_VERSION##*:}"
-	fi
-	termux_repology_auto_update
 }

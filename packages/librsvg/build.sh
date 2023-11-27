@@ -19,7 +19,7 @@ ac_cv_path_GDK_PIXBUF_QUERYLOADERS=$TERMUX_PREFIX/bin/gdk-pixbuf-query-loaders
 "
 
 termux_step_pre_configure() {
-	termux_setup_gir
+	TERMUX_PKG_VERSION=. termux_setup_gir
 	termux_setup_rust
 
 	LDFLAGS+=" -fuse-ld=lld"
@@ -35,16 +35,4 @@ termux_step_pre_configure() {
 
 termux_step_post_massage() {
 	find lib -name '*.la' -delete
-}
-
-termux_pkg_auto_update() {
-	local LATEST_VERSION="$(termux_repology_api_get_latest_version "${TERMUX_PKG_NAME}")"
-	if [[ "$LATEST_VERSION" == "null" ]]; then
-		echo "INFO: Already up to date."
-		return 0
-	fi
-	if termux_pkg_is_update_needed "${TERMUX_PKG_VERSION#*:}" "${LATEST_VERSION}"; then
-		mv "$TERMUX_PKG_BUILDER_DIR/gir/${TERMUX_PKG_VERSION##*:}" "$TERMUX_PKG_BUILDER_DIR/gir/${LATEST_VERSION##*:}"
-	fi
-	termux_repology_auto_update
 }
