@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Compression library implementing the deflate compression
 TERMUX_PKG_LICENSE="ZLIB"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.3
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.zlib.net/zlib-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=8a9ba2898e1d0d774eca6ba5b4627a11e5588ba85c8851336eb38de4683050a7
 TERMUX_PKG_BREAKS="ndk-sysroot (<< 19b-3), zlib-dev"
@@ -13,6 +14,8 @@ termux_step_pre_configure() {
 		CFLAGS+=" -march=armv8-a+crc"
 		CXXFLAGS+=" -march=armv8-a+crc"
 	fi
+	CFLAGS+=" -fPIC"
+	CXXFLAGS+=" -fPIC"
 }
 
 termux_step_configure() {
