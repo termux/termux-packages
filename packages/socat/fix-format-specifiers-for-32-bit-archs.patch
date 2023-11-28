@@ -26,19 +26,19 @@
  #endif
 --- a/procan.c
 +++ b/procan.c
-@@ -156,8 +156,12 @@
-       }
+@@ -306,8 +306,12 @@ int procan(FILE *outfile) {
+    fprintf(outfile, "#define __STDC_VERSION__    %ld\n", __STDC_VERSION__);
  #endif
  #ifdef SIZE_MAX
 +#if defined __ANDROID__ && !defined __LP64__
-+      fprintf(outfile, "SIZE_MAX                  = %-24u\n", SIZE_MAX);
++   fprintf(outfile, "SIZE_MAX                  = %-24u\n", SIZE_MAX);
 +#else
-       fprintf(outfile, "SIZE_MAX                  = %-24lu\n", SIZE_MAX);
+    fprintf(outfile, "SIZE_MAX                  = "F_Zu" /* maximum value of size_t */\n", SIZE_MAX);
  #endif
 +#endif
-    }
- 
-    /* file descriptors */
+ #ifdef P_tmpdir
+    fprintf(outfile, "P_tmpdir                  = \"%s\"\n", P_tmpdir);
+ #endif
 --- a/sycls.c
 +++ b/sycls.c
 @@ -395,12 +395,22 @@
