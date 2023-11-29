@@ -1,12 +1,11 @@
-diff -u -r ../postgresql-9.6.1/src/backend/Makefile ./src/backend/Makefile
---- ../postgresql-9.6.1/src/backend/Makefile	2016-10-24 20:08:51.000000000 +0000
-+++ ./src/backend/Makefile	2017-03-04 23:18:25.301563453 +0000
-@@ -49,6 +49,8 @@
- LIBS += -lsystemd
- endif
+--- a/src/backend/Makefile
++++ b/src/backend/Makefile
+@@ -56,6 +56,8 @@
+ 
+ override LDFLAGS := $(LDFLAGS) $(LDFLAGS_EX) $(LDFLAGS_EX_BE)
  
 +LIBS += -landroid-shmem -llog
 +
  ##########################################################################
  
- all: submake-libpgport submake-schemapg postgres $(POSTGRES_IMP)
+ all: submake-libpgport submake-catalog-headers submake-utils-headers postgres $(POSTGRES_IMP)
