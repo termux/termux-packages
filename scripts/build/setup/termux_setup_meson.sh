@@ -56,9 +56,11 @@ termux_setup_meson() {
 	echo "pkgconfig = '$PKG_CONFIG'" >> $TERMUX_MESON_CROSSFILE
 	echo "strip = '$STRIP'" >> $TERMUX_MESON_CROSSFILE
 
-	echo '' >> $TERMUX_MESON_CROSSFILE
-	echo "[properties]" >> $TERMUX_MESON_CROSSFILE
-	echo "needs_exe_wrapper = true" >> $TERMUX_MESON_CROSSFILE
+	if [ "$TERMUX_PACKAGE_LIBRARY" = "bionic" ]; then
+		echo '' >> $TERMUX_MESON_CROSSFILE
+		echo "[properties]" >> $TERMUX_MESON_CROSSFILE
+		echo "needs_exe_wrapper = true" >> $TERMUX_MESON_CROSSFILE
+  	fi
 
 	echo '' >> $TERMUX_MESON_CROSSFILE
 	echo "[built-in options]" >> $TERMUX_MESON_CROSSFILE
