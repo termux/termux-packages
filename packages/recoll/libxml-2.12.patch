@@ -1,0 +1,26 @@
+--- a/internfile/mh_xslt.cpp
++++ b/internfile/mh_xslt.cpp
+@@ -66,7 +66,11 @@
+     xmlDocPtr getDoc() {
+         int ret;
+         if ((ret = xmlParseChunk(ctxt, nullptr, 0, 1))) {
++#if LIBXML_VERSION < 21200
+             xmlError *error = xmlGetLastError();
++#else
++            const xmlError *error = xmlGetLastError();
++#endif
+             LOGERR("FileScanXML: final xmlParseChunk failed with error " <<
+                    ret << " error: " <<
+                    (error ? error->message :
+@@ -95,7 +99,11 @@
+         }            
+         int ret;
+         if ((ret = xmlParseChunk(ctxt, buf, cnt, 0))) {
++#if LIBXML_VERSION < 21200
+             xmlError *error = xmlGetLastError();
++#else
++            const xmlError *error = xmlGetLastError();
++#endif
+             LOGERR("FileScanXML: xmlParseChunk failed with error " <<
+                    ret << " for [" << buf << "] error " <<
+                    (error ? error->message :
