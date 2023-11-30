@@ -11,16 +11,7 @@
  elseif(CMAKE_SYSTEM_NAME MATCHES "Linux|BSD")
 --- a/cube/cube.c
 +++ b/cube/cube.c
-@@ -48,7 +48,7 @@
- #define APP_NAME_STR_LEN 80
- #endif  // _WIN32
- 
--#ifdef ANDROID
-+#if defined(ANDROID) && !defined(__TERMUX__)
- #include "vulkan_wrapper.h"
- #else
- #include <vulkan/vulkan.h>
-@@ -98,7 +98,7 @@
+@@ -97,7 +97,7 @@
      fflush(stdout);
  }
  
@@ -29,7 +20,7 @@
  #include <android/log.h>
  #define ERR_EXIT(err_msg, err_class)                                           \
      do {                                                                       \
-@@ -567,7 +567,7 @@
+@@ -571,7 +571,7 @@
      if (!demo->suppress_popups) MessageBox(NULL, message, "Alert", MB_OK);
      in_callback = false;
  
@@ -38,14 +29,12 @@
  
      if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT) {
          __android_log_print(ANDROID_LOG_INFO, APP_SHORT_NAME, "%s", message);
---- a/cube/cube.cpp
-+++ b/cube/cube.cpp
-@@ -1098,7 +1098,7 @@
-         demo.in_callback = false;
-     }
+@@ -4334,7 +4334,7 @@
+             continue;
+         }
  
--#elif defined(ANDROID)
-+#elif defined(ANDROID) && !defined(__TERMUX__)
- 
-     if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT) {
-         __android_log_print(ANDROID_LOG_INFO, APP_SHORT_NAME, "%s", message.str());
+-#if defined(ANDROID)
++#if defined(ANDROID) && !defined(__TERMUX__)
+         ERR_EXIT("Usage: vkcube [--validate]\n", "Usage");
+ #else
+         char *message =
