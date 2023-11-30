@@ -1,3 +1,13 @@
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -47,6 +47,7 @@
+     target_compile_definitions(VulkanCompilerConfiguration INTERFACE VK_USE_PLATFORM_WIN32_KHR)
+ elseif(ANDROID)
+     target_compile_definitions(VulkanCompilerConfiguration INTERFACE VK_USE_PLATFORM_ANDROID_KHR)
++    message(FATAL_ERROR "TEST")
+ elseif(APPLE)
+     target_compile_definitions(VulkanCompilerConfiguration INTERFACE VK_USE_PLATFORM_METAL_EXT)
+     if (IOS)
 --- a/src/layer/layer_settings_manager.cpp
 +++ b/src/layer/layer_settings_manager.cpp
 @@ -20,7 +20,7 @@
@@ -44,7 +54,7 @@
  static const char *GetDefaultPrefix() {
 -#ifdef __ANDROID__
 +#if defined(__ANDROID__) && !defined(__TERMUX__)
-     return "vulkan.";
+     return "vulkan";
  #else
      return "";
 @@ -59,7 +59,7 @@
