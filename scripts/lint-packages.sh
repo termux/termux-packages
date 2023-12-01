@@ -19,7 +19,7 @@ check_package_license() {
 			"BSD 3-Clause"|"BSD New"|"BSD Simplified"|BSL-1.0|Bouncy-Castle);;
 			CA-TOSL-1.1|CC0-1.0|CDDL-1.0|CDDL-1.1|CPAL-1.0|CPL-1.0|CPOL);;
 			CPOL-1.02|CUAOFFICE-1.0|CeCILL-1|CeCILL-2|CeCILL-2.1|CeCILL-B);;
-			CeCILL-C|Codehaus|Copyfree|Day|Day-Addendum|ECL2|EPL-1.0|EPL-2.0);;
+			CeCILL-C|Codehaus|Copyfree|curl|Day|Day-Addendum|ECL2|EPL-1.0|EPL-2.0);;
 			EUDATAGRID|EUPL-1.1|EUPL-1.2|Eiffel-2.0|Entessa-1.0);;
 			Facebook-Platform|Fair|Frameworx-1.0|GPL-2.0|GPL-3.0|GPL-3.0-only);;
 			GPL-3.0-or-later|Go|HSQLDB|Historical|IBMPL-1.0|IJG|IPAFont-1.0);;
