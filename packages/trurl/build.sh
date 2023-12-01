@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE="https://curl.se/trurl/"
+TERMUX_PKG_DESCRIPTION="trurl is a command line tool that parses and manipulates URLs"
+TERMUX_PKG_LICENSE="curl"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="0.9"
+TERMUX_PKG_SRCURL="https://github.com/curl/trurl/archive/trurl-$TERMUX_PKG_VERSION.tar.gz"
+TERMUX_PKG_SHA256="848da38c0ea07cd96d6adac4a5e5e141fe26e5bd846039aa350c3ca589a948e0"
+TERMUX_PKG_DEPENDS="libcurl"
+TERMUX_PKG_BUILD_IN_SRC=true
