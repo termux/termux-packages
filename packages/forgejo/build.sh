@@ -40,7 +40,7 @@ termux_step_make() {
 
 termux_step_make_install() {
 	install -Dm700 \
-		"$GOPATH"/src/forgejo.org/forgejo/forgejo \
+		"$GOPATH"/src/forgejo.org/forgejo/gitea \
 		"$TERMUX_PREFIX"/bin/forgejo
 
 	mkdir -p "$TERMUX_PREFIX"/etc/forgejo
