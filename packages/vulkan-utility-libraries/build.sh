@@ -17,7 +17,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_pkg_auto_update() {
 	# Get latest release tag:
 	local tag
-	tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}")"
+	tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}" "${TERMUX_PKG_UPDATE_TAG_TYPE}")"
 	if grep -qP "^v${TERMUX_PKG_UPDATE_VERSION_REGEXP}\$" <<<"$tag"; then
 		termux_pkg_upgrade_version "$tag"
 	else
