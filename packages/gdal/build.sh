@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="A translator library for raster and vector geospatial da
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="LICENSE.TXT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.8.0"
+TERMUX_PKG_VERSION="3.8.1"
 TERMUX_PKG_SRCURL=https://download.osgeo.org/gdal/${TERMUX_PKG_VERSION}/gdal-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=ec0f78d9dc32352aeac6edc9c3b27a991b91f9dc6f92c452207d84431c58757d
+TERMUX_PKG_SHA256=75a20b23879bfa3d8c0db68e1d6f8b924f7f9d97f5fed089b01a72e404293900
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="giflib, json-c, libc++, libcurl, libexpat, libfreexl, libgeos, libiconv, libjpeg-turbo, libjxl, liblzma, libpng, libspatialite, libsqlite, libwebp, libxml2, netcdf-c, openjpeg, openssl, proj, postgresql, zlib, zstd"
 TERMUX_PKG_BUILD_DEPENDS="json-c-static"
@@ -17,4 +17,5 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DGDAL_USE_JXL=ON
 -DGDAL_USE_TIFF_INTERNAL=ON
 -DGDAL_USE_GEOTIFF_INTERNAL=ON
+-DBUILD_PYTHON_BINDINGS=OFF
 "
