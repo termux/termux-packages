@@ -4,6 +4,7 @@ TERMUX_PKG_GROUPS="science"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.3.25"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/xianyi/OpenBLAS/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=4c25cb30c4bb23eddca05d7d0a85997b8db6144f5464ba7f8c09ce91e2f35543
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -11,7 +12,7 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_FORCE_CMAKE=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS='
 -DBUILD_SHARED_LIBS=ON
--DBUILD_STATIC_LIBS=OFF
+-DBUILD_STATIC_LIBS=ON
 -DC_LAPACK=ON
 '
 
@@ -30,4 +31,18 @@ termux_step_pre_configure() {
 	if [ "$TERMUX_ARCH" = "x86_64" ] || [ "$TERMUX_ARCH" = "i686" ]; then
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+='-DTARGET=CORE2'
 	fi
+}
+
+termux_step_post_make_install() {
+	mkdir -p $TERMUX_PREFIX/lib/pkgconfig
+	pushd $TERMUX_PREFIX/lib
+	local _lib
+	for _lib in blas cblas lapack lapacke; do
+		rm -f lib${_lib}.a lib${_lib}.so lib${_lib}.so.3 pkgconfig/${_lib}.pc
+		ln -s libopenblas.a lib${_lib}.a
+		ln -s libopenblas.so lib${_lib}.so
+		ln -s libopenblas.so lib${_lib}.so.3
+		ln -s openblas.pc pkgconfig/${_lib}.pc
+	done
+	popd # $TERMUX_PREFIX/lib
 }
