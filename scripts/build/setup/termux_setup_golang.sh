@@ -1,11 +1,11 @@
 # Utility function for golang-using packages to setup a go toolchain.
 termux_setup_golang() {
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
-		local TERMUX_GO_VERSION=go1.21.4
-		local TERMUX_GO_SHA256=73cac0215254d0c7d1241fa40837851f3b9a8a742d0b54714cbdfb3feaf8f0af
+		local TERMUX_GO_VERSION=go1.21.5
+		local TERMUX_GO_SHA256=e2bc0b3e4b64111ec117295c088bde5f00eeed1567999ff77bc859d7df70078e
 		if [ "$TERMUX_PKG_GO_USE_OLDER" = "true" ]; then
-			TERMUX_GO_VERSION=go1.20.11
-			TERMUX_GO_SHA256=ef79a11aa095a08772d2a69e4f152f897c4e96ee297b0dc20264b7dec2961abe
+			TERMUX_GO_VERSION=go1.20.12
+			TERMUX_GO_SHA256=9c5d48c54dd8b0a3b2ef91b0f92a1190aa01f11d26e98033efa64c46a30bba7b
 		fi
 		local TERMUX_GO_PLATFORM=linux-amd64
 
