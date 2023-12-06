@@ -10,7 +10,7 @@ Documentation/licenses/COPYING.BSD-4-Clause-UC
 Documentation/licenses/COPYING.ISC"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.39.3"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://www.kernel.org/pub/linux/utils/util-linux/v${TERMUX_PKG_VERSION:0:4}/util-linux-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=7b6605e48d1a49f43cc4b4cfc59f313d0dd5402fa40b96810bd572e167dfed0f
 # libcrypt is required for only newgrp and sulogin, which are not built anyways
