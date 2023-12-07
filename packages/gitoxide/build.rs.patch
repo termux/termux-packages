@@ -1,0 +1,41 @@
++++ ./build.rs
+@@ -1,4 +1,6 @@
+ use std::process::Command;
++use std::env;
++use glob::glob;
+ 
+ fn main() {
+     let version = Command::new(if cfg!(windows) { "git.exe" } else { "git" })
+@@ -8,6 +10,21 @@
+         .and_then(|out| parse_describe(&out.stdout))
+         .unwrap_or_else(|| env!("CARGO_PKG_VERSION").into());
+ 
++    // builtins for android-x86_64
++    let target = env::var("TARGET").unwrap();
++    if target == "x86_64-linux-android" {
++        let ndk_home = env::var("ANDROID_NDK_HOME").expect("ANDROID_NDK_HOME not set");
++        let link_search_glob = format!("{}/toolchains/llvm/prebuilt/linux-x86_64/**/clang/**/lib/linux", ndk_home);
++        // there will be different version so just pick first, there likely shouldn't be multiple anyways
++        let link_search_path = glob(&link_search_glob)
++            .expect("failed to read link_search_glob")
++            .next()
++            .expect("failed to find link_search_path")
++            .expect("link_search_path glob result failed");
++        println!("cargo:rustc-link-lib=static=clang_rt.builtins-x86_64-android");
++        println!("cargo:rustc-link-search={}", link_search_path.display());
++    }
++
+     println!("cargo:rustc-env=GITOXIDE_VERSION={version}");
+ }
+ 
++++ ./Cargo.toml
+@@ -160,6 +160,9 @@
+ 
+ 
++[build-dependencies]
++glob = "0.3.1"
++
+ [dependencies]
+ anyhow = "1.0.42"
+ 
+ gitoxide-core = { version = "^0.33.1", path = "gitoxide-core" }
