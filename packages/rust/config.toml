@@ -5,17 +5,30 @@
 link-shared = true
 
 [build]
-host = ["@triple@"]
-target = ["@triple@", "wasm32-unknown-unknown", "wasm32-wasi"]
+host = ["@CARGO_TARGET_NAME@"]
+target = [
+    "aarch64-linux-android",
+    "armv7-linux-androideabi",
+    "i686-linux-android",
+    "x86_64-linux-android",
+    "wasm32-unknown-unknown",
+    "wasm32-wasi",
+]
 rustc = "@RUSTC@"
 cargo = "@CARGO@"
-
 python = "python3"
 extended = true
+tools = [
+    "cargo",
+    "clippy",
+    "rustdoc",
+    "rustfmt",
+    "rust-analyzer-proc-macro-srv",
+    "analysis",
+    "src",
+    "rust-demangler",
+]
 sanitizers = false
-
-#tools = ["cargo", "analysis", "clippy-driver" ]
-tools = ["cargo", "rls", "clippy", "rustfmt", "analysis", "src", "rustdoc", "rust-analyzer-proc-macro-srv"]
 
 [install]
 prefix = "@TERMUX_PREFIX@"
@@ -32,10 +45,24 @@ rpath = false
 [target.x86_64-unknown-linux-gnu]
 llvm-config = "/usr/bin/llvm-config-15"
 
-[target.@triple@]
+[target.aarch64-linux-android]
 android-ndk = "@TERMUX_STANDALONE_TOOLCHAIN@"
 llvm-config = "@TERMUX_PREFIX@/bin/llvm-config"
-ar = "llvm-ar"
+profiler = true
+
+[target.armv7-linux-androideabi]
+android-ndk = "@TERMUX_STANDALONE_TOOLCHAIN@"
+llvm-config = "@TERMUX_PREFIX@/bin/llvm-config"
+profiler = true
+
+[target.i686-linux-android]
+android-ndk = "@TERMUX_STANDALONE_TOOLCHAIN@"
+llvm-config = "@TERMUX_PREFIX@/bin/llvm-config"
+profiler = true
+
+[target.x86_64-linux-android]
+android-ndk = "@TERMUX_STANDALONE_TOOLCHAIN@"
+llvm-config = "@TERMUX_PREFIX@/bin/llvm-config"
 profiler = true
 
 [target.wasm32-wasi]
@@ -43,4 +70,5 @@ wasi-root = "@TERMUX_PREFIX@/share/wasi-sysroot"
 
 [dist]
 src-tarball = false
+compression-formats = ["gz"]
 #missing-tools = true
