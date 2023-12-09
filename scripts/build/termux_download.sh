@@ -23,7 +23,7 @@ termux_download() {
 		ACTUAL_CHECKSUM=$(sha256sum "$TMPFILE" | cut -f 1 -d ' ')
 		if [ "$CHECKSUM" != "SKIP_CHECKSUM" ]; then
 			if [ "$CHECKSUM" != "$ACTUAL_CHECKSUM" ]; then
-				>&2 printf "Wrong checksum for %s:\nExpected: %s\nActual:   %s\n" \
+				>&2 printf "Wrong checksum for %s\nExpected: %s\nActual:   %s\n" \
 					   "$URL" "$CHECKSUM" "$ACTUAL_CHECKSUM"
 				return 1
 			fi
