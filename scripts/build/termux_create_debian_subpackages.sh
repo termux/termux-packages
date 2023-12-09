@@ -59,7 +59,7 @@ termux_create_debian_subpackages() {
 				mkdir -p "$SUB_PKG_MASSAGE_DIR/$_INCLUDE_DIRSET"
 				mv "$includeset" "$SUB_PKG_MASSAGE_DIR/$_INCLUDE_DIRSET"
 			else
-				echo "WARNING: tried to add $includeset to subpackage, but could not find it"
+				echo "WARNING: tried to add $includeset to subpackage '$SUB_PKG_NAME', but could not find it"
 			fi
 		done
 		shopt -u globstar extglob
