@@ -12,7 +12,7 @@ passing down `SWIFT_HOST_LIBRARIES_DEST_DIR` to avoid copying them as we
 were doing previously.
 
 diff --git a/swift/CMakeLists.txt b/swift/CMakeLists.txt
-index 9a460b731d019..726758e7143d3 100644
+index 2eeaf61e37423..e052c618fe5f8 100644
 --- a/swift/CMakeLists.txt
 +++ b/swift/CMakeLists.txt
 @@ -94,6 +94,7 @@ include(CMakeDependentOption)
@@ -23,7 +23,7 @@ index 9a460b731d019..726758e7143d3 100644
  
  # Enable Swift for the host compiler build if we have the language. It is
  # optional until we have a bootstrap story.
-@@ -691,10 +692,9 @@ if(CMAKE_C_COMPILER_ID MATCHES Clang)
+@@ -697,10 +698,9 @@ if(CMAKE_C_COMPILER_ID MATCHES Clang)
    add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Werror=c++98-compat-extra-semi>)
  endif()
  
@@ -36,8 +36,8 @@ index 9a460b731d019..726758e7143d3 100644
 +  FALSE)
  
  set(SWIFT_BUILD_HOST_DISPATCH FALSE)
- if(SWIFT_ENABLE_DISPATCH AND NOT CMAKE_SYSTEM_NAME STREQUAL Darwin)
-@@ -794,7 +794,6 @@ include(SwiftConfigureSDK)
+ if(SWIFT_ENABLE_DISPATCH AND NOT CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+@@ -800,7 +800,6 @@ include(SwiftConfigureSDK)
  include(SwiftComponents)
  include(SwiftList)
  include(AddPureSwift)
@@ -45,7 +45,7 @@ index 9a460b731d019..726758e7143d3 100644
  
  # Configure swift include, install, build components.
  swift_configure_components()
-@@ -830,7 +829,7 @@ elseif(BOOTSTRAPPING_MODE MATCHES "BOOTSTRAPPING.*")
+@@ -836,7 +835,7 @@ elseif(BOOTSTRAPPING_MODE MATCHES "BOOTSTRAPPING.*")
    else()
      set(BOOTSTRAPPING_MODE "HOSTTOOLS")
    endif()
@@ -54,7 +54,22 @@ index 9a460b731d019..726758e7143d3 100644
    # We are building using a pre-installed host toolchain but not bootstrapping
    # the Swift modules. This happens when building using 'build-tooling-libs'
    # where we haven't built a new Swift compiler. Use the Swift compiler from the
-@@ -838,21 +837,11 @@ elseif(BOOTSTRAPPING_MODE STREQUAL "HOSTTOOLS" OR SWIFT_SWIFT_PARSER)
+@@ -844,6 +843,14 @@ elseif(BOOTSTRAPPING_MODE STREQUAL "HOSTTOOLS" OR SWIFT_SWIFT_PARSER)
+   set(SWIFT_EXEC_FOR_SWIFT_MODULES "${CMAKE_Swift_COMPILER}")
+ endif()
+ 
++if(SWIFT_BUILD_SWIFT_SYNTAX)
++  # Only "HOSTTOOLS" is supported in Linux when Swift parser integration is enabled.
++  if(SWIFT_HOST_VARIANT_SDK MATCHES "LINUX|ANDROID|OPENBSD|FREEBSD" AND NOT BOOTSTRAPPING_MODE STREQUAL "HOSTTOOLS")
++    message(WARNING "Force setting BOOTSTRAPPING=HOSTTOOLS because Swift parser integration is enabled")
++    set(BOOTSTRAPPING_MODE "HOSTTOOLS")
++  endif()
++endif()
++
+ if(BOOTSTRAPPING_MODE MATCHES "HOSTTOOLS|.*-WITH-HOSTLIBS")
+   if(SWIFT_ENABLE_ARRAY_COW_CHECKS)
+     message(STATUS "array COW checks disabled when building the swift modules with host libraries")
+@@ -950,25 +957,6 @@ if(XCODE)
    set(SWIFT_SDKS "OSX")
  endif()
  
@@ -73,15 +88,14 @@ index 9a460b731d019..726758e7143d3 100644
 -      message(WARNING "Force setting BOOTSTRAPPING=HOSTTOOLS because Swift parser integration is enabled")
 -      set(BOOTSTRAPPING_MODE "HOSTTOOLS")
 -    endif()
-+if(SWIFT_BUILD_SWIFT_SYNTAX)
-+  # Only "HOSTTOOLS" is supported in Linux when Swift parser integration is enabled.
-+  if(SWIFT_HOST_VARIANT_SDK MATCHES "LINUX|ANDROID|OPENBSD|FREEBSD" AND NOT BOOTSTRAPPING_MODE STREQUAL "HOSTTOOLS")
-+    message(WARNING "Force setting BOOTSTRAPPING=HOSTTOOLS because Swift parser integration is enabled")
-+    set(BOOTSTRAPPING_MODE "HOSTTOOLS")
-   endif()
- endif()
- 
-@@ -1171,13 +1159,17 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin" AND NOT CMAKE_CROSSCOMPILING)
+-  endif()
+-endif()
+-
+-
+ # FIXME: the parameters we specify in SWIFT_SDKS are lacking architecture specifics,
+ # so we need to hard-code it. For example, the SDK for Android is just 'ANDROID',
+ # and we have to specify SWIFT_SDK_ANDROID_ARCHITECTURES separately.
+@@ -1169,13 +1157,17 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin" AND NOT CMAKE_CROSSCOMPILING)
    set(CMAKE_OSX_DEPLOYMENT_TARGET "")
  endif()
  
@@ -100,7 +114,7 @@ index 9a460b731d019..726758e7143d3 100644
    message(STATUS "")
  else()
    message(STATUS "Not building host Swift tools")
-@@ -1323,6 +1315,34 @@ endif()
+@@ -1326,6 +1318,35 @@ endif()
  add_subdirectory(include)
  
  if(SWIFT_INCLUDE_TOOLS)
@@ -125,8 +139,9 @@ index 9a460b731d019..726758e7143d3 100644
 +      set(SWIFT_HOST_LIBRARIES_RPATH "$ORIGIN;$ORIGIN/../..")
 +    endif()
 +
++    file(TO_CMAKE_PATH "${SWIFT_PATH_TO_SWIFT_SYNTAX_SOURCE}" swift_syntax_path)
 +    FetchContent_Declare(SwiftSyntax
-+      SOURCE_DIR "${SWIFT_PATH_TO_SWIFT_SYNTAX_SOURCE}"
++      SOURCE_DIR "${swift_syntax_path}"
 +    )
 +    FetchContent_MakeAvailable(SwiftSyntax)
 +  endfunction()
@@ -136,7 +151,7 @@ index 9a460b731d019..726758e7143d3 100644
  
    # SwiftCompilerSources must come before "tools".
 diff --git a/swift/cmake/modules/AddPureSwift.cmake b/swift/cmake/modules/AddPureSwift.cmake
-index 6c79fdcf351ce..953c607947fc0 100644
+index ad177634dbca9..2fed86ca12abf 100644
 --- a/swift/cmake/modules/AddPureSwift.cmake
 +++ b/swift/cmake/modules/AddPureSwift.cmake
 @@ -2,17 +2,15 @@ include(macCatalystUtils)
@@ -171,7 +186,7 @@ index 6c79fdcf351ce..953c607947fc0 100644
 -    set(DEPLOYMENT_VERSION "${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_DEPLOYMENT_VERSION}")
 -  endif()
 -
--  if(SWIFT_HOST_VARIANT_SDK STREQUAL ANDROID)
+-  if(SWIFT_HOST_VARIANT_SDK STREQUAL "ANDROID")
 -    set(DEPLOYMENT_VERSION ${SWIFT_ANDROID_API_LEVEL})
 -  endif()
 -
@@ -258,13 +273,13 @@ index 6c79fdcf351ce..953c607947fc0 100644
 +    )
 +  endif()
  
-   # Export this target.
-   set_property(GLOBAL APPEND PROPERTY SWIFT_EXPORTS ${name})
+   if(NOT APSHT_SWIFT_COMPONENT STREQUAL no_component)
+     add_dependencies(${APSHT_SWIFT_COMPONENT} ${name})
 diff --git a/swift/cmake/modules/AddSwift.cmake b/swift/cmake/modules/AddSwift.cmake
-index b55f7d8071656..d06a14f404756 100644
+index e0fb5de09f257..58f94846fa699 100644
 --- a/swift/cmake/modules/AddSwift.cmake
 +++ b/swift/cmake/modules/AddSwift.cmake
-@@ -112,9 +112,7 @@ function(_add_host_variant_swift_sanitizer_flags target)
+@@ -113,9 +113,7 @@ function(_add_host_variant_swift_sanitizer_flags target)
    endif()
  endfunction()
  
@@ -275,7 +290,7 @@ index b55f7d8071656..d06a14f404756 100644
    if(SWIFT_HOST_VARIANT_SDK IN_LIST SWIFT_DARWIN_PLATFORMS)
      set(DEPLOYMENT_VERSION "${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_DEPLOYMENT_VERSION}")
    endif()
-@@ -123,26 +121,30 @@ function(_add_host_variant_c_compile_link_flags name)
+@@ -124,26 +122,30 @@ function(_add_host_variant_c_compile_link_flags name)
      set(DEPLOYMENT_VERSION ${SWIFT_ANDROID_API_LEVEL})
    endif()
  
@@ -317,7 +332,7 @@ index b55f7d8071656..d06a14f404756 100644
  
     _add_host_variant_swift_sanitizer_flags(${name})
    endif()
-@@ -442,7 +444,7 @@ endfunction()
+@@ -439,7 +441,7 @@ endfunction()
  
  function(_add_swift_runtime_link_flags target relpath_to_lib_dir bootstrapping)
    if(NOT BOOTSTRAPPING_MODE)
@@ -326,8 +341,8 @@ index b55f7d8071656..d06a14f404756 100644
        set(ASRLF_BOOTSTRAPPING_MODE "HOSTTOOLS")
      else()
        return()
-@@ -578,7 +580,7 @@ function(_add_swift_runtime_link_flags target relpath_to_lib_dir bootstrapping)
-     endif()
+@@ -576,7 +578,7 @@ function(_add_swift_runtime_link_flags target relpath_to_lib_dir bootstrapping)
+       ${SWIFT_PATH_TO_SWIFT_SDK}/usr/lib/swift/${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_LIB_SUBDIR}/${SWIFT_HOST_VARIANT_ARCH})
    endif()
  
 -  if(SWIFT_SWIFT_PARSER)
@@ -335,7 +350,7 @@ index b55f7d8071656..d06a14f404756 100644
      # For the "end step" of bootstrapping configurations, we need to be
      # able to fall back to the SDK directory for libswiftCore et al.
      if (BOOTSTRAPPING_MODE MATCHES "BOOTSTRAPPING.*")
-@@ -656,7 +658,7 @@ function(add_swift_host_library name)
+@@ -654,7 +656,7 @@ function(add_swift_host_library name)
    translate_flags(ASHL "${options}")
  
    # Once the new Swift parser is linked, everything has Swift modules.
@@ -344,7 +359,7 @@ index b55f7d8071656..d06a14f404756 100644
      set(ASHL_HAS_SWIFT_MODULES ON)
    endif()
  
-@@ -702,7 +704,7 @@ function(add_swift_host_library name)
+@@ -700,7 +702,7 @@ function(add_swift_host_library name)
  
    add_library(${name} ${libkind} ${ASHL_SOURCES})
  
@@ -353,7 +368,7 @@ index b55f7d8071656..d06a14f404756 100644
  
    # Respect LLVM_COMMON_DEPENDS if it is set.
    #
-@@ -924,7 +926,7 @@ function(add_swift_host_tool executable)
+@@ -922,7 +924,7 @@ function(add_swift_host_tool executable)
    endif()
  
    # Once the new Swift parser is linked in, every host tool has Swift modules.
@@ -362,28 +377,54 @@ index b55f7d8071656..d06a14f404756 100644
      set(ASHT_HAS_SWIFT_MODULES ON)
    endif()
  
-@@ -963,7 +965,7 @@ function(add_swift_host_tool executable)
+@@ -961,7 +963,7 @@ function(add_swift_host_tool executable)
      endif()
    endif()
  
 -  if(SWIFT_SWIFT_PARSER)
 +  if(SWIFT_BUILD_SWIFT_SYNTAX)
      set(extra_relative_rpath "")
-     if(NOT ${ASHT_BOOTSTRAPPING} STREQUAL "")
-       if (${executable} MATCHES "-bootstrapping")
+     if(NOT "${ASHT_BOOTSTRAPPING}" STREQUAL "")
+       if(executable MATCHES "-bootstrapping")
 diff --git a/swift/cmake/modules/AddSwiftUnittests.cmake b/swift/cmake/modules/AddSwiftUnittests.cmake
-index b3ed5ef8a391f..78a84e6ec5821 100644
+index 45acb9bf10698..78a84e6ec5821 100644
 --- a/swift/cmake/modules/AddSwiftUnittests.cmake
 +++ b/swift/cmake/modules/AddSwiftUnittests.cmake
-@@ -123,7 +123,7 @@ function(add_swift_unittest test_dirname)
+@@ -111,10 +111,31 @@ function(add_swift_unittest test_dirname)
      endif()
    endif()
  
 -  if (SWIFT_SWIFT_PARSER AND NOT ASU_IS_TARGET_TEST)
++  file(RELATIVE_PATH relative_lib_path "${CMAKE_CURRENT_BINARY_DIR}" "${SWIFT_LIBRARY_OUTPUT_INTDIR}")
++
++  if(SWIFT_HOST_VARIANT_SDK IN_LIST SWIFT_DARWIN_PLATFORMS)
++    set_property(
++      TARGET ${test_dirname}
++      APPEND PROPERTY INSTALL_RPATH "@executable_path/${relative_lib_path}")
++  elseif(SWIFT_HOST_VARIANT_SDK MATCHES "LINUX|ANDROID|OPENBSD|FREEBSD")
++    set_property(
++      TARGET ${test_dirname}
++      APPEND PROPERTY INSTALL_RPATH "$ORIGIN/${relative_lib_path}")
++  endif()
++
 +  if (SWIFT_BUILD_SWIFT_SYNTAX AND NOT ASU_IS_TARGET_TEST)
      # Link to stdlib the compiler uses.
-     _add_swift_runtime_link_flags(${test_dirname} "../../lib" "")
-     set_property(TARGET ${test_dirname} PROPERTY BUILD_WITH_INSTALL_RPATH OFF)
+-    _add_swift_runtime_link_flags(${test_dirname} "../../lib" "")
+-    set_property(TARGET ${test_dirname} PROPERTY BUILD_WITH_INSTALL_RPATH OFF)
++    _add_swift_runtime_link_flags(${test_dirname} "${relative_lib_path}" "")
++
++    if(SWIFT_HOST_VARIANT_SDK IN_LIST SWIFT_DARWIN_PLATFORMS)
++      set_property(
++        TARGET ${test_dirname}
++        APPEND PROPERTY INSTALL_RPATH "@executable_path/${relative_lib_path}/swift/host")
++    elseif(SWIFT_HOST_VARIANT_SDK MATCHES "LINUX|ANDROID|OPENBSD|FREEBSD")
++      set_property(
++        TARGET ${test_dirname}
++        APPEND PROPERTY INSTALL_RPATH "$ORIGIN/${relative_lib_path}/swift/host")
++    endif()
+   endif()
+ endfunction()
+ 
 diff --git a/swift/cmake/modules/SetRPATH.cmake b/swift/cmake/modules/SetRPATH.cmake
 deleted file mode 100644
 index 76b8b4644e59a..0000000000000
@@ -446,7 +487,7 @@ index 5bfb3c7427693..c29f5286e1a28 100644
      add_custom_target(${component})
      add_llvm_install_targets(install-${component}
 diff --git a/swift/lib/AST/CMakeLists.txt b/swift/lib/AST/CMakeLists.txt
-index 9e5590b7315db..4bf20a642f0f8 100644
+index c8793e6d10ecb..5c7af5d85ee12 100644
 --- a/swift/lib/AST/CMakeLists.txt
 +++ b/swift/lib/AST/CMakeLists.txt
 @@ -155,10 +155,10 @@ target_link_libraries(swiftAST INTERFACE
@@ -463,10 +504,10 @@ index 9e5590b7315db..4bf20a642f0f8 100644
  endif()
  
 diff --git a/swift/lib/ASTGen/CMakeLists.txt b/swift/lib/ASTGen/CMakeLists.txt
-index f5d4a899cec73..736970051e359 100644
+index b80782f838e52..2628124156dfd 100644
 --- a/swift/lib/ASTGen/CMakeLists.txt
 +++ b/swift/lib/ASTGen/CMakeLists.txt
-@@ -26,15 +26,15 @@ add_pure_swift_host_library(swiftASTGen STATIC
+@@ -24,15 +24,15 @@ add_pure_swift_host_library(swiftASTGen STATIC
    DEPENDENCIES
      swiftAST
    SWIFT_DEPENDENCIES
@@ -493,10 +534,10 @@ index f5d4a899cec73..736970051e359 100644
      ${ASTGen_Swift_dependencies}
  )
 diff --git a/swift/lib/CMakeLists.txt b/swift/lib/CMakeLists.txt
-index 7a6f55c80406f..3c580fd824fb0 100644
+index 7d61c18522a1c..8c59a9292688f 100644
 --- a/swift/lib/CMakeLists.txt
 +++ b/swift/lib/CMakeLists.txt
-@@ -13,9 +13,7 @@
+@@ -16,9 +16,7 @@ list(APPEND LLVM_COMMON_DEPENDS intrinsics_gen clang-tablegen-targets)
  list(APPEND LLVM_COMMON_DEPENDS swift-ast-generated-headers)
  
  # Set up for linking against swift-syntax.
@@ -671,10 +712,10 @@ index 7a6f55c80406f..3c580fd824fb0 100644
  
  add_subdirectory(APIDigester)
 diff --git a/swift/lib/Frontend/CMakeLists.txt b/swift/lib/Frontend/CMakeLists.txt
-index c01fdcf7e174b..ebb9a2aeecabf 100644
+index 21ef5231ce3ac..a75be05e4feef 100644
 --- a/swift/lib/Frontend/CMakeLists.txt
 +++ b/swift/lib/Frontend/CMakeLists.txt
-@@ -37,9 +37,9 @@ target_link_libraries(swiftFrontend PRIVATE
+@@ -34,9 +34,9 @@ target_link_libraries(swiftFrontend PRIVATE
  
  set_swift_llvm_is_available(swiftFrontend)
  
@@ -687,10 +728,10 @@ index c01fdcf7e174b..ebb9a2aeecabf 100644
      )
  endif()
 diff --git a/swift/lib/Frontend/PrintingDiagnosticConsumer.cpp b/swift/lib/Frontend/PrintingDiagnosticConsumer.cpp
-index 9f6a8976c3aef..da70fa1f2f177 100644
+index eaa246940ccd0..f3e2e53834ce2 100644
 --- a/swift/lib/Frontend/PrintingDiagnosticConsumer.cpp
 +++ b/swift/lib/Frontend/PrintingDiagnosticConsumer.cpp
-@@ -315,7 +315,7 @@ namespace {
+@@ -964,7 +964,7 @@ static void annotateSnippetWithInfo(SourceManager &SM,
    }
  }
  
@@ -699,7 +740,7 @@ index 9f6a8976c3aef..da70fa1f2f177 100644
  /// Enqueue a diagnostic with ASTGen's diagnostic rendering.
  static void enqueueDiagnostic(
      void *queuedDiagnostics, const DiagnosticInfo &info, SourceManager &SM
-@@ -389,7 +389,7 @@ static SmallVector<unsigned, 1> getSourceBufferStack(
+@@ -1038,7 +1038,7 @@ static SmallVector<unsigned, 1> getSourceBufferStack(
    }
  }
  
@@ -708,7 +749,7 @@ index 9f6a8976c3aef..da70fa1f2f177 100644
  void PrintingDiagnosticConsumer::queueBuffer(
      SourceManager &sourceMgr, unsigned bufferID) {
    QueuedBuffer knownSourceFile = queuedBuffers[bufferID];
-@@ -454,7 +454,7 @@ void PrintingDiagnosticConsumer::handleDiagnostic(SourceManager &SM,
+@@ -1103,7 +1103,7 @@ void PrintingDiagnosticConsumer::handleDiagnostic(SourceManager &SM,
  
    switch (FormattingStyle) {
    case DiagnosticOptions::FormattingStyle::Swift: {
@@ -717,7 +758,7 @@ index 9f6a8976c3aef..da70fa1f2f177 100644
      // Use the swift-syntax formatter.
      auto bufferStack = getSourceBufferStack(SM, Info.Loc);
      if (!bufferStack.empty()) {
-@@ -496,7 +496,7 @@ void PrintingDiagnosticConsumer::handleDiagnostic(SourceManager &SM,
+@@ -1190,7 +1190,7 @@ void PrintingDiagnosticConsumer::flush(bool includeTrailingBreak) {
      currentSnippet.reset();
    }
  
@@ -727,10 +768,10 @@ index 9f6a8976c3aef..da70fa1f2f177 100644
      char *renderedString = nullptr;
      ptrdiff_t renderedStringLen = 0;
 diff --git a/swift/lib/IDE/CodeCompletion.cpp b/swift/lib/IDE/CodeCompletion.cpp
-index 362d0619152da..568d9557fe279 100644
+index 2cc7a2477e979..e76e64b6af883 100644
 --- a/swift/lib/IDE/CodeCompletion.cpp
 +++ b/swift/lib/IDE/CodeCompletion.cpp
-@@ -1172,7 +1172,7 @@ static void addPoundDirectives(CodeCompletionResultSink &Sink) {
+@@ -1142,7 +1142,7 @@ static void addPoundDirectives(CodeCompletionResultSink &Sink) {
      Builder.addRightParen();
    });
  
@@ -847,10 +888,10 @@ index 1b66331ad7e6d..8a01e55f893b0 100644
  endif()
  
 diff --git a/swift/lib/Parse/ParseDecl.cpp b/swift/lib/Parse/ParseDecl.cpp
-index 12f2bb72a10cc..50aa486a512aa 100644
+index cdae5b4443322..98344c7c98582 100644
 --- a/swift/lib/Parse/ParseDecl.cpp
 +++ b/swift/lib/Parse/ParseDecl.cpp
-@@ -163,7 +163,7 @@ extern "C" void parseTopLevelSwift(const char *buffer,
+@@ -162,7 +162,7 @@ extern "C" void parseTopLevelSwift(const char *buffer,
                                     void *outputContext,
                                     void (*)(void *, void *));
  
@@ -859,7 +900,7 @@ index 12f2bb72a10cc..50aa486a512aa 100644
  static void appendToVector(void *declPtr, void *vecPtr) {
    auto vec = static_cast<SmallVectorImpl<ASTNode> *>(vecPtr);
    auto decl = static_cast<Decl *>(declPtr);
-@@ -207,7 +207,7 @@ extern "C" void swift_ASTGen_buildTopLevelASTNodes(
+@@ -207,7 +207,7 @@ extern "C" void swift_ASTGen_buildTopLevelASTNodes(void *sourceFile,
  ///     decl-sil-stage [[only in SIL mode]
  /// \endverbatim
  void Parser::parseTopLevelItems(SmallVectorImpl<ASTNode> &items) {
@@ -922,10 +963,10 @@ index 7d02b146bf2fd..54548243d43cf 100644
        [&](void *exportedSourceFile, const void *sourceLoc) {
          const void *endLocPtr = nullptr;
 diff --git a/swift/lib/Sema/CMakeLists.txt b/swift/lib/Sema/CMakeLists.txt
-index 16494b3ff76d2..6a80e3c20768d 100644
+index f3cdbffcbfc18..4f95db5553219 100644
 --- a/swift/lib/Sema/CMakeLists.txt
 +++ b/swift/lib/Sema/CMakeLists.txt
-@@ -86,10 +86,10 @@ target_link_libraries(swiftSema PRIVATE
+@@ -87,10 +87,10 @@ target_link_libraries(swiftSema PRIVATE
    swiftParse
    swiftSerialization)
  
@@ -939,7 +980,7 @@ index 16494b3ff76d2..6a80e3c20768d 100644
    target_link_libraries(swiftSema PRIVATE
      swiftASTGen)
 diff --git a/swift/lib/Sema/CSApply.cpp b/swift/lib/Sema/CSApply.cpp
-index 0891865a43fcc..61b2c0eae84d5 100644
+index 77b0d7e2cd3a9..8317b9027c832 100644
 --- a/swift/lib/Sema/CSApply.cpp
 +++ b/swift/lib/Sema/CSApply.cpp
 @@ -2934,7 +2934,7 @@ namespace {
@@ -952,10 +993,10 @@ index 0891865a43fcc..61b2c0eae84d5 100644
        if (ctx.LangOpts.hasFeature(Feature::BuiltinMacros)) {
          auto expandedType = solution.simplifyType(solution.getType(expr));
 diff --git a/swift/lib/Sema/CSGen.cpp b/swift/lib/Sema/CSGen.cpp
-index 882349e9acf49..af0de3c9628d9 100644
+index f50b7d8fee110..037ad6db8bdff 100644
 --- a/swift/lib/Sema/CSGen.cpp
 +++ b/swift/lib/Sema/CSGen.cpp
-@@ -1356,7 +1356,7 @@ namespace {
+@@ -1267,7 +1267,7 @@ namespace {
      }
  
      Type visitMagicIdentifierLiteralExpr(MagicIdentifierLiteralExpr *expr) {
@@ -965,7 +1006,7 @@ index 882349e9acf49..af0de3c9628d9 100644
        if (ctx.LangOpts.hasFeature(Feature::BuiltinMacros)) {
          auto kind = MagicIdentifierLiteralExpr::getKindString(expr->getKind())
 diff --git a/swift/lib/Sema/TypeCheckMacros.cpp b/swift/lib/Sema/TypeCheckMacros.cpp
-index 5313ab221e60e..6cc8cb36ac735 100644
+index 9d599b54c4b95..4861eb726b27e 100644
 --- a/swift/lib/Sema/TypeCheckMacros.cpp
 +++ b/swift/lib/Sema/TypeCheckMacros.cpp
 @@ -94,7 +94,7 @@ extern "C" bool swift_ASTGen_pluginServerLoadLibraryPlugin(
@@ -1004,7 +1045,7 @@ index 5313ab221e60e..6cc8cb36ac735 100644
      llvm::SmallString<128> resolvedLibraryPath;
      auto fs = ctx.SourceMgr.getFileSystem();
      if (auto err = fs->getRealPath(libraryPath, resolvedLibraryPath)) {
-@@ -391,7 +391,7 @@ CompilerPluginLoadRequest::evaluate(Evaluator &evaluator, ASTContext *ctx,
+@@ -380,7 +380,7 @@ CompilerPluginLoadRequest::evaluate(Evaluator &evaluator, ASTContext *ctx,
  static llvm::Optional<ExternalMacroDefinition>
  resolveInProcessMacro(ASTContext &ctx, Identifier moduleName,
                        Identifier typeName, LoadedLibraryPlugin *plugin) {
@@ -1013,7 +1054,7 @@ index 5313ab221e60e..6cc8cb36ac735 100644
    /// Look for the type metadata given the external module and type names.
    auto macroMetatype = lookupMacroTypeMetadataByExternalName(
        ctx, moduleName.str(), typeName.str(), plugin);
-@@ -415,7 +415,7 @@ static llvm::Optional<ExternalMacroDefinition>
+@@ -404,7 +404,7 @@ static llvm::Optional<ExternalMacroDefinition>
  resolveExecutableMacro(ASTContext &ctx,
                         LoadedExecutablePlugin *executablePlugin,
                         Identifier moduleName, Identifier typeName) {
@@ -1022,7 +1063,7 @@ index 5313ab221e60e..6cc8cb36ac735 100644
    if (auto *execMacro = swift_ASTGen_resolveExecutableMacro(
            moduleName.str().data(), moduleName.str().size(),
            typeName.str().data(), typeName.str().size(), executablePlugin)) {
-@@ -986,7 +986,7 @@ evaluateFreestandingMacro(FreestandingMacroExpansion *expansion,
+@@ -975,7 +975,7 @@ evaluateFreestandingMacro(FreestandingMacroExpansion *expansion,
    LazyValue<std::string> discriminator([&]() -> std::string {
      if (!discriminatorStr.empty())
        return discriminatorStr.str();
@@ -1031,7 +1072,7 @@ index 5313ab221e60e..6cc8cb36ac735 100644
      Mangle::ASTMangler mangler;
      return mangler.mangleMacroExpansion(expansion);
  #else
-@@ -1047,7 +1047,7 @@ evaluateFreestandingMacro(FreestandingMacroExpansion *expansion,
+@@ -1036,7 +1036,7 @@ evaluateFreestandingMacro(FreestandingMacroExpansion *expansion,
        return nullptr;
      }
  
@@ -1040,7 +1081,7 @@ index 5313ab221e60e..6cc8cb36ac735 100644
      PrettyStackTraceFreestandingMacroExpansion debugStack(
          "expanding freestanding macro", expansion);
  
-@@ -1226,7 +1226,7 @@ static SourceFile *evaluateAttachedMacro(MacroDecl *macro, Decl *attachedTo,
+@@ -1215,7 +1215,7 @@ static SourceFile *evaluateAttachedMacro(MacroDecl *macro, Decl *attachedTo,
    LazyValue<std::string> discriminator([&]() -> std::string {
      if (!discriminatorStr.empty())
        return discriminatorStr.str();
@@ -1049,7 +1090,7 @@ index 5313ab221e60e..6cc8cb36ac735 100644
      Mangle::ASTMangler mangler;
      return mangler.mangleAttachedMacroExpansion(attachedTo, attr, role);
  #else
-@@ -1304,7 +1304,7 @@ static SourceFile *evaluateAttachedMacro(MacroDecl *macro, Decl *attachedTo,
+@@ -1294,7 +1294,7 @@ static SourceFile *evaluateAttachedMacro(MacroDecl *macro, Decl *attachedTo,
        return nullptr;
      }
  
@@ -1059,18 +1100,21 @@ index 5313ab221e60e..6cc8cb36ac735 100644
  
      auto *astGenAttrSourceFile = attrSourceFile->getExportedSourceFile();
 diff --git a/swift/test/CMakeLists.txt b/swift/test/CMakeLists.txt
-index a2998850bb96d..96411667cb4ec 100644
+index d2d5f71ded49a..52ea7dc00842a 100644
 --- a/swift/test/CMakeLists.txt
 +++ b/swift/test/CMakeLists.txt
-@@ -210,16 +210,7 @@ normalize_boolean_spelling(SWIFT_STDLIB_ENABLE_OBJC_INTEROP)
+@@ -205,18 +205,10 @@ normalize_boolean_spelling(SWIFT_STDLIB_ENABLE_UNICODE_DATA)
+ normalize_boolean_spelling(SWIFT_ENABLE_DISPATCH)
+ normalize_boolean_spelling(SWIFT_STDLIB_ENABLE_OBJC_INTEROP)
  normalize_boolean_spelling(SWIFT_ENABLE_BACKTRACING)
++normalize_boolean_spelling(SWIFT_BUILD_SWIFT_SYNTAX)
  is_build_type_optimized("${SWIFT_STDLIB_BUILD_TYPE}" SWIFT_OPTIMIZED)
  
 -# Get 'SWIFT_HOST_TRIPLE' and 'SWIFT_HOST_SDKROOT' for lit.site.cfg.in
 -if(SWIFT_HOST_VARIANT_SDK IN_LIST SWIFT_DARWIN_PLATFORMS)
 -  set(DEPLOYMENT_VERSION "${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_DEPLOYMENT_VERSION}")
 -endif()
--if(SWIFT_HOST_VARIANT_SDK STREQUAL ANDROID)
+-if(SWIFT_HOST_VARIANT_SDK STREQUAL "ANDROID")
 -  set(DEPLOYMENT_VERSION ${SWIFT_ANDROID_API_LEVEL})
 -endif()
 -get_target_triple(SWIFT_HOST_TRIPLE SWIFT_HOST_TRIPLE_VARIANT "${SWIFT_HOST_VARIANT_SDK}" "${SWIFT_HOST_VARIANT_ARCH}"
@@ -1080,8 +1124,85 @@ index a2998850bb96d..96411667cb4ec 100644
  set(SWIFT_HOST_SDKROOT "${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_ARCH_${SWIFT_HOST_VARIANT_ARCH}_PATH}")
  
  set(profdata_merge_worker
+diff --git a/swift/test/IDE/complete_pound_expr.swift b/swift/test/IDE/complete_pound_expr.swift
+index bb074a1ab0d26..4bfd862f00d68 100644
+--- a/swift/test/IDE/complete_pound_expr.swift
++++ b/swift/test/IDE/complete_pound_expr.swift
+@@ -1,7 +1,7 @@
+ // RUN: %target-swift-ide-test -code-completion -source-filename %s -code-completion-token=POUND_EXPR_1 | %FileCheck %s -check-prefix=POUND_EXPR_INTCONTEXT
+ // RUN: %target-swift-ide-test -code-completion -source-filename %s -code-completion-token=POUND_EXPR_2 | %FileCheck %s -check-prefix=POUND_EXPR_STRINGCONTEXT
+ // RUN: %target-swift-ide-test -code-completion -source-filename %s -code-completion-token=POUND_EXPR_3 | %FileCheck %s -check-prefix=POUND_EXPR_SELECTORCONTEXT
+-// REQUIRES: objc_interop
++// REQUIRES: objc_interop, swift_swift_parser
+ 
+ import ObjectiveC
+ 
+diff --git a/swift/test/Macros/extension_macro_plugin.swift b/swift/test/Macros/extension_macro_plugin.swift
+index 5204d9c74fb4b..eaf90a366c231 100644
+--- a/swift/test/Macros/extension_macro_plugin.swift
++++ b/swift/test/Macros/extension_macro_plugin.swift
+@@ -1,5 +1,4 @@
+-// FIXME: Swift parser is not enabled on Linux CI yet.
+-// REQUIRES: OS=macosx
++// REQUIRES: swift_swift_parser
+ 
+ // RUN: %empty-directory(%t)
+ // RUN: %empty-directory(%t/plugins)
+@@ -13,7 +12,7 @@
+ // RUN:   %S/Inputs/syntax_macro_definitions.swift \
+ // RUN:   -g -no-toolchain-stdlib-rpath
+ 
+-// RUN: SWIFT_DUMP_PLUGIN_MESSAGING=1 %swift-target-frontend \
++// RUN: env SWIFT_DUMP_PLUGIN_MESSAGING=1 %swift-target-frontend \
+ // RUN:   -typecheck -verify \
+ // RUN:   -swift-version 5 -enable-experimental-feature ExtensionMacros \
+ // RUN:   -external-plugin-path %t/plugins#%swift-plugin-server \
+diff --git a/swift/test/Macros/macro_plugin_server.swift b/swift/test/Macros/macro_plugin_server.swift
+index dfdd12874b30a..91d45c30e1c82 100644
+--- a/swift/test/Macros/macro_plugin_server.swift
++++ b/swift/test/Macros/macro_plugin_server.swift
+@@ -1,5 +1,4 @@
+-// FIXME: Swift parser is not enabled on Linux CI yet.
+-// REQUIRES: OS=macosx
++// REQUIRES: swift_swift_parser
+ 
+ // RUN: %empty-directory(%t)
+ // RUN: %empty-directory(%t/plugins)
+@@ -21,7 +20,7 @@
+ // RUN:   %S/Inputs/evil_macro_definitions.swift \
+ // RUN:   -g -no-toolchain-stdlib-rpath
+ 
+-// RUN: SWIFT_DUMP_PLUGIN_MESSAGING=1 %swift-target-frontend \
++// RUN: env SWIFT_DUMP_PLUGIN_MESSAGING=1 %swift-target-frontend \
+ // RUN:   -typecheck -verify \
+ // RUN:   -swift-version 5 -enable-experimental-feature Macros \
+ // RUN:   -external-plugin-path %t/plugins#%swift-plugin-server \
+@@ -33,9 +32,9 @@
+ 
+ // CHECK: ->(plugin:[[#PID1:]]) {"getCapability":{"capability":{"protocolVersion":[[#PROTOCOL_VERSION:]]}}}
+ // CHECK-NEXT: <-(plugin:[[#PID1]]) {"getCapabilityResult":{"capability":{"features":["load-plugin-library"],"protocolVersion":[[#PROTOCOL_VERSION]]}}}
+-// CHECK-NEXT: ->(plugin:[[#PID1]]) {"loadPluginLibrary":{"libraryPath":"BUILD_DIR{{.*}}plugins/libMacroDefinition.dylib","moduleName":"MacroDefinition"}}
++// CHECK-NEXT: ->(plugin:[[#PID1]]) {"loadPluginLibrary":{"libraryPath":"{{.*}}MacroDefinition.{{dylib|so|dll}}","moduleName":"MacroDefinition"}}
+ // CHECK-NEXT: <-(plugin:[[#PID1]]) {"loadPluginLibraryResult":{"diagnostics":[],"loaded":true}}
+-// CHECK-NEXT: ->(plugin:[[#PID1]]) {"loadPluginLibrary":{"libraryPath":"BUILD_DIR{{.*}}plugins/libEvilMacros.dylib","moduleName":"EvilMacros"}}
++// CHECK-NEXT: ->(plugin:[[#PID1]]) {"loadPluginLibrary":{"libraryPath":"{{.*}}EvilMacros.{{dylib|so|dll}}","moduleName":"EvilMacros"}}
+ // CHECK-NEXT: <-(plugin:[[#PID1]]) {"loadPluginLibraryResult":{"diagnostics":[],"loaded":true}}
+ // CHECK-NEXT: ->(plugin:[[#PID1]]) {"expandFreestandingMacro":{"discriminator":"${{.*}}","macro":{"moduleName":"MacroDefinition","name":"stringify","typeName":"StringifyMacro"},"macroRole":"expression","syntax":{"kind":"expression","location":{{{.+}}},"source":"#stringify(a + b)"}}}
+ // CHECK-NEXT: <-(plugin:[[#PID1]]) {"expandMacroResult":{"diagnostics":[],"expandedSource":"(a + b, \"a + b\")"}}
+@@ -44,9 +43,9 @@
+ 
+ // CHECK: ->(plugin:[[#PID2:]]) {"getCapability":{"capability":{"protocolVersion":[[#PROTOCOL_VERSION]]}}}
+ // CHECK-NEXT: <-(plugin:[[#PID2]]) {"getCapabilityResult":{"capability":{"features":["load-plugin-library"],"protocolVersion":[[#PROTOCOL_VERSION]]}}}
+-// CHECK-NEXT: ->(plugin:[[#PID2]]) {"loadPluginLibrary":{"libraryPath":"BUILD_DIR{{.*}}plugins/libMacroDefinition.dylib","moduleName":"MacroDefinition"}}
++// CHECK-NEXT: ->(plugin:[[#PID2]]) {"loadPluginLibrary":{"libraryPath":"{{.*}}MacroDefinition.{{dylib|so|dll}}","moduleName":"MacroDefinition"}}
+ // CHECK-NEXT: <-(plugin:[[#PID2]]) {"loadPluginLibraryResult":{"diagnostics":[],"loaded":true}}
+-// CHECK-NEXT: ->(plugin:[[#PID2]]) {"loadPluginLibrary":{"libraryPath":"BUILD_DIR{{.*}}plugins/libEvilMacros.dylib","moduleName":"EvilMacros"}}
++// CHECK-NEXT: ->(plugin:[[#PID2]]) {"loadPluginLibrary":{"libraryPath":"{{.*}}EvilMacros.{{dylib|so|dll}}","moduleName":"EvilMacros"}}
+ // CHECK-NEXT: <-(plugin:[[#PID2]]) {"loadPluginLibraryResult":{"diagnostics":[],"loaded":true}}
+ // CHECK-NEXT: ->(plugin:[[#PID2]]) {"expandFreestandingMacro":{"discriminator":"${{.*}}","macro":{"moduleName":"MacroDefinition","name":"stringify","typeName":"StringifyMacro"},"macroRole":"expression","syntax":{"kind":"expression","location":{{{.+}}},"source":"#stringify(b + a)"}}}
+ // CHECK-NEXT: <-(plugin:[[#PID2]]) {"expandMacroResult":{"diagnostics":[],"expandedSource":"(b + a, \"b + a\")"}}
 diff --git a/swift/test/lit.site.cfg.in b/swift/test/lit.site.cfg.in
-index 8544f2a22bcea..8d4414f3c5d36 100644
+index 06af9476c7f12..740a08c33bc7b 100644
 --- a/swift/test/lit.site.cfg.in
 +++ b/swift/test/lit.site.cfg.in
 @@ -166,7 +166,7 @@ elif "@BOOTSTRAPPING_MODE@" == 'BOOTSTRAPPING':
@@ -1094,7 +1215,7 @@ index 8544f2a22bcea..8d4414f3c5d36 100644
  
  # Let the main config do the real work.
 diff --git a/swift/tools/SourceKit/cmake/modules/AddSwiftSourceKit.cmake b/swift/tools/SourceKit/cmake/modules/AddSwiftSourceKit.cmake
-index 2293712165751..4b5a63fef6046 100644
+index 5514431eea9ce..4b5a63fef6046 100644
 --- a/swift/tools/SourceKit/cmake/modules/AddSwiftSourceKit.cmake
 +++ b/swift/tools/SourceKit/cmake/modules/AddSwiftSourceKit.cmake
 @@ -25,7 +25,7 @@ function(add_sourcekit_swift_runtime_link_flags target path HAS_SWIFT_MODULES)
@@ -1106,16 +1227,49 @@ index 2293712165751..4b5a63fef6046 100644
        set(ASKD_BOOTSTRAPPING_MODE HOSTTOOLS)
      endif()
    endif()
-@@ -152,7 +152,7 @@ function(add_sourcekit_swift_runtime_link_flags target path HAS_SWIFT_MODULES)
+@@ -115,12 +115,6 @@ function(add_sourcekit_swift_runtime_link_flags target path HAS_SWIFT_MODULES)
+                    LINK_FLAGS " -lobjc ")
+ 
+     endif() # HAS_SWIFT_MODULES AND ASKD_BOOTSTRAPPING_MODE
+-
+-    if(SWIFT_SWIFT_PARSER)
+-      # Add rpath to the host Swift libraries.
+-      file(RELATIVE_PATH relative_hostlib_path "${path}" "${SWIFTLIB_DIR}/host")
+-      list(APPEND RPATH_LIST "@loader_path/${relative_hostlib_path}")
+-    endif()
+   elseif(SWIFT_HOST_VARIANT_SDK MATCHES "LINUX|ANDROID|OPENBSD" AND HAS_SWIFT_MODULES AND ASKD_BOOTSTRAPPING_MODE)
+     set(swiftrt "swiftImageRegistrationObject${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_OBJECT_FORMAT}-${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_LIB_SUBDIR}-${SWIFT_HOST_VARIANT_ARCH}")
+     if(ASKD_BOOTSTRAPPING_MODE MATCHES "HOSTTOOLS|CROSSCOMPILE")
+@@ -156,18 +150,22 @@ function(add_sourcekit_swift_runtime_link_flags target path HAS_SWIFT_MODULES)
+     else()
        message(FATAL_ERROR "Unknown ASKD_BOOTSTRAPPING_MODE '${ASKD_BOOTSTRAPPING_MODE}'")
      endif()
-
++  endif()
+ 
 -    if(SWIFT_SWIFT_PARSER)
-+    if(SWIFT_BUILD_SWIFT_SYNTAX)
++  if(SWIFT_BUILD_SWIFT_SYNTAX)
++    if(SWIFT_HOST_VARIANT_SDK IN_LIST SWIFT_DARWIN_PLATFORMS)
++      # Add rpath to the host Swift libraries.
++      file(RELATIVE_PATH relative_hostlib_path "${path}" "${SWIFTLIB_DIR}/host")
++      list(APPEND RPATH_LIST "@loader_path/${relative_hostlib_path}")
++    elseif(SWIFT_HOST_VARIANT_SDK MATCHES "LINUX|ANDROID|OPENBSD")
        # Add rpath to the host Swift libraries.
        file(RELATIVE_PATH relative_hostlib_path "${path}" "${SWIFTLIB_DIR}/host")
        list(APPEND RPATH_LIST "$ORIGIN/${relative_hostlib_path}")
-@@ -261,7 +261,7 @@ macro(add_sourcekit_library name)
++    else()
++      target_link_directories(${target} PRIVATE
++        ${SWIFT_PATH_TO_SWIFT_SDK}/usr/lib/swift/${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_LIB_SUBDIR}/${SWIFT_HOST_VARIANT_ARCH})
+     endif()
+-  else()
+-    target_link_directories(${target} PRIVATE
+-      ${SWIFT_PATH_TO_SWIFT_SDK}/usr/lib/swift/${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_LIB_SUBDIR}/${SWIFT_HOST_VARIANT_ARCH})
+-  endif()
+ 
+-  if(SWIFT_SWIFT_PARSER)
+     # For the "end step" of bootstrapping configurations on Darwin, need to be
+     # able to fall back to the SDK directory for libswiftCore et al.
+     if (BOOTSTRAPPING_MODE MATCHES "BOOTSTRAPPING.*")
+@@ -263,7 +261,7 @@ macro(add_sourcekit_library name)
    endif()
  
    # Once the new Swift parser is linked, everything has Swift modules.
@@ -1124,7 +1278,7 @@ index 2293712165751..4b5a63fef6046 100644
      set(SOURCEKITLIB_HAS_SWIFT_MODULES ON)
    endif()
  
-@@ -365,7 +365,7 @@ macro(add_sourcekit_framework name)
+@@ -367,7 +365,7 @@ macro(add_sourcekit_framework name)
    set(framework_location "${lib_dir}/${name}.framework")
  
    # Once the new Swift parser is linked, everything has Swift modules.
@@ -1133,8 +1287,32 @@ index 2293712165751..4b5a63fef6046 100644
      set(SOURCEKITFW_HAS_SWIFT_MODULES ON)
    endif()
  
+@@ -439,7 +437,6 @@ macro(add_sourcekit_framework name)
+     file(RELATIVE_PATH relative_lib_path
+       "${framework_location}/Versions/A" "${SOURCEKIT_LIBRARY_OUTPUT_INTDIR}")
+     list(APPEND RPATH_LIST "@loader_path/${relative_lib_path}")
+-    list(APPEND RPATH_LIST "@loader_path/${relative_lib_path}/swift/host")
+ 
+     set_target_properties(${name} PROPERTIES
+                           BUILD_WITH_INSTALL_RPATH TRUE
+@@ -475,7 +472,6 @@ macro(add_sourcekit_framework name)
+     file(RELATIVE_PATH relative_lib_path
+       "${framework_location}" "${SOURCEKIT_LIBRARY_OUTPUT_INTDIR}")
+     list(APPEND RPATH_LIST "@loader_path/${relative_lib_path}")
+-    list(APPEND RPATH_LIST "@loader_path/${relative_lib_path}/swift/host")
+ 
+     set_target_properties(${name} PROPERTIES
+                           BUILD_WITH_INSTALL_RPATH TRUE
+@@ -567,7 +563,6 @@ macro(add_sourcekit_xpc_service name framework_target)
+ 
+   file(RELATIVE_PATH relative_lib_path "${xpc_bin_dir}" "${lib_dir}")
+   list(APPEND RPATH_LIST "@loader_path/${relative_lib_path}")
+-  list(APPEND RPATH_LIST "@loader_path/${relative_lib_path}/swift/host")
+ 
+   # Add rpath for sourcekitdInProc
+   # lib/${framework_target}.framework/Versions/A/XPCServices/${name}.xpc/Contents/MacOS/${name}
 diff --git a/swift/tools/driver/CMakeLists.txt b/swift/tools/driver/CMakeLists.txt
-index f08e56ee3c2f1..1b350f229d4a5 100644
+index 9c2e5ed6486a9..f6ceb3dae63d8 100644
 --- a/swift/tools/driver/CMakeLists.txt
 +++ b/swift/tools/driver/CMakeLists.txt
 @@ -4,9 +4,7 @@
@@ -1172,8 +1350,8 @@ index 1d1b88b22bd8a..34e8637089521 100644
    # Don't bother to create '.a' for that.
    add_swift_host_library(_swiftCSwiftPluginServer OBJECT
 @@ -19,9 +19,9 @@ if (SWIFT_SWIFT_PARSER)
-       swiftDemangling
-       $<TARGET_OBJECTS:_swiftCSwiftPluginServer>
+     SWIFT_COMPONENT
+       compiler
      SWIFT_DEPENDENCIES
 -      SwiftSyntax::SwiftSyntaxMacros
 -      SwiftSyntax::SwiftSyntaxMacroExpansion
@@ -1185,10 +1363,10 @@ index 1d1b88b22bd8a..34e8637089521 100644
    )
    target_include_directories(swift-plugin-server PRIVATE
 diff --git a/swift/utils/build-script-impl b/swift/utils/build-script-impl
-index c7658ae747a0f..abd937bb508fd 100755
+index 4a243bd7cab5e..4d388a96e3ed1 100755
 --- a/swift/utils/build-script-impl
 +++ b/swift/utils/build-script-impl
-@@ -844,16 +844,6 @@ function set_build_options_for_host() {
+@@ -836,16 +836,6 @@ function set_build_options_for_host() {
      swift_cmake_options+=(
          -DCOVERAGE_DB="${COVERAGE_DB}"
      )
@@ -1206,10 +1384,10 @@ index c7658ae747a0f..abd937bb508fd 100755
  
  function configure_default_options() {
 diff --git a/swift/utils/swift_build_support/swift_build_support/build_script_invocation.py b/swift/utils/swift_build_support/swift_build_support/build_script_invocation.py
-index d3cd28f0e9a55..ffd97f9b7bcb1 100644
+index 4d70897286f6a..166c5ea02cced 100644
 --- a/swift/utils/swift_build_support/swift_build_support/build_script_invocation.py
 +++ b/swift/utils/swift_build_support/swift_build_support/build_script_invocation.py
-@@ -248,13 +248,15 @@ def convert_to_impl_arguments(self):
+@@ -251,13 +251,15 @@ def convert_to_impl_arguments(self):
              args.extra_cmake_options.append(
                  '-DSWIFT_BACK_DEPLOY_CONCURRENCY:BOOL=TRUE')
  
@@ -1231,7 +1409,7 @@ index d3cd28f0e9a55..ffd97f9b7bcb1 100644
  
          # Then add subproject install flags that either skip building them /or/
          # if we are going to build them and install_all is set, we also install
-@@ -443,6 +445,15 @@ def convert_to_impl_arguments(self):
+@@ -446,6 +448,15 @@ def convert_to_impl_arguments(self):
                  os.path.abspath(args.coverage_db)
              ]
  
@@ -1247,7 +1425,7 @@ index d3cd28f0e9a55..ffd97f9b7bcb1 100644
          if args.llvm_install_components:
              impl_args += [
                  "--llvm-install-components=%s" % args.llvm_install_components
-@@ -565,9 +576,6 @@ def compute_product_pipelines(self):
+@@ -568,9 +579,6 @@ def compute_product_pipelines(self):
  
          builder.begin_pipeline()
  
@@ -1258,10 +1436,10 @@ index d3cd28f0e9a55..ffd97f9b7bcb1 100644
          # as usual, but relying on its own C++-based (Legacy) driver.
          # Otherwise, we build an "early" swift-driver using the host
 diff --git a/swift/utils/swift_build_support/swift_build_support/products/__init__.py b/swift/utils/swift_build_support/swift_build_support/products/__init__.py
-index 5f4d65c7ad995..5a382b8cd68c7 100644
+index 40fd43960af40..3294929bd1585 100644
 --- a/swift/utils/swift_build_support/swift_build_support/products/__init__.py
 +++ b/swift/utils/swift_build_support/swift_build_support/products/__init__.py
-@@ -14,7 +14,6 @@
+@@ -15,7 +15,6 @@
  from .cmark import CMark
  from .curl import LibCurl
  from .earlyswiftdriver import EarlySwiftDriver
@@ -1269,7 +1447,7 @@ index 5f4d65c7ad995..5a382b8cd68c7 100644
  from .foundation import Foundation
  from .indexstoredb import IndexStoreDB
  from .libcxx import LibCXX
-@@ -63,7 +62,6 @@
+@@ -65,7 +64,6 @@
      'SwiftPM',
      'SwiftDriver',
      'EarlySwiftDriver',
@@ -1307,7 +1485,7 @@ deleted file mode 100644
 index 37c1bede9b0bd..0000000000000
 --- a/swift/utils/swift_build_support/swift_build_support/products/earlyswiftsyntax.py
 +++ /dev/null
-@@ -1,82 +0,0 @@
+@@ -1,83 +0,0 @@
 -# swift_build_support/products/earlyswiftsyntax.py --------------*- python -*-
 -#
 -# This source file is part of the Swift.org open source project
@@ -1373,6 +1551,7 @@ index 37c1bede9b0bd..0000000000000
 -        self.cmake_options.define('CMAKE_INSTALL_PREFIX:PATH', self.args.install_prefix)
 -        self.cmake_options.define('SWIFTSYNTAX_ENABLE_ASSERTIONS:BOOL',
 -                                  self.args.assertions)
+-        self.cmake_options.define('SWIFT_MODULE_ABI_NAME_PREFIX:STRING', 'Compiler')
 -        self.build_with_cmake(["all"], self.args.swift_build_variant, [])
 -
 -    def should_test(self, host_target):
@@ -1383,10 +1562,10 @@ index 37c1bede9b0bd..0000000000000
 -        pass
 -
 -    def should_install(self, host_target):
--        # The artifacts are copied to build directory of 'swift' and are
--        # installed as a part of 'swift' product.
--        return False
+-        # When '--install-swift' is enabled, earlyswiftsyntax libraries are installed
+-        # from 'swift' product.
+-        return (self.should_build(host_target) and self.args.install_swiftsyntax and
+-                "--install-swift" not in self.args.build_script_impl_args)
 -
 -    def install(self, host_target):
--        # No-op.
--        pass
+-        self.install_with_cmake(["install"], self.host_install_destdir(host_target))
