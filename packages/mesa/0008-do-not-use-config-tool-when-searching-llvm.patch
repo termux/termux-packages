@@ -1,0 +1,12 @@
+This reverts https://gitlab.freedesktop.org/mesa/mesa/-/commit/d11900d5e76922790de90ebfb89f918673759a88
+
+--- a/meson.build
++++ b/meson.build
+@@ -1708,7 +1708,6 @@
+ if _llvm.allowed()
+   dep_llvm = dependency(
+     'llvm',
+-    method : host_machine.system() == 'windows' ? 'auto' : 'config-tool',
+     version : _llvm_version,
+     modules : llvm_modules,
+     optional_modules : llvm_optional_modules,
