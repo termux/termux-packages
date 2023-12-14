@@ -26,7 +26,7 @@ termux_step_pre_configure() {
 		echo "INPUT(-l:libunwind.a)" >libgcc.so
 		popd
 	fi
-	if [ $TERMUX_ARCH != "arm" ]; then
+	if [ $TERMUX_ARCH != "i686" && $TERMUX_ARCH != "arm" ]; then
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --features=dataframe"
 	fi
 
