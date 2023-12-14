@@ -56,6 +56,10 @@ termux_pkg_upgrade_version() {
 			return 0
 		fi
 	fi
+	
+	if [[ -n "${TERMUX_PKG_UPGRADE_VERSION_DRY_RUN:-}" ]]; then
+		return 1
+	fi
 
 	if [[ "${BUILD_PACKAGES}" == "false" ]]; then
 		echo "INFO: package needs to be updated to ${LATEST_VERSION}."
