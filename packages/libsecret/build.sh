@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A GObject-based library for accessing the Secret Service
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@suhan-paradkar"
 TERMUX_PKG_VERSION="0.21.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/libsecret/${TERMUX_PKG_VERSION%.*}/libsecret-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=e4a341496a0815e64c8d3b8fabab33d7bae7efdeab77b843669731d5b181dcee
 TERMUX_PKG_AUTO_UPDATE=true
