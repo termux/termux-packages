@@ -17,6 +17,9 @@ termux_step_massage() {
 	# Remove cache file created by glib-compile-schemas:
 	rm -f share/glib-2.0/schemas/gschemas.compiled
 
+	# Remove cache file generated when using glib-cross-bin:
+	rm -rf opt/glib/cross/share/glib-2.0/codegen/__pycache__
+
  	# Removing the pacman log that is often included in the package:
   	rm -f var/log/pacman.log
 
