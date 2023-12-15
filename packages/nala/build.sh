@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Commandline frontend for the apt package manager"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.14.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://gitlab.com/volian/nala/-/archive/v${TERMUX_PKG_VERSION}/nala-v${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=e9309f3aa269ec274c1250e34c4f7596395a38a90b40ec77d43d09bbbe8dffcf
 TERMUX_PKG_DEPENDS="python-apt, python-pip"
