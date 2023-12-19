@@ -30,5 +30,5 @@ termux_step_pre_configure() {
 	fi
 	export PATH="${_WRAPPER_BIN}:${PATH}"
 
-	CPPFLAGS+=" -DLINE_MAX=_POSIX2_LINE_MAX"
+	CPPFLAGS+=" -DLINE_MAX=_POSIX2_LINE_MAX -Wno-cast-function-type-strict -Wno-deprecated-declarations -Wno-cast-function-type"
 }
