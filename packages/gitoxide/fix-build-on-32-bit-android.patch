@@ -1,0 +1,51 @@
+From e2e17c60008f287796c6c10e1fa8a64a3d4a9105 Mon Sep 17 00:00:00 2001
+From: Sebastian Thiel <sebastian.thiel@icloud.com>
+Date: Thu, 7 Dec 2023 18:57:38 +0100
+Subject: [PATCH] fix: builds on 32bit android now work.
+
+Thanks to new CI tests, these should keep working as well.
+---
+ gix-index/src/fs.rs | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/gix-index/src/fs.rs b/gix-index/src/fs.rs
+index ed048942d9..02842f5536 100644
+--- a/gix-index/src/fs.rs
++++ b/gix-index/src/fs.rs
+@@ -44,7 +44,7 @@ impl Metadata {
+     pub fn is_dir(&self) -> bool {
+         #[cfg(not(windows))]
+         {
+-            (self.0.st_mode & libc::S_IFMT) == libc::S_IFDIR
++            (self.0.st_mode as u32 & libc::S_IFMT as u32) == libc::S_IFDIR as u32
+         }
+         #[cfg(windows)]
+         self.0.is_dir()
+@@ -133,7 +133,8 @@ impl Metadata {
+     pub fn is_executable(&self) -> bool {
+         #[cfg(not(windows))]
+         {
+-            (self.0.st_mode & libc::S_IFMT) == libc::S_IFREG && self.0.st_mode & libc::S_IXUSR == libc::S_IXUSR
++            (self.0.st_mode as u32 & libc::S_IFMT as u32) == libc::S_IFREG as u32
++                && self.0.st_mode as u32 & libc::S_IXUSR as u32 == libc::S_IXUSR as u32
+         }
+         #[cfg(windows)]
+         gix_fs::is_executable(&self.0)
+@@ -143,7 +144,7 @@ impl Metadata {
+     pub fn is_symlink(&self) -> bool {
+         #[cfg(not(windows))]
+         {
+-            (self.0.st_mode & libc::S_IFMT) == libc::S_IFLNK
++            (self.0.st_mode as u32 & libc::S_IFMT as u32) == libc::S_IFLNK as u32
+         }
+         #[cfg(windows)]
+         self.0.is_symlink()
+@@ -153,7 +154,7 @@ impl Metadata {
+     pub fn is_file(&self) -> bool {
+         #[cfg(not(windows))]
+         {
+-            (self.0.st_mode & libc::S_IFMT) == libc::S_IFREG
++            (self.0.st_mode as u32 & libc::S_IFMT as u32) == libc::S_IFREG as u32
+         }
+         #[cfg(windows)]
+         self.0.is_file()

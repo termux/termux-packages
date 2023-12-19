@@ -3,14 +3,13 @@ TERMUX_PKG_DESCRIPTION="Rust implementation of Git"
 TERMUX_PKG_LICENSE="Apache-2.0, MIT"
 TERMUX_PKG_LICENSE_FILE="LICENSE-APACHE, LICENSE-MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.31.1"
+TERMUX_PKG_VERSION="0.32.0"
 TERMUX_PKG_SRCURL=https://github.com/Byron/gitoxide/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=639c366d3767f5391e055a985de0ac9142fd56f76a1920bacd920b25dabc3b64
+TERMUX_PKG_SHA256=5a17da0379254bd996fe1888de4104d551a41bdd8bd4b93034f9d0757382fa75
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
 TERMUX_PKG_DEPENDS="resolv-conf"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_RUST_VERSION=1.73.0
 
 termux_step_pre_configure() {
 	termux_setup_cmake
@@ -18,8 +17,6 @@ termux_step_pre_configure() {
 
 	: "${CARGO_HOME:=$HOME/.cargo}"
 	export CARGO_HOME
-	export ANDROID_NDK_HOME=$NDK
-	echo ANDROID_NDK_HOME=$ANDROID_NDK_HOME
 
 	cargo fetch --target "${CARGO_TARGET_NAME}"
 
@@ -28,6 +25,10 @@ termux_step_pre_configure() {
 			$TERMUX_PKG_BUILDER_DIR/trust-dns-resolver.diff \
 			| patch --silent -p1 -d ${d} || :
 	done
+
+	if [ "$TERMUX_ARCH" == "x86_64" ]; then
+		RUSTFLAGS+=" -C link-arg=$($CC -print-libgcc-file-name)"
+	fi
 }
 
 termux_step_make() {
@@ -43,4 +44,3 @@ termux_step_make_install() {
 	install -Dm755 -t $TERMUX_PREFIX/bin target/${CARGO_TARGET_NAME}/release/gix
 	install -Dm755 -t $TERMUX_PREFIX/bin target/${CARGO_TARGET_NAME}/release/ein
 }
-
