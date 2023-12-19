@@ -1,0 +1,37 @@
++++ ./src/verb/internal.rs
+@@ -147,7 +147,6 @@
+     toggle_trim_root: "toggle removing nodes at first level too" false,
+     toggle_second_tree: "toggle display of a second tree panel" true,
+     total_search: "search again but on all children" false,
+-    trash: "move file to system trash" true,
+     up_tree: "focus the parent of the current root" true,
+ } 
+
++++ ./src/verb/verb_store.rs
+@@ -298,7 +298,6 @@
+         self.add_internal(toggle_perm).with_shortcut("perm");
+         self.add_internal(toggle_sizes).with_shortcut("sizes");
+         self.add_internal(toggle_trim_root);
+-        self.add_internal(trash);
+         self.add_internal(total_search).with_key(key!(ctrl-s));
+         self.add_internal(up_tree).with_shortcut("up");
+     }
++++ ./src/browser/browser_state.rs
+@@ -598,17 +598,6 @@
+                     }
+                 }
+             }
+-            Internal::trash => {
+-                let path = self.displayed_tree().selected_line().path.to_path_buf();
+-                info!("trash {:?}", &path);
+-                match trash::delete(&path) {
+-                    Ok(()) => CmdResult::RefreshState { clear_cache: true },
+-                    Err(e) => {
+-                        warn!("trash error: {:?}", &e);
+-                        CmdResult::DisplayError(format!("trash error: {:?}", &e))
+-                    }
+-                }
+-            }
+             Internal::quit => CmdResult::Quit,
+             _ => self.on_internal_generic(
+                 w,
