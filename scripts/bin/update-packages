@@ -131,7 +131,7 @@ declare -a _ALREADY_SEEN=() # Array of packages successfully updated or skipped.
 _fetch_and_cache_tags() {
 	if [ "$(uname -o)" = "Android" ] || [ -e "/system/bin/app_process" ]; then
 		if ! command -v ninja &> /dev/null; then
-			echo "WARNING: Skipping fetching and caching tags. Package 'ninja' is not installed."
+			echo "INFO: Skipping fetching and caching tags. Package 'ninja' is not installed."
 			return 0
 		fi
 	fi
@@ -202,7 +202,7 @@ _check_updated() {
 			set -eu
 			export TERMUX_PKG_UPGRADE_VERSION_DRY_RUN=1
 			if quiet termux_pkg_upgrade_version "${_LATEST_TAGS[${1##*/}]}"; then
-				echo "WARNING: Skipping ${1##*/}: already at version ${TERMUX_PKG_VERSION#*:}"
+				echo "INFO: Skipping ${1##*/}: already at version ${TERMUX_PKG_VERSION#*:}"
 				return 0
 			fi
 			return 1
@@ -350,10 +350,14 @@ _gh_create_new_issue() {
 	local assignee="${GITHUB_ACTOR:-}"
 	local issue_number
 	local body
+	local link
 
 	if [[ "${assignee:-termuxbot2}" == "termuxbot2" ]]; then
 		assignee="MrAdityaAlok" # Assign myself if termuxbot2 is the actor.
 	fi
+	
+	# Extract origin URL, commit hash and builder directory and put everything together
+	link="$(git config --get remote.origin.url |sed -E 's|\.git$||; s|git@([^:]+):(.+)|https://\1/\2|')/blob/$(git rev-parse HEAD)/$(echo */$1)"; }
 
 	body="$(
 		cat <<-EOF
@@ -361,7 +365,7 @@ _gh_create_new_issue() {
 
 			I'm here to help you update your Termux packages.
 
-			I've tried to update the ${pkg_name} package, but it failed.
+			I've tried to update the [${pkg_name}](${link}) package, but it failed.
 
 			Here's the output of the update script:
 			<details>
