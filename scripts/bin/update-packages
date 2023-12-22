@@ -246,10 +246,11 @@ _gh_check_issue_exists() {
 			_CACHED_ISSUE_TITLES+=("'${title}'") # An extra quote ('') is added to avoid false positive matches.
 		done <<<"$(
 			gh issue list \
+				--limit 10000 \
 				--label "auto update failing" --label "bot" \
 				--state open \
 				--search "Auto update failing for in:title type:issue" \
-				--json title | jq -r '.[] | .title'
+				--json title | jq -r '.[] | .title' | sort | uniq
 		)"
 	fi
 	# shellcheck disable=SC2076 # We want literal match here, not regex based.
