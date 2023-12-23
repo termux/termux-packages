@@ -166,15 +166,20 @@ diff -u -r ../openfoam-OpenFOAM-v2212/wmake/rules/General/Clang/link-c ./wmake/r
 +LINKEXE     = $(cc) $(cARCH) -Xlinker -z -Xlinker nodefs
 
  #------------------------------------------------------------------------------
-diff -u -r ../openfoam-OpenFOAM-v2212/wmake/rules/General/Clang/link-c++ ./wmake/rules/General/Clang/link-c++
---- ../openfoam-OpenFOAM-v2212/wmake/rules/General/Clang/link-c++       2022-12-21 17:16:18.000000000 +0100
-+++ ./wmake/rules/General/Clang/link-c++        2023-01-01 13:11:30.722003101 +0100
-@@ -4,7 +4,6 @@
-
- LINKLIBSO   = $(CC) $(c++FLAGS) -shared
-
--LINKEXE     = $(CC) $(c++FLAGS) \
--    -Xlinker --add-needed
-+LINKEXE     = $(CC) $(c++FLAGS)
-
- #------------------------------------------------------------------------------
+--- ./wmake/rules/General/Clang/link-c++.orig	2023-12-30 17:31:58.372842076 +0000
++++ ./wmake/rules/General/Clang/link-c++	2023-12-30 17:34:38.416798283 +0000
+@@ -34,12 +34,12 @@
+ else ifneq (,$(findstring +link-ld,$(WM_COMPILE_CONTROL)))
+ 
+     LINKLIBSO  += -fuse-ld=ld
+-    LINKEXE    += -fuse-ld=ld -Xlinker --add-needed
++    LINKEXE    += -fuse-ld=ld
+ 
+ # Default linker, assume ld - no dummy stub
+ else
+ 
+-    LINKEXE    += -Xlinker --add-needed
++    LINKEXE    +=
+ 
+ endif
+ 
