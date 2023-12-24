@@ -2,11 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://github.com/danmar/cppcheck
 TERMUX_PKG_DESCRIPTION="tool for static C/C++ code analysis"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.12.1"
+TERMUX_PKG_VERSION="2.13.0"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_METHOD=repology # Upstream only releases major versions theough GitHub. Other minor updates are released using git tags, better rely on repology for updated versiom
 TERMUX_PKG_SRCURL=https://github.com/danmar/cppcheck/archive/$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=2a3d4ba1179419612183ab3d6aed6d3b18be75e98cd6f138ea8e2020905dced2
+TERMUX_PKG_SHA256=8229afe1dddc3ed893248b8a723b428dc221ea014fbc76e6289840857c03d450
 TERMUX_PKG_DEPENDS="libc++"
 
 # Prevent running dmake during builds. dmake just generates Makefile which we
