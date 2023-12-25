@@ -1,0 +1,25 @@
+From 0cc36c33d35b3612987932d06217395306b43c5c Mon Sep 17 00:00:00 2001
+From: Sami Boukortt <sboukortt@google.com>
+Date: Sat, 23 Dec 2023 11:25:14 +0100
+Subject: [PATCH] Fix deps.sh (#3071)
+
+All / and - should be substituted.
+
+Fixes #3070.
+---
+ deps.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/deps.sh b/deps.sh
+index 78987c30204..cc41e238bca 100755
+--- a/deps.sh
++++ b/deps.sh
+@@ -27,7 +27,7 @@ download_github() {
+   local project="$2"
+ 
+   local varname=`echo "$path" | tr '[:lower:]' '[:upper:]'`
+-  varname="${varname/[\/-]/_}"
++  varname="${varname//[\/-]/_}"
+   local sha
+   eval "sha=\${${varname}}"
+ 
