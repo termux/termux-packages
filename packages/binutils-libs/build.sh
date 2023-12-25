@@ -49,6 +49,14 @@ termux_step_pre_configure() {
 	rm -rf $TERMUX_HOSTBUILD_MARKER
 
 	export CPPFLAGS="$CPPFLAGS -Wno-c++11-narrowing"
+	# llvm upgraded a warning to an error, which caused this build (and some
+	# others, including the rust toolchain) to fail like so:
+	#
+	# ld.lld: error: version script assignment of 'LIBCTF_1.0' to symbol 'ctf_label_set' failed: symbol not defined
+  # ld.lld: error: version script assignment of 'LIBCTF_1.0' to symbol 'ctf_label_get' failed: symbol not defined
+	# These flags restore it to a warning.
+	# https://reviews.llvm.org/D135402
+	export LDFLAGS="$LDFLAGS -Wl,--undefined-version"
 
 	if [ $TERMUX_ARCH_BITS = 32 ]; then
 		export LIB_PATH="${TERMUX_PREFIX}/lib:/system/lib"
