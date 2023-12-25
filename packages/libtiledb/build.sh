@@ -2,13 +2,14 @@ TERMUX_PKG_HOMEPAGE=https://tiledb.com/
 TERMUX_PKG_DESCRIPTION="A powerful engine for storing and accessing dense and sparse multi-dimensional arrays"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.18.3"
+TERMUX_PKG_VERSION="2.19.0"
 TERMUX_PKG_SRCURL=https://github.com/TileDB-Inc/TileDB/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=3454b97f363b7260e70b2018cd574c8985d8d2ae417f219d09c75c6a59df916f
+TERMUX_PKG_SHA256=c607801c4ecda58005e84db3b8b1f72da0100a5b7e149601358b9a254afff962
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="ca-certificates, file, libbz2, libc++, liblz4, libspdlog, openssl, zlib, zstd"
 TERMUX_PKG_BUILD_DEPENDS="clipp, fmt"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DTILEDB_VCPKG=OFF
 -DTILEDB_SUPERBUILD=OFF
 -DTILEDB_WERROR=OFF
 -DTILEDB_STATS=OFF
@@ -22,3 +23,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dlibmagic_FOUND=ON
 -Dlibmagic_DICTIONARY=$TERMUX_PREFIX/share/misc/magic.mgc
 "
+
+# XXX: TileDB assumes that `std::string_view::size_type` == `std::uint64_t`,
+# XXX: but this is not true on 32-bit Android.
+TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
