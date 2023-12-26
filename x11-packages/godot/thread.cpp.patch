@@ -1,8 +1,8 @@
---- src/thirdparty/oidn/common/thread.cpp	2023-03-01 03:38:07.000000000 +0300
-+++ src/thirdparty/oidn/common/thread.cpp.patch	2023-03-05 19:31:55.549053120 +0300
-@@ -26,6 +26,20 @@
- #include "thread.h"
- #include <fstream>
+--- src/thirdparty/embree/common/sys/thread.cpp	2023-12-26 12:19:13.350998846 +0300
++++ src/thirdparty/embree/common/sys/thread.cpp.patch	2023-12-26 12:20:30.020998817 +0300
+@@ -163,6 +163,20 @@
+ 
+ #if defined(__LINUX__) && !defined(__ANDROID__)
  
 +#if defined(__BIONIC__)
 +static inline int pthread_setaffinity_np(pthread_t thread, size_t cpusetsize,
@@ -18,6 +18,6 @@
 +}
 +#endif
 +
- namespace oidn {
- 
- #if defined(_WIN32)
+ #include <fstream>
+ #include <sstream>
+ #include <algorithm>
