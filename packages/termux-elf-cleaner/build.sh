@@ -4,9 +4,9 @@ TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Please update checksum in termux_step_start_build.sh as well if
 # updating the package.
-TERMUX_PKG_VERSION=2.2.0
+TERMUX_PKG_VERSION=2.2.1
 TERMUX_PKG_SRCURL=https://github.com/termux/termux-elf-cleaner/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=84b88d52811cd86e33c42458e0374d375912403e4035893dd57e9cac335114a5
+TERMUX_PKG_SHA256=105be3c8673fd377ea7fd6becb6782b2ba060ad764439883710a5a7789421c46
 TERMUX_PKG_DEPENDS="libc++"
 
 termux_step_pre_configure() {
