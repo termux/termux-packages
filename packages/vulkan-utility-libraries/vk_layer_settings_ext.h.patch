@@ -1,0 +1,47 @@
+--- Vulkan-Utility-Libraries-1.3.271/include/vulkan/layer/vk_layer_settings_ext.h	2023-11-27 23:46:40.000000000 +0300
++++ Vulkan-Utility-Libraries-1.3.271/include/vulkan/layer/vk_layer_settings_ext.h.patch	2023-12-28 13:08:00.785738824 +0300
+@@ -16,38 +16,28 @@
+ #include <vulkan/vk_layer.h>
+ 
+ #define VK_EXT_layer_settings 1
+-#define VK_EXT_LAYER_SETTINGS_SPEC_VERSION 1
+ #define VK_EXT_LAYER_SETTINGS_EXTENSION_NAME "VK_EXT_layer_settings"
+ //
+ // NOTE: VK_STRUCTURE_TYPE_MAX_ENUM - 1 is used by the intel driver.
+ // NOTE: VK_STRUCTURE_TYPE_MAX_ENUM - 42 is used by the validation layers
+ #define VK_STRUCTURE_TYPE_LAYER_SETTINGS_CREATE_INFO_EXT ((VkStructureType)(VK_STRUCTURE_TYPE_MAX_ENUM - 44))
+ 
+-typedef enum VkLayerSettingTypeEXT {
+-    VK_LAYER_SETTING_TYPE_BOOL32_EXT = 0,
+-    VK_LAYER_SETTING_TYPE_INT32_EXT,
+-    VK_LAYER_SETTING_TYPE_INT64_EXT,
+-    VK_LAYER_SETTING_TYPE_UINT32_EXT,
+-    VK_LAYER_SETTING_TYPE_UINT64_EXT,
+-    VK_LAYER_SETTING_TYPE_FLOAT32_EXT,
+-    VK_LAYER_SETTING_TYPE_FLOAT64_EXT,
+-    VK_LAYER_SETTING_TYPE_STRING_EXT
+-} VkLayerSettingTypeEXT;
+-
+-typedef struct VkLayerSettingEXT {
++typedef struct VkLayerSettingEXT_other {
+     const char *pLayerName;
+     const char *pSettingName;
+     VkLayerSettingTypeEXT type;
+     uint32_t count;
+     const void *pValues;
+-} VkLayerSettingEXT;
++} VkLayerSettingEXT_other;
++#define VkLayerSettingEXT VkLayerSettingEXT_other
+ 
+-typedef struct VkLayerSettingsCreateInfoEXT {
++typedef struct VkLayerSettingsCreateInfoEXT_other {
+     VkStructureType sType;
+     const void *pNext;
+     uint32_t settingCount;
+     const VkLayerSettingEXT *pSettings;
+-} VkLayerSettingsCreateInfoEXT;
++} VkLayerSettingsCreateInfoEXT_other;
++#define VkLayerSettingsCreateInfoEXT VkLayerSettingsCreateInfoEXT_other
+ 
+ #ifdef __cplusplus
+ }
