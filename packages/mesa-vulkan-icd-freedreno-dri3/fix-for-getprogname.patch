@@ -1,0 +1,20 @@
+--- a/src/util/u_process.c
++++ b/src/util/u_process.c
+@@ -103,7 +103,7 @@
+ {
+    return strdup(program_invocation_short_name);
+ }
+-#elif defined(__FreeBSD__) || defined(__DragonFly__) || defined(__APPLE__) || defined(ANDROID) || defined(__NetBSD__)
++#elif defined(__FreeBSD__) || defined(__DragonFly__) || defined(__APPLE__) || defined(__ANDROID__) || defined(__NetBSD__)
+ #if defined(__NetBSD__)
+ #    include <sys/param.h>
+ #endif
+@@ -170,7 +170,7 @@
+ #endif
+ 
+ #if defined(GET_PROGRAM_NAME_NOT_AVAILABLE)
+-#if defined(__OpenBSD__) || defined(__NetBSD__) || defined(__UCLIBC__) || defined(ANDROID)
++#if defined(__OpenBSD__) || defined(__NetBSD__) || defined(__UCLIBC__) || defined(__ANDROID__)
+ /* This is a hack. It's said to work on OpenBSD, NetBSD and GNU.
+  * Rogelio M.Serrano Jr. reported it's also working with UCLIBC. It's
+  * used as a last resort, if there is no documented facility available. */
