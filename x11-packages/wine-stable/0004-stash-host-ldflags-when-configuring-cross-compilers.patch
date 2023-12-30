@@ -1,0 +1,83 @@
+https://github.com/wine-mirror/wine/commit/c29336fa781a7cf34379c1e38dea7a7cd04f92af
+
+From c29336fa781a7cf34379c1e38dea7a7cd04f92af Mon Sep 17 00:00:00 2001
+From: Billy Laws <blaws05@gmail.com>
+Date: Sat, 3 Jun 2023 21:35:45 +0100
+Subject: [PATCH] configure: Stash host LDFLAGS when configuring
+ cross-compilers.
+
+---
+ configure    | 6 +++++-
+ configure.ac | 6 +++++-
+ 2 files changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/configure b/configure
+index 4cab5e67e43c..000776267b17 100755
+--- a/configure
++++ b/configure
+@@ -10591,11 +10591,13 @@ fi
+ 
+     saved_CC=$CC
+     saved_CFLAGS=$CFLAGS
++    saved_LDFLAGS=$LDFLAGS
+ 
+     CFLAGS=${CROSSCFLAGS:-"-g -O2"}
++    LDFLAGS=$CROSSLDFLAGS
+     eval CC=\$${wine_arch}_CC
+     eval ${wine_arch}_CFLAGS=\$CFLAGS
+-    eval ${wine_arch}_LDFLAGS=\$CROSSLDFLAGS
++    eval ${wine_arch}_LDFLAGS=\$LDFLAGS
+     eval "${wine_arch}_EXTRACFLAGS=\"-D__WINE_PE_BUILD -Wall\""
+ 
+     target=""
+@@ -10699,6 +10701,7 @@ fi
+     then
+         CC=$saved_CC
+         CFLAGS=$saved_CFLAGS
++        LDFLAGS=$saved_LDFLAGS
+         continue
+     fi
+     as_fn_append PE_ARCHS " $wine_arch"
+@@ -11672,6 +11675,7 @@ fi }
+ 
+     CC=$saved_CC
+     CFLAGS=$saved_CFLAGS
++    LDFLAGS=$saved_LDFLAGS
+ done
+ 
+ if test $HOST_ARCH = aarch64 -a "x$PE_ARCHS" = x
+diff --git a/configure.ac b/configure.ac
+index 3af0aa5fa98c..2b4c09069ac5 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -842,11 +842,13 @@ do
+ 
+     saved_CC=$CC
+     saved_CFLAGS=$CFLAGS
++    saved_LDFLAGS=$LDFLAGS
+ 
+     CFLAGS=${CROSSCFLAGS:-"-g -O2"}
++    LDFLAGS=$CROSSLDFLAGS
+     AS_VAR_COPY([CC],[${wine_arch}_CC])
+     AS_VAR_COPY([${wine_arch}_CFLAGS],[CFLAGS])
+-    AS_VAR_COPY([${wine_arch}_LDFLAGS],[CROSSLDFLAGS])
++    AS_VAR_COPY([${wine_arch}_LDFLAGS],[LDFLAGS])
+     AS_VAR_SET([${wine_arch}_EXTRACFLAGS],["-D__WINE_PE_BUILD -Wall"])
+ 
+     target=""
+@@ -892,6 +894,7 @@ do
+     then
+         CC=$saved_CC
+         CFLAGS=$saved_CFLAGS
++        LDFLAGS=$saved_LDFLAGS
+         continue
+     fi
+     AS_VAR_APPEND([PE_ARCHS],[" $wine_arch"])
+@@ -982,6 +985,7 @@ do
+ 
+     CC=$saved_CC
+     CFLAGS=$saved_CFLAGS
++    LDFLAGS=$saved_LDFLAGS
+ done
+ 
+ if test $HOST_ARCH = aarch64 -a "x$PE_ARCHS" = x

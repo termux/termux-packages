@@ -1,0 +1,49 @@
+--- a/dlls/ntdll/unix/socket.c
++++ b/dlls/ntdll/unix/socket.c
+@@ -53,7 +53,7 @@
+ # endif
+ # include <linux/ipx.h>
+ #endif
+-#if defined(SOL_IPX) || defined(SO_DEFAULT_HEADERS)
++#if (defined(SOL_IPX) || defined(SO_DEFAULT_HEADERS)) && !defined(__ANDROID__)
+ # define HAS_IPX
+ #endif
+ 
+@@ -2104,6 +2104,7 @@
+             break;
+         }
+ 
++#ifdef HAS_IPX
+ #ifdef SOL_IPX
+         case IOCTL_AFD_WINE_GET_IPX_PTYPE:
+             return do_getsockopt( handle, io, SOL_IPX, IPX_TYPE, out_buffer, out_size );
+@@ -2142,6 +2143,7 @@
+             return do_setsockopt( handle, io, 0, SO_DEFAULT_HEADERS, &value, sizeof(value) );
+         }
+ #endif
++#endif
+ 
+ #ifdef HAS_IRDA
+ #define MAX_IRDA_DEVICES 10
+--- a/dlls/ws2_32/unixlib.c
++++ b/dlls/ws2_32/unixlib.c
+@@ -75,7 +75,7 @@
+ # endif
+ # include <linux/ipx.h>
+ #endif
+-#if defined(SOL_IPX) || defined(SO_DEFAULT_HEADERS)
++#if (defined(SOL_IPX) || defined(SO_DEFAULT_HEADERS)) && !defined(__ANDROID__)
+ # define HAS_IPX
+ #endif
+ 
+--- a/server/sock.c
++++ b/server/sock.c
+@@ -68,7 +68,7 @@
+ # endif
+ # include <linux/ipx.h>
+ #endif
+-#if defined(SOL_IPX) || defined(SO_DEFAULT_HEADERS)
++#if (defined(SOL_IPX) || defined(SO_DEFAULT_HEADERS)) && !defined(__ANDROID__)
+ # define HAS_IPX
+ #endif
+ 
