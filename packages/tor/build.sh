@@ -10,8 +10,8 @@ TERMUX_PKG_DEPENDS="libevent, liblzma, openssl, resolv-conf, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libandroid-glob"
 # We're not using '--enable-android' as it just defines 'USE_ANDROID', which
 # makes Tor writes the log to Android's logcat instead of to stdout/stderr, not
-# helpful in our case. Although it would be good through the source and ensure
-# that in future there is not any other Android specific behaviour which
+# helpful in our case. Although it would be good to go through the source and
+# ensure that in future there is not any other Android specific behaviour which
 # affects security/anonymity.
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-zstd --disable-unittests"
 TERMUX_PKG_CONFFILES="etc/tor/torrc"
