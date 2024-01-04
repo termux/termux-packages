@@ -9,6 +9,8 @@ page_ref: "@ARK_PROJECT__VARIANT@/termux/termux-packages/docs/@ARK_DOC__VERSION@
 Welcome to documentation for [Termux Packages].
 
 - [Get started](get-started/index.md)
+- [Repos](repos/index.md)
+
 ## &nbsp;
 
 &nbsp;
