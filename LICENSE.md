@@ -1,11 +1,7 @@
-# License for package patches
+The `termux/termux-packages` repository is released under the [Apache 2.0](licenses/termux__termux-packages__Apache-2.0.md) license unless specified differently in a file/directory or in the [Exceptions](#Exceptions) section below.
 
-The scripts and patches to build each package is licensed under the same
-license as the actual package (so the patches and scripts to build bash are
-licensed under the same license as bash, while the patches and scripts to build
-python are licensed under the same license as python).
+### Exceptions
 
-# License for the build infrastructure
+- The files under the [`site`](site) directory are released under the [MIT](licenses/termux__termux-packages__MIT.md) license.
 
-For build infrastructure outside the `packages/` folder the license is
-[Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0).
+- The files under the [`packages`](packages), [`root-packages`](root-packages), [`x11-packages`](x11-packages) and [`disable-packages`](disable-packages) directories to build each package, like scripts and patches are licensed under the same license as the actual package source, i.e the files to build the `bash` package are licensed under the same license as `bash` source, while the files to build the `python` package are licensed under the same license as `python` source.
