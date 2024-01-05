@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Library providing core building blocks for libraries and
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.78.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://ftp.gnome.org/pub/gnome/sources/glib/${TERMUX_PKG_VERSION%.*}/glib-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=609801dd373796e515972bf95fc0b2daa44545481ee2f465c4f204d224b2bc21
 TERMUX_PKG_AUTO_UPDATE=true
@@ -38,6 +39,8 @@ opt/glib/cross/bin/gtester-report
 "
 
 termux_step_host_build() {
+	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "true" ]]; then return; fi
+
 	# XXX: termux_setup_meson is not expected to be called in host build
 	AR=;CC=;CFLAGS=;CPPFLAGS=;CXX=;CXXFLAGS=;LD=;LDFLAGS=;PKG_CONFIG=;STRIP=
 	termux_setup_meson
@@ -46,6 +49,13 @@ termux_step_host_build() {
 	${TERMUX_MESON} ${TERMUX_PKG_SRCDIR} . \
 		${TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS}
 	ninja -j "${TERMUX_MAKE_PROCESSES}" install
+
+	# termux_step_massage strip does not cover opt dir
+	find "${TERMUX_PREFIX}/opt" \
+		-path "*/glib/cross/bin/*" \
+		-type f -print0 | \
+		xargs -0 -r file | grep -E "ELF .+ (executable|shared object)" | \
+		cut -d":" -f1 | xargs -r strip --strip-unneeded --preserve-dates
 }
 
 termux_step_pre_configure() {
