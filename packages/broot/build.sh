@@ -2,12 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://github.com/Canop/broot
 TERMUX_PKG_DESCRIPTION="A better way to navigate directories"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.30.2"
-TERMUX_PKG_SRCURL=https://github.com/Canop/broot/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=497258f593ce6998f9a85369da87149ef1777313cd404dd83a46440dfff15943
-TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_VERSION="1.32.0"
+TERMUX_PKG_SRCURL=https://github.com/Canop/broot/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=0b9bf4a0dfa8a9cdcefcf18222dba4025379a8fa19190075835a99a507ae3d73
 TERMUX_PKG_DEPENDS="libgit2"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_pre_configure() {
 	termux_setup_rust
