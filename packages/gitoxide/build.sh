@@ -3,13 +3,13 @@ TERMUX_PKG_DESCRIPTION="Rust implementation of Git"
 TERMUX_PKG_LICENSE="Apache-2.0, MIT"
 TERMUX_PKG_LICENSE_FILE="LICENSE-APACHE, LICENSE-MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.32.0"
+TERMUX_PKG_VERSION="0.33.0"
 TERMUX_PKG_SRCURL=https://github.com/Byron/gitoxide/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=5a17da0379254bd996fe1888de4104d551a41bdd8bd4b93034f9d0757382fa75
-TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
+TERMUX_PKG_SHA256=0fc1e0f9e36d2622f6a11925607090abf619c73551d2a8f5ea710e97ef1a9eb4
 TERMUX_PKG_DEPENDS="resolv-conf"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
 
 termux_step_pre_configure() {
 	termux_setup_cmake
@@ -41,6 +41,7 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm755 -t $TERMUX_PREFIX/bin target/${CARGO_TARGET_NAME}/release/gix
-	install -Dm755 -t $TERMUX_PREFIX/bin target/${CARGO_TARGET_NAME}/release/ein
+	install -Dm755 -t $TERMUX_PREFIX/bin \
+		target/${CARGO_TARGET_NAME}/release/ein \
+		target/${CARGO_TARGET_NAME}/release/gix
 }
