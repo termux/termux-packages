@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://plutolang.github.io/
 TERMUX_PKG_DESCRIPTION="A superset of Lua 5.4, with unique features, optimizations, and improvements"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.8.0"
+TERMUX_PKG_VERSION="0.8.1"
 TERMUX_PKG_SRCURL=https://github.com/PlutoLang/Pluto/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=8c6c90ef58f069b13e1f50efb836463c7d7242efb08ab490e6696e8b505bfe93
+TERMUX_PKG_SHA256=af92de18bb854733354cdef25228c9951b45ac7fe4852c307c283070350d173b
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_BUILD_DEPENDS="readline"
@@ -20,4 +20,6 @@ termux_step_pre_configure() {
 	CXXFLAGS+=" -std=c++17"
 	export MYCFLAGS="-fPIC $CXXFLAGS $CPPFLAGS"
 	export MYLDFLAGS="$LDFLAGS"
+
+	TERMUX_PKG_EXTRA_MAKE_ARGS+=" CXX=$(command -v $CXX)"
 }
