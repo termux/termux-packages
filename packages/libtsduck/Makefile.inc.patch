@@ -1,35 +1,12 @@
 --- a/Makefile.inc
 +++ b/Makefile.inc
-@@ -212,12 +212,12 @@
- else ifneq ($(NETBSD),)
-     ALTDEVROOT := /usr/pkg
- else
--    ALTDEVROOT := /usr
-+    ALTDEVROOT := @TERMUX_PREFIX@
- endif
- 
- # Locate system directories.
- 
--USELIB64  := $(if $(findstring linux-x86_64,$(LOCAL_OS)-$(MAIN_ARCH)),$(if $(LINUXBREW),,$(if $(wildcard /usr/lib64/libc.so*),true)))
-+USELIB64  :=
- SYSPREFIX ?= $(if $(MACOS)$(LINUXBREW)$(FREEBSD)$(OPENBSD)$(NETBSD)$(DRAGONFLYBSD),$(ALTDEVROOT),/usr)
- USRLIBDIR ?= $(if $(USELIB64),$(SYSPREFIX)/lib64,$(SYSPREFIX)/lib)
- ETCDIR    ?= $(if $(subst /usr,,$(SYSPREFIX)),$(SYSPREFIX)/etc,/etc)
-@@ -399,7 +399,7 @@
- # Always use maximal or even paranoid warning mode.
- # With clang, the option -Weverything turns everything on. There is no such option with GCC.
- 
--CXXFLAGS_WARNINGS = -Werror
-+CXXFLAGS_WARNINGS =
- ifneq ($(USE_LLVM),)
-     CXXFLAGS_WARNINGS += -Weverything -Wno-c++98-compat-pedantic
-     ifneq ($(MACOS),)
-@@ -474,7 +474,7 @@
+@@ -538,7 +538,7 @@
  
  # External libraries
  
 -LDLIBS += -lstdc++ -lpthread $(if $(MACOS)$(OPENBSD),,-lrt) -lm
-+LDLIBS += -lm
++LDLIBS += -lc++_shared -lm
  
  # Global compilation flags.
  # Additional flags can be passed on the "make" command line using xxFLAGS_EXTRA.
+
