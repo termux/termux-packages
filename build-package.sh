@@ -11,7 +11,9 @@ export TMPDIR
 if [[ ! "$TERMUX_BUILD_PACKAGE_CALL_DEPTH" =~ ^[0-9]+$ ]]; then
 	export TERMUX_BUILD_PACKAGE_CALL_DEPTH=0
 	export TERMUX_BUILD_PACKAGE_CALL_BUILT_PACKAGES_LIST_FILE_PATH="${TMPDIR}/build-package-call-built-packages-list-$(date +"%Y-%m-%d-%H.%M.%S.")$((RANDOM%1000))"
+	export TERMUX_BUILD_PACKAGE_CALL_BUILDING_PACKAGES_LIST_FILE_PATH="${TMPDIR}/build-package-call-building-packages-list-$(date +"%Y-%m-%d-%H.%M.%S.")$((RANDOM%1000))"
 	echo -n " " > "$TERMUX_BUILD_PACKAGE_CALL_BUILT_PACKAGES_LIST_FILE_PATH"
+	touch "$TERMUX_BUILD_PACKAGE_CALL_BUILDING_PACKAGES_LIST_FILE_PATH"
 else
 	export TERMUX_BUILD_PACKAGE_CALL_DEPTH=$((TERMUX_BUILD_PACKAGE_CALL_DEPTH+1))
 fi
@@ -390,6 +392,13 @@ termux_add_package_to_built_packages_list() {
 	fi
 }
 
+# Check if the package is in the compiling list
+termux_check_package_in_building_packages_list() {
+	[ ! -f "$TERMUX_BUILD_PACKAGE_CALL_BUILDING_PACKAGES_LIST_FILE_PATH" ] && termux_error_exit "ERROR: file '$TERMUX_BUILD_PACKAGE_CALL_BUILDING_PACKAGES_LIST_FILE_PATH' not found."
+	grep -q "^${1}$" "$TERMUX_BUILD_PACKAGE_CALL_BUILDING_PACKAGES_LIST_FILE_PATH"
+	return $?
+}
+
 # Special hook to prevent use of "sudo" inside package build scripts.
 # build-package.sh shouldn't perform any privileged operations.
 sudo() {
@@ -610,6 +619,10 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 
 		termux_step_start_build
 
+		if ! termux_check_package_in_building_packages_list "$TERMUX_PKG_NAME"; then
+			echo "$TERMUX_PKG_NAME" >> $TERMUX_BUILD_PACKAGE_CALL_BUILDING_PACKAGES_LIST_FILE_PATH
+		fi
+
 		if [ "$TERMUX_CONTINUE_BUILD" == "false" ]; then
 			termux_step_get_dependencies
 			if [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
@@ -669,6 +682,9 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 			termux_error_exit "Unknown packaging format '$TERMUX_PACKAGE_FORMAT'."
 		fi
 		# Saving a list of compiled packages for further work with it
+		if termux_check_package_in_building_packages_list "$TERMUX_PKG_NAME"; then
+			sed -i "/^${TERMUX_PKG_NAME}$/d" "$TERMUX_BUILD_PACKAGE_CALL_BUILDING_PACKAGES_LIST_FILE_PATH"
+		fi
 		termux_add_package_to_built_packages_list "$TERMUX_PKG_NAME"
 		termux_step_finish_build
 	) 5< "$TERMUX_BUILD_LOCK_FILE"
@@ -677,4 +693,5 @@ done
 # Removing a file to store a list of compiled packages
 if [ "$TERMUX_BUILD_PACKAGE_CALL_DEPTH" = "0" ]; then
 	rm "$TERMUX_BUILD_PACKAGE_CALL_BUILT_PACKAGES_LIST_FILE_PATH"
+	rm "$TERMUX_BUILD_PACKAGE_CALL_BUILDING_PACKAGES_LIST_FILE_PATH"
 fi
