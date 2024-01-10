@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.nushell.sh
 TERMUX_PKG_DESCRIPTION="A new type of shell operating on structured data"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.88.1"
+TERMUX_PKG_VERSION="0.89.0"
 TERMUX_PKG_SRCURL=https://github.com/nushell/nushell/archive/$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=19f5a46799142117f61989a76f85fdd24361fe9e5068565d7fff36b91a7a7a39
+TERMUX_PKG_SHA256=1d7a7cc960bb8265214a7345ea3787a5bc22dcb7099d5c5056163df025c5527d
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="openssl, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -12,8 +12,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--features=extra"
 
 termux_step_pre_configure() {
 	termux_setup_rust
-
-	export CFLAGS="${TARGET_CFLAGS}"
 
 	local _CARGO_TARGET_LIBDIR="target/${CARGO_TARGET_NAME}/release/deps"
 	mkdir -p $_CARGO_TARGET_LIBDIR
