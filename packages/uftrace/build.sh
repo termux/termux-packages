@@ -12,6 +12,11 @@ TERMUX_PKG_DEPENDS="capstone, libandroid-execinfo, libandroid-glob, libandroid-s
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 
+# https://github.com/android/ndk/issues/1987#issuecomment-1886021103
+if [ "$TERMUX_ARCH" = "x86_64" ]; then
+	TERMUX_MAKE_PROCESSES=1
+fi
+
 termux_step_pre_configure() {
 	# uftrace uses custom configure script implementation, so we need to provide some flags
 	CFLAGS+=" -DEFD_SEMAPHORE=1 -DEF_ARM_ABI_FLOAT_HARD=0x400 -w"
