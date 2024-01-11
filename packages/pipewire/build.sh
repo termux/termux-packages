@@ -3,10 +3,9 @@ TERMUX_PKG_DESCRIPTION="A server and user space API to deal with multimedia pipe
 TERMUX_PKG_LICENSE="MIT, LGPL-2.1, LGPL-3.0, GPL-2.0"
 TERMUX_PKG_LICENSE_FILE="COPYING, LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.0.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="1.0.1"
 TERMUX_PKG_SRCURL="https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/${TERMUX_PKG_VERSION}/pipewire-${TERMUX_PKG_VERSION}.tar.bz2"
-TERMUX_PKG_SHA256=1bd233e732d5d19f918f0c467485305be8795af0c3828b68dd43e18c376fb1f8
+TERMUX_PKG_SHA256=19737865e007ab5b1cf4236e5a0bc3226da3e62a1b687acc6d746dbf29387ac4
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="ffmpeg, glib, libc++, liblua54, libopus, libsndfile, libwebrtc-audio-processing, lilv, ncurses, openssl, pulseaudio, readline"
 
