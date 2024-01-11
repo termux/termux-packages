@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="A Suite of Sparse matrix packages."
 TERMUX_PKG_GROUPS="science"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=7.4.0
+TERMUX_PKG_VERSION=7.5.0
 TERMUX_PKG_SRCURL=https://github.com/DrTimothyAldenDavis/SuiteSparse/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=f9a5cc2316a967198463198f7bf10fb8c4332de6189b0e405419a7092bc921b7
+TERMUX_PKG_SHA256=9090ead43f462737369f1b6f8f269decc7f98adbb3276db299a2d4f18d481328
 TERMUX_PKG_DEPENDS="libandroid-complex-math, libgmp, libmpfr, libopenblas"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_FORCE_CMAKE=true
@@ -89,7 +89,7 @@ lib/libccolamd.so.3
 lib/libcholmod.so.5
 lib/libcolamd.so.3
 lib/libcxsparse.so.4
-lib/libgraphblas.so.8
+lib/libgraphblas.so.9
 lib/libklu.so.2
 lib/libklu_cholmod.so.2
 lib/liblagraph.so.1
