@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://jpegxl.info/
 TERMUX_PKG_DESCRIPTION="JPEG XL image format reference implementation"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.9.0"
+TERMUX_PKG_VERSION="0.9.1"
 TERMUX_PKG_SRCURL=https://github.com/libjxl/libjxl/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=d83bbe188d8fa9725bb75109c922c37fcff8c3b802808f3a6c2c14aaf8337d9f
+TERMUX_PKG_SHA256=a0e72e9ece26878147069ad4888ac3382021d4bbee71c2e1b687d5bde7fd7e01
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="brotli, libc++"
 TERMUX_PKG_NO_STATICSPLIT=true
@@ -29,8 +29,6 @@ termux_step_post_get_source() {
 	if [ "${_SOVERSION}" != "${v}" ]; then
 		termux_error_exit "SOVERSION guard check failed."
 	fi
-
-	patch -p1 < $TERMUX_PKG_BUILDER_DIR/fix-deps.diff
 
 	./deps.sh
 }
