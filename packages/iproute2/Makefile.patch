@@ -1,23 +1,22 @@
-diff -uNr iproute2-6.6.0/Makefile iproute2-6.6.0.mod/Makefile
---- iproute2-6.6.0/Makefile	2023-11-05 10:27:42.014313998 +0800
-+++ iproute2-6.6.0.mod/Makefile	2023-11-05 10:33:54.362313856 +0800
+--- a/Makefile
++++ b/Makefile
 @@ -14,18 +14,18 @@
  MAKEFLAGS += --no-print-directory
  endif
  
 -PREFIX?=/usr
 -SBINDIR?=/sbin
--CONF_ETC_DIR?=/etc/iproute2
-+PREFIX?=$(PREFIX)/usr
-+SBINDIR?=$(PREFIX)/bin
-+CONF_ETC_DIR?=$(PREFIX)/etc/iproute2
- CONF_USR_DIR?=$(LIBDIR)/iproute2
 -NETNS_RUN_DIR?=/var/run/netns
 -NETNS_ETC_DIR?=/etc/netns
++PREFIX?=$(PREFIX)/usr
++SBINDIR?=$(PREFIX)/bin
 +NETNS_RUN_DIR?=$(PREFIX)/var/run/netns
 +NETNS_ETC_DIR?=$(PREFIX)/etc/netns
  DATADIR?=$(PREFIX)/share
  HDRDIR?=$(PREFIX)/include/iproute2
+-CONF_ETC_DIR?=/etc/iproute2
++CONF_ETC_DIR?=$(PREFIX)/etc/iproute2
+ CONF_USR_DIR?=$(DATADIR)/iproute2
  DOCDIR?=$(DATADIR)/doc/iproute2
  MANDIR?=$(DATADIR)/man
 -ARPDDIR?=/var/lib/arpd
