@@ -3,7 +3,7 @@
 termux_step_setup_cgct_environment() {
 	[ "$TERMUX_ON_DEVICE_BUILD" = "true" ] && return
 
-	for PKG in glibc linux-api-headers-glibc; do
+	for PKG in gcc-libs-glibc glibc linux-api-headers-glibc; do
 		local PKG_DIR=$(ls ${TERMUX_SCRIPTDIR}/*/${PKG}/build.sh 2> /dev/null || \
 			ls ${TERMUX_SCRIPTDIR}/*/${PKG/-glibc/}/build.sh 2> /dev/null)
 		if [ -z "$PKG_DIR" ]; then
