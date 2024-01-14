@@ -32,7 +32,7 @@ jobs:
       - name: Store artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: bootstrap-archives-${{ github.sha }}
+          name: bootstrap-archives-${{ matrix.arch }}-${{ github.sha }}
           path: "*.zip"
   publish:
     permissions:
@@ -47,7 +47,7 @@ jobs:
       - name: Fetch bootstrap archives
         uses: actions/download-artifact@v4
         with:
-          name: bootstrap-archives-${{ github.sha }}
+          merge-multiple: true
           path: ./
       - name: Create new tag
         id: get_tag
