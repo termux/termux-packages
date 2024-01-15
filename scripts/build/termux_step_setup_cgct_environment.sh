@@ -12,8 +12,8 @@ termux_step_setup_cgct_environment() {
 		local PKG_DIR_SPLIT=(${PKG_DIR//// })
 
 		local REPO_NAME=""
-		for idx in ${!TERMUX_REPO_DISTRIBUTION[@]}; do
-			if [ "${TERMUX_REPO_DISTRIBUTION[$idx]}" = "${PKG_DIR_SPLIT[-3]}" ]; then
+		for idx in ${!TERMUX_PACKAGES_DIRECTORIES[@]}; do
+			if [ "${TERMUX_PACKAGES_DIRECTORIES[$idx]}" = "${PKG_DIR_SPLIT[-3]}" ]; then
 				REPO_NAME=$(echo "${TERMUX_REPO_URL[$idx]}" | sed -e 's%https://%%g' -e 's%http://%%g' -e 's%/%-%g')
 				if [ "$TERMUX_REPO_PKG_FORMAT" = "debian" ]; then
 					REPO_NAME+="-${TERMUX_REPO_DISTRIBUTION[$idx]}-Release"
