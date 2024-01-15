@@ -1,0 +1,15 @@
+THREAD_PRIORITY_SCHEDULING is introduced in API 28, but Termux compiles as API 24
+
+--- a/nsprpub/pr/src/pthreads/ptthread.c
++++ b/nsprpub/pr/src/pthreads/ptthread.c
+@@ -37,6 +37,10 @@
+ #endif
+ #endif
+ 
++#if defined(_POSIX_THREAD_PRIORITY_SCHEDULING) && defined(__TERMUX__) && __ANDROID_API__ < 28
++#undef _POSIX_THREAD_PRIORITY_SCHEDULING
++#endif
++
+ /*
+  * Record whether or not we have the privilege to set the scheduling
+  * policy and priority of threads.  0 means that privilege is available.
