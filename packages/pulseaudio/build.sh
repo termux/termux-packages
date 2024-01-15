@@ -3,8 +3,7 @@ TERMUX_PKG_DESCRIPTION="A featureful, general-purpose sound server"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_SRCURL=git+https://github.com/pulseaudio/pulseaudio
-TERMUX_PKG_VERSION="16.99.1"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="17.0"
 TERMUX_PKG_DEPENDS="dbus, libandroid-execinfo, libandroid-glob, libc++, libltdl, libsndfile, libsoxr, libwebrtc-audio-processing, speexdsp"
 TERMUX_PKG_BREAKS="libpulseaudio-dev, libpulseaudio"
 TERMUX_PKG_REPLACES="libpulseaudio-dev, libpulseaudio"
@@ -40,6 +39,10 @@ termux_step_pre_configure() {
 
 	local _libgcc="$($CC -print-libgcc-file-name)"
 	LIBS+=" -L$(dirname $_libgcc) -l:$(basename $_libgcc)"
+
+	# https://github.com/termux/termux-packages/issues/18977
+	# https://github.com/termux/termux-packages/issues/18810
+	export LDFLAGS+=" -Wl,--undefined-version"
 }
 
 termux_step_post_make_install() {
@@ -55,12 +58,4 @@ termux_step_post_make_install() {
 		-e '/^load-module module-detect$/s/^/#/'
 	echo "load-module module-sles-sink" >> $TERMUX_PREFIX/etc/pulse/default.pa
 	echo "#load-module module-aaudio-sink" >> $TERMUX_PREFIX/etc/pulse/default.pa
-}
-
-termux_step_post_massage() {
-	# Some programs, e.g. Firefox, try to dlopen(3) `libpulse.so.0`.
-	cd ${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/lib || exit 1
-	if [ ! -e "./libpulse.so.0" ]; then
-		ln -sf libpulse.so libpulse.so.0
-	fi
 }
