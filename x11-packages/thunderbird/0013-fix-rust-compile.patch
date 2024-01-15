@@ -1,0 +1,49 @@
+--- a/toolkit/components/extensions/storage/moz.build
++++ b/toolkit/components/extensions/storage/moz.build
+@@ -17,7 +17,7 @@
+ # a delegate for consumers to use instead. Android Components can then provide
+ # an implementation of the delegate that's backed by the Rust component. For
+ # details, please see bug 1626506, comment 4.
+-if CONFIG["MOZ_WIDGET_TOOLKIT"] != "android":
++if False:
+     EXPORTS.mozilla.extensions.storage += [
+         "ExtensionStorageComponents.h",
+     ]
+--- a/toolkit/library/rust/shared/Cargo.toml
++++ b/toolkit/library/rust/shared/Cargo.toml
+@@ -106,11 +106,12 @@
+ # Since we're building with at least rustc 1.63, enable rust 1.57 features (use of try_reserve methods).
+ fallible_collections = { version = "0.4", features = ["rust_1_57"] }
+ 
+-[target.'cfg(not(target_os = "android"))'.dependencies]
+ viaduct = "0.1"
+-webext_storage_bridge = { path = "../../../components/extensions/storage/webext_storage_bridge" }
+ tabs = { version = "0.1" }
+ 
++[target.'cfg(not(target_os = "android"))'.dependencies]
++webext_storage_bridge = { path = "../../../components/extensions/storage/webext_storage_bridge" }
++
+ [target.'cfg(target_os = "windows")'.dependencies]
+ detect_win32k_conflicts = { path = "../../../xre/detect_win32k_conflicts" }
+ 
+--- a/toolkit/library/rust/shared/lib.rs
++++ b/toolkit/library/rust/shared/lib.rs
+@@ -52,10 +52,8 @@
+ #[cfg(not(target_os = "android"))]
+ extern crate webext_storage_bridge;
+ 
+-#[cfg(not(target_os = "android"))]
+ extern crate tabs;
+ 
+-#[cfg(not(target_os = "android"))]
+ mod reexport_tabs {
+     tabs::uniffi_reexport_scaffolding!();
+ }
+@@ -84,7 +82,6 @@
+ extern crate l10nregistry_ffi;
+ extern crate localization_ffi;
+ 
+-#[cfg(not(target_os = "android"))]
+ extern crate viaduct;
+ 
+ extern crate gecko_logger;
