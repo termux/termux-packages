@@ -1,0 +1,72 @@
+This reverts commit 78f3db760d0c510374c708f4898a91571c87d4a8.
+
+--- a/src/egl/drivers/dri2/platform_surfaceless.c
++++ b/src/egl/drivers/dri2/platform_surfaceless.c
+@@ -220,7 +220,7 @@ static const __DRIextension *swrast_loader_extensions[] = {
+ };
+ 
+ static bool
+-surfaceless_probe_device(_EGLDisplay *disp, bool swrast, bool zink)
++surfaceless_probe_device(_EGLDisplay *disp, bool swrast)
+ {
+    const unsigned node_type = swrast ? DRM_NODE_PRIMARY : DRM_NODE_RENDER;
+    struct dri2_egl_display *dri2_dpy = dri2_egl_display(disp);
+@@ -260,7 +260,7 @@ surfaceless_probe_device(_EGLDisplay *disp, bool swrast)
+       }
+ 
+       if (dri2_dpy->driver_name && dri2_load_driver_dri3(disp)) {
+-         if (swrast || zink)
++         if (swrast)
+             dri2_dpy->loader_extensions = swrast_loader_extensions;
+          else
+             dri2_dpy->loader_extensions = image_loader_extensions;
+@@ -323,8 +323,7 @@ dri2_initialize_surfaceless(_EGLDisplay *disp)
+    /* When ForceSoftware is false, we try the HW driver.  When ForceSoftware
+     * is true, we try kms_swrast and swrast in order.
+     */
+-   driver_loaded = surfaceless_probe_device(disp, disp->Options.ForceSoftware,
+-                                            disp->Options.Zink);
++   driver_loaded = surfaceless_probe_device(disp, disp->Options.ForceSoftware);
+    if (!driver_loaded && disp->Options.ForceSoftware) {
+       _eglLog(_EGL_DEBUG, "Falling back to surfaceless swrast without DRM.");
+       driver_loaded = surfaceless_probe_device_sw(disp);
+--- a/src/egl/drivers/dri2/platform_wayland.c
++++ b/src/egl/drivers/dri2/platform_wayland.c
+@@ -2830,7 +2830,7 @@ cleanup:
+ EGLBoolean
+ dri2_initialize_wayland(_EGLDisplay *disp)
+ {
+-   if (disp->Options.ForceSoftware || disp->Options.Zink)
++   if (disp->Options.ForceSoftware)
+       return dri2_initialize_wayland_swrast(disp);
+    else
+       return dri2_initialize_wayland_drm(disp);
+--- a/src/egl/drivers/dri2/platform_x11.c
++++ b/src/egl/drivers/dri2/platform_x11.c
+@@ -1785,7 +1785,7 @@ cleanup:
+ EGLBoolean
+ dri2_initialize_x11(_EGLDisplay *disp)
+ {
+-   if (disp->Options.ForceSoftware || disp->Options.Zink)
++   if (disp->Options.ForceSoftware)
+       return dri2_initialize_x11_swrast(disp);
+ 
+ #ifdef HAVE_DRI3
+--- a/src/egl/main/eglapi.c
++++ b/src/egl/main/eglapi.c
+@@ -682,6 +682,7 @@ eglInitialize(EGLDisplay dpy, EGLint *major, EGLint *minor)
+ 
+       const char *env = getenv("MESA_LOADER_DRIVER_OVERRIDE");
+       disp->Options.Zink = env && !strcmp(env, "zink");
++      disp->Options.ForceSoftware |= disp->Options.Zink;
+ 
+       const char *gallium_hud_env = getenv("GALLIUM_HUD");
+       disp->Options.GalliumHudWarn =
+@@ -696,7 +695,6 @@ eglInitialize(EGLDisplay dpy, EGLint *major, EGLint *minor)
+          if (disp->Options.ForceSoftware)
+             RETURN_EGL_ERROR(disp, EGL_NOT_INITIALIZED, EGL_FALSE);
+          else {
+-            disp->Options.Zink = EGL_FALSE;
+             disp->Options.ForceSoftware = EGL_TRUE;
+             if (!_eglDriver.Initialize(disp))
+                RETURN_EGL_ERROR(disp, EGL_NOT_INITIALIZED, EGL_FALSE);
