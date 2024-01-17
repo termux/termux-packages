@@ -1,6 +1,7 @@
---- ./Makefile.orig	2021-10-10 17:13:11.147988944 +0200
-+++ ./Makefile	2021-10-10 17:12:41.424662424 +0200
-@@ -76,7 +76,7 @@
+diff -uNr quickjs-2024-01-13.orig/Makefile quickjs-2024-01-13/Makefile
+--- quickjs-2024-01-13.orig/Makefile	2024-01-13 15:50:39.000000000 +0530
++++ quickjs-2024-01-13/Makefile	2024-01-17 13:52:04.672637577 +0530
+@@ -79,7 +79,7 @@
    CFLAGS += -Wchar-subscripts -funsigned-char
    CFLAGS += -MMD -MF $(OBJDIR)/$(@F).d
    ifdef CONFIG_DEFAULT_AR
@@ -9,21 +10,12 @@
    else
      ifdef CONFIG_LTO
        AR=$(CROSS_PREFIX)llvm-ar
-@@ -95,7 +95,7 @@
+@@ -106,7 +106,7 @@
      AR=$(CROSS_PREFIX)ar
    endif
  endif
 -STRIP=$(CROSS_PREFIX)strip
 +STRIP ?= $(CROSS_PREFIX)strip
+ CFLAGS+=-fwrapv # ensure that signed overflows behave as expected
  ifdef CONFIG_WERROR
  CFLAGS+=-Werror
- endif
-@@ -112,7 +112,7 @@
- CFLAGS_SMALL=$(CFLAGS) -Os
- CFLAGS_OPT=$(CFLAGS) -O2
- CFLAGS_NOLTO:=$(CFLAGS_OPT)
--LDFLAGS=-g
-+LDFLAGS+=-g
- ifdef CONFIG_LTO
- CFLAGS_SMALL+=-flto
- CFLAGS_OPT+=-flto
