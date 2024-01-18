@@ -24,19 +24,20 @@ diff -uNr a/dlls/dbghelp/macho_module.c b/dlls/dbghelp/macho_module.c
 diff -uNr a/dlls/dbghelp/module.c b/dlls/dbghelp/module.c
 --- a/dlls/dbghelp/module.c
 +++ b/dlls/dbghelp/module.c
-@@ -658,9 +658,9 @@
+@@ -671,10 +671,10 @@
      fmap_link = HeapAlloc(GetProcessHeap(), 0, sizeof(*fmap_link));
-     if (!fmap_link) return FALSE;
-
+     if (!fmap_link) return NULL;
+ 
 -    p = malloc(sizeof(L"/usr/lib/debug/.build-id/") +
-+    p = malloc(sizeof(L"/data/data/com.termux/files/usr/lib/debug/.build-id/") +
++    p = malloc(sizeof(L"@TERMUX_PREFIX@//lib/debug/.build-id/") +
                 (idlen * 2 + 1) * sizeof(WCHAR) + sizeof(L".debug"));
+     if (!p) goto fail;
 -    wcscpy(p, L"/usr/lib/debug/.build-id/");
-+    wcscpy(p, L"/data/data/com.termux/files/usr/lib/debug/.build-id/");
++    wcscpy(p, L"@TERMUX_PREFIX@//lib/debug/.build-id/");
      z = p + wcslen(p);
      if (idlen)
      {
-@@ -701,7 +701,7 @@
+@@ -778,7 +778,7 @@
                  if (!ret)
                  {
                      dst = HeapAlloc(GetProcessHeap(), 0,
@@ -45,7 +46,7 @@ diff -uNr a/dlls/dbghelp/module.c b/dlls/dbghelp/module.c
                      if (dst)
                      {
                          WCHAR* p;
-@@ -711,7 +711,7 @@
+@@ -788,7 +788,7 @@
                           * where the alternate file is...
                           * so try both
                           */
@@ -70,46 +71,19 @@ diff -uNr a/dlls/msvcrt/tests/environ.c b/dlls/msvcrt/tests/environ.c
 diff -uNr a/dlls/ntdll/unix/server.c b/dlls/ntdll/unix/server.c
 --- a/dlls/ntdll/unix/server.c
 +++ b/dlls/ntdll/unix/server.c
-@@ -1113,15 +1113,15 @@
-     char *p, *dir;
-     size_t len = sizeof("/server-") + 2 * sizeof(dev) + 2 * sizeof(ino) + 2;
+@@ -1257,10 +1257,10 @@
+     else
+         snprintf( tmp + p, sizeof(tmp) - p, "%lx", (unsigned long)ino );
  
 -#ifdef __ANDROID__  /* there's no /tmp dir on Android */
 +#if defined(__ANDROID__) && ! defined(__TERMUX__)  /* there's no /tmp dir on Android */
-     len += strlen( config_dir ) + sizeof("/.wineserver");
-     dir = malloc( len );
-     strcpy( dir, config_dir );
-     strcat( dir, "/.wineserver/server-" );
+     asprintf( &dir, "%s/.wineserver/server-%s", config_dir, tmp );
  #else
--    len += sizeof("/tmp/.wine-") + 12;
-+    len += sizeof("@TERMUX_PREFIX@/tmp/.wine-") + 12;
-     dir = malloc( len );
--    sprintf( dir, "/tmp/.wine-%u/server-", getuid() );
-+    sprintf( dir, "@TERMUX_PREFIX@/tmp/.wine-%u/server-", getuid() );
+-    asprintf( &dir, "/tmp/.wine-%u/server-%s", getuid(), tmp );
++    asprintf( &dir, "@TERMUX_PREFIX@/tmp/.wine-%u/server-%s", getuid(), tmp );
  #endif
-     p = dir + strlen( dir );
-     if (dev != (unsigned long)dev)
-diff -uNr a/libs/wine/config.c b/libs/wine/config.c
---- a/libs/wine/config.c
-+++ b/libs/wine/config.c
-@@ -342,7 +342,7 @@
+     return dir;
  }
- 
- static const char server_config_dir[] = "/.wine";        /* config dir relative to $HOME */
--static const char server_root_prefix[] = "/tmp/.wine";   /* prefix for server root dir */
-+static const char server_root_prefix[] = "@TERMUX_PREFIX@/tmp/.wine";   /* prefix for server root dir */
- static const char server_dir_prefix[] = "/server-";      /* prefix for server dir */
- 
- static char *config_dir;
-@@ -382,7 +382,7 @@
- {
-     char *p, *root;
- 
--#ifdef __ANDROID__  /* there's no /tmp dir on Android */
-+#if defined(__ANDROID__) && ! defined(__TERMUX__)  /* there's no /tmp dir on Android */
-     root = build_path( config_dir, ".wineserver" );
- #else
-     root = xmalloc( sizeof(server_root_prefix) + 12 );
 diff -uNr a/programs/winebrowser/main.c b/programs/winebrowser/main.c
 --- a/programs/winebrowser/main.c
 +++ b/programs/winebrowser/main.c
