@@ -1,0 +1,102 @@
+--- ../sudo-0.2.0/sudo	2021-04-10 20:59:50.000000000 +0000
++++ ./sudo	2024-01-20 10:30:26.726315077 +0000
+@@ -1,4 +1,4 @@
+-#!/data/data/com.termux/files/usr/bin/bash
++#!@TERMUX_PREFIX@/bin/bash
+ 
+ #title:         sudo
+ #description:   a wrapper script to drop to the supported shells or
+@@ -16,7 +16,7 @@
+ 
+ ### Install Instructions For Termux In Android:
+ 
+-#The `sudo` file should be placed in termux `bin` directory `/data/data/com.termux/files/usr/bin`.  
++#The `sudo` file should be placed in termux `bin` directory `@TERMUX_PREFIX@/bin`.  
+ #It should have `termux` `uid:gid` ownership and have executable `700` permission before it can be run directly without `bash`.  
+ #
+ #1. Download the `sudo` file.  
+@@ -25,15 +25,15 @@
+ #        Run `pkg install curl` to install `curl` first.  
+ #        - Latest release:  
+ #
+-#          `curl -L 'https://github.com/agnostic-apollo/sudo/releases/latest/download/sudo' -o "/data/data/com.termux/files/usr/bin/sudo"`  
++#          `curl -L 'https://github.com/agnostic-apollo/sudo/releases/latest/download/sudo' -o "@TERMUX_PREFIX@/bin/sudo"`  
+ #
+ #        - Specific release:  
+ #
+-#          `curl -L 'https://github.com/agnostic-apollo/sudo/releases/download/v0.1.0/sudo' -o "/data/data/com.termux/files/usr/bin/sudo"`  
++#          `curl -L 'https://github.com/agnostic-apollo/sudo/releases/download/v0.1.0/sudo' -o "@TERMUX_PREFIX@/bin/sudo"`  
+ #
+ #        - Master Branch *may be unstable*:  
+ #
+-#          `curl -L 'https://github.com/agnostic-apollo/sudo/raw/master/sudo' -o "/data/data/com.termux/files/usr/bin/sudo"`  
++#          `curl -L 'https://github.com/agnostic-apollo/sudo/raw/master/sudo' -o "@TERMUX_PREFIX@/bin/sudo"`  
+ #
+ #    - Download `sudo` file manually from github to the android download directory and then copy it to termux bin directory.  
+ #
+@@ -44,17 +44,17 @@
+ #
+ #      Then copy the file to termux bin directory using `cat` command below or use a root file browser to manually place it.  
+ #
+-#       `cat "/storage/emulated/0/Download/sudo" > "/data/data/com.termux/files/usr/bin/sudo"`  
++#       `cat "/storage/emulated/0/Download/sudo" > "@TERMUX_PREFIX@/bin/sudo"`  
+ #
+ #2. Set `termux` ownership and executable permissions.  
+ #
+ #    - If you used a `curl` or `cat` to copy the file, then use a non-root termux shell to set ownership and permissions with `chown` and `chmod` commands respectively:  
+ #
+-#      `export termux_bin_path="/data/data/com.termux/files/usr/bin"; export owner="$(stat -c "%u" "$termux_bin_path")"; chown "$owner:$owner" "$termux_bin_path/sudo" && chmod 700 "$termux_bin_path/sudo";`  
++#      `export termux_bin_path="@TERMUX_PREFIX@/bin"; export owner="$(stat -c "%u" "$termux_bin_path")"; chown "$owner:$owner" "$termux_bin_path/sudo" && chmod 700 "$termux_bin_path/sudo";`  
+ #
+ #    - If you used a root file browser to copy the file, then use `su` to start a root shell to set ownership and permissions with `chown` and `chmod` commands respectively:  
+ #
+-#      `export termux_bin_path="/data/data/com.termux/files/usr/bin"; export owner="$(stat -c "%u" "$termux_bin_path")"; su -c "chown \"$owner:$owner\" \"$termux_bin_path/sudo\" && chmod 700 \"$termux_bin_path/sudo\"";`  
++#      `export termux_bin_path="@TERMUX_PREFIX@/bin"; export owner="$(stat -c "%u" "$termux_bin_path")"; su -c "chown \"$owner:$owner\" \"$termux_bin_path/sudo\" && chmod 700 \"$termux_bin_path/sudo\"";`  
+ #
+ #    - Or manually set them with your root file browser. You can find `termux` `uid` and `gid` by running the command `id -u` in a non-root termux shell or by checking the properties of the termux `bin` directory from your root file browser.  
+ #
+@@ -62,7 +62,7 @@
+ sudo_set_default_variables() {
+ 
+ #set termux and android default variables
+-TERMUX_FILES="/data/data/com.termux/files"
++TERMUX_FILES="@TERMUX_BASE_DIR@"
+ TERMUX_HOME_BASENAME="home"
+ TERMUX_HOME="$TERMUX_FILES/$TERMUX_HOME_BASENAME"
+ TERMUX_PREFIX_BASENAME="usr"
+@@ -255,7 +255,7 @@
+ 	local return_value
+ 
+ 	#if sudo_config_file exists, source it
+-	sudo_config_file="/data/data/com.termux/files/home/.config/sudo/sudo.config"
++	sudo_config_file="@TERMUX_BASE_DIR@/home/.config/sudo/sudo.config"
+ 	sudo_config_file_sourced=0
+ 	if [ -f "$sudo_config_file" ] && [ -r "$sudo_config_file" ]; then
+ 		source "$sudo_config_file"
+@@ -1909,7 +1909,7 @@
+ 	#"/proc/self/fd/63: No such file or directory"
+ 	#hence we manually create a file descriptor and pass its path to su or to be more specific to the bash shell
+ 	#for the path and script commands
+-	#/system/xbin/su --shell="/data/data/com.termux/files/usr/bin/bash" --preserve-environment -c "bash --noprofile --norc" <(echo 'echo 1')
++	#/system/xbin/su --shell="@TERMUX_PREFIX@/bin/bash" --preserve-environment -c "bash --noprofile --norc" <(echo 'echo 1')
+ 
+ 	#the method that is used for passing data to su using file descriptors in sudo_run function and elsewhere is the following
+ 	#get an unsed file descriptor for the current sudo script process
+@@ -1962,7 +1962,7 @@
+ 	#   That can be done by running:
+ 	#   ```
+ 	#   fd_number="$(echo <(echo "") | sed -E 's|/proc/self/fd/([0-9]+)|\1|')"
+-	#	/system/xbin/su --shell="/data/data/com.termux/files/usr/bin/bash" --preserve-environment -c "bash_shell_pid=$$; "'su_shell_pid=$(pgrep -P $bash_shell_pid); bash /proc/$su_shell_pid/fd/'"$fd_number" <(echo 'echo 1')
++	#	/system/xbin/su --shell="@TERMUX_PREFIX@/bin/bash" --preserve-environment -c "bash_shell_pid=$$; "'su_shell_pid=$(pgrep -P $bash_shell_pid); bash /proc/$su_shell_pid/fd/'"$fd_number" <(echo 'echo 1')
+ 	#	```
+ 	#   Use the path to the 'su' installed on your device if its not at '/system/xbin/su'
+ 	#   The first line will just get the fd number that is chosen by default by bash when it uses process substitution which
+@@ -2005,7 +2005,7 @@
+ 	#   #ideally two commands would be shown by ps that created fd 63, one for the local bash interactive shell of the sudo su command
+ 	#   #and the other for the newly created su shell since the fd will be copied during the fork
+ 	#   fd_number="$(echo <(echo "") | sed -E 's|/proc/self/fd/([0-9]+)|\1|')"
+-	#   /system/xbin/su --shell="/data/data/com.termux/files/usr/bin/bash" --preserve-environment -c "bash_shell_pid=$$; "'su_shell_pid=$(pgrep -P $bash_shell_pid); sleep 0.3; bash /proc/$su_shell_pid/fd/'"$fd_number" <(echo 'echo 1')
++	#   /system/xbin/su --shell="@TERMUX_PREFIX@/bin/bash" --preserve-environment -c "bash_shell_pid=$$; "'su_shell_pid=$(pgrep -P $bash_shell_pid); sleep 0.3; bash /proc/$su_shell_pid/fd/'"$fd_number" <(echo 'echo 1')
+ 	#	#exit the second root shell once done
+ 	#   exit
+ 	#   #kill background process, do not leave it running since it will consume lots of resources and may slow down the system
