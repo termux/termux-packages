@@ -13,8 +13,8 @@ TERMUX_PKG_HOSTBUILD=true
 termux_step_host_build() {
 	# Generate ffmpeg headers for i686
 	mkdir -p fake-bin
-	ln -s $(command -v clang-14) fake-bin/clang
-	ln -s $(command -v clang++-14) fake-bin/clang++
+	ln -s $(command -v clang-15) fake-bin/clang
+	ln -s $(command -v clang++-15) fake-bin/clang++
 	
 	PATH="$PWD/fake-bin:$PATH" python2 $TERMUX_PKG_SRCDIR/src/3rdparty/chromium/third_party/ffmpeg/chromium/scripts/build_ffmpeg.py --config-only linux noasm-ia32
 }
@@ -31,6 +31,9 @@ termux_step_configure() {
 	cd $TERMUX_PKG_SRCDIR
 	termux_setup_ninja
 	termux_setup_nodejs
+
+	# https://gitweb.gentoo.org/repo/gentoo.git/commit/?id=adb049350a5d4b15b5ee19739d9f2baed83f6acf
+	export LDFLAGS+=" -Wl,--undefined-version"
 
 	# Remove termux's dummy pkg-config
 	local _host_pkg_config="$(cat $(command -v pkg-config) | grep exec | awk '{print $2}')"
