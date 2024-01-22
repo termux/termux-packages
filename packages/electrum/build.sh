@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://electrum.org
 TERMUX_PKG_DESCRIPTION="Electrum is a lightweight Bitcoin wallet"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="4.5.0"
+TERMUX_PKG_VERSION="4.5.2"
 TERMUX_PKG_SRCURL=https://download.electrum.org/$TERMUX_PKG_VERSION/Electrum-$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=b38147f05b4f838c1ea54ff95c8d3ad9d00df5f098475c491b0af17ed0922b3c
+TERMUX_PKG_SHA256=b415903214016c31a8831d174ca9ce0ebe309f74ddebee6684aba9cbdff9d384
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="python, libsecp256k1, python-pip"
 TERMUX_PKG_PYTHON_TARGET_DEPS="'qrcode', 'protobuf<4,>=3.20', 'qdarkstyle>=2.7', 'aiorpcx<0.23,>=0.22.0', 'aiohttp<4.0.0,>=3.3.0', 'aiohttp_socks>=0.3', 'certifi', 'bitstring', 'attrs>=19.2.0', 'dnspython>=2.0'"
