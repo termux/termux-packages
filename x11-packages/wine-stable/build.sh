@@ -102,7 +102,6 @@ termux_step_host_build() {
 	_setup_llvm_mingw_toolchain
 
 	# Make host wine-tools
-	(unset sudo; sudo apt update; sudo apt install libfreetype-dev:i386 -yqq)
 	"$TERMUX_PKG_SRCDIR/configure" ${TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS}
 	make -j "$TERMUX_MAKE_PROCESSES" __tooldeps__ nls/all
 }
