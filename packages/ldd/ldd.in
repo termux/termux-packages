@@ -86,9 +86,13 @@ do_search() {
 }
 
 num_args="$#"
-if [ "$num_args" -lt 1 ]; then
+if [ "$num_args" -lt 1 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     echo "Usage: ldd file..." >&2
     exit 1
+fi
+
+if [ "$1" = "--" ]; then
+    shift 1
 fi
 
 for f in "$@"; do
