@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="VP8 & VP9 Codec SDK"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1:1.14.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/webmproject/libvpx/archive/v${TERMUX_PKG_VERSION:2}.tar.gz
 TERMUX_PKG_SHA256=5f21d2db27071c8a46f1725928a10227ae45c5cd1cad3727e4aafbe476e321fa
 TERMUX_PKG_DEPENDS="libc++"
@@ -59,7 +60,12 @@ termux_step_configure() {
 		--disable-realtime-only \
 		--disable-unit-tests \
 		--enable-pic \
+		--enable-postproc \
 		--enable-vp8 \
+		--enable-vp9 \
+		--enable-vp9-highbitdepth \
+		--enable-vp9-temporal-denoising \
+		--enable-vp9-postproc \
 		--enable-shared \
 		--enable-small \
 		--as=auto \
