@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/mtrojnar/osslsigncode
+TERMUX_PKG_DESCRIPTION="OpenSSL based Authenticode signing for PE/MSI/Java CAB files"
+TERMUX_PKG_LICENSE="GPL-3.0-or-later"
+TERMUX_PKG_LICENSE_FILE="COPYING.txt, LICENSE.txt"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="2.7"
+TERMUX_PKG_SRCURL=https://github.com/mtrojnar/osslsigncode/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=00fc2b43395d89a2d07ebbd4981e7a9dbc676c7115d122a1385441c0294239b8
+TERMUX_PKG_DEPENDS="libcurl, openssl, zlib"
+TERMUX_PKG_AUTO_UPDATE=true
