@@ -1,0 +1,38 @@
+From d17c8910a60adc0133e38f727c40f3e676fea5dd Mon Sep 17 00:00:00 2001
+From: sxyazi <sxyazi@gmail.com>
+Date: Tue, 30 Jan 2024 01:37:15 +0800
+Subject: [PATCH] feat: make `trash` crate optional on Android
+
+---
+ yazi-scheduler/Cargo.toml       | 4 +++-
+ yazi-scheduler/src/file/file.rs | 2 +-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/yazi-scheduler/Cargo.toml b/yazi-scheduler/Cargo.toml
+index be0a828f..94aecb94 100644
+--- a/yazi-scheduler/Cargo.toml
++++ b/yazi-scheduler/Cargo.toml
+@@ -24,7 +24,9 @@ parking_lot            = "^0"
+ regex                  = "^1"
+ tokio                  = { version = "^1", features = [ "parking_lot", "rt-multi-thread" ] }
+ tokio-stream           = "^0"
+-trash                  = "^3"
+ 
+ # Logging
+ tracing = { version = "^0", features = [ "max_level_debug", "release_max_level_warn" ] }
++
++[target.'cfg(not(target_os = "android"))'.dependencies]
++trash = "^3"
+diff --git a/yazi-scheduler/src/file/file.rs b/yazi-scheduler/src/file/file.rs
+index dc869440..dec74cf8 100644
+--- a/yazi-scheduler/src/file/file.rs
++++ b/yazi-scheduler/src/file/file.rs
+@@ -122,7 +122,7 @@ impl File {
+ 					ctx.set_delete_method(DeleteMethod::NsFileManager);
+ 					ctx.delete(&task.target)?;
+ 				}
+-				#[cfg(not(target_os = "macos"))]
++				#[cfg(all(not(target_os = "macos"), not(target_os = "android")))]
+ 				{
+ 					trash::delete(&task.target)?;
+ 				}
