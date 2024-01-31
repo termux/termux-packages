@@ -15,6 +15,5 @@ termux_step_pre_configure() {
 	TERMUX_PKG_BUILDDIR="${TERMUX_PKG_SRCDIR}"
 	cd "${TERMUX_PKG_SRCDIR}"
 	./autogen.sh
-
 	LDFLAGS+=" $($CC -print-libgcc-file-name)"
 }
