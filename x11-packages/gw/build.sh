@@ -36,7 +36,7 @@ termux_step_make() {
 	local SKIA_URL_X64="https://github.com/JetBrains/skia-build/releases/download/m93-87e8842e8c/Skia-m93-87e8842e8c-android-Release-x64.zip"
 	local SKIA_CHECKSUM_X64="1546e41c0b2edc401639e1ed0dd32d9e8b30d478f1c4a5c345ee82f2a5e1b829"
 
-	cd lib/skia/
+	mkdir -p lib/skia && cd lib/skia/
 	case "$TERMUX_ARCH" in
 		aarch64)
 			termux_download "$SKIA_URL_AARCH64" "${TERMUX_PKG_CACHEDIR}/skia-${TERMUX_ARCH}.zip" "$SKIA_CHECKSUM_AARCH64"
