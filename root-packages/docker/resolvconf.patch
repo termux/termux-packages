@@ -60,21 +60,6 @@ diff -uNr src.orig/moby/daemon/container_operations_unix.go moby/daemon/containe
  		)
  	default:
  		// For other situations, such as the default bridge network, container
-diff -uNr src.orig/moby/libnetwork/resolvconf/resolvconf.go moby/libnetwork/resolvconf/resolvconf.go
---- src.orig/moby/libnetwork/resolvconf/resolvconf.go	2023-08-29 22:14:17.000000000 +0300
-+++ moby/libnetwork/resolvconf/resolvconf.go	2024-02-01 20:32:31.457173805 +0200
-@@ -13,9 +13,9 @@
- 
- const (
- 	// defaultPath is the default path to the resolv.conf that contains information to resolve DNS. See Path().
--	defaultPath = "/etc/resolv.conf"
-+	defaultPath = "@TERMUX_PREFIX@/etc/resolv.conf"
- 	// alternatePath is a path different from defaultPath, that may be used to resolve DNS. See Path().
--	alternatePath = "/run/systemd/resolve/resolv.conf"
-+	alternatePath = "/etc/resolv.conf"
- )
- 
- // constants for the IP address type
 diff -uNr src.orig/moby/plugin/v2/plugin_linux.go moby/plugin/v2/plugin_linux.go
 --- src.orig/moby/plugin/v2/plugin_linux.go	2023-08-29 22:14:17.000000000 +0300
 +++ moby/plugin/v2/plugin_linux.go	2024-02-01 20:27:35.648186687 +0200
