@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/kcleal/gw
 TERMUX_PKG_DESCRIPTION="A browser for genomic sequencing data (.bam/.cram format)"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="clealk@cardiff.ac.uk"
-TERMUX_PKG_VERSION=0.9.1
+TERMUX_PKG_VERSION=0.9.3
 TERMUX_PKG_SRCURL=https://github.com/kcleal/gw/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=10a65107717811179a124e8bac5b2f202bdbde6679a9e6eb67ef97c990b7cf9d
+TERMUX_PKG_SHA256=43445ef6d96bd8a09a9a45cd18e21481d7fefe7e9ab26aec4abd8d1f4bff3fcd
 TERMUX_PKG_DEPENDS="glfw, htslib, libc++, libjpeg-turbo, opengl"
 TERMUX_PKG_BUILD_DEPENDS="fontconfig, freetype, libicu, libuuid, mesa-dev"
 TERMUX_PKG_AUTO_UPDATE=true
@@ -36,7 +36,7 @@ termux_step_make() {
 	local SKIA_URL_X64="https://github.com/JetBrains/skia-build/releases/download/m93-87e8842e8c/Skia-m93-87e8842e8c-android-Release-x64.zip"
 	local SKIA_CHECKSUM_X64="1546e41c0b2edc401639e1ed0dd32d9e8b30d478f1c4a5c345ee82f2a5e1b829"
 
-	cd lib/skia/
+	mkdir -p lib/skia && cd lib/skia/
 	case "$TERMUX_ARCH" in
 		aarch64)
 			termux_download "$SKIA_URL_AARCH64" "${TERMUX_PKG_CACHEDIR}/skia-${TERMUX_ARCH}.zip" "$SKIA_CHECKSUM_AARCH64"
