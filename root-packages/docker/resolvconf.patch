@@ -1,24 +1,23 @@
-diff -ur ../src.orig/libnetwork/resolvconf/resolvconf.go ./libnetwork/resolvconf/resolvconf.go
---- ../src.orig/libnetwork/resolvconf/resolvconf.go	2023-10-15 10:26:02.794678146 +0000
-+++ ./libnetwork/resolvconf/resolvconf.go	2023-10-15 10:27:36.261675557 +0000
-@@ -16,7 +16,7 @@
+diff -uNr src.orig/libnetwork/resolvconf/resolvconf.go libnetwork/resolvconf/resolvconf.go
+--- src.orig/libnetwork/resolvconf/resolvconf.go	2023-07-24 12:20:29.000000000 +0300
++++ libnetwork/resolvconf/resolvconf.go	2024-02-01 20:21:43.768677906 +0200
+@@ -16,9 +16,9 @@
  
  const (
  	// defaultPath is the default path to the resolv.conf that contains information to resolve DNS. See Path().
 -	defaultPath = "/etc/resolv.conf"
 +	defaultPath = "@TERMUX_PREFIX@/etc/resolv.conf"
  	// alternatePath is a path different from defaultPath, that may be used to resolve DNS. See Path().
- 	alternatePath = "/run/systemd/resolve/resolv.conf"
+-	alternatePath = "/run/systemd/resolve/resolv.conf"
++	alternatePath = "/etc/resolv.conf"
  )
-diff -ur ../src.orig/libnetwork/sandbox_dns_unix.go ./libnetwork/sandbox_dns_unix.go
---- ../src.orig/libnetwork/sandbox_dns_unix.go	2023-10-15 10:26:02.794678146 +0000
-+++ ./libnetwork/sandbox_dns_unix.go	2023-10-15 10:27:36.268342246 +0000
-@@ -225,10 +225,10 @@
- 		if !os.IsNotExist(err) {
- 			return err
- 		}
--		// it's ok to continue if /etc/resolv.conf doesn't exist, default resolvers (Google's Public DNS)
-+		// it's ok to continue if @TERMUX_PREFIX@/etc/resolv.conf doesn't exist, default resolvers (Google's Public DNS)
+ 
+ var (
+diff -uNr src.orig/libnetwork/sandbox_dns_unix.go libnetwork/sandbox_dns_unix.go
+--- src.orig/libnetwork/sandbox_dns_unix.go	2023-07-24 12:20:29.000000000 +0300
++++ libnetwork/sandbox_dns_unix.go	2024-02-01 20:22:10.032223768 +0200
+@@ -228,7 +228,7 @@
+ 		// it's ok to continue if /etc/resolv.conf doesn't exist, default resolvers (Google's Public DNS)
  		// will be used
  		currRC = &resolvconf.File{}
 -		logrus.Infof("/etc/resolv.conf does not exist")
@@ -26,9 +25,9 @@ diff -ur ../src.orig/libnetwork/sandbox_dns_unix.go ./libnetwork/sandbox_dns_uni
  	}
  
  	if len(sb.config.dnsList) > 0 || len(sb.config.dnsSearchList) > 0 || len(sb.config.dnsOptionsList) > 0 {
-diff -ur ../src.orig/libnetwork/vendor/github.com/hashicorp/memberlist/config.go ./libnetwork/vendor/github.com/hashicorp/memberlist/config.go
---- ../src.orig/libnetwork/vendor/github.com/hashicorp/memberlist/config.go	2023-10-15 10:26:02.794678146 +0000
-+++ ./libnetwork/vendor/github.com/hashicorp/memberlist/config.go	2023-10-15 10:27:36.435009499 +0000
+diff -uNr src.orig/libnetwork/vendor/github.com/hashicorp/memberlist/config.go libnetwork/vendor/github.com/hashicorp/memberlist/config.go
+--- src.orig/libnetwork/vendor/github.com/hashicorp/memberlist/config.go	2023-07-24 12:20:29.000000000 +0300
++++ libnetwork/vendor/github.com/hashicorp/memberlist/config.go	2024-02-01 20:20:22.704688868 +0200
 @@ -254,7 +254,7 @@
  		SecretKey: nil,
  		Keyring:   nil,
@@ -38,68 +37,20 @@ diff -ur ../src.orig/libnetwork/vendor/github.com/hashicorp/memberlist/config.go
  
  		HandoffQueueDepth: 1024,
  		UDPBufferSize:     1400,
-diff -ur ../src.orig/moby/container/container_unix.go ./moby/container/container_unix.go
---- ../src.orig/moby/container/container_unix.go	2023-08-29 19:14:17.000000000 +0000
-+++ ./moby/container/container_unix.go	2023-10-15 10:27:35.245005315 +0000
-@@ -37,7 +37,7 @@
- // TrySetNetworkMount attempts to set the network mounts given a provided destination and
- // the path to use for it; return true if the given destination was a network mount file
- func (container *Container) TrySetNetworkMount(destination string, path string) bool {
--	if destination == "/etc/resolv.conf" {
-+	if destination == "@TERMUX_PREFIX@/etc/resolv.conf" {
- 		container.ResolvConfPath = path
- 		return true
- 	}
-@@ -73,14 +73,14 @@
- 			logrus.Warnf("ResolvConfPath set to %q, but can't stat this filename (err = %v); skipping", container.ResolvConfPath, err)
- 		} else {
- 			writable := !container.HostConfig.ReadonlyRootfs
--			if m, exists := container.MountPoints["/etc/resolv.conf"]; exists {
-+			if m, exists := container.MountPoints["@TERMUX_PREFIX@/etc/resolv.conf"]; exists {
- 				writable = m.RW
- 			} else {
- 				label.Relabel(container.ResolvConfPath, container.MountLabel, shared)
- 			}
- 			mounts = append(mounts, Mount{
- 				Source:      container.ResolvConfPath,
--				Destination: "/etc/resolv.conf",
-+				Destination: "@TERMUX_PREFIX@/etc/resolv.conf",
- 				Writable:    writable,
- 				Propagation: string(parser.DefaultPropagationMode()),
- 			})
-diff -ur ../src.orig/moby/daemon/container_operations_unix.go ./moby/daemon/container_operations_unix.go
---- ../src.orig/moby/daemon/container_operations_unix.go	2023-08-29 19:14:17.000000000 +0000
-+++ ./moby/daemon/container_operations_unix.go	2023-10-15 10:27:35.288338800 +0000
-@@ -384,25 +384,25 @@
- func (daemon *Daemon) setupPathsAndSandboxOptions(container *container.Container, sboxOptions *[]libnetwork.SandboxOption) error {
- 	var err error
- 
--	// Set the correct paths for /etc/hosts and /etc/resolv.conf, based on the
-+	// Set the correct paths for /etc/hosts and @TERMUX_PREFIX@/etc/resolv.conf, based on the
- 	// networking-mode of the container. Note that containers with "container"
- 	// networking are already handled in "initializeNetworking()" before we reach
- 	// this function, so do not have to be accounted for here.
- 	switch {
- 	case container.HostConfig.NetworkMode.IsHost():
- 		// In host-mode networking, the container does not have its own networking
--		// namespace, so both `/etc/hosts` and `/etc/resolv.conf` should be the same
-+		// namespace, so both `/etc/hosts` and `@TERMUX_PREFIX@/etc/resolv.conf` should be the same
+diff -uNr src.orig/moby/daemon/container_operations_unix.go moby/daemon/container_operations_unix.go
+--- src.orig/moby/daemon/container_operations_unix.go	2023-08-29 22:14:17.000000000 +0300
++++ moby/daemon/container_operations_unix.go	2024-02-01 20:35:13.895078933 +0200
+@@ -395,8 +395,8 @@
  		// as on the host itself. The container gets a copy of these files.
  		*sboxOptions = append(
  			*sboxOptions,
- 			libnetwork.OptionOriginHostsPath("/etc/hosts"),
+-			libnetwork.OptionOriginHostsPath("/etc/hosts"),
 -			libnetwork.OptionOriginResolvConfPath("/etc/resolv.conf"),
++			libnetwork.OptionOriginHostsPath("@TERMUX_PREFIX@/etc/hosts"),
 +			libnetwork.OptionOriginResolvConfPath("@TERMUX_PREFIX@/etc/resolv.conf"),
  		)
  	case container.HostConfig.NetworkMode.IsUserDefined():
  		// The container uses a user-defined network. We use the embedded DNS
- 		// server for container name resolution and to act as a DNS forwarder
- 		// for external DNS resolution.
--		// We parse the DNS server(s) that are defined in /etc/resolv.conf on
-+		// We parse the DNS server(s) that are defined in @TERMUX_PREFIX@/etc/resolv.conf on
- 		// the host, which may be a local DNS server (for example, if DNSMasq or
- 		// systemd-resolvd are in use). The embedded DNS server forwards DNS
- 		// resolution to the DNS server configured on the host, which in itself
 @@ -412,7 +412,7 @@
  		// directly, as they can be dynamically reconfigured.
  		*sboxOptions = append(
@@ -109,82 +60,92 @@ diff -ur ../src.orig/moby/daemon/container_operations_unix.go ./moby/daemon/cont
  		)
  	default:
  		// For other situations, such as the default bridge network, container
-diff -ur ../src.orig/moby/daemon/initlayer/setup_unix.go ./moby/daemon/initlayer/setup_unix.go
---- ../src.orig/moby/daemon/initlayer/setup_unix.go	2023-08-29 19:14:17.000000000 +0000
-+++ ./moby/daemon/initlayer/setup_unix.go	2023-10-15 10:27:35.341672321 +0000
-@@ -27,7 +27,7 @@
- 		"/proc":            "dir",
- 		"/sys":             "dir",
- 		"/.dockerenv":      "file",
--		"/etc/resolv.conf": "file",
-+		"@TERMUX_PREFIX@/etc/resolv.conf": "file",
- 		"/etc/hosts":       "file",
- 		"/etc/hostname":    "file",
- 		"/dev/console":     "file",
-diff -ur ../src.orig/moby/libnetwork/resolvconf/resolvconf.go ./moby/libnetwork/resolvconf/resolvconf.go
---- ../src.orig/moby/libnetwork/resolvconf/resolvconf.go	2023-08-29 19:14:17.000000000 +0000
-+++ ./moby/libnetwork/resolvconf/resolvconf.go	2023-10-15 10:27:36.141675134 +0000
-@@ -13,7 +13,7 @@
+diff -uNr src.orig/moby/libnetwork/resolvconf/resolvconf.go moby/libnetwork/resolvconf/resolvconf.go
+--- src.orig/moby/libnetwork/resolvconf/resolvconf.go	2023-08-29 22:14:17.000000000 +0300
++++ moby/libnetwork/resolvconf/resolvconf.go	2024-02-01 20:32:31.457173805 +0200
+@@ -13,9 +13,9 @@
  
  const (
  	// defaultPath is the default path to the resolv.conf that contains information to resolve DNS. See Path().
 -	defaultPath = "/etc/resolv.conf"
 +	defaultPath = "@TERMUX_PREFIX@/etc/resolv.conf"
  	// alternatePath is a path different from defaultPath, that may be used to resolve DNS. See Path().
- 	alternatePath = "/run/systemd/resolve/resolv.conf"
+-	alternatePath = "/run/systemd/resolve/resolv.conf"
++	alternatePath = "/etc/resolv.conf"
  )
-diff -ur ../src.orig/moby/plugin/v2/plugin_linux.go ./moby/plugin/v2/plugin_linux.go
---- ../src.orig/moby/plugin/v2/plugin_linux.go	2023-10-15 10:26:02.764678039 +0000
-+++ ./moby/plugin/v2/plugin_linux.go	2023-10-15 10:27:35.285005456 +0000
-@@ -50,12 +50,12 @@
- 	})
  
- 	if p.PluginObj.Config.Network.Type != "" {
--		// TODO: if net == bridge, use libnetwork controller to create a new plugin-specific bridge, bind mount /etc/hosts and /etc/resolv.conf look at the docker code (allocateNetwork, initialize)
-+		// TODO: if net == bridge, use libnetwork controller to create a new plugin-specific bridge, bind mount /etc/hosts and @TERMUX_PREFIX@/etc/resolv.conf look at the docker code (allocateNetwork, initialize)
+ // constants for the IP address type
+diff -uNr src.orig/moby/plugin/v2/plugin_linux.go moby/plugin/v2/plugin_linux.go
+--- src.orig/moby/plugin/v2/plugin_linux.go	2023-08-29 22:14:17.000000000 +0300
++++ moby/plugin/v2/plugin_linux.go	2024-02-01 20:27:35.648186687 +0200
+@@ -54,18 +54,18 @@
  		if p.PluginObj.Config.Network.Type == "host" {
  			oci.RemoveNamespace(&s, specs.LinuxNamespaceType("network"))
  		}
- 		etcHosts := "/etc/hosts"
+-		etcHosts := "/etc/hosts"
 -		resolvConf := "/etc/resolv.conf"
++		etcHosts := "@TERMUX_PREFIX@/etc/hosts"
 +		resolvConf := "@TERMUX_PREFIX@/etc/resolv.conf"
  		mounts = append(mounts,
  			types.PluginMount{
  				Source:      &etcHosts,
-diff -ur ../src.orig/moby/vendor/github.com/containerd/containerd/oci/spec_opts.go ./moby/vendor/github.com/containerd/containerd/oci/spec_opts.go
---- ../src.orig/moby/vendor/github.com/containerd/containerd/oci/spec_opts.go	2023-10-15 10:26:02.768011385 +0000
-+++ ./moby/vendor/github.com/containerd/containerd/oci/spec_opts.go	2023-10-15 10:27:35.995007952 +0000
-@@ -505,12 +505,12 @@
- 	return nil
- }
- 
--// WithHostResolvconf bind-mounts the host's /etc/resolv.conf into the container as readonly
-+// WithHostResolvconf bind-mounts the host's @TERMUX_PREFIX@/etc/resolv.conf into the container as readonly
- func WithHostResolvconf(_ context.Context, _ Client, _ *containers.Container, s *Spec) error {
+-				Destination: etcHosts,
++				Destination: "/etc/hosts",
+ 				Type:        "bind",
+ 				Options:     []string{"rbind", "ro"},
+ 			},
+ 			types.PluginMount{
+ 				Source:      &resolvConf,
+-				Destination: resolvConf,
++				Destination: "/etc/resolv.conf",
+ 				Type:        "bind",
+ 				Options:     []string{"rbind", "ro"},
+ 			})
+diff -uNr src.orig/moby/vendor/github.com/containerd/containerd/oci/spec_opts.go moby/vendor/github.com/containerd/containerd/oci/spec_opts.go
+--- src.orig/moby/vendor/github.com/containerd/containerd/oci/spec_opts.go	2023-08-29 22:14:17.000000000 +0300
++++ moby/vendor/github.com/containerd/containerd/oci/spec_opts.go	2024-02-01 20:37:20.602711636 +0200
+@@ -499,7 +499,7 @@
  	s.Mounts = append(s.Mounts, specs.Mount{
--		Destination: "/etc/resolv.conf",
-+		Destination: "@TERMUX_PREFIX@/etc/resolv.conf",
+ 		Destination: "/etc/hosts",
+ 		Type:        "bind",
+-		Source:      "/etc/hosts",
++		Source:      "@TERMUX_PREFIX@/etc/hosts",
+ 		Options:     []string{"rbind", "ro"},
+ 	})
+ 	return nil
+@@ -510,7 +510,7 @@
+ 	s.Mounts = append(s.Mounts, specs.Mount{
+ 		Destination: "/etc/resolv.conf",
  		Type:        "bind",
 -		Source:      "/etc/resolv.conf",
 +		Source:      "@TERMUX_PREFIX@/etc/resolv.conf",
  		Options:     []string{"rbind", "ro"},
  	})
  	return nil
-diff -ur ../src.orig/moby/vendor/github.com/containerd/containerd/rootfs/init_linux.go ./moby/vendor/github.com/containerd/containerd/rootfs/init_linux.go
---- ../src.orig/moby/vendor/github.com/containerd/containerd/rootfs/init_linux.go	2023-08-29 19:14:17.000000000 +0000
-+++ ./moby/vendor/github.com/containerd/containerd/rootfs/init_linux.go	2023-10-15 10:27:35.961674502 +0000
+@@ -521,7 +521,7 @@
+ 	s.Mounts = append(s.Mounts, specs.Mount{
+ 		Destination: "/etc/localtime",
+ 		Type:        "bind",
+-		Source:      "/etc/localtime",
++		Source:      "@TERMUX_PREFIX@/etc/localtime",
+ 		Options:     []string{"rbind", "ro"},
+ 	})
+ 	return nil
+diff -uNr src.orig/moby/vendor/github.com/containerd/containerd/rootfs/init_linux.go moby/vendor/github.com/containerd/containerd/rootfs/init_linux.go
+--- src.orig/moby/vendor/github.com/containerd/containerd/rootfs/init_linux.go	2023-08-29 22:14:17.000000000 +0300
++++ moby/vendor/github.com/containerd/containerd/rootfs/init_linux.go	2024-02-01 20:39:59.123727195 +0200
 @@ -114,7 +114,7 @@
  		createDirectory("/proc", uid, gid),
  		createDirectory("/sys", uid, gid),
  		createDirectory("/etc", uid, gid),
 -		touchFile("/etc/resolv.conf", uid, gid),
-+		touchFile("@TERMUX_PREFIX@/etc/resolv.conf", uid, gid),
++		touchFile("@/etc/resolv.conf", uid, gid),
  		touchFile("/etc/hosts", uid, gid),
  		touchFile("/etc/hostname", uid, gid),
  		symlink("/proc/mounts", "/etc/mtab"),
-diff -ur ../src.orig/moby/vendor/github.com/hashicorp/memberlist/config.go ./moby/vendor/github.com/hashicorp/memberlist/config.go
---- ../src.orig/moby/vendor/github.com/hashicorp/memberlist/config.go	2023-08-29 19:14:17.000000000 +0000
-+++ ./moby/vendor/github.com/hashicorp/memberlist/config.go	2023-10-15 10:27:35.821674009 +0000
+diff -uNr src.orig/moby/vendor/github.com/hashicorp/memberlist/config.go moby/vendor/github.com/hashicorp/memberlist/config.go
+--- src.orig/moby/vendor/github.com/hashicorp/memberlist/config.go	2023-08-29 22:14:17.000000000 +0300
++++ moby/vendor/github.com/hashicorp/memberlist/config.go	2024-02-01 20:20:22.708022228 +0200
 @@ -317,7 +317,7 @@
  		SecretKey: nil,
  		Keyring:   nil,
@@ -194,27 +155,3 @@ diff -ur ../src.orig/moby/vendor/github.com/hashicorp/memberlist/config.go ./mob
  
  		HandoffQueueDepth: 1024,
  		UDPBufferSize:     1400,
-diff -ur ../src.orig/moby/vendor/github.com/moby/buildkit/executor/oci/spec_unix.go ./moby/vendor/github.com/moby/buildkit/executor/oci/spec_unix.go
---- ../src.orig/moby/vendor/github.com/moby/buildkit/executor/oci/spec_unix.go	2023-08-29 19:14:17.000000000 +0000
-+++ ./moby/vendor/github.com/moby/buildkit/executor/oci/spec_unix.go	2023-10-15 10:27:35.918341016 +0000
-@@ -25,7 +25,7 @@
- 	return []oci.SpecOpts{
- 		// https://github.com/moby/buildkit/issues/429
- 		withRemovedMount("/run"),
--		withROBind(resolvConf, "/etc/resolv.conf"),
-+		withROBind(resolvConf, "@TERMUX_PREFIX@/etc/resolv.conf"),
- 		withROBind(hostsFile, "/etc/hosts"),
- 		withCGroup(),
- 	}, nil
-diff -ur ../src.orig/moby/vendor/github.com/moby/buildkit/executor/stubs.go ./moby/vendor/github.com/moby/buildkit/executor/stubs.go
---- ../src.orig/moby/vendor/github.com/moby/buildkit/executor/stubs.go	2023-08-29 19:14:17.000000000 +0000
-+++ ./moby/vendor/github.com/moby/buildkit/executor/stubs.go	2023-10-15 10:27:35.918341016 +0000
-@@ -12,7 +12,7 @@
- )
- 
- func MountStubsCleaner(dir string, mounts []Mount, recursive bool) func() {
--	names := []string{"/etc/resolv.conf", "/etc/hosts"}
-+	names := []string{"@TERMUX_PREFIX@/etc/resolv.conf", "/etc/hosts"}
- 
- 	for _, m := range mounts {
- 		names = append(names, m.Dest)
