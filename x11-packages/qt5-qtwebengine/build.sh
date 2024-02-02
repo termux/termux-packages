@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Qt 5 Web Engine Library"
 TERMUX_PKG_LICENSE="LGPL-3.0, LGPL-2.1, BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@licy183"
 TERMUX_PKG_VERSION="5.15.15"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/qt/qtwebengine
 TERMUX_PKG_GIT_BRANCH=v$TERMUX_PKG_VERSION-lts
 TERMUX_PKG_DEPENDS="dbus, fontconfig, libc++, libexpat, libjpeg-turbo, libminizip, libnspr, libnss, libpng, libsnappy, libvpx, libwebp, libx11, libxkbfile, qt5-qtbase, qt5-qtdeclarative, zlib"
@@ -13,8 +14,8 @@ TERMUX_PKG_HOSTBUILD=true
 termux_step_host_build() {
 	# Generate ffmpeg headers for i686
 	mkdir -p fake-bin
-	ln -s $(command -v clang-14) fake-bin/clang
-	ln -s $(command -v clang++-14) fake-bin/clang++
+	ln -s $(command -v clang-15) fake-bin/clang
+	ln -s $(command -v clang++-15) fake-bin/clang++
 	
 	PATH="$PWD/fake-bin:$PATH" python2 $TERMUX_PKG_SRCDIR/src/3rdparty/chromium/third_party/ffmpeg/chromium/scripts/build_ffmpeg.py --config-only linux noasm-ia32
 }
@@ -31,6 +32,9 @@ termux_step_configure() {
 	cd $TERMUX_PKG_SRCDIR
 	termux_setup_ninja
 	termux_setup_nodejs
+
+	# https://gitweb.gentoo.org/repo/gentoo.git/commit/?id=adb049350a5d4b15b5ee19739d9f2baed83f6acf
+	export LDFLAGS+=" -Wl,--undefined-version"
 
 	# Remove termux's dummy pkg-config
 	local _host_pkg_config="$(cat $(command -v pkg-config) | grep exec | awk '{print $2}')"

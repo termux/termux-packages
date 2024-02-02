@@ -2,9 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://termux.dev/
 TERMUX_PKG_DESCRIPTION="Basic system tools for Termux"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.39.5"
+TERMUX_PKG_VERSION="1.40.5"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/termux/termux-tools/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=9d645c9f4d30351b54f2a9fd835bbd8d964fb0e86574b4db6abe8bf24e0bc34d
+TERMUX_PKG_SHA256=08fcaf2a47b90b467038ac97ca152de4e31e29eb069959f01990ce112f476874
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_ESSENTIAL=true
 TERMUX_PKG_AUTO_UPDATE=true
@@ -23,7 +24,7 @@ etc/termux-login.sh
 # Some of these packages are not dependencies and used only to ensure
 # that core packages are installed after upgrading (we removed busybox
 # from essentials).
-TERMUX_PKG_DEPENDS="bzip2, coreutils, curl, dash, diffutils, findutils, gawk, grep, gzip, less, procps, psmisc, sed, tar, termux-am, termux-am-socket (>= 1.5.0), termux-exec, util-linux, xz-utils, dialog"
+TERMUX_PKG_DEPENDS="bzip2, coreutils, curl, dash, diffutils, findutils, gawk, grep, gzip, less, procps, psmisc, sed, tar, termux-am (>= 0.8.0), termux-am-socket (>= 1.5.0), termux-exec, util-linux, xz-utils, dialog"
 
 # Optional packages that are distributed as part of bootstrap archives.
 TERMUX_PKG_RECOMMENDS="ed, dos2unix, inetutils, net-tools, patch, unzip"

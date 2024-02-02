@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Spatial database extender for PostgreSQL object-relation
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.4.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.osgeo.org/postgis/source/postgis-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=fef6a141213d0ff27bf45b33b849cc396c22ddb1ffc6fed435469c9e891fc81d
 TERMUX_PKG_AUTO_UPDATE=true

@@ -1,0 +1,207 @@
+--- a/gfx/vr/external_api/moz_external_vr.h
++++ b/gfx/vr/external_api/moz_external_vr.h
+@@ -69,7 +69,7 @@
+ static const int kVRLayerMaxCount = 8;
+ static const int kVRHapticsMaxCount = 32;
+ 
+-#if defined(__ANDROID__)
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ typedef uint64_t VRLayerTextureHandle;
+ #elif defined(XP_MACOSX)
+ typedef uint32_t VRLayerTextureHandle;
+@@ -498,7 +498,7 @@
+ };
+ 
+ struct VRBrowserState {
+-#if defined(__ANDROID__)
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+   bool shutdown;
+ #endif  // defined(__ANDROID__)
+   /**
+@@ -610,7 +610,7 @@
+ struct VRExternalShmem {
+   int32_t version;
+   int32_t size;
+-#if defined(__ANDROID__)
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+   pthread_mutex_t systemMutex;
+   pthread_mutex_t geckoMutex;
+   pthread_mutex_t servoMutex;
+@@ -621,14 +621,14 @@
+   int64_t generationA;
+ #endif  // defined(__ANDROID__)
+   VRSystemState state;
+-#if !defined(__ANDROID__)
++#if !(defined(__ANDROID__) && !defined(__TERMUX__))
+   int64_t generationB;
+   int64_t geckoGenerationA;
+   int64_t servoGenerationA;
+ #endif  // !defined(__ANDROID__)
+   VRBrowserState geckoState;
+   VRBrowserState servoState;
+-#if !defined(__ANDROID__)
++#if !(defined(__ANDROID__) && !defined(__TERMUX__))
+   int64_t geckoGenerationB;
+   int64_t servoGenerationB;
+ #endif  // !defined(__ANDROID__)
+--- a/ipc/chromium/src/base/lock_impl_posix.cc
++++ b/ipc/chromium/src/base/lock_impl_posix.cc
+@@ -22,7 +22,7 @@
+ // Lock::PriorityInheritanceAvailable still must be checked as the code may
+ // compile but the underlying platform still may not correctly support priority
+ // inheritance locks.
+-#if defined(OS_NACL) || defined(OS_ANDROID)
++#if defined(OS_NACL) || defined(OS_ANDROID) || defined(__TERMUX__)
+ #  define PRIORITY_INHERITANCE_LOCKS_POSSIBLE() 0
+ #else
+ #  define PRIORITY_INHERITANCE_LOCKS_POSSIBLE() 1
+--- a/tools/profiler/core/platform.cpp
++++ b/tools/profiler/core/platform.cpp
+@@ -101,7 +101,7 @@
+ #include <string_view>
+ #include <type_traits>
+ 
+-#if defined(GP_OS_android)
++#if defined(GP_OS_android) && !defined(__TERMUX__)
+ #  include "JavaExceptions.h"
+ #  include "mozilla/java/GeckoJavaSamplerNatives.h"
+ #  include "mozilla/jni/Refs.h"
+@@ -227,7 +227,7 @@
+ 
+ mozilla::Atomic<int, mozilla::MemoryOrdering::Relaxed> gSkipSampling;
+ 
+-#if defined(GP_OS_android)
++#if defined(GP_OS_android) && !defined(__TERMUX__)
+ class GeckoJavaSampler
+     : public java::GeckoJavaSampler::Natives<GeckoJavaSampler> {
+  private:
+@@ -334,7 +334,7 @@
+ #undef ADD_FEATURE
+ 
+   // Now remove features not supported on this platform/configuration.
+-#if !defined(GP_OS_android)
++#if !(defined(GP_OS_android) && !defined(__TERMUX__))
+   ProfilerFeature::ClearJava(features);
+ #endif
+ #if !defined(HAVE_NATIVE_UNWIND)
+@@ -2928,7 +2928,7 @@
+                         aPreRecordedMetaInformation.mProcessInfoCpuCount);
+   }
+ 
+-#if defined(GP_OS_android)
++#if defined(GP_OS_android) && !defined(__TERMUX__)
+   jni::String::LocalRef deviceInformation =
+       java::GeckoJavaSampler::GetDeviceInformation();
+   aWriter.StringProperty("device", deviceInformation->ToCString());
+@@ -2990,7 +2990,7 @@
+   }
+ }
+ 
+-#if defined(GP_OS_android)
++#if defined(GP_OS_android) && !defined(__TERMUX__)
+ template <int N>
+ static bool StartsWith(const nsACString& string, const char (&prefix)[N]) {
+   if (N - 1 > string.Length()) {
+@@ -3223,7 +3223,7 @@
+   }
+   SLOW_DOWN_FOR_TESTING();
+ 
+-#if defined(GP_OS_android)
++#if defined(GP_OS_android) && !defined(__TERMUX__)
+   // Java thread profile data should be collected before serializing the meta
+   // object. This is because Java thread adds some markers with marker schema
+   // objects. And these objects should be added before the serialization of the
+@@ -3361,7 +3361,7 @@
+     }
+     aProgressLogger.SetLocalProgress(92_pc, "Wrote samples and markers");
+ 
+-#if defined(GP_OS_android)
++#if defined(GP_OS_android) && !defined(__TERMUX__)
+     if (ActivePS::FeatureJava(aLock)) {
+       for (java::GeckoJavaSampler::ThreadInfo::LocalRef& threadInfo :
+            javaThreads) {
+@@ -5134,7 +5134,7 @@
+     // Platform-specific initialization.
+     PlatformInit(lock);
+ 
+-#if defined(GP_OS_android)
++#if defined(GP_OS_android) && !defined(__TERMUX__)
+     if (jni::IsAvailable()) {
+       GeckoJavaSampler::Init();
+     }
+@@ -5841,7 +5841,7 @@
+   // Setup support for pushing/popping labels in mozglue.
+   RegisterProfilerLabelEnterExit(MozGlueLabelEnter, MozGlueLabelExit);
+ 
+-#if defined(GP_OS_android)
++#if defined(GP_OS_android) && !defined(__TERMUX__)
+   if (ActivePS::FeatureJava(aLock)) {
+     int javaInterval = interval;
+     // Java sampling doesn't accurately keep up with the sampling rate that is
+@@ -6011,7 +6011,7 @@
+     StopAudioCallbackTracing();
+   }
+ 
+-#if defined(GP_OS_android)
++#if defined(GP_OS_android) && !defined(__TERMUX__)
+   if (ActivePS::FeatureJava(aLock)) {
+     java::GeckoJavaSampler::Stop();
+   }
+@@ -6162,7 +6162,7 @@
+       return GenericPromise::CreateAndResolve(/* unused */ true, __func__);
+     }
+ 
+-#if defined(GP_OS_android)
++#if defined(GP_OS_android) && !defined(__TERMUX__)
+     if (ActivePS::FeatureJava(lock) && !ActivePS::IsSamplingPaused(lock)) {
+       // Not paused yet, so this is the first pause, let Java know.
+       // TODO: Distinguish Pause and PauseSampling in Java.
+@@ -6198,7 +6198,7 @@
+     ActivePS::SetIsPaused(lock, false);
+     RacyFeatures::SetUnpaused();
+ 
+-#if defined(GP_OS_android)
++#if defined(GP_OS_android) && !defined(__TERMUX__)
+     if (ActivePS::FeatureJava(lock) && !ActivePS::IsSamplingPaused(lock)) {
+       // Not paused anymore, so this is the last unpause, let Java know.
+       // TODO: Distinguish Unpause and UnpauseSampling in Java.
+@@ -6240,7 +6240,7 @@
+       return GenericPromise::CreateAndResolve(/* unused */ true, __func__);
+     }
+ 
+-#if defined(GP_OS_android)
++#if defined(GP_OS_android) && !defined(__TERMUX__)
+     if (ActivePS::FeatureJava(lock) && !ActivePS::IsSamplingPaused(lock)) {
+       // Not paused yet, so this is the first pause, let Java know.
+       // TODO: Distinguish Pause and PauseSampling in Java.
+@@ -6277,7 +6277,7 @@
+     ActivePS::SetIsSamplingPaused(lock, false);
+     RacyFeatures::SetSamplingUnpaused();
+ 
+-#if defined(GP_OS_android)
++#if defined(GP_OS_android) && !defined(__TERMUX__)
+     if (ActivePS::FeatureJava(lock) && !ActivePS::IsSamplingPaused(lock)) {
+       // Not paused anymore, so this is the last unpause, let Java know.
+       // TODO: Distinguish Unpause and UnpauseSampling in Java.
+--- a/dom/media/CubebUtils.cpp
++++ b/dom/media/CubebUtils.cpp
+@@ -57,7 +57,7 @@
+ #define PREF_AUDIOIPC_STACK_SIZE "media.audioipc.stack_size"
+ #define PREF_AUDIOIPC_SHM_AREA_SIZE "media.audioipc.shm_area_size"
+ 
+-#if (defined(XP_LINUX) && !defined(MOZ_WIDGET_ANDROID)) || \
++#if (defined(XP_LINUX) && !defined(__TERMUX__)) || \
+     defined(XP_MACOSX) || defined(XP_WIN)
+ #  define MOZ_CUBEB_REMOTING
+ #endif
+--- a/mozglue/misc/StackWalk.cpp
++++ b/mozglue/misc/StackWalk.cpp
+@@ -692,7 +692,7 @@
+   stackEnd = __libc_stack_end;
+ #    elif defined(XP_DARWIN)
+   stackEnd = pthread_get_stackaddr_np(pthread_self());
+-#    elif defined(ANDROID)
++#    elif defined(ANDROID) || defined(__TERMUX__)
+   pthread_attr_t sattr;
+   pthread_attr_init(&sattr);
+   pthread_getattr_np(pthread_self(), &sattr);

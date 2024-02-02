@@ -1,0 +1,34 @@
+From 3b135b1a8a575a3cf0718c697e546ea192dfb88d Mon Sep 17 00:00:00 2001
+From: Paul Wise <pabs@debian.org>
+Date: Sun, 24 Jul 2022 16:40:28 +0800
+Subject: [PATCH] Declare operator<< functions used by cppunit before they are
+ used.
+
+Solves a build failure with GCC 12 and clang.
+
+Fixes: https://bugs.debian.org/1012895
+---
+ tests/test_parsers.cc | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/tests/test_parsers.cc b/tests/test_parsers.cc
+index 1bcc8e31..afb046f6 100644
+--- a/tests/test_parsers.cc
++++ b/tests/test_parsers.cc
+@@ -20,6 +20,14 @@
+ 
+ #include <generic/util/parsers.h>
+ 
++// These are used by cppunit so they must be declared early.
++
++template<typename T>
++std::ostream &operator<<(std::ostream &out, const std::optional<T> &o);
++
++template<typename T>
++std::ostream &operator<<(std::ostream &out, const std::vector<T> &v);
++
+ #include <cppunit/extensions/HelperMacros.h>
+ 
+ #include <boost/fusion/container/generation/make_vector.hpp>
+-- 
+2.36.1

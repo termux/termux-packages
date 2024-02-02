@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://jpegxl.info/
 TERMUX_PKG_DESCRIPTION="JPEG XL image format reference implementation"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.8.2"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="0.9.1"
 TERMUX_PKG_SRCURL=https://github.com/libjxl/libjxl/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=c70916fb3ed43784eb840f82f05d390053a558e2da106e40863919238fa7b420
+TERMUX_PKG_SHA256=a0e72e9ece26878147069ad4888ac3382021d4bbee71c2e1b687d5bde7fd7e01
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="brotli, libc++"
 TERMUX_PKG_NO_STATICSPLIT=true
@@ -17,7 +16,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_post_get_source() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them
 	# after RELEASE / SOVERSION is changed.
-	local _SOVERSION=0.8
+	local _SOVERSION=0.9
 
 	for a in MAJOR SO_MINOR; do
 		local _${a}=$(sed -En 's/^set\(JPEGXL_'"${a}"'_VERSION\s+([0-9]+).*/\1/p' \

@@ -11,15 +11,15 @@
  is_local = (not is_pyinstaller and not is_android and not is_appimage
 --- a/electrum/logging.py
 +++ b/electrum/logging.py
-@@ -350,7 +350,7 @@
+@@ -354,7 +354,7 @@
  
  
  def describe_os_version() -> str:
 -    if 'ANDROID_DATA' in os.environ:
 +    if False:
-         #from kivy import utils
-         #if utils.platform != "android":
-         #    return utils.platform
+         import jnius
+         bv = jnius.autoclass('android.os.Build$VERSION')
+         b = jnius.autoclass('android.os.Build')
 --- a/electrum/simple_config.py
 +++ b/electrum/simple_config.py
 @@ -280,7 +280,7 @@

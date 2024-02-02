@@ -3,7 +3,7 @@
 termux_step_setup_cgct_environment() {
 	[ "$TERMUX_ON_DEVICE_BUILD" = "true" ] && return
 
-	for PKG in glibc linux-api-headers-glibc; do
+	for PKG in gcc-libs-glibc glibc linux-api-headers-glibc; do
 		local PKG_DIR=$(ls ${TERMUX_SCRIPTDIR}/*/${PKG}/build.sh 2> /dev/null || \
 			ls ${TERMUX_SCRIPTDIR}/*/${PKG/-glibc/}/build.sh 2> /dev/null)
 		if [ -z "$PKG_DIR" ]; then
@@ -12,8 +12,9 @@ termux_step_setup_cgct_environment() {
 		local PKG_DIR_SPLIT=(${PKG_DIR//// })
 
 		local REPO_NAME=""
-		for idx in ${!TERMUX_REPO_DISTRIBUTION[@]}; do
-			if [ "${TERMUX_REPO_DISTRIBUTION[$idx]}" = "${PKG_DIR_SPLIT[-3]}" ]; then
+		local LIST_PACKAGES_DIRECTORIES=(${TERMUX_PACKAGES_DIRECTORIES})
+		for idx in ${!LIST_PACKAGES_DIRECTORIES[@]}; do
+			if [ "${LIST_PACKAGES_DIRECTORIES[$idx]}" = "${PKG_DIR_SPLIT[-3]}" ]; then
 				REPO_NAME=$(echo "${TERMUX_REPO_URL[$idx]}" | sed -e 's%https://%%g' -e 's%http://%%g' -e 's%/%-%g')
 				if [ "$TERMUX_REPO_PKG_FORMAT" = "debian" ]; then
 					REPO_NAME+="-${TERMUX_REPO_DISTRIBUTION[$idx]}-Release"

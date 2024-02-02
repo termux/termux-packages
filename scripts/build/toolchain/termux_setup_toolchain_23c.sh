@@ -181,6 +181,11 @@ termux_setup_toolchain_23c() {
 		fi
 	done
 
+	# rust 1.75.0+ expects this directory to be present
+	rm -fr "${_TERMUX_TOOLCHAIN_TMPDIR}"/toolchains
+	mkdir -p "${_TERMUX_TOOLCHAIN_TMPDIR}"/toolchains/llvm/prebuilt
+	ln -fs ../../.. "${_TERMUX_TOOLCHAIN_TMPDIR}"/toolchains/llvm/prebuilt/linux-x86_64
+
 	# Create a pkg-config wrapper. We use path to host pkg-config to
 	# avoid picking up a cross-compiled pkg-config later on.
 	local _HOST_PKGCONFIG
@@ -213,7 +218,7 @@ termux_setup_toolchain_23c() {
 	# Remove <spawn.h> as it's only for future (later than android-27).
 	# Remove <zlib.h> and <zconf.h> as we build our own zlib.
 	# Remove unicode headers provided by libicu.
-	# Remove KRH/khrplatform.h provided by mesa.
+	# Remove KHR/khrplatform.h provided by mesa.
 	# Remove NDK vulkan headers.
 	rm usr/include/{sys/{capability,shm,sem},{glob,iconv,spawn,zlib,zconf},KHR/khrplatform}.h
 	rm usr/include/unicode/{char16ptr,platform,ptypes,putil,stringoptions,ubidi,ubrk,uchar,uconfig,ucpmap,udisplaycontext,uenum,uldnames,ulocdata,uloc,umachine,unorm2,urename,uscript,ustring,utext,utf16,utf8,utf,utf_old,utypes,uvernum,uversion}.h

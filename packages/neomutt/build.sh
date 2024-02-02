@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="A version of mutt with added features"
 # License: GPL-2.0-or-later
 TERMUX_PKG_LICENSE="GPL-2.0, GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="20231103"
+TERMUX_PKG_VERSION="20231221"
 TERMUX_PKG_SRCURL=https://github.com/neomutt/neomutt/archive/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=d8712c8f852f1cae4d5f53d8f7db3d2cc7ce7a11f54df3fc6e5417995d02bae8
+TERMUX_PKG_SHA256=b2add3823db78d8c0a86507ef3b244a3487d7e7a70c0d9e4e4b136acda9004d2
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d{8}"
 TERMUX_PKG_DEPENDS="gdbm, krb5, libandroid-support, libiconv, libsasl, ncurses, notmuch, openssl, zlib, zstd"

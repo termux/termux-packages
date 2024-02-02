@@ -30,9 +30,9 @@ jobs:
       - name: Create bootstrap archive
         run: ./scripts/generate-bootstraps.sh --architectures ${{ matrix.arch }}
       - name: Store artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: bootstrap-archives-${{ github.sha }}
+          name: bootstrap-archives-${{ matrix.arch }}-${{ github.sha }}
           path: "*.zip"
   publish:
     permissions:
@@ -45,9 +45,9 @@ jobs:
         with:
           fetch-depth: 0
       - name: Fetch bootstrap archives
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: bootstrap-archives-${{ github.sha }}
+          merge-multiple: true
           path: ./
       - name: Create new tag
         id: get_tag

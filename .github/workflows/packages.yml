@@ -169,7 +169,7 @@ jobs:
           ./scripts/lint-packages.sh $package_recipes
         fi
 
-    - name: Build packages
+    - name: Free additional disk space (if necessary)
       run: |
         declare -a packages
         for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
@@ -184,10 +184,27 @@ jobs:
           if grep -qP "(^|\\s)${packages// /($|\\s)|(^|\\s)}($|\\s)" ./scripts/big-pkgs.list; then
             ./scripts/setup-ubuntu.sh
             sudo apt install ninja-build
-            sudo apt purge -yq $(dpkg -l | grep '^ii' | awk '{ print $2 }' | grep -P '(aspnetcore|cabal-|dotnet-|ghc-|libmono|php)') \
-              firefox google-chrome-stable microsoft-edge-stable mono-runtime-common monodoc-manual ruby
+            sudo apt purge -yq $(dpkg -l | grep '^ii' | awk '{ print $2 }' | grep -P '(aspnetcore|cabal-|dotnet-|ghc-|libmono|mongodb-|mysql-|php)') \
+              firefox google-chrome-stable microsoft-edge-stable mono-devel mono-runtime-common monodoc-manual ruby
             sudo apt autoremove -yq
-            sudo rm -fr /opt/hostedtoolcache /usr/share/dotnet /usr/share/swift
+            sudo apt clean
+            sudo rm -fr /opt/hostedtoolcache /usr/lib/node_modules /usr/share/dotnet /usr/share/swift
+          fi
+        fi
+
+    - name: Build packages
+      run: |
+        declare -a packages
+        for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
+          repo=$(jq --raw-output '.["'${repo_path}'"].name' repo.json)
+
+          if [ -f ./built_${repo}_packages.txt ]; then
+            packages="$packages $(cat ./built_${repo}_packages.txt | tr '\n' ' ')"
+          fi
+        done
+
+        if [ ! -z "$packages" ]; then
+          if grep -qP "(^|\\s)${packages// /($|\\s)|(^|\\s)}($|\\s)" ./scripts/big-pkgs.list; then
             NDK=$ANDROID_NDK_LATEST_HOME ANDROID_HOME=$ANDROID_SDK_ROOT ./build-package.sh -I -a ${{ matrix.target_arch }} $packages
           else
             ./scripts/run-docker.sh ./build-package.sh -I -a ${{ matrix.target_arch }} $packages
@@ -224,7 +241,7 @@ jobs:
         find debs -type f -name "*.deb" -exec sha256sum "{}" \; | sort -k2
     - name: Store *.deb files
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: debs-${{ matrix.target_arch }}-${{ github.sha }}
         path: ./artifacts
@@ -240,7 +257,7 @@ jobs:
     - name: Clone repository
       uses: actions/checkout@v4
     - name: Get *.deb files
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         path: ./
     - name: Upload to packages.termux.dev

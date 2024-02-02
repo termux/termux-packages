@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.erlang.org/
 TERMUX_PKG_DESCRIPTION="General-purpose concurrent functional programming language"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="26.1.2"
+TERMUX_PKG_VERSION="26.2.1"
 TERMUX_PKG_SRCURL=https://github.com/erlang/otp/archive/OTP-$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=56042d53b30863d4e720ebf463d777f0502f8c986957fc3a9e63dae870bbafe0
+TERMUX_PKG_SHA256=d99eab3af908b41dd4d7df38f0b02a447579326dd6604f641bbe9f2789b5656b
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP='\d+(\.\d+)+'
 TERMUX_PKG_DEPENDS="libc++, openssl, ncurses, zlib"
@@ -45,4 +45,13 @@ termux_step_host_build() {
 termux_step_pre_configure() {
 	# Add --build flag for erlang cross build
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --build=$(./erts/autoconf/config.guess)"
+
+	# Use a wrapper CC to move `-I@TERMUX_PREFIX@/include` to the last include param
+	mkdir -p $TERMUX_PKG_TMPDIR/_fake_bin
+	sed -e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
+		-e "s|@COMPILER@|$(command -v ${CC})|g" \
+		"$TERMUX_PKG_BUILDER_DIR"/wrapper.py.in \
+		> $TERMUX_PKG_TMPDIR/_fake_bin/"$(basename ${CC})"
+	chmod +x $TERMUX_PKG_TMPDIR/_fake_bin/"$(basename ${CC})"
+	export PATH="$TERMUX_PKG_TMPDIR/_fake_bin:$PATH"
 }

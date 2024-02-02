@@ -1,4 +1,5 @@
-TERMUX_SUBPKG_DESCRIPTION="Rust development compiler libs"
-_VERSION=${TERMUX_PKG_VERSION//~*}
-_INCLUDED=$(sed 's/^.....//' "${TERMUX_PKG_BUILDDIR}/rustc-dev-${_VERSION}-${CARGO_TARGET_NAME}/rustc-dev/manifest.in" | grep -v '\.so$')
-TERMUX_SUBPKG_INCLUDE="${_INCLUDED}"
+TERMUX_SUBPKG_DESCRIPTION="Rust compiler development libs"
+TERMUX_SUBPKG_DEPEND_ON_PARENT=no
+TERMUX_SUBPKG_BREAKS="rust (<< 1.74.1-1)"
+TERMUX_SUBPKG_REPLACES="rust (<< 1.74.1-1)"
+TERMUX_SUBPKG_INCLUDE="${_INCLUDED-}"

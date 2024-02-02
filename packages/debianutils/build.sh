@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://packages.debian.org/debianutils
 TERMUX_PKG_DESCRIPTION="Small utilities which are used primarily by the installation scripts of Debian packages"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="5.14"
+TERMUX_PKG_VERSION="5.16"
 TERMUX_PKG_SRCURL=https://deb.debian.org/debian/pool/main/d/debianutils/debianutils_${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=531a9542b4054bfb4c26a9fd5f1e6489fc728f52785270ddd9434c14a56b1108
+TERMUX_PKG_SHA256=eeb069c2639906f4181214dd1c4e448bc825229b0250ebf66f69c7344e8aa1e0
 TERMUX_PKG_AUTO_UPDATE=true
 
 TERMUX_PKG_RM_AFTER_INSTALL="

@@ -1,0 +1,18 @@
+Description: Fix bashism-related issue with fixman i18n scripts
+ Simply calling them as script instead of forking them seems to do the trick.
+Author: Axel Beckert <abe@debian.org>
+Bug-Debian: https://bugs.debian.org/999383
+
+diff --git a/buildlib/docbook.mk b/buildlib/docbook.mk
+index 9ec1b433..de03f0b4 100644
+--- a/buildlib/docbook.mk
++++ b/buildlib/docbook.mk
+@@ -129,7 +129,7 @@ docbook-man-stamp: $(DOCBOOK_XML) aptitude-man.xsl aptitude-common.xsl
+ 	@if [ -x "$(srcdir)/fixman" ]; then \
+ 	  for i in $(DOCBOOK_MANS); do \
+ 	    echo "$(srcdir)/fixman $$i"; \
+-	    . $(srcdir)/fixman $$i; \
++	    $(srcdir)/fixman $$i; \
+           done; \
+         fi
+ 	touch docbook-man-stamp

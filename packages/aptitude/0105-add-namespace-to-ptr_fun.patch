@@ -1,0 +1,13 @@
+--- a/src/ui.cc
++++ b/src/ui.cc
+@@ -694,8 +694,8 @@
+ 	{
+ 	  really_quit_active = true;
+ 	  prompt_yesno(_("Really quit Aptitude?"), false,
+-		       cw::util::arg(sigc::bind(ptr_fun(do_really_quit_answer), true)),
+-		       cw::util::arg(sigc::bind(ptr_fun(do_really_quit_answer), false)));
++		       cw::util::arg(sigc::bind(sigc::ptr_fun(do_really_quit_answer), true)),
++		       cw::util::arg(sigc::bind(sigc::ptr_fun(do_really_quit_answer), false)));
+ 	}
+     }
+   else

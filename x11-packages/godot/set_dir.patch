@@ -51,19 +51,6 @@ index 786272b..2ddab17 100644
  	return true;
  #endif
  }
-diff --git a/thirdparty/openxr/src/common/platform_utils.hpp b/thirdparty/openxr/src/common/platform_utils.hpp
-index 85d5cda..0803317 100644
---- a/thirdparty/openxr/src/common/platform_utils.hpp
-+++ b/thirdparty/openxr/src/common/platform_utils.hpp
-@@ -118,7 +118,7 @@ static inline bool PlatformUtilsSetEnv(const char* name, const char* value) {
- }
- 
- // Prefix for the Apple global runtime JSON file name
--static const std::string rt_dir_prefix = "/usr/local/share/openxr/";
-+static const std::string rt_dir_prefix = "@TERMUX_PREFIX@/local/share/openxr/";
- static const std::string rt_filename = "/active_runtime.json";
- 
- static inline bool PlatformGetGlobalRuntimeFileName(uint16_t major_version, std::string& file_name) {
 diff --git a/thirdparty/openxr/src/loader/manifest_file.cpp b/thirdparty/openxr/src/loader/manifest_file.cpp
 index 1b0ef07..b1baded 100644
 --- a/thirdparty/openxr/src/loader/manifest_file.cpp

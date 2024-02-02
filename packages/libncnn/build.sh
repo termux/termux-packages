@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=4b97730b0d033b4dc2a790e5c35745e0dbf51569
 TERMUX_PKG_VERSION="20230627"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=git+https://github.com/Tencent/ncnn
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_SHA256=a81ee5b6df97830919f8ed8554c99a4f223976ed82eee0cc9f214de0ce53dd2a
@@ -59,7 +59,7 @@ termux_step_pre_configure() {
 	termux_setup_ninja
 	termux_setup_protobuf
 
-	CXXFLAGS+=" -std=c++14"
+	CXXFLAGS+=" -std=c++17"
 	LDFLAGS+=" $("${TERMUX_SCRIPTDIR}/packages/libprotobuf/interface_link_libraries.sh")"
 	LDFLAGS+=" -lutf8_range -lutf8_validity"
 	LDFLAGS+=" -landroid -ljnigraphics -llog"
