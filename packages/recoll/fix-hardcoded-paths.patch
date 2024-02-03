@@ -80,12 +80,12 @@
 @@ -5,7 +5,7 @@
  
  [Service]
- Type=simple
+ Type=exec
 -ExecStart=/usr/bin/recollindex -m -D -x -w 30 -c %h/.recoll/
 +ExecStart=@TERMUX_PREFIX@/bin/recollindex -m -D -x -w 30 -c %h/.recoll/
  Restart=on-failure
+ RestartSec=60
  
- [Install]
 --- a/index/recollindex@.service
 +++ b/index/recollindex@.service
 @@ -3,13 +3,13 @@
@@ -96,7 +96,7 @@
 +RequiresMountsFor=@TERMUX_HOME@
  
  [Service]
- Type=simple
+ Type=exec
  Restart=on-failure
  RestartSec=30
 -ExecStart=/usr/bin/recollindex -m -D -x -w 10 -c /home/%i/.recoll
