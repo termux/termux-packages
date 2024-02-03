@@ -1,8 +1,6 @@
-diff --git a/lib/inventory/metadata/metadata_linux.go b/lib/inventory/metadata/metadata_linux.go
-index 9ef14d8ef4..a7b25d4304 100644
---- a/lib/inventory/metadata/metadata_linux.go
-+++ b/lib/inventory/metadata/metadata_linux.go
-@@ -19,44 +19,20 @@ limitations under the License.
+--- teleport-15.0.0/lib/inventory/metadata/metadata_linux.go
++++ teleport-15.0.0 .mod/lib/inventory/metadata/metadata_linux.go
+@@ -21,45 +21,19 @@
  
  package metadata
  
@@ -13,7 +11,6 @@ index 9ef14d8ef4..a7b25d4304 100644
 -	"fmt"
 -	"strings"
 +	"runtime"
-+
 +	log "github.com/sirupsen/logrus"
  )
  
@@ -21,6 +18,7 @@ index 9ef14d8ef4..a7b25d4304 100644
 -// "ubuntu 22.04".
 +// fetchOSVersion returns "" if not on linux and not on darwin.
  func (c *fetchConfig) fetchOSVersion() string {
+-	// TODO(codingllama): Leverage lib/linux.ParseOSRelease here?
 -	filename := "/etc/os-release"
 -	out, err := c.read(filename)
 -	if err != nil {
