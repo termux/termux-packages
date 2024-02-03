@@ -16,6 +16,9 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, setuptools==67.8, docutils, myst_parser, sphinx_copybutton, sphinx_inline_tabs, sphinxcontrib.towncrier, completion"
 
 termux_step_post_make_install() {
+	if [ ! -e "$TERMUX_PYTHON_HOME/site-packages/pip-$TERMUX_PKG_VERSION.dist-info" ]; then
+		termux_error_exit "Package ${TERMUX_PKG_NAME} doesn't build properly."
+	fi
 	( # creating pip documentation
 		cd docs/
 		python pip_sphinxext.py
