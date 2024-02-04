@@ -8,6 +8,7 @@ termux_step_install_license() {
 		INSTALLED_LICENSES=()
 		COUNTER=1
 		while read -r LICENSE; do
+			[ -z "${LICENSE}" ] && continue
 			if [ ! -f "$TERMUX_PKG_SRCDIR/$LICENSE" ]; then
 				termux_error_exit "$TERMUX_PKG_SRCDIR/$LICENSE does not exist"
 			fi
