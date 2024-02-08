@@ -2,14 +2,29 @@ TERMUX_PKG_HOMEPAGE=https://yazi-rs.github.io/
 TERMUX_PKG_DESCRIPTION="Blazing fast terminal file manager written in Rust, based on async I/O"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.2.2"
+TERMUX_PKG_VERSION="0.2.3"
 TERMUX_PKG_SRCURL=https://github.com/sxyazi/yazi/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=ce830fc312fc7a9515abefbbc71c8d1a46515257e9d1c56165cf6ff2fa5404c7
+TERMUX_PKG_SHA256=61b6b0372360bbe2b720a75127bef9325b7d507d544235d6a548db01424553e9
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
-termux_step_make() {
+termux_step_pre_configure() {
 	termux_setup_rust
+
+	: "${CARGO_HOME:=$HOME/.cargo}"
+	export CARGO_HOME
+
+	cd $TERMUX_PKG_SRCDIR
+	cargo fetch --target "${CARGO_TARGET_NAME}"
+
+	local _patch=$TERMUX_PKG_BUILDER_DIR/tikv-jemalloc-sys-0.5.3+5.3.0-patched-src-lib.rs.diff
+	local d
+	for d in $CARGO_HOME/registry/src/*/tikv-jemalloc-sys-*; do
+		patch --silent -p1 -d ${d} < ${_patch} || :
+	done
+}
+
+termux_step_make() {
 	YAZI_GEN_COMPLETIONS=true cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
 }
 
