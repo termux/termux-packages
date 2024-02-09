@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/tree-sitter/tree-sitter
 TERMUX_PKG_DESCRIPTION="An incremental parsing system for programming tools"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.20.9"
+TERMUX_PKG_VERSION="0.21.0-pre-release-1"
 TERMUX_PKG_SRCURL=https://github.com/tree-sitter/tree-sitter/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=9b2fd489a7281e3a7e5e7cbbf3a974e5a6a115889ae65676d61b79bdae96464e
+TERMUX_PKG_SHA256=2e231021af39a188ea6de8c3c20800e366bee2e8fa477ae33681dc9de0731a3b
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
