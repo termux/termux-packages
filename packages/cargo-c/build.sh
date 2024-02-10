@@ -36,6 +36,10 @@ termux_step_pre_configure() {
 		$_CARGO_TARGET_LIBDIR/libz.so.1
 	ln -sfT $(readlink -f $TERMUX_PREFIX/lib/libz.so.tmp) \
 		$_CARGO_TARGET_LIBDIR/libz.so
+
+	if [[ "${TERMUX_ARCH}" == "x86_64" ]]; then
+		RUSTFLAGS+=" -C link-arg=$($CC -print-libgcc-file-name)"
+	fi
 }
 
 termux_step_post_make_install() {
