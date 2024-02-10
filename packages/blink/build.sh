@@ -2,11 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://justine.lol/blinkenlights/
 TERMUX_PKG_DESCRIPTION="Tiny x86-64 Linux emulator"
 TERMUX_PKG_LICENSE="ISC"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1:1.0.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="1:1.1.0"
 TERMUX_PKG_SRCURL=https://github.com/jart/blink/archive/refs/tags/${TERMUX_PKG_VERSION#*:}.tar.gz
-TERMUX_PKG_SHA256=09ffc3cdb57449111510bbf2f552b3923d82a983ef032ee819c07f5da924c3a6
+TERMUX_PKG_SHA256=2649793e1ebf12027f5e240a773f452434cefd9494744a858cd8bff8792dba68
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_pre_configure() {
 	# build system does not work with cross compilers
