@@ -1,0 +1,47 @@
+--- a/src/core/hook/wee-hook-url.c
++++ b/src/core/hook/wee-hook-url.c
+@@ -32,6 +32,10 @@
+ #include <errno.h>
+ #include <pthread.h>
+ 
++#ifdef __ANDROID__
++#include <stdatomic.h>
++#endif
++
+ #include "../weechat.h"
+ #include "../wee-hashtable.h"
+ #include "../wee-hook.h"
+@@ -205,7 +209,11 @@
+                 HOOK_URL(hook, url),
+                 ((float)HOOK_URL(hook, timeout)) / 1000);
+         }
++#ifndef __ANDROID__
+         pthread_cancel (HOOK_URL(hook, thread_id));
++#else
++        atomic_flag_clear(&(HOOK_URL(hook, thread_cancel)));
++#endif
+         usleep (1000);
+         unhook (hook);
+     }
+@@ -227,6 +235,9 @@
+     HOOK_URL(hook, thread_running) = 1;
+ 
+     /* create thread */
++#ifdef __ANDROID__
++    atomic_flag_test_and_set(&(HOOK_URL(hook, thread_cancel)));
++#endif
+     rc = pthread_create (&(HOOK_URL(hook, thread_id)), NULL,
+                          &hook_url_transfer_thread, hook);
+     if (rc != 0)
+@@ -383,7 +394,11 @@
+     }
+     if (HOOK_URL(hook, thread_running))
+     {
++#ifndef __ANDROID__
+         pthread_cancel (HOOK_URL(hook, thread_id));
++#else
++        atomic_flag_clear(&(HOOK_URL(hook, thread_cancel)));
++#endif
+         HOOK_URL(hook, thread_running) = 0;
+     }
+     if (HOOK_URL(hook, thread_created))
