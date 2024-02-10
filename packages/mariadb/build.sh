@@ -2,15 +2,17 @@ TERMUX_PKG_HOMEPAGE=https://mariadb.org
 TERMUX_PKG_DESCRIPTION="A drop-in replacement for mysql server"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2:11.1.2"
+TERMUX_PKG_VERSION="2:11.2.3"
 TERMUX_PKG_SRCURL=https://mirror.netcologne.de/mariadb/mariadb-${TERMUX_PKG_VERSION#*:}/source/mariadb-${TERMUX_PKG_VERSION#*:}.tar.gz
-TERMUX_PKG_SHA256=19a9e980e57fa332931f643b48ad7390528c889ff6ea8b0e16fd306aa3088238
-TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_SHA256=14a0bba0c2847eb3f69a4637f55798f8abe10904cd1dd22899c9b0a39c43e35f
 TERMUX_PKG_DEPENDS="libandroid-support, libc++, libcrypt, libedit, liblz4, liblzma, ncurses, openssl, pcre2, zlib"
 TERMUX_PKG_BREAKS="mariadb-dev"
+TERMUX_PKG_CONFLICTS="mysql"
 TERMUX_PKG_REPLACES="mariadb-dev"
 TERMUX_PKG_SERVICE_SCRIPT=("mysqld" "exec mysqld --basedir=$TERMUX_PREFIX --datadir=$TERMUX_PREFIX/var/lib/mysql 2>&1")
-
+TERMUX_PKG_HOSTBUILD=true
+TERMUX_CMAKE_BUILD="Unix Makefiles"
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DBISON_EXECUTABLE=$(command -v bison)
 -DGETCONF=$(command -v getconf)
@@ -58,10 +60,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DMASK_LONGDOUBLE_EXITCODE=1
 -DINSTALL_SYSCONFDIR=$TERMUX_PREFIX/etc
 "
-TERMUX_PKG_HOSTBUILD=true
-TERMUX_CMAKE_BUILD="Unix Makefiles"
-TERMUX_PKG_CONFLICTS="mysql"
-
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/mysqltest*
 share/man/man1/mysql-test-run.pl.1
