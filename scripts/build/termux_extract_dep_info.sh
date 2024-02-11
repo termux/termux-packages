@@ -17,7 +17,7 @@ termux_extract_dep_info() {
 				   [ "${PKG/-static/}-static" != "${PKG}" ]; then
 				if [ -f "${PKG_DIR}/${PKG}.subpackage.sh" ]; then
 					source ${PKG_DIR}/${PKG}.subpackage.sh
-				else
+				elif [ -f "${PKG_DIR}/${PKG/-glibc/}.subpackage.sh" ]; then
 					source ${PKG_DIR}/${PKG/-glibc/}.subpackage.sh
 				fi
 			fi
