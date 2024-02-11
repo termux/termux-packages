@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Library implementing the SSL and TLS protocols as well a
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1:3.2.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.openssl.org/source/openssl-${TERMUX_PKG_VERSION:2}.tar.gz
 TERMUX_PKG_SHA256=83c7329fe52c850677d75e5d0b0ca245309b97e8ecbcfdc1dfdc4ab9fac35b39
 TERMUX_PKG_AUTO_UPDATE=false
@@ -37,7 +38,8 @@ termux_step_configure() {
 		no-ssl \
 		no-hw \
 		no-srp \
-		no-tests
+		no-tests \
+		enable-tls1_3
 }
 
 termux_step_make() {
