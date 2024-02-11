@@ -1,6 +1,6 @@
-_COMMIT=105d70f7b4ce7706652853ece2e35ea8c774005f
-_COMMIT_DATE=20240205
-_COMMIT_SHA256=052d23edee1d946e7e9c5eab2b2489a74e48885860ba1cf7efdcf91cb603c875
+_COMMIT=4e91d38ddcdb659a4b2c298850c6ccf115073748
+_COMMIT_DATE=20240225
+_COMMIT_SHA256=26974776737d9da876395cc72a005a63526e305aeaa28ebf84c56778a8d9fdac
 
 TERMUX_PKG_HOMEPAGE=https://bellard.org/tcc/
 TERMUX_PKG_DESCRIPTION="Tiny C Compiler"
@@ -52,8 +52,4 @@ termux_step_make() {
 	./configure --targetos=Termux --cpu="$TERMUX_ARCH"
 	make -j $TERMUX_PKG_MAKE_PROCESSES tcc
 	make doc
-}
-
-termux_step_make_install() {
-	make install
 }
