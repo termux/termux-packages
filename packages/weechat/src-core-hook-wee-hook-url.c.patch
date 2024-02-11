@@ -11,6 +11,45 @@
  #include "../weechat.h"
  #include "../wee-hashtable.h"
  #include "../wee-hook.h"
+@@ -126,6 +126,24 @@
+  * URL transfer (in a separate thread).
+  */
+ 
++static void thread_testcancel (void *args)
++{
++#ifndef __ANDROID__
++    (void) args;
++    pthread_test_cancel ();
++#else
++    if (!atomic_flag_test_and_set ((atomic_flag *) args))
++    {
++        pthread_exit (NULL);
++    }
++#endif
++}
++
++int
++weeurl_download_internal (const char *url, struct t_hashtable *options,
++                 struct t_hashtable *output, void (thread_testcancel_func)(void *args),
++                 void *thread_test_cancel_args);
++
+ void *
+ hook_url_transfer_thread (void *hook_pointer)
+ {
+@@ -137,9 +150,11 @@
+ 
+     pthread_cleanup_push (&hook_url_thread_cleanup, hook);
+ 
+-    url_rc = weeurl_download (HOOK_URL(hook, url),
++    url_rc = weeurl_download_internal (HOOK_URL(hook, url),
+                               HOOK_URL(hook, options),
+-                              HOOK_URL(hook, output));
++                              HOOK_URL(hook, output),
++                              thread_testcancel,
++                              &HOOK_URL(hook, thread_cancel));
+ 
+     if (url_rc != 0)
+     {
 @@ -205,7 +209,11 @@
                  HOOK_URL(hook, url),
                  ((float)HOOK_URL(hook, timeout)) / 1000);
