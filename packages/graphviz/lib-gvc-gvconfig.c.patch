@@ -15,6 +15,6 @@
  #else
 -    static const char SO[] = ".so.";
 +    static const char SO[] = ".so";
-     if (len < strlen(SO)
-         || strncmp(filepath + len - strlen(SO), SO, strlen(SO)) != 0) {
+     if (len < strlen(SO) || !startswith(filepath + len - strlen(SO), SO)) {
  	return false;
+     }
