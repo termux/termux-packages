@@ -10,7 +10,7 @@ TERMUX_PKG_DEPENDS="libflac, libogg, libopus, libvorbis"
 TERMUX_PKG_BREAKS="libsndfile-dev"
 TERMUX_PKG_REPLACES="libsndfile-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
---disable-sqliter
+--disable-sqlite
 --disable-alsa
 --disable-mpeg
 "
