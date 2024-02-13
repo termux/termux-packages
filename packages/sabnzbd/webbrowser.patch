@@ -2,7 +2,7 @@ diff --git a/sabnzbd/panic.py b/sabnzbd/panic.py
 index 6e4b61f72..017dc9407 100644
 --- a/sabnzbd/panic.py
 +++ b/sabnzbd/panic.py
-@@ -24,10 +24,6 @@
+@@ -24,10 +24,7 @@ import logging
  import tempfile
  import ctypes
 
@@ -10,10 +10,11 @@ index 6e4b61f72..017dc9407 100644
 -    import webbrowser
 -except ImportError:
 -    webbrowser = None
++import subprocess
 
  import sabnzbd
  import sabnzbd.cfg as cfg
-@@ -240,10 +236,7 @@
+@@ -240,10 +237,7 @@ def launch_a_browser(url, force=False):
      try:
          if url and not url.startswith("http"):
              url = "file:///%s" % url
