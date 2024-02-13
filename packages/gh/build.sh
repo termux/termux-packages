@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="Krishna kanhaiya @kcubeterm"
 TERMUX_PKG_VERSION="2.43.1"
 TERMUX_PKG_SRCURL=https://github.com/cli/cli/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=1ea3f451fb7002c1fb95a7fab21e9ab16591058492628fe264c5878e79ec7c90
+TERMUX_PKG_DEPENDS="openssh"
 TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make() {
