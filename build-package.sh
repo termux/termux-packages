@@ -619,8 +619,8 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 
 		termux_step_start_build
 
-		if ! termux_check_package_in_building_packages_list "$TERMUX_PKG_NAME"; then
-			echo "$TERMUX_PKG_NAME" >> $TERMUX_BUILD_PACKAGE_CALL_BUILDING_PACKAGES_LIST_FILE_PATH
+		if ! termux_check_package_in_building_packages_list "${TERMUX_PKG_BUILDER_DIR#${TERMUX_SCRIPTDIR}/}"; then
+			echo "${TERMUX_PKG_BUILDER_DIR#${TERMUX_SCRIPTDIR}/}" >> $TERMUX_BUILD_PACKAGE_CALL_BUILDING_PACKAGES_LIST_FILE_PATH
 		fi
 
 		if [ "$TERMUX_CONTINUE_BUILD" == "false" ]; then
