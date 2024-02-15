@@ -11,7 +11,7 @@ termux_step_get_dependencies() {
 	while read PKG PKG_DIR; do
 		# Checking for duplicate dependencies
 		local cyclic_dependence=false
-		if termux_check_package_in_building_packages_list "$PKG"; then
+		if termux_check_package_in_building_packages_list "$PKG_DIR"; then
 			echo "A circular dependency was found on '$PKG', the old version of the package will be installed to resolve the conflict"
 			cyclic_dependence=true
 			if [ "$TERMUX_INSTALL_DEPS" = false ]; then
