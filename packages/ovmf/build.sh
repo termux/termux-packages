@@ -2,17 +2,22 @@ TERMUX_PKG_HOMEPAGE=https://www.tianocore.org/
 TERMUX_PKG_DESCRIPTION="Open Virtual Machine Firmware"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_MAINTAINER="@termux"
-_ED2K_VERSION=20221117gitfff6d81270b5
-_FEDORA_REPO_VERSION=14.fc39
+_ED2K_VERSION=20231122
+_FEDORA_REPO_VERSION=16.fc40
 TERMUX_PKG_VERSION=$_ED2K_VERSION-$_FEDORA_REPO_VERSION
 TERMUX_PKG_SRCURL=(https://kojipkgs.fedoraproject.org/packages/edk2/$_ED2K_VERSION/$_FEDORA_REPO_VERSION/noarch/edk2-aarch64-$TERMUX_PKG_VERSION.noarch.rpm
-		   https://kojipkgs.fedoraproject.org/packages/edk2/$_ED2K_VERSION/$_FEDORA_REPO_VERSION/noarch/edk2-arm-$TERMUX_PKG_VERSION.noarch.rpm
-		   https://kojipkgs.fedoraproject.org/packages/edk2/$_ED2K_VERSION/$_FEDORA_REPO_VERSION/noarch/edk2-ovmf-ia32-$TERMUX_PKG_VERSION.noarch.rpm
-		   https://kojipkgs.fedoraproject.org/packages/edk2/$_ED2K_VERSION/$_FEDORA_REPO_VERSION/noarch/edk2-ovmf-$TERMUX_PKG_VERSION.noarch.rpm)
+		               https://kojipkgs.fedoraproject.org/packages/edk2/$_ED2K_VERSION/$_FEDORA_REPO_VERSION/noarch/edk2-arm-$TERMUX_PKG_VERSION.noarch.rpm
+		               https://kojipkgs.fedoraproject.org/packages/edk2/$_ED2K_VERSION/$_FEDORA_REPO_VERSION/noarch/edk2-ovmf-ia32-$TERMUX_PKG_VERSION.noarch.rpm
+		               https://kojipkgs.fedoraproject.org/packages/edk2/$_ED2K_VERSION/$_FEDORA_REPO_VERSION/noarch/edk2-ovmf-$TERMUX_PKG_VERSION.noarch.rpm)
+		               https://kojipkgs.fedoraproject.org/packages/edk2/$_ED2K_VERSION/$_FEDORA_REPO_VERSION/noarch/edk2-ovmf-experimential-$TERMUX_PKG_VERSION.noarch.rpm
+		               https://kojipkgs.fedoraproject.org/packages/edk2/$_ED2K_VERSION/$_FEDORA_REPO_VERSION/noarch/edk2-riscv64-$TERMUX_PKG_VERSION.noarch.rpm
+		               https://kojipkgs.fedoraproject.org/packages/edk2/$_ED2K_VERSION/$_FEDORA_REPO_VERSION/noarch/edk2-ovmf-xen-$TERMUX_PKG_VERSION.noarch.rpm
+# Is it worth removing legacy arm architecture of ovmf firmware because most user using aarch64, x86_64 and riscv64, and aarch64 is used in daily production?
 TERMUX_PKG_SHA256=(deeea32e2ee7ffdd3a0b8a4a215dba50a0553128f7a21c27ec0929ed7a06d3e5
-		   dcc58da8c71fec992229ac629248802ffa71c4ef84ffa5b2df32dcf0fe56f6e4
-		   08ade311bde8b6a80b6aa138746949a6972a62c2976e0965a9be7127afac94f9
-		   5d4013dbdb7838227f3863514b61079a696e34f41492c66f437ec1a38afb06ea)
+		               dcc58da8c71fec992229ac629248802ffa71c4ef84ffa5b2df32dcf0fe56f6e4
+		               08ade311bde8b6a80b6aa138746949a6972a62c2976e0965a9be7127afac94f9
+		               5d4013dbdb7838227f3863514b61079a696e34f41492c66f437ec1a38afb06ea)
+# Help us update SHA256 sum
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
@@ -33,9 +38,21 @@ termux_step_make_install() {
 		${TERMUX_PKG_SRCURL[3]} \
 		${TERMUX_PKG_CACHEDIR}/edk2-x86_64.rpm \
 		${TERMUX_PKG_SHA256[3]}
+	termux_download \
+		${TERMUX_PKG_SRCURL[4]} \
+		${TERMUX_PKG_CACHEDIR}/edk2-experimential.rpm \
+		${TERMUX_PKG_SHA256[4]}
+	termux_download \
+		${TERMUX_PKG_SRCURL[5]} \
+		${TERMUX_PKG_CACHEDIR}/edk2-riscv64.rpm \
+		${TERMUX_PKG_SHA256[5]}
+	termux_download \
+		${TERMUX_PKG_SRCURL[6]} \
+		${TERMUX_PKG_CACHEDIR}/edk2-xen.rpm \
+		${TERMUX_PKG_SHA256[6]}
 
 	local i
-	for i in aarch64 arm i686 x86_64; do
+	for i in aarch64 arm i686 x86_64 experimential riscv64 xen; do
 		bsdtar xf ${TERMUX_PKG_CACHEDIR}/edk2-${i}.rpm -C $TERMUX_PREFIX/../
 	done
 
