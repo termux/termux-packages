@@ -2,11 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://nodejs.org/
 TERMUX_PKG_DESCRIPTION="Open Source, cross-platform JavaScript runtime environment"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Yaksh Bariya <thunder-coding@termux.dev>"
-TERMUX_PKG_VERSION=20.2.0
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=21.6.2
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=22523df2316c35569714ff1f69b053c2e286ced460898417dee46945efcdf989
- # thunder-coding: don't try to autoupdate nodejs, that thing takes 2 whole hours to build for a single arch, and requires a lot of patch updates everytime. Also I run tests everytime I update it to ensure least bugs
+TERMUX_PKG_SHA256=191294d445d1e6800359acc8174529b1e18e102147dc5f596030d3dce96931e5
+# thunder-coding: don't try to autoupdate nodejs, that thing takes 2 whole hours to build for a single arch, and requires a lot of patch updates everytime. Also I run tests everytime I update it to ensure least bugs
 TERMUX_PKG_AUTO_UPDATE=false
 # Note that we do not use a shared libuv to avoid an issue with the Android
 # linker, which does not use symbols of linked shared libraries when resolving
@@ -48,6 +47,10 @@ termux_step_host_build() {
 	make -j $TERMUX_MAKE_PROCESSES install
 }
 
+termux_step_pre_configure() {
+	termux_setup_ninja
+}
+
 termux_step_configure() {
 	local DEST_CPU
 	if [ $TERMUX_ARCH = "arm" ]; then
@@ -69,6 +72,7 @@ termux_step_configure() {
 
 	LDFLAGS+=" -ldl"
 	# See note above TERMUX_PKG_DEPENDS why we do not use a shared libuv.
+	# When building with ninja, build.ninja is generated for both Debug and Release builds.
 	./configure \
 		--prefix=$TERMUX_PREFIX \
 		--dest-cpu=$DEST_CPU \
@@ -77,19 +81,37 @@ termux_step_configure() {
 		--shared-openssl \
 		--shared-zlib \
 		--with-intl=system-icu \
-		--cross-compiling
+		--cross-compiling \
+		--ninja
 
 	export LD_LIBRARY_PATH=$TERMUX_PKG_HOSTBUILD_DIR/icu-installed/lib
-	perl -p -i -e "s@LIBS := \\$\\(LIBS\\)@LIBS := -L$TERMUX_PKG_HOSTBUILD_DIR/icu-installed/lib -lpthread -licui18n -licuuc -licudata -ldl -lz@" \
-		$TERMUX_PKG_SRCDIR/out/tools/v8_gypfiles/mksnapshot.host.mk \
-		$TERMUX_PKG_SRCDIR/out/tools/v8_gypfiles/torque.host.mk \
-		$TERMUX_PKG_SRCDIR/out/tools/v8_gypfiles/bytecode_builtins_list_generator.host.mk \
-		$TERMUX_PKG_SRCDIR/out/tools/v8_gypfiles/v8_libbase.host.mk \
-		$TERMUX_PKG_SRCDIR/out/tools/v8_gypfiles/gen-regexp-special-case.host.mk
+	sed -i \
+		-e "s|\-I$TERMUX_PREFIX/include||g" \
+		-e "s|\-L$TERMUX_PREFIX/lib||g" \
+		-e "s|-licui18n||g" \
+		-e "s|-licuuc||g" \
+		-e "s|-licudata||g" \
+		$TERMUX_PKG_SRCDIR/out/{Release,Debug}/obj.host/node_js2c.ninja
+	sed -i \
+		-e "s|\-I$TERMUX_PREFIX/include|-I$TERMUX_PKG_HOSTBUILD_DIR/icu-installed/include|g" \
+		-e "s|\-L$TERMUX_PREFIX/lib|-L$TERMUX_PKG_HOSTBUILD_DIR/icu-installed/lib|g" \
+		$(find $TERMUX_PKG_SRCDIR/out/{Release,Debug}/obj.host -name '*.ninja')
+}
+
+termux_step_make() {
+	if [ "${TERMUX_DEBUG_BUILD}" = "true" ]; then
+		ninja -C out/Debug -j "${TERMUX_MAKE_PROCESSES}"
+	else
+		ninja -C out/Release -j "${TERMUX_MAKE_PROCESSES}"
+	fi
 }
 
 termux_step_make_install() {
-	python ./tools/install.py install '' $TERMUX_PREFIX
+	if [ "${TERMUX_DEBUG_BUILD}" = "true" ]; then
+		python tools/install.py install "" "${TERMUX_PREFIX}" out/Debug/
+	else
+		python tools/install.py install "" "${TERMUX_PREFIX}" out/Release/
+	fi
 }
 
 termux_step_create_debscripts() {

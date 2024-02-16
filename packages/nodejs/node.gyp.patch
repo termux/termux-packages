@@ -1,6 +1,16 @@
---- ./node.gyp.orig	2023-05-16 12:28:21.000000000 +0530
-+++ ./node.gyp	2023-05-27 19:10:17.150845679 +0530
-@@ -466,7 +466,8 @@
+--- ./node.gyp.orig	2024-02-16 19:22:17.091451678 +0530
++++ ./node.gyp	2024-02-16 19:24:32.148773304 +0530
+@@ -473,9 +473,6 @@
+     },
+ 
+     'conditions': [
+-      ['target_arch=="arm64"', {
+-        'cflags': ['-mbranch-protection=standard'],  # Pointer authentication.
+-      }],
+       ['OS in "aix os400"', {
+         'ldflags': [
+           '-Wl,-bnoerrmsg',
+@@ -522,7 +519,8 @@
        ],
  
        'sources': [
@@ -10,15 +20,7 @@
        ],
  
        'dependencies': [
-@@ -761,6 +762,7 @@
-       'include_dirs': [
-         'src',
-         'deps/postject',
-+	'deps/cares/src/lib',
-         '<(SHARED_INTERMEDIATE_DIR)' # for node_natives.h
-       ],
-       'dependencies': [
-@@ -947,294 +949,6 @@
+@@ -1002,208 +1000,6 @@
          },
        ],
      }, # node_lib_target_name
@@ -76,6 +78,7 @@
 -        'deps/googletest/googletest.gyp:gtest_main',
 -        'deps/histogram/histogram.gyp:histogram',
 -        'deps/uvwasi/uvwasi.gyp:uvwasi',
+-        'deps/simdjson/simdjson.gyp:simdjson',
 -        'deps/simdutf/simdutf.gyp:simdutf',
 -        'deps/ada/ada.gyp:ada',
 -      ],
@@ -100,47 +103,20 @@
 -        'NODE_WANT_INTERNALS=1',
 -      ],
 -
--      'sources': [
--        'src/node_snapshot_stub.cc',
--        'test/cctest/node_test_fixture.cc',
--        'test/cctest/node_test_fixture.h',
--        'test/cctest/test_aliased_buffer.cc',
--        'test/cctest/test_base64.cc',
--        'test/cctest/test_base_object_ptr.cc',
--        'test/cctest/test_node_postmortem_metadata.cc',
--        'test/cctest/test_environment.cc',
--        'test/cctest/test_linked_binding.cc',
--        'test/cctest/test_node_api.cc',
--        'test/cctest/test_per_process.cc',
--        'test/cctest/test_platform.cc',
--        'test/cctest/test_report.cc',
--        'test/cctest/test_json_utils.cc',
--        'test/cctest/test_sockaddr.cc',
--        'test/cctest/test_traced_value.cc',
--        'test/cctest/test_util.cc',
--        'test/cctest/test_dataqueue.cc',
--      ],
+-      'sources': [ '<@(node_cctest_sources)' ],
 -
 -      'conditions': [
 -        [ 'node_use_openssl=="true"', {
 -          'defines': [
 -            'HAVE_OPENSSL=1',
 -          ],
--          'sources': [
--            'test/cctest/test_crypto_clienthello.cc',
--            'test/cctest/test_node_crypto.cc',
--            'test/cctest/test_quic_cid.cc',
--            'test/cctest/test_quic_tokens.cc',
--          ]
+-          'sources': [ '<@(node_cctest_openssl_sources)' ],
 -        }],
 -        ['v8_enable_inspector==1', {
--          'sources': [
--            'test/cctest/test_inspector_socket.cc',
--            'test/cctest/test_inspector_socket_server.cc'
--          ],
 -          'defines': [
 -            'HAVE_INSPECTOR=1',
 -          ],
+-          'sources': [ '<@(node_cctest_inspector_sources)' ],
 -        }, {
 -           'defines': [
 -             'HAVE_INSPECTOR=0',
@@ -250,6 +226,13 @@
 -        }],
 -      ]
 -    }, # overlapped-checker
+     {
+       'target_name': 'node_js2c',
+       'type': 'executable',
+@@ -1237,69 +1033,6 @@
+         }],
+       ]
+     },
 -    {
 -      'target_name': 'node_mksnapshot',
 -      'type': 'executable',
@@ -282,6 +265,9 @@
 -      ],
 -
 -      'conditions': [
+-        ['node_write_snapshot_as_array_literals=="true"', {
+-          'defines': [ 'NODE_MKSNAPSHOT_USE_ARRAY_LITERALS=1' ],
+-        }],
 -        [ 'node_use_openssl=="true"', {
 -          'defines': [
 -            'HAVE_OPENSSL=1',

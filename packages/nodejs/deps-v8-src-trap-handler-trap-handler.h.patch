@@ -1,6 +1,6 @@
---- ./deps/v8/src/trap-handler/trap-handler.h.orig	2023-05-27 19:03:25.691202764 +0530
-+++ ./deps/v8/src/trap-handler/trap-handler.h	2023-05-27 19:05:56.783177361 +0530
-@@ -17,29 +17,7 @@
+--- ./deps/v8/src/trap-handler/trap-handler.h.orig	2024-02-16 18:12:39.089954331 +0530
++++ ./deps/v8/src/trap-handler/trap-handler.h	2024-02-16 18:26:21.892058498 +0530
+@@ -17,30 +17,7 @@
  namespace internal {
  namespace trap_handler {
  
@@ -9,8 +9,9 @@
 -    ((V8_OS_LINUX && !V8_OS_ANDROID) || V8_OS_WIN || V8_OS_DARWIN || \
 -     V8_OS_FREEBSD)
 -#define V8_TRAP_HANDLER_SUPPORTED true
--// Arm64 (non-simulator) on Mac.
--#elif V8_TARGET_ARCH_ARM64 && V8_HOST_ARCH_ARM64 && V8_OS_DARWIN
+-// Arm64 (non-simulator) on Mac and Linux.
+-#elif V8_TARGET_ARCH_ARM64 && V8_HOST_ARCH_ARM64 && \
+-    (V8_OS_DARWIN || (V8_OS_LINUX && !V8_OS_ANDROID))
 -#define V8_TRAP_HANDLER_SUPPORTED true
 -// Arm64 simulator on x64 on Linux, Mac, or Windows.
 -//
