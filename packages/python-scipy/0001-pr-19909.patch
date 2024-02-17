@@ -1,0 +1,38 @@
+From 8c96a1f742335bca283aae418763aaba62c03378 Mon Sep 17 00:00:00 2001
+From: Ilhan Polat <ilhanpolat@gmail.com>
+Date: Thu, 18 Jan 2024 14:47:42 +0100
+Subject: [PATCH] MAINT:linalg:Adjust lwork/liwork changes OpenBLAS 0.3.26
+
+See https://github.com/Reference-LAPACK/lapack/pull/942
+---
+ scipy/linalg/flapack_sym_herm.pyf.src | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/scipy/linalg/flapack_sym_herm.pyf.src b/scipy/linalg/flapack_sym_herm.pyf.src
+index f07dbaecbc72..af04e0d8d8d8 100644
+--- a/scipy/linalg/flapack_sym_herm.pyf.src
++++ b/scipy/linalg/flapack_sym_herm.pyf.src
+@@ -762,8 +762,8 @@ subroutine <prefix2>syevr(compute_v,range,lower,n,a,lda,vl,vu,il,iu,abstol,w,z,m
+     <ftype2> optional,intent(in) :: vl=0.0
+     <ftype2> optional,intent(in),check(vu>=vl),depend(vl) :: vu=1.0
+     <ftype2> intent(in) :: abstol=0.0
+-    integer optional,intent(in),depend(n),check(lwork>=max(1,26*n)||lwork==-1) :: lwork=max(26*n,1)
+-    integer optional,intent(in),depend(n),check(liwork>=max(1,10*n)||liwork==-1):: liwork= max(1,10*n)
++    integer optional,intent(in),depend(n),check(lwork>=(n <= 1 ? 1 : max(1,26*n))||lwork==-1) :: lwork=max(26*n,1)
++    integer optional,intent(in),depend(n),check(liwork>=(n <= 1 ? 1 : max(1,10*n))||liwork==-1):: liwork= max(1,10*n)
+ 
+     integer intent(hide),depend(a) :: n=shape(a,0)
+     integer intent(hide),depend(n) :: lda=max(1,n)
+@@ -832,9 +832,9 @@ subroutine <prefix2c>heevr(compute_v,range,lower,n,a,lda,vl,vu,il,iu,abstol,w,z,
+     <ftype2> optional,intent(in) :: vl=0.0
+     <ftype2> optional,intent(in),check(vu>vl),depend(vl) :: vu=1.0
+     <ftype2> intent(in) :: abstol=0.0
+-    integer optional,intent(in),depend(n),check(lwork>=max(2*n,1)||lwork==-1) :: lwork=max(2*n,1)
+-    integer optional,intent(in),depend(n),check(lrwork>=max(24*n,1)||lrwork==-1) :: lrwork=max(24*n,1)
+-    integer optional,intent(in),depend(n),check(liwork>=max(1,10*n)||liwork==-1):: liwork= max(1,10*n)
++    integer optional,intent(in),depend(n),check(lwork>=(n <= 1 ? 1 : max(1,2*n))||lwork==-1) :: lwork=max(2*n,1)
++    integer optional,intent(in),depend(n),check(lrwork>=(n <= 1 ? 1 : max(1,24*n))||lrwork==-1) :: lrwork=max(24*n,1)
++    integer optional,intent(in),depend(n),check(liwork>=(n <= 1 ? 1 : max(1,10*n))||liwork==-1):: liwork= max(1,10*n)
+ 
+     integer intent(hide),depend(a) :: n=shape(a,0)
+     integer intent(hide),depend(n) :: lda=max(1,n)
