@@ -38,7 +38,7 @@ jobs:
       with:
         targets: arm aarch64
     - name: Clone repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@main
       with:
         fetch-depth: 1000
     - name: Gather build summary
@@ -186,7 +186,7 @@ jobs:
             sudo apt install ninja-build
             sudo apt purge -yq $(dpkg -l | grep '^ii' | awk '{ print $2 }' | grep -P '(aspnetcore|cabal-|dotnet-|ghc-|libmono|mongodb-|mysql-|php)') \
               firefox google-chrome-stable microsoft-edge-stable mono-devel mono-runtime-common monodoc-manual ruby
-            sudo apt autoremove -yq
+            sudo apt autopurge -yq
             sudo apt clean
             sudo rm -fr /opt/hostedtoolcache /usr/lib/node_modules /usr/share/dotnet /usr/share/swift
           fi
@@ -255,9 +255,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Clone repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@main
     - name: Get *.deb files
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@main
       with:
         path: ./
     - name: Upload to packages.termux.dev
