@@ -7,11 +7,11 @@ _FEDORA_REPO_VERSION=16.fc40
 TERMUX_PKG_VERSION=$_ED2K_VERSION-$_FEDORA_REPO_VERSION
 TERMUX_PKG_SRCURL=(https://kojipkgs.fedoraproject.org/packages/edk2/$_ED2K_VERSION/$_FEDORA_REPO_VERSION/noarch/edk2-aarch64-$TERMUX_PKG_VERSION.noarch.rpm
                    https://kojipkgs.fedoraproject.org/packages/edk2/$_ED2K_VERSION/$_FEDORA_REPO_VERSION/noarch/edk2-arm-$TERMUX_PKG_VERSION.noarch.rpm
-		   https://kojipkgs.fedoraproject.org/packages/edk2/$_ED2K_VERSION/$_FEDORA_REPO_VERSION/noarch/edk2-ovmf-ia32-$TERMUX_PKG_VERSION.noarch.rpm
+									 https://kojipkgs.fedoraproject.org/packages/edk2/$_ED2K_VERSION/$_FEDORA_REPO_VERSION/noarch/edk2-ovmf-ia32-$TERMUX_PKG_VERSION.noarch.rpm
                    https://kojipkgs.fedoraproject.org/packages/edk2/$_ED2K_VERSION/$_FEDORA_REPO_VERSION/noarch/edk2-ovmf-$TERMUX_PKG_VERSION.noarch.rpm
-		   https://kojipkgs.fedoraproject.org/packages/edk2/$_ED2K_VERSION/$_FEDORA_REPO_VERSION/noarch/edk2-ovmf-experimential-$TERMUX_PKG_VERSION.noarch.rpm
+									 https://kojipkgs.fedoraproject.org/packages/edk2/$_ED2K_VERSION/$_FEDORA_REPO_VERSION/noarch/edk2-ovmf-experimential-$TERMUX_PKG_VERSION.noarch.rpm
                    https://kojipkgs.fedoraproject.org/packages/edk2/$_ED2K_VERSION/$_FEDORA_REPO_VERSION/noarch/edk2-riscv64-$TERMUX_PKG_VERSION.noarch.rpm
-		   https://kojipkgs.fedoraproject.org/packages/edk2/$_ED2K_VERSION/$_FEDORA_REPO_VERSION/noarch/edk2-ovmf-xen-$TERMUX_PKG_VERSION.noarch.rpm)
+									 https://kojipkgs.fedoraproject.org/packages/edk2/$_ED2K_VERSION/$_FEDORA_REPO_VERSION/noarch/edk2-ovmf-xen-$TERMUX_PKG_VERSION.noarch.rpm)
 # Is it worth removing legacy arm architecture of ovmf firmware because most user using aarch64, x86_64 and riscv64, and aarch64 is used in daily production?
 TERMUX_PKG_SHA256=(deeea32e2ee7ffdd3a0b8a4a215dba50a0553128f7a21c27ec0929ed7a06d3e5
 		               dcc58da8c71fec992229ac629248802ffa71c4ef84ffa5b2df32dcf0fe56f6e4
