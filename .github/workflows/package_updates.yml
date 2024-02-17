@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@main
         with:
           fetch-depth: 0
           token: ${{ secrets.TERMUXBOT2_TOKEN }}
@@ -29,7 +29,7 @@ jobs:
         run: |
           sudo apt purge -yq $(dpkg -l | grep '^ii' | awk '{ print $2 }' | grep -P '(aspnetcore|cabal-|dotnet-|ghc-|libmono|php)') \
             firefox google-chrome-stable microsoft-edge-stable mono-runtime-common monodoc-manual ruby
-          sudo apt autoremove -yq
+          sudo apt autopurge -yq
           sudo rm -fr /opt/hostedtoolcache /usr/local /usr/share/dotnet /usr/share/swift
       - name: Process package updates
         env:
