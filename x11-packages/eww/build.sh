@@ -1,8 +1,8 @@
-TERMUX_PKG_HOMEPAGE=https://github.com/elkowar/eww
+TERMUX_PKG_HOMEPAGE=https://elkowar.github.io/eww/
 TERMUX_PKG_DESCRIPTION="ElKowars wacky widgets"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.4.0"
+TERMUX_PKG_VERSION="0.5.0"
 TERMUX_PKG_SRCURL=git+https://github.com/elkowar/eww
 TERMUX_PKG_DEPENDS="glib, gtk3, pango, gdk-pixbuf, libcairo"
 TERMUX_PKG_BUILD_IN_SRC=true
