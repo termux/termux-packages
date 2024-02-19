@@ -32,9 +32,9 @@ bin/rvim
 bin/ex
 share/man/man1/evim.1
 share/icons
-share/vim/vim90/spell/en.ascii*
-share/vim/vim90/print
-share/vim/vim90/tools
+share/vim/vim91/spell/en.ascii*
+share/vim/vim91/print
+share/vim/vim91/tools
 "
 TERMUX_PKG_CONFFILES="share/vim/vimrc"
 
@@ -67,9 +67,9 @@ termux_step_post_make_install() {
 		> $TERMUX_PREFIX/share/vim/vimrc
 
 	# Remove most tutor files:
-	cp $TERMUX_PREFIX/share/vim/vim90/tutor/{tutor,tutor.vim,tutor.utf-8} $TERMUX_PKG_TMPDIR/
-	rm -f $TERMUX_PREFIX/share/vim/vim90/tutor/*
-	cp $TERMUX_PKG_TMPDIR/{tutor,tutor.vim,tutor.utf-8} $TERMUX_PREFIX/share/vim/vim90/tutor/
+	cp $TERMUX_PREFIX/share/vim/vim91/tutor/{tutor,tutor.vim,tutor.utf-8} $TERMUX_PKG_TMPDIR/
+	rm -f $TERMUX_PREFIX/share/vim/vim91/tutor/*
+	cp $TERMUX_PKG_TMPDIR/{tutor,tutor.vim,tutor.utf-8} $TERMUX_PREFIX/share/vim/vim91/tutor/
 }
 
 termux_step_create_debscripts() {
