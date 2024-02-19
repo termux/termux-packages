@@ -15,9 +15,38 @@ TERMUX_PKG_REPLACES="nodejs-current, nodejs-dev"
 TERMUX_PKG_SUGGESTS="clang, make, pkg-config, python"
 TERMUX_PKG_RM_AFTER_INSTALL="lib/node_modules/npm/html lib/node_modules/npm/make.bat share/systemtap lib/dtrace"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_HOSTBUILD=true
+
+termux_step_post_get_source() {
+	# Prevent caching of host build:
+	rm -Rf $TERMUX_PKG_HOSTBUILD_DIR
+}
 
 termux_step_pre_configure() {
 	termux_setup_ninja
+}
+
+termux_step_host_build() {
+	local ICU_VERSION=74.1
+	local ICU_TAR=icu4c-${ICU_VERSION//./_}-src.tgz
+	local ICU_DOWNLOAD=https://github.com/unicode-org/icu/releases/download/release-${ICU_VERSION//./-}/$ICU_TAR
+	termux_download \
+		$ICU_DOWNLOAD\
+		$TERMUX_PKG_CACHEDIR/$ICU_TAR \
+		86ce8e60681972e60e4dcb2490c697463fcec60dd400a5f9bffba26d0b52b8d0
+	tar xf $TERMUX_PKG_CACHEDIR/$ICU_TAR
+	cd icu/source
+	if [ "$TERMUX_ARCH_BITS" = 32 ]; then
+		./configure --prefix $TERMUX_PKG_HOSTBUILD_DIR/icu-installed \
+			--disable-samples \
+			--disable-tests \
+			--build=i686-pc-linux-gnu "CFLAGS=-m32" "CXXFLAGS=-m32" "LDFLAGS=-m32"
+	else
+		./configure --prefix $TERMUX_PKG_HOSTBUILD_DIR/icu-installed \
+			--disable-samples \
+			--disable-tests
+	fi
+	make -j $TERMUX_MAKE_PROCESSES install
 }
 
 termux_step_configure() {
@@ -52,9 +81,10 @@ termux_step_configure() {
 		--cross-compiling \
 		--ninja
 
-	sed -i -e "s|\-I$TERMUX_PREFIX/include||g" \
+	export LD_LIBRARY_PATH=$TERMUX_PKG_HOSTBUILD_DIR/icu-installed/lib
+	sed -i -e "s|\-I$TERMUX_PREFIX/include|\-I$TERMUX_PKG_HOSTBUILD_DIR/icu-installed/include|g" \
 		$TERMUX_PKG_SRCDIR/out/Release/obj.host/tools/v8_gypfiles/*.ninja
-	sed -i -e "s|\-L$TERMUX_PREFIX/lib||g" \
+	sed -i -e "s|\-L$TERMUX_PREFIX/lib|\-L$TERMUX_PKG_HOSTBUILD_DIR/icu-installed/lib|g" \
 		$TERMUX_PKG_SRCDIR/out/Release/obj.host/tools/v8_gypfiles/*.ninja
 }
 
