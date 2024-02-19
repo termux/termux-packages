@@ -82,10 +82,18 @@ termux_step_configure() {
 		--ninja
 
 	export LD_LIBRARY_PATH=$TERMUX_PKG_HOSTBUILD_DIR/icu-installed/lib
-	sed -i -e "s|\-I$TERMUX_PREFIX/include|\-I$TERMUX_PKG_HOSTBUILD_DIR/icu-installed/include|g" \
-		$TERMUX_PKG_SRCDIR/out/Release/obj.host/tools/v8_gypfiles/*.ninja
-	sed -i -e "s|\-L$TERMUX_PREFIX/lib|\-L$TERMUX_PKG_HOSTBUILD_DIR/icu-installed/lib|g" \
-		$TERMUX_PKG_SRCDIR/out/Release/obj.host/tools/v8_gypfiles/*.ninja
+	sed -i \
+		-e "s|\-I$TERMUX_PREFIX/include||g" \
+		-e "s|\-L$TERMUX_PREFIX/lib||g" \
+		-e "s|-licui18n||g" \
+		-e "s|-licuuc||g" \
+		-e "s|-licudata||g" \
+		$TERMUX_PKG_SRCDIR/out/{Release,Debug}/obj.host/node_js2c.ninja
+	sed -i \
+		-e "s|\-I$TERMUX_PREFIX/include|-I$TERMUX_PKG_HOSTBUILD_DIR/icu-installed/include|g" \
+		-e "s|\-L$TERMUX_PREFIX/lib|-L$TERMUX_PKG_HOSTBUILD_DIR/icu-installed/lib|g" \
+		$(find $TERMUX_PKG_SRCDIR/out/{Release,Debug}/obj.host -name '*.ninja')
+
 }
 
 termux_step_make() {
