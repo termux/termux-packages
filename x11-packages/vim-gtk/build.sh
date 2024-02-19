@@ -40,9 +40,9 @@ vim_cv_tty_group=world
 --with-x"
 
 TERMUX_PKG_RM_AFTER_INSTALL="
-share/vim/vim90/spell/en.ascii*
-share/vim/vim90/print
-share/vim/vim90/tools
+share/vim/vim91/spell/en.ascii*
+share/vim/vim91/print
+share/vim/vim91/tools
 "
 
 TERMUX_PKG_CONFFILES="share/vim/vimrc"
