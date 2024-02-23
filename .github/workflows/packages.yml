@@ -76,15 +76,6 @@ jobs:
             exit 0
           fi
 
-          # Build local Docker image if setup scripts were changed.
-          # Useful for pull requests submitting changes for both build environment and packages.
-          if grep -qP '^scripts/(Dockerfile|properties\.sh|setup-android-sdk\.sh|setup-ubuntu\.sh)$' <<< "$CHANGED_FILES"; then
-            echo "Detected changes for environment setup scripts. Building custom Docker image now."
-            cd ./scripts
-            docker build -t ghcr.io/termux/package-builder:latest .
-            cd ..
-          fi
-
           for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
             repo=$(jq --raw-output '.["'${repo_path}'"].name' repo.json)
             # Parse changed files and identify new packages and deleted packages.
@@ -155,6 +146,31 @@ jobs:
           fi
         done
 
+        declare -a packages
+        for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
+          repo=$(jq --raw-output '.["'${repo_path}'"].name' repo.json)
+          if [ -f ./built_${repo}_packages.txt ]; then
+            packages="$packages $(cat ./built_${repo}_packages.txt | tr '\n' ' ')"
+          fi
+        done
+
+        if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+          # Build local Docker image if setup scripts were changed.
+          # Useful for pull requests submitting changes for both build environment and packages.
+          if grep -qP '^scripts/(Dockerfile|properties\.sh|setup-android-sdk\.sh|setup-ubuntu\.sh)$' <<< "$CHANGED_FILES"; then
+            echo "Detected changes for environment setup scripts. Building custom Docker image now."
+            if [ -n "$packages" ]; then
+              if grep -qP "(^|\\s)${packages// /($|\\s)|(^|\\s)}($|\\s)" ./scripts/big-pkgs.list; then
+                echo "Skipping due to building large packages."
+                exit 0
+              fi
+            fi
+            cd ./scripts
+            docker build -t ghcr.io/termux/package-builder:latest .
+            cd ..
+          fi
+        fi
+
     - name: Lint packages
       run: |
         declare -a package_recipes
@@ -165,30 +181,29 @@ jobs:
           fi
         done
 
-        if [ ! -z "$package_recipes" ]; then
+        if [ -n "$package_recipes" ]; then
           ./scripts/lint-packages.sh $package_recipes
         fi
 
-    - name: Free additional disk space (if necessary)
+    - name: Free additional disk space (if needed)
       run: |
         declare -a packages
         for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
           repo=$(jq --raw-output '.["'${repo_path}'"].name' repo.json)
-
           if [ -f ./built_${repo}_packages.txt ]; then
             packages="$packages $(cat ./built_${repo}_packages.txt | tr '\n' ' ')"
           fi
         done
 
-        if [ ! -z "$packages" ]; then
+        if [ -n "$packages" ]; then
           if grep -qP "(^|\\s)${packages// /($|\\s)|(^|\\s)}($|\\s)" ./scripts/big-pkgs.list; then
             ./scripts/setup-ubuntu.sh
             sudo apt install ninja-build
             sudo apt purge -yq $(dpkg -l | grep '^ii' | awk '{ print $2 }' | grep -P '(aspnetcore|cabal-|dotnet-|ghc-|libmono|mongodb-|mysql-|php)') \
-              firefox google-chrome-stable microsoft-edge-stable mono-devel mono-runtime-common monodoc-manual ruby
+              firefox google-chrome-stable google-cloud-cli microsoft-edge-stable mono-devel mono-runtime-common monodoc-manual powershell ruby
             sudo apt autoremove -yq
             sudo apt clean
-            sudo rm -fr /opt/hostedtoolcache /usr/lib/node_modules /usr/share/dotnet /usr/share/swift
+            sudo rm -fr /opt/ghc /opt/hostedtoolcache /usr/lib/node_modules /usr/local/share/boost /usr/share/dotnet /usr/share/swift
           fi
         fi
 
@@ -197,13 +212,12 @@ jobs:
         declare -a packages
         for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
           repo=$(jq --raw-output '.["'${repo_path}'"].name' repo.json)
-
           if [ -f ./built_${repo}_packages.txt ]; then
             packages="$packages $(cat ./built_${repo}_packages.txt | tr '\n' ' ')"
           fi
         done
 
-        if [ ! -z "$packages" ]; then
+        if [ -n "$packages" ]; then
           if grep -qP "(^|\\s)${packages// /($|\\s)|(^|\\s)}($|\\s)" ./scripts/big-pkgs.list; then
             NDK=$ANDROID_NDK_LATEST_HOME ANDROID_HOME=$ANDROID_SDK_ROOT ./build-package.sh -I -a ${{ matrix.target_arch }} $packages
           else
