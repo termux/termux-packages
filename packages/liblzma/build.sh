@@ -4,12 +4,17 @@ TERMUX_PKG_LICENSE="LGPL-2.1, GPL-2.0, GPL-3.0"
 TERMUX_PKG_LICENSE_FILE="COPYING, COPYING.GPLv2, COPYING.GPLv3, COPYING.LGPLv2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="5.6.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/tukaani-project/xz/releases/download/v${TERMUX_PKG_VERSION}/xz-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=cdafe1632f139c82937cc1ed824f7a60b7b0a0619dfbbd681dcac02b1ac28f5b
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BREAKS="liblzma-dev"
 TERMUX_PKG_REPLACES="liblzma-dev"
 TERMUX_PKG_ESSENTIAL=true
+# seccomp prevents SYS_landlock_create_ruleset
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--enable-sandbox=no
+"
 
 termux_step_post_massage() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them
