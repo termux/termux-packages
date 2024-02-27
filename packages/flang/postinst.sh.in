@@ -21,14 +21,14 @@ generate_module_files() {
     for file in ${_modules[@]}; do
         echo "Generating ${file}.mod..."
         cd "$TERMUX_PREFIX"/include/flang
-        flang-new -cpp -fsyntax-only $TERMUX_PREFIX/opt/flang/module/"$file".f90
+        flang-new -cpp -fsyntax-only -module-dir "$TERMUX_PREFIX"/include/flang "$TERMUX_PREFIX"/opt/flang/module/"$file".f90
         cp "$file".mod "$file".f18.mod
     done
 
     file="__ppc_intrinsics"
     echo "Generating ${file}.mod..."
     cd "$TERMUX_PREFIX"/include/flang
-    flang-new -cpp -fsyntax-only --target=ppc64le $TERMUX_PREFIX/opt/flang/module/"$file".f90
+    flang-new -cpp -fsyntax-only --target=ppc64le -module-dir "$TERMUX_PREFIX"/include/flang "$TERMUX_PREFIX"/opt/flang/module/"$file".f90
     cp "$file".mod "$file".f18.mod
 }
 
