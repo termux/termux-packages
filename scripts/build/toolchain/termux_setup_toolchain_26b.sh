@@ -67,7 +67,10 @@ termux_setup_toolchain_26b() {
 	# -static-openmp requires -fopenmp in LDFLAGS to work; hopefully this won't be problematic
 	# even when we don't have -fopenmp in CFLAGS / when we don't want to enable OpenMP
 	# We might also want to consider shipping libomp.so instead; since r21
-	LDFLAGS+=" -fopenmp -static-openmp -fno-openmp-implicit-rpath"
+	LDFLAGS+=" -fopenmp -static-openmp"
+	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
+  		LDFLAGS+=" -fno-openmp-implicit-rpath"
+    	fi
 
 	# Android 7 started to support DT_RUNPATH (but not DT_RPATH).
 	LDFLAGS+=" -Wl,--enable-new-dtags"
