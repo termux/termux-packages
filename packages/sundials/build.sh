@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://computing.llnl.gov/projects/sundials
 TERMUX_PKG_DESCRIPTION="SUite of Nonlinear and DIfferential/ALgebraic equation Solvers."
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux-user-repository"
-TERMUX_PKG_VERSION="6.7.0"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="7.0.0"
 TERMUX_PKG_SRCURL=https://github.com/LLNL/sundials/releases/download/v${TERMUX_PKG_VERSION}/sundials-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=5f113a1564a9d2d98ff95249f4871a4c815a05dbb9b8866a82b13ab158c37adb
+TERMUX_PKG_SHA256=d762a7950ef4097fbe9d289f67a8fb717a0b9f90f87ed82170eb5c36c0a07989
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="suitesparse"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -33,20 +32,30 @@ termux_step_post_massage() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them
 	# after SOVERSION is changed.
 	local _SOVERSION_GUARD_FILES="
-lib/libsundials_arkode.so.5
-lib/libsundials_cvode.so.6
-lib/libsundials_cvodes.so.6
-lib/libsundials_generic.so.6
-lib/libsundials_ida.so.6
-lib/libsundials_idas.so.5
-lib/libsundials_kinsol.so.6
-lib/libsundials_nvecmanyvector.so.6
-lib/libsundials_nvecopenmp.so.6
-lib/libsundials_nvecpthreads.so.6
-lib/libsundials_nvecserial.so.6
-lib/libsundials_sunmatrixband.so.4
-lib/libsundials_sunmatrixdense.so.4
-lib/libsundials_sunmatrixsparse.so.4
+lib/libsundials_arkode.so.6
+lib/libsundials_core.so.7
+lib/libsundials_cvode.so.7
+lib/libsundials_cvodes.so.7
+lib/libsundials_ida.so.7
+lib/libsundials_idas.so.6
+lib/libsundials_kinsol.so.7
+lib/libsundials_nvecmanyvector.so.7
+lib/libsundials_nvecopenmp.so.7
+lib/libsundials_nvecpthreads.so.7
+lib/libsundials_nvecserial.so.7
+lib/libsundials_sunlinsolband.so.5
+lib/libsundials_sunlinsoldense.so.5
+lib/libsundials_sunlinsolklu.so.5
+lib/libsundials_sunlinsolpcg.so.5
+lib/libsundials_sunlinsolspbcgs.so.5
+lib/libsundials_sunlinsolspfgmr.so.5
+lib/libsundials_sunlinsolspgmr.so.5
+lib/libsundials_sunlinsolsptfqmr.so.5
+lib/libsundials_sunmatrixband.so.5
+lib/libsundials_sunmatrixdense.so.5
+lib/libsundials_sunmatrixsparse.so.5
+lib/libsundials_sunnonlinsolfixedpoint.so.4
+lib/libsundials_sunnonlinsolnewton.so.4
 "
 	local f
 	for f in ${_SOVERSION_GUARD_FILES}; do
