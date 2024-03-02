@@ -1,0 +1,132 @@
+From ab5d1d2f74f2141e9c7c6635fddcfd7cc579a942 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?=E5=B1=85=E6=88=8E=E6=B0=8F?= <chen.sst@gmail.com>
+Date: Sun, 25 Feb 2024 12:43:39 +0800
+Subject: [PATCH 2/4] fix(glog): configure macros
+
+specify use glog as dll or lib
+---
+ CMakeLists.txt    | 16 +++++++++++++---
+ src/rime/common.h |  1 -
+ src/rime/setup.cc |  5 ++---
+ 3 files changed, 15 insertions(+), 7 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 3d5fe024a..66322fe2f 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -80,9 +80,19 @@ if(ENABLE_LOGGING)
+   find_package(Glog REQUIRED)
+   if(Glog_FOUND)
+     include_directories(${Glog_INCLUDE_PATH})
+-  endif()
+-  if(Glog_STATIC)
+-    add_definitions(-DGOOGLE_GLOG_DLL_DECL=)
++    if(WIN32)
++      add_compile_definitions("GLOG_DEPRECATED=__declspec(deprecated)")
++      add_compile_definitions(GLOG_NO_ABBREVIATED_SEVERITIES)
++    else()
++      add_compile_definitions("GLOG_DEPRECATED=__attribute__((deprecated))")
++    endif()
++    if(Glog_STATIC)
++      add_compile_definitions(GLOG_EXPORT=)
++      add_compile_definitions(GLOG_NO_EXPORT=)
++    else()
++      add_compile_definitions("GLOG_EXPORT=__attribute__((visibility(\"default\")))")
++      add_compile_definitions("GLOG_NO_EXPORT=__attribute__((visibility(\"default\")))")
++    endif()
+   endif()
+ 
+   set(RIME_ENABLE_LOGGING 1)
+diff --git a/src/rime/common.h b/src/rime/common.h
+index 5de23b876..9b937b073 100644
+--- a/src/rime/common.h
++++ b/src/rime/common.h
+@@ -26,7 +26,6 @@
+ #include <boost/signals2/signal.hpp>
+ 
+ #ifdef RIME_ENABLE_LOGGING
+-#define GLOG_NO_ABBREVIATED_SEVERITIES
+ #include <glog/logging.h>
+ #else
+ #include "no_logging.h"
+diff --git a/src/rime/setup.cc b/src/rime/setup.cc
+index a09c46495..760088cd6 100644
+--- a/src/rime/setup.cc
++++ b/src/rime/setup.cc
+@@ -8,10 +8,9 @@
+ #include <rime/build_config.h>
+ 
+ #ifdef RIME_ENABLE_LOGGING
+-#ifdef _WIN32
+-#define GLOG_NO_ABBREVIATED_SEVERITIES
+-#endif  // _WIN32
+ #include <glog/logging.h>
++#else
++#include "no_logging.h"
+ #endif  // RIME_ENABLE_LOGGING
+ 
+ #include <rime_api.h>
+
+From 20fdcc19e65955f6f57f33497f3098aab00af34e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?=E5=B1=85=E6=88=8E=E6=B0=8F?= <chen.sst@gmail.com>
+Date: Sun, 25 Feb 2024 17:35:21 +0800
+Subject: [PATCH 3/4] fix(glog): replace deprecated API
+
+---
+ src/rime/lever/deployment_tasks.cc | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
+
+diff --git a/src/rime/lever/deployment_tasks.cc b/src/rime/lever/deployment_tasks.cc
+index 99ca362b9..375bfa1bd 100644
+--- a/src/rime/lever/deployment_tasks.cc
++++ b/src/rime/lever/deployment_tasks.cc
+@@ -628,14 +628,15 @@ bool CleanOldLogFiles::Run(Deployer* deployer) {
+   string today(ymd);
+   DLOG(INFO) << "today: " << today;
+ 
++  // Make sure we have sufficient permissions on the scanned directories.
++  // E.g. on Android, there's no write permission on the cwd.
+   vector<string> dirs;
+-  // Don't call GetLoggingDirectories as it contains current directory,
+-  // which causes permission issue on Android
+-  // https://github.com/google/glog/blob/b58718f37cf58fa17f48bf1d576974d133d89839/src/logging.cc#L2410
+-  if (FLAGS_log_dir.empty()) {
+-    google::GetExistingTempDirectories(&dirs);
+-  } else {
+-    dirs.push_back(FLAGS_log_dir);
++  for (auto& dir : google::GetLoggingDirectories()) {
++    auto perms = fs::status(dir).permissions();
++    if ((perms & (fs::perms::owner_write | fs::perms::group_write |
++                  fs::perms::others_write)) != fs::perms::none) {
++      dirs.push_back(dir);
++    }
+   }
+   DLOG(INFO) << "scanning " << dirs.size() << " temp directory for log files.";
+ 
+
+From 49c7298b22024dc1b84375ba8795adaf0be63f09 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?=E5=B1=85=E6=88=8E=E6=B0=8F?= <chen.sst@gmail.com>
+Date: Sun, 25 Feb 2024 18:25:20 +0800
+Subject: [PATCH 4/4] fix(glog): someone at google is to blame for linking
+ error
+
+---
+ src/CMakeLists.txt | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 6364e1c8e..84b5b91e8 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -54,6 +54,11 @@ set(rime_gears_deps
+     ${Opencc_LIBRARY})
+ set(rime_levers_deps "")
+ 
++if(Glog_FOUND AND WIN32)
++  # TODO: in glog v0.7.0, someone at Google forget to add dbghelp.lib to the linker library list.
++  set(rime_core_deps ${rime_core_deps} dbghelp)
++endif()
++
+ if(MINGW)
+   # fix: bcrypt for boost uuid issue
+   # https://github.com/boostorg/uuid/issues/68
