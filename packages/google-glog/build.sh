@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/google/glog
 TERMUX_PKG_DESCRIPTION="Logging library for C++"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.6.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="0.7.0"
 TERMUX_PKG_SRCURL=https://github.com/google/glog/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=8a83bf982f37bb70825df71a9709fa90ea9f4447fb3c099e1d720a439d88bad6
+TERMUX_PKG_SHA256=375106b5976231b92e66879c1a92ce062923b9ae573c42b56ba28b112ee4cc11
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="gflags, libc++"
 TERMUX_PKG_BUILD_DEPENDS="gflags-static"
@@ -18,7 +17,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_post_get_source() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them
 	# after SOVERSION is changed.
-	local _SOVERSION=1
+	local _SOVERSION=2
 
 	local v=$(sed -En 's/^\s*set_target_properties\s*\(glog\s+.*\s+SOVERSION\s+([0-9]+).*/\1/p' \
 			CMakeLists.txt)
