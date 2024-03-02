@@ -26,6 +26,8 @@ termux_step_pre_configure() {
 
 	CPPFLAGS+=" -D_LIBCPP_ENABLE_CXX17_REMOVED_FEATURES"
 	CPPFLAGS+=" -DPROTOBUF_USE_DLLS"
+	# from PREFIX/lib/cmake/glog/glog-targets.cmake
+	CPPFLAGS+=" -DGLOG_USE_GLOG_EXPORT -DGLOG_USE_GFLAGS"
 	LDFLAGS+=" $($TERMUX_SCRIPTDIR/packages/libprotobuf/interface_link_libraries.sh)"
 	export DISABLE_UPDATE_SB=1
 }
