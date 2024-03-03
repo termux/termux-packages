@@ -26,6 +26,7 @@ lib/clang/*/include/llvm_libc_wrappers/
 lib/clang/*/include/openmp_wrappers/
 lib/clang/*/include/orc/
 lib/clang/*/include/ppc_wrappers/
+lib/clang/*/include/profile/
 lib/cmake/clang
 lib/cmake/openmp
 lib/libarcher.so

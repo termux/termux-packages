@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Modular compiler and toolchain technologies library"
 TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_LICENSE_FILE="llvm/LICENSE.TXT"
 TERMUX_PKG_MAINTAINER="@finagolfin"
-LLVM_MAJOR_VERSION=17
-TERMUX_PKG_VERSION=${LLVM_MAJOR_VERSION}.0.6
-TERMUX_PKG_SHA256=58a8818c60e6627064f312dbf46c02d9949956558340938b71cf731ad8bc0813
+LLVM_MAJOR_VERSION=18
+TERMUX_PKG_VERSION=${LLVM_MAJOR_VERSION}.1.2
+TERMUX_PKG_SHA256=51073febd91d1f2c3b411d022695744bda322647e76e0b4eb1918229210c48d5
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_SRCURL=https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/llvm-project-${TERMUX_PKG_VERSION}.src.tar.xz
 TERMUX_PKG_HOSTBUILD=true
@@ -120,6 +120,7 @@ termux_step_post_make_install() {
 	done
 
 	ln -f -s clang++ clang++-${LLVM_MAJOR_VERSION}
+	ln -f -s ${LLVM_MAJOR_VERSION} $TERMUX_PREFIX/lib/clang/latest
 
 	if [ $TERMUX_ARCH == "arm" ]; then
 		# For arm we replace symlinks with the same type of
