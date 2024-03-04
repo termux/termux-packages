@@ -1,0 +1,266 @@
+diff --git a/llbuild/products/llbuildSwift/BuildSystemBindings.swift b/llbuild/products/llbuildSwift/BuildSystemBindings.swift
+index 6962fff5..8f1bf502 100644
+--- a/llbuild/products/llbuildSwift/BuildSystemBindings.swift
++++ b/llbuild/products/llbuildSwift/BuildSystemBindings.swift
+@@ -17,8 +17,8 @@ import WinSDK
+ import Glibc
+ #elseif canImport(Musl)
+ import Musl
+-#elseif canImport(Bionic)
+-import Bionic
++#elseif canImport(Android)
++import Android
+ #else
+ #error("Missing libc or equivalent")
+ #endif
+@@ -1293,7 +1293,7 @@ public final class BuildSystem {
+         #elseif os(Windows)
+         info.pointee.mod_time.seconds = UInt64(s.st_mtime)
+         info.pointee.mod_time.nanoseconds = 0
+-        #elseif canImport(Glibc) || canImport(Musl) || canImport(Bionic)
++        #elseif canImport(Glibc) || canImport(Musl) || canImport(Android)
+         info.pointee.mod_time.seconds = UInt64(s.st_mtim.tv_sec)
+         info.pointee.mod_time.nanoseconds = UInt64(s.st_mtim.tv_nsec)
+         #else
+diff --git a/sourcekit-lsp/Sources/SKSupport/Process+Run.swift b/sourcekit-lsp/Sources/SKSupport/Process+Run.swift
+--- a/sourcekit-lsp/Sources/SKSupport/Process+Run.swift
++++ b/sourcekit-lsp/Sources/SKSupport/Process+Run.swift
+@@ -22,6 +22,8 @@
+ 
+ #if os(Windows)
+ import WinSDK
++#elseif canImport(Android)
++import Android
+ #endif
+ 
+ extension Process {
+diff --git a/sourcekit-lsp/Sources/sourcekit-lsp/SourceKitLSP.swift b/sourcekit-lsp/Sources/sourcekit-lsp/SourceKitLSP.swift
+--- a/sourcekit-lsp/Sources/sourcekit-lsp/SourceKitLSP.swift
++++ b/sourcekit-lsp/Sources/sourcekit-lsp/SourceKitLSP.swift
+@@ -28,6 +28,9 @@
+ import struct TSCBasic.AbsolutePath
+ import struct TSCBasic.RelativePath
+ import var TSCBasic.localFileSystem
++#if canImport(Android)
++import Android
++#endif
+ 
+ extension AbsolutePath {
+   public init?(argument: String) {
+diff --git a/swift-argument-parser/Sources/ArgumentParser/Utilities/Platform.swift b/swift-argument-parser/Sources/ArgumentParser/Utilities/Platform.swift
+index b7fa046..a94e3b8 100644
+--- a/swift-argument-parser/Sources/ArgumentParser/Utilities/Platform.swift
++++ b/swift-argument-parser/Sources/ArgumentParser/Utilities/Platform.swift
+@@ -19,6 +19,8 @@ import Darwin
+ import CRT
+ #elseif canImport(WASILibc)
+ import WASILibc
++#elseif canImport(Android)
++import Android
+ #endif
+ 
+ enum Platform {}
+@@ -88,6 +90,8 @@ extension Platform {
+     ucrt._exit(code)
+ #elseif canImport(WASILibc)
+     WASILibc.exit(code)
++#elseif canImport(Android)
++    Android.exit(code)
+ #endif
+   }
+ }
+@@ -108,7 +112,7 @@ extension Platform {
+ 
+ // MARK: Terminal size
+ 
+-#if canImport(Glibc)
++#if canImport(Glibc) || canImport(Android)
+ func ioctl(_ a: Int32, _ b: Int32, _ p: UnsafeMutableRawPointer) -> Int32 {
+   ioctl(CInt(a), UInt(b), p)
+ }
+diff --git a/swift-certificates/Sources/X509/Verifier/RFC5280/URIConstraints.swift b/swift-certificates/Sources/X509/Verifier/RFC5280/URIConstraints.swift
+--- a/swift-certificates/Sources/X509/Verifier/RFC5280/URIConstraints.swift
++++ b/swift-certificates/Sources/X509/Verifier/RFC5280/URIConstraints.swift
+@@ -21,6 +21,9 @@
+ #elseif canImport(Musl)
+ import Musl
+ import CoreFoundation
++#elseif canImport(Android)
++import Android
++import CoreFoundation
+ #elseif canImport(Darwin)
+ import Darwin
+ #endif
+diff --git "a/swift-crypto/Sources/Crypto/Key Derivation/HKDF.swift" "b/swift-crypto/Sources/Crypto/Key Derivation/HKDF.swift"
+index 5f47c2f..4b5579e 100644
+--- "a/swift-crypto/Sources/Crypto/Key Derivation/HKDF.swift"
++++ "b/swift-crypto/Sources/Crypto/Key Derivation/HKDF.swift"
+@@ -15,6 +15,9 @@
+ @_exported import CryptoKit
+ #else
+ import Foundation
++#if canImport(Android)
++import Android
++#endif
+ 
+ /// A standards-based implementation of an HMAC-based Key Derivation Function
+ /// (HKDF).
+diff --git a/swift-system/Sources/System/Internals/CInterop.swift b/swift-system/Sources/System/Internals/CInterop.swift
+index 13abc75..2ad551a 100644
+--- a/swift-system/Sources/System/Internals/CInterop.swift
++++ b/swift-system/Sources/System/Internals/CInterop.swift
+@@ -25,6 +25,9 @@ import Glibc
+ #elseif canImport(Musl)
+ @_implementationOnly import CSystem
+ import Musl
++#elseif canImport(Bionic)
++@_implementationOnly import CSystem
++import Bionic
+ #else
+ #error("Unsupported Platform")
+ #endif
+diff --git a/swift-system/Sources/System/Internals/Constants.swift b/swift-system/Sources/System/Internals/Constants.swift
+index 53e215f..27039de 100644
+--- a/swift-system/Sources/System/Internals/Constants.swift
++++ b/swift-system/Sources/System/Internals/Constants.swift
+@@ -18,6 +18,8 @@ import CSystem
+ import ucrt
+ #elseif canImport(Glibc)
+ import Glibc
++#elseif canImport(Android)
++import Android
+ #elseif canImport(Musl)
+ import CSystem
+ import Musl
+diff --git a/swift-system/Sources/System/Internals/Exports.swift b/swift-system/Sources/System/Internals/Exports.swift
+index 5b08725..899be25 100644
+--- a/swift-system/Sources/System/Internals/Exports.swift
++++ b/swift-system/Sources/System/Internals/Exports.swift
+@@ -23,6 +23,9 @@ import Glibc
+ #elseif canImport(Musl)
+ @_implementationOnly import CSystem
+ import Musl
++#elseif canImport(Android)
++@_implementationOnly import CSystem
++import Android
+ #else
+ #error("Unsupported Platform")
+ #endif
+@@ -58,6 +61,11 @@ internal var system_errno: CInt {
+   get { Musl.errno }
+   set { Musl.errno = newValue }
+ }
++#elseif canImport(Android)
++internal var system_errno: CInt {
++  get { Android.errno }
++  set { Android.errno = newValue }
++}
+ #endif
+ 
+ // MARK: C stdlib decls
+diff --git a/swift-system/Sources/System/Internals/Syscalls.swift b/swift-system/Sources/System/Internals/Syscalls.swift
+index 555f63b..f0db35f 100644
+--- a/swift-system/Sources/System/Internals/Syscalls.swift
++++ b/swift-system/Sources/System/Internals/Syscalls.swift
+@@ -15,6 +15,8 @@ import Glibc
+ import Musl
+ #elseif os(Windows)
+ import ucrt
++#elseif canImport(Android)
++import Android
+ #else
+ #error("Unsupported Platform")
+ #endif
+diff --git a/swiftpm/Sources/Basics/AsyncProcess.swift b/swiftpm/Sources/Basics/AsyncProcess.swift
+--- a/swiftpm/Sources/Basics/AsyncProcess.swift
++++ b/swiftpm/Sources/Basics/AsyncProcess.swift
+@@ -14,6 +14,8 @@
+ 
+ #if os(Windows)
+ import TSCLibc
++#elseif canImport(Android)
++import Android
+ #endif
+ 
+ #if os(Linux)
+diff --git a/swiftpm/Sources/Basics/Cancellator.swift b/swiftpm/Sources/Basics/Cancellator.swift
+--- a/swiftpm/Sources/Basics/Cancellator.swift
++++ b/swiftpm/Sources/Basics/Cancellator.swift
+@@ -15,6 +15,8 @@
+ import class TSCBasic.Thread
+ #if canImport(WinSDK)
+ import WinSDK
++#elseif canImport(Android)
++import Android
+ #endif
+ 
+ public typealias CancellationHandler = @Sendable (DispatchTime) throws -> Void
+diff --git a/swiftpm/Sources/Basics/Environment/Environment.swift b/swiftpm/Sources/Basics/Environment/Environment.swift
+--- a/swiftpm/Sources/Basics/Environment/Environment.swift
++++ b/swiftpm/Sources/Basics/Environment/Environment.swift
+@@ -19,8 +19,8 @@
+ #elseif os(Windows)
+ import CRT
+ import WinSDK
+-#elseif canImport(Bionic)
+-import Bionic
++#elseif canImport(Android)
++import Android
+ #else
+ import Darwin.C
+ #endif
+diff --git a/swiftpm/Sources/Commands/SwiftRunCommand.swift b/swiftpm/Sources/Commands/SwiftRunCommand.swift
+--- a/swiftpm/Sources/Commands/SwiftRunCommand.swift
++++ b/swiftpm/Sources/Commands/SwiftRunCommand.swift
+@@ -9,6 +9,9 @@
+ // See http://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
+ //
+ //===----------------------------------------------------------------------===//
++#if canImport(Android)
++import Android
++#endif
+ 
+ import ArgumentParser
+ import Basics
+diff --git a/swiftpm/Sources/PackagePlugin/Plugin.swift b/swiftpm/Sources/PackagePlugin/Plugin.swift
+--- a/swiftpm/Sources/PackagePlugin/Plugin.swift
++++ b/swiftpm/Sources/PackagePlugin/Plugin.swift
+@@ -36,6 +36,8 @@
+         return String(decodingCString: baseAddress, as: UTF16.self)
+     }
+ }
++#elseif canImport(Android)
++import Android
+ #endif
+ 
+ //
+diff --git a/swiftpm/Sources/PackageRegistryCommand/PackageRegistryCommand+Auth.swift b/swiftpm/Sources/PackageRegistryCommand/PackageRegistryCommand+Auth.swift
+index 41df217ce..cb56fb5c3 100644
+--- a/swiftpm/Sources/PackageRegistryCommand/PackageRegistryCommand+Auth.swift
++++ b/swiftpm/Sources/PackageRegistryCommand/PackageRegistryCommand+Auth.swift
+@@ -63,6 +63,10 @@ private func readpassword(_ prompt: String) throws -> String {
+     return password
+ }
+ #else
++#if canImport(Android)
++import Android
++#endif
++
+ private func readpassword(_ prompt: String) throws -> String {
+     let password: String
+ 
+diff --git a/yams/Sources/Yams/Representer.swift b/yams/Sources/Yams/Representer.swift
+index a749c52..b74ef8e 100644
+--- a/yams/Sources/Yams/Representer.swift
++++ b/yams/Sources/Yams/Representer.swift
+@@ -14,6 +14,10 @@ private let cpow: (_: Double, _: Double) -> Double = Darwin.pow
+ #elseif os(Windows)
+ import ucrt
+ private let cpow: (_: Double, _: Double) -> Double = ucrt.pow
++#elseif canImport(Bionic)
++import CoreFoundation
++import Bionic
++private let cpow: (_: Double, _: Double) -> Double = Bionic.pow
+ #else
+ import CoreFoundation
+ import Glibc

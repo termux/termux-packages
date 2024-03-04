@@ -1,0 +1,746 @@
+From 7afa419dd47cc537c02b788dd3e0428749d38cd0
+From: Erik Eckstein <eeckstein@apple.com>
+Date: Thu, 21 Mar 2024 15:19:33 +0100
+Subject: SIL: improve inline bitfields in SILNode, SILBasicBlock
+ and Operand
+
+* Let the customBits and lastInitializedBitfieldID share a single uint64_t. This increases the number of available bits in SILNode and Operand from 8 to 20. Also, it simplifies the Operand class because no PointerIntPairs are used anymore to store the operand pointer fields.
+* Instead make the "deleted" flag a separate bool field in SILNode (instead of encoding it with the sign of lastInitializedBitfieldID). Another simplification
+* Enable important invariant checks also in release builds by using `require` instead of `assert`. Not catching such errors in release builds would be a disaster.
+* Let the Swift optimization passes use all the available bits and not only a fixed amount of 8 (SILNode) and 16 (SILBasicBlock).
+
+diff --git a/swift/SwiftCompilerSources/Sources/Optimizer/DataStructures/Set.swift b/swift/SwiftCompilerSources/Sources/Optimizer/DataStructures/Set.swift
+index 4cb20cbe2cc76..d2ab37357656e 100644
+--- a/swift/SwiftCompilerSources/Sources/Optimizer/DataStructures/Set.swift
++++ b/swift/SwiftCompilerSources/Sources/Optimizer/DataStructures/Set.swift
+@@ -176,3 +176,55 @@ struct InstructionSet : IntrusiveSet {
+     context.freeNodeSet(bridged)
+   }
+ }
++
++/// A set of operands.
++///
++/// This is an extremely efficient implementation which does not need memory
++/// allocations or hash lookups.
++///
++/// This type should be a move-only type, but unfortunately we don't have move-only
++/// types yet. Therefore it's needed to call `deinitialize()` explicitly to
++/// destruct this data structure, e.g. in a `defer {}` block.
++struct OperandSet : IntrusiveSet {
++
++  private let context: BridgedPassContext
++  private let bridged: BridgedOperandSet
++
++  init(_ context: some Context) {
++    self.context = context._bridged
++    self.bridged = self.context.allocOperandSet()
++  }
++
++  func contains(_ operand: Operand) -> Bool {
++    bridged.contains(operand.bridged)
++  }
++
++  /// Returns true if `inst` was not contained in the set before inserting.
++  @discardableResult
++  mutating func insert(_ operand: Operand) -> Bool {
++    bridged.insert(operand.bridged)
++  }
++
++  mutating func erase(_ operand: Operand) {
++    bridged.erase(operand.bridged)
++  }
++
++  var description: String {
++    let function = bridged.getFunction().function
++    var d = "{\n"
++    for inst in function.instructions {
++      for op in inst.operands {
++        if contains(op) {
++          d += op.description
++        }
++      }
++    }
++    d += "}\n"
++    return d
++  }
++
++  /// TODO: once we have move-only types, make this a real deinit.
++  mutating func deinitialize() {
++    context.freeOperandSet(bridged)
++  }
++}
+diff --git a/swift/SwiftCompilerSources/Sources/Optimizer/DataStructures/Worklist.swift b/swift/SwiftCompilerSources/Sources/Optimizer/DataStructures/Worklist.swift
+index c36002ab59e8b..a5d1a00ff9ec3 100644
+--- a/swift/SwiftCompilerSources/Sources/Optimizer/DataStructures/Worklist.swift
++++ b/swift/SwiftCompilerSources/Sources/Optimizer/DataStructures/Worklist.swift
+@@ -75,3 +75,4 @@ struct Worklist<Set: IntrusiveSet> : CustomStringConvertible, NoReflectionChildr
+ typealias BasicBlockWorklist = Worklist<BasicBlockSet>
+ typealias InstructionWorklist = Worklist<InstructionSet>
+ typealias ValueWorklist = Worklist<ValueSet>
++typealias OperandWorklist = Worklist<OperandSet>
+diff --git a/swift/SwiftCompilerSources/Sources/SIL/Operand.swift b/swift/SwiftCompilerSources/Sources/SIL/Operand.swift
+index f3369ae01a843..d353cf45aef6a 100644
+--- a/swift/SwiftCompilerSources/Sources/SIL/Operand.swift
++++ b/swift/SwiftCompilerSources/Sources/SIL/Operand.swift
+@@ -14,7 +14,7 @@ import SILBridging
+ 
+ /// An operand of an instruction.
+ public struct Operand : CustomStringConvertible, NoReflectionChildren {
+-  fileprivate let bridged: BridgedOperand
++  public let bridged: BridgedOperand
+ 
+   public init(bridged: BridgedOperand) {
+     self.bridged = bridged
+diff --git a/swift/include/swift/Basic/Require.h b/swift/include/swift/Basic/Require.h
+new file mode 100644
+index 0000000000000..54d1aed574c59
+--- /dev/null
++++ b/swift/include/swift/Basic/Require.h
+@@ -0,0 +1,34 @@
++//===--- Require.h ----------------------------------------------*- C++ -*-===//
++//
++// This source file is part of the Swift.org open source project
++//
++// Copyright (c) 2014 - 2024 Apple Inc. and the Swift project authors
++// Licensed under Apache License v2.0 with Runtime Library Exception
++//
++// See https://swift.org/LICENSE.txt for license information
++// See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
++//
++//===----------------------------------------------------------------------===//
++//
++//  This file defines swift_unreachable, which provides the
++//  functionality of llvm_unreachable without necessarily depending on
++//  the LLVM support libraries.
++//
++//===----------------------------------------------------------------------===//
++
++#ifndef SWIFT_BASIC_REQUIRE_H
++#define SWIFT_BASIC_REQUIRE_H
++
++#include "llvm/Support/raw_ostream.h"
++namespace swift {
++/// Checks the `condition` and if it's false abort with `message`.
++/// In contrast to `assert` and similar functions, `require` works in
++/// no-assert builds the same way as in debug builds.
++inline void require(bool condition, const char *message) {
++  if (!condition) {
++    llvm::errs() << message << '\n';
++    abort();
++  }
++}
++}
++#endif
+diff --git a/swift/include/swift/SIL/SILBasicBlock.h b/swift/include/swift/SIL/SILBasicBlock.h
+index d1a72d5a6f683..ddd81e02b89e6 100644
+--- a/swift/include/swift/SIL/SILBasicBlock.h
++++ b/swift/include/swift/SIL/SILBasicBlock.h
+@@ -130,16 +130,13 @@ public SwiftObjectHeader {
+   ///    DD and EEE are uninitialized
+   ///
+   /// See also: SILBitfield::bitfieldID, SILFunction::currentBitfieldID.
+-  int64_t lastInitializedBitfieldID = 0;
++  uint64_t lastInitializedBitfieldID = 0;
+ 
+   // Used by `BasicBlockBitfield`.
+   unsigned getCustomBits() const { return customBits; }
+   // Used by `BasicBlockBitfield`.
+   void setCustomBits(unsigned value) { customBits = value; }
+ 
+-  // Used by `BasicBlockBitfield`.
+-  enum { numCustomBits = std::numeric_limits<CustomBitsType>::digits };
+-
+   friend struct llvm::ilist_traits<SILBasicBlock>;
+ 
+   SILBasicBlock();
+@@ -155,7 +152,8 @@ public SwiftObjectHeader {
+ 
+   ~SILBasicBlock();
+ 
+-  bool isMarkedAsDeleted() const { return lastInitializedBitfieldID < 0; }
++  enum { numCustomBits = std::numeric_limits<CustomBitsType>::digits };
++  enum { maxBitfieldID = std::numeric_limits<uint64_t>::max() };
+ 
+   /// Gets the ID (= index in the function's block list) of the block.
+   ///
+diff --git a/swift/include/swift/SIL/SILBitfield.h b/swift/include/swift/SIL/SILBitfield.h
+index 7e445a72b5262..148c0109a9924 100644
+--- a/swift/include/swift/SIL/SILBitfield.h
++++ b/swift/include/swift/SIL/SILBitfield.h
+@@ -17,6 +17,7 @@
+ #ifndef SWIFT_SIL_SILBITFIELD_H
+ #define SWIFT_SIL_SILBITFIELD_H
+ 
++#include "swift/Basic/Require.h"
+ #include "swift/SIL/SILFunction.h"
+ 
+ namespace swift {
+@@ -30,7 +31,7 @@ template <class Impl, class T> class SILBitfield {
+   /// that the bits of that block are not initialized yet.
+   /// See also: SILBasicBlock::lastInitializedBitfieldID,
+   ///           SILFunction::currentBitfieldID
+-  int64_t bitfieldID;
++  uint64_t bitfieldID;
+ 
+   short startBit;
+   short endBit;
+@@ -55,11 +56,13 @@ template <class Impl, class T> class SILBitfield {
+       parent(parent),
+       function(function) {
+     assert(size > 0 && "bit field size must be > 0");
+-    assert(endBit <= T::numCustomBits && "too many/large bit fields allocated in function");
++    require(endBit <= T::numCustomBits,
++            "too many/large bit fields allocated in function");
+     assert((!parent || bitfieldID > parent->bitfieldID) &&
+            "BasicBlockBitfield indices are not in order");
++    require(function->currentBitfieldID < T::maxBitfieldID,
++            "currentBitfieldID overflow");
+     ++function->currentBitfieldID;
+-    assert(function->currentBitfieldID != 0 && "currentBitfieldID overflow");
+   }
+ 
+   SILBitfield(const SILBitfield &) = delete;
+@@ -85,9 +88,6 @@ template <class Impl, class T> class SILBitfield {
+     unsigned clearMask = mask;
+     if (bitfieldID > entity->lastInitializedBitfieldID) {
+ 
+-      if (entity->isMarkedAsDeleted())
+-        return;
+-
+       // The bitfield is not initialized yet in this block.
+       // Initialize the bitfield, and also initialize all parent bitfields,
+       // which are not initialized, yet. Example:
+diff --git a/swift/include/swift/SIL/SILFunction.h b/swift/include/swift/SIL/SILFunction.h
+index 27fd1b5d91505..a624914c7574f 100644
+--- a/swift/include/swift/SIL/SILFunction.h
++++ b/swift/include/swift/SIL/SILFunction.h
+@@ -294,7 +294,7 @@ class SILFunction
+   /// A monotonically increasing ID which is incremented whenever a
+   /// BasicBlockBitfield, NodeBitfield, or OperandBitfield is constructed.  For
+   /// details see SILBitfield::bitfieldID;
+-  int64_t currentBitfieldID = 1;
++  uint64_t currentBitfieldID = 1;
+ 
+   /// Unique identifier for vector indexing and deterministic sorting.
+   /// May be reused when zombie functions are recovered.
+diff --git a/swift/include/swift/SIL/SILNode.h b/swift/include/swift/SIL/SILNode.h
+index 74f8ac228970b..b72705f5e8324 100644
+--- a/swift/include/swift/SIL/SILNode.h
++++ b/swift/include/swift/SIL/SILNode.h
+@@ -126,6 +126,9 @@ class alignas(8) SILNode :
+   enum { NumAllocRefTailTypesBits = 4 };
+   enum { NumMarkDependenceKindBits = 2 };
+ 
++  enum { numCustomBits = 20 };
++  enum { maxBitfieldID = std::numeric_limits<uint64_t>::max() >> numCustomBits };
++
+ protected:
+   friend class SILInstruction;
+   template <class, class> friend class SILBitfield;
+@@ -135,11 +138,7 @@ class alignas(8) SILNode :
+ 
+   uint8_t kind;
+ 
+-  // Used by `NodeBitfield`.
+-  enum { numCustomBits = 8 };
+-
+-  // Used by `NodeBitfield`.
+-  uint8_t customBits;
++  bool deleted = false;
+ 
+   // Part of SILInstruction's debug location. Together with
+   // `SILInstruction::locationStorage` this forms the SILLocation.
+@@ -364,6 +363,9 @@ class alignas(8) SILNode :
+ 
+   //===---------------------- end of shared fields ------------------------===//
+ 
++  // Used by `NodeBitfield`.
++  uint64_t customBits : numCustomBits;
++
+   /// The NodeBitfield ID of the last initialized bitfield in `customBits`.
+   /// Example:
+   ///
+@@ -377,20 +379,19 @@ class alignas(8) SILNode :
+   /// -> AAA, BB and C are initialized,
+   ///    DD and EEE are uninitialized
+   ///
+-  /// If the ID is negative, it means that the node (in case it's an instruction)
+-  /// is deleted, i.e. it does not belong to the function anymore. Conceptually
+-  /// this results in setting all bitfields to zero, which e.g. "removes" the
+-  /// node from all NodeSets.
++  /// The size of lastInitializedBitfieldID should be more than 32 bits to
++  /// absolutely avoid an overflow.
+   ///
+   /// See also: SILBitfield::bitfieldID, SILFunction::currentBitfieldID.
+-  int64_t lastInitializedBitfieldID = 0;
++  uint64_t lastInitializedBitfieldID : (64 - numCustomBits);
+ 
+ private:
+   SwiftMetatype getSILNodeMetatype(SILNodeKind kind);
+ 
+ protected:
+   SILNode(SILNodeKind kind) : SwiftObjectHeader(getSILNodeMetatype(kind)),
+-                              kind((uint8_t)kind) {
++                              kind((uint8_t)kind),
++                              customBits(0), lastInitializedBitfieldID(0) {
+     _sharedUInt8_private.opaque = 0;
+     _sharedUInt32_private.opaque = 0;
+   }
+@@ -442,11 +443,8 @@ class alignas(8) SILNode :
+     lastInitializedBitfieldID = 0;
+   }
+ 
+-  void markAsDeleted() {
+-    lastInitializedBitfieldID = -1;
+-  }
+-
+-  bool isMarkedAsDeleted() const { return lastInitializedBitfieldID < 0; }
++  void markAsDeleted() { deleted = true; }
++  bool isMarkedAsDeleted() const { return deleted; }
+ 
+   static SILNode *instAsNode(SILInstruction *inst);
+   static const SILNode *instAsNode(const SILInstruction *inst);
+diff --git a/swift/include/swift/SIL/SILValue.h b/swift/include/swift/SIL/SILValue.h
+index 5916b686b76dd..756e96e95ae58 100644
+--- a/swift/include/swift/SIL/SILValue.h
++++ b/swift/include/swift/SIL/SILValue.h
+@@ -1019,38 +1019,40 @@ ValueOwnershipKind::getForwardingOperandOwnership(bool allowUnowned) const {
+ /// A formal SIL reference to a value, suitable for use as a stored
+ /// operand.
+ class Operand {
++public:
++  enum { numCustomBits = 8 };
++  enum { maxBitfieldID = std::numeric_limits<uint64_t>::max() >> numCustomBits };
++
++private:
+   template <class, class> friend class SILBitfield;
+ 
+-  /// The value used as this operand combined with three bits we use for
+-  /// `customBits`.
+-  llvm::PointerIntPair<SILValue, 3> TheValueAndThreeBits = {SILValue(), 0};
++  /// The value used as this operand.
++  SILValue TheValue;
+ 
+-  /// The next operand in the use-chain. Note that the chain holds every use of
+-  /// the current ValueBase, not just those of the designated result.
+-  ///
+-  /// We use 3 bits of the pointer for customBits.
+-  llvm::PointerIntPair<Operand *, 3> NextUseAndThreeBits = {nullptr, 0};
++  /// The next operand in the use-chain.  Note that the chain holds
++  /// every use of the current ValueBase, not just those of the
++  /// designated result.
++  Operand *NextUse = nullptr;
+ 
+   /// A back-pointer in the use-chain, required for fast patching
+   /// of use-chains.
+-  ///
+-  /// We use 2 bits of the pointer for customBits.
+-  llvm::PointerIntPair<Operand **, 3> BackAndThreeBits = {nullptr, 0};
++  Operand **Back = nullptr;
+ 
+   /// The owner of this operand.
+   /// FIXME: this could be space-compressed.
+   SILInstruction *Owner;
+ 
+-  /// Used by `OperandBitfield`
+-  enum { numCustomBits = 8 };
++  uint64_t customBits : numCustomBits;
+ 
+-  /// Used by `OperandBitfield`
+-  int64_t lastInitializedBitfieldID = 0;
++  // For details see SILNode::lastInitializedBitfieldID
++  uint64_t lastInitializedBitfieldID : (64 - numCustomBits);
+ 
+ public:
+-  Operand(SILInstruction *owner) : Owner(owner) {}
++  Operand(SILInstruction *owner)
++      : Owner(owner), customBits(0), lastInitializedBitfieldID(0) {}
+   Operand(SILInstruction *owner, SILValue theValue)
+-      : TheValueAndThreeBits(theValue), Owner(owner) {
++      : TheValue(theValue), Owner(owner),
++        customBits(0), lastInitializedBitfieldID(0) {
+     insertIntoCurrent();
+   }
+ 
+@@ -1062,14 +1064,14 @@ class Operand {
+   Operand &operator=(Operand &&) = default;
+ 
+   /// Return the current value being used by this operand.
+-  SILValue get() const { return TheValueAndThreeBits.getPointer(); }
++  SILValue get() const { return TheValue; }
+ 
+   /// Set the current value being used by this operand.
+   void set(SILValue newValue) {
+     // It's probably not worth optimizing for the case of switching
+     // operands on a single value.
+     removeFromCurrent();
+-    TheValueAndThreeBits.setPointer(newValue);
++    TheValue = newValue;
+     insertIntoCurrent();
+   }
+ 
+@@ -1083,9 +1085,9 @@ class Operand {
+   /// Remove this use of the operand.
+   void drop() {
+     removeFromCurrent();
+-    TheValueAndThreeBits = {SILValue(), 0};
+-    NextUseAndThreeBits = {nullptr, 0};
+-    BackAndThreeBits = {nullptr, 0};
++    TheValue = SILValue();
++    NextUse = nullptr;
++    Back = nullptr;
+     Owner = nullptr;
+   }
+ 
+@@ -1097,7 +1099,7 @@ class Operand {
+   SILInstruction *getUser() { return Owner; }
+   const SILInstruction *getUser() const { return Owner; }
+ 
+-  Operand *getNextUse() const { return NextUseAndThreeBits.getPointer(); }
++  Operand *getNextUse() const { return NextUse; }
+ 
+   /// Return true if this operand is a type dependent operand.
+   ///
+@@ -1147,32 +1149,14 @@ class Operand {
+   SILBasicBlock *getParentBlock() const;
+   SILFunction *getParentFunction() const;
+ 
+-  unsigned getCustomBits() const {
+-    unsigned bits = 0;
+-    bits |= TheValueAndThreeBits.getInt();
+-    bits |= NextUseAndThreeBits.getInt() << 3;
+-    bits |= BackAndThreeBits.getInt() << 2;
+-    return bits;
+-  }
+-
+-  void setCustomBits(unsigned bits) {
+-    assert(bits < 256 && "Can only store a byte?!");
+-    TheValueAndThreeBits.setInt(bits & 0x7);
+-    NextUseAndThreeBits.setInt((bits >> 3) & 0x7);
+-    BackAndThreeBits.setInt((bits >> 6) & 0x3);
+-  }
++  unsigned getCustomBits() const { return customBits; }
++  void setCustomBits(unsigned bits) {customBits = bits; }
+ 
+   // Called when transferring basic blocks from one function to another.
+   void resetBitfields() {
+     lastInitializedBitfieldID = 0;
+   }
+ 
+-  void markAsDeleted() {
+-    lastInitializedBitfieldID = -1;
+-  }
+-
+-  bool isMarkedAsDeleted() const { return lastInitializedBitfieldID < 0; }
+-
+   SILFunction *getFunction() const;
+ 
+   void print(llvm::raw_ostream &os) const;
+@@ -1180,30 +1164,21 @@ class Operand {
+ 
+ private:
+   void removeFromCurrent() {
+-    auto *back = getBack();
+-    if (!back)
+-      return;
+-    auto *nextUse = getNextUse();
+-    *back = nextUse;
+-    if (nextUse)
+-      nextUse->setBack(back);
++    if (!Back)
++       return;
++     *Back = NextUse;
++     if (NextUse)
++       NextUse->Back = Back;
+   }
+ 
+   void insertIntoCurrent() {
+-    auto **firstUse = &get()->FirstUse;
+-    setBack(firstUse);
+-    setNextUse(*firstUse);
+-    if (auto *nextUse = getNextUse())
+-      nextUse->setBack(NextUseAndThreeBits.getAddrOfPointer());
+-    get()->FirstUse = this;
++    Back = &TheValue->FirstUse;
++    NextUse = TheValue->FirstUse;
++    if (NextUse)
++      NextUse->Back = &NextUse;
++    TheValue->FirstUse = this;
+   }
+ 
+-  void setNextUse(Operand *op) { NextUseAndThreeBits.setPointer(op); }
+-
+-  Operand **getBack() const { return BackAndThreeBits.getPointer(); }
+-
+-  void setBack(Operand **newValue) { BackAndThreeBits.setPointer(newValue); }
+-
+   friend class ValueBase;
+   friend class ValueBaseUseIterator;
+   friend class ConsumingUseIterator;
+diff --git a/swift/include/swift/SILOptimizer/OptimizerBridging.h b/swift/include/swift/SILOptimizer/OptimizerBridging.h
+index e0194a2b7b48a..ea8ef4210fec8 100644
+--- a/swift/include/swift/SILOptimizer/OptimizerBridging.h
++++ b/swift/include/swift/SILOptimizer/OptimizerBridging.h
+@@ -50,6 +50,7 @@ class DominanceInfo;
+ class PostDominanceInfo;
+ class BasicBlockSet;
+ class NodeSet;
++class OperandSet;
+ class ClonerWithFixedLocation;
+ class SwiftPassInvocation;
+ class FixedSizeSlabPayload;
+@@ -155,6 +156,15 @@ struct BridgedNodeSet {
+   SWIFT_IMPORT_UNSAFE BRIDGED_INLINE BridgedFunction getFunction() const;
+ };
+ 
++struct BridgedOperandSet {
++  swift::OperandSet * _Nonnull set;
++
++  BRIDGED_INLINE bool contains(BridgedOperand operand) const;
++  BRIDGED_INLINE bool insert(BridgedOperand operand) const;
++  BRIDGED_INLINE void erase(BridgedOperand operand) const;
++  SWIFT_IMPORT_UNSAFE BRIDGED_INLINE BridgedFunction getFunction() const;
++};
++
+ struct BridgedCloner {
+   swift::ClonerWithFixedLocation * _Nonnull cloner;
+ 
+@@ -244,6 +254,8 @@ struct BridgedPassContext {
+   BRIDGED_INLINE void freeBasicBlockSet(BridgedBasicBlockSet set) const;
+   SWIFT_IMPORT_UNSAFE BRIDGED_INLINE BridgedNodeSet allocNodeSet() const;
+   BRIDGED_INLINE void freeNodeSet(BridgedNodeSet set) const;
++  SWIFT_IMPORT_UNSAFE BRIDGED_INLINE BridgedOperandSet allocOperandSet() const;
++  BRIDGED_INLINE void freeOperandSet(BridgedOperandSet set) const;
+ 
+   // Stack nesting
+ 
+diff --git a/swift/include/swift/SILOptimizer/OptimizerBridgingImpl.h b/swift/include/swift/SILOptimizer/OptimizerBridgingImpl.h
+index 81ec890a88e1b..c79133a6c5447 100644
+--- a/swift/include/swift/SILOptimizer/OptimizerBridgingImpl.h
++++ b/swift/include/swift/SILOptimizer/OptimizerBridgingImpl.h
+@@ -129,6 +129,26 @@ BridgedFunction BridgedNodeSet::getFunction() const {
+   return {set->getFunction()};
+ }
+ 
++//===----------------------------------------------------------------------===//
++//                            BridgedOperandSet
++//===----------------------------------------------------------------------===//
++
++bool BridgedOperandSet::contains(BridgedOperand operand) const {
++  return set->contains(operand.op);
++}
++
++bool BridgedOperandSet::insert(BridgedOperand operand) const {
++  return set->insert(operand.op);
++}
++
++void BridgedOperandSet::erase(BridgedOperand operand) const {
++  set->erase(operand.op);
++}
++
++BridgedFunction BridgedOperandSet::getFunction() const {
++  return {set->getFunction()};
++}
++
+ //===----------------------------------------------------------------------===//
+ //                            BridgedPassContext
+ //===----------------------------------------------------------------------===//
+@@ -256,6 +276,14 @@ void BridgedPassContext::freeNodeSet(BridgedNodeSet set) const {
+   invocation->freeNodeSet(set.set);
+ }
+ 
++BridgedOperandSet BridgedPassContext::allocOperandSet() const {
++  return {invocation->allocOperandSet()};
++}
++
++void BridgedPassContext::freeOperandSet(BridgedOperandSet set) const {
++  invocation->freeOperandSet(set.set);
++}
++
+ void BridgedPassContext::notifyInvalidatedStackNesting() const {
+   invocation->setNeedFixStackNesting(true);
+ }
+diff --git a/swift/include/swift/SILOptimizer/PassManager/PassManager.h b/swift/include/swift/SILOptimizer/PassManager/PassManager.h
+index daf060c43829b..b1f12580f02ec 100644
+--- a/swift/include/swift/SILOptimizer/PassManager/PassManager.h
++++ b/swift/include/swift/SILOptimizer/PassManager/PassManager.h
+@@ -14,6 +14,7 @@
+ #include "swift/SIL/InstructionUtils.h"
+ #include "swift/SIL/BasicBlockBits.h"
+ #include "swift/SIL/NodeBits.h"
++#include "swift/SIL/OperandBits.h"
+ #include "swift/SILOptimizer/Analysis/Analysis.h"
+ #include "swift/SILOptimizer/PassManager/PassPipeline.h"
+ #include "swift/SILOptimizer/PassManager/Passes.h"
+@@ -73,16 +74,21 @@ class SwiftPassInvocation {
+ 
+   SILSSAUpdater *ssaUpdater = nullptr;
+ 
+-  static constexpr int BlockSetCapacity = 16;
++  static constexpr int BlockSetCapacity = SILBasicBlock::numCustomBits;
+   char blockSetStorage[sizeof(BasicBlockSet) * BlockSetCapacity];
+   bool aliveBlockSets[BlockSetCapacity];
+   int numBlockSetsAllocated = 0;
+ 
+-  static constexpr int NodeSetCapacity = 8;
++  static constexpr int NodeSetCapacity = SILNode::numCustomBits;
+   char nodeSetStorage[sizeof(NodeSet) * NodeSetCapacity];
+   bool aliveNodeSets[NodeSetCapacity];
+   int numNodeSetsAllocated = 0;
+ 
++  static constexpr int OperandSetCapacity = Operand::numCustomBits;
++  char operandSetStorage[sizeof(OperandSet) * OperandSetCapacity];
++  bool aliveOperandSets[OperandSetCapacity];
++  int numOperandSetsAllocated = 0;
++
+   int numClonersAllocated = 0;
+ 
+   bool needFixStackNesting = false;
+@@ -123,6 +129,10 @@ class SwiftPassInvocation {
+ 
+   void freeNodeSet(NodeSet *set);
+ 
++  OperandSet *allocOperandSet();
++
++  void freeOperandSet(OperandSet *set);
++
+   /// The top-level API to erase an instruction, called from the Swift pass.
+   void eraseInstruction(SILInstruction *inst);
+ 
+diff --git a/swift/lib/SIL/IR/SILBasicBlock.cpp b/swift/lib/SIL/IR/SILBasicBlock.cpp
+index 7198afb189837..8419eaf41a4f3 100644
+--- a/swift/lib/SIL/IR/SILBasicBlock.cpp
++++ b/swift/lib/SIL/IR/SILBasicBlock.cpp
+@@ -335,6 +335,9 @@ transferNodesFromList(llvm::ilist_traits<SILBasicBlock> &SrcTraits,
+       for (SILValue result : II.getResults()) {
+         result->resetBitfields();
+       }
++      for (Operand &op : II.getAllOperands()) {
++        op.resetBitfields();
++      }
+       II.asSILNode()->resetBitfields();
+     
+       II.setDebugScope(ScopeCloner.getOrCreateClonedScope(II.getDebugScope()));
+diff --git a/swift/lib/SIL/IR/SILInstruction.cpp b/swift/lib/SIL/IR/SILInstruction.cpp
+index 2f27bfe09b9b8..2d154494d60f3 100644
+--- a/swift/lib/SIL/IR/SILInstruction.cpp
++++ b/swift/lib/SIL/IR/SILInstruction.cpp
+@@ -85,6 +85,9 @@ transferNodesFromList(llvm::ilist_traits<SILInstruction> &L2,
+       for (SILValue result : first->getResults()) {
+         result->resetBitfields();
+       }
++      for (Operand &op : first->getAllOperands()) {
++        op.resetBitfields();
++      }
+       first->asSILNode()->resetBitfields();
+     }
+   }
+diff --git a/swift/lib/SILOptimizer/PassManager/PassManager.cpp b/swift/lib/SILOptimizer/PassManager/PassManager.cpp
+index c5d9025b00d22..651afa5cfb322 100644
+--- a/swift/lib/SILOptimizer/PassManager/PassManager.cpp
++++ b/swift/lib/SILOptimizer/PassManager/PassManager.cpp
+@@ -1402,8 +1402,8 @@ FixedSizeSlab *SwiftPassInvocation::freeSlab(FixedSizeSlab *slab) {
+ }
+ 
+ BasicBlockSet *SwiftPassInvocation::allocBlockSet() {
+-  assert(numBlockSetsAllocated < BlockSetCapacity - 1 &&
+-         "too many BasicBlockSets allocated");
++  require(numBlockSetsAllocated < BlockSetCapacity,
++          "too many BasicBlockSets allocated");
+ 
+   auto *storage = (BasicBlockSet *)blockSetStorage + numBlockSetsAllocated;
+   BasicBlockSet *set = new (storage) BasicBlockSet(function);
+@@ -1426,8 +1426,8 @@ void SwiftPassInvocation::freeBlockSet(BasicBlockSet *set) {
+ }
+ 
+ NodeSet *SwiftPassInvocation::allocNodeSet() {
+-  assert(numNodeSetsAllocated < NodeSetCapacity - 1 &&
+-         "too many BasicNodeSets allocated");
++  require(numNodeSetsAllocated < NodeSetCapacity,
++          "too many NodeSets allocated");
+ 
+   auto *storage = (NodeSet *)nodeSetStorage + numNodeSetsAllocated;
+   NodeSet *set = new (storage) NodeSet(function);
+@@ -1449,6 +1449,30 @@ void SwiftPassInvocation::freeNodeSet(NodeSet *set) {
+   }
+ }
+ 
++OperandSet *SwiftPassInvocation::allocOperandSet() {
++  require(numOperandSetsAllocated < OperandSetCapacity,
++          "too many OperandSets allocated");
++
++  auto *storage = (OperandSet *)operandSetStorage + numOperandSetsAllocated;
++  OperandSet *set = new (storage) OperandSet(function);
++  aliveOperandSets[numOperandSetsAllocated] = true;
++  ++numOperandSetsAllocated;
++  return set;
++}
++
++void SwiftPassInvocation::freeOperandSet(OperandSet *set) {
++  int idx = set - (OperandSet *)operandSetStorage;
++  assert(idx >= 0 && idx < numOperandSetsAllocated);
++  assert(aliveOperandSets[idx] && "double free of OperandSet");
++  aliveOperandSets[idx] = false;
++
++  while (numOperandSetsAllocated > 0 && !aliveOperandSets[numOperandSetsAllocated - 1]) {
++    auto *set = (OperandSet *)operandSetStorage + numOperandSetsAllocated - 1;
++    set->~OperandSet();
++    --numOperandSetsAllocated;
++  }
++}
++
+ void SwiftPassInvocation::startModulePassRun(SILModuleTransform *transform) {
+   assert(!this->function && !this->transform && "a pass is already running");
+   this->function = nullptr;
+@@ -1493,6 +1517,7 @@ void SwiftPassInvocation::endPass() {
+   assert(allocatedSlabs.empty() && "StackList is leaking slabs");
+   assert(numBlockSetsAllocated == 0 && "Not all BasicBlockSets deallocated");
+   assert(numNodeSetsAllocated == 0 && "Not all NodeSets deallocated");
++  assert(numOperandSetsAllocated == 0 && "Not all OperandSets deallocated");
+   assert(numClonersAllocated == 0 && "Not all cloners deallocated");
+   assert(!needFixStackNesting && "Stack nesting not fixed");
+   if (ssaUpdater) {
+@@ -1517,6 +1542,7 @@ void SwiftPassInvocation::endTransformFunction() {
+   function = nullptr;
+   assert(numBlockSetsAllocated == 0 && "Not all BasicBlockSets deallocated");
+   assert(numNodeSetsAllocated == 0 && "Not all NodeSets deallocated");
++  assert(numOperandSetsAllocated == 0 && "Not all OperandSets deallocated");
+ }
+ 
+ void SwiftPassInvocation::beginVerifyFunction(SILFunction *function) {
+@@ -1535,6 +1561,7 @@ void SwiftPassInvocation::endVerifyFunction() {
+            "verifyication must not change the SIL of a function");
+     assert(numBlockSetsAllocated == 0 && "Not all BasicBlockSets deallocated");
+     assert(numNodeSetsAllocated == 0 && "Not all NodeSets deallocated");
++    assert(numOperandSetsAllocated == 0 && "Not all OperandSets deallocated");
+     function = nullptr;
+   }
+ }
+diff --git a/swift/unittests/SIL/SILBitfieldTest.cpp b/swift/unittests/SIL/SILBitfieldTest.cpp
+index c9d23bf06b8e1..a11ace8c5483e 100644
+--- a/swift/unittests/SIL/SILBitfieldTest.cpp
++++ b/swift/unittests/SIL/SILBitfieldTest.cpp
+@@ -21,20 +21,20 @@ class BasicBlockBitfield;
+ 
+ struct SILFunction {
+   BasicBlockBitfield *newestAliveBlockBitfield = nullptr;
+-  int64_t currentBitfieldID = 1;
++  uint64_t currentBitfieldID = 1;
+ };
+ 
+ struct SILBasicBlock {
+   SILFunction *function;
+   uint32_t customBits = 0;
+-  int64_t lastInitializedBitfieldID = 0;
++  uint64_t lastInitializedBitfieldID = 0;
+ 
+   enum { numCustomBits = 32 };
++  enum { maxBitfieldID = std::numeric_limits<uint64_t>::max() };
+ 
+   SILBasicBlock(SILFunction *function): function(function) {}
+ 
+   SILFunction *getFunction() const { return function; }
+-  bool isMarkedAsDeleted() const { return false; }
+   
+   unsigned getCustomBits() const { return customBits; }
+   void setCustomBits(unsigned value) { customBits = value; }
