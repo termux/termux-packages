@@ -1,0 +1,27 @@
+Description: Fix OpenSSL 1.1 detection and access to now opaque structures.
+Bug-Debian: https://bugs.debian.org/845035
+Author: Axel Beckert <abe@debian.org>
+Forwarded: http://lists.dillo.org/pipermail/dillo-dev/2017-September/011076.html
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -286,7 +286,7 @@
+ 
+   if test "x$ssl_ok" = "xyes"; then
+     old_libs="$LIBS"
+-    AC_CHECK_LIB(ssl, SSL_library_init, ssl_ok=yes, ssl_ok=no, -lcrypto)
++    AC_CHECK_LIB(ssl, SSL_new, ssl_ok=yes, ssl_ok=no, -lcrypto)
+     LIBS="$old_libs"
+   fi
+ 
+--- a/dpi/https.c
++++ b/dpi/https.c
+@@ -476,7 +476,7 @@
+       case X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT:
+          /*Either self signed and untrusted*/
+          /*Extract CN from certificate name information*/
+-         if ((cn = strstr(remote_cert->name, "/CN=")) == NULL) {
++         if ((cn = strstr(X509_get_subject_name((X509 *) remote_cert), "/CN=")) == NULL) {
+             strcpy(buf, "(no CN given)");
+          } else {
+             char *cn_end;

@@ -1,0 +1,64 @@
+From 7624eefe5a1f116f1e2b4c43fb5933181d7cdfa3 Mon Sep 17 00:00:00 2001
+From: Rodrigo Arias Mallo <rodarima@gmail.com>
+Date: Sun, 3 Mar 2024 18:27:38 +0100
+Subject: [PATCH] Use memset() instead of bzero()
+
+The bzero() function is removed in POSIX.1-2008.
+
+Fixes: https://github.com/dillo-browser/dillo/issues/91
+---
+ dpid/dpidc.c | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
+
+diff --git a/dpid/dpidc.c b/dpid/dpidc.c
+index 58db9c3..1e0bb39 100644
+--- a/dpid/dpidc.c
++++ b/dpid/dpidc.c
+@@ -1,6 +1,16 @@
++/*
++ * Copyright (C) 2009-2013 Jorge Arellano Cid <jcid@dillo.org>
++ * Copyright (C) 2024 Rodrigo Arias Mallo <rodarima@gmail.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 3 of the License, or
++ * (at your option) any later version.
++ */
++
+ #include <stdio.h>
+ #include <stdlib.h>  /* for exit */
+-#include <string.h>  /* for bzero */
++#include <string.h>  /* for memset */
+ #include <unistd.h>  /* for read and write */
+ #include <ctype.h>   /* for isxdigit */
+ #include <sys/types.h>
+@@ -79,7 +89,7 @@ int main(int argc, char *argv[])
+     sockfd = socket(AF_INET, SOCK_STREAM, 0);
+     if (sockfd < 0)
+         error("ERROR opening socket");
+-    bzero((char *) &serv_addr, sizeof(serv_addr));
++    memset(&serv_addr, 0, sizeof(serv_addr));
+     serv_addr.sin_family = AF_INET;
+     serv_addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+ 
+@@ -98,7 +108,7 @@ int main(int argc, char *argv[])
+        strcpy(buffer, CMD_REGISTER);
+     } else if (strcmp(argv[1], "chat") == 0) {
+        printf("Please enter the message: ");
+-       bzero(buffer,256);
++       memset(buffer,0,256);
+        if (fgets(buffer,255,stdin) == NULL)
+           MSG_ERR("dpidc: Can't read the message\n");
+     } else {
+@@ -111,7 +121,7 @@ int main(int argc, char *argv[])
+     if (n < 0)
+          error("ERROR writing to socket");
+ /*
+-    bzero(buffer,256);
++    memset(buffer,0,256);
+     n = read(sockfd,buffer,255);
+     if (n < 0)
+          error("ERROR reading from socket");
+-- 
+2.44.0
+
