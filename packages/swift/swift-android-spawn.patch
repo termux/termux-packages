@@ -37,20 +37,30 @@ diff --git a/swift-corelibs-foundation/Sources/Foundation/CMakeLists.txt b/swift
 index 016bf294..cd534f16 100644
 --- a/swift-corelibs-foundation/Sources/Foundation/CMakeLists.txt
 +++ b/swift-corelibs-foundation/Sources/Foundation/CMakeLists.txt
-@@ -166,6 +166,13 @@ if(CMAKE_SYSTEM_NAME STREQUAL Windows)
-     $<TARGET_OBJECTS:CoreFoundationResources>)
- elseif(NOT CMAKE_SYSTEM_NAME STREQUAL Darwin)
-   target_link_options(Foundation PRIVATE "SHELL:-no-toolchain-stdlib-rpath")
-+  if(${CMAKE_SYSTEM_NAME} STREQUAL Android)
-+    target_link_libraries(Foundation PRIVATE android-spawn)
-+    if(CMAKE_FIND_ROOT_PATH)
-+      target_include_directories(Foundation PUBLIC ${CMAKE_FIND_ROOT_PATH}/usr/include)
-+      target_link_directories(Foundation PUBLIC ${CMAKE_FIND_ROOT_PATH}/usr/lib)
+@@ -162,6 +162,10 @@ if(NOT BUILD_SHARED_LIBS)
+         "SHELL:$<$<COMPILE_LANGUAGE:Swift>:-Xfrontend -public-autolink-library -Xfrontend _FoundationICU>")
+     target_compile_options(Foundation PRIVATE
+         "SHELL:$<$<COMPILE_LANGUAGE:Swift>:-Xfrontend -public-autolink-library -Xfrontend swiftSynchronization>")
++    if(${CMAKE_SYSTEM_NAME} STREQUAL Android)
++      target_compile_options(Foundation PRIVATE
++          "SHELL:$<$<COMPILE_LANGUAGE:Swift>:-Xfrontend -public-autolink-library -Xfrontend android-spawn>")
 +    endif()
-+  endif()
  endif()
  
+ set_target_properties(Foundation PROPERTIES
+@@ -174,6 +174,12 @@
+     target_link_libraries(Foundation PUBLIC
+         swiftDispatch)
+ endif()
++  if(${CMAKE_SYSTEM_NAME} STREQUAL Android)
++    target_link_libraries(Foundation PRIVATE android-spawn)
++    list(GET CMAKE_FIND_ROOT_PATH 0 SPAWN_DIR)
++    target_include_directories(Foundation PUBLIC ${SPAWN_DIR}/usr/include)
++    target_link_directories(Foundation PUBLIC ${SPAWN_DIR}/usr/lib)
++  endif()
  
+ if(LINKER_SUPPORTS_BUILD_ID)
+   target_link_options(Foundation PRIVATE "LINKER:--build-id=sha1")
 diff --git a/swift-driver/Utilities/build-script-helper.py b/swift-driver/Utilities/build-script-helper.py
 index 18f22fb0..bc2b1308 100755
 --- a/swift-driver/Utilities/build-script-helper.py

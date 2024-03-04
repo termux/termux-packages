@@ -1,0 +1,168 @@
+commit ad6ca71b4eef90e3ae69b130e3cc989a21192020
+Author: Alex Lorenz <arphaman@gmail.com>
+Date:   Wed Aug 14 10:56:25 2024 -0700
+
+    [android] fix the LP32 armv7/i686 android build (#846)
+    
+    * [android] fix the LP32 armv7/i686 android build
+    
+    * Update Sources/FoundationEssentials/Android+Extensions.swift
+    
+    Co-authored-by: Jeremy Schonfeld <1004103+jmschonfeld@users.noreply.github.com>
+    
+    * drop the android Lp32 specific operator &
+    
+    ---------
+    
+    Co-authored-by: Jeremy Schonfeld <1004103+jmschonfeld@users.noreply.github.com>
+
+diff --git a/swift-foundation/Sources/FoundationEssentials/Data/Data+Reading.swift b/swift-foundation/Sources/FoundationEssentials/Data/Data+Reading.swift
+index 2540b14..a779837 100644
+--- a/swift-foundation/Sources/FoundationEssentials/Data/Data+Reading.swift
++++ b/swift-foundation/Sources/FoundationEssentials/Data/Data+Reading.swift
+@@ -325,7 +325,7 @@ internal func readBytesFromFile(path inPath: PathOrURL, reportProgress: Bool, ma
+     }
+     
+     let fileSize = min(Int(clamping: filestat.st_size), maxLength ?? Int.max)
+-    let fileType = filestat.st_mode & S_IFMT
++    let fileType = mode_t(filestat.st_mode) & S_IFMT
+ #if !NO_FILESYSTEM
+     let shouldMap = shouldMapFileDescriptor(fd, path: inPath, options: options)
+ #else
+diff --git a/swift-foundation/Sources/FoundationEssentials/FileManager/FileManager+Basics.swift b/swift-foundation/Sources/FoundationEssentials/FileManager/FileManager+Basics.swift
+index 991c5e8..d3e6de3 100644
+--- a/swift-foundation/Sources/FoundationEssentials/FileManager/FileManager+Basics.swift
++++ b/swift-foundation/Sources/FoundationEssentials/FileManager/FileManager+Basics.swift
+@@ -221,7 +221,7 @@ internal struct _FileManagerImpl {
+             var statBuf = stat()
+             let fd = open(path, 0, 0)
+             guard fd >= 0 else { return nil }
+-            if fstat(fd, &statBuf) < 0 || statBuf.st_mode & S_IFMT == S_IFDIR {
++            if fstat(fd, &statBuf) < 0 || mode_t(statBuf.st_mode) & S_IFMT == S_IFDIR {
+                 close(fd)
+                 return nil
+             }
+@@ -240,7 +240,7 @@ internal struct _FileManagerImpl {
+         }
+         
+         /* check for being same type */
+-        if myInfo.st_mode & S_IFMT != otherInfo.st_mode & S_IFMT {
++        if mode_t(myInfo.st_mode) & S_IFMT != mode_t(otherInfo.st_mode) & S_IFMT {
+             return false
+         }
+         
+diff --git a/swift-foundation/Sources/FoundationEssentials/FileManager/FileManager+Files.swift b/swift-foundation/Sources/FoundationEssentials/FileManager/FileManager+Files.swift
+index b8cd50a..bee9fb3 100644
+--- a/swift-foundation/Sources/FoundationEssentials/FileManager/FileManager+Files.swift
++++ b/swift-foundation/Sources/FoundationEssentials/FileManager/FileManager+Files.swift
+@@ -175,7 +175,8 @@ extension stat {
+     }
+     
+     fileprivate var fileAttributes: [FileAttributeKey : Any] {
+-        let fileType = st_mode.fileType
++        // On 32 bit Android, st_mode is UInt32.
++        let fileType = mode_t(st_mode).fileType
+         var result: [FileAttributeKey : Any] = [
+             .size : _writeFileAttributePrimitive(st_size, as: UInt.self),
+             .modificationDate : modificationDate,
+@@ -400,7 +401,7 @@ extension _FileManagerImpl {
+             guard stat(rep, &fileInfo) == 0 else {
+                 return (false, false)
+             }
+-            let isDir = (fileInfo.st_mode & S_IFMT) == S_IFDIR
++            let isDir = (mode_t(fileInfo.st_mode) & S_IFMT) == S_IFDIR
+             return (true, isDir)
+         }
+ #endif
+@@ -479,7 +480,7 @@ extension _FileManagerImpl {
+             return false
+         }
+         
+-        if ((dirInfo.st_mode & S_ISVTX) != 0) && fileManager.fileExists(atPath: path) {
++        if ((mode_t(dirInfo.st_mode) & S_ISVTX) != 0) && fileManager.fileExists(atPath: path) {
+             // its sticky so verify that we own the file
+             // otherwise we answer YES on the principle that if
+             // we create files we can delete them
+diff --git a/swift-foundation/Sources/FoundationEssentials/FileManager/FileManager+Utilities.swift b/swift-foundation/Sources/FoundationEssentials/FileManager/FileManager+Utilities.swift
+index 9bac967..e531cb5 100644
+--- a/swift-foundation/Sources/FoundationEssentials/FileManager/FileManager+Utilities.swift
++++ b/swift-foundation/Sources/FoundationEssentials/FileManager/FileManager+Utilities.swift
+@@ -49,19 +49,19 @@ extension FILETIME {
+ #if !os(Windows)
+ extension stat {
+     var isDirectory: Bool {
+-        (self.st_mode & S_IFMT) == S_IFDIR
++        (mode_t(self.st_mode) & S_IFMT) == S_IFDIR
+     }
+     
+     var isRegular: Bool {
+-        (self.st_mode & S_IFMT) == S_IFREG
++        (mode_t(self.st_mode) & S_IFMT) == S_IFREG
+     }
+     
+     var isSymbolicLink: Bool {
+-        (self.st_mode & S_IFMT) == S_IFLNK
++        (mode_t(self.st_mode) & S_IFMT) == S_IFLNK
+     }
+     
+     var isSpecial: Bool {
+-        let type = self.st_mode & S_IFMT
++        let type = mode_t(self.st_mode) & S_IFMT
+         return type == S_IFBLK || type == S_IFCHR
+     }
+ }
+diff --git a/swift-foundation/Sources/FoundationEssentials/FileManager/FileOperations+Enumeration.swift b/swift-foundation/Sources/FoundationEssentials/FileManager/FileOperations+Enumeration.swift
+index 2c9a02f..500da1d 100644
+--- a/swift-foundation/Sources/FoundationEssentials/FileManager/FileOperations+Enumeration.swift
++++ b/swift-foundation/Sources/FoundationEssentials/FileManager/FileOperations+Enumeration.swift
+@@ -367,7 +367,7 @@ struct _POSIXDirectoryContentsSequence: Sequence {
+                         let statDir = directoryPath + "/" + fileName
+                         if stat(statDir, &statBuf) == 0 {
+                             // #define S_ISDIR(m)      (((m) & S_IFMT) == S_IFDIR)
+-                            if (statBuf.st_mode & S_IFMT) == S_IFDIR {
++                            if (mode_t(statBuf.st_mode) & S_IFMT) == S_IFDIR {
+                                 isDirectory = true
+                             }
+                         }
+diff --git a/swift-foundation/Sources/FoundationEssentials/FileManager/FileOperations.swift b/swift-foundation/Sources/FoundationEssentials/FileManager/FileOperations.swift
+index 03adcc6..92e609f 100644
+--- a/swift-foundation/Sources/FoundationEssentials/FileManager/FileOperations.swift
++++ b/swift-foundation/Sources/FoundationEssentials/FileManager/FileOperations.swift
+@@ -867,7 +867,7 @@ enum _FileOperations {
+         defer { close(dstfd) }
+ 
+         // Set the file permissions using fchmod() instead of when open()ing to avoid umask() issues
+-        let permissions = fileInfo.st_mode & ~S_IFMT
++        let permissions = mode_t(fileInfo.st_mode) & ~S_IFMT
+         guard fchmod(dstfd, permissions) == 0 else {
+             try delegate.throwIfNecessary(errno, String(cString: srcPtr), String(cString: dstPtr))
+             return
+diff --git a/swift-foundation/Sources/FoundationEssentials/ProcessInfo/ProcessInfo.swift b/swift-foundation/Sources/FoundationEssentials/ProcessInfo/ProcessInfo.swift
+index 2e809fa..d01ca3f 100644
+--- a/swift-foundation/Sources/FoundationEssentials/ProcessInfo/ProcessInfo.swift
++++ b/swift-foundation/Sources/FoundationEssentials/ProcessInfo/ProcessInfo.swift
+@@ -198,7 +198,10 @@ final class _ProcessInfo: Sendable {
+     }
+ 
+     var fullUserName: String {
+-#if canImport(Darwin) || os(Android) || canImport(Glibc) || canImport(Musl)
++#if os(Android) && (arch(i386) || arch(arm))
++        // On LP32 Android, pw_gecos doesn't exist and is presumed to be NULL.
++        return ""
++#elseif canImport(Darwin) || os(Android) || canImport(Glibc) || canImport(Musl)
+         let (euid, _) = Platform.getUGIDs()
+         if let upwd = getpwuid(euid),
+            let fullname = upwd.pointee.pw_gecos {
+diff --git a/swift-foundation/Sources/FoundationEssentials/String/String+Path.swift b/swift-foundation/Sources/FoundationEssentials/String/String+Path.swift
+index 477d5d3..1ce75d6 100644
+--- a/swift-foundation/Sources/FoundationEssentials/String/String+Path.swift
++++ b/swift-foundation/Sources/FoundationEssentials/String/String+Path.swift
+@@ -737,7 +737,7 @@ extension String {
+                         if lstat(buffer.baseAddress!, &statBuf) < 0 {
+                             return nil
+                         }
+-                        if statBuf.st_mode & S_IFMT == S_IFLNK {
++                        if mode_t(statBuf.st_mode) & S_IFMT == S_IFLNK {
+                             /* Examples:
+                              *   fspath == /foo/bar0baz/quux/froboz
+                              *   linkx == /tic/tac/toe

@@ -48,8 +48,20 @@ diff --git a/swift/CMakeLists.txt b/swift/CMakeLists.txt
 index b7503ecdd6..c643c2c9a5 100644
 --- a/swift/CMakeLists.txt
 +++ b/swift/CMakeLists.txt
+@@ -414,9 +414,9 @@ set(SWIFT_STDLIB_MSVC_RUNTIME_LIBRARY
+ 
+ 
+ if(BRIDGING_MODE STREQUAL "DEFAULT" OR NOT BRIDGING_MODE)
+-  if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR "${SWIFT_HOST_VARIANT_SDK}" MATCHES "WINDOWS|ANDROID" OR (CMAKE_Swift_COMPILER AND CMAKE_Swift_COMPILER_VERSION VERSION_LESS 5.8))
++  if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR "${SWIFT_HOST_VARIANT_SDK}" STREQUAL "WINDOWS" OR (CMAKE_Swift_COMPILER AND CMAKE_Swift_COMPILER_VERSION VERSION_LESS 5.8))
+     # In debug builds, to workaround a problem with LLDB's `po` command (rdar://115770255).
+-    # On Windows and Android, to workaround a build problem.
++    # On Windows, to workaround a build problem.
+     # If the host Swift version is less than 5.8, use pure mode to workaround a C++ interop compiler crash.
+     set(BRIDGING_MODE "PURE")
+   else()
 @@ -463,7 +463,7 @@ set(SWIFT_BUILD_HOST_DISPATCH FALSE)
- if(SWIFT_ENABLE_DISPATCH AND NOT CMAKE_SYSTEM_NAME STREQUAL Darwin)
+ if(SWIFT_ENABLE_DISPATCH AND NOT CMAKE_SYSTEM_NAME STREQUAL "Darwin")
    # Only build libdispatch for the host if the host tools are being built and
    # specifically if these two libraries that depend on it are built.
 -  if(SWIFT_INCLUDE_TOOLS AND SWIFT_BUILD_SOURCEKIT)
@@ -57,23 +69,6 @@ index b7503ecdd6..c643c2c9a5 100644
      set(SWIFT_BUILD_HOST_DISPATCH TRUE)
    endif()
  
-@@ -857,7 +857,7 @@ endif()
- 
- if(SWIFT_BUILD_SWIFT_SYNTAX)
-   # Only "HOSTTOOLS" is supported in Linux when Swift parser integration is enabled.
--  if(SWIFT_HOST_VARIANT_SDK MATCHES "LINUX|ANDROID|OPENBSD|FREEBSD" AND NOT BOOTSTRAPPING_MODE STREQUAL "HOSTTOOLS")
-+  if(SWIFT_HOST_VARIANT_SDK MATCHES "LINUX|OPENBSD|FREEBSD" AND NOT BOOTSTRAPPING_MODE STREQUAL "HOSTTOOLS")
-     message(WARNING "Force setting BOOTSTRAPPING=HOSTTOOLS because Swift parser integration is enabled")
-     set(BOOTSTRAPPING_MODE "HOSTTOOLS")
-   endif()
-@@ -1187,6 +1187,7 @@ if(SWIFT_INCLUDE_TOOLS)
-   message(STATUS "  Assertions:     ${LLVM_ENABLE_ASSERTIONS}")
-   message(STATUS "  LTO:            ${SWIFT_TOOLS_ENABLE_LTO}")
-   message(STATUS "  Bootstrapping:  ${BOOTSTRAPPING_MODE}")
-+  message(STATUS "  C++ Bridging:   ${BRIDGING_MODE}")
-   message(STATUS "  Swift parser:   ${SWIFT_BUILD_SWIFT_SYNTAX}")
-   message(STATUS "")
- else()
 @@ -1279,7 +1280,8 @@ if (LLVM_ENABLE_DOXYGEN)
    message(STATUS "Doxygen: enabled")
  endif()
@@ -84,80 +79,36 @@ index b7503ecdd6..c643c2c9a5 100644
    include(Libdispatch)
  endif()
  
-@@ -1345,6 +1345,9 @@ if(SWIFT_INCLUDE_TOOLS)
-     FetchContent_MakeAvailable(SwiftSyntax)
-   endfunction()
-   include_swift_syntax()
-+  if (NOT "${SWIFT_ANDROID_NDK_PATH}" STREQUAL "")
-+    add_dependencies(SwiftSyntax swift-stdlib-android-${SWIFT_HOST_VARIANT_ARCH})
-+  endif()
- 
-   add_subdirectory(lib)
- 
 diff --git a/swift/SwiftCompilerSources/CMakeLists.txt b/swift/SwiftCompilerSources/CMakeLists.txt
-index f4a2eb2dddc..61a2548cf77 100644
+index 79413a711d4..9eca061e1ca 100644
 --- a/swift/SwiftCompilerSources/CMakeLists.txt
 +++ b/swift/SwiftCompilerSources/CMakeLists.txt
-@@ -102,7 +102,7 @@ function(add_swift_compiler_modules_library name)
-   elseif(${BOOTSTRAPPING_MODE} STREQUAL "CROSSCOMPILE")
-     set(sdk_option "-sdk" "${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_ARCH_${SWIFT_HOST_VARIANT_ARCH}_PATH}")
-     get_filename_component(swift_exec_bin_dir ${ALS_SWIFT_EXEC} DIRECTORY)
--    set(sdk_option ${sdk_option} "-resource-dir" "${swift_exec_bin_dir}/../lib/swift")
-+    set(sdk_option ${sdk_option} "-resource-dir" "${SWIFT_BINARY_DIR}/lib/swift")
-   endif()
-   get_versioned_target_triple(target ${SWIFT_HOST_VARIANT_SDK}
-       ${SWIFT_HOST_VARIANT_ARCH} "${deployment_version}")
-@@ -186,6 +186,9 @@ function(add_swift_compiler_modules_library name)
- 
-     set("${module}_dep_target" ${dep_target})
-     set(all_module_targets ${all_module_targets} ${dep_target})
-+    if(${BOOTSTRAPPING_MODE} STREQUAL "CROSSCOMPILE")
-+      add_dependencies(${dep_target} swift-stdlib-android-${SWIFT_HOST_VARIANT_ARCH})
-+    endif()
-   endforeach()
- 
-   # Create a static library containing all module object files.
-diff --git a/swift/cmake/modules/AddPureSwift.cmake b/swift/cmake/modules/AddPureSwift.cmake
-index dc58b8fa0f6..37e9f817471 100644
---- a/swift/cmake/modules/AddPureSwift.cmake
-+++ b/swift/cmake/modules/AddPureSwift.cmake
-@@ -44,6 +44,13 @@ function(_add_host_swift_compile_options name)
-     $<$<COMPILE_LANGUAGE:Swift>:none>)
- 
-   target_compile_options(${name} PRIVATE $<$<COMPILE_LANGUAGE:Swift>:-target;${SWIFT_HOST_TRIPLE}>)
-+  if (NOT "${SWIFT_ANDROID_NDK_PATH}" STREQUAL "")
-+    swift_android_tools_path(${SWIFT_HOST_VARIANT_ARCH} tools_path)
-+    target_compile_options(${name} PRIVATE $<$<COMPILE_LANGUAGE:Swift>:-resource-dir;${SWIFTLIB_DIR};>
-+        $<$<COMPILE_LANGUAGE:Swift>:-sdk;${SWIFT_SDK_ANDROID_ARCH_${SWIFT_HOST_VARIANT_ARCH}_PATH};>
-+        $<$<COMPILE_LANGUAGE:Swift>:-tools-directory;${tools_path};>)
-+    add_dependencies(${name} swift-stdlib-android-${SWIFT_HOST_VARIANT_ARCH})
+@@ -172,7 +172,11 @@ function(add_swift_compiler_modules_library name)
+   # under `include/swift`. These are either located next to the compiler (in case of open source toolchains) or
+   # in the SDK (in case a Swift compiler from Xcode)
+   get_filename_component(swift_exec_bin_dir ${ALS_SWIFT_EXEC} DIRECTORY)
++  if(BOOTSTRAPPING_MODE STREQUAL "CROSSCOMPILE")
++  list(APPEND sdk_option "-I" "${SWIFTLIB_DIR}/../")
++  else()
+   list(APPEND sdk_option "-I" "${swift_exec_bin_dir}/../lib" "-I" "${sdk_path}/usr/lib")
 +  endif()
-   _add_host_variant_swift_sanitizer_flags(${name})
- endfunction()
  
-diff --git a/swift/cmake/modules/AddSwift.cmake b/swift/cmake/modules/AddSwift.cmake
-index a448bcb23c4..0ddbac17a52 100644
---- a/swift/cmake/modules/AddSwift.cmake
-+++ b/swift/cmake/modules/AddSwift.cmake
-@@ -548,7 +548,7 @@
-         get_filename_component(swift_bin_dir ${SWIFT_EXEC_FOR_SWIFT_MODULES} DIRECTORY)
-         get_filename_component(swift_dir ${swift_bin_dir} DIRECTORY)
-       endif()
--      set(host_lib_dir "${swift_dir}/lib/swift/${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_LIB_SUBDIR}")
-+      set(host_lib_dir "${SWIFT_BINARY_DIR}/lib/swift/${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_LIB_SUBDIR}")
-       set(host_lib_arch_dir "${host_lib_dir}/${SWIFT_HOST_VARIANT_ARCH}")
+   set(all_obj_files)
+   set(all_module_targets)
+diff --git a/swift/lib/SwiftSyntax/CMakeLists.txt b/swift/lib/SwiftSyntax/CMakeLists.txt
+index 5c7bd65fead..36f3bbc1b91 100644
+--- a/swift/lib/SwiftSyntax/CMakeLists.txt
++++ b/swift/lib/SwiftSyntax/CMakeLists.txt
+@@ -80,6 +80,9 @@ endif()
  
-       set(swiftrt "${host_lib_arch_dir}/swiftrt${CMAKE_C_OUTPUT_EXTENSION}")
-@@ -606,6 +606,9 @@ function(_add_swift_runtime_link_flags target relpath_to_lib_dir bootstrapping)
-         endif()
-       endif()
-     endif()
-+    if(SWIFT_HOST_VARIANT_SDK STREQUAL "ANDROID")
-+      target_link_options(${target} PRIVATE "SHELL:-Xlinker -z -Xlinker nostart-stop-gc")
-+    endif()
-   endif()
- 
-   set_property(TARGET ${target} PROPERTY BUILD_WITH_INSTALL_RPATH YES)
+ # Install Swift module interface files.
+ foreach(module ${SWIFT_SYNTAX_MODULES})
++  if(BOOTSTRAPPING_MODE STREQUAL "CROSSCOMPILE")
++    add_dependencies(${module} swift-stdlib-${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_LIB_SUBDIR}-${SWIFT_HOST_VARIANT_ARCH})
++  endif()
+   set(module_dir "${module}.swiftmodule")
+   set(module_file "${SWIFT_HOST_LIBRARIES_DEST_DIR}/${module_dir}/${SWIFT_HOST_MODULE_TRIPLE}")
+   swift_install_in_component(FILES "${module_file}.swiftinterface" "${module_file}.private.swiftinterface"
 diff --git a/swift/localization/CMakeLists.txt b/swift/localization/CMakeLists.txt
 index 07a3585a66c..461a98b6856 100644
 --- a/swift/localization/CMakeLists.txt
@@ -172,19 +123,6 @@ index 07a3585a66c..461a98b6856 100644
    PATTERN "*.strings"
  )
 +endif()
-diff --git a/swift/stdlib/cmake/modules/SwiftSource.cmake b/swift/stdlib/cmake/modules/SwiftSource.cmake
-index 4bc312f7f89..d71f6408d9f 100644
---- a/swift/stdlib/cmake/modules/SwiftSource.cmake
-+++ b/swift/stdlib/cmake/modules/SwiftSource.cmake
-@@ -708,7 +708,7 @@ function(_compile_swift_files
-   endif()
- 
-   set(swift_compiler_tool_dep)
--  if(SWIFT_INCLUDE_TOOLS)
-+  if(SWIFT_INCLUDE_TOOLS AND NOT ${BOOTSTRAPPING_MODE} STREQUAL "CROSSCOMPILE")
-     # Depend on the binary itself, in addition to the symlink.
-     set(swift_compiler_tool_dep "swift-frontend${target_suffix}")
-   endif()
 diff --git a/swift/stdlib/public/Concurrency/CMakeLists.txt b/swift/stdlib/public/Concurrency/CMakeLists.txt
 index 3313f56c8a6..59804ff6228 100644
 --- a/swift/stdlib/public/Concurrency/CMakeLists.txt
@@ -199,7 +137,7 @@ index 3313f56c8a6..59804ff6228 100644
 +    #  dispatch)
    endif()
  elseif("${SWIFT_CONCURRENCY_GLOBAL_EXECUTOR}" STREQUAL "singlethreaded" OR
-        "${SWIFT_CONCURRENCY_GLOBAL_EXECUTOR}" STREQUAL "hooked")
+        "${SWIFT_CONCURRENCY_GLOBAL_EXECUTOR}" STREQUAL "hooked" OR
 @@ -120,6 +120,7 @@ add_swift_target_library(swift_Concurrency ${SWIFT_STDLIB_LIBRARY_BUILD_TYPES} I
    INCORPORATE_OBJECT_LIBRARIES_SHARED_ONLY
      ${swift_concurrency_incorporate_object_libraries_so}
@@ -212,15 +150,15 @@ diff --git a/swift/stdlib/public/Platform/CMakeLists.txt b/swift/stdlib/public/P
 index f958d4ce899..ac6d7248606 100644
 --- a/swift/stdlib/public/Platform/CMakeLists.txt
 +++ b/swift/stdlib/public/Platform/CMakeLists.txt
-@@ -92,7 +92,7 @@ add_swift_target_library(swiftGlibc ${SWIFT_STDLIB_LIBRARY_BUILD_TYPES} IS_SDK_O
+@@ -300,7 +300,7 @@
        ${SWIFT_RUNTIME_SWIFT_COMPILE_FLAGS}
        ${SWIFT_STANDARD_LIBRARY_SWIFT_FLAGS}
        ${swift_platform_compile_flags}
 -    LINK_FLAGS "${SWIFT_RUNTIME_SWIFT_LINK_FLAGS}"
 +    LINK_FLAGS "${SWIFT_RUNTIME_SWIFT_LINK_FLAGS};-landroid-posix-semaphore"
-     TARGET_SDKS "${swiftGlibc_target_sdks}"
+     TARGET_SDKS "ANDROID"
      INSTALL_IN_COMPONENT sdk-overlay
-     DEPENDS glibc_modulemap)
+     DEPENDS android_modulemap)
 diff --git a/swift/tools/SourceKit/cmake/modules/AddSwiftSourceKit.cmake b/swift/tools/SourceKit/cmake/modules/AddSwiftSourceKit.cmake
 index 7a77e125f95..7eddfea2054 100644
 --- a/swift/tools/SourceKit/cmake/modules/AddSwiftSourceKit.cmake
@@ -234,16 +172,7 @@ index 7a77e125f95..7eddfea2054 100644
 +    ${SWIFT_ANDROID_NATIVE_SYSROOT}/usr/include)
  endfunction()
  
- function(add_sourcekitd_swifrt_linking target path HAS_SWIFT_MODULES)
-@@ -115,7 +115,7 @@ function(add_sourcekitd_swifrt_linking target path HAS_SWIFT_MODULES)
-       # installed host toolchain.
-       get_filename_component(swift_bin_dir ${SWIFT_EXEC_FOR_SWIFT_MODULES} DIRECTORY)
-       get_filename_component(swift_dir ${swift_bin_dir} DIRECTORY)
--      set(host_lib_dir "${swift_dir}/lib/swift/${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_LIB_SUBDIR}")
-+      set(host_lib_dir "${SWIFT_BINARY_DIR}/lib/swift/${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_LIB_SUBDIR}")
- 
-       target_link_libraries(${target} PRIVATE ${swiftrt})
-       target_link_libraries(${target} PRIVATE "swiftCore")
+ function(add_sourcekit_swift_runtime_link_flags target path HAS_SWIFT_MODULES)
 diff --git a/swift/tools/swift-compatibility-symbols/CMakeLists.txt b/swift/tools/swift-compatibility-symbols/CMakeLists.txt
 index 11cda641cc2..bd2cb152725 100644
 --- a/swift/tools/swift-compatibility-symbols/CMakeLists.txt
@@ -258,46 +187,6 @@ index 11cda641cc2..bd2cb152725 100644
      compiler
  )
 +endif()
-diff --git a/swift/tools/swift-plugin-server/CMakeLists.txt b/swift/tools/swift-plugin-server/CMakeLists.txt
-index a21b79ed260..5b591a30514 100644
---- a/swift/tools/swift-plugin-server/CMakeLists.txt
-+++ b/swift/tools/swift-plugin-server/CMakeLists.txt
-@@ -1,28 +1,19 @@
- if (SWIFT_BUILD_SWIFT_SYNTAX)
--  # _swiftCSwiftPluginServer is just a C support library for swift-plugin-server
--  # Don't bother to create '.a' for that.
--  add_swift_host_library(_swiftCSwiftPluginServer OBJECT
--    Sources/CSwiftPluginServer/PluginServer.cpp
--  )
--  target_link_libraries(_swiftCSwiftPluginServer PRIVATE
--    swiftDemangling
-+  add_swift_host_tool(swift-plugin-server SWIFT_COMPONENT compiler Sources/CSwiftPluginServer/PluginServer.cpp)
-+  add_pure_swift_host_library(SwiftPluginServer STATIC
-+    Sources/swift-plugin-server/swift-plugin-server.swift
-   )
--  target_include_directories(_swiftCSwiftPluginServer PUBLIC
-+  target_include_directories(SwiftPluginServer PUBLIC
-     Sources/CSwiftPluginServer/include
-   )
--
--  add_pure_swift_host_tool(swift-plugin-server
--    Sources/swift-plugin-server/swift-plugin-server.swift
--    DEPENDENCIES
-+  target_link_libraries(SwiftPluginServer PRIVATE SwiftCompilerPluginMessageHandling)
-+  target_link_libraries(swift-plugin-server PRIVATE
-       swiftDemangling
--      $<TARGET_OBJECTS:_swiftCSwiftPluginServer>
--    SWIFT_COMPONENT
--      compiler
--    SWIFT_DEPENDENCIES
-       SwiftSyntaxMacros
-       SwiftSyntaxMacroExpansion
-       SwiftCompilerPluginMessageHandling
-       swiftLLVMJSON
-+      SwiftPluginServer
-   )
-   target_include_directories(swift-plugin-server PRIVATE
-     Sources/CSwiftPluginServer/include
 diff --git a/swift-corelibs-xctest/CMakeLists.txt b/swift-corelibs-xctest/CMakeLists.txt
 index 531e7c0..589930f 100644
 --- a/swift-corelibs-xctest/CMakeLists.txt
@@ -310,20 +199,3 @@ index 531e7c0..589930f 100644
    endif()
  endif()
  set_target_properties(XCTest PROPERTIES
-diff --git a/swift-syntax/cmake/modules/AddSwiftHostLibrary.cmake b/swift-syntax/cmake/modules/AddSwiftHostLibrary.cmake
-index 951c2d2e..1157ec66 100644
---- a/swift-syntax/cmake/modules/AddSwiftHostLibrary.cmake
-+++ b/swift-syntax/cmake/modules/AddSwiftHostLibrary.cmake
-@@ -87,6 +87,12 @@ function(add_swift_syntax_library name)
-     target_compile_options(${name} PRIVATE
-         $<$<COMPILE_LANGUAGE:Swift>:-wmo>)
-   endif()
-+  if (NOT "${SWIFT_ANDROID_NDK_PATH}" STREQUAL "")
-+    swift_android_tools_path(${SWIFT_HOST_VARIANT_ARCH} tools_path)
-+    target_compile_options(${name} PRIVATE $<$<COMPILE_LANGUAGE:Swift>:-resource-dir;${SWIFTLIB_DIR};>
-+        $<$<COMPILE_LANGUAGE:Swift>:-sdk;${SWIFT_SDK_ANDROID_ARCH_${SWIFT_HOST_VARIANT_ARCH}_PATH};>
-+        $<$<COMPILE_LANGUAGE:Swift>:-tools-directory;${tools_path};>)
-+  endif()
- 
-   if(LLVM_USE_LINKER)
-     target_link_options(${name} PRIVATE
