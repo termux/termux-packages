@@ -12,13 +12,6 @@ TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 TERMUX_PKG_BREAKS="termux-keyring (<< 1.9)"
 TERMUX_PKG_CONFLICTS="procps (<< 3.3.15-2)"
 TERMUX_PKG_SUGGESTS="termux-api"
-TERMUX_PKG_CONFFILES="
-etc/motd
-etc/motd.sh
-etc/motd-playstore
-etc/profile.d/init-termux-properties.sh
-etc/termux-login.sh
-"
 
 # Some of these packages are not dependencies and used only to ensure
 # that core packages are installed after upgrading (we removed busybox
@@ -33,6 +26,11 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_make_install() {
-	cd "$TERMUX_PREFIX"
-	TERMUX_PKG_CONFFILES+=" $(find etc/termux/mirrors -type f)"
+	TERMUX_PKG_CONFFILES="$(cat "$TERMUX_PKG_BUILDDIR/conffiles")"
+}
+
+termux_step_create_debscripts() {
+	cat <<- EOF > ./preinst
+	$(cat "$TERMUX_PKG_BUILDDIR/preinst")
+	EOF
 }
