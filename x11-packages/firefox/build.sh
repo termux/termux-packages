@@ -8,9 +8,9 @@ TERMUX_PKG_SRCURL=https://ftp.mozilla.org/pub/firefox/releases/${TERMUX_PKG_VERS
 TERMUX_PKG_SHA256=b3a4216e01eaeb9a7c6ef4659d8dcd956fbd90a78a8279ee3a598881e63e49ce
 # ffmpeg and pulseaudio are dependencies through dlopen(3):
 TERMUX_PKG_DEPENDS="ffmpeg, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libc++, libcairo, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libpixman, libsm, libvpx, libwebp, libx11, libxcb, libxcomposite, libxdamage, libxext, libxfixes, libxrandr, libxtst, pango, pulseaudio, zlib"
-TERMUX_PKG_BUILD_DEPENDS="libcpufeatures, libice, libsm"
+TERMUX_PKG_BUILD_DEPENDS="binutils-cross, libcpufeatures, libice, libsm"
+TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_MAKE_PROCESSES=1
 
 termux_pkg_auto_update() {
 	# https://archive.mozilla.org/pub/firefox/releases/latest/README.txt
@@ -58,15 +58,13 @@ termux_step_pre_configure() {
 	# https://github.com/rust-lang/rust/issues/45854
 	# Out of memory when building gkrust
 	# CI shows (signal: 9, SIGKILL: kill)
-	case "${TERMUX_ARCH}" in
-	aarch64|arm|i686|x86_64) RUSTFLAGS+=" -C debuginfo=1" ;;
-	esac
+	if [ "$TERMUX_DEBUG_BUILD" = false ]; then
+		case "${TERMUX_ARCH}" in
+		aarch64|arm|i686|x86_64) RUSTFLAGS+=" -C debuginfo=1" ;;
+		esac
+	fi
 
 	cargo install cbindgen
-
-	sed \
-		-e "s|@CARGO_TARGET_NAME@|${CARGO_TARGET_NAME}|" \
-		-i "${TERMUX_PKG_SRCDIR}"/build/moz.configure/rust.configure
 
 	export HOST_CC=$(command -v clang)
 	export HOST_CXX=$(command -v clang++)
@@ -74,49 +72,43 @@ termux_step_pre_configure() {
 	# https://reviews.llvm.org/D141184
 	CXXFLAGS+=" -U__ANDROID__ -D_LIBCPP_HAS_NO_C11_ALIGNED_ALLOC"
 	LDFLAGS+=" -landroid-shmem -llog"
+
+	if [ "$TERMUX_ARCH" = "arm" ]; then
+		termux_setup_no_integrated_as
+		# For symbol android_getCpuFeatures
+		LDFLAGS+=" -l:libndk_compat.a"
+	fi
 }
 
 termux_step_configure() {
-	python3 "${TERMUX_PKG_SRCDIR}"/configure.py \
-		--target=${TERMUX_HOST_PLATFORM} \
-		--prefix=${TERMUX_PREFIX} \
-		--with-sysroot=${TERMUX_PREFIX} \
-		--allow-addon-sideload \
-		--disable-accessibility \
-		--disable-address-sanitizer-reporter \
-		--disable-crashreporter \
-		--disable-dbus \
-		--disable-elf-hack \
-		--disable-hardening \
-		--disable-jemalloc \
-		--disable-necko-wifi \
-		--disable-parental-controls \
-		--disable-synth-speechd \
-		--disable-webspeech \
-		--disable-sandbox \
-		--disable-tests \
-		--disable-updater \
-		--enable-audio-backends=pulseaudio \
-		--enable-minify=properties \
-		--enable-mobile-optimize \
-		--enable-printing \
-		--enable-system-ffi \
-		--enable-system-pixman \
-		--with-branding=browser/branding/official \
-		--with-system-icu \
-		--with-system-jpeg=${TERMUX_PREFIX} \
-		--with-system-libevent \
-		--with-system-libvpx \
-		--with-system-nspr \
-		--with-system-nss \
-		--with-system-webp \
-		--with-system-zlib \
-		--without-wasm-sandboxed-libraries
+	sed \
+		-e "s|@TERMUX_HOST_PLATFORM@|${TERMUX_HOST_PLATFORM}|" \
+		-e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|" \
+		-e "s|@CARGO_TARGET_NAME@|${CARGO_TARGET_NAME}|" \
+		$TERMUX_PKG_BUILDER_DIR/mozconfig.cfg > .mozconfig
+
+	if [ "$TERMUX_DEBUG_BUILD" = true ]; then
+		cat >>.mozconfig - <<END
+ac_add_options --enable-debug-symbols
+ac_add_options --disable-install-strip
+END
+	fi
+
+	./mach configure
+}
+
+termux_step_make() {
+	./mach build
+	./mach buildsymbols
+}
+
+termux_step_make_install() {
+	./mach install
+
+	install -Dm644 -t "${TERMUX_PREFIX}/share/applications" "${TERMUX_PKG_BUILDER_DIR}/firefox.desktop"
 }
 
 termux_step_post_make_install() {
-	install -Dm644 -t "${TERMUX_PREFIX}/share/applications" "${TERMUX_PKG_BUILDER_DIR}/firefox.desktop"
-
 	# https://github.com/termux/termux-packages/issues/18429
 	# https://phabricator.services.mozilla.com/D181687
 	# Android 8.x and older not support "-z pack-relative-relocs" / DT_RELR
