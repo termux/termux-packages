@@ -1,0 +1,60 @@
+From 1d966e98e41ce817d1f8c5159c0b9caa4de75816 Mon Sep 17 00:00:00 2001
+From: Vyas Ramasubramani <vyas.ramasubramani@gmail.com>
+Date: Wed, 6 Mar 2024 13:51:34 -0800
+Subject: [PATCH] GH-40386: [Python] Fix except clauses (#40387)
+
+### Rationale for this change
+
+See #40386, these changes are necessary for compatibility with Cython 3.0.9
+
+### What changes are included in this PR?
+
+This PR removes unnecessary `noexcept` clauses.
+
+### Are these changes tested?
+
+Covered by existing builds.
+
+### Are there any user-facing changes?
+
+No.
+
+* GitHub Issue: #40386
+
+Authored-by: Vyas Ramasubramani <vyasr@nvidia.com>
+Signed-off-by: Felipe Oliveira Carvalho <felipekde@gmail.com>
+---
+ python/pyarrow/types.pxi | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/python/pyarrow/types.pxi b/python/pyarrow/types.pxi
+index fbbf36ae9f551..ec05100caf6c7 100644
+--- a/python/pyarrow/types.pxi
++++ b/python/pyarrow/types.pxi
+@@ -5462,7 +5462,7 @@ cdef void pycapsule_schema_deleter(object schema_capsule) noexcept:
+ 
+     free(schema)
+ 
+-cdef object alloc_c_schema(ArrowSchema** c_schema) noexcept:
++cdef object alloc_c_schema(ArrowSchema** c_schema):
+     c_schema[0] = <ArrowSchema*> malloc(sizeof(ArrowSchema))
+     # Ensure the capsule destructor doesn't call a random release pointer
+     c_schema[0].release = NULL
+@@ -5481,7 +5481,7 @@ cdef void pycapsule_array_deleter(object array_capsule) noexcept:
+ 
+     free(array)
+ 
+-cdef object alloc_c_array(ArrowArray** c_array) noexcept:
++cdef object alloc_c_array(ArrowArray** c_array):
+     c_array[0] = <ArrowArray*> malloc(sizeof(ArrowArray))
+     # Ensure the capsule destructor doesn't call a random release pointer
+     c_array[0].release = NULL
+@@ -5500,7 +5500,7 @@ cdef void pycapsule_stream_deleter(object stream_capsule) noexcept:
+ 
+     free(stream)
+ 
+-cdef object alloc_c_stream(ArrowArrayStream** c_stream) noexcept:
++cdef object alloc_c_stream(ArrowArrayStream** c_stream):
+     c_stream[0] = <ArrowArrayStream*> malloc(sizeof(ArrowArrayStream))
+     # Ensure the capsule destructor doesn't call a random release pointer
+     c_stream[0].release = NULL
