@@ -1,0 +1,11 @@
+--- ./src/callproc.c.orig	2020-07-29 23:40:42.000000000 +0200
++++ ./src/callproc.c	2020-09-14 21:36:04.897296897 +0200
+@@ -1621,7 +1621,7 @@
+     dir_warning ("arch-independent data dir", Vdata_directory);
+ 
+   sh = getenv ("SHELL");
+-  Vshell_file_name = build_string (sh ? sh : "/bin/sh");
++  Vshell_file_name = build_string (sh ? sh : "@TERMUX_PREFIX@/bin/sh");
+ 
+   Lisp_Object gamedir = Qnil;
+   if (PATH_GAME)
