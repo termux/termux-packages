@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://yazi-rs.github.io/
 TERMUX_PKG_DESCRIPTION="Blazing fast terminal file manager written in Rust, based on async I/O"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.2.3"
+TERMUX_PKG_VERSION="0.2.4"
 TERMUX_PKG_SRCURL=https://github.com/sxyazi/yazi/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=61b6b0372360bbe2b720a75127bef9325b7d507d544235d6a548db01424553e9
+TERMUX_PKG_SHA256=ded7c95f1c80301ba3c9f64443b840ef3607ed3782330aa3140269f31788d864
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
@@ -31,7 +31,7 @@ termux_step_make() {
 termux_step_make_install() {
 	install -Dm700 -t $TERMUX_PREFIX/bin target/${CARGO_TARGET_NAME}/release/yazi
 
-	cd yazi-config/completions
+	cd yazi-boot/completions
 	install -Dm644 "${TERMUX_PKG_NAME}".bash "${TERMUX_PREFIX}"/share/bash-completion/completions/"${TERMUX_PKG_NAME}".bash
 	install -Dm644 _"${TERMUX_PKG_NAME}" "${TERMUX_PREFIX}"/share/zsh/site-functions/_"${TERMUX_PKG_NAME}"
 	install -Dm644 "${TERMUX_PKG_NAME}".fish "${TERMUX_PREFIX}"/share/fish/vendor_completions.d/"${TERMUX_PKG_NAME}".fish
