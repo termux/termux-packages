@@ -1,0 +1,38 @@
+--- a/sysvk.c
++++ b/sysvk.c
+@@ -1,11 +1,23 @@
++#include <dlfcn.h>
+ #include <hardware/hardware.h>
+ #include <hardware/hwvulkan.h>
+ 
++int (*hw_get_module_handle)(const char *id, const struct hw_module_t **module);
++
++void _init_hw() {
++  if (hw_get_module_handle != NULL) return;
++  void *libhardware_handle = dlopen("libhardware.so", RTLD_LAZY);
++  if (libhardware_handle == NULL) return;
++  hw_get_module_handle = (int (*)(const char *, const struct hw_module_t **))dlsym(libhardware_handle, "hw_get_module");
++}
++
+ VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL
+ vk_icdGetInstanceProcAddr(VkInstance instance, const char *pName) {
++  _init_hw();
++  if (hw_get_module_handle == NULL) return NULL;
+   hw_module_t *module;
+   int ret =
+-      hw_get_module(HWVULKAN_HARDWARE_MODULE_ID, (const hw_module_t **)&module);
++      hw_get_module_handle(HWVULKAN_HARDWARE_MODULE_ID, (const hw_module_t **)&module);
+   if (ret) {
+     return NULL;
+   }
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -3,7 +3,7 @@
+ project(sysvk)
+
+ add_library(sysvk SHARED sysvk.c)
+-target_link_libraries(sysvk hardware)
++target_link_libraries(sysvk)
+ target_include_directories(sysvk SYSTEM PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+ install(TARGETS sysvk
