@@ -1,12 +1,11 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/tsujan/FeatherNotes
 TERMUX_PKG_DESCRIPTION="Lightweight Qt Notes-Manager for Linux"
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_MAINTAINER="@Yisus7u7"
-TERMUX_PKG_VERSION="1.1.1"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="1.2.0"
 TERMUX_PKG_SRCURL=https://github.com/tsujan/FeatherNotes/archive/refs/tags/V${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=27dde444e5250637861cf89c2878be864e10a6760dc8523d3f2be9920dc55ae5
+TERMUX_PKG_SHA256=fd9d0c4c361196a6b513dc14808810b112c8c30dbcdb277497e46dcc34af2cce
+TERMUX_PKG_DEPENDS="hunspell, libc++, libx11, qt6-qtbase, qt6-qtsvg"
+TERMUX_PKG_RECOMMENDS="hicolor-icon-theme"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
-TERMUX_PKG_DEPENDS="hunspell, libc++, libx11, qt5-qtbase, qt5-qtsvg, qt5-qtx11extras"
-TERMUX_PKG_RECOMMENDS="hicolor-icon-theme"
-TERMUX_PKG_BUILD_DEPENDS="qt5-qtbase-cross-tools, qt5-qttools-cross-tools"
