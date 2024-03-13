@@ -1,0 +1,26 @@
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -1,5 +1,3 @@
+-glslang = find_program('glslang', 'glslangValidator')
+-
+ if get_option('dynamic_string_tokens')
+   ld_prefix = get_option('prefix') + '/\$LIB/'
+ else
+@@ -36,12 +34,11 @@
+   'overlay.frag',
+   'overlay.vert',
+ ]
+-overlay_spv = []
+-foreach s : ['overlay.frag', 'overlay.vert']
+-  overlay_spv += custom_target(
+-    s + '.spv.h', input : s, output : s + '.spv.h',
+-    command : [glslang, '-V', '-x', '-o', '@OUTPUT@', '@INPUT@'])
+-endforeach
++
++overlay_spv = [
++  'overlay.frag.spv.h',
++  'overlay.vert.spv.h',
++]
+ 
+ util_files = files(
+   'mesa/util/os_socket.c',

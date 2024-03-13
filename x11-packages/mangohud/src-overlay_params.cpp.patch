@@ -1,0 +1,20 @@
+--- a/src/overlay_params.cpp
++++ b/src/overlay_params.cpp
+@@ -6,7 +6,7 @@
+ #include <string.h>
+ #include <stdlib.h>
+ #include <errno.h>
+-#ifdef __linux__
++#if defined(__linux__) && !defined(__ANDROID__)
+ #include <wordexp.h>
+ #include <unistd.h>
+ #endif
+@@ -312,7 +312,7 @@
+ static std::string
+ parse_path(const char *str)
+ {
+-#ifdef _XOPEN_SOURCE
++#if defined(_XOPEN_SOURCE) && !defined(__ANDROID__)
+    // Expand ~/ to home dir
+    if (str[0] == '~') {
+       std::stringstream s;

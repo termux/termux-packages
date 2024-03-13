@@ -1,0 +1,11 @@
+--- a/src/real_dlsym.cpp
++++ b/src/real_dlsym.cpp
+@@ -21,7 +21,7 @@
+     int ret;
+ 
+     const char* libs[] = {
+-#if defined(__GLIBC__)
++#if defined(__GLIBC__) || defined(__ANDROID__)
+         "*libdl.so*",
+ #endif
+         "*libc.so*",
