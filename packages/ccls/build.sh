@@ -1,5 +1,4 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/MaskRay/ccls
-
 TERMUX_PKG_DESCRIPTION="C/C++/ObjC language server"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
