@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Application used in shell scripts which displays text us
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses"
-TERMUX_PKG_VERSION=1.3-20230209
+TERMUX_PKG_VERSION=1.3-20240307
 TERMUX_PKG_SRCURL=https://invisible-island.net/archives/dialog/dialog-${TERMUX_PKG_VERSION}.tgz
-TERMUX_PKG_SHA256=0c26282305264be2217f335f3798f48b1dce3cf12c5a076bf231cadf77a6d6a8
+TERMUX_PKG_SHA256=339d311c6abb240213426b99ad63565cbcb3e8641ef1989c033e945b754d34ef
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-ncursesw --enable-widec --with-pkg-config"
 
 termux_step_pre_configure() {
