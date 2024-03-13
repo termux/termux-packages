@@ -14,7 +14,8 @@ TERMUX_PKG_SUGGESTS="mosh-perl"
 termux_step_pre_configure() {
 	termux_setup_protobuf
 
-	CXXFLAGS+=" -std=c++14"
+	# Keep this the same version which abseil-cpp requires
+	CXXFLAGS+=" -std=c++17"
 	LDFLAGS+=" $($TERMUX_SCRIPTDIR/packages/libprotobuf/interface_link_libraries.sh)"
 }
 
