@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Network Security Services (NSS)"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_LICENSE_FILE="nss/COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.95"
+TERMUX_PKG_VERSION="3.98"
 TERMUX_PKG_SRCURL=https://archive.mozilla.org/pub/security/nss/releases/NSS_${TERMUX_PKG_VERSION//./_}_RTM/src/nss-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=469888e41e8a780051ce00edcd914e8a6bd38da88a82cfb84898dd388635822a
+TERMUX_PKG_SHA256=f549cc33d35c0601674bfacf7c6ad683c187595eb4125b423238d3e9aa4209ce
 TERMUX_PKG_DEPENDS="libnspr, libsqlite"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_MAKE_ARGS="
@@ -53,6 +53,7 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
+	local nsprver="$(pkg-config --modversion nspr)"
 	local pkgconfig_dir=$TERMUX_PREFIX/lib/pkgconfig
 	mkdir -p $pkgconfig_dir
 	sed \
@@ -61,7 +62,7 @@ termux_step_make_install() {
 		-e 's|%libdir%|${prefix}/lib|g' \
 		-e 's|%includedir%|${prefix}/include/nss|g' \
 		-e "s|%NSS_VERSION%|${TERMUX_PKG_VERSION#*:}|g" \
-		-e 's|%NSPR_VERSION%|4.25|g' \
+		-e "s|%NSPR_VERSION%|${nsprver}|g" \
 		nss/pkg/pkg-config/nss.pc.in > $pkgconfig_dir/nss.pc
 	cd dist
 	install -Dm600 -t $TERMUX_PREFIX/include/nss public/nss/*
