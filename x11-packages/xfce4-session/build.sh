@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 _MAJOR_VERSION=4.18
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.3
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://archive.xfce.org/src/xfce/xfce4-session/${_MAJOR_VERSION}/xfce4-session-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=382f93e096ec6493098719cab8cc31b93ad9bb469c0715c0c5117d75fe7394ec
 TERMUX_PKG_DEPENDS="atk, gdk-pixbuf, glib, gtk3, libcairo, libice, libsm, libwnck, libx11, libxfce4ui, libxfce4util, pango, xfconf, xorg-iceauth, xorg-xrdb"
