@@ -3,10 +3,9 @@ TERMUX_PKG_DESCRIPTION="Scalable Video Technology for AV1 (SVT-AV1 Encoder and D
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE.md, PATENTS.md"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.8.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="2.0.0"
 TERMUX_PKG_SRCURL=https://gitlab.com/AOMediaCodec/SVT-AV1/-/archive/v${TERMUX_PKG_VERSION}/SVT-AV1-v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=5be046efd5d5a5012e919249ee9e5791c9957f79f9d006d697882f02ad014f56
+TERMUX_PKG_SHA256=1ff917e2c866bd35dc9c35fd416575a4fbb0a2605878465e1a0e838dbd882082
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DBUILD_TESTING=OFF
@@ -16,7 +15,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_post_get_source() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them
 	# after SOVERSION is changed.
-	local _ENC_SOVERSION=1
+	local _ENC_SOVERSION=2
 	local _DEC_SOVERSION=0
 
 	local _enc_soverion=$(sed -En 's/^set\(ENC_VERSION_MAJOR\s+([0-9.]+).*/\1/p' \
