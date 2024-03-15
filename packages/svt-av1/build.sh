@@ -13,6 +13,24 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCMAKE_OUTPUT_DIRECTORY=$TERMUX_PKG_BUILDDIR
 "
 
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _ENC_SOVERSION=1
+	local _DEC_SOVERSION=0
+
+	local _enc_soverion=$(sed -En 's/^set\(ENC_VERSION_MAJOR\s+([0-9.]+).*/\1/p' \
+			Source/Lib/Encoder/CMakeLists.txt)
+	if [ ! "${_enc_soverion}" ] || [ "${_ENC_SOVERSION}" != "${_enc_soverion}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+	local _dec_soverion=$(sed -En 's/^set\(DEC_VERSION_MAJOR\s+([0-9.]+).*/\1/p' \
+			Source/Lib/Decoder/CMakeLists.txt)
+	if [ ! "${_dec_soverion}" ] || [ "${_DEC_SOVERSION}" != "${_dec_soverion}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
+
 termux_step_pre_configure() {
 	LDFLAGS+=" -lm"
 	case "${TERMUX_ARCH}" in
