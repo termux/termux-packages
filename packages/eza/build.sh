@@ -1,8 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/eza-community/eza
 TERMUX_PKG_DESCRIPTION="A modern replacement for ls"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
 TERMUX_PKG_VERSION="0.18.7"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/eza-community/eza/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=e712e3ae97ca7ee28e411b8537e20b1efb88b3e052c8053c13d70ae97bae9b61
 TERMUX_PKG_AUTO_UPDATE=true
@@ -34,31 +35,5 @@ termux_step_post_make_install() {
 	install -Dm600 completions/bash/eza $TERMUX_PREFIX/share/bash-completion/completions/eza
 	install -Dm600 completions/fish/eza.fish $TERMUX_PREFIX/share/fish/vendor_completions.d/eza.fish
 	install -Dm600 completions/zsh/_eza $TERMUX_PREFIX/share/zsh/site-functions/_eza
-}
-
-termux_step_create_debscripts() {
-	# This is a temporary notice and should be removed in the future
-	cat <<- POSTINST_EOF > ./postinst
-	#!$TERMUX_PREFIX/bin/bash
-
-		echo "===Package replacement notice==="
-		echo "exa has been replaced, by it's maintained community fork eza."
-		echo
-		echo "See:"
-		echo "https://github.com/ogham/exa#exa-is-unmaintained-use-the-fork-eza-instead"
-		echo "For more information."
-		echo
-		echo "Your options and aliases for exa may need to be updated"
-		echo "================================"
-		echo
-
-	exit 0
-	POSTINST_EOF
-
-	chmod 0755 postinst
-
-	if [[ "$TERMUX_PACKAGE_FORMAT" == "pacman" ]]; then
-		echo "post_install" > postupg
-	fi
 }
 
