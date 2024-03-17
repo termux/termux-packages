@@ -1,0 +1,93 @@
+--- a/src/apps/relay/mainrelay.c
++++ b/src/apps/relay/mainrelay.c
+@@ -83,7 +83,11 @@
+ 
+ #define QUOTE(x) Q(x)
+ 
++#ifndef __TERMUX__
+ #define DEFAULT_USERDB_FILE QUOTE(TURNDB)
++#else
++#define DEFAULT_USERDB_FILE "@TERMUX_PREFIX@/var/db/turndb"
++#endif
+ 
+ //////TURN PARAMS STRUCTURE DEFINITION //////
+ 
+@@ -131,7 +131,7 @@
+ 
+     0, /* do_not_use_config_file */
+ 
+-    "/var/run/turnserver.pid", /* pidfile */
++    "@TERMUX_PREFIX@/var/run/turnserver.pid", /* pidfile */
+     "",                        /* acme_redirect */
+ 
+     ////////////////  Listener server /////////////////
+@@ -3180,11 +3180,11 @@
+       TURN_LOG_FUNC(TURN_LOG_LEVEL_WARNING, "Cannot create pid file: %s\n", turn_params.pidfile);
+ 
+       {
+-        const char *pfs[] = {"/var/run/turnserver.pid",
+-                             "/var/spool/turnserver.pid",
+-                             "/var/turnserver.pid",
+-                             "/var/tmp/turnserver.pid",
+-                             "/tmp/turnserver.pid",
++        const char *pfs[] = {"@TERMUX_PREFIX@/var/run/turnserver.pid",
++                             "@TERMUX_PREFIX@/var/spool/turnserver.pid",
++                             "@TERMUX_PREFIX@/var/turnserver.pid",
++                             "@TERMUX_PREFIX@/var/tmp/turnserver.pid",
++                             "@TERMUX_PREFIX@/tmp/turnserver.pid",
+                              "turnserver.pid",
+                              NULL};
+         const char **ppfs = pfs;
+--- a/src/apps/common/apputils.c
++++ b/src/apps/common/apputils.c
+@@ -1022,9 +1022,9 @@
+                                                 "/etc/",
+                                                 "/etc/turnserver/",
+                                                 "/etc/coturn/",
+-                                                "/usr/local/etc/",
+-                                                "/usr/local/etc/turnserver/",
+-                                                "/usr/local/etc/coturn/",
++                                                "@TERMUX_PREFIX@/etc/",
++                                                "@TERMUX_PREFIX@/etc/turnserver/",
++                                                "@TERMUX_PREFIX@/etc/coturn/",
+                                                 QETCDIR,
+                                                 QETCDIR1,
+                                                 QETCDIR2,
+--- a/src/apps/common/ns_turn_utils.c
++++ b/src/apps/common/ns_turn_utils.c
+@@ -404,7 +404,7 @@
+     else
+       snprintf(logtail, FILE_STR_LEN, "turn_%d_", (int)getpid());
+ 
+-    if (snprintf(logbase, FILE_STR_LEN, "/var/log/turnserver/%s", logtail) < 0)
++    if (snprintf(logbase, FILE_STR_LEN, "@TERMUX_PREFIX@/var/log/turnserver/%s", logtail) < 0)
+       TURN_LOG_FUNC(TURN_LOG_LEVEL_INFO, "String truncation occured.\n");
+ 
+     set_log_file_name(logbase, logf);
+@@ -413,7 +413,7 @@
+     if (_rtpfile)
+       TURN_LOG_FUNC(TURN_LOG_LEVEL_INFO, "log file opened: %s\n", logf);
+     else {
+-      if (snprintf(logbase, FILE_STR_LEN, "/var/log/%s", logtail) < 0)
++      if (snprintf(logbase, FILE_STR_LEN, "@TERMUX_PREFIX@/var/log/%s", logtail) < 0)
+         TURN_LOG_FUNC(TURN_LOG_LEVEL_INFO, "String truncation occured.\n");
+ 
+       set_log_file_name(logbase, logf);
+@@ -421,7 +421,7 @@
+       if (_rtpfile)
+         TURN_LOG_FUNC(TURN_LOG_LEVEL_INFO, "log file opened: %s\n", logf);
+       else {
+-        if (snprintf(logbase, FILE_STR_LEN, "/var/tmp/%s", logtail) < 0)
++        if (snprintf(logbase, FILE_STR_LEN, "@TERMUX_PREFIX@/var/tmp/%s", logtail) < 0)
+           TURN_LOG_FUNC(TURN_LOG_LEVEL_INFO, "String truncation occured.\n");
+ 
+         set_log_file_name(logbase, logf);
+@@ -429,7 +429,7 @@
+         if (_rtpfile)
+           TURN_LOG_FUNC(TURN_LOG_LEVEL_INFO, "log file opened: %s\n", logf);
+         else {
+-          if (snprintf(logbase, FILE_STR_LEN, "/tmp/%s", logtail) < 0)
++          if (snprintf(logbase, FILE_STR_LEN, "@TERMUX_PREFIX@/tmp/%s", logtail) < 0)
+             TURN_LOG_FUNC(TURN_LOG_LEVEL_INFO, "String truncation occured.\n");
+           set_log_file_name(logbase, logf);
+           _rtpfile = fopen(logf, "a");

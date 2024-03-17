@@ -1,0 +1,112 @@
+diff -uNr a/src/apps/natdiscovery/CMakeLists.txt b/src/apps/natdiscovery/CMakeLists.txt
+--- a/src/apps/natdiscovery/CMakeLists.txt
++++ b/src/apps/natdiscovery/CMakeLists.txt
+@@ -15,8 +15,10 @@
+     RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+         COMPONENT Runtime
+     )
++if(WIN32)
+ install(DIRECTORY
+         $<TARGET_FILE_DIR:${PROJECT_NAME}>/
+     DESTINATION DESTINATION "${CMAKE_INSTALL_BINDIR}"
+         COMPONENT Runtime
+     )
++endif()
+diff -uNr a/src/apps/oauth/CMakeLists.txt b/src/apps/oauth/CMakeLists.txt
+--- a/src/apps/oauth/CMakeLists.txt
++++ b/src/apps/oauth/CMakeLists.txt
+@@ -15,8 +15,10 @@
+     RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+         COMPONENT Runtime
+     )
++if(WIN32)
+ install(DIRECTORY
+         $<TARGET_FILE_DIR:${PROJECT_NAME}>/
+     DESTINATION DESTINATION "${CMAKE_INSTALL_BINDIR}"
+         COMPONENT Runtime
+     )
++endif()
+diff -uNr a/src/apps/peer/CMakeLists.txt b/src/apps/peer/CMakeLists.txt
+--- a/src/apps/peer/CMakeLists.txt
++++ b/src/apps/peer/CMakeLists.txt
+@@ -15,8 +15,10 @@
+     RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+         COMPONENT Runtime
+     )
++if(WIN32)
+ install(DIRECTORY
+         $<TARGET_FILE_DIR:${PROJECT_NAME}>/
+     DESTINATION DESTINATION "${CMAKE_INSTALL_BINDIR}"
+         COMPONENT Runtime
+     )
++endif()
+diff -uNr a/src/apps/relay/CMakeLists.txt b/src/apps/relay/CMakeLists.txt
+--- a/src/apps/relay/CMakeLists.txt
++++ b/src/apps/relay/CMakeLists.txt
+@@ -138,11 +138,13 @@
+         COMPONENT Runtime
+     )
+ 
++if(WIN32)
+ install(DIRECTORY
+         $<TARGET_FILE_DIR:${PROJECT_NAME}>/
+     DESTINATION DESTINATION "${CMAKE_INSTALL_BINDIR}"
+         COMPONENT Runtime
+     )
++endif()
+ 
+ if(WIN32)
+     add_custom_target(turnadmin ALL
+@@ -155,7 +157,7 @@
+ else()
+     add_custom_target(turnadmin ALL
+         COMMAND
+-            ${CMAKE_COMMAND} -E create_symlink $<TARGET_FILE:${PROJECT_NAME}> $<TARGET_FILE_DIR:${PROJECT_NAME}>/turnadmin
++            ${CMAKE_COMMAND} -E create_symlink ${PROJECT_NAME} $<TARGET_FILE_DIR:${PROJECT_NAME}>/turnadmin
+         DEPENDS ${PROJECT_NAME})
+     INSTALL(FILES $<TARGET_FILE_DIR:${PROJECT_NAME}>/turnadmin
+         DESTINATION "${CMAKE_INSTALL_BINDIR}"
+diff -uNr a/src/apps/rfc5769/CMakeLists.txt b/src/apps/rfc5769/CMakeLists.txt
+--- a/src/apps/rfc5769/CMakeLists.txt
++++ b/src/apps/rfc5769/CMakeLists.txt
+@@ -15,8 +15,10 @@
+     RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+         COMPONENT Runtime
+     )
++if(WIN32)
+ install(DIRECTORY
+         $<TARGET_FILE_DIR:${PROJECT_NAME}>/
+     DESTINATION DESTINATION "${CMAKE_INSTALL_BINDIR}"
+         COMPONENT Runtime
+     )
++endif()
+diff -uNr a/src/apps/stunclient/CMakeLists.txt b/src/apps/stunclient/CMakeLists.txt
+--- a/src/apps/stunclient/CMakeLists.txt
++++ b/src/apps/stunclient/CMakeLists.txt
+@@ -15,8 +15,10 @@
+     RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+         COMPONENT Runtime
+     )
++if(WIN32)
+ install(DIRECTORY
+         $<TARGET_FILE_DIR:${PROJECT_NAME}>/
+     DESTINATION DESTINATION "${CMAKE_INSTALL_BINDIR}"
+         COMPONENT Runtime
+     )
++endif()
+diff -uNr a/src/apps/uclient/CMakeLists.txt b/src/apps/uclient/CMakeLists.txt
+--- a/src/apps/uclient/CMakeLists.txt
++++ b/src/apps/uclient/CMakeLists.txt
+@@ -17,8 +17,10 @@
+     RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+         COMPONENT Runtime
+     )
++if(WIN32)
+ install(DIRECTORY
+         $<TARGET_FILE_DIR:${PROJECT_NAME}>/
+     DESTINATION DESTINATION "${CMAKE_INSTALL_BINDIR}"
+         COMPONENT Runtime
+-    )
+\ No newline at end of file
++    )
++endif()
