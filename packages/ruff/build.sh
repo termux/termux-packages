@@ -14,15 +14,7 @@ termux_step_pre_configure() {
 	TERMUX_PKG_BUILDDIR="${TERMUX_PKG_SRCDIR}"
 
 	cd $TERMUX_PKG_BUILDDIR
-	rm -rf _lib
-	mkdir -p _lib
-	cd _lib
-	$CC $CPPFLAGS $CFLAGS -fvisibility=hidden \
-		-c $TERMUX_PKG_BUILDER_DIR/ctermid.c 
-	$AR cru libctermid.a ctermid.o
-
-	RUSTFLAGS+=" -C link-arg=$TERMUX_PKG_BUILDDIR/_lib/libctermid.a"
-
+	
 	termux_setup_rust
 
 	: "${CARGO_HOME:=$HOME/.cargo}"
