@@ -29,6 +29,6 @@ termux_step_pre_configure() {
 	local d
 	for d in $CARGO_HOME/registry/src/*/tikv-jemalloc-sys-*; do
  		printf "LOOK HERE %s\n" "$d" #DELETEME
-		patch --silent -p1 -d ${d} < ${_patch} || :
+		patch -p1 -d ${d} < ${_patch}
 	done
 }
