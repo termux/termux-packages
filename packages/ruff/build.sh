@@ -28,6 +28,8 @@ termux_step_pre_configure() {
 	: "${CARGO_HOME:=$HOME/.cargo}"
 	export CARGO_HOME
 
+ 	export RUST_BACKTRACE=1 #DELETEME
+
 	cd $TERMUX_PKG_SRCDIR
 	cargo fetch --target "${CARGO_TARGET_NAME}"
 
