@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/cutefishos/fishui
+TERMUX_PKG_DESCRIPTION="GUI library based on QQC2 for Cutefish applications"
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=0.8
+TERMUX_PKG_SRCURL=https://github.com/cutefishos/fishui/archive/${TERMUX_PKG_VERSION}/fishui-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=6c71df73639ffaf76c26908ae6ea0611461a62a3864b14f69a0799a8011c1556
+TERMUX_PKG_DEPENDS="kwindowsystem, qt5-qtdeclarative, qt5-qtquickcontrols2 "
+TERMUX_PKG_BUILD_DEPENDS="qt5-qttools, extra-cmake-modules"
+TERMUX_PKG_BUILD_IN_SRC=true

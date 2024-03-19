@@ -1,0 +1,19 @@
+diff '--color=auto' -uNr libcutefish-0.7/cmake/FindSoundThemeFreedesktop.cmake libcutefish-0.7.mod/cmake/FindSoundThemeFreedesktop.cmake
+--- libcutefish-0.7/cmake/FindSoundThemeFreedesktop.cmake	2021-12-27 23:20:55.000000000 +0530
++++ libcutefish-0.7.mod/cmake/FindSoundThemeFreedesktop.cmake	2023-03-03 13:01:05.881161763 +0530
+@@ -9,7 +9,7 @@
+ # SPDX-License-Identifier: BSD-3-Clause
+ 
+ find_file(SoundThemeFreeDesktop_PATH "sounds/freedesktop/index.theme"
+-    PATHS ENV XDG_DATA_DIRS /usr/local/share/ /usr/share/
++  PATHS ENV XDG_DATA_DIRS @TERMUX_PREFIX@/local/share/ @TERMUX_PREFIX@/share/
+     NO_DEFAULT_PATH
+ )
+ 
+@@ -18,4 +18,4 @@
+     FOUND_VAR SoundThemeFreeDesktop_FOUND
+     REQUIRED_VARS SoundThemeFreeDesktop_PATH
+ )
+-mark_as_advanced(SoundThemeFreeDesktop_PATH)
+\ No newline at end of file
++mark_as_advanced(SoundThemeFreeDesktop_PATH)

@@ -1,0 +1,31 @@
+diff '--color=auto' -uNr calculator-0.4/CMakeLists.txt calculator-0.4.mod/CMakeLists.txt
+--- calculator-0.4/CMakeLists.txt	2021-08-17 07:25:25.000000000 +0530
++++ calculator-0.4.mod/CMakeLists.txt	2022-11-27 00:17:49.527748881 +0530
+@@ -47,12 +47,12 @@
+ endif ()
+ 
+ 
+-install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION /usr/bin)
++install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION @TERMUX_PREFIX@/bin)
+ 
+ install(FILES
+     cutefish-calculator.desktop
+-    DESTINATION /usr/share/applications/
++    DESTINATION @TERMUX_PREFIX@/share/applications/
+     COMPONENT Runtime
+ )
+ 
+-install(FILES ${QM_FILES} DESTINATION /usr/share/${PROJECT_NAME}/translations)
++install(FILES ${QM_FILES} DESTINATION @TERMUX_PREFIX@/share/${PROJECT_NAME}/translations)
+diff '--color=auto' -uNr calculator-0.4/main.cpp calculator-0.4.mod/main.cpp
+--- calculator-0.4/main.cpp	2021-08-17 07:25:25.000000000 +0530
++++ calculator-0.4.mod/main.cpp	2022-11-27 00:18:18.751898989 +0530
+@@ -46,7 +46,7 @@
+ 
+     // Translations
+     QLocale locale;
+-    QString qmFilePath = QString("%1/%2.qm").arg("/usr/share/cutefish-calculator/translations/").arg(locale.name());
++    QString qmFilePath = QString("%1/%2.qm").arg("@TERMUX_PREFIX@/share/cutefish-calculator/translations/").arg(locale.name());
+     if (QFile::exists(qmFilePath)) {
+         QTranslator *translator = new QTranslator(QGuiApplication::instance());
+         if (translator->load(qmFilePath)) {

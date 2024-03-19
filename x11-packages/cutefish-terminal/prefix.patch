@@ -1,0 +1,56 @@
+diff '--color=auto' -uNr terminal-0.7/CMakeLists.txt terminal-0.7.mod/CMakeLists.txt
+--- terminal-0.7/CMakeLists.txt	2021-12-27 23:23:04.000000000 +0530
++++ terminal-0.7.mod/CMakeLists.txt	2022-11-27 00:24:22.730076522 +0530
+@@ -55,12 +55,12 @@
+ qt5_create_translation(QM_FILES ${TS_FILES})
+ add_custom_target(translations DEPENDS ${QM_FILES} SOURCES ${TS_FILES})
+ add_dependencies(${PROJECT_NAME} translations)
+-install(FILES ${QM_FILES} DESTINATION /usr/share/cutefish-terminal/translations)
++install(FILES ${QM_FILES} DESTINATION @TERMUX_PREFIX@/share/cutefish-terminal/translations)
+ 
+-install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION /usr/bin)
++install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION @TERMUX_PREFIX@/bin)
+ 
+ install(FILES
+     cutefish-terminal.desktop
+-    DESTINATION /usr/share/applications/
++    DESTINATION @TERMUX_PREFIX@/share/applications/
+     COMPONENT Runtime
+ )
+diff '--color=auto' -uNr terminal-0.7/cutefish-terminal.desktop terminal-0.7.mod/cutefish-terminal.desktop
+--- terminal-0.7/cutefish-terminal.desktop	2021-12-27 23:23:04.000000000 +0530
++++ terminal-0.7.mod/cutefish-terminal.desktop	2022-11-27 00:24:46.297175564 +0530
+@@ -2,7 +2,7 @@
+ Version=1.0
+ Name=Terminal
+ Name[zh_CN]=终端
+-Exec=/usr/bin/cutefish-terminal
++Exec=@TERMUX_PREFIX@/bin/cutefish-terminal
+ Icon=utilities-terminal
+ Terminal=false
+ Type=Application
+diff '--color=auto' -uNr terminal-0.7/qmltermwidget/lib/qtermwidget.cpp terminal-0.7.mod/qmltermwidget/lib/qtermwidget.cpp
+--- terminal-0.7/qmltermwidget/lib/qtermwidget.cpp	2021-12-27 23:23:04.000000000 +0530
++++ terminal-0.7.mod/qmltermwidget/lib/qtermwidget.cpp	2022-11-27 00:26:51.195994412 +0530
+@@ -265,8 +265,7 @@
+     QString d = QFile::decodeName(qgetenv("XDG_DATA_DIRS"));
+     QStringList dirs = d.split(QLatin1Char(':'), QString::SkipEmptyParts);
+     if (dirs.isEmpty()) {
+-        dirs.append(QString::fromLatin1("/usr/local/share"));
+-        dirs.append(QString::fromLatin1("/usr/share"));
++        dirs.append(QString::fromLatin1("@TERMUX_PREFIX@/share"));
+     }
+     dirs.append(QFile::decodeName(TRANSLATIONS_DIR));
+ 
+diff '--color=auto' -uNr terminal-0.7/src/main.cpp terminal-0.7.mod/src/main.cpp
+--- terminal-0.7/src/main.cpp	2021-12-27 23:23:04.000000000 +0530
++++ terminal-0.7.mod/src/main.cpp	2022-11-27 00:25:52.148337812 +0530
+@@ -41,7 +41,7 @@
+ 
+     // Translations
+     QLocale locale;
+-    QString qmFilePath = QString("%1/%2.qm").arg("/usr/share/cutefish-terminal/translations/").arg(locale.name());
++    QString qmFilePath = QString("%1/%2.qm").arg("@TERMUX_PREFIX@/share/cutefish-terminal/translations/").arg(locale.name());
+     if (QFile::exists(qmFilePath)) {
+         QTranslator *translator = new QTranslator(QGuiApplication::instance());
+         if (translator->load(qmFilePath)) {

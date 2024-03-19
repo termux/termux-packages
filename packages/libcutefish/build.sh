@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/cutefishos/libcutefish
+TERMUX_PKG_DESCRIPTION="Cutefish DE System Library"
+TERMUX_PKG_LICENSE="GPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=0.7
+TERMUX_PKG_SRCURL=https://github.com/cutefishos/libcutefish/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=fb9c9c1fe5a68394f99a98bc4b261989dadb4219597c465d5bd49fab92697c20
+TERMUX_PKG_DEPENDS="kwindowsystem, qt5-qtdeclarative, qt5-qtquickcontrols2 "
+TERMUX_PKG_BUILD_DEPENDS="qt5-qttools, extra-cmake-modules, qt5-qtquickcontrols2"
+TERMUX_PKG_BUILD_IN_SRC=true

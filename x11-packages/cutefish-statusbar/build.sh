@@ -1,0 +1,11 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/cutefishos/statusbar
+TERMUX_PKG_DESCRIPTION="CutefishOS statusbar"
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=0.7
+TERMUX_PKG_SRCURL=https://github.com/cutefishos/statusbar/archive/${TERMUX_PKG_VERSION}/cutefish-statusbar-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=0f8e4cbee85a39ad6b49c8271deffda7fcd5330e48cb41e7aa6a2fc9206f7814
+TERMUX_PKG_DEPENDS="fishui, libdbusmenu-qt, qt5-qtsvg"
+TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules, qt5-qttools"
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_CMAKE_BUILD="Unix Makefiles"

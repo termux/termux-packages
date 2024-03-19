@@ -1,0 +1,33 @@
+diff '--color=auto' -uNr statusbar-0.7/CMakeLists.txt statusbar-0.7.mod/CMakeLists.txt
+--- statusbar-0.7/CMakeLists.txt	2021-12-27 23:21:26.000000000 +0530
++++ statusbar-0.7.mod/CMakeLists.txt	2022-11-27 20:54:05.680436530 +0530
+@@ -117,4 +117,4 @@
+ add_dependencies(cutefish-statusbar translations)
+ 
+ install(TARGETS cutefish-statusbar RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+-install(FILES ${QM_FILES} DESTINATION /usr/share/cutefish-statusbar/translations)
++install(FILES ${QM_FILES} DESTINATION @TERMUX_PREFIX@/share/cutefish-statusbar/translations)
+diff '--color=auto' -uNr statusbar-0.7/src/capplications.cpp statusbar-0.7.mod/src/capplications.cpp
+--- statusbar-0.7/src/capplications.cpp	2021-12-27 23:21:26.000000000 +0530
++++ statusbar-0.7.mod/src/capplications.cpp	2022-11-27 20:55:00.703930992 +0530
+@@ -27,7 +27,7 @@
+ #include <QDir>
+ 
+ static CApplications *SELF = nullptr;
+-static QString s_systemAppFolder = "/usr/share/applications";
++static QString s_systemAppFolder = "@TERMUX_PREFIX@/share/applications";
+ 
+ static QByteArray detectDesktopEnvironment()
+ {
+diff '--color=auto' -uNr statusbar-0.7/src/main.cpp statusbar-0.7.mod/src/main.cpp
+--- statusbar-0.7/src/main.cpp	2021-12-27 23:21:26.000000000 +0530
++++ statusbar-0.7.mod/src/main.cpp	2022-11-27 20:54:37.700530295 +0530
+@@ -45,7 +45,7 @@
+     qmlRegisterType<AppMenuModel>(uri, 1, 0, "AppMenuModel");
+     qmlRegisterType<AppMenuApplet>(uri, 1, 0, "AppMenuApplet");
+ 
+-    QString qmFilePath = QString("%1/%2.qm").arg("/usr/share/cutefish-statusbar/translations/").arg(QLocale::system().name());
++    QString qmFilePath = QString("%1/%2.qm").arg("@TERMUX_PREFIX@/share/cutefish-statusbar/translations/").arg(QLocale::system().name());
+     if (QFile::exists(qmFilePath)) {
+         QTranslator *translator = new QTranslator(QApplication::instance());
+         if (translator->load(qmFilePath)) {
