@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/gravitational/teleport
 TERMUX_PKG_DESCRIPTION="Secure Access for Developers that doesn't get in the way"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="15.1.8"
+TERMUX_PKG_VERSION="15.1.9"
 TERMUX_PKG_SRCURL=https://github.com/gravitational/teleport/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=75e12e36b64f142282f2e502139b9ce66f3f71af63f386788e19a964354fba19
+TERMUX_PKG_SHA256=7cf76e50dd7fab18241cba6573f2da59487b51ca283f151ddddd29fc0b8d913e
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
