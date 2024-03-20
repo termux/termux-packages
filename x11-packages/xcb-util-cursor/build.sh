@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="XCB cursor library"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.1.5"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/archive/individual/lib/xcb-util-cursor-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=0e9c5446dc6f3beb8af6ebfcc9e27bcc6da6fe2860f7fc07b99144dfa568e93b
 TERMUX_PKG_AUTO_UPDATE=true
