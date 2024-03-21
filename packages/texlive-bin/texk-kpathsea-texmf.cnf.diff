@@ -7,7 +7,7 @@ need to fix them.
  % SELFAUTOGRANDPARENT (its great-grandparent = /usr/local/texlive).
  % Sorry for the off-by-one-generation names.
 -TEXMFROOT = $SELFAUTOPARENT
-+TEXMFROOT = @TERMUX_PREFIX@/share/texlive
++TEXMFROOT = @TERMUX_PREFIX@/share/texlive/@YEAR@
  
  % The main tree of distributed packages and programs:
  TEXMFDIST = $TEXMFROOT/texmf-dist
@@ -29,12 +29,13 @@ need to fix them.
  MPSUPPORT = $TEXMFDOTDIR;$TEXMF/metapost/support
  
  % For xdvi to find mime.types and .mailcap, if they do not exist in
-@@ -582,7 +582,8 @@
+@@ -582,7 +582,9 @@
  $SELFAUTOPARENT/share/texmf/web2c,\
  $SELFAUTOPARENT/texmf-local/web2c,\
  $SELFAUTOPARENT/texmf-dist/web2c,\
 -$SELFAUTOPARENT/texmf/web2c\
 +$SELFAUTOPARENT/texmf/web2c,\
++@TERMUX_PREFIX@/share/texlive/@YEAR@/texmf-dist/web2c,\
 +@TERMUX_PREFIX@/share/texlive/texmf-dist/web2c\
  }
  %
