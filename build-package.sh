@@ -682,8 +682,8 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 			termux_error_exit "Unknown packaging format '$TERMUX_PACKAGE_FORMAT'."
 		fi
 		# Saving a list of compiled packages for further work with it
-		if termux_check_package_in_building_packages_list "$TERMUX_PKG_NAME"; then
-			sed -i "/^${TERMUX_PKG_NAME}$/d" "$TERMUX_BUILD_PACKAGE_CALL_BUILDING_PACKAGES_LIST_FILE_PATH"
+		if termux_check_package_in_building_packages_list "${TERMUX_PKG_BUILDER_DIR#${TERMUX_SCRIPTDIR}/}"; then
+			sed -i "\|^${TERMUX_PKG_BUILDER_DIR#${TERMUX_SCRIPTDIR}/}$|d" "$TERMUX_BUILD_PACKAGE_CALL_BUILDING_PACKAGES_LIST_FILE_PATH"
 		fi
 		termux_add_package_to_built_packages_list "$TERMUX_PKG_NAME"
 		termux_step_finish_build
