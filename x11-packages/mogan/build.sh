@@ -2,13 +2,22 @@ TERMUX_PKG_HOMEPAGE=https://github.com/XmacsLabs/mogan
 TERMUX_PKG_DESCRIPTION="A structure editor forked from GNU TeXmacs"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.1.6
+TERMUX_PKG_VERSION="1.2.5.1"
 TERMUX_PKG_SRCURL=https://github.com/XmacsLabs/mogan/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=23ae08cd3c2af99d952b5ec37253ee639519402784b8766f37b2d223587659ab
-TERMUX_PKG_DEPENDS="freetype, ghostscript, libandroid-complex-math, libandroid-execinfo, libandroid-spawn, libc++, libcurl, libiconv, libjpeg-turbo, libpng, libsqlite, mogan-data, qt5-qtbase, qt5-qtsvg, which, zlib"
+TERMUX_PKG_SHA256=6e35af8235ec68e6d228b079d32b877702f4a4bf0e1b9e13f5640d15216fd849
+TERMUX_PKG_DEPENDS="freetype, ghostscript, libandroid-complex-math, libandroid-spawn, libandroid-wordexp, libc++, libcurl, libgit2, libiconv, libjpeg-turbo, libpng, mogan-data, qt5-qtbase, qt5-qtsvg, zlib"
 TERMUX_PKG_BUILD_DEPENDS="qt5-qtbase-cross-tools"
-TERMUX_PKG_ANTI_BUILD_DEPENDS="which"
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
+
+termux_step_post_get_source() {
+	sed \
+		"s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|" \
+		"${TERMUX_PKG_BUILDER_DIR}/lolly.diff" \
+		> "${TERMUX_PKG_SRCDIR}"/xmake/packages/l/lolly/lolly.diff
+	cp -f "${TERMUX_PKG_BUILDER_DIR}"/s7.diff \
+		"${TERMUX_PKG_SRCDIR}"/xmake/packages/s/s7/s7.diff
+}
 
 termux_step_pre_configure() {
 	termux_setup_cmake
@@ -42,7 +51,7 @@ termux_step_make() {
 		--yes \
 		--verbose \
 		--diagnosis \
-		-m release \
+		-m releasedbg \
 		--sdk="${TERMUX_STANDALONE_TOOLCHAIN}" \
 		--cross="${host_platform}-" \
 		--cflags="${CFLAGS}" \
@@ -65,8 +74,5 @@ termux_step_make_install() {
 		--verbose \
 		--diagnosis \
 		-o "${TERMUX_PREFIX}" \
-		mogan_install
-
-	mkdir -p $TERMUX_PREFIX/share/Xmacs/plugins/shell/bin
-	ln -sfTr $TERMUX_PREFIX/{libexec,share}/Xmacs/plugins/shell/bin/tm_shell
+		research
 }
