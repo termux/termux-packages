@@ -1,8 +1,8 @@
 # shellcheck shell=bash disable=SC2155
 termux_setup_xmake() {
-	local XMAKE_VERSION=2.8.5
+	local XMAKE_VERSION=2.8.9
 	local XMAKE_TGZ_URL=https://github.com/xmake-io/xmake/releases/download/v${XMAKE_VERSION}/xmake-v${XMAKE_VERSION}.tar.gz
-	local XMAKE_TGZ_SHA256=19c67be3bcfcbda96ca87a18effac39bfccc443fbb3754c7bbc01511decd24af
+	local XMAKE_TGZ_SHA256=5f793c393346ef80e47f083ade4d3c2fdfc448658a7917fda35ccd7bd2b911b8
 	local XMAKE_TGZ_FILE=${TERMUX_PKG_TMPDIR}/xmake-${XMAKE_VERSION}.tar.gz
 	local XMAKE_FOLDER=${TERMUX_COMMON_CACHEDIR}/xmake-${XMAKE_VERSION}
 	if [[ "${TERMUX_PACKAGES_OFFLINE-false}" == "true" ]]; then
