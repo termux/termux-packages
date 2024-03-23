@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Simple terminal UI for git commands"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Krishna kanhaiya @kcubeterm"
 TERMUX_PKG_VERSION="0.41.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/jesseduffield/lazygit/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=f2176fa253588fe4b7118bf83f4316ae3ecb914ae1e99aad8c474e23cea49fb8
 TERMUX_PKG_AUTO_UPDATE=true
@@ -17,8 +18,16 @@ termux_step_make() {
         cp -a "${TERMUX_PKG_SRCDIR}" "${TERMUX_PKG_BUILDDIR}/src/github.com/jesseduffield/lazygit"
         cd "${TERMUX_PKG_BUILDDIR}/src/github.com/jesseduffield/lazygit"
 
-        go get -d -v
-        go build
+	go build \
+	-trimpath \
+	-mod=readonly \
+	-modcacherw \
+	-ldflags "\
+	-X main.date=$(date --date=@${SOURCE_DATE_EPOCH} -u +%Y-%m-%dT%H:%M:%SZ) \
+	-X main.buildSource=termux \
+	-X main.version=${TERMUX_PKG_VERSION} \
+	-X main.commit=v${TERMUX_PKG_VERSION} \
+	"
 }
 
 termux_step_make_install() {
