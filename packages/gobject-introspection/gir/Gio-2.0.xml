@@ -48,6 +48,7 @@
     <implements name="GActionGroup"/>
     <implements name="GActionMap"/>
     <property name="application-id" type="gchararray" flags="231" default-value="NULL"/>
+    <property name="version" type="gchararray" flags="1073742051" default-value="NULL"/>
     <property name="flags" type="GApplicationFlags" flags="227" default-value="G_APPLICATION_FLAGS_NONE"/>
     <property name="resource-base-path" type="gchararray" flags="227" default-value="NULL"/>
     <property name="is-registered" type="gboolean" flags="225" default-value="FALSE"/>
@@ -524,6 +525,7 @@
     <member name="G_FILE_COPY_ALL_METADATA" nick="all-metadata" value="8"/>
     <member name="G_FILE_COPY_NO_FALLBACK_FOR_MOVE" nick="no-fallback-for-move" value="16"/>
     <member name="G_FILE_COPY_TARGET_DEFAULT_PERMS" nick="target-default-perms" value="32"/>
+    <member name="G_FILE_COPY_TARGET_DEFAULT_MODIFIED_TIME" nick="target-default-modified-time" value="64"/>
   </flags>
   <flags name="GFileMonitorFlags" get-type="g_file_monitor_flags_get_type">
     <member name="G_FILE_MONITOR_NONE" nick="none" value="0"/>
@@ -606,6 +608,7 @@
     <member name="G_IO_ERROR_NOT_CONNECTED" nick="not-connected" value="45"/>
     <member name="G_IO_ERROR_MESSAGE_TOO_LARGE" nick="message-too-large" value="46"/>
     <member name="G_IO_ERROR_NO_SUCH_DEVICE" nick="no-such-device" value="47"/>
+    <member name="G_IO_ERROR_DESTINATION_UNSET" nick="destination-unset" value="48"/>
   </enum>  <flags name="GAskPasswordFlags" get-type="g_ask_password_flags_get_type">
     <member name="G_ASK_PASSWORD_NEED_PASSWORD" nick="need-password" value="1"/>
     <member name="G_ASK_PASSWORD_NEED_USERNAME" nick="need-username" value="2"/>
@@ -1208,6 +1211,7 @@
     <prerequisite name="GActionGroup"/>
   </interface>
   <class name="GResolver" get-type="g_resolver_get_type" parents="GObject" abstract="1">
+    <property name="timeout" type="guint" flags="1073742051" default-value="0"/>
     <signal name="reload" return="void" when="last">
     </signal>
   </class>
