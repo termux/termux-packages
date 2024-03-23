@@ -10,12 +10,12 @@ TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
 	termux_setup_golang
-
-	local _DATE=$(date -u '+%Y.%m.%d-%H:%M UTC')
-	go build -v -ldflags "-X \"main.Version=$TERMUX_PKG_VERSION\" -X \"main.BuildTime=$_DATE\"" \
-		./cmd/cloudflared
 }
 
 termux_step_make_install() {
-	install -Dm700 -t $TERMUX_PREFIX/bin cloudflared
+	make install \
+		VERSION=$TERMUX_PKG_VERSION \
+		DATE=$(date -u +"%Y-%m-%dT%H:%M") \
+		PACKAGE_MANAGER=pkg \
+		PREFIX=$TERMUX_PREFIX
 }
