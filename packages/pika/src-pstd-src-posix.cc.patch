@@ -1,0 +1,18 @@
+--- a/src/pstd/src/posix.cc
++++ b/src/pstd/src/posix.cc
+@@ -403,11 +403,15 @@
+ }
+ 
+ void Pthread_cancel(pthread_t tid) {
++  #ifndef __ANDROID__
+   int rc;
+ 
+   if (rc = pthread_cancel(tid); rc != 0) {
+     LOG(ERROR) << "Pthread_cancel error: " << strerror(rc);
+   }
++  #else
++   log_err("Pthread_cancel error: %s\n", strerror(ENOSYS));
++  #endif
+ }
+ 
+ void Pthread_join(pthread_t tid, void** thread_return) {
