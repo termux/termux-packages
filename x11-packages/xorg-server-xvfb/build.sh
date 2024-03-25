@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="X virtual framebuffer"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=21.1.8
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/xserver/xorg-server-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=38aadb735650c8024ee25211c190bf8aad844c5f59632761ab1ef4c4d5aeb152
 
@@ -70,4 +71,11 @@ termux_step_pre_configure() {
 	if [ "$TERMUX_DEBUG_BUILD" = "true" ]; then
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-debug"
 	fi
+
+	local XVFB_RUN_URL="https://salsa.debian.org/xorg-team/xserver/xorg-server/-/raw/debian-bookworm/debian/local/xvfb-run"
+	termux_download ${XVFB_RUN_URL} "${TERMUX_PKG_CACHEDIR}/xvfb-run" fd05e0f8e6207c3984b980a0f037381c9c4a6f22a6dd94fdcfa995318db2a0a4
+}
+
+termux_step_post_make_install() {
+	install -Dm644 -t "${TERMUX_PREFIX}/bin" "${TERMUX_PKG_CACHEDIR}/xvfb-run"
 }
