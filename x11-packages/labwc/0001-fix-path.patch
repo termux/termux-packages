@@ -1,0 +1,32 @@
+diff --git a/src/common/dir.c b/src/common/dir.c
+index 85dfea1..1935ba0 100644
+--- a/src/common/dir.c
++++ b/src/common/dir.c
+@@ -21,7 +21,11 @@ static struct dir config_dirs[] = {
+ 	{ "XDG_CONFIG_HOME", "labwc" },
+ 	{ "HOME", ".config/labwc" },
+ 	{ "XDG_CONFIG_DIRS", "labwc" },
++#if defined (__ANDROID__) && defined (__TERMUX__)
++	{ NULL, "@TERMUX_PREFIX@/etc/xdg/labwc" },
++#else
+ 	{ NULL, "/etc/xdg/labwc" },
++#endif
+ 	{ NULL, NULL }
+ };
+ 
+@@ -30,9 +34,15 @@ static struct dir theme_dirs[] = {
+ 	{ "HOME", ".local/share/themes" },
+ 	{ "HOME", ".themes" },
+ 	{ "XDG_DATA_DIRS", "themes" },
++#if defined (__ANDROID__) && defined (__TERMUX__)
++	{ NULL, "@TERMUX_PREFIX@/share/themes" },
++	{ NULL, "@TERMUX_PREFIX@/local/share/themes" },
++	{ NULL, "@TERMUX_PREFIX@/opt/share/themes" },
++#else
+ 	{ NULL, "/usr/share/themes" },
+ 	{ NULL, "/usr/local/share/themes" },
+ 	{ NULL, "/opt/share/themes" },
++#endif
+ 	{ NULL, NULL }
+ };
+ 
