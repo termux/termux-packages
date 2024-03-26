@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="A cat(1) clone with wings"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.24.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/sharkdp/bat/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=907554a9eff239f256ee8fe05a922aad84febe4fe10a499def72a4557e9eedfb
 TERMUX_PKG_AUTO_UPDATE=true
@@ -32,6 +32,8 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_make_install() {
-	mkdir -p $TERMUX_PREFIX/share/man/man1
-	cp $(find . -name bat.1) $TERMUX_PREFIX/share/man/man1/
+	find . -name bat.1 -type f -exec install -Dm644 {} "$TERMUX_PREFIX/share/man/man1/bat.1" \;
+	find . -name bat.bash -type f -exec install -Dm644 {} "$TERMUX_PREFIX/share/bash-completion/completions/bat" \;
+	find . -name bat.zsh -type f -exec install -Dm644 {} "$TERMUX_PREFIX/share/zsh/site-functions/_bat" \;
+	find . -name bat.fish -type f -exec install -Dm644 {} "$TERMUX_PREFIX/share/fish/vendor_completions.d/bat.fish" \;
 }
