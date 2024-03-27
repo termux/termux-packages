@@ -308,6 +308,9 @@ PACKAGES+=" libzstd-dev"
 # Needed by tree-sitter-c
 PACKAGES+=" tree-sitter-cli"
 
+# Needed by wlroots
+PACKAGES+=" glslang-tools"
+
 # Do not require sudo if already running as root.
 SUDO="sudo"
 if [ "$(id -u)" = "0" ]; then
