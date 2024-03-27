@@ -26,6 +26,12 @@ termux_step_patch_package() {
 			-e "s%\@TERMUX_HOME\@%${TERMUX_ANDROID_HOME}%g" \
 			-e "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" \
 			-e "s%\@TERMUX_PREFIX_CLASSICAL\@%${TERMUX_PREFIX_CLASSICAL}%g" \
+			-e "s%\@TERMUX_ENV__S_TERMUX\@%${TERMUX_ENV__S_TERMUX}%g" \
+			-e "s%\@TERMUX_ENV__SE_TERMUX\@%${TERMUX_ENV__SE_TERMUX}%g" \
+			-e "s%\@TERMUX_ENV__S_TERMUX_APP\@%${TERMUX_ENV__S_TERMUX_APP}%g" \
+			-e "s%\@TERMUX_ENV__SE_TERMUX_APP\@%${TERMUX_ENV__SE_TERMUX_APP}%g" \
+			-e "s%\@TERMUX_ENV__S_TERMUX_EXEC\@%${TERMUX_ENV__S_TERMUX_EXEC}%g" \
+			-e "s%\@TERMUX_ENV__SE_TERMUX_EXEC\@%${TERMUX_ENV__SE_TERMUX_EXEC}%g" \
 			"$patch" | patch --silent -p1
 	done
 	shopt -u nullglob
