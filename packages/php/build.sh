@@ -5,6 +5,7 @@ TERMUX_PKG_LICENSE_FILE=LICENSE
 TERMUX_PKG_MAINTAINER="@termux"
 # Please revbump php-* extensions along with "minor" bump (e.g. 8.1.x to 8.2.0)
 TERMUX_PKG_VERSION=8.3.4
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/php/php-src/archive/php-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=4e633d4709afa5301d84d3821471bfb136f281bb71f9acca2fe9d29cc0407d2a
 TERMUX_PKG_AUTO_UPDATE=false
