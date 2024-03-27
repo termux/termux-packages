@@ -1,0 +1,478 @@
+diff --git a/backend/backend.c b/backend/backend.c
+index e4e8c8d8..b9a04d4c 100644
+--- a/backend/backend.c
++++ b/backend/backend.c
+@@ -36,6 +36,10 @@
+ #include <wlr/backend/x11.h>
+ #endif
+ 
++#if WLR_HAS_TERMUXGUI_BACKEND
++#include <wlr/backend/termuxgui.h>
++#endif
++
+ #define WAIT_SESSION_TIMEOUT 10000 // ms
+ 
+ void wlr_backend_init(struct wlr_backend *backend,
+@@ -240,6 +244,25 @@ static struct wlr_backend *attempt_headless_backend(struct wl_event_loop *loop)
+ 	return backend;
+ }
+ 
++static struct wlr_backend *attempt_tgui_backend(struct wl_event_loop *loop) {
++#if WLR_HAS_TERMUXGUI_BACKEND
++	struct wlr_backend *backend = wlr_tgui_backend_create(loop);
++	if (backend == NULL) {
++		return NULL;
++	}
++
++	size_t outputs = parse_outputs_env("WLR_TGUI_OUTPUTS");
++	for (size_t i = 0; i < outputs; ++i) {
++		wlr_tgui_output_create(backend);
++	}
++
++	return backend;
++#else
++	wlr_log(WLR_ERROR, "Cannot create Termux:GUI backend: disabled at compile-time");
++	return NULL;
++#endif
++}
++
+ static struct wlr_backend *attempt_drm_backend(struct wlr_backend *backend, struct wlr_session *session) {
+ #if WLR_HAS_DRM_BACKEND
+ 	struct wlr_device *gpus[8];
+@@ -305,6 +328,8 @@ static bool attempt_backend_by_name(struct wl_event_loop *loop,
+ 		backend = attempt_x11_backend(loop, NULL);
+ 	} else if (strcmp(name, "headless") == 0) {
+ 		backend = attempt_headless_backend(loop);
++	} else if (strcmp(name, "tgui") == 0) {
++		backend = attempt_tgui_backend(loop);
+ 	} else if (strcmp(name, "drm") == 0 || strcmp(name, "libinput") == 0) {
+ 		// DRM and libinput need a session
+ 		if (*session_ptr == NULL) {
+@@ -401,6 +426,12 @@ struct wlr_backend *wlr_backend_autocreate(struct wl_event_loop *loop,
+ 		goto success;
+ 	}
+ 
++	struct wlr_backend *tgui_backend = attempt_tgui_backend(loop);
++	if (tgui_backend) {
++		wlr_multi_backend_add(multi, tgui_backend);
++		goto success;
++	}
++
+ 	// Attempt DRM+libinput
+ 	session = session_create_and_wait(loop);
+ 	if (!session) {
+diff --git a/backend/meson.build b/backend/meson.build
+index ed977d3b..6086492f 100644
+--- a/backend/meson.build
++++ b/backend/meson.build
+@@ -1,6 +1,6 @@
+ wlr_files += files('backend.c')
+ 
+-all_backends = ['drm', 'libinput', 'x11']
++all_backends = ['drm', 'libinput', 'x11', 'termuxgui']
+ backends = get_option('backends')
+ if 'auto' in backends and get_option('auto_features').enabled()
+ 	backends = all_backends
+diff --git a/include/meson.build b/include/meson.build
+index 165166c3..a391fa82 100644
+--- a/include/meson.build
++++ b/include/meson.build
+@@ -8,6 +8,9 @@ endif
+ if not features.get('libinput-backend')
+ 	exclude_files += 'backend/libinput.h'
+ endif
++if not features.get('termuxgui-backend')
++	exclude_files += 'backend/termuxgui.h'
++endif
+ if not features.get('x11-backend')
+ 	exclude_files += 'backend/x11.h'
+ endif
+diff --git a/include/wlr/config.h.in b/include/wlr/config.h.in
+index e03049da..a3d131fe 100644
+--- a/include/wlr/config.h.in
++++ b/include/wlr/config.h.in
+@@ -4,6 +4,7 @@
+ #mesondefine WLR_HAS_DRM_BACKEND
+ #mesondefine WLR_HAS_LIBINPUT_BACKEND
+ #mesondefine WLR_HAS_X11_BACKEND
++#mesondefine WLR_HAS_TERMUXGUI_BACKEND
+ 
+ #mesondefine WLR_HAS_GLES2_RENDERER
+ #mesondefine WLR_HAS_VULKAN_RENDERER
+diff --git a/meson.build b/meson.build
+index c28bb772..095928c9 100644
+--- a/meson.build
++++ b/meson.build
+@@ -89,6 +89,7 @@ features = {
+ 	'drm-backend': false,
+ 	'x11-backend': false,
+ 	'libinput-backend': false,
++	'termuxgui-backend': false,
+ 	'xwayland': false,
+ 	'gles2-renderer': false,
+ 	'vulkan-renderer': false,
+diff --git a/meson_options.txt b/meson_options.txt
+index 35961b10..a7480a55 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -3,7 +3,7 @@ option('xwayland', type: 'feature', value: 'auto', yield: true, description: 'En
+ option('examples', type: 'boolean', value: true, description: 'Build example applications')
+ option('icon_directory', description: 'Location used to look for cursors (default: ${datadir}/icons)', type: 'string', value: '')
+ option('renderers', type: 'array', choices: ['auto', 'gles2', 'vulkan'], value: ['auto'], description: 'Select built-in renderers')
+-option('backends', type: 'array', choices: ['auto', 'drm', 'libinput', 'x11'], value: ['auto'], description: 'Select built-in backends')
++option('backends', type: 'array', choices: ['auto', 'drm', 'libinput', 'x11', 'termuxgui'], value: ['auto'], description: 'Select built-in backends')
+ option('allocators', type: 'array', choices: ['auto', 'gbm'], value: ['auto'],
+ 	description: 'Select built-in allocators')
+ option('session', type: 'feature', value: 'auto', description: 'Enable session support')
+diff --git a/render/allocator/allocator.c b/render/allocator/allocator.c
+index 27b08fc8..526ba2a7 100644
+--- a/render/allocator/allocator.c
++++ b/render/allocator/allocator.c
+@@ -18,6 +18,11 @@
+ #include "render/allocator/gbm.h"
+ #endif
+ 
++#if WLR_HAS_TERMUXGUI_BACKEND
++#include "backend/multi.h"
++#include "backend/termuxgui.h"
++#endif
++
+ void wlr_allocator_init(struct wlr_allocator *alloc,
+ 		const struct wlr_allocator_interface *impl, uint32_t buffer_caps) {
+ 	assert(impl && impl->destroy && impl->create_buffer);
+@@ -145,8 +150,31 @@ struct wlr_allocator *allocator_autocreate_with_drm_fd(
+ 	return NULL;
+ }
+ 
++#if WLR_HAS_TERMUXGUI_BACKEND
++static void backend_get_allocator(struct wlr_backend *backend, void *data) {
++	struct wlr_allocator **allocator = data;
++	if (wlr_backend_is_tgui(backend)) {
++		struct wlr_tgui_backend *tgui_backend = tgui_backend_from_backend(backend);
++		*allocator = wlr_tgui_backend_get_allocator(tgui_backend);
++	}
++}
++#endif
++
+ struct wlr_allocator *wlr_allocator_autocreate(struct wlr_backend *backend,
+ 		struct wlr_renderer *renderer) {
++#if WLR_HAS_TERMUXGUI_BACKEND
++	struct wlr_allocator *allocator = NULL;
++	if (wlr_backend_is_multi(backend)) {
++		wlr_multi_for_each_backend(backend, backend_get_allocator, &allocator);
++	} else {
++		backend_get_allocator(backend, &allocator);
++	}
++
++	if (allocator) {
++		return allocator;
++	}
++#endif
++
+ 	uint32_t backend_caps = backend_get_buffer_caps(backend);
+ 	// Note, drm_fd may be negative if unavailable
+ 	int drm_fd = wlr_backend_get_drm_fd(backend);
+diff --git a/render/egl.c b/render/egl.c
+index 19868ca8..a3bd8764 100644
+--- a/render/egl.c
++++ b/render/egl.c
+@@ -296,6 +296,7 @@ static bool egl_init_display(struct wlr_egl *egl, EGLDisplay display) {
+ 		check_egl_ext(display_exts_str, "EGL_EXT_create_context_robustness");
+ 
+ 	const char *device_exts_str = NULL, *driver_name = NULL;
++#ifndef __TERMUX__
+ 	if (egl->exts.EXT_device_query) {
+ 		EGLAttrib device_attrib;
+ 		if (!egl->procs.eglQueryDisplayAttribEXT(egl->display,
+@@ -335,6 +336,7 @@ static bool egl_init_display(struct wlr_egl *egl, EGLDisplay display) {
+ 		egl->exts.EXT_device_drm_render_node =
+ 			check_egl_ext(device_exts_str, "EGL_EXT_device_drm_render_node");
+ 	}
++#endif
+ 
+ 	if (!check_egl_ext(display_exts_str, "EGL_KHR_no_config_context") &&
+ 			!check_egl_ext(display_exts_str, "EGL_MESA_configless_context")) {
+@@ -440,6 +442,7 @@ static bool egl_init(struct wlr_egl *egl, EGLenum platform,
+ 
+ static bool device_has_name(const drmDevice *device, const char *name);
+ 
++#ifndef __TERMUX__
+ static EGLDeviceEXT get_egl_device_from_drm_fd(struct wlr_egl *egl,
+ 		int drm_fd) {
+ 	if (egl->procs.eglQueryDevicesEXT == NULL) {
+@@ -494,7 +497,9 @@ static EGLDeviceEXT get_egl_device_from_drm_fd(struct wlr_egl *egl,
+ 
+ 	return egl_device;
+ }
++#endif
+ 
++#ifndef __TERMUX__
+ static int open_render_node(int drm_fd) {
+ 	char *render_name = drmGetRenderDeviceNameFromFd(drm_fd);
+ 	if (render_name == NULL) {
+@@ -516,6 +521,7 @@ static int open_render_node(int drm_fd) {
+ 	free(render_name);
+ 	return render_fd;
+ }
++#endif
+ 
+ struct wlr_egl *wlr_egl_create_with_drm_fd(int drm_fd) {
+ 	struct wlr_egl *egl = egl_create();
+@@ -524,6 +530,7 @@ struct wlr_egl *wlr_egl_create_with_drm_fd(int drm_fd) {
+ 		return NULL;
+ 	}
+ 
++#ifndef __TERMUX__
+ 	if (egl->exts.EXT_platform_device) {
+ 		/*
+ 		 * Search for the EGL device matching the DRM fd using the
+@@ -541,8 +548,10 @@ struct wlr_egl *wlr_egl_create_with_drm_fd(int drm_fd) {
+ 	} else {
+ 		wlr_log(WLR_DEBUG, "EXT_platform_device not supported");
+ 	}
++#endif
+ 
+ 	if (egl->exts.KHR_platform_gbm) {
++#ifndef __TERMUX__
+ 		int gbm_fd = open_render_node(drm_fd);
+ 		if (gbm_fd < 0) {
+ 			wlr_log(WLR_ERROR, "Failed to open DRM render node");
+@@ -555,14 +564,19 @@ struct wlr_egl *wlr_egl_create_with_drm_fd(int drm_fd) {
+ 			wlr_log(WLR_ERROR, "Failed to create GBM device");
+ 			goto error;
+ 		}
++#endif
+ 
+ 		if (egl_init(egl, EGL_PLATFORM_GBM_KHR, egl->gbm_device)) {
+ 			wlr_log(WLR_DEBUG, "Using EGL_PLATFORM_GBM_KHR");
+ 			return egl;
+ 		}
+ 
++#ifndef __TERMUX__
+ 		gbm_device_destroy(egl->gbm_device);
+ 		close(gbm_fd);
++#else
++		goto error;
++#endif
+ 	} else {
+ 		wlr_log(WLR_DEBUG, "KHR_platform_gbm not supported");
+ 	}
+diff --git a/render/vulkan/renderer.c b/render/vulkan/renderer.c
+index 32effb5a..9dc91963 100644
+--- a/render/vulkan/renderer.c
++++ b/render/vulkan/renderer.c
+@@ -2488,6 +2488,7 @@ struct wlr_renderer *wlr_vk_renderer_create_with_drm_fd(int drm_fd) {
+ 		return NULL;
+ 	}
+ 
++#ifndef __TERMUX__
+ 	// Do not use the drm_fd that was passed in: we should prefer the render
+ 	// node even if a primary node was provided
+ 	dev->drm_fd = vulkan_open_phdev_drm_fd(phdev);
+@@ -2496,6 +2497,7 @@ struct wlr_renderer *wlr_vk_renderer_create_with_drm_fd(int drm_fd) {
+ 		vulkan_instance_destroy(ini);
+ 		return NULL;
+ 	}
++#endif
+ 
+ 	return vulkan_renderer_create_for_device(dev);
+ }
+diff --git a/render/vulkan/vulkan.c b/render/vulkan/vulkan.c
+index 7cdc44a0..ca700b48 100644
+--- a/render/vulkan/vulkan.c
++++ b/render/vulkan/vulkan.c
+@@ -273,11 +273,13 @@ VkPhysicalDevice vulkan_find_drm_phdev(struct wlr_vk_instance *ini, int drm_fd)
+ 		return VK_NULL_HANDLE;
+ 	}
+ 
++#ifndef __TERMUX__
+ 	struct stat drm_stat = {0};
+ 	if (fstat(drm_fd, &drm_stat) != 0) {
+ 		wlr_log_errno(WLR_ERROR, "fstat failed");
+ 		return VK_NULL_HANDLE;
+ 	}
++#endif
+ 
+ 	for (uint32_t i = 0; i < num_phdevs; ++i) {
+ 		VkPhysicalDevice phdev = phdevs[i];
+@@ -313,6 +315,7 @@ VkPhysicalDevice vulkan_find_drm_phdev(struct wlr_vk_instance *ini, int drm_fd)
+ 			continue;
+ 		}
+ 
++#ifndef __TERMUX__
+ 		bool has_drm_props = check_extension(avail_ext_props, avail_extc,
+ 			VK_EXT_PHYSICAL_DEVICE_DRM_EXTENSION_NAME);
+ 		bool has_driver_props = check_extension(avail_ext_props, avail_extc,
+@@ -359,11 +362,18 @@ VkPhysicalDevice vulkan_find_drm_phdev(struct wlr_vk_instance *ini, int drm_fd)
+ 				phdev_props.deviceName);
+ 			return phdev;
+ 		}
++#else
++		if (check_extension(avail_ext_props, avail_extc, VK_EXT_EXTERNAL_MEMORY_DMA_BUF_EXTENSION_NAME) &&
++				check_extension(avail_ext_props, avail_extc, VK_EXT_IMAGE_DRM_FORMAT_MODIFIER_EXTENSION_NAME)) {
++			return phdev;
++		}
++#endif
+ 	}
+ 
+ 	return VK_NULL_HANDLE;
+ }
+ 
++#ifndef __TERMUX__
+ int vulkan_open_phdev_drm_fd(VkPhysicalDevice phdev) {
+ 	// vulkan_find_drm_phdev() already checks that VK_EXT_physical_device_drm
+ 	// is supported
+@@ -409,6 +419,7 @@ int vulkan_open_phdev_drm_fd(VkPhysicalDevice phdev) {
+ 	drmFreeDevice(&device);
+ 	return drm_fd;
+ }
++#endif
+ 
+ static void load_device_proc(struct wlr_vk_device *dev, const char *name,
+ 		void *proc_ptr) {
+diff --git a/render/wlr_renderer.c b/render/wlr_renderer.c
+index 6a28908c..0f017e4c 100644
+--- a/render/wlr_renderer.c
++++ b/render/wlr_renderer.c
+@@ -6,7 +6,9 @@
+ #include <wlr/render/interface.h>
+ #include <wlr/render/pixman.h>
+ #include <wlr/render/wlr_renderer.h>
++#ifndef __TERMUX__
+ #include <wlr/types/wlr_drm.h>
++#endif
+ #include <wlr/types/wlr_linux_dmabuf_v1.h>
+ #include <wlr/types/wlr_shm.h>
+ #include <wlr/util/box.h>
+@@ -83,7 +85,9 @@ bool wlr_renderer_init_wl_display(struct wlr_renderer *r,
+ 	}
+ 
+ 	if (wlr_renderer_get_texture_formats(r, WLR_BUFFER_CAP_DMABUF) != NULL &&
++#ifndef __TERMUX__
+ 			wlr_renderer_get_drm_fd(r) >= 0 &&
++#endif
+ 			wlr_linux_dmabuf_v1_create_with_renderer(wl_display, 4, r) == NULL) {
+ 		return false;
+ 	}
+@@ -91,6 +95,7 @@ bool wlr_renderer_init_wl_display(struct wlr_renderer *r,
+ 	return true;
+ }
+ 
++#ifndef __TERMUX__
+ static int open_drm_render_node(void) {
+ 	uint32_t flags = 0;
+ 	int devices_len = drmGetDevices2(flags, NULL, 0);
+@@ -136,9 +141,11 @@ out:
+ 
+ 	return fd;
+ }
++#endif
+ 
+ static bool open_preferred_drm_fd(struct wlr_backend *backend, int *drm_fd_ptr,
+ 		bool *own_drm_fd) {
++#ifndef __TERMUX__
+ 	if (*drm_fd_ptr >= 0) {
+ 		return true;
+ 	}
+@@ -186,6 +193,9 @@ static bool open_preferred_drm_fd(struct wlr_backend *backend, int *drm_fd_ptr,
+ 	}
+ 
+ 	return false;
++#else
++	return true;
++#endif
+ }
+ 
+ static void log_creation_failure(bool is_auto, const char *msg) {
+diff --git a/types/wlr_linux_dmabuf_v1.c b/types/wlr_linux_dmabuf_v1.c
+index bfd97637..62aef5d2 100644
+--- a/types/wlr_linux_dmabuf_v1.c
++++ b/types/wlr_linux_dmabuf_v1.c
+@@ -890,13 +890,16 @@ static bool set_default_feedback(struct wlr_linux_dmabuf_v1 *linux_dmabuf,
+ 		return false;
+ 	}
+ 
++#ifndef __TERMUX__
+ 	drmDevice *device = NULL;
+ 	if (drmGetDeviceFromDevId(feedback->main_device, 0, &device) != 0) {
+ 		wlr_log_errno(WLR_ERROR, "drmGetDeviceFromDevId failed");
+ 		goto error_compiled;
+ 	}
++#endif
+ 
+ 	int main_device_fd = -1;
++#ifndef __TERMUX__
+ 	if (device->available_nodes & (1 << DRM_NODE_RENDER)) {
+ 		const char *name = device->nodes[DRM_NODE_RENDER];
+ 		main_device_fd = open(name, O_RDWR | O_CLOEXEC);
+@@ -914,6 +917,7 @@ static bool set_default_feedback(struct wlr_linux_dmabuf_v1 *linux_dmabuf,
+ 			"skipping DMA-BUF import checks", device->nodes[DRM_NODE_PRIMARY]);
+ 		drmFreeDevice(&device);
+ 	}
++#endif
+ 
+ 	size_t tranches_len =
+ 		feedback->tranches.size / sizeof(struct wlr_linux_dmabuf_feedback_v1_tranche);
+@@ -942,8 +946,10 @@ static bool set_default_feedback(struct wlr_linux_dmabuf_v1 *linux_dmabuf,
+ 
+ error_formats:
+ 	wlr_drm_format_set_finish(&formats);
++#ifndef __TERMUX__
+ error_compiled:
+ 	compiled_feedback_destroy(compiled);
++#endif
+ 	return false;
+ }
+ 
+@@ -1060,6 +1066,7 @@ void wlr_linux_dmabuf_feedback_v1_finish(struct wlr_linux_dmabuf_feedback_v1 *fe
+ 	wl_array_release(&feedback->tranches);
+ }
+ 
++#ifndef __TERMUX__
+ static bool devid_from_fd(int fd, dev_t *devid) {
+ 	struct stat stat;
+ 	if (fstat(fd, &stat) != 0) {
+@@ -1069,6 +1076,7 @@ static bool devid_from_fd(int fd, dev_t *devid) {
+ 	*devid = stat.st_rdev;
+ 	return true;
+ }
++#endif
+ 
+ static bool is_secondary_drm_backend(struct wlr_backend *backend) {
+ #if WLR_HAS_DRM_BACKEND
+@@ -1087,6 +1095,7 @@ bool wlr_linux_dmabuf_feedback_v1_init_with_options(struct wlr_linux_dmabuf_feed
+ 
+ 	*feedback = (struct wlr_linux_dmabuf_feedback_v1){0};
+ 
++#ifndef __TERMUX__
+ 	int renderer_drm_fd = wlr_renderer_get_drm_fd(options->main_renderer);
+ 	if (renderer_drm_fd < 0) {
+ 		wlr_log(WLR_ERROR, "Failed to get renderer DRM FD");
+@@ -1096,6 +1105,9 @@ bool wlr_linux_dmabuf_feedback_v1_init_with_options(struct wlr_linux_dmabuf_feed
+ 	if (!devid_from_fd(renderer_drm_fd, &renderer_dev)) {
+ 		goto error;
+ 	}
++#else
++	dev_t renderer_dev = -1;
++#endif
+ 
+ 	feedback->main_device = renderer_dev;
+ 
+@@ -1123,6 +1135,7 @@ bool wlr_linux_dmabuf_feedback_v1_init_with_options(struct wlr_linux_dmabuf_feed
+ 		}
+ 	} else if (options->scanout_primary_output != NULL &&
+ 			!is_secondary_drm_backend(options->scanout_primary_output->backend)) {
++#ifndef __TERMUX__
+ 		int backend_drm_fd = wlr_backend_get_drm_fd(options->scanout_primary_output->backend);
+ 		if (backend_drm_fd < 0) {
+ 			wlr_log(WLR_ERROR, "Failed to get backend DRM FD");
+@@ -1132,6 +1145,9 @@ bool wlr_linux_dmabuf_feedback_v1_init_with_options(struct wlr_linux_dmabuf_feed
+ 		if (!devid_from_fd(backend_drm_fd, &backend_dev)) {
+ 			goto error;
+ 		}
++#else
++		dev_t backend_dev = -1;
++#endif
+ 
+ 		const struct wlr_drm_format_set *scanout_formats =
+ 			wlr_output_get_primary_formats(options->scanout_primary_output, WLR_BUFFER_CAP_DMABUF);
