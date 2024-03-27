@@ -170,20 +170,52 @@ termux_step_massage() {
 	# Check so that package is not affected by
 	# https://github.com/android/ndk/issues/1614, or
 	# https://github.com/termux/termux-packages/issues/9944
-	if [ "$TERMUX_PACKAGE_LIBRARY" = "bionic" ] && [ -d "lib" ]; then
-		SYMBOLS="$($READELF -s $($TERMUX_HOST_PLATFORM-clang -print-libgcc-file-name) | grep "FUNC    GLOBAL HIDDEN" | awk '{print $8}')"
+	if [[ "${TERMUX_PACKAGE_LIBRARY}" == "bionic" ]]; then
+		echo "INFO: Using READELF ... ${READELF} ... $(command -v "${READELF}")"
+		local t0=$(cut -d"." -f1 /proc/uptime)
+		echo "INFO: Generating symbols regex"
+		SYMBOLS="$(${READELF} -s $(${TERMUX_HOST_PLATFORM}-clang -print-libgcc-file-name) | grep "FUNC    GLOBAL HIDDEN" | awk '{print $8}')"
 		SYMBOLS+=" $(echo libandroid_{sem_{open,close,unlink},shm{ctl,get,at,dt}})"
-		SYMBOLS+=" $(echo backtrace{,_symbols{,_fd}})"
-		SYMBOLS+=" posix_spawn posix_spawnp"
+		SYMBOLS+=" $(libc_o_map)"
+		SYMBOLS+=" $(libc_p_map)"
+		SYMBOLS+=" $(libc_q_map)"
+		SYMBOLS+=" $(libc_r_map)"
+		SYMBOLS+=" $(libc_s_map)"
+		SYMBOLS+=" $(libc_t_map)"
+		SYMBOLS+=" $(libc_u_map)"
+		SYMBOLS+=" $(echo ${TERMUX_PKG_EXTRA_UNDEF_SYMBOLS_TO_CHECK})"
 		grep_pattern="$(create_grep_pattern $SYMBOLS)"
-		for lib in $(find lib -name "*.so"); do
-			if ! $READELF -h "$lib" &> /dev/null; then
-				continue
-			fi
-			if $READELF -s "$lib" | egrep "${grep_pattern}" &> /dev/null; then
-				termux_error_exit "$lib contains undefined symbols:\n$($READELF -s "$lib" | egrep "${grep_pattern}")"
-			fi
-		done
+		local t1=$(cut -d"." -f1 /proc/uptime)
+		echo "INFO: Done ... $((t1-t0))s"
+		echo "INFO: Total symbols $(echo ${SYMBOLS} | wc -w)"
+		local t0=$(cut -d"." -f1 /proc/uptime)
+		echo "INFO: Running symbol checks"
+		local files=$(find . -type f)
+		local valid=$(echo "${files}" | xargs -P"$(nproc)" -i bash -c 'if "${READELF}" -h {} &>/dev/null; then echo {}; fi')
+		local undef=$(echo "${valid}" | xargs -P"$(nproc)" -n1 "${READELF}" -s | grep -E "${grep_pattern}")
+		local t1=$(cut -d"." -f1 /proc/uptime)
+		echo "INFO: Done ... $((t1-t0))s"
+		local numberOfFiles=$(echo "${files}" | wc -l)
+		local numberOfValid=$(echo "${valid}" | wc -l)
+		echo "INFO: Checked ${numberOfValid} / ${numberOfFiles} files"
+		if [[ "${numberOfValid}" -gt "${numberOfFiles}" ]]; then
+			termux_error_exit "${numberOfValid} > ${numberOfFiles}"
+		fi
+		if [[ -n "${undef}" ]]; then
+			local e=0
+			local valid_s=$(echo "${valid}" | sort)
+			for f in ${valid_s}; do
+				local undef_s=$("${READELF}" -s "${f}" | grep -E "${grep_pattern}")
+				if [[ -n "${undef_s}" ]]; then
+					case "${f}" in
+					*.a) echo -e "SKIP: ${f} contains undefined symbols:\n${undef_s}" >&2 ;;
+					*.rlib) echo -e "SKIP: ${f} contains undefined symbols:\n${undef_s}" >&2 ;;
+					*) e=1 && echo -e "ERROR: ${f} contains undefined symbols:\n${undef_s}" >&2 ;;
+					esac
+				fi
+			done
+			if [[ "${e}" == "1" ]]; then termux_error_exit "Refer above"; fi
+		fi
 	fi
 
 	if [ "$TERMUX_PACKAGE_FORMAT" = "debian" ]; then
@@ -209,4 +241,369 @@ create_grep_pattern() {
 	for arg in "$@"; do
 		echo -n "|$symbol_type$arg"'$'
 	done
+}
+
+# https://android.googlesource.com/platform/bionic/+/main/libc/libc.map.txt
+libc_o_map() {
+	# Android 8.x
+	local symbols=""
+	case "${TERMUX_ARCH}" in
+	arm|i686) symbols+=" bsd_signal" ;;
+	esac
+	symbols+="
+	__sendto_chk
+	__system_property_read_callback
+	__system_property_wait
+	catclose
+	catgets
+	catopen
+	ctermid
+	endgrent
+	endpwent
+	futimes
+	futimesat
+	getdomainname
+	getgrent
+	getpwent
+	getsubopt
+	hasmntopt
+	lutimes
+	mallopt
+	mblen
+	msgctl
+	msgget
+	msgrcv
+	msgsnd
+	nl_langinfo
+	nl_langinfo_l
+	pthread_getname_np
+	quotactl
+	semctl
+	semget
+	semop
+	semtimedop
+	setdomainname
+	setgrent
+	setpwent
+	shmat
+	shmctl
+	shmdt
+	shmget
+	sighold
+	sigignore
+	sigpause
+	sigrelse
+	sigset
+	strtod_l
+	strtof_l
+	strtol_l
+	strtoul_l
+	sync_file_range
+	towctrans
+	towctrans_l
+	wctrans
+	wctrans_l
+	"
+	# libm
+	symbols+="
+	cacoshl
+	cacosl
+	casinhl
+	casinl
+	catanhl
+	catanl
+	ccoshl
+	ccosl
+	cexpl
+	clog
+	clogf
+	clogl
+	cpow
+	cpowf
+	cpowl
+	csinhl
+	csinl
+	ctanhl
+	ctanl
+	"
+	# libdl
+	symbols+="
+	__cfi_shadow_size
+	__cfi_slowpath
+	__cfi_slowpath_diag
+	"
+	echo ${symbols}
+}
+
+libc_p_map() {
+	# Android 9
+	local symbols="
+	__freading
+	__free_hook
+	__fseterr
+	__fwriting
+	__malloc_hook
+	__memalign_hook
+	__realloc_hook
+	aligned_alloc
+	endhostent
+	endnetent
+	endprotoent
+	epoll_pwait64
+	fexecve
+	fflush_unlocked
+	fgetc_unlocked
+	fgets_unlocked
+	fputc_unlocked
+	fputs_unlocked
+	fread_unlocked
+	fwrite_unlocked
+	getentropy
+	getnetent
+	getprotoent
+	getrandom
+	getlogin_r
+	glob
+	globfree
+	hcreate
+	hcreate_r
+	hdestroy
+	hdestroy_r
+	hsearch
+	hsearch_r
+	iconv
+	iconv_close
+	iconv_open
+	posix_spawn
+	posix_spawnattr_destroy
+	posix_spawnattr_getflags
+	posix_spawnattr_getpgroup
+	posix_spawnattr_getschedparam
+	posix_spawnattr_getschedpolicy
+	posix_spawnattr_getsigdefault
+	posix_spawnattr_getsigdefault64
+	posix_spawnattr_getsigmask
+	posix_spawnattr_getsigmask64
+	posix_spawnattr_init
+	posix_spawnattr_setflags
+	posix_spawnattr_setpgroup
+	posix_spawnattr_setschedparam
+	posix_spawnattr_setschedpolicy
+	posix_spawnattr_setsigdefault
+	posix_spawnattr_setsigdefault64
+	posix_spawnattr_setsigmask
+	posix_spawnattr_setsigmask64
+	posix_spawn_file_actions_addclose
+	posix_spawn_file_actions_adddup2
+	posix_spawn_file_actions_addopen
+	posix_spawn_file_actions_destroy
+	posix_spawn_file_actions_init
+	posix_spawnp
+	ppoll64
+	pselect64
+	pthread_attr_getinheritsched
+	pthread_attr_setinheritsched
+	pthread_mutex_timedlock_monotonic_np
+	pthread_mutexattr_getprotocol
+	pthread_mutexattr_setprotocol
+	pthread_rwlock_timedrdlock_monotonic_np
+	pthread_rwlock_timedwrlock_monotonic_np
+	pthread_setschedprio
+	pthread_sigmask64
+	sem_timedwait_monotonic_np
+	sethostent
+	setnetent
+	setprotoent
+	sigaction64
+	sigaddset64
+	sigdelset64
+	sigemptyset64
+	sigfillset64
+	sigismember64
+	signalfd64
+	sigpending64
+	sigprocmask64
+	sigsuspend64
+	sigtimedwait64
+	sigwait64
+	sigwaitinfo64
+	strptime_l
+	swab
+	syncfs
+	wcsftime_l
+	wcstod_l
+	wcstof_l
+	wcstol_l
+	wcstoul_l
+	"
+	echo ${symbols}
+}
+
+libc_q_map() {
+	# Android 10
+	local symbols=""
+	case "${TERMUX_ARCH}" in
+	arm) symbols+=" __aeabi_read_tp" ;;
+	i686) symbols+=" ___tls_get_addr" ;;
+	esac
+	case "${TERMUX_ARCH}" in
+	arm|riscv64|x86_64) symbols+=" __tls_get_addr" ;;
+	esac
+	symbols+="
+	__res_randomid
+	android_fdsan_close_with_tag
+	android_fdsan_create_owner_tag
+	android_fdsan_exchange_owner_tag
+	android_fdsan_get_error_level
+	android_fdsan_get_owner_tag
+	android_fdsan_get_tag_type
+	android_fdsan_get_tag_value
+	android_fdsan_set_error_level
+	android_get_device_api_level
+	getloadavg
+	pthread_sigqueue
+	reallocarray
+	timespec_get
+	"
+	# Used by libselinux | apex
+	symbols+=" __system_properties_init"
+	# Used by libmemunreachable | apex llndk
+	symbols+=" malloc_backtrace malloc_disable malloc_enable malloc_iterate"
+	# Used by libandroid_net | apex
+	symbols+=" android_getaddrinfofornet"
+	# Used by libandroid_runtime, libcutils, libmedia, and libmediautils | apex llndk
+	symbols+=" android_mallopt"
+	echo ${symbols}
+}
+
+libc_r_map() {
+	# Android 11
+	local symbols=""
+	case "${TERMUX_ARCH}" in
+	aarch64) symbols+=" __tls_get_addr" ;;
+	esac
+	symbols+="
+	__mempcpy_chk
+	call_once
+	cnd_broadcast
+	cnd_destroy
+	cnd_init
+	cnd_signal
+	cnd_timedwait
+	cnd_wait
+	memfd_create
+	mlock2
+	mtx_destroy
+	mtx_init
+	mtx_lock
+	mtx_timedlock
+	mtx_trylock
+	mtx_unlock
+	pthread_cond_clockwait
+	pthread_mutex_clocklock
+	pthread_rwlock_clockrdlock
+	pthread_rwlock_clockwrlock
+	renameat2
+	sem_clockwait
+	statx
+	thrd_create
+	thrd_current
+	thrd_detach
+	thrd_equal
+	thrd_exit
+	thrd_join
+	thrd_sleep
+	thrd_yield
+	tss_create
+	tss_delete
+	tss_get
+	tss_set
+	"
+    # Unwinder implementation
+	case "${TERMUX_ARCH}" in
+	arm)
+		symbols+="
+		__aeabi_unwind_cpp_pr0
+		__aeabi_unwind_cpp_pr1
+		__aeabi_unwind_cpp_pr2
+		__gnu_unwind_frame
+		_Unwind_Complete
+		_Unwind_VRS_Get
+		_Unwind_VRS_Pop
+		_Unwind_VRS_Set
+		"
+		;;
+	aarch64|i686|x86_64)
+		symbols+="
+		__deregister_frame
+		__register_frame
+		_Unwind_ForcedUnwind
+		"
+		;;
+	esac
+	symbols+="
+	_Unwind_Backtrace
+	_Unwind_DeleteException
+	_Unwind_Find_FDE
+	_Unwind_FindEnclosingFunction
+	_Unwind_GetCFA
+	_Unwind_GetDataRelBase
+	_Unwind_GetGR
+	_Unwind_GetIP
+	_Unwind_GetIPInfo
+	_Unwind_GetLanguageSpecificData
+	_Unwind_GetRegionStart
+	_Unwind_GetTextRelBase
+	_Unwind_RaiseException
+	_Unwind_Resume
+	_Unwind_Resume_or_Rethrow
+	_Unwind_SetGR
+	_Unwind_SetIP
+	"
+	echo ${symbols}
+}
+
+libc_s_map() {
+	# Android 12
+	local symbols="
+	__libc_get_static_tls_bounds
+	__libc_register_thread_exit_callback
+	__libc_iterate_dynamic_tls
+	__libc_register_dynamic_tls_listeners
+	android_reset_stack_guards
+	ffsl
+	ffsll
+	pidfd_getfd
+	pidfd_open
+	pidfd_send_signal
+	process_madvise
+	"
+	echo ${symbols}
+}
+
+libc_t_map() {
+	# Android 13
+	local symbols="
+	backtrace
+	backtrace_symbols
+	backtrace_symbols_fd
+	preadv2
+	preadv64v2
+	pwritev2
+	pwritev64v2
+	"
+	echo ${symbols}
+}
+
+libc_u_map() {
+	# Android 14
+	local symbols="
+	__freadahead
+	close_range
+	copy_file_range
+	memset_explicit
+	posix_spawn_file_actions_addchdir_np
+	posix_spawn_file_actions_addfchdir_np
+	"
+	echo ${symbols}
 }
