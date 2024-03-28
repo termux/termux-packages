@@ -119,12 +119,16 @@ termux_step_create_pacman_package() {
 	termux_step_create_debscripts
 	termux_step_create_pacman_install_hook
 
+	# ensure all elements of the package have the same mtime
+	find . -exec touch -h -d @$SOURCE_DATE_EPOCH {} +
+
 	# Create package
 	shopt -s dotglob globstar
 	printf '%s\0' **/* | bsdtar -cnf - --format=mtree \
 		--options='!all,use-set,type,uid,gid,mode,time,size,md5,sha256,link' \
 		--null --files-from - --exclude .MTREE | \
 		gzip -c -f -n > .MTREE
+	touch -d @$SOURCE_DATE_EPOCH .MTREE
 	printf '%s\0' **/* | bsdtar --no-fflags -cnf - --null --files-from - | \
 		$COMPRESS > "$PACMAN_FILE"
 	shopt -u dotglob globstar

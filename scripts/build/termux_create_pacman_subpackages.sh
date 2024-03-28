@@ -197,6 +197,9 @@ termux_create_pacman_subpackages() {
 				PKG_FORMAT="xz";;
 		esac
 
+		# ensure all elements of the package have the same mtime
+		find . -exec touch -h -d @$SOURCE_DATE_EPOCH {} +
+
 		# Create the actual .pkg file:
 		local TERMUX_SUBPKG_PACMAN_FILE=$TERMUX_OUTPUT_DIR/${SUB_PKG_NAME}${DEBUG}-${TERMUX_PKG_FULLVERSION_FOR_PACMAN}-${SUB_PKG_ARCH}.pkg.tar.${PKG_FORMAT}
 		shopt -s dotglob globstar
@@ -204,6 +207,7 @@ termux_create_pacman_subpackages() {
 			--options='!all,use-set,type,uid,gid,mode,time,size,md5,sha256,link' \
 			--null --files-from - --exclude .MTREE | \
 			gzip -c -f -n > .MTREE
+		touch -d @$SOURCE_DATE_EPOCH .MTREE
 		printf '%s\0' **/* | bsdtar --no-fflags -cnf - --null --files-from - | \
 			$COMPRESS > "$TERMUX_SUBPKG_PACMAN_FILE"
 		shopt -u dotglob globstar
