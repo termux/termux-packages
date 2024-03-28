@@ -1,0 +1,1799 @@
+diff --git a/backend/backend.c b/backend/backend.c
+index a0ed834b..c027d07c 100644
+--- a/backend/backend.c
++++ b/backend/backend.c
+@@ -36,6 +36,10 @@
+ #include <wlr/backend/x11.h>
+ #endif
+ 
++#if defined (__ANDROID__) && defined (__TERMUX__)
++#include <wlr/backend/termuxgui.h>
++#endif
++
+ #define WAIT_SESSION_TIMEOUT 10000 // ms
+ 
+ void wlr_backend_init(struct wlr_backend *backend,
+@@ -196,6 +200,23 @@ static struct wlr_backend *attempt_headless_backend(
+ 	return backend;
+ }
+ 
++#if defined (__ANDROID__) && defined (__TERMUX__)
++static struct wlr_backend *attempt_tgui_backend(
++		struct wl_display *display) {
++	struct wlr_backend *backend = wlr_tgui_backend_create(display);
++	if (backend == NULL) {
++		return NULL;
++	}
++
++	size_t outputs = parse_outputs_env("WLR_TGUI_OUTPUTS");
++	for (size_t i = 0; i < outputs; ++i) {
++		wlr_tgui_add_output(backend);
++	}
++
++	return backend;
++}
++#endif
++
+ #if WLR_HAS_DRM_BACKEND
+ static struct wlr_backend *attempt_drm_backend(struct wl_display *display,
+ 		struct wlr_backend *backend, struct wlr_session *session) {
+@@ -249,6 +270,10 @@ static bool attempt_backend_by_name(struct wl_display *display,
+ #endif
+ 	} else if (strcmp(name, "headless") == 0) {
+ 		backend = attempt_headless_backend(display);
++#if defined (__ANDROID__) && defined (__TERMUX__)
++	} else if (strcmp(name, "tgui") == 0) {
++		backend = attempt_tgui_backend(display);
++#endif
+ 	} else if (strcmp(name, "drm") == 0 || strcmp(name, "libinput") == 0) {
+ 		// DRM and libinput need a session
+ 		if (*session_ptr == NULL) {
+@@ -344,6 +369,18 @@ struct wlr_backend *wlr_backend_autocreate(struct wl_display *display,
+ 	}
+ #endif
+ 
++#if defined (__ANDROID__) && defined (__TERMUX__)
++	{
++		struct wlr_backend *tgui_backend = attempt_tgui_backend(display);
++		if (!tgui_backend) {
++			goto error;
++		}
++
++		wlr_multi_backend_add(multi, tgui_backend);
++		goto success;
++	}
++#endif
++
+ #if !(WLR_HAS_LIBINPUT_BACKEND || WLR_HAS_DRM_BACKEND)
+ 	wlr_log(WLR_ERROR, "Neither DRM nor libinput backend support is compiled in");
+ 	goto error;
+diff --git a/backend/meson.build b/backend/meson.build
+index ed977d3b..446d894d 100644
+--- a/backend/meson.build
++++ b/backend/meson.build
+@@ -27,3 +27,4 @@ endforeach
+ subdir('multi')
+ subdir('wayland')
+ subdir('headless')
++subdir('termuxgui')
+diff --git a/backend/multi/backend.c b/backend/multi/backend.c
+index 49792ff9..b269a702 100644
+--- a/backend/multi/backend.c
++++ b/backend/multi/backend.c
+@@ -209,6 +209,13 @@ bool wlr_multi_backend_add(struct wlr_backend *_multi,
+ 	wl_signal_add(&backend->events.new_output, &sub->new_output);
+ 	sub->new_output.notify = new_output_reemit;
+ 
++#if defined (__ANDROID__) && defined (__TERMUX__)
++	if (multi->backend.allocator == NULL &&
++		backend->allocator != NULL) {
++		multi->backend.allocator = backend->allocator;
++	}
++#endif
++
+ 	wl_signal_emit_mutable(&multi->events.backend_add, backend);
+ 	return true;
+ }
+diff --git a/backend/termuxgui/.clang-format b/backend/termuxgui/.clang-format
+new file mode 100644
+index 00000000..ac8393f4
+--- /dev/null
++++ b/backend/termuxgui/.clang-format
+@@ -0,0 +1,11 @@
++
++BasedOnStyle: InheritParentConfig
++DisableFormat: false
++
++BinPackParameters: false
++IndentWidth: 4
++ColumnLimit: 78
++Cpp11BracedListStyle: false
++
++SpaceAfterCStyleCast: true
++SpaceBeforeCpp11BracedList: true
+diff --git a/backend/termuxgui/.editorconfig b/backend/termuxgui/.editorconfig
+new file mode 100644
+index 00000000..8e3b3200
+--- /dev/null
++++ b/backend/termuxgui/.editorconfig
+@@ -0,0 +1,6 @@
++[*.{c,h,cpp,hpp,cc,hh}]
++indent_style = space
++indent_size = 4
++tab_width = 8
++max_line_length = 78
++trim_trailing_whitespace = true
+diff --git a/backend/termuxgui/allocator.c b/backend/termuxgui/allocator.c
+new file mode 100644
+index 00000000..c60c855e
+--- /dev/null
++++ b/backend/termuxgui/allocator.c
+@@ -0,0 +1,216 @@
++#include <assert.h>
++#include <dlfcn.h>
++#include <malloc.h>
++#include <pthread.h>
++#include <unistd.h>
++
++#include <drm_fourcc.h>
++
++#include "backend/termuxgui.h"
++#include "render/drm_format_set.h"
++#include "render/pixel_format.h"
++
++static const struct wlr_buffer_impl buffer_impl;
++static const struct wlr_allocator_interface allocator_impl;
++
++struct wlr_tgui_buffer *
++tgui_buffer_from_buffer(struct wlr_buffer *wlr_buffer) {
++    assert(wlr_buffer->impl == &buffer_impl);
++    struct wlr_tgui_buffer *buffer =
++        wl_container_of(wlr_buffer, buffer, wlr_buffer);
++    return buffer;
++}
++
++static struct wlr_tgui_allocator *
++tgui_allocator_from_allocator(struct wlr_allocator *wlr_allocator) {
++    assert(wlr_allocator->impl == &allocator_impl);
++    struct wlr_tgui_allocator *alloc =
++        wl_container_of(wlr_allocator, alloc, wlr_allocator);
++    return alloc;
++}
++
++static void buffer_destroy(struct wlr_buffer *wlr_buffer) {
++    struct wlr_tgui_buffer *buffer = tgui_buffer_from_buffer(wlr_buffer);
++    if (buffer->data) {
++        buffer->allocator->AHardwareBuffer_unlock(buffer->buffer.buffer,
++                                                  NULL);
++    }
++
++    wlr_dmabuf_attributes_finish(&buffer->dmabuf);
++    tgui_hardware_buffer_destroy(buffer->conn, &buffer->buffer);
++    free(buffer);
++}
++
++static bool buffer_get_dmabuf(struct wlr_buffer *wlr_buffer,
++                              struct wlr_dmabuf_attributes *dmabuf) {
++    struct wlr_tgui_buffer *buffer = tgui_buffer_from_buffer(wlr_buffer);
++    memcpy(dmabuf, &buffer->dmabuf, sizeof(*dmabuf));
++    return true;
++}
++
++static bool begin_data_ptr_access(struct wlr_buffer *wlr_buffer,
++                                  uint32_t flags,
++                                  void **data,
++                                  uint32_t *format,
++                                  size_t *stride) {
++    struct wlr_tgui_buffer *buffer = tgui_buffer_from_buffer(wlr_buffer);
++
++    if (buffer->data == NULL) {
++        buffer->allocator->AHardwareBuffer_lock(
++            buffer->buffer.buffer,
++            AHARDWAREBUFFER_USAGE_CPU_READ_RARELY |
++                AHARDWAREBUFFER_USAGE_CPU_WRITE_RARELY,
++            -1, NULL, &buffer->data);
++        if (buffer->data == NULL) {
++            wlr_log(WLR_ERROR, "AHardwareBuffer_lock failed");
++            return false;
++        }
++    }
++
++    *data = buffer->data;
++    *format = buffer->format;
++    *stride = buffer->desc.stride * 4;
++    return true;
++}
++
++static void end_data_ptr_access(struct wlr_buffer *buffer) {}
++
++static const struct wlr_buffer_impl buffer_impl = {
++    .destroy = buffer_destroy,
++    .get_dmabuf = buffer_get_dmabuf,
++    .begin_data_ptr_access = begin_data_ptr_access,
++    .end_data_ptr_access = end_data_ptr_access,
++};
++
++static struct wlr_buffer *
++allocator_create_buffer(struct wlr_allocator *wlr_allocator,
++                        int width,
++                        int height,
++                        const struct wlr_drm_format *format) {
++    struct wlr_tgui_allocator *alloc =
++        tgui_allocator_from_allocator(wlr_allocator);
++
++    if (!wlr_drm_format_has(format, DRM_FORMAT_MOD_INVALID) &&
++        !wlr_drm_format_has(format, DRM_FORMAT_MOD_LINEAR)) {
++        wlr_log(WLR_ERROR, "TGUI allocator only supports INVALID and "
++                           "LINEAR modifiers");
++        return NULL;
++    }
++
++    const struct wlr_pixel_format_info *info =
++        drm_get_pixel_format_info(format->format);
++    if (info == NULL) {
++        wlr_log(WLR_ERROR, "Unsupported pixel format 0x%" PRIX32,
++                format->format);
++        return NULL;
++    }
++
++    struct wlr_tgui_buffer *buffer = calloc(1, sizeof(*buffer));
++    if (buffer == NULL) {
++        return NULL;
++    }
++    buffer->allocator = alloc;
++    buffer->format = format->format;
++    buffer->conn = alloc->conn;
++
++    wlr_buffer_init(&buffer->wlr_buffer, &buffer_impl, width, height);
++
++    tgui_err ret = tgui_hardware_buffer_create(
++        alloc->conn, &buffer->buffer, TGUI_HARDWARE_BUFFER_FORMAT_RGBA8888,
++        width, height, TGUI_HARDWARE_BUFFER_CPU_RARELY,
++        TGUI_HARDWARE_BUFFER_CPU_RARELY);
++    if (ret > 0) {
++        wlr_log(WLR_ERROR, "Failed to create tgui_hardware_buffer");
++        free(buffer);
++        return NULL;
++    }
++    alloc->AHardwareBuffer_describe(buffer->buffer.buffer, &buffer->desc);
++
++    const native_handle_t *handle =
++        alloc->AHardwareBuffer_getNativeHandle(buffer->buffer.buffer);
++
++    int fd = -1;
++    for (int i = 0; i < handle->numFds; i++) {
++        size_t size = lseek(handle->data[i], 0, SEEK_END);
++        if (size < (buffer->desc.stride * buffer->desc.height * 4))
++            continue;
++
++        fd = dup(handle->data[i]);
++        break;
++    }
++
++    if (fd < 0) {
++        wlr_log(WLR_ERROR, "Failed to get dmabuf");
++        tgui_hardware_buffer_destroy(alloc->conn, &buffer->buffer);
++        free(buffer);
++        return NULL;
++    }
++
++    buffer->dmabuf = (struct wlr_dmabuf_attributes) {
++        .width = buffer->desc.stride,
++        .height = buffer->desc.height,
++        .n_planes = 1,
++        .format = buffer->format,
++        .modifier = DRM_FORMAT_MOD_LINEAR,
++        .offset[0] = 0,
++        .stride[0] = buffer->desc.stride * 4,
++        .fd[0] = fd,
++
++    };
++
++    return &buffer->wlr_buffer;
++}
++
++static bool load_android_library(struct wlr_tgui_allocator *allocator) {
++    void *library_handle = dlopen("libandroid.so", RTLD_NOW);
++    if (!library_handle) {
++        wlr_log(WLR_ERROR, "load libandroid.so failed:%s", dlerror());
++        return false;
++    }
++
++#define LOAD_SYM(name)                                                       \
++    if ((allocator->name = dlsym(library_handle, #name)) == NULL) {          \
++        wlr_log(WLR_ERROR, "dlsym %s failed:%s", #name, dlerror());          \
++        dlclose(library_handle);                                             \
++        return false;                                                        \
++    }
++
++    LOAD_SYM(AHardwareBuffer_lock)
++    LOAD_SYM(AHardwareBuffer_unlock)
++    LOAD_SYM(AHardwareBuffer_describe)
++    LOAD_SYM(AHardwareBuffer_getNativeHandle)
++#undef LOAD_SYM
++
++    allocator->libandroid_handle = library_handle;
++    return true;
++}
++
++static void allocator_destroy(struct wlr_allocator *wlr_allocator) {
++    struct wlr_tgui_allocator *alloc =
++        tgui_allocator_from_allocator(wlr_allocator);
++    dlclose(alloc->libandroid_handle);
++    free(wlr_allocator);
++}
++
++static const struct wlr_allocator_interface allocator_impl = {
++    .destroy = allocator_destroy,
++    .create_buffer = allocator_create_buffer,
++};
++
++struct wlr_allocator *
++wlr_tgui_allocator_create(struct wlr_tgui_backend *backend) {
++    struct wlr_tgui_allocator *allocator = calloc(1, sizeof(*allocator));
++    if (allocator == NULL) {
++        return NULL;
++    }
++    allocator->conn = backend->conn;
++
++    if (!load_android_library(allocator)) {
++        free(allocator);
++        return NULL;
++    }
++
++    wlr_allocator_init(&allocator->wlr_allocator, &allocator_impl,
++                       WLR_BUFFER_CAP_DMABUF | WLR_BUFFER_CAP_DATA_PTR);
++    return &allocator->wlr_allocator;
++}
+diff --git a/backend/termuxgui/backend.c b/backend/termuxgui/backend.c
+new file mode 100644
+index 00000000..ac08cf89
+--- /dev/null
++++ b/backend/termuxgui/backend.c
+@@ -0,0 +1,197 @@
++#include <assert.h>
++#include <pthread.h>
++#include <stdlib.h>
++#include <sys/eventfd.h>
++#include <unistd.h>
++
++#include "backend/termuxgui.h"
++
++struct wlr_tgui_backend *
++tgui_backend_from_backend(struct wlr_backend *wlr_backend) {
++    assert(wlr_backend_is_tgui(wlr_backend));
++    return (struct wlr_tgui_backend *) wlr_backend;
++}
++
++static bool backend_start(struct wlr_backend *wlr_backend) {
++    struct wlr_tgui_backend *backend = tgui_backend_from_backend(wlr_backend);
++    wlr_log(WLR_INFO, "Starting Termux:GUI backend");
++
++    struct wlr_tgui_output *output;
++    wl_list_for_each(output, &backend->outputs, link) {
++        wlr_output_update_enabled(&output->wlr_output, true);
++        wl_signal_emit_mutable(&backend->backend.events.new_output,
++                               &output->wlr_output);
++        wl_signal_emit_mutable(&backend->backend.events.new_input,
++                               &output->keyboard.base);
++        wl_signal_emit_mutable(&backend->backend.events.new_input,
++                               &output->pointer.base);
++    }
++
++    backend->started = true;
++    return true;
++}
++
++static void backend_destroy(struct wlr_backend *wlr_backend) {
++    struct wlr_tgui_backend *backend = tgui_backend_from_backend(wlr_backend);
++    if (!wlr_backend) {
++        return;
++    }
++
++    wl_list_remove(&backend->display_destroy.link);
++    wl_event_source_remove(backend->tgui_event_source);
++
++    struct wlr_tgui_output *output, *output_tmp;
++    wl_list_for_each_safe(output, output_tmp, &backend->outputs, link) {
++        wlr_output_destroy(&output->wlr_output);
++    }
++
++    wlr_backend_finish(wlr_backend);
++
++    tgui_connection_destroy(backend->conn);
++    pthread_join(backend->tgui_event_thread, NULL);
++    pthread_mutex_destroy(&backend->event_queue_lock);
++
++    close(backend->fake_drm_fd);
++    close(backend->tgui_event_fd);
++    free(backend);
++}
++
++static uint32_t get_buffer_caps(struct wlr_backend *wlr_backend) {
++    return WLR_BUFFER_CAP_DATA_PTR | WLR_BUFFER_CAP_DMABUF;
++}
++
++static int get_drm_fd(struct wlr_backend *wlr_backend) {
++    struct wlr_tgui_backend *backend = tgui_backend_from_backend(wlr_backend);
++    if (!wlr_backend) {
++        return -1;
++    }
++
++    return backend->fake_drm_fd;
++}
++
++static const struct wlr_backend_impl backend_impl = {
++    .start = backend_start,
++    .destroy = backend_destroy,
++    .get_buffer_caps = get_buffer_caps,
++    .get_drm_fd = get_drm_fd,
++};
++
++static void handle_display_destroy(struct wl_listener *listener, void *data) {
++    struct wlr_tgui_backend *backend =
++        wl_container_of(listener, backend, display_destroy);
++    backend_destroy(&backend->backend);
++}
++
++static int handle_tgui_event(int fd, uint32_t mask, void *data) {
++    struct wlr_tgui_backend *backend = data;
++
++    if ((mask & WL_EVENT_HANGUP) || (mask & WL_EVENT_ERROR)) {
++        if (mask & WL_EVENT_ERROR) {
++            wlr_log(WLR_ERROR, "Failed to read from tgui event");
++            wl_display_terminate(backend->display);
++        }
++        return 0;
++    }
++
++    eventfd_t event_count = 0;
++    if (eventfd_read(backend->tgui_event_fd, &event_count) < 0) {
++        return 0;
++    }
++
++    pthread_mutex_lock(&backend->event_queue_lock);
++    if (wl_list_empty(&backend->event_queue)) {
++        pthread_mutex_unlock(&backend->event_queue_lock);
++        wlr_log(WLR_ERROR, "event queue empty");
++        return 0;
++    }
++
++    struct wlr_tgui_event *event =
++        wl_container_of(backend->event_queue.prev, event, link);
++    wl_list_remove(&event->link);
++    pthread_mutex_unlock(&backend->event_queue_lock);
++
++    struct wlr_tgui_output *output, *output_tmp;
++    wl_list_for_each_safe(output, output_tmp, &backend->outputs, link) {
++        if (event->e.activity == output->tgui_activity) {
++            handle_activity_event(&event->e, output);
++        }
++    }
++    tgui_event_destroy(&event->e);
++    free(event);
++
++    if (wl_list_empty(&backend->outputs)) {
++        wl_display_terminate(backend->display);
++    }
++    return 0;
++}
++
++static void *tgui_event_thread(void *data) {
++    struct wlr_tgui_backend *backend = data;
++
++    tgui_event event;
++    while (tgui_wait_event(backend->conn, &event) == 0) {
++        struct wlr_tgui_event *wlr_event = calloc(1, sizeof(*wlr_event));
++        if (wlr_event) {
++            wlr_event->e = event;
++            wlr_event->backend = backend;
++
++            pthread_mutex_lock(&backend->event_queue_lock);
++            wl_list_insert(&backend->event_queue, &wlr_event->link);
++            pthread_mutex_unlock(&backend->event_queue_lock);
++
++            eventfd_write(backend->tgui_event_fd, 1);
++        } else {
++            wlr_log(WLR_ERROR, "event loss: out of memory");
++            tgui_event_destroy(&event);
++        }
++    }
++
++    return 0;
++}
++
++struct wlr_backend *wlr_tgui_backend_create(struct wl_display *display) {
++    wlr_log(WLR_INFO, "Creating Termux:GUI backend");
++
++    struct wlr_tgui_backend *backend = calloc(1, sizeof(*backend));
++    if (!backend) {
++        wlr_log(WLR_ERROR, "Failed to allocate wlr_tgui_backend");
++        return NULL;
++    }
++    wlr_backend_init(&backend->backend, &backend_impl);
++
++    backend->display = display;
++    backend->loop = wl_display_get_event_loop(display);
++    backend->fake_drm_fd = open("/dev/null", O_RDONLY);
++    backend->tgui_event_fd = eventfd(0, EFD_CLOEXEC | EFD_NONBLOCK | EFD_SEMAPHORE);
++
++    assert(backend->fake_drm_fd >= 0 && backend->tgui_event_fd >= 0);
++
++    if (tgui_connection_create(&backend->conn)) {
++        wlr_log(WLR_ERROR, "Failed to create tgui_connection");
++        wlr_backend_finish(&backend->backend);
++        free(backend);
++        return NULL;
++    }
++    backend->backend.allocator = wlr_tgui_allocator_create(backend);
++
++    wl_list_init(&backend->outputs);
++    wl_list_init(&backend->event_queue);
++
++    backend->display_destroy.notify = handle_display_destroy;
++    wl_display_add_destroy_listener(display, &backend->display_destroy);
++
++    uint32_t events = WL_EVENT_READABLE | WL_EVENT_ERROR | WL_EVENT_HANGUP;
++    backend->tgui_event_source =
++        wl_event_loop_add_fd(backend->loop, backend->tgui_event_fd, events,
++                             handle_tgui_event, backend);
++
++    pthread_mutex_init(&backend->event_queue_lock, NULL);
++    pthread_create(&backend->tgui_event_thread, NULL, tgui_event_thread,
++                   backend);
++
++    return &backend->backend;
++}
++
++bool wlr_backend_is_tgui(struct wlr_backend *backend) {
++    return backend->impl == &backend_impl;
++}
+diff --git a/backend/termuxgui/input.c b/backend/termuxgui/input.c
+new file mode 100644
+index 00000000..947ee9cd
+--- /dev/null
++++ b/backend/termuxgui/input.c
+@@ -0,0 +1,271 @@
++#include <android/keycodes.h>
++#include <linux/input-event-codes.h>
++#include <xkbcommon/xkbcommon.h>
++
++#include "backend/termuxgui.h"
++
++static void send_pointer_position(struct wlr_tgui_output *output,
++                                  double x,
++                                  double y,
++                                  uint32_t time_ms) {
++    struct wlr_pointer_motion_absolute_event ev = {
++        .pointer = &output->pointer,
++        .time_msec = time_ms,
++        .x = x,
++        .y = y,
++    };
++    wl_signal_emit_mutable(&output->pointer.events.motion_absolute, &ev);
++    wl_signal_emit_mutable(&output->pointer.events.frame, &output->pointer);
++}
++
++static void send_pointer_button(struct wlr_tgui_output *output,
++                                uint32_t button,
++                                enum wlr_button_state state,
++                                uint32_t time_ms) {
++    struct wlr_pointer_button_event ev = {
++        .pointer = &output->pointer,
++        .time_msec = time_ms,
++        .button = button,
++        .state = state,
++    };
++    wl_signal_emit_mutable(&output->pointer.events.button, &ev);
++    wl_signal_emit_mutable(&output->pointer.events.frame, &output->pointer);
++}
++
++static void send_pointer_axis(struct wlr_tgui_output *output,
++                              int32_t delta,
++                              uint64_t time_ms) {
++    struct wlr_pointer_axis_event ev = {
++        .pointer = &output->pointer,
++        .time_msec = time_ms,
++        .source = WLR_AXIS_SOURCE_WHEEL,
++        .orientation = WLR_AXIS_ORIENTATION_VERTICAL,
++        .delta = delta * 15,
++        .delta_discrete = delta * WLR_POINTER_AXIS_DISCRETE_STEP,
++    };
++    wl_signal_emit_mutable(&output->pointer.events.axis, &ev);
++    wl_signal_emit_mutable(&output->pointer.events.frame, &output->pointer);
++}
++
++static void move_cursor(struct wlr_tgui_output *output,
++                        double dx,
++                        double dy,
++                        uint32_t time_ms) {
++    output->cursor_x -= dx;
++    output->cursor_y -= dy;
++
++    if (output->cursor_x < 0)
++        output->cursor_x = 0;
++    if (output->cursor_x > 1)
++        output->cursor_x = 1;
++
++    if (output->cursor_y < 0)
++        output->cursor_y = 0;
++    if (output->cursor_y > 1)
++        output->cursor_y = 1;
++
++    send_pointer_position(output, output->cursor_x, output->cursor_y,
++                          time_ms);
++}
++
++void handle_touch_event(tgui_event *e,
++                        struct wlr_tgui_output *output,
++                        uint64_t time_ms) {
++    switch (e->touch.action) {
++    case TGUI_TOUCH_DOWN: {
++        tgui_touch_pointer *p = &e->touch.pointers[e->touch.index][0];
++        memset(&output->touch_pointer, 0, sizeof(output->touch_pointer));
++        output->touch_pointer.id = p->id;
++        output->touch_pointer.max = 0;
++        output->touch_pointer.x = (double) p->x / output->wlr_output.width;
++        output->touch_pointer.y = (double) p->y / output->wlr_output.height;
++        output->touch_pointer.time_ms = time_ms;
++        break;
++    }
++    case TGUI_TOUCH_UP:
++    case TGUI_TOUCH_POINTER_UP: {
++        tgui_touch_pointer *p = &e->touch.pointers[e->touch.index][0];
++        if (p->id == output->touch_pointer.id) {
++            if (time_ms - output->touch_pointer.time_ms < 200 &&
++                output->touch_pointer.down == false &&
++                output->touch_pointer.moved == false) {
++                if (output->touch_pointer.max > 1) {
++                    send_pointer_button(output, BTN_RIGHT, WLR_BUTTON_PRESSED,
++                                        time_ms++);
++                    send_pointer_button(output, BTN_RIGHT,
++                                        WLR_BUTTON_RELEASED, time_ms);
++                } else {
++                    send_pointer_button(output, BTN_LEFT, WLR_BUTTON_PRESSED,
++                                        time_ms++);
++                    output->touch_pointer.down = true;
++                }
++            }
++            if (output->touch_pointer.down) {
++                send_pointer_button(output, BTN_LEFT, WLR_BUTTON_RELEASED,
++                                    time_ms);
++                output->touch_pointer.down = false;
++            }
++        }
++        break;
++    }
++    case TGUI_TOUCH_MOVE: {
++        for (uint32_t i = 0u; i < e->touch.num_pointers; i++) {
++            tgui_touch_pointer *p = &e->touch.pointers[0][i];
++            if (p->id != output->touch_pointer.id) {
++                break;
++            }
++            double x = (double) p->x / output->wlr_output.width;
++            double y = (double) p->y / output->wlr_output.height;
++            double px = (double) 1 / output->wlr_output.width;
++            double py = (double) 1 / output->wlr_output.height;
++            double dx = output->touch_pointer.x - x;
++            double dy = output->touch_pointer.y - y;
++            if (dx >= px || dx <= -px || dy >= py || dy <= -py) {
++                output->touch_pointer.x -= dx;
++                output->touch_pointer.y -= dy;
++                output->touch_pointer.moved = true;
++            }
++            if (output->touch_pointer.moved == true &&
++                e->touch.num_pointers == 2) {
++                static double s;
++                s += dy;
++                if (s > (double) 150 / output->wlr_output.height) {
++                    send_pointer_axis(output, 1, time_ms);
++                    s = 0;
++                } else if (s < (double) -150 / output->wlr_output.height) {
++                    send_pointer_axis(output, -1, time_ms);
++                    s = 0;
++                }
++            } else if (output->touch_pointer.moved == false &&
++                       output->touch_pointer.down == false &&
++                       time_ms - output->touch_pointer.time_ms > 200) {
++                send_pointer_button(output, BTN_LEFT, WLR_BUTTON_PRESSED,
++                                    time_ms);
++                output->touch_pointer.down = true;
++            } else {
++                move_cursor(output, dx, dy, time_ms);
++            }
++        }
++        if (e->touch.num_pointers > (uint32_t) output->touch_pointer.max) {
++            output->touch_pointer.max = e->touch.num_pointers;
++        }
++        break;
++    }
++    default: {
++        break;
++    }
++    }
++}
++
++static const struct {
++    uint32_t android, linux, wlr_mod;
++} keymap[] = {
++    { AKEYCODE_0, KEY_0 },
++    { AKEYCODE_1, KEY_1 },
++    { AKEYCODE_2, KEY_2 },
++    { AKEYCODE_3, KEY_3 },
++    { AKEYCODE_4, KEY_4 },
++    { AKEYCODE_5, KEY_5 },
++    { AKEYCODE_6, KEY_6 },
++    { AKEYCODE_7, KEY_7 },
++    { AKEYCODE_8, KEY_8 },
++    { AKEYCODE_9, KEY_9 },
++    { AKEYCODE_A, KEY_A },
++    { AKEYCODE_B, KEY_B },
++    { AKEYCODE_C, KEY_C },
++    { AKEYCODE_D, KEY_D },
++    { AKEYCODE_E, KEY_E },
++    { AKEYCODE_F, KEY_F },
++    { AKEYCODE_G, KEY_G },
++    { AKEYCODE_H, KEY_H },
++    { AKEYCODE_I, KEY_I },
++    { AKEYCODE_J, KEY_J },
++    { AKEYCODE_K, KEY_K },
++    { AKEYCODE_L, KEY_L },
++    { AKEYCODE_M, KEY_M },
++    { AKEYCODE_N, KEY_N },
++    { AKEYCODE_O, KEY_O },
++    { AKEYCODE_P, KEY_P },
++    { AKEYCODE_Q, KEY_Q },
++    { AKEYCODE_R, KEY_R },
++    { AKEYCODE_S, KEY_S },
++    { AKEYCODE_T, KEY_T },
++    { AKEYCODE_U, KEY_U },
++    { AKEYCODE_V, KEY_V },
++    { AKEYCODE_W, KEY_W },
++    { AKEYCODE_X, KEY_X },
++    { AKEYCODE_Y, KEY_Y },
++    { AKEYCODE_Z, KEY_Z },
++    { AKEYCODE_ENTER, KEY_ENTER },
++    { AKEYCODE_SPACE, KEY_SPACE },
++    { AKEYCODE_DEL, KEY_BACKSPACE },
++    { AKEYCODE_SHIFT_LEFT, KEY_LEFTSHIFT },
++    { AKEYCODE_COMMA, KEY_COMMA },
++    { AKEYCODE_PERIOD, KEY_DOT },
++    { AKEYCODE_MINUS, KEY_MINUS },
++    { AKEYCODE_AT, KEY_2, WLR_MODIFIER_SHIFT },
++    { AKEYCODE_STAR, KEY_8, WLR_MODIFIER_SHIFT },
++    { AKEYCODE_POUND, KEY_3, WLR_MODIFIER_SHIFT },
++    { AKEYCODE_SEMICOLON, KEY_SEMICOLON },
++    { AKEYCODE_APOSTROPHE, KEY_APOSTROPHE },
++    { AKEYCODE_SLASH, KEY_SLASH },
++    { AKEYCODE_EQUALS, KEY_EQUAL },
++    { AKEYCODE_PLUS, KEY_EQUAL, WLR_MODIFIER_SHIFT },
++    { AKEYCODE_GRAVE, KEY_GRAVE },
++    { AKEYCODE_BACKSLASH, KEY_BACKSLASH },
++    { AKEYCODE_LEFT_BRACKET, KEY_LEFTBRACE },
++    { AKEYCODE_RIGHT_BRACKET, KEY_RIGHTBRACE },
++};
++
++static bool get_keycode_and_modifier(uint32_t code,
++                                     uint32_t *keycode,
++                                     uint32_t *out_mod) {
++    for (size_t i = 0; i < sizeof(keymap) / sizeof(*keymap); i++) {
++        if (code == keymap[i].android) {
++            *keycode = keymap[i].linux;
++            *out_mod = keymap[i].wlr_mod;
++            return true;
++        }
++    }
++
++    return false;
++}
++
++void handle_keyboard_event(tgui_event *e,
++                           struct wlr_tgui_output *output,
++                           uint64_t time_ms) {
++    uint32_t keycode, modifiers;
++
++    if (!get_keycode_and_modifier(e->key.code, &keycode, &modifiers)) {
++        wlr_log(WLR_ERROR, "Unhandled keycode %d %c", e->key.code,
++                e->key.codePoint);
++        return;
++    }
++
++    if (e->key.mod & (TGUI_MOD_LSHIFT | TGUI_MOD_RSHIFT))
++        modifiers |= WLR_MODIFIER_SHIFT;
++    if (e->key.mod & (TGUI_MOD_LCTRL | TGUI_MOD_RCTRL))
++        modifiers |= WLR_MODIFIER_CTRL;
++    if (e->key.mod & TGUI_MOD_ALT)
++        modifiers |= WLR_MODIFIER_ALT;
++
++    xkb_layout_index_t group =
++        xkb_state_key_get_layout(output->keyboard.xkb_state, keycode + 8);
++    wlr_keyboard_notify_modifiers(&output->keyboard, modifiers, 0, 0, group);
++
++    struct wlr_keyboard_key_event key = {
++        .time_msec = time_ms,
++        .keycode = keycode,
++        /*
++        .state = e->key.down ? WL_KEYBOARD_KEY_STATE_PRESSED
++                             : WL_KEYBOARD_KEY_STATE_RELEASED,
++                             */
++        .state = WL_KEYBOARD_KEY_STATE_PRESSED,
++        .update_state = true,
++    };
++    wlr_keyboard_notify_key(&output->keyboard, &key);
++
++    key.time_msec++;
++    key.state = WL_KEYBOARD_KEY_STATE_RELEASED;
++    wlr_keyboard_notify_key(&output->keyboard, &key);
++}
+diff --git a/backend/termuxgui/meson.build b/backend/termuxgui/meson.build
+new file mode 100644
+index 00000000..081ddc51
+--- /dev/null
++++ b/backend/termuxgui/meson.build
+@@ -0,0 +1,8 @@
++wlr_files += files(
++	'backend.c',
++	'output.c',
++	'input.c',
++	'allocator.c',
++)
++
++wlr_deps += cc.find_library('termuxgui')
+diff --git a/backend/termuxgui/output.c b/backend/termuxgui/output.c
+new file mode 100644
+index 00000000..32200f4d
+--- /dev/null
++++ b/backend/termuxgui/output.c
+@@ -0,0 +1,381 @@
++#include <assert.h>
++#include <drm_fourcc.h>
++#include <pthread.h>
++#include <stdlib.h>
++#include <sys/eventfd.h>
++#include <unistd.h>
++
++#include "backend/termuxgui.h"
++#include "types/wlr_output.h"
++#include "util/time.h"
++
++static const uint32_t SUPPORTED_OUTPUT_STATE =
++    WLR_OUTPUT_STATE_BACKEND_OPTIONAL | WLR_OUTPUT_STATE_BUFFER |
++    WLR_OUTPUT_STATE_MODE;
++
++static size_t last_output_num = 0;
++
++static struct wlr_tgui_output *
++tgui_output_from_output(struct wlr_output *wlr_output) {
++    assert(wlr_output_is_tgui(wlr_output));
++    return (struct wlr_tgui_output *) wlr_output;
++}
++
++static bool output_test(struct wlr_output *wlr_output,
++                        const struct wlr_output_state *state) {
++    uint32_t unsupported = state->committed & ~SUPPORTED_OUTPUT_STATE;
++    if (unsupported != 0) {
++        wlr_log(WLR_DEBUG, "Unsupported output state fields: 0x%" PRIx32,
++                unsupported);
++        return false;
++    }
++
++    return true;
++}
++
++static bool output_commit(struct wlr_output *wlr_output,
++                          const struct wlr_output_state *state) {
++    struct wlr_tgui_output *output = tgui_output_from_output(wlr_output);
++
++    if (!output_test(wlr_output, state)) {
++        return false;
++    }
++
++    if (state->committed & WLR_OUTPUT_STATE_MODE) {
++        wlr_output_update_mode(&output->wlr_output, state->mode);
++    }
++
++    if (state->committed & WLR_OUTPUT_STATE_BUFFER) {
++        bool scanout = output_is_direct_scanout(wlr_output, state->buffer);
++
++        if (scanout) {
++            wlr_log(WLR_ERROR, "Unsupported scanout mode");
++        } else {
++            struct wlr_tgui_buffer *buffer =
++                tgui_buffer_from_buffer(state->buffer);
++
++            pthread_mutex_lock(&output->present_queue.pending.lock);
++            wlr_buffer_lock(&buffer->wlr_buffer);
++            wl_list_insert(&output->present_queue.pending.buffers,
++                           &buffer->link);
++            pthread_mutex_unlock(&output->present_queue.pending.lock);
++
++            pthread_cond_broadcast(&output->present_queue.thread_cond);
++        }
++    }
++
++    return true;
++}
++
++static void output_destroy(struct wlr_output *wlr_output) {
++    struct wlr_tgui_output *output = tgui_output_from_output(wlr_output);
++    wl_list_remove(&output->link);
++    wl_event_source_remove(output->present_queue.idle_event_source);
++
++    wlr_pointer_finish(&output->pointer);
++    wlr_keyboard_finish(&output->keyboard);
++    tgui_activity_finish(output->backend->conn, output->tgui_activity);
++
++    pthread_mutex_lock(&output->present_queue.thread_lock);
++    output->present_queue.state = TGUI_ERR_ACTIVITY_DESTROYED;
++    pthread_mutex_unlock(&output->present_queue.thread_lock);
++    pthread_cond_broadcast(&output->present_queue.thread_cond);
++    pthread_join(output->present_queue.thread, NULL);
++
++    struct wlr_tgui_buffer *buffer, *buffer_tmp;
++    wl_list_for_each_safe(buffer, buffer_tmp,
++                          &output->present_queue.pending.buffers, link) {
++        wl_list_remove(&buffer->link);
++        wlr_buffer_unlock(&buffer->wlr_buffer);
++    }
++    wl_list_for_each_safe(buffer, buffer_tmp,
++                          &output->present_queue.idle.buffers, link) {
++        wl_list_remove(&buffer->link);
++        wlr_buffer_unlock(&buffer->wlr_buffer);
++    }
++
++    struct wlr_output_mode *mode, *tmp_mode;
++    wl_list_for_each_safe(mode, tmp_mode, &output->wlr_output.modes, link) {
++        wl_list_remove(&mode->link);
++        free(mode);
++    }
++
++    pthread_mutex_destroy(&output->present_queue.pending.lock);
++    pthread_mutex_destroy(&output->present_queue.idle.lock);
++    pthread_mutex_destroy(&output->present_queue.thread_lock);
++    pthread_cond_destroy(&output->present_queue.thread_cond);
++    close(output->present_queue.idle_event_fd);
++    free(output);
++}
++
++static const struct wlr_output_impl output_impl = {
++    .destroy = output_destroy,
++    .commit = output_commit,
++};
++
++bool wlr_output_is_tgui(struct wlr_output *wlr_output) {
++    return wlr_output->impl == &output_impl;
++}
++
++static void output_configure_surfaceview(struct wlr_tgui_output *output) {
++    tgui_activity_set_orientation(output->backend->conn,
++                                  output->tgui_activity,
++                                  TGUI_ORIENTATION_LANDSCAPE);
++    tgui_activity_configure_insets(
++        output->backend->conn, output->tgui_activity,
++        TGUI_INSET_NAVIGATION_BAR, TGUI_INSET_BEHAVIOUR_TRANSIENT);
++    tgui_create_surface_view(output->backend->conn, output->tgui_activity,
++                             &output->tgui_surfaceview, NULL,
++                             TGUI_VIS_VISIBLE, true);
++    tgui_surface_view_config(output->backend->conn, output->tgui_activity,
++                             output->tgui_surfaceview, 0,
++                             TGUI_MISMATCH_CENTER_AXIS,
++                             TGUI_MISMATCH_CENTER_AXIS, 120);
++    tgui_send_touch_event(output->backend->conn, output->tgui_activity,
++                          output->tgui_surfaceview, true);
++    tgui_focus(output->backend->conn, output->tgui_activity,
++               output->tgui_surfaceview, false);
++}
++
++int handle_activity_event(tgui_event *e, struct wlr_tgui_output *output) {
++    uint64_t time_ms = get_current_time_msec();
++    switch (e->type) {
++    case TGUI_EVENT_CREATE: {
++        output_configure_surfaceview(output);
++        break;
++    }
++    case TGUI_EVENT_START:
++    case TGUI_EVENT_RESUME: {
++        output->tgui_activity_is_foreground = true;
++        pthread_cond_broadcast(&output->present_queue.thread_cond);
++        break;
++    }
++    case TGUI_EVENT_PAUSE: {
++        output->tgui_activity_is_foreground = false;
++        break;
++    }
++    case TGUI_EVENT_DESTROY: {
++        wlr_output_destroy(&output->wlr_output);
++        break;
++    }
++    case TGUI_EVENT_KEY: {
++        if (e->key.code == 4 /* back */) {
++            tgui_focus(output->backend->conn, output->tgui_activity,
++                       output->tgui_surfaceview, true);
++        } else {
++            handle_keyboard_event(e, output, time_ms);
++        }
++        break;
++    }
++    case TGUI_EVENT_TOUCH: {
++        handle_touch_event(e, output, time_ms);
++        break;
++    }
++    case TGUI_EVENT_SURFACE_CHANGED: {
++        struct wlr_pointer_motion_absolute_event ev = {
++            .pointer = &output->pointer,
++            .time_msec = time_ms,
++            .x = output->cursor_x = 0.5f,
++            .y = output->cursor_y = 0.5f,
++        };
++        wl_signal_emit_mutable(&output->pointer.events.motion_absolute, &ev);
++        wl_signal_emit_mutable(&output->pointer.events.frame,
++                               &output->pointer);
++        break;
++    }
++    case TGUI_EVENT_FRAME_COMPLETE: {
++        break;
++    }
++    default:
++        break;
++    }
++
++    return 0;
++}
++
++static void *present_queue_thread(void *data) {
++    struct wlr_tgui_output *output = data;
++    pthread_mutex_lock(&output->present_queue.thread_lock);
++    while (output->present_queue.state != TGUI_ERR_ACTIVITY_DESTROYED) {
++        pthread_mutex_lock(&output->present_queue.pending.lock);
++        if (wl_list_empty(&output->present_queue.pending.buffers) ||
++            output->tgui_activity_is_foreground == false) {
++            pthread_mutex_unlock(&output->present_queue.pending.lock);
++            pthread_cond_wait(&output->present_queue.thread_cond,
++                              &output->present_queue.thread_lock);
++        } else {
++            struct wlr_tgui_buffer *buffer = wl_container_of(
++                output->present_queue.pending.buffers.prev, buffer, link);
++            wl_list_remove(&buffer->link);
++            pthread_mutex_unlock(&output->present_queue.pending.lock);
++
++            output->present_queue.state = tgui_surface_view_set_buffer(
++                output->backend->conn, output->tgui_activity,
++                output->tgui_surfaceview, &buffer->buffer);
++
++            pthread_mutex_lock(&output->present_queue.idle.lock);
++            wl_list_insert(&output->present_queue.idle.buffers,
++                           &buffer->link);
++            pthread_mutex_unlock(&output->present_queue.idle.lock);
++
++            eventfd_write(output->present_queue.idle_event_fd, 1);
++        }
++    }
++    pthread_mutex_unlock(&output->present_queue.thread_lock);
++    return 0;
++}
++
++static int present_idle_event(int fd, uint32_t mask, void *data) {
++    struct wlr_tgui_output *output = data;
++
++    if ((mask & WL_EVENT_HANGUP) || (mask & WL_EVENT_ERROR)) {
++        if (mask & WL_EVENT_ERROR) {
++            wlr_log(WLR_ERROR, "Failed to read from idle event");
++        }
++        return 0;
++    }
++
++    eventfd_t count = 0;
++    if (eventfd_read(fd, &count) < 0) {
++        return 0;
++    }
++
++    struct wlr_tgui_buffer *buffer, *tmp;
++    pthread_mutex_lock(&output->present_queue.idle.lock);
++    wl_list_for_each_safe(buffer, tmp, &output->present_queue.idle.buffers,
++                          link) {
++        wl_list_remove(&buffer->link);
++        wlr_buffer_unlock(&buffer->wlr_buffer);
++        break;
++    }
++    pthread_mutex_unlock(&output->present_queue.idle.lock);
++
++    struct wlr_output_event_present present_event = {
++        .commit_seq = output->wlr_output.commit_seq + 1,
++        .presented = true,
++        .flags = WLR_OUTPUT_PRESENT_ZERO_COPY,
++    };
++    wlr_output_send_present(&output->wlr_output, &present_event);
++    wlr_output_send_frame(&output->wlr_output);
++    return 0;
++}
++
++static bool output_create_mode(struct wlr_tgui_output *output,
++                               int32_t width,
++                               int32_t height,
++                               int32_t refresh,
++                               bool preferred) {
++    struct wlr_output_mode *mode = calloc(1, sizeof(*mode));
++    if (mode == NULL) {
++        wlr_log(WLR_ERROR, "Failed to allocate wlr_output_mode");
++        return false;
++    }
++
++    mode->width = width;
++    mode->height = height;
++    mode->refresh = refresh;
++    mode->preferred = preferred;
++    mode->picture_aspect_ratio = WLR_OUTPUT_MODE_ASPECT_RATIO_16_9;
++
++    wl_list_insert(&output->wlr_output.modes, &mode->link);
++    return true;
++}
++
++const struct wlr_pointer_impl tgui_pointer_impl = {
++    .name = "tgui-pointer",
++};
++
++const struct wlr_keyboard_impl tgui_keyboard_impl = {
++    .name = "tgui-keyboard",
++};
++
++struct wlr_output *wlr_tgui_add_output(struct wlr_backend *wlr_backend) {
++    struct wlr_tgui_backend *backend = tgui_backend_from_backend(wlr_backend);
++
++    struct wlr_tgui_output *output = calloc(1, sizeof(*output));
++    if (output == NULL) {
++        wlr_log(WLR_ERROR, "Failed to allocate wlr_tgui_output");
++        return NULL;
++    }
++    output->backend = backend;
++
++    wl_list_init(&output->present_queue.pending.buffers);
++    wl_list_init(&output->present_queue.idle.buffers);
++
++    wlr_pointer_init(&output->pointer, &tgui_pointer_impl, "tgui-pointer");
++    wlr_keyboard_init(&output->keyboard, &tgui_keyboard_impl,
++                      "tgui-keyboard");
++
++    if (tgui_activity_create(backend->conn, &output->tgui_activity,
++                             TGUI_ACTIVITY_NORMAL, NULL, true)) {
++        wlr_log(WLR_ERROR, "Failed to create tgui_activity");
++        free(output);
++        return NULL;
++    }
++    tgui_activity_configuration conf;
++    tgui_activity_get_configuration(backend->conn, output->tgui_activity,
++                                    &conf);
++
++    wlr_output_init(&output->wlr_output, &backend->backend, &output_impl,
++                    backend->display);
++    struct wlr_output *wlr_output = &output->wlr_output;
++
++    wlr_output->adaptive_sync_status = WLR_OUTPUT_ADAPTIVE_SYNC_ENABLED;
++    wlr_output_set_render_format(wlr_output, DRM_FORMAT_ABGR8888);
++    wlr_output_set_transform(wlr_output, WL_OUTPUT_TRANSFORM_FLIPPED_180);
++
++    bool preferred = true;
++    if (conf.screen_width * conf.density > 1080) {
++        output_create_mode(output, 2560, 1440, 0, preferred);
++        preferred = false;
++    }
++    if (conf.screen_width * conf.density > 720) {
++        output_create_mode(output, 1920, 1080, 0, preferred);
++        preferred = false;
++    }
++    output_create_mode(output, 1280, 720, 0, preferred);
++
++    size_t output_num = ++last_output_num;
++
++    char name[64];
++    snprintf(name, sizeof(name), "TGUI-%zu", output_num);
++    wlr_output_set_name(wlr_output, name);
++    tgui_activity_set_task_description(output->backend->conn,
++                                       output->tgui_activity, NULL, 0, name);
++
++    char description[128];
++    snprintf(description, sizeof(description), "Termux:GUI output %zu",
++             output_num);
++    wlr_output_set_description(wlr_output, description);
++
++    wl_list_insert(&backend->outputs, &output->link);
++
++    uint32_t events = WL_EVENT_READABLE | WL_EVENT_ERROR | WL_EVENT_HANGUP;
++    output->present_queue.idle_event_fd =
++        eventfd(0, EFD_CLOEXEC | EFD_NONBLOCK | EFD_SEMAPHORE);
++    output->present_queue.idle_event_source = wl_event_loop_add_fd(
++        backend->loop, output->present_queue.idle_event_fd, events,
++        present_idle_event, output);
++
++    assert(output->present_queue.idle_event_fd >= 0 &&
++           output->present_queue.idle_event_source != NULL);
++
++    pthread_mutex_init(&output->present_queue.pending.lock, NULL);
++    pthread_mutex_init(&output->present_queue.idle.lock, NULL);
++    pthread_mutex_init(&output->present_queue.thread_lock, NULL);
++    pthread_cond_init(&output->present_queue.thread_cond, NULL);
++    pthread_create(&output->present_queue.thread, NULL, present_queue_thread,
++                   output);
++
++    if (backend->started) {
++        wlr_output_update_enabled(wlr_output, true);
++        wl_signal_emit_mutable(&backend->backend.events.new_output,
++                               wlr_output);
++        wl_signal_emit_mutable(&backend->backend.events.new_input,
++                               &output->keyboard.base);
++        wl_signal_emit_mutable(&backend->backend.events.new_input,
++                               &output->pointer.base);
++    }
++
++    return wlr_output;
++}
+diff --git a/include/backend/termuxgui.h b/include/backend/termuxgui.h
+new file mode 100644
+index 00000000..e7a9e74d
+--- /dev/null
++++ b/include/backend/termuxgui.h
+@@ -0,0 +1,140 @@
++#ifndef BACKEND_TERMUXGUI_H
++#define BACKEND_TERMUXGUI_H
++
++#include <android/hardware_buffer.h>
++#include <termuxgui/termuxgui.h>
++
++#include <wlr/backend/interface.h>
++#include <wlr/backend/termuxgui.h>
++#include <wlr/interfaces/wlr_buffer.h>
++#include <wlr/interfaces/wlr_keyboard.h>
++#include <wlr/interfaces/wlr_output.h>
++#include <wlr/interfaces/wlr_pointer.h>
++#include <wlr/render/allocator.h>
++#include <wlr/util/log.h>
++
++typedef struct native_handle {
++    int version; /* sizeof(native_handle_t) */
++    int numFds;  /* number of file-descriptors at &data[0] */
++    int numInts; /* number of ints at &data[numFds] */
++#if defined(__clang__)
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wzero-length-array"
++#endif
++    int data[0]; /* numFds + numInts ints */
++#if defined(__clang__)
++#pragma clang diagnostic pop
++#endif
++} native_handle_t;
++
++struct wlr_tgui_backend {
++    struct wlr_backend backend;
++    struct wl_display *display;
++    struct wl_event_loop *loop;
++    struct wl_list outputs;
++    struct wl_listener display_destroy;
++    bool started;
++
++    tgui_connection conn;
++    int fake_drm_fd;
++    int tgui_event_fd;
++    pthread_t tgui_event_thread;
++    pthread_mutex_t event_queue_lock;
++    struct wl_list event_queue;
++    struct wl_event_source *tgui_event_source;
++};
++
++struct wlr_tgui_allocator {
++    struct wlr_allocator wlr_allocator;
++
++    void *libandroid_handle;
++    int (*AHardwareBuffer_lock)(AHardwareBuffer *buffer,
++                                uint64_t usage,
++                                int32_t fence,
++                                const ARect *rect,
++                                void **outVirtualAddress);
++    int (*AHardwareBuffer_unlock)(AHardwareBuffer *buffer, int32_t *fence);
++    void (*AHardwareBuffer_describe)(const AHardwareBuffer *buffer,
++                                     AHardwareBuffer_Desc *outDesc);
++    const native_handle_t *(*AHardwareBuffer_getNativeHandle)(
++        const AHardwareBuffer *buffer);
++
++    tgui_connection conn;
++};
++
++struct wlr_tgui_buffer {
++    struct wlr_buffer wlr_buffer;
++
++    void *data;
++    uint32_t format;
++    tgui_connection conn;
++    tgui_hardware_buffer buffer;
++    AHardwareBuffer_Desc desc;
++    struct wl_list link;
++    struct wlr_dmabuf_attributes dmabuf;
++    struct wlr_tgui_allocator *allocator;
++};
++
++struct wlr_tgui_output {
++    struct wlr_output wlr_output;
++
++    struct wlr_tgui_backend *backend;
++    struct wl_list link;
++
++    tgui_activity tgui_activity;
++    tgui_view tgui_surfaceview;
++    bool tgui_activity_is_foreground;
++
++    struct {
++        struct {
++            struct wl_list buffers;
++            pthread_mutex_t lock;
++        } pending, idle;
++
++        tgui_err state;
++        pthread_t thread;
++        pthread_cond_t thread_cond;
++        pthread_mutex_t thread_lock;
++        int idle_event_fd;
++        struct wl_event_source *idle_event_source;
++    } present_queue;
++
++    struct wlr_pointer pointer;
++    struct wlr_keyboard keyboard;
++
++    struct {
++        int id, max;
++        double x, y;
++        bool moved, down;
++        uint64_t time_ms;
++    } touch_pointer;
++
++    double cursor_x, cursor_y;
++};
++
++struct wlr_tgui_event {
++    tgui_event e;
++    struct wlr_tgui_backend *backend;
++    struct wl_list link;
++};
++
++struct wlr_tgui_backend *
++tgui_backend_from_backend(struct wlr_backend *wlr_backend);
++
++struct wlr_allocator *
++wlr_tgui_allocator_create(struct wlr_tgui_backend *backend);
++
++struct wlr_tgui_buffer *
++tgui_buffer_from_buffer(struct wlr_buffer *wlr_buffer);
++
++int handle_activity_event(tgui_event *e, struct wlr_tgui_output *output);
++
++void handle_touch_event(tgui_event *e,
++                        struct wlr_tgui_output *output,
++                        uint64_t time_ms);
++
++void handle_keyboard_event(tgui_event *e,
++                           struct wlr_tgui_output *output,
++                           uint64_t time_ms);
++
++#endif
+diff --git a/include/wlr/backend.h b/include/wlr/backend.h
+index fac49f06..52986972 100644
+--- a/include/wlr/backend.h
++++ b/include/wlr/backend.h
+@@ -28,6 +28,9 @@ struct wlr_backend {
+ 		/** Raised when new outputs are added, passed the struct wlr_output */
+ 		struct wl_signal new_output;
+ 	} events;
++#if defined (__ANDROID__) && defined (__TERMUX__)
++	struct wlr_allocator *allocator;
++#endif
+ };
+ 
+ /**
+diff --git a/include/wlr/backend/termuxgui.h b/include/wlr/backend/termuxgui.h
+new file mode 100644
+index 00000000..f2e2833b
+--- /dev/null
++++ b/include/wlr/backend/termuxgui.h
+@@ -0,0 +1,31 @@
++/*
++ * This an unstable interface of wlroots. No guarantees are made regarding the
++ * future consistency of this API.
++ */
++#ifndef WLR_USE_UNSTABLE
++#error "Add -DWLR_USE_UNSTABLE to enable unstable wlroots features"
++#endif
++
++#ifndef WLR_BACKEND_TERMUXGUI_H
++#define WLR_BACKEND_TERMUXGUI_H
++
++#include <wlr/backend.h>
++#include <wlr/types/wlr_output.h>
++
++/**
++ * Creates a Termux:GUI backend, and connection to the Termux:GUI plugin.
++ * A Termux:GUI backend has no outputs or inputs by default.
++ */
++struct wlr_backend *wlr_tgui_backend_create(struct wl_display *display);
++/**
++ * Create a new Termux:GUI output.
++ *
++ * Will use Termux:GUI plugin to create Activity and SurfaceView, the buffers presented
++ * on the output is displayed to the SurfaceView.
++ */
++struct wlr_output *wlr_tgui_add_output(struct wlr_backend *backend);
++
++bool wlr_backend_is_tgui(struct wlr_backend *backend);
++bool wlr_output_is_tgui(struct wlr_output *output);
++
++#endif
+diff --git a/render/allocator/allocator.c b/render/allocator/allocator.c
+index b380584c..8783daa5 100644
+--- a/render/allocator/allocator.c
++++ b/render/allocator/allocator.c
+@@ -146,6 +146,11 @@ struct wlr_allocator *allocator_autocreate_with_drm_fd(
+ 
+ struct wlr_allocator *wlr_allocator_autocreate(struct wlr_backend *backend,
+ 		struct wlr_renderer *renderer) {
++#if defined (__ANDROID__) && defined (__TERMUX__)
++	if (backend->allocator)
++		return backend->allocator;
++#endif
++
+ 	// Note, drm_fd may be negative if unavailable
+ 	int drm_fd = wlr_backend_get_drm_fd(backend);
+ 	if (drm_fd < 0) {
+diff --git a/render/vulkan/meson.build b/render/vulkan/meson.build
+index 0c45a713..f7db70ac 100644
+--- a/render/vulkan/meson.build
++++ b/render/vulkan/meson.build
+@@ -24,18 +24,6 @@ if not cc.check_header('vulkan/vulkan.h', dependencies: dep_vulkan)
+ 	endif
+ endif
+ 
+-glslang = find_program('glslangValidator', native: true, required: false)
+-if not glslang.found()
+-	if 'vulkan' in renderers
+-		error('\n'.join(msg).format('glslang'))
+-	else
+-		subdir_done()
+-	endif
+-endif
+-
+-glslang_version_info = run_command(glslang, '--version', check: true).stdout()
+-glslang_version = glslang_version_info.split('\n')[0].split(':')[-1]
+-
+ wlr_files += files(
+ 	'renderer.c',
+ 	'texture.c',
+@@ -46,5 +34,3 @@ wlr_files += files(
+ 
+ wlr_deps += dep_vulkan
+ features += { 'vulkan-renderer': true }
+-
+-subdir('shaders')
+diff --git a/render/vulkan/renderer.c b/render/vulkan/renderer.c
+index ad45b2ef..e400dfcd 100644
+--- a/render/vulkan/renderer.c
++++ b/render/vulkan/renderer.c
+@@ -1816,6 +1816,9 @@ struct wlr_renderer *wlr_vk_renderer_create_with_drm_fd(int drm_fd) {
+ 		return NULL;
+ 	}
+ 
++#if defined (__ANDROID__) && defined (__TERMUX__)
++	dev->drm_fd = open("/dev/null", O_RDONLY);
++#else
+ 	// We duplicate it so it's not closed while we still need it.
+ 	dev->drm_fd = fcntl(drm_fd, F_DUPFD_CLOEXEC, 0);
+ 	if (dev->drm_fd < 0) {
+@@ -1824,6 +1827,7 @@ struct wlr_renderer *wlr_vk_renderer_create_with_drm_fd(int drm_fd) {
+ 		vulkan_instance_destroy(ini);
+ 		return NULL;
+ 	}
++#endif
+ 
+ 	return vulkan_renderer_create_for_device(dev);
+ }
+diff --git a/render/vulkan/shaders/common.vert.h b/render/vulkan/shaders/common.vert.h
+new file mode 100644
+index 00000000..8cdadf7c
+--- /dev/null
++++ b/render/vulkan/shaders/common.vert.h
+@@ -0,0 +1,57 @@
++	// 1114.1.0
++	 #pragma once
++const uint32_t common_vert_data[] = {
++	0x07230203,0x00010000,0x0008000b,0x0000003c,0x00000000,0x00020011,0x00000001,0x0006000b,
++	0x00000001,0x4c534c47,0x6474732e,0x3035342e,0x00000000,0x0003000e,0x00000000,0x00000001,
++	0x0008000f,0x00000000,0x00000004,0x6e69616d,0x00000000,0x0000000c,0x0000001b,0x0000002e,
++	0x00030003,0x00000002,0x000001c2,0x00040005,0x00000004,0x6e69616d,0x00000000,0x00030005,
++	0x00000009,0x00736f70,0x00060005,0x0000000c,0x565f6c67,0x65747265,0x646e4978,0x00007865,
++	0x00030005,0x0000001b,0x00007675,0x00030005,0x0000001e,0x004f4255,0x00050006,0x0000001e,
++	0x00000000,0x6a6f7270,0x00000000,0x00060006,0x0000001e,0x00000001,0x6f5f7675,0x65736666,
++	0x00000074,0x00050006,0x0000001e,0x00000002,0x735f7675,0x00657a69,0x00040005,0x00000020,
++	0x61746164,0x00000000,0x00060005,0x0000002c,0x505f6c67,0x65567265,0x78657472,0x00000000,
++	0x00060006,0x0000002c,0x00000000,0x505f6c67,0x7469736f,0x006e6f69,0x00070006,0x0000002c,
++	0x00000001,0x505f6c67,0x746e696f,0x657a6953,0x00000000,0x00070006,0x0000002c,0x00000002,
++	0x435f6c67,0x4470696c,0x61747369,0x0065636e,0x00070006,0x0000002c,0x00000003,0x435f6c67,
++	0x446c6c75,0x61747369,0x0065636e,0x00030005,0x0000002e,0x00000000,0x00040047,0x0000000c,
++	0x0000000b,0x0000002a,0x00040047,0x0000001b,0x0000001e,0x00000000,0x00040048,0x0000001e,
++	0x00000000,0x00000004,0x00050048,0x0000001e,0x00000000,0x00000023,0x00000000,0x00050048,
++	0x0000001e,0x00000000,0x00000007,0x00000010,0x00050048,0x0000001e,0x00000001,0x00000023,
++	0x00000040,0x00050048,0x0000001e,0x00000002,0x00000023,0x00000048,0x00030047,0x0000001e,
++	0x00000002,0x00050048,0x0000002c,0x00000000,0x0000000b,0x00000000,0x00050048,0x0000002c,
++	0x00000001,0x0000000b,0x00000001,0x00050048,0x0000002c,0x00000002,0x0000000b,0x00000003,
++	0x00050048,0x0000002c,0x00000003,0x0000000b,0x00000004,0x00030047,0x0000002c,0x00000002,
++	0x00020013,0x00000002,0x00030021,0x00000003,0x00000002,0x00030016,0x00000006,0x00000020,
++	0x00040017,0x00000007,0x00000006,0x00000002,0x00040020,0x00000008,0x00000007,0x00000007,
++	0x00040015,0x0000000a,0x00000020,0x00000001,0x00040020,0x0000000b,0x00000001,0x0000000a,
++	0x0004003b,0x0000000b,0x0000000c,0x00000001,0x0004002b,0x0000000a,0x0000000e,0x00000001,
++	0x0004002b,0x0000000a,0x00000010,0x00000002,0x0004002b,0x00000006,0x00000013,0x3f000000,
++	0x00040020,0x0000001a,0x00000003,0x00000007,0x0004003b,0x0000001a,0x0000001b,0x00000003,
++	0x00040017,0x0000001c,0x00000006,0x00000004,0x00040018,0x0000001d,0x0000001c,0x00000004,
++	0x0005001e,0x0000001e,0x0000001d,0x00000007,0x00000007,0x00040020,0x0000001f,0x00000009,
++	0x0000001e,0x0004003b,0x0000001f,0x00000020,0x00000009,0x00040020,0x00000021,0x00000009,
++	0x00000007,0x00040015,0x00000029,0x00000020,0x00000000,0x0004002b,0x00000029,0x0000002a,
++	0x00000001,0x0004001c,0x0000002b,0x00000006,0x0000002a,0x0006001e,0x0000002c,0x0000001c,
++	0x00000006,0x0000002b,0x0000002b,0x00040020,0x0000002d,0x00000003,0x0000002c,0x0004003b,
++	0x0000002d,0x0000002e,0x00000003,0x0004002b,0x0000000a,0x0000002f,0x00000000,0x00040020,
++	0x00000030,0x00000009,0x0000001d,0x0004002b,0x00000006,0x00000034,0x00000000,0x0004002b,
++	0x00000006,0x00000035,0x3f800000,0x00040020,0x0000003a,0x00000003,0x0000001c,0x00050036,
++	0x00000002,0x00000004,0x00000000,0x00000003,0x000200f8,0x00000005,0x0004003b,0x00000008,
++	0x00000009,0x00000007,0x0004003d,0x0000000a,0x0000000d,0x0000000c,0x00050080,0x0000000a,
++	0x0000000f,0x0000000d,0x0000000e,0x000500c7,0x0000000a,0x00000011,0x0000000f,0x00000010,
++	0x0004006f,0x00000006,0x00000012,0x00000011,0x00050085,0x00000006,0x00000014,0x00000012,
++	0x00000013,0x0004003d,0x0000000a,0x00000015,0x0000000c,0x000500c7,0x0000000a,0x00000016,
++	0x00000015,0x00000010,0x0004006f,0x00000006,0x00000017,0x00000016,0x00050085,0x00000006,
++	0x00000018,0x00000017,0x00000013,0x00050050,0x00000007,0x00000019,0x00000014,0x00000018,
++	0x0003003e,0x00000009,0x00000019,0x00050041,0x00000021,0x00000022,0x00000020,0x0000000e,
++	0x0004003d,0x00000007,0x00000023,0x00000022,0x0004003d,0x00000007,0x00000024,0x00000009,
++	0x00050041,0x00000021,0x00000025,0x00000020,0x00000010,0x0004003d,0x00000007,0x00000026,
++	0x00000025,0x00050085,0x00000007,0x00000027,0x00000024,0x00000026,0x00050081,0x00000007,
++	0x00000028,0x00000023,0x00000027,0x0003003e,0x0000001b,0x00000028,0x00050041,0x00000030,
++	0x00000031,0x00000020,0x0000002f,0x0004003d,0x0000001d,0x00000032,0x00000031,0x0004003d,
++	0x00000007,0x00000033,0x00000009,0x00050051,0x00000006,0x00000036,0x00000033,0x00000000,
++	0x00050051,0x00000006,0x00000037,0x00000033,0x00000001,0x00070050,0x0000001c,0x00000038,
++	0x00000036,0x00000037,0x00000034,0x00000035,0x00050091,0x0000001c,0x00000039,0x00000032,
++	0x00000038,0x00050041,0x0000003a,0x0000003b,0x0000002e,0x0000002f,0x0003003e,0x0000003b,
++	0x00000039,0x000100fd,0x00010038
++};
+diff --git a/render/vulkan/shaders/quad.frag.h b/render/vulkan/shaders/quad.frag.h
+new file mode 100644
+index 00000000..2a7d7a85
+--- /dev/null
++++ b/render/vulkan/shaders/quad.frag.h
+@@ -0,0 +1,20 @@
++	// 1114.1.0
++	 #pragma once
++const uint32_t quad_frag_data[] = {
++	0x07230203,0x00010000,0x0008000b,0x00000012,0x00000000,0x00020011,0x00000001,0x0006000b,
++	0x00000001,0x4c534c47,0x6474732e,0x3035342e,0x00000000,0x0003000e,0x00000000,0x00000001,
++	0x0006000f,0x00000004,0x00000004,0x6e69616d,0x00000000,0x00000009,0x00030010,0x00000004,
++	0x00000007,0x00030003,0x00000002,0x000001c2,0x00040005,0x00000004,0x6e69616d,0x00000000,
++	0x00050005,0x00000009,0x5f74756f,0x6f6c6f63,0x00000072,0x00030005,0x0000000a,0x004f4255,
++	0x00050006,0x0000000a,0x00000000,0x6f6c6f63,0x00000072,0x00040005,0x0000000c,0x61746164,
++	0x00000000,0x00040047,0x00000009,0x0000001e,0x00000000,0x00050048,0x0000000a,0x00000000,
++	0x00000023,0x00000050,0x00030047,0x0000000a,0x00000002,0x00020013,0x00000002,0x00030021,
++	0x00000003,0x00000002,0x00030016,0x00000006,0x00000020,0x00040017,0x00000007,0x00000006,
++	0x00000004,0x00040020,0x00000008,0x00000003,0x00000007,0x0004003b,0x00000008,0x00000009,
++	0x00000003,0x0003001e,0x0000000a,0x00000007,0x00040020,0x0000000b,0x00000009,0x0000000a,
++	0x0004003b,0x0000000b,0x0000000c,0x00000009,0x00040015,0x0000000d,0x00000020,0x00000001,
++	0x0004002b,0x0000000d,0x0000000e,0x00000000,0x00040020,0x0000000f,0x00000009,0x00000007,
++	0x00050036,0x00000002,0x00000004,0x00000000,0x00000003,0x000200f8,0x00000005,0x00050041,
++	0x0000000f,0x00000010,0x0000000c,0x0000000e,0x0004003d,0x00000007,0x00000011,0x00000010,
++	0x0003003e,0x00000009,0x00000011,0x000100fd,0x00010038
++};
+diff --git a/render/vulkan/shaders/texture.frag.h b/render/vulkan/shaders/texture.frag.h
+new file mode 100644
+index 00000000..f93c8845
+--- /dev/null
++++ b/render/vulkan/shaders/texture.frag.h
+@@ -0,0 +1,30 @@
++	// 1114.1.0
++	 #pragma once
++const uint32_t texture_frag_data[] = {
++	0x07230203,0x00010000,0x0008000b,0x0000001f,0x00000000,0x00020011,0x00000001,0x0006000b,
++	0x00000001,0x4c534c47,0x6474732e,0x3035342e,0x00000000,0x0003000e,0x00000000,0x00000001,
++	0x0007000f,0x00000004,0x00000004,0x6e69616d,0x00000000,0x00000009,0x00000011,0x00030010,
++	0x00000004,0x00000007,0x00030003,0x00000002,0x000001c2,0x00040005,0x00000004,0x6e69616d,
++	0x00000000,0x00050005,0x00000009,0x5f74756f,0x6f6c6f63,0x00000072,0x00030005,0x0000000d,
++	0x00786574,0x00030005,0x00000011,0x00007675,0x00030005,0x00000015,0x004f4255,0x00050006,
++	0x00000015,0x00000000,0x68706c61,0x00000061,0x00040005,0x00000017,0x61746164,0x00000000,
++	0x00040047,0x00000009,0x0000001e,0x00000000,0x00040047,0x0000000d,0x00000022,0x00000000,
++	0x00040047,0x0000000d,0x00000021,0x00000000,0x00040047,0x00000011,0x0000001e,0x00000000,
++	0x00050048,0x00000015,0x00000000,0x00000023,0x00000050,0x00030047,0x00000015,0x00000002,
++	0x00020013,0x00000002,0x00030021,0x00000003,0x00000002,0x00030016,0x00000006,0x00000020,
++	0x00040017,0x00000007,0x00000006,0x00000004,0x00040020,0x00000008,0x00000003,0x00000007,
++	0x0004003b,0x00000008,0x00000009,0x00000003,0x00090019,0x0000000a,0x00000006,0x00000001,
++	0x00000000,0x00000000,0x00000000,0x00000001,0x00000000,0x0003001b,0x0000000b,0x0000000a,
++	0x00040020,0x0000000c,0x00000000,0x0000000b,0x0004003b,0x0000000c,0x0000000d,0x00000000,
++	0x00040017,0x0000000f,0x00000006,0x00000002,0x00040020,0x00000010,0x00000001,0x0000000f,
++	0x0004003b,0x00000010,0x00000011,0x00000001,0x0004002b,0x00000006,0x00000013,0x00000000,
++	0x0003001e,0x00000015,0x00000006,0x00040020,0x00000016,0x00000009,0x00000015,0x0004003b,
++	0x00000016,0x00000017,0x00000009,0x00040015,0x00000018,0x00000020,0x00000001,0x0004002b,
++	0x00000018,0x00000019,0x00000000,0x00040020,0x0000001a,0x00000009,0x00000006,0x00050036,
++	0x00000002,0x00000004,0x00000000,0x00000003,0x000200f8,0x00000005,0x0004003d,0x0000000b,
++	0x0000000e,0x0000000d,0x0004003d,0x0000000f,0x00000012,0x00000011,0x00070058,0x00000007,
++	0x00000014,0x0000000e,0x00000012,0x00000002,0x00000013,0x0003003e,0x00000009,0x00000014,
++	0x00050041,0x0000001a,0x0000001b,0x00000017,0x00000019,0x0004003d,0x00000006,0x0000001c,
++	0x0000001b,0x0004003d,0x00000007,0x0000001d,0x00000009,0x0005008e,0x00000007,0x0000001e,
++	0x0000001d,0x0000001c,0x0003003e,0x00000009,0x0000001e,0x000100fd,0x00010038
++};
+diff --git a/render/vulkan/vulkan.c b/render/vulkan/vulkan.c
+index 61f49ea5..391dc565 100644
+--- a/render/vulkan/vulkan.c
++++ b/render/vulkan/vulkan.c
+@@ -26,6 +26,7 @@ static bool check_extension(const VkExtensionProperties *avail,
+ 	return false;
+ }
+ 
++#if !defined (__ANDROID__) && !defined (__TERMUX__)
+ static VkBool32 debug_callback(VkDebugUtilsMessageSeverityFlagBitsEXT severity,
+ 		VkDebugUtilsMessageTypeFlagsEXT type,
+ 		const VkDebugUtilsMessengerCallbackDataEXT *debug_data,
+@@ -74,6 +75,7 @@ static VkBool32 debug_callback(VkDebugUtilsMessageSeverityFlagBitsEXT severity,
+ 
+ 	return false;
+ }
++#endif
+ 
+ 
+ // instance
+@@ -126,12 +128,14 @@ struct wlr_vk_instance *vulkan_instance_create(bool debug) {
+ 	size_t extensions_len = 0;
+ 	const char *extensions[1] = {0};
+ 
++#if !defined (__ANDROID__) && !defined (__TERMUX__)
+ 	bool debug_utils_found = false;
+ 	if (debug && check_extension(avail_ext_props, avail_extc,
+ 			VK_EXT_DEBUG_UTILS_EXTENSION_NAME)) {
+ 		debug_utils_found = true;
+ 		extensions[extensions_len++] = VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
+ 	}
++#endif
+ 
+ 	assert(extensions_len <= sizeof(extensions) / sizeof(extensions[0]));
+ 
+@@ -143,7 +147,9 @@ struct wlr_vk_instance *vulkan_instance_create(bool debug) {
+ 	};
+ 
+ 	const char *layers[] = {
++#if !defined (__ANDROID__) && !defined (__TERMUX__)
+ 		"VK_LAYER_KHRONOS_validation",
++#endif
+ 		// "VK_LAYER_RENDERDOC_Capture",
+ 		// "VK_LAYER_live_introspection",
+ 	};
+@@ -159,6 +165,7 @@ struct wlr_vk_instance *vulkan_instance_create(bool debug) {
+ 		.ppEnabledLayerNames = layers,
+ 	};
+ 
++#if !defined (__ANDROID__) && !defined (__TERMUX__)
+ 	VkDebugUtilsMessageSeverityFlagsEXT severity =
+ 		// VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT |
+ 		VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+@@ -183,6 +190,7 @@ struct wlr_vk_instance *vulkan_instance_create(bool debug) {
+ 		// layers/extensions not being found.
+ 		instance_info.pNext = &debug_info;
+ 	}
++#endif
+ 
+ 	res = vkCreateInstance(&instance_info, NULL, &ini->instance);
+ 	if (res != VK_SUCCESS) {
+@@ -190,6 +198,7 @@ struct wlr_vk_instance *vulkan_instance_create(bool debug) {
+ 		goto error;
+ 	}
+ 
++#if !defined (__ANDROID__) && !defined (__TERMUX__)
+ 	// debug callback
+ 	if (debug_utils_found) {
+ 		ini->api.createDebugUtilsMessengerEXT =
+@@ -206,6 +215,7 @@ struct wlr_vk_instance *vulkan_instance_create(bool debug) {
+ 			wlr_log(WLR_ERROR, "vkCreateDebugUtilsMessengerEXT not found");
+ 		}
+ 	}
++#endif
+ 
+ 	return ini;
+ 
+@@ -282,11 +292,13 @@ VkPhysicalDevice vulkan_find_drm_phdev(struct wlr_vk_instance *ini, int drm_fd)
+ 		return VK_NULL_HANDLE;
+ 	}
+ 
++#if !defined (__ANDROID__) && !defined (__TERMUX__)
+ 	struct stat drm_stat = {0};
+ 	if (fstat(drm_fd, &drm_stat) != 0) {
+ 		wlr_log_errno(WLR_ERROR, "fstat failed");
+ 		return VK_NULL_HANDLE;
+ 	}
++#endif
+ 
+ 	for (uint32_t i = 0; i < num_phdevs; ++i) {
+ 		VkPhysicalDevice phdev = phdevs[i];
+@@ -353,6 +365,7 @@ VkPhysicalDevice vulkan_find_drm_phdev(struct wlr_vk_instance *ini, int drm_fd)
+ 			wlr_log(WLR_INFO, "  Driver name: %s (%s)", driver_props.driverName, driver_props.driverInfo);
+ 		}
+ 
++#if !defined (__ANDROID__) && !defined (__TERMUX__)
+ 		if (!has_drm_props) {
+ 			wlr_log(WLR_DEBUG, "  Ignoring physical device \"%s\": "
+ 				"VK_EXT_physical_device_drm not supported",
+@@ -368,6 +381,9 @@ VkPhysicalDevice vulkan_find_drm_phdev(struct wlr_vk_instance *ini, int drm_fd)
+ 				phdev_props.deviceName);
+ 			return phdev;
+ 		}
++#else
++		return phdev;
++#endif
+ 	}
+ 
+ 	return VK_NULL_HANDLE;
+diff --git a/render/wlr_renderer.c b/render/wlr_renderer.c
+index 2d6481f0..cd24164a 100644
+--- a/render/wlr_renderer.c
++++ b/render/wlr_renderer.c
+@@ -302,7 +302,7 @@ struct wlr_renderer *renderer_autocreate_with_drm_fd(int drm_fd) {
+ #endif
+ 
+ #if WLR_HAS_VULKAN_RENDERER
+-	if (!renderer && strcmp(renderer_name, "vulkan") == 0) {
++	if (!renderer && (is_auto || strcmp(renderer_name, "vulkan") == 0)) {
+ 		if (drm_fd < 0) {
+ 			log_creation_failure(is_auto, "Cannot create Vulkan renderer: no DRM FD available");
+ 		} else {
+diff --git a/types/wlr_cursor.c b/types/wlr_cursor.c
+index 46a196df..ab4a810a 100644
+--- a/types/wlr_cursor.c
++++ b/types/wlr_cursor.c
+@@ -451,7 +451,9 @@ static void handle_pointer_motion_absolute(struct wl_listener *listener,
+ 	struct wlr_output *output =
+ 		get_mapped_output(device);
+ 	if (output) {
++#if !defined (__ANDROID__) && !defined (__TERMUX__)
+ 		apply_output_transform(&event->x, &event->y, output->transform);
++#endif
+ 	}
+ 	wl_signal_emit_mutable(&device->cursor->events.motion_absolute, event);
+ }
+diff --git a/types/wlr_drm.c b/types/wlr_drm.c
+index 32eea1c7..0f479817 100644
+--- a/types/wlr_drm.c
++++ b/types/wlr_drm.c
+@@ -199,6 +199,13 @@ struct wlr_drm *wlr_drm_create(struct wl_display *display,
+ 		return NULL;
+ 	}
+ 
++#if defined (__ANDROID__) && defined (__TERMUX__)
++	static const char *fake_node = "/dev/null";
++	char *node_name = malloc(strlen(fake_node) + 1);
++	if (node_name) {
++		memcpy(node_name, fake_node, strlen(fake_node) + 1);
++	}
++#else
+ 	drmDevice *dev = NULL;
+ 	if (drmGetDevice2(drm_fd, 0, &dev) != 0) {
+ 		wlr_log(WLR_ERROR, "drmGetDevice2 failed");
+@@ -218,6 +225,7 @@ struct wlr_drm *wlr_drm_create(struct wl_display *display,
+ 	if (node_name == NULL) {
+ 		return NULL;
+ 	}
++#endif
+ 
+ 	struct wlr_drm *drm = calloc(1, sizeof(*drm));
+ 	if (drm == NULL) {
+diff --git a/types/wlr_linux_dmabuf_v1.c b/types/wlr_linux_dmabuf_v1.c
+index 7480b9e1..003ed365 100644
+--- a/types/wlr_linux_dmabuf_v1.c
++++ b/types/wlr_linux_dmabuf_v1.c
+@@ -635,6 +635,7 @@ static bool feedback_tranche_init_with_renderer(
+ 		struct wlr_renderer *renderer) {
+ 	memset(tranche, 0, sizeof(*tranche));
+ 
++#if !defined (__ANDROID__) && !defined (__TERMUX__)
+ 	int drm_fd = wlr_renderer_get_drm_fd(renderer);
+ 	if (drm_fd < 0) {
+ 		wlr_log(WLR_ERROR, "Failed to get DRM FD from renderer");
+@@ -647,6 +648,7 @@ static bool feedback_tranche_init_with_renderer(
+ 		return false;
+ 	}
+ 	tranche->target_device = stat.st_rdev;
++#endif
+ 
+ 	tranche->formats = wlr_renderer_get_dmabuf_texture_formats(renderer);
+ 	if (tranche->formats == NULL) {
