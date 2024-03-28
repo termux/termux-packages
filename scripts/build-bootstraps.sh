@@ -27,8 +27,14 @@ BOOTSTRAP_ANDROID10_COMPATIBLE=false
 TERMUX_DEFAULT_ARCHITECTURES=("aarch64" "arm" "i686" "x86_64")
 TERMUX_ARCHITECTURES=("${TERMUX_DEFAULT_ARCHITECTURES[@]}")
 
+# The supported termux package managers.
+TERMUX_PACKAGE_MANAGERS=("apt" "pacman")
+# The package manager that will be installed in bootstrap.
+# The default is 'apt'. Can be changed by using the '--pm' option.
+TERMUX_PACKAGE_MANAGER="apt"
+
 TERMUX_PACKAGES_DIRECTORY="/home/builder/termux-packages"
-TERMUX_BUILT_DEBS_DIRECTORY="$TERMUX_PACKAGES_DIRECTORY/output"
+TERMUX_BUILT_PKGS_DIRECTORY="$TERMUX_PACKAGES_DIRECTORY/output"
 TERMUX_BUILT_PACKAGES_DIRECTORY="/data/data/.built-packages"
 
 IGNORE_BUILD_SCRIPT_NOT_FOUND_ERROR=1
@@ -56,6 +62,22 @@ for cmd in ar awk curl grep gzip find sed tar xargs xz zip; do
 	fi
 done
 
+# format a metadata entry (from command repo-add)
+format_entry() {
+    local field=$1; shift
+
+    if [[ $1 ]]; then
+        printf '%%%s%%\n' "$field"
+        printf '%s\n' "$@"
+        printf '\n'
+    fi
+}
+
+# Get info about package from file .PKGINFO for create desc file
+get_info_pkg() {
+	echo "$(grep "^$1 " .PKGINFO | awk -F " = " '{printf $2 "\n"}')"
+}
+
 # Build deb files for package and its dependencies deb from source for arch
 build_package() {
 	
@@ -63,6 +85,11 @@ build_package() {
 
 	local package_arch="$1"
 	local package_name="$2"
+	if [ ! -d $TERMUX_PACKAGES_DIRECTORY/*packages/$package_name ]; then
+		local dir_subpackage=$(ls $TERMUX_PACKAGES_DIRECTORY/*packages/*/$package_name.subpackage.sh)
+		dir_subpackage=(${dir_subpackage//// })
+		package_name="${dir_subpackage[-2]}"
+	fi
 
 	local build_output
 
@@ -71,12 +98,12 @@ build_package() {
 	cd "$TERMUX_PACKAGES_DIRECTORY"
 	echo $'\n\n\n'"[*] Building '$package_name'..."
 	exec 99>&1
-	build_output="$("$TERMUX_PACKAGES_DIRECTORY"/build-package.sh "${BUILD_PACKAGE_OPTIONS[@]}" -a "$package_arch" "$package_name" 2>&1 | tee >(cat - >&99); exit ${PIPESTATUS[0]})";
+	build_output="$("$TERMUX_PACKAGES_DIRECTORY"/build-package.sh "${BUILD_PACKAGE_OPTIONS[@]}" --format "${TERMUX_PACKAGE_MANAGER//apt/debian}" -a "$package_arch" "$package_name" 2>&1 | tee >(cat - >&99); exit ${PIPESTATUS[0]})";
 	return_value=$?
 	echo "[*] Building '$package_name' exited with exit code $return_value"
 	exec 99>&-
 	if [ $return_value -ne 0 ]; then
-		echo "Failed to build package '$package_name' for arch '$package_arch'" 1>&2
+		echo "Failed to build package '$package_name' for arch '$package_arch' in format '${TERMUX_PACKAGE_MANAGER//apt/debian}'" 1>&2
 
 		# Dependency packages may not have a build.sh, so we ignore the error.
 		# A better way should be implemented to validate if its actually a dependency
@@ -101,7 +128,7 @@ extract_debs() {
 	local deb
 	local file
 
-	cd "$TERMUX_BUILT_DEBS_DIRECTORY"
+	cd "$TERMUX_BUILT_PKGS_DIRECTORY"
 
 	if [ -z "$(ls -A)" ]; then
 		echo $'\n\n\n'"No debs found"
@@ -136,7 +163,7 @@ extract_debs() {
 
 		echo "[*] Extracting '$deb'..."
 		(cd "$package_tmpdir"
-			ar x "$TERMUX_BUILT_DEBS_DIRECTORY/$deb"
+			ar x "$TERMUX_BUILT_PKGS_DIRECTORY/$deb"
 
 			# data.tar may have extension different from .xz
 			if [ -f "./data.tar.xz" ]; then
@@ -183,6 +210,104 @@ extract_debs() {
 						cp "$file" "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/dpkg/info/${current_package_name}.${file}"
 					fi
 				done
+			fi
+		)
+	done
+
+}
+
+# Extract *.pkg.* files to the bootstrap root.
+extract_pkgs() {
+
+	local current_package_name
+	local current_package_name_sp
+	local package_tmpdir
+	local package_name_for_db
+
+	cd "$TERMUX_BUILT_PKGS_DIRECTORY"
+
+	if [ -z "$(ls -A)" ]; then
+		echo $'\n\n\n'"No pkgs found"
+		return 1
+	else
+		echo $'\n\n\n'"Pkg Files:"
+		echo "\""
+		ls
+		echo "\""
+	fi
+
+	for pkg in *.pkg.*; do
+		current_package_name_sp=(${pkg//-/ })
+		current_package_name="$pkg"
+		for i in $(seq 0 2); do
+			current_package_name="${current_package_name//-${current_package_name_sp[$(($i-3))]/}}"
+		done
+
+		if [[ "$current_package_name" == *"-static" ]]; then
+			echo "[*] Skipping static package '$pkg'..."
+			continue
+		fi
+
+		if [[ " ${EXTRACTED_PACKAGES[*]} " == *" $current_package_name "* ]]; then
+			echo "[*] Skipping already extracted package '$current_package_name'..."
+			continue
+		fi
+
+		EXTRACTED_PACKAGES+=("$current_package_name")
+
+		package_tmpdir="${BOOTSTRAP_PKGDIR}/${current_package_name}"
+		mkdir -p "$package_tmpdir"
+		rm -rf "$package_tmpdir"/*
+
+		echo "[*] Extracting '$pkg'..."
+		(cd "$package_tmpdir"
+			tar xJf "$TERMUX_BUILT_PKGS_DIRECTORY/$pkg"
+			if [ -d ./data ]; then
+				cp -r ./data "$BOOTSTRAP_ROOTFS"
+			fi
+
+			if ! ${BOOTSTRAP_ANDROID10_COMPATIBLE}; then
+				package_name_for_db="${current_package_name}-${current_package_name_sp[-3]}-${current_package_name_sp[-2]}"
+				mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/pacman/local/${package_name_for_db}"
+				cp -r .MTREE "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/pacman/local/${package_name_for_db}/mtree"
+				{
+					format_entry "FILENAME"  "${pkg//+/0}"
+					format_entry "NAME"      "$current_package_name"
+					format_entry "BASE"      $(get_info_pkg pkgbase)
+					format_entry "VERSION"   $(get_info_pkg pkgver)
+					format_entry "DESC"      "$(get_info_pkg pkgdesc)"
+					format_entry "GROUPS"    $(get_info_pkg group)
+					format_entry "CSIZE"     $(wc -c < "$TERMUX_BUILT_PKGS_DIRECTORY/$pkg")
+					format_entry "ISIZE"     $(get_info_pkg size)
+
+					format_entry "MD5SUM"    $(md5sum "$TERMUX_BUILT_PKGS_DIRECTORY/$pkg" | awk '{printf $1}')
+					format_entry "SHA256SUM" $(sha256sum "$TERMUX_BUILT_PKGS_DIRECTORY/$pkg" | awk '{printf $1}')
+
+					format_entry "URL"       $(get_info_pkg url)
+					format_entry "LICENSE"   $(get_info_pkg license)
+					format_entry "ARCH"      $(get_info_pkg arch)
+					format_entry "BUILDDATE" $(get_info_pkg builddate)
+					format_entry "PACKAGER"  $(get_info_pkg packager)
+					format_entry "REPLACES"  $(get_info_pkg replaces)
+					format_entry "CONFLICTS" $(get_info_pkg conflict)
+					format_entry "PROVIDES"  $(get_info_pkg provides)
+
+					format_entry "DEPENDS" $(get_info_pkg depend)
+					format_entry "OPTDEPENDS" $(get_info_pkg optdepend)
+					format_entry "MAKEDEPENDS" $(get_info_pkg makedepend)
+					format_entry "CHECKDEPENDS" $(get_info_pkg checkdepend)
+				} > "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/pacman/local/${package_name_for_db}/desc"
+
+				if [ -f .INSTALL ]; then
+					cp -r .INSTALL "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/pacman/local/${package_name_for_db}/install"
+				fi
+
+				{
+					echo "%FILES%"
+					if [ -d ./data ]; then
+						find data
+					fi
+				} >> "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/pacman/local/${package_name_for_db}/files"
 			fi
 		)
 	done
@@ -261,6 +386,9 @@ Available command_options:
   [ -a | --add <packages> ]
                      Additional packages to include into bootstrap archive.
                      Multiple packages should be passed as comma-separated list.
+  [ -pm <manager> ]
+                     Set up a package manager in bootstrap. It can only be pacman
+                     or apt (the default is apt).
   [ --architectures <architectures> ]
                      Override default list of architectures for which bootstrap
                      archives will be created. Multiple architectures should be
@@ -286,6 +414,7 @@ HELP_EOF
 
 echo $'\n'"TERMUX_APP_PACKAGE: \"$TERMUX_APP_PACKAGE\""
 echo "TERMUX_PREFIX: \"${TERMUX_PREFIX[*]}\""
+echo "TERMUX_PACKAGE_MANAGER: \"${TERMUX_PACKAGE_MANAGER}\""
 echo "TERMUX_ARCHITECTURES: \"${TERMUX_ARCHITECTURES[*]}\""
 
 }
@@ -314,6 +443,16 @@ main() {
 					echo "[!] Option '--add' requires an argument." 1>&2
 					show_usage
 					return 1
+				fi
+				;;
+			--pm)
+				if [ $# -gt 1 ] && [ -n "$2" ] && [[ $2 != -* ]]; then
+					TERMUX_PACKAGE_MANAGER="$2"
+					shift 1
+				else
+					echo "[!] Option '--pm' requires an argument." 1>&2
+					show_usage
+					exit 1
 				fi
 				;;
 			--architectures)
@@ -370,7 +509,7 @@ main() {
 
 		if [[ $FORCE_BUILD_PACKAGES == "1" ]]; then
 			rm -f "$TERMUX_BUILT_PACKAGES_DIRECTORY_FOR_ARCH"/*
-			rm -f "$TERMUX_BUILT_DEBS_DIRECTORY"/*
+			rm -f "$TERMUX_BUILT_PKGS_DIRECTORY"/*
 		fi
 
 
@@ -380,14 +519,22 @@ main() {
 
 		# Create initial directories for $TERMUX_PREFIX
 		if ! ${BOOTSTRAP_ANDROID10_COMPATIBLE}; then
-			mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/etc/apt/apt.conf.d"
-			mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/etc/apt/preferences.d"
-			mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/dpkg/info"
-			mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/dpkg/triggers"
-			mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/dpkg/updates"
-			mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/log/apt"
-			touch "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/dpkg/available"
-			touch "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/dpkg/status"
+			if [ ${TERMUX_PACKAGE_MANAGER} = "apt" ]; then
+				mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/etc/apt/apt.conf.d"
+				mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/etc/apt/preferences.d"
+				mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/dpkg/info"
+				mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/dpkg/triggers"
+				mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/dpkg/updates"
+				mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/log/apt"
+				touch "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/dpkg/available"
+				touch "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/dpkg/status"
+			else
+				mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/pacman/sync"
+				mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/pacman/local"
+				echo "9" >> "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/pacman/local/ALPM_DB_VERSION"
+				mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/cache/pacman/pkg"
+				mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/log"
+			fi
 		fi
 		mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/tmp"
 
@@ -398,7 +545,7 @@ main() {
 
 		# Package manager.
 		if ! ${BOOTSTRAP_ANDROID10_COMPATIBLE}; then
-			PACKAGES+=("apt")
+			PACKAGES+=("${TERMUX_PACKAGE_MANAGER}")
 		fi
 
 		# Core utilities.
@@ -423,14 +570,18 @@ main() {
 		PACKAGES+=("sed")
 		PACKAGES+=("tar")
 		PACKAGES+=("termux-exec")
-		PACKAGES+=("termux-keyring")
+		if [ ${TERMUX_PACKAGE_MANAGER} = "apt" ]; then
+			PACKAGES+=("termux-keyring")
+		fi
 		PACKAGES+=("termux-tools")
 		PACKAGES+=("util-linux")
 		PACKAGES+=("xz-utils")
 
 		# Additional.
 		PACKAGES+=("ed")
-		PACKAGES+=("debianutils")
+		if [ ${TERMUX_PACKAGE_MANAGER} = "apt" ]; then
+			PACKAGES+=("debianutils")
+		fi
 		PACKAGES+=("dos2unix")
 		PACKAGES+=("inetutils")
 		PACKAGES+=("lsof")
@@ -454,8 +605,13 @@ main() {
 			set -e
 		done
 
-		# Extract all debs.
-		extract_debs || return $?
+		if [ ${TERMUX_PACKAGE_MANAGER} = "apt" ]; then
+			# Extract all debs.
+			extract_debs || return $?
+		elif [ ${TERMUX_PACKAGE_MANAGER} = "pacman" ]; then
+			# Extract all pkgs.
+			extract_pkgs || return $?
+		fi
 
 		# Create bootstrap archive.
 		create_bootstrap_archive "$package_arch" || return $?
