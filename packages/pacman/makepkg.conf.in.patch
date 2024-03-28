@@ -1,19 +1,19 @@
---- pacman-6.0.2/etc/makepkg.conf.in	2023-03-10 01:35:19.647470082 +0300
-+++ pacman-6.0.2/etc/makepkg.conf.in.patch	2023-03-10 01:37:36.035469985 +0300
+--- pacman-6.1.0/etc/makepkg.conf.in	2024-03-04 06:07:58.000000000 +0300
++++ pacman-6.1.0/etc/makepkg.conf.in.patch	2024-03-28 20:09:18.246340728 +0300
 @@ -9,17 +9,17 @@
  #
  #-- The download utilities that makepkg should use to acquire sources
  #  Format: 'protocol::agent'
--DLAGENTS=('file::/usr/bin/curl -gqC - -o %o %u'
--          'ftp::/usr/bin/curl -gqfC - --ftp-pasv --retry 3 --retry-delay 3 -o %o %u'
--          'http::/usr/bin/curl -gqb "" -fLC - --retry 3 --retry-delay 3 -o %o %u'
--          'https::/usr/bin/curl -gqb "" -fLC - --retry 3 --retry-delay 3 -o %o %u'
+-DLAGENTS=('file::/usr/bin/curl -qgC - -o %o %u'
+-          'ftp::/usr/bin/curl -qgfC - --ftp-pasv --retry 3 --retry-delay 3 -o %o %u'
+-          'http::/usr/bin/curl -qgb "" -fLC - --retry 3 --retry-delay 3 -o %o %u'
+-          'https::/usr/bin/curl -qgb "" -fLC - --retry 3 --retry-delay 3 -o %o %u'
 -          'rsync::/usr/bin/rsync --no-motd -z %u %o'
 -          'scp::/usr/bin/scp -C %u %o')
-+DLAGENTS=('file::@TERMUX_PREFIX@/bin/curl -gqC - -o %o %u'
-+          'ftp::@TERMUX_PREFIX@/bin/curl -gqfC - --ftp-pasv --retry 3 --retry-delay 3 -o %o %u'
-+          'http::@TERMUX_PREFIX@/bin/curl -gqb "" -fLC - --retry 3 --retry-delay 3 -o %o %u'
-+          'https::@TERMUX_PREFIX@/bin/curl -gqb "" -fLC - --retry 3 --retry-delay 3 -o %o %u'
++DLAGENTS=('file::@TERMUX_PREFIX@/bin/curl -qgC - -o %o %u'
++          'ftp::@TERMUX_PREFIX@/bin/curl -qgfC - --ftp-pasv --retry 3 --retry-delay 3 -o %o %u'
++          'http::@TERMUX_PREFIX@/bin/curl -qgb "" -fLC - --retry 3 --retry-delay 3 -o %o %u'
++          'https::@TERMUX_PREFIX@/bin/curl -qgb "" -fLC - --retry 3 --retry-delay 3 -o %o %u'
 +          'rsync::@TERMUX_PREFIX@/bin/rsync --no-motd -z %u %o'
 +          'scp::@TERMUX_PREFIX@/bin/scp -C %u %o')
  
@@ -22,7 +22,7 @@
 -# /usr/bin/lftpget -c
 -# /usr/bin/wget
 +# @TERMUX_PREFIX@/bin/snarf
-+# @TERMUX_PREFIX@/bin/lftpget -c0
++# @TERMUX_PREFIX@/bin/lftpget -c
 +# @TERMUX_PREFIX@/bin/wget
  
  #-- The package required by makepkg to download VCS sources
@@ -37,7 +37,7 @@
  
  #-- Compiler and Linker Flags
 @@ -93,7 +93,7 @@
- OPTIONS=(strip docs libtool staticlibs emptydirs zipman purge !debug !lto)
+ OPTIONS=(strip docs libtool staticlibs emptydirs zipman purge !debug !lto !autodeps)
  
  #-- File integrity checks to use. Valid: ck, md5, sha1, sha224, sha256, sha384, sha512, b2
 -INTEGRITY_CHECK=(ck)
@@ -51,6 +51,6 @@
  #-- Directory to store source code in for debug packages
 -DBGSRCDIR="/usr/src/debug"
 +DBGSRCDIR="@TERMUX_PREFIX@/src/debug"
+ #-- Prefix and directories for library autodeps
+ LIB_DIRS=('lib:usr/lib' 'lib32:usr/lib32')
  
- #########################################################################
- # PACKAGE OUTPUT

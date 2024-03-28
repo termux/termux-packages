@@ -11,15 +11,7 @@ diff -uNr pacman-6.0.0/lib/libalpm/add.c pacman-termux/lib/libalpm/add.c
  	archive_write_disk_set_options(archive_writer, archive_flags);
  
  	ret = archive_read_extract2(archive, entry, archive_writer);
-@@ -242,7 +245,6 @@
- 	 *  3,4- conflict checks should have caught this. either overwrite
- 	 *      or backup the file.
- 	 *  5- file replacing directory- don't allow it.
--	 *  6- skip extraction, dir already exists.
- 	 */
- 
- 	isnewfile = llstat(filename, &lsbuf) != 0;
-@@ -254,19 +256,6 @@
+@@ -257,19 +257,6 @@
  		gid_t entrygid = archive_entry_gid(entry);
  #endif
  
@@ -31,7 +23,7 @@ diff -uNr pacman-6.0.0/lib/libalpm/add.c pacman-termux/lib/libalpm/add.c
 -					"filesystem: %o  package: %o\n"), filename, lsbuf.st_mode & mask,
 -					entrymode & mask);
 -			alpm_logaction(handle, ALPM_CALLER_PREFIX,
--					"warning: directory permissions differ on %s\n"
+-					"warning: directory permissions differ on %s, "
 -					"filesystem: %o  package: %o\n", filename, lsbuf.st_mode & mask,
 -					entrymode & mask);
 -		}
