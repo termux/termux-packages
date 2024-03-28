@@ -82,9 +82,6 @@ termux_create_pacman_subpackages() {
 		local SUB_PKG_INSTALLSIZE
 		SUB_PKG_INSTALLSIZE=$(du -bs . | cut -f 1)
 
-		local BUILD_DATE
-		BUILD_DATE=$(date +%s)
-
 		local PKG_DEPS_SPC=" ${TERMUX_PKG_DEPENDS//,/} "
 		if [ -z "$TERMUX_SUBPKG_DEPEND_ON_PARENT" ] && [ "${PKG_DEPS_SPC/ $SUB_PKG_NAME /}" = "$PKG_DEPS_SPC" ]; then
 			# Does pacman supports versioned dependencies?
@@ -113,7 +110,7 @@ termux_create_pacman_subpackages() {
 			echo "pkgver = $TERMUX_PKG_FULLVERSION_FOR_PACMAN"
 			echo "pkgdesc = $(echo "$TERMUX_SUBPKG_DESCRIPTION" | tr '\n' ' ')"
 			echo "url = $TERMUX_PKG_HOMEPAGE"
-			echo "builddate = $BUILD_DATE"
+			echo "builddate = $SOURCE_DATE_EPOCH"
 			echo "packager = $TERMUX_PKG_MAINTAINER"
 			echo "size = $SUB_PKG_INSTALLSIZE"
 			echo "arch = $SUB_PKG_ARCH"
@@ -163,7 +160,7 @@ termux_create_pacman_subpackages() {
 			echo "pkgver = $TERMUX_PKG_FULLVERSION_FOR_PACMAN"
 			echo "pkgarch = $SUB_PKG_ARCH"
 			echo "packager = $TERMUX_PKG_MAINTAINER"
-			echo "builddate = $BUILD_DATE"
+			echo "builddate = $SOURCE_DATE_EPOCH"
 		} > .BUILDINFO
 
 		# Write package installation hooks.
@@ -200,6 +197,9 @@ termux_create_pacman_subpackages() {
 				PKG_FORMAT="xz";;
 		esac
 
+		# ensure all elements of the package have the same mtime
+		find . -exec touch -h -d @$SOURCE_DATE_EPOCH {} +
+
 		# Create the actual .pkg file:
 		local TERMUX_SUBPKG_PACMAN_FILE=$TERMUX_OUTPUT_DIR/${SUB_PKG_NAME}${DEBUG}-${TERMUX_PKG_FULLVERSION_FOR_PACMAN}-${SUB_PKG_ARCH}.pkg.tar.${PKG_FORMAT}
 		shopt -s dotglob globstar
@@ -207,6 +207,7 @@ termux_create_pacman_subpackages() {
 			--options='!all,use-set,type,uid,gid,mode,time,size,md5,sha256,link' \
 			--null --files-from - --exclude .MTREE | \
 			gzip -c -f -n > .MTREE
+		touch -d @$SOURCE_DATE_EPOCH .MTREE
 		printf '%s\0' **/* | bsdtar --no-fflags -cnf - --null --files-from - | \
 			$COMPRESS > "$TERMUX_SUBPKG_PACMAN_FILE"
 		shopt -u dotglob globstar

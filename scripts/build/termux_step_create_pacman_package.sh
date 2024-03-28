@@ -37,9 +37,6 @@ termux_step_create_pacman_package() {
 
 	local PACMAN_FILE=$TERMUX_OUTPUT_DIR/${TERMUX_PKG_NAME}${DEBUG}-${TERMUX_PKG_FULLVERSION_FOR_PACMAN}-${TERMUX_ARCH}.pkg.tar.${PKG_FORMAT}
 
-	local BUILD_DATE
-	BUILD_DATE=$(date +%s)
-
 	if [ "$TERMUX_GLOBAL_LIBRARY" = "true" ] && [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
 		test ! -z "$TERMUX_PKG_DEPENDS" && TERMUX_PKG_DEPENDS=$(package__add_prefix_glibc_to_package_list "$TERMUX_PKG_DEPENDS")
 		test ! -z "$TERMUX_PKG_BREAKS" && TERMUX_PKG_BREAKS=$(package__add_prefix_glibc_to_package_list "$TERMUX_PKG_BREAKS")
@@ -57,7 +54,7 @@ termux_step_create_pacman_package() {
 		echo "pkgver = $TERMUX_PKG_FULLVERSION_FOR_PACMAN"
 		echo "pkgdesc = $(echo "$TERMUX_PKG_DESCRIPTION" | tr '\n' ' ')"
 		echo "url = $TERMUX_PKG_HOMEPAGE"
-		echo "builddate = $BUILD_DATE"
+		echo "builddate = $SOURCE_DATE_EPOCH"
 		echo "packager = $TERMUX_PKG_MAINTAINER"
 		echo "size = $TERMUX_PKG_INSTALLSIZE"
 		echo "arch = $TERMUX_ARCH"
@@ -115,12 +112,15 @@ termux_step_create_pacman_package() {
 		echo "pkgver = $TERMUX_PKG_FULLVERSION_FOR_PACMAN"
 		echo "pkgarch = $TERMUX_ARCH"
 		echo "packager = $TERMUX_PKG_MAINTAINER"
-		echo "builddate = $BUILD_DATE"
+		echo "builddate = $SOURCE_DATE_EPOCH"
 	} > .BUILDINFO
 
 	# Write installation hooks.
 	termux_step_create_debscripts
 	termux_step_create_pacman_install_hook
+
+	# ensure all elements of the package have the same mtime
+	find . -exec touch -h -d @$SOURCE_DATE_EPOCH {} +
 
 	# Create package
 	shopt -s dotglob globstar
@@ -128,6 +128,7 @@ termux_step_create_pacman_package() {
 		--options='!all,use-set,type,uid,gid,mode,time,size,md5,sha256,link' \
 		--null --files-from - --exclude .MTREE | \
 		gzip -c -f -n > .MTREE
+	touch -d @$SOURCE_DATE_EPOCH .MTREE
 	printf '%s\0' **/* | bsdtar --no-fflags -cnf - --null --files-from - | \
 		$COMPRESS > "$PACMAN_FILE"
 	shopt -u dotglob globstar
