@@ -3,17 +3,16 @@ TERMUX_PKG_DESCRIPTION="Go compiler for microcontrollers, WASM, CLI tools"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.30.0"
+TERMUX_PKG_VERSION="0.31.2"
 TERMUX_PKG_SRCURL=git+https://github.com/tinygo-org/tinygo
 TERMUX_PKG_GIT_BRANCH="v${TERMUX_PKG_VERSION}"
-TERMUX_PKG_SHA256=4ecb1764af87efcd90fcc66cb3b25d7cf3c038fceb87d032155170a4a3c65614
-TERMUX_PKG_DEPENDS="libc++, tinygo-common"
+TERMUX_PKG_SHA256=90e35acf0463c299ee47d2d6836d19ce92471f4732f13047a58433407bc7e8f2
+TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_RECOMMENDS="binaryen, golang"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_AUTO_UPDATE=true
-
 _LLVM_OPTION="
 -DCMAKE_BUILD_TYPE=MinSizeRel
 -DGENERATOR_IS_MULTI_CONFIG=ON
@@ -21,7 +20,6 @@ _LLVM_OPTION="
 -DLLVM_TABLEGEN=${TERMUX_PKG_HOSTBUILD_DIR}/bin/llvm-tblgen
 -DCLANG_TABLEGEN=${TERMUX_PKG_HOSTBUILD_DIR}/bin/clang-tblgen
 "
-
 _LLVM_EXTRA_BUILD_TARGETS="
 lib/libLLVMDWARFLinker.a
 lib/libLLVMDWARFLinkerParallel.a
@@ -91,6 +89,9 @@ termux_pkg_auto_update() {
 }
 
 termux_step_post_get_source() {
+	# this is a workaround for build-all.sh issue
+	TERMUX_PKG_DEPENDS+=", tinygo-common"
+
 	# https://github.com/tinygo-org/tinygo/blob/release/Makefile
 	# https://github.com/espressif/llvm-project
 	make llvm-source GO=:
