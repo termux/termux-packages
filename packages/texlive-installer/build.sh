@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Wrapper around texlive's install-tl script"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 TERMUX_PKG_VERSION=20240310
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://ftp.math.utah.edu/pub/tex/historic/systems/texlive/${TERMUX_PKG_VERSION:0:4}/install-tl-unx.tar.gz
 TERMUX_PKG_SHA256=fa845fbbd8d5b78c93fb5e9f97e5d908b42fb50c1ae164f7d9aa31c8ad8c31c7
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
@@ -47,7 +48,7 @@ termux_step_make_install() {
 	fi
 	cp -r $TERMUX_PKG_SRCDIR/ $TERMUX_PREFIX/opt/texlive/install-tl
 
-	mkdir -p $TERMUX_PREFIX/etc/profile.d/
+	mkdir -p $TERMUX_PREFIX/etc/profile.d/ $TERMUX_PREFIX/etc/fish/conf.d/
 	{
 		echo "export PATH=\$PATH:$TERMUX_PREFIX/bin/texlive"
 		echo "export TEXMFROOT=$TERMUX_PREFIX/share/texlive/${TERMUX_PKG_VERSION:0:4}"
@@ -55,6 +56,13 @@ termux_step_make_install() {
 		echo "export OSFONTDIR=$TERMUX_PREFIX/share/fonts/TTF"
 		echo "export TRFONTS=$TERMUX_PREFIX/share/groff/{current/font,site-font}/devps"
 	} > $TERMUX_PREFIX/etc/profile.d/texlive.sh
+    {
+        echo "set -gx --append PATH $TERMUX_PREFIX/bin/texlive"
+        echo "set -gx TEXMFROOT $TERMUX_PREFIX/share/texlive/${TERMUX_PKG_VERSION:0:4}"
+        echo "set -gx TEXMFLOCAL $TERMUX_PREFIX/share/texlive/texmf-local"
+        echo "set -gx OSFONTDIR $TERMUX_PREFIX/share/fonts/TTF"
+        echo "set -gx TRFONTS $TERMUX_PREFIX/share/groff/current/font/devps $TERMUX_PREFIX/share/groff/site-font/devps"
+    } > $TERMUX_PREFIX/etc/fish/conf.d/texlive.fish
 }
 
 termux_step_create_debscripts() {
