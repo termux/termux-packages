@@ -611,10 +611,6 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 		termux_step_setup_variables
 		termux_step_handle_buildarch
 
-		if [ "$TERMUX_CONTINUE_BUILD" == "false" ]; then
-			termux_step_setup_build_folders
-		fi
-
 		termux_step_start_build
 
 		if ! termux_check_package_in_building_packages_list "${TERMUX_PKG_BUILDER_DIR#${TERMUX_SCRIPTDIR}/}"; then

@@ -68,8 +68,8 @@ termux_step_start_build() {
 	# Avoid exporting PKG_CONFIG_LIBDIR until after termux_step_host_build.
 	export TERMUX_PKG_CONFIG_LIBDIR=$TERMUX_PREFIX/lib/pkgconfig:$TERMUX_PREFIX/share/pkgconfig
 
+	local TERMUX_PKG_BUILDDIR_ORIG="$TERMUX_PKG_BUILDDIR"
 	if [ "$TERMUX_PKG_BUILD_IN_SRC" = "true" ]; then
-		echo "Building in src due to TERMUX_PKG_BUILD_IN_SRC being set to true" > "$TERMUX_PKG_BUILDDIR/BUILDING_IN_SRC.txt"
 		TERMUX_PKG_BUILDDIR=$TERMUX_PKG_SRCDIR
 	fi
 
@@ -86,6 +86,14 @@ termux_step_start_build() {
 
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ] && [ "$TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED" = "true" ]; then
 		termux_error_exit "Package '$TERMUX_PKG_NAME' is not available for on-device builds."
+	fi
+
+	# Delete and re-create the directories used for building the package
+	termux_step_setup_build_folders
+
+	if [ "$TERMUX_PKG_BUILD_IN_SRC" = "true" ]; then
+		# Create a file for users to know that the build directory not containing any built files is expected behaviour
+		echo "Building in src due to TERMUX_PKG_BUILD_IN_SRC being set to true" > "$TERMUX_PKG_BUILDDIR_ORIG/BUILDING_IN_SRC.txt"
 	fi
 
 	if [ "$TERMUX_PACKAGE_LIBRARY" = "bionic" ]; then

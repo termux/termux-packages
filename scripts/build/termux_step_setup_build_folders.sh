@@ -41,4 +41,10 @@ termux_step_setup_build_folders() {
 		mkdir -p $TERMUX_PREFIX/{bin,etc,lib,share,share/LICENSES,include}
 		mkdir -p $TERMUX_PREFIX_CLASSICAL/{bin,etc,tmp}
 	fi
+
+	# Required for creating `BUILDING_IN_SRC.txt` file in termux_step_start_build
+	if [ "$TERMUX_PKG_BUILDDIR_ORIG" != "$TERMUX_PKG_BUILDDIR" ]; then
+		rm -Rf "$TERMUX_PKG_BUILDDIR_ORIG"
+		mkdir -p "$TERMUX_PKG_BUILDDIR_ORIG"
+	fi
 }
