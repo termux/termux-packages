@@ -1,5 +1,56 @@
+diff --git a/src/vulkan/wsi/wsi_common.c b/src/vulkan/wsi/wsi_common.c
+index 97c26d6b08a..13b299b7fd8 100644
+--- a/src/vulkan/wsi/wsi_common.c
++++ b/src/vulkan/wsi/wsi_common.c
+@@ -1466,7 +1466,7 @@ wsi_common_queue_present(const struct wsi_device *wsi,
+       assert(!has_signal_dma_buf);
+ #endif
+ 
+-      if (wsi->sw)
++      if (wsi->sw || swapchain->present_mode == VK_PRESENT_MODE_IMMEDIATE_KHR)
+ 	      wsi->WaitForFences(device, 1, &swapchain->fences[image_index],
+ 				 true, ~0ull);
+ 
+diff --git a/src/vulkan/wsi/wsi_common_drm.c b/src/vulkan/wsi/wsi_common_drm.c
+index d82f9d5f1e1..38831de5ea5 100644
+--- a/src/vulkan/wsi/wsi_common_drm.c
++++ b/src/vulkan/wsi/wsi_common_drm.c
+@@ -43,6 +43,9 @@
+ static VkResult
+ wsi_dma_buf_export_sync_file(int dma_buf_fd, int *sync_file_fd)
+ {
++#if defined (__ANDROID__) && defined (__TERMUX__)
++   return VK_ERROR_FEATURE_NOT_PRESENT;
++#else
+    /* Don't keep trying an IOCTL that doesn't exist. */
+    static bool no_dma_buf_sync_file = false;
+    if (no_dma_buf_sync_file)
+@@ -66,11 +69,15 @@ wsi_dma_buf_export_sync_file(int dma_buf_fd, int *sync_file_fd)
+    *sync_file_fd = export.fd;
+ 
+    return VK_SUCCESS;
++#endif
+ }
+ 
+ static VkResult
+ wsi_dma_buf_import_sync_file(int dma_buf_fd, int sync_file_fd)
+ {
++#if defined (__ANDROID__) && defined (__TERMUX__)
++   return VK_ERROR_FEATURE_NOT_PRESENT;
++#else
+    /* Don't keep trying an IOCTL that doesn't exist. */
+    static bool no_dma_buf_sync_file = false;
+    if (no_dma_buf_sync_file)
+@@ -92,6 +99,7 @@ wsi_dma_buf_import_sync_file(int dma_buf_fd, int sync_file_fd)
+    }
+ 
+    return VK_SUCCESS;
++#endif
+ }
+ 
+ static VkResult
 diff --git a/src/vulkan/wsi/wsi_common_x11.c b/src/vulkan/wsi/wsi_common_x11.c
-index b7724c028ea..a9595291c37 100644
+index f6d711297e3..36b4ec1f14b 100644
 --- a/src/vulkan/wsi/wsi_common_x11.c
 +++ b/src/vulkan/wsi/wsi_common_x11.c
 @@ -439,7 +439,7 @@ wsi_x11_get_connection(struct wsi_device *wsi_dev,
