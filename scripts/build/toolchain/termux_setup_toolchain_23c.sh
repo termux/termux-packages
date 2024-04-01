@@ -113,7 +113,7 @@ termux_setup_toolchain_23c() {
 	# Do not put toolchain in place until we are done with setup, to avoid having a half setup
 	# toolchain left in place if something goes wrong (or process is just aborted):
 	local _TERMUX_TOOLCHAIN_TMPDIR=${TERMUX_STANDALONE_TOOLCHAIN}-tmp
-	rm -Rf $_TERMUX_TOOLCHAIN_TMPDIR
+	rm -Rf "$_TERMUX_TOOLCHAIN_TMPDIR"
 
 	local _NDK_ARCHNAME=$TERMUX_ARCH
 	if [ "$TERMUX_ARCH" = "aarch64" ]; then
@@ -124,7 +124,7 @@ termux_setup_toolchain_23c() {
 	cp $NDK/toolchains/llvm/prebuilt/linux-x86_64 $_TERMUX_TOOLCHAIN_TMPDIR -r
 
 	# Remove android-support header wrapping not needed on android-21:
-	rm -Rf $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/local
+	rm -Rf "$_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/local"
 
 	for HOST_PLAT in aarch64-linux-android armv7a-linux-androideabi i686-linux-android x86_64-linux-android; do
 		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT$TERMUX_PKG_API_LEVEL-clang \
