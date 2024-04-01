@@ -3,10 +3,9 @@ TERMUX_PKG_DESCRIPTION="An open-source implementation of the OpenGL specificatio
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="docs/license.rst"
 TERMUX_PKG_MAINTAINER="xMeM <haooy@outlook.com>"
-TERMUX_PKG_VERSION="23.3.2"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="24.0.4"
 TERMUX_PKG_SRCURL=https://archive.mesa3d.org/mesa-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=3cfcb81fa16f89c56abe3855d2637d396ee4e03849b659000a6b8e5f57e69adc
+TERMUX_PKG_SHA256=90febd30a098cbcd97ff62ecc3dcf5c93d76f7fa314de944cfce81951ba745f0
 TERMUX_PKG_DEPENDS="libandroid-shmem, libc++, libdrm, libx11, libxcb, libxshmfence, libwayland, vulkan-loader-generic, zlib, zstd"
 TERMUX_PKG_BUILD_DEPENDS="libwayland-protocols, libxrandr, xorgproto"
 TERMUX_PKG_CONFLICTS="mesa-vulkan-icd-freedreno"
@@ -27,10 +26,10 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 
 TERMUX_PKG_BLACKLISTED_ARCHES="i686, x86_64"
 
-termux_step_post_get_source() { 
- 	# Do not use meson wrap projects 
- 	rm -rf subprojects 
- }
+termux_step_post_get_source() {
+	# Do not use meson wrap projects
+	rm -rf subprojects
+}
 
 termux_step_pre_configure() {
 	termux_setup_cmake
