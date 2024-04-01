@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Multi-Cloud Object Storage"
 TERMUX_PKG_LICENSE="AGPL-V3"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2024.03.30.09.41.56"
+TERMUX_PKG_REVISION=1
 _VERSION=$(sed 's/\./T/3;s/\./-/g' <<< $TERMUX_PKG_VERSION)
 TERMUX_PKG_SRCURL=https://github.com/minio/minio/archive/refs/tags/RELEASE.${_VERSION}Z.tar.gz
 TERMUX_PKG_SHA256=fd52b7d67aab1a540b8ede7b50674f0b1ce29dbb4344598f3801125396564c9d
@@ -29,7 +30,7 @@ termux_step_make() {
 	-X 'github.com/minio/minio/cmd.GOPATH=$(go env GOPATH)' \
 	-X 'github.com/minio/minio/cmd.GOROOT=$(go env GOROOT)' \
 	"
-	CGO_ENABLED=0 go build -tags kqueue -trimpath --ldflags="$MINIOLDFLAGS" -o minio
+	go build -tags kqueue -trimpath --ldflags="$MINIOLDFLAGS" -o minio
 }
 termux_step_make_install() {
 	install -Dm700 -t "${TERMUX_PREFIX}"/bin minio
