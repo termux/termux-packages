@@ -6,7 +6,7 @@ termux_step_setup_variables() {
 	: "${TERMUX_FORCE_BUILD_DEPENDENCIES:="false"}"
 	: "${TERMUX_INSTALL_DEPS:="false"}"
 	: "${TERMUX_PKG_MAKE_PROCESSES:="$(nproc)"}"
-	: "${TERMUX_NO_CLEAN:="false"}"
+	: "${TERMUX_RM_ALL_PKGS_BUILT_MARKER_AND_INSTALL_FILES:="true"}"
 	: "${TERMUX_PKG_API_LEVEL:="24"}"
 	: "${TERMUX_CONTINUE_BUILD:="false"}"
 	: "${TERMUX_QUIET_BUILD:="false"}"
@@ -49,7 +49,7 @@ termux_step_setup_variables() {
 		# For on-device builds cross-compiling is not supported so we can
 		# store information about built packages under $TERMUX_TOPDIR.
 		TERMUX_BUILT_PACKAGES_DIRECTORY="$TERMUX_TOPDIR/.built-packages"
-		TERMUX_NO_CLEAN="true"
+		TERMUX_RM_ALL_PKGS_BUILT_MARKER_AND_INSTALL_FILES="false"
 
 		if [ "$TERMUX_PACKAGE_LIBRARY" = "bionic" ]; then
 			# On-device builds without termux-exec are unsupported.
