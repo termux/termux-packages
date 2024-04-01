@@ -498,7 +498,7 @@ while (($# >= 1)); do
 			;;
 		-I)
 			export TERMUX_INSTALL_DEPS=true
-			export TERMUX_NO_CLEAN=true
+			export TERMUX_PKGS__BUILD__RM_ALL_PKGS_BUILT_MARKER_AND_INSTALL_FILES=false
 			;;
 		-L) export TERMUX_GLOBAL_LIBRARY=true;;
 		-q) export TERMUX_QUIET_BUILD=true;;
