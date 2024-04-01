@@ -11,8 +11,8 @@ termux_step_setup_build_folders() {
 		   [ "$TERMUX_ON_DEVICE_BUILD" = false ]; then
 		# Remove all previously extracted/built files from
 		# $TERMUX_PREFIX:
-		rm -fr $TERMUX_PREFIX_CLASSICAL
-		rm -f $TERMUX_BUILT_PACKAGES_DIRECTORY/*
+		rm -fr "$TERMUX_PREFIX_CLASSICAL"
+		rm -f "$TERMUX_BUILT_PACKAGES_DIRECTORY"/*
 	fi
 
 	# Cleanup old build state:
@@ -38,8 +38,8 @@ termux_step_setup_build_folders() {
 	if [ "$TERMUX_PACKAGE_LIBRARY" = "bionic" ]; then
 		mkdir -p $TERMUX_PREFIX/{bin,etc,lib,libexec,share,share/LICENSES,tmp,include}
 	elif [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
-		mkdir -p $TERMUX_PREFIX/{bin,etc,lib,share,share/LICENSES,include}
-		mkdir -p $TERMUX_PREFIX_CLASSICAL/{bin,etc,tmp}
+		mkdir -p "$TERMUX_PREFIX"/{bin,etc,lib,share,share/LICENSES,include}
+		mkdir -p "$TERMUX_PREFIX_CLASSICAL"/{bin,etc,tmp}
 	fi
 
 	# Required for creating `BUILDING_IN_SRC.txt` file in termux_step_start_build

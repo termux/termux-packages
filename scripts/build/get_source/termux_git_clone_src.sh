@@ -40,14 +40,14 @@ termux_git_clone_src() {
 
 		echo "Downloading git source $([[ "$termux_pkg_branch_flags" != "" ]] && echo "with branch '${termux_pkg_branch_flags:9}' ")from '$termux_pkg_srcurl'"
 
-		rm -rf $TMP_CHECKOUT
+		rm -rf "$TMP_CHECKOUT"
 		git clone \
 			--depth 1 \
 			$termux_pkg_branch_flags \
 			"$termux_pkg_srcurl" \
-			$TMP_CHECKOUT
+			"$TMP_CHECKOUT"
 
-		pushd $TMP_CHECKOUT
+		pushd "$TMP_CHECKOUT"
 
 		# Workaround some bad server behaviour
 		# error: Server does not allow request for unadvertised object commit_no
@@ -71,11 +71,11 @@ termux_git_clone_src() {
 
 		popd
 
-		echo "$TERMUX_PKG_VERSION" > $TMP_CHECKOUT_VERSION
+		echo "$TERMUX_PKG_VERSION" > "$TMP_CHECKOUT_VERSION"
 	else
 		echo "Skipped downloading of git source from '$termux_pkg_srcurl'"
 	fi
 
-	rm -rf $TERMUX_PKG_SRCDIR
-	cp -Rf $TMP_CHECKOUT $TERMUX_PKG_SRCDIR
+	rm -rf "$TERMUX_PKG_SRCDIR"
+	cp -Rf "$TMP_CHECKOUT" "$TERMUX_PKG_SRCDIR"
 }
