@@ -7,7 +7,7 @@ termux_step_setup_build_folders() {
 	if [ "$TERMUX_SKIP_DEPCHECK" = false ] && \
 		   [ "$TERMUX_INSTALL_DEPS" = true ] && \
 		   [ "$TERMUX_PKG_METAPACKAGE" = false ] && \
-		   [ "$TERMUX_NO_CLEAN" = false ] && \
+		   [ "$TERMUX_RM_ALL_PKGS_BUILT_MARKER_AND_INSTALL_FILES" = true ] && \
 		   [ "$TERMUX_ON_DEVICE_BUILD" = false ]; then
 		# Remove all previously extracted/built files from
 		# $TERMUX_PREFIX:
