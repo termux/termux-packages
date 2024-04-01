@@ -9,7 +9,22 @@ termux_download() {
 	local DESTINATION="$2"
 	local CHECKSUM="$3"
 
-	if [[ -f "$DESTINATION" ]] && [[ "$CHECKSUM" != "SKIP_CHECKSUM" ]]; then
+	if [[ "$URL" =~ ^file://(/[^/]+)+$ ]]; then
+		local source="${URL:7}" # Remove `file://` prefix
+
+		if [ -d "$source" ]; then
+			# Create tar file from local directory
+			echo "Downloading local source directory at '$source'"
+			rm -f "$DESTINATION"
+			(cd "$(dirname "$source")" && tar -cf "$DESTINATION" --exclude=".git" "$(basename "$source")")
+			return 0
+		elif [ ! -f "$source" ]; then
+			echo "No local source file found at path of URL '$URL'"
+			return 1
+		fi
+	fi
+
+	if [ -f "$DESTINATION" ] && [ "$CHECKSUM" != "SKIP_CHECKSUM" ]; then
 		# Keep existing file if checksum matches.
 		local EXISTING_CHECKSUM
 		EXISTING_CHECKSUM=$(sha256sum "$DESTINATION" | cut -d' ' -f1)
