@@ -622,10 +622,6 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 		termux_step_setup_variables
 		termux_step_handle_buildarch
 
-		if [ "$TERMUX_CONTINUE_BUILD" == "false" ]; then
-			termux_step_setup_build_folders
-		fi
-
 		termux_step_cleanup_packages
 		termux_step_start_build
 
