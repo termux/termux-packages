@@ -410,6 +410,7 @@ _show_usage() {
 	echo
 	echo "Available options:"
 	[ "$TERMUX_ON_DEVICE_BUILD" = "false" ] && echo "  -a The architecture to build for: aarch64(default), arm, i686, x86_64 or all."
+	echo "  -c Continue previous build."
 	echo "  -d Build with debug symbols."
 	echo "  -D Build a disabled package in disabled-packages/."
 	echo "  -f Force build even if package has already been built."
