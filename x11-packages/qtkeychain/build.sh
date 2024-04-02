@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/frankosterfeld/qtkeychain
+TERMUX_PKG_DESCRIPTION="Platform-independent Qt API for storing passwords securely."
+TERMUX_PKG_LICENSE="BSD 2-Clause"
+TERMUX_PKG_MAINTAINER="Zhymabek Roman <robanokssamit@yandex.ru>"
+TERMUX_PKG_VERSION=0.14.2
+TERMUX_PKG_SRCURL="https://github.com/frankosterfeld/qtkeychain/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=cf2e972b783ba66334a79a30f6b3a1ea794a1dc574d6c3bebae5ffd2f0399571
+TERMUX_PKG_DEPENDS="dbus, qt5-qtbase, libsecret, qt5-qttools"
+TERMUX_PKG_BUILD_DEPENDS="qt5-qtbase-cross-tools, qt5-qttools-cross-tools"
