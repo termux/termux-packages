@@ -1,22 +1,15 @@
---- pacman-6.0.2/etc/pacman.conf.in	2023-03-10 01:31:38.207470241 +0300
-+++ pacman-6.0.2/etc/pacman.conf.in.patch	2023-03-10 01:33:13.819470172 +0300
-@@ -9,17 +9,17 @@
- [options]
- # The following paths are commented out with their default values listed.
- # If you wish to use different paths, uncomment and update the paths.
--#RootDir     = @ROOTDIR@
-+#RootDir     = /
- #DBPath      = @localstatedir@/lib/pacman/
- #CacheDir    = @localstatedir@/cache/pacman/pkg/
+--- pacman-6.1.0/etc/pacman.conf.in	2024-03-04 06:07:58.000000000 +0300
++++ pacman-6.1.0/etc/pacman.conf.in.patch	2024-03-28 20:02:54.786340874 +0300
+@@ -15,11 +15,11 @@
  #LogFile     = @localstatedir@/log/pacman.log
  #GPGDir      = @sysconfdir@/pacman.d/gnupg/
  #HookDir     = @sysconfdir@/pacman.d/hooks/
 -HoldPkg     = pacman glibc
 -#XferCommand = /usr/bin/curl -L -C - -f -o %o %u
 -#XferCommand = /usr/bin/wget --passive-ftp -c -O %o %u
++HoldPkg      = pacman
 +#XferCommand = @TERMUX_PREFIX@/bin/curl -L -C - -f -o %o %u
 +#XferCommand = @TERMUX_PREFIX@/bin/wget --passive-ftp -c -O %o %u
-+HoldPkg      = pacman
  #CleanMethod = KeepInstalled
 -Architecture = auto
 +Architecture = @TERMUX_ARCH@
@@ -64,7 +57,7 @@
 -# tips on creating your own repositories.
 -#[custom]
 -#SigLevel = Optional TrustAll
--#Server = file:///home/custompkgs
+-#Server = file:///home/packages
 +[main]
 +Include = @TERMUX_PREFIX@/etc/pacman.d/serverlist
 +

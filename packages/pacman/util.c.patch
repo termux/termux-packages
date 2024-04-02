@@ -1,18 +1,25 @@
-diff -uNr pacman-6.0.0/lib/libalpm/util.c pacman-termux/lib/libalpm/util.c
---- pacman-6.0.0/lib/libalpm/util.c	2021-05-20 06:38:45.948119900 +0300
-+++ pacman-termux/lib/libalpm/util.c	2021-10-04 16:00:39.000000000 +0300
-@@ -650,10 +650,6 @@
- 		}
+--- pacman-6.1.0/lib/libalpm/util.c	2024-03-04 06:07:58.000000000 +0300
++++ pacman-6.1.0/lib/libalpm/util.c.patch	2024-03-28 23:01:55.557474407 +0300
+@@ -35,6 +35,7 @@
+ #include <fnmatch.h>
+ #include <poll.h>
+ #include <signal.h>
++#include <sys/syscall.h>
  
+ /* libarchive */
+ #include <archive.h>
+@@ -657,10 +658,6 @@
  		/* use fprintf instead of _alpm_log to send output through the parent */
--		if(chroot(handle->root) != 0) {
+ 		/* don't chroot() to "/": this allows running with less caps when the
+ 		 * caller puts us in the right root */
+-		if(strcmp(handle->root, "/") != 0 && chroot(handle->root) != 0) {
 -			fprintf(stderr, _("could not change the root directory (%s)\n"), strerror(errno));
 -			exit(1);
 -		}
  		if(chdir("/") != 0) {
  			fprintf(stderr, _("could not change directory to %s (%s)\n"),
  					"/", strerror(errno));
-@@ -669,7 +665,7 @@
+@@ -684,7 +681,7 @@
  		/* this code runs for the parent only (wait on the child) */
  		int status;
  		char obuf[PIPE_BUF]; /* writes <= PIPE_BUF are guaranteed atomic */
@@ -21,7 +28,7 @@ diff -uNr pacman-6.0.0/lib/libalpm/util.c pacman-termux/lib/libalpm/util.c
  		ssize_t olen = 0, ilen = 0;
  		nfds_t nfds = 2;
  		struct pollfd fds[2], *child2parent = &(fds[0]), *parent2child = &(fds[1]);
-@@ -897,7 +893,7 @@
+@@ -919,7 +916,7 @@
  	if((tmpdir = getenv("TMPDIR")) && stat(tmpdir, &buf) && S_ISDIR(buf.st_mode)) {
  		/* TMPDIR was good, we can use it */
  	} else {
@@ -30,3 +37,17 @@ diff -uNr pacman-6.0.0/lib/libalpm/util.c pacman-termux/lib/libalpm/util.c
  	}
  	alpm_option_add_cachedir(handle, tmpdir);
  	cachedir = handle->cachedirs->prev->data;
+@@ -1375,11 +1372,11 @@
+ 		CALLOC(check_path, len, sizeof(char), RET_ERR(handle, ALPM_ERR_MEMORY, -1));
+ 		snprintf(check_path, len, "%s%s", dir, file);
+ 
+-		ret = faccessat(AT_FDCWD, check_path, amode, flag);
++		ret = syscall(SYS_faccessat, AT_FDCWD, check_path, amode, flag);
+ 		free(check_path);
+ 	} else {
+ 		dir = "";
+-		ret = faccessat(AT_FDCWD, file, amode, flag);
++		ret = syscall(SYS_faccessat, AT_FDCWD, file, amode, flag);
+ 	}
+ 
+ 	if(ret != 0) {
