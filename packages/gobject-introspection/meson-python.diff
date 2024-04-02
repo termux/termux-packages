@@ -1,7 +1,6 @@
-diff -uNr gobject-introspection/giscanner/meson.build gobject-introspection.mod/giscanner/meson.build
---- gobject-introspection/giscanner/meson.build	2021-06-03 13:43:38.060569823 +0000
-+++ gobject-introspection.mod/giscanner/meson.build	2021-06-03 13:55:08.705053742 +0000
-@@ -98,24 +98,12 @@
+--- a/giscanner/meson.build
++++ b/giscanner/meson.build
+@@ -95,29 +95,12 @@
    dependencies: [glib_dep, gobject_dep, gio_dep, gmodule_dep],
  )
  
@@ -21,27 +20,31 @@ diff -uNr gobject-introspection/giscanner/meson.build gobject-introspection.mod/
    link_with: giscanner_lib,
    c_args: gi_hidden_visibility_cflags + custom_c_args,
    include_directories : configinc,
--  dependencies: [glib_dep, gobject_dep, gio_dep, gmodule_dep,
--                 python_ext_dep],
+-  dependencies: [
+-    glib_dep,
+-    gobject_dep,
+-    gio_dep,
+-    gmodule_dep,
+-    python_ext_dep,
+-  ],
 +  dependencies: [glib_dep, gobject_dep, gio_dep, gmodule_dep],
 +  link_args: '-lpython@PYTHON_VERSION@',
    install: true,
    install_dir: giscannerdir,
  )
-diff -uNr gobject-introspection/meson.build gobject-introspection.mod/meson.build
---- gobject-introspection/meson.build	2021-06-03 13:43:38.062569940 +0000
-+++ gobject-introspection.mod/meson.build	2021-06-03 13:57:59.063038610 +0000
-@@ -3,6 +3,7 @@
-   meson_version: '>= 0.58.2',
+--- a/meson.build
++++ b/meson.build
+@@ -4,6 +4,7 @@
    default_options: [
+     'c_std=gnu99',
      'warning_level=2',
 +    'c_link_args=-lpython@PYTHON_VERSION@',
      'buildtype=debugoptimized',
    ],
  )
-@@ -157,9 +158,6 @@
- libffi_dep = dependency('libffi',
-   fallback : ['libffi', 'ffi_dep'])
+@@ -174,9 +175,6 @@
+   output: 'config.h'
+ )
  
 -# python headers
 -cc.check_header('Python.h', dependencies: [python.dependency()], required: true)
