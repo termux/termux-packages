@@ -3,7 +3,6 @@ TERMUX_PKG_DESCRIPTION="Command-line client tool for Nextcloud."
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Zhymabek Roman <robanokssamit@yandex.ru>"
 TERMUX_PKG_VERSION=3.12.3
-TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/nextcloud/desktop/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=9466abfc663dd12bd9fc8e6812fd9c3ef9a685c773a473532294c638c460c00b
 TERMUX_PKG_DEPENDS="dbus, dbus-glib, libdbusmenu-qt, qt5-qtkeychain, qt5-qtbase, qt5-qttools, inotify-tools, libsqlite, karchive, qt5-qtwebsockets, qt5-qtsvg, qt5-qtwebengine"
