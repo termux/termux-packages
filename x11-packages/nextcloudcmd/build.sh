@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://github.com/nextcloud/desktop
+TERMUX_PKG_HOMEPAGE=https://nextcloud.com/
 TERMUX_PKG_DESCRIPTION="Command-line client tool for Nextcloud."
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Zhymabek Roman <robanokssamit@yandex.ru>"
