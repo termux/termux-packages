@@ -418,6 +418,10 @@ _show_usage() {
 	echo "  -I Download and extract dependencies instead of building them, keep existing $TERMUX_BASE_DIR files."
 	echo "  -L The package and its dependencies will be based on the same library."
 	echo "  -q Quiet build."
+	echo "  -r Remove all package build dependent dirs that '-f/-F'"
+	echo "     flags alone would not remove, like cache dir containing "
+	echo "     package sources and host build dir. Ignored if '-f/-F'"
+	echo "     flags are not passed."
 	echo "  -w Install dependencies without version binding."
 	echo "  -s Skip dependency check."
 	echo "  -o Specify directory where to put built packages. Default: output/."
@@ -493,6 +497,7 @@ while (($# >= 1)); do
 			;;
 		-L) export TERMUX_GLOBAL_LIBRARY=true;;
 		-q) export TERMUX_QUIET_BUILD=true;;
+		-r) export TERMUX_RM_ALL_PKG_BUILD_DEPENDENT_DIRS=true;;
 		-w) export TERMUX_WITHOUT_DEPVERSION_BINDING=true;;
 		-s) export TERMUX_SKIP_DEPCHECK=true;;
 		-o)
@@ -579,6 +584,7 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 					 $({ test "${TERMUX_INSTALL_DEPS:-}" = "true" && test "${TERMUX_RM_ALL_PKGS_BUILT_MARKER_AND_INSTALL_FILES:-}" = "false"; } && echo "-I") \
 					 $(test "${TERMUX_GLOBAL_LIBRARY:-}" = "true" && echo "-L") \
 					 $(test -n "${TERMUX_OUTPUT_DIR:-}" && echo "-o $TERMUX_OUTPUT_DIR") \
+					 $(test "${TERMUX_RM_ALL_PKG_BUILD_DEPENDENT_DIRS:-}" = "true" && echo "-r") \
 					 $(test "${TERMUX_WITHOUT_DEPVERSION_BINDING:-}" = "true" && echo "-w") \
 					 $(test -n "${TERMUX_PACKAGE_FORMAT:-}" && echo "--format $TERMUX_PACKAGE_FORMAT") \
 					 $(test -n "${TERMUX_PACKAGE_LIBRARY:-}" && echo "--library $TERMUX_PACKAGE_LIBRARY") \

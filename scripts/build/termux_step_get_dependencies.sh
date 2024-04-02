@@ -134,6 +134,7 @@ termux_run_build-package() {
 	TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh \
  		$(test "${TERMUX_INSTALL_DEPS}" = "true" && echo "-I" || echo "-s") \
  		$({ test "${TERMUX_FORCE_BUILD}" = "true" && test "${TERMUX_FORCE_BUILD_DEPENDENCIES}" = "true"; } && echo "-F") \
+ 		$(test "${TERMUX_RM_ALL_PKG_BUILD_DEPENDENT_DIRS}" = "true" && echo "-r") \
    		$(test "${TERMUX_WITHOUT_DEPVERSION_BINDING}" = "true" && echo "-w") \
      		--format $TERMUX_PACKAGE_FORMAT --library $set_library "${PKG_DIR}"
 }

@@ -24,6 +24,12 @@ termux_step_setup_build_folders() {
 		"$TERMUX_PKG_TMPDIR" \
 		"$TERMUX_PKG_MASSAGEDIR"
 
+	# Cleanup cache directory containing package sources and hostbuild dir
+	if [ "$TERMUX_FORCE_BUILD" = true ] && \
+			[ "$TERMUX_RM_ALL_PKG_BUILD_DEPENDENT_DIRS" = true ]; then
+		rm -Rf "$TERMUX_PKG_CACHEDIR" "$TERMUX_PKG_HOSTBUILD_DIR"
+	fi
+
 	# Ensure folders present (but not $TERMUX_PKG_SRCDIR, it will
 	# be created in build)
 	mkdir -p "$TERMUX_COMMON_CACHEDIR" \
