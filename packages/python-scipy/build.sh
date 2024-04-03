@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://scipy.org/
 TERMUX_PKG_DESCRIPTION="Fundamental algorithms for scientific computing in Python"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.12.0"
+TERMUX_PKG_VERSION="1.13.0"
 TERMUX_PKG_SRCURL=git+https://github.com/scipy/scipy
 TERMUX_PKG_DEPENDS="libc++, libopenblas, python, python-numpy"
 TERMUX_PKG_BUILD_DEPENDS="python-numpy-static"
@@ -58,7 +58,7 @@ termux_step_configure() {
 
 termux_step_make() {
 	pushd $TERMUX_PKG_SRCDIR
-	python -m build -w -n -x --config-setting builddir=$TERMUX_PKG_BUILDDIR .
+	PYTHONPATH= python -m build -w -n -x --config-setting builddir=$TERMUX_PKG_BUILDDIR .
 	popd
 }
 
