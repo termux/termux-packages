@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Multi-format archive and compression library"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.7.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/libarchive/libarchive/releases/download/v$TERMUX_PKG_VERSION/libarchive-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=df404eb7222cf30b4f8f93828677890a2986b66ff8bf39dac32a804e96ddf104
 TERMUX_PKG_AUTO_UPDATE=true
