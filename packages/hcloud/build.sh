@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Hetzner Cloud command line client"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.43.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/hetznercloud/cli/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=51a979605cce7a146135f58c9b0825ecb39aa6f35cd9c5693c5f048f6e9a3c47
 TERMUX_PKG_DEPENDS="resolv-conf"
@@ -18,7 +19,6 @@ termux_step_pre_configure() {
 
 termux_step_make() {
 	# Below are taken from github.com/hetznercloud/cli@v1.30.1/.goreleaser.yml
-	local CGO_ENABLED=0
 	local LD_FLAGS="-s -w -X 'github.com/hetznercloud/cli/internal/version.Version=v${TERMUX_PKG_VERSION}'"
 	go build -ldflags "${LD_FLAGS}" -o hcloud  cmd/hcloud/main.go 
 }
