@@ -15,7 +15,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-lzma=$TERMUX_PREFIX/include
 --with-lz4=$TERMUX_PREFIX/include
 --with-zstd=$TERMUX_PREFIX/include
---oldincludedir=$TERMUX_PREFIX/include
+--includedir=$TERMUX_PREFIX/include
 --disable-sse2
 --disable-avx2
 "
