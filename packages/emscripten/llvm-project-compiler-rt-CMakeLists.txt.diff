@@ -1,7 +1,6 @@
-diff -uNr llvm-project/compiler-rt/CMakeLists.txt llvm-project.mod/compiler-rt/CMakeLists.txt
---- llvm-project/compiler-rt/CMakeLists.txt	2022-07-22 22:56:15.000000000 +0800
-+++ llvm-project.mod/compiler-rt/CMakeLists.txt	2022-07-23 14:45:26.423586698 +0800
-@@ -187,6 +187,9 @@
+--- a/compiler-rt/CMakeLists.txt
++++ b/compiler-rt/CMakeLists.txt
+@@ -203,6 +203,9 @@
      elseif (FUCHSIA)
        set(${var}_LIBNAME "libc++")
        set(${var}_INTREE 1)
@@ -11,7 +10,7 @@ diff -uNr llvm-project/compiler-rt/CMakeLists.txt llvm-project.mod/compiler-rt/C
      else()
        set(${var}_LIBNAME "libstdc++")
        set(${var}_SYSTEM 1)
-@@ -202,7 +205,7 @@
+@@ -218,7 +221,7 @@
  # TODO: Mark this as internal flag, most users should use COMPILER_RT_CXX_LIBRARY.
  set(SANITIZER_CXX_ABI "default" CACHE STRING
      "Specify C++ ABI library to use.")
@@ -20,7 +19,7 @@ diff -uNr llvm-project/compiler-rt/CMakeLists.txt llvm-project.mod/compiler-rt/C
  set_property(CACHE SANITIZER_CXX_ABI PROPERTY STRINGS ;${CXXABIS})
  handle_default_cxx_lib(SANITIZER_CXX_ABI)
  
-@@ -594,6 +597,8 @@
+@@ -639,6 +642,8 @@
    list(APPEND SANITIZER_CXX_ABI_LIBRARIES "c++abi")
  elseif (SANITIZER_CXX_ABI_LIBNAME STREQUAL "libstdc++")
    append_list_if(COMPILER_RT_HAS_LIBSTDCXX stdc++ SANITIZER_CXX_ABI_LIBRARIES)
