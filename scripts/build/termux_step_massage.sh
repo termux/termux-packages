@@ -115,6 +115,12 @@ termux_step_massage() {
 		done < <(find ./${ADDING_PREFIX}share/man -type l ! -iname \*.gz -print0)
 	fi
 
+	# Remove python-glibc package files that are created
+	# due to its launch during package compilation.
+	if [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ] && [ "$TERMUX_PKG_NAME" != "python-glibc" ]; then
+		rm -f ./${ADDING_PREFIX}lib/python${TERMUX_PYTHON_VERSION}/__pycache__/{base64,platform,quopri}.cpython-${TERMUX_PYTHON_VERSION//./}.pyc
+	fi
+
 	# Check so files were actually installed. Exclude
 	# share/doc/$TERMUX_PKG_NAME/ as a license file is always
 	# installed there.

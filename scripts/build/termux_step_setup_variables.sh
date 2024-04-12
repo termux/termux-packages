@@ -178,7 +178,7 @@ termux_step_setup_variables() {
 	TERMUX_PKG_GROUPS="" # https://wiki.archlinux.org/title/Pacman#Installing_package_groups
 	TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=false # if the package does not support compilation on a device, then this package should not be compiled on devices
 	TERMUX_PKG_SETUP_PYTHON=false # setting python to compile a package
-	TERMUX_PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION) # get the latest version of python
+	TERMUX_PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/$(test "${TERMUX_PACKAGE_LIBRARY}" = "bionic" && echo "packages" || echo "gpkg")/python/build.sh; echo $_MAJOR_VERSION) # get the latest version of python
 	TERMUX_PKG_PYTHON_TARGET_DEPS="" # python modules to be installed via pip3
 	TERMUX_PKG_PYTHON_BUILD_DEPS="" # python modules to be installed via build-pip
 	TERMUX_PKG_PYTHON_COMMON_DEPS="" # python modules to be installed via pip3 or build-pip
