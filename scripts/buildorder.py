@@ -8,7 +8,6 @@ from itertools import filterfalse
 termux_arch = os.getenv('TERMUX_ARCH') or 'aarch64'
 termux_global_library = os.getenv('TERMUX_GLOBAL_LIBRARY') or 'false'
 termux_pkg_library = os.getenv('TERMUX_PACKAGE_LIBRARY') or 'bionic'
-termux_install_deps = os.getenv('TERMUX_INSTALL_DEPS') or 'false'
 
 def unique_everseen(iterable, key=None):
     """List unique elements, preserving order. Remember all elements ever seen.
@@ -83,15 +82,18 @@ def parse_build_file_excluded_arches(path):
     return set(arches)
 
 def parse_build_file_variable_bool(path, var):
-    separate_subdeps = 'false'
+    value = 'false'
 
     with open(path, encoding="utf-8") as build_script:
         for line in build_script:
             if line.startswith(var):
-                separate_subdeps = line.split('=')[-1].replace('\n', '')
+                value = line.split('=')[-1].replace('\n', '')
                 break
 
-    return separate_subdeps == 'true'
+    return value == 'true'
+
+def add_prefix_glibc_to_pkgname(name):
+	return name.replace("-static", "-glibc-static") if "static" == name.split("-")[-1] else name+"-glibc"
 
 class TermuxPackage(object):
     "A main package definition represented by a directory with a build.sh file."
@@ -101,7 +103,7 @@ class TermuxPackage(object):
         self.name = os.path.basename(self.dir)
         self.pkgs_cache = []
         if "gpkg" in self.dir.split("/")[-2].split("-") and "glibc" not in self.name.split("-"):
-            self.name = self.name.replace("-static", "-glibc-static") if "static" == self.name.split("-")[-1] else f"{self.name}-glibc"
+            self.name = add_prefix_glibc_to_pkgname(self.name)
 
         # search package build.sh
         build_sh_path = os.path.join(self.dir, 'build.sh')
@@ -113,6 +115,7 @@ class TermuxPackage(object):
         self.excluded_arches = parse_build_file_excluded_arches(build_sh_path)
         self.only_installing = parse_build_file_variable_bool(build_sh_path, 'TERMUX_PKG_ONLY_INSTALLING')
         self.separate_subdeps = parse_build_file_variable_bool(build_sh_path, 'TERMUX_PKG_SEPARATE_SUB_DEPENDS')
+        self.accept_dep_scr = parse_build_file_variable_bool(build_sh_path, 'TERMUX_PKG_ACCEPT_PKG_IN_DEP')
 
         if os.getenv('TERMUX_ON_DEVICE_BUILD') == "true" and termux_pkg_library == "bionic":
             always_deps = ['libc++']
@@ -146,7 +149,7 @@ class TermuxPackage(object):
         is_root = dir_root == None
         if is_root:
             dir_root = self.dir
-        if is_root or termux_install_deps == 'false' or not self.separate_subdeps:
+        if is_root or not self.fast_build_mode or not self.separate_subdeps:
             for subpkg in self.subpkgs:
                 if f"{self.name}-static" != subpkg.name:
                     self.deps.add(subpkg.name)
@@ -157,18 +160,15 @@ class TermuxPackage(object):
                 self.deps.difference_update([subpkg.name for subpkg in self.subpkgs])
         for dependency_name in sorted(self.deps):
             if termux_global_library == "true" and termux_pkg_library == "glibc" and "glibc" not in dependency_name.split("-"):
-                if "static" == dependency_name.split("-")[-1]:
-                    mod_dependency_name = dependency_name.replace("-static", "-glibc-static")
-                else:
-                    mod_dependency_name = f"{dependency_name}-glibc"
+                mod_dependency_name = add_prefix_glibc_to_pkgname(dependency_name)
                 dependency_name = mod_dependency_name if mod_dependency_name in pkgs_map else dependency_name
             if dependency_name not in self.pkgs_cache:
                 self.pkgs_cache.append(dependency_name)
                 dependency_package = pkgs_map[dependency_name]
-                if dependency_package.dir != dir_root and dependency_package.only_installing and termux_install_deps == 'false':
+                if dependency_package.dir != dir_root and dependency_package.only_installing and not self.fast_build_mode:
                     continue
                 result += dependency_package.recursive_dependencies(pkgs_map, dir_root)
-                if dependency_package.dir != dir_root:
+                if dependency_package.accept_dep_scr or dependency_package.dir != dir_root:
                     result += [dependency_package]
         return unique_everseen(result)
 
@@ -180,10 +180,11 @@ class TermuxSubPackage:
 
         self.name = os.path.basename(subpackage_file_path).split('.subpackage.sh')[0]
         if "gpkg" in subpackage_file_path.split("/")[-3].split("-") and "glibc" not in self.name.split("-"):
-            self.name = self.name.replace("-static", "-glibc-static") if "static" == self.name.split("-")[-1] else f"{self.name}-glibc"
+            self.name = add_prefix_glibc_to_pkgname(self.name)
         self.parent = parent
         self.deps = set([parent.name])
         self.only_installing = parent.only_installing
+        self.accept_dep_scr = parent.accept_dep_scr
         self.excluded_arches = set()
         if not virtual:
             self.deps |= parse_build_file_dependencies(subpackage_file_path)
@@ -207,7 +208,7 @@ class TermuxSubPackage:
             dependency_package = pkgs_map[dependency_name]
             if dependency_package not in self.parent.subpkgs:
                 result += dependency_package.recursive_dependencies(pkgs_map, dir_root=dir_root)
-            if dependency_package.dir != dir_root:
+            if dependency_package.accept_dep_scr or dependency_package.dir != dir_root:
                 result += [dependency_package]
         return unique_everseen(result)
 
@@ -374,7 +375,7 @@ def main():
     for pkg in build_order:
         pkg_name = pkg.name
         if termux_global_library == "true" and termux_pkg_library == "glibc" and "glibc" not in pkg_name.split("-"):
-            pkg_name = pkg_name.replace("-static", "-glibc-static") if "static" == pkg_name.split("-")[-1] else f"{pkg_name}-glibc"
+            pkg_name = add_prefix_glibc_to_pkgname(pkgname)
         print("%-30s %s" % (pkg_name, pkg.dir))
 
 if __name__ == '__main__':
