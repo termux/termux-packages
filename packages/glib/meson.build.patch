@@ -68,3 +68,16 @@
    have_bind_textdomain_codeset = true  # proxy-libintl supports it
  endif
  
+@@ -2551,11 +2546,7 @@
+ 
+ # introspection
+ gir_scanner = find_program('g-ir-scanner', required: get_option('introspection'))
+-enable_gir = get_option('introspection').allowed() and gir_scanner.found() and meson.can_run_host_binaries()
+-
+-if get_option('introspection').enabled() and not meson.can_run_host_binaries()
+-  error('Running binaries on the build host needs to be supported to build with -Dintrospection=enabled')
+-endif
++enable_gir = get_option('introspection').allowed() and gir_scanner.found()
+ 
+ gir_args = [
+   '--quiet',
