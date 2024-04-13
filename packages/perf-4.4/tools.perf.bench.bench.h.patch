@@ -1,0 +1,19 @@
+diff -uNr android-trusty-4.4/tools/perf/bench/bench.h android-trusty-4.4.mod/tools/perf/bench/bench.h
+--- android-trusty-4.4/tools/perf/bench/bench.h	2024-04-11 13:24:41.344000000 +0800
++++ android-trusty-4.4.mod/tools/perf/bench/bench.h	2024-04-12 20:42:40.595991949 +0800
+@@ -1,6 +1,8 @@
+ #ifndef BENCH_H
+ #define BENCH_H
+ 
++#include <sys/time.h>
++
+ /*
+  * The madvise transparent hugepage constants were added in glibc
+  * 2.13. For compatibility with older versions of glibc, define these
+@@ -48,5 +50,6 @@
+ 
+ extern int bench_format;
+ extern unsigned int bench_repeat;
++extern struct timeval termux_bench_start, termux_bench_end, termux_bench_runtime;
+ 
+ #endif

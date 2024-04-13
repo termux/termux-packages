@@ -1,0 +1,50 @@
+diff -uNr android-trusty-4.4/tools/perf/bench/futex-hash.c android-trusty-4.4.mod/tools/perf/bench/futex-hash.c
+--- android-trusty-4.4/tools/perf/bench/futex-hash.c	2024-04-11 13:24:41.344000000 +0800
++++ android-trusty-4.4.mod/tools/perf/bench/futex-hash.c	2024-04-12 20:59:07.259999790 +0800
+@@ -28,7 +28,7 @@
+ static bool fshared = false, done = false, silent = false;
+ static int futex_flag = 0;
+ 
+-struct timeval start, end, runtime;
++struct timeval termux_bench_start, termux_bench_end, termux_bench_runtime;
+ static pthread_mutex_t thread_lock;
+ static unsigned int threads_starting;
+ static struct stats throughput_stats;
+@@ -92,8 +92,8 @@
+ {
+ 	/* inform all threads that we're done for the day */
+ 	done = true;
+-	gettimeofday(&end, NULL);
+-	timersub(&end, &start, &runtime);
++	gettimeofday(&termux_bench_end, NULL);
++	timersub(&termux_bench_end, &termux_bench_start, &termux_bench_runtime);
+ }
+ 
+ static void print_summary(void)
+@@ -103,7 +103,7 @@
+ 
+ 	printf("%sAveraged %ld operations/sec (+- %.2f%%), total secs = %d\n",
+ 	       !silent ? "\n" : "", avg, rel_stddev_stats(stddev, avg),
+-	       (int) runtime.tv_sec);
++	       (int) termux_bench_runtime.tv_sec);
+ }
+ 
+ int bench_futex_hash(int argc, const char **argv,
+@@ -148,7 +148,7 @@
+ 
+ 	threads_starting = nthreads;
+ 	pthread_attr_init(&thread_attr);
+-	gettimeofday(&start, NULL);
++	gettimeofday(&termux_bench_start, NULL);
+ 	for (i = 0; i < nthreads; i++) {
+ 		worker[i].tid = i;
+ 		worker[i].futex = calloc(nfutexes, sizeof(*worker[i].futex));
+@@ -191,7 +191,7 @@
+ 	pthread_mutex_destroy(&thread_lock);
+ 
+ 	for (i = 0; i < nthreads; i++) {
+-		unsigned long t = worker[i].ops/runtime.tv_sec;
++		unsigned long t = worker[i].ops/termux_bench_runtime.tv_sec;
+ 		update_stats(&throughput_stats, t);
+ 		if (!silent) {
+ 			if (nfutexes == 1)

@@ -1,0 +1,17 @@
+diff -uNr android-trusty-4.4/tools/perf/util/parse-events.y android-trusty-4.4.mod/tools/perf/util/parse-events.y
+--- android-trusty-4.4/tools/perf/util/parse-events.y	2024-04-11 13:24:41.601000000 +0800
++++ android-trusty-4.4.mod/tools/perf/util/parse-events.y	2024-04-11 16:11:55.490997383 +0800
+@@ -36,6 +36,13 @@
+ 		data->nr_groups++;
+ }
+ 
++/* should fix conflicting types for parse_events_error
++ * due to implicit declaration.
++ */
++void parse_events_error(YYLTYPE *loc, void *data,
++			void *scanner __maybe_unused,
++			char const *msg __maybe_unused);
++
+ %}
+ 
+ %token PE_START_EVENTS PE_START_TERMS

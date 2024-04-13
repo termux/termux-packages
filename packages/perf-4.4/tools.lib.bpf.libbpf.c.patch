@@ -1,0 +1,20 @@
+diff -uNr android-trusty-4.4/tools/lib/bpf/libbpf.c android-trusty-4.4.mod/tools/lib/bpf/libbpf.c
+--- android-trusty-4.4/tools/lib/bpf/libbpf.c	2024-04-11 13:24:41.235000000 +0800
++++ android-trusty-4.4.mod/tools/lib/bpf/libbpf.c	2024-04-12 19:44:12.839994458 +0800
+@@ -11,6 +11,7 @@
+ #include <stdarg.h>
+ #include <inttypes.h>
+ #include <string.h>
++#include <strings.h>
+ #include <unistd.h>
+ #include <fcntl.h>
+ #include <errno.h>
+@@ -641,7 +642,7 @@
+ 				 GELF_R_SYM(rel.r_info),
+ 				 &sym)) {
+ 			pr_warning("relocation: symbol %"PRIx64" not found\n",
+-				   GELF_R_SYM(rel.r_info));
++				   (uint64_t)(GELF_R_SYM(rel.r_info) & 0xffffffff));
+ 			return -LIBBPF_ERRNO__FORMAT;
+ 		}
+ 

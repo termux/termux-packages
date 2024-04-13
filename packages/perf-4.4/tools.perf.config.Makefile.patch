@@ -1,0 +1,13 @@
+diff -uNr android-trusty-4.4/tools/perf/config/Makefile android-trusty-4.4.mod/tools/perf/config/Makefile
+--- android-trusty-4.4/tools/perf/config/Makefile	2024-04-14 00:49:51.437987308 +0800
++++ android-trusty-4.4.mod/tools/perf/config/Makefile	2024-04-14 01:23:44.161985854 +0800
+@@ -202,6 +202,9 @@
+ CFLAGS += -I$(srctree)/arch/$(ARCH)/include
+ CFLAGS += -I$(srctree)/include/uapi
+ CFLAGS += -I$(srctree)/include
++# add termux prefix to the last search path.
++# prevents conflicts of "event.h" (libevent) and "event.h" (kernel header)
++CFLAGS += -I$(prefix)/include
+ 
+ # $(obj-perf)      for generated common-cmds.h
+ # $(obj-perf)/util for generated bison/flex headers

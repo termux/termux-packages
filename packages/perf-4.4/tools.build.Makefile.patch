@@ -1,0 +1,32 @@
+diff -uNr android-trusty-4.4/tools/build/Makefile android-trusty-4.4.mod/tools/build/Makefile
+--- android-trusty-4.4/tools/build/Makefile	2024-04-12 13:47:48.665997732 +0800
++++ android-trusty-4.4.mod/tools/build/Makefile	2024-04-12 14:49:40.072997395 +0800
+@@ -14,6 +14,15 @@
+ $(call allow-override,CC,$(CROSS_COMPILE)gcc)
+ $(call allow-override,LD,$(CROSS_COMPILE)ld)
+ 
++define allow-override-host
++  $(if $(or $(findstring environment,$(origin HOST$(1))),\
++            $(findstring command line,$(origin HOST$(1)))),,\
++    $(eval $(1) = $(2)))
++endef
++
++$(call allow-override-host,CC,$(HOSTCC))
++$(call allow-override-host,LD,$(HOSTLD))
++
+ ifeq ($(V),1)
+   Q =
+ else
+@@ -33,10 +42,10 @@
+ 	$(Q)rm -f fixdep
+ 
+ $(OUTPUT)fixdep-in.o: FORCE
+-	$(Q)$(MAKE) $(build)=fixdep
++	$(Q)$(MAKE) CC=$(HOSTCC) $(build)=fixdep
+ 
+ $(OUTPUT)fixdep: $(OUTPUT)fixdep-in.o
+-	$(QUIET_LINK)$(CC) $(LDFLAGS) -o $@ $<
++	$(QUIET_LINK)$(HOSTCC) $(LDFLAGS) -o $@ $<
+ 
+ FORCE:
+ 

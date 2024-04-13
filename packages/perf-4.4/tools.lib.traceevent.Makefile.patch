@@ -1,0 +1,12 @@
+diff -uNr android-trusty-4.4/tools/lib/traceevent/Makefile android-trusty-4.4.mod/tools/lib/traceevent/Makefile
+--- android-trusty-4.4/tools/lib/traceevent/Makefile	2024-04-11 13:24:41.251000000 +0800
++++ android-trusty-4.4.mod/tools/lib/traceevent/Makefile	2024-04-12 22:30:38.359995862 +0800
+@@ -251,7 +251,7 @@
+ 
+ define do_generate_dynamic_list_file
+ 	(echo '{';							\
+-	$(NM) -u -D $1 | awk 'NF>1 {print "\t"$$2";"}' | sort -u;	\
++	$(NM) -u -D $1 | awk 'NF>1 {sub("@.*", "", $$2); print "\t"$$2";"}' | sort -u; \
+ 	echo '};';							\
+ 	) > $2
+ endef

@@ -1,0 +1,14 @@
+diff -uNr android-trusty-4.4/tools/perf/util/cpumap.c android-trusty-4.4.mod/tools/perf/util/cpumap.c
+--- android-trusty-4.4/tools/perf/util/cpumap.c	2024-04-11 13:24:41.516000000 +0800
++++ android-trusty-4.4.mod/tools/perf/util/cpumap.c	2024-04-12 22:05:18.255996949 +0800
+@@ -7,6 +7,10 @@
+ #include <stdlib.h>
+ #include "asm/bug.h"
+ 
++int max_cpu_num;
++int max_node_num;
++int *cpunode_map;
++
+ static struct cpu_map *cpu_map__default_new(void)
+ {
+ 	struct cpu_map *cpus;

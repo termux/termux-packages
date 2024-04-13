@@ -1,0 +1,15 @@
+diff -uNr android-trusty-4.4/tools/perf/bench/futex.h android-trusty-4.4.mod/tools/perf/bench/futex.h
+--- android-trusty-4.4/tools/perf/bench/futex.h	2024-04-11 13:24:41.349000000 +0800
++++ android-trusty-4.4.mod/tools/perf/bench/futex.h	2024-04-13 14:44:27.466999281 +0800
+@@ -32,6 +32,11 @@
+  * These argument descriptions are the defaults for all
+  * like-named arguments in the following wrappers except where noted below.
+  */
++
++#if !defined(SYS_futex) && defined(SYS_futex_time64)
++#define SYS_futex SYS_futex_time64
++#endif
++
+ #define futex(uaddr, op, val, timeout, uaddr2, val3, opflags) \
+ 	syscall(SYS_futex, uaddr, op | opflags, val, timeout, uaddr2, val3)
+ 
