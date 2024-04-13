@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<dump>
+  <interface name="GFileDescriptorBased" get-type="g_file_descriptor_based_get_type">
+  </interface>
+  <boxed name="GUnixMountEntry" get-type="g_unix_mount_entry_get_type"/>
+  <boxed name="GUnixMountPoint" get-type="g_unix_mount_point_get_type"/>
+  <class name="GUnixMountMonitor" get-type="g_unix_mount_monitor_get_type" parents="GObject">
+    <signal name="mounts-changed" return="void" when="last">
+    </signal>
+    <signal name="mountpoints-changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="GUnixFDMessage" get-type="g_unix_fd_message_get_type" parents="GSocketControlMessage,GObject">
+    <property name="fd-list" type="GUnixFDList" flags="235"/>
+  </class>
+  <class name="GUnixInputStream" get-type="g_unix_input_stream_get_type" parents="GInputStream,GObject">
+    <implements name="GPollableInputStream"/>
+    <implements name="GFileDescriptorBased"/>
+    <property name="fd" type="gint" flags="235" default-value="-1"/>
+    <property name="close-fd" type="gboolean" flags="227" default-value="TRUE"/>
+  </class>
+  <class name="GUnixOutputStream" get-type="g_unix_output_stream_get_type" parents="GOutputStream,GObject">
+    <implements name="GPollableOutputStream"/>
+    <implements name="GFileDescriptorBased"/>
+    <property name="fd" type="gint" flags="235" default-value="-1"/>
+    <property name="close-fd" type="gboolean" flags="227" default-value="TRUE"/>
+  </class>
+  <class name="GDesktopAppInfo" get-type="g_desktop_app_info_get_type" parents="GObject">
+    <implements name="GAppInfo"/>
+    <property name="filename" type="gchararray" flags="11" default-value="NULL"/>
+  </class>
+  <interface name="GDesktopAppInfoLookup" get-type="g_desktop_app_info_lookup_get_type">
+  </interface>
+</dump>

@@ -3,16 +3,20 @@ TERMUX_PKG_DESCRIPTION="Library providing core building blocks for libraries and
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.80.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/glib/${TERMUX_PKG_VERSION%.*}/glib-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=8228a92f92a412160b139ae68b6345bd28f24434a7b5af150ebe21ff587a561d
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libandroid-support, libffi, libiconv, pcre2, resolv-conf, zlib"
+TERMUX_PKG_BUILD_DEPENDS="gobject-introspection"
 TERMUX_PKG_BREAKS="glib-dev"
 TERMUX_PKG_REPLACES="glib-dev"
+TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
--Dintrospection=disabled
+-Dintrospection=enabled
 -Druntime_dir=$TERMUX_PREFIX/var/run
 -Dlibmount=disabled
+-Dman-pages=enabled
 -Dtests=false
 "
 TERMUX_PKG_RM_AFTER_INSTALL="
@@ -63,6 +67,11 @@ termux_step_host_build() {
 termux_step_pre_configure() {
 	# glib checks for __BIONIC__ instead of __ANDROID__:
 	CFLAGS+=" -D__BIONIC__=1"
+
+	TERMUX_PKG_VERSION=. termux_setup_gir
+
+	# Workaround: Remove cyclic dependency between gir and glib
+	sed -i "/Requires:/d" "${TERMUX_PREFIX}/lib/pkgconfig/gobject-introspection-1.0.pc"
 }
 
 termux_step_post_make_install() {
@@ -73,6 +82,13 @@ termux_step_post_make_install() {
 			"${TERMUX_PREFIX}/lib/pkgconfig/${pc}" \
 			> "${TERMUX_PREFIX}/opt/glib/cross/lib/x86_64-linux-gnu/pkgconfig/${pc}"
 	done
+
+	# Workaround: Restore deleted line in pre-configure step
+	echo "Requires: glib-2.0 gobject-2.0" >> "${TERMUX_PREFIX}/lib/pkgconfig/gobject-introspection-1.0.pc"
+}
+
+termux_step_post_massage() {
+	rm -v lib/pkgconfig/gobject-introspection-1.0.pc
 }
 
 termux_step_create_debscripts() {
