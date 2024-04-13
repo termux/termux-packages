@@ -18,7 +18,7 @@ def get_pkg_hash_from_Packages(Packages_file, package, version, hash_type="SHA25
                         break
                 elif line.startswith(hash_type):
                     print(line.split(" ")[1])
-                    break
+                    package_list.clear()
 
 def get_Packages_hash_from_Release(Release_file, arch, component, hash_type="SHA256"):
     string_to_find = component+'/binary-'+arch+'/Packages'
