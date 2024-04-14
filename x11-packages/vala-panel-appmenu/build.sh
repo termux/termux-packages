@@ -7,7 +7,7 @@ TERMUX_PKG_SRCURL=https://gitlab.com/vala-panel-project/vala-panel-appmenu/-/arc
 TERMUX_PKG_SHA256=83b1803ea18afa9edfaad008ff378ef4b560d4ef968eadf552915d3569029c52
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="glib"
-TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, glib-cross, valac"
+TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, glib-cross, gtk2, gtk3, valac"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dwm_backend=wnck
 -Dvalapanel=disabled
@@ -15,7 +15,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dmate=disabled
 -Dbudgie=disabled
 -Dregistrar=disabled
--Dappmenu-gtk-module=disabled
+-Dappmenu-gtk-module=enabled
 -Djayatana=disabled
 "
 
