@@ -1,0 +1,13 @@
+Fix seccomp crash with setgid(9999)
+
+--- a/src/portab/portab.h
++++ b/src/portab/portab.h
+@@ -128,7 +128,7 @@ typedef unsigned char bool;
+ # define HOST_VENDOR "unknown"
+ #endif
+ 
+-#ifdef __HAIKU__
++#if defined(__HAIKU__) || defined(__ANDROID__)
+ # define SINGLE_USER_OS
+ #endif
+ 
