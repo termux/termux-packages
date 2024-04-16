@@ -1,6 +1,6 @@
 TERMUX_SUBPKG_INCLUDE="
 bin/gtk-update-icon-cache
-share/man/man1/gtk-update-icon-cache.1
+share/man/man1/gtk-update-icon-cache.1.gz
 "
 
 TERMUX_SUBPKG_DEPENDS="gdk-pixbuf, glib"
