@@ -1,15 +1,14 @@
-diff -uNr nelua-lang/Makefile nelua-lang.mod/Makefile
---- nelua-lang/Makefile	2022-08-28 12:14:53.076791242 +0800
-+++ nelua-lang.mod/Makefile	2022-08-28 12:16:10.306791213 +0800
+--- ./Makefile	2024-04-16 20:58:39.980928203 +0800
++++ ./Makefile	2024-04-16 21:01:18.432928142 +0800
 @@ -40,7 +40,6 @@
- OPT_CFLAGS=-O3 -flto -fno-plt -fno-stack-protector
+ FAST_CFLAGS=-O3 -flto=auto -fno-plt -fno-stack-protector
+ ARCH_CFLAGS=-march=native
  ifeq ($(SYS), Linux)
- 	CFLAGS=-std=gnu99 -O2
 -	CC=gcc
- 	DEFS+=-DLUA_USE_LINUX
- 	LIBS+=-lm -ldl
- 	LDFLAGS+=-Wl,-E
-@@ -227,7 +226,7 @@
+ 	DEFS+=-std=gnu99 -DLUA_USE_LINUX
+ 	LIBS+=-lm -ldl -Wl,-E
+ 	ifeq ($(CC), musl-gcc)
+@@ -226,7 +225,7 @@
  # Install
  
  # Install paths
@@ -18,7 +17,7 @@ diff -uNr nelua-lang/Makefile nelua-lang.mod/Makefile
  DPREFIX=$(DESTDIR)$(PREFIX)
  PREFIX_BIN=$(DPREFIX)/bin
  PREFIX_LIB=$(DPREFIX)/lib
-@@ -350,7 +349,7 @@
+@@ -349,7 +348,7 @@
  
  CACHE_DIR=.cache
  ifdef HOME
