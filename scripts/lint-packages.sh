@@ -88,21 +88,37 @@ lint_package() {
 
 	echo
 
-	echo -n "Syntax check: "
+	echo -n "File permission check: "
+	local file_permission
+	file_permission=$(stat -c "%A" "$package_script")
+	if [[ "$file_permission" == *"x"* ]]; then
+		echo -e "FAILED (executable bit is set)\n"
+		echo "${file_permission}"
+		return 1
+	fi
+	echo "PASS"
 
+	echo -n "Syntax check: "
 	local syntax_errors
 	syntax_errors=$(bash -n "$package_script" 2>&1)
-
 	if [ -n "$syntax_errors" ]; then
 		echo "FAILED"
 		echo
 		echo "$syntax_errors"
 		echo
-
 		return 1
 	else
 		echo "PASS"
 	fi
+
+	echo -n "Trailing whitespace check: "
+	local trailing_whitespace
+	trailing_whitespace=$(grep -n " $" "$package_script")
+	if [ -n "$trailing_whitespace" ]; then
+		echo -e "FAILED\n\n${trailing_whitespace}\n"
+		return 1
+	fi
+	echo "PASS"
 
 	echo
 
