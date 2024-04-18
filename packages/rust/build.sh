@@ -2,27 +2,64 @@ TERMUX_PKG_HOMEPAGE=https://www.rust-lang.org/
 TERMUX_PKG_DESCRIPTION="Systems programming language focused on safety, speed and concurrency"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.77.0"
+TERMUX_PKG_VERSION="1.77.2"
 TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/rustc-${TERMUX_PKG_VERSION}-src.tar.xz
-TERMUX_PKG_SHA256=66126989782cbf77fa3aff121bbb108429f2d46fe19328c3de231553de711b90
+TERMUX_PKG_SHA256=4d214c4189e4dd934d47e869fa5721b2c33dbbbdea21f2fc7fa6df3f38c1dea2
 _LLVM_MAJOR_VERSION=$(. $TERMUX_SCRIPTDIR/packages/libllvm/build.sh; echo $LLVM_MAJOR_VERSION)
 _LLVM_MAJOR_VERSION_NEXT=$((_LLVM_MAJOR_VERSION + 1))
 _LZMA_VERSION=$(. $TERMUX_SCRIPTDIR/packages/liblzma/build.sh; echo $TERMUX_PKG_VERSION)
 TERMUX_PKG_DEPENDS="clang, libc++, libllvm (<< ${_LLVM_MAJOR_VERSION_NEXT}), lld, openssl, zlib"
 TERMUX_PKG_BUILD_DEPENDS="wasi-libc"
 TERMUX_PKG_NO_STATICSPLIT=true
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/llc
 bin/llvm-*
 bin/opt
 bin/sh
 lib/liblzma.a
+lib/liblzma.so
 lib/liblzma.so.${_LZMA_VERSION}
 lib/libtinfo.so.6
 lib/libz.so
 lib/libz.so.1
 share/wasi-sysroot
 "
+
+termux_pkg_auto_update() {
+	# based on scripts/updates/internal/termux_repology_auto_update.sh
+	local e=0
+	local latest_version
+	latest_version=$(termux_repology_api_get_latest_version "${TERMUX_PKG_NAME}")
+	if [[ "${latest_version}" == "${TERMUX_PKG_VERSION}" ]]; then
+		echo "INFO: Already up to date."
+		return
+	fi
+	[[ "${latest_version}" == "null" ]] && e=1
+	local uptime_now=$(cat /proc/uptime)
+	local uptime_s="${uptime_now//.*}"
+	local uptime_h_limit=4
+	local uptime_s_limit=$((uptime_h_limit*60*60))
+	[[ -z "${uptime_s}" ]] && e=1
+	[[ "${uptime_s}" == 0 ]] && e=1
+	[[ "${uptime_s}" -gt "${uptime_s_limit}" ]] && e=1
+
+	if [[ "${e}" != 0 ]]; then
+		cat <<- EOL >&2
+		WARN: Auto update failure!
+		latest_version=${latest_version}
+		uptime_now=${uptime_now}
+		uptime_s=${uptime_s}
+		uptime_s_limit=${uptime_s_limit}
+		EOL
+		return
+	fi
+
+	sed \
+		-e "s/^\tlocal BOOTSTRAP_VERSION=.*/\tlocal BOOTSTRAP_VERSION=${TERMUX_PKG_VERSION}/" \
+		-i "${TERMUX_PKG_BUILDER_DIR}/build.sh"
+	termux_pkg_upgrade_version "${latest_version}"
+}
 
 termux_step_pre_configure() {
 	termux_setup_cmake
@@ -65,6 +102,7 @@ termux_step_pre_configure() {
 	# know where those are. Putting them temporarly in $PREFIX/lib prevents that failure
 	# https://github.com/termux/termux-packages/issues/11427
 	mv $TERMUX_PREFIX/lib/liblzma.a{,.tmp} || :
+	mv $TERMUX_PREFIX/lib/liblzma.so{,.tmp} || :
 	mv $TERMUX_PREFIX/lib/liblzma.so.${_LZMA_VERSION}{,.tmp} || :
 	mv $TERMUX_PREFIX/lib/libtinfo.so.6{,.tmp} || :
 	mv $TERMUX_PREFIX/lib/libz.so.1{,.tmp} || :
@@ -79,7 +117,7 @@ termux_step_configure() {
 	# like 30 to 40 + minutes ... so lets get it right
 
 	# upstream tests build using versions N and N-1
-	local BOOTSTRAP_VERSION="${TERMUX_PKG_VERSION}"
+	local BOOTSTRAP_VERSION=1.77.1
 	if rustup install $BOOTSTRAP_VERSION; then
 	rustup default $BOOTSTRAP_VERSION-x86_64-unknown-linux-gnu
 	export PATH=$HOME/.rustup/toolchains/$BOOTSTRAP_VERSION-x86_64-unknown-linux-gnu/bin:$PATH
@@ -132,6 +170,15 @@ termux_step_make_install() {
 	# remove version suffix: beta, nightly
 	local TERMUX_PKG_VERSION=${TERMUX_PKG_VERSION//~*}
 
+	# needed to workaround build issue that only happens on x86_64
+	# /home/runner/.termux-build/rust/build/build/bootstrap/debug/bootstrap: error while loading shared libraries: /lib/x86_64-linux-gnu/libc.so: invalid ELF header
+	if [[ "$TERMUX_ARCH" == "x86_64" ]]; then
+		mv ${TERMUX_PREFIX}{,.tmp}
+		$TERMUX_PKG_SRCDIR/x.py build --host x86_64-unknown-linux-gnu --stage 1 cargo
+		[[ -d "${TERMUX_PREFIX}" ]] && termux_error_exit "Contaminated PREFIX found:\n$(find ${TERMUX_PREFIX} | sort)"
+		mv ${TERMUX_PREFIX}{.tmp,}
+	fi
+
 	if ! :; then
 	# speed up building rust for testing
 	$TERMUX_PKG_SRCDIR/x.py install --stage 1 --target $CARGO_TARGET_NAME
@@ -159,6 +206,7 @@ termux_step_make_install() {
 	cd "$TERMUX_PREFIX/lib"
 	rm -f libc.so libdl.so
 	mv liblzma.a{.tmp,} || :
+	mv liblzma.so{.tmp,} || :
 	mv liblzma.so.${_LZMA_VERSION}{.tmp,} || :
 	mv libtinfo.so.6{.tmp,} || :
 	mv libz.so.1{.tmp,} || :
