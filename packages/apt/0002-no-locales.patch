@@ -20,18 +20,18 @@ diff -uNr apt-2.1.11/apt-pkg/contrib/strutl.cc apt-2.1.11.mod/apt-pkg/contrib/st
 diff -uNr apt-2.1.11/apt-pkg/deb/debrecords.cc apt-2.1.11.mod/apt-pkg/deb/debrecords.cc
 --- apt-2.1.11/apt-pkg/deb/debrecords.cc	2020-10-21 12:53:18.000000000 +0300
 +++ apt-2.1.11.mod/apt-pkg/deb/debrecords.cc	2020-11-05 15:54:06.103564689 +0200
-@@ -22,7 +22,9 @@
+@@ -24,7 +24,9 @@
  #include <sstream>
  #include <string>
  #include <vector>
 +#ifndef __ANDROID__
  #include <langinfo.h>
 +#endif
- #include <string.h>
  
  #include <apti18n.h>
-@@ -150,12 +152,14 @@
- 	 orig = Section.FindS("Description");
+ 									/*}}}*/
+@@ -151,12 +153,14 @@ string debRecordParserBase::LongDesc(std::string const &lang)
+ 	 orig = Section.Find(pkgTagSection::Key::Description).to_string();
     }
  
 +#ifndef __ANDROID__
