@@ -7,7 +7,7 @@ termux_step_make() {
 	fi
 
 	if test -f build.ninja; then
-		ninja -w dupbuild=warn -j $TERMUX_MAKE_PROCESSES
+		ninja -j $TERMUX_MAKE_PROCESSES
 	elif ls ./*.cabal &>/dev/null; then
 		cabal build
 	elif ls ./*akefile &>/dev/null || [ ! -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
