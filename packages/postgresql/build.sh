@@ -58,7 +58,7 @@ termux_step_post_make_install() {
 	make -C doc/src/sgml install-man
 
 	for contrib in \
-                btree_gin \
+		btree_gin \
 		btree_gist \
 		citext \
 		dblink \
