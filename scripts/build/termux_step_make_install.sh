@@ -3,7 +3,7 @@ termux_step_make_install() {
 	[ "$TERMUX_PKG_METAPACKAGE" = "true" ] && return
 
 	if test -f build.ninja; then
-		ninja -w dupbuild=warn -j $TERMUX_MAKE_PROCESSES install
+		ninja -j $TERMUX_MAKE_PROCESSES install
 	elif test -f setup.py || test -f pyproject.toml || test -f setup.cfg; then
 		pip install --no-deps . --prefix $TERMUX_PREFIX
 	elif ls ./*.cabal &>/dev/null; then
