@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="The ZIM library is the reference implementation for the 
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="9.2.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/openzim/libzim/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=979ad974d2dbd7ed36241cd3da8abde394bfb6f1973e5f47c2ac6cb6d7af3a07
 TERMUX_PKG_AUTO_UPDATE=true
