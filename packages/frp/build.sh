@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://gofrp.org/doc
+TERMUX_PKG_HOMEPAGE=https://gofrp.org/
 TERMUX_PKG_DESCRIPTION="A fast reverse proxy to expose a local server behind a NAT or firewall to the internet"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="2096779623 <admin@utermux.dev>"
