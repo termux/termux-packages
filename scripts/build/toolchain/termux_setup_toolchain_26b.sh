@@ -69,8 +69,8 @@ termux_setup_toolchain_26b() {
 	# We might also want to consider shipping libomp.so instead; since r21
 	LDFLAGS+=" -fopenmp -static-openmp"
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
-  		LDFLAGS+=" -fno-openmp-implicit-rpath"
-    	fi
+		LDFLAGS+=" -fno-openmp-implicit-rpath"
+	fi
 
 	# Android 7 started to support DT_RUNPATH (but not DT_RPATH).
 	LDFLAGS+=" -Wl,--enable-new-dtags"
@@ -100,8 +100,9 @@ termux_setup_toolchain_26b() {
 	export GOOS=android
 	export CGO_ENABLED=1
 	export GO_LDFLAGS="-extldflags=-pie"
-	export CGO_LDFLAGS="${LDFLAGS/-Wl,-z,relro,-z,now/}"
-	CGO_LDFLAGS="${LDFLAGS/-static-openmp/}"
+	export CGO_LDFLAGS="${LDFLAGS/ -Wl,-z,relro,-z,now/}"
+	CGO_LDFLAGS="${CGO_LDFLAGS/ -static-openmp/}"
+	CGO_LDFLAGS="${CGO_LDFLAGS/ -fno-openmp-implicit-rpath/}"
 	export CGO_CFLAGS="-I$TERMUX_PREFIX/include"
 	export RUSTFLAGS="-C link-arg=-Wl,-rpath=$TERMUX_PREFIX/lib -C link-arg=-Wl,--enable-new-dtags"
 
