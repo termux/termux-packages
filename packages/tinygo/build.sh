@@ -4,11 +4,12 @@ TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.31.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/tinygo-org/tinygo
 TERMUX_PKG_GIT_BRANCH="v${TERMUX_PKG_VERSION}"
-TERMUX_PKG_SHA256=90e35acf0463c299ee47d2d6836d19ce92471f4732f13047a58433407bc7e8f2
-TERMUX_PKG_DEPENDS="libc++"
-TERMUX_PKG_RECOMMENDS="binaryen, golang"
+TERMUX_PKG_SHA256=cb5e95fe40ea983ded57730a4abcb194439a657a84041787733a6227a8fd1700
+TERMUX_PKG_DEPENDS="binaryen, golang, libc++"
+TERMUX_PKG_ANTI_BUILD_DEPENDS="binaryen, golang"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
@@ -89,9 +90,6 @@ termux_pkg_auto_update() {
 }
 
 termux_step_post_get_source() {
-	# this is a workaround for build-all.sh issue
-	TERMUX_PKG_DEPENDS+=", tinygo-common"
-
 	# https://github.com/tinygo-org/tinygo/blob/release/Makefile
 	# https://github.com/espressif/llvm-project
 	make llvm-source GO=:
@@ -140,6 +138,9 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
+	# this is a workaround for build-all.sh issue
+	TERMUX_PKG_DEPENDS+=", tinygo-common"
+
 	# https://github.com/termux/termux-packages/issues/16358
 	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "true" ]]; then
 		echo "WARN: ld.lld wrapper is not working for on-device builds. Skipping."
