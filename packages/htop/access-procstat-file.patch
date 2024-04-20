@@ -1,25 +1,9 @@
-diff -uNr htop-3.2.0/linux/LinuxProcessList.c htop-3.2.0.mod/linux/LinuxProcessList.c
---- htop-3.2.0/linux/LinuxProcessList.c	2022-05-01 14:31:20.000000000 +0800
-+++ htop-3.2.0.mod/linux/LinuxProcessList.c	2022-06-18 13:46:07.415229800 +0800
-@@ -274,7 +274,14 @@
-    this->haveSmapsRollup = (access(PROCDIR "/self/smaps_rollup", R_OK) == 0);
+diff --git a/linux/LinuxMachine.c b/linux/LinuxMachine.c
+--- a/linux/LinuxMachine.c
++++ b/linux/LinuxMachine.c
+@@ -404,7 +404,15 @@ static void LinuxMachine_scanCPUTime(LinuxMachine* this) {
  
-    // Read btime (the kernel boot time, as number of seconds since the epoch)
--   FILE* statfile = fopen(PROCSTATFILE, "r");
-+   FILE* statfile;
-+
-+   if (access("/proc/stat", R_OK) == 0){
-+      statfile = fopen("/proc/stat", "r");
-+   } else {
-+      statfile = fopen(PROCSTATFILE, "r");
-+   }
-+
-    if (statfile == NULL)
-       CRT_fatalError("Cannot open " PROCSTATFILE);
-    while (true) {
-@@ -1925,7 +1932,15 @@
- 
-    LinuxProcessList_updateCPUcount(super);
+    LinuxMachine_updateCPUcount(this);
  
 -   FILE* file = fopen(PROCSTATFILE, "r");
 +   FILE* file;
@@ -32,5 +16,21 @@ diff -uNr htop-3.2.0/linux/LinuxProcessList.c htop-3.2.0.mod/linux/LinuxProcessL
 +   }
 +
     if (!file)
+       CRT_fatalError("Cannot open " PROCSTATFILE);
+ 
+@@ -653,7 +661,14 @@ Machine* Machine_new(UsersTable* usersTable, uid_t userId) {
+       CRT_fatalError("Cannot get clock ticks by sysconf(_SC_CLK_TCK)");
+ 
+    // Read btime (the kernel boot time, as number of seconds since the epoch)
+-   FILE* statfile = fopen(PROCSTATFILE, "r");
++   FILE* statfile;
++
++   if (access("/proc/stat", R_OK) == 0){
++      statfile = fopen("/proc/stat", "r");
++   } else {
++      statfile = fopen(PROCSTATFILE, "r");
++   }
++
+    if (statfile == NULL)
        CRT_fatalError("Cannot open " PROCSTATFILE);
  
