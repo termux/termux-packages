@@ -4,9 +4,9 @@ TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # NOTE: as of 1.12.0 compilation fails when package zstd is
 # present in TERMUX_PREFIX.
-TERMUX_PKG_VERSION="1.27.3"
+TERMUX_PKG_VERSION="1.27.6"
 TERMUX_PKG_SRCURL=https://github.com/syncthing/syncthing/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=fa2edae90c7999a6f667bba26a6c63c7165647f77c02c83860237c6d08ee4bbd
+TERMUX_PKG_SHA256=7db43491488263379d7e240207eb3c3e4eff7bdbefe5fd3b8f902c154e338e30
 TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make() {
@@ -27,7 +27,7 @@ termux_step_make() {
 	export GO_ARCH="${GOARCH}"
 	export _CC="${CC}"
 	export GO_OS="${GOOS}"
-	unset GOOS GOARCH CC
+	unset GOOS GOARCH CGO_LDFLAGS CC
 
 	rm -rf vendor # syncthing has vendored dependencies, which fails with our compiler.
 	# Now file structure is same as go get etc.
