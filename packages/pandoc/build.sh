@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://pandoc.org/
 TERMUX_PKG_DESCRIPTION="Universal markup converter"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.19.2
+TERMUX_PKG_VERSION=3.1.13
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -15,11 +15,11 @@ termux_step_make_install() {
 	case "$TERMUX_ARCH" in
 		aarch64)
 			srcurl="https://github.com/jgm/pandoc/releases/download/${TERMUX_PKG_VERSION}/pandoc-${TERMUX_PKG_VERSION}-linux-arm64.tar.gz"
-			sha256="43f364915b9da64905fc3f6009f5542f224e54fb24f71043ef5154540f1a3983"
+			sha256="678c09ac4227c88b491f6e75491e6da871fd08d79b8c0f0ee37b611f01ad3d25"
 			;;
 		x86_64)
 			srcurl="https://github.com/jgm/pandoc/releases/download/${TERMUX_PKG_VERSION}/pandoc-${TERMUX_PKG_VERSION}-linux-amd64.tar.gz"
-			sha256="9d55c7afb6a244e8a615451ed9cb02e6a6f187ad4d169c6d5a123fa74adb4830"
+			sha256="db556c98cf207d2fddc088d12d2e2f367d9401784d4a3e914b068fa895dcf3f0"
 			;;
 		*)
 			termux_error_exit "Unsupported arch: $TERMUX_ARCH"
