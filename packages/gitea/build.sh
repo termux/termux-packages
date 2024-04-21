@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://gitea.io
 TERMUX_PKG_DESCRIPTION="Git with a cup of tea, painless self-hosted git service"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.21.5"
+TERMUX_PKG_VERSION="1.21.11"
 TERMUX_PKG_SRCURL=https://github.com/go-gitea/gitea/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=d6f1ab196011cb53e98abfa2a85d7b5a730a69ea426cc1e24a451e410b76a7a5
+TERMUX_PKG_SHA256=9828409e71c9fcf46bbe8f858974d5b863dfc4a7e539165cef98890ac6bd2e2f
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="dash, git"
 TERMUX_PKG_CONFFILES="etc/gitea/app.ini"
@@ -21,6 +21,7 @@ termux_step_make() {
 	cp -a "$TERMUX_PKG_SRCDIR" "$GOPATH"/src/code.gitea.io/gitea
 	cd "$GOPATH"/src/code.gitea.io/gitea
 
+	export CGO_LDFLAGS="${CGO_LDFLAGS/ -fno-openmp-implicit-rpath}"
 	go mod init || :
 	go mod tidy
 
