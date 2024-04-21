@@ -1,0 +1,11 @@
+--- a/Makefile
++++ b/Makefile
+@@ -7,7 +7,7 @@
+ DATE := $(shell date +'%Y-%m-%d')
+ GOFLAGS ?= -buildmode=pie -trimpath -mod=readonly -modcacherw -pgo=default.pgo
+ GOFLAGS_STATIC ?= -trimpath -mod=readonly -modcacherw -pgo=default.pgo
+-LDFLAGS := -s -w -extldflags '-static' \
++LDFLAGS := -s -w -extldflags '$(LDFLAGS)' \
+ 	-X '$(PACKAGE)/build.Version=$(VERSION)' \
+ 	-X '$(PACKAGE)/build.User=$(shell id -u -n)' \
+ 	-X '$(PACKAGE)/build.Time=$(shell LC_ALL=en_US.UTF-8 date)'

@@ -10,8 +10,9 @@ TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
 	termux_setup_golang
+	sed -i 's|CGO_ENABLED=0|CGO_ENABLED=1|g' Makefile
 
-	make build
+	make build VERSION=$TERMUX_PKG_VERSION
 	make gdu.1
 }
 
