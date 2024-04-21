@@ -29,6 +29,15 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DUSE_AVIF=OFF
 "
 
+termux_step_post_get_source() {
+	# Version guard
+	local ver_e=${TERMUX_PKG_VERSION#*:}
+	local ver_x=$(. $TERMUX_SCRIPTDIR/x11-packages/webkitgtk-6.0/build.sh; echo ${TERMUX_PKG_VERSION#*:})
+	if [ "${ver_e}" != "${ver_x}" ]; then
+		termux_error_exit "Version mismatch between webkit2gtk-4.1 and webkitgtk-6.0."
+	fi
+}
+
 termux_step_pre_configure() {
 	TERMUX_PKG_VERSION=. termux_setup_gir
 
