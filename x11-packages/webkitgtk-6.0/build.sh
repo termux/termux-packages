@@ -35,6 +35,15 @@ termux_step_pre_configure() {
 		-DENABLE_WEBDRIVER=OFF
 	"
 
+	# FIXME: `GI_VERSION` mismatched from Termux and the building machine. On April 22,
+	# FIXME: 2024, Termux has version 1.80.1 but Ubuntu 22.04 has version 1.72.0.
+	# FIXME: `cmake` will pick up `GI_VERSION` from the config files of Termux, but
+	# FIXME: it is intended to use the version in the building machine.
+	if [ "$TERMUX_ON_DEVICE_BUILD" = false ]; then
+		sed -i 's@if ("${GI_VERSION}" VERSION_GREATER_EQUAL 1.79.2)@if (FALSE)@g' \
+			$TERMUX_PKG_SRCDIR/Source/WebKit/PlatformGTK.cmake
+	fi
+
 	termux_setup_gir
 
 	# Workaround for https://github.com/android/ndk/issues/1973
