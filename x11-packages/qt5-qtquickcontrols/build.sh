@@ -11,18 +11,18 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_NO_STATICSPLIT=true
 
 termux_step_configure () {
-    "${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
-        -spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-cross"
+	"${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
+		-spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-cross"
 }
 
 termux_step_post_make_install() {
-    #######################################################
-    ##
-    ##  Fixes & cleanup.
-    ##
-    #######################################################
+	#######################################################
+	##
+	##  Fixes & cleanup.
+	##
+	#######################################################
 
-    ## Remove *.la files.
-    find "${TERMUX_PREFIX}/lib" -iname \*.la -delete
+	## Remove *.la files.
+	find "${TERMUX_PREFIX}/lib" -iname \*.la -delete
 }
 
