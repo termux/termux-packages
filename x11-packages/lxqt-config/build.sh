@@ -13,7 +13,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DWITH_INPUT=OFF -DWITH_MONITOR=OFF"
 TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_pre_configure() {
-    # This is required because of the private lib used by lxqt-config-appearance
-    LDFLAGS+=" -Wl,-rpath=${TERMUX_PREFIX}/lib/lxqt-config"
-    export LDFLAGS
+	# This is required because of the private lib used by lxqt-config-appearance
+	LDFLAGS+=" -Wl,-rpath=${TERMUX_PREFIX}/lib/lxqt-config"
+	export LDFLAGS
 }

@@ -85,7 +85,7 @@ termux_step_pre_configure() {
 
 termux_step_post_make_install () {
 	rm -f "${TERMUX_PREFIX}/usr/share/X11/xkb/compiled"
-	install -Dm644 -t "$TERMUX_PREFIX/etc/X11/" "${TERMUX_PKG_BUILDER_DIR}/xorg.conf" 
+	install -Dm644 -t "$TERMUX_PREFIX/etc/X11/" "${TERMUX_PKG_BUILDER_DIR}/xorg.conf"
 }
 
 ## The following is required for package 'tigervnc'.

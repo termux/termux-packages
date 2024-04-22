@@ -25,8 +25,8 @@ termux_step_post_massage() {
 	local _GUARD_FILES="lib/libtelepathy-glib.so"
 	local f
 	for f in ${_GUARD_FILES}; do
-		 if [ ! -e "${f}" ]; then
-			  termux_error_exit "Error: file ${f} not found."
-		 fi
+		if [ ! -e "${f}" ]; then
+			termux_error_exit "Error: file ${f} not found."
+		fi
 	done
 }
