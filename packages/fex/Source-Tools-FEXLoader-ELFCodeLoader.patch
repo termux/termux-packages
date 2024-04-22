@@ -1,0 +1,16 @@
+diff --git a/Source/Tools/FEXLoader/ELFCodeLoader.h b/Source/Tools/FEXLoader/ELFCodeLoader.h
+index ffb5ec1..fdbb098 100644
+--- a/Source/Tools/FEXLoader/ELFCodeLoader.h
++++ b/Source/Tools/FEXLoader/ELFCodeLoader.h
+@@ -182,7 +182,11 @@ class ELFCodeLoader final : public FEX::CodeLoader {
+     do {
+       // This is guaranteed to not be interrupted by a signal,
+       // since fewer than 256 bytes of RNG data are requested
++#if defined(__ANDROID__) && __ANDROID_API__ < 28
++      Result = syscall(__NR_getrandom, Data, DataSize, 0);
++#else
+       Result = getrandom(Data, DataSize, 0);
++#endif
+     } while (Result != -1 && Result != DataSize);
+ 
+     return Result != -1;

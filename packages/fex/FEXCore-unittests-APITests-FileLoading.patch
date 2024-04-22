@@ -1,0 +1,13 @@
+diff --git a/FEXCore/unittests/APITests/FileLoading.cpp b/FEXCore/unittests/APITests/FileLoading.cpp
+index e1b7169..2f20314 100644
+--- a/FEXCore/unittests/APITests/FileLoading.cpp
++++ b/FEXCore/unittests/APITests/FileLoading.cpp
+@@ -3,7 +3,7 @@
+ 
+ TEST_CASE("LoadFile-Doesn'tExist") {
+   fextl::string MapsFile;
+-  auto Read = FEXCore::FileLoading::LoadFile(MapsFile, "/tmp/a/b/c/d/e/z");
++  auto Read = FEXCore::FileLoading::LoadFile(MapsFile, "@TERMUX_PREFIX@/tmp/a/b/c/d/e/z");
+   REQUIRE(MapsFile.size() == 0);
+   REQUIRE(Read == false);
+ }
