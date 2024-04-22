@@ -15,7 +15,7 @@ termux_step_post_get_source() {
 	local _SOVERSION=0
 
 	local v=$(sed -n "/library('inih'/,/)\s*$/p" meson.build | \
-			 sed -En "s/\s*soversion\s*:\s*'?([0-9]+).*/\1/p")
+			sed -En "s/\s*soversion\s*:\s*'?([0-9]+).*/\1/p")
 	if [ "${v}" != "${_SOVERSION}" ]; then
 		termux_error_exit "SOVERSION guard check failed."
 	fi

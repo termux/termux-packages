@@ -27,7 +27,7 @@ _LIBNSS_SIGN_LIBS="libfreebl3.so libnssdbm3.so libsoftokn3.so"
 termux_step_host_build() {
 	mkdir -p nsinstall
 	cd nsinstall
-	for f in nsinstall.c pathsub.c; do 
+	for f in nsinstall.c pathsub.c; do
 		gcc -c $TERMUX_PKG_SRCDIR/nss/coreconf/nsinstall/$f
 	done
 	gcc nsinstall.o pathsub.o -o nsinstall

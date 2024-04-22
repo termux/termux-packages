@@ -23,7 +23,7 @@ termux_step_post_get_source() {
 	if [ $TERMUX_ARCH = i686 ]; then
 		# Android i686 has same config as arm (verified by generating a file on a i686 device):
 		cp $TERMUX_PKG_SRCDIR/src/syscfg/lock-obj-pub.arm-unknown-linux-androideabi.h \
-		   $TERMUX_PKG_SRCDIR/src/syscfg/lock-obj-pub.linux-android.h
+			$TERMUX_PKG_SRCDIR/src/syscfg/lock-obj-pub.linux-android.h
 	elif [ $TERMUX_ARCH = x86_64 ]; then
 		# FIXME: Generate on device.
 		cp $TERMUX_PKG_BUILDER_DIR/lock-obj-pub.aarch64-unknown-linux-android.h \

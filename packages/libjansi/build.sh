@@ -11,14 +11,14 @@ TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_post_get_source() {
 	termux_download https://raw.githubusercontent.com/openjdk/jdk/jdk-11%2B28/src/java.base/unix/native/include/jni_md.h \
-	    ${TERMUX_PKG_CACHEDIR}/jni_md.h 48888b52ef525a8c92985b501162b2e4ca7bb2a742456e4c053c1417e8ccfff2
+		${TERMUX_PKG_CACHEDIR}/jni_md.h 48888b52ef525a8c92985b501162b2e4ca7bb2a742456e4c053c1417e8ccfff2
 }
 
 termux_step_make() {
-    local s=$TERMUX_PKG_SRCDIR/src/main/native/jansi
-    ${CC} -o ${TERMUX_PKG_SRCDIR}/libjansi.so \
-        ${s}.c ${s}_isatty.c ${s}_structs.c ${s}_ttyname.c \
-        ${CFLAGS} -fPIC -I${TERMUX_PKG_CACHEDIR} ${LDFLAGS} -shared
+	local s=$TERMUX_PKG_SRCDIR/src/main/native/jansi
+	${CC} -o ${TERMUX_PKG_SRCDIR}/libjansi.so \
+		${s}.c ${s}_isatty.c ${s}_structs.c ${s}_ttyname.c \
+		${CFLAGS} -fPIC -I${TERMUX_PKG_CACHEDIR} ${LDFLAGS} -shared
 }
 
 termux_step_make_install() {
