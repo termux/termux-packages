@@ -11,21 +11,21 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_NO_STATICSPLIT=true
 
 termux_step_configure () {
-    "${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
-        -spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-cross"
+	"${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
+		-spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-cross"
 }
 
 termux_step_post_make_install() {
-    #######################################################
-    ##
-    ##  Fixes & cleanup.
-    ##
-    #######################################################
+	#######################################################
+	##
+	##  Fixes & cleanup.
+	##
+	#######################################################
 
-    ## Drop QMAKE_PRL_BUILD_DIR because reference the build dir.
-    sed -i -e '/^QMAKE_PRL_BUILD_DIR/d' "${TERMUX_PREFIX}/lib/libQt5WebSockets.prl"
+	## Drop QMAKE_PRL_BUILD_DIR because reference the build dir.
+	sed -i -e '/^QMAKE_PRL_BUILD_DIR/d' "${TERMUX_PREFIX}/lib/libQt5WebSockets.prl"
 
-    ## Remove *.la files.
-    find "${TERMUX_PREFIX}/lib" -iname \*.la -delete
+	## Remove *.la files.
+	find "${TERMUX_PREFIX}/lib" -iname \*.la -delete
 }
 

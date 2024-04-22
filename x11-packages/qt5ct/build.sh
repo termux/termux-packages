@@ -12,7 +12,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_NO_STATICSPLIT=true
 
 termux_step_configure () {
-    "${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
-        -spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-cross" \
-        PREFIX="${TERMUX_PREFIX}"
+	"${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
+		-spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-cross" \
+		PREFIX="${TERMUX_PREFIX}"
 }
