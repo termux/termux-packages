@@ -1,6 +1,6 @@
 --- a/zig/lib/libc/musl/src/ipc/semtimedop.c
 +++ b/zig/lib/libc/musl/src/ipc/semtimedop.c
-@@ -16,7 +16,7 @@
+@@ -15,7 +15,7 @@
  
  int semtimedop(int id, struct sembuf *buf, size_t n, const struct timespec *ts)
  {
@@ -130,9 +130,9 @@
  	int r = -ENOSYS;
 --- a/zig/lib/libc/musl/src/stat/fstatat.c
 +++ b/zig/lib/libc/musl/src/stat/fstatat.c
-@@ -7,6 +7,9 @@
- #include <sys/sysmacros.h>
+@@ -8,6 +8,9 @@
  #include "syscall.h"
+ #include "kstat.h"
  
 +#undef SYS_lstat
 +#undef SYS_stat
@@ -140,10 +140,22 @@
  struct statx {
  	uint32_t stx_mask;
  	uint32_t stx_blksize;
-@@ -139,14 +142,18 @@
+@@ -36,8 +39,10 @@
+ static int fstatat_statx(int fd, const char *restrict path, struct stat *restrict st, int flag)
+ {
+ 	struct statx stx;
+-
++	int ret;
++#if 0
+ 	int ret = __syscall(SYS_statx, fd, path, flag, 0x7ff, &stx);
++#endif
+ 	if (ret) return ret;
+ 
+ 	*st = (struct stat){
+@@ -134,10 +139,12 @@
+ int fstatat(int fd, const char *restrict path, struct stat *restrict st, int flag)
  {
  	int ret;
- #ifdef SYS_fstatat
 +#if 0
  	if (sizeof((struct kstat){0}.st_atime_sec) < sizeof(time_t)) {
  		ret = fstatat_statx(fd, path, st, flag);
@@ -151,14 +163,8 @@
  	}
 +#endif
  	ret = fstatat_kstat(fd, path, st, flag);
- #else
-+#if 0
- 	ret = fstatat_statx(fd, path, st, flag);
- #endif
-+#endif
  	return __syscall_ret(ret);
  }
- 
 --- a/zig/lib/libc/musl/src/stat/utimensat.c
 +++ b/zig/lib/libc/musl/src/stat/utimensat.c
 @@ -12,7 +12,7 @@
@@ -194,7 +200,7 @@
  	int r = -ENOSYS;
 --- a/zig/lib/libc/musl/src/time/clock_gettime.c
 +++ b/zig/lib/libc/musl/src/time/clock_gettime.c
-@@ -75,7 +75,7 @@
+@@ -72,7 +72,7 @@
  	}
  #endif
  
