@@ -52,19 +52,19 @@ termux_step_host_build() {
 	# Compile libepoxy
 	mkdir -p libepoxy-build
 	$TERMUX_MESON $TERMUX_PKG_SRCDIR/libepoxy libepoxy-build \
-        --cross-file $TERMUX_MESON_CROSSFILE \
-        --prefix=$_INSTALL_PREFIX \
+		--cross-file $TERMUX_MESON_CROSSFILE \
+		--prefix=$_INSTALL_PREFIX \
 		--libdir lib \
-        -Degl=yes -Dglx=no -Dx11=false
+		-Degl=yes -Dglx=no -Dx11=false
 	ninja -C libepoxy-build install -j $TERMUX_MAKE_PROCESSES
 
 	# Compile virglrenderer
 	mkdir -p virglrenderer-build
 	$TERMUX_MESON $TERMUX_PKG_SRCDIR virglrenderer-build \
-        --cross-file $TERMUX_MESON_CROSSFILE \
-        --prefix=$_INSTALL_PREFIX \
+		--cross-file $TERMUX_MESON_CROSSFILE \
+		--prefix=$_INSTALL_PREFIX \
 		--libdir lib \
-        -Dplatforms=egl
+		-Dplatforms=egl
 	ninja -C virglrenderer-build install -j $TERMUX_MAKE_PROCESSES
 }
 

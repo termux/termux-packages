@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://gitlab.gnome.org/GNOME/gtk-doc
-TERMUX_PKG_DESCRIPTION="GTK+ DocBook Documentation Generator" 
+TERMUX_PKG_DESCRIPTION="GTK+ DocBook Documentation Generator"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.33.2

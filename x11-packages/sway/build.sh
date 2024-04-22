@@ -17,5 +17,5 @@ termux_step_pre_configure() {
 
 	# XXX: use alloca for shm_open
 	export CPPFLAGS+=" -Wno-alloca"
-    export LDFLAGS+=" -landroid-wordexp"
+	export LDFLAGS+=" -landroid-wordexp"
 }

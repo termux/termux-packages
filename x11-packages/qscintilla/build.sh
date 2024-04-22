@@ -15,19 +15,19 @@ TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_EXTRA_MAKE_ARGS="-C src"
 
 termux_step_configure () {
-    for i in src designer; do
-        cd "${TERMUX_PKG_SRCDIR}/${i}" && {
-            "${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
-                -spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-cross"
-        }
-    done
-    unset i
+	for i in src designer; do
+		cd "${TERMUX_PKG_SRCDIR}/${i}" && {
+			"${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
+				-spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-cross"
+		}
+	done
+	unset i
 }
 
 termux_step_post_make_install() {
-    cd "${TERMUX_PKG_SRCDIR}/designer" && {
-        make -j "${TERMUX_MAKE_PROCESSES}"
-        make install
-    }
+	cd "${TERMUX_PKG_SRCDIR}/designer" && {
+		make -j "${TERMUX_MAKE_PROCESSES}"
+		make install
+	}
 }
 
