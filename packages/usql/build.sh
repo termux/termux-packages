@@ -24,7 +24,7 @@ termux_step_make() {
 		-trimpath \
 		-tags="$tags" \
 		-ldflags="-X github.com/xo/usql/text.CommandName=usql
-                  -X github.com/xo/usql/text.CommandVersion=$TERMUX_PKG_VERSION" \
+		-X github.com/xo/usql/text.CommandVersion=$TERMUX_PKG_VERSION" \
 		-o usql
 }
 

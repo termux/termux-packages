@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION="2.7.0"
 TERMUX_PKG_SRCURL=https://github.com/AbiWord/enchant/releases/download/v${TERMUX_PKG_VERSION}/enchant-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=2a073dc6ebe753196c0674a781ccf321bed25d1c6e43bffb97e2c92af420952c
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-relocatable" 
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-relocatable"
 TERMUX_PKG_DEPENDS="aspell, glib, hunspell, libc++"
 
 termux_step_pre_configure() {

@@ -18,6 +18,6 @@ termux_step_make_install() {
 			c7a8c4d08c29d237880844b1623099f59092602f189be38ce3912e457ff38bc1
 	termux_download https://cgit.freedesktop.org/libreoffice/dictionaries/plain/en/en_US.dic \
 			$TERMUX_PREFIX/share/hunspell/en_US.dic \
-		        f0b1a234bd178bdd01875b2a392a9647f888b8fe879f79c52aae62c2759b3647
+			f0b1a234bd178bdd01875b2a392a9647f888b8fe879f79c52aae62c2759b3647
 	touch $TERMUX_PREFIX/share/hunspell/en_US.{aff,dic}
 }

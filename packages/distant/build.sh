@@ -16,7 +16,7 @@ termux_step_pre_configure() {
 	export LIBSSH2_SYS_USE_PKG_CONFIG=1
 	export PKG_CONFIG_ALLOW_CROSS=1
 
-    sed -i "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" ${TERMUX_PKG_SRCDIR}/src/constants.rs
+	sed -i "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" ${TERMUX_PKG_SRCDIR}/src/constants.rs
 
 	termux_setup_rust
 	: "${CARGO_HOME:=$HOME/.cargo}"

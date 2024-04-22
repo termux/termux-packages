@@ -20,4 +20,4 @@ termux_step_create_debscripts() {
 	pip3 install --upgrade $TERMUX_PKG_PYTHON_TARGET_DEPS
 	EOF
 }
- 
+

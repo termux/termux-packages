@@ -18,7 +18,7 @@ termux_step_pre_configure() {
 	mkdir -p _lib
 	cd _lib
 	$CC $CPPFLAGS $CFLAGS -fvisibility=hidden \
-		-c $TERMUX_PKG_BUILDER_DIR/ctermid.c 
+		-c $TERMUX_PKG_BUILDER_DIR/ctermid.c
 	$AR cru libctermid.a ctermid.o
 
 	RUSTFLAGS+=" -C link-arg=$TERMUX_PKG_BUILDDIR/_lib/libctermid.a"

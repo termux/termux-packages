@@ -23,7 +23,7 @@ termux_step_pre_configure() {
 	CXXFLAGS+=" $CPPFLAGS"
 	export OBJCC="$CC"
 	export OBJCFLAGS="$CFLAGS -fobjc-nonfragile-abi"
-        export LDFLAGS+=" -landroid-utimes"
+	export LDFLAGS+=" -landroid-utimes"
 	LD="$CXX"
 }
 

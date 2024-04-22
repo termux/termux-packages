@@ -121,6 +121,6 @@ termux_step_pre_configure() {
 	export HIMKTABLES=$TERMUX_PKG_HOSTBUILD_DIR/texk/web2c/himktables
 
 	sed -e "s%@TERMUX_PREFIX@%$TERMUX_PREFIX%g" \
-	    -e "s%@YEAR@%${TERMUX_PKG_VERSION:0:4}%g" \
+		-e "s%@YEAR@%${TERMUX_PKG_VERSION:0:4}%g" \
 		"$TERMUX_PKG_BUILDER_DIR"/texk-kpathsea-texmf.cnf.diff | patch --silent -p1
 }

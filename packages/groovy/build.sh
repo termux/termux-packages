@@ -53,7 +53,7 @@ termux_step_make_install() {
 	rm -rf $TERMUX_PREFIX/opt/groovy
 	mkdir -p $TERMUX_PREFIX/opt/groovy
 	find . -mindepth 1 -maxdepth 1 ! -name jansi ! -name jline2 \
-		 -exec cp -r \{\} $TERMUX_PREFIX/opt/groovy/ \;
+			-exec cp -r \{\} $TERMUX_PREFIX/opt/groovy/ \;
 	for i in $TERMUX_PREFIX/opt/groovy/bin/*; do
 		if [ ! -f "$i" ]; then
 			continue

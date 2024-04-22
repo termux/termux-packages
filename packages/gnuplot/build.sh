@@ -36,5 +36,5 @@ termux_step_post_make_install() {
 	mkdir -p $TERMUX_PREFIX/share/gnuplot/${TERMUX_PKG_VERSION:0:3}/
 
 	cp $TERMUX_PKG_HOSTBUILD_DIR/docs/gnuplot.gih \
-	   $TERMUX_PREFIX/share/gnuplot/${TERMUX_PKG_VERSION:0:3}/gnuplot.gih
+		$TERMUX_PREFIX/share/gnuplot/${TERMUX_PKG_VERSION:0:3}/gnuplot.gih
 }

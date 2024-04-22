@@ -81,7 +81,7 @@ termux_step_configure() {
 		--enable-libmp3lame \
 		--enable-libopencore-amrnb \
 		--enable-libopencore-amrwb \
-  		--enable-libopenmpt \
+		--enable-libopenmpt \
 		--enable-libopus \
 		--enable-librav1e \
 		--enable-libsoxr \

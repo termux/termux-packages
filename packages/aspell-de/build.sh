@@ -21,6 +21,6 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-    make install
+	make install
 	echo "add de_CH.multi" > "${TERMUX_PREFIX}/lib/aspell-0.60/swiss.alias"
 }
