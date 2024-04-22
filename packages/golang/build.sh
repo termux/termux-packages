@@ -29,14 +29,14 @@ termux_step_make_install() {
 	# Unset PKG_CONFIG to avoid the path being hardcoded into src/cmd/cgo/zdefaultcc.go,
 	# see https://github.com/termux/termux-packages/issues/3505.
 	env CC_FOR_TARGET=$CC \
-	    CXX_FOR_TARGET=$CXX \
-	    CC=gcc \
-	    GO_LDFLAGS="-extldflags=-pie" \
-	    GO_LDSO="$LINKER" \
-	    GOROOT_BOOTSTRAP=$GOROOT \
-	    GOROOT_FINAL=$TERMUX_GODIR \
-	    PKG_CONFIG= \
-	    ./make.bash
+		CXX_FOR_TARGET=$CXX \
+		CC=gcc \
+		GO_LDFLAGS="-extldflags=-pie" \
+		GO_LDSO="$LINKER" \
+		GOROOT_BOOTSTRAP=$GOROOT \
+		GOROOT_FINAL=$TERMUX_GODIR \
+		PKG_CONFIG= \
+		./make.bash
 
 	cd ..
 	rm -Rf $TERMUX_GODIR

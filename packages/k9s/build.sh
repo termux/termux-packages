@@ -9,19 +9,19 @@ TERMUX_PKG_SHA256=597fa2c547437070a8993d1fb6fce91d696bd3731d37230feace3a2d3bfdb1
 TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make() {
-        termux_setup_golang
-        local GOPKG="github.com/derailed/k9s"
-        local GOLDFLAGS="-w -s -X ${GOPKG}/cmd.version=${TERMUX_PKG_VERSION} -X ${GOPKG}/cmd.commit=${TERMUX_PKG_VERSION}"
-        cd "$TERMUX_PKG_SRCDIR"
-        mkdir -p "${TERMUX_PKG_BUILDDIR}/src/github.com/derailed"
-        cp -a "${TERMUX_PKG_SRCDIR}" "${TERMUX_PKG_BUILDDIR}/src/github.com/derailed/k9s"
-        cd "${TERMUX_PKG_BUILDDIR}/src/github.com/derailed/k9s"
+	termux_setup_golang
+	local GOPKG="github.com/derailed/k9s"
+	local GOLDFLAGS="-w -s -X ${GOPKG}/cmd.version=${TERMUX_PKG_VERSION} -X ${GOPKG}/cmd.commit=${TERMUX_PKG_VERSION}"
+	cd "$TERMUX_PKG_SRCDIR"
+	mkdir -p "${TERMUX_PKG_BUILDDIR}/src/github.com/derailed"
+	cp -a "${TERMUX_PKG_SRCDIR}" "${TERMUX_PKG_BUILDDIR}/src/github.com/derailed/k9s"
+	cd "${TERMUX_PKG_BUILDDIR}/src/github.com/derailed/k9s"
 
-        go get -d -v
-        go build -ldflags "$GOLDFLAGS"
+	go get -d -v
+	go build -ldflags "$GOLDFLAGS"
 }
 
 termux_step_make_install() {
-        install -Dm700 ${TERMUX_PKG_BUILDDIR}/src/github.com/derailed/k9s/k9s \
-                 $TERMUX_PREFIX/bin/k9s
+	install -Dm700 ${TERMUX_PKG_BUILDDIR}/src/github.com/derailed/k9s/k9s \
+		$TERMUX_PREFIX/bin/k9s
 }

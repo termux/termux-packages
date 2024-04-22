@@ -10,28 +10,28 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make() {
-        rm -f Makefile
+	rm -f Makefile
 
-        termux_setup_golang
-        termux_setup_nodejs
+	termux_setup_golang
+	termux_setup_nodejs
 
-        local GO_VERSION=$(grep "^go " $TERMUX_PKG_SRCDIR/go.mod | cut -f 2 -d ' ')
-        local NODE_VERSION=$(. $TERMUX_SCRIPTDIR/packages/golang/build.sh; echo $TERMUX_PKG_VERSION)
-        local GIT_SHA=$(git ls-remote https://github.com/navidrome/navidrome refs/tags/v$TERMUX_PKG_VERSION | head -c 7)
-        export GIT_TAG="v$TERMUX_PKG_VERSION"
-        # Build frontend
-        cd $TERMUX_PKG_SRCDIR/ui
-        npm ci && npm run build
+	local GO_VERSION=$(grep "^go " $TERMUX_PKG_SRCDIR/go.mod | cut -f 2 -d ' ')
+	local NODE_VERSION=$(. $TERMUX_SCRIPTDIR/packages/golang/build.sh; echo $TERMUX_PKG_VERSION)
+	local GIT_SHA=$(git ls-remote https://github.com/navidrome/navidrome refs/tags/v$TERMUX_PKG_VERSION | head -c 7)
+	export GIT_TAG="v$TERMUX_PKG_VERSION"
+	# Build frontend
+	cd $TERMUX_PKG_SRCDIR/ui
+	npm ci && npm run build
 
-        # Build backend
-        cd $TERMUX_PKG_SRCDIR
-        go build -o navidrome -ldflags="-X github.com/navidrome/navidrome/consts.gitSha=$GIT_SHA -X github.com/navidrome/navidrome/consts.gitTag=$GIT_TAG-SNAPSHOT" -tags=netgo
+	# Build backend
+	cd $TERMUX_PKG_SRCDIR
+	go build -o navidrome -ldflags="-X github.com/navidrome/navidrome/consts.gitSha=$GIT_SHA -X github.com/navidrome/navidrome/consts.gitTag=$GIT_TAG-SNAPSHOT" -tags=netgo
 }
 
 termux_step_make_install() {
-        install -Dm755 -t "${TERMUX_PREFIX}"/bin ${TERMUX_PKG_SRCDIR}/navidrome
+	install -Dm755 -t "${TERMUX_PREFIX}"/bin ${TERMUX_PKG_SRCDIR}/navidrome
 
-        install -Dm644 /dev/null "${TERMUX_PREFIX}/share/bash-completion/completions/navidrome.bash"
+	install -Dm644 /dev/null "${TERMUX_PREFIX}/share/bash-completion/completions/navidrome.bash"
 	install -Dm644 /dev/null "${TERMUX_PREFIX}/share/zsh/site-functions/_navidrome"
 	install -Dm644 /dev/null "${TERMUX_PREFIX}/share/fish/vendor_completions.d/navidrome.fish"
 }

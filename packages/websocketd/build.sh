@@ -13,7 +13,7 @@ termux_step_pre_configure() {
 	termux_setup_golang
 
 	go mod init || :
-	go mod tidy 
+	go mod tidy
 }
 
 termux_step_make() {

@@ -10,13 +10,13 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_RECOMMENDS=git
 
 termux_step_make() {
-        termux_setup_golang
+	termux_setup_golang
 
-        cd "$TERMUX_PKG_SRCDIR"
+	cd "$TERMUX_PKG_SRCDIR"
 
-        mkdir -p "${TERMUX_PKG_BUILDDIR}/src/github.com/jesseduffield"
-        cp -a "${TERMUX_PKG_SRCDIR}" "${TERMUX_PKG_BUILDDIR}/src/github.com/jesseduffield/lazygit"
-        cd "${TERMUX_PKG_BUILDDIR}/src/github.com/jesseduffield/lazygit"
+	mkdir -p "${TERMUX_PKG_BUILDDIR}/src/github.com/jesseduffield"
+	cp -a "${TERMUX_PKG_SRCDIR}" "${TERMUX_PKG_BUILDDIR}/src/github.com/jesseduffield/lazygit"
+	cd "${TERMUX_PKG_BUILDDIR}/src/github.com/jesseduffield/lazygit"
 
 	go build \
 	-trimpath \
@@ -31,12 +31,12 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-        mkdir -p $TERMUX_PREFIX/share/doc/lazygit
+	mkdir -p $TERMUX_PREFIX/share/doc/lazygit
 
-        install -Dm700 ${TERMUX_PKG_BUILDDIR}/src/github.com/jesseduffield/lazygit/lazygit \
-                $TERMUX_PREFIX/bin/lazygit
+	install -Dm700 ${TERMUX_PKG_BUILDDIR}/src/github.com/jesseduffield/lazygit/lazygit \
+		$TERMUX_PREFIX/bin/lazygit
 
-        cp -a ${TERMUX_PKG_BUILDDIR}/src/github.com/jesseduffield/lazygit/docs/* \
-                $TERMUX_PREFIX/share/doc/lazygit/
+	cp -a ${TERMUX_PKG_BUILDDIR}/src/github.com/jesseduffield/lazygit/docs/* \
+		$TERMUX_PREFIX/share/doc/lazygit/
 
 }

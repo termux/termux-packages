@@ -11,10 +11,10 @@ TERMUX_PKG_AUTO_UPDATE=true
 
 
 termux_step_make() {
-        termux_setup_golang
-        go build -ldflags="-s -w" -o bed ./cmd/bed
-	}
+	termux_setup_golang
+	go build -ldflags="-s -w" -o bed ./cmd/bed
+}
 
 termux_step_make_install() {
-        install -Dm700 -t $TERMUX_PREFIX/bin bed
+	install -Dm700 -t $TERMUX_PREFIX/bin bed
 }
