@@ -32,9 +32,9 @@ termux_setup_golang_119() {
 			"$TERMUX_BUILDGO_TAR" \
 			"$TERMUX_GO_SHA256"
 
-		( cd "$TERMUX_PKG_CACHEDIR"; tar xf "$TERMUX_BUILDGO_TAR"; 
+		( cd "$TERMUX_PKG_CACHEDIR"; tar xf "$TERMUX_BUILDGO_TAR";
 		( cd go; . ${TERMUX_PKG_BUILDER_DIR}/fix-hardcoded-etc-resolv-conf.sh )
-		  mv go "$TERMUX_BUILDGO_FOLDER"; rm "$TERMUX_BUILDGO_TAR" )
+		mv go "$TERMUX_BUILDGO_FOLDER"; rm "$TERMUX_BUILDGO_TAR" )
 	else
 		termux_error_exit "This package cannot build on device currently."
 	fi

@@ -30,7 +30,7 @@ termux_step_pre_configure() {
 	termux_setup_golang
 
 	go mod init || :
-	go mod tidy 
+	go mod tidy
 }
 
 termux_step_make() {
@@ -41,8 +41,8 @@ termux_step_make_install() {
 	install -Dm700 -t "${TERMUX_PREFIX}"/bin logo-ls
 }
 
-termux_step_create_debscripts() {                   
-	cat <<- POSTINST_EOF > ./postinst           
+termux_step_create_debscripts() {
+	cat <<- POSTINST_EOF > ./postinst
 	#!$TERMUX_PREFIX/bin/sh
 	echo "Please change font from termux-styling addon"
 	POSTINST_EOF

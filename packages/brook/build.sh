@@ -18,7 +18,7 @@ termux_step_make() {
 	cp -a "$TERMUX_PKG_SRCDIR" "$GOPATH"/src/github.com/txthinking/brook
 	cd "$GOPATH"/src/github.com/txthinking/brook/cli/brook
 	go get -d -v
-	go build -o brook 
+	go build -o brook
 }
 
 termux_step_make_install() {

@@ -10,19 +10,19 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_RECOMMENDS=git
 
 termux_step_make() {
-        termux_setup_golang
+	termux_setup_golang
 
-        cd "$TERMUX_PKG_SRCDIR"
+	cd "$TERMUX_PKG_SRCDIR"
 
-        mkdir -p "${TERMUX_PKG_BUILDDIR}/src/github.com/charmbracelet"
-        cp -a "${TERMUX_PKG_SRCDIR}" "${TERMUX_PKG_BUILDDIR}/src/github.com/charmbracelet/glow"
-        cd "${TERMUX_PKG_BUILDDIR}/src/github.com/charmbracelet/glow"
+	mkdir -p "${TERMUX_PKG_BUILDDIR}/src/github.com/charmbracelet"
+	cp -a "${TERMUX_PKG_SRCDIR}" "${TERMUX_PKG_BUILDDIR}/src/github.com/charmbracelet/glow"
+	cd "${TERMUX_PKG_BUILDDIR}/src/github.com/charmbracelet/glow"
 
-        go get -d -v
-        go build
+	go get -d -v
+	go build
 }
 
 termux_step_make_install() {
-        install -Dm700 ${TERMUX_PKG_BUILDDIR}/src/github.com/charmbracelet/glow/glow \
-                $TERMUX_PREFIX/bin/glow
+	install -Dm700 ${TERMUX_PKG_BUILDDIR}/src/github.com/charmbracelet/glow/glow \
+		$TERMUX_PREFIX/bin/glow
 }

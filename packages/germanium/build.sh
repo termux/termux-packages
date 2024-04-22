@@ -20,7 +20,7 @@ termux_step_make() {
 	export GOPATH=$TERMUX_PKG_SRCDIR/go
 	go build -o germanium -v ./cmd/germanium
 }
- 
+
 termux_step_make_install() {
 	install -Dm700 -t "$TERMUX_PREFIX"/bin germanium
 }
