@@ -23,7 +23,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_have_decl_struct_in6_ifreq=yes"
 # Submodule path 'contrib/gana': checked out '79163ab6ea6f6cfe7f4311f91fb45c747b8c33da'
 # error: Server does not allow request for unadvertised object 4f40b5deca02c8dc64ff6c73e6602e6abdd1bae2
 # fatal: Fetched in submodule path 'contrib/sphinx', but it did not contain 4f40b5deca02c8dc64ff6c73e6602e6abdd1bae2. Direct fetching of that commit failed.
-# fatal: 
+# fatal:
 # ##[error]Process completed with exit code 128.
 # ```
 termux_step_get_source() {

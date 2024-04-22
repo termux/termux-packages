@@ -15,8 +15,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DOCIO_BUILD_APPS=OFF"
 
 termux_step_pre_configure() {
-    # error: constant expression evaluates to -1 which cannot be narrowed to type 'char' [-Wc++11-narrowing]
-    # also same is used while building apt
-    CXXFLAGS+=" -Wno-c++11-narrowing"
-    CXXFLAGS+=" -I$PREFIX/include/pystring"
+	# error: constant expression evaluates to -1 which cannot be narrowed to type 'char' [-Wc++11-narrowing]
+	# also same is used while building apt
+	CXXFLAGS+=" -Wno-c++11-narrowing"
+	CXXFLAGS+=" -I$PREFIX/include/pystring"
 }

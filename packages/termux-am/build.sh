@@ -26,7 +26,7 @@ termux_step_make() {
 
 	# Avoid spawning the gradle daemon due to org.gradle.jvmargs
 	# being set (https://github.com/gradle/gradle/issues/1434):
-  	sed -i'' -E '/^org\.gradle\.jvmargs=.*/d' gradle.properties
+	sed -i'' -E '/^org\.gradle\.jvmargs=.*/d' gradle.properties
 
 	export ANDROID_HOME
 	export GRADLE_OPTS="-Dorg.gradle.daemon=false -Xmx1536m -Dorg.gradle.java.home=/usr/lib/jvm/java-1.17.0-openjdk-amd64"

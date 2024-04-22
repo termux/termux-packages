@@ -12,7 +12,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-windows
 --disable-x3270
---disable-tcl3270 
+--disable-tcl3270
 ac_cv_path_LESSPATH=$TERMUX_PREFIX/bin/less
 "
 

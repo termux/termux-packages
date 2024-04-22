@@ -43,7 +43,7 @@ termux_step_create_debscripts() {
 	cat <<- EOF > ./postinst
 	#!${TERMUX_PREFIX}/bin/bash
 	rm -f $TERMUX_PREFIX/share/dex/oat/*/dx.{art,oat,odex,vdex} >/dev/null 2>&1
- 	chmod -w $TERMUX_PREFIX/share/dex/dx.jar
+	chmod -w $TERMUX_PREFIX/share/dex/dx.jar
 	exit 0
 	EOF
 }

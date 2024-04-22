@@ -126,7 +126,7 @@ termux_step_host_build() {
 
 termux_step_make() {
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
-	        termux_setup_swift
+			termux_setup_swift
 		ln -sf $TERMUX_PKG_HOSTBUILD_DIR/llvm-linux-x86_64 $TERMUX_PKG_BUILDDIR/llvm-linux-x86_64
 
 		SWIFT_BUILD_FLAGS="$SWIFT_BUILD_FLAGS --android

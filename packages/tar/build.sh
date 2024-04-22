@@ -19,7 +19,7 @@ termux_step_pre_configure() {
 	CPPFLAGS+=" -D__USE_FORTIFY_LEVEL=0"
 	LDFLAGS+=" -landroid-glob"
 	# https://android.googlesource.com/platform/bionic/+/master/docs/32-bit-abi.md#is-32_bit-on-lp32-y2038
- 	if [ $TERMUX_ARCH_BITS = 32 ]; then
- 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --disable-year2038"
-   	fi
+	if [ $TERMUX_ARCH_BITS = 32 ]; then
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --disable-year2038"
+	fi
 }

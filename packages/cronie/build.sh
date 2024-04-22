@@ -22,14 +22,14 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 TERMUX_PKG_SERVICE_SCRIPT=("crond" 'exec crond -n -s')
 
 termux_step_post_get_source() {
-    sed -i "s|\"/usr/sbin/sendmail\"|\"${TERMUX_PREFIX}/bin/sendmail\"|" ${TERMUX_PKG_SRCDIR}/configure
-    sed -i "s|\"/usr/sbin/sendmail\"|\"${TERMUX_PREFIX}/bin/sendmail\"|" ${TERMUX_PKG_SRCDIR}/src/cron.c
-    sed -i "s|\"/tmp\"|\"${TERMUX_PREFIX}/tmp\"|" ${TERMUX_PKG_SRCDIR}/src/crontab.c
-    sed -i "s|_PATH_BSHELL \"/bin/sh\"|_PATH_BSHELL \"${TERMUX_PREFIX}/bin/sh\"|" ${TERMUX_PKG_SRCDIR}/src/crontab.c
-    sed -i "s|_PATH_STDPATH \"/usr/bin:/bin:/usr/sbin:/sbin\"|_PATH_STDPATH \"${TERMUX_PREFIX}/bin\"|" ${TERMUX_PKG_SRCDIR}/src/crontab.c
-    sed -i "s|_PATH_TMP \"/tmp\"|_PATH_TMP \"${TERMUX_PREFIX}/tmp\"|" ${TERMUX_PKG_SRCDIR}/src/crontab.c
-    sed -i "s|getdtablesize()|sysconf(_SC_OPEN_MAX)|" ${TERMUX_PKG_SRCDIR}/src/do_command.c
-    sed -i "s|getdtablesize()|sysconf(_SC_OPEN_MAX)|" ${TERMUX_PKG_SRCDIR}/src/popen.c
+	sed -i "s|\"/usr/sbin/sendmail\"|\"${TERMUX_PREFIX}/bin/sendmail\"|" ${TERMUX_PKG_SRCDIR}/configure
+	sed -i "s|\"/usr/sbin/sendmail\"|\"${TERMUX_PREFIX}/bin/sendmail\"|" ${TERMUX_PKG_SRCDIR}/src/cron.c
+	sed -i "s|\"/tmp\"|\"${TERMUX_PREFIX}/tmp\"|" ${TERMUX_PKG_SRCDIR}/src/crontab.c
+	sed -i "s|_PATH_BSHELL \"/bin/sh\"|_PATH_BSHELL \"${TERMUX_PREFIX}/bin/sh\"|" ${TERMUX_PKG_SRCDIR}/src/crontab.c
+	sed -i "s|_PATH_STDPATH \"/usr/bin:/bin:/usr/sbin:/sbin\"|_PATH_STDPATH \"${TERMUX_PREFIX}/bin\"|" ${TERMUX_PKG_SRCDIR}/src/crontab.c
+	sed -i "s|_PATH_TMP \"/tmp\"|_PATH_TMP \"${TERMUX_PREFIX}/tmp\"|" ${TERMUX_PKG_SRCDIR}/src/crontab.c
+	sed -i "s|getdtablesize()|sysconf(_SC_OPEN_MAX)|" ${TERMUX_PKG_SRCDIR}/src/do_command.c
+	sed -i "s|getdtablesize()|sysconf(_SC_OPEN_MAX)|" ${TERMUX_PKG_SRCDIR}/src/popen.c
 }
 
 termux_step_create_debscripts() {

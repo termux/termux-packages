@@ -12,7 +12,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
 termux_step_make() {
-    :
+	:
 }
 
 termux_step_make_install() {

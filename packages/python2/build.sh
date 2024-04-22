@@ -74,9 +74,9 @@ termux_step_pre_configure() {
 termux_step_post_make_install() {
 	# Avoid file clashes with the python (3) package:
 	(cd $TERMUX_PREFIX/bin
-	 mv 2to3 2to3-${_MAJOR_VERSION}
-	 mv pydoc pydoc${_MAJOR_VERSION}
-	 ln -sf pydoc${_MAJOR_VERSION} pydoc2)
+	mv 2to3 2to3-${_MAJOR_VERSION}
+	mv pydoc pydoc${_MAJOR_VERSION}
+	ln -sf pydoc${_MAJOR_VERSION} pydoc2)
 	# Restore path which termux_step_host_build messed with
 	export PATH=$TERMUX_ORIG_PATH
 }

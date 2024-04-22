@@ -38,7 +38,7 @@ termux_step_make_install() {
 
 	for DIFF in "$TERMUX_PKG_BUILDER_DIR"/*.diff; do
 		sed -e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
-                    -e "s|@YEAR@|${TERMUX_PKG_VERSION:0:4}|g" $DIFF \
+			-e "s|@YEAR@|${TERMUX_PKG_VERSION:0:4}|g" $DIFF \
 			> $TERMUX_PREFIX/opt/texlive/$(basename $DIFF)
 		chmod 600 $TERMUX_PREFIX/opt/texlive/$(basename $DIFF)
 	done
@@ -56,13 +56,13 @@ termux_step_make_install() {
 		echo "export OSFONTDIR=$TERMUX_PREFIX/share/fonts/TTF"
 		echo "export TRFONTS=$TERMUX_PREFIX/share/groff/{current/font,site-font}/devps"
 	} > $TERMUX_PREFIX/etc/profile.d/texlive.sh
-    {
-        echo "set -gx --append PATH $TERMUX_PREFIX/bin/texlive"
-        echo "set -gx TEXMFROOT $TERMUX_PREFIX/share/texlive/${TERMUX_PKG_VERSION:0:4}"
-        echo "set -gx TEXMFLOCAL $TERMUX_PREFIX/share/texlive/texmf-local"
-        echo "set -gx OSFONTDIR $TERMUX_PREFIX/share/fonts/TTF"
-        echo "set -gx TRFONTS $TERMUX_PREFIX/share/groff/current/font/devps $TERMUX_PREFIX/share/groff/site-font/devps"
-    } > $TERMUX_PREFIX/etc/fish/conf.d/texlive.fish
+	{
+		echo "set -gx --append PATH $TERMUX_PREFIX/bin/texlive"
+		echo "set -gx TEXMFROOT $TERMUX_PREFIX/share/texlive/${TERMUX_PKG_VERSION:0:4}"
+		echo "set -gx TEXMFLOCAL $TERMUX_PREFIX/share/texlive/texmf-local"
+		echo "set -gx OSFONTDIR $TERMUX_PREFIX/share/fonts/TTF"
+		echo "set -gx TRFONTS $TERMUX_PREFIX/share/groff/current/font/devps $TERMUX_PREFIX/share/groff/site-font/devps"
+	} > $TERMUX_PREFIX/etc/fish/conf.d/texlive.fish
 }
 
 termux_step_create_debscripts() {

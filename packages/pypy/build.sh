@@ -63,13 +63,13 @@ termux_step_pre_configure() {
 		$_undocker_url \
 		$TERMUX_PKG_CACHEDIR/undocker.py \
 		$_undocker_checksums
-	
+
 	# Get proot
 	termux_download \
 		$_proot_url \
 		$PROOT \
 		$_proot_checksums
-	
+
 	chmod +x $PROOT
 
 	# Get qemu-aarch64-static
@@ -154,7 +154,7 @@ termux_step_configure() {
 	ln -s $TERMUX_PKG_SRCDIR $PYPY_SRC_DIR
 	PROOT_HOST="env -i PROOT_NO_SECCOMP=1
 						$TERMUX_RUNTIME_ENV_VARS
-						$PROOT 
+						$PROOT
 						-b /proc -b /dev -b /sys
 						-b $HOME
 						-b $TERMUX_ANDROID_HOME

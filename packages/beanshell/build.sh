@@ -39,7 +39,7 @@ termux_step_make_install() {
 termux_step_create_debscripts() {
 	cat <<- EOF > ./postinst
 	#!${TERMUX_PREFIX}/bin/bash
-  	chmod -w $TERMUX_PREFIX/share/dex/beanshell.jar
+	chmod -w $TERMUX_PREFIX/share/dex/beanshell.jar
 	rm -f $TERMUX_PREFIX/share/dex/oat/*/beanshell.{art,oat,odex,vdex} >/dev/null 2>&1
 	exit 0
 	EOF

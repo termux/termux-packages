@@ -78,18 +78,18 @@ termux_step_post_make_install() {
 	# in one go since $TERMUX_PREFIX also contain "/usr" so we risk doubling the prefix:
 	# "/data/data/com.termux/files/data/data/com.termux/files/usr"
 
-	sed -i "s@$TERMUX_PREFIX@\$TERMUX_PREFIX@g" $faustscripts 
+	sed -i "s@$TERMUX_PREFIX@\$TERMUX_PREFIX@g" $faustscripts
 	sed -i "s@/usr/local@\$TERMUX_PREFIX@g" $faustscripts
 	sed -i "s@/usr@\$TERMUX_PREFIX@g" $faustscripts
 
-	# turns /tmp and /var with $TERMUX_PREFIX_{tmp,var} 
+	# turns /tmp and /var with $TERMUX_PREFIX_{tmp,var}
 	for i in tmp var; do
 		sed -i "s@\$TERMUX_PREFIX/${i}/@\$TERMUX_PREFIX_${i}@g" $faustscripts
 		perl -pi -e 's@(?<=("|[^[:alnum:]_\.]))/'${i}'(?=(/|\s))@\$TERMUX_PREFIX_'${i}'@g' \
 			$faustscripts
 	done
 
-	# restore 
+	# restore
 	for i in tmp var; do
 		sed -i "s@\$TERMUX_PREFIX_${i}@\$TERMUX_PREFIX/${i}@g" $faustscripts
 	done

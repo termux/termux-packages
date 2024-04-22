@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://gitlab.com/jallbrit/cbonsai
-TERMUX_PKG_DESCRIPTION="Grow bonsai trees in your terminal" 
+TERMUX_PKG_DESCRIPTION="Grow bonsai trees in your terminal"
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_MAINTAINER="@termux"                        
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.3.1
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://gitlab.com/jallbrit/cbonsai/-/archive/v${TERMUX_PKG_VERSION}/cbonsai-v${TERMUX_PKG_VERSION}.tar.gz
