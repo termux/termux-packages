@@ -10,7 +10,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PROVIDES="libexecinfo"
 TERMUX_PKG_CONFLICTS="libexecinfo"
 
-# Files are taken from the Bionic libc repo. 
+# Files are taken from the Bionic libc repo.
 # exexinfo.h: https://android.googlesource.com/platform/bionic/+/refs/heads/master/libc/include/execinfo.h
 # execinfo.c: https://android.googlesource.com/platform/bionic/+/refs/heads/master/libc/bionic/execinfo.cpp
 termux_step_make() {

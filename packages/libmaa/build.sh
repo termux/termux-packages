@@ -12,12 +12,12 @@ termux_step_make() {
 	cd ${TERMUX_PKG_SRCDIR}/maa
 	awk -f arggram2c < arggram.txt > arggram.c
 	$CC -shared -o libmaa.so \
-	    xmalloc.c hash.c set.c stack.c list.c error.c memory.c string.c \
-	    debug.c flags.c maa.c prime.c bit.c timer.c arg.c pr.c sl.c \
-	    base64.c base26.c source.c parse-concrete.c text.c log.c \
-	    -DMAA_MAJOR=4 -DMAA_MINOR=0 -DMAA_TEENY=0 \
-	    -DHAVE_HEADER_SYS_RESOURCE_H=1 -DSIZEOF_LONG=__SIZEOF_LONG__ \
-	    $CFLAGS $LDFLAGS -fPIC
+		xmalloc.c hash.c set.c stack.c list.c error.c memory.c string.c \
+		debug.c flags.c maa.c prime.c bit.c timer.c arg.c pr.c sl.c \
+		base64.c base26.c source.c parse-concrete.c text.c log.c \
+		-DMAA_MAJOR=4 -DMAA_MINOR=0 -DMAA_TEENY=0 \
+		-DHAVE_HEADER_SYS_RESOURCE_H=1 -DSIZEOF_LONG=__SIZEOF_LONG__ \
+		$CFLAGS $LDFLAGS -fPIC
 	cd -
 }
 
