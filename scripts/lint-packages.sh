@@ -8,6 +8,7 @@ check_package_license() {
 	local pkg_licenses=$1
 	local license
 	local license_ok=true
+	local IFS
 
 	IFS=","
 	for license in $pkg_licenses; do
@@ -40,7 +41,6 @@ check_package_license() {
 				;;
 		esac
 	done
-	IFS=$old_ifs
 
 	if $license_ok; then
 		return 0
@@ -66,12 +66,61 @@ check_package_name() {
 	fi
 }
 
+check_indentation() {
+	local pkg_script="$1"
+	local line='' heredoc_terminator='' in_array=0 i=0
+	local -a issues=('' '') bad_lines=('FAILED')
+
+	# parse leading whitespace
+	while IFS=$'\n' read -r line; do
+		((i++))
+
+		# make sure it's a heredoc, not a herestring
+		if ! [[ "$line" == *'<<<'* ]]; then
+			# Skip this check in entirely within heredocs
+			# (see packages/ghc-libs for an example of why)
+				[[ "$line" =~ [^\(]\<{2}-?[\'\"]?([^\'\"]+) ]] && {
+				heredoc_terminator="${BASH_REMATCH[1]}"
+			}
+
+			(( ${#heredoc_terminator} )) && \
+			grep -qP "^\s*${heredoc_terminator}" <<< "$line" && {
+				heredoc_terminator=''
+			}
+			(( ${#heredoc_terminator} )) && continue
+		fi
+
+		# check for mixed indentation
+		grep -qP '^(\t+ +| +\t+)' <<< "$line" && {
+			issues[0]='Mixed indentation'
+			bad_lines[$i]="${pkg_script}:${i}:$line"
+		}
+
+		[[ "$line" == *'=('* ]] && in_array=1
+		if (( ! in_array )); then # spaces for indentation are okay for aligning arrays
+			grep -qP '^ +' <<< "$line" && { # check for spaces as indentation
+				issues[1]='Use tabs for indentation'
+				bad_lines[$i]="${pkg_script}:${i}:$line"
+			}
+		fi
+		[[ "$line" == *')' ]] && in_array=0
+	done < "$pkg_script"
+
+	# if we found problems print them out and throw an error
+	(( ${#issues[0]} || ${#issues[1]} )) && {
+		printf '%s\n' "${bad_lines[@]}"
+		printf '%s\n' "${issues[@]}"
+		return 1
+	}
+	return 0
+}
+
 lint_package() {
 	local package_script
 	local package_name
 
-	package_script=$1
-	package_name=$(basename "$(dirname "$package_script")")
+	package_script="$1"
+	package_name="$(basename "$(dirname "$package_script")")"
 
 	echo "================================================================"
 	echo
@@ -86,8 +135,6 @@ lint_package() {
 		check_package_name "$subpkg_name" || return 1
 	done
 
-	echo
-
 	echo -n "File permission check: "
 	local file_permission
 	file_permission=$(stat -c "%A" "$package_script")
@@ -98,28 +145,34 @@ lint_package() {
 	fi
 	echo "PASS"
 
+	echo -n "Indentation check: "
+	local script
+	for script in "$package_script" $(dirname "$package_script")/*.subpackage.sh; do
+		test ! -f "$script" && continue
+		check_indentation "$script" || return 1
+	done
+	echo "PASS"
+
 	echo -n "Syntax check: "
 	local syntax_errors
 	syntax_errors=$(bash -n "$package_script" 2>&1)
-	if [ -n "$syntax_errors" ]; then
+	if (( ${#syntax_errors} )); then
 		echo "FAILED"
 		echo
 		echo "$syntax_errors"
 		echo
 		return 1
-	else
-		echo "PASS"
 	fi
+	echo "PASS"
 
 	echo -n "Trailing whitespace check: "
 	local trailing_whitespace
-	trailing_whitespace=$(grep -n " $" "$package_script")
-	if [ -n "$trailing_whitespace" ]; then
+	trailing_whitespace=$(grep -Hn ' $' "$package_script")
+	if (( ${#trailing_whitespace} )); then
 		echo -e "FAILED\n\n${trailing_whitespace}\n"
 		return 1
 	fi
 	echo "PASS"
-
 	echo
 
 	# Fields checking is done in subshell since we will source build.sh.
