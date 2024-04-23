@@ -1,6 +1,6 @@
 --- a/Makefile
 +++ b/Makefile
-@@ -11,7 +11,7 @@
+@@ -10,7 +10,7 @@ CONFIG := clang
  
  # features (the more the better)
  ENABLE_TCL := 1
@@ -9,15 +9,12 @@
  ENABLE_GLOB := 1
  ENABLE_PLUGINS := 1
  ENABLE_READLINE := 1
-@@ -216,9 +215,8 @@
- endif
+@@ -217,7 +217,7 @@ endif
  
  ifeq ($(CONFIG),clang)
--CXX = clang
--LD = clang++
+ CXX = clang++
 -CXXFLAGS += -std=$(CXXSTD) -Os
-+LD = $(CXX)
 +CXXFLAGS += -std=$(CXXSTD)
- ABCMKARGS += ARCHFLAGS="-DABC_USE_STDINT_H -Wno-c++11-narrowing $(ABC_ARCHFLAGS)"
+ ABCMKARGS += ARCHFLAGS="-DABC_USE_STDINT_H $(ABC_ARCHFLAGS)"
  
  ifneq ($(SANITIZER),)
