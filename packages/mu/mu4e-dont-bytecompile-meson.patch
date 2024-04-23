@@ -1,30 +1,29 @@
 # Patch meson to copy mu4e source files even if emacs was not found.
 --- ./meson.build.orig	2022-07-06 09:38:17.491018593 +0530
 +++ ./meson.build	2022-07-06 09:39:41.161018561 +0530
-@@ -196,7 +196,7 @@
-   message('emacs not found; not generating manpages')
- endif
- 
+@@ -274,9 +274,7 @@
+ # emacs -- needed for mu4e compilation
+ emacs_name=get_option('emacs')
+ emacs_min_version='26.3'
+-emacs=find_program([emacs_name], version: '>='+emacs_min_version, required:false)
 -if emacs.found()
+-  subdir('man')
 +if true
-    subdir('mu4e')
+   subdir('mu4e')
  else
-   message('emacs not found; not preparing mu4e support')
+   message('emacs not found; not pre-compiling mu4e / generating manpages')
 --- ./mu4e/meson.build.orig	2022-07-06 09:21:53.456610752 +0530
 +++ ./mu4e/meson.build	2022-07-06 09:36:08.601018642 +0530
-@@ -73,6 +73,7 @@
-                  install_mode: 'r--r--r--')
- endforeach
+@@ -75,6 +75,7 @@ mu4e_srcs=[
+ #
+ #... so let's not do that!
  
 +if false
  foreach src : mu4e_srcs
    target_name= '@BASENAME@.elc'
    target_path = join_paths(meson.current_build_dir(), target_name)
-@@ -100,6 +101,7 @@
-                           '--eval', target_func,
-                           '--funcall', 'batch-byte-compile', '@INPUT@'])
- endforeach
+@@ -117,6 +118,7 @@ mu4e_autoloads = configure_file(
+             '--load', 'package',
+             '--eval', '(package-generate-autoloads "mu4e" "' +
+                       meson.current_build_dir() + '" )'])
 +endif
- 
- # also install the sources and the config
- install_data(mu4e_srcs, install_dir: mu4e_lispdir)
