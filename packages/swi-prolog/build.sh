@@ -2,11 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://swi-prolog.org/
 TERMUX_PKG_DESCRIPTION="Most popular and complete prolog implementation"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-# Use "development" versions.
-TERMUX_PKG_VERSION=9.1.11
+TERMUX_PKG_VERSION=9.3.3
 TERMUX_PKG_SRCURL=https://www.swi-prolog.org/download/devel/src/swipl-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=2a668333faebc19431989bd08f5d0f9716af29eb914a092a795bf3705925a289
-TERMUX_PKG_DEPENDS="libarchive, libcrypt, libgmp, libyaml, ncurses, openssl, ossp-uuid, readline, zlib, pcre2"
+TERMUX_PKG_SHA256=db8453356811edbb4c2130d52617d327a4b4e322e2941dd4d52b5751d03e3946
+TERMUX_PKG_DEPENDS="libandroid-execinfo, libarchive, libcrypt, libgmp, libyaml, ncurses, openssl, ossp-uuid, readline, zlib, pcre2"
 TERMUX_PKG_FORCE_CMAKE=true
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -39,7 +38,7 @@ termux_step_host_build() {
 	if [ $TERMUX_ARCH_BITS = 32 ]; then
 		export LDFLAGS=-m32
 		export CFLAGS=-m32
-		export CXXFLAGS=-m32
+		export CXXFLAGS='-m32 -funwind-tables'
 		CMAKE_EXTRA_DEFS="-DCMAKE_LIBRARY_PATH=/usr/lib/i386-linux-gnu"
 	else
 		CMAKE_EXTRA_DEFS=""
@@ -65,7 +64,7 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
-	LDFLAGS+=" $($CC -print-libgcc-file-name)"
+	LDFLAGS+=" -landroid-execinfo $($CC -print-libgcc-file-name)"
 }
 
 termux_step_post_make_install() {
