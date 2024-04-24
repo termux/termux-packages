@@ -24,6 +24,15 @@ share/gtk-doc
 
 termux_step_post_get_source() {
 	mv CMakeLists.txt CMakeLists.txt.unused
+
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=0
+
+	local e=$(grep -oP "hb_so_version = '\K\d+" src/meson.build | uniq)
+	if [ ! "${e}" ] || [ "${_SOVERSION}" != "${e}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
 }
 
 termux_step_pre_configure() {
