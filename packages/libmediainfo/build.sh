@@ -13,7 +13,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-shared --enable-static --with-libcurl"
 termux_pkg_auto_update() {
 	local e=0
 	local api_url="https://mediaarea.net/en/MediaInfo"
-	local api_url_r=$(curl -s "${api_url}/")
+	local api_url_r=$(curl -Ls "${api_url}/")
 	local r1=$(echo "${api_url_r}" | grep -o '"softwareVersion"\s*:\s*"\([^"]\+\)"')
 	local latest_version=$(echo "${r1}" | grep -o '[0-9.]\+')
 
