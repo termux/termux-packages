@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/facebookincubator/below
 TERMUX_PKG_DESCRIPTION="An interactive tool to view and record historical system data"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.7.1
+TERMUX_PKG_VERSION="0.8.1"
 TERMUX_PKG_SRCURL=https://github.com/facebookincubator/below/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=9b70d010189e8d343dc67b730a1d8eeb0e1d19805688e4f70662e216fb4cd6b5
+TERMUX_PKG_SHA256=bfeb9cd911e0477a5428ee0b6cbf7cbdc7eba90b716ac1e4f6cbadcde2ffbcb1
 TERMUX_PKG_DEPENDS="libelf, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
@@ -29,12 +29,6 @@ termux_step_pre_configure() {
 	local d p
 	for d in $CARGO_HOME/registry/src/*/libbpf-sys-*; do
 		for p in libbpf-sys-0.6.0-1-libbpf-include-linux-{compiler,types}.h.diff; do
-			patch --silent -p1 -d ${d} \
-				< "$TERMUX_PKG_BUILDER_DIR/${p}" || :
-		done
-	done
-	for d in $CARGO_HOME/registry/src/*/nix-*; do
-		for p in nix-{0.22.0,0.23.1}-src-sys-statfs.rs.diff; do
 			patch --silent -p1 -d ${d} \
 				< "$TERMUX_PKG_BUILDER_DIR/${p}" || :
 		done
