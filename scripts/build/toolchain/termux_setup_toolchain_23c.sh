@@ -96,8 +96,8 @@ termux_setup_toolchain_23c() {
 	export GOOS=android
 	export CGO_ENABLED=1
 	export GO_LDFLAGS="-extldflags=-pie"
-	export CGO_LDFLAGS="${LDFLAGS/-Wl,-z,relro,-z,now/}"
-	CGO_LDFLAGS="${LDFLAGS/-static-openmp/}"
+	export CGO_LDFLAGS="${LDFLAGS/ -Wl,-z,relro,-z,now/}"
+	CGO_LDFLAGS="${CGO_LDFLAGS/ -static-openmp/}"
 	export CGO_CFLAGS="-I$TERMUX_PREFIX/include"
 	export RUSTFLAGS="-C link-arg=-Wl,-rpath=$TERMUX_PREFIX/lib -C link-arg=-Wl,--enable-new-dtags"
 
