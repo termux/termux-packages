@@ -5,7 +5,7 @@
  
  # Linux using GCC
 -CXX=c++
--CXXFLAGS=-O2 -Wno-logical-op-parentheses -Wno-switch -Wno-dangling-else
+-CXXFLAGS=-march=native -O2 -std=c++11 -Wno-logical-op-parentheses -Wno-switch -Wno-dangling-else
 -LIBFLAGS=-fPIC
 +CXX?=c++
 +CXXFLAGS?=
@@ -20,9 +20,9 @@
 +AR?=ar
 +LDFLAGS?=-pthread
  
- # Linux using LCC
- #CXX=lcc
-@@ -161,14 +161,14 @@
+ ##########################
+ 
+@@ -63,14 +63,14 @@
  	$(AR) rcs libunrar.a $(OBJECTS) $(LIB_OBJ)
  
  install-unrar:
