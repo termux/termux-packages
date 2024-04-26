@@ -27,15 +27,17 @@ share/wasi-sysroot
 "
 
 termux_pkg_auto_update() {
-	# based on scripts/updates/internal/termux_repology_auto_update.sh
 	local e=0
-	local latest_version
-	latest_version=$(termux_repology_api_get_latest_version "${TERMUX_PKG_NAME}")
+	local api_url="https://releases.rs"
+	local api_url_r=$(curl -Ls "${api_url}")
+	local latest_version=$(echo "${api_url_r}" | grep "html" | sed -ne "s|.*Stable: \([0-9]*\+.\+[0-9]*\+.\+[0-9]*\) Beta:.*|\1|p")
 	if [[ "${latest_version}" == "${TERMUX_PKG_VERSION}" ]]; then
 		echo "INFO: Already up to date."
 		return
 	fi
-	[[ "${latest_version}" == "null" ]] && e=1
+	[[ -z "${api_url_r}" ]] && e=1
+	[[ -z "${latest_version}" ]] && e=1
+
 	local uptime_now=$(cat /proc/uptime)
 	local uptime_s="${uptime_now//.*}"
 	local uptime_h_limit=4
@@ -47,6 +49,7 @@ termux_pkg_auto_update() {
 	if [[ "${e}" != 0 ]]; then
 		cat <<- EOL >&2
 		WARN: Auto update failure!
+		api_url_r=${api_url_r}
 		latest_version=${latest_version}
 		uptime_now=${uptime_now}
 		uptime_s=${uptime_s}
