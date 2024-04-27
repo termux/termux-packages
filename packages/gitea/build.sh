@@ -21,7 +21,6 @@ termux_step_make() {
 	cp -a "$TERMUX_PKG_SRCDIR" "$GOPATH"/src/code.gitea.io/gitea
 	cd "$GOPATH"/src/code.gitea.io/gitea
 
-	export CGO_LDFLAGS="${CGO_LDFLAGS/ -fno-openmp-implicit-rpath}"
 	go mod init || :
 	go mod tidy
 
