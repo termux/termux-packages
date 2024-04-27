@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://www.freerdp.com/
 TERMUX_PKG_DESCRIPTION="A free remote desktop protocol library and clients"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.11.2
-TERMUX_PKG_SRCURL=https://github.com/FreeRDP/FreeRDP/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=674b5600bc2ae3e16e5b5a811c7d5b0daaff6198601ba278bd15b4cb9b281044
+TERMUX_PKG_VERSION="2.11.7"
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_SRCURL=https://github.com/FreeRDP/FreeRDP/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SHA256=22dbeeaad065e93f152d70e04ec8eeab08aa32c406a96be64f252526623625a4
 TERMUX_PKG_DEPENDS="libandroid-shmem, libcairo, libjpeg-turbo, libusb, libwayland, libx11, libxcursor, libxdamage, libxext, libxfixes, libxi, libxinerama, libxkbcommon, libxkbfile, libxrandr, libxrender, libxv, openssl, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libwayland-cross-scanner, libwayland-protocols"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -22,6 +22,12 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DWITH_OPENSSL=ON
 -DWITH_SERVER=ON
 "
+
+termux_pkg_auto_update() {
+	local latest_tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}" latest-regex 2)"
+	[[ -z "${latest_tag}" ]] && termux_error_exit "ERROR: Unable to get tag from ${TERMUX_PKG_SRCURL}"
+	termux_pkg_upgrade_version "${latest_tag}"
+}
 
 termux_step_post_get_source() {
 	find "$TERMUX_PKG_SRCDIR" -name CMakeLists.txt -o -name '*.cmake' | \
