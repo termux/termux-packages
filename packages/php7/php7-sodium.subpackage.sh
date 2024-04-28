@@ -1,3 +1,0 @@
-TERMUX_SUBPKG_INCLUDE="lib/php/sodium.so"
-TERMUX_SUBPKG_DEPENDS="libsodium"
-TERMUX_SUBPKG_DESCRIPTION="Sodium module for PHP"
