@@ -47,6 +47,10 @@
   </fundamental>
   <fundamental name="GskRoundedClipNode" get-type="gsk_rounded_clip_node_get_type" instantiatable="1" parents="GskRenderNode">
   </fundamental>
+  <fundamental name="GskFillNode" get-type="gsk_fill_node_get_type" instantiatable="1" parents="GskRenderNode">
+  </fundamental>
+  <fundamental name="GskStrokeNode" get-type="gsk_stroke_node_get_type" instantiatable="1" parents="GskRenderNode">
+  </fundamental>
   <fundamental name="GskShadowNode" get-type="gsk_shadow_node_get_type" instantiatable="1" parents="GskRenderNode">
   </fundamental>
   <fundamental name="GskBlendNode" get-type="gsk_blend_node_get_type" instantiatable="1" parents="GskRenderNode">
@@ -61,13 +65,26 @@
   </fundamental>
   <fundamental name="GskGLShaderNode" get-type="gsk_gl_shader_node_get_type" instantiatable="1" parents="GskRenderNode">
   </fundamental>
+  <fundamental name="GskSubsurfaceNode" get-type="gsk_subsurface_node_get_type" instantiatable="1" parents="GskRenderNode">
+  </fundamental>
   <class name="GskRenderer" get-type="gsk_renderer_get_type" parents="GObject" abstract="1">
     <property name="realized" type="gboolean" flags="1073742049" default-value="FALSE"/>
     <property name="surface" type="GdkSurface" flags="1073742049"/>
   </class>
   <class name="GskCairoRenderer" get-type="gsk_cairo_renderer_get_type" parents="GskRenderer,GObject">
   </class>
+  <boxed name="GskPath" get-type="gsk_path_get_type"/>
+  <boxed name="GskPathBuilder" get-type="gsk_path_builder_get_type"/>
+  <boxed name="GskPathPoint" get-type="gsk_path_point_get_type"/>
+  <boxed name="GskPathMeasure" get-type="gsk_path_measure_get_type"/>
+  <boxed name="GskStroke" get-type="gsk_stroke_get_type"/>
   <boxed name="GskTransform" get-type="gsk_transform_get_type"/>
+  <class name="GskGLRenderer" get-type="gsk_gl_renderer_get_type" parents="GskRenderer,GObject">
+    <implements name="GdkDmabufDownloader"/>
+  </class>
+  <class name="GskNglRenderer" get-type="gsk_ngl_renderer_get_type" parents="GskGpuRenderer,GskRenderer,GObject">
+    <implements name="GdkDmabufDownloader"/>
+  </class>
   <enum name="GskRenderNodeType" get-type="gsk_render_node_type_get_type">
     <member name="GSK_NOT_A_RENDER_NODE" nick="not-a-render-node" value="0"/>
     <member name="GSK_CONTAINER_NODE" nick="container-node" value="1"/>
@@ -97,6 +114,9 @@
     <member name="GSK_GL_SHADER_NODE" nick="gl-shader-node" value="25"/>
     <member name="GSK_TEXTURE_SCALE_NODE" nick="texture-scale-node" value="26"/>
     <member name="GSK_MASK_NODE" nick="mask-node" value="27"/>
+    <member name="GSK_FILL_NODE" nick="fill-node" value="28"/>
+    <member name="GSK_STROKE_NODE" nick="stroke-node" value="29"/>
+    <member name="GSK_SUBSURFACE_NODE" nick="subsurface-node" value="30"/>
   </enum>  <enum name="GskScalingFilter" get-type="gsk_scaling_filter_get_type">
     <member name="GSK_SCALING_FILTER_LINEAR" nick="linear" value="0"/>
     <member name="GSK_SCALING_FILTER_NEAREST" nick="nearest" value="1"/>
@@ -123,6 +143,29 @@
     <member name="GSK_CORNER_TOP_RIGHT" nick="top-right" value="1"/>
     <member name="GSK_CORNER_BOTTOM_RIGHT" nick="bottom-right" value="2"/>
     <member name="GSK_CORNER_BOTTOM_LEFT" nick="bottom-left" value="3"/>
+  </enum>  <enum name="GskFillRule" get-type="gsk_fill_rule_get_type">
+    <member name="GSK_FILL_RULE_WINDING" nick="winding" value="0"/>
+    <member name="GSK_FILL_RULE_EVEN_ODD" nick="even-odd" value="1"/>
+  </enum>  <enum name="GskLineCap" get-type="gsk_line_cap_get_type">
+    <member name="GSK_LINE_CAP_BUTT" nick="butt" value="0"/>
+    <member name="GSK_LINE_CAP_ROUND" nick="round" value="1"/>
+    <member name="GSK_LINE_CAP_SQUARE" nick="square" value="2"/>
+  </enum>  <enum name="GskLineJoin" get-type="gsk_line_join_get_type">
+    <member name="GSK_LINE_JOIN_MITER" nick="miter" value="0"/>
+    <member name="GSK_LINE_JOIN_ROUND" nick="round" value="1"/>
+    <member name="GSK_LINE_JOIN_BEVEL" nick="bevel" value="2"/>
+  </enum>  <enum name="GskPathOperation" get-type="gsk_path_operation_get_type">
+    <member name="GSK_PATH_MOVE" nick="move" value="0"/>
+    <member name="GSK_PATH_CLOSE" nick="close" value="1"/>
+    <member name="GSK_PATH_LINE" nick="line" value="2"/>
+    <member name="GSK_PATH_QUAD" nick="quad" value="3"/>
+    <member name="GSK_PATH_CUBIC" nick="cubic" value="4"/>
+    <member name="GSK_PATH_CONIC" nick="conic" value="5"/>
+  </enum>  <enum name="GskPathDirection" get-type="gsk_path_direction_get_type">
+    <member name="GSK_PATH_FROM_START" nick="from-start" value="0"/>
+    <member name="GSK_PATH_TO_START" nick="to-start" value="1"/>
+    <member name="GSK_PATH_TO_END" nick="to-end" value="2"/>
+    <member name="GSK_PATH_FROM_END" nick="from-end" value="3"/>
   </enum>  <enum name="GskSerializationError" get-type="gsk_serialization_error_get_type">
     <member name="GSK_SERIALIZATION_UNSUPPORTED_FORMAT" nick="unsupported-format" value="0"/>
     <member name="GSK_SERIALIZATION_UNSUPPORTED_VERSION" nick="unsupported-version" value="1"/>
@@ -149,9 +192,14 @@
     <member name="GSK_MASK_MODE_INVERTED_ALPHA" nick="inverted-alpha" value="1"/>
     <member name="GSK_MASK_MODE_LUMINANCE" nick="luminance" value="2"/>
     <member name="GSK_MASK_MODE_INVERTED_LUMINANCE" nick="inverted-luminance" value="3"/>
-  </enum>  <class name="GskGLRenderer" get-type="gsk_gl_renderer_get_type" parents="GskRenderer,GObject">
-  </class>
-  <class name="GskNglRenderer" get-type="gsk_ngl_renderer_get_type" parents="GskRenderer,GObject">
+  </enum>  <flags name="GskPathForeachFlags" get-type="gsk_path_foreach_flags_get_type">
+    <member name="GSK_PATH_FOREACH_ALLOW_ONLY_LINES" nick="only-lines" value="0"/>
+    <member name="GSK_PATH_FOREACH_ALLOW_QUAD" nick="quad" value="1"/>
+    <member name="GSK_PATH_FOREACH_ALLOW_CUBIC" nick="cubic" value="2"/>
+    <member name="GSK_PATH_FOREACH_ALLOW_CONIC" nick="conic" value="4"/>
+  </flags>
+  <class name="GskVulkanRenderer" get-type="gsk_vulkan_renderer_get_type" parents="GskGpuRenderer,GskRenderer,GObject">
+    <implements name="GdkDmabufDownloader"/>
   </class>
   <error-quark function="gsk_serialization_error_quark" domain="gsk-serialization-error-quark"/>
 </dump>

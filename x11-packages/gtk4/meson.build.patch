@@ -1,11 +1,11 @@
 --- a/meson.build
 +++ b/meson.build
-@@ -884,7 +884,7 @@
+@@ -634,7 +634,7 @@
+ libdrm_dep = libdrm_dep.partial_dependency(includes: true, compile_args: true)
+ cdata.set('HAVE_DRM_FOURCC_H', libdrm_dep.found())
  
- subdir('docs/reference')
+-cdata.set('HAVE_DMABUF', cc.has_header('linux/dma-buf.h'))
++cdata.set('HAVE_DMABUF', false)
  
--if not meson.is_cross_build()
-+if false
-   gnome.post_install(
-     glib_compile_schemas: true,
-     gio_querymodules: gio_module_dirs,
+ cloudproviders_dep = dependency('cloudproviders',
+   required: get_option('cloudproviders'),
