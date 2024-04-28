@@ -93,8 +93,8 @@ termux_step_pre_configure() {
 		CFLAGS+=" -march=armv8-a+crc"
 		CXXFLAGS+=" -march=armv8-a+crc"
 	fi
-	 CXXFLAGS+=" -std=c++17 "
-CXX+=" -std=c++17 "
+	CXXFLAGS+=" -std=c++17 "
+	CXX+=" -std=c++17 "
 	# Regenerate configure again since we have patched config.m4 files.
 	./buildconf --force
 
@@ -105,12 +105,10 @@ CXX+=" -std=c++17 "
 	chmod +x $TERMUX_PKG_TMPDIR/apxs-wrapper.sh
 	cat $TERMUX_PKG_TMPDIR/apxs-wrapper.sh
 
-
 	CFLAGS="-I$TERMUX_PREFIX/include/openssl-1.1 $CFLAGS"
-        CPPFLAGS="-I$TERMUX_PREFIX/include/openssl-1.1 $CPPFLAGS"
-        CXXFLAGS="-I$TERMUX_PREFIX/include/openssl-1.1 $CXXFLAGS"
-        LDFLAGS="-L$TERMUX_PREFIX/lib/openssl-1.1 -Wl,-rpath=$TERMUX_PREFIX/lib/openssl-1.1 $LDFLAGS"
-
+	CPPFLAGS="-I$TERMUX_PREFIX/include/openssl-1.1 $CPPFLAGS"
+	CXXFLAGS="-I$TERMUX_PREFIX/include/openssl-1.1 $CXXFLAGS"
+	LDFLAGS="-L$TERMUX_PREFIX/lib/openssl-1.1 -Wl,-rpath=$TERMUX_PREFIX/lib/openssl-1.1 $LDFLAGS"
 
 	# Fix overlinking (unneeded DT_NEEDED entries) with libtool:
 	local wrapper_bin=$TERMUX_PKG_BUILDDIR/_wrapper/bin
