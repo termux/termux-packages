@@ -1,0 +1,14 @@
+diff -u -r ../php-7.1.0RC3/ext/posix/posix.c ./ext/posix/posix.c
+--- ../php-7.1.0RC3/ext/posix/posix.c	2016-09-28 22:15:45.000000000 -0400
++++ ./ext/posix/posix.c	2016-10-03 08:39:39.009354865 -0400
+@@ -1163,7 +1163,10 @@
+ 	add_assoc_string(return_value, "passwd",    pw->pw_passwd);
+ 	add_assoc_long  (return_value, "uid",       pw->pw_uid);
+ 	add_assoc_long  (return_value, "gid",		pw->pw_gid);
++#if !defined(__ANDROID__) || defined(__LP64__)
++	/* Only 64-bit Android has the pw_gecos field. */
+ 	add_assoc_string(return_value, "gecos",     pw->pw_gecos);
++#endif
+ 	add_assoc_string(return_value, "dir",       pw->pw_dir);
+ 	add_assoc_string(return_value, "shell",     pw->pw_shell);
+ 	return 1;
