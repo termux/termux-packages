@@ -3,11 +3,13 @@ TERMUX_PKG_DESCRIPTION="Most popular and complete prolog implementation"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=9.3.3
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.swi-prolog.org/download/devel/src/swipl-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=db8453356811edbb4c2130d52617d327a4b4e322e2941dd4d52b5751d03e3946
 TERMUX_PKG_DEPENDS="libandroid-execinfo, libarchive, libcrypt, libgmp, libyaml, ncurses, openssl, ossp-uuid, readline, zlib, pcre2"
 TERMUX_PKG_FORCE_CMAKE=true
 TERMUX_PKG_HOSTBUILD=true
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DHAVE_WEAK_ATTRIBUTE_EXITCODE=0
 -DHAVE_WEAK_ATTRIBUTE_EXITCODE__TRYRUN_OUTPUT=
@@ -24,6 +26,15 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DINSTALL_TESTS=OFF
 -DBUILD_TESTING=OFF
 -DSYSTEM_CACERT_FILENAME=${TERMUX_PREFIX}/etc/tls/cert.pem"
+
+termux_pkg_auto_update() {
+	# upstream website recommendes this to get the latest devel version
+	local latest_devel='https://www.swi-prolog.org/download/devel/src/swipl-latest.tar.gz'
+	local version=$(curl -s "$latest_devel" \
+	| jq '.location' \
+	| sed 's/.*swipl-\(.*\)\..*/\1/')
+termux_pkg_upgrade_version "$version"
+}
 
 # We do this to produce:
 # a native host build to produce
