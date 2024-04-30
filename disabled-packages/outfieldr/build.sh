@@ -8,9 +8,11 @@ TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
 TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
+TERMUX_ZIG_VERSION="0.9.1"
 
 termux_step_make() {
 	termux_setup_zig
+	ZIG_TARGET_NAME=${TERMUX_ARCH}-linux-android
 	zig build -Dtarget=$ZIG_TARGET_NAME
 }
 
