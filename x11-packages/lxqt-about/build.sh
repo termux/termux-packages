@@ -8,4 +8,3 @@ TERMUX_PKG_SHA256=b5ec828bb3b7de2ed82708719843608f0acc855eb09a85cb1670bfa06049b1
 TERMUX_PKG_DEPENDS="libc++, qt5-qtbase, liblxqt"
 TERMUX_PKG_BUILD_DEPENDS="lxqt-build-tools, qt5-qtbase-cross-tools"
 TERMUX_PKG_AUTO_UPDATE=true
-

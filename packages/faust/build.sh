@@ -98,4 +98,3 @@ termux_step_post_make_install() {
 	cd $TERMUX_PREFIX/share/faust
 	rm jack-*.cpp && rm *-gtk.{c,cpp} *-qt.cpp
 }
-
