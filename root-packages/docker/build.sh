@@ -118,9 +118,9 @@ termux_step_make_install() {
 	mkdir -p "${TERMUX_PREFIX}"/etc/docker
 	sed -e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
 		"${TERMUX_PKG_BUILDER_DIR}"/daemon.json > "${TERMUX_PREFIX}"/etc/docker/daemon.json
-        chmod 600 "${TERMUX_PREFIX}"/etc/docker/daemon.json
+	chmod 600 "${TERMUX_PREFIX}"/etc/docker/daemon.json
 	sed -e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
-	       "${TERMUX_PKG_BUILDER_DIR}/dockerd.sh" > "${TERMUX_PREFIX}/bin/dockerd"
+		"${TERMUX_PKG_BUILDER_DIR}/dockerd.sh" > "${TERMUX_PREFIX}/bin/dockerd"
 	chmod 700 "${TERMUX_PREFIX}/bin/dockerd"
 }
 
