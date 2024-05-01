@@ -34,7 +34,27 @@ termux_step_pre_configure() {
 	: "${CARGO_HOME:=$HOME/.cargo}"
 	export CARGO_HOME
 
+	rm -rf $CARGO_HOME/registry/src/*/interprocess-*
+	rm -rf $CARGO_HOME/registry/src/*/libmimalloc-sys-*
 	cargo fetch --target "${CARGO_TARGET_NAME}"
+
+	local d p
+	p="interprocess-socklen_t.diff"
+	for d in $CARGO_HOME/registry/src/*/interprocess-*; do
+		patch --silent -p1 -d ${d} < "${TERMUX_PKG_BUILDER_DIR}/${p}"
+	done
+
+	p="libmimalloc-sys-tls.diff"
+	for d in $CARGO_HOME/registry/src/*/libmimalloc-sys-*; do
+		patch --silent -p1 -d ${d} < "${TERMUX_PKG_BUILDER_DIR}/${p}"
+	done
+
+	# XXX: Do not enable `mimalloc` feature. It will fetch `libmimalloc-sys`,
+	# XXX: which needs to be patched to compile successfully, at building
+	# XXX: time. `cargo fetch` will not fetch its source.
+	# XXX: Besides, the above `libminalloc-sys` patch is also necessary because
+	# XXX: some dependencies of nushell refer to it.
+	sed -i 's/"mimalloc",/ /g' $TERMUX_PKG_SRCDIR/Cargo.toml
 
 	mv $TERMUX_PREFIX/lib/libz.so.1{,.tmp}
 	mv $TERMUX_PREFIX/lib/libz.so{,.tmp}
@@ -63,4 +83,7 @@ termux_step_post_make_install() {
 termux_step_post_massage() {
 	rm -f lib/libz.so.1
 	rm -f lib/libz.so
+
+	rm -rf $CARGO_HOME/registry/src/*/interprocess-*
+	rm -rf $CARGO_HOME/registry/src/*/libmimalloc-sys-*
 }
