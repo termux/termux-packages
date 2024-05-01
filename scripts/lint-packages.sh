@@ -135,6 +135,21 @@ lint_package() {
 		check_package_name "$subpkg_name" || return 1
 	done
 
+	echo -n "End of line check: "
+	local last2octet
+	last2octet=$(xxd -s -2 "$package_script" | awk '{ print $2 }')
+	if [[ "$last2octet" == "0a0a" ]]; then
+		echo -e "FAILED (duplicate newlines at the end)\n"
+		tail -n5 "$package_script" | sed -e "s|^|  |" -e "5s|^  |>>|"
+		return 1
+	fi
+	if [[ "$last2octet" != *"0a" ]]; then
+		echo -e "FAILED (no newline terminated)\n"
+		xxd -s -2 "$package_script"
+		return 1
+	fi
+	echo "PASS"
+
 	echo -n "File permission check: "
 	local file_permission
 	file_permission=$(stat -c "%A" "$package_script")
@@ -298,7 +313,6 @@ lint_package() {
 
 		echo -n "TERMUX_PKG_SRCURL: "
 		if (( ${#TERMUX_PKG_SRCURL} )); then
-
 			urls_ok=true
 			for url in "${TERMUX_PKG_SRCURL[@]}"; do
 				if (( ${#url} )); then
@@ -351,9 +365,12 @@ lint_package() {
 				pkg_lint_error=true
 			fi
 		else
+			echo -n "NOT SET"
 			if [[ "$TERMUX_PKG_SKIP_SRC_EXTRACT" != 'true' ]] && ! declare -F termux_step_extract_package > /dev/null 2>&1; then
-				echo "TERMUX_PKG_SRCURL: NOT SET (set TERMUX_PKG_SKIP_SRC_EXTRACT to 'true' if no sources downloaded)"
+				echo " (set TERMUX_PKG_SKIP_SRC_EXTRACT to 'true' if no sources downloaded)"
 				pkg_lint_error=true
+			else
+				echo " (acceptable since TERMUX_PKG_SKIP_SRC_EXTRACT is true)"
 			fi
 		fi
 
