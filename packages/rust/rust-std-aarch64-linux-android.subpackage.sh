@@ -6,5 +6,4 @@ TERMUX_SUBPKG_REPLACES="rust (<< 1.74.1-1)"
 TERMUX_SUBPKG_INCLUDE="
 lib/rustlib/aarch64-linux-android/lib/*.rlib
 lib/rustlib/aarch64-linux-android/lib/libstd-*.so
-lib/rustlib/aarch64-linux-android/lib/libtest-*.so
 "

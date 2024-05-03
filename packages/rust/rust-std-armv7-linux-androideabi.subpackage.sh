@@ -6,5 +6,4 @@ TERMUX_SUBPKG_REPLACES="rust (<< 1.74.1-1)"
 TERMUX_SUBPKG_INCLUDE="
 lib/rustlib/armv7-linux-androideabi/lib/*.rlib
 lib/rustlib/armv7-linux-androideabi/lib/libstd-*.so
-lib/rustlib/armv7-linux-androideabi/lib/libtest-*.so
 "
