@@ -28,7 +28,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.TERMUXBOT2_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Gather build summary
         run: |
           BASE_COMMIT=$(jq --raw-output .pull_request.base.sha "$GITHUB_EVENT_PATH")
@@ -100,7 +100,7 @@ jobs:
           done
       - name: Process package updates
         env:
-          GITHUB_TOKEN: ${{ secrets.TERMUXBOT2_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BUILD_PACKAGES: "false"
           GIT_COMMIT_PACKAGES: "false"
           GIT_PUSH_PACKAGES: "false"
