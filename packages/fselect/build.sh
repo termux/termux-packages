@@ -8,6 +8,9 @@ TERMUX_PKG_SHA256=4b7a6dc5f6f3da39c3242856a1c78734c7b14bd801dc4d7e32bc6f5a1809bc
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
+# ld.lld: error: undefined symbol: __aeabi_read_tp
+TERMUX_PKG_BLACKLISTED_ARCHES="arm"
+
 termux_step_pre_configure() {
 	termux_setup_cmake
 	termux_setup_rust
