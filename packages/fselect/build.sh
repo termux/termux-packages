@@ -8,9 +8,6 @@ TERMUX_PKG_SHA256=4b7a6dc5f6f3da39c3242856a1c78734c7b14bd801dc4d7e32bc6f5a1809bc
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
-# ld.lld: error: undefined symbol: __aeabi_read_tp
-TERMUX_PKG_BLACKLISTED_ARCHES="arm"
-
 termux_step_pre_configure() {
 	termux_setup_cmake
 	termux_setup_rust
@@ -22,10 +19,25 @@ termux_step_pre_configure() {
 	# Android: Neither the NDK or a standalone toolchain was found.
 	export TARGET_CMAKE_TOOLCHAIN_FILE="${TERMUX_PKG_BUILDDIR}/android.toolchain.cmake"
 	touch "${TERMUX_PKG_BUILDDIR}/android.toolchain.cmake"
+
+	: "${CARGO_HOME:=$HOME/.cargo}"
+	export CARGO_HOME
+
+	rm -rf $CARGO_HOME/registry/src/*/libmimalloc-sys-*
+	cargo fetch --target "${CARGO_TARGET_NAME}"
+
+	p="libmimalloc-sys-tls.diff"
+	for d in $CARGO_HOME/registry/src/*/libmimalloc-sys-*; do
+		patch --silent -p1 -d ${d} < "${TERMUX_PKG_BUILDER_DIR}/${p}"
+	done
 }
 
 termux_step_post_make_install() {
 	install -Dm700 \
 		"$TERMUX_PKG_SRCDIR/target/$CARGO_TARGET_NAME"/release/fselect \
 		"$TERMUX_PREFIX"/bin/fselect
+}
+
+termux_step_post_massage() {
+	rm -rf $CARGO_HOME/registry/src/*/libmimalloc-sys-*
 }
