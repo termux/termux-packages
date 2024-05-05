@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A post-modern modal text editor written in rust"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.org>"
 TERMUX_PKG_VERSION="24.03"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="git+https://github.com/helix-editor/helix"
 TERMUX_PKG_GIT_BRANCH="${TERMUX_PKG_VERSION}"
 TERMUX_PKG_SUGGESTS="helix-grammars"
@@ -30,4 +31,8 @@ termux_step_make_install() {
 
 	cp -r ./runtime "${datadir}"
 	find "${datadir}"/runtime/grammars -type f -name "*.so" -exec chmod 0700 {} \;
+
+	install -Dm 0644 "contrib/completion/hx.zsh" "${TERMUX_PREFIX}/share/zsh/site-functions/_hx"
+	install -Dm 0644 "contrib/completion/hx.bash" "${TERMUX_PREFIX}/share/bash-completion/completions/hx"
+	install -Dm 0644 "contrib/completion/hx.fish" "${TERMUX_PREFIX}/share/fish/vendor_completions.d/hx.fish"
 }
