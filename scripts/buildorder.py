@@ -306,10 +306,10 @@ def generate_full_buildorder(pkgs_map):
                 pkg_queue.append(other_pkg)  # should be processed
 
     if set(pkgs_map.values()) != set(build_order):
-        print("ERROR: Cycle exists. Remaining: ")
+        print("ERROR: Cycle exists. Remaining: ", file=sys.stderr)
         for name, pkg in pkgs_map.items():
             if pkg not in build_order:
-                print(name, remaining_deps[name])
+                print(name, remaining_deps[name], file=sys.stderr)
 
         sys.exit(1)
 
