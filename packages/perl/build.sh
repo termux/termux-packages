@@ -11,7 +11,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # - subversion
 TERMUX_PKG_VERSION=(5.38.2
                     388d0eedbfc3864bbbf7ad7f965064d99cac5aaa)
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SHA256=(a0a31534451eb7b83c7d6594a497543a54d488bc90ca00f5e34762577f40655e
                    a975c196075623f0dc94f57d00633b0d18ed08e3d85a3ea19d34ece4ec1a94c1)
 TERMUX_PKG_SRCURL=(http://www.cpan.org/src/5.0/perl-${TERMUX_PKG_VERSION}.tar.gz
@@ -54,7 +54,7 @@ termux_step_configure() {
 		ORIG_LD=$LD; unset LD
 
 		cd $TERMUX_PKG_BUILDDIR
-		CFLAGS=" -D__USE_BSD=1" LDFLAGS=" -Wl,-rpath=$TERMUX_PREFIX/lib -L$TERMUX_PREFIX/lib -landroid-utimes" $TERMUX_PKG_SRCDIR/configure \
+		CFLAGS=" -D__USE_BSD=1" LDFLAGS=" -Wl,-rpath=$TERMUX_PREFIX/lib -L$TERMUX_PREFIX/lib -landroid-utimes -lm" $TERMUX_PKG_SRCDIR/configure \
 			--target=$TERMUX_HOST_PLATFORM \
 			--with-cc="$ORIG_CC" \
 			--with-ranlib="$ORIG_RANLIB" \
