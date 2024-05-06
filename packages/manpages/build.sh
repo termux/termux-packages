@@ -3,11 +3,11 @@ TERMUX_PKG_DESCRIPTION="Man pages for linux kernel and C library interfaces"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSES/Linux-man-pages-copyleft.txt, _man-pages-posix/POSIX-COPYRIGHT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=(6.05.01
+TERMUX_PKG_VERSION=(6.7
                     2017)
-TERMUX_PKG_SHA256=(b96ab6b44a688c91d1b572e52fece519e1cfd2bb4c33fe7014fc3fd1ef3f9cae
+TERMUX_PKG_SHA256=(82403ad4bc17aadb924f68638b79d6930b2cbd551531248a7a9688779db4efb2
                    ce67bb25b5048b20dad772e405a83f4bc70faf051afa289361c81f9660318bc3)
-TERMUX_PKG_SRCURL=(https://www.kernel.org/pub/linux/docs/man-pages/man-pages-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SRCURL=(https://www.kernel.org/pub/linux/docs/man-pages/man-pages-${TERMUX_PKG_VERSION[0]}.tar.xz
                    https://www.kernel.org/pub/linux/docs/man-pages/man-pages-posix/man-pages-posix-${TERMUX_PKG_VERSION[1]}-a.tar.xz)
 TERMUX_PKG_DEPENDS="man"
 TERMUX_PKG_CONFLICTS="linux-man-pages"
