@@ -121,6 +121,12 @@ termux_step_massage() {
 		rm -f ./${ADDING_PREFIX}lib/python${TERMUX_PYTHON_VERSION}/__pycache__/{base64,platform,quopri}.cpython-${TERMUX_PYTHON_VERSION//./}.pyc
 	fi
 
+	# Remove module files in the python-glibc package
+	# that run during python-glibc compilation.
+	if [ "$TERMUX_PKG_NAME" = "python-glibc" ]; then
+		rm -fr ./${ADDING_PREFIX}lib/python${TERMUX_PYTHON_VERSION}/site-packages/*/
+	fi
+
 	# Check so files were actually installed. Exclude
 	# share/doc/$TERMUX_PKG_NAME/ as a license file is always
 	# installed there.
