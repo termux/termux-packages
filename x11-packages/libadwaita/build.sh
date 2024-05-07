@@ -12,7 +12,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dintrospection=enabled
 -Dvapi=true
 -Dtests=false
--Dexamples=false
+-Dexamples=true
 "
 
 termux_step_pre_configure() {
