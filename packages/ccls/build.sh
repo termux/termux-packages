@@ -7,6 +7,7 @@ _COMMIT_DATE=2024.02.02
 TERMUX_PKG_VERSION=0.${_COMMIT_DATE//./}
 TERMUX_PKG_SRCURL=git+https://github.com/MaskRay/ccls.git
 TERMUX_PKG_GIT_BRANCH=master
+TERMUX_PKG_AUTO_UPDATE=false
 # clang is for libclang-cpp.so
 TERMUX_PKG_DEPENDS="clang, libc++, libllvm"
 TERMUX_PKG_BUILD_DEPENDS="rapidjson, libllvm-static"
