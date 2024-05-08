@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="An unofficial command line client for Bitwarden"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.9.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/doy/rbw/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=fdf2942b3b9717e5923ac9b8f2b2cece0c1e47713292ea501af9709398efbacd
 TERMUX_PKG_DEPENDS="pinentry"
