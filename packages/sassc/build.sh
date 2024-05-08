@@ -10,4 +10,3 @@ TERMUX_PKG_DEPENDS="libsass"
 termux_step_pre_configure() {
 	autoreconf -fi
 }
-
