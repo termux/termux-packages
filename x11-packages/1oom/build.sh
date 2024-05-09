@@ -8,7 +8,7 @@ TERMUX_PKG_SHA256=410c4cac16c8e1b5dcb988a7ed71e1f23eca9afdccd34acf8cd44381c91802
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP='\d+\.\d+\.\d+'
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
-TERMUX_PKG_DEPENDS="libandroid-shmem, xorgproto, libx11, readline"
+TERMUX_PKG_DEPENDS="libandroid-shmem, xorgproto, libx11, libxext, readline"
 TERMUX_PKG_GROUPS="games"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-static
