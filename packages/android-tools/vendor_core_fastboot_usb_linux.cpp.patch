@@ -22,7 +22,7 @@
  };
  
 +#ifdef __ANDROID__
-+struct context {
++static struct context {
 +    libusb_context *libusb_ctx;
 +
 +    context() {
@@ -55,7 +55,7 @@
  }
 + 
 +#ifdef __ANDROID__
-+bool ref_deleted(int fd) {
++static inline bool ref_deleted(int fd) {
 +    struct stat fd_stat;
 +    fstat(fd, &fd_stat);
 +    return fd_stat.st_nlink < 1;
