@@ -157,21 +157,19 @@
  
          if(callback(&info) == 0) {
              *ept_in_id = in;
-@@ -368,16 +442,55 @@
+@@ -368,16 +442,53 @@
      int fd;
      int writable;
  
 +#ifdef __ANDROID__
 +    bool try_linux_usb = true, try_termux_usb = false, search_linux_usb, search_termux_usb;
-+    int termux_usb_fd;
-+    char* fd_str = getenv("TERMUX_USB_FD");
-+    if (fd_str != nullptr) {
-+        long int fd_long = strtol(fd_str, nullptr, 10);
-+        if (fd_long >= INT_MIN && fd_long <= INT_MAX) {
-+            termux_usb_fd = (int) fd_long;
-+            if (termux_usb_fd != -1 && !ref_deleted(termux_usb_fd))
-+                try_termux_usb = true;
-+        }
++    long int termux_usb_fd;
++    char *termux_usb_env = getenv("TERMUX_USB_FD");
++    if (termux_usb_env != nullptr) {
++        char *endp;
++        termux_usb_fd = strtol(termux_usb_env, &endp, 10);
++        if (endp != termux_usb_env && !ref_deleted(termux_usb_fd))
++            try_termux_usb = true;
 +    }
 +#endif
 +
