@@ -157,12 +157,12 @@
  
          if(callback(&info) == 0) {
              *ept_in_id = in;
-@@ -368,16 +442,52 @@
+@@ -368,16 +442,55 @@
      int fd;
      int writable;
  
 +#ifdef __ANDROID__
-+    bool linux_usb = true, termux_usb = false, is_linux_usb, is_termux_usb;
++    bool try_linux_usb = true, try_termux_usb = false, search_linux_usb, search_termux_usb;
 +    int termux_usb_fd;
 +    char* fd_str = getenv("TERMUX_USB_FD");
 +    if (fd_str != nullptr) {
@@ -170,7 +170,7 @@
 +        if (fd_long >= INT_MIN && fd_long <= INT_MAX) {
 +            termux_usb_fd = (int) fd_long;
 +            if (termux_usb_fd != -1 && !ref_deleted(termux_usb_fd))
-+                termux_usb = true;
++                try_termux_usb = true;
 +        }
 +    }
 +#endif
@@ -178,16 +178,19 @@
      std::unique_ptr<DIR, decltype(&closedir)> busdir(opendir(base), closedir);
 +#ifdef __ANDROID__
 +    if (busdir == nullptr)
-+        linux_usb = false;
++        try_linux_usb = false;
 +
-+    while (((is_linux_usb = (linux_usb &&
-+            (de = readdir(busdir.get())))) || termux_usb) && (usb == nullptr)) {
-+        is_termux_usb = !is_linux_usb;
++    // read the next entry from busdir if it was opened successfully,
++    // enter the loop until we reach the end of the busdir,
++    // or we have Termux-usb left to try, until an interesting device is found.
++    while (((search_linux_usb = (try_linux_usb &&
++            (de = readdir(busdir.get())))) || try_termux_usb) && (usb == nullptr)) {
++        search_termux_usb = !search_linux_usb;  // try Termux-usb at last
 +
-+        if (is_linux_usb && badname(de->d_name))
++        if (search_linux_usb && badname(de->d_name))
 +            continue;
 +
-+        if (is_termux_usb || !convert_to_devfs_name(de->d_name,
++        if (search_termux_usb || !convert_to_devfs_name(de->d_name,
 +                                                    devname, sizeof(devname))) {
 +#else
      if (busdir == 0) return 0;
@@ -201,8 +204,8 @@
  //            DBG("[ scanning %s ]\n", devname);
              writable = 1;
 +#ifdef __ANDROID__
-+            if (is_termux_usb) {
-+                termux_usb = false;
++            if (search_termux_usb) {
++                try_termux_usb = false;  // try only once since there is only one fd
 +                fd = termux_usb_fd;
 +                lseek(fd, 0, SEEK_SET);
 +            } else {
@@ -221,14 +224,14 @@
              n = read(fd, desc, sizeof(desc));
  
 +#ifdef __ANDROID__
-+            if (filter_usb_device(de->d_name, is_termux_usb, fd, desc, n,
++            if (filter_usb_device(de->d_name, search_termux_usb, fd, desc, n,
 +                                  writable, callback, &in, &out, &ifc) == 0) {
 +#else
              if (filter_usb_device(de->d_name, desc, n, writable, callback, &in, &out, &ifc) == 0) {
 +#endif
                  usb.reset(new usb_handle());
 +#ifdef __ANDROID__
-+                if (is_termux_usb)
++                if (search_termux_usb)
 +                    usb->is_termux_usb = true;
 +#else
                  strcpy(usb->fname, devname);
