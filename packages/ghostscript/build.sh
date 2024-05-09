@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Interpreter for the PostScript language and for PDF"
 TERMUX_PKG_LICENSE="AGPL-V3"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="10.02.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs${TERMUX_PKG_VERSION//.}/ghostpdl-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=25399af0ef5bb94f2a13c91dc785c128d14f16744c4c92fa7c86e011c23151d8
 TERMUX_PKG_AUTO_UPDATE=false
