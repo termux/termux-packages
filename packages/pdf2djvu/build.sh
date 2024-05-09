@@ -13,5 +13,5 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure() {
-	CXXFLAGS+=" -std=c++17"
+	CXXFLAGS+=" -std=c++20"
 }
