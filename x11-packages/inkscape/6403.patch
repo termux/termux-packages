@@ -1,0 +1,49 @@
+From 2b0b25abe887242cd201b2c6ecb221eef080b071 Mon Sep 17 00:00:00 2001
+From: Heiko Becker <mail@heiko-becker.de>
+Date: Fri, 3 May 2024 14:52:00 +0200
+Subject: [PATCH] Fix build with poppler >= 24.05.0
+
+GooString::hasUnicodeMarkerLE and GooString::hasUnicodeMarker were
+rename and moved to UTF.h [1][2]
+
+[1] https://gitlab.freedesktop.org/poppler/poppler/-/commit/98fabb298b0e8eaef9193bbce68c99c85473a314
+[2] https://gitlab.freedesktop.org/poppler/poppler/-/commit/1f06dca08c32ed18c3030530d98a0e30d41dd7a2
+---
+ src/extension/internal/pdfinput/poppler-utils.cpp | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/src/extension/internal/pdfinput/poppler-utils.cpp b/src/extension/internal/pdfinput/poppler-utils.cpp
+index 78d90c66c9d..18cad6b9198 100644
+--- a/src/extension/internal/pdfinput/poppler-utils.cpp
++++ b/src/extension/internal/pdfinput/poppler-utils.cpp
+@@ -12,6 +12,8 @@
+ 
+ #include "poppler-utils.h"
+ 
++#include <poppler/UTF.h>
++
+ #include "2geom/affine.h"
+ #include "GfxFont.h"
+ #include "GfxState.h"
+@@ -563,10 +565,18 @@ std::string getDictString(Dict *dict, const char *key)
+  */
+ std::string getString(const GooString *value)
+ {
++#if POPPLER_CHECK_VERSION(24, 5, 0)
++    if (hasUnicodeByteOrderMark(value->toStr())) {
++#else
+     if (value->hasUnicodeMarker()) {
++#endif
+         return g_convert(value->getCString () + 2, value->getLength () - 2,
+                          "UTF-8", "UTF-16BE", NULL, NULL, NULL);
++#if POPPLER_CHECK_VERSION(24, 5, 0)
++    } else if (hasUnicodeByteOrderMarkLE(value->toStr())) {
++#else
+     } else if (value->hasUnicodeMarkerLE()) {
++#endif
+         return g_convert(value->getCString () + 2, value->getLength () - 2,
+                          "UTF-8", "UTF-16LE", NULL, NULL, NULL);
+     }
+-- 
+GitLab
+

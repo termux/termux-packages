@@ -1,0 +1,47 @@
+diff -up inkscape-1.3.2_2023-11-25_091e20ef0f/CMakeLists.txt.omv~ inkscape-1.3.2_2023-11-25_091e20ef0f/CMakeLists.txt
+--- inkscape-1.3.2_2023-11-25_091e20ef0f/CMakeLists.txt.omv~	2024-05-04 02:07:00.183191531 +0200
++++ inkscape-1.3.2_2023-11-25_091e20ef0f/CMakeLists.txt	2024-05-04 02:07:06.023264167 +0200
+@@ -18,7 +18,7 @@ message("Binary Dir: ${CMAKE_CURRENT_BIN
+ # -----------------------------------------------------------------------------
+ # CMake Configuration
+ # -----------------------------------------------------------------------------
+-set(CMAKE_CXX_STANDARD 17)
++set(CMAKE_CXX_STANDARD 20)
+ set(CMAKE_CXX_STANDARD_REQUIRED ON)
+ # set(CMAKE_CXX_EXTENSIONS OFF) # enforces -std=c++17 instead of -std=gnu++17
+                                 # TODO: build currently fails with it as we actually depend on GNU compiler extensions...
+diff -up inkscape-1.3.2_2023-11-25_091e20ef0f/src/3rdparty/2geom/CMakeLists.txt.omv~ inkscape-1.3.2_2023-11-25_091e20ef0f/src/3rdparty/2geom/CMakeLists.txt
+--- inkscape-1.3.2_2023-11-25_091e20ef0f/src/3rdparty/2geom/CMakeLists.txt.omv~	2024-05-04 02:07:12.835348881 +0200
++++ inkscape-1.3.2_2023-11-25_091e20ef0f/src/3rdparty/2geom/CMakeLists.txt	2024-05-04 02:07:15.411380913 +0200
+@@ -19,7 +19,7 @@ project(lib2geom
+ set(2GEOM_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/include" CACHE INTERNAL "")
+ include_directories("${CMAKE_CURRENT_LIST_DIR}/src/2geom") # for private headers/template support.
+ 
+-set(CMAKE_CXX_STANDARD 17)
++set(CMAKE_CXX_STANDARD 20)
+ set(CMAKE_CXX_STANDARD_REQUIRED ON)
+ set(CMAKE_CXX_EXTENSIONS OFF) # enforces -std=c++17 instead of -std=gnu++17
+ set(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib)
+diff -up inkscape-1.3.2_2023-11-25_091e20ef0f/src/3rdparty/2geom/tests/dependent-project/CMakeLists.txt.omv~ inkscape-1.3.2_2023-11-25_091e20ef0f/src/3rdparty/2geom/tests/dependent-project/CMakeLists.txt
+--- inkscape-1.3.2_2023-11-25_091e20ef0f/src/3rdparty/2geom/tests/dependent-project/CMakeLists.txt.omv~	2024-05-04 02:07:21.395455318 +0200
++++ inkscape-1.3.2_2023-11-25_091e20ef0f/src/3rdparty/2geom/tests/dependent-project/CMakeLists.txt	2024-05-04 02:07:24.447493263 +0200
+@@ -1,6 +1,6 @@
+ cmake_minimum_required(VERSION 3.1)
+ project(test_dep_2geom CXX C)
+-set(CMAKE_CXX_STANDARD 17)
++set(CMAKE_CXX_STANDARD 20)
+ 
+ option(2GEOM_AS_SUBPROJECT "include 2geom as subproject" OFF)
+ 
+diff -up inkscape-1.3.2_2023-11-25_091e20ef0f/src/ui/knot/knot-holder-entity.cpp.omv~ inkscape-1.3.2_2023-11-25_091e20ef0f/src/ui/knot/knot-holder-entity.cpp
+--- inkscape-1.3.2_2023-11-25_091e20ef0f/src/ui/knot/knot-holder-entity.cpp.omv~	2024-05-04 02:19:33.124510593 +0200
++++ inkscape-1.3.2_2023-11-25_091e20ef0f/src/ui/knot/knot-holder-entity.cpp	2024-05-04 02:23:27.107396343 +0200
+@@ -329,7 +329,7 @@ PatternKnotHolderEntityScale::knot_set(G
+     double scale_x = std::clamp(new_extent[X] / _cached_diagonal[X], _cached_min_scale, 1e9);
+     double scale_y = std::clamp(new_extent[Y] / _cached_diagonal[Y], _cached_min_scale, 1e9);
+ 
+-    Affine new_transform = (state & GDK_CONTROL_MASK) ? Scale(lerp(0.5, scale_x, scale_y))
++    Affine new_transform = (state & GDK_CONTROL_MASK) ? Scale(std::lerp(static_cast<double>(0.5), scale_x, scale_y))
+                                                       : Scale(scale_x, scale_y);
+ 
+     // 2. Calculate offset to keep pattern origin aligned
