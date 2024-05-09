@@ -1,10 +1,7 @@
-diff --git a/vendor/core/fastboot/fastboot.cpp b/vendor/core/fastboot/fastboot.cpp
-index 0062e7e..5f2894d 100644
---- a/vendor/core/fastboot/fastboot.cpp
-+++ b/vendor/core/fastboot/fastboot.cpp
-@@ -1343,6 +1343,12 @@ static bool is_userspace_fastboot() {
++++ ./vendor/core/fastboot/fastboot.cpp
+@@ -1547,6 +1547,13 @@
  
- static void reboot_to_userspace_fastboot() {
+ void reboot_to_userspace_fastboot() {
      fb->RebootTo("fastboot");
 +#ifdef __ANDROID__
 +    if (fb->transport()->NotReusable()) {
@@ -12,6 +9,7 @@ index 0062e7e..5f2894d 100644
 +        return;
 +    }
 +#endif
++
+     fb->set_transport(nullptr);
  
-     auto* old_transport = fb->set_transport(nullptr);
-     delete old_transport;
+     // Give the current connection time to close.

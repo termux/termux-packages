@@ -1,8 +1,5 @@
-diff --git a/vendor/CMakeLists.fastboot.txt b/vendor/CMakeLists.fastboot.txt
-index a217ecc..1d8d3b1 100644
---- a/vendor/CMakeLists.fastboot.txt
-+++ b/vendor/CMakeLists.fastboot.txt
-@@ -5,7 +5,7 @@ add_library(libzip STATIC
++++ ./vendor/CMakeLists.fastboot.txt
+@@ -5,7 +5,7 @@
  	libziparchive/zip_error.cpp
  	libziparchive/zip_writer.cc)
  
@@ -11,7 +8,16 @@ index a217ecc..1d8d3b1 100644
  target_include_directories(libzip PUBLIC
  	libziparchive/include
  	libziparchive/incfs_support/include
-@@ -61,7 +61,41 @@ add_library(libselinux STATIC
+@@ -30,6 +30,8 @@
+ 	core/include
+ 	logging/liblog/include
+ 	core/libutils/include
++	core/libprocessgroup/include
++	core/libvndksupport/include
+ 	libbase/include)
+ 
+ add_library(libext4 STATIC
+@@ -54,7 +56,41 @@
  	selinux/libselinux/src/setrans_client.c
  	selinux/libselinux/src/sha1.c
  	selinux/libselinux/src/label_file.c
@@ -52,12 +58,12 @@ index a217ecc..1d8d3b1 100644
 +	selinux/libselinux/src/stringrep.c
 +	core/libpackagelistparser/packagelistparser.cpp)
  
- target_compile_definitions(libselinux PRIVATE
- 	-DAUDITD_LOG_TAG=1003 -D_GNU_SOURCE -DBUILD_HOST -DUSE_PCRE2
-@@ -82,6 +86,13 @@ target_compile_definitions(libselinux PRIVATE
+ if(HAVE_STRLCPY)
+ 	target_compile_definitions(libselinux PRIVATE HAVE_STRLCPY)
+@@ -68,6 +104,13 @@
  target_include_directories(libselinux PUBLIC
  	selinux/libselinux/include selinux/libsepol/include)
-
+ 
 +target_include_directories(libselinux PRIVATE
 +	selinux/libselinux/src
 +	libselinux/src/android
@@ -68,7 +74,7 @@ index a217ecc..1d8d3b1 100644
  add_library(libsepol
  	selinux/libsepol/src/assertion.c
  	selinux/libsepol/src/avrule_block.c
-@@ -100,6 +111,7 @@ add_library(libsepol
+@@ -86,6 +129,7 @@
  	selinux/libsepol/src/policydb.c
  	selinux/libsepol/src/policydb_convert.c
  	selinux/libsepol/src/policydb_public.c
@@ -76,9 +82,9 @@ index a217ecc..1d8d3b1 100644
  	selinux/libsepol/src/services.c
  	selinux/libsepol/src/sidtab.c
  	selinux/libsepol/src/symtab.c
-@@ -135,7 +147,7 @@ target_compile_definitions(fastboot PRIV
+@@ -136,7 +180,7 @@
  target_link_libraries(fastboot
- 	libsparse libzip libcutils liblog libfsmgr libutil
+ 	libsparse libzip libcutils liblog liblp libutil
  	libbase libext4 libselinux libsepol libdiagnoseusb crypto
 -	z PkgConfig::libpcre2-8 Threads::Threads dl)
 +	z PkgConfig::libpcre2-8 Threads::Threads dl usb-1.0)
