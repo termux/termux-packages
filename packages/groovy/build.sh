@@ -14,6 +14,7 @@ TERMUX_PKG_SRCURL=(https://groovy.jfrog.io/artifactory/dist-release-local/groovy
 TERMUX_PKG_SHA256=(b8c3bec88a3f5a62235d9429a97e371032bf7216f3e28724823a9169dd10befc
                    d992c07f17fc2937f7ef0579c6386457a476ef93b1e81778b427c09318a70833
                    c6205afb214288cd8ef53f1ea1243ba9388c84b55c929f0b9e6cee7757c6efac)
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="libjansi (>= 2.4.0-1), openjdk-17"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
