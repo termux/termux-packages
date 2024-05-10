@@ -24,7 +24,7 @@ termux_download() {
 		--location
 	)
 	TMPFILE=$(mktemp "$TERMUX_PKG_TMPDIR/download.${TERMUX_PKG_NAME-unnamed}.XXXXXXXXX")
-	if [ "$TERMUX_QUIET_BUILD" = true ]; then
+	if [ "${TERMUX_QUIET_BUILD-}" = true ]; then
 		CURL_OPTIONS+=( --no-progress-meter)
 	fi
 
