@@ -184,7 +184,7 @@ termux_step_massage() {
 		local SYMBOLS=$(${READELF} -s $(${TERMUX_HOST_PLATFORM}-clang -print-libgcc-file-name) | grep -E "FUNC[[:space:]]+GLOBAL[[:space:]]+HIDDEN" | awk '{ print $8 }')
 		SYMBOLS+=" $(echo libandroid_{sem_{open,close,unlink},shm{ctl,get,at,dt}})"
 		# TODO replace grep all symbols with a parser
-		SYMBOLS+=" $(grep "^    " ${TERMUX_SCRIPTDIR}/scripts/lib{c,dl,m}.map.txt | cut -d":" -f2 | grep ";" | grep -v '*' | sed -e "s/^    //" -e "s/;.*//")"
+		SYMBOLS+=" $(grep "^    [_a-zA-Z0-9]*;" ${TERMUX_SCRIPTDIR}/scripts/lib{c,dl,m}.map.txt | cut -d":" -f2 | sed -e "s/^    //" -e "s/;.*//")"
 		SYMBOLS+=" ${TERMUX_PKG_EXTRA_UNDEF_SYMBOLS_TO_CHECK}"
 		SYMBOLS=$(echo $SYMBOLS | tr " " "\n" | sort | uniq)
 		create_grep_pattern ${SYMBOLS} > "${pattern_file}"
@@ -198,7 +198,7 @@ termux_step_massage() {
 		local files=$(find . -type f)
 		# use bash to see if llvm-readelf crash
 		# https://github.com/llvm/llvm-project/issues/89534
-		local valid=$(echo "${files}" | xargs -P"${nproc}" -i bash -c 'if ${READELF} -h {} &>/dev/null; then echo {}; fi')
+		local valid=$(echo "${files}" | xargs -P"${nproc}" -i bash -c 'if ${READELF} -h "{}" &>/dev/null; then echo "{}"; fi')
 		local t1=$(get_epoch)
 		echo "INFO: Done ... $((t1-t0))s"
 		local numberOfFiles=$(echo "${files}" | wc -l)
@@ -210,7 +210,7 @@ termux_step_massage() {
 
 		echo "INFO: Running symbol checks on ${numberOfValid} files with nproc=${nproc}"
 		local t0=$(get_epoch)
-		local undef=$(echo "${valid}" | xargs -P"${nproc}" -i sh -c '${READELF} -s {} | grep -Ef "${pattern_file}"')
+		local undef=$(echo "${valid}" | xargs -P"${nproc}" -i sh -c '${READELF} -s "{}" | grep -Ef "${pattern_file}"')
 		local t1=$(get_epoch)
 		echo "INFO: Done ... $((t1-t0))s"
 
