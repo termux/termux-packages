@@ -1,7 +1,8 @@
-diff -uNr xrdp-0.9.15/sesman/verify_user.c xrdp-0.9.15.mod/sesman/verify_user.c
---- xrdp-0.9.15/sesman/verify_user.c	2020-12-28 14:03:43.000000000 +0000
-+++ xrdp-0.9.15.mod/sesman/verify_user.c	2021-02-09 20:39:29.340212904 +0000
-@@ -33,8 +33,10 @@
+diff --git a/sesman/libsesman/verify_user.c.orig b/sesman/libsesman/verify_user.c
+index ccd289d..154dc69 100644
+--- a/sesman/libsesman/verify_user.c.orig
++++ b/sesman/libsesman/verify_user.c
+@@ -37,19 +37,23 @@
  #include <stdio.h>
  #include <string.h>
  #include <sys/types.h>
@@ -12,9 +13,8 @@ diff -uNr xrdp-0.9.15/sesman/verify_user.c xrdp-0.9.15.mod/sesman/verify_user.c
  #include <pwd.h>
  
  #ifndef SECS_PER_DAY
-@@ -43,17 +45,20 @@
- 
- extern struct config_sesman *g_cfg; /* in sesman.c */
+ #define SECS_PER_DAY (24L*3600L)
+ #endif
  
 +#ifndef __ANDROID__
  static int
@@ -24,26 +24,47 @@ diff -uNr xrdp-0.9.15/sesman/verify_user.c xrdp-0.9.15.mod/sesman/verify_user.c
  auth_account_disabled(struct spwd *stp);
 +#endif
  
- /******************************************************************************/
- /* returns boolean */
- long
- auth_userpass(const char *user, const char *pass, int *errorcode)
+ /*
+  * Need a complete type for struct auth_info, even though we're
+@@ -65,6 +69,7 @@ struct auth_info *
+ auth_userpass(const char *user, const char *pass,
+               const char *client_ip, enum scp_login_status *errorcode)
  {
 +#ifndef __ANDROID__
-     const char *encr;
-     const char *epass;
+     const char *encr = NULL;
      struct passwd *spw;
-@@ -95,6 +100,9 @@
-         return 0;
+ 
+@@ -124,6 +129,10 @@ auth_userpass(const char *user, const char *pass,
      }
-     return (strcmp(encr, epass) == 0);
+ 
+     return (status == E_SCP_LOGIN_OK) ? &success : NULL;
 +#else
-+    return 1;
++    static struct auth_info success = {0};
++    return &success;
 +#endif
  }
  
  /******************************************************************************/
-@@ -131,6 +139,7 @@
+@@ -131,6 +140,7 @@ auth_userpass(const char *user, const char *pass,
+ struct auth_info *
+ auth_uds(const char *user, enum scp_login_status *errorcode)
+ {
++#ifndef __ANDROID__
+     struct passwd *spw;
+ 
+     /* Need a non-NULL pointer to return to indicate success */
+@@ -169,6 +179,10 @@ auth_uds(const char *user, enum scp_login_status *errorcode)
+     }
+ 
+     return (status == E_SCP_LOGIN_OK) ? &success : NULL;
++#else
++    static struct auth_info success = {0};
++    return &success;
++#endif
+ }
+ 
+ 
+@@ -198,6 +212,7 @@ auth_set_env(struct auth_info *auth_info)
  int
  auth_check_pwd_chg(const char *user)
  {
@@ -51,7 +72,7 @@ diff -uNr xrdp-0.9.15/sesman/verify_user.c xrdp-0.9.15.mod/sesman/verify_user.c
      struct passwd *spw;
      struct spwd *stp;
      int now;
-@@ -181,13 +190,14 @@
+@@ -248,13 +263,14 @@ auth_check_pwd_chg(const char *user)
          /* cannot change pwd for now */
          return AUTH_PWD_CHG_NOT_NOW;
      }
@@ -67,7 +88,7 @@ diff -uNr xrdp-0.9.15/sesman/verify_user.c xrdp-0.9.15.mod/sesman/verify_user.c
      struct passwd *spw;
      struct spwd *stp;
      char hash[35] = "";
-@@ -248,6 +258,9 @@
+@@ -315,6 +331,9 @@ auth_change_pwd(const char *user, const char *newpwd)
  
      ulckpwdf();
      return 0;
@@ -77,7 +98,7 @@ diff -uNr xrdp-0.9.15/sesman/verify_user.c xrdp-0.9.15.mod/sesman/verify_user.c
  }
  
  /**
-@@ -258,7 +271,7 @@
+@@ -325,7 +344,7 @@ auth_change_pwd(const char *user, const char *newpwd)
   * @param crp Crypted new password
   *
   */
@@ -86,7 +107,7 @@ diff -uNr xrdp-0.9.15/sesman/verify_user.c xrdp-0.9.15.mod/sesman/verify_user.c
  static int
  auth_crypt_pwd(const char *pwd, const char *pln, char *crp)
  {
-@@ -335,3 +348,4 @@
+@@ -402,3 +421,4 @@ auth_account_disabled(struct spwd *stp)
  
      return 0;
  }
