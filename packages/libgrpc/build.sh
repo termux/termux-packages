@@ -28,6 +28,15 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DProtobuf_PROTOC_LIBRARY=$TERMUX_PREFIX/lib/libprotoc.so
 "
 
+termux_pkg_auto_update() {
+	local latest_tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}" "${TERMUX_PKG_UPDATE_TAG_TYPE}")"
+	if grep -qP "${TERMUX_PKG_UPDATE_VERSION_REGEXP}" <<<"${latest_tag}"; then
+		termux_pkg_upgrade_version "${latest_tag}"
+	else
+		echo "INFO: No update needed, tag '${latest_tag}' is not a stable release."
+	fi
+}
+
 termux_step_host_build() {
 	termux_setup_cmake
 	termux_setup_ninja
