@@ -2,7 +2,7 @@ TERMUX_SUBPKG_DESCRIPTION="Update or create index file from all installed info f
 TERMUX_SUBPKG_PLATFORM_INDEPENDENT=true
 TERMUX_SUBPKG_INCLUDE="
 bin/update-info-dir
-share/man/man8/update-info-dir.8
+share/man/man8/update-info-dir.8.gz
 "
 
 termux_step_create_subpkg_debscripts() {
