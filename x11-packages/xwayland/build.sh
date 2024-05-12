@@ -42,7 +42,7 @@ share/man/man1/Xserver.1
 termux_step_pre_configure() {
 	export PATH="$TERMUX_PREFIX/opt/libwayland/cross/bin:$PATH"
 
-	CFLAGS+=" -fcommon -fPIC -DFNDELAY=O_NDELAY -Wno-int-to-pointer-cast"
+	CFLAGS+=" -fcommon -fPIC -DFNDELAY=O_NDELAY -Wno-int-to-pointer-cast -Wno-implicit-function-declaration"
 	CPPFLAGS+=" -fcommon -fPIC -I${TERMUX_PREFIX}/include/libdrm"
 	LDFLAGS+=" -landroid-shmem"
 }
