@@ -10,7 +10,7 @@ diff -uNr a/include/sway/config.h b/include/sway/config.h
  #include <time.h>
 --- a/include/sway/server.h
 +++ b/include/sway/server.h
-@@ -3,13 +3,13 @@
+@@ -3,6 +3,7 @@
  #include <stdbool.h>
  #include <wayland-server-core.h>
  #include <wlr/backend.h>
@@ -18,24 +18,6 @@ diff -uNr a/include/sway/config.h b/include/sway/config.h
  #include <wlr/render/allocator.h>
  #include <wlr/render/wlr_renderer.h>
  #include <wlr/types/wlr_compositor.h>
- #include <wlr/types/wlr_data_device.h>
- #include <wlr/types/wlr_input_method_v2.h>
- #include <wlr/types/wlr_foreign_toplevel_management_v1.h>
--#include <wlr/types/wlr_drm_lease_v1.h>
- #include <wlr/types/wlr_layer_shell_v1.h>
- #include <wlr/types/wlr_output_management_v1.h>
- #include <wlr/types/wlr_output_power_management_v1.h>
-@@ -25,6 +25,10 @@
- #include "sway/xwayland.h"
- #endif
- 
-+#if WLR_HAS_DRM_BACKEND
-+#include <wlr/types/wlr_drm_lease_v1.h>
-+#endif
-+
- struct sway_transaction;
- 
- struct sway_server {
 --- a/include/sway/input/input-manager.h
 +++ b/include/sway/input/input-manager.h
 @@ -1,6 +1,5 @@
