@@ -5,10 +5,10 @@
  # Python and Numpy libraries
  find_package(Python3Alt REQUIRED)
 +include_directories(SYSTEM ${NUMPY_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})
- include(UseCython)
+ message(STATUS "Found NumPy version: ${Python3_NumPy_VERSION}")
+ message(STATUS "NumPy include dir: ${NUMPY_INCLUDE_DIRS}")
  
- # PyArrow C++
-@@ -369,7 +370,7 @@
+@@ -371,7 +372,7 @@
    target_precompile_headers(arrow_python PUBLIC
                              "$<$<COMPILE_LANGUAGE:CXX>:arrow/python/pch.h>")
  endif()

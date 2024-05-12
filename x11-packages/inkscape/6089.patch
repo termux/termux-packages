@@ -1,0 +1,32 @@
+From 694d8ae43d06efff21adebf377ce614d660b24cd Mon Sep 17 00:00:00 2001
+From: Christian Hesse <mail@eworm.de>
+Date: Fri, 17 Nov 2023 22:30:42 +0100
+Subject: [PATCH] include missing header file
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This fixes build error:
+```
+/build/inkscape/src/inkscape/src/object/uri.cpp: In constructor âInkscape::URI::URI(const gchar*, const char*)â:
+/build/inkscape/src/inkscape/src/object/uri.cpp:86:9: error: âxmlFreeâ was not declared in this scope; did you mean âxmlFreeURIâ?
+   86 |         xmlFree(full);
+```
+---
+ src/object/uri.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/object/uri.h b/src/object/uri.h
+index 381adec58cf..d5b211fe2b2 100644
+--- a/src/object/uri.h
++++ b/src/object/uri.h
+@@ -13,6 +13,7 @@
+ #define INKSCAPE_URI_H
+ 
+ #include <libxml/uri.h>
++#include <libxml/xmlmemory.h>
+ #include <memory>
+ #include <string>
+ 
+-- 
+GitLab

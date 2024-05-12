@@ -11,4 +11,3 @@ TERMUX_PKG_AUTO_UPDATE=true
 termux_step_make_install() {
 	cp $TERMUX_PKG_SRCDIR/ipcalc $TERMUX_PREFIX/bin/
 }
-

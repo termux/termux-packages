@@ -1,120 +1,60 @@
---- a/src/iperf_client_api.c	2024-04-23 02:39:41.293234343 +0000
-+++ b/src/iperf_client_api.c	2024-04-23 02:31:39.000000000 +0000
-@@ -51,14 +51,29 @@
- #endif /* TCP_CA_NAME_MAX */
- #endif /* HAVE_TCP_CONGESTION */
+diff --git a/src/iperf_pthread.c b/src/iperf_pthread.c
+index ea4918bcd..55ddd530f 100644
+--- a/src/iperf_pthread.c
++++ b/src/iperf_pthread.c
+@@ -6,19 +6,10 @@
+  * as Android NDK does not support `pthread_cancel()`.
+  */
  
-+#ifdef __ANDROID__
-+static void thread_signal_handler(int signum) {
-+    pthread_exit(0);
++#include <string.h>
+ #include <signal.h>
+ #include "iperf_pthread.h"
+ 
+-int pthread_setcanceltype(int type, int *oldtype) { return 0; }
+-int pthread_setcancelstate(int state, int *oldstate) { return 0; }
+-int pthread_cancel(pthread_t thread_id) {
+-    int status;
+-    if ((status = iperf_set_thread_exit_handler()) == 0) {
+-        status = pthread_kill(thread_id, SIGUSR1);
+-    }
+-    return status;
+-}
+-
+ void iperf_thread_exit_handler(int sig)
+ { 
+     pthread_exit(0);
+@@ -37,4 +28,14 @@ int iperf_set_thread_exit_handler() {
+     return rc;
+ }
+ 
++int pthread_setcanceltype(int type, int *oldtype) { return 0; }
++int pthread_setcancelstate(int state, int *oldstate) { return 0; }
++int pthread_cancel(pthread_t thread_id) {
++    int status;
++    if ((status = iperf_set_thread_exit_handler()) == 0) {
++        status = pthread_kill(thread_id, SIGUSR1);
++    }
++    return status;
 +}
-+#endif
 +
- void *
- iperf_client_worker_run(void *s) {
-     struct iperf_stream *sp = (struct iperf_stream *) s;
-     struct iperf_test *test = sp->test;
+ #endif // defined(HAVE_PTHREAD) && defined(__ANDROID__)
+diff --git a/src/iperf_pthread.h b/src/iperf_pthread.h
+index 44828d6a9..9fe3db8a2 100644
+--- a/src/iperf_pthread.h
++++ b/src/iperf_pthread.h
+@@ -10,7 +10,7 @@
+  */
  
-     /* Allow this thread to be cancelled even if it's in a syscall */
-+#ifndef __ANDROID__
-     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
-     pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
-+#else
-+    struct sigaction actions;
-+    memset(&actions, 0, sizeof(actions));
-+    sigemptyset(&actions.sa_mask);
-+    actions.sa_flags = 0;
-+    actions.sa_handler = thread_signal_handler;
-+    sigaction(SIGUSR1, &actions, NULL);
-+#endif
+ #define PTHREAD_CANCEL_ASYNCHRONOUS 0
+-#define PTHREAD_CANCEL_ENABLE NULL
++#define PTHREAD_CANCEL_ENABLE 0
  
-     while (! (test->done) && ! (sp->done)) {
-         if (sp->sender) {
-@@ -709,11 +724,11 @@ iperf_run_client(struct iperf_test * tes
-                     if (sp->sender) {
-                         int rc;
-                         sp->done = 1;
--                        rc = pthread_cancel(sp->thr);
-+                        rc = pthread_kill(sp->thr, SIGUSR1);
-                         if (rc != 0 && rc != ESRCH) {
-                             i_errno = IEPTHREADCANCEL;
-                             errno = rc;
--                            iperf_err(test, "sender cancel in pthread_cancel - %s", iperf_strerror(i_errno));
-+                            iperf_err(test, "sender cancel in pthread_kill - %s", iperf_strerror(i_errno));
-                             goto cleanup_and_fail;
-                         }
-                         rc = pthread_join(sp->thr, NULL);
-@@ -747,11 +762,11 @@ iperf_run_client(struct iperf_test * tes
-         if (!sp->sender) {
-             int rc;
-             sp->done = 1;
--            rc = pthread_cancel(sp->thr);
-+            rc = pthread_kill(sp->thr, SIGUSR1);
-             if (rc != 0 && rc != ESRCH) {
-                 i_errno = IEPTHREADCANCEL;
-                 errno = rc;
--                iperf_err(test, "receiver cancel in pthread_cancel - %s", iperf_strerror(i_errno));
-+                iperf_err(test, "receiver cancel in pthread_kill - %s", iperf_strerror(i_errno));
-                 goto cleanup_and_fail;
-             }
-             rc = pthread_join(sp->thr, NULL);
-@@ -788,11 +803,11 @@ iperf_run_client(struct iperf_test * tes
-     SLIST_FOREACH(sp, &test->streams, streams) {
-         sp->done = 1;
-         int rc;
--        rc = pthread_cancel(sp->thr);
-+        rc = pthread_kill(sp->thr, SIGUSR1);
-         if (rc != 0 && rc != ESRCH) {
-             i_errno = IEPTHREADCANCEL;
-             errno = rc;
--            iperf_err(test, "cleanup_and_fail in pthread_cancel - %s", iperf_strerror(i_errno));
-+            iperf_err(test, "cleanup_and_fail in pthread_kill - %s", iperf_strerror(i_errno));
-         }
-         rc = pthread_join(sp->thr, NULL); 
-         if (rc != 0 && rc != ESRCH) {
---- a/src/iperf_server_api.c	2024-04-23 02:40:06.670277381 +0000
-+++ b/src/iperf_server_api.c	2024-04-23 02:31:39.000000000 +0000
-@@ -66,14 +66,29 @@
- #endif /* TCP_CA_NAME_MAX */
- #endif /* HAVE_TCP_CONGESTION */
+ int pthread_setcanceltype(int type, int *oldtype);
+ int pthread_setcancelstate(int state, int *oldstate);
+@@ -18,4 +18,4 @@ int pthread_cancel(pthread_t thread_id);
  
-+#ifdef __ANDROID__
-+static void thread_signal_handler(int signum) {
-+    pthread_exit(0);
-+}
-+#endif
-+
- void *
- iperf_server_worker_run(void *s) {
-     struct iperf_stream *sp = (struct iperf_stream *) s;
-     struct iperf_test *test = sp->test;
+ #endif // defined(__ANDROID__)
  
-     /* Allow this thread to be cancelled even if it's in a syscall */
-+#ifndef __ANDROID__
-     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
-     pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
-+#else
-+    struct sigaction actions;
-+    memset(&actions, 0, sizeof(actions));
-+    sigemptyset(&actions.sa_mask);
-+    actions.sa_flags = 0;
-+    actions.sa_handler = thread_signal_handler;
-+    sigaction(SIGUSR1, &actions, NULL);
-+#endif
- 
-     while (! (test->done) && ! (sp->done)) {
-         if (sp->sender) {
-@@ -420,11 +435,11 @@ cleanup_server(struct iperf_test *test)
-     SLIST_FOREACH(sp, &test->streams, streams) {
-         int rc;
-         sp->done = 1;
--        rc = pthread_cancel(sp->thr);
-+        rc = pthread_kill(sp->thr, SIGUSR1);
-         if (rc != 0 && rc != ESRCH) {
-             i_errno = IEPTHREADCANCEL;
-             errno = rc;
--            iperf_err(test, "cleanup_server in pthread_cancel - %s", iperf_strerror(i_errno));
-+            iperf_err(test, "cleanup_server in pthread_kill - %s", iperf_strerror(i_errno));
-         }
-         rc = pthread_join(sp->thr, NULL);
-         if (rc != 0 && rc != ESRCH) {
+-#endif // defined(HAVE_PTHREAD)
+\ No newline at end of file
++#endif // defined(HAVE_PTHREAD)

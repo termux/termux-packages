@@ -1,12 +1,12 @@
 --- a/gsk/gskrenderer.c
 +++ b/gsk/gskrenderer.c
-@@ -614,7 +614,9 @@
+@@ -702,7 +702,9 @@
  } renderer_possibilities[] = {
    { get_renderer_for_display },
    { get_renderer_for_env_var },
 +#ifndef __ANDROID__
    { get_renderer_for_backend },
 +#endif
-   { get_renderer_fallback },
- };
- 
+   { get_renderer_for_gl },
+   { get_renderer_for_gles2 },
+   { get_renderer_for_vulkan },

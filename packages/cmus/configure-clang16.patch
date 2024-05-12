@@ -14,15 +14,3 @@ https://github.com/termux/termux-packages/issues/15852
  }
  "
  	if try_compile_link "$string_function_code"
---- a/scripts/checks.sh
-+++ b/scripts/checks.sh
-@@ -495,7 +495,8 @@
- 	__func="$1"
- 	shift
- 	msg_checking "for function $__func"
--	if try_compile_link "char $__func(); int main(int argc, char *argv[]) { return $__func; }" "$@"
-+	if try_compile_link "#include <stdint.h>
-+char $__func(); int main(int argc, char *argv[]) { return (int)(uintptr_t)$__func; }" "$@"
- 	then
- 		msg_result yes
- 		return 0

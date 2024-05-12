@@ -20,4 +20,3 @@ termux_step_make_install () {
 	install -Dm700 -t ${TERMUX_PREFIX}/lib ./*.so*
 	install -Dm700 -t ${TERMUX_PREFIX}/bin ./wkhtmltoimage ./wkhtmltopdf
 }
-
