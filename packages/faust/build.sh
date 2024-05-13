@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL=(https://github.com/grame-cncm/faust/archive/refs/tags/${TERMU
 		https://github.com/grame-cncm/faustlibraries/archive/${_FAUSTLIB_COMMIT}.zip)
 TERMUX_PKG_SHA256=(644484f95167fe63014eac3db410f50c58810289fea228a2221e07d27da50eec
 		be37b2d32b213996ca2b7ab12c6d282d254dc20a1792c796d26f6bd3bda8bdd6)
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="COPYING.txt, faustlibraries-${_FAUSTLIB_COMMIT}/licenses/stk-4.3.0.md"
 TERMUX_PKG_DEPENDS="libc++"
