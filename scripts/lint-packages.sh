@@ -3,6 +3,7 @@
 set -e -u
 
 TERMUX_SCRIPTDIR=$(realpath "$(dirname "$0")/../")
+. "$TERMUX_SCRIPTDIR/scripts/properties.sh"
 
 check_package_license() {
 	local pkg_licenses=$1
@@ -129,7 +130,7 @@ lint_package() {
 
 	echo -n "Layout: "
 	local channel in_dir=''
-	for channel in 'packages' 'x11-packages' 'root-packages'; do
+	for channel in $TERMUX_PACKAGES_DIRECTORIES; do
 		[[ -d "$TERMUX_SCRIPTDIR/$channel/$package_name" ]] && {
 			in_dir="$TERMUX_SCRIPTDIR/$channel/$package_name"
 			break
@@ -216,10 +217,6 @@ lint_package() {
 		# Certain fields may be API-specific.
 		# Using API 24 here.
 		TERMUX_PKG_API_LEVEL=24
-
-		if [[ -f "$TERMUX_SCRIPTDIR/scripts/properties.sh" ]]; then
-			. "$TERMUX_SCRIPTDIR/scripts/properties.sh"
-		fi
 
 		. "$package_script"
 
