@@ -1,6 +1,6 @@
 --- a/setup.py
 +++ b/setup.py
-@@ -254,7 +254,7 @@
+@@ -252,7 +252,7 @@
          EXTRA_ENV_COMPILE_ARGS += " /MT"
      elif "linux" in sys.platform:
          # GCC by defaults uses C17 so only C++14 needs to be specified.
@@ -9,7 +9,7 @@
          EXTRA_ENV_COMPILE_ARGS += (
              " -fvisibility=hidden -fno-wrapv -fno-exceptions"
          )
-@@ -314,25 +314,25 @@
+@@ -299,25 +299,25 @@
          lambda x: "third_party/boringssl" not in x, CORE_C_FILES
      )
      CORE_C_FILES = filter(lambda x: "src/boringssl" not in x, CORE_C_FILES)
@@ -40,12 +40,12 @@
  
  EXTENSION_INCLUDE_DIRECTORIES = (
      (PYTHON_STEM,)
-@@ -375,7 +375,7 @@
-     EXTENSION_LIBRARIES += ("re2",)
+@@ -361,7 +361,7 @@
  if BUILD_WITH_SYSTEM_ABSL:
      EXTENSION_LIBRARIES += tuple(
--        lib.stem[3:] for lib in pathlib.Path("/usr").glob("lib*/libabsl_*.so")
-+        lib.stem[3:] for lib in pathlib.Path("@TERMUX_PREFIX@").glob("lib*/libabsl_*.so")
+         lib.stem[3:]
+-        for lib in sorted(pathlib.Path("/usr").glob("lib*/libabsl_*.so"))
++        for lib in sorted(pathlib.Path("@TERMUX_PREFIX@").glob("lib*/libabsl_*.so"))
      )
  
  DEFINE_MACROS = (("_WIN32_WINNT", 0x600),)
