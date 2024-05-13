@@ -40,7 +40,7 @@ termux_step_pre_configure() {
 
 	autoreconf -fi
 
-	LDFLAGS+=" $($CC -print-libgcc-file-name)"
+	LDFLAGS+=" $($CC -print-libgcc-file-name) -lm"
 }
 
 termux_step_post_configure() {
