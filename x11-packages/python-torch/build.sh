@@ -3,10 +3,10 @@ TERMUX_PKG_DESCRIPTION="Tensors and Dynamic neural networks in Python"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.1.2"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=git+https://github.com/pytorch/pytorch
 TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
-TERMUX_PKG_DEPENDS="ffmpeg, libc++, libopenblas, libprotobuf, libzmq, opencv, python, python-numpy, python-pip, fmt"
+TERMUX_PKG_DEPENDS="abseil-cpp, ffmpeg, fmt, libc++, libopenblas, libprotobuf, libzmq, opencv, python, python-numpy, python-pip"
 TERMUX_PKG_BUILD_DEPENDS="vulkan-headers, vulkan-loader-android"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, pyyaml, typing_extensions"
@@ -91,5 +91,5 @@ termux_step_make_install() {
 termux_step_create_debscripts() {
 	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
 	echo "echo 'Installing dependencies for $TERMUX_PKG_NAME...'" >> postinst
-	echo "pip3 install filelock jinja2 networkx sympy typing_extensions" >> postinst
+	echo "pip3 install torch" >> postinst
 }
