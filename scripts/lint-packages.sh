@@ -12,7 +12,7 @@ check_package_license() {
 
 	IFS=","
 	for license in $pkg_licenses; do
-		license=$(echo "$license" | sed -r 's/^\s*(\S+(\s+\S+)*)\s*$/\1/')
+		license=$(sed -r 's/^\s*(\S+(\s+\S+)*)\s*$/\1/' <<< "$license")
 
 		case "$license" in
 			AFL-2.1|AFL-3.0|AGPL-V3|APL-1.0|APSL-2.0|Apache-1.0|Apache-1.1);;
@@ -126,6 +126,25 @@ lint_package() {
 	echo
 	echo "Package: $package_name"
 	echo
+
+	echo -n "Layout: "
+	local channel in_dir=''
+	for channel in 'packages' 'x11-packages' 'root-packages'; do
+		[[ -d "$TERMUX_SCRIPTDIR/$channel/$package_name" ]] && {
+			in_dir="$TERMUX_SCRIPTDIR/$channel/$package_name"
+			break
+		}
+	done
+	(( ! ${#in_dir}  )) && {
+		echo "FAIL - '$package_script' is not a directory"
+		return 1
+	}
+
+	[[ -f "${in_dir}/build.sh" ]] || {
+		echo "FAIL - No build.sh file in package '$package_name'"
+		return 1
+	}
+	echo "PASS"
 
 	check_package_name "$package_name" || return 1
 	local subpkg_script
