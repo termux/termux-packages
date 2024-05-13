@@ -27,4 +27,15 @@ termux_step_pre_configure() {
 		export PKG_CONFIG="${_WRAPPER_BIN}/pkg-config"
 	fi
 	export PATH="${_WRAPPER_BIN}:${PATH}"
+
+	export TERMUX_MESON_ENABLE_SOVERSION=1
+}
+
+termux_step_post_massage() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _GUARD_FILE="lib/libgedit-gtksourceview-300.so.1"
+	if [ ! -e "${_GUARD_FILE}" ]; then
+		termux_error_exit "Error: file ${_GUARD_FILE} not found."
+	fi
 }
