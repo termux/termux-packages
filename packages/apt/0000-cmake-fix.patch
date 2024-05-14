@@ -1,7 +1,7 @@
-diff -u -r apt-2.9.2/apt-pkg/CMakeLists.txt src/apt-pkg/CMakeLists.txt
---- apt-2.9.2/apt-pkg/CMakeLists.txt	2024-04-22 17:36:30.000000000 +0000
-+++ src/apt-pkg/CMakeLists.txt	2024-05-05 21:30:19.498701160 +0000
-@@ -57,7 +57,7 @@
+diff -u -r ../apt-2.9.3/apt-pkg/CMakeLists.txt ./apt-pkg/CMakeLists.txt
+--- ../apt-2.9.3/apt-pkg/CMakeLists.txt	2024-05-14 11:01:31.000000000 +0000
++++ ./apt-pkg/CMakeLists.txt	2024-05-14 18:33:35.039473088 +0000
+@@ -61,7 +61,7 @@
  )
  
  target_link_libraries(apt-pkg
@@ -10,9 +10,10 @@ diff -u -r apt-2.9.2/apt-pkg/CMakeLists.txt src/apt-pkg/CMakeLists.txt
                               ${CMAKE_THREAD_LIBS_INIT}
                               ${ZLIB_LIBRARIES}
                               ${BZIP2_LIBRARIES}
-diff -u -r apt-2.9.2/CMakeLists.txt src/CMakeLists.txt
---- apt-2.9.2/CMakeLists.txt	2024-04-22 17:36:30.000000000 +0000
-+++ src/CMakeLists.txt	2024-05-05 21:30:19.498701160 +0000
+Only in ./apt-pkg: CMakeLists.txt.orig
+diff -u -r ../apt-2.9.3/CMakeLists.txt ./CMakeLists.txt
+--- ../apt-2.9.3/CMakeLists.txt	2024-05-14 11:01:31.000000000 +0000
++++ ./CMakeLists.txt	2024-05-14 18:38:48.263646165 +0000
 @@ -195,14 +195,6 @@
    endif()
  endif()
@@ -28,18 +29,19 @@ diff -u -r apt-2.9.2/CMakeLists.txt src/CMakeLists.txt
  # Configure some variables like package, version and architecture.
  set(PACKAGE ${PROJECT_NAME})
  set(PACKAGE_MAIL "APT Development Team <deity@lists.debian.org>")
-@@ -215,10 +207,6 @@
+@@ -216,11 +208,6 @@
    message(STATUS "Found dpkg data dir: ${DPKG_DATADIR_CMD}")
    set(DPKG_DATADIR "${DPKG_DATADIR_CMD}" CACHE PATH "dpkg data directory")
  endif()
 -if (NOT DEFINED COMMON_ARCH)
 -  execute_process(COMMAND dpkg-architecture -qDEB_HOST_ARCH
--                  OUTPUT_VARIABLE COMMON_ARCH OUTPUT_STRIP_TRAILING_WHITESPACE)
+-                  OUTPUT_VARIABLE COMMON_ARCH OUTPUT_STRIP_TRAILING_WHITESPACE
+-                  COMMAND_ERROR_IS_FATAL ANY)
 -endif()
  if (NOT DEFINED ROOT_GROUP)
    execute_process(COMMAND id -gn root
-                   OUTPUT_VARIABLE ROOT_GROUP OUTPUT_STRIP_TRAILING_WHITESPACE)
-@@ -251,7 +239,6 @@
+                   OUTPUT_VARIABLE ROOT_GROUP OUTPUT_STRIP_TRAILING_WHITESPACE
+@@ -254,7 +241,6 @@
  add_subdirectory(dselect)
  add_subdirectory(ftparchive)
  add_subdirectory(methods)
@@ -47,9 +49,30 @@ diff -u -r apt-2.9.2/CMakeLists.txt src/CMakeLists.txt
  
  if (USE_NLS)
  add_subdirectory(po)
-diff -u -r apt-2.9.2/methods/CMakeLists.txt src/methods/CMakeLists.txt
---- apt-2.9.2/methods/CMakeLists.txt	2024-04-22 17:36:30.000000000 +0000
-+++ src/methods/CMakeLists.txt	2024-05-05 21:31:42.650799537 +0000
+Only in .: CMakeLists.txt.orig
+Only in .: CMakeLists.txt.rej
+diff -u -r ../apt-2.9.3/doc/CMakeLists.txt ./doc/CMakeLists.txt
+--- ../apt-2.9.3/doc/CMakeLists.txt	2024-05-14 11:01:31.000000000 +0000
++++ ./doc/CMakeLists.txt	2024-05-14 18:33:35.040473072 +0000
+@@ -3,15 +3,6 @@
+ endif()
+ 
+ set(LINGUAS
+-    de
+-    es
+-    fr
+-    it
+-    ja
+-    nl
+-    pl
+-    pt_BR
+-    pt
+ )
+ 
+ set(TRANSLATED_ENTITIES
+diff -u -r ../apt-2.9.3/methods/CMakeLists.txt ./methods/CMakeLists.txt
+--- ../apt-2.9.3/methods/CMakeLists.txt	2024-05-14 11:01:31.000000000 +0000
++++ ./methods/CMakeLists.txt	2024-05-14 18:33:35.040473072 +0000
 @@ -11,7 +11,6 @@
  add_executable(cdrom cdrom.cc)
  add_executable(http http.cc basehttp.cc $<TARGET_OBJECTS:connectlib>)
@@ -72,22 +95,3 @@ diff -u -r apt-2.9.2/methods/CMakeLists.txt src/methods/CMakeLists.txt
          RUNTIME DESTINATION ${CMAKE_INSTALL_LIBEXECDIR}/apt/methods)
  
  add_links(${CMAKE_INSTALL_LIBEXECDIR}/apt/methods mirror mirror+ftp mirror+http mirror+https mirror+file mirror+copy)
-diff -u -r apt-2.9.2/doc/CMakeLists.txt src/doc/CMakeLists.txt
---- apt-2.9.2/doc/CMakeLists.txt	2024-04-22 17:36:30.000000000 +0000
-+++ src/doc/CMakeLists.txt	2024-05-05 21:30:19.499701137 +0000
-@@ -3,15 +3,6 @@
- endif()
- 
- set(LINGUAS
--    de
--    es
--    fr
--    it
--    ja
--    nl
--    pl
--    pt_BR
--    pt
- )
- 
- set(TRANSLATED_ENTITIES
