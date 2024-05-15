@@ -1,0 +1,110 @@
+#!/bin/bash
+
+source $PREFIX/bin/termux-setup-package-manager
+MANAGER=$TERMUX_APP_PACKAGE_MANAGER
+
+if ! command -v jq &>/dev/null; then
+        if [ "$MANAGER" == 'apt' ]; then
+                apt-get update
+                apt-get install -y jq
+        elif [ "$MANAGER" == 'pacman' ]; then
+                pacman -Syy
+                pacman -S --noconfirm jq
+        fi
+fi
+
+if ! command -v termux-api-start &>/dev/null; then
+        if [ "$MANAGER" == 'apt' ]; then
+                apt-get update
+                apt-get install -y termux-api
+        elif [ "$MANAGER" == 'pacman' ]; then
+                pacman -Syy
+                pacman -S --noconfirm termux-api
+        fi
+fi
+
+if ! command -v dpkg &>/dev/null; then
+        pacman -Syy
+        pacman -S --noconfirm dpkg
+fi
+
+unset MANAGER
+
+arch=$(dpkg --print-architecture)
+
+echo "Enter URL to the Special Bootstrap or type Pacman, APT"
+
+read -p "Press Any Key..." enter
+
+case "$enter" in
+        *)
+                ;;
+esac
+
+bootstrap=$(termux-dialog | jq -r '.text')
+
+case "$bootstrap" in
+        pacman|PACMAN|Pacman)
+                case "$arch" in
+                        arm)
+                                url="https://github.com/termux-pacman/termux-packages/releases/download/bootstrap-2024.05.12-r1%2Bpacman-android-7/bootstrap-arm.zip"
+                                ;;
+                        aarch64)
+                                url="https://github.com/termux-pacman/termux-packages/releases/download/bootstrap-2024.05.12-r1%2Bpacman-android-7/bootstrap-aarch64.zip"
+                                ;;
+                        i686)
+                                url="https://github.com/termux-pacman/termux-packages/releases/download/bootstrap-2024.05.12-r1%2Bpacman-android-7/bootstrap-i686.zip"
+                                ;;
+                        x86_64)
+                                url="https://github.com/termux-pacman/termux-packages/releases/download/bootstrap-2024.05.12-r1%2Bpacman-android-7/bootstrap-x86_64.zip"
+                                ;;
+                        *)
+                                echo "Invalid Architecture"
+                                ;;
+                esac
+                ;;
+        apt|APT|Apt)
+                case "$arch" in
+                        arm)
+                                url="https://github.com/termux/termux-packages/releases/download/bootstrap-2024.05.12-r1%2Bapt-android-7/bootstrap-arm.zip"
+                                ;;
+                        aarch64)
+                                url="https://github.com/termux/termux-packages/releases/download/bootstrap-2024.05.12-r1%2Bapt-android-7/bootstrap-aarch64.zip"
+                                ;;
+                        i686)                                                     url="https://github.com/termux/termux-packages/releases/download/bootstrap-2024.05.12-r1%2Bapt-android-7/bootstrap-i686.zip"
+                                ;;
+                        x86_64)
+                                url="https://github.com/termux/termux-packages/releases/download/bootstrap-2024.05.12-r1%2Bapt-android-7/bootstrap-x86_64.zip"
+                                ;;
+                        *)                                                        echo "Invalid Arch
+itecture"
+                                ;;
+                esac
+                ;;
+        *)
+                url="$bootstrap"
+                ;;
+esac
+
+mkdir -p usr
+cd usr
+echo "$(pwd)"
+curl -OL $url
+unzip bootstrap-$arch.zip
+rm -rf bootstrap-$arch.zip
+cat SYMLINKS.txt | awk -F "←" '{system("ln -s '"'"'"$1"'"'"' '"'"'"$2"'"'"'")}'
+cd ..
+tar -cf bootstrap.tar ./usr
+gzip bootstrap.tar
+rm -rf usr
+termux-restore bootstrap.tar.gz
+rm -rf bootstrap.tar.gz
+source $PREFIX/bin/termux-setup-package-manager
+MANAGER=$TERMUX_APP_PACKAGE_MANAGER
+if [ "$MANAGER" == 'apt' ]; then
+        apt-get update
+        apt-get dist-upgrade -y
+elif [ "$MANAGER" == 'pacman' ]; then
+        pacman -Syy
+        pacman -Syu --noconfirm
+fi
