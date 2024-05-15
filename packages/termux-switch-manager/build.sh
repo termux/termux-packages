@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://gist.github.com/DevMasterLinux/ba96cfb7ec6b7e0960f400a1b0d80a24
+TERMUX_PKG_HOMEPAG=https://gist.github.com/DevMasterLinux/ba96cfb7ec6b7e0960f400a1b0d80a24
 TERMUX_PKG_DESCRIPTION="A Tool to Switch the Package Manager fast and safe"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@DevMasterLinux"
@@ -9,7 +9,7 @@ termux_step_make_install() {
 }
 
 termux_step_create_debscripts() {
-    # No need for pre/post installation scripts
+    # Keine Notwendigkeit für Vor-/Nachinstallations-Skripte
     return 0
 }
-
+E
