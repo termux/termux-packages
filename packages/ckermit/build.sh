@@ -4,8 +4,8 @@ TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_LICENSE_FILE="COPYING.TXT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=9.0.302
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=http://www.columbia.edu/kermit/ftp/archives/cku${TERMUX_PKG_VERSION##*.}.tar.gz
+TERMUX_PKG_REVISION=2
+TERMUX_PKG_SRCURL=https://www.kermitproject.org/ftp/kermit/archives/cku${TERMUX_PKG_VERSION##*.}.tar.gz
 TERMUX_PKG_SHA256=0d5f2cd12bdab9401b4c836854ebbf241675051875557783c332a6a40dac0711
 TERMUX_PKG_DEPENDS="libcrypt"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -18,7 +18,7 @@ termux_extract_src_archive() {
 }
 
 termux_step_pre_configure() {
-	CFLAGS+=" -fPIC"
+	CFLAGS+=" -fPIC -Wno-error=implicit-int"
 	export KFLAGS="-DNOGETUSERSHELL -UNOTIMEH -DTIMEH -DUSE_FILE_R"
 	LDFLAGS+=" -lcrypt"
 	export LNKFLAGS="$LDFLAGS"
