@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://starship.rs
 TERMUX_PKG_DESCRIPTION="A minimal, blazing fast, and extremely customizable prompt for any shell"
 TERMUX_PKG_LICENSE="ISC"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.18.2"
+TERMUX_PKG_VERSION="1.19.0"
 TERMUX_PKG_SRCURL=https://github.com/starship/starship/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=505100002efe93dbff702edd82f814cadc340335487993e76dd6777dba461a7a
+TERMUX_PKG_SHA256=cf789791b5c11d6d7a00628590696627bb8f980e3d7c7a0200026787b08aba37
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_DEPENDS="zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -18,11 +18,10 @@ termux_step_pre_configure() {
 	export CARGO_HOME
 
 	rm -rf $CARGO_HOME/registry/src/*/cmake-*
-	rm -rf $CARGO_HOME/registry/src/*/gix-index-*
 	cargo fetch --target "${CARGO_TARGET_NAME}"
 
-	local p="cmake-0.1.50-src-lib.rs.diff"
-	local d
+	local d p
+	p="cmake-0.1.50-src-lib.rs.diff"
 	for d in $CARGO_HOME/registry/src/*/cmake-*; do
 		patch --silent -p1 -d ${d} \
 			< "$TERMUX_PKG_BUILDER_DIR/${p}"
@@ -58,6 +57,8 @@ termux_step_post_make_install() {
 termux_step_post_massage() {
 	rm -f lib/libz.so.1
 	rm -f lib/libz.so
+
+	rm -rf $CARGO_HOME/registry/src/*/cmake-*
 }
 
 termux_step_create_debscripts() {
