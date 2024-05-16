@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="An AV1 encoder library focused on speed and safety"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.7.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/xiph/rav1e/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=da7ae0df2b608e539de5d443c096e109442cdfa6c5e9b4014361211cf61d030c
 TERMUX_PKG_AUTO_UPDATE=true
@@ -25,6 +26,11 @@ termux_step_make_install() {
 	termux_setup_cargo_c
 
 	export CARGO_BUILD_TARGET=$CARGO_TARGET_NAME
+
+	# Surprisingly CC should not be set to the cross compiler when building the
+	# rav1e rust crate - see https://github.com/xiph/rav1e/issues/2991
+	# and the linked issue https://github.com/gdesmott/system-deps/issues/62.
+	unset CC
 
 	cargo fetch \
 		--target $CARGO_TARGET_NAME \
