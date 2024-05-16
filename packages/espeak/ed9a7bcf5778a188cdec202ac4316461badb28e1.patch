@@ -1,0 +1,39 @@
+From 497c6217d696c1190c3e8b992ff7b9110eb3bedd Mon Sep 17 00:00:00 2001
+From: Dimitry Andric <dimitry@andric.com>
+Date: Sat, 20 May 2023 17:41:15 +0200
+Subject: [PATCH] speechPlayer: fix sample type qualification to avoid
+ ambiguity
+
+As reported in <https://bugs.freebsd.org/271486>, when the C++ standard
+library provides std::sample, it causes a compile error when compiling
+speechWaveGenerator.cpp:
+
+  src/speechPlayer/src/speechWaveGenerator.cpp:197:56: error: reference to 'sample' is ambiguous
+          unsigned int generate(const unsigned int sampleCount, sample* sampleBuf) {
+                                                                ^
+  src/speechPlayer/src/sample.h:23:3: note: candidate found by name lookup is 'sample'
+  } sample;
+    ^
+  /usr/include/c++/v1/__algorithm/sample.h:95:17: note: candidate found by name lookup is 'std::sample'
+  _SampleIterator sample(_PopulationIterator __first,
+                  ^
+
+Since speechWaveGenerator.cpp puts "using namespace std;" at the top,
+fix the error by qualifying "sample" with an explicit "::".
+---
+ src/speechPlayer/src/speechWaveGenerator.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/speechPlayer/src/speechWaveGenerator.cpp b/src/speechPlayer/src/speechWaveGenerator.cpp
+index 89ecb9af3..3ac0d1788 100644
+--- a/src/speechPlayer/src/speechWaveGenerator.cpp
++++ b/src/speechPlayer/src/speechWaveGenerator.cpp
+@@ -194,7 +194,7 @@ class SpeechWaveGeneratorImpl: public SpeechWaveGenerator {
+ 	SpeechWaveGeneratorImpl(int sr): sampleRate(sr), voiceGenerator(sr), fricGenerator(), cascade(sr), parallel(sr), frameManager(NULL) {
+ 	}
+ 
+-	unsigned int generate(const unsigned int sampleCount, sample* sampleBuf) {
++	unsigned int generate(const unsigned int sampleCount, ::sample* sampleBuf) {
+ 		if(!frameManager) return 0; 
+ 		for(unsigned int i=0;i<sampleCount;++i) {
+ 			const speechPlayer_frame_t* frame=frameManager->getCurrentFrame();
