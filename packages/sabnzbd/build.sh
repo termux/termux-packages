@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0, GPL-3.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE.txt, GPL2.txt, GPL3.txt"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.3.1"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/sabnzbd/sabnzbd/releases/download/${TERMUX_PKG_VERSION}/SABnzbd-${TERMUX_PKG_VERSION}-src.tar.gz
 TERMUX_PKG_SHA256=c9902c212df3e6b7208c850e6ceab244afc4b3e173459c425db9be4df902bd44
 TERMUX_PKG_AUTO_UPDATE=true
@@ -22,7 +22,8 @@ termux_step_post_get_source() {
 			break
 		fi
 		dep="${dep/[# ]*}"
-		if [ -z "$dep" ]; then
+		# https://github.com/termux/termux-packages/issues/20229
+		if [ -z "$dep" ] || [ -z "${dep/sabctools*}" ]; then
 			continue
 		fi
 		TERMUX_PKG_PYTHON_TARGET_DEPS+="'$dep', "
