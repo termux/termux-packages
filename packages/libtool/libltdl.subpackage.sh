@@ -5,3 +5,4 @@ lib/libltdl.so
 "
 TERMUX_SUBPKG_DEPEND_ON_PARENT=no
 TERMUX_SUBPKG_DESCRIPTION="Library for dlopening libraries"
+TERMUX_SUBPKG_BREAKS="libtool (<< 2.4.7-2)"
