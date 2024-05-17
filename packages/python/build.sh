@@ -5,6 +5,7 @@ TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.11.9
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=9b1e896523fc510691126c864406d9360a3d1e986acbda59cda57b5abda45b87
 TERMUX_PKG_AUTO_UPDATE=false
@@ -97,6 +98,11 @@ termux_step_post_massage() {
 }
 
 termux_step_create_debscripts() {
+	# XXX: Remove workaround for `-fno-openmp-implicit-rpath` in next NDK major bump.
+	if [ "$TERMUX_NDK_VERSION_NUM" != 26 ]; then
+		termux_error_exit "This workaround should be removed."
+	fi
+
 	# This is a temporary script and will therefore be removed when python is updated to 3.12
 	cat <<- POSTINST_EOF > ./postinst
 	#!$TERMUX_PREFIX/bin/bash
@@ -117,6 +123,11 @@ termux_step_create_debscripts() {
 		echo "   pkg install python-pip"
 		echo
 	fi
+
+	_file="$(find $TERMUX_PREFIX/lib/python3.11 -name "_sysconfigdata*.py")"
+	echo "Patching \$(basename \$_file)"
+	rm -rf $TERMUX_PREFIX/lib/python3.11/__pycache__
+	sed -i 's|-fno-openmp-implicit-rpath||g' "\$_file"
 
 	exit 0
 	POSTINST_EOF
