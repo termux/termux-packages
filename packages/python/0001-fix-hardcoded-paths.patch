@@ -1,6 +1,5 @@
-diff -uNr Python-3.6.2/Lib/aifc.py Python-3.6.2.mod/Lib/aifc.py
---- Python-3.6.2/Lib/aifc.py	2017-07-08 06:33:27.000000000 +0300
-+++ Python-3.6.2.mod/Lib/aifc.py	2017-09-15 15:09:08.092797061 +0300
+--- a/Lib/aifc.py
++++ b/Lib/aifc.py
 @@ -920,7 +920,7 @@
  if __name__ == '__main__':
      import sys
@@ -10,9 +9,8 @@ diff -uNr Python-3.6.2/Lib/aifc.py Python-3.6.2.mod/Lib/aifc.py
      fn = sys.argv[1]
      with open(fn, 'r') as f:
          print("Reading", fn)
-diff -uNr Python-3.6.2/Lib/mailcap.py Python-3.6.2.mod/Lib/mailcap.py
---- Python-3.6.2/Lib/mailcap.py	2017-07-08 06:33:27.000000000 +0300
-+++ Python-3.6.2.mod/Lib/mailcap.py	2017-09-15 15:08:41.312797081 +0300
+--- a/Lib/mailcap.py
++++ b/Lib/mailcap.py
 @@ -55,7 +55,8 @@
              # Don't bother with getpwuid()
              home = '.' # Last resort
@@ -23,9 +21,8 @@ diff -uNr Python-3.6.2/Lib/mailcap.py Python-3.6.2.mod/Lib/mailcap.py
      return mailcaps
  
  
-diff -uNr Python-3.6.2/Lib/mimetypes.py Python-3.6.2.mod/Lib/mimetypes.py
---- Python-3.6.2/Lib/mimetypes.py	2017-07-08 06:33:27.000000000 +0300
-+++ Python-3.6.2.mod/Lib/mimetypes.py	2017-09-15 15:08:05.522797106 +0300
+--- a/Lib/mimetypes.py
++++ b/Lib/mimetypes.py
 @@ -49,6 +49,7 @@
      "/usr/local/lib/netscape/mime.types",
      "/usr/local/etc/httpd/conf/mime.types",     # Apache 1.2
@@ -34,9 +31,8 @@ diff -uNr Python-3.6.2/Lib/mimetypes.py Python-3.6.2.mod/Lib/mimetypes.py
      ]
  
  inited = False
-diff -uNr Python-3.6.2/Lib/posixpath.py Python-3.6.2.mod/Lib/posixpath.py
---- Python-3.6.2/Lib/posixpath.py	2017-07-08 06:33:27.000000000 +0300
-+++ Python-3.6.2.mod/Lib/posixpath.py	2017-09-15 15:07:20.872797138 +0300
+--- a/Lib/posixpath.py
++++ b/Lib/posixpath.py
 @@ -32,7 +32,7 @@
  extsep = '.'
  sep = '/'
@@ -46,9 +42,8 @@ diff -uNr Python-3.6.2/Lib/posixpath.py Python-3.6.2.mod/Lib/posixpath.py
  altsep = None
  devnull = '/dev/null'
  
-diff -uNr Python-3.9.0/Lib/uuid.py Python-3.9.0.mod/Lib/uuid.py
---- Python-3.9.0/Lib/uuid.py    2020-10-05 20:37:58.000000000 +0530
-+++ Python-3.9.0.mod/Lib/uuid.py        2020-10-08 18:25:45.565373486 +0530
+--- a/Lib/uuid.py
++++ b/Lib/uuid.py
 @@ -361,7 +361,6 @@
 
      try:
@@ -57,3 +52,27 @@ diff -uNr Python-3.9.0/Lib/uuid.py Python-3.9.0.mod/Lib/uuid.py
          executable = shutil.which(command, path=os.pathsep.join(path_dirs))
          if executable is None:
              return None
+--- a/Lib/subprocess.py
++++ b/Lib/subprocess.py
+@@ -1389,9 +1389,7 @@
+                 args = list(args)
+ 
+             if shell:
+-                # On Android the default shell is at '/system/bin/sh'.
+-                unix_shell = ('/system/bin/sh' if
+-                          hasattr(sys, 'getandroidapilevel') else '/bin/sh')
++                unix_shell = ('@TERMUX_PREFIX@/bin/sh')
+                 args = [unix_shell, "-c"] + args
+                 if executable:
+                     args[0] = executable
+--- a/Lib/tempfile.py
++++ b/Lib/tempfile.py
+@@ -124,7 +124,7 @@
+     if _os.name == 'nt':
+         dirlist.extend([ r'c:\temp', r'c:\tmp', r'\temp', r'\tmp' ])
+     else:
+-        dirlist.extend([ '/tmp', '/var/tmp', '/usr/tmp' ])
++        dirlist.extend([ '@TERMUX_PREFIX@/tmp' ])
+ 
+     # As a last resort, the current directory.
+     try:

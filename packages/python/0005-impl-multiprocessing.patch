@@ -1,6 +1,19 @@
-diff -uNr Python-3.10.1/Lib/multiprocessing/heap.py Python-3.10.1.mod/Lib/multiprocessing/heap.py
---- Python-3.10.1/Lib/multiprocessing/heap.py      2022-02-07 11:51:46.427116300 +0800
-+++ Python-3.10.1.mod/Lib/multiprocessing/heap.py  2022-02-07 11:52:48.432577700 +0800
+--- a/setup.py
++++ b/setup.py
+@@ -1328,8 +1329,8 @@
+             sysconfig.get_config_var('POSIX_SEMAPHORES_NOT_ENABLED')
+         ):
+             multiprocessing_srcs.append('_multiprocessing/semaphore.c')
+-        self.addext(Extension('_multiprocessing', multiprocessing_srcs))
+-        self.addext(Extension('_posixshmem', ['_multiprocessing/posixshmem.c']))
++        self.addext(Extension('_multiprocessing', multiprocessing_srcs, libraries=["android-posix-semaphore"]))
++        self.addext(Extension('_posixshmem', ['_multiprocessing/posixshmem.c','_multiprocessing/posix-shm-extension.c']))
+ 
+     def detect_uuid(self):
+         # Build the _uuid module if possible
+
+--- a/Lib/multiprocessing/heap.py
++++ b/Lib/multiprocessing/heap.py
 @@ -70,7 +70,7 @@
          """
  
@@ -11,9 +24,8 @@ diff -uNr Python-3.10.1/Lib/multiprocessing/heap.py Python-3.10.1.mod/Lib/multip
              _dir_candidates = []
  
 
-diff -uNr Python-3.10.1/Modules/_multiprocessing/multiprocessing.c Python-3.10.1.mod/Modules/_multiprocessing/multiprocessing.c
---- Python-3.10.1/Modules/_multiprocessing/multiprocessing.c        2021-12-07 02:23:39.000000000 +0800
-+++ Python-3.10.1.mod/Modules/_multiprocessing/multiprocessing.c    2022-02-10 03:05:11.249248300 +0800
+--- a/Modules/_multiprocessing/multiprocessing.c
++++ b/Modules/_multiprocessing/multiprocessing.c
 @@ -172,7 +172,7 @@
      _MULTIPROCESSING_RECV_METHODDEF
      _MULTIPROCESSING_SEND_METHODDEF
@@ -24,9 +36,8 @@ diff -uNr Python-3.10.1/Modules/_multiprocessing/multiprocessing.c Python-3.10.1
  #endif
      {NULL}
 
-diff -uNr Python-3.10.1/Modules/_multiprocessing/posixshmem.c Python-3.10.1.mod/Modules/_multiprocessing/posixshmem.c
---- Python-3.10.1/Modules/_multiprocessing/posixshmem.c     2021-12-07 02:23:39.000000000 +0800
-+++ Python-3.10.1.mod/Modules/_multiprocessing/posixshmem.c 2022-02-10 01:37:03.547649100 +0800
+--- a/Modules/_multiprocessing/posixshmem.c
++++ b/Modules/_multiprocessing/posixshmem.c
 @@ -11,6 +11,9 @@
  #include <sys/mman.h>
  #endif
@@ -38,9 +49,8 @@ diff -uNr Python-3.10.1/Modules/_multiprocessing/posixshmem.c Python-3.10.1.mod/
  module _posixshmem
  [clinic start generated code]*/
 
-diff -uNr Python-3.10.1/Modules/_multiprocessing/posix-shm-extension.c Python-3.10.1.mod/Modules/_multiprocessing/posix-shm-extension.c
---- Python-3.10.1/Modules/_multiprocessing/posix-shm-extension.c        1970-01-01 08:00:00.000000000 +0800
-+++ Python-3.10.1.mod/Modules/_multiprocessing/posix-shm-extension.c    2022-02-12 13:25:30.306949200 +0800
+--- a/Modules/_multiprocessing/posix-shm-extension.c
++++ b/Modules/_multiprocessing/posix-shm-extension.c
 @@ -0,0 +1,76 @@
 +/* This file is a port of posix shared memory for Python3 on Termux Android, 
 +   based on musl-libc which is licensed under the following standard MIT 
