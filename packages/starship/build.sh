@@ -3,13 +3,14 @@ TERMUX_PKG_DESCRIPTION="A minimal, blazing fast, and extremely customizable prom
 TERMUX_PKG_LICENSE="ISC"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.19.0"
+TERMUX_PKG_REVISION="1"
 TERMUX_PKG_SRCURL=https://github.com/starship/starship/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=cf789791b5c11d6d7a00628590696627bb8f980e3d7c7a0200026787b08aba37
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_DEPENDS="zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--all-features"
-TERMUX_PKG_SUGGESTS="nerdfix"
+TERMUX_PKG_SUGGESTS="nerdfix, taplo"
 
 termux_step_pre_configure() {
 	termux_setup_rust
