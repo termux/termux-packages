@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/cantino/mcfly
 TERMUX_PKG_DESCRIPTION="Replaces your default ctrl-r shell history search with an intelligent search engine"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.8.5"
+TERMUX_PKG_VERSION="0.8.6"
 TERMUX_PKG_SRCURL=https://github.com/cantino/mcfly/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=110b639b1c814a166faf205deb0714d96049f65c58bd9514189892484ebfd82b
+TERMUX_PKG_SHA256=baab80d9c78843d32a04d63107ec4fc8d7627989ac374bd16a2a9904f296498b
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
