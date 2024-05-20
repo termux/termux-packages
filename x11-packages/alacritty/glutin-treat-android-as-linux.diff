@@ -1,0 +1,64 @@
+--- a/glutin/build.rs
++++ b/glutin/build.rs
+@@ -4,7 +4,7 @@
+     // Setup alias to reduce `cfg` boilerplate.
+     cfg_aliases! {
+         // Systems.
+-        android_platform: { target_os = "android" },
++        android_platform: { target_os = "dummy" },
+         wasm_platform: { target_family = "wasm" },
+         macos_platform: { target_os = "macos" },
+         ios_platform: { target_os = "ios" },
+--- a/glutin/Cargo.toml
++++ b/glutin/Cargo.toml
+@@ -40,10 +40,10 @@
+ ]
+ optional = true
+ 
+-[target.'cfg(target_os = "android")'.dependencies]
++[target.'cfg(target_os = "dummy")'.dependencies]
+ glutin_egl_sys = { version = "0.6.0", path = "../glutin_egl_sys" }
+ 
+-[target.'cfg(any(target_os = "linux", target_os = "freebsd", target_os = "dragonfly", target_os = "netbsd", target_os = "openbsd"))'.dependencies]
++[target.'cfg(any(target_os = "android", target_os = "linux", target_os = "freebsd", target_os = "dragonfly", target_os = "netbsd", target_os = "openbsd"))'.dependencies]
+ glutin_egl_sys = { version = "0.6.0", path = "../glutin_egl_sys", optional = true }
+ glutin_glx_sys = { version = "0.5.0", path = "../glutin_glx_sys", optional = true }
+ wayland-sys = { version = "0.31.1", default-features = false, features = ["egl", "client", "dlopen"], optional = true }
+--- a/glutin_glx_sys/build.rs
++++ b/glutin_glx_sys/build.rs
+@@ -10,6 +10,7 @@
+     println!("cargo:rerun-if-changed=build.rs");
+ 
+     if target.contains("linux")
++        || target.contains("android")
+         || target.contains("dragonfly")
+         || target.contains("freebsd")
+         || target.contains("netbsd")
+--- a/glutin_glx_sys/Cargo.toml
++++ b/glutin_glx_sys/Cargo.toml
+@@ -12,5 +12,5 @@
+ [build-dependencies]
+ gl_generator = "0.14"
+ 
+-[target.'cfg(any(target_os = "linux", target_os = "freebsd", target_os="dragonfly", target_os="netbsd", target_os="openbsd"))'.dependencies]
++[target.'cfg(any(target_os = "android", target_os = "linux", target_os = "freebsd", target_os="dragonfly", target_os="netbsd", target_os="openbsd"))'.dependencies]
+ x11-dl = "2.18.3"
+--- a/glutin_glx_sys/src/lib.rs
++++ b/glutin_glx_sys/src/lib.rs
+@@ -1,4 +1,5 @@
+ #![cfg(any(
++    target_os = "android",
+     target_os = "linux",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+--- a/glutin-winit/build.rs
++++ b/glutin-winit/build.rs
+@@ -6,7 +6,7 @@
+     // Setup alias to reduce `cfg` boilerplate.
+     cfg_aliases! {
+         // Systems.
+-        android_platform: { target_os = "android" },
++        android_platform: { target_os = "dummy" },
+         wasm_platform: { target_family = "wasm" },
+         macos_platform: { target_os = "macos" },
+         ios_platform: { target_os = "ios" },
