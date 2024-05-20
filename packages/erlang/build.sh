@@ -17,6 +17,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-termcap
 erl_xcomp_sysroot=${TERMUX_PREFIX}
 "
+
 termux_pkg_auto_update() {
 	# Get latest release tag:
 	local tag
@@ -45,6 +46,11 @@ termux_step_host_build() {
 termux_step_pre_configure() {
 	# Add --build flag for erlang cross build
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --build=$(./erts/autoconf/config.guess)"
+
+	# https://android.googlesource.com/platform/bionic/+/master/docs/32-bit-abi.md#is-32_bit-on-lp32-y2038
+	if [ $TERMUX_ARCH_BITS = 32 ]; then
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --disable-year2038"
+	fi
 
 	# Use a wrapper CC to move `-I@TERMUX_PREFIX@/include` to the last include param
 	mkdir -p $TERMUX_PKG_TMPDIR/_fake_bin
