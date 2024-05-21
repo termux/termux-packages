@@ -1,0 +1,46 @@
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -76,10 +76,10 @@
+ simple_logger = { version = "4.2.0", default_features = false }
+ winit = { path = ".", features = ["rwh_05"] }
+ 
+-[target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dev-dependencies]
++[target.'cfg(not(any(target_os = "ios")))'.dev-dependencies]
+ softbuffer = "0.3.0"
+ 
+-[target.'cfg(target_os = "android")'.dependencies]
++[target.'cfg(target_os = "dummy")'.dependencies]
+ android-activity = "0.5.0"
+ ndk = { version = "0.8.0", default-features = false }
+ ndk-sys = "0.5.0"
+@@ -151,7 +151,7 @@
+     "Win32_UI_WindowsAndMessaging",
+ ]
+ 
+-[target.'cfg(all(unix, not(any(target_os = "redox", target_family = "wasm", target_os = "android", target_os = "ios", target_os = "macos"))))'.dependencies]
++[target.'cfg(all(unix, not(any(target_os = "redox", target_family = "wasm", target_os = "ios", target_os = "macos"))))'.dependencies]
+ ahash = { version = "0.8.3", features = ["no-rng"], optional = true }
+ bytemuck = { version = "1.13.1", default-features = false, optional = true }
+ calloop = "0.12.3"
+--- a/build.rs
++++ b/build.rs
+@@ -7,7 +7,7 @@
+     // Setup cfg aliases
+     cfg_aliases! {
+         // Systems.
+-        android_platform: { target_os = "android" },
++        android_platform: { target_os = "dummy" },
+         wasm_platform: { all(target_family = "wasm", not(target_os = "emscripten")) },
+         macos_platform: { target_os = "macos" },
+         ios_platform: { target_os = "ios" },
+--- a/src/platform_impl/linux/mod.rs
++++ b/src/platform_impl/linux/mod.rs
+@@ -958,7 +958,7 @@
+     })
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "android", target_os = "linux"))]
+ fn is_main_thread() -> bool {
+     rustix::thread::gettid() == rustix::process::getpid()
+ }
