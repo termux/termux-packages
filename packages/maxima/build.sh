@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE="https://maxima.sourceforge.io/"
 TERMUX_PKG_DESCRIPTION="A Computer Algebra System"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Marlin Sööse <marlin.soose@laro.se>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=()
 TERMUX_PKG_VERSION+=(5.47.0)
 TERMUX_PKG_VERSION+=(24.5.10) # ECL version

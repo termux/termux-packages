@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/Macchina-CLI/macchina
 TERMUX_PKG_DESCRIPTION="A system information fetcher, with an emphasis on performance and minimalism."
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Max Ferrer @PandaFoss"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.1.8"
 TERMUX_PKG_SRCURL=https://github.com/Macchina-CLI/macchina/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=e827f640b55fe47a6127dd0c276e76b597e3cb83916be37351cdd6a81d75311e
