@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/octobanana/peaclock
 TERMUX_PKG_DESCRIPTION="A responsive and customizable clock, timer, and stopwatch for the terminal."
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="@efreak"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.4.3
 TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://github.com/octobanana/peaclock/archive/${TERMUX_PKG_VERSION}.tar.gz
