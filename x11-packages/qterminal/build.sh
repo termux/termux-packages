@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://lxqt.github.io
 TERMUX_PKG_DESCRIPTION="A lightweight Qt terminal emulator"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.4.0"
 TERMUX_PKG_SRCURL="https://github.com/lxqt/qterminal/releases/download/${TERMUX_PKG_VERSION}/qterminal-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=8313326ac3ef728924271cd60a8f79e17e5e755a6bfa4e4419a4b7a53528659f

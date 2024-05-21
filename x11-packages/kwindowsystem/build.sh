@@ -8,7 +8,7 @@ LICENSES/LGPL-2.1-or-later.txt
 LICENSES/LGPL-3.0-only.txt
 LICENSES/LicenseRef-KDE-Accepted-LGPL.txt
 LICENSES/MIT.txt"
-TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="5.112.0"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/kwindowsystem-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=418e13e52f66a4030757d8479c787adab1112f40f694c0cc26309d84bf793022

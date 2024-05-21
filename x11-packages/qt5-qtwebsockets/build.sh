@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.qt.io/
 TERMUX_PKG_DESCRIPTION="Qt 5 WebSockets Library"
 TERMUX_PKG_LICENSE="LGPL-3.0"
-TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=5.15.10
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/${TERMUX_PKG_VERSION%.*}/${TERMUX_PKG_VERSION}/submodules/qtwebsockets-everywhere-opensource-src-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=2b9562db9e5c4b4585ab017f9b46b59ddc75b4d7222c5b03ebbc479652f6d98a

@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/KDE/trojita
 TERMUX_PKG_DESCRIPTION="Fast, lightweight and standard-compliant IMAP e-mail client"
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_MAINTAINER="Yisus7u7 <dev.yisus@hotmail.com>"
+TERMUX_PKG_MAINTAINER="@Yisus7u7"
 TERMUX_PKG_VERSION=0.7
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/KDE/trojita/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz

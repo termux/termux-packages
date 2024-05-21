@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://riverbankcomputing.com/software/qscintilla
 TERMUX_PKG_DESCRIPTION="QScintilla is a port to Qt of the Scintilla editing component"
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 # Align the version with `python-qscintilla` package.
 TERMUX_PKG_VERSION=2.14.1
 TERMUX_PKG_SRCURL="https://www.riverbankcomputing.com/static/Downloads/QScintilla/${TERMUX_PKG_VERSION}/QScintilla_src-${TERMUX_PKG_VERSION}.tar.gz"

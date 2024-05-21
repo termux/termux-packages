@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://docs.xfce.org/panel-plugins/xfce4-notes-plugin/start
 TERMUX_PKG_DESCRIPTION="Notes application for the Xfce4 desktop"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Yisus7u7 <dev.yisus@hotmail.com>"
+TERMUX_PKG_MAINTAINER="@Yisus7u7"
 TERMUX_PKG_VERSION="1.11.0"
 TERMUX_PKG_SRCURL=https://archive.xfce.org/src/panel-plugins/xfce4-notes-plugin/${TERMUX_PKG_VERSION%.*}/xfce4-notes-plugin-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=eb38246deb0fc89535fa9ff9b953c762cece232b5585d8210fab9abbf282aae3

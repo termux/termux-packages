@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://git.causal.agency/libretls/about/
 TERMUX_PKG_DESCRIPTION="libtls for OpenSSL"
 TERMUX_PKG_LICENSE="ISC"
-TERMUX_PKG_MAINTAINER="@Yonle <yonle@duck.com>"
+TERMUX_PKG_MAINTAINER="@Yonle"
 TERMUX_PKG_VERSION="3.8.1"
 TERMUX_PKG_SRCURL=https://git.causal.agency/libretls/snapshot/libretls-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=4a705c9c079dc70383ccc08432b93fbb61f9ec5873a92883e01e0940b8eaf3de

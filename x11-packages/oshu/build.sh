@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/fmang/oshu
 TERMUX_PKG_DESCRIPTION="Oshu Is a Musical Game"
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_MAINTAINER="@AnGelXoG"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.0.2
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/fmang/oshu/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz

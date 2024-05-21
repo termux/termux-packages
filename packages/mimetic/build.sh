@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.codesink.org/mimetic_mime_library.html
 TERMUX_PKG_DESCRIPTION="A C++ Email library (MIME)"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.9.8
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.codesink.org/download/mimetic-${TERMUX_PKG_VERSION}.tar.gz

@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/qtwebkit/qtwebkit
 TERMUX_PKG_DESCRIPTION="Qt 5 WebKit Library"
 TERMUX_PKG_LICENSE="LGPL-2.1"
-TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="5.212.0-alpha4"
 TERMUX_PKG_REVISION=16
 TERMUX_PKG_SRCURL="https://github.com/qtwebkit/qtwebkit/releases/download/qtwebkit-${TERMUX_PKG_VERSION}/qtwebkit-${TERMUX_PKG_VERSION}.tar.xz"

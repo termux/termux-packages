@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/tsujan/Kvantum
 TERMUX_PKG_DESCRIPTION="SVG-based theme engine for Qt5"
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.0.10"
 TERMUX_PKG_SRCURL="https://github.com/tsujan/Kvantum/releases/download/V${TERMUX_PKG_VERSION}/Kvantum-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=4a070a1a6fac3d1861010aa44d34e665e4697bc64c4c5015a6448203c31f1f1f

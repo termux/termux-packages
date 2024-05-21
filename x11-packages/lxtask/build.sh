@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.lxde.org/
 TERMUX_PKG_DESCRIPTION="LXTask is a GUI application for the Lightweight X11 Desktop Environment (LXDE)"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Yisus7u7 <dev.yisus@hotmail.com>"
+TERMUX_PKG_MAINTAINER="@Yisus7u7"
 TERMUX_PKG_VERSION=0.1.10
 TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://github.com/lxde/lxtask/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz

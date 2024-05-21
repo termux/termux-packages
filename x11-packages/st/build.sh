@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://st.suckless.org/
 TERMUX_PKG_DESCRIPTION="A simple virtual terminal emulator for X"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Tristan Ross <spaceboyross@yandex.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.9.2"
 TERMUX_PKG_SRCURL="https://dl.suckless.org/st/st-$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=6b215d4f472b21d6232f30f221117a777e24bcfee68955ddefb7426467f9494b

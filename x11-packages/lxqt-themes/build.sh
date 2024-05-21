@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://lxqt.github.io
 TERMUX_PKG_DESCRIPTION="Themes, graphics and icons for LXQt"
 TERMUX_PKG_LICENSE="LGPL-2.1"
-TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.3.0"
 TERMUX_PKG_SRCURL="https://github.com/lxqt/lxqt-themes/releases/download/${TERMUX_PKG_VERSION}/lxqt-themes-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=217fec5bb2c1d5b92c9b07d470a960d1fbfeeac927c12f54a85c5e9c25c67504

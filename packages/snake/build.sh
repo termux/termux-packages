@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/gogakoreli/snake
 TERMUX_PKG_DESCRIPTION="Eat as much as you want while avoiding walls"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Tipz Team @TipzTeam"
+TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=a57f7f8aa8c77fcce2dabafca1a5ec4b96825231
 TERMUX_PKG_VERSION=2022.11.07
 TERMUX_PKG_SRCURL=git+https://github.com/gogakoreli/snake

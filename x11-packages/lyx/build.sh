@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.lyx.org
 TERMUX_PKG_DESCRIPTION="WYSIWYM (What You See Is What You Mean) Document Processor"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.3.7p1"
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://ftp.lip6.fr/pub/lyx/stable/${TERMUX_PKG_VERSION%.*}.x/lyx-${TERMUX_PKG_VERSION/p/-}.tar.xz"
