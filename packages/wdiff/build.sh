@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/wdiff/
 TERMUX_PKG_DESCRIPTION="Display word differences between text files"
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_MAINTAINER="@harieamjari"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.2.2
 TERMUX_PKG_REVISION=1
 #TERMUX_PKG_SRCURL=http://ftp.gnu.org/gnu/wdiff/wdiff-${TERMUX_PKG_VERSION}.tar.gz

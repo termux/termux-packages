@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://codeberg.org/Anoxinon_e.V./xmppc
 TERMUX_PKG_DESCRIPTION="Command Line Interface Tool for XMPP"
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_MAINTAINER="j.r <j.r@jugendhacker.de>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.1.2
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://codeberg.org/Anoxinon_e.V./xmppc/archive/${TERMUX_PKG_VERSION}.tar.gz

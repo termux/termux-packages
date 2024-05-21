@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/mitnk/cicada
 TERMUX_PKG_DESCRIPTION="A bash like Unix shell"
-TERMUX_PKG_MAINTAINER="Hugo Wang <w@mitnk.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION="0.9.38"
 TERMUX_PKG_SRCURL=https://github.com/mitnk/cicada/archive/v$TERMUX_PKG_VERSION.tar.gz
