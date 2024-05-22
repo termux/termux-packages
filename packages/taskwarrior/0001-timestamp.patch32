@@ -1,0 +1,11 @@
+--- a/taskchampion/lib/src/atomic.rs
++++ b/taskchampion/lib/src/atomic.rs
+@@ -22,7 +22,7 @@
+ 
+     unsafe fn from_ctype(self) -> Option<DateTime<Utc>> {
+         if self != 0 {
+-            return Some(utc_timestamp(self));
++            return Some(utc_timestamp(self.into()));
+         }
+         None
+     }

@@ -1,0 +1,86 @@
+https://github.com/dtolnay/linkme/pull/66/commits/38cb074be7193d87e386a02c0e3b20a01f8ba6aa
+
+--- a/src/declaration.rs
++++ b/src/declaration.rs
+@@ -118,6 +118,7 @@
+         #(#attrs)*
+         #vis static #ident: #linkme_path::DistributedSlice<#ty> = {
+             #[cfg(any(
++                target_os = "android",
+                 target_os = "none",
+                 target_os = "linux",
+                 target_os = "macos",
+@@ -127,25 +128,25 @@
+                 target_os = "freebsd",
+             ))]
+             extern "Rust" {
+-                #[cfg_attr(any(target_os = "none", target_os = "linux"), link_name = #linux_section_start)]
++                #[cfg_attr(any(target_os = "android", target_os = "none", target_os = "linux"), link_name = #linux_section_start)]
+                 #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_name = #macho_section_start)]
+                 #[cfg_attr(target_os = "illumos", link_name = #illumos_section_start)]
+                 #[cfg_attr(target_os = "freebsd", link_name = #freebsd_section_start)]
+                 static LINKME_START: <#ty as #linkme_path::__private::Slice>::Element;
+ 
+-                #[cfg_attr(any(target_os = "none", target_os = "linux"), link_name = #linux_section_stop)]
++                #[cfg_attr(any(target_os = "android", target_os = "none", target_os = "linux"), link_name = #linux_section_stop)]
+                 #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_name = #macho_section_stop)]
+                 #[cfg_attr(target_os = "illumos", link_name = #illumos_section_stop)]
+                 #[cfg_attr(target_os = "freebsd", link_name = #freebsd_section_stop)]
+                 static LINKME_STOP: <#ty as #linkme_path::__private::Slice>::Element;
+ 
+-                #[cfg_attr(any(target_os = "none", target_os = "linux"), link_name = #linux_dupcheck_start)]
++                #[cfg_attr(any(target_os = "android", target_os = "none", target_os = "linux"), link_name = #linux_dupcheck_start)]
+                 #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_name = #macho_dupcheck_start)]
+                 #[cfg_attr(target_os = "illumos", link_name = #illumos_dupcheck_start)]
+                 #[cfg_attr(target_os = "freebsd", link_name = #freebsd_dupcheck_start)]
+                 static DUPCHECK_START: #linkme_path::__private::usize;
+ 
+-                #[cfg_attr(any(target_os = "none", target_os = "linux"), link_name = #linux_dupcheck_stop)]
++                #[cfg_attr(any(target_os = "android", target_os = "none", target_os = "linux"), link_name = #linux_dupcheck_stop)]
+                 #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_name = #macho_dupcheck_stop)]
+                 #[cfg_attr(target_os = "illumos", link_name = #illumos_dupcheck_stop)]
+                 #[cfg_attr(target_os = "freebsd", link_name = #freebsd_dupcheck_stop)]
+@@ -169,14 +170,14 @@
+             static DUPCHECK_STOP: () = ();
+ 
+             #used
+-            #[cfg(any(target_os = "none", target_os = "linux", target_os = "illumos", target_os = "freebsd"))]
+-            #[cfg_attr(any(target_os = "none", target_os = "linux"), link_section = #linux_section)]
++            #[cfg(any(target_os = "android", target_os = "none", target_os = "linux", target_os = "illumos", target_os = "freebsd"))]
++            #[cfg_attr(any(target_os = "android", target_os = "none", target_os = "linux"), link_section = #linux_section)]
+             #[cfg_attr(target_os = "illumos", link_section = #illumos_section)]
+             #[cfg_attr(target_os = "freebsd", link_section = #freebsd_section)]
+             static mut LINKME_PLEASE: [<#ty as #linkme_path::__private::Slice>::Element; 0] = [];
+ 
+             #used
+-            #[cfg_attr(any(target_os = "none", target_os = "linux"), link_section = #linux_dupcheck)]
++            #[cfg_attr(any(target_os = "android", target_os = "none", target_os = "linux"), link_section = #linux_dupcheck)]
+             #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_section = #macho_dupcheck)]
+             #[cfg_attr(target_os = "windows", link_section = #windows_dupcheck)]
+             #[cfg_attr(target_os = "illumos", link_section = #illumos_dupcheck)]
+@@ -184,6 +185,7 @@
+             static DUPCHECK: #linkme_path::__private::usize = 1;
+ 
+             #[cfg(not(any(
++                target_os = "android",
+                 target_os = "none",
+                 target_os = "linux",
+                 target_os = "macos",
+@@ -236,7 +238,7 @@
+                 $item:item
+             ) => {
+                 #used
+-                #[cfg_attr(any(target_os = "none", target_os = "linux"), link_section = $linux_section)]
++                #[cfg_attr(any(target_os = "android", target_os = "none", target_os = "linux"), link_section = $linux_section)]
+                 #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_section = $macho_section)]
+                 #[cfg_attr(target_os = "windows", link_section = $windows_section)]
+                 #[cfg_attr(target_os = "illumos", link_section = $illumos_section)]
+@@ -245,7 +247,7 @@
+             };
+             ($item:item) => {
+                 #used
+-                #[cfg_attr(any(target_os = "none", target_os = "linux"), link_section = #linux_section)]
++                #[cfg_attr(any(target_os = "android", target_os = "none", target_os = "linux"), link_section = #linux_section)]
+                 #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_section = #macho_section)]
+                 #[cfg_attr(target_os = "windows", link_section = #windows_section)]
+                 #[cfg_attr(target_os = "illumos", link_section = #illumos_section)]
