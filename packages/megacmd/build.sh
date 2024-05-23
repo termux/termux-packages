@@ -2,8 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://mega.io/
 TERMUX_PKG_DESCRIPTION="Provides non UI access to MEGA services"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.6.3
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="1.7.0"
 TERMUX_PKG_SRCURL=git+https://github.com/meganz/MEGAcmd
 TERMUX_PKG_GIT_BRANCH=${TERMUX_PKG_VERSION}_Linux
 TERMUX_PKG_AUTO_UPDATE=true
@@ -14,6 +13,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-static
 --with-pcre=$TERMUX_PREFIX
+--with-ffmpeg=$TERMUX_PREFIX
 ac_cv_lib_pthread_pthread_create=yes
 "
 
