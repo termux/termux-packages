@@ -24,8 +24,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-imagemagick
 --with-x=no
 "
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
-
 termux_step_post_get_source() {
 	local _PATCH_FILES="
 		transcode-1.1.7-freetype251.patch
