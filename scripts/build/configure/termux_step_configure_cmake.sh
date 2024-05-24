@@ -10,11 +10,9 @@ termux_step_configure_cmake() {
 	test $CMAKE_PROC == "arm" && CMAKE_PROC='armv7-a'
 
 	local CMAKE_TERMUX_TOOL_C_COMPILER=False
-	if [ "$TERMUX_PKG_ENABLE_CLANG16_PORTING" = "true" ]; then
-		local _cc
-		if _cc="$(command -v ${CC-})"; then
-			CMAKE_TERMUX_TOOL_C_COMPILER="$_cc"
-		fi
+	local _cc
+	if _cc="$(command -v ${CC-})"; then
+		CMAKE_TERMUX_TOOL_C_COMPILER="$_cc"
 	fi
 
 	local CMAKE_ADDITIONAL_ARGS=()

@@ -10,7 +10,6 @@ TERMUX_PKG_SRCURL=git+https://github.com/ptitSeb/box86
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_DEPENDS="libandroid-complex-math, libandroid-glob, libandroid-spawn, libandroid-sysv-semaphore"
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
 
 # box86 is for arm only
 TERMUX_PKG_BLACKLISTED_ARCHES="aarch64, i686, x86_64"
