@@ -17,7 +17,7 @@ termux_pkg_auto_update() {
 	local api_url="https://api.github.com/repos/rust-lang/rust-analyzer/tags"
 	local api_url_r=$(curl -s "${api_url}")
 	local r1=$(echo "${api_url_r}" | jq .[].name | sed -e 's|\"||g')
-	local latest_tag=$(echo "${r1}" | sed -nE 's/^([0-9]*-)/\1/p' | sort | tail -n1)
+	local latest_tag=$(echo "${r1}" | sed -nE 's/^([0-9]*-)/\1/p' | sort -V | tail -n1)
 	# https://github.com/termux/termux-packages/issues/18667
 	local latest_version=${latest_tag:0:4}${latest_tag:5:2}${latest_tag:8:2}
 	if [[ "${latest_version}" == "${TERMUX_PKG_VERSION}" ]]; then
