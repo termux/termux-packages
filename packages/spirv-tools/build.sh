@@ -18,11 +18,11 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_pkg_auto_update() {
 	# use versions from sdk-* and not vYEAR.* to match spirv-headers
 	local api_url="https://api.github.com/repos/KhronosGroup/SPIRV-Tools/git/refs/tags"
-	local latest_refs_tags=$(curl -s "${api_url}" | jq .[].ref | grep -oP vulkan-sdk-${TERMUX_PKG_UPDATE_VERSION_REGEXP} | sort)
+	local latest_refs_tags=$(curl -s "${api_url}" | jq .[].ref | grep -oP vulkan-sdk-${TERMUX_PKG_UPDATE_VERSION_REGEXP})
 	if [[ -z "${latest_refs_tags}" ]]; then
 		echo "WARN: Unable to get latest refs tags from upstream. Try again later." >&2
 		return
 	fi
-	local latest_version=$(echo "${latest_refs_tags}" | tail -n1)
+	local latest_version=$(echo "${latest_refs_tags}" | sort -V | tail -n1)
 	termux_pkg_upgrade_version "${latest_version//vulkan-sdk-}"
 }
