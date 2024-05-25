@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://nodejs.org/
 TERMUX_PKG_DESCRIPTION="Open Source, cross-platform JavaScript runtime environment"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Yaksh Bariya <thunder-coding@termux.dev>"
-TERMUX_PKG_VERSION=20.11.1
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION=20.13.1
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=77813edbf3f7f16d2d35d3353443dee4e61d5ee84d9e3138c7538a3c0ca5209e
+TERMUX_PKG_SHA256=791786a09023241cb7e4f7d65ec90aa924bb39141ff7bb6d5a1dedf7def4b4e7
 # Note that we do not use a shared libuv to avoid an issue with the Android
 # linker, which does not use symbols of linked shared libraries when resolving
 # symbols on dlopen(). See https://github.com/termux/termux-packages/issues/462.
@@ -106,11 +105,13 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
+	local _BUILD_DIR=out/
 	if [ "${TERMUX_DEBUG_BUILD}" = "true" ]; then
-		python tools/install.py install "" "${TERMUX_PREFIX}" out/Debug/
+		_BUILD_DIR+="/Debug/"
 	else
-		python tools/install.py install "" "${TERMUX_PREFIX}" out/Release/
+		_BUILD_DIR+="/Release/"
 	fi
+	python tools/install.py install --dest-dir="" --prefix "${TERMUX_PREFIX}" --build-dir "$_BUILD_DIR"
 }
 
 termux_step_create_debscripts() {
