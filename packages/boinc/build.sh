@@ -28,7 +28,7 @@ termux_pkg_auto_update() {
 		return
 	fi
 
-	local latest_version=$(echo "${latest_refs_tags}" | tail -n1)
+	local latest_version=$(echo "${latest_refs_tags}" | sort -V | tail -n1)
 	if [[ "${latest_version}" == "${TERMUX_PKG_VERSION}" ]]; then
 		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
 		return
