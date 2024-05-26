@@ -1,0 +1,24 @@
+Fix CANNOT LINK EXECUTABLE "/data/data/com.termux/files/usr/lib/erlang/erts-15.0/bin/erlexec": can't enable GNU RELRO protection for "/data/data/com.termux/files/usr/lib/erlang/erts-15.0/bin/erlexec": Out of memory
+
+--- a/erts/configure
++++ b/erts/configure
+@@ -25762,7 +25762,7 @@
+ rm -f core conftest.err conftest.$ac_objext conftest.beam \
+     conftest$ac_exeext conftest.$ac_ext
+     LDFLAGS="$saved_LDFLAGS"
+-    for flag in "-Wl,-z,common-page-size=2097152" "-Wl,-z,max-page-size=2097152"
++    for flag in "-Wl,-z,common-page-size=4096" "-Wl,-z,max-page-size=16384"
+     do
+       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if we can add $flag to LDFLAGS" >&5
+ printf %s "checking if we can add $flag to LDFLAGS... " >&6; }
+--- a/erts/configure.ac
++++ b/erts/configure.ac
+@@ -3071,7 +3071,7 @@
+       ]
+     )
+     LDFLAGS="$saved_LDFLAGS"
+-    for flag in "-Wl,-z,common-page-size=2097152" "-Wl,-z,max-page-size=2097152"
++    for flag in "-Wl,-z,common-page-size=4096" "-Wl,-z,max-page-size=16384"
+     do
+       AC_MSG_CHECKING([if we can add $flag to LDFLAGS])
+       saved_LDFLAGS="$LDFLAGS"
