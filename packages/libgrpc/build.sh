@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="High performance, open source, general RPC framework tha
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_SRCURL=git+https://github.com/grpc/grpc
-TERMUX_PKG_VERSION="1.63.0"
+TERMUX_PKG_VERSION="1.64.0"
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_VERSION_REGEXP="^\d+\.\d+\.\d+$"
+TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
 TERMUX_PKG_DEPENDS="abseil-cpp, c-ares, ca-certificates, libc++, libprotobuf, libre2, openssl, protobuf, zlib"
 TERMUX_PKG_BREAKS="libgrpc-dev"
 TERMUX_PKG_REPLACES="libgrpc-dev"
@@ -27,15 +27,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DRUN_HAVE_STEADY_CLOCK=0
 -DProtobuf_PROTOC_LIBRARY=$TERMUX_PREFIX/lib/libprotoc.so
 "
-
-termux_pkg_auto_update() {
-	local latest_tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}" "${TERMUX_PKG_UPDATE_TAG_TYPE}")"
-	if grep -qP "${TERMUX_PKG_UPDATE_VERSION_REGEXP}" <<<"${latest_tag}"; then
-		termux_pkg_upgrade_version "${latest_tag}"
-	else
-		echo "INFO: No update needed, tag '${latest_tag}' is not a stable release."
-	fi
-}
 
 termux_step_host_build() {
 	termux_setup_cmake

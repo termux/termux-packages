@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/Mangeshrex/rxfetch
 TERMUX_PKG_DESCRIPTION="A custom system info fetching tool"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="@PeroSar"
+TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=fa70e5aa0eaa72914fc3b170b83a2b67c049cbef
 TERMUX_PKG_VERSION=2023.01.07
 TERMUX_PKG_SRCURL=git+https://github.com/mangeshrex/rxfetch

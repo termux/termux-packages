@@ -3,11 +3,12 @@ TERMUX_PKG_DESCRIPTION="A remote shell that automatically reconnects without int
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.2.9"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/MisterTea/EternalTerminal
 TERMUX_PKG_GIT_BRANCH=et-v${TERMUX_PKG_VERSION}
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
-TERMUX_PKG_DEPENDS="libc++, libsodium, openssl, protobuf, zlib"
+TERMUX_PKG_DEPENDS="abseil-cpp, libc++, libsodium, openssl, protobuf, zlib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DDISABLE_VCPKG=1"
 
 termux_step_pre_configure() {

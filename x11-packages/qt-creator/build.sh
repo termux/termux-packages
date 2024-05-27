@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.qt.io/
 TERMUX_PKG_DESCRIPTION="Integrated Development Environment for Qt"
 TERMUX_PKG_LICENSE="LGPL-3.0"
-TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=4.15.2
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL="https://github.com/qt-creator/qt-creator/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"

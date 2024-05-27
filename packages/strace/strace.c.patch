@@ -1,7 +1,8 @@
-diff -uNr strace-6.5/src/strace.c strace-6.5.mod/src/strace.c
---- strace-6.5/src/strace.c	2023-06-30 16:00:00.000000000 +0800
-+++ strace-6.5.mod/src/strace.c	2023-09-02 09:37:22.940907755 +0800
-@@ -627,11 +627,7 @@
+diff --git a/src/strace.c b/src/strace.c
+index 1c2e9a8..050e36e 100644
+--- a/src/strace.c
++++ b/src/strace.c
+@@ -654,11 +654,7 @@ set_cloexec_flag(int fd)
  static void
  swap_uid(void)
  {
@@ -14,30 +15,20 @@ diff -uNr strace-6.5/src/strace.c strace-6.5.mod/src/strace.c
  }
  
  static FILE *
-@@ -1505,26 +1501,6 @@
+@@ -1581,6 +1577,8 @@ exec_or_die(void)
+ 		if (!use_seize && ptrace(PTRACE_TRACEME, 0L, 0L, 0L) < 0)
  			perror_msg_and_die("ptrace(PTRACE_TRACEME, ...)");
  	}
++#ifndef __TERMUX__
++
  
--	if (username != NULL) {
--		/*
--		 * It is important to set groups before we
--		 * lose privileges on setuid.
--		 */
--		if (initgroups(username, run_gid) < 0)
--			perror_msg_and_die("initgroups");
--		if (setregid(run_gid, params->run_egid) < 0)
--			perror_msg_and_die("setregid");
--
--		/*
--		 * If there is a seccomp filter to be installed, this should
--		 * be done before CAP_SYS_ADMIN is dropped by setreuid.
--		 */
--		maybe_init_seccomp_filter();
--
--		if (setreuid(run_uid, params->run_euid) < 0)
--			perror_msg_and_die("setreuid");
--	}
--
+ 	if (username != NULL) {
+ 		/*
+@@ -1609,6 +1607,7 @@ exec_or_die(void)
+ 		if (setreuid(run_uid, params->run_euid) < 0)
+ 			perror_msg_and_die("setreuid");
+ 	}
++#endif
+ 
  	if (!daemonized_tracer) {
  		/*
- 		 * Induce a ptrace stop. Tracer (our parent)

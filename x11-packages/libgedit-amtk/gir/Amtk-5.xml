@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<dump>
+  <flags name="AmtkFactoryFlags" get-type="amtk_factory_flags_get_type">
+    <member name="AMTK_FACTORY_FLAGS_NONE" nick="flags-none" value="0"/>
+    <member name="AMTK_FACTORY_IGNORE_GACTION" nick="ignore-gaction" value="1"/>
+    <member name="AMTK_FACTORY_IGNORE_ICON" nick="ignore-icon" value="2"/>
+    <member name="AMTK_FACTORY_IGNORE_LABEL" nick="ignore-label" value="4"/>
+    <member name="AMTK_FACTORY_IGNORE_TOOLTIP" nick="ignore-tooltip" value="8"/>
+    <member name="AMTK_FACTORY_IGNORE_ACCELS" nick="ignore-accels" value="16"/>
+    <member name="AMTK_FACTORY_IGNORE_ACCELS_FOR_DOC" nick="ignore-accels-for-doc" value="32"/>
+    <member name="AMTK_FACTORY_IGNORE_ACCELS_FOR_APP" nick="ignore-accels-for-app" value="64"/>
+  </flags>
+  <boxed name="AmtkActionInfo" get-type="amtk_action_info_get_type"/>
+  <class name="AmtkActionInfoStore" get-type="amtk_action_info_store_get_type" parents="GObject">
+  </class>
+  <class name="AmtkActionInfoCentralStore" get-type="amtk_action_info_central_store_get_type" parents="GObject">
+  </class>
+  <class name="AmtkApplicationWindow" get-type="amtk_application_window_get_type" parents="GObject">
+    <property name="application-window" type="GtkApplicationWindow" flags="235"/>
+    <property name="statusbar" type="GtkStatusbar" flags="227"/>
+  </class>
+  <class name="AmtkFactory" get-type="amtk_factory_get_type" parents="GObject">
+    <property name="application" type="GtkApplication" flags="235"/>
+    <property name="default-flags" type="AmtkFactoryFlags" flags="227" default-value="AMTK_FACTORY_FLAGS_NONE"/>
+  </class>
+  <class name="AmtkMenuShell" get-type="amtk_menu_shell_get_type" parents="GObject">
+    <property name="menu-shell" type="GtkMenuShell" flags="235"/>
+    <signal name="menu-item-selected" return="void" when="first">
+      <param type="GtkMenuItem"/>
+    </signal>
+    <signal name="menu-item-deselected" return="void" when="first">
+      <param type="GtkMenuItem"/>
+    </signal>
+  </class>
+</dump>

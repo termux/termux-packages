@@ -3,6 +3,7 @@
 set -e -u
 
 TERMUX_SCRIPTDIR=$(realpath "$(dirname "$0")/../")
+. "$TERMUX_SCRIPTDIR/scripts/properties.sh"
 
 check_package_license() {
 	local pkg_licenses=$1
@@ -12,7 +13,7 @@ check_package_license() {
 
 	IFS=","
 	for license in $pkg_licenses; do
-		license=$(echo "$license" | sed -r 's/^\s*(\S+(\s+\S+)*)\s*$/\1/')
+		license=$(sed -r 's/^\s*(\S+(\s+\S+)*)\s*$/\1/' <<< "$license")
 
 		case "$license" in
 			AFL-2.1|AFL-3.0|AGPL-V3|APL-1.0|APSL-2.0|Apache-1.0|Apache-1.1);;
@@ -127,6 +128,25 @@ lint_package() {
 	echo "Package: $package_name"
 	echo
 
+	echo -n "Layout: "
+	local channel in_dir=''
+	for channel in $TERMUX_PACKAGES_DIRECTORIES; do
+		[[ -d "$TERMUX_SCRIPTDIR/$channel/$package_name" ]] && {
+			in_dir="$TERMUX_SCRIPTDIR/$channel/$package_name"
+			break
+		}
+	done
+	(( ! ${#in_dir}  )) && {
+		echo "FAIL - '$package_script' is not a directory"
+		return 1
+	}
+
+	[[ -f "${in_dir}/build.sh" ]] || {
+		echo "FAIL - No build.sh file in package '$package_name'"
+		return 1
+	}
+	echo "PASS"
+
 	check_package_name "$package_name" || return 1
 	local subpkg_script
 	for subpkg_script in $(dirname "$package_script")/*.subpackage.sh; do
@@ -197,10 +217,6 @@ lint_package() {
 		# Certain fields may be API-specific.
 		# Using API 24 here.
 		TERMUX_PKG_API_LEVEL=24
-
-		if [[ -f "$TERMUX_SCRIPTDIR/scripts/properties.sh" ]]; then
-			. "$TERMUX_SCRIPTDIR/scripts/properties.sh"
-		fi
 
 		. "$package_script"
 

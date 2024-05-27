@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://ngircd.barton.de/
 TERMUX_PKG_DESCRIPTION="Free, portable and lightweight Internet Relay Chat server"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="@yonle <yonle@protonmail.com>"
+TERMUX_PKG_MAINTAINER="@Yonle"
 TERMUX_PKG_VERSION="27"
 TERMUX_PKG_SRCURL="https://github.com/ngircd/ngircd/releases/download/rel-${TERMUX_PKG_VERSION}/ngircd-${TERMUX_PKG_VERSION%.*}.tar.xz"
 TERMUX_PKG_SHA256=6897880319dd5e2e73c1c9019613509f88eb5b8daa5821a36fbca3d785c247b8

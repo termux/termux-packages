@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/poac-dev/poac
 TERMUX_PKG_DESCRIPTION="A package manager and build system for C++"
 TERMUX_PKG_LICENSE="Apache-2.0"
-TERMUX_PKG_MAINTAINER="@SunPodder"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.9.3"
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/poac-dev/poac/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"

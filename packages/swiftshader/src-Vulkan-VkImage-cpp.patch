@@ -1,0 +1,30 @@
+diff -u -r ../swiftshader-da334852e70510d259bfa8cbaa7c5412966b2f41/src/Vulkan/VkImage.cpp ./src/Vulkan/VkImage.cpp
+--- ../swiftshader-da334852e70510d259bfa8cbaa7c5412966b2f41/src/Vulkan/VkImage.cpp	2024-05-08 17:29:21.000000000 +0000
++++ ./src/Vulkan/VkImage.cpp	2024-05-16 09:03:48.599534883 +0000
+@@ -25,7 +25,7 @@
+ #include "Device/Blitter.hpp"
+ #include "Device/ETC_Decoder.hpp"
+ 
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ #	include <vndk/hardware_buffer.h>
+ 
+ #	include "VkDeviceMemoryExternalAndroid.hpp"
+@@ -135,7 +135,7 @@
+ 		// VK_STRUCTURE_TYPE_SWAPCHAIN_IMAGE_CREATE_INFO_ANDROID, are not enumerated in the official Vulkan headers.
+ 		switch((int)(nextInfo->sType))
+ 		{
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ 		case VK_STRUCTURE_TYPE_EXTERNAL_FORMAT_ANDROID:
+ 			{
+ 				const VkExternalFormatANDROID *externalFormatAndroid = reinterpret_cast<const VkExternalFormatANDROID *>(nextInfo);
+@@ -317,7 +317,7 @@
+ 	}
+ }
+ 
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ VkResult Image::prepareForExternalUseANDROID() const
+ {
+ 	VkExtent3D extent = getMipLevelExtent(VK_IMAGE_ASPECT_COLOR_BIT, 0);

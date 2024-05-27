@@ -6,8 +6,7 @@ Fix compilation with clang-16
 aclocal.m4 contains code that no longer compiles: missing headers and missing
 return types.
 
---- a/autoconf_local/aclocal.m4
-+++ b/autoconf_local/aclocal.m4
++++ ./autoconf_local/aclocal.m4
 @@ -192,6 +192,7 @@
  #include "pchtest.h"
  #pragma hdrstop
@@ -16,270 +15,7 @@ return types.
  
  int main(int argc, char **argv)
  {
-@@ -1242,7 +1243,9 @@
- AC_MSG_CHECKING([if -D__STDC_EXT__ is needed with GCC on HP-UX])
- AC_TRY_RUN([
- #include <stdio.h>
-+#include <stdlib.h>
-  
-+int
- main()
- {
- #ifdef __STDC_EXT__
-@@ -1674,7 +1677,9 @@
- #include <sys/types.h>
- #include <sys/stat.h>
- #include <stdio.h>
-+#include <stdlib.h>
-  
-+int
- main()
- {
- 	int result;
-@@ -1816,6 +1821,7 @@
- #	include <snprintf.h>
- #endif
-  
-+int
- main()
- {
- 	char s[16];
-@@ -1876,6 +1882,7 @@
- #	include <snprintf.h>
- #endif
-  
-+int
- main()
- {
- 	int result;
-@@ -2004,7 +2011,9 @@
- #ifdef HAVE_SYS_UN_H
- #include <sys/un.h>
- #endif
-+#include <stdlib.h>
-  
-+int
- main()
- {
- 	int sfd;
-@@ -2088,7 +2097,9 @@
- #include <sys/socket.h>
- #include <netinet/in.h>
- #include <netdb.h>
-+#include <stdlib.h>
-  
-+int
- main()
- {
- 	struct hostent *hp1, *hp2;
-@@ -2134,6 +2145,7 @@
- #endif
- #include <sys/types.h>
- #include <stdio.h>
-+#include <stdlib.h>
- 
- /* These are needed if libwrap.a was compiled with
-  * PROCESS_OPTIONS defined.
-@@ -2238,6 +2250,7 @@
- #include <stdio.h>
- #include <signal.h>
- #include <setjmp.h>
-+#include <stdlib.h>
- ],[
- 	/* function-body */
- 	sigjmp_buf sjb;
-@@ -2265,6 +2278,7 @@
- #include <unistd.h>
- #include <sys/types.h>
- #include <utmp.h>
-+#include <stdlib.h>
- ],[
- struct utmp u;
- 
-@@ -2288,6 +2302,7 @@
- #include <unistd.h>
- #include <sys/types.h>
- #include <utmp.h>
-+#include <stdlib.h>
- ],[
- struct utmp u;
- 
-@@ -2311,6 +2326,7 @@
- #include <unistd.h>
- #include <sys/types.h>
- #include <utmpx.h>
-+#include <stdlib.h>
- ],[
- struct utmpx u;
- 
-@@ -2334,6 +2350,7 @@
- #include <unistd.h>
- #include <sys/types.h>
- #include <utmpx.h>
-+#include <stdlib.h>
- ],[
- struct utmpx u;
- 
-@@ -2357,6 +2374,7 @@
- #include <unistd.h>
- #include <sys/types.h>
- #include <utmpx.h>
-+#include <stdlib.h>
- ],[
- struct utmpx u;
- 
-@@ -2380,6 +2398,7 @@
- #include <unistd.h>
- #include <sys/types.h>
- #include <utmp.h>
-+#include <stdlib.h>
- ],[
- struct utmp u;
- 
-@@ -2403,6 +2422,7 @@
- #include <unistd.h>
- #include <sys/types.h>
- #include <utmp.h>
-+#include <stdlib.h>
- ],[
- struct utmp u;
- 
-@@ -2427,6 +2447,7 @@
- #include <unistd.h>
- #include <sys/types.h>
- #include <utmp.h>
-+#include <stdlib.h>
- ],[
- struct utmp u;
- 
-@@ -2450,6 +2471,7 @@
- #include <unistd.h>
- #include <sys/types.h>
- #include <utmp.h>
-+#include <stdlib.h>
- ],[
- struct utmp u;
- 
-@@ -2482,6 +2504,7 @@
- #include <stdio.h>
- #include <stdlib.h>
-  
-+int
- main()
- {
- 	size_t x = 0;
-@@ -2545,6 +2568,7 @@
- #include <stdio.h>
- #include <stdlib.h>
-  
-+int
- main()
- {
- 	off_t x = 0;
-@@ -2608,6 +2632,7 @@
- #include <stdio.h>
- #include <stdlib.h>
-  
-+int
- main()
- {
- 	struct stat x;
-@@ -2671,6 +2696,7 @@
- #include <stdio.h>
- #include <stdlib.h>
-  
-+int
- main()
- {
- 	off64_t x = 0;
-@@ -2732,6 +2758,7 @@
- #include <stdio.h>
- #include <stdlib.h>
-  
-+int
- main()
- {
- 	struct stat64 x;
-@@ -2789,6 +2816,7 @@
- #include <unistd.h>
- #include <sys/types.h>
- #include <sys/stat.h>
-+#include <stdlib.h>
- ],[
- struct stat64 st;
- 
-@@ -2815,6 +2843,7 @@
- #include <sys/uio.h>
- #include <sys/socket.h>
- #include <sys/un.h>
-+#include <stdlib.h>
- ],[
- struct cmsghdr cm;
- 
-@@ -2844,6 +2873,7 @@
- #include <sys/uio.h>
- #include <sys/socket.h>
- #include <sys/un.h>
-+#include <stdlib.h>
- ],[
- struct msghdr m;
- 
-@@ -2872,6 +2902,7 @@
- #include <sys/uio.h>
- #include <sys/socket.h>
- #include <sys/un.h>
-+#include <stdlib.h>
- ],[
- struct msghdr m;
- 
-@@ -2975,6 +3006,8 @@
- #include <sys/uio.h>
- #include <sys/socket.h>
- #include <sys/un.h>
-+#include <stdlib.h>
-+#include <string.h>
- ],[
- struct sockaddr_un uaddr;
- 
-@@ -3004,6 +3037,7 @@
- #elif defined(HAVE_SYS_VFS_H)
- #	include <sys/vfs.h>
- #endif
-+#include <stdlib.h>
- ],[
- struct statfs st;
- 
-@@ -3027,6 +3061,7 @@
- #include <unistd.h>
- #include <sys/types.h>
- #include <sys/statvfs.h>
-+#include <stdlib.h>
- ],[
- struct statvfs st;
- 
-@@ -3049,7 +3084,9 @@
- 	/* program */
- #include <stdio.h>
- #include <string.h>
-+#include <stdlib.h>
-  
-+int
- main()
- {
- 	int result;
-@@ -3108,9 +3145,11 @@
- #endif
- #include <stdio.h>
- #include <string.h>
-+#include <stdlib.h>
- 
- extern char *crypt(const char *key, const char *salt);
- 
-+int
- main()
- {
- 	char cleartext[256];
-@@ -3182,6 +3221,7 @@
+@@ -3279,6 +3280,7 @@
  #include <sys/socket.h>
  #include <arpa/inet.h>
  #include <netinet/in.h>
@@ -287,63 +23,7 @@ return types.
  #ifdef HAVE_ARPA_NAMESER_H
  #	include <arpa/nameser.h>
  #endif
-@@ -3327,9 +3367,11 @@
- #include <unistd.h>
- #include <sys/types.h>
- #include <stdio.h>
-+#include <stdlib.h>
- 
- extern char *rl_library_version;
- 
-+int
- main()
- {
- 	FILE *fp;
-@@ -3446,9 +3488,11 @@
- #endif
- #include <sys/types.h>
- #include <stdio.h>
-+#include <stdlib.h>
- 
- long long hugeNumvar = 1;
- 
-+int
- main()
- {
- 	long long hugeNumtoo = 2;
-@@ -3495,6 +3539,7 @@
- #include <string.h>
- #include <stdlib.h>
- 
-+int
- main()
- {
- 	char s[80];
-@@ -3536,6 +3581,7 @@
- #include <string.h>
- #include <stdlib.h>
- 
-+int
- main()
- {
- 	char s[80];
-@@ -3585,6 +3631,7 @@
- #include <string.h>
- #include <stdlib.h>
- 
-+int
- main()
- {
- 	long long hugeNum, justAsHugeNum;
-@@ -3629,6 +3676,7 @@
- #include <string.h>
- #include <stdlib.h>
- 
-+int
- main()
- {
- 	long long hugeNum, justAsHugeNum;
-@@ -4076,7 +4124,7 @@
+@@ -4193,7 +4195,7 @@
  #include <sys/select.h>
  #endif
  #include <sys/socket.h>	/* MG: always incl */
@@ -352,83 +32,25 @@ return types.
          [ac_not_found=no ; break 3],ac_not_found=yes)
        done
       done
-@@ -4226,7 +4274,9 @@
- #include <netinet/in.h>
- #include <arpa/inet.h>
- #include <netdb.h>
-+#include <stdlib.h>
- 
-+int
- main()
- {
- 	exit(0);
-@@ -5023,6 +5073,7 @@
- 		/* includes */
- #include <stdio.h>
- #include <stdlib.h>
+@@ -5145,6 +5147,7 @@
+ #ifdef HAVE_STDLIB_H
+ #	include <stdlib.h>
+ #endif
 +#include <string.h>
  
  #ifdef HAVE_NCURSES_H
  #	define NCURSES_OPAQUE 0
-@@ -5054,6 +5105,7 @@
- #endif
- 
-  
-+int
- main(int argc, char **argv)
- {
- 	/* Note:  don't actually call curses, since it may block;
-@@ -5142,6 +5194,7 @@
+@@ -5175,7 +5178,8 @@
  #	include <curses.h>
  #endif
  
-+int
- main()
+- 
++
++int  
+ main(int argc, char **argv)
  {
- 	exit(0);
-@@ -5809,7 +5862,9 @@
- 		cat <<EOF > "$vertest.c"
- #include <stdio.h>
- #include <gnu/libc-version.h>
-+#include <stdlib.h>
- 
-+int
- main()
- {
- 	const char *ver = gnu_get_libc_version();
-@@ -5957,6 +6012,7 @@
- #include <stdlib.h>
- #include <ctype.h>
- 
-+int
- main()
- {
- 	char line[256], *cp, *cp2; 
-@@ -6109,6 +6165,7 @@
- #include <stdio.h>
- #include <stdlib.h>
-  
-+int
- main()
- {
- 	FILE *fp;
-@@ -6166,6 +6223,7 @@
- #include <stdio.h>
- #include <stdlib.h>
-  
-+int
- main()
- {
- 	struct stat x;
-@@ -6224,6 +6282,7 @@
- #include <stdio.h>
- #include <stdlib.h>
-  
-+int
- main()
- {
- 	struct stat64 x;
-@@ -6457,7 +6516,8 @@
+ 	/* Note:  don't actually call curses, since it may block;
+@@ -6608,7 +6612,8 @@
  	  ac_cv_func_setvbuf_reversed,
  	[AC_TRY_RUN([#include <stdio.h>
  	/* If setvbuf has the reversed format, exit 0. */

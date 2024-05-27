@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="EUPL-1.2"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.5.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/mgunyho/tere/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=d7f657371ffbd469c4d8855c2a2734c20b53ae632fe3cbf9bb7cab94bd726326
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -11,8 +12,6 @@ TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_pre_configure() {
 	termux_setup_rust
-
-	export CFLAGS="${TARGET_CFLAGS}"
 
 	: "${CARGO_HOME:=$HOME/.cargo}"
 	export CARGO_HOME

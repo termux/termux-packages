@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/xxxserxxx/gotop
 TERMUX_PKG_DESCRIPTION="A terminal based graphical activity monitor inspired by gtop and vtop"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="@medzikuser"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.2.0"
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/xxxserxxx/gotop/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz

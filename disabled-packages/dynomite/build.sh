@@ -13,8 +13,6 @@ ac_cv_evports_works=no
 ac_cv_header_execinfo_h=no
 ac_cv_kqueue_works=no
 "
-TERMUX_PKG_ENABLE_CLANG16_PORTING=false
-
 termux_step_pre_configure() {
 	autoreconf -fi
 

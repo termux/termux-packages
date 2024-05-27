@@ -4,10 +4,9 @@ TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 _MAJOR_VERSION=8
 _MINOR_VERSION=0
-TERMUX_PKG_VERSION="8.0.1"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="8.0.2"
 TERMUX_PKG_SRCURL=https://github.com/BOINC/boinc/archive/refs/tags/client_release/${_MAJOR_VERSION}.${_MINOR_VERSION}/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=db808f95a99ba0f27674ad7ea0a5f8b9ae027aa0cb5cc58bd731051a6ec928b0
+TERMUX_PKG_SHA256=c593f157aacbd61bf814f44ed6e4dbb38145336d5c018c756206bdfc0c6df33e
 TERMUX_PKG_DEPENDS="libandroid-execinfo, libandroid-shmem, libc++, libcurl, openssl, zlib"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_AUTO_UPDATE=true
@@ -29,7 +28,7 @@ termux_pkg_auto_update() {
 		return
 	fi
 
-	local latest_version=$(echo "${latest_refs_tags}" | tail -n1)
+	local latest_version=$(echo "${latest_refs_tags}" | sort -V | tail -n1)
 	if [[ "${latest_version}" == "${TERMUX_PKG_VERSION}" ]]; then
 		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
 		return

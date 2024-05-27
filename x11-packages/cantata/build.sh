@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/CDrummond/cantata
 TERMUX_PKG_DESCRIPTION="Qt client for the music player daemon (MPD)"
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_MAINTAINER="Yisus7u7 <dev.yisus@hotmail.com>"
+TERMUX_PKG_MAINTAINER="@Yisus7u7"
 TERMUX_PKG_VERSION=2.5.0
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/CDrummond/cantata/releases/download/v${TERMUX_PKG_VERSION}/cantata-${TERMUX_PKG_VERSION}.tar.bz2

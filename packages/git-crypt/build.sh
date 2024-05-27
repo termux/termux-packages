@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.agwa.name/projects/git-crypt/
 TERMUX_PKG_DESCRIPTION="Enables transparent encryption and decryption of files for a git repository"
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_MAINTAINER="@jottr"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.7.0
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://www.agwa.name/projects/git-crypt/downloads/git-crypt-${TERMUX_PKG_VERSION}.tar.gz

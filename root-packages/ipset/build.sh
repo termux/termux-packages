@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://ipset.netfilter.org
 TERMUX_PKG_DESCRIPTION="Administration tool for kernel IP sets"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="7.21"
 TERMUX_PKG_SRCURL=https://ipset.netfilter.org/ipset-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=e2c6ce4fcf3acb3893ca5d35c86935f80ad76fc5ccae601185842df760e0bc69

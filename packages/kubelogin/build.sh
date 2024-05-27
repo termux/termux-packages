@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/int128/kubelogin
 TERMUX_PKG_DESCRIPTION="A kubectl plugin for Kubernetes OpenID Connect (OIDC) authentication"
 TERMUX_PKG_LICENSE="Apache-2.0"
-TERMUX_PKG_MAINTAINER="Steeve Chailloux"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.28.0"
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/int128/kubelogin/archive/v${TERMUX_PKG_VERSION}.tar.gz

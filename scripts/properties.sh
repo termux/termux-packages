@@ -51,6 +51,8 @@ TERMUX_REPO_URL=()
 TERMUX_REPO_DISTRIBUTION=()
 TERMUX_REPO_COMPONENT=()
 
+export TERMUX_PACKAGES_DIRECTORIES=$(jq --raw-output 'del(.pkg_format) | keys | .[]' ${TERMUX_SCRIPTDIR}/repo.json)
+
 for url in $(jq -r 'del(.pkg_format) | .[] | .url' ${TERMUX_SCRIPTDIR}/repo.json); do
 	TERMUX_REPO_URL+=("$url")
 done

@@ -1,0 +1,19 @@
+--- a/config.tests/pulseaudio/pulseaudio.cpp
++++ b/config.tests/pulseaudio/pulseaudio.cpp
+@@ -2,7 +2,7 @@
+ // SPDX-License-Identifier: BSD-3-Clause
+ 
+ #include <pulse/pulseaudio.h>
+-#include <pulse/glib-mainloop.h>
++#include <pulse/mainloop.h>
+ 
+ #if !defined(PA_API_VERSION) || PA_API_VERSION-0 != 12
+ # error "Incompatible PulseAudio API version"
+@@ -12,6 +12,6 @@
+ {
+     const char *headers = pa_get_headers_version();
+     const char *library = pa_get_library_version();
+-    pa_glib_mainloop_new(0);
++    pa_mainloop_new();
+     return (headers - library) * 0;
+ }

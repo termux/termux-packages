@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://goodies.xfce.org/
 TERMUX_PKG_DESCRIPTION="this meta-package will install various utilities and programs for the XFCE desktop environment (incomplete!)"
 TERMUX_PKG_LICENSE="Public Domain"
-TERMUX_PKG_MAINTAINER="Yisus7u7 <dev.yisus@hotmail.com>"
+TERMUX_PKG_MAINTAINER="@Yisus7u7"
 TERMUX_PKG_VERSION=4.16.0
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_AUTO_UPDATE=false

@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.mesa3d.org
 TERMUX_PKG_DESCRIPTION="OpenGL demonstration and test programs"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Rafael Kitover <rkitover@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=9.0.0
 TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://mesa.freedesktop.org/archive/demos/mesa-demos-${TERMUX_PKG_VERSION}.tar.xz
