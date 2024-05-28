@@ -1,5 +1,5 @@
---- a/src/core/hook/wee-hook-url.c
-+++ b/src/core/hook/wee-hook-url.c
+--- a/src/core/hook/hook-url.c
++++ b/src/core/hook/hook-url.c
 @@ -32,6 +32,10 @@
  #include <errno.h>
  #include <pthread.h>
@@ -9,9 +9,9 @@
 +#endif
 +
  #include "../weechat.h"
- #include "../wee-hashtable.h"
- #include "../wee-hook.h"
-@@ -126,6 +126,24 @@
+ #include "../core-hashtable.h"
+ #include "../core-hook.h"
+@@ -122,6 +126,24 @@ hook_url_thread_cleanup (void *hook_pointer)
   * URL transfer (in a separate thread).
   */
  
@@ -36,7 +36,7 @@
  void *
  hook_url_transfer_thread (void *hook_pointer)
  {
-@@ -137,9 +150,11 @@
+@@ -133,9 +155,11 @@ hook_url_transfer_thread (void *hook_pointer)
  
      pthread_cleanup_push (&hook_url_thread_cleanup, hook);
  
@@ -50,19 +50,16 @@
  
      if (url_rc != 0)
      {
-@@ -205,7 +209,11 @@
+@@ -205,7 +229,7 @@ hook_url_timer_cb (const void *pointer, void *data, int remaining_calls)
                  HOOK_URL(hook, url),
                  ((float)HOOK_URL(hook, timeout)) / 1000);
          }
-+#ifndef __ANDROID__
-         pthread_cancel (HOOK_URL(hook, thread_id));
-+#else
+-        pthread_cancel (HOOK_URL(hook, thread_id));
 +        atomic_flag_clear(&(HOOK_URL(hook, thread_cancel)));
-+#endif
          usleep (1000);
          unhook (hook);
      }
-@@ -227,6 +235,9 @@
+@@ -227,6 +251,9 @@ hook_url_transfer (struct t_hook *hook)
      HOOK_URL(hook, thread_running) = 1;
  
      /* create thread */
@@ -72,15 +69,12 @@
      rc = pthread_create (&(HOOK_URL(hook, thread_id)), NULL,
                           &hook_url_transfer_thread, hook);
      if (rc != 0)
-@@ -383,7 +394,11 @@
+@@ -381,7 +408,7 @@ hook_url_free_data (struct t_hook *hook)
      }
      if (HOOK_URL(hook, thread_running))
      {
-+#ifndef __ANDROID__
-         pthread_cancel (HOOK_URL(hook, thread_id));
-+#else
+-        pthread_cancel (HOOK_URL(hook, thread_id));
 +        atomic_flag_clear(&(HOOK_URL(hook, thread_cancel)));
-+#endif
          HOOK_URL(hook, thread_running) = 0;
      }
      if (HOOK_URL(hook, thread_created))
