@@ -30,7 +30,7 @@ source "$TERMUX_SCRIPTDIR/scripts/utils/docker/docker.sh"; docker__create_docker
 # Functions for working with packages
 source "$TERMUX_SCRIPTDIR/scripts/utils/package/package.sh"
 
-export SOURCE_DATE_EPOCH=${SOURCE_DATE_EPOCH:-$(git log -1 --pretty=%ct 2>/dev/null || date "+%s")}
+export SOURCE_DATE_EPOCH=${SOURCE_DATE_EPOCH:-$(git -c log.showSignature=false log -1 --pretty=%ct 2>/dev/null || date "+%s")}
 
 if [ "$(uname -o)" = "Android" ] || [ -e "/system/bin/app_process" ]; then
 	if [ "$(id -u)" = "0" ]; then
