@@ -17,5 +17,5 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-qt --disable-gtk"
 
 termux_step_pre_configure() {
-	CFLAGS+="-Wno-enum-constexpr-conversion"
+	CFLAGS+=" -Wno-enum-constexpr-conversion"
 }
