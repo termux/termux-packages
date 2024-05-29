@@ -15,3 +15,8 @@ TERMUX_PKG_BUILD_IN_SRC=true
 # Audacious has switched to Qt toolkit and it's the default GUI option now
 # Disable GTK to reduce the size and dependencies
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-qt --disable-gtk"
+
+termux_step_pre_configure() {
+	CFLAGS+=" -Wno-enum-constexpr-conversion"
+	CXXFLAGS+=" -Wno-enum-constexpr-conversion"
+}
