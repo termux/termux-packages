@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.nushell.sh
 TERMUX_PKG_DESCRIPTION="A new type of shell operating on structured data"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.93.0"
+TERMUX_PKG_VERSION="0.94.0"
 TERMUX_PKG_SRCURL=https://github.com/nushell/nushell/archive/$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=00dcd5ab112d8afd683aa0b87b65b2e47a45487857a6d2481ce7eeb0045c2c00
+TERMUX_PKG_SHA256=697a3cc040f673c9eb74e31d8f9cce85f5d4d5302ea34277cfd16aacf9a495a5
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="openssl, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -25,25 +25,15 @@ termux_step_pre_configure() {
 		popd
 	fi
 
-	local _features="default-no-clipboard"
-	if [ $TERMUX_ARCH != "i686" ] && [ $TERMUX_ARCH != "arm" ]; then
-		_features+=" dataframe"
-	fi
-	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=("--features=$_features")
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=("--features=default-no-clipboard")
 
 	: "${CARGO_HOME:=$HOME/.cargo}"
 	export CARGO_HOME
 
-	rm -rf $CARGO_HOME/registry/src/*/interprocess-*
 	rm -rf $CARGO_HOME/registry/src/*/libmimalloc-sys-*
 	cargo fetch --target "${CARGO_TARGET_NAME}"
 
 	local d p
-	p="interprocess-socklen_t.diff"
-	for d in $CARGO_HOME/registry/src/*/interprocess-*; do
-		patch --silent -p1 -d ${d} < "${TERMUX_PKG_BUILDER_DIR}/${p}"
-	done
-
 	p="libmimalloc-sys-tls.diff"
 	for d in $CARGO_HOME/registry/src/*/libmimalloc-sys-*; do
 		patch --silent -p1 -d ${d} < "${TERMUX_PKG_BUILDER_DIR}/${p}"
@@ -84,6 +74,5 @@ termux_step_post_massage() {
 	rm -f lib/libz.so.1
 	rm -f lib/libz.so
 
-	rm -rf $CARGO_HOME/registry/src/*/interprocess-*
 	rm -rf $CARGO_HOME/registry/src/*/libmimalloc-sys-*
 }

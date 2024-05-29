@@ -17,10 +17,10 @@ The error message is as follows.
 
 --- a/build.rs
 +++ b/build.rs
-@@ -24,7 +28,10 @@
+@@ -25,7 +25,10 @@ fn main() {
  
      let dynamic_tls = env::var("CARGO_FEATURE_LOCAL_DYNAMIC_TLS").is_ok();
-
+ 
 -    if target_family == "unix" && target_os != "haiku" {
 +    if target_family == "unix" && target_os == "android" {
 +        build.flag_if_supported("-femulated-tls");
@@ -31,17 +31,17 @@ The error message is as follows.
          } else {
 --- a/c_src/mimalloc/include/mimalloc/prim.h
 +++ b/c_src/mimalloc/include/mimalloc/prim.h
-@@ -147,7 +147,7 @@
- #elif defined(__GNUC__) && ( \
+@@ -133,7 +133,7 @@ void _mi_prim_thread_associate_default_heap(mi_heap_t* heap);
+ // Note: we would like to prefer `__builtin_thread_pointer()` nowadays instead of using assembly,
+ // but unfortunately we can not detect support reliably (see issue #883)
+ // We also use it on Apple OS as we use a TLS slot for the default heap there.
+-#if defined(__GNUC__) && ( \
++#if 0 && defined(__GNUC__) && ( \
             (defined(__GLIBC__)   && (defined(__x86_64__) || defined(__i386__) || defined(__arm__) || defined(__aarch64__))) \
-         || (defined(__APPLE__)   && (defined(__x86_64__) || defined(__aarch64__))) \
--        || (defined(__BIONIC__)  && (defined(__x86_64__) || defined(__i386__) || defined(__arm__) || defined(__aarch64__))) \
-+        || (defined(__BIONIC__) && 0  && (defined(__x86_64__) || defined(__i386__) || defined(__arm__) || defined(__aarch64__))) \
-         || (defined(__FreeBSD__) && (defined(__x86_64__) || defined(__i386__) || defined(__aarch64__))) \
-         || (defined(__OpenBSD__) && (defined(__x86_64__) || defined(__i386__) || defined(__aarch64__))) \
-       )
-@@ -206,7 +206,7 @@
- }
+         || (defined(__APPLE__)   && (defined(__x86_64__) || defined(__aarch64__) || defined(__POWERPC__))) \
+         || (defined(__BIONIC__)  && (defined(__x86_64__) || defined(__i386__) || defined(__arm__) || defined(__aarch64__))) \
+@@ -243,7 +243,7 @@ static inline mi_threadid_t _mi_prim_thread_id(void) mi_attr_noexcept {
+ #elif defined(MI_HAS_TLS_SLOT)
  
  static inline mi_threadid_t _mi_prim_thread_id(void) mi_attr_noexcept {
 -  #if defined(__BIONIC__)
