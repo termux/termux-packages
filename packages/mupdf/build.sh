@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Lightweight PDF and XPS viewer (library)"
 TERMUX_PKG_LICENSE="AGPL-V3"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.24.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mupdf.com/downloads/archive/mupdf-${TERMUX_PKG_VERSION}-source.tar.gz
 TERMUX_PKG_SHA256=7fbced6d6024608661d773b93990119db7eb2483f0d3e28855eadef9ca9a8686
 TERMUX_PKG_AUTO_UPDATE=true
@@ -26,4 +27,5 @@ termux_step_post_make_install() {
 	TERMUX_PKG_EXTRA_MAKE_ARGS="${TERMUX_PKG_EXTRA_MAKE_ARGS/shared=yes/}"
 	termux_step_make
 	install -Dm600 -t $TERMUX_PREFIX/lib build/release*/libmupdf{-third,}.a
+	ln -sf $TERMUX_PREFIX/lib/libmupdf.so.* $TERMUX_PREFIX/lib/libmupdf.so
 }
