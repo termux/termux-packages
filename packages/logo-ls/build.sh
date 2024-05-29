@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://github.com/Yash-Handa/logo-ls
 TERMUX_PKG_DESCRIPTION="Modern ls command with vscode like File Icon and Git Integrations"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-_COMMIT=96bd6044d7a5270bd32458a7d0f38caf7fd5ee53
-TERMUX_PKG_VERSION="2023.08.18"
+_COMMIT=61ad1aaddb38ee9a2d004ff84e45f82747d9d41e
+TERMUX_PKG_VERSION="2024.05.26"
 TERMUX_PKG_SRCURL=git+https://github.com/canta2899/logo-ls
-TERMUX_PKG_SHA256=2e86813bd10113c7b69fd5914dcd18ead4eb4dda9b50d951c5380cbf4a685e79
+TERMUX_PKG_SHA256=f1143f13f12df4c74167d4542105cbe2d9bb42429555f9ec31b63fd16e9146aa
 TERMUX_PKG_GIT_BRANCH="main"
 TERMUX_PKG_BUILD_IN_SRC=true
 
@@ -13,7 +13,7 @@ termux_step_post_get_source() {
 	git fetch --unshallow
 	git checkout $_COMMIT
 
-	local version="$(git log -1 --format=%cs | sed 's/-/./g')"
+	local version="$(git -c log.showSignature=false log -1 --format=%cs | sed 's/-/./g')"
 	if [ "$version" != "$TERMUX_PKG_VERSION" ]; then
 		echo -n "ERROR: The specified version \"$TERMUX_PKG_VERSION\""
 		echo " is different from what is expected to be: \"$version\""
