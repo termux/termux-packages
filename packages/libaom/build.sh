@@ -3,10 +3,9 @@ TERMUX_PKG_DESCRIPTION="AV1 Video Codec Library"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_LICENSE_FILE="LICENSE, PATENTS"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.7.0
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=3.9.0
 TERMUX_PKG_SRCURL=git+https://aomedia.googlesource.com/aom
-TERMUX_PKG_SHA256=dabba1164f71ca26c67af9359fe5ac78c066c39d5ce79c4fd1f86edc78932b69
+TERMUX_PKG_SHA256=e5be735a080f8e5ca440df979e829e7c369e343b99a86153f6d588ba97bc736b
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DBUILD_SHARED_LIBS=ON
@@ -16,6 +15,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_post_get_source() {
 	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum)
 	if [[ "${s}" != "${TERMUX_PKG_SHA256}  "* ]]; then
+		echo "$s"
 		termux_error_exit "Checksum mismatch for source files."
 	fi
 }
