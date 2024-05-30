@@ -8,7 +8,10 @@ TERMUX_PKG_SHA256=697a3cc040f673c9eb74e31d8f9cce85f5d4d5302ea34277cfd16aacf9a495
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="openssl, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS=("--no-default-features")
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--no-default-features
+--features=default-no-clipboard
+"
 
 termux_step_pre_configure() {
 	termux_setup_rust
@@ -24,8 +27,6 @@ termux_step_pre_configure() {
 		echo "INPUT(-l:libunwind.a)" >libgcc.so
 		popd
 	fi
-
-	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=("--features=default-no-clipboard")
 
 	: "${CARGO_HOME:=$HOME/.cargo}"
 	export CARGO_HOME
@@ -53,16 +54,6 @@ termux_step_pre_configure() {
 		$_CARGO_TARGET_LIBDIR/libz.so.1
 	ln -sfT $(readlink -f $TERMUX_PREFIX/lib/libz.so.tmp) \
 		$_CARGO_TARGET_LIBDIR/libz.so
-}
-
-termux_step_make_install() {
-	cargo install \
-			--path . \
-			--jobs $TERMUX_MAKE_PROCESSES \
-			--no-track \
-			--target $CARGO_TARGET_NAME \
-			--root $TERMUX_PREFIX \
-			"${TERMUX_PKG_EXTRA_CONFIGURE_ARGS[@]}"
 }
 
 termux_step_post_make_install() {
