@@ -1,16 +1,7 @@
---- ./node.gyp.orig	2024-02-16 19:22:17.091451678 +0530
-+++ ./node.gyp	2024-02-16 19:24:32.148773304 +0530
-@@ -473,9 +473,6 @@
-     },
- 
-     'conditions': [
--      ['target_arch=="arm64"', {
--        'cflags': ['-mbranch-protection=standard'],  # Pointer authentication.
--      }],
-       ['OS in "aix os400"', {
-         'ldflags': [
-           '-Wl,-bnoerrmsg',
-@@ -522,7 +519,8 @@
+diff -u -r ../node-v22.2.0/node.gyp ./node.gyp
+--- ../node-v22.2.0/node.gyp	2024-05-15 12:35:06.000000000 +0000
++++ ./node.gyp	2024-05-30 20:10:01.025103479 +0000
+@@ -546,7 +546,8 @@
        ],
  
        'sources': [
@@ -20,7 +11,7 @@
        ],
  
        'dependencies': [
-@@ -1002,208 +1000,6 @@
+@@ -1024,49 +1025,6 @@
          },
        ],
      }, # node_lib_target_name
@@ -30,8 +21,8 @@
 -      'dependencies': [
 -        '<(node_lib_target_name)',
 -        'deps/histogram/histogram.gyp:histogram',
--        'deps/uvwasi/uvwasi.gyp:uvwasi',
 -      ],
+-
 -      'includes': [
 -        'node.gypi'
 -      ],
@@ -41,9 +32,9 @@
 -        'deps/v8/include',
 -        'deps/cares/include',
 -        'deps/uv/include',
--        'deps/uvwasi/include',
 -        'test/cctest',
 -      ],
+-
 -      'defines': [
 -        'NODE_ARCH="<(target_arch)"',
 -        'NODE_PLATFORM="<(OS)"',
@@ -67,17 +58,22 @@
 -        }],
 -      ],
 -    }, # fuzz_env
+     { # fuzz_ClientHelloParser.cc
+       'target_name': 'fuzz_ClientHelloParser',
+       'type': 'executable',
+@@ -1155,161 +1113,8 @@
+         }],
+       ],
+     }, # fuzz_strings
 -    {
 -      'target_name': 'cctest',
 -      'type': 'executable',
 -
 -      'dependencies': [
 -        '<(node_lib_target_name)',
--        'deps/base64/base64.gyp:base64',
 -        'deps/googletest/googletest.gyp:gtest',
 -        'deps/googletest/googletest.gyp:gtest_main',
 -        'deps/histogram/histogram.gyp:histogram',
--        'deps/uvwasi/uvwasi.gyp:uvwasi',
 -        'deps/simdjson/simdjson.gyp:simdjson',
 -        'deps/simdutf/simdutf.gyp:simdutf',
 -        'deps/ada/ada.gyp:ada',
@@ -93,7 +89,6 @@
 -        'deps/v8/include',
 -        'deps/cares/include',
 -        'deps/uv/include',
--        'deps/uvwasi/include',
 -        'test/cctest',
 -      ],
 -
@@ -147,15 +142,14 @@
 -        }],
 -      ],
 -    }, # cctest
--
--    {
+ 
+     {
 -      'target_name': 'embedtest',
 -      'type': 'executable',
 -
 -      'dependencies': [
 -        '<(node_lib_target_name)',
 -        'deps/histogram/histogram.gyp:histogram',
--        'deps/uvwasi/uvwasi.gyp:uvwasi',
 -        'deps/ada/ada.gyp:ada',
 -      ],
 -
@@ -169,7 +163,6 @@
 -        'deps/v8/include',
 -        'deps/cares/include',
 -        'deps/uv/include',
--        'deps/uvwasi/include',
 -        'test/embedding',
 -      ],
 -
@@ -226,10 +219,11 @@
 -        }],
 -      ]
 -    }, # overlapped-checker
-     {
+-    {
        'target_name': 'node_js2c',
        'type': 'executable',
-@@ -1237,69 +1033,6 @@
+       'toolsets': ['host'],
+@@ -1345,69 +1150,6 @@
          }],
        ]
      },
@@ -240,8 +234,9 @@
 -      'dependencies': [
 -        '<(node_lib_target_name)',
 -        'deps/histogram/histogram.gyp:histogram',
--        'deps/uvwasi/uvwasi.gyp:uvwasi',
 -        'deps/ada/ada.gyp:ada',
+-        'deps/simdjson/simdjson.gyp:simdjson',
+-        'deps/simdutf/simdutf.gyp:simdutf',
 -      ],
 -
 -      'includes': [
@@ -254,7 +249,6 @@
 -        'deps/v8/include',
 -        'deps/cares/include',
 -        'deps/uv/include',
--        'deps/uvwasi/include',
 -      ],
 -
 -      'defines': [ 'NODE_WANT_INTERNALS=1' ],
