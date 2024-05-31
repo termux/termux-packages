@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Termux X11 add-on application. Still in early developmen
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Twaik Yont @twaik"
 TERMUX_PKG_VERSION=1.03.00
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://github.com/termux/termux-x11/archive/ecd3a3e292baec2ea76d95527ae7db654df93141.tar.gz
 TERMUX_PKG_SHA256=96dc050d24dc6354a554a05cf4a6c61e1758d27692e897f21ac54242ba3f9e31
 TERMUX_PKG_AUTO_UPDATE=false
@@ -46,6 +46,8 @@ termux_step_make() {
 	cd $TERMUX_PKG_SRCDIR
 	# Github action builds are signed with debug key, and loader checks self signature while loading main package.
 	$TERMUX_PKG_TMPDIR/gradle/gradle-$_GRADLE_VERSION/bin/gradle :shell-loader:assembleDebug
+	chmod +x $TERMUX_PKG_SRCDIR/termux-x11
+	chmod +x $TERMUX_PKG_SRCDIR/termux-x11-preference
 }
 
 termux_step_make_install() {
