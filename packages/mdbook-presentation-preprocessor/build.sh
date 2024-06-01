@@ -3,13 +3,11 @@ TERMUX_PKG_DESCRIPTION="A preprocessor for utilizing an MDBook as slides for a p
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.3.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/FreeMasen/mdbook-presentation-preprocessor/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=477eb3104bfe216ebd2067bad97cc3e5a2116ae37bd3819cf523771d315733c6
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
-
-# https://github.com/termux/termux-packages/issues/16755
-TERMUX_RUST_VERSION=1.68.2
 
 termux_step_make() {
 	termux_setup_rust
