@@ -1,10 +1,10 @@
 SOVERSION suffix is needed for SONAME of `liblzma.so` to avoid conflict
 with a system one (in /system/lib64 or /system/lib)
 
-diff -uNr xz-5.2.4/configure xz-5.2.4.mod/configure
---- xz-5.2.4/configure	2018-04-29 19:01:24.000000000 +0300
-+++ xz-5.2.4.mod/configure	2019-05-03 15:50:52.793155366 +0300
-@@ -14026,26 +14026,6 @@
+diff -u -r ../xz-5.6.2/configure ./configure
+--- ../xz-5.6.2/configure	2024-05-29 15:16:38.000000000 +0000
++++ ./configure	2024-05-31 10:56:38.683582292 +0000
+@@ -15666,27 +15666,6 @@
    dynamic_linker=no
    ;;
  
@@ -12,7 +12,7 @@ diff -uNr xz-5.2.4/configure xz-5.2.4.mod/configure
 -  version_type=none # Android doesn't support versioned libraries.
 -  need_lib_prefix=no
 -  need_version=no
--  library_names_spec='$libname$release$shared_ext'
+-  library_names_spec='$libname$release$shared_ext $libname$shared_ext'
 -  soname_spec='$libname$release$shared_ext'
 -  finish_cmds=
 -  shlibpath_var=LD_LIBRARY_PATH
@@ -24,14 +24,15 @@ diff -uNr xz-5.2.4/configure xz-5.2.4.mod/configure
 -  hardcode_into_libs=yes
 -
 -  dynamic_linker='Android linker'
--  # Don't embed -rpath directories since the linker doesn't support them.
--  hardcode_libdir_flag_spec='-L$libdir'
+-  # -rpath works at least for libraries that are not overridden by
+-  # libraries installed in system locations.
+-  hardcode_libdir_flag_spec='$wl-rpath $wl$libdir'
 -  ;;
 -
  # This must be glibc/ELF.
  linux* | k*bsd*-gnu | kopensolaris*-gnu | gnu*)
    version_type=linux # correct to gnu/linux during the next big refactor
-@@ -14053,7 +14033,7 @@
+@@ -15694,7 +15673,7 @@
    need_version=no
    library_names_spec='$libname$release$shared_ext$versuffix $libname$release$shared_ext$major $libname$shared_ext'
    soname_spec='$libname$release$shared_ext$major'
