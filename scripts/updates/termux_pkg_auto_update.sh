@@ -4,7 +4,7 @@ termux_pkg_auto_update() {
 		termux_pkg_upgrade_version ${__CACHED_TAG}
 		return $?
 	fi
-	
+
 	local project_host
 	project_host="$(echo "${TERMUX_PKG_SRCURL}" | cut -d"/" -f3)"
 
