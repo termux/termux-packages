@@ -1,0 +1,150 @@
+From 0ff64adee9c7ddf01b9b019fadc04153a1151575 Mon Sep 17 00:00:00 2001
+From: Elisabeth Henry <liz.henry@ouvaton.org>
+Date: Fri, 4 Aug 2023 04:58:47 +0200
+Subject: [PATCH] Replace rustc-serialize dependency with base64
+
+---
+ Cargo.toml                  |  2 +-
+ src/lib/html_if.rs          |  8 +++-----
+ src/lib/html_single.rs      | 14 ++++++--------
+ src/lib/misc.rs             |  6 ++++++
+ src/lib/resource_handler.rs |  4 ++--
+ 5 files changed, 18 insertions(+), 16 deletions(-)
+
+diff --git a/Cargo.toml b/Cargo.toml
+index 7cecd42..9649a3c 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -54,7 +54,7 @@ yaml-rust = "0.4"
+ mustache = "0.9"
+ uuid = { version = "1", features = ["v4"] }
+ walkdir = "2"
+-rustc-serialize = "0.3"
++base64 = "0.21"
+ rayon = "1.6"
+ crowbook-text-processing = "^1.1.1"
+ lazy_static = "1"
+diff --git a/src/lib/html_if.rs b/src/lib/html_if.rs
+index 975d97a..2d749c4 100644
+--- a/src/lib/html_if.rs
++++ b/src/lib/html_if.rs
+@@ -23,8 +23,7 @@ use crate::html::HtmlRenderer;
+ use crate::parser::Parser;
+ use crate::renderer::Renderer;
+ use crate::token::Token;
+-
+-use rustc_serialize::base64::{self, ToBase64};
++use crate::misc;
+ 
+ use std::convert::{AsMut, AsRef};
+ use std::io;
+@@ -333,12 +332,11 @@ return crowbook_return_variable.replace(/<\\/ul><ul>/g, '');\n",
+             );
+         }
+         if self.html.highlight == Highlight::Js {
+-            let highlight_js = self
++            let highlight_js = misc::u8_to_base64(&self
+                 .html
+                 .book
+                 .get_template("html.highlight.js")?
+-                .as_bytes()
+-                .to_base64(base64::STANDARD);
++                .as_bytes());
+             let highlight_js = format!("data:text/javascript;base64,{highlight_js}");
+             mapbuilder = mapbuilder
+                 .insert_bool("highlight_code", true)
+diff --git a/src/lib/html_single.rs b/src/lib/html_single.rs
+index 8850b01..b4dcc7d 100644
+--- a/src/lib/html_single.rs
++++ b/src/lib/html_single.rs
+@@ -24,8 +24,7 @@ use crate::parser::Parser;
+ use crate::renderer::Renderer;
+ use crate::templates::img;
+ use crate::token::Token;
+-
+-use rustc_serialize::base64::{self, ToBase64};
++use crate::misc;
+ 
+ use std::convert::{AsMut, AsRef};
+ use std::fmt::Write;
+@@ -78,13 +77,13 @@ impl<'a> HtmlSingleRenderer<'a> {
+ 
+     /// Render books as a standalone HTML file
+     pub fn render_book(&mut self) -> Result<String> {
+-        let menu_svg = img::MENU_SVG.to_base64(base64::STANDARD);
++        let menu_svg = misc::u8_to_base64(&img::MENU_SVG);
+         let menu_svg = format!("data:image/svg+xml;base64,{menu_svg}");
+ 
+-        let book_svg = img::BOOK_SVG.to_base64(base64::STANDARD);
++        let book_svg = misc::u8_to_base64(&img::BOOK_SVG);
+         let book_svg = format!("data:image/svg+xml;base64,{book_svg}");
+ 
+-        let pages_svg = img::PAGES_SVG.to_base64(base64::STANDARD);
++        let pages_svg = misc::u8_to_base64(&img::PAGES_SVG);
+         let pages_svg = format!("data:image/svg+xml;base64,{pages_svg}");
+ 
+         let mut content = String::new();
+@@ -305,12 +304,11 @@ impl<'a> HtmlSingleRenderer<'a> {
+             mapbuilder = mapbuilder.insert_str("toc", toc)
+         }
+         if self.html.highlight == Highlight::Js {
+-            let highlight_js = self
++            let highlight_js = misc::u8_to_base64(&self
+                 .html
+                 .book
+                 .get_template("html.highlight.js")?
+-                .as_bytes()
+-                .to_base64(base64::STANDARD);
++                .as_bytes());
+             let highlight_js = format!("data:text/javascript;base64,{highlight_js}");
+             mapbuilder = mapbuilder
+                 .insert_bool("highlight_code", true)
+diff --git a/src/lib/misc.rs b/src/lib/misc.rs
+index 4e98b35..b154e40 100644
+--- a/src/lib/misc.rs
++++ b/src/lib/misc.rs
+@@ -21,6 +21,8 @@ use crate::token::Token;
+ 
+ use std::io::Result;
+ use std::path::{Path, PathBuf};
++use base64::Engine;
++
+ 
+ /// Try to canonicalize a path using std::fs::canonicalize, and returns the
+ /// unmodified path if it fails (e.g. if the path doesn't exist (yet))
+@@ -59,3 +61,7 @@ pub fn insert_title(tokens: &mut Vec<Token>) {
+     tokens.insert(0, Token::Header(1, vec![]));
+ }
+ 
++/// Convert to base 64
++pub fn u8_to_base64(s: &[u8]) -> String {
++    base64::engine::general_purpose::STANDARD_NO_PAD.encode(s)
++}
+diff --git a/src/lib/resource_handler.rs b/src/lib/resource_handler.rs
+index 7944463..c993f93 100644
+--- a/src/lib/resource_handler.rs
++++ b/src/lib/resource_handler.rs
+@@ -1,5 +1,6 @@
+ use crate::error::{Error, Result, Source};
+ use crate::token::Token;
++use crate::misc;
+ 
+ use std::borrow::Cow;
+ use std::collections::HashMap;
+@@ -7,7 +8,6 @@ use std::fs;
+ use std::io::Read;
+ use std::path::{Path, PathBuf};
+ 
+-use rustc_serialize::base64::{self, ToBase64};
+ use walkdir::WalkDir;
+ 
+ /// Resource Handler.
+@@ -134,7 +134,7 @@ impl ResourceHandler {
+                 );
+                 return Ok(file);
+             }
+-            let base64 = content.to_base64(base64::STANDARD);
++            let base64 = misc::u8_to_base64(&content);
+             match mime_guess::from_path(file.as_ref()).first() {
+                 None => {
+                     error!(
