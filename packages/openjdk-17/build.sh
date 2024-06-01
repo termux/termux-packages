@@ -3,13 +3,13 @@ TERMUX_PKG_DESCRIPTION="Java development kit and runtime"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=17.0
-TERMUX_PKG_REVISION=31
+TERMUX_PKG_REVISION=32
 _COMMIT=82234f890786d49c49cf4ecbcb09c47bd9bea7ed
 TERMUX_PKG_SRCURL=https://github.com/openjdk/mobile/archive/$_COMMIT.tar.gz
 TERMUX_PKG_SHA256=5b298148a26e754120c6dfe699056d0609fc6ed92bfc858dc2ba4909ef6e791b
 TERMUX_PKG_AUTO_UPDATE=false
-TERMUX_PKG_DEPENDS="libiconv, libjpeg-turbo, zlib, libandroid-spawn"
-TERMUX_PKG_BUILD_DEPENDS="cups, libandroid-spawn, libandroid-shmem, xorgproto"
+TERMUX_PKG_DEPENDS="libandroid-shmem, libandroid-spawn, libiconv, libjpeg-turbo, zlib"
+TERMUX_PKG_BUILD_DEPENDS="cups, fontconfig, libxrandr, libxt, xorgproto"
 # openjdk-17-x is recommended because X11 separation is still very experimental.
 TERMUX_PKG_RECOMMENDS="ca-certificates-java, openjdk-17-x, resolv-conf"
 TERMUX_PKG_SUGGESTS="cups"
