@@ -1,5 +1,18 @@
-TLS (Thread Local Storage) is not introduced until Android 10, and the TLS Slot
-ABI is not designed to be stable. Force using Emulated TLS for better compatibility.
+TLS-related functions (`__aeabi_read_tp`, `__tls_get_addr`) are not introduced
+to bionic libc until Android 10. `__builtin_thread_pointer` will omit calls to
+`__aeabi_read_tp` on arm, and causes build failure when `__ANDROID_API__` < 29.
+
+TLS slot 1 has been used to storage thread id since Android 1.6 [1], and hasn't
+changed until Android 14 [2,3]. If `__builtin_thread_pointer` is not available,
+the default code path uses the method mentioned above to obtain a unique thread
+id, and there doesn't seem to be anything wrong with this. If necessary in the
+future, other methods can be made up for it, such as calling `pthread_self`.
+
+Besides, force using Emulated TLS for better compatibility.
+
+[1]: https://android.googlesource.com/platform/bionic/+/refs/tags/android-1.6_r1/libc/private/bionic_tls.h#57
+[2]: https://android.googlesource.com/platform/bionic/+/refs/heads/android14-dev/libc/platform/bionic/tls_defines.h#86
+[3]: https://android.googlesource.com/platform/bionic/+/refs/heads/android14-dev/libc/platform/bionic/tls_defines.h#106
 
 The error message is as follows.
 
@@ -17,10 +30,10 @@ The error message is as follows.
 
 --- a/build.rs
 +++ b/build.rs
-@@ -24,7 +28,10 @@
+@@ -25,7 +25,10 @@ fn main() {
  
      let dynamic_tls = env::var("CARGO_FEATURE_LOCAL_DYNAMIC_TLS").is_ok();
-
+ 
 -    if target_family == "unix" && target_os != "haiku" {
 +    if target_family == "unix" && target_os == "android" {
 +        build.flag_if_supported("-femulated-tls");
@@ -31,21 +44,11 @@ The error message is as follows.
          } else {
 --- a/c_src/mimalloc/include/mimalloc/prim.h
 +++ b/c_src/mimalloc/include/mimalloc/prim.h
-@@ -147,7 +147,7 @@
- #elif defined(__GNUC__) && ( \
-            (defined(__GLIBC__)   && (defined(__x86_64__) || defined(__i386__) || defined(__arm__) || defined(__aarch64__))) \
-         || (defined(__APPLE__)   && (defined(__x86_64__) || defined(__aarch64__))) \
--        || (defined(__BIONIC__)  && (defined(__x86_64__) || defined(__i386__) || defined(__arm__) || defined(__aarch64__))) \
-+        || (defined(__BIONIC__) && 0  && (defined(__x86_64__) || defined(__i386__) || defined(__arm__) || defined(__aarch64__))) \
-         || (defined(__FreeBSD__) && (defined(__x86_64__) || defined(__i386__) || defined(__aarch64__))) \
-         || (defined(__OpenBSD__) && (defined(__x86_64__) || defined(__i386__) || defined(__aarch64__))) \
-       )
-@@ -206,7 +206,7 @@
- }
+@@ -211,6 +212,7 @@
+ #if defined(__GNUC__) && (__GNUC__ >= 7) && defined(__aarch64__) /* special case aarch64 for older gcc versions (issue #851) */ \
+     && !defined(__APPLE__)  /* on apple (M1) the wrong register is read (tpidr_el0 instead of tpidrro_el0) so fall back to TLS slot assembly (<https://github.com/microsoft/mimalloc/issues/343#issuecomment-763272369>)*/ \
+     && (!defined(__clang_major__) || __clang_major__ >= 14)  /* older clang versions emit bad code; fall back to using the TLS slot (<https://lore.kernel.org/linux-arm-kernel/202110280952.352F66D8@keescook/T/>) */
++    && (!defined(__ANDROID__) || __ANDROID_API__ >= 29) /* __builtin_thread_pointer will omit calls to __aeabi_read_tp on arm Android, and causes build failure when __ANDROID_API__ < 29 */
+ #define MI_USE_BUILTIN_THREAD_POINTER  1
+ #endif
  
- static inline mi_threadid_t _mi_prim_thread_id(void) mi_attr_noexcept {
--  #if defined(__BIONIC__)
-+  #if defined(__BIONIC__) && 0
-     // issue #384, #495: on the Bionic libc (Android), slot 1 is the thread id
-     // see: https://github.com/aosp-mirror/platform_bionic/blob/c44b1d0676ded732df4b3b21c5f798eacae93228/libc/platform/bionic/tls_defines.h#L86
-     return (uintptr_t)mi_prim_tls_slot(1);
