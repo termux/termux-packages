@@ -4,9 +4,9 @@ TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # `weechat-python-plugin` depends on libpython${TERMUX_PYTHON_VERSION}.so.
 # Please revbump and rebuild when bumping TERMUX_PYTHON_VERSION.
-TERMUX_PKG_VERSION="4.3.0"
+TERMUX_PKG_VERSION="4.3.1"
 TERMUX_PKG_SRCURL=https://www.weechat.org/files/src/weechat-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=36f9f90bf2f69f77a34d1e0d58f06ca08f0f20f8263ab940b637e7abf796862d
+TERMUX_PKG_SHA256=157e22a17dcc303c665739631a04470d786474e805febed2ed2d5b6250d18653
 TERMUX_PKG_DEPENDS="libandroid-support, libcurl, libgcrypt, libgnutls, libiconv, ncurses, zlib, zstd"
 TERMUX_PKG_BREAKS="weechat-dev"
 TERMUX_PKG_REPLACES="weechat-dev"
@@ -31,7 +31,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DENABLE_SPELL=OFF
 -DENABLE_TCL=OFF
 -DENABLE_TESTS=OFF
--DLIBGCRYPT_CONFIG_EXECUTABLE=${TERMUX_PREFIX}/bin/libgcrypt-config
 -DMSGFMT_EXECUTABLE=$(command -v msgfmt)
 -DMSGMERGE_EXECUTABLE=$(command -v msgmerge)
 -DXGETTEXT_EXECUTABLE=$(command -v xgettext)
