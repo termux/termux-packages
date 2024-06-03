@@ -672,6 +672,7 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 		cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX_CLASSICAL"
 		termux_step_post_massage
 		cd "$TERMUX_PKG_MASSAGEDIR"
+		cp -a "./$TERMUX_PREFIX_CLASSICAL" "$TERMUX_BASE_DIR"
 		if [ "$TERMUX_PACKAGE_FORMAT" = "debian" ]; then
 			termux_step_create_debian_package
 		elif [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ]; then
