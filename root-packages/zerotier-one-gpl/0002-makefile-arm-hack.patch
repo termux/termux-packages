@@ -1,0 +1,17 @@
+diff --git a/make-linux.mk b/make-linux.mk
+index e232d93..ce8a934 100644
+--- a/make-linux.mk
++++ b/make-linux.mk
+@@ -199,6 +199,12 @@ ifeq ($(CC_MACH),armv7)
+ 	override DEFS+=-DZT_NO_TYPE_PUNNING
+ 	ZT_USE_ARM32_NEON_ASM_CRYPTO=1
+ endif
++# HACK: Termux arm support (above Android 6)
++ifeq ($(CC_MACH),armv7a)
++	ZT_ARCHITECTURE=3
++	override DEFS+=-DZT_NO_TYPE_PUNNING
++	ZT_USE_ARM32_NEON_ASM_CRYPTO=1
++endif
+ ifeq ($(CC_MACH),armv7l)
+ 	ZT_ARCHITECTURE=3
+ 	override DEFS+=-DZT_NO_TYPE_PUNNING
