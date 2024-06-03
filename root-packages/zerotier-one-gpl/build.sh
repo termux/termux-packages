@@ -8,7 +8,7 @@ TERMUX_PKG_SHA256=557a444127812384265ec97232bae43dce1d4b1545ddd72e2b1646c971dad7
 TERMUX_PKG_DEPENDS="natpmpc, miniupnpc"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_SERVICE_SCRIPT=(
-    'zerotier-one' 'exec su -c "'$TERMUX_PREFIX'/bin/zerotier-one -d"'
+    'zerotier-one' 'exec su -c "':$TERMUX_PREFIX'/bin/zerotier-one -d"'
 )
 
 termux_step_configure() {
