@@ -1,0 +1,13 @@
+diff --git a/osdep/LinuxNetLink.cpp b/osdep/LinuxNetLink.cpp
+index da75ccd..046e36f 100644
+--- a/osdep/LinuxNetLink.cpp
++++ b/osdep/LinuxNetLink.cpp
+@@ -103,7 +103,7 @@ void LinuxNetLink::_setSocketTimeout(int fd, int seconds)
+ #define ZT_NL_BUF_SIZE 16384
+ int LinuxNetLink::_doRecv(int fd)
+ {
+-	char *const buf = (char *)valloc(ZT_NL_BUF_SIZE);
++	char *const buf = (char *)malloc(ZT_NL_BUF_SIZE);
+ 	if (!buf) {
+ 		fprintf(stderr,"malloc failed!\n");
+ 		::exit(1);
