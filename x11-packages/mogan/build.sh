@@ -2,13 +2,25 @@ TERMUX_PKG_HOMEPAGE=https://github.com/XmacsLabs/mogan
 TERMUX_PKG_DESCRIPTION="A structure editor forked from GNU TeXmacs"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.2.5.4"
+TERMUX_PKG_VERSION="1.2.5.5"
 TERMUX_PKG_SRCURL=https://github.com/XmacsLabs/mogan/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=a1dc30f23eb8b486e7a7d07e5cbd4e419e7c0dbb453811f6a4d41c43368472b2
+TERMUX_PKG_SHA256=f97e138837e04cc7d6840e3b0ccb1bce42684608b63e69826a1e5cc5acf74a03
 TERMUX_PKG_DEPENDS="freetype, ghostscript, libandroid-complex-math, libandroid-spawn, libandroid-wordexp, libc++, libcurl, libgit2, libiconv, libjpeg-turbo, libpng, mogan-data, qt5-qtbase, qt5-qtsvg, zlib"
 TERMUX_PKG_BUILD_DEPENDS="qt5-qtbase-cross-tools"
-TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_AUTO_UPDATE=true
+
+termux_pkg_auto_update() {
+	local api_url="https://api.github.com/repos/XmacsLabs/mogan/git/refs/tags"
+	local latest_refs_tags=$(curl -s "${api_url}" | jq .[].ref | sed -ne "s|.*v\(.*\)\"|\1|p")
+	if [[ -z "${latest_refs_tags}" ]]; then
+		echo "WARN: Unable to get latest refs tags from upstream. Try again later." >&2
+		return
+	fi
+	local latest_version=$(echo "${latest_refs_tags}" | grep "^1.2.5." | sort -V | tail -n1)
+
+	termux_pkg_upgrade_version "${latest_version}"
+}
 
 termux_step_post_get_source() {
 	sed \
