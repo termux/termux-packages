@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_LICENSE_FILE="LICENSES/GPL-3.0-only.txt"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.7.1"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/${TERMUX_PKG_VERSION%.*}/${TERMUX_PKG_VERSION}/submodules/qtbase-everywhere-src-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=b7338da1bdccb4d861e714efffaa83f174dfe37e194916bfd7ec82279a6ace19
 TERMUX_PKG_DEPENDS="brotli, double-conversion, freetype, glib, harfbuzz, libandroid-shmem, libandroid-sysv-semaphore, libc++, libdrm, libice, libicu, libjpeg-turbo, libpng, libsm, libsqlite, libuuid, libx11, libxcb, libxi, libxkbcommon, libwayland, opengl, openssl, pcre2, vulkan-loader, xcb-util-cursor, xcb-util-image, xcb-util-keysyms, xcb-util-renderutil, xcb-util-wm, zlib, zstd"
@@ -31,11 +31,13 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DINSTALL_MKSPECSDIR=lib/qt6/mkspecs
 -DINSTALL_PUBLICBINDIR=${TERMUX_PREFIX}/bin
 -DQT_ALLOW_SYMLINK_IN_PATHS=OFF
+-DQT_BUILD_TOOLS_BY_DEFAULT=ON
 -DQT_FEATURE_freetype=ON
 -DQT_FEATURE_gui=ON
 -DQT_FEATURE_harfbuzz=ON
 -DQT_FEATURE_widgets=ON
 -DQT_FEATURE_zstd=ON
+-DQT_FORCE_BUILD_TOOLS=ON
 -DQT_HOST_PATH=${TERMUX_PREFIX}/opt/qt6/cross
 "
 TERMUX_PKG_NO_SHEBANG_FIX_FILES="
@@ -129,6 +131,7 @@ termux_step_post_make_install() {
 	find ${TERMUX_PKG_BUILDDIR} -type f -name user_facing_tool_links.txt \
 		-exec echo "{}" \; \
 		-exec cat "{}" \;
+	cat $PWD/user_facing_tool_links.txt | xargs -P${TERMUX_MAKE_PROCESSES} -L1 ln -sv
 	find ${TERMUX_PREFIX}/lib/qt6 -type f -name target_qt.conf \
 		-exec echo "{}" \; \
 		-exec cat "{}" \;
