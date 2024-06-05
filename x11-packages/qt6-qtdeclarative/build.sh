@@ -3,18 +3,20 @@ TERMUX_PKG_DESCRIPTION="Classes for QML and JavaScript languages"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.7.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/${TERMUX_PKG_VERSION%.*}/${TERMUX_PKG_VERSION}/submodules/qtdeclarative-everywhere-src-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=81135c96ed2f599385b8a68c57f4f438dad193c62f946f5b200a321558fd9f1c
 TERMUX_PKG_DEPENDS="libc++, qt6-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="qt6-qtlanguageserver, qt6-shadertools"
 TERMUX_PKG_RECOMMENDS="qt6-qtlanguageserver"
 TERMUX_PKG_HOSTBUILD=true
-TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCMAKE_MESSAGE_LOG_LEVEL=STATUS
 -DCMAKE_SYSTEM_NAME=Linux
 -DINSTALL_PUBLICBINDIR=${TERMUX_PREFIX}/bin
+-DQT_BUILD_TOOLS_BY_DEFAULT=ON
+-DQT_FORCE_BUILD_TOOLS=ON
 -DQT_HOST_PATH=${TERMUX_PREFIX}/opt/qt6/cross
 "
 TERMUX_PKG_RM_AFTER_INSTALL="
@@ -63,4 +65,5 @@ termux_step_post_make_install() {
 	find ${TERMUX_PKG_BUILDDIR} -type f -name user_facing_tool_links.txt \
 		-exec echo "{}" \; \
 		-exec cat "{}" \;
+	cat $PWD/user_facing_tool_links.txt | xargs -P${TERMUX_MAKE_PROCESSES} -L1 ln -sv
 }
