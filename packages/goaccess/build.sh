@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://goaccess.io
+TERMUX_PKG_HOMEPAGE=https://goaccess.io
 TERMUX_PKG_DESCRIPTION="An open source real-time web log analyzer and interactive viewer"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
