@@ -11,14 +11,17 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_NO_STRIP=true
 
 termux_step_configure() {
-  curl -Lo- https://github.com/luvit/lit/raw/"$(. ../lit/build.sh; echo "${TERMUX_PKG_VERSION}")"/get-lit.sh | sh
-  mv lit "${TERMUX_PKG_SRCDIR}/_lit"
+	curl -Lo- https://github.com/luvit/lit/raw/"$(
+		. ../lit/build.sh
+		echo "${TERMUX_PKG_VERSION}"
+	)"/get-lit.sh | sh
+	mv lit "${TERMUX_PKG_SRCDIR}/_lit"
 }
 
 termux_step_make() {
-  ./_lit make . ./luvit "${TERMUX_PREFIX}/bin/luvi"
+	./_lit make . ./luvit "${TERMUX_PREFIX}/bin/luvi"
 }
 
 termux_step_make_install() {
-  install -Dm700 luvit "${TERMUX_PREFIX}/bin/luvit"
+	install -Dm700 luvit "${TERMUX_PREFIX}/bin/luvit"
 }

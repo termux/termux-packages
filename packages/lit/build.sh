@@ -11,14 +11,14 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_NO_STRIP=true
 
 termux_step_configure() {
-  sh "${TERMUX_PKG_SRCDIR}/get-lit.sh"
-  mv lit "${TERMUX_PKG_SRCDIR}/_lit"
+	sh "${TERMUX_PKG_SRCDIR}/get-lit.sh"
+	mv lit "${TERMUX_PKG_SRCDIR}/_lit"
 }
 
 termux_step_make() {
-  ./_lit make . ./lit "${TERMUX_PREFIX}/bin/luvi"
+	./_lit make . ./lit "${TERMUX_PREFIX}/bin/luvi"
 }
 
 termux_step_make_install() {
-  install -Dm700 lit "${TERMUX_PREFIX}/bin/lit"
+	install -Dm700 lit "${TERMUX_PREFIX}/bin/lit"
 }
