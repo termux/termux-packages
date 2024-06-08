@@ -12,7 +12,7 @@ TERMUX_PKG_NO_STRIP=true
 
 termux_step_configure() {
 	curl -Lo- https://github.com/luvit/lit/raw/"$(
-		. "${TERMUX_SCRIPTDIR}/packages/lit/build.sh"
+		source "${TERMUX_SCRIPTDIR}/packages/lit/build.sh"
 		echo "${TERMUX_PKG_VERSION}"
 	)"/get-lit.sh | sh
 	mv lit "${TERMUX_PKG_SRCDIR}/_lit"
