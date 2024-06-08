@@ -8,7 +8,6 @@ _version=2.14.0
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_SRCURL=git+https://github.com/luvit/luvi.git
 TERMUX_PKG_DEPENDS="pcre, openssl, luv, lua51-lpeg, libluajit"
-TERMUX_PKG_BUILD_DEPENDS="luv, lua51-lpeg"
 TERMUX_PKG_SUGGESTS="lit, luvit"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
