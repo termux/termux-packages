@@ -1,0 +1,44 @@
+diff --git a/commands/make.lua b/commands/make.lua
+index c4bece2..fa024ab 100644
+--- a/commands/make.lua
++++ b/commands/make.lua
+@@ -1,15 +1,39 @@
++local log = require('log').log
++
+ return function ()
+   local core = require('core')()
+   local uv = require('uv')
+   local pathJoin = require('luvi').path.join
+ 
++  log('warning', '\'lit make` will try to use it\'s own luvi binary, regardless of the required luvi version', 'highlight')
++
+   local cwd = uv.cwd()
+   local source = args[2] and pathJoin(cwd, args[2])
+   local target = args[3] and pathJoin(cwd, args[3])
+   local luvi_source = args[4] and pathJoin(cwd, args[4])
++
++  if not luvi_source then
++    if uv.fs_stat("@TERMUX_PREFIX@/bin/strip") then
++      luvi_source = os.tmpname()
++      local ok, _, code = os.execute("@TERMUX_PREFIX@/bin/strip --strip-unneeded -o "..luvi_source.." "..uv.exepath())
++      if not ok then
++        error("strip exitted with non-zero exit code: "..code)
++      end
++    elseif uv.fs_stat("@TERMUX_PREFIX@/bin/luvi") then
++      luvi_source = "@TERMUX_PREFIX@/bin/luvi"
++    else
++      log('not found', '\'lit make` requires binutils or luvi package to be installed', 'failure')
++      os.exit(-1, true)
++    end
++  end
++
+   if not source or uv.fs_access(source, "r") then
+     core.make(source or cwd, target, luvi_source)
+   else
+     core.makeUrl(args[2], target, luvi_source)
+   end
++
++  if luvi_source:sub(1, 35) == "@TERMUX_PREFIX@/tmp" then
++    os.remove(luvi_source)
++  end
+ end
