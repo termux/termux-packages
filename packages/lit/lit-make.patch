@@ -18,14 +18,14 @@ index c4bece2..fa024ab 100644
    local luvi_source = args[4] and pathJoin(cwd, args[4])
 +
 +  if not luvi_source then
-+    if uv.fs_stat("@TERMUX_PREFIX@/bin/strip") then
++    if uv.fs_stat("@TERMUX_PREFIX@/bin/luvi") then
++      luvi_source = "@TERMUX_PREFIX@/bin/luvi"
++    elseif uv.fs_stat("@TERMUX_PREFIX@/bin/strip") then
 +      luvi_source = os.tmpname()
 +      local ok, _, code = os.execute("@TERMUX_PREFIX@/bin/strip --strip-unneeded -o "..luvi_source.." "..uv.exepath())
 +      if not ok then
 +        error("strip exitted with non-zero exit code: "..code)
 +      end
-+    elseif uv.fs_stat("@TERMUX_PREFIX@/bin/luvi") then
-+      luvi_source = "@TERMUX_PREFIX@/bin/luvi"
 +    else
 +      log('not found', '\'lit make` requires binutils or luvi package to be installed', 'failure')
 +      os.exit(-1, true)
