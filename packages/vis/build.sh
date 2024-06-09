@@ -11,7 +11,7 @@ TERMUX_PKG_DEPENDS="liblua53, libtermkey, lua53-lpeg, ncurses"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
-	CFLAGS+=" -I$TERMUX_PREFIX/include -I$TERMUX_PREFIX/include/lua5.3"
+	CFLAGS+=" -I$TERMUX_PREFIX/include -I$TERMUX_PREFIX/include/lua/5.3"
 }
 
 termux_step_create_debscripts() {
