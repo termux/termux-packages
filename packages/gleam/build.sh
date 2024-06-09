@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL=https://github.com/gleam-lang/gleam/archive/refs/tags/v${TERMU
 TERMUX_PKG_SHA256=7ced040b0289faff08ef2ff8113e9ecf06e2c7e3ac9154a529fa3b9bf1a4ade0
 TERMUX_PKG_DEPENDS="erlang"
 TERMUX_PKG_SUGGESTS="nodejs"
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_configure() {
