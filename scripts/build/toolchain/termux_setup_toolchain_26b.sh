@@ -72,6 +72,11 @@ termux_setup_toolchain_26b() {
 		LDFLAGS+=" -fno-openmp-implicit-rpath"
 	fi
 
+	# Remove option `openmp-implicit-rpath` in next NDK major bump.
+	if [ "$TERMUX_NDK_VERSION_NUM" != 26 ]; then
+		termux_error_exit "Remove the useless option \`-fopenmp-implicit-rpath\` and rebuild the libllvm."
+	fi
+
 	# Android 7 started to support DT_RUNPATH (but not DT_RPATH).
 	LDFLAGS+=" -Wl,--enable-new-dtags"
 
