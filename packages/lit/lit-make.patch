@@ -1,18 +1,14 @@
 diff --git a/commands/make.lua b/commands/make.lua
-index c4bece2..fa024ab 100644
+index c4bece2..c406692 100644
 --- a/commands/make.lua
 +++ b/commands/make.lua
-@@ -1,15 +1,39 @@
-+local log = require('log').log
-+
+@@ -1,4 +1,5 @@
  return function ()
++  local log = require('log').log
    local core = require('core')()
    local uv = require('uv')
    local pathJoin = require('luvi').path.join
- 
-+  log('warning', '\'lit make` will try to use it\'s own luvi binary, regardless of the required luvi version', 'highlight')
-+
-   local cwd = uv.cwd()
+@@ -7,9 +8,29 @@ return function ()
    local source = args[2] and pathJoin(cwd, args[2])
    local target = args[3] and pathJoin(cwd, args[3])
    local luvi_source = args[4] and pathJoin(cwd, args[4])
