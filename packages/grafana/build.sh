@@ -41,6 +41,8 @@ termux_step_make() {
 		GOOS=linux GOARCH=amd64 \
 		make "$TERMUX_PKG_EXTRA_MAKE_ARGS" build-go
 	make "$TERMUX_PKG_EXTRA_MAKE_ARGS" deps-js
+	# get rid of unnecessary things during build to not run out of storage
+	rm -r .yarn/cache node_modules/@storybook
 	make "$TERMUX_PKG_EXTRA_MAKE_ARGS" build-js
 }
 
