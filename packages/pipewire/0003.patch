@@ -104,7 +104,7 @@ index 55a152e..ef29c33 100644
  		spa_log_error(state->log, "can't create log file");
  		return -errno;
 diff --git a/src/daemon/pipewire-pulse.conf.in b/src/daemon/pipewire-pulse.conf.in
-index 0d54cf9..9d7759e 100644
+index 0d54cf9..74b8711 100644
 --- a/src/daemon/pipewire-pulse.conf.in
 +++ b/src/daemon/pipewire-pulse.conf.in
 @@ -61,7 +61,8 @@ context.exec = [
@@ -112,8 +112,8 @@ index 0d54cf9..9d7759e 100644
  #      ( flags = [ nofail ] )
  pulse.cmd = [
 -    { cmd = "load-module" args = "module-always-sink" flags = [ ] }
-+    { cmd = "load-module" args = "module-oboe-sink stream_write_timeout=0" flags = [ ] }
-+    { cmd = "load-module" args = "module-oboe-source stream_read_timeout=0" flags = [ ] }
++    { cmd = "load-module" args = "module-oboe-sink" flags = [ ] }
++    { cmd = "load-module" args = "module-oboe-source" flags = [ ] }
      { cmd = "load-module" args = "module-device-manager" flags = [ ] }
      { cmd = "load-module" args = "module-device-restore" flags = [ ] }
      { cmd = "load-module" args = "module-stream-restore" flags = [ ] }
@@ -126,6 +126,29 @@ index 0d54cf9..9d7759e 100644
          #"tcp:[::]:9999"                    # IPv6 on all addresses
          #"tcp:127.0.0.1:8888"               # IPv4 on a single address
          #
+diff --git a/src/daemon/pipewire.conf.in b/src/daemon/pipewire.conf.in
+index 7114513..9de30a4 100644
+--- a/src/daemon/pipewire.conf.in
++++ b/src/daemon/pipewire.conf.in
+@@ -225,6 +225,18 @@ context.modules = [
+         flags = [ ifexists nofail ]
+         condition = [ { module.jackdbus-detect = true } ]
+     }
++
++    # Oboe sink and source
++    { name = libpipewire-module-oboe-sink
++        args = {
++            stream.write.timeout = 5000
++        }
++    }
++    { name = libpipewire-module-oboe-source
++        args = {
++            stream.read.timeout = 0
++        }
++    }
+ ]
+ 
+ context.objects = [
 diff --git a/src/modules/meson.build b/src/modules/meson.build
 index 922a384..cd74b6f 100644
 --- a/src/modules/meson.build

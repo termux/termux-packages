@@ -1,0 +1,18 @@
+diff --git a/libjack/thread.c b/libjack/thread.c
+index a7466cc..b10cd9d 100644
+--- a/libjack/thread.c
++++ b/libjack/thread.c
+@@ -175,11 +175,13 @@ jack_client_create_thread (jack_client_t* client,
+ #ifndef JACK_USE_MACH_THREADS
+ 
+ 	pthread_attr_init (&attr);
++#if !defined __ANDROID__ || __ANDROID_API__ >= 28
+ 	result = pthread_attr_setinheritsched (&attr, PTHREAD_EXPLICIT_SCHED);
+ 	if (result) {
+ 		log_result ("requesting explicit scheduling", result);
+ 		return result;
+ 	}
++#endif
+ 	result = pthread_attr_setdetachstate (&attr, PTHREAD_CREATE_JOINABLE);
+ 	if (result) {
+ 		log_result ("requesting joinable thread creation", result);

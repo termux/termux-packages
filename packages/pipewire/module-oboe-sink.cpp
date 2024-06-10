@@ -242,6 +242,7 @@ static int open_oboe_stream(struct impl *impl)
                 ->openStream(impl->oboe_stream));
 
     impl->info.rate = impl->oboe_stream->getSampleRate();
+	CHK(impl->oboe_stream->setBufferSizeInFrames(50 * impl->oboe_stream->getFramesPerBurst()));
 
 	CHK(impl->oboe_stream->requestStart());
 	CHK(impl->oboe_stream->waitForStateChange(oboe::StreamState::Starting, NULL, 1000 * NANOS_PER_MILLISECOND));
@@ -524,7 +525,7 @@ int pipewire__module_init(struct pw_impl_module *module, const char *args)
 
 	impl->frame_size = calc_frame_size(&impl->info);
 	impl->stream_write_timeout = pw_properties_get_uint64(props, "stream.write.timeout", DEFAULT_STREAM_WRITE_TIMEOUT);
-	pw_log_debug( "stream write timeout set to %d", impl->stream_write_timeout);
+	pw_log_info( "stream write timeout set to %d", impl->stream_write_timeout);
 	if (impl->frame_size == 0) {
 		res = -EINVAL;
 		pw_log_error( "can't parse audio format");
