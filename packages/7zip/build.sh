@@ -56,5 +56,5 @@ termux_step_make_install() {
 		-t "$TERMUX_PREFIX"/share/doc/"$TERMUX_PKG_NAME" \
 		"$TERMUX_PKG_BUILDDIR"/DOC/{7zC,7zFormat,copying,License,lzma,Methods,readme,src-history}.txt
 	tar -C "$TERMUX_PREFIX"/share/doc/"$TERMUX_PKG_NAME" \
-		-xvf "$TERMUX_PKG_CACHEDIR/$(basename "$TERMUX_PKG_SRCURL[1]")" MANUAL
+		-xvf "$TERMUX_PKG_CACHEDIR/$(basename "${TERMUX_PKG_SRCURL[1]}")" MANUAL
 }
