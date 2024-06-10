@@ -26,8 +26,15 @@ termux_step_pre_configure() {
 
 	export NODE_OPTIONS=--max-old-space-size=6000
 	NODE_OPTIONS+=" --openssl-legacy-provider"
+}
 
-	yarn set version 4.2.2
+termux_step_post_get_source() {
+	termux_setup_golang
+	#there is currently a bug in this version of go-sockaddr that prevents building. We download it here to patch it.
+	sockaddr_version=v1.0.6
+	go mod download github.com/hashicorp/go-sockaddr@$sockaddr_version
+	cp -r "$(go env GOPATH)"/pkg/mod/github.com/hashicorp/go-sockaddr@$sockaddr_version go-sockaddr
+	chmod +w -R go-sockaddr
 }
 
 termux_step_make() {
