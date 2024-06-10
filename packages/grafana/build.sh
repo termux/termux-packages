@@ -9,7 +9,6 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_MAKE_ARGS="SPEC_TARGET= MERGED_SPEC_TARGET="
 
 termux_step_pre_configure() {
-	termux_setup_golang
 	termux_setup_nodejs
 
 	local bin="$TERMUX_PKG_BUILDDIR/_bin"
