@@ -8,6 +8,7 @@ TERMUX_PKG_SRCURL=https://github.com/mpv-player/mpv/archive/v${TERMUX_PKG_VERSIO
 TERMUX_PKG_SHA256=86d9ef40b6058732f67b46d0bbda24a074fae860b3eaae05bab3145041303066
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="ffmpeg, libandroid-glob, libandroid-support, libarchive, libass, libcaca, libiconv, liblua52, libsixel, libuchardet, openal-soft, pulseaudio, rubberband, zlib, libplacebo"
+TERMUX_PKG_MAKE_DEPENDS="jack, alsa-lib"
 TERMUX_PKG_RM_AFTER_INSTALL="share/icons share/applications"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dlibmpv=true
