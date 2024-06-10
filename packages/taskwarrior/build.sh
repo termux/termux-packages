@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Utility for managing your TODO list"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.0.2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/GothenburgBitFactory/taskwarrior/releases/download/v${TERMUX_PKG_VERSION}/task-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=633b76637b0c74e4845ffa28249f01a16ed2c84000ece58d4358e72bf88d5f10
 TERMUX_PKG_AUTO_UPDATE=true
@@ -33,8 +34,9 @@ termux_step_pre_configure() {
 	LDFLAGS+=" -landroid-glob"
 
 	if [ "$TERMUX_ARCH" = "arm" ]; then
-		rustup target add thumbv7neon-linux-androideabi
-	fi	
+		# See https://cmake.org/cmake/help/latest/variable/CMAKE_ANDROID_ARM_MODE.html
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCMAKE_ANDROID_ARM_MODE=ON"
+	fi
 }
 
 termux_step_post_make_install() {
