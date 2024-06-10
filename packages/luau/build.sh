@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION=0.629
 TERMUX_PKG_SRCURL=https://github.com/luau-lang/luau/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=18b04e673a4e450872b57e1881fc54615f8c18addd8336b3e0b20df43562d50d
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_NO_STATICSPLIT=true
 
 termux_step_make_install() {
