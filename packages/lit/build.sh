@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Toolkit for developing, sharing, and running luvit/lua p
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.8.5
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=git+https://github.com/luvit/lit.git
 TERMUX_PKG_GIT_BRANCH=${TERMUX_PKG_VERSION}
 TERMUX_PKG_BUILD_DEPENDS="luvi"
