@@ -26,7 +26,7 @@ termux_step_host_build() {
 		--prefix=$_PREFIX_FOR_BUILD \
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
 	sed -i -e 's/^\(#define HOSTARCHITECTURE\)_X32 1/\1_X86 1/g' config.h
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j $TERMUX_PKG_MAKE_PROCESSES
 	make install
 	popd
 
@@ -55,10 +55,10 @@ termux_step_host_build() {
 	sed -i -e '/^#define HOSTARCHITECTURE_/d' config.h
 	echo >> config.h
 	echo "#define HOSTARCHITECTURE_${arch} 1" >> config.h
-	make -j $TERMUX_MAKE_PROCESSES -C libpolyml libpolyml.la
-	make -j $TERMUX_MAKE_PROCESSES polyimport
-	make -j $TERMUX_MAKE_PROCESSES -C libpolymain libpolymain.la
-	make -j $TERMUX_MAKE_PROCESSES poly
+	make -j $TERMUX_PKG_MAKE_PROCESSES -C libpolyml libpolyml.la
+	make -j $TERMUX_PKG_MAKE_PROCESSES polyimport
+	make -j $TERMUX_PKG_MAKE_PROCESSES -C libpolymain libpolymain.la
+	make -j $TERMUX_PKG_MAKE_PROCESSES poly
 	export PATH=$(pwd):$TERMUX_ORIG_PATH
 	popd
 }

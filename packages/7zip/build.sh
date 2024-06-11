@@ -42,7 +42,7 @@ termux_step_make() {
 		CXX="$CXX $CXXFLAGS $LDFLAGS -D_GNU_SOURCE" \
 		DISABLE_RAR=1 \
 		--file ../../cmpl_clang.mak \
-		--jobs "$TERMUX_MAKE_PROCESSES"
+		--jobs "$TERMUX_PKG_MAKE_PROCESSES"
 }
 
 termux_step_make_install() {

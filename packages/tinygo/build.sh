@@ -119,7 +119,7 @@ termux_step_host_build() {
 	# build whatever llvm-config think is missing
 	ninja \
 		-C "${TERMUX_PKG_HOSTBUILD_DIR}" \
-		-j "${TERMUX_MAKE_PROCESSES}" \
+		-j "${TERMUX_PKG_MAKE_PROCESSES}" \
 		${_LLVM_EXTRA_BUILD_TARGETS}
 
 	echo "===== llvm-config ====="
@@ -186,7 +186,7 @@ termux_step_make() {
 
 	ninja \
 		-C llvm-build \
-		-j "${TERMUX_MAKE_PROCESSES}" \
+		-j "${TERMUX_PKG_MAKE_PROCESSES}" \
 		${_LLVM_EXTRA_BUILD_TARGETS}
 
 	# replace Android llvm-config with wrapper around host build

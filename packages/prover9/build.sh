@@ -7,7 +7,7 @@ TERMUX_PKG_SRCURL=https://www.cs.unm.edu/~mccune/mace4/download/LADR-${TERMUX_PK
 TERMUX_PKG_SHA256=c32bed5807000c0b7161c276e50d9ca0af0cb248df2c1affb2f6fc02471b51d0
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_MAKE_ARGS="-e all"
-TERMUX_MAKE_PROCESSES=1
+TERMUX_PKG_MAKE_PROCESSES=1
 
 termux_step_make_install() {
 	install -Dm700 -t $TERMUX_PREFIX/bin bin/*

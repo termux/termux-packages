@@ -15,7 +15,7 @@ termux_step_pre_configure() {
 	termux_setup_ninja
 	termux_setup_zig
 
-	export TERMUX_MAKE_PROCESSES
+	export TERMUX_PKG_MAKE_PROCESSES
 
 	# zig 0.11.0+ uses 3 stages bootstrapping build system
 	# which NDK cant be used anymore

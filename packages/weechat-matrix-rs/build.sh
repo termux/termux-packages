@@ -45,7 +45,7 @@ termux_step_make() {
 	printf "WeeChat Plugin API version: %s \n" "$WEECHAT_PLUGIN_API_VERSION"
 	[[ -z "$WEECHAT_PLUGIN_API_VERSION" ]] && exit 1
 
-	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
+	cargo build --jobs $TERMUX_PKG_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
 }
 
 termux_step_make_install() {

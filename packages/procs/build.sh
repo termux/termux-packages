@@ -13,7 +13,7 @@ TERMUX_PKG_AUTO_UPDATE=true
 # This package contains makefiles to run the tests. So, we need to override build steps.
 termux_step_make() {
 	termux_setup_rust
-	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
+	cargo build --jobs $TERMUX_PKG_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
 	asciidoctor -b manpage man/procs.1.adoc
 }
 

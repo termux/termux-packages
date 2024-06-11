@@ -10,7 +10,7 @@ TERMUX_PKG_DEPENDS="libc++, pulseaudio, sdl, sdl-ttf"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
-	make -j $TERMUX_MAKE_PROCESSES -f Makefile.linux \
+	make -j $TERMUX_PKG_MAKE_PROCESSES -f Makefile.linux \
 		CC="$CC" \
 		CXX="$CXX" \
 		LINK="$CXX" \

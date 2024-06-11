@@ -56,7 +56,7 @@ termux_step_pre_configure() {
 	export AR=$(command -v llvm-ar)
 	export NM=$(command -v llvm-nm)
 	export INSTALL_DIR="${TERMUX_PREFIX}/share/wasi-sysroot"
-	export NINJA_FLAGS="-j ${TERMUX_MAKE_PROCESSES}"
+	export NINJA_FLAGS="-j ${TERMUX_PKG_MAKE_PROCESSES}"
 
 	sed \
 		-e "s|CC=\$(BUILD_PREFIX).*|CC=${CC} \\\\|g" \

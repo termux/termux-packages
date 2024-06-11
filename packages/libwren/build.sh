@@ -24,7 +24,7 @@ termux_step_make() {
 	else
 		RELEASE=release_64bit
 	fi
-	make -j $TERMUX_MAKE_PROCESSES $QUIET_BUILD config=${RELEASE}
+	make -j $TERMUX_PKG_MAKE_PROCESSES $QUIET_BUILD config=${RELEASE}
 }
 
 termux_step_make_install() {

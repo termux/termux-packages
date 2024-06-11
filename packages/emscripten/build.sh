@@ -228,7 +228,7 @@ termux_step_host_build() {
 		-DLLVM_INCLUDE_UTILS=OFF
 	ninja \
 		-C "${TERMUX_PKG_HOSTBUILD_DIR}" \
-		-j "${TERMUX_MAKE_PROCESSES}" \
+		-j "${TERMUX_PKG_MAKE_PROCESSES}" \
 		llvm-tblgen clang-tblgen
 }
 
@@ -285,7 +285,7 @@ termux_step_make() {
 		${_LLVM_BUILD_ARGS}
 	ninja \
 		-C "${TERMUX_PKG_BUILDDIR}/build-llvm" \
-		-j "${TERMUX_MAKE_PROCESSES}" \
+		-j "${TERMUX_PKG_MAKE_PROCESSES}" \
 		install
 
 	cmake \
@@ -295,7 +295,7 @@ termux_step_make() {
 		${_BINARYEN_BUILD_ARGS}
 	ninja \
 		-C "${TERMUX_PKG_BUILDDIR}/build-binaryen" \
-		-j "${TERMUX_MAKE_PROCESSES}" \
+		-j "${TERMUX_PKG_MAKE_PROCESSES}" \
 		install
 }
 

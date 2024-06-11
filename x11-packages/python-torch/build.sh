@@ -55,7 +55,7 @@ lib/libfmt.a
 termux_step_host_build() {
 	termux_setup_cmake
 	cmake "$TERMUX_PKG_SRCDIR/third_party/sleef"
-	make -j "$TERMUX_MAKE_PROCESSES" mkrename mkrename_gnuabi mkmasked_gnuabi mkalias mkdisp
+	make -j "$TERMUX_PKG_MAKE_PROCESSES" mkrename mkrename_gnuabi mkmasked_gnuabi mkalias mkdisp
 }
 
 termux_step_pre_configure() {

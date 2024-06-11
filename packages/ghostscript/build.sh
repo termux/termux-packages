@@ -31,7 +31,7 @@ termux_step_post_get_source() {
 termux_step_pre_configure() {
 	# Use `make -j1` otherwise build may fail with error
 	# about missing 'arch.h'.
-	TERMUX_MAKE_PROCESSES=1
+	TERMUX_PKG_MAKE_PROCESSES=1
 	CPPFLAGS+=" -I${TERMUX_STANDALONE_TOOLCHAIN}/sysroot/usr/include/c++/v1"
 
 	# Workaround for build break caused by `sha2.h` from `libmd` package:
@@ -44,7 +44,7 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
-	make -j $TERMUX_MAKE_PROCESSES \
+	make -j $TERMUX_PKG_MAKE_PROCESSES \
 		so all \
 		${TERMUX_PKG_EXTRA_MAKE_ARGS}
 }

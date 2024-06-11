@@ -77,12 +77,12 @@ termux_step_host_build() {
 	pushd $PATCHELF_SRCDIR
 	./bootstrap.sh
 	./configure
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j $TERMUX_PKG_MAKE_PROCESSES
 	popd
 
 	(cd "$TERMUX_PKG_SRCDIR" && ./buildconf --force)
 	"$TERMUX_PKG_SRCDIR/configure" ${TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS}
-	make -j "$TERMUX_MAKE_PROCESSES"
+	make -j "$TERMUX_PKG_MAKE_PROCESSES"
 }
 
 termux_step_pre_configure() {

@@ -31,7 +31,7 @@ termux_step_host_build() {
 	$ecl_srcdir/configure ABI=${TERMUX_ARCH_BITS} \
 		CFLAGS=-m${TERMUX_ARCH_BITS} LDFLAGS=-m${TERMUX_ARCH_BITS} \
 		--prefix=$_PREFIX_FOR_BUILD --srcdir=$ecl_srcdir --disable-c99complex
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j $TERMUX_PKG_MAKE_PROCESSES
 	make install
 	popd
 
@@ -41,7 +41,7 @@ termux_step_host_build() {
 	pushd maxima
 	find $TERMUX_PKG_SRCDIR -mindepth 1 -maxdepth 1 ! -name ecl -exec cp -a \{\} ./ \;
 	./configure --prefix=$_PREFIX_FOR_BUILD $TERMUX_PKG_EXTRA_CONFIGURE_ARGS
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j $TERMUX_PKG_MAKE_PROCESSES
 	popd
 }
 

@@ -31,7 +31,7 @@ termux_step_host_build() {
 
 	( cd $TERMUX_PKG_SRCDIR && sh build0.sh )
 	cmake $TERMUX_PKG_SRCDIR
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j $TERMUX_PKG_MAKE_PROCESSES
 }
 
 termux_step_pre_configure() {

@@ -14,7 +14,7 @@
    -DCLANG_TOOL_C_ARCMT_TEST_BUILD=OFF \
    -DCLANG_TOOL_LIBCLANG_BUILD=OFF
 -cmake --build . --target install
-+ninja -j"${TERMUX_MAKE_PROCESSES}" install
++ninja -j"${TERMUX_PKG_MAKE_PROCESSES}" install
  
  # Now we build Zig, still with system C/C++ compiler, linking against LLVM,
  # Clang, LLD we just built from source.
@@ -27,7 +27,7 @@
    -DCMAKE_BUILD_TYPE=Release \
    -DZIG_VERSION="$ZIG_VERSION"
 -cmake --build . --target install
-+ninja -j"${TERMUX_MAKE_PROCESSES}" install
++ninja -j"${TERMUX_PKG_MAKE_PROCESSES}" install
  
  # Now we have Zig as a cross compiler.
  ZIG="$ROOTDIR/out/host/bin/zig"
@@ -45,7 +45,7 @@
    -DCMAKE_AR="$ROOTDIR/out/host/bin/llvm-ar" \
    -DCMAKE_RANLIB="$ROOTDIR/out/host/bin/llvm-ranlib"
 -cmake --build . --target install
-+ninja -j"${TERMUX_MAKE_PROCESSES}" install
++ninja -j"${TERMUX_PKG_MAKE_PROCESSES}" install
  
  # Same deal for zstd.
  # The build system for zstd is whack so I just put all the files here.
@@ -63,7 +63,7 @@
    -DLIBCLANG_BUILD_STATIC=ON \
    -DLLD_BUILD_TOOLS=OFF
 -cmake --build . --target install
-+ninja -j"${TERMUX_MAKE_PROCESSES}" install
++ninja -j"${TERMUX_PKG_MAKE_PROCESSES}" install
  
  # Finally, we can cross compile Zig itself, with Zig.
  cd "$ROOTDIR/zig"

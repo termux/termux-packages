@@ -76,7 +76,7 @@ termux_step_host_build() {
 		$TERMUX_PKG_SRCDIR \
 		-DWITH_SSL=bundled \
 		-DCMAKE_BUILD_TYPE=Release
-	make -j $TERMUX_MAKE_PROCESSES import_executables
+	make -j $TERMUX_PKG_MAKE_PROCESSES import_executables
 }
 
 termux_step_pre_configure() {

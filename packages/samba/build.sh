@@ -93,7 +93,7 @@ EOF
 	USING_SYSTEM_COMPILE_ET=1 COMPILE_ET=/usr/bin/compile_et \
 	CFLAGS="$CFLAGS" LINKFLAGS="$CFLAGS $LDFLAGS" \
 	./buildtools/bin/waf configure \
-		--jobs="$TERMUX_MAKE_PROCESSES" \
+		--jobs="$TERMUX_PKG_MAKE_PROCESSES" \
 		--bundled-libraries='!asn1_compile,!compile_et' \
 		--cross-compile \
 		--cross-answers=cross-answers.txt \
@@ -144,11 +144,11 @@ EOF
 
 
 termux_step_make() {
-	./buildtools/bin/waf build --jobs="$TERMUX_MAKE_PROCESSES"
+	./buildtools/bin/waf build --jobs="$TERMUX_PKG_MAKE_PROCESSES"
 }
 
 termux_step_make_install() {
-	./buildtools/bin/waf install --jobs="$TERMUX_MAKE_PROCESSES"
+	./buildtools/bin/waf install --jobs="$TERMUX_PKG_MAKE_PROCESSES"
 }
 
 termux_step_post_make_install() {

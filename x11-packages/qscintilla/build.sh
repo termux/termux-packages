@@ -26,7 +26,7 @@ termux_step_configure () {
 
 termux_step_post_make_install() {
 	cd "${TERMUX_PKG_SRCDIR}/designer" && {
-		make -j "${TERMUX_MAKE_PROCESSES}"
+		make -j "${TERMUX_PKG_MAKE_PROCESSES}"
 		make install
 	}
 }

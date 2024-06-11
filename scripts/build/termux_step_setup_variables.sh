@@ -5,7 +5,7 @@ termux_step_setup_variables() {
 	: "${TERMUX_FORCE_BUILD:="false"}"
 	: "${TERMUX_FORCE_BUILD_DEPENDENCIES:="false"}"
 	: "${TERMUX_INSTALL_DEPS:="false"}"
-	: "${TERMUX_MAKE_PROCESSES:="$(nproc)"}"
+	: "${TERMUX_PKG_MAKE_PROCESSES:="$(nproc)"}"
 	: "${TERMUX_NO_CLEAN:="false"}"
 	: "${TERMUX_PKG_API_LEVEL:="24"}"
 	: "${TERMUX_CONTINUE_BUILD:="false"}"

@@ -76,7 +76,7 @@ termux_step_host_build() {
 
 	cmake -G Ninja -DCMAKE_BUILD_TYPE=Release \
 		-DLLVM_ENABLE_PROJECTS='clang;clang-tools-extra;lldb;mlir' $TERMUX_PKG_SRCDIR/llvm
-	ninja -j $TERMUX_MAKE_PROCESSES clang-tblgen clang-pseudo-gen \
+	ninja -j $TERMUX_PKG_MAKE_PROCESSES clang-tblgen clang-pseudo-gen \
 		clang-tidy-confusable-chars-gen lldb-tblgen llvm-tblgen mlir-tblgen mlir-linalg-ods-yaml-gen
 }
 
@@ -107,9 +107,9 @@ termux_step_post_configure() {
 
 termux_step_post_make_install() {
 	if [ "$TERMUX_CMAKE_BUILD" = Ninja ]; then
-		ninja -j $TERMUX_MAKE_PROCESSES docs-{llvm,clang}-man
+		ninja -j $TERMUX_PKG_MAKE_PROCESSES docs-{llvm,clang}-man
 	else
-		make -j $TERMUX_MAKE_PROCESSES docs-{llvm,clang}-man
+		make -j $TERMUX_PKG_MAKE_PROCESSES docs-{llvm,clang}-man
 	fi
 
 	cp docs/man/* $TERMUX_PREFIX/share/man/man1

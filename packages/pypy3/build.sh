@@ -248,7 +248,7 @@ termux_step_make() {
 	cd $PYPY_USESSION_DIR
 	cd $(ls -C | awk '{print $1}')/testing_1
 	$PROOT_HOST env -C $(pwd) make clean
-	$PROOT_HOST env -C $(pwd) make -j$TERMUX_MAKE_PROCESSES
+	$PROOT_HOST env -C $(pwd) make -j$TERMUX_PKG_MAKE_PROCESSES
 
 	# Copy the built files
 	cp ./pypy$_MAJOR_VERSION-c $PYPY_SRC_DIR/pypy/goal/pypy$_MAJOR_VERSION-c || bash

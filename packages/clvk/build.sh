@@ -118,7 +118,7 @@ termux_step_host_build() {
 		-DLLVM_TARGETS_TO_BUILD="${_LLVM_TARGET_ARCH}"
 	ninja \
 		-C "${TERMUX_PKG_HOSTBUILD_DIR}" \
-		-j "${TERMUX_MAKE_PROCESSES}" \
+		-j "${TERMUX_PKG_MAKE_PROCESSES}" \
 		llvm-tblgen clang-tblgen
 }
 

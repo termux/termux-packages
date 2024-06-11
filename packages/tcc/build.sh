@@ -76,7 +76,7 @@ termux_step_make() {
 			--prefix="/tmp/tcc.host" \
 			--cpu="${TERMUX_ARCH}" \
 			--sysincludepaths="${sysinc}"
-		make -j $TERMUX_MAKE_PROCESSES tcc
+		make -j $TERMUX_PKG_MAKE_PROCESSES tcc
 		mv -f tcc tcc.host
 		make distclean
 	)
@@ -94,10 +94,10 @@ termux_step_make() {
 
 	mv tcc.host tcc
 	touch -d "next minute" tcc
-	make -j ${TERMUX_MAKE_PROCESSES} libtcc1.a
+	make -j ${TERMUX_PKG_MAKE_PROCESSES} libtcc1.a
 
 	rm -f tcc
-	make -j ${TERMUX_MAKE_PROCESSES} tcc
+	make -j ${TERMUX_PKG_MAKE_PROCESSES} tcc
 }
 
 termux_step_post_make_install() {

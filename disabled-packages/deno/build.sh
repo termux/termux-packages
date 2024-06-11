@@ -45,7 +45,7 @@ termux_step_make() {
 	ln -sf $TERMUX_PREFIX/lib/libffi.so $libdir/
 	local libgcc="$($CC -print-libgcc-file-name)"
 	echo "INPUT($libgcc -l:libunwind.a)" > $libdir/libgcc.so
-	local cmd="cargo build --jobs $TERMUX_MAKE_PROCESSES \
+	local cmd="cargo build --jobs $TERMUX_PKG_MAKE_PROCESSES \
 		--target $CARGO_TARGET_NAME"
 	if [ "$TERMUX_DEBUG_BUILD" = "false" ]; then
 		cmd+=" --release"

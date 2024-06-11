@@ -53,7 +53,7 @@ termux_step_host_build() {
 
 	${TERMUX_MESON} setup ${TERMUX_PKG_SRCDIR} . \
 		${TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS}
-	ninja -j "${TERMUX_MAKE_PROCESSES}" install
+	ninja -j "${TERMUX_PKG_MAKE_PROCESSES}" install
 
 	# termux_step_massage strip does not cover opt dir
 	find "${TERMUX_PREFIX}/opt" \

@@ -75,7 +75,7 @@ termux_step_make() {
 		--yes \
 		--verbose \
 		--diagnosis \
-		--jobs="${TERMUX_MAKE_PROCESSES}" \
+		--jobs="${TERMUX_PKG_MAKE_PROCESSES}" \
 		--all
 }
 

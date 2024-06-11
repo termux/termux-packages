@@ -46,7 +46,7 @@ termux_step_make() {
 	echo "make build-wasmer"
 	# https://github.com/wasmerio/wasmer/blob/master/lib/cli/Cargo.toml
 	cargo build \
-		--jobs "${TERMUX_MAKE_PROCESSES}" \
+		--jobs "${TERMUX_PKG_MAKE_PROCESSES}" \
 		--target "${CARGO_TARGET_NAME}" \
 		--release \
 		--manifest-path lib/cli/Cargo.toml \
@@ -56,7 +56,7 @@ termux_step_make() {
 
 	echo "make build-capi"
 	cargo build \
-		--jobs "${TERMUX_MAKE_PROCESSES}" \
+		--jobs "${TERMUX_PKG_MAKE_PROCESSES}" \
 		--target "${CARGO_TARGET_NAME}" \
 		--release \
 		--manifest-path lib/c-api/Cargo.toml \
@@ -66,7 +66,7 @@ termux_step_make() {
 	echo "make build-wasmer-headless-minimal"
 	RUSTFLAGS="${RUSTFLAGS} -C panic=abort" \
 	cargo build \
-		--jobs "${TERMUX_MAKE_PROCESSES}" \
+		--jobs "${TERMUX_PKG_MAKE_PROCESSES}" \
 		--target "${CARGO_TARGET_NAME}" \
 		--release \
 		--manifest-path=lib/cli/Cargo.toml \
@@ -77,7 +77,7 @@ termux_step_make() {
 	echo "make build-capi-headless"
 	RUSTFLAGS="${RUSTFLAGS} -C panic=abort -C link-dead-code -C lto -O -C embed-bitcode=yes" \
 	cargo build \
-		--jobs "${TERMUX_MAKE_PROCESSES}" \
+		--jobs "${TERMUX_PKG_MAKE_PROCESSES}" \
 		--target "${CARGO_TARGET_NAME}" \
 		--release \
 		--manifest-path lib/c-api/Cargo.toml \

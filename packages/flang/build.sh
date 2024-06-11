@@ -55,7 +55,7 @@ termux_step_host_build() {
 	cmake -G Ninja "-DCMAKE_BUILD_TYPE=Release" \
 					"-DLLVM_ENABLE_PROJECTS=clang;mlir" \
 					$TERMUX_PKG_SRCDIR/llvm
-	ninja -j $TERMUX_MAKE_PROCESSES clang-tblgen mlir-tblgen
+	ninja -j $TERMUX_PKG_MAKE_PROCESSES clang-tblgen mlir-tblgen
 }
 
 termux_step_pre_configure() {
@@ -67,7 +67,7 @@ termux_step_pre_configure() {
 	TERMUX_SRCDIR_SAVE=$TERMUX_PKG_SRCDIR
 	TERMUX_PKG_SRCDIR=$TERMUX_PKG_SRCDIR/flang
 	# Avoid the possible OOM
-	TERMUX_MAKE_PROCESSES=1
+	TERMUX_PKG_MAKE_PROCESSES=1
 }
 
 termux_step_post_configure() {

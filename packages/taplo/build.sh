@@ -35,7 +35,7 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
-	cargo build --jobs "$TERMUX_MAKE_PROCESSES" \
+	cargo build --jobs "$TERMUX_PKG_MAKE_PROCESSES" \
 		--target "$CARGO_TARGET_NAME" \
 		--release \
 		--locked \

@@ -136,7 +136,7 @@ termux_step_post_make_install() {
 			-spec "${TERMUX_PKG_SRCDIR}/mkspecs/termux-cross" \
 			DEFINES+="QT_POSIX_IPC"
 
-		make -j "${TERMUX_MAKE_PROCESSES}"
+		make -j "${TERMUX_PKG_MAKE_PROCESSES}"
 		install -Dm644 ../../../lib/libQt5Bootstrap.a "${TERMUX_PREFIX}/lib/libQt5Bootstrap.a"
 		install -Dm644 ../../../lib/libQt5Bootstrap.prl "${TERMUX_PREFIX}/lib/libQt5Bootstrap.prl"
 	}
@@ -147,7 +147,7 @@ termux_step_post_make_install() {
 		"${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
 			-spec "${TERMUX_PKG_SRCDIR}/mkspecs/termux-cross"
 
-		make -j "${TERMUX_MAKE_PROCESSES}"
+		make -j "${TERMUX_PKG_MAKE_PROCESSES}"
 	}
 
 	#######################################################
@@ -168,7 +168,7 @@ termux_step_post_make_install() {
 				-i 's@$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)@$(LINK) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS) $(LFLAGS) -lz@g' \
 				Makefile
 
-			make -j "${TERMUX_MAKE_PROCESSES}"
+			make -j "${TERMUX_PKG_MAKE_PROCESSES}"
 			install -Dm700 "../../../bin/${i}" "${TERMUX_PREFIX}/bin/${i}"
 		}
 	done

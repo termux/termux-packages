@@ -20,7 +20,7 @@ TERMUX_PKG_FORCE_CMAKE=true
 TERMUX_CMAKE_BUILD=Ninja
 
 SWIFT_COMPONENTS="autolink-driver;compiler;clang-resource-dir-symlink;swift-remote-mirror;license;sourcekit-inproc;static-mirror-lib;stdlib;sdk-overlay"
-SWIFT_TOOLCHAIN_FLAGS="-RA --llvm-targets-to-build='X86;ARM;AArch64' -j $TERMUX_MAKE_PROCESSES --install-prefix=$TERMUX_PREFIX"
+SWIFT_TOOLCHAIN_FLAGS="-RA --llvm-targets-to-build='X86;ARM;AArch64' -j $TERMUX_PKG_MAKE_PROCESSES --install-prefix=$TERMUX_PREFIX"
 SWIFT_PATH_FLAGS="--build-subdir=. --install-destdir=/"
 SWIFT_BUILD_FLAGS="$SWIFT_TOOLCHAIN_FLAGS $SWIFT_PATH_FLAGS"
 
@@ -116,7 +116,7 @@ termux_step_host_build() {
 
 		# Natively compile llvm-tblgen and some other files needed later.
 		SWIFT_BUILD_ROOT=$TERMUX_PKG_HOSTBUILD_DIR $TERMUX_PKG_SRCDIR/swift/utils/build-script \
-		-R --no-assertions -j $TERMUX_MAKE_PROCESSES $SWIFT_PATH_FLAGS \
+		-R --no-assertions -j $TERMUX_PKG_MAKE_PROCESSES $SWIFT_PATH_FLAGS \
 		--skip-build-cmark --skip-build-llvm --skip-build-swift --skip-early-swift-driver \
 		--skip-early-swiftsyntax --build-toolchain-only --host-cc=$CLANG --host-cxx=$CLANGXX
 	fi

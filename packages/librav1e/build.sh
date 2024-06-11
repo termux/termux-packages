@@ -41,7 +41,7 @@ termux_step_pre_configure() {
 
 termux_step_make_install() {
 	cargo install \
-		--jobs $TERMUX_MAKE_PROCESSES \
+		--jobs $TERMUX_PKG_MAKE_PROCESSES \
 		--path . \
 		--force \
 		--locked \
@@ -53,7 +53,7 @@ termux_step_make_install() {
 	cargo cbuild \
 		--release \
 		--prefix $TERMUX_PREFIX \
-		--jobs $TERMUX_MAKE_PROCESSES \
+		--jobs $TERMUX_PKG_MAKE_PROCESSES \
 		--frozen \
 		--target $CARGO_TARGET_NAME
 

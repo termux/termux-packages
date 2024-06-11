@@ -28,7 +28,7 @@ termux_step_host_build() {
 	pushd libt3config
 	tar xf $LIBT3CONFIG_TARFILE --strip-components=1
 	./configure --prefix=$_PREFIX_FOR_BUILD --without-gettext
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j $TERMUX_PKG_MAKE_PROCESSES
 	make install
 	popd
 
@@ -37,7 +37,7 @@ termux_step_host_build() {
 	find $TERMUX_PKG_SRCDIR -mindepth 1 -maxdepth 1 -exec cp -a \{\} ./ \;
 	./configure --prefix=$_PREFIX_FOR_BUILD --without-gettext \
 		LDFLAGS="-Wl,-rpath=$_PREFIX_FOR_BUILD/lib"
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j $TERMUX_PKG_MAKE_PROCESSES
 	make install
 	popd
 
