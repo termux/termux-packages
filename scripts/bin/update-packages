@@ -279,6 +279,10 @@ _should_update() {
 	if [[ " ${_ALREADY_SEEN[*]} ${!_FAILED_UPDATES[*]} " =~ " $(basename "${pkg_dir}") " ]]; then
 		return 1 # Skip.
 	fi
+	if [[ "${BUILD_PACKAGES}" == "true" ]] && [[ "${GITHUB_ACTIONS:-}" == "true" ]] && _gh_check_issue_exists "$(basename "${pkg_dir}")"; then
+		echo "INFO: Skipping '$(basename "${pkg_dir}")', an update issue for it hasn't been resolved yet."
+		return 1
+	fi
 
 	return 0
 }
