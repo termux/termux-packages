@@ -1,6 +1,6 @@
 TERMUX_SUBPKG_DESCRIPTION="A set common files used by the QEMU emulators"
 TERMUX_SUBPKG_DEPENDS="glib, libbz2, libcap-ng, libcurl, libgmp, libgnutls, libnettle, libnfs, libpixman, libssh, zlib, zstd"
-TERMUX_SUBPKG_DEPEND_ON_PARENT=no
+TERMUX_SUBPKG_DEPEND_ON_PARENT=false
 TERMUX_SUBPKG_BREAKS="qemu-system-x86-64 (<< 1:8.0.0), qemu-system-x86-64-headless (<< 1:8.0.0)"
 TERMUX_SUBPKG_REPLACES="qemu-system-x86-64 (<< 1:8.0.0), qemu-system-x86-64-headless (<< 1:8.0.0)"
 
