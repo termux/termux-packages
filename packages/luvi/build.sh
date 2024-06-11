@@ -36,6 +36,7 @@ termux_step_pre_configure() {
 		-DOPENSSL_LIBRARIES=$lib
 		-DPCRE_INCLUDE_DIR=$include
 		-DPCRE_LIBRARIES=$lib
+		-DLPEG_LIBRARY=$lib/liblpeg-5.1.so
 	"
 
 	case "${TERMUX_ARCH}" in

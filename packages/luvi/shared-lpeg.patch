@@ -1,0 +1,20 @@
+diff --git a/deps/lpeg.cmake b/deps/lpeg.cmake
+index d2b8a29..767b0c8 100644
+--- a/deps/lpeg.cmake
++++ b/deps/lpeg.cmake
+@@ -2,13 +2,8 @@ include_directories(
+   ${LPEGLIB_DIR}
+ )
+ 
+-add_library(LPEGLIB
+-  ${LPEGLIB_DIR}/lpcap.c
+-  ${LPEGLIB_DIR}/lpcode.c
+-  ${LPEGLIB_DIR}/lpprint.c
+-  ${LPEGLIB_DIR}/lptree.c
+-  ${LPEGLIB_DIR}/lpvm.c
+-)
++add_library(LPEGLIB SHARED IMPORTED GLOBAL)
++set_target_properties(LPEGLIB PROPERTIES IMPORTED_LOCATION ${LPEG_LIBRARY})
+ 
+ set(EXTRA_LIBS ${EXTRA_LIBS} LPEGLIB)
+ 
