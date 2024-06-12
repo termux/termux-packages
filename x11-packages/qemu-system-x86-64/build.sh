@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.qemu.org
 TERMUX_PKG_DESCRIPTION="A generic and open source machine emulator and virtualizer"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1:8.0.2
+TERMUX_PKG_VERSION=1:8.2.5
 TERMUX_PKG_SRCURL=https://download.qemu.org/qemu-${TERMUX_PKG_VERSION:2}.tar.xz
-TERMUX_PKG_SHA256=f060abd435fbe6794125e2c398568ffc3cfa540042596907a8b18edca34cf6a5
+TERMUX_PKG_SHA256=65693b4a64f28be7501ed0dd3e042478780c516de3f17813d1c32ebb2eb249a9
 TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libbz2, libcairo, libcurl, libepoxy, libgmp, libgnutls, libiconv, libjpeg-turbo, liblzo, libnettle, libnfs, libpixman, libpng, libslirp, libspice-server, libssh, libusb, libusbredir, libx11, mesa, ncurses, pulseaudio, qemu-common, resolv-conf, sdl2, sdl2-image, virglrenderer, zlib, zstd"
 
 # Required by configuration script, but I can't find any binary that uses it.
