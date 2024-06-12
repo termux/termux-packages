@@ -17,6 +17,13 @@ termux_git_clone_src() {
 		git submodule update --init --recursive --depth=1
 		popd
 
+		ACTUAL_CHECKSUM=$(git -c core.abbrev=no -C "$TMP_CHECKOUT" archive --format tar "$TERMUX_PKG_GIT_BRANCH" | sha256sum 2>&1)
+		if [ "$TERMUX_PKG_SHA256" != "${ACTUAL_CHECKSUM%% *}" ]; then
+			>&2 printf "Wrong checksum for %s\nExpected: %s\nActual:   %s\n" \
+				"${TERMUX_PKG_SRCURL:4}" "$TERMUX_PKG_SHA256" "$ACTUAL_CHECKSUM"
+			return 1
+		fi
+
 		echo "$TERMUX_PKG_VERSION" > $TMP_CHECKOUT_VERSION
 	fi
 
