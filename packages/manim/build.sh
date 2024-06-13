@@ -11,7 +11,7 @@ TERMUX_PKG_PYTHON_TARGET_DEPS="av, click, cloup, decorator, importlib-metadata, 
 TERMUX_PKG_PYTHON_COMMON_DEPS="poetry"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_PLATFORM_INDEPENDENT=true
+TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
 
 _SKIA_REPO_URL=git+https://github.com/fonttools/skia
 _SKIA_REPO_BRANCH=chrome/m113-fix-win-x86-no-deps
