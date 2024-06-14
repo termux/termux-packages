@@ -54,7 +54,7 @@ termux_step_make_install() {
 		"$TERMUX_PKG_BUILDDIR"/DOC/{7zC,7zFormat,copying,License,lzma,Methods,readme,src-history}.txt
 	tar -C "$TERMUX_PREFIX"/share/doc/"$TERMUX_PKG_NAME" \
 		-xvf "$TERMUX_PKG_CACHEDIR/$(basename "${TERMUX_PKG_SRCURL[1]}")" MANUAL
-  	# Remove carriage returns from docs
-  	find "$TERMUX_PREFIX"/share/doc/"$TERMUX_PKG_NAME" \
-   		-type f -execdir sed -i -e 's/\r$//g' {} +
+	# Remove carriage returns from docs
+	find "$TERMUX_PREFIX"/share/doc/"$TERMUX_PKG_NAME" \
+		-type f -execdir sed -i -e 's/\r$//g' {} +
 }
