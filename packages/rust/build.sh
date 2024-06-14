@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.rust-lang.org/
 TERMUX_PKG_DESCRIPTION="Systems programming language focused on safety, speed and concurrency"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.78.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="1.79.0"
 TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/rustc-${TERMUX_PKG_VERSION}-src.tar.xz
-TERMUX_PKG_SHA256=8065824f0255faa3901db8206e6f9423f6f8c07cec28bc6f2797c6c948310ece
+TERMUX_PKG_SHA256=ab826e84b8d48ec6eda3370065034dea8c006f6a946d78a9ba12bcb50e6d3c7a
 _LLVM_MAJOR_VERSION=$(. $TERMUX_SCRIPTDIR/packages/libllvm/build.sh; echo $LLVM_MAJOR_VERSION)
 _LLVM_MAJOR_VERSION_NEXT=$((_LLVM_MAJOR_VERSION + 1))
 _LZMA_VERSION=$(. $TERMUX_SCRIPTDIR/packages/liblzma/build.sh; echo $TERMUX_PKG_VERSION)
@@ -29,29 +28,39 @@ share/wasi-sysroot
 
 termux_pkg_auto_update() {
 	local e=0
-	local api_url="https://releases.rs"
-	local api_url_r=$(curl -Ls "${api_url}")
-	local latest_version=$(echo "${api_url_r}" | grep "html" | sed -ne "s|.*Stable: \([0-9]*\+.\+[0-9]*\+.\+[0-9]*\) Beta:.*|\1|p")
+	local api_url1="https://releases.rs"
+	local api_url2="https://forge.rust-lang.org/infra/other-installation-methods.html"
+	local api_url1_r=$(curl -Ls "${api_url1}")
+	local api_url2_r=$(curl -Ls "${api_url2}")
+	local latest_version=$(echo "${api_url1_r}" | grep "html" | sed -ne "s|.*Stable: \([0-9]*\+.\+[0-9]*\+.\+[0-9]*\) Beta:.*|\1|p")
 	if [[ "${latest_version}" == "${TERMUX_PKG_VERSION}" ]]; then
 		echo "INFO: Already up to date."
 		return
 	fi
-	[[ -z "${api_url_r}" ]] && e=1
+	local latest_version_url=$(echo "${api_url2_r}" | grep static.rust-lang.org | sed -nE 's|.*(https.*.xz)".*|\1|p')
+	if [[ -z "$(echo ${latest_version_url} | grep ${latest_version})" ]]; then
+		echo -e "INFO: Not updating to ${latest_version}. Only these are available:\n${latest_version_url}"
+		return
+	fi
+	[[ -z "${api_url1_r}" ]] && e=1
+	[[ -z "${api_url2_r}" ]] && e=1
 	[[ -z "${latest_version}" ]] && e=1
 
 	local uptime_now=$(cat /proc/uptime)
 	local uptime_s="${uptime_now//.*}"
 	local uptime_h_limit=4
 	local uptime_s_limit=$((uptime_h_limit*60*60))
-	[[ -z "${uptime_s}" ]] && e=1
-	[[ "${uptime_s}" == 0 ]] && e=1
+	[[ -z "${uptime_s}" ]] && [[ "$(uname -o)" != "Android" ]] && e=1
+	[[ "${uptime_s}" == 0 ]] && [[ "$(uname -o)" != "Android" ]] && e=1
 	[[ "${uptime_s}" -gt "${uptime_s_limit}" ]] && e=1
 
 	if [[ "${e}" != 0 ]]; then
 		cat <<- EOL >&2
 		WARN: Auto update failure!
-		api_url_r=${api_url_r}
+		api_url1_r=${api_url1_r}
+		api_url2_r=${api_url2_r}
 		latest_version=${latest_version}
+		latest_version_url=${latest_version_url}
 		uptime_now=${uptime_now}
 		uptime_s=${uptime_s}
 		uptime_s_limit=${uptime_s_limit}
@@ -121,7 +130,7 @@ termux_step_configure() {
 	# like 30 to 40 + minutes ... so lets get it right
 
 	# upstream tests build using versions N and N-1
-	local BOOTSTRAP_VERSION=1.77.2
+	local BOOTSTRAP_VERSION=1.78.0
 	if rustup install $BOOTSTRAP_VERSION; then
 	rustup default $BOOTSTRAP_VERSION-x86_64-unknown-linux-gnu
 	export PATH=$HOME/.rustup/toolchains/$BOOTSTRAP_VERSION-x86_64-unknown-linux-gnu/bin:$PATH
@@ -155,6 +164,12 @@ termux_step_configure() {
 
 	# NDK r26
 	export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C link-arg=-lc++_shared"
+
+	# rust 1.79.0
+	# note: ld.lld: error: undefined reference due to --no-allow-shlib-undefined: syncfs
+	"${CC}" ${CPPFLAGS} -c "${TERMUX_PKG_BUILDER_DIR}/syncfs.c"
+	"${AR}" rcu "${RUST_LIBDIR}/libsyncfs.a" syncfs.o
+	export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C link-arg=-l:libsyncfs.a"
 
 	export X86_64_UNKNOWN_LINUX_GNU_OPENSSL_LIB_DIR=/usr/lib/x86_64-linux-gnu
 	export X86_64_UNKNOWN_LINUX_GNU_OPENSSL_INCLUDE_DIR=/usr/include
