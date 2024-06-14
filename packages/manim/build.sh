@@ -9,6 +9,7 @@ TERMUX_PKG_DEPENDS="libc++, ffmpeg, libcairo, pango, xorgproto, python-numpy, py
 TERMUX_PKG_RECOMMENDS="texlive-installer"
 TERMUX_PKG_PYTHON_TARGET_DEPS="av, click, cloup, decorator, importlib-metadata, isosurfaces, manimpango, mapbox-earcut, moderngl, moderngl-window, networkx, pydub, Pygments, rich, screeninfo, skia-pathops, srt, svgelements, tqdm, typing-extensions, watchdog"
 TERMUX_PKG_PYTHON_COMMON_DEPS="poetry"
+TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
