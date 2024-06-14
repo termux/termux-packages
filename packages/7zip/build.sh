@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="7-Zip file archiver with a high compression ratio"
 TERMUX_PKG_LICENSE="LGPL-2.1, BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=24.06
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=(https://www.7-zip.org/a/7z${TERMUX_PKG_VERSION//./}-src.tar.xz
 https://www.7-zip.org/a/7z${TERMUX_PKG_VERSION//./}-linux-arm.tar.xz) # for manual, arm is smallest
 TERMUX_PKG_SHA256=(2aa1660c773525b2ed84d6cd7ff0680c786ec0893b87e4db44654dcb7f5ac8b5
@@ -24,9 +24,6 @@ termux_step_pre_configure() {
 		CFLAGS+=' -march=armv8.1-a+crypto'
 		CXXFLAGS+=' -march=armv8.1-a+crypto'
 	fi
-	# from https://build.opensuse.org/package/view_file/openSUSE:Factory/7zip/7zip.spec?rev=5
-	# Remove carriage returns from docs
-	sed -i -e 's/\r$//g' DOC/*.txt
 	# Remove executable perms from docs
 	chmod -x DOC/*.txt
 	# Remove -Werror to make build succeed
@@ -57,4 +54,7 @@ termux_step_make_install() {
 		"$TERMUX_PKG_BUILDDIR"/DOC/{7zC,7zFormat,copying,License,lzma,Methods,readme,src-history}.txt
 	tar -C "$TERMUX_PREFIX"/share/doc/"$TERMUX_PKG_NAME" \
 		-xvf "$TERMUX_PKG_CACHEDIR/$(basename "${TERMUX_PKG_SRCURL[1]}")" MANUAL
+  	# Remove carriage returns from docs
+  	find "$TERMUX_PREFIX"/share/doc/"$TERMUX_PKG_NAME" \
+   		-type f -execdir sed -i -e 's/\r$//g' {} +
 }
