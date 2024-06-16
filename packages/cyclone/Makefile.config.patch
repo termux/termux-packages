@@ -1,0 +1,16 @@
+https://github.com/termux/termux-packages/pull/20560#issuecomment-2171793305
+
+--- a/Makefile.config
++++ b/Makefile.config
+@@ -90,9 +90,8 @@ DATADIR   ?= $(PREFIX)/share/cyclone
+ DESTDIR   ?=
+ 
+ # Automatically detect platform-specific flags, instead of using autoconf
+-#CYC_PLATFORM_HAS_MEMSTREAM ?= 1
+-CYC_PLATFORM_HAS_MEMSTREAM := $(shell echo "main(){char *buf; int len; open_memstream(&buf, &len);}" | $(CC) -xc - >/dev/null 2>/dev/null && echo 1 || echo 0)
+-CYC_PLATFORM_HAS_FMEMOPEN := $(shell echo "main(){char *buf; fmemopen(&buf, 0, \"r\");}" | $(CC) -xc - >/dev/null 2>/dev/null && echo 1 || echo 0)
++CYC_PLATFORM_HAS_MEMSTREAM ?= 1
++CYC_PLATFORM_HAS_FMEMOPEN ?= 1
+ 
+ # code from chibi's makefile to detect platform
+ ifndef PLATFORM

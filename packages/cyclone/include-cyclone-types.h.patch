@@ -1,0 +1,16 @@
+--- a/include/cyclone/types.h
++++ b/include/cyclone/types.h
+@@ -22,6 +22,13 @@
+ #include <dlfcn.h>
+ #include "cyclone/bignum.h"
+ 
++#if defined(__ANDROID__) && __ANDROID_API__ < 26
++double complex clog(double complex);
++float complex clogf(float complex);
++double complex cpow(double complex, double complex);
++float complex cpowf(float complex, float complex);
++#endif
++
+ #ifdef CYC_HIGH_RES_TIMERS
+ /**
+  * \defgroup hrt High resolution timers
