@@ -7,7 +7,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # $ sudo docker run -it ubuntu bash
 # docker: Error response from daemon: failed to create task for container: failed to start shim: start failed: io.containerd.runc.v2: create new shim socket: listen unix /data/data/com.termux/files/usr/var/run/containerd/s/3f71828f1d6c1ead43fded842abc9c3cf5857c74c3e0704cd83ab177e17cfe6c: bind: invalid argument: exit status 1: unknown.
 TERMUX_PKG_VERSION=1.6.21
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=git+https://github.com/containerd/containerd
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="runc"
@@ -28,7 +28,7 @@ termux_step_make() {
 
 	# issue the build command
 	export BUILDTAGS=no_btrfs
-	make -j ${TERMUX_PKG_MAKE_PROCESSES}
+	SHIM_CGO_ENABLED=1 make -j ${TERMUX_PKG_MAKE_PROCESSES}
 	(unset GOOS GOARCH CGO_LDFLAGS CC CXX CFLAGS CXXFLAGS LDFLAGS
 	make -j ${TERMUX_PKG_MAKE_PROCESSES} man)
 
