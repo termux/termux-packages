@@ -4,11 +4,11 @@ TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_LICENSE_FILE="LICENSES/GPL-3.0-only.txt"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.7.1"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/${TERMUX_PKG_VERSION%.*}/${TERMUX_PKG_VERSION}/submodules/qtbase-everywhere-src-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=b7338da1bdccb4d861e714efffaa83f174dfe37e194916bfd7ec82279a6ace19
-TERMUX_PKG_DEPENDS="brotli, double-conversion, freetype, glib, harfbuzz, libandroid-shmem, libandroid-sysv-semaphore, libc++, libdrm, libice, libicu, libjpeg-turbo, libpng, libsm, libsqlite, libuuid, libx11, libxcb, libxi, libxkbcommon, libwayland, opengl, openssl, pcre2, vulkan-loader, xcb-util-cursor, xcb-util-image, xcb-util-keysyms, xcb-util-renderutil, xcb-util-wm, zlib, zstd"
-TERMUX_PKG_BUILD_DEPENDS="libwayland-protocols, vulkan-headers, vulkan-loader-generic"
+TERMUX_PKG_DEPENDS="brotli, double-conversion, freetype, glib, harfbuzz, libandroid-shmem, libandroid-posix-semaphore, libc++, libdrm, libice, libicu, libjpeg-turbo, libpng, libsm, libsqlite, libuuid, libx11, libxcb, libxi, libxkbcommon, libwayland, opengl, openssl, pcre2, vulkan-loader, xcb-util-cursor, xcb-util-image, xcb-util-keysyms, xcb-util-renderutil, xcb-util-wm, zlib, zstd"
+TERMUX_PKG_BUILD_DEPENDS="binutils-cross, libwayland-protocols, vulkan-headers, vulkan-loader-generic"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_FORCE_CMAKE=true
 TERMUX_PKG_NO_STATICSPLIT=true
@@ -37,6 +37,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DQT_FEATURE_harfbuzz=ON
 -DQT_FEATURE_widgets=ON
 -DQT_FEATURE_zstd=ON
+-DQT_FEATURE_ipc_posix=ON
 -DQT_FORCE_BUILD_TOOLS=ON
 -DQT_HOST_PATH=${TERMUX_PREFIX}/opt/qt6/cross
 "
@@ -117,7 +118,7 @@ termux_step_pre_configure() {
 	termux_setup_ninja
 	[[ "${TERMUX_ARCH}" == "arm" ]] && termux_setup_no_integrated_as
 
-	LDFLAGS+=" -landroid-shmem -landroid-sysv-semaphore"
+	LDFLAGS+=" -landroid-shmem -landroid-posix-semaphore"
 
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
 	-DCMAKE_C_COMPILER_AR=$(command -v llvm-ar)

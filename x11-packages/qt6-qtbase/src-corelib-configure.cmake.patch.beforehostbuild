@@ -1,0 +1,35 @@
+--- a/src/corelib/configure.cmake
++++ b/src/corelib/configure.cmake
+@@ -246,6 +246,10 @@
+ #include <sys/shm.h>
+ #include <fcntl.h>
+ 
++#ifdef __ANDROID__
++#error "Do not build sysv_shm for Android QT"
++#endif
++
+ int main(void)
+ {
+     key_t unix_key = ftok(\"test\", 'Q');
+@@ -263,6 +267,10 @@
+ #include <sys/sem.h>
+ #include <fcntl.h>
+ 
++#ifdef __ANDROID__
++#error "Do not build sysv_sem for Android QT"
++#endif
++
+ int main(void)
+ {
+     key_t unix_key = ftok(\"test\", 'Q');
+@@ -285,8 +296,10 @@
+ 
+ int main(void)
+ {
++#ifndef __ANDROID__
+     shm_open(\"test\", O_RDWR | O_CREAT | O_EXCL, 0666);
+     shm_unlink(\"test\");
++#endif
+     return 0;
+ }
+ ")
