@@ -27,7 +27,7 @@ termux_step_host_build() {
 		--with-jpeg \
 		--with-png \
 		--with-rsvg
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j $TERMUX_PKG_MAKE_PROCESSES
 	make install
 }
 

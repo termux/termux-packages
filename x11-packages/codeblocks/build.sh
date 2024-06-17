@@ -26,8 +26,8 @@ termux_step_post_get_source() {
 
 termux_step_host_build() {
 	"${TERMUX_PKG_SRCDIR}/configure"
-	make -j $TERMUX_MAKE_PROCESSES -C src/base
-	make -j $TERMUX_MAKE_PROCESSES -C src/build_tools
+	make -j $TERMUX_PKG_MAKE_PROCESSES -C src/base
+	make -j $TERMUX_PKG_MAKE_PROCESSES -C src/build_tools
 }
 
 termux_step_pre_configure() {

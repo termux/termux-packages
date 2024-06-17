@@ -5,6 +5,7 @@ TERMUX_PKG_LICENSE_FILE="llvm/LICENSE.TXT"
 TERMUX_PKG_MAINTAINER="@finagolfin"
 LLVM_MAJOR_VERSION=18
 TERMUX_PKG_VERSION=${LLVM_MAJOR_VERSION}.1.7
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=74446ab6943f686391954cbda0d77ae92e8a60c432eff437b8666e121d748ec4
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_SRCURL=https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/llvm-project-${TERMUX_PKG_VERSION}.src.tar.xz
@@ -75,7 +76,7 @@ termux_step_host_build() {
 
 	cmake -G Ninja -DCMAKE_BUILD_TYPE=Release \
 		-DLLVM_ENABLE_PROJECTS='clang;clang-tools-extra;lldb;mlir' $TERMUX_PKG_SRCDIR/llvm
-	ninja -j $TERMUX_MAKE_PROCESSES clang-tblgen clang-pseudo-gen \
+	ninja -j $TERMUX_PKG_MAKE_PROCESSES clang-tblgen clang-pseudo-gen \
 		clang-tidy-confusable-chars-gen lldb-tblgen llvm-tblgen mlir-tblgen mlir-linalg-ods-yaml-gen
 }
 
@@ -106,9 +107,9 @@ termux_step_post_configure() {
 
 termux_step_post_make_install() {
 	if [ "$TERMUX_CMAKE_BUILD" = Ninja ]; then
-		ninja -j $TERMUX_MAKE_PROCESSES docs-{llvm,clang}-man
+		ninja -j $TERMUX_PKG_MAKE_PROCESSES docs-{llvm,clang}-man
 	else
-		make -j $TERMUX_MAKE_PROCESSES docs-{llvm,clang}-man
+		make -j $TERMUX_PKG_MAKE_PROCESSES docs-{llvm,clang}-man
 	fi
 
 	cp docs/man/* $TERMUX_PREFIX/share/man/man1

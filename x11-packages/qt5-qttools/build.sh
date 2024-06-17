@@ -57,7 +57,7 @@ termux_step_post_make_install() {
 			"${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
 				-spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-cross"
 
-			make -j "${TERMUX_MAKE_PROCESSES}"
+			make -j "${TERMUX_PKG_MAKE_PROCESSES}"
 			install -Dm700 "../../bin/${i}" "${TERMUX_PREFIX}/bin/${i}"
 		}
 	done
@@ -79,7 +79,7 @@ termux_step_post_make_install() {
 		"${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
 			-spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-cross"
 
-		make -j "${TERMUX_MAKE_PROCESSES}"
+		make -j "${TERMUX_PKG_MAKE_PROCESSES}"
 		make install
 	}
 
@@ -98,7 +98,7 @@ termux_step_post_make_install() {
 	cd "${TERMUX_PKG_SRCDIR}/src/linguist/linguist" && {
 		"${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
 			-spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-cross"
-		make -j "${TERMUX_MAKE_PROCESSES}"
+		make -j "${TERMUX_PKG_MAKE_PROCESSES}"
 		make install
 	}
 
@@ -124,7 +124,7 @@ termux_step_post_make_install() {
 			"${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
 				-spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-cross"
 
-			make -j "${TERMUX_MAKE_PROCESSES}"
+			make -j "${TERMUX_PKG_MAKE_PROCESSES}"
 			install -Dm700 "../../../bin/${i}" "${TERMUX_PREFIX}/bin/${i}"
 		}
 	done
@@ -151,7 +151,7 @@ termux_step_post_make_install() {
 			"${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
 				-spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-cross"
 
-			make -j "${TERMUX_MAKE_PROCESSES}"
+			make -j "${TERMUX_PKG_MAKE_PROCESSES}"
 			make install
 		}
 	done
@@ -189,7 +189,7 @@ termux_step_post_make_install() {
 		make clean
 		"${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
 			-spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-host"
-		make -j "${TERMUX_MAKE_PROCESSES}"
+		make -j "${TERMUX_PKG_MAKE_PROCESSES}"
 		install -Dm700 \
 			"../../bin/qtattributionsscanner" \
 			"${TERMUX_PREFIX}/opt/qt/cross/bin/qtattributionsscanner"
@@ -200,7 +200,7 @@ termux_step_post_make_install() {
 			make clean
 			"${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
 				-spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-host"
-			make -j "${TERMUX_MAKE_PROCESSES}"
+			make -j "${TERMUX_PKG_MAKE_PROCESSES}"
 			install -Dm700 "../../../bin/${i}" "${TERMUX_PREFIX}/opt/qt/cross/bin/${i}"
 		}
 	done

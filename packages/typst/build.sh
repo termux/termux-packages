@@ -13,7 +13,7 @@ termux_step_make() {
 
 	export GEN_ARTIFACTS=artifacts
 	export OPENSSL_NO_VENDOR=1
-	cargo build --jobs $TERMUX_MAKE_PROCESSES -p typst-cli --target $CARGO_TARGET_NAME --release
+	cargo build --jobs $TERMUX_PKG_MAKE_PROCESSES -p typst-cli --target $CARGO_TARGET_NAME --release
 }
 
 termux_step_make_install() {

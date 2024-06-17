@@ -74,7 +74,7 @@ termux_step_host_build() {
 		-DLLVM_INCLUDE_BENCHMARKS=OFF \
 		-DCOMPILER_RT_INCLUDE_TESTS=OFF \
 		-DLLVM_INCLUDE_TESTS=OFF
-	ninja -j $TERMUX_MAKE_PROCESSES llvm-tblgen
+	ninja -j $TERMUX_PKG_MAKE_PROCESSES llvm-tblgen
 }
 
 # Just before CMake invokation for LLVM:
@@ -130,7 +130,7 @@ termux_step_post_configure() {
 	# Cross-compile & install LLVM
 	cd "$TERMUX_PKG_BUILDDIR"
 	if test -f build.ninja; then
-		ninja -j $TERMUX_MAKE_PROCESSES install
+		ninja -j $TERMUX_PKG_MAKE_PROCESSES install
 	fi
 
 	# Invoke CMake for LDC:
@@ -167,7 +167,7 @@ termux_step_post_configure() {
 
 termux_step_make() {
 	# Cross-compile the runtime libraries
-	$LDC_PATH/bin/ldc-build-runtime --ninja -j $TERMUX_MAKE_PROCESSES \
+	$LDC_PATH/bin/ldc-build-runtime --ninja -j $TERMUX_PKG_MAKE_PROCESSES \
 		--dFlags="-fvisibility=hidden;$LDC_FLAGS" \
 		--cFlags="-I$TERMUX_PREFIX/include" \
 		--targetSystem="Android;Linux;UNIX" \
@@ -178,7 +178,7 @@ termux_step_make() {
 
 	# Cross-compile LDC executables (linked against runtime libs above)
 	if test -f build.ninja; then
-		ninja -j $TERMUX_MAKE_PROCESSES ldc2 ldmd2 ldc-build-runtime ldc-profdata ldc-prune-cache
+		ninja -j $TERMUX_PKG_MAKE_PROCESSES ldc2 ldmd2 ldc-build-runtime ldc-profdata ldc-prune-cache
 	fi
 	echo ".: LDC built successfully."
 

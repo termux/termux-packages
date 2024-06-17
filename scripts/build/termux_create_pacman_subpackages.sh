@@ -83,7 +83,7 @@ termux_create_pacman_subpackages() {
 		SUB_PKG_INSTALLSIZE=$(du -bs . | cut -f 1)
 
 		local PKG_DEPS_SPC=" ${TERMUX_PKG_DEPENDS//,/} "
-		if [ -z "$TERMUX_SUBPKG_DEPEND_ON_PARENT" ] && [ "${PKG_DEPS_SPC/ $SUB_PKG_NAME /}" = "$PKG_DEPS_SPC" ]; then
+		if [ -z "$TERMUX_SUBPKG_DEPEND_ON_PARENT" ] && [ "${PKG_DEPS_SPC/ $SUB_PKG_NAME /}" = "$PKG_DEPS_SPC" ] || [ "$TERMUX_SUBPKG_DEPEND_ON_PARENT" = "true" ]; then
 			# Does pacman supports versioned dependencies?
 			#TERMUX_SUBPKG_DEPENDS+=", $TERMUX_PKG_NAME (= $TERMUX_PKG_FULLVERSION)"
 			TERMUX_SUBPKG_DEPENDS+=", $TERMUX_PKG_NAME"

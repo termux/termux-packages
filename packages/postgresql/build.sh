@@ -41,7 +41,7 @@ termux_step_host_build() {
 	# Build a native zic binary which we have patched to
 	# use symlinks instead of hard links.
 	$TERMUX_PKG_SRCDIR/configure --without-readline
-	make -j "${TERMUX_MAKE_PROCESSES}"
+	make -j "${TERMUX_PKG_MAKE_PROCESSES}"
 }
 
 termux_step_pre_configure() {
@@ -74,6 +74,6 @@ termux_step_post_make_install() {
 		unaccent \
 		uuid-ossp \
 		; do
-		(make -C contrib/${contrib} -s -j ${TERMUX_MAKE_PROCESSES} install)
+		(make -C contrib/${contrib} -s -j ${TERMUX_PKG_MAKE_PROCESSES} install)
 	done
 }

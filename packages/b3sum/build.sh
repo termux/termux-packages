@@ -12,7 +12,7 @@ termux_step_make() {
 
 	cd $TERMUX_PKG_SRCDIR/b3sum
 
-	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
+	cargo build --jobs $TERMUX_PKG_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
 }
 
 termux_step_make_install() {

@@ -20,7 +20,7 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
-	make -j $TERMUX_MAKE_PROCESSES \
+	make -j $TERMUX_PKG_MAKE_PROCESSES \
 		GCC="$CC" CFLAGS_O="$CFLAGS $CPPFLAGS" LDFLAGS="$LDFLAGS" \
 		$TERMUX_PKG_EXTRA_MAKE_ARGS
 }

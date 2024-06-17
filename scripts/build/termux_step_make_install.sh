@@ -3,7 +3,7 @@ termux_step_make_install() {
 	[ "$TERMUX_PKG_METAPACKAGE" = "true" ] && return
 
 	if test -f build.ninja; then
-		ninja -j $TERMUX_MAKE_PROCESSES install
+		ninja -j $TERMUX_PKG_MAKE_PROCESSES install
 	elif test -f setup.py || test -f pyproject.toml || test -f setup.cfg; then
 		pip install --no-deps . --prefix $TERMUX_PREFIX
 	elif ls ./*.cabal &>/dev/null; then
@@ -24,7 +24,7 @@ termux_step_make_install() {
 	elif test -f Cargo.toml; then
 		termux_setup_rust
 		cargo install \
-			--jobs $TERMUX_MAKE_PROCESSES \
+			--jobs $TERMUX_PKG_MAKE_PROCESSES \
 			--path . \
 			--force \
 			--locked \

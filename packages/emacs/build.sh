@@ -115,7 +115,7 @@ termux_step_host_build() {
 	ln -s $TERMUX_PKG_SRCDIR/lisp $NATIVE_PREFIX/share/emacs/${_VERSION}/lisp
 	( cd $TERMUX_PKG_SRCDIR; ./autogen.sh )
 	$TERMUX_PKG_SRCDIR/configure --prefix=$NATIVE_PREFIX --without-all --without-x
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j $TERMUX_PKG_MAKE_PROCESSES
 }
 
 termux_step_post_configure() {

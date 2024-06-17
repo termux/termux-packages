@@ -47,7 +47,7 @@ termux_step_make_install() {
 		BOOSTAM=32
 	fi
 
-	./b2 target-os=android -j${TERMUX_MAKE_PROCESSES} \
+	./b2 target-os=android -j${TERMUX_PKG_MAKE_PROCESSES} \
 		define=BOOST_FILESYSTEM_DISABLE_STATX \
 		include=$TERMUX_PREFIX/include \
 		toolset=clang-$TERMUX_ARCH \

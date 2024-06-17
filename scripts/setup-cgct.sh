@@ -8,7 +8,7 @@
 set -e -u
 
 ARCH="x86_64"
-REPO_URL="https://service.termux-pacman.dev/gpkg-dev/${ARCH}"
+REPO_URL="https://service.termux-pacman.dev/cgct/${ARCH}"
 
 if [ "$ARCH" != "$(uname -m)" ]; then
 	echo "Error: the requested CGCT is not supported on your architecture"
@@ -37,7 +37,7 @@ fi
 
 # Installing CGCT
 echo "Installing CGCT..."
-curl "${REPO_URL}/gpkg-dev.json" -o "${TMPDIR_CGCT}/cgct.json"
+curl "${REPO_URL}/cgct.json" -o "${TMPDIR_CGCT}/cgct.json"
 for pkgname in ${!CGCT[@]}; do
 	SHA256SUM=$(jq -r '."'$pkgname'"."SHA256SUM"' "${TMPDIR_CGCT}/cgct.json")
 	if [ "$SHA256SUM" = "null" ]; then

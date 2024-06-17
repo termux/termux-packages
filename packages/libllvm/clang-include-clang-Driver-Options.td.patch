@@ -2,6 +2,19 @@ diff --git a/clang/include/clang/Driver/Options.td b/clang/include/clang/Driver/
 index 59e1337599b2..656545555349 100644
 --- a/clang/include/clang/Driver/Options.td
 +++ b/clang/include/clang/Driver/Options.td
+@@ -5370,6 +5370,12 @@
+   Flags<[NoArgumentUnused]>,
+   HelpText<"Do not add -rpath with architecture-specific resource directory to the linker flags. "
+   "When --hip-link is specified, do not add -rpath with HIP runtime library directory to the linker flags">;
++defm openmp_implicit_rpath: BoolFOption<"openmp-implicit-rpath",
++  LangOpts<"OpenMP">,
++  DefaultTrue,
++  PosFlag<SetTrue, [], [ClangOption, CC1Option, FlangOption, FC1Option], "Useless option, for compatibility only">,
++  NegFlag<SetFalse>,
++  BothFlags<[NoArgumentUnused]>>;
+ def offload_add_rpath: Flag<["--"], "offload-add-rpath">,
+   Flags<[NoArgumentUnused]>,
+   Alias<frtlib_add_rpath>;
 @@ -4879,6 +4879,10 @@ defm spec_constr_count : BooleanFFlag<"spec-constr-count">, Group<clang_ignored_
  defm stack_check : BooleanFFlag<"stack-check">, Group<clang_ignored_f_Group>;
  defm strength_reduce :

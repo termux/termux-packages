@@ -35,7 +35,7 @@ termux_step_host_build() {
 		-DCMAKE_MESSAGE_LOG_LEVEL=STATUS \
 		-DINSTALL_PUBLICBINDIR=${TERMUX_PREFIX}/opt/qt6/cross/bin
 	ninja \
-		-j ${TERMUX_MAKE_PROCESSES} \
+		-j ${TERMUX_PKG_MAKE_PROCESSES} \
 		install
 
 	mkdir -p ${TERMUX_PREFIX}/opt/qt6/cross/bin
@@ -43,7 +43,7 @@ termux_step_host_build() {
 		-exec echo "{}" \; \
 		-exec cat "{}" \; \
 		-exec sed -e "s|^${TERMUX_PREFIX}/opt/qt6/cross|..|g" -i "{}" \;
-	cat $PWD/user_facing_tool_links.txt | xargs -P${TERMUX_MAKE_PROCESSES} -L1 ln -sv
+	cat $PWD/user_facing_tool_links.txt | xargs -P${TERMUX_PKG_MAKE_PROCESSES} -L1 ln -sv
 }
 
 termux_step_pre_configure() {
@@ -62,5 +62,5 @@ termux_step_post_make_install() {
 	find ${TERMUX_PKG_BUILDDIR} -type f -name user_facing_tool_links.txt \
 		-exec echo "{}" \; \
 		-exec cat "{}" \;
-	cat $PWD/user_facing_tool_links.txt | xargs -P${TERMUX_MAKE_PROCESSES} -L1 ln -sv
+	cat $PWD/user_facing_tool_links.txt | xargs -P${TERMUX_PKG_MAKE_PROCESSES} -L1 ln -sv
 }

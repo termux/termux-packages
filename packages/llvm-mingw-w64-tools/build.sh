@@ -22,7 +22,7 @@ termux_step_make() {
 	pushd mingw-w64-tools/gendef
 	mkdir -p build && cd build
 	../configure --host=$TERMUX_HOST_PLATFORM --prefix="$_INSTALL_PREFIX"
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j $TERMUX_PKG_MAKE_PROCESSES
 	make install-strip
 	mkdir -p "$_INSTALL_PREFIX/share/gendef"
 	install -m644 ../COPYING "$_INSTALL_PREFIX/share/gendef"
@@ -35,7 +35,7 @@ termux_step_make() {
 				--prefix="$_INSTALL_PREFIX" \
 				--target=x86_64-w64-mingw32 \
 				--with-widl-includedir="$_INCLUDE_DIR"
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j $TERMUX_PKG_MAKE_PROCESSES
 	make install-strip
 	mkdir -p "$_INSTALL_PREFIX/share/widl"
 	install -m644 ../../../COPYING "$_INSTALL_PREFIX/share/widl"

@@ -52,7 +52,7 @@ termux_step_configure() {
 
 termux_step_make() {
 	make depend
-	make -j $TERMUX_MAKE_PROCESSES all
+	make -j $TERMUX_PKG_MAKE_PROCESSES all
 }
 
 termux_step_make_install() {

@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A self-hosted comment system"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Moraxyc <termux@qaq.li>"
 TERMUX_PKG_VERSION=2.8.6
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(https://github.com/ArtalkJS/Artalk/archive/v${TERMUX_PKG_VERSION}.tar.gz
                    https://github.com/ArtalkJS/Artalk/releases/download/v${TERMUX_PKG_VERSION}/artalk_ui.tar.gz)
 TERMUX_PKG_SHA256=(1d6abad32da1fe88dcc38bda3a61070820126598b2fdba2c9f5808b72d0d0fd1
@@ -10,16 +11,51 @@ TERMUX_PKG_SHA256=(1d6abad32da1fe88dcc38bda3a61070820126598b2fdba2c9f5808b72d0d0
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
+termux_pkg_auto_update() {
+	local latest_tag
+	latest_tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL[0]}" "${TERMUX_PKG_UPDATE_TAG_TYPE}")"
+	(( ${#latest_tag} )) || {
+		printf '%s\n' \
+		'WARN: Auto update failure!' \
+		"latest_tag=${latest_tag}"
+	return
+	} >&2
+
+	if [[ "${latest_tag}" == "${TERMUX_PKG_VERSION}" ]]; then
+		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
+		return
+	fi
+
+	local tmpdir
+	tmpdir="$(mktemp -d)"
+	curl -so "${tmpdir}/src" "https://github.com/ArtalkJS/Artalk/archive/v${latest_tag}.tar.gz"
+	curl -so "${tmpdir}/ui"  "https://github.com/ArtalkJS/Artalk/releases/download/v${latest_tag}/artalk_ui.tar.gz"
+	local -a sha=(
+		"$(sha256sum "${tmpdir}/src" | cut -d ' ' -f 1)"
+		"$(sha256sum "${tmpdir}/ui"  | cut -d ' ' -f 1)"
+	)
+
+	sed \
+		-e "s|${TERMUX_PKG_SHA256[0]}|${sha[0]}|" \
+		-e "s|${TERMUX_PKG_SHA256[1]}|${sha[1]}|" \
+		-i "${TERMUX_PKG_BUILDER_DIR}/build.sh"
+
+	rm -fr "${tmpdir}"
+
+	printf '%s\n' 'INFO: Generated checksums:' "${sha[@]}"
+	termux_pkg_upgrade_version "${latest_tag}"
+}
+
 termux_step_post_get_source() {
 	mv artalk_ui/* public
 }
 
 termux_step_make() {
 	termux_setup_golang
+	local _gitCommit ldflags
 
-	local ldflags
-	local _gitCommit=$(git ls-remote https://github.com/ArtalkJS/Artalk refs/tags/v$TERMUX_PKG_VERSION | head -c 7)
 	export CGO_ENABLED=1
+	_gitCommit=$(git ls-remote https://github.com/ArtalkJS/Artalk refs/tags/v$TERMUX_PKG_VERSION | head -c 7)
 
 	ldflags="\
 	-w -s \

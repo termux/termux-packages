@@ -14,7 +14,7 @@ TERMUX_PKG_SUGGESTS="clang, make, pkg-config, fmt"
 TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
 
 termux_step_make() {
-	make RELEASE=1 -j$TERMUX_MAKE_PROCESSES
+	make RELEASE=1 -j$TERMUX_PKG_MAKE_PROCESSES
 }
 
 termux_step_make_install() {

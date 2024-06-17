@@ -14,5 +14,5 @@ termux_step_configure() {
 }
 
 termux_step_make() {
-	LD="$CC $LDFLAGS" CC="$CC $CFLAGS $CPPFLAGS $LDFLAGS" make -j $TERMUX_MAKE_PROCESSES generic
+	LD="$CC $LDFLAGS" CC="$CC $CFLAGS $CPPFLAGS $LDFLAGS" make -j $TERMUX_PKG_MAKE_PROCESSES generic
 }

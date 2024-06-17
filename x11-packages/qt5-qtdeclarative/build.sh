@@ -22,7 +22,7 @@ termux_step_pre_configure () {
 	pushd "${TERMUX_PKG_SRCDIR}/src/qmltyperegistrar"
 	"${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
 		-spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-host"
-	make -j "${TERMUX_MAKE_PROCESSES}"
+	make -j "${TERMUX_PKG_MAKE_PROCESSES}"
 	popd
 
 	#######################################################
@@ -57,7 +57,7 @@ termux_step_post_make_install () {
 			"${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
 				-spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-cross"
 
-			make -j "${TERMUX_MAKE_PROCESSES}"
+			make -j "${TERMUX_PKG_MAKE_PROCESSES}"
 			install -Dm700 "../../bin/${i}" "${TERMUX_PREFIX}/bin/${i}"
 		}
 	done
@@ -69,7 +69,7 @@ termux_step_post_make_install () {
 			"${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
 				-spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-cross"
 
-			make -j "${TERMUX_MAKE_PROCESSES}"
+			make -j "${TERMUX_PKG_MAKE_PROCESSES}"
 			install -Dm700 "../../bin/${i}" "${TERMUX_PREFIX}/bin/${i}"
 		}
 	done
@@ -105,7 +105,7 @@ termux_step_post_make_install () {
 		"${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
 			-spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-host"
 
-		make -j "${TERMUX_MAKE_PROCESSES}"
+		make -j "${TERMUX_PKG_MAKE_PROCESSES}"
 		install -Dm644 ../../lib/libQt5QmlDevTools.a "${TERMUX_PREFIX}/opt/qt/cross/lib/libQt5QmlDevTools.a"
 		install -Dm644 ../../lib/libQt5QmlDevTools.prl "${TERMUX_PREFIX}/opt/qt/cross/lib/libQt5QmlDevTools.prl"
 	}
@@ -118,7 +118,7 @@ termux_step_post_make_install () {
 			"${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
 				-spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-host"
 
-			make -j "${TERMUX_MAKE_PROCESSES}"
+			make -j "${TERMUX_PKG_MAKE_PROCESSES}"
 			install -Dm700 "../../bin/${i}" "${TERMUX_PREFIX}/opt/qt/cross/bin/${i}"
 		}
 	done
@@ -130,7 +130,7 @@ termux_step_post_make_install () {
 			"${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
 				-spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-host"
 
-			make -j "${TERMUX_MAKE_PROCESSES}"
+			make -j "${TERMUX_PKG_MAKE_PROCESSES}"
 			install -Dm700 "../../bin/${i}" "${TERMUX_PREFIX}/opt/qt/cross/bin/${i}"
 		}
 	done

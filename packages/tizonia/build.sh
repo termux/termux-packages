@@ -17,7 +17,7 @@ termux_step_host_build() {
 	local srcdir="$TERMUX_PKG_SRCDIR"/3rdparty/dbus-cplusplus
 	autoreconf -fi "$srcdir"
 	"$srcdir"/configure --prefix=$_PREFIX_FOR_BUILD
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j $TERMUX_PKG_MAKE_PROCESSES
 	make install
 }
 

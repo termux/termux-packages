@@ -31,7 +31,7 @@ termux_step_host_build() {
 	pushd libxml2
 	$TERMUX_PKG_SRCDIR/libxml2/configure --prefix=$_PREFIX_FOR_BUILD \
 		--without-python
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j $TERMUX_PKG_MAKE_PROCESSES
 	make install
 	popd
 
@@ -39,14 +39,14 @@ termux_step_host_build() {
 	pushd neon
 	$TERMUX_PKG_SRCDIR/neon/configure --prefix=$_PREFIX_FOR_BUILD \
 		--with-libxml2
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j $TERMUX_PKG_MAKE_PROCESSES
 	make install
 	popd
 
 	termux_setup_cmake
 
 	cmake $TERMUX_PKG_SRCDIR
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j $TERMUX_PKG_MAKE_PROCESSES
 
 	unset PKG_CONFIG_PATH
 }

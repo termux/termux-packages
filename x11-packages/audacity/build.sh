@@ -73,7 +73,7 @@ termux_step_pre_configure() {
 		--enable-avcodec \
 		--enable-avformat \
 		--disable-asm
-	make -j ${TERMUX_MAKE_PROCESSES}
+	make -j ${TERMUX_PKG_MAKE_PROCESSES}
 	make install
 	popd
 

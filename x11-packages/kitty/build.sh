@@ -61,11 +61,11 @@ termux_step_host_build() {
 
 	pushd "xcb-proto-${xcb_proto_ver}"
 	./configure --prefix "${TERMUX_PKG_HOSTBUILD_DIR}"
-	make -j "${TERMUX_MAKE_PROCESSES}" install
+	make -j "${TERMUX_PKG_MAKE_PROCESSES}" install
 	popd
 	pushd "libxcb-${libxcb_ver}"
 	./configure --prefix "${TERMUX_PKG_HOSTBUILD_DIR}"
-	make -j "${TERMUX_MAKE_PROCESSES}" install
+	make -j "${TERMUX_PKG_MAKE_PROCESSES}" install
 	popd
 	pushd "libxkbcommon-xkbcommon-${libxkbcommon_ver}"
 	${TERMUX_MESON} \
@@ -76,11 +76,11 @@ termux_step_host_build() {
 		-Denable-docs=false
 	ninja \
 		-C ${TERMUX_PKG_HOSTBUILD_DIR}/build-xkbcommon \
-		-j "${TERMUX_MAKE_PROCESSES}" install
+		-j "${TERMUX_PKG_MAKE_PROCESSES}" install
 	popd
 	pushd "libX11-${libx11_ver}"
 	./configure --prefix "${TERMUX_PKG_HOSTBUILD_DIR}"
-	make -j "${TERMUX_MAKE_PROCESSES}" install
+	make -j "${TERMUX_PKG_MAKE_PROCESSES}" install
 	popd
 
 	pushd "${TERMUX_PKG_SRCDIR}"

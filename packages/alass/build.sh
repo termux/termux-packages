@@ -16,7 +16,7 @@ termux_step_pre_configure() {
 termux_step_make_install() {
 	termux_setup_rust
 	cargo install \
-		--jobs $TERMUX_MAKE_PROCESSES \
+		--jobs $TERMUX_PKG_MAKE_PROCESSES \
 		--path alass-cli \
 		--force \
 		--locked \

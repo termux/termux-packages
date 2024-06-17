@@ -25,7 +25,7 @@ termux_step_host_build() {
 		-DCMAKE_INSTALL_PREFIX=${TERMUX_PREFIX}/opt/qt6/cross \
 		-DCMAKE_MESSAGE_LOG_LEVEL=STATUS
 	ninja \
-		-j ${TERMUX_MAKE_PROCESSES} \
+		-j ${TERMUX_PKG_MAKE_PROCESSES} \
 		install
 }
 

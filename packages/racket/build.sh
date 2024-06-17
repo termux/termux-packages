@@ -26,7 +26,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_host_build() {
 	"$TERMUX_PKG_SRCDIR"/src/configure \
 		$TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS
-	make -j "$TERMUX_MAKE_PROCESSES"
+	make -j "$TERMUX_PKG_MAKE_PROCESSES"
 }
 
 termux_step_pre_configure() {

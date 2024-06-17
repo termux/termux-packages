@@ -13,7 +13,7 @@ ac_cv_file__usr_X_include_X11_X_h=no
 ac_cv_file__usr_X11R6_include_X11_X_h=no
 ac_cv_func_setpgrp_void=yes
 "
-TERMUX_MAKE_PROCESSES=1
+TERMUX_PKG_MAKE_PROCESSES=1
 TERMUX_PKG_HOSTBUILD=true
 
 termux_step_post_get_source() {

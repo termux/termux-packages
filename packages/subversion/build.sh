@@ -20,7 +20,7 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_make_install() {
-	make -j $TERMUX_MAKE_PROCESSES install-swig-pl-lib
+	make -j $TERMUX_PKG_MAKE_PROCESSES install-swig-pl-lib
 
 	pushd subversion/bindings/swig/perl/native
 	# it's probably not needed to pass all flags to both perl and make
@@ -32,7 +32,7 @@ termux_step_post_make_install() {
 		perl Makefile.PL PREFIX="$TERMUX_PREFIX"
 	popd
 
-	make -j $TERMUX_MAKE_PROCESSES PREFIX="$TERMUX_PREFIX" \
+	make -j $TERMUX_PKG_MAKE_PROCESSES PREFIX="$TERMUX_PREFIX" \
 		PERL_MM_USE_DEFAULT=1 INSTALLDIRS=site CC="$CC" LD="$CC" \
 		OPTIMIZE="$CFLAGS" CFLAGS="$CFLAGS" CCFLAGS="$CFLAGS" \
 		LDFLAGS="$LDFLAGS -lperl" LDDLFLAGS="-shared $CFLAGS $LDFLAGS -lperl" \
