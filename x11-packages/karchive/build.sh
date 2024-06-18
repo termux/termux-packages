@@ -1,10 +1,13 @@
 TERMUX_PKG_HOMEPAGE=https://www.kde.org/
-TERMUX_PKG_DESCRIPTION="Qt 5 addon providing access to numerous types of archives (KDE)"
+TERMUX_PKG_DESCRIPTION="Qt addon providing access to numerous types of archives (KDE)"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="5.112.0"
+TERMUX_PKG_VERSION="6.3.0"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/karchive-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=27d697a52a5016c16081c6a414b390d96350450d6eeb889d1f463358eeebfd67
+TERMUX_PKG_SHA256=27807f5707668f9aa41c898eba90198a3083577fdab9f4751a02fefe63674e29
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="libbz2, libc++, liblzma, qt5-qtbase, zlib, zstd"
-TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules, qt5-qtbase-cross-tools, qt5-qttools-cross-tools"
+TERMUX_PKG_DEPENDS="libbz2, libc++, liblzma, qt6-qtbase, zlib, zstd"
+TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules, qt6-qttools"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DCMAKE_SYSTEM_NAME=Linux
+"
