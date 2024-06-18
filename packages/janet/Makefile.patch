@@ -1,0 +1,48 @@
+diff --git a/Makefile b/Makefile
+index e3af90c9..3eb56c13 100644
+--- a/Makefile
++++ b/Makefile
+@@ -29,7 +29,7 @@ INCLUDEDIR?=$(PREFIX)/include
+ BINDIR?=$(PREFIX)/bin
+ LIBDIR?=$(PREFIX)/lib
+ JANET_BUILD?="\"$(shell git log --pretty=format:'%h' -n 1 2> /dev/null || echo local)\""
+-CLIBS=-lm -lpthread
++CLIBS=$(LDFLAGS) -lm
+ JANET_TARGET=build/janet
+ JANET_BOOT=build/janet_boot
+ JANET_IMPORT_LIB=build/janet.lib
+@@ -77,7 +77,7 @@ ifeq ($(UNAME), Darwin)
+ 	JANET_LIBRARY=build/libjanet.dylib
+ 	LDCONFIG:=true
+ else ifeq ($(UNAME), Linux)
+-	CLIBS:=$(CLIBS) -lrt -ldl
++	CLIBS:=$(CLIBS) -ldl
+ endif
+ 
+ # For other unix likes, add flags here!
+@@ -87,10 +87,10 @@ ifeq ($(UNAME), Haiku)
+ endif
+ # For Android (termux)
+ ifeq ($(UNAME), Linux) # uname on Darwin doesn't recognise -o
+-ifeq ($(shell uname -o), Android)
++#ifeq ($(shell uname -o), Android)
+ 	CLIBS:=$(CLIBS) -landroid-spawn
+ endif
+-endif
++#endif
+ 
+ # Mingw
+ ifeq ($(findstring MINGW,$(UNAME)), MINGW)
+@@ -182,10 +182,10 @@ JANET_BOOT_OBJECTS=$(patsubst src/%.c,build/%.boot.o,$(JANET_CORE_SOURCES) $(JAN
+ $(JANET_BOOT_OBJECTS): $(JANET_BOOT_HEADERS)
+ 
+ build/%.boot.o: src/%.c $(JANET_HEADERS) $(JANET_LOCAL_HEADERS) Makefile
+-	$(CC) $(BOOT_CFLAGS) -o $@ -c $<
++	clang $(BOOT_CFLAGS) -o $@ -c $<
+ 
+ $(JANET_BOOT): $(JANET_BOOT_OBJECTS)
+-	$(CC) $(BOOT_CFLAGS) -o $@ $(JANET_BOOT_OBJECTS) $(CLIBS)
++	clang $(BOOT_CFLAGS) -o $@ $(JANET_BOOT_OBJECTS) -lm -ldl -lrt -lpthread
+ 
+ # Now the reason we bootstrap in the first place
+ build/c/janet.c: $(JANET_BOOT) src/boot/boot.janet
