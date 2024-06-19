@@ -1,0 +1,41 @@
+diff --git a/src/nvim/CMakeLists.txt b/src/nvim/CMakeLists.txt
+index 937cfaaa3..fbac79152 100644
+--- a/src/nvim/CMakeLists.txt
++++ b/src/nvim/CMakeLists.txt
+@@ -500,8 +504,8 @@
+     "${NVIM_VERSION_DEF_H}"
+   DEPENDS "${PROJECT_BINARY_DIR}/cmake.config/auto/versiondef-$<CONFIG>.h")
+ 
+-set(LUA_GEN ${LUA_GEN_PRG} ${GENERATOR_PRELOAD} ${PROJECT_SOURCE_DIR} $<TARGET_FILE:nlua0> ${PROJECT_BINARY_DIR})
++set(LUA_GEN ${LUA_GEN_PRG} ${GENERATOR_PRELOAD} ${PROJECT_SOURCE_DIR} "${PROJECT_BINARY_DIR}/../host-build/libnlua0.so" ${PROJECT_BINARY_DIR})
+ set(LUA_GEN_DEPS ${GENERATOR_PRELOAD} $<TARGET_FILE:nlua0>)
+ 
+ # NVIM_GENERATED_FOR_HEADERS: generated headers to be included in headers
+ # NVIM_GENERATED_FOR_SOURCES: generated headers to be included in sources
+@@ -913,7 +913,7 @@ file(GLOB LUA_SOURCES CONFIGURE_DEPENDS
+ )
+ 
+ add_target(doc-vim
+-  COMMAND $<TARGET_FILE:nvim_bin> -u NONE -l scripts/gen_vimdoc.lua
++  COMMAND "${PROJECT_BINARY_DIR}/../host-build/bin/nvim" -u NONE -l scripts/gen_vimdoc.lua
+   DEPENDS
+     nvim
+     ${API_SOURCES}
+@@ -927,7 +927,7 @@ add_target(doc-vim
+   )
+ 
+ add_target(doc-eval
+-  COMMAND $<TARGET_FILE:nvim_bin> -u NONE -l ${PROJECT_SOURCE_DIR}/scripts/gen_eval_files.lua
++  COMMAND "${PROJECT_BINARY_DIR}/../host-build/bin/nvim" -u NONE -l ${PROJECT_SOURCE_DIR}/scripts/gen_eval_files.lua
+   DEPENDS
+     nvim
+     ${FUNCS_METADATA}
+@@ -942,7 +942,7 @@ add_custom_target(doc)
+ add_dependencies(doc doc-vim doc-eval)
+ 
+ add_target(lintdoc
+-  COMMAND $<TARGET_FILE:nvim_bin> -u NONE -l scripts/lintdoc.lua
++  COMMAND "${PROJECT_BINARY_DIR}/../host-build/bin/nvim" -u NONE -l scripts/lintdoc.lua
+   DEPENDS ${DOCFILES}
+   CUSTOM_COMMAND_ARGS USES_TERMINAL)
+ add_dependencies(lintdoc nvim)
