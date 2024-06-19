@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Swift is a high-performance system programming language"
 TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_MAINTAINER="@finagolfin"
 TERMUX_PKG_VERSION=5.10.1
+TERMUX_PKG_REVISION=1
 SWIFT_RELEASE="RELEASE"
 TERMUX_PKG_SRCURL=https://github.com/apple/swift/archive/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE.tar.gz
 TERMUX_PKG_SHA256=087c59a1b79c46dd23f8e6cb4fe12a27935a5b6581282f48db952827bb3fdf57
@@ -108,10 +109,10 @@ termux_step_host_build() {
 		local CLANGXX=$(command -v clang++)
 
 		# The Ubuntu CI may not have clang/clang++ in its path so explicitly set it
-		# to clang-15 instead.
+		# to clang-17 instead.
 		if [ -z "$CLANG" ]; then
-			CLANG=$(command -v clang-15)
-			CLANGXX=$(command -v clang++-15)
+			CLANG=$(command -v clang-17)
+			CLANGXX=$(command -v clang++-17)
 		fi
 
 		# Natively compile llvm-tblgen and some other files needed later.
