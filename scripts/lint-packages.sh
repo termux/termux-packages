@@ -6,7 +6,7 @@ TERMUX_SCRIPTDIR=$(realpath "$(dirname "$0")/../")
 . "$TERMUX_SCRIPTDIR/scripts/properties.sh"
 
 check_package_license() {
-	local pkg_licenses=$1
+	local pkg_licenses="$1"
 	local license
 	local license_ok=true
 	local IFS
