@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Modular compiler and toolchain technologies library"
 TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_LICENSE_FILE="llvm/LICENSE.TXT"
 TERMUX_PKG_MAINTAINER="@finagolfin"
+# Keep flang version and revision in sync when updating (enforced by check in termux_step_pre_configure).
 LLVM_MAJOR_VERSION=18
 TERMUX_PKG_VERSION=${LLVM_MAJOR_VERSION}.1.7
 TERMUX_PKG_REVISION=1
@@ -81,6 +82,13 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
+	# Version guard to keep flang in sync
+	local flang_version=$(. $TERMUX_SCRIPTDIR/packages/flang/build.sh; echo ${TERMUX_PKG_VERSION})
+	local flang_revision=$( unset TERMUX_PKG_REVISION; . $TERMUX_SCRIPTDIR/packages/flang/build.sh; echo ${TERMUX_PKG_REVISION:-0})
+	if [ "${flang_version}" != "${TERMUX_PKG_VERSION}" ] || [ "${flang_revision}" != "${TERMUX_PKG_REVISION}" ]; then
+		termux_error_exit "Version mismatch between libllvm and flang. libllvm=$TERMUX_PKG_VERSION:$TERMUX_PKG_REVISION, flang=$flang_version:$flang_revision"
+	fi
+
 	# Add unknown vendor, otherwise it screws with the default LLVM triple
 	# detection.
 	export LLVM_DEFAULT_TARGET_TRIPLE=${CCTERMUX_HOST_PLATFORM/-/-unknown-}
