@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A project in-between luv and luvit."
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="Komo @cattokomo"
 TERMUX_PKG_VERSION=20240216
+TERMUX_PKG_REVISION=2
 _commit=b85da58f2549a519486a7296f5b836a8f6a64880
 _version=2.14.0
 TERMUX_PKG_GIT_BRANCH=master
@@ -36,6 +37,7 @@ termux_step_pre_configure() {
 		-DOPENSSL_LIBRARIES=$lib
 		-DPCRE_INCLUDE_DIR=$include
 		-DPCRE_LIBRARIES=$lib
+		-DLPEG_LIBRARY=$lib/liblpeg-5.1.so
 	"
 
 	case "${TERMUX_ARCH}" in
