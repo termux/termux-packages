@@ -2,7 +2,7 @@ TERMUX_SUBPKG_DESCRIPTION="Utilities for handling block device attributes"
 TERMUX_SUBPKG_DEPENDS="libblkid, libmount, libsmartcols, libuuid"
 TERMUX_SUBPKG_BREAKS="util-linux (<< 2.38.1-1)"
 TERMUX_SUBPKG_REPLACES="util-linux (<< 2.38.1-1)"
-TERMUX_SUBPKG_DEPEND_ON_PARENT="no"
+TERMUX_SUBPKG_DEPEND_ON_PARENT=false
 TERMUX_SUBPKG_INCLUDE="
 bin/blkdiscard
 bin/blkid
