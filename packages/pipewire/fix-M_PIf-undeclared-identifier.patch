@@ -1,0 +1,251 @@
+From f7d59bcea7fcfa5bb9d7ec334c92e23c22483005 Mon Sep 17 00:00:00 2001
+From: Wim Taymans <wtaymans@redhat.com>
+Date: Tue, 18 Jun 2024 15:41:12 +0200
+Subject: [PATCH] fix compilation some more
+
+The math M_*f symbols are GNU extensions.
+---
+ spa/plugins/alsa/test-timer.c                    |  2 +-
+ spa/plugins/audioconvert/hilbert.h               |  5 +++--
+ spa/plugins/audiotestsrc/render.c                |  2 +-
+ src/examples/audio-dsp-src.c                     |  2 +-
+ src/examples/audio-src.c                         |  2 +-
+ src/examples/export-sink.c                       |  2 +-
+ src/examples/export-source.c                     |  2 +-
+ src/modules/module-filter-chain/builtin_plugin.c | 12 ++++++------
+ src/modules/module-filter-chain/pffft.c          | 12 ++++++------
+ src/modules/module-filter-chain/sofa_plugin.c    |  2 +-
+ 10 files changed, 22 insertions(+), 21 deletions(-)
+
+diff --git a/spa/plugins/alsa/test-timer.c b/spa/plugins/alsa/test-timer.c
+index 283fe7cef0..6fa39ab723 100644
+--- a/spa/plugins/alsa/test-timer.c
++++ b/spa/plugins/alsa/test-timer.c
+@@ -16,7 +16,7 @@
+ 
+ #define DEFAULT_DEVICE	"hw:0"
+ 
+-#define M_PI_M2f (M_PIf + M_PIf)
++#define M_PI_M2f (float)(M_PI+M_PI)
+ 
+ #define BW_PERIOD	(SPA_NSEC_PER_SEC * 3)
+ 
+diff --git a/spa/plugins/audioconvert/hilbert.h b/spa/plugins/audioconvert/hilbert.h
+index 76218d90c9..7abef708d5 100644
+--- a/spa/plugins/audioconvert/hilbert.h
++++ b/spa/plugins/audioconvert/hilbert.h
+@@ -13,11 +13,12 @@ extern "C" {
+ #include <stddef.h>
+ #include <math.h>
+ 
++
+ static inline void blackman_window(float *taps, int n_taps)
+ {
+ 	int n;
+ 	for (n = 0; n < n_taps; n++) {
+-		float w = 2.0f * M_PIf * n / (n_taps-1);
++		float w = 2.0f * (float)M_PI * n / (n_taps-1);
+ 		taps[n] = 0.3635819f - 0.4891775f * cosf(w)
+ 			+ 0.1365995f * cosf(2 * w) - 0.0106411f * cosf(3 * w);
+ 	}
+@@ -33,7 +34,7 @@ static inline int hilbert_generate(float *taps, int n_taps)
+ 	for (i = 0; i < n_taps; i++) {
+ 		int k = -(n_taps / 2) + i;
+ 		if (k & 1) {
+-			float pk = M_PIf * k;
++			float pk = (float)M_PI * k;
+ 			taps[i] *= (1.0f - cosf(pk)) / pk;
+ 		} else {
+ 			taps[i] = 0.0f;
+diff --git a/spa/plugins/audiotestsrc/render.c b/spa/plugins/audiotestsrc/render.c
+index 7ddcf28bc2..16ff52b7c0 100644
+--- a/spa/plugins/audiotestsrc/render.c
++++ b/spa/plugins/audiotestsrc/render.c
+@@ -4,7 +4,7 @@
+ 
+ #include <math.h>
+ 
+-#define M_PI_M2f ( M_PIf + M_PIf )
++#define M_PI_M2f (float)(M_PI+M_PI)
+ 
+ #define DEFINE_SINE(type,scale)								\
+ static void										\
+diff --git a/src/examples/audio-dsp-src.c b/src/examples/audio-dsp-src.c
+index 0aa1c850f0..135d2e27e3 100644
+--- a/src/examples/audio-dsp-src.c
++++ b/src/examples/audio-dsp-src.c
+@@ -16,7 +16,7 @@
+ #include <pipewire/pipewire.h>
+ #include <pipewire/filter.h>
+ 
+-#define M_PI_M2f ( M_PIf + M_PIf )
++#define M_PI_M2f (float)(M_PI+M_PI)
+ 
+ #define DEFAULT_RATE		44100
+ #define DEFAULT_FREQ		440
+diff --git a/src/examples/audio-src.c b/src/examples/audio-src.c
+index d309b1083c..08c93421ed 100644
+--- a/src/examples/audio-src.c
++++ b/src/examples/audio-src.c
+@@ -17,7 +17,7 @@
+ 
+ #include <pipewire/pipewire.h>
+ 
+-#define M_PI_M2f ( M_PIf + M_PIf )
++#define M_PI_M2f (float)(M_PI+M_PI)
+ 
+ #define DEFAULT_RATE		44100
+ #define DEFAULT_CHANNELS	2
+diff --git a/src/examples/export-sink.c b/src/examples/export-sink.c
+index 4bc3ed1960..0a5644f8dd 100644
+--- a/src/examples/export-sink.c
++++ b/src/examples/export-sink.c
+@@ -29,7 +29,7 @@
+ 
+ #include "sdl.h"
+ 
+-#define M_PI_M2f ( M_PIf + M_PIf )
++#define M_PI_M2f (float)(M_PI+M_PI)
+ 
+ #define MAX_BUFFERS	64
+ 
+diff --git a/src/examples/export-source.c b/src/examples/export-source.c
+index c94fdee08a..85af5b7276 100644
+--- a/src/examples/export-source.c
++++ b/src/examples/export-source.c
+@@ -23,7 +23,7 @@
+ 
+ #include <pipewire/pipewire.h>
+ 
+-#define M_PI_M2f ( M_PIf + M_PIf )
++#define M_PI_M2f (float)(M_PI + M_PI)
+ 
+ #define BUFFER_SAMPLES	128
+ #define MAX_BUFFERS	32
+diff --git a/src/modules/module-filter-chain/builtin_plugin.c b/src/modules/module-filter-chain/builtin_plugin.c
+index 2901b80558..b873932145 100644
+--- a/src/modules/module-filter-chain/builtin_plugin.c
++++ b/src/modules/module-filter-chain/builtin_plugin.c
+@@ -752,10 +752,10 @@ static float *create_hilbert(const char *filename, float gain, int delay, int of
+         if (samples == NULL)
+ 		return NULL;
+ 
+-	gain *= 2 / M_PIf;
++	gain *= 2 / (float)M_PI;
+ 	h = length / 2;
+ 	for (i = 1; i < h; i += 2) {
+-		v = (gain / i) * (0.43f + 0.57f * cosf(i * M_PIf / h));
++		v = (gain / i) * (0.43f + 0.57f * cosf(i * (float)M_PI / h));
+ 		samples[delay + h + i] = -v;
+ 		samples[delay + h - i] =  v;
+ 	}
+@@ -1453,7 +1453,7 @@ static struct fc_port exp_ports[] = {
+ 	{ .index = 4,
+ 	  .name = "Base",
+ 	  .flags = FC_PORT_INPUT | FC_PORT_CONTROL,
+-	  .def = M_Ef, .min = -10.0f, .max = 10.0f
++	  .def = (float)M_E, .min = -10.0f, .max = 10.0f
+ 	},
+ };
+ 
+@@ -1510,7 +1510,7 @@ static struct fc_port log_ports[] = {
+ 	{ .index = 4,
+ 	  .name = "Base",
+ 	  .flags = FC_PORT_INPUT | FC_PORT_CONTROL,
+-	  .def = M_Ef, .min = 2.0f, .max = 100.0f
++	  .def = (float)M_E, .min = 2.0f, .max = 100.0f
+ 	},
+ 	{ .index = 5,
+ 	  .name = "M1",
+@@ -1611,7 +1611,7 @@ static const struct fc_descriptor mult_desc = {
+ 	.cleanup = builtin_cleanup,
+ };
+ 
+-#define M_PI_M2f ( M_PIf + M_PIf )
++#define M_PI_M2f (float)(M_PI+M_PI)
+ 
+ /* sine */
+ static void sine_run(void * Instance, unsigned long SampleCount)
+@@ -1658,7 +1658,7 @@ static struct fc_port sine_ports[] = {
+ 	{ .index = 4,
+ 	  .name = "Phase",
+ 	  .flags = FC_PORT_INPUT | FC_PORT_CONTROL,
+-	  .def = 0.0f, .min = -M_PIf, .max = M_PIf
++	  .def = 0.0f, .min = (float)-M_PI, .max = (float)M_PI
+ 	},
+ 	{ .index = 5,
+ 	  .name = "Offset",
+diff --git a/src/modules/module-filter-chain/pffft.c b/src/modules/module-filter-chain/pffft.c
+index 64909a44aa..6ec105c020 100644
+--- a/src/modules/module-filter-chain/pffft.c
++++ b/src/modules/module-filter-chain/pffft.c
+@@ -1273,7 +1273,7 @@ static void rffti1_ps(int n, float *wa, int *ifac)
+ 	int k1, j, ii;
+ 
+ 	int nf = decompose(n, ifac, ntryh);
+-	float argh = (2 * M_PIf) / n;
++	float argh = (2 * (float)M_PI) / n;
+ 	int is = 0;
+ 	int nfm1 = nf - 1;
+ 	int l1 = 1;
+@@ -1306,7 +1306,7 @@ static void cffti1_ps(int n, float *wa, int *ifac)
+ 	int k1, j, ii;
+ 
+ 	int nf = decompose(n, ifac, ntryh);
+-	float argh = (2 * M_PIf) / (float)n;
++	float argh = (2 * (float)M_PI) / (float)n;
+ 	int i = 1;
+ 	int l1 = 1;
+ 	for (k1 = 1; k1 <= nf; k1++) {
+@@ -1440,7 +1440,7 @@ static PFFFT_Setup *new_setup_simd(int N, pffft_transform_t transform)
+ 			int i = k / SIMD_SZ;
+ 			int j = k % SIMD_SZ;
+ 			for (m = 0; m < SIMD_SZ - 1; ++m) {
+-				float A = -2 * M_PIf * (m + 1) * k / N;
++				float A = -2 * (float)M_PI * (m + 1) * k / N;
+ 				s->e[(2 * (i * 3 + m) + 0) * SIMD_SZ + j] =
+ 				    cosf(A);
+ 				s->e[(2 * (i * 3 + m) + 1) * SIMD_SZ + j] =
+@@ -1453,7 +1453,7 @@ static PFFFT_Setup *new_setup_simd(int N, pffft_transform_t transform)
+ 			int i = k / SIMD_SZ;
+ 			int j = k % SIMD_SZ;
+ 			for (m = 0; m < SIMD_SZ - 1; ++m) {
+-				float A = -2 * M_PIf * (m + 1) * k / N;
++				float A = -2 * (float)M_PI * (m + 1) * k / N;
+ 				s->e[(2 * (i * 3 + m) + 0) * SIMD_SZ + j] =
+ 				    cosf(A);
+ 				s->e[(2 * (i * 3 + m) + 1) * SIMD_SZ + j] =
+@@ -1765,7 +1765,7 @@ static NEVER_INLINE(void) pffft_real_finalize(int Ncvec, const v4sf * in,
+ 	v4sf_union cr, ci, *uout = (v4sf_union *) out;
+ 	v4sf save = in[7], zero = VZERO();
+ 	float xr0, xi0, xr1, xi1, xr2, xi2, xr3, xi3;
+-	static const float s = M_SQRT2f / 2;
++	static const float s = (float)M_SQRT2 / 2;
+ 
+ 	cr.v = in[0];
+ 	ci.v = in[Ncvec * 2 - 1];
+@@ -1871,7 +1871,7 @@ static NEVER_INLINE(void) pffft_real_preprocess(int Ncvec, const v4sf * in,
+ 
+ 	v4sf_union Xr, Xi, *uout = (v4sf_union *) out;
+ 	float cr0, ci0, cr1, ci1, cr2, ci2, cr3, ci3;
+-	static const float s = M_SQRT2f;
++	static const float s = (float)M_SQRT2;
+ 	assert(in != out);
+ 	for (k = 0; k < 4; ++k) {
+ 		Xr.f[k] = ((float *)in)[8 * k];
+diff --git a/src/modules/module-filter-chain/sofa_plugin.c b/src/modules/module-filter-chain/sofa_plugin.c
+index be4e4b6bbb..53a3c90b67 100644
+--- a/src/modules/module-filter-chain/sofa_plugin.c
++++ b/src/modules/module-filter-chain/sofa_plugin.c
+@@ -229,7 +229,7 @@ static void spatializer_reload(void * Instance)
+ 	);
+ 
+ 	// TODO: make use of delay
+-	if ((left_delay || right_delay) && (!isnan(left_delay) || !isnan(right_delay))) {
++	if ((left_delay != 0.0f || right_delay != 0.0f) && (!isnan(left_delay) || !isnan(right_delay))) {
+ 		pw_log_warn("delay dropped l: %f, r: %f", left_delay, right_delay);
+ 	}
+ 
+-- 
+GitLab
+
