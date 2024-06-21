@@ -10,6 +10,9 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_SETUP_PYTHON=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-python
+--with-zlib
+--with-lzma
+--with-http
 "
 TERMUX_PKG_RM_AFTER_INSTALL="share/gtk-doc"
 TERMUX_PKG_DEPENDS="libiconv, liblzma, zlib"
