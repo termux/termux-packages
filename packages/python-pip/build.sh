@@ -8,7 +8,7 @@ TERMUX_PKG_SRCURL=https://github.com/pypa/pip/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=ad0dfe75fb28092a8cbe18523391695ceb0c0d65a5c9a969349fcb13b12b84c7
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
-TERMUX_PKG_UPDATE_VERSION_REGEXP='\d+\.\d+\.\d+'
+TERMUX_PKG_UPDATE_VERSION_REGEXP='^\d+\.\d+(\.\d+)?$'
 TERMUX_PKG_DEPENDS="clang, make, pkg-config, python (>= 3.11.1-1)"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="clang"
 TERMUX_PKG_BREAKS="python (<< 3.11.1-1)"
