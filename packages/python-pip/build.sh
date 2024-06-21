@@ -17,10 +17,13 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, setuptools==67.8, docutils, myst_parser, sphinx_copybutton, sphinx_inline_tabs, sphinxcontrib.towncrier, completion"
 
 termux_pkg_auto_update() {
-	local latest_tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}" "${TERMUX_PKG_UPDATE_TAG_TYPE}")"
+	local tag
+	tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}" "${TERMUX_PKG_UPDATE_TAG_TYPE}")"
 
-	if ! grep -oP "${TERMUX_PKG_UPDATE_VERSION_REGEXP}" <<< "${latest_tag}"; then
-		echo "INFO: No update needed, tag '${latest_tag}' is not a stable release."
+	if grep -oP "${TERMUX_PKG_UPDATE_VERSION_REGEXP}" <<< "${tag}"; then
+		termux_pkg_upgrade_version "${tag}"
+	else
+		echo "INFO: No update needed, tag '${tag}' is not a stable release."
 	fi
 }
 
