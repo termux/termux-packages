@@ -1,0 +1,20 @@
+--- a/Makefile
++++ b/Makefile
+@@ -1,7 +1,7 @@
+ .POSIX:
+ .SUFFIXES:
+ 
+-CXX = c++
++CXX ?= c++
+ 
+ debug = no
+ static = no
+@@ -33,7 +33,7 @@
+ version = $(shell cat .version 2>/dev/null || git describe --tags HEAD 2>/dev/null | sed s/^v// || echo unknown)
+ version != cat .version 2>/dev/null || ( git describe --tags HEAD 2>/dev/null | sed s/^v// ) || echo unknown
+ 
+-PREFIX = /usr/local
++PREFIX ?= /usr/local
+ DESTDIR = # root dir
+ 
+ bindir = $(DESTDIR)$(PREFIX)/bin

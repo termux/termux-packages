@@ -1,29 +1,20 @@
 --- a/Makefile
 +++ b/Makefile
-@@ -24,7 +24,7 @@
- 
+@@ -25,7 +25,7 @@
  WARNFLAGS=-Werror -Wall -Wextra -Wunreachable-code
  INCLUDES=-Iinclude -Istfl -Ifilter -I. -Irss -I$(CARGO_TARGET_DIR)/cxxbridge/
--BARE_CXXFLAGS=-std=c++11 -O2 -ggdb $(INCLUDES)
-+BARE_CXXFLAGS=-std=c++11 -O2 $(INCLUDES)
+ # Keep in sync with c++ version specified in FFI build.rs
+-BARE_CXXFLAGS=-std=c++14 -O2 -ggdb $(INCLUDES)
++BARE_CXXFLAGS=-std=c++14 -O2 $(INCLUDES)
  LDFLAGS+=-L.
  
  # Constants
-@@ -56,7 +56,7 @@
+@@ -57,7 +57,7 @@
  NEWSBOAT=newsboat
  NEWSBOAT_SRCS:=$(shell cat mk/newsboat.deps)
  NEWSBOAT_OBJS:=$(patsubst %.cpp,%.o,$(NEWSBOAT_SRCS))
 -NEWSBOAT_LIBS=-lboat -lnewsboat -lfilter -lpthread -lrsspp -ldl
-+NEWSBOAT_LIBS=-lboat -lnewsboat -lfilter -lrsspp -landroid-glob -ldl
++NEWSBOAT_LIBS=-lboat -lnewsboat -lfilter -lpthread -lrsspp -landroid-glob -ldl
  
  RSSPPLIB_SRCS=$(sort $(wildcard rss/*.cpp))
  RSSPPLIB_OBJS=$(patsubst rss/%.cpp,rss/%.o,$(RSSPPLIB_SRCS))
-@@ -65,7 +65,7 @@
- PODBOAT=podboat
- PODBOAT_SRCS:=$(shell cat mk/podboat.deps)
- PODBOAT_OBJS:=$(patsubst %.cpp,%.o,$(PODBOAT_SRCS))
--PODBOAT_LIBS=-lboat -lnewsboat -lfilter -lpthread -ldl
-+PODBOAT_LIBS=-lboat -lnewsboat -lfilter -ldl
- 
- TEST_SRCS:=$(wildcard test/*.cpp test/test_helpers/*.cpp)
- TEST_OBJS:=$(patsubst %.cpp,%.o,$(TEST_SRCS))

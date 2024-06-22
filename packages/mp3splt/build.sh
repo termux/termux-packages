@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://mp3splt.sourceforge.net
+TERMUX_PKG_HOMEPAGE=https://mp3splt.sourceforge.net
 TERMUX_PKG_DESCRIPTION="Utility to split mp3, ogg vorbis and FLAC files without decoding"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

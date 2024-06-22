@@ -1,11 +1,10 @@
-TERMUX_PKG_HOMEPAGE=http://openscad.org/
+TERMUX_PKG_HOMEPAGE=https://openscad.org/
 TERMUX_PKG_DESCRIPTION="The programmers solid 3D CAD modeller (headless build)"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2019.05
-TERMUX_PKG_REVISION=10
+TERMUX_PKG_VERSION=2021.01
 TERMUX_PKG_SRCURL=https://files.openscad.org/openscad-$TERMUX_PKG_VERSION.src.tar.gz
-TERMUX_PKG_SHA256=0a16c4263ce52380819dd91c609a719d38f12f6b8c4da0e828dcbe5b70996f59
+TERMUX_PKG_SHA256=d938c297e7e5f65dbab1461cac472fc60dfeaa4999ea2c19b31a4184f2d70359
 TERMUX_PKG_DEPENDS="boost, double-conversion, fontconfig, freetype, glib, harfbuzz, libc++, libgmp, libmpfr, libxml2, libzip"
 TERMUX_PKG_BUILD_DEPENDS="boost-headers, cgal, eigen"
 TERMUX_PKG_GROUPS="science"

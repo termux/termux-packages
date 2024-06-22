@@ -1,9 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://www.kde.org/
 TERMUX_PKG_DESCRIPTION="Large set of desktop Qt widgets (KDE)"
 TERMUX_PKG_LICENSE="LGPL-2.1"
-TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
-TERMUX_PKG_VERSION=5.101.0
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="5.112.0"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/kwidgetsaddons-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=78913d3303e94329db964bf072b9e565bd582fbbd026310dce6e994c8d083823
+TERMUX_PKG_SHA256=2b7a1cf73b99bbc7a95ef04c79971b8b5d8909e085815d0e04f452de08f8b574
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libc++, qt5-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules, qt5-qtbase-cross-tools, qt5-qttools-cross-tools"

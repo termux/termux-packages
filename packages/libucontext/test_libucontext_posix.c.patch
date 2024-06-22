@@ -1,0 +1,18 @@
+https://github.com/termux/termux-packages/issues/15852
+
+--- a/test_libucontext_posix.c
++++ b/test_libucontext_posix.c
+@@ -9,6 +9,13 @@
+ #include <string.h>
+ #include <ucontext.h>
+ 
++#ifdef __ANDROID__
++int getcontext (ucontext_t *);
++int setcontext(const ucontext_t *);
++int swapcontext(ucontext_t *, const ucontext_t *);
++void makecontext(ucontext_t *, void (*)(), int, ...);
++#endif
++
+ static ucontext_t ctx[3];
+ 
+ 

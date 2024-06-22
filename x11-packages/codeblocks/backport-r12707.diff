@@ -1,0 +1,127 @@
+------------------------------------------------------------------------
+r12707 | wh11204 | 2022-02-08 00:55:51 +0900 (Tue, 08 Feb 2022) | 3 lines
+
+- Fix compilation of notebookstyles.cpp with wxWidgets-master.
+This change allows testing C::B with the upcoming wx3.1.6.
+
+------------------------------------------------------------------------
+Index: src/src/notebookstyles.cpp
+===================================================================
+--- src/src/notebookstyles.cpp	(revision 12706)
++++ src/src/notebookstyles.cpp	(revision 12707)
+@@ -124,8 +124,16 @@
+     if (page.bitmap.IsOk())
+     {
+         bitmap_offset = tab_x + 8;
++        // draw bitmap
++#if wxCHECK_VERSION(3, 1, 6)
++        const wxBitmap bmp(page.bitmap.GetBitmapFor(wnd));
++        dc.DrawBitmap(bmp,
++                      bitmap_offset,
++                      drawn_tab_yoff + (drawn_tab_height/2) - (bmp.GetHeight()/2),
++                      true);
+ 
+-        // draw bitmap
++        text_offset = bitmap_offset + bmp.GetWidth();
++#else
+         dc.DrawBitmap(page.bitmap,
+                       bitmap_offset,
+                       drawn_tab_yoff + (drawn_tab_height/2) - (page.bitmap.GetHeight()/2),
+@@ -132,6 +140,7 @@
+                       true);
+ 
+         text_offset = bitmap_offset + page.bitmap.GetWidth();
++#endif
+         text_offset += 3; // bitmap padding
+     }
+      else
+@@ -161,13 +170,23 @@
+     // draw 'x' on tab (if enabled)
+     if (close_button_state != wxAUI_BUTTON_STATE_HIDDEN)
+     {
+-        int close_button_width = m_activeCloseBmp.GetWidth();
+-        wxBitmap bmp = m_disabledCloseBmp;
++        wxBitmap bmp;
+ 
++#if wxCHECK_VERSION(3, 1, 6)
+         if ((close_button_state == wxAUI_BUTTON_STATE_HOVER) ||
+                     (close_button_state == wxAUI_BUTTON_STATE_PRESSED))
++            bmp = m_activeCloseBmp.GetBitmapFor(wnd);
++        else
++            bmp = m_disabledCloseBmp.GetBitmapFor(wnd);
++#else
++        if ((close_button_state == wxAUI_BUTTON_STATE_HOVER) ||
++                    (close_button_state == wxAUI_BUTTON_STATE_PRESSED))
+             bmp = m_activeCloseBmp;
++        else
++            bmp = m_disabledCloseBmp;
++#endif
+ 
++        const int close_button_width = bmp.GetWidth();
+         wxRect rect(tab_x + tab_width - close_button_width - 3,
+                     drawn_tab_yoff + (drawn_tab_height / 2) - (bmp.GetHeight() / 2),
+                     close_button_width, tab_height);
+@@ -285,11 +304,20 @@
+     int text_offset = tab_x + 8;
+ 
+     int bitmap_offset = 0;
++
+     if (page.bitmap.IsOk())
+     {
+         bitmap_offset = tab_x + 8;
++        // draw bitmap
++#if wxCHECK_VERSION(3, 1, 6)
++        const wxBitmap bmp(page.bitmap.GetBitmapFor(wnd));
++        dc.DrawBitmap(bmp,
++                      bitmap_offset,
++                      drawn_tab_yoff + (drawn_tab_height/2) - (bmp.GetHeight()/2),
++                      true);
+ 
+-        // draw bitmap
++        text_offset = bitmap_offset + bmp.GetWidth();
++#else
+         dc.DrawBitmap(page.bitmap,
+                       bitmap_offset,
+                       drawn_tab_yoff + (drawn_tab_height/2) - (page.bitmap.GetHeight()/2),
+@@ -296,6 +324,7 @@
+                       true);
+ 
+         text_offset = bitmap_offset + page.bitmap.GetWidth();
++#endif
+         text_offset += 3; // bitmap padding
+     }
+      else
+@@ -303,7 +332,6 @@
+         text_offset = tab_x + 8;
+     }
+ 
+-
+     // if the caption is empty, measure some temporary text
+     wxString caption = page.caption;
+     if (caption.empty())
+@@ -325,13 +353,23 @@
+     // draw 'x' on tab (if enabled)
+     if (close_button_state != wxAUI_BUTTON_STATE_HIDDEN)
+     {
+-        int close_button_width = m_activeCloseBmp.GetWidth();
+-        wxBitmap bmp = m_disabledCloseBmp;
++        wxBitmap bmp;
+ 
++#if wxCHECK_VERSION(3, 1, 6)
+         if ((close_button_state == wxAUI_BUTTON_STATE_HOVER) ||
+                     (close_button_state == wxAUI_BUTTON_STATE_PRESSED))
++            bmp = m_activeCloseBmp.GetBitmapFor(wnd);
++        else
++            bmp = m_disabledCloseBmp.GetBitmapFor(wnd);
++#else
++        if ((close_button_state == wxAUI_BUTTON_STATE_HOVER) ||
++                    (close_button_state == wxAUI_BUTTON_STATE_PRESSED))
+             bmp = m_activeCloseBmp;
++        else
++            bmp = m_disabledCloseBmp;
++#endif
+ 
++        const int close_button_width = bmp.GetWidth();
+         wxRect rect(tab_x + tab_width - close_button_width - 3,
+                     drawn_tab_yoff + (drawn_tab_height / 2) - (bmp.GetHeight() / 2),
+                     close_button_width, tab_height);

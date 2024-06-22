@@ -2,9 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://z-push.org/
 TERMUX_PKG_DESCRIPTION="An open-source application to synchronize ActiveSync compatible devices and Outlook"
 TERMUX_PKG_LICENSE="AGPL-V3"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.6.4
+TERMUX_PKG_VERSION="2.7.3"
 TERMUX_PKG_SRCURL=https://github.com/Z-Hub/Z-Push/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=7795ae7165fa3fb39a6ba40ca3e79609767e0c78c01857ede0f7014b90b27431
+TERMUX_PKG_SHA256=89a052dd585b2858c499bea2514ce360f510a6ede469216f4498c050d7a420fa
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="apache2, php"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -26,4 +27,3 @@ termux_step_create_debscripts() {
 	mkdir -p $TERMUX_PREFIX/var/log/z-push
 	EOF
 }
-

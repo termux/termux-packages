@@ -16,5 +16,5 @@ TERMUX_PKG_EXTRA_MAKE_ARGS="DESTDIR=$TERMUX_PREFIX BINDIR=$TERMUX_PREFIX/bin \
 termux_step_post_make_install() {
 	mkdir -p $TERMUX_PREFIX/etc/bash_completion.d/
 	cp $TERMUX_PKG_SRCDIR/debian/bash-completion \
-	   $TERMUX_PREFIX/etc/bash_completion.d/apt-file
+		$TERMUX_PREFIX/etc/bash_completion.d/apt-file
 }

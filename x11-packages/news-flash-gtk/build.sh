@@ -3,10 +3,13 @@ TERMUX_PKG_DESCRIPTION="A modern feed reader designed for the GNOME desktop"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.0.2
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/patchedsoul/news-flash/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=bc4ce6aa7cd26409d5d9a7ffa539214c9907c7b263eb88f46d8bbab7546fd323
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libcairo, libhandy-0.0, libsqlite, libxml2, openssl-1.1, pango, webkit2gtk-4.1"
+TERMUX_PKG_BUILD_DEPENDS="libsoup"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
@@ -22,7 +25,7 @@ termux_step_pre_configure() {
 
 	local p=$TERMUX_PKG_BUILDER_DIR/webkit2gtk-sys.diff
 	local d
-	for d in $CARGO_HOME/registry/src/github.com-*/webkit2gtk-sys-*; do
+	for d in $CARGO_HOME/registry/src/*/webkit2gtk-sys-*; do
 		echo "Applying $(basename ${p}) to $(basename ${d})"
 		patch --silent -p1 -d ${d} < ${p} || :
 	done
@@ -65,7 +68,7 @@ termux_step_configure() {
 
 termux_step_make() {
 	cargo build \
-		--jobs $TERMUX_MAKE_PROCESSES \
+		--jobs $TERMUX_PKG_MAKE_PROCESSES \
 		--target $CARGO_TARGET_NAME \
 		--release
 }

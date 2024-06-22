@@ -1,0 +1,29 @@
+--- godot-4.0-stable/modules/mbedtls/crypto_mbedtls.cpp	2023-03-01 03:38:07.000000000 +0300
++++ godot-4.0-stable/modules/mbedtls/crypto_mbedtls.cpp.patch	2023-03-04 01:02:23.259279050 +0300
+@@ -67,7 +67,7 @@
+ 	if (p_public_only) {
+ 		ret = mbedtls_pk_parse_public_key(&pkey, out.ptr(), out.size());
+ 	} else {
+-		ret = mbedtls_pk_parse_key(&pkey, out.ptr(), out.size(), nullptr, 0);
++		ret = mbedtls_pk_parse_key(&pkey, out.ptr(), out.size(), nullptr, 0, 0, nullptr);
+ 	}
+ 	// We MUST zeroize the memory for safety!
+ 	mbedtls_platform_zeroize(out.ptrw(), out.size());
+@@ -106,7 +106,7 @@
+ 	if (p_public_only) {
+ 		ret = mbedtls_pk_parse_public_key(&pkey, (unsigned char *)p_string_key.utf8().get_data(), p_string_key.utf8().size());
+ 	} else {
+-		ret = mbedtls_pk_parse_key(&pkey, (unsigned char *)p_string_key.utf8().get_data(), p_string_key.utf8().size(), nullptr, 0);
++		ret = mbedtls_pk_parse_key(&pkey, (unsigned char *)p_string_key.utf8().get_data(), p_string_key.utf8().size(), nullptr, 0, 0, nullptr);
+ 	}
+ 	ERR_FAIL_COND_V_MSG(ret, FAILED, "Error parsing key '" + itos(ret) + "'.");
+ 
+@@ -407,7 +407,7 @@
+ 	size_t sig_size = 0;
+ 	unsigned char buf[MBEDTLS_MPI_MAX_SIZE];
+ 	Vector<uint8_t> out;
+-	int ret = mbedtls_pk_sign(&(key->pkey), type, p_hash.ptr(), size, buf, &sig_size, mbedtls_ctr_drbg_random, &ctr_drbg);
++	int ret = mbedtls_pk_sign(&(key->pkey), type, p_hash.ptr(), size, buf, sizeof(buf)/sizeof(char), &sig_size, mbedtls_ctr_drbg_random, &ctr_drbg);
+ 	ERR_FAIL_COND_V_MSG(ret, out, "Error while signing: " + itos(ret));
+ 	out.resize(sig_size);
+ 	memcpy(out.ptrw(), buf, sig_size);

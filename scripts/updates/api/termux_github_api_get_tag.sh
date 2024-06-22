@@ -2,7 +2,7 @@
 termux_github_api_get_tag() {
 	if [[ -z "$1" ]]; then
 		termux_error_exit <<-EndOfUsage
-			Usage: ${FUNCNAME[0]} PKG_SRCURL [TAG_TYPE]
+			Usage: ${FUNCNAME[0]} PKG_SRCURL [TAG_TYPE [FILTER_REGEX]]
 			Returns the latest tag of the given package.
 		EndOfUsage
 	fi
@@ -14,19 +14,25 @@ termux_github_api_get_tag() {
 
 	local PKG_SRCURL="$1"
 	local TAG_TYPE="${2:-}"
+	local FILTER_REGEX="${3:-}"
 
 	local project
 	project="$(echo "${PKG_SRCURL}" | cut -d'/' -f4-5)"
-	project="${project%.git}"
+	project="${project#git+}"
 
 	if [[ -z "${TAG_TYPE}" ]]; then # If not set, then decide on the basis of url.
-		if [[ "${PKG_SRCURL: -4}" == ".git" ]]; then
+		if [[ "${PKG_SRCURL:0:4}" == "git+" ]]; then
 			# Get newest tag.
 			TAG_TYPE="newest-tag"
 		else
 			# Get the latest release tag.
 			TAG_TYPE="latest-release-tag"
 		fi
+	fi
+	if [[ -n "${FILTER_REGEX}" && "${TAG_TYPE}" != "latest-regex" ]]; then
+		termux_error_exit <<-EndOfError
+		ERROR: You can only specify a regex with TAG_TYPE="latest-regex"
+		EndOfError
 	fi
 
 	local jq_filter
@@ -71,6 +77,9 @@ termux_github_api_get_tag() {
 	elif [[ "${TAG_TYPE}" == "latest-release-tag" ]]; then
 		api_url="${api_url}/repos/${project}/releases/latest"
 		jq_filter=".tag_name"
+	elif [[ "${TAG_TYPE}" == "latest-regex" ]]; then
+		api_url="${api_url}/repos/${project}/releases"
+		jq_filter=".[].tag_name"
 	else
 		termux_error_exit <<-EndOfError
 			ERROR: Invalid TAG_TYPE: '${TAG_TYPE}'.
@@ -88,17 +97,29 @@ termux_github_api_get_tag() {
 
 	local tag_name
 	if [[ "${http_code}" == "200" ]]; then
-		if jq --exit-status --raw-output "${jq_filter}" <<<"${response}" >/dev/null; then
-			tag_name="$(jq --exit-status --raw-output "${jq_filter}" <<<"${response}")"
+		if [[ "${FILTER_REGEX}" ]]; then
+			if jq --exit-status --raw-output "${jq_filter}" <<<"${response}" >/dev/null; then
+				tag_name="$(jq --exit-status --raw-output "${jq_filter}" <<<"${response}" \
+					| sed 's/^v//' | grep -P "${FILTER_REGEX}" | head -n 1)"
+				if [[ -z "${tag_name}" ]]; then
+					termux_error_exit "ERROR: No tags matched regex '${FILTER_REGEX}' in '${response}'"
+				fi
+			else
+				termux_error_exit "ERROR: Failed to parse tag name from: '${response}'"
+			fi
 		else
-			termux_error_exit "ERROR: Failed to parse tag name from: '${response}'"
+			if jq --exit-status --raw-output "${jq_filter}" <<<"${response}" >/dev/null; then
+				tag_name="$(jq --exit-status --raw-output "${jq_filter}" <<<"${response}")"
+			else
+				termux_error_exit "ERROR: Failed to parse tag name from: '${response}'"
+			fi
 		fi
 	elif [[ "${http_code}" == "404" ]]; then
 		if jq --exit-status "has(\"message\") and .message == \"Not Found\"" <<<"${response}"; then
 			termux_error_exit <<-EndOfError
 				ERROR: No '${TAG_TYPE}' found (${api_url}).
 					Try using '$(
-					if [ ${TAG_TYPE} = "newest-tag" ]; then
+					if [ "${TAG_TYPE}" = "newest-tag" ]; then
 						echo "latest-release-tag"
 					else
 						echo "newest-tag"

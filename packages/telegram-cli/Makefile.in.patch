@@ -1,14 +1,11 @@
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -4,9 +4,9 @@
+@@ -4,7 +4,7 @@
  LDFLAGS=@LDFLAGS@ @OPENSSL_LDFLAGS@
  CPPFLAGS=@CPPFLAGS@ @OPENSSL_INCLUDES@
  DEFS=@DEFS@
 -COMPILE_FLAGS=${CFLAGS} ${CPFLAGS} ${CPPFLAGS} ${DEFS} -Wall -Werror -Wextra -Wno-missing-field-initializers -Wno-deprecated-declarations -fno-strict-aliasing -fno-omit-frame-pointer -ggdb -Wno-unused-parameter -fPIC
 +COMPILE_FLAGS=${CFLAGS} ${CPFLAGS} ${CPPFLAGS} ${DEFS} -Wall -Werror -Wextra -Wno-missing-field-initializers -Wno-deprecated-declarations -fno-strict-aliasing -fno-omit-frame-pointer -ggdb -Wno-unused-parameter -Wno-unused-but-set-variable -fPIC
  EXTRA_LIBS=@LIBS@ @EXTRA_LIBS@ @OPENSSL_LIBS@
--LOCAL_LDFLAGS=-rdynamic -ggdb -levent ${EXTRA_LIBS} -ldl -lpthread -lutil
-+LOCAL_LDFLAGS=-rdynamic -ggdb -levent ${EXTRA_LIBS} -ldl
+ LOCAL_LDFLAGS=-rdynamic -ggdb -levent ${EXTRA_LIBS} -ldl -lpthread -lutil
  LINK_FLAGS=${LDFLAGS} ${LOCAL_LDFLAGS}
- 
- DEP=dep

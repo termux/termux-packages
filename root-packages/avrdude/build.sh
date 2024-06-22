@@ -1,8 +1,11 @@
-TERMUX_PKG_HOMEPAGE=https://savannah.nongnu.org/projects/avrdude
+TERMUX_PKG_HOMEPAGE=https://avrdudes.github.io/avrdude/
 TERMUX_PKG_DESCRIPTION="Software for programming Microchip (former Atmel) AVR Microcontrollers"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=7.0
-TERMUX_PKG_SRCURL=https://download.savannah.gnu.org/releases/avrdude/avrdude-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=c0ef65d98d6040ca0b4f2b700d51463c2a1f94665441f39d15d97442dbb79b54
+TERMUX_PKG_VERSION=7.3
+TERMUX_PKG_SRCURL=https://github.com/avrdudes/avrdude/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=1c61ae67aacf8b8ccae5741f987ba4b0c48d6e320405520352a8eca8c6e2c457
 TERMUX_PKG_DEPENDS="libusb"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DBUILD_SHARED_LIBS=ON
+"

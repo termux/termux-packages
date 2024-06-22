@@ -1,0 +1,39 @@
+------------------------------------------------------------------------
+r11991 | fuscated | 2020-03-23 05:02:49 +0900 (Mon, 23 Mar 2020) | 8 lines
+
+- build: Fixes to make it compile when using wx-master
+
+> Paint events aren't no longer allowed to be created. We've used this in a
+  single place in the code. I'm not sure what is the idea behind this,
+  probably to redraw something. For now I'm removing it and we'll see if
+  something breaks.
+> The second change is the removal of a c-tor in wxPGWindowList, I've
+  replaced it with the non-generic two parameter one.
+------------------------------------------------------------------------
+Index: src/src/main.cpp
+===================================================================
+--- src/src/main.cpp	(revision 11990)
++++ src/src/main.cpp	(revision 11991)
+@@ -2680,8 +2680,6 @@
+     else
+     {
+         wxBusyCursor useless;
+-        wxPaintEvent e;
+-        ProcessEvent(e);
+         for (unsigned int i = 0; i < files.GetCount(); ++i)
+           success &= OpenGeneric(files[i]);
+     }
+Index: src/src/watchesdlg.cpp
+===================================================================
+--- src/src/watchesdlg.cpp	(revision 11990)
++++ src/src/watchesdlg.cpp	(revision 11991)
+@@ -103,8 +103,7 @@
+                                   cb_unused const wxPoint& pos,
+                                   cb_unused const wxSize& sz) const override
+     {
+-        wxPGWindowList const list;
+-        return list;
++        return wxPGWindowList(nullptr, nullptr);
+     }
+     void UpdateControl(cb_unused wxPGProperty* property, cb_unused wxWindow* ctrl) const override {}
+     bool OnEvent(cb_unused wxPropertyGrid* propgrid, cb_unused wxPGProperty* property,

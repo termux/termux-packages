@@ -1,0 +1,41 @@
++++ a/src/inkscape.cpp
+@@ -17,8 +17,6 @@
+ 
+ #include <unistd.h>
+ 
+-#include <boost/stacktrace.hpp>
+-
+ #include <map>
+ 
+ #include <glibmm/regex.h>
+@@ -550,17 +548,17 @@
+         try {
+             auto builder = UI::create_builder("dialog-crash.glade");
+             UI::get_widget<Gtk::Label>(builder, "message").set_label(b);
+-            UI::get_object<Gtk::TextBuffer>(builder, "stacktrace")->set_text("<pre>\n" + boost::stacktrace::to_string(boost::stacktrace::stacktrace()) + "</pre>\n<details><summary>System info</summary>\n" + debug_info() + "\n</details>");
++            UI::get_object<Gtk::TextBuffer>(builder, "stacktrace")->set_text("<pre>\nNo stacktrace available.</pre>\n<details><summary>System info</summary>\n" + debug_info() + "\n</details>");
+             Gtk::MessageDialog &m = UI::get_widget<Gtk::MessageDialog>(builder, "crash_dialog");
+             sp_transientize(GTK_WIDGET(m.gobj()));
+             m.run();
+         } catch (const Glib::Error &ex) {
+             g_message("Glade file loading failed for crash handler... Anyway, error was: %s", b);
+-            std::cerr << boost::stacktrace::stacktrace();
++            std::cerr << "No stacktrace available." << std::endl;
+         }
+     } else {
+         g_message( "Error: %s", b );
+-        std::cerr << boost::stacktrace::stacktrace();
++        std::cerr << "No stacktrace available." << std::endl;
+     }
+     g_free (b);
+ 
++++ a/CMakeScripts/DefineDependsandFlags.cmake
+@@ -311,7 +311,7 @@
+         list(APPEND INKSCAPE_LIBS "-lbacktrace")
+         add_definitions("-DBOOST_STACKTRACE_USE_BACKTRACE")
+     else() # fall back to stacktrace_basic
+-        find_package(Boost 1.19.0 REQUIRED COMPONENTS stacktrace_basic)
++        find_package(Boost 1.19.0 REQUIRED COMPONENTS)
+         list(APPEND INKSCAPE_CXX_FLAGS "-D_GNU_SOURCE")
+     endif()
+ endif()

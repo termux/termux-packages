@@ -2,23 +2,23 @@ diff -uNr cups-2.3.3/config-scripts/cups-directories.m4 cups-2.3.3.mod/config-sc
 --- cups-2.3.3/config-scripts/cups-directories.m4	2020-04-27 21:04:29.000000000 +0300
 +++ cups-2.3.3.mod/config-scripts/cups-directories.m4	2020-07-24 16:44:23.353948751 +0300
 @@ -31,9 +31,7 @@
- AC_DEFINE_UNQUOTED(CUPS_BINDIR, "$bindir")
+ AC_DEFINE_UNQUOTED([CUPS_BINDIR], ["$bindir"], [Location of CUPS user programs.])
  
  dnl Fix "sbindir" variable...
--if test "$sbindir" = "\${exec_prefix}/sbin"; then
--	sbindir="$exec_prefix/sbin"
--fi
+-AS_IF([test "$sbindir" = "\${exec_prefix}/sbin"], [
+-    sbindir="$exec_prefix/sbin"
+-])
 +sbindir="$exec_prefix/bin"
  
- AC_DEFINE_UNQUOTED(CUPS_SBINDIR, "$sbindir")
+ AC_DEFINE_UNQUOTED([CUPS_SBINDIR], ["$sbindir"], [Location of CUPS admin programs.])
  
 diff -uNr cups-2.3.3/Makedefs.in cups-2.3.3.mod/Makedefs.in
 --- cups-2.3.3/Makedefs.in	2020-04-27 21:04:29.000000000 +0300
 +++ cups-2.3.3.mod/Makedefs.in	2020-07-24 16:43:17.017576910 +0300
 @@ -214,7 +214,7 @@
+ mandir		=	@mandir@
  oldincludedir	=	@oldincludedir@
  prefix		=	@prefix@
- privateinclude	=	@privateinclude@
 -sbindir		=	@sbindir@
 +sbindir		=	@bindir@
  sharedstatedir	=	@sharedstatedir@

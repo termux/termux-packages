@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE="http://libnova.sourceforge.net"
+TERMUX_PKG_HOMEPAGE="https://libnova.sourceforge.net"
 TERMUX_PKG_DESCRIPTION="A general purpose, double precision, Celestial Mechanics, Astrometry and Astrodynamics library"
 TERMUX_PKG_GROUPS="science"
 TERMUX_PKG_LICENSE="LGPL-2.0"

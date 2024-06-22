@@ -1,0 +1,809 @@
+<?xml version="1.0"?>
+<dump>
+  <boxed name="GODateConventions" get-type="go_date_conventions_get_type"/>
+  <boxed name="GOBezierSpline" get-type="go_bezier_spline_get_type"/>
+  <boxed name="GOEditor" get-type="go_editor_get_type"/>
+  <boxed name="GOFilePermissions" get-type="go_file_permissions_get_type"/>
+  <boxed name="GOFont" get-type="go_font_get_type"/>
+  <boxed name="GOFontMetrics" get-type="go_font_metrics_get_type"/>
+  <boxed name="GOFormatCurrency" get-type="go_format_currency_get_type"/>
+  <boxed name="GOFormatDetails" get-type="go_format_details_get_type"/>
+  <boxed name="GOFormat" get-type="go_format_get_type"/>
+  <enum name="GODirection" get-type="go_direction_get_type">
+    <member name="GO_DIRECTION_NONE" nick="none" value="4"/>
+    <member name="GO_DIRECTION_DOWN" nick="down" value="1"/>
+    <member name="GO_DIRECTION_UP" nick="up" value="0"/>
+    <member name="GO_DIRECTION_RIGHT" nick="right" value="3"/>
+    <member name="GO_DIRECTION_LEFT" nick="left" value="2"/>
+  </enum>  <boxed name="GOMemChunk" get-type="go_mem_chunk_get_type"/>
+  <boxed name="GOImageFormatInfo" get-type="go_image_format_info_get_type"/>
+  <class name="GOImage" get-type="go_image_get_type" parents="GObject" abstract="1">
+    <property name="width" type="guint" flags="3" default-value="0"/>
+    <property name="height" type="guint" flags="3" default-value="0"/>
+  </class>
+  <class name="GOPixbuf" get-type="go_pixbuf_get_type" parents="GOImage,GObject">
+    <property name="pixbuf" type="GdkPixbuf" flags="3"/>
+    <property name="image-type" type="gchararray" flags="227" default-value="NULL"/>
+  </class>
+  <class name="GOSvg" get-type="go_svg_get_type" parents="GOImage,GObject">
+  </class>
+  <class name="GOEmf" get-type="go_emf_get_type" parents="GOImage,GObject">
+  </class>
+  <class name="GOSpectre" get-type="go_spectre_get_type" parents="GOImage,GObject">
+  </class>
+  <boxed name="GOLineDashSequence" get-type="go_line_dash_sequence_get_type"/>
+  <boxed name="GOArrow" get-type="go_arrow_get_type"/>
+  <class name="GOMarker" get-type="go_marker_get_type" parents="GObject">
+  </class>
+  <boxed name="GOPath" get-type="go_path_get_type"/>
+  <interface name="GOPersist" get-type="go_persist_get_type">
+  </interface>
+  <boxed name="GOString" get-type="go_string_get_type"/>
+  <interface name="GOStyledObject" get-type="go_styled_object_get_type">
+  </interface>
+  <class name="GOStyle" get-type="go_style_get_type" parents="GObject">
+    <implements name="GOPersist"/>
+  </class>
+  <class name="GOUndo" get-type="go_undo_get_type" parents="GObject">
+  </class>
+  <class name="GOUndoGroup" get-type="go_undo_group_get_type" parents="GOUndo,GObject">
+  </class>
+  <class name="GOUndoBinary" get-type="go_undo_binary_get_type" parents="GOUndo,GObject">
+  </class>
+  <class name="GOUndoUnary" get-type="go_undo_unary_get_type" parents="GOUndo,GObject">
+  </class>
+  <boxed name="GoUnit" get-type="go_unit_get_type"/>
+  <class name="GOSearchReplace" get-type="go_search_replace_get_type" parents="GObject">
+    <property name="search-text" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="replace-text" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="is-regexp" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="ignore-case" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="preserve-case" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="match-words" type="gboolean" flags="227" default-value="FALSE"/>
+  </class>
+  <enum name="GoResourceType" get-type="go_resource_type_get_type">
+    <member name="GO_RESOURCE_NATIVE" nick="native" value="0"/>
+    <member name="GO_RESOURCE_RW" nick="rw" value="2"/>
+    <member name="GO_RESOURCE_RO" nick="ro" value="1"/>
+    <member name="GO_RESOURCE_CHILD" nick="child" value="3"/>
+    <member name="GO_RESOURCE_EXTERNAL" nick="external" value="4"/>
+    <member name="GO_RESOURCE_INVALID" nick="invalid" value="6"/>
+  </enum>  <boxed name="GogViewAllocation" get-type="gog_view_allocation_get_type"/>
+  <class name="GOData" get-type="go_data_get_type" parents="GObject" abstract="1">
+    <signal name="changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="GODataScalar" get-type="go_data_scalar_get_type" parents="GOData,GObject" abstract="1">
+  </class>
+  <class name="GODataVector" get-type="go_data_vector_get_type" parents="GOData,GObject" abstract="1">
+  </class>
+  <class name="GODataMatrix" get-type="go_data_matrix_get_type" parents="GOData,GObject" abstract="1">
+  </class>
+  <class name="GODataScalarVal" get-type="go_data_scalar_val_get_type" parents="GODataScalar,GOData,GObject">
+  </class>
+  <class name="GODataScalarStr" get-type="go_data_scalar_str_get_type" parents="GODataScalar,GOData,GObject">
+  </class>
+  <class name="GODataVectorVal" get-type="go_data_vector_val_get_type" parents="GODataVector,GOData,GObject">
+  </class>
+  <class name="GODataVectorStr" get-type="go_data_vector_str_get_type" parents="GODataVector,GOData,GObject">
+  </class>
+  <class name="GODataMatrixVal" get-type="go_data_matrix_val_get_type" parents="GODataMatrix,GOData,GObject">
+  </class>
+  <boxed name="GOComplex" get-type="go_complex_get_type"/>
+  <boxed name="GOCSpline" get-type="go_cspline_get_type"/>
+  <class name="GODistribution" get-type="go_distribution_get_type" parents="GObject" abstract="1">
+    <implements name="GOPersist"/>
+    <property name="location" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="scale" type="gdouble" flags="227" default-value="1.000000"/>
+  </class>
+  <boxed name="go_regression_stat_t" get-type="go_regression_stat_get_type"/>
+  <boxed name="GogObjectRole" get-type="gog_object_role_get_type"/>
+  <class name="GogObject" get-type="gog_object_get_type" parents="GObject" abstract="1">
+    <property name="id" type="guint" flags="483" default-value="0"/>
+    <property name="position" type="gchararray" flags="483" default-value="0 0 1 1"/>
+    <property name="compass" type="gchararray" flags="1507" default-value="top"/>
+    <property name="alignment" type="gchararray" flags="1507" default-value="fill"/>
+    <property name="is-position-manual" type="gboolean" flags="483" default-value="FALSE"/>
+    <property name="anchor" type="gchararray" flags="1507" default-value="top-left"/>
+    <property name="invisible" type="gboolean" flags="483" default-value="FALSE"/>
+    <property name="manual-size" type="gchararray" flags="483" default-value="none"/>
+    <signal name="changed" return="void" when="last">
+      <param type="gboolean"/>
+    </signal>
+    <signal name="child-added" return="void" when="last">
+      <param type="GObject"/>
+    </signal>
+    <signal name="child-removed" return="void" when="last">
+      <param type="GObject"/>
+    </signal>
+    <signal name="child-name-changed" return="void" when="last">
+      <param type="GObject"/>
+    </signal>
+    <signal name="children-reordered" return="void" when="last">
+    </signal>
+    <signal name="name-changed" return="void" when="last">
+    </signal>
+    <signal name="update-editor" return="void" when="last">
+    </signal>
+  </class>
+  <class name="GogStyledObject" get-type="gog_styled_object_get_type" parents="GogObject,GObject" abstract="1">
+    <implements name="GOStyledObject"/>
+    <property name="style" type="GogStyle" flags="483"/>
+    <signal name="style-changed" return="void" when="last">
+      <param type="GObject"/>
+    </signal>
+  </class>
+  <class name="GogTrendLine" get-type="gog_trend_line_get_type" parents="GogStyledObject,GogObject,GObject" abstract="1">
+    <implements name="GOStyledObject"/>
+    <property name="has-legend" type="gboolean" flags="483" default-value="TRUE"/>
+  </class>
+  <boxed name="GogToolAction" get-type="gog_tool_action_get_type"/>
+  <class name="GogView" get-type="gog_view_get_type" parents="GObject" abstract="1">
+    <property name="parent" type="GogView" flags="226"/>
+    <property name="model" type="GogObject" flags="226"/>
+  </class>
+  <class name="GogOutlinedObject" get-type="gog_outlined_object_get_type" parents="GogStyledObject,GogObject,GObject">
+    <implements name="GOStyledObject"/>
+    <property name="padding-pts" type="gdouble" flags="483" default-value="0.000000"/>
+  </class>
+  <class name="GogOutlinedView" get-type="gog_outlined_view_get_type" parents="GogView,GObject" abstract="1">
+  </class>
+  <interface name="GogDataset" get-type="gog_dataset_get_type">
+  </interface>
+  <class name="GogSeriesElement" get-type="gog_series_element_get_type" parents="GogStyledObject,GogObject,GObject" abstract="1">
+    <implements name="GOStyledObject"/>
+    <property name="index" type="gint" flags="995" default-value="0"/>
+  </class>
+  <class name="GogSeries" get-type="gog_series_get_type" parents="GogStyledObject,GogObject,GObject" abstract="1">
+    <implements name="GOStyledObject"/>
+    <implements name="GogDataset"/>
+    <property name="has-legend" type="gboolean" flags="483" default-value="TRUE"/>
+    <property name="interpolation" type="gchararray" flags="995" default-value="linear"/>
+    <property name="interpolation-skip-invalid" type="gboolean" flags="483" default-value="FALSE"/>
+    <property name="fill-type" type="gchararray" flags="483" default-value="invalid"/>
+  </class>
+  <class name="Gog3DBox" get-type="gog_3d_box_get_type" parents="GogObject,GObject">
+    <property name="psi" type="gint" flags="483" default-value="70"/>
+    <property name="theta" type="gint" flags="483" default-value="10"/>
+    <property name="phi" type="gint" flags="483" default-value="270"/>
+    <property name="fov" type="gint" flags="483" default-value="10"/>
+  </class>
+  <class name="Gog3DBoxView" get-type="gog_3d_box_view_get_type" parents="GogView,GObject">
+  </class>
+  <class name="GogAxisBase" get-type="gog_axis_base_get_type" parents="GogStyledObject,GogObject,GObject" abstract="1">
+    <implements name="GOStyledObject"/>
+    <property name="pos" type="guint" flags="227" default-value="0"/>
+    <property name="pos-str" type="gchararray" flags="483" default-value="auto"/>
+    <property name="major-tick-labeled" type="gboolean" flags="483" default-value="TRUE"/>
+    <property name="major-tick-in" type="gboolean" flags="483" default-value="FALSE"/>
+    <property name="major-tick-out" type="gboolean" flags="483" default-value="TRUE"/>
+    <property name="major-tick-size-pts" type="gint" flags="483" default-value="4"/>
+    <property name="minor-tick-in" type="gboolean" flags="483" default-value="FALSE"/>
+    <property name="minor-tick-out" type="gboolean" flags="483" default-value="FALSE"/>
+    <property name="minor-tick-size-pts" type="gint" flags="483" default-value="2"/>
+    <property name="cross-axis-id" type="guint" flags="483" default-value="0"/>
+    <property name="padding-pts" type="gint" flags="483" default-value="0"/>
+  </class>
+  <class name="GogAxisLine" get-type="gog_axis_line_get_type" parents="GogAxisBase,GogStyledObject,GogObject,GObject">
+    <implements name="GOStyledObject"/>
+    <implements name="GogDataset"/>
+    <property name="assigned-format-string-XL" type="gchararray" flags="483" default-value="General"/>
+  </class>
+  <boxed name="GogAxisMap" get-type="gog_axis_map_get_type"/>
+  <class name="GogAxis" get-type="gog_axis_get_type" parents="GogAxisBase,GogStyledObject,GogObject,GObject">
+    <implements name="GOStyledObject"/>
+    <implements name="GogDataset"/>
+    <implements name="GOPersist"/>
+    <property name="type" type="gint" flags="227" default-value="-1"/>
+    <property name="invert-axis" type="gboolean" flags="483" default-value="FALSE"/>
+    <property name="map-name" type="gchararray" flags="483" default-value="Linear"/>
+    <property name="assigned-format-string-XL" type="gchararray" flags="483" default-value="General"/>
+    <property name="circular-rotation" type="gdouble" flags="483" default-value="0.000000"/>
+    <property name="polar-unit" type="gchararray" flags="483" default-value="Degrees"/>
+    <property name="span-start" type="gdouble" flags="483" default-value="0.000000"/>
+    <property name="span-end" type="gdouble" flags="483" default-value="1.000000"/>
+    <property name="color-map-name" type="gchararray" flags="483" default-value="default"/>
+    <property name="metrics" type="gchararray" flags="483" default-value="default"/>
+    <property name="axis-ref" type="gchararray" flags="483" default-value="none"/>
+    <property name="metrics-unit" type="gchararray" flags="483" default-value="cm"/>
+    <property name="metrics-ratio" type="gdouble" flags="483" default-value="1.000000"/>
+    <property name="display-factor" type="gdouble" flags="483" default-value="1.000000"/>
+  </class>
+  <class name="GogChart" get-type="gog_chart_get_type" parents="GogOutlinedObject,GogStyledObject,GogObject,GObject">
+    <implements name="GOStyledObject"/>
+    <property name="cardinality-valid" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="plot-area" type="gchararray" flags="483" default-value="0 0 1 1"/>
+    <property name="is-plot-area-manual" type="gboolean" flags="483" default-value="FALSE"/>
+    <property name="xpos" type="gint" flags="259" default-value="0"/>
+    <property name="ypos" type="gint" flags="771" default-value="0"/>
+    <property name="rows" type="gint" flags="259" default-value="1"/>
+    <property name="columns" type="gint" flags="259" default-value="1"/>
+  </class>
+  <boxed name="GogChartMap" get-type="gog_chart_map_get_type"/>
+  <boxed name="GogChartMap3D" get-type="gog_chart_map_3d_get_type"/>
+  <class name="GogAxisColorMap" get-type="gog_axis_color_map_get_type" parents="GObject">
+    <implements name="GOPersist"/>
+    <property name="resource-type" type="GoResourceType" flags="235" default-value="GO_RESOURCE_INVALID"/>
+  </class>
+  <class name="GogColorScale" get-type="gog_color_scale_get_type" parents="GogStyledObject,GogObject,GObject">
+    <implements name="GOStyledObject"/>
+    <property name="horizontal" type="gboolean" flags="483" default-value="FALSE"/>
+    <property name="width" type="gdouble" flags="483" default-value="10.000000"/>
+    <property name="axis" type="gchararray" flags="483" default-value="NULL"/>
+    <property name="tick-size-pts" type="gint" flags="483" default-value="4"/>
+  </class>
+  <class name="GogChildButton" get-type="gog_child_button_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+  </class>
+  <interface name="GogDataEditor" get-type="gog_data_editor_get_type">
+  </interface>
+  <interface name="GogDataAllocator" get-type="gog_data_allocator_get_type">
+  </interface>
+  <class name="GogErrorBar" get-type="gog_error_bar_get_type" parents="GObject">
+    <implements name="GOPersist"/>
+  </class>
+  <class name="GogGraph" get-type="gog_graph_get_type" parents="GogOutlinedObject,GogStyledObject,GogObject,GObject">
+    <implements name="GOStyledObject"/>
+    <implements name="GOPersist"/>
+    <property name="theme" type="GogTheme" flags="227"/>
+    <property name="theme-name" type="gchararray" flags="483" default-value="default"/>
+    <property name="width-pts" type="gdouble" flags="483" default-value="340.157480"/>
+    <property name="height-pts" type="gdouble" flags="483" default-value="226.771654"/>
+    <property name="document" type="GODoc" flags="227"/>
+    <signal name="add-data" return="void" when="last">
+      <param type="GObject"/>
+    </signal>
+    <signal name="remove-data" return="void" when="last">
+      <param type="GObject"/>
+    </signal>
+  </class>
+  <class name="GogGraphView" get-type="gog_graph_view_get_type" parents="GogOutlinedView,GogView,GObject">
+    <property name="renderer" type="GogRenderer" flags="226"/>
+    <signal name="selection-changed" return="void" when="last">
+      <param type="GObject"/>
+    </signal>
+  </class>
+  <class name="GOPalette" get-type="go_palette_get_type" parents="GtkMenu,GtkMenuShell,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <signal name="activate" return="void" when="last">
+      <param type="gint"/>
+    </signal>
+    <signal name="automatic-activate" return="void" when="last">
+      <param type="gint"/>
+    </signal>
+    <signal name="custom-activate" return="void" when="last">
+    </signal>
+  </class>
+  <class name="GOSelector" get-type="go_selector_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <signal name="activate" return="void" when="last">
+    </signal>
+  </class>
+  <class name="GOArrowSel" get-type="go_arrow_sel_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="arrow" type="GOArrow" flags="227"/>
+  </class>
+  <class name="GO3DRotationSel" get-type="go_3d_rotation_sel_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <signal name="matrix-changed" return="void" when="last">
+    </signal>
+    <signal name="psi-changed" return="void" when="last">
+      <param type="gint"/>
+    </signal>
+    <signal name="theta-changed" return="void" when="last">
+      <param type="gint"/>
+    </signal>
+    <signal name="phi-changed" return="void" when="last">
+      <param type="gint"/>
+    </signal>
+    <signal name="fov-changed" return="void" when="last">
+      <param type="gint"/>
+    </signal>
+  </class>
+  <class name="GOActionComboColor" get-type="go_action_combo_color_get_type" parents="GtkAction,GObject">
+    <implements name="GtkBuildable"/>
+    <signal name="display-custom-dialog" return="void" when="last">
+      <param type="GObject"/>
+    </signal>
+    <signal name="combo-activate" return="void" when="last">
+    </signal>
+  </class>
+  <class name="GOActionComboPixmaps" get-type="go_action_combo_pixmaps_get_type" parents="GtkAction,GObject">
+    <implements name="GtkBuildable"/>
+    <signal name="combo-activate" return="void" when="last">
+    </signal>
+  </class>
+  <class name="GOActionComboStack" get-type="go_action_combo_stack_get_type" parents="GtkAction,GObject">
+    <implements name="GtkBuildable"/>
+  </class>
+  <class name="GOActionComboText" get-type="go_action_combo_text_get_type" parents="GtkAction,GObject">
+    <implements name="GtkBuildable"/>
+    <property name="case-sensitive" type="gboolean" flags="235" default-value="TRUE"/>
+  </class>
+  <class name="GOCalendarButton" get-type="go_calendar_button_get_type" parents="GOComboBox,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <signal name="changed" return="void" when="first">
+    </signal>
+  </class>
+  <class name="GOCharmapSel" get-type="go_charmap_sel_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="TestDirection" type="guint" flags="3" default-value="0"/>
+    <signal name="charmap-changed" return="void" when="last">
+      <param type="gpointer"/>
+    </signal>
+  </class>
+  <class name="GOColorGroup" get-type="go_color_group_get_type" parents="GObject">
+    <signal name="history-changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="GOColorPalette" get-type="go_color_palette_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <signal name="display-custom-dialog" return="void" when="last">
+      <param type="GObject"/>
+    </signal>
+    <signal name="color-changed" return="void" when="last">
+      <param type="gint"/>
+      <param type="gboolean"/>
+      <param type="gboolean"/>
+      <param type="gboolean"/>
+    </signal>
+  </class>
+  <class name="GOComboBox" get-type="go_combo_box_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="title" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="show-arrow" type="gboolean" flags="227" default-value="TRUE"/>
+    <signal name="pop-down-done" return="gboolean" when="last">
+      <param type="GObject"/>
+    </signal>
+  </class>
+  <class name="GOComboColor" get-type="go_combo_color_get_type" parents="GOComboBox,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <signal name="display-custom-dialog" return="void" when="last">
+      <param type="GObject"/>
+    </signal>
+    <signal name="color-changed" return="void" when="last">
+      <param type="gint"/>
+      <param type="gboolean"/>
+      <param type="gboolean"/>
+      <param type="gboolean"/>
+    </signal>
+  </class>
+  <class name="GOComboPixmaps" get-type="go_combo_pixmaps_get_type" parents="GOComboBox,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <signal name="changed" return="void" when="last">
+      <param type="gint"/>
+    </signal>
+  </class>
+  <class name="GOMenuPixmaps" get-type="go_menu_pixmaps_get_type" parents="GtkMenu,GtkMenuShell,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <signal name="changed" return="void" when="last">
+      <param type="gint"/>
+    </signal>
+  </class>
+  <class name="GOFontSel" get-type="go_font_sel_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <implements name="GtkFontChooser"/>
+    <property name="show-style" type="gboolean" flags="11" default-value="FALSE"/>
+    <property name="show-color" type="gboolean" flags="11" default-value="FALSE"/>
+    <property name="show-underline" type="gboolean" flags="11" default-value="FALSE"/>
+    <property name="show-script" type="gboolean" flags="11" default-value="FALSE"/>
+    <property name="show-strikethrough" type="gboolean" flags="11" default-value="FALSE"/>
+    <property name="color-unset-text" type="gchararray" flags="11" default-value="NULL"/>
+    <property name="color-group" type="GOColorGroup" flags="11"/>
+    <property name="color-default" type="guint" flags="11" default-value="255"/>
+    <property name="underline-picker" type="GtkWidget" flags="11"/>
+    <signal name="font-changed" return="void" when="last">
+      <param type="gpointer"/>
+    </signal>
+  </class>
+  <class name="GOFontSelDialog" get-type="go_font_sel_dialog_get_type" parents="GtkDialog,GtkWindow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkFontChooser"/>
+  </class>
+  <class name="GOFormatSel" get-type="go_format_sel_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <signal name="format-changed" return="void" when="last">
+      <param type="gpointer"/>
+    </signal>
+    <signal name="generate-preview" return="gchararray" when="last">
+      <param type="gpointer"/>
+    </signal>
+  </class>
+  <class name="GOGraphWidget" get-type="go_graph_widget_get_type" parents="GtkLayout,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkScrollable"/>
+    <property name="aspect-ratio" type="gdouble" flags="7" default-value="-1.000000"/>
+    <property name="graph" type="GogGraph" flags="11"/>
+    <property name="hres" type="gdouble" flags="11" default-value="96.000000"/>
+    <property name="vres" type="gdouble" flags="11" default-value="96.000000"/>
+  </class>
+  <class name="GOLocaleSel" get-type="go_locale_sel_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <signal name="locale-changed" return="void" when="last">
+      <param type="gpointer"/>
+    </signal>
+  </class>
+  <class name="GOOptionMenu" get-type="go_option_menu_get_type" parents="GtkButton,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkActionable"/>
+    <implements name="GtkActivatable"/>
+    <property name="menu" type="GtkMenu" flags="3"/>
+    <signal name="changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="GORotationSel" get-type="go_rotation_sel_get_type" parents="GtkGrid,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <signal name="rotation-changed" return="void" when="last">
+      <param type="gint"/>
+    </signal>
+  </class>
+  <class name="GoMathEditor" get-type="go_math_editor_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <signal name="itex-changed" return="void" when="last">
+    </signal>
+    <signal name="inline-changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="GogGrid" get-type="gog_grid_get_type" parents="GogStyledObject,GogObject,GObject">
+    <implements name="GOStyledObject"/>
+    <property name="type" type="gint" flags="483" default-value="-1"/>
+  </class>
+  <class name="GogGridLine" get-type="gog_grid_line_get_type" parents="GogStyledObject,GogObject,GObject">
+    <implements name="GOStyledObject"/>
+    <property name="is-minor" type="gboolean" flags="227" default-value="FALSE"/>
+  </class>
+  <class name="GogText" get-type="gog_text_get_type" parents="GogOutlinedObject,GogStyledObject,GogObject,GObject" abstract="1">
+    <implements name="GOStyledObject"/>
+    <property name="allow-markup" type="gboolean" flags="483" default-value="FALSE"/>
+    <property name="rotate-frame" type="gboolean" flags="483" default-value="FALSE"/>
+    <property name="rotate-bg" type="gboolean" flags="483" default-value="FALSE"/>
+    <property name="allow-wrap" type="gboolean" flags="483" default-value="FALSE"/>
+  </class>
+  <class name="GogLabel" get-type="gog_label_get_type" parents="GogText,GogOutlinedObject,GogStyledObject,GogObject,GObject">
+    <implements name="GOStyledObject"/>
+    <implements name="GogDataset"/>
+    <property name="justification" type="gchararray" flags="483" default-value="center"/>
+  </class>
+  <class name="GogRegEqn" get-type="gog_reg_eqn_get_type" parents="GogText,GogOutlinedObject,GogStyledObject,GogObject,GObject">
+    <implements name="GOStyledObject"/>
+    <property name="show-eq" type="gboolean" flags="483" default-value="TRUE"/>
+    <property name="show-r2" type="gboolean" flags="483" default-value="TRUE"/>
+  </class>
+  <class name="GogLegend" get-type="gog_legend_get_type" parents="GogOutlinedObject,GogStyledObject,GogObject,GObject">
+    <implements name="GOStyledObject"/>
+    <property name="swatch-size-pts" type="gdouble" flags="483" default-value="0.000000"/>
+    <property name="swatch-padding-pts" type="gdouble" flags="483" default-value="0.000000"/>
+  </class>
+  <class name="GogPlot" get-type="gog_plot_get_type" parents="GogObject,GObject" abstract="1">
+    <property name="vary-style-by-element" type="gboolean" flags="995" default-value="FALSE"/>
+    <property name="x-axis" type="guint" flags="483" default-value="0"/>
+    <property name="y-axis" type="guint" flags="483" default-value="0"/>
+    <property name="z-axis" type="guint" flags="483" default-value="0"/>
+    <property name="circ-axis" type="guint" flags="483" default-value="0"/>
+    <property name="radial-axis" type="guint" flags="483" default-value="0"/>
+    <property name="pseudo-3d-axis" type="guint" flags="483" default-value="0"/>
+    <property name="color-axis" type="guint" flags="483" default-value="0"/>
+    <property name="bubble-axis" type="guint" flags="483" default-value="0"/>
+    <property name="plot-group" type="gchararray" flags="483" default-value="NULL"/>
+    <property name="interpolation" type="gchararray" flags="483" default-value="linear"/>
+    <property name="guru-hints" type="gchararray" flags="227" default-value="NULL"/>
+  </class>
+  <class name="GogPlotView" get-type="gog_plot_view_get_type" parents="GogView,GObject" abstract="1">
+  </class>
+  <class name="GogRegCurve" get-type="gog_reg_curve_get_type" parents="GogTrendLine,GogStyledObject,GogObject,GObject" abstract="1">
+    <implements name="GOStyledObject"/>
+    <implements name="GogDataset"/>
+    <property name="skip-invalid" type="gboolean" flags="483" default-value="FALSE"/>
+    <property name="drawing-bounds" type="gchararray" flags="483" default-value="none"/>
+  </class>
+  <boxed name="GogSeriesLabelElt" get-type="gog_series_label_elt_get_type"/>
+  <class name="GogDataLabel" get-type="gog_data_label_get_type" parents="GogOutlinedObject,GogStyledObject,GogObject,GObject">
+    <implements name="GOStyledObject"/>
+    <implements name="GogDataset"/>
+    <property name="position" type="gchararray" flags="483" default-value="default"/>
+    <property name="offset" type="guint" flags="483" default-value="0"/>
+    <property name="format" type="gchararray" flags="483" default-value=""/>
+    <property name="index" type="gint" flags="995" default-value="0"/>
+  </class>
+  <class name="GogSeriesLabels" get-type="gog_series_labels_get_type" parents="GogOutlinedObject,GogStyledObject,GogObject,GObject">
+    <implements name="GOStyledObject"/>
+    <implements name="GogDataset"/>
+    <property name="position" type="gchararray" flags="483" default-value="default"/>
+    <property name="offset" type="guint" flags="483" default-value="0"/>
+    <property name="format" type="gchararray" flags="483" default-value=""/>
+  </class>
+  <class name="GogRenderer" get-type="gog_renderer_get_type" parents="GObject">
+    <property name="model" type="GogGraph" flags="227"/>
+    <property name="view" type="GogView" flags="225"/>
+    <signal name="request-update" return="void" when="last">
+    </signal>
+  </class>
+  <class name="GogSeriesLines" get-type="gog_series_lines_get_type" parents="GogStyledObject,GogObject,GObject">
+    <implements name="GOStyledObject"/>
+  </class>
+  <class name="GogSmoothedCurve" get-type="gog_smoothed_curve_get_type" parents="GogTrendLine,GogStyledObject,GogObject,GObject" abstract="1">
+    <implements name="GOStyledObject"/>
+    <implements name="GogDataset"/>
+  </class>
+  <class name="GogTheme" get-type="gog_theme_get_type" parents="GObject">
+    <implements name="GOPersist"/>
+    <property name="resource-type" type="GoResourceType" flags="235" default-value="GO_RESOURCE_INVALID"/>
+  </class>
+  <class name="GocCanvas" get-type="goc_canvas_get_type" parents="GtkLayout,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkScrollable"/>
+  </class>
+  <class name="GocItem" get-type="goc_item_get_type" parents="GObject" abstract="1">
+    <property name="canvas" type="GocCanvas" flags="225"/>
+    <property name="parent" type="GocGroup" flags="225"/>
+  </class>
+  <class name="GocStyledItem" get-type="goc_styled_item_get_type" parents="GocItem,GObject" abstract="1">
+    <implements name="GOStyledObject"/>
+    <property name="style" type="GOStyle" flags="483"/>
+    <property name="scale-line-width" type="gboolean" flags="227" default-value="TRUE"/>
+    <signal name="style-changed" return="void" when="last">
+      <param type="GObject"/>
+    </signal>
+  </class>
+  <boxed name="GocPoints" get-type="goc_points_get_type"/>
+  <boxed name="GocIntArray" get-type="goc_int_array_get_type"/>
+  <class name="GocCircle" get-type="goc_circle_get_type" parents="GocStyledItem,GocItem,GObject">
+    <implements name="GOStyledObject"/>
+    <property name="x" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="y" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="radius" type="gdouble" flags="227" default-value="0.000000"/>
+  </class>
+  <class name="GocEllipse" get-type="goc_ellipse_get_type" parents="GocStyledItem,GocItem,GObject">
+    <implements name="GOStyledObject"/>
+    <property name="x" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="y" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="width" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="height" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="rotation" type="gdouble" flags="227" default-value="0.000000"/>
+  </class>
+  <class name="GocGraph" get-type="goc_graph_get_type" parents="GocItem,GObject">
+    <property name="x" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="y" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="height" type="gdouble" flags="227" default-value="100.000000"/>
+    <property name="width" type="gdouble" flags="227" default-value="100.000000"/>
+    <property name="graph" type="GogGraph" flags="226"/>
+    <property name="renderer" type="GogRenderer" flags="227"/>
+  </class>
+  <class name="GocGroup" get-type="goc_group_get_type" parents="GocItem,GObject">
+    <property name="x" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="y" type="gdouble" flags="227" default-value="0.000000"/>
+  </class>
+  <class name="GocArc" get-type="goc_arc_get_type" parents="GocStyledItem,GocItem,GObject">
+    <implements name="GOStyledObject"/>
+    <property name="xc" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="yc" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="xr" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="yr" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="ang1" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="ang2" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="rotation" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="type" type="gint" flags="227" default-value="0"/>
+    <property name="start-arrow" type="GOArrow" flags="227"/>
+    <property name="end-arrow" type="GOArrow" flags="227"/>
+  </class>
+  <class name="GocImage" get-type="goc_image_get_type" parents="GocItem,GObject">
+    <property name="x" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="y" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="width" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="height" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="image" type="GOImage" flags="227"/>
+    <property name="crop-bottom" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="crop-left" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="crop-right" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="crop-top" type="gdouble" flags="227" default-value="0.000000"/>
+  </class>
+  <class name="GocLine" get-type="goc_line_get_type" parents="GocStyledItem,GocItem,GObject">
+    <implements name="GOStyledObject"/>
+    <property name="x0" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="y0" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="x1" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="y1" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="start-arrow" type="GOArrow" flags="227"/>
+    <property name="end-arrow" type="GOArrow" flags="227"/>
+  </class>
+  <class name="GocPath" get-type="goc_path_get_type" parents="GocStyledItem,GocItem,GObject">
+    <implements name="GOStyledObject"/>
+    <property name="x" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="y" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="rotation" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="closed" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="fill-rule" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="path" type="GOPath" flags="227"/>
+  </class>
+  <class name="GocPixbuf" get-type="goc_pixbuf_get_type" parents="GocItem,GObject">
+    <property name="x" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="y" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="width" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="height" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="pixbuf" type="GdkPixbuf" flags="227"/>
+  </class>
+  <class name="GocPolyline" get-type="goc_polyline_get_type" parents="GocStyledItem,GocItem,GObject">
+    <implements name="GOStyledObject"/>
+    <property name="points" type="GocPoints" flags="227"/>
+    <property name="use-spline" type="gboolean" flags="227" default-value="FALSE"/>
+  </class>
+  <class name="GocPolygon" get-type="goc_polygon_get_type" parents="GocStyledItem,GocItem,GObject">
+    <implements name="GOStyledObject"/>
+    <property name="points" type="GocPoints" flags="227"/>
+    <property name="use-spline" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="fill-rule" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="sizes" type="GocIntArray" flags="227"/>
+  </class>
+  <class name="GocRectangle" get-type="goc_rectangle_get_type" parents="GocStyledItem,GocItem,GObject">
+    <implements name="GOStyledObject"/>
+    <property name="x" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="y" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="width" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="height" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="rotation" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="rx" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="ry" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="type" type="gint" flags="227" default-value="0"/>
+  </class>
+  <class name="GocText" get-type="goc_text_get_type" parents="GocStyledItem,GocItem,GObject">
+    <implements name="GOStyledObject"/>
+    <property name="x" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="y" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="rotation" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="anchor" type="GOAnchorType" flags="227" default-value="GO_ANCHOR_CENTER"/>
+    <property name="text" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="attributes" type="PangoAttrList" flags="227"/>
+    <property name="clip" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="clip-width" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="clip-height" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="wrap-width" type="gdouble" flags="227" default-value="0.000000"/>
+  </class>
+  <class name="GOComponent" get-type="go_component_get_type" parents="GObject" abstract="1">
+    <property name="mime-type" type="gchararray" flags="11" default-value="NULL"/>
+    <property name="width" type="gdouble" flags="3" default-value="0.000000"/>
+    <property name="ascent" type="gdouble" flags="3" default-value="0.000000"/>
+    <property name="descent" type="gdouble" flags="3" default-value="0.000000"/>
+    <property name="height" type="gdouble" flags="1" default-value="0.000000"/>
+    <property name="inline" type="gboolean" flags="3" default-value="FALSE"/>
+    <signal name="changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="GOComponentMimeDialog" get-type="go_component_mime_dialog_get_type" parents="GtkDialog,GtkWindow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+  </class>
+  <class name="GocComponent" get-type="goc_component_get_type" parents="GocItem,GObject">
+    <property name="x" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="y" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="height" type="gdouble" flags="227" default-value="100.000000"/>
+    <property name="width" type="gdouble" flags="227" default-value="100.000000"/>
+    <property name="rotation" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="object" type="GOComponent" flags="227"/>
+  </class>
+  <class name="GocWidget" get-type="goc_widget_get_type" parents="GocItem,GObject">
+    <property name="widget" type="GtkWidget" flags="227"/>
+    <property name="x" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="y" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="width" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="height" type="gdouble" flags="227" default-value="0.000000"/>
+  </class>
+  <boxed name="GOErrorInfo" get-type="go_error_info_get_type"/>
+  <enum name="GOFileFormatLevel" get-type="go_file_format_level_get_type">
+    <member name="GO_FILE_FL_NONE" nick="none" value="0"/>
+    <member name="GO_FILE_FL_WRITE_ONLY" nick="write_only" value="1"/>
+    <member name="GO_FILE_FL_NEW" nick="new" value="2"/>
+    <member name="GO_FILE_FL_MANUAL" nick="manual" value="3"/>
+    <member name="GO_FL_MANUAL_REMEMBER" nick="manual_remember" value="4"/>
+    <member name="GO_FILE_FL_AUTO" nick="auto" value="5"/>
+  </enum>  <enum name="GOFileSaveScope" get-type="go_file_save_scope_get_type">
+    <member name="GO_FILE_SAVE_WORKBOOK" nick="workbook" value="0"/>
+    <member name="GO_FILE_SAVE_SHEET" nick="sheet" value="1"/>
+    <member name="GO_FILE_SAVE_RANGE" nick="range" value="2"/>
+  </enum>  <class name="GOFileOpener" get-type="go_file_opener_get_type" parents="GObject">
+    <property name="id" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="description" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="interactive-only" type="gboolean" flags="227" default-value="FALSE"/>
+  </class>
+  <class name="GOFileSaver" get-type="go_file_saver_get_type" parents="GObject">
+    <property name="id" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="mime-type" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="extension" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="description" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="overwrite" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="interactive-only" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="format-level" type="GOFileFormatLevel" flags="227" default-value="GO_FILE_FL_NEW"/>
+    <property name="scope" type="GOFileSaveScope" flags="227" default-value="GO_FILE_SAVE_WORKBOOK"/>
+    <property name="sheet-selection" type="gboolean" flags="227" default-value="FALSE"/>
+    <signal name="set-export-options" return="gboolean" when="last">
+      <param type="GODoc"/>
+      <param type="gchararray"/>
+      <param type="gpointer"/>
+    </signal>
+  </class>
+  <interface name="GOCmdContext" get-type="go_cmd_context_get_type">
+  </interface>
+  <boxed name="GOConfNode" get-type="go_conf_node_get_type"/>
+  <class name="GODocControl" get-type="go_doc_control_get_type" parents="GObject">
+  </class>
+  <class name="GODoc" get-type="go_doc_get_type" parents="GObject">
+    <property name="uri" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="dirty" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="dirty-time" type="gint64" flags="227" default-value="0"/>
+    <property name="pristine" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="modtime" type="GDateTime" flags="227"/>
+    <property name="saved-state" type="guint64" flags="227" default-value="0"/>
+    <property name="state" type="guint64" flags="227" default-value="0"/>
+    <signal name="metadata-update" return="void" when="last">
+    </signal>
+    <signal name="metadata-changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="GOPlugin" get-type="go_plugin_get_type" parents="GObject">
+    <signal name="state-changed" return="void" when="last">
+    </signal>
+    <signal name="can-deactivate-changed" return="void" when="last">
+    </signal>
+  </class>
+  <interface name="GOPluginLoader" get-type="go_plugin_loader_get_type">
+  </interface>
+  <class name="GOPluginLoaderModule" get-type="go_plugin_loader_module_get_type" parents="GObject">
+    <implements name="GOPluginLoader"/>
+  </class>
+  <class name="GOPluginService" get-type="go_plugin_service_get_type" parents="GObject">
+  </class>
+  <class name="GOPluginServiceGeneral" get-type="go_plugin_service_general_get_type" parents="GOPluginService,GObject">
+  </class>
+  <class name="GOPluginServiceResource" get-type="go_plugin_service_resource_get_type" parents="GOPluginService,GObject">
+  </class>
+  <class name="GOPluginServiceFileOpener" get-type="go_plugin_service_file_opener_get_type" parents="GOPluginService,GObject">
+  </class>
+  <class name="GOPluginServiceFileSaver" get-type="go_plugin_service_file_saver_get_type" parents="GOPluginService,GObject">
+  </class>
+  <class name="GOPluginServicePluginLoader" get-type="go_plugin_service_plugin_loader_get_type" parents="GOPluginService,GObject">
+  </class>
+  <class name="GOPluginServiceGObjectLoader" get-type="go_plugin_service_gobject_loader_get_type" parents="GOPluginServiceSimple,GOPluginService,GObject">
+  </class>
+  <class name="GOPluginServiceSimple" get-type="go_plugin_service_simple_get_type" parents="GOPluginService,GObject">
+  </class>
+  <class name="GoView" get-type="go_view_get_type" parents="GObject" abstract="1">
+  </class>
+  <class name="GOIOContext" get-type="go_io_context_get_type" parents="GObject">
+    <implements name="GOCmdContext"/>
+    <property name="exec-main-loop" type="gboolean" flags="3" default-value="TRUE"/>
+  </class>
+  <error-quark function="go_search_replace_error_quark" domain="go-search-replace-error-quark"/>
+</dump>

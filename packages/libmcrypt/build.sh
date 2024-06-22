@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://mcrypt.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://mcrypt.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="A library which provides a uniform interface to several symmetric encryption algorithms"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

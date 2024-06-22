@@ -1,0 +1,39 @@
+diff -uNr a/include/sway/config.h b/include/sway/config.h
+--- a/include/sway/config.h
++++ b/include/sway/config.h
+@@ -1,6 +1,5 @@
+ #ifndef _SWAY_CONFIG_H
+ #define _SWAY_CONFIG_H
+-#include <libinput.h>
+ #include <stdint.h>
+ #include <string.h>
+ #include <time.h>
+--- a/include/sway/server.h
++++ b/include/sway/server.h
+@@ -3,6 +3,7 @@
+ #include <stdbool.h>
+ #include <wayland-server-core.h>
+ #include <wlr/backend.h>
++#include <wlr/config.h>
+ #include <wlr/render/allocator.h>
+ #include <wlr/render/wlr_renderer.h>
+ #include <wlr/types/wlr_compositor.h>
+--- a/include/sway/input/input-manager.h
++++ b/include/sway/input/input-manager.h
+@@ -1,6 +1,5 @@
+ #ifndef _SWAY_INPUT_INPUT_MANAGER_H
+ #define _SWAY_INPUT_INPUT_MANAGER_H
+-#include <libinput.h>
+ #include <wlr/types/wlr_input_inhibitor.h>
+ #include <wlr/types/wlr_keyboard_shortcuts_inhibit_v1.h>
+ #include <wlr/types/wlr_virtual_keyboard_v1.h>
+--- a/sway/config.c
++++ b/sway/config.c
+@@ -9,7 +9,6 @@
+ #include <sys/wait.h>
+ #include <sys/stat.h>
+ #include <signal.h>
+-#include <libinput.h>
+ #include <limits.h>
+ #include <dirent.h>
+ #include <strings.h>

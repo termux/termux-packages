@@ -1,0 +1,64 @@
+------------------------------------------------------------------------
+r12305 | fuscated | 2021-03-17 08:28:35 +0900 (Wed, 17 Mar 2021) | 9 lines
+
+* UI: Add display info in the Help -> About -> Information dialog
+
+> There are many reports of people having trouble with either multi monitor
+  setups or HiDPI setups. It would be a lot easier if they could gather
+  the information form one single place.
+> Note0: The scaling factors are based on the scaling factors of the About
+  dialog. In a system which supports monitors with different PPIs it might
+  report the incorrect value.
+> Note1: wxGetDisplayPPI is also some global and not per display.
+------------------------------------------------------------------------
+Index: src/src/dlgabout.cpp
+===================================================================
+--- src/src/dlgabout.cpp	(revision 12304)
++++ src/src/dlgabout.cpp	(revision 12305)
+@@ -31,6 +31,7 @@
+ 
+ #include <wx/bitmap.h>
+ #include <wx/dcmemory.h>    // wxMemoryDC
++#include <wx/display.h>
+ #include <wx/statbmp.h>
+ 
+ #include "appglobals.h"
+@@ -164,10 +165,38 @@
+     items.push_back({_("Version"), appglobals::AppActualVersion});
+     items.push_back({_("SDK Version"), appglobals::AppSDKVersion});
+     items.push_back({_("Scintilla Version"), scintillaStr});
++
+     items.push_back({_("Author"), _("The Code::Blocks Team")});
+     items.push_back({_("E-mail"), appglobals::AppContactEmail});
+     items.push_back({_("Website"), appglobals::AppUrl});
+ 
++    items.push_back({_("Scaling factor"), wxString::Format("%f", GetContentScaleFactor())});
++    items.push_back({_("Detected scaling factor"),
++                     wxString::Format("%f", cbGetActualContentScaleFactor(*this))});
++    const wxSize displayPPI = wxGetDisplayPPI();
++    items.push_back({_("Display PPI"), wxString::Format("%dx%d", displayPPI.x, displayPPI.y)});
++
++    unsigned displays = wxDisplay::GetCount();
++    items.push_back({_("Display count"), wxString::Format("%u", displays)});
++
++    for (unsigned ii = 0; ii < displays; ++ii)
++    {
++        wxDisplay display(ii);
++
++        Item item;
++        item.name = wxString::Format(_("Display %u"), ii);
++
++        const wxString &name = display.GetName();
++        if (!name.empty())
++            item.name += " (" + name + ")";
++
++        const wxRect geometry = display.GetGeometry();
++        item.value= wxString::Format(_("XY=[%d,%d]; Size=[%d,%d]; %s"), geometry.GetLeft(),
++                                     geometry.GetTop(), geometry.GetWidth(), geometry.GetHeight(),
++                                     (display.IsPrimary() ? _("Primary") : wxString()));
++        items.push_back(item);
++    }
++
+     int maxNameLength = 0;
+     for (const Item &item : items)
+     {

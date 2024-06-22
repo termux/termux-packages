@@ -1,7 +1,8 @@
---- ./ssh-agent.c.orig	2020-09-27 09:25:01.000000000 +0200
-+++ ./ssh-agent.c	2020-10-17 22:11:56.636611859 +0200
-@@ -94,7 +94,7 @@
- #include "sk-api.h"
+diff -uNr openssh-portable-V_9_5_P1/ssh-agent.c openssh-portable-V_9_5_P1.mod/ssh-agent.c
+--- openssh-portable-V_9_5_P1/ssh-agent.c	2023-10-04 07:34:10.000000000 +0300
++++ openssh-portable-V_9_5_P1.mod/ssh-agent.c	2023-11-23 16:29:34.274542842 +0200
+@@ -92,7 +92,7 @@
+ #include "myproposal.h"
  
  #ifndef DEFAULT_ALLOWED_PROVIDERS
 -# define DEFAULT_ALLOWED_PROVIDERS "/usr/lib*/*,/usr/local/lib*/*"
@@ -9,14 +10,14 @@
  #endif
  
  /* Maximum accepted message length */
-@@ -1292,9 +1292,11 @@
+@@ -2036,9 +2036,11 @@
  	/* Ensure that fds 0, 1 and 2 are open or directed to /dev/null */
  	sanitise_stdfd();
  
 +#ifndef __ANDROID__
  	/* drop */
- 	setegid(getgid());
- 	setgid(getgid());
+ 	(void)setegid(getgid());
+ 	(void)setgid(getgid());
 +#endif
  
  	platform_disable_tracing(0);	/* strict=no */

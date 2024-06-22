@@ -11,8 +11,8 @@ body:
         Package requests are recommendational and are served at low priority. There no guarantee that package will be added at all, for example if it violates our [Packaging Policy](https://github.com/termux/termux-packages/blob/master/CONTRIBUTING.md#packaging-policy) or doesn't seem to have obvious practical use.
   - type: textarea
     attributes:
-      label: Why do you want to add this package to Termux?
-      description: Tell us what kind of tasks can be resolved with that package in context of Termux application.
+      label: Why is it worth to add this package?
+      description: Provide us a detailed explanation how do you plan to use the requested package and why it would be a nice addition to the Termux repository.
     validations:
       required: true
   - type: input
@@ -24,13 +24,40 @@ body:
       placeholder: Link to Git or source archive
     validations:
       required: true
+
   - type: checkboxes
     attributes:
       label: Packaging policy acknowledgement
-      description: We reject packages that are used for Hacking or fall under certain other conditions described in [Packaging Policy](https://github.com/termux/termux-packages/blob/master/CONTRIBUTING.md#packaging-policy). Please READ this policy document!
+      description: |
+        We reject packages that are used for Hacking or fall under certain other conditions described in [Packaging Policy](https://github.com/termux/termux-packages/blob/master/CONTRIBUTING.md#packaging-policy).
+        Please ***READ*** this policy document for the specific meanings of the terms below!
       options:
-        - label: The requested package complies with [Packaging Policy](https://github.com/termux/termux-packages/blob/master/CONTRIBUTING.md#packaging-policy).
+        - label: The project is actively developed.
+            ###### We prefer packaging actively maintained projects
+          required: false
+        - label: The project has [existing packages](https://repology.org/projects) and is "well known".
+            ###### We prefer packaging projects with [existing packages on other distributions](https://repology.org/projects).
+          required: false
+        - label: Licensed under an [open source license](https://spdx.org/licenses/).
           required: true
+        - label: |
+            Not available through a language package manager: pip, npm, cpan, cargo, etc.
+        ###### We do not package modules for Ruby, Lua, Python, NodeJS, etc.
+        ###### Unless they require specific tweaks in order to work on Termux, in which case the rest of the packaging policy still applies.
+          required: true
+        - label: Not taking up too much disk space (< 100MiB per architecture, exceptions can be made)
+            ###### All packages are usually built across 4 architectures, and our resources are limited.
+            ###### We generally restrict package size to 100MiB (per architecture).
+          required: false
+        - label: Not duplicating the functionality of existing packages.
+            ###### Every package requires a baseline of maintenance, as such we generally prefer packaging projects offering distinct functionality from existing packages.
+          required: false
+        - label: Not serving hacking, malware, phishing, spamming, spying, ddos functionality.
+            ###### We do not accept packages which serve solely destructive or privacy violation purposes, including but not limited to pentesting, phishing, bruteforce, sms/call bombing, DDoS attaks, OSINT.
+          required: true
+        - label: I certify that I have read [Termux Packaging Policy](https://github.com/termux/termux-packages/blob/master/CONTRIBUTING.md#packaging-policy) and understand that my request will be denied if it is found lacking.
+          required: true
+
   - type: textarea
     attributes:
       label: Additional information

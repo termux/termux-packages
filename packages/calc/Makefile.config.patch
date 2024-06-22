@@ -1,0 +1,137 @@
+--- a/Makefile.config
++++ b/Makefile.config
+@@ -135,7 +135,7 @@
+ #
+ #	PREFIX= /usr/local
+ #
+-PREFIX= /usr/local
++PREFIX ?= /usr/local
+ #PREFIX= /usr
+ #PREFIX= /usr/global
+ 
+@@ -838,8 +838,8 @@
+ #
+ else	# ($(target),Darwin)
+ 
+-INCDIR= /usr/include
+-#INCDIR= ${PREFIX}/include
++#INCDIR= /usr/include
++INCDIR= ${PREFIX}/include
+ #INCDIR= /dev/env/DJDIR/include
+ 
+ endif	# ($(target),Darwin)
+@@ -898,16 +898,16 @@
+ # defaults for non-macOS
+ else	# ($(target),Darwin)
+ # default BINDIR for non-macOS
+-BINDIR= /usr/bin
+-#BINDIR= ${PREFIX}/bin
++#BINDIR= /usr/bin
++BINDIR= ${PREFIX}/bin
+ #BINDIR= /dev/env/DJDIR/bin
+ # default LIBDIR for non-macOS
+-LIBDIR= /usr/lib
+-#LIBDIR= ${PREFIX}/lib
++#LIBDIR= /usr/lib
++LIBDIR= ${PREFIX}/lib
+ #LIBDIR= /dev/env/DJDIR/lib
+ # default CALC_SHAREDIR for non-macOS
+-CALC_SHAREDIR= /usr/share/calc
+-#CALC_SHAREDIR= ${PREFIX}/lib/calc
++#CALC_SHAREDIR= /usr/share/calc
++CALC_SHAREDIR= ${PREFIX}/lib/calc
+ #CALC_SHAREDIR= /dev/env/DJDIR/share/calc
+ endif	# ($(target),Darwin)
+ 
+@@ -944,7 +944,7 @@
+ CUSTOMCALDIR= ${CALC_SHAREDIR}/custom
+ CUSTOMHELPDIR= ${CALC_SHAREDIR}/custhelp
+ CUSTOMINCDIR= ${CALC_INCDIR}/custom
+-SCRIPTDIR= ${BINDIR}/cscript
++SCRIPTDIR= ${CALC_SHAREDIR}/cscript
+ 
+ # T - top level directory under which calc will be installed
+ #
+@@ -986,7 +986,7 @@
+ #
+ # If in doubt, use T=
+ #
+-T=
++T=${DESTDIR}
+ 
+ # where man section 1 pages are installed
+ #
+@@ -1003,11 +1003,11 @@
+ #MANDIR= ${PREFIX}/man/man1
+ #MANDIR= /usr/man/man1
+ #
+-ifeq ($(target),Darwin)
++#ifeq ($(target),Darwin)
+ MANDIR= ${PREFIX}/share/man/man1
+-else	# ($(target),Darwin)
+-MANDIR= /usr/share/man/man1
+-endif	# ($(target),Darwin)
++#else	# ($(target),Darwin)
++#MANDIR= /usr/share/man/man1
++#endif	# ($(target),Darwin)
+ #MANDIR= /dev/env/DJDIR/man/man1
+ #MANDIR= /usr/man/u_man/man1
+ #MANDIR= /usr/contrib/man/man1
+@@ -1163,14 +1163,14 @@
+ #READLINE_LIB=
+ #READLINE_EXTRAS=
+ #
+-READLINE_LIB= -lreadline
+-READLINE_EXTRAS= -lhistory -lncurses
++#READLINE_LIB= -lreadline
++#READLINE_EXTRAS= -lhistory -lncurses
+ #
+ #READLINE_LIB= -L/usr/gnu/lib -lreadline
+ #READLINE_EXTRAS= -lhistory -lncurses
+ #
+-#READLINE_LIB= -L${PREFIX}/lib -lreadline
+-#READLINE_EXTRAS= -lhistory -lncurses
++READLINE_LIB= -L${PREFIX}/lib -lreadline
++READLINE_EXTRAS= -lhistory -lncurses
+ #
+ # For Apple OS X: install fink from http://fink.sourceforge.net
+ #		  and then do a 'fink install readline' and then use:
+@@ -1187,9 +1187,9 @@
+ #READLINE_LIB= -L${PREFIX}/opt/readline/lib -lreadline
+ #READLINE_EXTRAS= -lhistory -lncurses
+ #
+-READLINE_INCLUDE=
++#READLINE_INCLUDE=
+ #READLINE_INCLUDE= -I/usr/gnu/include
+-#READLINE_INCLUDE= -I${PREFIX}/include
++READLINE_INCLUDE= -I${PREFIX}/include
+ 
+ # Handle the case where macOS is being used with HomeBrew
+ # # and using the readline, history, and ncurses libraries.
+@@ -1241,7 +1241,7 @@
+ # a *.a link library.  Set RANLIB to the utility that performs this
+ # action.  Set RANLIB to : if your system does not need such a utility.
+ #
+-RANLIB=ranlib
++RANLIB?=ranlib
+ #RANLIB=:
+ 
+ # If you do not wish to use purify, set PURIFY to an empty string.
+@@ -1317,7 +1317,7 @@
+ 
+ # standard utilities used during make
+ #
+-AR= ar
++AR?= ar
+ AWK= awk
+ CAT= cat
+ CHMOD= chmod
+@@ -1332,7 +1332,7 @@
+ GREP= grep
+ HOSTNAME= hostname
+ LANG= C
+-LDCONFIG= ldconfig
++LDCONFIG=
+ LN= ln
+ LS= ls
+ MAKE= make

@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=http://joewing.net/projects/jwm/
+TERMUX_PKG_DESCRIPTION="Joe's Window Manager is a light-weight X11 window manager"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
+TERMUX_PKG_VERSION=2.4.3
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL=https://github.com/joewing/jwm/releases/download/v${TERMUX_PKG_VERSION}/jwm-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=ee3b4ee0c452ef31fcb9303ab50aaf496cf5bdf7b5f1fdc9a1251b7175ca67ab
+TERMUX_PKG_DEPENDS="libcairo,librsvg,pango,libjpeg-turbo,libpng,libxext,libxrender,libxmu,libxinerama,libxpm"
+TERMUX_PKG_BUILD_IN_SRC=true

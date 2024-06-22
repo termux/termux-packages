@@ -8,6 +8,7 @@ TERMUX_PKG_VERSION=1:3.1.0
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://linuxcontainers.org/downloads/lxc/lxc-${TERMUX_PKG_VERSION:2}.tar.gz
 TERMUX_PKG_SHA256=4d8772c25baeaea2c37a954902b88c05d1454c91c887cb6a0997258cfac3fdc5
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="gnupg, libcap, libseccomp, rsync, wget"
 TERMUX_PKG_BREAKS="lxc-dev"
 TERMUX_PKG_REPLACES="lxc-dev"

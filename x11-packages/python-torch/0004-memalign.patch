@@ -1,0 +1,22 @@
+--- a/torch/csrc/jit/python/script_init.cpp
++++ b/torch/csrc/jit/python/script_init.cpp
+@@ -718,7 +718,7 @@
+   std::shared_ptr<char> bytes_copy(
+       static_cast<char*>(_aligned_malloc(size, kFlatbufferDataAlignmentBytes)),
+       _aligned_free);
+-#elif defined(__APPLE__)
++#elif defined(__APPLE__) || defined(__ANDROID__)
+   void* p;
+   ::posix_memalign(&p, kFlatbufferDataAlignmentBytes, size);
+   TORCH_INTERNAL_ASSERT(p, "Could not allocate memory for flatbuffer");
+--- a/third_party/pocketfft/pocketfft_hdronly.h
++++ b/third_party/pocketfft/pocketfft_hdronly.h
+@@ -149,7 +149,7 @@
+ #endif
+ #endif
+ 
+-#if __cplusplus >= 201703L
++#if (__cplusplus >= 201703L) && !defined(__ANDROID__)
+ inline void *aligned_alloc(size_t align, size_t size)
+   {
+   // aligned_alloc() requires that the requested size is a multiple of "align"

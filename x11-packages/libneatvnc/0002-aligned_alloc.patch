@@ -1,0 +1,18 @@
+--- a/src/fb.c
++++ b/src/fb.c
+@@ -33,6 +33,15 @@
+ #define ALIGN_UP(n, a) (UDIV_UP(n, a) * a)
+ #define EXPORT __attribute__((visibility("default")))
+ 
++#if defined(__ANDROID__) && __ANDROID_API__ < 26
++void *aligned_alloc(size_t align, size_t size)
++{
++	void *result = NULL;
++	posix_memalign(&result, align, size);
++	return result;
++}
++#endif
++
+ EXPORT
+ struct nvnc_fb* nvnc_fb_new(uint16_t width, uint16_t height,
+                             uint32_t fourcc_format, uint16_t stride)

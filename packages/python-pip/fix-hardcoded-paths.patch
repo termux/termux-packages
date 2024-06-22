@@ -1,0 +1,19 @@
+--- pip-22.3.1/src/pip/_internal/utils/appdirs.py
++++ pip-22.3.1/src/pip/_internal/utils/appdirs.py
+@@ -49,4 +49,4 @@ def site_config_dirs(appname: str) -> List[str]:
+         return [dirval]
+ 
+     # Unix-y system. Look in /etc as well.
+-    return dirval.split(os.pathsep) + ["/etc"]
++    return dirval.split(os.pathsep) + ["@TERMUX_PREFIX@/etc"]
+--- pip-22.3.1/src/pip/_vendor/platformdirs/unix.py
++++ pip-22.3.1/src/pip/_vendor/platformdirs/unix.py
+@@ -79,7 +79,7 @@ def site_config_dir(self) -> str:
+         # XDG default for $XDG_CONFIG_DIRS only first, if multipath is False
+         path = os.environ.get("XDG_CONFIG_DIRS", "")
+         if not path.strip():
+-            path = "/etc/xdg"
++            path = "@TERMUX_PREFIX@/etc/xdg"
+         return self._with_multi_path(path)
+ 
+     @property

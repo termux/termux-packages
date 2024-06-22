@@ -1,0 +1,13 @@
+https://github.com/termux/termux-packages/issues/19050
+
+--- a/gfx/gl/GLContext.cpp
++++ b/gfx/gl/GLContext.cpp
+@@ -2619,6 +2619,8 @@
+   dl_iterate_phdr(
+       [](dl_phdr_info* info, size_t size, void* data) {
+         auto& foundPath = *reinterpret_cast<Maybe<nsAutoCString>*>(data);
++        // XXX: `dlpi_name` may be nullptr, see termux/termux-packages#19050.
++        if (info->dlpi_name == nullptr) return 0;
+         nsDependentCString thisPath(info->dlpi_name);
+         if (StringEndsWith(thisPath, "/swrast_dri.so"_ns)) {
+           foundPath.emplace(thisPath);

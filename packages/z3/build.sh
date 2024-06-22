@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/Z3Prover/z3
 TERMUX_PKG_DESCRIPTION="Z3 is a theorem prover from Microsoft Research"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="4.11.2"
+TERMUX_PKG_VERSION="4.13.0"
 TERMUX_PKG_SRCURL=https://github.com/Z3Prover/z3/archive/z3-$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=e3a82431b95412408a9c994466fad7252135c8ed3f719c986cd75c8c5f234c7e
+TERMUX_PKG_SHA256=01bcc61c8362e37bb89fd2430f7e3385e86df7915019bd2ce45de9d9bd934502
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
 TERMUX_PKG_DEPENDS="libc++"
@@ -18,5 +18,4 @@ termux_step_configure() {
 	else
 		sed 's%../../../../../%%g' -i Makefile
 	fi
-	sed 's/\-lpthread//g' -i config.mk
 }

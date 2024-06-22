@@ -1,17 +1,17 @@
 --- ./src/main.c.orig	2021-08-01 00:28:01.000000000 +0200
 +++ ./src/main.c	2021-09-10 09:34:27.031713786 +0200
-@@ -36,7 +36,7 @@
+@@ -37,7 +37,7 @@
   */
- #include "locale.h"
+ #include <locale.h>
  
 -#if !defined(WINDOWS)
 +#if !defined(WINDOWS) && !defined(__ANDROID__)
- #include "langinfo.h"
+ #include <langinfo.h>
  #endif
  
-@@ -497,9 +497,11 @@
+@@ -475,9 +475,11 @@
  		ANGBAND_SYS = mstr;
- #if !defined(WINDOWS)
+ #if !defined(WINDOWS) && !defined(DJGPP)
  	if (setlocale(LC_CTYPE, "")) {
 +#ifndef __ANDROID__
  		/* Require UTF-8 */

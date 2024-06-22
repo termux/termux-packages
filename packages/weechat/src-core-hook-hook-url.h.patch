@@ -1,0 +1,23 @@
+--- a/src/core/hook/hook-url.h
++++ b/src/core/hook/hook-url.h
+@@ -20,6 +20,10 @@
+ #ifndef WEECHAT_HOOK_URL_H
+ #define WEECHAT_HOOK_URL_H
+ 
++#ifdef __ANDROID__
++#include <stdatomic.h>
++#endif
++
+ struct t_weechat_plugin;
+ struct t_infolist_item;
+ struct t_hashtable;
+@@ -42,6 +46,9 @@
+     int thread_running;                /* 1 if thread is running            */
+     struct t_hook *hook_timer;         /* timer to check if thread has ended*/
+     struct t_hashtable *output;        /* URL transfer output data          */
++#ifdef __ANDROID__
++    atomic_flag thread_cancel;         /* thread cancellation flag          */
++#endif
+ };
+ 
+ extern char *hook_url_get_description (struct t_hook *hook);

@@ -1,6 +1,5 @@
 TERMUX_SUBPKG_DESCRIPTION="Tkinter support for PyPy 3"
 TERMUX_SUBPKG_DEPENDS="tk"
-_MAJOR_VERSION=3.8
 TERMUX_SUBPKG_INCLUDE="
 opt/pypy3/lib/pypy$_MAJOR_VERSION/_tkinter/*
 "

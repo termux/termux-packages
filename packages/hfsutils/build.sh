@@ -10,7 +10,10 @@ TERMUX_PKG_DEPENDS="libandroid-support"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--mandir=$TERMUX_PREFIX/share/man"
 TERMUX_PKG_BUILD_IN_SRC=true
 
+termux_step_pre_configure() {
+	autoreconf -fi
+}
+
 termux_step_post_configure() {
 	mkdir -p ${TERMUX_PREFIX}/share/man/man1
 }
-

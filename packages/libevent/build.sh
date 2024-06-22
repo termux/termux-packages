@@ -31,13 +31,14 @@ termux_step_post_get_source() {
 	local _SOVERSION=7
 
 	for a in LIBVERSION_CURRENT LIBVERSION_AGE; do
-		local _${a}=$(sed -En 's/.*set\(EVENT_ABI_'"${a}"'\s+([0-9])\).*/\1/p' \
+		local _${a}=$(sed -En 's/.*set\(EVENT_ABI_'"${a}"'\s+([0-9]+)\).*/\1/p' \
 				CMakeLists.txt)
 	done
 	local r=$(sed -En 's/.*set\(EVENT_PACKAGE_RELEASE\s+([0-9.]+)\).*/\1/p' \
 			CMakeLists.txt)
 	local v=$(( _LIBVERSION_CURRENT - _LIBVERSION_AGE ))
-	if [ "${_RELEASE}" != "${r}" ] || [ "${_SOVERSION}" != "${v}" ]; then
+	if [ "${_RELEASE}" != "${r}" ] || \
+		[ ! "${_LIBVERSION_CURRENT}" ] || [ "${_SOVERSION}" != "${v}" ]; then
 		termux_error_exit "SOVERSION guard check failed."
 	fi
 }

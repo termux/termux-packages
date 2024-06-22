@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://rizin.re
+TERMUX_PKG_DESCRIPTION="UNIX-like reverse engineering framework and command-line toolset."
+TERMUX_PKG_LICENSE="GPL-3.0, LGPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="0.7.3"
+TERMUX_PKG_SRCURL=https://github.com/rizinorg/rizin/archive/v$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SUGGESTS="python, apk-tools, apktool, apksigner"
+TERMUX_PKG_SHA256=df369c2646cee3cfde0cccf64d1f914f01127a14dffe8d638a6fe031a96e6116
+TERMUX_PKG_AUTO_UPDATE=true

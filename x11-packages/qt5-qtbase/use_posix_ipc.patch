@@ -1,0 +1,97 @@
+`shm_open` and `shm_unlink` are implemented as static functions, do not check them
+in configure step.
+--- a/src/corelib/configure.json
++++ b/src/corelib/configure.json
+@@ -463,11 +463,9 @@
+             "test": {
+                 "include": [ "sys/types.h", "sys/mman.h", "semaphore.h", "fcntl.h" ],
+                 "main": [
+-                    "sem_close(sem_open(\"test\", O_CREAT | O_EXCL, 0666, 0));",
+-                    "shm_open(\"test\", O_RDWR | O_CREAT | O_EXCL, 0666);",
+-                    "shm_unlink(\"test\");"
++                    "sem_close(sem_open(\"test\", O_CREAT | O_EXCL, 0666, 0));"
+                 ],
+-                "qmake": "linux: LIBS += -lpthread -lrt"
++                "qmake": "linux: LIBS += -lpthread -lrt -landroid-posix-semaphore"
+             }
+         },
+         "linkat": {
+--- a/src/corelib/kernel/qsharedmemory_p.h
++++ b/src/corelib/kernel/qsharedmemory_p.h
+@@ -72,7 +72,7 @@
+ # include "private/qobject_p.h"
+ #endif
+ 
+-#if !defined(Q_OS_WIN) && !defined(Q_OS_ANDROID) && !defined(Q_OS_INTEGRITY) && !defined(Q_OS_RTEMS)
++#if !defined(Q_OS_WIN) && !defined(Q_OS_ANDROID) && !defined(Q_OS_INTEGRITY) && !defined(Q_OS_RTEMS) && !defined(QT_POSIX_IPC)
+ #  include <sys/sem.h>
+ #endif
+ 
+--- a/src/corelib/kernel/qsharedmemory_posix.cpp
++++ b/src/corelib/kernel/qsharedmemory_posix.cpp
+@@ -59,6 +59,65 @@
+ 
+ #include "private/qcore_unix_p.h"
+ 
++static int shm_unlink(const char *name) {
++    size_t namelen;
++    char *fname;
++
++    /* Construct the filename.  */
++    while (name[0] == '/') ++name;
++
++    if (name[0] == '\0') {
++        /* The name "/" is not supported.  */
++        errno = EINVAL;
++        return -1;
++    }
++
++    namelen = strlen(name);
++    fname = (char *) alloca(sizeof("@TERMUX_PREFIX@/tmp/") - 1 + namelen + 1);
++    memcpy(fname, "@TERMUX_PREFIX@/tmp/", sizeof("@TERMUX_PREFIX@/tmp/") - 1);
++    memcpy(fname + sizeof("@TERMUX_PREFIX@/tmp/") - 1, name, namelen + 1);
++
++    return unlink(fname);
++}
++
++static int shm_open(const char *name, int oflag, mode_t mode) {
++    size_t namelen;
++    char *fname;
++    int fd;
++
++    /* Construct the filename.  */
++    while (name[0] == '/') ++name;
++
++    if (name[0] == '\0') {
++        /* The name "/" is not supported.  */
++        errno = EINVAL;
++        return -1;
++    }
++
++    namelen = strlen(name);
++    fname = (char *) alloca(sizeof("@TERMUX_PREFIX@/tmp/") - 1 + namelen + 1);
++    memcpy(fname, "@TERMUX_PREFIX@/tmp/", sizeof("@TERMUX_PREFIX@/tmp/") - 1);
++    memcpy(fname + sizeof("@TERMUX_PREFIX@/tmp/") - 1, name, namelen + 1);
++
++    fd = open(fname, oflag, mode);
++    if (fd != -1) {
++        /* We got a descriptor.  Now set the FD_CLOEXEC bit.  */
++        int flags = fcntl(fd, F_GETFD, 0);
++        flags |= FD_CLOEXEC;
++        flags = fcntl(fd, F_SETFD, flags);
++
++        if (flags == -1) {
++            /* Something went wrong.  We cannot return the descriptor.  */
++            int save_errno = errno;
++            close(fd);
++            fd = -1;
++            errno = save_errno;
++        }
++    }
++
++    return fd;
++}
++
+ QT_BEGIN_NAMESPACE
+ 
+ int QSharedMemoryPrivate::handle()

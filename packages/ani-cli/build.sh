@@ -2,12 +2,15 @@ TERMUX_PKG_HOMEPAGE=https://github.com/pystardust/ani-cli
 TERMUX_PKG_DESCRIPTION="A cli to browse and watch anime"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.4
-TERMUX_PKG_SRCURL=https://github.com/pystardust/ani-cli/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=45cfd2e43b8b83ae662fc3c8724b250281aca681828101e3bd5eb287a3794167
-TERMUX_PKG_DEPENDS="axel, curl, ffmpeg, gawk, grep, openssl-tool, sed"
+TERMUX_PKG_VERSION="4.8"
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL=https://github.com/pystardust/ani-cli/archive/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=9857bf88a1cbef4580dea52da349d3b23d2288b67a03fdd7b6c5c1b35d08351d
+TERMUX_PKG_DEPENDS="aria2, ffmpeg, fzf, grep, sed, wget"
+TERMUX_PKG_ANTI_BUILD_DEPENDS="aria2, ffmpeg, fzf, grep, sed, wget"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make_install() {
 	install -Dm700 -t $TERMUX_PREFIX/bin ani-cli
@@ -21,10 +24,10 @@ termux_step_make_install() {
 }
 
 termux_step_create_debscripts() {
-	cat <<-EOF > ./postinst
-		#!$TERMUX_PREFIX/bin/sh
-		echo
-		echo Note that you need to have the mpv android app installed.
-		echo
+	cat <<- EOF > ./postinst
+	#!${TERMUX_PREFIX}/bin/sh
+	echo
+	echo Note that you need to have the mpv android app installed.
+	echo
 	EOF
 }

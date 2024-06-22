@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=3.2.91
 TERMUX_PKG_REVISION=14
 TERMUX_PKG_SRCURL=ftp://alpha.gnu.org/gnu/smalltalk/smalltalk-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=13a7480553c182dbb8092bd4f215781b9ec871758d1db7045c2d8587e4d1bef9
-TERMUX_PKG_DEPENDS="glib, libandroid-support, libffi, libltdl, libsigsegv, zlib"
+TERMUX_PKG_DEPENDS="gdbm, glib, libandroid-support, libexpat, libffi, libgmp, libiconv, libltdl, libsigsegv, libsqlite, zlib"
 TERMUX_PKG_BREAKS="smalltalk-dev"
 TERMUX_PKG_REPLACES="smalltalk-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-gtk"
@@ -26,6 +26,8 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
+	autoreconf -fi
+
 	export LD_LIBRARY_PATH="$TERMUX_PKG_HOSTBUILD_DIR/libgst/.libs"
 	sed -i \
 		"s%@TERMUX_PKG_HOSTBUILD_DIR@%$TERMUX_PKG_HOSTBUILD_DIR%g" \

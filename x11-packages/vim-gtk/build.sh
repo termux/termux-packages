@@ -4,21 +4,23 @@ TERMUX_PKG_LICENSE="VIM License"
 TERMUX_PKG_MAINTAINER="@termux"
 
 # vim should only be updated every 50 releases on multiples of 50.
-TERMUX_PKG_VERSION=9.0.1050
-TERMUX_PKG_SRCURL=https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=5cc8b8f3272d3302384b6f3d52ef6302dbb53587f5d88e2a155767530c1f6c3f
-
+# Update all of vim, vim-python and vim-gtk to the same version in one PR.
+TERMUX_PKG_VERSION=9.1.0500
+TERMUX_PKG_SRCURL="https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=d6009449df4e28e38b0da3bf5621a65037dec1ec53092f8f56cd1a27f3d91009
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libcairo, libcanberra, libice, libiconv, liblua52, libsm, libx11, libxt, ncurses, pango, python"
 TERMUX_PKG_CONFLICTS="vim, vim-python, vim-runtime"
 TERMUX_PKG_BUILD_IN_SRC=true
 
-_PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_small_wchar_t=no
 ac_cv_path_vi_cv_path_plain_lua=lua5.2
 vi_cv_path_python3_pfx=$TERMUX_PREFIX
+vi_cv_path_python3_include=${TERMUX_PREFIX}/include/python${TERMUX_PYTHON_VERSION}
+vi_cv_path_python3_platinclude=${TERMUX_PREFIX}/include/python${TERMUX_PYTHON_VERSION}
 vi_cv_var_python3_abiflags=
-vi_cv_var_python3_version=${_PYTHON_VERSION}
+vi_cv_var_python3_version=${TERMUX_PYTHON_VERSION}
 vim_cv_getcwd_broken=no
 vim_cv_memmove_handles_overlap=yes
 vim_cv_stat_ignores_slash=no
@@ -33,22 +35,28 @@ vim_cv_tty_group=world
 --enable-python3interp
 --with-features=huge
 --with-lua-prefix=$TERMUX_PREFIX
---with-python3-config-dir=$TERMUX_PREFIX/lib/python${_PYTHON_VERSION}/config-${_PYTHON_VERSION}/
+--with-python3-config-dir=$TERMUX_PYTHON_HOME/config-${TERMUX_PYTHON_VERSION}/
 --with-tlib=ncursesw
 --with-x"
 
 TERMUX_PKG_RM_AFTER_INSTALL="
-share/vim/vim90/spell/en.ascii*
-share/vim/vim90/print
-share/vim/vim90/tools
-share/applications/mimeinfo.cache
-share/icons/hicolor/icon-theme.cache
+share/vim/vim91/spell/en.ascii*
+share/vim/vim91/print
+share/vim/vim91/tools
 "
 
 TERMUX_PKG_CONFFILES="share/vim/vimrc"
 
 termux_step_pre_configure() {
 	LDFLAGS+=" -landroid-shmem"
+
+	# Version guard
+	local ver_v=$(. $TERMUX_SCRIPTDIR/packages/vim/build.sh; echo ${TERMUX_PKG_VERSION#*:})
+	local ver_p=$(. $TERMUX_SCRIPTDIR/packages/vim-python/build.sh; echo ${TERMUX_PKG_VERSION#*:})
+	local ver_g=$(. $TERMUX_SCRIPTDIR/x11-packages/vim-gtk/build.sh; echo ${TERMUX_PKG_VERSION#*:})
+	if [ "${ver_v}" != "${ver_p}" ] || [ "${ver_p}" != "${ver_g}" ]; then
+		termux_error_exit "Version mismatch between vim, vim-python and vim-gtk."
+	fi
 
 	make distclean
 

@@ -1,0 +1,100 @@
+--- a/extra/cups-pdf.conf
++++ b/extra/cups-pdf.conf
+@@ -46,23 +46,23 @@
+ ##     ${USER} will be expanded to the user name
+ ##  in case it is an NFS export make sure it is exported without
+ ##  root_squash! 
+-### Default: /var/spool/cups-pdf/${USER}
++### Default: @TERMUX_PREFIX@/var/spool/cups-pdf/${USER}
+ 
+-#Out /var/spool/cups-pdf/${USER}
++#Out @TERMUX_PREFIX@/var/spool/cups-pdf/${USER}
+ 
+ ### Key: AnonDirName (config)
+ ##  ABSOLUTE path for anonymously created PDF files
+ ##  if anonymous access is disabled this setting has no effect
+-### Default: /var/spool/cups-pdf/ANONYMOUS
++### Default: @TERMUX_PREFIX@/var/spool/cups-pdf/ANONYMOUS
+ 
+-#AnonDirName /var/spool/cups-pdf/ANONYMOUS
++#AnonDirName @TERMUX_PREFIX@/var/spool/cups-pdf/ANONYMOUS
+ 
+ ### Key: Spool (config)
+ ##  CUPS-PDF spool directory - make sure there is no user 'SPOOL' on your
+ ##  system or change the path	
+-### Default: /var/spool/cups-pdf/SPOOL
++### Default: @TERMUX_PREFIX@/var/spool/cups-pdf/SPOOL
+ 
+-#Spool /var/spool/cups-pdf/SPOOL
++#Spool @TERMUX_PREFIX@/var/spool/cups-pdf/SPOOL
+ 
+ 
+ ###########################################################################
+@@ -210,9 +210,9 @@
+ ### Key: Log (config)
+ ##  CUPS-PDF log directory 
+ ##  set this to an empty value to disable all logging
+-### Default: /var/log/cups
++### Default: @TERMUX_PREFIX@/var/log/cups
+ 
+-#Log /var/log/cups
++#Log @TERMUX_PREFIX@/var/log/cups
+ 
+ ### Key: LogType (config, ppd)
+ ##  log-mode 
+@@ -236,16 +236,16 @@
+ ##  location of GhostScript binary (gs) 
+ ##  MacOSX: for using pstopdf (recommended) set this to /usr/bin/pstopdf
+ ##          or its proper location on your system
+-### Default: /usr/bin/gs
++### Default: @TERMUX_PREFIX@/bin/gs
+ 
+-#GhostScript /usr/bin/gs
++#GhostScript @TERMUX_PREFIX@/bin/gs
+ 
+ ### Key: GSTmp (config)
+ ##  location of temporary files during GhostScript operation 
+ ##  this must be user-writable like /var/tmp or /tmp ! 
+-### Default: /var/tmp
++### Default: @TERMUX_PREFIX@/tmp
+ 
+-#GSTmp /var/tmp
++#GSTmp @TERMUX_PREFIX@/tmp
+ 
+ ### Key: GSCall (config)
+ ## command line for calling GhostScript (!!! DO NOT USE NEWLINES !!!)
+--- a/src/cups-pdf.h
++++ b/src/cups-pdf.h
+@@ -18,7 +18,7 @@
+ /  they are reasonable for most systems.			     */
+ 
+ /* location of the configuration file */
+-#define CP_CONFIG_PATH "/etc/cups"
++#define CP_CONFIG_PATH "@TERMUX_PREFIX@/etc/cups"
+ 
+ 
+ /* --- DO NOT EDIT BELOW THIS LINE --- */
+@@ -55,17 +55,17 @@
+     mode_t modval;
+   } value;
+ } configData[] = {
+-  { "AnonDirName", SEC_CONF|SEC_PPD, { "/var/spool/cups-pdf/ANONYMOUS" } },
++  { "AnonDirName", SEC_CONF|SEC_PPD, { "@TERMUX_PREFIX@/var/spool/cups-pdf/ANONYMOUS" } },
+   { "AnonUser", SEC_CONF|SEC_PPD, { "nobody" } },
+-  { "GhostScript", SEC_CONF|SEC_PPD, { "/usr/bin/gs" } },
++  { "GhostScript", SEC_CONF|SEC_PPD, { "@TERMUX_PREFIX@/bin/gs" } },
+   { "GSCall", SEC_CONF|SEC_PPD, { "%s -q -dCompatibilityLevel=%s -dNOPAUSE -dBATCH -dSAFER -sDEVICE=pdfwrite -sOutputFile=\"%s\" -dAutoRotatePages=/PageByPage -dAutoFilterColorImages=false -dColorImageFilter=/FlateEncode -dPDFSETTINGS=/prepress -c -f %s" } },
+   { "Grp", SEC_CONF|SEC_PPD, { "lp" } },
+-  { "GSTmp", SEC_CONF|SEC_PPD, { "TMPDIR=/var/tmp" } },
+-  { "Log", SEC_CONF|SEC_PPD, { "/var/log/cups" } },
++  { "GSTmp", SEC_CONF|SEC_PPD, { "TMPDIR=@TERMUX_PREFIX@/tmp" } },
++  { "Log", SEC_CONF|SEC_PPD, { "@TERMUX_PREFIX@/var/log/cups" } },
+   { "PDFVer", SEC_CONF|SEC_PPD|SEC_LPOPT, { "1.4" } },
+   { "PostProcessing", SEC_CONF|SEC_PPD|SEC_LPOPT, { "" } },
+-  { "Out", SEC_CONF|SEC_PPD, { "/var/spool/cups-pdf/${USER}" } },
+-  { "Spool", SEC_CONF|SEC_PPD, { "/var/spool/cups-pdf/SPOOL" } },
++  { "Out", SEC_CONF|SEC_PPD, { "@TERMUX_PREFIX@/var/spool/cups-pdf/${USER}" } },
++  { "Spool", SEC_CONF|SEC_PPD, { "@TERMUX_PREFIX@/var/spool/cups-pdf/SPOOL" } },
+   { "UserPrefix", SEC_CONF|SEC_PPD, { "" } },
+   { "RemovePrefix", SEC_CONF|SEC_PPD, { "" } },
+   { "OutExtension", SEC_CONF|SEC_PPD|SEC_LPOPT, { "pdf" } },

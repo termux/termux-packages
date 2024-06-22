@@ -1,26 +1,26 @@
-diff --git a/aom_ports/arm_cpudetect.c b/aom_ports/arm_cpudetect.c
-index 1696f15bf..b0b011bcc 100644
---- a/aom_ports/arm_cpudetect.c
-+++ b/aom_ports/arm_cpudetect.c
-@@ -88,20 +88,17 @@ int aom_arm_cpu_caps(void) {
- }
- 
- #elif defined(__ANDROID__) /* end _MSC_VER */
--#include <cpu-features.h>
- 
- int aom_arm_cpu_caps(void) {
-   int flags;
-   int mask;
--  uint64_t features;
-   if (!arm_cpu_env_flags(&flags)) {
-     return flags;
-   }
-   mask = arm_cpu_env_mask();
--  features = android_getCpuFeatures();
- 
+diff --git a/aom_ports/aarch32_cpudetect.c b/aom_ports/aarch32_cpudetect.c
+index 809bae5920..9f44573118 100644
+--- a/aom_ports/aarch32_cpudetect.c
++++ b/aom_ports/aarch32_cpudetect.c
+@@ -49,8 +49,7 @@ static int arm_get_cpu_caps(void) {
+ static int arm_get_cpu_caps(void) {
+   int flags = 0;
  #if HAVE_NEON
+-  uint64_t features = android_getCpuFeatures();
 -  if (features & ANDROID_CPU_ARM_FEATURE_NEON) flags |= HAS_NEON;
 +  flags |= HAS_NEON;
- #endif /* HAVE_NEON */
-   return flags & mask;
+ #endif  // HAVE_NEON
+   return flags;
  }
+diff --git a/aom_ports/arm_cpudetect.h b/aom_ports/arm_cpudetect.h
+index 2b63942424..6c15e83326 100644
+--- a/aom_ports/arm_cpudetect.h
++++ b/aom_ports/arm_cpudetect.h
+@@ -36,7 +36,6 @@
+ // Use getauxval() when targeting (64-bit) Android with API level >= 18.
+ // getauxval() is supported since Android API level 18 (Android 4.3.)
+ // First Android version with 64-bit support was Android 5.x (API level 21).
+-#include <cpu-features.h>
+ #endif
+ 
+ static bool arm_cpu_env_flags(int *flags) {

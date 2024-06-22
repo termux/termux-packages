@@ -64,15 +64,6 @@ diff -uNr uftrace-0.9.3/cmds/record.c uftrace-0.9.3.mod/cmds/record.c
 +    return fd;
 +}
 +
- static bool can_use_fast_libmcount(struct opts *opts)
+ static bool can_use_fast_libmcount(struct uftrace_opts *opts)
  {
  	if (debug)
-@@ -918,7 +977,7 @@
- 		sscanf(sl->id, "/uftrace-%[^-]-%*d-%*d", shmem_session);
- 		pr_dbg2("unlink for session: %s\n", shmem_session);
- 
--		num = scandir("/dev/shm/", &shmem_bufs, filter_shmem, alphasort);
-+		num = scandir("@TERMUX_PREFIX@/tmp/", &shmem_bufs, filter_shmem, alphasort);
- 		for (i = 0; i < num; i++) {
- 			sid[0] = '/';
- 			memcpy(&sid[1], shmem_bufs[i]->d_name, MSG_ID_SIZE);

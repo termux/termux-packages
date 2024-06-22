@@ -1,0 +1,52 @@
+--- a/src/cwidget/generic/threads/threads.h
++++ b/src/cwidget/generic/threads/threads.h
+@@ -25,6 +25,8 @@
+ #ifndef THREADS_H
+ #define THREADS_H
+ 
++#include <stdatomic.h>
++
+ #include <errno.h>
+ #include <cwidget/generic/util/exception.h>
+ 
+@@ -120,6 +122,8 @@
+       }
+ 
+     public:
++      atomic_bool request_cancel;
++
+       /** \brief Stores the attributes with which a thread is to be
+        * created.
+        *
+@@ -157,7 +161,7 @@
+        */
+       template<typename F>
+       thread(const F &thunk, const attr &a = attr())
+-	:joined(false)
++	:joined(false), request_cancel(ATOMIC_VAR_INIT(false))
+       {
+ 	// Create a thunk on the heap to pass to the new thread.
+ 	F *tmp = new F(thunk);
+@@ -192,7 +196,7 @@
+       /** Cancel this thread. */
+       void cancel()
+       {
+-	pthread_cancel(tid);
++	atomic_store(&request_cancel, true);
+       }
+     };
+ 
+--- a/src/cwidget/toplevel.cc
++++ b/src/cwidget/toplevel.cc
+@@ -480,9 +480,9 @@
+ 	    FD_ZERO(&selectfds);
+ 	    FD_SET(0, &selectfds);
+ 
+-	    pthread_testcancel();
++	    if (atomic_load(&instancet->request_cancel)) pthread_exit(NULL);
+ 	    int result = select(1, &selectfds, NULL, NULL, &timeout);
+-	    pthread_testcancel();	// Workaround for Linux threads suckage.
++	    if (atomic_load(&instancet->request_cancel)) pthread_exit(NULL);
+ 	    // See pthread_cancel(3).
+ 
+ 	    if(result != 1)

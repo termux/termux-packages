@@ -1,0 +1,26 @@
+Since ICU 75, ICU C++ headers need at least C++17 to compile as it
+uses `std::enable_if_t` (introduced in C++14) and `std::is_same_v`
+(introduced in C++17).
+
+--- a/crates/engine_xetex/build.rs
++++ b/crates/engine_xetex/build.rs
+@@ -184,7 +184,7 @@
+ ];
+ 
+ const CXX_FLAGS: &[&str] = &[
+-    "-std=c++14",
++    "-std=c++17",
+     "-Wall",
+     "-Wdate-time",
+     "-Wendif-labels",
+--- a/crates/xetex_layout/build.rs
++++ b/crates/xetex_layout/build.rs
+@@ -86,7 +86,7 @@
+     let mut cppcfg = cc::Build::new();
+ 
+     let cppflags = [
+-        "-std=c++14",
++        "-std=c++17",
+         "-Wall",
+         "-Wdate-time",
+         "-Wendif-labels",

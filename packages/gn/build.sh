@@ -1,18 +1,19 @@
 TERMUX_PKG_HOMEPAGE=https://gn.googlesource.com/gn
 TERMUX_PKG_DESCRIPTION="Meta-build system that generates build files for Ninja"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
-TERMUX_PKG_MAINTAINER="Yaksh Bariya <yakshbari4@gmail.com>"
-TERMUX_PKG_SRCURL=https://gn.googlesource.com/gn.git
+TERMUX_PKG_MAINTAINER="Yaksh Bariya <thunder-coding@termux.dev>"
+TERMUX_PKG_SRCURL=git+https://gn.googlesource.com/gn
 _COMMIT=53ef169800760fdc09f0773bf380fe99eaeab339
 _COMMIT_DATE=2022.05.02
 TERMUX_PKG_VERSION=${_COMMIT_DATE//./}
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_GIT_BRANCH=main
 TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_RECOMMENDS="ninja"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_post_get_source() {
-      	git fetch --unshallow
+	git fetch --unshallow
 	git checkout $_COMMIT
 
 	local version="$(git log -1 --format=%cs | sed 's/-/./g')"

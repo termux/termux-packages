@@ -85,6 +85,16 @@
  	pthread_mutex_destroy(&nas_id->pt_mutex);
 --- a/src/common/common.c
 +++ b/src/common/common.c
+@@ -18,6 +18,9 @@
+ 
+ #include <signal.h>
+ #include <pthread.h>
++#ifdef __ANDROID__
++#include <string.h>
++#endif
+ 
+ #include "common.h"
+ 
 @@ -47,8 +47,24 @@ int spd_pthread_create(pthread_t *thread
  	return ret;
  }

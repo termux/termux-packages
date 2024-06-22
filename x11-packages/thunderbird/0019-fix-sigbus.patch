@@ -1,0 +1,13 @@
+Fix SIGBUS error on Arm. Also apply to other arches just in case.
+
+--- a/other-licenses/nsis/Contrib/CityHash/cityhash/city.cpp
++++ b/other-licenses/nsis/Contrib/CityHash/cityhash/city.cpp
+@@ -33,7 +33,7 @@
+ 
+ using namespace std;
+ 
+-#if __sparc__
++#if __sparc__ || __TERMUX__
+ #include <string.h>
+ static inline uint64 UNALIGNED_LOAD64(const char *p) {
+   uint64 val;

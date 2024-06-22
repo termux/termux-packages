@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://www.thc.org/
+TERMUX_PKG_HOMEPAGE=https://www.thc.org/
 TERMUX_PKG_DESCRIPTION="Secure file, disk, swap, memory erasure utilities"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

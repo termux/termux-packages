@@ -1,12 +1,13 @@
 TERMUX_PKG_HOMEPAGE=https://docs.xfce.org/apps/xfce4-panel-profiles/start
 TERMUX_PKG_DESCRIPTION="A simple application to manage Xfce panel layouts."
-TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.0.13
-TERMUX_PKG_REVISION=9
-TERMUX_PKG_SRCURL=https://archive.xfce.org/src/apps/xfce4-panel-profiles/${TERMUX_PKG_VERSION:0:3}/xfce4-panel-profiles-$TERMUX_PKG_VERSION.tar.bz2
-TERMUX_PKG_SHA256=bc387c13f94109422dc72b0fcb919b0dc11619ba589d03e492252b0d2513b170
-TERMUX_PKG_DEPENDS="xfce4-panel, pygobject, python"
+_MAJOR_VERSION=1.0
+TERMUX_PKG_VERSION=${_MAJOR_VERSION}.14
+TERMUX_PKG_SRCURL=https://archive.xfce.org/src/apps/xfce4-panel-profiles/${_MAJOR_VERSION}/xfce4-panel-profiles-$TERMUX_PKG_VERSION.tar.bz2
+TERMUX_PKG_SHA256=6d08354e8c44d4b0370150809c1ed601d09c8b488b68986477260609a78be3f9
+TERMUX_PKG_DEPENDS="gtk3, libxfce4ui, libxfce4util, pygobject, python, xfce4-panel"
+TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_configure() {

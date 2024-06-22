@@ -1,0 +1,24 @@
+https://github.com/termux/termux-packages/issues/15852
+https://github.com/xiph/libao/commit/1f998f5d6d77674dad01b181811638578ad68242
+
+From 1f998f5d6d77674dad01b181811638578ad68242 Mon Sep 17 00:00:00 2001
+From: Tristan Matthews <tmatth@videolan.org>
+Date: Sun, 15 Jan 2017 12:15:07 -0500
+Subject: [PATCH] pulse: fix missing include warning for nanosleep
+
+---
+ src/plugins/pulse/ao_pulse.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/plugins/pulse/ao_pulse.c b/src/plugins/pulse/ao_pulse.c
+index 9835273..2d10d57 100644
+--- a/src/plugins/pulse/ao_pulse.c
++++ b/src/plugins/pulse/ao_pulse.c
+@@ -30,6 +30,7 @@
+ #include <assert.h>
+ #include <string.h>
+ #include <signal.h>
++#include <time.h>
+ #include <limits.h>
+ 
+ #include <pulse/pulseaudio.h>

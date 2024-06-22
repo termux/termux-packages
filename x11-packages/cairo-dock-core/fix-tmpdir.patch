@@ -1,0 +1,53 @@
++++ ./src/gldit/cairo-dock-packages.c
+@@ -203,11 +203,11 @@
+ gchar *cairo_dock_download_file_in_tmp (const gchar *cURL)
+ {
+ 	int fds = 0;
+-	gchar *cTmpFilePath = g_strdup ("/tmp/cairo-dock-net-file.XXXXXX");
++	gchar *cTmpFilePath = g_strdup ("@TERMUX_PREFIX@/tmp/cairo-dock-net-file.XXXXXX");
+ 	fds = mkstemp (cTmpFilePath);
+ 	if (fds == -1)
+ 	{
+-		cd_warning ("Couldn't create temporary file '%s' - check permissions in /tmp", cTmpFilePath);
++		cd_warning ("Couldn't create temporary file '%s' - check permissions in @TERMUX_PREFIX@/tmp", cTmpFilePath);
+ 		g_free (cTmpFilePath);
+ 		return NULL;
+ 	}
+@@ -263,7 +263,7 @@
+ 			pSharedMemory[1] = NULL;
+ 		}
+ 	}
+-	else  // download in /tmp
++	else  // download in @TERMUX_PREFIX@/tmp
+ 	{
+ 		pSharedMemory[4] = cairo_dock_download_file_in_tmp (pSharedMemory[0]);
+ 	}
+
++++ ./tests/TestCustomLauncher.py
+@@ -7,7 +7,7 @@
+ # Test Custom Launcher
+ class TestCustomLauncher(Test):
+ 	def __init__(self, dock):
+-		self.test_file='/tmp/cairo-dock-test'
++		self.test_file='@TERMUX_PREFIX@/tmp/cairo-dock-test'
+ 		Test.__init__(self, "Test custom launcher", dock)
+ 	
+ 	def run(self):
+@@ -22,7 +22,7 @@
+ 		
+ 		# reload
+ 		set_param (conf_file, "Desktop Entry", "Name", "Test launcher")
+-		set_param (conf_file, "Desktop Entry", "Exec", "echo -n 123 > \/tmp\/cairo-dock-test")
++		set_param (conf_file, "Desktop Entry", "Exec", "echo -n 123 > \@TERMUX_PREFIX@/tmp\/cairo-dock-test")
+ 		self.d.Reload('config-file='+conf_file)
+ 		
+ 		# left-click on it
+@@ -30,7 +30,7 @@
+ 		key("2")  # 'position' starts from 0, but numbers on the icons start from 1
+ 		
+ 		try:
+-			f = open('/tmp/cairo-dock-test', 'r')
++			f = open('@TERMUX_PREFIX@/tmp/cairo-dock-test', 'r')
+ 			result = f.read()
+ 			if result != "123":
+ 				self.print_error ("Failed to reload the launcher")

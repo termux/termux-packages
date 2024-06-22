@@ -1,12 +1,11 @@
-diff -u -r ../iperf-3.2/src/iperf_api.c ./src/iperf_api.c
---- ../iperf-3.2/src/iperf_api.c	2017-06-26 19:42:56.000000000 +0200
-+++ ./src/iperf_api.c	2017-07-26 14:00:54.136126122 +0200
-@@ -3168,7 +3168,7 @@
-             tempdir = getenv("TMP");
+--- src/src/iperf_api.c	2023-09-14 21:38:11.000000000 +0300
++++ src/src/iperf_api.c.patch	2023-09-23 18:27:44.715256242 +0300
+@@ -4307,7 +4307,7 @@
          }
          if (tempdir == 0){
--            tempdir = "/tmp";
+ #if defined(__ANDROID__)
+-            tempdir = "/data/local/tmp";
 +            tempdir = "@TERMUX_PREFIX@/tmp";
-         }
-         snprintf(template, sizeof(template) / sizeof(char), "%s/iperf3.XXXXXX", tempdir);
-     }
+ #else
+             tempdir = "/tmp";
+ #endif

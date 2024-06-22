@@ -1,0 +1,37 @@
+--- a/libweston/meson.build
++++ b/libweston/meson.buil
+@@ -90,7 +90,7 @@
+ 	dep_egl = dependency('', required: false)
+ endif
+ 
+-if get_option('backend-vnc')
++if get_option('backend-vnc') and host_machine.system() != 'android'
+ 	dep_pam = dependency('pam', required: false)
+ 	if not dep_pam.found()
+ 		dep_pam = cc.find_library('pam')
+--- a/pam/meson.build
++++ b/pam/meson.build
+@@ -1,4 +1,4 @@
+-if not get_option('backend-vnc')
++if not get_option('backend-vnc') or host_machine.system() == 'android'
+ 	subdir_done()
+ endif
+ 
+--- a/libweston/backend-vnc/vnc.c
++++ b/libweston/backend-vnc/vnc.c
+@@ -1090,6 +1090,7 @@
+ 	nvnc_set_userdata(backend->server, backend, NULL);
+ 	nvnc_set_name(backend->server, "Weston VNC backend");
+ 
++#ifndef __ANDROID__
+ 	if (!nvnc_has_auth()) {
+ 		weston_log("Neat VNC built without TLS support\n");
+ 		goto err_output;
+@@ -1117,6 +1118,7 @@
+ 	}
+ 
+ 	weston_log("TLS support activated\n");
++#endif
+ 
+ 	ret = weston_plugin_api_register(compositor, WESTON_VNC_OUTPUT_API_NAME,
+ 					 &api, sizeof(api));

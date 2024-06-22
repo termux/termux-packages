@@ -1,0 +1,14 @@
+--- a/support/export/export.c
++++ b/support/export/export.c
+@@ -20,6 +20,11 @@
+ #include <stdlib.h>
+ #include <dirent.h>
+ #include <errno.h>
++
++#ifdef __ANDROID__
++int versionsort(const struct dirent **, const struct dirent **);
++#endif
++
+ #include "xmalloc.h"
+ #include "nfslib.h"
+ #include "exportfs.h"

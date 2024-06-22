@@ -2,32 +2,40 @@ TERMUX_PKG_HOMEPAGE=https://github.com/jesseduffield/lazygit
 TERMUX_PKG_DESCRIPTION="Simple terminal UI for git commands"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Krishna kanhaiya @kcubeterm"
-TERMUX_PKG_VERSION="0.36.0"
+TERMUX_PKG_VERSION="0.42.0"
 TERMUX_PKG_SRCURL=https://github.com/jesseduffield/lazygit/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=0b8630b09e28dc478fb2545c6fbe52e679b9a2e5dbe569982c9649655ab969c3
+TERMUX_PKG_SHA256=50a502b44fa5d28ce046def9388c6fd3e484f678691deea64c729bfd728c7f77
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_RECOMMENDS=git
 
 termux_step_make() {
-        termux_setup_golang
+	termux_setup_golang
 
-        cd "$TERMUX_PKG_SRCDIR"
+	cd "$TERMUX_PKG_SRCDIR"
 
-        mkdir -p "${TERMUX_PKG_BUILDDIR}/src/github.com/jesseduffield"
-        cp -a "${TERMUX_PKG_SRCDIR}" "${TERMUX_PKG_BUILDDIR}/src/github.com/jesseduffield/lazygit"
-        cd "${TERMUX_PKG_BUILDDIR}/src/github.com/jesseduffield/lazygit"
+	mkdir -p "${TERMUX_PKG_BUILDDIR}/src/github.com/jesseduffield"
+	cp -a "${TERMUX_PKG_SRCDIR}" "${TERMUX_PKG_BUILDDIR}/src/github.com/jesseduffield/lazygit"
+	cd "${TERMUX_PKG_BUILDDIR}/src/github.com/jesseduffield/lazygit"
 
-        go get -d -v
-        go build
+	go build \
+	-trimpath \
+	-mod=readonly \
+	-modcacherw \
+	-ldflags "\
+	-X main.date=$(date --date=@${SOURCE_DATE_EPOCH} -u +%Y-%m-%dT%H:%M:%SZ) \
+	-X main.buildSource=termux \
+	-X main.version=${TERMUX_PKG_VERSION} \
+	-X main.commit=v${TERMUX_PKG_VERSION} \
+	"
 }
 
 termux_step_make_install() {
-        mkdir -p $TERMUX_PREFIX/share/doc/lazygit
+	mkdir -p $TERMUX_PREFIX/share/doc/lazygit
 
-        install -Dm700 ${TERMUX_PKG_BUILDDIR}/src/github.com/jesseduffield/lazygit/lazygit \
-                $TERMUX_PREFIX/bin/lazygit
+	install -Dm700 ${TERMUX_PKG_BUILDDIR}/src/github.com/jesseduffield/lazygit/lazygit \
+		$TERMUX_PREFIX/bin/lazygit
 
-        cp -a ${TERMUX_PKG_BUILDDIR}/src/github.com/jesseduffield/lazygit/docs/* \
-                $TERMUX_PREFIX/share/doc/lazygit/
+	cp -a ${TERMUX_PKG_BUILDDIR}/src/github.com/jesseduffield/lazygit/docs/* \
+		$TERMUX_PREFIX/share/doc/lazygit/
 
 }

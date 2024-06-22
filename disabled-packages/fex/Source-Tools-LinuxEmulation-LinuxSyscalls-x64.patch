@@ -1,0 +1,28 @@
+diff --git a/Source/Tools/LinuxEmulation/LinuxSyscalls/x64/Memory.cpp b/Source/Tools/LinuxEmulation/LinuxSyscalls/x64/Memory.cpp
+index 1dbe51d..bda4bc4 100644
+--- a/Source/Tools/LinuxEmulation/LinuxSyscalls/x64/Memory.cpp
++++ b/Source/Tools/LinuxEmulation/LinuxSyscalls/x64/Memory.cpp
+@@ -103,9 +103,10 @@ namespace FEX::HLE::x64 {
+       SYSCALL_ERRNO();
+     });
+ 
++    #undef shmat
+     REGISTER_SYSCALL_IMPL_X64_FLAGS(shmat, SyscallFlags::OPTIMIZETHROUGH | SyscallFlags::NOSYNCSTATEONENTRY,
+       [](FEXCore::Core::CpuStateFrame *Frame, int shmid, const void *shmaddr, int shmflg) -> uint64_t {
+-      uint64_t Result = reinterpret_cast<uint64_t>(shmat(shmid, shmaddr, shmflg));
++      uint64_t Result = reinterpret_cast<uint64_t>(::libandroid_shmat(shmid, shmaddr, shmflg));
+ 
+       if (Result != -1) {
+         FEX::HLE::_SyscallHandler->TrackShmat(Frame->Thread, shmid, Result, shmflg);
+@@ -113,9 +114,10 @@ namespace FEX::HLE::x64 {
+       SYSCALL_ERRNO();
+     });
+ 
++    #undef shmdt
+     REGISTER_SYSCALL_IMPL_X64_FLAGS(shmdt, SyscallFlags::OPTIMIZETHROUGH | SyscallFlags::NOSYNCSTATEONENTRY,
+       [](FEXCore::Core::CpuStateFrame *Frame, const void *shmaddr) -> uint64_t {
+-      uint64_t Result = ::shmdt(shmaddr);
++      uint64_t Result = ::libandroid_shmdt(shmaddr);
+ 
+       if (Result != -1) {
+         FEX::HLE::_SyscallHandler->TrackShmdt(Frame->Thread, (uintptr_t)shmaddr);

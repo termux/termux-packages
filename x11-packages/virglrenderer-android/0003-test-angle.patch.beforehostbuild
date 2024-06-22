@@ -1,0 +1,46 @@
+diff --git a/src/dispatch_common.c b/src/dispatch_common.c
+--- a/libepoxy/src/dispatch_common.c
++++ b/libepoxy/src/dispatch_common.c
+@@ -179,10 +179,38 @@
+ #define GLES1_LIB "libGLESv1_CM.so"
+ #define GLES2_LIB "libGLESv2.so"
+ #elif defined(__ANDROID__)
+-#define GLX_LIB "libGLESv2.so"
+-#define EGL_LIB "libEGL.so"
+-#define GLES1_LIB "libGLESv1_CM.so"
+-#define GLES2_LIB "libGLESv2.so"
++static inline const char *__android_get_glx_libraries() {
++    if (getenv("EPOXY_USE_ANGLE")) {
++        return "libGLESv2_angle.so";
++    } else {
++        return "libGLESv2.so";
++    }
++}
++static inline const char *__android_get_egl_libraries() {
++    if (getenv("EPOXY_USE_ANGLE")) {
++        return "libEGL_angle.so";
++    } else {
++        return "libEGL.so";
++    }
++}
++static inline const char *__android_get_gles1_libraries() {
++    if (getenv("EPOXY_USE_ANGLE")) {
++        return "libGLESv1_CM_angle.so";
++    } else {
++        return "libGLESv1_CM.so";
++    }
++}
++static inline const char *__android_get_gles2_libraries() {
++    if (getenv("EPOXY_USE_ANGLE")) {
++        return "libGLESv2_angle.so";
++    } else {
++        return "libGLESv2.so";
++    }
++}
++#define GLX_LIB __android_get_glx_libraries()
++#define EGL_LIB __android_get_egl_libraries()
++#define GLES1_LIB __android_get_gles1_libraries()
++#define GLES2_LIB __android_get_gles2_libraries()
+ #elif defined(_WIN32)
+ #define EGL_LIB "libEGL.dll"
+ #define GLES1_LIB "libGLES_CM.dll"

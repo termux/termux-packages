@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://docs.xfce.org/panel-plugins/xfce4-wavelan-plugin/start
 TERMUX_PKG_DESCRIPTION="wavelan status plugin for the Xfce4 panel"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
-TERMUX_PKG_MAINTAINER="Yisus7u7 <dev.yisus@hotmail.com>"
+TERMUX_PKG_MAINTAINER="@Yisus7u7"
 _MAJOR_VERSION=0.6
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.3
 TERMUX_PKG_SRCURL=https://archive.xfce.org/src/panel-plugins/xfce4-wavelan-plugin/${_MAJOR_VERSION}/xfce4-wavelan-plugin-${TERMUX_PKG_VERSION}.tar.bz2

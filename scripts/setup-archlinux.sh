@@ -21,6 +21,7 @@ PACKAGES+=" gperf" # Used by the fontconfig build.
 PACKAGES+=" help2man"
 PACKAGES+=" intltool" # Used by qalc build.
 PACKAGES+=" jre8-openjdk-headless"
+PACKAGES+=" jq" # Required for parsing repo.json
 PACKAGES+=" re2c" # Needed by kphp-timelib
 PACKAGES+=" libjpeg-turbo" # Needed by ghostscript.
 PACKAGES+=" libtool"
@@ -35,7 +36,6 @@ PACKAGES+=" python-docutils" # For rst2man, used by mpv.
 PACKAGES+=" python-recommonmark" # Needed for LLVM-8 documentation.
 PACKAGES+=" python-setuptools" # Needed by at least asciinema.
 PACKAGES+=" python-sphinx" # Needed by notmuch man page generation.
-PACKAGES+=" python2"
 PACKAGES+=" ruby" # Needed to build ruby.
 PACKAGES+=" scdoc" # Needed by aerc.
 PACKAGES+=" scons"
@@ -56,4 +56,8 @@ $SUDO pacman -Syq --needed --noconfirm $PACKAGES
 $SUDO mkdir -p $TERMUX_PREFIX
 $SUDO chown -R $(whoami) /data
 
-echo "Please also install ncurses5-compat-libs and makedepend packages from the AUR before continuing"
+echo "Please also install the following packages from the AUR before continuing"
+echo
+echo "- ncurses5-compat-libs"
+echo "- makedepend"
+echo "- python2"

@@ -1,11 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://docs.xfce.org/apps/xfce4-dict/start
 TERMUX_PKG_DESCRIPTION="Dictionary for XFCE desktop"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Yisus7u7 <dev.yisus@hotmail.com>"
-TERMUX_PKG_VERSION=0.8.4
-TERMUX_PKG_REVISION=4
-TERMUX_PKG_SRCURL=http://deb.debian.org/debian/pool/main/x/xfce4-dict/xfce4-dict_${TERMUX_PKG_VERSION}.orig.tar.bz2
-TERMUX_PKG_SHA256=cb85fefbf742b306f2a8dca695252bae22842ab586abd31b52688312e3f631e3
-TERMUX_PKG_DEPENDS="atk, gdk-pixbuf, glib, gtk3, harfbuzz, libcairo, libx11, libxfce4ui, libxfce4util, pango, xfce4-panel"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="0.8.6"
+TERMUX_PKG_SRCURL=https://archive.xfce.org/src/apps/xfce4-dict/${TERMUX_PKG_VERSION%.*}/xfce4-dict-${TERMUX_PKG_VERSION}.tar.bz2
+TERMUX_PKG_SHA256=ae5db7ca70354d3293fc08eaf7ca40cdbc91799a219f199d824684b39e6c0a41
+TERMUX_PKG_DEPENDS="atk, gdk-pixbuf, glib, gtk3, harfbuzz, libcairo, libx11, libxfce4ui, libxfce4util, pango, xfce4-panel, zlib"
 TERMUX_PKG_SUGGESTS="aspell"
 TERMUX_PKG_BUILD_IN_SRC=true

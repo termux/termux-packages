@@ -2,10 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://webkitgtk.org
 TERMUX_PKG_DESCRIPTION="A full-featured port of the WebKit rendering engine"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.38.3
+TERMUX_PKG_VERSION="2.42.4"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://webkitgtk.org/releases/webkitgtk-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=41f001d1ed448c6936b394a9f20e4640eebf83a7f08262df28504f7410604a5a
-TERMUX_PKG_DEPENDS="atk, enchant, fontconfig, freetype, glib, gst-plugins-base, gst-plugins-good, gstreamer, gtk3, harfbuzz, harfbuzz-icu, libc++, libcairo, libgcrypt, libhyphen, libicu, libjpeg-turbo, libpng, libsoup3, libtasn1, libwebp, libxml2, libx11, libxcomposite, libxdamage, libxslt, libxt, littlecms, openjpeg, pango, woff2"
+TERMUX_PKG_SHA256=52288b30bda22373442cecb86f9c9a569ad8d4769a1f97b352290ed92a67ed86
+TERMUX_PKG_DEPENDS="atk, enchant, fontconfig, freetype, glib, gst-plugins-bad, gst-plugins-base, gst-plugins-good, gstreamer, gtk3, harfbuzz, harfbuzz-icu, libc++, libcairo, libgcrypt, libhyphen, libicu, libjpeg-turbo, libpng, libsoup3, libtasn1, libwebp, libxml2, libx11, libxcomposite, libxdamage, libxslt, libxt, littlecms, openjpeg, pango, woff2, zlib"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, xorgproto"
 TERMUX_PKG_DISABLE_GIR=false
 
@@ -17,6 +18,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DUSE_LIBSECRET=OFF
 -DENABLE_INTROSPECTION=ON
 -DENABLE_DOCUMENTATION=OFF
+-DENABLE_WAYLAND_TARGET=OFF
 -DUSE_WPE_RENDERER=OFF
 -DENABLE_BUBBLEWRAP_SANDBOX=OFF
 -DUSE_LD_GOLD=OFF
@@ -24,13 +26,36 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DENABLE_JOURNALD_LOG=OFF
 -DUSE_SOUP2=OFF
 -DUSE_GTK4=OFF
+-DUSE_AVIF=OFF
 "
 
+termux_step_post_get_source() {
+	# Version guard
+	local ver_e=${TERMUX_PKG_VERSION#*:}
+	local ver_x=$(. $TERMUX_SCRIPTDIR/x11-packages/webkitgtk-6.0/build.sh; echo ${TERMUX_PKG_VERSION#*:})
+	if [ "${ver_e}" != "${ver_x}" ]; then
+		termux_error_exit "Version mismatch between webkit2gtk-4.1 and webkitgtk-6.0."
+	fi
+}
+
 termux_step_pre_configure() {
-	termux_setup_gir
+	TERMUX_PKG_VERSION=. termux_setup_gir
+
+	# FIXME: `GI_VERSION` mismatched from Termux and the building machine. On April 22,
+	# FIXME: 2024, Termux has version 1.80.1 but Ubuntu 22.04 has version 1.72.0.
+	# FIXME: `cmake` will pick up `GI_VERSION` from the config files of Termux, but
+	# FIXME: it is intended to use the version in the building machine.
+	if [ "$TERMUX_ON_DEVICE_BUILD" = false ]; then
+		sed -i 's@if ("${GI_VERSION}" VERSION_GREATER_EQUAL 1.79.2)@if (FALSE)@g' \
+			$TERMUX_PKG_SRCDIR/Source/WebKit/PlatformGTK.cmake
+	fi
+
+	# Workaround for https://github.com/android/ndk/issues/1973
+	[ "$TERMUX_ARCH" == "arm" ] && sed -i '/#define MUST_TAIL_CALL \[\[clang::musttail]]/d' Source/WTF/wtf/Compiler.h
 
 	CPPFLAGS+=" -DHAVE_MISSING_STD_FILESYSTEM_PATH_CONSTRUCTOR"
 	CPPFLAGS+=" -DCMS_NO_REGISTER_KEYWORD"
+	CPPFLAGS+=" -I${TERMUX_PREFIX}/lib/gstreamer-1.0/include"
 }
 
 termux_step_post_massage() {

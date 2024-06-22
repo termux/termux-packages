@@ -4,9 +4,11 @@ TERMUX_PKG_DESCRIPTION="Displays a histogram of changes to a file"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.65
-TERMUX_PKG_SRCURL=https://ftp-osl.osuosl.org/pub/gentoo/distfiles/diffstat-${TERMUX_PKG_VERSION}.tgz
+TERMUX_PKG_VERSION="1.66"
+TERMUX_PKG_SRCURL=https://github.com/ThomasDickey/diffstat-snapshots/archive/refs/tags/v${TERMUX_PKG_VERSION/./_}.tar.gz
 # invisible-mirror.net is not suitable for CI due to bad responsiveness.
 #TERMUX_PKG_SRCURL=https://invisible-mirror.net/archives/diffstat/diffstat-${TERMUX_PKG_VERSION}.tgz
 #TERMUX_PKG_SRCURL=https://invisible-island.net/datafiles/release/diffstat.tar.gz
-TERMUX_PKG_SHA256=8cf27424926debcd85921755c3915559288244bd103f62d740dc6b83b557a28a
+TERMUX_PKG_SHA256=51570ed05b8c13ca2163ce301fc1418545baf05881e18bcd21e4af5ff1bd14eb
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"

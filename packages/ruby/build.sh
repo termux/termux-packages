@@ -2,12 +2,15 @@ TERMUX_PKG_HOMEPAGE=https://www.ruby-lang.org/
 TERMUX_PKG_DESCRIPTION="Dynamic programming language with a focus on simplicity and productivity"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.2.0
+# Packages which should be rebuilt after "minor" bump (e.g. 3.1.x to 3.2.0):
+# - asciidoctor
+# - weechat
+TERMUX_PKG_VERSION=3.3.2
 TERMUX_PKG_SRCURL=https://cache.ruby-lang.org/pub/ruby/$(echo $TERMUX_PKG_VERSION | cut -d . -f 1-2)/ruby-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=d2f4577306e6dd932259693233141e5c3ec13622c95b75996541b8d5b68b28b4
+TERMUX_PKG_SHA256=b5e8a8ed4a47cdd9a3358b5bdd998c37bd9e971ca63766a37d5ae5933fdb69f1
 # libbffi is used by the fiddle extension module:
 TERMUX_PKG_DEPENDS="libandroid-execinfo, libandroid-support, libffi, libgmp, readline, openssl, libyaml, zlib"
-TERMUX_PKG_RECOMMENDS="clang, make, pkg-config"
+TERMUX_PKG_RECOMMENDS="clang, make, pkg-config, resolv-conf"
 TERMUX_PKG_BREAKS="ruby-dev"
 TERMUX_PKG_REPLACES="ruby-dev"
 # Needed to fix compilation on android:
@@ -28,7 +31,7 @@ TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="
 
 termux_step_host_build() {
 	"$TERMUX_PKG_SRCDIR/configure" ${TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS}
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j $TERMUX_PKG_MAKE_PROCESSES
 	make install
 }
 
@@ -72,9 +75,6 @@ termux_step_make_install() {
 }
 
 termux_step_post_massage() {
-	if [ ! -f ./lib/ruby/${_RUBY_API_VERSION}/${TERMUX_HOST_PLATFORM}/readline.so ]; then
-		termux_error_exit "The readline extension was not installed."
-	fi
 	local _RUBYGEMS_ARCH=${TERMUX_HOST_PLATFORM/i686-/x86-}
 	if [ ! -d ./lib/ruby/gems/${_RUBY_API_VERSION}/extensions/${_RUBYGEMS_ARCH} ]; then
 		termux_error_exit "Extensions for bundled gems were not installed."

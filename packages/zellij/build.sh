@@ -2,9 +2,10 @@ TERMUX_PKG_HOMEPAGE="https://zellij.dev/"
 TERMUX_PKG_DESCRIPTION="A terminal workspace with batteries included"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Jonathan Lei <me@xjonathan.dev>"
-TERMUX_PKG_VERSION="0.34.4"
+TERMUX_PKG_VERSION="0.40.1"
 TERMUX_PKG_SRCURL="https://github.com/zellij-org/zellij/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=687e30a3e6916cdd7189ab04ff4b170bc5e09edd937637f0388b3f8432d0fc49
+TERMUX_PKG_SHA256=1f0bfa13f2dbe657d76341a196f98a3b4caa47ac63abee06b39883a11ca220a8
+TERMUX_PKG_BUILD_DEPENDS="zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
@@ -13,7 +14,7 @@ TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
 
 termux_step_make() {
 	termux_setup_rust
-	cargo build --jobs ${TERMUX_MAKE_PROCESSES} --target ${CARGO_TARGET_NAME} --release
+	cargo build --jobs ${TERMUX_PKG_MAKE_PROCESSES} --target ${CARGO_TARGET_NAME} --release
 }
 
 termux_step_make_install() {

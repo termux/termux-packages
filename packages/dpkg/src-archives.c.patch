@@ -1,7 +1,7 @@
-diff -u -r ../dpkg-1.19.2/src/archives.c ./src/archives.c
---- ../dpkg-1.19.2/src/archives.c	2018-10-08 09:43:48.000000000 +0000
-+++ ./src/main/archives.c	2018-11-11 02:17:28.534503365 +0000
-@@ -389,9 +389,11 @@
+diff -u -r src-orig/src/main/archives.c src/src/main/archives.c
+--- src-orig/src/main/archives.c	2024-03-03 01:30:15.000000000 +0000
++++ src/src/main/archives.c	2024-05-05 20:36:54.148725216 +0000
+@@ -394,9 +394,11 @@
              namenode->statoverride->uid,
              namenode->statoverride->gid,
              namenode->statoverride->mode);
@@ -13,7 +13,7 @@ diff -u -r ../dpkg-1.19.2/src/archives.c ./src/archives.c
      rc = fchmod(fd, st->mode & ~S_IFMT);
      if (forcible_nonroot_error(rc))
        ohshite(_("error setting permissions of '%.255s'"), te->name);
-@@ -506,13 +508,17 @@
+@@ -509,13 +511,17 @@
      return; /* Already handled using the file descriptor. */
  
    if (te->type == TAR_FILETYPE_SYMLINK) {
@@ -31,7 +31,7 @@ diff -u -r ../dpkg-1.19.2/src/archives.c ./src/archives.c
      rc = chmod(path, st->mode & ~S_IFMT);
      if (forcible_nonroot_error(rc))
        ohshite(_("error setting permissions of '%.255s'"), path);
-@@ -552,9 +558,11 @@
+@@ -555,9 +561,11 @@
      else if (linksize > stab->st_size)
        ohshit(_("symbolic link '%.250s' size has changed from %jd to %zd"),
               fn_old, (intmax_t)stab->st_size, linksize);
@@ -40,20 +40,18 @@ diff -u -r ../dpkg-1.19.2/src/archives.c ./src/archives.c
        warning(_("symbolic link '%.250s' size has changed from %jd to %zd"),
               fn_old, (intmax_t)stab->st_size, linksize);
 +#endif
-     linkname[linksize] = '\0';
-     if (strcmp(linkname, te->linkname) == 0) {
-       free(linkname);
-@@ -1041,20 +1049,29 @@
-       else if (r > stab.st_size)
+     linkmatch = strcmp(linkname.buf, te->linkname) == 0;
+     varbuf_destroy(&linkname);
+     if (linkmatch)
+@@ -1053,18 +1061,27 @@
+       else if (linksize > stab.st_size)
          ohshit(_("symbolic link '%.250s' size has changed from %jd to %zd"),
-                fnamevb.buf, (intmax_t)stab.st_size, r);
+                fnamevb.buf, (intmax_t)stab.st_size, linksize);
 +#ifndef __ANDROID__
-       else if (r < stab.st_size)
+       else if (linksize < stab.st_size)
          warning(_("symbolic link '%.250s' size has changed from %jd to %zd"),
-                fnamevb.buf, (intmax_t)stab.st_size, r);
+                fnamevb.buf, (intmax_t)stab.st_size, linksize);
 +#endif
-       varbuf_trunc(&symlinkfn, r);
-       varbuf_end_str(&symlinkfn);
        if (symlink(symlinkfn.buf,fnametmpvb.buf))
          ohshite(_("unable to make backup symlink for '%.255s'"), ti->name);
 +#ifndef __ANDROID__

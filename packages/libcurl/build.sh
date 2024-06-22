@@ -2,12 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://curl.se/
 TERMUX_PKG_DESCRIPTION="Easy-to-use client-side URL transfer library"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="7.87.0"
+TERMUX_PKG_VERSION="8.8.0"
 TERMUX_PKG_SRCURL=https://github.com/curl/curl/releases/download/curl-${TERMUX_PKG_VERSION//./_}/curl-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=ee5f1a1955b0ed413435ef79db28b834ea5f0fb7c8cfb1ce47175cc3bee08fff
+TERMUX_PKG_SHA256=0f58bb95fc330c8a46eeb3df5701b0d90c9d9bfcc42bd1cd08791d12551d4400
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+.\d+.\d+"
-TERMUX_PKG_DEPENDS="libnghttp2, libssh2, openssl (>= 3.0.3), zlib"
+TERMUX_PKG_DEPENDS="libnghttp2, libnghttp3, libssh2, openssl (>= 1:3.2.1-1), zlib"
 TERMUX_PKG_BREAKS="libcurl-dev"
 TERMUX_PKG_REPLACES="libcurl-dev"
 TERMUX_PKG_ESSENTIAL=true
@@ -21,10 +21,16 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --without-libidn2
 --without-librtmp
 --without-brotli
---with-ssl
+--without-libpsl
 --with-libssh2
+--with-ssl
+--with-openssl
+--with-openssl-quic
+--with-nghttp3
 "
 
+# https://github.com/termux/termux-packages/issues/15889
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_getpwuid=yes"
 
 # Starting with version 7.62 curl started enabling http/2 by default.
 # Support for http/2 as added in version 1.4.8-8 of the apt package, so we
@@ -42,7 +48,7 @@ termux_step_post_get_source() {
 				lib/Makefile.soname)
 	done
 	local v=$(( _VERSIONCHANGE - _VERSIONDEL ))
-	if [ "${v}" != "${_SOVERSION}" ]; then
+	if [ ! "${_VERSIONCHANGE}" ] || [ "${v}" != "${_SOVERSION}" ]; then
 		termux_error_exit "SOVERSION guard check failed."
 	fi
 }

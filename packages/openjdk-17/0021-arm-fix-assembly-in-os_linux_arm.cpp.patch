@@ -1,0 +1,27 @@
+From 729d65c3f5268a64c4bb212b6dff920c24afa21b Mon Sep 17 00:00:00 2001
+From: Duy Tran Khanh <40482367+khanhduytran0@users.noreply.github.com>
+Date: Wed, 30 Jun 2021 14:30:02 +0700
+Subject: [PATCH] arm: fix assembly in os_linux_arm.cpp
+
+---
+ src/hotspot/os_cpu/linux_arm/os_linux_arm.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/hotspot/os_cpu/linux_arm/os_linux_arm.cpp b/src/hotspot/os_cpu/linux_arm/os_linux_arm.cpp
+index a9a3087419bd..3296ad867666 100644
+--- a/src/hotspot/os_cpu/linux_arm/os_linux_arm.cpp
++++ b/src/hotspot/os_cpu/linux_arm/os_linux_arm.cpp
+@@ -408,8 +408,8 @@ void os::setup_fpu() {
+ #if !defined(__SOFTFP__) && defined(__VFP_FP__)
+   // Turn on IEEE-754 compliant VFP mode
+   __asm__ volatile (
+-    "mov %%r0, #0;"
+-    "fmxr fpscr, %%r0"
++    "mov r0, #0;"
++    "fmxr fpscr, r0"
+     : /* no output */ : /* no input */ : "r0"
+   );
+ #endif
+-- 
+2.44.0
+

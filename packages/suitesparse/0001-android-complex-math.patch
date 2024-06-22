@@ -1,0 +1,16 @@
+--- a/GraphBLAS/Config/GraphBLAS.h.in
++++ b/GraphBLAS/Config/GraphBLAS.h.in
+@@ -179,6 +179,13 @@
+             ((GxB_FC32_t)((float)(r)) + (GxB_FC32_t)((float)(i) * _Complex_I))
+         #endif
+ 
++        #if defined(__ANDROID__) && __ANDROID_API__ < 26
++            double complex clog(double complex);
++            float complex clogf(float complex);
++            double complex cpow(double complex, double complex);
++            float complex cpowf(float complex, float complex);
++        #endif
++
+     #else
+ 
+         #error "Unknown or unsupported complex number arithmetic"

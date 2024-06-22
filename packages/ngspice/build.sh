@@ -3,9 +3,12 @@ TERMUX_PKG_DESCRIPTION="A mixed-level/mixed-signal circuit simulator"
 TERMUX_PKG_LICENSE="BSD 3-Clause, LGPL-2.1"
 TERMUX_PKG_LICENSE_FILE="COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=38
-TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/ngspice/ngspice-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=2c3e22f6c47b165db241cf355371a0a7558540ab2af3f8b5eedeeb289a317c56
+TERMUX_PKG_VERSION="42"
+TERMUX_PKG_SRCURL=https://github.com/imr/ngspice/archive/refs/tags/ngspice-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=d6e566aa72bd289ca9a4f985ab0bcace4e5530fe9e970e18f2f9e99715f96174
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
+TERMUX_PKG_UPDATE_VERSION_SED_REGEXP="s/ngspice-//"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-xspice
 --enable-cider
@@ -21,13 +24,19 @@ TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="
 TERMUX_PKG_DEPENDS="fftw, libc++, ncurses, readline"
 TERMUX_PKG_GROUPS="science"
 
-termux_step_host_build(){
+termux_step_host_build() {
+	autoreconf -fi $TERMUX_PKG_SRCDIR
 	$TERMUX_PKG_SRCDIR/configure $TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS
 
 	# compiles ngspice codemodel preprocessor
 	cd src/xspice/cmpp && make
 }
-termux_step_post_configure(){
+
+termux_step_pre_configure() {
+	autoreconf -fi
+}
+
+termux_step_post_configure() {
 	cp -ru $TERMUX_PKG_HOSTBUILD_DIR/src/xspice/cmpp \
 		src/xspice
 	cd src/xspice/cmpp && cp cmpp build/cmpp

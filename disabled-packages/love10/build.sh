@@ -8,7 +8,7 @@ TERMUX_PKG_VERSION=0.10.2
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/love2d/love/releases/download/${TERMUX_PKG_VERSION}/love-${TERMUX_PKG_VERSION}-linux-src.tar.gz
 TERMUX_PKG_SHA256=b26b306b113158927ae12d2faadb606eb1db49ffdcd7592d6a0a3fc0af21a387
-TERMUX_PKG_DEPENDS="freetype, game-music-emu, libandroid-spawn, libc++, libluajit, libmodplug, libogg, libphysfs, libtheora, libvorbis, mesa, mpg123, openal-soft, sdl2, zlib"
+TERMUX_PKG_DEPENDS="freetype, game-music-emu, libandroid-spawn, libc++, libluajit, libmodplug, libogg, libphysfs, libtheora, libvorbis, mpg123, openal-soft, opengl, sdl2, zlib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-gme
 --with-lua=luajit

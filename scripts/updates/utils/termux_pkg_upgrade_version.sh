@@ -17,16 +17,32 @@ termux_pkg_upgrade_version() {
 		EPOCH=""
 	fi
 
-	# If needed, filter version numbers using regexp.
+	# If needed, filter version numbers using grep regexp.
 	if [[ -n "${TERMUX_PKG_UPDATE_VERSION_REGEXP}" ]]; then
 		# Extract version numbers.
-		LATEST_VERSION="$(grep -oP "${TERMUX_PKG_UPDATE_VERSION_REGEXP}" <<<"${LATEST_VERSION}" || true)"
+		local OLD_LATEST_VERSION="${LATEST_VERSION}"
+		LATEST_VERSION="$(grep -oP "${TERMUX_PKG_UPDATE_VERSION_REGEXP}" <<< "${LATEST_VERSION}" || true)"
 		if [[ -z "${LATEST_VERSION}" ]]; then
 			termux_error_exit <<-EndOfError
 				ERROR: failed to filter version numbers using regexp '${TERMUX_PKG_UPDATE_VERSION_REGEXP}'.
-				Ensure that it is works correctly with ${LATEST_VERSION}.
+				Ensure that it works correctly with ${OLD_LATEST_VERSION}.
 			EndOfError
 		fi
+		unset OLD_LATEST_VERSION
+	fi
+
+	# If needed, filter version numbers using sed regexp.
+	if [[ -n "${TERMUX_PKG_UPDATE_VERSION_SED_REGEXP}" ]]; then
+		# Extract version numbers.
+		local OLD_LATEST_VERSION="${LATEST_VERSION}"
+		LATEST_VERSION="$(sed "${TERMUX_PKG_UPDATE_VERSION_SED_REGEXP}" <<< "${LATEST_VERSION}" || true)"
+		if [[ -z "${LATEST_VERSION}" ]]; then
+			termux_error_exit <<-EndOfError
+				ERROR: failed to filter version numbers using regexp '${TERMUX_PKG_UPDATE_VERSION_SED_REGEXP}'.
+				Ensure that it works correctly with ${OLD_LATEST_VERSION}.
+			EndOfError
+		fi
+		unset OLD_LATEST_VERSION
 	fi
 
 	# Translate "_" into ".": some packages use underscores to seperate
@@ -35,10 +51,14 @@ termux_pkg_upgrade_version() {
 
 	if [[ "${SKIP_VERSION_CHECK}" != "--skip-version-check" ]]; then
 		if ! termux_pkg_is_update_needed \
-			"${TERMUX_PKG_VERSION}" "${EPOCH}${LATEST_VERSION}"; then
+			"${TERMUX_PKG_VERSION#*:}" "${LATEST_VERSION}"; then
 			echo "INFO: No update needed. Already at version '${LATEST_VERSION}'."
 			return 0
 		fi
+	fi
+
+	if [[ -n "${TERMUX_PKG_UPGRADE_VERSION_DRY_RUN:-}" ]]; then
+		return 1
 	fi
 
 	if [[ "${BUILD_PACKAGES}" == "false" ]]; then
@@ -54,7 +74,7 @@ termux_pkg_upgrade_version() {
 			"${TERMUX_PKG_BUILDER_DIR}/build.sh"
 
 		# Update checksum
-		if [[ "${TERMUX_PKG_SHA256[*]}" != "SKIP_CHECKSUM" ]] && [[ "${TERMUX_PKG_SRCURL: -4}" != ".git" ]]; then
+		if [[ "${TERMUX_PKG_SHA256[*]}" != "SKIP_CHECKSUM" ]] && [[ "${TERMUX_PKG_SRCURL:0:4}" != "git+" ]]; then
 			echo n | "${TERMUX_SCRIPTDIR}/scripts/bin/update-checksum" "${TERMUX_PKG_NAME}" || {
 				git checkout -- "${TERMUX_PKG_BUILDER_DIR}"
 				git pull --rebase
@@ -64,7 +84,7 @@ termux_pkg_upgrade_version() {
 
 		echo "INFO: Trying to build package."
 
-		for repo_path in $(jq --raw-output 'keys | .[]' ${TERMUX_SCRIPTDIR}/repo.json); do
+		for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' ${TERMUX_SCRIPTDIR}/repo.json); do
 			_buildsh_path="${TERMUX_SCRIPTDIR}/${repo_path}/${TERMUX_PKG_NAME}/build.sh"
 			repo=$(jq --raw-output ".\"${repo_path}\".name" ${TERMUX_SCRIPTDIR}/repo.json)
 			repo=${repo#"termux-"}
@@ -76,7 +96,7 @@ termux_pkg_upgrade_version() {
 			fi
 		done
 
-		if "${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" ./build-package.sh -a "${TERMUX_ARCH}" -I "${TERMUX_PKG_NAME}"; then
+		if "${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" ./build-package.sh -a "${TERMUX_ARCH}" -i "${TERMUX_PKG_NAME}"; then
 			if [[ "${GIT_COMMIT_PACKAGES}" == "true" ]]; then
 				echo "INFO: Committing package."
 				stderr="$(

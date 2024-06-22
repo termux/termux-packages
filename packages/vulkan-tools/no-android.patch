@@ -1,0 +1,40 @@
+--- a/cube/CMakeLists.txt
++++ b/cube/CMakeLists.txt
+@@ -84,8 +84,6 @@
+ 
+ if(WIN32)
+     add_definitions(-DVK_USE_PLATFORM_WIN32_KHR -DWIN32_LEAN_AND_MEAN -DNOMINMAX)
+-elseif(ANDROID)
+-    add_definitions(-DVK_USE_PLATFORM_ANDROID_KHR)
+ elseif(APPLE)
+     add_definitions(-DVK_USE_PLATFORM_METAL_EXT)
+ elseif(CMAKE_SYSTEM_NAME MATCHES "Linux|BSD")
+--- a/cube/cube.c
++++ b/cube/cube.c
+@@ -97,7 +97,7 @@
+     fflush(stdout);
+ }
+ 
+-#elif defined __ANDROID__
++#elif defined(__ANDROID__) && !defined(__TERMUX__)
+ #include <android/log.h>
+ #define ERR_EXIT(err_msg, err_class)                                           \
+     do {                                                                       \
+@@ -571,7 +571,7 @@
+     if (!demo->suppress_popups) MessageBox(NULL, message, "Alert", MB_OK);
+     in_callback = false;
+ 
+-#elif defined(ANDROID)
++#elif defined(ANDROID) && !defined(__TERMUX__)
+ 
+     if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT) {
+         __android_log_print(ANDROID_LOG_INFO, APP_SHORT_NAME, "%s", message);
+@@ -4334,7 +4334,7 @@
+             continue;
+         }
+ 
+-#if defined(ANDROID)
++#if defined(ANDROID) && !defined(__TERMUX__)
+         ERR_EXIT("Usage: vkcube [--validate]\n", "Usage");
+ #else
+         char *message =

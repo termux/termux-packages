@@ -39,6 +39,15 @@ diff -uNr psmisc/src/killall.c psmisc.mod/src/killall.c
  }
  
  /* process age from jiffies to seconds via uptime */
+@@ -324,7 +341,7 @@
+     const pid_t pid,
+     const int sig)
+ {
+-#ifdef __NR_pidfd_send_signal
++#if defined __NR_pidfd_send_signal && !defined __ANDROID__
+     if (pid > 0) /* Not PGID */
+     {
+ 	int ret = syscall(__NR_pidfd_send_signal, pidfd, sig, NULL, 0);
 @@ -881,6 +898,20 @@
      return stat(filename, &isproc) == 0;
  }

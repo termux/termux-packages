@@ -1,0 +1,95 @@
+--- a/winpr/libwinpr/path/shell.c
++++ b/winpr/libwinpr/path/shell.c
+@@ -107,7 +107,7 @@
+ 	path = GetEnvAlloc("TMPDIR");
+ 
+ 	if (!path)
+-		path = _strdup("/tmp");
++		path = _strdup("@TERMUX_PREFIX@/tmp");
+ 
+ #endif
+ 	return path;
+--- a/winpr/libwinpr/sspi/Schannel/schannel_openssl.c
++++ b/winpr/libwinpr/sspi/Schannel/schannel_openssl.c
+@@ -240,7 +240,7 @@
+ 	options |= SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS;
+ 	SSL_CTX_set_options(context->ctx, options);
+ 
+-	if (SSL_CTX_use_RSAPrivateKey_file(context->ctx, "/tmp/localhost.key", SSL_FILETYPE_PEM) <= 0)
++	if (SSL_CTX_use_RSAPrivateKey_file(context->ctx, "@TERMUX_PREFIX@/tmp/localhost.key", SSL_FILETYPE_PEM) <= 0)
+ 	{
+ 		WLog_ERR(TAG, "SSL_CTX_use_RSAPrivateKey_file failed");
+ 		goto out_rsa_key;
+@@ -254,7 +254,7 @@
+ 		goto out_ssl_new;
+ 	}
+ 
+-	if (SSL_use_certificate_file(context->ssl, "/tmp/localhost.crt", SSL_FILETYPE_PEM) <= 0)
++	if (SSL_use_certificate_file(context->ssl, "@TERMUX_PREFIX@/tmp/localhost.crt", SSL_FILETYPE_PEM) <= 0)
+ 	{
+ 		WLog_ERR(TAG, "SSL_use_certificate_file failed");
+ 		goto out_use_certificate;
+--- a/server/shadow/X11/x11_shadow.c
++++ b/server/shadow/X11/x11_shadow.c
+@@ -131,7 +131,7 @@
+ static BOOL x11_shadow_pam_get_service_name(SHADOW_PAM_AUTH_INFO* info)
+ {
+ 	size_t x;
+-	const char* base = "/etc/pam.d";
++	const char* base = "@TERMUX_PREFIX@/etc/pam.d";
+ 	const char* hints[] = { "lightdm", "gdm", "xdm", "login", "sshd" };
+ 
+ 	for (x = 0; x < ARRAYSIZE(hints); x++)
+--- a/winpr/libwinpr/timezone/timezone.c
++++ b/winpr/libwinpr/timezone/timezone.c
+@@ -89,7 +89,7 @@
+ 
+ static char* winpr_get_timezone_from_link(void)
+ {
+-	const char* links[] = { "/etc/localtime", "/etc/TZ" };
++	const char* links[] = { "@TERMUX_PREFIX@/etc/localtime", "@TERMUX_PREFIX@/etc/TZ" };
+ 	size_t x;
+ 	ssize_t len;
+ 	char buf[1024];
+@@ -233,7 +233,7 @@
+ #if defined(__FreeBSD__) || defined(__OpenBSD__)
+ 	fp = winpr_fopen("/var/db/zoneinfo", "r");
+ #else
+-	fp = winpr_fopen("/etc/timezone", "r");
++	fp = winpr_fopen("@TERMUX_PREFIX@/etc/timezone", "r");
+ #endif
+ 
+ 	if (NULL == fp)
+--- a/winpr/libwinpr/utils/sam.c
++++ b/winpr/libwinpr/utils/sam.c
+@@ -40,7 +40,7 @@
+ #ifdef _WIN32
+ #define WINPR_SAM_FILE "C:\\SAM"
+ #else
+-#define WINPR_SAM_FILE "/etc/winpr/SAM"
++#define WINPR_SAM_FILE "@TERMUX_PREFIX@/etc/winpr/SAM"
+ #endif
+ #define TAG WINPR_TAG("utils")
+ 
+--- a/winpr/libwinpr/registry/registry_reg.c
++++ b/winpr/libwinpr/registry/registry_reg.c
+@@ -36,7 +36,7 @@
+ #include "../log.h"
+ #define TAG WINPR_TAG("registry")
+ 
+-#define WINPR_HKLM_HIVE "/etc/winpr/HKLM.reg"
++#define WINPR_HKLM_HIVE "@TERMUX_PREFIX@/etc/winpr/HKLM.reg"
+ 
+ struct reg_data_type
+ {
+--- a/winpr/libwinpr/wtsapi/wtsapi.c
++++ b/winpr/libwinpr/wtsapi/wtsapi.c
+@@ -740,7 +740,7 @@
+ 
+ 	ini = IniFile_New();
+ 
+-	if (IniFile_ReadFile(ini, "/var/run/freerds.instance") < 0)
++	if (IniFile_ReadFile(ini, "@TERMUX_PREFIX@/var/run/freerds.instance") < 0)
+ 	{
+ 		IniFile_Free(ini);
+ 		WLog_ERR(TAG, "failed to parse freerds.instance");

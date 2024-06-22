@@ -1,29 +1,38 @@
---- ./Makefile.orig	2021-10-10 17:13:11.147988944 +0200
-+++ ./Makefile	2021-10-10 17:12:41.424662424 +0200
-@@ -76,7 +76,7 @@
+--- a/Makefile	2024-03-16 14:02:10.458220600 +0800
++++ b/Makefile	2024-03-16 14:06:02.219544200 +0800
+@@ -79,7 +79,7 @@ ifdef CONFIG_CLANG
    CFLAGS += -Wchar-subscripts -funsigned-char
    CFLAGS += -MMD -MF $(OBJDIR)/$(@F).d
    ifdef CONFIG_DEFAULT_AR
 -    AR=$(CROSS_PREFIX)ar
-+    AR ?= $(CROSS_PREFIX)ar
++    AR?=$(CROSS_PREFIX)ar
    else
      ifdef CONFIG_LTO
        AR=$(CROSS_PREFIX)llvm-ar
-@@ -95,7 +95,7 @@
+@@ -106,7 +106,7 @@ else
      AR=$(CROSS_PREFIX)ar
    endif
  endif
 -STRIP=$(CROSS_PREFIX)strip
-+STRIP ?= $(CROSS_PREFIX)strip
++STRIP?=$(CROSS_PREFIX)strip
+ CFLAGS+=-fwrapv # ensure that signed overflows behave as expected
  ifdef CONFIG_WERROR
  CFLAGS+=-Werror
- endif
-@@ -177,7 +177,7 @@
- HOST_LIBS=-lm -ldl -lpthread
- LIBS=-lm
- ifndef CONFIG_WIN32
--LIBS+=-ldl -lpthread
-+LIBS+=-ldl
- endif
+@@ -283,7 +283,7 @@ $(OBJDIR)/%.o: %.c | $(OBJDIR)
+ 	$(CC) $(CFLAGS_OPT) -c -o $@ $<
  
- $(OBJDIR):
+ $(OBJDIR)/%.host.o: %.c | $(OBJDIR)
+-	$(HOST_CC) $(CFLAGS_OPT) -c -o $@ $<
++	$(HOST_CC) -fwrapv $(DEFINES) -O2 -c -o $@ $<
+ 
+ $(OBJDIR)/%.pic.o: %.c | $(OBJDIR)
+ 	$(CC) $(CFLAGS_OPT) -fPIC -DJS_SHARED_LIBRARY -c -o $@ $<
+@@ -307,7 +307,7 @@ regexp_test: libregexp.c libunicode.c cu
+ 	$(CC) $(LDFLAGS) $(CFLAGS) -DTEST -o $@ libregexp.c libunicode.c cutils.c $(LIBS)
+ 
+ unicode_gen: $(OBJDIR)/unicode_gen.host.o $(OBJDIR)/cutils.host.o libunicode.c unicode_gen_def.h
+-	$(HOST_CC) $(LDFLAGS) $(CFLAGS) -o $@ $(OBJDIR)/unicode_gen.host.o $(OBJDIR)/cutils.host.o
++	$(HOST_CC) $(LDFLAGS) -fwrapv $(DEFINES) -o $@ $(OBJDIR)/unicode_gen.host.o $(OBJDIR)/cutils.host.o
+ 
+ clean:
+ 	rm -f repl.c qjscalc.c out.c

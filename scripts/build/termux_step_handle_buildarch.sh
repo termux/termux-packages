@@ -17,6 +17,10 @@ termux_step_handle_buildarch() {
 			fi
 			if [ -d /data/data ]; then
 				mv /data/data "$TERMUX_DATA_PREVIOUS_BACKUPDIR"
+				if [ -d "${TERMUX_DATA_PREVIOUS_BACKUPDIR}/${TERMUX_APP_PACKAGE}/cgct" ]; then
+					mkdir -p "/data/data/${TERMUX_APP_PACKAGE}"
+					mv "${TERMUX_DATA_PREVIOUS_BACKUPDIR}/${TERMUX_APP_PACKAGE}/cgct" "/data/data/${TERMUX_APP_PACKAGE}"
+				fi
 			fi
 			# Restore new one (if any)
 			if [ -d "$TERMUX_DATA_CURRENT_BACKUPDIR" ]; then

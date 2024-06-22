@@ -1,0 +1,61 @@
+From 3dd9846ab99260134e11938f0e575be822507037 Mon Sep 17 00:00:00 2001
+From: Andreas Sturmlechner <asturm@gentoo.org>
+Date: Mon, 4 Mar 2024 22:59:40 +0100
+Subject: [PATCH] Fix build with >=poppler-24.03.0
+
+Fixes build errors caused by:
+
+"Use an enum for Function getType"
+Upstream commit 6e3824d45d42cb806a28a2df84e4ab6bb3587083
+
+Signed-off-by: Andreas Sturmlechner <asturm@gentoo.org>
+---
+ src/extension/internal/pdfinput/svg-builder.cpp | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/src/extension/internal/pdfinput/svg-builder.cpp b/src/extension/internal/pdfinput/svg-builder.cpp
+index 525fbfec0a..bcd7b1f61b 100644
+--- a/src/extension/internal/pdfinput/svg-builder.cpp
++++ b/src/extension/internal/pdfinput/svg-builder.cpp
+@@ -1175,9 +1175,13 @@ static bool svgGetShadingColor(GfxShading *shading, double offset, GfxColor *res
+ #define INT_EPSILON 8
+ bool SvgBuilder::_addGradientStops(Inkscape::XML::Node *gradient, GfxShading *shading,
+                                    _POPPLER_CONST Function *func) {
+-    int type = func->getType();
++    auto type = func->getType();
+     auto space = shading->getColorSpace();
++#if POPPLER_CHECK_VERSION(24, 3, 0)
++    if ( type == Function::Type::Sampled || type == Function::Type::Exponential ) {  // Sampled or exponential function
++#else
+     if ( type == 0 || type == 2 ) {  // Sampled or exponential function
++#endif
+         GfxColor stop1, stop2;
+         if (!svgGetShadingColor(shading, 0.0, &stop1) || !svgGetShadingColor(shading, 1.0, &stop2)) {
+             return false;
+@@ -1185,7 +1189,11 @@ bool SvgBuilder::_addGradientStops(Inkscape::XML::Node *gradient, GfxShading *sh
+             _addStopToGradient(gradient, 0.0, &stop1, space, 1.0);
+             _addStopToGradient(gradient, 1.0, &stop2, space, 1.0);
+         }
++#if POPPLER_CHECK_VERSION(24, 3, 0)
++    } else if ( type == Function::Type::Stitching ) { // Stitching
++#else
+     } else if ( type == 3 ) { // Stitching
++#endif
+         auto stitchingFunc = static_cast<_POPPLER_CONST StitchingFunction*>(func);
+         const double *bounds = stitchingFunc->getBounds();
+         const double *encode = stitchingFunc->getEncode();
+@@ -1200,7 +1208,11 @@ bool SvgBuilder::_addGradientStops(Inkscape::XML::Node *gradient, GfxShading *sh
+         for ( int i = 0 ; i < num_funcs ; i++ ) {
+             svgGetShadingColor(shading, bounds[i + 1], &color);
+             // Add stops
++#if POPPLER_CHECK_VERSION(24, 3, 0)
++            if (stitchingFunc->getFunc(i)->getType() == Function::Type::Exponential) {    // process exponential fxn
++#else
+             if (stitchingFunc->getFunc(i)->getType() == 2) {    // process exponential fxn
++#endif
+                 double expE = (static_cast<_POPPLER_CONST ExponentialFunction*>(stitchingFunc->getFunc(i)))->getE();
+                 if (expE > 1.0) {
+                     expE = (bounds[i + 1] - bounds[i])/expE;    // approximate exponential as a single straight line at x=1
+-- 
+GitLab
+

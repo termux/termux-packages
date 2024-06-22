@@ -1,0 +1,24 @@
+diff --git a/sourcekit-lsp/Utilities/build-script-helper.py b/sourcekit-lsp/Utilities/build-script-helper.py
+index 17ad9e3..953fffd 100755
+--- a/sourcekit-lsp/Utilities/build-script-helper.py
++++ b/sourcekit-lsp/Utilities/build-script-helper.py
+@@ -142,6 +142,7 @@ def get_swiftpm_options(swift_exec: str, args: argparse.Namespace) -> List[str]:
+         elif re.match('android-', args.cross_compile_host):
+             print('Cross-compiling for %s' % args.cross_compile_host)
+             swiftpm_args += ['--destination', args.cross_compile_config]
++            swiftpm_args += ['--pkg-config-path', os.path.join(os.path.split(args.cross_compile_config)[0], 'lib/pkgconfig')]
+         else:
+             fatal_error("cannot cross-compile for %s" % args.cross_compile_host)
+ 
+diff --git a/swiftpm/Utilities/bootstrap b/swiftpm/Utilities/bootstrap
+index 085056de..1ded1a90 100755
+--- a/swiftpm/Utilities/bootstrap
++++ b/swiftpm/Utilities/bootstrap
+@@ -834,6 +834,7 @@ def get_swiftpm_flags(args):
+             build_flags += ["--arch", "x86_64", "--arch", "arm64"]
+         elif cross_compile_hosts.startswith('android-'):
+             build_flags.extend(["--destination", args.cross_compile_config])
++            build_flags.extend(["--pkg-config-path", os.path.join(os.path.split(args.cross_compile_config)[0], "lib/pkgconfig")])
+         else:
+             error("cannot cross-compile for %s" % cross_compile_hosts)
+ 

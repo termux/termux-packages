@@ -25,11 +25,11 @@ diff -uNr mtpaint/src/main.c mtpaint.mod/src/main.c
 --- mtpaint/src/main.c	2019-05-09 22:29:43.000000000 +0300
 +++ mtpaint.mod/src/main.c	2019-05-19 18:17:33.794226039 +0300
 @@ -299,7 +299,7 @@
- 	/* Enable threading for GLib, but NOT for GTK+ (at least, not yet) */
  	g_thread_init(NULL);
  #endif
--	inifile_init("/etc/mtpaint/mtpaintrc", "~/.mtpaint");
-+	inifile_init("@TERMUX_PREFIX@/etc/mtpaint/mtpaintrc", "~/.mtpaint");
+ 	env = getenv("MTPAINT_INI");
+-	inifile_init("/etc/mtpaint/mtpaintrc", env ? env : "~/.mtpaint");
++	inifile_init("@TERMUX_PREFIX@/etc/mtpaint/mtpaintrc", env ? env : "~/.mtpaint");
  
  #ifdef U_NLS
  #if GTK_MAJOR_VERSION == 1

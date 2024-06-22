@@ -2,9 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://www.openssh.com/
 TERMUX_PKG_DESCRIPTION="Secure shell for logging into a remote machine"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=9.1p1
-TERMUX_PKG_SRCURL=https://fastly.cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=19f85009c7e3e23787f0236fbb1578392ab4d4bf9f8ec5fe6bc1cd7e8bfdd288
+TERMUX_PKG_VERSION="9.7p1"
+TERMUX_PKG_SRCURL=https://github.com/openssh/openssh-portable/archive/refs/tags/V_$(sed 's/\./_/g; s/p/_P/g' <<< $TERMUX_PKG_VERSION).tar.gz
+TERMUX_PKG_SHA256=f0c22a08eeaa7dfbae3ba553031a8c7d5322e498216d99ad8074a076b28c6f90
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="krb5, ldns, libandroid-support, libedit, openssh-sftp-server, openssl, termux-auth, zlib"
 TERMUX_PKG_CONFLICTS="dropbear"
 # --disable-strip to prevent host "install" command to use "-s", which won't work for target binaries:
@@ -36,6 +37,7 @@ ac_cv_func_getlastlogxbyname=no
 ac_cv_func_readpassphrase=no
 ac_cv_func_strnvis=no
 ac_cv_header_sys_un_h=yes
+ac_cv_lib_crypt_crypt=no
 ac_cv_search_getrrsetbyname=no
 ac_cv_func_bzero=yes
 "
@@ -111,4 +113,11 @@ termux_step_create_debscripts() {
 	echo "done" >> postinst
 	echo "exit 0" >> postinst
 	chmod 0755 postinst
+}
+
+termux_pkg_auto_update() {
+	local latest_tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}" newest-tag)"
+	[[ -z "${latest_tag}" ]] && termux_error_exit "ERROR: Unable to get tag from ${TERMUX_PKG_SRCURL}"
+	local version="$(echo ${latest_tag} | sed -E 's/V_([0-9]+)_([0-9]+)_P([0-9]+)/\1.\2p\3/')"
+	termux_pkg_upgrade_version $version
 }

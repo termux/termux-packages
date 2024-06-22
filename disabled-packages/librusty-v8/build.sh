@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=8b90dfd2f4fcbbaefd2c4d2be220d94a00a3ebba
 TERMUX_PKG_VERSION=2022.02.02
-TERMUX_PKG_SRCURL=https://github.com/denoland/rusty_v8.git
+TERMUX_PKG_SRCURL=git+https://github.com/denoland/rusty_v8
 TERMUX_PKG_GIT_BRANCH=main
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_NO_STATICSPLIT=true
@@ -31,7 +31,7 @@ termux_step_pre_configure() {
 
 termux_step_make() {
 	termux_setup_rust
-	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
+	cargo build --jobs $TERMUX_PKG_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
 }
 
 termux_step_make_install() {

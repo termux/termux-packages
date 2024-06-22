@@ -1,0 +1,39 @@
+https://github.com/termux/termux-packages/issues/18954
+
+--- a/ui_curses.c
++++ b/ui_curses.c
+@@ -75,6 +75,23 @@
+ #include <math.h>
+ #include <sys/time.h>
+ 
++#ifdef __TERMUX__
++#include <android/fdsan.h>
++#include <dlfcn.h>
++
++static inline void termux_disable_fdsan() {
++	// For Android 11+.
++	void *lib_handle = dlopen("libc.so", RTLD_LAZY);
++	if (lib_handle) {
++		void (*set_fdsan_error_level)(enum android_fdsan_error_level newlevel) = dlsym(lib_handle, "android_fdsan_set_error_level");
++		if (set_fdsan_error_level) {
++			set_fdsan_error_level(ANDROID_FDSAN_ERROR_LEVEL_DISABLED);
++		}
++		dlclose(lib_handle);
++	}
++}
++#endif
++
+ #if defined(__sun__) || defined(__CYGWIN__)
+ /* TIOCGWINSZ */
+ #include <termios.h>
+@@ -2474,6 +2491,10 @@
+ {
+ 	int list_plugins = 0;
+ 
++#ifdef __TERMUX__
++	termux_disable_fdsan();
++#endif
++
+ 	program_name = argv[0];
+ 	argv++;
+ 	while (1) {

@@ -1,0 +1,105 @@
+--- a/configure.ac
++++ b/configure.ac
+@@ -177,9 +177,6 @@
+     AC_DEFINE([_DARWIN_C_SOURCE], [1], [Define _DARWIN_C_SOURCE])
+     DARWIN=yes
+     ;;
+-  *-android*)
+-    ANDROID=yes
+-    ;;    
+   *-linux*)
+     LINUX=yes
+     ;;
+--- a/sdk/include/mega/posix/megasys.h
++++ b/sdk/include/mega/posix/megasys.h
+@@ -23,7 +23,7 @@
+ #define MEGA_POSIX_OS_H 1
+ 
+ // platform dependent constants
+-#ifdef __ANDROID__
++#if 0
+ #include "mega/config-android.h"
+ #else
+ #ifndef MEGA_GENERATED_CONFIG_H
+--- a/sdk/include/mega/thread/posixthread.h
++++ b/sdk/include/mega/thread/posixthread.h
+@@ -24,7 +24,7 @@
+ 
+ #if defined(HAVE_CONFIG_H) || !(defined _WIN32)
+ // platform dependent constants
+-#ifdef __ANDROID__
++#if 0
+ #include "mega/config-android.h"
+ #else
+ #ifndef MEGA_GENERATED_CONFIG_H
+--- a/sdk/include/mega/win32/megasys.h
++++ b/sdk/include/mega/win32/megasys.h
+@@ -24,7 +24,7 @@
+ 
+ #ifdef HAVE_CONFIG_H
+ // platform dependent constants
+-#ifdef __ANDROID__
++#if 0
+ #include "mega/config-android.h"
+ #else
+ #include "mega/config.h"
+--- a/sdk/src/mega_evt_tls.cpp
++++ b/sdk/src/mega_evt_tls.cpp
+@@ -10,7 +10,7 @@
+ 
+ #if defined(HAVE_CONFIG_H) || !(defined _WIN32)
+ // platform dependent constants
+-#ifdef __ANDROID__
++#if 0
+ #include "mega/config-android.h"
+ #else
+ #include "mega/config.h"
+--- a/sdk/src/posix/fs.cpp
++++ b/sdk/src/posix/fs.cpp
+@@ -30,7 +30,7 @@
+ #include "mega/osx/osxutils.h"
+ #endif
+ 
+-#ifdef __ANDROID__
++#if 0
+ #include <jni.h>
+ extern JavaVM *MEGAjvm;
+ #endif
+@@ -1530,7 +1530,7 @@
+ 
+ void PosixFileSystemAccess::statsid(string *id) const
+ {
+-#ifdef __ANDROID__
++#if 0
+     if (!MEGAjvm)
+     {
+         LOG_err << "No JVM found";
+--- a/sdk/src/posix/net.cpp
++++ b/sdk/src/posix/net.cpp
+@@ -23,7 +23,7 @@
+ #include "mega/posix/meganet.h"
+ #include "mega/logging.h"
+ 
+-#if defined(__ANDROID__) && ARES_VERSION >= 0x010F00
++#if 0 && ARES_VERSION >= 0x010F00
+ #include <jni.h>
+ extern JavaVM *MEGAjvm;
+ #endif
+@@ -298,7 +298,7 @@
+             LOG_debug << "c-ares version: " << aresversion;
+         }
+ 
+-#if (defined(ANDROID) || defined(__ANDROID__)) && ARES_VERSION >= 0x010F00
++#if 0 && ARES_VERSION >= 0x010F00
+         initialize_android();
+ #endif
+ #endif
+@@ -2941,7 +2941,7 @@
+ }
+ 
+ #ifdef MEGA_USE_C_ARES
+-#if (defined(ANDROID) || defined(__ANDROID__)) && ARES_VERSION >= 0x010F00
++#if 0 && ARES_VERSION >= 0x010F00
+ 
+ void CurlHttpIO::initialize_android()
+ {

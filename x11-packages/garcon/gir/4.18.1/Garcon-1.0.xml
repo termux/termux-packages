@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<dump>
+  <class name="GarconMenuDirectory" get-type="garcon_menu_directory_get_type" parents="GObject">
+    <property name="file" type="GFile" flags="235"/>
+    <property name="name" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="comment" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="no-display" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="icon-name" type="gchararray" flags="227" default-value="NULL"/>
+  </class>
+  <interface name="GarconMenuElement" get-type="garcon_menu_element_get_type">
+  </interface>
+  <class name="GarconMenuItemAction" get-type="garcon_menu_item_action_get_type" parents="GObject">
+    <property name="name" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="command" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="icon-name" type="gchararray" flags="227" default-value="NULL"/>
+  </class>
+  <class name="GarconMenuItem" get-type="garcon_menu_item_get_type" parents="GObject">
+    <implements name="GarconMenuElement"/>
+    <property name="file" type="GFile" flags="235"/>
+    <property name="desktop-id" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="requires-terminal" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="no-display" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="supports-startup-notification" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="name" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="generic-name" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="comment" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="icon-name" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="command" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="try-exec" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="hidden" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="prefers-non-default-gpu" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="path" type="gchararray" flags="227" default-value="NULL"/>
+    <signal name="changed" return="void" when="first">
+    </signal>
+  </class>
+  <class name="GarconMenuItemPool" get-type="garcon_menu_item_pool_get_type" parents="GObject">
+  </class>
+  <class name="GarconMenu" get-type="garcon_menu_get_type" parents="GObject">
+    <implements name="GarconMenuElement"/>
+    <property name="file" type="GFile" flags="235"/>
+    <property name="directory" type="GarconMenuDirectory" flags="227"/>
+    <signal name="reload-required" return="void" when="last" no-hooks="1">
+    </signal>
+    <signal name="directory-changed" return="void" when="last" no-hooks="1">
+      <param type="GarconMenuDirectory"/>
+      <param type="GarconMenuDirectory"/>
+    </signal>
+  </class>
+  <class name="GarconMenuItemCache" get-type="garcon_menu_item_cache_get_type" parents="GObject">
+  </class>
+  <enum name="GarconMenuNodeType" get-type="garcon_menu_node_type_get_type">
+    <member name="GARCON_MENU_NODE_TYPE_INVALID" nick="Invalid" value="0"/>
+    <member name="GARCON_MENU_NODE_TYPE_MENU" nick="Menu" value="1"/>
+    <member name="GARCON_MENU_NODE_TYPE_NAME" nick="Name" value="2"/>
+    <member name="GARCON_MENU_NODE_TYPE_DIRECTORY" nick="Directory" value="3"/>
+    <member name="GARCON_MENU_NODE_TYPE_DIRECTORY_DIR" nick="DirectoryDir" value="4"/>
+    <member name="GARCON_MENU_NODE_TYPE_DEFAULT_DIRECTORY_DIRS" nick="DefaultDirectoryDirs" value="5"/>
+    <member name="GARCON_MENU_NODE_TYPE_APP_DIR" nick="AppDir" value="6"/>
+    <member name="GARCON_MENU_NODE_TYPE_DEFAULT_APP_DIRS" nick="DefaultAppDirs" value="7"/>
+    <member name="GARCON_MENU_NODE_TYPE_ONLY_UNALLOCATED" nick="OnlyUnallocated" value="8"/>
+    <member name="GARCON_MENU_NODE_TYPE_NOT_ONLY_UNALLOCATED" nick="NotOnlyUnallocated" value="9"/>
+    <member name="GARCON_MENU_NODE_TYPE_DELETED" nick="Deleted" value="10"/>
+    <member name="GARCON_MENU_NODE_TYPE_NOT_DELETED" nick="NotDeleted" value="11"/>
+    <member name="GARCON_MENU_NODE_TYPE_INCLUDE" nick="Include" value="12"/>
+    <member name="GARCON_MENU_NODE_TYPE_EXCLUDE" nick="Exclude" value="13"/>
+    <member name="GARCON_MENU_NODE_TYPE_ALL" nick="All" value="14"/>
+    <member name="GARCON_MENU_NODE_TYPE_FILENAME" nick="Filename" value="15"/>
+    <member name="GARCON_MENU_NODE_TYPE_CATEGORY" nick="Category" value="16"/>
+    <member name="GARCON_MENU_NODE_TYPE_OR" nick="Or" value="17"/>
+    <member name="GARCON_MENU_NODE_TYPE_AND" nick="And" value="18"/>
+    <member name="GARCON_MENU_NODE_TYPE_NOT" nick="Not" value="19"/>
+    <member name="GARCON_MENU_NODE_TYPE_MOVE" nick="Move" value="20"/>
+    <member name="GARCON_MENU_NODE_TYPE_OLD" nick="Old" value="21"/>
+    <member name="GARCON_MENU_NODE_TYPE_NEW" nick="New" value="22"/>
+    <member name="GARCON_MENU_NODE_TYPE_DEFAULT_LAYOUT" nick="DefaultLayout" value="23"/>
+    <member name="GARCON_MENU_NODE_TYPE_LAYOUT" nick="Layout" value="24"/>
+    <member name="GARCON_MENU_NODE_TYPE_MENUNAME" nick="Menuname" value="25"/>
+    <member name="GARCON_MENU_NODE_TYPE_SEPARATOR" nick="Separator" value="26"/>
+    <member name="GARCON_MENU_NODE_TYPE_MERGE" nick="Merge" value="27"/>
+    <member name="GARCON_MENU_NODE_TYPE_MERGE_FILE" nick="MergeFile" value="28"/>
+    <member name="GARCON_MENU_NODE_TYPE_MERGE_DIR" nick="MergeDir" value="29"/>
+    <member name="GARCON_MENU_NODE_TYPE_DEFAULT_MERGE_DIRS" nick="MergeDirs" value="30"/>
+  </enum>  <class name="GarconMenuNode" get-type="garcon_menu_node_get_type" parents="GObject">
+    <property name="node-type" type="GarconMenuNodeType" flags="227" default-value="GARCON_MENU_NODE_TYPE_MENU"/>
+  </class>
+  <interface name="GarconMenuTreeProvider" get-type="garcon_menu_tree_provider_get_type">
+  </interface>
+  <class name="GarconMenuMerger" get-type="garcon_menu_merger_get_type" parents="GObject">
+    <implements name="GarconMenuTreeProvider"/>
+    <property name="tree-provider" type="GarconMenuTreeProvider" flags="235"/>
+  </class>
+  <class name="GarconMenuParser" get-type="garcon_menu_parser_get_type" parents="GObject">
+    <implements name="GarconMenuTreeProvider"/>
+    <property name="file" type="GFile" flags="235"/>
+  </class>
+  <class name="GarconMenuSeparator" get-type="garcon_menu_separator_get_type" parents="GObject">
+    <implements name="GarconMenuElement"/>
+  </class>
+</dump>

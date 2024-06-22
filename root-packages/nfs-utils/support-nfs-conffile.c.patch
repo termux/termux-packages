@@ -1,0 +1,13 @@
+--- a/support/nfs/conffile.c
++++ b/support/nfs/conffile.c
+@@ -54,6 +54,10 @@
+ #include <time.h>
+ #include <dirent.h>
+ 
++#ifdef __ANDROID__
++int versionsort(const struct dirent **, const struct dirent **);
++#endif
++
+ #include "conffile.h"
+ #include "xlog.h"
+ 

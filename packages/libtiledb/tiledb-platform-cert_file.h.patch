@@ -1,0 +1,22 @@
+--- a/tiledb/platform/cert_file.h
++++ b/tiledb/platform/cert_file.h
+@@ -134,6 +134,7 @@
+    */
+   static std::string get() {
+     std::call_once(cert_file_initialized_, []() {
++#ifndef __ANDROID__
+       const std::array<std::string, 6> cert_files = {
+           "/etc/ssl/certs/ca-certificates.crt",  // Debian/Ubuntu/Gentoo etc.
+           "/etc/pki/tls/certs/ca-bundle.crt",    // Fedora/RHEL 6
+@@ -142,6 +143,11 @@
+           "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem",  // CentOS/RHEL 7
+           "/etc/ssl/cert.pem"                                   // Alpine Linux
+       };
++#else
++      const std::array<std::string, 1> cert_files = {
++          "@TERMUX_PREFIX@/etc/tls/cert.pem"
++      };
++#endif
+ 
+       for (const std::string& cert : cert_files) {
+         if (file_exists(cert)) {

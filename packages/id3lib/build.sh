@@ -1,9 +1,9 @@
-TERMUX_PKG_HOMEPAGE=http://id3lib.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://id3lib.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="A software library for manipulating ID3v1/v1.1 and ID3v2 tags"
 TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.8.3
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/id3lib/id3lib-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=2749cc3c0cd7280b299518b1ddf5a5bcfe2d1100614519b68702230e26c7d079
 TERMUX_PKG_DEPENDS="libc++, libiconv, zlib"
@@ -19,6 +19,8 @@ termux_step_pre_configure() {
 	aclocal
 	automake --add-missing
 	autoreconf -fi
+
+	LDFLAGS+=" $($CC -print-libgcc-file-name)"
 }
 
 termux_step_post_make_install() {

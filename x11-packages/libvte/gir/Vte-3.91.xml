@@ -1,0 +1,160 @@
+<?xml version="1.0"?>
+<dump>
+  <class name="VtePty" get-type="vte_pty_get_type" parents="GObject">
+    <implements name="GInitable"/>
+    <property name="flags" type="VtePtyFlags" flags="1073742059" default-value="VTE_PTY_DEFAULT"/>
+    <property name="fd" type="gint" flags="1073742059" default-value="-1"/>
+  </class>
+  <boxed name="VteRegex" get-type="vte_regex_get_type"/>
+  <class name="VteTerminal" get-type="vte_terminal_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkScrollable"/>
+    <property name="allow-bold" type="gboolean" flags="1073742051" default-value="TRUE"/>
+    <property name="allow-hyperlink" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="audible-bell" type="gboolean" flags="1073742051" default-value="TRUE"/>
+    <property name="backspace-binding" type="VteEraseBinding" flags="1073742051" default-value="VTE_ERASE_AUTO"/>
+    <property name="bold-is-bright" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="cell-height-scale" type="gdouble" flags="1073742051" default-value="1.000000"/>
+    <property name="cell-width-scale" type="gdouble" flags="1073742051" default-value="1.000000"/>
+    <property name="cjk-ambiguous-width" type="gint" flags="1073742051" default-value="1"/>
+    <property name="cursor-blink-mode" type="VteCursorBlinkMode" flags="1073742051" default-value="VTE_CURSOR_BLINK_SYSTEM"/>
+    <property name="cursor-shape" type="VteCursorShape" flags="1073742051" default-value="VTE_CURSOR_SHAPE_BLOCK"/>
+    <property name="current-directory-uri" type="gchararray" flags="1073742049" default-value="NULL"/>
+    <property name="current-file-uri" type="gchararray" flags="1073742049" default-value="NULL"/>
+    <property name="delete-binding" type="VteEraseBinding" flags="1073742051" default-value="VTE_ERASE_AUTO"/>
+    <property name="enable-bidi" type="gboolean" flags="1073742051" default-value="TRUE"/>
+    <property name="enable-fallback-scrolling" type="gboolean" flags="1073742051" default-value="TRUE"/>
+    <property name="enable-shaping" type="gboolean" flags="1073742051" default-value="TRUE"/>
+    <property name="enable-sixel" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="encoding" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="font-desc" type="PangoFontDescription" flags="1073742051"/>
+    <property name="font-options" type="CairoFontOptions" flags="1073742051"/>
+    <property name="font-scale" type="gdouble" flags="1073742051" default-value="1.000000"/>
+    <property name="hyperlink-hover-uri" type="gchararray" flags="1073742049" default-value="NULL"/>
+    <property name="icon-title" type="gchararray" flags="1073742049" default-value="NULL"/>
+    <property name="input-enabled" type="gboolean" flags="1073742051" default-value="TRUE"/>
+    <property name="pointer-autohide" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="pty" type="VtePty" flags="1073742051"/>
+    <property name="rewrap-on-resize" type="gboolean" flags="1073742051" default-value="TRUE"/>
+    <property name="scrollback-lines" type="guint" flags="1073742051" default-value="512"/>
+    <property name="scroll-on-keystroke" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="scroll-on-output" type="gboolean" flags="1073742051" default-value="TRUE"/>
+    <property name="scroll-unit-is-pixels" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="text-blink-mode" type="VteTextBlinkMode" flags="1073742051" default-value="VTE_TEXT_BLINK_ALWAYS"/>
+    <property name="window-title" type="gchararray" flags="1073742049" default-value="NULL"/>
+    <property name="word-char-exceptions" type="gchararray" flags="1073742049" default-value="NULL"/>
+    <signal name="eof" return="void" when="last">
+    </signal>
+    <signal name="child-exited" return="void" when="last">
+      <param type="gint"/>
+    </signal>
+    <signal name="window-title-changed" return="void" when="last">
+    </signal>
+    <signal name="icon-title-changed" return="void" when="last">
+    </signal>
+    <signal name="current-directory-uri-changed" return="void" when="last">
+    </signal>
+    <signal name="current-file-uri-changed" return="void" when="last">
+    </signal>
+    <signal name="hyperlink-hover-uri-changed" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="GdkRectangle"/>
+    </signal>
+    <signal name="encoding-changed" return="void" when="last">
+    </signal>
+    <signal name="commit" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="guint"/>
+    </signal>
+    <signal name="char-size-changed" return="void" when="last">
+      <param type="guint"/>
+      <param type="guint"/>
+    </signal>
+    <signal name="selection-changed" return="void" when="last">
+    </signal>
+    <signal name="contents-changed" return="void" when="last">
+    </signal>
+    <signal name="cursor-moved" return="void" when="last">
+    </signal>
+    <signal name="deiconify-window" return="void" when="last">
+    </signal>
+    <signal name="iconify-window" return="void" when="last">
+    </signal>
+    <signal name="raise-window" return="void" when="last">
+    </signal>
+    <signal name="lower-window" return="void" when="last">
+    </signal>
+    <signal name="refresh-window" return="void" when="last">
+    </signal>
+    <signal name="restore-window" return="void" when="last">
+    </signal>
+    <signal name="maximize-window" return="void" when="last">
+    </signal>
+    <signal name="resize-window" return="void" when="last">
+      <param type="guint"/>
+      <param type="guint"/>
+    </signal>
+    <signal name="move-window" return="void" when="last">
+      <param type="guint"/>
+      <param type="guint"/>
+    </signal>
+    <signal name="increase-font-size" return="void" when="last">
+    </signal>
+    <signal name="decrease-font-size" return="void" when="last">
+    </signal>
+    <signal name="copy-clipboard" return="void" when="last" action="1">
+    </signal>
+    <signal name="paste-clipboard" return="void" when="last" action="1">
+    </signal>
+    <signal name="bell" return="void" when="last">
+    </signal>
+  </class>
+  <enum name="VteCursorBlinkMode" get-type="vte_cursor_blink_mode_get_type">
+    <member name="VTE_CURSOR_BLINK_SYSTEM" nick="system" value="0"/>
+    <member name="VTE_CURSOR_BLINK_ON" nick="on" value="1"/>
+    <member name="VTE_CURSOR_BLINK_OFF" nick="off" value="2"/>
+  </enum>  <enum name="VteCursorShape" get-type="vte_cursor_shape_get_type">
+    <member name="VTE_CURSOR_SHAPE_BLOCK" nick="block" value="0"/>
+    <member name="VTE_CURSOR_SHAPE_IBEAM" nick="ibeam" value="1"/>
+    <member name="VTE_CURSOR_SHAPE_UNDERLINE" nick="underline" value="2"/>
+  </enum>  <enum name="VteTextBlinkMode" get-type="vte_text_blink_mode_get_type">
+    <member name="VTE_TEXT_BLINK_NEVER" nick="never" value="0"/>
+    <member name="VTE_TEXT_BLINK_FOCUSED" nick="focused" value="1"/>
+    <member name="VTE_TEXT_BLINK_UNFOCUSED" nick="unfocused" value="2"/>
+    <member name="VTE_TEXT_BLINK_ALWAYS" nick="always" value="3"/>
+  </enum>  <enum name="VteEraseBinding" get-type="vte_erase_binding_get_type">
+    <member name="VTE_ERASE_AUTO" nick="auto" value="0"/>
+    <member name="VTE_ERASE_ASCII_BACKSPACE" nick="ascii-backspace" value="1"/>
+    <member name="VTE_ERASE_ASCII_DELETE" nick="ascii-delete" value="2"/>
+    <member name="VTE_ERASE_DELETE_SEQUENCE" nick="delete-sequence" value="3"/>
+    <member name="VTE_ERASE_TTY" nick="tty" value="4"/>
+  </enum>  <enum name="VtePtyError" get-type="vte_pty_error_get_type">
+    <member name="VTE_PTY_ERROR_PTY_HELPER_FAILED" nick="pty-helper-failed" value="0"/>
+    <member name="VTE_PTY_ERROR_PTY98_FAILED" nick="pty98-failed" value="1"/>
+  </enum>  <flags name="VtePtyFlags" get-type="vte_pty_flags_get_type">
+    <member name="VTE_PTY_NO_LASTLOG" nick="no-lastlog" value="1"/>
+    <member name="VTE_PTY_NO_UTMP" nick="no-utmp" value="2"/>
+    <member name="VTE_PTY_NO_WTMP" nick="no-wtmp" value="4"/>
+    <member name="VTE_PTY_NO_HELPER" nick="no-helper" value="8"/>
+    <member name="VTE_PTY_NO_FALLBACK" nick="no-fallback" value="16"/>
+    <member name="VTE_PTY_NO_SESSION" nick="no-session" value="32"/>
+    <member name="VTE_PTY_NO_CTTY" nick="no-ctty" value="64"/>
+    <member name="VTE_PTY_DEFAULT" nick="default" value="0"/>
+  </flags>
+  <enum name="VteWriteFlags" get-type="vte_write_flags_get_type">
+    <member name="VTE_WRITE_DEFAULT" nick="default" value="0"/>
+  </enum>  <enum name="VteRegexError" get-type="vte_regex_error_get_type">
+    <member name="VTE_REGEX_ERROR_INCOMPATIBLE" nick="incompatible" value="2147483646"/>
+    <member name="VTE_REGEX_ERROR_NOT_SUPPORTED" nick="not-supported" value="2147483647"/>
+  </enum>  <enum name="VteFormat" get-type="vte_format_get_type">
+    <member name="VTE_FORMAT_TEXT" nick="text" value="1"/>
+    <member name="VTE_FORMAT_HTML" nick="html" value="2"/>
+  </enum>  <enum name="VteAlign" get-type="vte_align_get_type">
+    <member name="VTE_ALIGN_START" nick="start" value="0"/>
+    <member name="VTE_ALIGN_CENTER" nick="center" value="1"/>
+    <member name="VTE_ALIGN_END" nick="end" value="3"/>
+  </enum>  <error-quark function="vte_pty_error_quark" domain="vte-pty-error"/>
+  <error-quark function="vte_regex_error_quark" domain="vte-regex-error"/>
+</dump>

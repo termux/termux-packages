@@ -1,6 +1,7 @@
 TERMUX_SUBPKG_INCLUDE="
 bin/mlir-*
 bin/tblgen-lsp-server
+bin/tblgen-to-irdl
 include/mlir*
 lib/cmake/mlir/
 lib/libMLIR.so

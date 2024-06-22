@@ -1,7 +1,7 @@
-diff -u -r ../openssh-7.1p1/mux.c ./mux.c
---- ../openssh-7.1p1/mux.c	2015-08-21 00:49:03.000000000 -0400
-+++ ./mux.c	2015-12-17 19:20:36.368902909 -0500
-@@ -1295,6 +1295,22 @@
+diff -uNr openssh-portable-V_9_5_P1/mux.c openssh-portable-V_9_5_P1.mod/mux.c
+--- openssh-portable-V_9_5_P1/mux.c	2023-10-04 07:34:10.000000000 +0300
++++ openssh-portable-V_9_5_P1.mod/mux.c	2023-11-23 16:29:34.264542664 +0200
+@@ -1325,6 +1325,22 @@
  	}
  
  	/* Now atomically "move" the mux socket into position */
@@ -23,8 +23,8 @@ diff -u -r ../openssh-7.1p1/mux.c ./mux.c
 +#else
  	if (link(options.control_path, orig_control_path) != 0) {
  		if (errno != EEXIST) {
- 			fatal("%s: link mux listener %s => %s: %s", __func__, 
-@@ -1307,6 +1324,7 @@
+ 			fatal_f("link mux listener %s => %s: %s",
+@@ -1337,6 +1353,7 @@
  		goto disable_mux_master;
  	}
  	unlink(options.control_path);

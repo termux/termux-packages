@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<dump>
+  <class name="WebKitScriptWorld" get-type="webkit_script_world_get_type" parents="GObject" final="1">
+    <signal name="window-object-cleared" return="void" when="last">
+      <param type="WebKitWebPage"/>
+      <param type="WebKitFrame"/>
+    </signal>
+  </class>
+  <class name="WebKitFrame" get-type="webkit_frame_get_type" parents="GObject" final="1">
+  </class>
+  <class name="WebKitUserMessage" get-type="webkit_user_message_get_type" parents="GInitiallyUnowned,GObject" final="1">
+    <property name="name" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="parameters" type="GVariant" flags="235"/>
+    <property name="fd-list" type="GUnixFDList" flags="235"/>
+  </class>
+  <class name="WebKitWebFormManager" get-type="webkit_web_form_manager_get_type" parents="GObject">
+    <signal name="form-controls-associated" return="void" when="last">
+      <param type="WebKitFrame"/>
+      <param type="GPtrArray"/>
+    </signal>
+    <signal name="will-send-submit-event" return="void" when="last">
+      <param type="JSCValue"/>
+      <param type="WebKitFrame"/>
+      <param type="WebKitFrame"/>
+    </signal>
+    <signal name="will-submit-form" return="void" when="last">
+      <param type="JSCValue"/>
+      <param type="WebKitFrame"/>
+      <param type="WebKitFrame"/>
+    </signal>
+  </class>
+  <class name="WebKitWebPage" get-type="webkit_web_page_get_type" parents="GObject" final="1">
+    <property name="uri" type="gchararray" flags="225" default-value="NULL"/>
+    <signal name="document-loaded" return="void" when="last">
+    </signal>
+    <signal name="send-request" return="gboolean" when="last">
+      <param type="WebKitURIRequest"/>
+      <param type="WebKitURIResponse"/>
+    </signal>
+    <signal name="context-menu" return="gboolean" when="last">
+      <param type="WebKitContextMenu"/>
+      <param type="WebKitWebHitTestResult"/>
+    </signal>
+    <signal name="user-message-received" return="gboolean" when="last">
+      <param type="WebKitUserMessage"/>
+    </signal>
+  </class>
+  <class name="WebKitWebEditor" get-type="webkit_web_editor_get_type" parents="GObject" final="1">
+    <signal name="selection-changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="WebKitHitTestResult" get-type="webkit_hit_test_result_get_type" parents="GObject" final="1">
+    <property name="context" type="guint" flags="235" default-value="0"/>
+    <property name="link-uri" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="link-title" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="link-label" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="image-uri" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="media-uri" type="gchararray" flags="235" default-value="NULL"/>
+  </class>
+  <class name="WebKitWebHitTestResult" get-type="webkit_web_hit_test_result_get_type" parents="GObject" final="1">
+  </class>
+  <class name="WebKitContextMenu" get-type="webkit_context_menu_get_type" parents="GObject" final="1">
+  </class>
+  <class name="WebKitContextMenuItem" get-type="webkit_context_menu_item_get_type" parents="GInitiallyUnowned,GObject" final="1">
+  </class>
+  <class name="WebKitURIRequest" get-type="webkit_uri_request_get_type" parents="GObject" final="1">
+    <property name="uri" type="gchararray" flags="231" default-value="about:blank"/>
+  </class>
+  <class name="WebKitURIResponse" get-type="webkit_uri_response_get_type" parents="GObject" final="1">
+    <property name="uri" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="status-code" type="guint" flags="225" default-value="0"/>
+    <property name="content-length" type="guint64" flags="225" default-value="0"/>
+    <property name="mime-type" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="suggested-filename" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="http-headers" type="SoupMessageHeaders" flags="225"/>
+  </class>
+  <class name="WebKitWebProcessExtension" get-type="webkit_web_process_extension_get_type" parents="GObject" final="1">
+    <signal name="user-message-received" return="void" when="last">
+      <param type="WebKitUserMessage"/>
+    </signal>
+    <signal name="page-created" return="void" when="last">
+      <param type="WebKitWebPage"/>
+    </signal>
+  </class>
+  <error-quark function="webkit_user_message_error_quark" domain="WebKitUserMessageError"/>
+</dump>

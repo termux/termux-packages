@@ -1,0 +1,34 @@
+--- a/xwayland/sockets.c
++++ b/xwayland/sockets.c
+@@ -14,11 +14,11 @@
+ #include <wlr/util/log.h>
+ #include "sockets.h"
+ 
+-static const char lock_fmt[] = "/tmp/.X%d-lock";
+-static const char socket_dir[] = "/tmp/.X11-unix";
+-static const char socket_fmt[] = "/tmp/.X11-unix/X%d";
++static const char lock_fmt[] = "@TERMUX_PREFIX@/tmp/.X%d-lock";
++static const char socket_dir[] = "@TERMUX_PREFIX@/tmp/.X11-unix";
++static const char socket_fmt[] = "@TERMUX_PREFIX@/tmp/.X11-unix/X%d";
+ #ifndef __linux__
+-static const char socket_fmt2[] = "/tmp/.X11-unix/X%d_";
++static const char socket_fmt2[] = "@TERMUX_PREFIX@/tmp/.X11-unix/X%d_";
+ #endif
+ 
+ bool set_cloexec(int fd, bool cloexec) {
+--- a/xwayland/server.c
++++ b/xwayland/server.c
+@@ -18,6 +18,13 @@
+ #include "sockets.h"
+ #include "xwayland/config.h"
+ 
++#ifdef __TERMUX__
++#ifdef XWAYLAND_PATH
++#undef XWAYLAND_PATH
++#endif
++#define XWAYLAND_PATH "@TERMUX_PREFIX@/bin/Xwayland"
++#endif
++
+ static void safe_close(int fd) {
+ 	if (fd >= 0) {
+ 		close(fd);

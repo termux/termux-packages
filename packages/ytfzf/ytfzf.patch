@@ -1,29 +1,14 @@
 --- a/ytfzf
 +++ b/ytfzf
-@@ -248,7 +248,7 @@
- 	# clean up only as parent process
- 	# kill ytfzf sub process{{{
- 	# I think this needs to be written to a file because of sub-shells
--    jobs_file="${TMPDIR:-/tmp}/ytfzf-the-jobs-need-to-be-written-to-a-file-$(id -u).list"
-+    jobs_file="${TMPDIR:-@TERMUX_PREFIX@/tmp}/ytfzf-the-jobs-need-to-be-written-to-a-file-$(id -u).list"
- 	jobs -p > "$jobs_file"
- 	while read -r line; do
- 		[ "$line" ] && kill "$line" 2> /dev/null
-@@ -509,7 +509,7 @@
+@@ -20,9 +20,9 @@
  : "${YTFZF_EXTENSIONS_DIR:=$YTFZF_CONFIG_DIR/extensions}"
  : "${YTFZF_CUSTOM_SCRAPERS_DIR:=$YTFZF_CONFIG_DIR/scrapers}"
  
 -: "${YTFZF_SYSTEM_ADDON_DIR:=/usr/local/share/ytfzf/addons}"
 +: "${YTFZF_SYSTEM_ADDON_DIR:=@TERMUX_PREFIX@/share/ytfzf/addons}"
  
- #}}}
+-: "${YTFZF_TEMP_DIR:="${TMPDIR:-/tmp}"/ytfzf-$(id -u)}"
++: "${YTFZF_TEMP_DIR:="${TMPDIR:-@TERMUX_PREFIX@/tmp}"/ytfzf-$(id -u)}"
  
-@@ -520,7 +520,7 @@
- 
-     # save the ecurrent environment so that any user set variables will be saved
-     if [ "$check_exists" -eq 1 ]; then
--        tmp_env=/tmp/"ytfzf-env-$(id -u)"
-+        tmp_env=@TERMUX_PREFIX@/tmp/"ytfzf-env-$(id -u)"
-         export -p > "$tmp_env"
-     fi
+ : "${YTFZF_LOGFILE:="/dev/stderr"}"
  

@@ -10,6 +10,21 @@ TERMUX_PKG_BREAKS="libunibilium-dev"
 TERMUX_PKG_REPLACES="libunibilium-dev"
 TERMUX_PKG_BUILD_IN_SRC=true
 
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=4
+
+	local a
+	for a in LT_CURRENT LT_AGE; do
+		local _${a}=$(sed -En 's/^'"${a}"'=([0-9]+).*/\1/p' Makefile)
+	done
+	local v=$(( _LT_CURRENT - _LT_AGE ))
+	if [ ! "${_LT_CURRENT}" ] || [ "${v}" != "${_SOVERSION}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
+
 termux_step_pre_configure() {
 	rm -f CMakeLists.txt
 }

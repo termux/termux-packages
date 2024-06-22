@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://www.polyml.org/
 TERMUX_PKG_DESCRIPTION="A Standard ML implementation"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=5.9
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION="5.9.1"
 TERMUX_PKG_SRCURL=https://github.com/polyml/polyml/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=5aa452a49f2ac0278668772af4ea0b9bf30c93457e60ff7f264c5aec2023c83e
+TERMUX_PKG_SHA256=52f56a57a4f308f79446d479e744312195b298aa65181893bce2dfc023a3663c
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libandroid-posix-semaphore, libc++, libffi, libgmp"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -26,7 +26,7 @@ termux_step_host_build() {
 		--prefix=$_PREFIX_FOR_BUILD \
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
 	sed -i -e 's/^\(#define HOSTARCHITECTURE\)_X32 1/\1_X86 1/g' config.h
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j $TERMUX_PKG_MAKE_PROCESSES
 	make install
 	popd
 
@@ -55,10 +55,10 @@ termux_step_host_build() {
 	sed -i -e '/^#define HOSTARCHITECTURE_/d' config.h
 	echo >> config.h
 	echo "#define HOSTARCHITECTURE_${arch} 1" >> config.h
-	make -j $TERMUX_MAKE_PROCESSES -C libpolyml libpolyml.la
-	make -j $TERMUX_MAKE_PROCESSES polyimport
-	make -j $TERMUX_MAKE_PROCESSES -C libpolymain libpolymain.la
-	make -j $TERMUX_MAKE_PROCESSES poly
+	make -j $TERMUX_PKG_MAKE_PROCESSES -C libpolyml libpolyml.la
+	make -j $TERMUX_PKG_MAKE_PROCESSES polyimport
+	make -j $TERMUX_PKG_MAKE_PROCESSES -C libpolymain libpolymain.la
+	make -j $TERMUX_PKG_MAKE_PROCESSES poly
 	export PATH=$(pwd):$TERMUX_ORIG_PATH
 	popd
 }

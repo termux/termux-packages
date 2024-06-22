@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Interactive shell for TCL programming language"
 ## per https://directory.fsf.org/wiki/Eltclsh and their ports http://robotpkg.openrobots.org/robotpkg/shell/eltclsh/ and embedded license headers in init.tcl
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@flosnvjx"
-TERMUX_PKG_VERSION=1.18
+TERMUX_PKG_VERSION="1.19"
 TERMUX_PKG_SRCURL=https://www.openrobots.org/distfiles/eltclsh/eltclsh-"$TERMUX_PKG_VERSION".tar.gz
-TERMUX_PKG_SHA256=77c242ebf384c893916d96a7382882af586c0cbf901f7fde33edd496a03cd9c6
+TERMUX_PKG_SHA256=d4e4f7b79d89a5ed37dc7535d00ac3894fcf3ba33245e672d7a0753ede39d351
 TERMUX_PKG_DEPENDS="tcl, libedit"
 TERMUX_PKG_BUILD_DEPENDS="tk"
 TERMUX_PKG_SUGGESTS="tk"

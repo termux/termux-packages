@@ -10,6 +10,22 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="pulseaudio"
 TERMUX_PKG_BUILD_IN_SRC=true
 
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=0
+
+	local a
+	for a in CURRENT AGE; do
+		local _LT_${a}=$(sed -En 's/^'"${a}"'=([0-9]+).*/\1/p' \
+				Makefile.am)
+	done
+	local v=$(( _LT_CURRENT - _LT_AGE ))
+	if [ ! "${_LT_CURRENT}" ] || [ "${v}" != "${_SOVERSION}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
+
 termux_step_pre_configure() {
 	./autogen.sh
 }

@@ -1,0 +1,20 @@
+#!@TERMUX_PREFIX@/bin/sh
+
+pkg_format="@TERMUX_PACKAGE_FORMAT@"
+pkg_arch=unknown
+case "$pkg_format" in
+	debian ) pkg_arch=$(dpkg --print-architecture) ;;
+	pacman ) pkg_arch=$(pacman-conf Architecture) ;;
+	* ) echo "Warning: unknown package format: $pkg_format" ;;
+esac
+native_triple=unknown
+case "$pkg_arch" in
+	aarch64 ) native_triple=aarch64-linux-android ;;
+	arm ) native_triple=arm-linux-androideabi ;;
+	i686 ) native_triple=i686-linux-android ;;
+	x86_64 ) native_triple=x86_64-linux-android ;;
+	* ) echo "Warning: unknown arch: $pkg_arch" ;;
+esac
+
+swift_runtime_triple=@SWIFT_TRIPLE@
+install_path=@TERMUX_PREFIX@

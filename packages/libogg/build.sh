@@ -8,3 +8,19 @@ TERMUX_PKG_SHA256=c4d91be36fc8e54deae7575241e03f4211eb102afb3fc0775fbbc1b7400167
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BREAKS="libogg-dev"
 TERMUX_PKG_REPLACES="libogg-dev"
+
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=0
+
+	local a
+	for a in LIB_CURRENT LIB_AGE; do
+		local _${a}=$(sed -En 's/^'"${a}"'=([0-9]+).*/\1/p' \
+				configure.ac)
+	done
+	local v=$(( _LIB_CURRENT - _LIB_AGE ))
+	if [ ! "${_LIB_CURRENT}" ] || [ "${v}" != "${_SOVERSION}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}

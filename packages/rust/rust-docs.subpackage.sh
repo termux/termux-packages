@@ -1,3 +1,7 @@
 TERMUX_SUBPKG_DESCRIPTION="Rust documentation"
+TERMUX_SUBPKG_DEPEND_ON_PARENT=false
 TERMUX_SUBPKG_PLATFORM_INDEPENDENT=true
-TERMUX_SUBPKG_INCLUDE="share/doc/rust/html"
+TERMUX_SUBPKG_INCLUDE="
+share/doc/docs/html
+share/doc/rust/html
+"

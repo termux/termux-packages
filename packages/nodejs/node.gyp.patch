@@ -1,6 +1,7 @@
---- ./node.gyp.orig	2022-10-05 20:33:27.730099607 +0530
-+++ ./node.gyp	2022-10-05 20:39:22.010099472 +0530
-@@ -157,7 +157,8 @@
+diff -u -r ../node-v22.3.0/node.gyp ./node.gyp
+--- ../node-v22.3.0/node.gyp	2024-06-11 13:24:36.000000000 +0000
++++ ./node.gyp	2024-06-19 21:36:41.345330645 +0000
+@@ -548,7 +548,8 @@
        ],
  
        'sources': [
@@ -10,60 +11,18 @@
        ],
  
        'dependencies': [
-@@ -458,6 +459,7 @@
- 
-       'include_dirs': [
-         'src',
-+        'deps/cares/src/lib',
-         '<(SHARED_INTERMEDIATE_DIR)' # for node_natives.h
+@@ -1026,49 +1027,6 @@
+         },
        ],
-       'dependencies': [
-@@ -1113,309 +1115,6 @@
-         } ],
-       ]
-     }, # specialize_node_d
--    { # fuzz_url
--      'target_name': 'fuzz_url',
--      'type': 'executable',
--      'dependencies': [
--        '<(node_lib_target_name)',
--      ],
--      'includes': [
--        'node.gypi'
--      ],
--      'include_dirs': [
--        'src',
--      ],
--      'defines': [
--        'NODE_ARCH="<(target_arch)"',
--        'NODE_PLATFORM="<(OS)"',
--        'NODE_WANT_INTERNALS=1',
--      ],
--      'sources': [
--        'src/node_snapshot_stub.cc',
--        'test/fuzzers/fuzz_url.cc',
--      ],
--      'conditions': [
--        ['OS=="linux"', {
--          'ldflags': [ '-fsanitize=fuzzer' ]
--        }],
--        # Ensure that ossfuzz flag has been set and that we are on Linux
--        [ 'OS!="linux" or ossfuzz!="true"', {
--          'type': 'none',
--        }],
--      ],
--    }, # fuzz_url
+     }, # node_lib_target_name
 -    { # fuzz_env
 -      'target_name': 'fuzz_env',
 -      'type': 'executable',
 -      'dependencies': [
 -        '<(node_lib_target_name)',
 -        'deps/histogram/histogram.gyp:histogram',
--        'deps/uvwasi/uvwasi.gyp:uvwasi',
--        'node_dtrace_header',
--        'node_dtrace_ustack',
--        'node_dtrace_provider',
 -      ],
+-
 -      'includes': [
 -        'node.gypi'
 -      ],
@@ -73,9 +32,9 @@
 -        'deps/v8/include',
 -        'deps/cares/include',
 -        'deps/uv/include',
--        'deps/uvwasi/include',
 -        'test/cctest',
 -      ],
+-
 -      'defines': [
 -        'NODE_ARCH="<(target_arch)"',
 -        'NODE_PLATFORM="<(OS)"',
@@ -93,22 +52,31 @@
 -        [ 'OS!="linux" or ossfuzz!="true"', {
 -          'type': 'none',
 -        }],
+-        # Avoid excessive LTO
+-        ['enable_lto=="true"', {
+-          'ldflags': [ '-fno-lto' ],
+-        }],
 -      ],
 -    }, # fuzz_env
+     { # fuzz_ClientHelloParser.cc
+       'target_name': 'fuzz_ClientHelloParser',
+       'type': 'executable',
+@@ -1157,83 +1115,6 @@
+         }],
+       ],
+     }, # fuzz_strings
 -    {
 -      'target_name': 'cctest',
 -      'type': 'executable',
 -
 -      'dependencies': [
 -        '<(node_lib_target_name)',
--        'deps/base64/base64.gyp:base64',
 -        'deps/googletest/googletest.gyp:gtest',
 -        'deps/googletest/googletest.gyp:gtest_main',
 -        'deps/histogram/histogram.gyp:histogram',
--        'deps/uvwasi/uvwasi.gyp:uvwasi',
--        'node_dtrace_header',
--        'node_dtrace_ustack',
--        'node_dtrace_provider',
+-        'deps/simdjson/simdjson.gyp:simdjson',
+-        'deps/simdutf/simdutf.gyp:simdutf',
+-        'deps/ada/ada.gyp:ada',
 -      ],
 -
 -      'includes': [
@@ -121,7 +89,6 @@
 -        'deps/v8/include',
 -        'deps/cares/include',
 -        'deps/uv/include',
--        'deps/uvwasi/include',
 -        'test/cctest',
 -      ],
 -
@@ -131,46 +98,20 @@
 -        'NODE_WANT_INTERNALS=1',
 -      ],
 -
--      'sources': [
--        'src/node_snapshot_stub.cc',
--        'test/cctest/node_test_fixture.cc',
--        'test/cctest/node_test_fixture.h',
--        'test/cctest/test_aliased_buffer.cc',
--        'test/cctest/test_base64.cc',
--        'test/cctest/test_base_object_ptr.cc',
--        'test/cctest/test_node_postmortem_metadata.cc',
--        'test/cctest/test_environment.cc',
--        'test/cctest/test_js_native_api_v8.cc',
--        'test/cctest/test_linked_binding.cc',
--        'test/cctest/test_node_api.cc',
--        'test/cctest/test_per_process.cc',
--        'test/cctest/test_platform.cc',
--        'test/cctest/test_report.cc',
--        'test/cctest/test_json_utils.cc',
--        'test/cctest/test_sockaddr.cc',
--        'test/cctest/test_traced_value.cc',
--        'test/cctest/test_util.cc',
--        'test/cctest/test_url.cc',
--      ],
+-      'sources': [ '<@(node_cctest_sources)' ],
 -
 -      'conditions': [
 -        [ 'node_use_openssl=="true"', {
 -          'defines': [
 -            'HAVE_OPENSSL=1',
 -          ],
--          'sources': [
--            'test/cctest/test_crypto_clienthello.cc',
--            'test/cctest/test_node_crypto.cc',
--          ]
+-          'sources': [ '<@(node_cctest_openssl_sources)' ],
 -        }],
 -        ['v8_enable_inspector==1', {
--          'sources': [
--            'test/cctest/test_inspector_socket.cc',
--            'test/cctest/test_inspector_socket_server.cc'
--          ],
 -          'defines': [
 -            'HAVE_INSPECTOR=1',
 -          ],
+-          'sources': [ '<@(node_cctest_inspector_sources)' ],
 -        }, {
 -           'defines': [
 -             'HAVE_INSPECTOR=0',
@@ -195,81 +136,19 @@
 -            'Ws2_32.lib',
 -          ],
 -        }],
+-        # Avoid excessive LTO
+-        ['enable_lto=="true"', {
+-          'ldflags': [ '-fno-lto' ],
+-        }],
 -      ],
 -    }, # cctest
--
--    {
--      'target_name': 'embedtest',
--      'type': 'executable',
--
--      'dependencies': [
--        '<(node_lib_target_name)',
--        'deps/histogram/histogram.gyp:histogram',
--        'deps/uvwasi/uvwasi.gyp:uvwasi',
--        'node_dtrace_header',
--        'node_dtrace_ustack',
--        'node_dtrace_provider',
--      ],
--
--      'includes': [
--        'node.gypi'
--      ],
--
--      'include_dirs': [
--        'src',
--        'tools/msvs/genfiles',
--        'deps/v8/include',
--        'deps/cares/include',
--        'deps/uv/include',
--        'deps/uvwasi/include',
--        'test/embedding',
--      ],
--
--      'sources': [
--        'src/node_snapshot_stub.cc',
--        'test/embedding/embedtest.cc',
--      ],
--
--      'conditions': [
--        ['OS=="solaris"', {
--          'ldflags': [ '-I<(SHARED_INTERMEDIATE_DIR)' ]
--        }],
--        # Skip cctest while building shared lib node for Windows
--        [ 'OS=="win" and node_shared=="true"', {
--          'type': 'none',
--        }],
--        [ 'node_shared=="true"', {
--          'xcode_settings': {
--            'OTHER_LDFLAGS': [ '-Wl,-rpath,@loader_path', ],
--          },
--        }],
--        ['OS=="win"', {
--          'libraries': [
--            'Dbghelp.lib',
--            'winmm.lib',
--            'Ws2_32.lib',
--          ],
--        }],
--      ],
--    }, # embedtest
--
--    {
--      'target_name': 'overlapped-checker',
--      'type': 'executable',
--
--      'conditions': [
--        ['OS=="win"', {
--          'sources': [
--            'test/overlapped-checker/main_win.c'
--          ],
--        }],
--        ['OS!="win"', {
--          'sources': [
--            'test/overlapped-checker/main_unix.c'
--          ],
--        }],
--      ]
--    }, # overlapped-checker
+ 
+     {
+       'target_name': 'embedtest',
+@@ -1348,69 +1229,6 @@
+         }],
+       ]
+     },
 -    {
 -      'target_name': 'node_mksnapshot',
 -      'type': 'executable',
@@ -277,7 +156,9 @@
 -      'dependencies': [
 -        '<(node_lib_target_name)',
 -        'deps/histogram/histogram.gyp:histogram',
--        'deps/uvwasi/uvwasi.gyp:uvwasi',
+-        'deps/ada/ada.gyp:ada',
+-        'deps/simdjson/simdjson.gyp:simdjson',
+-        'deps/simdutf/simdutf.gyp:simdutf',
 -      ],
 -
 -      'includes': [
@@ -290,7 +171,6 @@
 -        'deps/v8/include',
 -        'deps/cares/include',
 -        'deps/uv/include',
--        'deps/uvwasi/include',
 -      ],
 -
 -      'defines': [ 'NODE_WANT_INTERNALS=1' ],
@@ -301,6 +181,9 @@
 -      ],
 -
 -      'conditions': [
+-        ['node_write_snapshot_as_array_literals=="true"', {
+-          'defines': [ 'NODE_MKSNAPSHOT_USE_ARRAY_LITERALS=1' ],
+-        }],
 -        [ 'node_use_openssl=="true"', {
 -          'defines': [
 -            'HAVE_OPENSSL=1',
@@ -322,6 +205,10 @@
 -            'winmm.lib',
 -            'Ws2_32.lib',
 -          ],
+-        }],
+-        # Avoid excessive LTO
+-        ['enable_lto=="true"', {
+-          'ldflags': [ '-fno-lto' ],
 -        }],
 -      ],
 -    }, # node_mksnapshot

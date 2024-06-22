@@ -1,0 +1,318 @@
+This patch contains the changes in the following unmerged PR:
+https://github.com/tat/mimetic/pull/30
+
+diff --git a/mimetic/circular_buffer.h b/mimetic/circular_buffer.h
+index 49ace54..2973216 100644
+--- a/mimetic/circular_buffer.h
++++ b/mimetic/circular_buffer.h
+@@ -52,23 +52,23 @@ struct circular_buffer
+     inline void push_back(const value_type& c)
+     {
+         m_pItem[m_last] = c;    
+-        m_last = ++m_last % m_sz;
++        m_last = (m_last + 1) % m_sz;
+         m_count += (m_count == m_sz ? 0 : 1);
+     }
+     inline void push_front(const value_type& c)
+     {
+-        m_first = (--m_first + m_sz) % m_sz;        
++        m_first = (m_first - 1 + m_sz) % m_sz;
+         m_pItem[m_first] = c;    
+         m_count += (m_count == m_sz ? 0 : 1);
+     }
+     inline void pop_front()
+     {
+-        m_first = ++m_first % m_sz;        
++        m_first = (m_first + 1) % m_sz;
+         m_count--;
+     }
+     inline void pop_back()
+     {
+-        m_last = (--m_last + m_sz) % m_sz;
++        m_last = (m_last - 1 + m_sz) % m_sz;
+         m_count--;
+     }
+     inline const value_type& front() const
+diff --git a/mimetic/codec/base64.h b/mimetic/codec/base64.h
+index 254eaed..4d9d838 100644
+--- a/mimetic/codec/base64.h
++++ b/mimetic/codec/base64.h
+@@ -36,7 +36,7 @@ class Base64
+ class Encoder: public buffered_codec, public chainable_codec<Encoder>
+ {
+     enum { pad_idx = 64 };
+-    char_type m_ch[3];
++    char_type m_ch[3] = { 0 };
+     int m_cidx;
+     int m_pos, m_maxlen;
+ 
+diff --git a/mimetic/os/directory.h b/mimetic/os/directory.h
+index 706fffc..1f0133d 100644
+--- a/mimetic/os/directory.h
++++ b/mimetic/os/directory.h
+@@ -23,8 +23,14 @@ class Directory
+         Type type;
+     };
+     friend class iterator;
+-    struct iterator: public std::iterator<std::forward_iterator_tag, DirEntry>
++    struct iterator
+     {
++        typedef std::forward_iterator_tag iterator_category;
++        typedef DirEntry value_type;
++        typedef std::ptrdiff_t  difference_type;
++        typedef DirEntry* pointer;
++        typedef DirEntry& reference;
++
+         iterator() // end() it
+         : m_dirp(0), m_dirh(0), m_eoi(true)
+         {
+diff --git a/mimetic/os/file_iterator.h b/mimetic/os/file_iterator.h
+index 4471485..9e0321c 100644
+--- a/mimetic/os/file_iterator.h
++++ b/mimetic/os/file_iterator.h
+@@ -13,8 +13,14 @@ namespace mimetic
+ {
+ struct StdFile;
+ 
+-struct ifile_iterator: public std::iterator<std::input_iterator_tag, char>
++struct ifile_iterator
+ {
++    typedef std::input_iterator_tag iterator_category;
++    typedef char value_type;
++    typedef std::ptrdiff_t  difference_type;
++    typedef char* pointer;
++    typedef char& reference;
++
+     ifile_iterator();    
+     ifile_iterator(StdFile* f);
+     ifile_iterator(const ifile_iterator&);
+diff --git a/mimetic/parser/itparser.h b/mimetic/parser/itparser.h
+index 6033394..427c7da 100644
+--- a/mimetic/parser/itparser.h
++++ b/mimetic/parser/itparser.h
+@@ -234,7 +234,7 @@ struct IteratorParser<Iterator, std::input_iterator_tag>
+             sValue,
+             sIgnoreHeader
+         };
+-        register int status;
++        int status;
+         int pos;
+         char *name, *value;
+         size_t nBufSz, vBufSz, nPos, vPos;
+@@ -472,7 +472,7 @@ struct IteratorParser<Iterator, std::input_iterator_tag>
+     virtual void copy_until_boundary(ParsingElem pe)
+     {
+         size_t pos, lines, eomsz = 0;
+-        register char c;
++        char c;
+         enum { nlsz = 1 };
+         const char *eom = 0;
+ 
+diff --git a/mimetic/rfc822/field.cxx b/mimetic/rfc822/field.cxx
+index 71a1e3f..1f9661f 100644
+--- a/mimetic/rfc822/field.cxx
++++ b/mimetic/rfc822/field.cxx
+@@ -154,7 +154,8 @@ ostream& Field::write(ostream& os, unsigned int fold) const
+     // override to customize
+     if(fold)
+     {
+-        int i, sp;
++        int sp;
++        size_t i;
+         string ostr = name() + ": " + value();
+ 
+         // skip the "fieldname: " part just on the first inner iteration 
+diff --git a/mimetic/rfc822/header.h b/mimetic/rfc822/header.h
+index 6b41457..6e27ddb 100644
+--- a/mimetic/rfc822/header.h
++++ b/mimetic/rfc822/header.h
+@@ -33,9 +33,10 @@ namespace mimetic
+ class Rfc822Header: public std::deque<Field>
+ {
+ public:
+-    struct find_by_name: 
+-        public std::unary_function<const Field, bool>
++    struct find_by_name
+     {
++        typedef const Field argument_type;
++        typedef bool result_type;
+         find_by_name(const std::string&);
+         bool operator()(const Field&) const;
+     private:
+diff --git a/mimetic/strutils.cxx b/mimetic/strutils.cxx
+index e30e032..c81f0fe 100644
+--- a/mimetic/strutils.cxx
++++ b/mimetic/strutils.cxx
+@@ -35,7 +35,7 @@ string canonical(const string& s, bool no_ws)
+     input.erase(1 + idx, string::npos);
+     // removes rfc822 comments and non-required spaces
+     bool in_dquote = false, has_brack = false;
+-    int in_par = 0, in_brack = 0, par_last;
++    int in_par = 0, in_brack = 0, par_last = 0;
+     for(int t =input.length() - 1; t >= 0; --t)
+     {
+         if(input[t] == '"') {
+diff --git a/mimetic/tokenizer.h b/mimetic/tokenizer.h
+index 39de397..546f5b2 100644
+--- a/mimetic/tokenizer.h
++++ b/mimetic/tokenizer.h
+@@ -16,8 +16,11 @@ namespace mimetic
+ {
+ 
+ template<typename value_type>
+-struct IsDelim: public std::unary_function<value_type,bool>
++struct IsDelim
+ {
++    typedef value_type argument_type;
++    typedef bool result_type;
++
+     bool operator()(const value_type& val) const
+     {
+         return m_delims.count(val) != 0; 
+@@ -49,8 +52,11 @@ struct IsDelim: public std::unary_function<value_type,bool>
+ };
+ 
+ template<>
+-struct IsDelim<char>: public std::unary_function<char, bool>
++struct IsDelim<char>
+ {
++    typedef char argument_type;
++    typedef bool result_type;
++
+     void setDelimList(const std::string& delims)
+     {
+         setDelimList(delims.begin(), delims.end());
+diff --git a/mimetic/utils.cxx b/mimetic/utils.cxx
+index 294dc6a..7ede231 100644
+--- a/mimetic/utils.cxx
++++ b/mimetic/utils.cxx
+@@ -113,7 +113,7 @@ string int2hex(unsigned int n)
+             if(zeros)
+                 r.insert((string::size_type)0, zeros, '0');
+             zeros = 0;
+-            r.insert((string::size_type)0, 1, tb[cp]);
++            r.insert((string::size_type)0, 1, tb[static_cast<unsigned>(cp)]);
+         }
+     }
+     return r;
+diff --git a/test/Makefile.in b/test/Makefile.in
+index f337e67..79f608c 100644
+--- a/test/Makefile.in
++++ b/test/Makefile.in
+@@ -563,7 +563,7 @@ touch-autocutee.mk:
+ autocutee.mk: cutee Makefile.am $(test_files)
+ 	./cutee -k -o autocutee.mk $(addprefix $(srcdir)/, $(test_files))
+ 
+-%.cutee.cxx: $(srcdir)/%.h
++%.cutee.cxx: $(srcdir)/%.h cutee
+ 	$(CUTEE) -o $@ $<
+ 
+ runtest.cxx: cutee
+diff --git a/test/cutee.cxx b/test/cutee.cxx
+index d1e27a3..06b7220 100644
+--- a/test/cutee.cxx
++++ b/test/cutee.cxx
+@@ -43,6 +43,15 @@ void do_die_if(int b, const string& msg, int line)
+ }
+ #define _( code ) of << code << endl
+ 
++string stripPath(const string& fqn)
++{
++    string::size_type idx =    fqn.find_last_of('/');
++    if(idx != string::npos)
++        return string(fqn, ++idx);
++    else
++        return fqn;
++}
++
+ enum {     
+     MODE_RUNTEST, 
+     MODE_MAIN, 
+@@ -58,7 +67,7 @@ struct CmdLineOpts
+     int mode;
+ 
+     CmdLineOpts()
+-    : ext(DEFAULT_RUNNER_EXT),mode(MODE_RUNTEST)
++    : ext(stripPath(DEFAULT_RUNNER_EXT)),mode(MODE_RUNTEST)
+     {
+     }
+     void parse(int argc, char **argv)
+@@ -343,11 +352,11 @@ struct GenMakefile
+ 
+         _( "" );
+         _( RUNTEST_NAME ".cxx: cutee" );
+-        _( "\t$(CUTEE) -m -o "RUNTEST_NAME".cxx" );
++        _( "\t$(CUTEE) -m -o " RUNTEST_NAME ".cxx" );
+         _( "" );
+-        _( RUNTEST_NAME": autocutee.mk " RUNTEST_NAME ".o $(object_files)");
+-        _( "\t$(CXX) $(CXXFLAGS) $(LDFLAGS) -o "RUNTEST_NAME" "RUNTEST_NAME".o $(object_files)");
+-        _( "\t./"RUNTEST_NAME );
++        _( RUNTEST_NAME ": autocutee.mk " RUNTEST_NAME ".o $(object_files)");
++        _( "\t$(CXX) $(CXXFLAGS) $(LDFLAGS) -o " RUNTEST_NAME " " RUNTEST_NAME ".o $(object_files)");
++        _( "\t./" RUNTEST_NAME );
+         _( "" );
+         _( "# cutee autogen: end ");
+     }
+@@ -400,7 +409,7 @@ struct GenAutomakefile
+         of << endl;
+ 
+         _( "" );
+-        _( "%.cutee.cxx: $(srcdir)/%.h" );
++        _( "%.cutee.cxx: $(srcdir)/%.h cutee" );
+         _( "\t$(CUTEE) -o $@ $<");
+ 
+         _( "" );
+@@ -410,24 +419,16 @@ struct GenAutomakefile
+ 
+         _( "" );
+         _( RUNTEST_NAME "-clean:");
+-        _( "\trm -f autocutee.mk cutee *.o *.cutee.cxx "RUNTEST_NAME" "RUNTEST_NAME".cxx");
++        _( "\trm -f autocutee.mk cutee *.o *.cutee.cxx " RUNTEST_NAME " " RUNTEST_NAME ".cxx");
+         _( "\ttouch autocutee.mk");
+ 
+         _( "" );
+-        _( "EXTRA_PROGRAMS="RUNTEST_NAME );
+-        _( RUNTEST_NAME "_SOURCES="RUNTEST_NAME".cxx $(test_files) $(t_runners)");
+-        _( RUNTEST_NAME"_DEPENDENCIES=cutee autocutee.mk" );
++        _( "EXTRA_PROGRAMS=" RUNTEST_NAME );
++        _( RUNTEST_NAME "_SOURCES=" RUNTEST_NAME ".cxx $(test_files) $(t_runners)");
++        _( RUNTEST_NAME "_DEPENDENCIES=cutee autocutee.mk" );
+         _( "# cutee autogen: end ");
+     }
+ private:
+-    string stripPath(const string& fqn)
+-    {
+-        string::size_type idx =    fqn.find_last_of('/');
+-        if(idx != string::npos)
+-            return string(fqn, ++idx);
+-        else
+-            return fqn;
+-    }
+     string stripExt(const string& fqn)
+     {
+         string::size_type idx =    fqn.find_last_of('.');
+diff --git a/test/t.qp.h b/test/t.qp.h
+index 2160a33..20911d3 100644
+--- a/test/t.qp.h
++++ b/test/t.qp.h
+@@ -177,7 +177,7 @@ class TEST_CLASS( test_qp )
+         tb[QP::CR] = tb[QP::LF] = QP::newline;
+         const char* unsafe = "!\"#$@[]\\^`{}|~";
+         while(*unsafe != 0)
+-            tb[*unsafe++] = QP::unsafe;
++            tb[static_cast<unsigned>(*unsafe++)] = QP::unsafe;
+         for(int i = 0; i < 256; i++)
+         {
+             TEST_ASSERT(tb[i] == QP::sTb[i]);
+diff --git a/test/t.rfc822.cxx b/test/t.rfc822.cxx
+index 7d83bb8..187c458 100644
+--- a/test/t.rfc822.cxx
++++ b/test/t.rfc822.cxx
+@@ -137,7 +137,6 @@ void testRfc822::testMailbox()
+ void testRfc822::testAddress()
+ {
+     Address a("e@mail.com"), b;
+-    int i;
+     TEST_ASSERT(!a.isGroup());
+ 
+     b.set("e@mail.com");

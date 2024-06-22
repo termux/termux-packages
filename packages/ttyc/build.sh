@@ -3,15 +3,18 @@ TERMUX_PKG_DESCRIPTION="ttyd protocol client"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.4"
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/Depau/ttyc/archive/refs/tags/ttyc-v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=375e2b27335ed3db13aee6d4525548148b8579cdbe34ed4d971d4e3cdff0f173
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	termux_setup_golang
 
 	go mod init || :
-	go mod tidy 
+	go mod tidy
 }
 
 termux_step_make() {

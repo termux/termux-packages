@@ -1,0 +1,54 @@
+--- a/plugin-configure.m4
++++ b/plugin-configure.m4
+@@ -56,7 +56,7 @@
+   goffice_req=libgoffice-0.10
+ fi
+ 
+-goffice_pkgs="$goffice_req >= 0.10.2"
++goffice_pkgs="$goffice_req >= 0.10.2 $gsf_req gtk+-3.0"
+ goffice_deps="no"
+ 
+ if test "$enable_goffice" != ""; then
+@@ -93,7 +93,7 @@
+ test "$enable_goffice" = "auto" && PLUGINS="$PLUGINS goffice"
+ 
+ GOFFICE_CFLAGS="$GOFFICE_CFLAGS "'${PLUGIN_CFLAGS}'
+-GOFFICE_LIBS="$GOFFICE_LIBS "'${PLUGIN_LIBS}'
++GOFFICE_LIBS="$GOFFICE_LIBS "'${PLUGIN_LIBS} -lc++_shared'
+ 
+ fi
+ 
+@@ -150,7 +150,7 @@
+ test "$enable_gdict" = "auto" && PLUGINS="$PLUGINS gdict"
+ 
+ GDICT_CFLAGS="$GDICT_CFLAGS "'${PLUGIN_CFLAGS} -DUSE_FORK_AND_EXEC_METHOD=1'
+-GDICT_LIBS='${PLUGIN_LIBS}'
++GDICT_LIBS='${PLUGIN_LIBS} -lc++_shared'
+ 
+ if test "$enable_gdict_builtin" != ""; then
+ 	GDICT_CFLAGS="$GDICT_CFLAGS -DABI_PLUGIN_BUILTIN"
+@@ -575,7 +575,7 @@
+ AC_SUBST([EML_LIBS])
+ 
+ 
+-epub_pkgs="libgsf-1 >= 1.14.4"
++epub_pkgs="libgsf-1 >= 1.14.4 gtk+-3.0"
+ epub_deps="no"
+ 
+ if test "$enable_epub" != ""; then
+@@ -1188,12 +1188,14 @@
+ AC_MSG_ERROR([command plugin: static linking not supported])
+ fi
+ 
++PKG_CHECK_MODULES(COMMAND,[ gtk+-3.0 ])
++
+ AC_MSG_CHECKING([command plugin: for readline and friends])
+ if test "$command_deps" != "yes"; then
+ 	AC_MSG_ERROR([no])
+ else
+ 	AC_MSG_RESULT([yes])
+-        COMMAND_LIBS="-lreadline -lhistory $COMMAND_LIBS"
++        COMMAND_LIBS="-lreadline -lhistory $COMMAND_LIBS -lc++_shared"
+ fi
+ 
+ test "$enable_command" = "auto" && PLUGINS="$PLUGINS command"

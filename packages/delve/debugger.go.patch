@@ -1,0 +1,12 @@
+diff -uNr delve/service/debugger/debugger.go delve.mod/service/debugger/debugger.go
+--- delve/service/debugger/debugger.go	2024-04-16 07:54:18.275477304 +0200
++++ delve.mod/service/debugger/debugger.go	2024-04-16 08:01:10.542185042 +0200
+@@ -2408,7 +2407,7 @@
+ 	switch runtime.GOOS {
+ 	case "darwin":
+ 		exe, err = macho.NewFile(f)
+-	case "linux", "freebsd":
++	case "linux", "freebsd", "android":
+ 		exe, err = elf.NewFile(f)
+ 	case "windows":
+ 		exe, err = pe.NewFile(f)

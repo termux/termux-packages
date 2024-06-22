@@ -3,13 +3,13 @@ TERMUX_PKG_DESCRIPTION="An open-source implementation of the OpenGL specificatio
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="docs/license.rst"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=22.3.1
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="24.0.8"
 TERMUX_PKG_SRCURL=https://archive.mesa3d.org/mesa-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=3c9cd611c0859d307aba0659833386abdca4c86162d3c275ba5be62d16cf31eb
-TERMUX_PKG_DEPENDS="libandroid-shmem, libc++, libdrm, libexpat, libx11, libxext, libxfixes, libxshmfence, libxxf86vm, ncurses, zlib, zstd"
+TERMUX_PKG_SHA256=d1ed86a266d5b7b8c136ae587ef5618ed1a9837a43440f3713622bf0123bf5c1
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="libandroid-shmem, libc++, libdrm, libglvnd, libwayland, libx11, libxext, libxfixes, libxshmfence, libxxf86vm, ncurses, vulkan-loader, zlib, zstd"
 TERMUX_PKG_SUGGESTS="mesa-dev"
-TERMUX_PKG_BUILD_DEPENDS="libllvm-static, libxrandr, llvm, llvm-tools, mlir, xorgproto"
+TERMUX_PKG_BUILD_DEPENDS="libllvm-static, libwayland-protocols, libxrandr, llvm, llvm-tools, mlir, xorgproto"
 TERMUX_PKG_CONFLICTS="libmesa, ndk-sysroot (<= 25b)"
 TERMUX_PKG_REPLACES="libmesa"
 
@@ -20,17 +20,23 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dopengl=true
 -Degl=enabled
 -Degl-native-platform=x11
--Dgles1=enabled
+-Dgles1=disabled
 -Dgles2=enabled
 -Ddri3=enabled
 -Dglx=dri
 -Dllvm=enabled
 -Dshared-llvm=disabled
--Dplatforms=x11
--Dgallium-drivers=swrast
--Dvulkan-drivers=
+-Dplatforms=x11,wayland
+-Dgallium-drivers=swrast,virgl,zink
 -Dosmesa=true
+-Dglvnd=true
+-Dxmlconfig=disabled
 "
+
+termux_step_post_get_source() {
+	# Do not use meson wrap projects
+	rm -rf subprojects
+}
 
 termux_step_pre_configure() {
 	termux_setup_cmake
@@ -45,8 +51,23 @@ termux_step_pre_configure() {
 			$TERMUX_PKG_BUILDER_DIR/cmake-wrapper.in \
 			> $_WRAPPER_BIN/cmake
 		chmod 0700 $_WRAPPER_BIN/cmake
+		sed "s|^export PKG_CONFIG_LIBDIR=|export PKG_CONFIG_LIBDIR=${TERMUX_PREFIX}/opt/libwayland/cross/lib/x86_64-linux-gnu/pkgconfig:|" \
+			"${TERMUX_STANDALONE_TOOLCHAIN}/bin/pkg-config" \
+			> "${_WRAPPER_BIN}/pkg-config"
+		chmod +x "${_WRAPPER_BIN}/pkg-config"
+		export PKG_CONFIG="${_WRAPPER_BIN}/pkg-config"
+		export LLVM_CONFIG="$TERMUX_PREFIX/bin/llvm-config"
 	fi
-	export PATH=$_WRAPPER_BIN:$PATH
+	export PATH="$_WRAPPER_BIN:$PATH"
+
+	if [ $TERMUX_ARCH = "arm" ] || [ $TERMUX_ARCH = "aarch64" ]; then
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -Dvulkan-drivers=swrast,freedreno"
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -Dfreedreno-kmds=msm,kgsl"
+	elif [ $TERMUX_ARCH = "i686" ] || [ $TERMUX_ARCH = "x86_64" ]; then
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -Dvulkan-drivers=swrast"
+	else
+		termux_error_exit "Invalid arch: $TERMUX_ARCH"
+	fi
 }
 
 termux_step_post_configure() {
@@ -54,13 +75,25 @@ termux_step_post_configure() {
 }
 
 termux_step_post_make_install() {
-	# A bunch of programs in the wild assume that the name of OpenGL shared
-	# library is `libGL.so.1` and try to dlopen(3) it. In fact `sdl2` does
-	# this. So please do not ever remove the symlink.
-	ln -sf libGL.so ${TERMUX_PREFIX}/lib/libGL.so.1
-	ln -sf libEGL.so ${TERMUX_PREFIX}/lib/libEGL.so.1
-	ln -sf libGLESv1_CM.so ${TERMUX_PREFIX}/lib/libGLESv1_CM.so.1
-	ln -sf libGLESv2.so ${TERMUX_PREFIX}/lib/libGLESv2.so.2
+	# Avoid hard links
+	local f1
+	for f1 in $TERMUX_PREFIX/lib/dri/*; do
+		if [ ! -f "${f1}" ]; then
+			continue
+		fi
+		local f2
+		for f2 in $TERMUX_PREFIX/lib/dri/*; do
+			if [ -f "${f2}" ] && [ "${f1}" != "${f2}" ]; then
+				local s1=$(stat -c "%i" "${f1}")
+				local s2=$(stat -c "%i" "${f2}")
+				if [ "${s1}" = "${s2}" ]; then
+					ln -sfr "${f1}" "${f2}"
+				fi
+			fi
+		done
+	done
 
-	patch -p1 -d $TERMUX_PREFIX/include < $TERMUX_PKG_BUILDER_DIR/egl-not-android.diff
+	# Create symlinks
+	ln -sf libEGL_mesa.so ${TERMUX_PREFIX}/lib/libEGL_mesa.so.0
+	ln -sf libGLX_mesa.so ${TERMUX_PREFIX}/lib/libGLX_mesa.so.0
 }

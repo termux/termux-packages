@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://gitlab.gnome.org/GNOME/gnome-themes-extra
 TERMUX_PKG_DESCRIPTION="This is the version of Adwaita, the standard GNOME theme, for the GTK+ 2/3 toolkit."
 TERMUX_PKG_LICENSE="LGPL-2.1"
-TERMUX_PKG_MAINTAINER="Yisus7u7 <dev.yisus@hotmail.com>"
+TERMUX_PKG_MAINTAINER="@Yisus7u7"
 TERMUX_PKG_VERSION=3.28
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL="http://deb.debian.org/debian/pool/main/g/gnome-themes-extra/gnome-themes-extra_${TERMUX_PKG_VERSION}.orig.tar.xz"

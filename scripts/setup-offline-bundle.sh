@@ -15,8 +15,8 @@ export TERMUX_SCRIPTDIR="$(dirname "$(readlink -f "$0")")/../"
 mkdir -p "$TERMUX_SCRIPTDIR"/build-tools
 
 . "$TERMUX_SCRIPTDIR"/scripts/properties.sh
-: "${TERMUX_MAKE_PROCESSES:="$(nproc)"}"
-export TERMUX_MAKE_PROCESSES
+: "${TERMUX_PKG_MAKE_PROCESSES:="$(nproc)"}"
+export TERMUX_PKG_MAKE_PROCESSES
 export TERMUX_PACKAGES_OFFLINE=true
 export TERMUX_ARCH=aarch64
 export TERMUX_ON_DEVICE_BUILD=false
@@ -26,12 +26,21 @@ export TERMUX_HOST_PLATFORM=aarch64-linux-android
 export TERMUX_ARCH_BITS=64
 export TERMUX_BUILD_TUPLE=x86_64-pc-linux-gnu
 export TERMUX_PKG_API_LEVEL=24
+export TERMUX_TOPDIR="$HOME/.termux-build"
+export TERMUX_PYTHON_CROSSENV_PREFIX="$TERMUX_TOPDIR/python-crossenv-prefix"
+export TERMUX_PYTHON_VERSION=$(. "$TERMUX_SCRIPTDIR/packages/python/build.sh"; echo "$_MAJOR_VERSION")
+export TERMUX_PYTHON_HOME=$TERMUX_PREFIX/lib/python${TERMUX_PYTHON_VERSION}
 export CC=gcc CXX=g++ LD=ld AR=ar STRIP=strip PKG_CONFIG=pkg-config
 export CPPFLAGS="" CFLAGS="" CXXFLAGS="" LDFLAGS=""
+export TERMUX_PACKAGE_LIBRARY=bionic
+export TERMUX_PKG_GO_USE_OLDER=false
 mkdir -p "$TERMUX_PKG_TMPDIR"
 
 # Build tools.
 . "$TERMUX_SCRIPTDIR"/scripts/build/termux_download.sh
+(. "$TERMUX_SCRIPTDIR"/scripts/build/setup/termux_setup_cargo_c.sh
+	termux_setup_cargo_c
+)
 (. "$TERMUX_SCRIPTDIR"/scripts/build/setup/termux_setup_cmake.sh
 	termux_setup_cmake
 )
@@ -50,9 +59,9 @@ mkdir -p "$TERMUX_PKG_TMPDIR"
 (. "$TERMUX_SCRIPTDIR"/scripts/build/setup/termux_setup_protobuf.sh
 	termux_setup_protobuf
 )
-(. "$TERMUX_SCRIPTDIR"/scripts/build/setup/termux_setup_python_crossenv.sh
-	termux_setup_python_crossenv
-)
+#(. "$TERMUX_SCRIPTDIR"/scripts/build/setup/termux_setup_python_pip.sh
+#	termux_setup_python_pip
+#)
 # Offline rust is not supported yet.
 #(. "$TERMUX_SCRIPTDIR"/scripts/build/setup/termux_setup_rust.sh
 #	termux_setup_rust
@@ -69,7 +78,7 @@ mkdir -p "$TERMUX_PKG_TMPDIR"
 rm -rf "${TERMUX_PKG_TMPDIR}"
 
 # Package sources.
-for repo_path in $(jq --raw-output 'keys | .[]' $TERMUX_SCRIPTDIR/repo.json); do
+for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' $TERMUX_SCRIPTDIR/repo.json); do
 	for p in "$TERMUX_SCRIPTDIR"/$repo_path/*; do
 		(
 			. "$TERMUX_SCRIPTDIR"/scripts/build/get_source/termux_step_get_source.sh

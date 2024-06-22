@@ -60,8 +60,8 @@ termux_step_configure() {
 		local libdir=target/$CARGO_TARGET_NAME/release/deps
 		mkdir -p $libdir
 		pushd $libdir
-		local libgcc="$($CC -print-libgcc-file-name)"
-		echo "INPUT($libgcc -l:libunwind.a)" > libgcc.so
+		RUSTFLAGS+=" -C link-arg=$($CC -print-libgcc-file-name)"
+		echo "INPUT(-l:libunwind.a)" > libgcc.so
 		popd
 	fi
 }
@@ -69,11 +69,11 @@ termux_step_configure() {
 termux_step_make() {
 	cargo fetch --target $CARGO_TARGET_NAME
 	patch --silent -p1 \
-		-d $CARGO_HOME/registry/src/github.com-*/parity-rocksdb-sys-0.5.6/rocksdb \
+		-d $CARGO_HOME/registry/src/*/parity-rocksdb-sys-0.5.6/rocksdb \
 		< $TERMUX_PKG_BUILDER_DIR/parity-rocksdb-sys-0.5.6-mutex.diff
-	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release --features final
+	cargo build --jobs $TERMUX_PKG_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release --features final
 	for applet in evmbin ethstore-cli ethkey-cli; do
-		cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release -p $applet
+		cargo build --jobs $TERMUX_PKG_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release -p $applet
 	done
 }
 

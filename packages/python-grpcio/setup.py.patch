@@ -1,0 +1,51 @@
+--- a/setup.py
++++ b/setup.py
+@@ -252,7 +252,7 @@
+         EXTRA_ENV_COMPILE_ARGS += " /MT"
+     elif "linux" in sys.platform:
+         # GCC by defaults uses C17 so only C++14 needs to be specified.
+-        EXTRA_ENV_COMPILE_ARGS += " -std=c++14"
++        EXTRA_ENV_COMPILE_ARGS += " -std=c++17"
+         EXTRA_ENV_COMPILE_ARGS += (
+             " -fvisibility=hidden -fno-wrapv -fno-exceptions"
+         )
+@@ -299,25 +299,25 @@
+         lambda x: "third_party/boringssl" not in x, CORE_C_FILES
+     )
+     CORE_C_FILES = filter(lambda x: "src/boringssl" not in x, CORE_C_FILES)
+-    SSL_INCLUDE = (os.path.join("/usr", "include", "openssl"),)
++    SSL_INCLUDE = (os.path.join("@TERMUX_PREFIX@", "include", "openssl"),)
+ 
+ if BUILD_WITH_SYSTEM_ZLIB:
+     CORE_C_FILES = filter(lambda x: "third_party/zlib" not in x, CORE_C_FILES)
+-    ZLIB_INCLUDE = (os.path.join("/usr", "include"),)
++    ZLIB_INCLUDE = (os.path.join("@TERMUX_PREFIX@", "include"),)
+ 
+ if BUILD_WITH_SYSTEM_CARES:
+     CORE_C_FILES = filter(lambda x: "third_party/cares" not in x, CORE_C_FILES)
+-    CARES_INCLUDE = (os.path.join("/usr", "include"),)
++    CARES_INCLUDE = (os.path.join("@TERMUX_PREFIX@", "include"),)
+ 
+ if BUILD_WITH_SYSTEM_RE2:
+     CORE_C_FILES = filter(lambda x: "third_party/re2" not in x, CORE_C_FILES)
+-    RE2_INCLUDE = (os.path.join("/usr", "include", "re2"),)
++    RE2_INCLUDE = (os.path.join("@TERMUX_PREFIX@", "include", "re2"),)
+ 
+ if BUILD_WITH_SYSTEM_ABSL:
+     CORE_C_FILES = filter(
+         lambda x: "third_party/abseil-cpp" not in x, CORE_C_FILES
+     )
+-    ABSL_INCLUDE = (os.path.join("/usr", "include"),)
++    ABSL_INCLUDE = (os.path.join("@TERMUX_PREFIX@", "include"),)
+ 
+ EXTENSION_INCLUDE_DIRECTORIES = (
+     (PYTHON_STEM,)
+@@ -361,7 +361,7 @@
+ if BUILD_WITH_SYSTEM_ABSL:
+     EXTENSION_LIBRARIES += tuple(
+         lib.stem[3:]
+-        for lib in sorted(pathlib.Path("/usr").glob("lib*/libabsl_*.so"))
++        for lib in sorted(pathlib.Path("@TERMUX_PREFIX@").glob("lib*/libabsl_*.so"))
+     )
+ 
+ DEFINE_MACROS = (("_WIN32_WINNT", 0x600),)

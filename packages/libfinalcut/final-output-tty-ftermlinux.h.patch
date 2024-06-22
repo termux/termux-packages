@@ -14,24 +14,24 @@
 +  #else /* __ANDROID__ */
 +  #include <linux/kd.h>
 +  #endif
- #endif  // defined(__linux__)
- 
- #include <sys/ioctl.h>
-@@ -237,13 +241,17 @@
+ #else
+   // struct forward declaration
+   struct console_font_op;
+@@ -243,13 +247,17 @@
  #if defined(__linux__)
-     bool                 vga_font{};
-     bool                 new_font{};
+     bool             vga_font{};
+     bool             new_font{};
 +#ifndef __ANDROID__
-     bool                 has_saved_palette{};
+     bool             has_saved_palette{};
 +#endif
-     int                  framebuffer_bpp{-1};
-     CursorStyle          linux_console_cursor_style{};
-     console_font_op      screen_font{};
-     unimapdesc           screen_unicode_map{};
+     int              framebuffer_bpp{-1};
+     CursorStyle      linux_console_cursor_style{};
+     console_font_op  screen_font{};
+     unimapdesc       screen_unicode_map{};
 +#ifndef __ANDROID__
-     ColorMap             saved_color_map{};
-     ColorMap             cmap{};
+     ColorMap         saved_color_map{};
+     ColorMap         cmap{};
 +#endif
-     KeyMap               key_map{};
-     ModifierKey          mod_key{};
+     KeyMap           key_map{};
+     ModifierKey      mod_key{};
  #endif  // defined(__linux__)

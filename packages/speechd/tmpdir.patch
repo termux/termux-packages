@@ -110,10 +110,10 @@
  
 --- a/doc/speech-dispatcher.html	2022-04-15 04:49:54.323385878 +0000
 +++ b/doc/speech-dispatcher.html	2022-04-15 14:12:51.794383491 +0000
-@@ -574,8 +574,8 @@
+@@ -721,8 +721,8 @@
  </p>
  <div class="example">
- <pre class="example">killall -u `whoami` speech-dispatcher
+ <pre class="example-preformatted">killall -u `whoami` speech-dispatcher
 -speech-dispatcher -c unix_socket -S /tmp/my.sock
 -SPEECHD_ADDRESS=unix_socket:/tmp/my.sock spd-say &quot;test&quot;
 +speech-dispatcher -c unix_socket -S @TERMUX_PREFIX@/tmp/my.sock
@@ -121,19 +121,19 @@
  </pre></div>
  
  <hr>
-@@ -1007,7 +1007,7 @@
+@@ -1154,7 +1154,7 @@
  </p><div class="example">
- <pre class="example">GenericExecuteSynth \
+ <pre class="example-preformatted">GenericExecuteSynth \
  &quot;epos-say -o --language $LANG --voice $VOICE --init_f $PITCH --init_t $RATE \
 -\&quot;$DATA\&quot; | sed -e s+unknown.*$++ &gt;/tmp/epos-said.wav &amp;&amp; play /tmp/epos-said.wav &gt;/dev/null&quot;
 +\&quot;$DATA\&quot; | sed -e s+unknown.*$++ &gt;@TERMUX_PREFIX@/tmp/epos-said.wav &amp;&amp; play @TERMUX_PREFIX@/tmp/epos-said.wav &gt;/dev/null&quot;
  </pre></div>
  </dd></dl>
  
-@@ -1436,7 +1436,7 @@
+@@ -1582,7 +1582,7 @@
  <p>Examples of valid address lines are:
  </p><div class="example">
- <pre class="example">unix_socket
+ <pre class="example-preformatted">unix_socket
 -unix_socket:/tmp/test.sock
 +unix_socket:@TERMUX_PREFIX@/tmp/test.sock
  inet_socket
@@ -172,15 +172,17 @@
  inet_socket:192.168.0.34:6563
 --- a/po/cs.po	2022-04-15 04:49:54.441394110 +0000
 +++ b/po/cs.po	2022-04-15 14:12:52.126382997 +0000
-@@ -144,7 +144,7 @@
+@@ -144,8 +144,8 @@
  
  #: src/server/options.c:110
- #, c-format
+ #, fuzzy, c-format
 -msgid "if TMPDIR is exported, otherwise to /tmp/%s\n"
+-msgstr "pokud je exportován TMPDIR, jinak do /tmp/%s\n"
 +msgid "if TMPDIR is exported, otherwise to @TERMUX_PREFIX@/tmp/%s\n"
- msgstr ""
++msgstr "pokud je exportován TMPDIR, jinak do @TERMUX_PREFIX@/tmp/%s\n"
  
- #: src/server/options.c:113 src/clients/say/options.c:169
+ #: src/server/options.c:113 src/clients/say/options.c:170
+ #, c-format
 --- a/po/de.po	2022-04-15 04:49:54.441394110 +0000
 +++ b/po/de.po	2022-04-15 14:12:52.130382991 +0000
 @@ -144,8 +144,8 @@

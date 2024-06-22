@@ -1,0 +1,16 @@
+--- src/tests/mtd-tests/flash_speed2.c	2023-10-12 17:22:58.990125732 +0300
++++ src/tests/mtd-tests/flash_speed.c	2023-10-12 17:23:58.558730681 +0300
+@@ -540,13 +540,11 @@
+ 		 *scheduled more aggressively than the read thread.
+ 		 */
+ 		pthread_attr_init(&attr_write);
+-		pthread_attr_setinheritsched(&attr_write, PTHREAD_EXPLICIT_SCHED);
+ 		pthread_attr_setschedpolicy(&attr_write, SCHED_FIFO);
+ 		param_write.sched_priority = 42;
+ 		pthread_attr_setschedparam(&attr_write, &param_write);
+ 
+ 		pthread_attr_init(&attr_read);
+-		pthread_attr_setinheritsched(&attr_read, PTHREAD_EXPLICIT_SCHED);
+ 		pthread_attr_setschedpolicy(&attr_read, SCHED_FIFO);
+ 		param_read.sched_priority = 41;
+ 		pthread_attr_setschedparam(&attr_read, &param_read);

@@ -1,0 +1,24 @@
+--- a/src/aptitude.h
++++ b/src/aptitude.h
+@@ -32,9 +32,7 @@
+ 
+ #if ENABLE_NLS
+ # include <libintl.h>
+-# include <cwidget/generic/util/transcode.h>
+ # define _(Text) gettext (Text)
+-# define W_(Text) cwidget::util::transcode (gettext (Text) )
+ # define N_(Text) Text
+ 
+ /** Strips everything up to and including the first pipe character
+@@ -69,8 +67,11 @@
+ }
+ # define gettext(Text) Text
+ # define dgettext(Domain, Text) Text
++# define ngettext(Msg1, Msg2, Count) ((Count == 1) ? Msg1 : Msg2)
+ #endif
+ 
++#include <cwidget/generic/util/transcode.h>
++#define W_(Text) cwidget::util::transcode (gettext (Text) )
+ 
+ // This is used to store the location of the binary as determined by
+ // argv[0].

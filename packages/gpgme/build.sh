@@ -3,9 +3,10 @@ TERMUX_PKG_DESCRIPTION="Library designed to make access to GnuPG easier"
 TERMUX_PKG_LICENSE="GPL-2.0, LGPL-2.1, MIT"
 TERMUX_PKG_LICENSE_FILE="COPYING, COPYING.LESSER, LICENSES"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.18.0
+TERMUX_PKG_VERSION="1.23.2"
 TERMUX_PKG_SRCURL=ftp://ftp.gnupg.org/gcrypt/gpgme/gpgme-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=361d4eae47ce925dba0ea569af40e7b52c645c4ae2e65e5621bf1b6cdd8b0e9e
+TERMUX_PKG_SHA256=9499e8b1f33cccb6815527a1bc16049d35a6198a6c5fae0185f2bd561bce5224
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="gnupg (>= 2.2.9-1), libassuan, libgpg-error"
 TERMUX_PKG_BREAKS="gpgme-dev"
 TERMUX_PKG_REPLACES="gpgme-dev"
@@ -18,3 +19,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --without-gpgconf
 --without-gpgsm
 "
+
+termux_step_pre_configure() {
+	LDFLAGS+=" $($CC -print-libgcc-file-name)"
+}

@@ -1,0 +1,34 @@
+--- a/Lib/http/server.py
++++ b/Lib/http/server.py
+@@ -1165,10 +1165,6 @@
+                 return
+             # Child
+             try:
+-                try:
+-                    os.setuid(nobody)
+-                except OSError:
+-                    pass
+                 os.dup2(self.rfile.fileno(), 0)
+                 os.dup2(self.wfile.fileno(), 1)
+                 os.execve(scriptfile, args, env)
+--- a/Lib/smtpd.py
++++ b/Lib/smtpd.py
+@@ -9,7 +9,8 @@
+     -n
+         This program generally tries to setuid `nobody', unless this flag is
+         set.  The setuid call will fail if this program is not run as root (in
+-        which case, use this flag).
++        which case, use this flag). Ignored in Termux as no setuid done on this
++        platform.
+ 
+     --version
+     -V
+@@ -863,7 +864,7 @@
+ 
+ 
+ class Options:
+-    setuid = True
++    setuid = False
+     classname = 'PureProxy'
+     size_limit = None
+     enable_SMTPUTF8 = False

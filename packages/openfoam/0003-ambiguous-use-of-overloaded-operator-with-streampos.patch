@@ -1,0 +1,36 @@
+```
+ensightMeshReader.C:249:33: error: use of overloaded operator '<<' is ambiguous (with operand types 'Foam::Ostream' and 'std::basic_istream<char>::pos_type' (aka 'fpos<mbstate_t>'))
+```
+
+--- a/src/OpenFOAM/primitives/ints/int64/int64.H
++++ b/src/OpenFOAM/primitives/ints/int64/int64.H
+@@ -42,6 +42,7 @@
+ #include <cstdint>
+ #include <climits>
+ #include <cstdlib>
++#include <iostream>
+ 
+ #include "direction.H"
+ #include "pTraits.H"
+@@ -129,6 +130,8 @@
+     Ostream& operator<<(Ostream& os, const long val);
+ #endif
+ 
++Ostream& operator<<(Ostream& os, const std::streampos val);
++
+ 
+ //- Template specialization for pTraits<int64_t>
+ template<>
+--- a/src/OpenFOAM/primitives/ints/int64/int64IO.C
++++ b/src/OpenFOAM/primitives/ints/int64/int64IO.C
+@@ -195,4 +195,10 @@
+ #endif
+ 
+ 
++Foam::Ostream& Foam::operator<<(Ostream& os, const std::streampos val)
++{
++    return (os << int64_t(val));
++}
++
++
+ // ************************************************************************* //

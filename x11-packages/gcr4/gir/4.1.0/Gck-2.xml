@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<dump>
+  <enum name="GckError" get-type="gck_error_get_type">
+    <member name="GCK_ERROR_MODULE_PROBLEM" nick="problem" value="-951891199"/>
+  </enum>  <flags name="GckSessionOptions" get-type="gck_session_options_get_type">
+    <member name="GCK_SESSION_READ_ONLY" nick="read-only" value="0"/>
+    <member name="GCK_SESSION_READ_WRITE" nick="read-write" value="2"/>
+    <member name="GCK_SESSION_LOGIN_USER" nick="login-user" value="4"/>
+    <member name="GCK_SESSION_AUTHENTICATE" nick="authenticate" value="8"/>
+  </flags>
+  <enum name="GckBuilderFlags" get-type="gck_builder_flags_get_type">
+    <member name="GCK_BUILDER_NONE" nick="none" value="0"/>
+    <member name="GCK_BUILDER_SECURE_MEMORY" nick="secure-memory" value="1"/>
+  </enum>  <enum name="GckUriError" get-type="gck_uri_error_get_type">
+    <member name="GCK_URI_BAD_SCHEME" nick="bad-scheme" value="1"/>
+    <member name="GCK_URI_BAD_ENCODING" nick="bad-encoding" value="2"/>
+    <member name="GCK_URI_BAD_SYNTAX" nick="bad-syntax" value="3"/>
+    <member name="GCK_URI_BAD_VERSION" nick="bad-version" value="4"/>
+    <member name="GCK_URI_NOT_FOUND" nick="not-found" value="5"/>
+  </enum>  <flags name="GckUriFlags" get-type="gck_uri_flags_get_type">
+    <member name="GCK_URI_FOR_OBJECT" nick="for-object" value="2"/>
+    <member name="GCK_URI_FOR_TOKEN" nick="for-token" value="4"/>
+    <member name="GCK_URI_FOR_MODULE" nick="for-module" value="8"/>
+    <member name="GCK_URI_WITH_VERSION" nick="with-version" value="16"/>
+    <member name="GCK_URI_FOR_ANY" nick="for-any" value="65535"/>
+  </flags>
+  <boxed name="GckAttribute" get-type="gck_attribute_get_type"/>
+  <boxed name="GckBuilder" get-type="gck_builder_get_type"/>
+  <boxed name="GckAttributes" get-type="gck_attributes_get_type"/>
+  <boxed name="GckModuleInfo" get-type="gck_module_info_get_type"/>
+  <class name="GckModule" get-type="gck_module_get_type" parents="GObject">
+    <property name="path" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="functions" type="gpointer" flags="235"/>
+  </class>
+  <class name="GckEnumerator" get-type="gck_enumerator_get_type" parents="GObject">
+    <property name="interaction" type="GTlsInteraction" flags="227"/>
+    <property name="object-type" type="GType" flags="227"/>
+    <property name="chained" type="GckEnumerator" flags="227"/>
+  </class>
+  <boxed name="GckSlotInfo" get-type="gck_slot_info_get_type"/>
+  <boxed name="GckTokenInfo" get-type="gck_token_info_get_type"/>
+  <boxed name="GckMechanismInfo" get-type="gck_mechanism_info_get_type"/>
+  <class name="GckSlot" get-type="gck_slot_get_type" parents="GObject">
+    <property name="module" type="GckModule" flags="235"/>
+    <property name="handle" type="gulong" flags="235" default-value="0"/>
+  </class>
+  <boxed name="GckSessionInfo" get-type="gck_session_info_get_type"/>
+  <class name="GckSession" get-type="gck_session_get_type" parents="GObject">
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <property name="module" type="GckModule" flags="225"/>
+    <property name="handle" type="gulong" flags="235" default-value="0"/>
+    <property name="interaction" type="GTlsInteraction" flags="227"/>
+    <property name="slot" type="GckSlot" flags="235"/>
+    <property name="options" type="GckSessionOptions" flags="235" default-value="GCK_SESSION_READ_ONLY"/>
+    <property name="opening-flags" type="gulong" flags="234" default-value="0"/>
+    <property name="app-data" type="gpointer" flags="234"/>
+    <signal name="discard-handle" return="gboolean" when="last">
+      <param type="gulong"/>
+    </signal>
+  </class>
+  <class name="GckObject" get-type="gck_object_get_type" parents="GObject">
+    <property name="module" type="GckModule" flags="235"/>
+    <property name="session" type="GckSession" flags="235"/>
+    <property name="handle" type="gulong" flags="235" default-value="0"/>
+  </class>
+  <interface name="GckObjectCache" get-type="gck_object_cache_get_type">
+    <prerequisite name="GckObject"/>
+    <property name="attributes" type="GckAttributes" flags="227"/>
+  </interface>
+  <class name="GckPassword" get-type="gck_password_get_type" parents="GTlsPassword,GObject">
+    <property name="module" type="GckModule" flags="225"/>
+    <property name="token" type="GckSlot" flags="235"/>
+    <property name="key" type="GckObject" flags="235"/>
+  </class>
+  <boxed name="GckUriData" get-type="gck_uri_data_get_type"/>
+  <error-quark function="gck_error_quark" domain="GckError"/>
+  <error-quark function="gck_uri_error_quark" domain="GckUriError"/>
+</dump>

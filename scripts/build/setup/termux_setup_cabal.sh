@@ -1,7 +1,7 @@
 # shellcheck shell=bash
 termux_setup_cabal() {
 	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "false" ]]; then
-		local TERMUX_CABAL_VERSION=3.6.2.0
+		local TERMUX_CABAL_VERSION=3.8.1.0
 		local TERMUX_CABAL_TAR="${TERMUX_COMMON_CACHEDIR}/cabal-${TERMUX_CABAL_VERSION}.tar.xz"
 
 		local TERMUX_CABAL_RUNTIME_FOLDER
@@ -18,7 +18,7 @@ termux_setup_cabal() {
 
 		termux_download "https://github.com/MrAdityaAlok/ghc-cross-tools/releases/download/cabal-install-v${TERMUX_CABAL_VERSION}/cabal-install-${TERMUX_CABAL_VERSION}.tar.xz" \
 			"${TERMUX_CABAL_TAR}" \
-			"f433e99cb3ff85239bd633f2ae2a370bfb7103f9db80e38199e0fda27897bdfe"
+			6a8c3c04414cbf1c805d2c1c63a09bdc879a7babd9ac1143370bdb6f6bf5a927
 
 		mkdir -p "${TERMUX_CABAL_RUNTIME_FOLDER}"
 		tar xf "${TERMUX_CABAL_TAR}" -C "${TERMUX_CABAL_RUNTIME_FOLDER}"

@@ -1,7 +1,16 @@
-diff -uNr openssh-8.0p1/session.c openssh-8.0p1.mod/session.c
---- openssh-8.0p1/session.c	2019-04-18 01:52:57.000000000 +0300
-+++ openssh-8.0p1.mod/session.c	2019-09-06 01:41:30.581023746 +0300
-@@ -197,7 +197,7 @@
+diff -uNr openssh-portable-V_9_5_P1/session.c openssh-portable-V_9_5_P1.mod/session.c
+--- openssh-portable-V_9_5_P1/session.c	2023-10-04 07:34:10.000000000 +0300
++++ openssh-portable-V_9_5_P1.mod/session.c	2023-11-23 16:29:34.271209449 +0200
+@@ -139,6 +139,8 @@
+ extern struct sshauthopt *auth_opts;
+ extern char *tun_fwd_ifnames; /* serverloop.c */
+ 
++extern char **environ;
++
+ /* original command from peer. */
+ const char *original_command = NULL;
+ 
+@@ -195,7 +197,7 @@
  	temporarily_use_uid(pw);
  
  	/* Allocate a buffer for the socket name, and format the name. */
@@ -10,16 +19,16 @@ diff -uNr openssh-8.0p1/session.c openssh-8.0p1.mod/session.c
  
  	/* Create private directory for socket */
  	if (mkdtemp(auth_sock_dir) == NULL) {
-@@ -267,7 +267,7 @@
+@@ -265,7 +267,7 @@
  		return;
  
  	temporarily_use_uid(pw);
 -	auth_info_file = xstrdup("/tmp/sshauth.XXXXXXXXXXXXXXX");
 +	auth_info_file = xstrdup("@TERMUX_PREFIX@/tmp/sshauth.XXXXXXXXXXXXXXX");
  	if ((fd = mkstemp(auth_info_file)) == -1) {
- 		error("%s: mkstemp: %s", __func__, strerror(errno));
+ 		error_f("mkstemp: %s", strerror(errno));
  		goto out;
-@@ -799,6 +799,11 @@
+@@ -793,6 +795,11 @@
  	char buf[256];
  
  	if (options.print_motd) {
@@ -31,7 +40,7 @@ diff -uNr openssh-8.0p1/session.c openssh-8.0p1.mod/session.c
  #ifdef HAVE_LOGIN_CAP
  		f = fopen(login_getcapstr(lc, "welcome", "/etc/motd",
  		    "/etc/motd"), "r");
-@@ -810,7 +815,14 @@
+@@ -804,7 +811,14 @@
  				fputs(buf, stdout);
  			fclose(f);
  		}
@@ -46,7 +55,7 @@ diff -uNr openssh-8.0p1/session.c openssh-8.0p1.mod/session.c
  }
  
  
-@@ -1052,11 +1064,13 @@
+@@ -1050,11 +1064,13 @@
  # endif /* HAVE_CYGWIN */
  #endif /* HAVE_LOGIN_CAP */
  
@@ -60,16 +69,34 @@ diff -uNr openssh-8.0p1/session.c openssh-8.0p1.mod/session.c
  
  	/* Normal systems set SHELL by default. */
  	child_set_env(&env, &envsize, "SHELL", shell);
-@@ -1100,6 +1114,15 @@
+@@ -1098,6 +1114,33 @@
  		    auth_sock_name);
  
  
 +#ifdef __ANDROID__
-+	char const* envs_to_keep[] = {"ANDROID_ART_ROOT", "ANDROID_DATA", "ANDROID_I18N_ROOT", "ANDROID_ROOT", "ANDROID_RUNTIME_ROOT", "ANDROID_TZDATA_ROOT", "BOOTCLASSPATH", "DEX2OATBOOTCLASSPATH", "EXTERNAL_STORAGE", "LANG", "LD_LIBRARY_PATH", "PATH", "PREFIX", "TERMUX_HUSHLOGIN", "TERMUX_VERSION", "TMPDIR"};
++	char const* envs_to_keep[] = {"ASEC_MOUNTPOINT", "BOOTCLASSPATH", "DEX2OATBOOTCLASSPATH", "EXTERNAL_STORAGE", "LANG", "PATH", "PREFIX", "SYSTEMSERVERCLASSPATH", "TMPDIR", "LD_PRELOAD"};
 +	for (i = 0; i < (sizeof(envs_to_keep) / sizeof(envs_to_keep[0])); i++) {
 +		char const* env_to_keep_name = envs_to_keep[i];
 +		char const* env_to_keep_value = getenv(env_to_keep_name);
 +		if (env_to_keep_value) child_set_env(&env, &envsize, env_to_keep_name, env_to_keep_value);
++	}
++
++	char const* env_prefixes_to_keep[] = {"ANDROID_", "TERMUX_"};
++	char **all_env_vars = environ;
++	for (; *all_env_vars; all_env_vars++) {
++		for (int i = 0; i < (sizeof(env_prefixes_to_keep) / sizeof(env_prefixes_to_keep[0])); i++) {
++			if (strncmp(env_prefixes_to_keep[i], *all_env_vars, strlen(env_prefixes_to_keep[i])) == 0) {
++				char const* env_var = strdup(*all_env_vars);
++				char const* env_to_keep_name = strtok(env_var, "=");
++				if (env_to_keep_name) {
++					char const* env_to_keep_value = getenv(env_to_keep_name);
++					if (env_to_keep_value) {
++						child_set_env(&env, &envsize, env_to_keep_name, env_to_keep_value);
++					}
++				}
++				free(env_var);
++			}
++		}
 +	}
 +#endif
 +

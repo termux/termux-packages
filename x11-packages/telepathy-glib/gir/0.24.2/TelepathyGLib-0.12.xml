@@ -1,0 +1,644 @@
+<?xml version="1.0"?>
+<dump>
+  <class name="TpProxy" get-type="tp_proxy_get_type" parents="GObject">
+    <property name="dbus-daemon" type="TpDBusDaemon" flags="235"/>
+    <property name="dbus-connection" type="DBusGConnection" flags="235"/>
+    <property name="bus-name" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="object-path" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="interfaces" type="GStrv" flags="225"/>
+    <property name="factory" type="TpSimpleClientFactory" flags="235"/>
+    <signal name="interface-added" return="void" when="last" detailed="1">
+      <param type="guint"/>
+      <param type="DBusGProxy"/>
+    </signal>
+    <signal name="invalidated" return="void" when="last" detailed="1">
+      <param type="guint"/>
+      <param type="gint"/>
+      <param type="gchararray"/>
+    </signal>
+  </class>
+  <class name="TpCapabilities" get-type="tp_capabilities_get_type" parents="GObject">
+    <property name="channel-classes" type="GPtrArray_GValueArray_GHashTable_gchararray+GValue_+GStrv__" flags="235"/>
+    <property name="contact-specific" type="gboolean" flags="235" default-value="FALSE"/>
+    <property name="channel-classes-variant" type="GVariant" flags="225"/>
+  </class>
+  <boxed name="TpContactInfoFieldSpec" get-type="tp_contact_info_field_spec_get_type"/>
+  <boxed name="TpContactInfoSpecList" get-type="tp_contact_info_spec_list_get_type"/>
+  <boxed name="TpContactInfoField" get-type="tp_contact_info_field_get_type"/>
+  <boxed name="TpContactInfoList" get-type="tp_contact_info_list_get_type"/>
+  <class name="TpConnection" get-type="tp_connection_get_type" parents="TpProxy,GObject">
+    <property name="status" type="guint" flags="225" default-value="4294967295"/>
+    <property name="status-reason" type="guint" flags="225" default-value="0"/>
+    <property name="connection-manager-name" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="cm-name" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="protocol-name" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="connection-ready" type="gboolean" flags="-2147483423" default-value="FALSE"/>
+    <property name="self-contact" type="TpContact" flags="225"/>
+    <property name="self-handle" type="guint" flags="225" default-value="0"/>
+    <property name="capabilities" type="TpCapabilities" flags="225"/>
+    <property name="balance" type="gint" flags="225" default-value="0"/>
+    <property name="balance-scale" type="guint" flags="225" default-value="4294967295"/>
+    <property name="balance-currency" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="balance-uri" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="contact-list-state" type="guint" flags="225" default-value="0"/>
+    <property name="contact-list-persists" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="can-change-contact-list" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="request-uses-message" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="disjoint-groups" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="group-storage" type="guint" flags="225" default-value="0"/>
+    <property name="contact-groups" type="GStrv" flags="225"/>
+    <property name="can-report-abusive" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="blocked-contacts" type="GPtrArray" flags="225"/>
+    <signal name="balance-changed" return="void" when="last" detailed="1">
+      <param type="gint"/>
+      <param type="guint"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="groups-created" return="void" when="last">
+      <param type="GStrv"/>
+    </signal>
+    <signal name="groups-removed" return="void" when="last">
+      <param type="GStrv"/>
+    </signal>
+    <signal name="group-renamed" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="contact-list-changed" return="void" when="last">
+      <param type="GPtrArray"/>
+      <param type="GPtrArray"/>
+    </signal>
+    <signal name="blocked-contacts-changed" return="void" when="last">
+      <param type="GPtrArray"/>
+      <param type="GPtrArray"/>
+    </signal>
+  </class>
+  <boxed name="TpAvatarRequirements" get-type="tp_avatar_requirements_get_type"/>
+  <class name="TpDBusDaemon" get-type="tp_dbus_daemon_get_type" parents="TpProxy,GObject">
+  </class>
+  <class name="TpAccount" get-type="tp_account_get_type" parents="TpProxy,GObject">
+    <property name="enabled" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="changing-presence" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="current-presence-type" type="guint" flags="225" default-value="0"/>
+    <property name="current-status" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="current-status-message" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="connection-status" type="guint" flags="225" default-value="2"/>
+    <property name="connection-status-reason" type="guint" flags="225" default-value="0"/>
+    <property name="connection-error" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="connection-error-details" type="GHashTable" flags="225"/>
+    <property name="connection" type="TpConnection" flags="225"/>
+    <property name="display-name" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="connection-manager" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="cm-name" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="protocol" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="protocol-name" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="icon-name" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="connect-automatically" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="has-been-online" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="service" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="valid" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="requested-presence-type" type="guint" flags="225" default-value="0"/>
+    <property name="requested-status" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="requested-status-message" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="nickname" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="automatic-presence-type" type="guint" flags="225" default-value="0"/>
+    <property name="automatic-status" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="automatic-status-message" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="normalized-name" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="storage-provider" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="storage-identifier" type="GValue" flags="225"/>
+    <property name="storage-identifier-variant" type="GVariant" flags="225"/>
+    <property name="storage-restrictions" type="guint" flags="225" default-value="0"/>
+    <property name="supersedes" type="GStrv" flags="225"/>
+    <property name="uri-schemes" type="GStrv" flags="225"/>
+    <signal name="status-changed" return="void" when="last">
+      <param type="guint"/>
+      <param type="guint"/>
+      <param type="guint"/>
+      <param type="gchararray"/>
+      <param type="GHashTable"/>
+    </signal>
+    <signal name="presence-changed" return="void" when="last">
+      <param type="guint"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="avatar-changed" return="void" when="last">
+    </signal>
+  </class>
+  <boxed name="TpIntset" get-type="tp_intset_get_type"/>
+  <class name="TpChannel" get-type="tp_channel_get_type" parents="TpProxy,GObject">
+    <implements name="TpChannelIface"/>
+    <property name="connection" type="TpConnection" flags="235"/>
+    <property name="identifier" type="gchararray" flags="225" default-value=""/>
+    <property name="channel-ready" type="gboolean" flags="-2147483423" default-value="FALSE"/>
+    <property name="channel-properties" type="GHashTable_gchararray+GValue_" flags="235"/>
+    <property name="group-self-handle" type="guint" flags="225" default-value="0"/>
+    <property name="group-flags" type="guint" flags="225" default-value="0"/>
+    <property name="requested" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="initiator-handle" type="guint" flags="225" default-value="0"/>
+    <property name="initiator-identifier" type="gchararray" flags="225" default-value=""/>
+    <property name="password-needed" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="target-contact" type="TpContact" flags="225"/>
+    <property name="initiator-contact" type="TpContact" flags="225"/>
+    <property name="group-self-contact" type="TpContact" flags="225"/>
+    <signal name="group-flags-changed" return="void" when="last" detailed="1">
+      <param type="guint"/>
+      <param type="guint"/>
+    </signal>
+    <signal name="group-members-changed" return="void" when="last" detailed="1">
+      <param type="gchararray"/>
+      <param type="GArray_guint_"/>
+      <param type="GArray_guint_"/>
+      <param type="GArray_guint_"/>
+      <param type="GArray_guint_"/>
+      <param type="guint"/>
+      <param type="guint"/>
+    </signal>
+    <signal name="group-members-changed-detailed" return="void" when="last" detailed="1">
+      <param type="GArray_guint_"/>
+      <param type="GArray_guint_"/>
+      <param type="GArray_guint_"/>
+      <param type="GArray_guint_"/>
+      <param type="GHashTable_gchararray+GValue_"/>
+    </signal>
+    <signal name="chat-state-changed" return="void" when="last" detailed="1">
+      <param type="guint"/>
+      <param type="guint"/>
+    </signal>
+    <signal name="group-contacts-changed" return="void" when="last" detailed="1">
+      <param type="GPtrArray"/>
+      <param type="GPtrArray"/>
+      <param type="GPtrArray"/>
+      <param type="GPtrArray"/>
+      <param type="TpContact"/>
+      <param type="GHashTable_gchararray+GValue_"/>
+    </signal>
+  </class>
+  <interface name="TpClientChannelFactory" get-type="tp_client_channel_factory_get_type">
+  </interface>
+  <class name="TpChannelRequest" get-type="tp_channel_request_get_type" parents="TpProxy,GObject">
+    <property name="channel-factory" type="GObject" flags="231"/>
+    <property name="immutable-properties" type="GHashTable_gchararray+GValue_" flags="235"/>
+    <property name="immutable-properties-vardict" type="GVariant" flags="225"/>
+    <property name="account" type="TpAccount" flags="225"/>
+    <property name="user-action-time" type="gint64" flags="225" default-value="0"/>
+    <property name="preferred-handler" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="hints" type="GHashTable_gchararray+GValue_" flags="225"/>
+    <property name="hints-vardict" type="GVariant" flags="225"/>
+    <signal name="succeeded" return="void" when="last" detailed="1">
+    </signal>
+    <signal name="succeeded-with-channel" return="void" when="last" detailed="1">
+      <param type="TpConnection"/>
+      <param type="TpChannel"/>
+    </signal>
+  </class>
+  <class name="TpHandleChannelsContext" get-type="tp_handle_channels_context_get_type" parents="GObject">
+    <property name="account" type="TpAccount" flags="235"/>
+    <property name="connection" type="TpConnection" flags="235"/>
+    <property name="channels" type="GPtrArray" flags="235"/>
+    <property name="requests-satisfied" type="GPtrArray" flags="235"/>
+    <property name="user-action-time" type="gint64" flags="235" default-value="0"/>
+    <property name="handler-info" type="GHashTable_gchararray+GValue_" flags="235"/>
+    <property name="dbus-context" type="gpointer" flags="234"/>
+    <signal name="done" return="void" when="last" detailed="1">
+    </signal>
+  </class>
+  <class name="TpAccountChannelRequest" get-type="tp_account_channel_request_get_type" parents="GObject">
+    <property name="account" type="TpAccount" flags="235"/>
+    <property name="request" type="GHashTable_gchararray+GValue_" flags="235"/>
+    <property name="request-vardict" type="GVariant" flags="235"/>
+    <property name="user-action-time" type="gint64" flags="235" default-value="0"/>
+    <property name="channel-request" type="TpChannelRequest" flags="225"/>
+    <signal name="re-handled" return="void" when="last" detailed="1">
+      <param type="TpChannel"/>
+      <param type="gint64"/>
+      <param type="TpHandleChannelsContext"/>
+    </signal>
+  </class>
+  <class name="TpAccountManager" get-type="tp_account_manager_get_type" parents="TpProxy,GObject">
+    <signal name="account-validity-changed" return="void" when="last">
+      <param type="TpAccount"/>
+      <param type="gboolean"/>
+    </signal>
+    <signal name="account-removed" return="void" when="last">
+      <param type="TpAccount"/>
+    </signal>
+    <signal name="account-enabled" return="void" when="last">
+      <param type="TpAccount"/>
+    </signal>
+    <signal name="account-disabled" return="void" when="last">
+      <param type="TpAccount"/>
+    </signal>
+    <signal name="most-available-presence-changed" return="void" when="last">
+      <param type="guint"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+  </class>
+  <class name="TpCallChannel" get-type="tp_call_channel_get_type" parents="TpChannel,TpProxy,GObject">
+    <implements name="TpChannelIface"/>
+    <property name="contents" type="GPtrArray" flags="225"/>
+    <property name="state" type="guint" flags="225" default-value="0"/>
+    <property name="flags" type="guint" flags="225" default-value="0"/>
+    <property name="state-details" type="GHashTable" flags="225"/>
+    <property name="state-reason" type="TpCallStateReason" flags="225"/>
+    <property name="hardware-streaming" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="initial-audio" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="initial-video" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="initial-audio-name" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="initial-video-name" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="mutable-contents" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="hold-state" type="guint" flags="225" default-value="0"/>
+    <property name="hold-state-reason" type="guint" flags="225" default-value="0"/>
+    <signal name="content-added" return="void" when="last">
+      <param type="GObject"/>
+    </signal>
+    <signal name="content-removed" return="void" when="last">
+      <param type="GObject"/>
+      <param type="TpCallStateReason"/>
+    </signal>
+    <signal name="state-changed" return="void" when="last">
+      <param type="guint"/>
+      <param type="guint"/>
+      <param type="TpCallStateReason"/>
+      <param type="GHashTable"/>
+    </signal>
+    <signal name="members-changed" return="void" when="last">
+      <param type="GHashTable"/>
+      <param type="GPtrArray"/>
+      <param type="TpCallStateReason"/>
+    </signal>
+  </class>
+  <boxed name="TpCallStateReason" get-type="tp_call_state_reason_get_type"/>
+  <class name="TpDBusTubeChannel" get-type="tp_dbus_tube_channel_get_type" parents="TpChannel,TpProxy,GObject">
+    <implements name="TpChannelIface"/>
+    <property name="service-name" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="parameters" type="GHashTable_gchararray+GValue_" flags="225"/>
+    <property name="parameters-vardict" type="GVariant" flags="225"/>
+  </class>
+  <class name="TpFileTransferChannel" get-type="tp_file_transfer_channel_get_type" parents="TpChannel,TpProxy,GObject">
+    <implements name="TpChannelIface"/>
+    <property name="mime-type" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="date" type="GDateTime" flags="225"/>
+    <property name="description" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="filename" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="size" type="guint64" flags="225" default-value="0"/>
+    <property name="state" type="guint" flags="225" default-value="0"/>
+    <property name="transferred-bytes" type="guint64" flags="225" default-value="0"/>
+    <property name="file" type="GFile" flags="225"/>
+    <property name="initial-offset" type="guint64" flags="225" default-value="0"/>
+    <property name="service-name" type="gchararray" flags="225" default-value=""/>
+    <property name="metadata" type="GHashTable_gchararray+GStrv_" flags="225"/>
+  </class>
+  <class name="TpAddDispatchOperationContext" get-type="tp_add_dispatch_operation_context_get_type" parents="GObject">
+    <property name="account" type="TpAccount" flags="235"/>
+    <property name="connection" type="TpConnection" flags="235"/>
+    <property name="channels" type="GPtrArray" flags="235"/>
+    <property name="dispatch-operation" type="TpChannelDispatchOperation" flags="235"/>
+    <property name="dbus-context" type="gpointer" flags="234"/>
+  </class>
+  <class name="TpObserveChannelsContext" get-type="tp_observe_channels_context_get_type" parents="GObject">
+    <property name="account" type="TpAccount" flags="235"/>
+    <property name="connection" type="TpConnection" flags="235"/>
+    <property name="channels" type="GPtrArray" flags="235"/>
+    <property name="dispatch-operation" type="TpChannelDispatchOperation" flags="235"/>
+    <property name="requests" type="GPtrArray" flags="235"/>
+    <property name="observer-info" type="GHashTable_gchararray+GValue_" flags="235"/>
+    <property name="dbus-context" type="gpointer" flags="234"/>
+  </class>
+  <class name="TpBaseClient" get-type="tp_base_client_get_type" parents="GObject" abstract="1">
+    <implements name="TpSvcDBusProperties"/>
+    <implements name="TpSvcClient"/>
+    <implements name="TpSvcClientObserver"/>
+    <implements name="TpSvcClientApprover"/>
+    <implements name="TpSvcClientHandler"/>
+    <implements name="TpSvcClientInterfaceRequests"/>
+    <property name="dbus-daemon" type="TpDBusDaemon" flags="235"/>
+    <property name="account-manager" type="TpAccountManager" flags="235"/>
+    <property name="factory" type="TpSimpleClientFactory" flags="235"/>
+    <property name="name" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="uniquify-name" type="gboolean" flags="235" default-value="FALSE"/>
+    <property name="channel-factory" type="GObject" flags="235"/>
+    <signal name="request-added" return="void" when="last" detailed="1">
+      <param type="TpAccount"/>
+      <param type="TpChannelRequest"/>
+    </signal>
+    <signal name="request-removed" return="void" when="last" detailed="1">
+      <param type="TpChannelRequest"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+  </class>
+  <class name="TpChannelDispatchOperation" get-type="tp_channel_dispatch_operation_get_type" parents="TpProxy,GObject">
+    <property name="connection" type="TpConnection" flags="235"/>
+    <property name="account" type="TpAccount" flags="235"/>
+    <property name="channels" type="GPtrArray" flags="235"/>
+    <property name="possible-handlers" type="GStrv" flags="225"/>
+    <property name="cdo-properties" type="GHashTable_gchararray+GValue_" flags="235"/>
+    <signal name="channel-lost" return="void" when="last" detailed="1">
+      <param type="TpChannel"/>
+      <param type="guint"/>
+      <param type="gint"/>
+      <param type="gchararray"/>
+    </signal>
+  </class>
+  <class name="TpContact" get-type="tp_contact_get_type" parents="GObject">
+    <property name="connection" type="TpConnection" flags="225"/>
+    <property name="handle" type="guint" flags="225" default-value="0"/>
+    <property name="identifier" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="alias" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="avatar-token" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="avatar-file" type="GFile" flags="225"/>
+    <property name="avatar-mime-type" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="presence-type" type="guint" flags="225" default-value="0"/>
+    <property name="presence-status" type="gchararray" flags="225" default-value=""/>
+    <property name="presence-message" type="gchararray" flags="225" default-value=""/>
+    <property name="location" type="GHashTable_gchararray+GValue_" flags="225"/>
+    <property name="location-vardict" type="GVariant" flags="225"/>
+    <property name="capabilities" type="TpCapabilities" flags="225"/>
+    <property name="contact-info" type="TpContactInfoList" flags="225"/>
+    <property name="client-types" type="GStrv" flags="225"/>
+    <property name="subscribe-state" type="guint" flags="225" default-value="0"/>
+    <property name="publish-state" type="guint" flags="225" default-value="0"/>
+    <property name="publish-request" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="contact-groups" type="GStrv" flags="225"/>
+    <property name="is-blocked" type="gboolean" flags="225" default-value="FALSE"/>
+    <signal name="presence-changed" return="void" when="last">
+      <param type="guint"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="contact-groups-changed" return="void" when="last">
+      <param type="GStrv"/>
+      <param type="GStrv"/>
+    </signal>
+    <signal name="subscription-states-changed" return="void" when="last">
+      <param type="guint"/>
+      <param type="guint"/>
+      <param type="gchararray"/>
+    </signal>
+  </class>
+  <class name="TpSimpleClientFactory" get-type="tp_simple_client_factory_get_type" parents="GObject">
+    <property name="dbus-daemon" type="TpDBusDaemon" flags="235"/>
+  </class>
+  <class name="TpStreamTubeChannel" get-type="tp_stream_tube_channel_get_type" parents="TpChannel,TpProxy,GObject">
+    <implements name="TpChannelIface"/>
+    <property name="service" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="parameters" type="GHashTable_gchararray+GValue_" flags="225"/>
+    <property name="parameters-vardict" type="GVariant" flags="225"/>
+    <signal name="incoming" return="void" when="last">
+      <param type="TpStreamTubeConnection"/>
+    </signal>
+  </class>
+  <class name="TpMessage" get-type="tp_message_get_type" parents="GObject">
+  </class>
+  <class name="TpClientMessage" get-type="tp_client_message_get_type" parents="TpMessage,GObject">
+  </class>
+  <class name="TpSignalledMessage" get-type="tp_signalled_message_get_type" parents="TpMessage,GObject">
+    <property name="sender" type="TpContact" flags="235"/>
+  </class>
+  <class name="TpTextChannel" get-type="tp_text_channel_get_type" parents="TpChannel,TpProxy,GObject">
+    <implements name="TpChannelIface"/>
+    <property name="supported-content-types" type="GStrv" flags="225"/>
+    <property name="message-part-support-flags" type="guint" flags="225" default-value="0"/>
+    <property name="delivery-reporting-support" type="guint" flags="225" default-value="0"/>
+    <property name="message-types" type="GArray_guint_" flags="225"/>
+    <property name="is-sms-channel" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="sms-flash" type="gboolean" flags="225" default-value="FALSE"/>
+    <signal name="message-received" return="void" when="last">
+      <param type="TpSignalledMessage"/>
+    </signal>
+    <signal name="pending-message-removed" return="void" when="last">
+      <param type="TpSignalledMessage"/>
+    </signal>
+    <signal name="message-sent" return="void" when="last">
+      <param type="TpSignalledMessage"/>
+      <param type="guint"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="contact-chat-state-changed" return="void" when="last" detailed="1">
+      <param type="TpContact"/>
+      <param type="guint"/>
+    </signal>
+  </class>
+  <class name="TpAutomaticClientFactory" get-type="tp_automatic_client_factory_get_type" parents="TpSimpleClientFactory,GObject">
+  </class>
+  <class name="TpAutomaticProxyFactory" get-type="tp_automatic_proxy_factory_get_type" parents="GObject">
+    <implements name="TpClientChannelFactory"/>
+  </class>
+  <class name="TpBasicProxyFactory" get-type="tp_basic_proxy_factory_get_type" parents="GObject">
+    <implements name="TpClientChannelFactory"/>
+  </class>
+  <class name="TpProtocol" get-type="tp_protocol_get_type" parents="TpProxy,GObject">
+    <property name="protocol-name" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="protocol-properties" type="GHashTable_gchararray+GValue_" flags="235"/>
+    <property name="protocol-properties-vardict" type="GVariant" flags="225"/>
+    <property name="english-name" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="vcard-field" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="icon-name" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="capabilities" type="TpCapabilities" flags="225"/>
+    <property name="param-names" type="GStrv" flags="225"/>
+    <property name="authentication-types" type="GStrv" flags="225"/>
+    <property name="avatar-requirements" type="gpointer" flags="225"/>
+    <property name="cm-name" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="addressable-vcard-fields" type="GStrv" flags="225"/>
+    <property name="addressable-uri-schemes" type="GStrv" flags="225"/>
+  </class>
+  <class name="TpConnectionManager" get-type="tp_connection_manager_get_type" parents="TpProxy,GObject">
+    <property name="info-source" type="guint" flags="225" default-value="0"/>
+    <property name="manager-file" type="gchararray" flags="231" default-value="NULL"/>
+    <property name="always-introspect" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="connection-manager" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="cm-name" type="gchararray" flags="225" default-value="NULL"/>
+    <signal name="activated" return="void" when="last" detailed="1">
+    </signal>
+    <signal name="exited" return="void" when="last" detailed="1">
+    </signal>
+    <signal name="got-info" return="void" when="last" detailed="1">
+      <param type="guint"/>
+    </signal>
+  </class>
+  <boxed name="TpConnectionManagerParam" get-type="tp_connection_manager_param_get_type"/>
+  <boxed name="TpConnectionManagerProtocol" get-type="tp_connection_manager_protocol_get_type"/>
+  <class name="TpContactSearch" get-type="tp_contact_search_get_type" parents="GObject">
+    <implements name="GAsyncInitable"/>
+    <property name="account" type="TpAccount" flags="235"/>
+    <property name="server" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="limit" type="guint" flags="227" default-value="0"/>
+    <property name="state" type="guint" flags="225" default-value="0"/>
+    <signal name="search-results-received" return="void" when="last">
+      <param type="gpointer"/>
+    </signal>
+  </class>
+  <class name="TpContactSearchResult" get-type="tp_contact_search_result_get_type" parents="GObject">
+    <property name="identifier" type="gchararray" flags="235" default-value="NULL"/>
+  </class>
+  <class name="TpSimpleApprover" get-type="tp_simple_approver_get_type" parents="TpBaseClient,GObject">
+    <implements name="TpSvcDBusProperties"/>
+    <implements name="TpSvcClient"/>
+    <implements name="TpSvcClientObserver"/>
+    <implements name="TpSvcClientApprover"/>
+    <implements name="TpSvcClientHandler"/>
+    <implements name="TpSvcClientInterfaceRequests"/>
+    <property name="callback" type="gpointer" flags="234"/>
+    <property name="user-data" type="gpointer" flags="234"/>
+    <property name="destroy" type="gpointer" flags="234"/>
+  </class>
+  <class name="TpSimpleHandler" get-type="tp_simple_handler_get_type" parents="TpBaseClient,GObject">
+    <implements name="TpSvcDBusProperties"/>
+    <implements name="TpSvcClient"/>
+    <implements name="TpSvcClientObserver"/>
+    <implements name="TpSvcClientApprover"/>
+    <implements name="TpSvcClientHandler"/>
+    <implements name="TpSvcClientInterfaceRequests"/>
+    <property name="bypass-approval" type="gboolean" flags="234" default-value="FALSE"/>
+    <property name="requests" type="gboolean" flags="234" default-value="FALSE"/>
+    <property name="callback" type="gpointer" flags="234"/>
+    <property name="user-data" type="gpointer" flags="234"/>
+    <property name="destroy" type="gpointer" flags="234"/>
+  </class>
+  <class name="TpSimpleObserver" get-type="tp_simple_observer_get_type" parents="TpBaseClient,GObject">
+    <implements name="TpSvcDBusProperties"/>
+    <implements name="TpSvcClient"/>
+    <implements name="TpSvcClientObserver"/>
+    <implements name="TpSvcClientApprover"/>
+    <implements name="TpSvcClientHandler"/>
+    <implements name="TpSvcClientInterfaceRequests"/>
+    <property name="recover" type="gboolean" flags="234" default-value="FALSE"/>
+    <property name="callback" type="gpointer" flags="234"/>
+    <property name="user-data" type="gpointer" flags="234"/>
+    <property name="destroy" type="gpointer" flags="234"/>
+  </class>
+  <boxed name="TpHandleSet" get-type="tp_handle_set_get_type"/>
+  <interface name="TpHandleRepoIface" get-type="tp_handle_repo_iface_get_type">
+    <property name="handle-type" type="guint" flags="235" default-value="0"/>
+  </interface>
+  <boxed name="TpPresenceStatusSpec" get-type="tp_presence_status_spec_get_type"/>
+  <class name="TpBaseConnection" get-type="tp_base_connection_get_type" parents="GObject" abstract="1">
+    <implements name="TpSvcConnection"/>
+    <implements name="TpSvcDBusProperties"/>
+    <implements name="TpSvcConnectionInterfaceRequests"/>
+    <property name="protocol" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="self-handle" type="guint" flags="227" default-value="0"/>
+    <property name="self-id" type="gchararray" flags="225" default-value=""/>
+    <property name="interfaces" type="GStrv" flags="225"/>
+    <property name="dbus-status" type="guint" flags="225" default-value="2"/>
+    <property name="dbus-daemon" type="TpDBusDaemon" flags="235"/>
+    <property name="has-immortal-handles" type="gboolean" flags="225" default-value="TRUE"/>
+    <property name="account-path-suffix" type="gchararray" flags="235" default-value="NULL"/>
+    <signal name="shutdown-finished" return="void" when="last" detailed="1">
+    </signal>
+    <signal name="clients-interested" return="void" when="last" detailed="1">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="clients-uninterested" return="void" when="last" detailed="1">
+      <param type="gchararray"/>
+    </signal>
+  </class>
+  <class name="TpStreamTubeConnection" get-type="tp_stream_tube_connection_get_type" parents="GObject">
+    <property name="socket-connection" type="GSocketConnection" flags="235"/>
+    <property name="channel" type="TpStreamTubeChannel" flags="235"/>
+    <property name="contact" type="TpContact" flags="235"/>
+    <signal name="closed" return="void" when="last">
+      <param type="GError"/>
+    </signal>
+  </class>
+  <class name="TpCallContent" get-type="tp_call_content_get_type" parents="TpProxy,GObject">
+    <property name="connection" type="TpConnection" flags="235"/>
+    <property name="name" type="gchararray" flags="225" default-value=""/>
+    <property name="media-type" type="guint" flags="225" default-value="0"/>
+    <property name="disposition" type="guint" flags="225" default-value="0"/>
+    <property name="streams" type="GPtrArray" flags="225"/>
+    <property name="channel" type="TpCallChannel" flags="235"/>
+    <signal name="removed" return="void" when="last">
+    </signal>
+    <signal name="streams-added" return="void" when="last">
+      <param type="GPtrArray"/>
+    </signal>
+    <signal name="streams-removed" return="void" when="last">
+      <param type="GPtrArray"/>
+      <param type="TpCallStateReason"/>
+    </signal>
+  </class>
+  <class name="TpCallStream" get-type="tp_call_stream_get_type" parents="TpProxy,GObject">
+    <property name="connection" type="TpConnection" flags="235"/>
+    <property name="local-sending-state" type="guint" flags="225" default-value="0"/>
+    <property name="can-request-receiving" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="content" type="TpCallContent" flags="235"/>
+    <signal name="local-sending-state-changed" return="void" when="last">
+      <param type="guint"/>
+      <param type="TpCallStateReason"/>
+    </signal>
+    <signal name="remote-members-changed" return="void" when="last">
+      <param type="GHashTable"/>
+      <param type="GPtrArray"/>
+      <param type="TpCallStateReason"/>
+    </signal>
+  </class>
+  <class name="TpChannelDispatcher" get-type="tp_channel_dispatcher_get_type" parents="TpProxy,GObject">
+  </class>
+  <class name="TpDebugMessage" get-type="tp_debug_message_get_type" parents="GObject">
+    <property name="time" type="GDateTime" flags="225"/>
+    <property name="domain" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="category" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="level" type="guint" flags="225" default-value="0"/>
+    <property name="message" type="gchararray" flags="225" default-value="NULL"/>
+  </class>
+  <class name="TpDebugClient" get-type="tp_debug_client_get_type" parents="TpProxy,GObject">
+    <property name="enabled" type="gboolean" flags="225" default-value="FALSE"/>
+    <signal name="new-debug-message" return="void" when="last">
+      <param type="TpDebugMessage"/>
+    </signal>
+  </class>
+  <class name="TpTLSCertificateRejection" get-type="tp_tls_certificate_rejection_get_type" parents="GObject">
+    <property name="reason" type="guint" flags="235" default-value="0"/>
+    <property name="dbus-error" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="details" type="GVariant" flags="235"/>
+    <property name="error" type="GError" flags="235"/>
+  </class>
+  <class name="TpTLSCertificate" get-type="tp_tls_certificate_get_type" parents="TpProxy,GObject">
+    <property name="cert-type" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="cert-data" type="GPtrArray" flags="225"/>
+    <property name="state" type="guint" flags="225" default-value="0"/>
+    <property name="parent" type="TpProxy" flags="235"/>
+  </class>
+  <class name="TpRoomInfo" get-type="tp_room_info_get_type" parents="GObject">
+  </class>
+  <class name="TpRoomList" get-type="tp_room_list_get_type" parents="GObject">
+    <implements name="GAsyncInitable"/>
+    <property name="account" type="TpAccount" flags="235"/>
+    <property name="server" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="listing" type="gboolean" flags="225" default-value="FALSE"/>
+    <signal name="got-room" return="void" when="last">
+      <param type="TpRoomInfo"/>
+    </signal>
+    <signal name="failed" return="void" when="last">
+      <param type="GError"/>
+    </signal>
+  </class>
+  <class name="TpAccountRequest" get-type="tp_account_request_get_type" parents="GObject">
+    <property name="account-manager" type="TpAccountManager" flags="235"/>
+    <property name="connection-manager" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="protocol" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="display-name" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="parameters" type="GVariant" flags="225"/>
+    <property name="properties" type="GVariant" flags="225"/>
+    <property name="icon-name" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="nickname" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="requested-presence-type" type="guint" flags="225" default-value="0"/>
+    <property name="requested-status" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="requested-status-message" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="automatic-presence-type" type="guint" flags="225" default-value="0"/>
+    <property name="automatic-status" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="automatic-status-message" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="enabled" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="connect-automatically" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="supersedes" type="GStrv" flags="225"/>
+    <property name="avatar" type="GArray" flags="225"/>
+    <property name="avatar-mime-type" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="service" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="storage-provider" type="gchararray" flags="225" default-value="NULL"/>
+  </class>
+  <error-quark function="tp_error_quark" domain="tp_errors"/>
+</dump>

@@ -1,7 +1,7 @@
-diff -u -r ../openssh-7.5p1/servconf.c ./servconf.c
---- ../openssh-7.5p1/servconf.c	2017-03-20 03:39:27.000000000 +0100
-+++ ./servconf.c	2017-03-24 00:08:05.880913398 +0100
-@@ -212,7 +212,7 @@
+diff -uNr openssh-portable-V_9_5_P1/servconf.c openssh-portable-V_9_5_P1.mod/servconf.c
+--- openssh-portable-V_9_5_P1/servconf.c	2023-10-04 07:34:10.000000000 +0300
++++ openssh-portable-V_9_5_P1.mod/servconf.c	2023-11-23 16:29:34.267876057 +0200
+@@ -299,7 +299,7 @@
  	}
  	/* No certificates by default */
  	if (options->num_ports == 0)
@@ -10,7 +10,7 @@ diff -u -r ../openssh-7.5p1/servconf.c ./servconf.c
  	if (options->address_family == -1)
  		options->address_family = AF_UNSPEC;
  	if (options->listen_addrs == NULL)
-@@ -336,9 +336,13 @@
+@@ -450,9 +450,13 @@
  
  	assemble_algorithms(options);
  
@@ -25,8 +25,8 @@ diff -u -r ../openssh-7.5p1/servconf.c ./servconf.c
  
  #define CLEAR_ON_NONE(v) \
  	do { \
-@@ -675,7 +679,7 @@
- 	u_int i;
+@@ -887,7 +891,7 @@
+ 	struct queued_listenaddr *qla;
  
  	if (options->num_ports == 0)
 -		options->ports[options->num_ports++] = SSH_DEFAULT_PORT;

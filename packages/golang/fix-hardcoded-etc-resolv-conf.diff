@@ -1,97 +1,71 @@
---- a/src/net/conf.go
-+++ b/src/net/conf.go
-@@ -2,7 +2,7 @@
+--- a/src/net/conf.go	2024-02-02 23:39:55.000000000 +0530
++++ b/src/net/conf.go	2024-02-18 22:34:10.016000996 +0530
+@@ -2,6 +2,8 @@
  // Use of this source code is governed by a BSD-style
  // license that can be found in the LICENSE file.
-
--//go:build !js
-+//go:build !js && !android
-
+ 
++//go:build !android
++
  package net
-
---- a/src/net/conf_android.go
-+++ b/src/net/conf_android.go
-@@ -2,7 +2,7 @@
+ 
+ import (
+--- a/src/net/conf_android.go	2024-02-18 22:31:59.680000988 +0530
++++ b/src/net/conf_android.go	2024-02-18 22:41:52.060001024 +0530
+@@ -2,6 +2,8 @@
  // Use of this source code is governed by a BSD-style
  // license that can be found in the LICENSE file.
-
--//go:build !js
+ 
 +//go:build android
-
++
  package net
-
---- a/src/net/conf_android.go
-+++ b/src/net/conf_android.go
-@@ -113,10 +113,10 @@ func initConfVal() {
- 	}
-
- 	if runtime.GOOS != "openbsd" {
--		confVal.nss = parseNSSConfFile("/etc/nsswitch.conf")
-+		confVal.nss = parseNSSConfFile("@TERMUX_PREFIX@/etc/nsswitch.conf")
- 	}
-
--	confVal.resolv = dnsReadConfig("/etc/resolv.conf")
-+	confVal.resolv = dnsReadConfig("@TERMUX_PREFIX@/etc/resolv.conf")
- 	if confVal.resolv.err != nil && !os.IsNotExist(confVal.resolv.err) &&
- 		!os.IsPermission(confVal.resolv.err) {
- 		// If we can't read the resolv.conf file, assume it
-@@ -126,7 +126,7 @@ func initConfVal() {
- 		confVal.forceCgoLookupHost = true
- 	}
-
--	if _, err := os.Stat("/etc/mdns.allow"); err == nil {
-+	if _, err := os.Stat("@TERMUX_PREFIX@/etc/mdns.allow"); err == nil {
- 		confVal.hasMDNSAllow = true
- 	}
+ 
+ import (
+@@ -414,7 +416,7 @@
+ 				var haveMDNSAllow bool
+ 				switch c.mdnsTest {
+ 				case mdnsFromSystem:
+-					_, err := os.Stat("/etc/mdns.allow")
++					_, err := os.Stat("@TERMUX_PREFIX@/etc/mdns.allow")
+ 					if err != nil && !errors.Is(err, fs.ErrNotExist) {
+ 						// Let libc figure out what is going on.
+ 						return hostLookupCgo, dnsConf
+--- a/src/net/dnsclient_unix.go	2024-02-02 23:39:55.000000000 +0530
++++ b/src/net/dnsclient_unix.go	2024-02-18 22:36:17.948001004 +0530
+@@ -2,6 +2,8 @@
+ // Use of this source code is governed by a BSD-style
+ // license that can be found in the LICENSE file.
+ 
++//go:build !android
++
+ // DNS client: see RFC 1035.
+ // Has to be linked into package net for Dial.
+ 
+--- a/src/net/dnsclient_android.go	2024-02-18 22:32:31.136000990 +0530
++++ b/src/net/dnsclient_android.go	2024-02-18 22:43:13.612001028 +0530
+@@ -2,6 +2,8 @@
+ // Use of this source code is governed by a BSD-style
+ // license that can be found in the LICENSE file.
+ 
++//go:build android
++
+ // DNS client: see RFC 1035.
+ // Has to be linked into package net for Dial.
+ 
+@@ -367,7 +369,7 @@
+ var resolvConf resolverConfig
+ 
+ func getSystemDNSConfig() *dnsConfig {
+-	resolvConf.tryUpdate("/etc/resolv.conf")
++	resolvConf.tryUpdate("@TERMUX_PREFIX@/etc/resolv.conf")
+ 	return resolvConf.dnsConfig.Load()
  }
---- a/src/net/dnsclient_unix.go
-+++ b/src/net/dnsclient_unix.go
-@@ -2,7 +2,7 @@
- // Use of this source code is governed by a BSD-style
- // license that can be found in the LICENSE file.
-
--//go:build !js
-+//go:build !js && !android
-
- // DNS client: see RFC 1035.
- // Has to be linked into package net for Dial.
---- a/src/net/dnsclient_android.go
-+++ b/src/net/dnsclient_android.go
-@@ -2,7 +2,7 @@
- // Use of this source code is governed by a BSD-style
- // license that can be found in the LICENSE file.
-
--//go:build !js
-+//go:build android
-
- // DNS client: see RFC 1035.
- // Has to be linked into package net for Dial.
---- a/src/net/dnsclient_android.go
-+++ b/src/net/dnsclient_android.go
-@@ -355,7 +355,7 @@ func (conf *resolverConfig) init() {
+ 
+@@ -375,7 +377,7 @@
+ func (conf *resolverConfig) init() {
+ 	// Set dnsConfig and lastChecked so we don't parse
  	// resolv.conf twice the first time.
- 	conf.dnsConfig = systemConf().resolv
- 	if conf.dnsConfig == nil {
--		conf.dnsConfig = dnsReadConfig("/etc/resolv.conf")
-+		conf.dnsConfig = dnsReadConfig("@TERMUX_PREFIX@/etc/resolv.conf")
- 	}
+-	conf.dnsConfig.Store(dnsReadConfig("/etc/resolv.conf"))
++	conf.dnsConfig.Store(dnsReadConfig("@TERMUX_PREFIX@/etc/resolv.conf"))
  	conf.lastChecked = time.Now()
-
-@@ -427,7 +427,7 @@ func (r *Resolver) lookup(ctx context.Context, name string, qtype dnsmessage.Typ
- 		// For consistency with libc resolvers, report no such host.
- 		return dnsmessage.Parser{}, "", &DNSError{Err: errNoSuchHost.Error(), Name: name, IsNotFound: true}
- 	}
--	resolvConf.tryUpdate("/etc/resolv.conf")
-+	resolvConf.tryUpdate("@TERMUX_PREFIX@/etc/resolv.conf")
- 	resolvConf.mu.RLock()
- 	conf := resolvConf.dnsConfig
- 	resolvConf.mu.RUnlock()
-@@ -604,7 +604,7 @@ func (r *Resolver) goLookupIPCNAMEOrder(ctx context.Context, network, name strin
- 		// See comment in func lookup above about use of errNoSuchHost.
- 		return nil, dnsmessage.Name{}, &DNSError{Err: errNoSuchHost.Error(), Name: name, IsNotFound: true}
- 	}
--	resolvConf.tryUpdate("/etc/resolv.conf")
-+	resolvConf.tryUpdate("@TERMUX_PREFIX@/etc/resolv.conf")
- 	resolvConf.mu.RLock()
- 	conf := resolvConf.dnsConfig
- 	resolvConf.mu.RUnlock()
+ 
+ 	// Prepare ch so that only one update of resolverConfig may

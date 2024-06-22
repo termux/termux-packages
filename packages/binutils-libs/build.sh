@@ -2,11 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/binutils/
 TERMUX_PKG_DESCRIPTION="GNU Binutils libraries"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.39
-TERMUX_PKG_REVISION=4
-TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/binutils/binutils-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=645c25f563b8adc0a81dbd6a41cffbf4d37083a382e02d5d3df4f65c09516d00
-TERMUX_PKG_DEPENDS="zlib"
+TERMUX_PKG_VERSION=2.42
+TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/binutils/binutils-${TERMUX_PKG_VERSION}.tar.bz2
+TERMUX_PKG_SHA256=aa54850ebda5064c72cd4ec2d9b056c294252991486350d9a97ab2a6dfdfaf12
+TERMUX_PKG_DEPENDS="zlib, zstd"
 TERMUX_PKG_BREAKS="binutils (<< 2.39), binutils-dev"
 TERMUX_PKG_REPLACES="binutils (<< 2.39), binutils-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -37,7 +36,8 @@ TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="
 
 termux_step_host_build() {
 	$TERMUX_PKG_SRCDIR/configure $TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j $TERMUX_PKG_MAKE_PROCESSES
+	make install
 	make install-strip
 }
 
@@ -49,6 +49,14 @@ termux_step_pre_configure() {
 	rm -rf $TERMUX_HOSTBUILD_MARKER
 
 	export CPPFLAGS="$CPPFLAGS -Wno-c++11-narrowing"
+	# llvm upgraded a warning to an error, which caused this build (and some
+	# others, including the rust toolchain) to fail like so:
+	#
+	# ld.lld: error: version script assignment of 'LIBCTF_1.0' to symbol 'ctf_label_set' failed: symbol not defined
+	# ld.lld: error: version script assignment of 'LIBCTF_1.0' to symbol 'ctf_label_get' failed: symbol not defined
+	# These flags restore it to a warning.
+	# https://reviews.llvm.org/D135402
+	export LDFLAGS="$LDFLAGS -Wl,--undefined-version"
 
 	if [ $TERMUX_ARCH_BITS = 32 ]; then
 		export LIB_PATH="${TERMUX_PREFIX}/lib:/system/lib"

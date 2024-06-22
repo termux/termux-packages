@@ -1,0 +1,25 @@
+diff --git a/src/daemon.c b/src/daemon.c
+index 98c9f5b..46dd2ea 100644
+--- a/src/daemon.c
++++ b/src/daemon.c
+@@ -11,6 +11,20 @@
+ #include "id.h"
+ #include "daemon.h"
+ 
++/*
++ * Bionic implemention from initial aosp commit :)))
++ * https://android.googlesource.com/platform/bionic/+/a799b53f10e5a6fd51fef4436cfb7ec99836a516/libc/unistd/getdtablesize.c
++ */
++#include <sys/resource.h>
++int getdtablesize()
++{
++    struct rlimit r;
++    if (getrlimit(RLIMIT_NOFILE, &r) < 0) {
++        return sysconf(_SC_OPEN_MAX);
++    }
++    return r.rlim_cur;
++}
++
+ void daemonize(void)
+ {
+ 	int i;

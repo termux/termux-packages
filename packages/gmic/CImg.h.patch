@@ -1,6 +1,27 @@
 diff -uNr gmic-2.6.7/src/CImg.h gmic-2.6.7.mod/src/CImg.h
 --- gmic-2.6.7/src/CImg.h	2019-06-28 09:56:12.000000000 +0300
 +++ gmic-2.6.7.mod/src/CImg.h	2019-06-29 18:45:02.595895578 +0300
+@@ -9838,8 +9838,10 @@
+     static void* _events_thread(void *arg) { // Thread to manage events for all opened display windows
+       Display *const dpy = cimg::X11_attr().display;
+       XEvent event;
++#ifndef __ANDROID__
+       pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED,0);
+       pthread_setcancelstate(PTHREAD_CANCEL_ENABLE,0);
++#endif
+       if (!arg) for ( ; ; ) {
+         cimg_lock_display();
+         bool event_flag = XCheckTypedEvent(dpy,ClientMessage,&event);
+@@ -9852,7 +9854,9 @@
+             if (!cimg::X11_attr().wins[i]->_is_closed && event.xany.window==cimg::X11_attr().wins[i]->_window)
+               cimg::X11_attr().wins[i]->_handle_events(&event);
+         cimg_unlock_display();
++#ifndef __ANDROID__
+         pthread_testcancel();
++#endif
+         cimg::sleep(8);
+       }
+       return 0;
 @@ -60774,8 +60774,8 @@
          _cimg_test_temporary_path("D:\\Temp");
          _cimg_test_temporary_path("D:");

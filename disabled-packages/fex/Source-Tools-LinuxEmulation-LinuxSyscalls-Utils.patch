@@ -1,0 +1,19 @@
+diff --git a/Source/Tools/LinuxEmulation/LinuxSyscalls/Utils/Threads.cpp b/Source/Tools/LinuxEmulation/LinuxSyscalls/Utils/Threads.cpp
+index d49f05c..fb7732f 100644
+--- a/Source/Tools/LinuxEmulation/LinuxSyscalls/Utils/Threads.cpp
++++ b/Source/Tools/LinuxEmulation/LinuxSyscalls/Utils/Threads.cpp
+@@ -31,8 +31,13 @@ namespace FEX::LinuxEmulation::Threads {
+     // Keep the first item in the stack pool
+     void *Ptr{};
+ 
+-    for (auto it = DeadStackPool.begin(); it != DeadStackPool.end();) {
++    /*
++    /home/builder/.termux-build/fex/src/Source/Tools/LinuxEmulation/LinuxSyscalls/Utils/Threads.cpp: error: no member named 'atomic_ref' in namespace 'std'
+       auto Ready = std::atomic_ref<bool>(it->ReadyToBeReaped);
++                      ~~~~~^
++    */
++    for (auto it = DeadStackPool.begin(); it != DeadStackPool.end();) {
++      std::atomic<bool> Ready(it->ReadyToBeReaped);
+       bool ReadyToBeReaped = Ready.load();
+       if (Ptr == nullptr && ReadyToBeReaped) {
+         Ptr = it->Ptr;

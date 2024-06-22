@@ -1,0 +1,21 @@
+--- a/player/src/tizplaylist.cpp
++++ b/player/src/tizplaylist.cpp
+@@ -32,6 +32,7 @@
+ 
+ #include <algorithm>
+ #include <cmath>
++#include <random>
+ #include <string>
+ 
+ #include <boost/algorithm/string.hpp>
+@@ -228,7 +229,9 @@
+ 
+     if (shuffle_playlist)
+     {
+-      std::random_shuffle (uri_list.begin (), uri_list.end ());
++      std::random_device rd;
++      std::mt19937 g(rd ());
++      std::shuffle (uri_list.begin (), uri_list.end (), g);
+     }
+     else
+     {

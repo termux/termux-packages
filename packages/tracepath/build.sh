@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/iputils/iputils
 TERMUX_PKG_DESCRIPTION="Tool to trace the network path to a remote host"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="20221126"
+TERMUX_PKG_VERSION="20240117"
 TERMUX_PKG_SRCURL=https://github.com/iputils/iputils/archive/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=745ea711fe06d5c57d470d21acce3c3ab866eb6afb69379a16c6d60b89bd4311
+TERMUX_PKG_SHA256=a5d66e2997945b2541b8f780a7f5a5ec895d53a517ae1dc4f3ab762573edea9a
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d{8}"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -33,9 +33,6 @@ termux_step_make_install() {
 		tracepath.xml
 	cp tracepath.8 $MANDIR/
 
-	# Setup traceroute as an alias for tracepath, since traceroute
-	# requires root which most Termux user does not have, and tracepath
-	# is probably good enough for most:
-	(cd $TERMUX_PREFIX/bin && ln -f -s tracepath traceroute)
-	(cd $MANDIR && ln -f -s tracepath.8 traceroute.8)
+	# `traceroute` command is now provided by the package of the same name.
+	# Please do not make `traceroute` an alias of `tracepath`.
 }

@@ -1,0 +1,59 @@
+--- ../android-tools-34.0.4/vendor/libbase/file.cpp	2023-09-03 13:06:50.000000000 +0000
++++ ./vendor/libbase/file.cpp	2023-12-26 12:32:13.066885657 +0000
+@@ -470,7 +470,10 @@
+ std::string GetExecutablePath() {
+ #if defined(__linux__)
+   std::string path;
+-  android::base::Readlink("/proc/self/exe", &path);
++  if (const char *tmp = std::getenv("TERMUX_EXEC__PROC_SELF_EXE"))
++    path.assign(tmp);
++  else
++    android::base::Readlink("/proc/self/exe", &path);
+   return path;
+ #elif defined(__APPLE__)
+   char path[PATH_MAX + 1];
+--- ../android-tools-34.0.4/vendor/adb/client/main.cpp	2023-09-03 13:06:58.000000000 +0000
++++ ./vendor/adb/client/main.cpp	2023-12-26 12:05:45.857992616 +0000
+@@ -219,10 +219,7 @@
+ 
+ #if defined(__linux__)
+     // Write our location to .android/adb.$PORT, so that older clients can exec us.
+-    std::string path;
+-    if (!android::base::Readlink("/proc/self/exe", &path)) {
+-        PLOG(ERROR) << "failed to readlink /proc/self/exe";
+-    }
++    std::string path = android::base::GetExecutablePath();
+ 
+     std::optional<std::string> server_executable_path = adb_get_server_executable_path();
+     if (server_executable_path) {
+--- ../android-tools-34.0.4/vendor/extras/alloc-stress/alloc-stress.cpp	2023-09-03 13:06:45.000000000 +0000
++++ ./vendor/extras/alloc-stress/alloc-stress.cpp	2023-12-26 12:27:57.549286502 +0000
+@@ -117,7 +117,14 @@
+         snprintf(readFdStr, sizeof(readFdStr), "%d", pipe.getReadFd());
+         snprintf(writeFdStr, sizeof(writeFdStr), "%d", pipe.getWriteFd());
+         char exPath[PATH_MAX];
+-        ssize_t exPathLen = readlink("/proc/self/exe", exPath, sizeof(exPath));
++        ssize_t exPathLen;
++        const char *tmp;
++        if (tmp = getenv("TERMUX_EXEC__PROC_SELF_EXE")) {
++            strncpy(exPath, tmp, sizeof(exPath));
++            exPathLen = strlen(exPath)
++        } else {
++            exPathLen = readlink("/proc/self/exe", exPath, sizeof(exPath));
++        }
+         bool isExPathAvailable =
+                 exPathLen != -1 && exPathLen < static_cast<ssize_t>(sizeof(exPath));
+         if (isExPathAvailable) {
+--- ../android-tools-34.0.4/vendor/extras/simpleperf/environment.cpp	2023-09-03 13:06:46.000000000 +0000
++++ ./vendor/extras/simpleperf/environment.cpp	2023-12-26 12:05:29.657975255 +0000
+@@ -709,7 +709,9 @@
+ 
+ bool RunAs::Prepare() {
+   // run-as can't run /data/local/tmp/simpleperf directly. So copy simpleperf binary if needed.
+-  if (!android::base::Readlink("/proc/self/exe", &simpleperf_path_)) {
++  if (const char *tmp = std::getenv("TERMUX_EXEC__PROC_SELF_EXE"))
++    simpleperf_path_.assign(tmp);
++  else if (!android::base::Readlink("/proc/self/exe", &simpleperf_path_)) {
+     PLOG(ERROR) << "ReadLink failed";
+     return false;
+   }

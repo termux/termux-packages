@@ -1,0 +1,20 @@
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -57,7 +57,7 @@
+ endif()
+ 
+ if (GLFW_BUILD_X11 OR GLFW_BUILD_WAYLAND)
+-    if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
++    if (CMAKE_SYSTEM_NAME MATCHES "Linux|Android")
+         target_sources(glfw PRIVATE linux_joystick.h linux_joystick.c)
+     endif()
+     target_sources(glfw PRIVATE posix_poll.h posix_poll.c)
+@@ -174,7 +174,7 @@
+ 
+     target_include_directories(glfw PRIVATE ${Wayland_INCLUDE_DIRS})
+ 
+-    if (NOT CMAKE_SYSTEM_NAME STREQUAL "Linux")
++    if (NOT CMAKE_SYSTEM_NAME MATCHES "Linux|Android")
+         find_package(EpollShim)
+         if (EPOLLSHIM_FOUND)
+             target_include_directories(glfw PRIVATE ${EPOLLSHIM_INCLUDE_DIRS})

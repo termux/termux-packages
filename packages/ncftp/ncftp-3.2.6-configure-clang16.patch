@@ -1,0 +1,62 @@
+https://github.com/termux/termux-packages/issues/15852
+Borrowed from https://github.com/gentoo/gentoo/blob/52c6387234ecf60c8605cf23093e82d8f384249c/net-ftp/ncftp/files/ncftp-3.2.6-fix-clang.patch
+
+Fix compilation with clang-16
+
+aclocal.m4 contains code that no longer compiles: missing headers and missing
+return types.
+
++++ ./autoconf_local/aclocal.m4
+@@ -192,6 +192,7 @@
+ #include "pchtest.h"
+ #pragma hdrstop
+ #include <stdarg.h>
++#include <stdlib.h>
+ 
+ int main(int argc, char **argv)
+ {
+@@ -3279,6 +3280,7 @@
+ #include <sys/socket.h>
+ #include <arpa/inet.h>
+ #include <netinet/in.h>
++#include <string.h>
+ #ifdef HAVE_ARPA_NAMESER_H
+ #	include <arpa/nameser.h>
+ #endif
+@@ -4193,7 +4195,7 @@
+ #include <sys/select.h>
+ #endif
+ #include <sys/socket.h>	/* MG: always incl */
+-extern select ($ac_cv_func_select_arg1,$ac_cv_func_select_arg234,$ac_cv_func_select_arg234,$ac_cv_func_select_arg234,$ac_cv_func_select_arg5);],,dnl
++extern int select ($ac_cv_func_select_arg1,$ac_cv_func_select_arg234,$ac_cv_func_select_arg234,$ac_cv_func_select_arg234,$ac_cv_func_select_arg5);],,dnl
+         [ac_not_found=no ; break 3],ac_not_found=yes)
+       done
+      done
+@@ -5145,6 +5147,7 @@
+ #ifdef HAVE_STDLIB_H
+ #	include <stdlib.h>
+ #endif
++#include <string.h>
+ 
+ #ifdef HAVE_NCURSES_H
+ #	define NCURSES_OPAQUE 0
+@@ -5175,7 +5178,8 @@
+ #	include <curses.h>
+ #endif
+ 
+- 
++
++int  
+ main(int argc, char **argv)
+ {
+ 	/* Note:  don't actually call curses, since it may block;
+@@ -6608,7 +6612,8 @@
+ 	  ac_cv_func_setvbuf_reversed,
+ 	[AC_TRY_RUN([#include <stdio.h>
+ 	/* If setvbuf has the reversed format, exit 0. */
+-	main () {
++	#include <stdlib.h>
++	int main () {
+ 	  /* This call has the arguments reversed.
+ 	     A reversed system may check and see that the address of main
+ 	     is not _IOLBF, _IONBF, or _IOFBF, and return nonzero.  */

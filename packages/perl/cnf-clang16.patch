@@ -1,0 +1,33 @@
+https://github.com/termux/termux-packages/issues/15852
+
+--- a/cnf/configure_func.sh
++++ b/cnf/configure_func.sh
+@@ -33,7 +33,7 @@
+ checkfunc d_alarm 'alarm' "0" 'unistd.h'
+ checkfunc d_asctime64 'asctime64'
+ checkfunc d_atolf 'atolf'
+-checkfunc d_atoll 'atoll'
++checkfunc d_atoll 'atoll' "NULL" 'stdlib.h'
+ checkfunc d_backtrace 'backtrace' 'NULL, 0' 'execinfo.h'
+ checkfunc d_bcmp 'bcmp' "NULL,NULL,0" 'string.h'
+ checkfunc d_bcopy 'bcopy' "NULL,NULL,0" 'string.h'
+@@ -269,7 +269,7 @@
+ checkfunc d_strtod_l 'strtod_l'
+ checkfunc d_strtol 'strtol' 'NULL,NULL,0'
+ checkfunc d_strtold 'strtold' 'NULL,NULL'
+-checkfunc d_strtold_l 'strtold_l'
++checkfunc d_strtold_l 'strtold_l' 'NULL,NULL,NULL' 'stdlib.h'
+ checkfunc d_strtoll 'strtoll' 'NULL,NULL,0'
+ checkfunc d_strtoq 'strtoq' 'NULL,NULL,0'
+ checkfunc d_strtoul 'strtoul' 'NULL,NULL,0'
+--- a/cnf/configure_func_dbl.sh
++++ b/cnf/configure_func_dbl.sh
+@@ -40,7 +40,7 @@
+ checkfunc d_ldexpl 'ldexpl' '0.0, 0'
+ checkfunc d_lgamma 'lgamma' '0.0'
+ checkfunc d_lgamma_r 'lgamma_r' '0.0, NULL'
+-checkfunc d_llabs 'llabs' '0LL'
++checkfunc d_llabs 'llabs' '0LL' 'stdlib.h'
+ checkfunc d_llrint 'llrint' '0.0'
+ checkfunc d_llrintl 'llrintl' '0.0'
+ checkfunc d_llround 'llround' '0.0'

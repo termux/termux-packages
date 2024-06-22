@@ -2,11 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://wiki.gnome.org/Projects/JsonGlib
 TERMUX_PKG_DESCRIPTION="GLib JSON manipulation library"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-_MAJOR_VERSION=1.6
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}.6
-TERMUX_PKG_REVISION=3
-TERMUX_PKG_SRCURL=https://ftp.gnome.org/pub/GNOME/sources/json-glib/${_MAJOR_VERSION}/json-glib-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=96ec98be7a91f6dde33636720e3da2ff6ecbb90e76ccaa49497f31a6855a490e
+TERMUX_PKG_VERSION="1.8.0"
+TERMUX_PKG_SRCURL=https://ftp.gnome.org/pub/GNOME/sources/json-glib/${TERMUX_PKG_VERSION%.*}/json-glib-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=97ef5eb92ca811039ad50a65f06633f1aae64792789307be7170795d8b319454
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="glib"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner"
 TERMUX_PKG_BREAKS="json-glib-dev"
@@ -23,5 +22,5 @@ bin/
 "
 
 termux_step_pre_configure() {
-	termux_setup_gir
+	TERMUX_PKG_VERSION=. termux_setup_gir
 }

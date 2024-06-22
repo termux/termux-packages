@@ -1,0 +1,22 @@
+--- a/build/moz.configure/toolchain.configure
++++ b/build/moz.configure/toolchain.configure
+@@ -1256,7 +1256,7 @@
+     ):
+         wrapper = list(compiler_wrapper or ())
+         flags = []
+-        if sysroot.path:
++        if False:
+             if host_or_target.kernel == "Darwin":
+                 # While --sysroot and -isysroot are roughly equivalent, when not using
+                 # -isysroot on mac, clang takes the SDKROOT environment variable into
+--- a/build/moz.configure/pkg.configure
++++ b/build/moz.configure/pkg.configure
+@@ -56,7 +56,7 @@
+ @imports(_from="os", _import="environ")
+ @imports(_from="os", _import="pathsep")
+ def pkg_config_vars(target, sysroot_path, multiarch_dir):
+-    if sysroot_path and target.kernel != "Darwin":
++    if False:
+         return namespace(
+             PKG_CONFIG_PATH="",
+             PKG_CONFIG_SYSROOT_DIR=sysroot_path,

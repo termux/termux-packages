@@ -8,3 +8,8 @@ TERMUX_PKG_SHA256=12fde9a0dca2852d5f819eeb9de85c4d11c5c384822f93ac66b2b7b166c3af
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_BUILD_IN_SRC=true
+
+termux_step_post_get_source() {
+	mv pyproject.toml{,.unused}
+	mv setup.py{,.unused}
+}

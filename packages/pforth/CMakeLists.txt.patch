@@ -1,17 +1,5 @@
 --- ../CMakeLists.txt.orig	2022-02-04 15:41:06.250332497 +0000
 +++ ./CMakeLists.txt	2022-02-04 16:24:58.062366747 +0000
-@@ -38,9 +38,9 @@
- endif(WIN32)
- 
- add_subdirectory(csrc)
--if(NOT WIN32 AND NOT APPLE)
-+if(NOT WIN32 AND NOT APPLE AND NOT ANDROID)
- 	link_libraries(rt pthread)
--endif(NOT WIN32 AND NOT APPLE)
-+endif(NOT WIN32 AND NOT APPLE AND NOT ANDROID)
- 
- option(UNISTD "Enable libunistd" false)
- if(UNISTD)
 @@ -61,7 +61,6 @@
  add_custom_command(OUTPUT ${PFORTH_DIC}
    COMMAND ./pforth -i system.fth

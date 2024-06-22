@@ -46,3 +46,15 @@
  bool matches_color(const char *arg, int *val)
  {
  	char *dup, *p;
+--- iproute2-6.8.0/lib/bpf_legacy.c.orig
++++ iproute2-6.8.0/lib/bpf_legacy.c
+@@ -958,6 +958,9 @@
+ 	return 0;
+ }
+ 
++#undef strdupa
++#define strdupa(s) strcpy(alloca(strlen(s) + 1), s)
++
+ int bpf_load_common(struct bpf_cfg_in *cfg, const struct bpf_cfg_ops *ops,
+ 		    void *nl)
+ {

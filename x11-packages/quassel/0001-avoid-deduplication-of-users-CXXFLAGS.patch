@@ -1,0 +1,32 @@
+From 367fc85fb3433a79a582b4a52a4f8f24d9d13d72 Mon Sep 17 00:00:00 2001
+From: Mike Gilbert <floppym@gentoo.org>
+Date: Sat, 8 Jan 2022 13:26:05 -0500
+Subject: [PATCH] cmake: avoid de-duplication of user's CXXFLAGS
+
+Use the "SHELL:" prefix behavior introduced in cmake 3.12 to avoid the
+option de-duplication behavior of add_compile_options().
+
+Bug: https://bugs.gentoo.org/830738
+---
+ cmake/QuasselMacros.cmake | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/cmake/QuasselMacros.cmake b/cmake/QuasselMacros.cmake
+index 3f9f09269..9ba0003a8 100644
+--- a/cmake/QuasselMacros.cmake
++++ b/cmake/QuasselMacros.cmake
+@@ -410,8 +410,12 @@ endfunction()
+ function(process_cmake_cxx_flags)
+     string(TOUPPER ${CMAKE_BUILD_TYPE} upper_build_type)
+     set(cxx_flags "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${upper_build_type}}")
+-    separate_arguments(sep_cxx_flags UNIX_COMMAND ${cxx_flags})
+-    add_compile_options(${sep_cxx_flags})
++    if(CMAKE_VERSION VERSION_LESS 3.12)
++        separate_arguments(sep_cxx_flags UNIX_COMMAND ${cxx_flags})
++        add_compile_options(${sep_cxx_flags})
++    else()
++        add_compile_options("SHELL:${cxx_flags}")
++    endif()
+     set(CMAKE_CXX_FLAGS "" PARENT_SCOPE)
+     set(CMAKE_CXX_FLAGS_${upper_build_type} "" PARENT_SCOPE)
+ endfunction()

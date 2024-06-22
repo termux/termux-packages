@@ -1,0 +1,18 @@
+diff --git a/vtest/vtest_server.c b/vtest/vtest_server.c
+--- a/vtest/vtest_server.c
++++ b/vtest/vtest_server.c
+@@ -264,6 +264,14 @@
+       server.do_fork = false;
+       server.multi_clients = false;
+    }
++ 
++#ifdef __ANDROID__
++   // On Android, ensure that EGL and GLES is used.
++   server.use_egl_surfaceless = true;
++   server.use_glx = false;
++   server.use_gles = true;
++   server.no_virgl = false;
++#endif
+ 
+    if (!server.no_virgl) {
+       server.ctx_flags = VIRGL_RENDERER_USE_EGL;

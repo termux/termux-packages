@@ -10,3 +10,9 @@ TERMUX_PKG_DEPENDS="openssl, readline"
 termux_step_pre_configure() {
 	sh bootstrap
 }
+
+termux_pkg_auto_update() {
+	local latest_tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}")"
+	[[ -z "${latest_tag}" ]] && termux_error_exit "ERROR: Unable to get tag from ${TERMUX_PKG_SRCURL}"
+	termux_pkg_upgrade_version "$(sed -n 's/^IPMITOOL_\([0-9]\+\)_\([0-9]\+\)_\([0-9]\+\)$/\1.\2.\3/p' <<< ${latest_tag})"
+}

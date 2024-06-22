@@ -1,6 +1,5 @@
-diff -uNr boinc/client/hostinfo_unix.cpp boinc.mod/client/hostinfo_unix.cpp
---- boinc/client/hostinfo_unix.cpp	2022-11-09 18:26:42.000000000 +0800
-+++ boinc.mod/client/hostinfo_unix.cpp	2022-11-18 14:59:05.689992523 +0800
+--- a/client/hostinfo_unix.cpp
++++ b/client/hostinfo_unix.cpp
 @@ -169,6 +169,16 @@
  #include <OS.h>
  #endif
@@ -18,19 +17,28 @@ diff -uNr boinc/client/hostinfo_unix.cpp boinc.mod/client/hostinfo_unix.cpp
  // Some OS define _SC_PAGE_SIZE instead of _SC_PAGESIZE
  #if defined(_SC_PAGE_SIZE) && !defined(_SC_PAGESIZE)
  #define _SC_PAGESIZE _SC_PAGE_SIZE
-@@ -1536,12 +1546,21 @@
+@@ -1505,7 +1515,12 @@
+ // return BOINC_SUCCESS if at least version could be found (extra_info may remain empty)
+ // return ERR_NOT_FOUND if ldd couldn't be opened or no version information was found
+ //
+-#ifdef __GLIBC__
++#ifdef __ANDROID__
++int get_libc_version(string&, string&) {
++    // ldd should always not found on Android, less overhead
++    return ERR_NOT_FOUND;
++}
++#elif defined(__GLIBC__)
+ int get_libc_version(string& version, string&) {
+     version = string(gnu_get_libc_version());
+     return BOINC_SUCCESS;
+@@ -1555,16 +1570,24 @@
  #if HAVE_SYS_UTSNAME_H
      struct utsname u;
      uname(&u);
 -#ifdef ANDROID
 +#ifdef __ANDROID__
      safe_strcpy(os_name, "Android");
- #else
-     safe_strcpy(os_name, u.sysname);
--#endif //ANDROID
--#if defined(__EMX__) // OS2: version is in u.version
-+#endif
-+#ifdef __ANDROID__
+-#else
 +    // remove the need of query Android version through Java API
 +    // which then process in client/gui_rpc_server_ops.cpp, handle_set_host_info()
 +    char android_version[PROP_VALUE_MAX];
@@ -40,10 +48,19 @@ diff -uNr boinc/client/hostinfo_unix.cpp boinc.mod/client/hostinfo_unix.cpp
 +#endif
 +    snprintf(os_version, sizeof(os_version), "%s (Android %s)", u.release, android_version);
 +#elif defined(__EMX__) // OS2: version is in u.version
+     safe_strcpy(os_name, u.sysname);
+-#endif //ANDROID
+-#if defined(__EMX__) // OS2: version is in u.version
      safe_strcpy(os_version, u.version);
  #elif defined(__HAIKU__)
++    safe_strcpy(os_name, u.sysname);
      snprintf(os_version, sizeof(os_version), "%s, %s", u.release, u.version);
-@@ -1698,7 +1717,7 @@
+ #else
++    safe_strcpy(os_name, u.sysname);
+     safe_strcpy(os_version, u.release);
+ #endif
+ #ifdef _HPUX_SOURCE
+@@ -1717,7 +1740,7 @@
          return false;
      }
  } tty_patterns[] = {

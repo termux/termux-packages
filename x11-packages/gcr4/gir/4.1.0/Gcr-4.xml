@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<dump>
+  <interface name="GcrCertificate" get-type="gcr_certificate_get_type">
+    <property name="description" type="gchararray" flags="225" default-value=""/>
+    <property name="expiry-date" type="GDateTime" flags="225"/>
+    <property name="issuer-name" type="gchararray" flags="225" default-value=""/>
+    <property name="label" type="gchararray" flags="225" default-value=""/>
+    <property name="subject-name" type="gchararray" flags="225" default-value=""/>
+  </interface>
+  <class name="GcrCertificateChain" get-type="gcr_certificate_chain_get_type" parents="GObject">
+    <property name="status" type="GcrCertificateChainStatus" flags="225" default-value="GCR_CERTIFICATE_CHAIN_UNKNOWN"/>
+    <property name="length" type="guint" flags="225" default-value="0"/>
+  </class>
+  <class name="GcrCertificateSection" get-type="gcr_certificate_section_get_type" parents="GObject" final="1">
+    <property name="label" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="fields" type="GListModel" flags="225"/>
+    <property name="flags" type="GcrCertificateSectionFlags" flags="235" default-value="GCR_CERTIFICATE_SECTION_NONE"/>
+  </class>
+  <class name="GcrCertificateField" get-type="gcr_certificate_field_get_type" parents="GObject" final="1">
+    <property name="label" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="value" type="GValue" flags="225"/>
+    <property name="section" type="GcrCertificateSection" flags="235"/>
+  </class>
+  <class name="GcrCertificateRequest" get-type="gcr_certificate_request_get_type" parents="GObject">
+    <property name="format" type="GcrCertificateRequestFormat" flags="235" default-value="GCR_CERTIFICATE_REQUEST_PKCS10"/>
+    <property name="private-key" type="GckObject" flags="235"/>
+  </class>
+  <class name="GcrParser" get-type="gcr_parser_get_type" parents="GObject">
+    <property name="parsed-label" type="gchararray" flags="225" default-value=""/>
+    <property name="parsed-attributes" type="GckAttributes" flags="225"/>
+    <property name="parsed-description" type="gchararray" flags="225" default-value=""/>
+    <signal name="authenticate" return="gboolean" when="last">
+      <param type="gint"/>
+    </signal>
+    <signal name="parsed" return="void" when="first">
+    </signal>
+  </class>
+  <boxed name="GcrParsed" get-type="gcr_parsed_get_type"/>
+  <interface name="GcrImporter" get-type="gcr_importer_get_type">
+    <property name="interaction" type="GTlsInteraction" flags="227"/>
+    <property name="label" type="gchararray" flags="225" default-value=""/>
+    <property name="uri" type="gchararray" flags="225" default-value="NULL"/>
+  </interface>
+  <interface name="GcrPrompt" get-type="gcr_prompt_get_type">
+    <property name="caller-window" type="gchararray" flags="231" default-value="NULL"/>
+    <property name="cancel-label" type="gchararray" flags="231" default-value="Cancel"/>
+    <property name="choice-chosen" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="choice-label" type="gchararray" flags="231" default-value="NULL"/>
+    <property name="continue-label" type="gchararray" flags="231" default-value="Continue"/>
+    <property name="description" type="gchararray" flags="231" default-value="NULL"/>
+    <property name="message" type="gchararray" flags="231" default-value="NULL"/>
+    <property name="password-new" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="password-strength" type="gint" flags="225" default-value="0"/>
+    <property name="title" type="gchararray" flags="231" default-value="NULL"/>
+    <property name="warning" type="gchararray" flags="231" default-value="NULL"/>
+    <signal name="prompt-close" return="void" when="first">
+    </signal>
+  </interface>
+  <class name="GcrSecretExchange" get-type="gcr_secret_exchange_get_type" parents="GObject">
+    <property name="protocol" type="gchararray" flags="235" default-value="sx-aes-1"/>
+  </class>
+  <class name="GcrSystemPrompter" get-type="gcr_system_prompter_get_type" parents="GObject">
+    <property name="mode" type="GcrSystemPrompterMode" flags="235" default-value="GCR_SYSTEM_PROMPTER_SINGLE"/>
+    <property name="prompt-type" type="GType" flags="235"/>
+    <property name="prompting" type="gboolean" flags="225" default-value="FALSE"/>
+    <signal name="new-prompt" return="GcrPrompt" when="last">
+    </signal>
+  </class>
+  <class name="GcrPkcs11Certificate" get-type="gcr_pkcs11_certificate_get_type" parents="GckObject,GObject">
+    <implements name="GcrCertificate"/>
+    <property name="attributes" type="GckAttributes" flags="235"/>
+  </class>
+  <class name="GcrSimpleCertificate" get-type="gcr_simple_certificate_get_type" parents="GObject">
+    <implements name="GcrCertificate"/>
+  </class>
+  <class name="GcrSshAskpass" get-type="gcr_ssh_askpass_get_type" parents="GObject">
+    <property name="interaction" type="GTlsInteraction" flags="235"/>
+  </class>
+  <class name="GcrSystemPrompt" get-type="gcr_system_prompt_get_type" parents="GObject">
+    <implements name="GcrPrompt"/>
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <property name="bus-name" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="secret-exchange" type="GcrSecretExchange" flags="227"/>
+    <property name="timeout-seconds" type="gint" flags="234" default-value="-1"/>
+  </class>
+  <interface name="GcrImportInteraction" get-type="gcr_import_interaction_get_type">
+    <prerequisite name="GTlsInteraction"/>
+  </interface>
+</dump>

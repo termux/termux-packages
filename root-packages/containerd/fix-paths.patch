@@ -1,0 +1,48 @@
+diff -ur ../src.orig/cluster/gce/configure.sh ./cluster/gce/configure.sh
+--- ../src.orig/cluster/gce/configure.sh	2023-10-15 18:45:05.281722654 +0000
++++ ./cluster/gce/configure.sh	2023-10-15 18:45:27.488481779 +0000
+@@ -189,7 +189,7 @@
+ rm -f "${CONTAINERD_HOME}/etc/crictl.yaml"
+ 
+ # Generate containerd config
+-config_path="${CONTAINERD_CONFIG_PATH:-"/etc/containerd/config.toml"}"
++config_path="${CONTAINERD_CONFIG_PATH:-"@TERMUX_PREFIX@/etc/containerd/config.toml"}"
+ mkdir -p $(dirname ${config_path})
+ cni_bin_dir="${CONTAINERD_HOME}/opt/cni/bin"
+ cni_template_path="${CONTAINERD_HOME}/opt/containerd/cluster/gce/cni.template"
+diff -ur ../src.orig/contrib/ansible/cri-containerd.yaml ./contrib/ansible/cri-containerd.yaml
+--- ../src.orig/contrib/ansible/cri-containerd.yaml	2023-10-15 18:45:05.278389306 +0000
++++ ./contrib/ansible/cri-containerd.yaml	2023-10-15 18:45:27.488481779 +0000
+@@ -11,7 +11,7 @@
+     - include_tasks: tasks/binaries.yaml # Contains tasks for pulling containerd components
+ 
+     - name: "Create a directory for containerd config"
+-      file: path=/etc/containerd state=directory
++      file: path=@TERMUX_PREFIX@/etc/containerd state=directory
+ 
+     - name: "Start Containerd"
+       systemd: name=containerd daemon_reload=yes state=started enabled=yes
+diff -ur ../src.orig/script/setup/config-containerd ./script/setup/config-containerd
+--- ../src.orig/script/setup/config-containerd	2023-10-15 18:45:05.351722947 +0000
++++ ./script/setup/config-containerd	2023-10-15 18:45:27.495148474 +0000
+@@ -15,7 +15,7 @@
+ #   limitations under the License.
+ 
+ #
+-# establishes /etc/containerd/config.toml
++# establishes @TERMUX_PREFIX@/etc/containerd/config.toml
+ # parameterized by the current SELinux mode
+ #
+ set -eux -o pipefail
+@@ -26,9 +26,9 @@
+   enable_selinux=true
+ fi
+ 
+-mkdir -p /etc/containerd
++mkdir -p @TERMUX_PREFIX@/etc/containerd
+ 
+-cat << EOF | sudo tee /etc/containerd/config.toml
++cat << EOF | sudo tee @TERMUX_PREFIX@/etc/containerd/config.toml
+ version = 2
+ [plugins]
+   [plugins."io.containerd.grpc.v1.cri"]

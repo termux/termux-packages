@@ -1,8 +1,12 @@
-. @TERMUX_PREFIX@/etc/profile
+emulate sh -c '. @TERMUX_PREFIX@/etc/profile'
 command_not_found_handler() {
 	@TERMUX_PREFIX@/libexec/termux/command-not-found $1
 }
-#set nomatch so *.sh would not error if no file is available
-setopt +o nomatch
-. @TERMUX_PREFIX@/etc/profile
 PS1='%# '
+# If there is no .zshrc offer to set one up
+# This is the same fresh install behavior as for example on Arch Linux
+[[ -r "${ZDOTDIR:-$HOME}"/.zshrc ]] || {
+	autoload -U zsh-newuser-install
+	zsh-newuser-install
+}
+# vim: set noet ft=zsh tw=4 sw=4 ff=unix

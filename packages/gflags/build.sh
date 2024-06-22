@@ -19,6 +19,22 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DINSTALL_HEADERS=ON
 "
 
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=2.2
+
+	local _MAJOR=$(echo ${TERMUX_PKG_VERSION#*:} | cut -d . -f 1)
+	local _MINOR=$(echo ${TERMUX_PKG_VERSION#*:} | cut -d . -f 2)
+	local v=${_MAJOR}
+	if [ "${_MAJOR}" == 2 ]; then
+		v+=".${_MINOR}"
+	fi
+	if [ "${v}" != "${_SOVERSION}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
+
 termux_step_post_make_install() {
 	#Any old packages using the library name of libgflags
 	ln -sfr "$TERMUX_PREFIX"/lib/pkgconfig/gflags.pc \

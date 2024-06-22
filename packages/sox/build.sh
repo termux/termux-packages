@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://sox.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://sox.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="Command line utility for converting between and applying effects to various audio files formats"
 TERMUX_PKG_LICENSE="GPL-2.0, LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"

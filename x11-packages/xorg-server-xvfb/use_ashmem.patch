@@ -1,0 +1,84 @@
+--- ./Xext/shm_old.c	2023-02-07 03:16:51.000000000 +0200
++++ ./Xext/shm.c	2023-02-21 10:35:54.199460924 +0200
+@@ -60,6 +60,7 @@
+ #include <sys/mman.h>
+ #include "protocol-versions.h"
+ #include "busfault.h"
++#include <linux/ioctl.h>
+ 
+ /* Needed for Solaris cross-zone shared memory extension */
+ #ifdef HAVE_SHMCTL64
+@@ -1142,6 +1143,20 @@
+     FreeResource (shmdesc->resource, RT_NONE);
+ }
+ 
++static int 
++shm_tmpfile_size(int fd) 
++{
++    char path[PATH_MAX] = {0};
++    char realpath[256] = {0};
++    sprintf(path, "/proc/self/fd/%d", fd);
++
++    int size;
++    if (readlink(path, realpath, sizeof(realpath)) != -1 && !strcmp("/dev/ashmem", realpath))
++        return ioctl(fd, /* ASHMEM_GET_SIZE */ _IO(0x77, 4), NULL);
++    else
++        return 0;
++}
++
+ static int
+ ProcShmAttachFd(ClientPtr client)
+ {
+@@ -1161,7 +1176,7 @@
+     if (fd < 0)
+         return BadMatch;
+ 
+-    if (fstat(fd, &statb) < 0 || statb.st_size == 0) {
++    if (fstat(fd, &statb) < 0 || (statb.st_size == 0 && (statb.st_size = shm_tmpfile_size(fd)) == 0)) {
+         close(fd);
+         return BadMatch;
+     }
+@@ -1257,6 +1272,28 @@
+     return -1;
+ }
+ 
++static inline int
++shm_tmpfile_sized(size_t size)
++{
++    int fd, ret;
++    long flags;
++    fd = open("/dev/ashmem", O_RDWR | O_CLOEXEC);
++    if (fd < 0)
++        return fd;
++    ret = ioctl(fd, /* ASHMEM_SET_SIZE */ _IOW(0x77, 3, size_t), size);
++    if (ret < 0)
++        goto err;
++    flags = fcntl(fd, F_GETFD);
++    if (flags == -1)
++        goto err;
++    if (fcntl(fd, F_SETFD, flags | FD_CLOEXEC) == -1)
++        goto err;
++    return fd;
++    err:
++    close(fd);
++    return ret;
++}
++
+ static int
+ ProcShmCreateSegment(ClientPtr client)
+ {
+@@ -1276,13 +1313,9 @@
+         client->errorValue = stuff->readOnly;
+         return BadValue;
+     }
+-    fd = shm_tmpfile();
++    fd = shm_tmpfile_sized(stuff->size);
+     if (fd < 0)
+         return BadAlloc;
+-    if (ftruncate(fd, stuff->size) < 0) {
+-        close(fd);
+-        return BadAlloc;
+-    }
+     shmdesc = malloc(sizeof(ShmDescRec));
+     if (!shmdesc) {
+         close(fd);

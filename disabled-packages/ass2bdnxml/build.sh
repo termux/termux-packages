@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=42a5572c631bbb4dcf9b43d07179de8c5607d47c
 TERMUX_PKG_VERSION=2019.02.06
 TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://github.com/hguandl/ass2bdnxml.git
+TERMUX_PKG_SRCURL=git+https://github.com/hguandl/ass2bdnxml
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_DEPENDS="libpng"
 

@@ -9,15 +9,17 @@ TERMUX_PKG_MAINTAINER="@termux"
 # - libregexp-assemble-perl
 # - psutils
 # - subversion
-TERMUX_PKG_VERSION=(5.36.0
-                    1.4)
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SHA256=(e26085af8ac396f62add8a533c3a0ea8c8497d836f0689347ac5abd7b7a4e00a
-                   be9d9f9f7148edff7a2f9695ba3cb7e3975eff6b25a9a81dd311725fd757aa91)
+TERMUX_PKG_VERSION=(5.38.2
+                    388d0eedbfc3864bbbf7ad7f965064d99cac5aaa)
+TERMUX_PKG_REVISION=3
+TERMUX_PKG_SHA256=(a0a31534451eb7b83c7d6594a497543a54d488bc90ca00f5e34762577f40655e
+                   a975c196075623f0dc94f57d00633b0d18ed08e3d85a3ea19d34ece4ec1a94c1)
 TERMUX_PKG_SRCURL=(http://www.cpan.org/src/5.0/perl-${TERMUX_PKG_VERSION}.tar.gz
-		   https://github.com/arsv/perl-cross/releases/download/${TERMUX_PKG_VERSION[1]}/perl-cross-${TERMUX_PKG_VERSION[1]}.tar.gz)
+                   https://github.com/arsv/perl-cross/archive/${TERMUX_PKG_VERSION[1]}.tar.gz)
+#                  https://github.com/arsv/perl-cross/releases/download/${TERMUX_PKG_VERSION[1]}/perl-cross-${TERMUX_PKG_VERSION[1]}.tar.gz)
+TERMUX_PKG_DEPENDS=libandroid-utimes
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_MAKE_PROCESSES=1
+TERMUX_PKG_MAKE_PROCESSES=1
 TERMUX_PKG_RM_AFTER_INSTALL="bin/perl${TERMUX_PKG_VERSION}"
 
 termux_step_post_get_source() {
@@ -52,7 +54,7 @@ termux_step_configure() {
 		ORIG_LD=$LD; unset LD
 
 		cd $TERMUX_PKG_BUILDDIR
-		$TERMUX_PKG_SRCDIR/configure \
+		CFLAGS=" -D__USE_BSD=1" LDFLAGS=" -Wl,-rpath=$TERMUX_PREFIX/lib -L$TERMUX_PREFIX/lib -landroid-utimes -lm" $TERMUX_PKG_SRCDIR/configure \
 			--target=$TERMUX_HOST_PLATFORM \
 			--with-cc="$ORIG_CC" \
 			--with-ranlib="$ORIG_RANLIB" \
@@ -64,7 +66,9 @@ termux_step_configure() {
 			-Dar="$ORIG_AR" \
 			-Duseshrplib \
 			-Duseithreads \
-			-Dusemultiplicity
+			-Dusemultiplicity \
+			-Doptimize="-O2" \
+			--with-libs="-lm -L$TERMUX_PREFIX/lib -landroid-utimes"
 	)
 }
 
@@ -73,6 +77,9 @@ termux_step_post_make_install() {
 	cd $TERMUX_PREFIX/share/man/man1
 	rm perlbug.1
 	ln -s perlthanks.1 perlbug.1
+	cd $TERMUX_PREFIX/bin
+	rm perlbug
+	ln -s perlthanks perlbug
 
 	cd $TERMUX_PREFIX/lib
 	ln -f -s perl5/${TERMUX_PKG_VERSION}/${TERMUX_ARCH}-android/CORE/libperl.so libperl.so

@@ -1,0 +1,12 @@
+--- a/extensions/libxt_LOG.c
++++ b/extensions/libxt_LOG.c
+@@ -2,6 +2,9 @@
+ #include <string.h>
+ #define SYSLOG_NAMES
+ #include <syslog.h>
++#ifdef __ANDROID__
++#include "syslog-names.h"
++#endif
+ #include <xtables.h>
+ #include <linux/netfilter/xt_LOG.h>
+ 

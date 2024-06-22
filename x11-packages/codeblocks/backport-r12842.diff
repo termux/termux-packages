@@ -1,0 +1,48 @@
+------------------------------------------------------------------------
+r12842 | wh11204 | 2022-06-30 18:36:18 +0900 (Thu, 30 Jun 2022) | 3 lines
+
+- Complete previous commit, InsertPage() must be fixed too.
+It appeared in the diff, but I forgot about it when editing.
+
+------------------------------------------------------------------------
+Index: src/include/cbauibook.h
+===================================================================
+--- src/include/cbauibook.h	(revision 12841)
++++ src/include/cbauibook.h	(revision 12842)
+@@ -138,7 +138,7 @@
+          * \param page The page to add
+          * \param caption The caption of the page
+          * \param select If true the page gets selected
+-         * \param bitmap The bitmap of the tab
++         * \param bitmap The bitmap (or bitmap bundle since wx3.1.6) of the tab
+          * \return true if successful
+          */
+         bool InsertPage(size_t page_idx,
+@@ -145,7 +145,11 @@
+                         wxWindow* page,
+                         const wxString& caption,
+                         bool select = false,
++#if wxCHECK_VERSION(3, 1, 6)
++                        const wxBitmapBundle& bitmap = wxBitmapBundle());
++#else
+                         const wxBitmap& bitmap = wxNullBitmap);
++#endif
+         /** \brief Set zoom factor for builtin editors
+          *
+          * Sets the zoom factor for all visible builtin
+Index: src/sdk/cbauibook.cpp
+===================================================================
+--- src/sdk/cbauibook.cpp	(revision 12841)
++++ src/sdk/cbauibook.cpp	(revision 12842)
+@@ -515,7 +515,11 @@
+                                wxWindow* page,
+                                const wxString& caption,
+                                bool select,
++#if wxCHECK_VERSION(3, 1, 6)
++                               const wxBitmapBundle& bitmap)
++#else
+                                const wxBitmap& bitmap)
++#endif
+ {
+     bool result = wxAuiNotebook::InsertPage(page_idx, page, caption, select, bitmap);
+     MinimizeFreeSpace();

@@ -1,0 +1,11 @@
+--- a/src/3rdparty/chromium/base/synchronization/lock_impl_posix.cc
++++ b/src/3rdparty/chromium/base/synchronization/lock_impl_posix.cc
+@@ -59,7 +59,7 @@
+ // Lock::PriorityInheritanceAvailable still must be checked as the code may
+ // compile but the underlying platform still may not correctly support priority
+ // inheritance locks.
+-#if defined(OS_NACL) || defined(OS_ANDROID) || defined(OS_FUCHSIA)
++#if defined(OS_NACL) || defined(OS_ANDROID) || defined(OS_FUCHSIA) || defined(__TERMUX__)
+ #define PRIORITY_INHERITANCE_LOCKS_POSSIBLE() 0
+ #else
+ #define PRIORITY_INHERITANCE_LOCKS_POSSIBLE() 1

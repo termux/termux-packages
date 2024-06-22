@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Nim programming language compiler"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="copying.txt"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.6.10
+TERMUX_PKG_VERSION=2.0.4
 TERMUX_PKG_SRCURL=https://nim-lang.org/download/nim-$TERMUX_PKG_VERSION.tar.xz
-TERMUX_PKG_SHA256=13d7702f8b57087babe8cd051c13bc56a3171418ba867b49c6bbd09b29d24fea
+TERMUX_PKG_SHA256=71526bd07439dc8e378fa1a6eb407eda1298f1f3d4df4476dca0e3ca3cbe3f09
 TERMUX_PKG_DEPENDS="clang, git, libandroid-glob, openssl"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -21,7 +21,7 @@ tools/nimgrep
 
 termux_step_host_build() {
 	cp -r ../src/* ./
-	make -j $TERMUX_MAKE_PROCESSES CC=gcc LD=gcc
+	make -j $TERMUX_PKG_MAKE_PROCESSES CC=gcc LD=gcc
 }
 
 termux_step_make() {
@@ -46,7 +46,7 @@ termux_step_make() {
 		sed -i 's/arm64/amd64/g' makefile
 	fi
 	export CFLAGS=" $CPPFLAGS $CFLAGS  -w  -fno-strict-aliasing"
-	make LD=$CC uos=linux mycpu=$NIM_ARCH myos=android  -j $TERMUX_MAKE_PROCESSES useShPath=$TERMUX_PREFIX/bin/sh
+	make LD=$CC uos=linux mycpu=$NIM_ARCH myos=android  -j $TERMUX_PKG_MAKE_PROCESSES useShPath=$TERMUX_PREFIX/bin/sh
 	cp config/nim.cfg ../host-build/config
 
 	for cmd in $_NIM_TOOLS; do
@@ -55,7 +55,7 @@ termux_step_make() {
 			koch) nim_flags="--opt:size" ;;
 			*) nim_flags= ;;
 		esac
-		nim --cc:clang --clang.exe=$CC --clang.linkerexe=$CC $nim_flags --define:termux -d:release -d:sslVersion=1.1 --os:android --cpu:$NIM_ARCH  -t:"$CPPFLAGS $CFLAGS" -l:"$LDFLAGS -landroid-glob" -d:tempDir:$TERMUX_PREFIX/tmp c $(basename $cmd).nim
+		nim --cc:clang --clang.exe=$CC --clang.linkerexe=$CC $nim_flags --define:termux -d:release -d:sslVersion=3 --os:android --cpu:$NIM_ARCH  -t:"$CPPFLAGS $CFLAGS" -l:"$LDFLAGS -landroid-glob" -d:tempDir:$TERMUX_PREFIX/tmp c $(basename $cmd).nim
 		popd
 	done
 }

@@ -1,0 +1,19 @@
+This reverts https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/11714,
+which implements resource_create_front for vtest.
+
+It breaks `glxinfo` with `virglrenderer-android`.
+
+--- a/src/gallium/winsys/virgl/vtest/virgl_vtest_winsys.c
++++ b/src/gallium/winsys/virgl/vtest/virgl_vtest_winsys.c
+@@ -304,7 +304,11 @@
+    }
+ 
+    res->res_handle = handle;
++#ifndef __TERMUX__
+    if (map_front_private && res->ptr && res->dt) {
++#else
++   if (map_front_private && res->ptr && res->dt && getenv("TERMUX_ENABLE_GLXCOPYSUBBUFFERMESA_FOR_VTEST")) {
++#endif
+       void *dt_map = vtws->sws->displaytarget_map(vtws->sws, res->dt, PIPE_MAP_READ_WRITE);
+       uint32_t shm_stride = util_format_get_stride(res->format, res->width);
+       util_copy_rect(res->ptr, res->format, shm_stride, 0, 0,

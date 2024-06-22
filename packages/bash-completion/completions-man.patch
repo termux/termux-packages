@@ -1,13 +1,24 @@
-diff -uNr bash-completion-2.9/completions/man bash-completion-2.9.mod/completions/man
---- bash-completion-2.9/completions/man	2019-04-27 11:54:49.000000000 +0300
-+++ bash-completion-2.9.mod/completions/man	2019-05-02 15:36:06.454990217 +0300
-@@ -51,8 +51,7 @@
+diff --git a/completions/man b/completions/man
+index b405f084..eaa5b811 100644
+--- a/completions/man
++++ b/completions/man
+@@ -56,18 +56,7 @@ _comp_cmd_man()
          return
      fi
  
 -    local manpath=$(manpath 2>/dev/null || command man -w 2>/dev/null)
--    [[ -z $manpath ]] && manpath="/usr/share/man:/usr/local/share/man"
-+    local manpath="@TERMUX_PREFIX@/share/man"
+-    if [[ ! $manpath ]]; then
+-        # Note: Both "manpath" and "man -w" may be unavailable, in
+-        # which case we determine the man paths based on the
+-        # environment variable MANPATH.
+-        manpath=:${MANPATH-}:
+-        # Note: An empty path (represented by two consecutive colons
+-        # or a preceding/trailing colon) represents the system man
+-        # paths.
+-        manpath=${manpath//::/':/usr/share/man:/usr/local/share/man:'}
+-        manpath=${manpath:1:-1}
+-    fi
++    local manpath="${MANPATH-@TERMUX_PREFIX@/share/man}"
  
      # determine manual section to search
      local sect

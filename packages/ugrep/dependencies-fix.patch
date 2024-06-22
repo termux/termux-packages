@@ -1,6 +1,18 @@
-diff -uNr ugrep-3.9.2/m4/ax_check_bzlib.m4 ugrep-3.9.2.mod/m4/ax_check_bzlib.m4
---- ugrep-3.9.2/m4/ax_check_bzlib.m4	2022-08-21 19:20:26.000000000 +0300
-+++ ugrep-3.9.2.mod/m4/ax_check_bzlib.m4	2022-10-29 15:07:19.868515345 +0300
+diff -uNr ugrep-4.3.3/m4/ax_check_brotlilib.m4 ugrep-4.3.3.mod/m4/ax_check_brotlilib.m4
+--- ugrep-4.3.3/m4/ax_check_brotlilib.m4	2023-11-16 01:18:04.000000000 +0800
++++ ugrep-4.3.3.mod/m4/ax_check_brotlilib.m4	2023-11-18 14:09:52.528254886 +0800
+@@ -67,7 +67,7 @@
+ # Handle user hints
+ #
+ [AC_MSG_CHECKING(if brotli is wanted)
+-brotli_places="/usr/local /usr /opt/homebrew /opt/local /sw"
++brotli_places="@TERMUX_PREFIX@"
+ AC_ARG_WITH([brotli],
+ [  --with-brotli=DIR       root directory path of brotli library installation
+                           @<:@defaults to /usr/local or /usr if not found in
+diff -uNr ugrep-4.3.3/m4/ax_check_bz2lib.m4 ugrep-4.3.3.mod/m4/ax_check_bz2lib.m4
+--- ugrep-4.3.3/m4/ax_check_bz2lib.m4	2023-11-16 01:18:04.000000000 +0800
++++ ugrep-4.3.3.mod/m4/ax_check_bz2lib.m4	2023-11-18 14:07:54.328254931 +0800
 @@ -64,7 +64,7 @@
  # Handle user hints
  #
@@ -10,9 +22,21 @@ diff -uNr ugrep-3.9.2/m4/ax_check_bzlib.m4 ugrep-3.9.2.mod/m4/ax_check_bzlib.m4
  AC_ARG_WITH([bzlib],
  [  --with-bzlib=DIR        root directory path of bzlib installation @<:@defaults to
                            /usr/local or /usr if not found in /usr/local@:>@
-diff -uNr ugrep-3.9.2/m4/ax_check_lz4lib.m4 ugrep-3.9.2.mod/m4/ax_check_lz4lib.m4
---- ugrep-3.9.2/m4/ax_check_lz4lib.m4	2022-08-21 19:20:26.000000000 +0300
-+++ ugrep-3.9.2.mod/m4/ax_check_lz4lib.m4	2022-10-29 15:07:28.868596412 +0300
+diff -uNr ugrep-4.3.3/m4/ax_check_bzip3lib.m4 ugrep-4.3.3.mod/m4/ax_check_bzip3lib.m4
+--- ugrep-4.3.3/m4/ax_check_bzip3lib.m4	2023-11-16 01:18:04.000000000 +0800
++++ ugrep-4.3.3.mod/m4/ax_check_bzip3lib.m4	2023-11-18 14:10:14.388254878 +0800
+@@ -64,7 +64,7 @@
+ # Handle user hints
+ #
+ [AC_MSG_CHECKING(if bzip3 is wanted)
+-bzip3_places="/usr/local /usr /opt/homebrew /opt/local /sw"
++bzip3_places="@TERMUX_PREFIX@"
+ AC_ARG_WITH([bzip3],
+ [  --with-bzip3=DIR        root directory path of bzip3 library installation
+                           @<:@defaults to /usr/local or /usr if not found in
+diff -uNr ugrep-4.3.3/m4/ax_check_lz4lib.m4 ugrep-4.3.3.mod/m4/ax_check_lz4lib.m4
+--- ugrep-4.3.3/m4/ax_check_lz4lib.m4	2023-11-16 01:18:04.000000000 +0800
++++ ugrep-4.3.3.mod/m4/ax_check_lz4lib.m4	2023-11-18 14:08:16.688254923 +0800
 @@ -64,7 +64,7 @@
  # Handle user hints
  #
@@ -22,9 +46,9 @@ diff -uNr ugrep-3.9.2/m4/ax_check_lz4lib.m4 ugrep-3.9.2.mod/m4/ax_check_lz4lib.m
  AC_ARG_WITH([lz4],
  [  --with-lz4=DIR          root directory path of lz4 installation @<:@defaults to
                            /usr/local or /usr if not found in /usr/local@:>@
-diff -uNr ugrep-3.9.2/m4/ax_check_lzmalib.m4 ugrep-3.9.2.mod/m4/ax_check_lzmalib.m4
---- ugrep-3.9.2/m4/ax_check_lzmalib.m4	2022-08-21 19:20:26.000000000 +0300
-+++ ugrep-3.9.2.mod/m4/ax_check_lzmalib.m4	2022-10-29 15:07:37.300672362 +0300
+diff -uNr ugrep-4.3.3/m4/ax_check_lzmalib.m4 ugrep-4.3.3.mod/m4/ax_check_lzmalib.m4
+--- ugrep-4.3.3/m4/ax_check_lzmalib.m4	2023-11-16 01:18:04.000000000 +0800
++++ ugrep-4.3.3.mod/m4/ax_check_lzmalib.m4	2023-11-18 14:10:32.088254871 +0800
 @@ -64,7 +64,7 @@
  # Handle user hints
  #
@@ -34,9 +58,9 @@ diff -uNr ugrep-3.9.2/m4/ax_check_lzmalib.m4 ugrep-3.9.2.mod/m4/ax_check_lzmalib
  AC_ARG_WITH([lzma],
  [  --with-lzma=DIR         root directory path of lzma installation @<:@defaults to
                            /usr/local or /usr if not found in /usr/local@:>@
-diff -uNr ugrep-3.9.2/m4/ax_check_pcre2.m4 ugrep-3.9.2.mod/m4/ax_check_pcre2.m4
---- ugrep-3.9.2/m4/ax_check_pcre2.m4	2022-08-21 19:20:26.000000000 +0300
-+++ ugrep-3.9.2.mod/m4/ax_check_pcre2.m4	2022-10-29 15:07:44.504737252 +0300
+diff -uNr ugrep-4.3.3/m4/ax_check_pcre2.m4 ugrep-4.3.3.mod/m4/ax_check_pcre2.m4
+--- ugrep-4.3.3/m4/ax_check_pcre2.m4	2023-11-16 01:18:04.000000000 +0800
++++ ugrep-4.3.3.mod/m4/ax_check_pcre2.m4	2023-11-18 14:08:35.568254916 +0800
 @@ -72,7 +72,7 @@
  # Handle user hints
  #
@@ -46,9 +70,9 @@ diff -uNr ugrep-3.9.2/m4/ax_check_pcre2.m4 ugrep-3.9.2.mod/m4/ax_check_pcre2.m4
  AC_ARG_WITH([pcre2],
  [  --with-pcre2=DIR        root directory path of PCRE2 installation @<:@defaults to
                            /usr/local or /usr if not found in /usr/local@:>@
-diff -uNr ugrep-3.9.2/m4/ax_check_zlib.m4 ugrep-3.9.2.mod/m4/ax_check_zlib.m4
---- ugrep-3.9.2/m4/ax_check_zlib.m4	2022-08-21 19:20:26.000000000 +0300
-+++ ugrep-3.9.2.mod/m4/ax_check_zlib.m4	2022-10-29 15:07:51.844803367 +0300
+diff -uNr ugrep-4.3.3/m4/ax_check_zlib.m4 ugrep-4.3.3.mod/m4/ax_check_zlib.m4
+--- ugrep-4.3.3/m4/ax_check_zlib.m4	2023-11-16 01:18:04.000000000 +0800
++++ ugrep-4.3.3.mod/m4/ax_check_zlib.m4	2023-11-18 14:10:48.748254865 +0800
 @@ -70,7 +70,7 @@
  # Handle user hints
  #
@@ -58,15 +82,15 @@ diff -uNr ugrep-3.9.2/m4/ax_check_zlib.m4 ugrep-3.9.2.mod/m4/ax_check_zlib.m4
  AC_ARG_WITH([zlib],
  [  --with-zlib=DIR         root directory path of zlib installation @<:@defaults to
                            /usr/local or /usr if not found in /usr/local@:>@
-diff -uNr ugrep-3.9.2/m4/ax_check_zstdlib.m4 ugrep-3.9.2.mod/m4/ax_check_zstdlib.m4
---- ugrep-3.9.2/m4/ax_check_zstdlib.m4	2022-08-21 19:20:26.000000000 +0300
-+++ ugrep-3.9.2.mod/m4/ax_check_zstdlib.m4	2022-10-29 15:07:59.376871210 +0300
+diff -uNr ugrep-4.3.3/m4/ax_check_zstdlib.m4 ugrep-4.3.3.mod/m4/ax_check_zstdlib.m4
+--- ugrep-4.3.3/m4/ax_check_zstdlib.m4	2023-11-16 01:18:04.000000000 +0800
++++ ugrep-4.3.3.mod/m4/ax_check_zstdlib.m4	2023-11-18 14:08:58.328254907 +0800
 @@ -64,7 +64,7 @@
  # Handle user hints
  #
  [AC_MSG_CHECKING(if zstd is wanted)
 -zstd_places="/usr/local /usr /opt/homebrew /opt/local /sw"
-+zstd_places="@TERMUX_PREFIX@"
++zstd_places="@TERMUX_RPEFIX@"
  AC_ARG_WITH([zstd],
  [  --with-zstd=DIR         root directory path of zstd installation @<:@defaults to
                            /usr/local or /usr if not found in /usr/local@:>@

@@ -9,6 +9,7 @@ on:
     - 'scripts/properties.sh'
     - 'scripts/setup-android-sdk.sh'
     - 'scripts/setup-ubuntu.sh'
+    - 'scripts/setup-cgct.sh'
   schedule:
     - cron:  '0 2 * * 0'
   workflow_dispatch:
@@ -19,24 +20,27 @@ jobs:
     permissions:
       contents: read
       packages: write
+    if: github.repository == 'termux/termux-packages'
     steps:
     - name: Clone repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Build
       run: |
         cd ./scripts
         docker build --tag termux/package-builder:latest .
         docker tag termux/package-builder:latest ghcr.io/termux/package-builder:latest
+        docker build --tag termux/package-builder-cgct:latest --file Dockerfile.cgct .
+        docker tag termux/package-builder-cgct:latest ghcr.io/termux/package-builder-cgct:latest
     - name: Login to GHCR
       if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request' && github.repository == 'termux/termux-packages'
-      uses: docker/login-action@v2
+      uses: docker/login-action@v3
       with:
         registry: ghcr.io
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: Login to Docker Hub
       if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request' && github.repository == 'termux/termux-packages'
-      uses: docker/login-action@v2
+      uses: docker/login-action@v3
       with:
         username: grimler
         password: ${{ secrets.DOCKER_TOKEN }}
@@ -46,14 +50,18 @@ jobs:
         # ghcr.io seem to be unstable sometimes. It may suddenly drop connection
         # during docker push when some layers are already uploaded. The workaround
         # is to retry again 1 or 2 more times.
-        for t in 1 2 3; do
-          if docker push "ghcr.io/termux/package-builder:latest"; then
-            break
-          else
-            if [ "$t" = "3" ]; then
-              exit 1
-            fi
-          fi
+        for registry in "ghcr.io/" ""; do
+          for image in package-builder package-builder-cgct; do
+            for t in 1 2 3; do
+              if docker push "${registry}termux/${image}:latest"; then
+                break
+              else
+                if [ "$t" = "3" ]; then
+                  echo "Giving up after 3 attempts"
+                  exit 1
+                fi
+                sleep 20
+              fi
+            done
+          done
         done
-
-        docker push termux/package-builder:latest

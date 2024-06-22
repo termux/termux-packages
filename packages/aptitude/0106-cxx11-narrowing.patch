@@ -1,0 +1,13 @@
+--- a/src/pkg_columnizer.cc
++++ b/src/pkg_columnizer.cc
+@@ -71,8 +71,8 @@
+   {30, false, false},   // origin
+   {10, true, true},     // archive
+   {9, false, false},    // sizechange
+-  {strlen(PACKAGE), false, false},  // progname
+-  {strlen(VERSION), false, false},  // progver
++  {static_cast<unsigned int>(strlen(PACKAGE)), false, false},  // progname
++  {static_cast<unsigned int>(strlen(VERSION)), false, false},  // progver
+   {12, false, false},   // brokencount
+   {16, false, false},   // diskusage, example (max): "Disk: -2,587 kB "
+   {22, false, false},   // downloadsize, example (max): " DL: 2,586 kB/2,587 kB"

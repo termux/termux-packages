@@ -1,2 +1,0 @@
-TERMUX_SUBPKG_DESCRIPTION="amber search"
-TERMUX_SUBPKG_INCLUDE="bin/ambs"

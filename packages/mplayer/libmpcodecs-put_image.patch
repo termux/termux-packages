@@ -1,0 +1,66 @@
+https://github.com/termux/termux-packages/issues/15852
+
+--- a/libmpcodecs/ve_lavc.c
++++ b/libmpcodecs/ve_lavc.c
+@@ -710,7 +710,7 @@
+     return -10.0*log(d)/log(10);
+ }
+ 
+-static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts){
++static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts, double endpts __attribute__((unused))){
+     AVFrame *pic= vf->priv->pic;
+ 
+     pic->data[0]=mpi->planes[0];
+--- a/libmpcodecs/ve_nuv.c
++++ b/libmpcodecs/ve_nuv.c
+@@ -120,7 +120,7 @@
+   return 0;
+ }
+ 
+-static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts){
++static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts, double endpts __attribute__((unused))){
+   uint8_t *header  = vf->priv->buffer;
+   uint8_t* data = vf->priv->buffer + FRAMEHEADERSIZE;
+   uint8_t* zdata = vf->priv->zbuffer + FRAMEHEADERSIZE;
+--- a/libmpcodecs/ve_raw.c
++++ b/libmpcodecs/ve_raw.c
+@@ -150,7 +150,7 @@
+     return 0;
+ }
+ 
+-static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts) {
++static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts, double endpts __attribute__((unused))) {
+     mux_v->buffer = mpi->planes[0];
+     muxer_write_chunk(mux_v, mpi->width*mpi->height*mux_v->bih->biBitCount/8, 0x10, pts, pts);
+     return 1;
+--- a/libmpcodecs/ve_x264.c
++++ b/libmpcodecs/ve_x264.c
+@@ -62,7 +62,7 @@
+ static x264_param_t param;
+ static int parse_error = 0;
+ 
+-static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts);
++static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts, double endpts __attribute__((unused)));
+ static int encode_frame(struct vf_instance *vf, x264_picture_t *pic_in);
+ 
+ void x264enc_set_param(const m_option_t* opt, char* arg)
+@@ -234,7 +234,7 @@
+     return 0;
+ }
+ 
+-static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts)
++static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts, double endpts __attribute__((unused)))
+ {
+     h264_module_t *mod=(h264_module_t*)vf->priv;
+     int i;
+--- a/libmpcodecs/ve_xvid4.c
++++ b/libmpcodecs/ve_xvid4.c
+@@ -523,7 +523,7 @@
+  *==========================================================================*/
+ 
+ static int
+-put_image(struct vf_instance *vf, mp_image_t *mpi, double pts)
++put_image(struct vf_instance *vf, mp_image_t *mpi, double pts, double endpts __attribute__((unused)))
+ {
+ 	int size;
+ 	xvid_enc_stats_t stats;

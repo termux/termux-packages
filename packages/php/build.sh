@@ -3,9 +3,11 @@ TERMUX_PKG_DESCRIPTION="Server-side, HTML-embedded scripting language"
 TERMUX_PKG_LICENSE="PHP-3.01"
 TERMUX_PKG_LICENSE_FILE=LICENSE
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=8.2.0
+# Please revbump php-* extensions along with "minor" bump (e.g. 8.1.x to 8.2.0)
+TERMUX_PKG_VERSION="8.3.8"
 TERMUX_PKG_SRCURL=https://github.com/php/php-src/archive/php-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=e6e9d2dd5b7981ecaefcebda330dde40b884f05d1431c7c86ea1a7ee5aaad649
+TERMUX_PKG_SHA256=0f14f28d6f8d9ab35c618ee39f0dc9c9441a4242443fca2733d68ef27f6c6290
+TERMUX_PKG_AUTO_UPDATE=false
 # Build native php for phar to build (see pear-Makefile.frag.patch):
 TERMUX_PKG_HOSTBUILD=true
 # Build the native php without xml support as we only need phar:
@@ -19,6 +21,12 @@ TERMUX_PKG_SERVICE_SCRIPT=("php-fpm" "mkdir -p $TERMUX_ANDROID_HOME/.php\nif [ -
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_func_res_nsearch=no
 ac_cv_phpdbg_userfaultfd_writefault=no
+php_cv_lib_gd_gdImageCreateFromPng=yes
+php_cv_lib_gd_gdImageCreateFromAvif=yes
+php_cv_lib_gd_gdImageCreateFromWebp=yes
+php_cv_lib_gd_gdImageCreateFromJpeg=yes
+php_cv_lib_gd_gdImageCreateFromBmp=yes
+php_cv_lib_gd_gdImageCreateFromTga=yes
 --enable-bcmath
 --enable-calendar
 --enable-exif
@@ -69,19 +77,18 @@ termux_step_host_build() {
 	pushd $PATCHELF_SRCDIR
 	./bootstrap.sh
 	./configure
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j $TERMUX_PKG_MAKE_PROCESSES
 	popd
 
 	(cd "$TERMUX_PKG_SRCDIR" && ./buildconf --force)
 	"$TERMUX_PKG_SRCDIR/configure" ${TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS}
-	make -j "$TERMUX_MAKE_PROCESSES"
+	make -j "$TERMUX_PKG_MAKE_PROCESSES"
 }
 
 termux_step_pre_configure() {
 	export PATH=$TERMUX_PKG_HOSTBUILD_DIR/_patchelf/src:$PATH
 
 	LDFLAGS+=" -lresolv_wrapper -landroid-glob -llog $($CC -print-libgcc-file-name)"
-
 	export PATH=$PATH:$TERMUX_PKG_HOSTBUILD_DIR/sapi/cli/
 	export NATIVE_PHP_EXECUTABLE=$TERMUX_PKG_HOSTBUILD_DIR/sapi/cli/php
 	export NATIVE_MINILUA_EXECUTABLE=$TERMUX_PKG_HOSTBUILD_DIR/ext/opcache/minilua

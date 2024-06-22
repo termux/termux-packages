@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://www.kde.org/
 TERMUX_PKG_DESCRIPTION="KDE Kirigami2 QtQuick components based on Qt Quick Controls 2"
 TERMUX_PKG_LICENSE="LGPL-2.1"
-TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
-TERMUX_PKG_VERSION=5.101.0
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=5.107.0
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/kirigami2-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=7608eeb528ee863441270cb5896628f8f592dcf09ad00d5bd76d5f7dc1578fbd
+TERMUX_PKG_SHA256=f5c3d1363ddde13c977f6f6c747cb0b34ac6fb647134ef9e9c1c24474e0cb9c9
 TERMUX_PKG_DEPENDS="libc++, qt5-qtbase, qt5-qtdeclarative, qt5-qtgraphicaleffects, qt5-qtquickcontrols2, qt5-qtsvg"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules, qt5-qtbase-cross-tools, qt5-qttools-cross-tools"

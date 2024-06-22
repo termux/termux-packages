@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://sourceforge.net/projects/cunit/
 TERMUX_PKG_DESCRIPTION="C Unit Testing Framework"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Thibault Meyer <meyer.thibault@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.1.3
 _VERSION=$(echo "$TERMUX_PKG_VERSION" | sed -E 's/(.*)\./\1-/')
 TERMUX_PKG_SRCURL=https://github.com/Linaro/libcunit/releases/download/${_VERSION}/CUnit-${_VERSION}.tar.bz2

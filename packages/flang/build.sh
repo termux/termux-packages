@@ -3,12 +3,17 @@ TERMUX_PKG_DESCRIPTION="LLVM's Fortran frontend"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_LICENSE_FILE="flang/LICENSE.TXT"
 TERMUX_PKG_MAINTAINER="@termux"
-LLVM_MAJOR_VERSION=15
-TERMUX_PKG_VERSION=${LLVM_MAJOR_VERSION}.0.6
-TERMUX_PKG_SHA256=9d53ad04dc60cb7b30e810faf64c5ab8157dadef46c8766f67f286238256ff92
+LLVM_MAJOR_VERSION=18
+TERMUX_PKG_VERSION=${LLVM_MAJOR_VERSION}.1.7
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/llvm-project-$TERMUX_PKG_VERSION.src.tar.xz
+TERMUX_PKG_SHA256=74446ab6943f686391954cbda0d77ae92e8a60c432eff437b8666e121d748ec4
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_HOSTBUILD=true
-TERMUX_PKG_DEPENDS="libc++, libllvm, clang, lld, mlir"
+# `flang-new` should be rebuilt when libllvm bumps version.
+# See https://github.com/termux/termux-packages/issues/19362
+DEP_QUALIFIER=$TERMUX_PKG_VERSION-$TERMUX_PKG_REVISION
+TERMUX_PKG_DEPENDS="libc++, libllvm (= $DEP_QUALIFIER), clang (= $DEP_QUALIFIER), lld (= $DEP_QUALIFIER), mlir (= $DEP_QUALIFIER)"
 TERMUX_PKG_BUILD_DEPENDS="libllvm-static"
 
 # Upstream doesn't support 32-bit arches well. See https://github.com/llvm/llvm-project/issues/57621.
@@ -31,8 +36,9 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLLVM_DIR=$TERMUX_PREFIX/lib/cmake/llvm
 -DCLANG_DIR=$TERMUX_PREFIX/lib/cmake/clang
 -DMLIR_DIR=$TERMUX_PREFIX/lib/cmake/mlir
--DCLANG_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/clang-tblgen
 -DMLIR_TABLEGEN_EXE=$TERMUX_PKG_HOSTBUILD_DIR/bin/mlir-tblgen
+-DLLVM_NATIVE_TOOL_DIR=$TERMUX_PKG_HOSTBUILD_DIR/bin
+-DCROSS_TOOLCHAIN_FLAGS_LLVM_NATIVE=-DLLVM_NATIVE_TOOL_DIR=$TERMUX_PKG_HOSTBUILD_DIR/bin
 "
 
 if [ $TERMUX_ARCH_BITS = 32 ]; then
@@ -49,9 +55,9 @@ termux_step_host_build() {
 	termux_setup_ninja
 
 	cmake -G Ninja "-DCMAKE_BUILD_TYPE=Release" \
-				   "-DLLVM_ENABLE_PROJECTS=clang;mlir" \
-				   $TERMUX_PKG_SRCDIR/llvm
-	ninja -j $TERMUX_MAKE_PROCESSES clang-tblgen mlir-tblgen
+					"-DLLVM_ENABLE_PROJECTS=clang;mlir" \
+					$TERMUX_PKG_SRCDIR/llvm
+	ninja -j $TERMUX_PKG_MAKE_PROCESSES clang-tblgen mlir-tblgen
 }
 
 termux_step_pre_configure() {
@@ -63,10 +69,27 @@ termux_step_pre_configure() {
 	TERMUX_SRCDIR_SAVE=$TERMUX_PKG_SRCDIR
 	TERMUX_PKG_SRCDIR=$TERMUX_PKG_SRCDIR/flang
 	# Avoid the possible OOM
-	TERMUX_MAKE_PROCESSES=1
+	TERMUX_PKG_MAKE_PROCESSES=1
 }
 
 termux_step_post_configure() {
 	TERMUX_PKG_SRCDIR=$TERMUX_SRCDIR_SAVE
 	unset TERMUX_SRCDIR_SAVE
+}
+
+termux_step_post_make_install() {
+	# Copy module source files
+	mkdir -p $TERMUX_PREFIX/opt/flang/{include,module}
+	cp -f $TERMUX_PKG_SRCDIR/flang/module/* $TERMUX_PREFIX/opt/flang/module/
+	ln -sf $TERMUX_PREFIX/include/flang $TERMUX_PREFIX/opt/flang/include/
+}
+
+termux_step_create_debscripts() {
+	sed -e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
+		"$TERMUX_PKG_BUILDER_DIR/postinst.sh.in" > ./postinst
+	chmod +x ./postinst
+
+	sed -e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
+		"$TERMUX_PKG_BUILDER_DIR/prerm.sh.in" > ./prerm
+	chmod +x ./prerm
 }

@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<dump>
+  <boxed name="JsonNode" get-type="json_node_get_type"/>
+  <boxed name="JsonObject" get-type="json_object_get_type"/>
+  <boxed name="JsonArray" get-type="json_array_get_type"/>
+  <class name="JsonBuilder" get-type="json_builder_get_type" parents="GObject">
+    <property name="immutable" type="gboolean" flags="11" default-value="FALSE"/>
+  </class>
+  <class name="JsonGenerator" get-type="json_generator_get_type" parents="GObject">
+    <property name="pretty" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="indent" type="guint" flags="3" default-value="2"/>
+    <property name="root" type="JsonNode" flags="3"/>
+    <property name="indent-char" type="guint" flags="3" default-value="32"/>
+  </class>
+  <interface name="JsonSerializable" get-type="json_serializable_get_type">
+  </interface>
+  <class name="JsonParser" get-type="json_parser_get_type" parents="GObject">
+    <property name="immutable" type="gboolean" flags="11" default-value="FALSE"/>
+    <signal name="parse-start" return="void" when="last">
+    </signal>
+    <signal name="parse-end" return="void" when="last">
+    </signal>
+    <signal name="object-start" return="void" when="last">
+    </signal>
+    <signal name="object-member" return="void" when="last">
+      <param type="JsonObject"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="object-end" return="void" when="last">
+      <param type="JsonObject"/>
+    </signal>
+    <signal name="array-start" return="void" when="last">
+    </signal>
+    <signal name="array-element" return="void" when="last">
+      <param type="JsonArray"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="array-end" return="void" when="last">
+      <param type="JsonArray"/>
+    </signal>
+    <signal name="error" return="void" when="last">
+      <param type="gpointer"/>
+    </signal>
+  </class>
+  <class name="JsonPath" get-type="json_path_get_type" parents="GObject">
+  </class>
+  <class name="JsonReader" get-type="json_reader_get_type" parents="GObject">
+    <property name="root" type="JsonNode" flags="231"/>
+  </class>
+  <enum name="JsonParserError" get-type="json_parser_error_get_type">
+    <member name="JSON_PARSER_ERROR_PARSE" nick="parse" value="0"/>
+    <member name="JSON_PARSER_ERROR_TRAILING_COMMA" nick="trailing-comma" value="1"/>
+    <member name="JSON_PARSER_ERROR_MISSING_COMMA" nick="missing-comma" value="2"/>
+    <member name="JSON_PARSER_ERROR_MISSING_COLON" nick="missing-colon" value="3"/>
+    <member name="JSON_PARSER_ERROR_INVALID_BAREWORD" nick="invalid-bareword" value="4"/>
+    <member name="JSON_PARSER_ERROR_EMPTY_MEMBER_NAME" nick="empty-member-name" value="5"/>
+    <member name="JSON_PARSER_ERROR_INVALID_DATA" nick="invalid-data" value="6"/>
+    <member name="JSON_PARSER_ERROR_UNKNOWN" nick="unknown" value="7"/>
+  </enum>  <enum name="JsonPathError" get-type="json_path_error_get_type">
+    <member name="JSON_PATH_ERROR_INVALID_QUERY" nick="query" value="0"/>
+  </enum>  <enum name="JsonReaderError" get-type="json_reader_error_get_type">
+    <member name="JSON_READER_ERROR_NO_ARRAY" nick="no-array" value="0"/>
+    <member name="JSON_READER_ERROR_INVALID_INDEX" nick="invalid-index" value="1"/>
+    <member name="JSON_READER_ERROR_NO_OBJECT" nick="no-object" value="2"/>
+    <member name="JSON_READER_ERROR_INVALID_MEMBER" nick="invalid-member" value="3"/>
+    <member name="JSON_READER_ERROR_INVALID_NODE" nick="invalid-node" value="4"/>
+    <member name="JSON_READER_ERROR_NO_VALUE" nick="no-value" value="5"/>
+    <member name="JSON_READER_ERROR_INVALID_TYPE" nick="invalid-type" value="6"/>
+  </enum>  <enum name="JsonNodeType" get-type="json_node_type_get_type">
+    <member name="JSON_NODE_OBJECT" nick="object" value="0"/>
+    <member name="JSON_NODE_ARRAY" nick="array" value="1"/>
+    <member name="JSON_NODE_VALUE" nick="value" value="2"/>
+    <member name="JSON_NODE_NULL" nick="null" value="3"/>
+  </enum>  <error-quark function="json_parser_error_quark" domain="json-parser-error-quark"/>
+  <error-quark function="json_path_error_quark" domain="json-path-error-quark"/>
+  <error-quark function="json_reader_error_quark" domain="json-reader-error-quark"/>
+</dump>

@@ -1,0 +1,16 @@
+--- a/sysdeps/linux/msg_limits.c
++++ b/sysdeps/linux/msg_limits.c
+@@ -48,6 +48,7 @@
+ 
+ 	memset (buf, 0, sizeof (glibtop_msg_limits));
+ 
++#ifndef __ANDROID__
+ 	msgctl (0, IPC_INFO, (void*) &msginfo);
+ 
+ 	buf->msgpool = msginfo.msgpool;
+@@ -58,4 +59,5 @@
+ 	buf->msgssz = msginfo.msgssz;
+ 	buf->msgtql = msginfo.msgtql;
+ 	buf->flags = _glibtop_sysdeps_msg_limits;
++#endif
+ }

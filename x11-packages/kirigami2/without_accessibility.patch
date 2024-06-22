@@ -2,19 +2,17 @@ Qt build on Termux doesn't have accessibility feature. It needs to be removed.
 diff -uNr kirigami2-5.100.0/src/controls/Avatar.qml kirigami2-5.100.0.mod/src/controls/Avatar.qml
 --- kirigami2-5.100.0/src/controls/Avatar.qml	2022-11-05 20:28:40.000000000 +0800
 +++ kirigami2-5.100.0.mod/src/controls/Avatar.qml	2022-12-03 12:57:42.000000000 +0800
-@@ -159,12 +159,6 @@
+@@ -159,10 +159,6 @@
  
      activeFocusOnTab: !!actions.main
  
 -    Accessible.role: !!actions.main ? Accessible.Button : Accessible.Graphic
 -    Accessible.name: !!actions.main ? qsTr("%1 — %2").arg(name).arg(actions.main.text) : name
 -    Accessible.focusable: !!actions.main
--    Accessible.onPressAction: {
--        avatarRoot.actions.main.trigger()
--    }
-     Keys.onEnterPressed: if (!!avatarRoot.actions.main.trigger()) avatarRoot.actions.main.trigger()
-     Keys.onSpacePressed: if (!!avatarRoot.actions.main.trigger()) avatarRoot.actions.main.trigger()
- 
+-    Accessible.onPressAction: __triggerMainAction()
+     Keys.onReturnPressed: event => __triggerMainAction()
+     Keys.onEnterPressed: event => __triggerMainAction()
+     Keys.onSpacePressed: event => __triggerMainAction()
 diff -uNr kirigami2-5.100.0/src/controls/FormLayout.qml kirigami2-5.100.0.mod/src/controls/FormLayout.qml
 --- kirigami2-5.100.0/src/controls/FormLayout.qml	2022-11-05 20:28:40.000000000 +0800
 +++ kirigami2-5.100.0.mod/src/controls/FormLayout.qml	2022-12-03 12:57:40.000000000 +0800
@@ -60,7 +58,7 @@ diff -uNr kirigami2-5.100.0/src/controls/SearchField.qml kirigami2-5.100.0.mod/s
 -    Accessible.name: qsTr("Search")
 -    Accessible.searchEdit: true
 -
-     focusSequence: "Ctrl+F"
+     focusSequence: StandardKey.Find
      inputMethodHints: Qt.ImhNoPredictiveText
      rightActions: [
 diff -uNr kirigami2-5.100.0/src/controls/SelectableLabel.qml kirigami2-5.100.0.mod/src/controls/SelectableLabel.qml
@@ -180,7 +178,7 @@ diff -uNr kirigami2-5.100.0/src/controls/swipenavigator/templates/PageTab.qml ki
 -    Accessible.focusable: true
 -    Accessible.onPressAction: control.clicked()
 -
-     Keys.onPressed: {
+     Keys.onPressed: event => {
          if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return) {
              control.clicked()
 diff -uNr kirigami2-5.100.0/src/controls/templates/AbstractListItem.qml kirigami2-5.100.0.mod/src/controls/templates/AbstractListItem.qml
@@ -197,13 +195,13 @@ diff -uNr kirigami2-5.100.0/src/controls/templates/OverlayDrawer.qml kirigami2-5
 --- kirigami2-5.100.0/src/controls/templates/OverlayDrawer.qml	2022-11-05 20:28:40.000000000 +0800
 +++ kirigami2-5.100.0.mod/src/controls/templates/OverlayDrawer.qml	2022-12-03 12:58:46.000000000 +0800
 @@ -170,7 +170,6 @@
-             width: parent.height - Kirigami.Units.smallSpacing * 1.5
-             height: parent.height - Kirigami.Units.smallSpacing * 1.5
-             onClicked: root.drawerOpen = !root.drawerOpen;
+                 drawerHandle.displayToolTip = false
+                 Qt.callLater(() => root.drawerOpen = !root.drawerOpen)
+             }
 -            Accessible.name: root.drawerOpen ? root.handleOpenToolTip : root.handleClosedToolTip
              visible: !Kirigami.SettingstabletMode && !Kirigami.SettingshasTransientTouchInput
          }
- 
+         T2.ToolTip.visible: drawerHandle.displayToolTip && containsMouse
 diff -uNr kirigami2-5.100.0/src/controls/templates/SwipeListItem.qml kirigami2-5.100.0.mod/src/controls/templates/SwipeListItem.qml
 --- kirigami2-5.100.0/src/controls/templates/SwipeListItem.qml	2022-11-05 20:28:40.000000000 +0800
 +++ kirigami2-5.100.0.mod/src/controls/templates/SwipeListItem.qml	2022-12-03 12:58:52.000000000 +0800

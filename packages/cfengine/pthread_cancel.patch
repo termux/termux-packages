@@ -1,0 +1,42 @@
+--- a/libpromises/evalfunction.c
++++ b/libpromises/evalfunction.c
+@@ -8459,10 +8459,27 @@
+     FnCallResult result;
+ };
+ 
++#ifdef __ANDROID__
++#define PTHREAD_CANCELED ((void *)-1)
++static void ThreadSignalHandler(int signum)
++{
++    pthread_exit(PTHREAD_CANCELED);
++}
++#endif
++
+ static void *IsReadableThreadRoutine(void *data)
+ {
+     assert(data != NULL);
+ 
++#ifdef __ANDROID__
++    struct sigaction actions;
++    memset(&actions, 0, sizeof(actions));
++    sigemptyset(&actions.sa_mask);
++    actions.sa_flags = 0;
++    actions.sa_handler = ThreadSignalHandler;
++    sigaction(SIGUSR2, &actions, NULL);
++#endif
++
+     struct IsReadableThreadData *const thread_data = data;
+ 
+     // Give main thread time to call pthread_cond_timedwait(3)
+@@ -8614,7 +8631,11 @@
+                 "Read operation timed out, exceeded %ld seconds.", path,
+                 timeout);
+ 
++#ifndef __ANDROID__
+             ret = pthread_cancel(thread_data.thread);
++#else
++            ret = pthread_kill(thread_data.thread, SIGUSR2);
++#endif
+             if (ret != 0)
+             {
+                 Log(LOG_LEVEL_ERR, "Failed to cancel thread");

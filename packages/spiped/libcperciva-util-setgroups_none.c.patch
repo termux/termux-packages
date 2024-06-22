@@ -1,0 +1,20 @@
+--- a/libcperciva/util/setgroups_none.c
++++ b/libcperciva/util/setgroups_none.c
+@@ -8,7 +8,7 @@
+  * happen before the regular includes, as in some cases we need to define other
+  * symbols before including the relevant header.
+  */
+-#if defined(__linux__)
++#if defined(__linux__) && !defined(__ANDROID__)
+ /* setgroups() includes for Linux. */
+ #define _BSD_SOURCE 1
+ #define _DEFAULT_SOURCE 1
+@@ -25,7 +25,7 @@
+ #include <sys/types.h>
+ #include <unistd.h>
+ 
+-#elif defined(__sun) || defined(__hpux)
++#elif defined(__sun) || defined(__hpux) || defined(__ANDROID__)
+ /* setgroups() includes for Solaris. */
+ #include <unistd.h>
+ 

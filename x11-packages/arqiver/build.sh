@@ -1,10 +1,12 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/tsujan/Arqiver
 TERMUX_PKG_DESCRIPTION="A simple Qt archiver manager based on libarchive"
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_MAINTAINER="Yisus7u7 <dev.yisus@hotmail.com>"
-TERMUX_PKG_VERSION=0.10.0
+TERMUX_PKG_MAINTAINER="@Yisus7u7"
+TERMUX_PKG_VERSION="0.12.0"
 TERMUX_PKG_SRCURL=https://github.com/tsujan/Arqiver/releases/download/V${TERMUX_PKG_VERSION}/Arqiver-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=6208f1678cd42f3f4ce4d5849c2b628b68937fb934e0f291f02e3c414994556a
+TERMUX_PKG_SHA256=053df7eb855313f74b7f058b2a7ebbb1ba1bad235fbd433e38736c4c928d1660
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
 TERMUX_PKG_DEPENDS="libc++, qt5-qtbase, qt5-qtsvg"
 TERMUX_PKG_RECOMMENDS="bsdtar, gzip, hicolor-icon-theme"
 TERMUX_PKG_BUILD_DEPENDS="qt5-qtbase-cross-tools, qt5-qttools-cross-tools"

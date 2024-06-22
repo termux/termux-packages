@@ -1,0 +1,7 @@
+--- a/lib_pypy/_resource_build.py
++++ b/lib_pypy/_resource_build.py
+@@ -75,2 +75,4 @@
+ 
++/* Termux addition: Add wait3() declaration used by busybox. Available in libc for 32-bit only. */
++static pid_t wait3(int* status, int options, struct rusage* rusage) { return wait4(-1, status, options, rusage); }
+ """.replace('$RLIMIT_CONSTS', ''.join(rlimit_consts)))

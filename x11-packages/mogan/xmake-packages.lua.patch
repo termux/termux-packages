@@ -1,0 +1,82 @@
+--- a/xmake/packages.lua
++++ b/xmake/packages.lua
+@@ -13,17 +13,18 @@
+ -- Dependencies: Platform|Package Manager
+ --
+ function using_apt ()
+-    return linuxos.name() == "debian"
++    return false and (linuxos.name() == "debian"
+            or linuxos.name() == "ubuntu"
+            or linuxos.name() == "uos"
++    )
+ end
+ 
+ function using_legacy_apt ()
+-    return (linuxos.name() == "uos") or (linuxos.name () == "ubuntu" and linuxos.version():major() == 20)
++    return false and ((linuxos.name() == "uos") or (linuxos.name () == "ubuntu" and linuxos.version():major() == 20))
+ end
+ 
+ function using_pacman ()
+-    return linuxos.name() == "archlinux"
++    return false and (linuxos.name() == "archlinux")
+ end
+ 
+ -- The following versions are adopted on macOS/Windows/ArchLinux
+@@ -70,7 +71,8 @@
+         add_requires("pacman::curl", {alias="libcurl"})
+         add_requireconfs("lolly.cpr.libcurl", {system = true, override=true})
+     else
+-        add_requireconfs("lolly.cpr.libcurl", {version = CURL_VERSION, system = false, override=true})
++        add_requires("pkgconfig::libcurl", {alias="libcurl", system=true})
++        add_requireconfs("lolly.cpr.libcurl", {system=true, override=true})
+     end
+ 
+     -- package: fontconfig
+@@ -95,7 +97,8 @@
+         add_requires("pacman::libpng", {alias="libpng"})
+         add_requireconfs("pdfhummus.libpng", {system = true, override=true})
+     else
+-        add_requireconfs("pdfhummus.libpng", {version = LIBPNG_VERSION, system = false, override=true})
++        add_requires("pkgconfig::libpng", {alias="libpng", system=true})
++        add_requireconfs("pdfhummus.libpng", {system=true, override=true})
+     end
+ 
+     -- package: libjpeg
+@@ -107,7 +110,8 @@
+         end
+         add_requireconfs("pdfhummus.libjpeg", {system = true, override=true})
+     else
+-        add_requireconfs("pdfhummus.libjpeg", {version = LIBJPEG_VERSION, system = false, override=true})
++        add_requires("pkgconfig::libjpeg", {alias="libjpeg", system=true})
++        add_requireconfs("pdfhummus.libjpeg", {system=true, override=true})
+     end
+ 
+     -- package: freetype
+@@ -123,11 +127,14 @@
+         add_requires("pacman::freetype2", {alias="freetype"})
+     else
+     -- Let xrepo manage the dependencies for macOS and other GNU/Linux distros
++        if false then
+         if not is_plat ("macosx") then
+             add_requires("libiconv "..LIBICONV_VERSION, {system=false})
+         end
+         add_requires("freetype "..FREETYPE_VERSION, {system=false})
+         add_requireconfs("pdfhummus.freetype", {version = FREETYPE_VERSION, system = false, override=true})
++        end
++        add_requires("pkgconfig::freetype2", {alias="freetype", system=true})
+     end
+ 
+     -- package: libgit2
+@@ -139,5 +146,12 @@
+ 
+     if is_plat ("linux") and using_apt() then
+         add_requires ("apt::libssl-dev", {alias="openssl"})
++    else
++        add_requires("pkgconfig::libssl", {alias="openssl"})
+     end
++
++    add_links("android-complex-math")
++    add_links("android-spawn")
++    add_links("android-wordexp")
++    add_links("iconv")
+ end

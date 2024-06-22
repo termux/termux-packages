@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/shellinabox/shellinabox
 TERMUX_PKG_DESCRIPTION="Implementation of a web server that can export arbitrary command line tools to a web based terminal emulator"
+# License: GPL-2.0-with-OpenSSL-exception
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.21

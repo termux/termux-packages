@@ -29,7 +29,7 @@
   <boxed name="GckAttributes" get-type="gck_attributes_get_type"/>
   <boxed name="GckModuleInfo" get-type="gck_module_info_get_type"/>
   <class name="GckModule" get-type="gck_module_get_type" parents="GObject">
-    <property name="path" type="gchararray" flags="235"/>
+    <property name="path" type="gchararray" flags="235" default-value="NULL"/>
     <property name="functions" type="gpointer" flags="235"/>
     <signal name="authenticate-slot" return="gboolean" when="last">
       <param type="GckSlot"/>
@@ -52,18 +52,18 @@
   <boxed name="GckMechanismInfo" get-type="gck_mechanism_info_get_type"/>
   <class name="GckSlot" get-type="gck_slot_get_type" parents="GObject">
     <property name="module" type="GckModule" flags="235"/>
-    <property name="handle" type="gulong" flags="235"/>
+    <property name="handle" type="gulong" flags="235" default-value="0"/>
   </class>
   <boxed name="GckSessionInfo" get-type="gck_session_info_get_type"/>
   <class name="GckSession" get-type="gck_session_get_type" parents="GObject">
     <implements name="GInitable"/>
     <implements name="GAsyncInitable"/>
     <property name="module" type="GckModule" flags="225"/>
-    <property name="handle" type="gulong" flags="235"/>
+    <property name="handle" type="gulong" flags="235" default-value="0"/>
     <property name="interaction" type="GTlsInteraction" flags="227"/>
     <property name="slot" type="GckSlot" flags="235"/>
-    <property name="options" type="GckSessionOptions" flags="235"/>
-    <property name="opening-flags" type="gulong" flags="234"/>
+    <property name="options" type="GckSessionOptions" flags="235" default-value="GCK_SESSION_READ_ONLY"/>
+    <property name="opening-flags" type="gulong" flags="234" default-value="0"/>
     <property name="app-data" type="gpointer" flags="234"/>
     <signal name="discard-handle" return="gboolean" when="last">
       <param type="gulong"/>
@@ -72,7 +72,7 @@
   <class name="GckObject" get-type="gck_object_get_type" parents="GObject">
     <property name="module" type="GckModule" flags="235"/>
     <property name="session" type="GckSession" flags="235"/>
-    <property name="handle" type="gulong" flags="235"/>
+    <property name="handle" type="gulong" flags="235" default-value="0"/>
   </class>
   <interface name="GckObjectCache" get-type="gck_object_cache_get_type">
     <prerequisite name="GckObject"/>

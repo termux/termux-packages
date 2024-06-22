@@ -1,0 +1,18 @@
+--- a/liboctave/system/oct-password.cc
++++ b/liboctave/system/oct-password.cc
+@@ -31,6 +31,15 @@
+ 
+ #if defined (HAVE_PWD_H)
+ #  include <pwd.h>
++#  ifdef getpwnam
++#  undef getpwnam
++#  endif
++#  ifdef getpwuid
++#  undef getpwuid
++#  endif
++#  ifdef getpwuid_r
++#  undef getpwuid_r
++#  endif
+ #endif
+ 
+ #include "lo-error.h"

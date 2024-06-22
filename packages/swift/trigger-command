@@ -1,0 +1,14 @@
+
+if [ x"$native_triple" != x"$swift_runtime_triple" ]; then
+	install_path=$install_path/$swift_runtime_triple
+fi
+install_path=$install_path/lib
+
+for so in Foundation FoundationNetworking FoundationXML XCTest swiftCore swiftDispatch \
+	swiftDistributed swiftGlibc swiftObservation swiftRegexBuilder swiftRemoteMirror \
+	swiftSwiftOnoneSupport swift_Concurrency swift_Differentiation swift_RegexParser swift_StringProcessing
+do
+	@COMMAND@
+done
+
+exit 0

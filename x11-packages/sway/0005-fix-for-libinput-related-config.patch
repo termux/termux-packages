@@ -1,0 +1,98 @@
+--- a/sway/commands.c
++++ b/sway/commands.c
+@@ -75,7 +75,9 @@
+ 	{ "fullscreen", cmd_fullscreen },
+ 	{ "gaps", cmd_gaps },
+ 	{ "hide_edge_borders", cmd_hide_edge_borders },
++#if !defined(WLR_HAS_LIBINPUT_BACKEND)
+ 	{ "input", cmd_input },
++#endif
+ 	{ "mode", cmd_mode },
+ 	{ "mouse_warping", cmd_mouse_warping },
+ 	{ "new_float", cmd_new_float },
+--- a/sway/meson.build
++++ b/sway/meson.build
+@@ -75,7 +75,6 @@
+ 	'commands/max_render_time.c',
+ 	'commands/opacity.c',
+ 	'commands/include.c',
+-	'commands/input.c',
+ 	'commands/layout.c',
+ 	'commands/mode.c',
+ 	'commands/mouse_warping.c',
+@@ -151,6 +150,35 @@
+ 	'commands/bar/workspace_min_width.c',
+ 	'commands/bar/wrap_scroll.c',
+ 
++	'commands/output/adaptive_sync.c',
++	'commands/output/background.c',
++	'commands/output/disable.c',
++	'commands/output/dpms.c',
++	'commands/output/enable.c',
++	'commands/output/max_render_time.c',
++	'commands/output/mode.c',
++	'commands/output/position.c',
++	'commands/output/power.c',
++	'commands/output/render_bit_depth.c',
++	'commands/output/scale.c',
++	'commands/output/scale_filter.c',
++	'commands/output/subpixel.c',
++	'commands/output/toggle.c',
++	'commands/output/transform.c',
++	'commands/output/unplug.c',
++
++	'tree/arrange.c',
++	'tree/container.c',
++	'tree/node.c',
++	'tree/root.c',
++	'tree/view.c',
++	'tree/workspace.c',
++	'tree/output.c',
++)
++
++input_config_files = files(
++	'commands/input.c',
++
+ 	'commands/input/accel_profile.c',
+ 	'commands/input/calibration_matrix.c',
+ 	'commands/input/click_method.c',
+@@ -183,31 +211,6 @@
+ 	'commands/input/xkb_rules.c',
+ 	'commands/input/xkb_switch_layout.c',
+ 	'commands/input/xkb_variant.c',
+-
+-	'commands/output/adaptive_sync.c',
+-	'commands/output/background.c',
+-	'commands/output/disable.c',
+-	'commands/output/dpms.c',
+-	'commands/output/enable.c',
+-	'commands/output/max_render_time.c',
+-	'commands/output/mode.c',
+-	'commands/output/position.c',
+-	'commands/output/power.c',
+-	'commands/output/render_bit_depth.c',
+-	'commands/output/scale.c',
+-	'commands/output/scale_filter.c',
+-	'commands/output/subpixel.c',
+-	'commands/output/toggle.c',
+-	'commands/output/transform.c',
+-	'commands/output/unplug.c',
+-
+-	'tree/arrange.c',
+-	'tree/container.c',
+-	'tree/node.c',
+-	'tree/root.c',
+-	'tree/view.c',
+-	'tree/workspace.c',
+-	'tree/output.c',
+ )
+ 
+ sway_deps = [
+@@ -236,6 +239,7 @@
+ 
+ if wlroots_features['libinput_backend']
+ 	sway_sources += 'input/libinput.c'
++	swat_sources += input_config_files
+ endif
+ 
+ executable(

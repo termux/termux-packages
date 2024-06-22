@@ -1,0 +1,109 @@
+--- a/src/corelib/global/qsystemdetection.h
++++ b/src/corelib/global/qsystemdetection.h
+@@ -78,7 +78,7 @@
+ #  define Q_OS_WEBOS
+ #  define Q_OS_LINUX
+ #elif defined(__ANDROID__) || defined(ANDROID)
+-#  define Q_OS_ANDROID
++#  define Q_OS_ANDROID_EMBEDDED
+ #  define Q_OS_LINUX
+ #elif defined(__CYGWIN__)
+ #  define Q_OS_CYGWIN
+--- a/src/corelib/io/qfilesystemengine_unix.cpp
++++ b/src/corelib/io/qfilesystemengine_unix.cpp
+@@ -66,7 +66,7 @@
+ #endif
+ #endif
+ 
+-#if defined(Q_OS_ANDROID)
++#if defined(Q_OS_ANDROID) || defined(__ANDROID__)
+ // statx() is disabled on Android because quite a few systems
+ // come with sandboxes that kill applications that make system calls outside a
+ // whitelist and several Android vendors can't be bothered to update the list.
+@@ -82,7 +82,7 @@
+ using namespace Qt::StringLiterals;
+ 
+ enum {
+-#ifdef Q_OS_ANDROID
++#if defined(Q_OS_ANDROID) || defined(__ANDROID__)
+     // On Android, the link(2) system call has been observed to always fail
+     // with EACCES, regardless of whether there are permission problems or not.
+     SupportsHardlinking = false
+@@ -644,7 +644,7 @@
+ {
+     Q_CHECK_FILE_NAME(entry, entry);
+ 
+-#if !defined(Q_OS_DARWIN) && !defined(Q_OS_QNX) && !defined(Q_OS_ANDROID) && !defined(Q_OS_HAIKU) && _POSIX_VERSION < 200809L
++#if !defined(Q_OS_DARWIN) && !defined(Q_OS_QNX) && !defined(Q_OS_ANDROID) && !defined(Q_OS_HAIKU) && _POSIX_VERSION < 200809L && !defined(__ANDROID__)
+     // realpath(X,0) is not supported
+     Q_UNUSED(data);
+     return QFileSystemEntry(slowCanonicalized(absoluteName(entry).filePath()));
+@@ -667,7 +667,7 @@
+ # endif
+     };
+     std::unique_ptr<char, decltype (resolved_path_deleter)> resolved_name {nullptr, resolved_path_deleter};
+-# if defined(Q_OS_DARWIN) || defined(Q_OS_ANDROID)
++# if defined(Q_OS_DARWIN) || defined(Q_OS_ANDROID) || defined(__ANDROID__)
+     // On some Android and macOS versions, realpath() will return a path even if
+     // it does not exist. To work around this, we check existence in advance.
+     if (!data.hasFlags(QFileSystemMetaData::ExistsAttribute))
+@@ -798,7 +798,7 @@
+ 
+ #if !defined(Q_OS_INTEGRITY) && !defined(Q_OS_WASM)
+     struct group *gr = nullptr;
+-#if QT_CONFIG(thread) && defined(_POSIX_THREAD_SAFE_FUNCTIONS) && !defined(Q_OS_OPENBSD) && !defined(Q_OS_VXWORKS) && (!defined(Q_OS_ANDROID) || defined(Q_OS_ANDROID) && (__ANDROID_API__ >= 24))
++#if QT_CONFIG(thread) && defined(_POSIX_THREAD_SAFE_FUNCTIONS) && !defined(Q_OS_OPENBSD) && !defined(Q_OS_VXWORKS) && (!defined(Q_OS_ANDROID) || !defined(__ANDROID__) || defined(Q_OS_ANDROID) && (__ANDROID_API__ >= 24))
+     size_max = sysconf(_SC_GETGR_R_SIZE_MAX);
+     if (size_max == -1)
+         size_max = 1024;
+--- a/src/corelib/io/qtemporaryfile_p.h
++++ b/src/corelib/io/qtemporaryfile_p.h
+@@ -22,7 +22,7 @@
+ #include "private/qfile_p.h"
+ #include "qtemporaryfile.h"
+ 
+-#if defined(Q_OS_LINUX) && QT_CONFIG(linkat)
++#if defined(Q_OS_LINUX) && !defined(__ANDROID__) && QT_CONFIG(linkat)
+ #  include <fcntl.h>
+ #  ifdef O_TMPFILE
+ // some early libc support had the wrong values for O_TMPFILE
+--- a/src/corelib/thread/qthread_unix.cpp
++++ b/src/corelib/thread/qthread_unix.cpp
+@@ -61,7 +61,7 @@
+ # define SCHED_IDLE    5
+ #endif
+ 
+-#if defined(Q_OS_DARWIN) || !defined(Q_OS_ANDROID) && !defined(Q_OS_OPENBSD) && defined(_POSIX_THREAD_PRIORITY_SCHEDULING) && (_POSIX_THREAD_PRIORITY_SCHEDULING-0 >= 0)
++#if !defined(__ANDROID__) && (defined(Q_OS_DARWIN) || !defined(Q_OS_OPENBSD) && defined(_POSIX_THREAD_PRIORITY_SCHEDULING) && (_POSIX_THREAD_PRIORITY_SCHEDULING-0 >= 0))
+ #define QT_HAS_THREAD_PRIORITY_SCHEDULING
+ #endif
+ 
+@@ -742,7 +742,7 @@
+ 
+ void QThread::terminate()
+ {
+-#if !defined(Q_OS_ANDROID)
++#if !defined(__ANDROID__)
+     Q_D(QThread);
+     QMutexLocker locker(&d->mutex);
+ 
+@@ -785,7 +785,7 @@
+                "Current thread was not started with QThread.");
+ 
+     Q_UNUSED(thr);
+-#if defined(Q_OS_ANDROID)
++#if defined(Q_OS_ANDROID) || defined(__ANDROID__)
+     Q_UNUSED(enabled);
+ #else
+     pthread_setcancelstate(enabled ? PTHREAD_CANCEL_ENABLE : PTHREAD_CANCEL_DISABLE, nullptr);
+--- a/src/network/ssl/qsslsocket.cpp
++++ b/src/network/ssl/qsslsocket.cpp
+@@ -2958,6 +2958,7 @@
+         ba("/etc/openssl/certs/"), // BlackBerry
+         ba("/opt/openssl/certs/"), // HP-UX
+         ba("/etc/ssl/"), // OpenBSD
++        ba("@TERMUX_PREFIX@/etc/tls/"), // Termux
+     };
+     return QList<QByteArray>::fromReadOnlyData(dirs);
+ }
+ 

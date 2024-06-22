@@ -9,6 +9,11 @@ TERMUX_PKG_DEPENDS="libc++, ncurses, libpcap"
 TERMUX_PKG_EXTRA_MAKE_ARGS="nethogs"
 TERMUX_PKG_BUILD_IN_SRC=true
 
+termux_step_post_get_source() {
+	mv pyproject.toml{,.unused}
+	mv setup.py{,.unused}
+}
+
 termux_step_pre_configure() {
 	CPPFLAGS+=" -Dindex=strchr -Drindex=strrchr -Dquad_t=int64_t"
 }

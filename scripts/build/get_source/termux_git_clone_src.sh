@@ -4,13 +4,13 @@ termux_git_clone_src() {
 
 	if [ ! -f $TMP_CHECKOUT_VERSION ] || [ "$(cat $TMP_CHECKOUT_VERSION)" != "$TERMUX_PKG_VERSION" ]; then
 		if [ "$TERMUX_PKG_GIT_BRANCH" == "" ]; then
-			TERMUX_PKG_GIT_BRANCH=v$TERMUX_PKG_VERSION
+			TERMUX_PKG_GIT_BRANCH=v${TERMUX_PKG_VERSION#*:}
 		fi
 
 		rm -rf $TMP_CHECKOUT
 		git clone --depth 1 \
 			--branch $TERMUX_PKG_GIT_BRANCH \
-			$TERMUX_PKG_SRCURL \
+			${TERMUX_PKG_SRCURL:4} \
 			$TMP_CHECKOUT
 
 		pushd $TMP_CHECKOUT

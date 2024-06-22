@@ -1,0 +1,11 @@
+--- a/below/ethtool/src/reader.rs
++++ b/below/ethtool/src/reader.rs
+@@ -33,7 +33,7 @@ fn ioctl(
+         ifr_ifru: libc::__c_anonymous_ifr_ifru { ifru_data: data },
+     };
+ 
+-    let exit_code = unsafe { libc::ioctl(fd.as_raw_fd(), nix::libc::SIOCETHTOOL, &ifr) };
++    let exit_code = unsafe { libc::ioctl(fd.as_raw_fd(), nix::libc::SIOCETHTOOL.try_into().unwrap(), &ifr) };
+     if exit_code != 0 {
+         return Err(Errno::from_i32(exit_code));
+     }

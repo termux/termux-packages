@@ -1,0 +1,19 @@
+diff --git a/Source/Tools/LinuxEmulation/LinuxSyscalls/EmulatedFiles/EmulatedFiles.cpp b/Source/Tools/LinuxEmulation/LinuxSyscalls/EmulatedFiles/EmulatedFiles.cpp
+index bf74c64..2a64a73 100644
+--- a/Source/Tools/LinuxEmulation/LinuxSyscalls/EmulatedFiles/EmulatedFiles.cpp
++++ b/Source/Tools/LinuxEmulation/LinuxSyscalls/EmulatedFiles/EmulatedFiles.cpp
+@@ -33,6 +33,14 @@ $end_info$
+ #include <unistd.h>
+ #include <utility>
+ 
++#if defined(__ANDROID__) && __ANDROID_API__ < 30
++#include <sys/mman.h>
++#define memfd_create(name,flags) syscall(SYS_memfd_create,name,flags)
++#endif
++#ifndef MFD_CLOEXEC
++#define MFD_CLOEXEC 0x0001U
++#endif
++
+ namespace FEX::EmulatedFile {
+   /**
+    * @brief Generates a temporary file using raw FDs

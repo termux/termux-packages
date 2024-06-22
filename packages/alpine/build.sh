@@ -46,8 +46,8 @@ termux_step_post_configure() {
 	$CC_FOR_BUILD help_h_gen.c -o help_h_gen
 	touch -d "next hour" help_c_gen help_h_gen
 }
-termux_step_create_debscripts() {
 
+termux_step_create_debscripts() {
 	echo "#!$TERMUX_PREFIX/bin/sh" >> postinst
 	echo "if [ ! -e $TERMUX_ANDROID_HOME/.alpine-smime/.pwd/MasterPassword.crt ] && [ ! -e $HOME/.alpine-smime/.pwd/MasterPassword.key ]; then" >> postinst
 	echo "echo 'warning making a passwordless masterpasword file'" >> postinst
@@ -56,4 +56,3 @@ termux_step_create_debscripts() {
 	echo "touch \$HOME/.pine-passfile" >> postinst
 	echo "fi" >> postinst
 }
-

@@ -1,5 +1,16 @@
 --- a/ckutio.c
 +++ b/ckutio.c
+@@ -39,6 +39,10 @@
+ 
+ /* Includes */
+ 
++#ifdef __ANDROID__
++#include <pty.h>
++#endif
++
+ #include "ckcsym.h"			/* This must go first   */
+ #include "ckcdeb.h"			/* This must go second  */
+ 
 @@ -492,7 +492,7 @@
  #define LOCK_DIR "/var/spool/locks"
  #else

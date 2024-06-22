@@ -3,9 +3,10 @@ TERMUX_PKG_DESCRIPTION="A highly configurable, next generation framework window 
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Latest release version 4.3 does not support Lua 5.4.
-_COMMIT=5077c8381b6bf7fb8215d24d1f0c683816e27a55
-TERMUX_PKG_VERSION=2022.10.31
-TERMUX_PKG_SRCURL=https://github.com/awesomeWM/awesome.git
+_COMMIT=b54e50ad6cfdcd864a21970b31378f7c64adf3f4
+TERMUX_PKG_VERSION=2023.01.16
+TERMUX_PKG_SRCURL=git+https://github.com/awesomeWM/awesome
+TERMUX_PKG_SHA256=ce0f4ef9105adf1ca04536d60b31dc3aa04cb45e3b1459a63043c34484842ace
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_DEPENDS="dbus, gdk-pixbuf, glib, libcairo, liblua54, libx11, libxcb, libxdg-basedir, libxkbcommon, lua-lgi, pango, startup-notification, xcb-util, xcb-util-cursor, xcb-util-keysyms, xcb-util-wm, xcb-util-xrm"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -23,6 +24,11 @@ termux_step_post_get_source() {
 		echo " is different from what is expected to be: \"$version\""
 		return 1
 	fi
+
+	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum)
+	if [[ "${s}" != "${TERMUX_PKG_SHA256}  "* ]]; then
+		termux_error_exit "Checksum mismatch for source files."
+	fi
 }
 
 termux_step_host_build() {
@@ -37,7 +43,7 @@ termux_step_host_build() {
 	cd imagemagick
 	tar xf $IMAGEMAGICK_TARFILE --strip-components=1
 	./configure --prefix="$prefix" --with-png
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j $TERMUX_PKG_MAKE_PROCESSES
 	make install
 }
 

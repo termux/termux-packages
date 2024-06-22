@@ -4,13 +4,13 @@ TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.13.1
 TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://github.com/nivekuil/rip.git
+TERMUX_PKG_SRCURL=git+https://github.com/nivekuil/rip
 TERMUX_PKG_GIT_BRANCH="${TERMUX_PKG_VERSION}"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
 	termux_setup_rust
-	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
+	cargo build --jobs $TERMUX_PKG_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
 }
 
 termux_step_make_install() {

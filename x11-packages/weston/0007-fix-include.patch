@@ -1,0 +1,28 @@
+--- a/shared/signal.h
++++ b/shared/signal.h
+@@ -23,6 +23,10 @@
+ #ifndef WESTON_SIGNAL_H
+ #define WESTON_SIGNAL_H
+ 
++#ifdef __ANDROID__
++#include_next <signal.h>
++#endif
++
+ #include <wayland-server-core.h>
+ 
+ #ifdef  __cplusplus
+--- a/libweston/input.c
++++ b/libweston/input.c
+@@ -34,7 +34,12 @@
+ #include <sys/mman.h>
+ #include <assert.h>
+ #include <unistd.h>
++#ifndef __ANDROID__
+ #include <values.h>
++#else
++#include <limits.h>
++#include <float.h>
++#endif
+ #include <fcntl.h>
+ #include <limits.h>
+ #include <errno.h>

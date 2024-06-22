@@ -11,7 +11,8 @@ termux_step_override_config_scripts() {
 		return
 	fi
 
-	if [ "$TERMUX_PKG_DEPENDS" != "${TERMUX_PKG_DEPENDS/libllvm/}" ]; then
+	if [ "$TERMUX_PKG_DEPENDS" != "${TERMUX_PKG_DEPENDS/libllvm/}" ] ||
+		[ "$TERMUX_PKG_BUILD_DEPENDS" != "${TERMUX_PKG_BUILD_DEPENDS/libllvm/}" ]; then
 		LLVM_DEFAULT_TARGET_TRIPLE=$TERMUX_HOST_PLATFORM
 		if [ $TERMUX_ARCH = "arm" ]; then
 			LLVM_TARGET_ARCH=ARM
@@ -26,14 +27,14 @@ termux_step_override_config_scripts() {
 		sed $TERMUX_SCRIPTDIR/packages/libllvm/llvm-config.in \
 			-e "s|@TERMUX_PKG_VERSION@|$LIBLLVM_VERSION|g" \
 			-e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
-			-e "s|@TERMUX_PKG_SRCDIR@|$TERMUX_TOPDIR/libllvm/src|g" \
 			-e "s|@LLVM_TARGET_ARCH@|$LLVM_TARGET_ARCH|g" \
 			-e "s|@LLVM_DEFAULT_TARGET_TRIPLE@|$LLVM_DEFAULT_TARGET_TRIPLE|g" \
 			-e "s|@TERMUX_ARCH@|$TERMUX_ARCH|g" > $TERMUX_PREFIX/bin/llvm-config
 		chmod 755 $TERMUX_PREFIX/bin/llvm-config
 	fi
 
-	if [ "$TERMUX_PKG_DEPENDS" != "${TERMUX_PKG_DEPENDS/postgresql/}" ]; then
+	if [ "$TERMUX_PKG_DEPENDS" != "${TERMUX_PKG_DEPENDS/postgresql/}" ] ||
+		[ "$TERMUX_PKG_BUILD_DEPENDS" != "${TERMUX_PKG_BUILD_DEPENDS/postgresql/}" ]; then
 		local postgresql_version=$(. $TERMUX_SCRIPTDIR/packages/postgresql/build.sh; echo $TERMUX_PKG_VERSION)
 		sed $TERMUX_SCRIPTDIR/packages/postgresql/pg_config.in \
 			-e "s|@POSTGRESQL_VERSION@|$postgresql_version|g" \

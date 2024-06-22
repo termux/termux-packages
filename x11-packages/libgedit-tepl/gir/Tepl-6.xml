@@ -1,0 +1,200 @@
+<?xml version="1.0"?>
+<dump>
+  <enum name="TeplSelectionType" get-type="tepl_selection_type_get_type">
+    <member name="TEPL_SELECTION_TYPE_NO_SELECTION" nick="no-selection" value="0"/>
+    <member name="TEPL_SELECTION_TYPE_ON_SAME_LINE" nick="on-same-line" value="1"/>
+    <member name="TEPL_SELECTION_TYPE_MULTIPLE_LINES" nick="multiple-lines" value="2"/>
+  </enum>  <flags name="TeplFileSaverFlags" get-type="tepl_file_saver_flags_get_type">
+    <member name="TEPL_FILE_SAVER_FLAGS_NONE" nick="none" value="0"/>
+    <member name="TEPL_FILE_SAVER_FLAGS_CREATE_BACKUP" nick="create-backup" value="1"/>
+  </flags>
+  <enum name="TeplNewlineType" get-type="tepl_newline_type_get_type">
+    <member name="TEPL_NEWLINE_TYPE_LF" nick="lf" value="0"/>
+    <member name="TEPL_NEWLINE_TYPE_CR" nick="cr" value="1"/>
+    <member name="TEPL_NEWLINE_TYPE_CR_LF" nick="cr-lf" value="2"/>
+  </enum>  <flags name="TeplGutterRendererFoldsState" get-type="tepl_gutter_renderer_folds_state_get_type">
+    <member name="TEPL_GUTTER_RENDERER_FOLDS_STATE_NONE" nick="none" value="0"/>
+    <member name="TEPL_GUTTER_RENDERER_FOLDS_STATE_START_FOLDED" nick="start-folded" value="1"/>
+    <member name="TEPL_GUTTER_RENDERER_FOLDS_STATE_START_OPENED" nick="start-opened" value="2"/>
+    <member name="TEPL_GUTTER_RENDERER_FOLDS_STATE_CONTINUE" nick="continue" value="4"/>
+    <member name="TEPL_GUTTER_RENDERER_FOLDS_STATE_END" nick="end" value="8"/>
+  </flags>
+  <enum name="TeplInfoBarLocation" get-type="tepl_info_bar_location_get_type">
+    <member name="TEPL_INFO_BAR_LOCATION_ALONGSIDE_ICON" nick="alongside-icon" value="0"/>
+    <member name="TEPL_INFO_BAR_LOCATION_BELOW_ICON" nick="below-icon" value="1"/>
+  </enum>  <enum name="TeplSettingsThemeVariant" get-type="tepl_settings_theme_variant_get_type">
+    <member name="TEPL_SETTINGS_THEME_VARIANT_SYSTEM" nick="system" value="0"/>
+    <member name="TEPL_SETTINGS_THEME_VARIANT_LIGHT" nick="light" value="1"/>
+    <member name="TEPL_SETTINGS_THEME_VARIANT_DARK" nick="dark" value="2"/>
+  </enum>  <enum name="TeplSettingsSimpleThemeVariant" get-type="tepl_settings_simple_theme_variant_get_type">
+    <member name="TEPL_SETTINGS_SIMPLE_THEME_VARIANT_LIGHT" nick="light" value="0"/>
+    <member name="TEPL_SETTINGS_SIMPLE_THEME_VARIANT_DARK" nick="dark" value="1"/>
+  </enum>  <class name="TeplFile" get-type="tepl_file_get_type" parents="GObject">
+    <property name="location" type="GFile" flags="231"/>
+    <property name="newline-type" type="TeplNewlineType" flags="225" default-value="TEPL_NEWLINE_TYPE_LF"/>
+    <property name="short-name" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="full-name" type="gchararray" flags="225" default-value="NULL"/>
+  </class>
+  <class name="TeplPrefsDialog" get-type="tepl_prefs_dialog_get_type" parents="GtkDialog,GtkWindow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+  </class>
+  <class name="TeplMetadata" get-type="tepl_metadata_get_type" parents="GObject">
+  </class>
+  <class name="TeplBuffer" get-type="tepl_buffer_get_type" parents="GtkSourceBuffer,GtkTextBuffer,GObject">
+    <property name="tepl-short-title" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="tepl-full-title" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="tepl-style-scheme-id" type="gchararray" flags="227" default-value=""/>
+    <signal name="tepl-cursor-moved" return="void" when="first">
+    </signal>
+  </class>
+  <class name="TeplView" get-type="tepl_view_get_type" parents="GtkSourceView,GtkTextView,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkScrollable"/>
+  </class>
+  <class name="TeplGotoLineBar" get-type="tepl_goto_line_bar_get_type" parents="GtkGrid,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+  </class>
+  <class name="TeplTab" get-type="tepl_tab_get_type" parents="GtkGrid,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <implements name="TeplTabGroup"/>
+    <property name="view" type="TeplView" flags="235"/>
+    <signal name="close-request" return="void" when="last">
+    </signal>
+  </class>
+  <class name="TeplAbstractFactory" get-type="tepl_abstract_factory_get_type" parents="GObject">
+  </class>
+  <class name="TeplApplication" get-type="tepl_application_get_type" parents="GObject">
+    <property name="application" type="GtkApplication" flags="235"/>
+  </class>
+  <interface name="TeplTabGroup" get-type="tepl_tab_group_get_type">
+    <property name="active-buffer" type="TeplBuffer" flags="225"/>
+    <property name="active-tab" type="TeplTab" flags="227"/>
+    <property name="active-view" type="TeplView" flags="225"/>
+  </interface>
+  <class name="TeplApplicationWindow" get-type="tepl_application_window_get_type" parents="GObject">
+    <implements name="TeplTabGroup"/>
+    <property name="application-window" type="GtkApplicationWindow" flags="235"/>
+    <property name="handle-title" type="gboolean" flags="231" default-value="FALSE"/>
+  </class>
+  <class name="TeplFileLoader" get-type="tepl_file_loader_get_type" parents="GObject">
+    <property name="buffer" type="TeplBuffer" flags="235"/>
+    <property name="file" type="TeplFile" flags="235"/>
+    <property name="location" type="GFile" flags="235"/>
+  </class>
+  <class name="TeplFileSaver" get-type="tepl_file_saver_get_type" parents="GObject">
+    <property name="buffer" type="TeplBuffer" flags="235"/>
+    <property name="file" type="TeplFile" flags="235"/>
+    <property name="location" type="GFile" flags="235"/>
+    <property name="newline-type" type="TeplNewlineType" flags="231" default-value="TEPL_NEWLINE_TYPE_LF"/>
+    <property name="flags" type="TeplFileSaverFlags" flags="231" default-value="TEPL_FILE_SAVER_FLAGS_NONE"/>
+  </class>
+  <class name="TeplFoldRegion" get-type="tepl_fold_region_get_type" parents="GObject">
+    <property name="buffer" type="GtkTextBuffer" flags="235"/>
+    <property name="folded" type="gboolean" flags="227" default-value="FALSE"/>
+  </class>
+  <class name="TeplGutterRendererFolds" get-type="tepl_gutter_renderer_folds_get_type" parents="GtkSourceGutterRenderer,GInitiallyUnowned,GObject">
+  </class>
+  <class name="TeplInfoBar" get-type="tepl_info_bar_get_type" parents="GtkInfoBar,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="icon-from-message-type" type="gboolean" flags="231" default-value="FALSE"/>
+    <property name="icon-name" type="gchararray" flags="231" default-value="NULL"/>
+    <property name="handle-close-response" type="gboolean" flags="231" default-value="FALSE"/>
+  </class>
+  <interface name="TeplLanguageChooser" get-type="tepl_language_chooser_get_type">
+    <signal name="language-activated" return="void" when="last">
+      <param type="GtkSourceLanguage"/>
+    </signal>
+  </interface>
+  <class name="TeplLanguageChooserDialog" get-type="tepl_language_chooser_dialog_get_type" parents="GtkDialog,GtkWindow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="TeplLanguageChooser"/>
+  </class>
+  <class name="TeplLanguageChooserWidget" get-type="tepl_language_chooser_widget_get_type" parents="GtkGrid,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <implements name="TeplLanguageChooser"/>
+  </class>
+  <class name="TeplLineColumnIndicator" get-type="tepl_line_column_indicator_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+  </class>
+  <class name="TeplMetadataManager" get-type="tepl_metadata_manager_get_type" parents="GObject">
+  </class>
+  <class name="TeplNotebook" get-type="tepl_notebook_get_type" parents="GtkNotebook,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="TeplTabGroup"/>
+  </class>
+  <class name="TeplOverwriteIndicator" get-type="tepl_overwrite_indicator_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="overwrite" type="gboolean" flags="227" default-value="FALSE"/>
+  </class>
+  <class name="TeplPanel1" get-type="tepl_panel1_get_type" parents="GtkGrid,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+  </class>
+  <interface name="TeplPanelItem" get-type="tepl_panel_item_get_type">
+  </interface>
+  <interface name="TeplPanel" get-type="tepl_panel_get_type">
+  </interface>
+  <class name="TeplPanelContainer" get-type="tepl_panel_container_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="TeplPanel"/>
+    <signal name="changed" return="void" when="first">
+    </signal>
+  </class>
+  <class name="TeplPanelSwitcherMenu" get-type="tepl_panel_switcher_menu_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+  </class>
+  <class name="TeplPanelSwitcherNotebook" get-type="tepl_panel_switcher_notebook_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+  </class>
+  <class name="TeplProgressInfoBar" get-type="tepl_progress_info_bar_get_type" parents="TeplInfoBar,GtkInfoBar,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="has-cancel-button" type="gboolean" flags="235" default-value="TRUE"/>
+  </class>
+  <class name="TeplSettings" get-type="tepl_settings_get_type" parents="GObject">
+    <signal name="font-changed" return="void" when="first">
+    </signal>
+  </class>
+  <class name="TeplSpaceDrawerPrefs" get-type="tepl_space_drawer_prefs_get_type" parents="GtkGrid,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+  </class>
+  <class name="TeplStatusMenuButton" get-type="tepl_status_menu_button_get_type" parents="GtkMenuButton,GtkToggleButton,GtkButton,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkActionable"/>
+    <implements name="GtkActivatable"/>
+  </class>
+  <class name="TeplStyleSchemeChooserWidget" get-type="tepl_style_scheme_chooser_widget_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkSourceStyleSchemeChooser"/>
+    <property name="tepl-style-scheme-id" type="gchararray" flags="227" default-value=""/>
+  </class>
+  <class name="TeplTabLabel" get-type="tepl_tab_label_get_type" parents="GtkGrid,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="tab" type="TeplTab" flags="235"/>
+  </class>
+</dump>

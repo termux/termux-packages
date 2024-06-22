@@ -4,12 +4,13 @@ TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.1
 TERMUX_PKG_REVISION=1
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PROVIDES="libexecinfo"
 TERMUX_PKG_CONFLICTS="libexecinfo"
 
-# Files are taken from the Bionic libc repo. 
+# Files are taken from the Bionic libc repo.
 # exexinfo.h: https://android.googlesource.com/platform/bionic/+/refs/heads/master/libc/include/execinfo.h
 # execinfo.c: https://android.googlesource.com/platform/bionic/+/refs/heads/master/libc/bionic/execinfo.cpp
 termux_step_make() {

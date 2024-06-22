@@ -1,0 +1,11 @@
+--- a/src/edge_management.c
++++ b/src/edge_management.c
+@@ -392,7 +392,7 @@
+ };
+ 
+ /* Map topic number to function */
+-static const size_t (*mgmt_events[])(strbuf_t *buf, char *tag, int data0, void *data1) = {
++static size_t (*const mgmt_events[])(strbuf_t *buf, char *tag, int data0, void *data1) = {
+     [N2N_EVENT_DEBUG] = event_debug,
+     [N2N_EVENT_TEST] = event_test,
+     [N2N_EVENT_PEER] = event_peer,

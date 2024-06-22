@@ -1,21 +1,22 @@
 --- a/Makefile
 +++ b/Makefile
-@@ -14,17 +14,17 @@
+@@ -14,18 +14,18 @@
  MAKEFLAGS += --no-print-directory
  endif
  
 -PREFIX?=/usr
 -SBINDIR?=/sbin
--CONFDIR?=/etc/iproute2
 -NETNS_RUN_DIR?=/var/run/netns
 -NETNS_ETC_DIR?=/etc/netns
-+PREFIX?=@TERMUX_PREFIX@
++PREFIX?=$(PREFIX)/usr
 +SBINDIR?=$(PREFIX)/bin
-+CONFDIR?=$(PREFIX)/etc/iproute2
 +NETNS_RUN_DIR?=$(PREFIX)/var/run/netns
 +NETNS_ETC_DIR?=$(PREFIX)/etc/netns
  DATADIR?=$(PREFIX)/share
  HDRDIR?=$(PREFIX)/include/iproute2
+-CONF_ETC_DIR?=/etc/iproute2
++CONF_ETC_DIR?=$(PREFIX)/etc/iproute2
+ CONF_USR_DIR?=$(DATADIR)/iproute2
  DOCDIR?=$(DATADIR)/doc/iproute2
  MANDIR?=$(DATADIR)/man
 -ARPDDIR?=/var/lib/arpd

@@ -16,6 +16,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 
 termux_step_pre_configure() {
 	cp $TERMUX_PKG_HOSTBUILD_DIR/bc/libmath.h \
-	   $TERMUX_PKG_SRCDIR/bc/libmath.h
+		$TERMUX_PKG_SRCDIR/bc/libmath.h
 	touch -d "next hour" $TERMUX_PKG_SRCDIR/bc/libmath.h
 }

@@ -1,0 +1,91 @@
+--- a/internal/updater/updater.go
++++ b/internal/updater/updater.go
+@@ -15,6 +15,9 @@
+ // You should have received a copy of the GNU General Public License
+ // along with Proton Mail Bridge.  If not, see <https://www.gnu.org/licenses/>.
+ 
++//go:build !android
++// +build !android
++
+ package updater
+ 
+ import (
+--- /dev/null
++++ b/internal/updater/updater_android.go
+@@ -0,0 +1,76 @@
++// Copyright (c) 2023 Proton AG
++//
++// This file is part of Proton Mail Bridge.
++//
++// Proton Mail Bridge is free software: you can redistribute it and/or modify
++// it under the terms of the GNU General Public License as published by
++// the Free Software Foundation, either version 3 of the License, or
++// (at your option) any later version.
++//
++// Proton Mail Bridge is distributed in the hope that it will be useful,
++// but WITHOUT ANY WARRANTY; without even the implied warranty of
++// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++// GNU General Public License for more details.
++//
++// You should have received a copy of the GNU General Public License
++// along with Proton Mail Bridge.  If not, see <https://www.gnu.org/licenses/>.
++
++//go:build android
++// +build android
++
++package updater
++
++import (
++	"context"
++	"io"
++
++	"github.com/Masterminds/semver/v3"
++	"github.com/ProtonMail/gopenpgp/v2/crypto"
++	"github.com/ProtonMail/proton-bridge/v3/internal/versioner"
++	"github.com/pkg/errors"
++)
++
++var (
++	ErrDownloadVerify         = errors.New("failed to download or verify the update")
++	ErrInstall                = errors.New("failed to install the update")
++	ErrUpdateAlreadyInstalled = errors.New("update is already installed")
++)
++
++type Downloader interface {
++	DownloadAndVerify(ctx context.Context, kr *crypto.KeyRing, url, sig string) ([]byte, error)
++}
++
++type Installer interface {
++	IsAlreadyInstalled(*semver.Version) bool
++	InstallUpdate(*semver.Version, io.Reader) error
++}
++
++type Updater struct {
++	versioner *versioner.Versioner
++	installer Installer
++	verifier  *crypto.KeyRing
++	product   string
++	platform  string
++}
++
++func NewUpdater(ver *versioner.Versioner, verifier *crypto.KeyRing, product, platform string) *Updater {
++	return &Updater{
++		versioner: ver,
++		installer: NewInstaller(ver),
++		verifier:  verifier,
++		product:   product,
++		platform:  platform,
++	}
++}
++
++func (u *Updater) GetVersionInfo(ctx context.Context, downloader Downloader, channel Channel) (VersionInfo, error) {
++	return VersionInfo{}, errors.New("no updates available for this channel")
++}
++
++func (u *Updater) InstallUpdate(ctx context.Context, downloader Downloader, update VersionInfo) error {
++	return nil
++}
++
++func (u *Updater) RemoveOldUpdates() error {
++	return nil
++}

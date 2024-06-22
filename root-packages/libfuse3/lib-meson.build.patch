@@ -14,22 +14,3 @@ diff -uNr libfuse-fuse-3.9.1/lib/meson.build libfuse-fuse-3.9.1.mod/lib/meson.bu
  
  deps = [ thread_dep ]
  if cfg.get('HAVE_ICONV')
-@@ -27,9 +23,6 @@
- if host_machine.system().startswith('netbsd')
-    deps += [ cc.find_library('perfuse'),
-              cc.find_library('puffs') ]
--else
--   # Required for clock_gettime before glibc 2.17
--   deps += cc.find_library('rt')
- endif
- 
- fusermount_path = join_paths(get_option('prefix'), get_option('bindir'))
-@@ -43,7 +36,7 @@
-                               + '/fuse_versionscript' ])
- 
- pkg = import('pkgconfig')
--pkg.generate(libraries: [ libfuse, '-lpthread' ],
-+pkg.generate(libraries: [ libfuse, '-lc' ],
-              libraries_private: '-ldl',
-              version: meson.project_version(),
-              name: 'fuse3',

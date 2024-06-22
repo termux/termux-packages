@@ -1,12 +1,12 @@
 # X11 package
 TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="X.Org Autotools macros"
-# License: HPND
+# Licenses: HPND, MIT
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.19.3
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/util/util-macros-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=0f812e6e9d2786ba8f54b960ee563c0663ddbe2434bf24ff193f5feab1f31971
+TERMUX_PKG_VERSION="1.20.1"
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/util/util-macros-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=0b308f62dce78ac0f4d9de6888234bf170f276b64ac7c96e99779bb4319bcef5
 TERMUX_PKG_PLATFORM_INDEPENDENT=true

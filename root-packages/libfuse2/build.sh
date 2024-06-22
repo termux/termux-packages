@@ -6,6 +6,8 @@ TERMUX_PKG_VERSION=2.9.9
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/libfuse/libfuse/archive/fuse-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=e57a24721177c3b3dd71cb9239ca46b4dee283db9388d48f7ccd256184982194
+#that package is a snapshot, it does not need to be updated.
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="libiconv"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="

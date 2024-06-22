@@ -1,0 +1,14 @@
+--- a/torch/csrc/jit/python/python_list.cpp.orig
++++ b/torch/csrc/jit/python/python_list.cpp
+@@ -28,7 +28,11 @@
+ 
+ namespace {
+ py::list scriptListToPyList(const ScriptList& src) {
++#ifndef __LP64__
++  py::list out(static_cast<ptrdiff_t>(src.len()));
++#else
+   py::list out(src.len());
++#endif
+   auto iter = src.iter();
+ 
+   size_t i = 0;

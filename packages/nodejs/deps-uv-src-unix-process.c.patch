@@ -1,7 +1,6 @@
-diff '--color=auto' -uNr node-v18.0.0.orig/deps/uv/src/unix/process.c node-v18.0.0/deps/uv/src/unix/process.c
---- node-v18.0.0.orig/deps/uv/src/unix/process.c	2022-04-21 15:15:32.631869790 +0530
-+++ node-v18.0.0/deps/uv/src/unix/process.c	2022-04-21 15:42:34.267175190 +0530
-@@ -303,23 +303,6 @@
+--- ./deps/uv/src/unix/process.c.orig	2022-11-23 18:29:41.212329442 +0530
++++ ./deps/uv/src/unix/process.c	2022-11-23 18:32:37.602329375 +0530
+@@ -351,23 +351,6 @@
    if (options->cwd != NULL && chdir(options->cwd))
      uv__write_errno(error_fd);
  
@@ -22,6 +21,6 @@ diff '--color=auto' -uNr node-v18.0.0.orig/deps/uv/src/unix/process.c node-v18.0
 -  if ((options->flags & UV_PROCESS_SETUID) && setuid(options->uid))
 -    uv__write_errno(error_fd);
 -
-   if (options->env != NULL) {
+   if (options->env != NULL)
      environ = options->env;
-   }
+ 

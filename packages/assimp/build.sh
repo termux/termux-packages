@@ -1,10 +1,10 @@
-TERMUX_PKG_HOMEPAGE=http://assimp.sourceforge.net/index.html
+TERMUX_PKG_HOMEPAGE=https://assimp.sourceforge.net/index.html
 TERMUX_PKG_DESCRIPTION="Library to import various well-known 3D model formats in an uniform manner"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="5.2.5"
+TERMUX_PKG_VERSION="5.4.1"
 TERMUX_PKG_SRCURL=https://github.com/assimp/assimp/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=b5219e63ae31d895d60d98001ee5bb809fb2c7b2de1e7f78ceeb600063641e1a
+TERMUX_PKG_SHA256=a1bf71c4eb851ca336bba301730cd072b366403e98e3739d6a024f6313b8f954
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libc++, zlib"
 TERMUX_PKG_BUILD_DEPENDS="boost, boost-headers"
