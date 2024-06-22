@@ -1,0 +1,38 @@
+From 105a9e3dcf95ba64e7737a479579e20063ead0bb Mon Sep 17 00:00:00 2001
+From: Christian Clason <c.clason@uni-graz.at>
+Date: Sat, 8 Jun 2024 10:19:28 +0200
+Subject: [PATCH] build(deps): bump tree-sitter-vimdoc to v3.0.0
+
+---
+ runtime/queries/vimdoc/highlights.scm | 16 +++++++++++-----
+ 2 files changed, 13 insertions(+), 7 deletions(-)
+
+diff --git a/runtime/queries/vimdoc/highlights.scm b/runtime/queries/vimdoc/highlights.scm
+index 70a3a2f2060723..194c80362c4091 100644
+--- a/runtime/queries/vimdoc/highlights.scm
++++ b/runtime/queries/vimdoc/highlights.scm
+@@ -1,13 +1,19 @@
+-(h1) @markup.heading.1
++(h1
++  (delimiter) @markup.heading.1
++  (heading) @markup.heading.1)
+ 
+-(h2) @markup.heading.2
++(h2
++  (delimiter) @markup.heading.2
++  (heading) @markup.heading.2)
+ 
+-(h3) @markup.heading.3
++(h3
++  (heading) @markup.heading.3)
+ 
+-(column_heading) @markup.heading.4
++(column_heading
++  (heading) @markup.heading.4)
+ 
+ (column_heading
+-  "~" @markup.heading.4
++  (delimiter) @markup.heading.4
+   (#set! conceal ""))
+ 
+ (tag
