@@ -1,4 +1,4 @@
-termux_step_handle_hostbuild() {
+termux_step_handle_host_build() {
 	[ "$TERMUX_PKG_METAPACKAGE" = "true" ] && return
 	[ "$TERMUX_PKG_HOSTBUILD" = "false" ] && return
 
