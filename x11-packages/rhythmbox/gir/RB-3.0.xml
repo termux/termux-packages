@@ -1,0 +1,1061 @@
+<?xml version="1.0"?>
+<dump>
+  <class name="RBAsyncCopy" get-type="rb_async_copy_get_type" parents="GObject">
+  </class>
+  <class name="RBChunkLoader" get-type="rb_chunk_loader_get_type" parents="GObject">
+  </class>
+  <class name="RBListModel" get-type="rb_list_model_get_type" parents="GObject">
+    <signal name="items-changed" return="void" when="last">
+      <param type="gint"/>
+      <param type="gint"/>
+      <param type="gint"/>
+    </signal>
+  </class>
+  <class name="RBStringValueMap" get-type="rb_string_value_map_get_type" parents="GObject">
+  </class>
+  <enum name="RBTaskOutcome" get-type="rb_task_outcome_get_type">
+    <member name="RB_TASK_OUTCOME_NONE" nick="none" value="0"/>
+    <member name="RB_TASK_OUTCOME_COMPLETE" nick="complete" value="1"/>
+    <member name="RB_TASK_OUTCOME_CANCELLED" nick="cancelled" value="2"/>
+  </enum>  <interface name="RBTaskProgress" get-type="rb_task_progress_get_type">
+    <property name="task-cancellable" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="task-detail" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="task-label" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="task-notify" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="task-outcome" type="RBTaskOutcome" flags="3" default-value="RB_TASK_OUTCOME_NONE"/>
+    <property name="task-progress" type="gdouble" flags="3" default-value="0.000000"/>
+  </interface>
+  <class name="RBTaskProgressSimple" get-type="rb_task_progress_simple_get_type" parents="GObject">
+    <implements name="RBTaskProgress"/>
+    <signal name="cancel-task" return="void" when="last">
+    </signal>
+  </class>
+  <boxed name="RBRefString" get-type="rb_refstring_get_type"/>
+  <boxed name="RhythmDBEntry" get-type="rhythmdb_entry_get_type"/>
+  <enum name="RhythmDBEntryCategory" get-type="rhythmdb_entry_category_get_type">
+    <member name="RHYTHMDB_ENTRY_NORMAL" nick="normal" value="0"/>
+    <member name="RHYTHMDB_ENTRY_STREAM" nick="stream" value="1"/>
+    <member name="RHYTHMDB_ENTRY_CONTAINER" nick="container" value="2"/>
+    <member name="RHYTHMDB_ENTRY_VIRTUAL" nick="virtual" value="3"/>
+  </enum>  <enum name="RhythmDBEntryAvailability" get-type="rhythmdb_entry_availability_get_type">
+    <member name="RHYTHMDB_ENTRY_AVAIL_CHECKED" nick="checked" value="0"/>
+    <member name="RHYTHMDB_ENTRY_AVAIL_MOUNTED" nick="mounted" value="1"/>
+    <member name="RHYTHMDB_ENTRY_AVAIL_UNMOUNTED" nick="unmounted" value="2"/>
+    <member name="RHYTHMDB_ENTRY_AVAIL_NOT_FOUND" nick="not-found" value="3"/>
+  </enum>  <class name="RhythmDBEntryType" get-type="rhythmdb_entry_type_get_type" parents="GObject">
+    <property name="db" type="RhythmDB" flags="11"/>
+    <property name="name" type="gchararray" flags="11" default-value="NULL"/>
+    <property name="save-to-disk" type="gboolean" flags="11" default-value="FALSE"/>
+    <property name="type-data-size" type="guint" flags="11" default-value="0"/>
+    <property name="category" type="RhythmDBEntryCategory" flags="11" default-value="RHYTHMDB_ENTRY_NORMAL"/>
+    <property name="cache-name" type="gchararray" flags="11" default-value="NULL"/>
+  </class>
+  <interface name="RhythmDBQueryResults" get-type="rhythmdb_query_results_get_type">
+  </interface>
+  <boxed name="RBExtDBKey" get-type="rb_ext_db_key_get_type"/>
+  <boxed name="RhythmDBQuery" get-type="rhythmdb_query_get_type"/>
+  <enum name="RhythmDBQueryType" get-type="rhythmdb_query_type_get_type">
+    <member name="RHYTHMDB_QUERY_END" nick="query-end" value="0"/>
+    <member name="RHYTHMDB_QUERY_DISJUNCTION" nick="disjunctive-marker" value="1"/>
+    <member name="RHYTHMDB_QUERY_SUBQUERY" nick="subquery" value="2"/>
+    <member name="RHYTHMDB_QUERY_PROP_EQUALS" nick="equals" value="3"/>
+    <member name="RHYTHMDB_QUERY_PROP_NOT_EQUAL" nick="not-equal" value="4"/>
+    <member name="RHYTHMDB_QUERY_PROP_LIKE" nick="fuzzy-match" value="5"/>
+    <member name="RHYTHMDB_QUERY_PROP_NOT_LIKE" nick="inverted-fuzzy-match" value="6"/>
+    <member name="RHYTHMDB_QUERY_PROP_PREFIX" nick="starts-with" value="7"/>
+    <member name="RHYTHMDB_QUERY_PROP_SUFFIX" nick="ends-with" value="8"/>
+    <member name="RHYTHMDB_QUERY_PROP_GREATER" nick="greater-than" value="9"/>
+    <member name="RHYTHMDB_QUERY_PROP_LESS" nick="less-than" value="10"/>
+    <member name="RHYTHMDB_QUERY_PROP_CURRENT_TIME_WITHIN" nick="within-current-time" value="11"/>
+    <member name="RHYTHMDB_QUERY_PROP_CURRENT_TIME_NOT_WITHIN" nick="not-within-current-time" value="12"/>
+    <member name="RHYTHMDB_QUERY_PROP_YEAR_EQUALS" nick="year-equals" value="13"/>
+    <member name="RHYTHMDB_QUERY_PROP_YEAR_NOT_EQUAL" nick="year-not-equals" value="14"/>
+    <member name="RHYTHMDB_QUERY_PROP_YEAR_GREATER" nick="year-greater-than" value="15"/>
+    <member name="RHYTHMDB_QUERY_PROP_YEAR_LESS" nick="year-less-than" value="16"/>
+  </enum>  <enum name="RhythmDBPropType" get-type="rhythmdb_prop_type_get_type">
+    <member name="RHYTHMDB_PROP_TYPE" nick="type" value="0"/>
+    <member name="RHYTHMDB_PROP_ENTRY_ID" nick="entry-id" value="1"/>
+    <member name="RHYTHMDB_PROP_TITLE" nick="title" value="2"/>
+    <member name="RHYTHMDB_PROP_GENRE" nick="genre" value="3"/>
+    <member name="RHYTHMDB_PROP_ARTIST" nick="artist" value="4"/>
+    <member name="RHYTHMDB_PROP_ALBUM" nick="album" value="5"/>
+    <member name="RHYTHMDB_PROP_TRACK_NUMBER" nick="track-number" value="6"/>
+    <member name="RHYTHMDB_PROP_TRACK_TOTAL" nick="track-total" value="7"/>
+    <member name="RHYTHMDB_PROP_DISC_NUMBER" nick="disc-number" value="8"/>
+    <member name="RHYTHMDB_PROP_DISC_TOTAL" nick="disc-total" value="9"/>
+    <member name="RHYTHMDB_PROP_DURATION" nick="duration" value="10"/>
+    <member name="RHYTHMDB_PROP_FILE_SIZE" nick="file-size" value="11"/>
+    <member name="RHYTHMDB_PROP_LOCATION" nick="location" value="12"/>
+    <member name="RHYTHMDB_PROP_MOUNTPOINT" nick="mountpoint" value="13"/>
+    <member name="RHYTHMDB_PROP_MTIME" nick="mtime" value="14"/>
+    <member name="RHYTHMDB_PROP_FIRST_SEEN" nick="first-seen" value="15"/>
+    <member name="RHYTHMDB_PROP_LAST_SEEN" nick="last-seen" value="16"/>
+    <member name="RHYTHMDB_PROP_RATING" nick="rating" value="17"/>
+    <member name="RHYTHMDB_PROP_PLAY_COUNT" nick="play-count" value="18"/>
+    <member name="RHYTHMDB_PROP_LAST_PLAYED" nick="last-played" value="19"/>
+    <member name="RHYTHMDB_PROP_BITRATE" nick="bitrate" value="20"/>
+    <member name="RHYTHMDB_PROP_DATE" nick="date" value="21"/>
+    <member name="RHYTHMDB_PROP_TRACK_GAIN" nick="replaygain-track-gain" value="22"/>
+    <member name="RHYTHMDB_PROP_TRACK_PEAK" nick="replaygain-track-peak" value="23"/>
+    <member name="RHYTHMDB_PROP_ALBUM_GAIN" nick="replaygain-album-gain" value="24"/>
+    <member name="RHYTHMDB_PROP_ALBUM_PEAK" nick="replaygain-album-peak" value="25"/>
+    <member name="RHYTHMDB_PROP_MEDIA_TYPE" nick="media-type" value="26"/>
+    <member name="RHYTHMDB_PROP_TITLE_SORT_KEY" nick="title-sort-key" value="27"/>
+    <member name="RHYTHMDB_PROP_GENRE_SORT_KEY" nick="genre-sort-key" value="28"/>
+    <member name="RHYTHMDB_PROP_ARTIST_SORT_KEY" nick="artist-sort-key" value="29"/>
+    <member name="RHYTHMDB_PROP_ALBUM_SORT_KEY" nick="album-sort-key" value="30"/>
+    <member name="RHYTHMDB_PROP_TITLE_FOLDED" nick="title-folded" value="31"/>
+    <member name="RHYTHMDB_PROP_GENRE_FOLDED" nick="genre-folded" value="32"/>
+    <member name="RHYTHMDB_PROP_ARTIST_FOLDED" nick="artist-folded" value="33"/>
+    <member name="RHYTHMDB_PROP_ALBUM_FOLDED" nick="album-folded" value="34"/>
+    <member name="RHYTHMDB_PROP_LAST_PLAYED_STR" nick="last-played-str" value="35"/>
+    <member name="RHYTHMDB_PROP_HIDDEN" nick="hidden" value="36"/>
+    <member name="RHYTHMDB_PROP_PLAYBACK_ERROR" nick="playback-error" value="37"/>
+    <member name="RHYTHMDB_PROP_FIRST_SEEN_STR" nick="first-seen-str" value="38"/>
+    <member name="RHYTHMDB_PROP_LAST_SEEN_STR" nick="last-seen-str" value="39"/>
+    <member name="RHYTHMDB_PROP_SEARCH_MATCH" nick="search-match" value="40"/>
+    <member name="RHYTHMDB_PROP_YEAR" nick="year" value="41"/>
+    <member name="RHYTHMDB_PROP_KEYWORD" nick="keyword" value="42"/>
+    <member name="RHYTHMDB_PROP_STATUS" nick="status" value="43"/>
+    <member name="RHYTHMDB_PROP_DESCRIPTION" nick="description" value="44"/>
+    <member name="RHYTHMDB_PROP_SUBTITLE" nick="subtitle" value="45"/>
+    <member name="RHYTHMDB_PROP_SUMMARY" nick="summary" value="46"/>
+    <member name="RHYTHMDB_PROP_LANG" nick="lang" value="47"/>
+    <member name="RHYTHMDB_PROP_COPYRIGHT" nick="copyright" value="48"/>
+    <member name="RHYTHMDB_PROP_IMAGE" nick="image" value="49"/>
+    <member name="RHYTHMDB_PROP_POST_TIME" nick="post-time" value="50"/>
+    <member name="RHYTHMDB_PROP_PODCAST_GUID" nick="podcast-guid" value="51"/>
+    <member name="RHYTHMDB_PROP_MUSICBRAINZ_TRACKID" nick="mb-trackid" value="52"/>
+    <member name="RHYTHMDB_PROP_MUSICBRAINZ_ARTISTID" nick="mb-artistid" value="53"/>
+    <member name="RHYTHMDB_PROP_MUSICBRAINZ_ALBUMID" nick="mb-albumid" value="54"/>
+    <member name="RHYTHMDB_PROP_MUSICBRAINZ_ALBUMARTISTID" nick="mb-albumartistid" value="55"/>
+    <member name="RHYTHMDB_PROP_ARTIST_SORTNAME" nick="mb-artistsortname" value="56"/>
+    <member name="RHYTHMDB_PROP_ALBUM_SORTNAME" nick="album-sortname" value="57"/>
+    <member name="RHYTHMDB_PROP_ARTIST_SORTNAME_SORT_KEY" nick="artist-sortname-sort-key" value="58"/>
+    <member name="RHYTHMDB_PROP_ARTIST_SORTNAME_FOLDED" nick="artist-sortname-folded" value="59"/>
+    <member name="RHYTHMDB_PROP_ALBUM_SORTNAME_SORT_KEY" nick="album-sortname-sort-key" value="60"/>
+    <member name="RHYTHMDB_PROP_ALBUM_SORTNAME_FOLDED" nick="album-sortname-folded" value="61"/>
+    <member name="RHYTHMDB_PROP_COMMENT" nick="comment" value="62"/>
+    <member name="RHYTHMDB_PROP_ALBUM_ARTIST" nick="album-artist" value="63"/>
+    <member name="RHYTHMDB_PROP_ALBUM_ARTIST_SORT_KEY" nick="album-artist-sort-key" value="64"/>
+    <member name="RHYTHMDB_PROP_ALBUM_ARTIST_FOLDED" nick="album-artist-folded" value="65"/>
+    <member name="RHYTHMDB_PROP_ALBUM_ARTIST_SORTNAME" nick="album-artist-sortname" value="66"/>
+    <member name="RHYTHMDB_PROP_ALBUM_ARTIST_SORTNAME_SORT_KEY" nick="album-artist-sortname-sort-key" value="67"/>
+    <member name="RHYTHMDB_PROP_ALBUM_ARTIST_SORTNAME_FOLDED" nick="album-artist-sortname-folded" value="68"/>
+    <member name="RHYTHMDB_PROP_BPM" nick="beats-per-minute" value="69"/>
+    <member name="RHYTHMDB_PROP_COMPOSER" nick="composer" value="70"/>
+    <member name="RHYTHMDB_PROP_COMPOSER_SORT_KEY" nick="composer-sort-key" value="71"/>
+    <member name="RHYTHMDB_PROP_COMPOSER_FOLDED" nick="composer-folded" value="72"/>
+    <member name="RHYTHMDB_PROP_COMPOSER_SORTNAME" nick="composer-sortname" value="73"/>
+    <member name="RHYTHMDB_PROP_COMPOSER_SORTNAME_SORT_KEY" nick="composer-sortname-sort-key" value="74"/>
+    <member name="RHYTHMDB_PROP_COMPOSER_SORTNAME_FOLDED" nick="composer-sortname-folded" value="75"/>
+  </enum>  <boxed name="RhythmDBEntryChange" get-type="rhythmdb_entry_change_get_type"/>
+  <class name="RhythmDB" get-type="rhythmdb_get_type" parents="GObject" abstract="1">
+    <property name="name" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="dry-run" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="no-update" type="gboolean" flags="3" default-value="FALSE"/>
+    <signal name="entry-added" return="void" when="last">
+      <param type="RhythmDBEntry"/>
+    </signal>
+    <signal name="entry-deleted" return="void" when="last">
+      <param type="RhythmDBEntry"/>
+    </signal>
+    <signal name="entry-changed" return="void" when="last">
+      <param type="RhythmDBEntry"/>
+      <param type="GPtrArray"/>
+    </signal>
+    <signal name="entry-keyword-added" return="void" when="last">
+      <param type="RhythmDBEntry"/>
+      <param type="RBRefString"/>
+    </signal>
+    <signal name="entry-keyword-removed" return="void" when="last">
+      <param type="RhythmDBEntry"/>
+      <param type="RBRefString"/>
+    </signal>
+    <signal name="entry-extra-metadata-request" return="GValue" when="last" detailed="1">
+      <param type="RhythmDBEntry"/>
+    </signal>
+    <signal name="entry-extra-metadata-notify" return="void" when="last" detailed="1">
+      <param type="RhythmDBEntry"/>
+      <param type="gchararray"/>
+      <param type="GValue"/>
+    </signal>
+    <signal name="entry-extra-metadata-gather" return="void" when="last">
+      <param type="RhythmDBEntry"/>
+      <param type="RBStringValueMap"/>
+    </signal>
+    <signal name="load-complete" return="void" when="last">
+    </signal>
+    <signal name="save-complete" return="void" when="last">
+    </signal>
+    <signal name="save-error" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="gpointer"/>
+    </signal>
+    <signal name="read-only" return="void" when="last">
+      <param type="gboolean"/>
+    </signal>
+    <signal name="create-mount-op" return="GMountOperation" when="last">
+    </signal>
+  </class>
+  <enum name="RBEncoderError" get-type="rb_encoder_error_get_type">
+    <member name="RB_ENCODER_ERROR_FORMAT_UNSUPPORTED" nick="format-unsupported" value="0"/>
+    <member name="RB_ENCODER_ERROR_INTERNAL" nick="internal-error" value="1"/>
+    <member name="RB_ENCODER_ERROR_FILE_ACCESS" nick="file-access-error" value="2"/>
+    <member name="RB_ENCODER_ERROR_OUT_OF_SPACE" nick="out-of-space" value="3"/>
+    <member name="RB_ENCODER_ERROR_DEST_READ_ONLY" nick="destination-read-only" value="4"/>
+    <member name="RB_ENCODER_ERROR_DEST_EXISTS" nick="destination-exists" value="5"/>
+  </enum>  <class name="RBEncoderFactory" get-type="rb_encoder_factory_get_type" parents="GObject">
+    <signal name="prepare-source" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="GObject"/>
+    </signal>
+    <signal name="prepare-sink" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="GObject"/>
+    </signal>
+  </class>
+  <interface name="RBEncoder" get-type="rb_encoder_get_type">
+    <signal name="progress" return="void" when="last">
+      <param type="gdouble"/>
+    </signal>
+    <signal name="completed" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="guint64"/>
+      <param type="gchararray"/>
+      <param type="gpointer"/>
+    </signal>
+  </interface>
+  <class name="RBMetaData" get-type="rb_metadata_get_type" parents="GObject">
+  </class>
+  <enum name="RBMetadataFieldType" get-type="rb_metadata_field_get_type">
+    <member name="RB_METADATA_FIELD_TITLE" nick="title" value="0"/>
+    <member name="RB_METADATA_FIELD_ARTIST" nick="artist" value="1"/>
+    <member name="RB_METADATA_FIELD_ALBUM" nick="album" value="2"/>
+    <member name="RB_METADATA_FIELD_DATE" nick="date" value="3"/>
+    <member name="RB_METADATA_FIELD_GENRE" nick="genre" value="4"/>
+    <member name="RB_METADATA_FIELD_COMMENT" nick="comment" value="5"/>
+    <member name="RB_METADATA_FIELD_TRACK_NUMBER" nick="track-number" value="6"/>
+    <member name="RB_METADATA_FIELD_MAX_TRACK_NUMBER" nick="track-count" value="7"/>
+    <member name="RB_METADATA_FIELD_DISC_NUMBER" nick="album-disc-number" value="8"/>
+    <member name="RB_METADATA_FIELD_MAX_DISC_NUMBER" nick="album-disc-count" value="9"/>
+    <member name="RB_METADATA_FIELD_DESCRIPTION" nick="description" value="10"/>
+    <member name="RB_METADATA_FIELD_VERSION" nick="version" value="11"/>
+    <member name="RB_METADATA_FIELD_ISRC" nick="isrc" value="12"/>
+    <member name="RB_METADATA_FIELD_ORGANIZATION" nick="organization" value="13"/>
+    <member name="RB_METADATA_FIELD_COPYRIGHT" nick="copyright" value="14"/>
+    <member name="RB_METADATA_FIELD_CONTACT" nick="contact" value="15"/>
+    <member name="RB_METADATA_FIELD_LICENSE" nick="license" value="16"/>
+    <member name="RB_METADATA_FIELD_PERFORMER" nick="performer" value="17"/>
+    <member name="RB_METADATA_FIELD_DURATION" nick="duration" value="18"/>
+    <member name="RB_METADATA_FIELD_CODEC" nick="codec" value="19"/>
+    <member name="RB_METADATA_FIELD_BITRATE" nick="bitrate" value="20"/>
+    <member name="RB_METADATA_FIELD_TRACK_GAIN" nick="replaygain-track-gain" value="21"/>
+    <member name="RB_METADATA_FIELD_TRACK_PEAK" nick="replaygain-track-peak" value="22"/>
+    <member name="RB_METADATA_FIELD_ALBUM_GAIN" nick="replaygain-album-gain" value="23"/>
+    <member name="RB_METADATA_FIELD_ALBUM_PEAK" nick="replaygain-album-peak" value="24"/>
+    <member name="RB_METADATA_FIELD_BPM" nick="beats-per-minute" value="26"/>
+    <member name="RB_METADATA_FIELD_LANGUAGE_CODE" nick="language-code" value="25"/>
+    <member name="RB_METADATA_FIELD_MUSICBRAINZ_TRACKID" nick="musicbrainz-trackid" value="27"/>
+    <member name="RB_METADATA_FIELD_MUSICBRAINZ_ARTISTID" nick="musicbrainz-artistid" value="28"/>
+    <member name="RB_METADATA_FIELD_MUSICBRAINZ_ALBUMID" nick="musicbrainz-albumid" value="29"/>
+    <member name="RB_METADATA_FIELD_MUSICBRAINZ_ALBUMARTISTID" nick="musicbrainz-albumartistid" value="30"/>
+    <member name="RB_METADATA_FIELD_ARTIST_SORTNAME" nick="musicbrainz-sortname" value="31"/>
+    <member name="RB_METADATA_FIELD_ALBUM_SORTNAME" nick="album-sortname" value="32"/>
+    <member name="RB_METADATA_FIELD_ALBUM_ARTIST" nick="album-artist" value="33"/>
+    <member name="RB_METADATA_FIELD_ALBUM_ARTIST_SORTNAME" nick="album-artist-sortname" value="34"/>
+    <member name="RB_METADATA_FIELD_COMPOSER" nick="composer" value="35"/>
+    <member name="RB_METADATA_FIELD_COMPOSER_SORTNAME" nick="composer-sortname" value="36"/>
+  </enum>  <enum name="RBMetadataErrorType" get-type="rb_metadata_error_get_type">
+    <member name="RB_METADATA_ERROR_IO" nick="io-error" value="0"/>
+    <member name="RB_METADATA_ERROR_MISSING_PLUGIN" nick="missing-plugins" value="1"/>
+    <member name="RB_METADATA_ERROR_UNRECOGNIZED" nick="identify-failed" value="2"/>
+    <member name="RB_METADATA_ERROR_UNSUPPORTED" nick="unsupported-filetype" value="3"/>
+    <member name="RB_METADATA_ERROR_GENERAL" nick="general-error" value="4"/>
+    <member name="RB_METADATA_ERROR_INTERNAL" nick="internal-error" value="5"/>
+    <member name="RB_METADATA_ERROR_EMPTY_FILE" nick="empty-file" value="6"/>
+  </enum>  <enum name="RBPlayerPlayType" get-type="rb_player_play_type_get_type">
+    <member name="RB_PLAYER_PLAY_REPLACE" nick="replace" value="0"/>
+    <member name="RB_PLAYER_PLAY_AFTER_EOS" nick="start-after-eos" value="1"/>
+    <member name="RB_PLAYER_PLAY_CROSSFADE" nick="crossfade" value="2"/>
+  </enum>  <enum name="RBPlayerError" get-type="rb_player_error_get_type">
+    <member name="RB_PLAYER_ERROR_NO_AUDIO" nick="no-audio" value="0"/>
+    <member name="RB_PLAYER_ERROR_GENERAL" nick="general-error" value="1"/>
+    <member name="RB_PLAYER_ERROR_INTERNAL" nick="internal-error" value="2"/>
+    <member name="RB_PLAYER_ERROR_NOT_FOUND" nick="not-found" value="3"/>
+  </enum>  <interface name="RBPlayer" get-type="rb_player_get_type">
+    <signal name="eos" return="void" when="last" no-recurse="1">
+      <param type="gpointer"/>
+      <param type="gboolean"/>
+    </signal>
+    <signal name="info" return="void" when="last">
+      <param type="gpointer"/>
+      <param type="gint"/>
+      <param type="GValue"/>
+    </signal>
+    <signal name="error" return="void" when="last" no-recurse="1">
+      <param type="gpointer"/>
+      <param type="gpointer"/>
+    </signal>
+    <signal name="tick" return="void" when="last">
+      <param type="gpointer"/>
+      <param type="gint64"/>
+      <param type="gint64"/>
+    </signal>
+    <signal name="buffering" return="void" when="last">
+      <param type="gpointer"/>
+      <param type="guint"/>
+    </signal>
+    <signal name="event" return="void" when="last" detailed="1">
+      <param type="gpointer"/>
+      <param type="gpointer"/>
+    </signal>
+    <signal name="playing-stream" return="void" when="last">
+      <param type="gpointer"/>
+    </signal>
+    <signal name="volume-changed" return="void" when="last">
+      <param type="gfloat"/>
+    </signal>
+    <signal name="image" return="void" when="last">
+      <param type="gpointer"/>
+      <param type="GdkPixbuf"/>
+    </signal>
+    <signal name="redirect" return="void" when="last">
+      <param type="gpointer"/>
+      <param type="gchararray"/>
+    </signal>
+  </interface>
+  <interface name="RBPlayerGstFilter" get-type="rb_player_gst_filter_get_type">
+    <signal name="filter-inserted" return="void" when="last" no-recurse="1">
+      <param type="GObject"/>
+    </signal>
+    <signal name="filter-pre-remove" return="void" when="last" no-recurse="1">
+      <param type="GObject"/>
+    </signal>
+  </interface>
+  <interface name="RBPlayerGstTee" get-type="rb_player_gst_tee_get_type">
+    <signal name="tee-inserted" return="void" when="last" no-recurse="1">
+      <param type="GObject"/>
+    </signal>
+    <signal name="tee-pre-remove" return="void" when="last" no-recurse="1">
+      <param type="GObject"/>
+    </signal>
+  </interface>
+  <enum name="RBExtDBSourceType" get-type="rb_ext_db_source_type_get_type">
+    <member name="RB_EXT_DB_SOURCE_NONE" nick="none" value="0"/>
+    <member name="RB_EXT_DB_SOURCE_SEARCH" nick="search" value="1"/>
+    <member name="RB_EXT_DB_SOURCE_EMBEDDED" nick="embedded" value="2"/>
+    <member name="RB_EXT_DB_SOURCE_USER" nick="user" value="3"/>
+    <member name="RB_EXT_DB_SOURCE_USER_EXPLICIT" nick="user-explicit" value="4"/>
+  </enum>  <class name="RBExtDB" get-type="rb_ext_db_get_type" parents="GObject">
+    <property name="name" type="gchararray" flags="11" default-value="NULL"/>
+    <signal name="added" return="void" when="last">
+      <param type="RBExtDBKey"/>
+      <param type="gchararray"/>
+      <param type="GValue"/>
+    </signal>
+    <signal name="request" return="gboolean" when="last">
+      <param type="RBExtDBKey"/>
+      <param type="gulong"/>
+    </signal>
+    <signal name="store" return="gpointer" when="last">
+      <param type="GValue"/>
+    </signal>
+    <signal name="load" return="gpointer" when="last">
+      <param type="GValue"/>
+    </signal>
+  </class>
+  <boxed name="RBPodcastChannel" get-type="rb_podcast_channel_get_type"/>
+  <boxed name="RBPodcastItem" get-type="rb_podcast_item_get_type"/>
+  <enum name="RBPodcastFeedUpdateStatus" get-type="rb_podcast_feed_update_status_get_type">
+    <member name="RB_PODCAST_FEED_UPDATE_STARTED" nick="started" value="0"/>
+    <member name="RB_PODCAST_FEED_UPDATE_ERROR" nick="error" value="1"/>
+    <member name="RB_PODCAST_FEED_UPDATE_ERROR_BG" nick="error-background" value="2"/>
+    <member name="RB_PODCAST_FEED_UPDATE_CONFLICT" nick="conflict" value="3"/>
+    <member name="RB_PODCAST_FEED_UPDATE_CANCELLED" nick="cancelled" value="4"/>
+    <member name="RB_PODCAST_FEED_UPDATE_SUBSCRIBED" nick="subscribed" value="5"/>
+    <member name="RB_PODCAST_FEED_UPDATE_UNCHANGED" nick="unchanged" value="6"/>
+    <member name="RB_PODCAST_FEED_UPDATE_UPDATED" nick="updated" value="7"/>
+  </enum>  <class name="RBPodcastManager" get-type="rb_podcast_manager_get_type" parents="GObject">
+    <property name="db" type="RhythmDB" flags="3"/>
+    <property name="updating" type="gboolean" flags="1" default-value="FALSE"/>
+    <signal name="start-download" return="void" when="last">
+      <param type="RhythmDBEntry"/>
+    </signal>
+    <signal name="finish-download" return="void" when="last">
+      <param type="RhythmDBEntry"/>
+      <param type="GError"/>
+    </signal>
+    <signal name="feed-update-status" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="RBPodcastFeedUpdateStatus"/>
+      <param type="gchararray"/>
+    </signal>
+  </class>
+  <class name="RBPodcastSearch" get-type="rb_podcast_search_get_type" parents="GObject">
+    <signal name="result" return="void" when="last">
+      <param type="gpointer"/>
+    </signal>
+    <signal name="finished" return="void" when="last">
+      <param type="gboolean"/>
+    </signal>
+  </class>
+  <class name="RBPodcastSearchITunes" get-type="rb_podcast_search_itunes_get_type" parents="RBPodcastSearch,GObject">
+  </class>
+  <class name="RhythmDBImportJob" get-type="rhythmdb_import_job_get_type" parents="GObject">
+    <implements name="RBTaskProgress"/>
+    <property name="db" type="RhythmDB" flags="11"/>
+    <property name="entry-type" type="RhythmDBEntryType" flags="11"/>
+    <property name="ignore-type" type="RhythmDBEntryType" flags="11"/>
+    <property name="error-type" type="RhythmDBEntryType" flags="11"/>
+    <signal name="entry-added" return="void" when="last">
+      <param type="RhythmDBEntry"/>
+    </signal>
+    <signal name="status-changed" return="void" when="last">
+      <param type="gint"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="scan-complete" return="void" when="last">
+      <param type="gint"/>
+    </signal>
+    <signal name="complete" return="void" when="last">
+      <param type="gint"/>
+    </signal>
+  </class>
+  <enum name="RhythmDBQueryModelLimitType" get-type="rhythmdb_query_model_limit_type_get_type">
+    <member name="RHYTHMDB_QUERY_MODEL_LIMIT_NONE" nick="no-limit" value="0"/>
+    <member name="RHYTHMDB_QUERY_MODEL_LIMIT_COUNT" nick="limit-count" value="1"/>
+    <member name="RHYTHMDB_QUERY_MODEL_LIMIT_SIZE" nick="limit-size" value="2"/>
+    <member name="RHYTHMDB_QUERY_MODEL_LIMIT_TIME" nick="limit-duration" value="3"/>
+  </enum>  <class name="RhythmDBQueryModel" get-type="rhythmdb_query_model_get_type" parents="GObject">
+    <implements name="RhythmDBQueryResults"/>
+    <implements name="GtkTreeModel"/>
+    <implements name="RbTreeDragSource"/>
+    <implements name="RbTreeDragDest"/>
+    <property name="db" type="RhythmDB" flags="11"/>
+    <property name="query" type="gpointer" flags="3"/>
+    <property name="sort-func" type="gpointer" flags="3"/>
+    <property name="sort-data" type="gpointer" flags="3"/>
+    <property name="sort-data-destroy" type="gpointer" flags="3"/>
+    <property name="sort-reverse" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="limit-type" type="RhythmDBQueryModelLimitType" flags="11" default-value="RHYTHMDB_QUERY_MODEL_LIMIT_NONE"/>
+    <property name="limit-value" type="GVariant" flags="11"/>
+    <property name="show-hidden" type="gboolean" flags="7" default-value="FALSE"/>
+    <property name="base-model" type="RhythmDBQueryModel" flags="7"/>
+    <signal name="complete" return="void" when="last">
+    </signal>
+    <signal name="entry-prop-changed" return="void" when="last">
+      <param type="RhythmDBEntry"/>
+      <param type="gint"/>
+      <param type="gpointer"/>
+      <param type="gpointer"/>
+    </signal>
+    <signal name="entry-removed" return="void" when="last">
+      <param type="RhythmDBEntry"/>
+    </signal>
+    <signal name="non-entry-dropped" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="post-entry-delete" return="void" when="last">
+      <param type="RhythmDBEntry"/>
+    </signal>
+    <signal name="filter-entry-drop" return="gboolean" when="last">
+      <param type="RhythmDBEntry"/>
+    </signal>
+  </class>
+  <enum name="RhythmDBPropertyModelColumn" get-type="rhythmdb_property_model_column_get_type">
+    <member name="RHYTHMDB_PROPERTY_MODEL_COLUMN_TITLE" nick="property-title" value="0"/>
+    <member name="RHYTHMDB_PROPERTY_MODEL_COLUMN_PRIORITY" nick="value-priority" value="1"/>
+    <member name="RHYTHMDB_PROPERTY_MODEL_COLUMN_NUMBER" nick="track-count" value="2"/>
+  </enum>  <class name="RhythmDBPropertyModel" get-type="rhythmdb_property_model_get_type" parents="GObject">
+    <implements name="GtkTreeModel"/>
+    <implements name="RbTreeDragSource"/>
+    <property name="db" type="RhythmDB" flags="11"/>
+    <property name="prop" type="gint" flags="11" default-value="0"/>
+    <property name="query-model" type="RhythmDBQueryModel" flags="3"/>
+    <signal name="pre-row-deletion" return="void" when="last">
+    </signal>
+  </class>
+  <class name="RhythmDBQueryResultList" get-type="rhythmdb_query_result_list_get_type" parents="GObject">
+    <implements name="RhythmDBQueryResults"/>
+    <signal name="complete" return="void" when="last">
+    </signal>
+  </class>
+  <class name="RBApplication" get-type="rb_application_get_type" parents="GtkApplication,GApplication,GObject">
+    <implements name="GActionGroup"/>
+    <implements name="GActionMap"/>
+    <property name="shell" type="RBShell" flags="1"/>
+  </class>
+  <enum name="RBShellPrefsUILocation" get-type="rb_shell_prefs_ui_location_get_type">
+    <member name="RB_SHELL_PREFS_UI_LOCATION_GENERAL" nick="general" value="0"/>
+    <member name="RB_SHELL_PREFS_UI_LOCATION_PLAYBACK" nick="playback" value="1"/>
+  </enum>  <class name="RBShellPreferences" get-type="rb_shell_preferences_get_type" parents="GtkDialog,GtkWindow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+  </class>
+  <class name="RBDisplayPage" get-type="rb_display_page_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject" abstract="1">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="shell" type="RBShell" flags="11"/>
+    <property name="name" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="icon" type="GIcon" flags="7"/>
+    <property name="visibility" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="parent" type="RBDisplayPage" flags="11"/>
+    <property name="plugin" type="GObject" flags="7"/>
+    <property name="selected" type="gboolean" flags="1" default-value="FALSE"/>
+    <signal name="status-changed" return="void" when="last">
+    </signal>
+    <signal name="deleted" return="void" when="last">
+    </signal>
+  </class>
+  <class name="RBSourceSearch" get-type="rb_source_search_get_type" parents="GObject">
+  </class>
+  <enum name="RBEntryViewColumn" get-type="rb_entry_view_column_get_type">
+    <member name="RB_ENTRY_VIEW_COL_TRACK_NUMBER" nick="track-number" value="0"/>
+    <member name="RB_ENTRY_VIEW_COL_TITLE" nick="title" value="1"/>
+    <member name="RB_ENTRY_VIEW_COL_ARTIST" nick="artist" value="2"/>
+    <member name="RB_ENTRY_VIEW_COL_ALBUM" nick="album" value="3"/>
+    <member name="RB_ENTRY_VIEW_COL_GENRE" nick="genre" value="4"/>
+    <member name="RB_ENTRY_VIEW_COL_COMMENT" nick="comment" value="5"/>
+    <member name="RB_ENTRY_VIEW_COL_DURATION" nick="duration" value="6"/>
+    <member name="RB_ENTRY_VIEW_COL_QUALITY" nick="quality" value="7"/>
+    <member name="RB_ENTRY_VIEW_COL_RATING" nick="rating" value="8"/>
+    <member name="RB_ENTRY_VIEW_COL_PLAY_COUNT" nick="play-count" value="9"/>
+    <member name="RB_ENTRY_VIEW_COL_YEAR" nick="year" value="10"/>
+    <member name="RB_ENTRY_VIEW_COL_LAST_PLAYED" nick="last-played" value="11"/>
+    <member name="RB_ENTRY_VIEW_COL_FIRST_SEEN" nick="first-seen" value="12"/>
+    <member name="RB_ENTRY_VIEW_COL_LAST_SEEN" nick="last-seen" value="13"/>
+    <member name="RB_ENTRY_VIEW_COL_LOCATION" nick="location" value="14"/>
+    <member name="RB_ENTRY_VIEW_COL_BPM" nick="bpm" value="15"/>
+    <member name="RB_ENTRY_VIEW_COL_ERROR" nick="error" value="16"/>
+    <member name="RB_ENTRY_VIEW_COL_COMPOSER" nick="composer" value="17"/>
+  </enum>  <enum name="RBEntryViewState" get-type="rb_entry_view_state_get_type">
+    <member name="RB_ENTRY_VIEW_NOT_PLAYING" nick="not-playing" value="0"/>
+    <member name="RB_ENTRY_VIEW_PLAYING" nick="playing" value="1"/>
+    <member name="RB_ENTRY_VIEW_PAUSED" nick="paused" value="2"/>
+  </enum>  <class name="RBEntryView" get-type="rb_entry_view_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="db" type="RhythmDB" flags="11"/>
+    <property name="shell-player" type="RBShellPlayer" flags="11"/>
+    <property name="model" type="RhythmDBQueryModel" flags="3"/>
+    <property name="sort-order" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="is-drag-source" type="gboolean" flags="11" default-value="FALSE"/>
+    <property name="is-drag-dest" type="gboolean" flags="11" default-value="FALSE"/>
+    <property name="playing-state" type="gint" flags="3" default-value="0"/>
+    <property name="visible-columns" type="GStrv" flags="3"/>
+    <signal name="entry-added" return="void" when="last">
+      <param type="RhythmDBEntry"/>
+    </signal>
+    <signal name="entry-deleted" return="void" when="last">
+      <param type="RhythmDBEntry"/>
+    </signal>
+    <signal name="entries-replaced" return="void" when="last">
+    </signal>
+    <signal name="entry-activated" return="void" when="last">
+      <param type="RhythmDBEntry"/>
+    </signal>
+    <signal name="selection-changed" return="void" when="last">
+    </signal>
+    <signal name="show-popup" return="void" when="last">
+      <param type="gboolean"/>
+    </signal>
+    <signal name="have-selection-changed" return="void" when="last">
+      <param type="gboolean"/>
+    </signal>
+  </class>
+  <class name="RBSearchEntry" get-type="rb_search_entry_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="explicit-mode" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="has-popup" type="gboolean" flags="11" default-value="FALSE"/>
+    <signal name="activate" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="show-popup" return="void" when="last">
+    </signal>
+    <signal name="search" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+  </class>
+  <class name="RBTrackTransferBatch" get-type="rb_track_transfer_batch_get_type" parents="GObject">
+    <implements name="RBTaskProgress"/>
+    <property name="encoding-target" type="GstEncodingTarget" flags="7"/>
+    <property name="settings" type="GSettings" flags="11"/>
+    <property name="queue" type="RBTrackTransferQueue" flags="11"/>
+    <property name="source" type="RBSource" flags="11"/>
+    <property name="destination" type="RBSource" flags="11"/>
+    <property name="total-entries" type="gint" flags="1" default-value="0"/>
+    <property name="done-entries" type="gint" flags="1" default-value="0"/>
+    <property name="progress" type="gdouble" flags="1" default-value="0.000000"/>
+    <property name="entry-list" type="gpointer" flags="1"/>
+    <signal name="complete" return="void" when="last">
+    </signal>
+    <signal name="started" return="void" when="last">
+    </signal>
+    <signal name="cancelled" return="void" when="last">
+    </signal>
+    <signal name="get-dest-uri" return="gchararray" when="last">
+      <param type="RhythmDBEntry"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="overwrite-prompt" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="track-started" return="void" when="last">
+      <param type="RhythmDBEntry"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="track-progress" return="void" when="last">
+      <param type="RhythmDBEntry"/>
+      <param type="gchararray"/>
+      <param type="gint"/>
+      <param type="gint"/>
+      <param type="gdouble"/>
+    </signal>
+    <signal name="track-done" return="void" when="last">
+      <param type="RhythmDBEntry"/>
+      <param type="gchararray"/>
+      <param type="guint64"/>
+      <param type="gchararray"/>
+      <param type="gpointer"/>
+    </signal>
+    <signal name="track-prepare" return="void" when="last">
+      <param type="GTask"/>
+      <param type="RhythmDBEntry"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="track-postprocess" return="void" when="last">
+      <param type="GTask"/>
+      <param type="RhythmDBEntry"/>
+      <param type="gchararray"/>
+      <param type="guint64"/>
+      <param type="gchararray"/>
+    </signal>
+  </class>
+  <enum name="RBSourceEOFType" get-type="rb_source_eof_type_get_type">
+    <member name="RB_SOURCE_EOF_ERROR" nick="error" value="0"/>
+    <member name="RB_SOURCE_EOF_STOP" nick="stop" value="1"/>
+    <member name="RB_SOURCE_EOF_RETRY" nick="retry" value="2"/>
+    <member name="RB_SOURCE_EOF_NEXT" nick="next" value="3"/>
+  </enum>  <enum name="RBSourceLoadStatus" get-type="rb_source_load_status_get_type">
+    <member name="RB_SOURCE_LOAD_STATUS_NOT_LOADED" nick="not-loaded" value="0"/>
+    <member name="RB_SOURCE_LOAD_STATUS_WAITING" nick="waiting" value="1"/>
+    <member name="RB_SOURCE_LOAD_STATUS_LOADING" nick="loading" value="2"/>
+    <member name="RB_SOURCE_LOAD_STATUS_LOADED" nick="loaded" value="3"/>
+  </enum>  <class name="RBSource" get-type="rb_source_get_type" parents="RBDisplayPage,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject" abstract="1">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="query-model" type="RhythmDBQueryModel" flags="3"/>
+    <property name="hidden-when-empty" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="entry-type" type="RhythmDBEntryType" flags="11"/>
+    <property name="base-query-model" type="RhythmDBQueryModel" flags="1"/>
+    <property name="play-order" type="RBPlayOrder" flags="1"/>
+    <property name="settings" type="GSettings" flags="7"/>
+    <property name="show-browser" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="load-status" type="RBSourceLoadStatus" flags="7" default-value="RB_SOURCE_LOAD_STATUS_LOADED"/>
+    <property name="toolbar-menu" type="GMenuModel" flags="11"/>
+    <property name="playlist-menu" type="GMenuModel" flags="3"/>
+    <signal name="filter-changed" return="void" when="last">
+    </signal>
+    <signal name="reset-filters" return="void" when="last" action="1">
+    </signal>
+    <signal name="playback-status-changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="RBSongInfo" get-type="rb_song_info_get_type" parents="GtkDialog,GtkWindow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="source" type="RBSource" flags="11"/>
+    <property name="entry-view" type="RBEntryView" flags="11"/>
+    <property name="current-entry" type="RhythmDBEntry" flags="1"/>
+    <property name="selected-entries" type="GArray" flags="1"/>
+    <signal name="pre-metadata-change" return="void" when="last">
+      <param type="RhythmDBEntry"/>
+    </signal>
+    <signal name="post-metadata-change" return="void" when="last">
+      <param type="RhythmDBEntry"/>
+    </signal>
+  </class>
+  <enum name="RBShellActivationType" get-type="rb_shell_activation_type_get_type">
+    <member name="RB_SHELL_ACTIVATION_SELECT" nick="select" value="0"/>
+    <member name="RB_SHELL_ACTIVATION_PLAY" nick="play" value="1"/>
+    <member name="RB_SHELL_ACTIVATION_ALWAYS_PLAY" nick="always-play" value="2"/>
+  </enum>  <enum name="RBShellErrorType" get-type="rb_shell_error_get_type">
+    <member name="RB_SHELL_ERROR_NO_SUCH_URI" nick="no-such-uri" value="0"/>
+    <member name="RB_SHELL_ERROR_NO_SUCH_PROPERTY" nick="no-such-property" value="1"/>
+    <member name="RB_SHELL_ERROR_IMMUTABLE_PROPERTY" nick="immutable-property" value="2"/>
+    <member name="RB_SHELL_ERROR_INVALID_PROPERTY_TYPE" nick="invalid-property-type" value="3"/>
+    <member name="RB_SHELL_ERROR_NO_SOURCE_FOR_URI" nick="no-source-for-uri" value="4"/>
+  </enum>  <enum name="RBShellUILocation" get-type="rb_shell_ui_location_get_type">
+    <member name="RB_SHELL_UI_LOCATION_SIDEBAR" nick="sidebar" value="0"/>
+    <member name="RB_SHELL_UI_LOCATION_RIGHT_SIDEBAR" nick="right-sidebar" value="1"/>
+    <member name="RB_SHELL_UI_LOCATION_MAIN_TOP" nick="main-top" value="2"/>
+    <member name="RB_SHELL_UI_LOCATION_MAIN_BOTTOM" nick="main-bottom" value="3"/>
+  </enum>  <class name="RBShell" get-type="rb_shell_get_type" parents="GObject">
+    <property name="application" type="RBApplication" flags="11"/>
+    <property name="no-registration" type="gboolean" flags="11" default-value="FALSE"/>
+    <property name="no-update" type="gboolean" flags="11" default-value="FALSE"/>
+    <property name="dry-run" type="gboolean" flags="11" default-value="FALSE"/>
+    <property name="rhythmdb-file" type="gchararray" flags="11" default-value="rhythmdb.xml"/>
+    <property name="playlists-file" type="gchararray" flags="11" default-value="playlists.xml"/>
+    <property name="selected-page" type="RBDisplayPage" flags="1"/>
+    <property name="db" type="RhythmDB" flags="1"/>
+    <property name="accel-group" type="GtkAccelGroup" flags="1"/>
+    <property name="clipboard" type="RBShellClipboard" flags="1"/>
+    <property name="playlist-manager" type="RBPlaylistManager" flags="1"/>
+    <property name="removable-media-manager" type="RBRemovableMediaManager" flags="1"/>
+    <property name="shell-player" type="RBShellPlayer" flags="1"/>
+    <property name="window" type="GtkWindow" flags="1"/>
+    <property name="prefs" type="RBShellPreferences" flags="1"/>
+    <property name="queue-source" type="RBPlayQueueSource" flags="1"/>
+    <property name="library-source" type="RBLibrarySource" flags="1"/>
+    <property name="display-page-model" type="RBDisplayPageModel" flags="1"/>
+    <property name="display-page-tree" type="RBDisplayPageTree" flags="1"/>
+    <property name="visibility" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="track-transfer-queue" type="RBTrackTransferQueue" flags="1"/>
+    <property name="autostarted" type="gboolean" flags="11" default-value="FALSE"/>
+    <property name="disable-plugins" type="gboolean" flags="11" default-value="FALSE"/>
+    <property name="task-list" type="RBTaskList" flags="1"/>
+    <signal name="visibility-changed" return="void" when="last">
+      <param type="gboolean"/>
+    </signal>
+    <signal name="visibility-changing" return="gboolean" when="last">
+      <param type="gboolean"/>
+      <param type="gboolean"/>
+    </signal>
+    <signal name="create-song-info" return="void" when="last">
+      <param type="RBSongInfo"/>
+      <param type="gboolean"/>
+    </signal>
+    <signal name="notify-playing-entry" return="void" when="last">
+      <param type="gboolean"/>
+    </signal>
+    <signal name="notify-custom" return="void" when="last">
+      <param type="guint"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+      <param type="gboolean"/>
+    </signal>
+  </class>
+  <enum name="RBShellPlayerError" get-type="rb_shell_player_error_get_type">
+    <member name="RB_SHELL_PLAYER_ERROR_PLAYLIST_PARSE_ERROR" nick="playlist-parse-failed" value="0"/>
+    <member name="RB_SHELL_PLAYER_ERROR_END_OF_PLAYLIST" nick="end-of-playlist" value="1"/>
+    <member name="RB_SHELL_PLAYER_ERROR_NOT_PLAYING" nick="not-playing" value="2"/>
+    <member name="RB_SHELL_PLAYER_ERROR_NOT_SEEKABLE" nick="not-seekable" value="3"/>
+    <member name="RB_SHELL_PLAYER_ERROR_POSITION_NOT_AVAILABLE" nick="position-not-available" value="4"/>
+  </enum>  <class name="RBShellPlayer" get-type="rb_shell_player_get_type" parents="GObject">
+    <property name="source" type="RBSource" flags="3"/>
+    <property name="db" type="RhythmDB" flags="11"/>
+    <property name="play-order" type="gchararray" flags="1" default-value="linear"/>
+    <property name="playing" type="gboolean" flags="1" default-value="FALSE"/>
+    <property name="volume" type="gfloat" flags="3" default-value="1.000000"/>
+    <property name="header" type="RBHeader" flags="3"/>
+    <property name="queue-source" type="RBPlaylistSource" flags="3"/>
+    <property name="queue-only" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="playing-from-queue" type="gboolean" flags="1" default-value="FALSE"/>
+    <property name="player" type="GObject" flags="1"/>
+    <property name="mute" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="has-next" type="gboolean" flags="1" default-value="FALSE"/>
+    <property name="has-prev" type="gboolean" flags="1" default-value="FALSE"/>
+    <signal name="window-title-changed" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="elapsed-changed" return="void" when="last">
+      <param type="guint"/>
+    </signal>
+    <signal name="playing-source-changed" return="void" when="last">
+      <param type="RBSource"/>
+    </signal>
+    <signal name="playing-changed" return="void" when="last">
+      <param type="gboolean"/>
+    </signal>
+    <signal name="playing-song-changed" return="void" when="last">
+      <param type="RhythmDBEntry"/>
+    </signal>
+    <signal name="playing-uri-changed" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="playing-song-property-changed" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+      <param type="GValue"/>
+      <param type="GValue"/>
+    </signal>
+    <signal name="elapsed-nano-changed" return="void" when="last">
+      <param type="gint64"/>
+    </signal>
+  </class>
+  <enum name="RBDisplayPageModelColumn" get-type="rb_display_page_model_column_get_type">
+    <member name="RB_DISPLAY_PAGE_MODEL_COLUMN_PLAYING" nick="playing" value="0"/>
+    <member name="RB_DISPLAY_PAGE_MODEL_COLUMN_PAGE" nick="page" value="1"/>
+  </enum>  <class name="RBDisplayPageModel" get-type="rb_display_page_model_get_type" parents="GtkTreeModelFilter,GObject">
+    <implements name="GtkTreeModel"/>
+    <implements name="GtkTreeDragSource"/>
+    <implements name="RbTreeDragSource"/>
+    <implements name="RbTreeDragDest"/>
+    <signal name="drop-received" return="void" when="last">
+      <param type="RBDisplayPage"/>
+      <param type="gint"/>
+      <param type="gpointer"/>
+    </signal>
+    <signal name="page-inserted" return="void" when="last">
+      <param type="RBDisplayPage"/>
+      <param type="GtkTreeIter"/>
+    </signal>
+  </class>
+  <class name="RBDisplayPageTree" get-type="rb_display_page_tree_get_type" parents="GtkGrid,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="shell" type="RBShell" flags="11"/>
+    <property name="model" type="GtkTreeModel" flags="1"/>
+    <signal name="selected" return="void" when="last">
+      <param type="GObject"/>
+    </signal>
+    <signal name="drop-received" return="void" when="last">
+      <param type="gpointer"/>
+      <param type="gpointer"/>
+    </signal>
+  </class>
+  <class name="RBPlaylistManager" get-type="rb_playlist_manager_get_type" parents="GObject">
+    <property name="playlists-file" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="shell" type="RBShell" flags="3"/>
+    <property name="source" type="RBSource" flags="3"/>
+    <signal name="playlist-added" return="void" when="last">
+      <param type="GObject"/>
+    </signal>
+    <signal name="playlist-created" return="void" when="last">
+      <param type="GObject"/>
+    </signal>
+    <signal name="load-start" return="void" when="last">
+    </signal>
+    <signal name="load-finish" return="void" when="last">
+    </signal>
+  </class>
+  <class name="RBRemovableMediaManager" get-type="rb_removable_media_manager_get_type" parents="GObject">
+    <property name="shell" type="RBShell" flags="11"/>
+    <property name="scanned" type="gboolean" flags="1" default-value="FALSE"/>
+    <signal name="medium-added" return="void" when="last">
+      <param type="GObject"/>
+    </signal>
+    <signal name="create-source-device" return="RBSource" when="last">
+      <param type="GObject"/>
+    </signal>
+    <signal name="create-source-volume" return="RBSource" when="last">
+      <param type="GVolume"/>
+    </signal>
+    <signal name="create-source-mount" return="RBSource" when="last">
+      <param type="GMount"/>
+      <param type="MPIDDevice"/>
+    </signal>
+  </class>
+  <class name="RBHistory" get-type="rb_history_get_type" parents="GObject">
+    <property name="truncate-on-play" type="gboolean" flags="7" default-value="FALSE"/>
+    <property name="maximum-size" type="guint" flags="3" default-value="0"/>
+  </class>
+  <class name="RBPlayOrder" get-type="rb_play_order_get_type" parents="GObject">
+    <property name="player" type="RBShellPlayer" flags="11"/>
+    <property name="playing-entry" type="RhythmDBEntry" flags="3"/>
+    <signal name="have-next-previous-changed" return="void" when="last">
+      <param type="gboolean"/>
+      <param type="gboolean"/>
+    </signal>
+  </class>
+  <class name="RBTaskList" get-type="rb_task_list_get_type" parents="GObject">
+    <property name="model" type="RBListModel" flags="1"/>
+  </class>
+  <class name="RBTrackTransferQueue" get-type="rb_track_transfer_queue_get_type" parents="GObject">
+    <property name="shell" type="RBShell" flags="11"/>
+    <property name="batch" type="RBTrackTransferBatch" flags="1"/>
+    <signal name="transfer-progress" return="void" when="last">
+      <param type="gint"/>
+      <param type="gint"/>
+      <param type="gdouble"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="missing-plugins" return="gboolean" when="last">
+      <param type="GStrv"/>
+      <param type="GStrv"/>
+      <param type="GClosure"/>
+    </signal>
+  </class>
+  <class name="RBPlaylistSource" get-type="rb_playlist_source_get_type" parents="RBSource,RBDisplayPage,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject" abstract="1">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="db" type="RhythmDB" flags="1"/>
+    <property name="dirty" type="gboolean" flags="1" default-value="FALSE"/>
+    <property name="is-local" type="gboolean" flags="11" default-value="TRUE"/>
+  </class>
+  <class name="RBAutoPlaylistSource" get-type="rb_auto_playlist_source_get_type" parents="RBPlaylistSource,RBSource,RBDisplayPage,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+  </class>
+  <class name="RBBrowserSource" get-type="rb_browser_source_get_type" parents="RBSource,RBDisplayPage,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject" abstract="1">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="populate" type="gboolean" flags="7" default-value="TRUE"/>
+  </class>
+  <interface name="RBDeviceSource" get-type="rb_device_source_get_type">
+  </interface>
+  <enum name="RBDisplayPageGroupType" get-type="rb_display_page_group_category_get_type">
+    <member name="RB_DISPLAY_PAGE_GROUP_CATEGORY_FIXED" nick="fixed" value="0"/>
+    <member name="RB_DISPLAY_PAGE_GROUP_CATEGORY_PERSISTENT" nick="persistent" value="2"/>
+    <member name="RB_DISPLAY_PAGE_GROUP_CATEGORY_REMOVABLE" nick="removable" value="1"/>
+    <member name="RB_DISPLAY_PAGE_GROUP_CATEGORY_TRANSIENT" nick="transient" value="3"/>
+    <member name="RB_DISPLAY_PAGE_GROUP_CATEGORY_TOOLS" nick="tools" value="4"/>
+  </enum>  <class name="RBDisplayPageGroup" get-type="rb_display_page_group_get_type" parents="RBDisplayPage,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="id" type="gchararray" flags="11" default-value="NULL"/>
+    <property name="category" type="RBDisplayPageGroupType" flags="11" default-value="RB_DISPLAY_PAGE_GROUP_CATEGORY_FIXED"/>
+    <property name="loaded" type="gboolean" flags="1" default-value="FALSE"/>
+  </class>
+  <class name="RBMediaPlayerEntryType" get-type="rb_media_player_entry_type_get_type" parents="RhythmDBEntryType,GObject">
+    <property name="uri-prefix" type="gchararray" flags="11" default-value="NULL"/>
+    <property name="key-prefix" type="gchararray" flags="11" default-value="NULL"/>
+  </class>
+  <class name="RBMediaPlayerSource" get-type="rb_media_player_source_get_type" parents="RBBrowserSource,RBSource,RBDisplayPage,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="serial" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="encoding-target" type="GstEncodingTarget" flags="3"/>
+    <property name="encoding-settings" type="GSettings" flags="3"/>
+  </class>
+  <class name="RBSourceSearchBasic" get-type="rb_source_search_basic_get_type" parents="RBSourceSearch,GObject">
+    <property name="prop" type="gint" flags="11" default-value="0"/>
+    <property name="description" type="gchararray" flags="11" default-value="NULL"/>
+  </class>
+  <class name="RBStaticPlaylistSource" get-type="rb_static_playlist_source_get_type" parents="RBPlaylistSource,RBSource,RBDisplayPage,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+  </class>
+  <class name="RBStreamingSource" get-type="rb_streaming_source_get_type" parents="RBSource,RBDisplayPage,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+  </class>
+  <interface name="RBTransferTarget" get-type="rb_transfer_target_get_type">
+    <property name="encoding-target" type="GstEncodingTarget" flags="3"/>
+  </interface>
+  <class name="RBButtonBar" get-type="rb_button_bar_get_type" parents="GtkGrid,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="model" type="GMenuModel" flags="11"/>
+    <property name="target" type="GObject" flags="11"/>
+  </class>
+  <class name="RBCellRendererPixbuf" get-type="rb_cell_renderer_pixbuf_get_type" parents="GtkCellRendererPixbuf,GtkCellRenderer,GInitiallyUnowned,GObject">
+    <signal name="pixbuf-clicked" return="void" when="first">
+      <param type="gchararray"/>
+    </signal>
+  </class>
+  <class name="RBCellRendererRating" get-type="rb_cell_renderer_rating_get_type" parents="GtkCellRenderer,GInitiallyUnowned,GObject">
+    <property name="rating" type="gdouble" flags="3" default-value="2.500000"/>
+    <signal name="rated" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="gdouble"/>
+    </signal>
+  </class>
+  <class name="RBFadingImage" get-type="rb_fading_image_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="fallback" type="gchararray" flags="11" default-value="NULL"/>
+    <property name="use-tooltip" type="gboolean" flags="11" default-value="TRUE"/>
+    <signal name="uri-dropped" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="pixbuf-dropped" return="void" when="last">
+      <param type="GdkPixbuf"/>
+    </signal>
+  </class>
+  <class name="RBPropertyView" get-type="rb_property_view_get_type" parents="GtkScrolledWindow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="db" type="RhythmDB" flags="11"/>
+    <property name="prop" type="RhythmDBPropType" flags="11" default-value="RHYTHMDB_PROP_TYPE"/>
+    <property name="title" type="gchararray" flags="11" default-value=""/>
+    <property name="property-model" type="RhythmDBPropertyModel" flags="3"/>
+    <property name="draggable" type="gboolean" flags="11" default-value="TRUE"/>
+    <signal name="show-popup" return="void" when="last">
+    </signal>
+    <signal name="property-activated" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="property-selected" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="properties-selected" return="void" when="last">
+      <param type="gpointer"/>
+    </signal>
+    <signal name="property-selection-reset" return="void" when="last">
+    </signal>
+  </class>
+  <class name="RBLibraryBrowser" get-type="rb_library_browser_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="db" type="RhythmDB" flags="11"/>
+    <property name="input-model" type="RhythmDBQueryModel" flags="1"/>
+    <property name="output-model" type="RhythmDBQueryModel" flags="1"/>
+    <property name="entry-type" type="RhythmDBEntryType" flags="11"/>
+    <property name="browser-views" type="gchararray" flags="7" default-value="artists-albums"/>
+  </class>
+  <class name="RBRating" get-type="rb_rating_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="rating" type="gdouble" flags="3" default-value="2.500000"/>
+    <signal name="rated" return="void" when="last">
+      <param type="gdouble"/>
+    </signal>
+    <signal name="set-rating" return="void" when="last" action="1">
+      <param type="gdouble"/>
+    </signal>
+    <signal name="adjust-rating" return="void" when="last" action="1">
+      <param type="gdouble"/>
+    </signal>
+  </class>
+  <class name="RBSegmentedBar" get-type="rb_segmented_bar_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="show-reflection" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="show-labels" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="bar-height" type="guint" flags="7" default-value="26"/>
+  </class>
+  <class name="RBSourceToolbar" get-type="rb_source_toolbar_get_type" parents="GtkGrid,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="page" type="RBDisplayPage" flags="11"/>
+    <property name="accel-group" type="GtkAccelGroup" flags="11"/>
+  </class>
+  <class name="RBURIDialog" get-type="rb_uri_dialog_get_type" parents="GtkDialog,GtkWindow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="label" type="gchararray" flags="11" default-value=""/>
+    <signal name="location-added" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+  </class>
+  <error-quark function="rhythmdb_error_quark" domain="rhythmdb_error"/>
+  <error-quark function="rb_encoder_error_quark" domain="rb_encoder_error"/>
+  <error-quark function="rb_metadata_error_quark" domain="rb_metadata_error"/>
+  <error-quark function="rb_player_error_quark" domain="rb_player_error"/>
+  <error-quark function="rb_podcast_parse_error_quark" domain="rb_podcast_parse_error"/>
+  <error-quark function="rb_shell_error_quark" domain="rb_shell_error"/>
+  <error-quark function="rb_shell_player_error_quark" domain="rb_shell_player_error"/>
+  <error-quark function="rb_playlist_manager_error_quark" domain="rb_playlist_manager_error"/>
+</dump>
