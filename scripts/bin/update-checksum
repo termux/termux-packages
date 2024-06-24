@@ -55,31 +55,40 @@ for package in "${@}"; do
 		continue
 	fi
 
-	# Calculate new checksum in subshell.
+	# Command substitution create a subshell, we want to do this
+	# to not effect the main scope's variables by sourcing the build script
 	echo
-	new_checksum=$(
+	new_checksum=($(
 		source "${buildsh_path}" 2>/dev/null
+		for url in "${TERMUX_PKG_SRCURL[@]}"; do
+			dl_tmpdir=$(mktemp -d "${TMPDIR-/tmp}/termux.src.dl.XXXXXXXX")
 
-		dl_tmpdir=$(mktemp -d "${TMPDIR-/tmp}/termux.src.dl.XXXXXXXX")
+			if [[ -d "${dl_tmpdir}" ]]; then
+				if ! curl --fail --location --retry 3 --output "${dl_tmpdir}/source-bundle" "$url"; then
+					rm -rf "${dl_tmpdir}"
+				fi
 
-		if [ -n "${dl_tmpdir}" ] && [ -d "${dl_tmpdir}" ]; then
-			if ! curl --fail --location --retry 3 --output "${dl_tmpdir}/source-bundle" \
-				"${TERMUX_PKG_SRCURL[0]}"; then
+				if [[ -f "${dl_tmpdir}/source-bundle" ]]; then
+					sha256sum "${dl_tmpdir}/source-bundle" | awk '{ print $1 }'
+				fi
+
 				rm -rf "${dl_tmpdir}"
 			fi
+		done
+	))
 
-			if [ -f "${dl_tmpdir}/source-bundle" ]; then
-				sha256sum "${dl_tmpdir}/source-bundle" | awk '{ print $1 }'
-			fi
-
-			rm -rf "${dl_tmpdir}"
-		fi
-	)
-
-	if [ -n "${new_checksum}" ]; then
+	if (( ${#new_checksum[@]} )); then
 		# Replace old SHA-256.
-		# Note that this will not work properly if SHA-256 is an array.
-		sed -i "s/^\(TERMUX_PKG_SHA256=\)\(.*\)\$/\1${new_checksum}/g" "${buildsh_path}"
+		if (( ${#new_checksum[@]} > 1 )); then
+			checksum="(\n$(printf '\\t%s\\n' "${new_checksum[@]}"))"
+		else
+			checksum="${new_checksum[0]}"
+		fi
+		if grep -qPz "TERMUX_PKG_SHA256=\([^)]*\)" "${buildsh_path}"; then
+			sed -zi "s/\(TERMUX_PKG_SHA256=\)([^)]*)/\1${checksum}/g" "${buildsh_path}"
+		else
+			sed -i "s/\(TERMUX_PKG_SHA256=\).*/\1${checksum}/g" "${buildsh_path}"
+		fi
 
 		# Delete revision as it shouldn't be present if package was updated.
 		sed -i "/TERMUX_PKG_REVISION=/d" "${buildsh_path}"
