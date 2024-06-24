@@ -4,10 +4,11 @@ TERMUX_PKG_DESCRIPTION="Python 3 programming language intended to enable clear p
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.11.9
+# When we used branch names, it will automaticlly update to latest, v3.12.4.
+TERMUX_PKG_VERSION=3.12
 TERMUX_PKG_REVISION=2
-TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=9b1e896523fc510691126c864406d9360a3d1e986acbda59cda57b5abda45b87
+TERMUX_PKG_SRCURL=https://github.com/python/cpython/archive/${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=d833211ef08babdeecdba6447f371766f802b56731b34e0188949fb2fdeee968
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="gdbm, libandroid-posix-semaphore, libandroid-support, libbz2, libcrypt, libexpat, libffi, liblzma, libsqlite, ncurses, ncurses-ui-libs, openssl, readline, zlib"
 TERMUX_PKG_RECOMMENDS="python-ensurepip-wheels, python-pip"
@@ -29,7 +30,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_file__dev_ptmx=yes ac_cv_file__dev_ptc=no
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_ftime=no"
 # Avoid trying to use AT_EACCESS which is not defined:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_faccessat=no"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --build=$TERMUX_BUILD_TUPLE --with-system-ffi --with-system-expat --without-ensurepip"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --build=$TERMUX_BUILD_TUPLE --with-system-ffi --with-system-expat --with-asyncio --without-ensurepip"
 # Hard links does not work on Android 6:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_linkat=no"
 # Do not assume getaddrinfo is buggy when cross compiling:
