@@ -3,14 +3,13 @@ TERMUX_PKG_DESCRIPTION="Extensible, customizable text editor-and more"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Update both emacs and emacs-x to the same version in one PR.
-_VERSION=29.3
+_VERSION=29.4
 TERMUX_PKG_VERSION=${_VERSION}
-TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/emacs/emacs-${_VERSION}.tar.xz
 if [[ $TERMUX_PKG_VERSION == *-rc* ]]; then
 	TERMUX_PKG_SRCURL=https://alpha.gnu.org/gnu/emacs/pretest/emacs-${TERMUX_PKG_VERSION#*:}.tar.xz
 fi
-TERMUX_PKG_SHA256=c34c05d3ace666ed9c7f7a0faf070fea3217ff1910d004499bd5453233d742a0
+TERMUX_PKG_SHA256=ba897946f94c36600a7e7bb3501d27aa4112d791bfe1445c61ed28550daca235
 TERMUX_PKG_DEPENDS="fontconfig, freetype, gdk-pixbuf, giflib, glib, harfbuzz, libgmp, libgnutls, libice, libjansson, libjpeg-turbo, libpng, librsvg, libsm, libsqlite, libtiff, libtreesitter, libx11, libxaw, libxcb, libxext, libxfixes, libxft, libxinerama, libxml2, libxmu, libxpm, libxrandr, libxrender, libxt, littlecms, ncurses, zlib"
 TERMUX_PKG_CONFLICTS="emacs"
 TERMUX_PKG_REPLACES="emacs"
