@@ -1,0 +1,227 @@
+diff --git a/drivers/alsa/hammerfall.c b/drivers/alsa/hammerfall.c
+index 531d73a..91eaf17 100644
+--- a/drivers/alsa/hammerfall.c
++++ b/drivers/alsa/hammerfall.c
+@@ -200,7 +200,10 @@ hammerfall_release (jack_hardware_t *hw)
+ 		return;
+ 	}
+ 
++// not patched properly because thread is never created
++#ifndef __ANDROID__
+ 	pthread_cancel (h->monitor_thread);
++#endif
+ 	pthread_join (h->monitor_thread, &status);
+ 
+ 	free (h);
+@@ -215,7 +218,10 @@ hammerfall_monitor_controls (void *arg)
+ 	snd_ctl_elem_id_t *switch_id[3];
+ 	snd_ctl_elem_value_t *sw[3];
+ 
++// not patched properly because thread is never created
++#ifndef __ANDROID__
+ 	pthread_setcanceltype (PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
++#endif
+ 
+ 	snd_ctl_elem_id_malloc (&switch_id[0]);
+ 	snd_ctl_elem_id_malloc (&switch_id[1]);
+diff --git a/drivers/freebob/freebob_driver.c b/drivers/freebob/freebob_driver.c
+index d26e6dd..8f09a48 100644
+--- a/drivers/freebob/freebob_driver.c
++++ b/drivers/freebob/freebob_driver.c
+@@ -795,6 +795,12 @@ freebob_driver_delete (freebob_driver_t *driver)
+  */
+ 
+ // the thread that will queue the midi events from the seq to the stream buffers
++#ifdef __ANDROID__
++static void ThreadSignalHandler(int signum)
++{
++	pthread_exit(0);
++}
++#endif
+ 
+ void * freebob_driver_midi_queue_thread (void *arg)
+ {
+@@ -807,6 +813,14 @@ void * freebob_driver_midi_queue_thread (void *arg)
+ 	int b;
+ 	int i;
+ 
++#ifdef __ANDROID__
++	struct sigaction actions;
++	memset(&actions, 0, sizeof(actions));
++	sigemptyset(&actions.sa_mask);
++	actions.sa_flags = 0;
++	actions.sa_handler = ThreadSignalHandler;
++	sigaction(SIGUSR2, &actions, NULL);
++#endif
+ 	printMessage ("MIDI queue thread started");
+ 
+ 	while (1) {
+@@ -868,6 +882,14 @@ void *freebob_driver_midi_dequeue_thread (void *arg)
+ 
+ 	assert (m);
+ 
++#ifdef __ANDROID__
++	struct sigaction actions;
++	memset(&actions, 0, sizeof(actions));
++	sigemptyset(&actions.sa_mask);
++	actions.sa_flags = 0;
++	actions.sa_handler = ThreadSignalHandler;
++	sigaction(SIGUSR2, &actions, NULL);
++#endif
+ 	while (1) {
+ 		// read incoming events
+ 
+@@ -1084,10 +1106,20 @@ freebob_driver_midi_stop (freebob_driver_midi_handle_t *m)
+ {
+ 	assert (m);
+ 
++// indeed, may not necessary because pthread_testcancel() seems never called
++#ifdef __ANDROID__
++	pthread_kill( m->queue_thread_cancel, SIGUSR2 );
++#else
+ 	pthread_cancel (m->queue_thread);
++#endif
+ 	pthread_join (m->queue_thread, NULL);
+ 
++// indeed, may not necessary because pthread_testcancel() seems never called
++#ifdef __ANDROID__
++	pthread_kill( m->queue_thread_cancel, SIGUSR2 );
++#else
+ 	pthread_cancel (m->dequeue_thread);
++#endif
+ 	pthread_join (m->dequeue_thread, NULL);
+ 	return 0;
+ 
+diff --git a/include/engine.h b/include/engine.h
+index 5106713..ea11b66 100644
+--- a/include/engine.h
++++ b/include/engine.h
+@@ -105,6 +105,9 @@ struct _jack_engine {
+ 
+ 	unsigned int port_max;
+ 	pthread_t server_thread;
++#ifdef __ANDROID__
++	atomic_flag server_thread_cancel;
++#endif
+ 
+ 	int fds[2];
+ 	int cleanup_fifo[2];
+diff --git a/jackd/controlapi.c b/jackd/controlapi.c
+index a117e20..931b619 100644
+--- a/jackd/controlapi.c
++++ b/jackd/controlapi.c
+@@ -692,7 +692,9 @@ jackctl_setup_signals (
+ 
+ 	setsid ();
+ 
++#ifndef __ANDROID__
+ 	pthread_setcanceltype (PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
++#endif
+ 
+ 	/* what's this for?
+ 
+diff --git a/jackd/engine.c b/jackd/engine.c
+index 1235815..b7458e0 100644
+--- a/jackd/engine.c
++++ b/jackd/engine.c
+@@ -1623,7 +1623,11 @@ jack_server_thread (void *arg)
+ 
+ 		/* Stephane Letz: letz@grame.fr : has to be added
+ 		 * otherwise pthread_cancel() does not work on MacOSX */
++#ifdef __ANDROID__
++		if ( !atomic_flag_test_and_set( &engine->server_thread_cancel ) ) { pthread_exit( NULL ); };
++#else
+ 		pthread_testcancel ();
++#endif
+ 
+ 
+ 		/* empty cleanup FIFO if necessary */
+@@ -2038,6 +2042,9 @@ jack_engine_new (int realtime, int rtpriority, int do_mlock, int do_unlock,
+ 
+ 	(void)jack_get_fifo_fd (engine, 0);
+ 
++#ifdef __ANDROID__
++	atomic_flag_test_and_set( &engine->server_thread_cancel );
++#endif
+ 	jack_client_create_thread (NULL, &engine->server_thread, 0, FALSE,
+ 				   &jack_server_thread, engine);
+ 
+@@ -2594,8 +2601,12 @@ jack_engine_delete (jack_engine_t *engine)
+ 	// MacOSX pthread_cancel still not implemented correctly in Darwin
+ 	mach_port_t machThread = pthread_mach_thread_np (engine->server_thread);
+ 	thread_terminate (machThread);
++#else
++#ifdef __ANDROID__
++	atomic_flag_clear( &engine->server_thread_cancel );
+ #else
+ 	pthread_cancel (engine->server_thread);
++#endif
+ 	pthread_join (engine->server_thread, NULL);
+ #endif
+ 
+diff --git a/jackd/jackd.c b/jackd/jackd.c
+index b27dde2..8a808b0 100644
+--- a/jackd/jackd.c
++++ b/jackd/jackd.c
+@@ -253,7 +253,9 @@ jack_main (jack_driver_desc_t * driver_desc, JSList * driver_params, JSList * sl
+ 
+ 	setsid ();
+ 
++#ifndef __ANDROID__
+ 	pthread_setcanceltype (PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
++#endif
+ 
+ 	/* what's this for?
+ 
+diff --git a/libjack/client.c b/libjack/client.c
+index b34766a..f97579d 100644
+--- a/libjack/client.c
++++ b/libjack/client.c
+@@ -2109,7 +2109,11 @@ jack_client_core_wait (jack_client_t* client)
+ 			return -1;
+ 		}
+ 
++#ifdef __ANDROID__
++		if ( !atomic_flag_test_and_set( &client->thread_cancel ) ) { pthread_exit( NULL ); };
++#else
+ 		pthread_testcancel ();
++#endif
+ 
+ 		/* get an accurate timestamp on waking from poll for a
+ 		 * process() cycle.
+@@ -2379,6 +2383,9 @@ jack_start_thread (jack_client_t *client)
+ 		return -1;
+ 	}
+ #else
++#ifdef __ANDROID__
++	atomic_flag_test_and_set( &client->thread_cancel );
++#endif
+ 	if (jack_client_create_thread (client,
+ 				       &client->thread,
+ 				       client->engine->client_priority,
+@@ -2545,7 +2552,11 @@ jack_client_close_aux (jack_client_t *client)
+ 		 */
+ 
+ 		if (client->thread_ok) {
++#ifdef __ANDROID__
++			atomic_flag_clear( &client->thread_cancel );
++#else
+ 			pthread_cancel (client->thread);
++#endif
+ 			pthread_join (client->thread, &status);
+ 		}
+ 
+diff --git a/libjack/local.h b/libjack/local.h
+index c90d7b0..da2e70e 100644
+--- a/libjack/local.h
++++ b/libjack/local.h
+@@ -26,6 +26,9 @@ struct _jack_client {
+ 	JSList *ports_ext;
+ 
+ 	pthread_t thread;
++#ifdef __ANDROID__
++	atomic_flag thread_cancel;
++#endif
+ 	char fifo_prefix[PATH_MAX + 1];
+ 	void (*on_shutdown)(void *arg);
+ 	void *on_shutdown_arg;
