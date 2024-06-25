@@ -2,11 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://grafana.com/
 TERMUX_PKG_DESCRIPTION="The open-source platform for monitoring and observability"
 TERMUX_PKG_LICENSE="AGPL-V3"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=11.0.0
+TERMUX_PKG_VERSION=11.1.0
 TERMUX_PKG_SRCURL=git+https://github.com/grafana/grafana
 TERMUX_PKG_BUILD_DEPENDS="yarn"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_MAKE_ARGS="SPEC_TARGET= MERGED_SPEC_TARGET="
+TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_pre_configure() {
 	termux_setup_nodejs
