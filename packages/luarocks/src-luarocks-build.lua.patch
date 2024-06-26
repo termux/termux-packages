@@ -6,7 +6,7 @@ diff -uNr luarocks-3.11.1/src/luarocks/build.lua luarocks-3.11.1b/src/luarocks/b
              if not ok then return nil, err end
           end
 -         local ok = fs.copy(file, dir.path(dest, filename), perms)
-+         local copied_file dir.path(dest, filename)
++         local copied_file = dir.path(dest, filename)
 +         local ok = fs.copy(file, copied_file, perms)
           if not ok then
              return nil, "Failed copying "..file
