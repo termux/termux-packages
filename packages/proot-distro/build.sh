@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/termux/proot-distro
 TERMUX_PKG_DESCRIPTION="Termux official utility for managing proot'ed Linux distributions"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=4.14.0
+TERMUX_PKG_VERSION=4.14.1
 TERMUX_PKG_SRCURL=https://github.com/termux/proot-distro/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=ff2fd8cf1837fdc6c3d40145f89dbbceb10e90e2ab16ff82fddc60648bb34b0f
+TERMUX_PKG_SHA256=a822cf82a6880e74faeab19d1e7fa9d78b310b353a9c4817824c199eeae31cef
 TERMUX_PKG_DEPENDS="bash, bzip2, coreutils, curl, findutils, gzip, ncurses-utils, proot (>= 5.1.107-32), sed, tar, termux-tools, util-linux, xz-utils"
 TERMUX_PKG_SUGGESTS="bash-completion, termux-api"
 TERMUX_PKG_BUILD_IN_SRC=true
