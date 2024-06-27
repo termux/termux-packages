@@ -1,0 +1,98 @@
+--- a/common/jobs-unix.cc
++++ b/common/jobs-unix.cc
+@@ -66,6 +66,68 @@ static bool do_lock() {
+   return false;
+ }
+ 
++#ifdef __ANDROID__
++#include <alloca.h>
++static int shm_unlink(const char *name) {
++    size_t namelen;
++    char *fname;
++
++    /* Construct the filename.  */
++    while (name[0] == '/') ++name;
++
++    if (name[0] == '\0') {
++        /* The name "/" is not supported.  */
++        errno = EINVAL;
++        return -1;
++    }
++
++    namelen = strlen(name);
++    fname = (char *) alloca(sizeof("@TERMUX_PREFIX@/tmp/") - 1 + namelen + 1);
++    memcpy(fname, "@TERMUX_PREFIX@/tmp/", sizeof("@TERMUX_PREFIX@/tmp/") - 1);
++    memcpy(fname + sizeof("@TERMUX_PREFIX@/tmp/") - 1, name, namelen + 1);
++
++    return unlink(fname);
++}
++
++static int shm_open(const char *name, int oflag, mode_t mode) {
++    size_t namelen;
++    char *fname;
++    int fd;
++
++    /* Construct the filename.  */
++    while (name[0] == '/') ++name;
++
++    if (name[0] == '\0') {
++        /* The name "/" is not supported.  */
++        errno = EINVAL;
++        return -1;
++    }
++
++    namelen = strlen(name);
++    fname = (char *) alloca(sizeof("@TERMUX_PREFIX@/tmp/") - 1 + namelen + 1);
++    memcpy(fname, "@TERMUX_PREFIX@/tmp/", sizeof("@TERMUX_PREFIX@/tmp/") - 1);
++    memcpy(fname + sizeof("@TERMUX_PREFIX@/tmp/") - 1, name, namelen + 1);
++
++    fd = open(fname, oflag, mode);
++    if (fd != -1) {
++        /* We got a descriptor.  Now set the FD_CLOEXEC bit.  */
++        int flags = fcntl(fd, F_GETFD, 0);
++        flags |= FD_CLOEXEC;
++        flags = fcntl(fd, F_SETFD, flags);
++
++        if (flags == -1) {
++            /* Something went wrong.  We cannot return the descriptor.  */
++            int save_errno = errno;
++            close(fd);
++            fd = -1;
++            errno = save_errno;
++        }
++    }
++
++    return fd;
++}
++#endif
++
+ static SharedData *get_shared_data() {
+   // Create a shared memory object and mmap it
+   std::string name = "/mold-signal-" + std::to_string(getuid());
+@@ -91,7 +153,7 @@ static SharedData *get_shared_data() {
+     pthread_mutexattr_init(&mu_attr);
+     pthread_mutexattr_setpshared(&mu_attr, PTHREAD_PROCESS_SHARED);
+ 
+-#ifndef __APPLE__
++#if !defined(__APPLE__) && !defined(__ANDROID__)
+     pthread_mutexattr_setrobust(&mu_attr, PTHREAD_MUTEX_ROBUST);
+ #endif
+ 
+@@ -116,7 +178,7 @@ void acquire_global_lock() {
+   if (char *dir = getenv("XDG_RUNTIME_DIR"))
+     path = dir + "/mold.lock"s;
+   else
+-    path = "/tmp/mold-" + std::to_string(getuid()) + ".lock";
++    path = "@TERMUX_PREFIX@/tmp/mold-" + std::to_string(getuid()) + ".lock";
+ 
+   lock_fd = open(path.c_str(), O_WRONLY | O_CREAT | O_CLOEXEC, 0600);
+   if (lock_fd == -1 || do_lock())
+@@ -126,7 +188,7 @@ void acquire_global_lock() {
+   pthread_cond_t *cond = &shared_data->cond;
+   int r = pthread_mutex_lock(mu);
+ 
+-#ifndef __APPLE__
++#if !defined(__APPLE__) && !defined(__ANDROID__)
+   // If the previous process got killed while holding the mutex, the
+   // mutex has became inconsistent. We need to fix it in that case.
+   if (r == EOWNERDEAD)
