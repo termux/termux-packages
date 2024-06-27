@@ -1,0 +1,11 @@
+--- a/src/gui/CMakeLists.txt
++++ b/src/gui/CMakeLists.txt
+@@ -789,7 +789,7 @@
+ # Only enable the Pixman draw-helpers on platforms that support the GAS syntax of their asm files
+ # Note: These helpers are only used for 16-bit surfaces, so excluding them does not generally
+ # exclude neon-drawhelpers on these platforms.
+-if(UNIX AND NOT ANDROID AND NOT INTEGRITY AND NOT (TEST_architecture_arch STREQUAL "arm64") AND NOT UIKIT AND NOT QT_IS_MACOS_UNIVERSAL)
++if(FALSE AND UNIX AND NOT ANDROID AND NOT INTEGRITY AND NOT (TEST_architecture_arch STREQUAL "arm64") AND NOT UIKIT AND NOT QT_IS_MACOS_UNIVERSAL)
+     qt_internal_extend_target(Gui DEFINES ENABLE_PIXMAN_DRAWHELPERS)
+     qt_internal_add_simd_part(Gui SIMD neon
+         SOURCES
