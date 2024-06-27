@@ -83,7 +83,7 @@ termux_step_host_build() {
 termux_step_pre_configure() {
 	# Version guard to keep flang in sync
 	local flang_version=$(. $TERMUX_SCRIPTDIR/packages/flang/build.sh; echo ${TERMUX_PKG_VERSION})
-	local flang_revision=$( unset TERMUX_PKG_REVISION; . $TERMUX_SCRIPTDIR/packages/flang/build.sh; echo ${TERMUX_PKG_REVISION:-0})
+	local flang_revision=$(TERMUX_PKG_REVISION=0; . $TERMUX_SCRIPTDIR/packages/flang/build.sh; echo ${TERMUX_PKG_REVISION})
 	if [ "${flang_version}" != "${TERMUX_PKG_VERSION}" ] || [ "${flang_revision}" != "${TERMUX_PKG_REVISION}" ]; then
 		termux_error_exit "Version mismatch between libllvm and flang. libllvm=$TERMUX_PKG_VERSION:$TERMUX_PKG_REVISION, flang=$flang_version:$flang_revision"
 	fi
