@@ -75,6 +75,9 @@ termux_step_pre_configure() {
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-build-python=python$_MAJOR_VERSION"
 	fi
 
+	# For multiprocessing libs
+	export LDFLAGS+=" -landroid-posix-semaphore"
+
 	export LIBCRYPT_LIBS="-lcrypt"
 }
 
