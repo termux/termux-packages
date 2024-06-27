@@ -1,0 +1,111 @@
+--- ./Makefile.orig	2022-06-02 09:10:11.587243501 +0000
++++ ./Makefile	2022-06-02 09:14:24.432460451 +0000
+@@ -2282,105 +2226,19 @@
+ endif   # spec found
+ endif   # rpm available
+ endif   # inUnix
++
+ ifeq ($(OS_TARGET),android)
+ ifneq ($(CPU_TARGET),jvm)
+ ifdef CROSSCOMPILE
+-ifeq ($(NDK),)
+-  $(error It is needed to set the Android NDK path using NDK=<path>)
+-endif
+-override NDK:=$(subst $(PATHSEP),/,$(NDK))
+-ifeq ($(wildcard $(NDK)),)
+-  $(error NDK path does not exist: $(NDK))
+-endif
+-NDK_LIB:=$(NDK)/platforms/android-21
+-ifeq ($(wildcard $(NDK_LIB)/arch-arm64/usr/lib/crtbegin_so.o),)
+-  $(error Unable to find NDK library files in $(NDK_LIB))
+-endif
+-NDKARCH:=$(notdir $(firstword $(wildcard $(NDK)/prebuilt/$(OS_SOURCE)-$(CPU_SOURCE))))
+-ifeq ($(NDKARCH),)
+-  NDKARCH:=windows
+-endif
+-gettoolchain=$(dir $(firstword $(foreach d, $(wildcard $(NDK)/toolchains/$(1)-*.*), $(wildcard $(d)/prebuilt/$(NDKARCH)/bin/$(2)-ld.bfd$(SRCEXEEXT)))))
+-ANDROID_AARCH64_BINUTILS:=$(call gettoolchain,aarch64,aarch64-linux-android)
+-ifeq ($(ANDROID_AARCH64_BINUTILS),)
+-  WINARCH:=$(PROCESSOR_ARCHITEW6432)
+-  ifeq ($(WINARCH),)
+-    WINARCH:=$(PROCESSOR_ARCHITECTURE)
+-  endif
+-  ifeq ($(WINARCH),AMD64)
+-    NDKARCH:=windows-x86_64
+-    ANDROID_AARCH64_BINUTILS:=$(call gettoolchain,aarch64,aarch64-linux-android)
+-  endif
+-  ifeq ($(ANDROID_AARCH64_BINUTILS),)
+-    ANDROID_AARCH64_BINUTILS:=$(call gettoolchain,arm64,arm64-linux-android)
+-    ifeq ($(ANDROID_AARCH64_BINUTILS),)
+-      ANDROID_AARCH64_BINUTILS:=$(dir $(firstword $(wildcard $(addsuffix /aarch64-linux-android-as$(SRCEXEEXT),$(SEARCHPATH)))))
+-    endif
+-  endif
+-endif
+-ANDROID_ARM_BINUTILS:=$(call gettoolchain,arm-linux-androideabi,arm-linux-androideabi)
+-ifeq ($(ANDROID_ARM_BINUTILS),)
+-  ifeq ($(ANDROID_ARM_BINUTILS),)
+-    ANDROID_ARM_BINUTILS:=$(dir $(firstword $(wildcard $(addsuffix /arm-linux-androideabi-as$(SRCEXEEXT),$(SEARCHPATH)))))
+-    ifneq ($(ANDROID_ARM_BINUTILS),)
+-      $(info "ANDROID_ARM_BINUTILS is $(ANDROID_ARM_BINUTILS)")
+-    endif
+-  endif
+-endif
+-ANDROID_X86_BINUTILS:=$(call gettoolchain,x86,i686-linux-android)
+-ifeq ($(ANDROID_X86_BINUTILS),)
+-  ANDROID_X86_BINUTILS:=$(dir $(firstword $(wildcard $(addsuffix /i686-linux-android-as$(SRCEXEEXT),$(SEARCHPATH)))))
+-endif
+-ANDROID_X86_64_BINUTILS:=$(call gettoolchain,x86_64,x86_64-linux-android)
+-ifeq ($(ANDROID_X86_64_BINUTILS),)
+-  ANDROID_X86_64_BINUTILS:=$(dir $(firstword $(wildcard $(addsuffix /x86_64-linux-android-as$(SRCEXEEXT),$(SEARCHPATH)))))
+-endif
+-ANDROID_MIPS_BINUTILS:=$(call gettoolchain,mipsel-linux-android,mipsel-linux-android)
+-ifeq ($(ANDROID_MIPS_BINUTILS),)
+-  ANDROID_MIPS_BINUTILS:=$(dir $(firstword $(wildcard $(addsuffix /mipsel-linux-android-as$(SRCEXEEXT),$(SEARCHPATH)))))
+-endif
+ unexport BUILDFULLNATIVE
+-ifeq ($(CPU_TARGET),arm)
+-  ifeq ($(ANDROID_ARM_BINUTILS),)
+-    $(error Unable to find binutils for arm-android)
+-  endif
+-  CROSSBINDIR=$(ANDROID_ARM_BINUTILS)
+-  override LIBDIR+=$(NDK_LIB)/arch-arm/usr/lib
+-endif
+-ifeq ($(CPU_TARGET),aarch64)
+-  ifeq ($(ANDROID_AARCH64_BINUTILS),)
+-    $(error Unable to find binutils for aarch64-android)
+-  endif
+-  CROSSBINDIR=$(ANDROID_AARCH64_BINUTILS)
+-  override LIBDIR+=$(NDK_LIB)/arch-arm64/usr/lib
+-endif
+-ifeq ($(CPU_TARGET),i386)
+-  ifeq ($(ANDROID_X86_BINUTILS),)
+-    $(error Unable to find binutils for i386-android)
+-  endif
+-  CROSSBINDIR=$(ANDROID_X86_BINUTILS)
+-  override LIBDIR+=$(NDK_LIB)/arch-x86/usr/lib
+-endif
+-ifeq ($(CPU_TARGET),x86_64)
+-  ifeq ($(ANDROID_X86_64_BINUTILS),)
+-    $(error Unable to find binutils for x86_64-android)
+-  endif
+-  CROSSBINDIR=$(ANDROID_X86_64_BINUTILS)
+-  override LIBDIR+=$(NDK_LIB)/arch-x86_64/usr/lib64
+-endif
+-ifeq ($(CPU_TARGET),mipsel)
+-  ifeq ($(ANDROID_MIPS_BINUTILS),)
+-    $(error Unable to find binutils for mipsel-android)
+-  endif
+-  CROSSBINDIR=$(ANDROID_MIPS_BINUTILS)
+-  override LIBDIR+=$(NDK_LIB)/arch-mips/usr/lib
+-endif
++override LIBDIR+=@LIBDIR@
+ export CROSSBINDIR
+ export BINUTILSPREFIX
+ export LIBDIR
+ endif
+ endif
+ endif
++
+ ifndef ISCCPROG
+ ISCCPROG=$(subst $(PATHSEP),/,$(ProgramFiles))/inno setup 5/iscc.exe
+ endif # ISCCPROG
