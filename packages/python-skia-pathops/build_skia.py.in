@@ -1,0 +1,65 @@
+#!/usr/bin/env python
+import os
+import subprocess
+import sys
+
+BUILD_ARGS = [
+    "ndk=\"@NDK_PATH@\"",
+    "target_cpu=\"@TARGET_CPU@\""
+    "is_official_build=true",
+    "is_debug=false",
+    "skia_enable_pdf=false",
+    "skia_enable_discrete_gpu=false",
+    "skia_enable_skottie=false",
+    "skia_enable_skshaper=false",
+    "skia_use_dng_sdk=false",
+    "skia_use_expat=false",
+    "skia_use_freetype=false",
+    "skia_use_fontconfig=false",
+    "skia_use_fonthost_mac=false",
+    "skia_use_harfbuzz=false",
+    "skia_use_icu=false",
+    "skia_use_libjpeg_turbo_encode=false",
+    "skia_use_libjpeg_turbo_decode=false",
+    "skia_use_libpng_encode=false",
+    "skia_use_libpng_decode=false",
+    "skia_use_libwebp_encode=false",
+    "skia_use_libwebp_decode=false",
+    "skia_use_piex=false",
+    "skia_use_sfntly=false",
+    "skia_use_xps=false",
+    "skia_use_zlib=false",
+    "skia_enable_spirv_validation=false",
+    "skia_use_libheif=false",
+    "skia_use_lua=false",
+    "skia_use_wuffs=false",
+    "skia_enable_fontmgr_empty=true",
+    "skia_enable_gpu=false",
+    "skia_use_gl=false",
+]
+
+def build_skia(build_dir):
+    src_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "skia"))
+    build_dir = os.path.abspath(build_dir)
+    env = os.environ.copy()
+
+    build_args = BUILD_ARGS
+    for var in ("CC", "CXX", "AR"):
+        v = os.environ.get(var)
+        if v is not None:
+            build_args.append('{}="{}"'.format(var.lower(), v))
+
+    subprocess.check_call(
+        [
+            "@GN_PATH@",
+            "gen",
+            build_dir,
+            "--args={}".format(" ".join(build_args)),
+        ],
+        cwd=src_dir,
+        env=env,
+    )
+    subprocess.check_call(["ninja", "-C", build_dir, "skia"], env=env)
+
+if __name__ == '__main__':
+    build_skia(sys.argv[1])
