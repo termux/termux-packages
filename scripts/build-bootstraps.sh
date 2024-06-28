@@ -8,7 +8,7 @@
 #                bootstrap archives to be easily built for (forked) termux
 #                apps without having to publish an apt repo first.
 # Usage:         run "build-bootstrap.sh --help"
-version=0.1.0
+version=0.2.0
 
 set -e
 
@@ -41,6 +41,13 @@ declare -a PACKAGES=()
 # By default it is empty, but can be filled with option '--add'.
 declare -a ADDITIONAL_PACKAGES=()
 
+# By default, build core packages first then additional packages
+# later. Override with option '--build-extra-first'.
+# Helpful in avoiding conflicts when building packages in a
+# certain order. Examples that have build issues:
+# libandroid-glob -> gdb
+BOOTSTRAP_BUILD_ADDITIONAL_PACKAGES_FIRST=false
+
 # A list of already extracted packages
 declare -a EXTRACTED_PACKAGES=()
 
@@ -58,7 +65,7 @@ done
 
 # Build deb files for package and its dependencies deb from source for arch
 build_package() {
-	
+
 	local return_value
 
 	local package_arch="$1"
@@ -94,6 +101,7 @@ build_package() {
 # Extract *.deb files to the bootstrap root.
 extract_debs() {
 
+	local package_arch="$1"
 	local current_package_name
 	local data_archive
 	local control_archive
@@ -116,7 +124,14 @@ extract_debs() {
 	for deb in *.deb; do
 
 		current_package_name="$(echo "$deb" | sed -E 's/^([^_]+).*/\1/' )"
+		current_package_arch="$(echo "$deb" | sed -E 's/.*_(.*).deb$/\1/' )"
 		echo "current_package_name: '$current_package_name'"
+		echo "current_package_arch: '$current_package_arch'"
+
+		if [[ "$current_package_arch" != "$package_arch" ]] && [[ "$current_package_arch" != "all" ]]; then
+			echo "[*] Skipping incompatible package '$deb' for target '$package_arch'..."
+			continue
+		fi
 
 		if [[ "$current_package_name" == *"-static" ]]; then
 			echo "[*] Skipping static package '$deb'..."
@@ -290,6 +305,10 @@ Available command_options:
                      Override default list of architectures for which bootstrap
                      archives will be created. Multiple architectures should be
                      passed as comma-separated list.
+  [ --build-extra-first ]
+                     Build the specified additional packages first rather than
+                     the core packages. May avoid build conflicts for some
+                     packages when building in certain order.
 
 
 The package name/prefix that the bootstrap is built for is defined by
@@ -354,6 +373,9 @@ main() {
 					show_usage
 					return 1
 				fi
+				;;
+			--build-extra-first)
+				BOOTSTRAP_BUILD_ADDITIONAL_PACKAGES_FIRST=true
 				;;
 			-f)
 				BUILD_PACKAGE_OPTIONS+=("-f")
@@ -464,13 +486,24 @@ main() {
 		PACKAGES+=("patch")
 		PACKAGES+=("unzip")
 
-		# Handle additional packages.
-		for add_pkg in "${ADDITIONAL_PACKAGES[@]}"; do
-			if [[ " ${PACKAGES[*]} " != *" $add_pkg "* ]]; then
-				PACKAGES+=("$add_pkg")
-			fi
-		done
-		unset add_pkg
+		if ! ${BOOTSTRAP_BUILD_ADDITIONAL_PACKAGES_FIRST}; then
+			# Handle additional packages.
+			for add_pkg in "${ADDITIONAL_PACKAGES[@]}"; do
+				if [[ " ${PACKAGES[*]} " != *" $add_pkg "* ]]; then
+					PACKAGES+=("$add_pkg")
+				fi
+			done
+			unset add_pkg
+		else
+			# This is pretty much the reverse. Dont think too hard.
+			for core_pkg in "${PACKAGES[@]}"; do
+				if [[ " ${ADDITIONAL_PACKAGES[*]} " != *" $core_pkg "* ]]; then
+					ADDITIONAL_PACKAGES+=("$core_pkg")
+				fi
+			done
+			unset core_pkg
+			PACKAGES=("${ADDITIONAL_PACKAGES[@]}")
+		fi
 
 		# Build packages.
 		for package_name in "${PACKAGES[@]}"; do
@@ -480,7 +513,7 @@ main() {
 		done
 
 		# Extract all debs.
-		extract_debs || return $?
+		extract_debs "$package_arch" || return $?
 
 		# Add termux bootstrap second stage files
 		add_termux_bootstrap_second_stage_files "$package_arch"
