@@ -4,3 +4,4 @@ TERMUX_SUBPKG_INCLUDE="
 share/fonts/
 share/komorebi/
 "
+TERMUX_SUBPKG_DEPEND_ON_PARENT=false

@@ -7,6 +7,7 @@ TERMUX_SUBPKG_DEPENDS="gdk-pixbuf, glib"
 TERMUX_SUBPKG_DESCRIPTION="GTK+ icon cache updater"
 TERMUX_SUBPKG_BREAKS="gtk3 (<< 3.24.41)"
 TERMUX_SUBPKG_REPLACES="gtk3 (<< 3.24.41)"
+TERMUX_SUBPKG_DEPEND_ON_PARENT=false
 
 termux_step_create_subpkg_debscripts() {
 	cat <<- EOF > ./triggers

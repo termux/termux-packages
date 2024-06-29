@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Common interface to speech synthesis"
 TERMUX_PKG_LICENSE="LGPL-2.1, GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.11.5"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=cc4b388fce40681eaff3545e9cc0642216c13c420d5676a4d28c957ddcb916de
 TERMUX_PKG_SRCURL=https://github.com/brailcom/speechd/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="dotconf, espeak, glib, libiconv, libltdl, libsndfile, pulseaudio, python, speechd-data"
