@@ -16,8 +16,6 @@ TERMUX_PKG_PROVIDES="linux-man-pages"
 TERMUX_PKG_EXTRA_MAKE_ARGS="prefix=$TERMUX_PREFIX"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
-# Problems with changing permissions of non-built files
-TERMUX_MAKE_PROCESSSES=1
 
 # Do not remove an entire section; intro should always be included.
 # Bionic libc does not provide <aio.h>, <monetary.h> or pthread_cancel.
