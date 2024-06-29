@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Dynamic Animation and Robotics Toolkit"
 TERMUX_PKG_GROUPS="science"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="Pooya Moradi <pvonmoradi@gmail.com>"
-TERMUX_PKG_VERSION="6.14.1"
+TERMUX_PKG_VERSION="6.14.2"
 TERMUX_PKG_SRCURL="https://github.com/dartsim/dart/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=07bc1442a80abc03b2c1984bdb9b5843446047ac6a37c18b834533c871631fde
+TERMUX_PKG_SHA256=6bbaf452f8182b97bf22adeab6cc7f3dc1cd2733358543131fa130e07c0860fc
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
 # FIXME add ipopt, nlopt, snopt  after a proper FORTRAN compiler is
