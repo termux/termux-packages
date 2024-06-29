@@ -12,7 +12,6 @@ TERMUX_PKG_BREAKS="glib-dev"
 TERMUX_PKG_REPLACES="glib-dev"
 TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
--Dintrospection=enabled
 -Druntime_dir=$TERMUX_PREFIX/var/run
 -Dlibmount=disabled
 -Dman-pages=enabled
@@ -69,8 +68,14 @@ termux_step_pre_configure() {
 
 	TERMUX_PKG_VERSION=. termux_setup_gir
 
-	# Workaround: Remove cyclic dependency between gir and glib
-	sed -i "/Requires:/d" "${TERMUX_PREFIX}/lib/pkgconfig/gobject-introspection-1.0.pc"
+	if [ "${TERMUX_FORCE_BUILD_DEPENDENCIES}" = "true" ]; then
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -Dintrospection=disabled"
+	else
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -Dintrospection=enabled"
+
+		# Workaround: Remove cyclic dependency between gir and glib
+		sed -i "/Requires:/d" "${TERMUX_PREFIX}/lib/pkgconfig/gobject-introspection-1.0.pc"
+	fi
 }
 
 termux_step_post_make_install() {
@@ -82,12 +87,16 @@ termux_step_post_make_install() {
 			> "${TERMUX_PREFIX}/opt/glib/cross/lib/x86_64-linux-gnu/pkgconfig/${pc}"
 	done
 
-	# Workaround: Restore deleted line in pre-configure step
-	echo "Requires: glib-2.0 gobject-2.0" >> "${TERMUX_PREFIX}/lib/pkgconfig/gobject-introspection-1.0.pc"
+	if [ "${TERMUX_FORCE_BUILD_DEPENDENCIES}" = "false" ]; then
+		# Workaround: Restore deleted line in pre-configure step
+		echo "Requires: glib-2.0 gobject-2.0" >> "${TERMUX_PREFIX}/lib/pkgconfig/gobject-introspection-1.0.pc"
+	fi
 }
 
 termux_step_post_massage() {
-	rm -v lib/pkgconfig/gobject-introspection-1.0.pc
+	if [ "${TERMUX_FORCE_BUILD_DEPENDENCIES}" = "false" ]; then
+		rm -v lib/pkgconfig/gobject-introspection-1.0.pc
+	fi
 }
 
 termux_step_create_debscripts() {
