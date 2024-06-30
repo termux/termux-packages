@@ -1,0 +1,16 @@
+# error[E0425]: cannot find value MAP_HUGE_SHIFT in crate libc
+
+--- a/src/unix.rs
++++ b/src/unix.rs
+@@ -32,8 +32,10 @@ const MAP_HUGETLB: libc::c_int = libc::MAP_HUGETLB;
+ #[cfg(target_os = "linux")]
+ const MAP_HUGE_MASK: libc::c_int = libc::MAP_HUGE_MASK;
+
+-#[cfg(any(target_os = "linux", target_os = "android"))]
++#[cfg(target_os = "linux")]
+ const MAP_HUGE_SHIFT: libc::c_int = libc::MAP_HUGE_SHIFT;
++#[cfg(target_os = "android")]
++const MAP_HUGE_SHIFT: libc::c_int = 26;
+
+ #[cfg(not(any(target_os = "linux", target_os = "android")))]
+ const MAP_HUGETLB: libc::c_int = 0;
