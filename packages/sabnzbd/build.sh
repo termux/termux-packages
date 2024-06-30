@@ -6,7 +6,6 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.3.2"
 TERMUX_PKG_SRCURL=https://github.com/sabnzbd/sabnzbd/releases/download/${TERMUX_PKG_VERSION}/SABnzbd-${TERMUX_PKG_VERSION}-src.tar.gz
 TERMUX_PKG_SHA256=d238ffa957e71ad22c16535922cb32e7e6e84afc79eadd5c8f668ce591e207be
-TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="python, python-cryptography, python-sabyenc3, termux-tools, par2, unrar, p7zip, unzip"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -21,8 +20,9 @@ termux_step_post_get_source() {
 			break
 		fi
 		dep="${dep/[# ]*}"
-		# https://github.com/termux/termux-packages/issues/20229
-		if [ -z "$dep" ] || [ -z "${dep/sabctools*}" ]; then
+		dep="${dep/cffi*}" # in python-cryptography
+		dep="${dep/sabctools*}" # in python-sabyenc3
+		if [ -z "$dep" ]; then
 			continue
 		fi
 		TERMUX_PKG_PYTHON_TARGET_DEPS+="'$dep', "
