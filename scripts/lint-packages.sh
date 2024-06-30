@@ -250,7 +250,7 @@ lint_package() {
 
 		echo -n "TERMUX_PKG_LICENSE: "
 		if (( ${#TERMUX_PKG_LICENSE} )); then
-			if [[ "$TERMUX_PKG_LICENSE" == 'custom' ]]; then
+			if [[ "$TERMUX_PKG_LICENSE" == *'custom'* ]]; then
 				echo "CUSTOM"
 			elif [[ "$TERMUX_PKG_LICENSE" == 'non-free' ]]; then
 				echo "NON-FREE"
