@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Uniform machine readable API"
 TERMUX_PKG_LICENSE="LGPL-2.0, GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.80.1"
+# Please update or bump glib when updating gobject-introspection
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/gobject-introspection/${TERMUX_PKG_VERSION%.*}/gobject-introspection-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=a1df7c424e15bda1ab639c00e9051b9adf5cea1a9e512f8a603b53cd199bc6d8
 TERMUX_PKG_DEPENDS="glib, libffi"
