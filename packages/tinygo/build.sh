@@ -3,11 +3,10 @@ TERMUX_PKG_DESCRIPTION="Go compiler for microcontrollers, WASM, CLI tools"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.31.2"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="0.32.0"
 TERMUX_PKG_SRCURL=git+https://github.com/tinygo-org/tinygo
 TERMUX_PKG_GIT_BRANCH="v${TERMUX_PKG_VERSION}"
-TERMUX_PKG_SHA256=cb5e95fe40ea983ded57730a4abcb194439a657a84041787733a6227a8fd1700
+TERMUX_PKG_SHA256=f5def9d80a4fe2f6f5d3f81ae81b7d4bc04b64df64fa7641eb9334279e00259d
 TERMUX_PKG_DEPENDS="binaryen, golang, libc++"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="binaryen, golang"
 TERMUX_PKG_NO_STATICSPLIT=true
@@ -27,6 +26,7 @@ lib/libLLVMDWARFLinkerParallel.a
 lib/libLLVMDWP.a
 lib/libLLVMDebugInfoGSYM.a
 lib/libLLVMDebugInfoLogicalView.a
+lib/libLLVMDWARFLinkerClassic.a
 lib/libLLVMFileCheck.a
 lib/libLLVMFrontendOpenACC.a
 lib/libLLVMFuzzMutate.a
@@ -37,8 +37,10 @@ lib/libLLVMLineEditor.a
 lib/libLLVMMIRParser.a
 lib/libLLVMObjCopy.a
 lib/libLLVMObjectYAML.a
+lib/libLLVMOrcDebugging.a
 lib/libLLVMOrcJIT.a
 lib/libLLVMXRay.a
+lib/libLLVMTextAPIBinaryReader.a
 "
 
 termux_pkg_auto_update() {
