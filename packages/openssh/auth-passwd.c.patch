@@ -1,0 +1,26 @@
+--- a/auth-passwd.c
++++ b/auth-passwd.c
+@@ -56,6 +56,10 @@
+ #include "auth.h"
+ #include "auth-options.h"
+ 
++#ifdef __TERMUX__
++#include <termux-auth.h>
++#endif
++
+ extern struct sshbuf *loginmsg;
+ extern ServerOptions options;
+ 
+@@ -187,6 +191,12 @@
+ 		return (auth_close(as));
+ 	}
+ }
++#elif defined(__TERMUX__)
++int
++sys_auth_passwd(struct ssh *ssh, const char *password)
++{
++	return termux_auth(((Authctxt *)ssh->authctxt)->user, password);	
++}
+ #elif !defined(CUSTOM_SYS_AUTH_PASSWD)
+ int
+ sys_auth_passwd(struct ssh *ssh, const char *password)
