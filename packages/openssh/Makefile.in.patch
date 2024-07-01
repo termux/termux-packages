@@ -1,12 +1,16 @@
-diff -uNr openssh-portable-V_9_5_P1/Makefile.in openssh-portable-V_9_5_P1.mod/Makefile.in
---- openssh-portable-V_9_5_P1/Makefile.in	2023-10-04 07:34:10.000000000 +0300
-+++ openssh-portable-V_9_5_P1.mod/Makefile.in	2023-11-23 16:29:34.261209272 +0200
-@@ -207,7 +207,7 @@
+diff -uNr openssh-portable-V_9_8_P1/Makefile.in openssh-portable-V_9_8_P1.mod/Makefile.in
+--- openssh-portable-V_9_8_P1/Makefile.in	2024-07-01 12:36:28.000000000 +0800
++++ openssh-portable-V_9_8_P1.mod/Makefile.in	2024-07-01 18:12:36.935637270 +0800
+@@ -215,10 +215,10 @@
  	$(LD) -o $@ $(SSHOBJS) $(LDFLAGS) -lssh -lopenbsd-compat $(LIBS) $(GSSLIBS) $(CHANNELLIBS)
  
  sshd$(EXEEXT): libssh.a	$(LIBCOMPAT) $(SSHDOBJS)
--	$(LD) -o $@ $(SSHDOBJS) $(LDFLAGS) -lssh -lopenbsd-compat $(SSHDLIBS) $(LIBS) $(GSSLIBS) $(K5LIBS) $(CHANNELLIBS)
-+	$(LD) -o $@ $(SSHDOBJS) $(LDFLAGS) -ltermux-auth -lssh -lopenbsd-compat $(SSHDLIBS) $(LIBS) $(GSSLIBS) $(K5LIBS) $(CHANNELLIBS)
+-	$(LD) -o $@ $(SSHDOBJS) $(LDFLAGS) -lssh -lopenbsd-compat $(SSHDLIBS) $(LIBS) $(CHANNELLIBS)
++	$(LD) -o $@ $(SSHDOBJS) $(LDFLAGS) -ltermux-auth -lssh -lopenbsd-compat $(SSHDLIBS) $(LIBS) $(CHANNELLIBS)
+ 
+ sshd-session$(EXEEXT): libssh.a	$(LIBCOMPAT) $(SSHD_SESSION_OBJS)
+-	$(LD) -o $@ $(SSHD_SESSION_OBJS) $(LDFLAGS) -lssh -lopenbsd-compat $(SSHDLIBS) $(LIBS) $(GSSLIBS) $(K5LIBS) $(CHANNELLIBS)
++	$(LD) -o $@ $(SSHD_SESSION_OBJS) $(LDFLAGS) -ltermux-auth -lssh -lopenbsd-compat $(SSHDLIBS) $(LIBS) $(GSSLIBS) $(K5LIBS) $(CHANNELLIBS)
  
  scp$(EXEEXT): $(LIBCOMPAT) libssh.a $(SCP_OBJS)
  	$(LD) -o $@ $(SCP_OBJS) $(LDFLAGS) -lssh -lopenbsd-compat $(LIBS)
