@@ -2,12 +2,22 @@ TERMUX_PKG_HOMEPAGE=https://github.com/lu-zero/cargo-c
 TERMUX_PKG_DESCRIPTION="Cargo C-ABI helpers"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.10.1"
+TERMUX_PKG_VERSION="0.10.2"
 TERMUX_PKG_SRCURL=https://github.com/lu-zero/cargo-c/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=0f08ef800bd2c46968356d9445ee780085fcbb500a2e8ac3447f2e4a9981e939
+TERMUX_PKG_SHA256=0217c26fee99f3af867ce52719a39349d19ec6cfac084eea3901f8046f4607c6
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP='^\d+\.\d+(\.\d+)?$'
 TERMUX_PKG_DEPENDS="libcurl, libgit2, libssh2, openssl, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
+
+termux_pkg_auto_update() {
+	local latest_tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}" "${TERMUX_PKG_UPDATE_TAG_TYPE}")"
+	if grep -qP "${TERMUX_PKG_UPDATE_VERSION_REGEXP}" <<<"${latest_tag}"; then
+		termux_pkg_upgrade_version "${latest_tag}"
+	else
+		echo "INFO: No update needed, tag '${latest_tag}' is not a stable release."
+	fi
+}
 
 termux_step_pre_configure() {
 	export LIBGIT2_SYS_USE_PKG_CONFIG=1
