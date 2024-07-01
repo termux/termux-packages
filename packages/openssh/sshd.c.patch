@@ -1,6 +1,16 @@
 diff -uNr openssh-portable-V_9_8_P1/sshd.c openssh-portable-V_9_8_P1.mod/sshd.c
 --- openssh-portable-V_9_8_P1/sshd.c	2024-07-01 12:36:28.000000000 +0800
 +++ openssh-portable-V_9_8_P1.mod/sshd.c	2024-07-01 18:02:23.167637504 +0800
+@@ -1208,7 +1208,8 @@
+ 	saved_argc = ac;
+ 	rexec_argc = ac;
+ 	saved_argv = xcalloc(ac + 1, sizeof(*saved_argv));
+-	for (i = 0; (int)i < ac; i++)
++	saved_argv[0] = "@TERMUX_PREFIX@/bin/sshd";
++	for (i = 1; (int)i < ac; i++)
+ 		saved_argv[i] = xstrdup(av[i]);
+ 	saved_argv[i] = NULL;
+ 
 @@ -1217,10 +1217,10 @@
  	compat_init_setproctitle(ac, av);
  	av = saved_argv;
@@ -14,6 +24,18 @@ diff -uNr openssh-portable-V_9_8_P1/sshd.c openssh-portable-V_9_8_P1.mod/sshd.c
  	/* Ensure that fds 0, 1 and 2 are open or directed to /dev/null */
  	sanitise_stdfd();
  
+@@ -1341,9 +1341,10 @@
+ 			break;
+ 		}
+ 	}
++#ifndef __ANDROID__
+ 	if (!test_flag && !do_dump_cfg && !path_absolute(av[0]))
+ 		fatal("sshd requires execution with an absolute path");
+-
++#endif
+ 	closefrom(STDERR_FILENO + 1);
+ 
+ 	/* Reserve fds we'll need later for reexec things */
 @@ -1606,7 +1606,9 @@
  		fatal("Privilege separation user %s does not exist",
  		    SSH_PRIVSEP_USER);
