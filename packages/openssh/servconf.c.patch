@@ -1,7 +1,7 @@
-diff -uNr openssh-portable-V_9_5_P1/servconf.c openssh-portable-V_9_5_P1.mod/servconf.c
---- openssh-portable-V_9_5_P1/servconf.c	2023-10-04 07:34:10.000000000 +0300
-+++ openssh-portable-V_9_5_P1.mod/servconf.c	2023-11-23 16:29:34.267876057 +0200
-@@ -299,7 +299,7 @@
+diff -uNr openssh-portable-V_9_8_P1/servconf.c openssh-portable-V_9_8_P1.mod/servconf.c
+--- openssh-portable-V_9_8_P1/servconf.c	2024-07-01 12:36:28.000000000 +0800
++++ openssh-portable-V_9_8_P1.mod/servconf.c	2024-07-01 17:43:33.815637935 +0800
+@@ -317,7 +317,7 @@
  	}
  	/* No certificates by default */
  	if (options->num_ports == 0)
@@ -10,22 +10,7 @@ diff -uNr openssh-portable-V_9_5_P1/servconf.c openssh-portable-V_9_5_P1.mod/ser
  	if (options->address_family == -1)
  		options->address_family = AF_UNSPEC;
  	if (options->listen_addrs == NULL)
-@@ -450,9 +450,13 @@
- 
- 	assemble_algorithms(options);
- 
--	/* Turn privilege separation and sandboxing on by default */
- 	if (use_privsep == -1)
-+#ifdef __ANDROID__
-+		use_privsep = PRIVSEP_OFF;
-+#else
-+		/* Turn privilege separation and sandboxing on by default */
- 		use_privsep = PRIVSEP_ON;
-+#endif
- 
- #define CLEAR_ON_NONE(v) \
- 	do { \
-@@ -887,7 +891,7 @@
+@@ -933,7 +933,7 @@
  	struct queued_listenaddr *qla;
  
  	if (options->num_ports == 0)
