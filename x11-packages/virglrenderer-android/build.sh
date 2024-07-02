@@ -2,15 +2,18 @@ TERMUX_PKG_HOMEPAGE=https://virgil3d.github.io/
 TERMUX_PKG_DESCRIPTION="A virtual 3D GPU for use inside qemu virtual machines over OpenGLES libraries on Android"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@licy183"
-TERMUX_PKG_VERSION=(1.0.1)
-TERMUX_PKG_VERSION+=(1.5.10) # libepoxy version
+TERMUX_PKG_VERSION="1.0.1"
+_LIBEPOXY_VERSION="1.5.10"
 TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=(https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/virglrenderer-${TERMUX_PKG_VERSION[0]}/virglrenderer-virglrenderer-${TERMUX_PKG_VERSION[0]}.tar.gz)
-TERMUX_PKG_SRCURL+=(https://github.com/anholt/libepoxy/archive/refs/tags/${TERMUX_PKG_VERSION[1]}.tar.gz)
-TERMUX_PKG_SHA256=(446ab3e265f574ec598e77bdfbf0616ee3c77361f0574bec733ba4bac4df730a)
-TERMUX_PKG_SHA256+=(a7ced37f4102b745ac86d6a70a9da399cc139ff168ba6b8002b4d8d43c900c15)
+TERMUX_PKG_SRCURL=(
+	https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/virglrenderer-${TERMUX_PKG_VERSION}/virglrenderer-virglrenderer-${TERMUX_PKG_VERSION}.tar.gz
+	https://github.com/anholt/libepoxy/archive/refs/tags/${_LIBEPOXY_VERSION}.tar.gz
+)
+TERMUX_PKG_SHA256=(
+	446ab3e265f574ec598e77bdfbf0616ee3c77361f0574bec733ba4bac4df730a
+	a7ced37f4102b745ac86d6a70a9da399cc139ff168ba6b8002b4d8d43c900c15
+)
 TERMUX_PKG_DEPENDS="angle-android"
-
 TERMUX_PKG_HOSTBUILD=true
 
 termux_step_post_get_source() {
