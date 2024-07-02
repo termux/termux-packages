@@ -6,13 +6,17 @@ TERMUX_PKG_VERSION=1:24.0.6
 TERMUX_PKG_REVISION=2
 LIBNETWORK_COMMIT=67e0588f1ddfaf2faf4c8cae8b7ea2876434d91c
 DOCKER_GITCOMMIT=ed223bc
-TERMUX_PKG_SRCURL=(https://github.com/moby/moby/archive/v${TERMUX_PKG_VERSION:2}.tar.gz
-                   https://github.com/docker/cli/archive/v${TERMUX_PKG_VERSION:2}.tar.gz
-                   https://github.com/moby/libnetwork/archive/${LIBNETWORK_COMMIT}.tar.gz)
+TERMUX_PKG_SRCURL=(
+	https://github.com/moby/moby/archive/v${TERMUX_PKG_VERSION:2}.tar.gz
+	https://github.com/docker/cli/archive/v${TERMUX_PKG_VERSION:2}.tar.gz
+	https://github.com/moby/libnetwork/archive/${LIBNETWORK_COMMIT}.tar.gz
+)
 TERMUX_PKG_DEPENDS="containerd, libdevmapper, resolv-conf"
-TERMUX_PKG_SHA256=(29a8ee54e9ea008b40eebca42dec8b67ab257eb8ac175f67e79c110e4187d7d2
-                   c1a4a580ced3633e489c5c9869a20198415da44df7023fdc200d425cdf5fa652
-                   4ab6f6c97db834c2eedc053d06c4d32d268f33051b8148098b4a0e8eee51e97b)
+TERMUX_PKG_SHA256=(
+	29a8ee54e9ea008b40eebca42dec8b67ab257eb8ac175f67e79c110e4187d7d2
+	c1a4a580ced3633e489c5c9869a20198415da44df7023fdc200d425cdf5fa652
+	4ab6f6c97db834c2eedc053d06c4d32d268f33051b8148098b4a0e8eee51e97b
+)
 TERMUX_PKG_CONFFILES="etc/docker/daemon.json"
 TERMUX_PKG_SERVICE_SCRIPT=("dockerd" "exec su -c \"PATH=\$PATH $TERMUX_PREFIX/bin/dockerd 2>&1\"")
 TERMUX_PKG_BUILD_IN_SRC=true

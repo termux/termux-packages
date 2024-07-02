@@ -6,23 +6,27 @@ _TAG_VERSION=13.0.0
 _TAG_REVISION=6
 TERMUX_PKG_VERSION=${_TAG_VERSION}.${_TAG_REVISION}
 TERMUX_PKG_REVISION=11
-TERMUX_PKG_SRCURL=(https://android.googlesource.com/platform/frameworks/base
-                   https://android.googlesource.com/platform/system/core
-                   https://android.googlesource.com/platform/system/libbase
-                   https://android.googlesource.com/platform/system/libziparchive
-                   https://android.googlesource.com/platform/system/logging
-                   https://android.googlesource.com/platform/system/incremental_delivery
-                   https://android.googlesource.com/platform/build
-                   https://android.googlesource.com/platform/system/tools/aidl)
+TERMUX_PKG_SRCURL=(
+	https://android.googlesource.com/platform/frameworks/base
+	https://android.googlesource.com/platform/system/core
+	https://android.googlesource.com/platform/system/libbase
+	https://android.googlesource.com/platform/system/libziparchive
+	https://android.googlesource.com/platform/system/logging
+	https://android.googlesource.com/platform/system/incremental_delivery
+	https://android.googlesource.com/platform/build
+	https://android.googlesource.com/platform/system/tools/aidl
+)
 TERMUX_PKG_GIT_BRANCH=android-${_TAG_VERSION}_r${_TAG_REVISION}
-TERMUX_PKG_SHA256=(SKIP_CHECKSUM
-                   SKIP_CHECKSUM
-                   SKIP_CHECKSUM
-                   SKIP_CHECKSUM
-                   SKIP_CHECKSUM
-                   SKIP_CHECKSUM
-                   SKIP_CHECKSUM
-                   SKIP_CHECKSUM)
+TERMUX_PKG_SHA256=(
+	SKIP_CHECKSUM
+	SKIP_CHECKSUM
+	SKIP_CHECKSUM
+	SKIP_CHECKSUM
+	SKIP_CHECKSUM
+	SKIP_CHECKSUM
+	SKIP_CHECKSUM
+	SKIP_CHECKSUM
+)
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="libc++, libexpat, libpng, libzopfli, zlib"
