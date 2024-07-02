@@ -4,10 +4,9 @@ TERMUX_PKG_DESCRIPTION="Python 3 programming language intended to enable clear p
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.11.9
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=3.12.4
 TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=9b1e896523fc510691126c864406d9360a3d1e986acbda59cda57b5abda45b87
+TERMUX_PKG_SHA256=f6d419a6d8743ab26700801b4908d26d97e8b986e14f95de31b32de2b0e79554
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="gdbm, libandroid-posix-semaphore, libandroid-support, libbz2, libcrypt, libexpat, libffi, liblzma, libsqlite, ncurses, ncurses-ui-libs, openssl, readline, zlib"
 TERMUX_PKG_RECOMMENDS="python-ensurepip-wheels, python-pip"
@@ -18,7 +17,7 @@ TERMUX_PKG_REPLACES="python-dev"
 TERMUX_PKG_PROVIDES="python3"
 
 # https://github.com/termux/termux-packages/issues/15908
-TERMUX_PKG_MAKE_PROCESSES=1
+TERMUX_MAKE_PROCESSES=1
 
 _MAJOR_VERSION="${TERMUX_PKG_VERSION%.*}"
 
@@ -74,6 +73,9 @@ termux_step_pre_configure() {
 	else
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-build-python=python$_MAJOR_VERSION"
 	fi
+
+	# For multiprocessing libs
+	export LDFLAGS+=" -landroid-posix-semaphore"
 
 	export LIBCRYPT_LIBS="-lcrypt"
 }

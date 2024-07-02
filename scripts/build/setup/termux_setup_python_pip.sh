@@ -59,6 +59,13 @@ termux_setup_python_pip() {
 		fi
 		. "${TERMUX_PYTHON_CROSSENV_PREFIX}/bin/activate"
 
+		# Since 3.12, distutils is removed from python, but setuptools>=60 provides it
+		build-pip install 'setuptools==67.6.1' wheel
+		cross-pip install 'setuptools==67.6.1' wheel
+		if [ "${TERMUX_PYTHON_VERSION#*.}" -lt "12" ]; then
+			export SETUPTOOLS_USE_DISTUTILS=stdlib
+		fi
+
 		export PATH="${PATH}:${TERMUX_PYTHON_CROSSENV_PREFIX}/build/bin"
 	fi
 }
