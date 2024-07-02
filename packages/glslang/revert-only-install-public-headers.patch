@@ -40,10 +40,10 @@ index 37eecaad..10de92a7 100644
      Include/Types.h)
  
 -add_library(glslang ${LIB_TYPE} ${GLSLANG_SOURCES} ${GLSLANG_HEADERS})
-+add_library(glslang ${LIB_TYPE} ${BISON_GLSLParser_OUTPUT_SOURCE} ${GLSLANG_SOURCES} ${GLSLANG_HEADERS})
++add_library(glslang ${LIB_TYPE} ${GLSLANG_SOURCES} ${GLSLANG_HEADERS} ${BISON_GLSLParser_OUTPUT_SOURCE})
+ add_library(glslang::glslang ALIAS glslang)
  set_target_properties(glslang PROPERTIES
      FOLDER glslang
-     POSITION_INDEPENDENT_CODE ON
 @@ -252,16 +252,12 @@ if(PROJECT_IS_TOP_LEVEL)
          install(FILES "${CMAKE_CURRENT_BINARY_DIR}/glslangTargets.cmake" DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake)
      endif()
