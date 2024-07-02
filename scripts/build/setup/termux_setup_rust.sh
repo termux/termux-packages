@@ -14,12 +14,6 @@ termux_setup_rust() {
 			pkg install rust
 
 			pacman -S rust
-
-			or build it from source with
-
-			./build-package.sh rust
-
-			Note that package 'rust' is known to be problematic for building on device.
 			EOL
 			exit 1
 		fi
