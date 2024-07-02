@@ -2,23 +2,28 @@ TERMUX_PKG_HOMEPAGE=https://github.com/ldc-developers/ldc
 TERMUX_PKG_DESCRIPTION="D programming language compiler, built with LLVM"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=(1.30.0)
-TERMUX_PKG_VERSION+=(14.0.3)  # LLVM version
-TERMUX_PKG_VERSION+=(2.100.1) # TOOLS version
-TERMUX_PKG_VERSION+=(1.30.0)  # DUB version
-
-TERMUX_PKG_SRCURL=(https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc-${TERMUX_PKG_VERSION}-src.tar.gz
-                   https://github.com/ldc-developers/llvm-project/releases/download/ldc-v${TERMUX_PKG_VERSION[1]}/llvm-${TERMUX_PKG_VERSION[1]}.src.tar.xz
-                   https://github.com/llvm/llvm-project/releases/download/llvmorg-${TERMUX_PKG_VERSION[1]}/libunwind-${TERMUX_PKG_VERSION[1]}.src.tar.xz
-                   https://github.com/dlang/tools/archive/v${TERMUX_PKG_VERSION[2]}.tar.gz
-                   https://github.com/dlang/dub/archive/v${TERMUX_PKG_VERSION[3]}.tar.gz
-                   https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc2-${TERMUX_PKG_VERSION}-linux-x86_64.tar.xz)
-TERMUX_PKG_SHA256=(fdbb376f08242d917922a6a22a773980217fafa310046fc5d6459490af23dacd
-                   9638d8d0b6a43d9cdc53699bec19e6bc9bef98f5950b99e6b8c1ec373aee4fa7
-                   301137841d1e3401f59b3828d2a9ac86a1b826b89265d55541a2fd6ca2a595eb
-                   54bde9a979d70952690a517f90de8d76631fa9a2f7252af7278dafbcaaa42d54
-                   840cd65bf5f0dd06ca688f63b94d71fccd92b526bbf1d3892fe5535b1e85c10e
-                   5784d4cc47d0845af0897d3b7473a08dd0281a4cdabac0a486740840d014fde1)
+TERMUX_PKG_VERSION=(
+	1.30.0
+	14.0.3  # LLVM version
+	2.100.1 # TOOLS version
+	1.30.0  # DUB version
+)
+TERMUX_PKG_SRCURL=(
+	https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc-${TERMUX_PKG_VERSION}-src.tar.gz
+	https://github.com/ldc-developers/llvm-project/releases/download/ldc-v${TERMUX_PKG_VERSION[1]}/llvm-${TERMUX_PKG_VERSION[1]}.src.tar.xz
+	https://github.com/llvm/llvm-project/releases/download/llvmorg-${TERMUX_PKG_VERSION[1]}/libunwind-${TERMUX_PKG_VERSION[1]}.src.tar.xz
+	https://github.com/dlang/tools/archive/v${TERMUX_PKG_VERSION[2]}.tar.gz
+	https://github.com/dlang/dub/archive/v${TERMUX_PKG_VERSION[3]}.tar.gz
+	https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc2-${TERMUX_PKG_VERSION}-linux-x86_64.tar.xz
+)
+TERMUX_PKG_SHA256=(
+	fdbb376f08242d917922a6a22a773980217fafa310046fc5d6459490af23dacd
+	9638d8d0b6a43d9cdc53699bec19e6bc9bef98f5950b99e6b8c1ec373aee4fa7
+	301137841d1e3401f59b3828d2a9ac86a1b826b89265d55541a2fd6ca2a595eb
+	54bde9a979d70952690a517f90de8d76631fa9a2f7252af7278dafbcaaa42d54
+	840cd65bf5f0dd06ca688f63b94d71fccd92b526bbf1d3892fe5535b1e85c10e
+	5784d4cc47d0845af0897d3b7473a08dd0281a4cdabac0a486740840d014fde1
+)
 TERMUX_PKG_AUTO_UPDATE=false
 # dub dlopen()s libcurl.so:
 TERMUX_PKG_DEPENDS="binutils-bin, binutils-is-llvm | binutils, clang, libc++, libcurl, zlib"
@@ -88,7 +93,7 @@ termux_step_pre_configure() {
 		# [...]/ldc/src/llvm/projects/compiler-rt/lib/builtins/clear_cache.c:85:20:
 		# error: write to reserved register 'R7'
 		#   __asm __volatile("svc 0x0"
-		#                    ^
+		#	 ^
 		CFLAGS="${CFLAGS//-mthumb/}"
 	fi
 	LDFLAGS=" -L$TERMUX_PKG_BUILDDIR/llvm/lib $LDFLAGS -lc++_shared"

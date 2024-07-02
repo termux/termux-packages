@@ -4,10 +4,14 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=20110708
 TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=(https://downloads.sourceforge.net/fte/fte-${TERMUX_PKG_VERSION}-src.zip
-                   https://downloads.sourceforge.net/fte/fte-${TERMUX_PKG_VERSION}-common.zip)
-TERMUX_PKG_SHA256=(d6311c542d3f0f2890a54a661c3b67228e27b894b4164e9faf29f014f254499e
-                   58411578b31958765f42d2bf29b7aedd9f916955c2c19c96909a1c03e0246af7)
+TERMUX_PKG_SRCURL=(
+	https://downloads.sourceforge.net/fte/fte-${TERMUX_PKG_VERSION}-src.zip
+	https://downloads.sourceforge.net/fte/fte-${TERMUX_PKG_VERSION}-common.zip
+)
+TERMUX_PKG_SHA256=(
+	d6311c542d3f0f2890a54a661c3b67228e27b894b4164e9faf29f014f254499e
+	58411578b31958765f42d2bf29b7aedd9f916955c2c19c96909a1c03e0246af7
+)
 TERMUX_PKG_DEPENDS="libc++, ncurses"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_MAKE_ARGS="

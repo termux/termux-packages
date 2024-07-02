@@ -53,31 +53,10 @@ termux_pkg_auto_update() {
 		EOL
 		return
 	fi
-	local tmpdir=$(mktemp -d)
-	curl -sLC- \
-		"$(dirname "${TERMUX_PKG_SRCURL[0]}")/texinfo-${latest_version}.tar.xz" \
-		-o "${tmpdir}/texinfo-${latest_version}.tar.xz"
-	curl -sLC- \
-		"$(dirname "${TERMUX_PKG_SRCURL[1]}")/texinfo_${latest_version}${debian_revision}.debian.tar.xz" \
-		-o "${tmpdir}/texinfo_${latest_version}${debian_revision}.debian.tar.xz"
-	local texinfo_txz_sha256=$(sha256sum "${tmpdir}/texinfo-${latest_version}.tar.xz" | sed -e "s| .*$||")
-	local texinfo_debian_txz_sha256=$(sha256sum "${tmpdir}/texinfo_${latest_version}${debian_revision}.debian.tar.xz" | sed -e "s| .*$||")
-	if [[ -z "${texinfo_txz_sha256}" || -z "${texinfo_debian_txz_sha256}" ]]; then
-		cat <<- EOL >&2
-		WARN: Auto update failure!
-		texinfo_txz_sha256=${texinfo_txz_sha256}
-		texinfo_debian_txz_sha256=${texinfo_debian_txz_sha256}
-		EOL
-		return
-	fi
 
 	sed \
 		-e "s|^_DEBIAN_REVISION=.*|_DEBIAN_REVISION=\"${debian_revision}\"|" \
-		-e "s|^\t${TERMUX_PKG_SHA256[0]}.*|\t${texinfo_txz_sha256}|" \
-		-e "s|^\t${TERMUX_PKG_SHA256[1]}.*|\t${texinfo_debian_txz_sha256}|" \
 		-i "${TERMUX_PKG_BUILDER_DIR}/build.sh"
-
-	rm -fr "${tmpdir}"
 
 	termux_pkg_upgrade_version "${latest_version}"
 }
