@@ -1,6 +1,5 @@
-diff -u -r ../node-v22.3.0/node.gyp ./node.gyp
---- ../node-v22.3.0/node.gyp	2024-06-11 13:24:36.000000000 +0000
-+++ ./node.gyp	2024-06-19 21:36:41.345330645 +0000
+--- ./node.gyp.orig	2024-07-02 11:51:21.000000000 +0530
++++ ./node.gyp	2024-07-02 15:57:06.792934530 +0530
 @@ -548,7 +548,8 @@
        ],
  
@@ -11,7 +10,7 @@ diff -u -r ../node-v22.3.0/node.gyp ./node.gyp
        ],
  
        'dependencies': [
-@@ -1026,49 +1027,6 @@
+@@ -1028,51 +1029,6 @@
          },
        ],
      }, # node_lib_target_name
@@ -21,6 +20,7 @@ diff -u -r ../node-v22.3.0/node.gyp ./node.gyp
 -      'dependencies': [
 -        '<(node_lib_target_name)',
 -        'deps/histogram/histogram.gyp:histogram',
+-        'deps/sqlite/sqlite.gyp:sqlite',
 -      ],
 -
 -      'includes': [
@@ -32,6 +32,7 @@ diff -u -r ../node-v22.3.0/node.gyp ./node.gyp
 -        'deps/v8/include',
 -        'deps/cares/include',
 -        'deps/uv/include',
+-        'deps/sqlite',
 -        'test/cctest',
 -      ],
 -
@@ -61,7 +62,7 @@ diff -u -r ../node-v22.3.0/node.gyp ./node.gyp
      { # fuzz_ClientHelloParser.cc
        'target_name': 'fuzz_ClientHelloParser',
        'type': 'executable',
-@@ -1157,83 +1115,6 @@
+@@ -1166,86 +1122,6 @@
          }],
        ],
      }, # fuzz_strings
@@ -74,9 +75,11 @@ diff -u -r ../node-v22.3.0/node.gyp ./node.gyp
 -        'deps/googletest/googletest.gyp:gtest',
 -        'deps/googletest/googletest.gyp:gtest_main',
 -        'deps/histogram/histogram.gyp:histogram',
+-        'deps/sqlite/sqlite.gyp:sqlite',
 -        'deps/simdjson/simdjson.gyp:simdjson',
 -        'deps/simdutf/simdutf.gyp:simdutf',
 -        'deps/ada/ada.gyp:ada',
+-        'deps/nbytes/nbytes.gyp:nbytes',
 -      ],
 -
 -      'includes': [
@@ -89,6 +92,7 @@ diff -u -r ../node-v22.3.0/node.gyp ./node.gyp
 -        'deps/v8/include',
 -        'deps/cares/include',
 -        'deps/uv/include',
+-        'deps/sqlite',
 -        'test/cctest',
 -      ],
 -
@@ -145,7 +149,7 @@ diff -u -r ../node-v22.3.0/node.gyp ./node.gyp
  
      {
        'target_name': 'embedtest',
-@@ -1348,69 +1229,6 @@
+@@ -1363,72 +1239,6 @@
          }],
        ]
      },
@@ -156,7 +160,9 @@ diff -u -r ../node-v22.3.0/node.gyp ./node.gyp
 -      'dependencies': [
 -        '<(node_lib_target_name)',
 -        'deps/histogram/histogram.gyp:histogram',
+-        'deps/sqlite/sqlite.gyp:sqlite',
 -        'deps/ada/ada.gyp:ada',
+-        'deps/nbytes/nbytes.gyp:nbytes',
 -        'deps/simdjson/simdjson.gyp:simdjson',
 -        'deps/simdutf/simdutf.gyp:simdutf',
 -      ],
@@ -171,6 +177,7 @@ diff -u -r ../node-v22.3.0/node.gyp ./node.gyp
 -        'deps/v8/include',
 -        'deps/cares/include',
 -        'deps/uv/include',
+-        'deps/sqlite',
 -      ],
 -
 -      'defines': [ 'NODE_WANT_INTERNALS=1' ],
