@@ -18,26 +18,28 @@ fi
 test -f "$HOME"/.termuxrc && . "$HOME"/.termuxrc
 : ${TERMUX_TOPDIR:="$HOME/.termux-build"}
 : ${TERMUX_ARCH:="aarch64"}
+: ${TERMUX_FORMAT:="debian"}
 : ${TERMUX_DEBUG_BUILD:=""}
-: ${TERMUX_INSTALL_DEPS:="-s"}
-# Set TERMUX_INSTALL_DEPS to -s unless set to -i
+: ${TERMUX_INSTALL_DEPS:=""}
 
 _show_usage() {
-	echo "Usage: ./build-all.sh [-a ARCH] [-d] [-i] [-o DIR]"
+	echo "Usage: ./build-all.sh [-a ARCH] [-d] [-i] [-o DIR] [-f FORMAT]"
 	echo "Build all packages."
 	echo "  -a The architecture to build for: aarch64(default), arm, i686, x86_64 or all."
 	echo "  -d Build with debug symbols."
 	echo "  -i Build dependencies."
 	echo "  -o Specify deb directory. Default: debs/."
+	echo "  -f Specify format pkg. Default: debian."
 	exit 1
 }
 
-while getopts :a:hdio: option; do
+while getopts :a:hdio:f: option; do
 case "$option" in
 	a) TERMUX_ARCH="$OPTARG";;
 	d) TERMUX_DEBUG_BUILD='-d';;
 	i) TERMUX_INSTALL_DEPS='-i';;
 	o) TERMUX_OUTPUT_DIR="$(realpath -m "$OPTARG")";;
+	f) TERMUX_FORMAT="$OPTARG";;
 	h) _show_usage;;
 	*) _show_usage >&2 ;;
 esac
@@ -47,6 +49,11 @@ if [ "$#" -ne 0 ]; then _show_usage; fi
 
 if [[ ! "$TERMUX_ARCH" =~ ^(all|aarch64|arm|i686|x86_64)$ ]]; then
 	echo "ERROR: Invalid arch '$TERMUX_ARCH'" 1>&2
+	exit 1
+fi
+
+if [[ ! "$TERMUX_FORMAT" =~ ^(debian|pacman)$ ]]; then
+	echo "ERROR: Invalid format '$TERMUX_FORMAT'" 1>&2
 	exit 1
 fi
 
@@ -65,28 +72,42 @@ if [ -e "$BUILDSTATUS_FILE" ]; then
 	echo "Continuing build-all from: $BUILDSTATUS_FILE"
 fi
 
-exec >	>(tee -a "$BUILDALL_DIR"/ALL.out)
-exec 2> >(tee -a "$BUILDALL_DIR"/ALL.err >&2)
-trap 'echo ERROR: See $BUILDALL_DIR/${PKG}.err' ERR
+exec &>	>(tee -a "$BUILDALL_DIR"/ALL.out)
+trap 'echo ERROR: See $BUILDALL_DIR/${PKG}.out' ERR
 
 while read -r PKG PKG_DIR; do
 	# Check build status (grepping is a bit crude, but it works)
-	if [ -e "$BUILDSTATUS_FILE" ] && grep "^$PKG\$" "$BUILDSTATUS_FILE" >/dev/null; then
+	if [ -e "$BUILDSTATUS_FILE" ] && grep -q "^$PKG\$" "$BUILDSTATUS_FILE"; then
 		echo "Skipping $PKG"
 		continue
 	fi
 
+	# Start building
+	if [ -n "${TERMUX_DEBUG_BUILD}" ]; then
+		echo "\"$BUILDSCRIPT\" -a \"$TERMUX_ARCH\" $TERMUX_DEBUG_BUILD --format \"$TERMUX_FORMAT\" ${TERMUX_OUTPUT_DIR+-o $TERMUX_OUTPUT_DIR} $TERMUX_INSTALL_DEPS \"$PKG_DIR\""
+	fi
 	echo -n "Building $PKG... "
 	BUILD_START=$(date "+%s")
-	bash -x "$BUILDSCRIPT" -a "$TERMUX_ARCH" $TERMUX_DEBUG_BUILD \
+	"$BUILDSCRIPT" -a "$TERMUX_ARCH" $TERMUX_DEBUG_BUILD --format "$TERMUX_FORMAT" \
 		${TERMUX_OUTPUT_DIR+-o $TERMUX_OUTPUT_DIR} $TERMUX_INSTALL_DEPS "$PKG_DIR" \
-		> "$BUILDALL_DIR"/"${PKG}".out 2> "$BUILDALL_DIR"/"${PKG}".err
+		&> "$BUILDALL_DIR"/"${PKG}".out
 	BUILD_END=$(date "+%s")
 	BUILD_SECONDS=$(( BUILD_END - BUILD_START ))
-	echo "done in $BUILD_SECONDS"
+	echo "done in $BUILD_SECONDS sec"
 
 	# Update build status
 	echo "$PKG" >> "$BUILDSTATUS_FILE"
+
+	# Check which packages were also compiled
+	if [ -z "$TERMUX_INSTALL_DEPS" ]; then
+		for build_pkg in $(ls -1 ~/.termux-build/ | grep -v -e '^_cache' -e '^_buildall'); do
+			if grep -q "^${build_pkg}\$" "$BUILDSTATUS_FILE"; then
+				continue
+			fi
+			echo "The \"${build_pkg}\" package was also compiled"
+			echo "$build_pkg" >> "$BUILDSTATUS_FILE"
+		done
+	fi
 done<"${BUILDORDER_FILE}"
 
 # Update build status

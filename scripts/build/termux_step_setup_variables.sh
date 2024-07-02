@@ -187,6 +187,9 @@ termux_step_setup_variables() {
 	TERMUX_PYTHON_HOME=$TERMUX_PREFIX/lib/python${TERMUX_PYTHON_VERSION} # location of python libraries
 	TERMUX_PKG_MESON_NATIVE=false
 	TERMUX_PKG_CMAKE_CROSSCOMPILING=true
+	TERMUX_PKG_ONLY_INSTALLING=false # when set to true in a package, it will not be included in the list of dependencies of other packages if it is planned to be compiled and not installed
+	TERMUX_PKG_SEPARATE_SUB_DEPENDS=false # when set to true in a package, subpackage(s) of package will not be added to the dependency of the parent package
+	TERMUX_PKG_ACCEPT_PKG_IN_DEP=false # when set to true in a package, the package can be in its own dependency if there is a circular dependency on it
 
 	unset CFLAGS CPPFLAGS LDFLAGS CXXFLAGS
 	unset TERMUX_MESON_ENABLE_SOVERSION # setenv to enable SOVERSION suffix for shared libs built with Meson
