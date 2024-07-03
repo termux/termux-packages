@@ -36,16 +36,21 @@ diff -uNr openssh-portable-V_9_8_P1/sshd.c openssh-portable-V_9_8_P1.mod/sshd.c
  	closefrom(STDERR_FILENO + 1);
  
  	/* Reserve fds we'll need later for reexec things */
-@@ -1606,7 +1606,9 @@
+@@ -1602,12 +1602,13 @@
+ 	/* Ensure privsep directory is correctly configured. */
+ 	need_chroot = ((getuid() == 0 || geteuid() == 0) ||
+ 	    options.kerberos_authentication);
++#ifndef __ANDROID__
+ 	if ((getpwnam(SSH_PRIVSEP_USER)) == NULL && need_chroot) {
  		fatal("Privilege separation user %s does not exist",
  		    SSH_PRIVSEP_USER);
  	}
-+#ifndef __ANDROID__
  	endpwent();
+-
 +#endif
- 
  	if (need_chroot) {
  		if ((stat(_PATH_PRIVSEP_CHROOT_DIR, &sb) == -1) ||
+ 		    (S_ISDIR(sb.st_mode) == 0))
 @@ -1638,9 +1640,10 @@
  	 * to create a file, and we can't control the code in every
  	 * module which might be used).
