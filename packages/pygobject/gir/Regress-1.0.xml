@@ -1,0 +1,158 @@
+<?xml version="1.0"?>
+<dump>
+  <enum name="RegressTestEnum" get-type="regress_test_enum_get_type">
+    <member name="REGRESS_TEST_VALUE1" nick="value1" value="0"/>
+    <member name="REGRESS_TEST_VALUE2" nick="value2" value="1"/>
+    <member name="REGRESS_TEST_VALUE3" nick="value3" value="-1"/>
+    <member name="REGRESS_TEST_VALUE4" nick="value4" value="48"/>
+    <member name="REGRESS_TEST_VALUE5" nick="value5" value="49"/>
+  </enum>  <enum name="RegressTestEnumUnsigned" get-type="regress_test_enum_unsigned_get_type">
+    <member name="REGRESS_TEST_UNSIGNED_VALUE1" nick="value1" value="1"/>
+    <member name="REGRESS_TEST_UNSIGNED_VALUE2" nick="value2" value="-2147483648"/>
+  </enum>  <flags name="RegressTestFlags" get-type="regress_test_flags_get_type">
+    <member name="TEST_FLAG1" nick="flag1" value="1"/>
+    <member name="TEST_FLAG2" nick="flag2" value="2"/>
+    <member name="TEST_FLAG3" nick="flag3" value="4"/>
+  </flags>
+  <enum name="RegressTestError" get-type="regress_test_error_get_type">
+    <member name="REGRESS_TEST_ERROR_CODE1" nick="code1" value="1"/>
+    <member name="REGRESS_TEST_ERROR_CODE2" nick="code2" value="2"/>
+    <member name="REGRESS_TEST_ERROR_CODE3" nick="code3" value="3"/>
+  </enum>  <enum name="RegressTestABCError" get-type="regress_test_abc_error_get_type">
+    <member name="REGRESS_TEST_ABC_ERROR_CODE1" nick="code1" value="1"/>
+    <member name="REGRESS_TEST_ABC_ERROR_CODE2" nick="code2" value="2"/>
+    <member name="REGRESS_TEST_ABC_ERROR_CODE3" nick="code3" value="3"/>
+  </enum>  <enum name="RegressTestOtherError" get-type="regress_test_unconventional_error_get_type">
+    <member name="REGRESS_TEST_OTHER_ERROR_CODE1" nick="code1" value="1"/>
+    <member name="REGRESS_TEST_OTHER_ERROR_CODE2" nick="code2" value="2"/>
+    <member name="REGRESS_TEST_OTHER_ERROR_CODE3" nick="code3" value="3"/>
+  </enum>  <boxed name="RegressTestSimpleBoxedA" get-type="regress_test_simple_boxed_a_get_gtype"/>
+  <boxed name="RegressTestSimpleBoxedB" get-type="regress_test_simple_boxed_b_get_type"/>
+  <boxed name="RegressTestBoxed" get-type="regress_test_boxed_get_type"/>
+  <boxed name="RegressTestBoxedB" get-type="regress_test_boxed_b_get_type"/>
+  <boxed name="RegressTestBoxedC" get-type="regress_test_boxed_c_get_type"/>
+  <boxed name="RegressTestBoxedD" get-type="regress_test_boxed_d_get_type"/>
+  <class name="RegressTestObj" get-type="regress_test_obj_get_type" parents="GObject">
+    <property name="bare" type="GObject" flags="3"/>
+    <property name="boxed" type="RegressTestBoxed" flags="3"/>
+    <property name="hash-table" type="GHashTable" flags="3"/>
+    <property name="list" type="gpointer" flags="3"/>
+    <property name="pptrarray" type="gpointer" flags="3"/>
+    <property name="hash-table-old" type="GHashTable" flags="3"/>
+    <property name="list-old" type="gpointer" flags="3"/>
+    <property name="int" type="gint" flags="3" default-value="0"/>
+    <property name="float" type="gfloat" flags="3" default-value="1.000000"/>
+    <property name="double" type="gdouble" flags="3" default-value="1.000000"/>
+    <property name="string" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="gtype" type="GType" flags="3"/>
+    <property name="name-conflict" type="gint" flags="7" default-value="42"/>
+    <property name="byte-array" type="GByteArray" flags="7"/>
+    <property name="write-only" type="gboolean" flags="2" default-value="FALSE"/>
+    <signal name="test" return="void" when="last" no-recurse="1" no-hooks="1">
+    </signal>
+    <signal name="test-with-static-scope-arg" return="void" when="last" no-recurse="1" no-hooks="1">
+      <param type="RegressTestSimpleBoxedA"/>
+    </signal>
+    <signal name="sig-with-array-prop" return="void" when="last">
+      <param type="GArray"/>
+    </signal>
+    <signal name="sig-with-array-len-prop" return="void" when="last">
+      <param type="gpointer"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="sig-with-hash-prop" return="void" when="last">
+      <param type="GHashTable"/>
+    </signal>
+    <signal name="sig-with-strv" return="void" when="last">
+      <param type="GStrv"/>
+    </signal>
+    <signal name="sig-with-strv-full" return="void" when="last">
+      <param type="GStrv"/>
+    </signal>
+    <signal name="sig-with-obj" return="void" when="last">
+      <param type="GObject"/>
+    </signal>
+    <signal name="sig-with-obj-full" return="void" when="last">
+      <param type="GObject"/>
+    </signal>
+    <signal name="sig-with-foreign-struct" return="void" when="last">
+      <param type="CairoContext"/>
+    </signal>
+    <signal name="first" return="void" when="first">
+    </signal>
+    <signal name="cleanup" return="void" when="cleanup">
+    </signal>
+    <signal name="all" return="void" when="first" no-recurse="1" detailed="1" action="1" no-hooks="1">
+    </signal>
+    <signal name="sig-with-int64-prop" return="gint64" when="last">
+      <param type="gint64"/>
+    </signal>
+    <signal name="sig-with-uint64-prop" return="guint64" when="last">
+      <param type="guint64"/>
+    </signal>
+    <signal name="sig-with-intarray-ret" return="GArray" when="last">
+      <param type="gint"/>
+    </signal>
+    <signal name="sig-with-inout-int" return="void" when="last">
+      <param type="gpointer"/>
+    </signal>
+    <signal name="sig-with-gerror" return="void" when="last">
+      <param type="GError"/>
+    </signal>
+  </class>
+  <class name="RegressTestSubObj" get-type="regress_test_sub_obj_get_type" parents="RegressTestObj,GObject">
+    <implements name="RegressTestInterface"/>
+    <property name="boolean" type="gboolean" flags="231" default-value="TRUE"/>
+  </class>
+  <fundamental name="RegressTestFundamentalObject" get-type="regress_test_fundamental_object_get_type" abstract="1" instantiatable="1">
+  </fundamental>
+  <fundamental name="RegressTestFundamentalSubObject" get-type="regress_test_fundamental_sub_object_get_type" instantiatable="1" parents="RegressTestFundamentalObject">
+  </fundamental>
+  <fundamental name="RegressTestFundamentalObjectNoGetSetFunc" get-type="regress_test_fundamental_object_no_get_set_func_get_type" instantiatable="1">
+  </fundamental>
+  <fundamental name="RegressTestFundamentalSubObjectNoGetSetFunc" get-type="regress_test_fundamental_sub_object_no_get_set_func_get_type" instantiatable="1" parents="RegressTestFundamentalObjectNoGetSetFunc">
+  </fundamental>
+  <interface name="RegressTestInterface" get-type="regress_test_interface_get_type">
+    <property name="number" type="gint" flags="231" default-value="0"/>
+    <signal name="interface-signal" return="void" when="last">
+      <param type="gpointer"/>
+    </signal>
+  </interface>
+  <class name="RegressTestWi8021x" get-type="regress_test_wi_802_1x_get_type" parents="GObject">
+    <property name="testbool" type="gboolean" flags="3" default-value="TRUE"/>
+  </class>
+  <class name="RegressTestFloating" get-type="regress_test_floating_get_type" parents="GInitiallyUnowned,GObject">
+  </class>
+  <class name="RegressAnnotationObject" get-type="regress_annotation_object_get_type" parents="GObject">
+    <property name="string-property" type="gchararray" flags="7" default-value="NULL"/>
+    <property name="function-property" type="gpointer" flags="7"/>
+    <property name="tab-property" type="gchararray" flags="7" default-value="NULL"/>
+    <signal name="string-signal" return="void" when="last">
+      <param type="gpointer"/>
+    </signal>
+    <signal name="list-signal" return="void" when="last">
+      <param type="gpointer"/>
+    </signal>
+    <signal name="doc-empty-arg-parsing" return="void" when="last">
+      <param type="gpointer"/>
+    </signal>
+    <signal name="attribute-signal" return="gchararray" when="last">
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+  </class>
+  <boxed name="RegressTestBoxedCWrapper" get-type="regress_test_boxed_c_wrapper_get_type"/>
+  <class name="RegressTestAction" get-type="regress_test_action_get_type" parents="GInitiallyUnowned,GObject">
+    <signal name="action" return="RegressTestAction" when="last" action="1">
+    </signal>
+    <signal name="action2" return="RegressTestAction" when="last" action="1">
+    </signal>
+  </class>
+  <fundamental name="RegressBitmask" get-type="regress_bitmask_get_type">
+  </fundamental>
+  <error-quark function="regress_test_error_quark" domain="regress-test-error"/>
+  <error-quark function="regress_test_abc_error_quark" domain="regress-test-abc-error"/>
+  <error-quark function="regress_test_unconventional_error_quark" domain="regress-test-other-error"/>
+  <error-quark function="regress_test_def_error_quark" domain="regress-test-def-error"/>
+  <error-quark function="regress_atest_error_quark" domain="regress-atest-error"/>
+</dump>
