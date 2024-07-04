@@ -149,9 +149,9 @@ PACKAGES+=" composer"
 
 # Needed by package rust.
 PACKAGES+=" libssl-dev" # Needed to build Rust
-PACKAGES+=" llvm-16-dev"
-PACKAGES+=" llvm-16-tools"
-PACKAGES+=" clang-16"
+PACKAGES+=" llvm-17-dev"
+PACKAGES+=" llvm-17-tools"
+PACKAGES+=" clang-17"
 
 # Needed for package smalltalk.
 PACKAGES+=" libsigsegv-dev"
@@ -321,7 +321,7 @@ $SUDO cp $(dirname "$(realpath "$0")")/llvm-snapshot.gpg.key /etc/apt/trusted.gp
 $SUDO chmod a+r /etc/apt/trusted.gpg.d/apt.llvm.org.asc
 {
 	echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy main"
-	echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-16 main"
+	echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-17 main"
 } | $SUDO tee /etc/apt/sources.list.d/apt-llvm-org.list > /dev/null
 
 # Add ppa repo to be able to get openjdk-17 on ubuntu 22.04
@@ -338,6 +338,7 @@ $SUDO env DEBIAN_FRONTEND=noninteractive \
 curl -L --output /tmp/py2-get-pip.py https://bootstrap.pypa.io/pip/2.7/get-pip.py
 $SUDO python2 /tmp/py2-get-pip.py
 rm -f /tmp/py2-get-pip.py
+$SUDO rm -f /usr/local/bin/pip
 
 $SUDO locale-gen --purge en_US.UTF-8
 echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US:en"\n' | $SUDO tee -a /etc/default/locale
@@ -345,4 +346,4 @@ echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US:en"\n' | $SUDO tee -a /etc/default/
 . $(dirname "$(realpath "$0")")/properties.sh
 $SUDO mkdir -p $TERMUX_PREFIX
 $SUDO chown -R $(whoami) /data
-$SUDO ln -s /data/data/com.termux/files/usr/opt/bionic-host /system
+$SUDO ln -sf /data/data/com.termux/files/usr/opt/bionic-host /system

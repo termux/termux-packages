@@ -41,7 +41,7 @@ termux_step_host_build() {
 	# Erlang cross compile reference: https://github.com/erlang/otp/blob/master/HOWTO/INSTALL-CROSS.md#building-a-bootstrap-system
 	# Build erlang bootstrap system.
 	./configure --enable-bootstrap-only --without-javac --without-ssl --without-termcap
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j $TERMUX_PKG_MAKE_PROCESSES
 }
 
 termux_step_pre_configure() {

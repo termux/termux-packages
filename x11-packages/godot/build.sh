@@ -27,7 +27,7 @@ termux_step_make() {
 	esac
 
 	export BUILD_NAME=termux
-	scons -j$TERMUX_MAKE_PROCESSES \
+	scons -j$TERMUX_PKG_MAKE_PROCESSES \
 		use_static_cpp=no \
 		colored=yes \
 		platform=linuxbsd \

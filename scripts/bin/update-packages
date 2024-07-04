@@ -5,6 +5,8 @@ set -u
 # Following variables should be set in environment outside of this script.
 # Build updated packages.
 : "${BUILD_PACKAGES:=false}"
+# Github Action create issue for failed updates.
+: "${CREATE_ISSUE:=false}"
 # Commit changes to Git.
 : "${GIT_COMMIT_PACKAGES:=false}"
 # Push changes to remote.
@@ -277,7 +279,7 @@ _should_update() {
 	if [[ " ${_ALREADY_SEEN[*]} ${!_FAILED_UPDATES[*]} " =~ " $(basename "${pkg_dir}") " ]]; then
 		return 1 # Skip.
 	fi
-	if [[ "${GITHUB_ACTIONS:-}" == "true" ]] && _gh_check_issue_exists "$(basename "${pkg_dir}")"; then
+	if [[ "${BUILD_PACKAGES}" == "true" ]] && [[ "${GITHUB_ACTIONS:-}" == "true" ]] && _gh_check_issue_exists "$(basename "${pkg_dir}")"; then
 		echo "INFO: Skipping '$(basename "${pkg_dir}")', an update issue for it hasn't been resolved yet."
 		return 1
 	fi
@@ -346,17 +348,24 @@ fi
 
 _gh_create_new_issue() {
 	local pkg_name="$1"
-
 	local max_body_length=65536 # Max length of the body for one request.
-	local assignee="${GITHUB_ACTOR:-}"
 	local issue_number
 	local body
 	local link
-
+	local assignee="${GITHUB_ACTOR:-}"
 	if [[ "${assignee:-termuxbot2}" == "termuxbot2" ]]; then
 		assignee="MrAdityaAlok" # Assign myself if termuxbot2 is the actor.
 	fi
-	
+
+	if [[ "${CREATE_ISSUE}" != "true" ]]; then
+		echo "INFO: CREATE_ISSUE set to '${CREATE_ISSUE}'. Not creating new issue."
+		return
+	fi
+	if _gh_check_issue_exists "${pkg_name}"; then
+		echo "INFO: An existing update issue for '${pkg_name}' hasn't been resolved yet."
+		return
+	fi
+
 	# Extract origin URL, commit hash and builder directory and put everything together
 	link="$(git config --get remote.origin.url |sed -E 's|\.git$||; s|git@([^:]+):(.+)|https://\1/\2|')/blob/$(git rev-parse HEAD)/$(echo */$1)"
 
@@ -371,7 +380,7 @@ _gh_create_new_issue() {
 			Here's the output of the update script:
 			<details>
 				<summary>Show log</summary>
-				<pre lang="bash">${_FAILED_UPDATES["${pkg_name}"]}</pre>
+				<pre lang="console">${_FAILED_UPDATES["${pkg_name}"]}</pre>
 			</details>
 
 			<hr>

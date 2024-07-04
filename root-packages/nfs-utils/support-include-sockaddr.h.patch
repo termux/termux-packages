@@ -1,0 +1,13 @@
+Fix "call to undeclared library function 'memcmp'" error with current clang.
+
+diff -u -r ../nfs-utils-2.6.4/support/include/sockaddr.h ./support/include/sockaddr.h
+--- ../nfs-utils-2.6.4/support/include/sockaddr.h	2023-11-17 17:32:39.000000000 +0000
++++ ./support/include/sockaddr.h	2024-06-18 09:41:32.777237803 +0000
+@@ -26,6 +26,7 @@
+ 
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <string.h>
+ #include <stdbool.h>
+ #include <sys/socket.h>
+ #include <netinet/in.h>

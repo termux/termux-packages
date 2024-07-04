@@ -16,7 +16,7 @@ termux_step_make() {
 
 	RUSTFLAGS+=" -C link-arg=$($CC -print-libgcc-file-name)"
 
-	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
+	cargo build --jobs $TERMUX_PKG_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
 }
 
 termux_step_make_install() {

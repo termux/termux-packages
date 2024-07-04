@@ -189,6 +189,31 @@ extract_debs() {
 
 }
 
+# Add termux bootstrap second stage files
+add_termux_bootstrap_second_stage_files() {
+
+	local package_arch="$1"
+
+	echo $'\n\n\n'"[*] Adding termux bootstrap second stage files..."
+
+	mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_BOOTSTRAP_CONFIG_DIR_PATH}"
+	sed -e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
+		-e "s|@TERMUX_BOOTSTRAP_CONFIG_DIR_PATH@|${TERMUX_BOOTSTRAP_CONFIG_DIR_PATH}|g" \
+		-e "s|@TERMUX_PACKAGE_MANAGER@|${TERMUX_PACKAGE_MANAGER}|g" \
+		-e "s|@TERMUX_PACKAGE_ARCH@|${package_arch}|g" \
+		"$(dirname "$(realpath "$0")")/bootstrap/termux-bootstrap-second-stage.sh" \
+		> "${BOOTSTRAP_ROOTFS}/${TERMUX_BOOTSTRAP_CONFIG_DIR_PATH}/termux-bootstrap-second-stage.sh"
+	chmod 700 "${BOOTSTRAP_ROOTFS}/${TERMUX_BOOTSTRAP_CONFIG_DIR_PATH}/termux-bootstrap-second-stage.sh"
+
+	# TODO: Remove it when Termux app supports `pacman` bootstraps installation.
+	sed -e "s|@TERMUX_PROFILE_D_PREFIX_DIR_PATH@|${TERMUX_PROFILE_D_PREFIX_DIR_PATH}|g" \
+		-e "s|@TERMUX_BOOTSTRAP_CONFIG_DIR_PATH@|${TERMUX_BOOTSTRAP_CONFIG_DIR_PATH}|g" \
+		"$(dirname "$(realpath "$0")")/bootstrap/01-termux-bootstrap-second-stage-fallback.sh" \
+		> "${BOOTSTRAP_ROOTFS}/${TERMUX_PROFILE_D_PREFIX_DIR_PATH}/01-termux-bootstrap-second-stage-fallback.sh"
+	chmod 600 "${BOOTSTRAP_ROOTFS}/${TERMUX_PROFILE_D_PREFIX_DIR_PATH}/01-termux-bootstrap-second-stage-fallback.sh"
+
+}
+
 # Final stage: generate bootstrap archive and place it to current
 # working directory.
 # Information about symlinks is stored in file SYMLINKS.txt.
@@ -402,7 +427,7 @@ main() {
 		fi
 
 		# Core utilities.
-		PACKAGES+=("bash")
+		PACKAGES+=("bash") # Used by `termux-bootstrap-second-stage.sh`
 		PACKAGES+=("bzip2")
 		if ! ${BOOTSTRAP_ANDROID10_COMPATIBLE}; then
 			PACKAGES+=("command-not-found")
@@ -456,6 +481,9 @@ main() {
 
 		# Extract all debs.
 		extract_debs || return $?
+
+		# Add termux bootstrap second stage files
+		add_termux_bootstrap_second_stage_files "$package_arch"
 
 		# Create bootstrap archive.
 		create_bootstrap_archive "$package_arch" || return $?

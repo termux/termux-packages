@@ -65,7 +65,7 @@ termux_step_pre_configure() {
 
 termux_step_post_make_install() {
 	cd ${TERMUX_PKG_BUILDDIR}/unix/xserver
-	make -j ${TERMUX_MAKE_PROCESSES}
+	make -j ${TERMUX_PKG_MAKE_PROCESSES}
 
 	cd ${TERMUX_PKG_BUILDDIR}/unix/xserver/hw/vnc
 	make install

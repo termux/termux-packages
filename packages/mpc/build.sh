@@ -9,7 +9,7 @@ TERMUX_PKG_DEPENDS="libiconv, libmpdclient"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-Diconv=enabled"
 
 # There seems to be issues with sphinx-build when using concurrent builds:
-TERMUX_MAKE_PROCESSES=1
+TERMUX_PKG_MAKE_PROCESSES=1
 
 termux_step_pre_configure() {
 	LDFLAGS+=" -liconv"

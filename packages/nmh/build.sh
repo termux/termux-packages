@@ -44,7 +44,7 @@ etc/nmh/scan.timely
 etc/nmh/scan.unseen"
 
 termux_step_pre_configure() {
-	TERMUX_MAKE_PROCESSES=1
+	TERMUX_PKG_MAKE_PROCESSES=1
 	autoreconf -fi
 }
 

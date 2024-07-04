@@ -1,6 +1,5 @@
-diff -uNr algernon-1.15.2/engine/config.go algernon-1.15.2.mod/engine/config.go
---- algernon-1.15.2/engine/config.go	2023-06-03 20:37:01.000000000 +0800
-+++ algernon-1.15.2.mod/engine/config.go	2023-06-04 12:39:16.650131453 +0800
+--- a/engine/config.go
++++ b/engine/config.go
 @@ -154,7 +154,7 @@
  
  // New creates a new server configuration based using the default values
@@ -19,9 +18,17 @@ diff -uNr algernon-1.15.2/engine/config.go algernon-1.15.2.mod/engine/config.go
  
  		// Compression speed over compactness
  		cacheCompressionSpeed: true,
-diff -uNr algernon-1.15.2/engine/flags.go algernon-1.15.2.mod/engine/flags.go
---- algernon-1.15.2/engine/flags.go	2023-06-03 20:37:01.000000000 +0800
-+++ algernon-1.15.2.mod/engine/flags.go	2023-06-04 12:40:02.810131436 +0800
+@@ -218,7 +218,7 @@
+ 		return nil, err
+ 	}
+ 	// Read in the mimetype information from the system. Set UTF-8 when setting Content-Type.
+-	ac.mimereader = mime.New("/etc/mime.types", true)
++	ac.mimereader = mime.New("@TERMUX_PREFIX@/etc/mime.types", true)
+ 	ac.setupLogging()
+ 
+ 	// File stat cache
+--- a/engine/flags.go
++++ b/engine/flags.go
 @@ -206,9 +206,9 @@
  	switch {
  	case ac.productionMode:
@@ -35,19 +42,8 @@ diff -uNr algernon-1.15.2/engine/flags.go algernon-1.15.2.mod/engine/flags.go
  		ac.cacheMode = cachemode.Production
  		ac.serverMode = true
  	case ac.devMode:
-diff -uNr algernon-1.15.2/engine/mime.go algernon-1.15.2.mod/engine/mime.go
---- algernon-1.15.2/engine/mime.go	2023-06-03 20:37:01.000000000 +0800
-+++ algernon-1.15.2.mod/engine/mime.go	2023-06-04 12:40:20.450131429 +0800
-@@ -6,5 +6,5 @@
- 
- func (ac *Config) initializeMime() {
- 	// Read in the mimetype information from the system. Set UTF-8 when setting Content-Type.
--	ac.mimereader = mime.New("/etc/mime.types", true)
-+	ac.mimereader = mime.New("@TERMUX_PREFIX@/etc/mime.types", true)
- }
-diff -uNr algernon-1.15.2/engine/serve.go algernon-1.15.2.mod/engine/serve.go
---- algernon-1.15.2/engine/serve.go	2023-06-03 20:37:01.000000000 +0800
-+++ algernon-1.15.2.mod/engine/serve.go	2023-06-04 12:40:42.770131420 +0800
+--- a/engine/serve.go
++++ b/engine/serve.go
 @@ -167,7 +167,7 @@
  			// If $XDG_CONFIG_DIR is not set, use $HOME.
  			// If $HOME is not set, use $TMPDIR.
@@ -57,30 +53,16 @@ diff -uNr algernon-1.15.2/engine/serve.go algernon-1.15.2.mod/engine/serve.go
  
  			defaultEmail := env.Str("LOGNAME", "root") + "@localhost"
  			if len(ac.certMagicDomains) > 0 {
-diff -uNr algernon-1.15.2/vendor/github.com/caddyserver/certmagic/dnsutil.go algernon-1.15.2.mod/vendor/github.com/caddyserver/certmagic/dnsutil.go
---- algernon-1.15.2/vendor/github.com/caddyserver/certmagic/dnsutil.go	2023-06-03 20:37:01.000000000 +0800
-+++ algernon-1.15.2.mod/vendor/github.com/caddyserver/certmagic/dnsutil.go	2023-06-04 12:42:21.670131383 +0800
+--- a/vendor/github.com/caddyserver/certmagic/dnsutil.go
++++ b/vendor/github.com/caddyserver/certmagic/dnsutil.go
 @@ -339,4 +339,4 @@
  	fqdnSOACacheMu sync.Mutex
  )
  
 -const defaultResolvConf = "/etc/resolv.conf"
 +const defaultResolvConf = "@TERMUX_PREFIX@/etc/resolv.conf"
-diff -uNr algernon-1.15.2/vendor/github.com/go-sql-driver/mysql/dsn.go algernon-1.15.2.mod/vendor/github.com/go-sql-driver/mysql/dsn.go
---- algernon-1.15.2/vendor/github.com/go-sql-driver/mysql/dsn.go	2023-06-03 20:37:01.000000000 +0800
-+++ algernon-1.15.2.mod/vendor/github.com/go-sql-driver/mysql/dsn.go	2023-06-04 12:41:01.690131413 +0800
-@@ -112,7 +112,7 @@
- 		case "tcp":
- 			cfg.Addr = "127.0.0.1:3306"
- 		case "unix":
--			cfg.Addr = "/tmp/mysql.sock"
-+			cfg.Addr = "@TERMUX_PREFIX@/tmp/mysql.sock"
- 		default:
- 			return errors.New("default addr for network '" + cfg.Net + "' unknown")
- 		}
-diff -uNr algernon-1.15.2/vendor/github.com/xyproto/gopher-lua/utils.go algernon-1.15.2.mod/vendor/github.com/xyproto/gopher-lua/utils.go
---- algernon-1.15.2/vendor/github.com/xyproto/gopher-lua/utils.go	2023-06-03 20:37:01.000000000 +0800
-+++ algernon-1.15.2.mod/vendor/github.com/xyproto/gopher-lua/utils.go	2023-06-04 12:41:20.570131406 +0800
+--- a/vendor/github.com/xyproto/gopher-lua/utils.go
++++ b/vendor/github.com/xyproto/gopher-lua/utils.go
 @@ -156,7 +156,7 @@
  }
  

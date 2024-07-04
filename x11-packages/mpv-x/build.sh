@@ -5,10 +5,11 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
 # Update both mpv and mpv-x to the same version in one PR.
 TERMUX_PKG_VERSION="0.38.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/mpv-player/mpv/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=86d9ef40b6058732f67b46d0bbda24a074fae860b3eaae05bab3145041303066
 TERMUX_PKG_AUTO_UPDATE=false
-TERMUX_PKG_DEPENDS="ffmpeg, libandroid-glob, libandroid-shmem, libarchive, libass, libbluray, libcaca, libdrm, libdvdnav, libiconv, libjpeg-turbo, liblua52, libsixel, libuchardet, libx11, libxext, libxinerama, libxpresent, libxrandr, libxss, libzimg, littlecms, openal-soft, pipewire, pulseaudio, rubberband, zlib, libplacebo"
+TERMUX_PKG_DEPENDS="alsa-lib, ffmpeg, jack, libandroid-glob, libandroid-shmem, libarchive, libass, libbluray, libcaca, libdrm, libdvdnav, libiconv, libjpeg-turbo, liblua52, libsixel, libuchardet, libx11, libxext, libxinerama, libxpresent, libxrandr, libxss, libzimg, littlecms, openal-soft, pipewire, pulseaudio, rubberband, zlib, libplacebo"
 TERMUX_PKG_CONFLICTS="mpv"
 TERMUX_PKG_REPLACES="mpv"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="

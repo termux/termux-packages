@@ -1,0 +1,23 @@
+From 406b63bfe234864710d1d23329bf41d48001fbfa Mon Sep 17 00:00:00 2001
+From: Dmitri Goutnik <dg@syrec.org>
+Date: Sat, 14 May 2022 14:09:40 -0500
+Subject: [PATCH] Unbreak build with llvm13.
+
+Fixes #641
+---
+ encfs/NullCipher.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/encfs/NullCipher.cpp b/encfs/NullCipher.cpp
+index 50dadffd..5e1a4729 100644
+--- a/encfs/NullCipher.cpp
++++ b/encfs/NullCipher.cpp
+@@ -76,7 +76,7 @@ class NullDestructor {
+   NullDestructor &operator=(const NullDestructor &) = delete; // copy assignment
+   NullDestructor& operator=(NullDestructor&& other) = delete; // move assignment
+ 
+-  void operator()(NullKey *&) {}
++  void operator()(NullKey *) {}
+ };
+ std::shared_ptr<AbstractCipherKey> gNullKey(new NullKey(), NullDestructor());
+ 

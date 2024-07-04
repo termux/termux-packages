@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="An interactive tool to view and record historical system
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.8.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/facebookincubator/below/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=bfeb9cd911e0477a5428ee0b6cbf7cbdc7eba90b716ac1e4f6cbadcde2ffbcb1
 TERMUX_PKG_DEPENDS="libelf, zlib"
@@ -42,12 +43,12 @@ termux_step_pre_configure() {
 	done
 
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
-		export CLANG=/usr/bin/clang-15
+		export CLANG=/usr/bin/clang-17
 	fi
 }
 
 termux_step_make() {
-	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
+	cargo build --jobs $TERMUX_PKG_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
 }
 
 termux_step_make_install() {

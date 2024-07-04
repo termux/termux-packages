@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://packages.qa.debian.org/f/fakeroot.html
 TERMUX_PKG_DESCRIPTION="Tool for simulating superuser privileges (with tcp ipc)"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.34"
+TERMUX_PKG_VERSION="1.35.1"
 TERMUX_PKG_SRCURL=https://deb.debian.org/debian/pool/main/f/fakeroot/fakeroot_${TERMUX_PKG_VERSION}.orig.tar.gz
-TERMUX_PKG_SHA256=5727f16d8903792588efa7a9f8ef8ce71f8756e746b62e45162e7735662e56bb
+TERMUX_PKG_SHA256=6a0de53b2de05277d4e6d4a884eb0de7a8ad467b82c07a6f8f2f6a629e655fdc
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-ipc=tcp"
 TERMUX_PKG_BUILD_DEPENDS="libcap"

@@ -44,7 +44,7 @@ termux_step_pre_configure() {
 
 termux_step_make() {
 	python ${TERMUX_PYTHON_CROSSENV_PREFIX}/build/bin/sip-build \
-		--jobs ${TERMUX_MAKE_PROCESSES} \
+		--jobs ${TERMUX_PKG_MAKE_PROCESSES} \
 		${TERMUX_PKG_EXTRA_MAKE_ARGS}
 }
 

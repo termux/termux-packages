@@ -13,7 +13,7 @@ share/boxes/boxes-config
 "
 
 termux_step_make() {
-	make -j $TERMUX_MAKE_PROCESSES \
+	make -j $TERMUX_PKG_MAKE_PROCESSES \
 		CC="$CC" \
 		CFLAGS_ADDTL="$CFLAGS $CPPFLAGS" \
 		LDFLAGS_ADDTL="$LDFLAGS"

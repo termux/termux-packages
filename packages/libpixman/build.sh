@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://www.pixman.org/
+TERMUX_PKG_HOMEPAGE=https://www.pixman.org/
 TERMUX_PKG_DESCRIPTION="Low-level library for pixel manipulation"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"

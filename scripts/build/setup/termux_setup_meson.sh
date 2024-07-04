@@ -90,7 +90,7 @@ termux_setup_meson() {
 	echo ']' >> $TERMUX_MESON_CROSSFILE
 
 	local property
-	for property in c_link_args cpp_link_args; do
+	for property in c_link_args cpp_link_args fortran_link_args; do
 		echo -n "$property = [" >> $TERMUX_MESON_CROSSFILE
 		first=true
 		for word in $LDFLAGS; do

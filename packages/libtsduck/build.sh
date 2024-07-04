@@ -43,7 +43,7 @@ termux_step_post_get_source() {
 
 termux_step_host_build() {
 	find $TERMUX_PKG_SRCDIR -mindepth 1 -maxdepth 1 -exec cp -a \{\} ./ \;
-	make -j $TERMUX_MAKE_PROCESSES \
+	make -j $TERMUX_PKG_MAKE_PROCESSES \
 		NOCURL=1 \
 		NODEKTEC=1 \
 		NOEDITLINE=1 \
@@ -70,7 +70,7 @@ termux_step_make() {
 		-e "s|\$(call F_SEARCH_CROSS,gcc)|${CC}|g" \
 		-e "s|\$(call F_SEARCH_CROSS,ld)|${LD}|g" \
 		-i ${TERMUX_PKG_SRCDIR}/Makefile.inc
-	make -j $TERMUX_MAKE_PROCESSES \
+	make -j $TERMUX_PKG_MAKE_PROCESSES \
 		CXX="$CXX" \
 		GCC="$CC" \
 		LD="$LD" \

@@ -2,9 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://www.7-zip.org
 TERMUX_PKG_DESCRIPTION="7-Zip file archiver with a high compression ratio"
 TERMUX_PKG_LICENSE="LGPL-2.1, BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=23.01
-TERMUX_PKG_SRCURL=https://www.7-zip.org/a/7z${TERMUX_PKG_VERSION//./}-src.tar.xz
-TERMUX_PKG_SHA256=356071007360e5a1824d9904993e8b2480b51b570e8c9faf7c0f58ebe4bf9f74
+TERMUX_PKG_VERSION="24.07"
+TERMUX_PKG_SRCURL=(https://www.7-zip.org/a/7z${TERMUX_PKG_VERSION//./}-src.tar.xz
+https://www.7-zip.org/a/7z${TERMUX_PKG_VERSION//./}-linux-arm.tar.xz) # for manual, arm is smallest
+TERMUX_PKG_SHA256=(d1b0874a3f1c26df21c761a4a30691dc1213e8577f18ee78326c14ca4d683e2b
+cb73f46d3bbaadc9cca7c28b63c0385bcddda95eb6d5b00be56be3340a972176)
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_BUILD_IN_SRC=true
 
@@ -21,9 +23,6 @@ termux_step_pre_configure() {
 		CFLAGS+=' -march=armv8.1-a+crypto'
 		CXXFLAGS+=' -march=armv8.1-a+crypto'
 	fi
-	# from https://build.opensuse.org/package/view_file/openSUSE:Factory/7zip/7zip.spec?rev=5
-	# Remove carriage returns from docs
-	sed -i -e 's/\r$//g' DOC/*.txt
 	# Remove executable perms from docs
 	chmod -x DOC/*.txt
 	# Remove -Werror to make build succeed
@@ -42,7 +41,7 @@ termux_step_make() {
 		CXX="$CXX $CXXFLAGS $LDFLAGS -D_GNU_SOURCE" \
 		DISABLE_RAR=1 \
 		--file ../../cmpl_clang.mak \
-		--jobs "$TERMUX_MAKE_PROCESSES"
+		--jobs "$TERMUX_PKG_MAKE_PROCESSES"
 }
 
 termux_step_make_install() {
@@ -51,8 +50,10 @@ termux_step_make_install() {
 		"$TERMUX_PKG_BUILDDIR"/CPP/7zip/Bundles/Alone2/b/c/7zz
 	install -Dm0644 \
 		-t "$TERMUX_PREFIX"/share/doc/"$TERMUX_PKG_NAME" \
-		"$TERMUX_PKG_BUILDDIR"/DOC/{7zC,7zFormat,lzma,Methods,readme,src-history}.txt
-	install -Dm0644 \
-		-t "$TERMUX_PREFIX"/share/LICENSES/"$TERMUX_PKG_NAME" \
-		"$TERMUX_PKG_BUILDDIR"/DOC/{copying,License}.txt
+		"$TERMUX_PKG_BUILDDIR"/DOC/{7zC,7zFormat,copying,License,lzma,Methods,readme,src-history}.txt
+	tar -C "$TERMUX_PREFIX"/share/doc/"$TERMUX_PKG_NAME" \
+		-xvf "$TERMUX_PKG_CACHEDIR/$(basename "${TERMUX_PKG_SRCURL[1]}")" MANUAL
+	# Remove carriage returns from docs
+	find "$TERMUX_PREFIX"/share/doc/"$TERMUX_PKG_NAME" \
+		-type f -execdir sed -i -e 's/\r$//g' {} +
 }

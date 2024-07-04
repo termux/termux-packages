@@ -9,7 +9,7 @@ TERMUX_PKG_SHA256=67f1945057d679414533a30fe860aeb2714f5167a8c03041e023a65f629a93
 TERMUX_PKG_BREAKS="libsasl-dev"
 TERMUX_PKG_REPLACES="libsasl-dev"
 # Seems to be race issues in build (symlink creation)::
-TERMUX_MAKE_PROCESSES=1
+TERMUX_PKG_MAKE_PROCESSES=1
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 lt_cv_deplibs_check_method=pass_all
 ac_cv_func_syslog=no

@@ -38,7 +38,7 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
-	make -j "${TERMUX_MAKE_PROCESSES}" static-${ZIG_TARGET_NAME}.tar.gz
+	make -j "${TERMUX_PKG_MAKE_PROCESSES}" static-${ZIG_TARGET_NAME}.tar.gz
 }
 
 termux_step_make_install() {

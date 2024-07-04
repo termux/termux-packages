@@ -42,4 +42,12 @@ termux_step_override_config_scripts() {
 			-e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" > $TERMUX_PREFIX/bin/pg_config
 		chmod 755 $TERMUX_PREFIX/bin/pg_config
 	fi
+
+	if [ "$TERMUX_PKG_DEPENDS" != "${TERMUX_PKG_DEPENDS/libprotobuf/}" ]; then
+		rm -f $TERMUX_PREFIX/lib/cmake/protobuf/protobuf-targets{,-release}.cmake
+		cp $TERMUX_PREFIX/opt/protobuf-cmake/shared/protobuf-targets{,-release}.cmake $TERMUX_PREFIX/lib/cmake/protobuf/
+	elif [ "$TERMUX_PKG_BUILD_DEPENDS" != "${TERMUX_PKG_BUILD_DEPENDS/protobuf-static/}" ]; then
+		rm -f $TERMUX_PREFIX/lib/cmake/protobuf/protobuf-targets{,-release}.cmake
+		cp $TERMUX_PREFIX/opt/protobuf-cmake/static/protobuf-targets{,-release}.cmake $TERMUX_PREFIX/lib/cmake/protobuf/
+	fi
 }

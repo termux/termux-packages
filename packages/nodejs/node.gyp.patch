@@ -1,7 +1,7 @@
-diff -u -r ../node-v22.2.0/node.gyp ./node.gyp
---- ../node-v22.2.0/node.gyp	2024-05-15 12:35:06.000000000 +0000
-+++ ./node.gyp	2024-05-30 20:10:01.025103479 +0000
-@@ -546,7 +546,8 @@
+diff -u -r ../node-v22.3.0/node.gyp ./node.gyp
+--- ../node-v22.3.0/node.gyp	2024-06-11 13:24:36.000000000 +0000
++++ ./node.gyp	2024-06-19 21:36:41.345330645 +0000
+@@ -548,7 +548,8 @@
        ],
  
        'sources': [
@@ -11,7 +11,7 @@ diff -u -r ../node-v22.2.0/node.gyp ./node.gyp
        ],
  
        'dependencies': [
-@@ -1024,49 +1025,6 @@
+@@ -1026,49 +1027,6 @@
          },
        ],
      }, # node_lib_target_name
@@ -61,7 +61,7 @@ diff -u -r ../node-v22.2.0/node.gyp ./node.gyp
      { # fuzz_ClientHelloParser.cc
        'target_name': 'fuzz_ClientHelloParser',
        'type': 'executable',
-@@ -1155,161 +1113,8 @@
+@@ -1157,83 +1115,6 @@
          }],
        ],
      }, # fuzz_strings
@@ -144,86 +144,8 @@ diff -u -r ../node-v22.2.0/node.gyp ./node.gyp
 -    }, # cctest
  
      {
--      'target_name': 'embedtest',
--      'type': 'executable',
--
--      'dependencies': [
--        '<(node_lib_target_name)',
--        'deps/histogram/histogram.gyp:histogram',
--        'deps/ada/ada.gyp:ada',
--      ],
--
--      'includes': [
--        'node.gypi'
--      ],
--
--      'include_dirs': [
--        'src',
--        'tools/msvs/genfiles',
--        'deps/v8/include',
--        'deps/cares/include',
--        'deps/uv/include',
--        'test/embedding',
--      ],
--
--      'sources': [
--        'src/node_snapshot_stub.cc',
--        'test/embedding/embedtest.cc',
--      ],
--
--      'conditions': [
--        ['OS=="solaris"', {
--          'ldflags': [ '-I<(SHARED_INTERMEDIATE_DIR)' ]
--        }],
--        # Skip cctest while building shared lib node for Windows
--        [ 'OS=="win" and node_shared=="true"', {
--          'type': 'none',
--        }],
--        [ 'node_shared=="true"', {
--          'xcode_settings': {
--            'OTHER_LDFLAGS': [ '-Wl,-rpath,@loader_path', ],
--          },
--        }],
--        ['OS=="win"', {
--          'libraries': [
--            'Dbghelp.lib',
--            'winmm.lib',
--            'Ws2_32.lib',
--          ],
--        }],
--        # Avoid excessive LTO
--        ['enable_lto=="true"', {
--          'ldflags': [ '-fno-lto' ],
--        }],
--      ],
--    }, # embedtest
--
--    {
--      'target_name': 'overlapped-checker',
--      'type': 'executable',
--
--      'conditions': [
--        ['OS=="win"', {
--          'sources': [
--            'test/overlapped-checker/main_win.c'
--          ],
--        }],
--        ['OS!="win"', {
--          'sources': [
--            'test/overlapped-checker/main_unix.c'
--          ],
--        }],
--        # Avoid excessive LTO
--        ['enable_lto=="true"', {
--          'ldflags': [ '-fno-lto' ],
--        }],
--      ]
--    }, # overlapped-checker
--    {
-       'target_name': 'node_js2c',
-       'type': 'executable',
-       'toolsets': ['host'],
-@@ -1345,69 +1150,6 @@
+       'target_name': 'embedtest',
+@@ -1348,69 +1229,6 @@
          }],
        ]
      },

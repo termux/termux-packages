@@ -13,7 +13,7 @@ prefix=$TERMUX_PREFIX
 LIBDIR=$TERMUX_PREFIX/lib
 MAN3DIR=$TERMUX_PREFIX/share/man/man3
 "
-TERMUX_MAKE_PROCESSES=1
+TERMUX_PKG_MAKE_PROCESSES=1
 
 termux_step_pre_configure() {
 	# Use pregenerated entities.h.

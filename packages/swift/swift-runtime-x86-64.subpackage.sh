@@ -1,7 +1,7 @@
 TERMUX_SUBPKG_DESCRIPTION="Swift runtime libraries for Android x86_64"
 TERMUX_SUBPKG_INCLUDE="opt/ndk-multilib/x86_64-linux-android/lib/lib[FXs]*.so"
 TERMUX_SUBPKG_PLATFORM_INDEPENDENT=true
-TERMUX_SUBPKG_DEPEND_ON_PARENT=no
+TERMUX_SUBPKG_DEPEND_ON_PARENT=false
 TERMUX_SUBPKG_DEPENDS="ndk-multilib"
 
 termux_step_create_subpkg_debscripts() {

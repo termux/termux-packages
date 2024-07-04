@@ -6,7 +6,7 @@ TERMUX_SCRIPTDIR=$(realpath "$(dirname "$0")/../")
 . "$TERMUX_SCRIPTDIR/scripts/properties.sh"
 
 check_package_license() {
-	local pkg_licenses=$1
+	local pkg_licenses="$1"
 	local license
 	local license_ok=true
 	local IFS
@@ -250,7 +250,7 @@ lint_package() {
 
 		echo -n "TERMUX_PKG_LICENSE: "
 		if (( ${#TERMUX_PKG_LICENSE} )); then
-			if [[ "$TERMUX_PKG_LICENSE" == 'custom' ]]; then
+			if [[ "$TERMUX_PKG_LICENSE" == *'custom'* ]]; then
 				echo "CUSTOM"
 			elif [[ "$TERMUX_PKG_LICENSE" == 'non-free' ]]; then
 				echo "NON-FREE"

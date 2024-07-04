@@ -19,7 +19,7 @@ termux_step_make() {
 		BUILD_TYPE=--release
 	fi
 
-	cargo build --jobs $TERMUX_MAKE_PROCESSES \
+	cargo build --jobs $TERMUX_PKG_MAKE_PROCESSES \
 		--target $CARGO_TARGET_NAME ${BUILD_TYPE}
 }
 

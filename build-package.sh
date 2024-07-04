@@ -228,8 +228,8 @@ termux_step_post_get_source() {
 }
 
 # Optional host build. Not to be overridden by packages.
-# shellcheck source=scripts/build/termux_step_handle_hostbuild.sh
-source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_handle_hostbuild.sh"
+# shellcheck source=scripts/build/termux_step_handle_host_build.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_handle_host_build.sh"
 
 # Perform a host build. Will be called in $TERMUX_PKG_HOSTBUILD_DIR.
 # After termux_step_post_get_source() and before termux_step_patch_package()
@@ -636,7 +636,7 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 			termux_step_get_source
 			cd "$TERMUX_PKG_SRCDIR"
 			termux_step_post_get_source
-			termux_step_handle_hostbuild
+			termux_step_handle_host_build
 		fi
 
 		termux_step_setup_toolchain

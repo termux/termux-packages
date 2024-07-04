@@ -1,6 +1,6 @@
 TERMUX_SUBPKG_DESCRIPTION="Utilities for (un)mounting filesystems"
 TERMUX_SUBPKG_DEPENDS="libblkid, libsmartcols, libmount"
-TERMUX_SUBPKG_DEPEND_ON_PARENT="no"
+TERMUX_SUBPKG_DEPEND_ON_PARENT=false
 TERMUX_SUBPKG_BREAKS="termux-tools (<= 1.34.1)"
 TERMUX_SUBPKG_INCLUDE="
 bin/findmnt

@@ -16,7 +16,7 @@ opt/helix/runtime/grammars/sources/
 termux_step_make_install() {
 	termux_setup_rust
 
-	cargo build --jobs "${TERMUX_MAKE_PROCESSES}" --target "${CARGO_TARGET_NAME}" --release
+	cargo build --jobs "${TERMUX_PKG_MAKE_PROCESSES}" --target "${CARGO_TARGET_NAME}" --release
 
 	local datadir="${TERMUX_PREFIX}/opt/${TERMUX_PKG_NAME}"
 	mkdir -p "${datadir}"

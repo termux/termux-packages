@@ -14,7 +14,27 @@ termux_git_clone_src() {
 			$TMP_CHECKOUT
 
 		pushd $TMP_CHECKOUT
-		git submodule update --init --recursive --depth=1
+
+		# Workaround some bad server behaviour
+		# error: Server does not allow request for unadvertised object commit_no
+		# fatal: Fetched in submodule 'submodule_path', but it did not contain commit_no. Direct fetching of that commit failed.
+		if ! git submodule update --init --recursive --depth=1; then
+			local depth=10
+			local maxdepth=100
+			sleep 1
+			while :; do
+				echo "WARN: Retrying with max depth $depth"
+				if git submodule update --init --recursive --depth=$depth; then
+					break
+				fi
+				if [[ "$depth" -gt "$maxdepth" ]]; then
+					termux_error_exit "Failed to clone submodule"
+				fi
+				depth=$((depth+10))
+				sleep 1
+			done
+		fi
+
 		popd
 
 		echo "$TERMUX_PKG_VERSION" > $TMP_CHECKOUT_VERSION

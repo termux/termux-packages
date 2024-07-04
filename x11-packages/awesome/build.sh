@@ -43,7 +43,7 @@ termux_step_host_build() {
 	cd imagemagick
 	tar xf $IMAGEMAGICK_TARFILE --strip-components=1
 	./configure --prefix="$prefix" --with-png
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j $TERMUX_PKG_MAKE_PROCESSES
 	make install
 }
 

@@ -103,7 +103,7 @@ termux_step_host_build() {
 
 	# Make host wine-tools
 	"$TERMUX_PKG_SRCDIR/configure" ${TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS}
-	make -j "$TERMUX_MAKE_PROCESSES" __tooldeps__ nls/all
+	make -j "$TERMUX_PKG_MAKE_PROCESSES" __tooldeps__ nls/all
 }
 
 termux_step_pre_configure() {
@@ -125,5 +125,5 @@ termux_step_pre_configure() {
 }
 
 termux_step_make_install() {
-	make -j $TERMUX_MAKE_PROCESSES install
+	make -j $TERMUX_PKG_MAKE_PROCESSES install
 }
