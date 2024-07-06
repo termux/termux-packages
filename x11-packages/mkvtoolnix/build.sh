@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Set of tools to create, edit and inspect Matroska files"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="85.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://gitlab.com/mbunkus/mkvtoolnix
 TERMUX_PKG_GIT_BRANCH=release-$TERMUX_PKG_VERSION
 TERMUX_PKG_AUTO_UPDATE=true
@@ -17,7 +18,7 @@ enable_gui=no
 --with-boost-filesystem=boost_filesystem
 --with-boost-system=boost_system
 --with-boost-date-time=boost_date_time
---with-qmake6=${TERMUX_PREFIX}/lib/qt6/bin/qmake6
+--with-qmake6=${TERMUX_PREFIX}/lib/qt6/bin/host-qmake6
 "
 
 termux_step_pre_configure() {
