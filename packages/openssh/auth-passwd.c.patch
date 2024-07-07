@@ -11,7 +11,7 @@
  extern struct sshbuf *loginmsg;
  extern ServerOptions options;
  
-@@ -187,6 +191,12 @@
+@@ -187,6 +191,17 @@
  		return (auth_close(as));
  	}
  }
@@ -19,7 +19,12 @@
 +int
 +sys_auth_passwd(struct ssh *ssh, const char *password)
 +{
-+	return termux_auth(((Authctxt *)ssh->authctxt)->user, password);	
++	Authctxt *authctxt = ssh->authctxt;
++	/* If sshd is starting as root, only allow root login */
++	if (authctxt->pw->pw_uid == 0 && strcmp(authctxt->user, "root") != 0) {
++		return 0;
++	}
++	return termux_auth(authctxt->user, password);	
 +}
  #elif !defined(CUSTOM_SYS_AUTH_PASSWD)
  int

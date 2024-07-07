@@ -6,7 +6,7 @@ diff -uNr openssh-portable-V_9_8_P1/sshd.c openssh-portable-V_9_8_P1.mod/sshd.c
  	rexec_argc = ac;
  	saved_argv = xcalloc(ac + 1, sizeof(*saved_argv));
 -	for (i = 0; (int)i < ac; i++)
-+	saved_argv[0] = "@TERMUX_PREFIX@/bin/sshd";
++	saved_argv[0] = xstrdup("@TERMUX_PREFIX@/bin/sshd");
 +	for (i = 1; (int)i < ac; i++)
  		saved_argv[i] = xstrdup(av[i]);
  	saved_argv[i] = NULL;
