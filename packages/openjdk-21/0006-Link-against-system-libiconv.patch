@@ -1,0 +1,39 @@
+From c6ec5202528ed923fb713607a69e51e9c504e6db Mon Sep 17 00:00:00 2001
+From: Henrik Grimler <grimler@termux.dev>
+Date: Fri, 3 Feb 2023 11:09:10 +0100
+Subject: [PATCH 06/37] Link against system libiconv
+
+---
+ make/modules/java.instrument/Lib.gmk | 2 +-
+ make/modules/jdk.jdwp.agent/Lib.gmk  | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/make/modules/java.instrument/Lib.gmk b/make/modules/java.instrument/Lib.gmk
+index ae985b315..417e0d6a0 100644
+--- a/make/modules/java.instrument/Lib.gmk
++++ b/make/modules/java.instrument/Lib.gmk
+@@ -48,7 +48,7 @@ $(eval $(call SetupJdkLibrary, BUILD_LIBINSTRUMENT, \
+     LDFLAGS_aix := -L$(SUPPORT_OUTPUTDIR)/native/java.base, \
+     LIBS := $(JDKLIB_LIBS), \
+     LIBS_unix := -ljava -ljvm $(LIBZ_LIBS), \
+-    LIBS_linux := -ljli $(LIBDL), \
++    LIBS_linux := -ljli -liconv $(LIBDL), \
+     LIBS_aix := -liconv -ljli_static $(LIBDL), \
+     LIBS_macosx := -ljli -liconv -framework Cocoa -framework Security \
+         -framework ApplicationServices, \
+diff --git a/make/modules/jdk.jdwp.agent/Lib.gmk b/make/modules/jdk.jdwp.agent/Lib.gmk
+index ba694f50e..9631bf239 100644
+--- a/make/modules/jdk.jdwp.agent/Lib.gmk
++++ b/make/modules/jdk.jdwp.agent/Lib.gmk
+@@ -64,7 +64,7 @@ $(eval $(call SetupJdkLibrary, BUILD_LIBJDWP, \
+     LDFLAGS := $(LDFLAGS_JDKLIB) \
+         $(call SET_SHARED_LIBRARY_ORIGIN), \
+     LIBS := $(JDKLIB_LIBS), \
+-    LIBS_linux := $(LIBDL), \
++    LIBS_linux := -liconv $(LIBDL), \
+     LIBS_macosx := -liconv, \
+     LIBS_aix := -liconv, \
+ ))
+-- 
+2.45.2
+
