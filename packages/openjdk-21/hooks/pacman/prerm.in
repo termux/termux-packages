@@ -1,0 +1,19 @@
+#!@TERMUX_PREFIX@/bin/sh
+
+if [ -f @TERMUX_PREFIX@/etc/profile.d/java.sh ]; then
+	raelpath=$(readlink @TERMUX_PREFIX@/etc/profile.d/java.sh)
+	sp_raelpath=(${raelpath//// })
+	if [ "${sp_raelpath[-4]}" != "java-21-openjdk" ]; then
+		return
+	fi
+fi
+
+for i in @binaries@; do
+	rm "@TERMUX_PREFIX@/bin/${i}"
+done
+
+for i in @manpages@; do
+	rm "@TERMUX_PREFIX@/share/man/man1/${i}"
+done
+
+rm @TERMUX_PREFIX@/etc/profile.d/java.sh
