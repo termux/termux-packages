@@ -12,13 +12,10 @@ TERMUX_PKG_BREAKS="json-glib-dev"
 TERMUX_PKG_REPLACES="json-glib-dev"
 TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-Ddocumentation=disabled
 -Dintrospection=enabled
--Dgtk_doc=disabled
-"
-TERMUX_PKG_RM_AFTER_INSTALL="
-share/installed-tests
-libexec/installed-tests
-bin/
+-Dman=true
+-Dtests=false
 "
 
 termux_step_pre_configure() {
