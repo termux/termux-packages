@@ -4,10 +4,10 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=21.0.3-ga
 TERMUX_PKG_SRCURL=https://github.com/openjdk/jdk21u/archive/refs/tags/jdk-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_DEPENDS="libandroid-shmem, libandroid-spawn, libiconv, libjpeg-turbo, zlib"
 TERMUX_PKG_SHA256=818e9dee28ae390f2781406d594690fc42bd994d078ad9f8360a4fbca6a3df1f
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+-ga"
+TERMUX_PKG_DEPENDS="libandroid-shmem, libandroid-spawn, libiconv, libjpeg-turbo, zlib, littlecms"
 TERMUX_PKG_BUILD_DEPENDS="cups, fontconfig, libxrandr, libxt, xorgproto"
 # openjdk-21-x is recommended because X11 separation is still very experimental.
 TERMUX_PKG_RECOMMENDS="ca-certificates-java, openjdk-21-x, resolv-conf"
@@ -44,6 +44,7 @@ termux_step_configure() {
 		--x-includes="$TERMUX_PREFIX/include/X11" \
 		--x-libraries="$TERMUX_PREFIX/lib" \
 		--with-giflib=system \
+		--with-lcms=system \
 		--with-libjpeg=system \
 		--with-libpng=system \
 		--with-zlib=system \
