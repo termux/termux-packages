@@ -6,8 +6,8 @@ TERMUX_PKG_VERSION=0.10.0
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/kcleal/gw/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=81d9a560152af6d1c45d90336c74ad051edb5ea29bab5b8791c323b1ed3ac608
-TERMUX_PKG_DEPENDS="glfw, htslib, libc++, libjpeg-turbo, opengl"
-TERMUX_PKG_BUILD_DEPENDS="fontconfig, freetype, libicu, libuuid, mesa-dev"
+TERMUX_PKG_DEPENDS="glfw, htslib, libc++, libjpeg-turbo, opengl, libcurl"
+TERMUX_PKG_BUILD_DEPENDS="fontconfig, freetype, libicu, libuuid, mesa-dev, libcurl"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
