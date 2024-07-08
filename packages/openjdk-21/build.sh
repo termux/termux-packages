@@ -14,6 +14,10 @@ TERMUX_PKG_RECOMMENDS="ca-certificates-java, openjdk-21-x, resolv-conf"
 TERMUX_PKG_SUGGESTS="cups"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HAS_DEBUG=false
+# currently zgc and shenandoahgc would be auto enabled in server variant,
+# while these features is not supported on arm.
+# only leave lto here.
+__jvm_features="link-time-opt"
 
 termux_step_pre_configure() {
 	unset JAVA_HOME
@@ -30,6 +34,7 @@ termux_step_configure() {
 		--with-version-pre="" \
 		--with-version-opt="" \
 		--with-jvm-variants=server \
+		--with-jvm-features="${__jvm_features}" \
 		--with-debug-level=release \
 		--openjdk-target=$TERMUX_HOST_PLATFORM \
 		--with-toolchain-type=clang \
