@@ -55,7 +55,7 @@ termux_step_make() {
 	unzip -o "${TERMUX_PKG_CACHEDIR}/skia-${TERMUX_ARCH}.zip"
 	cd ../../
 
-	LDFLAGS+="${LDFLAGS} -L${TERMUX_PREFIX}/lib" make -j "$TERMUX_PKG_MAKE_PROCESSES"
+	LDFLAGS="${LDFLAGS} -L${TERMUX_PREFIX}/lib" make -j "$TERMUX_PKG_MAKE_PROCESSES"
 }
 
 termux_step_make_install() {
