@@ -21,6 +21,7 @@ termux_step_pre_configure() {
 		-e '/\/usr\/local\/include/d' \
 		-e '/\/usr\/local\/lib/d' \
 		./Makefile
+        sed -i 's/LDFLAGS=/LDFLAGS+=/g' Makefile
 
 	if [ "$TERMUX_ARCH" = "aarch64" ]; then
 		sed -i 's/Release-x64/Release-arm64/g' ./Makefile
