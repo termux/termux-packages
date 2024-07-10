@@ -1,6 +1,6 @@
---- ./node.gyp.orig	2024-02-14 03:13:33.000000000 +0530
-+++ ./node.gyp	2024-02-18 23:15:08.296058654 +0530
-@@ -506,7 +506,8 @@
+--- ./node.gyp.orig	2024-07-08 17:40:12.000000000 +0530
++++ ./node.gyp	2024-07-10 16:25:57.143829186 +0530
+@@ -527,7 +527,8 @@
        ],
  
        'sources': [
@@ -10,7 +10,7 @@
        ],
  
        'dependencies': [
-@@ -985,207 +986,6 @@
+@@ -1006,295 +1007,7 @@
          },
        ],
      }, # node_lib_target_name
@@ -57,6 +57,94 @@
 -        }],
 -      ],
 -    }, # fuzz_env
+-    { # fuzz_ClientHelloParser.cc
+-      'target_name': 'fuzz_ClientHelloParser',
+-      'type': 'executable',
+-      'dependencies': [
+-        '<(node_lib_target_name)',
+-        'deps/histogram/histogram.gyp:histogram',
+-        'deps/uvwasi/uvwasi.gyp:uvwasi',
+-      ],
+-      'includes': [
+-        'node.gypi'
+-      ],
+-      'include_dirs': [
+-        'src',
+-        'tools/msvs/genfiles',
+-        'deps/v8/include',
+-        'deps/cares/include',
+-        'deps/uv/include',
+-        'deps/uvwasi/include',
+-        'test/cctest',
+-      ],
+-      'defines': [
+-        'NODE_ARCH="<(target_arch)"',
+-        'NODE_PLATFORM="<(OS)"',
+-        'NODE_WANT_INTERNALS=1',
+-      ],
+-      'sources': [
+-        'src/node_snapshot_stub.cc',
+-        'test/fuzzers/fuzz_ClientHelloParser.cc',
+-      ],
+-      'conditions': [
+-        ['OS=="linux"', {
+-          'ldflags': [ '-fsanitize=fuzzer' ]
+-        }],
+-        # Ensure that ossfuzz flag has been set and that we are on Linux
+-        [ 'OS!="linux" or ossfuzz!="true"', {
+-          'type': 'none',
+-        }],
+-        # Avoid excessive LTO
+-        ['enable_lto=="true"', {
+-          'ldflags': [ '-fno-lto' ],
+-        }],
+-      ],
+-    }, # fuzz_ClientHelloParser.cc
+-    { # fuzz_strings
+-      'target_name': 'fuzz_strings',
+-      'type': 'executable',
+-      'dependencies': [
+-        '<(node_lib_target_name)',
+-        'deps/googletest/googletest.gyp:gtest_prod',
+-        'deps/histogram/histogram.gyp:histogram',
+-        'deps/uvwasi/uvwasi.gyp:uvwasi',
+-        'deps/ada/ada.gyp:ada',
+-      ],
+-      'includes': [
+-        'node.gypi'
+-      ],
+-      'include_dirs': [
+-        'src',
+-        'tools/msvs/genfiles',
+-        'deps/v8/include',
+-        'deps/cares/include',
+-        'deps/uv/include',
+-        'deps/uvwasi/include',
+-        'test/cctest',
+-      ],
+-      'defines': [
+-        'NODE_ARCH="<(target_arch)"',
+-        'NODE_PLATFORM="<(OS)"',
+-        'NODE_WANT_INTERNALS=1',
+-      ],
+-      'sources': [
+-        'src/node_snapshot_stub.cc',
+-        'test/fuzzers/fuzz_strings.cc',
+-      ],
+-      'conditions': [
+-        ['OS=="linux"', {
+-          'ldflags': [ '-fsanitize=fuzzer' ]
+-        }],
+-        # Ensure that ossfuzz flag has been set and that we are on Linux
+-        [ 'OS!="linux" or ossfuzz!="true"', {
+-          'type': 'none',
+-        }],
+-        # Avoid excessive LTO
+-        ['enable_lto=="true"', {
+-          'ldflags': [ '-fno-lto' ],
+-        }],
+-      ],
+-    }, # fuzz_strings
 -    {
 -      'target_name': 'cctest',
 -      'type': 'executable',
@@ -93,7 +181,7 @@
 -      ],
 -
 -      'sources': [ '<@(node_cctest_sources)' ],
--
+ 
 -      'conditions': [
 -        [ 'node_use_openssl=="true"', {
 -          'defines': [
@@ -218,14 +306,14 @@
      {
        'target_name': 'node_js2c',
        'type': 'executable',
-@@ -1219,69 +1019,7 @@
+@@ -1331,69 +1044,7 @@
          }],
        ]
      },
 -    {
 -      'target_name': 'node_mksnapshot',
 -      'type': 'executable',
- 
+-
 -      'dependencies': [
 -        '<(node_lib_target_name)',
 -        'deps/histogram/histogram.gyp:histogram',
@@ -247,7 +335,7 @@
 -      ],
 -
 -      'defines': [ 'NODE_WANT_INTERNALS=1' ],
--
+ 
 -      'sources': [
 -        'src/node_snapshot_stub.cc',
 -        'tools/snapshot/node_mksnapshot.cc',
