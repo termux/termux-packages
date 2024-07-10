@@ -2,10 +2,10 @@ Fix CANNOT LINK EXECUTABLE "/data/data/com.termux/files/usr/lib/erlang/erts-15.0
 
 --- a/erts/configure
 +++ b/erts/configure
-@@ -25762,7 +25762,7 @@
- rm -f core conftest.err conftest.$ac_objext conftest.beam \
+@@ -25764,7 +25764,7 @@
      conftest$ac_exeext conftest.$ac_ext
      LDFLAGS="$saved_LDFLAGS"
+     EMU_LDFLAGS=""
 -    for flag in "-Wl,-z,common-page-size=2097152" "-Wl,-z,max-page-size=2097152"
 +    for flag in "-Wl,-z,common-page-size=4096" "-Wl,-z,max-page-size=16384"
      do
@@ -13,10 +13,10 @@ Fix CANNOT LINK EXECUTABLE "/data/data/com.termux/files/usr/lib/erlang/erts-15.0
  printf %s "checking if we can add $flag to LDFLAGS... " >&6; }
 --- a/erts/configure.ac
 +++ b/erts/configure.ac
-@@ -3071,7 +3071,7 @@
-       ]
+@@ -3072,7 +3072,7 @@
      )
      LDFLAGS="$saved_LDFLAGS"
+     EMU_LDFLAGS=""
 -    for flag in "-Wl,-z,common-page-size=2097152" "-Wl,-z,max-page-size=2097152"
 +    for flag in "-Wl,-z,common-page-size=4096" "-Wl,-z,max-page-size=16384"
      do
