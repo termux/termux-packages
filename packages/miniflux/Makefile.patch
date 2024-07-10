@@ -1,12 +1,12 @@
 --- a/Makefile
 +++ b/Makefile
 @@ -1,7 +1,7 @@
- APP          := miniflux
- DOCKER_IMAGE := miniflux/miniflux
--VERSION      := $(shell git describe --tags --abbrev=0 2>/dev/null)
--COMMIT       := $(shell git rev-parse --short HEAD 2>/dev/null)
-+VERSION      ?= $(shell git describe --tags --abbrev=0 2>/dev/null)
-+COMMIT       :=
- BUILD_DATE   := `date +%FT%T%z`
- LD_FLAGS     := "-s -w -X 'miniflux.app/v2/internal/version.Version=$(VERSION)' -X 'miniflux.app/v2/internal/version.Commit=$(COMMIT)' -X 'miniflux.app/v2/internal/version.BuildDate=$(BUILD_DATE)'"
- PKG_LIST     := $(shell go list ./... | grep -v /vendor/)
+ APP             := miniflux
+ DOCKER_IMAGE    := miniflux/miniflux
+-VERSION         := $(shell git describe --tags --abbrev=0 2>/dev/null)
+-COMMIT          := $(shell git rev-parse --short HEAD 2>/dev/null)
++VERSION         ?= $(shell git describe --tags --abbrev=0 2>/dev/null)
++COMMIT          :=
+ BUILD_DATE      := `date +%FT%T%z`
+ LD_FLAGS        := "-s -w -X 'miniflux.app/v2/internal/version.Version=$(VERSION)' -X 'miniflux.app/v2/internal/version.Commit=$(COMMIT)' -X 'miniflux.app/v2/internal/version.BuildDate=$(BUILD_DATE)'"
+ PKG_LIST        := $(shell go list ./... | grep -v /vendor/)
