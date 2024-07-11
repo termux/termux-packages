@@ -1,0 +1,11 @@
+--- a/src/lxqtplatformtheme.cpp
++++ b/src/lxqtplatformtheme.cpp
+@@ -516,7 +516,7 @@
+ 
+     QString xdgDataDirs = QFile::decodeName(qgetenv("XDG_DATA_DIRS"));
+     if (xdgDataDirs.isEmpty())
+-        xdgDataDirs = QLatin1String("/usr/local/share/:/usr/share/");
++        xdgDataDirs = QLatin1String("@TERMUX_PREFIX@/local/share/:@TERMUX_PREFIX@/share/");
+     xdgDirs.append(xdgDataDirs);
+ 
+     for (const auto &s: xdgDirs) {
