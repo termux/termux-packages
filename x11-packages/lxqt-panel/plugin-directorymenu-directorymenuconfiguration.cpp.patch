@@ -1,0 +1,20 @@
+--- a/plugin-directorymenu/directorymenuconfiguration.cpp
++++ b/plugin-directorymenu/directorymenuconfiguration.cpp
+@@ -43,7 +43,7 @@
+     ui(new Ui::DirectoryMenuConfiguration),
+     mBaseDirectory(QDir::homePath()),
+     mDefaultIcon(XdgIcon::fromTheme(QStringLiteral("folder"))),
+-    mDefaultTerminal(QStringLiteral("/usr/bin/qterminal"))
++    mDefaultTerminal(QStringLiteral("@TERMUX_PREFIX@/bin/qterminal"))
+ {
+     setAttribute(Qt::WA_DeleteOnClose);
+     setObjectName(QStringLiteral("DirectoryMenuConfigurationWindow"));
+@@ -128,7 +128,7 @@
+ 
+ void DirectoryMenuConfiguration::showTermDialog()
+ {
+-    QFileDialog d(this, tr("Choose Default Terminal"), QStringLiteral("/usr/bin"));
++    QFileDialog d(this, tr("Choose Default Terminal"), QStringLiteral("@TERMUX_PREFIX@/bin"));
+     d.setFileMode(QFileDialog::ExistingFile);
+     d.setWindowModality(Qt::WindowModal);
+ 
