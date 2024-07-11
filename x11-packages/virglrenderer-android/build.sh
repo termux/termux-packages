@@ -17,7 +17,7 @@ TERMUX_PKG_DEPENDS="angle-android"
 TERMUX_PKG_HOSTBUILD=true
 
 termux_step_post_get_source() {
-	mv libepoxy-${TERMUX_PKG_VERSION[1]} libepoxy
+	mv libepoxy-${_LIBEPOXY_VERSION} libepoxy
 }
 
 termux_step_host_build() {
