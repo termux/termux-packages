@@ -9,10 +9,9 @@ LICENSES/LGPL-3.0-only.txt
 LICENSES/LicenseRef-KDE-Accepted-LGPL.txt
 LICENSES/MIT.txt"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.3.0"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="6.4.0"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/kwindowsystem-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=40e33c592934bc27484b922e3dab3c9fdbe078063fa5bcaf29d50d2cd8e8aab9
+TERMUX_PKG_SHA256=c4e8742cbdd294d56a689d66a73b03a660702037ac46242f17cc01b24f014a59
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libc++, libwayland, libx11, libxcb, libxfixes, qt6-qtbase, qt6-qtdeclarative, qt6-qtwayland, xcb-util-keysyms"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules, libwayland-protocols, plasma-wayland-protocols, qt6-qttools"
