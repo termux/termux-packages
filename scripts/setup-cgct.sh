@@ -16,7 +16,7 @@ if [ "$ARCH" != "$(uname -m)" ]; then
 fi
 
 declare -A CGCT=(
-	["cbt"]="2.42-2" # Cross Binutils for Termux
+	["cbt"]="2.42-3" # Cross Binutils for Termux
 	["cgt"]="14.1.0-2" # Cross GCCs for Termux
 	["glibc-cgct"]="2.39-0" # Glibc for CGCT
 )
