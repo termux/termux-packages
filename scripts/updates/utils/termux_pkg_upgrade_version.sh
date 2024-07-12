@@ -18,11 +18,11 @@ termux_pkg_upgrade_version() {
 	fi
 
 	# If needed, filter version numbers using grep regexp.
-	if [[ -n "${TERMUX_PKG_UPDATE_VERSION_REGEXP}" ]]; then
+	if [[ -n "${TERMUX_PKG_UPDATE_VERSION_REGEXP:-}" ]]; then
 		# Extract version numbers.
 		local OLD_LATEST_VERSION="${LATEST_VERSION}"
 		LATEST_VERSION="$(grep -oP "${TERMUX_PKG_UPDATE_VERSION_REGEXP}" <<< "${LATEST_VERSION}" || true)"
-		if [[ -z "${LATEST_VERSION}" ]]; then
+		if [[ -z "${LATEST_VERSION:-}" ]]; then
 			termux_error_exit <<-EndOfError
 				ERROR: failed to filter version numbers using regexp '${TERMUX_PKG_UPDATE_VERSION_REGEXP}'.
 				Ensure that it works correctly with ${OLD_LATEST_VERSION}.
@@ -32,11 +32,11 @@ termux_pkg_upgrade_version() {
 	fi
 
 	# If needed, filter version numbers using sed regexp.
-	if [[ -n "${TERMUX_PKG_UPDATE_VERSION_SED_REGEXP}" ]]; then
+	if [[ -n "${TERMUX_PKG_UPDATE_VERSION_SED_REGEXP:-}" ]]; then
 		# Extract version numbers.
 		local OLD_LATEST_VERSION="${LATEST_VERSION}"
 		LATEST_VERSION="$(sed "${TERMUX_PKG_UPDATE_VERSION_SED_REGEXP}" <<< "${LATEST_VERSION}" || true)"
-		if [[ -z "${LATEST_VERSION}" ]]; then
+		if [[ -z "${LATEST_VERSION:-}" ]]; then
 			termux_error_exit <<-EndOfError
 				ERROR: failed to filter version numbers using regexp '${TERMUX_PKG_UPDATE_VERSION_SED_REGEXP}'.
 				Ensure that it works correctly with ${OLD_LATEST_VERSION}.
