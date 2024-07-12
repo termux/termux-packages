@@ -36,7 +36,7 @@ termux_step_make() {
 	-X 'github.com/alist-org/alist/v3/internal/conf.GitAuthor=$_gitAuthor' \
 	-X 'github.com/alist-org/alist/v3/internal/conf.GitCommit=$_gitCommit' \
 	-X 'github.com/alist-org/alist/v3/internal/conf.Version=$TERMUX_PKG_VERSION' \
-	-X 'github.com/alist-org/alist/v3/internal/conf.WebVersion=${TERMUX_PKG_VERSION[1]}' \
+	-X 'github.com/alist-org/alist/v3/internal/conf.WebVersion=$TERMUX_PKG_VERSION' \
 	"
 	go build -o "${TERMUX_PKG_NAME}" -ldflags="$ldflags" -tags=jsoniter
 }
