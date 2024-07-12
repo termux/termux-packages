@@ -27,6 +27,11 @@ termux_pkg_auto_update() {
 		return
 	fi
 
+	# We want to avoid re-filtering the version.
+	# It's already cleaned up, so unset the regexp.
+	# See: https://github.com/termux/termux-packages/issues/20836
+	unset TERMUX_PKG_UPDATE_VERSION_REGEXP
+
 	termux_pkg_upgrade_version "${latest_version}"
 }
 
