@@ -62,15 +62,25 @@ termux_step_start_build() {
 		fi
 	fi
 
+	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ] || [ "$TERMUX_ARCH_BITS" = "32" ]; then
+		TERMUX_PKG_BUILD32=false
+	fi
+	if [ "$TERMUX_PKG_BUILD32" = "true" ] && [ $(tr ' ' '\n' <<< "${TERMUX_PKG_EXCLUDED_ARCHES//,/}" | grep -c -e '^arm$' -e '^i686$') = "2" ]; then
+		TERMUX_PKG_ONLY_BUILD32=true
+	fi
+
 	echo "termux - building $TERMUX_PKG_NAME for arch $TERMUX_ARCH..."
 	test -t 1 && printf "\033]0;%s...\007" "$TERMUX_PKG_NAME"
 
 	# Avoid exporting PKG_CONFIG_LIBDIR until after termux_step_host_build.
-	export TERMUX_PKG_CONFIG_LIBDIR=$TERMUX_PREFIX/lib/pkgconfig:$TERMUX_PREFIX/share/pkgconfig
+	termux_step_setup_pkg_config_libdir
 
 	local TERMUX_PKG_BUILDDIR_ORIG="$TERMUX_PKG_BUILDDIR"
 	if [ "$TERMUX_PKG_BUILD_IN_SRC" = "true" ]; then
 		TERMUX_PKG_BUILDDIR=$TERMUX_PKG_SRCDIR
+	fi
+	if [ "$TERMUX_PKG_BUILD32" = "true" ] && [ "$TERMUX_PKG_ONLY_BUILD32" = "false" ] && ([ "$TERMUX_PKG_BUILD_IN_SRC" = "true" ] || [ "$TERMUX_PKG_BUILD32DIR" = "$TERMUX_PKG_BUILDDIR" ]); then
+		termux_error_exit "It is not possible to build 32-bit and 64-bit versions of a package in one place, the build location must be separate."
 	fi
 
 	if [ "$TERMUX_CONTINUE_BUILD" == "true" ]; then
@@ -127,4 +137,8 @@ termux_step_start_build() {
 			fi
 		done
 	fi
+}
+
+termux_step_setup_pkg_config_libdir() {
+	export TERMUX_PKG_CONFIG_LIBDIR=$TERMUX_PREFIX_LIB/pkgconfig:$TERMUX_PREFIX/share/pkgconfig
 }
