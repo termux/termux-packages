@@ -2,12 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://github.com/kcleal/gw
 TERMUX_PKG_DESCRIPTION="A browser for genomic sequencing data (.bam/.cram format)"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="clealk@cardiff.ac.uk"
-TERMUX_PKG_VERSION=0.9.3
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=0.10.1
 TERMUX_PKG_SRCURL=https://github.com/kcleal/gw/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=43445ef6d96bd8a09a9a45cd18e21481d7fefe7e9ab26aec4abd8d1f4bff3fcd
-TERMUX_PKG_DEPENDS="glfw, htslib, libc++, libjpeg-turbo, opengl"
-TERMUX_PKG_BUILD_DEPENDS="fontconfig, freetype, libicu, libuuid, mesa-dev"
+TERMUX_PKG_SHA256=a864010d9ba329feb9211d554ea9c410f5bcc1e1462369bef56a8f5b8914f3d2
+TERMUX_PKG_DEPENDS="glfw, htslib, libc++, libjpeg-turbo, opengl, libcurl"
+TERMUX_PKG_BUILD_DEPENDS="fontconfig, freetype, libicu, libuuid, mesa-dev, libcurl"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
