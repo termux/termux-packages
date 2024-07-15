@@ -8,7 +8,7 @@ TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/gnucobol/gnucobol-${TERMUX_PKG_VERSION
 TERMUX_PKG_SHA256=597005d71fd7d65b90cbe42bbfecd5a9ec0445388639404662e70d53ddf22574
 TERMUX_PKG_DEPENDS="json-c, libgmp, libvbisam, libxml2, ncurses"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
---without-db
+--with-db
 --with-json=json-c
 --with-vbisam
 "
