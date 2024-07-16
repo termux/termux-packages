@@ -24,7 +24,7 @@ check_package_license() {
 			CeCILL-C|Codehaus|Copyfree|curl|Day|Day-Addendum|ECL2|EPL-1.0|EPL-2.0);;
 			EUDATAGRID|EUPL-1.1|EUPL-1.2|Eiffel-2.0|Entessa-1.0);;
 			Facebook-Platform|Fair|Frameworx-1.0|GPL-2.0|GPL-3.0|GPL-3.0-only);;
-			GPL-3.0-or-later|Go|HSQLDB|Historical|IBMPL-1.0|IJG|IPAFont-1.0);;
+			GPL-3.0-or-later|Go|HSQLDB|Historical|HPND|IBMPL-1.0|IJG|IPAFont-1.0);;
 			ISC|IU-Extreme-1.1.1|ImageMagick|JA-SIG|JSON|JTidy|LGPL-2.0);;
 			LGPL-2.1|LGPL-3.0|LPPL-1.0|Libpng|Lucent-1.02|MIT|MPL-2.0|MS-PL);;
 			MS-RL|MirOS|Motosoto-0.9.1|Mozilla-1.1|Multics|NASA-1.3|NAUMEN);;
