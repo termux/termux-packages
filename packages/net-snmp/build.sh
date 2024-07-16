@@ -1,8 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://www.net-snmp.org/
 TERMUX_PKG_DESCRIPTION="Various tools relating to the Simple Network Management Protocol"
-# Licenses: HPND, BSD 3-Clause, MIT
-TERMUX_PKG_LICENSE="custom"
-TERMUX_PKG_LICENSE_FILE="COPYING"
+TERMUX_PKG_LICENSE="HPND, BSD 3-Clause, MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="5.9.4"
 TERMUX_PKG_SRCURL=https://github.com/net-snmp/net-snmp/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz

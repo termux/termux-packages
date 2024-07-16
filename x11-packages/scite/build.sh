@@ -1,7 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://www.scintilla.org/SciTE.html
 TERMUX_PKG_DESCRIPTION="A free source code editor"
-# License: HPND
-TERMUX_PKG_LICENSE="custom"
+TERMUX_PKG_LICENSE="HPND"
 TERMUX_PKG_LICENSE_FILE="scite/License.txt"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="5.5.0"

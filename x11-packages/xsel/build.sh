@@ -1,8 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://www.kfish.org/software/xsel/
 TERMUX_PKG_DESCRIPTION="Command-line program for getting and setting the contents of the X selection"
-# License: HPND
-TERMUX_PKG_LICENSE="custom"
-TERMUX_PKG_LICENSE_FILE="COPYING"
+TERMUX_PKG_LICENSE="HPND"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.2.1
 TERMUX_PKG_SRCURL=https://github.com/kfish/xsel/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
