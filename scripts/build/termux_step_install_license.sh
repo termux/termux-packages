@@ -84,12 +84,11 @@ termux_step_install_license() {
 				;;
 			esac
 		done <<< "${TERMUX_PKG_LICENSE//,/$'\n'}"
+		local license_files
+		license_files="$(find -L "$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME" -maxdepth 1 \( -type f -o -type l \) -name "copyright*")"
+		[[ -n "$license_files" ]] || {
+			termux_error_exit "No LICENSE file was installed for $TERMUX_PKG_NAME"
+		}
 	fi
-
-	local license_files
-	license_files="$(find -L "$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME" -maxdepth 1 \( -type f -o -type l \) -name "copyright*")"
-	[[ -n "$license_files" ]] || {
-		termux_error_exit "No LICENSE file was installed for $TERMUX_PKG_NAME"
-	}
 return 0
 }
