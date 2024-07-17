@@ -3,20 +3,22 @@ TERMUX_PKG_DESCRIPTION="Python bindings for Apache Arrow"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Align the version with `libarrow-cpp` package.
-TERMUX_PKG_VERSION="16.1.0"
+TERMUX_PKG_VERSION="17.0.0"
 TERMUX_PKG_SRCURL=https://github.com/apache/arrow/archive/refs/tags/apache-arrow-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=9762d9ecc13d09de2a03f9c625a74db0d645cb012de1e9a10dfed0b4ddc09524
+TERMUX_PKG_SHA256=8379554d89f19f2c8db63620721cabade62541f47a4e706dfb0a401f05a713ef
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_METHOD=repology
 TERMUX_PKG_DEPENDS="libarrow-cpp (>= ${TERMUX_PKG_VERSION}), libc++, python, python-numpy"
-TERMUX_PKG_PYTHON_COMMON_DEPS="Cython, numpy, wheel"
+# FIXME: Force use setuptools 65. This should be no more needed after PR 18078
+# FIXME: is merged or builder image bumps to Ubuntu 24.
+TERMUX_PKG_PYTHON_COMMON_DEPS="Cython, numpy, wheel, 'setuptools==65.7.0'"
 TERMUX_PKG_PROVIDES="libarrow-python"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
-	echo "Applying setup.py.diff"
+	echo "Applying pyproject.toml.diff"
 	sed -e "s|@VERSION@|${TERMUX_PKG_VERSION#*:}|g" \
-		$TERMUX_PKG_BUILDER_DIR/setup.py.diff \
+		$TERMUX_PKG_BUILDER_DIR/pyproject.toml.diff \
 		| patch --silent -p1
 
 	TERMUX_PKG_SRCDIR+="/python"
@@ -46,5 +48,9 @@ termux_step_post_make_install() {
 	local f="$TERMUX_PYTHON_HOME/site-packages/pyarrow/_generated_version.py"
 	if [ ! -e "${f}" ]; then
 		echo "version = '${TERMUX_PKG_VERSION#*:}'" > "${f}"
+	fi
+
+	if [ ! -e "$TERMUX_PYTHON_HOME/site-packages/pyarrow-$TERMUX_PKG_VERSION.dist-info" ]; then
+		termux_error_exit "Package ${TERMUX_PKG_NAME} doesn't build properly."
 	fi
 }
