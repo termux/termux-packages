@@ -3,21 +3,24 @@ TERMUX_PKG_DESCRIPTION="Deduplicating and compressing backup program"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
 TERMUX_PKG_VERSION="1.4.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/borgbackup/borg/releases/download/${TERMUX_PKG_VERSION}/borgbackup-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=c54c45155643fa66fed7f9ff2d134ea0a58d0ac197c18781ddc2fb236bf6ed29
-TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libacl, liblz4, openssl, python, xxhash, zstd"
-TERMUX_PKG_BUILD_IN_SRC=true
 # FIXME: Force use setuptools 65. This should be no more needed after PR 18078
 # FIXME: is merged or builder image bumps to Ubuntu 24.
-TERMUX_PKG_PYTHON_COMMON_DEPS="Cython, wheel, 'setuptools==65.7.0'"
-TERMUX_PKG_PYTHON_TARGET_DEPS="msgpack==1.0.8"
+TERMUX_PKG_PYTHON_COMMON_DEPS="build, Cython, pkgconfig, 'setuptools==65.7.0', setuptools-scm, wheel"
+TERMUX_PKG_PYTHON_TARGET_DEPS="'msgpack==1.0.8', packaging"
+TERMUX_PKG_AUTO_UPDATE=true
 
-termux_step_post_make_install() {
-	# Fail if setuptools didn't set the package name correctly.
-	[[ -e "${TERMUX_PYTHON_HOME}/site-packages/${TERMUX_PKG_NAME}-${TERMUX_PKG_VERSION}.dist-info" ]] || {
-		termux_error_exit "Package ${TERMUX_PKG_NAME}: package name not detected by pip"
-	}
+termux_step_make() {
+	PYTHONPATH='' python -m build -w -n -x --config-setting builddir="$TERMUX_PKG_BUILDDIR" "$TERMUX_PKG_SRCDIR"
+}
+
+termux_step_make_install() {
+	local _pyver="${TERMUX_PYTHON_VERSION//./}"
+	local _wheel="borgbackup-${TERMUX_PKG_VERSION}-cp${_pyver}-cp${_pyver}-linux_${TERMUX_ARCH}.whl"
+	pip install --no-deps --prefix="$TERMUX_PREFIX" "$TERMUX_PKG_SRCDIR/dist/${_wheel}"
 }
 
 termux_step_create_debscripts() {
