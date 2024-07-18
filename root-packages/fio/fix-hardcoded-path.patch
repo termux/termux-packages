@@ -1,0 +1,193 @@
+diff -uNr fio-fio-3.37/Makefile fio-fio-3.37.mod/Makefile
+--- fio-fio-3.37/Makefile	2024-03-27 05:13:51.000000000 +0800
++++ fio-fio-3.37.mod/Makefile	2024-07-18 10:36:51.284109555 +0800
+@@ -512,7 +512,7 @@
+ mandir = /usr/share/man
+ sharedir = /usr/share/fio
+ else
+-mandir = $(prefix)/man
++mandir = $(prefix)/share/man
+ sharedir = $(prefix)/share/fio
+ endif
+ 
+diff -uNr fio-fio-3.37/engines/glusterfs.c fio-fio-3.37.mod/engines/glusterfs.c
+--- fio-fio-3.37/engines/glusterfs.c	2024-03-27 05:13:51.000000000 +0800
++++ fio-fio-3.37.mod/engines/glusterfs.c	2024-07-18 10:36:51.284109555 +0800
+@@ -63,7 +63,7 @@
+ 		log_err("glfs_new failed.\n");
+ 		goto out;
+ 	}
+-	glfs_set_logging(fs, "/tmp/fio_gfapi.log", 7);
++	glfs_set_logging(fs, "@TERMUX_PREFIX@/tmp/fio_gfapi.log", 7);
+ 	/* default to tcp */
+ 	r = glfs_set_volfile_server(fs, "tcp", brick, 0);
+ 	if (r) {
+diff -uNr fio-fio-3.37/engines/rados.c fio-fio-3.37.mod/engines/rados.c
+--- fio-fio-3.37/engines/rados.c	2024-03-27 05:13:51.000000000 +0800
++++ fio-fio-3.37.mod/engines/rados.c	2024-07-18 10:36:51.284109555 +0800
+@@ -76,7 +76,7 @@
+ 		.type     = FIO_OPT_STR_STORE,
+ 		.help     = "Path of the ceph configuration file",
+ 		.off1     = offsetof(struct rados_options, conf),
+-		.def      = "/etc/ceph/ceph.conf",
++		.def      = "@TERMUX_PREFIX@/etc/ceph/ceph.conf",
+ 		.category = FIO_OPT_C_ENGINE,
+ 		.group    = FIO_OPT_G_RBD,
+ 	},
+diff -uNr fio-fio-3.37/fio.1 fio-fio-3.37.mod/fio.1
+--- fio-fio-3.37/fio.1	2024-03-27 05:13:51.000000000 +0800
++++ fio-fio-3.37.mod/fio.1	2024-07-18 10:39:00.968109505 +0800
+@@ -118,7 +118,7 @@
+ Smalloc is an internal allocator for shared structures from a fixed size
+ memory pool and can grow to 16 pools. The pool size defaults to 16MiB.
+ NOTE: While running `.fio_smalloc.*' backing store files are visible
+-in `/tmp'.
++in `@TERMUX_PREFIX/tmp'.
+ .TP
+ .BI \-\-warnings\-fatal
+ All fio parser warnings are fatal, causing fio to exit with an error.
+@@ -1984,8 +1984,8 @@
+ .TP
+ .B external
+ Prefix to specify loading an external I/O engine object file. Append
+-the engine filename, e.g. `ioengine=external:/tmp/foo.o' to load
+-ioengine `foo.o' in `/tmp'. The path can be either
++the engine filename, e.g. `ioengine=external:@TERMUX_PREFIX/tmp/foo.o' to load
++ioengine `foo.o' in `@TERMUX_PREFIX/tmp'. The path can be either
+ absolute or relative. See `engines/skeleton_external.c' in the fio source for
+ details of writing an external I/O engine.
+ .TP
+@@ -2644,7 +2644,7 @@
+ .TP
+ \fInbd://localhost:10809\fR
+ .TP
+-\fInbd+unix:///?socket=/tmp/socket\fR
++\fInbd+unix:///?socket=@TERMUX_PREFIX/tmp/socket\fR
+ .TP
+ \fInbds://tlshost/exportname\fR
+ .RE
+@@ -4359,7 +4359,7 @@
+ It is also possible to get fio to dump the current output while it is running,
+ without terminating the job. To do that, send fio the USR1 signal. You can
+ also get regularly timed dumps by using the \fB\-\-status\-interval\fR
+-parameter, or by creating a file in `/tmp' named
++parameter, or by creating a file in `@TERMUX_PREFIX/tmp' named
+ `fio\-dump\-status'. If fio sees this file, it will unlink it and dump the
+ current output status.
+ .SH TERSE OUTPUT
+@@ -4735,8 +4735,8 @@
+ .P
+ A trigger is invoked either through creation ('touch') of a specified file in
+ the system, or through a timeout setting. If fio is run with
+-`\-\-trigger\-file=/tmp/trigger\-file', then it will continually
+-check for the existence of `/tmp/trigger\-file'. When it sees this file, it
++`\-\-trigger\-file=@TERMUX_PREFIX/tmp/trigger\-file', then it will continually
++check for the existence of `@TERMUX_PREFIX/tmp/trigger\-file'. When it sees this file, it
+ will fire off the trigger (thus saving state, and executing the trigger
+ command).
+ .P
+@@ -4761,10 +4761,10 @@
+ and on the client, we'll fire off the workload:
+ .RS
+ .P
+-localbox$ fio \-\-client=server \-\-trigger\-file=/tmp/my\-trigger \-\-trigger\-remote="bash \-c "echo b > /proc/sysrq\-triger""
++localbox$ fio \-\-client=server \-\-trigger\-file=@TERMUX_PREFIX/tmp/my\-trigger \-\-trigger\-remote="bash \-c "echo b > /proc/sysrq\-triger""
+ .RE
+ .P
+-We set `/tmp/my\-trigger' as the trigger file, and we tell fio to execute:
++We set `@TERMUX_PREFIX/tmp/my\-trigger' as the trigger file, and we tell fio to execute:
+ .RS
+ .P
+ echo b > /proc/sysrq\-trigger
+@@ -4779,7 +4779,7 @@
+ instead:
+ .RS
+ .P
+-localbox$ fio \-\-client=server \-\-trigger\-file=/tmp/my\-trigger \-\-trigger="ipmi\-reboot server"
++localbox$ fio \-\-client=server \-\-trigger\-file=@TERMUX_PREFIX/tmp/my\-trigger \-\-trigger="ipmi\-reboot server"
+ .RE
+ .P
+ For this case, fio would wait for the server to send us the write state, then
+@@ -4892,8 +4892,8 @@
+ 5) \fBfio \-\-server=1.2.3.4\fR
+ Start a fio server, listening on IP 1.2.3.4 on the default port.
+ .TP
+-6) \fBfio \-\-server=sock:/tmp/fio.sock\fR
+-Start a fio server, listening on the local socket `/tmp/fio.sock'.
++6) \fBfio \-\-server=sock:@TERMUX_PREFIX/tmp/fio.sock\fR
++Start a fio server, listening on the local socket `@TERMUX_PREFIX/tmp/fio.sock'.
+ .RE
+ .P
+ Once a server is running, a "client" can connect to the fio server with:
+diff -uNr fio-fio-3.37/lib/mountcheck.c fio-fio-3.37.mod/lib/mountcheck.c
+--- fio-fio-3.37/lib/mountcheck.c	2024-03-27 05:13:51.000000000 +0800
++++ fio-fio-3.37.mod/lib/mountcheck.c	2024-07-18 10:36:51.284109555 +0800
+@@ -6,7 +6,7 @@
+ 
+ #include "mountcheck.h"
+ 
+-#define MTAB	"/etc/mtab"
++#define MTAB	"@TERMUX_PREFIX@/etc/mtab"
+ 
+ int device_is_mounted(const char *dev)
+ {
+diff -uNr fio-fio-3.37/os/os-linux.h fio-fio-3.37.mod/os/os-linux.h
+--- fio-fio-3.37/os/os-linux.h	2024-03-27 05:13:51.000000000 +0800
++++ fio-fio-3.37.mod/os/os-linux.h	2024-07-18 10:36:51.284109555 +0800
+@@ -69,7 +69,7 @@
+ 
+ #define OS_MAP_ANON		MAP_ANONYMOUS
+ 
+-#define FIO_EXT_ENG_DIR	"/usr/local/lib/fio"
++#define FIO_EXT_ENG_DIR	"@TERMUX_PREFIX@/lib/fio"
+ 
+ typedef cpu_set_t os_cpu_mask_t;
+ 
+diff -uNr fio-fio-3.37/stat.c fio-fio-3.37.mod/stat.c
+--- fio-fio-3.37/stat.c	2024-03-27 05:13:51.000000000 +0800
++++ fio-fio-3.37.mod/stat.c	2024-07-18 10:36:51.284109555 +0800
+@@ -2820,7 +2820,7 @@
+ 			temp_dir = NULL;
+ 	}
+ 	if (temp_dir == NULL)
+-		temp_dir = "/tmp";
++		temp_dir = "@TERMUX_PREFIX@/tmp";
+ #ifdef __COVERITY__
+ 	__coverity_tainted_data_sanitize__(temp_dir);
+ #endif
+diff -uNr fio-fio-3.37/tools/genfio fio-fio-3.37.mod/tools/genfio
+--- fio-fio-3.37/tools/genfio	2024-03-27 05:13:51.000000000 +0800
++++ fio-fio-3.37.mod/tools/genfio	2024-07-18 10:36:51.284109555 +0800
+@@ -22,7 +22,7 @@
+ BLK_SIZE=
+ BLOCK_SIZE=4k
+ SEQ=-1
+-TEMPLATE=$(mktemp "${TMPDIR:-${TEMP:-/tmp}}/template.fio.XXXXXX") || exit $?
++TEMPLATE=$(mktemp "${TMPDIR:-${TEMP:-@TERMUX_PREFIX@/tmp}}/template.fio.XXXXXX") || exit $?
+ trap 'rm -f "$TEMPLATE"' EXIT
+ OUTFILE=
+ DISKS=
+diff -uNr fio-fio-3.37/tools/plot/fio2gnuplot fio-fio-3.37.mod/tools/plot/fio2gnuplot
+--- fio-fio-3.37/tools/plot/fio2gnuplot	2024-03-27 05:13:51.000000000 +0800
++++ fio-fio-3.37.mod/tools/plot/fio2gnuplot	2024-07-18 10:36:51.284109555 +0800
+@@ -390,7 +390,7 @@
+     title='No title'
+     gnuplot_output_filename='result'
+     gnuplot_output_dir='./'
+-    gpm_dir="/usr/share/fio/"
++    gpm_dir="@TERMUX_PREFIX@/share/fio/"
+     disk_perf=[]
+     run_gnuplot=False
+     parse_global=False
+@@ -406,9 +406,9 @@
+     force_keep_temp_files=False
+ 
+     if not os.path.isfile(gpm_dir+'math.gpm'):
+-        gpm_dir="/usr/local/share/fio/"
++        gpm_dir="@TERMUX_PREFIX@/share/fio/"
+         if not os.path.isfile(gpm_dir+'math.gpm'):
+-            print("Looks like fio didn't get installed properly as no gpm files found in '/usr/share/fio' or '/usr/local/share/fio'\n")
++            print("Looks like fio didn't get installed properly as no gpm files found in '@TERMUX_PREFIX@/share/fio''\n")
+             sys.exit(3)
+ 
+     try:
