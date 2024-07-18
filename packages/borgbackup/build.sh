@@ -14,7 +14,7 @@ TERMUX_PKG_PYTHON_TARGET_DEPS="'msgpack==1.0.8', packaging"
 TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make() {
-	PYTHONPATH='' python -m build -w -n -x --config-setting builddir="$TERMUX_PKG_BUILDDIR" "$TERMUX_PKG_SRCDIR"
+	PYTHONPATH='' python -m build -w -n -x "$TERMUX_PKG_SRCDIR"
 }
 
 termux_step_make_install() {
