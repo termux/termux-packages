@@ -13,6 +13,11 @@ termux_git_clone_src() {
 			${TERMUX_PKG_SRCURL:4} \
 			$TMP_CHECKOUT
 
+		echo "git clone --depth 1 \
+			--branch $TERMUX_PKG_GIT_BRANCH \
+			${TERMUX_PKG_SRCURL:4} \
+			$TMP_CHECKOUT"
+
 		pushd $TMP_CHECKOUT
 
 		# Workaround some bad server behaviour
