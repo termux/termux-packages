@@ -8,7 +8,7 @@ TERMUX_PKG_REVISION=3
 ##TERMUX_PKG_SHA256=3bb48af46ced4779facf41fdc2ee60e4ccb86eaa99d010b36685315df39c2ee2
 TERMUX_PKG_SRCURL=git+https://github.com/alexbodn/gnucobol-3.2.git
 TERMUX_PKG_SHA256=bcdc555d76cbc951bb51d66f1cae5e92bf5bcb5349d0330f5c58f5954e62c8c3
-TERMUX_PKG_GIT_BRANCH=termux
+TERMUX_PKG_GIT_BRANCH="termux"
 TERMUX_PKG_DEPENDS="json-c, libgmp, libdb, libxml2, ncurses"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-db
