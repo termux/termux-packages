@@ -35,8 +35,8 @@ termux_step_massage() {
 		termux_error_exit "MIME cache found in package. Please disable \`update-mime-database\`."
 	fi
 
-	# Remove old kept libraries (readline):
-	find . -name '*.old' -print0 | xargs -0 -r rm -f
+	# Remove old kept libraries (readline) and directories (rust):
+	find . -name '*.old' -print0 | xargs -0 -r rm -fr
 
 	# Move over sbin to bin:
 	for file in sbin/*; do if test -f "$file"; then mv "$file" bin/; fi; done
@@ -233,8 +233,8 @@ termux_step_massage() {
 				*.a) (( e &= ~1 )) || : ;;
 				*.o) (( e &= ~1 )) || : ;;
 				*.obj) (( e &= ~1 )) || : ;;
-				*.syso) (( e &= ~1 )) || : ;;
 				*.rlib) (( e &= ~1 )) || : ;;
+				*.syso) (( e &= ~1 )) || : ;;
 				*) (( e |= 1 )) || : ;;
 				esac
 				while IFS= read -r excluded_f; do
@@ -284,9 +284,10 @@ termux_step_massage() {
 
 # Local function called by termux_step_massage
 create_grep_pattern() {
-	symbol_type='NOTYPE[[:space:]]+GLOBAL[[:space:]]+DEFAULT[[:space:]]+UND[[:space:]]+'
+	local symbol_type='NOTYPE[[:space:]]+GLOBAL[[:space:]]+DEFAULT[[:space:]]+UND[[:space:]]+'
 	echo -n "$symbol_type$1"'$'
 	shift 1
+	local arg
 	for arg in "$@"; do
 		echo -n "|$symbol_type$arg"'$'
 	done
