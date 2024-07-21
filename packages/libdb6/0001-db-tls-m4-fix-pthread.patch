@@ -1,0 +1,15 @@
+--- a/dist/aclocal/tls.m4
++++ b/dist/aclocal/tls.m4
+@@ -42,10 +42,10 @@
+              pthread_key_create(&key, NULL);
+          }
+          static void *get_tls() {
+-             return (void *)pthread_getspecific(&key);
++             return (void *)pthread_getspecific(key);
+          }
+          static void set_tls(void *p) {
+-              pthread_setspecific(&key, p);
++              pthread_setspecific(key, p);
+          }], [],
+          [ac_cv_tls=pthread])
+   fi

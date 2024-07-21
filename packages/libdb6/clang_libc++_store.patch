@@ -1,0 +1,21 @@
+--- db-6.0.19/src/dbinc/db_cxx.in.orig	2021-08-30 11:16:06.008802400 -0700
++++ db-6.0.19/src/dbinc/db_cxx.in	2021-08-30 11:18:04.727661400 -0700
+@@ -48,6 +48,9 @@
+ // Forward declarations
+ //
+ 
++#pragma push_macro("store")
++#undef store
++
+ #include <stdarg.h>
+ 
+ @cxx_have_stdheaders@
+@@ -61,6 +64,8 @@
+ #define	__DB_STD(x)	x
+ #endif
+ 
++#pragma pop_macro("store")
++
+ #include "db.h"
+ 
+ class Db;                                        // forward

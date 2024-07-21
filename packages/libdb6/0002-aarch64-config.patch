@@ -1,0 +1,102 @@
+diff -bur db-6.0.19/dist/config.sub db-6.0.19-orig/dist/config.sub
+--- db-6.0.19/dist/config.sub	2013-05-31 09:00:04.000000000 -0600
++++ db-6.0.19-orig/dist/config.sub	2024-02-28 01:08:43.886879000 -0700
+@@ -352,7 +352,7 @@
+ 	# We use `pc' rather than `unknown'
+ 	# because (1) that's what they normally are, and
+ 	# (2) the word "unknown" tends to confuse beginning users.
+-	i*86 | x86_64)
++	i*86 | x86_64 | aarch64)
+ 	  basic_machine=$basic_machine-pc
+ 	  ;;
+ 	# Object if more than one company name word.
+diff -bur db-6.0.19/lang/sql/jdbc/config.sub db-6.0.19-orig/lang/sql/jdbc/config.sub
+--- db-6.0.19/lang/sql/jdbc/config.sub	2010-08-24 13:42:47.000000000 -0600
++++ db-6.0.19-orig/lang/sql/jdbc/config.sub	2024-02-28 01:08:43.683168800 -0700
+@@ -245,7 +245,7 @@
+ 	# Some are omitted here because they have special meanings below.
+ 	1750a | 580 \
+ 	| a29k \
+-	| alpha | alphaev[4-8] | alphaev56 | alphaev6[78] | alphapca5[67] \
++	| aarch64 | alpha | alphaev[4-8] | alphaev56 | alphaev6[78] | alphapca5[67] \
+ 	| alpha64 | alpha64ev[4-8] | alpha64ev56 | alpha64ev6[78] | alpha64pca5[67] \
+ 	| am33_2.0 \
+ 	| arc | arm | arm[bl]e | arme[lb] | armv[2345] | armv[345][lb] | avr | avr32 \
+@@ -316,7 +316,7 @@
+ 	# We use `pc' rather than `unknown'
+ 	# because (1) that's what they normally are, and
+ 	# (2) the word "unknown" tends to confuse beginning users.
+-	i*86 | x86_64)
++	i*86 | x86_64 | aarch64)
+ 	  basic_machine=$basic_machine-pc
+ 	  ;;
+ 	# Object if more than one company name word.
+@@ -327,7 +327,7 @@
+ 	# Recognize the basic CPU types with company name.
+ 	580-* \
+ 	| a29k-* \
+-	| alpha-* | alphaev[4-8]-* | alphaev56-* | alphaev6[78]-* \
++	| aarch64-* | alpha-* | alphaev[4-8]-* | alphaev56-* | alphaev6[78]-* \
+ 	| alpha64-* | alpha64ev[4-8]-* | alpha64ev56-* | alpha64ev6[78]-* \
+ 	| alphapca5[67]-* | alpha64pca5[67]-* | arc-* \
+ 	| arm-*  | armbe-* | armle-* | armeb-* | armv*-* \
+diff -bur db-6.0.19/lang/sql/odbc/config.sub db-6.0.19-orig/lang/sql/odbc/config.sub
+--- db-6.0.19/lang/sql/odbc/config.sub	2009-12-15 18:19:00.000000000 -0700
++++ db-6.0.19-orig/lang/sql/odbc/config.sub	2024-02-28 01:08:43.824306900 -0700
+@@ -226,7 +226,7 @@
+ 	# Some are omitted here because they have special meanings below.
+ 	1750a | 580 \
+ 	| a29k \
+-	| alpha | alphaev[4-8] | alphaev56 | alphaev6[78] | alphapca5[67] \
++	| aarch64 | alpha | alphaev[4-8] | alphaev56 | alphaev6[78] | alphapca5[67] \
+ 	| alpha64 | alpha64ev[4-8] | alpha64ev56 | alpha64ev6[78] | alpha64pca5[67] \
+ 	| arc | arm | arm[bl]e | arme[lb] | armv[2345] | armv[345][lb] | avr \
+ 	| c4x | clipper \
+@@ -280,7 +280,7 @@
+ 	# We use `pc' rather than `unknown'
+ 	# because (1) that's what they normally are, and
+ 	# (2) the word "unknown" tends to confuse beginning users.
+-	i*86 | x86_64)
++	i*86 | x86_64 | aarch64)
+ 	  basic_machine=$basic_machine-pc
+ 	  ;;
+ 	# Object if more than one company name word.
+@@ -291,7 +291,7 @@
+ 	# Recognize the basic CPU types with company name.
+ 	580-* \
+ 	| a29k-* \
+-	| alpha-* | alphaev[4-8]-* | alphaev56-* | alphaev6[78]-* \
++	| aarch64-* | alpha-* | alphaev[4-8]-* | alphaev56-* | alphaev6[78]-* \
+ 	| alpha64-* | alpha64ev[4-8]-* | alpha64ev56-* | alpha64ev6[78]-* \
+ 	| alphapca5[67]-* | alpha64pca5[67]-* | arc-* \
+ 	| arm-*  | armbe-* | armle-* | armeb-* | armv*-* \
+diff -bur db-6.0.19/lang/sql/sqlite/config.sub db-6.0.19-orig/lang/sql/sqlite/config.sub
+--- db-6.0.19/lang/sql/sqlite/config.sub	2013-05-31 09:00:08.000000000 -0600
++++ db-6.0.19-orig/lang/sql/sqlite/config.sub	2024-02-28 01:08:43.816301400 -0700
+@@ -238,7 +238,7 @@
+ 	# Some are omitted here because they have special meanings below.
+ 	1750a | 580 \
+ 	| a29k \
+-	| alpha | alphaev[4-8] | alphaev56 | alphaev6[78] | alphapca5[67] \
++	| aarch64 | alpha | alphaev[4-8] | alphaev56 | alphaev6[78] | alphapca5[67] \
+ 	| alpha64 | alpha64ev[4-8] | alpha64ev56 | alpha64ev6[78] | alpha64pca5[67] \
+ 	| am33_2.0 \
+ 	| arc | arm | arm[bl]e | arme[lb] | armv[2345] | armv[345][lb] | avr | avr32 \
+@@ -303,7 +303,7 @@
+ 	# We use `pc' rather than `unknown'
+ 	# because (1) that's what they normally are, and
+ 	# (2) the word "unknown" tends to confuse beginning users.
+-	i*86 | x86_64)
++	i*86 | x86_64 | aarch64)
+ 	  basic_machine=$basic_machine-pc
+ 	  ;;
+ 	# Object if more than one company name word.
+@@ -314,7 +314,7 @@
+ 	# Recognize the basic CPU types with company name.
+ 	580-* \
+ 	| a29k-* \
+-	| alpha-* | alphaev[4-8]-* | alphaev56-* | alphaev6[78]-* \
++	| aarch64-* | alpha-* | alphaev[4-8]-* | alphaev56-* | alphaev6[78]-* \
+ 	| alpha64-* | alpha64ev[4-8]-* | alpha64ev56-* | alpha64ev6[78]-* \
+ 	| alphapca5[67]-* | alpha64pca5[67]-* | arc-* \
+ 	| arm-*  | armbe-* | armle-* | armeb-* | armv*-* \

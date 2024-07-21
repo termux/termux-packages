@@ -1,0 +1,69 @@
+diff --git a/lang/sql/generated/sqlite3.c b/lang/sql/generated/sqlite3.c
+index 00a1552..e6c37ab 100644
+--- a/lang/sql/generated/sqlite3.c
++++ b/lang/sql/generated/sqlite3.c
+@@ -27598,9 +27598,9 @@ static const char *unixTempFileDir(void){
+   static const char *azDirs[] = {
+      0,
+      0,
+-     "/var/tmp",
+-     "/usr/tmp",
+-     "/tmp",
++     "@TERMUX_PREFIX@/var/tmp",
++     "@TERMUX_PREFIX@/usr/tmp",
++     "@TERMUX_PREFIX@/tmp",
+      0        /* List terminator */
+   };
+   unsigned int i;
+@@ -28607,7 +28607,7 @@ static int proxyGetLockPath(const char *dbPath, char *lPath, size_t maxLen){
+     len = strlcat(lPath, "sqliteplocks", maxLen);    
+   }
+ # else
+-  len = strlcpy(lPath, "/tmp/", maxLen);
++  len = strlcpy(lPath, "@TERMUX_PREFIX@/tmp/", maxLen);
+ # endif
+ #endif
+ 
+diff --git a/lang/sql/sqlite/src/os_unix.c b/lang/sql/sqlite/src/os_unix.c
+index 84b1594..a0b8f82 100644
+--- a/lang/sql/sqlite/src/os_unix.c
++++ b/lang/sql/sqlite/src/os_unix.c
+@@ -4907,9 +4907,9 @@ static const char *unixTempFileDir(void){
+   static const char *azDirs[] = {
+      0,
+      0,
+-     "/var/tmp",
+-     "/usr/tmp",
+-     "/tmp",
++     "@TERMUX_PREFIX@/var/tmp",
++     "@TERMUX_PREFIX@/usr/tmp",
++     "@TERMUX_PREFIX@/tmp",
+      0        /* List terminator */
+   };
+   unsigned int i;
+@@ -5916,7 +5916,7 @@ static int proxyGetLockPath(const char *dbPath, char *lPath, size_t maxLen){
+     len = strlcat(lPath, "sqliteplocks", maxLen);    
+   }
+ # else
+-  len = strlcpy(lPath, "/tmp/", maxLen);
++  len = strlcpy(lPath, "@TERMUX_PREFIX@/tmp/", maxLen);
+ # endif
+ #endif
+ 
+diff --git a/src/os/os_tmpdir.c b/src/os/os_tmpdir.c
+index 7bb959c..98b9c73 100644
+--- a/src/os/os_tmpdir.c
++++ b/src/os/os_tmpdir.c
+@@ -125,9 +125,9 @@ found:			return (__os_strdup(env, tdir, &dbenv->db_tmp_dir));
+ 	DB_TEMP_DIRECTORY("C:/temp");
+ 	DB_TEMP_DIRECTORY("C:/tmp");
+ #else
+-	DB_TEMP_DIRECTORY("/var/tmp");
+-	DB_TEMP_DIRECTORY("/usr/tmp");
+-	DB_TEMP_DIRECTORY("/tmp");
++	DB_TEMP_DIRECTORY("@TERMUX_PREFIX@/var/tmp");
++	DB_TEMP_DIRECTORY("@TERMUX_PREFIX@/usr/tmp");
++	DB_TEMP_DIRECTORY("@TERMUX_PREFIX@/tmp");
+ #if defined(ANDROID) || defined(DB_ANDROID)
+ 	DB_TEMP_DIRECTORY("/cache");
+ #endif

@@ -1,0 +1,141 @@
+diff -ruN db-5.3.28.orig/dist/configure db-5.3.28/dist/configure
+--- db-5.3.28.orig/dist/configure	2013-09-09 17:35:02.000000000 +0200
++++ db-5.3.28/dist/configure	2014-03-29 20:59:46.684253900 +0100
+@@ -17781,6 +17781,7 @@
+ 	# Since Cygwin uses Windows' javac, we need Windows path separators
+ 	case "$host_os" in
+ 	cygwin*)	CLASSPATH=".;$CLASSPATH";;
++	mingw*)		CLASSPATH=".;$CLASSPATH";;
+ 	*)		CLASSPATH=".:$CLASSPATH";;
+ 	esac
+ 	export CLASSPATH
+@@ -18444,7 +18445,8 @@
+ 	case "$host_os" in
+ 	aix*)		_JNI_INC_SUBDIRS="aix";;
+ 	bsdi*)		_JNI_INC_SUBDIRS="bsdos";;
+-	cygwin*)	_JNI_INC_SUBDIRS="win32";;
++ 	cygwin*)	_JNI_INC_SUBDIRS="win32";;
++	mingw*)		_JNI_INC_SUBDIRS="win32";;
+ 	freebsd*)	_JNI_INC_SUBDIRS="freebsd";;
+ 	hp*)		_JNI_INC_SUBDIRS="hp-ux";;
+ 	linux*)		_JNI_INC_SUBDIRS="linux genunix";;
+diff -ruN db-5.3.28.orig/dist/configure.ac db-5.3.28/dist/configure.ac
+--- db-5.3.28.orig/dist/configure.ac	2013-09-09 17:35:02.000000000 +0200
++++ db-5.3.28/dist/configure.ac	2014-03-29 20:59:46.762395000 +0100
+@@ -436,6 +436,7 @@
+ 	# Since Cygwin uses Windows' javac, we need Windows path separators
+ 	case "$host_os" in 
+ 	cygwin*)	CLASSPATH=".;$CLASSPATH";;
++	mingw*)		CLASSPATH=".;$CLASSPATH";;
+ 	*)		CLASSPATH=".:$CLASSPATH";;
+ 	esac
+ 	export CLASSPATH
+@@ -489,12 +489,12 @@
+ 	OSDIR=os_windows
+ 	PATH_SEPARATOR="\\\\/:"
+ 
+-	AC_DEFINE(DB_WIN32)
+-	AC_DEFINE(STDC_HEADERS)
++	AC_DEFINE(DB_WIN32, [], [Description])
++	AC_DEFINE(STDC_HEADERS, [], [Description])
+ else
+ 	OSDIR=os
+ 	PATH_SEPARATOR="/"
+-	AC_DEFINE(HAVE_SYSTEM_INCLUDE_FILES)
++	AC_DEFINE(HAVE_SYSTEM_INCLUDE_FILES, [], [Description])
+ fi
+ 
+ # Optional SQL API.
+--- db-6.0.19/dist/aclocal_java/ac_jni_include_dirs.m4.orig	2021-08-30 12:17:27.639455100 -0700
++++ db-6.0.19/dist/aclocal_java/ac_jni_include_dirs.m4	2021-08-30 12:17:43.422456700 -0700
+@@ -76,6 +76,7 @@
+ 	aix*)		_JNI_INC_SUBDIRS="aix";;
+ 	bsdi*)		_JNI_INC_SUBDIRS="bsdos";;
+ 	cygwin*)	_JNI_INC_SUBDIRS="win32";;
++	mingw*)		_JNI_INC_SUBDIRS="win32";;
+ 	freebsd*)	_JNI_INC_SUBDIRS="freebsd";;
+ 	hp*)		_JNI_INC_SUBDIRS="hp-ux";;
+ 	linux*)		_JNI_INC_SUBDIRS="linux genunix";;
+diff -ruN db-5.3.28.orig/dist/Makefile.in db-5.3.28/dist/Makefile.in
+--- db-5.3.28.orig/dist/Makefile.in	2013-09-09 17:35:02.000000000 +0200
++++ db-5.3.28/dist/Makefile.in	2014-03-29 21:00:05.731463900 +0100
+@@ -17,7 +17,7 @@
+ bindir=	@bindir@
+ includedir=@includedir@
+ libdir=	@libdir@
+-docdir=	$(prefix)/docs
++docdir=	@docdir@
+ 
+ dmode=	755
+ emode=	555
+@@ -58,6 +58,7 @@
+ SOFLAGS=	@SOFLAGS@
+ LIBMAJOR=	@DB_VERSION_MAJOR@
+ LIBVERSION=	@DB_VERSION_MAJOR@.@DB_VERSION_MINOR@
++IMPLIB_SUFFIX=	dll.a
+ 
+ CPPFLAGS=	-I$(builddir) -I$(srcdir) @CPPFLAGS@
+ 
+@@ -75,7 +76,7 @@
+ 
+ libdb_base=	libdb
+ libdb=		$(libdb_base).a
+-libdb_version=	$(libdb_base)-$(LIBVERSION).a
++libdb_version=	$(libdb_base)-$(LIBVERSION).$(IMPLIB_SUFFIX)
+ libso=		$(libdb_base)-$(LIBVERSION)@SOSUFFIX@
+ libso_target=	$(libdb_base)-$(LIBVERSION).la
+ libso_default=	$(libdb_base)@SOSUFFIX@
+@@ -94,7 +95,7 @@
+ 
+ libcxx_base=	libdb_cxx
+ libcxx=		$(libcxx_base).a
+-libcxx_version=	$(libcxx_base)-$(LIBVERSION).a
++libcxx_version=	$(libcxx_base)-$(LIBVERSION).$(IMPLIB_SUFFIX)
+ libxso=		$(libcxx_base)-$(LIBVERSION)@SOSUFFIX@
+ libxso_target=	$(libcxx_base)-$(LIBVERSION).la
+ libxso_default=	$(libcxx_base)@SOSUFFIX@
+@@ -110,7 +111,7 @@
+ 
+ libsql_base=	libdb_sql
+ libsql=		$(libsql_base).a
+-libsql_version=	$(libsql_base)-$(LIBVERSION).a
++libsql_version=	$(libsql_base)-$(LIBVERSION).$(IMPLIB_SUFFIX)
+ libsqlso=	$(libsql_base)-$(LIBVERSION)@SOSUFFIX@
+ libsqlso_target=$(libsql_base)-$(LIBVERSION).la
+ libsqlso_default=$(libsql_base)@SOSUFFIX@
+@@ -131,7 +132,7 @@
+ 
+ libstl_base=	libdb_stl
+ libstl=		$(libstl_base).a
+-libstl_version=	$(libstl_base)-$(LIBVERSION).a
++libstl_version=	$(libstl_base)-$(LIBVERSION).$(IMPLIB_SUFFIX)
+ libstlso=	$(libstl_base)-$(LIBVERSION)@SOSUFFIX@
+ libstlso_target=$(libstl_base)-$(LIBVERSION).la
+ libstlso_default=$(libstl_base)@SOSUFFIX@
+@@ -161,7 +162,7 @@
+ libj_exjarfile=	dbexamples.jar
+ libjso_base=	libdb_java
+ libjso=		$(libjso_base)-$(LIBVERSION)@JMODSUFFIX@
+-libjso_static=	$(libjso_base)-$(LIBVERSION).a
++libjso_static=	$(libjso_base)-$(LIBVERSION).$(IMPLIB_SUFFIX)
+ libjso_target=	$(libjso_base)-$(LIBVERSION).la
+ libjso_default=	$(libjso_base)@JMODSUFFIX@
+ libjso_major=	$(libjso_base)-$(LIBMAJOR)@JMODSUFFIX@
+@@ -177,7 +178,7 @@
+ TCL_SRCDIR=	$(langdir)/tcl
+ libtcl_base=	libdb_tcl
+ libtcl=		$(libtcl_base).a
+-libtcl_version=	$(libtcl_base)-$(LIBVERSION).a
++libtcl_version=	$(libtcl_base)-$(LIBVERSION).$(IMPLIB_SUFFIX)
+ libtso=		$(libtcl_base)-$(LIBVERSION)@LIBTSO_MODSUFFIX@
+ libtso_target=	$(libtcl_base)-$(LIBVERSION).la
+ libtso_default=	$(libtcl_base)@LIBTSO_MODSUFFIX@
+@@ -977,7 +978,7 @@
+ 	$(JAVA) -classpath $(JAVA_CLASSTOP) \
+ 	    com.sleepycat.persist.model.ClassEnhancer $(JAVA_CLASSTOP)
+ 	cd $(JAVA_CLASSTOP) && \
+-	     $(JAR) cfm ../$(libj_jarfile) ../$(JAVA_MANIFEST) ./com/sleepycat
++	     $(JAR) cfm ../$(libj_jarfile) $(JAVA_MANIFEST) ./com/sleepycat
+ 
+ $(libj_exjarfile): $(libj_jarfile) $(JAVA_EXSRCS)
+ 	@test -d $(JAVA_EXCLASSTOP) || \

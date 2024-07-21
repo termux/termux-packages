@@ -1,0 +1,14 @@
+diff -bur db-6.0.19/src/dbinc/mutex_int.h db-6.0.19-new/src/dbinc/mutex_int.h
+--- db-6.0.19/src/dbinc/mutex_int.h	2013-05-31 09:00:12.000000000 -0600
++++ db-6.0.19-new/src/dbinc/mutex_int.h	2024-02-28 12:00:18.228756800 -0700
+@@ -374,8 +374,8 @@
+ #define	MUTEX_PAUSE		{__asm{_emit 0xf3}; __asm{_emit 0x90}}
+ #endif
+ #endif
+-#ifdef HAVE_MUTEX_WIN32_GCC
+-#define	MUTEX_PAUSE		__asm__ volatile ("rep; nop" : : );
++#if defined(HAVE_MUTEX_WIN32_GCC) && !defined(_M_ARM64)
++	#define	MUTEX_PAUSE		__asm__ volatile ("rep; nop" : : );
+ #endif
+ #endif
+ #endif
