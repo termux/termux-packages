@@ -21,3 +21,7 @@ termux_step_pre_configure() {
 	export COB_32_BIT_LONG="$(( 1 - ${lp64} ))"
 	export COB_HAS_64_BIT_POINTER="${lp64}"
 }
+
+termux_step_pre_configure() {
+	cat config.log
+}
