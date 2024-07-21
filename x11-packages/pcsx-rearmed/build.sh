@@ -37,7 +37,7 @@ termux_step_configure() {
 termux_step_make_install() {
 	install -Dm755 pcsx $TERMUX_PREFIX/bin/pcsx
 	mkdir -p $TERMUX_PREFIX/etc/pcsx $TERMUX_PREFIX/lib/pcsx_plugins
-	cp -r frontend/pandora/skin $TERMUX_PREFIX/etc/pcsx/
+	cp -fr frontend/pandora/skin $TERMUX_PREFIX/etc/pcsx/
 	install -m755 plugins/*.so $TERMUX_PREFIX/lib/pcsx_plugins/
 	ln -fs ../../lib/pcsx_plugins $TERMUX_PREFIX/etc/pcsx/plugins
 }
