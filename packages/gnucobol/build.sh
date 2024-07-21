@@ -24,4 +24,5 @@ termux_step_pre_configure() {
 
 termux_step_post_configure() {
 	cat config.log
+	touch bin/cobcrun.1 cobc/cobc.1
 }
