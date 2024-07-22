@@ -13,22 +13,22 @@ TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_BREAKS="libdb-dev,libdb"
 TERMUX_PKG_REPLACES="libdb-dev,libdb"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
-    --enable-compat185 \
-    --enable-shared \
-    --enable-static \
-    --disable-rpath \
-    --enable-cxx \
-    --enable-sql \
-    --enable-sql-codegen \
-    --enable-stl \
-    --enable-dbm \
-    --disable-tcl \
-    --disable-replication \
-    --docdir='/share/doc/libdb6'
+	--enable-compat185 \
+	--enable-shared \
+	--enable-static \
+	--disable-rpath \
+	--enable-cxx \
+	--enable-sql \
+	--enable-sql-codegen \
+	--enable-stl \
+	--enable-dbm \
+	--disable-tcl \
+	--disable-replication \
+	--docdir='/share/doc/libdb6'
 "
 
 termux_step_pre_configure() {
-    TERMUX_PKG_SRCDIR=$TERMUX_PKG_SRCDIR/dist
+	TERMUX_PKG_SRCDIR=$TERMUX_PKG_SRCDIR/dist
 
-    LDFLAGS+=" $($CC -print-libgcc-file-name)"
+	LDFLAGS+=" $($CC -print-libgcc-file-name)"
 }
