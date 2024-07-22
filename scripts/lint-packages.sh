@@ -250,6 +250,7 @@ echo "checking $subpkg_name"
 			pkg_lint_error=true
 		fi
 
+echo "-------- $TERMUX_PKG_LICENSE"
 		echo -n "TERMUX_PKG_LICENSE: "
 		if (( ${#TERMUX_PKG_LICENSE} )); then
 			if [[ "$TERMUX_PKG_LICENSE" == *'custom'* ]]; then
@@ -257,7 +258,6 @@ echo "checking $subpkg_name"
 			elif [[ "$TERMUX_PKG_LICENSE" == 'non-free' ]]; then
 				echo "NON-FREE"
 			else
-echo "-------- $TERMUX_PKG_LICENSE"
 				if check_package_license "$TERMUX_PKG_LICENSE"; then
 					echo "PASS"
 				else
