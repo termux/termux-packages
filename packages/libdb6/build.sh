@@ -20,6 +20,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 	--enable-static \
 	--disable-rpath \
 	--enable-cxx \
+	--with-tcl=no \
 	--enable-sql \
 	--enable-sql-codegen \
 	--enable-stl \
