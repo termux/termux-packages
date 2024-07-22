@@ -2,8 +2,6 @@ termux_git_clone_src() {
 	local TMP_CHECKOUT=$TERMUX_PKG_CACHEDIR/tmp-checkout
 	local TMP_CHECKOUT_VERSION=$TERMUX_PKG_CACHEDIR/tmp-checkout-version
 
-echo "==========   ===== ${TMP_CHECKOUT} ${TMP_CHECKOUT_VERSION}"
-
 	if [ ! -f $TMP_CHECKOUT_VERSION ] || [ "$(cat $TMP_CHECKOUT_VERSION)" != "$TERMUX_PKG_VERSION" ]; then
 		if [ "$TERMUX_PKG_GIT_BRANCH" == "" ]; then
 			TERMUX_PKG_GIT_BRANCH=v${TERMUX_PKG_VERSION#*:}
@@ -14,11 +12,6 @@ echo "==========   ===== ${TMP_CHECKOUT} ${TMP_CHECKOUT_VERSION}"
 			--branch $TERMUX_PKG_GIT_BRANCH \
 			${TERMUX_PKG_SRCURL:4} \
 			$TMP_CHECKOUT
-
-		echo "git clone --depth 1 \
-			--branch $TERMUX_PKG_GIT_BRANCH \
-			${TERMUX_PKG_SRCURL:4} \
-			$TMP_CHECKOUT"
 
 		pushd $TMP_CHECKOUT
 
