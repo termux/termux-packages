@@ -1,4 +1,4 @@
-termux_setup_toolchain_26b() {
+termux_setup_toolchain_27() {
 	export CFLAGS=""
 	export CPPFLAGS=""
 	export LDFLAGS="-L${TERMUX_PREFIX}/lib"
@@ -68,14 +68,6 @@ termux_setup_toolchain_26b() {
 	# even when we don't have -fopenmp in CFLAGS / when we don't want to enable OpenMP
 	# We might also want to consider shipping libomp.so instead; since r21
 	LDFLAGS+=" -fopenmp -static-openmp"
-	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
-		LDFLAGS+=" -fno-openmp-implicit-rpath"
-	fi
-
-	# Remove option `openmp-implicit-rpath` in next NDK major bump.
-	if [ "$TERMUX_NDK_VERSION_NUM" != 26 ]; then
-		termux_error_exit "Remove the useless option \`-fopenmp-implicit-rpath\` and rebuild the libllvm."
-	fi
 
 	# Android 7 started to support DT_RUNPATH (but not DT_RPATH).
 	LDFLAGS+=" -Wl,--enable-new-dtags"
