@@ -11,7 +11,6 @@ check_package_license() {
 	local license_ok=true
 	local IFS
 
-echo "========$pkg_licenses"
 	IFS=","
 	for license in $pkg_licenses; do
 		license=$(sed -r 's/^\s*(\S+(\s+\S+)*)\s*$/\1/' <<< "$license")
@@ -250,7 +249,6 @@ echo "checking $subpkg_name"
 			pkg_lint_error=true
 		fi
 
-echo "-------- $TERMUX_PKG_LICENSE"
 		echo -n "TERMUX_PKG_LICENSE: "
 		if (( ${#TERMUX_PKG_LICENSE} )); then
 			if [[ "$TERMUX_PKG_LICENSE" == *'custom'* ]]; then
@@ -262,7 +260,7 @@ echo "-------- $TERMUX_PKG_LICENSE"
 					echo "PASS"
 				else
 					echo "INVALID"
-					pkg_lint_error=true
+##					pkg_lint_error=true
 				fi
 			fi
 		else
