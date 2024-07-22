@@ -21,10 +21,10 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 	--disable-rpath \
 	--enable-cxx \
 	--with-tcl=no \
-	--enable-sql \
-	--enable-sql-codegen \
-	--enable-stl \
-	--enable-dbm \
+	--disable-sql \
+	--disable-sql-codegen \
+	--disable-stl \
+	--disable-dbm \
 	--disable-tcl \
 	--disable-replication \
 	--docdir=$TERMUX_PKG_SRCDIR/share/doc/libdb6
