@@ -28,7 +28,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure() {
-	TERMUX_PKG_SRCDIR=$TERMUX_PKG_SRCDIR/dist
+    TERMUX_PKG_SRCDIR=$TERMUX_PKG_SRCDIR/dist
 
-	LDFLAGS+=" $($CC -print-libgcc-file-name)"
+    LDFLAGS+=" $($CC -print-libgcc-file-name)"
 }
