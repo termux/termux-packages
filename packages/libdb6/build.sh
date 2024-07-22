@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.oracle.com/database/berkeley-db
 TERMUX_PKG_DESCRIPTION="The Berkeley DB embedded database system (library) last non AGPL"
-#TERMUX_PKG_LICENSE=Sleepycat
-TERMUX_PKG_LICENSE="custom"
+TERMUX_PKG_LICENSE=Sleepycat
+#TERMUX_PKG_LICENSE="custom"
 # We override TERMUX_PKG_SRCDIR termux_step_pre_configure so need to do
 # this hack to be able to find the license file.
 TERMUX_PKG_LICENSE_FILE="../LICENSE"
