@@ -14,7 +14,6 @@ TERMUX_PKG_BREAKS="libdb-dev,libdb"
 TERMUX_PKG_REPLACES="libdb-dev,libdb"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
     --enable-compat185 \
-    --enable-mingw \
     --enable-shared \
     --enable-static \
     --disable-rpath \
@@ -25,7 +24,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
     --enable-dbm \
     --disable-tcl \
     --disable-replication \
-    --docdir='${prefix}/share/doc/db'
+    --docdir='/share/doc/libdb6'
 "
 
 termux_step_pre_configure() {
