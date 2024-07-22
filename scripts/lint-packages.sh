@@ -152,6 +152,7 @@ lint_package() {
 	for subpkg_script in $(dirname "$package_script")/*.subpackage.sh; do
 		test ! -f "$subpkg_script" && continue
 		local subpkg_name=$(basename "${subpkg_script%.subpackage.sh}")
+echo "checking $subpkg_name"
 		check_package_name "$subpkg_name" || return 1
 	done
 
