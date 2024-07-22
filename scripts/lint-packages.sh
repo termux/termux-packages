@@ -14,7 +14,7 @@ check_package_license() {
 	IFS=","
 	for license in $pkg_licenses; do
 		license=$(sed -r 's/^\s*(\S+(\s+\S+)*)\s*$/\1/' <<< "$license")
-
+echo $license
 		case "$license" in
 			AFL-2.1|AFL-3.0|AGPL-V3|APL-1.0|APSL-2.0|Apache-1.0|Apache-1.1);;
 			Apache-2.0|Artistic-License-2.0|Attribution|BSD|"BSD 2-Clause");;
