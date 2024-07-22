@@ -13,6 +13,8 @@ TERMUX_PKG_DEPENDS="json-c, libgmp, libdb, libxml2, ncurses"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-db
 --with-json=json-c
+LIBCOB_CPPFLAGS=-DWITH_DB
+LIBCOB_LIBS=-ldb
 "
 
 termux_step_pre_configure() {
