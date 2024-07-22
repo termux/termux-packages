@@ -26,7 +26,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 	--enable-dbm \
 	--disable-tcl \
 	--disable-replication \
-	--docdir='$TERMUX_PKG_SRCDIR/share/doc/libdb6'
+	--docdir=$TERMUX_PKG_SRCDIR/share/doc/libdb6
 "
 
 termux_step_pre_configure() {
