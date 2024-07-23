@@ -11,8 +11,9 @@ TERMUX_PKG_SRCURL=git+https://github.com/alexbodn/gnucobol-3.2.git
 TERMUX_PKG_GIT_BRANCH="termux"
 TERMUX_PKG_DEPENDS="json-c, libgmp, libdb, libxml2, ncurses, libvbisam"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
---with-vbisam
+--with-db
 --with-json=json-c
+--with-xml2
 "
 
 termux_step_pre_configure() {
