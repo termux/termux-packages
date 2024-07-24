@@ -22,7 +22,7 @@ termux_step_pre_configure() {
 	export COB_32_BIT_LONG="$(( 1 - ${lp64} ))"
 	export COB_HAS_64_BIT_POINTER="${lp64}"
 	export BDB_LIBS="-ldb"
-	export LIBCOB_CPPFLAGS="-DWITH_DB"
+	export LIBCOB_CPPFLAGS="-DWITH_DB=1"
 	export BDB_HEADER="18.1"
 }
 
@@ -32,5 +32,8 @@ termux_step_post_configure() {
 	#echo '#undef WITH_DB' >> config.h
 	#echo '#endif /*WITH_DB*/' >> config.h
 	#echo '#define WITH_DB 1' >> config.h
+	echo "==================="
+	cat config.h
+	echo "==================="
 	touch bin/cobcrun.1 cobc/cobc.1
 }
