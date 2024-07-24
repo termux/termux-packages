@@ -21,6 +21,7 @@ termux_step_pre_configure() {
 	export COB_LI_IS_LL="${lp64}"
 	export COB_32_BIT_LONG="$(( 1 - ${lp64} ))"
 	export COB_HAS_64_BIT_POINTER="${lp64}"
+	export BDB_LIBS="-ldb"
 	export BDB_HEADER="18.1"
 }
 
