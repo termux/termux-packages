@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="bionic libc, libm, libdl and dynamic linker for ubuntu h
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="8.0.0-r51"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SHA256=6b42a86fc2ec58f86862a8f09a5465af0758ce24f2ca8c3cabb3bb6a81d96525
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -45,7 +45,7 @@ termux_step_get_source() {
 	termux_download \
 		https://storage.googleapis.com/git-repo-downloads/repo \
 		${TERMUX_PKG_CACHEDIR}/repo \
-		df6e4f72ef21d839b4352f376ab9428e303a1414ac7a1f21fe420069b2acd476
+		b03b473e2f5342acd914693a3a9d70560de6d6cd5fad2bdb8dcbb5ae170d78c9
 	chmod +x ${TERMUX_PKG_CACHEDIR}/repo
 	${TERMUX_PKG_CACHEDIR}/repo init \
 		-u https://android.googlesource.com/platform/manifest \
