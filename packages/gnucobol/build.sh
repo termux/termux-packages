@@ -25,10 +25,10 @@ termux_step_pre_configure() {
 	export LIBCOB_CPPFLAGS="-DWITH_DB=1"
 	export BDB_HEADER="18.1"
 
-	echo '#ifdef WITH_DB' >> config.h.in
-	echo '#undef WITH_DB' >> config.h.in
-	echo '#endif /*WITH_DB*/' >> config.h.in
-	echo '#define WITH_DB 1' >> config.h.in
+#	echo '#ifdef WITH_DB' >> config.h.in
+#	echo '#undef WITH_DB' >> config.h.in
+#	echo '#endif /*WITH_DB*/' >> config.h.in
+#	echo '#define WITH_DB 1' >> config.h.in
 	#echo "==================="
 	#cat config.h
 	#echo "==================="
@@ -36,8 +36,5 @@ termux_step_pre_configure() {
 
 termux_step_post_configure() {
 	#cat config.log
-	echo "==================="
-	cat confdefs.h
-	echo "==================="
 	touch bin/cobcrun.1 cobc/cobc.1
 }
