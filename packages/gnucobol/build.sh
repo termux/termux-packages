@@ -23,7 +23,7 @@ termux_step_pre_configure() {
 	export COB_HAS_64_BIT_POINTER="${lp64}"
 	
 	export BDB_LIBS="-ldb"
-	export BDB_CFLAGS="-DWITH_DB=1"
+#	export BDB_CFLAGS="-DWITH_DB=1"
 	export LIBCOB_CPPFLAGS="-DWITH_DB=1"
 	export COBC_CPPFLAGS="-DWITH_DB=1"
 	export BDB_HEADER="18.1"
@@ -38,11 +38,11 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_configure() {
-	echo "==================="
-	cat config.log
-	echo $DEFS
-	echo $CFLAGS
-	find -name confdefs.h
-	echo "==================="
+#	echo "==================="
+#	cat config.log
+#	echo $DEFS
+#	echo $CFLAGS
+#	find -name confdefs.h
+#	echo "==================="
 	touch bin/cobcrun.1 cobc/cobc.1
 }
