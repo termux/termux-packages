@@ -1,0 +1,24 @@
+diff --git a/pueue_lib/Cargo.toml b/pueue_lib/Cargo.toml
+index b71b729..28ff044 100644
+--- a/pueue_lib/Cargo.toml
++++ b/pueue_lib/Cargo.toml
+@@ -73,5 +73,5 @@ whoami = "1"
+ libproc = "0.14.6"
+ 
+ # Linux only
+-[target.'cfg(target_os = "linux")'.dependencies]
++[target.'cfg(any(target_os = "linux", target_os = "android"))'.dependencies]
+ procfs = { version = "0.16", default-features = false }
+diff --git a/pueue_lib/src/process_helper/mod.rs b/pueue_lib/src/process_helper/mod.rs
+index 624ec5b..ddd635a 100644
+--- a/pueue_lib/src/process_helper/mod.rs
++++ b/pueue_lib/src/process_helper/mod.rs
+@@ -18,7 +18,7 @@ pub use self::unix::*;
+ use command_group::Signal;
+ 
+ // Platform specific process support
+-#[cfg_attr(target_os = "linux", path = "linux.rs")]
++#[cfg_attr(any(target_os = "linux", target_os = "android"), path = "linux.rs")]
+ #[cfg_attr(target_vendor = "apple", path = "apple.rs")]
+ #[cfg_attr(target_os = "windows", path = "windows.rs")]
+ #[cfg_attr(target_os = "freebsd", path = "freebsd.rs")]
