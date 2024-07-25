@@ -23,7 +23,7 @@ termux_step_pre_configure() {
 	export COB_HAS_64_BIT_POINTER="${lp64}"
 	export BDB_LIBS="-ldb"
 	export LIBCOB_CPPFLAGS="-DWITH_DB=1"
-	export COB_CPPFLAGS="-DWITH_DB=1"
+	export COBC_CPPFLAGS="-DWITH_DB=1"
 	export BDB_HEADER="18.1"
 
 #	echo '#ifdef WITH_DB' >> config.h.in
