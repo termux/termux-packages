@@ -37,9 +37,9 @@ termux_step_pre_configure() {
 
 termux_step_post_configure() {
 	echo "==================="
+	cat config.log
 	echo $DEFS
 	echo $CFLAGS
-	cat config.log
 	find -name confdefs.h
 	echo "==================="
 	touch bin/cobcrun.1 cobc/cobc.1
