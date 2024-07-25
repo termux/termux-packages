@@ -31,7 +31,7 @@ termux_step_get_source() {
 	local PACKAGES=(
 		"http://security.ubuntu.com/ubuntu/pool/universe/n/ncurses/libtinfo5_6.4-2ubuntu0.1_amd64.deb a5acc48e56ca4cd1b2e5fb22b36c5a02788c0baede55617e3f30decff58616ab"
 		"http://security.ubuntu.com/ubuntu/pool/universe/n/ncurses/libncurses5_6.4-2ubuntu0.1_amd64.deb 654b4f5b41380efabf606a691174974f9304e0b3ee461d0d91712b7e024f5546"
-		"http://mirrors.kernel.org/ubuntu/pool/main/o/openssh/openssh-client_8.9p1-3ubuntu0.4_amd64.deb afb16d53e762a78fabd9ce405752cd35d2f45904355ee820ce00f67bdf530155"
+		"http://mirrors.kernel.org/ubuntu/pool/main/o/openssh/openssh-client_8.9p1-3ubuntu0.10_amd64.deb 5d78dcd3f21d0caf86a35347beb2f963cc0f38160c995cda4552dafca598db5f"
 	)
 	for item in "${PACKAGES[@]}"; do
 		local URL=$(cut -d' ' -f1 <<< $item) SHA256=$(cut -d' ' -f2 <<< $item)
