@@ -632,7 +632,7 @@ if [ -n "${TERMUX_PACKAGE_LIBRARY-}" ]; then
 	esac
 fi
 
-if [ "${TERMUX_INSTALL_DEPS-false}" = "true" ] || [ "${TERMUX_PACKAGE_LIBRARY-bionic}" = "glibc" ]; then
+if [ "$TERMUX_REPO_PACKAGE" = "$TERMUX_APP_PACKAGE" ]; then
 	# Setup PGP keys for verifying integrity of dependencies.
 	# Keys are obtained from our keyring package.
 	gpg --list-keys 2C7F29AE97891F6419A9E2CDB0076E490B71616B > /dev/null 2>&1 || {
