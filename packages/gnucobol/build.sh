@@ -10,12 +10,17 @@ TERMUX_PKG_SRCURL=git+https://github.com/alexbodn/gnucobol-3.2.git
 #TERMUX_PKG_SHA256=bcdc555d76cbc951bb51d66f1cae5e92bf5bcb5349d0330f5c58f5954e62c8c3
 TERMUX_PKG_GIT_BRANCH="termux"
 TERMUX_INSTALL_DEPS=true
-TERMUX_PKG_DEPENDS="json-c, libgmp, libdb, libxml2, ncurses"
+
+#TERMUX_PKG_DEPENDS="json-c, libgmp, libdb, libxml2, ncurses"
+
+TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686, x86_64"
+TERMUX_PKG_DEPENDS="libgmp, libdb, ncurses"
+
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-db
---with-json=json-c
---with-xml2
 "
+##--with-json=json-c
+##--with-xml2
 
 termux_step_pre_configure() {
 	local lp64="$(( $TERMUX_ARCH_BITS / 32 - 1 ))"
@@ -27,7 +32,7 @@ termux_step_pre_configure() {
 #	export BDB_CFLAGS="-DWITH_DB=1"
 #	export LIBCOB_CPPFLAGS="-DWITH_DB=1"
 #	export COBC_CPPFLAGS="-DWITH_DB=1"
-	export BDB_HEADER="18.1"
+##	export BDB_HEADER="18.1"
 
 #	echo '#ifdef WITH_DB' >> config.h.in
 #	echo '#undef WITH_DB' >> config.h.in
