@@ -15,7 +15,7 @@ termux_step_get_dependencies() {
 			echo "A circular dependency was found on '$PKG', the old version of the package will be installed to resolve the conflict"
 			cyclic_dependence=true
 			if [ "$TERMUX_INSTALL_DEPS" = false ]; then
-				termux_download_repo_file
+				TERMUX_INSTALL_DEPS=true termux_download_repo_file
 			fi
 		fi
 
@@ -133,7 +133,7 @@ termux_run_build-package() {
 		fi
 	fi
 	TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh \
- 		$(test "${TERMUX_INSTALL_DEPS}" = "true" && echo "-I" || echo "-s") \
+		$(test "${TERMUX_INSTALL_DEPS}" = "true" && echo "-I") \
  		$(test "${TERMUX_FORCE_BUILD_DEPENDENCIES}" = "true" && echo "-F") \
    		$(test "${TERMUX_WITHOUT_DEPVERSION_BINDING}" = "true" && echo "-w") \
      		--format $TERMUX_PACKAGE_FORMAT --library $set_library "${PKG_DIR}"

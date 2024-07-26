@@ -19,8 +19,7 @@ test -f "$HOME"/.termuxrc && . "$HOME"/.termuxrc
 : ${TERMUX_TOPDIR:="$HOME/.termux-build"}
 : ${TERMUX_ARCH:="aarch64"}
 : ${TERMUX_DEBUG_BUILD:=""}
-: ${TERMUX_INSTALL_DEPS:="-s"}
-# Set TERMUX_INSTALL_DEPS to -s unless set to -i
+: ${TERMUX_INSTALL_DEPS:=""}
 
 _show_usage() {
 	echo "Usage: ./build-all.sh [-a ARCH] [-d] [-i] [-o DIR]"
@@ -87,6 +86,16 @@ while read -r PKG PKG_DIR; do
 
 	# Update build status
 	echo "$PKG" >> "$BUILDSTATUS_FILE"
+
+	# Check which packages were also compiled
+	if [ -z "$TERMUX_INSTALL_DEPS" ]; then
+		for build_pkg in ~/.termux-build/*; do
+                        pkgname="${build_pkg##*/}"
+			(grep -q '^_' <<< "${pkgname}" || grep -q "^${pkgname}\$" "$BUILDSTATUS_FILE") && continue
+			echo "The \"${pkgname}\" package was also compiled"
+			echo "${pkgname}" >> "$BUILDSTATUS_FILE"
+		done
+	fi
 done<"${BUILDORDER_FILE}"
 
 # Update build status
