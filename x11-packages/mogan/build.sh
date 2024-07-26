@@ -3,9 +3,10 @@ TERMUX_PKG_DESCRIPTION="A structure editor forked from GNU TeXmacs"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.2.5.5"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/XmacsLabs/mogan/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=f97e138837e04cc7d6840e3b0ccb1bce42684608b63e69826a1e5cc5acf74a03
-TERMUX_PKG_DEPENDS="freetype, ghostscript, libandroid-complex-math, libandroid-spawn, libandroid-wordexp, libc++, libcurl, libgit2, libiconv, libjpeg-turbo, libpng, mogan-data, qt5-qtbase, qt5-qtsvg, zlib"
+TERMUX_PKG_DEPENDS="freetype, ghostscript, libandroid-complex-math, libandroid-spawn, libandroid-wordexp, libc++, libcurl, libgit2, libiconv, libjpeg-turbo, libpng, qt5-qtbase, qt5-qtsvg, zlib"
 TERMUX_PKG_BUILD_DEPENDS="qt5-qtbase-cross-tools"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
@@ -32,6 +33,9 @@ termux_step_post_get_source() {
 }
 
 termux_step_pre_configure() {
+	# this is a workaround for build-all.sh issue
+	TERMUX_PKG_DEPENDS+=", mogan-data"
+
 	termux_setup_cmake
 	termux_setup_xmake
 

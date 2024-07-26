@@ -1,8 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://pngquant.org
 TERMUX_PKG_DESCRIPTION="PNG image optimising utility"
-# Licenses: GPL-3.0-or-later, HPND, BSD 2-Clause
-TERMUX_PKG_LICENSE="custom"
-TERMUX_PKG_LICENSE_FILE="COPYRIGHT"
+TERMUX_PKG_LICENSE="GPL-3.0-or-later, HPND, BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.0.3"
 TERMUX_PKG_SRCURL=git+https://github.com/kornelski/pngquant
