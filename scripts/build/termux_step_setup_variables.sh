@@ -178,6 +178,9 @@ termux_step_setup_variables() {
 	TERMUX_PKG_MESON_NATIVE=false
 	TERMUX_PKG_CMAKE_CROSSCOMPILING=true
 	TERMUX_PROOT_EXTRA_ENV_VARS="" # Extra environvent variables for proot command in termux_setup_proot
+	TERMUX_PKG_ONLY_INSTALLING=false # when a package is set to true and compilation occurs without installing dependencies (that is, dependencies will also be compiled), the package's dependency will be included in the list of dependencies of other packages (that will require this package) instead of including the package in this list. This variable also applies to subpackages of the package, but this can be changed through the `TERMUX_SUBPKG_ONLY_INSTALLING` variable for subpackages (only for algorithms `scripts/buildorder.py`)
+	TERMUX_PKG_SEPARATE_SUB_DEPENDS=false # when set to true in a package, subpackage(s) of package will not be added to the dependency of the parent package (only for algorithms `scripts/buildorder.py`)
+	TERMUX_PKG_ACCEPT_PKG_IN_DEP=false # allows you to add an initial package as a dependency, if any requested package (and their dependencies) will have a dependency on it (only for algorithms `scripts/buildorder.py`)
 
 	unset CFLAGS CPPFLAGS LDFLAGS CXXFLAGS
 	unset TERMUX_MESON_ENABLE_SOVERSION # setenv to enable SOVERSION suffix for shared libs built with Meson
