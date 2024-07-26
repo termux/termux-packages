@@ -32,6 +32,11 @@ def die(msg):
     "Exit the process with an error message."
     sys.exit('ERROR: ' + msg)
 
+def remove_char(var):
+    for char in "\"'\n":
+        var = var.replace(char, '')
+    return var
+
 def parse_build_file_dependencies_with_vars(path, vars):
     "Extract the dependencies specified in the given variables of a build.sh or *.subpackage.sh file."
     dependencies = []
@@ -39,9 +44,7 @@ def parse_build_file_dependencies_with_vars(path, vars):
     with open(path, encoding="utf-8") as build_script:
         for line in build_script:
             if line.startswith(vars):
-                dependencies_string = line.split('DEPENDS=')[1]
-                for char in "\"'\n":
-                    dependencies_string = dependencies_string.replace(char, '')
+                dependencies_string = remove_char(line.split('DEPENDS=')[1])
 
                 # Split also on '|' to dependencies with '|', as in 'nodejs | nodejs-current':
                 for dependency_value in re.split(',|\\|', dependencies_string):
@@ -73,27 +76,31 @@ def parse_build_file_excluded_arches(path):
     with open(path, encoding="utf-8") as build_script:
         for line in build_script:
             if line.startswith(('TERMUX_PKG_BLACKLISTED_ARCHES', 'TERMUX_SUBPKG_EXCLUDED_ARCHES')):
-                arches_string = line.split('ARCHES=')[1]
-                for char in "\"'\n":
-                    arches_string = arches_string.replace(char, '')
+                arches_string = remove_char(line.split('ARCHES=')[1])
                 for arches_value in re.split(',', arches_string):
                     arches.append(arches_value.strip())
 
     return set(arches)
 
-def parse_build_file_variable_bool(path, var):
-    value = 'false'
+def parse_build_file_variable(path, var):
+    value = None
 
     with open(path, encoding="utf-8") as build_script:
         for line in build_script:
             if line.startswith(var):
-                value = line.split('=')[-1].replace('\n', '')
+                value = remove_char(line.split('=')[-1])
                 break
 
-    return value == 'true'
+    return value
+
+def parse_build_file_variable_bool(path, var):
+    return parse_build_file_variable(path, var) == 'true'
 
 def add_prefix_glibc_to_pkgname(name):
-	return name.replace("-static", "-glibc-static") if "static" == name.split("-")[-1] else name+"-glibc"
+    return name.replace("-static", "-glibc-static") if "static" == name.split("-")[-1] else name + "-glibc"
+
+def has_prefix_glibc(pkgname):
+    return "glibc" in pkgname.split("-")
 
 class TermuxPackage(object):
     "A main package definition represented by a directory with a build.sh file."
@@ -102,7 +109,7 @@ class TermuxPackage(object):
         self.fast_build_mode = fast_build_mode
         self.name = os.path.basename(self.dir)
         self.pkgs_cache = []
-        if "gpkg" in self.dir.split("/")[-2].split("-") and "glibc" not in self.name.split("-"):
+        if "gpkg" in self.dir.split("/")[-2].split("-") and not has_prefix_glibc(self.name):
             self.name = add_prefix_glibc_to_pkgname(self.name)
 
         # search package build.sh
@@ -159,7 +166,7 @@ class TermuxPackage(object):
             if not self.fast_build_mode or self.dir == dir_root:
                 self.deps.difference_update([subpkg.name for subpkg in self.subpkgs])
         for dependency_name in sorted(self.deps):
-            if termux_global_library == "true" and termux_pkg_library == "glibc" and "glibc" not in dependency_name.split("-"):
+            if termux_global_library == "true" and termux_pkg_library == "glibc" and not has_prefix_glibc(dependency_name):
                 mod_dependency_name = add_prefix_glibc_to_pkgname(dependency_name)
                 dependency_name = mod_dependency_name if mod_dependency_name in pkgs_map else dependency_name
             if dependency_name not in self.pkgs_cache:
@@ -179,7 +186,7 @@ class TermuxSubPackage:
             raise Exception("SubPackages should have a parent")
 
         self.name = os.path.basename(subpackage_file_path).split('.subpackage.sh')[0]
-        if "gpkg" in subpackage_file_path.split("/")[-3].split("-") and "glibc" not in self.name.split("-"):
+        if "gpkg" in subpackage_file_path.split("/")[-3].split("-") and not has_prefix_glibc(self.name):
             self.name = add_prefix_glibc_to_pkgname(self.name)
         self.parent = parent
         self.deps = set([parent.name])
@@ -200,7 +207,7 @@ class TermuxSubPackage:
         """All the dependencies of the subpackage, both direct and indirect.
         Only relevant when building in fast-build mode"""
         result = []
-        if dir_root == None:
+        if dir_root:
             dir_root = self.dir
         for dependency_name in sorted(self.deps):
             if dependency_name == self.parent.name:
@@ -339,8 +346,8 @@ def generate_target_buildorder(target_path, pkgs_map, fast_build_mode):
         target_path = target_path[:-1]
 
     package_name = os.path.basename(target_path)
-    if "gpkg" in target_path.split("/")[-2].split("-") and "glibc" not in package_name.split("-"):
-        package_name += "-glibc"
+    if "gpkg" in target_path.split("/")[-2].split("-") and not has_prefix_glibc(package_name):
+        package_name = add_prefix_glibc_to_pkgname(package_name)
     package = pkgs_map[package_name]
     # Do not depend on any sub package
     if fast_build_mode:
@@ -391,10 +398,10 @@ def main():
         build_order = generate_target_buildorder(package, pkgs_map, fast_build_mode)
 
     for pkg in build_order:
-        pkg_name = pkg.name
-        if termux_global_library == "true" and termux_pkg_library == "glibc" and "glibc" not in pkg_name.split("-"):
-            pkg_name = add_prefix_glibc_to_pkgname(pkgname)
-        print("%-30s %s" % (pkg_name, pkg.dir))
+        pkgname = pkg.name
+        if termux_global_library == "true" and termux_pkg_library == "glibc" and not has_prefix_glibc(pkgname):
+            pkgname = add_prefix_glibc_to_pkgname(pkgname)
+        print("%-30s %s" % (pkgname, pkg.dir))
 
 if __name__ == '__main__':
     main()
