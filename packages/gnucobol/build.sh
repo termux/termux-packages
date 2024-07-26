@@ -33,6 +33,8 @@ termux_step_pre_configure() {
 #	export LIBCOB_CPPFLAGS="-DWITH_DB=1"
 #	export COBC_CPPFLAGS="-DWITH_DB=1"
 	export BDB_HEADER=$(cat db_header.c |cc -P -E -| tail -n 1| sed -e 's/[\ \t]//g')
+	cat db_header.c
+	echo $BDB_HEADER
 ##	export BDB_HEADER="18.1"
 
 #	echo '#ifdef WITH_DB' >> config.h.in
