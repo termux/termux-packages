@@ -12,16 +12,16 @@ TERMUX_PKG_SHA256=3bb48af46ced4779facf41fdc2ee60e4ccb86eaa99d010b36685315df39c2e
 
 TERMUX_INSTALL_DEPS=true
 
-#TERMUX_PKG_DEPENDS="json-c, libgmp, libdb, libxml2, ncurses"
+TERMUX_PKG_DEPENDS="json-c, libgmp, libdb, libxml2, ncurses"
 
-TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686, x86_64"
-TERMUX_PKG_DEPENDS="libgmp, libdb, ncurses"
+#TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686, x86_64"
+#TERMUX_PKG_DEPENDS="libgmp, libdb, ncurses"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
---with-db
+	--with-db
+	--with-json=json-c
+	--with-xml2
 "
-##--with-json=json-c
-##--with-xml2
 
 termux_step_pre_configure() {
 	local lp64="$(( $TERMUX_ARCH_BITS / 32 - 1 ))"
