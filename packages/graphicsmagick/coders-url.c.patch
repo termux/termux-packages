@@ -1,0 +1,100 @@
+https://sourceforge.net/p/graphicsmagick/code/ci/ffe38e523f547a43219c8cdefc01c51fa4b51671/
+
+--- a/coders/url.c
++++ b/coders/url.c
+@@ -52,12 +52,19 @@
+ #    include <win32config.h>
+ #  endif
+ #endif
++#include <libxml/xmlversion.h>
+ #include <libxml/parser.h>
+ #include <libxml/xmlmemory.h>
+-#if defined(HAVE_XMLNANOFTPNEWCTXT) && HAVE_XMLNANOFTPNEWCTXT
+-#  include <libxml/nanoftp.h>
+-#endif /* defined(HAVE_XMLNANOFTPNEWCTXT) && HAVE_XMLNANOFTPNEWCTXT */
+-#include <libxml/nanohttp.h>
++#if defined(LIBXML_FTP_ENABLED)
++#  if defined(HAVE_XMLNANOFTPNEWCTXT) && HAVE_XMLNANOFTPNEWCTXT
++#    include <libxml/nanoftp.h>
++#  endif /* defined(HAVE_XMLNANOFTPNEWCTXT) && HAVE_XMLNANOFTPNEWCTXT */
++#endif /* if defined(LIBXML_FTP_ENABLED) */
++#if defined(LIBXML_HTTP_ENABLED)
++#  if defined(HAVE_XMLNANOHTTPOPEN) && HAVE_XMLNANOHTTPOPEN
++#    include <libxml/nanohttp.h>
++#  endif /* defined(HAVE_XMLNANOHTTPOPEN) && HAVE_XMLNANOHTTPOPEN */
++#endif /* if defined(LIBXML_HTTP_ENABLED) */
+ 
+ /*
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+@@ -95,6 +102,7 @@
+ extern "C" {
+ #endif
+ 
++#if defined(LIBXML_FTP_ENABLED)
+ #if defined(HAVE_XMLNANOFTPNEWCTXT) && HAVE_XMLNANOFTPNEWCTXT
+ static void GetFTPData(void *userdata,const char *data,int length)
+ {
+@@ -109,6 +117,7 @@
+   (void) fwrite(data,length,1,file);
+ }
+ #endif /* if defined(HAVE_XMLNANOFTPNEWCTXT) && HAVE_XMLNANOFTPNEWCTXT */
++#endif /* if defined(LIBXML_FTP_ENABLED) */
+ 
+ #if defined(__cplusplus) || defined(c_plusplus)
+ }
+@@ -175,6 +184,7 @@
+         }
+       if (LocaleCompare(clone_info->magick,"http") == 0)
+         {
++#if defined(LIBXML_HTTP_ENABLED)
+ #if defined(HAVE_XMLNANOHTTPOPEN) && HAVE_XMLNANOHTTPOPEN
+           char
+             buffer[MaxBufferExtent];
+@@ -199,9 +209,11 @@
+               xmlNanoHTTPCleanup();
+             }
+ #endif /* if defined(HAVE_XMLNANOHTTPOPEN) && HAVE_XMLNANOHTTPOPEN */
++#endif /* if defined(LIBXML_FTP_ENABLED) */
+         }
+       else if (LocaleCompare(clone_info->magick,"ftp") == 0)
+         {
++#if defined(LIBXML_FTP_ENABLED)
+ #if defined(HAVE_XMLNANOFTPNEWCTXT) && HAVE_XMLNANOFTPNEWCTXT
+           void
+             *context;
+@@ -216,6 +228,7 @@
+               (void) xmlNanoFTPClose(context);
+             }
+ #endif /* if defined(HAVE_XMLNANOFTPNEWCTXT) && HAVE_XMLNANOFTPNEWCTXT */
++#endif /* if defined(LIBXML_FTP_ENABLED) */
+         }
+       (void) fclose(file);
+       if (!IsAccessibleAndNotEmpty(clone_info->filename))
+@@ -264,6 +277,8 @@
+   MagickInfo
+     *entry;
+ 
++  /* HTTP URLs are not encouraged on the Internet */
++#if defined(LIBXML_HTTP_ENABLED)
+ #if defined(HAVE_XMLNANOHTTPOPEN) && HAVE_XMLNANOHTTPOPEN
+   entry=SetMagickInfo("HTTP");
+   entry->decoder=(DecoderHandler) ReadURLImage;
+@@ -273,7 +288,10 @@
+   entry->coder_class=UnstableCoderClass;
+   (void) RegisterMagickInfo(entry);
+ #endif /* if defined(HAVE_XMLNANOHTTPOPEN) && HAVE_XMLNANOHTTPOPEN */
++#endif /* if defined(LIBXML_HTTP_ENABLED) */
+ 
++  /* FTP URLs have been deprecated for quite some time already */
++#if defined(LIBXML_FTP_ENABLED)
+ #if defined(HAVE_XMLNANOFTPNEWCTXT) && HAVE_XMLNANOFTPNEWCTXT
+   entry=SetMagickInfo("FTP");
+   entry->decoder=(DecoderHandler) ReadURLImage;
+@@ -283,6 +301,7 @@
+   entry->coder_class=UnstableCoderClass;
+   (void) RegisterMagickInfo(entry);
+ #endif /* if defined(HAVE_XMLNANOFTPNEWCTXT) && HAVE_XMLNANOFTPNEWCTXT */
++#endif /* if defined(LIBXML_FTP_ENABLED) */
+ 
+   entry=SetMagickInfo("FILE");
+   entry->decoder=(DecoderHandler) ReadURLImage;
