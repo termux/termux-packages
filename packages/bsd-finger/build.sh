@@ -1,10 +1,10 @@
-TERMUX_PKG_HOMEPAGE=http://ftp.linux.org.uk/pub/linux/Networking/netkit/
+TERMUX_PKG_HOMEPAGE='https://packages.debian.org/sid/source/bsd-finger'
 TERMUX_PKG_DESCRIPTION="User information lookup program"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.17
-TERMUX_PKG_SRCURL=http://ftp.linux.org.uk/pub/linux/Networking/netkit/bsd-finger-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=84885d668d117ef50e01c7034a45d8343d747cec6212e40e8d08151bc18e13fa
+TERMUX_PKG_SRCURL=https://salsa.debian.org/debian/bsd-finger/-/archive/upstream/${TERMUX_PKG_VERSION}/bsd-finger-upstream-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=56e18928a04b38eadea741f9f07db6155ce56b6992defba3c0e32f9caeee9109
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_post_get_source() {
