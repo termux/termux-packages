@@ -1,14 +1,16 @@
-TERMUX_PKG_HOMEPAGE=http://tobold.org/article/rc
+TERMUX_PKG_HOMEPAGE=https://github.com/rakitzis/rc
 TERMUX_PKG_DESCRIPTION="An alternative implementation of the plan 9 rc shell"
 TERMUX_PKG_LICENSE="ZLIB"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.7.4
-TERMUX_PKG_REVISION=4
-TERMUX_PKG_SRCURL=https://sources.voidlinux-ppc.org/rc-${TERMUX_PKG_VERSION}/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SRCURL=https://github.com/rakitzis/rc/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=0b83f8698dd8ef44ca97b25c4748c087133f53c7fff39b6b70dab65931def8b0
 TERMUX_PKG_DEPENDS="readline"
+TERMUX_PKG_BREAKS="rcshell"
+TERMUX_PKG_REPLACES="rcshell"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
+TERMUX_PKG_AUTO_UPDATE=true
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_func_setpgrp_void=yes
