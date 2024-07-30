@@ -1,0 +1,405 @@
+--- a/finch/plugins/Makefile.am
++++ b/finch/plugins/Makefile.am
+@@ -27,12 +27,12 @@
+ gntclipboard_la_CFLAGS = $(X11_CFLAGS)
+ gntgf_la_CFLAGS = $(X11_CFLAGS)
+ 
+-gntclipboard_la_LIBADD = $(GLIB_LIBS) $(X11_LIBS)
+-gntgf_la_LIBADD       = $(GLIB_LIBS) $(X11_LIBS) $(LIBGNT_LIBS)
+-gnthistory_la_LIBADD  = $(GLIB_LIBS)
+-gntlastlog_la_LIBADD  = $(GLIB_LIBS)
+-gnttinyurl_la_LIBADD  = $(GLIB_LIBS)
+-grouping_la_LIBADD    = $(GLIB_LIBS) $(LIBGNT_LIBS)
++gntclipboard_la_LIBADD = $(GLIB_LIBS) $(X11_LIBS) $(LIBGNT_LIBS) $(top_builddir)/libpurple/libpurple.la
++gntgf_la_LIBADD       = $(GLIB_LIBS) $(X11_LIBS) $(LIBGNT_LIBS) $(top_builddir)/libpurple/libpurple.la
++gnthistory_la_LIBADD  = $(GLIB_LIBS) $(LIBGNT_LIBS) $(top_builddir)/libpurple/libpurple.la
++gntlastlog_la_LIBADD  = $(GLIB_LIBS) $(LIBGNT_LIBS) $(top_builddir)/libpurple/libpurple.la
++gnttinyurl_la_LIBADD  = $(GLIB_LIBS) $(LIBGNT_LIBS) $(top_builddir)/libpurple/libpurple.la
++grouping_la_LIBADD    = $(GLIB_LIBS) $(LIBGNT_LIBS) $(top_builddir)/libpurple/libpurple.la
+ 
+ endif # PLUGINS
+ 
+--- a/libpurple/plugins/Makefile.am
++++ b/libpurple/plugins/Makefile.am
+@@ -90,29 +90,29 @@
+ simple_la_SOURCES			= simple.c
+ statenotify_la_SOURCES      = statenotify.c
+ 
+-autoaccept_la_LIBADD        = $(GLIB_LIBS)
+-buddynote_la_LIBADD         = $(GLIB_LIBS)
+-ciphertest_la_LIBADD		= $(GLIB_LIBS)
+-codeinline_la_LIBADD		= $(GLIB_LIBS)
+-idle_la_LIBADD              = $(GLIB_LIBS)
+-joinpart_la_LIBADD          = $(GLIB_LIBS)
+-log_reader_la_LIBADD        = $(GLIB_LIBS)
+-newline_la_LIBADD           = $(GLIB_LIBS)
+-notify_example_la_LIBADD    = $(GLIB_LIBS)
+-offlinemsg_la_LIBADD        = $(GLIB_LIBS)
+-one_time_password_la_LIBADD = $(GLIB_LIBS)
+-pluginpref_example_la_LIBADD = $(GLIB_LIBS)
+-psychic_la_LIBADD           = $(GLIB_LIBS)
+-signals_test_la_LIBADD		= $(GLIB_LIBS)
+-simple_la_LIBADD			= $(GLIB_LIBS)
+-statenotify_la_LIBADD       = $(GLIB_LIBS)
++autoaccept_la_LIBADD        = $(GLIB_LIBS) $(top_builddir)/libpurple/libpurple.la
++buddynote_la_LIBADD         = $(GLIB_LIBS) $(top_builddir)/libpurple/libpurple.la
++ciphertest_la_LIBADD		= $(GLIB_LIBS) $(top_builddir)/libpurple/libpurple.la
++codeinline_la_LIBADD		= $(GLIB_LIBS) $(top_builddir)/libpurple/libpurple.la
++idle_la_LIBADD              = $(GLIB_LIBS) $(top_builddir)/libpurple/libpurple.la
++joinpart_la_LIBADD          = $(GLIB_LIBS) $(top_builddir)/libpurple/libpurple.la
++log_reader_la_LIBADD        = $(GLIB_LIBS) $(top_builddir)/libpurple/libpurple.la
++newline_la_LIBADD           = $(GLIB_LIBS) $(top_builddir)/libpurple/libpurple.la
++notify_example_la_LIBADD    = $(GLIB_LIBS) $(top_builddir)/libpurple/libpurple.la
++offlinemsg_la_LIBADD        = $(GLIB_LIBS) $(top_builddir)/libpurple/libpurple.la
++one_time_password_la_LIBADD = $(GLIB_LIBS) $(top_builddir)/libpurple/libpurple.la
++pluginpref_example_la_LIBADD = $(GLIB_LIBS) $(top_builddir)/libpurple/libpurple.la
++psychic_la_LIBADD           = $(GLIB_LIBS) $(top_builddir)/libpurple/libpurple.la
++signals_test_la_LIBADD		= $(GLIB_LIBS) $(top_builddir)/libpurple/libpurple.la
++simple_la_LIBADD			= $(GLIB_LIBS) $(top_builddir)/libpurple/libpurple.la
++statenotify_la_LIBADD       = $(GLIB_LIBS) $(top_builddir)/libpurple/libpurple.la
+ 
+ if ENABLE_DBUS
+ 
+ CLEANFILES              = dbus-example-bindings.c
+ dbus_example_la_SOURCES = dbus-example.c
+ 
+-dbus_example_la_LIBADD      = $(GLIB_LIBS) $(DBUS_LIBS)
++dbus_example_la_LIBADD      = $(GLIB_LIBS) $(DBUS_LIBS) $(top_builddir)/libpurple/libpurple.la
+ 
+ .PHONY: always
+ 
+--- a/libpurple/plugins/mono/loader/Makefile.am
++++ b/libpurple/plugins/mono/loader/Makefile.am
+@@ -14,7 +14,7 @@
+ 
+ mono_la_LDFLAGS  = -module -avoid-version
+ 
+-mono_la_LIBADD = $(MONO_LIBS)
++mono_la_LIBADD = $(MONO_LIBS) $(top_builddir)/libpurple/libpurple.la
+ 
+ AM_CPPFLAGS = \
+ 	-I$(top_srcdir) \
+--- a/libpurple/plugins/perl/Makefile.am
++++ b/libpurple/plugins/perl/Makefile.am
+@@ -5,7 +5,7 @@
+ plugin_LTLIBRARIES = perl.la
+ 
+ perl_la_LDFLAGS = -module -avoid-version
+-perl_la_LIBADD = $(GLIB_LIBS) $(PERL_LIBS)
++perl_la_LIBADD = $(GLIB_LIBS) $(PERL_LIBS) $(top_builddir)/libpurple/libpurple.la
+ perl_la_SOURCES = \
+ 	perl.c \
+ 	perl-common.c \
+--- a/libpurple/plugins/ssl/Makefile.am
++++ b/libpurple/plugins/ssl/Makefile.am
+@@ -43,10 +43,10 @@
+ ssl_nss_la_SOURCES    = ssl-nss.c
+ nss_prefs_la_SOURCES  = nss-prefs.c
+ 
+-ssl_la_LIBADD        = $(GLIB_LIBS)
+-ssl_gnutls_la_LIBADD = $(GLIB_LIBS) $(GNUTLS_LIBS)
+-ssl_nss_la_LIBADD    = $(GLIB_LIBS) $(NSS_LIBS)
+-nss_prefs_la_LIBADD  = $(GLIB_LIBS) $(NSS_LIBS)
++ssl_la_LIBADD        = $(GLIB_LIBS) $(top_builddir)/libpurple/libpurple.la
++ssl_gnutls_la_LIBADD = $(GLIB_LIBS) $(GNUTLS_LIBS) $(top_builddir)/libpurple/libpurple.la
++ssl_nss_la_LIBADD    = $(GLIB_LIBS) $(NSS_LIBS) $(top_builddir)/libpurple/libpurple.la
++nss_prefs_la_LIBADD  = $(GLIB_LIBS) $(NSS_LIBS) $(top_builddir)/libpurple/libpurple.la
+ 
+ endif # PLUGINS
+ 
+--- a/libpurple/plugins/tcl/Makefile.am
++++ b/libpurple/plugins/tcl/Makefile.am
+@@ -7,7 +7,7 @@
+ tcl_la_SOURCES = tcl.c tcl_glib.c tcl_glib.h tcl_cmds.c tcl_signals.c tcl_purple.h \
+                  tcl_ref.c tcl_cmd.c
+ 
+-tcl_la_LIBADD = $(GLIB_LIBS) $(TCL_LIBS) $(TK_LIBS)
++tcl_la_LIBADD = $(GLIB_LIBS) $(TCL_LIBS) $(TK_LIBS) $(top_builddir)/libpurple/libpurple.la
+ 
+ EXTRA_DIST = signal-test.tcl Makefile.mingw
+ 
+--- a/libpurple/protocols/bonjour/Makefile.am
++++ b/libpurple/protocols/bonjour/Makefile.am
+@@ -33,14 +33,14 @@
+ noinst_LTLIBRARIES    = libbonjour.la
+ libbonjour_la_SOURCES = $(BONJOURSOURCES)
+ libbonjour_la_CFLAGS  = $(AM_CFLAGS)
+-libbonjour_la_LIBADD  = $(AVAHI_LIBS)
++libbonjour_la_LIBADD  = $(AVAHI_LIBS) $(top_builddir)/libpurple/libpurple.la
+ 
+ else
+ 
+ st =
+ pkg_LTLIBRARIES       = libbonjour.la
+ libbonjour_la_SOURCES = $(BONJOURSOURCES)
+-libbonjour_la_LIBADD  = $(GLIB_LIBS) $(LIBXML_LIBS) $(AVAHI_LIBS)
++libbonjour_la_LIBADD  = $(GLIB_LIBS) $(LIBXML_LIBS) $(AVAHI_LIBS) $(top_builddir)/libpurple/libpurple.la
+ 
+ endif
+ 
+--- a/libpurple/protocols/gg/Makefile.am
++++ b/libpurple/protocols/gg/Makefile.am
+@@ -121,14 +121,14 @@
+ noinst_LTLIBRARIES = libgg.la
+ libgg_la_SOURCES = $(GGSOURCES)
+ libgg_la_CFLAGS  = $(AM_CFLAGS)
+-libgg_la_LIBADD  = $(LIBGADU_LIBS) $(INTGG_LIBS)
++libgg_la_LIBADD  = $(LIBGADU_LIBS) $(INTGG_LIBS) $(top_builddir)/libpurple/libpurple.la
+ 
+ else
+ 
+ st =
+ pkg_LTLIBRARIES = libgg.la
+ libgg_la_SOURCES = $(GGSOURCES)
+-libgg_la_LIBADD  = $(GLIB_LIBS) $(LIBGADU_LIBS) $(INTGG_LIBS)
++libgg_la_LIBADD  = $(GLIB_LIBS) $(LIBGADU_LIBS) $(INTGG_LIBS) $(top_builddir)/libpurple/libpurple.la
+ 
+ endif
+ 
+--- a/libpurple/protocols/irc/Makefile.am
++++ b/libpurple/protocols/irc/Makefile.am
+@@ -27,7 +27,7 @@
+ st =
+ pkg_LTLIBRARIES   = libirc.la
+ libirc_la_SOURCES = $(IRCSOURCES)
+-libirc_la_LIBADD  = $(GLIB_LIBS) $(SASL_LIBS)
++libirc_la_LIBADD  = $(GLIB_LIBS) $(SASL_LIBS) $(top_builddir)/libpurple/libpurple.la
+ 
+ endif
+ 
+--- a/libpurple/protocols/jabber/Makefile.am
++++ b/libpurple/protocols/jabber/Makefile.am
+@@ -116,10 +116,10 @@
+ libjabber_la_LIBADD  = $(GLIB_LIBS) $(SASL_LIBS) $(LIBXML_LIBS) $(IDN_LIBS)\
+ 	$(FARSIGHT_LIBS) \
+ 	$(GSTREAMER_LIBS) \
+-	$(GSTINTERFACES_LIBS)
++	$(GSTINTERFACES_LIBS) $(top_builddir)/libpurple/libpurple.la
+ 
+ libxmpp_la_SOURCES = libxmpp.c
+-libxmpp_la_LIBADD = libjabber.la
++libxmpp_la_LIBADD = libjabber.la $(top_builddir)/libpurple/libpurple.la
+ 
+ endif
+ 
+--- a/libpurple/protocols/novell/Makefile.am
++++ b/libpurple/protocols/novell/Makefile.am
+@@ -42,7 +42,7 @@
+ st =
+ pkg_LTLIBRARIES      = libnovell.la
+ libnovell_la_SOURCES = $(NOVELLSOURCES)
+-libnovell_la_LIBADD  = $(GLIB_LIBS)
++libnovell_la_LIBADD  = $(GLIB_LIBS) $(top_builddir)/libpurple/libpurple.la
+ 
+ endif
+ 
+--- a/libpurple/protocols/null/Makefile.am
++++ b/libpurple/protocols/null/Makefile.am
+@@ -14,7 +14,7 @@
+ st =
+ pkg_LTLIBRARIES    = libnull.la
+ libnull_la_SOURCES = $(NULLSOURCES)
+-libnull_la_LIBADD  = $(GLIB_LIBS)
++libnull_la_LIBADD  = $(GLIB_LIBS) $(top_builddir)/libpurple/libpurple.la
+ 
+ AM_CPPFLAGS = \
+ 	-I$(top_srcdir)/libpurple \
+--- a/libpurple/protocols/sametime/Makefile.am
++++ b/libpurple/protocols/sametime/Makefile.am
+@@ -25,7 +25,7 @@
+ 
+ libsametime_la_SOURCES = $(SAMETIMESOURCES)
+ libsametime_la_LDFLAGS = -module -avoid-version
+-libsametime_la_LIBADD = $(GLIB_LIBS) $(MEANWHILE_LIBS)
++libsametime_la_LIBADD = $(GLIB_LIBS) $(MEANWHILE_LIBS) $(top_builddir)/libpurple/libpurple.la
+ 
+ AM_CPPFLAGS = \
+ 	-I$(top_srcdir)/libpurple \
+--- a/libpurple/protocols/silc/Makefile.am
++++ b/libpurple/protocols/silc/Makefile.am
+@@ -27,14 +27,14 @@
+ noinst_LTLIBRARIES       = libsilcpurple.la
+ libsilcpurple_la_SOURCES = $(SILCSOURCES)
+ libsilcpurple_la_CFLAGS  = $(AM_CFLAGS)
+-libsilcpurple_la_LIBADD  = $(SILC_LIBS)
++libsilcpurple_la_LIBADD  = $(SILC_LIBS) $(top_builddir)/libpurple/libpurple.la
+ 
+ else
+ 
+ st = $(SILC_CFLAGS)
+ pkg_LTLIBRARIES          = libsilcpurple.la
+ libsilcpurple_la_SOURCES = $(SILCSOURCES)
+-libsilcpurple_la_LIBADD  = $(GLIB_LIBS) $(SILC_LIBS)
++libsilcpurple_la_LIBADD  = $(GLIB_LIBS) $(SILC_LIBS) $(top_builddir)/libpurple/libpurple.la
+ 
+ endif
+ 
+--- a/libpurple/protocols/silc10/Makefile.am
++++ b/libpurple/protocols/silc10/Makefile.am
+@@ -17,14 +17,14 @@
+ noinst_LTLIBRARIES       = libsilcpurple.la
+ libsilcpurple_la_SOURCES = $(SILCSOURCES)
+ libsilcpurple_la_CFLAGS  = $(AM_CFLAGS)
+-libsilcpurple_la_LIBADD  = $(SILC_LIBS)
++libsilcpurple_la_LIBADD  = $(SILC_LIBS) $(top_builddir)/libpurple/libpurple.la
+ 
+ else
+ 
+ st = $(SILC_CFLAGS)
+ pkg_LTLIBRARIES          = libsilcpurple.la
+ libsilcpurple_la_SOURCES = $(SILCSOURCES)
+-libsilcpurple_la_LIBADD  = $(GLIB_LIBS) $(SILC_LIBS)
++libsilcpurple_la_LIBADD  = $(GLIB_LIBS) $(SILC_LIBS) $(top_builddir)/libpurple/libpurple.la
+ 
+ endif
+ 
+--- a/libpurple/protocols/simple/Makefile.am
++++ b/libpurple/protocols/simple/Makefile.am
+@@ -25,7 +25,7 @@
+ st =
+ pkg_LTLIBRARIES      = libsimple.la
+ libsimple_la_SOURCES = $(SIMPLESOURCES)
+-libsimple_la_LIBADD  = $(GLIB_LIBS)
++libsimple_la_LIBADD  = $(GLIB_LIBS) $(top_builddir)/libpurple/libpurple.la
+ 
+ endif
+ 
+--- a/libpurple/protocols/zephyr/Makefile.am
++++ b/libpurple/protocols/zephyr/Makefile.am
+@@ -80,7 +80,7 @@
+ noinst_LTLIBRARIES   = libzephyr.la
+ libzephyr_la_SOURCES = $(ZEPHYRSOURCES)
+ libzephyr_la_CFLAGS  = $(AM_CFLAGS)
+-libzephyr_la_LIBADD  = $(ZEPHYRLIBS)
++libzephyr_la_LIBADD  = $(ZEPHYRLIBS) $(top_builddir)/libpurple/libpurple.la
+ 
+ else
+ 
+@@ -89,10 +89,10 @@
+ 
+ if EXTERNAL_LIBZEPHYR
+ libzephyr_la_SOURCES = $(ZEPHYRSOURCESEXT)
+-libzephyr_la_LIBADD  = $(GLIB_LIBS) $(ZEPHYRLIBSEXT)
++libzephyr_la_LIBADD  = $(GLIB_LIBS) $(ZEPHYRLIBSEXT) $(top_builddir)/libpurple/libpurple.la
+ else
+ libzephyr_la_SOURCES = $(ZEPHYRSOURCES)
+-libzephyr_la_LIBADD  = $(GLIB_LIBS) $(ZEPHYRLIBS)
++libzephyr_la_LIBADD  = $(GLIB_LIBS) $(ZEPHYRLIBS) $(top_builddir)/libpurple/libpurple.la
+ endif
+ 
+ 
+--- a/pidgin/plugins/Makefile.am
++++ b/pidgin/plugins/Makefile.am
+@@ -105,26 +105,26 @@
+ vvconfig_la_SOURCES         = vvconfig.c
+ xmppconsole_la_SOURCES      = xmppconsole.c
+ 
+-convcolors_la_LIBADD        = $(GTK_LIBS)
+-contact_priority_la_LIBADD  = $(GTK_LIBS)
+-extplacement_la_LIBADD      = $(GTK_LIBS)
+-gtk_signals_test_la_LIBADD  = $(GTK_LIBS)
+-gtkbuddynote_la_LIBADD      = $(GTK_LIBS)
+-history_la_LIBADD           = $(GTK_LIBS)
+-iconaway_la_LIBADD          = $(GTK_LIBS)
+-markerline_la_LIBADD        = $(GTK_LIBS)
+-notify_la_LIBADD            = $(GTK_LIBS)
+-pidginrc_la_LIBADD          = $(GTK_LIBS)
+-relnot_la_LIBADD            = $(GLIB_LIBS)
+-sendbutton_la_LIBADD        = $(GTK_LIBS)
+-spellchk_la_LIBADD          = $(GTK_LIBS)
+-themeedit_la_LIBADD         = $(GTK_LIBS)
+-timestamp_la_LIBADD         = $(GTK_LIBS)
+-timestamp_format_la_LIBADD  = $(GTK_LIBS)
+-transparency_la_LIBADD      = $(GTK_LIBS)
+-unity_la_LIBADD             = $(GTK_LIBS) $(UNITY_LIBS)
+-vvconfig_la_LIBADD          = $(GTK_LIBS) $(GSTREAMER_LIBS)
+-xmppconsole_la_LIBADD       = $(GTK_LIBS)
++convcolors_la_LIBADD        = $(GTK_LIBS) $(top_builddir)/libpurple/libpurple.la
++contact_priority_la_LIBADD  = $(GTK_LIBS) $(top_builddir)/libpurple/libpurple.la
++extplacement_la_LIBADD      = $(GTK_LIBS) $(top_builddir)/libpurple/libpurple.la
++gtk_signals_test_la_LIBADD  = $(GTK_LIBS) $(top_builddir)/libpurple/libpurple.la
++gtkbuddynote_la_LIBADD      = $(GTK_LIBS) $(top_builddir)/libpurple/libpurple.la
++history_la_LIBADD           = $(GTK_LIBS) $(top_builddir)/libpurple/libpurple.la
++iconaway_la_LIBADD          = $(GTK_LIBS) $(top_builddir)/libpurple/libpurple.la
++markerline_la_LIBADD        = $(GTK_LIBS) $(top_builddir)/libpurple/libpurple.la
++notify_la_LIBADD            = $(GTK_LIBS) $(top_builddir)/libpurple/libpurple.la
++pidginrc_la_LIBADD          = $(GTK_LIBS) $(top_builddir)/libpurple/libpurple.la
++relnot_la_LIBADD            = $(GLIB_LIBS) $(top_builddir)/libpurple/libpurple.la
++sendbutton_la_LIBADD        = $(GTK_LIBS) $(top_builddir)/libpurple/libpurple.la
++spellchk_la_LIBADD          = $(GTK_LIBS) $(top_builddir)/libpurple/libpurple.la
++themeedit_la_LIBADD         = $(GTK_LIBS) $(top_builddir)/libpurple/libpurple.la
++timestamp_la_LIBADD         = $(GTK_LIBS) $(top_builddir)/libpurple/libpurple.la
++timestamp_format_la_LIBADD  = $(GTK_LIBS) $(top_builddir)/libpurple/libpurple.la
++transparency_la_LIBADD      = $(GTK_LIBS) $(top_builddir)/libpurple/libpurple.la
++unity_la_LIBADD             = $(GTK_LIBS) $(UNITY_LIBS) $(top_builddir)/libpurple/libpurple.la
++vvconfig_la_LIBADD          = $(GTK_LIBS) $(GSTREAMER_LIBS) $(top_builddir)/libpurple/libpurple.la
++xmppconsole_la_LIBADD       = $(GTK_LIBS) $(top_builddir)/libpurple/libpurple.la
+ 
+ endif # PLUGINS
+ 
+--- a/pidgin/plugins/cap/Makefile.am
++++ b/pidgin/plugins/cap/Makefile.am
+@@ -15,7 +15,7 @@
+ 
+ endif
+ 
+-cap_la_LIBADD = $(GTK_LIBS) $(SQLITE3_LIBS)
++cap_la_LIBADD = $(GTK_LIBS) $(SQLITE3_LIBS) $(top_builddir)/libpurple/libpurple.la
+ 
+ AM_CPPFLAGS = \
+ 	-DDATADIR=\"$(datadir)\" \
+--- a/pidgin/plugins/disco/Makefile.am
++++ b/pidgin/plugins/disco/Makefile.am
+@@ -15,7 +15,7 @@
+ 	xmppdisco.c \
+ 	xmppdisco.h
+ 
+-xmppdisco_la_LIBADD = $(GTK_LIBS)
++xmppdisco_la_LIBADD = $(GTK_LIBS) $(top_builddir)/libpurple/libpurple.la
+ 
+ endif
+ 
+--- a/pidgin/plugins/gestures/Makefile.am
++++ b/pidgin/plugins/gestures/Makefile.am
+@@ -13,7 +13,7 @@
+ 	stroke.c \
+ 	stroke-draw.c
+ 
+-gestures_la_LIBADD = $(GTK_LIBS)
++gestures_la_LIBADD = $(GTK_LIBS) $(top_builddir)/libpurple/libpurple.la
+ 
+ endif
+ 
+--- a/pidgin/plugins/gevolution/Makefile.am
++++ b/pidgin/plugins/gevolution/Makefile.am
+@@ -15,7 +15,7 @@
+ 	new_person_dialog.c \
+ 	eds-utils.c
+ 
+-gevolution_la_LIBADD = $(EVOLUTION_ADDRESSBOOK_LIBS) $(GTK_LIBS)
++gevolution_la_LIBADD = $(EVOLUTION_ADDRESSBOOK_LIBS) $(GTK_LIBS) $(top_builddir)/libpurple/libpurple.la
+ 
+ endif
+ 
+--- a/pidgin/plugins/musicmessaging/Makefile.am
++++ b/pidgin/plugins/musicmessaging/Makefile.am
+@@ -16,7 +16,7 @@
+ musicmessaging_la_SOURCES = \
+ 	musicmessaging.c
+ 
+-musicmessaging_la_LIBADD = $(GTK_LIBS) $(DBUS_LIBS)
++musicmessaging_la_LIBADD = $(GTK_LIBS) $(DBUS_LIBS) $(top_builddir)/libpurple/libpurple.la
+ 
+ CLEANFILES              = music-messaging-bindings.c
+ 
+--- a/pidgin/plugins/ticker/Makefile.am
++++ b/pidgin/plugins/ticker/Makefile.am
+@@ -14,7 +14,7 @@
+ 	gtkticker.h \
+ 	ticker.c
+ 
+-ticker_la_LIBADD = $(GTK_LIBS)
++ticker_la_LIBADD = $(GTK_LIBS) $(top_builddir)/libpurple/libpurple.la
+ 
+ endif
+ 
