@@ -1,0 +1,75 @@
+diff -urpN xorg-server-1.20.0/configure.ac xorg-server-1.20.0/configure.ac
+--- xorg-server-1.20.0/configure.ac	2018-05-10 09:32:34.000000000 -0700
++++ xorg-server-1.20.0/configure.ac	2018-06-13 19:04:47.536413626 -0700
+@@ -74,6 +74,7 @@ dnl forcing an entire recompile.x
+ AC_CONFIG_HEADERS(include/version-config.h)
+ 
+ AM_PROG_AS
++AC_PROG_CXX
+ AC_PROG_LN_S
+ LT_PREREQ([2.2])
+ LT_INIT([disable-static win32-dll])
+@@ -1777,6 +1778,10 @@ if test "x$XVFB" = xyes; then
+ 	AC_SUBST([XVFB_SYS_LIBS])
+ fi
+ 
++dnl Xvnc DDX
++AC_SUBST([XVNC_CPPFLAGS], ["-DHAVE_DIX_CONFIG_H $XSERVER_CFLAGS"])
++AC_SUBST([XVNC_LIBS], ["$FB_LIB $FIXES_LIB $XEXT_LIB $CONFIG_LIB $DBE_LIB $RECORD_LIB $GLX_LIBS $RANDR_LIB $RENDER_LIB $DAMAGE_LIB $DRI3_LIB $PRESENT_LIB $MIEXT_SYNC_LIB $MIEXT_DAMAGE_LIB $MIEXT_SHADOW_LIB $XI_LIB $XKB_LIB $XKB_STUB_LIB $COMPOSITE_LIB $MAIN_LIB"])
++AC_SUBST([XVNC_SYS_LIBS], ["$GLX_SYS_LIBS"])
+ 
+ dnl Xnest DDX
+ 
+@@ -1812,6 +1817,8 @@ if test "x$XORG" = xauto; then
+ fi
+ AC_MSG_RESULT([$XORG])
+ 
++AC_DEFINE_UNQUOTED(XORG_VERSION_CURRENT, [$VENDOR_RELEASE], [Current Xorg version])
++
+ if test "x$XORG" = xyes; then
+ 	XORG_DDXINCS='-I$(top_srcdir)/hw/xfree86 -I$(top_srcdir)/hw/xfree86/include -I$(top_srcdir)/hw/xfree86/common'
+ 	XORG_OSINCS='-I$(top_srcdir)/hw/xfree86/os-support -I$(top_srcdir)/hw/xfree86/os-support/bus -I$(top_srcdir)/os'
+@@ -2029,7 +2036,6 @@ if test "x$XORG" = xyes; then
+ 	AC_DEFINE(XORG_SERVER, 1, [Building Xorg server])
+ 	AC_DEFINE(XORGSERVER, 1, [Building Xorg server])
+ 	AC_DEFINE(XFree86Server, 1, [Building XFree86 server])
+-	AC_DEFINE_UNQUOTED(XORG_VERSION_CURRENT, [$VENDOR_RELEASE], [Current Xorg version])
+ 	AC_DEFINE(NEED_XF86_TYPES, 1, [Need XFree86 typedefs])
+ 	AC_DEFINE(NEED_XF86_PROTOTYPES, 1, [Need XFree86 helper functions])
+ 	AC_DEFINE(__XSERVERNAME__, "Xorg", [Name of X server])
+@@ -2565,6 +2571,7 @@ hw/dmx/Makefile
+ hw/dmx/man/Makefile
+ hw/vfb/Makefile
+ hw/vfb/man/Makefile
++hw/vnc/Makefile
+ hw/xnest/Makefile
+ hw/xnest/man/Makefile
+ hw/xwin/Makefile
+diff -urpN xorg-server-1.20.0/hw/Makefile.am xorg-server-1.20.0/hw/Makefile.am
+--- xorg-server-1.20.0/hw/Makefile.am	2018-05-10 09:32:34.000000000 -0700
++++ xorg-server-1.20.0/hw/Makefile.am	2018-06-13 19:04:47.536413626 -0700
+@@ -44,3 +44,5 @@
+ 
+ relink:
+ 	$(AM_V_at)for i in $(SUBDIRS) ; do $(MAKE) -C $$i relink || exit 1 ; done
++
++SUBDIRS += vnc
+diff -urpN xorg-server-1.20.0/mi/miinitext.c xorg-server-1.20.0/mi/miinitext.c
+--- xorg-server-1.20.0/mi/miinitext.c	2018-05-10 09:32:37.000000000 -0700
++++ xorg-server-1.20.0/mi/miinitext.c	2018-06-13 19:05:14.742200675 -0700
+@@ -107,8 +107,15 @@ SOFTWARE.
+ #include "os.h"
+ #include "globals.h"
+ 
++#ifdef TIGERVNC
++extern void vncExtensionInit(void);
++#endif
++
+ /* List of built-in (statically linked) extensions */
+ static const ExtensionModule staticExtensions[] = {
++#ifdef TIGERVNC
++    {vncExtensionInit, "VNC-EXTENSION", NULL},
++#endif
+     {GEExtensionInit, "Generic Event Extension", &noGEExtension},
+     {ShapeExtensionInit, "SHAPE", NULL},
+ #ifdef MITSHM
