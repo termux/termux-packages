@@ -1,0 +1,11 @@
+--- a/src/slirp.c
++++ b/src/slirp.c
+@@ -362,6 +362,8 @@ int get_dns6_addr(struct in6_addr *pdns6_addr, uint32_t *scope_id)
+ 
+ #if defined(__HAIKU__)
+ #define RESOLV_CONF_PATH "/boot/system/settings/network/resolv.conf"
++#elif defined(__ANDROID__)
++#define RESOLV_CONF_PATH "@TERMUX_PREFIX@/etc/resolv.conf"
+ #else
+ #define RESOLV_CONF_PATH "/etc/resolv.conf"
+ #endif
