@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://taplo.tamasfe.dev/
 TERMUX_PKG_DESCRIPTION="A TOML LSP and toolkit"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
-TERMUX_PKG_VERSION="0.9.2"
+TERMUX_PKG_VERSION="0.9.3"
 TERMUX_PKG_SRCURL=https://github.com/tamasfe/taplo/archive/refs/tags/release-taplo-cli-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=86884b6a2d505d6280ae1304e2bdc434e3b572d05d833833f7189331124f81ae
+TERMUX_PKG_SHA256=5744a06a1e93128f5cb5409d5bf5e553915703ec0491df9f4c7ab31dbe430287
 TERMUX_PKG_BUILD_DEPENDS='openssl'
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
@@ -43,7 +43,6 @@ termux_step_make() {
 	cargo build --jobs "$TERMUX_PKG_MAKE_PROCESSES" \
 		--target "$CARGO_TARGET_NAME" \
 		--release \
-		--locked \
 		--all-features
 }
 
