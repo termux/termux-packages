@@ -1,5 +1,21 @@
 #!/usr/bin/env python3
-"Script to generate a build order respecting package dependencies."
+"""Script to generate a build order respecting package dependencies.
+
+Can either handle finding dependencies of a single package, or a
+buildorder list for all packages.  Can either handle build mode, where
+dependencies should be built, or in download mode where package
+dependencies should be downloaded from repo.
+
+When making buildorder list for a single package we can simply look at
+its dependencies, then look at their dependencies, and so on, until we
+get a nice tree.  If we are in build mode, then we also need to map
+subpackages to their parents.
+
+When generating order for all packages we need to identify all 'leaf'
+packages that do not have any dependencies. They should be the ones we
+start with when building all packages.
+
+"""
 
 import json, os, re, sys
 
@@ -81,6 +97,26 @@ def parse_build_file_excluded_arches(path):
 
     return set(arches)
 
+def clean_and_translate_bool(var):
+    for char in "\"'\n":
+        var = var.replace(char, '')
+    if var == 'false':
+        var = False
+    elif var == 'true':
+        var = True
+    return var
+
+def parse_build_file_depend_on_parent(path):
+    "Extract value of TERMUX_SUBPKG_DEPEND_ON_PARENT, if set in a *.subpackage.sh file."
+    value = True
+    with open(path, encoding="utf-8") as build_script:
+        for line in build_script:
+            if line.startswith('TERMUX_SUBPKG_DEPEND_ON_PARENT'):
+                value = line.split('DEPEND_ON_PARENT=')[1]
+                value = clean_and_translate_bool(value)
+                break
+    return value
+
 def parse_build_file_variable_bool(path, var):
     value = 'false'
 
@@ -151,7 +187,7 @@ class TermuxPackage(object):
             dir_root = self.dir
         if is_root or not self.fast_build_mode or not self.separate_subdeps:
             for subpkg in self.subpkgs:
-                if f"{self.name}-static" != subpkg.name:
+                if subpkg.depend_on_parent and f"{self.name}-static" != subpkg.name:
                     self.deps.add(subpkg.name)
                     self.deps |= subpkg.deps
             self.deps -= self.antideps
@@ -182,13 +218,17 @@ class TermuxSubPackage:
         if "gpkg" in subpackage_file_path.split("/")[-3].split("-") and "glibc" not in self.name.split("-"):
             self.name = add_prefix_glibc_to_pkgname(self.name)
         self.parent = parent
-        self.deps = set([parent.name])
+        self.deps = set()
         self.only_installing = parent.only_installing
         self.accept_dep_scr = parent.accept_dep_scr
         self.excluded_arches = set()
+        self.depend_on_parent = True
         if not virtual:
             self.deps |= parse_build_file_dependencies(subpackage_file_path)
             self.excluded_arches |= parse_build_file_excluded_arches(subpackage_file_path)
+            self.depend_on_parent = parse_build_file_depend_on_parent(subpackage_file_path)
+            if self.depend_on_parent:
+                self.deps |= set([parent.name])
         self.dir = parent.dir
 
         self.needed_by = set()  # Populated outside constructor, reverse of deps.
@@ -238,8 +278,7 @@ def read_packages_from_directories(directories, fast_build_mode, full_buildmode)
 
                 if new_package.name in pkgs_map:
                     die('Duplicated package: ' + new_package.name)
-                else:
-                    pkgs_map[new_package.name] = new_package
+                pkgs_map[new_package.name] = new_package
                 all_packages.append(new_package)
 
                 for subpkg in new_package.subpkgs:
