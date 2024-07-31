@@ -93,7 +93,11 @@ def parse_build_file_variable_bool(path, var):
     return value == 'true'
 
 def add_prefix_glibc_to_pkgname(name):
-	return name.replace("-static", "-glibc-static") if "static" == name.split("-")[-1] else name+"-glibc"
+    return name.replace("-static", "-glibc-static") if "static" == name.split("-")[-1] else name+"-glibc"
+
+def has_prefix_glibc(pkgname):
+    pkgname = pkgname.split("-")
+    return "glibc" in pkgname or "glibc32" in pkgname
 
 class TermuxPackage(object):
     "A main package definition represented by a directory with a build.sh file."
@@ -102,7 +106,7 @@ class TermuxPackage(object):
         self.fast_build_mode = fast_build_mode
         self.name = os.path.basename(self.dir)
         self.pkgs_cache = []
-        if "gpkg" in self.dir.split("/")[-2].split("-") and "glibc" not in self.name.split("-"):
+        if "gpkg" in self.dir.split("/")[-2].split("-") and not has_prefix_glibc(self.name):
             self.name = add_prefix_glibc_to_pkgname(self.name)
 
         # search package build.sh
@@ -159,7 +163,7 @@ class TermuxPackage(object):
             if not self.fast_build_mode or self.dir == dir_root:
                 self.deps.difference_update([subpkg.name for subpkg in self.subpkgs])
         for dependency_name in sorted(self.deps):
-            if termux_global_library == "true" and termux_pkg_library == "glibc" and "glibc" not in dependency_name.split("-"):
+            if termux_global_library == "true" and termux_pkg_library == "glibc" and not has_prefix_glibc(dependency_name):
                 mod_dependency_name = add_prefix_glibc_to_pkgname(dependency_name)
                 dependency_name = mod_dependency_name if mod_dependency_name in pkgs_map else dependency_name
             if dependency_name not in self.pkgs_cache:
@@ -179,7 +183,7 @@ class TermuxSubPackage:
             raise Exception("SubPackages should have a parent")
 
         self.name = os.path.basename(subpackage_file_path).split('.subpackage.sh')[0]
-        if "gpkg" in subpackage_file_path.split("/")[-3].split("-") and "glibc" not in self.name.split("-"):
+        if "gpkg" in subpackage_file_path.split("/")[-3].split("-") and not has_prefix_glibc(self.name):
             self.name = add_prefix_glibc_to_pkgname(self.name)
         self.parent = parent
         self.deps = set([parent.name])
@@ -339,7 +343,7 @@ def generate_target_buildorder(target_path, pkgs_map, fast_build_mode):
         target_path = target_path[:-1]
 
     package_name = os.path.basename(target_path)
-    if "gpkg" in target_path.split("/")[-2].split("-") and "glibc" not in package_name.split("-"):
+    if "gpkg" in target_path.split("/")[-2].split("-") and not has_prefix_glibc(package_name):
         package_name += "-glibc"
     package = pkgs_map[package_name]
     # Do not depend on any sub package
@@ -392,8 +396,8 @@ def main():
 
     for pkg in build_order:
         pkg_name = pkg.name
-        if termux_global_library == "true" and termux_pkg_library == "glibc" and "glibc" not in pkg_name.split("-"):
-            pkg_name = add_prefix_glibc_to_pkgname(pkgname)
+        if termux_global_library == "true" and termux_pkg_library == "glibc" and not has_prefix_glibc(pkg_name):
+            pkg_name = add_prefix_glibc_to_pkgname(pkg_name)
         print("%-30s %s" % (pkg_name, pkg.dir))
 
 if __name__ == '__main__':
