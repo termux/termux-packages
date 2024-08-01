@@ -155,9 +155,11 @@ termux_step_post_make_install() {
 	##
 	#######################################################
 	## Note: qmake can be built only on host so it is omitted here.
-	for i in moc qlalr qvkgen rcc uic qdbuscpp2xml qdbusxml2cpp; do
+	for i in moc qlalr qvkgen rcc uic qdbuscpp2xml qdbusxml2cpp tracegen; do
 		cd "${TERMUX_PKG_SRCDIR}/src/tools/${i}" && {
-			make clean
+			if [ -f Makefile ]; then
+				make clean
+			fi
 
 			"${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
 				-spec "${TERMUX_PKG_SRCDIR}/mkspecs/termux-cross"
