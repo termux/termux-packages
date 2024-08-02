@@ -25,7 +25,9 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
-	YAZI_GEN_COMPLETIONS=true cargo build --jobs $TERMUX_PKG_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
+	VERGEN_GIT_SHA="termux" \
+	YAZI_GEN_COMPLETIONS=true \
+	cargo build --jobs $TERMUX_PKG_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
 }
 
 termux_step_make_install() {
