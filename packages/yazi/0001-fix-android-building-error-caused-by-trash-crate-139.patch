@@ -1,0 +1,25 @@
+From 9d1fab84efdd78dcf102262601d6965ec760ad95 Mon Sep 17 00:00:00 2001
+From: Xerxes-2 <dspxue@gmail.com>
+Date: Fri, 2 Aug 2024 14:46:43 +1000
+Subject: [PATCH] fix: android building error caused by `trash` crate (#1393)
+
+---
+ yazi-scheduler/src/file/file.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/yazi-scheduler/src/file/file.rs b/yazi-scheduler/src/file/file.rs
+index 5b06385..24e8090 100644
+--- a/yazi-scheduler/src/file/file.rs
++++ b/yazi-scheduler/src/file/file.rs
+@@ -140,7 +140,7 @@ impl File {
+ 					{
+ 						trash::delete(&task.target)?;
+ 					}
+-					Ok::<_, trash::Error>(())
++					Ok::<_, anyhow::Error>(())
+ 				})
+ 				.await??;
+ 				self.prog.send(TaskProg::Adv(task.id, 1, task.length))?;
+-- 
+2.46.0
+
