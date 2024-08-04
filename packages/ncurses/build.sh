@@ -14,7 +14,7 @@ TERMUX_PKG_VERSION=(6.4.20231001
                     15
                     0.31.0
                     0.11.0)
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=(https://github.com/ThomasDickey/ncurses-snapshots/archive/${_SNAPSHOT_COMMIT}.tar.gz
                    https://fossies.org/linux/misc/rxvt-unicode-${TERMUX_PKG_VERSION[1]}.tar.bz2
                    https://github.com/thestinger/termite/archive/v${TERMUX_PKG_VERSION[2]}.tar.gz
@@ -65,7 +65,7 @@ termux_step_pre_configure() {
 	PATCH_VERSION=$(cut -f 3 VERSION)
 	ACTUAL_VERSION=${MAIN_VERSION}.${PATCH_VERSION}
 	EXPECTED_VERSION=${TERMUX_PKG_VERSION[0]}
-	if [ "${ACTUAL_VERSION}" != "${EXPECTED_VERSION}"]; then
+	if [ "${ACTUAL_VERSION}" != "${EXPECTED_VERSION}" ]; then
 		termux_error_exit "Version mismatch - expected ${EXPECTED_VERSION}, was ${ACTUAL_VERSION}. Check https://github.com/ThomasDickey/ncurses-snapshots/commit/${_SNAPSHOT_COMMIT}"
 	fi
 	export CPPFLAGS+=" -fPIC"
