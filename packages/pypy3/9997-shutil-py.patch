@@ -1,0 +1,11 @@
+--- pypy3.9-v7.3.13-src/lib-python/3/shutil.py	2023-09-27 20:44:39.000000000 +0800
++++ pypy3.9-v7.3.13-src/lib-python/3/shutil.py	2024-08-05 17:36:37.553007913 +0800
+@@ -335,7 +335,7 @@
+         for name in names:
+             try:
+                 value = os.getxattr(src, name, follow_symlinks=follow_symlinks)
+-                os.setxattr(dst, name, value, follow_symlinks=follow_symlinks)
++                # os.setxattr(dst, name, value, follow_symlinks=follow_symlinks)
+             except OSError as e:
+                 if e.errno not in (errno.EPERM, errno.ENOTSUP, errno.ENODATA,
+                                    errno.EINVAL):
