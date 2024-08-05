@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Blazing fast terminal file manager written in Rust, base
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.3.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/sxyazi/yazi/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=0a0c1583accca16759392f258367156a2c36fb0b1d37152b07e1aa5239c531ff
 TERMUX_PKG_AUTO_UPDATE=true
@@ -14,29 +15,32 @@ termux_step_pre_configure() {
 	: "${CARGO_HOME:=$HOME/.cargo}"
 	export CARGO_HOME
 
-	cd $TERMUX_PKG_SRCDIR
+	cd "$TERMUX_PKG_SRCDIR"
 	cargo fetch --target "${CARGO_TARGET_NAME}"
 
 	local _patch=$TERMUX_PKG_BUILDER_DIR/tikv-jemalloc-sys-0.5.3+5.3.0-patched-src-lib.rs.diff
 	local d
-	for d in $CARGO_HOME/registry/src/*/tikv-jemalloc-sys-*; do
-		patch --silent -p1 -d ${d} < ${_patch} || :
+	for d in "$CARGO_HOME"/registry/src/*/tikv-jemalloc-sys-*; do
+		patch --silent -p1 -d "${d}" < "${_patch}" || :
 	done
 }
 
 termux_step_make() {
 	VERGEN_GIT_SHA="termux" \
 	YAZI_GEN_COMPLETIONS=true \
-	cargo build --jobs $TERMUX_PKG_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
+	cargo build --jobs "$TERMUX_PKG_MAKE_PROCESSES" --target "$CARGO_TARGET_NAME" --release
 }
 
 termux_step_make_install() {
-	install -Dm700 -t $TERMUX_PREFIX/bin target/${CARGO_TARGET_NAME}/release/yazi
+	install -Dm700 -t "$TERMUX_PREFIX/bin" "target/${CARGO_TARGET_NAME}/release/yazi"
+	install -Dm700 -t "$TERMUX_PREFIX/bin" "target/${CARGO_TARGET_NAME}/release/ya"
 
 	cd yazi-boot/completions
-	install -Dm644 "${TERMUX_PKG_NAME}".bash "${TERMUX_PREFIX}"/share/bash-completion/completions/"${TERMUX_PKG_NAME}".bash
-	install -Dm644 _"${TERMUX_PKG_NAME}" "${TERMUX_PREFIX}"/share/zsh/site-functions/_"${TERMUX_PKG_NAME}"
-	install -Dm644 "${TERMUX_PKG_NAME}".fish "${TERMUX_PREFIX}"/share/fish/vendor_completions.d/"${TERMUX_PKG_NAME}".fish
+	install -Dm644 "${TERMUX_PKG_NAME}.bash" "${TERMUX_PREFIX}/share/bash-completion/completions/${TERMUX_PKG_NAME}.bash"
+	install -Dm644 "${TERMUX_PKG_NAME}.elv"  "${TERMUX_PREFIX}/share/elvish/lib/${TERMUX_PKG_NAME}.elv"
+	install -Dm644 "${TERMUX_PKG_NAME}.fish" "${TERMUX_PREFIX}/share/fish/vendor_completions.d/${TERMUX_PKG_NAME}.fish"
+	install -Dm644 "${TERMUX_PKG_NAME}.nu"   "${TERMUX_PREFIX}/share/nushell/vendor/autoload/${TERMUX_PKG_NAME}.nu"
+	install -Dm644 "_${TERMUX_PKG_NAME}"     "${TERMUX_PREFIX}/share/zsh/site-functions/_${TERMUX_PKG_NAME}"
 }
 
 termux_step_create_debscripts() {
