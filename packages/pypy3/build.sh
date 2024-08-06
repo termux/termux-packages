@@ -166,7 +166,7 @@ termux_step_configure() {
 						-w $TERMUX_ANDROID_HOME
 						-r $HOST_ROOTFS_BASE/"
 	# Get dependencies
-	$PROOT_HOST update-static-dns
+	echo "nameserver 1.1.1.1" > $HOST_ROOTFS_BASE/$TERMUX_PREFIX/etc/resolv.conf
 	sed -i "s/deb/deb [trusted=yes]/g" $HOST_ROOTFS_BASE/$TERMUX_PREFIX/etc/apt/sources.list
 	$PROOT_HOST apt update
 	$PROOT_HOST apt upgrade -yq -o Dpkg::Options::=--force-confnew
@@ -198,7 +198,7 @@ termux_step_configure() {
 		$PROOT_HOST $PROOT_TARGET uname -a
 		$PROOT_TARGET uname -a
 		# update-static-dns will use the arm busybox binary.
-		${PROOT_TARGET/qemu-$TERMUX_ARCH-static/qemu-arm-static} update-static-dns
+		echo "nameserver 1.1.1.1" >$HOST_ROOTFS_BASE/$TARGET_ROOTFS_BASE/$TERMUX_PREFIX/etc/resolv.conf
 		# FIXME: If we don't add `[trusted=yes]`, apt-key will generate an error.
 		# FIXME: The key(s) in the keyring XXX.gpg are ignored as the file is not readable by user '' executing apt-key.
 		sed -i "s/deb/deb [trusted=yes]/g" $HOST_ROOTFS_BASE/$TARGET_ROOTFS_BASE/$TERMUX_PREFIX/etc/apt/sources.list
