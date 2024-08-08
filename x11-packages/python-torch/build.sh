@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Tensors and Dynamic neural networks in Python"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.1.2"
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=git+https://github.com/pytorch/pytorch
 TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
 TERMUX_PKG_DEPENDS="abseil-cpp, ffmpeg, fmt, libc++, libopenblas, libprotobuf, libzmq, opencv, python, python-numpy, python-pip"
@@ -59,6 +59,8 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
+	LDFLAGS+=" -fopenmp -static-openmp"
+
 	export PYTHONPATH="${PYTHONPATH}:${TERMUX_PKG_SRCDIR}"
 	find "$TERMUX_PKG_SRCDIR" -name CMakeLists.txt -o -name '*.cmake' ! -name 'VulkanCodegen*' | \
 		xargs -n 1 sed -i \
