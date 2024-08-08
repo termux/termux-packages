@@ -4,6 +4,7 @@ TERMUX_PKG_GROUPS="science"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="7.8.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/DrTimothyAldenDavis/SuiteSparse/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=8ea989f36be3646d0b0eecb06218698766ca06256c0de15a64350e993bf5c5f9
 TERMUX_PKG_DEPENDS="libandroid-complex-math, libgmp, libmpfr, libopenblas"
@@ -23,7 +24,7 @@ termux_step_configure() {
 	termux_setup_ninja
 	termux_setup_flang
 
-	LDFLAGS+=" -landroid-complex-math -lm"
+	LDFLAGS+=" -fopenmp -static-openmp -landroid-complex-math -lm"
 }
 
 termux_step_make() {
