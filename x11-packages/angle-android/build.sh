@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://chromium.googlesource.com/angle/angle
 TERMUX_PKG_DESCRIPTION="A conformant OpenGL ES implementation for Windows, Mac, Linux, iOS and Android"
 TERMUX_PKG_LICENSE="BSD 3-Clause, Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-_COMMIT_DATE=2023.7.11
-_COMMIT=75e647193aeb1a78dad27bd5dc8f0199262800d1
-_COMMIT_POSISION=21474
+_COMMIT_DATE=2024.7.15
+_COMMIT=faae3c32c038030acca0cebd4abc3f52f8168f03
+_COMMIT_POSISION=23487
 TERMUX_PKG_SRCURL=git+https://chromium.googlesource.com/angle/angle
 TERMUX_PKG_VERSION="2.1.$_COMMIT_POSISION-${_COMMIT:0:8}"
 
