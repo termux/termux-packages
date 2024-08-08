@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="SUite of Nonlinear and DIfferential/ALgebraic equation S
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux-user-repository"
 TERMUX_PKG_VERSION="7.1.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/LLNL/sundials/releases/download/v${TERMUX_PKG_VERSION}/sundials-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=ea7d6edfb52448ddfdc1ec48f89a721fe6c0a259c10f8ef56f60fcded87a94bb
 TERMUX_PKG_AUTO_UPDATE=true
@@ -27,6 +28,10 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
 TERMUX_PKG_RM_AFTER_INSTALL="examples/"
+
+termux_step_pre_configure() {
+	LDFLAGS+=" -fopenmp -static-openmp"
+}
 
 termux_step_post_massage() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them
