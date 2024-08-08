@@ -1,0 +1,25 @@
+#!@TERMUX_PREFIX@/bin/sh
+
+if [ -f @TERMUX_PREFIX@/etc/profile.d/java.sh ]; then
+	raelpath=$(readlink @TERMUX_PREFIX@/etc/profile.d/java.sh)
+	sp_raelpath=(${raelpath//// })
+	if [ "${sp_raelpath[-4]}" != "java-21-openjdk" ]; then
+		echo "==> Attention, the commands will be reconfigured to openjdk-21. If you want to stay on \"${sp_raelpath[-4]}\" then reinstall the package"
+	fi
+fi
+
+echo "==> Setting up the openjdk-21 package..."
+
+for i in @binaries@; do
+	ln -sfr "@TERMUX_PREFIX@/lib/jvm/java-21-openjdk/bin/${i}" "@TERMUX_PREFIX@/bin/${i}"
+done
+
+mkdir -p @TERMUX_PREFIX@/share/man/man1
+for i in @manpages@; do
+	ln -sfr "@TERMUX_PREFIX@/lib/jvm/java-21-openjdk/man/man1/${i}" "@TERMUX_PREFIX@/share/man/man1/${i}"
+done
+
+mkdir -p @TERMUX_PREFIX@/etc/profile.d
+ln -sfr @TERMUX_PREFIX@/lib/jvm/java-21-openjdk/etc/profile.d/java.sh @TERMUX_PREFIX@/etc/profile.d/java.sh
+
+echo "==> Done"

@@ -1,0 +1,136 @@
+From 0d40424c10b8dbf94b5ffd6101faf7f25791dedb Mon Sep 17 00:00:00 2001
+From: Duy Tran Khanh <40482367+khanhduytran0@users.noreply.github.com>
+Date: Wed, 30 Jun 2021 14:28:14 +0700
+Subject: [PATCH 20/37] Remove pre-UAL aliases
+
+---
+ src/hotspot/os_cpu/linux_arm/linux_arm_32.S | 40 ++++++++++-----------
+ 1 file changed, 20 insertions(+), 20 deletions(-)
+
+diff --git a/src/hotspot/os_cpu/linux_arm/linux_arm_32.S b/src/hotspot/os_cpu/linux_arm/linux_arm_32.S
+index eb560d8f0..be8da136b 100644
+--- a/src/hotspot/os_cpu/linux_arm/linux_arm_32.S
++++ b/src/hotspot/os_cpu/linux_arm/linux_arm_32.S
+@@ -88,7 +88,7 @@ dw_f2b_loop_32:
+         stmia to!, {r3 - r9, ip}
+         bgt     dw_f2b_loop_32
+ dw_f2b_loop_32_finish:
+-        addlts  r2, #32
++        addslt  r2, #32
+         beq     disjoint_words_finish
+         cmp     r2, #16
+ 	blt	disjoint_words_small
+@@ -136,7 +136,7 @@ cw_f2b_loop_32:
+         stmia to!, {r3 - r9, ip}
+         bgt     cw_f2b_loop_32
+ cw_f2b_loop_32_finish:
+-        addlts  r2, #32
++        addslt  r2, #32
+         beq     conjoint_words_finish
+         cmp     r2, #16
+ 	blt	conjoint_words_small
+@@ -169,7 +169,7 @@ cw_b2f_loop_32:
+         stmdb to!, {r3-r9,ip}
+         bgt     cw_b2f_loop_32
+ cw_b2f_loop_32_finish:
+-        addlts  r2, #32
++        addslt  r2, #32
+         beq     conjoint_words_finish
+         cmp     r2, #16
+ 	blt	cw_b2f_copy_small
+@@ -221,7 +221,7 @@ cs_f2b_loop_32:
+         stmia to!, {r3 - r9, ip}
+         bgt     cs_f2b_loop_32
+ cs_f2b_loop_32_finish:
+-        addlts  r2, #32
++        addslt  r2, #32
+         beq     conjoint_shorts_finish
+         movs    r6, r2, lsr #3
+         .align 3
+@@ -237,11 +237,11 @@ cs_f2b_4:
+         beq     conjoint_shorts_finish
+         cmp     r2, #4
+         ldrh    r3, [from], #2
+-        ldrgeh  r4, [from], #2
+-        ldrgth  r5, [from], #2
++        ldrhge  r4, [from], #2
++        ldrhgt  r5, [from], #2
+         strh    r3, [to], #2
+-        strgeh  r4, [to], #2
+-        strgth  r5, [to], #2
++        strhge  r4, [to], #2
++        strhgt  r5, [to], #2
+         b       conjoint_shorts_finish
+ 
+ 	# Destination not aligned
+@@ -299,11 +299,11 @@ cs_f2b_4_u:
+         beq     conjoint_shorts_finish
+         cmp     r2, #4
+         ldrh    r3, [from], #2
+-        ldrgeh  r4, [from], #2
+-        ldrgth  r5, [from], #2
++        ldrhge  r4, [from], #2
++        ldrhgt  r5, [from], #2
+         strh    r3, [to], #2
+-        strgeh  r4, [to], #2
+-        strgth  r5, [to], #2
++        strhge  r4, [to], #2
++        strhgt  r5, [to], #2
+         b       conjoint_shorts_finish
+ 
+ 	# Src and dest overlap, copy in a descending order
+@@ -326,7 +326,7 @@ cs_b2f_loop_32:
+         stmdb to!, {r3-r9,ip}
+         bgt     cs_b2f_loop_32
+ cs_b2f_loop_32_finish:
+-        addlts  r2, #32
++        addslt  r2, #32
+         beq     conjoint_shorts_finish
+         cmp     r2, #24
+         blt     cs_b2f_16
+@@ -352,11 +352,11 @@ cs_b2f_8:
+ cs_b2f_all_copy:
+         cmp     r2, #4
+         ldrh    r3, [from, #-2]!
+-        ldrgeh  r4, [from, #-2]!
+-        ldrgth  r5, [from, #-2]!
++        ldrhge  r4, [from, #-2]!
++        ldrhgt  r5, [from, #-2]!
+         strh    r3, [to, #-2]!
+-        strgeh  r4, [to, #-2]!
+-        strgth  r5, [to, #-2]!
++        strhge  r4, [to, #-2]!
++        strhgt  r5, [to, #-2]!
+         b       conjoint_shorts_finish
+ 
+ 	# Destination not aligned
+@@ -391,7 +391,7 @@ cs_b2f_16_loop_u:
+         bgt     cs_b2f_16_loop_u
+         beq     conjoint_shorts_finish
+ cs_b2f_16_loop_u_finished:
+-        addlts  r2, #16
++        addslt  r2, #16
+         ldr     r3, [from]
+ 	cmp     r2, #10
+         blt     cs_b2f_2_u_loop
+@@ -454,7 +454,7 @@ cl_f2b_loop_32:
+         stmia to!, {r3 - r9, ip}
+         bgt     cl_f2b_loop_32
+ cl_f2b_loop_32_finish:
+-        addlts  r2, #32
++        addslt  r2, #32
+         beq     conjoint_longs_finish
+ conjoint_longs_small:
+         cmp     r2, #16
+@@ -487,7 +487,7 @@ cl_b2f_loop_32:
+         stmdb 	to!, {r3 - r9, ip}
+         bgt     cl_b2f_loop_32
+ cl_b2f_loop_32_finish:
+-        addlts  r2, #32
++        addslt  r2, #32
+         beq     conjoint_longs_finish
+         cmp     r2, #16
+ 	blt	cl_b2f_copy_8
+-- 
+2.45.2
+

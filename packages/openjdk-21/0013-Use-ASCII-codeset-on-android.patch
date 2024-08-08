@@ -1,0 +1,46 @@
+From a1b9ba285d928522eacf26a5c8dbe77a784f4dea Mon Sep 17 00:00:00 2001
+From: Duy Tran Khanh <40482367+khanhduytran0@users.noreply.github.com>
+Date: Thu, 10 Jun 2021 20:42:40 +0700
+Subject: [PATCH 13/37] Use ASCII codeset on android
+
+Since android's locale support is very rudimentary.
+---
+ .../unix/native/libinstrument/EncodingSupport_md.c            | 4 ++++
+ src/jdk.jdwp.agent/share/native/libjdwp/utf_util.c            | 4 ++++
+ 2 files changed, 8 insertions(+)
+
+diff --git a/src/java.instrument/unix/native/libinstrument/EncodingSupport_md.c b/src/java.instrument/unix/native/libinstrument/EncodingSupport_md.c
+index 490eea9a5..27ee1c23e 100644
+--- a/src/java.instrument/unix/native/libinstrument/EncodingSupport_md.c
++++ b/src/java.instrument/unix/native/libinstrument/EncodingSupport_md.c
+@@ -65,7 +65,11 @@ utfInitialize(void)
+     (void)setlocale(LC_ALL, "");
+ 
+     /* Get the codeset name */
++#ifndef __ANDROID__
+     codeset = (char*)nl_langinfo(CODESET);
++#else
++    codeset = "ASCII"; // (MB_CUR_MAX == 1) ? "ASCII" : "UTF-8";
++#endif
+     if ( codeset == NULL || codeset[0] == 0 ) {
+         UTF_DEBUG(("NO codeset returned by nl_langinfo(CODESET)\n"));
+         return;
+diff --git a/src/jdk.jdwp.agent/share/native/libjdwp/utf_util.c b/src/jdk.jdwp.agent/share/native/libjdwp/utf_util.c
+index f5573930d..b64e30046 100644
+--- a/src/jdk.jdwp.agent/share/native/libjdwp/utf_util.c
++++ b/src/jdk.jdwp.agent/share/native/libjdwp/utf_util.c
+@@ -483,7 +483,11 @@ static int iconvConvert(conv_direction drn, char *bytes, size_t len, char *outpu
+         // locale is not initialized, do it now
+         if (setlocale(LC_ALL, "") != NULL) {
+             // nl_langinfo returns ANSI_X3.4-1968 by default
++#ifndef __ANDROID__
+             codeset = (char*)nl_langinfo(CODESET);
++#else
++            codeset = "ASCII";
++#endif
+         }
+ 
+         if (codeset == NULL) {
+-- 
+2.45.2
+

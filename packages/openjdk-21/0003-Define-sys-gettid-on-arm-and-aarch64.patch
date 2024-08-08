@@ -1,0 +1,39 @@
+From 66538fbc0880ee4fe7121a426aeae6661df4e584 Mon Sep 17 00:00:00 2001
+From: Duy Tran Khanh <40482367+khanhduytran0@users.noreply.github.com>
+Date: Mon, 7 Jun 2021 06:27:26 +0700
+Subject: [PATCH 03/37] Define sys gettid on arm and aarch64
+
+---
+ src/hotspot/os/linux/os_linux.cpp | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/src/hotspot/os/linux/os_linux.cpp b/src/hotspot/os/linux/os_linux.cpp
+index c76b6f90a..93cdec6dd 100644
+--- a/src/hotspot/os/linux/os_linux.cpp
++++ b/src/hotspot/os/linux/os_linux.cpp
+@@ -374,11 +374,11 @@ bool os::Linux::get_tick_information(CPUPerfTicks* pticks, int which_logical_cpu
+ }
+ 
+ #ifndef SYS_gettid
+-// i386: 224, ia64: 1105, amd64: 186, sparc: 143
++// i386 & arm: 224, ia64: 1105, amd64: 186, sparc: 143, aarch64: 178
+   #ifdef __ia64__
+     #define SYS_gettid 1105
+   #else
+-    #ifdef __i386__
++    #if defined(__i386__) || defined(__arm__)
+       #define SYS_gettid 224
+     #else
+       #ifdef __amd64__
+@@ -386,6 +386,8 @@ bool os::Linux::get_tick_information(CPUPerfTicks* pticks, int which_logical_cpu
+       #else
+         #ifdef __sparc__
+           #define SYS_gettid 143
++        #elif defined(__arm64__) || defined(__aarch64__)
++          #define SYS_gettid 178
+         #else
+           #error define gettid for the arch
+         #endif
+-- 
+2.45.2
+

@@ -1,0 +1,31 @@
+From 1da115f2c6906360f90ee93f017038e340663679 Mon Sep 17 00:00:00 2001
+From: Duy Tran Khanh <40482367+khanhduytran0@users.noreply.github.com>
+Date: Thu, 10 Jun 2021 08:46:35 +0700
+Subject: [PATCH 08/37] Remove aarch64_get_thread_helper()
+
+See commit 6f407090fda1 ("aarch64_get_thread_helper() ->
+Thread::current()") for more details.
+---
+ src/hotspot/os_cpu/linux_aarch64/threadLS_linux_aarch64.S | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/hotspot/os_cpu/linux_aarch64/threadLS_linux_aarch64.S b/src/hotspot/os_cpu/linux_aarch64/threadLS_linux_aarch64.S
+index ac60d6aa9..0645f0e00 100644
+--- a/src/hotspot/os_cpu/linux_aarch64/threadLS_linux_aarch64.S
++++ b/src/hotspot/os_cpu/linux_aarch64/threadLS_linux_aarch64.S
+@@ -19,6 +19,7 @@
+ // or visit www.oracle.com if you need additional information or have any
+ // questions.
+ 
++#ifndef __ANDROID__
+         // JavaThread::aarch64_get_thread_helper()
+         //
+         // Return the current thread pointer in x0.
+@@ -44,3 +45,4 @@ _ZN10JavaThread25aarch64_get_thread_helperEv:
+ 	ret
+ 
+ 	.size _ZN10JavaThread25aarch64_get_thread_helperEv, .-_ZN10JavaThread25aarch64_get_thread_helperEv
++#endif
+-- 
+2.45.2
+
