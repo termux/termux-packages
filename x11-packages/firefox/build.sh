@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Mozilla Firefox web browser"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="129.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://archive.mozilla.org/pub/firefox/releases/${TERMUX_PKG_VERSION}/source/firefox-${TERMUX_PKG_VERSION}.source.tar.xz
 TERMUX_PKG_SHA256=4b9ff955de7099f09aa1f00985e34695fa1a911e56c2d46cb4d60c3bff3d9174
 # ffmpeg and pulseaudio are dependencies through dlopen(3):
