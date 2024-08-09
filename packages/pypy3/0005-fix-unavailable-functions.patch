@@ -1,6 +1,5 @@
-diff -uNr pypy3.7-v7.3.7-src/lib-python/3/http/server.py pypy3.7-v7.3.7-src.mod/lib-python/3/http/server.py
---- pypy3.7-v7.3.7-src/lib-python/3/http/server.py      2021-10-24 22:07:11.000000000 +0800
-+++ pypy3.7-v7.3.7-src.mod/lib-python/3/http/server.py  2022-01-18 00:16:44.328899400 +0800
+--- a/lib-python/3/http/server.py
++++ b/lib-python/3/http/server.py
 @@ -1161,10 +1161,6 @@
                  return
              # Child
@@ -13,9 +12,8 @@ diff -uNr pypy3.7-v7.3.7-src/lib-python/3/http/server.py pypy3.7-v7.3.7-src.mod/
                  os.dup2(self.wfile.fileno(), 1)
                  os.execve(scriptfile, args, env)
 
-diff -uNr pypy3.6-v7.3.2-src/lib_pypy/_pwdgrp_build.py pypy3.6-v7.3.2-src.mod/lib_pypy/_pwdgrp_build.py
---- pypy3.6-v7.3.2-src/lib_pypy/_pwdgrp_build.py        2020-09-23 15:02:22.000000000 +0800
-+++ pypy3.6-v7.3.2-src.mod/lib_pypy/_pwdgrp_build.py    2021-11-09 18:32:36.933096400 +0800
+--- a/lib_pypy/_pwdgrp_build.py
++++ b/lib_pypy/_pwdgrp_build.py
 @@ -35,9 +35,9 @@
  struct passwd *getpwuid(uid_t uid);
  struct passwd *getpwnam(const char *name);
@@ -30,9 +28,8 @@ diff -uNr pypy3.6-v7.3.2-src/lib_pypy/_pwdgrp_build.py pypy3.6-v7.3.2-src.mod/li
  struct group *getgrgid(gid_t gid);
  struct group *getgrnam(const char *name);
 
-diff -uNr pypy3.7-v7.3.7-src/lib-python/3/smtpd.py pypy3.7-v7.3.7-src.mod/lib-python/3/smtpd.py
---- pypy3.7-v7.3.7-src/lib-python/3/smtpd.py            2021-10-24 22:07:11.000000000 +0800
-+++ pypy3.7-v7.3.7-src.mod/lib-python/3/smtpd.py        2022-01-18 00:18:09.630517000 +0800
+--- a/lib-python/3/smtpd.py
++++ b/lib-python/3/smtpd.py
 @@ -9,7 +9,8 @@
      -n
          This program generally tries to setuid `nobody', unless this flag is
@@ -54,9 +51,8 @@ diff -uNr pypy3.7-v7.3.7-src/lib-python/3/smtpd.py pypy3.7-v7.3.7-src.mod/lib-py
      enable_SMTPUTF8 = False
 
 
-diff -uNr pypy3.6-v7.3.2-src/pypy/module/pwd/interp_pwd.py pypy3.6-v7.3.2-src.mod/pypy/module/pwd/interp_pwd.py
---- pypy3.6-v7.3.2-src/pypy/module/pwd/interp_pwd.py            2020-09-23 15:02:22.000000000 +0800
-+++ pypy3.6-v7.3.2-src.mod/pypy/module/pwd/interp_pwd.py        2022-01-09 05:13:04.669185900 +0800
+--- a/pypy/module/pwd/interp_pwd.py
++++ b/pypy/module/pwd/interp_pwd.py
 @@ -19,18 +19,25 @@
  uid_t = config['uid_t']
  gid_t = config['gid_t']
@@ -141,9 +137,8 @@ diff -uNr pypy3.6-v7.3.2-src/pypy/module/pwd/interp_pwd.py pypy3.6-v7.3.2-src.mo
 +#         c_endpwent()
 +#     return space.newlist(users_w)
 
-diff -uNr pypy3.6-v7.3.2-src/pypy/module/pwd/moduledef.py pypy3.6-v7.3.2-src.mod/pypy/module/pwd/moduledef.py
---- pypy3.6-v7.3.2-src/pypy/module/pwd/moduledef.py     2020-09-23 15:02:22.000000000 +0800
-+++ pypy3.6-v7.3.2-src.mod/pypy/module/pwd/moduledef.py 2021-11-09 18:31:05.132729100 +0800
+--- a/pypy/module/pwd/moduledef.py
++++ b/pypy/module/pwd/moduledef.py
 @@ -15,11 +15,11 @@
      interpleveldefs = {
          'getpwuid': 'interp_pwd.getpwuid',
@@ -158,9 +153,8 @@ diff -uNr pypy3.6-v7.3.2-src/pypy/module/pwd/moduledef.py pypy3.6-v7.3.2-src.mod
 +        # 'struct_pwent': 'app_pwd.struct_passwd',
      }
 
-diff -uNr pypy3.7-v7.3.7-src/rpython/rlib/rvmprof/cintf.py pypy3.7-v7.3.7-src.mod/rpython/rlib/rvmprof/cintf.py
---- pypy3.7-v7.3.7-src/rpython/rlib/rvmprof/cintf.py            2022-01-02 01:09:08.909941000 +0800
-+++ pypy3.7-v7.3.7-src.mod/rpython/rlib/rvmprof/cintf.py        2022-01-02 01:10:11.909941000 +0800
+--- a/rpython/rlib/rvmprof/cintf.py
++++ b/rpython/rlib/rvmprof/cintf.py
 @@ -16,14 +16,14 @@
  class VMProfPlatformUnsupported(Exception):
      pass
@@ -184,3 +178,31 @@ diff -uNr pypy3.7-v7.3.7-src/rpython/rlib/rvmprof/cintf.py pypy3.7-v7.3.7-src.mo
  ROOT = py.path.local(rpythonroot).join('rpython', 'rlib', 'rvmprof')
  SRC = ROOT.join('src')
 
+--- a/pypy/module/posix/moduledef.py
++++ b/pypy/module/posix/moduledef.py
+@@ -140,12 +140,12 @@
+         interpleveldefs['pathconf_names'] = 'space.wrap(interp_posix.pathconf_names())'
+     if hasattr(os, 'pathconf'):
+         interpleveldefs['pathconf'] = 'interp_posix.pathconf'
+-    if hasattr(os, 'confstr'):
++    if False:
+         interpleveldefs['confstr'] = 'interp_posix.confstr'
+         interpleveldefs['confstr_names'] = 'space.wrap(interp_posix.confstr_names())'
+     if hasattr(os, 'ttyname'):
+         interpleveldefs['ttyname'] = 'interp_posix.ttyname'
+-    if hasattr(os, 'getloadavg'):
++    if False:
+         interpleveldefs['getloadavg'] = 'interp_posix.getloadavg'
+     if hasattr(os, 'makedev'):
+         interpleveldefs['makedev'] = 'interp_posix.makedev'
+--- a/rpython/rlib/rposix.py
++++ b/rpython/rlib/rposix.py
+@@ -3049,7 +3049,7 @@
+ # ____________________________________________________________
+ # Support for *xattr functions
+
+-if sys.platform.startswith('linux'):
++if False:
+
+     class CConfig:
+         _compilation_info_ = ExternalCompilationInfo(
