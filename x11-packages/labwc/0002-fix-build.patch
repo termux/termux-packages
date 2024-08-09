@@ -1,0 +1,369 @@
+diff --git a/include/config/libinput.h b/include/config/libinput.h
+index 912009e..483a02c 100644
+--- a/include/config/libinput.h
++++ b/include/config/libinput.h
+@@ -2,6 +2,8 @@
+ #ifndef LABWC_LIBINPUT_H
+ #define LABWC_LIBINPUT_H
+ 
++#include <wlr/config.h>
++#if WLR_HAS_LIBINPUT_BACKEND
+ #include <libinput.h>
+ #include <string.h>
+ #include <wayland-server-core.h>
+@@ -36,4 +38,5 @@ enum lab_libinput_device_type get_device_type(const char *s);
+ struct libinput_category *libinput_category_create(void);
+ struct libinput_category *libinput_category_get_default(void);
+ 
++#endif
+ #endif /* LABWC_LIBINPUT_H */
+diff --git a/include/labwc.h b/include/labwc.h
+index 70cef94..29c367c 100644
+--- a/include/labwc.h
++++ b/include/labwc.h
+@@ -10,6 +10,7 @@
+ #include <unistd.h>
+ #include <wayland-server-core.h>
+ #include <wlr/backend.h>
++#include <wlr/config.h>
+ #include <wlr/render/allocator.h>
+ #include <wlr/render/wlr_renderer.h>
+ #include <wlr/types/wlr_compositor.h>
+@@ -36,7 +37,9 @@
+ #include <wlr/types/wlr_xcursor_manager.h>
+ #include <wlr/types/wlr_xdg_activation_v1.h>
+ #include <wlr/types/wlr_xdg_shell.h>
++#if WLR_HAS_DRM_BACKEND
+ #include <wlr/types/wlr_drm_lease_v1.h>
++#endif
+ #include <wlr/types/wlr_virtual_pointer_v1.h>
+ #include <wlr/types/wlr_virtual_keyboard_v1.h>
+ #include <wlr/types/wlr_tearing_control_v1.h>
+@@ -311,8 +314,10 @@ struct server {
+ 
+ 	struct wlr_foreign_toplevel_manager_v1 *foreign_toplevel_manager;
+ 
++#if WLR_HAS_DRM_BACKEND
+ 	struct wlr_drm_lease_v1_manager *drm_lease_manager;
+ 	struct wl_listener drm_lease_request;
++#endif
+ 
+ 	struct wlr_output_power_manager_v1 *output_power_manager_v1;
+ 	struct wl_listener output_power_manager_set_mode;
+diff --git a/meson.build b/meson.build
+index adbd545..955b3e4 100644
+--- a/meson.build
++++ b/meson.build
+@@ -67,7 +67,7 @@ xml2 = dependency('libxml-2.0')
+ glib = dependency('glib-2.0')
+ cairo = dependency('cairo')
+ pangocairo = dependency('pangocairo')
+-input = dependency('libinput', version: '>=1.14')
++input = dependency('libinput', required: false, version: '>=1.14')
+ pixman = dependency('pixman-1')
+ math = cc.find_library('m')
+ png = dependency('libpng')
+diff --git a/src/config/libinput.c b/src/config/libinput.c
+index 93ab9af..c350feb 100644
+--- a/src/config/libinput.c
++++ b/src/config/libinput.c
+@@ -8,6 +8,7 @@
+ #include "config/libinput.h"
+ #include "config/rcxml.h"
+ 
++#if WLR_HAS_LIBINPUT_BACKEND
+ static void
+ libinput_category_init(struct libinput_category *l)
+ {
+@@ -73,3 +74,4 @@ libinput_category_get_default(void)
+ 	}
+ 	return NULL;
+ }
++#endif
+diff --git a/src/config/rcxml.c b/src/config/rcxml.c
+index 56f93e3..e7cb213 100644
+--- a/src/config/rcxml.c
++++ b/src/config/rcxml.c
+@@ -446,6 +446,7 @@ fill_touch(char *nodename, char *content)
+ 	}
+ }
+ 
++#if WLR_HAS_LIBINPUT_BACKEND
+ static int
+ get_accel_profile(const char *s)
+ {
+@@ -604,6 +605,7 @@ fill_libinput_category(char *nodename, char *content)
+ 			get_send_events_mode(content);
+ 	}
+ }
++#endif
+ 
+ static void
+ set_font_attr(struct font *font, const char *nodename, const char *content)
+@@ -748,10 +750,12 @@ entry(xmlNode *node, char *nodename, char *content)
+ 		fill_touch(nodename, content);
+ 		return;
+ 	}
++#if WLR_HAS_LIBINPUT_BACKEND
+ 	if (in_libinput_category) {
+ 		fill_libinput_category(nodename, content);
+ 		return;
+ 	}
++#endif
+ 	if (in_regions) {
+ 		fill_region(nodename, content);
+ 		return;
+@@ -1447,6 +1451,7 @@ post_processing(void)
+ 	if (!rc.font_osd.name) {
+ 		rc.font_osd.name = xstrdup("sans");
+ 	}
++#if WLR_HAS_LIBINPUT_BACKEND
+ 	if (!libinput_category_get_default()) {
+ 		/* So we still allow tap to click by default */
+ 		struct libinput_category *l = libinput_category_create();
+@@ -1454,6 +1459,7 @@ post_processing(void)
+ 		(void)l;
+ 		assert(l && libinput_category_get_default() == l);
+ 	}
++#endif
+ 
+ 	int nr_workspaces = wl_list_length(&rc.workspace_config.workspaces);
+ 	if (nr_workspaces < rc.workspace_config.min_nr_workspaces) {
+@@ -1663,12 +1669,14 @@ rcxml_finish(void)
+ 
+ 	zfree(rc.tablet.output_name);
+ 
++#if WLR_HAS_LIBINPUT_BACKEND
+ 	struct libinput_category *l, *l_tmp;
+ 	wl_list_for_each_safe(l, l_tmp, &rc.libinput_categories, link) {
+ 		wl_list_remove(&l->link);
+ 		zfree(l->name);
+ 		zfree(l);
+ 	}
++#endif
+ 
+ 	struct workspace *w, *w_tmp;
+ 	wl_list_for_each_safe(w, w_tmp, &rc.workspace_config.workspaces, link) {
+diff --git a/src/input/keyboard.c b/src/input/keyboard.c
+index 7379a54..90cb1cf 100644
+--- a/src/input/keyboard.c
++++ b/src/input/keyboard.c
+@@ -1,7 +1,6 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+ #include <assert.h>
+ #include <wlr/backend/multi.h>
+-#include <wlr/backend/session.h>
+ #include <wlr/interfaces/wlr_keyboard.h>
+ #include "action.h"
+ #include "idle.h"
+@@ -13,6 +12,10 @@
+ #include "view.h"
+ #include "workspaces.h"
+ 
++#if WLR_HAS_SESSION
++#include <wlr/backend/session.h>
++#endif
++
+ enum lab_key_handled {
+ 	LAB_KEY_HANDLED_FALSE = 0,
+ 	LAB_KEY_HANDLED_TRUE = 1,
+@@ -37,7 +40,9 @@ static bool should_cancel_cycling_on_next_key_release;
+ static void
+ change_vt(struct server *server, unsigned int vt)
+ {
++#if WLR_HAS_SESSION
+ 	wlr_session_change_vt(server->session, vt);
++#endif
+ }
+ 
+ bool
+diff --git a/src/output.c b/src/output.c
+index e1c615e..fb21586 100644
+--- a/src/output.c
++++ b/src/output.c
+@@ -9,11 +9,9 @@
+ #define _POSIX_C_SOURCE 200809L
+ #include <assert.h>
+ #include <strings.h>
+-#include <wlr/backend/drm.h>
+ #include <wlr/backend/headless.h>
+ #include <wlr/backend/wayland.h>
+ #include <wlr/types/wlr_buffer.h>
+-#include <wlr/types/wlr_drm_lease_v1.h>
+ #include <wlr/types/wlr_output.h>
+ #include <wlr/types/wlr_xdg_output_v1.h>
+ #include <wlr/types/wlr_scene.h>
+@@ -29,6 +27,11 @@
+ #include "view.h"
+ #include "xwayland.h"
+ 
++#if WLR_HAS_DRM_BACKEND
++#include <wlr/backend/drm.h>
++#include <wlr/types/wlr_drm_lease_v1.h>
++#endif
++
+ static bool
+ get_tearing_preference(struct output *output)
+ {
+@@ -206,7 +209,7 @@ new_output_notify(struct wl_listener *listener, void *data)
+ 		wlr_output_set_name(wlr_output, server->headless.pending_output_name);
+ 		server->headless.pending_output_name[0] = '\0';
+ 	}
+-
++#if WLR_HAS_DRM_BACKEND
+ 	/*
+ 	 * We offer any display as available for lease, some apps like
+ 	 * gamescope, want to take ownership of a display when they can
+@@ -218,6 +221,7 @@ new_output_notify(struct wl_listener *listener, void *data)
+ 		wlr_drm_lease_v1_manager_offer_output(
+ 			server->drm_lease_manager, wlr_output);
+ 	}
++#endif
+ 
+ 	/*
+ 	 * Don't configure any non-desktop displays, such as VR headsets;
+@@ -502,6 +506,7 @@ verify_output_config_v1(const struct wlr_output_configuration_v1 *config)
+ 		if (!head->state.mode) {
+ 			int32_t refresh = head->state.custom_mode.refresh;
+ 
++#if WLR_HAS_DRM_BACKEND
+ 			if (wlr_output_is_drm(head->state.output) && refresh == 0) {
+ 				/*
+ 				 * wlroots has a bug which causes a divide by zero
+@@ -515,6 +520,7 @@ verify_output_config_v1(const struct wlr_output_configuration_v1 *config)
+ 				err_msg = "DRM backend does not support a refresh rate of 0";
+ 				goto custom_mode_failed;
+ 			}
++#endif
+ 
+ 			if (wlr_output_is_wl(head->state.output) && refresh != 0) {
+ 				/* Wayland backend does not support refresh rates */
+diff --git a/src/seat.c b/src/seat.c
+index e4e69ef..0c70f8d 100644
+--- a/src/seat.c
++++ b/src/seat.c
+@@ -2,7 +2,10 @@
+ #include <assert.h>
+ #include <stdbool.h>
+ #include <strings.h>
++#include <wlr/config.h>
++#if WLR_HAS_LIBINPUT_BACKEND
+ #include <wlr/backend/libinput.h>
++#endif
+ #include <wlr/types/wlr_input_device.h>
+ #include <wlr/types/wlr_keyboard.h>
+ #include <wlr/types/wlr_pointer.h>
+@@ -34,6 +37,7 @@ input_device_destroy(struct wl_listener *listener, void *data)
+ 	free(input);
+ }
+ 
++#if WLR_HAS_LIBINPUT_BACKEND
+ static enum lab_libinput_device_type
+ device_type_from_wlr_device(struct wlr_input_device *wlr_input_device)
+ {
+@@ -57,12 +61,14 @@ device_type_from_wlr_device(struct wlr_input_device *wlr_input_device)
+ 
+ 	return LAB_LIBINPUT_DEVICE_NON_TOUCH;
+ }
++#endif
+ 
+ /*
+  * Get applicable profile (category) by matching first by name and secondly be
+  * type (e.g. 'touch' and 'non-touch'). If not suitable match is found based on
+  * those two criteria we fallback on 'default'.
+  */
++#if WLR_HAS_LIBINPUT_BACKEND
+ static struct libinput_category *
+ get_category(struct wlr_input_device *device)
+ {
+@@ -87,10 +93,12 @@ get_category(struct wlr_input_device *device)
+ 	/* Use default profile as a fallback */
+ 	return libinput_category_get_default();
+ }
++#endif
+ 
+ static void
+ configure_libinput(struct wlr_input_device *wlr_input_device)
+ {
++#if WLR_HAS_LIBINPUT_BACKEND
+ 	/*
+ 	 * TODO: We do not check any return values for the various
+ 	 *       libinput_device_config_*_set_*() calls. It would
+@@ -237,6 +245,7 @@ configure_libinput(struct wlr_input_device *wlr_input_device)
+ 		wlr_log(WLR_INFO, "send events mode configured");
+ 		libinput_device_config_send_events_set_mode(libinput_dev, dc->send_events_mode);
+ 	}
++#endif
+ }
+ 
+ static struct wlr_output *
+diff --git a/src/server.c b/src/server.c
+index c0ee768..9935481 100644
+--- a/src/server.c
++++ b/src/server.c
+@@ -5,6 +5,7 @@
+ #include <sys/wait.h>
+ #include <wlr/backend/headless.h>
+ #include <wlr/backend/multi.h>
++#include <wlr/config.h>
+ #include <wlr/types/wlr_data_control_v1.h>
+ #include <wlr/types/wlr_export_dmabuf_v1.h>
+ #include <wlr/types/wlr_fractional_scale_v1.h>
+@@ -18,7 +19,9 @@
+ #if HAVE_XWAYLAND
+ #include <wlr/xwayland.h>
+ #endif
++#if WLR_HAS_DRM_BACKEND
+ #include "drm-lease-v1-protocol.h"
++#endif
+ #include "config/rcxml.h"
+ #include "config/session.h"
+ #include "decorations.h"
+@@ -135,6 +138,7 @@ handle_input_disinhibit(struct wl_listener *listener, void *data)
+ 	seat_disinhibit_input(&server->seat);
+ }
+ 
++#if WLR_HAS_DRM_BACKEND
+ static void
+ handle_drm_lease_request(struct wl_listener *listener, void *data)
+ {
+@@ -162,6 +166,7 @@ handle_drm_lease_request(struct wl_listener *listener, void *data)
+ 		output->leased = true;
+ 	}
+ }
++#endif
+ 
+ static bool
+ server_global_filter(const struct wl_client *client, const struct wl_global *global, void *data)
+@@ -175,6 +180,7 @@ server_global_filter(const struct wl_client *client, const struct wl_global *glo
+ 	struct wl_client *xwayland_client =
+ 		server->xwayland ? server->xwayland->server->client : NULL;
+ 	if (xwayland_client && client == xwayland_client) {
++#if WLR_HAS_DRM_BACKEND
+ 		/*
+ 		 * Filter out wp_drm_lease_device_v1 for now as it is resulting in
+ 		 * issues with Xwayland applications lagging over time.
+@@ -184,6 +190,7 @@ server_global_filter(const struct wl_client *client, const struct wl_global *glo
+ 		if (!strcmp(iface->name, wp_drm_lease_device_v1_interface.name)) {
+ 			return false;
+ 		}
++#endif
+ 	}
+ #endif
+ 
+@@ -430,6 +437,7 @@ server_init(struct server *server)
+ 
+ 	session_lock_init(server);
+ 
++#if WLR_HAS_DRM_BACKEND
+ 	server->drm_lease_manager = wlr_drm_lease_v1_manager_create(
+ 		server->wl_display, server->backend);
+ 	if (server->drm_lease_manager) {
+@@ -440,6 +448,7 @@ server_init(struct server *server)
+ 		wlr_log(WLR_DEBUG, "Failed to create wlr_drm_lease_device_v1");
+ 		wlr_log(WLR_INFO, "VR will not be available");
+ 	}
++#endif
+ 
+ 	server->output_power_manager_v1 =
+ 		wlr_output_power_manager_v1_create(server->wl_display);

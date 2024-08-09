@@ -310,6 +310,9 @@ PACKAGES+=" patchelf"
 # Needed by lldb for python integration
 PACKAGES+=" swig"
 
+# Needed by wlroots
+PACKAGES+=" glslang-tools"
+
 # Do not require sudo if already running as root.
 SUDO="sudo"
 if [ "$(id -u)" = "0" ]; then
