@@ -1,0 +1,28 @@
+diff -uNr qemu-8.2.5/configure qemu-8.2.5.mod/configure
+--- qemu-8.2.5/configure	2024-06-10 20:19:05.000000000 +0300
++++ qemu-8.2.5.mod/configure	2024-08-10 13:51:42.297414832 +0300
+@@ -238,7 +238,7 @@
+   esac
+ done
+ 
+-default_cflags='-O2 -g'
++default_cflags=''
+ git_submodules_action="update"
+ docs="auto"
+ EXESUF=""
+diff -uNr qemu-8.2.5/meson.build qemu-8.2.5.mod/meson.build
+--- qemu-8.2.5/meson.build	2024-06-10 20:19:05.000000000 +0300
++++ qemu-8.2.5.mod/meson.build	2024-08-10 14:07:03.185763103 +0300
+@@ -4144,9 +4144,9 @@
+   summary_info += {'Objective-C compiler': false}
+ endif
+ option_cflags = (get_option('debug') ? ['-g'] : [])
+-if get_option('optimization') != 'plain'
+-  option_cflags += ['-O' + get_option('optimization')]
+-endif
++#if get_option('optimization') != 'plain'
++#  option_cflags += ['-O' + get_option('optimization')]
++#endif
+ summary_info += {'CFLAGS':            ' '.join(get_option('c_args') + option_cflags)}
+ if 'cpp' in all_languages
+   summary_info += {'CXXFLAGS':        ' '.join(get_option('cpp_args') + option_cflags)}
