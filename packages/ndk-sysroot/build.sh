@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # Version should be equal to TERMUX_NDK_{VERSION_NUM,REVISION} in
 # scripts/properties.sh
 TERMUX_PKG_VERSION=27
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://dl.google.com/android/repository/android-ndk-r${TERMUX_PKG_VERSION}-linux.zip
 TERMUX_PKG_SHA256=2f17eb8bcbfdc40201c0b36e9a70826fcd2524ab7a2a235e2c71186c302da1dc
 TERMUX_PKG_AUTO_UPDATE=false
@@ -28,6 +29,7 @@ include/sys/capability.h
 include/sys/sem.h
 include/sys/shm.h
 include/unicode
+include/vk_video
 include/vulkan
 include/zconf.h
 include/zlib.h
