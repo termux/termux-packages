@@ -29,12 +29,12 @@ termux_step_make_install() {
 
 termux_step_post_make_install() {
 	# Make a placeholder for shell-completions (to be filled with postinst)
-	mkdir -p "${TERMUX_PREFIX}"/share/bash-completions/completions
+	mkdir -p "${TERMUX_PREFIX}"/share/bash-completion/completions
 	mkdir -p "${TERMUX_PREFIX}"/share/elvish/lib
 	mkdir -p "${TERMUX_PREFIX}"/share/fish/vendor_completions.d
 	mkdir -p "${TERMUX_PREFIX}"/share/nushell/vendor/autoload
 	mkdir -p "${TERMUX_PREFIX}"/share/zsh/site-functions
-	touch "${TERMUX_PREFIX}"/share/bash-completions/completions/pueue
+	touch "${TERMUX_PREFIX}"/share/bash-completion/completions/pueue
 	touch "${TERMUX_PREFIX}"/share/elvish/lib/pueue.elv
 	touch "${TERMUX_PREFIX}"/share/fish/vendor_completions.d/pueue.fish
 	touch "${TERMUX_PREFIX}"/share/nushell/vendor/autoload/pueue.nu
@@ -45,7 +45,7 @@ termux_step_create_debscripts() {
 	cat <<-EOF >./postinst
 		#!${TERMUX_PREFIX}/bin/sh
 
-		pueue completions bash > ${TERMUX_PREFIX}/share/bash-completions/completions/pueue
+		pueue completions bash > ${TERMUX_PREFIX}/share/bash-completion/completions/pueue
 		pueue completions elvish > ${TERMUX_PREFIX}/share/elvish/lib/pueue.elv
 		pueue completions fish > ${TERMUX_PREFIX}/share/fish/vendor_completions.d/pueue.fish
 		pueue completions nushell > ${TERMUX_PREFIX}/share/nushell/vendor/autoload/pueue.nu
