@@ -51,4 +51,7 @@ termux_step_create_debscripts() {
 		pueue completions nushell > ${TERMUX_PREFIX}/share/nushell/vendor/autoload/pueue.nu
 		pueue completions zsh > ${TERMUX_PREFIX}/share/zsh/site-functions/_pueue
 	EOF
+	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ]; then
+		echo "post_install" > postupg
+	fi
 }
