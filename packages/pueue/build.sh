@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A command-line task management tool for sequential and p
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@stevenxxiu"
 TERMUX_PKG_VERSION=3.4.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/Nukesor/pueue/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=868710de128db49e0a0c4ddee127dfc0e19b20cbdfd4a9d53d5ed792c5538244
 TERMUX_PKG_BUILD_IN_SRC=true
