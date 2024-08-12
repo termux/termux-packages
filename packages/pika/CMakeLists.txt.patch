@@ -1,0 +1,114 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -67,13 +67,9 @@
+      set(CMAKE_CXX_FLAGS "-pthread -Wl,--no-as-needed -ldl")
+    endif()
+    add_definitions(-DOS_LINUX)
+-else()
+-   message(FATAL_ERROR "only support linux or macOs")
+ endif()
+ 
+-if(HOST_ARCH MATCHES "x86_64" OR HOST_ARCH MATCHES "i386")
+-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse -msse4.2")
+-elseif(HOST_ARCH MATCHES "arm")
++if(HOST_ARCH MATCHES "arm")
+   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=armv8-a+crc+crypto -moutline-atomics")
+ endif()
+ 
+@@ -209,39 +205,7 @@
+ set(GFLAGS_LIBRARY ${INSTALL_LIBDIR}/${LIB_GFLAGS})
+ set(GFLAGS_INCLUDE_DIR ${INSTALL_INCLUDEDIR})
+ 
+-if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+-  ExternalProject_Add(unwind
+-    DEPENDS
+-    URL
+-    https://github.com/libunwind/libunwind/releases/download/v1.6.2/libunwind-1.6.2.tar.gz
+-    URL_HASH
+-    MD5=f625b6a98ac1976116c71708a73dc44a
+-    DOWNLOAD_NO_PROGRESS
+-    1
+-    UPDATE_COMMAND
+-    ""
+-    LOG_CONFIGURE
+-    1
+-    LOG_BUILD
+-    1
+-    LOG_INSTALL
+-    1
+-    CONFIGURE_COMMAND
+-    <SOURCE_DIR>/configure --prefix=${STAGED_INSTALL_PREFIX} --enable-minidebuginfo=no --enable-zlibdebuginfo=no --enable-shared=no
+-    BUILD_IN_SOURCE
+-    1
+-    BUILD_COMMAND
+-    make -j${CPU_CORE}
+-    INSTALL_COMMAND
+-    make install
+-  )
+-  set(LIBUNWIND_LIBRARY ${INSTALL_LIBDIR}/libunwind.a)
+-  set(LIBUNWIND_INCLUDE_DIR ${INSTALL_INCLUDEDIR})
+-  set(LIBUNWIND_NAME unwind)
+-  set(LIBUNWIND_ON ON)
+-else()
+-  set(LIBUNWIND_ON OFF)
+-endif()
++set(LIBUNWIND_ON OFF)
+ 
+ ExternalProject_Add(glog
+   DEPENDS
+@@ -249,9 +213,9 @@
+   gtest
+   ${LIBUNWIND_NAME}
+   URL
+-  https://github.com/google/glog/archive/refs/tags/v0.6.0.tar.gz
++  https://github.com/google/glog/archive/refs/tags/v0.7.0.tar.gz
+   URL_HASH
+-  MD5=c98a6068bc9b8ad9cebaca625ca73aa2
++  MD5=3ced74024300dc289ee1847db19f766e
+   DOWNLOAD_NO_PROGRESS
+   1
+   UPDATE_COMMAND
+@@ -366,9 +366,9 @@
+ ExternalProject_Add(fmt
+   DEPENDS
+   URL
+-  https://github.com/fmtlib/fmt/archive/refs/tags/7.1.0.tar.gz
++  https://github.com/fmtlib/fmt/archive/refs/tags/10.2.1.tar.gz
+   URL_HASH
+-  MD5=32af902636d373641f4ef9032fc65b3a
++  MD5=dc09168c94f90ea890257995f2c497a5
+   DOWNLOAD_NO_PROGRESS
+   1
+   UPDATE_COMMAND
+@@ -384,8 +384,6 @@
+   -DCMAKE_BUILD_TYPE=${LIB_BUILD_TYPE}
+   BUILD_ALWAYS
+   1
+-  BUILD_COMMAND
+-  make -j${CPU_CORE}
+ )
+ 
+ if(${LIB_BUILD_TYPE} STREQUAL DEBUG)
+@@ -540,9 +540,9 @@
+   DEPENDS
+   zlib
+   URL
+-  https://github.com/protocolbuffers/protobuf/releases/download/v3.17.3/protobuf-cpp-3.17.3.tar.gz
++  https://github.com/protocolbuffers/protobuf/archive/refs/tags/v26.0.tar.gz
+   URL_HASH
+-  MD5=3fe4c2647e0991c014a386a896d0a116
++  MD5=44068557aabb2b774a29260740bbccc4
+   DOWNLOAD_NO_PROGRESS
+   1
+   UPDATE_COMMAND
+@@ -559,7 +559,8 @@
+   -DCMAKE_INSTALL_PREFIX=${STAGED_INSTALL_PREFIX}
+   -DCMAKE_BUILD_TYPE=${LIB_BUILD_TYPE}
+   -DBUILD_SHARED_LIBS=FALSE
+-  -Dprotobuf_BUILD_TESTS=FALSE
++  -Dprotobuf_BUILD_TESTS=OFF
++  -Dprotobuf_ABSL_PROVIDER=package
+   BUILD_IN_SOURCE
+   1
+   BUILD_ALWAYS
+
