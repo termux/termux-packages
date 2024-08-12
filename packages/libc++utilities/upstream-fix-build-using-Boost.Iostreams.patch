@@ -1,0 +1,22 @@
+From e79fcf793e4ff3ab90ec870496349725cd9b76dd Mon Sep 17 00:00:00 2001
+From: Martchus <martchus@gmx.net>
+Date: Thu, 8 Aug 2024 12:26:42 +0200
+Subject: [PATCH] Fix build using Boost.Iostreams after 8dcd65bd
+
+---
+ io/nativefilestream.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/io/nativefilestream.cpp b/io/nativefilestream.cpp
+index b0473ee..0d9e0d8 100644
+--- a/io/nativefilestream.cpp
++++ b/io/nativefilestream.cpp
+@@ -196,7 +196,7 @@ NativeFileStream::FileBuffer::FileBuffer(const char *path, ios_base::openmode op
+     buffer = make_unique<StreamBuffer>(handle, boost::iostreams::close_handle);
+     // if we wanted to open assign the descriptor as well: descriptor = _open_osfhandle(reinterpret_cast<intptr_t>(handle), nativeParams.flags);
+ #else
+-    descriptor = ::open(path.data(), nativeParams.openFlags, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
++    descriptor = ::open(path, nativeParams.openFlags, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+     if (descriptor == -1) {
+         throw std::ios_base::failure("open failed", std::error_code(errno, std::system_category()));
+     }
