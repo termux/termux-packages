@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="Oliver Schmidhauser @Neo-Oli"
 # This package depends on libpython${TERMUX_PYTHON_VERSION}.so.
 # Please revbump and rebuild when bumping TERMUX_PYTHON_VERSION.
 TERMUX_PKG_VERSION="0.14.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/profanity-im/profanity/releases/download/$TERMUX_PKG_VERSION/profanity-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=fd23ffd38a31907974a680a3900c959e14d44e16f1fb7df2bdb7f6c67bd7cf7f
 TERMUX_PKG_AUTO_UPDATE=true

@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A full featured command-line backup tool, short for Disk
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.7.15"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/dar/dar/${TERMUX_PKG_VERSION}/dar-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=fac56b59b78b5435ee19541ff4bd3dc329c8252ff78749ffea240f6421534bfe
 TERMUX_PKG_AUTO_UPDATE=true
