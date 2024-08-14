@@ -1,0 +1,18 @@
+--- a/usr/include/time.h
++++ b/usr/include/time.h
+@@ -39,6 +39,7 @@
+ 
+ __BEGIN_DECLS
+ 
++#if __ANDROID_API__ >= 35
+ /* If we just use void* in the typedef, the compiler exposes that in error messages. */
+ struct __timezone_t;
+ 
+@@ -50,6 +51,7 @@
+  * to remove the pointer.
+  */
+ typedef struct __timezone_t* timezone_t;
++#endif
+ 
+ /** Divisor to compute seconds from the result of a call to clock(). */
+ #define CLOCKS_PER_SEC 1000000
