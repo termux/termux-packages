@@ -7,7 +7,7 @@ termux_step_setup_toolchain() {
 		# toolchain setup to ensure that everyone gets an updated
 		# toolchain
 		if [ "${TERMUX_NDK_VERSION}" = "27" ]; then
-			TERMUX_STANDALONE_TOOLCHAIN+="-v0"
+			TERMUX_STANDALONE_TOOLCHAIN+="-v1"
 			termux_setup_toolchain_27
 		elif [ "${TERMUX_NDK_VERSION}" = 23c ]; then
 			TERMUX_STANDALONE_TOOLCHAIN+="-v8"
