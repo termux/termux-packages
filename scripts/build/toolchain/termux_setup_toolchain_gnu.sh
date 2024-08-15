@@ -20,19 +20,30 @@ termux_setup_toolchain_gnu() {
 		export CXXFILT=$TERMUX_HOST_PLATFORM-c++filt
 	fi
 
-	export PATH_DYNAMIC_LINKER="$TERMUX_PREFIX/lib/"
+	if [ ! -d "$TERMUX_PREFIX/lib/" ]; then
+		termux_error_exit "glibc library directory was not found ('$TERMUX_PREFIX/lib/')"
+	fi
+	if [ ! -d "$TERMUX_PREFIX/include/" ]; then
+		termux_error_exit "glibc header directory was not found ('$TERMUX_PREFIX/include/')"
+	fi
+
 	if [ "$TERMUX_ARCH" = "aarch64" ]; then
 		CFLAGS+=" -march=armv8-a"
-		PATH_DYNAMIC_LINKER+="ld-linux-aarch64.so.1"
+		export DYNAMIC_LINKER="ld-linux-aarch64.so.1"
 	elif [ "$TERMUX_ARCH" = "arm" ]; then
 		CFLAGS+=" -march=armv7-a -mfloat-abi=hard -mfpu=neon"
-		PATH_DYNAMIC_LINKER+="ld-linux-armhf.so.3"
+		export DYNAMIC_LINKER="ld-linux-armhf.so.3"
 	elif [ "$TERMUX_ARCH" = "x86_64" ]; then
 		CFLAGS+=" -march=x86-64 -fPIC"
-		PATH_DYNAMIC_LINKER+="ld-linux-x86-64.so.2"
+		export DYNAMIC_LINKER="ld-linux-x86-64.so.2"
 	elif [ "$TERMUX_ARCH" = "i686" ]; then
 		CFLAGS+=" -march=i686"
-		PATH_DYNAMIC_LINKER+="ld-linux.so.2"
+		export DYNAMIC_LINKER="ld-linux.so.2"
+	fi
+	export PATH_DYNAMIC_LINKER="$TERMUX_PREFIX/lib/$DYNAMIC_LINKER"
+
+	if [ ! -f "$PATH_DYNAMIC_LINKER" ]; then
+		termux_error_exit "glibc dynamic linker was not found ('$PATH_DYNAMIC_LINKER')"
 	fi
 
 	case "$TERMUX_ARCH" in
