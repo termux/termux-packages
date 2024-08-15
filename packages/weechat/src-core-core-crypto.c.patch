@@ -1,0 +1,16 @@
+diff -u -r ../weechat-4.3.6/src/core/core-crypto.c ./src/core/core-crypto.c
+--- ../weechat-4.3.6/src/core/core-crypto.c	2024-08-15 13:21:34.000000000 +0000
++++ ./src/core/core-crypto.c	2024-08-15 19:00:04.048492591 +0000
+@@ -31,6 +31,12 @@
+ #include <math.h>
+ #include <gcrypt.h>
+ 
++#ifdef __ANDROID__
++/* Bring in htobe64 */
++#define _BSD_SOURCE
++#include <endian.h>
++#endif
++
+ #include "weechat.h"
+ #include "core-crypto.h"
+ #include "core-config-file.h"
