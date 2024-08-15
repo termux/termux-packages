@@ -1,35 +1,41 @@
---- a/cli/Cargo.toml
-+++ b/cli/Cargo.toml
-@@ -23,5 +23,4 @@ dialoguer = "0.10.0"
- color-eyre = "0.6.0"
+diff -u -r ../magic-wormhole.rs-0.7.1/cli/Cargo.toml ./cli/Cargo.toml
+--- ../magic-wormhole.rs-0.7.1/cli/Cargo.toml	2024-07-25 21:06:53.000000000 +0000
++++ ./cli/Cargo.toml	2024-08-15 10:40:23.896874099 +0000
+@@ -39,9 +39,6 @@
  number_prefix = "0.4.0"
  ctrlc = "3.2.1"
--cli-clipboard = "0.4.0"
  qr2term = "0.3.0"
---- a/cli/src/main.rs
-+++ b/cli/src/main.rs
-@@ -8,7 +8,6 @@ use std::{
+-arboard = { version = "3.2.0", features = [
+-    "wayland-data-control",
+-] } # Wayland by default, fallback to X11.
  
- use async_std::{fs::OpenOptions, sync::Arc};
+ [dev-dependencies]
+ trycmd = "0.15"
+diff -u -r ../magic-wormhole.rs-0.7.1/cli/src/main.rs ./cli/src/main.rs
+--- ../magic-wormhole.rs-0.7.1/cli/src/main.rs	2024-07-25 21:06:53.000000000 +0000
++++ ./cli/src/main.rs	2024-08-15 10:41:40.550532903 +0000
+@@ -3,7 +3,6 @@
+ 
+ use std::time::{Duration, Instant};
+ 
+-use arboard::Clipboard;
+ use async_std::sync::Arc;
  use clap::{Args, CommandFactory, Parser, Subcommand};
--use cli_clipboard::{ClipboardContext, ClipboardProvider};
  use color_eyre::{eyre, eyre::Context};
- use console::{style, Term};
- use futures::{future::Either, Future, FutureExt};
-@@ -283,12 +282,6 @@ async fn main() -> eyre::Result<()> {
+@@ -279,12 +278,6 @@
              .try_init()?;
      }
  
--    let mut clipboard = ClipboardContext::new()
+-    let mut clipboard = Clipboard::new()
 -        .map_err(|err| {
 -            log::warn!("Failed to initialize clipboard support: {}", err);
 -        })
 -        .ok();
 -
-     let concat_file_name = |file_path: &Path, file_name: Option<_>| {
-         // TODO this has gotten out of hand (it ugly)
-         // The correct solution would be to make `file_name` an Option everywhere and
-@@ -337,7 +330,6 @@ async fn main() -> eyre::Result<()> {
+     match app.command {
+         WormholeCommand::Send {
+             common,
+@@ -304,7 +297,6 @@
                      true,
                      transfer::APP_CONFIG,
                      Some(&sender_print_code),
@@ -37,7 +43,7 @@
                  )),
                  ctrl_c(),
              )
-@@ -375,7 +367,6 @@ async fn main() -> eyre::Result<()> {
+@@ -342,7 +334,6 @@
                      true,
                      transfer::APP_CONFIG,
                      Some(&sender_print_code),
@@ -45,7 +51,7 @@
                  ));
                  match futures::future::select(connect_fut, ctrl_c()).await {
                      Either::Left((result, _)) => result?,
-@@ -421,7 +412,6 @@ async fn main() -> eyre::Result<()> {
+@@ -382,7 +373,6 @@
                      false,
                      transfer::APP_CONFIG,
                      None,
@@ -53,7 +59,7 @@
                  ));
                  match futures::future::select(connect_fut, ctrl_c()).await {
                      Either::Left((result, _)) => result?,
-@@ -496,7 +486,6 @@ async fn main() -> eyre::Result<()> {
+@@ -456,7 +446,6 @@
                      true,
                      app_config,
                      Some(&server_print_code),
@@ -61,7 +67,7 @@
                  ));
                  let (wormhole, _code, relay_hints) =
                      match futures::future::select(connect_fut, ctrl_c()).await {
-@@ -532,7 +521,6 @@ async fn main() -> eyre::Result<()> {
+@@ -492,7 +481,6 @@
                  false,
                  app_config,
                  None,
@@ -69,23 +75,23 @@
              )
              .await?;
  
-@@ -618,7 +606,6 @@ async fn parse_and_connect(
-     print_code: Option<
-         &dyn Fn(&mut Term, &magic_wormhole::Code, &Option<url::Url>) -> eyre::Result<()>,
-     >,
--    clipboard: Option<&mut ClipboardContext>,
+@@ -578,7 +566,6 @@
+     is_send: bool,
+     mut app_config: magic_wormhole::AppConfig<impl serde::Serialize + Send + Sync + 'static>,
+     print_code: Option<&PrintCodeFn>,
+-    clipboard: Option<&mut Clipboard>,
  ) -> eyre::Result<(Wormhole, magic_wormhole::Code, Vec<transit::RelayHint>)> {
      // TODO handle relay servers with multiple endpoints better
      let mut relay_hints: Vec<transit::RelayHint> = common_args
-@@ -666,15 +653,8 @@ async fn parse_and_connect(
-             let (server_welcome, connector) =
-                 magic_wormhole::Wormhole::connect_without_code(app_config, numwords).await?;
-             print_welcome(term, &server_welcome)?;
+@@ -621,15 +608,8 @@
+             let mailbox_connection =
+                 MailboxConnection::create(app_config, code_length.unwrap()).await?;
+ 
 -            /* Print code and also copy it to clipboard */
 +            /* Print code */
              if is_send {
 -                if let Some(clipboard) = clipboard {
--                    match clipboard.set_contents(server_welcome.code.to_string()) {
+-                    match clipboard.set_text(mailbox_connection.code().to_string()) {
 -                        Ok(()) => log::info!("Code copied to clipboard"),
 -                        Err(err) => log::warn!("Failed to copy code to clipboard: {}", err),
 -                    }
@@ -93,4 +99,14 @@
 -
                  print_code.expect("`print_code` must be `Some` when `is_send` is `true`")(
                      term,
-                     &server_welcome.code,
+                     mailbox_connection.code(),
+@@ -749,7 +729,7 @@
+     .to_string();
+     writeln!(
+         term,
+-        "\nThis wormhole's code is: {} (it has been copied to your clipboard)",
++        "\nThis wormhole's code is: {}",
+         style(&code).bold()
+     )?;
+     writeln!(term, "This is equivalent to the following link: \u{001B}]8;;{}\u{001B}\\{}\u{001B}]8;;\u{001B}\\", &uri, &uri)?;
+Only in .: target
