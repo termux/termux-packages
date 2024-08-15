@@ -10,18 +10,6 @@ TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	termux_setup_rust
-
-	: "${CARGO_HOME:=$HOME/.cargo}"
-	export CARGO_HOME
-
-	cd "$TERMUX_PKG_SRCDIR"
-	cargo fetch --target "${CARGO_TARGET_NAME}"
-
-	local _patch=$TERMUX_PKG_BUILDER_DIR/tikv-jemalloc-sys-0.5.3+5.3.0-patched-src-lib.rs.diff
-	local d
-	for d in "$CARGO_HOME"/registry/src/*/tikv-jemalloc-sys-*; do
-		patch --silent -p1 -d "${d}" < "${_patch}" || :
-	done
 }
 
 termux_step_make() {
