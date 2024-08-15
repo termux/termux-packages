@@ -16,29 +16,26 @@ termux_setup_flang() {
 		return
 	fi
 
-	local _version="r26b"
-	local _flang_aarch64_libs_url="https://github.com/licy183/ndk-toolchain-clang-with-flang/releases/download/$_version/package-flang-aarch64.tar.bz2"
-	local _flang_toolchain_url="https://github.com/licy183/ndk-toolchain-clang-with-flang/releases/download/$_version/package-flang-host.tar.bz2"
-	local _flang_x86_64_libs_url="https://github.com/licy183/ndk-toolchain-clang-with-flang/releases/download/$_version/package-flang-x86_64.tar.bz2"
-	local _clang_toolchain_url="https://github.com/licy183/ndk-toolchain-clang-with-flang/releases/download/$_version/package-install.tar.bz2"
+	local __cache_dir="$TERMUX_COMMON_CACHEDIR"/flang-toolchain-cache
+	mkdir -p "$__cache_dir"
 
-	local _flang_aarch64_libs_checksum="1f4c3d479f57f782d4b8ef7c55cacf828db7fc119e2d6b97fb6d7754bd4641e5"
-	local _flang_toolchain_checksum="5b26c9645b74883d1ef7c8e90a994c596ddc6d3b5d8ae15bfbf8be45e1496c76"
-	local _flang_x86_64_libs_checksum="cde95a4db5caed12b99a3bdb7f0cfed0b7a675d6d467563c2655be412278b119"
-	local _clang_toolchain_checksum="919741a97a867515b9be8e92089b62f60a99bcc9ecec12912f0749583cedd20b"
-
-	local _flang_toolchain_cache_dir="$TERMUX_COMMON_CACHEDIR/flang-toolchain-cache"
-	mkdir -p $_flang_toolchain_cache_dir
-
-	local _flang_aarch64_libs_file="$_flang_toolchain_cache_dir/$(basename "$_flang_aarch64_libs_url")"
-	local _flang_toolchain_file="$_flang_toolchain_cache_dir/$(basename "$_flang_toolchain_url")"
-	local _flang_x86_64_libs_file="$_flang_toolchain_cache_dir/$(basename "$_flang_x86_64_libs_url")"
-	local _clang_toolchain_file="$_flang_toolchain_cache_dir/$(basename "$_clang_toolchain_url")"
-
-	termux_download $_flang_aarch64_libs_url $_flang_aarch64_libs_file $_flang_aarch64_libs_checksum
-	termux_download $_flang_toolchain_url $_flang_toolchain_file $_flang_toolchain_checksum
-	termux_download $_flang_x86_64_libs_url $_flang_x86_64_libs_file $_flang_x86_64_libs_checksum
-	termux_download $_clang_toolchain_url $_clang_toolchain_file $_clang_toolchain_checksum
+	local __version="r27"
+	local __sha256sums="
+cf8744bf0abd5efa5667dbbd906c72c6d47ed6306daa41bd0b7ddd860772f3cd  package-flang-aarch64.tar.bz2
+508a63c9d268e6758d19c8bd29f1e23de98b768f9ea094e053cb39b72f2abd31  package-flang-host.tar.bz2
+7e4ffe9bb98bcc86d379aa755755495ce34a1835d00c40017e1a20cc0a9e0d7e  package-flang-x86_64.tar.bz2
+f12815f039a4997b59503f1bd6dcd0b0441040ec40bd8813aa29643ee4982a97  package-install.tar.bz2
+	"
+	local __checksum
+	local __file
+	while read -r __checksum __file; do
+		if [ "$__checksum" == "" ]; then continue; fi
+		echo "$__checksum"
+		echo "$__file"
+		termux_download \
+			https://github.com/licy183/ndk-toolchain-clang-with-flang/releases/download/"$__version"/"$__file" \
+			"$__cache_dir/$__file" "$__checksum"
+	done <<< "$__sha256sums"
 
 	local _flang_toolchain_version=0
 
@@ -62,6 +59,12 @@ termux_setup_flang() {
 
 		tar xf $_flang_aarch64_libs_file -C $FLANG_FOLDER_TMP/sysroot/usr/lib/aarch64-linux-android --strip-components=1
 		tar xf $_flang_x86_64_libs_file -C $FLANG_FOLDER_TMP/sysroot/usr/lib/x86_64-linux-android --strip-components=1
+
+		local clang_major_version=$($FLANG_FOLDER_TMP/bin/clang --version | grep -m1 version | sed -E 's|.*\bclang version ([0-9]+).*|\1|')
+		rm -rf $FLANG_FOLDER_TMP/lib/clang/$clang_major_version/lib/
+		mkdir -p $FLANG_FOLDER_TMP/lib/clang/$clang_major_version/lib
+		cp -Rf $TERMUX_STANDALONE_TOOLCHAIN/lib/clang/$clang_major_version/lib/* \
+				$FLANG_FOLDER_TMP/lib/clang/$clang_major_version/lib
 
 		local host_plat
 		local tool
