@@ -30,8 +30,6 @@ f12815f039a4997b59503f1bd6dcd0b0441040ec40bd8813aa29643ee4982a97  package-instal
 	local __file
 	while read -r __checksum __file; do
 		if [ "$__checksum" == "" ]; then continue; fi
-		echo "$__checksum"
-		echo "$__file"
 		termux_download \
 			https://github.com/licy183/ndk-toolchain-clang-with-flang/releases/download/"$__version"/"$__file" \
 			"$__cache_dir/$__file" "$__checksum"
@@ -53,12 +51,14 @@ f12815f039a4997b59503f1bd6dcd0b0441040ec40bd8813aa29643ee4982a97  package-instal
 		rm -rf "$FLANG_FOLDER_TMP"
 		mkdir -p "$FLANG_FOLDER_TMP"
 		cd "$FLANG_FOLDER_TMP"
-		tar xf $_clang_toolchain_file -C $FLANG_FOLDER_TMP --strip-components=4
-		tar xf $_flang_toolchain_file -C $FLANG_FOLDER_TMP --strip-components=1
+		tar xf "$__cache_dir"/package-install.tar.bz2 --strip-components=4
+		tar xf "$__cache_dir"/package-flang-host.tar.bz2 --strip-components=1
 		cp -Rf $TERMUX_STANDALONE_TOOLCHAIN/sysroot $FLANG_FOLDER_TMP/
 
-		tar xf $_flang_aarch64_libs_file -C $FLANG_FOLDER_TMP/sysroot/usr/lib/aarch64-linux-android --strip-components=1
-		tar xf $_flang_x86_64_libs_file -C $FLANG_FOLDER_TMP/sysroot/usr/lib/x86_64-linux-android --strip-components=1
+		tar xf "$__cache_dir"/package-flang-aarch64.tar.bz2 --strip-components=1 \
+			-C "$FLANG_FOLDER_TMP"/sysroot/usr/lib/aarch64-linux-android
+		tar xf "$__cache_dir"/package-flang-x86_64.tar.bz2 --strip-components=1 \
+			-C "$FLANG_FOLDER_TMP"/sysroot/usr/lib/x86_64-linux-android
 
 		local clang_major_version=$($FLANG_FOLDER_TMP/bin/clang --version | grep -m1 version | sed -E 's|.*\bclang version ([0-9]+).*|\1|')
 		rm -rf $FLANG_FOLDER_TMP/lib/clang/$clang_major_version/lib/
