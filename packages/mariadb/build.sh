@@ -64,7 +64,7 @@ TERMUX_PKG_RM_AFTER_INSTALL="
 bin/rcmysql
 bin/mysqltest*
 share/man/man1/mysql-test-run.pl.1
-share/mysql/mysql-test
+share/mariadb/mariadb-test
 mysql-test
 sql-bench
 "
