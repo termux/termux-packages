@@ -56,8 +56,9 @@ termux_step_install_license() {
 					# We only want to include the license files from the source files once
 					if (( ! FROM_SOURCES )); then
 						local FILE
+						local EXTRA_LICENSE_FILES=("LICENCE-${LICENSE// /-}" "LICENSE-${LICENSE// /-}")
 						# Find the license file(s) in the source files
-						for FILE in "${COMMON_LICENSE_FILES[@]}"; do
+						for FILE in "${COMMON_LICENSE_FILES[@]}" "${EXTRA_LICENSE_FILES[@]}"; do
 							[[ -f "$TERMUX_PKG_SRCDIR/$FILE" ]] && {
 								if (( COUNTER )); then
 									cp -f "${TERMUX_PKG_SRCDIR}/$FILE" "${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}/copyright.${COUNTER}"
