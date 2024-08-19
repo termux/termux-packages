@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Qt XmlPatterns Library"
 TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="5.15.14"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/${TERMUX_PKG_VERSION%.*}/${TERMUX_PKG_VERSION}/submodules/qtxmlpatterns-everywhere-opensource-src-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=c73bec56c5c4fe706496ae8f29bdda7bcb59f9faa2fa11feb700d5e2f38caaba
 TERMUX_PKG_DEPENDS="libc++, qt5-qtbase, qt5-qtdeclarative"

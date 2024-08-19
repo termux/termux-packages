@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Qt Development Tools (Linguist, Assistant, Designer, etc
 TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="5.15.14"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/${TERMUX_PKG_VERSION%.*}/${TERMUX_PKG_VERSION}/submodules/qttools-everywhere-opensource-src-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=12061a85baf5f4de8fbc795e1d3872b706f340211b9e70962caeffc6f5e89563
 TERMUX_PKG_DEPENDS="libc++, qt5-qtbase, qt5-qtdeclarative"

@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Qt Serial Port Library"
 TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="5.15.14"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/${TERMUX_PKG_VERSION%.*}/${TERMUX_PKG_VERSION}/submodules/qtserialport-everywhere-opensource-src-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=7bf09ee9886f07efd9a427eb4d7f3cc08baed62456770ab6c0ff13ed0c26cd43
 TERMUX_PKG_DEPENDS="libc++, qt5-qtbase"

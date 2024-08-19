@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="The Qt Declarative module provides classes for using GUI
 TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="5.15.14"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/${TERMUX_PKG_VERSION%.*}/${TERMUX_PKG_VERSION}/submodules/qtdeclarative-everywhere-opensource-src-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=25d9ae3e27efb814f3ca933b6f5acdc754fdefbc714a297040932f133ad1e652
 TERMUX_PKG_DEPENDS="libc++, qt5-qtbase"
