@@ -30,6 +30,9 @@ source "$TERMUX_SCRIPTDIR/scripts/utils/docker/docker.sh"; docker__create_docker
 # Functions for working with packages
 source "$TERMUX_SCRIPTDIR/scripts/utils/package/package.sh"
 
+# Source the repository library.
+source "$TERMUX_SCRIPTDIR/scripts/utils/termux/repository/repository.sh"
+
 export SOURCE_DATE_EPOCH=${SOURCE_DATE_EPOCH:-$(git -c log.showSignature=false log -1 --pretty=%ct 2>/dev/null || date "+%s")}
 
 if [ "$(uname -o)" = "Android" ] || [ -e "/system/bin/app_process" ]; then
@@ -548,20 +551,8 @@ if [ -n "${TERMUX_PACKAGE_LIBRARY-}" ]; then
 fi
 
 if [ "${TERMUX_INSTALL_DEPS-false}" = "true" ] || [ "${TERMUX_PACKAGE_LIBRARY-bionic}" = "glibc" ]; then
-	# Setup PGP keys for verifying integrity of dependencies.
-	# Keys are obtained from our keyring package.
-	gpg --list-keys 2C7F29AE97891F6419A9E2CDB0076E490B71616B > /dev/null 2>&1 || {
-		gpg --import "$TERMUX_SCRIPTDIR/packages/termux-keyring/grimler.gpg"
-		gpg --no-tty --command-file <(echo -e "trust\n5\ny")  --edit-key 2C7F29AE97891F6419A9E2CDB0076E490B71616B
-	}
-	gpg --list-keys CC72CF8BA7DBFA0182877D045A897D96E57CF20C > /dev/null 2>&1 || {
-		gpg --import "$TERMUX_SCRIPTDIR/packages/termux-keyring/termux-autobuilds.gpg"
-		gpg --no-tty --command-file <(echo -e "trust\n5\ny")  --edit-key CC72CF8BA7DBFA0182877D045A897D96E57CF20C
-	}
-	gpg --list-keys 998DE27318E867EA976BA877389CEED64573DFCA > /dev/null 2>&1 || {
-		gpg --import "$TERMUX_SCRIPTDIR/packages/termux-keyring/termux-pacman.gpg"
-		gpg --no-tty --command-file <(echo -e "trust\n5\ny")  --edit-key 998DE27318E867EA976BA877389CEED64573DFCA
-	}
+	# Setup PGP keys for each repo channel in repo.json file for verifying integrity of dependencies.
+	termux_repository__add_repo_signing_keys_to_keystore "$TERMUX_SCRIPTDIR/repo.json" "$TERMUX_SCRIPTDIR"
 fi
 
 for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
