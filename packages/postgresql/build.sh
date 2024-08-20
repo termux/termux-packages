@@ -68,7 +68,7 @@ termux_step_post_make_install() {
 		pg_stat_statements \
 		pg_trgm \
 		pgcrypto \
-                pgroonga \
+            pgroonga \
 		pgrowlocks \
 		postgres_fdw \
 		tablefunc \
