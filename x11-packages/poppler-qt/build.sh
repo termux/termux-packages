@@ -45,12 +45,7 @@ termux_step_pre_configure() {
 	CPPFLAGS+=" -DCMS_NO_REGISTER_KEYWORD"
 }
 
-termux_step_post_massage() {
-	find . ! -type d \
-		! -wholename "./include/poppler/qt5/*" \
-		! -wholename "./lib/libpoppler-qt5.so" \
-		! -wholename "./lib/pkgconfig/poppler-qt5.pc" \
-		! -wholename "./share/doc/$TERMUX_PKG_NAME/*" \
-		-exec rm -f '{}' \;
-	find . -type d -empty -delete
+termux_step_make_install() {
+	cmake --build "${TERMUX_PKG_BUILDDIR}" --target qt5/install
+	install -Dm600 -t "${TERMUX_PREFIX}"/lib/pkgconfig "${TERMUX_PKG_BUILDDIR}"/poppler-qt5.pc
 }
