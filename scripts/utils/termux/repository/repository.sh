@@ -6,121 +6,120 @@
 
 
 ##
-# Add repository signing keys to local keystore.
+# Check that each repos specifies existing signing key names.
 # .
-# Each repo channel dict in `repo.json` file should have a
-# `signing_keys` key for an array of dicts, where each dict contains
-# information for each key that may be required by the parent repo
-# channel. At least one signing key info must exist for each repo
-# channel.
-# .
-# The `key_file` key should be set to the path of the key file. If it
-# is a relative path that does not start a slash `/`, then
-# `termux-packages` repo root directory will be prepended to it.
-# .
-#
-# A dict is being used because other keys may be required
-# in future in addition to current `key_file` key, like `key_format`, etc.
+# Each repo channel must contain a `key` key, which must store
+# a list of signing key names in the `repo.json` file. The names
+# of the signing keys are the keys of the `signing_keys` key,
+# which are configured separately.
 # .
 # ```
 # "<repo_channel_path>": {
-#     "signing_keys": [
-#       {
-#         "key_file": "path/to/key1.gpg"
-#       },
-#       {
-#         "key_file": "path/to/key1.gpg"
-#       }
-#     ]
+#     "keys": ["signing_key1", "signing_key2"]
 # }
 # ```
 # .
 # .
 # **Parameters:**
-# `repo_json_file` - The path to the `repo.json` file.
-# `repo_root_dir` - The path to the `termux-packages` repo root
-#                   directory.
+# `TERMUX_PACKAGES_DIRECTORIES` - list of package directories (repos).
+# `TERMUX_REPO_KEYS` - list of signing key names for each repos.
+# .
+# **Returns:**
+# Returns 0 if everything is ok. Otherwise, an error.
+# .
+# .
+# TERMUX_PACKAGES_DIRECTORIES= TERMUX_REPO_KEYS= termux_repository__check_repo_keys_name
+##
+termux_repository__check_repo_keys_name() {
+	local index=0
+	local repo
+	local key
+	for repo in ${TERMUX_PACKAGES_DIRECTORIES}; do
+		for key in ${TERMUX_REPO_KEYS[$index]}; do
+			if [[ -z "$key" ]] || [[ "$key" == "null" ]]; then
+				echo "The repo channel '${repo}' does not specify a list of signing keys in repo json file" 1>&2
+				return 1
+			fi
+			if ! [[ " ${TERMUX_SIGNING_KEYS} " =~ " ${key} " ]]; then
+				echo "The repo channel '${repo}' specifies non-existent signing key '${key}' in repo json file" 1>&2
+				return 1
+			fi
+		done
+		index=$((index + 1))
+	done
+	return 0
+}
+
+
+
+##
+# Add repository signing keys to local keystore.
+# .
+# To store signing keys, the `signing_keys` key of the `repo.json`
+# file is used. To configure (add) a signing key, you first need to
+# give a name to the signing key, which will be the key of `signing_keys`,
+# and then configure the following keys inside your signing key: `key_file`.
+# .
+# `key_file` - path to signing key file (full path or not full
+# but accessible via path `TERMUX_SCRIPTDIR`).
+# .
+# A dict is being used because other keys may be required
+# in future in addition to current `key_file` key, like `key_format`, etc.
+# .
+# ```
+# "signing_keys": {
+#     "signing_key1": {
+#         "key_file": "path/to/key1.gpg"
+#     },
+#     "signing_key2": {
+#         "key_file": "path/to/key2.gpg"
+#     }
+# }
+# ```
+# .
+# .
+# **Parameters:**
+# `TERMUX_SIGNING_KEYS` - list of signing key names.
+# `TERMUX_SIGNING_KEYS_FILE` - list of paths to the signing key file.
+# `TERMUX_SCRIPTDIR` - full path to the repository directory.
 # .
 # **Returns:**
 # Returns `0` if successful, otherwise returns with a non-zero exit code.
 # .
 # .
-# termux_repository__add_repo_signing_keys_to_keystore `<repo_json_file>`
-#     `<repo_root_dir>`
+# TERMUX_SIGNING_KEYS= TERMUX_SIGNING_KEYS_FILE= TERMUX_SCRIPTDIR= termux_repository__add_repo_signing_keys_to_keystore
 ##
 termux_repository__add_repo_signing_keys_to_keystore() {
+	# The first step is to check the specified key names in repos.
+	termux_repository__check_repo_keys_name
 
-	local repo_json_file="$1"
-	local repo_root_dir="$2"
-
+	# The second stage is adding signing keys.
+	local sig_keys_array=(${TERMUX_SIGNING_KEYS})
 	local gpg_keys_list
-	local i
-	local key_file
-	local repo_channel_path
-	local repo_channel_paths_list
-	local signing_keys_json
-	local signing_keys_json_array_string
+	local index
+	for index in ${!sig_keys_array[@]}; do
+		local sig_key="${sig_keys_array[$index]}"
+		local key_file="${TERMUX_SIGNING_KEYS_FILE[$index]}"
 
-	local -a signing_keys_json_array
-
-	if [[ -z "$repo_json_file" ]]; then
-		echo "The repo_json_file is not set that is passed to 'termux_repository__add_repo_signing_keys_to_keystore'" 1>&2
-		return 1
-	elif [[ ! -f "$repo_json_file" ]]; then
-		echo "The repo_json_file '$repo_json_file' does not exist at path that is passed to 'termux_repository__add_repo_signing_keys_to_keystore'" 1>&2
-		return 1
-	fi
-
-	# Get the paths list for each repo channel and loop on it.
-	repo_channel_paths_list="$(jq --raw-output 'del(.pkg_format) | keys | .[]' "$repo_json_file")" || return $?
-	for repo_channel_path in $repo_channel_paths_list; do
-		# Check if `signing_keys` array exists for repo channel
-		if [[ "$(jq ".[\"$repo_channel_path\"].signing_keys"' | if type=="array" then "found" else "not_found" end' "$repo_json_file")" != '"found"' ]]; then
-			echo "The 'signing_keys' array in '$repo_channel_path' repo channel dict in repo json file '$repo_json_file' does not exist" 1>&2
-			echo "Check 'termux_repository__add_repo_signing_keys_to_keystore()' function for more info." 1>&2
+		if [[ -z "$key_file" ]] || [[ "$key_file" == "null" ]]; then
+			echo "The 'key_file' key for signing key $sig_key in repo json file does not exist or is not set" 1>&2
 			return 1
 		fi
 
-		# Get the json for each `dict` in the the `signing_keys` array
-		# of the repo channel, separated by newlines.
-		signing_keys_json_array_string="$(jq --compact-output ".[\"$repo_channel_path\"].signing_keys[]" "$repo_json_file")" || return $?
-		if [[ -z "$signing_keys_json_array_string" ]]; then
-			echo "The 'signing_keys' array in '$repo_channel_path' repo channel dict in repo json file '$repo_json_file' is empty." 1>&2
-			echo "At least one singing key info must exist for a repo channel." 1>&2
+		if [[ "$key_file" != "/"* ]]; then
+			key_file="$TERMUX_SCRIPTDIR/$key_file"
+		fi
+
+		if [[ ! -f "$key_file" ]]; then
+			echo "The key file '$key_file' for signing key $sig_key in repo json file does not exist at path" 1>&2
 			return 1
 		fi
 
-		# Create an array of jsons and loop on it.
-		readarray -t signing_keys_json_array < <(echo "$signing_keys_json_array_string")
-		i=1
-		for signing_keys_json in "${signing_keys_json_array[@]}"; do
-			key_file=$(echo "$signing_keys_json" | jq --raw-output '.key_file')
-
-			if [[ -z "$key_file" ]] || [[ "$key_file" == "null" ]]; then
-				echo "The 'key_file' key for signing key $i of '$repo_channel_path' repo channel in repo json file '$repo_json_file' does not exist or is not set" 1>&2
-				echo "signing_keys_json: $signing_keys_json" 1>&2
-				return 1
-			fi
-
-			if [[ "$key_file" != "/"* ]]; then
-				key_file="$repo_root_dir/$key_file"
-			fi
-
-			if [[ ! -f "$key_file" ]]; then
-				echo "The key file '$key_file' for signing key $i of '$repo_channel_path' repo channel in repo json file '$repo_json_file' does not exist at path" 1>&2
-				echo "signing_keys_json: $signing_keys_json" 1>&2
-				return 1
-			fi
-
-			gpg_keys_list=$(gpg --show-keys "$key_file" | sed -n 2p | sed -E -e 's/^[ ]+//') || return $?
-			gpg --list-keys "$gpg_keys_list" > /dev/null 2>&1 || {
-				echo "Adding key file '$key_file' for signing key $i of '$repo_channel_path' repo channel in repo json file '$repo_json_file' to gpg keystore"
-				gpg --import "$key_file" || return $?
-				gpg --no-tty --command-file <(echo -e "trust\n5\ny")  --edit-key "$gpg_keys_list" || return $?
-			}
-
-			i=$((i + 1))
-		done
+		gpg_keys_list=$(gpg --show-keys "$key_file" | sed -n 2p | sed -E -e 's/^[ ]+//') || return $?
+		gpg --list-keys "$gpg_keys_list" > /dev/null 2>&1 || {
+			echo "Adding key file '$key_file' for signing key $sig_key in repo json file to gpg keystore"
+			gpg --import "$key_file" || return $?
+			gpg --no-tty --command-file <(echo -e "trust\n5\ny")  --edit-key "$gpg_keys_list" || return $?
+		}
 	done
-
 }

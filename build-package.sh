@@ -544,7 +544,7 @@ fi
 
 if [ "${TERMUX_INSTALL_DEPS-false}" = "true" ] || [ "${TERMUX_PACKAGE_LIBRARY-bionic}" = "glibc" ]; then
 	# Setup PGP keys for each repo channel in repo.json file for verifying integrity of dependencies.
-	termux_repository__add_repo_signing_keys_to_keystore "$TERMUX_SCRIPTDIR/repo.json" "$TERMUX_SCRIPTDIR"
+	termux_repository__add_repo_signing_keys_to_keystore
 fi
 
 for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do

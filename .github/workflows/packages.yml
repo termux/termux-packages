@@ -73,7 +73,7 @@ jobs:
             exit 0
           fi
 
-          for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
+          for repo_path in $(jq --raw-output '.channels | keys | .[]' repo.json); do
             repo=$(jq --raw-output '.["'${repo_path}'"].name' repo.json)
             # Parse changed files and identify new packages and deleted packages.
             # Create lists of those packages that will be passed to upload job for
@@ -108,7 +108,7 @@ jobs:
           done
         else
           for pkg in ${{ github.event.inputs.packages }}; do
-            repo_paths=$(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json)
+            repo_paths=$(jq --raw-output '.channels | keys | .[]' repo.json)
             found=false
             for repo_path in $repo_paths; do
               repo=$(jq --raw-output '.["'${repo_path}'"].name' repo.json)
@@ -127,7 +127,7 @@ jobs:
           done
         fi
 
-        for repo in $(jq --raw-output 'del(.pkg_format) | .[].name' repo.json); do
+        for repo in $(jq --raw-output '.channels | .[].name' repo.json); do
           # Fix so that lists do not contain duplicates
           if [ -f ./built_${repo}_packages.txt ]; then
             sort ./built_${repo}_packages.txt | uniq > ./built_${repo}_packages.txt.tmp
@@ -144,7 +144,7 @@ jobs:
         done
 
         declare -a packages
-        for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
+        for repo_path in $(jq --raw-output '.channels | keys | .[]' repo.json); do
           repo=$(jq --raw-output '.["'${repo_path}'"].name' repo.json)
           if [ -f ./built_${repo}_packages.txt ]; then
             packages="$packages $(cat ./built_${repo}_packages.txt | tr '\n' ' ')"
@@ -174,7 +174,7 @@ jobs:
     - name: Lint packages
       run: |
         declare -a package_recipes
-        for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
+        for repo_path in $(jq --raw-output '.channels | keys | .[]' repo.json); do
           repo=$(jq --raw-output '.["'${repo_path}'"].name' repo.json)
           if [ -f ./built_${repo}_packages.txt ]; then
             package_recipes="$package_recipes $(cat ./built_${repo}_packages.txt | repo_path=${repo_path} awk '{print ENVIRON["repo_path"]"/"$1"/build.sh"}')"
@@ -188,7 +188,7 @@ jobs:
     - name: Free additional disk space (if needed)
       run: |
         declare -a packages
-        for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
+        for repo_path in $(jq --raw-output '.channels | keys | .[]' repo.json); do
           repo=$(jq --raw-output '.["'${repo_path}'"].name' repo.json)
           if [ -f ./built_${repo}_packages.txt ]; then
             packages="$packages $(cat ./built_${repo}_packages.txt | tr '\n' ' ')"
@@ -208,7 +208,7 @@ jobs:
     - name: Build packages
       run: |
         declare -a packages
-        for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
+        for repo_path in $(jq --raw-output '.channels | keys | .[]' repo.json); do
           repo=$(jq --raw-output '.["'${repo_path}'"].name' repo.json)
           if [ -f ./built_${repo}_packages.txt ]; then
             packages="$packages $(cat ./built_${repo}_packages.txt | tr '\n' ' ')"
@@ -226,7 +226,7 @@ jobs:
       run: |
         test -d termux-packages/output && mv termux-packages/output/* ./output/
 
-        for repo in $(jq --raw-output 'del(.pkg_format) | .[].name' repo.json); do
+        for repo in $(jq --raw-output '.channels | .[].name' repo.json); do
           # Put package lists into directory with *.deb files so they will be transferred to
           # upload job.
           test -f ./built_${repo}_packages.txt && mv ./built_${repo}_packages.txt ./debs/
@@ -290,7 +290,7 @@ jobs:
           tar xf "$archive"
         done
 
-        for repo in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
+        for repo in $(jq --raw-output '.channels | keys | .[]' repo.json); do
           export REPOSITORY_NAME=$(jq --raw-output '.["'$repo'"].name' repo.json)
           export REPOSITORY_DISTRIBUTION=$(jq --raw-output '.["'$repo'"].distribution' repo.json)
 

@@ -55,17 +55,22 @@ TERMUX_REPO_PACKAGE="com.termux"
 TERMUX_REPO_URL=()
 TERMUX_REPO_DISTRIBUTION=()
 TERMUX_REPO_COMPONENT=()
+TERMUX_REPO_KEYS=()
+TERMUX_SIGNING_KEYS_FILE=()
+#TERMUX_SIGNING_KEYS_FORMAT=()
 
-export TERMUX_PACKAGES_DIRECTORIES=$(jq --raw-output 'del(.pkg_format) | keys | .[]' ${TERMUX_SCRIPTDIR}/repo.json)
+export TERMUX_PACKAGES_DIRECTORIES=$(jq --raw-output '.channels | keys | join(" ")' ${TERMUX_SCRIPTDIR}/repo.json)
+for pkg_dir in $TERMUX_PACKAGES_DIRECTORIES; do
+	TERMUX_REPO_URL+=("$(jq -r '.channels | ."'${pkg_dir}'" | .url' ${TERMUX_SCRIPTDIR}/repo.json)")
+	TERMUX_REPO_DISTRIBUTION+=("$(jq -r '.channels | ."'${pkg_dir}'" | .distribution' ${TERMUX_SCRIPTDIR}/repo.json)")
+	TERMUX_REPO_COMPONENT+=("$(jq -r '.channels | ."'${pkg_dir}'" | .component' ${TERMUX_SCRIPTDIR}/repo.json)")
+	TERMUX_REPO_KEYS+=("$(jq -r '.channels | ."'${pkg_dir}'" | .keys | if . != null then join(" ") else . end' ${TERMUX_SCRIPTDIR}/repo.json)")
+done
 
-for url in $(jq -r 'del(.pkg_format) | .[] | .url' ${TERMUX_SCRIPTDIR}/repo.json); do
-	TERMUX_REPO_URL+=("$url")
-done
-for distribution in $(jq -r 'del(.pkg_format) | .[] | .distribution' ${TERMUX_SCRIPTDIR}/repo.json); do
-	TERMUX_REPO_DISTRIBUTION+=("$distribution")
-done
-for component in $(jq -r 'del(.pkg_format) | .[] | .component' ${TERMUX_SCRIPTDIR}/repo.json); do
-	TERMUX_REPO_COMPONENT+=("$component")
+export TERMUX_SIGNING_KEYS=$(jq --raw-output '.signing_keys | keys | join(" ")' ${TERMUX_SCRIPTDIR}/repo.json)
+for signing_key in $TERMUX_SIGNING_KEYS; do
+	TERMUX_SIGNING_KEYS_FILE+=("$(jq -r '.signing_keys | ."'${signing_key}'" | .key_file' ${TERMUX_SCRIPTDIR}/repo.json)")
+	#TERMUX_SIGNING_KEYS_FORMAT+=("$(jq -r '.signing_keys | ."'${signing_key}'" | .key_format' ${TERMUX_SCRIPTDIR}/repo.json)")
 done
 
 # Allow to override setup.
