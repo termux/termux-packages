@@ -86,7 +86,7 @@ termux_step_pre_configure() {
 	export HOST_CXX=$(command -v clang++)
 
 	export BINDGEN_CFLAGS="--target=$CCTERMUX_HOST_PLATFORM --sysroot=$TERMUX_PKG_TMPDIR/firefox-toolchain/sysroot"
-	local env_name=BINDGEN_EXTRA_CLANG_ARGS_${CARGO_TARGET_NAME^^}
+	local env_name=BINDGEN_EXTRA_CLANG_ARGS_${CARGO_TARGET_NAME@U}
 	env_name=${env_name//-/_}
 	export $env_name="$BINDGEN_CFLAGS"
 
