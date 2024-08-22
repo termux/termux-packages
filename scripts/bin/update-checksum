@@ -18,8 +18,7 @@
 set -e
 
 if [ "${#}" = "0" ]; then
-	echo
-	echo "Usage: update-sha256 [package name] ..."
+	echo "Usage: update-checksum [package name] ..."
 	echo
 	echo "Update TERMUX_PKG_SHA256 of package and optionally commit changes."
 	echo
@@ -57,10 +56,10 @@ for package in "${@}"; do
 
 	# Command substitution create a subshell, we want to do this
 	# to not effect the main scope's variables by sourcing the build script
-	echo
 	new_checksum=($(
 		source "${buildsh_path}" 2>/dev/null
 		for url in "${TERMUX_PKG_SRCURL[@]}"; do
+			echo "Downloading ${url}" >&2
 			dl_tmpdir=$(mktemp -d "${TMPDIR-/tmp}/termux.src.dl.XXXXXXXX")
 
 			if [[ -d "${dl_tmpdir}" ]]; then
