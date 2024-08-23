@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="A modern feed reader designed for the GNOME desktop"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.0.2
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/patchedsoul/news-flash/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=bc4ce6aa7cd26409d5d9a7ffa539214c9907c7b263eb88f46d8bbab7546fd323
 TERMUX_PKG_AUTO_UPDATE=true
@@ -21,6 +21,7 @@ termux_step_pre_configure() {
 	: "${CARGO_HOME:=$HOME/.cargo}"
 	export CARGO_HOME
 
+	rm -rf $CARGO_HOME/registry/src/*/webkit2gtk-sys-*
 	cargo fetch --target $CARGO_TARGET_NAME
 
 	local p=$TERMUX_PKG_BUILDER_DIR/webkit2gtk-sys.diff
@@ -42,12 +43,12 @@ termux_step_pre_configure() {
 		exec $(command -v cc) -L/usr/lib/x86_64-linux-gnu "\$@"
 	EOF
 	chmod 0700 $wrapper_bin/cc
-	export PATH=$wrapper_bin:$PATH
+	export PATH="$wrapper_bin:$PATH"
 
 	local _CARGO_TARGET_LIBDIR=target/$CARGO_TARGET_NAME/release/deps
 	mkdir -p $_CARGO_TARGET_LIBDIR
 	echo "char *gettext(const char *msgid){return (char *)msgid;}" | \
-		$CC $TARGET_CFLAGS -fPIC -x c -c - -o $wrapper_tmp/gettext.o
+		$CC $CPPFLAGS -fPIC -x c -c - -o $wrapper_tmp/gettext.o
 	local libintl_a=$_CARGO_TARGET_LIBDIR/libintl.a
 	rm -rf $libintl_a
 	$AR cru $libintl_a $wrapper_tmp/gettext.o
@@ -76,4 +77,8 @@ termux_step_make() {
 termux_step_make_install() {
 	install -Dm700 -t $TERMUX_PREFIX/bin \
 		target/${CARGO_TARGET_NAME}/release/news_flash_gtk
+}
+
+termux_step_post_massage() {
+	rm -rf $CARGO_HOME/registry/src/*/webkit2gtk-sys-*
 }
