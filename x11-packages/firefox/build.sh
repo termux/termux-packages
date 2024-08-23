@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Mozilla Firefox web browser"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="129.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://archive.mozilla.org/pub/firefox/releases/${TERMUX_PKG_VERSION}/source/firefox-${TERMUX_PKG_VERSION}.source.tar.xz
 TERMUX_PKG_SHA256=4b9ff955de7099f09aa1f00985e34695fa1a911e56c2d46cb4d60c3bff3d9174
 # ffmpeg and pulseaudio are dependencies through dlopen(3):
@@ -50,6 +51,22 @@ termux_step_post_get_source() {
 }
 
 termux_step_pre_configure() {
+	# XXX: flang toolchain provides libclang.so
+	termux_setup_flang
+	local __fc_dir="$(dirname $(command -v $FC))"
+	local __flang_toolchain_folder="$(realpath "$__fc_dir"/..)"
+	if [ ! -d "$TERMUX_PKG_TMPDIR/firefox-toolchain" ]; then
+		rm -rf "$TERMUX_PKG_TMPDIR"/firefox-toolchain-tmp
+		mv "$__flang_toolchain_folder" "$TERMUX_PKG_TMPDIR"/firefox-toolchain-tmp
+
+		cp "$(command -v "$CC")" "$TERMUX_PKG_TMPDIR"/firefox-toolchain-tmp/bin/
+		cp "$(command -v "$CXX")" "$TERMUX_PKG_TMPDIR"/firefox-toolchain-tmp/bin/
+		cp "$(command -v "$CPP")" "$TERMUX_PKG_TMPDIR"/firefox-toolchain-tmp/bin/
+
+		mv "$TERMUX_PKG_TMPDIR"/firefox-toolchain-tmp "$TERMUX_PKG_TMPDIR"/firefox-toolchain
+	fi
+	export PATH="$TERMUX_PKG_TMPDIR/firefox-toolchain/bin:$PATH"
+
 	termux_setup_nodejs
 	termux_setup_rust
 
@@ -68,6 +85,11 @@ termux_step_pre_configure() {
 	export HOST_CC=$(command -v clang)
 	export HOST_CXX=$(command -v clang++)
 
+	export BINDGEN_CFLAGS="--target=$CCTERMUX_HOST_PLATFORM --sysroot=$TERMUX_PKG_TMPDIR/firefox-toolchain/sysroot"
+	local env_name=BINDGEN_EXTRA_CLANG_ARGS_${CARGO_TARGET_NAME@U}
+	env_name=${env_name//-/_}
+	export $env_name="$BINDGEN_CFLAGS"
+
 	# https://reviews.llvm.org/D141184
 	CXXFLAGS+=" -U__ANDROID__ -D_LIBCPP_HAS_NO_C11_ALIGNED_ALLOC"
 	LDFLAGS+=" -landroid-shmem -landroid-spawn -llog"
@@ -79,6 +101,11 @@ termux_step_pre_configure() {
 }
 
 termux_step_configure() {
+	if [ "$TERMUX_CONTINUE_BUILD" == "true" ]; then
+		termux_step_pre_configure
+		cd $TERMUX_PKG_SRCDIR
+	fi
+
 	sed \
 		-e "s|@TERMUX_HOST_PLATFORM@|${TERMUX_HOST_PLATFORM}|" \
 		-e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|" \
@@ -96,7 +123,7 @@ END
 }
 
 termux_step_make() {
-	./mach build --keep-going
+	./mach build
 	./mach buildsymbols
 }
 
