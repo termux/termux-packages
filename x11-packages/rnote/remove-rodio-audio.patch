@@ -1,0 +1,749 @@
+diff --git a/Cargo.toml b/Cargo.toml
+index 496eb27..edaf9a8 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -61,9 +61,9 @@ rand_distr = "0.4.3"
+ rand_pcg = "0.3.1"
+ rayon = "1.10"
+ regex = "1.10"
+-rodio = { version = "0.19.0", default-features = false, features = [
+-    "symphonia-wav",
+-] }
++# rodio = { version = "0.19.0", default-features = false, features = [
++#     "symphonia-wav",
++# ] }
+ rough_piet = "0.6.0"
+ roughr = "0.6.0"
+ roxmltree = "0.20.0"
+
+diff --git a/crates/rnote-engine/Cargo.toml b/crates/rnote-engine/Cargo.toml
+index c8add53..cbc551a 100644
+--- a/crates/rnote-engine/Cargo.toml
++++ b/crates/rnote-engine/Cargo.toml
+@@ -40,7 +40,7 @@ rand_distr = { workspace = true }
+ rand_pcg = { workspace = true }
+ rayon = { workspace = true }
+ regex = { workspace = true }
+-rodio = { workspace = true }
++# rodio = { workspace = true }
+ rough_piet = { workspace = true }
+ roughr = { workspace = true }
+ roxmltree = { workspace = true }
+
+diff --git a/crates/rnote-engine/src/audioplayer.rs b/crates/rnote-engine/src/audioplayer.rs.bak
+similarity index 100%
+rename from crates/rnote-engine/src/audioplayer.rs
+rename to crates/rnote-engine/src/audioplayer.rs.bak
+
+diff --git a/crates/rnote-engine/src/meson.build b/crates/rnote-engine/src/meson.build
+index eb75fb2..f216f6b 100644
+--- a/crates/rnote-engine/src/meson.build
++++ b/crates/rnote-engine/src/meson.build
+@@ -52,7 +52,7 @@ rnote_engine_sources = files(
+     'strokes/stroke.rs',
+     'strokes/textstroke.rs',
+     'strokes/vectorimage.rs',
+-    'audioplayer.rs',
++#    'audioplayer.rs',
+     'camera.rs',
+     'cloneconfig.rs',
+     'drawable.rs',
+
+diff --git a/crates/rnote-engine/src/lib.rs b/crates/rnote-engine/src/lib.rs
+index 26e98c9..a840589 100644
+--- a/crates/rnote-engine/src/lib.rs
++++ b/crates/rnote-engine/src/lib.rs
+@@ -9,7 +9,7 @@
+ //! The main entry point is the [Engine] struct.
+
+ // Modules
+-pub mod audioplayer;
++// pub mod audioplayer;
+ pub mod camera;
+ pub mod cloneconfig;
+ pub mod document;
+@@ -28,7 +28,7 @@ pub mod utils;
+ pub mod widgetflags;
+
+ // Re-exports
+-pub use audioplayer::AudioPlayer;
++// pub use audioplayer::AudioPlayer;
+ pub use camera::Camera;
+ pub use cloneconfig::CloneConfig;
+ pub use document::Document;
+
+diff --git a/crates/rnote-engine/src/engine/mod.rs b/crates/rnote-engine/src/engine/mod.rs
+index 2e7ad19..abecc5d 100644
+--- a/crates/rnote-engine/src/engine/mod.rs
++++ b/crates/rnote-engine/src/engine/mod.rs
+@@ -22,7 +22,7 @@ use crate::store::render_comp::{self, RenderCompState};
+ use crate::store::StrokeKey;
+ use crate::strokes::content::GeneratedContentImages;
+ use crate::strokes::textstroke::{TextAttribute, TextStyle};
+-use crate::{render, AudioPlayer, CloneConfig, SelectionCollision, WidgetFlags};
++use crate::{render, CloneConfig, SelectionCollision, WidgetFlags};
+ use crate::{Camera, Document, PenHolder, StrokeStore};
+ use futures::channel::{mpsc, oneshot};
+ use p2d::bounding_volume::{Aabb, BoundingVolume};
+@@ -31,7 +31,7 @@ use rnote_compose::ext::AabbExt;
+ use rnote_compose::penevent::{PenEvent, ShortcutKey};
+ use rnote_compose::{Color, SplitOrder};
+ use serde::{Deserialize, Serialize};
+-use std::path::PathBuf;
++// use std::path::PathBuf;
+ use std::sync::Arc;
+ use std::time::Instant;
+
+@@ -44,7 +44,6 @@ pub struct EngineView<'a> {
+     pub document: &'a Document,
+     pub store: &'a StrokeStore,
+     pub camera: &'a Camera,
+-    pub audioplayer: &'a Option<AudioPlayer>,
+ }
+
+ /// A mutable view into the engine, excluding the penholder.
+@@ -55,7 +54,6 @@ pub struct EngineViewMut<'a> {
+     pub document: &'a mut Document,
+     pub store: &'a mut StrokeStore,
+     pub camera: &'a mut Camera,
+-    pub audioplayer: &'a mut Option<AudioPlayer>,
+ }
+
+ impl<'a> EngineViewMut<'a> {
+@@ -67,7 +65,6 @@ impl<'a> EngineViewMut<'a> {
+             document: self.document,
+             store: self.store,
+             camera: self.camera,
+-            audioplayer: self.audioplayer,
+         }
+     }
+ }
+@@ -119,8 +116,6 @@ pub struct EngineConfig {
+     import_prefs: ImportPrefs,
+     #[serde(rename = "export_prefs")]
+     export_prefs: ExportPrefs,
+-    #[serde(rename = "pen_sounds")]
+-    pen_sounds: bool,
+     #[serde(rename = "optimize_epd")]
+     optimize_epd: bool,
+ }
+@@ -167,13 +162,9 @@ pub struct Engine {
+     pub import_prefs: ImportPrefs,
+     #[serde(rename = "export_prefs")]
+     pub export_prefs: ExportPrefs,
+-    #[serde(rename = "pen_sounds")]
+-    pen_sounds: bool,
+     #[serde(rename = "optimize_epd")]
+     optimize_epd: bool,
+
+-    #[serde(skip)]
+-    audioplayer: Option<AudioPlayer>,
+     #[serde(skip)]
+     visual_debug: bool,
+     // the task sender. Must not be modified, only cloned.
+@@ -207,10 +198,8 @@ impl Default for Engine {
+             penholder: PenHolder::default(),
+             import_prefs: ImportPrefs::default(),
+             export_prefs: ExportPrefs::default(),
+-            pen_sounds: false,
+             optimize_epd: false,
+
+-            audioplayer: None,
+             visual_debug: false,
+             tasks_tx: EngineTaskSender(tasks_tx),
+             tasks_rx: Some(EngineTaskReceiver(tasks_rx)),
+@@ -243,7 +232,6 @@ impl Engine {
+             document: &self.document,
+             store: &self.store,
+             camera: &self.camera,
+-            audioplayer: &self.audioplayer,
+         }
+     }
+
+@@ -255,36 +243,6 @@ impl Engine {
+             document: &mut self.document,
+             store: &mut self.store,
+             camera: &mut self.camera,
+-            audioplayer: &mut self.audioplayer,
+-        }
+-    }
+-
+-    /// Whether pen sounds are enabled.
+-    pub fn pen_sounds(&self) -> bool {
+-        self.pen_sounds
+-    }
+-
+-    /// Enables/disables the pen sounds.
+-    ///
+-    /// If pen sound should be enabled, the pkg data dir must be provided.
+-    pub fn set_pen_sounds(&mut self, pen_sounds: bool, pkg_data_dir: Option<PathBuf>) {
+-        self.pen_sounds = pen_sounds;
+-
+-        if pen_sounds {
+-            if let Some(pkg_data_dir) = pkg_data_dir {
+-                // Only create and init a new audioplayer if it does not already exists
+-                if self.audioplayer.is_none() {
+-                    self.audioplayer = match AudioPlayer::new_init(pkg_data_dir) {
+-                        Ok(audioplayer) => Some(audioplayer),
+-                        Err(e) => {
+-                            tracing::error!("Creating a new audioplayer failed while enabling pen sounds, Err: {e:?}");
+-                            None
+-                        }
+-                    }
+-                }
+-            }
+-        } else {
+-            self.audioplayer.take();
+         }
+     }
+
+@@ -486,7 +444,6 @@ impl Engine {
+                 document: &mut self.document,
+                 store: &mut self.store,
+                 camera: &mut self.camera,
+-                audioplayer: &mut self.audioplayer,
+             },
+         )
+     }
+@@ -506,7 +463,6 @@ impl Engine {
+                 document: &mut self.document,
+                 store: &mut self.store,
+                 camera: &mut self.camera,
+-                audioplayer: &mut self.audioplayer,
+             },
+         )
+     }
+@@ -521,7 +477,6 @@ impl Engine {
+                 document: &mut self.document,
+                 store: &mut self.store,
+                 camera: &mut self.camera,
+-                audioplayer: &mut self.audioplayer,
+             },
+         )
+     }
+@@ -539,7 +494,6 @@ impl Engine {
+                 document: &mut self.document,
+                 store: &mut self.store,
+                 camera: &mut self.camera,
+-                audioplayer: &mut self.audioplayer,
+             },
+         )
+     }
+@@ -554,7 +508,6 @@ impl Engine {
+                 document: &mut self.document,
+                 store: &mut self.store,
+                 camera: &mut self.camera,
+-                audioplayer: &mut self.audioplayer,
+             },
+         )
+     }
+@@ -568,7 +521,6 @@ impl Engine {
+                 document: &mut self.document,
+                 store: &mut self.store,
+                 camera: &mut self.camera,
+-                audioplayer: &mut self.audioplayer,
+             })
+     }
+
+@@ -767,7 +719,6 @@ impl Engine {
+             document: &mut self.document,
+             store: &mut self.store,
+             camera: &mut self.camera,
+-            audioplayer: &mut self.audioplayer,
+         })
+     }
+
+@@ -782,7 +733,6 @@ impl Engine {
+             document: &self.document,
+             store: &self.store,
+             camera: &self.camera,
+-            audioplayer: &self.audioplayer,
+         })
+     }
+
+@@ -797,7 +747,6 @@ impl Engine {
+             document: &mut self.document,
+             store: &mut self.store,
+             camera: &mut self.camera,
+-            audioplayer: &mut self.audioplayer,
+         })
+     }
+
+@@ -906,7 +855,6 @@ impl Engine {
+                     document: &mut self.document,
+                     store: &mut self.store,
+                     camera: &mut self.camera,
+-                    audioplayer: &mut self.audioplayer,
+                 },
+             )
+         }
+@@ -923,7 +871,6 @@ impl Engine {
+                     document: &mut self.document,
+                     store: &mut self.store,
+                     camera: &mut self.camera,
+-                    audioplayer: &mut self.audioplayer,
+                 })
+         }
+         widget_flags
+@@ -943,7 +890,6 @@ impl Engine {
+                     document: &mut self.document,
+                     store: &mut self.store,
+                     camera: &mut self.camera,
+-                    audioplayer: &mut self.audioplayer,
+                 },
+             )
+         }
+@@ -961,7 +907,6 @@ impl Engine {
+                     document: &mut self.document,
+                     store: &mut self.store,
+                     camera: &mut self.camera,
+-                    audioplayer: &mut self.audioplayer,
+                 },
+             )
+         }
+@@ -980,7 +925,6 @@ impl Engine {
+                         document: &mut self.document,
+                         store: &mut self.store,
+                         camera: &mut self.camera,
+-                        audioplayer: &mut self.audioplayer,
+                     },
+                 )
+             } else {
+@@ -992,7 +936,6 @@ impl Engine {
+                         document: &mut self.document,
+                         store: &mut self.store,
+                         camera: &mut self.camera,
+-                        audioplayer: &mut self.audioplayer,
+                     },
+                 )
+             }
+
+
+diff --git a/crates/rnote-engine/src/pens/brush.rs b/crates/rnote-engine/src/pens/brush.rs
+index d993bb8..8defca6 100644
+--- a/crates/rnote-engine/src/pens/brush.rs
++++ b/crates/rnote-engine/src/pens/brush.rs
+@@ -74,12 +74,6 @@ impl PenBehaviour for Brush {
+                         .bounds()
+                         .loosened(Self::INPUT_OVERSHOOT),
+                 ) {
+-                    if engine_view.pens_config.brush_config.style == BrushStyle::Marker {
+-                        play_marker_sound(engine_view);
+-                    } else {
+-                        trigger_brush_sound(engine_view);
+-                    }
+-
+                     engine_view.pens_config.brush_config.new_style_seeds();
+
+                     let brushstroke = Stroke::BrushStroke(BrushStroke::new(
+@@ -176,18 +170,8 @@ impl PenBehaviour for Brush {
+                 let propagate = builder_result.propagate;
+
+                 let progress = match builder_result.progress {
+-                    BuilderProgress::InProgress => {
+-                        if engine_view.pens_config.brush_config.style != BrushStyle::Marker {
+-                            trigger_brush_sound(engine_view);
+-                        }
+-
+-                        PenProgress::InProgress
+-                    }
++                    BuilderProgress::InProgress => PenProgress::InProgress,
+                     BuilderProgress::EmitContinue(segments) => {
+-                        if engine_view.pens_config.brush_config.style != BrushStyle::Marker {
+-                            trigger_brush_sound(engine_view);
+-                        }
+-
+                         let n_segments = segments.len();
+
+                         if n_segments != 0 {
+@@ -313,18 +297,6 @@ impl Brush {
+     const INPUT_OVERSHOOT: f64 = 30.0;
+ }
+
+-fn play_marker_sound(engine_view: &mut EngineViewMut) {
+-    if let Some(audioplayer) = engine_view.audioplayer {
+-        audioplayer.play_random_marker_sound();
+-    }
+-}
+-
+-fn trigger_brush_sound(engine_view: &mut EngineViewMut) {
+-    if let Some(audioplayer) = engine_view.audioplayer.as_mut() {
+-        audioplayer.trigger_random_brush_sound();
+-    }
+-}
+-
+ fn new_builder(
+     builder_type: PenPathBuilderType,
+     element: Element,
+
+diff --git a/crates/rnote-engine/src/pens/typewriter/mod.rs b/crates/rnote-engine/src/pens/typewriter/mod.rs
+index f4bd028..63d1c0a 100644
+--- a/crates/rnote-engine/src/pens/typewriter/mod.rs
++++ b/crates/rnote-engine/src/pens/typewriter/mod.rs
+@@ -9,12 +9,12 @@ use crate::engine::{EngineTask, EngineView, EngineViewMut};
+ use crate::store::StrokeKey;
+ use crate::strokes::textstroke::{RangedTextAttribute, TextAttribute, TextStyle};
+ use crate::strokes::{Stroke, TextStroke};
+-use crate::{AudioPlayer, Camera, DrawableOnDoc, WidgetFlags};
++use crate::{Camera, DrawableOnDoc, WidgetFlags};
+ use futures::channel::oneshot;
+ use p2d::bounding_volume::{Aabb, BoundingVolume};
+ use piet::RenderContext;
+ use rnote_compose::ext::{AabbExt, Vector2Ext};
+-use rnote_compose::penevent::{KeyboardKey, PenEvent, PenProgress, PenState};
++use rnote_compose::penevent::{PenEvent, PenProgress, PenState};
+ use rnote_compose::shapes::Shapeable;
+ use rnote_compose::style::indicators;
+ use rnote_compose::EventResult;
+@@ -916,9 +916,3 @@ impl Typewriter {
+         self.cursor_visible = true;
+     }
+ }
+-
+-fn play_sound(keyboard_key: Option<KeyboardKey>, audioplayer: &mut Option<AudioPlayer>) {
+-    if let Some(audioplayer) = audioplayer {
+-        audioplayer.play_typewriter_key_sound(keyboard_key);
+-    }
+-}
+
+diff --git a/crates/rnote-engine/src/pens/typewriter/penevents.rs b/crates/rnote-engine/src/pens/typewriter/penevents.rs
+index 3fc6de8..8412aa5 100644
+--- a/crates/rnote-engine/src/pens/typewriter/penevents.rs
++++ b/crates/rnote-engine/src/pens/typewriter/penevents.rs
+@@ -495,8 +495,6 @@ impl Typewriter {
+                 progress: PenProgress::Idle,
+             },
+             TypewriterState::Start(pos) => {
+-                super::play_sound(Some(keyboard_key), engine_view.audioplayer);
+-
+                 match keyboard_key {
+                     KeyboardKey::Unicode(keychar) => {
+                         text_style.ranged_text_attributes.clear();
+@@ -548,8 +546,6 @@ impl Typewriter {
+             } => {
+                 match modify_state {
+                     ModifyState::Up | ModifyState::Hover(_) => {
+-                        super::play_sound(Some(keyboard_key), engine_view.audioplayer);
+-
+                         if let Some(Stroke::TextStroke(ref mut textstroke)) =
+                             engine_view.store.get_stroke_mut(*stroke_key)
+                         {
+@@ -822,8 +818,6 @@ impl Typewriter {
+                         selection_cursor,
+                         finished,
+                     } => {
+-                        super::play_sound(Some(keyboard_key), engine_view.audioplayer);
+-
+                         if let Some(Stroke::TextStroke(textstroke)) =
+                             engine_view.store.get_stroke_mut(*stroke_key)
+                         {
+@@ -1068,8 +1062,6 @@ impl Typewriter {
+                 progress: PenProgress::Idle,
+             },
+             TypewriterState::Start(pos) => {
+-                super::play_sound(None, engine_view.audioplayer);
+-
+                 text_style.ranged_text_attributes.clear();
+                 text_style.set_max_width(Some(text_width));
+                 let text_len = text.len();
+@@ -1110,8 +1102,6 @@ impl Typewriter {
+             } => {
+                 match modify_state {
+                     ModifyState::Up | ModifyState::Hover(_) => {
+-                        super::play_sound(None, engine_view.audioplayer);
+-
+                         if let Some(Stroke::TextStroke(ref mut textstroke)) =
+                             engine_view.store.get_stroke_mut(*stroke_key)
+                         {
+@@ -1151,8 +1141,6 @@ impl Typewriter {
+                         selection_cursor,
+                         finished,
+                     } => {
+-                        super::play_sound(None, engine_view.audioplayer);
+-
+                         if let Some(Stroke::TextStroke(textstroke)) =
+                             engine_view.store.get_stroke_mut(*stroke_key)
+                         {
+
+diff --git a/crates/rnote-engine/src/engine/import.rs b/crates/rnote-engine/src/engine/import.rs
+index 7ba5359..ec600e3 100644
+--- a/crates/rnote-engine/src/engine/import.rs
++++ b/crates/rnote-engine/src/engine/import.rs
+@@ -152,7 +152,7 @@ impl Engine {
+     pub fn load_engine_config(
+         &mut self,
+         engine_config: EngineConfig,
+-        data_dir: Option<PathBuf>,
++        _data_dir: Option<PathBuf>,
+     ) -> WidgetFlags {
+         let mut widget_flags = WidgetFlags::default();
+
+@@ -162,9 +162,6 @@ impl Engine {
+         self.import_prefs = engine_config.import_prefs;
+         self.export_prefs = engine_config.export_prefs;
+
+-        // Set the pen sounds to update the audioplayer
+-        self.set_pen_sounds(engine_config.pen_sounds, data_dir);
+-
+         self.set_optimize_epd(engine_config.optimize_epd);
+
+         widget_flags |= self
+@@ -175,7 +172,6 @@ impl Engine {
+                 document: &mut self.document,
+                 store: &mut self.store,
+                 camera: &mut self.camera,
+-                audioplayer: &mut self.audioplayer,
+             });
+         widget_flags |= self.doc_resize_to_fit_content();
+         widget_flags.redraw = true;
+@@ -187,7 +183,7 @@ impl Engine {
+     pub fn load_engine_config_sync_tab(
+         &mut self,
+         engine_config: EngineConfig,
+-        data_dir: Option<PathBuf>,
++        _data_dir: Option<PathBuf>,
+     ) -> WidgetFlags {
+         let mut widget_flags = WidgetFlags::default();
+
+@@ -196,9 +192,6 @@ impl Engine {
+         self.import_prefs = engine_config.import_prefs;
+         self.export_prefs = engine_config.export_prefs;
+
+-        // Set the pen sounds to update the audioplayer
+-        self.set_pen_sounds(engine_config.pen_sounds, data_dir);
+-
+         self.set_optimize_epd(engine_config.optimize_epd);
+
+         widget_flags |= self
+@@ -209,7 +202,6 @@ impl Engine {
+                 document: &mut self.document,
+                 store: &mut self.store,
+                 camera: &mut self.camera,
+-                audioplayer: &mut self.audioplayer,
+             });
+         widget_flags |= self.doc_resize_to_fit_content();
+         widget_flags.redraw = true;
+@@ -218,15 +210,13 @@ impl Engine {
+     }
+
+     /// Import and replaces the engine config.
+-    ///
+-    /// If pen sounds should be enabled the rnote data-dir must be provided.
+     pub fn import_engine_config_from_json(
+         &mut self,
+         serialized_config: &str,
+         data_dir: Option<PathBuf>,
+     ) -> anyhow::Result<WidgetFlags> {
+         let engine_config = serde_json::from_str::<EngineConfig>(serialized_config)?;
+-        Ok(self.load_engine_config(engine_config, data_dir))
++        Ok(self.load_engine_config(engine_config, data_dir))
+     }
+
+     /// Generate a vectorimage from the bytes.
+@@ -439,7 +429,6 @@ impl Engine {
+                     document: &mut self.document,
+                     store: &mut self.store,
+                     camera: &mut self.camera,
+-                    audioplayer: &mut self.audioplayer,
+                 },
+             );
+         }
+@@ -490,7 +479,6 @@ impl Engine {
+             document: &mut self.document,
+             store: &mut self.store,
+             camera: &mut self.camera,
+-            audioplayer: &mut self.audioplayer,
+         });
+
+         widget_flags |= self.store.record(Instant::now());
+
+diff --git a/crates/rnote-engine/src/engine/export.rs b/crates/rnote-engine/src/engine/export.rs
+index 7c59237..b8c7720 100644
+--- a/crates/rnote-engine/src/engine/export.rs
++++ b/crates/rnote-engine/src/engine/export.rs
+@@ -353,7 +353,6 @@ impl Engine {
+             penholder: self.penholder.clone_config(),
+             import_prefs: self.import_prefs.clone_config(),
+             export_prefs: self.export_prefs.clone_config(),
+-            pen_sounds: self.pen_sounds(),
+             optimize_epd: self.optimize_epd(),
+         }
+     }
+
+diff --git a/crates/rnote-engine/src/engine/rendering.rs b/crates/rnote-engine/src/engine/rendering.rs
+index 30888b5..3f80ce0 100644
+--- a/crates/rnote-engine/src/engine/rendering.rs
++++ b/crates/rnote-engine/src/engine/rendering.rs
+@@ -198,7 +198,6 @@ impl Engine {
+                 document: &self.document,
+                 store: &self.store,
+                 camera: &self.camera,
+-                audioplayer: &self.audioplayer,
+             },
+         )?;
+
+diff --git a/crates/rnote-engine/src/engine/visual_debug.rs b/crates/rnote-engine/src/engine/visual_debug.rs
+index 5b673ff..a469257 100644
+--- a/crates/rnote-engine/src/engine/visual_debug.rs
++++ b/crates/rnote-engine/src/engine/visual_debug.rs
+@@ -234,7 +234,6 @@ pub(crate) fn draw_stroke_debug_to_gtk_snapshot(
+         document: &engine.document,
+         store: &engine.store,
+         camera: &engine.camera,
+-        audioplayer: &engine.audioplayer,
+     }) {
+         draw_bounds_to_gtk_snapshot(bounds, COLOR_SELECTOR_BOUNDS, snapshot, border_widths);
+     }
+
+diff --git a/crates/rnote-ui/data/ui/canvasmenu.ui b/crates/rnote-ui/data/ui/canvasmenu.ui
+index c123305..c6af1ac 100644
+--- a/crates/rnote-ui/data/ui/canvasmenu.ui
++++ b/crates/rnote-ui/data/ui/canvasmenu.ui
+@@ -25,11 +25,6 @@
+             <attribute name="toggle" />
+             <attribute name="action">win.snap-positions</attribute>
+           </item>
+-          <item>
+-            <attribute name="label" translatable="yes">_Pen Sounds</attribute>
+-            <attribute name="toggle" />
+-            <attribute name="action">win.pen-sounds</attribute>
+-          </item>
+           <item>
+             <attribute name="label" translatable="yes">_Return to Origin Page</attribute>
+             <attribute name="action">win.return-origin-page</attribute>
+
+diff --git a/crates/rnote-ui/src/appwindow/mod.rs b/crates/rnote-ui/src/appwindow/mod.rs
+index 935e09a..b512b75 100644
+--- a/crates/rnote-ui/src/appwindow/mod.rs
++++ b/crates/rnote-ui/src/appwindow/mod.rs
+@@ -630,7 +630,6 @@ impl RnAppWindow {
+
+         // Avoids already borrowed
+         let pen_style = canvas.engine_ref().penholder.current_pen_style_w_override();
+-        let pen_sounds = canvas.engine_ref().pen_sounds();
+         let doc_format = canvas.engine_ref().document.format;
+         let total_zoom = canvas.engine_ref().camera.total_zoom();
+         let snap_positions = canvas.engine_ref().document.snap_positions;
+@@ -656,11 +655,6 @@ impl RnAppWindow {
+             "pen-style",
+             &pen_style.to_string().to_variant(),
+         );
+-        adw::prelude::ActionGroupExt::change_action_state(
+-            self,
+-            "pen-sounds",
+-            &pen_sounds.to_variant(),
+-        );
+         adw::prelude::ActionGroupExt::change_action_state(
+             self,
+             "snap-positions",
+
+diff --git a/crates/rnote-ui/src/appwindow/actions.rs b/crates/rnote-ui/src/appwindow/actions.rs
+index 14676df..2934f65 100644
+--- a/crates/rnote-ui/src/appwindow/actions.rs
++++ b/crates/rnote-ui/src/appwindow/actions.rs
+@@ -67,9 +67,6 @@ impl RnAppWindow {
+         let action_focus_mode = gio::PropertyAction::new("focus-mode", self, "focus-mode");
+         self.add_action(&action_focus_mode);
+
+-        let action_pen_sounds =
+-            gio::SimpleAction::new_stateful("pen-sounds", None, &false.to_variant());
+-        self.add_action(&action_pen_sounds);
+         let action_snap_positions =
+             gio::SimpleAction::new_stateful("snap-positions", None, &false.to_variant());
+         self.add_action(&action_snap_positions);
+@@ -278,15 +275,6 @@ impl RnAppWindow {
+             }),
+         );
+
+-        // Pen sounds
+-        action_pen_sounds.connect_change_state(
+-            clone!(@weak self as appwindow => move |action, state_request| {
+-                let pen_sounds = state_request.unwrap().get::<bool>().unwrap();
+-                appwindow.active_tab_wrapper().canvas().engine_mut().set_pen_sounds(pen_sounds, crate::env::pkg_data_dir().ok());
+-                action.set_state(&pen_sounds.to_variant());
+-            }),
+-        );
+-
+         // Snap positions
+         action_snap_positions.connect_change_state(
+             clone!(@weak self as appwindow => move |action, state_request| {
+
+diff --git a/crates/rnote-engine/data/meson.build b/crates/rnote-engine/data/meson.build
+index fe32317..47ee6b1 100644
+--- a/crates/rnote-engine/data/meson.build
++++ b/crates/rnote-engine/data/meson.build
+@@ -1,59 +1,10 @@
+ # sounds
+ sounds_files = files(
+-    'sounds/brush/brush.wav',
+-    'sounds/marker/marker_00.wav',
+-    'sounds/marker/marker_01.wav',
+-    'sounds/marker/marker_02.wav',
+-    'sounds/marker/marker_03.wav',
+-    'sounds/marker/marker_04.wav',
+-    'sounds/marker/marker_05.wav',
+-    'sounds/marker/marker_06.wav',
+-    'sounds/marker/marker_07.wav',
+-    'sounds/marker/marker_08.wav',
+-    'sounds/marker/marker_09.wav',
+-    'sounds/marker/marker_10.wav',
+-    'sounds/marker/marker_11.wav',
+-    'sounds/marker/marker_12.wav',
+-    'sounds/marker/marker_13.wav',
+-    'sounds/marker/marker_14.wav',
+-    'sounds/typewriter/typewriter_00.wav',
+-    'sounds/typewriter/typewriter_01.wav',
+-    'sounds/typewriter/typewriter_02.wav',
+-    'sounds/typewriter/typewriter_03.wav',
+-    'sounds/typewriter/typewriter_04.wav',
+-    'sounds/typewriter/typewriter_05.wav',
+-    'sounds/typewriter/typewriter_06.wav',
+-    'sounds/typewriter/typewriter_07.wav',
+-    'sounds/typewriter/typewriter_08.wav',
+-    'sounds/typewriter/typewriter_09.wav',
+-    'sounds/typewriter/typewriter_10.wav',
+-    'sounds/typewriter/typewriter_11.wav',
+-    'sounds/typewriter/typewriter_12.wav',
+-    'sounds/typewriter/typewriter_13.wav',
+-    'sounds/typewriter/typewriter_14.wav',
+-    'sounds/typewriter/typewriter_15.wav',
+-    'sounds/typewriter/typewriter_16.wav',
+-    'sounds/typewriter/typewriter_17.wav',
+-    'sounds/typewriter/typewriter_18.wav',
+-    'sounds/typewriter/typewriter_19.wav',
+-    'sounds/typewriter/typewriter_20.wav',
+-    'sounds/typewriter/typewriter_21.wav',
+-    'sounds/typewriter/typewriter_22.wav',
+-    'sounds/typewriter/typewriter_23.wav',
+-    'sounds/typewriter/typewriter_24.wav',
+-    'sounds/typewriter/typewriter_25.wav',
+-    'sounds/typewriter/typewriter_26.wav',
+-    'sounds/typewriter/typewriter_27.wav',
+-    'sounds/typewriter/typewriter_28.wav',
+-    'sounds/typewriter/typewriter_29.wav',
+-    'sounds/typewriter/typewriter_bell.wav',
+-    'sounds/typewriter/typewriter_insert.wav',
+-    'sounds/typewriter/typewriter_linefeed.wav',
+-    'sounds/typewriter/typewriter_thump.wav',
++
+ )
+
+ # install sounds flat in one directory
+-install_data(sounds_files, install_dir: pkgdatadir / 'sounds')
++# install_data(sounds_files, install_dir: pkgdatadir / 'sounds')
+
+
+ # fonts
+
+diff --git a/build-aux/com.github.flxzt.rnote.Devel.json b/build-aux/com.github.flxzt.rnote.Devel.json
+index 198eab6..d587717 100644
+--- a/build-aux/com.github.flxzt.rnote.Devel.json
++++ b/build-aux/com.github.flxzt.rnote.Devel.json
+@@ -16,7 +16,6 @@
+     "--socket=fallback-x11",
+     "--device=dri",
+     "--share=ipc",
+-    "--socket=pulseaudio",
+     "--filesystem=xdg-documents",
+     "--filesystem=xdg-pictures",
+     "--filesystem=xdg-desktop",
