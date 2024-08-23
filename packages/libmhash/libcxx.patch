@@ -1,0 +1,23 @@
+https://github.com/void-linux/void-packages/pull/46005
+
+--- a/include/mutils/mutils.h
++++ b/include/mutils/mutils.h
+@@ -21,6 +21,9 @@
+ #if !defined(__MUTILS_H)
+ #define __MUTILS_H
+ 
++#ifndef __cplusplus
++#include <stdbool.h>
++#endif
+ #include <mutils/mincludes.h>
+ 
+ #if defined(const)
+@@ -97,7 +100,7 @@ typedef unsigned char mutils_word8;
+  */
+ 
+ #if defined(HAVE__BOOL)
+-#define mutils_boolean _Bool
++#define mutils_boolean bool
+ #else
+ typedef char mutils_boolean;
+ #endif
