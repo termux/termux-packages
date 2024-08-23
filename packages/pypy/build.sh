@@ -3,10 +3,13 @@ TERMUX_PKG_DESCRIPTION="A fast, compliant alternative implementation of Python"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@licy183"
 _MAJOR_VERSION=2.7
-TERMUX_PKG_VERSION="7.3.15"
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SRCURL=https://downloads.python.org/pypy/pypy$_MAJOR_VERSION-v$TERMUX_PKG_VERSION-src.tar.bz2
-TERMUX_PKG_SHA256=a66ddaed39544a35bb7ab7a17dbf673a020c7cb3a614bd2b61a54776888daf2c
+TERMUX_PKG_VERSION="7.3.16"
+TERMUX_PKG_SRCURL=(https://downloads.python.org/pypy/pypy$_MAJOR_VERSION-v$TERMUX_PKG_VERSION-src.tar.bz2
+                   https://downloads.python.org/pypy/pypy2.7-v$TERMUX_PKG_VERSION-linux64.tar.bz2
+                   https://downloads.python.org/pypy/pypy2.7-v$TERMUX_PKG_VERSION-linux32.tar.bz2)
+TERMUX_PKG_SHA256=(43721cc0c397f0f3560b325c20c70b11f7c76c27910d3df09f8418cec4f9c2ad
+                   04b2fceb712d6f811274825b8a471ee392d3d1b53afc83eb3f42439ce00d8e07
+                   a19712d7a6bd4f6d113e352c5271803c583b5129b76a357d387b1fa85204f8e5)
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="gdbm, libandroid-posix-semaphore, libandroid-support, libbz2, libcrypt, libexpat, libffi, liblzma, libsqlite, ncurses, ncurses-ui-libs, openssl, zlib"
 TERMUX_PKG_BUILD_DEPENDS="bionic-host, tk, xorgproto"
@@ -33,21 +36,9 @@ termux_step_pre_configure() {
 
 __setup_host_pypy2() {
 	if [ "$TERMUX_ARCH_BITS" = "32" ]; then
-		termux_download \
-			"https://downloads.python.org/pypy/pypy2.7-v$TERMUX_PKG_VERSION-linux32.tar.bz2" \
-			"$TERMUX_PKG_CACHEDIR"/pypy2.7-v$TERMUX_PKG_VERSION-linux32.tar.bz2 \
-			cb5c1da62a8ca31050173c4f6f537bc3ff316026895e5f1897b9bb526babae79
-		rm -rf "$TERMUX_PKG_CACHEDIR"/pypy2.7-v$TERMUX_PKG_VERSION-linux32
-		tar -C "$TERMUX_PKG_CACHEDIR" -xf "$TERMUX_PKG_CACHEDIR"/pypy2.7-v$TERMUX_PKG_VERSION-linux32.tar.bz2
-		export PATH="$TERMUX_PKG_CACHEDIR/pypy2.7-v$TERMUX_PKG_VERSION-linux32/bin:$PATH"
+		export PATH="$TERMUX_PKG_SRCDIR/pypy2.7-v$TERMUX_PKG_VERSION-linux32/bin:$PATH"
 	else
-		termux_download \
-			"https://downloads.python.org/pypy/pypy2.7-v$TERMUX_PKG_VERSION-linux64.tar.bz2" \
-			"$TERMUX_PKG_CACHEDIR"/pypy2.7-v$TERMUX_PKG_VERSION-linux64.tar.bz2 \
-			e857553bdc4f25ba9670a5c173a057a9ff71262d5c5da73a6ddef9d7dc5d4f5e
-		rm -rf "$TERMUX_PKG_CACHEDIR"/pypy2.7-v$TERMUX_PKG_VERSION-linux64
-		tar -C "$TERMUX_PKG_CACHEDIR" -xf "$TERMUX_PKG_CACHEDIR"/pypy2.7-v$TERMUX_PKG_VERSION-linux64.tar.bz2
-		export PATH="$TERMUX_PKG_CACHEDIR/pypy2.7-v$TERMUX_PKG_VERSION-linux64/bin:$PATH"
+		export PATH="$TERMUX_PKG_SRCDIR/pypy2.7-v$TERMUX_PKG_VERSION-linux64/bin:$PATH"
 	fi
 
 	pypy2 -m ensurepip --altinstall --no-default-pip
