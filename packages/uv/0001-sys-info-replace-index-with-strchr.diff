@@ -1,0 +1,36 @@
+https://github.com/FillZpp/sys-info-rs/pull/118
+From e68597ffd323107bc766e6b04e565fd907d9820a Mon Sep 17 00:00:00 2001
+From: bb010g <me@bb010g.com>
+Date: Mon, 13 May 2024 06:57:39 -0700
+Subject: [PATCH] fix: `index()` -> `strchr()`
+
+`index()` is deprecated.
+---
+ c/linux.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/c/linux.c b/c/linux.c
+index 4cd1589..ede98d5 100644
+--- a/c/linux.c
++++ b/c/linux.c
+@@ -93,16 +93,16 @@ DiskInfo get_disk_info(void) {
+ 	}
+ 	while ( fgets(procline, sizeof(procline), mounts) ) {
+ 		device = procline;
+-		mount = index(procline, ' ');
++		mount = strchr(procline, ' ');
+ 		if (mount == NULL) continue;
+ 		*mount++ = '\0';
+-		type = index(mount, ' ');
++		type = strchr(mount, ' ');
+ 		if (type == NULL) continue;
+ 		*type++ = '\0';
+-		mode = index(type, ' ');
++		mode = strchr(type, ' ');
+ 		if (mode == NULL) continue;
+ 		*mode++ = '\0';
+-		other = index(mode, ' ');
++		other = strchr(mode, ' ');
+ 		if (other != NULL) *other = '\0';
+ 		if (!strncmp(mode, "ro", 2)) continue;
+ 		if (remote_mount(device, type)) continue;
