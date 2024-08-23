@@ -1,0 +1,12 @@
+--- a/set.h
++++ b/set.h
+@@ -55,6 +55,9 @@
+ #ifdef __GNUC__
+ #pragma GCC diagnostic error "-Wstrict-prototypes"
+ #endif
++#if defined(__clang__) && __clang_major__ >= 15
++#pragma GCC diagnostic ignored "-Wdeprecated-non-prototype"
++#endif
+ 
+ long
+ s_get_option_integer(const char *option);
