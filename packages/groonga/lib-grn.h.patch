@@ -1,0 +1,20 @@
+lib/grn.h:150:15: error: typedef redefinition with different types ('off_t' (aka 'long') vs 'loff_t' (aka 'long long'))
+  150 | typedef off_t off64_t;
+      |               ^
+sysroot/usr/include/sys/types.h:107:16: note: previous definition is here
+  107 | typedef loff_t off64_t;
+      |                ^
+
+--- a/lib/grn.h
++++ b/lib/grn.h
+@@ -146,10 +146,6 @@
+ #    include <unistd.h>
+ #  endif /* HAVE_UNISTD_H */
+ 
+-#  ifndef __off64_t_defined
+-typedef off_t off64_t;
+-#  endif
+-
+ #  ifndef PATH_MAX
+ #    if defined(MAXPATHLEN)
+ #      define PATH_MAX MAXPATHLEN
