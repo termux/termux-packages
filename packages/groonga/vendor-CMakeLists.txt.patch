@@ -1,0 +1,13 @@
+--- a/vendor/CMakeLists.txt
++++ b/vendor/CMakeLists.txt
+@@ -14,7 +14,9 @@
+ # License along with this library; if not, write to the Free Software
+ # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ 
+-add_subdirectory(onigmo)
++if(GRN_WITH_BUNDLED_ONIGMO)
++  add_subdirectory(onigmo)
++endif()
+ add_subdirectory(mruby)
+ add_subdirectory(mecab)
+ add_subdirectory(message_pack)
