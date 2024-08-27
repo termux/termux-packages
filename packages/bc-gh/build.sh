@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="Gavin D. Howard <gavin@gavinhoward.com>"
 TERMUX_PKG_VERSION=7.0.0
 TERMUX_PKG_SRCURL=https://github.com/gavinhoward/bc/releases/download/${TERMUX_PKG_VERSION}/bc-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=ea99f18482c2fd3775f1b6de4b2faf6dd2eed9e8e6699c0d4ecf54b539affd43
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="readline"
 
 termux_step_configure() {
