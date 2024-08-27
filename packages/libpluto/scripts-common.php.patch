@@ -1,0 +1,26 @@
+diff --git a/scripts/common.php b/scripts/common.php
+index 66ea1d0..de32c6c 100644
+--- a/scripts/common.php
++++ b/scripts/common.php
+@@ -44,12 +44,20 @@ function check_compiler()
+ 			}
+ 		}
+ 	}
++	if (getenv("CXXFLAGS"))
++	{
++	   $compiler .= " ".getenv("CXXFLAGS");
++	}
+ }
+ 
+ function prepare_link()
+ {
+ 	global $compiler;
+-	$compiler .= " -L".__DIR__."/../src/vendor/Soup -lsoup";
++	$srcdir = __DIR__."/../src";
++	$compiler .= " -L$srcdir/vendor/Soup -L$srcdir -lsoup";
++	if (getenv("LDFLAGS")) {
++	   $compiler .= " ".getenv("LDFLAGS");
++	}
+ }
+ 
+ function resolve_installed_program($exe)

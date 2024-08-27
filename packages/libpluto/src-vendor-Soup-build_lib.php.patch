@@ -1,0 +1,18 @@
+diff --git a/src/vendor/Soup/build_lib.php b/src/vendor/Soup/build_lib.php
+index e32b4ab..cab4f07 100644
+--- a/src/vendor/Soup/build_lib.php
++++ b/src/vendor/Soup/build_lib.php
+@@ -28,11 +28,11 @@ foreach(scandir(__DIR__."/soup") as $file)
+ }
+ if(is_dir(__DIR__."/Intrin"))
+ {
+-	if (php_uname("m") == "aarch64")
++	if (getenv("TARGET_ARCH") == "aarch64")
+ 	{
+ 		$clang .= " -march=armv8+crypto+crc";
+ 	}
+-	else
++	elseif (getenv("TARGET_ARCH") != "arm")
+ 	{
+ 		$clang .= " -maes -mpclmul -mrdrnd -mrdseed -msha -msse4.1";
+ 	}
