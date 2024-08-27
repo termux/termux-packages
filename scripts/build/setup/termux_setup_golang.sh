@@ -16,6 +16,8 @@ termux_setup_golang() {
 			TERMUX_BUILDGO_FOLDER=${TERMUX_COMMON_CACHEDIR}/${TERMUX_GO_VERSION}
 		fi
 
+		TERMUX_BUILDGO_FOLDER+="-r1"
+
 		export GOROOT=$TERMUX_BUILDGO_FOLDER
 		export PATH=${GOROOT}/bin:${PATH}
 
@@ -30,7 +32,8 @@ termux_setup_golang() {
 		( cd "$TERMUX_COMMON_CACHEDIR"; tar xf "$TERMUX_BUILDGO_TAR"; mv go "$TERMUX_BUILDGO_FOLDER"; rm "$TERMUX_BUILDGO_TAR" )
 
 		if [ "$TERMUX_PKG_GO_USE_OLDER" = "false" ]; then
-			( cd "$TERMUX_BUILDGO_FOLDER"; . ${TERMUX_SCRIPTDIR}/packages/golang/fix-hardcoded-etc-resolv-conf.sh )
+			( cd "$TERMUX_BUILDGO_FOLDER"; . ${TERMUX_SCRIPTDIR}/packages/golang/patch-script/fix-hardcoded-etc-resolv-conf.sh )
+			( cd "$TERMUX_BUILDGO_FOLDER"; . ${TERMUX_SCRIPTDIR}/packages/golang/patch-script/remove-pidfd.sh )
 		fi
 	else
 		if [[ "$TERMUX_APP_PACKAGE_MANAGER" = "apt" && "$(dpkg-query -W -f '${db:Status-Status}\n' golang 2>/dev/null)" != "installed" ]] ||

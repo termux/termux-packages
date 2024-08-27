@@ -1,0 +1,87 @@
+https://github.com/termux/termux-packages/issues/21265
+https://github.com/golang/go/issues/69065
+https://go-review.googlesource.com/c/go/+/608518
+
+os: don't use pidfd functions on android
+
+Reportedly the seccomp policy on at least some versions of
+android/arm64 sends a SIGSYS signal on a call to pidfd_open.
+
+Fixes #69065
+
+Change-Id: Id8675ca6dc7193c2985cfbb11dd85206430e2f9d
+
+diff --git a/src/os/export_linux_test.go b/src/os/export_linux_test.go
+index 12434cb..da527f9 100644
+--- a/src/os/export_linux_test.go
++++ b/src/os/export_linux_test.go
+@@ -8,7 +8,6 @@
+ 	PollCopyFileRangeP  = &pollCopyFileRange
+ 	PollSpliceFile      = &pollSplice
+ 	GetPollFDAndNetwork = getPollFDAndNetwork
+-	CheckPidfdOnce      = checkPidfdOnce
+ )
+
+ const StatusDone = statusDone
+diff --git a/src/os/export_pidfd_test.go b/src/os/export_pidfd_test.go
+new file mode 100644
+index 0000000..7705ddb
+--- /dev/null
++++ b/src/os/export_pidfd_test.go
+@@ -0,0 +1,9 @@
++// Copyright 2024 The Go Authors. All rights reserved.
++// Use of this source code is governed by a BSD-style
++// license that can be found in the LICENSE file.
++
++//go:build linux && !android
++
++package os
++
++var CheckPidfdOnce = checkPidfdOnce
+diff --git a/src/os/pidfd_linux.go b/src/os/pidfd_linux.go
+index 0404c4f..4bdc289 100644
+--- a/src/os/pidfd_linux.go
++++ b/src/os/pidfd_linux.go
+@@ -2,12 +2,17 @@
+ // Use of this source code is governed by a BSD-style
+ // license that can be found in the LICENSE file.
+ 
++//go:build linux && !android
++
+ // Support for pidfd was added during the course of a few Linux releases:
+ //  v5.1: pidfd_send_signal syscall;
+ //  v5.2: CLONE_PIDFD flag for clone syscall;
+ //  v5.3: pidfd_open syscall, clone3 syscall;
+ //  v5.4: P_PIDFD idtype support for waitid syscall;
+ //  v5.6: pidfd_getfd syscall.
++//
++// On Android systems the pidfd_open call reportedly triggers a SIGSYS signal,
++// (issue #69065), so don't use pidfd on Android.
+ 
+ package os
+ 
+diff --git a/src/os/pidfd_linux_test.go b/src/os/pidfd_linux_test.go
+index 8375937..47b3dad 100644
+--- a/src/os/pidfd_linux_test.go
++++ b/src/os/pidfd_linux_test.go
+@@ -2,6 +2,8 @@
+ // Use of this source code is governed by a BSD-style
+ // license that can be found in the LICENSE file.
+ 
++//go:build linux && !android
++
+ package os_test
+ 
+ import (
+diff --git a/src/os/pidfd_other.go b/src/os/pidfd_other.go
+index 5780432..fcb0d3c 100644
+--- a/src/os/pidfd_other.go
++++ b/src/os/pidfd_other.go
+@@ -2,7 +2,7 @@
+ // Use of this source code is governed by a BSD-style
+ // license that can be found in the LICENSE file.
+ 
+-//go:build (unix && !linux) || (js && wasm) || wasip1 || windows
++//go:build (unix && (android || !linux)) || (js && wasm) || wasip1 || windows
+ 
+ package os

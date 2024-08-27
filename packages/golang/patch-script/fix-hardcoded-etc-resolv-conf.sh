@@ -8,5 +8,5 @@ cp -T src/net/conf.go src/net/conf_android.go
 cp -T src/net/dnsclient_unix.go src/net/dnsclient_android.go
 
 sed -e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|" \
-	${TERMUX_SCRIPTDIR}/packages/golang/fix-hardcoded-etc-resolv-conf.diff \
+	${TERMUX_SCRIPTDIR}/packages/golang/patch-script/fix-hardcoded-etc-resolv-conf.diff \
 	| patch --silent -p1
