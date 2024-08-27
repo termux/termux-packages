@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A drop-in replacement for mysql server"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2:11.5.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://archive.mariadb.org/mariadb-${TERMUX_PKG_VERSION#*:}/source/mariadb-${TERMUX_PKG_VERSION#*:}.tar.gz
 TERMUX_PKG_SHA256=e25fac00aeb34610faf62182836a14e3310c0ca5d882e9109f63bd8dfdc3542d
 TERMUX_PKG_DEPENDS="libandroid-support, libc++, libcrypt, libedit, liblz4, liblzma, ncurses, openssl, pcre2, zlib, zstd"
@@ -64,7 +65,7 @@ TERMUX_PKG_RM_AFTER_INSTALL="
 bin/rcmysql
 bin/mysqltest*
 share/man/man1/mysql-test-run.pl.1
-share/mysql/mysql-test
+share/mariadb/mariadb-test
 mysql-test
 sql-bench
 "
