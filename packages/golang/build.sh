@@ -14,7 +14,8 @@ TERMUX_PKG_RECOMMENDS="resolv-conf"
 TERMUX_PKG_NO_STATICSPLIT=true
 
 termux_step_post_get_source() {
-	. $TERMUX_PKG_BUILDER_DIR/fix-hardcoded-etc-resolv-conf.sh
+	. $TERMUX_PKG_BUILDER_DIR/patch-script/fix-hardcoded-etc-resolv-conf.sh
+	. $TERMUX_PKG_BUILDER_DIR/patch-script/remove-pidfd.sh
 }
 
 termux_step_make_install() {
