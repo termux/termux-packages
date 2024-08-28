@@ -5,31 +5,47 @@ termux_get_repo_files() {
 		return
 	fi
 
-	for idx in $(seq ${#TERMUX_REPO_URL[@]}); do
-		local TERMUX_REPO_NAME=$(echo ${TERMUX_REPO_URL[$idx-1]} | sed -e 's%https://%%g' -e 's%http://%%g' -e 's%/%-%g')
-		if [ "$TERMUX_REPO_PKG_FORMAT" = "debian" ]; then
-			local RELEASE_FILE=${TERMUX_COMMON_CACHEDIR}/${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-Release
-			local repo_base="${TERMUX_REPO_URL[$idx-1]}/dists/${TERMUX_REPO_DISTRIBUTION[$idx-1]}"
-			local dl_prefix="${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-${TERMUX_REPO_COMPONENT[$idx-1]}"
-		elif [ "$TERMUX_REPO_PKG_FORMAT" = "pacman" ]; then
-			local JSON_FILE="${TERMUX_COMMON_CACHEDIR}-${TERMUX_ARCH}/${TERMUX_REPO_NAME}-json"
-			local repo_base="${TERMUX_REPO_URL[$idx-1]}/${TERMUX_ARCH}"
+	local i
+	local TERMUX_REPO_DIR
+	local TERMUX_REPO_URL
+	local TERMUX_REPO_URL_ID
+	for i in "${!TERMUX_REPO__CHANNEL_URLS[@]}"; do
+		TERMUX_REPO_DIR="${TERMUX_REPO__CHANNEL_DIRS["$i"]}"
+		TERMUX_REPO_URL="${TERMUX_REPO__CHANNEL_URLS["$i"]}"
+		if [ -z "$TERMUX_REPO_URL" ]; then
+			echo "Ignoring to download '${TERMUX_REPO__CHANNEL_NAMES["$i"]}' repo files as its url is not set"
+			continue
+		fi
+
+		if [ -z "${TERMUX_REPO__CHANNEL_SIGNING_KEY_NAMES_AND_FINGERPRINTS["$TERMUX_REPO_DIR"]:-}" ]; then
+			termux_error_exit "The signing key names and fingerprints not set for the '$TERMUX_REPO_DIR' repo channel directory"
+		fi
+
+		TERMUX_REPO_URL_ID=$(echo "$TERMUX_REPO_URL" | sed -e 's%https://%%g' -e 's%http://%%g' -e 's%/%-%g')
+		if [ "$TERMUX_REPO__PKG_FORMAT" = "debian" ]; then
+			local RELEASE_FILE=${TERMUX_COMMON_CACHEDIR}/${TERMUX_REPO_URL_ID}-${TERMUX_REPO__CHANNEL_DISTRIBUTIONS["$i"]}-Release
+			local repo_base="${TERMUX_REPO__CHANNEL_URLS["$i"]}/dists/${TERMUX_REPO__CHANNEL_DISTRIBUTIONS["$i"]}"
+			local dl_prefix="${TERMUX_REPO_URL_ID}-${TERMUX_REPO__CHANNEL_DISTRIBUTIONS["$i"]}-${TERMUX_REPO__CHANNEL_COMPONENTS["$i"]}"
+		elif [ "$TERMUX_REPO__PKG_FORMAT" = "pacman" ]; then
+			local JSON_FILE="${TERMUX_COMMON_CACHEDIR}-${TERMUX_ARCH}/${TERMUX_REPO_URL_ID}-json"
+			local repo_base="${TERMUX_REPO__CHANNEL_URLS["$i"]}/${TERMUX_ARCH}"
 		fi
 
 		local download_attempts=6
 		while ((download_attempts > 0)); do
-			if [ "$TERMUX_REPO_PKG_FORMAT" = "debian" ]; then
+			if [ "$TERMUX_REPO__PKG_FORMAT" = "debian" ]; then
 				if termux_download "${repo_base}/Release" "$RELEASE_FILE" SKIP_CHECKSUM && \
-					termux_download "${repo_base}/Release.gpg" "${RELEASE_FILE}.gpg" SKIP_CHECKSUM && \
-					gpg --verify "${RELEASE_FILE}.gpg" "$RELEASE_FILE"; then
+						termux_download "${repo_base}/Release.gpg" "${RELEASE_FILE}.gpg" SKIP_CHECKSUM; then
+					termux_repository__verify_repo_gpg_signing_key "'${TERMUX_REPO__CHANNEL_NAMES["$i"]}' repo" \
+						"${TERMUX_REPO__CHANNEL_SIGNING_KEY_NAMES_AND_FINGERPRINTS["$TERMUX_REPO_DIR"]}" "${RELEASE_FILE}.gpg" "$RELEASE_FILE"
 
 					local failed=false
 					for arch in all $TERMUX_ARCH; do
-						local PACKAGES_HASH=$(./scripts/get_hash_from_file.py ${RELEASE_FILE} $arch ${TERMUX_REPO_COMPONENT[$idx-1]})
+						local PACKAGES_HASH=$(./scripts/get_hash_from_file.py ${RELEASE_FILE} $arch ${TERMUX_REPO__CHANNEL_COMPONENTS["$i"]})
 
 						# If packages_hash = "" then the repo probably doesn't contain debs for $arch
 						if [ -n "$PACKAGES_HASH" ]; then
-							if ! termux_download "${repo_base}/${TERMUX_REPO_COMPONENT[$idx-1]}/binary-$arch/Packages" \
+							if ! termux_download "${repo_base}/${TERMUX_REPO__CHANNEL_COMPONENTS["$i"]}/binary-$arch/Packages" \
 								"${TERMUX_COMMON_CACHEDIR}-$arch/${dl_prefix}-Packages" \
 								$PACKAGES_HASH; then
 								failed=true
@@ -42,10 +58,11 @@ termux_get_repo_files() {
 						break
 					fi
 				fi
-			elif [ "$TERMUX_REPO_PKG_FORMAT" = "pacman" ]; then
-				if termux_download "${repo_base}/${TERMUX_REPO_DISTRIBUTION[$idx-1]}.json" "$JSON_FILE" SKIP_CHECKSUM && \
-					termux_download "${repo_base}/${TERMUX_REPO_DISTRIBUTION[$idx-1]}.json.sig" "${JSON_FILE}.sig" SKIP_CHECKSUM && \
-					gpg --verify "${JSON_FILE}.sig" "$JSON_FILE"; then
+			elif [ "$TERMUX_REPO__PKG_FORMAT" = "pacman" ]; then
+				if termux_download "${repo_base}/${TERMUX_REPO__CHANNEL_DISTRIBUTIONS["$i"]}.json" "$JSON_FILE" SKIP_CHECKSUM && \
+						termux_download "${repo_base}/${TERMUX_REPO__CHANNEL_DISTRIBUTIONS["$i"]}.json.sig" "${JSON_FILE}.sig" SKIP_CHECKSUM; then
+					termux_repository__verify_repo_gpg_signing_key "'${TERMUX_REPO__CHANNEL_NAMES["$i"]}' repo" \
+						"${TERMUX_REPO__CHANNEL_SIGNING_KEY_NAMES_AND_FINGERPRINTS["$TERMUX_REPO_DIR"]}" "${JSON_FILE}.sig" "$JSON_FILE"
 
 					break
 				fi
