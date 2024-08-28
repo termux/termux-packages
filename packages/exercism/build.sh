@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE="https://github.com/exercism/cli/"
 TERMUX_PKG_DESCRIPTION="A Go based command line tool for exercism.io"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.5.0"
+TERMUX_PKG_VERSION="3.5.1"
 TERMUX_PKG_SRCURL="https://github.com/exercism/cli/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=819ac86c397782c8227ae443418c46ce86bfd0bd4ee6c67175102a7e67ba3010
+TERMUX_PKG_SHA256=e20e30ea0acc8a47d67d577e13af87fc7a189f133b0b9f092594a7b65993166b
 TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make() {
