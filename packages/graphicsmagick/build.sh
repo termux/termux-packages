@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=http://www.graphicsmagick.org/
 TERMUX_PKG_DESCRIPTION="Collection of image processing tools"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.3.44"
+TERMUX_PKG_VERSION="1.3.45"
 # Bandwith limited on main ftp site, so it's asked to use sourceforge instead:
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/graphicsmagick/graphicsmagick/${TERMUX_PKG_VERSION}/GraphicsMagick-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=6ac28470d2fbd3d5f60859dd43f3cee2585e955e32896f892b4dc61dda101ea0
+TERMUX_PKG_SHA256=dcea5167414f7c805557de2d7a47a9b3147bcbf617b91f5f0f4afe5e6543026b
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="freetype, libbz2, libc++, libde265, libheif, libjasper, libjpeg-turbo, libjxl, liblzma, libpng, libtiff, libwebp, libxml2, littlecms, zlib, zstd"
 TERMUX_PKG_BREAKS="graphicsmagick-dev"
