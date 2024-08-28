@@ -22,6 +22,7 @@ termux_step_make_install() {
 	cp -R . $MICRO_SRC
 
 	cd $MICRO_SRC
+	sed -zEi 's/VERSION = \$\(.+\\\n.+\)/VERSION = '"$TERMUX_PKG_VERSION"'/gm' Makefile
 	make build
 	mv micro $TERMUX_PREFIX/bin/micro
 }
