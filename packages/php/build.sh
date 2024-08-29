@@ -5,6 +5,7 @@ TERMUX_PKG_LICENSE_FILE=LICENSE
 TERMUX_PKG_MAINTAINER="@termux"
 # Please revbump php-* extensions along with "minor" bump (e.g. 8.1.x to 8.2.0)
 TERMUX_PKG_VERSION="8.3.10"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/php/php-src/archive/php-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=ef428734ff3b32bade6528b29fb0cd2dc29c5c9b1e45bb382b113a9242ab0320
 TERMUX_PKG_AUTO_UPDATE=false
@@ -36,6 +37,8 @@ php_cv_lib_gd_gdImageCreateFromTga=yes
 --enable-sockets
 --mandir=$TERMUX_PREFIX/share/man
 --with-bz2=$TERMUX_PREFIX
+--with-config-file-path=$TERMUX_PREFIX/etc/$TERMUX_PKG_NAME
+--with-config-file-scan-dir=$TERMUX_PREFIX/etc/$TERMUX_PKG_NAME/conf.d
 --with-curl=$TERMUX_PREFIX
 --with-ldap=shared,$TERMUX_PREFIX
 --with-ldap-sasl
@@ -144,6 +147,12 @@ termux_step_post_make_install() {
 	mkdir -p $docdir
 	for suffix in development production; do
 		cp $TERMUX_PKG_SRCDIR/php.ini-$suffix $docdir/
+	done
+
+	local extdir="$TERMUX_PREFIX/etc/$TERMUX_PKG_NAME/conf.d"
+	mkdir -p "$extdir"
+	for ext in gd ldap pgsql pdo_pgsql sodium; do
+		echo "extension=$ext" > "$extdir/$ext.ini"
 	done
 
 	sed -i 's/SED=.*/SED=sed/' $TERMUX_PREFIX/bin/phpize
