@@ -1,0 +1,165 @@
+diff --git a/panel-plugin/os.cc b/panel-plugin/os.cc
+index a8c9e40..b6b3cb3 100644
+--- a/panel-plugin/os.cc
++++ b/panel-plugin/os.cc
+@@ -79,9 +79,160 @@ static kstat_ctl_t *kc;
+ #endif
+ 
+ #if defined (__linux__) || defined (__FreeBSD_kernel__)
++
++#ifdef __ANDROID__
++#include <unistd.h>
++#include <glob.h>
++#include <android/api-level.h>
++
++static guint
++detect_cpu_number_android28 ()
++{
++    return sysconf(_SC_NPROCESSORS_ONLN);
++}
++
++static bool
++read_cpu_data_android28 (unordered_map<guint, CpuData> &data)
++{
++    static gulong cpu_core_time = 0, cpu_core_time_old = 0;
++    gulong cpu_core_time_delta = 0;
++    struct timespec ts;
++    glob_t globbuf;
++    int i;
++    int tid, processor;
++    gulong utime, stime;
++    static GHashTable *hash_cpu_user = NULL;
++    static GHashTable *hash_cpu_system = NULL;
++    gulong utime_old, stime_old;
++    FILE *fp;
++
++    if (G_UNLIKELY(data.size() == 0))
++        return false;
++
++    const size_t nb_cpu = data.size()-1;
++
++    for (i = 0; i <= nb_cpu; i++) {
++        data[i].user = 0;
++        data[i].system = 0;
++        data[i].load = 0;
++    }
++
++    // calculate CPU clock duration
++    cpu_core_time_old = cpu_core_time;
++    if (0 >= clock_gettime(CLOCK_BOOTTIME, &ts)) {
++        cpu_core_time = (ts.tv_sec + ts.tv_nsec * 1.0e-9) * sysconf(_SC_CLK_TCK);
++    }
++    if (cpu_core_time > cpu_core_time_old) {
++        cpu_core_time_delta = (cpu_core_time - cpu_core_time_old);
++    } else {
++        return true;
++    }
++
++    // read thread stat
++    if (hash_cpu_user == NULL)
++    {
++        hash_cpu_user = g_hash_table_new (NULL, NULL);
++        hash_cpu_system = g_hash_table_new (NULL, NULL);
++    }
++    if (glob("/proc/[0-9]*/task/[0-9]*/stat", 0, NULL, &globbuf) != 0) {
++        return false;
++    }
++
++    for (i = 0; i < globbuf.gl_pathc; i++) {
++        fp = fopen(globbuf.gl_pathv[i], "r");
++        if (fp == NULL) { continue; }
++        if (fscanf(fp,
++            // man proc_pid_stat(5)
++            "%d %*s %*c "                    // pid, comm, state
++            "%*d %*d %*d %*d %*d "           // ppid, pgrp, sid, tty_nr, tpgid
++            "%*u %*lu %*lu %*lu %*lu "       // flags, minflt, cminflt, majflt, cmajflt
++            "%lu %lu %*lu %*lu "             // utime, stime, cutime, cstime
++            "%*ld %*ld %*ld "                // priority, nice, num_threads
++            "%*ld %*llu %*lu %*ld "          // itrealvalue, starttime, vsize, rss
++            "%*lu %*lu %*lu %*lu %*lu %*lu " // rsslim, startcode, endcode, startstack, kstkesp, kstkeip
++            "%*lu %*lu %*lu %*lu "           // signal, blocked, sigignore, sigcatch
++            "%*lu %*lu %*lu "                // wchan, nswap, cnswap
++            "%*d %d "                        // exit_signal, processor
++            "%*u %*u "                       // rt_priority, policy
++            "%*llu %*lu %*ld ",              // delayacct_blkio_ticks, guest_time, cguest_time
++            &tid, &utime, &stime, &processor
++        ) == 4) {
++            utime_old = GPOINTER_TO_UINT (g_hash_table_lookup (hash_cpu_user, GINT_TO_POINTER (tid)));
++            stime_old = GPOINTER_TO_UINT (g_hash_table_lookup (hash_cpu_system, GINT_TO_POINTER (tid)));
++            g_hash_table_insert (hash_cpu_user, GINT_TO_POINTER (tid), GUINT_TO_POINTER (utime));
++            g_hash_table_insert (hash_cpu_system, GINT_TO_POINTER (tid), GUINT_TO_POINTER (stime));
++            if (utime >= utime_old && stime >= stime_old) {
++                if (processor >= 0 && processor < nb_cpu) {
++                    data[processor+1].user += utime - utime_old;
++                    data[processor+1].system += stime - stime_old;
++                    data[processor+1].load += (utime - utime_old) + (stime - stime_old);
++                } else {  // even out the usage when processor == -1
++                    for (i = 1; i <= nb_cpu; i++) {
++                        data[i].user += (utime - utime_old) / (float)nb_cpu;
++                        data[i].system += (stime - stime_old) / (float)nb_cpu;
++                        data[i].load += ((utime - utime_old) + (stime - stime_old)) / (float)nb_cpu;
++                    }
++                }
++            }
++        }
++        fclose(fp);
++    }
++
++    globfree(&globbuf);
++
++    for (i = 1; i <= nb_cpu; i++) {
++        data[i].user /= cpu_core_time_delta;
++        data[i].system /= cpu_core_time_delta;
++        data[i].load /= cpu_core_time_delta;
++        data[0].user += data[i].user / nb_cpu;
++        data[0].system += data[i].system / nb_cpu;
++        data[0].load += data[i].load / nb_cpu;
++    }
++
++    return true;
++}
++
++
++// read_cpu_data_android28() is copied and modified from read_cpu_data() implementation in the later macro conditional block for non-Linux non-FreeBSD system
++void
++read_cpu_data_android28 (unordered_map<guint, CpuData> &data, unordered_map<guint, guint> &cpu_to_index)
++{
++    static guint n_cpus = detect_cpu_number_android28 ();
++
++    if (data.empty())
++    {
++        data.reserve (n_cpus + 1);
++        for (guint i = 0; i < n_cpus + 1; ++i)
++        {
++            data[i] = CpuData ();
++        }
++    }
++
++    if (read_cpu_data_android28 (data))
++    {
++        if (cpu_to_index.empty ())
++        {
++            cpu_to_index.reserve (n_cpus);
++            for (guint i = 0; i < n_cpus; ++i)
++            {
++                cpu_to_index[i] = i;
++            }
++        }
++    }
++    else
++    {
++        cpu_to_index.clear();
++    }
++    return;
++}
++#endif
++
+ void
+ read_cpu_data (unordered_map<guint, CpuData> &data, unordered_map<guint, guint> &cpu_to_index)
+ {
++#ifdef __ANDROID__
++    if (android_get_device_api_level() >= 28) { read_cpu_data_android28(data, cpu_to_index); return; }
++#endif
+     FILE *fStat;
+ 
+     cpu_to_index.clear();
