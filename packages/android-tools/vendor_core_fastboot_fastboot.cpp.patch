@@ -11,6 +11,6 @@
 +    }
 +#endif
 +
-     fb->set_transport(nullptr);
- 
-     // Give the current connection time to close.
+     if (fb->WaitForDisconnect() != fastboot::SUCCESS) {
+         die("Error waiting for USB disconnect.");
+     }

@@ -82,12 +82,21 @@
  	selinux/libsepol/src/services.c
  	selinux/libsepol/src/sidtab.c
  	selinux/libsepol/src/symtab.c
+@@ -127,7 +171,7 @@
+ add_executable(fastboot ${fastboot_SOURCES})
+ target_include_directories(fastboot PRIVATE
+ 	libbase/include core/include core/adb core/libsparse/include
+-	extras/ext4_utils/include extras/f2fs_utils
++	extras/ext4_utils/include extras/f2fs_utils libusb
+ 	core/libziparchive/include mkbootimg/include/bootimg
+ 	core/fs_mgr/liblp/include core/fs_mgr/libstorage_literals avb)
+ target_compile_definitions(fastboot PRIVATE
 @@ -136,7 +180,7 @@
  target_link_libraries(fastboot
  	libsparse libzip libcutils liblog liblp libutil
  	libbase libext4 libselinux libsepol libdiagnoseusb crypto
 -	z PkgConfig::libpcre2-8 Threads::Threads dl)
-+	z PkgConfig::libpcre2-8 PkgConfig::libusb-1.0 Threads::Threads dl)
++	z PkgConfig::libpcre2-8 android_tools_libusb Threads::Threads dl)
  
  if(APPLE)
  	target_link_libraries(fastboot
