@@ -11,10 +11,8 @@ termux_step_setup_cgct_environment() {
 	local i
 	local PKG_DIR
 	local TERMUX_REPO_URL
-	local TERMUX_REPO_URL_ID=""
 	for PKG in gcc-libs-glibc glibc linux-api-headers-glibc; do
 		PKG_DIR=""
-		TERMUX_REPO_URL_ID=""
 		for i in "${!TERMUX_REPO__CHANNEL_DIRS[@]}"; do
 			repo_channel_dir="${TERMUX_REPO__CHANNEL_DIRS["$i"]}"
 			if [[ -f "${TERMUX_SCRIPTDIR}/${repo_channel_dir}/${PKG}/build.sh" ]]; then
@@ -30,14 +28,7 @@ termux_step_setup_cgct_environment() {
 				termux_error_exit "The url not set for '${TERMUX_REPO__CHANNEL_NAMES["$i"]}' repo for package '$PKG'"
 			fi
 
-			TERMUX_REPO_URL_ID=$(echo "$TERMUX_REPO_URL" | sed -e 's%https://%%g' -e 's%http://%%g' -e 's%/%-%g')
-			if [ "$TERMUX_REPO__PKG_FORMAT" = "debian" ]; then
-				TERMUX_REPO_URL_ID+="-${TERMUX_REPO__CHANNEL_DISTRIBUTIONS["$i"]}-Release"
-			elif [ "$TERMUX_REPO__PKG_FORMAT" = "pacman" ]; then
-				TERMUX_REPO_URL_ID+="-json"
-			fi
 			break
-
 		done
 		if [ -z "$PKG_DIR" ]; then
 			termux_error_exit "Failed to find package directory for package '$PKG'"
@@ -47,12 +38,10 @@ termux_step_setup_cgct_environment() {
 
 		if ! package__is_package_version_built "$PKG" "$DEP_VERSION" && [ ! -f "$TERMUX_BUILT_PACKAGES_DIRECTORY/$PKG-for-cgct" ]; then
 			[ ! "$TERMUX_QUIET_BUILD" = "true" ] && echo "Installing '${PKG}' for the CGCT tool environment."
-
-			if [ ! -f "${TERMUX_COMMON_CACHEDIR}-${DEP_ARCH}/${TERMUX_REPO_URL_ID}" ]; then
-				TERMUX_INSTALL_DEPS=true termux_get_repo_files
 			fi
 
-			if ! TERMUX_WITHOUT_DEPVERSION_BINDING=true termux_download_deb_pac "$PKG" "$DEP_ARCH" "$DEP_VERSION" "$DEP_VERSION_PAC"; then
+			if ! TERMUX_WITHOUT_DEPVERSION_BINDING=true TERMUX_ON_DEVICE_BUILD=false \
+					termux_download_deb_pac "$PKG" "$DEP_ARCH" "$DEP_VERSION" "$DEP_VERSION_PAC"; then
 				termux_error_exit "Failed to download package '${PKG}'"
 			fi
 

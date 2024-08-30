@@ -1,7 +1,18 @@
 termux_get_repo_files() {
-	# Not needed for on-device builds or when building
-	# dependencies.
-	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ] || [ "$TERMUX_INSTALL_DEPS" = "false" ]; then
+
+	# If already downloaded, then just return.
+	if [[ "${TERMUX_REPO__REPO_METADATA_FILES_DOWNLOADED:-}" == "true" ]]; then
+		return 0
+	fi
+
+	# If building on device.
+	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
+		# Ensure that package manager packages metadata caches are up-to-date.
+		case "$TERMUX_APP_PACKAGE_MANAGER" in
+			"apt") apt update || return $?;;
+			"pacman") pacman -Sy || return $?;;
+		esac
+		TERMUX_REPO__REPO_METADATA_FILES_DOWNLOADED="true"
 		return
 	fi
 
@@ -78,4 +89,6 @@ termux_get_repo_files() {
 		done
 
 	done
+
+	TERMUX_REPO__REPO_METADATA_FILES_DOWNLOADED="true"
 }

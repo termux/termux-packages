@@ -24,6 +24,9 @@ termux_download_deb_pac() {
 		return 1
 	fi
 
+	# Download repo metadata files.
+	termux_get_repo_files
+
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
 		case "$TERMUX_APP_PACKAGE_MANAGER" in
 			"apt") apt install -y "${PACKAGE}$(test ${TERMUX_WITHOUT_DEPVERSION_BINDING} != true && echo "=${VERSION}")";;

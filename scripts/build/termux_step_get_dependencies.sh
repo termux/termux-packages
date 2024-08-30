@@ -3,20 +3,12 @@ termux_step_get_dependencies() {
 		return 0
 	fi
 
-	if [ "$TERMUX_INSTALL_DEPS" = true ]; then
-		# Download repo files
-		termux_download_repo_file
-	fi
-
 	while read PKG PKG_DIR; do
 		# Checking for duplicate dependencies
 		local cyclic_dependence=false
 		if termux_check_package_in_building_packages_list "$PKG_DIR"; then
 			echo "A circular dependency was found on '$PKG', the old version of the package will be installed to resolve the conflict"
 			cyclic_dependence=true
-			if [ "$TERMUX_INSTALL_DEPS" = false ]; then
-				termux_download_repo_file
-			fi
 		fi
 
 		if [ "$TERMUX_INSTALL_DEPS" = true ] || [ "$cyclic_dependence" = true ]; then
@@ -137,16 +129,4 @@ termux_run_build-package() {
  		$(test "${TERMUX_RM_ALL_PKG_BUILD_DEPENDENT_DIRS}" = "true" && echo "-r") \
    		$(test "${TERMUX_WITHOUT_DEPVERSION_BINDING}" = "true" && echo "-w") \
      		--format $TERMUX_PACKAGE_FORMAT --library $set_library "${PKG_DIR}"
-}
-
-termux_download_repo_file() {
-	termux_get_repo_files
-
-	# When doing build on device, ensure that apt lists are up-to-date.
-	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
-		case "$TERMUX_APP_PACKAGE_MANAGER" in
-			"apt") apt update;;
-			"pacman") pacman -Sy;;
-		esac
-	fi
 }
