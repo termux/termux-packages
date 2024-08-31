@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 # Please align the version with `libprotobuf` package.
 TERMUX_PKG_VERSION=25.1
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/protocolbuffers/protobuf/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=9bd87b8280ef720d3240514f884e56a712f2218f0d693b48050c836028940a42
 v_proto_version_shared=$(. $TERMUX_SCRIPTDIR/packages/libprotobuf/build.sh; echo ${TERMUX_PKG_VERSION})

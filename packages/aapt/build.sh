@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 _TAG_VERSION=13.0.0
 _TAG_REVISION=6
 TERMUX_PKG_VERSION=${_TAG_VERSION}.${_TAG_REVISION}
-TERMUX_PKG_REVISION=13
+TERMUX_PKG_REVISION=14
 TERMUX_PKG_SRCURL=(https://android.googlesource.com/platform/frameworks/base
                    https://android.googlesource.com/platform/system/core
                    https://android.googlesource.com/platform/system/libbase
