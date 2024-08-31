@@ -1,5 +1,4 @@
-# shellcheck shell=sh
-# shellcheck disable=SC2039,SC2059
+# shellcheck shell=bash
 
 # Title:          termux_package
 # Description:    A library for Termux package utils.

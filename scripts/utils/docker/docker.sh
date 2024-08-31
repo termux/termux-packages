@@ -1,5 +1,4 @@
-# shellcheck shell=sh
-# shellcheck disable=SC2039,SC2059
+# shellcheck shell=bash
 
 # Title:          docker
 # Description:    A library for docker.
