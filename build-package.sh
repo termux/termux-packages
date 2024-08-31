@@ -27,8 +27,8 @@ export TERMUX_SCRIPTDIR
 # Store pid of current process in a file for docker__run_docker_exec_trap
 source "$TERMUX_SCRIPTDIR/scripts/utils/docker/docker.sh"; docker__create_docker_exec_pid_file
 
-# Functions for working with packages
-source "$TERMUX_SCRIPTDIR/scripts/utils/package/package.sh"
+# Source the `termux_package` library.
+source "$TERMUX_SCRIPTDIR/scripts/utils/termux/package/termux_package.sh"
 
 export SOURCE_DATE_EPOCH=${SOURCE_DATE_EPOCH:-$(git -c log.showSignature=false log -1 --pretty=%ct 2>/dev/null || date "+%s")}
 

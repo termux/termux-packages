@@ -35,7 +35,7 @@ termux_step_setup_cgct_environment() {
 
 		read DEP_ARCH DEP_VERSION DEP_VERSION_PAC <<< $(termux_extract_dep_info $PKG "${PKG_DIR/'/build.sh'/}")
 
-		if ! package__is_package_version_built "$PKG" "$DEP_VERSION" && [ ! -f "$TERMUX_BUILT_PACKAGES_DIRECTORY/$PKG-for-cgct" ]; then
+		if ! termux_package__is_package_version_built "$PKG" "$DEP_VERSION" && [ ! -f "$TERMUX_BUILT_PACKAGES_DIRECTORY/$PKG-for-cgct" ]; then
 			[ ! "$TERMUX_QUIET_BUILD" = "true" ] && echo "Installing '${PKG}' for the CGCT tool environment."
 
 			if [ ! -f "${TERMUX_COMMON_CACHEDIR}-${DEP_ARCH}/${REPO_NAME}" ]; then
