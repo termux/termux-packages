@@ -1,8 +1,8 @@
 # shellcheck shell=sh
 # shellcheck disable=SC2039,SC2059
 
-# Title:          package
-# Description:    A library for package utils.
+# Title:          termux_package
+# Description:    A library for Termux package utils.
 
 
 
@@ -19,11 +19,14 @@
 # Returns `0` if supported, otherwise `1`.
 # .
 # .
-# package__is_package_on_device_build_supported `package_dir`
+# termux_package__is_package_on_device_build_supported `<package_dir>`
 ##
-package__is_package_on_device_build_supported() {
-	[ $(. "${1}/build.sh"; echo "$TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED") != "true" ]
+termux_package__is_package_on_device_build_supported() {
+
+	# shellcheck disable=SC1091
+	[[ "$(. "$1/build.sh"; echo "$TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED")" != "true" ]]
 	return $?
+
 }
 
 
@@ -41,11 +44,13 @@ package__is_package_on_device_build_supported() {
 # Returns `0` if built, otherwise `1`.
 # .
 # .
-# package__is_package_version_built `package_name` `package_version`
+# termux_package__is_package_version_built `<package_name>` `<package_version>`
 ##
-package__is_package_version_built() {
+termux_package__is_package_version_built() {
+
 	[ -e "$TERMUX_BUILT_PACKAGES_DIRECTORY/$1" ] && [ "$(cat "$TERMUX_BUILT_PACKAGES_DIRECTORY/$1")" = "$2" ]
 	return $?
+
 }
 
 
@@ -61,15 +66,18 @@ package__is_package_version_built() {
 # Returns `0` if have, otherwise `1`.
 # .
 # .
-# package__is_package_name_have_glibc_prefix `package_name`
+# termux_package__is_package_name_have_glibc_prefix `<package_name>`
 ##
-package__is_package_name_have_glibc_prefix() {
+termux_package__is_package_name_have_glibc_prefix() {
+
 	for __pkgname_part in ${1//-/ }; do
-		if [ "${__pkgname_part}" = "glibc" ]; then
+		if [ "$__pkgname_part" = "glibc" ]; then
 			return 0
 		fi
 	done
+
 	return 1
+
 }
 
 
@@ -85,14 +93,16 @@ package__is_package_name_have_glibc_prefix() {
 # Returns a modified package name.
 # .
 # .
-# package__add_prefix_glibc_to_package_name `package_name`
+# termux_package__add_prefix_glibc_to_package_name `<package_name>`
 ##
-package__add_prefix_glibc_to_package_name() {
+termux_package__add_prefix_glibc_to_package_name() {
+
 	if [[ "${1}" = *"-static" ]]; then
 		echo "${1/-static/-glibc-static}"
 	else
 		echo "${1}-glibc"
 	fi
+
 }
 
 
@@ -108,24 +118,28 @@ package__add_prefix_glibc_to_package_name() {
 # Returns a modified list of package names.
 # .
 # .
-# package__add_prefix_glibc_to_package_list `package_list`
+# termux_package__add_prefix_glibc_to_package_list `<package_list>`
 ##
-package__add_prefix_glibc_to_package_list() {
+termux_package__add_prefix_glibc_to_package_list() {
+
 	local packages=""
+
 	for __pkg in ${1//,/}; do
-		if ! $(echo "${__pkg}" | grep -q -e '(' -e ')' -e '|'); then
+		if ! "$(echo "$__pkg" | grep -q -e '(' -e ')' -e '|')"; then
 			if [ "${packages: -1}" != "|" ]; then
 				packages+=","
 			fi
 			packages+=" "
-			if ! package__is_package_name_have_glibc_prefix "${__pkg}"; then
-				packages+="$(package__add_prefix_glibc_to_package_name ${__pkg})"
+			if ! termux_package__is_package_name_have_glibc_prefix "$__pkg"; then
+				packages+="$(termux_package__add_prefix_glibc_to_package_name "$__pkg")"
 			else
-				packages+="${__pkg}"
+				packages+="$__pkg"
 			fi
 		else
-			packages+=" ${__pkg}"
+			packages+=" $__pkg"
 		fi
 	done
+
 	echo "${packages:2}"
+
 }
