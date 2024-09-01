@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Centralized version control system characterized by its 
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.14.3
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.apache.org/dist/subversion/subversion-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=949efd451a09435f7e8573574c71c7b71b194d844890fa49cd61d2262ea1a440
 TERMUX_PKG_DEPENDS="apr, apr-util, serf, libexpat, libsqlite, liblz4, utf8proc, zlib"
