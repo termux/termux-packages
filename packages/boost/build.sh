@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # Never forget to always bump revision of reverse dependencies and rebuild them
 # when bumping version.
 TERMUX_PKG_VERSION="1.83.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://boostorg.jfrog.io/artifactory/main/release/$TERMUX_PKG_VERSION/source/boost_${TERMUX_PKG_VERSION//./_}.tar.bz2
 TERMUX_PKG_SHA256=6478edfe2f3305127cffe8caf73ea0176c53769f4bf1585be237eb30798c3b8e
 TERMUX_PKG_AUTO_UPDATE=false
