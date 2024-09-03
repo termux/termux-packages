@@ -1,6 +1,6 @@
 termux_setup_nodejs() {
 	# Use LTS version for now
-	local NODEJS_VERSION=18.16.1
+	local NODEJS_VERSION=18.17.0
 	local NODEJS_FOLDER
 
 	if [ "${TERMUX_PACKAGES_OFFLINE-false}" = "true" ]; then
