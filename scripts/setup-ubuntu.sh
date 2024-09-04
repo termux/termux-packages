@@ -99,7 +99,6 @@ PACKAGES+=" gengetopt"
 PACKAGES+=" libdbus-1-dev"
 
 # Needed by package below.
-PACKAGES+=" clang-15"
 PACKAGES+=" libelf-dev"
 
 # Needed by package ghostscript.
