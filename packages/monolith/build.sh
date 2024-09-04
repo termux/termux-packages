@@ -11,4 +11,11 @@ TERMUX_PKG_DEPENDS="openssl"
 
 termux_step_pre_configure() {
 	rm -f Makefile
+
+	# ld: error: undefined symbol: __atomic_is_lock_free
+	# ld: error: undefined symbol: __atomic_fetch_or_8
+	# ld: error: undefined symbol: __atomic_load
+	if [[ "${TERMUX_ARCH}" == "i686" ]]; then
+		RUSTFLAGS+=" -C link-arg=$(${CC} -print-libgcc-file-name)"
+	fi
 }
