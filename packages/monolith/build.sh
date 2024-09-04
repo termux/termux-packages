@@ -18,4 +18,6 @@ termux_step_pre_configure() {
 	if [[ "${TERMUX_ARCH}" == "i686" ]]; then
 		RUSTFLAGS+=" -C link-arg=$(${CC} -print-libgcc-file-name)"
 	fi
+
+	export OPENSSL_NO_VENDOR=1
 }
