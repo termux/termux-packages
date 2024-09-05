@@ -65,7 +65,6 @@ PACKAGES+=" xmlto"
 PACKAGES+=" xmltoman"
 
 # Needed by python modules (e.g. asciinema) and some build systems.
-PACKAGES+=" python3.9"
 PACKAGES+=" python3.10"
 PACKAGES+=" python3.11"
 PACKAGES+=" python3-pip"
