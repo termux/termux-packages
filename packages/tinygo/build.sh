@@ -3,10 +3,10 @@ TERMUX_PKG_DESCRIPTION="Go compiler for microcontrollers, WASM, CLI tools"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.32.0"
+TERMUX_PKG_VERSION="0.33.0"
 TERMUX_PKG_SRCURL=git+https://github.com/tinygo-org/tinygo
 TERMUX_PKG_GIT_BRANCH="v${TERMUX_PKG_VERSION}"
-TERMUX_PKG_SHA256=f5def9d80a4fe2f6f5d3f81ae81b7d4bc04b64df64fa7641eb9334279e00259d
+TERMUX_PKG_SHA256=c4ed2c186c32e84946b4fe89ee9a0cf5b3fd43b3598e5bf880dfecf9e5d9ff16
 TERMUX_PKG_DEPENDS="binaryen, golang, libc++"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="binaryen, golang"
 TERMUX_PKG_NO_STATICSPLIT=true
@@ -16,7 +16,6 @@ TERMUX_PKG_AUTO_UPDATE=true
 _LLVM_OPTION="
 -DCMAKE_BUILD_TYPE=MinSizeRel
 -DGENERATOR_IS_MULTI_CONFIG=ON
--DLLVM_ENABLE_LTO=Thin
 -DLLVM_TABLEGEN=${TERMUX_PKG_HOSTBUILD_DIR}/bin/llvm-tblgen
 -DCLANG_TABLEGEN=${TERMUX_PKG_HOSTBUILD_DIR}/bin/clang-tblgen
 "
@@ -142,8 +141,6 @@ termux_step_host_build() {
 termux_step_pre_configure() {
 	# this is a workaround for build-all.sh issue
 	TERMUX_PKG_DEPENDS+=", tinygo-common"
-
-	export CGO_LDFLAGS=${CGO_LDFLAGS/ -fopenmp/}
 
 	# https://github.com/termux/termux-packages/issues/16358
 	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "true" ]]; then
