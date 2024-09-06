@@ -65,12 +65,9 @@ PACKAGES+=" xmlto"
 PACKAGES+=" xmltoman"
 
 # Needed by python modules (e.g. asciinema) and some build systems.
-PACKAGES+=" python3.10"
-PACKAGES+=" python3.11"
 PACKAGES+=" python3-pip"
 PACKAGES+=" python3-setuptools"
 PACKAGES+=" python-wheel-common"
-PACKAGES+=" python3.10-venv"
 PACKAGES+=" python3.11-venv"
 
 # Needed by package bc.
@@ -190,7 +187,7 @@ PACKAGES+=" rsync"
 PACKAGES+=" wget"
 
 # Needed by codeblocks
-PACKAGES+=" libwxgtk3.0-gtk3-dev"
+PACKAGES+=" libwxgtk3.2-dev"
 PACKAGES+=" libgtk-3-dev"
 
 # Needed by packages in unstable repository.
@@ -324,7 +321,7 @@ $SUDO dpkg --add-architecture i386
 $SUDO cp $(dirname "$(realpath "$0")")/llvm-snapshot.gpg.key /etc/apt/trusted.gpg.d/apt.llvm.org.asc
 $SUDO chmod a+r /etc/apt/trusted.gpg.d/apt.llvm.org.asc
 {
-	echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-17 main"
+	echo "deb http://apt.llvm.org/noble/ llvm-toolchain-noble-17 main"
 } | $SUDO tee /etc/apt/sources.list.d/apt-llvm-org.list > /dev/null
 
 $SUDO apt-get -yq update
