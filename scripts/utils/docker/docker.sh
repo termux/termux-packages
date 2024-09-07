@@ -25,26 +25,26 @@
 ##
 docker__run_docker_exec_trap() {
 
-	local exit_code=$? # Store the original trap signal
-	local signal="${1:-}";
-	trap - EXIT  # Remove the EXIT trap so its not called again
+    local exit_code=$? # Store the original trap signal
+    local signal="${1:-}";
+    trap - EXIT  # Remove the EXIT trap so its not called again
 
-	[ -n "${1:-}" ] && trap - "${1:-}"; # If a signal argument was passed, then remove its trap
+    [ -n "${1:-}" ] && trap - "${1:-}"; # If a signal argument was passed, then remove its trap
 
-	if [ -n "${CONTAINER_NAME-}" ] && [ -n "${DOCKER_EXEC_PID_FILE_PATH-}" ]; then
+    if [ -n "${CONTAINER_NAME-}" ] && [ -n "${DOCKER_EXEC_PID_FILE_PATH-}" ]; then
 
-		local docker_exec_trap_command='
+        local docker_exec_trap_command='
 # If called process did not store its pid in file path, then just exit
 [ ! -f '"$DOCKER_EXEC_PID_FILE_PATH"' ] && exit 0;
 
 docker_killtree() {
-	local signal="${1:-}"; local pid="${2:-}"; local cpid; local docker_process
-	for cpid in $(pgrep -P "$pid"); do docker_killtree "$signal" "$cpid"; done
-	[[ "$pid" != "$$" ]] && \
-	docker_process="$(ps -efww --pid "$pid" --no-headers -o pid:1,cmd || :)" && \
-	test -n "$docker_process" && \
-	#echo "Killing $docker_process" && \
-	kill "-${signal:-15}" "$pid" 2>/dev/null || :
+    local signal="${1:-}"; local pid="${2:-}"; local cpid; local docker_process
+    for cpid in $(pgrep -P "$pid"); do docker_killtree "$signal" "$cpid"; done
+    [[ "$pid" != "$$" ]] && \
+    docker_process="$(ps -efww --pid "$pid" --no-headers -o pid:1,cmd || :)" && \
+    test -n "$docker_process" && \
+    #echo "Killing $docker_process" && \
+    kill "-${signal:-15}" "$pid" 2>/dev/null || :
 }
 
 # Read the pid stored in file path and send kill signals to the process and all its children
@@ -53,13 +53,13 @@ DOCKER_PROCESS="$(ps -efww --pid "$DOCKER_PID" --no-headers -o pid:1,cmd || :)" 
 test -n "$DOCKER_PROCESS" && \
 echo "Docker trap killing DOCKER_PROCESS" && \
 docker_killtree "'"$signal"'" "$DOCKER_PID" || :
-		'
-		# Exec docker_exec_trap_command inside docker context
-		$SUDO docker exec "$CONTAINER_NAME" bash -c "$docker_exec_trap_command"
+        '
+        # Exec docker_exec_trap_command inside docker context
+        $SUDO docker exec "$CONTAINER_NAME" bash -c "$docker_exec_trap_command"
 
-	fi
+    fi
 
-	exit $exit_code # Exit with the original trap signal exit code
+    exit $exit_code # Exit with the original trap signal exit code
 
 }
 
@@ -78,13 +78,13 @@ docker_killtree "'"$signal"'" "$DOCKER_PID" || :
 ##
 docker__setup_docker_exec_traps() {
 
-	DOCKER_EXEC_PID_FILE_PATH="/tmp/docker-exec-pid-$(date +"%Y-%m-%d-%H.%M.%S.")$((RANDOM%1000))"
+    DOCKER_EXEC_PID_FILE_PATH="/tmp/docker-exec-pid-$(date +"%Y-%m-%d-%H.%M.%S.")$((RANDOM%1000))"
 
-	trap 'docker__run_docker_exec_trap' EXIT
-	trap 'docker__run_docker_exec_trap TERM' TERM
-	trap 'docker__run_docker_exec_trap INT' INT
-	trap 'docker__run_docker_exec_trap HUP' HUP
-	trap 'docker__run_docker_exec_trap QUIT' QUIT
+    trap 'docker__run_docker_exec_trap' EXIT
+    trap 'docker__run_docker_exec_trap TERM' TERM
+    trap 'docker__run_docker_exec_trap INT' INT
+    trap 'docker__run_docker_exec_trap HUP' HUP
+    trap 'docker__run_docker_exec_trap QUIT' QUIT
 
 }
 
@@ -102,12 +102,12 @@ docker__setup_docker_exec_traps() {
 ##
 docker__create_docker_exec_pid_file() {
 
-	local pid=${1:-}; pid=${pid:-$$}
+    local pid=${1:-}; pid=${pid:-$$}
 
-	if [ -n "${DOCKER_EXEC_PID_FILE_PATH-}" ] && [ ! -e "${DOCKER_EXEC_PID_FILE_PATH-}" ]; then
-		if ! echo "$pid" > "$DOCKER_EXEC_PID_FILE_PATH"; then
-			echo "Failed to create docker exec pid file at \"$DOCKER_EXEC_PID_FILE_PATH\""
-		fi
-	fi
+    if [ -n "${DOCKER_EXEC_PID_FILE_PATH-}" ] && [ ! -e "${DOCKER_EXEC_PID_FILE_PATH-}" ]; then
+        if ! echo "$pid" > "$DOCKER_EXEC_PID_FILE_PATH"; then
+            echo "Failed to create docker exec pid file at \"$DOCKER_EXEC_PID_FILE_PATH\""
+        fi
+    fi
 
 }

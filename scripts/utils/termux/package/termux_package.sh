@@ -22,9 +22,9 @@
 ##
 termux_package__is_package_on_device_build_supported() {
 
-	# shellcheck disable=SC1091
-	[[ "$(. "$1/build.sh"; echo "$TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED")" != "true" ]]
-	return $?
+    # shellcheck disable=SC1091
+    [[ "$(. "$1/build.sh"; echo "$TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED")" != "true" ]]
+    return $?
 
 }
 
@@ -47,8 +47,8 @@ termux_package__is_package_on_device_build_supported() {
 ##
 termux_package__is_package_version_built() {
 
-	[ -e "$TERMUX_BUILT_PACKAGES_DIRECTORY/$1" ] && [ "$(cat "$TERMUX_BUILT_PACKAGES_DIRECTORY/$1")" = "$2" ]
-	return $?
+    [ -e "$TERMUX_BUILT_PACKAGES_DIRECTORY/$1" ] && [ "$(cat "$TERMUX_BUILT_PACKAGES_DIRECTORY/$1")" = "$2" ]
+    return $?
 
 }
 
@@ -69,13 +69,13 @@ termux_package__is_package_version_built() {
 ##
 termux_package__is_package_name_have_glibc_prefix() {
 
-	for __pkgname_part in ${1//-/ }; do
-		if [ "$__pkgname_part" = "glibc" ]; then
-			return 0
-		fi
-	done
+    for __pkgname_part in ${1//-/ }; do
+        if [ "$__pkgname_part" = "glibc" ]; then
+            return 0
+        fi
+    done
 
-	return 1
+    return 1
 
 }
 
@@ -96,11 +96,11 @@ termux_package__is_package_name_have_glibc_prefix() {
 ##
 termux_package__add_prefix_glibc_to_package_name() {
 
-	if [[ "${1}" = *"-static" ]]; then
-		echo "${1/-static/-glibc-static}"
-	else
-		echo "${1}-glibc"
-	fi
+    if [[ "${1}" = *"-static" ]]; then
+        echo "${1/-static/-glibc-static}"
+    else
+        echo "${1}-glibc"
+    fi
 
 }
 
@@ -121,24 +121,24 @@ termux_package__add_prefix_glibc_to_package_name() {
 ##
 termux_package__add_prefix_glibc_to_package_list() {
 
-	local packages=""
+    local packages=""
 
-	for __pkg in ${1//,/}; do
-		if ! "$(echo "$__pkg" | grep -q -e '(' -e ')' -e '|')"; then
-			if [ "${packages: -1}" != "|" ]; then
-				packages+=","
-			fi
-			packages+=" "
-			if ! termux_package__is_package_name_have_glibc_prefix "$__pkg"; then
-				packages+="$(termux_package__add_prefix_glibc_to_package_name "$__pkg")"
-			else
-				packages+="$__pkg"
-			fi
-		else
-			packages+=" $__pkg"
-		fi
-	done
+    for __pkg in ${1//,/}; do
+        if ! "$(echo "$__pkg" | grep -q -e '(' -e ')' -e '|')"; then
+            if [ "${packages: -1}" != "|" ]; then
+                packages+=","
+            fi
+            packages+=" "
+            if ! termux_package__is_package_name_have_glibc_prefix "$__pkg"; then
+                packages+="$(termux_package__add_prefix_glibc_to_package_name "$__pkg")"
+            else
+                packages+="$__pkg"
+            fi
+        else
+            packages+=" $__pkg"
+        fi
+    done
 
-	echo "${packages:2}"
+    echo "${packages:2}"
 
 }
