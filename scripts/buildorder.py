@@ -102,6 +102,22 @@ def add_prefix_glibc_to_pkgname(name):
 def has_prefix_glibc(pkgname):
     return "glibc" in pkgname.split("-")
 
+def get_source_sh(pkgpath):
+    pkgname = os.path.basename(pkgpath)
+    pkgpath = os.path.join(pkgpath, 'build.sh')
+    if not os.path.isfile(pkgpath):
+        die("build.sh not found for package '" + pkgname + "'")
+    return pkgpath
+
+def directories_repo_json():
+    with open ('repo.json') as f:
+        data = json.load(f)
+    directories = []
+    for d in data.keys():
+        if d != "pkg_format":
+            directories.append(d)
+    return directories
+
 class TermuxPackage(object):
     "A main package definition represented by a directory with a build.sh file."
     def __init__(self, dir_path, fast_build_mode):
@@ -113,9 +129,21 @@ class TermuxPackage(object):
             self.name = add_prefix_glibc_to_pkgname(self.name)
 
         # search package build.sh
-        build_sh_path = os.path.join(self.dir, 'build.sh')
-        if not os.path.isfile(build_sh_path):
-            raise Exception("build.sh not found for package '" + self.name + "'")
+        build_sh_path = get_source_sh(self.dir)
+
+        self.virtual = parse_build_file_variable_bool(build_sh_path, 'TERMUX_VIRTUAL_PKG')
+        self.virtual_src = parse_build_file_variable(build_sh_path, 'TERMUX_VIRTUAL_PKG_SRC')
+        if self.virtual_src:
+            if "/" not in self.virtual_src:
+                for dir in directories_repo_json():
+                    pkgpath = os.path.join(dir, self.virtual_src)
+                    if os.path.isdir(pkgpath):
+                        self.virtual_src = pkgpath
+                        break
+                else:
+                    die(f"source package '{self.virtual_src}' not found for virtual package '{self.name}'")
+            self.virtual_src = get_source_sh(self.virtual_src)
+            self.virtual = True
 
         self.deps = parse_build_file_dependencies(build_sh_path)
         self.pkg_deps = parse_build_file_dependencies_with_vars(build_sh_path, 'TERMUX_PKG_DEPENDS')
@@ -124,6 +152,14 @@ class TermuxPackage(object):
         self.only_installing = parse_build_file_variable_bool(build_sh_path, 'TERMUX_PKG_ONLY_INSTALLING')
         self.separate_subdeps = parse_build_file_variable_bool(build_sh_path, 'TERMUX_PKG_SEPARATE_SUB_DEPENDS')
         self.accept_dep_scr = parse_build_file_variable_bool(build_sh_path, 'TERMUX_PKG_ACCEPT_PKG_IN_DEP')
+
+        if self.virtual_src:
+            if not self.deps:
+                self.deps = parse_build_file_dependencies(self.virtual_src)
+            if not self.pkg_deps:
+                self.pkg_deps = parse_build_file_dependencies_with_vars(self.virtual_src, 'TERMUX_PKG_DEPENDS')
+            if not self.antideps:
+                self.antideps = parse_build_file_antidependencies(self.virtual_src)
 
         if os.getenv('TERMUX_ON_DEVICE_BUILD') == "true" and termux_pkg_library == "bionic":
             always_deps = ['libc++']
@@ -134,17 +170,18 @@ class TermuxPackage(object):
         # search subpackages
         self.subpkgs = []
 
-        for filename in os.listdir(self.dir):
-            if not filename.endswith('.subpackage.sh'):
-                continue
-            subpkg = TermuxSubPackage(self.dir + '/' + filename, self)
-            if termux_arch in subpkg.excluded_arches:
-                continue
+        if not self.virtual:
+            for filename in os.listdir(self.dir):
+                if not filename.endswith('.subpackage.sh'):
+                    continue
+                subpkg = TermuxSubPackage(self.dir + '/' + filename, self)
+                if termux_arch in subpkg.excluded_arches:
+                    continue
+                self.subpkgs.append(subpkg)
 
+        if not self.virtual:
+            subpkg = TermuxSubPackage(self.dir + '/' + self.name + '-static' + '.subpackage.sh', self, virtual=True)
             self.subpkgs.append(subpkg)
-
-        subpkg = TermuxSubPackage(self.dir + '/' + self.name + '-static' + '.subpackage.sh', self, virtual=True)
-        self.subpkgs.append(subpkg)
 
         self.needed_by = set()  # Populated outside constructor, reverse of deps.
 
@@ -239,12 +276,7 @@ def read_packages_from_directories(directories, fast_build_mode, full_buildmode)
 
     if full_buildmode:
         # Ignore directories and get all folders from repo.json file
-        with open ('repo.json') as f:
-            data = json.load(f)
-        directories = []
-        for d in data.keys():
-            if d != "pkg_format":
-                directories.append(d)
+        directories = directories_repo_json()
 
     for package_dir in directories:
         for pkgdir_name in sorted(os.listdir(package_dir)):
@@ -258,7 +290,7 @@ def read_packages_from_directories(directories, fast_build_mode, full_buildmode)
                 if new_package.name in pkgs_map:
                     die('Duplicated package: ' + new_package.name)
                 else:
-                    pkgs_map[new_package.name] = new_package
+                    pkgs_map[new_package.dir if new_package.virtual else new_package.name] = new_package
                 all_packages.append(new_package)
 
                 for subpkg in new_package.subpkgs:
@@ -358,12 +390,15 @@ def generate_target_buildorder(target_path, pkgs_map, fast_build_mode):
     if target_path.endswith('/'):
         target_path = target_path[:-1]
 
-    package_name = os.path.basename(target_path)
-    if "gpkg" in target_path.split("/")[-2].split("-") and not has_prefix_glibc(package_name):
-        package_name = add_prefix_glibc_to_pkgname(package_name)
-    package = pkgs_map[package_name]
+    if target_path in pkgs_map.keys():
+        package = pkgs_map[target_path]
+    else:
+        package_name = os.path.basename(target_path)
+        if "gpkg" in target_path.split("/")[-2].split("-") and not has_prefix_glibc(package_name):
+            package_name = add_prefix_glibc_to_pkgname(package_name)
+        package = pkgs_map[package_name]
     # Do not depend on any sub package
-    if fast_build_mode:
+    if not package.virtual and fast_build_mode:
         package.deps.difference_update([subpkg.name for subpkg in package.subpkgs])
     return package.recursive_dependencies(pkgs_map)
 

@@ -195,6 +195,13 @@ termux_step_setup_variables() {
 	TERMUX_PKG_SEPARATE_SUB_DEPENDS=false # when set to true in a package, subpackage(s) of package will not be added to the dependency of the parent package (only for algorithms `scripts/buildorder.py`)
 	TERMUX_PKG_ACCEPT_PKG_IN_DEP=false # allows you to add an initial package as a dependency, if any requested package (and their dependencies) will have a dependency on it (only for algorithms `scripts/buildorder.py`)
 
+	TERMUX_VIRTUAL_PKG=false
+	TERMUX_VIRTUAL_PKG_SRC=""
+	TERMUX_VIRTUAL_PKG_INCLUDE=""
+	TERMUX_VIRTUAL_PKG_NAME="$TERMUX_PKG_NAME"
+	TERMUX_VIRTUAL_PKG_BUILDER_DIR="$TERMUX_PKG_BUILDER_DIR"
+	TERMUX_VIRTUAL_PKG_BUILDER_SCRIPT="$TERMUX_PKG_BUILDER_SCRIPT"
+
 	unset CFLAGS CPPFLAGS LDFLAGS CXXFLAGS
 	unset TERMUX_MESON_ENABLE_SOVERSION # setenv to enable SOVERSION suffix for shared libs built with Meson
 }
