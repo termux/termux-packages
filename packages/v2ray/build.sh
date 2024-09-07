@@ -30,7 +30,7 @@ termux_pkg_auto_update() {
 	local tmpdir
 	tmpdir="$(mktemp -d)"
 	curl -sLo "${tmpdir}/tmpfile" "https://github.com/v2fly/v2ray-core/releases/download/v$latest_tag/v2ray-linux-64.zip"
-	local sha="$(sha256sum "${tmpdir}/src" | cut -d ' ' -f 1)"
+	local sha="$(sha256sum "${tmpdir}/tmpfile" | cut -d ' ' -f 1)"
 	
 	sed \
 		-e "s|^_RELEASE_SHA256=.*|_RELEASE_SHA256=${sha}|" \
