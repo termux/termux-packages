@@ -486,6 +486,44 @@ termux_run_base_and_multilib_build_step() {
 	fi
 }
 
+# Sets up TERMUX_PKG_BUILDER_DIR and TERMUX_PKG_BUILDER_SCRIPT
+termux_step_get_build_script_directory() {
+	TERMUX_PKG_NAME="${1}"
+	if [[ ${TERMUX_PKG_NAME} == *"/"* ]]; then
+		# Path to directory which may be outside this repo:
+		if [ ! -d "${TERMUX_PKG_NAME}" ]; then termux_error_exit "'${TERMUX_PKG_NAME}' seems to be a path but is not a directory"; fi
+		export TERMUX_PKG_BUILDER_DIR=$(realpath "${TERMUX_PKG_NAME}")
+		TERMUX_PKG_NAME=$(basename "${TERMUX_PKG_NAME}")
+	else
+		# Package name:
+		for package_directory in $TERMUX_PACKAGES_DIRECTORIES; do
+			if [ -d "${TERMUX_SCRIPTDIR}/${package_directory}/${TERMUX_PKG_NAME}" ]; then
+				export TERMUX_PKG_BUILDER_DIR=${TERMUX_SCRIPTDIR}/$package_directory/$TERMUX_PKG_NAME
+				break
+			elif [ -n "${TERMUX_IS_DISABLED=""}" ] && [ -d "${TERMUX_SCRIPTDIR}/disabled-packages/${TERMUX_PKG_NAME}" ]; then
+				export TERMUX_PKG_BUILDER_DIR=$TERMUX_SCRIPTDIR/disabled-packages/$TERMUX_PKG_NAME
+				break
+			fi
+		done
+		if [ -z "${TERMUX_PKG_BUILDER_DIR}" ]; then
+			termux_error_exit "No package $TERMUX_PKG_NAME found in any of the enabled repositories. Are you trying to set up a custom repository?"
+		fi
+	fi
+	TERMUX_PKG_BUILDER_SCRIPT=$TERMUX_PKG_BUILDER_DIR/build.sh
+	if test ! -f "$TERMUX_PKG_BUILDER_SCRIPT"; then
+		termux_error_exit "No build.sh script at package dir $TERMUX_PKG_BUILDER_DIR!"
+	fi
+}
+
+# Removes included sources in a virtual package
+# Should only be run on error or when the script exits.
+termux_remove_include_virtual_files() {
+	[ -z "${TERMUX_VIRTUAL_PKG-}" ] || [ "$TERMUX_VIRTUAL_PKG" = "false" ] || [ "$TERMUX_VIRTUAL_PKG_INCLUDE" = "false" ] && return
+	for file in $TERMUX_VIRTUAL_PKG_INCLUDE; do
+		rm -fr "${TERMUX_VIRTUAL_PKG_BUILDER_DIR}/${file}"
+	done
+}
+
 # Special hook to prevent use of "sudo" inside package build scripts.
 # build-package.sh shouldn't perform any privileged operations.
 sudo() {
@@ -516,6 +554,7 @@ _show_usage() {
 	echo "     flags are not passed."
 	echo "  -w Install dependencies without version binding."
 	echo "  -s Skip dependency check."
+	echo "  -b Fix circular dependencies using virtual packages only."
 	echo "  -o Specify directory where to put built packages. Default: output/."
 	echo "  --format Specify package output format (debian, pacman)."
 	echo "  --library Specify library of package (bionic, glibc)."
@@ -587,6 +626,7 @@ while (($# >= 1)); do
 		-r) export TERMUX_PKGS__BUILD__RM_ALL_PKG_BUILD_DEPENDENT_DIRS=true;;
 		-w) export TERMUX_WITHOUT_DEPVERSION_BINDING=true;;
 		-s) export TERMUX_SKIP_DEPCHECK=true;;
+		-b) export TERMUX_FIX_CYCLIC_DEPS_WITH_VIRTUAL_PKGS=true;;
 		-o)
 			if [ $# -ge 2 ]; then
 				shift 1
@@ -632,7 +672,7 @@ if [ -n "${TERMUX_PACKAGE_LIBRARY-}" ]; then
 	esac
 fi
 
-if [ "$TERMUX_REPO_PACKAGE" = "$TERMUX_APP_PACKAGE" ]; then
+if [ "$TERMUX_REPO_APP__PACKAGE_NAME" = "$TERMUX_APP_PACKAGE" ]; then
 	# Setup PGP keys for verifying integrity of dependencies.
 	# Keys are obtained from our keyring package.
 	gpg --list-keys 2C7F29AE97891F6419A9E2CDB0076E490B71616B > /dev/null 2>&1 || {
@@ -683,31 +723,11 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 		fi
 
 		# Check the package to build:
-		TERMUX_PKG_NAME=$(basename "${PACKAGE_LIST[i]}")
 		export TERMUX_PKG_BUILDER_DIR=
-		if [[ ${PACKAGE_LIST[i]} == *"/"* ]]; then
-			# Path to directory which may be outside this repo:
-			if [ ! -d "${PACKAGE_LIST[i]}" ]; then termux_error_exit "'${PACKAGE_LIST[i]}' seems to be a path but is not a directory"; fi
-			export TERMUX_PKG_BUILDER_DIR=$(realpath "${PACKAGE_LIST[i]}")
-		else
-			# Package name:
-			for package_directory in $TERMUX_PACKAGES_DIRECTORIES; do
-				if [ -d "${TERMUX_SCRIPTDIR}/${package_directory}/${TERMUX_PKG_NAME}" ]; then
-					export TERMUX_PKG_BUILDER_DIR=${TERMUX_SCRIPTDIR}/$package_directory/$TERMUX_PKG_NAME
-					break
-				elif [ -n "${TERMUX_IS_DISABLED=""}" ] && [ -d "${TERMUX_SCRIPTDIR}/disabled-packages/${TERMUX_PKG_NAME}" ]; then
-					export TERMUX_PKG_BUILDER_DIR=$TERMUX_SCRIPTDIR/disabled-packages/$TERMUX_PKG_NAME
-					break
-				fi
-			done
-			if [ -z "${TERMUX_PKG_BUILDER_DIR}" ]; then
-				termux_error_exit "No package $TERMUX_PKG_NAME found in any of the enabled repositories. Are you trying to set up a custom repository?"
-			fi
-		fi
-		TERMUX_PKG_BUILDER_SCRIPT=$TERMUX_PKG_BUILDER_DIR/build.sh
-		if test ! -f "$TERMUX_PKG_BUILDER_SCRIPT"; then
-			termux_error_exit "No build.sh script at package dir $TERMUX_PKG_BUILDER_DIR!"
-		fi
+		termux_step_get_build_script_directory "${PACKAGE_LIST[i]}"
+
+		# Add trap to remove included sources in virtual package
+		trap 'termux_remove_include_virtual_files' ERR EXIT
 
 		termux_step_setup_variables
 		termux_step_handle_buildarch
@@ -715,8 +735,12 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 		termux_step_cleanup_packages
 		termux_step_start_build
 
-		if ! termux_check_package_in_building_packages_list "${TERMUX_PKG_BUILDER_DIR#${TERMUX_SCRIPTDIR}/}"; then
-			echo "${TERMUX_PKG_BUILDER_DIR#${TERMUX_SCRIPTDIR}/}" >> $TERMUX_BUILD_PACKAGE_CALL_BUILDING_PACKAGES_LIST_FILE_PATH
+		TERMUX_PKG_PATH="${TERMUX_PKG_BUILDER_DIR#${TERMUX_SCRIPTDIR}/}"
+		if ! termux_check_package_in_building_packages_list "$TERMUX_PKG_PATH"; then
+			echo "$TERMUX_PKG_PATH" >> $TERMUX_BUILD_PACKAGE_CALL_BUILDING_PACKAGES_LIST_FILE_PATH
+		else
+			cat -n $TERMUX_BUILD_PACKAGE_CALL_BUILDING_PACKAGES_LIST_FILE_PATH
+			termux_error_exit "A cyclic dependency was detected that was not resolved during the assembly of packages. Abort."
 		fi
 
 		if [ "$TERMUX_CONTINUE_BUILD" == "false" ]; then
@@ -727,7 +751,9 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 			termux_step_override_config_scripts
 		fi
 
-		termux_step_create_timestamp_file
+		if [ "$TERMUX_VIRTUAL_PKG" == "false" ]; then
+			termux_step_create_timestamp_file
+		fi
 
 		if [ "$TERMUX_CONTINUE_BUILD" == "false" ]; then
 			cd "$TERMUX_PKG_CACHEDIR"
@@ -762,31 +788,33 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 		termux_step_install_pacman_hooks
 		termux_step_install_service_scripts
 		termux_step_install_license
-		cd "$TERMUX_PKG_MASSAGEDIR"
-		termux_step_copy_into_massagedir
-		cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX_CLASSICAL"
-		termux_step_pre_massage
-		cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX_CLASSICAL"
-		termux_step_massage
-		cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX_CLASSICAL"
-		termux_step_post_massage
-		# At the final stage (when the package is archiving) it is better to use commands from the system
-		if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
-			export PATH="/usr/bin:$PATH"
+		if [ "$TERMUX_VIRTUAL_PKG" == "false" ]; then
+			cd "$TERMUX_PKG_MASSAGEDIR"
+			termux_step_copy_into_massagedir
+			cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX_CLASSICAL"
+			termux_step_pre_massage
+			cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX_CLASSICAL"
+			termux_step_massage
+			cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX_CLASSICAL"
+			termux_step_post_massage
+			# At the final stage (when the package is archiving) it is better to use commands from the system
+			if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
+				export PATH="/usr/bin:$PATH"
+			fi
+			cd "$TERMUX_PKG_MASSAGEDIR"
+			if [ "$TERMUX_PACKAGE_FORMAT" = "debian" ]; then
+				termux_step_create_debian_package
+			elif [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ]; then
+				termux_step_create_pacman_package
+			else
+				termux_error_exit "Unknown packaging format '$TERMUX_PACKAGE_FORMAT'."
+			fi
+			# Saving a list of compiled packages for further work with it
+			termux_add_package_to_built_packages_list "$TERMUX_PKG_NAME"
 		fi
-		cd "$TERMUX_PKG_MASSAGEDIR"
-		if [ "$TERMUX_PACKAGE_FORMAT" = "debian" ]; then
-			termux_step_create_debian_package
-		elif [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ]; then
-			termux_step_create_pacman_package
-		else
-			termux_error_exit "Unknown packaging format '$TERMUX_PACKAGE_FORMAT'."
+		if termux_check_package_in_building_packages_list "$TERMUX_PKG_PATH"; then
+			sed -i "\|^${TERMUX_PKG_PATH}$|d" "$TERMUX_BUILD_PACKAGE_CALL_BUILDING_PACKAGES_LIST_FILE_PATH"
 		fi
-		# Saving a list of compiled packages for further work with it
-		if termux_check_package_in_building_packages_list "${TERMUX_PKG_BUILDER_DIR#${TERMUX_SCRIPTDIR}/}"; then
-			sed -i "\|^${TERMUX_PKG_BUILDER_DIR#${TERMUX_SCRIPTDIR}/}$|d" "$TERMUX_BUILD_PACKAGE_CALL_BUILDING_PACKAGES_LIST_FILE_PATH"
-		fi
-		termux_add_package_to_built_packages_list "$TERMUX_PKG_NAME"
 		termux_step_finish_build
 	) 5< "$TERMUX_BUILD_LOCK_FILE"
 done

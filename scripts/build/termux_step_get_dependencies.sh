@@ -1,14 +1,19 @@
 termux_step_get_dependencies() {
-	[[ "$TERMUX_SKIP_DEPCHECK" == "true" || "$TERMUX_PKG_METAPACKAGE" == "true" ]] && return 0
+	[[ "$TERMUX_SKIP_DEPCHECK" == "true" ]] && return 0
 	[[ "$TERMUX_INSTALL_DEPS" == "true" ]] && termux_download_repo_file # Download repo files
 
 	while read -r PKG PKG_DIR; do
 		# Checking for duplicate dependencies
 		local cyclic_dependence="false"
 		if termux_check_package_in_building_packages_list "$PKG_DIR"; then
-			echo "A circular dependency was found on '$PKG', the old version of the package will be installed to resolve the conflict"
+			echo -n "A circular dependency was found on $PKG, "
+			if [[ "$TERMUX_FIX_CYCLIC_DEPS_WITH_VIRTUAL_PKGS" = "false" ]]; then
+				echo "the old version of the package will be installed to resolve the conflict"
+				[[ "$TERMUX_INSTALL_DEPS" == "false" ]] && TERMUX_INSTALL_DEPS="true" termux_download_repo_file
+			else
+				echo "a virtual package will be built to resolve cyclic dependencies"
+			fi
 			cyclic_dependence="true"
-			[[ "$TERMUX_INSTALL_DEPS" == "false" ]] && TERMUX_INSTALL_DEPS=true termux_download_repo_file
 		fi
 
 		[[ -z "$PKG" ]] && continue
@@ -16,36 +21,51 @@ termux_step_get_dependencies() {
 
 		if [[ "$TERMUX_INSTALL_DEPS" == "true" || "$cyclic_dependence" = "true" ]]; then
 			[[ "$PKG" == "ndk-sysroot" ]] && continue # llvm doesn't build if ndk-sysroot is installed:
-			read -r DEP_ARCH DEP_VERSION DEP_VERSION_PAC DEP_ON_DEVICE_NOT_SUPPORTED < <(termux_extract_dep_info "${PKG}" "${PKG_DIR}")
-			local pkg_versioned="$PKG" build_dependency="false" force_build_dependency="$TERMUX_FORCE_BUILD_DEPENDENCIES"
-			[[ "${TERMUX_WITHOUT_DEPVERSION_BINDING}" == "false" ]] && pkg_versioned+="@$DEP_VERSION"
-			if [[ "$cyclic_dependence" == "false" ]]; then
-				[[ "$TERMUX_QUIET_BUILD" != "true" ]] && echo "Downloading dependency $pkg_versioned if necessary..."
-				if [[ "$TERMUX_FORCE_BUILD_DEPENDENCIES" == "true" && "$TERMUX_ON_DEVICE_BUILD" == "true" && "$DEP_ON_DEVICE_NOT_SUPPORTED" == "true" ]]; then
-					echo "Building dependency $PKG on device is not supported. It will be downloaded..."
-					force_build_dependency="false"
-				fi
-			else
-				force_build_dependency="false"
-			fi
-			if [[ "$force_build_dependency" = "true" ]]; then
-				termux_force_check_package_dependency && continue || :
-				[[ "$TERMUX_QUIET_BUILD" != "true" ]] && echo "Force building dependency $PKG instead of downloading due to -I flag..."
+			local build_dependency
+			if [[ "$cyclic_dependence" = "true" && "$TERMUX_FIX_CYCLIC_DEPS_WITH_VIRTUAL_PKGS" = "true" ]]; then
 				build_dependency="true"
 			else
-				if termux_package__is_package_version_built "$PKG" "$DEP_VERSION"; then
-					[[ "$TERMUX_QUIET_BUILD" != "true" ]] && echo "Skipping already built dependency $pkg_versioned"
-					continue
+				read -r DEP_ARCH DEP_VERSION DEP_VERSION_PAC DEP_ON_DEVICE_NOT_SUPPORTED < <(termux_extract_dep_info "${PKG}" "${PKG_DIR}")
+				if [[ "$cyclic_dependence" = "false" ]]; then
+					[[ "$TERMUX_QUIET_BUILD" != "true" ]] && echo "Downloading dependency $PKG$([[ "${TERMUX_WITHOUT_DEPVERSION_BINDING}" = "false" ]] && echo "@${DEP_VERSION}") if necessary..."
+					local force_build_dependency="$TERMUX_FORCE_BUILD_DEPENDENCIES"
+					if [[ "$TERMUX_FORCE_BUILD_DEPENDENCIES" == "true" && "$TERMUX_ON_DEVICE_BUILD" == "true" && "$DEP_ON_DEVICE_NOT_SUPPORTED" == "true" ]]; then
+						echo "Building dependency $PKG on device is not supported. It will be downloaded..."
+						force_build_dependency="false"
+					fi
+				else
+					local force_build_dependency="false"
 				fi
-				if ! TERMUX_WITHOUT_DEPVERSION_BINDING="$([[ "${cyclic_dependence}" == "true" ]] && echo "true" || echo "${TERMUX_WITHOUT_DEPVERSION_BINDING}")" termux_download_deb_pac $PKG $DEP_ARCH $DEP_VERSION $DEP_VERSION_PAC; then
-					[[ "$cyclic_dependence" == "true" || ( "$TERMUX_FORCE_BUILD_DEPENDENCIES" == "true" && "$TERMUX_ON_DEVICE_BUILD" == "true" ) ]] \
-						&& termux_error_exit "Download of $PKG$([[ "${TERMUX_WITHOUT_DEPVERSION_BINDING}" == "false" && "${cyclic_dependence}" == "false" ]] && echo "@$DEP_VERSION") from $TERMUX_REPO_URL failed"
-					echo "Download of $pkg_versioned from $TERMUX_REPO_URL failed, building instead"
+				build_dependency="false"
+				if [[ "$force_build_dependency" = "true" ]]; then
+					[[ "$TERMUX_QUIET_BUILD" != "true" ]] && echo "Force building dependency $PKG instead of downloading due to -I flag..."
+					termux_force_check_package_dependency && continue
 					build_dependency="true"
+				else
+					if termux_package__is_package_version_built "$PKG" "$DEP_VERSION"; then
+						[[ "$TERMUX_QUIET_BUILD" != "true" ]] && echo "Skipping already built dependency $PKG$(test ${TERMUX_WITHOUT_DEPVERSION_BINDING} = false && echo "@$DEP_VERSION")"
+						continue
+					fi
+					if ! TERMUX_WITHOUT_DEPVERSION_BINDING=$([[ "${cyclic_dependence}" = "true" ]] && echo "true" || echo "${TERMUX_WITHOUT_DEPVERSION_BINDING}") termux_download_deb_pac $PKG $DEP_ARCH $DEP_VERSION $DEP_VERSION_PAC; then
+						if [[ "$TERMUX_FORCE_BUILD_DEPENDENCIES" = "true" && "$TERMUX_ON_DEVICE_BUILD" = "true" ]]; then
+							echo "Download of $PKG$([[ "${TERMUX_WITHOUT_DEPVERSION_BINDING}" = "false" ]] && echo "@${DEP_VERSION}") from $TERMUX_REPO_URL failed"
+							return 1
+						else
+							if [[ "$cyclic_dependence" = "true" ]]; then
+								echo "Unable to resolve circular dependency by installing prebuilt $PKG package, building virtual package instead"
+							else
+								echo "Download of $PKG$([[ "${TERMUX_WITHOUT_DEPVERSION_BINDING}" = "false" ]] && echo "@$DEP_VERSION") from $TERMUX_REPO_URL failed, building instead"
+							fi
+							build_dependency="true"
+						fi
+					fi
 				fi
 			fi
-			if [[ "$cyclic_dependence" == "false" ]]; then
-				[[ "$build_dependency" == "true" ]] && termux_run_build-package && continue
+			if [[ "$build_dependency" = "true" ]]; then
+				termux_run_build-package
+				continue
+			fi
+			if [[ "$cyclic_dependence" = "false" ]]; then
 				termux_add_package_to_built_packages_list "$PKG"
 			fi
 			if [[ "$TERMUX_ON_DEVICE_BUILD" == "false" ]]; then
@@ -101,12 +121,25 @@ termux_run_build-package() {
 			set_library="glibc"
 		fi
 	fi
+	local pkg_path="$PKG_DIR"
+	if [ "$cyclic_dependence" = "true" ]; then
+		local pkgname="$(basename ${pkg_path})"
+		if [ -e "$TERMUX_BUILT_PACKAGES_DIRECTORY/${pkgname}-virtual" ]; then
+			echo "Virtual package $PKG (${pkg_path}) is already built"
+			return
+		fi
+		pkg_path="virtual-packages/${pkgname}"
+		if [ ! -d "${pkg_path}" ]; then
+			echo "Virtual package $PKG (${pkg_path}) for resolving circular dependencies not found, impossible to solve the cyclic dependency"
+			return 1
+		fi
+	fi
 	TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh \
 		$([[ "${TERMUX_INSTALL_DEPS}" == "true" ]] && echo "-I") \
 		$([[ "${TERMUX_FORCE_BUILD}" == "true" && "${TERMUX_FORCE_BUILD_DEPENDENCIES}" == "true" ]] && echo "-F") \
 		$([[ "${TERMUX_PKGS__BUILD__RM_ALL_PKG_BUILD_DEPENDENT_DIRS}" == "true" ]] && echo "-r") \
    		$([[ "${TERMUX_WITHOUT_DEPVERSION_BINDING}" = "true" ]] && echo "-w") \
-     			--format $TERMUX_PACKAGE_FORMAT --library $set_library "${PKG_DIR}"
+     			--format $TERMUX_PACKAGE_FORMAT --library $set_library "${pkg_path}"
 }
 
 termux_download_repo_file() {

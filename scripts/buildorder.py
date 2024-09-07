@@ -93,8 +93,9 @@ def parse_build_file_variable(path, var):
 
     return value
 
-def parse_build_file_variable_bool(path, var):
-    return parse_build_file_variable(path, var) == 'true'
+def parse_build_file_variable_bool(path, var, with_none=False):
+    value = parse_build_file_variable(path, var)
+    return None if with_none and not value else value == 'true'
 
 def add_prefix_glibc_to_pkgname(name):
     return name.replace("-static", "-glibc-static") if "static" == name.split("-")[-1] else name+"-glibc"
@@ -103,28 +104,80 @@ def has_prefix_glibc(pkgname):
     pkgname = pkgname.split("-")
     return "glibc" in pkgname or "glibc32" in pkgname
 
+def get_source_sh(pkgpath):
+    pkgname = os.path.basename(pkgpath)
+    pkgpath = os.path.join(pkgpath, 'build.sh')
+    if not os.path.isfile(pkgpath):
+        die("build.sh not found for package '" + pkgname + "'")
+    return pkgpath
+
+def directories_repo_json():
+    with open ('repo.json') as f:
+        data = json.load(f)
+    directories = []
+    for d in data.keys():
+        if d != "pkg_format":
+            directories.append(d)
+    return directories
+
 class TermuxPackage(object):
     "A main package definition represented by a directory with a build.sh file."
     def __init__(self, dir_path, fast_build_mode):
         self.dir = dir_path
         self.fast_build_mode = fast_build_mode
         self.name = os.path.basename(self.dir)
-        self.pkgs_cache = []
         if "gpkg" == self.dir.split("/")[-2] and not has_prefix_glibc(self.name):
             self.name = add_prefix_glibc_to_pkgname(self.name)
 
         # search package build.sh
-        build_sh_path = os.path.join(self.dir, 'build.sh')
-        if not os.path.isfile(build_sh_path):
-            raise Exception("build.sh not found for package '" + self.name + "'")
+        build_sh_path = get_source_sh(self.dir)
 
+        self.virtual = parse_build_file_variable_bool(build_sh_path, 'TERMUX_VIRTUAL_PKG')
+        self.virtual_src = parse_build_file_variable(build_sh_path, 'TERMUX_VIRTUAL_PKG_SRC')
+        self.virtual_antideps = set()
+        if self.virtual_src:
+            if "/" not in self.virtual_src:
+                for dir in directories_repo_json():
+                    pkgpath = os.path.join(dir, self.virtual_src)
+                    if os.path.isdir(pkgpath):
+                        self.virtual_src = pkgpath
+                        break
+                else:
+                    die(f"source package '{self.virtual_src}' not found for virtual package '{self.name}'")
+            self.virtual_src = get_source_sh(self.virtual_src)
+            self.virtual = True
+            dir_path = os.path.dirname(self.virtual_src)
+        if self.virtual:
+            self.name += "-virtual"
+            self.virtual_antideps = parse_build_file_dependencies_with_vars(build_sh_path, 'TERMUX_VIRTUAL_PKG_ANTI_DEPENDS')
+
+        self.base = self.name
         self.deps = parse_build_file_dependencies(build_sh_path)
         self.pkg_deps = parse_build_file_dependencies_with_vars(build_sh_path, 'TERMUX_PKG_DEPENDS')
         self.antideps = parse_build_file_antidependencies(build_sh_path)
         self.excluded_arches = parse_build_file_excluded_arches(build_sh_path)
-        self.only_installing = parse_build_file_variable_bool(build_sh_path, 'TERMUX_PKG_ONLY_INSTALLING')
-        self.separate_subdeps = parse_build_file_variable_bool(build_sh_path, 'TERMUX_PKG_SEPARATE_SUB_DEPENDS')
+        self.only_installing = parse_build_file_variable_bool(build_sh_path, 'TERMUX_PKG_ONLY_INSTALLING', self.virtual)
+        self.separate_subdeps = parse_build_file_variable_bool(build_sh_path, 'TERMUX_PKG_SEPARATE_SUB_DEPENDS', self.virtual)
         self.accept_dep_scr = parse_build_file_variable_bool(build_sh_path, 'TERMUX_PKG_ACCEPT_PKG_IN_DEP')
+        if self.virtual:
+            self.accept_dep_scr = False
+
+        if self.virtual_src:
+            if not self.deps:
+                self.deps = parse_build_file_dependencies(self.virtual_src)
+            if not self.pkg_deps:
+                self.pkg_deps = parse_build_file_dependencies_with_vars(self.virtual_src, 'TERMUX_PKG_DEPENDS')
+            if not self.antideps:
+                self.antideps = parse_build_file_antidependencies(self.virtual_src)
+            if not self.excluded_arches:
+                self.excluded_arches = parse_build_file_excluded_arches(self.virtual_src)
+            if not self.only_installing:
+                self.only_installing = parse_build_file_variable_bool(self.virtual_src, 'TERMUX_PKG_ONLY_INSTALLING')
+            if not self.separate_subdeps:
+                self.separate_subdeps = parse_build_file_variable_bool(self.virtual_src, 'TERMUX_PKG_SEPARATE_SUB_DEPENDS')
+        for pkg_var in "deps", "pkg_deps", "antideps", "excluded_arches":
+            if getattr(self, pkg_var) == {''}:
+                setattr(self, pkg_var, set())
 
         if os.getenv('TERMUX_ON_DEVICE_BUILD') == "true" and termux_pkg_library == "bionic":
             always_deps = ['libc++']
@@ -135,16 +188,15 @@ class TermuxPackage(object):
         # search subpackages
         self.subpkgs = []
 
-        for filename in os.listdir(self.dir):
+        for filename in os.listdir(dir_path):
             if not filename.endswith('.subpackage.sh'):
                 continue
-            subpkg = TermuxSubPackage(self.dir + '/' + filename, self)
+            subpkg = TermuxSubPackage(dir_path + '/' + filename, self)
             if termux_arch in subpkg.excluded_arches:
                 continue
-
             self.subpkgs.append(subpkg)
 
-        subpkg = TermuxSubPackage(self.dir + '/' + self.name + '-static' + '.subpackage.sh', self, virtual=True)
+        subpkg = TermuxSubPackage(dir_path + '/' + self.name + '-static' + '.subpackage.sh', self, static=True)
         self.subpkgs.append(subpkg)
 
         self.needed_by = set()  # Populated outside constructor, reverse of deps.
@@ -152,12 +204,12 @@ class TermuxPackage(object):
     def __repr__(self):
         return "<{} '{}'>".format(self.__class__.__name__, self.name)
 
-    def recursive_dependencies(self, pkgs_map, dir_root=None, only_installing=False):
+    def recursive_dependencies(self, pkgs_map, pkg_root=None, only_installing=False, cache=set()):
         "All the dependencies of the package, both direct and indirect."
         result = []
-        is_root = dir_root == None
+        is_root = pkg_root == None
         if is_root:
-            dir_root = self.dir
+            pkg_root = self
         if is_root or not self.fast_build_mode or not self.separate_subdeps:
             for subpkg in self.subpkgs:
                 if f"{self.name}-static" != subpkg.name:
@@ -165,25 +217,25 @@ class TermuxPackage(object):
                     self.deps |= subpkg.deps
             self.deps -= self.antideps
             self.deps.discard(self.name)
-            if not self.fast_build_mode or self.dir == dir_root:
+            if not self.fast_build_mode or self.base == pkg_root.base:
                 self.deps.difference_update([subpkg.name for subpkg in self.subpkgs])
-        for dependency_name in sorted(self.pkg_deps if only_installing else self.deps):
+        for dependency_name in sorted((self.pkg_deps if only_installing else self.deps)-self.virtual_antideps-cache):
             if termux_global_library == "true" and termux_pkg_library == "glibc" and not has_prefix_glibc(dependency_name):
                 mod_dependency_name = add_prefix_glibc_to_pkgname(dependency_name)
                 dependency_name = mod_dependency_name if mod_dependency_name in pkgs_map else dependency_name
-            if dependency_name not in self.pkgs_cache:
-                self.pkgs_cache.append(dependency_name)
-                dependency_package = pkgs_map[dependency_name]
-                dep_only_installing = (dependency_package.dir != dir_root and dependency_package.only_installing and not self.fast_build_mode)
-                if dep_only_installing or self.fast_build_mode:
-                    result += dependency_package.recursive_dependencies(pkgs_map, dir_root, dep_only_installing)
-                if not dep_only_installing and (dependency_package.accept_dep_scr or dependency_package.dir != dir_root):
-                    result += [dependency_package]
+            dependency_package = pkgs_map[dependency_name]
+            if pkg_root.virtual and pkgs_map[pkg_root.base].virtual_src and f"{dependency_package.base}-virtual" == pkg_root.base:
+                continue
+            dep_only_installing = (dependency_package.base != pkg_root.base and dependency_package.only_installing and not self.fast_build_mode)
+            if dep_only_installing or self.fast_build_mode:
+                result += dependency_package.recursive_dependencies(pkgs_map, pkg_root, dep_only_installing, cache|{dependency_name})
+            if not dep_only_installing and (dependency_package.accept_dep_scr or dependency_package.base != pkg_root.base):
+                result += [dependency_package]
         return unique_everseen(result)
 
 class TermuxSubPackage:
     "A sub-package represented by a ${PACKAGE_NAME}.subpackage.sh file."
-    def __init__(self, subpackage_file_path, parent, virtual=False):
+    def __init__(self, subpackage_file_path, parent, static=False):
         if parent is None:
             raise Exception("SubPackages should have a parent")
 
@@ -191,22 +243,29 @@ class TermuxSubPackage:
         if "gpkg" == subpackage_file_path.split("/")[-3] and not has_prefix_glibc(self.name):
             self.name = add_prefix_glibc_to_pkgname(self.name)
         self.parent = parent
+        self.base = parent.base
+        self.virtual = parent.virtual
+        self.virtual_antideps = parent.virtual_antideps
         self.fast_build_mode = parent.fast_build_mode
         self.accept_dep_scr = parent.accept_dep_scr
         self.depend_on_parent = None
         self.only_installing = None
         self.excluded_arches = set()
         self.deps = set()
-        if not virtual:
+        self.antideps = parent.antideps
+        if not static:
             self.deps |= parse_build_file_dependencies(subpackage_file_path)
             self.pkg_deps = parse_build_file_dependencies_with_vars(subpackage_file_path, 'TERMUX_SUBPKG_DEPENDS')
             self.excluded_arches |= parse_build_file_excluded_arches(subpackage_file_path)
             self.depend_on_parent = parse_build_file_variable(subpackage_file_path, "TERMUX_SUBPKG_DEPEND_ON_PARENT")
             self.only_installing = parse_build_file_variable(subpackage_file_path, "TERMUX_SUBPKG_ONLY_INSTALLING")
-        if not self.depend_on_parent or self.depend_on_parent == "unversioned" or self.depend_on_parent == "true":
-            self.deps |= set([parent.name])
-        elif self.depend_on_parent == "deps":
-            self.deps |= parent.deps
+        if not self.virtual:
+            if (not self.depend_on_parent and self.name not in parent.deps) or self.depend_on_parent == "unversioned" or self.depend_on_parent == "true":
+                self.deps |= set([parent.name])
+            elif self.depend_on_parent == "deps":
+                self.deps |= parent.deps
+        else:
+            self.name += "-virtual"
         self.only_installing = self.only_installing == "true" if self.only_installing else parent.only_installing
         self.dir = parent.dir
 
@@ -215,20 +274,22 @@ class TermuxSubPackage:
     def __repr__(self):
         return "<{} '{}' parent='{}'>".format(self.__class__.__name__, self.name, self.parent)
 
-    def recursive_dependencies(self, pkgs_map, dir_root=None, only_installing=False):
+    def recursive_dependencies(self, pkgs_map, pkg_root=None, only_installing=False, cache=set()):
         """All the dependencies of the subpackage, both direct and indirect.
         Only relevant when building in fast-build mode"""
         result = []
-        if not dir_root:
-            dir_root = self.dir
-        for dependency_name in sorted(self.pkg_deps if only_installing else self.deps):
+        if not pkg_root:
+            pkg_root = self
+        for dependency_name in sorted((self.pkg_deps if only_installing else self.deps)-self.virtual_antideps-cache):
             if dependency_name == self.parent.name:
                 self.parent.deps.discard(self.name)
             dependency_package = pkgs_map[dependency_name]
-            dep_only_installing = (dependency_package.dir != dir_root and dependency_package.only_installing and not self.fast_build_mode)
+            if pkg_root.virtual and pkgs_map[pkg_root.base].virtual_src and f"{dependency_package.base}-virtual" == pkg_root.base:
+                continue
+            dep_only_installing = (dependency_package.base != pkg_root.base and dependency_package.only_installing and not self.fast_build_mode)
             if dependency_package not in self.parent.subpkgs and (dep_only_installing or self.fast_build_mode):
-                result += dependency_package.recursive_dependencies(pkgs_map, dir_root, dep_only_installing)
-            if not dep_only_installing and (dependency_package.accept_dep_scr or dependency_package.dir != dir_root):
+                result += dependency_package.recursive_dependencies(pkgs_map, pkg_root, dep_only_installing, cache|{dependency_name})
+            if not dep_only_installing and (dependency_package.accept_dep_scr or dependency_package.base != pkg_root.base):
                 result += [dependency_package]
         return unique_everseen(result)
 
@@ -237,15 +298,11 @@ def read_packages_from_directories(directories, fast_build_mode, full_buildmode)
     Subpackages are mapped to the parent package if fast_build_mode is false."""
     pkgs_map = {}
     all_packages = []
+    directories_repo = directories_repo_json()
 
     if full_buildmode:
         # Ignore directories and get all folders from repo.json file
-        with open ('repo.json') as f:
-            data = json.load(f)
-        directories = []
-        for d in data.keys():
-            if d != "pkg_format":
-                directories.append(d)
+        directories = directories_repo
 
     for package_dir in directories:
         for pkgdir_name in sorted(os.listdir(package_dir)):
@@ -260,6 +317,8 @@ def read_packages_from_directories(directories, fast_build_mode, full_buildmode)
                     die('Duplicated package: ' + new_package.name)
                 else:
                     pkgs_map[new_package.name] = new_package
+                    if os.path.dirname(new_package.dir) not in directories_repo:
+                        pkgs_map[new_package.dir] = new_package.name
                 all_packages.append(new_package)
 
                 for subpkg in new_package.subpkgs:
@@ -309,7 +368,7 @@ def generate_full_buildorder(pkgs_map, build_mode=True, without_cyclic_dependenc
     requireds = {}
 
     # copy of the pkgs_map list without subpackages which will contain only unsorted packages
-    pkgs_map_copy = {pkg.name:pkg for pkg in pkgs_map.values() if not build_mode or isinstance(pkg, TermuxPackage)}
+    pkgs_map_copy = {pkg.name:pkg for pkg in pkgs_map.values() if not isinstance(pkg, str) and (not build_mode or isinstance(pkg, TermuxPackage))}
 
     # Start sorting packages by dependencies.
     while len(pkgs_sort) < len(pkgs_map):
@@ -326,6 +385,7 @@ def generate_full_buildorder(pkgs_map, build_mode=True, without_cyclic_dependenc
             if build_mode:
                 for subpkg in subpkgs:
                     deps |= pkgs_map[subpkg].deps
+                deps -= pkgs_map[subpkg].antideps
                 deps = remove_only_installing_deps(pkgs_map, deps - {pkg.name} - set(subpkgs))
             # Checking package dependencies
             for dep in deps:
@@ -359,10 +419,13 @@ def generate_target_buildorder(target_path, pkgs_map, fast_build_mode):
     if target_path.endswith('/'):
         target_path = target_path[:-1]
 
-    package_name = os.path.basename(target_path)
-    if "gpkg" == target_path.split("/")[-2] and not has_prefix_glibc(package_name):
-        package_name = add_prefix_glibc_to_pkgname(package_name)
-    package = pkgs_map[package_name]
+    if target_path in pkgs_map.keys():
+        package = pkgs_map[pkgs_map[target_path]]
+    else:
+        package_name = os.path.basename(target_path)
+        if "gpkg" == target_path.split("/")[-2] and not has_prefix_glibc(package_name):
+            package_name = add_prefix_glibc_to_pkgname(package_name)
+        package = pkgs_map[package_name]
     # Do not depend on any sub package
     if fast_build_mode:
         package.deps.difference_update([subpkg.name for subpkg in package.subpkgs])
@@ -381,6 +444,7 @@ def get_list_cyclic_dependencies(pkgs_map, index=[], ok_pkgs=set(), pkgname=None
                 range_pkgs |= subpkg.deps
             range_pkgs = remove_only_installing_deps(pkgs_map, range_pkgs - {index[-1]} - {subpkg.name for subpkg in pkgs_map[index[-1]].subpkgs})
         range_pkgs -= ok_pkgs
+        range_pkgs -= pkgs_map[index[-1]].virtual_antideps
 
     for pkg in range_pkgs:
         if build_mode and isinstance(pkgs_map[pkg], TermuxSubPackage):
@@ -434,9 +498,12 @@ def main():
     if get_list_cirdep:
         pkgname = None
         if not full_buildorder:
-            pkgname = package.split("/")[-1]
-            if "gpkg" in package.split("/")[-2].split("-") and not has_prefix_glibc(pkgname):
-                pkgname = add_prefix_glibc_to_pkgname(pkgname)
+            if package in pkgs_map:
+                pkgname = pkgs_map[package]
+            else:
+                pkgname = os.path.basename(package)
+                if "gpkg" in os.path.dirname(package) and not has_prefix_glibc(pkgname):
+                    pkgname = add_prefix_glibc_to_pkgname(pkgname)
         cycles = set()
         for cycle in get_list_cyclic_dependencies(pkgs_map, pkgname=pkgname, build_mode=not(fast_build_mode)):
             if cycle not in cycles:

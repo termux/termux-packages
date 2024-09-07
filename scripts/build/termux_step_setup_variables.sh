@@ -14,6 +14,7 @@ termux_step_setup_variables() {
 	: "${TERMUX_WITHOUT_DEPVERSION_BINDING:="false"}"
 	: "${TERMUX_SKIP_DEPCHECK:="false"}"
 	: "${TERMUX_GLOBAL_LIBRARY:="false"}"
+	: "${TERMUX_FIX_CYCLIC_DEPS_WITH_VIRTUAL_PKGS:="false"}"
 	: "${TERMUX_TOPDIR:="$HOME/.termux-build"}"
 	: "${TERMUX_PACMAN_PACKAGE_COMPRESSION:="xz"}"
 
@@ -181,6 +182,14 @@ termux_step_setup_variables() {
 	TERMUX_PKG_ONLY_INSTALLING=false # when a package is set to true and compilation occurs without installing dependencies (that is, dependencies will also be compiled), the package's dependency will be included in the list of dependencies of other packages (that will require this package) instead of including the package in this list. This variable also applies to subpackages of the package, but this can be changed through the `TERMUX_SUBPKG_ONLY_INSTALLING` variable for subpackages (only for algorithms `scripts/buildorder.py`)
 	TERMUX_PKG_SEPARATE_SUB_DEPENDS=false # when set to true in a package, subpackage(s) of package will not be added to the dependency of the parent package (only for algorithms `scripts/buildorder.py`)
 	TERMUX_PKG_ACCEPT_PKG_IN_DEP=false # allows you to add an initial package as a dependency, if any requested package (and their dependencies) will have a dependency on it (only for algorithms `scripts/buildorder.py`)
+
+	TERMUX_VIRTUAL_PKG=false # if true, the package will be built as a virtual package
+	TERMUX_VIRTUAL_PKG_SRC="" # specify a package (path) to virtualize this package (when specifying this variable in a package, it will automatically indicate that the package is virtual)
+	TERMUX_VIRTUAL_PKG_INCLUDE="" # list of sources from the package that will be included in the virtual package (by default, all sources will be included; to disable inclusion of sources, set the value to "false")
+	TERMUX_VIRTUAL_PKG_ANTI_DEPENDS="" # list of dependencies that will be disabled (can be used to get rid of cyclic dependencies)
+	TERMUX_VIRTUAL_PKG_NAME="$TERMUX_PKG_NAME"
+	TERMUX_VIRTUAL_PKG_BUILDER_DIR="$TERMUX_PKG_BUILDER_DIR"
+	TERMUX_VIRTUAL_PKG_BUILDER_SCRIPT="$TERMUX_PKG_BUILDER_SCRIPT"
 
 	unset CFLAGS CPPFLAGS LDFLAGS CXXFLAGS
 	unset TERMUX_MESON_ENABLE_SOVERSION # setenv to enable SOVERSION suffix for shared libs built with Meson
