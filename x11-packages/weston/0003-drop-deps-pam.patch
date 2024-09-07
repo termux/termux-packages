@@ -19,19 +19,19 @@
  
 --- a/libweston/backend-vnc/vnc.c
 +++ b/libweston/backend-vnc/vnc.c
-@@ -1090,6 +1090,7 @@
- 	nvnc_set_userdata(backend->server, backend, NULL);
+@@ -1227,6 +1227,7 @@
  	nvnc_set_name(backend->server, "Weston VNC backend");
  
+ 	if (!config->disable_tls) {
 +#ifndef __ANDROID__
- 	if (!nvnc_has_auth()) {
- 		weston_log("Neat VNC built without TLS support\n");
- 		goto err_output;
-@@ -1117,6 +1118,7 @@
- 	}
+ 		if (!nvnc_has_auth()) {
+ 			weston_log("Neat VNC built without TLS support\n");
+ 			goto err_output;
+@@ -1265,6 +1266,7 @@
+ 		}
  
- 	weston_log("TLS support activated\n");
+ 		weston_log("TLS support activated\n");
 +#endif
- 
- 	ret = weston_plugin_api_register(compositor, WESTON_VNC_OUTPUT_API_NAME,
- 					 &api, sizeof(api));
+ 	} else {
+ 		ret = nvnc_enable_auth(backend->server, NVNC_AUTH_REQUIRE_AUTH,
+ 				       vnc_handle_auth, NULL);
