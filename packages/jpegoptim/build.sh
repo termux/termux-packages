@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="JPEG optimizer that recompresses image files to a smalle
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.5.5"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/tjko/jpegoptim/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=90a309d1c092de358bb411d702281ac3039b489d03adb0bc3c4ef04cf0067d38
 TERMUX_PKG_AUTO_UPDATE=true
