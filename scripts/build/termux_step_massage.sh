@@ -312,7 +312,7 @@ termux_step_massage() {
 			echo "INFO: Found ${c} files with OpenMP symbols after exclusion"
 			[[ "${c}" -gt "${numberOfValid}" ]] && termux_error_exit "${c} > ${numberOfValid}"
 		fi
-		if [[ -n "${depend_libomp_so}" ]]; then
+		if [[ -n "${depend_libomp_so}" && "${TERMUX_PKG_NO_OPENMP_CHECK}" != "true" ]]; then
 			echo "ERROR: Found files depend on libomp.so" >&2
 			echo "ERROR: Showing result" >&2
 			local t0=$(get_epoch)
