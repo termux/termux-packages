@@ -8,23 +8,22 @@ TERMUX_PKG_MAINTAINER="@termux"
 # is checked in termux_step_pre_configure(), so the build will fail on a mistake.
 # Using this simplifies things (no need to avoid downloading and applying patches manually),
 # and uses github is a high available hosting.
-_SNAPSHOT_COMMIT=8bd5a3d98fc741bdcc9e5fada1a3d5980e1ea22a
-TERMUX_PKG_VERSION=(6.4.20231001
+_SNAPSHOT_COMMIT=a480458efb0662531287f0c75116c0e91fe235cb
+TERMUX_PKG_VERSION=(6.5.20240831
                     9.31
                     15
-                    0.31.0
-                    0.11.0)
-TERMUX_PKG_REVISION=5
+                    0.36.2
+                    0.13.2)
 TERMUX_PKG_SRCURL=(https://github.com/ThomasDickey/ncurses-snapshots/archive/${_SNAPSHOT_COMMIT}.tar.gz
                    https://fossies.org/linux/misc/rxvt-unicode-${TERMUX_PKG_VERSION[1]}.tar.bz2
                    https://github.com/thestinger/termite/archive/v${TERMUX_PKG_VERSION[2]}.tar.gz
                    https://github.com/kovidgoyal/kitty/releases/download/v${TERMUX_PKG_VERSION[3]}/kitty-${TERMUX_PKG_VERSION[3]}.tar.xz
                    https://github.com/alacritty/alacritty/archive/refs/tags/v${TERMUX_PKG_VERSION[4]}.tar.gz)
-TERMUX_PKG_SHA256=(ca4a28ed4d38a7b79e1cd883e3d2755839072a7e4fe8cf265be1ef4ae79b6bc2
+TERMUX_PKG_SHA256=(ec6122c3b8ab930d1477a1dbfd90299e9f715555a98b6e6805d5ae1b0d72becd
                    aaa13fcbc149fe0f3f391f933279580f74a96fd312d6ed06b8ff03c2d46672e8
                    3ae9ebef28aad081c6c11351f086776e2fd9547563b2f900732b41c376bec05a
-                   d122497134abab8e25dfcb6b127af40cfe641980e007f696732f70ed298198f5
-                   0fb3370c662f5b87d1b9a487aef999195212b192e08f6f68a572fed8fd637e07)
+                   16db7fba5541f322ecc35f15755bc5dc0b4ab3d02156778317f541c44447fb62
+                   e9a54aabc92bbdc25ab1659c2e5a1e9b76f27d101342c8219cc98a730fd46d90)
 TERMUX_PKG_AUTO_UPDATE=false
 
 # ncurses-utils: tset/reset/clear are moved to package 'ncurses'.

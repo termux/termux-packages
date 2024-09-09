@@ -1,9 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/qt/qtwebengine
 TERMUX_PKG_DESCRIPTION="Qt 5 Web Engine Library"
-TERMUX_PKG_LICENSE="LGPL-3.0, LGPL-2.1, BSD 3-Clause"
+TERMUX_PKG_LICENSE="LGPL-3.0, GPL-2.0, GPL-3.0, BSD 3-Clause"
+TERMUX_PKG_LICENSE_FILE="LICENSE.LGPL3, LICENSE.GPL2, LICENSE.GPL3, LICENSE.Chromium"
 TERMUX_PKG_MAINTAINER="@licy183"
-TERMUX_PKG_VERSION="5.15.15"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="5.15.17"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/qt/qtwebengine
 TERMUX_PKG_GIT_BRANCH=v$TERMUX_PKG_VERSION-lts
 TERMUX_PKG_DEPENDS="dbus, fontconfig, libc++, libexpat, libjpeg-turbo, libminizip, libnspr, libnss, libpng, libsnappy, libvpx, libwebp, libx11, libxkbfile, qt5-qtbase, qt5-qtdeclarative, zlib"
@@ -17,7 +18,10 @@ termux_step_host_build() {
 	ln -s $(command -v clang-17) fake-bin/clang
 	ln -s $(command -v clang++-17) fake-bin/clang++
 
-	PATH="$PWD/fake-bin:$PATH" python2 $TERMUX_PKG_SRCDIR/src/3rdparty/chromium/third_party/ffmpeg/chromium/scripts/build_ffmpeg.py --config-only linux noasm-ia32
+	# Remove python3 compatibility file preventing using newer python3 versions:
+	rm $TERMUX_PKG_SRCDIR/src/3rdparty/chromium/third_party/ffmpeg/chromium/scripts/enum.py
+
+	PATH="$PWD/fake-bin:$PATH" python3 $TERMUX_PKG_SRCDIR/src/3rdparty/chromium/third_party/ffmpeg/chromium/scripts/build_ffmpeg.py --config-only linux noasm-ia32
 }
 
 termux_step_pre_configure() {

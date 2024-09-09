@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Libc for WebAssembly programs built on top of WASI syste
 TERMUX_PKG_LICENSE="Apache-2.0, BSD 2-Clause, MIT"
 TERMUX_PKG_LICENSE_FILE="LICENSE, src/wasi-libc/LICENSE-MIT, src/wasi-libc/libc-bottom-half/cloudlibc/LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="22"
+TERMUX_PKG_VERSION="24"
 TERMUX_PKG_SRCURL=git+https://github.com/WebAssembly/wasi-sdk
 TERMUX_PKG_GIT_BRANCH=wasi-sdk-${TERMUX_PKG_VERSION}
 TERMUX_PKG_RECOMMENDS="wasm-component-ld"
@@ -26,17 +26,47 @@ termux_pkg_auto_update() {
 }
 
 termux_step_host_build() {
-	# https://github.com/WebAssembly/wasi-sdk/blob/main/Makefile
+	# https://github.com/WebAssembly/wasi-sdk/blob/main/CMakeLists.txt
 	termux_setup_cmake
 	termux_setup_ninja
 	termux_setup_rust
 
-	pushd "${TERMUX_PKG_BUILDDIR}"
-	mkdir -p "build/install/${TERMUX_PREFIX#/}"
-	make -j "${TERMUX_PKG_MAKE_PROCESSES}" build NINJA_FLAGS="-j ${TERMUX_PKG_MAKE_PROCESSES}"
-	echo "${PWD}/build/install/${TERMUX_PREFIX#/}/VERSION"
-	cat "${PWD}/build/install/${TERMUX_PREFIX#/}/VERSION"
-	popd
+	cmake \
+		-G Ninja \
+		-S "${TERMUX_PKG_SRCDIR}" \
+		-B "${TERMUX_PKG_HOSTBUILD_DIR}/toolchain" \
+		-DWASI_SDK_BUILD_TOOLCHAIN=ON \
+		-DCMAKE_INSTALL_PREFIX="${TERMUX_PKG_HOSTBUILD_DIR}/install"
+	ninja \
+		-C "${TERMUX_PKG_HOSTBUILD_DIR}/toolchain" \
+		-j "${TERMUX_PKG_MAKE_PROCESSES}" \
+		install
+
+	cmake \
+		-G Ninja \
+		-S "${TERMUX_PKG_SRCDIR}" \
+		-B "${TERMUX_PKG_HOSTBUILD_DIR}/sysroot" \
+		-DCMAKE_INSTALL_PREFIX="${TERMUX_PREFIX}" \
+		-DCMAKE_TOOLCHAIN_FILE="${TERMUX_PKG_HOSTBUILD_DIR}/install/share/cmake/wasi-sdk.cmake" \
+		-DCMAKE_C_COMPILER_WORKS=ON \
+		-DCMAKE_CXX_COMPILER_WORKS=ON
+	ninja \
+		-C ${TERMUX_PKG_HOSTBUILD_DIR}/sysroot \
+		-j ${TERMUX_PKG_MAKE_PROCESSES} \
+		install
+
+	mkdir -p "${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}"
+	mv -v "${TERMUX_PREFIX}/VERSION" "${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}"
+	echo "INFO: ${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}/VERSION"
+	cat "${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}/VERSION"
+	echo
+
+	mv -v "${TERMUX_PKG_HOSTBUILD_DIR}/install/share/cmake" "${TERMUX_PREFIX}/share"
+
+	local llvm_major_version=$(grep llvm-version "${TERMUX_PREFIX}/share/wasi-sysroot/VERSION" | cut -d" " -f2 | cut -d"." -f1)
+	mkdir -p "${TERMUX_PREFIX}/lib/clang/${llvm_major_version}/lib"
+	mv -v "${TERMUX_PREFIX}/clang-resource-dir/lib" "${TERMUX_PREFIX}/lib/clang/${llvm_major_version}"
+	rm -frv "${TERMUX_PREFIX}/clang-resource-dir"
 }
 
 termux_step_make() {
@@ -44,10 +74,5 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	# use our own LLVM, autoconf config.guess, wasm-component-ld
-	local llvm_major_version=$(grep llvm-version "build/install/${TERMUX_PREFIX#/}/VERSION" | cut -d" " -f2 | sed "s|\..*||")
-	mkdir -p "${TERMUX_PREFIX}/lib/clang/${llvm_major_version}"
-	cp -fr "build/install/${TERMUX_PREFIX#/}/lib/clang/${llvm_major_version}/lib" "${TERMUX_PREFIX}/lib/clang/${llvm_major_version}"
-	cp -fr "build/install/${TERMUX_PREFIX#/}/share/cmake" "${TERMUX_PREFIX}/share"
-	cp -fr "build/install/${TERMUX_PREFIX#/}/share/wasi-sysroot" "${TERMUX_PREFIX}/share"
+	:
 }
