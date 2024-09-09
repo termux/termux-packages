@@ -1,25 +1,3 @@
---- a/media/libvpx/libvpx/vpx_ports/arm_cpudetect.c
-+++ b/media/libvpx/libvpx/vpx_ports/arm_cpudetect.c
-@@ -92,7 +92,7 @@
- }
- 
- #elif defined(__ANDROID__) /* end _MSC_VER */
--#include <cpu-features.h>
-+#include <ndk_compat/cpu-features.h>
- 
- int arm_cpu_caps(void) {
-   int flags;
---- a/third_party/aom/aom_ports/arm_cpudetect.c
-+++ b/third_party/aom/aom_ports/arm_cpudetect.c
-@@ -88,7 +88,7 @@
- }
- 
- #elif defined(__ANDROID__) /* end _MSC_VER */
--#include <cpu-features.h>
-+#include <ndk_compat/cpu-features.h>
- 
- int aom_arm_cpu_caps(void) {
-   int flags;
 --- a/gfx/cairo/libpixman/src/pixman-arm.c
 +++ b/gfx/cairo/libpixman/src/pixman-arm.c
 @@ -96,7 +96,7 @@
@@ -31,3 +9,25 @@
  
  static arm_cpu_features_t
  detect_cpu_features (void)
+--- a/media/libvpx/libvpx/vpx_ports/arm_cpudetect.h
++++ b/media/libvpx/libvpx/vpx_ports/arm_cpudetect.h
+@@ -34,7 +34,7 @@
+ // Use getauxval() when targeting (64-bit) Android with API level >= 18.
+ // getauxval() is supported since Android API level 18 (Android 4.3.)
+ // First Android version with 64-bit support was Android 5.x (API level 21).
+-#include <cpu-features.h>
++#include <ndk_compat/cpu-features.h>
+ #endif
+ 
+ static INLINE int arm_cpu_env_flags(int *flags) {
+--- a/third_party/aom/aom_ports/arm_cpudetect.h
++++ b/third_party/aom/aom_ports/arm_cpudetect.h
+@@ -36,7 +36,7 @@
+ // Use getauxval() when targeting (64-bit) Android with API level >= 18.
+ // getauxval() is supported since Android API level 18 (Android 4.3.)
+ // First Android version with 64-bit support was Android 5.x (API level 21).
+-#include <cpu-features.h>
++#include <ndk_compat/cpu-features.h>
+ #endif
+ 
+ static bool arm_cpu_env_flags(int *flags) {
