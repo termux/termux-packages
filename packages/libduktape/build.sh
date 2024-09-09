@@ -3,38 +3,20 @@ TERMUX_PKG_DESCRIPTION="An embeddable Javascript engine with a focus on portabil
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.7.0
-TERMUX_PKG_SRCURL=https://github.com/svaarala/duktape/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=fde9a11e816cf06ccc1da5d85e2d15d62eace6122c8177bcee18ce042a649cdc
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL=https://github.com/svaarala/duktape/releases/download/v$TERMUX_PKG_VERSION/duktape-$TERMUX_PKG_VERSION.tar.xz
+TERMUX_PKG_SHA256=90f8d2fa8b5567c6899830ddef2c03f3c27960b11aca222fa17aa7ac613c2890
 TERMUX_PKG_REPLACES="duktape (<< 2.3.0-1), libduktape-dev"
 TERMUX_PKG_BREAKS="duktape (<< 2.3.0-1), libduktape-dev"
 TERMUX_PKG_BUILD_IN_SRC=true
 
-termux_step_pre_configure() {
-	# configure.py requires 'yaml' python2 module.
-	if ! pip2 show pyyaml > /dev/null 2>&1; then
-		pip2 install pyyaml
-	fi
-}
-
-termux_step_make() {
-	make libduktape.so.1.0.0 duk CC=${CC} GXX=${CXX}
-}
-
 termux_step_make_install() {
-	install libduktape.so.1.0.0 ${TERMUX_PREFIX}/lib/libduktape.so
-	install duk ${TERMUX_PREFIX}/bin
-	install prep/nondebug/*.h ${TERMUX_PREFIX}/include
-}
+	# Add missing NEEDED on libm.so
+	sed -i 's/duktape\.c/& -lm/' Makefile.sharedlibrary
 
-termux_step_post_make_install() {
-	# Add a pkg-config file for the duktape lib
-	local pkgconfig_dir="$TERMUX_PREFIX/lib/pkgconfig"
-	mkdir -p "${pkgconfig_dir}"
-	cat > "${pkgconfig_dir}/duktape.pc" <<-HERE
-		Name: Duktape
-		Description: Shared library for the Duktape interpreter
-		Version: $TERMUX_PKG_VERSION
-		Requires:
-		Libs: -lduktape -lm
-	HERE
+	make -f Makefile.sharedlibrary CC="${CC}" GXX="${CXX}" INSTALL_PREFIX="${TERMUX_PREFIX}" install
+
+	make -f Makefile.cmdline CC="${CC}" GXX="${CXX}" INSTALL_PREFIX="${TERMUX_PREFIX}" duk
+
+	install duk "${TERMUX_PREFIX}"/bin
 }
