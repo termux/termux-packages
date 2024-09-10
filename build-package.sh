@@ -378,21 +378,23 @@ fi
 
 # Check if the package is in the compiled list
 termux_check_package_in_built_packages_list() {
-	[ ! -f "$TERMUX_BUILD_PACKAGE_CALL_BUILT_PACKAGES_LIST_FILE_PATH" ] && termux_error_exit "ERROR: file '$TERMUX_BUILD_PACKAGE_CALL_BUILT_PACKAGES_LIST_FILE_PATH' not found."
-	cat "$TERMUX_BUILD_PACKAGE_CALL_BUILT_PACKAGES_LIST_FILE_PATH" | grep -q " $1 "
+	[ ! -f "$TERMUX_BUILD_PACKAGE_CALL_BUILT_PACKAGES_LIST_FILE_PATH" ] && \
+		termux_error_exit "ERROR: file '$TERMUX_BUILD_PACKAGE_CALL_BUILT_PACKAGES_LIST_FILE_PATH' not found."
+	grep -q " $1 " "$TERMUX_BUILD_PACKAGE_CALL_BUILT_PACKAGES_LIST_FILE_PATH"
 	return $?
 }
 
 # Adds a package to the list of built packages if it is not in the list
 termux_add_package_to_built_packages_list() {
 	if ! termux_check_package_in_built_packages_list "$1"; then
-		echo -n "$1 " >> $TERMUX_BUILD_PACKAGE_CALL_BUILT_PACKAGES_LIST_FILE_PATH
+		echo -n "$1 " >> "$TERMUX_BUILD_PACKAGE_CALL_BUILT_PACKAGES_LIST_FILE_PATH"
 	fi
 }
 
 # Check if the package is in the compiling list
 termux_check_package_in_building_packages_list() {
-	[ ! -f "$TERMUX_BUILD_PACKAGE_CALL_BUILDING_PACKAGES_LIST_FILE_PATH" ] && termux_error_exit "ERROR: file '$TERMUX_BUILD_PACKAGE_CALL_BUILDING_PACKAGES_LIST_FILE_PATH' not found."
+	[ ! -f "$TERMUX_BUILD_PACKAGE_CALL_BUILDING_PACKAGES_LIST_FILE_PATH" ] && \
+		termux_error_exit "ERROR: file '$TERMUX_BUILD_PACKAGE_CALL_BUILDING_PACKAGES_LIST_FILE_PATH' not found."
 	grep -q "^${1}$" "$TERMUX_BUILD_PACKAGE_CALL_BUILDING_PACKAGES_LIST_FILE_PATH"
 	return $?
 }
