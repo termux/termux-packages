@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Command line linker for creating WebAssembly components"
 TERMUX_PKG_LICENSE="Apache-2.0, MIT"
 TERMUX_PKG_LICENSE_FILE="LICENSE-APACHE, LICENSE-Apache-2.0_WITH_LLVM-exception, LICENSE-MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.5.7"
+TERMUX_PKG_VERSION="0.5.8"
 TERMUX_PKG_SRCURL=https://github.com/bytecodealliance/wasm-component-ld/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=f046d4eb152bbb5637fede88c8f3afacdb64f94ce61448d3ccb71a7b652816ef
+TERMUX_PKG_SHA256=b1cb7ecfab5548d71d3c5dc4b96da03a1a544eb7c56cb3155f89dba2bdfb244e
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
