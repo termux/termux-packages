@@ -10,7 +10,7 @@ FROM ubuntu:22.04
 ENV LANG=en_US.UTF-8
 
 # Needed for setup:
-COPY ./llvm-snapshot.gpg.key ./openjdk-r-ppa.gpg ./properties.sh ./setup-android-sdk.sh ./setup-cgct.sh ./setup-ubuntu.sh /tmp/
+COPY ./llvm-snapshot.gpg.key ./properties.sh ./setup-android-sdk.sh ./setup-cgct.sh ./setup-ubuntu.sh /tmp/
 RUN mkdir /tmp/build
 COPY ./build/termux_download.sh /tmp/build/
 
