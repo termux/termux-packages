@@ -2,15 +2,14 @@ TERMUX_PKG_HOMEPAGE=https://github.com/alok8bb/cloneit
 TERMUX_PKG_DESCRIPTION="A cli tool to download specific GitHub directories or files"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-_COMMIT=62c433f0b1c54a977d585f3b84b8c43213095474
-_COMMIT_DATE=2022.10.24
+_COMMIT=6198556e810d964cc5938c446ef42fc21b55fe0b
+_COMMIT_DATE=2024.07.28
 TERMUX_PKG_VERSION=${_COMMIT_DATE//./}
-TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/alok8bb/cloneit
-TERMUX_PKG_SHA256=61b2631109817bd468d5b8ab6411206fff75df13bafb45e53558139eea46c0cb
+TERMUX_PKG_SHA256=562c92bd96b13681bac7a453d0eaa4ea5ecda4a604962cf2ffb962045c1f2553
 TERMUX_PKG_GIT_BRANCH="master"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_DEPENDS="openssl-1.1"
+TERMUX_PKG_DEPENDS="openssl"
 
 termux_step_post_get_source() {
 	git fetch --unshallow
@@ -25,19 +24,8 @@ termux_step_post_get_source() {
 
 	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum)
 	if [[ "${s}" != "${TERMUX_PKG_SHA256}  "* ]]; then
-		termux_error_exit "Checksum mismatch for source files."
+		termux_error_exit "Checksum mismatch for source files: expected=${TERMUX_PKG_SHA256}, actual=${s}"
 	fi
-}
-
-termux_step_pre_configure() {
-	# openssl-sys supports OpenSSL 3 in >= 0.9.69
-	export OPENSSL_INCLUDE_DIR=$TERMUX_PREFIX/include/openssl-1.1
-	export OPENSSL_LIB_DIR=$TERMUX_PREFIX/lib/openssl-1.1
-	CFLAGS="-I$TERMUX_PREFIX/include/openssl-1.1 $CFLAGS"
-	CPPFLAGS="-I$TERMUX_PREFIX/include/openssl-1.1 $CPPFLAGS"
-	CXXFLAGS="-I$TERMUX_PREFIX/include/openssl-1.1 $CXXFLAGS"
-	LDFLAGS="-L$TERMUX_PREFIX/lib/openssl-1.1 -Wl,-rpath=$TERMUX_PREFIX/lib/openssl-1.1 $LDFLAGS"
-	RUSTFLAGS+=" -C link-arg=-Wl,-rpath=$TERMUX_PREFIX/lib/openssl-1.1"
 }
 
 termux_step_make() {
