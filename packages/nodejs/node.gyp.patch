@@ -1,6 +1,7 @@
---- ./node.gyp.orig	2024-07-02 11:51:21.000000000 +0530
-+++ ./node.gyp	2024-07-02 15:57:06.792934530 +0530
-@@ -548,7 +548,8 @@
+diff -u -r ../node-v22.8.0/node.gyp ./node.gyp
+--- ../node-v22.8.0/node.gyp	2024-09-03 03:18:45.000000000 +0000
++++ ./node.gyp	2024-09-10 21:40:40.985225197 +0000
+@@ -560,7 +560,8 @@
        ],
  
        'sources': [
@@ -10,7 +11,7 @@
        ],
  
        'dependencies': [
-@@ -1028,51 +1029,6 @@
+@@ -1043,51 +1044,6 @@
          },
        ],
      }, # node_lib_target_name
@@ -62,7 +63,7 @@
      { # fuzz_ClientHelloParser.cc
        'target_name': 'fuzz_ClientHelloParser',
        'type': 'executable',
-@@ -1166,86 +1122,6 @@
+@@ -1181,89 +1137,6 @@
          }],
        ],
      }, # fuzz_strings
@@ -109,6 +110,9 @@
 -          'defines': [
 -            'HAVE_OPENSSL=1',
 -          ],
+-          'dependencies': [
+-            'deps/ncrypto/ncrypto.gyp:ncrypto',
+-          ],
 -          'sources': [ '<@(node_cctest_openssl_sources)' ],
 -        }],
 -        ['v8_enable_inspector==1', {
@@ -149,7 +153,7 @@
  
      {
        'target_name': 'embedtest',
-@@ -1363,72 +1239,6 @@
+@@ -1381,75 +1254,6 @@
          }],
        ]
      },
@@ -192,6 +196,9 @@
 -          'defines': [ 'NODE_MKSNAPSHOT_USE_ARRAY_LITERALS=1' ],
 -        }],
 -        [ 'node_use_openssl=="true"', {
+-          'dependencies': [
+-            'deps/ncrypto/ncrypto.gyp:ncrypto',
+-          ],
 -          'defines': [
 -            'HAVE_OPENSSL=1',
 -          ],
