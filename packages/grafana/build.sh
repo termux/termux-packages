@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://grafana.com/
 TERMUX_PKG_DESCRIPTION="The open-source platform for monitoring and observability"
 TERMUX_PKG_LICENSE="AGPL-V3"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1:11.1.3"
+TERMUX_PKG_VERSION="1:11.2.0"
 TERMUX_PKG_SRCURL=git+https://github.com/grafana/grafana
 TERMUX_PKG_BUILD_DEPENDS="yarn"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -13,6 +13,8 @@ TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
 
 termux_step_pre_configure() {
 	termux_setup_nodejs
+
+	export YARN_ENABLE_HARDENED_MODE=0
 
 	local bin="$TERMUX_PKG_BUILDDIR/_bin"
 	mkdir -p "$bin"
