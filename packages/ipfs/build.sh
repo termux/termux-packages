@@ -3,12 +3,14 @@ TERMUX_PKG_DESCRIPTION="A peer-to-peer hypermedia distribution protocol"
 TERMUX_PKG_LICENSE="MIT, Apache-2.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE, LICENSE-APACHE, LICENSE-MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.29.0"
+TERMUX_PKG_VERSION="0.30.0"
 TERMUX_PKG_SRCURL=https://github.com/ipfs/kubo/releases/download/v${TERMUX_PKG_VERSION}/kubo-source.tar.gz
-TERMUX_PKG_SHA256=b9d095c80dcd377442995b5d22371c7f2fd1ca6bebb06268c6517c0e26a93f88
+TERMUX_PKG_SHA256=f863b6dc0f431c81ee2b318d90f2c136fbcfcc52f715f418458bbd4df3e28b4f
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_SUGGESTS="termux-services"
 TERMUX_PKG_SERVICE_SCRIPT=("ipfs" "[ ! -d \"${TERMUX_ANDROID_HOME}/.ipfs\" ] && ipfs init --empty-repo 2>&1 && ipfs config --json Swarm.EnableRelayHop false 2>&1 && ipfs config --json Swarm.EnableAutoRelay true 2>&1; exec ipfs daemon --enable-namesys-pubsub 2>&1")
+# See https://github.com/ipfs/kubo/issues/10501 about issues with ipfs and go 1.23:
+TERMUX_PKG_GO_USE_OLDER=true
 
 termux_step_make() {
 	termux_setup_golang
