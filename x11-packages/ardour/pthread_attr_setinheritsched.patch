@@ -1,6 +1,20 @@
---- a/libs/pbd/pthread_utils.cc
-+++ b/libs/pbd/pthread_utils.cc
-@@ -346,7 +371,9 @@
+diff -u -r ../cache/tmp-checkout/libs/ardour/io_tasklist.cc ./libs/ardour/io_tasklist.cc
+--- ../cache/tmp-checkout/libs/ardour/io_tasklist.cc	2024-09-12 10:52:22.692516638 +0000
++++ ./libs/ardour/io_tasklist.cc	2024-09-12 10:54:29.286128872 +0000
+@@ -62,7 +62,9 @@
+ #endif
+   pthread_attr_setschedparam (&attr, &parm);
+   pthread_attr_setscope (&attr, PTHREAD_SCOPE_SYSTEM);
++#if !defined __ANDROID__ || __ANDROID_API__ >= 28
+   pthread_attr_setinheritsched (&attr, PTHREAD_EXPLICIT_SCHED);
++#endif
+ 
+ 	DEBUG_TRACE (PBD::DEBUG::IOTaskList, string_compose ("IOTaskList starting %1 threads with priority = %2\n", _n_threads, parm.sched_priority));
+ 
+diff -u -r ../cache/tmp-checkout/libs/pbd/pthread_utils.cc ./libs/pbd/pthread_utils.cc
+--- ../cache/tmp-checkout/libs/pbd/pthread_utils.cc	2024-09-12 10:52:22.779516386 +0000
++++ ./libs/pbd/pthread_utils.cc	2024-09-12 10:52:23.445514465 +0000
+@@ -355,7 +380,9 @@
  	pthread_attr_setschedpolicy (&attr, policy);
  	pthread_attr_setschedparam (&attr, &parm);
  	pthread_attr_setscope (&attr, PTHREAD_SCOPE_SYSTEM);
@@ -10,8 +24,9 @@
  	pthread_attr_setstacksize (&attr, stacksize + pbd_stack_size ());
  	rv = pthread_create (thread, &attr, start_routine, arg);
  	pthread_attr_destroy (&attr);
---- a/libs/zita-convolver/zita-convolver.cc
-+++ b/libs/zita-convolver/zita-convolver.cc
+diff -u -r ../cache/tmp-checkout/libs/zita-convolver/zita-convolver.cc ./libs/zita-convolver/zita-convolver.cc
+--- ../cache/tmp-checkout/libs/zita-convolver/zita-convolver.cc	2024-09-12 10:52:22.933515941 +0000
++++ ./libs/zita-convolver/zita-convolver.cc	2024-09-12 10:52:23.443514471 +0000
 @@ -625,7 +625,9 @@
  	pthread_attr_setschedpolicy (&attr, policy);
  	pthread_attr_setschedparam (&attr, &parm);
