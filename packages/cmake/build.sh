@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 # When updating version here, please update termux_setup_cmake.sh as well.
 TERMUX_PKG_VERSION="3.30.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.cmake.org/files/v${TERMUX_PKG_VERSION:0:4}/cmake-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=6d5de15b6715091df7f5441007425264bdd477809f80333fdf95f846aaff88e4
 TERMUX_PKG_AUTO_UPDATE=true
