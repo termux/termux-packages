@@ -67,6 +67,7 @@ PACKAGES+=" xmltoman"
 # Needed by python modules (e.g. asciinema) and some build systems.
 PACKAGES+=" python3.10"
 PACKAGES+=" python3.11"
+PACKAGES+=" python3.12"
 PACKAGES+=" python3-pip"
 PACKAGES+=" python3-setuptools"
 PACKAGES+=" python-wheel-common"
@@ -326,6 +327,12 @@ $SUDO chmod a+r /etc/apt/trusted.gpg.d/apt.llvm.org.asc
 {
 	echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-17 main"
 } | $SUDO tee /etc/apt/sources.list.d/apt-llvm-org.list > /dev/null
+
+# Added deadsnakes repo to install (new) python-3.12
+{
+	echo "deb https://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu/ jammy main"
+} | $SUDO tee /etc/apt/sources.list.d/deadsnakes-python.list > /dev/null
+$SUDO apt-key adv --keyserver keyserver.ubuntu.com/ --recv-keys BA6932366A755776
 
 $SUDO apt-get -yq update
 
