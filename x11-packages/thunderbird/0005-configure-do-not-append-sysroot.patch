@@ -1,6 +1,21 @@
+diff --git a/build/moz.configure/pkg.configure b/build/moz.configure/pkg.configure
+index 418331b874..4fe1d1c53e 100644
+--- a/build/moz.configure/pkg.configure
++++ b/build/moz.configure/pkg.configure
+@@ -60,7 +60,7 @@ def pkg_config_base_flags(is_pkgconf, pkg_config_version, target_sysroot_bootstr
+ @imports(_from="os", _import="environ")
+ @imports(_from="os", _import="pathsep")
+ def pkg_config_vars(target, sysroot_path, multiarch_dir):
+-    if sysroot_path and target.kernel != "Darwin":
++    if False:
+         pkgconfig_dirs = [
+             "usr/lib/pkgconfig",
+             "usr/lib/{}/pkgconfig".format(multiarch_dir),
+diff --git a/build/moz.configure/toolchain.configure b/build/moz.configure/toolchain.configure
+index 264027e57d..6e924e3515 100644
 --- a/build/moz.configure/toolchain.configure
 +++ b/build/moz.configure/toolchain.configure
-@@ -1256,7 +1256,7 @@
+@@ -1365,7 +1365,7 @@ def compiler(
      ):
          wrapper = list(compiler_wrapper or ())
          flags = []
@@ -9,14 +24,3 @@
              if host_or_target.kernel == "Darwin":
                  # While --sysroot and -isysroot are roughly equivalent, when not using
                  # -isysroot on mac, clang takes the SDKROOT environment variable into
---- a/build/moz.configure/pkg.configure
-+++ b/build/moz.configure/pkg.configure
-@@ -56,7 +56,7 @@
- @imports(_from="os", _import="environ")
- @imports(_from="os", _import="pathsep")
- def pkg_config_vars(target, sysroot_path, multiarch_dir):
--    if sysroot_path and target.kernel != "Darwin":
-+    if False:
-         return namespace(
-             PKG_CONFIG_PATH="",
-             PKG_CONFIG_SYSROOT_DIR=sysroot_path,

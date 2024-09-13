@@ -1,6 +1,21 @@
+diff --git a/gfx/skia/skia/src/ports/SkDebug_android.cpp b/gfx/skia/skia/src/ports/SkDebug_android.cpp
+index 749a0fbcb8..6d40f5ad66 100644
+--- a/gfx/skia/skia/src/ports/SkDebug_android.cpp
++++ b/gfx/skia/skia/src/ports/SkDebug_android.cpp
+@@ -8,7 +8,7 @@
+ #include "include/private/base/SkDebug.h"
+ #include "include/private/base/SkFeatures.h"
+ 
+-#if defined(SK_BUILD_FOR_ANDROID)
++#if defined(SK_BUILD_FOR_ANDROID) && !defined(__TERMUX__)
+ 
+ #include <stdio.h>
+ 
+diff --git a/gfx/skia/skia/src/ports/SkDebug_stdio.cpp b/gfx/skia/skia/src/ports/SkDebug_stdio.cpp
+index 6a58936900..af5d02337a 100644
 --- a/gfx/skia/skia/src/ports/SkDebug_stdio.cpp
 +++ b/gfx/skia/skia/src/ports/SkDebug_stdio.cpp
-@@ -8,7 +8,7 @@
+@@ -9,7 +9,7 @@
  #include "include/private/base/SkFeatures.h"
  #include "include/private/base/SkLoadUserConfig.h"
  
@@ -9,14 +24,3 @@
  
  #include <stdarg.h>
  #include <stdio.h>
---- a/gfx/skia/skia/src/ports/SkDebug_android.cpp
-+++ b/gfx/skia/skia/src/ports/SkDebug_android.cpp
-@@ -6,7 +6,7 @@
-  */
- 
- #include "include/core/SkTypes.h"
--#if defined(SK_BUILD_FOR_ANDROID)
-+#if defined(SK_BUILD_FOR_ANDROID) && !defined(__TERMUX__)
- 
- #include <stdio.h>
- 
