@@ -19,12 +19,13 @@ termux_setup_flang() {
 	local __cache_dir="$TERMUX_COMMON_CACHEDIR"/flang-toolchain-cache
 	mkdir -p "$__cache_dir"
 
-	local __version="r27"
+	local __version="r27b"
+	local _flang_toolchain_version=0
 	local __sha256sums="
-cf8744bf0abd5efa5667dbbd906c72c6d47ed6306daa41bd0b7ddd860772f3cd  package-flang-aarch64.tar.bz2
-508a63c9d268e6758d19c8bd29f1e23de98b768f9ea094e053cb39b72f2abd31  package-flang-host.tar.bz2
-7e4ffe9bb98bcc86d379aa755755495ce34a1835d00c40017e1a20cc0a9e0d7e  package-flang-x86_64.tar.bz2
-f12815f039a4997b59503f1bd6dcd0b0441040ec40bd8813aa29643ee4982a97  package-install.tar.bz2
+811b70320c7fa46aa179dc6e7fa69ce2009844dbe8af40de4befe185ae348a87  package-flang-aarch64.tar.bz2
+9fe4d6d255d4294a97f59fa55f732f34e3b7dacfa6af0bfc949787055b1b0f47  package-flang-host.tar.bz2
+f5cca2f9cf0d736e108c490e90b30fd8dee34f53cbd6e442cdbcc34fdaa55527  package-flang-x86_64.tar.bz2
+4763f91d32b9be8df8f6695868ac71f7f4b85d3f99e43bafb186986718060442  package-install.tar.bz2
 	"
 	local __checksum
 	local __file
@@ -34,8 +35,6 @@ f12815f039a4997b59503f1bd6dcd0b0441040ec40bd8813aa29643ee4982a97  package-instal
 			https://github.com/licy183/ndk-toolchain-clang-with-flang/releases/download/"$__version"/"$__file" \
 			"$__cache_dir/$__file" "$__checksum"
 	done <<< "$__sha256sums"
-
-	local _flang_toolchain_version=0
 
 	local _termux_toolchain_name="$(basename "$TERMUX_STANDALONE_TOOLCHAIN")"
 
