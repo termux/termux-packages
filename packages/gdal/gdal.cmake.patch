@@ -1,0 +1,19 @@
+Avoid -Wdocumentation clang flag which causes a clang crash.
+
+Will be fixed in NDK r27c: https://github.com/android/ndk/issues/2070
+
+diff -u -r ../gdal-3.9.1/gdal.cmake ./gdal.cmake
+--- ../gdal-3.9.1/gdal.cmake	2024-06-22 22:04:02.000000000 +0000
++++ ./gdal.cmake	2024-09-13 13:26:47.821834791 +0000
+@@ -156,11 +156,6 @@
+   detect_and_set_cxx_warning_flag(extra-semi)
+   detect_and_set_c_and_cxx_warning_flag(comma)
+   detect_and_set_c_and_cxx_warning_flag(float-conversion)
+-  check_c_compiler_flag("-Wdocumentation -Wno-documentation-deprecated-sync" HAVE_WFLAG_DOCUMENTATION_AND_NO_DEPRECATED)
+-  if (HAVE_WFLAG_DOCUMENTATION_AND_NO_DEPRECATED)
+-    set(GDAL_C_WARNING_FLAGS ${GDAL_C_WARNING_FLAGS} -Wdocumentation -Wno-documentation-deprecated-sync)
+-    set(GDAL_CXX_WARNING_FLAGS ${GDAL_CXX_WARNING_FLAGS} -Wdocumentation -Wno-documentation-deprecated-sync)
+-  endif ()
+   detect_and_set_cxx_warning_flag(unused-private-field)
+   detect_and_set_cxx_warning_flag(non-virtual-dtor)
+   detect_and_set_cxx_warning_flag(overloaded-virtual)
