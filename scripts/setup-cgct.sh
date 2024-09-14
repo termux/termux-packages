@@ -65,7 +65,7 @@ if [ ! -f "${CGCT_DIR}/lib/libgcc_s.so" ]; then
 	echo "Installing ${pkgname} for CGCT..."
 	curl -L "https://archlinux.org/packages/core/${ARCH}/${pkgname}/download/" -o "${TMPDIR_CGCT}/${pkgname}.pkg.zstd"
 	tar --use-compress-program=unzstd -xf "${TMPDIR_CGCT}/${pkgname}.pkg.zstd" -C "${TMPDIR_CGCT}" usr/lib
-	cp -r "${TMPDIR_CGCT}/usr/lib"* "${CGCT_DIR}/lib"
+	cp -r "${TMPDIR_CGCT}/usr/lib/"* "${CGCT_DIR}/lib"
 fi
 
 # Setting up CGCT
