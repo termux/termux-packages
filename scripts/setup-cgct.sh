@@ -18,7 +18,7 @@ fi
 declare -A CGCT=(
 	["cbt"]="2.43-1" # Cross Binutils for Termux
 	["cgt"]="14.1.0-2" # Cross GCCs for Termux
-	["glibc-cgct"]="2.40-0" # Glibc for CGCT
+	["glibc-cgct"]="2.40-1" # Glibc for CGCT
 )
 
 : "${TERMUX_PKG_TMPDIR:="/tmp"}"
@@ -65,8 +65,7 @@ if [ ! -f "${CGCT_DIR}/lib/libgcc_s.so" ]; then
 	echo "Installing ${pkgname} for CGCT..."
 	curl -L "https://archlinux.org/packages/core/${ARCH}/${pkgname}/download/" -o "${TMPDIR_CGCT}/${pkgname}.pkg.zstd"
 	tar --use-compress-program=unzstd -xf "${TMPDIR_CGCT}/${pkgname}.pkg.zstd" -C "${TMPDIR_CGCT}" usr/lib
-	cp -r "${TMPDIR_CGCT}/usr/lib" "${CGCT_DIR}/lib"
-	rm -fr "${TMPDIR_CGCT}/usr"
+	cp -r "${TMPDIR_CGCT}/usr/lib"* "${CGCT_DIR}/lib"
 fi
 
 # Setting up CGCT
