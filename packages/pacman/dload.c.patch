@@ -1,0 +1,11 @@
+--- pacman-7.0.0/lib/libalpm/dload.c	2024-07-14 12:11:18.000000000 +0300
++++ pacman-7.0.0/lib/libalpm/dload.c.patch	2024-09-15 14:13:39.008174435 +0300
+@@ -82,7 +82,7 @@
+ 		unlink(filename);
+                 return 1;
+ 	}
+-	ASSERT(chown(filename, 0, 0) != -1, return -1);
++	ASSERT(chown(filename, getuid(), getgid()) != -1, return -1);
+ 	ASSERT(chmod(filename, ~(_getumask()) & 0666) != -1, return -1);
+ 	return 0;
+ }
