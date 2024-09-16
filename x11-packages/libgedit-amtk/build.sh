@@ -1,10 +1,10 @@
-TERMUX_PKG_HOMEPAGE=https://github.com/gedit-technology/libgedit-amtk
+TERMUX_PKG_HOMEPAGE=https://gitlab.gnome.org/World/gedit/libgedit-amtk
 TERMUX_PKG_DESCRIPTION="Actions, Menus and Toolbars Kit for GTK applications"
 TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="5.8.0"
-TERMUX_PKG_SRCURL=https://github.com/gedit-technology/libgedit-amtk/releases/download/${TERMUX_PKG_VERSION}/libgedit-amtk-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=64017ae100ef588e01ef54d79c13c4b9767fd37e4365d7e4afd924f751460ecc
+TERMUX_PKG_VERSION="5.9.0"
+TERMUX_PKG_SRCURL=https://download.gnome.org/sources/libgedit-amtk/${TERMUX_PKG_VERSION%.*}/libgedit-amtk-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=7fc3348bef242e08967bdbb9a6698cf39f7810f95051fd8132910f36ed2d6d15
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="glib, gtk3"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, glib-cross"
@@ -12,6 +12,7 @@ TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dgobject_introspection=true
 -Dgtk_doc=false
+-Dtests=false
 "
 
 termux_step_pre_configure() {
