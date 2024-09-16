@@ -26,9 +26,6 @@
     <member name="TEPL_SETTINGS_THEME_VARIANT_SYSTEM" nick="system" value="0"/>
     <member name="TEPL_SETTINGS_THEME_VARIANT_LIGHT" nick="light" value="1"/>
     <member name="TEPL_SETTINGS_THEME_VARIANT_DARK" nick="dark" value="2"/>
-  </enum>  <enum name="TeplSettingsSimpleThemeVariant" get-type="tepl_settings_simple_theme_variant_get_type">
-    <member name="TEPL_SETTINGS_SIMPLE_THEME_VARIANT_LIGHT" nick="light" value="0"/>
-    <member name="TEPL_SETTINGS_SIMPLE_THEME_VARIANT_DARK" nick="dark" value="1"/>
   </enum>  <class name="TeplFile" get-type="tepl_file_get_type" parents="GObject">
     <property name="location" type="GFile" flags="231"/>
     <property name="newline-type" type="TeplNewlineType" flags="225" default-value="TEPL_NEWLINE_TYPE_LF"/>
@@ -44,7 +41,6 @@
   <class name="TeplBuffer" get-type="tepl_buffer_get_type" parents="GtkSourceBuffer,GtkTextBuffer,GObject">
     <property name="tepl-short-title" type="gchararray" flags="225" default-value="NULL"/>
     <property name="tepl-full-title" type="gchararray" flags="225" default-value="NULL"/>
-    <property name="tepl-style-scheme-id" type="gchararray" flags="227" default-value=""/>
     <signal name="tepl-cursor-moved" return="void" when="first">
     </signal>
   </class>
@@ -145,22 +141,33 @@
     <implements name="GtkBuildable"/>
     <implements name="GtkOrientable"/>
   </class>
-  <interface name="TeplPanelItem" get-type="tepl_panel_item_get_type">
-  </interface>
+  <class name="TeplPanelItem" get-type="tepl_panel_item_get_type" parents="GObject">
+    <property name="widget" type="GtkWidget" flags="235"/>
+    <property name="name" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="title" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="icon-name" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="position" type="gint" flags="235" default-value="0"/>
+  </class>
   <interface name="TeplPanel" get-type="tepl_panel_get_type">
   </interface>
-  <class name="TeplPanelContainer" get-type="tepl_panel_container_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
-    <implements name="AtkImplementorIface"/>
-    <implements name="GtkBuildable"/>
+  <class name="TeplPanelSimple" get-type="tepl_panel_simple_get_type" parents="GObject">
     <implements name="TeplPanel"/>
+    <property name="active-item" type="TeplPanelItem" flags="227"/>
+    <property name="active-item-name" type="gchararray" flags="227" default-value="NULL"/>
     <signal name="changed" return="void" when="first">
     </signal>
+    <signal name="add-item" return="void" when="last">
+      <param type="TeplPanelItem"/>
+    </signal>
+    <signal name="remove-item" return="void" when="last">
+      <param type="TeplPanelItem"/>
+    </signal>
+  </class>
+  <class name="TeplPanelNotebook" get-type="tepl_panel_notebook_get_type" parents="GObject">
+  </class>
+  <class name="TeplPanelStack" get-type="tepl_panel_stack_get_type" parents="GObject">
   </class>
   <class name="TeplPanelSwitcherMenu" get-type="tepl_panel_switcher_menu_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
-    <implements name="AtkImplementorIface"/>
-    <implements name="GtkBuildable"/>
-  </class>
-  <class name="TeplPanelSwitcherNotebook" get-type="tepl_panel_switcher_notebook_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
     <implements name="AtkImplementorIface"/>
     <implements name="GtkBuildable"/>
   </class>
@@ -171,6 +178,7 @@
     <property name="has-cancel-button" type="gboolean" flags="235" default-value="TRUE"/>
   </class>
   <class name="TeplSettings" get-type="tepl_settings_get_type" parents="GObject">
+    <property name="style-scheme-id" type="gchararray" flags="225" default-value="NULL"/>
     <signal name="font-changed" return="void" when="first">
     </signal>
   </class>
@@ -185,13 +193,16 @@
     <implements name="GtkActionable"/>
     <implements name="GtkActivatable"/>
   </class>
-  <class name="TeplStyleSchemeChooserWidget" get-type="tepl_style_scheme_chooser_widget_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+  <class name="TeplStyleSchemeChooserFull" get-type="tepl_style_scheme_chooser_full_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
     <implements name="AtkImplementorIface"/>
     <implements name="GtkBuildable"/>
-    <implements name="GtkSourceStyleSchemeChooser"/>
-    <property name="tepl-style-scheme-id" type="gchararray" flags="227" default-value=""/>
   </class>
-  <class name="TeplTabLabel" get-type="tepl_tab_label_get_type" parents="GtkGrid,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+  <class name="TeplStyleSchemeChooserSimple" get-type="tepl_style_scheme_chooser_simple_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="style-scheme-id" type="gchararray" flags="227" default-value="NULL"/>
+  </class>
+  <class name="TeplTabLabel" get-type="tepl_tab_label_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
     <implements name="AtkImplementorIface"/>
     <implements name="GtkBuildable"/>
     <implements name="GtkOrientable"/>
