@@ -1,20 +1,22 @@
 --- ./usr/include/stdlib.h.orig	2021-08-16 11:50:47.432239182 +0200
 +++ ./usr/include/stdlib.h	2021-08-16 11:51:31.102222894 +0200
-@@ -33,6 +33,7 @@
+@@ -33,6 +33,9 @@
  #include <bits/wait.h>
  #include <malloc.h>
  #include <stddef.h>
++#if !defined(__swift__)
 +#include <stdint.h>
++#endif
  #include <sys/cdefs.h>
  #include <xlocale.h>
  
-@@ -224,8 +225,7 @@
- size_t wcstombs(char* __dst, const wchar_t* __src, size_t __n);
+@@ -207,8 +207,7 @@
  
- #if __ANDROID_API__ >= 21
--size_t __ctype_get_mb_cur_max(void) __INTRODUCED_IN(21);
+ size_t wcstombs(char* _Nullable __dst, const wchar_t* _Nullable __src, size_t __n);
+ 
+-size_t __ctype_get_mb_cur_max(void);
 -#define MB_CUR_MAX __ctype_get_mb_cur_max()
 +#define MB_CUR_MAX 4
- #else
- /*
-  * Pre-L we didn't have any locale support and so we were always the POSIX
+ 
+ #if defined(__BIONIC_INCLUDE_FORTIFY_HEADERS)
+ #include <bits/fortify/stdlib.h>
