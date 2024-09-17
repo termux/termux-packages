@@ -1,0 +1,13 @@
+diff --git a/scripts/link_shared.php b/scripts/link_shared.php
+index d2a6553..4de5ce5 100644
+--- a/scripts/link_shared.php
++++ b/scripts/link_shared.php
+@@ -3,7 +3,7 @@ require __DIR__."/common.php";
+ check_compiler();
+ 
+ prepare_link();
+-$cmd = $compiler." -shared -o src/libpluto.so";
++$cmd = $compiler." -shared -Wl,-soname,libpluto.so -o src/libpluto.so";
+ 
+ for_each_obj(function($file)
+ {
