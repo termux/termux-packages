@@ -6,5 +6,6 @@ TERMUX_PKG_VERSION="5.116.0"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/kconfig-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=2c5de3609273aa167a5c49be42470a3bf87d70fc8565ba6cee3717c00067470e
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP="5\.\d+\.\d+"
 TERMUX_PKG_DEPENDS="libc++, qt5-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules, qt5-qtbase-cross-tools, qt5-qttools-cross-tools"
