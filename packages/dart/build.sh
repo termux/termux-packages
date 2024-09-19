@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Dart is a general-purpose programming language"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_LICENSE_FILE="sdk/LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.4.4
+TERMUX_PKG_VERSION=3.5.3
 TERMUX_PKG_SRCURL=https://github.com/dart-lang/sdk/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=2057c67402c38993780d38358fbe1e5ae5cc5b59cf29d579937caac97361716a
+TERMUX_PKG_SHA256=ee2cfea26c9eb22a5e7df5f68e13863d4e55ff14c06a286bf98d866f7b85652d
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE='newest-tag'
@@ -15,6 +15,33 @@ TERMUX_PKG_UPDATE_VERSION_REGEXP='^\d+.\d+.\d+$'
 # Busybox-based versions of such utilities cause issues so
 # complete ones should be used.
 TERMUX_PKG_DEPENDS="gzip, tar"
+
+termux_pkg_auto_update() {
+	# Taken from packages/taplo
+
+	# Get latest release tag:
+	local api_url="https://api.github.com/repos/dart-lang/sdk/git/refs/tags"
+	local latest_refs_tags
+	latest_refs_tags=$(curl -s "${api_url}" | jq '.[].ref' | sed -ne "s|.*${TERMUX_PKG_UPDATE_VERSION_REGEXP}\"|\1|p")
+	if [[ -z "${latest_refs_tags}" ]]; then
+		echo "WARN: Unable to get latest refs tags from upstream. Try again later." >&2
+		return
+	fi
+
+	local latest_version
+	latest_version=$(tail -n1 <<< "$latest_refs_tags")
+	if [[ "${latest_version}" == "${TERMUX_PKG_VERSION}" ]]; then
+		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
+		return
+	fi
+
+	# We want to avoid re-filtering the version.
+	# It's already cleaned up, so unset the regexp.
+	# See: https://github.com/termux/termux-packages/issues/20836
+	unset TERMUX_PKG_UPDATE_VERSION_REGEXP
+
+	termux_pkg_upgrade_version "${latest_version}"
+}
 
 termux_step_post_get_source() {
 	git clone --depth=1 https://chromium.googlesource.com/chromium/tools/depot_tools.git
