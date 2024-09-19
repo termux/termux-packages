@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 _TAG_VERSION=13.0.0
 _TAG_REVISION=15
 TERMUX_PKG_VERSION=${_TAG_VERSION}.${_TAG_REVISION}
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=(https://android.googlesource.com/platform/system/tools/sysprop
                    https://android.googlesource.com/platform/system/core
                    https://android.googlesource.com/platform/system/libbase)
@@ -16,8 +16,7 @@ TERMUX_PKG_SHA256=(SKIP_CHECKSUM
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 # aapt is for libandroid-base.so
-TERMUX_PKG_DEPENDS="aapt, libc++, libprotobuf"
-TERMUX_PKG_BUILD_DEPENDS="fmt"
+TERMUX_PKG_DEPENDS="aapt, fmt, libc++, libprotobuf"
 
 termux_step_post_get_source() {
 	# FIXME: We would like to enable checksums when downloading

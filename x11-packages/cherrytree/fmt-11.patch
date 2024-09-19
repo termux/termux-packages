@@ -1,0 +1,985 @@
+From ccc2d101f24a409efddb2f29e8c14002c9836a85 Mon Sep 17 00:00:00 2001
+From: Giuseppe Penone <giuspen@gmail.com>
+Date: Wed, 21 Aug 2024 18:19:40 +0100
+Subject: [PATCH] removed fmt custom formatter for Glib::ustring (#2548)
+
+---
+ src/ct/ct_actions_edit.cc      |  6 +++---
+ src/ct/ct_actions_find.cc      |  4 ++--
+ src/ct/ct_actions_others.cc    |  2 +-
+ src/ct/ct_clipboard.cc         | 10 +++++-----
+ src/ct/ct_config.cc            |  2 +-
+ src/ct/ct_dialogs_find.cc      |  2 +-
+ src/ct/ct_export2html.cc       | 10 +++++-----
+ src/ct/ct_export2pdf.cc        | 10 +++++-----
+ src/ct/ct_export2txt.cc        |  2 +-
+ src/ct/ct_filesystem.cc        |  2 +-
+ src/ct/ct_image.cc             |  2 +-
+ src/ct/ct_imports.cc           |  4 ++--
+ src/ct/ct_logging.h            | 13 +------------
+ src/ct/ct_main_win_buffer.cc   |  4 ++--
+ src/ct/ct_main_win_events.cc   |  2 +-
+ src/ct/ct_misc_utils.cc        |  4 ++--
+ src/ct/ct_misc_utils.h         |  2 +-
+ src/ct/ct_storage_control.cc   |  6 +++---
+ src/ct/ct_storage_multifile.cc |  2 +-
+ src/ct/ct_storage_sqlite.cc    |  4 ++--
+ src/ct/ct_storage_sqlite.h     |  4 ++--
+ src/ct/ct_storage_xml.cc       |  2 +-
+ src/ct/ct_treestore.cc         |  6 +++---
+ tests/tests_encoding.cpp       |  4 ++--
+ 24 files changed, 49 insertions(+), 60 deletions(-)
+
+diff --git a/src/ct/ct_actions_edit.cc b/src/ct/ct_actions_edit.cc
+index 972838431..155d935ff 100644
+--- a/src/ct/ct_actions_edit.cc
++++ b/src/ct/ct_actions_edit.cc
+@@ -93,7 +93,7 @@ void CtActions::image_insert()
+         rPixbuf = Gdk::Pixbuf::create_from_file(filename);
+     }
+     catch (Glib::Error& error) {
+-        spdlog::error("{} {}", __FUNCTION__, error.what());
++        spdlog::error("{} {}", __FUNCTION__, error.what().raw());
+     }
+     if (rPixbuf)
+         _image_edit_dialog(rPixbuf, _curr_buffer()->get_insert()->get_iter(), nullptr/*pIterBound*/);
+@@ -303,7 +303,7 @@ TocEntry find_toc_entries(CtActions& actions, CtTreeIter& node, unsigned depth)
+     std::unordered_map<int, int> encountered_headers;
+     Glib::RefPtr<Gsv::Buffer> rTextBuffer = node.get_node_text_buffer();
+     if (not rTextBuffer) {
+-        throw std::runtime_error(str::format(_("Failed to retrieve the content of the node '%s'"), node.get_node_name()));
++        throw std::runtime_error(str::format(_("Failed to retrieve the content of the node '%s'"), node.get_node_name().raw()));
+     }
+     Gtk::TextIter text_iter = rTextBuffer->begin();
+ 
+@@ -354,7 +354,7 @@ TocEntry find_toc_entries(CtActions& actions, CtTreeIter& node, unsigned depth)
+                 entry.children.emplace_back(fmt::format("node {} {}", node_id, anchor_txt), false/*is_node*/, txt, depth + 1, h_lvl);
+             }
+             catch(std::invalid_argument&) {
+-                spdlog::error("Could not convert [{}] to an integer", h_level_str);
++                spdlog::error("Could not convert [{}] to an integer", h_level_str.raw());
+             }
+         }
+ 
+diff --git a/src/ct/ct_actions_find.cc b/src/ct/ct_actions_find.cc
+index 47a708873..d0b8cabad 100644
+--- a/src/ct/ct_actions_find.cc
++++ b/src/ct/ct_actions_find.cc
+@@ -218,7 +218,7 @@ void CtActions::find_in_multiple_nodes_ok_clicked()
+         if (_s_options.node_content) {
+             Glib::RefPtr<Gsv::Buffer> rTextBuffer = ct_node_iter.get_node_text_buffer();
+             if (not rTextBuffer) {
+-                CtDialogs::error_dialog(str::format(_("Failed to retrieve the content of the node '%s'"), ct_node_iter.get_node_name()), *_pCtMainWin);
++                CtDialogs::error_dialog(str::format(_("Failed to retrieve the content of the node '%s'"), ct_node_iter.get_node_name().raw()), *_pCtMainWin);
+                 break;
+             }
+         }
+@@ -440,7 +440,7 @@ CtMatchType CtActions::_parse_given_node_content(CtTreeIter node_iter,
+                 if (_s_options.node_content) {
+                     Glib::RefPtr<Gsv::Buffer> rTextBuffer = ct_node_iter.get_node_text_buffer();
+                     if (not rTextBuffer) {
+-                        CtDialogs::error_dialog(str::format(_("Failed to retrieve the content of the node '%s'"), ct_node_iter.get_node_name()), *_pCtMainWin);
++                        CtDialogs::error_dialog(str::format(_("Failed to retrieve the content of the node '%s'"), ct_node_iter.get_node_name().raw()), *_pCtMainWin);
+                         break;
+                     }
+                 }
+diff --git a/src/ct/ct_actions_others.cc b/src/ct/ct_actions_others.cc
+index a7c6746eb..91ff638e4 100644
+--- a/src/ct/ct_actions_others.cc
++++ b/src/ct/ct_actions_others.cc
+@@ -575,7 +575,7 @@ void CtActions::_exec_code(const bool is_all)
+     }
+     else {
+         const int retVal = std::system(terminal_cmd.c_str());
+-        if (retVal != 0) spdlog::error("system({}) returned {}", terminal_cmd, retVal);
++        if (retVal != 0) spdlog::error("system({}) returned {}", terminal_cmd.raw(), retVal);
+     }
+ }
+ 
+diff --git a/src/ct/ct_clipboard.cc b/src/ct/ct_clipboard.cc
+index 9c9bc3ca7..8ca0b080f 100644
+--- a/src/ct/ct_clipboard.cc
++++ b/src/ct/ct_clipboard.cc
+@@ -246,7 +246,7 @@ void CtClipboard::anchor_link_to_clipboard(CtTreeIter node, const Glib::ustring&
+     CtClipboardData* clip_data = new CtClipboardData{};
+     std::string tml = R"XML(<?xml version="1.0" encoding="UTF-8"?><root><slot><rich_text link="node {} {}">{}</rich_text></slot></root>)XML";
+     clip_data->rich_text = fmt::format(tml, node.get_node_id(), str::xml_escape(anchor_name), str::xml_escape(anchor_name));
+-    clip_data->plain_text = fmt::format("{} - {} - {}", node.get_cherrytree_filepath(), CtMiscUtil::get_node_hierarchical_name(node, " / ", false/*for_filename*/).c_str(), anchor_name);
++    clip_data->plain_text = fmt::format("{} - {} - {}", node.get_cherrytree_filepath(), CtMiscUtil::get_node_hierarchical_name(node, " / ", false/*for_filename*/).c_str(), anchor_name.raw());
+ 
+     _set_clipboard_data({CtConst::TARGET_CTD_RICH_TEXT, CtConst::TARGET_CTD_PLAIN_TEXT}, clip_data);
+ }
+@@ -756,7 +756,7 @@ void CtClipboard::on_received_to_uri_list(const Gtk::SelectionData& selection_da
+                 property_value = "webs " + element;
+             }
+             else if (str::startswith(element, "file://")) {
+-                Glib::ustring file_path = element.substr(7);
++                std::string file_path = element.substr(7);
+                 file_path = str::replace(file_path, "%20", CtConst::CHAR_SPACE);
+                 g_autofree gchar* mimetype = g_content_type_guess(file_path.c_str(), nullptr, 0, nullptr);
+                 if (mimetype and str::startswith(mimetype, "image/") and Glib::file_test(file_path, Glib::FILE_TEST_IS_REGULAR)) {
+@@ -794,7 +794,7 @@ void CtClipboard::on_received_to_uri_list(const Gtk::SelectionData& selection_da
+                     _pCtMainWin->get_ct_actions()->embfile_insert_path(element);
+                 }
+                 else {
+-                    spdlog::debug("'{}' not dir or file", element);
++                    spdlog::debug("'{}' not dir or file", element.raw());
+                 }
+             }
+             if (not property_value.empty()) {
+@@ -883,10 +883,10 @@ void CtClipboard::_yaml_to_codebox(const Glib::ustring& yaml_text, Gtk::TextView
+         _xml_to_codebox(xml_doc.write_to_string(), pTextView);
+     }
+     catch (std::exception& e) {
+-        spdlog::error("_yaml_to_codebox exception: {}\n{}", e.what(), yaml_text);
++        spdlog::error("_yaml_to_codebox exception: {}\n{}", e.what(), yaml_text.raw());
+     }
+     catch (...) {
+-        spdlog::error("_yaml_to_codebox unknown exception\n{}", yaml_text);
++        spdlog::error("_yaml_to_codebox unknown exception\n{}", yaml_text.raw());
+     }
+ }
+ 
+diff --git a/src/ct/ct_config.cc b/src/ct/ct_config.cc
+index 2470ab82f..3ebb54512 100644
+--- a/src/ct/ct_config.cc
++++ b/src/ct/ct_config.cc
+@@ -92,7 +92,7 @@ bool CtConfig::_load_from_file()
+             _uKeyFile->load_from_file(_configFilepath.string());
+         }
+         catch (Glib::Error& error) {
+-            spdlog::error("CtConfig {}: {}", _configFilepath, error.what());
++            spdlog::error("CtConfig {}: {}", _configFilepath, error.what().raw());
+             return false;
+         }
+         _populate_data_from_keyfile();
+diff --git a/src/ct/ct_dialogs_find.cc b/src/ct/ct_dialogs_find.cc
+index a4e8c4e4b..78ef6dc31 100644
+--- a/src/ct/ct_dialogs_find.cc
++++ b/src/ct/ct_dialogs_find.cc
+@@ -526,7 +526,7 @@ void CtDialogs::match_dialog(const std::string& str_find,
+     pButtonNext->set_image_position(Gtk::PositionType::POS_RIGHT);
+     CtMenuAction* pAction = pCtMainWin->get_ct_menu().find_action("toggle_show_allmatches_dlg");
+     Glib::ustring label = CtStrUtil::get_accelerator_label(pAction->get_shortcut(pCtMainWin->get_ct_config()));
+-    Gtk::Button* pButtonHide = pMatchesDialog->add_button(str::format(_("Hide (Restore with '%s')"), label), Gtk::RESPONSE_CLOSE);
++    Gtk::Button* pButtonHide = pMatchesDialog->add_button(str::format(_("Hide (Restore with '%s')"), label.raw()), Gtk::RESPONSE_CLOSE);
+     pButtonHide->set_image_from_icon_name("ct_close", Gtk::ICON_SIZE_BUTTON);
+ 
+     rModel->load_current_page();
+diff --git a/src/ct/ct_export2html.cc b/src/ct/ct_export2html.cc
+index ea2acce2c..2e777548a 100644
+--- a/src/ct/ct_export2html.cc
++++ b/src/ct/ct_export2html.cc
+@@ -1,7 +1,7 @@
+ /*
+  * ct_export2html.cc
+  *
+- * Copyright 2009-2023
++ * Copyright 2009-2024
+  * Giuseppe Penone <giuspen@gmail.com>
+  * Evgenii Gurianov <https://github.com/txe>
+  *
+@@ -83,9 +83,9 @@ void CtExport2Html::node_export_to_html(CtTreeIter tree_iter, const CtExportOpti
+ {
+     Glib::RefPtr<Gsv::Buffer> rTextBuffer = tree_iter.get_node_text_buffer();
+     if (not rTextBuffer) {
+-        throw std::runtime_error(str::format(_("Failed to retrieve the content of the node '%s'"), tree_iter.get_node_name()));
++        throw std::runtime_error(str::format(_("Failed to retrieve the content of the node '%s'"), tree_iter.get_node_name().raw()));
+     }
+-    Glib::ustring html_text = str::format(HTML_HEADER, tree_iter.get_node_name());
++    Glib::ustring html_text = str::format(HTML_HEADER, tree_iter.get_node_name().raw());
+     if (not index.empty() and options.index_in_page) {
+         auto script = R"HTML(
+             <script type='text/javascript'>
+@@ -270,7 +270,7 @@ void CtExport2Html::nodes_all_export_to_single_html(bool all_tree, const CtExpor
+         else {
+             Glib::RefPtr<Gsv::Buffer> rTextBuffer = tree_iter.get_node_text_buffer();
+             if (not rTextBuffer) {
+-                throw std::runtime_error(str::format(_("Failed to retrieve the content of the node '%s'"), tree_iter.get_node_name()));
++                throw std::runtime_error(str::format(_("Failed to retrieve the content of the node '%s'"), tree_iter.get_node_name().raw()));
+             }
+             html_text += _html_get_from_code_buffer(rTextBuffer, -1, -1, tree_iter.get_node_syntax_highlighting());
+         }
+@@ -529,7 +529,7 @@ void CtExport2Html::_html_get_from_treestore_node(CtTreeIter tree_iter,
+ {
+     Glib::RefPtr<Gsv::Buffer> rTextBuffer = tree_iter.get_node_text_buffer();
+     if (not rTextBuffer) {
+-        throw std::runtime_error(str::format(_("Failed to retrieve the content of the node '%s'"), tree_iter.get_node_name()));
++        throw std::runtime_error(str::format(_("Failed to retrieve the content of the node '%s'"), tree_iter.get_node_name().raw()));
+     }
+     auto widgets = tree_iter.get_anchored_widgets(sel_start, sel_end);
+     out_widgets = std::vector<CtAnchoredWidget*>(widgets.begin(), widgets.end()); // copy from list to vector
+diff --git a/src/ct/ct_export2pdf.cc b/src/ct/ct_export2pdf.cc
+index 88aafdef5..4afacb154 100644
+--- a/src/ct/ct_export2pdf.cc
++++ b/src/ct/ct_export2pdf.cc
+@@ -1,7 +1,7 @@
+ /*
+  * ct_export2pdf.cc
+  *
+- * Copyright 2009-2023
++ * Copyright 2009-2024
+  * Giuseppe Penone <giuspen@gmail.com>
+  * Evgenii Gurianov <https://github.com/txe>
+  *
+@@ -355,7 +355,7 @@ std::shared_ptr<CtPangoText> CtExport2Pango::_pango_link_url(const Glib::ustring
+ #endif /* !_WIN32 && !__APPLE__ */
+     }
+     else {
+-        spdlog::debug("invalid link entry {}, text {}", link, tagged_text);
++        spdlog::debug("invalid link entry {}, text {}", link.raw(), tagged_text.raw());
+         return std::make_shared<CtPangoText>(tagged_text, CtConst::RICH_TEXT_ID, indent, pango_dir);
+     }
+ 
+@@ -367,7 +367,7 @@ void CtExport2Pdf::node_export_print(const fs::path& pdf_filepath, CtTreeIter tr
+ {
+     Glib::RefPtr<Gsv::Buffer> rTextBuffer = tree_iter.get_node_text_buffer();
+     if (not rTextBuffer) {
+-        throw std::runtime_error(str::format(_("Failed to retrieve the content of the node '%s'"), tree_iter.get_node_name()));
++        throw std::runtime_error(str::format(_("Failed to retrieve the content of the node '%s'"), tree_iter.get_node_name().raw()));
+     }
+     std::vector<CtPangoObjectPtr> pango_slots;
+     if (tree_iter.get_node_is_text()) {
+@@ -409,7 +409,7 @@ void CtExport2Pdf::_nodes_all_export_print_iter(CtTreeIter tree_iter,
+ {
+     Glib::RefPtr<Gsv::Buffer> rTextBuffer = tree_iter.get_node_text_buffer();
+     if (not rTextBuffer) {
+-        throw std::runtime_error(str::format(_("Failed to retrieve the content of the node '%s'"), tree_iter.get_node_name()));
++        throw std::runtime_error(str::format(_("Failed to retrieve the content of the node '%s'"), tree_iter.get_node_name().raw()));
+     }
+     std::vector<CtPangoObjectPtr> node_pango_slots;
+     if (tree_iter.get_node_is_text()) {
+@@ -592,7 +592,7 @@ bool CtPrint::_cairo_tag_can_apply(const Glib::ustring& tag_name, const Glib::us
+             return true;
+         }
+     }
+-    spdlog::debug("{} dropped", tag_attr);
++    spdlog::debug("{} dropped", tag_attr.raw());
+     return false;
+ }
+ 
+diff --git a/src/ct/ct_export2txt.cc b/src/ct/ct_export2txt.cc
+index fbf4a810c..4d471a41b 100644
+--- a/src/ct/ct_export2txt.cc
++++ b/src/ct/ct_export2txt.cc
+@@ -34,7 +34,7 @@ Glib::ustring CtExport2Txt::node_export_to_txt(CtTreeIter tree_iter, fs::path fi
+ {
+     Glib::RefPtr<Gsv::Buffer> rTextBuffer = tree_iter.get_node_text_buffer();
+     if (not rTextBuffer) {
+-        throw std::runtime_error(str::format(_("Failed to retrieve the content of the node '%s'"), tree_iter.get_node_name()));
++        throw std::runtime_error(str::format(_("Failed to retrieve the content of the node '%s'"), tree_iter.get_node_name().raw()));
+     }
+     Glib::ustring plain_text;
+     if (export_options.include_node_name) {
+diff --git a/src/ct/ct_filesystem.cc b/src/ct/ct_filesystem.cc
+index 821d470d9..5c5f5ea7d 100644
+--- a/src/ct/ct_filesystem.cc
++++ b/src/ct/ct_filesystem.cc
+@@ -202,7 +202,7 @@ bool copy_file(const path& from, const path& to)
+         return rFileFrom->copy(rFileTo, Gio::FILE_COPY_OVERWRITE);
+     }
+     catch (Gio::Error& error) {
+-        spdlog::debug("fs::copy_file, error: {}, from: {}, to: {}", error.what(), from.string(), to.string());
++        spdlog::debug("fs::copy_file, error: {}, from: {}, to: {}", error.what().raw(), from.string(), to.string());
+         return false;
+     }
+ }
+diff --git a/src/ct/ct_image.cc b/src/ct/ct_image.cc
+index 50e807985..12944e73d 100644
+--- a/src/ct/ct_image.cc
++++ b/src/ct/ct_image.cc
+@@ -433,7 +433,7 @@ static const char* get_dvipng_bin_cmd()
+         return rPixbuf;
+     }
+     catch (Glib::Error& error) {
+-        spdlog::error("{} {}", __FUNCTION__, error.what());
++        spdlog::error("{} {}", __FUNCTION__, error.what().raw());
+     }
+     // fallback
+     return pCtMainWin->get_icon_theme()->load_icon("ct_warning", 48);
+diff --git a/src/ct/ct_imports.cc b/src/ct/ct_imports.cc
+index 203ca6650..20e5d01dc 100644
+--- a/src/ct/ct_imports.cc
++++ b/src/ct/ct_imports.cc
+@@ -1,7 +1,7 @@
+ /*
+  * ct_imports.cc
+  *
+- * Copyright 2009-2023
++ * Copyright 2009-2024
+  * Giuseppe Penone <giuspen@gmail.com>
+  * Evgenii Gurianov <https://github.com/txe>
+  *
+@@ -384,7 +384,7 @@ void CtTomboyImport::_iterate_tomboy_note(xmlpp::Element* iter, std::unique_ptr<
+                 _is_link_to_node = false;
+             }
+             else {
+-                spdlog::debug(dom_iter->get_name());
++                spdlog::debug(dom_iter->get_name().raw());
+                 _iterate_tomboy_note(dom_iter_el, node);
+             }
+         }
+diff --git a/src/ct/ct_logging.h b/src/ct/ct_logging.h
+index dfe2ef7fb..e447ba4e1 100644
+--- a/src/ct/ct_logging.h
++++ b/src/ct/ct_logging.h
+@@ -1,7 +1,7 @@
+ /*
+  * ct_logging.h
+  *
+- * Copyright 2009-2021
++ * Copyright 2009-2024
+  * Giuseppe Penone <giuspen@gmail.com>
+  * Evgenii Gurianov <https://github.com/txe>
+  *
+@@ -32,14 +32,3 @@
+ #include "spdlog/fmt/bundled/core.h"
+ #include "spdlog/fmt/bundled/printf.h"
+ #endif // not SHARED_FMT_SPDLOG
+-#include <glibmm/ustring.h>
+-
+-// ostream works badly on Win32 due to locale encoding
+-template <>
+-struct fmt::formatter<Glib::ustring>: formatter<string_view> {
+-  // parse is inherited from formatter<string_view>.
+-  template <typename FormatContext>
+-  auto format(Glib::ustring c, FormatContext& ctx) {
+-    return formatter<string_view>::format(c.c_str(), ctx);
+-  }
+-};
+diff --git a/src/ct/ct_main_win_buffer.cc b/src/ct/ct_main_win_buffer.cc
+index 4d69e89d3..f04471ae5 100644
+--- a/src/ct/ct_main_win_buffer.cc
++++ b/src/ct/ct_main_win_buffer.cc
+@@ -125,7 +125,7 @@ void CtMainWin::reapply_syntax_highlighting(const char target/*'r':RichText, 'p'
+                 if (node.get_node_is_rich_text()) {
+                     Glib::RefPtr<Gsv::Buffer> rTextBuffer = node.get_node_text_buffer();
+                     if (not rTextBuffer) {
+-                        error = str::format(_("Failed to retrieve the content of the node '%s'"), node.get_node_name());
++                        error = str::format(_("Failed to retrieve the content of the node '%s'"), node.get_node_name().raw());
+                         return true; /* true for stop */
+                     }
+                     apply_syntax_highlighting(rTextBuffer, node.get_node_syntax_highlighting(), true/*forceReApply*/);
+@@ -144,7 +144,7 @@ void CtMainWin::reapply_syntax_highlighting(const char target/*'r':RichText, 'p'
+                 else {
+                     Glib::RefPtr<Gsv::Buffer> rTextBuffer = node.get_node_text_buffer();
+                     if (not rTextBuffer) {
+-                        error = str::format(_("Failed to retrieve the content of the node '%s'"), node.get_node_name());
++                        error = str::format(_("Failed to retrieve the content of the node '%s'"), node.get_node_name().raw());
+                         return true; /* true for stop */
+                     }
+                     apply_syntax_highlighting(rTextBuffer, node.get_node_syntax_highlighting(), true/*forceReApply*/);
+diff --git a/src/ct/ct_main_win_events.cc b/src/ct/ct_main_win_events.cc
+index 732336414..99095a392 100644
+--- a/src/ct/ct_main_win_events.cc
++++ b/src/ct/ct_main_win_events.cc
+@@ -56,7 +56,7 @@ void CtMainWin::_on_treeview_cursor_changed()
+ 
+     Glib::RefPtr<Gsv::Buffer> rTextBuffer = treeIter.get_node_text_buffer();
+     if (not rTextBuffer) {
+-        CtDialogs::error_dialog(str::format(_("Failed to retrieve the content of the node '%s'"), treeIter.get_node_name()), *this);
++        CtDialogs::error_dialog(str::format(_("Failed to retrieve the content of the node '%s'"), treeIter.get_node_name().raw()), *this);
+         if (_prevTreeIter) {
+             _uCtTreeview->set_cursor_safe(_prevTreeIter);
+         }
+diff --git a/src/ct/ct_misc_utils.cc b/src/ct/ct_misc_utils.cc
+index 8ed98b8b3..2b452fe86 100644
+--- a/src/ct/ct_misc_utils.cc
++++ b/src/ct/ct_misc_utils.cc
+@@ -1160,7 +1160,7 @@ int str::indexOf(const Glib::ustring& str, const gunichar& uc)
+     return index != std::string::npos ? static_cast<int>(index) : -1;
+ }
+ 
+-Glib::ustring str::xml_escape(const Glib::ustring& text)
++std::string str::xml_escape(const Glib::ustring& text)
+ {
+     Glib::ustring buffer;
+     buffer.reserve(text.size());
+@@ -1175,7 +1175,7 @@ Glib::ustring str::xml_escape(const Glib::ustring& text)
+             default:   buffer.append(1, *ch);        break;
+         }
+     }
+-    return buffer;
++    return buffer.raw();
+ }
+ 
+ Glib::ustring str::sanitize_bad_symbols(const Glib::ustring& xml_content)
+diff --git a/src/ct/ct_misc_utils.h b/src/ct/ct_misc_utils.h
+index dc2cb09a2..d75a0f263 100644
+--- a/src/ct/ct_misc_utils.h
++++ b/src/ct/ct_misc_utils.h
+@@ -328,7 +328,7 @@ int indexOf(const std::array<T, size>& array, const T& uc)
+     return -1;
+ }
+ 
+-Glib::ustring xml_escape(const Glib::ustring& text);
++std::string xml_escape(const Glib::ustring& text);
+ 
+ Glib::ustring sanitize_bad_symbols(const Glib::ustring& xml_content);
+ 
+diff --git a/src/ct/ct_storage_control.cc b/src/ct/ct_storage_control.cc
+index 54b9c145b..9a6e813a0 100644
+--- a/src/ct/ct_storage_control.cc
++++ b/src/ct/ct_storage_control.cc
+@@ -140,7 +140,7 @@ static const std::string BAD_ARCHIVE{"_BAD_ARC_"};
+             return Glib::build_filename(first_backup_dir, CtConst::CHAR_DOT + Glib::path_get_basename(file_or_dir_path)) + CtConst::CHAR_TILDE;
+         }
+         catch (Glib::Error& ex) {
+-            spdlog::error("failed to create backup directory: {}, \n{}", first_backup_dir, ex.what());
++            spdlog::error("failed to create backup directory: {}, \n{}", first_backup_dir, ex.what().raw());
+             return "";
+         }
+     };
+@@ -778,7 +778,7 @@ void CtStorageCache::generate_cache(CtMainWin* pCtMainWin, const CtStorageSyncPe
+             CtTreeIter ct_tree_iter = store.to_ct_tree_iter(iter);
+             Glib::RefPtr<Gsv::Buffer> rTextBuffer = ct_tree_iter.get_node_text_buffer();
+             if (not rTextBuffer) {
+-                error = str::format(_("Failed to retrieve the content of the node '%s'"), ct_tree_iter.get_node_name());
++                error = str::format(_("Failed to retrieve the content of the node '%s'"), ct_tree_iter.get_node_name().raw());
+                 return true; /* true for stop */
+             }
+             for (auto widget : ct_tree_iter.get_anchored_widgets_fast())
+@@ -795,7 +795,7 @@ void CtStorageCache::generate_cache(CtMainWin* pCtMainWin, const CtStorageSyncPe
+             if (node_pair.second.buff && ct_tree_iter.get_node_is_rich_text()) {
+                 Glib::RefPtr<Gsv::Buffer> rTextBuffer = ct_tree_iter.get_node_text_buffer();
+                 if (not rTextBuffer) {
+-                    throw std::runtime_error(str::format(_("Failed to retrieve the content of the node '%s'"), ct_tree_iter.get_node_name()));
++                    throw std::runtime_error(str::format(_("Failed to retrieve the content of the node '%s'"), ct_tree_iter.get_node_name().raw()));
+                 }
+                 for (auto widget : ct_tree_iter.get_anchored_widgets_fast())
+                     if (widget->get_type() == CtAnchWidgType::ImagePng) // important to check type
+diff --git a/src/ct/ct_storage_multifile.cc b/src/ct/ct_storage_multifile.cc
+index 966cba10c..ebd729e0e 100644
+--- a/src/ct/ct_storage_multifile.cc
++++ b/src/ct/ct_storage_multifile.cc
+@@ -455,7 +455,7 @@ bool CtStorageMultiFile::_nodes_to_multifile(const CtTreeIter* ct_tree_iter,
+         }
+     }
+     catch (Glib::Error& error) {
+-        spdlog::error("{} {}", __FUNCTION__, error.what());
++        spdlog::error("{} {}", __FUNCTION__, error.what().raw());
+     }
+     return false;
+ }
+diff --git a/src/ct/ct_storage_sqlite.cc b/src/ct/ct_storage_sqlite.cc
+index 476e563ed..dd2c703bb 100644
+--- a/src/ct/ct_storage_sqlite.cc
++++ b/src/ct/ct_storage_sqlite.cc
+@@ -108,8 +108,8 @@ const char CtStorageSqlite::TABLE_BOOKMARK_CREATE[]{"CREATE TABLE bookmark ("
+ const char CtStorageSqlite::TABLE_BOOKMARK_INSERT[]{"INSERT INTO bookmark VALUES(?,?)"};
+ const char CtStorageSqlite::TABLE_BOOKMARK_DELETE[]{"DELETE FROM bookmark"};
+ 
+-const Glib::ustring CtStorageSqlite::ERR_SQLITE_PREPV2{"!! sqlite3_prepare_v2: "};
+-const Glib::ustring CtStorageSqlite::ERR_SQLITE_STEP{"!! sqlite3_step: "};
++/*static*/const std::string CtStorageSqlite::ERR_SQLITE_PREPV2{"!! sqlite3_prepare_v2: "};
++/*static*/const std::string CtStorageSqlite::ERR_SQLITE_STEP{"!! sqlite3_step: "};
+ 
+ class Sqlite3StmtAuto
+ {
+diff --git a/src/ct/ct_storage_sqlite.h b/src/ct/ct_storage_sqlite.h
+index e6cad42df..e42fe9cd4 100644
+--- a/src/ct/ct_storage_sqlite.h
++++ b/src/ct/ct_storage_sqlite.h
+@@ -129,8 +129,8 @@ class CtStorageSqlite : public CtStorageEntity
+     static const char TABLE_BOOKMARK_CREATE[];
+     static const char TABLE_BOOKMARK_INSERT[];
+     static const char TABLE_BOOKMARK_DELETE[];
+-    static const Glib::ustring ERR_SQLITE_PREPV2;
+-    static const Glib::ustring ERR_SQLITE_STEP;
++    static const std::string ERR_SQLITE_PREPV2;
++    static const std::string ERR_SQLITE_STEP;
+     static const char* safe_sqlite3_column_text(sqlite3_stmt* stmt, int iCol);
+ 
+ private:
+diff --git a/src/ct/ct_storage_xml.cc b/src/ct/ct_storage_xml.cc
+index 555c72362..3e0fc8cc4 100644
+--- a/src/ct/ct_storage_xml.cc
++++ b/src/ct/ct_storage_xml.cc
+@@ -249,7 +249,7 @@ void CtStorageXml::_nodes_to_xml(CtTreeIter* ct_tree_iter,
+ {
+     Glib::RefPtr<Gsv::Buffer> rTextBuffer = ct_tree_iter->get_node_text_buffer();
+     if (not rTextBuffer) {
+-        throw std::runtime_error(str::format(_("Failed to retrieve the content of the node '%s'"), ct_tree_iter->get_node_name()));
++        throw std::runtime_error(str::format(_("Failed to retrieve the content of the node '%s'"), ct_tree_iter->get_node_name().raw()));
+     }
+     xmlpp::Element* p_node_node =  CtStorageXmlHelper{_pCtMainWin}.node_to_xml(
+         ct_tree_iter,
+diff --git a/src/ct/ct_treestore.cc b/src/ct/ct_treestore.cc
+index 44c0d14bf..bd3d34eac 100644
+--- a/src/ct/ct_treestore.cc
++++ b/src/ct/ct_treestore.cc
+@@ -866,8 +866,8 @@ void CtTreeStore::text_view_apply_textbuffer(CtTreeIter& treeIter, CtTextView* p
+     const gint64 nodeMasterId = treeIter.get_node_shared_master_id();
+     const gint64 nodeId = treeIter.get_node_id();
+     const Glib::ustring nodeName = treeIter.get_node_name();
+-    if (nodeMasterId <= 0) spdlog::debug("Node {} > {}", nodeId, nodeName);
+-    else spdlog::debug("Node {}[{}] > {}", nodeId, nodeMasterId, nodeName);
++    if (nodeMasterId <= 0) spdlog::debug("Node {} > {}", nodeId, nodeName.raw());
++    else spdlog::debug("Node {}[{}] > {}", nodeId, nodeMasterId, nodeName.raw());
+ 
+     Glib::RefPtr<Gsv::Buffer> rTextBuffer = treeIter.get_node_text_buffer();
+     _pCtMainWin->apply_syntax_highlighting(rTextBuffer, treeIter.get_node_syntax_highlighting(), false/*forceReApply*/);
+@@ -1416,7 +1416,7 @@ bool CtTreeStore::populate_summary_info(CtSummaryInfo& summaryInfo)
+             // ensure the node content is populated
+             Glib::RefPtr<Gsv::Buffer> rTextBuffer = ctTreeIter.get_node_text_buffer();
+             if (not rTextBuffer) {
+-                error = str::format(_("Failed to retrieve the content of the node '%s'"), ctTreeIter.get_node_name());
++                error = str::format(_("Failed to retrieve the content of the node '%s'"), ctTreeIter.get_node_name().raw());
+                 return true; /* true for stop */
+             }
+             const gint64 shared_master_id = ctTreeIter.get_node_shared_master_id();
+diff --git a/tests/tests_encoding.cpp b/tests/tests_encoding.cpp
+index ce3ce3101..80683ced8 100644
+--- a/tests/tests_encoding.cpp
++++ b/tests/tests_encoding.cpp
+@@ -1,7 +1,7 @@
+ /*
+  * tests_encoding.cpp
+  *
+- * Copyright 2009-2020
++ * Copyright 2009-2024
+  * Giuseppe Penone <giuspen@gmail.com>
+  * Evgenii Gurianov <https://github.com/txe>
+  *
+@@ -28,5 +28,5 @@ TEST(EncodingGroup, ustring_format)
+ {
+     // on win32 this could throw an exception due to locale
+     Glib::ustring str = "привет こんにちは";
+-    ASSERT_STREQ(str.c_str(), fmt::format("{}", str).c_str());
++    ASSERT_STREQ(str.c_str(), fmt::format("{}", str.raw()).c_str());
+ }
+From 76f0030e2e2b6e1488148d3828baeb8f5911eb8d Mon Sep 17 00:00:00 2001
+From: Giuseppe Penone <giuspen@gmail.com>
+Date: Wed, 21 Aug 2024 22:42:54 +0100
+Subject: [PATCH] fixed fmt issue on fs::path (#2548)
+
+---
+ src/ct/ct_actions_others.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/ct/ct_actions_others.cc b/src/ct/ct_actions_others.cc
+index 91ff638e..6931d411 100644
+--- a/src/ct/ct_actions_others.cc
++++ b/src/ct/ct_actions_others.cc
+@@ -898,7 +898,7 @@ bool CtActions::_on_embfiles_sentinel_timeout()
+     for (auto& item : _embfiles_opened) {
+         const fs::path& tmp_filepath = item.second.tmp_filepath;
+         if (not fs::is_regular_file(tmp_filepath)) {
+-            spdlog::debug("embdrop {}", tmp_filepath);
++            spdlog::debug("embdrop {}", tmp_filepath.string());
+             _embfiles_opened.erase(item.first);
+             break;
+         }
+From 22142f3b44fef81e67c9bfbcdaed2f80ab2ff5de Mon Sep 17 00:00:00 2001
+From: Giuseppe Penone <giuspen@gmail.com>
+Date: Thu, 22 Aug 2024 22:22:46 +0100
+Subject: [PATCH] fixed fmt issue on fs::path (#2548)
+
+---
+ src/ct/ct_config.cc | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/ct/ct_config.cc b/src/ct/ct_config.cc
+index 3ebb5451..44a7ab10 100644
+--- a/src/ct/ct_config.cc
++++ b/src/ct/ct_config.cc
+@@ -69,7 +69,7 @@ void CtConfig::move_from_tmp()
+ {
+     if (not _configFilepathTmp.string().empty() and fs::exists(_configFilepathTmp)) {
+         if (not fs::move_file(_configFilepathTmp, _configFilepath)) {
+-            spdlog::error("{} -> {}", _configFilepathTmp, _configFilepath);
++            spdlog::error("{} -> {}", _configFilepathTmp.string(), _configFilepath.string());
+         }
+     }
+ }
+@@ -92,15 +92,15 @@ bool CtConfig::_load_from_file()
+             _uKeyFile->load_from_file(_configFilepath.string());
+         }
+         catch (Glib::Error& error) {
+-            spdlog::error("CtConfig {}: {}", _configFilepath, error.what().raw());
++            spdlog::error("CtConfig {}: {}", _configFilepath.string(), error.what().raw());
+             return false;
+         }
+         _populate_data_from_keyfile();
+         _uKeyFile.reset(nullptr);
+-        spdlog::debug("{} parsed", _configFilepath);
++        spdlog::debug("{} parsed", _configFilepath.string());
+         return true;
+     }
+-    spdlog::warn("{} missing", _configFilepath);
++    spdlog::warn("{} missing", _configFilepath.string());
+     return false;
+ }
+ 
+From 05233db2b25977037c7520a8316183636a262130 Mon Sep 17 00:00:00 2001
+From: Giuseppe Penone <giuspen@gmail.com>
+Date: Thu, 22 Aug 2024 22:58:03 +0100
+Subject: [PATCH] fixed fmt issue on fs::path (#2548)
+
+---
+ src/ct/ct_app.cc               |  2 +-
+ src/ct/ct_filesystem.cc        | 20 ++++++++++----------
+ src/ct/ct_imports.cc           |  2 +-
+ src/ct/ct_main_win_file.cc     |  8 ++++----
+ src/ct/ct_storage_control.cc   |  8 ++++----
+ src/ct/ct_storage_multifile.cc |  6 +++---
+ 6 files changed, 23 insertions(+), 23 deletions(-)
+
+diff --git a/src/ct/ct_app.cc b/src/ct/ct_app.cc
+index 788e6092..66460cd0 100644
+--- a/src/ct/ct_app.cc
++++ b/src/ct/ct_app.cc
+@@ -152,7 +152,7 @@ void CtApp::on_activate()
+             }
+             else {
+                 const fs::path last_doc_path{_pCtConfig->recentDocsFilepaths.front()};
+-                spdlog::info("{} Last doc not found: {}", __FUNCTION__, last_doc_path);
++                spdlog::info("{} Last doc not found: {}", __FUNCTION__, last_doc_path.string());
+                 _pCtConfig->recentDocsFilepaths.move_or_push_back(last_doc_path);
+                 pAppWindow->menu_set_items_recent_documents();
+             }
+diff --git a/src/ct/ct_filesystem.cc b/src/ct/ct_filesystem.cc
+index 5c5f5ea7..1b94a186 100644
+--- a/src/ct/ct_filesystem.cc
++++ b/src/ct/ct_filesystem.cc
+@@ -163,13 +163,13 @@ bool remove(const fs::path& path2rm)
+ {
+     if (fs::is_directory(path2rm)) {
+         if (g_rmdir(path2rm.c_str()) != 0) {
+-            spdlog::error("fs::remove: g_rmdir failed to remove {}", path2rm);
++            spdlog::error("fs::remove: g_rmdir failed to remove {}", path2rm.string());
+             return false;
+         }
+     }
+     else if (fs::exists(path2rm)) {
+         if (::g_remove(path2rm.c_str()) != 0) {
+-            spdlog::error("fs::remove: g_remove failed to remove {}", path2rm);
++            spdlog::error("fs::remove: g_remove failed to remove {}", path2rm.string());
+             return false;
+         }
+     }
+@@ -249,13 +249,13 @@ time_t getmtime(const path& p)
+ std::uintmax_t file_size(const path& p)
+ {
+     if (fs::is_directory(p)) {
+-        spdlog::error("fs::file_size: path is a directory, {}", p);
++        spdlog::error("fs::file_size: path is a directory, {}", p.string());
+         return 0;
+     }
+ 
+     GStatBuf st;
+     if (g_stat(p.c_str(), &st) != 0) {
+-        spdlog::error("fs::file_size: g_stat failed, {}", p);
++        spdlog::error("fs::file_size: g_stat failed, {}", p.string());
+         return 0;
+     }
+ 
+@@ -317,7 +317,7 @@ void _open_path_with_default_app(const fs::path& file_or_folder_path)
+ // Open Filepath with External App
+ void open_filepath(const fs::path& filepath, bool open_folder_if_file_not_exists, CtConfig* config)
+ {
+-    spdlog::debug("fs::open_filepath {}", filepath);
++    spdlog::debug("fs::open_filepath {}", filepath.string());
+     if (config->filelinkCustomOn) {
+         std::string cmd = fmt::sprintf(config->filelinkCustomAct, filepath.string());
+         _locale_env_vars_set_for_external_cmd(true/*isPre*/);
+@@ -344,7 +344,7 @@ void open_filepath(const fs::path& filepath, bool open_folder_if_file_not_exists
+ // Open Folderpath with External App
+ void open_folderpath(const fs::path& folderpath, CtConfig* config)
+ {
+-    spdlog::debug("fs::open_folderpath {}", folderpath);
++    spdlog::debug("fs::open_folderpath {}", folderpath.string());
+     if (config->folderlinkCustomOn) {
+         std::string cmd = fmt::sprintf(config->folderlinkCustomAct, folderpath.string());
+         _locale_env_vars_set_for_external_cmd(true/*isPre*/);
+@@ -361,12 +361,12 @@ void open_folderpath(const fs::path& folderpath, CtConfig* config)
+ 
+ path prepare_export_folder(const path& dir_place, path new_folder, bool overwrite_existing)
+ {
+-    if (fs::is_directory(dir_place / new_folder))
+-    {
++    const fs::path dir_place_new_folder = dir_place / new_folder;
++    if (fs::is_directory(dir_place_new_folder)) {
+         // todo:
+         if (overwrite_existing) {
+-            spdlog::debug("fs::prepare_export_folder: removing dir {}", dir_place / new_folder);
+-            remove_all(dir_place / new_folder);
++            spdlog::debug("fs::prepare_export_folder: removing dir {}", dir_place_new_folder.string());
++            remove_all(dir_place_new_folder);
+         }
+         else {
+             int n = 2;
+diff --git a/src/ct/ct_imports.cc b/src/ct/ct_imports.cc
+index 20e5d01d..59947ee4 100644
+--- a/src/ct/ct_imports.cc
++++ b/src/ct/ct_imports.cc
+@@ -454,7 +454,7 @@ std::unique_ptr<CtImportedNode> CtPlainTextImport::import_file(const fs::path& f
+         }
+     }
+     catch (std::exception& ex) {
+-        spdlog::error("{}, what: {}, file: {}", __FUNCTION__, ex.what(), file);
++        spdlog::error("{}, what: {}, file: {}", __FUNCTION__, ex.what(), file.string());
+     }
+     return nullptr;
+ }
+diff --git a/src/ct/ct_main_win_file.cc b/src/ct/ct_main_win_file.cc
+index 52540b7f..752f97ee 100644
+--- a/src/ct/ct_main_win_file.cc
++++ b/src/ct/ct_main_win_file.cc
+@@ -194,14 +194,14 @@ bool CtMainWin::file_open(const fs::path& filepath,
+                         spdlog::debug("trying {} -> {}", curr_backup_file.string(), filepath.string());
+                         new_storage = CtStorageControl::load_from(this, filepath, doc_type, error_or_warning, password);
+                         if (new_storage) {
+-                            spdlog::debug("OK recover from {}", curr_backup_file);
++                            spdlog::debug("OK recover from {}", curr_backup_file.string());
+                             break;
+                         }
+                         fs::move_file(filepath, curr_backup_file);
+                         spdlog::debug("moved back {} -> {}", filepath.string(), curr_backup_file.string());
+                     }
+                     else {
+-                        spdlog::debug("?? backed up data, {} missing", curr_backup_file);
++                        spdlog::debug("?? backed up data, {} missing", curr_backup_file.string());
+                         if (++missing_backup > 3) break;
+                     }
+                 }
+@@ -445,7 +445,7 @@ void CtMainWin::mod_time_sentinel_restart()
+ 
+ bool CtMainWin::file_insert_plain_text(const fs::path& filepath)
+ {
+-    spdlog::debug("trying to insert text file as node: {}", filepath);
++    spdlog::debug("trying to insert text file as node: {}", filepath.string());
+     try {
+         Glib::RefPtr<Gsv::Buffer> pBuffer = Gsv::Buffer::create();
+         if (CtStrUtil::file_any_encoding_load_into_source_buffer(filepath.string(), pBuffer)) {
+@@ -459,7 +459,7 @@ bool CtMainWin::file_insert_plain_text(const fs::path& filepath)
+         }
+     }
+     catch (std::exception& ex) {
+-        spdlog::error("{}, what: {}, file: {}", __FUNCTION__, ex.what(), filepath);
++        spdlog::error("{}, what: {}, file: {}", __FUNCTION__, ex.what(), filepath.string());
+     }
+     return false;
+ }
+diff --git a/src/ct/ct_storage_control.cc b/src/ct/ct_storage_control.cc
+index 9a6e813a..34dd0a1b 100644
+--- a/src/ct/ct_storage_control.cc
++++ b/src/ct/ct_storage_control.cc
+@@ -443,7 +443,7 @@ Glib::RefPtr<Gsv::Buffer> CtStorageControl::get_delayed_text_buffer(const gint64
+                 fs::get_doc_type_from_file_ext(filesInTmpDir.front()) == fs::get_doc_type_from_file_ext(temp_file_path) and
+                 fs::move_file(filesInTmpDir.front(), temp_file_path))
+             {
+-                spdlog::debug("encrypt doc renamed {} -> {}", filesInTmpDir.front().filename(), temp_file_path.filename());
++                spdlog::debug("encrypt doc renamed {} -> {}", filesInTmpDir.front().filename().string(), temp_file_path.filename().string());
+                 return temp_file_path;
+             }
+         }
+@@ -476,7 +476,7 @@ Glib::RefPtr<Gsv::Buffer> CtStorageControl::get_delayed_text_buffer(const gint64
+         return false;
+     }
+     if (not fs::is_regular_file(file_to)) {
+-        spdlog::debug("!! is_regular_file {}", file_to);
++        spdlog::debug("!! is_regular_file {}", file_to.string());
+         if (not tmp_prev_archive.empty()) {
+             (void)fs::move_file(tmp_prev_archive, file_to);
+         }
+@@ -628,7 +628,7 @@ void CtStorageControl::_backupEncryptThread()
+                                 break;
+                             }
+ #if defined(DEBUG_BACKUP_ENCRYPT)
+-                            spdlog::debug("{} -> {}", tilda_node_dir_from, tilda_node_dir_to);
++                            spdlog::debug("{} -> {}", tilda_node_dir_from.string(), tilda_node_dir_to.string());
+ #endif // DEBUG_BACKUP_ENCRYPT
+                         }
+                         tilda_dirpath = tilda_dirpath.string().substr(0, tilda_dirpath.string().size()-1);
+@@ -647,7 +647,7 @@ void CtStorageControl::_backupEncryptThread()
+                 }
+ #if defined(DEBUG_BACKUP_ENCRYPT)
+                 else {
+-                    spdlog::debug("{} -> {}", pBackupEncryptData->main_backup, tilda_node_dir_to);
++                    spdlog::debug("{} -> {}", pBackupEncryptData->main_backup, tilda_node_dir_to.string());
+                 }
+ #endif // DEBUG_BACKUP_ENCRYPT
+             }
+diff --git a/src/ct/ct_storage_multifile.cc b/src/ct/ct_storage_multifile.cc
+index ebd729e0..b7b10b4d 100644
+--- a/src/ct/ct_storage_multifile.cc
++++ b/src/ct/ct_storage_multifile.cc
+@@ -284,7 +284,7 @@ void CtStorageMultiFile::_hier_try_move_node(const fs::path& dir_path_to)
+     };
+     f_find_dir_from(_dir_path);
+     if (not dir_path_from.empty()) {
+-        spdlog::debug("{} -> {}", dir_path_from, dir_path_to);
++        spdlog::debug("{} -> {}", dir_path_from.string(), dir_path_to.string());
+         fs::move_file(dir_path_from, dir_path_to);
+     }
+ }
+@@ -520,7 +520,7 @@ bool CtStorageMultiFile::populate_treestore(const fs::path& dir_path, Glib::ustr
+                     const fs::path curr_backup_dir = first_backup_dir + str::repeat(CtConst::CHAR_TILDE, b).raw();
+                     if (fs::is_directory(curr_backup_dir)) {
+                         missing_backup = 0;
+-                        spdlog::debug("backed up data, {} found", curr_backup_dir);
++                        spdlog::debug("backed up data, {} found", curr_backup_dir.string());
+                         const fs::path backup_node_xml_path = curr_backup_dir / nodedir.filename() / NODE_XML;
+                         try {
+                             pParser = CtStorageXml::get_parser(backup_node_xml_path);
+@@ -541,7 +541,7 @@ bool CtStorageMultiFile::populate_treestore(const fs::path& dir_path, Glib::ustr
+                         }
+                     }
+                     else {
+-                        spdlog::debug("?? backed up data, {} missing", curr_backup_dir);
++                        spdlog::debug("?? backed up data, {} missing", curr_backup_dir.string());
+                         if (++missing_backup > 3) break;
+                     }
+                 }
+From fc1d7499067b9db9841175b5a2d6934dc65e4522 Mon Sep 17 00:00:00 2001
+From: Ben Cotton <bcotton@funnelfiasco.com>
+Date: Fri, 23 Aug 2024 06:02:31 -0400
+Subject: [PATCH] Fix formatting issues with fmt 11 (#2548) (#2560)
+
+CherryTree fails to build on Fedora Rawhide due to errors introduced by
+fmt 11. This commit fixes all of the remaining errors raised during
+compile.
+
+Fixes #2548
+
+Signed-off-by: Ben Cotton <bcotton@fedoraproject.org>
+Co-authored-by: Ben Cotton <bcotton@fedoraproject.org>
+---
+ src/ct/ct_export2html.cc       |  4 ++--
+ src/ct/ct_storage_control.cc   | 12 ++++++------
+ src/ct/ct_storage_multifile.cc |  6 +++---
+ src/ct/ct_storage_sqlite.cc    |  6 +++---
+ 4 files changed, 14 insertions(+), 14 deletions(-)
+
+diff --git a/src/ct/ct_export2html.cc b/src/ct/ct_export2html.cc
+index 2e777548..b74aff5a 100644
+--- a/src/ct/ct_export2html.cc
++++ b/src/ct/ct_export2html.cc
+@@ -180,7 +180,7 @@ void CtExport2Html::nodes_all_export_to_multiple_html(bool all_tree, const CtExp
+     tree_links_text += "</div>\n";
+ 
+     // create index html page
+-    Glib::ustring html_text = str::format(HTML_HEADER, _pCtMainWin->get_ct_storage()->get_file_name());
++    Glib::ustring html_text = str::format(HTML_HEADER, _pCtMainWin->get_ct_storage()->get_file_name().string());
+     if (options.index_in_page) {
+         html_text += "<div class='two-panels'>\n<div class='tree-panel'>\n";
+         html_text += tree_links_text;
+@@ -283,7 +283,7 @@ void CtExport2Html::nodes_all_export_to_single_html(bool all_tree, const CtExpor
+         }
+     };
+ 
+-    Glib::ustring html_header = str::format(HTML_HEADER, _pCtMainWin->get_ct_storage()->get_file_name());
++    Glib::ustring html_header = str::format(HTML_HEADER, _pCtMainWin->get_ct_storage()->get_file_name().string());
+     rFileStream->write(html_header.c_str(), html_header.bytes());
+ 
+     // start to iterarte nodes
+diff --git a/src/ct/ct_storage_control.cc b/src/ct/ct_storage_control.cc
+index 34dd0a1b..e2b6f114 100644
+--- a/src/ct/ct_storage_control.cc
++++ b/src/ct/ct_storage_control.cc
+@@ -78,7 +78,7 @@ static const std::string BAD_ARCHIVE{"_BAD_ARC_"};
+                     return nullptr;
+                 }
+                 if (extracted_file_path.string() == BAD_ARCHIVE) {
+-                    throw std::runtime_error(str::format(_("'%s' is Not a Valid Archive"), file_path));
++                    throw std::runtime_error(str::format(_("'%s' is Not a Valid Archive"), file_path.string()));
+                 }
+             }
+         }
+@@ -533,14 +533,14 @@ void CtStorageControl::_backupEncryptThread()
+                 // move back the latest file version
+                 (void)fs::move_file(pBackupEncryptData->main_backup, pBackupEncryptData->file_path);
+ #if defined(DEBUG_BACKUP_ENCRYPT)
+-                spdlog::debug("{} -> {}", pBackupEncryptData->main_backup, pBackupEncryptData->file_path);
++                spdlog::debug("{} -> {}", pBackupEncryptData->main_backup, pBackupEncryptData->file_path.string());
+ #endif // DEBUG_BACKUP_ENCRYPT
+                 _pCtMainWin->errorsDEQueue.push_back(_("Failed to encrypt the file"));
+                 _pCtMainWin->dispatcherErrorMsg.emit();
+                 continue;
+             }
+ #if defined(DEBUG_BACKUP_ENCRYPT)
+-            spdlog::debug("{} => {}", pBackupEncryptData->extracted_copy, pBackupEncryptData->file_path);
++            spdlog::debug("{} => {}", pBackupEncryptData->extracted_copy, pBackupEncryptData->file_path.string());
+ #endif // DEBUG_BACKUP_ENCRYPT
+         }
+ 
+@@ -729,12 +729,12 @@ void CtStorageControl::add_nodes_from_storage(const fs::path& file_path,
+ {
+     if (is_folder) {
+         if (not fs::is_directory(file_path)) {
+-            throw std::runtime_error(fmt::format("{} not a dir", file_path));
++            throw std::runtime_error(fmt::format("{} not a dir", file_path.string()));
+         }
+     }
+     else {
+         if (not fs::is_regular_file(file_path)) {
+-            throw std::runtime_error(fmt::format("{} not a file", file_path));
++            throw std::runtime_error(fmt::format("{} not a file", file_path.string()));
+         }
+     }
+ 
+@@ -747,7 +747,7 @@ void CtStorageControl::add_nodes_from_storage(const fs::path& file_path,
+             return;
+         }
+         if (extracted_file_path.string() == BAD_ARCHIVE) {
+-            throw std::runtime_error(str::format(_("'%s' is Not a Valid Archive"), file_path));
++            throw std::runtime_error(str::format(_("'%s' is Not a Valid Archive"), file_path.string()));
+         }
+     }
+ 
+diff --git a/src/ct/ct_storage_multifile.cc b/src/ct/ct_storage_multifile.cc
+index b7b10b4d..94db12bb 100644
+--- a/src/ct/ct_storage_multifile.cc
++++ b/src/ct/ct_storage_multifile.cc
+@@ -510,7 +510,7 @@ bool CtStorageMultiFile::populate_treestore(const fs::path& dir_path, Glib::ustr
+                 parsingOk = true;
+             }
+             catch (std::exception& ex) {
+-                spdlog::error("parse {} : {} - trying first backup...", node_xml_path, ex.what());
++                spdlog::error("parse {} : {} - trying first backup...", node_xml_path.string(), ex.what());
+             }
+             if (not parsingOk) {
+                 std::string first_backup_dir;
+@@ -527,13 +527,13 @@ bool CtStorageMultiFile::populate_treestore(const fs::path& dir_path, Glib::ustr
+                             parsingOk = true;
+                         }
+                         catch (std::exception& ex) {
+-                            spdlog::error("parse {} : {} - trying backup {}...", node_xml_path, ex.what(), b+2);
++                            spdlog::error("parse {} : {} - trying backup {}...", node_xml_path.string(), ex.what(), b+2);
+                         }
+                         if (parsingOk) {
+                             if (fs::exists(node_xml_path)) {
+                                 fs::move_file(node_xml_path, node_xml_path.parent_path() / (node_xml_path.stem() + std::string{"_BAD.xml"}));
+                             }
+-                            spdlog::debug("parse backed up data ok, copying {} -> {}", backup_node_xml_path, node_xml_path);
++                            spdlog::debug("parse backed up data ok, copying {} -> {}", backup_node_xml_path.string(), node_xml_path.string());
+                             fs::copy_file(backup_node_xml_path, node_xml_path);
+                             if (error.empty()) error += _("A Restore From Backup Was Necessary For:");
+                             error += "\n\n" + node_xml_path.string();
+diff --git a/src/ct/ct_storage_sqlite.cc b/src/ct/ct_storage_sqlite.cc
+index dd2c703b..3b0b9217 100644
+--- a/src/ct/ct_storage_sqlite.cc
++++ b/src/ct/ct_storage_sqlite.cc
+@@ -207,10 +207,10 @@ void CtStorageSqlite::test_connection()
+     }
+     catch(std::exception& e) {
+         spdlog::debug("{} {}", __FUNCTION__, e.what());
+-        throw std::runtime_error(str::format(_("%s write failed - file is missing. Reattach USB drive or shared resource!"), _file_path));
++        throw std::runtime_error(str::format(_("%s write failed - file is missing. Reattach USB drive or shared resource!"), _file_path.string()));
+     }
+     if (not test_readwrite())
+-        throw std::runtime_error(str::format(_("%s write failed - is file blocked by a sync program?"), _file_path));
++        throw std::runtime_error(str::format(_("%s write failed - is file blocked by a sync program?"), _file_path.string()));
+     (void)_check_database_integrity();
+ }
+ 
+@@ -223,7 +223,7 @@ void CtStorageSqlite::try_reopen()
+     }
+     catch(std::exception& e) {
+         spdlog::debug("{} {}", __FUNCTION__, e.what());
+-        throw std::runtime_error(str::format(_("%s reopen failed - file is missing. Reattach USB drive or shared resource!"), _file_path));
++        throw std::runtime_error(str::format(_("%s reopen failed - file is missing. Reattach USB drive or shared resource!"), _file_path.string()));
+     }
+     (void)_check_database_integrity();
+ }
