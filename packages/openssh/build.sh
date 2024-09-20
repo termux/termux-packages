@@ -87,6 +87,11 @@ termux_step_post_make_install() {
 
 	mkdir -p $TERMUX_PREFIX/etc/ssh/
 	cp $TERMUX_PKG_SRCDIR/moduli $TERMUX_PREFIX/etc/ssh/moduli
+
+	mkdir -p $TERMUX_PREFIX/etc/ssh/ssh_config.d
+	touch $TERMUX_PREFIX/etc/ssh/ssh_config.d/.placeholder
+	mkdir -p $TERMUX_PREFIX/etc/ssh/sshd_config.d
+	touch $TERMUX_PREFIX/etc/ssh/sshd_config.d/.placeholder
 }
 
 termux_step_post_massage() {

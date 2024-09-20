@@ -1,7 +1,7 @@
 diff -uNr openssh-portable-V_9_9_P1/sshd_config openssh-portable-V_9_9_P1.mod/sshd_config
 --- openssh-portable-V_9_9_P1/sshd_config	2024-09-20 01:20:48.000000000 +0300
-+++ openssh-portable-V_9_9_P1.mod/sshd_config	2024-09-20 12:35:30.528635584 +0300
-@@ -3,21 +3,21 @@
++++ openssh-portable-V_9_9_P1.mod/sshd_config	2024-09-20 21:17:58.227367401 +0300
+@@ -3,21 +3,23 @@
  # This is the sshd server system-wide configuration file.  See
  # sshd_config(5) for more information.
  
@@ -14,6 +14,8 @@ diff -uNr openssh-portable-V_9_9_P1/sshd_config openssh-portable-V_9_9_P1.mod/ss
  # default value.
  
 -#Port 22
++Include @TERMUX_PREFIX@/etc/ssh/sshd_config.d/*.conf
++
 +#Port 8022
  #AddressFamily any
  #ListenAddress 0.0.0.0
@@ -28,7 +30,7 @@ diff -uNr openssh-portable-V_9_9_P1/sshd_config openssh-portable-V_9_9_P1.mod/ss
  
  # Ciphers and keying
  #RekeyLimit default none
-@@ -70,17 +70,6 @@
+@@ -70,17 +72,6 @@
  #GSSAPIAuthentication no
  #GSSAPICleanupCredentials yes
  
@@ -46,7 +48,7 @@ diff -uNr openssh-portable-V_9_9_P1/sshd_config openssh-portable-V_9_9_P1.mod/ss
  #AllowAgentForwarding yes
  #AllowTcpForwarding yes
  #GatewayPorts no
-@@ -89,24 +78,22 @@
+@@ -89,24 +80,22 @@
  #X11UseLocalhost yes
  #PermitTTY yes
  #PrintMotd yes
