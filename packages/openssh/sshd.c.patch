@@ -1,7 +1,8 @@
-diff -uNr openssh-portable-V_9_8_P1/sshd.c openssh-portable-V_9_8_P1.mod/sshd.c
---- openssh-portable-V_9_8_P1/sshd.c	2024-07-01 12:36:28.000000000 +0800
-+++ openssh-portable-V_9_8_P1.mod/sshd.c	2024-07-01 18:02:23.167637504 +0800
-@@ -1208,7 +1208,8 @@
+diff --git a/sshd.c b/sshd.c
+index df76dc78c..c6041cfae 100644
+--- a/sshd.c
++++ b/sshd.c
+@@ -1215,7 +1215,8 @@ main(int ac, char **av)
  	saved_argc = ac;
  	rexec_argc = ac;
  	saved_argv = xcalloc(ac + 1, sizeof(*saved_argv));
@@ -11,7 +12,7 @@ diff -uNr openssh-portable-V_9_8_P1/sshd.c openssh-portable-V_9_8_P1.mod/sshd.c
  		saved_argv[i] = xstrdup(av[i]);
  	saved_argv[i] = NULL;
  
-@@ -1217,10 +1217,10 @@
+@@ -1224,10 +1225,10 @@ main(int ac, char **av)
  	compat_init_setproctitle(ac, av);
  	av = saved_argv;
  #endif
@@ -24,19 +25,19 @@ diff -uNr openssh-portable-V_9_8_P1/sshd.c openssh-portable-V_9_8_P1.mod/sshd.c
  	/* Ensure that fds 0, 1 and 2 are open or directed to /dev/null */
  	sanitise_stdfd();
  
-@@ -1341,9 +1341,10 @@
+@@ -1348,9 +1349,10 @@ main(int ac, char **av)
  			break;
  		}
  	}
 +#ifndef __ANDROID__
- 	if (!test_flag && !do_dump_cfg && !path_absolute(av[0]))
+ 	if (!test_flag && !inetd_flag && !do_dump_cfg && !path_absolute(av[0]))
  		fatal("sshd requires execution with an absolute path");
 -
 +#endif
  	closefrom(STDERR_FILENO + 1);
  
  	/* Reserve fds we'll need later for reexec things */
-@@ -1602,12 +1602,13 @@
+@@ -1609,12 +1611,13 @@ main(int ac, char **av)
  	/* Ensure privsep directory is correctly configured. */
  	need_chroot = ((getuid() == 0 || geteuid() == 0) ||
  	    options.kerberos_authentication);
@@ -51,7 +52,7 @@ diff -uNr openssh-portable-V_9_8_P1/sshd.c openssh-portable-V_9_8_P1.mod/sshd.c
  	if (need_chroot) {
  		if ((stat(_PATH_PRIVSEP_CHROOT_DIR, &sb) == -1) ||
  		    (S_ISDIR(sb.st_mode) == 0))
-@@ -1638,9 +1640,10 @@
+@@ -1645,9 +1648,10 @@ main(int ac, char **av)
  	 * to create a file, and we can't control the code in every
  	 * module which might be used).
  	 */
@@ -63,7 +64,7 @@ diff -uNr openssh-portable-V_9_8_P1/sshd.c openssh-portable-V_9_8_P1.mod/sshd.c
  	/* Prepare arguments for sshd-session */
  	if (rexec_argc < 0)
  		fatal("rexec_argc %d < 0", rexec_argc);
-@@ -1679,7 +1682,7 @@
+@@ -1686,7 +1690,7 @@ main(int ac, char **av)
  	already_daemon = daemonized();
  	if (!(debug_flag || inetd_flag || no_daemon_flag || already_daemon)) {
  
@@ -72,7 +73,7 @@ diff -uNr openssh-portable-V_9_8_P1/sshd.c openssh-portable-V_9_8_P1.mod/sshd.c
  			fatal("daemon() failed: %.200s", strerror(errno));
  
  		disconnect_controlling_tty();
-@@ -1691,9 +1694,10 @@
+@@ -1698,9 +1702,10 @@ main(int ac, char **av)
  	 * Chdir to the root directory so that the current disk can be
  	 * unmounted if desired.
  	 */
