@@ -1,0 +1,75 @@
+diff -uNr openssh-portable-V_9_9_P1/sshd_config openssh-portable-V_9_9_P1.mod/sshd_config
+--- openssh-portable-V_9_9_P1/sshd_config	2024-09-20 01:20:48.000000000 +0300
++++ openssh-portable-V_9_9_P1.mod/sshd_config	2024-09-20 12:35:30.528635584 +0300
+@@ -3,21 +3,21 @@
+ # This is the sshd server system-wide configuration file.  See
+ # sshd_config(5) for more information.
+ 
+-# This sshd was compiled with PATH=/usr/bin:/bin:/usr/sbin:/sbin
++# This sshd was compiled with PATH=@TERMUX_PREFIX@/bin
+ 
+ # The strategy used for options in the default sshd_config shipped with
+ # OpenSSH is to specify options with their default value where
+ # possible, but leave them commented.  Uncommented options override the
+ # default value.
+ 
+-#Port 22
++#Port 8022
+ #AddressFamily any
+ #ListenAddress 0.0.0.0
+ #ListenAddress ::
+ 
+-#HostKey /etc/ssh/ssh_host_rsa_key
+-#HostKey /etc/ssh/ssh_host_ecdsa_key
+-#HostKey /etc/ssh/ssh_host_ed25519_key
++#HostKey @TERMUX_PREFIX@/etc/ssh/ssh_host_rsa_key
++#HostKey @TERMUX_PREFIX@/etc/ssh/ssh_host_ecdsa_key
++#HostKey @TERMUX_PREFIX@/etc/ssh/ssh_host_ed25519_key
+ 
+ # Ciphers and keying
+ #RekeyLimit default none
+@@ -70,17 +70,6 @@
+ #GSSAPIAuthentication no
+ #GSSAPICleanupCredentials yes
+ 
+-# Set this to 'yes' to enable PAM authentication, account processing,
+-# and session processing. If this is enabled, PAM authentication will
+-# be allowed through the KbdInteractiveAuthentication and
+-# PasswordAuthentication.  Depending on your PAM configuration,
+-# PAM authentication via KbdInteractiveAuthentication may bypass
+-# the setting of "PermitRootLogin prohibit-password".
+-# If you just want the PAM account and session checks to run without
+-# PAM authentication, then enable this but set PasswordAuthentication
+-# and KbdInteractiveAuthentication to 'no'.
+-#UsePAM no
+-
+ #AllowAgentForwarding yes
+ #AllowTcpForwarding yes
+ #GatewayPorts no
+@@ -89,24 +78,22 @@
+ #X11UseLocalhost yes
+ #PermitTTY yes
+ #PrintMotd yes
+-#PrintLastLog yes
+ #TCPKeepAlive yes
+ #PermitUserEnvironment no
+ #Compression delayed
+ #ClientAliveInterval 0
+ #ClientAliveCountMax 3
+ #UseDNS no
+-#PidFile /var/run/sshd.pid
++#PidFile @TERMUX_PREFIX@/var/run/sshd.pid
+ #MaxStartups 10:30:100
+ #PermitTunnel no
+-#ChrootDirectory none
+ #VersionAddendum none
+ 
+ # no default banner path
+ #Banner none
+ 
+ # override default of no subsystems
+-Subsystem	sftp	/usr/libexec/sftp-server
++Subsystem	sftp	@TERMUX_PREFIX@/libexec/sftp-server
+ 
+ # Example of overriding settings on a per-user basis
+ #Match User anoncvs
