@@ -1,11 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://www.openssh.com/
 TERMUX_PKG_DESCRIPTION="Secure shell for logging into a remote machine"
 TERMUX_PKG_LICENSE="BSD"
-TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="9.8p1"
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
+TERMUX_PKG_VERSION="9.9p1"
 TERMUX_PKG_SRCURL=https://github.com/openssh/openssh-portable/archive/refs/tags/V_$(sed 's/\./_/g; s/p/_P/g' <<< $TERMUX_PKG_VERSION).tar.gz
-TERMUX_PKG_SHA256=d8f6802914e4c344dc74599c29915651554bb318102d71cb4063e1f4a0d8286f
+TERMUX_PKG_SHA256=e8858153f188754d0bbf109477690eba226132879b6840cf08b51afb38151040
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="krb5, ldns, libandroid-support, libedit, openssh-sftp-server, openssl, termux-auth, zlib"
 TERMUX_PKG_CONFLICTS="dropbear"
