@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Unofficial Thunderbird email client"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="128.2.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://archive.mozilla.org/pub/thunderbird/releases/${TERMUX_PKG_VERSION}esr/source/thunderbird-${TERMUX_PKG_VERSION}esr.source.tar.xz
 TERMUX_PKG_SHA256=ca67c2b8648527548788848b94c80227be681f6262ca518114f787fb2180f6e1
 TERMUX_PKG_DEPENDS="ffmpeg, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libandroid-spawn, libc++, libcairo, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libotr, libpixman, libsm, libvpx, libwebp, libx11, libxcb, libxcomposite, libxdamage, libxext, libxfixes, libxrandr, libxtst, pango, pulseaudio, zlib"
@@ -89,4 +90,14 @@ termux_step_make_install() {
 	./mach install
 
 	install -Dm644 -t "${TERMUX_PREFIX}/share/applications" "${TERMUX_PKG_BUILDER_DIR}/thunderbird.desktop"
+}
+
+termux_step_post_make_install() {
+	# https://github.com/termux/termux-packages/issues/21511
+	# https://phabricator.services.mozilla.com/D181687
+	# Android 8.x and older not support "-z pack-relative-relocs" / DT_RELR
+	local r=$("${READELF}" -d "${TERMUX_PREFIX}/bin/thunderbird")
+	if [[ -n "$(echo "${r}" | grep "(RELR)")" ]]; then
+		termux_error_exit "DT_RELR is unsupported on Android 8.x and older\n${r}"
+	fi
 }
