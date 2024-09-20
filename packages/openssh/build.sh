@@ -67,7 +67,7 @@ termux_step_pre_configure() {
 termux_step_post_configure() {
 	# We need to remove this file before installing, since otherwise the
 	# install leaves it alone which means no updated timestamps.
-	rm -Rf $TERMUX_PREFIX/etc/moduli
+	rm -f $TERMUX_PREFIX/etc/ssh/moduli
 }
 
 termux_step_post_make_install() {
