@@ -18,7 +18,6 @@ COPY ./build/termux_download.sh /tmp/build/
 RUN apt-get update && \
 	apt-get -yq upgrade && \
 	apt-get install -yq sudo lsb-release software-properties-common && \
-	add-apt-repository -y 'ppa:deadsnakes/ppa' && \
 	userdel ubuntu && \
 	useradd -u 1001 -U -m -s /bin/bash builder && \
 	echo "builder ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/builder && \
