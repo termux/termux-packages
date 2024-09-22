@@ -1,0 +1,92 @@
+diff --git a/Doxyfile b/Doxyfile
+index d97915d8..35561561 100644
+--- a/Doxyfile
++++ b/Doxyfile
+@@ -1263,7 +1263,7 @@ EXTERNAL_GROUPS = YES
+ # The PERL_PATH should be the absolute path and name of the perl script 
+ # interpreter (i.e. the result of `which perl').
+ 
+-PERL_PATH = /usr/bin/perl
++PERL_PATH = @TERMUX_PREFIX@/bin/perl
+ 
+ #---------------------------------------------------------------------------
+ # Configuration options related to the dot tool   
+diff --git a/cmake/FindMono.cmake b/cmake/FindMono.cmake
+index 0588a9c3..1378ab2f 100644
+--- a/cmake/FindMono.cmake
++++ b/cmake/FindMono.cmake
+@@ -110,10 +110,10 @@ else( UNIX )
+   set( chsarp_mono_names "mcs" "mcs.exe" "dmcs" "dmcs.exe" "smcs" "smcs.exe" "gmcs" "gmcs.exe" )
+   set(
+     csharp_mono_paths
+-    "/usr/bin/"
+-    "/usr/local/bin/"
+-    "/usr/lib/mono/2.0"
+-    "/opt/novell/mono/bin"
++    "@TERMUX_PREFIX@/bin/"
++    "@TERMUX_PREFIX@/local/bin/"
++    "@TERMUX_PREFIX@/lib/mono/2.0"
++    "@TERMUX_PREFIX@/opt/novell/mono/bin"
+   )
+   find_program(
+     csharp_mono_compiler # variable is added to the cache, we removed it below
+diff --git a/cmake/FindNode.cmake b/cmake/FindNode.cmake
+index 98b9de4f..88b0006b 100644
+--- a/cmake/FindNode.cmake
++++ b/cmake/FindNode.cmake
+@@ -1,8 +1,8 @@
+ # https://github.com/eclipse/upm/blob/master/cmake/modules/FindNode.cmake
+ 
+-# Macro to add directory to NODEJS_INCLUDE_DIRS if it exists and is not /usr/include
++# Macro to add directory to NODEJS_INCLUDE_DIRS if it exists and is not @TERMUX_PREFIX@/include
+ macro(add_include_dir dir)
+-    if (IS_DIRECTORY ${dir} AND NOT ${dir} STREQUAL "/usr/include")
++    if (IS_DIRECTORY ${dir} AND NOT ${dir} STREQUAL "@TERMUX_PREFIX@/include")
+         set(NODEJS_INCLUDE_DIRS ${NODEJS_INCLUDE_DIRS} ${dir})
+     endif()
+ endmacro()
+@@ -16,7 +16,7 @@ find_program (NODEJS_EXECUTABLE NAMES node nodejs
+ include (FindPackageHandleStandardArgs)
+ 
+ # If compat-libuv package exists, it must be at start of include path
+-find_path (UV_ROOT_DIR "uv.h" PATHS /usr/include/compat-libuv010 NO_DEFAULT_PATH)
++find_path (UV_ROOT_DIR "uv.h" PATHS @TERMUX_PREFIX@/include/compat-libuv010 NO_DEFAULT_PATH)
+ if (UV_ROOT_DIR)
+     # set (NODEJS_INCLUDE_DIRS ${UV_ROOT_DIR})
+     add_include_dir(${UV_ROOT_DIR})
+@@ -26,7 +26,7 @@ endif()
+ find_path (NODE_ROOT_DIR
+     NAMES node.h src/node.h
+     PATH_SUFFIXES node node4 node5 node6 node7 node8 nodejs
+-    PATHS /usr/include /usr/local/include)
++    PATHS @TERMUX_PREFIX@/include @TERMUX_PREFIX@/local/include)
+ 
+ if (NODE_ROOT_DIR)
+     add_include_dir(${NODE_ROOT_DIR})
+diff --git a/src/modules/frei0r/factory.c b/src/modules/frei0r/factory.c
+index 10b68ff2..c30635fd 100644
+--- a/src/modules/frei0r/factory.c
++++ b/src/modules/frei0r/factory.c
+@@ -45,8 +45,7 @@
+ #endif
+ #else
+ #define FREI0R_PLUGIN_PATH \
+-    "/usr/lib/frei0r-1:/usr/lib64/frei0r-1:/opt/local/lib/frei0r-1:/usr/local/lib/frei0r-1:$HOME/" \
+-    ".frei0r-1/lib"
++    "@TERMUX_PREFIX@/lib/frei0r-1:$HOME/.frei0r-1/lib"
+ #endif
+ #endif
+ 
+diff --git a/src/modules/jackrack/plugin_mgr.c b/src/modules/jackrack/plugin_mgr.c
+index dd6fd438..c3d46aea 100644
+--- a/src/modules/jackrack/plugin_mgr.c
++++ b/src/modules/jackrack/plugin_mgr.c
+@@ -391,7 +391,7 @@ static void plugin_mgr_get_path_plugins(plugin_mgr_t *plugin_mgr)
+     }
+ #else
+     if (!ladspa_path)
+-        ladspa_path = g_strdup("/usr/local/lib/ladspa:/usr/lib/ladspa:/usr/lib64/ladspa");
++        ladspa_path = g_strdup ("@TERMUX_PREFIX@/lib/ladspa");
+ #endif
+ 
+     for (dir = strtok(ladspa_path, MLT_DIRLIST_DELIMITER); dir;
