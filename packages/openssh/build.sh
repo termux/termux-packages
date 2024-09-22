@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Secure shell for logging into a remote machine"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
 TERMUX_PKG_VERSION="9.9p1"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/openssh/openssh-portable/archive/refs/tags/V_$(sed 's/\./_/g; s/p/_P/g' <<< $TERMUX_PKG_VERSION).tar.gz
 TERMUX_PKG_SHA256=e8858153f188754d0bbf109477690eba226132879b6840cf08b51afb38151040
 TERMUX_PKG_AUTO_UPDATE=true
@@ -32,6 +32,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-privsep-path=$TERMUX_PREFIX/var/empty
 --with-xauth=$TERMUX_PREFIX/bin/xauth
 --with-kerberos5
+--with-default-path=$TERMUX_PREFIX/bin
 ac_cv_func_endgrent=yes
 ac_cv_func_fmt_scaled=no
 ac_cv_func_getlastlogxbyname=no
@@ -87,14 +88,13 @@ termux_step_post_make_install() {
 
 	mkdir -p $TERMUX_PREFIX/etc/ssh/
 	cp $TERMUX_PKG_SRCDIR/moduli $TERMUX_PREFIX/etc/ssh/moduli
-
-	mkdir -p $TERMUX_PREFIX/etc/ssh/ssh_config.d
-	touch $TERMUX_PREFIX/etc/ssh/ssh_config.d/.placeholder
-	mkdir -p $TERMUX_PREFIX/etc/ssh/sshd_config.d
-	touch $TERMUX_PREFIX/etc/ssh/sshd_config.d/.placeholder
 }
 
 termux_step_post_massage() {
+	# Directories referenced by Include in ssh_config and sshd_config.
+	mkdir -p etc/ssh/ssh_config.d
+	mkdir -p etc/ssh/sshd_config.d
+
 	# Verify that we have man pages packaged (#1538).
 	local manpage
 	for manpage in ssh-keyscan.1 ssh-add.1 scp.1 ssh-agent.1 ssh.1; do
