@@ -1,0 +1,33 @@
+Cherry picked from https://github.com/rust-lang/rust/pull/127513
+
+From 00bfd702dc8c3b760b4f965fd059a5f1db8bb2b1 Mon Sep 17 00:00:00 2001
+From: Krasimir Georgiev <krasimir@google.com>
+Date: Mon, 17 Jun 2024 09:35:38 +0000
+Subject: [PATCH 2/4] Disable MC/DC tests on LLVM 19
+
+Disable the tests and generate an error if MC/DC is used on LLVM 19.
+The support will be ported separately, as it is substantially
+different on LLVM 19, and there are no plans to support both
+versions.
+---
+ compiler/rustc_llvm/llvm-wrapper/RustWrapper.cpp | 2 +-
+ tests/coverage/mcdc/condition-limit.rs           | 1 +
+ tests/coverage/mcdc/if.rs                        | 1 +
+ tests/coverage/mcdc/inlined_expressions.rs       | 1 +
+ tests/coverage/mcdc/nested_if.rs                 | 1 +
+ tests/coverage/mcdc/non_control_flow.rs          | 1 +
+ 6 files changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/compiler/rustc_llvm/llvm-wrapper/RustWrapper.cpp b/compiler/rustc_llvm/llvm-wrapper/RustWrapper.cpp
+index 4cdd8af1008c0..2ff7335a0fc81 100644
+--- a/compiler/rustc_llvm/llvm-wrapper/RustWrapper.cpp
++++ b/compiler/rustc_llvm/llvm-wrapper/RustWrapper.cpp
+@@ -1555,7 +1555,7 @@ LLVMRustGetInstrProfMCDCTVBitmapUpdateIntrinsic(LLVMModuleRef M) {
+ 
+ extern "C" LLVMValueRef
+ LLVMRustGetInstrProfMCDCCondBitmapIntrinsic(LLVMModuleRef M) {
+-#if LLVM_VERSION_GE(18, 0)
++#if LLVM_VERSION_GE(18, 0) && LLVM_VERSION_LT(19, 0)
+   return wrap(llvm::Intrinsic::getDeclaration(
+       unwrap(M), llvm::Intrinsic::instrprof_mcdc_condbitmap_update));
+ #else
