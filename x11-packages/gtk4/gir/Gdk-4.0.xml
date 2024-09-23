@@ -5,6 +5,12 @@
   </class>
   <class name="GdkCairoContext" get-type="gdk_cairo_context_get_type" parents="GdkDrawContext,GObject" abstract="1">
   </class>
+  <class name="GdkCicpParams" get-type="gdk_cicp_params_get_type" parents="GObject">
+    <property name="color-primaries" type="guint" flags="1073742051" default-value="2"/>
+    <property name="transfer-function" type="guint" flags="1073742051" default-value="2"/>
+    <property name="matrix-coefficients" type="guint" flags="1073742051" default-value="2"/>
+    <property name="range" type="GdkCicpRange" flags="1073742051" default-value="GDK_CICP_RANGE_NARROW"/>
+  </class>
   <class name="GdkClipboard" get-type="gdk_clipboard_get_type" parents="GObject">
     <property name="display" type="GdkDisplay" flags="1073742059"/>
     <property name="formats" type="GdkContentFormats" flags="1073742049"/>
@@ -13,6 +19,7 @@
     <signal name="changed" return="void" when="last">
     </signal>
   </class>
+  <boxed name="GdkColorState" get-type="gdk_color_state_get_type"/>
   <class name="GdkContentDeserializer" get-type="gdk_content_deserializer_get_type" parents="GObject">
     <implements name="GAsyncResult"/>
   </class>
@@ -222,6 +229,7 @@
     <implements name="GLoadableIcon"/>
     <property name="width" type="gint" flags="1073742059" default-value="1"/>
     <property name="height" type="gint" flags="1073742059" default-value="1"/>
+    <property name="color-state" type="GdkColorState" flags="1073742059"/>
   </class>
   <class name="GdkDmabufTexture" get-type="gdk_dmabuf_texture_get_type" parents="GdkTexture,GObject">
     <implements name="GdkPaintable"/>
@@ -236,6 +244,7 @@
     <property name="modifier" type="guint64" flags="1073742051" default-value="0"/>
     <property name="premultiplied" type="gboolean" flags="1073742051" default-value="TRUE"/>
     <property name="n-planes" type="guint" flags="1073742051" default-value="1"/>
+    <property name="color-state" type="GdkColorState" flags="1073742051"/>
     <property name="update-region" type="CairoRegion" flags="1073742051"/>
     <property name="update-texture" type="GdkTexture" flags="1073742051"/>
   </class>
@@ -257,7 +266,10 @@
     <property name="formats" type="GdkContentFormats" flags="1073742059"/>
     <property name="surface" type="GdkSurface" flags="1073742059"/>
   </class>
-  <enum name="GdkInputSource" get-type="gdk_input_source_get_type">
+  <enum name="GdkCicpRange" get-type="gdk_cicp_range_get_type">
+    <member name="GDK_CICP_RANGE_NARROW" nick="narrow" value="0"/>
+    <member name="GDK_CICP_RANGE_FULL" nick="full" value="1"/>
+  </enum>  <enum name="GdkInputSource" get-type="gdk_input_source_get_type">
     <member name="GDK_SOURCE_MOUSE" nick="mouse" value="0"/>
     <member name="GDK_SOURCE_PEN" nick="pen" value="1"/>
     <member name="GDK_SOURCE_KEYBOARD" nick="keyboard" value="2"/>
@@ -558,6 +570,7 @@
     <property name="height" type="gint" flags="1073742051" default-value="0"/>
     <property name="id" type="guint" flags="1073742051" default-value="0"/>
     <property name="sync" type="gpointer" flags="1073742051"/>
+    <property name="color-state" type="GdkColorState" flags="1073742051"/>
     <property name="update-region" type="CairoRegion" flags="1073742051"/>
     <property name="update-texture" type="GdkTexture" flags="1073742051"/>
     <property name="width" type="gint" flags="1073742051" default-value="0"/>
@@ -566,6 +579,16 @@
     <implements name="GdkPaintable"/>
     <implements name="GIcon"/>
     <implements name="GLoadableIcon"/>
+  </class>
+  <class name="GdkMemoryTextureBuilder" get-type="gdk_memory_texture_builder_get_type" parents="GObject">
+    <property name="bytes" type="GBytes" flags="1073742051"/>
+    <property name="color-state" type="GdkColorState" flags="1073742051"/>
+    <property name="format" type="GdkMemoryFormat" flags="1073742051" default-value="GDK_MEMORY_R8G8B8A8_PREMULTIPLIED"/>
+    <property name="height" type="gint" flags="1073742051" default-value="0"/>
+    <property name="stride" type="guint64" flags="1073742051" default-value="0"/>
+    <property name="update-region" type="CairoRegion" flags="1073742051"/>
+    <property name="update-texture" type="GdkTexture" flags="1073742051"/>
+    <property name="width" type="gint" flags="1073742051" default-value="0"/>
   </class>
   <interface name="GdkPaintable" get-type="gdk_paintable_get_type">
     <signal name="invalidate-contents" return="void" when="last">
