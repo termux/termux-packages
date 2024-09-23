@@ -1,6 +1,16 @@
 <?xml version="1.0"?>
 <dump>
-  <enum name="AdwResponseAppearance" get-type="adw_response_appearance_get_type">
+  <enum name="AdwAccentColor" get-type="adw_accent_color_get_type">
+    <member name="ADW_ACCENT_COLOR_BLUE" nick="blue" value="0"/>
+    <member name="ADW_ACCENT_COLOR_TEAL" nick="teal" value="1"/>
+    <member name="ADW_ACCENT_COLOR_GREEN" nick="green" value="2"/>
+    <member name="ADW_ACCENT_COLOR_YELLOW" nick="yellow" value="3"/>
+    <member name="ADW_ACCENT_COLOR_ORANGE" nick="orange" value="4"/>
+    <member name="ADW_ACCENT_COLOR_RED" nick="red" value="5"/>
+    <member name="ADW_ACCENT_COLOR_PINK" nick="pink" value="6"/>
+    <member name="ADW_ACCENT_COLOR_PURPLE" nick="purple" value="7"/>
+    <member name="ADW_ACCENT_COLOR_SLATE" nick="slate" value="8"/>
+  </enum>  <enum name="AdwResponseAppearance" get-type="adw_response_appearance_get_type">
     <member name="ADW_RESPONSE_DEFAULT" nick="default" value="0"/>
     <member name="ADW_RESPONSE_SUGGESTED" nick="suggested" value="1"/>
     <member name="ADW_RESPONSE_DESTRUCTIVE" nick="destructive" value="2"/>
@@ -245,6 +255,7 @@
     <property name="body" type="gchararray" flags="1073742051" default-value=""/>
     <property name="body-use-markup" type="gboolean" flags="1073742051" default-value="FALSE"/>
     <property name="extra-child" type="GtkWidget" flags="1073742051"/>
+    <property name="prefer-wide-layout" type="gboolean" flags="1073742051" default-value="FALSE"/>
     <property name="default-response" type="gchararray" flags="1073742051" default-value="NULL"/>
     <property name="close-response" type="gchararray" flags="1073742051" default-value="close"/>
     <signal name="response" return="void" when="last" detailed="1">
@@ -274,6 +285,9 @@
     <property name="system-supports-color-schemes" type="gboolean" flags="225" default-value="FALSE"/>
     <property name="dark" type="gboolean" flags="225" default-value="FALSE"/>
     <property name="high-contrast" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="system-supports-accent-colors" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="accent-color" type="AdwAccentColor" flags="225" default-value="ADW_ACCENT_COLOR_BLUE"/>
+    <property name="accent-color-rgba" type="GdkRGBA" flags="225"/>
   </class>
   <class name="AdwApplication" get-type="adw_application_get_type" parents="GtkApplication,GApplication,GObject">
     <implements name="GActionGroup"/>
@@ -322,6 +336,26 @@
     <implements name="GtkConstraintTarget"/>
     <property name="child" type="GtkWidget" flags="1073742051"/>
   </class>
+  <class name="AdwBottomSheet" get-type="adw_bottom_sheet_get_type" parents="GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="AdwSwipeable"/>
+    <property name="content" type="GtkWidget" flags="1073742051"/>
+    <property name="sheet" type="GtkWidget" flags="1073742051"/>
+    <property name="bottom-bar" type="GtkWidget" flags="1073742051"/>
+    <property name="open" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="align" type="gfloat" flags="1073742051" default-value="0.500000"/>
+    <property name="full-width" type="gboolean" flags="1073742051" default-value="TRUE"/>
+    <property name="show-drag-handle" type="gboolean" flags="1073742051" default-value="TRUE"/>
+    <property name="modal" type="gboolean" flags="1073742051" default-value="TRUE"/>
+    <property name="can-open" type="gboolean" flags="1073742051" default-value="TRUE"/>
+    <property name="can-close" type="gboolean" flags="1073742051" default-value="TRUE"/>
+    <property name="sheet-height" type="gint" flags="225" default-value="0"/>
+    <property name="bottom-bar-height" type="gint" flags="225" default-value="0"/>
+    <signal name="close-attempt" return="void" when="last">
+    </signal>
+  </class>
   <class name="AdwBreakpointBin" get-type="adw_breakpoint_bin_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
     <implements name="GtkAccessible"/>
     <implements name="GtkBuildable"/>
@@ -337,6 +371,16 @@
     <property name="label" type="gchararray" flags="1073742051" default-value=""/>
     <property name="use-underline" type="gboolean" flags="1073742051" default-value="FALSE"/>
     <property name="can-shrink" type="gboolean" flags="1073742051" default-value="FALSE"/>
+  </class>
+  <class name="AdwButtonRow" get-type="adw_button_row_get_type" parents="AdwPreferencesRow,GtkListBoxRow,GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkActionable"/>
+    <property name="start-icon-name" type="gchararray" flags="1073742051" default-value=""/>
+    <property name="end-icon-name" type="gchararray" flags="1073742051" default-value=""/>
+    <signal name="activated" return="void" when="last">
+    </signal>
   </class>
   <boxed name="AdwSpringParams" get-type="adw_spring_params_get_type"/>
   <class name="AdwCarousel" get-type="adw_carousel_get_type" parents="GtkWidget,GInitiallyUnowned,GObject" final="1">
@@ -408,10 +452,12 @@
     <property name="selected-item" type="GObject" flags="225"/>
     <property name="model" type="GListModel" flags="1073742051"/>
     <property name="factory" type="GtkListItemFactory" flags="1073742051"/>
+    <property name="header-factory" type="GtkListItemFactory" flags="1073742051"/>
     <property name="list-factory" type="GtkListItemFactory" flags="1073742051"/>
     <property name="expression" type="GtkExpression" flags="1073742051"/>
     <property name="use-subtitle" type="gboolean" flags="1073742051" default-value="FALSE"/>
     <property name="enable-search" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="search-match-mode" type="GtkStringFilterMatchMode" flags="1073742051" default-value="GTK_STRING_FILTER_MATCH_MODE_PREFIX"/>
   </class>
   <class name="AdwEntryRow" get-type="adw_entry_row_get_type" parents="AdwPreferencesRow,GtkListBoxRow,GtkWidget,GInitiallyUnowned,GObject">
     <implements name="GtkAccessible"/>
@@ -426,6 +472,7 @@
     <property name="enable-emoji-completion" type="gboolean" flags="1073742051" default-value="FALSE"/>
     <property name="activates-default" type="gboolean" flags="1073742051" default-value="FALSE"/>
     <property name="text-length" type="guint" flags="1" default-value="0"/>
+    <property name="max-length" type="gint" flags="1073741827" default-value="0"/>
     <signal name="apply" return="void" when="last">
     </signal>
     <signal name="entry-activated" return="void" when="last">
@@ -488,6 +535,17 @@
     <property name="centering-policy" type="AdwCenteringPolicy" flags="1073742051" default-value="ADW_CENTERING_POLICY_LOOSE"/>
     <property name="show-title" type="gboolean" flags="1073742051" default-value="TRUE"/>
   </class>
+  <class name="AdwLayout" get-type="adw_layout_get_type" parents="GObject" final="1">
+    <implements name="GtkBuildable"/>
+    <property name="content" type="GtkWidget" flags="235"/>
+    <property name="name" type="gchararray" flags="1073742051" default-value="NULL"/>
+  </class>
+  <class name="AdwLayoutSlot" get-type="adw_layout_slot_get_type" parents="GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <property name="id" type="gchararray" flags="235" default-value="NULL"/>
+  </class>
   <class name="AdwLeafletPage" get-type="adw_leaflet_page_get_type" parents="GObject" final="1">
     <property name="child" type="GtkWidget" flags="-2147483413"/>
     <property name="name" type="gchararray" flags="-1073741597" default-value="NULL"/>
@@ -530,6 +588,13 @@
     <signal name="response" return="void" when="last" detailed="1">
       <param type="gchararray"/>
     </signal>
+  </class>
+  <class name="AdwMultiLayoutView" get-type="adw_multi_layout_view_get_type" parents="GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <property name="layout" type="AdwLayout" flags="1073742051"/>
+    <property name="layout-name" type="gchararray" flags="1073742051" default-value="NULL"/>
   </class>
   <class name="AdwNavigationPage" get-type="adw_navigation_page_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
     <implements name="GtkAccessible"/>
@@ -612,6 +677,7 @@
     <property name="title" type="gchararray" flags="1073742051" default-value=""/>
     <property name="description" type="gchararray" flags="1073742051" default-value=""/>
     <property name="header-suffix" type="GtkWidget" flags="1073742051"/>
+    <property name="separate-rows" type="gboolean" flags="1073742051" default-value="FALSE"/>
   </class>
   <class name="AdwPreferencesPage" get-type="adw_preferences_page_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
     <implements name="GtkAccessible"/>
@@ -622,6 +688,7 @@
     <property name="description" type="gchararray" flags="1073742051" default-value=""/>
     <property name="name" type="gchararray" flags="1073742051" default-value="NULL"/>
     <property name="use-underline" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="description-centered" type="gboolean" flags="1073742051" default-value="FALSE"/>
   </class>
   <class name="AdwToast" get-type="adw_toast_get_type" parents="GObject" final="1">
     <property name="title" type="gchararray" flags="1073742051" default-value=""/>
@@ -678,6 +745,16 @@
     </signal>
     <signal name="wrapped" return="void" when="last">
     </signal>
+  </class>
+  <class name="AdwSpinner" get-type="adw_spinner_get_type" parents="GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+  </class>
+  <class name="AdwSpinnerPaintable" get-type="adw_spinner_paintable_get_type" parents="GObject" final="1">
+    <implements name="GdkPaintable"/>
+    <implements name="GtkSymbolicPaintable"/>
+    <property name="widget" type="GtkWidget" flags="1073742051"/>
   </class>
   <class name="AdwSplitButton" get-type="adw_split_button_get_type" parents="GtkWidget,GInitiallyUnowned,GObject" final="1">
     <implements name="GtkAccessible"/>
