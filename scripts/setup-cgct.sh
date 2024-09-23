@@ -18,7 +18,7 @@ fi
 declare -A CGCT=(
 	["cbt"]="2.43-1" # Cross Binutils for Termux
 	["cgt"]="14.1.0-2" # Cross GCCs for Termux
-	["glibc-cgct"]="2.40-1" # Glibc for CGCT
+	["glibc-cgct"]="2.40-2" # Glibc for CGCT
 )
 
 : "${TERMUX_PKG_TMPDIR:="/tmp"}"
