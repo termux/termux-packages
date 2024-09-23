@@ -1,0 +1,22 @@
+diff -u -r ../libuv-v1.48.0/src/unix/procfs-exepath.c ./src/unix/procfs-exepath.c
+--- ../libuv-v1.48.0/src/unix/procfs-exepath.c	2024-02-07 20:20:07.000000000 +0000
++++ ./src/unix/procfs-exepath.c	2024-07-02 10:04:51.745846344 +0000
+@@ -26,6 +26,18 @@
+ #include <unistd.h>
+ 
+ int uv_exepath(char* buffer, size_t* size) {
++#ifdef __ANDROID__
++  char* termux_self_exe = getenv("TERMUX_EXEC__PROC_SELF_EXE");
++  if (termux_self_exe) {
++    size_t n = strlen(termux_self_exe);
++    if (*size > n) {
++      memcpy(buffer, termux_self_exe, n);
++      buffer[n] = '\0';
++      *size = n;
++      return 0;
++    }
++  }
++#endif
+   ssize_t n;
+ 
+   if (buffer == NULL || size == NULL || *size == 0)
