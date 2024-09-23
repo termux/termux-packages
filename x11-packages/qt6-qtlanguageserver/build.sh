@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="An implementation of the Language Server Protocol"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.7.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/${TERMUX_PKG_VERSION%.*}/${TERMUX_PKG_VERSION}/submodules/qtlanguageserver-everywhere-src-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=b659fe655144ffa061e3ae509eadb42ae373230517295a96935434340e101a92
 TERMUX_PKG_DEPENDS="libc++, qt6-qtbase"

@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A cross-platform application and UI framework (Translati
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.7.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/${TERMUX_PKG_VERSION%.*}/${TERMUX_PKG_VERSION}/submodules/qttranslations-everywhere-src-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=9845780b5dc1b7279d57836db51aeaf2e4a1160c42be09750616f39157582ca9
 TERMUX_PKG_BUILD_DEPENDS="qt6-qttools"
