@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Plugins for additional image formats: TIFF, TGA, WBMP"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.7.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/${TERMUX_PKG_VERSION%.*}/${TERMUX_PKG_VERSION}/submodules/qtimageformats-everywhere-src-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=e1a1d8785fae67d16ad0a443b01d5f32663a6b68d275f1806ebab257485ce5d6
 TERMUX_PKG_DEPENDS="libc++, libjasper, libtiff, libwebp, qt6-qtbase"
