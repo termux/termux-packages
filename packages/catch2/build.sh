@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE="https://github.com/catchorg/catch2"
+TERMUX_PKG_DESCRIPTION="Modern, C++-native, header-only, test framework for unit-tests, TDD and BDD"
+TERMUX_PKG_LICENSE="BSL-1.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=3.7.1
+TERMUX_PKG_SRCURL=git+https://github.com/catchorg/Catch2
+TERMUX_PKG_GIT_BRANCH="v$TERMUX_PKG_VERSION"
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
+TERMUX_PKG_AUTO_UPDATE=true
