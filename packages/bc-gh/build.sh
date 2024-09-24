@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://git.gavinhoward.com/gavin/bc
 TERMUX_PKG_DESCRIPTION="Unix dc and POSIX bc with GNU and BSD extensions"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="Gavin D. Howard <gavin@gavinhoward.com>"
-TERMUX_PKG_VERSION="7.0.2"
+TERMUX_PKG_VERSION="7.0.3"
 TERMUX_PKG_SRCURL=https://github.com/gavinhoward/bc/releases/download/${TERMUX_PKG_VERSION}/bc-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=3fc050df25577ae5dee00d74109b039f48f3d3f54bbd8ddefc455a734fb2a7de
+TERMUX_PKG_SHA256=6e59d1154d167f8073a56de58a5476cc6213a7672abdf4197b5cc9599d56cd43
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="readline"
 
