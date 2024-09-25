@@ -3,17 +3,18 @@ TERMUX_PKG_DESCRIPTION="A lightweight, high-performance, and extensible WebAssem
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE, LICENSE.spdx"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.14.0"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="0.14.1"
 # Use source tarball from release assets to get VERSION file for proper version number
 TERMUX_PKG_SRCURL=https://github.com/WasmEdge/WasmEdge/releases/download/${TERMUX_PKG_VERSION}/WasmEdge-${TERMUX_PKG_VERSION}-src.tar.gz
-TERMUX_PKG_SHA256=3fc518c172329d128ab41671b86e3de0544bcaacdec9c9b47bfc4ce8b421dfd5
+TERMUX_PKG_SHA256=e5a944975fb949ecda73d6fe80a86507deb2d0a221b2274338807b63758350b4
 TERMUX_PKG_DEPENDS="libc++, libspdlog"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DWASMEDGE_FORCE_DISABLE_LTO=ON
 -DWASMEDGE_USE_LLVM=OFF
 "
+# Until fmt 11.0.3 is released with https://github.com/fmtlib/fmt/issues/4140:
+TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
 
 termux_step_pre_configure() {
 	case "${TERMUX_ARCH}" in
