@@ -1,0 +1,19 @@
+diff -uNr openssh-portable-V_9_9_P1/readconf.c openssh-portable-V_9_9_P1.mod/readconf.c
+--- openssh-portable-V_9_9_P1/readconf.c	2024-09-20 01:20:48.000000000 +0300
++++ openssh-portable-V_9_9_P1.mod/readconf.c	2024-09-26 11:38:08.562842583 +0300
+@@ -2490,6 +2490,7 @@
+ 	if ((f = fopen(filename, "r")) == NULL)
+ 		return 0;
+ 
++#ifndef __ANDROID__
+ 	if (flags & SSHCONF_CHECKPERM) {
+ 		struct stat sb;
+ 
+@@ -2499,6 +2500,7 @@
+ 		    (sb.st_mode & 022) != 0))
+ 			fatal("Bad owner or permissions on %s", filename);
+ 	}
++#endif
+ 
+ 	debug("Reading configuration data %.200s", filename);
+ 
