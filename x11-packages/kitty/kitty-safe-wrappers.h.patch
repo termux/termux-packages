@@ -1,13 +1,15 @@
---- a/kitty/safe-wrappers.h
-+++ b/kitty/safe-wrappers.h
-@@ -8,6 +8,10 @@
- #include "data-types.h"
- #include <fcntl.h>
- #include <sys/mman.h>
+diff -u -r ../kitty-0.36.4/kitty/safe-wrappers.h ./kitty/safe-wrappers.h
+--- ../kitty-0.36.4/kitty/safe-wrappers.h	2024-09-27 04:50:49.000000000 +0000
++++ ./kitty/safe-wrappers.h	2024-09-27 21:59:57.340501152 +0000
+@@ -12,6 +12,11 @@
+ #include <stdlib.h>
+ #include <unistd.h>
+ 
 +#ifdef __ANDROID__
 +int shm_open(const char *, int, mode_t);
 +int shm_unlink(const char *);
 +#endif
- 
- 
++
  static inline int
+ safe_lockf(int fd, int function, off_t size) {
+     while (true) {
