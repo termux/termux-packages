@@ -1,0 +1,11 @@
+--- a/flang/runtime/time-intrinsic.cpp
++++ b/flang/runtime/time-intrinsic.cpp
+@@ -139,7 +139,7 @@
+   }
+ }
+ 
+-#ifndef _AIX
++#if !defined(_AIX) && !(defined(__ANDROID__) && __ANDROID__ < 29)
+ // This is the fallback implementation, which should work everywhere.
+ template <typename Unused = void>
+ count_t GetSystemClockCount(int kind, fallback_implementation) {
