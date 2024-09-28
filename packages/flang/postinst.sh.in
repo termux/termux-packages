@@ -13,8 +13,8 @@ generate_module_files() {
     "ieee_exceptions"
     "ieee_features"
     "iso_c_binding"
+    "iso_fortran_env_impl"
     "iso_fortran_env"
-    "omp_lib"
     )
 
     local file
@@ -25,11 +25,12 @@ generate_module_files() {
         cp "$file".mod "$file".f18.mod
     done
 
-    file="__ppc_intrinsics"
-    echo "Generating ${file}.mod..."
-    cd "$TERMUX_PREFIX"/include/flang
-    flang-new -cpp -fsyntax-only --target=ppc64le -module-dir "$TERMUX_PREFIX"/include/flang "$TERMUX_PREFIX"/opt/flang/module/"$file".f90
-    cp "$file".mod "$file".f18.mod
+    for file in "__ppc_intrinsics" "mma"; do
+        echo "Generating ${file}.mod..."
+        cd "$TERMUX_PREFIX"/include/flang
+        flang-new -cpp -fsyntax-only --target=ppc64le -module-dir "$TERMUX_PREFIX"/include/flang "$TERMUX_PREFIX"/opt/flang/module/"$file".f90
+        cp "$file".mod "$file".f18.mod
+    done
 }
 
 generate_module_files

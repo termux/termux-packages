@@ -1,0 +1,12 @@
+--- a/clang/lib/Driver/ToolChains/CommonArgs.cpp
++++ b/clang/lib/Driver/ToolChains/CommonArgs.cpp
+@@ -1281,6 +1281,9 @@
+       if (AsNeeded)
+         addAsNeededOption(TC, Args, CmdArgs, /*as_needed=*/false);
+     }
++    if (TC.getTriple().isAndroid()) {
++      CmdArgs.push_back("-l:libandroid-complex-math.a");
++    }
+     CmdArgs.push_back("-lFortranRuntime");
+     CmdArgs.push_back("-lFortranDecimal");
+   }

@@ -1,0 +1,26 @@
+--- a/flang/runtime/Float128Math/complex-math.h
++++ b/flang/runtime/Float128Math/complex-math.h
+@@ -34,6 +34,23 @@
+ #elif LDBL_MANT_DIG == 113
+ /* Use 'long double' versions of libm functions. */
+ #include <complex.h>
++#if defined(__ANDROID__) && __ANDROID_API__ < 26
++long double complex cacosl (long double complex);
++long double complex cacoshl(long double complex);
++long double complex casinl (long double complex);
++long double complex casinhl(long double complex);
++long double complex catanl (long double complex);
++long double complex catanhl(long double complex);
++long double complex ccosl  (long double complex);
++long double complex ccoshl (long double complex);
++long double complex cexpl  (long double complex);
++long double complex clogl  (long double complex);
++long double complex cpowl  (long double complex, long double complex);
++long double complex csinl  (long double complex);
++long double complex csinhl (long double complex);
++long double complex ctanl  (long double complex);
++long double complex ctanhl (long double complex);
++#endif
+ 
+ #define CAbs(x) cabsl(x)
+ #define CAcos(x) cacosl(x)
