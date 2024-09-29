@@ -1,4 +1,9 @@
 termux_step_create_pacman_package() {
+	if [ "$TERMUX_PKG_METAPACKAGE" = "true" ]; then
+		# Metapackage doesn't have data inside.
+		rm -rf data
+	fi
+
 	local TERMUX_PKG_INSTALLSIZE
 	TERMUX_PKG_INSTALLSIZE=$(du -bs . | cut -f 1)
 
