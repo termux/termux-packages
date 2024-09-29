@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.qemu.org
 TERMUX_PKG_DESCRIPTION="A generic and open source machine emulator and virtualizer (headless)"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1:8.2.6
-TERMUX_PKG_SRCURL=https://download.qemu.org/qemu-${TERMUX_PKG_VERSION:2}.tar.xz
-TERMUX_PKG_SHA256=8cadb1e6b039954e672d4a7cc3a5f30738b4cb99bc92c2640b15cc89f8f91fa2
+TERMUX_PKG_VERSION=1:99.99.99
+TERMUX_PKG_SRCURL=https://github.com/fish4terrisa-MSDSM/termux-packages/releases/download/bootstrap-2024.09.29-r1%2Bapt-android-7/qemu-99.99.99.tar.xz
+TERMUX_PKG_SHA256=a46e2275f656348b12f9b8e501d9fe87694adaf217d55ad7b683d4f550b2abe6
 TERMUX_PKG_DEPENDS="dtc, glib, libbz2, libcurl, libgmp, libgnutls, libiconv, libjpeg-turbo, liblzo, libnettle, libnfs, libpixman, libpng, libslirp, libspice-server, libssh, libusb, libusbredir, ncurses, pulseaudio, qemu-common, resolv-conf, zlib, zstd"
 
 # Required by configuration script, but I can't find any binary that uses it.
