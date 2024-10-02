@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Align the version with `libarrow-cpp` package.
 TERMUX_PKG_VERSION="17.0.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/apache/arrow/archive/refs/tags/apache-arrow-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=8379554d89f19f2c8db63620721cabade62541f47a4e706dfb0a401f05a713ef
 TERMUX_PKG_AUTO_UPDATE=true
@@ -19,7 +19,7 @@ termux_step_pre_configure() {
 
 	export PYARROW_CMAKE_OPTIONS="
 		-DCMAKE_PREFIX_PATH=$TERMUX_PREFIX/lib/cmake
-		-DNUMPY_INCLUDE_DIRS=$TERMUX_PYTHON_HOME/site-packages/numpy/core/include
+		-DNUMPY_INCLUDE_DIRS=$TERMUX_PYTHON_HOME/site-packages/numpy/_core/include
 		"
 	export PYARROW_WITH_DATASET=1
 	export PYARROW_WITH_HDFS=1
