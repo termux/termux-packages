@@ -14,6 +14,7 @@ TERMUX_PKG_VERSION=(6.5.20240831
                     15
                     0.36.2
                     0.13.2)
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(https://github.com/ThomasDickey/ncurses-snapshots/archive/${_SNAPSHOT_COMMIT}.tar.gz
                    https://fossies.org/linux/misc/rxvt-unicode-${TERMUX_PKG_VERSION[1]}.tar.bz2
                    https://github.com/thestinger/termite/archive/v${TERMUX_PKG_VERSION[2]}.tar.gz
@@ -34,6 +35,7 @@ TERMUX_PKG_REPLACES="ncurses-dev, ncurses-utils (<< 6.1.20190511-4)"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_header_locale_h=no
 am_cv_langinfo_codeset=no
+--disable-opaque-panel
 --disable-stripping
 --enable-const
 --enable-ext-colors
