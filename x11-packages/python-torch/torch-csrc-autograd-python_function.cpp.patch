@@ -1,0 +1,17 @@
+Fix 32-bit builds, which otherwise fail with:
+
+	python_function.cpp:798:15: error: format specifies type 'long' but the argument has type 'int' [-Werror,-Wformat]
+  	796 |               "save_for_backward can only save variables, but argument %ld is of "
+
+diff -u -r ../cache/tmp-checkout/torch/csrc/autograd/python_function.cpp ./torch/csrc/autograd/python_function.cpp
+--- ../cache/tmp-checkout/torch/csrc/autograd/python_function.cpp	2024-10-03 18:00:30.204986580 +0000
++++ ./torch/csrc/autograd/python_function.cpp	2024-10-04 15:06:58.912498321 +0000
+@@ -795,7 +795,7 @@
+           throw torch::TypeError(
+               "save_for_backward can only save variables, but argument %ld is of "
+               "type %s",
+-              i,
++              (long) i,
+               Py_TYPE(obj)->tp_name);
+         }
+       }

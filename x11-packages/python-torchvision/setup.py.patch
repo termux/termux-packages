@@ -1,5 +1,6 @@
---- ./setup.py.orig
-+++ ./setup.py
+diff -u -r ../cache/tmp-checkout/setup.py ./setup.py
+--- ../cache/tmp-checkout/setup.py	2024-10-03 18:27:11.540911181 +0000
++++ ./setup.py	2024-10-04 12:09:20.737925352 +0000
 @@ -6,10 +6,9 @@
  import subprocess
  import sys
@@ -12,7 +13,7 @@
  
  
  def read(*names, **kwargs):
-@@ -159,11 +158,6 @@
+@@ -163,11 +162,6 @@
  
      is_rocm_pytorch = False
  
@@ -24,7 +25,8 @@
      if is_rocm_pytorch:
          from torch.utils.hipify import hipify_python
  
-@@ -189,7 +183,7 @@
+@@ -190,8 +184,8 @@
+ 
      define_macros = []
  
 -    extra_compile_args = {"cxx": []}
@@ -34,8 +36,27 @@
          extension = CUDAExtension
          sources += source_cuda
          if not is_rocm_pytorch:
-@@ -245,7 +245,7 @@
-         image_macros += [("USE_PYTHON", None)]
+@@ -204,8 +198,6 @@
+             define_macros += [("WITH_HIP", None)]
+             nvcc_flags = []
+         extra_compile_args["nvcc"] = nvcc_flags
+-    elif torch.backends.mps.is_available() or force_mps:
+-        sources += source_mps
+ 
+     if sys.platform == "win32":
+         define_macros += [("torchvision_EXPORTS", None)]
+@@ -221,9 +213,6 @@
+             extra_compile_args["nvcc"] = [f for f in nvcc_flags if not ("-O" in f or "-g" in f)]
+             extra_compile_args["nvcc"].append("-O0")
+             extra_compile_args["nvcc"].append("-g")
+-    else:
+-        print("Compiling with debug mode OFF")
+-        extra_compile_args["cxx"].append("-g0")
+ 
+     sources = [os.path.join(extensions_dir, s) for s in sources]
+ 
+@@ -254,7 +243,7 @@
+     image_link_flags = []
  
      # Locating libPNG
 -    libpng = shutil.which("libpng-config")
@@ -43,7 +64,7 @@
      pngfix = shutil.which("pngfix")
      png_found = libpng is not None or pngfix is not None
  
-@@ -308,11 +302,7 @@
+@@ -313,11 +302,7 @@
  
      # Locating nvjpeg
      # Should be included in CUDA_HOME for CUDA >= 10.1, which is the minimum version we have in the CI
@@ -56,8 +77,8 @@
  
      use_nvjpeg = use_nvjpeg and nvjpeg_found
      if use_nvjpeg:
-@@ -343,7 +333,7 @@
-         )
+@@ -354,7 +339,7 @@
+     )
  
      # Locating ffmpeg
 -    ffmpeg_exe = shutil.which("ffmpeg")
@@ -65,7 +86,7 @@
      has_ffmpeg = ffmpeg_exe is not None
      ffmpeg_version = None
      # FIXME: Building torchvision with ffmpeg on MacOS or with Python 3.9
-@@ -352,7 +342,7 @@
+@@ -363,7 +348,7 @@
      # FIXME: https://github.com/pytorch/vision/issues/3367
      if sys.platform != "linux" or (sys.version_info.major == 3 and sys.version_info.minor == 9):
          has_ffmpeg = False
@@ -74,7 +95,7 @@
          try:
              # This is to check if ffmpeg is installed properly.
              ffmpeg_version = subprocess.check_output(["ffmpeg", "-version"])
-@@ -444,13 +434,7 @@
+@@ -455,13 +440,7 @@
      # CUDA_HOME should be set to the cuda root directory.
      # TORCHVISION_INCLUDE and TORCHVISION_LIBRARY should include the location to
      # video codec header files and libraries respectively.
@@ -89,7 +110,7 @@
  
      use_video_codec = use_video_codec and video_codec_found
      if (
-@@ -547,7 +531,6 @@
+@@ -560,7 +539,6 @@
          ext_modules=get_extensions(),
          python_requires=">=3.8",
          cmdclass={

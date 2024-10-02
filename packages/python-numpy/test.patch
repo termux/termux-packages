@@ -1,6 +1,7 @@
---- a/numpy/core/tests/test_mem_policy.py
-+++ b/numpy/core/tests/test_mem_policy.py
-@@ -18,6 +18,8 @@
+diff -u -r ../cache/tmp-checkout/numpy/_core/tests/test_mem_policy.py ./numpy/_core/tests/test_mem_policy.py
+--- ../cache/tmp-checkout/numpy/_core/tests/test_mem_policy.py	2024-09-25 20:21:18.703117205 +0000
++++ ./numpy/_core/tests/test_mem_policy.py	2024-09-25 20:24:40.984240601 +0000
+@@ -21,6 +21,8 @@
      """
      if sys.platform.startswith('cygwin'):
          pytest.skip('link fails on cygwin')
@@ -8,4 +9,4 @@
 +        pytest.skip('link fails on Android')
      if IS_WASM:
          pytest.skip("Can't build module inside Wasm")
-     functions = [
+     if IS_EDITABLE:

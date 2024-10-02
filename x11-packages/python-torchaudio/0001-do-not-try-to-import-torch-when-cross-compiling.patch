@@ -44,8 +44,9 @@
  
  
  def _fetch_third_party_libraries():
---- a/tools/setup_helpers/extension.py.orig
-+++ b/tools/setup_helpers/extension.py
+diff -u -r ../cache/tmp-checkout/tools/setup_helpers/extension.py ./tools/setup_helpers/extension.py
+--- ../cache/tmp-checkout/tools/setup_helpers/extension.py	2024-10-03 18:27:06.446948017 +0000
++++ ./tools/setup_helpers/extension.py	2024-10-04 12:28:00.563912841 +0000
 @@ -4,10 +4,9 @@
  import subprocess
  from pathlib import Path
@@ -58,26 +59,31 @@
  
  __all__ = [
      "get_ext_modules",
-@@ -39,9 +37,10 @@
+@@ -38,11 +37,13 @@
+ _BUILD_RIR = _get_build("BUILD_RIR", True)
  _BUILD_RNNT = _get_build("BUILD_RNNT", True)
- _BUILD_CTC_DECODER = _get_build("BUILD_CTC_DECODER", True)
- _USE_FFMPEG = _get_build("USE_FFMPEG", False)
+ _USE_FFMPEG = _get_build("USE_FFMPEG", True)
 -_USE_ROCM = _get_build("USE_ROCM", torch.backends.cuda.is_built() and torch.version.hip is not None)
 -_USE_CUDA = _get_build("USE_CUDA", torch.backends.cuda.is_built() and torch.version.hip is None)
--_USE_OPENMP = _get_build("USE_OPENMP", True) and "ATen parallel backend: OpenMP" in torch.__config__.parallel_info()
 +_USE_ROCM = _get_build("USE_ROCM", False)
 +_USE_CUDA = _get_build("USE_CUDA", False)
+ _BUILD_ALIGN = _get_build("BUILD_ALIGN", True)
+ _BUILD_CUDA_CTC_DECODER = _get_build("BUILD_CUDA_CTC_DECODER", _USE_CUDA)
+-_USE_OPENMP = _get_build("USE_OPENMP", True) and "ATen parallel backend: OpenMP" in torch.__config__.parallel_info()
 +_USE_OPENMP = _get_build("USE_OPENMP", False)
 +_CMAKE_PREFIX_PATH = os.environ.get("TORCHAUDIO_CMAKE_PREFIX_PATH", "@TERMUX_PREFIX@")
++_CMAKE_MAKE_PROGRAM = subprocess.check_output(['which', 'ninja'], text=True).strip()
  _TORCH_CUDA_ARCH_LIST = os.environ.get("TORCH_CUDA_ARCH_LIST", None)
  
  
-@@ -111,7 +109,7 @@
+@@ -124,8 +125,9 @@
  
          cmake_args = [
              f"-DCMAKE_BUILD_TYPE={cfg}",
 -            f"-DCMAKE_PREFIX_PATH={torch.utils.cmake_prefix_path}",
 +            f"-DCMAKE_PREFIX_PATH={_CMAKE_PREFIX_PATH}",
              f"-DCMAKE_INSTALL_PREFIX={extdir}",
++            f"-DCMAKE_MAKE_PROGRAM={_CMAKE_MAKE_PROGRAM}",
              "-DCMAKE_VERBOSE_MAKEFILE=ON",
              f"-DPython_INCLUDE_DIR={distutils.sysconfig.get_python_inc()}",
+             f"-DBUILD_CPP_TEST={'ON' if _BUILD_CPP_TEST else 'OFF'}",

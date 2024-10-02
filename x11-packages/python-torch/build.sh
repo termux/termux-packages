@@ -2,8 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://pytorch.org/
 TERMUX_PKG_DESCRIPTION="Tensors and Dynamic neural networks in Python"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.1.2"
-TERMUX_PKG_REVISION=6
+TERMUX_PKG_VERSION="2.4.1"
 TERMUX_PKG_SRCURL=git+https://github.com/pytorch/pytorch
 TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
 TERMUX_PKG_DEPENDS="abseil-cpp, ffmpeg, fmt, libc++, libopenblas, libprotobuf, libzmq, opencv, python, python-numpy, python-pip"
@@ -20,10 +19,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCMAKE_BUILD_TYPE=Release
 -DCMAKE_INSTALL_PREFIX=${TERMUX_PKG_SRCDIR}/torch
 -DCMAKE_PREFIX_PATH=${TERMUX_PYTHON_HOME}/site-packages
--DNUMPY_INCLUDE_DIR=${TERMUX_PYTHON_HOME}/site-packages/numpy/core/include
+-DNumPy_INCLUDE_DIR=${TERMUX_PYTHON_HOME}/site-packages/numpy/_core/include
 -DOpenBLAS_INCLUDE_DIR=${TERMUX_PREFIX}/include/openblas
--DPYTHON_INCLUDE_DIR=${TERMUX_PREFIX}/include/python${TERMUX_PYTHON_VERSION}
--DPYTHON_LIBRARY=${TERMUX_PREFIX}/lib/libpython${TERMUX_PYTHON_VERSION}.so
 -DNATIVE_BUILD_DIR=${TERMUX_PKG_HOSTBUILD_DIR}
 -DTORCH_BUILD_VERSION=${TERMUX_PKG_VERSION}
 -DONNX_USE_PROTOBUF_SHARED_LIBS=ON
@@ -70,7 +67,7 @@ termux_step_pre_configure() {
 	termux_setup_protobuf
 
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
-	-DPYTHON_EXECUTABLE=$(command -v python3)
+	-DPython_EXECUTABLE=$(command -v python3)
 	-DPROTOBUF_PROTOC_EXECUTABLE=$(command -v protoc)
 	-DCAFFE2_CUSTOM_PROTOC_EXECUTABLE=$(command -v protoc)
 	"
