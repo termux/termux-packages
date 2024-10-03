@@ -7,7 +7,7 @@ termux_step_override_config_scripts() {
 	# scripts can assume that it works on both builder and host later on:
 	ln -sf /bin/sh "$TERMUX_PREFIX/bin/sh"
 
-	if [ "$TERMUX_INSTALL_DEPS" = false ]; then
+	if [ "$TERMUX_INSTALL_DEPS" = false ] || [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
 		return
 	fi
 
