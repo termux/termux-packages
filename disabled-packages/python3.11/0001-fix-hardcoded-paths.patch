@@ -1,0 +1,78 @@
+--- a/Lib/aifc.py
++++ b/Lib/aifc.py
+@@ -920,7 +920,7 @@
+ if __name__ == '__main__':
+     import sys
+     if not sys.argv[1:]:
+-        sys.argv.append('/usr/demos/data/audio/bach.aiff')
++        sys.argv.append('@TERMUX_PREFIX@/demos/data/audio/bach.aiff')
+     fn = sys.argv[1]
+     with open(fn, 'r') as f:
+         print("Reading", fn)
+--- a/Lib/mailcap.py
++++ b/Lib/mailcap.py
+@@ -55,7 +55,8 @@
+             # Don't bother with getpwuid()
+             home = '.' # Last resort
+         mailcaps = [home + '/.mailcap', '/etc/mailcap',
+-                '/usr/etc/mailcap', '/usr/local/etc/mailcap']
++                '/usr/etc/mailcap', '/usr/local/etc/mailcap',
++                '@TERMUX_PREFIX@/etc/mailcap']
+     return mailcaps
+ 
+ 
+--- a/Lib/mimetypes.py
++++ b/Lib/mimetypes.py
+@@ -49,6 +49,7 @@
+     "/usr/local/lib/netscape/mime.types",
+     "/usr/local/etc/httpd/conf/mime.types",     # Apache 1.2
+     "/usr/local/etc/mime.types",                # Apache 1.3
++    "@TERMUX_PREFIX@/etc/mime.types",           # Termux
+     ]
+ 
+ inited = False
+--- a/Lib/posixpath.py
++++ b/Lib/posixpath.py
+@@ -32,7 +32,7 @@
+ extsep = '.'
+ sep = '/'
+ pathsep = ':'
+-defpath = '/bin:/usr/bin'
++defpath = '@TERMUX_PREFIX@/bin'
+ altsep = None
+ devnull = '/dev/null'
+ 
+--- a/Lib/uuid.py
++++ b/Lib/uuid.py
+@@ -361,7 +361,6 @@
+
+     try:
+         path_dirs = os.environ.get('PATH', os.defpath).split(os.pathsep)
+-        path_dirs.extend(['/sbin', '/usr/sbin'])
+         executable = shutil.which(command, path=os.pathsep.join(path_dirs))
+         if executable is None:
+             return None
+--- a/Lib/subprocess.py
++++ b/Lib/subprocess.py
+@@ -1389,9 +1389,7 @@
+                 args = list(args)
+ 
+             if shell:
+-                # On Android the default shell is at '/system/bin/sh'.
+-                unix_shell = ('/system/bin/sh' if
+-                          hasattr(sys, 'getandroidapilevel') else '/bin/sh')
++                unix_shell = ('@TERMUX_PREFIX@/bin/sh')
+                 args = [unix_shell, "-c"] + args
+                 if executable:
+                     args[0] = executable
+--- a/Lib/tempfile.py
++++ b/Lib/tempfile.py
+@@ -124,7 +124,7 @@
+     if _os.name == 'nt':
+         dirlist.extend([ r'c:\temp', r'c:\tmp', r'\temp', r'\tmp' ])
+     else:
+-        dirlist.extend([ '/tmp', '/var/tmp', '/usr/tmp' ])
++        dirlist.extend([ '@TERMUX_PREFIX@/tmp' ])
+ 
+     # As a last resort, the current directory.
+     try:
