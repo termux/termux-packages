@@ -3,13 +3,11 @@ TERMUX_PKG_DESCRIPTION="Deduplicating and compressing backup program"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
 TERMUX_PKG_VERSION="1.4.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/borgbackup/borg/releases/download/${TERMUX_PKG_VERSION}/borgbackup-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=c54c45155643fa66fed7f9ff2d134ea0a58d0ac197c18781ddc2fb236bf6ed29
 TERMUX_PKG_DEPENDS="libacl, liblz4, openssl, python, xxhash, zstd"
-# FIXME: Force use setuptools 65. This should be no more needed after PR 18078
-# FIXME: is merged or builder image bumps to Ubuntu 24.
-TERMUX_PKG_PYTHON_COMMON_DEPS="build, Cython, pkgconfig, 'setuptools==65.7.0', setuptools-scm, wheel"
+TERMUX_PKG_PYTHON_COMMON_DEPS="build, Cython, pkgconfig, setuptools, setuptools-scm, wheel"
 TERMUX_PKG_PYTHON_TARGET_DEPS="'msgpack==1.0.8', packaging"
 TERMUX_PKG_AUTO_UPDATE=true
 
