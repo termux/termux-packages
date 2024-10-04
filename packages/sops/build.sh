@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/getsops/sops
 TERMUX_PKG_DESCRIPTION="Simple and flexible tool for managing secrets"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.9.0"
+TERMUX_PKG_VERSION="3.9.1"
 TERMUX_PKG_SRCURL=https://github.com/getsops/sops/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=eda01428a4178903b2d9552940fe441d93fab7b4582cd3f5fee7b6b73404d8cb
+TERMUX_PKG_SHA256=d79e8caaef3134d00f759231e8ef587b791996e2e45319ffe83dee1ab01aebda
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
 
