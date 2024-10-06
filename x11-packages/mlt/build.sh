@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Multimedia Framework. Author, manage, and run multitrack
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_VERSION=7.28.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/mltframework/mlt/releases/download/v${TERMUX_PKG_VERSION}/mlt-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=bc425bf9602213f5f4855b78cfbbcd43eeb78097c508588bde44415963955aa1
 TERMUX_PKG_DEPENDS="libebur128, swig"
