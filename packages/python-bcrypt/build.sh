@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Acceptable password hashing for your software and your s
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.2.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://pypi.io/packages/source/b/bcrypt/bcrypt-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=cf69eaf5185fd58f268f805b505ce31f9b9fc2d64b376642164e9244540c1221
 TERMUX_PKG_AUTO_UPDATE=true
