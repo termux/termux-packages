@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Python Bindings for the Qt WebEngine Framework"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=5.15.6
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://files.pythonhosted.org/packages/source/P/PyQtWebEngine/PyQtWebEngine-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=ae241ef2a61c782939c58b52c2aea53ad99b30f3934c8358d5e0a6ebb3fd0721
 TERMUX_PKG_DEPENDS="libc++, pyqt5, python, qt5-qtbase, qt5-qtwebengine"
