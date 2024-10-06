@@ -65,11 +65,9 @@ PACKAGES+=" xmlto"
 PACKAGES+=" xmltoman"
 
 # Needed by python modules (e.g. asciinema) and some build systems.
-PACKAGES+=" python3.11"
 PACKAGES+=" python3-pip"
 PACKAGES+=" python3-setuptools"
 PACKAGES+=" python-wheel-common"
-PACKAGES+=" python3.11-venv"
 PACKAGES+=" python3.12-venv"
 
 # Needed by package bc.
