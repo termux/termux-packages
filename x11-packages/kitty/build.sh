@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # When updating the package, also update terminfo for kitty by updating
 # ncurses' kitty sources in main repo
 TERMUX_PKG_VERSION="0.36.4"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/kovidgoyal/kitty/releases/download/v${TERMUX_PKG_VERSION}/kitty-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=10ebf00a8576bca34ae683866c5be307a35f3c517906d6441923fd740db059bd
 # fontconfig is dlopen(3)ed:
