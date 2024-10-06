@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # `weechat-python-plugin` depends on libpython${TERMUX_PYTHON_VERSION}.so.
 # Please revbump and rebuild when bumping TERMUX_PYTHON_VERSION.
 TERMUX_PKG_VERSION="4.4.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.weechat.org/files/src/weechat-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=d4df289a9c5bca03a6d4fae006e52037064ef03bad6fbe959c538f3197434dec
 TERMUX_PKG_DEPENDS="libandroid-support, libcurl, libgcrypt, libgnutls, libiconv, ncurses, zlib, zstd"
