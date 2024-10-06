@@ -122,6 +122,14 @@ termux_step_create_debscripts() {
 		echo
 	fi
 
+	if [ -d $TERMUX_PREFIX/lib/python3.11/site-packages ]; then
+		echo
+		echo "NOTE: The system python package has been updated to 3.12."
+		echo "NOTE: Run 'pkg upgrade' to update system python packages."
+		echo "NOTE: Packages installed using pip needs to be re-installed."
+		echo
+	fi
+
 	exit 0
 	POSTINST_EOF
 
