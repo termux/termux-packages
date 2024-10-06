@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Datasets, Transforms and Models specific to Computer Vis
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.19.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/pytorch/vision
 # ffmpeg
 TERMUX_PKG_DEPENDS="libc++, python, python-numpy, python-pillow, python-pip, python-torch, libjpeg-turbo, libpng, zlib"
