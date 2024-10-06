@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="The GNOME spreadsheet"
 TERMUX_PKG_LICENSE="GPL-2.0, GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.12.57"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/gnumeric/${TERMUX_PKG_VERSION%.*}/gnumeric-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=aff50b1b62340c24fccf453d5fad3e7fb73f4bc4b34f7e34b6c3d2d9af6a1e4f
 TERMUX_PKG_DEPENDS="atk, gdk-pixbuf, glib, goffice, gtk3, libcairo, libgsf, libxml2, pango, zlib"
