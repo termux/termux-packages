@@ -2,8 +2,8 @@ TERMUX_PKG_HOMEPAGE=https://luvit.io
 TERMUX_PKG_DESCRIPTION="A project in-between luv and luvit."
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="Komo @cattokomo"
-TERMUX_PKG_VERSION=20240723
-_commit=4e92094134161601a841d2ff5c8b0759fcc743b1
+TERMUX_PKG_VERSION=20240820
+_commit=eb1d7c92406267560aff2d9cd83fd5ca7dc3f414
 _version=2.14.0+g${_commit::7}
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_SRCURL=git+https://github.com/luvit/luvi.git
@@ -17,6 +17,16 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 	-DWithPCRE2=On
 	-DWithSharedPCRE2=On
 	-DWithLPEG=On
+	-DLIBLUV_INCLUDE_DIR=${TERMUX_PKG_SRCDIR}/deps/luv/src
+	-DLIBLUV_LIBRARIES=${TERMUX_PREFIX}/lib/libluv.so
+	-DLUAJIT_INCLUDE_DIR=${TERMUX_PREFIX}/include/luajit-2.1
+	-DLUAJIT_LIBRARIES=${TERMUX_PREFIX}/lib/libluajit.so
+	-DLIBUV_INCLUDE_DIR=${TERMUX_PREFIX}/include
+	-DLIBUV_LIBRARIES=${TERMUX_PREFIX}/lib/libuv.so
+	-DOPENSSL_INCLUDE_DIR=${TERMUX_PREFIX}/include
+	-DOPENSSL_LIBRARIES=${TERMUX_PREFIX}/lib
+	-DPCRE2_INCLUDE_DIR=${TERMUX_PREFIX}/include
+	-DPCRE2_LIBRARIES=${TERMUX_PREFIX}/lib
 "
 
 termux_step_post_get_source() {
@@ -24,29 +34,12 @@ termux_step_post_get_source() {
 }
 
 termux_step_pre_configure() {
-	declare include=${TERMUX_PREFIX}/include lib=${TERMUX_PREFIX}/lib
-	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
-		-DLIBLUV_INCLUDE_DIR=${TERMUX_PKG_SRCDIR}/deps/luv/src
-		-DLIBLUV_LIBRARIES=$lib/libluv.so
-		-DLUAJIT_INCLUDE_DIR=$include/luajit-2.1
-		-DLUAJIT_LIBRARIES=$lib/libluajit.so
-		-DLIBUV_INCLUDE_DIR=$include
-		-DLIBUV_LIBRARIES=$lib/libuv.so
-		-DOPENSSL_INCLUDE_DIR=$include
-		-DOPENSSL_LIBRARIES=$lib
-		-DPCRE2_INCLUDE_DIR=$include
-		-DPCRE2_LIBRARIES=$lib
-	"
+	local dlp_commit="7adf5b3" script_checksum="4b4412c4e93c3cebfc830c643a04b31108a12f10abf7489ab0a80077a1a1ccdb"
 
-	case "${TERMUX_ARCH}" in
-	x86_64) TARGET_ARCH=x64 ;;
-	i686) TARGET_ARCH=x86 ;;
-	aarch64) TARGET_ARCH=arm64 ;;
-	arm) TARGET_ARCH=arm ;;
-	esac
-	export TARGET_ARCH
-
-	export LPEGLIB_DIR=deps/lpeg
-
+	termux_download "https://github.com/ReFreezed/DumbLuaParser/raw/${dlp_commit}/dumbParser.lua" \
+		"${TERMUX_PKG_CACHEDIR}/dumbParser.lua" \
+		"${script_checksum}"
+	export LUA_PATH=";;${TERMUX_PKG_CACHEDIR}/?.lua"
+	
 	echo "$_version" >"${TERMUX_PKG_SRCDIR}/VERSION"
 }
