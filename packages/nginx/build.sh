@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Lightweight HTTP server"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.27.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://nginx.org/download/nginx-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=a91ecfc3a0b3a2c1413afca627bd886d76e0414b81cad0fb7872a9655a1b25fa
 TERMUX_PKG_AUTO_UPDATE=true
@@ -63,6 +64,7 @@ termux_step_configure() {
 		--with-http_v2_module \
 		--with-http_gunzip_module \
 		--with-http_sub_module \
+		--with-http_dav_module \
 		--with-stream \
 		--with-stream_ssl_module \
 		$DEBUG_FLAG
