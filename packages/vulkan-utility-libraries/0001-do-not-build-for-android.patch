@@ -1,6 +1,6 @@
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -47,6 +47,7 @@
+@@ -48,6 +48,7 @@
      target_compile_definitions(VulkanCompilerConfiguration INTERFACE VK_USE_PLATFORM_WIN32_KHR)
  elseif(ANDROID)
      target_compile_definitions(VulkanCompilerConfiguration INTERFACE VK_USE_PLATFORM_ANDROID_KHR)
@@ -25,10 +25,10 @@
  
 -#if defined(__ANDROID__)
 +#if defined(__ANDROID__) && !defined(__TERMUX__)
- static std::string GetAndroidProperty(const char *name) {
-     std::string output;
-     const prop_info *pi = __system_property_find(name);
-@@ -51,7 +51,7 @@
+ /*
+  * Use the __system_property_read_callback API that appeared in
+  * Android API level 26. If not avaible use the old __system_property_get function.
+@@ -68,7 +68,7 @@
  #endif
  
  static std::string GetEnvironment(const char *variable) {
@@ -37,7 +37,7 @@
      std::string result = GetAndroidProperty(variable);
      // Workaround for screenshot layer backward compatibility
      if (result.empty() && std::string(variable) == "debug.vulkan.screenshot.frames") {
-@@ -192,7 +192,7 @@
+@@ -214,7 +214,7 @@
      }
  #endif
  
