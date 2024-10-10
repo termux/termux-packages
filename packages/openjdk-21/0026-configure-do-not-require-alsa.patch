@@ -1,0 +1,32 @@
+From e34eb60bf0131ee6b6dad462f0c2252e4ee87ae2 Mon Sep 17 00:00:00 2001
+From: Henrik Grimler <grimler@termux.dev>
+Date: Wed, 8 Feb 2023 15:36:25 +0100
+Subject: [PATCH 26/37] configure: do not require alsa
+
+Android, which counts as linux according to configure check, does not
+have alsa so we cannot use it.
+---
+ make/autoconf/libraries.m4 | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
+
+diff --git a/make/autoconf/libraries.m4 b/make/autoconf/libraries.m4
+index a1fc81564..fc0356e92 100644
+--- a/make/autoconf/libraries.m4
++++ b/make/autoconf/libraries.m4
+@@ -74,12 +74,7 @@ AC_DEFUN_ONCE([LIB_DETERMINE_DEPENDENCIES],
+     NEEDS_LIB_FREETYPE=true
+   fi
+ 
+-  # Check if alsa is needed
+-  if test "x$OPENJDK_TARGET_OS" = xlinux; then
+-    NEEDS_LIB_ALSA=true
+-  else
+-    NEEDS_LIB_ALSA=false
+-  fi
++  NEEDS_LIB_ALSA=false
+ 
+   # Check if ffi is needed
+   if HOTSPOT_CHECK_JVM_VARIANT(zero) || test "x$ENABLE_FALLBACK_LINKER" = "xtrue"; then
+-- 
+2.45.2
+

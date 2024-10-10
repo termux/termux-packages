@@ -1,0 +1,18 @@
+
+--- a/src/java.base/unix/native/libnio/fs/UnixNativeDispatcher.c	2024-07-08 12:10:48.000000000 +0800
++++ b/src/java.base/unix/native/libnio/fs/UnixNativeDispatcher.c	2024-07-08 12:19:09.096387500 +0800
+@@ -79,12 +79,14 @@
+ // by defining binary compatible statx structs in this file and
+ // not relying on included headers.
+ 
++#ifndef __BIONIC__
+ #ifndef __GLIBC__
+ // Alpine doesn't know these types, define them
+ typedef unsigned int       __uint32_t;
+ typedef unsigned short     __uint16_t;
+ typedef unsigned long int  __uint64_t;
+ #endif
++#endif
+ 
+ /*
+  * Timestamp structure for the timestamps in struct statx.

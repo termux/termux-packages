@@ -1,0 +1,36 @@
+From 06429af2ea014a40696c2937196c6474966a78d5 Mon Sep 17 00:00:00 2001
+From: Henrik Grimler <grimler@termux.dev>
+Date: Sun, 31 Mar 2024 12:02:51 +0200
+Subject: [PATCH 36/37] make: autoconf: define ARM for arm build with clang
+
+Fixes error like
+
+ad_arm.cpp:19849:4: error: "ARM must be defined"
+   ^
+1 warning and 1 error generated.
+gmake[3]: *** [lib/CompileJvm.gmk:143: /home/builder/.termux-build/openjdk-17/src/build/linux-arm-server-release/hotspot/variant-server/libjvm/objs/ad_arm.o] Error 1
+gmake[2]: *** [make/Main.gmk:252: hotspot-server-libs] Error 2
+---
+ make/autoconf/flags-cflags.m4 | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/make/autoconf/flags-cflags.m4 b/make/autoconf/flags-cflags.m4
+index 4cfc77586..ab4811036 100644
+--- a/make/autoconf/flags-cflags.m4
++++ b/make/autoconf/flags-cflags.m4
+@@ -769,6 +769,12 @@ AC_DEFUN([FLAGS_SETUP_CFLAGS_CPU_DEP],
+       $1_CFLAGS_CPU="-mcpu=pwr8"
+     fi
+ 
++    if test "x$FLAGS_CPU" = xarm; then
++      # For whatever reason arm build with clang fails with:
++      #   ad_arm.cpp:19849:4: error: "ARM must be defined"
++      # Fix by defining arm here as well.
++      $1_CFLAGS_CPU_JVM="-DARM"
++    fi
+   elif test "x$TOOLCHAIN_TYPE" = xxlc; then
+     if test "x$FLAGS_CPU" = xppc64; then
+       $1_CFLAGS_CPU_JVM="-qarch=ppc64"
+-- 
+2.45.2
+

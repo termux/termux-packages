@@ -1,0 +1,14 @@
+#!@TERMUX_PREFIX@/bin/sh
+
+if [ "$1" != "upgrade" ]; then
+	if [ -x "@TERMUX_PREFIX@/bin/update-alternatives" ]; then
+		update-alternatives --remove java-profile @TERMUX_PREFIX@/lib/jvm/java-21-openjdk/etc/profile.d/java.sh
+		for tool in @binaries@; do
+			update-alternatives --remove $tool @TERMUX_PREFIX@/lib/jvm/java-21-openjdk/bin/$tool
+		done
+
+		for manpage in @manpages@; do
+			update-alternatives --remove $manpage @TERMUX_PREFIX@/lib/jvm/java-21-openjdk/man/man1/$manpage
+		done
+	fi
+fi
