@@ -11,6 +11,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="xkeyboard-config"
 TERMUX_PKG_BREAKS="termux-x11"
 TERMUX_PKG_REPLACES="termux-x11"
+TERMUX__PKG_PROVIDES="termux-x11"
 
 termux_step_make() {
 	:
@@ -20,6 +21,7 @@ termux_step_make_install() {
 	# Downloading full JDK to compile 7kb apk seems excessive, let's download a prebuilt.
 	local LOADER_URL="https://github.com/termux/termux-x11/releases/download/nightly/termux-x11-nightly-1.03.01-0-any.pkg.tar.xz"
 	install -t $TERMUX_PREFIX/bin -m 755 termux-x11 termux-x11-preference
+	mkdir -p $TERMUX_PREFIX/libexec/termux-x11
 	wget -qO- $LOADER_URL | tar -OJxf - --wildcards "*loader.apk" > $TERMUX_PREFIX/libexec/termux-x11/loader.apk
 }
 
