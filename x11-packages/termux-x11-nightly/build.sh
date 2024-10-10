@@ -11,7 +11,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="xkeyboard-config"
 TERMUX_PKG_BREAKS="termux-x11"
 TERMUX_PKG_REPLACES="termux-x11"
-TERMUX__PKG_PROVIDES="termux-x11"
+TERMUX_PKG_PROVIDES="termux-x11"
 
 termux_step_make() {
 	:
