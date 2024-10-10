@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE='https://community.kde.org/Frameworks'
+TERMUX_PKG_DESCRIPTION='Qt library that implements the Open Collaboration Services API'
+TERMUX_PKG_LICENSE="LGPL-2.0, LGPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=6.6.0
+TERMUX_PKG_SRCURL=https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/attica-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=e2370e7f0a0e4721180c364342f47bc974cf3b45c45c7ce9e70c5d9ba5230be3
+TERMUX_PKG_DEPENDS="qt6-qtbase"
+TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules, qt6-qttools"
+TERMUX_PKG_AUTO_UPDATE=true

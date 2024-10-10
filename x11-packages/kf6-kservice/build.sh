@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE='https://community.kde.org/Frameworks'
+TERMUX_PKG_DESCRIPTION='Advanced plugin and service introspection'
+TERMUX_PKG_LICENSE="LGPL-2.0, LGPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=6.6.0
+TERMUX_PKG_SRCURL=https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/kservice-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=ba0d6323efecaf055655bb6d9dd072e7f889d23969ca4fc55565bda8999101f4
+TERMUX_PKG_DEPENDS="kf6-kconfig, kf6-kcoreaddons, kf6-ki18n, qt6-qtbase"
+TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules, qt6-qttools"
+TERMUX_PKG_AUTO_UPDATE=true
