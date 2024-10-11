@@ -17,5 +17,5 @@ termux_setup_glib_cross_pkg_config_wrapper() {
 }
 
 termux_setup_wayland_cross_pkg_config_wrapper() {
-	termux_setup_wayland_cross_pkg_config_wrapper
+	termux_setup_pkg_config_wrapper "${TERMUX_PREFIX}/opt/libwayland/cross/lib/x86_64-linux-gnu/pkgconfig"
 }

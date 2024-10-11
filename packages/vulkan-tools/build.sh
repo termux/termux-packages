@@ -22,5 +22,5 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure() {
-	termux_setup_pkg_config_wrapper "${TERMUX_PREFIX}/opt/libwayland/cross/lib/x86_64-linux-gnu/pkgconfig
+	termux_setup_wayland_cross_pkg_config_wrapper
 }
