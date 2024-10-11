@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE='https://community.kde.org/Frameworks'
+TERMUX_PKG_DESCRIPTION='RSS/Atom parser library'
+TERMUX_PKG_LICENSE="LGPL-2.0, LGPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=6.6.0
+TERMUX_PKG_SRCURL=https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/syndication-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=627e4b310b8721e8b426ec5492f4036a7756d98933d318738352bfdd0a78a0d0
+TERMUX_PKG_DEPENDS="kf6-kcodecs, qt6-qtbase"
+TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules, qt6-qttools"
+TERMUX_PKG_AUTO_UPDATE=true

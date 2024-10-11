@@ -11,4 +11,6 @@ TERMUX_PKG_DEPENDS="gettext, iso-codes, libc++, qt6-qtbase, qt6-qtdeclarative"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules, python, qt6-qttools"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCMAKE_SYSTEM_NAME=Linux
+-DKDE_INSTALL_QMLDIR=lib/qt6/qml
+-DKDE_INSTALL_QTPLUGINDIR=lib/qt6/plugins
 "

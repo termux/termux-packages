@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE='https://community.kde.org/Frameworks'
+TERMUX_PKG_DESCRIPTION='User configurable main windows'
+TERMUX_PKG_LICENSE="LGPL-2.0, LGPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=6.6.0
+TERMUX_PKG_SRCURL=https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/kxmlgui-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=647fc7510d33b9de9196fd2c8f6f6a114dd18559ee21aab7cf47f687b8ae0452
+TERMUX_PKG_DEPENDS="kf6-kcolorscheme, kf6-kconfig, kf6-kconfigwidgets, kf6-kcoreaddons, kf6-kglobalaccel, kf6-kguiaddons, kf6-ki18n, kf6-kiconthemes, kf6-kitemviews, kf6-kwidgetsaddons, qt6-qtbase"
+TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules, qt6-qttools"
+TERMUX_PKG_AUTO_UPDATE=true
