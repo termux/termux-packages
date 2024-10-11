@@ -3,13 +3,15 @@ TERMUX_PKG_DESCRIPTION="Efficient ID3 tag editor"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.9.6"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/kid3/kid3-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=df4a330b874cace7e84beb6d178316f681d09abb94d368c056de7e749ce4dff8
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="chromaprint, ffmpeg, id3lib, libc++, libflac, libogg, libvorbis, qt5-qtbase, qt5-qtdeclarative, qt5-qtmultimedia, readline, taglib"
-TERMUX_PKG_BUILD_DEPENDS="docbook-xsl, qt5-qtbase-cross-tools, qt5-qtdeclarative-cross-tools, qt5-qttools-cross-tools"
+TERMUX_PKG_DEPENDS="chromaprint, ffmpeg, id3lib, libc++, libflac, libogg, libvorbis, qt6-qtbase, qt6-qtdeclarative, qt6-qtmultimedia, readline, taglib"
+TERMUX_PKG_BUILD_DEPENDS="docbook-xsl, qt6-qtbase-cross-tools, qt6-qtdeclarative-cross-tools, qt6-qttools-cross-tools"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DANDROID_NO_TERMUX=OFF
+-DBUILD_WITH_QT6=ON
 -DWITH_APPS=Qt;CLI
 -DWITH_FFMPEG=ON
 "
