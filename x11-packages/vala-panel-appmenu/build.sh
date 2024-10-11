@@ -8,6 +8,7 @@ TERMUX_PKG_SHA256=4dd891578429199d2310dc6ff37008be2bb26d045e1fdbbaed8d607af70f7c
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="glib"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, glib-cross, gtk2, gtk3, valac"
+TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dwm_backend=wnck
 -Dvalapanel=disabled
@@ -20,7 +21,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure() {
-	TERMUX_PKG_VERSION=. termux_setup_gir
+	termux_setup_gir
 
 	CPPFLAGS+=" -Dulong=u_long"
 	LDFLAGS+=" -lX11"

@@ -9,6 +9,7 @@ TERMUX_PKG_SHA256=ee8f3ef946156ad3406fdf45feedbdcd932dbd211ab4f16f75eba4f36fb2f6
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="gdk-pixbuf, glib"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, glib-cross"
+TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dtests=false
@@ -16,7 +17,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dgtk_doc=false"
 
 termux_step_pre_configure() {
-	TERMUX_PKG_VERSION=. termux_setup_gir
+	termux_setup_gir
 
 	local _WRAPPER_BIN="${TERMUX_PKG_BUILDDIR}/_wrapper/bin"
 	mkdir -p "${_WRAPPER_BIN}"

@@ -8,6 +8,7 @@ TERMUX_PKG_SHA256=0a3ec258b12dbf10e5fe840b2421c84137eb7cc1b09c3de6210f3f7d517337
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="glib, liblzma, libstemmer, zstd"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, glib-cross"
+TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dgtkdoc=false
@@ -17,5 +18,5 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure() {
-	TERMUX_PKG_VERSION=. termux_setup_gir
+	termux_setup_gir
 }

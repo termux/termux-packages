@@ -8,6 +8,7 @@ TERMUX_PKG_SHA256=9ed783934cb99c9101639194e1fc072cb09303b8f3c2fc6623390186a9dad8
 TERMUX_PKG_DEPENDS="appstream, fribidi, glib, graphene, gtk4, pango"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, valac"
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dintrospection=enabled
@@ -17,7 +18,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure() {
-	TERMUX_PKG_VERSION=. termux_setup_gir
+	termux_setup_gir
 
 	local _WRAPPER_BIN="${TERMUX_PKG_BUILDDIR}/_wrapper/bin"
 	mkdir -p "${_WRAPPER_BIN}"

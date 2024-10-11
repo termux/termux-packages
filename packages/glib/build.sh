@@ -10,6 +10,7 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libandroid-support, libffi, libiconv, pcre2, resolv-conf, zlib"
 TERMUX_PKG_BREAKS="glib-dev"
 TERMUX_PKG_REPLACES="glib-dev"
+TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dintrospection=enabled
@@ -89,7 +90,7 @@ termux_step_pre_configure() {
 		TERMUX_PKG_BUILDDIR="$TERMUX_PKG_TMPDIR/glib-build"
 		mkdir -p "$TERMUX_PKG_BUILDDIR"
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS="${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/"-Dintrospection=enabled"/"-Dintrospection=disabled"}"
-		TERMUX_PKG_VERSION=. termux_setup_gir
+		termux_setup_gir
 		
 		cd "$TERMUX_PKG_BUILDDIR"
 		TERMUX_PREFIX="$_PREFIX" termux_step_configure
@@ -125,7 +126,7 @@ termux_step_pre_configure() {
 	)
 	
 	# Place the GIR files inside the root of the GIR directory (gir/.) of the package
-	TERMUX_PKG_VERSION=. termux_setup_gir
+	termux_setup_gir
 
 	# The package will be built with using gobject-introspection we built before...
 }

@@ -9,6 +9,7 @@ TERMUX_PKG_SHA256=bad10f3c553a0e1854649ab59c5b2434da22ca1a54ae6138f1f53961567e1a
 TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libcairo, libgcrypt, p11-kit, pango"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, glib-cross, gnupg, valac"
 TERMUX_PKG_RECOMMENDS="gnupg"
+TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dintrospection=true
@@ -20,7 +21,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure() {
-	TERMUX_PKG_VERSION=. termux_setup_gir
+	termux_setup_gir
 
 	local bin_dir=$TERMUX_PKG_BUILDDIR/_dummy/bin
 	mkdir -p $bin_dir

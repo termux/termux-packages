@@ -8,6 +8,7 @@ TERMUX_PKG_SHA256=163d08d783be6d4ab9a979ceb5a4fecbc1d9660d3c34168c581301cd53912b
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="glib, libgcrypt"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, valac"
+TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dgtk_doc=false
@@ -15,7 +16,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure() {
-	TERMUX_PKG_VERSION=. termux_setup_gir
+	termux_setup_gir
 
 	local _WRAPPER_BIN="${TERMUX_PKG_BUILDDIR}/_wrapper/bin"
 	mkdir -p "${_WRAPPER_BIN}"

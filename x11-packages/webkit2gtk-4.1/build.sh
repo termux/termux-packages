@@ -8,6 +8,7 @@ TERMUX_PKG_SRCURL=https://webkitgtk.org/releases/webkitgtk-${TERMUX_PKG_VERSION}
 TERMUX_PKG_SHA256=52288b30bda22373442cecb86f9c9a569ad8d4769a1f97b352290ed92a67ed86
 TERMUX_PKG_DEPENDS="atk, enchant, fontconfig, freetype, glib, gst-plugins-bad, gst-plugins-base, gst-plugins-good, gstreamer, gtk3, harfbuzz, harfbuzz-icu, libc++, libcairo, libgcrypt, libhyphen, libicu, libjpeg-turbo, libpng, libsoup3, libtasn1, libwebp, libxml2, libx11, libxcomposite, libxdamage, libxslt, libxt, littlecms, openjpeg, pango, woff2, zlib"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, xorgproto"
+TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_DISABLE_GIR=false
 
 # USE_OPENGL_OR_ES causes crashes when enabled.
@@ -39,7 +40,7 @@ termux_step_post_get_source() {
 }
 
 termux_step_pre_configure() {
-	TERMUX_PKG_VERSION=. termux_setup_gir
+	termux_setup_gir
 
 	# FIXME: `GI_VERSION` mismatched from Termux and the building machine. On April 22,
 	# FIXME: 2024, Termux has version 1.80.1 but Ubuntu 22.04 has version 1.72.0.

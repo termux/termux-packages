@@ -11,6 +11,7 @@ TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner"
 TERMUX_PKG_PYTHON_COMMON_DEPS="wheel"
 TERMUX_PKG_RECOMMENDS="gnumeric-help"
 TERMUX_PKG_SUGGESTS="glpk"
+TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 PYTHON=python
@@ -26,7 +27,7 @@ lib/locale
 "
 
 termux_step_pre_configure() {
-	TERMUX_PKG_VERSION=. termux_setup_gir
+	termux_setup_gir
 
 	echo "Applying plugins-python-loader-Makefile.in.diff"
 	sed "s|@PYTHON_VERSION@|${TERMUX_PYTHON_VERSION}|g" \

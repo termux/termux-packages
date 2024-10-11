@@ -8,6 +8,7 @@ TERMUX_PKG_SHA256=34b624848e5de22a138b675ad6f39c0c7b9d67907c10e1fc7e5b03060e8d54
 TERMUX_PKG_DEPENDS="adwaita-icon-theme, fontconfig, fribidi, gdk-pixbuf, glib, glib-bin, graphene, gtk-update-icon-cache, harfbuzz, libcairo, libepoxy, libjpeg-turbo, libpng, libtiff, libwayland, libx11, libxcursor, libxdamage, libxext, libxfixes, libxi, libxinerama, libxkbcommon, libxrandr, pango, shared-mime-info"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, glib-cross, libwayland-protocols, xorgproto"
 TERMUX_PKG_RECOMMENDS="desktop-file-utils, librsvg, ttf-dejavu"
+TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_DISABLE_GIR=false
 # Prevent updating to unstable branch
 TERMUX_PKG_AUTO_UPDATE=false
@@ -25,7 +26,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 
 termux_step_pre_configure() {
 	termux_setup_cmake
-	TERMUX_PKG_VERSION=. termux_setup_gir
+	termux_setup_gir
 	termux_setup_ninja
 
 	local _WRAPPER_BIN="${TERMUX_PKG_BUILDDIR}/_wrapper/bin"

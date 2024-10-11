@@ -8,6 +8,7 @@ TERMUX_PKG_SHA256=d687d3a3d4990ea7aff4066e17768ec9fefe7b3129b98090c750b8d7074b47
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="atk, glib, gtk3, libcairo, pango, pcre2, unicode-data"
 TERMUX_PKG_BUILD_DEPENDS="freetype, g-ir-scanner, glib-cross, valac"
+TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Ducd_path=$TERMUX_PREFIX/share/unicode-data
@@ -17,7 +18,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure() {
-	TERMUX_PKG_VERSION=. termux_setup_gir
+	termux_setup_gir
 
 	local _WRAPPER_BIN="${TERMUX_PKG_BUILDDIR}/_wrapper/bin"
 	mkdir -p "${_WRAPPER_BIN}"

@@ -8,6 +8,7 @@ TERMUX_PKG_SRCURL=https://download.gnome.org/sources/gobject-introspection/${TER
 TERMUX_PKG_SHA256=a1df7c424e15bda1ab639c00e9051b9adf5cea1a9e512f8a603b53cd199bc6d8
 TERMUX_PKG_DEPENDS="glib, libffi"
 TERMUX_PKG_SUGGESTS="g-ir-scanner"
+TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_PYTHON_COMMON_DEPS="packaging, wheel"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -17,7 +18,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure() {
-	TERMUX_PKG_VERSION=. termux_setup_gir
+	termux_setup_gir
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
 		-Dgi_cross_binary_wrapper=$GI_CROSS_LAUNCHER
 		"

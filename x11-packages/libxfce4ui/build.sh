@@ -11,6 +11,7 @@ TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="atk, gdk-pixbuf, glib, gtk3, harfbuzz, libcairo, libgtop, libice, libsm, libx11, libxfce4util, pango, startup-notification, xfconf, zlib"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner"
 TERMUX_PKG_RECOMMENDS="hicolor-icon-theme"
+TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-vendor-info=Termux
@@ -21,5 +22,5 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure() {
-	TERMUX_PKG_VERSION=. termux_setup_gir
+	termux_setup_gir
 }

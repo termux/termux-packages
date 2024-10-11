@@ -9,10 +9,11 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libcairo, pango"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, valac"
+TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DENABLE_TESTS=OFF
 "
 
 termux_step_pre_configure() {
-	TERMUX_PKG_VERSION=. termux_setup_gir
+	termux_setup_gir
 }

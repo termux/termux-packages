@@ -9,6 +9,7 @@ TERMUX_PKG_SHA256=d9a329182b78f7e2520cd4aafcbb276bbbf162f6a89191676539ad2e3889c3
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="glib"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, valac"
+TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-introspection=yes
@@ -17,5 +18,5 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure() {
-	TERMUX_PKG_VERSION=. termux_setup_gir
+	termux_setup_gir
 }

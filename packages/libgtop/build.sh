@@ -8,6 +8,7 @@ TERMUX_PKG_SHA256=2136f5586377706c267b61c04c3f59ada69d59d83fc8967f137813a8503d0f
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="glib, libandroid-shmem, libxau"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, glib-cross"
+TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-gtk-doc-html=no
@@ -22,7 +23,7 @@ termux_step_post_get_source() {
 }
 
 termux_step_pre_configure() {
-	TERMUX_PKG_VERSION=. termux_setup_gir
+	termux_setup_gir
 	NOCONFIGURE=1 ./autogen.sh
 	LDFLAGS+=" -landroid-shmem"
 }

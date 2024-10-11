@@ -11,6 +11,7 @@ TERMUX_PKG_CONFLICTS="libgtk3"
 TERMUX_PKG_REPLACES="libgtk3"
 # Prevent updating to unstable branch or gtk4
 TERMUX_PKG_AUTO_UPDATE=false
+TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dbroadway_backend=true
@@ -26,7 +27,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 
 termux_step_pre_configure() {
 	termux_setup_cmake
-	TERMUX_PKG_VERSION=. termux_setup_gir
+	termux_setup_gir
 	termux_setup_ninja
 
 	local _WRAPPER_BIN="${TERMUX_PKG_BUILDDIR}/_wrapper/bin"
