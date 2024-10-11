@@ -57,6 +57,8 @@ termux_step_configure() {
 		--cc="$CC" \
 		--cxx="$CXX" \
 		--nm="$NM" \
+		--ar="$AR" \
+		--ranlib="llvm-ranlib" \
 		--pkg-config="$PKG_CONFIG" \
 		--strip="$STRIP" \
 		--cross-prefix="${TERMUX_HOST_PLATFORM}-" \
