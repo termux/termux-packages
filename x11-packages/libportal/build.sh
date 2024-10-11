@@ -23,5 +23,5 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 
 termux_step_pre_configure() {
 	termux_setup_gir
-	export PKG_CONFIG_LIBDIR="${TERMUX_PREFIX}/opt/glib/cross/lib/x86_64-linux-gnu/pkgconfig:${PKG_CONFIG_LIBDIR}"
+	termux_setup_glib_cross_pkg_config_wrapper
 }
