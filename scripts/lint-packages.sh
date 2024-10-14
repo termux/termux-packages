@@ -592,7 +592,7 @@ linter_main() {
 if (( $# )); then
 	linter_main "$@" || exit 1
 else
-	for repo_dir in $(jq --raw-output 'del(.pkg_format) | keys | .[]' $TERMUX_SCRIPTDIR/repo.json); do
+	for repo_dir in $(jq --raw-output '.channels | keys | .[]' $TERMUX_SCRIPTDIR/repo.json); do
 		linter_main $repo_dir/*/build.sh
 	done || exit 1
 fi
