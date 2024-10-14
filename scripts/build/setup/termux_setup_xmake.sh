@@ -1,8 +1,8 @@
 # shellcheck shell=bash disable=SC2155
 termux_setup_xmake() {
-	local XMAKE_VERSION=2.8.9
+	local XMAKE_VERSION=2.9.5
 	local XMAKE_TGZ_URL=https://github.com/xmake-io/xmake/releases/download/v${XMAKE_VERSION}/xmake-v${XMAKE_VERSION}.tar.gz
-	local XMAKE_TGZ_SHA256=5f793c393346ef80e47f083ade4d3c2fdfc448658a7917fda35ccd7bd2b911b8
+	local XMAKE_TGZ_SHA256=03feb5787e22fab8dd40419ec3d84abd35abcd9f8a1b24c488c7eb571d6724c8
 	local XMAKE_TGZ_FILE=${TERMUX_PKG_TMPDIR}/xmake-${XMAKE_VERSION}.tar.gz
 	local XMAKE_FOLDER=${TERMUX_COMMON_CACHEDIR}/xmake-${XMAKE_VERSION}
 	if [[ "${TERMUX_PACKAGES_OFFLINE-false}" == "true" ]]; then
@@ -44,7 +44,9 @@ termux_setup_xmake() {
 		done
 
 		(
+			# avoid pick up Termux pkg-config, stop link with Termux ncursesw
 			unset AR AS CC CFLAGS CPP CPPFLAGS CXX CXXFLAGS LD LDFLAGS PREFIX TERMUX_ARCH
+			export PATH="/usr/bin:${PATH}"
 			pushd "${XMAKE_FOLDER}"
 			./configure --prefix="${XMAKE_FOLDER}"
 			make -j"$(nproc)" install
