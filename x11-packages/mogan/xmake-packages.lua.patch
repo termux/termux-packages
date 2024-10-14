@@ -1,6 +1,6 @@
 --- a/xmake/packages.lua
 +++ b/xmake/packages.lua
-@@ -13,17 +13,18 @@
+@@ -15,17 +15,18 @@
  -- Dependencies: Platform|Package Manager
  --
  function using_apt ()
@@ -21,7 +21,7 @@
 +    return false and (linuxos.name() == "archlinux")
  end
  
- -- The following versions are adopted on macOS/Windows/ArchLinux
+ function add_requires_of_mogan()
 @@ -70,7 +71,8 @@
          add_requires("pacman::curl", {alias="libcurl"})
          add_requireconfs("lolly.cpr.libcurl", {system = true, override=true})
@@ -67,7 +67,7 @@
      end
  
      -- package: libgit2
-@@ -139,5 +146,12 @@
+@@ -139,5 +146,13 @@
  
      if is_plat ("linux") and using_apt() then
          add_requires ("apt::libssl-dev", {alias="openssl"})
@@ -76,6 +76,7 @@
      end
 +
 +    add_links("android-complex-math")
++    add_links("android-execinfo")
 +    add_links("android-spawn")
 +    add_links("android-wordexp")
 +    add_links("iconv")
