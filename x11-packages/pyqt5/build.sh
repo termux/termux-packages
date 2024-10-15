@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.riverbankcomputing.com/software/pyqt/
 TERMUX_PKG_DESCRIPTION="Comprehensive Python Bindings for Qt v5"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="5.15.10"
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION="5.15.11"
 TERMUX_PKG_SRCURL=https://files.pythonhosted.org/packages/source/P/PyQt5/PyQt5-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=d46b7804b1b10a4ff91753f8113e5b5580d2b4462f3226288e2d84497334898a
+TERMUX_PKG_SHA256=fda45743ebb4a27b4b1a51c6d8ef455c4c1b5d610c90d2934c7802b5c1557c52
 TERMUX_PKG_DEPENDS="libc++, python, qt5-qtbase, qt5-qtdeclarative, qt5-qtlocation, qt5-qtmultimedia, qt5-qtsensors, qt5-qtsvg, qt5-qttools, qt5-qtwebchannel, qt5-qtwebkit, qt5-qtwebsockets, qt5-qtx11extras, qt5-qtxmlpatterns, python-pip"
 TERMUX_PKG_BUILD_DEPENDS="qt5-qtbase-cross-tools, qt5-qtdeclarative-cross-tools, qt5-qttools-cross-tools"
 TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, 'sip>=6.6.2,<7', 'PyQt-builder>=1.14.1,<2'"
