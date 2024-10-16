@@ -3,11 +3,28 @@ termux_step_override_config_scripts() {
 		return
 	fi
 
+	# resolves many variants of "cannot execute binary file: Exec format error"
+	# symlink host binaries over incompatible architecture and libc crossbuild rootfs binaries
+	symlink_incompatible_binary() {
+		src="$1"
+		dst="$2"
+		if [ -f $src ] && ! file $(readlink -f $dst) | grep text >/dev/null \
+		   && [ "$(readlink -f $src)" != "$(readlink -f $dst)" ]; then
+			echo "symlink_incompatible_binary: linking $dst to $src"
+			ln -sf $src $dst
+		fi
+	}
+	export -f symlink_incompatible_binary
+	find $TERMUX_PREFIX/bin/ -executable -exec bash -c 'symlink_incompatible_binary /usr/bin/$(basename {}) {}' \;
+	unset symlink_incompatible_binary
+	# from one perspective, the above block could be considered an expansion of the same logic
+	# behind the line below this, but for everything in the usr/bin folder instead of only bin/sh
+
 	# Make $TERMUX_PREFIX/bin/sh executable on the builder, so that build
 	# scripts can assume that it works on both builder and host later on:
 	ln -sf /bin/sh "$TERMUX_PREFIX/bin/sh"
 
-	if [ "$TERMUX_INSTALL_DEPS" = false ] || [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
+	if [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
 		return
 	fi
 
