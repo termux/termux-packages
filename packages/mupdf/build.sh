@@ -5,10 +5,12 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.24.10"
 TERMUX_PKG_SRCURL=https://mupdf.com/downloads/archive/mupdf-${TERMUX_PKG_VERSION}-source.tar.gz
 TERMUX_PKG_SHA256=939285b5f97caf770fd46cbe7e6cc3a695ab19bb5bfaf5712904549cef390b7b
-TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="freetype, gumbo-parser, harfbuzz, jbig2dec, leptonica, libc++, libjpeg-turbo, openjpeg, tesseract, zlib"
 TERMUX_PKG_EXTRA_MAKE_ARGS="prefix=$TERMUX_PREFIX build=release libs shared=yes tesseract=yes V=1"
 TERMUX_PKG_BUILD_IN_SRC=true
+
+# Automatic updates break k2pdfopt on regular basis
+TERMUX_PKG_AUTO_UPDATE=false
 
 termux_step_post_get_source() {
 	mv pyproject.toml{,.unused}
