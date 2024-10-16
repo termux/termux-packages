@@ -3,11 +3,44 @@ TERMUX_PKG_DESCRIPTION="bionic libc, libm, libdl and dynamic linker for ubuntu h
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="8.0.0-r51"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SHA256=6b42a86fc2ec58f86862a8f09a5465af0758ce24f2ca8c3cabb3bb6a81d96525
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
+# Should be handled by AOSP build system so I am disable it here.
+TERMUX_PKG_UNDEF_SYMBOLS_FILES="all"
+
+# Function to obtain the .deb URL
+obtain_deb_url() {
+	# jammy is last known Ubuntu distro which contains `libncurses.so.5` in packages
+	local url="https://packages.ubuntu.com/jammy/amd64/$1/download"
+	local retries=5
+	local wait=5
+	local attempt
+	local deb_url
+
+	for ((attempt=1; attempt<=retries; attempt++)); do
+		local PAGE="$(curl -s "$url")"
+		>&2 echo page
+		>&2 echo "$PAGE"
+		if deb_url=$(echo "$PAGE" | grep -Eo 'http://.*\.deb' | head -n 1); then
+			if [[ -n "$deb_url" ]]; then
+				echo "$deb_url"
+				return 0
+			else
+				>&2 echo "Attempt $attempt: Received empty URL or server answered with `Internal server error` page. Retrying in $wait seconds..."
+			fi
+		else
+			>&2 echo "Attempt $attempt: Command failed. Retrying in $wait seconds..."
+		fi
+		sleep "$wait"
+	done
+
+	>&2 echo "Failed to obtain URL after $retries attempts."
+	exit 1
+}
+
 
 termux_step_get_source() {
 	if $TERMUX_ON_DEVICE_BUILD; then
@@ -27,25 +60,17 @@ termux_step_get_source() {
 	cd ${TERMUX_PKG_SRCDIR}
 
 	cp -f ${TERMUX_PKG_BUILDER_DIR}/LICENSE.txt ${TERMUX_PKG_SRCDIR}/LICENSE.txt
-
-	local PACKAGES=(
-		"http://security.ubuntu.com/ubuntu/pool/universe/n/ncurses/libtinfo5_6.4-2ubuntu0.1_amd64.deb a5acc48e56ca4cd1b2e5fb22b36c5a02788c0baede55617e3f30decff58616ab"
-		"http://security.ubuntu.com/ubuntu/pool/universe/n/ncurses/libncurses5_6.4-2ubuntu0.1_amd64.deb 654b4f5b41380efabf606a691174974f9304e0b3ee461d0d91712b7e024f5546"
-		"http://mirrors.kernel.org/ubuntu/pool/main/o/openssh/openssh-client_8.9p1-3ubuntu0.4_amd64.deb afb16d53e762a78fabd9ce405752cd35d2f45904355ee820ce00f67bdf530155"
-	)
-	for item in "${PACKAGES[@]}"; do
-		local URL=$(cut -d' ' -f1 <<< $item) SHA256=$(cut -d' ' -f2 <<< $item)
-		termux_download ${URL} ${TERMUX_PKG_CACHEDIR}/${URL##*/} ${SHA256}
+	
+	for i in libtinfo5 libncurses5 openssh-client; do
+		local URL="$(obtain_deb_url $i)"
+		wget "$URL" -O ${TERMUX_PKG_CACHEDIR}/${URL##*/}
 
 		mkdir -p ${TERMUX_PKG_TMPDIR}/${URL##*/}
 		ar x ${TERMUX_PKG_CACHEDIR}/${URL##*/} --output=${TERMUX_PKG_TMPDIR}/${URL##*/}
 		tar xf ${TERMUX_PKG_TMPDIR}/${URL##*/}/data.tar.zst -C ${TERMUX_PKG_SRCDIR}/prefix
 	done
 
-	termux_download \
-		https://storage.googleapis.com/git-repo-downloads/repo \
-		${TERMUX_PKG_CACHEDIR}/repo \
-		df6e4f72ef21d839b4352f376ab9428e303a1414ac7a1f21fe420069b2acd476
+	termux_download https://storage.googleapis.com/git-repo-downloads/repo ${TERMUX_PKG_CACHEDIR}/repo SKIP_CHECKSUM
 	chmod +x ${TERMUX_PKG_CACHEDIR}/repo
 	${TERMUX_PKG_CACHEDIR}/repo init \
 		-u https://android.googlesource.com/platform/manifest \
