@@ -1,0 +1,48 @@
+--- a/internal/config/config_linux.go
++++ b/internal/config/config_linux.go
+@@ -22,6 +22,5 @@
+ // linux specific config search path
+ func setViperAdditionalConfigPaths() {
+ 	viper.AddConfigPath("$HOME/.config/sftpgo")
+-	viper.AddConfigPath("/etc/sftpgo")
+-	viper.AddConfigPath("/usr/local/etc/sftpgo")
++	viper.AddConfigPath("@TERMUX_PREFIX@/etc/sftpgo")
+ }
+--- a/sftpgo.json
++++ b/sftpgo.json
+@@ -67,7 +67,7 @@
+     "domains": [],
+     "email": "",
+     "key_type": "4096",
+-    "certs_path": "certs",
++    "certs_path": "@TERMUX_PREFIX@/var/lib/sftpgo/certs",
+     "ca_endpoint": "https://acme-v02.api.letsencrypt.org/directory",
+     "renew_days": 30,
+     "http01_challenge": {
+@@ -198,7 +198,7 @@
+   },
+   "data_provider": {
+     "driver": "sqlite",
+-    "name": "sftpgo.db",
++    "name": "@TERMUX_PREFIX@/var/lib/sftpgo/sftpgo.db",
+     "host": "",
+     "port": 0,
+     "username": "",
+@@ -214,7 +214,7 @@
+     "track_quota": 2,
+     "delayed_quota_update": 0,
+     "pool_size": 0,
+-    "users_base_dir": "",
++    "users_base_dir": "@TERMUX_PREFIX@/share/sftpgo/data",
+     "actions": {
+       "execute_on": [],
+       "execute_for": [],
+@@ -256,7 +256,7 @@
+       "port": 0,
+       "proto": "http"
+     },
+-    "backups_path": "backups"
++    "backups_path": "@TERMUX_PREFIX@/share/sftpgo/backups"
+   },
+   "httpd": {
+     "bindings": [
