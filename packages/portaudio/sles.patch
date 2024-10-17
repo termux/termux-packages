@@ -1,0 +1,31 @@
++++ ./configure
+@@ -16173,6 +16173,12 @@
+   as_fn_error $? "libpthread not found!" "$LINENO" 5
+ fi
+ 
++        DLL_LIBS="$DLL_LIBS -lOpenSLES"
++        LIBS="$LIBS -lOpenSLES"
++        OTHER_OBJS="$OTHER_OBJS pa_opensles.o"
++        $as_echo "#define PA_USE_OPENSLES 1" >>confdefs.h
++        $as_echo "#define PaUtil_AllocateMemory PaUtil_AllocateZeroInitializedMemory" >>confdefs.h
++        $as_echo "#define PaUtil_GroupAllocateMemory PaUtil_GroupAllocateZeroInitializedMemory" >>confdefs.h
+ 
+         if [ "$have_alsa" = "yes" ] && [ "$with_alsa" != "no" ] ; then
+            DLL_LIBS="$DLL_LIBS -lasound"
++++ ./src/os/unix/pa_unix_hostapis.c
+@@ -51,6 +51,7 @@
+ PaError PaAsiHpi_Initialize( PaUtilHostApiRepresentation **hostApi, PaHostApiIndex index );
+ PaError PaMacCore_Initialize( PaUtilHostApiRepresentation **hostApi, PaHostApiIndex index );
+ PaError PaSkeleton_Initialize( PaUtilHostApiRepresentation **hostApi, PaHostApiIndex index );
++PaError PaOpenSLES_Initialize( PaUtilHostApiRepresentation **hostApi, PaHostApiIndex index );
+ 
+ /** Note that on Linux, ALSA is placed before OSS so that the former is preferred over the latter.
+  */
+@@ -58,6 +59,7 @@
+ PaUtilHostApiInitializer *paHostApiInitializers[] =
+     {
+ #ifdef __linux__
++        PaOpenSLES_Initialize,
+ 
+ #if PA_USE_ALSA
+         PaAlsa_Initialize,
