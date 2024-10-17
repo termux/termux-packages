@@ -1,48 +1,44 @@
---- a/svr-chansession.c
-+++ b/svr-chansession.c
-@@ -611,7 +611,11 @@ static int sessionpty(struct ChanSess *
++++ ./src/svr-chansession.c
+@@ -611,7 +611,7 @@
  		dropbear_exit("Out of memory"); /* TODO disconnect */
  	}
  
-+#ifdef __ANDROID__
+-	pw = getpwnam(ses.authstate.pw_name);
 +	pw = getpwuid(getuid());
-+#else
- 	pw = getpwnam(ses.authstate.pw_name);
-+#endif
  	if (!pw)
  		dropbear_exit("getpwnam failed after succeeding previously");
  	pty_setowner(pw, chansess->tty);
-@@ -919,6 +923,8 @@
+@@ -968,6 +968,8 @@
  #endif
  
  	/* clear environment if -e was not set */
 +	/* termux: do not clear environment on android */
-+#ifndef __ANDROID__
++#if 0
  	/* if we're debugging using valgrind etc, we need to keep the LD_PRELOAD
  	 * etc. This is hazardous, so should only be used for debugging. */
  	if ( !svr_opts.pass_on_env) {
-@@ -980,6 +986,7 @@ static void execchild(const void *user_d
+@@ -982,6 +984,7 @@
  #endif /* HAVE_CLEARENV */
  #endif /* DEBUG_VALGRIND */
  	}
-+#endif /* __ANDROID__ */
++#endif /* 0 */
  
  #if DROPBEAR_SVR_MULTIUSER
  	/* We can only change uid/gid as root ... */
-@@ -1007,6 +1014,8 @@ static void execchild(const void *user_d
+@@ -1009,6 +1012,8 @@
  	}
  #endif
  
 +	/* termux: do not modify environment since we did not clean it */
-+#ifndef __ANDROID__
++#if 0
  	/* set env vars */
  	addnewvar("USER", ses.authstate.pw_name);
  	addnewvar("LOGNAME", ses.authstate.pw_name);
-@@ -1017,6 +1026,7 @@ static void execchild(const void *user_d
+@@ -1019,6 +1024,7 @@
  	} else {
  		addnewvar("PATH", DEFAULT_PATH);
  	}
-+#endif /* __ANDROID__ */
++#endif /* 0 */
  	if (cp != NULL) {
  		addnewvar("LANG", cp);
  		m_free(cp);
