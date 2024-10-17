@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL=https://github.com/lxde/lxmenu-data/archive/refs/tags/${TERMUX
 TERMUX_PKG_SHA256=b237e732609fb2a521a942e08bb825ac7973ee478db7567d3606665a3793b2e8
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 
 termux_step_pre_configure() {
 	./autogen.sh
