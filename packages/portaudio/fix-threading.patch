@@ -1,0 +1,27 @@
++++ ./src/os/unix/pa_unix_util.h
+@@ -153,6 +153,7 @@
+     pthread_cond_t cond;
+     PaUtilClockId condClockId;
+     volatile sig_atomic_t stopRequest;
++    int stopped;
+ } PaUnixThread;
+ 
+ /** Initialize global threading state.
++++ ./src/os/unix/pa_unix_util.c
+@@ -424,6 +424,8 @@
+     {
+         *exitResult = paNoError;
+     }
++    if (self->stopped)
++		return paNoError;
+ #if 0
+     if( watchdogExitResult )
+         *watchdogExitResult = paNoError;
+@@ -473,6 +475,7 @@
+ error:
+     PA_ASSERT_CALL( PaUnixMutex_Terminate( &self->mtx ), paNoError );
+     PA_ASSERT_CALL( pthread_cond_destroy( &self->cond ), 0 );
++    self->stopped = 1;
+ 
+     return result;
+ }
