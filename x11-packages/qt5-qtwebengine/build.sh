@@ -7,6 +7,7 @@ TERMUX_PKG_VERSION="5.15.17"
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/qt/qtwebengine
 TERMUX_PKG_GIT_BRANCH=v$TERMUX_PKG_VERSION-lts
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="dbus, fontconfig, libc++, libexpat, libjpeg-turbo, libminizip, libnspr, libnss, libpng, libsnappy, libvpx, libwebp, libx11, libxkbfile, qt5-qtbase, qt5-qtdeclarative, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libdrm, qt5-qtbase-cross-tools, qt5-qtdeclarative-cross-tools"
 TERMUX_PKG_NO_STATICSPLIT=true
