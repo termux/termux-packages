@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="bionic libc, libm, libdl and dynamic linker for ubuntu h
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="8.0.0-r51"
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_SHA256=6b42a86fc2ec58f86862a8f09a5465af0758ce24f2ca8c3cabb3bb6a81d96525
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -60,7 +60,7 @@ termux_step_get_source() {
 	cd ${TERMUX_PKG_SRCDIR}
 
 	cp -f ${TERMUX_PKG_BUILDER_DIR}/LICENSE.txt ${TERMUX_PKG_SRCDIR}/LICENSE.txt
-	
+
 	for i in libtinfo5 libncurses5 openssh-client; do
 		local URL="$(obtain_deb_url $i)"
 		wget "$URL" -O ${TERMUX_PKG_CACHEDIR}/${URL##*/}
@@ -72,9 +72,14 @@ termux_step_get_source() {
 
 	termux_download https://storage.googleapis.com/git-repo-downloads/repo ${TERMUX_PKG_CACHEDIR}/repo SKIP_CHECKSUM
 	chmod +x ${TERMUX_PKG_CACHEDIR}/repo
+
+	# Repo requires us to have a Git user name and email set.
+	# The GitHub workflow does this, but the local build container doesn't
+	[[ "$(git config --get user.name)" != '' ]] || git config --global user.name "Termux Github Actions"
+	[[ "$(git config --get user.email)" != '' ]] || git config --global user.email "contact@termux.dev"
 	${TERMUX_PKG_CACHEDIR}/repo init \
 		-u https://android.googlesource.com/platform/manifest \
-		-b main -m ${TERMUX_PKG_BUILDER_DIR}/default.xml
+		-b main -m ${TERMUX_PKG_BUILDER_DIR}/default.xml <<< 'n'
 	${TERMUX_PKG_CACHEDIR}/repo sync -c -j32
 
 	sed -i '1s|.*|\#!'${TERMUX_PKG_SRCDIR}'/prebuilts/python/linux-x86/2.7.5/bin/python2|' ${TERMUX_PKG_SRCDIR}/bionic/libc/fs_config_generator.py
