@@ -79,10 +79,11 @@
  	return 0;
 --- a/libs/pbd/pthread_utils.cc
 +++ b/libs/pbd/pthread_utils.cc
-@@ -84,9 +84,26 @@
+@@ -171,10 +171,24 @@
+ 		, name (s)
  	{}
  };
- 
+-
 +#ifdef __ANDROID__
 +static void
 +thread_signal_handler (int signum)
@@ -90,7 +91,6 @@
 +	pthread_exit (0);
 +}
 +#endif
-+
  static void*
  fake_thread_start (void* arg)
  {
@@ -102,30 +102,30 @@
 +	actions.sa_handler = thread_signal_handler;
 +	sigaction (SIGUSR2, &actions, NULL);
 +#endif
-+
  	ThreadStartWithName* ts      = (ThreadStartWithName*)arg;
  	void* (*thread_work) (void*) = ts->thread_work;
  	void* thread_arg             = ts->arg;
-@@ -188,7 +205,11 @@
- 		++nxt;
- 
- 		if (!pthread_equal ((*i), pthread_self ())) {
-+#ifndef __ANDROID__
- 			pthread_cancel ((*i));
-+#else
-+			pthread_kill ((*i), SIGUSR2);
-+#endif
+@@ -281,7 +295,11 @@
+ 			continue;
  		}
- 
- 		i = nxt;
-@@ -208,7 +229,11 @@
+ 		DEBUG_TRACE (PBD::DEBUG::Threads, string_compose ("Cancel: '%1'\n", t.second));
++#ifndef __ANDROID__
+ 		pthread_cancel (t.first);
++#else
++		pthread_kill ((t.first), SIGUSR2);
++#endif
+ 	}
+ 	all_threads.clear ();
+ 	pthread_mutex_unlock (&thread_map_lock);
+@@ -297,8 +315,11 @@
+ 			break;
  		}
  	}
- 
+-
 +#ifndef __ANDROID__
  	pthread_cancel (thread);
 +#else
-+	pthread_kill (thread, SIGUSR2);
++	pthread_kill ((thread), SIGUSR2);
 +#endif
  	pthread_mutex_unlock (&thread_map_lock);
  }
