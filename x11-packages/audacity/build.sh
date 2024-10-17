@@ -2,46 +2,116 @@ TERMUX_PKG_HOMEPAGE=https://www.audacityteam.org/
 TERMUX_PKG_DESCRIPTION="An easy-to-use, multi-track audio editor and recorder"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-# Version 3.0.0 or higher does not work with vanilla wxWidgets.
-TERMUX_PKG_VERSION=2.4.2
-TERMUX_PKG_REVISION=9
-_FFMPEG_VERSION=4.4.3
+TERMUX_PKG_VERSION=3.6.4
+_FFMPEG_VERSION=6.1.1
 TERMUX_PKG_SRCURL=(https://github.com/audacity/audacity/archive/Audacity-${TERMUX_PKG_VERSION}.tar.gz
                    https://www.ffmpeg.org/releases/ffmpeg-${_FFMPEG_VERSION}.tar.xz)
-TERMUX_PKG_SHA256=(cdb4800c8e9d1d4ca19964caf8d24000f80286ebd8a4db566c2622449744c099
-                   6c5b6c195e61534766a0b5fe16acc919170c883362612816d0a1c7f4f947006e)
-TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libc++, libexpat, libflac, libmp3lame, libogg, libsndfile, libsoundtouch, libsoxr, libvorbis, wxwidgets"
+TERMUX_PKG_SHA256=(e7d82eaae65081a1118a899751ff50ddf76a1cc0f056882eeaffcedb86c12aec
+                   8684f4b00f94b85461884c3719382f1261f0d9eb3d59640a1f4ac0873616f968)
+TERMUX_PKG_DEPENDS="zlib, libpng, libjpeg-turbo, libjpeg-turbo-static, libexpat, wxwidgets, libmp3lame, mpg123, libid3tag, libwavpack, libogg, libflac, libopus, opusfile, libvorbis, libsndfile, portmidi, portaudio, rapidjson, libuuid"
 # Support for FFmpeg 5.0 is not backported:
 # https://github.com/audacity/audacity/issues/2445
 TERMUX_PKG_SUGGESTS="audacity-ffmpeg"
+TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DCMAKE_STRIP=llvm-strip
+-Daudacity_conan_enabled=off
+-Daudacity_has_vst3=no
+-Daudacity_has_tests=no
+-Daudacity_has_networking=no
+-Daudacity_has_crashreports=no
+-Daudacity_has_sentry_reporting=no
+-Daudacity_has_updates_check=no
 -Daudacity_use_wxwidgets=system
 -Daudacity_use_expat=system
 -Daudacity_use_lame=system
--Daudacity_use_sndfile=system
 -Daudacity_use_soxr=system
--Daudacity_use_portaudio=local
+-Daudacity_use_portaudio=system
 -Daudacity_use_ffmpeg=loaded
--Daudacity_use_id3tag=off
--Daudacity_use_mad=off
 -Daudacity_use_nyquist=local
 -Daudacity_use_vamp=off
--Daudacity_use_ogg=system
--Daudacity_use_vorbis=system
--Daudacity_use_flac=system
 -Daudacity_use_lv2=off
--Daudacity_use_midi=off
+-Daudacity_use_midi=system
 -Daudacity_use_portmixer=local
--Daudacity_use_portsmf=off
+-Daudacity_use_portsmf=local
 -Daudacity_use_sbsms=off
 -Daudacity_use_soundtouch=system
 -Daudacity_use_twolame=off
+-DUSE_MIDI=OFF
 "
 TERMUX_PKG_RM_AFTER_INSTALL="
 opt/audacity/include
 opt/audacity/lib/pkgconfig
 opt/audacity/share
 "
+
+# Function to obtain the .deb URL
+obtain_deb_url() {
+	local url="https://packages.ubuntu.com/noble/amd64/$1/download"
+	local retries=5
+	local wait=5
+	local attempt
+	local deb_url
+
+	for ((attempt=1; attempt<=retries; attempt++)); do
+		local PAGE="$(curl -s "$url")"
+		>&2 echo page
+		>&2 echo "$PAGE"
+		if deb_url=$(echo "$PAGE" | grep -Eo 'http://.*\.deb' | head -n 1); then
+			if [[ -n "$deb_url" ]]; then
+				echo "$deb_url"
+				return 0
+			else
+				# deb_url is empty or server answered with `internal server error`, retry
+				>&2 echo "Attempt $attempt: Received empty URL or server answered with `Internal server error` page. Retrying in $wait seconds..."
+			fi
+		else
+			# The command failed, retry
+			>&2 echo "Attempt $attempt: Command failed. Retrying in $wait seconds..."
+		fi
+		sleep "$wait"
+	done
+
+	# Failed after retries, output error to stderr and exit with code 1
+	>&2 echo "Failed to obtain URL after $retries attempts."
+	exit 1
+}
+
+termux_step_host_build() {
+	termux_setup_cmake
+	termux_setup_ninja
+	
+	( # Running build in a subshell to avoid variable mess
+		# We must build the `image-compiler` for building.
+		# See https://github.com/audacity/audacity/blob/Audacity-3.6.4/BUILDING.md#selecting-target-architecture-on-macos
+		_PREFIX="$TERMUX_PKG_HOSTBUILD_DIR/prefix"
+
+		# Building both gtk2.0 and alsa only for building host-side tool seems to be excessive.
+		# Let's download them from ubuntu repos.
+		# To avoid messing with `apt update` and `apt download` we will get download links directly from ubuntu servers.
+		mkdir "$_PREFIX"
+		for i in libgtk2.0-0t64 libgtk2.0-dev libasound2-dev; do
+			wget "$(obtain_deb_url $i)" -O "$TERMUX_PKG_HOSTBUILD_DIR/tmp.deb"
+			dpkg-deb -R "$TERMUX_PKG_HOSTBUILD_DIR/tmp.deb" "$TERMUX_PKG_HOSTBUILD_DIR/tmp"
+			cp -rf "$TERMUX_PKG_HOSTBUILD_DIR"/tmp/* "$_PREFIX"
+			rm -rf "$TERMUX_PKG_HOSTBUILD_DIR/tmp.deb" "$TERMUX_PKG_HOSTBUILD_DIR/tmp"
+			unset _URL
+		done
+
+		for i in "$_PREFIX"/usr/lib/x86_64-linux-gnu/pkgconfig/*.pc; do
+			# patch pkg-config files to match new prefix
+			sed -i '/^prefix=/c\prefix='"$_PREFIX/usr" "$i"
+		done
+
+		# Also we should import pkg-config configuration files from the packages we imported from ubuntu repos
+		export PKG_CONFIG_LIBDIR="/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/share/pkgconfig"
+		PKG_CONFIG_LIBDIR+=":$_PREFIX/usr/lib/x86_64-linux-gnu/pkgconfig"
+		export CFLAGS="-I$_PREFIX/usr/include"
+		export LDFLAGS="-Wl,-rpath,$_PREFIX/usr/lib/x86_64-linux-gnu"
+		cmake -GNinja -B "$TERMUX_PKG_HOSTBUILD_DIR" -S "$TERMUX_PKG_SRCDIR" -DCMAKE_BUILD_TYPE=Release
+		ninja -C "$TERMUX_PKG_HOSTBUILD_DIR" image-compiler
+	)
+}
 
 termux_step_pre_configure() {
 	local _FFMPEG_PREFIX=${TERMUX_PREFIX}/opt/${TERMUX_PKG_NAME}
@@ -88,6 +158,12 @@ termux_step_pre_configure() {
 	CPPFLAGS="-I${_FFMPEG_PREFIX}/include ${CPPFLAGS}"
 
 	CPPFLAGS+=" -Dushort=u_short -Dulong=u_long"
+	CXXFLAGS+=" -std=c++17"
+	# Adding `image-compiler` we built in host_build step
+	export PATH="$TERMUX_PKG_HOSTBUILD_DIR/Release/bin:$PATH"
+	LDFLAGS+=" -Wl,-rpath=$TERMUX_PREFIX/lib/audacity"
+	# For some reason `image-compiler` fails to find it's libraries in our custom prefix, let's help it.
+	export LD_LIBRARY_PATH="$TERMUX_PKG_HOSTBUILD_DIR/prefix/usr/lib/x86_64-linux-gnu"
 }
 
 termux_step_post_make_install() {
@@ -115,9 +191,7 @@ termux_step_create_debscripts() {
 		#!$TERMUX_PREFIX/bin/sh
 		echo
 		echo "********"
-		echo "Audacity in this particular package does not (yet) support audio devices."
-		echo
-		echo "https://github.com/termux/termux-packages/issues/10412"
+		echo "Audacity can not use microphone until you grant microphone access to Termux:API."
 		echo "********"
 		echo
 	EOF
