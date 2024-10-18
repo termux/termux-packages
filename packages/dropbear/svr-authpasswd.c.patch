@@ -1,7 +1,9 @@
-diff -u -r ../dropbear-2019.77/svr-authpasswd.c ./svr-authpasswd.c
---- ../dropbear-2019.77/svr-authpasswd.c	2019-03-23 13:46:29.000000000 +0000
-+++ ./svr-authpasswd.c	2019-03-24 22:40:59.586161245 +0000
-@@ -33,28 +33,13 @@
++++ ./src/svr-authpasswd.c
+@@ -30,28 +30,14 @@
+ #include "dbutil.h"
+ #include "auth.h"
+ #include "runopts.h"
++#include <termux-auth.h>
  
  #if DROPBEAR_SVR_PASSWORD_AUTH
  
@@ -17,35 +19,29 @@ diff -u -r ../dropbear-2019.77/svr-authpasswd.c ./svr-authpasswd.c
 -
 -	return constant_time_memcmp(a, b, la);
 -}
-+#include <termux-auth.h>
- 
+-
  /* Process a password auth request, sending success or failure messages as
   * appropriate */
  void svr_auth_password(int valid_user) {
--	
+ 	
 -	char * passwdcrypt = NULL; /* the crypt from /etc/passwd or /etc/shadow */
 -	char * testcrypt = NULL; /* crypt generated from the user's password sent */
--	char * password = NULL;
--	unsigned int passwordlen;
--	unsigned int changepw;
-+	char *password;
-+	unsigned int changepw, passwordlen;
- 
- 	/* check if client wants to change password */
- 	changepw = buf_getbool(ses.payload);
-@@ -65,6 +50,7 @@
+ 	char * password = NULL;
+ 	unsigned int passwordlen;
+ 	unsigned int changepw;
+@@ -65,6 +51,7 @@
  	}
  
  	password = buf_getstring(ses.payload, &passwordlen);
-+#ifndef __ANDROID__
++#if 0
  	if (valid_user && passwordlen <= DROPBEAR_MAX_PASSWORD_LEN) {
  		/* the first bytes of passwdcrypt are the salt */
  		passwdcrypt = ses.authstate.pw_passwd;
-@@ -106,6 +92,15 @@
+@@ -106,6 +93,15 @@
  	}
  
  	if (constant_time_strcmp(testcrypt, passwdcrypt) == 0) {
-+#else /* __ANDROID__ */
++#else
 +	/* check if password is valid */
 +	if (termux_auth(ses.authstate.pw_name, password)) {
 +		if (!ses.authstate.pw_name) {
@@ -53,7 +49,7 @@ diff -u -r ../dropbear-2019.77/svr-authpasswd.c ./svr-authpasswd.c
 +			send_msg_userauth_failure(0, 1);
 +			return;
 +		}
-+#endif /* __ANDROID__ */
++#endif
  		if (svr_opts.multiauthmethod && (ses.authstate.authtypes & ~AUTH_TYPE_PASSWORD)) {
  			/* successful password authentication, but extra auth required */
  			dropbear_log(LOG_NOTICE,

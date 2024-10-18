@@ -1,0 +1,33 @@
++++ ./src/svr-session.c
+@@ -41,6 +41,7 @@
+ #include "runopts.h"
+ #include "crypto_desc.h"
+ #include "fuzz.h"
++#include <android/log.h>
+ 
+ static void svr_remoteclosed(void);
+ static void svr_algos_initialise(void);
+@@ -312,7 +313,14 @@
+ 
+ /* priority is priority as with syslog() */
+ void svr_dropbear_log(int priority, const char* format, va_list param) {
+-
++#if 1
++	int prio = ANDROID_LOG_DEBUG;
++	switch(priority) {
++		case LOG_NOTICE: prio = ANDROID_LOG_VERBOSE; break;
++		case LOG_INFO: prio = ANDROID_LOG_INFO; break;
++	}
++	__android_log_vprint(prio, "dropbear", format, param);
++#else
+ 	char printbuf[1024];
+ 	char datestr[20];
+ 	time_t timesec;
+@@ -345,6 +353,7 @@
+ 		}
+ 		fprintf(stderr, "[%d] %s %s\n", getpid(), datestr, printbuf);
+ 	}
++#endif
+ }
+ 
+ /* called when the remote side closes the connection */

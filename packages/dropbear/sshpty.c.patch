@@ -1,28 +1,39 @@
-diff -uNr dropbear-2018.76/sshpty.c dropbear-2018.76.mod/sshpty.c
---- dropbear-2018.76/sshpty.c	2018-02-27 16:25:12.000000000 +0200
-+++ dropbear-2018.76.mod/sshpty.c	2018-04-21 13:45:06.703730641 +0300
-@@ -22,6 +22,10 @@
++++ ./src/sshpty.c
+@@ -21,6 +21,7 @@
+ #include "dbutil.h"
  #include "errno.h"
  #include "sshpty.h"
- 
-+#ifdef __ANDROID__
 +# define USE_DEV_PTMX 1
-+#endif
-+
+ 
  /* Pty allocated with _getpty gets broken if we do I_PUSH:es to it. */
  #if defined(HAVE__GETPTY) || defined(HAVE_OPENPTY)
- #undef HAVE_DEV_PTMX
-@@ -380,6 +384,7 @@
- 				tty_name, strerror(errno));
+@@ -247,6 +248,7 @@
+ void
+ pty_release(const char *tty_name)
+ {
++#if 0
+ 	if (chown(tty_name, (uid_t) 0, (gid_t) 0) < 0
+ 			&& (errno != ENOENT)) {
+ 		dropbear_log(LOG_ERR,
+@@ -257,6 +259,7 @@
+ 		dropbear_log(LOG_ERR,
+ 			"chmod %.100s 0666 failed: %.100s", tty_name, strerror(errno));
  	}
++#endif
+ }
  
-+	/*
- 	if (st.st_uid != pw->pw_uid || st.st_gid != gid) {
- 		if (chown(tty_name, pw->pw_uid, gid) < 0) {
- 			if (errno == EROFS &&
-@@ -409,4 +414,5 @@
+ /* Makes the tty the processes controlling tty and sets it to sane modes. */
+@@ -355,6 +358,7 @@
+ void
+ pty_setowner(struct passwd *pw, const char *tty_name)
+ {
++#if 0
+ 	struct group *grp;
+ 	gid_t gid;
+ 	mode_t mode;
+@@ -411,4 +415,5 @@
  			}
  		}
  	}
-+	*/
++#endif 0
  }

@@ -1,7 +1,5 @@
-diff -uNr dropbear-2018.76/gensignkey.c dropbear-2018.76.mod/gensignkey.c
---- dropbear-2018.76/gensignkey.c	2018-02-27 16:25:10.000000000 +0200
-+++ dropbear-2018.76.mod/gensignkey.c	2018-04-21 13:45:22.973731479 +0300
-@@ -140,6 +140,16 @@
++++ ./src/gensignkey.c
+@@ -157,6 +157,16 @@
  		goto out;
  	}
  
@@ -18,11 +16,11 @@ diff -uNr dropbear-2018.76/gensignkey.c dropbear-2018.76.mod/gensignkey.c
  	if (link(fn_temp, filename) < 0) {
  		/* If generating keys on connection (skipexist) it's OK to get EEXIST 
  		- we probably just lost a race with another connection to generate the key */
-@@ -151,6 +161,7 @@
+@@ -174,6 +184,7 @@
  			goto out;
  		}
  	}
 +#endif
  
- out:
- 	if (buf) {
+ 	/* ensure directory update is flushed to disk, otherwise we can end up
+ 	with zero-byte hostkey files if the power goes off */

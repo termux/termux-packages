@@ -1,7 +1,14 @@
-diff -uNr dropbear-2018.76/compat.c dropbear-2018.76.mod/compat.c
---- dropbear-2018.76/compat.c	2018-02-27 16:25:10.000000000 +0200
-+++ dropbear-2018.76.mod/compat.c	2018-04-21 13:47:36.443738351 +0300
-@@ -244,7 +244,7 @@
++++ ./src/compat.c
+@@ -172,7 +172,7 @@
+ 		return -1;
+ 
+ 	if (!nochdir)
+-		(void)chdir("/");
++		(void)chdir("@TERMUX_PREFIX");
+ 
+ 	if (!noclose && (fd = open(DROPBEAR_PATH_DEVNULL, O_RDWR, 0)) != -1) {
+ 		(void)dup2(fd, STDIN_FILENO);
+@@ -243,7 +243,7 @@
  	if (strings != NULL)
  		free(strings);
  	strings = NULL;
