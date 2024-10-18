@@ -23,6 +23,10 @@ termux_setup_gir() {
 		args="${args// -Dwith_vapi=true / -Dwith_vapi=false }"
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS="$args"
 	fi
+	
+	if [ "${TERMUX_PKG_VERSIONED_GIR-true}" = "false" ]; then
+		local TERMUX_PKG_VERSION=.
+	fi
 
 	# Used by gi-cross-launcher:
 	export TERMUX_PKG_GIR_PRE_GENERATED_DUMP_DIR="$TERMUX_PKG_BUILDER_DIR/gir/${TERMUX_PKG_VERSION##*:}"

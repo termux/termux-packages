@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=6a24b762d3e1086dcffd002c68cb5ca3a33a5c6d
 _COMMIT_DATE=20230415
 TERMUX_PKG_VERSION=1:0.9.27-p${_COMMIT_DATE}
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=git+https://repo.or.cz/tinycc.git
 TERMUX_PKG_SHA256=467792219d0172f594ec71bcd6bac9dbb25308cbe9f708bab455b717148b491b
 TERMUX_PKG_GIT_BRANCH=mob
@@ -76,7 +76,7 @@ termux_step_make() {
 			--prefix="/tmp/tcc.host" \
 			--cpu="${TERMUX_ARCH}" \
 			--sysincludepaths="${sysinc}"
-		make -j $TERMUX_MAKE_PROCESSES tcc
+		make -j $TERMUX_PKG_MAKE_PROCESSES tcc
 		mv -f tcc tcc.host
 		make distclean
 	)
@@ -94,10 +94,10 @@ termux_step_make() {
 
 	mv tcc.host tcc
 	touch -d "next minute" tcc
-	make -j ${TERMUX_MAKE_PROCESSES} libtcc1.a
+	make -j ${TERMUX_PKG_MAKE_PROCESSES} libtcc1.a
 
 	rm -f tcc
-	make -j ${TERMUX_MAKE_PROCESSES} tcc
+	make -j ${TERMUX_PKG_MAKE_PROCESSES} tcc
 }
 
 termux_step_post_make_install() {

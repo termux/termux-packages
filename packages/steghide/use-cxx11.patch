@@ -1,0 +1,45 @@
+error: no template named 'unary_function' in namespace 'std'
+
+--- a/configure.in
++++ b/configure.in
+@@ -22,14 +22,14 @@
+ 	then
+ 		AC_MSG_RESULT([yes])
+ 		AC_DEFINE(DEBUG,1,[enable code used only for debugging])
+-		CXXFLAGS="-O2 -Wall -g"
++		CXXFLAGS="-std=c++11 -O2 -Wall -g"
+ 	else
+ 		AC_MSG_RESULT([no])
+-		CXXFLAGS="-O2 -Wall"
++		CXXFLAGS="-std=c++11 -O2 -Wall"
+ 	fi
+ 	,
+ 	AC_MSG_RESULT([no])
+-	CXXFLAGS="-O2 -Wall"
++	CXXFLAGS="-std=c++11 -O2 -Wall"
+ )
+ 
+ dnl check if randomness should be disabled
+--- a/configure
++++ b/configure
+@@ -7560,17 +7560,17 @@
+ #define DEBUG 1
+ _ACEOF
+ 
+-		CXXFLAGS="-O2 -Wall -g"
++		CXXFLAGS="-std=c++11 -O2 -Wall -g"
+ 	else
+ 		echo "$as_me:$LINENO: result: no" >&5
+ echo "${ECHO_T}no" >&6
+-		CXXFLAGS="-O2 -Wall"
++		CXXFLAGS="-std=c++11 -O2 -Wall"
+ 	fi
+ 
+ else
+   echo "$as_me:$LINENO: result: no" >&5
+ echo "${ECHO_T}no" >&6
+-	CXXFLAGS="-O2 -Wall"
++	CXXFLAGS="-std=c++11 -O2 -Wall"
+ 
+ fi;
+ 

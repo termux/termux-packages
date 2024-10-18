@@ -38,7 +38,7 @@ termux_step_host_build() {
 	pushd mpfr
 	$TERMUX_PKG_SRCDIR/.src/mpfr/configure \
 		--prefix="${_PREFIX_FOR_BUILD}"
-	make -j "${TERMUX_MAKE_PROCESSES}"
+	make -j "${TERMUX_PKG_MAKE_PROCESSES}"
 	make install
 	popd # mpfr
 
@@ -47,7 +47,7 @@ termux_step_host_build() {
 	$TERMUX_PKG_SRCDIR/.src/mpc/configure \
 		--prefix="${_PREFIX_FOR_BUILD}" \
 		--with-mpfr="${_PREFIX_FOR_BUILD}"
-	make -j "${TERMUX_MAKE_PROCESSES}"
+	make -j "${TERMUX_PKG_MAKE_PROCESSES}"
 	make install
 	popd # mpc
 
@@ -65,7 +65,7 @@ termux_step_host_build() {
 		$TERMUX_PKG_SRCDIR/.src/binutils/configure \
 			--prefix="${_PREFIX_FOR_BUILD}" \
 			--target="${target}"
-		make -j "${TERMUX_MAKE_PROCESSES}"
+		make -j "${TERMUX_PKG_MAKE_PROCESSES}"
 		make install
 		popd # binutils
 
@@ -79,7 +79,7 @@ termux_step_host_build() {
 			--with-mpfr="${_PREFIX_FOR_BUILD}" \
 			--with-mpc="${_PREFIX_FOR_BUILD}" \
 			--enable-languages=c,c++
-		make -j "${TERMUX_MAKE_PROCESSES}"
+		make -j "${TERMUX_PKG_MAKE_PROCESSES}"
 		make install
 		popd # gcc
 

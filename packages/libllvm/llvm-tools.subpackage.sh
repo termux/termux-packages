@@ -12,7 +12,7 @@ bin/yaml2obj
 share/man/man1/FileCheck.1.gz
 "
 TERMUX_SUBPKG_DESCRIPTION="LLVM Development Tools"
-TERMUX_SUBPKG_DEPEND_ON_PARENT=no
+TERMUX_SUBPKG_DEPEND_ON_PARENT=false
 TERMUX_SUBPKG_DEPENDS="libc++, ncurses, zlib, zstd"
 TERMUX_SUBPKG_BREAKS="libllvm (<< 16.0.0)"
 TERMUX_SUBPKG_REPLACES="libllvm (<< 16.0.0)"

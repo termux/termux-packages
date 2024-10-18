@@ -6,6 +6,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="8.6.14"
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/tcl/Tcl/${TERMUX_PKG_VERSION}/tcl${TERMUX_PKG_VERSION}-src.tar.gz
 TERMUX_PKG_SHA256=5880225babf7954c58d4fb0f5cf6279104ce1cd6aa9b71e9a6322540e1c4de66
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="zlib"
 TERMUX_PKG_BREAKS="tcl-dev, tcl-static"
 TERMUX_PKG_REPLACES="tcl-dev, tcl-static"

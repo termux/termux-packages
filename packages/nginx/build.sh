@@ -2,9 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://www.nginx.org
 TERMUX_PKG_DESCRIPTION="Lightweight HTTP server"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.27.0"
+TERMUX_PKG_VERSION="1.27.2"
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://nginx.org/download/nginx-$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=b7230e3cf87eaa2d4b0bc56aadc920a960c7873b9991a1b66ffcc08fc650129c
+TERMUX_PKG_SHA256=a91ecfc3a0b3a2c1413afca627bd886d76e0414b81cad0fb7872a9655a1b25fa
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libandroid-glob, libcrypt, pcre2, openssl, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -29,6 +30,9 @@ termux_step_pre_configure() {
 
 	CPPFLAGS="$CPPFLAGS -DIOV_MAX=1024"
 	LDFLAGS="$LDFLAGS -landroid-glob"
+
+	# for cpu_set_t
+	CPPFLAGS+=" -D__USE_GNU=1"
 
 	# remove config from previous installs
 	rm -rf "$TERMUX_PREFIX/etc/nginx"
@@ -61,8 +65,10 @@ termux_step_configure() {
 		--with-http_auth_request_module \
 		--with-http_ssl_module \
 		--with-http_v2_module \
+		--with-http_v3_module \
 		--with-http_gunzip_module \
 		--with-http_sub_module \
+		--with-http_dav_module \
 		--with-stream \
 		--with-stream_ssl_module \
 		$DEBUG_FLAG

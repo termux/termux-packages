@@ -16,6 +16,6 @@ bin/strip
 share/binutils/
 "
 TERMUX_SUBPKG_DESCRIPTION="GNU Binutils (metapackage)"
-TERMUX_SUBPKG_DEPEND_ON_PARENT=no
+TERMUX_SUBPKG_DEPEND_ON_PARENT=false
 TERMUX_SUBPKG_DEPENDS="binutils-bin"
 TERMUX_SUBPKG_CONFLICTS="binutils-is-llvm"

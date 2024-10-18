@@ -5,12 +5,12 @@ TERMUX_PKG_MAINTAINER="@termux"
 # No update anymore. v1.11.x requires support of PAM.
 TERMUX_PKG_VERSION=(1.10.1
                     21.1.8)
-TERMUX_PKG_REVISION=40
+TERMUX_PKG_REVISION=41
 TERMUX_PKG_SRCURL=(https://github.com/TigerVNC/tigervnc/archive/v${TERMUX_PKG_VERSION}.tar.gz
                    https://xorg.freedesktop.org/releases/individual/xserver/xorg-server-${TERMUX_PKG_VERSION[1]}.tar.xz)
 TERMUX_PKG_SHA256=(19fcc80d7d35dd58115262e53cac87d8903180261d94c2a6b0c19224f50b58c4
                    38aadb735650c8024ee25211c190bf8aad844c5f59632761ab1ef4c4d5aeb152)
-TERMUX_PKG_DEPENDS="libandroid-shmem, libc++, libgnutls, libjpeg-turbo, libpixman, libx11, libxau, libxdamage, libxdmcp, libxext, libxfixes, libxfont2, opengl, openssl, perl, xkeyboard-config, xorg-xauth, xorg-xkbcomp, zlib"
+TERMUX_PKG_DEPENDS="libandroid-shmem, libc++, libgnutls, libjpeg-turbo, libpixman, libx11, libxau, libxdamage, libxdmcp, libxext, libxfixes, libxfont2, libxrandr, libxtst, opengl, openssl, perl, xkeyboard-config, xorg-xauth, xorg-xkbcomp, zlib"
 TERMUX_PKG_BUILD_DEPENDS="xorg-font-util, xorg-server-xvfb, xorg-util-macros, xorgproto, xtrans"
 TERMUX_PKG_SUGGESTS="aterm, xorg-twm"
 
@@ -20,14 +20,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DBUILD_VIEWER=OFF -DENABLE_NLS=OFF -DENABLE_PA
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_post_get_source() {
-	local p=tigervnc-xserver21-patch.patch
-	termux_download \
-		"https://github.com/TigerVNC/tigervnc/commit/0c5a2b2e7759c2829c07186cfce4d24aa9b5274e.patch" \
-		"$TERMUX_PKG_CACHEDIR/${p}" \
-		1fd6858fbc7c67aa3ab82347c5b9dc54e3bb7a9386f373a155acbaca5d8db3c6
-	echo "Applying ${p}"
-	cat "$TERMUX_PKG_CACHEDIR/${p}" | patch --silent -p1
-
 	## TigerVNC requires sources of X server (either Xorg or Xvfb).
 	cp -r xorg-server-${TERMUX_PKG_VERSION[1]}/* unix/xserver/
 
@@ -39,7 +31,7 @@ termux_step_post_get_source() {
 			| patch --silent -p1
 	done
 
-	patch -p1 -i ${TERMUX_PKG_SRCDIR}/unix/xserver21.1.1.patch
+	patch -p1 -i ${TERMUX_PKG_BUILDER_DIR}/xserver21.1.1.diff
 }
 
 termux_step_pre_configure() {
@@ -49,7 +41,11 @@ termux_step_pre_configure() {
 
 	CFLAGS="${CFLAGS/-Os/-Oz} -DFNDELAY=O_NDELAY -DINITARGS=void"
 	CPPFLAGS="${CPPFLAGS} -I${TERMUX_PREFIX}/include/libdrm"
-	LDFLAGS="${LDFLAGS} -llog $($CC -print-libgcc-file-name)"
+
+	local _libgcc_file="$($CC -print-libgcc-file-name)"
+	local _libgcc_path="$(dirname $_libgcc_file)"
+	local _libgcc_name="$(basename $_libgcc_file)"
+	LDFLAGS="${LDFLAGS} -llog -L$_libgcc_path -l:$_libgcc_name"
 
 	local xorg_server_xvfb_configure_args="$(. $TERMUX_SCRIPTDIR/x11-packages/xorg-server-xvfb/build.sh; echo $TERMUX_PKG_EXTRA_CONFIGURE_ARGS)"
 	./configure \
@@ -65,7 +61,7 @@ termux_step_pre_configure() {
 
 termux_step_post_make_install() {
 	cd ${TERMUX_PKG_BUILDDIR}/unix/xserver
-	make -j ${TERMUX_MAKE_PROCESSES}
+	make -j ${TERMUX_PKG_MAKE_PROCESSES}
 
 	cd ${TERMUX_PKG_BUILDDIR}/unix/xserver/hw/vnc
 	make install

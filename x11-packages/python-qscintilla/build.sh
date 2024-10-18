@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Align the version with `qscintilla` package.
 TERMUX_PKG_VERSION=2.14.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.riverbankcomputing.com/static/Downloads/QScintilla/${TERMUX_PKG_VERSION}/QScintilla_src-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=dfe13c6acc9d85dfcba76ccc8061e71a223957a6c02f3c343b30a9d43a4cdd4d
 TERMUX_PKG_DEPENDS="libc++, pyqt5, python, qscintilla (>= ${TERMUX_PKG_VERSION}), qt5-qtbase"
@@ -44,7 +45,7 @@ termux_step_pre_configure() {
 
 termux_step_make() {
 	python ${TERMUX_PYTHON_CROSSENV_PREFIX}/build/bin/sip-build \
-		--jobs ${TERMUX_MAKE_PROCESSES} \
+		--jobs ${TERMUX_PKG_MAKE_PROCESSES} \
 		${TERMUX_PKG_EXTRA_MAKE_ARGS}
 }
 

@@ -4,13 +4,13 @@ TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # When updating the package, also update terminfo for kitty by updating
 # ncurses' kitty sources in main repo
-TERMUX_PKG_VERSION="0.31.0"
+TERMUX_PKG_VERSION="0.36.4"
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/kovidgoyal/kitty/releases/download/v${TERMUX_PKG_VERSION}/kitty-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=d122497134abab8e25dfcb6b127af40cfe641980e007f696732f70ed298198f5
+TERMUX_PKG_SHA256=10ebf00a8576bca34ae683866c5be307a35f3c517906d6441923fd740db059bd
 # fontconfig is dlopen(3)ed:
 TERMUX_PKG_DEPENDS="dbus, fontconfig, harfbuzz, libpng, librsync, libx11, libxkbcommon, littlecms, ncurses, opengl, openssl, python, xxhash, zlib"
-TERMUX_PKG_BUILD_DEPENDS="libxcursor, libxi, libxinerama, libxrandr, xorgproto"
+TERMUX_PKG_BUILD_DEPENDS="libxcursor, libxi, libxinerama, libxrandr, simde, xorgproto"
 TERMUX_PKG_PYTHON_COMMON_DEPS="wheel"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
@@ -61,11 +61,11 @@ termux_step_host_build() {
 
 	pushd "xcb-proto-${xcb_proto_ver}"
 	./configure --prefix "${TERMUX_PKG_HOSTBUILD_DIR}"
-	make -j "${TERMUX_MAKE_PROCESSES}" install
+	make -j "${TERMUX_PKG_MAKE_PROCESSES}" install
 	popd
 	pushd "libxcb-${libxcb_ver}"
 	./configure --prefix "${TERMUX_PKG_HOSTBUILD_DIR}"
-	make -j "${TERMUX_MAKE_PROCESSES}" install
+	make -j "${TERMUX_PKG_MAKE_PROCESSES}" install
 	popd
 	pushd "libxkbcommon-xkbcommon-${libxkbcommon_ver}"
 	${TERMUX_MESON} \
@@ -76,11 +76,11 @@ termux_step_host_build() {
 		-Denable-docs=false
 	ninja \
 		-C ${TERMUX_PKG_HOSTBUILD_DIR}/build-xkbcommon \
-		-j "${TERMUX_MAKE_PROCESSES}" install
+		-j "${TERMUX_PKG_MAKE_PROCESSES}" install
 	popd
 	pushd "libX11-${libx11_ver}"
 	./configure --prefix "${TERMUX_PKG_HOSTBUILD_DIR}"
-	make -j "${TERMUX_MAKE_PROCESSES}" install
+	make -j "${TERMUX_PKG_MAKE_PROCESSES}" install
 	popd
 
 	pushd "${TERMUX_PKG_SRCDIR}"
@@ -90,6 +90,9 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
+	mkdir -p "$TERMUX_PKG_SRCDIR"/fonts
+	termux_download https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/NerdFontsSymbolsOnly/SymbolsNerdFontMono-Regular.ttf "$TERMUX_PKG_SRCDIR"/fonts/SymbolsNerdFontMono-Regular.ttf SKIP_CHECKSUM
+
 	termux_setup_golang
 	CFLAGS+=" $CPPFLAGS"
 
@@ -110,6 +113,9 @@ termux_step_make() {
 		--ignore-compiler-warnings \
 		--skip-code-generation \
 		--verbose
+
+	# Needs a new host build each time it's built:
+	rm -Rf $TERMUX_PKG_HOSTBUILD_DIR
 }
 
 termux_step_make_install() {

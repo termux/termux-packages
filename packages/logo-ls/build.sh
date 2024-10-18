@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://github.com/Yash-Handa/logo-ls
 TERMUX_PKG_DESCRIPTION="Modern ls command with vscode like File Icon and Git Integrations"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-_COMMIT=61ad1aaddb38ee9a2d004ff84e45f82747d9d41e
-TERMUX_PKG_VERSION="2024.05.26"
+_COMMIT=f8cd9997ebfad185d5668ed0403702540828199c
+TERMUX_PKG_VERSION="2024.07.17"
 TERMUX_PKG_SRCURL=git+https://github.com/canta2899/logo-ls
-TERMUX_PKG_SHA256=f1143f13f12df4c74167d4542105cbe2d9bb42429555f9ec31b63fd16e9146aa
+TERMUX_PKG_SHA256=b71da1a634f8e22f500cc37c99ae26d173f8b49a6bd3c1ee4dd49b21d30fdd66
 TERMUX_PKG_GIT_BRANCH="main"
 TERMUX_PKG_BUILD_IN_SRC=true
 
@@ -34,7 +34,7 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
-	go build -o logo-ls
+	go build -o logo-ls ./cmd/logo-ls
 }
 
 termux_step_make_install() {

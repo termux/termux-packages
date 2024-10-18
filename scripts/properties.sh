@@ -9,7 +9,7 @@ TERMUX_ANDROID_BUILD_TOOLS_VERSION=33.0.1
 # change TERMUX_PKG_VERSION (and remove TERMUX_PKG_REVISION if necessary) in:
 #   apksigner, d8
 # and trigger rebuild of them
-: "${TERMUX_NDK_VERSION_NUM:="26"}"
+: "${TERMUX_NDK_VERSION_NUM:="27"}"
 : "${TERMUX_NDK_REVISION:="b"}"
 TERMUX_NDK_VERSION=$TERMUX_NDK_VERSION_NUM$TERMUX_NDK_REVISION
 # when changing the above:
@@ -37,9 +37,14 @@ TERMUX_ANDROID_HOME="${TERMUX_BASE_DIR}/home"
 TERMUX_APPS_DIR="${TERMUX_BASE_DIR}/apps"
 TERMUX_PREFIX_CLASSICAL="${TERMUX_BASE_DIR}/usr"
 TERMUX_PREFIX="${TERMUX_PREFIX_CLASSICAL}"
+TERMUX_ETC_PREFIX_DIR_PATH="${TERMUX_PREFIX}/etc"
+TERMUX_PROFILE_D_PREFIX_DIR_PATH="${TERMUX_ETC_PREFIX_DIR_PATH}/profile.d"
+TERMUX_CONFIG_PREFIX_DIR_PATH="${TERMUX_ETC_PREFIX_DIR_PATH}/termux"
+TERMUX_BOOTSTRAP_CONFIG_DIR_PATH="${TERMUX_CONFIG_PREFIX_DIR_PATH}/bootstrap"
 
 # Path to CGCT tools
-export CGCT_DIR="/data/data/${TERMUX_APP_PACKAGE}/cgct"
+CGCT_DEFAULT_PREFIX="/data/data/com.termux/files/usr/glibc"
+export CGCT_DIR="/data/data/com.termux/cgct"
 
 # Package name for the packages hosted on the repo.
 # This must only equal TERMUX_APP_PACKAGE if using custom repo that

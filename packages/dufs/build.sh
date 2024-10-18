@@ -3,15 +3,15 @@ TERMUX_PKG_DESCRIPTION="A file server that supports static serving, uploading, s
 TERMUX_PKG_LICENSE="Apache-2.0,MIT"
 TERMUX_PKG_LICENSE_FILE="LICENSE-APACHE,LICENSE-MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.41.0"
+TERMUX_PKG_VERSION="0.42.0"
 TERMUX_PKG_SRCURL=https://github.com/sigoden/dufs/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=8c0549678a4954a498e0f1f99fe4beec2acd3cb0084fc611cf20431313b05033
+TERMUX_PKG_SHA256=76439a01c142d6a378912930de4b74821aa2fef54ccfb7dbb00d6ea3b1a0ab4c
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	termux_setup_rust
-	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
+	cargo build --jobs $TERMUX_PKG_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
 }
 
 termux_step_post_make_install() {

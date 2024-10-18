@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://taplo.tamasfe.dev/
 TERMUX_PKG_DESCRIPTION="A TOML LSP and toolkit"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
-TERMUX_PKG_VERSION='0.9.1'
+TERMUX_PKG_VERSION="0.9.3"
 TERMUX_PKG_SRCURL=https://github.com/tamasfe/taplo/archive/refs/tags/release-taplo-cli-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=6b00333260bd593f7eb2046c9d5f0fac48b5e673e9b064b23eccf240a86b33f7
+TERMUX_PKG_SHA256=5744a06a1e93128f5cb5409d5bf5e553915703ec0491df9f4c7ab31dbe430287
 TERMUX_PKG_BUILD_DEPENDS='openssl'
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
@@ -27,6 +27,11 @@ termux_pkg_auto_update() {
 		return
 	fi
 
+	# We want to avoid re-filtering the version.
+	# It's already cleaned up, so unset the regexp.
+	# See: https://github.com/termux/termux-packages/issues/20836
+	unset TERMUX_PKG_UPDATE_VERSION_REGEXP
+
 	termux_pkg_upgrade_version "${latest_version}"
 }
 
@@ -35,10 +40,9 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
-	cargo build --jobs "$TERMUX_MAKE_PROCESSES" \
+	cargo build --jobs "$TERMUX_PKG_MAKE_PROCESSES" \
 		--target "$CARGO_TARGET_NAME" \
 		--release \
-		--locked \
 		--all-features
 }
 

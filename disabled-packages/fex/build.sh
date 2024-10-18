@@ -32,7 +32,7 @@ termux_pkg_auto_update() {
 termux_step_pre_configure() {
 	LDFLAGS+=" -landroid-shmem"
 	find "${TERMUX_PKG_SRCDIR}" -name '*.h' -o -name '*.c' -o -name '*.cpp' | \
-		xargs -P"${TERMUX_MAKE_PROCESSES}" -n1 \
+		xargs -P"${TERMUX_PKG_MAKE_PROCESSES}" -n1 \
 		sed \
 			-e 's:"/data/local/tmp:"'${TERMUX_PREFIX}'/tmp:g' \
 			-e 's:"/tmp:"'${TERMUX_PREFIX}'/tmp:g' \

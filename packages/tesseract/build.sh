@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://github.com/tesseract-ocr/tesseract
 TERMUX_PKG_DESCRIPTION="Tesseract is probably the most accurate open source OCR engine available"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="5.3.4"
+TERMUX_PKG_VERSION="5.4.1"
 TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://github.com/tesseract-ocr/tesseract/archive/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=141afc12b34a14bb691a939b4b122db0d51bd38feda7f41696822bacea7710c7
+TERMUX_PKG_SRCURL=https://github.com/tesseract-ocr/tesseract/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=c4bc2a81c12a472f445b7c2fb4705a08bd643ef467f51ec84f0e148bd368051b
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="fontconfig, glib, harfbuzz, leptonica, libandroid-glob, libandroid-posix-semaphore, libarchive, libc++, libcairo, libcurl, libicu, pango"
 TERMUX_PKG_BUILD_DEPENDS="libcpufeatures"
@@ -32,7 +32,7 @@ termux_step_post_get_source() {
 }
 
 termux_step_pre_configure() {
-	LDFLAGS+=" -landroid-posix-semaphore"
+	LDFLAGS+=" -fopenmp -static-openmp -landroid-posix-semaphore"
 }
 
 termux_step_post_make_install() {

@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://kde.org/plasma-desktop
+TERMUX_PKG_DESCRIPTION="Plasma Specific Protocols for Wayland"
+TERMUX_PKG_LICENSE="LGPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="1.14.0"
+TERMUX_PKG_SRCURL="https://download.kde.org/stable/plasma-wayland-protocols/plasma-wayland-protocols-${TERMUX_PKG_VERSION}.tar.xz"
+TERMUX_PKG_SHA256=1a4385ecfc79f7589f07381cab11c3ff51f6e2fa4b73b78600d6ad096394bf81
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules, qt6-qtbase"

@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Code::Blocks is the Integrated Development Environment (
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=20.03
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://sourceforge.net/projects/codeblocks/files/Sources/${TERMUX_PKG_VERSION}/codeblocks-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=15eeb3e28aea054e1f38b0c7f4671b4d4d1116fd05f63c07aa95a91db89eaac5
 TERMUX_PKG_DEPENDS="codeblocks-data, glib, gtk3, libc++, wxwidgets, zip"
@@ -26,12 +27,18 @@ termux_step_post_get_source() {
 
 termux_step_host_build() {
 	"${TERMUX_PKG_SRCDIR}/configure"
-	make -j $TERMUX_MAKE_PROCESSES -C src/base
-	make -j $TERMUX_MAKE_PROCESSES -C src/build_tools
+	make -j $TERMUX_PKG_MAKE_PROCESSES -C src/base
+	make -j $TERMUX_PKG_MAKE_PROCESSES -C src/build_tools
 }
 
 termux_step_pre_configure() {
-	LDFLAGS+=" $($CC -print-libgcc-file-name)"
+	local _libgcc_file="$($CC -print-libgcc-file-name)"
+	local _libgcc_path="$(dirname $_libgcc_file)"
+	local _libgcc_name="$(basename $_libgcc_file)"
+	LDFLAGS+=" -L$_libgcc_path -l:$_libgcc_name"
+
+	# error: no member named 'mem_fun_ref' in namespace 'std'
+	CXXFLAGS+=" -std=c++11"
 }
 
 termux_step_post_configure() {

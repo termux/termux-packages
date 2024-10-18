@@ -1,17 +1,16 @@
 diff -uNr openssh-portable-V_9_5_P1/auth.c openssh-portable-V_9_5_P1.mod/auth.c
 --- openssh-portable-V_9_5_P1/auth.c	2023-10-04 07:34:10.000000000 +0300
 +++ openssh-portable-V_9_5_P1.mod/auth.c	2023-11-23 16:29:34.257875879 +0200
-@@ -485,7 +485,13 @@
+@@ -485,7 +485,12 @@
  	aix_setauthdb(user);
  #endif
  
 +#ifdef __ANDROID__
-+        /* Effectively a single-user system, use current user no matter supplied user */
-+        pw = getpwuid(getuid());
++	/* Effectively a single-user system, use current user no matter supplied user */
++	pw = getpwuid(getuid());
 +#else
  	pw = getpwnam(user);
 +#endif
-+
  
  #if defined(_AIX) && defined(HAVE_SETAUTHDB)
  	aix_restoreauthdb();

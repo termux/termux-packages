@@ -1,0 +1,44 @@
+From ced3c5d8cad0177b297666343f1561799dfefb0d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 22 Nov 2023 18:49:10 -0800
+Subject: [PATCH] Fix build with libxml2-2.12.0 and clang-17
+
+Fixes build errors about missing function prototypes with clang-17
+
+Fixes
+| ../libsoup-2.74.3/libsoup/soup-xmlrpc-old.c:512:8: error: call to undeclared function 'xmlParseMemory'; ISO C99 and later do not support implicit function declarations
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/libsoup/-/merge_requests/385]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libsoup/soup-xmlrpc-old.c | 1 +
+ libsoup/soup-xmlrpc.c     | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/libsoup/soup-xmlrpc-old.c b/libsoup/soup-xmlrpc-old.c
+index c57086b6..527e3b23 100644
+--- a/libsoup/soup-xmlrpc-old.c
++++ b/libsoup/soup-xmlrpc-old.c
+@@ -11,6 +11,7 @@
+ 
+ #include <string.h>
+ 
++#include <libxml/parser.h>
+ #include <libxml/tree.h>
+ 
+ #include "soup-xmlrpc-old.h"
+diff --git a/libsoup/soup-xmlrpc.c b/libsoup/soup-xmlrpc.c
+index 42dcda9c..e991cbf0 100644
+--- a/libsoup/soup-xmlrpc.c
++++ b/libsoup/soup-xmlrpc.c
+@@ -17,6 +17,7 @@
+ 
+ #include <string.h>
+ #include <errno.h>
++#include <libxml/parser.h>
+ #include <libxml/tree.h>
+ #include "soup-xmlrpc.h"
+ #include "soup.h"
+-- 
+2.43.0
+

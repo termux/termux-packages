@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="An R7RS Scheme implementation developed to be a handy sc
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.9.12
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://github.com/shirok/Gauche/releases/download/release${TERMUX_PKG_VERSION//./_}/Gauche-${TERMUX_PKG_VERSION}.tgz
 TERMUX_PKG_SHA256=b4ae64921b07a96661695ebd5aac0dec813d1a68e546a61609113d7843f5b617
 TERMUX_PKG_AUTO_UPDATE=false
@@ -30,7 +30,7 @@ termux_step_host_build() {
 
 	find "$TERMUX_PKG_SRCDIR" -mindepth 1 -maxdepth 1 ! -name build_gosh -exec cp -a \{\} ./ \;
 	./configure --prefix=$_PREFIX_FOR_BUILD
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j $TERMUX_PKG_MAKE_PROCESSES
 	make install
 }
 

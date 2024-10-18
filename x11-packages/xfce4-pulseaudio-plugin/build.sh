@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://docs.xfce.org/panel-plugins/xfce4-pulseaudio-plugin/start
+TERMUX_PKG_DESCRIPTION="Pulseaudio plugin for the Xfce4 panel"
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=0.4.8
+TERMUX_PKG_SRCURL=https://archive.xfce.org/src/panel-plugins/xfce4-pulseaudio-plugin/${TERMUX_PKG_VERSION%.*}/xfce4-pulseaudio-plugin-${TERMUX_PKG_VERSION}.tar.bz2
+TERMUX_PKG_SHA256=bd742b207c39c221e91c57c9c9be2839eb802d1b1ee01a02b7427cd02d3f0348
+TERMUX_PKG_DEPENDS="libnotify, libcanberra, pulseaudio, xfce4-panel, pavucontrol"
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_BUILD_IN_SRC=true

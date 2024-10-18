@@ -2,15 +2,15 @@ TERMUX_PKG_HOMEPAGE=https://nodejs.org/
 TERMUX_PKG_DESCRIPTION="Open Source, cross-platform JavaScript runtime environment"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Yaksh Bariya <thunder-coding@termux.dev>"
-TERMUX_PKG_VERSION=22.2.0
+TERMUX_PKG_VERSION=22.8.0
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=889908a8828d1484910d7e659b6aa57ade8d528ff0e390e9a77ef659a7628474
+TERMUX_PKG_SHA256=f130e82176d1ee0702d99afc1995d0061bf8ed357c38834a32a08c9ef74f1ac7
 # thunder-coding: don't try to autoupdate nodejs, that thing takes 2 whole hours to build for a single arch, and requires a lot of patch updates everytime. Also I run tests everytime I update it to ensure least bugs
 TERMUX_PKG_AUTO_UPDATE=false
 # Note that we do not use a shared libuv to avoid an issue with the Android
 # linker, which does not use symbols of linked shared libraries when resolving
 # symbols on dlopen(). See https://github.com/termux/termux-packages/issues/462.
-TERMUX_PKG_DEPENDS="libc++, openssl, c-ares, libicu, zlib"
+TERMUX_PKG_DEPENDS="libc++, openssl, c-ares, libicu, libsqlite, zlib"
 TERMUX_PKG_CONFLICTS="nodejs-lts, nodejs-current"
 TERMUX_PKG_BREAKS="nodejs-dev"
 TERMUX_PKG_REPLACES="nodejs-current, nodejs-dev"
@@ -44,7 +44,7 @@ termux_step_host_build() {
 			--disable-samples \
 			--disable-tests
 	fi
-	make -j $TERMUX_MAKE_PROCESSES install
+	make -j $TERMUX_PKG_MAKE_PROCESSES install
 }
 
 termux_step_pre_configure() {
@@ -79,6 +79,7 @@ termux_step_configure() {
 		--dest-os=android \
 		--shared-cares \
 		--shared-openssl \
+		--shared-sqlite \
 		--shared-zlib \
 		--with-intl=system-icu \
 		--cross-compiling \
@@ -100,9 +101,9 @@ termux_step_configure() {
 
 termux_step_make() {
 	if [ "${TERMUX_DEBUG_BUILD}" = "true" ]; then
-		ninja -C out/Debug -j "${TERMUX_MAKE_PROCESSES}"
+		ninja -C out/Debug -j "${TERMUX_PKG_MAKE_PROCESSES}"
 	else
-		ninja -C out/Release -j "${TERMUX_MAKE_PROCESSES}"
+		ninja -C out/Release -j "${TERMUX_PKG_MAKE_PROCESSES}"
 	fi
 }
 

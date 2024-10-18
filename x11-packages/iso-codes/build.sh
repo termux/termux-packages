@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://salsa.debian.org/iso-codes-team/iso-codes
 TERMUX_PKG_DESCRIPTION="Lists of the country, language, and currency names"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="4.16.0"
+TERMUX_PKG_VERSION="4.17.0"
 TERMUX_PKG_SRCURL=https://salsa.debian.org/iso-codes-team/iso-codes/-/archive/v${TERMUX_PKG_VERSION}/iso-codes-v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=7c990fc39a05975bedb0175e3ff09fc383048815f68b462abbf055a8032e66cc
+TERMUX_PKG_SHA256=dd5ca13db77ec6dd1cc25f5c0184290a870ec1fed245d8e39a04ff34f59076c3
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 

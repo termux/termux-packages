@@ -20,7 +20,7 @@ ac_cv_func_memcmp_working=yes
 skipcode=no
 --without-check
 "
-TERMUX_MAKE_PROCESSES=1
+TERMUX_PKG_MAKE_PROCESSES=1
 TERMUX_PKG_HOSTBUILD=true
 
 termux_step_host_build() {
@@ -29,7 +29,7 @@ termux_step_host_build() {
 
 	find $TERMUX_PKG_SRCDIR -mindepth 1 -maxdepth 1 -exec cp -a \{\} ./ \;
 	./configure --prefix=$_PREFIX_FOR_BUILD CC="gcc -m$TERMUX_ARCH_BITS"
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j $TERMUX_PKG_MAKE_PROCESSES
 	make install
 }
 

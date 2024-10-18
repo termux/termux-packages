@@ -2,15 +2,62 @@ TERMUX_PKG_HOMEPAGE=https://alist.nn.ci
 TERMUX_PKG_DESCRIPTION="A file list program that supports multiple storage"
 TERMUX_PKG_LICENSE="AGPL-V3"
 TERMUX_PKG_MAINTAINER="2096779623 <admin@utermux.dev>"
-TERMUX_PKG_VERSION=(3.35.0) # alist version
-TERMUX_PKG_VERSION+=(3.35.0) # alist-web version
-TERMUX_PKG_SRCURL=(https://github.com/alist-org/alist/archive/v${TERMUX_PKG_VERSION}.tar.gz
-                   https://github.com/alist-org/alist-web/releases/download/${TERMUX_PKG_VERSION[1]}/dist.tar.gz)
-TERMUX_PKG_SHA256=(e349a178cd41fff9b668e9d8df9ff1b407b7f6d6fd3dbb2f8a7ca9d0d5ecad55
-                   940608c2b9f64cf585ad4d241545e5f1e59e5f6e54ef8ea2c9c3a29998313fc7)
+TERMUX_PKG_VERSION="3.38.0"
+_ALIST_WEB_VERSION="3.38.0"
+TERMUX_PKG_SRCURL=(
+	https://github.com/alist-org/alist/archive/v${TERMUX_PKG_VERSION}.tar.gz
+	https://github.com/alist-org/alist-web/releases/download/${_ALIST_WEB_VERSION}/dist.tar.gz
+)
+TERMUX_PKG_SHA256=(
+	bc8983900786afdc2ac3d4a60d5e71a1e5db0c2c63f00190c728974ee266ce12
+	8c76d6863bc77e0b5da1cbae10b6cec2b3332fcb4e41f055747f4cc5ab04c06a
+)
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
-# termux_pkg_upgrade_version couldn't check multiple versions now.
-TERMUX_PKG_AUTO_UPDATE=false
+
+termux_pkg_auto_update() {
+	local latest_tag
+	latest_tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL[0]}" "${TERMUX_PKG_UPDATE_TAG_TYPE}")"
+	(( ${#latest_tag} )) || {
+		printf '%s\n' \
+		'WARN: Auto update failure!' \
+		"latest_tag=${latest_tag}"
+	return
+	} >&2
+
+	if [[ "${latest_tag}" == "${TERMUX_PKG_VERSION}" ]]; then
+		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
+		return
+	fi
+
+	local tmpdir
+	tmpdir="$(mktemp -d)"
+	curl -sLo "${tmpdir}/alist-linux-amd64.tar.gz" "https://github.com/alist-org/alist/releases/download/v${latest_tag}/alist-linux-amd64.tar.gz"
+	tar -C "${tmpdir}" -xf "${tmpdir}/alist-linux-amd64.tar.gz"
+	chmod +x "${tmpdir}/alist"
+	local latest_web_version="$("${tmpdir}"/alist version | grep "WebVersion:" | cut -d ' ' -f 2)"
+
+	curl -sLo "${tmpdir}/src" "https://github.com/alist-org/alist/archive/v${latest_tag}.tar.gz"
+	curl -sLo "${tmpdir}/web" "https://github.com/alist-org/alist-web/releases/download/${latest_web_version}/dist.tar.gz"
+	local -a sha=(
+		"$(sha256sum "${tmpdir}/src" | cut -d ' ' -f 1)"
+		"$(sha256sum "${tmpdir}/web" | cut -d ' ' -f 1)"
+	)
+
+	sed \
+		-e "s|^_ALIST_WEB_VERSION=.*|_ALIST_WEB_VERSION=\"${latest_web_version}\"|" \
+		-e "s|^\t${TERMUX_PKG_SHA256[0]}.*|\t${sha[0]}|" \
+		-e "s|^\t${TERMUX_PKG_SHA256[1]}.*|\t${sha[1]}|" \
+		-i "${TERMUX_PKG_BUILDER_DIR}/build.sh"
+
+	rm -fr "${tmpdir}"
+
+	printf '%s %s\n' 'ALIST_VERSION     :' "${latest_tag}"
+	printf '%s %s\n' 'ALIST_CHECKSUM    :' "${sha[0]}"
+	printf '%s %s\n' 'ALIST_WEB_VERSION :' "${latest_web_version}"
+	printf '%s %s\n' 'ALIST_WEB_CHECKSUM:' "${sha[1]}"
+	termux_pkg_upgrade_version "${latest_tag}"
+}
 
 termux_step_post_get_source() {
 	rm -rf public/dist
@@ -34,7 +81,7 @@ termux_step_make() {
 	-X 'github.com/alist-org/alist/v3/internal/conf.GitAuthor=$_gitAuthor' \
 	-X 'github.com/alist-org/alist/v3/internal/conf.GitCommit=$_gitCommit' \
 	-X 'github.com/alist-org/alist/v3/internal/conf.Version=$TERMUX_PKG_VERSION' \
-	-X 'github.com/alist-org/alist/v3/internal/conf.WebVersion=${TERMUX_PKG_VERSION[1]}' \
+	-X 'github.com/alist-org/alist/v3/internal/conf.WebVersion=$_ALIST_WEB_VERSION' \
 	"
 	go build -o "${TERMUX_PKG_NAME}" -ldflags="$ldflags" -tags=jsoniter
 }

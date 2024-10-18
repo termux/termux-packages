@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<dump>
+  <enum name="MPIDError" get-type="mpid_error_get_type">
+    <member name="MPID_ERROR_NONE" nick="OK" value="0"/>
+    <member name="MPID_ERROR_NO_DEVICE_PATH" nick="no-such-device" value="1"/>
+    <member name="MPID_ERROR_MECHANISM_FAILED" nick="device-db-failed" value="2"/>
+    <member name="MPID_ERROR_NOT_MEDIA_PLAYER" nick="not-media-player" value="3"/>
+    <member name="MPID_ERROR_DEVICE_INFO_MISSING" nick="device-info-missing" value="4"/>
+  </enum>  <enum name="MPIDSourceType" get-type="mpid_source_get_type">
+    <member name="MPID_SOURCE_NONE" nick="no-device-info" value="0"/>
+    <member name="MPID_SOURCE_SYSTEM" nick="system-device-info" value="1"/>
+    <member name="MPID_SOURCE_OVERRIDE" nick="override-device-info" value="2"/>
+  </enum>  <class name="MPIDDevice" get-type="mpid_device_get_type" parents="GObject">
+    <property name="input-path" type="gchararray" flags="11" default-value="NULL"/>
+    <property name="mpi-file" type="gchararray" flags="11" default-value="NULL"/>
+    <property name="error" type="MPIDError" flags="1" default-value="MPID_ERROR_NONE"/>
+    <property name="source" type="MPIDSourceType" flags="1" default-value="MPID_SOURCE_NONE"/>
+    <property name="model" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="vendor" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="fs-uuid" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="serial" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="drive-type" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="requires-eject" type="gboolean" flags="1" default-value="FALSE"/>
+    <property name="access-protocols" type="GStrv" flags="1"/>
+    <property name="output-formats" type="GStrv" flags="1"/>
+    <property name="input-formats" type="GStrv" flags="1"/>
+    <property name="playlist-formats" type="GStrv" flags="1"/>
+    <property name="playlist-path" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="audio-folders" type="GStrv" flags="1"/>
+    <property name="folder-depth" type="gint" flags="1" default-value="-1"/>
+  </class>
+</dump>

@@ -40,7 +40,7 @@ termux_step_host_build() {
 	pushd mpfr
 	$TERMUX_PKG_SRCDIR/mpfr/configure \
 		--prefix="${_PREFIX_FOR_BUILD}"
-	make -j "${TERMUX_MAKE_PROCESSES}"
+	make -j "${TERMUX_PKG_MAKE_PROCESSES}"
 	make install
 	popd # mpfr
 
@@ -49,7 +49,7 @@ termux_step_host_build() {
 	$TERMUX_PKG_SRCDIR/mpc/configure \
 		--prefix="${_PREFIX_FOR_BUILD}" \
 		--with-mpfr="${_PREFIX_FOR_BUILD}"
-	make -j "${TERMUX_MAKE_PROCESSES}"
+	make -j "${TERMUX_PKG_MAKE_PROCESSES}"
 	make install
 	popd # mpc
 
@@ -65,7 +65,7 @@ termux_step_host_build() {
 		$TERMUX_PKG_SRCDIR/binutils/configure \
 			--prefix="${_PREFIX_FOR_BUILD}" \
 			--target="${target}"
-		make -j "${TERMUX_MAKE_PROCESSES}"
+		make -j "${TERMUX_PKG_MAKE_PROCESSES}"
 		make install
 		popd # binutils
 
@@ -95,7 +95,7 @@ termux_step_host_build() {
 			--disable-libquadmath \
 			--disable-libssp \
 			--disable-shared
-		make -j "${TERMUX_MAKE_PROCESSES}"
+		make -j "${TERMUX_PKG_MAKE_PROCESSES}"
 		make install
 		popd # gcc-nocrt
 
@@ -114,7 +114,7 @@ termux_step_host_build() {
 			--prefix="${sysroot}/usr" \
 			--host="${target}" \
 			${mingw_crt_conf}
-		make -j "${TERMUX_MAKE_PROCESSES}"
+		make -j "${TERMUX_PKG_MAKE_PROCESSES}"
 		make -C mingw-w64-crt install
 		popd # mingw-w64-crt
 

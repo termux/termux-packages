@@ -732,6 +732,7 @@
     <member name="GTK_DEBUG_A11Y" nick="a11y" value="131072"/>
     <member name="GTK_DEBUG_ICONFALLBACK" nick="iconfallback" value="262144"/>
     <member name="GTK_DEBUG_INVERT_TEXT_DIR" nick="invert-text-dir" value="524288"/>
+    <member name="GTK_DEBUG_CSS" nick="css" value="1048576"/>
   </flags>
   <enum name="GtkDialogError" get-type="gtk_dialog_error_get_type">
     <member name="GTK_DIALOG_ERROR_FAILED" nick="failed" value="0"/>
@@ -1186,6 +1187,7 @@
     <member name="GTK_ACCESSIBLE_PROPERTY_VALUE_MIN" nick="value-min" value="16"/>
     <member name="GTK_ACCESSIBLE_PROPERTY_VALUE_NOW" nick="value-now" value="17"/>
     <member name="GTK_ACCESSIBLE_PROPERTY_VALUE_TEXT" nick="value-text" value="18"/>
+    <member name="GTK_ACCESSIBLE_PROPERTY_HELP_TEXT" nick="help-text" value="19"/>
   </enum>  <enum name="GtkAccessibleRelation" get-type="gtk_accessible_relation_get_type">
     <member name="GTK_ACCESSIBLE_RELATION_ACTIVE_DESCENDANT" nick="active-descendant" value="0"/>
     <member name="GTK_ACCESSIBLE_RELATION_COL_COUNT" nick="col-count" value="1"/>
@@ -1231,6 +1233,15 @@
   </enum>  <flags name="GtkPopoverMenuFlags" get-type="gtk_popover_menu_flags_get_type">
     <member name="GTK_POPOVER_MENU_SLIDING" nick="sliding" value="0"/>
     <member name="GTK_POPOVER_MENU_NESTED" nick="nested" value="1"/>
+  </flags>
+  <enum name="GtkFontRendering" get-type="gtk_font_rendering_get_type">
+    <member name="GTK_FONT_RENDERING_AUTOMATIC" nick="automatic" value="0"/>
+    <member name="GTK_FONT_RENDERING_MANUAL" nick="manual" value="1"/>
+  </enum>  <flags name="GtkTextBufferNotifyFlags" get-type="gtk_text_buffer_notify_flags_get_type">
+    <member name="GTK_TEXT_BUFFER_NOTIFY_BEFORE_INSERT" nick="before-insert" value="1"/>
+    <member name="GTK_TEXT_BUFFER_NOTIFY_AFTER_INSERT" nick="after-insert" value="2"/>
+    <member name="GTK_TEXT_BUFFER_NOTIFY_BEFORE_DELETE" nick="before-delete" value="4"/>
+    <member name="GTK_TEXT_BUFFER_NOTIFY_AFTER_DELETE" nick="after-delete" value="8"/>
   </flags>
   <flags name="GtkEventControllerScrollFlags" get-type="gtk_event_controller_scroll_flags_get_type">
     <member name="GTK_EVENT_CONTROLLER_SCROLL_NONE" nick="none" value="0"/>
@@ -2226,6 +2237,7 @@
     <implements name="GtkConstraintTarget"/>
     <property name="child" type="GtkWidget" flags="1073742051"/>
     <property name="enabled" type="GtkGraphicsOffloadEnabled" flags="1073742051" default-value="GTK_GRAPHICS_OFFLOAD_ENABLED"/>
+    <property name="black-background" type="gboolean" flags="1073742051" default-value="FALSE"/>
   </class>
   <class name="GtkGrid" get-type="gtk_grid_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
     <implements name="GtkAccessible"/>
@@ -3592,7 +3604,7 @@
     <property name="gtk-xft-hintstyle" type="gchararray" flags="227" default-value="NULL"/>
     <property name="gtk-xft-rgba" type="gchararray" flags="227" default-value="NULL"/>
     <property name="gtk-xft-dpi" type="gint" flags="227" default-value="-1"/>
-    <property name="gtk-hint-font-metrics" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="gtk-hint-font-metrics" type="gboolean" flags="227" default-value="TRUE"/>
     <property name="gtk-cursor-theme-name" type="gchararray" flags="227" default-value="NULL"/>
     <property name="gtk-cursor-theme-size" type="gint" flags="227" default-value="0"/>
     <property name="gtk-alternative-button-order" type="gboolean" flags="227" default-value="FALSE"/>
@@ -3627,6 +3639,7 @@
     <property name="gtk-long-press-time" type="guint" flags="227" default-value="500"/>
     <property name="gtk-keynav-use-caret" type="gboolean" flags="227" default-value="FALSE"/>
     <property name="gtk-overlay-scrolling" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="gtk-font-rendering" type="GtkFontRendering" flags="227" default-value="GTK_FONT_RENDERING_AUTOMATIC"/>
   </class>
   <class name="GtkShortcutController" get-type="gtk_shortcut_controller_get_type" parents="GtkEventController,GObject">
     <implements name="GListModel"/>

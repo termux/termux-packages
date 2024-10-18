@@ -11,12 +11,12 @@
                  # -isysroot on mac, clang takes the SDKROOT environment variable into
 --- a/build/moz.configure/pkg.configure
 +++ b/build/moz.configure/pkg.configure
-@@ -56,7 +56,7 @@
+@@ -60,7 +60,7 @@
  @imports(_from="os", _import="environ")
  @imports(_from="os", _import="pathsep")
  def pkg_config_vars(target, sysroot_path, multiarch_dir):
 -    if sysroot_path and target.kernel != "Darwin":
 +    if False:
-         return namespace(
-             PKG_CONFIG_PATH="",
-             PKG_CONFIG_SYSROOT_DIR=sysroot_path,
+         pkgconfig_dirs = [
+             "usr/lib/pkgconfig",
+             "usr/lib/{}/pkgconfig".format(multiarch_dir),

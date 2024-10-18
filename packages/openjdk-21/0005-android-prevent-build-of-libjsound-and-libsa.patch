@@ -1,0 +1,37 @@
+From c67ff2011d20ee7de29b34912a87ceaeeb8aa4c0 Mon Sep 17 00:00:00 2001
+From: Henrik Grimler <grimler@termux.dev>
+Date: Fri, 3 Feb 2023 11:06:24 +0100
+Subject: [PATCH 05/37] android: prevent build of libjsound and libsa
+
+---
+ make/modules/java.desktop/Lib.gmk      | 2 --
+ make/modules/jdk.hotspot.agent/Lib.gmk | 2 --
+ 2 files changed, 4 deletions(-)
+
+diff --git a/make/modules/java.desktop/Lib.gmk b/make/modules/java.desktop/Lib.gmk
+index be1ac3f1f..069c1b46d 100644
+--- a/make/modules/java.desktop/Lib.gmk
++++ b/make/modules/java.desktop/Lib.gmk
+@@ -76,8 +76,6 @@ ifeq ($(call isTargetOs, aix), false)
+ 
+   $(BUILD_LIBJSOUND): $(call FindLib, java.base, java)
+ 
+-  TARGETS += $(BUILD_LIBJSOUND)
+-
+ endif
+ 
+ ################################################################################
+diff --git a/make/modules/jdk.hotspot.agent/Lib.gmk b/make/modules/jdk.hotspot.agent/Lib.gmk
+index 478d199e5..54ee4b203 100644
+--- a/make/modules/jdk.hotspot.agent/Lib.gmk
++++ b/make/modules/jdk.hotspot.agent/Lib.gmk
+@@ -76,6 +76,4 @@ $(eval $(call SetupJdkLibrary, BUILD_LIBSA, \
+     LIBS_windows := dbgeng.lib $(WIN_JAVA_LIB), \
+ ))
+ 
+-TARGETS += $(BUILD_LIBSA)
+-
+ ################################################################################
+-- 
+2.45.2
+

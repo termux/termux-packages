@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Lightweight Ethereum Client"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.3.5"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/openethereum/openethereum/archive/v${TERMUX_PKG_VERSION}.zip
 TERMUX_PKG_SHA256=fb4a3c9ac1e5ba2803098b3ba1c114a2a9a5397fed3cd65c4c966525cb6b075d
 TERMUX_PKG_AUTO_UPDATE=true
@@ -67,13 +67,21 @@ termux_step_configure() {
 }
 
 termux_step_make() {
+	rm -rf $CARGO_HOME/registry/src/*/parity-rocksdb-sys-*
+	rm -rf $CARGO_HOME/registry/src/*/rustc-serialize-*
 	cargo fetch --target $CARGO_TARGET_NAME
 	patch --silent -p1 \
 		-d $CARGO_HOME/registry/src/*/parity-rocksdb-sys-0.5.6/rocksdb \
 		< $TERMUX_PKG_BUILDER_DIR/parity-rocksdb-sys-0.5.6-mutex.diff
-	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release --features final
+	patch --silent -p1 \
+		-d $CARGO_HOME/registry/src/*/parity-rocksdb-sys-0.5.6/rocksdb \
+		< $TERMUX_PKG_BUILDER_DIR/parity-rocksdb-sys-0.5.6-iterator.diff
+	patch --silent -p1 \
+		-d $CARGO_HOME/registry/src/*/rustc-serialize-0.3.24 \
+		< $TERMUX_PKG_BUILDER_DIR/rustc-serialize-0.3.24.diff
+	cargo build --jobs $TERMUX_PKG_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release --features final
 	for applet in evmbin ethstore-cli ethkey-cli; do
-		cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release -p $applet
+		cargo build --jobs $TERMUX_PKG_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release -p $applet
 	done
 }
 
@@ -81,4 +89,9 @@ termux_step_make_install() {
 	for applet in openethereum openethereum-evm ethstore ethkey; do
 		install -Dm755 -t $TERMUX_PREFIX/bin target/${CARGO_TARGET_NAME}/release/$applet
 	done
+}
+
+termux_step_post_massage() {
+	rm -rf $CARGO_HOME/registry/src/*/parity-rocksdb-sys-*
+	rm -rf $CARGO_HOME/registry/src/*/rustc-serialize-*
 }

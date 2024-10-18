@@ -1,0 +1,28 @@
+--- a/src/config.c
++++ b/src/config.c
+@@ -446,11 +446,25 @@
+ 	if (!where) {
+ 		int path_len, path_len2;
+ 		const char *config_home = getenv( "XDG_CONFIG_HOME" );
++#ifndef __ANDROID__
+ 		if (config_home)
+ 			nfsnprintf( path, sizeof(path), "%s/%nisyncrc", config_home, &path_len );
+ 		else
+ 			nfsnprintf( path, sizeof(path), "%s/.config/%nisyncrc", Home, &path_len );
+ 		nfsnprintf( path2, sizeof(path2), "%s/%n.mbsyncrc", Home, &path_len2 );
++#else
++		// %n is disabled in Bionic libc.
++		if (config_home) {
++			nfsnprintf( path, sizeof(path), "%s/isyncrc", config_home );
++			path_len = strlen(config_home) + strlen("/");
++		}
++		else {
++			nfsnprintf( path, sizeof(path), "%s/.config/isyncrc", Home );
++			path_len = strlen(Home) + strlen("/.config/");
++		}
++		nfsnprintf( path2, sizeof(path2), "%s/.mbsyncrc", Home );
++		path_len2 = strlen(Home) + strlen("/");
++#endif
+ 		struct stat st;
+ 		int ex = !lstat( path, &st );
+ 		int ex2 = !lstat( path2, &st );

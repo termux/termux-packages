@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Advanced cross-platform 2D and 3D game engine"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.2.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/godotengine/godot/archive/$TERMUX_PKG_VERSION-stable.tar.gz
 TERMUX_PKG_SHA256=990b7b716656122364b1672508c516c898497c50216d7c00c60eeaf507685c0e
 TERMUX_PKG_DEPENDS="ca-certificates, glu, libandroid-execinfo, libc++, libenet, libogg, libtheora, libvorbis, libvpx, libwebp, libwslay, libxcursor, libxi, libxinerama, libxkbcommon, libxrandr, mbedtls, miniupnpc, opengl, opusfile, pcre2, speechd, zstd, fontconfig"
@@ -27,7 +28,7 @@ termux_step_make() {
 	esac
 
 	export BUILD_NAME=termux
-	scons -j$TERMUX_MAKE_PROCESSES \
+	scons -j$TERMUX_PKG_MAKE_PROCESSES \
 		use_static_cpp=no \
 		colored=yes \
 		platform=linuxbsd \

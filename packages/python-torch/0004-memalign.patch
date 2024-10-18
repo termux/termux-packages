@@ -1,0 +1,24 @@
+diff -u -r ../cache/tmp-checkout/third_party/pocketfft/pocketfft_hdronly.h ./third_party/pocketfft/pocketfft_hdronly.h
+--- ../cache/tmp-checkout/third_party/pocketfft/pocketfft_hdronly.h	2024-10-02 13:08:14.683993465 +0000
++++ ./third_party/pocketfft/pocketfft_hdronly.h	2024-10-02 13:17:29.799680354 +0000
+@@ -152,7 +152,7 @@
+ // the __MINGW32__ part in the conditional below works around the problem that
+ // the standard C++ library on Windows does not provide aligned_alloc() even
+ // though the MinGW compiler and MSVC may advertise C++17 compliance.
+-#if (__cplusplus >= 201703L) && (!defined(__MINGW32__)) && (!defined(_MSC_VER))
++#if (__cplusplus >= 201703L) && (!defined(__MINGW32__)) && (!defined(_MSC_VER)) && (!defined(__ANDROID__))
+ inline void *aligned_alloc(size_t align, size_t size)
+   {
+   // aligned_alloc() requires that the requested size is a multiple of "align"
+diff -u -r ../cache/tmp-checkout/torch/csrc/jit/python/script_init.cpp ./torch/csrc/jit/python/script_init.cpp
+--- ../cache/tmp-checkout/torch/csrc/jit/python/script_init.cpp	2024-10-02 13:05:35.577599122 +0000
++++ ./torch/csrc/jit/python/script_init.cpp	2024-10-02 13:16:36.541910940 +0000
+@@ -722,7 +722,7 @@
+   std::shared_ptr<char> bytes_copy(
+       static_cast<char*>(_aligned_malloc(size, kFlatbufferDataAlignmentBytes)),
+       _aligned_free);
+-#elif defined(__APPLE__)
++#elif defined(__APPLE__) || defined(__ANDROID__)
+   void* p;
+   ::posix_memalign(&p, kFlatbufferDataAlignmentBytes, size);
+   TORCH_INTERNAL_ASSERT(p, "Could not allocate memory for flatbuffer");

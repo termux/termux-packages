@@ -18,7 +18,7 @@
  	fi
  fi
  
-@@ -541,14 +541,31 @@
+@@ -547,14 +547,31 @@
  
  if in_path dpkg && \
       dpkg --print-architecture >/dev/null 2>&1; then
@@ -52,7 +52,7 @@
  # basic host OS guessing for non-Debian systems
  if [ -z "$HOST_OS" ]; then
  	case $(uname) in
-@@ -585,12 +602,8 @@
+@@ -591,12 +608,8 @@
  if [ "$TARGET" = "/" ]; then
  	CHROOT_CMD=""
  else
@@ -67,7 +67,7 @@
  fi
  
  if [ -z "$SHA_SIZE" ]; then
-@@ -604,19 +617,6 @@
+@@ -610,19 +623,6 @@
  
  export ARCH SUITE EXTRA_SUITES TARGET CHROOT_CMD SHA_SIZE DEBOOTSTRAP_CHECKSUM_FIELD
  
@@ -80,7 +80,7 @@
 -	fi
 -	# Ensure that we can create working devices and executables on the target.
 -	if ! check_sane_mount "$TARGET"; then
--		error 1 NOEXEC "Cannot install into target '$TARGET' mounted with noexec or nodev"
+-		error 1 NOEXEC "Cannot install into target '$TARGET' mounted with noexec"
 -	fi
 -fi
 -

@@ -1,0 +1,102 @@
+From e380ae90ebb6325d1820b6f34e10bf3474710899 Mon Sep 17 00:00:00 2001
+From: Max Kellermann <max.kellermann@gmail.com>
+Date: Sun, 7 Jul 2024 10:09:08 +0200
+Subject: [PATCH] Log: add missing include for std::back_inserter()
+
+Closes https://github.com/MusicPlayerDaemon/MPD/issues/2071
+---
+ src/Log.cxx | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/Log.cxx b/src/Log.cxx
+index d5a3db2aa6..78e0efb54a 100644
+--- a/src/Log.cxx
++++ b/src/Log.cxx
+@@ -8,6 +8,8 @@
+ 
+ #include <fmt/format.h>
+ 
++#include <iterator> // for std::back_inserter()
++
+ static constexpr Domain exception_domain("exception");
+ 
+ void
+From 1402869715e3efca87942d79c3173a6b21a6925d Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Fri, 5 Jul 2024 14:27:45 +0000
+Subject: [PATCH] lib/fmt: support build with libfmt-11.0.0
+
+Upstream libfmt commit fmtlib/fmt@d707292
+now requires the format function to be const.
+
+Adjust the function prototype so it is const and can compile.
+
+Signed-off-by: Rudi Heitbaum <rudi@heitbaum.com>
+---
+ src/lib/ffmpeg/LibFmt.hxx            | 2 +-
+ src/lib/fmt/AudioFormatFormatter.hxx | 4 ++--
+ src/lib/fmt/ExceptionFormatter.hxx   | 2 +-
+ src/lib/fmt/PathFormatter.hxx        | 2 +-
+ 4 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/src/lib/ffmpeg/LibFmt.hxx b/src/lib/ffmpeg/LibFmt.hxx
+index aa068711f3..dee83ed2d5 100644
+--- a/src/lib/ffmpeg/LibFmt.hxx
++++ b/src/lib/ffmpeg/LibFmt.hxx
+@@ -13,7 +13,7 @@ template<>
+ struct fmt::formatter<AVSampleFormat> : formatter<string_view>
+ {
+ 	template<typename FormatContext>
+-	auto format(const AVSampleFormat format, FormatContext &ctx) {
++	auto format(const AVSampleFormat format, FormatContext &ctx) const {
+ 		const char *name = av_get_sample_fmt_name(format);
+ 		if (name == nullptr)
+ 			name = "?";
+diff --git a/src/lib/fmt/AudioFormatFormatter.hxx b/src/lib/fmt/AudioFormatFormatter.hxx
+index e0ffb62160..8da98efd41 100644
+--- a/src/lib/fmt/AudioFormatFormatter.hxx
++++ b/src/lib/fmt/AudioFormatFormatter.hxx
+@@ -13,7 +13,7 @@ template<>
+ struct fmt::formatter<SampleFormat> : formatter<string_view>
+ {
+ 	template<typename FormatContext>
+-	auto format(const SampleFormat format, FormatContext &ctx) {
++	auto format(const SampleFormat format, FormatContext &ctx) const {
+ 		return formatter<string_view>::format(sample_format_to_string(format),
+ 						      ctx);
+ 	}
+@@ -23,7 +23,7 @@ template<>
+ struct fmt::formatter<AudioFormat> : formatter<string_view>
+ {
+ 	template<typename FormatContext>
+-	auto format(const AudioFormat &af, FormatContext &ctx) {
++	auto format(const AudioFormat &af, FormatContext &ctx) const {
+ 		return formatter<string_view>::format(ToString(af).c_str(),
+ 						      ctx);
+ 	}
+diff --git a/src/lib/fmt/ExceptionFormatter.hxx b/src/lib/fmt/ExceptionFormatter.hxx
+index 3f342df672..f08b3bb228 100644
+--- a/src/lib/fmt/ExceptionFormatter.hxx
++++ b/src/lib/fmt/ExceptionFormatter.hxx
+@@ -12,7 +12,7 @@ template<>
+ struct fmt::formatter<std::exception_ptr> : formatter<string_view>
+ {
+ 	template<typename FormatContext>
+-	auto format(std::exception_ptr e, FormatContext &ctx) {
++	auto format(std::exception_ptr e, FormatContext &ctx) const {
+ 		return formatter<string_view>::format(GetFullMessage(e), ctx);
+ 	}
+ };
+diff --git a/src/lib/fmt/PathFormatter.hxx b/src/lib/fmt/PathFormatter.hxx
+index e5ae89dec5..add06df81b 100644
+--- a/src/lib/fmt/PathFormatter.hxx
++++ b/src/lib/fmt/PathFormatter.hxx
+@@ -13,7 +13,7 @@ template<std::convertible_to<Path> T>
+ struct fmt::formatter<T> : formatter<string_view>
+ {
+ 	template<typename FormatContext>
+-	auto format(Path path, FormatContext &ctx) {
++	auto format(Path path, FormatContext &ctx) const {
+ 		return formatter<string_view>::format(path.ToUTF8(), ctx);
+ 	}
+ };

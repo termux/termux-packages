@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://emscripten.org
 TERMUX_PKG_DESCRIPTION="Emscripten: An LLVM-to-WebAssembly Compiler"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.1.61"
+TERMUX_PKG_VERSION="3.1.69"
 TERMUX_PKG_SRCURL=git+https://github.com/emscripten-core/emscripten
 TERMUX_PKG_GIT_BRANCH=${TERMUX_PKG_VERSION}
 TERMUX_PKG_DEPENDS="nodejs-lts | nodejs, python"
@@ -13,10 +13,7 @@ TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_AUTO_UPDATE=true
 
 # remove files according to emsdk/upstream directory
-# git clone https://github.com/emscripten-core/emsdk --depth=1
-# cd emsdk
-# ./emsdk install latest
-# ls ./upstream/bin/*
+# refer termux_step_post_get_source and termux_step_post_massage
 TERMUX_PKG_RM_AFTER_INSTALL="
 opt/emscripten-llvm/bin/amdgpu-arch
 opt/emscripten-llvm/bin/clang-check
@@ -36,14 +33,9 @@ opt/emscripten-llvm/bin/clang-pseudo
 opt/emscripten-llvm/bin/clang-refactor
 opt/emscripten-llvm/bin/clang-rename
 opt/emscripten-llvm/bin/clang-repl
-opt/emscripten-llvm/bin/clang-scan-deps
 opt/emscripten-llvm/bin/diagtool
 opt/emscripten-llvm/bin/git-clang-format
 opt/emscripten-llvm/bin/hmaptool
-opt/emscripten-llvm/bin/ld.lld
-opt/emscripten-llvm/bin/ld64.lld
-opt/emscripten-llvm/bin/ld64.lld.darwin*
-opt/emscripten-llvm/bin/lld-link
 opt/emscripten-llvm/bin/llvm-cov
 opt/emscripten-llvm/bin/llvm-dlltool
 opt/emscripten-llvm/bin/llvm-lib
@@ -61,13 +53,13 @@ opt/emscripten/LICENSE
 
 # https://github.com/emscripten-core/emscripten/issues/11362
 # can switch to stable LLVM to save space once above is fixed
-_LLVM_COMMIT=7cfffe74eeb68fbb3fb9706ac7071f8caeeb6520
-_LLVM_TGZ_SHA256=0a65e5533d70f210f2f17f2c6db64750e90d8f6f8b208304313b4229dc0f9fdd
+_LLVM_COMMIT=16c8056ca9d3c28ca5e409162a0c82d5726ea655
+_LLVM_TGZ_SHA256=fc3e27bd8604950d8d96ca09400939fa028cd6573f78f5562ea071b2254aa205
 
 # https://github.com/emscripten-core/emscripten/issues/12252
 # upstream says better bundle the right binaryen revision for now
-_BINARYEN_COMMIT=5d90167464ef5709406aea7d87ad1657eec8618b
-_BINARYEN_TGZ_SHA256=c53282d36a891a8e68429071bd84a26eee9e650c009139dab374e132a54577e7
+_BINARYEN_COMMIT=34906bfbc99d31b3e62d2d006af2247d8418ba2f
+_BINARYEN_TGZ_SHA256=05652fc673acd7051a826046dee73a998d8ff553bd059bffac873afe2f7bd1e5
 
 # https://github.com/emscripten-core/emsdk/blob/main/emsdk.py
 # https://chromium.googlesource.com/emscripten-releases/+/refs/heads/main/src/build.py
@@ -77,9 +69,7 @@ _LLVM_BUILD_ARGS="
 -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON
 -DCMAKE_CROSSCOMPILING=ON
 -DCMAKE_INSTALL_PREFIX=${TERMUX_PREFIX}/opt/emscripten-llvm
-
 -DDEFAULT_SYSROOT=$(dirname ${TERMUX_PREFIX})
--DGENERATOR_IS_MULTI_CONFIG=ON
 -DLLVM_ENABLE_ASSERTIONS=ON
 -DLLVM_ENABLE_BINDINGS=OFF
 -DLLVM_ENABLE_LIBEDIT=OFF
@@ -87,7 +77,6 @@ _LLVM_BUILD_ARGS="
 -DLLVM_ENABLE_LIBXML2=OFF
 -DLLVM_ENABLE_LTO=Thin
 -DLLVM_ENABLE_PROJECTS=clang;compiler-rt;lld
--DLLVM_ENABLE_TERMINFO=OFF
 -DLLVM_INCLUDE_BENCHMARKS=OFF
 -DLLVM_INCLUDE_EXAMPLES=OFF
 -DLLVM_INCLUDE_TESTS=OFF
@@ -95,11 +84,10 @@ _LLVM_BUILD_ARGS="
 -DLLVM_INSTALL_TOOLCHAIN_ONLY=ON
 -DLLVM_LINK_LLVM_DYLIB=ON
 -DLLVM_NATIVE_TOOL_DIR=${TERMUX_PKG_HOSTBUILD_DIR}/bin
-
 -DCLANG_DEFAULT_LINKER=lld
 -DCLANG_ENABLE_ARCMT=OFF
 -DCLANG_ENABLE_STATIC_ANALYZER=OFF
-
+-DCLANG_LINKS_TO_CREATE=clang++;wasm32-clang;wasm32-clang++;wasm32-wasi-clang;wasm32-wasi-clang++
 -DCOMPILER_RT_BUILD_CRT=OFF
 -DCOMPILER_RT_BUILD_LIBFUZZER=OFF
 -DCOMPILER_RT_BUILD_MEMPROF=OFF
@@ -107,6 +95,7 @@ _LLVM_BUILD_ARGS="
 -DCOMPILER_RT_BUILD_SANITIZERS=OFF
 -DCOMPILER_RT_BUILD_XRAY=OFF
 -DCOMPILER_RT_INCLUDE_TESTS=OFF
+-DLLD_SYMLINKS_TO_CREATE=wasm-ld
 "
 
 # https://github.com/WebAssembly/binaryen/blob/main/CMakeLists.txt
@@ -165,6 +154,14 @@ termux_pkg_auto_update() {
 }
 
 termux_step_post_get_source() {
+	# for comparing files in termux_step_post_massage
+	pushd "${TERMUX_PKG_CACHEDIR}"
+	rm -fr emsdk
+	git clone https://github.com/emscripten-core/emsdk --depth=1
+	cd emsdk
+	./emsdk install latest
+	popd
+
 	termux_download \
 		"https://github.com/llvm/llvm-project/archive/${_LLVM_COMMIT}.tar.gz" \
 		"${TERMUX_PKG_CACHEDIR}/llvm.tar.gz" \
@@ -228,7 +225,7 @@ termux_step_host_build() {
 		-DLLVM_INCLUDE_UTILS=OFF
 	ninja \
 		-C "${TERMUX_PKG_HOSTBUILD_DIR}" \
-		-j "${TERMUX_MAKE_PROCESSES}" \
+		-j "${TERMUX_PKG_MAKE_PROCESSES}" \
 		llvm-tblgen clang-tblgen
 }
 
@@ -267,9 +264,9 @@ termux_step_make() {
 	local _LLVM_TARGET_TRIPLE=${TERMUX_HOST_PLATFORM/-/-unknown-}${TERMUX_PKG_API_LEVEL}
 	local _LLVM_TARGET_ARCH
 	case "${TERMUX_ARCH}" in
-	aarch64) _LLVM_TARGET_ARCH=AArch64 ;;
-	arm) _LLVM_TARGET_ARCH=ARM ;;
-	i686|x86_64) _LLVM_TARGET_ARCH=X86 ;;
+	aarch64) _LLVM_TARGET_ARCH="AArch64" ;;
+	arm) _LLVM_TARGET_ARCH="ARM" ;;
+	i686|x86_64) _LLVM_TARGET_ARCH="X86" ;;
 	*) termux_error_exit "Invalid arch: ${TERMUX_ARCH}" ;;
 	esac
 	_LLVM_BUILD_ARGS+="
@@ -285,7 +282,7 @@ termux_step_make() {
 		${_LLVM_BUILD_ARGS}
 	ninja \
 		-C "${TERMUX_PKG_BUILDDIR}/build-llvm" \
-		-j "${TERMUX_MAKE_PROCESSES}" \
+		-j "${TERMUX_PKG_MAKE_PROCESSES}" \
 		install
 
 	cmake \
@@ -295,7 +292,7 @@ termux_step_make() {
 		${_BINARYEN_BUILD_ARGS}
 	ninja \
 		-C "${TERMUX_PKG_BUILDDIR}/build-binaryen" \
-		-j "${TERMUX_MAKE_PROCESSES}" \
+		-j "${TERMUX_PKG_MAKE_PROCESSES}" \
 		install
 }
 
@@ -336,15 +333,6 @@ termux_step_make_install() {
 		install -Dm755 "${TERMUX_PKG_BUILDDIR}/build-llvm/bin/${tool}" "${TERMUX_PREFIX}/opt/emscripten-llvm/bin/${tool}"
 	done
 
-	# wasm32 triplets
-	rm -fr "${TERMUX_PREFIX}"/opt/emscripten-llvm/bin/wasm32-{clang,clang++,wasi-clang,wasi-clang++}
-	rm -fr "${TERMUX_PREFIX}/opt/emscripten-llvm/bin/wasm-ld"
-	ln -fs "clang"   "${TERMUX_PREFIX}/opt/emscripten-llvm/bin/wasm32-clang"
-	ln -fs "clang++" "${TERMUX_PREFIX}/opt/emscripten-llvm/bin/wasm32-clang++"
-	ln -fs "clang"   "${TERMUX_PREFIX}/opt/emscripten-llvm/bin/wasm32-wasi-clang"
-	ln -fs "clang++" "${TERMUX_PREFIX}/opt/emscripten-llvm/bin/wasm32-wasi-clang++"
-	ln -fs "lld"     "${TERMUX_PREFIX}/opt/emscripten-llvm/bin/wasm-ld"
-
 	# termux_step_massage strip does not cover opt dir
 	find "${TERMUX_PREFIX}/opt" \( \
 		-path "*/emscripten-llvm/bin/*" -o \
@@ -358,46 +346,26 @@ termux_step_make_install() {
 	popd
 }
 
+termux_step_post_massage() {
+	local upstream_bin=$(ls "${TERMUX_PKG_CACHEDIR}/emsdk/upstream/bin")
+	local llvm_bin=$(ls "${TERMUX_TOPDIR}/emscripten/subpackages/emscripten-llvm/massage/${TERMUX_PREFIX_CLASSICAL}/opt/emscripten-llvm/bin")
+	local binaryen_bin=$(ls "${TERMUX_TOPDIR}/emscripten/subpackages/emscripten-binaryen/massage/${TERMUX_PREFIX_CLASSICAL}/opt/emscripten-binaryen/bin")
+	local df=$(diff -u <(echo "${upstream_bin}") <(echo -e "${llvm_bin}\n${binaryen_bin}" | sort))
+	if [[ -n "${df}" ]]; then
+		termux_error_exit "Mismatch list of binaries with upstream:\n${df}"
+	fi
+}
+
 termux_step_create_debscripts() {
 	# emscripten's package-lock.json is generated with nodejs v12.13.0
 	# which comes with npm v6 which used lockfile version 1
 	# which isn't compatible with lockfile version 2 used in npm v7 and v8
-	cat <<- EOF > postinst
-	#!${TERMUX_PREFIX}/bin/sh
-	DIR="${TERMUX_PREFIX}/opt/emscripten"
-	cd "\${DIR}"
-	if [ -n "\$(command -v npm)" ]; then
-	if [ -n "\$(npm --version | grep "^6.")" ]; then
-	CMD="ci --production --no-optional"
-	else
-	CMD="install --omit=dev --omit=optional"
-	rm package-lock.json
-	fi
-	echo "Running 'npm \${CMD}' in \${DIR} ..."
-	npm \${CMD}
-	else
-	echo '
-	WARNING: npm is not installed! Emscripten may not work properly without installing node modules!
-	' >&2
-	fi
-	echo '
-	===== Post-install notice =====
+	sed \
+		-e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
+		"${TERMUX_PKG_BUILDER_DIR}/postinst.sh" > postinst
+	sed \
+		-e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
+		"${TERMUX_PKG_BUILDER_DIR}/postrm.sh" > postrm
 
-	Please start a new session to use Emscripten.
-	You may want to clear the cache by running
-	the command below to fix issues.
-
-	emcc --clear-cache
-
-	===== Post-install notice =====
-	'
-	EOF
-
-	cat <<- EOF > postrm
-	#!${TERMUX_PREFIX}/bin/sh
-	case "\$1" in
-	purge|remove)
-	rm -fr "${TERMUX_PREFIX}/opt/emscripten"
-	esac
-	EOF
+	chmod u+x postinst postrm
 }

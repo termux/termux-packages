@@ -1,11 +1,45 @@
---- a/meson.build
-+++ b/meson.build
-@@ -42,7 +42,7 @@
+diff -uNr pkgfile-22/meson.build pkgfile-22.mod/meson.build
+--- pkgfile-22/meson.build	2024-07-31 01:13:37.000000000 +0800
++++ pkgfile-22.mod/meson.build	2024-08-19 22:21:43.911872718 +0800
+@@ -11,7 +11,7 @@
+ conf.set_quoted('PACKAGE_NAME', meson.project_name())
+ conf.set_quoted('PACKAGE_VERSION', meson.project_version())
+ conf.set_quoted('DEFAULT_CACHEPATH', get_option('cachedir'))
+-conf.set_quoted('DEFAULT_PACMAN_CONF', '/etc/pacman.conf')
++conf.set_quoted('DEFAULT_PACMAN_CONF', '@TERMUX_PREFIX@/etc/pacman.conf')
+ 
+ cpp = meson.get_compiler('cpp')
+ 
+@@ -28,15 +28,15 @@
+ libpcre = dependency('libpcre', version : '>= 8.30')
+ libarchive = dependency('libarchive', version : '>= 3.2.0')
+ libcurl = dependency('libcurl')
+-libsystemd = dependency('libsystemd')
++libsystemd = dependency('libsystemd', required: false)
+ pthreads = dependency('threads')
+-stdcppfs = cpp.find_library('stdc++fs')
++stdcppfs = cpp.find_library('stdc++fs', required: false)
+ gtest = dependency('gtest', required : false)
+ gmock = dependency('gmock', required : false)
  
  pod2man = find_program('pod2man')
  pkgconfig = find_program('pkg-config')
 -mkdir_p = 'mkdir -p $DESTDIR/@0@'
 +mkdir_p = 'mkdir -p @TERMUX_PREFIX@/@0@'
  
- pkgfile_sources = files('''
-   src/match.c src/match.h
+ libcommon = static_library(
+   'pkgfile',
+@@ -67,13 +67,6 @@
+   link_with : [libcommon],
+   install : true)
+ 
+-executable(
+-  'pkgfiled',
+-  'src/pkgfiled.cc',
+-  link_with : [libcommon],
+-  dependencies : [libsystemd, stdcppfs],
+-  install : true)
+-
+ custom_target(
+     'pkgfile.1',
+     output : 'pkgfile.1',

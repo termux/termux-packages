@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://openscad.org/
+TERMUX_PKG_HOMEPAGE=https://openscad.org/
 TERMUX_PKG_DESCRIPTION="The programmers solid 3D CAD modeller (headless build)"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

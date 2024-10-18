@@ -261,8 +261,9 @@
  	if (fd < 0)
  		return 0;
  
---- a/utils/statd/start-statd
-+++ b/utils/statd/start-statd
+diff -u -r ../nfs-utils-2.6.4/utils/statd/start-statd ./utils/statd/start-statd
+--- ../nfs-utils-2.6.4/utils/statd/start-statd	2023-11-17 17:32:39.000000000 +0000
++++ ./utils/statd/start-statd	2024-06-18 09:23:02.089236046 +0000
 @@ -4,21 +4,21 @@
  # /run/rpc.statd.pid).
  # It should run statd with whatever flags are apropriate for this
@@ -276,11 +277,11 @@
  flock -e 9
  
 -if [ -s /run/rpc.statd.pid ] &&
--       [ 1`cat /run/rpc.statd.pid` -gt 1 ] &&
--       kill -0 `cat /run/rpc.statd.pid` > /dev/null 2>&1
+-       [ "1$(cat /run/rpc.statd.pid)" -gt 1 ] &&
+-       kill -0 "$(cat /run/rpc.statd.pid)" > /dev/null 2>&1
 +if [ -s @TERMUX_PREFIX@/var/run/rpc.statd.pid ] &&
-+       [ 1`cat @TERMUX_PREFIX@/var/run/rpc.statd.pid` -gt 1 ] &&
-+       kill -0 `cat @TERMUX_PREFIX@/var/run/rpc.statd.pid` > /dev/null 2>&1
++       [ "1$(cat @TERMUX_PREFIX@/var/run/rpc.statd.pid)" -gt 1 ] &&
++       kill -0 "$(cat @TERMUX_PREFIX@/var/run/rpc.statd.pid)" > /dev/null 2>&1
  then
      # statd already running - must have been slow to respond.
      exit 0

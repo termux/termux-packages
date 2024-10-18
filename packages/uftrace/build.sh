@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Function (graph) tracer for user-space"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.16"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/namhyung/uftrace/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=dd0549f610d186b6f25fa2334a5e82b6ddc232ec6ca088dbb41b3fe66961d6bb
 # Hardcoded libpython${TERMUX_PYTHON_VERSION}.so is dlopen(3)ed by uftrace.
@@ -11,10 +12,12 @@ TERMUX_PKG_SHA256=dd0549f610d186b6f25fa2334a5e82b6ddc232ec6ca088dbb41b3fe66961d6
 TERMUX_PKG_DEPENDS="capstone, libandroid-execinfo, libandroid-glob, libandroid-spawn, libc++, libdw, libelf, libluajit, ncurses, python"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
+# See https://github.com/termux/termux-packages/pull/21712 about arm build failure:
+TERMUX_PKG_BLACKLISTED_ARCHES="arm"
 
 # https://github.com/android/ndk/issues/1987#issuecomment-1886021103
 if [ "$TERMUX_ARCH" = "x86_64" ]; then
-	TERMUX_MAKE_PROCESSES=1
+	TERMUX_PKG_MAKE_PROCESSES=1
 fi
 
 termux_step_pre_configure() {

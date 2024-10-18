@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="PythonPL"
 TERMUX_PKG_MAINTAINER="@termux"
 _MAJOR_VERSION=2.7
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.18
-TERMUX_PKG_REVISION=13
+TERMUX_PKG_REVISION=14
 TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=b62c0e7937551d0cc02b8fd5cb0f544f9405bafc9a54d3808ed4594812edef43
 TERMUX_PKG_DEPENDS="gdbm, libandroid-posix-semaphore, libandroid-support, libbz2, libcrypt, libffi, libsqlite, ncurses, ncurses-ui-libs, openssl, readline, zlib"
@@ -59,6 +59,8 @@ termux_step_pre_configure() {
 	# Put the host-built python in path:
 	export TERMUX_ORIG_PATH=$PATH
 	export PATH=$TERMUX_PKG_HOSTBUILD_DIR:$PATH
+	
+	if [ $TERMUX_ARCH = i686 ] || [ $TERMUX_ARCH = arm ]; then LDFLAGS+=" -lm"; fi
 
 	# Needed when building with clang, as setup.py only probes
 	# gcc for include paths when finding headers for determining

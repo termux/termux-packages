@@ -3,14 +3,13 @@ TERMUX_PKG_DESCRIPTION="A library for displaying certificates and crypto UI, acc
 TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # This specific package is for libgcr-3.
-_MAJOR_VERSION=3.41
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}.1
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://download.gnome.org/sources/gcr/${_MAJOR_VERSION}/gcr-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=bb7128a3c2febbfee9c03b90d77d498d0ceb237b0789802d60185c71c4bea24f
-TERMUX_PKG_DEPENDS="glib, gtk3, libcairo, libgcrypt, p11-kit, pango"
-TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, gnupg"
+TERMUX_PKG_VERSION="3.41.2"
+TERMUX_PKG_SRCURL=https://download.gnome.org/sources/gcr/${TERMUX_PKG_VERSION%.*}/gcr-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=bad10f3c553a0e1854649ab59c5b2434da22ca1a54ae6138f1f53961567e1ab7
+TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libcairo, libgcrypt, p11-kit, pango"
+TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, glib-cross, gnupg, valac"
 TERMUX_PKG_RECOMMENDS="gnupg"
+TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dintrospection=true
@@ -37,6 +36,7 @@ termux_step_pre_configure() {
 	done
 	popd
 	export PATH+=":$bin_dir"
+	termux_setup_glib_cross_pkg_config_wrapper
 }
 
 termux_step_post_massage() {

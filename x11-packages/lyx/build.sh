@@ -2,17 +2,15 @@ TERMUX_PKG_HOMEPAGE=https://www.lyx.org
 TERMUX_PKG_DESCRIPTION="WYSIWYM (What You See Is What You Mean) Document Processor"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.3.7p1"
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL="https://ftp.lip6.fr/pub/lyx/stable/${TERMUX_PKG_VERSION%.*}.x/lyx-${TERMUX_PKG_VERSION/p/-}.tar.xz"
-TERMUX_PKG_SHA256=39be8864fb86b34e88310e70fb80e5e9e296601f0856cf161aa094171718d8ed
+TERMUX_PKG_VERSION="2.4.2.1"
+TERMUX_PKG_SRCURL="https://ftp.lip6.fr/pub/lyx/stable/${TERMUX_PKG_VERSION:0:3}.x/lyx-${TERMUX_PKG_VERSION/p/-}.tar.xz"
+TERMUX_PKG_SHA256=1d2b1c7abe391e2fb49109de2c8e13a7dfe605f27df68f689bf947dfafc7a4d9
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_SED_REGEXP='s/\./p/3; s/-/p/'
-TERMUX_PKG_DEPENDS="ghostscript, hunspell, imagemagick, libandroid-execinfo, libc++, libxcb, lyx-data, qt5-qtbase, qt5-qtsvg, qt5-qtx11extras, texlive-bin, zlib"
+TERMUX_PKG_DEPENDS="file, ghostscript, hunspell, imagemagick, libandroid-execinfo, libc++, libiconv, libxcb, lyx-data, qt5-qtbase, qt5-qtsvg, qt5-qtx11extras, texlive-bin, zlib"
 TERMUX_PKG_BUILD_DEPENDS="boost, boost-headers, qt5-qtbase-cross-tools"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-build-type=rel
---enable-qt5
 --without-included-boost
 --without-aspell
 --with-hunspell

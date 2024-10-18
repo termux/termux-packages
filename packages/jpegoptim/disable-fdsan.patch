@@ -1,0 +1,29 @@
+--- a/jpegoptim.c
++++ b/jpegoptim.c
+@@ -1216,10 +1216,26 @@
+ }
+ #endif
+ 
++#include <android/fdsan.h>
++#include <dlfcn.h>
++
++static inline void termux_disable_fdsan() {
++	// For Android 11+.
++	void *lib_handle = dlopen("libc.so", RTLD_LAZY);
++	if (lib_handle) {
++		void (*set_fdsan_error_level)(enum android_fdsan_error_level newlevel) = dlsym(lib_handle, "android_fdsan_set_error_level");
++		if (set_fdsan_error_level) {
++			set_fdsan_error_level(ANDROID_FDSAN_ERROR_LEVEL_DISABLED);
++		}
++		dlclose(lib_handle);
++	}
++}
+ 
+ /****************************************************************************/
+ int main(int argc, char **argv)
+ {
++	termux_disable_fdsan();
++
+ 	struct stat file_stat;
+ 	char tmpfilename[MAXPATHLEN + 1],tmpdir[MAXPATHLEN + 1];
+ 	char newname[MAXPATHLEN + 1], dest_path[MAXPATHLEN + 1];

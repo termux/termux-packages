@@ -29,7 +29,7 @@ termux_step_host_build() {
 	termux_setup_cmake
 
 	cmake .
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j $TERMUX_PKG_MAKE_PROCESSES
 }
 
 termux_step_post_configure() {

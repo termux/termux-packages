@@ -3,15 +3,16 @@ TERMUX_PKG_DESCRIPTION="LLVM's Fortran frontend"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_LICENSE_FILE="flang/LICENSE.TXT"
 TERMUX_PKG_MAINTAINER="@termux"
-LLVM_MAJOR_VERSION=18
-TERMUX_PKG_VERSION=${LLVM_MAJOR_VERSION}.1.6
+LLVM_MAJOR_VERSION=19
+TERMUX_PKG_VERSION=${LLVM_MAJOR_VERSION}.1.2
 TERMUX_PKG_SRCURL=https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/llvm-project-$TERMUX_PKG_VERSION.src.tar.xz
-TERMUX_PKG_SHA256=bd4b4cb6374bcd5fc5a3ba60cb80425d29da34f316b8821abc12c0db225cf6b4
+TERMUX_PKG_SHA256=3666f01fc52d8a0b0da83e107d74f208f001717824be0b80007f529453aa1e19
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_HOSTBUILD=true
 # `flang-new` should be rebuilt when libllvm bumps version.
 # See https://github.com/termux/termux-packages/issues/19362
-TERMUX_PKG_DEPENDS="libc++, libllvm (= $TERMUX_PKG_VERSION), clang (= $TERMUX_PKG_VERSION), lld (= $TERMUX_PKG_VERSION), mlir (= $TERMUX_PKG_VERSION)"
+DEP_QUALIFIER=$TERMUX_PKG_VERSION-$TERMUX_PKG_REVISION
+TERMUX_PKG_DEPENDS="libandroid-complex-math-static, libc++, libllvm (= $DEP_QUALIFIER), clang (= $DEP_QUALIFIER), lld (= $DEP_QUALIFIER), mlir (= $DEP_QUALIFIER)"
 TERMUX_PKG_BUILD_DEPENDS="libllvm-static"
 
 # Upstream doesn't support 32-bit arches well. See https://github.com/llvm/llvm-project/issues/57621.
@@ -55,7 +56,7 @@ termux_step_host_build() {
 	cmake -G Ninja "-DCMAKE_BUILD_TYPE=Release" \
 					"-DLLVM_ENABLE_PROJECTS=clang;mlir" \
 					$TERMUX_PKG_SRCDIR/llvm
-	ninja -j $TERMUX_MAKE_PROCESSES clang-tblgen mlir-tblgen
+	ninja -j $TERMUX_PKG_MAKE_PROCESSES clang-tblgen mlir-tblgen
 }
 
 termux_step_pre_configure() {
@@ -67,7 +68,7 @@ termux_step_pre_configure() {
 	TERMUX_SRCDIR_SAVE=$TERMUX_PKG_SRCDIR
 	TERMUX_PKG_SRCDIR=$TERMUX_PKG_SRCDIR/flang
 	# Avoid the possible OOM
-	TERMUX_MAKE_PROCESSES=1
+	TERMUX_PKG_MAKE_PROCESSES=1
 }
 
 termux_step_post_configure() {

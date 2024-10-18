@@ -3,7 +3,7 @@
 
 TERMUX_SUBPKG_INCLUDE="bin/ncat share/man/man1/ncat.1.gz"
 TERMUX_SUBPKG_DESCRIPTION="Feature-packed networking utility which reads and writes data across networks from the command line"
-TERMUX_SUBPKG_DEPEND_ON_PARENT=no
+TERMUX_SUBPKG_DEPEND_ON_PARENT=false
 TERMUX_SUBPKG_DEPENDS="liblua54, libpcap, openssl"
 TERMUX_SUBPKG_BREAKS="netcat"
 TERMUX_SUBPKG_REPLACES="netcat"

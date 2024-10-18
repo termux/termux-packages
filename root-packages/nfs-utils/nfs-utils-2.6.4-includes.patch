@@ -1,0 +1,41 @@
+https://bugs.gentoo.org/922373
+https://git.linux-nfs.org/?p=steved/nfs-utils.git;a=commit;h=bb25f3f594ddf85e5826e931eaaa35874f6a4204
+
+From bb25f3f594ddf85e5826e931eaaa35874f6a4204 Mon Sep 17 00:00:00 2001
+From: Petr Vorel <pvorel@suse.cz>
+Date: Wed, 3 Jan 2024 19:07:43 -0500
+Subject: [PATCH] reexport/{fsidd,reexport}.c: Re-add missing includes
+
+Older uClibc-ng requires <unistd.h> for close(2), unlink(2) and write(2),
+<sys/un.h> for struct sockaddr_un.
+
+Fixes: 1a4edb2a ("reexport/fsidd.c: Remove unused headers")
+Fixes: bdc79f02 ("support/reexport.c: Remove unused headers")
+
+Reviewed-by: Giulio Benetti <giulio.benetti@benettiengineering.com>
+Tested-by: Giulio Benetti <giulio.benetti@benettiengineering.com>
+Signed-off-by: Petr Vorel <pvorel@suse.cz>
+Signed-off-by: Steve Dickson <steved@redhat.com>
+--- a/support/reexport/fsidd.c
++++ b/support/reexport/fsidd.c
+@@ -7,6 +7,8 @@
+ #include <dlfcn.h>
+ #endif
+ #include <event2/event.h>
++#include <sys/un.h>
++#include <unistd.h>
+ 
+ #include "conffile.h"
+ #include "reexport_backend.h"
+--- a/support/reexport/reexport.c
++++ b/support/reexport/reexport.c
+@@ -7,6 +7,7 @@
+ #endif
+ #include <sys/types.h>
+ #include <sys/vfs.h>
++#include <unistd.h>
+ #include <errno.h>
+ 
+ #include "nfsd_path.h"
+-- 
+1.8.3.1

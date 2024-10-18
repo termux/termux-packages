@@ -27,6 +27,8 @@ lib/clang/*/include/openmp_wrappers/
 lib/clang/*/include/orc/
 lib/clang/*/include/ppc_wrappers/
 lib/clang/*/include/profile/
+lib/clang/*/include/zos_wrappers/
+lib/clang/latest
 lib/cmake/clang
 lib/cmake/openmp
 lib/libarcher.so
@@ -36,6 +38,7 @@ lib/libomp.a
 lib/libscanbuild/
 libexec/
 share/clang
+share/clang-doc
 share/man/man1/clang.1.gz
 share/man/man1/diagtool.1.gz
 share/man/man1/scan-build.1.gz

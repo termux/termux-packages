@@ -1,8 +1,8 @@
 TERMUX_PKG_HOMEPAGE="https://github.com/sumneko/lua-language-server"
 TERMUX_PKG_DESCRIPTION="Sumneko Lua Language Server coded in Lua"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.org>"
-TERMUX_PKG_VERSION="3.9.1"
+TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
+TERMUX_PKG_VERSION="3.11.1"
 TERMUX_PKG_GIT_BRANCH="${TERMUX_PKG_VERSION}"
 TERMUX_PKG_SRCURL="git+https://github.com/sumneko/lua-language-server"
 TERMUX_PKG_DEPENDS="libandroid-spawn, libc++"
@@ -49,20 +49,12 @@ termux_step_make_install() {
 
 	cat > "${TERMUX_PREFIX}/bin/${TERMUX_PKG_NAME}" <<- EOF
 		#!${TERMUX_PREFIX}/bin/bash
+		TMPPATH="\$(mktemp -d "${TERMUX_PREFIX}/tmp/${TERMUX_PKG_NAME}.XXXX")"
 
-		# After action of termux-elf-cleaner lua-language-server's binary is unable to
-		# determine its version, so provide it manually.
-		if [ "\$1" = "--version" ]; then
-			echo "${TERMUX_PKG_NAME}: ${TERMUX_PKG_VERSION}"
-		else
-			TMPPATH=\$(mktemp -d "${TERMUX_PREFIX}/tmp/${TERMUX_PKG_NAME}.XXXX")
-
-			exec ${datadir}/bin/${TERMUX_PKG_NAME} \\
-				--logpath="\${TMPPATH}/log" \\
-				--metapath="\${TMPPATH}/meta" \\
-				"\${@}"
-		fi
-
+		exec ${datadir}/bin/${TERMUX_PKG_NAME} \\
+		--logpath="\${TMPPATH}/log" \\
+		--metapath="\${TMPPATH}/meta" \\
+		"\${@}"
 	EOF
 
 	chmod 0700 "${TERMUX_PREFIX}/bin/${TERMUX_PKG_NAME}"
@@ -70,6 +62,9 @@ termux_step_make_install() {
 	install -Dm700 -t "${datadir}"/bin ./bin/"${TERMUX_PKG_NAME}"
 	install -Dm600 -t "${datadir}" ./{main,debugger}.lua
 	install -Dm600 -t "${datadir}"/bin ./bin/main.lua
+
+	# needed for --version
+	install -Dm600 -t "${datadir}" ./changelog.md
 
 	cp -r ./script ./meta ./locale "${datadir}"
 }

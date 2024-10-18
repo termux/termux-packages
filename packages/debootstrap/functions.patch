@@ -91,11 +91,12 @@
  	case "$HOST_OS" in
  	    *freebsd*)
  		umount_on_exit /dev
-@@ -1306,9 +1316,6 @@
+@@ -1306,10 +1316,6 @@
  		touch "$TARGET/dev/console"
  		;;
  	    *)
--		if ! setup_devices_simple; then
+-		if ! setup_devices_simple ||
+-		   !  sh -c ': >"$1"' -- "$TARGET/dev/null" 2>/dev/null; then
 -			setup_devices_bind
 -		fi
  		;;

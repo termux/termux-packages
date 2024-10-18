@@ -16,5 +16,5 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 
 termux_step_pre_configure() {
 	# Should prevent random failures on installation step.
-	export TERMUX_MAKE_PROCESSES=1
+	export TERMUX_PKG_MAKE_PROCESSES=1
 }

@@ -1,0 +1,142 @@
+--- a/xfce4-about/system-info.c
++++ b/xfce4-about/system-info.c
+@@ -24,6 +24,11 @@
+ #include <stdlib.h>
+ #endif
+ 
++#ifdef __ANDROID__
++#include <sys/system_properties.h>
++#include <unistd.h>
++#endif
++
+ #include <libxfce4util/libxfce4util.h>
+ #include <libxfce4ui/libxfce4ui.h>
+ 
+@@ -182,10 +187,113 @@
+   return remove_duplicate_whitespace (pretty);
+ }
+ 
++#ifdef __ANDROID__
++static char* guess_cpu_info_from_proc_cpuinfo(int cpu_num) {
++  FILE* p;
++  const char* cmd = "bash -c \"cat /proc/cpuinfo | grep -E '^Hardware\\s*:\\s*.*' | sed -E 's/^Hardware\\s*:\\s*(.*)$/\\1/' | head -n 1\"";
++  char buffer[BUFSIZ] = { 0 };
++  char* result = NULL;
++
++  p = popen(cmd, "r");
++  if (p != NULL) {
++    if (fgets(buffer, sizeof(buffer), p) != NULL) {
++      if (strlen(g_strstrip(buffer)) != 0) {
++        if (cpu_num <= 1) {
++          result = g_strdup_printf("%s (1 Core)", buffer);
++        } else {
++          result = g_strdup_printf("%s (%d Cores)", buffer, cpu_num);
++        }
++      }
++    }
++    fclose(p);
++  }
++
++  return result;
++}
++
++static char* guess_cpu_info_from_prop(int cpu_num) {
++  char hardware[PROP_VALUE_MAX] = { 0 };
++  char model[PROP_VALUE_MAX] = { 0 };
++
++  if (__system_property_get("ro.hardware", hardware) < 1 || strlen(hardware) == 0)
++    return NULL;
++  if (__system_property_get("ro.board.platform", model) < 1 || strlen(model) == 0) {
++    if (__system_property_get("ro.product.board", model) < 1 || strlen(model) == 0) {
++      return NULL;
++    }
++  }
++
++  if (g_ascii_islower(hardware[0])) {
++    hardware[0] = g_ascii_toupper(hardware[0]);
++  }
++
++  if (g_ascii_islower(model[0])) {
++    model[0] = g_ascii_toupper(model[0]);
++  }
++
++  if (cpu_num <= 1) {
++    return g_strdup_printf("%s %s (1 Core)", hardware, model);
++  }
++  return g_strdup_printf("%s %s (%d Cores)", hardware, model, cpu_num);
++}
++
++static char* cpu_info_from_compiler(int cpu_num) {
++  const char* model = 
++#if defined(__aarch64__)
++  "AArch64 CPU";
++#elif defined(__arm__)
++  "ARM32 CPU";
++#elif defined(__i386__)
++  "X86 CPU";
++#elif defined(__x86_64__)
++  "X86-64 CPU";
++#else
++#error "Unreachable"
++#endif
++#if defined(__arm__)
++  // Check if uname.machine is armv8l. If it is, model should be AArch64
++  struct utsname buffer;
++  memset(&buffer, 0, sizeof(buffer));
++  if (uname(&buffer) == 0 && g_str_has_prefix(buffer.machine, "armv8l")) {
++    model = "AArch64 CPU";
++  }
++#endif
++  if (cpu_num <= 1) {
++    return g_strdup_printf("%s (1 Core)", model);
++  }
++  return g_strdup_printf("%s (%d Cores)", model, cpu_num);
++}
++
++static char* guess_cpu_info_from_glibtop(const glibtop_sysinfo *info);
+ 
++char* get_cpu_info(const glibtop_sysinfo *info) {
++  char* result_str = NULL;
++  // On Android, guess from `Hardware` section in /proc/cpuinfo first.
++  // It may contain more infomation than other methods.
++  result_str = guess_cpu_info_from_proc_cpuinfo(info->ncpu);
++  if (result_str != NULL)
++    return result_str;
++
++  // Guess from glibtop
++  result_str = guess_cpu_info_from_glibtop(info);
++  if (result_str != NULL)
++    return result_str;
++
++  // Guess from system props
++  result_str = guess_cpu_info_from_prop(info->ncpu);
++  if (result_str != NULL)
++    return result_str;
+ 
++  return cpu_info_from_compiler(info->ncpu);
++}
++#endif
++
++#ifdef __ANDROID__
++static char* guess_cpu_info_from_glibtop(const glibtop_sysinfo *info)
++#else
+ char *
+ get_cpu_info (const glibtop_sysinfo *info)
++#endif
+ {
+   g_autoptr(GHashTable) counts = NULL;
+   g_autoptr(GString) cpu = NULL;
+@@ -236,7 +344,13 @@
+         g_string_append_printf (cpu, "%s ", cleanedup);
+     }
+ 
++#ifdef __ANDROID__
++  if (strlen(g_strstrip(cpu->str)) != 0)
++    return g_strdup(cpu->str);
++  return NULL;
++#else
+   return g_strdup (cpu->str);
++#endif
+ }
+ 
+ 

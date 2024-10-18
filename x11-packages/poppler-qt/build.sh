@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Please align the version with `poppler` package.
 TERMUX_PKG_VERSION="24.05.0"
+TERMUX_PKG_REVISION=1
 # Do not forget to bump revision of reverse dependencies and rebuild them
 # when SOVERSION is changed.
 _POPPLER_SOVERSION=137
@@ -11,15 +12,15 @@ TERMUX_PKG_SRCURL=https://poppler.freedesktop.org/poppler-${TERMUX_PKG_VERSION}.
 TERMUX_PKG_SHA256=d8c5eb30b50285ad9f0af8c6335cc2d3b9597fca475cbc2598a5479fa379f779
 # The package must be updated at the same time as poppler, auto updater script does not support that.
 TERMUX_PKG_AUTO_UPDATE=false
-TERMUX_PKG_DEPENDS="freetype, libc++, littlecms, poppler (>= ${TERMUX_PKG_VERSION}), qt5-qtbase"
-TERMUX_PKG_BUILD_DEPENDS="boost, boost-headers, qt5-qtbase-cross-tools"
+TERMUX_PKG_DEPENDS="freetype, libc++, littlecms, poppler (>= ${TERMUX_PKG_VERSION}), qt6-qtbase"
+TERMUX_PKG_BUILD_DEPENDS="boost, boost-headers, qt6-qtbase-cross-tools"
 #texlive needs the xpdf headers
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DENABLE_GLIB=ON
 -DENABLE_GOBJECT_INTROSPECTION=OFF
 -DENABLE_UNSTABLE_API_ABI_HEADERS=ON
--DENABLE_QT5=ON
--DENABLE_QT6=OFF
+-DENABLE_QT5=OFF
+-DENABLE_QT6=ON
 -DFONT_CONFIGURATION=fontconfig
 "
 
@@ -45,12 +46,7 @@ termux_step_pre_configure() {
 	CPPFLAGS+=" -DCMS_NO_REGISTER_KEYWORD"
 }
 
-termux_step_post_massage() {
-	find . ! -type d \
-		! -wholename "./include/poppler/qt5/*" \
-		! -wholename "./lib/libpoppler-qt5.so" \
-		! -wholename "./lib/pkgconfig/poppler-qt5.pc" \
-		! -wholename "./share/doc/$TERMUX_PKG_NAME/*" \
-		-exec rm -f '{}' \;
-	find . -type d -empty -delete
+termux_step_make_install() {
+	cmake --build "${TERMUX_PKG_BUILDDIR}" --target qt6/install
+	install -Dm600 -t "${TERMUX_PREFIX}"/lib/pkgconfig "${TERMUX_PKG_BUILDDIR}"/poppler-qt6.pc
 }

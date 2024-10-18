@@ -4,12 +4,12 @@ TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Do not upgrade to EasyEffects version.
 TERMUX_PKG_VERSION=4.8.7
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://github.com/wwmm/easyeffects/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=d841f27df87b99747349be6b8de62d131422369908fcb57a81f39590437a8099
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="boost, glib, gst-plugins-bad, gst-plugins-base, gst-plugins-good, gstreamer, gtk3, gtkmm3, libbs2b, libc++, libebur128, librnnoise, libsndfile, libzita-convolver, lilv, pulseaudio"
-TERMUX_PKG_BUILD_DEPENDS="boost-headers, libsamplerate"
+TERMUX_PKG_BUILD_DEPENDS="boost-headers, glib-cross, libsamplerate"
 
 termux_step_pre_configure() {
 	case "$TERMUX_PKG_VERSION" in
@@ -18,4 +18,5 @@ termux_step_pre_configure() {
 	esac
 
 	export BOOST_ROOT=$TERMUX_PREFIX
+	termux_setup_glib_cross_pkg_config_wrapper
 }

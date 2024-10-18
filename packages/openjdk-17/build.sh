@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Java development kit and runtime"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=17.0
-TERMUX_PKG_REVISION=32
+TERMUX_PKG_REVISION=37
 _COMMIT=82234f890786d49c49cf4ecbcb09c47bd9bea7ed
 TERMUX_PKG_SRCURL=https://github.com/openjdk/mobile/archive/$_COMMIT.tar.gz
 TERMUX_PKG_SHA256=5b298148a26e754120c6dfe699056d0609fc6ed92bfc858dc2ba4909ef6e791b
@@ -50,12 +50,12 @@ termux_step_configure() {
 		OBJDUMP="$OBJDUMP" \
 		STRIP="$STRIP" \
 		CXXFILT="llvm-cxxfilt" \
-		BUILD_CC="/usr/bin/clang-16" \
-		BUILD_CXX="/usr/bin/clang++-16" \
-		BUILD_NM="/usr/bin/llvm-nm-16" \
-		BUILD_AR="/usr/bin/llvm-ar-16" \
-		BUILD_OBJCOPY="/usr/bin/llvm-objcopy-16" \
-		BUILD_STRIP="/usr/bin/llvm-strip-16"
+		BUILD_CC="/usr/bin/clang-17" \
+		BUILD_CXX="/usr/bin/clang++-17" \
+		BUILD_NM="/usr/bin/llvm-nm-17" \
+		BUILD_AR="/usr/bin/llvm-ar-17" \
+		BUILD_OBJCOPY="/usr/bin/llvm-objcopy-17" \
+		BUILD_STRIP="/usr/bin/llvm-strip-17"
 }
 
 termux_step_make() {
@@ -83,41 +83,18 @@ termux_step_post_make_install() {
 }
 
 termux_step_create_debscripts() {
-	local binaries="$(find $TERMUX_PREFIX/lib/jvm/java-17-openjdk/bin -executable -type f | xargs -I{} basename "{}" | xargs echo)"
-	local manpages="$(find $TERMUX_PREFIX/lib/jvm/java-17-openjdk/man/man1 -name "*.1.gz" | xargs -I{} basename "{}" | xargs echo)"
-	cat <<-EOF >./postinst
-		#!$TERMUX_PREFIX/bin/sh
-		if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" = "configure" ] || [ "\$1" = "abort-upgrade" ]; then
-			if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
-				update-alternatives --install $TERMUX_PREFIX/etc/profile.d/java.sh java-profile	$TERMUX_PREFIX/lib/jvm/java-17-openjdk/etc/profile.d/java.sh 40
-				for tool in $binaries; do
-					update-alternatives --install \
-						$TERMUX_PREFIX/bin/\$tool \$tool \
-						$TERMUX_PREFIX/lib/jvm/java-17-openjdk/bin/\$tool 40
-				done
+	binaries="$(find $TERMUX_PREFIX/lib/jvm/java-17-openjdk/bin -executable -type f | xargs -I{} basename "{}" | xargs echo)"
+	manpages="$(find $TERMUX_PREFIX/lib/jvm/java-17-openjdk/man/man1 -name "*.1.gz" | xargs -I{} basename "{}" | xargs echo)"
 
-				for manpage in $manpages; do
-					update-alternatives --install \
-						$TERMUX_PREFIX/share/man/man1/\$manpage \$manpage \
-						$TERMUX_PREFIX/lib/jvm/java-17-openjdk/man/man1/\$manpage 60
-				done
-			fi
-		fi
-	EOF
+	for hook in postinst prerm; do
+		sed -e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
+			-e "s|@binaries@|${binaries}|g" \
+			-e "s|@manpages@|${manpages}|g" \
+			"$TERMUX_PKG_BUILDER_DIR/hooks/$TERMUX_PACKAGE_FORMAT/$hook.in" > $hook
+		chmod 700 $hook
+	done
 
-	cat <<-EOF >./prerm
-		#!$TERMUX_PREFIX/bin/sh
-		if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" != "upgrade" ]; then
-			if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
-				update-alternatives --remove java-profile $TERMUX_PREFIX/etc/profile.d/java.sh
-				for tool in $binaries; do
-					update-alternatives --remove \$tool $TERMUX_PREFIX/bin/\$tool
-				done
-
-				for manpage in $manpages; do
-					update-alternatives --remove \$manpage $TERMUX_PREFIX/share/man/man1/\$manpage
-				done
-			fi
-		fi
-	EOF
+	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ]; then
+		echo "post_install" > postupg
+	fi
 }

@@ -25,7 +25,7 @@ termux_step_host_build() {
 		--program-suffix=1.8 \
 		--disable-error-on-warning
 
-	make -j "$TERMUX_MAKE_PROCESSES"
+	make -j "$TERMUX_PKG_MAKE_PROCESSES"
 	make install
 }
 

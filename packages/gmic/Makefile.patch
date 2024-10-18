@@ -1,6 +1,7 @@
---- a/src/Makefile
-+++ b/src/Makefile
-@@ -188,7 +188,7 @@
+diff -u -r ../gmic-3.4.3/src/Makefile ./src/Makefile
+--- ../gmic-3.4.3/src/Makefile	2024-10-11 15:23:57.000000000 +0000
++++ ./src/Makefile	2024-10-12 11:00:29.832806811 +0000
+@@ -189,7 +189,7 @@
  ifndef NO_SRIPDLIB
  MANDATORY_CFLAGS += -std=c++11 -pedantic
  endif
@@ -9,18 +10,18 @@
  ifdef IS_GCC
  MANDATORY_CFLAGS += -Wall -Wextra -Wfatal-errors -Werror=unknown-pragmas -Werror=unused-label
  GCC_VER_GTEQ5 = $(shell expr `$(CXX) -dumpversion | cut -f1 -d.` \>= 5)
-@@ -348,8 +348,8 @@
+@@ -355,8 +355,8 @@
  GMIC_STD_CFLAGS = -Dgmic_community $(MANDATORY_CFLAGS) $(ABORT_CFLAGS) $(PARALLEL_CFLAGS) $(FFTW_CFLAGS) $(CURL_CFLAGS) $(PNG_CFLAGS) $(JPEG_CFLAGS) $(TIFF_CFLAGS)
  GMIC_STD_LIBS = $(MANDATORY_LIBS) $(PARALLEL_LIBS) $(FFTW_LIBS) $(CURL_LIBS) $(PNG_LIBS) $(JPEG_LIBS) $(TIFF_LIBS)
  ifeq ($(OS),Unix) # Unix
--GMIC_STD_CFLAGS += $(OPENMP_CFLAGS) $(X11_CFLAGS) $(OPENEXR_CFLAGS)
--GMIC_STD_LIBS += $(OPENMP_LIBS) $(X11_LIBS) $(OPENEXR_LIBS)
-+GMIC_STD_CFLAGS += $(X11_CFLAGS) $(OPENEXR_CFLAGS)
-+GMIC_STD_LIBS += $(X11_LIBS) $(OPENEXR_LIBS)
+-GMIC_STD_CFLAGS += $(OPENMP_CFLAGS) $(X11_CFLAGS) $(OPENEXR_CFLAGS) $(WEBP_CFLAGS)
+-GMIC_STD_LIBS += $(OPENMP_LIBS) $(X11_LIBS) $(OPENEXR_LIBS) $(WEBP_LIBS)
++GMIC_STD_CFLAGS += $(X11_CFLAGS) $(OPENEXR_CFLAGS) $(WEBP_CFLAGS)
++GMIC_STD_LIBS += $(X11_LIBS) $(OPENEXR_LIBS) $(WEBP_LIBS)
  else
  ifeq ($(OS),Darwin) # MacOSX
  GMIC_STD_CFLAGS += $(X11_CFLAGS) $(OPENEXR_CFLAGS)
-@@ -414,6 +414,10 @@
+@@ -421,6 +421,10 @@
  	$(MAKE) "CFLAGS+=$(GMIC_STD_CFLAGS) $(OPT_CFLAGS)" "LIBS+=gmic.o $(GMIC_STD_LIBS) $(OPT_LIBS)" gmic.o _cli
  	$(STRIP) gmic$(EXE)
  
@@ -31,7 +32,7 @@
  dev:
  	$(MAKE) "CFLAGS+=$(GMIC_STD_CFLAGS)" "LIBS+=gmic.o $(GMIC_STD_LIBS)" gmic.o _cli
  
-@@ -432,13 +436,20 @@
+@@ -439,13 +443,20 @@
  	        "LIBS+=gmic.o $(MANDATORY_LIBS) $(PARALLEL_LIBS) $(OPENMP_LIBS) $(X11_LIBS) $(OPENEXR_LIBS)" gmic.o _cli
  
  _cli: gmic$(EXE)

@@ -1,0 +1,20 @@
+diff --git a/scripts/webpack/webpack.prod.js b/scripts/webpack/webpack.prod.js
+index a94550fd0a5..538a3f25619 100644
+--- a/scripts/webpack/webpack.prod.js
++++ b/scripts/webpack/webpack.prod.js
+@@ -52,15 +52,6 @@ module.exports = (env = {}) =>
+       minimizer: [new EsbuildPlugin(esbuildOptions), new CssMinimizerPlugin()],
+     },
+ 
+-    // enable persistent cache for faster builds
+-    cache: {
+-      type: 'filesystem',
+-      name: 'grafana-default-production',
+-      buildDependencies: {
+-        config: [__filename],
+-      },
+-    },
+-
+     plugins: [
+       new MiniCssExtractPlugin({
+         filename: 'grafana.[name].[contenthash].css',

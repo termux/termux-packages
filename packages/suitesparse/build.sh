@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="A Suite of Sparse matrix packages."
 TERMUX_PKG_GROUPS="science"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="7.7.0"
+TERMUX_PKG_VERSION="7.8.2"
 TERMUX_PKG_SRCURL=https://github.com/DrTimothyAldenDavis/SuiteSparse/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=529b067f5d80981f45ddf6766627b8fc5af619822f068f342aab776e683df4f3
+TERMUX_PKG_SHA256=996c48c87baaeb5fc04bd85c7e66d3651a56fe749c531c60926d75b4db5d2181
 TERMUX_PKG_DEPENDS="libandroid-complex-math, libgmp, libmpfr, libopenblas"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_FORCE_CMAKE=true
@@ -23,7 +23,7 @@ termux_step_configure() {
 	termux_setup_ninja
 	termux_setup_flang
 
-	LDFLAGS+=" -landroid-complex-math -lm"
+	LDFLAGS+=" -fopenmp -static-openmp -landroid-complex-math -lm"
 }
 
 termux_step_make() {
@@ -70,8 +70,8 @@ termux_step_make() {
 	CMAKE_OPTIONS+=" -DBUILD_TESTING=OFF"
 	CMAKE_OPTIONS+=" $(echo $TERMUX_PKG_EXTRA_CONFIGURE_ARGS)"
 
-	make -j $TERMUX_MAKE_PROCESSES \
-		CMAKE_OPTIONS="$CMAKE_OPTIONS" JOBS=$TERMUX_MAKE_PROCESSES
+	make -j $TERMUX_PKG_MAKE_PROCESSES \
+		CMAKE_OPTIONS="$CMAKE_OPTIONS" JOBS=$TERMUX_PKG_MAKE_PROCESSES
 }
 
 termux_step_make_install() {

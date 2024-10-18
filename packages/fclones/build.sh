@@ -11,7 +11,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 termux_step_make_install() {
 	termux_setup_rust
 	cargo install \
-		--jobs $TERMUX_MAKE_PROCESSES \
+		--jobs $TERMUX_PKG_MAKE_PROCESSES \
 		--path $TERMUX_PKG_SRCDIR/fclones \
 		--force \
 		--locked \

@@ -22,7 +22,7 @@ termux_step_make() {
 		$TERMUX_PKG_SRCDIR/configure.py --bootstrap
 	else
 		termux_setup_ninja
-		ninja -j $TERMUX_MAKE_PROCESSES
+		ninja -j $TERMUX_PKG_MAKE_PROCESSES
 	fi
 }
 

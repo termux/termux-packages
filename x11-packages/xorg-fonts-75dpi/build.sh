@@ -39,7 +39,7 @@ termux_step_make_install() {
 			--prefix="${TERMUX_PREFIX}" \
 			--host="${TERMUX_HOST_PLATFORM}" \
 			--with-fontdir="${TERMUX_PREFIX}/share/fonts/75dpi"
-		make -j "${TERMUX_MAKE_PROCESSES}"
+		make -j "${TERMUX_PKG_MAKE_PROCESSES}"
 		make install
 		popd
 	done

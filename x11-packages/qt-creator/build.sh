@@ -3,11 +3,11 @@ TERMUX_PKG_DESCRIPTION="Integrated Development Environment for Qt"
 TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=4.15.2
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL="https://github.com/qt-creator/qt-creator/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=e23e76ea518cc65949f29e9eff18331a9a1da0817b292afbcbb4d5cdeada3c47
 TERMUX_PKG_AUTO_UPDATE=false
-TERMUX_PKG_DEPENDS="libc++, qt5-qtbase, qt5-qtdeclarative, qt5-qtxmlpatterns, qt5-qttools, qt5-qtx11extras, qt5-qtsvg, llvm, clang"
+TERMUX_PKG_DEPENDS="libc++, libllvm, qt5-qtbase, qt5-qtdeclarative, qt5-qtxmlpatterns, qt5-qttools, qt5-qtx11extras, qt5-qtsvg, llvm, clang"
 TERMUX_PKG_BUILD_DEPENDS="qt5-qtbase-cross-tools, qt5-qtdeclarative-cross-tools, qt5-qttools-cross-tools"
 TERMUX_PKG_RECOMMENDS="gdb, git, make, cmake, valgrind"
 TERMUX_PKG_SUGGESTS="cvs, subversion"
@@ -21,7 +21,8 @@ termux_step_configure () {
 	export QTC_DO_NOT_BUILD_QMLDESIGNER=1
 	export QTC_DISABLE_CLANG_REFACTORING=1
 	"${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" -r \
-		-spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-cross"
+		-spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-cross" \
+		LLVM_CONFIG=$TERMUX_PREFIX/bin/llvm-config
 }
 
 termux_step_post_configure() {

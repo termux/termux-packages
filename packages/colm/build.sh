@@ -22,7 +22,7 @@ termux_step_host_build() {
 	for f in ${srcdir}/src/*.lm; do
 		ln -sf ${f} src/$(basename ${f})
 	done
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j $TERMUX_PKG_MAKE_PROCESSES
 }
 
 termux_step_pre_configure() {

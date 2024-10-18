@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://git-scm.com/
 TERMUX_PKG_DESCRIPTION="Fast, scalable, distributed revision control system"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.45.2"
+TERMUX_PKG_VERSION="2.47.0"
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/pub/software/scm/git/git-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=51bfe87eb1c02fed1484051875365eeab229831d30d0cec5d89a14f9e40e9adb
+TERMUX_PKG_SHA256=1ce114da88704271b43e027c51e04d9399f8c88e9ef7542dae7aebae7d87bc4e
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libcurl, libexpat, libiconv, less, openssl, pcre2, zlib"
 TERMUX_PKG_RECOMMENDS="openssh"
@@ -66,11 +66,11 @@ termux_step_pre_configure() {
 
 termux_step_post_make_install() {
 	# Installing man requires asciidoc and xmlto, so git uses separate make targets for man pages
-	make -j $TERMUX_MAKE_PROCESSES install-man
+	make -j $TERMUX_PKG_MAKE_PROCESSES install-man
 
-	make -j $TERMUX_MAKE_PROCESSES -C contrib/subtree $TERMUX_PKG_EXTRA_MAKE_ARGS
+	make -j $TERMUX_PKG_MAKE_PROCESSES -C contrib/subtree $TERMUX_PKG_EXTRA_MAKE_ARGS
 	make -C contrib/subtree $TERMUX_PKG_EXTRA_MAKE_ARGS ${TERMUX_PKG_MAKE_INSTALL_TARGET}
-	make -j $TERMUX_MAKE_PROCESSES -C contrib/subtree install-man
+	make -j $TERMUX_PKG_MAKE_PROCESSES -C contrib/subtree install-man
 
 	mkdir -p $TERMUX_PREFIX/etc/bash_completion.d/
 	cp $TERMUX_PKG_SRCDIR/contrib/completion/git-completion.bash \

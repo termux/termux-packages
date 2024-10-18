@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=(1.30.0)
 TERMUX_PKG_VERSION+=(14.0.3)  # LLVM version
 TERMUX_PKG_VERSION+=(2.100.1) # TOOLS version
 TERMUX_PKG_VERSION+=(1.30.0)  # DUB version
-
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc-${TERMUX_PKG_VERSION}-src.tar.gz
                    https://github.com/ldc-developers/llvm-project/releases/download/ldc-v${TERMUX_PKG_VERSION[1]}/llvm-${TERMUX_PKG_VERSION[1]}.src.tar.xz
                    https://github.com/llvm/llvm-project/releases/download/llvmorg-${TERMUX_PKG_VERSION[1]}/libunwind-${TERMUX_PKG_VERSION[1]}.src.tar.xz
@@ -74,12 +74,12 @@ termux_step_host_build() {
 		-DLLVM_INCLUDE_BENCHMARKS=OFF \
 		-DCOMPILER_RT_INCLUDE_TESTS=OFF \
 		-DLLVM_INCLUDE_TESTS=OFF
-	ninja -j $TERMUX_MAKE_PROCESSES llvm-tblgen
+	ninja -j $TERMUX_PKG_MAKE_PROCESSES llvm-tblgen
 }
 
 # Just before CMake invokation for LLVM:
 termux_step_pre_configure() {
-	PATH=$TERMUX_PREFIX/opt/binutils/cross/$TERMUX_HOST_PLATFORM/bin:$PATH
+	export PATH="$TERMUX_PREFIX/opt/binutils/cross/$TERMUX_HOST_PLATFORM/bin:$PATH"
 
 	LLVM_INSTALL_DIR=$TERMUX_PKG_BUILDDIR/llvm-install
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCMAKE_INSTALL_PREFIX=$LLVM_INSTALL_DIR"
@@ -130,7 +130,7 @@ termux_step_post_configure() {
 	# Cross-compile & install LLVM
 	cd "$TERMUX_PKG_BUILDDIR"
 	if test -f build.ninja; then
-		ninja -j $TERMUX_MAKE_PROCESSES install
+		ninja -j $TERMUX_PKG_MAKE_PROCESSES install
 	fi
 
 	# Invoke CMake for LDC:
@@ -167,7 +167,7 @@ termux_step_post_configure() {
 
 termux_step_make() {
 	# Cross-compile the runtime libraries
-	$LDC_PATH/bin/ldc-build-runtime --ninja -j $TERMUX_MAKE_PROCESSES \
+	$LDC_PATH/bin/ldc-build-runtime --ninja -j $TERMUX_PKG_MAKE_PROCESSES \
 		--dFlags="-fvisibility=hidden;$LDC_FLAGS" \
 		--cFlags="-I$TERMUX_PREFIX/include" \
 		--targetSystem="Android;Linux;UNIX" \
@@ -178,7 +178,7 @@ termux_step_make() {
 
 	# Cross-compile LDC executables (linked against runtime libs above)
 	if test -f build.ninja; then
-		ninja -j $TERMUX_MAKE_PROCESSES ldc2 ldmd2 ldc-build-runtime ldc-profdata ldc-prune-cache
+		ninja -j $TERMUX_PKG_MAKE_PROCESSES ldc2 ldmd2 ldc-build-runtime ldc-profdata ldc-prune-cache
 	fi
 	echo ".: LDC built successfully."
 

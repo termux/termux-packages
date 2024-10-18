@@ -1,15 +1,6 @@
---- a/meson.build
-+++ b/meson.build
-@@ -136,7 +136,6 @@
- dep_wayland_server = dependency('wayland-server', version: '>= 1.22.0')
- dep_wayland_client = dependency('wayland-client', version: '>= 1.22.0')
- dep_pixman = dependency('pixman-1', version: '>= 0.25.2')
--dep_libinput = dependency('libinput', version: '>= 1.2.0')
- dep_libevdev = dependency('libevdev')
- dep_libm = cc.find_library('m')
- dep_libdl = cc.find_library('dl')
---- a/compositor/meson.build
-+++ b/compositor/meson.build
+diff -uNr weston-14.0.0/frontend/meson.build weston-14.0.0.mod/frontend/meson.build
+--- weston-14.0.0/frontend/meson.build	2024-09-04 16:53:50.000000000 +0800
++++ weston-14.0.0.mod/frontend/meson.build	2024-09-07 14:51:52.322883177 +0800
 @@ -12,7 +12,6 @@
  deps_weston = [
  	dep_libshared,
@@ -18,26 +9,9 @@
  	dep_libevdev,
  	dep_libdl,
  	dep_threads,
---- a/libweston/meson.build
-+++ b/libweston/meson.build
-@@ -181,7 +181,6 @@
- 		install: false
- 	)
- 	dep_session_helper = declare_dependency(link_with: lib_session_helper)
--endif
- 
- lib_libinput_backend = static_library(
- 	'libinput-backend',
-@@ -202,6 +201,7 @@
- 	link_with: lib_libinput_backend,
- 	include_directories: include_directories('.')
- )
-+endif
- 
- dep_vertex_clipping = declare_dependency(
- 	sources: 'vertex-clipping.c',
---- a/compositor/main.c
-+++ b/compositor/main.c
+diff -uNr weston-14.0.0/frontend/main.c weston-14.0.0.mod/frontend/main.c
+--- weston-14.0.0/frontend/main.c	2024-09-04 16:53:50.000000000 +0800
++++ weston-14.0.0.mod/frontend/main.c	2024-09-07 15:02:56.886882924 +0800
 @@ -41,7 +41,9 @@
  #include <sys/stat.h>
  #include <sys/wait.h>
@@ -48,26 +22,29 @@
  #include <libevdev/libevdev.h>
  #include <linux/input.h>
  #include <sys/time.h>
-@@ -1046,6 +1048,7 @@
+@@ -1070,7 +1072,7 @@
+ 		load_pipewire(wet.compositor, wet.config);
  	}
  }
- 
+-
 +#ifndef __ANDROID__
  static int
  save_touch_device_calibration(struct weston_compositor *compositor,
  			      struct weston_touch_device *device,
-@@ -1103,6 +1106,7 @@
+@@ -1128,7 +1130,7 @@
  
  	return ret;
  }
+-
 +#endif
- 
  static const struct {
  	const char *name;
-@@ -1184,12 +1188,14 @@
+ 	enum require_outputs mode;
+@@ -1208,14 +1210,14 @@
+ 		else
  			compositor->use_color_manager = true;
  	}
- 
+-
 +#ifndef __ANDROID__
  	/* weston.ini [libinput] */
  	s = weston_config_get_section(config, "libinput", NULL, NULL);
@@ -75,11 +52,12 @@
  	if (cal)
  		weston_compositor_enable_touch_calibrator(ec,
  						save_touch_device_calibration);
+-
 +#endif
- 
  	return 0;
  }
-@@ -1905,6 +1911,7 @@
+ 
+@@ -2127,6 +2129,7 @@
  	}
  }
  
@@ -87,15 +65,16 @@
  static void
  configure_input_device_accel(struct weston_config_section *s,
  		struct libinput_device *device)
-@@ -2106,6 +2113,7 @@
+@@ -2328,7 +2331,7 @@
  
  	configure_input_device_scroll(s, device);
  }
+-
 +#endif
- 
  static int
  drm_backend_output_configure(struct weston_output *output,
-@@ -3019,6 +3027,7 @@
+ 			     struct weston_config_section *section)
+@@ -3377,6 +3380,7 @@
  load_drm_backend(struct weston_compositor *c, int *argc, char **argv,
  		 struct weston_config *wc, enum weston_renderer_type renderer)
  {
@@ -103,15 +82,45 @@
  	struct weston_drm_backend_config config = {{ 0, }};
  	struct weston_config_section *section;
  	struct wet_compositor *wet = to_wet_compositor(c);
-@@ -3081,6 +3090,11 @@
+@@ -3440,7 +3444,10 @@
+ 	free(config.gbm_format);
  	free(config.seat_id);
  	free(config.specific_device);
- 
+-
 +#else
 +	weston_log("error: drm_backend is not avaiable on Android.\n");
 +	abort();
 +#endif
-+
  	return 0;
  }
  
+diff -uNr weston-14.0.0/libweston/meson.build weston-14.0.0.mod/libweston/meson.build
+--- weston-14.0.0/libweston/meson.build	2024-09-04 16:53:50.000000000 +0800
++++ weston-14.0.0.mod/libweston/meson.build	2024-09-07 14:51:52.322883177 +0800
+@@ -180,7 +180,6 @@
+ 		install: false
+ 	)
+ 	dep_session_helper = declare_dependency(link_with: lib_session_helper)
+-endif
+ 
+ lib_libinput_backend = static_library(
+ 	'libinput-backend',
+@@ -201,6 +200,7 @@
+ 	link_with: lib_libinput_backend,
+ 	include_directories: include_directories('.')
+ )
++endif
+ 
+ dep_vertex_clipping = declare_dependency(
+ 	sources: 'vertex-clipping.c',
+diff -uNr weston-14.0.0/meson.build weston-14.0.0.mod/meson.build
+--- weston-14.0.0/meson.build	2024-09-04 16:53:50.000000000 +0800
++++ weston-14.0.0.mod/meson.build	2024-09-07 14:51:52.326883177 +0800
+@@ -147,7 +147,6 @@
+ dep_wayland_server = dependency('wayland-server', version: '>= 1.22.0')
+ dep_wayland_client = dependency('wayland-client', version: '>= 1.22.0')
+ dep_pixman = dependency('pixman-1', version: '>= 0.25.2')
+-dep_libinput = dependency('libinput', version: '>= 1.2.0')
+ dep_libevdev = dependency('libevdev')
+ dep_libm = cc.find_library('m')
+ dep_libdl = cc.find_library('dl')

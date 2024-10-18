@@ -98,9 +98,9 @@ met these conditions:
   Software which is either closed-source, contain binary-only components or
   is distributed under End User License Agreement is not accepted.
 
-- **Not installable through cpan, gem, npm, or pip**
+- **Not installable through cpan, gem, npm, pip or cargo**
 
-  These packages should be installed through `cpan`, `gem`, `npm`, `pip` and
+  These packages should be installed through `cpan`, `gem`, `npm`, `pip`, `cargo` and
   so on.
 
   Packaging modules for Perl, Ruby, Node.js, is problematic, especially

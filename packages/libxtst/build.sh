@@ -1,10 +1,11 @@
 # X11 package
 TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/
-TERMUX_PKG_DESCRIPTION="X11 Testing -- Resource extension library"
+TERMUX_PKG_DESCRIPTION="Xlib-based library for XTEST & RECORD extensions"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.2.4
+TERMUX_PKG_VERSION="1.2.5"
 TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/lib/libXtst-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=84f5f30b9254b4ffee14b5b0940e2622153b0d3aed8286a3c5b7eeb340ca33c8
+TERMUX_PKG_SHA256=b50d4c25b97009a744706c1039c598f4d8e64910c9fde381994e1cae235d9242
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libx11, libxext, libxi"
 TERMUX_PKG_BUILD_DEPENDS="libxfixes, xorg-util-macros"

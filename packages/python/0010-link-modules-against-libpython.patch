@@ -1,0 +1,23 @@
+Borrowed from https://github.com/msys2-contrib/cpython-mingw/commit/c4c698ec8fd7413068fce2de966938b3f8462de8
+
+--- a/Modules/makesetup
++++ b/Modules/makesetup
+@@ -97,6 +97,9 @@
+ 	 	ExtraLibDir='$(LIBPL)'
+ 	 fi
+ 	 ExtraLibs="-L$ExtraLibDir -lpython\$(LDVERSION)";;
++Linux*)
++	 ExtraLibs='$(BLDLIBRARY)'
++	 ExtraLibDepends='$(LIBRARY_DEPS)';;
+ esac
+ 
+ # Main loop
+@@ -285,7 +288,7 @@
+ 				BUILT_SHARED="$BUILT_SHARED $mod"
+ 				;;
+ 			esac
+-			rule="$file: $objs"
++			rule="$file: $objs $ExtraLibDepends"
+ 			rule="$rule; \$(BLDSHARED) $objs $libs $ExtraLibs -o $file"
+ 			echo "$rule" >>$rulesf
+ 		done

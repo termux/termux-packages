@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://www.openjpeg.org/
+TERMUX_PKG_HOMEPAGE=https://www.openjpeg.org/
 TERMUX_PKG_DESCRIPTION="JPEG 2000 image compression library"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"

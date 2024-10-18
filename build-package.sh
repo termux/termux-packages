@@ -27,8 +27,8 @@ export TERMUX_SCRIPTDIR
 # Store pid of current process in a file for docker__run_docker_exec_trap
 source "$TERMUX_SCRIPTDIR/scripts/utils/docker/docker.sh"; docker__create_docker_exec_pid_file
 
-# Functions for working with packages
-source "$TERMUX_SCRIPTDIR/scripts/utils/package/package.sh"
+# Source the `termux_package` library.
+source "$TERMUX_SCRIPTDIR/scripts/utils/termux/package/termux_package.sh"
 
 export SOURCE_DATE_EPOCH=${SOURCE_DATE_EPOCH:-$(git -c log.showSignature=false log -1 --pretty=%ct 2>/dev/null || date "+%s")}
 
@@ -79,6 +79,10 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_setup_cgct_environment.sh"
 # Utility function for setting up Cargo C-ABI helpers.
 # shellcheck source=scripts/build/setup/termux_setup_cargo_c.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_cargo_c.sh"
+
+# Utility function for setting up pkg-config wrapper.
+# shellcheck source=scripts/build/setup/termux_setup_pkg_config_wrapper.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_pkg_config_wrapper.sh"
 
 # Utility function for setting up Crystal toolchain.
 # shellcheck source=scripts/build/setup/termux_setup_crystal.sh
@@ -228,8 +232,8 @@ termux_step_post_get_source() {
 }
 
 # Optional host build. Not to be overridden by packages.
-# shellcheck source=scripts/build/termux_step_handle_hostbuild.sh
-source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_handle_hostbuild.sh"
+# shellcheck source=scripts/build/termux_step_handle_host_build.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_handle_host_build.sh"
 
 # Perform a host build. Will be called in $TERMUX_PKG_HOSTBUILD_DIR.
 # After termux_step_post_get_source() and before termux_step_patch_package()
@@ -237,8 +241,8 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_handle_hostbuild.sh"
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_host_build.sh"
 
 # Setup a standalone Android NDK toolchain. Called from termux_step_setup_toolchain.
-# shellcheck source=scripts/build/toolchain/termux_setup_toolchain_26b.sh
-source "$TERMUX_SCRIPTDIR/scripts/build/toolchain/termux_setup_toolchain_26b.sh"
+# shellcheck source=scripts/build/toolchain/termux_setup_toolchain_27b.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/toolchain/termux_setup_toolchain_27b.sh"
 
 # Setup a standalone Android NDK 23c toolchain. Called from termux_step_setup_toolchain.
 # shellcheck source=scripts/build/toolchain/termux_setup_toolchain_23c.sh
@@ -636,7 +640,7 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 			termux_step_get_source
 			cd "$TERMUX_PKG_SRCDIR"
 			termux_step_post_get_source
-			termux_step_handle_hostbuild
+			termux_step_handle_host_build
 		fi
 
 		termux_step_setup_toolchain

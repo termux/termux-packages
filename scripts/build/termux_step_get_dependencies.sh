@@ -31,7 +31,7 @@ termux_step_get_dependencies() {
 			if [ "$cyclic_dependence" = false ]; then
 				[ ! "$TERMUX_QUIET_BUILD" = true ] && echo "Downloading dependency $PKG$(test ${TERMUX_WITHOUT_DEPVERSION_BINDING} = false && echo "@$DEP_VERSION") if necessary..."
 				local force_build_dependency="$TERMUX_FORCE_BUILD_DEPENDENCIES"
-				if [ "$TERMUX_FORCE_BUILD_DEPENDENCIES" = "true" ] && [ "$TERMUX_ON_DEVICE_BUILD" = "true" ] && ! package__is_package_on_device_build_supported "$PKG_DIR"; then
+				if [ "$TERMUX_FORCE_BUILD_DEPENDENCIES" = "true" ] && [ "$TERMUX_ON_DEVICE_BUILD" = "true" ] && ! termux_package__is_package_on_device_build_supported "$PKG_DIR"; then
 					echo "Building dependency $PKG on device is not supported. It will be downloaded..."
 					force_build_dependency="false"
 				fi
@@ -44,7 +44,7 @@ termux_step_get_dependencies() {
 				termux_force_check_package_dependency && continue
 				build_dependency=true
 			else
-				if package__is_package_version_built "$PKG" "$DEP_VERSION"; then
+				if termux_package__is_package_version_built "$PKG" "$DEP_VERSION"; then
 					[ ! "$TERMUX_QUIET_BUILD" = true ] && echo "Skipping already built dependency $PKG$(test ${TERMUX_WITHOUT_DEPVERSION_BINDING} = false && echo "@$DEP_VERSION")"
 					continue
 				fi
@@ -99,7 +99,7 @@ termux_step_get_dependencies() {
 			# Built dependencies are put in the default TERMUX_OUTPUT_DIR instead of the specified one
 			if [ "$TERMUX_FORCE_BUILD_DEPENDENCIES" = "true" ]; then
 				[ ! "$TERMUX_QUIET_BUILD" = true ] && echo "Force building dependency $PKG..."
-				if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ] && ! package__is_package_on_device_build_supported "$PKG_DIR"; then
+				if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ] && ! termux_package__is_package_on_device_build_supported "$PKG_DIR"; then
 					echo "Building $PKG on device is not supported. Consider passing -I flag to download it instead"
 					return 1
 				fi
@@ -114,7 +114,7 @@ termux_step_get_dependencies() {
 }
 
 termux_force_check_package_dependency() {
-	if termux_check_package_in_built_packages_list "$PKG" && package__is_package_version_built "$PKG" "$DEP_VERSION"; then
+	if termux_check_package_in_built_packages_list "$PKG" && termux_package__is_package_version_built "$PKG" "$DEP_VERSION"; then
 		[ ! "$TERMUX_QUIET_BUILD" = true ] && echo "Skipping already built dependency $PKG$(test ${TERMUX_WITHOUT_DEPVERSION_BINDING} = false && echo "@$DEP_VERSION")"
 		return 0
 	fi
@@ -127,7 +127,7 @@ termux_run_build-package() {
 		set_library="$TERMUX_PACKAGE_LIBRARY -L"
 	else
 		set_library="bionic"
-		if package__is_package_name_have_glibc_prefix "$PKG"; then
+		if termux_package__is_package_name_have_glibc_prefix "$PKG"; then
 			set_library="glibc"
 		fi
 	fi

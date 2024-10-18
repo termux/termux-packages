@@ -4,15 +4,16 @@ TERMUX_PKG_LICENSE="PHP-3.01"
 TERMUX_PKG_LICENSE_FILE=LICENSE
 TERMUX_PKG_MAINTAINER="@termux"
 # Please revbump php-* extensions along with "minor" bump (e.g. 8.1.x to 8.2.0)
-TERMUX_PKG_VERSION=8.3.7
+TERMUX_PKG_VERSION="8.3.10"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/php/php-src/archive/php-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=320ae974d288cc8a71793929a4767025a3342c5d19f05e3dadc6c821c46729be
+TERMUX_PKG_SHA256=ef428734ff3b32bade6528b29fb0cd2dc29c5c9b1e45bb382b113a9242ab0320
 TERMUX_PKG_AUTO_UPDATE=false
 # Build native php for phar to build (see pear-Makefile.frag.patch):
 TERMUX_PKG_HOSTBUILD=true
 # Build the native php without xml support as we only need phar:
 TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="--disable-libxml --disable-dom --disable-simplexml --disable-xml --disable-xmlreader --disable-xmlwriter --without-pear --disable-sqlite3 --without-libxml --without-sqlite3 --without-pdo-sqlite"
-TERMUX_PKG_DEPENDS="libandroid-glob, libandroid-support, libbz2, libc++, libcurl, libffi, libgd, libgmp, libiconv, libicu, libresolv-wrapper, libsqlite, libxml2, libxslt, libzip, oniguruma, openssl, pcre2, readline, tidy, zlib"
+TERMUX_PKG_DEPENDS="libandroid-glob, libandroid-support, libbz2, libc++, libcurl, libffi, libgmp, libiconv, libicu, libresolv-wrapper, libsqlite, libxml2, libxslt, libzip, oniguruma, openssl, pcre2, readline, tidy, zlib"
 TERMUX_PKG_CONFLICTS="php-mysql, php-dev"
 TERMUX_PKG_REPLACES="php-mysql, php-dev"
 TERMUX_PKG_RM_AFTER_INSTALL="php/php/fpm"
@@ -21,6 +22,12 @@ TERMUX_PKG_SERVICE_SCRIPT=("php-fpm" "mkdir -p $TERMUX_ANDROID_HOME/.php\nif [ -
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_func_res_nsearch=no
 ac_cv_phpdbg_userfaultfd_writefault=no
+php_cv_lib_gd_gdImageCreateFromPng=yes
+php_cv_lib_gd_gdImageCreateFromAvif=yes
+php_cv_lib_gd_gdImageCreateFromWebp=yes
+php_cv_lib_gd_gdImageCreateFromJpeg=yes
+php_cv_lib_gd_gdImageCreateFromBmp=yes
+php_cv_lib_gd_gdImageCreateFromTga=yes
 --enable-bcmath
 --enable-calendar
 --enable-exif
@@ -30,6 +37,8 @@ ac_cv_phpdbg_userfaultfd_writefault=no
 --enable-sockets
 --mandir=$TERMUX_PREFIX/share/man
 --with-bz2=$TERMUX_PREFIX
+--with-config-file-path=$TERMUX_PREFIX/etc/$TERMUX_PKG_NAME
+--with-config-file-scan-dir=$TERMUX_PREFIX/etc/$TERMUX_PKG_NAME/conf.d
 --with-curl=$TERMUX_PREFIX
 --with-ldap=shared,$TERMUX_PREFIX
 --with-ldap-sasl
@@ -46,7 +55,7 @@ ac_cv_phpdbg_userfaultfd_writefault=no
 --with-apxs2=$TERMUX_PKG_TMPDIR/apxs-wrapper.sh
 --with-iconv=$TERMUX_PREFIX
 --enable-fpm
---enable-gd
+--enable-gd=shared,$TERMUX_PREFIX
 --with-external-gd
 --with-external-pcre
 --with-zip
@@ -71,18 +80,23 @@ termux_step_host_build() {
 	pushd $PATCHELF_SRCDIR
 	./bootstrap.sh
 	./configure
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j $TERMUX_PKG_MAKE_PROCESSES
 	popd
 
 	(cd "$TERMUX_PKG_SRCDIR" && ./buildconf --force)
 	"$TERMUX_PKG_SRCDIR/configure" ${TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS}
-	make -j "$TERMUX_MAKE_PROCESSES"
+	make -j "$TERMUX_PKG_MAKE_PROCESSES"
 }
 
 termux_step_pre_configure() {
 	export PATH=$TERMUX_PKG_HOSTBUILD_DIR/_patchelf/src:$PATH
 
-	LDFLAGS+=" -lresolv_wrapper -landroid-glob -llog $($CC -print-libgcc-file-name)"
+	# warning: static library libclang_rt.builtins-aarch64-android.a is not portable
+	local _libgcc_file="$($CC -print-libgcc-file-name)"
+	local _libgcc_path="$(dirname $_libgcc_file)"
+	local _libgcc_name="$(basename $_libgcc_file)"
+	LDFLAGS+=" -lresolv_wrapper -landroid-glob -llog -L$_libgcc_path -l:$_libgcc_name -lm"
+
 	export PATH=$PATH:$TERMUX_PKG_HOSTBUILD_DIR/sapi/cli/
 	export NATIVE_PHP_EXECUTABLE=$TERMUX_PKG_HOSTBUILD_DIR/sapi/cli/php
 	export NATIVE_MINILUA_EXECUTABLE=$TERMUX_PKG_HOSTBUILD_DIR/ext/opcache/minilua
@@ -133,6 +147,12 @@ termux_step_post_make_install() {
 	mkdir -p $docdir
 	for suffix in development production; do
 		cp $TERMUX_PKG_SRCDIR/php.ini-$suffix $docdir/
+	done
+
+	local extdir="$TERMUX_PREFIX/etc/$TERMUX_PKG_NAME/conf.d"
+	mkdir -p "$extdir"
+	for ext in gd ldap pgsql pdo_pgsql sodium; do
+		echo "extension=$ext" > "$extdir/$ext.ini"
 	done
 
 	sed -i 's/SED=.*/SED=sed/' $TERMUX_PREFIX/bin/phpize

@@ -1,0 +1,48 @@
+diff -uNr openssh-portable-V_9_9_P1/sshd_config openssh-portable-V_9_9_P1.mod/sshd_config
+--- openssh-portable-V_9_9_P1/sshd_config	2024-09-20 01:20:48.000000000 +0300
++++ openssh-portable-V_9_9_P1.mod/sshd_config	2024-09-22 13:52:50.784644276 +0300
+@@ -10,7 +10,9 @@
+ # possible, but leave them commented.  Uncommented options override the
+ # default value.
+ 
+-#Port 22
++Include /etc/ssh/sshd_config.d/*.conf
++
++#Port 8022
+ #AddressFamily any
+ #ListenAddress 0.0.0.0
+ #ListenAddress ::
+@@ -70,17 +72,6 @@
+ #GSSAPIAuthentication no
+ #GSSAPICleanupCredentials yes
+ 
+-# Set this to 'yes' to enable PAM authentication, account processing,
+-# and session processing. If this is enabled, PAM authentication will
+-# be allowed through the KbdInteractiveAuthentication and
+-# PasswordAuthentication.  Depending on your PAM configuration,
+-# PAM authentication via KbdInteractiveAuthentication may bypass
+-# the setting of "PermitRootLogin prohibit-password".
+-# If you just want the PAM account and session checks to run without
+-# PAM authentication, then enable this but set PasswordAuthentication
+-# and KbdInteractiveAuthentication to 'no'.
+-#UsePAM no
+-
+ #AllowAgentForwarding yes
+ #AllowTcpForwarding yes
+ #GatewayPorts no
+@@ -89,7 +80,6 @@
+ #X11UseLocalhost yes
+ #PermitTTY yes
+ #PrintMotd yes
+-#PrintLastLog yes
+ #TCPKeepAlive yes
+ #PermitUserEnvironment no
+ #Compression delayed
+@@ -99,7 +89,6 @@
+ #PidFile /var/run/sshd.pid
+ #MaxStartups 10:30:100
+ #PermitTunnel no
+-#ChrootDirectory none
+ #VersionAddendum none
+ 
+ # no default banner path

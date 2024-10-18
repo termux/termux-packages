@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://nodejs.org/
 TERMUX_PKG_DESCRIPTION="Open Source, cross-platform JavaScript runtime environment"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Yaksh Bariya <thunder-coding@termux.dev>"
-TERMUX_PKG_VERSION=20.14.0
+TERMUX_PKG_VERSION=20.17.0
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=08655028f0d8436e88163f9186044d635d3f36a85ee528f36bd05b6c5e46c1bb
+TERMUX_PKG_SHA256=9abf03ac23362c60387ebb633a516303637145cb3c177be3348b16880fd8b28c
 # Note that we do not use a shared libuv to avoid an issue with the Android
 # linker, which does not use symbols of linked shared libraries when resolving
 # symbols on dlopen(). See https://github.com/termux/termux-packages/issues/462.
@@ -46,7 +46,7 @@ termux_step_host_build() {
 			--disable-samples \
 			--disable-tests
 	fi
-	make -j $TERMUX_MAKE_PROCESSES install
+	make -j $TERMUX_PKG_MAKE_PROCESSES install
 }
 
 termux_step_configure() {
@@ -98,9 +98,9 @@ termux_step_configure() {
 
 termux_step_make() {
 	if [ "${TERMUX_DEBUG_BUILD}" = "true" ]; then
-		ninja -C out/Debug -j "${TERMUX_MAKE_PROCESSES}"
+		ninja -C out/Debug -j "${TERMUX_PKG_MAKE_PROCESSES}"
 	else
-		ninja -C out/Release -j "${TERMUX_MAKE_PROCESSES}"
+		ninja -C out/Release -j "${TERMUX_PKG_MAKE_PROCESSES}"
 	fi
 }
 

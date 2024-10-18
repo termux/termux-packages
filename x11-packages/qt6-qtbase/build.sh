@@ -3,15 +3,15 @@ TERMUX_PKG_DESCRIPTION="A cross-platform application and UI framework"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_LICENSE_FILE="LICENSES/GPL-3.0-only.txt"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.7.1"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="6.8.0"
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/${TERMUX_PKG_VERSION%.*}/${TERMUX_PKG_VERSION}/submodules/qtbase-everywhere-src-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=b7338da1bdccb4d861e714efffaa83f174dfe37e194916bfd7ec82279a6ace19
-TERMUX_PKG_DEPENDS="brotli, double-conversion, freetype, glib, harfbuzz, libandroid-shmem, libandroid-sysv-semaphore, libc++, libdrm, libice, libicu, libjpeg-turbo, libpng, libsm, libsqlite, libuuid, libx11, libxcb, libxi, libxkbcommon, libwayland, opengl, openssl, pcre2, vulkan-loader, xcb-util-cursor, xcb-util-image, xcb-util-keysyms, xcb-util-renderutil, xcb-util-wm, zlib, zstd"
-TERMUX_PKG_BUILD_DEPENDS="libwayland-protocols, vulkan-headers, vulkan-loader-generic"
+TERMUX_PKG_SHA256=1bad481710aa27f872de6c9f72651f89a6107f0077003d0ebfcc9fd15cba3c75
+TERMUX_PKG_DEPENDS="brotli, double-conversion, freetype, glib, harfbuzz, libandroid-posix-semaphore, libandroid-shmem, libc++, libdrm, libice, libicu, libjpeg-turbo, libpng, libsm, libsqlite, libuuid, libx11, libxcb, libxi, libxkbcommon, libwayland, opengl, openssl, pcre2, vulkan-loader, xcb-util-cursor, xcb-util-image, xcb-util-keysyms, xcb-util-renderutil, xcb-util-wm, zlib, zstd"
+TERMUX_PKG_BUILD_DEPENDS="binutils-cross, libwayland-protocols, vulkan-headers, vulkan-loader-generic"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_FORCE_CMAKE=true
 TERMUX_PKG_NO_STATICSPLIT=true
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
 -DCMAKE_MESSAGE_LOG_LEVEL=STATUS
@@ -31,11 +31,14 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DINSTALL_MKSPECSDIR=lib/qt6/mkspecs
 -DINSTALL_PUBLICBINDIR=${TERMUX_PREFIX}/bin
 -DQT_ALLOW_SYMLINK_IN_PATHS=OFF
+-DQT_BUILD_TOOLS_BY_DEFAULT=ON
 -DQT_FEATURE_freetype=ON
 -DQT_FEATURE_gui=ON
 -DQT_FEATURE_harfbuzz=ON
+-DQT_FEATURE_ipc_posix=ON
 -DQT_FEATURE_widgets=ON
 -DQT_FEATURE_zstd=ON
+-DQT_FORCE_BUILD_TOOLS=ON
 -DQT_HOST_PATH=${TERMUX_PREFIX}/opt/qt6/cross
 "
 TERMUX_PKG_NO_SHEBANG_FIX_FILES="
@@ -96,7 +99,7 @@ termux_step_host_build() {
 		-DQT_FEATURE_widgets=ON \
 		-DQT_FEATURE_zstd=OFF
 	ninja \
-		-j ${TERMUX_MAKE_PROCESSES} \
+		-j ${TERMUX_PKG_MAKE_PROCESSES} \
 		install
 
 	mkdir -p ${TERMUX_PREFIX}/opt/qt6/cross/bin
@@ -104,7 +107,7 @@ termux_step_host_build() {
 		-exec echo "{}" \; \
 		-exec cat "{}" \; \
 		-exec sed -e "s|^${TERMUX_PREFIX}/opt/qt6/cross|..|g" -i "{}" \;
-	cat $PWD/user_facing_tool_links.txt | xargs -P${TERMUX_MAKE_PROCESSES} -L1 ln -sv
+	cat $PWD/user_facing_tool_links.txt | xargs -P${TERMUX_PKG_MAKE_PROCESSES} -L1 ln -sv
 	find ${TERMUX_PREFIX}/opt/qt6/cross -type f -name target_qt.conf \
 		-exec echo "{}" \; \
 		-exec cat "{}" \;
@@ -113,9 +116,8 @@ termux_step_host_build() {
 termux_step_pre_configure() {
 	termux_setup_cmake
 	termux_setup_ninja
-	[[ "${TERMUX_ARCH}" == "arm" ]] && termux_setup_no_integrated_as
 
-	LDFLAGS+=" -landroid-shmem -landroid-sysv-semaphore"
+	LDFLAGS+=" -landroid-posix-semaphore -landroid-shmem"
 
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
 	-DCMAKE_C_COMPILER_AR=$(command -v llvm-ar)
@@ -129,6 +131,7 @@ termux_step_post_make_install() {
 	find ${TERMUX_PKG_BUILDDIR} -type f -name user_facing_tool_links.txt \
 		-exec echo "{}" \; \
 		-exec cat "{}" \;
+	cat $PWD/user_facing_tool_links.txt | xargs -P${TERMUX_PKG_MAKE_PROCESSES} -L1 ln -sv
 	find ${TERMUX_PREFIX}/lib/qt6 -type f -name target_qt.conf \
 		-exec echo "{}" \; \
 		-exec cat "{}" \;

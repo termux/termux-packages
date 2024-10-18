@@ -1,6 +1,5 @@
-diff -uNr lpeg-1.0.2/makefile lpeg-1.0.2.mod/makefile
---- lpeg-1.0.2/makefile	2019-03-11 16:08:29.000000000 +0200
-+++ lpeg-1.0.2.mod/makefile	2019-05-10 16:13:05.997196863 +0300
+--- v1/makefile	2023-06-27 00:30:55.000000000 +0800
++++ v2/makefile	2024-06-09 20:05:00.118926980 +0800
 @@ -1,7 +1,7 @@
  LIBNAME = lpeg
  LUADIR = ./lua/
@@ -10,7 +9,7 @@ diff -uNr lpeg-1.0.2/makefile lpeg-1.0.2.mod/makefile
  # COPT = -O0 -DLPEG_DEBUG -g
  
  CWARNS = -Wall -Wextra -pedantic \
-@@ -22,7 +22,7 @@
+@@ -25,29 +25,29 @@
  # -Wunreachable-code \
  
  
@@ -18,13 +17,32 @@ diff -uNr lpeg-1.0.2/makefile lpeg-1.0.2.mod/makefile
 +CFLAGS += $(CWARNS) $(COPT) -std=c99 -I$(LUADIR) -fPIC
  CC = gcc
  
- FILES = lpvm.o lpcap.o lptree.o lpcode.o lpprint.o
-@@ -36,7 +36,7 @@
- 	$(MAKE) lpeg.so "DLLFLAGS = -bundle -undefined dynamic_lookup"
+ FILES = lpvm.o lpcap.o lptree.o lpcode.o lpprint.o lpcset.o
  
- lpeg.so: $(FILES)
+ # For Linux
+ linux:
+-	$(MAKE) lpeg.so "DLLFLAGS = -shared -fPIC"
++	$(MAKE) liblpeg.so "DLLFLAGS = -shared -fPIC"
+ 
+ # For Mac OS
+ macosx:
+-	$(MAKE) lpeg.so "DLLFLAGS = -bundle -undefined dynamic_lookup"
++	$(MAKE) liblpeg.so "DLLFLAGS = -bundle -undefined dynamic_lookup"
+ 
+-lpeg.so: $(FILES)
 -	env $(CC) $(DLLFLAGS) $(FILES) -o lpeg.so
-+	env $(CC) $(DLLFLAGS) $(FILES) -o lpeg.so $(LDFLAGS)
++liblpeg.so: $(FILES)
++	env $(CC) $(DLLFLAGS) -Wl,-soname,liblpeg-$(LUAVER).so $(FILES) -o liblpeg.so
  
  $(FILES): makefile
  
+-test: test.lua re.lua lpeg.so
++test: test.lua re.lua liblpeg.so
+ 	./test.lua
+ 
+ clean:
+-	rm -f $(FILES) lpeg.so
++	rm -f $(FILES) liblpeg.so
+ 
+ 
+ lpcap.o: lpcap.c lpcap.h lptypes.h

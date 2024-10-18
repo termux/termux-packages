@@ -48,7 +48,7 @@ termux_step_make() {
 		_ARCH=$TERMUX_ARCH
 	fi
 
-	make ARCH=$_ARCH CC="$CC $CPPFLAGS $CFLAGS" LDFLAGS="$LDFLAGS" -j $TERMUX_MAKE_PROCESSES
+	make ARCH=$_ARCH CC="$CC $CPPFLAGS $CFLAGS" LDFLAGS="$LDFLAGS" -j $TERMUX_PKG_MAKE_PROCESSES
 }
 
 termux_step_make_install() {

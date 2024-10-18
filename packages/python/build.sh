@@ -4,12 +4,12 @@ TERMUX_PKG_DESCRIPTION="Python 3 programming language intended to enable clear p
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.11.9
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=3.12.7
 TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=9b1e896523fc510691126c864406d9360a3d1e986acbda59cda57b5abda45b87
+TERMUX_PKG_SHA256=24887b92e2afd4a2ac602419ad4b596372f67ac9b077190f459aba390faf5550
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="gdbm, libandroid-posix-semaphore, libandroid-support, libbz2, libcrypt, libexpat, libffi, liblzma, libsqlite, ncurses, ncurses-ui-libs, openssl, readline, zlib"
+TERMUX_PKG_BUILD_DEPENDS="tk"
 TERMUX_PKG_RECOMMENDS="python-ensurepip-wheels, python-pip"
 TERMUX_PKG_SUGGESTS="python-tkinter"
 TERMUX_PKG_BREAKS="python2 (<= 2.7.15), python-dev"
@@ -75,6 +75,9 @@ termux_step_pre_configure() {
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-build-python=python$_MAJOR_VERSION"
 	fi
 
+	# For multiprocessing libs
+	export LDFLAGS+=" -landroid-posix-semaphore"
+
 	export LIBCRYPT_LIBS="-lcrypt"
 }
 
@@ -98,11 +101,6 @@ termux_step_post_massage() {
 }
 
 termux_step_create_debscripts() {
-	# XXX: Remove workaround for `-fno-openmp-implicit-rpath` in next NDK major bump.
-	if [ "$TERMUX_NDK_VERSION_NUM" != 26 ]; then
-		termux_error_exit "This workaround should be removed."
-	fi
-
 	# This is a temporary script and will therefore be removed when python is updated to 3.12
 	cat <<- POSTINST_EOF > ./postinst
 	#!$TERMUX_PREFIX/bin/bash
@@ -124,10 +122,13 @@ termux_step_create_debscripts() {
 		echo
 	fi
 
-	_file="$(find $TERMUX_PREFIX/lib/python3.11 -name "_sysconfigdata*.py")"
-	echo "Patching \$(basename \$_file)"
-	rm -rf $TERMUX_PREFIX/lib/python3.11/__pycache__
-	sed -i 's|-fno-openmp-implicit-rpath||g' "\$_file"
+	if [ -d $TERMUX_PREFIX/lib/python3.11/site-packages ]; then
+		echo
+		echo "NOTE: The system python package has been updated to 3.12."
+		echo "NOTE: Run 'pkg upgrade' to update system python packages."
+		echo "NOTE: Packages installed using pip needs to be re-installed."
+		echo
+	fi
 
 	exit 0
 	POSTINST_EOF

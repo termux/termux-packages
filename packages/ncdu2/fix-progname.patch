@@ -1,0 +1,156 @@
+diff --git a/ncdu.1 b/ncdu.1
+index e26e1e4..c37e6e5 100644
+--- a/ncdu.1
++++ b/ncdu.1
+@@ -1,11 +1,11 @@
+ .\" SPDX-FileCopyrightText: Yorhel <projects@yorhel.nl>
+ .\" SPDX-License-Identifier: MIT
+ .Dd September 27, 2024
+-.Dt NCDU 1
++.Dt NCDU2 1
+ .Os
+ .Sh NAME
+-.Nm ncdu
+-.Nd NCurses Disk Usage
++.Nm ncdu2
++.Nd NCurses Disk Usage 2.x
+ .
+ .Sh SYNOPSIS
+ .Nm
+@@ -51,7 +51,7 @@
+ .
+ .Sh DESCRIPTION
+ .Nm
+-(NCurses Disk Usage) is an interactive curses-based version of the well-known
++(NCurses Disk Usage 2.x) is an interactive curses-based version of the well-known
+ .Xr du 1 ,
+ and provides a fast way to see what directories are using your disk space.
+ .
+@@ -322,7 +322,7 @@ Enable (default) or disable natural sort when sorting by file name.
+ .It Fl \-group\-directories\-first , \-no\-group\-directories\-first
+ Sort (or not) directories before files.
+ .It Fl \-confirm\-quit , \-no\-confirm\-quit
+-Require a confirmation before quitting ncdu.
++Require a confirmation before quitting ncdu2.
+ Can be helpful when you accidentally press 'q' during or after a very long scan.
+ .It Fl \-confirm\-delete , \-no\-confirm\-delete
+ Require a confirmation before deleting a file or directory.
+@@ -347,9 +347,10 @@ The default is
+ .Sh CONFIGURATION
+ .Nm
+ can be configured by placing command-line options in
+-.Pa /etc/ncdu.conf
++.Pa @TERMUX_PREFIX@/etc/ncdu2.conf
+ or
+-.Pa $HOME/.config/ncdu/config .
++.Pa $HOME/.config/ncdu2/config .
++
+ If both files exist, the system configuration will be loaded before the user
+ configuration, allowing users to override options set in the system
+ configuration.
+@@ -447,7 +448,7 @@ For example, to spawn the
+ file manager instead of a shell, run
+ .Nm
+ as follows:
+-.Dl NCDU_SHELL=vifm ncdu
++.Dl NCDU_SHELL=vifm ncdu2
+ The
+ .Ev NCDU_LEVEL
+ environment variable is set or incremented before spawning the shell, allowing
+@@ -486,18 +487,18 @@ Empty directory.
+ .
+ .Sh EXAMPLES
+ To scan and browse the directory you're currently in, all you need is a simple:
+-.Dl ncdu
++.Dl ncdu2
+ If you want to scan a full filesystem, for example your root filesystem, then
+ you'll want to use
+ .Fl x :
+-.Dl ncdu \-x /
++.Dl ncdu2 \-x /
+ .Pp
+ Since scanning a large directory may take a while, you can scan a directory and
+ export the results for later viewing:
+ .Bd -literal -offset indent
+-ncdu \-1xo\- / | gzip >export.gz
++ncdu2 \-1xo\- / | gzip >export.gz
+ # ...some time later:
+-zcat export.gz | ncdu \-f\-
++zcat export.gz | ncdu2 \-f\-
+ .Ed
+ To export from a cron job, make sure to replace
+ .Fl 1
+@@ -506,12 +507,12 @@ with
+ to suppress any unnecessary output.
+ .Pp
+ You can also export a directory and browse it once scanning is done:
+-.Dl ncdu \-o\- | tee export.file | ./ncdu \-f\-
++.Dl ncdu2 \-o\- | tee export.file | ./ncdu2 \-f\-
+ The same is possible with gzip compression, but is a bit kludgey:
+-.Dl ncdu \-o\- | gzip | tee export.gz | gunzip | ./ncdu \-f\-
++.Dl ncdu2 \-o\- | gzip | tee export.gz | gunzip | ./ncdu2 \-f\-
+ .Pp
+ To scan a system remotely, but browse through the files locally:
+-.Dl ssh \-C user@system ncdu \-o\- / | ./ncdu \-f\-
++.Dl ssh \-C user@system ncdu2 \-o\- / | ./ncdu2 \-f\-
+ The
+ .Fl C
+ option to ssh enables compression, which will be very useful over slow links.
+@@ -548,11 +549,11 @@ The unique and shared directory sizes are calculated based on the assumption
+ that the link count of hard links does not change during a filesystem scan or
+ in between refreshes.
+ If this does happen, for example when a hard link is deleted, then these
+-numbers will be very much incorrect and a full refresh by restarting ncdu is
++numbers will be very much incorrect and a full refresh by restarting ncdu2 is
+ needed to get correct numbers again.
+ .Pp
+ All sizes are internally represented as a signed 64bit integer.
+-If you have a directory larger than 8 EiB minus one byte, ncdu will clip its
++If you have a directory larger than 8 EiB minus one byte, ncdu2 will clip its
+ size to 8 EiB minus one byte.
+ When deleting or refreshing items in a directory with a clipped size, the
+ resulting sizes will be incorrect.
+diff --git a/src/main.zig b/src/main.zig
+index bdf98ef..41d68c4 100644
+--- a/src/main.zig
++++ b/src/main.zig
+@@ -38,7 +38,7 @@ test "imports" {
+ }
+ 
+ // "Custom" allocator that wraps the libc allocator and calls ui.oom() on error.
+-// This allocator never returns an error, it either succeeds or causes ncdu to quit.
++// This allocator never returns an error, it either succeeds or causes ncdu2 to quit.
+ // (Which means you'll find a lot of "catch unreachable" sprinkled through the code,
+ // they look scarier than they are)
+ fn wrapAlloc(_: *anyopaque, len: usize, ptr_alignment: u8, return_address: usize) ?[*]u8 {
+@@ -341,14 +341,14 @@ fn tryReadArgsFile(path: [:0]const u8) void {
+ 
+ fn version() noreturn {
+     const stdout = std.io.getStdOut();
+-    stdout.writeAll("ncdu " ++ program_version ++ "\n") catch {};
++    stdout.writeAll("ncdu2 " ++ program_version ++ "\n") catch {};
+     std.process.exit(0);
+ }
+ 
+ fn help() noreturn {
+     const stdout = std.io.getStdOut();
+     stdout.writeAll(
+-    \\ncdu <options> <directory>
++    \\ncdu2 <options> <directory>
+     \\
+     \\Options:
+     \\  -h,--help                  This help message
+@@ -367,11 +367,11 @@ fn help() noreturn {
+     \\  -L, --follow-symlinks      Follow symbolic links (excluding directories)
+     \\  --exclude-caches           Exclude directories containing CACHEDIR.TAG
+     \\  --exclude-kernfs           Exclude Linux pseudo filesystems (procfs,sysfs,cgroup,...)
+-    \\  --confirm-quit             Confirm quitting ncdu
++    \\  --confirm-quit             Confirm quitting ncdu2
+     \\  --color SCHEME             Set color scheme (off/dark/dark-bg)
+     \\  --ignore-config            Don't load config files
+     \\
+-    \\Refer to `man ncdu` for the full list of options.
++    \\Refer to `man ncdu2` for the full list of options.
+     \\
+     ) catch {};
+     std.process.exit(0);

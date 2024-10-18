@@ -18,6 +18,8 @@
     <property name="cell-height-scale" type="gdouble" flags="1073742051" default-value="1.000000"/>
     <property name="cell-width-scale" type="gdouble" flags="1073742051" default-value="1.000000"/>
     <property name="cjk-ambiguous-width" type="gint" flags="1073742051" default-value="1"/>
+    <property name="context-menu-model" type="GMenuModel" flags="1073742051"/>
+    <property name="context-menu" type="GtkMenu" flags="1073742051"/>
     <property name="cursor-blink-mode" type="VteCursorBlinkMode" flags="1073742051" default-value="VTE_CURSOR_BLINK_SYSTEM"/>
     <property name="cursor-shape" type="VteCursorShape" flags="1073742051" default-value="VTE_CURSOR_SHAPE_BLOCK"/>
     <property name="current-directory-uri" type="gchararray" flags="1073742049" default-value="NULL"/>
@@ -38,12 +40,17 @@
     <property name="pty" type="VtePty" flags="1073742051"/>
     <property name="rewrap-on-resize" type="gboolean" flags="1073742051" default-value="TRUE"/>
     <property name="scrollback-lines" type="guint" flags="1073742051" default-value="512"/>
+    <property name="scroll-on-insert" type="gboolean" flags="1073742051" default-value="FALSE"/>
     <property name="scroll-on-keystroke" type="gboolean" flags="1073742051" default-value="FALSE"/>
     <property name="scroll-on-output" type="gboolean" flags="1073742051" default-value="TRUE"/>
     <property name="scroll-unit-is-pixels" type="gboolean" flags="1073742051" default-value="FALSE"/>
     <property name="text-blink-mode" type="VteTextBlinkMode" flags="1073742051" default-value="VTE_TEXT_BLINK_ALWAYS"/>
     <property name="window-title" type="gchararray" flags="1073742049" default-value="NULL"/>
     <property name="word-char-exceptions" type="gchararray" flags="1073742049" default-value="NULL"/>
+    <property name="xalign" type="VteAlign" flags="1073742051" default-value="VTE_ALIGN_START"/>
+    <property name="yalign" type="VteAlign" flags="1073742051" default-value="VTE_ALIGN_START"/>
+    <property name="xfill" type="gboolean" flags="1073742051" default-value="TRUE"/>
+    <property name="yfill" type="gboolean" flags="1073742051" default-value="TRUE"/>
     <signal name="eof" return="void" when="last">
     </signal>
     <signal name="child-exited" return="void" when="last">
@@ -118,6 +125,9 @@
     </signal>
     <signal name="bell" return="void" when="last">
     </signal>
+    <signal name="setup-context-menu" return="void" when="last">
+      <param type="VteEventContext"/>
+    </signal>
   </class>
   <enum name="VteCursorBlinkMode" get-type="vte_cursor_blink_mode_get_type">
     <member name="VTE_CURSOR_BLINK_SYSTEM" nick="system" value="0"/>
@@ -162,7 +172,7 @@
   </enum>  <enum name="VteAlign" get-type="vte_align_get_type">
     <member name="VTE_ALIGN_START" nick="start" value="0"/>
     <member name="VTE_ALIGN_CENTER" nick="center" value="1"/>
-    <member name="VTE_ALIGN_END" nick="end" value="3"/>
+    <member name="VTE_ALIGN_END" nick="end" value="2"/>
   </enum>  <error-quark function="vte_pty_error_quark" domain="vte-pty-error"/>
   <error-quark function="vte_regex_error_quark" domain="vte-regex-error"/>
 </dump>

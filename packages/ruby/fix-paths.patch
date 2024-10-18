@@ -146,27 +146,6 @@ diff -uNr ruby-3.0.0/lib/resolv.rb ruby-3.0.0.mod/lib/resolv.rb
          if File.exist? filename
            config_hash = Config.parse_resolv_conf(filename)
          else
-diff -uNr ruby-3.0.0/mjit.c ruby-3.0.0.mod/mjit.c
---- ruby-3.0.0/mjit.c	2020-12-25 05:33:01.000000000 +0200
-+++ ruby-3.0.0.mod/mjit.c	2021-02-09 17:41:47.157406979 +0200
-@@ -606,7 +606,7 @@
-     RETURN_ENV("TMP");
-     tmpdir = system_default_tmpdir();
-     if (check_tmpdir(tmpdir)) return tmpdir;
--    return ruby_strdup("/tmp");
-+    return ruby_strdup("@TERMUX_PREFIX@/tmp");
- # undef RETURN_ENV
- }
- 
-@@ -1741,7 +1741,7 @@
-     M("--mjit-warnings",           "", "Enable printing JIT warnings"),
-     M("--mjit-debug",              "", "Enable JIT debugging (very slow), or add cflags if specified"),
-     M("--mjit-wait",               "", "Wait until JIT compilation finishes every time (for testing)"),
--    M("--mjit-save-temps",         "", "Save JIT temporary files in $TMP or /tmp (for testing)"),
-+    M("--mjit-save-temps",         "", "Save JIT temporary files in $TMP or @TERMUX_PREFIX@/tmp (for testing)"),
-     M("--mjit-verbose=num",        "", "Print JIT logs of level num or less to stderr (default: 0)"),
-     M("--mjit-max-cache=num",      "", "Max number of methods to be JIT-ed in a cache (default: "
-       STRINGIZE(DEFAULT_MAX_CACHE_SIZE) ")"),
 diff -uNr ruby-3.0.0/process.c ruby-3.0.0.mod/process.c
 --- ruby-3.0.0/process.c	2020-12-25 05:33:01.000000000 +0200
 +++ ruby-3.0.0.mod/process.c	2021-02-09 17:49:30.716668413 +0200
@@ -206,18 +185,6 @@ diff -uNr ruby-3.1.0/ruby.c ruby-3.1.0.mod/ruby.c
          const ptrdiff_t bindir_len = (ptrdiff_t)sizeof(bindir) - 1;
  
          const char *p2 = NULL;
-diff -uNr ruby-3.0.0/spec/bundler/commands/exec_spec.rb ruby-3.0.0.mod/spec/bundler/commands/exec_spec.rb
---- ruby-3.0.0/spec/bundler/commands/exec_spec.rb	2020-12-25 05:33:01.000000000 +0200
-+++ ruby-3.0.0.mod/spec/bundler/commands/exec_spec.rb	2021-02-09 17:50:58.332721054 +0200
-@@ -156,7 +156,7 @@
- 
-     install_gemfile 'gem "rack"'
-     File.open(bundled_app("--verbose"), "w") do |f|
--      f.puts "#!/bin/sh"
-+      f.puts "#!@TERMUX_PREFIX@/bin/sh"
-       f.puts "echo foobar"
-     end
-     File.chmod(0o744, bundled_app("--verbose"))
 diff -uNr ruby-3.0.0/spec/ruby/core/dir/shared/pwd.rb ruby-3.0.0.mod/spec/ruby/core/dir/shared/pwd.rb
 --- ruby-3.0.0/spec/ruby/core/dir/shared/pwd.rb	2020-12-25 05:33:01.000000000 +0200
 +++ ruby-3.0.0.mod/spec/ruby/core/dir/shared/pwd.rb	2021-02-09 17:50:07.720664849 +0200
@@ -230,27 +197,6 @@ diff -uNr ruby-3.0.0/spec/ruby/core/dir/shared/pwd.rb ruby-3.0.0.mod/spec/ruby/c
      end
      platform_is :windows do
        File.stat(pwd).ino.should == File.stat(File.expand_path(`cd`.chomp)).ino
-diff -uNr ruby-3.0.0/spec/ruby/core/process/exec_spec.rb ruby-3.0.0.mod/spec/ruby/core/process/exec_spec.rb
---- ruby-3.0.0/spec/ruby/core/process/exec_spec.rb	2020-12-25 05:33:01.000000000 +0200
-+++ ruby-3.0.0.mod/spec/ruby/core/process/exec_spec.rb	2021-02-09 17:50:27.464678688 +0200
-@@ -154,7 +154,7 @@
-   describe "with a command array" do
-     it "uses the first element as the command name and the second as the argv[0] value" do
-       platform_is_not :windows do
--        ruby_exe('Process.exec(["/bin/sh", "argv_zero"], "-c", "echo $0")', escape: true).should == "argv_zero\n"
-+        ruby_exe('Process.exec(["@TERMUX_PREFIX@/bin/sh", "argv_zero"], "-c", "echo $0")', escape: true).should == "argv_zero\n"
-       end
-       platform_is :windows do
-         ruby_exe('Process.exec(["cmd.exe", "/C"], "/C", "echo", "argv_zero")', escape: true).should == "argv_zero\n"
-@@ -163,7 +163,7 @@
- 
-     it "coerces the argument using to_ary" do
-       platform_is_not :windows do
--        ruby_exe('o = Object.new; def o.to_ary; ["/bin/sh", "argv_zero"]; end; Process.exec(o, "-c", "echo $0")', escape: true).should == "argv_zero\n"
-+        ruby_exe('o = Object.new; def o.to_ary; ["@TERMUX_PREFIX@/bin/sh", "argv_zero"]; end; Process.exec(o, "-c", "echo $0")', escape: true).should == "argv_zero\n"
-       end
-       platform_is :windows do
-         ruby_exe('o = Object.new; def o.to_ary; ["cmd.exe", "/C"]; end; Process.exec(o, "/C", "echo", "argv_zero")', escape: true).should == "argv_zero\n"
 diff -uNr ruby-3.0.0/spec/ruby/core/process/spawn_spec.rb ruby-3.0.0.mod/spec/ruby/core/process/spawn_spec.rb
 --- ruby-3.0.0/spec/ruby/core/process/spawn_spec.rb	2020-12-25 05:33:01.000000000 +0200
 +++ ruby-3.0.0.mod/spec/ruby/core/process/spawn_spec.rb	2021-02-09 17:50:41.692695143 +0200

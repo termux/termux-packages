@@ -36,7 +36,7 @@
  static int menu_do_last_cd_img(int is_get)
  {
 -	static const char *defaults[] = { "/media", "/mnt/sd", "/mnt" };
-+	static const char *default_dir = "@TERMUX_BASE_DIR@";
++	static const char default_dir[] = "@TERMUX_ANDROID_HOME@";
  	char path[256];
 -	struct stat64 st;
  	FILE *f;
@@ -126,12 +126,11 @@
  		if (stat(fname, &st) != 0) {
  			printf("bad memcard file: %s\n", ent->d_name);
  			continue;
-@@ -2532,7 +2505,7 @@
- void menu_init(void)
+@@ -2533,6 +2505,7 @@
  {
  	char buff[MAXPATHLEN];
--	int i;
-+	int i, pos;
+ 	int i;
++	size_t pos;
  
  	cpu_clock_st = cpu_clock = plat_target_cpu_clock_get();
  

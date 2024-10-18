@@ -1,0 +1,106 @@
+diff --git a/crates/rnote-ui/build.rs b/crates/rnote-ui/build.rs
+index 9e5c07e..cd7baa5 100644
+--- a/crates/rnote-ui/build.rs
++++ b/crates/rnote-ui/build.rs
+@@ -1,5 +1,11 @@
+ fn main() -> anyhow::Result<()> {
+-    compile_gresources()?;
++    let is_cross_compiling = detect_cross_compilation();
++
++    if !is_cross_compiling {
++        println!("cargo:rustc-cfg=feature=\"use_glib_build_tools\"");
++    }
++
++    compile_gresources(is_cross_compiling)?;
+
+     #[cfg(windows)]
+     compile_icon_winres()?;
+@@ -18,11 +24,64 @@ fn compile_icon_winres() -> anyhow::Result<()> {
+         .context("Failed to compile winresource resource")
+ }
+
+-fn compile_gresources() -> anyhow::Result<()> {
+-    glib_build_tools::compile_resources(
+-        &["data"],
+-        "data/resources.gresource.xml",
+-        "compiled.gresource",
+-    );
+-    Ok(())
++fn detect_cross_compilation() -> bool {
++    let host = std::env::var("HOST").unwrap_or_default();
++    let target = std::env::var("TARGET").unwrap_or_default();
++    host != target
++}
++
++fn compile_gresources(is_cross_compiling: bool) -> anyhow::Result<()> {
++    use std::env;
++    use std::path::PathBuf;
++    use std::process::Command;
++
++    let out_dir = env::var("OUT_DIR").expect("OUT_DIR not set");
++    let output_path = PathBuf::from(&out_dir).join("compiled.gresource");
++
++    // First, try using the system's glib-compile-resources
++    let system_result = Command::new("glib-compile-resources")
++        .args(&[
++            "--sourcedir=data",
++            "data/resources.gresource.xml",
++            &format!("--target={}", output_path.display()),
++        ])
++        .status();
++
++    match system_result {
++        Ok(status) if status.success() => return Ok(()),
++        Ok(_) => println!("glib-compile-resources command failed, trying fallback method..."),
++        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
++            println!("glib-compile-resources not found, trying fallback method...")
++        }
++        Err(e) => println!(
++            "Error executing glib-compile-resources: {}, trying fallback method...",
++            e
++        ),
++    }
++
++    // If cross-compiling, don't use glib_build_tools
++    if is_cross_compiling {
++        return Err(anyhow::anyhow!(
++            "Failed to compile gresources: system glib-compile-resources failed and we're cross-compiling. \
++            Please ensure you have glib development tools installed on your target system."
++        ));
++    }
++
++    // If not cross-compiling and system command fails, fall back to glib_build_tools if available
++    #[cfg(feature = "use_glib_build_tools")]
++    {
++        println!("Attempting to use glib_build_tools::compile_resources...");
++        glib_build_tools::compile_resources(
++            &["data"],
++            "data/resources.gresource.xml",
++            output_path.to_str().unwrap(),
++        );
++        Ok(())
++    }
++
++    #[cfg(not(feature = "use_glib_build_tools"))]
++    Err(anyhow::anyhow!(
++        "Failed to compile gresources: system glib-compile-resources failed and glib_build_tools is not available. \
++        Please ensure you have glib development tools installed on your system."
++    ))
+ }
+
+diff --git a/crates/rnote-ui/Cargo.toml b/crates/rnote-ui/Cargo.toml
+index 426d8e9..55447fc 100644
+--- a/crates/rnote-ui/Cargo.toml
++++ b/crates/rnote-ui/Cargo.toml
+@@ -58,7 +58,10 @@ url = { workspace = true }
+
+ [build-dependencies]
+ anyhow = { workspace = true }
+-glib-build-tools = { workspace = true }
++glib-build-tools = { workspace = true, optional = true }
++
++[features]
++use_glib_build_tools = ["glib-build-tools"]
+
+ [target.'cfg(windows)'.build-dependencies]
+ winresource = { workspace = true }

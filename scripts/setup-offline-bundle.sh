@@ -15,8 +15,8 @@ export TERMUX_SCRIPTDIR="$(dirname "$(readlink -f "$0")")/../"
 mkdir -p "$TERMUX_SCRIPTDIR"/build-tools
 
 . "$TERMUX_SCRIPTDIR"/scripts/properties.sh
-: "${TERMUX_MAKE_PROCESSES:="$(nproc)"}"
-export TERMUX_MAKE_PROCESSES
+: "${TERMUX_PKG_MAKE_PROCESSES:="$(nproc)"}"
+export TERMUX_PKG_MAKE_PROCESSES
 export TERMUX_PACKAGES_OFFLINE=true
 export TERMUX_ARCH=aarch64
 export TERMUX_ON_DEVICE_BUILD=false

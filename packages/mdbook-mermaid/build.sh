@@ -2,14 +2,14 @@ TERMUX_PKG_HOMEPAGE=https://github.com/badboy/mdbook-mermaid
 TERMUX_PKG_DESCRIPTION="A preprocessor for mdbook to add mermaid support"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.13.0"
+TERMUX_PKG_VERSION="0.14.0"
 TERMUX_PKG_SRCURL=git+https://github.com/badboy/mdbook-mermaid
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make() {
 	termux_setup_rust
-	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
+	cargo build --jobs $TERMUX_PKG_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
 }
 
 termux_step_make_install() {

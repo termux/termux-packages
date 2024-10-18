@@ -14,12 +14,6 @@ termux_setup_rust() {
 			pkg install rust
 
 			pacman -S rust
-
-			or build it from source with
-
-			./build-package.sh rust
-
-			Note that package 'rust' is known to be problematic for building on device.
 			EOL
 			exit 1
 		fi
@@ -36,13 +30,13 @@ termux_setup_rust() {
 
 	local ENV_NAME=CARGO_TARGET_${CARGO_TARGET_NAME^^}_LINKER
 	ENV_NAME=${ENV_NAME//-/_}
-	export $ENV_NAME="${CC}"
+	export $ENV_NAME="${CC:-}"
 	# TARGET_CFLAGS and CFLAGS incorrectly applied globally
 	# for host build and other targets so set them individually
-	export CFLAGS_aarch64_linux_android="${CPPFLAGS}"
-	export CFLAGS_armv7_linux_androideabi="${CPPFLAGS}"
-	export CFLAGS_i686_linux_android="${CPPFLAGS}"
-	export CFLAGS_x86_64_linux_android="${CPPFLAGS}"
+	export CFLAGS_aarch64_linux_android="${CPPFLAGS:-}"
+	export CFLAGS_armv7_linux_androideabi="${CPPFLAGS:-}"
+	export CFLAGS_i686_linux_android="${CPPFLAGS:-}"
+	export CFLAGS_x86_64_linux_android="${CPPFLAGS:-}"
 	unset CFLAGS
 
 	if [[ -z "${TERMUX_RUST_VERSION-}" ]]; then

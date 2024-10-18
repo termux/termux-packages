@@ -146,7 +146,9 @@ repology() {
 	if [[ -z "${UNIQUE_PACKAGES[*]}" ]]; then
 		# NOTE: mapfile requires bash 4+
 		mapfile -t UNIQUE_PACKAGES < <(
-			curl --silent --location --retry 5 --retry-delay 5 --retry-max-time 60 \
+			curl -A "Termux update checker 1.0 (github.com/termux/termux-packages)" \
+				--silent --location --retry 5 \
+				--retry-delay 5 --retry-max-time 60 \
 				"https://repology.org/api/v1/projects/?inrepo=termux&&repos=1" |
 				jq -r 'keys[]'
 		)
@@ -220,6 +222,8 @@ test_pkg() {
 		if [[ "$check" != "repology" ]]; then
 			check "$check" "$src_url" || return_code="$?"
 		else
+			# sleep to ensure we do not flood repology with requests
+			sleep 1
 			repology "$pkg_name" || return_code="$?"
 			update_method="repology"
 		fi

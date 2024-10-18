@@ -27,7 +27,7 @@ termux_step_host_build() {
 	mkdir -p libsodium
 	pushd libsodium
 	$TERMUX_PKG_SRCDIR/libsodium/configure --prefix=$_PREFIX_FOR_BUILD
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j $TERMUX_PKG_MAKE_PROCESSES
 	make install
 	popd
 
@@ -35,7 +35,7 @@ termux_step_host_build() {
 
 	termux_setup_cmake
 	cmake $TERMUX_PKG_SRCDIR
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j $TERMUX_PKG_MAKE_PROCESSES
 
 	unset PKG_CONFIG_PATH
 }

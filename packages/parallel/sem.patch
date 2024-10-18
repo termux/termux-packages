@@ -2,16 +2,20 @@ diff --git a/sem b/sem
 index 873f294..4fa24cb 100644
 --- a/src/sem
 +++ b/src/sem
-@@ -2131,7 +2131,7 @@ sub parse_options(@) {
-     if($opt::bug) { ::die_bug("test-bug"); }
-     $Global::debug = $opt::D;
-     $Global::shell = $ENV{'PARALLEL_SHELL'} || parent_shell($$)
--	|| $ENV{'SHELL'} || "/bin/sh";
-+	|| $ENV{'SHELL'} || "@TERMUX_PREFIX@/bin/sh";
+@@ -2335,10 +2335,10 @@
+     ## Shell
+     #
+     if($opt::fast) {
+-	$Global::shell = $ENV{'PARALLEL_SHELL'} || which("dash") || "/bin/sh";
++	$Global::shell = $ENV{'PARALLEL_SHELL'} || which("dash") || "@TERMUX_PREFIX@/bin/sh";
+     } else {
+ 	$Global::shell = $ENV{'PARALLEL_SHELL'} || parent_shell($$)
+-	    || $ENV{'SHELL'} || "/bin/sh";
++	    || $ENV{'SHELL'} || "@TERMUX_PREFIX@/bin/sh";
+     }
      if(not -x $Global::shell and not which($Global::shell)) {
  	::error("Shell '$Global::shell' not found.");
- 	wait_and_exit(255);
-@@ -2869,14 +2869,14 @@ sub init_globals() {
+@@ -3009,14 +3009,14 @@
      $Global::trim = 'n';
      $Global::max_jobs_running = 0;
      $Global::job_already_run = '';
@@ -30,7 +34,7 @@ index 873f294..4fa24cb 100644
      }
      # no warnings to allow for undefined $XDG_*
      no warnings 'uninitialized';
-@@ -4688,7 +4688,7 @@ sub _run_gnu_parallel() {
+@@ -5152,7 +5152,7 @@
      unlink $stderrname;
  
      my $pid = ::open3($stdin_fh,$stdout_fh,$stderr_fh,

@@ -1,7 +1,7 @@
-diff -u -r ../rclone-v1.55.1/backend/hdfs/fs.go ./backend/hdfs/fs.go
---- ../rclone-v1.55.1/backend/hdfs/fs.go	2021-04-26 07:32:21.000000000 +0000
-+++ ./backend/hdfs/fs.go	2021-06-05 12:31:40.555728922 +0000
-@@ -36,7 +36,7 @@
+diff -uNr rclone-v1.67.0/backend/hdfs/fs.go rclone-v1.67.0.mod/backend/hdfs/fs.go
+--- rclone-v1.67.0/backend/hdfs/fs.go	2024-06-14 23:04:51.000000000 +0800
++++ rclone-v1.67.0.mod/backend/hdfs/fs.go	2024-06-15 11:36:29.543678242 +0800
+@@ -44,7 +44,7 @@
  func getKerberosClient() (*krb.Client, error) {
  	configPath := os.Getenv("KRB5_CONFIG")
  	if configPath == "" {
@@ -10,28 +10,19 @@ diff -u -r ../rclone-v1.55.1/backend/hdfs/fs.go ./backend/hdfs/fs.go
  	}
  
  	cfg, err := config.Load(configPath)
-diff -u -r ../rclone-v1.55.1/cmd/genautocomplete/genautocomplete_bash.go ./cmd/genautocomplete/genautocomplete_bash.go
---- ../rclone-v1.55.1/cmd/genautocomplete/genautocomplete_bash.go	2021-04-26 07:32:21.000000000 +0000
-+++ ./cmd/genautocomplete/genautocomplete_bash.go	2021-06-05 12:31:40.965729258 +0000
-@@ -18,7 +18,7 @@
- 	Long: `
- Generates a bash shell autocompletion script for rclone.
+diff -uNr rclone-v1.67.0/cmd/genautocomplete/genautocomplete_bash.go rclone-v1.67.0.mod/cmd/genautocomplete/genautocomplete_bash.go
+--- rclone-v1.67.0/cmd/genautocomplete/genautocomplete_bash.go	2024-06-14 23:04:51.000000000 +0800
++++ rclone-v1.67.0.mod/cmd/genautocomplete/genautocomplete_bash.go	2024-06-15 11:37:51.239678211 +0800
+@@ -24,7 +24,7 @@
  
--This writes to /etc/bash_completion.d/rclone by default so will
-+This writes to @TERMUX_PREFIX@/etc/bash_completion.d/rclone by default so will
- probably need to be run with sudo or as root, e.g.
+ the generated script will be written to
  
-     sudo rclone genautocomplete bash
-@@ -26,7 +26,7 @@
- Logout and login again to use the autocompletion scripts, or source
- them directly
+-    /etc/bash_completion.d/rclone
++    @TERMUX_PREFIX@/etc/bash_completion.d/rclone
  
--    . /etc/bash_completion
-+    . @TERMUX_PREFIX@/etc/bash_completion
+ and so rclone will probably need to be run as root, or with sudo.
  
- If you supply a command line argument the script will be written
- there.
-@@ -35,7 +35,7 @@
+@@ -46,7 +46,7 @@
  `,
  	Run: func(command *cobra.Command, args []string) {
  		cmd.CheckArgs(0, 1, command, args)
@@ -39,10 +30,10 @@ diff -u -r ../rclone-v1.55.1/cmd/genautocomplete/genautocomplete_bash.go ./cmd/g
 +		out := "@TERMUX_PREFIX@/etc/bash_completion.d/rclone"
  		if len(args) > 0 {
  			if args[0] == "-" {
- 				err := cmd.Root.GenBashCompletion(os.Stdout)
-diff -u -r ../rclone-v1.55.1/cmd/genautocomplete/genautocomplete_fish.go ./cmd/genautocomplete/genautocomplete_fish.go
---- ../rclone-v1.55.1/cmd/genautocomplete/genautocomplete_fish.go	2021-04-26 07:32:21.000000000 +0000
-+++ ./cmd/genautocomplete/genautocomplete_fish.go	2021-06-05 12:31:40.969062594 +0000
+ 				err := cmd.Root.GenBashCompletionV2(os.Stdout, false)
+diff -uNr rclone-v1.67.0/cmd/genautocomplete/genautocomplete_fish.go rclone-v1.67.0.mod/cmd/genautocomplete/genautocomplete_fish.go
+--- rclone-v1.67.0/cmd/genautocomplete/genautocomplete_fish.go	2024-06-14 23:04:51.000000000 +0800
++++ rclone-v1.67.0.mod/cmd/genautocomplete/genautocomplete_fish.go	2024-06-15 11:38:57.435678185 +0800
 @@ -18,7 +18,7 @@
  	Long: `
  Generates a fish autocompletion script for rclone.
@@ -70,9 +61,9 @@ diff -u -r ../rclone-v1.55.1/cmd/genautocomplete/genautocomplete_fish.go ./cmd/g
  		if len(args) > 0 {
  			if args[0] == "-" {
  				err := cmd.Root.GenFishCompletion(os.Stdout, true)
-diff -u -r ../rclone-v1.55.1/cmd/genautocomplete/genautocomplete_zsh.go ./cmd/genautocomplete/genautocomplete_zsh.go
---- ../rclone-v1.55.1/cmd/genautocomplete/genautocomplete_zsh.go	2021-04-26 07:32:21.000000000 +0000
-+++ ./cmd/genautocomplete/genautocomplete_zsh.go	2021-06-05 12:34:18.472488640 +0000
+diff -uNr rclone-v1.67.0/cmd/genautocomplete/genautocomplete_zsh.go rclone-v1.67.0.mod/cmd/genautocomplete/genautocomplete_zsh.go
+--- rclone-v1.67.0/cmd/genautocomplete/genautocomplete_zsh.go	2024-06-14 23:04:51.000000000 +0800
++++ rclone-v1.67.0.mod/cmd/genautocomplete/genautocomplete_zsh.go	2024-06-15 11:39:33.603678172 +0800
 @@ -18,7 +18,7 @@
  	Long: `
  Generates a zsh autocompletion script for rclone.

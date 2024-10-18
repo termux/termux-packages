@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/rust-lang/rust-bindgen
 TERMUX_PKG_DESCRIPTION="Automatically generates Rust FFI bindings to C (and some C++) libraries"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.69.4"
+TERMUX_PKG_VERSION="0.70.1"
 TERMUX_PKG_SRCURL=https://github.com/rust-lang/rust-bindgen/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=c02ce18b95c4e5021b95b8b461e5dbe6178edffc52a5f555cbca35b910559b5e
+TERMUX_PKG_SHA256=243ed50f99c00ae8c18d50429a1278b6fd37dff94df46df38f2733745362c014
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
@@ -19,7 +19,7 @@ termux_step_make() {
 		BUILD_TYPE=--release
 	fi
 
-	cargo build --jobs $TERMUX_MAKE_PROCESSES \
+	cargo build --jobs $TERMUX_PKG_MAKE_PROCESSES \
 		--target $CARGO_TARGET_NAME ${BUILD_TYPE}
 }
 

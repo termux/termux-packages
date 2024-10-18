@@ -1,0 +1,24 @@
+https://github.com/rust-lang-deprecated/rustc-serialize/commit/75ce92452a5f7c25a58fdea81e5f6f888630a2c9
+
+From 75ce92452a5f7c25a58fdea81e5f6f888630a2c9 Mon Sep 17 00:00:00 2001
+From: lcnr <rust@lcnr.de>
+Date: Fri, 1 Dec 2023 10:43:57 +0100
+Subject: [PATCH] fix the `implied_bounds_entailment` lint
+
+---
+ src/serialize.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/serialize.rs b/src/serialize.rs
+index 296f3d4..9b25e8f 100644
+--- a/src/serialize.rs
++++ b/src/serialize.rs
+@@ -1152,7 +1152,7 @@ impl<'a, T: ?Sized> Decodable for Cow<'a, T>
+     where T: ToOwned, T::Owned: Decodable
+ {
+     #[inline]
+-    fn decode<D: Decoder>(d: &mut D) -> Result<Cow<'static, T>, D::Error> {
++    fn decode<D: Decoder>(d: &mut D) -> Result<Cow<'a, T>, D::Error> {
+         Ok(Cow::Owned(try!(Decodable::decode(d))))
+     }
+ }

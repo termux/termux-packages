@@ -21,7 +21,7 @@ tools/nimgrep
 
 termux_step_host_build() {
 	cp -r ../src/* ./
-	make -j $TERMUX_MAKE_PROCESSES CC=gcc LD=gcc
+	make -j $TERMUX_PKG_MAKE_PROCESSES CC=gcc LD=gcc
 }
 
 termux_step_make() {
@@ -46,7 +46,7 @@ termux_step_make() {
 		sed -i 's/arm64/amd64/g' makefile
 	fi
 	export CFLAGS=" $CPPFLAGS $CFLAGS  -w  -fno-strict-aliasing"
-	make LD=$CC uos=linux mycpu=$NIM_ARCH myos=android  -j $TERMUX_MAKE_PROCESSES useShPath=$TERMUX_PREFIX/bin/sh
+	make LD=$CC uos=linux mycpu=$NIM_ARCH myos=android  -j $TERMUX_PKG_MAKE_PROCESSES useShPath=$TERMUX_PREFIX/bin/sh
 	cp config/nim.cfg ../host-build/config
 
 	for cmd in $_NIM_TOOLS; do

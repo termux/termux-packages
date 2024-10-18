@@ -1,11 +1,12 @@
---- a/src/backend/commands/collationcmds.c
-+++ b/src/backend/commands/collationcmds.c
-@@ -539,7 +539,7 @@
+diff -uNr a/src/backend/commands/collationcmds.c b/src/backend/commands/collationcmds.c
+--- a/src/backend/commands/collationcmds.c	2024-09-24 01:32:53.000000000 +0530
++++ b/src/backend/commands/collationcmds.c	2024-09-26 21:05:47.489959070 +0530
+@@ -579,7 +579,7 @@
  
  
  /* will we use "locale -a" in pg_import_system_collations? */
--#if defined(HAVE_LOCALE_T) && !defined(WIN32)
-+#if defined(HAVE_LOCALE_T) && !defined(WIN32) && !defined(__ANDROID__)
+-#if !defined(WIN32)
++#if !defined(WIN32) && !defined(__ANDROID__)
  #define READ_LOCALE_A_OUTPUT
  #endif
  

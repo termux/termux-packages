@@ -5,11 +5,11 @@ TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=154a5e0f13aebc80a465336642a406d6ddfc06cf
 _COMMIT_DATE=20230415
 TERMUX_PKG_VERSION=0.1.0-p${_COMMIT_DATE}
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=git+https://github.com/libhangul/libhangul.git
 TERMUX_PKG_SHA256=e1dd5bf2553f2676ac05e99069c6fd0eaa1b24c283b12678b780ea70a19a664d
 TERMUX_PKG_GIT_BRANCH=main
-TERMUX_PKG_DEPENDS="libexpat, libiconv"
-TERMUX_PKG_BUILD_DEPENDS="libandroid-glob"
+TERMUX_PKG_DEPENDS="libandroid-glob, libexpat, libiconv"
 
 termux_step_post_get_source() {
 	git fetch --unshallow
@@ -33,4 +33,6 @@ termux_step_pre_configure() {
 	# prefer autotools
 	rm CMakeLists.txt
 	./autogen.sh
+
+	LDFLAGS+=" -landroid-glob"
 }

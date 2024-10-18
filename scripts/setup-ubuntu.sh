@@ -65,14 +65,10 @@ PACKAGES+=" xmlto"
 PACKAGES+=" xmltoman"
 
 # Needed by python modules (e.g. asciinema) and some build systems.
-PACKAGES+=" python3.9"
-PACKAGES+=" python3.10"
-PACKAGES+=" python3.11"
 PACKAGES+=" python3-pip"
 PACKAGES+=" python3-setuptools"
 PACKAGES+=" python-wheel-common"
-PACKAGES+=" python3.10-venv"
-PACKAGES+=" python3.11-venv"
+PACKAGES+=" python3.12-venv"
 
 # Needed by package bc.
 PACKAGES+=" ed"
@@ -99,7 +95,6 @@ PACKAGES+=" gengetopt"
 PACKAGES+=" libdbus-1-dev"
 
 # Needed by package below.
-PACKAGES+=" clang-15"
 PACKAGES+=" libelf-dev"
 
 # Needed by package ghostscript.
@@ -138,6 +133,7 @@ PACKAGES+=" ruby"
 PACKAGES+=" libc-ares-dev"
 PACKAGES+=" libc-ares-dev:i386"
 PACKAGES+=" libicu-dev"
+PACKAGES+=" libsqlite3-dev:i386"
 
 # Needed by php.
 PACKAGES+=" re2c"
@@ -149,9 +145,9 @@ PACKAGES+=" composer"
 
 # Needed by package rust.
 PACKAGES+=" libssl-dev" # Needed to build Rust
-PACKAGES+=" llvm-16-dev"
-PACKAGES+=" llvm-16-tools"
-PACKAGES+=" clang-16"
+PACKAGES+=" llvm-17-dev"
+PACKAGES+=" llvm-17-tools"
+PACKAGES+=" clang-17"
 
 # Needed for package smalltalk.
 PACKAGES+=" libsigsegv-dev"
@@ -191,7 +187,7 @@ PACKAGES+=" rsync"
 PACKAGES+=" wget"
 
 # Needed by codeblocks
-PACKAGES+=" libwxgtk3.0-gtk3-dev"
+PACKAGES+=" libwxgtk3.2-dev"
 PACKAGES+=" libgtk-3-dev"
 
 # Needed by packages in unstable repository.
@@ -221,7 +217,7 @@ PACKAGES+=" itstool"
 PACKAGES+=" libdbus-glib-1-dev-bin"
 PACKAGES+=" libgdk-pixbuf2.0-dev"
 PACKAGES+=" libwayland-dev"
-PACKAGES+=" python-setuptools"
+PACKAGES+=" python3-html5lib"
 PACKAGES+=" python3-xcbgen"
 PACKAGES+=" sassc"
 PACKAGES+=" texlive-extra-utils"
@@ -288,6 +284,9 @@ PACKAGES+=" libcurl4-openssl-dev"
 # Required by openjdk-17
 PACKAGES+=" openjdk-17-jre openjdk-17-jdk"
 
+# Required by openjdk-21
+PACKAGES+=" openjdk-21-jre openjdk-21-jdk"
+
 # Required by qt5-qtwebengine
 PACKAGES+=" libnss3 libnss3:i386 libnss3-dev"
 PACKAGES+=" libwebp7 libwebp7:i386 libwebp-dev"
@@ -306,11 +305,13 @@ PACKAGES+=" patchelf"
 # Needed by lldb for python integration
 PACKAGES+=" swig"
 
+# Needed by binutils-cross
+PACKAGES+=" libzstd-dev"
+
 # Do not require sudo if already running as root.
+SUDO="sudo"
 if [ "$(id -u)" = "0" ]; then
 	SUDO=""
-else
-	SUDO="sudo"
 fi
 
 # Allow 32-bit packages.
@@ -320,24 +321,16 @@ $SUDO dpkg --add-architecture i386
 $SUDO cp $(dirname "$(realpath "$0")")/llvm-snapshot.gpg.key /etc/apt/trusted.gpg.d/apt.llvm.org.asc
 $SUDO chmod a+r /etc/apt/trusted.gpg.d/apt.llvm.org.asc
 {
-	echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy main"
-	echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-16 main"
+	echo "deb [arch=amd64] http://apt.llvm.org/noble/ llvm-toolchain-noble-17 main"
 } | $SUDO tee /etc/apt/sources.list.d/apt-llvm-org.list > /dev/null
 
-# Add ppa repo to be able to get openjdk-17 on ubuntu 22.04
-$SUDO cp $(dirname "$(realpath "$0")")/openjdk-r-ppa.gpg /etc/apt/trusted.gpg.d/
-$SUDO chmod a+r /etc/apt/trusted.gpg.d/openjdk-r-ppa.gpg
-echo "deb https://ppa.launchpadcontent.net/openjdk-r/ppa/ubuntu/ jammy main" | $SUDO tee /etc/apt/sources.list.d/openjdk-r-ubuntu-ppa-jammy.list > /dev/null
+# Add deadsnakes PPA to enable installing python 3.11:
+$SUDO add-apt-repository -y 'ppa:deadsnakes/ppa'
 
 $SUDO apt-get -yq update
 
 $SUDO env DEBIAN_FRONTEND=noninteractive \
 	apt-get install -yq --no-install-recommends $PACKAGES
-
-# Pip for python2.
-curl -L --output /tmp/py2-get-pip.py https://bootstrap.pypa.io/pip/2.7/get-pip.py
-$SUDO python2 /tmp/py2-get-pip.py
-rm -f /tmp/py2-get-pip.py
 
 $SUDO locale-gen --purge en_US.UTF-8
 echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US:en"\n' | $SUDO tee -a /etc/default/locale
@@ -345,4 +338,4 @@ echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US:en"\n' | $SUDO tee -a /etc/default/
 . $(dirname "$(realpath "$0")")/properties.sh
 $SUDO mkdir -p $TERMUX_PREFIX
 $SUDO chown -R $(whoami) /data
-$SUDO ln -s /data/data/com.termux/files/usr/opt/bionic-host /system
+$SUDO ln -sf /data/data/com.termux/files/usr/opt/bionic-host /system

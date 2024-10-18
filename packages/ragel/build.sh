@@ -25,7 +25,7 @@ termux_step_host_build() {
 	ln -sf . src/colm
 	sed -i '/^SUBDIRS =/s/ test//' Makefile.in
 	./configure
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j $TERMUX_PKG_MAKE_PROCESSES
 }
 
 termux_step_pre_configure() {

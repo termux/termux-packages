@@ -1,16 +1,7 @@
-commit c1ae07116d9bebbe580b3df22f8c8f3a7cbeec44
-Author: Kevin Williams <admin@utermux.dev>
-Date:   Sat Dec 23 16:47:56 2023 +0800
-
-    Revert "cmake: only install public headers"
-    
-    This reverts commit 1dcb072cda091180a5b8b03c030bcbe83a54f8e2.
-
-diff --git a/SPIRV/CMakeLists.txt b/SPIRV/CMakeLists.txt
-index 61c7a266..286ab73c 100644
---- a/SPIRV/CMakeLists.txt
-+++ b/SPIRV/CMakeLists.txt
-@@ -70,13 +70,6 @@ set(SPVREMAP_HEADERS
+diff -uNr glslang-15.0.0/SPIRV/CMakeLists.txt glslang-15.0.0.mod/SPIRV/CMakeLists.txt
+--- glslang-15.0.0/SPIRV/CMakeLists.txt	2024-09-26 07:10:44.000000000 +0800
++++ glslang-15.0.0.mod/SPIRV/CMakeLists.txt	2024-10-02 09:09:13.806580988 +0800
+@@ -73,14 +73,6 @@
      SPVRemapper.h
      doc.h)
  
@@ -19,33 +10,24 @@ index 61c7a266..286ab73c 100644
 -    disassemble.h
 -    Logger.h
 -    spirv.hpp
--    SPVRemapper.h)
+-    SPVRemapper.h
+-    SpvTools.h)
 -
- add_library(SPIRV ${LIB_TYPE} ${SOURCES} ${HEADERS})
+ add_library(SPIRV ${LIB_TYPE} ${CMAKE_CURRENT_SOURCE_DIR}/../glslang/stub.cpp)
+ add_library(glslang::SPIRV ALIAS SPIRV)
  set_target_properties(SPIRV PROPERTIES
-     FOLDER glslang
-@@ -150,5 +143,5 @@ if(PROJECT_IS_TOP_LEVEL)
-     ")
-     install(FILES "${CMAKE_CURRENT_BINARY_DIR}/SPIRVTargets.cmake" DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake)
+@@ -130,5 +122,5 @@
+ 
+     install(TARGETS SPIRV EXPORT glslang-targets)
  
 -    install(FILES ${PUBLIC_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/glslang/SPIRV/)
 +    install(FILES ${HEADERS} ${SPVREMAP_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/glslang/SPIRV/)
  endif()
-diff --git a/glslang/CMakeLists.txt b/glslang/CMakeLists.txt
-index 37eecaad..10de92a7 100644
---- a/glslang/CMakeLists.txt
-+++ b/glslang/CMakeLists.txt
-@@ -168,7 +168,7 @@ set(GLSLANG_HEADERS
-     Include/SpirvIntrinsics.h
-     Include/Types.h)
- 
--add_library(glslang ${LIB_TYPE} ${GLSLANG_SOURCES} ${GLSLANG_HEADERS})
-+add_library(glslang ${LIB_TYPE} ${BISON_GLSLParser_OUTPUT_SOURCE} ${GLSLANG_SOURCES} ${GLSLANG_HEADERS})
- set_target_properties(glslang PROPERTIES
-     FOLDER glslang
-     POSITION_INDEPENDENT_CODE ON
-@@ -252,16 +252,12 @@ if(PROJECT_IS_TOP_LEVEL)
-         install(FILES "${CMAKE_CURRENT_BINARY_DIR}/glslangTargets.cmake" DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake)
+diff -uNr glslang-15.0.0/glslang/CMakeLists.txt glslang-15.0.0.mod/glslang/CMakeLists.txt
+--- glslang-15.0.0/glslang/CMakeLists.txt	2024-09-26 07:10:44.000000000 +0800
++++ glslang-15.0.0.mod/glslang/CMakeLists.txt	2024-10-02 09:13:07.818580898 +0800
+@@ -256,17 +256,12 @@
+         install(TARGETS GenericCodeGen EXPORT glslang-targets)
      endif()
  
 -    set(PUBLIC_HEADERS
@@ -55,6 +37,7 @@ index 37eecaad..10de92a7 100644
 -        Include/glslang_c_interface.h
 -        Include/glslang_c_shader_types.h
 -        Include/ResourceLimits.h
+-        Include/visibility.h
 -        MachineIndependent/Versions.h)
 +    set(ALL_HEADERS
 +        ${GLSLANG_HEADERS}

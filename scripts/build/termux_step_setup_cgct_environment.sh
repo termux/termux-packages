@@ -3,6 +3,11 @@
 termux_step_setup_cgct_environment() {
 	[ "$TERMUX_ON_DEVICE_BUILD" = "true" ] && return
 
+	if [ "$TERMUX_REPO_PACKAGE" != "$TERMUX_APP_PACKAGE" ]; then
+		echo "WARNING: It is not possible to install glibc core packages from the repo for operation of CGCT, you must install glibc packages for your application with the prefix '$TERMUX_PREFIX' yourself (core packages: glibc and linux-api-headers-glibc)."
+		return
+	fi
+
 	for PKG in gcc-libs-glibc glibc linux-api-headers-glibc; do
 		local PKG_DIR=$(ls ${TERMUX_SCRIPTDIR}/*/${PKG}/build.sh 2> /dev/null || \
 			ls ${TERMUX_SCRIPTDIR}/*/${PKG/-glibc/}/build.sh 2> /dev/null)
@@ -30,7 +35,7 @@ termux_step_setup_cgct_environment() {
 
 		read DEP_ARCH DEP_VERSION DEP_VERSION_PAC <<< $(termux_extract_dep_info $PKG "${PKG_DIR/'/build.sh'/}")
 
-		if ! package__is_package_version_built "$PKG" "$DEP_VERSION" && [ ! -f "$TERMUX_BUILT_PACKAGES_DIRECTORY/$PKG-for-cgct" ]; then
+		if ! termux_package__is_package_version_built "$PKG" "$DEP_VERSION" && [ ! -f "$TERMUX_BUILT_PACKAGES_DIRECTORY/$PKG-for-cgct" ]; then
 			[ ! "$TERMUX_QUIET_BUILD" = "true" ] && echo "Installing '${PKG}' for the CGCT tool environment."
 
 			if [ ! -f "${TERMUX_COMMON_CACHEDIR}-${DEP_ARCH}/${REPO_NAME}" ]; then

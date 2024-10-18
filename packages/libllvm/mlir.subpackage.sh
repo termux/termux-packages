@@ -4,8 +4,8 @@ bin/tblgen-lsp-server
 bin/tblgen-to-irdl
 include/mlir*
 lib/cmake/mlir/
-lib/libMLIR.so
-lib/libmlir*so
+lib/libMLIR*.so
+lib/libmlir*.so
 "
 TERMUX_SUBPKG_DESCRIPTION="A Multi-Level Intermediate Representation for compilers from LLVM"
 TERMUX_SUBPKG_DEPENDS="libc++, ncurses"

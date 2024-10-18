@@ -4,17 +4,17 @@
  
    # Can skip the run check by providing the result in a cross file or
    # native file as bool property value.
--  prop = meson.get_external_property('ipc_rmid_deferred_release', 'auto')
+-  prop = meson.get_external_property('ipc_rmid_deferred_release', meson.is_cross_build() ? 'false' : 'auto')
 +  prop = 'true'
    # We don't know the type of prop (bool, string) but need to differentiate
    # between a set value (bool) or the fallback value (string), so convert to
-   # a string and chec the string value.
-@@ -890,7 +890,7 @@
+   # a string and check the string value.
+@@ -769,7 +769,7 @@
    conf.set('ATOMIC_OP_NEEDS_MEMORY_BARRIER', 1)
  endif
  
--have_ld_preload = ['linux', 'freebsd', 'darwin', 'dragonfly'].contains(host_machine.system())
-+have_ld_preload = ['linux', 'android', 'freebsd', 'darwin', 'dragonfly'].contains(host_machine.system())
+-have_ld_preload = ['linux', 'freebsd', 'darwin', 'dragonfly', 'sunos'].contains(host_machine.system())
++have_ld_preload = ['linux', 'android', 'freebsd', 'darwin', 'dragonfly', 'sunos'].contains(host_machine.system())
  
  if have_ld_preload and zlib_dep.found() and conf.get('CAIRO_HAS_REAL_PTHREAD', 0) == 1 and conf.get('CAIRO_HAS_DLSYM', 0) == 1
    conf.set('CAIRO_HAS_TRACE', 1)

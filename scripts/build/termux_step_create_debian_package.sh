@@ -25,13 +25,13 @@ termux_step_create_debian_package() {
 		Homepage: $TERMUX_PKG_HOMEPAGE
 	HERE
 	if [ "$TERMUX_GLOBAL_LIBRARY" = "true" ] && [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
-		test ! -z "$TERMUX_PKG_DEPENDS" && TERMUX_PKG_DEPENDS=$(package__add_prefix_glibc_to_package_list "$TERMUX_PKG_DEPENDS")
-		test ! -z "$TERMUX_PKG_BREAKS" && TERMUX_PKG_BREAKS=$(package__add_prefix_glibc_to_package_list "$TERMUX_PKG_BREAKS")
-		test ! -z "$TERMUX_PKG_CONFLICTS" && TERMUX_PKG_CONFLICTS=$(package__add_prefix_glibc_to_package_list "$TERMUX_PKG_CONFLICTS")
-		test ! -z "$TERMUX_PKG_RECOMMENDS" && TERMUX_PKG_RECOMMENDS=$(package__add_prefix_glibc_to_package_list "$TERMUX_PKG_RECOMMENDS")
-		test ! -z "$TERMUX_PKG_REPLACES" && TERMUX_PKG_REPLACES=$(package__add_prefix_glibc_to_package_list "$TERMUX_PKG_REPLACES")
-		test ! -z "$TERMUX_PKG_PROVIDES" && TERMUX_PKG_PROVIDES=$(package__add_prefix_glibc_to_package_list "$TERMUX_PKG_PROVIDES")
-		test ! -z "$TERMUX_PKG_SUGGESTS" && TERMUX_PKG_SUGGESTS=$(package__add_prefix_glibc_to_package_list "$TERMUX_PKG_SUGGESTS")
+		test ! -z "$TERMUX_PKG_DEPENDS" && TERMUX_PKG_DEPENDS=$(termux_package__add_prefix_glibc_to_package_list "$TERMUX_PKG_DEPENDS")
+		test ! -z "$TERMUX_PKG_BREAKS" && TERMUX_PKG_BREAKS=$(termux_package__add_prefix_glibc_to_package_list "$TERMUX_PKG_BREAKS")
+		test ! -z "$TERMUX_PKG_CONFLICTS" && TERMUX_PKG_CONFLICTS=$(termux_package__add_prefix_glibc_to_package_list "$TERMUX_PKG_CONFLICTS")
+		test ! -z "$TERMUX_PKG_RECOMMENDS" && TERMUX_PKG_RECOMMENDS=$(termux_package__add_prefix_glibc_to_package_list "$TERMUX_PKG_RECOMMENDS")
+		test ! -z "$TERMUX_PKG_REPLACES" && TERMUX_PKG_REPLACES=$(termux_package__add_prefix_glibc_to_package_list "$TERMUX_PKG_REPLACES")
+		test ! -z "$TERMUX_PKG_PROVIDES" && TERMUX_PKG_PROVIDES=$(termux_package__add_prefix_glibc_to_package_list "$TERMUX_PKG_PROVIDES")
+		test ! -z "$TERMUX_PKG_SUGGESTS" && TERMUX_PKG_SUGGESTS=$(termux_package__add_prefix_glibc_to_package_list "$TERMUX_PKG_SUGGESTS")
 	fi
 	test ! -z "$TERMUX_PKG_BREAKS" && echo "Breaks: $TERMUX_PKG_BREAKS" >> DEBIAN/control
 	test ! -z "$TERMUX_PKG_PRE_DEPENDS" && echo "Pre-Depends: $TERMUX_PKG_PRE_DEPENDS" >> DEBIAN/control
