@@ -1,0 +1,11 @@
+--- a/exec/exec.go	2024-04-22 17:03:28.000000000 -0700
++++ b/exec/exec.go	2024-06-02 23:59:20.755782617 -0700
+@@ -109,6 +109,8 @@
+ 		} else {
+ 			cmd = exec.Command("open", "-a", browser, url)
+ 		}
++	case "android":
++		cmd = exec.Command("xdg-open", url)
+ 	case "linux":
+ 		if IsWSL() {
+ 			cmd = exec.Command("rundll32.exe", "url.dll,FileProtocolHandler", url)
