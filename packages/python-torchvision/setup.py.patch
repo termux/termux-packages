@@ -1,117 +1,58 @@
 diff -u -r ../cache/tmp-checkout/setup.py ./setup.py
 --- ../cache/tmp-checkout/setup.py	2024-10-03 18:27:11.540911181 +0000
 +++ ./setup.py	2024-10-04 12:09:20.737925352 +0000
-@@ -6,10 +6,9 @@
- import subprocess
- import sys
+@@ -8,10 +8,9 @@
+ import warnings
+ from pathlib import Path
  
 -import torch
  from pkg_resources import DistributionNotFound, get_distribution, parse_version
  from setuptools import find_packages, setup
--from torch.utils.cpp_extension import BuildExtension, CppExtension, CUDA_HOME, CUDAExtension
+-from torch.utils.cpp_extension import BuildExtension, CppExtension, CUDA_HOME, CUDAExtension, ROCM_HOME
 +from setuptools import Extension as CppExtension
  
+ FORCE_CUDA = os.getenv("FORCE_CUDA", "0") == "1"
+ FORCE_MPS = os.getenv("FORCE_MPS", "0") == "1"
+@@ -39,8 +38,8 @@
  
- def read(*names, **kwargs):
-@@ -163,11 +162,6 @@
+ ROOT_DIR = Path(__file__).absolute().parent
+ CSRS_DIR = ROOT_DIR / "torchvision/csrc"
+-IS_ROCM = (torch.version.hip is not None) and (ROCM_HOME is not None)
+-BUILD_CUDA_SOURCES = (torch.cuda.is_available() and ((CUDA_HOME is not None) or IS_ROCM)) or FORCE_CUDA
++IS_ROCM = False
++BUILD_CUDA_SOURCES = False
  
-     is_rocm_pytorch = False
+ PACKAGE_NAME = "torchvision"
  
--    if torch.__version__ >= "1.5":
--        from torch.utils.cpp_extension import ROCM_HOME
--
--        is_rocm_pytorch = (torch.version.hip is not None) and (ROCM_HOME is not None)
--
-     if is_rocm_pytorch:
-         from torch.utils.hipify import hipify_python
+@@ -146,7 +145,7 @@
+     else:
+         extra_compile_args["cxx"].append("-g0")
  
-@@ -190,8 +184,8 @@
+-    return define_macros, extra_compile_args
++    return define_macros, extra_compile_args["cxx"]
  
-     define_macros = []
  
--    extra_compile_args = {"cxx": []}
--    if (torch.cuda.is_available() and ((CUDA_HOME is not None) or is_rocm_pytorch)) or force_cuda:
-+    extra_compile_args = {}
-+    if False:
-         extension = CUDAExtension
-         sources += source_cuda
-         if not is_rocm_pytorch:
-@@ -204,8 +198,6 @@
-             define_macros += [("WITH_HIP", None)]
-             nvcc_flags = []
-         extra_compile_args["nvcc"] = nvcc_flags
--    elif torch.backends.mps.is_available() or force_mps:
--        sources += source_mps
+ def make_C_extension():
+@@ -183,7 +182,7 @@
+         sources += cuda_sources
+     else:
+         Extension = CppExtension
+-        if torch.backends.mps.is_available() or FORCE_MPS:
++        if False or FORCE_MPS:
+             sources += mps_sources
  
-     if sys.platform == "win32":
-         define_macros += [("torchvision_EXPORTS", None)]
-@@ -221,9 +213,6 @@
-             extra_compile_args["nvcc"] = [f for f in nvcc_flags if not ("-O" in f or "-g" in f)]
-             extra_compile_args["nvcc"].append("-O0")
-             extra_compile_args["nvcc"].append("-g")
--    else:
--        print("Compiling with debug mode OFF")
--        extra_compile_args["cxx"].append("-g0")
+     define_macros, extra_compile_args = get_macros_and_flags()
+@@ -366,7 +365,7 @@
+         else:
+             warnings.warn("Building torchvision without AVIF support")
  
-     sources = [os.path.join(extensions_dir, s) for s in sources]
+-    if USE_NVJPEG and (torch.cuda.is_available() or FORCE_CUDA):
++    if USE_NVJPEG and (False or FORCE_CUDA):
+         nvjpeg_found = CUDA_HOME is not None and (Path(CUDA_HOME) / "include/nvjpeg.h").exists()
  
-@@ -254,7 +243,7 @@
-     image_link_flags = []
- 
-     # Locating libPNG
--    libpng = shutil.which("libpng-config")
-+    libpng = "@TERMUX_PREFIX@/bin/libpng-config"
-     pngfix = shutil.which("pngfix")
-     png_found = libpng is not None or pngfix is not None
- 
-@@ -313,11 +302,7 @@
- 
-     # Locating nvjpeg
-     # Should be included in CUDA_HOME for CUDA >= 10.1, which is the minimum version we have in the CI
--    nvjpeg_found = (
--        extension is CUDAExtension
--        and CUDA_HOME is not None
--        and os.path.exists(os.path.join(CUDA_HOME, "include", "nvjpeg.h"))
--    )
-+    nvjpeg_found = False
- 
-     use_nvjpeg = use_nvjpeg and nvjpeg_found
-     if use_nvjpeg:
-@@ -354,7 +339,7 @@
-     )
- 
-     # Locating ffmpeg
--    ffmpeg_exe = shutil.which("ffmpeg")
-+    ffmpeg_exe = "@TERMUX_PREFIX@/bin/ffmpeg"
-     has_ffmpeg = ffmpeg_exe is not None
-     ffmpeg_version = None
-     # FIXME: Building torchvision with ffmpeg on MacOS or with Python 3.9
-@@ -363,7 +348,7 @@
-     # FIXME: https://github.com/pytorch/vision/issues/3367
-     if sys.platform != "linux" or (sys.version_info.major == 3 and sys.version_info.minor == 9):
-         has_ffmpeg = False
--    if has_ffmpeg:
-+    if False:
-         try:
-             # This is to check if ffmpeg is installed properly.
-             ffmpeg_version = subprocess.check_output(["ffmpeg", "-version"])
-@@ -455,13 +440,7 @@
-     # CUDA_HOME should be set to the cuda root directory.
-     # TORCHVISION_INCLUDE and TORCHVISION_LIBRARY should include the location to
-     # video codec header files and libraries respectively.
--    video_codec_found = (
--        extension is CUDAExtension
--        and CUDA_HOME is not None
--        and any([os.path.exists(os.path.join(folder, "cuviddec.h")) for folder in vision_include])
--        and any([os.path.exists(os.path.join(folder, "nvcuvid.h")) for folder in vision_include])
--        and any([os.path.exists(os.path.join(folder, "libnvcuvid.so")) for folder in library_dirs])
--    )
-+    video_codec_found = False
- 
-     use_video_codec = use_video_codec and video_codec_found
-     if (
-@@ -560,7 +539,6 @@
-         ext_modules=get_extensions(),
+         if nvjpeg_found:
+@@ -593,7 +592,6 @@
+         ext_modules=extensions,
          python_requires=">=3.8",
          cmdclass={
 -            "build_ext": BuildExtension.with_options(no_python_abi_suffix=True),

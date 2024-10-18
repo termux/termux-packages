@@ -2,8 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://github.com/pytorch/vision
 TERMUX_PKG_DESCRIPTION="Datasets, Transforms and Models specific to Computer Vision"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.19.1
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=0.20.0
 TERMUX_PKG_SRCURL=git+https://github.com/pytorch/vision
 # ffmpeg
 TERMUX_PKG_DEPENDS="libc++, python, python-numpy, python-pillow, python-pip, python-torch, libjpeg-turbo, libpng, zlib"
@@ -30,5 +29,6 @@ termux_step_make_install() {
 
 termux_step_create_debscripts() {
 	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
-	echo "pip3 install typing_extensions requests" >> postinst
+	echo "echo 'Installing dependencies for $TERMUX_PKG_NAME...'" >> postinst
+	echo "pip3 install torchvision" >> postinst
 }

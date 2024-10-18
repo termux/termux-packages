@@ -2,8 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://github.com/pytorch/audio
 TERMUX_PKG_DESCRIPTION="Data manipulation and transformation for audio signal processing, powered by PyTorch"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.4.1
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=2.5.0
 TERMUX_PKG_SRCURL=git+https://github.com/pytorch/audio
 # FFMPEG
 TERMUX_PKG_DEPENDS="libc++, python, python-pip, python-torch"
