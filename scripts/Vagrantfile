@@ -3,7 +3,10 @@
 
 Vagrant.configure("2") do |config|
 
-  config.vm.box = "ubuntu/jammy64"
+  config.vm.box = "bento/ubuntu-24.04"
+
+  # default 300 is too short
+  config.vm.boot_timeout = 600
 
   # use vagrant-disksize plugin to resize partition - https://github.com/sprotheroe/vagrant-disksize
   config.disksize.size = '50GB'
@@ -19,7 +22,10 @@ Vagrant.configure("2") do |config|
   config.vm.synced_folder ".", "/vagrant", disabled: true
 
   # Filesystem needs to be resized
-  config.vm.provision "shell", inline: "resize2fs /dev/sda1", privileged: true
+  config.vm.provision "shell", inline: "pwd"
+  config.vm.provision "shell", inline: "stat -f -c%T ."
+  config.vm.provision "shell", inline: "mount"
+  config.vm.provision "shell", inline: "resize2fs /dev/sda2", privileged: true
 
   # Run environment setup scripts
   config.vm.provision "shell", inline: "cd /home/vagrant/termux-packages && ./scripts/setup-ubuntu.sh", privileged: false
