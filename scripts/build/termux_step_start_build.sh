@@ -1,6 +1,37 @@
 termux_step_start_build() {
 	# shellcheck source=/dev/null
 	source "$TERMUX_PKG_BUILDER_SCRIPT"
+
+	if [ -n "$TERMUX_VIRTUAL_PKG_SRC" ]; then
+		export TERMUX_VIRTUAL_PKG=true
+	fi
+	if [ "$TERMUX_VIRTUAL_PKG" = "true" ]; then
+		if [ -z "${TERMUX_PKG_VERSION:=}" ]; then
+			TERMUX_PKG_VERSION="0"
+		fi
+		if [ -n "$TERMUX_VIRTUAL_PKG_SRC" ]; then
+			# Parsing the original package
+			termux_get_pkg_builder_dir_and_pkg_builder_script "$TERMUX_VIRTUAL_PKG_SRC"
+			# Checking that the original package is not a virtual package
+			(
+				local TERMUX_VIRTUAL_PKG_SRC_ORG="$TERMUX_VIRTUAL_PKG_SRC"
+				TERMUX_VIRTUAL_PKG=false
+				TERMUX_VIRTUAL_PKG_SRC=""
+				source "$TERMUX_PKG_BUILDER_SCRIPT"
+				if [ "$TERMUX_VIRTUAL_PKG" = "true" ] || [ -n "$TERMUX_VIRTUAL_PKG_SRC" ]; then
+					termux_error_exit "Virtual package '${TERMUX_VIRTUAL_PKG_NAME}' specifies virtual package '${TERMUX_VIRTUAL_PKG_SRC_ORG}' as source package. Cannot use virtual package as source."
+				fi
+			)
+			# Mixing the original package with the virtual package
+			source "$TERMUX_PKG_BUILDER_SCRIPT"
+			source "$TERMUX_VIRTUAL_PKG_BUILDER_SCRIPT"
+			# Setting the source in the virtual package
+			termux_step_setup_virtual_srcs
+			# Restoring variables by virtual package
+			termux_restore_variables_by_virtual_pkg
+		fi
+	fi
+
 	# Path to hostbuild marker, for use if package has hostbuild step
 	TERMUX_HOSTBUILD_MARKER="$TERMUX_PKG_HOSTBUILD_DIR/TERMUX_BUILT_FOR_$TERMUX_PKG_VERSION"
 
@@ -62,7 +93,7 @@ termux_step_start_build() {
 		fi
 	fi
 
-	echo "termux - building $TERMUX_PKG_NAME for arch $TERMUX_ARCH..."
+	echo "termux - building $(test "${TERMUX_VIRTUAL_PKG}" = "true" && echo "virtual") $TERMUX_PKG_NAME for arch $TERMUX_ARCH..."
 	test -t 1 && printf "\033]0;%s...\007" "$TERMUX_PKG_NAME"
 
 	# Avoid exporting PKG_CONFIG_LIBDIR until after termux_step_host_build.
@@ -115,4 +146,20 @@ termux_step_start_build() {
 			fi
 		done
 	fi
+}
+
+termux_step_setup_virtual_srcs() {
+	[ "$TERMUX_VIRTUAL_PKG_INCLUDE" = "false" ] && return
+
+	if [ -z "$TERMUX_VIRTUAL_PKG_INCLUDE" ]; then
+		export TERMUX_VIRTUAL_PKG_INCLUDE=$(find "$TERMUX_PKG_BUILDER_DIR" -mindepth 1 -maxdepth 1 \
+			! -name "build.sh" ! -name "*.subpackage.sh" -exec basename {} ';')
+	fi
+
+	for src in $TERMUX_VIRTUAL_PKG_INCLUDE; do
+		if [ -e "${TERMUX_VIRTUAL_PKG_BUILDER_DIR}/${src}" ]; then
+			termux_error_exit "conflict, file '${src}' already exists."
+		fi
+		ln -sr "${TERMUX_PKG_BUILDER_DIR}/${src}" "${TERMUX_VIRTUAL_PKG_BUILDER_DIR}"
+	done
 }
