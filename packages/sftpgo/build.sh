@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Full-featured and highly configurable SFTP, HTTP/S, FTP/
 TERMUX_PKG_LICENSE="AGPL-V3"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.6.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/drakkan/sftpgo/releases/download/v$TERMUX_PKG_VERSION/sftpgo_v${TERMUX_PKG_VERSION}_src_with_deps.tar.xz
 TERMUX_PKG_SHA256=c90260b7b2901438bbd476eee9fd389af5af24113088a50284b2d170631b52ee
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -27,7 +28,12 @@ termux_step_host_build() {
 termux_step_make() {
 	termux_setup_golang
 
-	go build -mod vendor -o sftpgo
+	local _commit="$(cat VERSION.txt | head -n 2 | tail -n 1)"
+	local _go_ldflags="-s -w"
+	_go_ldflags+=" -X github.com/drakkan/sftpgo/v2/internal/version.commit=${_commit}"
+	_go_ldflags+=" -X github.com/drakkan/sftpgo/v2/internal/version.date=$(date -u +%FT%TZ)"
+
+	go build -trimpath -ldflags "$_go_ldflags" -mod vendor -o sftpgo
 }
 
 termux_step_make_install() {
