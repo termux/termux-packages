@@ -3,11 +3,11 @@ TERMUX_PKG_DESCRIPTION="A preprocessor for mdBook, pre-rendering LaTex equations
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.9.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/lzanini/mdbook-katex/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=098b6554fcf87705e1902584b4c352b04ed6f31c3a995aba9a36bc087e22c409
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+$"
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="openssl"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_pkg_auto_update() {
@@ -20,12 +20,10 @@ termux_pkg_auto_update() {
 }
 
 termux_step_pre_configure() {
-	export OPENSSL_INCLUDE_DIR=$TERMUX_PREFIX/include/openssl
-	export OPENSSL_LIB_DIR=$TERMUX_PREFIX/lib
+	termux_setup_rust
 }
 
 termux_step_make() {
-	termux_setup_rust
 	cargo build --jobs $TERMUX_PKG_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
 }
 

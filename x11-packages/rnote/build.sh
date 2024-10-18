@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="An infinite canvas vector-based drawing application for 
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@EDLLT"
 TERMUX_PKG_VERSION="0.11.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/flxzt/rnote/archive/v${TERMUX_PKG_VERSION}/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=b133d4331963d3c09d3a7477f60fc4c5072471dcbf459379a593ca1724164af4
 TERMUX_PKG_AUTO_UPDATE=true
@@ -12,11 +13,7 @@ TERMUX_PKG_PYTHON_BUILD_DEPS="toml2json"
 
 __fetch_gettext_rs() {
 	# Latest version of gettext-sys, provided by the gettext-rs crate
-	local crate_version
-	crate_version="$(curl -s https://crates.io/api/v1/crates/gettext-sys | jq --raw-output '.crate.max_stable_version')"
-	grep -qP '\d+\.\d+\.\d+' <<< "$crate_version" || {
-		termux_error_exit "Unable to fetch latest version for \`gettext-sys\` crate"
-	}
+	local crate_version=0.21.4
 	local -a crate=(
 		"https://github.com/gettext-rs/gettext-rs/archive/refs/tags/gettext-sys-$crate_version.tar.gz" # Upstream URL
 		"$TERMUX_PKG_CACHEDIR/gettext-v$crate_version.tar.gz"                                          # Local save path
