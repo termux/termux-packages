@@ -1,0 +1,39 @@
+From 6125c3438e6cf30e1ebd70ca6ac3f1e04481c7a7 Mon Sep 17 00:00:00 2001
+From: Gergely Nagy <algernon@madhouse-project.org>
+Date: Sat, 30 Jun 2012 13:08:13 +0200
+Subject: [PATCH] Typo fix: KEY_MOUDE => KEY_MOUSE
+
+Patch by Sam Hocevar <sam@zoy.org> 17 Nov 2003
+
+Origin: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=221243
+---
+ src/aacurkbd.c | 2 +-
+ src/aastdin.c  | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/aacurkbd.c b/src/aacurkbd.c
+index 801897b..418b6a3 100644
+--- a/src/aacurkbd.c
++++ b/src/aacurkbd.c
+@@ -112,7 +112,7 @@ static int curses_getchar(aa_context * c1, int wait)
+ 	return (AA_UP);
+     case KEY_DOWN:
+ 	return (AA_DOWN);
+-#ifdef KEY_MOUDE
++#ifdef KEY_MOUSE
+     case KEY_MOUSE:
+ #ifdef GPM_MOUSEDRIVER
+ 	if (!__curses_usegpm)
+diff --git a/src/aastdin.c b/src/aastdin.c
+index 696d87b..e2dabe4 100644
+--- a/src/aastdin.c
++++ b/src/aastdin.c
+@@ -88,7 +88,7 @@ static int stdin_getchar(aa_context * c1, int wait)
+     if (c > 0 && c < 127 && c != 127)
+ 	return (c);
+     switch (c) {
+-#ifdef KEY_MOUDE
++#ifdef KEY_MOUSE
+     case KEY_MOUSE:
+ 	return AA_MOUSE
+ #endif
