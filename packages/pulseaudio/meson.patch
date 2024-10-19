@@ -1,8 +1,6 @@
-diff --git a/meson.build b/meson.build
-index c5135330f..0f0c3d5ed 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -279,10 +279,6 @@ if host_machine.system() != 'windows'
+@@ -286,10 +286,6 @@
    endif
  endif
  
@@ -13,7 +11,25 @@ index c5135330f..0f0c3d5ed 100644
  # Headers which are usable
  
  check_usable_headers = [
-@@ -374,7 +370,7 @@ if cc.has_function('dgettext')
+@@ -322,7 +318,6 @@
+   'getuid',
+   'lrintf',
+   'lstat',
+-  'memfd_create',
+   'mkfifo',
+   'mlock',
+   'nanosleep',
+@@ -369,8 +364,7 @@
+   endif
+ endforeach
+ 
+-if cc.has_header_symbol('sys/syscall.h', 'SYS_memfd_create') \
+-  or cc.has_function('memfd_create')
++if false
+   cdata.set('HAVE_MEMFD', 1)
+ endif
+ 
+@@ -381,7 +375,7 @@
      libintl_dep = cc.find_library('intl')
    endif
  else
@@ -22,7 +38,7 @@ index c5135330f..0f0c3d5ed 100644
  endif
  
  # Symbols
-@@ -440,6 +436,8 @@ endif
+@@ -448,6 +442,8 @@
  # Core Dependencies
  
  libm_dep = cc.find_library('m', required : true)
