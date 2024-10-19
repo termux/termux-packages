@@ -119,7 +119,7 @@ extract_debs() {
 	for deb in *.deb; do
 
 		current_package_name="$(echo "$deb" | sed -E 's/^([^_]+).*/\1/' )"
-		current_package_arch="$(echo "$deb" | sed -E 's/.*_(.*).deb$/\1/' )"
+		current_package_arch="$(echo "$deb" | sed -E 's/.*_(aarch64|all|arm|i686|x86_64).deb$/\1/' )"
 		echo "current_package_name: '$current_package_name'"
 		echo "current_package_arch: '$current_package_arch'"
 
