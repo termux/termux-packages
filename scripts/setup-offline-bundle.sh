@@ -78,7 +78,7 @@ mkdir -p "$TERMUX_PKG_TMPDIR"
 rm -rf "${TERMUX_PKG_TMPDIR}"
 
 # Package sources.
-for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' $TERMUX_SCRIPTDIR/repo.json); do
+for repo_path in $(jq --raw-output '.channels | keys | .[]' $TERMUX_SCRIPTDIR/repo.json); do
 	for p in "$TERMUX_SCRIPTDIR"/$repo_path/*; do
 		(
 			. "$TERMUX_SCRIPTDIR"/scripts/build/get_source/termux_step_get_source.sh
