@@ -13,7 +13,9 @@ version=0.1.0
 set -e
 
 export TERMUX_SCRIPTDIR=$(realpath "$(dirname "$(realpath "$0")")/../")
-. $(dirname "$(realpath "$0")")/properties.sh
+: "${TERMUX_TOPDIR:="$HOME/.termux-build"}"
+. "${TERMUX_SCRIPTDIR}"/scripts/properties.sh
+. "${TERMUX_SCRIPTDIR}"/scripts/build/termux_step_handle_buildarch.sh
 
 BOOTSTRAP_TMPDIR=$(mktemp -d "${TMPDIR:-/tmp}/bootstrap-tmp.XXXXXXXX")
 
@@ -379,26 +381,13 @@ main() {
 	done
 
 	for package_arch in "${TERMUX_ARCHITECTURES[@]}"; do
-
-		# The termux_step_finish_build stores package version in .built-packages directory, but
-		# its not arch independent. So instead we create an arch specific one and symlink it
-		# to the .built-packages directory so that users can easily switch arches without having
-		# to rebuild packages
-		TERMUX_BUILT_PACKAGES_DIRECTORY_FOR_ARCH="$TERMUX_BUILT_PACKAGES_DIRECTORY-$package_arch"
-		mkdir -p "$TERMUX_BUILT_PACKAGES_DIRECTORY_FOR_ARCH"
-
-		if [ -f "$TERMUX_BUILT_PACKAGES_DIRECTORY" ] || [ -d "$TERMUX_BUILT_PACKAGES_DIRECTORY" ]; then
-			rm -rf "$TERMUX_BUILT_PACKAGES_DIRECTORY"
-		fi
-
-		ln -sf "$TERMUX_BUILT_PACKAGES_DIRECTORY_FOR_ARCH" "$TERMUX_BUILT_PACKAGES_DIRECTORY"
+		TERMUX_ARCH=${package_arch}
+		termux_step_handle_buildarch
 
 		if [[ $FORCE_BUILD_PACKAGES == "1" ]]; then
 			rm -f "$TERMUX_BUILT_PACKAGES_DIRECTORY_FOR_ARCH"/*
 			rm -f "$TERMUX_BUILT_DEBS_DIRECTORY"/*
 		fi
-
-
 
 		BOOTSTRAP_ROOTFS="$BOOTSTRAP_TMPDIR/rootfs-${package_arch}"
 		BOOTSTRAP_PKGDIR="$BOOTSTRAP_TMPDIR/packages-${package_arch}"
