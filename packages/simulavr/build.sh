@@ -39,6 +39,5 @@ termux_step_make_install() {
 		"$TERMUX_PREFIX"/share/doc/"$TERMUX_PKG_NAME"/LICENSE
 	# Headers are moved into their own subdirectory to prevent conflicts.
 	# Might cause issues when using them.
-	mkdir -p "$TERMUX_PREFIX"/include
-	cp -r "$TERMUX_PKG_BUILDDIR"/include/* "$TERMUX_PREFIX"/include/"$TERMUX_PKG_NAME"
+	cp -rf "$TERMUX_PKG_BUILDDIR"/include/ "$TERMUX_PREFIX"/include/"$TERMUX_PKG_NAME"
 }
