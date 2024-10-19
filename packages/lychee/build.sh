@@ -9,6 +9,7 @@ TERMUX_PKG_SHA256=ee61627083c80459e0f6a48c11cd910711c86b744a294b6a00f7072dffa1b0
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="openssl, resolv-conf"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
 
 termux_step_pre_configure() {
 	termux_setup_rust
