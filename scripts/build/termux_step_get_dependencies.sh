@@ -81,8 +81,7 @@ termux_step_get_dependencies() {
 						fi
 					elif [ "$TERMUX_REPO_PKG_FORMAT" = "pacman" ]; then
 						tar -xJf "${PKG}-${DEP_VERSION_PAC}-${DEP_ARCH}.pkg.tar.xz" \
-							--exclude=".BUILDINFO" --exclude=".PKGINFO" \
-							--exclude=".MTREE" --exclude=".INSTALL" \
+							--anchored --exclude=.{BUILDINFO,PKGINFO,MTREE,INSTALL} \
 							--force-local --no-overwrite-dir -C /
 					fi
 				)
