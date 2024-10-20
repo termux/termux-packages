@@ -13,7 +13,7 @@ cvs_cv_func_printf_ptr=yes
 ac_cv_header_syslog_h=no
 --disable-server
 --with-external-zlib
---with-editor=$TERMUX_PREFIX/bin/vi
+--with-editor=$TERMUX_PREFIX/bin/nano
 "
 TERMUX_PKG_RM_AFTER_INSTALL="bin/cvsbug share/man/man8/cvsbug.8"
 
