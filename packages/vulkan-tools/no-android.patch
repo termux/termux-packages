@@ -1,17 +1,65 @@
 --- a/cube/CMakeLists.txt
 +++ b/cube/CMakeLists.txt
-@@ -84,8 +84,6 @@
+@@ -61,11 +61,7 @@
+     endif()
+ endif()
  
+-if(ANDROID OR APPLE)
+-    set(WSI_DISPLAY_DEFAULT_SETTING "OFF")
+-else()
+     set(WSI_DISPLAY_DEFAULT_SETTING "ON")
+-endif()
+ 
+ option(BUILD_WSI_DISPLAY_SUPPORT "Build DISPLAY WSI support" ${WSI_DISPLAY_DEFAULT_SETTING})
+ 
+@@ -167,8 +163,6 @@
  if(WIN32)
-     add_definitions(-DVK_USE_PLATFORM_WIN32_KHR -DWIN32_LEAN_AND_MEAN -DNOMINMAX)
+     add_definitions(-DWIN32_LEAN_AND_MEAN -DNOMINMAX)
+     list(APPEND ENABLED_CUBE_PLATFORMS VK_USE_PLATFORM_WIN32_KHR)
 -elseif(ANDROID)
--    add_definitions(-DVK_USE_PLATFORM_ANDROID_KHR)
+-    list(APPEND ENABLED_CUBE_PLATFORMS VK_USE_PLATFORM_ANDROID_KHR)
  elseif(APPLE)
-     add_definitions(-DVK_USE_PLATFORM_METAL_EXT)
- elseif(CMAKE_SYSTEM_NAME MATCHES "Linux|BSD")
+     list(APPEND ENABLED_CUBE_PLATFORMS VK_USE_PLATFORM_METAL_EXT)
+ elseif(CMAKE_SYSTEM_NAME MATCHES "Linux|BSD|GNU")
+@@ -231,13 +225,6 @@
+ 
+ if(APPLE)
+     add_subdirectory(macOS/cube)
+-elseif (ANDROID)
+-    add_library(vkcube MODULE)
+-
+-    target_sources(vkcube PRIVATE cube.c)
+-
+-    add_subdirectory(android)
+-
+ elseif(CMAKE_SYSTEM_NAME MATCHES "Linux|BSD|GNU")
+     add_executable(vkcube)
+     target_sources(vkcube PRIVATE
+@@ -285,9 +272,7 @@
+ target_include_directories(vkcube PRIVATE .)
+ target_link_libraries(vkcube  Vulkan::Headers volk::volk_headers)
+ 
+-if (ANDROID)
+-    install(TARGETS vkcube DESTINATION ${CMAKE_INSTALL_LIBDIR})
+-elseif(APPLE)
++if(APPLE)
+     install(
+         TARGETS vkcube
+         # Install runtime dependencies like the Vulkan::Loader so the app is self-contained
+@@ -301,10 +286,6 @@
+     install(TARGETS vkcube)
+ endif()
+ 
+-if (ANDROID)
+-    return()
+-endif()
+-
+ if (XCB_LINK_LIBRARIES)
+     target_compile_definitions(vkcube PRIVATE "XCB_LIBRARY=\"${XCB_LINK_LIBRARIES}\"")
+ endif()
 --- a/cube/cube.c
 +++ b/cube/cube.c
-@@ -97,7 +97,7 @@
+@@ -105,7 +105,7 @@
      fflush(stdout);
  }
  
@@ -20,7 +68,7 @@
  #include <android/log.h>
  #define ERR_EXIT(err_msg, err_class)                                           \
      do {                                                                       \
-@@ -571,7 +571,7 @@
+@@ -643,7 +643,7 @@
      if (!demo->suppress_popups) MessageBox(NULL, message, "Alert", MB_OK);
      in_callback = false;
  
@@ -29,12 +77,21 @@
  
      if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT) {
          __android_log_print(ANDROID_LOG_INFO, APP_SHORT_NAME, "%s", message);
-@@ -4334,7 +4334,7 @@
+@@ -4703,7 +4703,7 @@
+             i++;
              continue;
          }
- 
 -#if defined(ANDROID)
 +#if defined(ANDROID) && !defined(__TERMUX__)
          ERR_EXIT("Usage: vkcube [--validate]\n", "Usage");
  #else
-         char *message =
+ 
+@@ -4913,7 +4913,7 @@
+ }
+ 
+ #endif
+-#if defined(VK_USE_PLATFORM_ANDROID_KHR)
++#if defined(VK_USE_PLATFORM_ANDROID_KHR) && !defined(__TERMUX__)
+ #include <android/log.h>
+ #include <android_native_app_glue.h>
+ #include "android_util.h"
