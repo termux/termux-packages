@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/JCWasmx86/mesonlsp
+TERMUX_PKG_DESCRIPTION="an unofficial, unendorsed language server for meson written in C++"
+TERMUX_PKG_LICENSE=GPL-3.0-or-later
+TERMUX_PKG_MAINTAINER=@termux
+TERMUX_PKG_VERSION=4.2.2
+TERMUX_PKG_SRCURL=https://github.com/JCWasmx86/mesonlsp/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SHA256=4f67325d48ab26ac1c53bf95d5e1e0e9e48091e4a5aaa47cbb4c3b96c1a2cb4d
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="libcurl, libarchive, libuuid"
