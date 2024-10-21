@@ -1,0 +1,115 @@
++++ ./vtest/vtest_server.c
+@@ -95,6 +95,7 @@
+    bool venus;
+ 
+    bool no_virgl;
++   bool angle_path;
+    bool use_compat_profile;
+ 
+    int ctx_flags;
+@@ -105,7 +106,7 @@
+ };
+ 
+ struct vtest_server server = {
+-   .socket_name = VTEST_DEFAULT_SOCKET_NAME,
++   .socket_name = "@TERMUX_PREFIX@/tmp/.virgl_test",
+    .socket = -1,
+ 
+    .read_file = NULL,
+@@ -129,6 +130,7 @@
+ static void vtest_server_run(void);
+ static void vtest_server_close_socket(void);
+ static int vtest_client_dispatch_commands(struct vtest_client *client);
++extern void epoxy_set_library_path(const char *path);
+ 
+ 
+ int vtest_main(int argc, char **argv)
+@@ -174,6 +176,9 @@
+ #define OPT_SOCKET_PATH 'p'
+ #define OPT_NO_VIRGL 'g'
+ #define OPT_COMPAT_PROFILE 'c'
++#define OPT_ANGLE_GL 400
++#define OPT_ANGLE_VULKAN 401
++#define OPT_ANGLE_NULL 402
+ 
+ static void vtest_server_parse_args(int argc, char **argv)
+ {
+@@ -183,14 +188,13 @@
+       {"no-fork",             no_argument, NULL, OPT_NO_FORK},
+       {"no-loop-or-fork",     no_argument, NULL, OPT_NO_LOOP_OR_FORK},
+       {"multi-clients",       no_argument, NULL, OPT_MULTI_CLIENTS},
+-      {"use-glx",             no_argument, NULL, OPT_USE_GLX},
+-      {"use-egl-surfaceless", no_argument, NULL, OPT_USE_EGL_SURFACELESS},
+-      {"use-gles",            no_argument, NULL, OPT_USE_GLES},
+       {"rendernode",          required_argument, NULL, OPT_RENDERNODE},
+       {"venus",               no_argument, NULL, OPT_VENUS},
+       {"socket-path",         required_argument, NULL, OPT_SOCKET_PATH},
+-      {"no-virgl",            no_argument, NULL, OPT_NO_VIRGL},
+       {"compat",              no_argument, NULL, OPT_COMPAT_PROFILE},
++      {"angle-gl",            no_argument, NULL, OPT_ANGLE_GL},
++      {"angle-vulkan",        no_argument, NULL, OPT_ANGLE_VULKAN},
++      {"angle-null",          no_argument, NULL, OPT_ANGLE_NULL},
+       {0, 0, 0, 0}
+    };
+ 
+@@ -235,8 +239,29 @@
+       case OPT_NO_VIRGL:
+          server.no_virgl = true;
+          break;
+-      case OPT_COMPAT_PROFILE:
+-         server.use_compat_profile = true;
++      case OPT_ANGLE_GL:
++         if (server.angle_path) {
++             printf("Only one of [--angle-gl] [--angle-vulkan] [--angle-null] can be used at the same time.");
++             exit(EXIT_FAILURE);
++         }
++         epoxy_set_library_path("@TERMUX_PREFIX@/opt/angle-android/gl");
++         server.angle_path = 1;
++         break;
++      case OPT_ANGLE_VULKAN:
++         if (server.angle_path) {
++             printf("Only one of [--angle-gl] [--angle-vulkan] [--angle-null] can be used at the same time.");
++             exit(EXIT_FAILURE);
++         }
++         epoxy_set_library_path("@TERMUX_PREFIX@/opt/angle-android/vulkan");
++         server.angle_path = 1;
++         break;
++      case OPT_ANGLE_NULL:
++         if (server.angle_path) {
++             printf("Only one of [--angle-gl] [--angle-vulkan] [--angle-null] can be used at the same time.");
++             exit(EXIT_FAILURE);
++         }
++         epoxy_set_library_path("@TERMUX_PREFIX@/opt/angle-android/vulkan-null");
++         server.angle_path = 1;
+          break;
+ #ifdef ENABLE_VENUS
+       case OPT_VENUS:
+@@ -248,7 +273,7 @@
+          break;
+       default:
+          printf("Usage: %s [--no-fork] [--no-loop-or-fork] [--multi-clients] "
+-                "[--use-glx] [--use-egl-surfaceless] [--use-gles] [--no-virgl]"
++                "[--angle-gl] [--angle-gl] [--angle-null] "
+                 "[--rendernode <dev>] [--socket-path <path>] "
+                 "%s"
+                 " [file]\n", argv[0], ven);
+@@ -265,6 +290,11 @@
+       server.multi_clients = false;
+    }
+ 
++   server.use_egl_surfaceless = true;
++   server.use_glx = false;
++   server.use_gles = true;
++   server.no_virgl = false;
++
+    if (!server.no_virgl) {
+       server.ctx_flags = VIRGL_RENDERER_USE_EGL;
+       if (server.use_glx) {
+@@ -304,6 +334,7 @@
+    server.use_gles = getenv("VTEST_USE_GLES") != NULL;
+    server.render_device = getenv("VTEST_RENDERNODE");
+    server.use_compat_profile = getenv("VTEST_USE_COMPATIBILITY_PROFILE");
++   server.socket_name = getenv("VTEST_RENDERER_SOCKET_NAME") ? getenv("VTEST_RENDERER_SOCKET_NAME") : server.socket_name;
+ }
+ 
+ static void handler(int sig, siginfo_t *si, void *unused)
