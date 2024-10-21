@@ -1,0 +1,12 @@
+This patch is needed to change path of executable passed to help2man
++++ ./man/Makefile.am
+@@ -206,7 +206,8 @@
+ | sed s,../tftp/tftp,../src/tftp,\
+ | sed s,../tftpd/tftpd,../src/tftpd,\
+ | sed s,../traceroute/traceroute,../src/traceroute,\
+-| sed s,../uucpd/uucpd,../src/uucpd,`
++| sed s,../uucpd/uucpd,../src/uucpd,\
++| sed s,..,@HOSTBUILD@,`
+ 
+ .PHONY: man
+ man:
