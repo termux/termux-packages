@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0, LGPL-2.1"
 TERMUX_PKG_LICENSE_FILE="COPYING, COPYING.LESSER"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.6.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/libimobiledevice/libplist/releases/download/${TERMUX_PKG_VERSION}/libplist-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=67be9ee3169366589c92dc7c22809b90f51911dd9de22520c39c9a64fb047c9c
 TERMUX_PKG_AUTO_UPDATE=true
@@ -25,5 +26,6 @@ termux_step_post_get_source() {
 }
 
 termux_step_pre_configure() {
+	sed -e 's|#if _MSC_VER|#if defined(_MSC_VER)|' -i include/plist/plist.h
 	autoreconf -fi
 }
