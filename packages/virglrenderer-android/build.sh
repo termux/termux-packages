@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@licy183"
 TERMUX_PKG_VERSION="1.0.1"
 _LIBEPOXY_VERSION="1.5.10"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=(
 	https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/virglrenderer-${TERMUX_PKG_VERSION}/virglrenderer-virglrenderer-${TERMUX_PKG_VERSION}.tar.gz
 	https://github.com/anholt/libepoxy/archive/refs/tags/${_LIBEPOXY_VERSION}.tar.gz
@@ -21,7 +21,7 @@ termux_step_post_get_source() {
 }
 
 termux_step_host_build() {
-	# This packages should use the Android NDK toolchain to compile, not
+	# This package should use the Android NDK toolchain to compile, not
 	# our custom toolchain, so I'd like to compile it in the hostbuild step.
 	export PATH="$NDK/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH"
 	export CCTERMUX_HOST_PLATFORM=$TERMUX_HOST_PLATFORM$TERMUX_PKG_API_LEVEL
@@ -48,7 +48,7 @@ termux_step_host_build() {
 	CFLAGS=""
 	CPPFLAGS=""
 	CXXFLAGS=""
-	LDFLAGS="-Wl,-rpath=\$ORIGIN/../lib"
+	LDFLAGS="-Wl,-rpath=$_INSTALL_PREFIX/lib"
 	STRIP=$(command -v llvm-strip)
 	termux_setup_meson
 
@@ -69,6 +69,12 @@ termux_step_host_build() {
 		--libdir lib \
 		-Dplatforms=egl
 	ninja -C virglrenderer-build install -j $TERMUX_PKG_MAKE_PROCESSES
+
+	# Move our virglrenderer binary to regular bin directory.
+	mv $_INSTALL_PREFIX/bin/virgl_test_server $TERMUX_PREFIX/bin/virgl_test_server_android
+
+	# Cleanup.
+	rm -rf $_INSTALL_PREFIX/{bin,include,lib/pkgconfig}
 }
 
 termux_step_configure() {
@@ -81,10 +87,7 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	sed "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
-		$TERMUX_PKG_BUILDER_DIR/virgl_test_server_android.in > \
-		$TERMUX_PREFIX/bin/virgl_test_server_android
-	chmod +x $TERMUX_PREFIX/bin/virgl_test_server_android
+	:
 }
 
 termux_step_install_license() {

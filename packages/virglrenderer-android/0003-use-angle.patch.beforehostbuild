@@ -1,0 +1,21 @@
++++ ./libepoxy/src/dispatch_common.c
+@@ -179,10 +179,15 @@
+ #define GLES1_LIB "libGLESv1_CM.so"
+ #define GLES2_LIB "libGLESv2.so"
+ #elif defined(__ANDROID__)
+-#define GLX_LIB "libGLESv2.so"
+-#define EGL_LIB "libEGL.so"
+-#define GLES1_LIB "libGLESv1_CM.so"
+-#define GLES2_LIB "libGLESv2.so"
++#define GLX_LIB GLES2_LIB
++static char EGL_LIB[256] = "libEGL.so";
++static char GLES1_LIB[256] = "libGLESv1_CM.so";
++static char GLES2_LIB[256] = "libGLESv2.so";
++EPOXY_PUBLIC void epoxy_set_library_path(const char * path) {
++    snprintf(EGL_LIB, sizeof(EGL_LIB), "%s/libEGL_angle.so", path);
++    snprintf(GLES1_LIB, sizeof(GLES1_LIB), "%s/libGLESv1_CM_angle.so", path);
++    snprintf(GLES2_LIB, sizeof(GLES2_LIB), "%s/libGLESv2_angle.so", path);
++}
+ #elif defined(_WIN32)
+ #define EGL_LIB "libEGL.dll"
+ #define GLES1_LIB "libGLES_CM.dll"
