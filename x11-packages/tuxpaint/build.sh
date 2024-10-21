@@ -3,12 +3,14 @@ TERMUX_PKG_DESCRIPTION="A free, award-winning drawing program for children ages 
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.9.33"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/tuxpaint/tuxpaint-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=8701ec5082d48a00ba2f408c7c48cf592aa82b60f50dd6d4b6574fac6b48dc76
 TERMUX_PKG_DEPENDS="fontconfig, fribidi, glib, libandroid-wordexp, libcairo, libimagequant, libpaper, libpng, librsvg, pango, sdl2, sdl2-gfx, sdl2-image, sdl2-mixer, sdl2-pango, sdl2-ttf, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_MAKE_INSTALL_TARGET="install install-xdg"
 
 termux_step_host_build() {
 	local _PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
@@ -33,8 +35,13 @@ termux_step_pre_configure() {
 	# this is a workaround for build-all.sh issue
 	TERMUX_PKG_DEPENDS+=", tuxpaint-data"
 
-	local _PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
-	export PATH=$_PREFIX_FOR_BUILD/bin:$PATH
+	local _PREFIX_FOR_BUILD="$TERMUX_PKG_HOSTBUILD_DIR/prefix"
+	export PATH="$_PREFIX_FOR_BUILD/bin:$PATH"
+	export XDG_DATA_HOME="$TERMUX_PREFIX/share" XDG_DATA_DIRS="$TERMUX_PREFIX" XDG_CURRENT_DESKTOP="X-Generic"
+	
+	# Disabling gtk-update-icon-cache
+	ln -s /usr/bin/true "$_PREFIX_FOR_BUILD/bin/update-desktop-database" ||:
+	ln -s /usr/bin/true "$_PREFIX_FOR_BUILD/bin/gtk-update-icon-cache" ||:
 
 	CPPFLAGS+=" -U__ANDROID__"
 	LDFLAGS+=" -landroid-wordexp"
@@ -43,4 +50,8 @@ termux_step_pre_configure() {
 termux_step_post_configure() {
 	# https://github.com/termux/termux-packages/issues/12458
 	mkdir -p trans
+}
+
+termux_step_post_make_install() {
+	rm -rf $TERMUX_PREFIX/applications/mimeinfo.cache
 }
