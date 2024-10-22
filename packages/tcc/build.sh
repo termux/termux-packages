@@ -1,12 +1,12 @@
-_COMMIT=4e91d38ddcdb659a4b2c298850c6ccf115073748
-_COMMIT_DATE=20240225
-_COMMIT_SHA256=26974776737d9da876395cc72a005a63526e305aeaa28ebf84c56778a8d9fdac
+_COMMIT=9fb89c23d0f1c25528cb83161d16a846b6cda69c
+_COMMIT_DATE=20241022
+_COMMIT_SHA256=2e48f1fb7b0b30ba74be78a533fc6eb3b565984a695eb7c03d1c934c701a50d3
 
 TERMUX_PKG_HOMEPAGE=https://bellard.org/tcc/
 TERMUX_PKG_DESCRIPTION="Tiny C Compiler"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1:0.9.28-p${_COMMIT_DATE}
+TERMUX_PKG_VERSION=1:0.9.28~p${_COMMIT_DATE}
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://repo.or.cz/tinycc.git
 TERMUX_PKG_SHA256=$_COMMIT_SHA256
@@ -36,7 +36,7 @@ termux_step_post_get_source() {
 
 termux_step_configure() {
 	# override default step
-        echo "running on : $(uname -a)"
+	true
 }
 
 termux_step_make() {
