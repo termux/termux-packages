@@ -7,6 +7,7 @@ LICENSE.OLD
 COPYING.LIB"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=9.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://dl.winehq.org/wine/source/${TERMUX_PKG_VERSION:0:3}/wine-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=7cfd090a5395f5b76d95bb5defac8a312c8de4c070c1163b8b58da38330ca6ee
 TERMUX_PKG_DEPENDS="fontconfig, freetype, krb5, libandroid-spawn, libc++, libgmp, libgnutls, libxcb, libxcomposite, libxcursor, libxfixes, libxrender, mesa, opengl, pulseaudio, sdl2, vulkan-loader, xorg-xrandr"
@@ -122,6 +123,17 @@ termux_step_pre_configure() {
 	LDFLAGS="${LDFLAGS/-Wl,-z,relro,-z,now/}"
 
 	LDFLAGS+=" -landroid-spawn"
+	
+	if [ "$TERMUX_ARCH" = "x86_64" ]; then
+		mkdir -p "$TERMUX_PKG_TMPDIR/bin"
+		cat <<- EOF > "$TERMUX_PKG_TMPDIR/bin/x86_64-linux-android-clang"
+			#!/bin/bash
+			set -- "\${@/-mabi=ms/}"
+			exec $TERMUX_STANDALONE_TOOLCHAIN/bin/x86_64-linux-android-clang "\$@"
+		EOF
+		chmod +x "$TERMUX_PKG_TMPDIR/bin/x86_64-linux-android-clang"
+		export PATH="$TERMUX_PKG_TMPDIR/bin:$PATH"
+	fi
 }
 
 termux_step_make_install() {
