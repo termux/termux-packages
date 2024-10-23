@@ -1,12 +1,14 @@
-diff -uNr vim-9.0.1300/src/option.c vim-9.0.1300.mod/src/option.c
---- vim-9.0.1300/src/option.c	2023-02-13 16:49:55.580216245 +0000
-+++ vim-9.0.1300.mod/src/option.c	2023-02-13 16:50:06.356216250 +0000
-@@ -141,7 +141,7 @@
- # ifdef MACOS_X
+diff -u -r ../vim-9.1.0800/src/option.c ./src/option.c
+--- ../vim-9.1.0800/src/option.c	2024-10-22 20:01:46.000000000 +0000
++++ ./src/option.c	2024-10-23 22:06:11.398390279 +0000
+@@ -155,8 +155,8 @@
  	    p = (char_u *)"/private/tmp";
+ 	    plen = (int)STRLEN_LITERAL("/private/tmp");
  # else
--	p = (char_u *)"/tmp";
-+	p = (char_u *)"@TERMUX_PREFIX@/tmp";
+-	    p = (char_u *)"/tmp";
+-	    plen = (int)STRLEN_LITERAL("/tmp");
++	    p = (char_u *)"@TERMUX_PREFIX@/tmp";
++	    plen = (int)STRLEN_LITERAL("@TERMUX_PREFIX@/tmp");
  # endif
+ 	}
  	else
- #endif
