@@ -15,6 +15,8 @@ TERMUX_PKG_BUILD_DEPENDS="libjpeg-turbo, libjpeg-turbo-static, libmp3lame, libpn
 # https://github.com/audacity/audacity/issues/2445
 TERMUX_PKG_SUGGESTS="audacity-ffmpeg"
 TERMUX_PKG_HOSTBUILD=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+.\d+.\d+"
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCMAKE_STRIP=llvm-strip
 -Daudacity_conan_enabled=off
