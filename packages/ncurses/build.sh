@@ -9,22 +9,27 @@ TERMUX_PKG_MAINTAINER="@termux"
 # Using this simplifies things (no need to avoid downloading and applying patches manually),
 # and uses github is a high available hosting.
 _SNAPSHOT_COMMIT=a480458efb0662531287f0c75116c0e91fe235cb
+
+# The subshell leaving the value in the outer scope unchanged is the point here.
+# shellcheck disable=SC2031
 TERMUX_PKG_VERSION=(6.5.20240831
                     9.31
-                    15
-                    0.36.2
-                    0.13.2)
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=(https://github.com/ThomasDickey/ncurses-snapshots/archive/${_SNAPSHOT_COMMIT}.tar.gz
-                   https://fossies.org/linux/misc/rxvt-unicode-${TERMUX_PKG_VERSION[1]}.tar.bz2
-                   https://github.com/thestinger/termite/archive/v${TERMUX_PKG_VERSION[2]}.tar.gz
-                   https://github.com/kovidgoyal/kitty/releases/download/v${TERMUX_PKG_VERSION[3]}/kitty-${TERMUX_PKG_VERSION[3]}.tar.xz
-                   https://github.com/alacritty/alacritty/archive/refs/tags/v${TERMUX_PKG_VERSION[4]}.tar.gz)
+                    "$(. "$TERMUX_SCRIPTDIR/x11-packages/kitty/build.sh"; echo "$TERMUX_PKG_VERSION")"
+                    "$(. "$TERMUX_SCRIPTDIR/x11-packages/alacritty/build.sh"; echo "$TERMUX_PKG_VERSION")"
+                    "$(. "$TERMUX_SCRIPTDIR/x11-packages/foot/build.sh"; echo "$TERMUX_PKG_VERSION")")
+TERMUX_PKG_REVISION=2
+# shellcheck disable=SC2031
+TERMUX_PKG_SRCURL=("https://github.com/ThomasDickey/ncurses-snapshots/archive/${_SNAPSHOT_COMMIT}.tar.gz"
+                   "https://fossies.org/linux/misc/rxvt-unicode-${TERMUX_PKG_VERSION[1]}.tar.bz2"
+                   "$(. "$TERMUX_SCRIPTDIR/x11-packages/kitty/build.sh"; echo "$TERMUX_PKG_SRCURL")"
+                   "$(. "$TERMUX_SCRIPTDIR/x11-packages/alacritty/build.sh"; echo "$TERMUX_PKG_SRCURL")"
+                   "$(. "$TERMUX_SCRIPTDIR/x11-packages/foot/build.sh"; echo "$TERMUX_PKG_SRCURL")")
+# shellcheck disable=SC2031
 TERMUX_PKG_SHA256=(ec6122c3b8ab930d1477a1dbfd90299e9f715555a98b6e6805d5ae1b0d72becd
                    aaa13fcbc149fe0f3f391f933279580f74a96fd312d6ed06b8ff03c2d46672e8
-                   3ae9ebef28aad081c6c11351f086776e2fd9547563b2f900732b41c376bec05a
-                   16db7fba5541f322ecc35f15755bc5dc0b4ab3d02156778317f541c44447fb62
-                   e9a54aabc92bbdc25ab1659c2e5a1e9b76f27d101342c8219cc98a730fd46d90)
+                   "$(. "$TERMUX_SCRIPTDIR/x11-packages/kitty/build.sh"; echo "$TERMUX_PKG_SHA256")"
+                   "$(. "$TERMUX_SCRIPTDIR/x11-packages/alacritty/build.sh"; echo "$TERMUX_PKG_SHA256")"
+                   "$(. "$TERMUX_SCRIPTDIR/x11-packages/foot/build.sh"; echo "$TERMUX_PKG_SHA256")")
 TERMUX_PKG_AUTO_UPDATE=false
 
 # ncurses-utils: tset/reset/clear are moved to package 'ncurses'.
@@ -61,65 +66,72 @@ share/man/man5
 share/man/man7
 "
 
+# shellcheck disable=SC2031
 termux_step_pre_configure() {
-	MAIN_VERSION=$(cut -f 2 VERSION)
-	PATCH_VERSION=$(cut -f 3 VERSION)
-	ACTUAL_VERSION=${MAIN_VERSION}.${PATCH_VERSION}
-	EXPECTED_VERSION=${TERMUX_PKG_VERSION[0]}
-	if [ "${ACTUAL_VERSION}" != "${EXPECTED_VERSION}" ]; then
+	MAIN_VERSION="$(cut -f 2 VERSION)"
+	PATCH_VERSION="$(cut -f 3 VERSION)"
+	ACTUAL_VERSION="${MAIN_VERSION}.${PATCH_VERSION}"
+	EXPECTED_VERSION="${TERMUX_PKG_VERSION[0]}"
+	if [[ "${ACTUAL_VERSION}" != "${EXPECTED_VERSION}" ]]; then
 		termux_error_exit "Version mismatch - expected ${EXPECTED_VERSION}, was ${ACTUAL_VERSION}. Check https://github.com/ThomasDickey/ncurses-snapshots/commit/${_SNAPSHOT_COMMIT}"
 	fi
 	export CPPFLAGS+=" -fPIC"
 }
 
+# shellcheck disable=SC2031
 termux_step_post_make_install() {
-	cd $TERMUX_PREFIX/lib
+	cd "$TERMUX_PREFIX/lib" || termux_error_exit "Prefix 'lib' directory does not exist."
 
 	# Ncursesw/Ncurses compatibility symlinks.
 	for lib in form menu ncurses panel; do
-		ln -sfr lib${lib}w.so.${TERMUX_PKG_VERSION:0:3} lib${lib}.so.${TERMUX_PKG_VERSION:0:3}
-		ln -sfr lib${lib}w.so.${TERMUX_PKG_VERSION:0:3} lib${lib}.so.${TERMUX_PKG_VERSION:0:1}
-		ln -sfr lib${lib}w.so.${TERMUX_PKG_VERSION:0:3} lib${lib}.so
-		ln -sfr lib${lib}w.a lib${lib}.a
-		(cd pkgconfig; ln -sf ${lib}w.pc $lib.pc)
+		ln -sfr "lib${lib}w.so.${TERMUX_PKG_VERSION:0:3}" "lib${lib}.so.${TERMUX_PKG_VERSION:0:3}"
+		ln -sfr "lib${lib}w.so.${TERMUX_PKG_VERSION:0:3}" "lib${lib}.so.${TERMUX_PKG_VERSION:0:1}"
+		ln -sfr "lib${lib}w.so.${TERMUX_PKG_VERSION:0:3}" "lib${lib}.so"
+		ln -sfr "lib${lib}w.a" "lib${lib}.a"
+		(cd pkgconfig; ln -sf "${lib}w.pc" "$lib.pc") || termux_error_exit "Failed to install comatibility symlink for '${lib}'"
 	done
 
 	# Legacy compatibility symlinks (libcurses, libtermcap, libtic, libtinfo).
 	for lib in curses termcap tic tinfo; do
-		ln -sfr libncursesw.so.${TERMUX_PKG_VERSION:0:3} lib${lib}.so.${TERMUX_PKG_VERSION:0:3}
-		ln -sfr libncursesw.so.${TERMUX_PKG_VERSION:0:3} lib${lib}.so.${TERMUX_PKG_VERSION:0:1}
-		ln -sfr libncursesw.so.${TERMUX_PKG_VERSION:0:3} lib${lib}.so
-		ln -sfr libncursesw.a lib${lib}.a
-		(cd pkgconfig; ln -sfr ncursesw.pc ${lib}.pc)
+		ln -sfr "libncursesw.so.${TERMUX_PKG_VERSION:0:3}" "lib${lib}.so.${TERMUX_PKG_VERSION:0:3}"
+		ln -sfr "libncursesw.so.${TERMUX_PKG_VERSION:0:3}" "lib${lib}.so.${TERMUX_PKG_VERSION:0:1}"
+		ln -sfr "libncursesw.so.${TERMUX_PKG_VERSION:0:3}" "lib${lib}.so"
+		ln -sfr libncursesw.a "lib${lib}.a"
+		(cd pkgconfig; ln -sfr ncursesw.pc "${lib}.pc") || termux_error_exit "Failed to install legacy comatibility symlink for '${lib}'"
 	done
 
 	# Some packages want these:
-	cd $TERMUX_PREFIX/include/
+	cd "$TERMUX_PREFIX/include/" || termux_error_exit "Prefix 'include' directory does not exist."
 	rm -Rf ncurses{,w}
 	mkdir ncurses{,w}
 	ln -s ../{curses.h,eti.h,form.h,menu.h,ncurses_dll.h,ncurses.h,panel.h,termcap.h,term_entry.h,term.h,unctrl.h} ncurses
 	ln -s ../{curses.h,eti.h,form.h,menu.h,ncurses_dll.h,ncurses.h,panel.h,termcap.h,term_entry.h,term.h,unctrl.h} ncursesw
 
 	# Strip away 30 years of cruft to decrease size.
-	local TI=$TERMUX_PREFIX/share/terminfo
-	mv $TI $TERMUX_PKG_TMPDIR/full-terminfo
-	mkdir -p $TI/{a,d,e,g,n,k,l,p,r,s,t,v,x}
-	cp $TERMUX_PKG_TMPDIR/full-terminfo/a/ansi $TI/a/
-	cp $TERMUX_PKG_TMPDIR/full-terminfo/d/{dtterm,dumb} $TI/d/
-	cp $TERMUX_PKG_TMPDIR/full-terminfo/e/eterm-color $TI/e/
-	cp $TERMUX_PKG_TMPDIR/full-terminfo/g/gnome{,-256color} $TI/g/
-	cp $TERMUX_PKG_TMPDIR/full-terminfo/n/nsterm $TI/n/
-	cp $TERMUX_PKG_TMPDIR/full-terminfo/k/kitty{,+common,-direct} $TI/k/
-	cp $TERMUX_PKG_TMPDIR/full-terminfo/l/linux $TI/l/
-	cp $TERMUX_PKG_TMPDIR/full-terminfo/p/putty{,-256color} $TI/p/
-	cp $TERMUX_PKG_TMPDIR/full-terminfo/r/rxvt{,-256color} $TI/r/
-	cp $TERMUX_PKG_TMPDIR/full-terminfo/s/{screen{,2,-256color},st{,-256color}} $TI/s/
-	cp $TERMUX_PKG_TMPDIR/full-terminfo/t/tmux{,-256color} $TI/t/
-	cp $TERMUX_PKG_TMPDIR/full-terminfo/v/{vt52,vt100,vt102} $TI/v/
-	cp $TERMUX_PKG_TMPDIR/full-terminfo/x/xterm{,-color,-new,-16color,-256color,+256color} $TI/x/
+	local TI="$TERMUX_PREFIX/share/terminfo"
+	mv "$TI" "$TERMUX_PKG_TMPDIR/full-terminfo"
+	mkdir -p "$TI"/{a,d,e,f,g,n,k,l,p,r,s,t,v,x}
+	cp "$TERMUX_PKG_TMPDIR"/full-terminfo/a/{alacritty{,+common,-direct},ansi} "$TI/a/"
+	cp "$TERMUX_PKG_TMPDIR"/full-terminfo/d/{dtterm,dumb} "$TI/d/"
+	cp "$TERMUX_PKG_TMPDIR"/full-terminfo/e/eterm-color "$TI/e/"
+	cp "$TERMUX_PKG_TMPDIR"/full-terminfo/f/foot{,+base,-direct} "$TI/f/"
+	cp "$TERMUX_PKG_TMPDIR"/full-terminfo/g/gnome{,-256color} "$TI/g/"
+	cp "$TERMUX_PKG_TMPDIR"/full-terminfo/n/nsterm "$TI/n/"
+	cp "$TERMUX_PKG_TMPDIR"/full-terminfo/k/kitty{,+common,-direct} "$TI/k/"
+	cp "$TERMUX_PKG_TMPDIR"/full-terminfo/l/linux "$TI/l/"
+	cp "$TERMUX_PKG_TMPDIR"/full-terminfo/p/putty{,-256color} "$TI/p/"
+	cp "$TERMUX_PKG_TMPDIR"/full-terminfo/r/rxvt{,-256color} "$TI/r/"
+	cp "$TERMUX_PKG_TMPDIR"/full-terminfo/s/{screen{,2,-256color},st{,-256color}} "$TI/s/"
+	cp "$TERMUX_PKG_TMPDIR"/full-terminfo/t/tmux{,-256color} "$TI/t/"
+	cp "$TERMUX_PKG_TMPDIR"/full-terminfo/v/vt{52,100,102} "$TI/v/"
+	cp "$TERMUX_PKG_TMPDIR"/full-terminfo/x/xterm{,-color,-new,-16color,-256color,+256color} "$TI/x/"
 
-	tic -x -o $TI $TERMUX_PKG_SRCDIR/rxvt-unicode-${TERMUX_PKG_VERSION[1]}/doc/etc/rxvt-unicode.terminfo
-	tic -x -o $TI $TERMUX_PKG_SRCDIR/termite-${TERMUX_PKG_VERSION[2]}/termite.terminfo
-	tic -x -o $TI $TERMUX_PKG_SRCDIR/kitty-${TERMUX_PKG_VERSION[3]}/terminfo/kitty.terminfo
-	tic -x -o $TI $TERMUX_PKG_SRCDIR/alacritty-${TERMUX_PKG_VERSION[4]}/extra/alacritty.info
+	tic -x -o "$TI" "$TERMUX_PKG_SRCDIR/rxvt-unicode-${TERMUX_PKG_VERSION[1]}/doc/etc/rxvt-unicode.terminfo"
+	tic -x -o "$TI" "$TERMUX_PKG_SRCDIR/kitty-${TERMUX_PKG_VERSION[2]}/terminfo/kitty.terminfo"
+	tic -x -e alacritty,alacritty+common,alacritty-direct -o "$TI" "$TERMUX_PKG_SRCDIR/alacritty-${TERMUX_PKG_VERSION[3]}/extra/alacritty.info"
+
+	# Upstream instructions for building foot's terminfo
+	# See: https://codeberg.org/dnkl/foot/src/branch/master/INSTALL.md#terminfo
+	sed 's/@default_terminfo@/foot/g' "$TERMUX_PKG_SRCDIR/foot/foot.info" | \
+	tic -x -e foot,foot-direct -o "$TI" -
 }
