@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="GNU Octave is a high-level language, primarily intended 
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=8.4.0
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=https://ftpmirror.gnu.org/octave/octave-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=6f9ad73a3ee4291b6341d6c0f5e5c85d6e0310376e4991b959a6d340b3ffa8a8
 TERMUX_PKG_DEPENDS="arpack-ng, bzip2, fftw, fontconfig, freetype, glpk, graphicsmagick, libcurl, libhdf5, libiconv, libopenblas, libsndfile, openssl, pcre2, portaudio, qhull, qrupdate-ng, rapidjson, readline, suitesparse, sundials, zlib"
@@ -48,6 +48,9 @@ termux_step_post_get_source() {
 
 termux_step_pre_configure() {
 	termux_setup_flang
+	
+	$CC "$TERMUX_PKG_BUILDER_DIR/clogf.c" -o "$TERMUX_PKG_BUILDDIR/clogf.o" -c
+	ar rcu "$TERMUX_PKG_BUILDDIR/clogf.a" "$TERMUX_PKG_BUILDDIR/clogf.o"
 
 	local flang_toolchain_dir="$(dirname $(dirname $(command -v flang-new)))"
 	local flang_libs_dir="$flang_toolchain_dir/sysroot/usr/lib/$TERMUX_HOST_PLATFORM"
@@ -57,4 +60,5 @@ termux_step_pre_configure() {
 
 	LDFLAGS+=" -Wl,-rpath,$TERMUX_PREFIX/lib/octave/$TERMUX_PKG_VERSION"
 	LDFLAGS+=" $($CC -print-libgcc-file-name)"
+	export LIBS="$TERMUX_PKG_BUILDDIR/clogf.a"
 }
