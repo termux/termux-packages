@@ -1,0 +1,26 @@
+Author: Andreas Beckmann <anbe@debian.org>
+Description: fix building with strlcpy() provided by glibc 2.38
+
+--- a/src/sysdep.h
++++ b/src/sysdep.h
+@@ -189,8 +189,13 @@
+ #define ftruncate _ftruncate
+ #endif
+ 
++#if 0
+ #undef HAVE_STRLCPY
+ #undef HAVE_STRLCAT
++#else
++#define HAVE_STRLCPY
++#define HAVE_STRLCAT
++#endif
+ 
+ #ifndef HAVE_BOOL
+ #define bool  int
+--- a/src/s_string.cpp
++++ b/src/s_string.cpp
+@@ -1,3 +1,4 @@
++#include "sysdep.h"
+ #include "s_string.h"
+ 
+ #include <string.h>
