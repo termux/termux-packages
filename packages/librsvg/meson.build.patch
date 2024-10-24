@@ -1,0 +1,25 @@
++++ ./meson.build
+@@ -160,7 +160,7 @@
+ if host_system == 'windows'
+   build_gir = get_option('introspection').require(get_option('default_library') != 'static' and not meson.is_cross_build() and gi_dep.found())
+ else
+-  build_gir = get_option('introspection').require(not meson.is_cross_build() and gi_dep.found())
++  build_gir = get_option('introspection').require(gi_dep.found())
+ endif
+ build_vala = get_option('vala').require(not meson.is_cross_build() and vapigen_dep.found())
+ 
+@@ -451,13 +451,7 @@
+   cargo_wrapper_args += ['--release']
+ endif
+ 
+-if target_arg != []
+-  cargo_wrapper_args += target_arg
+-endif
+-if toolchain_arg != []
+-  cargo_wrapper_args += toolchain_arg
+-endif
+-
++cargo_wrapper_args += ['--target', '@BUILD_TRIPLET@']
+ # avif support with dav1d
+ 
+ if dav1d_dep.found()
