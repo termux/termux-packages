@@ -1,0 +1,225 @@
+Revert https://github.com/llvm/llvm-project/commit/c6049e67efaaca34ca8ad93b007397b118574b81
+
+https://github.com/termux/termux-packages/issues/21863
+
+--- a/compiler-rt/lib/asan/asan_linux.cpp
++++ b/compiler-rt/lib/asan/asan_linux.cpp
+@@ -93,8 +93,7 @@
+ #  endif
+ 
+   return MapDynamicShadow(shadow_size_bytes, ASAN_SHADOW_SCALE,
+-                          /*min_shadow_base_alignment*/ 0, kHighMemEnd,
+-                          GetMmapGranularity());
++                          /*min_shadow_base_alignment*/ 0, kHighMemEnd);
+ }
+ 
+ void AsanApplyToGlobals(globals_op_fptr op, const void *needle) {
+--- a/compiler-rt/lib/asan/asan_mac.cpp
++++ b/compiler-rt/lib/asan/asan_mac.cpp
+@@ -51,8 +51,7 @@
+ 
+ uptr FindDynamicShadowStart() {
+   return MapDynamicShadow(MemToShadowSize(kHighMemEnd), ASAN_SHADOW_SCALE,
+-                          /*min_shadow_base_alignment*/ 0, kHighMemEnd,
+-                          GetMmapGranularity());
++                          /*min_shadow_base_alignment*/ 0, kHighMemEnd);
+ }
+ 
+ // No-op. Mac does not support static linkage anyway.
+--- a/compiler-rt/lib/asan/asan_premap_shadow.cpp
++++ b/compiler-rt/lib/asan/asan_premap_shadow.cpp
+@@ -33,8 +33,7 @@
+ // PremapShadowSize() bytes on the right of it are mapped r/o.
+ uptr PremapShadow() {
+   return MapDynamicShadow(PremapShadowSize(), /*mmap_alignment_scale*/ 3,
+-                          /*min_shadow_base_alignment*/ 0, kHighMemEnd,
+-                          GetMmapGranularity());
++                          /*min_shadow_base_alignment*/ 0, kHighMemEnd);
+ }
+ 
+ bool PremapShadowFailed() {
+--- a/compiler-rt/lib/asan/asan_win.cpp
++++ b/compiler-rt/lib/asan/asan_win.cpp
+@@ -268,8 +268,7 @@
+ // ---------------------- Various stuff ---------------- {{{
+ uptr FindDynamicShadowStart() {
+   return MapDynamicShadow(MemToShadowSize(kHighMemEnd), ASAN_SHADOW_SCALE,
+-                          /*min_shadow_base_alignment*/ 0, kHighMemEnd,
+-                          GetMmapGranularity());
++                          /*min_shadow_base_alignment*/ 0, kHighMemEnd);
+ }
+ 
+ void AsanCheckDynamicRTPrereqs() {}
+--- a/compiler-rt/lib/hwasan/hwasan_dynamic_shadow.cpp
++++ b/compiler-rt/lib/hwasan/hwasan_dynamic_shadow.cpp
+@@ -36,20 +36,15 @@
+ 
+ namespace __hwasan {
+ 
+-// We cannot call anything in libc here (see comment above), so we need to
+-// assume the biggest allowed page size.
+-// Android max page size is defined as 16k here:
+-// https://android.googlesource.com/platform/bionic/+/main/libc/platform/bionic/page.h#41
+-static constexpr uptr kMaxGranularity = 16384;
+-
+ // Conservative upper limit.
+ static uptr PremapShadowSize() {
+-  return RoundUpTo(GetMaxVirtualAddress() >> kShadowScale, kMaxGranularity);
++  return RoundUpTo(GetMaxVirtualAddress() >> kShadowScale,
++                   GetMmapGranularity());
+ }
+ 
+ static uptr PremapShadow() {
+   return MapDynamicShadow(PremapShadowSize(), kShadowScale,
+-                          kShadowBaseAlignment, kHighMemEnd, kMaxGranularity);
++                          kShadowBaseAlignment, kHighMemEnd);
+ }
+ 
+ static bool IsPremapShadowAvailable() {
+@@ -61,7 +56,7 @@
+ }
+ 
+ static uptr FindPremappedShadowStart(uptr shadow_size_bytes) {
+-  const uptr granularity = kMaxGranularity;
++  const uptr granularity = GetMmapGranularity();
+   const uptr shadow_start = reinterpret_cast<uptr>(&__hwasan_shadow);
+   const uptr premap_shadow_size = PremapShadowSize();
+   const uptr shadow_size = RoundUpTo(shadow_size_bytes, granularity);
+@@ -114,7 +109,7 @@
+   if (IsPremapShadowAvailable())
+     return FindPremappedShadowStart(shadow_size_bytes);
+   return MapDynamicShadow(shadow_size_bytes, kShadowScale, kShadowBaseAlignment,
+-                          kHighMemEnd, kMaxGranularity);
++                          kHighMemEnd);
+ }
+ 
+ }  // namespace __hwasan
+@@ -140,7 +135,7 @@
+                                     RingBufferSize());
+ #  endif
+   return MapDynamicShadow(shadow_size_bytes, kShadowScale, kShadowBaseAlignment,
+-                          kHighMemEnd, GetMmapGranularity());
++                          kHighMemEnd);
+ }
+ 
+ }  // namespace __hwasan
+--- a/compiler-rt/lib/memprof/memprof_linux.cpp
++++ b/compiler-rt/lib/memprof/memprof_linux.cpp
+@@ -58,8 +58,7 @@
+ uptr FindDynamicShadowStart() {
+   uptr shadow_size_bytes = MemToShadowSize(kHighMemEnd);
+   return MapDynamicShadow(shadow_size_bytes, SHADOW_SCALE,
+-                          /*min_shadow_base_alignment*/ 0, kHighMemEnd,
+-                          GetMmapGranularity());
++                          /*min_shadow_base_alignment*/ 0, kHighMemEnd);
+ }
+ 
+ void *MemprofDlSymNext(const char *sym) { return dlsym(RTLD_NEXT, sym); }
+--- a/compiler-rt/lib/sanitizer_common/sanitizer_common.h
++++ b/compiler-rt/lib/sanitizer_common/sanitizer_common.h
+@@ -60,10 +60,14 @@
+   return atomic_load(&current_verbosity, memory_order_relaxed);
+ }
+ 
+-#if SANITIZER_ANDROID && !defined(__aarch64__)
+-// 32-bit Android only has 4k pages.
+-inline uptr GetPageSize() { return 4096; }
+-inline uptr GetPageSizeCached() { return 4096; }
++#if SANITIZER_ANDROID
++inline uptr GetPageSize() {
++// Android post-M sysconf(_SC_PAGESIZE) crashes if called from .preinit_array.
++  return 4096;
++}
++inline uptr GetPageSizeCached() {
++  return 4096;
++}
+ #else
+ uptr GetPageSize();
+ extern uptr PageSizeCached;
+@@ -73,7 +77,6 @@
+   return PageSizeCached;
+ }
+ #endif
+-
+ uptr GetMmapGranularity();
+ uptr GetMaxVirtualAddress();
+ uptr GetMaxUserVirtualAddress();
+@@ -88,7 +91,6 @@
+ 
+ // Memory management
+ void *MmapOrDie(uptr size, const char *mem_type, bool raw_report = false);
+-
+ inline void *MmapOrDieQuietly(uptr size, const char *mem_type) {
+   return MmapOrDie(size, mem_type, /*raw_report*/ true);
+ }
+@@ -137,8 +139,7 @@
+ // shadow_size_bytes bytes on the right, which on linux is mapped no access.
+ // The high_mem_end may be updated if the original shadow size doesn't fit.
+ uptr MapDynamicShadow(uptr shadow_size_bytes, uptr shadow_scale,
+-                      uptr min_shadow_base_alignment, uptr &high_mem_end,
+-                      uptr granularity);
++                      uptr min_shadow_base_alignment, uptr &high_mem_end);
+ 
+ // Let S = max(shadow_size, num_aliases * alias_size, ring_buffer_size).
+ // Reserves 2*S bytes of address space to the right of the returned address and
+--- a/compiler-rt/lib/sanitizer_common/sanitizer_linux.cpp
++++ b/compiler-rt/lib/sanitizer_common/sanitizer_linux.cpp
+@@ -1182,7 +1182,7 @@
+   return addr;
+ }
+ 
+-#  if !SANITIZER_ANDROID || defined(__aarch64__)
++#  if !SANITIZER_ANDROID
+ uptr GetPageSize() {
+ #    if SANITIZER_LINUX && (defined(__x86_64__) || defined(__i386__)) && \
+         defined(EXEC_PAGESIZE)
+@@ -1201,7 +1201,7 @@
+   return sysconf(_SC_PAGESIZE);  // EXEC_PAGESIZE may not be trustworthy.
+ #    endif
+ }
+-#  endif
++#  endif  // !SANITIZER_ANDROID
+ 
+ uptr ReadBinaryName(/*out*/ char *buf, uptr buf_len) {
+ #  if SANITIZER_SOLARIS
+--- a/compiler-rt/lib/sanitizer_common/sanitizer_linux_libcdep.cpp
++++ b/compiler-rt/lib/sanitizer_common/sanitizer_linux_libcdep.cpp
+@@ -1008,8 +1008,9 @@
+ }
+ 
+ uptr MapDynamicShadow(uptr shadow_size_bytes, uptr shadow_scale,
+-                      uptr min_shadow_base_alignment, UNUSED uptr &high_mem_end,
+-                      uptr granularity) {
++                      uptr min_shadow_base_alignment,
++                      UNUSED uptr &high_mem_end) {
++  const uptr granularity = GetMmapGranularity();
+   const uptr alignment =
+       Max<uptr>(granularity << shadow_scale, 1ULL << min_shadow_base_alignment);
+   const uptr left_padding =
+--- a/compiler-rt/lib/sanitizer_common/sanitizer_mac.cpp
++++ b/compiler-rt/lib/sanitizer_common/sanitizer_mac.cpp
+@@ -1188,8 +1188,8 @@
+ }
+ 
+ uptr MapDynamicShadow(uptr shadow_size_bytes, uptr shadow_scale,
+-                      uptr min_shadow_base_alignment, uptr &high_mem_end,
+-                      uptr granularity) {
++                      uptr min_shadow_base_alignment, uptr &high_mem_end) {
++  const uptr granularity = GetMmapGranularity();
+   const uptr alignment =
+       Max<uptr>(granularity << shadow_scale, 1ULL << min_shadow_base_alignment);
+   const uptr left_padding =
+--- a/compiler-rt/lib/sanitizer_common/sanitizer_win.cpp
++++ b/compiler-rt/lib/sanitizer_common/sanitizer_win.cpp
+@@ -384,8 +384,9 @@
+ }
+ 
+ uptr MapDynamicShadow(uptr shadow_size_bytes, uptr shadow_scale,
+-                      uptr min_shadow_base_alignment, UNUSED uptr &high_mem_end,
+-                      uptr granularity) {
++                      uptr min_shadow_base_alignment,
++                      UNUSED uptr &high_mem_end) {
++  const uptr granularity = GetMmapGranularity();
+   const uptr alignment =
+       Max<uptr>(granularity << shadow_scale, 1ULL << min_shadow_base_alignment);
+   const uptr left_padding =
