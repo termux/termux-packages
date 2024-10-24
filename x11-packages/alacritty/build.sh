@@ -2,13 +2,14 @@ TERMUX_PKG_HOMEPAGE=https://alacritty.org/
 TERMUX_PKG_DESCRIPTION="A fast, cross-platform, OpenGL terminal emulator"
 TERMUX_PKG_LICENSE="Apache-2.0, MIT"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
-# Keep in sync with packages/ncurses/build.sh
 TERMUX_PKG_VERSION=0.13.2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/alacritty/alacritty/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=e9a54aabc92bbdc25ab1659c2e5a1e9b76f27d101342c8219cc98a730fd46d90
 TERMUX_PKG_DEPENDS="fontconfig, freetype, libxi, libxcursor, libxrandr"
 TERMUX_PKG_BUILD_DEPENDS="libxcb, libxkbcommon, ncurses"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_AUTO_UPDATE=true
 
 __cargo_fetch_dep_source_for_rust_windowing() {
 	local _name="$1"
