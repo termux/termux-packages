@@ -3,21 +3,39 @@ TERMUX_PKG_DESCRIPTION="An AirPlay audio player"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSES"
 TERMUX_PKG_MAINTAINER="@termux"
-# Cannot simply be updated to a newer version due to `pthread_cancel` being used
-TERMUX_PKG_VERSION=3.1.2
-TERMUX_PKG_REVISION=6
+TERMUX_PKG_VERSION="4.3.4"
 TERMUX_PKG_SRCURL=https://github.com/mikebrady/shairport-sync/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=8c13f7ebbd417e8cab07ea9f74392ced0f54315d8697d4513580f472859a9c65
-TERMUX_PKG_DEPENDS="libconfig, libdaemon, libpopt, libsoxr, openssl, pulseaudio"
+TERMUX_PKG_SHA256=3173cc54d06f6186a04509947697b56c7eac09c48153d7dea5f702042620a2df
+TERMUX_PKG_DEPENDS="libao, libconfig, libdaemon, libpopt, libsndfile, libsoxr, openssl, pulseaudio"
 TERMUX_PKG_BUILD_IN_SRC=true
+# Airplay2 requires nqptp so we do not activate it
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-pa
---with-soxr
+--with-libdaemon
+--with-stdout
+--with-ao
+--with-pipe
 --with-ssl=openssl
+--with-metadata
+--with-tinysvcmdns
+--with-soxr
+--with-convolution
+--with-ssl=openssl
+--with-piddir=$TERMUX_PREFIX/tmp/
 "
 
 termux_step_pre_configure() {
+	sed -i 's/-Wno-clobbered//g' "$TERMUX_PKG_SRCDIR/Makefile.am"
 	autoreconf -fi
+	
+	"$CC" "$TERMUX_PKG_BUILDER_DIR/pthread_cancel_impl.c" -c -o "$TERMUX_PKG_BUILDDIR/pthread_cancel_impl.o"
 
+	LDFLAGS+=" $TERMUX_PKG_BUILDDIR/pthread_cancel_impl.o"
 	CFLAGS+=" -fcommon"
+}
+
+termux_step_post_configure() {
+	echo "#include <$TERMUX_PKG_BUILDER_DIR/pthread_cancel_impl.h>" >> "$TERMUX_PKG_BUILDDIR/config.h"
+	echo "#define bzero(poi,len) memset(poi,0,len)" >> "$TERMUX_PKG_BUILDDIR/config.h"
+	echo "#define MAC_FILE_PATH \"$TERMUX_PREFIX/share/shairport-sync/MAC.txt\"" >> "$TERMUX_PKG_BUILDDIR/config.h"
 }
