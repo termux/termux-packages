@@ -1,11 +1,10 @@
+diff --git a/alacritty/src/clipboard.rs b/alacritty/src/clipboard.rs
+index 7853de47..5bdfc81b 100644
 --- a/alacritty/src/clipboard.rs
 +++ b/alacritty/src/clipboard.rs
-@@ -3,13 +3,13 @@
- 
+@@ -4,11 +4,11 @@ use winit::raw_window_handle::RawDisplayHandle;
  use alacritty_terminal::term::ClipboardType;
  
--#[cfg(any(test, not(any(feature = "x11", target_os = "macos", windows))))]
-+#[cfg(any(test, not(any(feature = "x11", target_os = "android", target_os = "macos", windows))))]
  use copypasta::nop_clipboard::NopClipboardContext;
 -#[cfg(all(feature = "wayland", not(any(target_os = "macos", windows))))]
 +#[cfg(all(feature = "wayland", not(any(target_os = "android", target_os = "macos", windows))))]
@@ -18,7 +17,7 @@
  use copypasta::ClipboardContext;
  use copypasta::ClipboardProvider;
  
-@@ -21,7 +21,7 @@
+@@ -20,7 +20,7 @@ pub struct Clipboard {
  impl Clipboard {
      pub unsafe fn new(display: RawDisplayHandle) -> Self {
          match display {
@@ -26,17 +25,8 @@
 +            #[cfg(all(feature = "wayland", not(any(target_os = "android", target_os = "macos", windows))))]
              RawDisplayHandle::Wayland(display) => {
                  let (selection, clipboard) =
-                     wayland_clipboard::create_clipboards_from_external(display.display);
-@@ -33,7 +33,7 @@
- 
-     /// Used for tests and to handle missing clipboard provider when built without the `x11`
-     /// feature.
--    #[cfg(any(test, not(any(feature = "x11", target_os = "macos", windows))))]
-+    #[cfg(any(test, not(any(feature = "x11", target_os = "android", target_os = "macos", windows))))]
-     pub fn new_nop() -> Self {
-         Self { clipboard: Box::new(NopClipboardContext::new().unwrap()), selection: None }
-     }
-@@ -41,16 +41,16 @@
+                     wayland_clipboard::create_clipboards_from_external(display.display.as_ptr());
+@@ -39,16 +39,16 @@ impl Clipboard {
  
  impl Default for Clipboard {
      fn default() -> Self {

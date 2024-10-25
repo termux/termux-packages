@@ -1,6 +1,8 @@
---- a/glutin/build.rs
-+++ b/glutin/build.rs
-@@ -4,7 +4,7 @@
+diff --git a/glutin-winit/build.rs b/glutin-winit/build.rs
+index 32078de..bc32b33 100644
+--- a/glutin-winit/build.rs
++++ b/glutin-winit/build.rs
+@@ -6,7 +6,7 @@ fn main() {
      // Setup alias to reduce `cfg` boilerplate.
      cfg_aliases! {
          // Systems.
@@ -9,24 +11,52 @@
          wasm_platform: { target_family = "wasm" },
          macos_platform: { target_os = "macos" },
          ios_platform: { target_os = "ios" },
+diff --git a/glutin/Cargo.toml b/glutin/Cargo.toml
+index ecc9499..c58e938 100644
 --- a/glutin/Cargo.toml
 +++ b/glutin/Cargo.toml
-@@ -40,10 +40,10 @@
+@@ -40,10 +40,10 @@ features = [
  ]
  optional = true
  
 -[target.'cfg(target_os = "android")'.dependencies]
 +[target.'cfg(target_os = "dummy")'.dependencies]
- glutin_egl_sys = { version = "0.6.0", path = "../glutin_egl_sys" }
+ glutin_egl_sys = { version = "0.7.0", path = "../glutin_egl_sys" }
  
 -[target.'cfg(any(target_os = "linux", target_os = "freebsd", target_os = "dragonfly", target_os = "netbsd", target_os = "openbsd"))'.dependencies]
 +[target.'cfg(any(target_os = "android", target_os = "linux", target_os = "freebsd", target_os = "dragonfly", target_os = "netbsd", target_os = "openbsd"))'.dependencies]
- glutin_egl_sys = { version = "0.6.0", path = "../glutin_egl_sys", optional = true }
- glutin_glx_sys = { version = "0.5.0", path = "../glutin_glx_sys", optional = true }
+ glutin_egl_sys = { version = "0.7.0", path = "../glutin_egl_sys", optional = true }
+ glutin_glx_sys = { version = "0.6.0", path = "../glutin_glx_sys", optional = true }
  wayland-sys = { version = "0.31.1", default-features = false, features = ["egl", "client", "dlopen"], optional = true }
+diff --git a/glutin/build.rs b/glutin/build.rs
+index c8eab1b..6acca1a 100644
+--- a/glutin/build.rs
++++ b/glutin/build.rs
+@@ -4,7 +4,7 @@ fn main() {
+     // Setup alias to reduce `cfg` boilerplate.
+     cfg_aliases! {
+         // Systems.
+-        android_platform: { target_os = "android" },
++        android_platform: { target_os = "dummy" },
+         wasm_platform: { target_family = "wasm" },
+         macos_platform: { target_os = "macos" },
+         ios_platform: { target_os = "ios" },
+diff --git a/glutin_glx_sys/Cargo.toml b/glutin_glx_sys/Cargo.toml
+index 682c69c..d44ad2e 100644
+--- a/glutin_glx_sys/Cargo.toml
++++ b/glutin_glx_sys/Cargo.toml
+@@ -12,5 +12,5 @@ edition = "2021"
+ [build-dependencies]
+ gl_generator = "0.14"
+ 
+-[target.'cfg(any(target_os = "linux", target_os = "freebsd", target_os="dragonfly", target_os="netbsd", target_os="openbsd"))'.dependencies]
++[target.'cfg(any(target_os = "android", target_os = "linux", target_os = "freebsd", target_os="dragonfly", target_os="netbsd", target_os="openbsd"))'.dependencies]
+ x11-dl = "2.18.3"
+diff --git a/glutin_glx_sys/build.rs b/glutin_glx_sys/build.rs
+index c9ce54b..47b7ad2 100644
 --- a/glutin_glx_sys/build.rs
 +++ b/glutin_glx_sys/build.rs
-@@ -10,6 +10,7 @@
+@@ -10,6 +10,7 @@ fn main() {
      println!("cargo:rerun-if-changed=build.rs");
  
      if target.contains("linux")
@@ -34,15 +64,8 @@
          || target.contains("dragonfly")
          || target.contains("freebsd")
          || target.contains("netbsd")
---- a/glutin_glx_sys/Cargo.toml
-+++ b/glutin_glx_sys/Cargo.toml
-@@ -12,5 +12,5 @@
- [build-dependencies]
- gl_generator = "0.14"
- 
--[target.'cfg(any(target_os = "linux", target_os = "freebsd", target_os="dragonfly", target_os="netbsd", target_os="openbsd"))'.dependencies]
-+[target.'cfg(any(target_os = "android", target_os = "linux", target_os = "freebsd", target_os="dragonfly", target_os="netbsd", target_os="openbsd"))'.dependencies]
- x11-dl = "2.18.3"
+diff --git a/glutin_glx_sys/src/lib.rs b/glutin_glx_sys/src/lib.rs
+index 5bec303..9f904b9 100644
 --- a/glutin_glx_sys/src/lib.rs
 +++ b/glutin_glx_sys/src/lib.rs
 @@ -1,4 +1,5 @@
@@ -51,14 +74,3 @@
      target_os = "linux",
      target_os = "dragonfly",
      target_os = "freebsd",
---- a/glutin-winit/build.rs
-+++ b/glutin-winit/build.rs
-@@ -6,7 +6,7 @@
-     // Setup alias to reduce `cfg` boilerplate.
-     cfg_aliases! {
-         // Systems.
--        android_platform: { target_os = "android" },
-+        android_platform: { target_os = "dummy" },
-         wasm_platform: { target_family = "wasm" },
-         macos_platform: { target_os = "macos" },
-         ios_platform: { target_os = "ios" },

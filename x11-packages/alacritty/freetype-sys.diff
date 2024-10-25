@@ -1,11 +1,13 @@
+diff --git a/build.rs b/build.rs
+index 4948cf1..363299d 100644
 --- a/build.rs
 +++ b/build.rs
-@@ -6,7 +6,7 @@ use std::env;
-
+@@ -13,7 +13,7 @@ fn add_sources(build: &mut cc::Build, root: &str, files: &[&str]) {
+ 
  fn main() {
      let target = env::var("TARGET").unwrap();
 -    if !target.contains("android")
 +    if true
-         && pkg_config::Config::new().atleast_version("18.5.12").find("freetype2").is_ok()
-     {
-         return
+         && !target.contains("ohos")
+         && pkg_config::Config::new()
+             .atleast_version("24.3.18")
