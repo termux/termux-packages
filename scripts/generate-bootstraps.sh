@@ -110,7 +110,7 @@ print_desc_package_pac() {
 	echo -e "%${1}%\n${2}\n"
 }
 
-# Download specified package, its depenencies and then extract *.deb or *.pkg.tar.xz files to
+# Download specified package, its dependencies and then extract *.deb or *.pkg.tar.xz files to
 # the bootstrap root.
 pull_package() {
 	local package_name=$1
