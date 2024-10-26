@@ -16,6 +16,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DKDE_INSTALL_QTPLUGINDIR=lib/qt6/plugins
 "
 
+# All dependencies using `kconfig_compiler_kf6` must have `kf6-kconfig-cross-tools` in TERMUX_PKG_BUILD_DEPENDS and have `-DKF6_HOST_TOOLING=$TERMUX_PREFIX/opt/kf6/cross/lib/cmake/` in TERMUX_PKG_EXTRA_CONFIGURE_ARGS.
+
 termux_step_host_build() {
 	# CMakeLists.txt
 	cp "$TERMUX_PKG_SRCDIR/CMakeLists.txt" "$TERMUX_PKG_SRCDIR/CMakeLists.txt.bak"
