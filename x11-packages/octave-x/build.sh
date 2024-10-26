@@ -1,19 +1,19 @@
 TERMUX_PKG_HOMEPAGE=https://octave.org
-TERMUX_PKG_DESCRIPTION="GNU Octave is a high-level language, primarily intended for numerical computations. (only CLI)"
+TERMUX_PKG_DESCRIPTION="GNU Octave is a high-level language, primarily intended for numerical computations"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="9.2.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://ftpmirror.gnu.org/octave/octave-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=21417afb579105b035cac0bea09201522e384893ae90a781b8727efa32765807
-TERMUX_PKG_DEPENDS="libandroid-complex-math, arpack-ng, bzip2, fftw, fltk, fontconfig, freetype, glpk, glu, graphicsmagick, libcurl, libhdf5, libiconv, libopenblas, libsndfile, opengl, openssl, pcre, portaudio, qhull, qrupdate-ng, rapidjson, readline, suitesparse, sundials, zlib"
-TERMUX_PKG_BUILD_DEPENDS="gnuplot, less"
+TERMUX_PKG_DEPENDS="libandroid-complex-math, arpack-ng, bzip2, fftw, fltk, fontconfig, freetype, glpk, glu, graphicsmagick, libcurl, libhdf5, libiconv, libopenblas, libsndfile, opengl, openssl, pcre, portaudio, qhull, qrupdate-ng, qt6-qtbase, qt6-qttools, qt6-qt5compat, rapidjson, readline, suitesparse, sundials, zlib"
+TERMUX_PKG_BUILD_DEPENDS="gnuplot, less, qt6-qtbase-cross-tools, qt6-qttools-cross-tools"
 TERMUX_PKG_RECOMMENDS="gnuplot, less"
 TERMUX_PKG_CONFLICTS="octave-x"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-x
---without-qt
+--with-qt=6
 --disable-java
 --enable-link-all-dependencies
 --disable-openmp
@@ -57,6 +57,12 @@ termux_step_pre_configure() {
 	export ac_cv_f77_libs=" $flang_libs_dir/libFortranRuntime.a $flang_libs_dir/libFortranDecimal.a"
 
 	LDFLAGS+=" -Wl,-rpath,$TERMUX_PREFIX/lib/octave/$TERMUX_PKG_VERSION"
-	LDFLAGS+=" $($CC -print-libgcc-file-name)"
+
+	local _libgcc_file="$($CC -print-libgcc-file-name)"
+	local _libgcc_path="$(dirname $_libgcc_file)"
+	local _libgcc_name="$(basename $_libgcc_file)"
+	LDFLAGS+=" -L$_libgcc_path -l:$_libgcc_name"
 	export LIBS="-landroid-complex-math"
+
+	export PATH="$TERMUX_PREFIX/opt/qt6/cross/bin:$PATH"
 }
