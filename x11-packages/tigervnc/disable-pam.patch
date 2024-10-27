@@ -1,0 +1,48 @@
++++ ./CMakeLists.txt	2018-09-12 11:14:21.772989769 +0300
+@@ -288,7 +288,7 @@
+ endif()
+ 
+ # Check for PAM library
+-if(UNIX AND NOT APPLE)
++if(FALSE)
+   check_include_files(security/pam_appl.h HAVE_PAM_H)
+   set(CMAKE_REQUIRED_LIBRARIES -lpam)
+   check_function_exists(pam_start HAVE_PAM_START)
+@@ -351,7 +351,6 @@
+   add_subdirectory(media)
+ endif()
+ 
+-add_subdirectory(tests)
+ 
+ 
+ if(BUILD_VIEWER)
++++ ./common/rfb/CMakeLists.txt
+@@ -92,7 +92,7 @@
+   target_sources(rfb PRIVATE WinPasswdValidator.cxx)
+ endif(WIN32)
+ 
+-if(UNIX AND NOT APPLE)
++if(FALSE)
+   target_sources(rfb PRIVATE UnixPasswordValidator.cxx pam.c)
+   target_link_libraries(rfb ${PAM_LIBS})
+ endif()
++++ ./unix/CMakeLists.txt
+@@ -6,5 +6,4 @@
+ add_subdirectory(common)
+ add_subdirectory(vncconfig)
+ add_subdirectory(vncpasswd)
+-add_subdirectory(vncserver)
+ add_subdirectory(x0vncserver)
+
++++ ./common/rfb/UnixPasswordValidator.h
+@@ -28,7 +28,7 @@
+   class UnixPasswordValidator: public PasswordValidator {
+   protected:
+     bool validateInternal(SConnection * sc, const char *username,
+-			   const char *password);
++			   const char *password) { return false; }
+   };
+ }
+ 
+
+
