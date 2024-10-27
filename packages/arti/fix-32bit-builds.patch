@@ -1,0 +1,38 @@
+Sourced from https://gitlab.torproject.org/tpo/core/arti/-/merge_requests/3532
+
+commit bed4a9c1de898170a46a910151764e79466fa1d2
+Author: Yaksh Bariya <yakshbari4@gmail.com>
+Date:   Sun Dec 7 18:55:10 2025 +0530
+
+    tor-memquota: fix builds for 32-bit platforms
+    
+    Multiplying 8 * GIB overflows the usize limit (4 GIB - 1) on 32-bit
+    platforms. So handle this properly for 32-bit platforms
+
+diff --git a/crates/tor-memquota/src/config.rs b/crates/tor-memquota/src/config.rs
+index 0a006c0fe..aa7d84b45 100644
+--- a/crates/tor-memquota/src/config.rs
++++ b/crates/tor-memquota/src/config.rs
+@@ -230,15 +230,18 @@ fn compute_max_from_total_system_mem(mem: Result<usize, MemQueryError>) -> Qty {
+         }
+     };
+ 
+-    let mem = if mem >= 8 * GIB {
++    let mem = {
+         // From c-tor:
+         //
+         // > The idea behind this value is that the amount of RAM is more than enough
+         // > for a single relay and should allow the relay operator to run two relays
+         // > if they have additional bandwidth available.
+-        (mem as f64 * 0.40) as usize
+-    } else {
+-        (mem as f64 * 0.75) as usize
++        let mut factor = 0.75;
++        #[cfg(target_pointer_width = "64")]
++        if mem >= 8 * GIB {
++            factor = 0.40;
++        }
++        (mem as f64 * factor) as usize
+     };
+ 
+     // The (min, max) range to clamp `mem` to.
