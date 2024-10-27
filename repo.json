@@ -1,21 +1,34 @@
 {
   "pkg_format": "debian",
-  "packages": {
-    "name": "termux-main",
-    "distribution": "stable",
-    "component": "main",
-    "url": "https://packages-cf.termux.dev/apt/termux-main"
+  "signing_keys": {
+    "termux": {
+      "key_file": "packages/termux-keyring/termux-autobuilds.gpg"
+    },
+    "grimler": {
+      "key_file": "packages/termux-keyring/grimler.gpg"
+    }
   },
-  "root-packages": {
-    "name": "termux-root",
-    "distribution": "root",
-    "component": "stable",
-    "url": "https://packages-cf.termux.dev/apt/termux-root"
-  },
-  "x11-packages": {
-    "name": "termux-x11",
-    "distribution": "x11",
-    "component": "main",
-    "url": "https://packages-cf.termux.dev/apt/termux-x11"
+  "channels": {
+    "packages": {
+      "name": "termux-main",
+      "distribution": "stable",
+      "component": "main",
+      "url": "https://packages-cf.termux.dev/apt/termux-main",
+      "keys": ["termux", "grimler"]
+    },
+    "root-packages": {
+      "name": "termux-root",
+      "distribution": "root",
+      "component": "stable",
+      "url": "https://packages-cf.termux.dev/apt/termux-root",
+      "keys": ["termux", "grimler"]
+    },
+    "x11-packages": {
+      "name": "termux-x11",
+      "distribution": "x11",
+      "component": "main",
+      "url": "https://packages-cf.termux.dev/apt/termux-x11",
+      "keys": ["termux", "grimler"]
+    }
   }
 }
