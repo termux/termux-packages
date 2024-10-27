@@ -3,9 +3,16 @@ TERMUX_PKG_DESCRIPTION="A library to aid in making portable programs that compil
 TERMUX_PKG_LICENSE="GPL-3.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.2.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/lightning/lightning-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=4e3984ff1ccf0ba30a985211d40fc5c06b25f014ebdf3d80d0fe3d0c80dd7c0e
 TERMUX_PKG_DEPENDS="zlib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_func_ffsl=yes
 "
+
+# Fixes "ld.lld: error: unable to find library -liberty" anytime the binutils-libs
+# package was installed in the same $TERMUX_PREFIX before the build of liblightning.
+termux_step_pre_configure() {
+	autoreconf -fi
+}
