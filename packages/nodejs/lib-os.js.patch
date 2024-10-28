@@ -1,11 +1,11 @@
---- ./lib/os.js.orig	2023-01-06 02:53:28.000000000 +0530
-+++ ./lib/os.js	2023-01-07 16:38:56.051166243 +0530
-@@ -193,7 +193,7 @@
-     path = safeGetenv('TMPDIR') ||
-            safeGetenv('TMP') ||
-            safeGetenv('TEMP') ||
--           '/tmp';
-+           '@TERMUX_PREFIX@/tmp';
-     if (path.length > 1 && StringPrototypeEndsWith(path, '/'))
-       path = StringPrototypeSlice(path, 0, -1);
+--- ./lib/os.js.orig	2024-10-28 09:48:51.426924888 +0530
++++ ./lib/os.js	2024-10-28 09:51:52.088950596 +0530
+@@ -191,7 +191,7 @@
+     return path;
    }
+ 
+-  return getTempDir() || '/tmp';
++  return getTempDir() || '@TERMUX_PREFIX@/tmp';
+ }
+ tmpdir[SymbolToPrimitive] = () => tmpdir();
+ 

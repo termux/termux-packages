@@ -1,7 +1,6 @@
-diff -u -r ../node-v22.8.0/node.gyp ./node.gyp
---- ../node-v22.8.0/node.gyp	2024-09-03 03:18:45.000000000 +0000
-+++ ./node.gyp	2024-09-10 21:40:40.985225197 +0000
-@@ -560,7 +560,8 @@
+--- ./node.gyp.orig	2024-10-24 18:14:08.000000000 +0530
++++ ./node.gyp	2024-10-28 20:02:07.415607786 +0530
+@@ -550,7 +550,8 @@
        ],
  
        'sources': [
@@ -11,7 +10,7 @@ diff -u -r ../node-v22.8.0/node.gyp ./node.gyp
        ],
  
        'dependencies': [
-@@ -1043,51 +1044,6 @@
+@@ -1031,298 +1032,7 @@
          },
        ],
      }, # node_lib_target_name
@@ -21,7 +20,6 @@ diff -u -r ../node-v22.8.0/node.gyp ./node.gyp
 -      'dependencies': [
 -        '<(node_lib_target_name)',
 -        'deps/histogram/histogram.gyp:histogram',
--        'deps/sqlite/sqlite.gyp:sqlite',
 -      ],
 -
 -      'includes': [
@@ -33,7 +31,6 @@ diff -u -r ../node-v22.8.0/node.gyp ./node.gyp
 -        'deps/v8/include',
 -        'deps/cares/include',
 -        'deps/uv/include',
--        'deps/sqlite',
 -        'test/cctest',
 -      ],
 -
@@ -60,13 +57,95 @@ diff -u -r ../node-v22.8.0/node.gyp ./node.gyp
 -        }],
 -      ],
 -    }, # fuzz_env
-     { # fuzz_ClientHelloParser.cc
-       'target_name': 'fuzz_ClientHelloParser',
-       'type': 'executable',
-@@ -1181,89 +1137,6 @@
-         }],
-       ],
-     }, # fuzz_strings
+-    { # fuzz_ClientHelloParser.cc
+-      'target_name': 'fuzz_ClientHelloParser',
+-      'type': 'executable',
+-      'dependencies': [
+-        '<(node_lib_target_name)',
+-        'deps/histogram/histogram.gyp:histogram',
+-        'deps/uvwasi/uvwasi.gyp:uvwasi',
+-      ],
+-      'includes': [
+-        'node.gypi'
+-      ],
+-      'include_dirs': [
+-        'src',
+-        'tools/msvs/genfiles',
+-        'deps/v8/include',
+-        'deps/cares/include',
+-        'deps/uv/include',
+-        'deps/uvwasi/include',
+-        'test/cctest',
+-      ],
+-      'defines': [
+-        'NODE_ARCH="<(target_arch)"',
+-        'NODE_PLATFORM="<(OS)"',
+-        'NODE_WANT_INTERNALS=1',
+-      ],
+-      'sources': [
+-        'src/node_snapshot_stub.cc',
+-        'test/fuzzers/fuzz_ClientHelloParser.cc',
+-      ],
+-      'conditions': [
+-        ['OS=="linux"', {
+-          'ldflags': [ '-fsanitize=fuzzer' ]
+-        }],
+-        # Ensure that ossfuzz flag has been set and that we are on Linux
+-        [ 'OS!="linux" or ossfuzz!="true"', {
+-          'type': 'none',
+-        }],
+-        # Avoid excessive LTO
+-        ['enable_lto=="true"', {
+-          'ldflags': [ '-fno-lto' ],
+-        }],
+-      ],
+-    }, # fuzz_ClientHelloParser.cc
+-    { # fuzz_strings
+-      'target_name': 'fuzz_strings',
+-      'type': 'executable',
+-      'dependencies': [
+-        '<(node_lib_target_name)',
+-        'deps/googletest/googletest.gyp:gtest_prod',
+-        'deps/histogram/histogram.gyp:histogram',
+-        'deps/uvwasi/uvwasi.gyp:uvwasi',
+-        'deps/ada/ada.gyp:ada',
+-        'deps/nbytes/nbytes.gyp:nbytes',
+-      ],
+-      'includes': [
+-        'node.gypi'
+-      ],
+-      'include_dirs': [
+-        'src',
+-        'tools/msvs/genfiles',
+-        'deps/v8/include',
+-        'deps/cares/include',
+-        'deps/uv/include',
+-        'deps/uvwasi/include',
+-        'test/cctest',
+-      ],
+-      'defines': [
+-        'NODE_ARCH="<(target_arch)"',
+-        'NODE_PLATFORM="<(OS)"',
+-        'NODE_WANT_INTERNALS=1',
+-      ],
+-      'sources': [
+-        'src/node_snapshot_stub.cc',
+-        'test/fuzzers/fuzz_strings.cc',
+-      ],
+-      'conditions': [
+-        ['OS=="linux"', {
+-          'ldflags': [ '-fsanitize=fuzzer' ]
+-        }],
+-        # Ensure that ossfuzz flag has been set and that we are on Linux
+-        [ 'OS!="linux" or ossfuzz!="true"', {
+-          'type': 'none',
+-        }],
+-        # Avoid excessive LTO
+-        ['enable_lto=="true"', {
+-          'ldflags': [ '-fno-lto' ],
+-        }],
+-      ],
+-    }, # fuzz_strings
 -    {
 -      'target_name': 'cctest',
 -      'type': 'executable',
@@ -76,7 +155,6 @@ diff -u -r ../node-v22.8.0/node.gyp ./node.gyp
 -        'deps/googletest/googletest.gyp:gtest',
 -        'deps/googletest/googletest.gyp:gtest_main',
 -        'deps/histogram/histogram.gyp:histogram',
--        'deps/sqlite/sqlite.gyp:sqlite',
 -        'deps/simdjson/simdjson.gyp:simdjson',
 -        'deps/simdutf/simdutf.gyp:simdutf',
 -        'deps/ada/ada.gyp:ada',
@@ -93,7 +171,6 @@ diff -u -r ../node-v22.8.0/node.gyp ./node.gyp
 -        'deps/v8/include',
 -        'deps/cares/include',
 -        'deps/uv/include',
--        'deps/sqlite',
 -        'test/cctest',
 -      ],
 -
@@ -150,10 +227,89 @@ diff -u -r ../node-v22.8.0/node.gyp ./node.gyp
 -        }],
 -      ],
 -    }, # cctest
+-
+-    {
+-      'target_name': 'embedtest',
+-      'type': 'executable',
+-
+-      'dependencies': [
+-        '<(node_lib_target_name)',
+-        'deps/histogram/histogram.gyp:histogram',
+-        'deps/ada/ada.gyp:ada',
+-        'deps/nbytes/nbytes.gyp:nbytes',
+-      ],
+-
+-      'includes': [
+-        'node.gypi'
+-      ],
+-
+-      'include_dirs': [
+-        'src',
+-        'tools',
+-        'tools/msvs/genfiles',
+-        'deps/v8/include',
+-        'deps/cares/include',
+-        'deps/uv/include',
+-        'test/embedding',
+-      ],
+-
+-      'sources': [
+-        'src/node_snapshot_stub.cc',
+-        'test/embedding/embedtest.cc',
+-      ],
+-
+-      'conditions': [
+-        ['OS=="solaris"', {
+-          'ldflags': [ '-I<(SHARED_INTERMEDIATE_DIR)' ]
+-        }],
+-        # Skip cctest while building shared lib node for Windows
+-        [ 'OS=="win" and node_shared=="true"', {
+-          'type': 'none',
+-        }],
+-        [ 'node_shared=="true"', {
+-          'xcode_settings': {
+-            'OTHER_LDFLAGS': [ '-Wl,-rpath,@loader_path', ],
+-          },
+-        }],
+-        ['OS=="win"', {
+-          'libraries': [
+-            'Dbghelp.lib',
+-            'winmm.lib',
+-            'Ws2_32.lib',
+-          ],
+-        }],
+-        # Avoid excessive LTO
+-        ['enable_lto=="true"', {
+-          'ldflags': [ '-fno-lto' ],
+-        }],
+-      ],
+-    }, # embedtest
+-
+-    {
+-      'target_name': 'overlapped-checker',
+-      'type': 'executable',
  
+-      'conditions': [
+-        ['OS=="win"', {
+-          'sources': [
+-            'test/overlapped-checker/main_win.c'
+-          ],
+-        }],
+-        ['OS!="win"', {
+-          'sources': [
+-            'test/overlapped-checker/main_unix.c'
+-          ],
+-        }],
+-        # Avoid excessive LTO
+-        ['enable_lto=="true"', {
+-          'ldflags': [ '-fno-lto' ],
+-        }],
+-      ]
+-    }, # overlapped-checker
      {
-       'target_name': 'embedtest',
-@@ -1381,75 +1254,6 @@
+       'target_name': 'node_js2c',
+       'type': 'executable',
+@@ -1359,79 +1069,6 @@
          }],
        ]
      },
@@ -164,7 +320,6 @@ diff -u -r ../node-v22.8.0/node.gyp ./node.gyp
 -      'dependencies': [
 -        '<(node_lib_target_name)',
 -        'deps/histogram/histogram.gyp:histogram',
--        'deps/sqlite/sqlite.gyp:sqlite',
 -        'deps/ada/ada.gyp:ada',
 -        'deps/nbytes/nbytes.gyp:nbytes',
 -        'deps/simdjson/simdjson.gyp:simdjson',
@@ -181,7 +336,6 @@ diff -u -r ../node-v22.8.0/node.gyp ./node.gyp
 -        'deps/v8/include',
 -        'deps/cares/include',
 -        'deps/uv/include',
--        'deps/sqlite',
 -      ],
 -
 -      'defines': [ 'NODE_WANT_INTERNALS=1' ],
@@ -190,6 +344,12 @@ diff -u -r ../node-v22.8.0/node.gyp ./node.gyp
 -        'src/node_snapshot_stub.cc',
 -        'tools/snapshot/node_mksnapshot.cc',
 -      ],
+-
+-      'msvs_settings': {
+-        'VCLinkerTool': {
+-          'EnableCOMDATFolding': '1', # /OPT:NOICF
+-        },
+-      },
 -
 -      'conditions': [
 -        ['node_write_snapshot_as_array_literals=="true"', {
