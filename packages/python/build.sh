@@ -19,7 +19,7 @@ TERMUX_PKG_REPLACES="python-dev"
 TERMUX_PKG_PROVIDES="python3"
 
 # https://github.com/termux/termux-packages/issues/15908
-TERMUX_MAKE_PROCESSES=1
+TERMUX_PKG_MAKE_PROCESSES=1
 
 _MAJOR_VERSION="${TERMUX_PKG_VERSION%.*}"
 
