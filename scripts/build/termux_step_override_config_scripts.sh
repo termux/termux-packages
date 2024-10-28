@@ -22,7 +22,7 @@ termux_step_override_config_scripts() {
 					echo "handle_incompatible_binary: linking $prefix_binary to $host_binary"
 					ln -sf $host_binary $prefix_binary
 				fi
-			else
+			elif [ ! -d $prefix_binary ]; then
 				# host equivalent binary does not exist, so delete the file
 				echo "handle_incompatible_binary: deleting $prefix_binary"
 				rm -f $prefix_binary
