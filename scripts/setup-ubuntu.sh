@@ -332,6 +332,94 @@ $SUDO apt-get -yq update
 $SUDO env DEBIAN_FRONTEND=noninteractive \
 	apt-get install -yq --no-install-recommends $PACKAGES
 
+# Reinstall the older implementation of pkg-config from Ubuntu 22.04 in order to
+# avoid a bug with the command
+# /home/builder/.termux-build/_cache/android-r27b-api-24-v1/bin/pkg-config --cflags protobuf
+# ($PKG_CONFIG --cflags protobuf)
+# involving the abseil-cpp pkg-config files
+# during the build of the libprotobuf-c package.
+# The older implementation parses the abseil-cpp pkg-config files correctly,
+# but the new implementation, pkgconf, is resulting in "-Wno-float-conversion -DNOMINMAX"
+# repeated 632,438 times which is not what the older implementation prints.
+# https://gitea.treehouse.systems/ariadne/pkgconf/issues/229
+# https://github.com/termux/termux-packages/issues/21995
+
+# Function to obtain the .deb URL, by twaik from
+# https://github.com/termux/termux-packages/pull/21825/commits/8efe9c69039a698b69781c3330e31a4958387ca1
+obtain_deb_url() {
+	# jammy is last known Ubuntu distro which contains pkg-config version 0.29.2 in packages
+	local url="https://packages.ubuntu.com/jammy/amd64/$1/download"
+	local retries=5
+	local wait=5
+	local attempt
+	local deb_url
+
+	for ((attempt=1; attempt<=retries; attempt++)); do
+		local PAGE="$(curl -s "$url")"
+		>&2 echo page
+		>&2 echo "$PAGE"
+		if deb_url=$(echo "$PAGE" | grep -Eo 'http://.*\.deb' | head -n 1); then
+			if [[ -n "$deb_url" ]]; then
+				echo "$deb_url"
+				return 0
+			else
+				>&2 echo "Attempt $attempt: Received empty URL or server answered with 'Internal server error' page. Retrying in $wait seconds..."
+			fi
+		else
+			>&2 echo "Attempt $attempt: Command failed. Retrying in $wait seconds..."
+		fi
+		sleep "$wait"
+	done
+
+	>&2 echo "Failed to obtain URL after $retries attempts."
+	exit 1
+}		
+
+PC_URL="$(obtain_deb_url pkg-config)"
+PC_TMPDIR="$HOME/legacy-pkg-config-tmp"
+PC_DEB="$PC_TMPDIR/legacy-pkg-config.deb"
+mkdir -p "$PC_TMPDIR"
+wget "$PC_URL" -O "$PC_DEB"
+ar x "$PC_DEB" --output="$PC_TMPDIR"
+tar xf "$PC_TMPDIR/data.tar.zst" -C "$PC_TMPDIR"
+# Directory contains this:
+#legacy-pkg-config-tmp/usr/
+#├── bin
+#│   ├── pkg-config
+#│   └── x86_64-pc-linux-gnu-pkg-config
+#├── lib
+#│   ├── pkgconfig
+#│   └── pkg-config.multiarch
+#└── share
+#    ├── aclocal
+#    │   └── pkg.m4
+#    ├── doc
+#    │   └── pkg-config
+#    │       ├── AUTHORS
+#    │       ├── changelog.Debian.gz
+#    │       ├── copyright
+#    │       ├── NEWS.gz
+#    │       ├── pkg-config-guide.html
+#    │       └── README
+#    ├── man
+#    │   └── man1
+#    │       └── pkg-config.1.gz
+#    ├── pkgconfig
+#    ├── pkg-config-crosswrapper
+#    └── pkg-config-dpkghook
+#
+# since only the usr/bin/pkg-config binary is needed for the workaround
+# to be successful in this situation, it seems to me that it is fine to install
+# only that file. This overwrites the symlink to pkgconf that Ubuntu 24.04 normally has
+# with a copy of the legacy implementation of the pkg-config program,
+# identifiable by version "0.29.2"
+# The reason why I believe it is necessary to globally install this is
+# because any other package besides libprotobuf-c that attempts to invoke
+# the command "$PKG_CONFIG --cflags protobuf" will be affected by the same
+# issue if this is not also applied to it.
+$SUDO install -DTm755 "$PC_TMPDIR/usr/bin/pkg-config" /usr/bin/pkg-config
+rm -rf "$PC_TMPDIR"
+
 $SUDO locale-gen --purge en_US.UTF-8
 echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US:en"\n' | $SUDO tee -a /etc/default/locale
 
