@@ -4,19 +4,34 @@ termux_step_override_config_scripts() {
 	fi
 
 	# resolves many variants of "cannot execute binary file: Exec format error"
-	# symlink host binaries over incompatible architecture and libc crossbuild rootfs binaries
-	symlink_incompatible_binary() {
-		src="$1"
-		dst="$2"
-		if [ -f $src ] && ! file $(readlink -f $dst) | grep text >/dev/null \
-		   && [ "$(readlink -f $src)" != "$(readlink -f $dst)" ]; then
-			echo "symlink_incompatible_binary: linking $dst to $src"
-			ln -sf $src $dst
+	# only symlinking host binaries over incompatible architecture and libc crossbuild rootfs binaries
+	# is not quite 100% effective because of the edge case produced by installing
+	# libprotobuf into $TERMUX_PREFIX first, then building libprotozero, which will attempt
+	# to run the binary /data/data/com.termux/files/usr/bin/protoc which cannot be replaced
+	# by any other method than deleting it because protoc is not preinstalled in the build host.
+	# Therefore, this symlinks if applicable, but if there is no host binary available
+	# to symlink to, the binary is deleted.
+	handle_incompatible_binary() {
+		host_binary="$1"
+		prefix_binary="$2"
+		# if file in $TERMUX_PREFIX/bin is, or links to, a binary program
+		if ! file $(readlink -f $prefix_binary) | grep text >/dev/null; then
+			if [ -f $host_binary ]; then
+				# host binary exists, so symlink to it
+				if [ "$(readlink -f $host_binary)" != "$(readlink -f $prefix_binary)" ]; then
+					echo "handle_incompatible_binary: linking $prefix_binary to $host_binary"
+					ln -sf $host_binary $prefix_binary
+				fi
+			else
+				# host equivalent binary does not exist, so delete the file
+				echo "handle_incompatible_binary: deleting $prefix_binary"
+				rm -f $prefix_binary
+			fi
 		fi
 	}
-	export -f symlink_incompatible_binary
-	find $TERMUX_PREFIX/bin/ -executable -exec bash -c 'symlink_incompatible_binary /usr/bin/$(basename {}) {}' \;
-	unset symlink_incompatible_binary
+	export -f handle_incompatible_binary
+	find $TERMUX_PREFIX/bin/ -executable -exec bash -c 'handle_incompatible_binary /usr/bin/$(basename {}) {}' \;
+	unset handle_incompatible_binary
 	# from one perspective, the above block could be considered an expansion of the same logic
 	# behind the line below this, but for everything in the usr/bin folder instead of only bin/sh
 
@@ -64,3 +79,4 @@ termux_step_override_config_scripts() {
 		cp $TERMUX_PREFIX/opt/protobuf-cmake/static/protobuf-targets{,-release}.cmake $TERMUX_PREFIX/lib/cmake/protobuf/
 	fi
 }
+

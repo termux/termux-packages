@@ -1,0 +1,22 @@
+CMakeLists.txt: protobuf is only needed for tests
+
+Don't check for protobuf if tests are disabled. As a side effect, this
+will avoid a build failure if clang-tidy and protobuf are found but
+tests are disabled
+
+Fix #109
+
+Signed-off-by: Fabrice Fontaine <fontaine.fabrice@gmail.com>
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -52,7 +52,9 @@ endif()
+ #
+ #-----------------------------------------------------------------------------
+ 
+-find_package(Protobuf)
++if(BUILD_TESTING)
++    find_package(Protobuf)
++endif()
+ 
+ 
+ #-----------------------------------------------------------------------------
