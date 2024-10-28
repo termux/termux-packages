@@ -1238,6 +1238,54 @@ TERMUX_ENV__S_TERMUX_CORE__TESTS="${TERMUX_ENV__S_ROOT}${TERMUX_ENV__SS_TERMUX_C
 
 
 
+##
+# Termux environment variables `termux-exec` sub scope.
+#
+# **Do not modify this!** This is considered a constant `termux-exec`
+# sub scope for Termux execution environment that's used by external
+# programs that do not use the termux packages building infrastructure
+# and rely on `$TERMUX_ENV__S_ROOT` environment variable exported by
+# Termux app containing the root scope to generate the value for
+# `$TERMUX_ENV__S_TERMUX_EXEC` and variable names under it.**
+#
+# Default value: `EXEC__`
+##
+TERMUX_ENV__SS_TERMUX_EXEC="EXEC__"
+
+##
+# Termux environment variables `termux-exec` scope.
+#
+# **Do not modify this!**
+#
+# Default value: `TERMUX_EXEC__`
+##
+TERMUX_ENV__S_TERMUX_EXEC="${TERMUX_ENV__S_ROOT}${TERMUX_ENV__SS_TERMUX_EXEC}"
+
+
+##
+# Termux environment variables `termux-exec-tests` sub scope.
+#
+# **Do not modify this!** This is considered a constant
+# `termux-exec-tests` sub scope for Termux execution environment
+#  that's used by `termux-exec` package to generate the value for
+# `$TERMUX_ENV__S_TERMUX_EXEC__TESTS` and variable names under it.**
+#
+# Default value: `TERMUX_EXEC__TESTS__`
+##
+TERMUX_ENV__SS_TERMUX_EXEC__TESTS="EXEC__TESTS__"
+
+##
+# Termux environment variables `termux-exec-tests` scope.
+#
+# **Do not modify this!**
+#
+# Default value: `TERMUX_EXEC__TESTS__`
+##
+TERMUX_ENV__S_TERMUX_EXEC__TESTS="${TERMUX_ENV__S_ROOT}${TERMUX_ENV__SS_TERMUX_EXEC__TESTS}"
+
+
+
+##
 # Termux environment variables `termux-am-socket` sub scope.
 #
 # **Do not modify this!** This is considered a constant `termux-am-socket`

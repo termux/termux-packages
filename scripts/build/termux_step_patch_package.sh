@@ -30,6 +30,7 @@ termux_step_patch_package() {
 			-e "s%\@TERMUX_ENV__S_TERMUX_APP\@%${TERMUX_ENV__S_TERMUX_APP}%g" \
 			-e "s%\@TERMUX_ENV__S_TERMUX_API_APP\@%${TERMUX_ENV__S_TERMUX_API_APP}%g" \
 			-e "s%\@TERMUX_ENV__S_TERMUX_ROOTFS\@%${TERMUX_ENV__S_TERMUX_ROOTFS}%g" \
+			-e "s%\@TERMUX_ENV__S_TERMUX_EXEC\@%${TERMUX_ENV__S_TERMUX_EXEC}%g" \
 			"$patch" | patch --silent -p1
 	done
 	shopt -u nullglob
