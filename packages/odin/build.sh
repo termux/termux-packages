@@ -5,7 +5,8 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2024.10
 TERMUX_PKG_SRCURL=https://github.com/odin-lang/Odin/archive/refs/tags/dev-${TERMUX_PKG_VERSION//./-}.tar.gz
 TERMUX_PKG_SHA256=00e7a033129006fb339b5514955dc0d7fafa712919db9f32e1a6d5bededb8a19
-TERMUX_PKG_DEPENDS="clang, libllvm"
+TERMUX_PKG_DEPENDS="libllvm"
+TERMUX_PKG_BUILD_DEPENDS="clang"
 
 
 # ```
