@@ -1,36 +1,4 @@
-diff -uNr Hilbish-2.1.2/Taskfile.yaml Hilbish-2.1.2.mod/Taskfile.yaml
---- Hilbish-2.1.2/Taskfile.yaml	2023-04-11 00:31:32.000000000 +0800
-+++ Hilbish-2.1.2.mod/Taskfile.yaml	2023-08-16 13:36:43.673694676 +0800
-@@ -3,7 +3,7 @@
- version: '3'
- 
- vars:
--  PREFIX: '{{default "/usr/local" .PREFIX}}'
-+  PREFIX: '{{default "@TERMUX_PREFIX@" .PREFIX}}'
-   bindir__: '{{.PREFIX}}/bin'
-   BINDIR: '{{default .bindir__ .BINDIR}}'
-   libdir__: '{{.PREFIX}}/share/hilbish'
-@@ -16,7 +16,7 @@
-     cmds:
-       - CGO_ENABLED=0 go build {{.GOFLAGS}}
-     vars:
--      GOFLAGS: '-ldflags "-s -w -X main.dataDir={{.LIBDIR}} -X main.gitCommit=$(git rev-parse --short HEAD) -X main.gitBranch=$(git rev-parse --abbrev-ref HEAD)"'
-+      GOFLAGS: '-ldflags "-s -w -X main.dataDir={{.LIBDIR}} -X main.gitCommit=$(git ls-remote https://github.com/rosettea/hilbish refs/tags/vrvalue) -X main.gitBranch=rvalue"'
- 
-   build:
-     cmds:
-@@ -27,7 +27,7 @@
-       - install -v -d "{{.DESTDIR}}{{.BINDIR}}/" && install -m 0755 -v hilbish "{{.DESTDIR}}{{.BINDIR}}/hilbish"
-       - mkdir -p "{{.DESTDIR}}{{.LIBDIR}}"
-       - cp -r libs docs emmyLuaDocs nature .hilbishrc.lua {{.DESTDIR}}{{.LIBDIR}}
--      - grep -qxF "{{.DESTDIR}}{{.BINDIR}}/hilbish" /etc/shells || echo "{{.DESTDIR}}{{.BINDIR}}/hilbish" >> /etc/shells
-+      - grep -qxF "{{.DESTDIR}}{{.BINDIR}}/hilbish" @TERMUX_PREFIX@/etc/shells || echo "{{.DESTDIR}}{{.BINDIR}}/hilbish" >> @TERMUX_PREFIX@/etc/shells
- 
-   uninstall:
-     cmds:
-diff -uNr Hilbish-2.1.2/vars_linux.go Hilbish-2.1.2.mod/vars_linux.go
---- Hilbish-2.1.2/vars_linux.go	2023-04-11 00:31:32.000000000 +0800
-+++ Hilbish-2.1.2.mod/vars_linux.go	2023-08-16 13:37:25.913694660 +0800
++++ ./vars_unix.go
 @@ -14,7 +14,7 @@
  	.. hilbish.userDir.config	.. '/hilbish/?/init.lua;'
  	.. hilbish.userDir.config	.. '/hilbish/?/?.lua;'
