@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Qt component to allow applications to make use of the Wa
 TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.2.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.kde.org/stable/plasma/${TERMUX_PKG_VERSION}/layer-shell-qt-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=07e6b5b1b3a543b6ac386beabb05e1f0fe0d4d34a720fb9a9b62bcf42640575a
 TERMUX_PKG_AUTO_UPDATE=true
@@ -10,4 +11,6 @@ TERMUX_PKG_DEPENDS="libc++, qt6-qtbase, qt6-qtdeclarative, qt6-qtwayland, libway
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules, libwayland-cross-scanner, libwayland-protocols"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCMAKE_SYSTEM_NAME=Linux
+-DKDE_INSTALL_QMLDIR=lib/qt6/qml
+-DKDE_INSTALL_QTPLUGINDIR=lib/qt6/plugins
 "
