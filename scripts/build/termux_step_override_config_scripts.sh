@@ -9,24 +9,31 @@ termux_step_override_config_scripts() {
 	# libprotobuf into $TERMUX_PREFIX first, then building libprotozero, which will attempt
 	# to run the binary /data/data/com.termux/files/usr/bin/protoc which cannot be replaced
 	# by any other method than deleting it because protoc is not preinstalled in the build host.
+	# just deleting the files is also not a completely successful option because the package
+	# ragel depends on the package colm, and ragel's build attempts to detect the colm binary,
+	# for ragel, one of the root causes is probably something about its current configure.diff patch,
+	# since that patch causes ragel to still attempt to detect the colm binary but just not run it,
+	# but it's enough that there is one package to tell me that the binaries cannot just be
+	# deleted and must always be symlinked to something to produce a working outcome most reliably.
+	# and will fail if the binary has simply been deleted.
 	# Therefore, this symlinks if applicable, but if there is no host binary available
-	# to symlink to, the binary is deleted.
+	# to symlink to, the binary is stubbed.
 	handle_incompatible_binary() {
 		host_binary="$1"
 		prefix_binary="$2"
-		# if file in $TERMUX_PREFIX/bin is, or links to, a binary program
-		if ! file $(readlink -f $prefix_binary) | grep text >/dev/null; then
-			if [ -f $host_binary ]; then
-				# host binary exists, so symlink to it
-				if [ "$(readlink -f $host_binary)" != "$(readlink -f $prefix_binary)" ]; then
-					echo "handle_incompatible_binary: linking $prefix_binary to $host_binary"
-					ln -sf $host_binary $prefix_binary
-				fi
-			elif [ ! -d $prefix_binary ]; then
-				# host equivalent binary does not exist, so delete the file
-				echo "handle_incompatible_binary: deleting $prefix_binary"
-				rm -f $prefix_binary
-			fi
+
+		# if host binary does not exist, use /bin/true to stub.
+		if [ ! -f $host_binary ]; then
+			host_binary=/bin/true
+		fi
+
+		# if file in $TERMUX_PREFIX/bin is, or links to, a binary program,
+		# and the host binary and prefix binary do not currently link to the same file,
+		# then symlink the prefix binary to the host binary.
+		if [ ! -d $prefix_binary ] && ! file $(readlink -f $prefix_binary) | grep text >/dev/null \
+		&& [ "$(readlink -f $host_binary)" != "$(readlink -f $prefix_binary)" ]; then
+			echo "handle_incompatible_binary: linking $prefix_binary to $host_binary"
+			ln -sf $host_binary $prefix_binary
 		fi
 	}
 	export -f handle_incompatible_binary
