@@ -16,6 +16,8 @@ TERMUX_PKG_BUILD_DEPENDS="clang"
 # ```
 TERMUX_PKG_BLACKLISTED_ARCHES="arm"
 
+
+# Logic is borrowed from build_odin.sh (https://github.com/odin-lang/Odin/blob/master/build_odin.sh)
 termux_step_pre_configure() {
 	CPPFLAGS="$CPPFLAGS -DODIN_VERSION_RAW=\"dev-${TERMUX_PKG_VERSION//./-}\""
 	if [ "$TERMUX_PKG_API_LEVEL" -lt 28 ]; then
