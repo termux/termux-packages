@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://plutolang.github.io/
 TERMUX_PKG_DESCRIPTION="Shared library for the Pluto interpreter"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Komo @cattokomo"
-TERMUX_PKG_VERSION="0.9.5"
+TERMUX_PKG_VERSION="0.10.0"
 TERMUX_PKG_SRCURL=https://github.com/PlutoLang/Pluto/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=31e223267e302c9b90425f39ada421b63706ee48ab00ec710ad883f05bfe57e1
+TERMUX_PKG_SHA256=1656c28b9b78b88626eaba035103b8c5486e0e5b425430c01d26546d87b24309
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_BUILD_DEPENDS="readline"
@@ -16,7 +16,7 @@ termux_step_configure() {
 	# can't use php version from termux repo, there's no build for the latest version on the pre-built binaries
 	local php_version="8.3.9"
 	local tarball_checksum="6c7b45dabc362c9c447c6c9688f8922d0cfa3d5c4618d632c504342d37085e2f"
-	
+
 	mkdir -p "${TERMUX_PKG_CACHEDIR}/php"
 	termux_download "https://dl.static-php.dev/static-php-cli/common/php-${php_version}-cli-linux-x86_64.tar.gz" \
 		"${TERMUX_PKG_CACHEDIR}/php.tar.gz" \
