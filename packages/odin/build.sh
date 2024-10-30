@@ -40,7 +40,13 @@ termux_step_pre_configure() {
 	LDFLAGS="$LDFLAGS -ldl $($LLVM_CONFIG --libs core native --system-libs --libfiles)"
 	LDFLAGS="$LDFLAGS -Wl,-rpath=\$ORIGIN"
 
-	EXTRAFLAGS="-O3 -mcpu=native"
+	if [ "$OS_ARCH" = "arm64" ] || [ "$OS_ARCH" = "aarch64" ]; then
+		# Use preferred flag for Arm (ie arm64 / aarch64 / etc)
+		EXTRAFLAGS="-O3 -mcpu=native"
+	else
+		# Use preferred flag for x86 / amd64
+		EXTRAFLAGS="-O3 -march=native"
+	fi
 }
 
 termux_step_make() {
