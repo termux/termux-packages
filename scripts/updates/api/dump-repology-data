@@ -24,16 +24,17 @@
 
 
 from requests import get as requests_get
+from time import sleep as sleep
 
 
 def get_repology_data(last_project, project):
     url = f"https://repology.org/api/v1"
     if project != "":
-        url = f"{url}/projects/{project}?inrepo=termux&outdated=1"
+        url = f"{url}/projects/{project}/?inrepo=termux&outdated=1"
     else:
-        url = f"{url}/projects/{last_project}?inrepo=termux&outdated=1&families_newest=2-"
+        url = f"{url}/projects/{last_project}{'/' if last_project != '' else ''}?inrepo=termux&outdated=1&families_newest=2-"
 
-    repology_data = requests_get(url, timeout=60).json()
+    repology_data = requests_get(url, timeout=60, headers={'User-Agent': 'Termux update checker 1.0 (github.com/termux/termux-packages)'}).json()
     # NOTE: We are using `families_newest=2-` so that api will return a
     # package as outdated if it is so in 2 or more
     # repo family. This helps us avoid false positives.
@@ -48,6 +49,8 @@ def get_outdated_packages(project):
     last_project = ""
 
     while True:
+        # sleep to ensure we do not flood repology with requests
+        sleep(1)
         repology_data = get_repology_data(last_project, project)
         project = "" # clear to not loop again
         last_project = sorted(repology_data.keys())[
