@@ -339,3 +339,17 @@ echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US:en"\n' | $SUDO tee -a /etc/default/
 $SUDO mkdir -p $TERMUX_PREFIX
 $SUDO chown -R $(whoami) /data
 $SUDO ln -sf /data/data/com.termux/files/usr/opt/bionic-host /system
+
+# Install newer pkg-config then what ubuntu provides, as the stock
+# ubuntu version has performance problems with at least protobuf:
+PKGCONF_VERSION=2.3.0
+mkdir -p /tmp/pkgconf-build
+cd /tmp/pkgconf-build
+curl -O https://distfiles.ariadne.space/pkgconf/pkgconf-${PKGCONF_VERSION}.tar.xz
+tar xf pkgconf-${PKGCONF_VERSION}.tar.xz
+cd pkgconf-${PKGCONF_VERSION}
+./configure --prefix=/usr && make && $SUDO make install
+cd -
+rm -Rf /tmp/pkgconf-build
+# Prevent package from being upgraded and overwriting our manual installation:
+$SUDO apt-mark hold pkgconf
