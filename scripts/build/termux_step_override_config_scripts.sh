@@ -22,6 +22,23 @@ termux_step_override_config_scripts() {
 		host_binary="$1"
 		prefix_binary="$2"
 
+		# Binaries in this list need to be deleted.
+		# libduckdb and libtd will attempt to use ccache if it is present in $TERMUX_PREFIX/bin
+		# and print variants of "/bin/sh: 1: ccache: not found".
+		# ccache could be a good example for the limitations of this technique on certain edge cases
+		# as opposed to other solutions like deleting everything from the prefix in between every build
+		# and repopulating it by installing only the build dependency packages,
+		# which could be more resilient to occasional edge cases.
+		deletelist=("ccache")
+
+		for binary_to_delete in "${deletelist[@]}"; do
+			if grep -q "$binary_to_delete" <<< "$prefix_binary"; then
+				echo "handle_incompatible_binary: deleting $prefix_binary"
+				rm -f $prefix_binary
+				return
+			fi
+		done
+
 		# if host binary does not exist, use /bin/true to stub.
 		if [ ! -f $host_binary ]; then
 			host_binary=/bin/true
@@ -37,7 +54,18 @@ termux_step_override_config_scripts() {
 		fi
 	}
 	export -f handle_incompatible_binary
-	find $TERMUX_PREFIX/bin/ -executable -exec bash -c 'handle_incompatible_binary /usr/bin/$(basename {}) {}' \;
+
+	# Execute a single subshell that runs the function handle_incompatible_binary in a loop,
+	# avoiding the use of the -exec argument to find because it was very slow for me due to
+	# the excessive subshells. this still continues to get slower the more files are in
+	# $TERMUX_PREFIX/bin, but not as much.
+	(
+	while IFS= read -r -d '' prefix_binary; do
+		host_binary="/usr/bin/$(basename "$prefix_binary")"
+		handle_incompatible_binary "$host_binary" "$prefix_binary"
+	done < <(find "$TERMUX_PREFIX/bin" -type f -executable -print0)
+	)
+
 	unset handle_incompatible_binary
 	# from one perspective, the above block could be considered an expansion of the same logic
 	# behind the line below this, but for everything in the usr/bin folder instead of only bin/sh
