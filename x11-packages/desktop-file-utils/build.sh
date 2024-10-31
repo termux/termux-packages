@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.freedesktop.org/wiki/Software/desktop-file-utils
 TERMUX_PKG_DESCRIPTION="Command line utilities for working with desktop entries"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.27"
+TERMUX_PKG_VERSION="0.28"
 TERMUX_PKG_SRCURL=https://www.freedesktop.org/software/desktop-file-utils/releases/desktop-file-utils-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=a0817df39ce385b6621880407c56f1f298168c040c2032cedf88d5b76affe836
+TERMUX_PKG_SHA256=4401d4e231d842c2de8242395a74a395ca468cd96f5f610d822df33594898a70
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="glib"
 
