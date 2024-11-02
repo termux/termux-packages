@@ -174,7 +174,7 @@ termux_step_massage() {
 	fi
 
 	# Check so that package is not affected by
-	# https://github.com/android/ndk/issues/1614, or
+	# https://github.com/android/ndk/issues/1614
 	# https://github.com/termux/termux-packages/issues/9944
 	if [[ "${TERMUX_PACKAGE_LIBRARY}" == "bionic" ]]; then
 		echo "INFO: READELF=${READELF} ... $(command -v ${READELF})"
@@ -215,22 +215,29 @@ termux_step_massage() {
 		local valid=$(echo "${files}" | xargs -P"${nproc}" -i bash -c 'if ${READELF} -h "{}" &>/dev/null; then echo "{}"; fi')
 		local t1=$(get_epoch)
 		echo "INFO: Done ... $((t1-t0))s"
-		local numberOfFiles=$(echo "${files}" | wc -l)
-		local numberOfValid=$(echo "${valid}" | wc -l)
-		echo "INFO: Found ${numberOfValid} / ${numberOfFiles} files"
+		local numberOfFiles=0
+		local numberOfValid=0
+		[[ -n "${files}" ]] && numberOfFiles=$(echo "${files}" | wc -l)
+		[[ -n "${valid}" ]] && numberOfValid=$(echo "${valid}" | wc -l)
+		echo "INFO: Found ${numberOfValid} ELF files / ${numberOfFiles} total files"
 		if [[ "${numberOfValid}" -gt "${numberOfFiles}" ]]; then
 			termux_error_exit "${numberOfValid} > ${numberOfFiles}"
 		fi
 
-		echo "INFO: Running symbol checks on ${numberOfValid} files with nproc=${nproc}"
-		local t0=$(get_epoch)
-		local undef=$(echo "${valid}" | xargs -P"${nproc}" -i sh -c '${READELF} -s "{}" | grep -Ef "${pattern_file_undef}"')
-		local openmp=$(echo "${valid}" | xargs -P"${nproc}" -i sh -c '${READELF} -s "{}" | grep -Ef "${pattern_file_openmp}"')
-		local depend_libomp_so=$(echo "${valid}" | xargs -P$(nproc) -n1 ${READELF} -d 2>/dev/null | sed -ne "s|.*NEEDED.*\[\(.*\)\].*|\1|p" | grep libomp.so)
-		local t1=$(get_epoch)
-		echo "INFO: Done ... $((t1-t0))s"
+		local undef=""
+		local openmp=""
+		local depend_libomp_so=""
+		if [[ "${numberOfValid}" != 0 ]]; then
+			echo "INFO: Running symbol checks on ${numberOfValid} ELF files with nproc=${nproc}"
+			local t0=$(get_epoch)
+			local undef=$(echo "${valid}" | xargs -P"${nproc}" -i sh -c '${READELF} -s "{}" | grep -Ef "${pattern_file_undef}"')
+			local openmp=$(echo "${valid}" | xargs -P"${nproc}" -i sh -c '${READELF} -s "{}" | grep -Ef "${pattern_file_openmp}"')
+			local depend_libomp_so=$(echo "${valid}" | xargs -P$(nproc) -n1 ${READELF} -d 2>/dev/null | sed -ne "s|.*NEEDED.*\[\(.*\)\].*|\1|p" | grep libomp.so)
+			local t1=$(get_epoch)
+			echo "INFO: Done ... $((t1-t0))s"
+		fi
 
-		[[ -n "${undef}" ]] && echo "INFO: Found files with undefined symbols"
+		[[ -n "${undef}" ]] && echo "INFO: Found ELF files with undefined symbols"
 		if [[ "${TERMUX_PKG_UNDEF_SYMBOLS_FILES}" == "all" ]]; then
 			echo "INFO: Skipping output result as TERMUX_PKG_UNDEF_SYMBOLS_FILES=all"
 			undef=""
@@ -239,33 +246,33 @@ termux_step_massage() {
 		if [[ -n "${undef}" ]]; then
 			echo "INFO: Showing result"
 			local t0=$(get_epoch)
-			# e: bit0 valid file, bit1 error handling
-			local e=0
-			local c=0
+			# error: bit0 valid file, bit1 error handling
+			local error=0
+			local count=0
 			local valid_s=$(echo "${valid}" | sort)
 			local f excluded_f
 			while IFS= read -r f; do
 				# exclude object, static files
 				case "${f}" in
-				*.a) (( e &= ~1 )) || : ;;
-				*.dll) (( e &= ~1 )) || : ;;
-				*.o) (( e &= ~1 )) || : ;;
-				*.obj) (( e &= ~1 )) || : ;;
-				*.rlib) (( e &= ~1 )) || : ;;
-				*.syso) (( e &= ~1 )) || : ;;
-				*) (( e |= 1 )) || : ;;
+				*.a) (( error &= ~1 )) || : ;;
+				*.dll) (( error &= ~1 )) || : ;;
+				*.o) (( error &= ~1 )) || : ;;
+				*.obj) (( error &= ~1 )) || : ;;
+				*.rlib) (( error &= ~1 )) || : ;;
+				*.syso) (( error &= ~1 )) || : ;;
+				*) (( error |= 1 )) || : ;;
 				esac
 				while IFS= read -r excluded_f; do
-					[[ "${f}" == ${excluded_f} ]] && (( e &= ~1 )) && break
+					[[ "${f}" == ${excluded_f} ]] && (( error &= ~1 )) && break
 				done < <(echo "${TERMUX_PKG_UNDEF_SYMBOLS_FILES}")
-				[[ "${TERMUX_PKG_UNDEF_SYMBOLS_FILES}" == "error" ]] && (( e |= 1 )) || :
-				[[ $(( e & 1 )) == 0 ]] && echo "SKIP: ${f}" && continue
+				[[ "${TERMUX_PKG_UNDEF_SYMBOLS_FILES}" == "error" ]] && (( error |= 1 )) || :
+				[[ $(( error & 1 )) == 0 ]] && echo "SKIP: ${f}" && continue
 				local undef_sym=$(${READELF} -s "${f}" | grep -Ef "${pattern_file_undef}")
 				if [[ -n "${undef_sym}" ]]; then
-					((c++)) || :
-					if [[ $(( e & 1 )) != 0 ]]; then
+					((count++)) || :
+					if [[ $(( error & 1 )) != 0 ]]; then
 						echo -e "ERROR: ${f} contains undefined symbols:\n${undef_sym}" >&2
-						(( e |= 2 )) || :
+						(( error |= 2 )) || :
 					else
 						local undef_symu=$(echo "${undef_sym}" | awk '{ print $8 }' | sort | uniq)
 						local undef_symu_len=$(echo ${undef_symu} | wc -w)
@@ -275,45 +282,45 @@ termux_step_massage() {
 			done < <(echo "${valid_s}")
 			local t1=$(get_epoch)
 			echo "INFO: Done ... $((t1-t0))s"
-			echo "INFO: Found ${c} files with undefined symbols after exclusion"
-			[[ "${c}" -gt "${numberOfValid}" ]] && termux_error_exit "${c} > ${numberOfValid}"
-			[[ $(( e & 2 )) != 0 ]] && termux_error_exit "Refer above"
+			echo "INFO: Found ${count} ELF files with undefined symbols after exclusion"
+			[[ "${count}" -gt "${numberOfValid}" ]] && termux_error_exit "${count} > ${numberOfValid}"
+			[[ $(( error & 2 )) != 0 ]] && termux_error_exit "Refer above"
 		fi
 
 		if [[ -n "${openmp}" ]]; then
-			echo "INFO: Found files with OpenMP symbols"
+			echo "INFO: Found ELF files with OpenMP symbols"
 			echo "INFO: Showing result"
 			local t0=$(get_epoch)
-			# e: bit0 valid file, bit1 error handling
-			local e=0
-			local c=0
+			# error: bit0 valid file, bit1 error handling
+			local error=0
+			local count=0
 			local valid_s=$(echo "${valid}" | sort)
 			local f
 			while IFS= read -r f; do
 				# exclude object, static files
 				case "${f}" in
-				*.a) (( e &= ~1 )) || : ;;
-				*.dll) (( e &= ~1 )) || : ;;
-				*.o) (( e &= ~1 )) || : ;;
-				*.obj) (( e &= ~1 )) || : ;;
-				*.rlib) (( e &= ~1 )) || : ;;
-				*.syso) (( e &= ~1 )) || : ;;
-				*) (( e |= 1 )) || : ;;
+				*.a) (( error &= ~1 )) || : ;;
+				*.dll) (( error &= ~1 )) || : ;;
+				*.o) (( error &= ~1 )) || : ;;
+				*.obj) (( error &= ~1 )) || : ;;
+				*.rlib) (( error &= ~1 )) || : ;;
+				*.syso) (( error &= ~1 )) || : ;;
+				*) (( error |= 1 )) || : ;;
 				esac
-				[[ $(( e & 1 )) == 0 ]] && echo "SKIP: ${f}" && continue
+				[[ $(( error & 1 )) == 0 ]] && echo "SKIP: ${f}" && continue
 				local openmp_sym=$(${READELF} -s "${f}" | grep -Ef "${pattern_file_openmp}")
 				if [[ -n "${openmp_sym}" ]]; then
-					((c++)) || :
+					((count++)) || :
 					echo -e "INFO: ${f} contains OpenMP symbols: $(echo "${openmp_sym}" | wc -l)" >&2
 				fi
 			done < <(echo "${valid_s}")
 			local t1=$(get_epoch)
 			echo "INFO: Done ... $((t1-t0))s"
-			echo "INFO: Found ${c} files with OpenMP symbols after exclusion"
-			[[ "${c}" -gt "${numberOfValid}" ]] && termux_error_exit "${c} > ${numberOfValid}"
+			echo "INFO: Found ${count} ELF files with OpenMP symbols after exclusion"
+			[[ "${count}" -gt "${numberOfValid}" ]] && termux_error_exit "${count} > ${numberOfValid}"
 		fi
 		if [[ -n "${depend_libomp_so}" && "${TERMUX_PKG_NO_OPENMP_CHECK}" != "true" ]]; then
-			echo "ERROR: Found files depend on libomp.so" >&2
+			echo "ERROR: Found ELF files depend on libomp.so" >&2
 			echo "ERROR: Showing result" >&2
 			local t0=$(get_epoch)
 			local valid_s=$(echo "${valid}" | sort)
@@ -331,6 +338,31 @@ termux_step_massage() {
 
 		rm -f "${pattern_file_undef}" "${pattern_file_openmp}"
 		unset pattern_file_undef pattern_file_openmp
+
+		local platform_independent=$(grep '^TERMUX_PKG_PLATFORM_INDEPENDENT=' -nH ${TERMUX_PKG_BUILDER_DIR}/build.sh)
+		local platform_independent_explicit=$(echo "${platform_independent}" | cut -d"=" -f2)
+		local subpackage_platform_independent=$(grep '^TERMUX_SUBPKG_PLATFORM_INDEPENDENT=' -nH ${TERMUX_PKG_BUILDER_DIR}/*.subpackage.sh 2>/dev/null)
+		local subpackage_platform_independent_explicit=$(echo "${subpackage_platform_independent}" | cut -d"=" -f2 | sort | uniq | tail -n1) # prefer true
+		local error=0
+		# always add case 0 first then case * for new cases
+		case "${TERMUX_PKG_PLATFORM_INDEPENDENT}:${platform_independent_explicit}:${subpackage_platform_independent_explicit}:${numberOfValid}" in
+		false:::0) error=1 ;;
+		false:::*) ;;
+		false::true:0) error=1 ;;
+		false::true:*) ;;
+		false:false::0) ;; # override
+		false:false::*) ;;
+		true:true::0) ;;
+		true:true::*) ;; # override
+		true:true:true:0) ;; # override
+		true:true:true:*) error=1 ;;
+		*)
+			termux_error_exit "new unhandled case: ${TERMUX_PKG_PLATFORM_INDEPENDENT}:${platform_independent_explicit}:${subpackage_platform_independent_explicit}:${numberOfValid}"
+			;;
+		esac
+		if [[ "${error}" == 1 ]]; then
+			termux_error_exit "${TERMUX_PKG_PLATFORM_INDEPENDENT}:${platform_independent_explicit}:${subpackage_platform_independent_explicit}:${numberOfValid}\nPlease check TERMUX_*PKG_PLATFORM_INDEPENDENT varible in build.sh and/or *.subpackage.sh"
+		fi
 	fi
 
 	if [ "$TERMUX_PACKAGE_FORMAT" = "debian" ]; then
