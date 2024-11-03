@@ -114,7 +114,7 @@ END
 termux_step_make() {
 	# XXX: Try max 10 times
 	for t in $(seq 1 10); do
-		if $(./mach build --keep-going); then
+		if ./mach build --keep-going; then
 			break
 		else
 			if [ "$t" = "10" ]; then
