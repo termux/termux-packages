@@ -1,7 +1,7 @@
 diff -u -r ../inetutils-1.9.3/libinetutils/if_index.c ./libinetutils/if_index.c
 --- ../inetutils-1.9.3/libinetutils/if_index.c	2015-03-31 11:40:48.000000000 -0400
 +++ ./libinetutils/if_index.c	2015-05-12 15:32:45.660145151 -0400
-@@ -37,10 +37,22 @@
+@@ -36,10 +36,22 @@
  #include <net/if.h>
  
  #ifndef HAVE_STRUCT_IF_NAMEINDEX
@@ -21,10 +21,10 @@ diff -u -r ../inetutils-1.9.3/libinetutils/if_index.c ./libinetutils/if_index.c
 +#ifdef __ANDROID__
 +  return result;
 +#else
- #ifdef SIOCGIFINDEX
+ # ifdef SIOCGIFINDEX
    {
      int fd = socket (AF_INET, SOCK_DGRAM, 0);
-@@ -75,11 +87,13 @@
+@@ -74,11 +86,13 @@
        }
      return result;
    }
@@ -39,19 +39,19 @@ diff -u -r ../inetutils-1.9.3/libinetutils/if_index.c ./libinetutils/if_index.c
    if (!ifn)
      return;
 @@ -88,6 +102,7 @@
-       free (ptr->if_name);
        ++ptr;
      }
-+#endif
    free (ifn);
++#endif
  }
  
-@@ -162,7 +177,7 @@
+ struct if_nameindex *
+@@ -161,7 +176,7 @@
  	  return NULL;
  	}
  
--# if defined SIOCGIFINDEX
-+# if defined SIOCGIFINDEX && !defined(__ANDROID__)
+-#  if defined SIOCGIFINDEX
++#  if defined SIOCGIFINDEX && !defined(__ANDROID__)
        if (ioctl (fd, SIOCGIFINDEX, cur) >= 0)
  	idx[i].if_index = cur->ifr_index;
        else
