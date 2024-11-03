@@ -2,12 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://openjdk.java.net
 TERMUX_PKG_DESCRIPTION="Java development kit and runtime"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=21.0.5
+TERMUX_PKG_VERSION="21.0.5"
 TERMUX_PKG_SRCURL=https://github.com/openjdk/jdk21u/archive/refs/tags/jdk-${TERMUX_PKG_VERSION}-ga.tar.gz
 TERMUX_PKG_SHA256=1dcf54fe0d4263a0fb95290a77dac9e4ff81761ed234daadfbab781f1779bf0b
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
-TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
 TERMUX_PKG_DEPENDS="libandroid-shmem, libandroid-spawn, libiconv, libjpeg-turbo, zlib, littlecms"
 TERMUX_PKG_BUILD_DEPENDS="cups, fontconfig, libxrandr, libxt, xorgproto"
 # openjdk-21-x is recommended because X11 separation is still very experimental.
@@ -19,6 +17,41 @@ TERMUX_PKG_HAS_DEBUG=false
 # while these features is not supported on arm.
 # only leave lto here.
 __jvm_features="link-time-opt"
+
+termux_pkg_auto_update() {
+	# based on `termux_github_api_get_tag.sh`
+	# fetch latest tags
+	local latest_tags="$(curl -d "$(cat <<-EOF | tr '\n' ' '
+	{
+		"query": "query {
+			repository(owner: \"openjdk\", name: \"jdk21u\") {
+				refs(refPrefix: \"refs/tags/\", first: 20, orderBy: {
+					field: TAG_COMMIT_DATE, direction: DESC
+				})
+				{ edges { node { name } } }
+			}
+		}"
+	}
+	EOF
+	)" \
+		-H "Authorization: token ${GITHUB_TOKEN}" \
+		-H "Accept: application/vnd.github.v3+json" \
+		--silent \
+		--location \
+		--retry 10 \
+		--retry-delay 1 \
+		https://api.github.com/graphql \
+		| jq '.data.repository.refs.edges[].node.name')"
+	# filter only tags having "-ga" and extract only raw version.
+	local latest_tag="$(echo "$latest_tags" \
+		| grep -P "\d+\.\d+\.\d+-ga" \
+		| grep -oP "\d+\.\d+\.\d+")"
+	# we need only one result from the top.
+	latest_tag="$(echo "$latest_tag" | head -n 1)"
+
+	[[ -z "${latest_tag}" ]] && termux_error_exit "ERROR: Unable to get tag from ${TERMUX_PKG_SRCURL}"
+	termux_pkg_upgrade_version "${latest_tag}"
+}
 
 termux_step_pre_configure() {
 	unset JAVA_HOME
