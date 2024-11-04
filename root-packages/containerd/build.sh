@@ -9,7 +9,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 #
 # Above error is fixed by too_long_path.patch
 TERMUX_PKG_VERSION=1.6.21
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=git+https://github.com/containerd/containerd
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="runc"
