@@ -197,12 +197,13 @@ jobs:
 
         if [ ${{ steps.build-info.outputs.docker-build }} == 'false' ]; then
           ./scripts/setup-ubuntu.sh
+          NDK= ANDROID_HOME= ./scripts/setup-android-sdk.sh
           sudo apt install ninja-build
           sudo apt purge -yq $(dpkg -l | grep '^ii' | awk '{ print $2 }' | grep -P '(aspnetcore|cabal-|dotnet-|ghc-|libmono|mongodb-|mysql-|php)') \
             firefox google-chrome-stable microsoft-edge-stable mono-devel mono-runtime-common monodoc-manual ruby
           sudo apt autoremove -yq
           sudo apt clean
-          sudo rm -fr /opt/ghc /opt/hostedtoolcache /usr/lib/node_modules /usr/local/share/boost /usr/share/dotnet /usr/share/swift
+          sudo rm -fr /opt/ghc /opt/hostedtoolcache /usr/lib/node_modules /usr/local/share/boost /usr/share/dotnet /usr/share/swift /usr/local/lib/android
         fi
 
     - name: Build packages
@@ -216,7 +217,7 @@ jobs:
         done
 
         if [ ${{ steps.build-info.outputs.docker-build }} == 'false' ]; then
-          NDK=$ANDROID_NDK ANDROID_HOME=$ANDROID_SDK_ROOT ./build-package.sh -I -a ${{ matrix.target_arch }} $packages
+          NDK= ANDROID_HOME= ./build-package.sh -I -a ${{ matrix.target_arch }} $packages
         elif [ -n "$packages" ]; then
           ./scripts/run-docker.sh ./build-package.sh -I -a ${{ matrix.target_arch }} $packages
         fi
