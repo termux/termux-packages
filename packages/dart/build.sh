@@ -8,7 +8,6 @@ TERMUX_PKG_SRCURL=https://github.com/dart-lang/sdk/archive/refs/tags/${TERMUX_PK
 TERMUX_PKG_SHA256=c6bdf7591d3ba8d353dfaa0b10af58918610e65a1de9f3c9a644e7f3aecab16c
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 
 # Dart uses tar and gzip to extract downloaded packages.
 # Busybox-based versions of such utilities cause issues so
@@ -18,6 +17,7 @@ TERMUX_PKG_DEPENDS="gzip, tar"
 termux_pkg_auto_update() {
 	curl -fLSso VERSION https://storage.googleapis.com/dart-archive/channels/stable/release/latest/VERSION
 	local latest_version=$(jq -r .version VERSION)
+	rm -f VERSION
 	if [[ ${latest_version} = "null" ]]; then
 		echo "ERROR: Failed to get latest version."
 		exit 1
