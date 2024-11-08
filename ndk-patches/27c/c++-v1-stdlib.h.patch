@@ -1,0 +1,27 @@
+--- a/usr/include/c++/v1/stdlib.h	2024-11-08 20:01:18
++++ b/usr/include/c++/v1/stdlib.h	2024-11-08 20:03:38
+@@ -109,6 +109,7 @@
+ #    endif
+ 
+ // MSVCRT already has the correct prototype in <stdlib.h> if __cplusplus is defined
++#    if !defined(__swift__)
+ #    if !defined(_LIBCPP_MSVCRT)
+ _LIBCPP_NODISCARD_EXT inline _LIBCPP_HIDE_FROM_ABI long abs(long __x) _NOEXCEPT { return __builtin_labs(__x); }
+ _LIBCPP_NODISCARD_EXT inline _LIBCPP_HIDE_FROM_ABI long long abs(long long __x) _NOEXCEPT {
+@@ -127,6 +128,7 @@
+ _LIBCPP_NODISCARD_EXT inline _LIBCPP_HIDE_FROM_ABI long double abs(long double __lcpp_x) _NOEXCEPT {
+   return __builtin_fabsl(__lcpp_x);
+ }
++#    endif // !defined(__swift__)
+ 
+ // div
+ 
+@@ -141,7 +143,7 @@
+ #    endif
+ 
+ // MSVCRT already has the correct prototype in <stdlib.h> if __cplusplus is defined
+-#    if !defined(_LIBCPP_MSVCRT)
++#    if !defined(_LIBCPP_MSVCRT) && !defined(__swift__)
+ inline _LIBCPP_HIDE_FROM_ABI ldiv_t div(long __x, long __y) _NOEXCEPT { return ::ldiv(__x, __y); }
+ #      if !(defined(__FreeBSD__) && !defined(__LONG_LONG_SUPPORTED))
+ inline _LIBCPP_HIDE_FROM_ABI lldiv_t div(long long __x, long long __y) _NOEXCEPT { return ::lldiv(__x, __y); }
