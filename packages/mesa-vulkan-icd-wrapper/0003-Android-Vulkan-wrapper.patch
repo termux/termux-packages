@@ -1,0 +1,158 @@
+From fc392d32760bc8f705e2299f4a5f817cd0bb04a7 Mon Sep 17 00:00:00 2001
+From: xMeM <haooy@outlook.com>
+Date: Sat, 26 Oct 2024 19:19:39 +0800
+Subject: [PATCH 1/2] Android Vulkan wrapper
+
+Wrap the Android Vulkan loader into ICD, using common WSI to provide X11 platform surface support.
+
+Signed-off-by: xMeM <haooy@outlook.com>
+---
+ meson.build                            |  5 +++--
+ meson_options.txt                      |  2 +-
+ src/android_stub/nativewindow_stub.cpp |  7 +++++++
+ src/vulkan/meson.build                 |  5 ++++-
+ src/vulkan/wsi/wsi_common.c            | 26 ++++++++++++++++++++++----
+ src/vulkan/wsi/wsi_common.h            |  2 ++
+ 6 files changed, 39 insertions(+), 8 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index de9c9af53a1..b812f72e3b1 100644
+--- a/meson.build
++++ b/meson.build
+@@ -250,6 +250,7 @@ elif _vulkan_drivers.contains('all')
+                       'nouveau', 'asahi', 'gfxstream-experimental']
+ endif
+ 
++with_wrapper_vk = _vulkan_drivers.contains('wrapper')
+ with_intel_vk = _vulkan_drivers.contains('intel')
+ with_intel_hasvk = _vulkan_drivers.contains('intel_hasvk')
+ with_amd_vk = _vulkan_drivers.contains('amd')
+@@ -850,8 +851,8 @@ endif
+ pre_args += '-DGLAPI_EXPORT_PROTO_ENTRY_POINTS=@0@'.format(with_glapi_export_proto_entry_points.to_int())
+ 
+ with_android_stub = get_option('android-stub')
+-if with_android_stub and not with_platform_android
+-  error('`-D android-stub=true` makes no sense without `-D platforms=android`')
++if with_wrapper_vk
++  with_android_stub = true
+ endif
+ 
+ with_libbacktrace = get_option('android-libbacktrace') \
+diff --git a/meson_options.txt b/meson_options.txt
+index 79ee65e6094..95049229682 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -214,7 +214,7 @@ option(
+   choices : ['auto', 'amd', 'broadcom', 'freedreno', 'intel', 'intel_hasvk',
+              'panfrost', 'swrast', 'virtio', 'imagination-experimental',
+              'microsoft-experimental', 'nouveau', 'asahi',
+-             'gfxstream-experimental', 'all'],
++             'gfxstream-experimental', 'wrapper', 'all'],
+   description : 'List of vulkan drivers to build. If this is set to auto ' +
+                 'all drivers applicable to the target OS/architecture ' +
+                 'will be built'
+diff --git a/src/android_stub/nativewindow_stub.cpp b/src/android_stub/nativewindow_stub.cpp
+index 9276a9c3d2e..4bd0cfe25ab 100644
+--- a/src/android_stub/nativewindow_stub.cpp
++++ b/src/android_stub/nativewindow_stub.cpp
+@@ -43,6 +43,13 @@ AHardwareBuffer_getNativeHandle(const AHardwareBuffer *buffer)
+    return NULL;
+ }
+ 
++int
++AHardwareBuffer_sendHandleToUnixSocket(const AHardwareBuffer* buffer,
++                                       int socketFd)
++{
++   return 0;
++}
++
+ void
+ ANativeWindow_acquire(ANativeWindow *window)
+ {
+diff --git a/src/vulkan/meson.build b/src/vulkan/meson.build
+index b0bc67a8a4f..0b56cf00150 100644
+--- a/src/vulkan/meson.build
++++ b/src/vulkan/meson.build
+@@ -62,7 +62,7 @@ if with_xlib_lease
+   vulkan_wsi_deps += [dep_xlib_xrandr]
+   vulkan_wsi_list += '-DVK_USE_PLATFORM_XLIB_XRANDR_EXT'
+ endif
+-if with_platform_android
++if with_platform_android or with_wrapper_vk
+   vulkan_wsi_list += '-DVK_USE_PLATFORM_ANDROID_KHR'
+ endif
+ if with_platform_windows
+@@ -95,3 +95,6 @@ endif
+ if with_vulkan_screenshot_layer
+   subdir('screenshot-layer')
+ endif
++if with_wrapper_vk
++  subdir('wrapper')
++endif
+diff --git a/src/vulkan/wsi/wsi_common.c b/src/vulkan/wsi/wsi_common.c
+index 548bbc8c930..809f5726262 100644
+--- a/src/vulkan/wsi/wsi_common.c
++++ b/src/vulkan/wsi/wsi_common.c
+@@ -203,6 +203,8 @@ wsi_device_init(struct wsi_device *wsi,
+    WSI_GET_CB(GetPhysicalDeviceFormatProperties2);
+    WSI_GET_CB(GetPhysicalDeviceImageFormatProperties2);
+    WSI_GET_CB(GetSemaphoreFdKHR);
++   WSI_GET_CB(ImportSemaphoreFdKHR);
++   WSI_GET_CB(ImportFenceFdKHR);
+    WSI_GET_CB(ResetFences);
+    WSI_GET_CB(QueueSubmit);
+    WSI_GET_CB(WaitForFences);
+@@ -1178,8 +1180,16 @@ wsi_signal_semaphore_for_image(struct vk_device *device,
+                                const struct wsi_image *image,
+                                VkSemaphore _semaphore)
+ {
+-   if (device->physical->supported_sync_types == NULL)
+-      return VK_SUCCESS;
++   if (device->physical->supported_sync_types == NULL) {
++      const VkImportSemaphoreFdInfoKHR import_fd_info = {
++         .sType = VK_STRUCTURE_TYPE_IMPORT_SEMAPHORE_FD_INFO_KHR,
++         .semaphore = _semaphore,
++         .handleType = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_SYNC_FD_BIT,
++         .fd = -1,
++         .flags = VK_SEMAPHORE_IMPORT_TEMPORARY_BIT,
++      };
++      return chain->wsi->ImportSemaphoreFdKHR(chain->device, &import_fd_info);
++   }
+ 
+    VK_FROM_HANDLE(vk_semaphore, semaphore, _semaphore);
+ 
+@@ -1214,8 +1224,16 @@ wsi_signal_fence_for_image(struct vk_device *device,
+                            const struct wsi_image *image,
+                            VkFence _fence)
+ {
+-   if (device->physical->supported_sync_types == NULL)
+-      return VK_SUCCESS;
++   if (device->physical->supported_sync_types == NULL) {
++      const VkImportFenceFdInfoKHR import_fd_info = {
++         .sType = VK_STRUCTURE_TYPE_IMPORT_FENCE_FD_INFO_KHR,
++         .fence = _fence,
++         .handleType = VK_EXTERNAL_FENCE_HANDLE_TYPE_SYNC_FD_BIT,
++         .fd = -1,
++         .flags = VK_FENCE_IMPORT_TEMPORARY_BIT,
++      };
++      return chain->wsi->ImportFenceFdKHR(chain->device, &import_fd_info);
++   }
+ 
+    VK_FROM_HANDLE(vk_fence, fence, _fence);
+ 
+diff --git a/src/vulkan/wsi/wsi_common.h b/src/vulkan/wsi/wsi_common.h
+index fee70909b70..5fda2a7e45f 100644
+--- a/src/vulkan/wsi/wsi_common.h
++++ b/src/vulkan/wsi/wsi_common.h
+@@ -268,6 +268,8 @@ struct wsi_device {
+    WSI_CB(GetPhysicalDeviceFormatProperties2);
+    WSI_CB(GetPhysicalDeviceImageFormatProperties2);
+    WSI_CB(GetSemaphoreFdKHR);
++   WSI_CB(ImportSemaphoreFdKHR);
++   WSI_CB(ImportFenceFdKHR);
+    WSI_CB(ResetFences);
+    WSI_CB(QueueSubmit);
+    WSI_CB(WaitForFences);
+-- 
+2.47.1
+
