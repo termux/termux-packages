@@ -1,0 +1,28 @@
+From 78fbcab276ffdfd8525a00e320dff81ffcbae4ce Mon Sep 17 00:00:00 2001
+From: Matthew Flatt <mflatt@racket-lang.org>
+Date: Fri, 8 Nov 2024 10:29:00 -0700
+Subject: [PATCH] rktio: avoid `AI_V4MAPPED` on Android
+
+Although `AI_V4MAPPED` is `#define`d, using it trigger a "Invalid
+value for ai_flags" error.
+---
+ racket/src/rktio/rktio_network.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/racket/src/rktio/rktio_network.c b/racket/src/rktio/rktio_network.c
+index 2a1d6731fa3..c73fc32977f 100644
+--- a/src/rktio/rktio_network.c
++++ b/src/rktio/rktio_network.c
+@@ -727,10 +727,10 @@ rktio_addrinfo_lookup_t *rktio_start_addrinfo_lookup(rktio_t *rktio,
+   /* On modern systems, `AI_ADDRCONFIG` and `AI_V4MAPPED` tend to be
+      the defaults when `hints` is NULL, so add them if they seem
+      available. */
+-#ifdef AI_ADDRCONFIG
++#if defined(AI_ADDRCONFIG)
+   RKTIO_AS_ADDRINFO(hints)->ai_flags |= AI_ADDRCONFIG;
+ #endif
+-#ifdef AI_V4MAPPED
++#if defined(AI_V4MAPPED) && !defined(__ANDROID__)
+   RKTIO_AS_ADDRINFO(hints)->ai_flags |= AI_V4MAPPED;
+ #endif
+   if (tcp) {
