@@ -1,0 +1,17 @@
+--- a/cmake/FindICU.cmake
++++ b/cmake/FindICU.cmake
+@@ -42,12 +42,14 @@
+     # Check the libraries returned by pkg-config really exist.
+     unset(PC_LIBRARIES)
+     foreach(LIBRARY IN LISTS PC_ICU_${MOD_NAME}_LIBRARIES)
++      if (NOT ${LIBRARY} MATCHES "m")
+         unset(PC_LIBRARY CACHE)
+         find_library(PC_LIBRARY NAMES ${LIBRARY})
+         if(NOT PC_LIBRARY)
+             unset(PC_ICU_${MOD_NAME}_FOUND)
+         endif()
+         list(APPEND PC_LIBRARIES ${PC_LIBRARY})
++      endif()
+     endforeach()
+     unset(PC_LIBRARY CACHE)
+ 
