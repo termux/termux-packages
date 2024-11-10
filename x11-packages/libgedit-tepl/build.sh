@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Library that eases the development of GtkSourceView-base
 TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.11.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/libgedit-tepl/${TERMUX_PKG_VERSION%.*}/libgedit-tepl-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=30814663de8324acbbdce623ead4690ed75a9ff7c90023a04997d67e2c0121aa
 TERMUX_PKG_AUTO_UPDATE=true
