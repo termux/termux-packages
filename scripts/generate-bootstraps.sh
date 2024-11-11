@@ -468,6 +468,7 @@ for package_arch in "${TERMUX_ARCHITECTURES[@]}"; do
 	pull_package psmisc
 	pull_package sed
 	pull_package tar
+	pull_package termux-core
 	pull_package termux-exec
 	pull_package termux-keyring
 	pull_package termux-tools

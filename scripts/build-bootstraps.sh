@@ -444,6 +444,7 @@ main() {
 		PACKAGES+=("psmisc")
 		PACKAGES+=("sed")
 		PACKAGES+=("tar")
+		PACKAGES+=("termux-core")
 		PACKAGES+=("termux-exec")
 		PACKAGES+=("termux-keyring")
 		PACKAGES+=("termux-tools")
