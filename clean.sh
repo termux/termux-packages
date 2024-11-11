@@ -46,28 +46,48 @@ fi
 		chmod +w -R "$TERMUX_TOPDIR" || true
 	fi
 
-	# For on-device build cleanup /data shouldn't be erased.
+	# For on-device build cleanup Termux app data directory shouldn't be erased.
 	if [[ "$TERMUX_ON_DEVICE_BUILD" == "false" ]]; then
-		if [[ ! "$TERMUX_BASE_DIR" =~ ^(/[^/]+)+$ ]]; then
-			echo "TERMUX_BASE_DIR '$TERMUX_BASE_DIR' is not an absolute path under rootfs '/'." 1>&2
-			exit 1
-		fi
-		if [[ "$TERMUX_BASE_DIR" =~ ^/[^/]+$ ]]; then
-			# Use `/rootfs` as is.
-			rootfs_top_level_dir="$TERMUX_BASE_DIR"
+		for variable_name in TERMUX__PREFIX TERMUX_APP__DATA_DIR CGCT_DIR; do
+			variable_value="${!variable_name:-}"
+			if [[ ! "$variable_value" =~ ^(/[^/]+)+$ ]]; then
+				echo "The $variable_name '$variable_value' is not an absolute path under rootfs '/' while running 'clean.sh'." 1>&2
+				exit 1
+			fi
+		done
+
+		# If `TERMUX__PREFIX` is under `TERMUX_APP__DATA_DIR`, then
+		# just delete the entire `TERMUX_APP__DATA_DIR`. Otherwise,
+		# only delete `TERMUX__PREFIX` since its parent directories could
+		# be a critical directory in `TERMUX_REGEX__INVALID_TERMUX_PREFIX_PATHS`.
+		# This should not be an issue as package files are only packed
+		# from `TERMUX_PREFIX_CLASSICAL` via `termux_step_extract_into_massagedir()`.
+		if [[ "$TERMUX__PREFIX" == "$TERMUX_APP__DATA_DIR" ]] || \
+			[[ "$TERMUX__PREFIX" == "$TERMUX_APP__DATA_DIR/"* ]]; then
+			deletion_dir="$TERMUX_APP__DATA_DIR"
 		else
-			# Get `/path/` from `/path/to/rootfs`.
-			rootfs_top_level_dir="${TERMUX_BASE_DIR%"${TERMUX_BASE_DIR#/*/}"}"
+			deletion_dir="$TERMUX__PREFIX"
 		fi
 
-		if [[ ! "$CGCT_DIR" =~ ^(/[^/]+)+$ ]] || [[ "$CGCT_DIR" == "$TERMUX_BASE_DIR" ]]; then
-			echo "CGCT_DIR '$CGCT_DIR' is not an absolute path under rootfs '/' or equals TERMUX_BASE_DIR." 1>&2
-			exit 1
-		fi
+		if [[ -e "$deletion_dir" ]]; then
+			if [[ ! -d "$deletion_dir" ]]; then
+				echo "A non-directory file exists at deletion directory '$deletion_dir' for TERMUX__PREFIX while running 'clean.sh'." 1>&2
+				exit 1
+			fi
 
-		# Escape '\$[](){}|^.?+*' with backslashes
-		cgct_dir_escaped="$(printf "%s" "$CGCT_DIR" | sed -zE -e 's/[][\.|$(){}?+*^]/\\&/g')"
-		find "$rootfs_top_level_dir" -mindepth 1 -regextype posix-extended ! -regex "^$cgct_dir_escaped(/.*)?" -delete 2>/dev/null || true
+			# If deletion directory is under rootfs `/` or not accessible
+			# by current user, like the `builder` user in Termux docker
+			# cannot access root owned directories.
+			if [[ ! -r "$deletion_dir" ]] || [[ ! -w "$deletion_dir" ]] || [[ ! -x "$deletion_dir" ]]; then
+				echo "The deletion directory '$deletion_dir' for TERMUX__PREFIX is not readable, writable or searchable while running 'clean.sh'." 1>&2
+				echo "Try running 'clean.sh' with 'sudo'." 1>&2
+				exit 1
+			fi
+
+			# Escape '\$[](){}|^.?+*' with backslashes.
+			cgct_dir_escaped="$(printf "%s" "$CGCT_DIR" | sed -zE -e 's/[][\.|$(){}?+*^]/\\&/g')"
+			find "$deletion_dir" -mindepth 1 -regextype posix-extended ! -regex "^$cgct_dir_escaped(/.*)?" -delete 2>/dev/null || true
+		fi
 	fi
 
 	rm -Rf "$TERMUX_TOPDIR"
