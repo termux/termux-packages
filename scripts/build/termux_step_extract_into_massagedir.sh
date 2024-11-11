@@ -8,7 +8,7 @@ termux_step_extract_into_massagedir() {
 		-czf "$TARBALL_ORIG" .
 
 	# Extract tar in order to massage it
-	mkdir -p "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"
+	mkdir -p "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX_CLASSICAL"
 	cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX_CLASSICAL"
 	tar xf "$TARBALL_ORIG"
 	rm "$TARBALL_ORIG"
