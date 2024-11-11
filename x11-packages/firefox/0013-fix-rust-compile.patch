@@ -11,40 +11,33 @@
      ]
 --- a/toolkit/library/rust/shared/Cargo.toml
 +++ b/toolkit/library/rust/shared/Cargo.toml
-@@ -104,7 +104,6 @@
- # Since we're building with at least rustc 1.63, enable rust 1.57 features (use of try_reserve methods).
- fallible_collections = { version = "0.4", features = ["rust_1_57"] }
+@@ -106,7 +106,6 @@
+ 
+ libz-rs-sys = { git = "https://github.com/memorysafety/zlib-rs", rev = "4aa430ccb77537d0d60dab8db993ca51bb1194c5", features = ["custom-prefix"], optional = true }
  
 -[target.'cfg(not(target_os = "android"))'.dependencies]
+ gkrust-uniffi-components = { path = "../../../components/uniffi-bindgen-gecko-js/components/" }
+ gkrust-uniffi-fixtures = { path = "../../../components/uniffi-bindgen-gecko-js/fixtures/", optional = true }
  viaduct = "0.1"
- webext_storage_bridge = { path = "../../../components/extensions/storage/webext_storage_bridge" }
- tabs = { version = "0.1" }
 --- a/toolkit/library/rust/shared/lib.rs
 +++ b/toolkit/library/rust/shared/lib.rs
-@@ -51,20 +51,16 @@
+@@ -54,7 +54,6 @@
  
  extern crate audio_thread_priority;
  
 -#[cfg(not(target_os = "android"))]
  extern crate webext_storage_bridge;
  
--#[cfg(not(target_os = "android"))]
- extern crate tabs;
- 
--#[cfg(not(target_os = "android"))]
- mod reexport_appservices_uniffi_scaffolding {
-     tabs::uniffi_reexport_scaffolding!();
-     relevancy::uniffi_reexport_scaffolding!();
-     suggest::uniffi_reexport_scaffolding!();
- }
- 
--#[cfg(not(target_os = "android"))]
- extern crate suggest;
- 
  #[cfg(feature = "webrtc")]
-@@ -93,7 +88,6 @@
+@@ -84,13 +83,11 @@
  extern crate l10nregistry_ffi;
  extern crate localization_ffi;
+ 
+-#[cfg(not(target_os = "android"))]
+ extern crate gkrust_uniffi_components;
+ 
+ #[cfg(feature = "uniffi_fixtures")]
+ extern crate gkrust_uniffi_fixtures;
  
 -#[cfg(not(target_os = "android"))]
  extern crate viaduct;
