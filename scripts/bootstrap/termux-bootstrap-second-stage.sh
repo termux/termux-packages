@@ -92,15 +92,28 @@ run_bootstrap_second_stage() {
 
 	local return_value
 
-	if ! ln -s "termux-bootstrap-second-stage.sh" \
-		"@TERMUX_BOOTSTRAPS__BOOTSTRAP_CONFIG_DIR@/termux-bootstrap-second-stage.sh.lock" 2>/dev/null; then
-		log "The termux bootstrap second stage has already been run before and cannot be run again."
-		log "If you still want to force run it again (not recommended), \
+	local output
+
+	output="$(ln -s "termux-bootstrap-second-stage.sh" \
+		"@TERMUX_BOOTSTRAPS__BOOTSTRAP_CONFIG_DIR@/termux-bootstrap-second-stage.sh.lock" 2>&1)"
+	return_value=$?
+	if [ $return_value -ne 0 ]; then
+		if [ $return_value -eq 1 ] && [[ "$output" == *"File exists"* ]]; then
+			log "The termux bootstrap second stage has already been run before and cannot be run again."
+			log "If you still want to force run it again (not recommended), \
 like in case of previous failure and it must be re-run again for testing, \
 then delete the '@TERMUX_BOOTSTRAPS__BOOTSTRAP_CONFIG_DIR@/termux-bootstrap-second-stage.sh.lock' \
 file manually and run 'termux-bootstrap-second-stage.sh' again."
-		return 0
+			return 0
+		else
+			log_error "$output"
+			log_error "Failed to create lock file for termux bootstrap second stage at \
+'@TERMUX_BOOTSTRAPS__BOOTSTRAP_CONFIG_DIR@/termux-bootstrap-second-stage.sh.lock'"
+			warn_if_process_killed "$return_value" "ln"
+			return $return_value
+		fi
 	fi
+
 
 	log "Running termux bootstrap second stage"
 	run_bootstrap_second_stage_inner
@@ -111,6 +124,7 @@ file manually and run 'termux-bootstrap-second-stage.sh' again."
 	fi
 
 	log "The termux bootstrap second stage completed successfully"
+
 
 	return 0
 
@@ -359,6 +373,30 @@ run_package_postinst_maintainer_scripts() {
 	return 0
 
 }
+
+
+
+
+
+warn_if_process_killed() {
+
+	local return_value="${1:-}"
+	local command="${2:-}"
+
+	if [[ "$return_value" == "137" ]]; then
+		log_error "The '$command' command was apparently killed with SIGKILL (signal 9). \
+This may have been due to the security policies of the Android OS installed on your device.
+Check https://github.com/termux/termux-app/issues/4219 for more info."
+		return 0
+	fi
+
+	return 1
+
+}
+
+
+
+
 
 # If running in bash, run script logic, otherwise exit with usage error
 if [ -n "${BASH_VERSION:-}" ]; then
