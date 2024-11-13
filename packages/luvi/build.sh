@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://luvit.io
 TERMUX_PKG_DESCRIPTION="A project in-between luv and luvit."
 TERMUX_PKG_LICENSE="Apache-2.0"
-TERMUX_PKG_MAINTAINER="Komo @cattokomo"
+TERMUX_PKG_MAINTAINER="Komo @mbekkomo"
 TERMUX_PKG_VERSION=20241009
 _commit=32b274bed2a291068eda6cf7a296328b86d682a9
 _version=2.14.0+g${_commit::7}
