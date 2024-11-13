@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://arturo-lang.io
 TERMUX_PKG_DESCRIPTION="Simple, expressive & portable programming language for efficient scripting"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Komo @cattokomo"
+TERMUX_PKG_MAINTAINER="Komo @mbekkomo"
 TERMUX_PKG_VERSION=0.9.83
 TERMUX_PKG_SRCURL=https://github.com/arturo-lang/arturo/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=0bb3632f21a1556167fdcb82170c29665350beb44f15b4666b4e22a23c2063cf
