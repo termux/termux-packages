@@ -8,6 +8,7 @@ TERMUX_PKG_SHA256=0280847682dad4ed0efa918f573aee35c3f5c03f0634dc79c2fb757ff50196
 TERMUX_PKG_DEPENDS="boost, fcitx5, fcitx5-qt, libc++, libcurl, libime, libopencc, qt6-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="boost-headers, extra-cmake-modules"
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 # FIXME: Enable generating dictionary data
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DENABLE_BROWSER=OFF
