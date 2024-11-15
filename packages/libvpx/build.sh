@@ -34,9 +34,8 @@ termux_step_post_get_source() {
 
 	mkdir -p termux-abi-test && cd termux-abi-test
 	gcc "$TERMUX_PKG_BUILDER_DIR"/abi-test.c -o abi-test -I../
-	local abi_got="$(./abi-test | cut -d' ' -f 1)"
-	local eabi_got="$(./abi-test | cut -d' ' -f 2)"
-	local dabi_got="$(./abi-test | cut -d' ' -f 3)"
+	local abi_got eabi_got dabi_got
+	IFS=' ' read -r abi_got eabi_got dabi_got < <(./abi-test)
 	if [ "$abi_got $eabi_got $dabi_got" != "$abi $encabi $decabi" ]; then
 		termux_error_exit "ABI version mismatch in libvpx, got $abi_got $eabi_got $dabi_got."
 	fi
