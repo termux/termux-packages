@@ -1,5 +1,5 @@
 termux_step_setup_variables() {
-	: "${TERMUX_ARCH:="aarch64"}" # arm, aarch64, i686 or x86_64.
+	: "${TERMUX_ARCH:="aarch64"}" # arm, aarch64, i686, x86_64, riscv64
 	: "${TERMUX_OUTPUT_DIR:="${TERMUX_SCRIPTDIR}/output"}"
 	: "${TERMUX_DEBUG_BUILD:="false"}"
 	: "${TERMUX_FORCE_BUILD:="false"}"
@@ -15,6 +15,10 @@ termux_step_setup_variables() {
 	: "${TERMUX_GLOBAL_LIBRARY:="false"}"
 	: "${TERMUX_TOPDIR:="$HOME/.termux-build"}"
 	: "${TERMUX_PACMAN_PACKAGE_COMPRESSION:="xz"}"
+
+	if [ "${TERMUX_ARCH}" = "riscv64" ] && (( TERMUX_PKG_API_LEVEL < 35 )); then
+		TERMUX_PKG_API_LEVEL=35
+	fi
 
 	if [ -z "${TERMUX_PACKAGE_FORMAT-}" ]; then
 		if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ] && [ -n "${TERMUX_APP_PACKAGE_MANAGER-}" ]; then
@@ -64,11 +68,11 @@ termux_step_setup_variables() {
 	# TERMUX_PKG_MAINTAINER should be explicitly set in build.sh of the package.
 	: "${TERMUX_PKG_MAINTAINER:="default"}"
 
-	if [ "x86_64" = "$TERMUX_ARCH" ] || [ "aarch64" = "$TERMUX_ARCH" ]; then
-		TERMUX_ARCH_BITS=64
-	else
-		TERMUX_ARCH_BITS=32
-	fi
+	TERMUX_ARCH_BITS=64
+	case "${TERMUX_ARCH}" in
+	arm) TERMUX_ARCH_BITS=32 ;;
+	i686) TERMUX_ARCH_BITS=32 ;;
+	esac
 
 	if [ "$TERMUX_PACKAGE_LIBRARY" = "bionic" ]; then
 		TERMUX_HOST_PLATFORM="${TERMUX_ARCH}-linux-android"
