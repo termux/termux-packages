@@ -29,6 +29,7 @@ termux_step_configure() {
 	test $TERMUX_ARCH = "aarch64" && TERMUX_OPENSSL_PLATFORM="android-arm64"
 	test $TERMUX_ARCH = "i686" && TERMUX_OPENSSL_PLATFORM="android-x86"
 	test $TERMUX_ARCH = "x86_64" && TERMUX_OPENSSL_PLATFORM="android-x86_64"
+	test $TERMUX_ARCH = "riscv64" && TERMUX_OPENSSL_PLATFORM="android-riscv64"
 	./Configure $TERMUX_OPENSSL_PLATFORM \
 		--prefix=$TERMUX_PREFIX \
 		--openssldir=$TERMUX_PREFIX/etc/tls \
