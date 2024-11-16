@@ -14,15 +14,12 @@ termux_step_override_config_scripts() {
 	if [ "$TERMUX_PKG_DEPENDS" != "${TERMUX_PKG_DEPENDS/libllvm/}" ] ||
 		[ "$TERMUX_PKG_BUILD_DEPENDS" != "${TERMUX_PKG_BUILD_DEPENDS/libllvm/}" ]; then
 		LLVM_DEFAULT_TARGET_TRIPLE=$TERMUX_HOST_PLATFORM
-		if [ $TERMUX_ARCH = "arm" ]; then
-			LLVM_TARGET_ARCH=ARM
-		elif [ $TERMUX_ARCH = "aarch64" ]; then
-			LLVM_TARGET_ARCH=AArch64
-		elif [ $TERMUX_ARCH = "i686" ]; then
-			LLVM_TARGET_ARCH=X86
-		elif [ $TERMUX_ARCH = "x86_64" ]; then
-			LLVM_TARGET_ARCH=X86
-		fi
+		case "${TERMUX_ARCH}" in
+		aarch64) LLVM_TARGET_ARCH=AArch64 ;;
+		arm) LLVM_TARGET_ARCH=ARM ;;
+		i686|x86_64) LLVM_TARGET_ARCH=X86 ;;
+		riscv64) LLVM_TARGET_ARCH=RISCV ;;
+		esac
 		LIBLLVM_VERSION=$(. $TERMUX_SCRIPTDIR/packages/libllvm/build.sh; echo $TERMUX_PKG_VERSION)
 		sed $TERMUX_SCRIPTDIR/packages/libllvm/llvm-config.in \
 			-e "s|@TERMUX_PKG_VERSION@|$LIBLLVM_VERSION|g" \
