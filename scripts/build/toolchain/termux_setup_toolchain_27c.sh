@@ -60,8 +60,10 @@ termux_setup_toolchain_27c() {
 		export GOARCH=arm64
 	elif [ "$TERMUX_ARCH" = "x86_64" ]; then
 		export GOARCH=amd64
+	elif [ "$TERMUX_ARCH" = "riscv64" ]; then
+		export GOARCH=riscv64
 	else
-		termux_error_exit "Invalid arch '$TERMUX_ARCH' - support arches are 'arm', 'i686', 'aarch64', 'x86_64'"
+		termux_error_exit "Invalid arch '$TERMUX_ARCH' - support arches are 'arm', 'i686', 'aarch64', 'x86_64', 'riscv64'"
 	fi
 
 	# Android 7 started to support DT_RUNPATH (but not DT_RPATH).
@@ -127,7 +129,7 @@ termux_setup_toolchain_27c() {
 	# Remove android-support header wrapping not needed on android-21:
 	rm -Rf $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/local
 
-	for HOST_PLAT in aarch64-linux-android armv7a-linux-androideabi i686-linux-android x86_64-linux-android; do
+	for HOST_PLAT in aarch64-linux-android armv7a-linux-androideabi i686-linux-android x86_64-linux-android riscv64-linux-android; do
 		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT$TERMUX_PKG_API_LEVEL-clang \
 			$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang
 		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT$TERMUX_PKG_API_LEVEL-clang++ \
