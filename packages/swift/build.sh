@@ -10,7 +10,7 @@ TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_DEPENDS="clang, libandroid-execinfo, libandroid-glob, libandroid-posix-semaphore, libandroid-shmem, libandroid-spawn, libandroid-spawn-static, libandroid-sysv-semaphore, libcurl, libsqlite, libuuid, libxml2, libdispatch, llbuild, pkg-config, swift-sdk-${TERMUX_ARCH/_/-}"
 TERMUX_PKG_BUILD_DEPENDS="rsync"
-TERMUX_PKG_BLACKLISTED_ARCHES="i686"
+TERMUX_PKG_BLACKLISTED_ARCHES="i686, riscv64"
 TERMUX_PKG_NO_STATICSPLIT=true
 # Temporary hack only needed for x86_64
 TERMUX_PKG_UNDEF_SYMBOLS_FILES="
