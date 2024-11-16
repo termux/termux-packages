@@ -1,0 +1,13 @@
+diff --git a/src/recipe.rs b/src/recipe.rs
+index 3976983a..4253099b 100644
+--- a/src/recipe.rs
++++ b/src/recipe.rs
+@@ -355,6 +355,8 @@ impl<'src, D> Recipe<'src, D> {
+           .unwrap_or_else(|| Interpreter::default_script_interpreter()),
+       )
+     } else {
++      evaluated_lines[0] = format!("#!@TERMUX_PREFIX@{}", evaluated_lines[0][2..].to_string());
++      evaluated_lines[0] = evaluated_lines[0].replace("/usr/usr", "/usr");
+       let line = evaluated_lines
+         .first()
+         .ok_or_else(|| Error::internal("evaluated_lines was empty"))?;
