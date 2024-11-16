@@ -42,6 +42,9 @@ termux_setup_meson() {
 	elif [ "$TERMUX_ARCH" = "aarch64" ]; then
 		MESON_CPU_FAMILY="aarch64"
 		MESON_CPU="aarch64"
+	elif [ "$TERMUX_ARCH" = "riscv64" ]; then
+		MESON_CPU_FAMILY="riscv64"
+		MESON_CPU="riscv64"
 	else
 		termux_error_exit "Unsupported arch: $TERMUX_ARCH"
 	fi
