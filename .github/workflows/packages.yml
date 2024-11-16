@@ -154,10 +154,10 @@ jobs:
           fi
         done
 
-        docker='true'
-        [ -n "$packages" ] && if grep -qP "(^|\\s)${packages// /($|\\s)|(^|\\s)}($|\\s)" ./scripts/big-pkgs.list; then
+        #docker='true'
+        #[ -n "$packages" ] && if grep -qP "(^|\\s)${packages// /($|\\s)|(^|\\s)}($|\\s)" ./scripts/big-pkgs.list; then
           docker='false'
-        fi
+        #fi
         echo "docker-build=$docker" >> $GITHUB_OUTPUT
         if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
           # Build local Docker image if setup scripts were changed.
@@ -219,7 +219,7 @@ jobs:
         done
 
         if [ ${{ steps.build-info.outputs.docker-build }} == 'false' ]; then
-          NDK=$ANDROID_NDK ANDROID_HOME=$ANDROID_SDK_ROOT ./build-package.sh -I -a ${{ matrix.target_arch }} $packages
+          NDK=$ANDROID_NDK ANDROID_HOME=$ANDROID_SDK_ROOT ./build-package.sh -a ${{ matrix.target_arch }} $packages
         elif [ -n "$packages" ]; then
           ./scripts/run-docker.sh ./build-package.sh -I -a ${{ matrix.target_arch }} $packages
         fi
