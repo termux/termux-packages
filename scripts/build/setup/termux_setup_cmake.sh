@@ -41,6 +41,9 @@ termux_setup_cmake() {
 		tar xf "${TERMUX_CMAKE_TARFILE}" -C "${TERMUX_PKG_TMPDIR}"
 		mv "${TERMUX_PKG_TMPDIR}/cmake-${TERMUX_CMAKE_VERSION}-linux-x86_64" \
 			"${TERMUX_CMAKE_FOLDER}"
+		pushd "${TERMUX_CMAKE_FOLDER}/share/cmake-${TERMUX_CMAKE_MAJORVERSION}"
+		patch -p1 -i "${TERMUX_SCRIPTDIR}/packages/cmake/riscv64.patch"
+		popd
 	fi
 
 	export PATH="${TERMUX_CMAKE_FOLDER}/bin:${PATH}"

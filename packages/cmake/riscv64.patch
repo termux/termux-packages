@@ -1,0 +1,49 @@
+--- a/Modules/Platform/Android/abi-riscv64-Clang.cmake
++++ b/Modules/Platform/Android/abi-riscv64-Clang.cmake
+@@ -0,0 +1 @@
++include(Platform/Android/abi-common-Clang)
+--- a/Modules/Platform/Android-Determine.cmake
++++ b/Modules/Platform/Android-Determine.cmake
+@@ -353,6 +353,10 @@
+   set(NDK_ABI_x86_64_ARCH              "x86_64")
+   set(NDK_ABI_x86_64_TRIPLE            "x86_64-linux-android")
+   set(NDK_ABI_x86_64_LLVM_TRIPLE       "x86_64-none-linux-android")
++  set(NDK_ABI_riscv64_PROC             "riscv64")
++  set(NDK_ABI_riscv64_ARCH             "riscv64")
++  set(NDK_ABI_riscv64_TRIPLE           "riscv64-linux-android")
++  set(NDK_ABI_riscv64_LLVM_TRIPLE      "riscv64-none-linux-android")
+ 
+   set(NDK_PROC_aarch64_ABI "arm64-v8a")
+   set(NDK_PROC_armv7-a_ABI "armeabi-v7a")
+@@ -362,13 +366,15 @@
+   set(NDK_PROC_mips_ABI    "mips")
+   set(NDK_PROC_mips64_ABI  "mips64")
+   set(NDK_PROC_x86_64_ABI  "x86_64")
++  set(NDK_PROC_riscv64_ABI "riscv64")
+ 
+-  set(NDK_ARCH_arm64_ABI  "arm64-v8a")
+-  set(NDK_ARCH_arm_ABI    "armeabi")
+-  set(NDK_ARCH_mips_ABI   "mips")
+-  set(NDK_ARCH_mips64_ABI "mips64")
+-  set(NDK_ARCH_x86_ABI    "x86")
+-  set(NDK_ARCH_x86_64_ABI "x86_64")
++  set(NDK_ARCH_arm64_ABI   "arm64-v8a")
++  set(NDK_ARCH_arm_ABI     "armeabi")
++  set(NDK_ARCH_mips_ABI    "mips")
++  set(NDK_ARCH_mips64_ABI  "mips64")
++  set(NDK_ARCH_x86_ABI     "x86")
++  set(NDK_ARCH_x86_64_ABI  "x86_64")
++  set(NDK_ARCH_riscv64_ABI "riscv64")
+ endif()
+ 
+ # Validate inputs.
+@@ -525,6 +531,9 @@
+     if(CMAKE_ANDROID_ARCH_ABI MATCHES "64(-v8a)?$" AND CMAKE_SYSTEM_VERSION LESS 21)
+       set(CMAKE_SYSTEM_VERSION 21)
+     endif()
++    if(CMAKE_ANDROID_ARCH_ABI MATCHES "^riscv64$" AND CMAKE_SYSTEM_VERSION LESS 35)
++      set(CMAKE_SYSTEM_VERSION 35)
++    endif()
+   else()
+     file(GLOB _ANDROID_APIS_1 RELATIVE "${CMAKE_ANDROID_NDK}/platforms" "${CMAKE_ANDROID_NDK}/platforms/android-[0-9]")
+     file(GLOB _ANDROID_APIS_2 RELATIVE "${CMAKE_ANDROID_NDK}/platforms" "${CMAKE_ANDROID_NDK}/platforms/android-[0-9][0-9]")
