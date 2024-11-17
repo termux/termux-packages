@@ -35,4 +35,12 @@ case "$TERMUX_ARCH" in
 			i686-linux-android/lib/libm.so
 		"
 		;;
+	riscv64 )
+		TERMUX_SUBPKG_INCLUDE+="
+			riscv64-linux-android/lib/libc.so
+			riscv64-linux-android/lib/libdl.so
+			riscv64-linux-android/lib/liblog.so
+			riscv64-linux-android/lib/libm.so
+		"
+		;;
 esac

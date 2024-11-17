@@ -78,12 +78,13 @@ termux_step_make_install() {
 	prepare_libs "arm64" "aarch64-linux-android"
 	prepare_libs "x86" "i686-linux-android"
 	prepare_libs "x86_64" "x86_64-linux-android"
+	prepare_libs "riscv64" "riscv64-linux-android"
 	add_cross_compiler_rt
 }
 
 termux_step_post_massage() {
 	local triple f
-	for triple in aarch64-linux-android arm-linux-androideabi i686-linux-android x86_64-linux-android; do
+	for triple in aarch64-linux-android arm-linux-androideabi i686-linux-android x86_64-linux-android riscv64-linux-android; do
 		for f in lib{c,dl,log,m}.so lib{c,dl,m}.a; do
 			rm -f ${triple}/lib/${f}
 		done
