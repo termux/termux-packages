@@ -8,13 +8,17 @@ TERMUX_PKG_VERSION="1.8.10"
 TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/lib/libX11-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=2b3b3dad9347db41dca56beb7db5878f283bde1142f04d9f8e478af435dfdc53
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="libandroid-support, libxcb"
+TERMUX_PKG_DEPENDS="libandroid-shmem, libandroid-support, libxcb"
 TERMUX_PKG_BUILD_DEPENDS="xorgproto, xorg-util-macros, xtrans"
 TERMUX_PKG_RECOMMENDS="xorg-xauth"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_path_RAWCPP=/usr/bin/cpp
 --enable-malloc0returnsnull
 "
+
+termux_step_pre_configure() {
+	LDFLAGS+=" -landroid-shmem"
+}
 
 termux_step_post_massage() {
 	# Regression test for broken XLC_LOCALE files. Do not remove.
