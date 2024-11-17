@@ -3,10 +3,10 @@ termux_setup_toolchain_27c() {
 	export CPPFLAGS=""
 	export LDFLAGS="-L${TERMUX_PREFIX}/lib"
 
-	export AS=$TERMUX_HOST_PLATFORM-clang
-	export CC=$TERMUX_HOST_PLATFORM-clang
-	export CPP=$TERMUX_HOST_PLATFORM-cpp
-	export CXX=$TERMUX_HOST_PLATFORM-clang++
+	export AS="ccache-$TERMUX_HOST_PLATFORM-clang"
+	export CC="ccache-$TERMUX_HOST_PLATFORM-clang"
+	export CPP="$TERMUX_HOST_PLATFORM-cpp"
+	export CXX="ccache-$TERMUX_HOST_PLATFORM-clang++"
 	export LD=ld.lld
 	export AR=llvm-ar
 	export OBJCOPY=llvm-objcopy
@@ -114,6 +114,7 @@ termux_setup_toolchain_27c() {
 	# Do not put toolchain in place until we are done with setup, to avoid having a half setup
 	# toolchain left in place if something goes wrong (or process is just aborted):
 	local _TERMUX_TOOLCHAIN_TMPDIR=${TERMUX_STANDALONE_TOOLCHAIN}-tmp
+	mkdir -p $_TERMUX_TOOLCHAIN_TMPDIR
 	rm -Rf $_TERMUX_TOOLCHAIN_TMPDIR
 
 	local _NDK_ARCHNAME=$TERMUX_ARCH
@@ -124,6 +125,19 @@ termux_setup_toolchain_27c() {
 	fi
 	cp $NDK/toolchains/llvm/prebuilt/linux-x86_64 $_TERMUX_TOOLCHAIN_TMPDIR -r
 
+	for EXEC in clang clang++; do
+	    mv $_TERMUX_TOOLCHAIN_TMPDIR/bin/$EXEC $_TERMUX_TOOLCHAIN_TMPDIR/bin/$EXEC.uncached
+	    cat > $_TERMUX_TOOLCHAIN_TMPDIR/bin/$EXEC <<EOF
+exec ccache.local $TERMUX_STANDALONE_TOOLCHAIN/bin/clang-18 "\$@"
+EOF
+	    chmod a+x $_TERMUX_TOOLCHAIN_TMPDIR/bin/$EXEC
+	done
+	cat > $_TERMUX_TOOLCHAIN_TMPDIR/bin/clang++ <<EOF
+exec ccache.local $TERMUX_STANDALONE_TOOLCHAIN/bin/clang++-18 "\$@"
+EOF
+	chmod a+x $_TERMUX_TOOLCHAIN_TMPDIR/bin/clang++
+	ln -sf clang-18 $_TERMUX_TOOLCHAIN_TMPDIR/bin/clang++-18
+
 	# Remove android-support header wrapping not needed on android-21:
 	rm -Rf $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/local
 
@@ -131,7 +145,17 @@ termux_setup_toolchain_27c() {
 		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT$TERMUX_PKG_API_LEVEL-clang \
 			$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang
 		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT$TERMUX_PKG_API_LEVEL-clang++ \
-			$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang++
+		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang++
+
+		cat > $_TERMUX_TOOLCHAIN_TMPDIR/bin/ccache-$HOST_PLAT-clang <<EOF
+exec ccache.local $HOST_PLAT-clang "\$@"
+EOF
+		chmod a+x $_TERMUX_TOOLCHAIN_TMPDIR/bin/ccache-$HOST_PLAT-clang
+
+		cat > $_TERMUX_TOOLCHAIN_TMPDIR/bin/ccache-$HOST_PLAT-clang++ <<EOF
+exec ccache.local $HOST_PLAT-clang++ "\$@"
+EOF
+		chmod a+x $_TERMUX_TOOLCHAIN_TMPDIR/bin/ccache-$HOST_PLAT-clang++
 
 		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT$TERMUX_PKG_API_LEVEL-clang \
 			$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-cpp
