@@ -10,7 +10,7 @@ FROM ubuntu:24.04
 ENV LANG=en_US.UTF-8
 
 # Needed for setup:
-COPY ./llvm-snapshot.gpg.key ./properties.sh ./setup-android-sdk.sh ./setup-cgct.sh ./setup-ubuntu.sh /tmp/
+COPY ./llvm-snapshot.gpg.key ./properties.sh ./setup-android-sdk.sh ./setup-cgct.sh ./setup-ubuntu.sh ./setup-ccache.sh /tmp/
 RUN mkdir /tmp/build
 COPY ./build/termux_download.sh /tmp/build/
 
@@ -24,6 +24,7 @@ RUN apt-get update && \
 	chmod 0440 /etc/sudoers.d/builder && \
 	chmod a+rx /tmp/*.sh /tmp/build/termux_download.sh && \
 	su - builder -c /tmp/setup-ubuntu.sh && \
+	su - builder -c /tmp/setup-ccache.sh && \
 	su - builder -c /tmp/setup-android-sdk.sh && \
 	# Removed unused parts to make a smaller Docker image:
 	apt-get remove -yq --autoremove lsb-release software-properties-common && \
@@ -32,6 +33,12 @@ RUN apt-get update && \
 
 # Switch User
 USER builder:builder
+
+RUN mkdir -p /home/builder/.config/ccache
+RUN echo 'max_size = 0' >> /home/builder/.config/ccache/ccache.conf
+RUN echo 'compression = false' >> /home/builder/.config/ccache/ccache.conf
+RUN echo 'debug = true' >> /home/builder/.config/ccache/ccache.conf
+RUN echo 'debug_dir = /home/builder/termux-packages/ccache-debug/' >> /home/builder/.config/ccache/ccache.conf
 
 # We expect this to be mounted with '-v $PWD:/home/builder/termux-packages':
 WORKDIR /home/builder/termux-packages
