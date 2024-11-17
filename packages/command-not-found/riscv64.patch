@@ -1,0 +1,40 @@
+--- a/command-not-found.cpp
++++ b/command-not-found.cpp
+@@ -34,6 +34,8 @@
+ #include "commands-i686-termux-main.h"
+ #elif defined __x86_64__
+ #include "commands-x86_64-termux-main.h"
++#elif defined __riscv
++#include "commands-riscv64-termux-main.h"
+ #else
+ #error Failed to detect arch
+ #endif
+@@ -48,6 +50,8 @@
+ #include "commands-i686-termux-root.h"
+ #elif defined __x86_64__
+ #include "commands-x86_64-termux-root.h"
++#elif defined __riscv
++#include "commands-riscv64-termux-root.h"
+ #else
+ #error Failed to detect arch
+ #endif
+@@ -62,6 +66,8 @@
+ #include "commands-i686-termux-x11.h"
+ #elif defined __x86_64__
+ #include "commands-x86_64-termux-x11.h"
++#elif defined __riscv
++#include "commands-riscv64-termux-x11.h"
+ #else
+ #error Failed to detect arch
+ #endif
+--- a/generate-db.js
++++ b/generate-db.js
+@@ -7,7 +7,7 @@
+ const gunzipAsync = promisify(gunzip);
+ 
+ // TODO(@thunder-coding): Do not hardcode list of known architectures.
+-const archs = ["aarch64", "arm", "i686", "x86_64"];
++const archs = ["aarch64", "arm", "i686", "x86_64", "riscv64"];
+ const { TERMUX_PKG_CACHEDIR, TERMUX_PREFIX } = process.env;
+ 
+ if (!TERMUX_PKG_CACHEDIR) {
