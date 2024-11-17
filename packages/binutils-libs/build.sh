@@ -85,8 +85,10 @@ termux_step_post_make_install() {
 	ln -sfr $TERMUX_PREFIX/libexec/binutils/ld $TERMUX_PREFIX/bin/ld.bfd
 
 	rm -f $TERMUX_PREFIX/bin/ld.gold
-	mv ld.gold $TERMUX_PREFIX/bin/
-	ln -sfr $TERMUX_PREFIX/bin/{ld.,}gold
+	if [ -f ld.gold ]; then
+		mv ld.gold $TERMUX_PREFIX/bin/
+		ln -sfr $TERMUX_PREFIX/bin/{ld.,}gold
+	fi
 
 	for b in *; do
 		ln -sfr $TERMUX_PREFIX/libexec/binutils/${b} \
