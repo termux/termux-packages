@@ -1,0 +1,16 @@
+Fixes the following error in i686 environment.
+ld.lld: error: relocation R_386_32 cannot be used against local symbol; recompile with -fPIC
+
+The constant is defined with ENABLEPIC option in x86-common.mk file.
+
+--- a/meson.build
++++ b/meson.build
+@@ -68,7 +68,7 @@
+   endif
+   if cpu_family == 'x86'
+     asm_format = asm_format32
+-    asm_args += ['-DX86_32', '-DHAVE_AVX2']
++    asm_args += ['-DX86_32_PICASM', '-DX86_32', '-DHAVE_AVX2']
+     add_project_arguments('-DHAVE_AVX2', language: 'cpp')
+     add_project_arguments('-DHAVE_AVX2', '-DX86_ASM', '-DX86_32_ASM', language: 'c')
+     asm_inc = join_paths(meson.current_source_dir(), 'codec', 'common', 'x86', '')
