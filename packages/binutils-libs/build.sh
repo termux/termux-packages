@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.43.1"
 TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/binutils/binutils-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=13f74202a3c4c51118b797a39ea4200d3f6cfbe224da6d1d95bb938480132dfd
-TERMUX_PKG_DEPENDS="zlib, zstd"
+TERMUX_PKG_DEPENDS="libandroid-spawn, zlib, zstd"
 TERMUX_PKG_BREAKS="binutils (<< 2.39), binutils-dev"
 TERMUX_PKG_REPLACES="binutils (<< 2.39), binutils-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -55,6 +55,7 @@ export LEXLIB=
 
 termux_step_pre_configure() {
 	export CPPFLAGS="$CPPFLAGS -Wno-c++11-narrowing"
+	export LDFLAGS+=" -landroid-spawn"
 	# llvm upgraded a warning to an error, which caused this build (and some
 	# others, including the rust toolchain) to fail like so:
 	#
