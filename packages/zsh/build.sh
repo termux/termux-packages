@@ -4,12 +4,11 @@ TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENCE"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
 TERMUX_PKG_VERSION=5.9
-TERMUX_PKG_REVISION=5
-TERMUX_PKG_SRCURL="https://sourceforge.net/projects/zsh/files/zsh/$TERMUX_PKG_VERSION/zsh-$TERMUX_PKG_VERSION".tar.xz
+TERMUX_PKG_REVISION=6
+TERMUX_PKG_SRCURL=https://www.zsh.org/pub/zsh-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=9b8d1ecedd5b5e81fbf1918e876752a7dd948e05c1a0dba10ab863842d45acd5
-# Remove hard link to bin/zsh as Android does not support hard links:
-TERMUX_PKG_RM_AFTER_INSTALL="bin/zsh-${TERMUX_PKG_VERSION}"
-TERMUX_PKG_DEPENDS="libandroid-support, libcap, ncurses, termux-tools, command-not-found, pcre"
+TERMUX_PKG_BUILD_DEPENDS="pcre2"
+TERMUX_PKG_DEPENDS="libandroid-support, libcap, ncurses, termux-tools, command-not-found, pcre2"
 TERMUX_PKG_RECOMMENDS="command-not-found, zsh-completions"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-gdbm
@@ -25,13 +24,23 @@ ac_cv_func_setresuid=no
 TERMUX_PKG_CONFFILES="etc/zshrc"
 TERMUX_PKG_BUILD_IN_SRC=true
 
-# Remove compdef pkg not suitable for Termux:
-TERMUX_PKG_RM_AFTER_INSTALL+="
-share/zsh/${TERMUX_PKG_VERSION}/functions/_pkg5
-"
+# Remove hard link to bin/zsh as Android does not support hard links.
+# We replace this with a symlink to offer the same functionality:
+TERMUX_PKG_RM_AFTER_INSTALL="bin/zsh-${TERMUX_PKG_VERSION}"
+# Remove compdef for Solaris `pkg` command:
+TERMUX_PKG_RM_AFTER_INSTALL+="share/zsh/${TERMUX_PKG_VERSION}/functions/_pkg5"
+
+termux_step_post_get_source() {
+	# Fetch the Arch Linux cherry-picks for updating the zsh/pcre module to PCRE2.
+	termux_download \
+		'https://gitlab.archlinux.org/archlinux/packaging/packages/zsh/-/raw/main/0004-pcre2.patch' \
+		"${TERMUX_SCRIPTDIR}/packages/zsh/pcre2.patch" \
+		'ea68214d5be0514aa1b19e93fc9f44de878b9428e920227230a8fa3a75b0bd18'
+}
 
 termux_step_pre_configure() {
 
+	autoreconf -fi
 	## fix "largefile" for arithmetic larger than sint32
 	## as zsh force disable the detection of these flags in its ./configure when running in a cross-build environment
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
@@ -91,14 +100,20 @@ termux_step_post_configure() {
 	'zselect'       # - The zselect module is used by multiple plugins https://github.com/termux/termux-packages/issues/4939
 	)
 	for module in "${modules[@]}"; do
-		perl -p -i -e "s|${module}.mdd link=no|${module}.mdd link=static|" $TERMUX_PKG_BUILDDIR/config.modules
+		perl -p -i -e "s|${module}.mdd link=no|${module}.mdd link=static|" "$TERMUX_PKG_BUILDDIR/config.modules"
 	done
 }
 
 termux_step_post_make_install() {
 	# /etc/zshrc - Run for interactive shells (http://zsh.sourceforge.net/Guide/zshguide02.html):
-	sed "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|" $TERMUX_PKG_BUILDER_DIR/etc-zshrc > $TERMUX_PREFIX/etc/zshrc
+	sed "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|" "$TERMUX_PKG_BUILDER_DIR/etc-zshrc" > "$TERMUX_PREFIX/etc/zshrc"
+
+	# Remove upstream PCRE2 patch
+	rm -f "${TERMUX_SCRIPTDIR}/packages/zsh/pcre2.patch"
 
 	# Remove zsh.new/zsh.old/zsh-$version if any exists:
-	rm -f $TERMUX_PREFIX/{zsh-*,zsh.*}
+	rm -f "$TERMUX_PREFIX"/{zsh-*,zsh.*}
+
+	# Create a symlink for zsh-$version instead of the hardlink:
+	ln -sf "$TERMUX_PREFIX/bin/zsh" "$TERMUX_PREFIX/bin/zsh-$TERMUX_PKG_VERSION"
 }
