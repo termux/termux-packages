@@ -2,25 +2,14 @@ TERMUX_PKG_HOMEPAGE=https://www.vim.org
 TERMUX_PKG_DESCRIPTION="Vi IMproved - enhanced vi editor"
 TERMUX_PKG_LICENSE="VIM License"
 TERMUX_PKG_MAINTAINER="@termux"
-
-# vim should only be updated every 50 releases on multiples of 50.
-# Update all of vim, vim-python and vim-gtk to the same version in one PR.
+TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libcairo, libcanberra, libice, libiconv, liblua52, libsm, libx11, libxt, ncurses, pango, python"
+TERMUX_PKG_RECOMMENDS="diffutils"
+TERMUX_PKG_CONFLICTS="vim, vim-python, vim-runtime"
 TERMUX_PKG_VERSION=9.1.0800
 TERMUX_PKG_SRCURL="https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=3bc15301f35addac9acde1da64da0976dbeafe1264e904c25a3cdc831e347303
-TERMUX_PKG_AUTO_UPDATE=false
-TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libcairo, libcanberra, libice, libiconv, liblua52, libsm, libx11, libxt, ncurses, pango, python"
-TERMUX_PKG_CONFLICTS="vim, vim-python, vim-runtime"
 TERMUX_PKG_BUILD_IN_SRC=true
-
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
-ac_cv_small_wchar_t=no
-ac_cv_path_vi_cv_path_plain_lua=lua5.2
-vi_cv_path_python3_pfx=$TERMUX_PREFIX
-vi_cv_path_python3_include=${TERMUX_PREFIX}/include/python${TERMUX_PYTHON_VERSION}
-vi_cv_path_python3_platinclude=${TERMUX_PREFIX}/include/python${TERMUX_PYTHON_VERSION}
-vi_cv_var_python3_abiflags=
-vi_cv_var_python3_version=${TERMUX_PYTHON_VERSION}
 vim_cv_getcwd_broken=no
 vim_cv_memmove_handles_overlap=yes
 vim_cv_stat_ignores_slash=no
@@ -28,16 +17,28 @@ vim_cv_terminfo=yes
 vim_cv_tgetent=zero
 vim_cv_toupper_broken=no
 vim_cv_tty_group=world
---enable-cscope
+--with-compiledby='Termux'
 --enable-gui=gtk3
 --enable-multibyte
---enable-luainterp
---enable-python3interp
+--enable-netbeans=no
 --with-features=huge
 --with-lua-prefix=$TERMUX_PREFIX
 --with-python3-config-dir=$TERMUX_PYTHON_HOME/config-${TERMUX_PYTHON_VERSION}/
 --with-tlib=ncursesw
---with-x"
+--with-x
+ac_cv_small_wchar_t=no
+--enable-cscope
+vi_cv_path_python3_pfx=$TERMUX_PREFIX
+vi_cv_path_python3_include=${TERMUX_PREFIX}/include/python${TERMUX_PYTHON_VERSION}
+vi_cv_path_python3_platinclude=${TERMUX_PREFIX}/include/python${TERMUX_PYTHON_VERSION}
+vi_cv_var_python3_abiflags=
+vi_cv_var_python3_version=${TERMUX_PYTHON_VERSION}
+--enable-python3interp
+--with-python3-config-dir=$TERMUX_PYTHON_HOME/config-${TERMUX_PYTHON_VERSION}/
+ac_cv_path_vi_cv_path_plain_lua=lua5.2
+--enable-luainterp
+--with-lua-prefix=$TERMUX_PREFIX
+"
 
 TERMUX_PKG_RM_AFTER_INSTALL="
 share/vim/vim91/spell/en.ascii*
@@ -73,6 +74,11 @@ termux_pkg_auto_update() {
 termux_step_pre_configure() {
 	LDFLAGS+=" -landroid-shmem"
 
+	# Certain packages are not safe to build on device because their
+	# build.sh script deletes specific files in $TERMUX_PREFIX.
+	if $TERMUX_ON_DEVICE_BUILD; then
+		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
+	fi
 
 	make distclean
 

@@ -4,12 +4,12 @@ TERMUX_PKG_LICENSE="VIM License"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_DEPENDS="libiconv, ncurses, vim-runtime"
 TERMUX_PKG_RECOMMENDS="diffutils"
-# vim should only be updated every 50 releases on multiples of 50.
-# Update all of vim, vim-python and vim-gtk to the same version in one PR.
+TERMUX_PKG_CONFLICTS="vim-python" # probably also , vim-gtk"
 TERMUX_PKG_VERSION=9.1.0800
 TERMUX_PKG_SRCURL="https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=3bc15301f35addac9acde1da64da0976dbeafe1264e904c25a3cdc831e347303
-TERMUX_PKG_AUTO_UPDATE=false
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_CONFFILES="share/vim/vimrc"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 vim_cv_getcwd_broken=no
 vim_cv_memmove_handles_overlap=yes
@@ -18,14 +18,15 @@ vim_cv_terminfo=yes
 vim_cv_tgetent=zero
 vim_cv_toupper_broken=no
 vim_cv_tty_group=world
+--with-compiledby='Termux'
 --enable-gui=no
 --enable-multibyte
 --enable-netbeans=no
 --with-features=huge
---without-x
 --with-tlib=ncursesw
+--without-x
 "
-TERMUX_PKG_BUILD_IN_SRC=true
+
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/rview
 bin/rvim
@@ -36,9 +37,6 @@ share/vim/vim91/spell/en.ascii*
 share/vim/vim91/print
 share/vim/vim91/tools
 "
-TERMUX_PKG_CONFFILES="share/vim/vimrc"
-
-TERMUX_PKG_CONFLICTS="vim-python"
 
 # Vim releases every commit as a new patch release.
 # To avoid auto update spam, we only update Vim every 50th patch.
