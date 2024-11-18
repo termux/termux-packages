@@ -6,6 +6,7 @@ TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libcairo, libcanberra, libice, libic
 TERMUX_PKG_RECOMMENDS="diffutils"
 TERMUX_PKG_CONFLICTS="vim, vim-python, vim-runtime"
 TERMUX_PKG_VERSION=9.1.0800
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=3bc15301f35addac9acde1da64da0976dbeafe1264e904c25a3cdc831e347303
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -22,8 +23,6 @@ vim_cv_tty_group=world
 --enable-multibyte
 --enable-netbeans=no
 --with-features=huge
---with-lua-prefix=$TERMUX_PREFIX
---with-python3-config-dir=$TERMUX_PYTHON_HOME/config-${TERMUX_PYTHON_VERSION}/
 --with-tlib=ncursesw
 --with-x
 ac_cv_small_wchar_t=no
@@ -83,14 +82,14 @@ termux_step_pre_configure() {
 	make distclean
 
 	# Remove eventually existing symlinks from previous builds so that they get re-created.
-	for link in eview evim ex gview gvim gvimdiff rgview rgvim rview rvim view vimdiff; do
-		rm -f $TERMUX_PREFIX/bin/$link
-		rm -f $TERMUX_PREFIX/share/man/man1/${link}.1*
+	for sym in 'eview' 'evim' 'ex' 'gview' 'gvim' 'gvimdiff' 'rgview' 'rgvim' 'rview' 'rvim' 'view' 'vimdiff'; do
+		rm -f "$TERMUX_PREFIX/bin/${sym}"
+		rm -f "$TERMUX_PREFIX/share/man/man1/${sym}.1"*
 	done
 }
 
 termux_step_post_make_install() {
-	install -Dm600 $TERMUX_PKG_BUILDER_DIR/vimrc $TERMUX_PREFIX/share/vim/vimrc
-	sed -i "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" $TERMUX_PREFIX/share/vim/vimrc
-	ln -sfr $TERMUX_PREFIX/bin/vim $TERMUX_PREFIX/bin/vi
+	install -Dm600 "$TERMUX_PKG_BUILDER_DIR/vimrc" "$TERMUX_PREFIX/share/vim/vimrc"
+	sed -i "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" "$TERMUX_PREFIX/share/vim/vimrc"
+	ln -sfr "$TERMUX_PREFIX/bin/vim" "$TERMUX_PREFIX/bin/vi"
 }
