@@ -305,6 +305,9 @@ PACKAGES+=" swig"
 # Needed by binutils-cross
 PACKAGES+=" libzstd-dev"
 
+# Needed by tree-sitter-c
+PACKAGES+=" tree-sitter-cli"
+
 # Do not require sudo if already running as root.
 SUDO="sudo"
 if [ "$(id -u)" = "0" ]; then
