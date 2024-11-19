@@ -1,11 +1,11 @@
 diff --git a/Makefile b/Makefile
-index ad9d7f7..3ce01a3 100644
+index b248131..3903512 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -71,8 +71,8 @@ static-%.tar.gz:
- 		--with-pkg-config-libdir="`pwd`/../inst/pkg"\
+@@ -70,8 +70,8 @@ static-%.tar.gz:
+ 	cd static-$*/nc && ../../ncurses/configure --prefix="`pwd`/../inst"\
  		--without-cxx --without-cxx-binding --without-ada --without-manpages --without-progs\
- 		--without-tests --enable-pc-files --without-pkg-config --without-shared --without-debug\
+ 		--without-tests --disable-pc-files --without-pkg-config --without-shared --without-debug\
 -		--without-gpm --without-sysmouse --enable-widec --with-default-terminfo-dir=/usr/share/terminfo\
 -		--with-terminfo-dirs=/usr/share/terminfo:/lib/terminfo:/usr/local/share/terminfo\
 +		--without-gpm --without-sysmouse --enable-widec --with-default-terminfo-dir=@TERMUX_PREFIX@/share/terminfo\
@@ -13,20 +13,11 @@ index ad9d7f7..3ce01a3 100644
  		--with-fallbacks="screen linux vt100 xterm xterm-256color" --host=$*\
  		CC="${ZIG} cc --target=$*"\
  		LD="${ZIG} cc --target=$*"\
-@@ -85,7 +85,7 @@ static-%.tar.gz:
- 	cd static-$* && ${ZIG} build-exe -target $*\
- 		-Iinst/include -Iinst/include/ncursesw -Izstd -lc inst/lib/libncursesw.a zstd/libzstd.a\
- 		--cache-dir zig-cache -static -fstrip -O ReleaseFast ../src/main.zig
--	strip -R .eh_frame -R .eh_frame_hdr static-$*/main
-+	${STRIP} -R .eh_frame -R .eh_frame_hdr static-$*/main
- 	cd static-$* && mv main ncdu && tar -czf ../static-$*.tar.gz ncdu
- 	rm -rf static-$*
- 
 diff --git a/src/main.zig b/src/main.zig
-index bdf98ef..8ebc165 100644
+index 7575c1b..6169b3e 100644
 --- a/src/main.zig
 +++ b/src/main.zig
-@@ -492,14 +492,14 @@ pub fn main() void {
+@@ -504,14 +504,14 @@ pub fn main() void {
      };
  
      if (loadConf) {
