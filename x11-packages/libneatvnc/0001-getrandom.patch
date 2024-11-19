@@ -1,6 +1,6 @@
---- a/src/crypto-nettle.c
-+++ b/src/crypto-nettle.c
-@@ -24,6 +24,11 @@
+--- a/src/crypto/random.c
++++ b/src/crypto/random.c
+@@ -21,6 +21,11 @@
  // TODO: This is linux specific
  #include <sys/random.h>
  
@@ -9,6 +9,6 @@
 +#define getrandom(buf,buflen,flags) syscall(SYS_getrandom,buf,buflen,flags)
 +#endif
 +
- #define UDIV_UP(a, b) (((a) + (b) - 1) / (b))
- 
- struct vec;
+ void crypto_random(uint8_t* dst, size_t len)
+ {
+ 	getrandom(dst, len, 0);
