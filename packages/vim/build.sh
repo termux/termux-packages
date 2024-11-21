@@ -5,10 +5,9 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_DEPENDS="libiconv, ncurses, vim-runtime"
 TERMUX_PKG_RECOMMENDS="diffutils"
 TERMUX_PKG_CONFLICTS="vim-python" # probably also , vim-gtk"
-TERMUX_PKG_VERSION=9.1.0800
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=9.1.0850
 TERMUX_PKG_SRCURL="https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=3bc15301f35addac9acde1da64da0976dbeafe1264e904c25a3cdc831e347303
+TERMUX_PKG_SHA256=4bbd7480c2d5c577a77a070fa4a133e057c37f611adf47d9a317e50244d7caa4
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_CONFFILES="share/vim/vimrc"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -84,7 +83,7 @@ termux_step_post_make_install() {
 
 	# Remove most tutor files:
 	cp "$TERMUX_PREFIX/share/vim/vim91/tutor"/{tutor,tutor.vim,tutor.utf-8} "$TERMUX_PKG_TMPDIR"/
-	rm -f "$TERMUX_PREFIX/share/vim/vim91/tutor"/*
+	rm -rf "$TERMUX_PREFIX/share/vim/vim91/tutor"/*
 	cp "$TERMUX_PKG_TMPDIR"/{tutor,tutor.vim,tutor.utf-8} "$TERMUX_PREFIX/share/vim/vim91/tutor/"
 }
 
