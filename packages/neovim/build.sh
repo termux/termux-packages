@@ -83,6 +83,12 @@ termux_step_post_make_install() {
 
 	# Tree-sitter grammars are packaged separately and installed into TERMUX_PREFIX/lib/tree_sitter.
 	ln -s "${TERMUX_PREFIX}"/lib/tree_sitter "${TERMUX_PREFIX}"/share/nvim/runtime/parser
+
+	# Move the `nvim` binary to $PREFIX/libexec
+	# and replace it with our LD_PRELOAD shim.
+	# See: packages/neovim/nvim-shim.sh for details.
+	mv "${TERMUX_PREFIX}"/bin/nvim "${TERMUX_PREFIX}"/libexec/nvim
+	install -m755 "$TERMUX_PKG_BUILDER_DIR/nvim-shim.sh" "${TERMUX_PREFIX}/bin/nvim"
 }
 
 termux_step_create_debscripts() {
