@@ -1,0 +1,69 @@
+--- a/client.c
++++ b/client.c
+@@ -385,11 +385,11 @@
+                 connected = (connect(fd, (const struct sockaddr *)&addr, sizeof(addr)) == 0);
+             }
+             if (!connected)
+-                LOG_WARN("%s: failed to connect, will now try /tmp/foot.sock", addr.sun_path);
++                LOG_WARN("%s: failed to connect, will now try @TERMUX_PREFIX@/tmp/foot.sock", addr.sun_path);
+         }
+ 
+         if (!connected) {
+-            strncpy(addr.sun_path, "/tmp/foot.sock", sizeof(addr.sun_path) - 1);
++            strncpy(addr.sun_path, "@TERMUX_PREFIX@/tmp/foot.sock", sizeof(addr.sun_path) - 1);
+             if (connect(fd, (const struct sockaddr *)&addr, sizeof(addr)) < 0) {
+                 LOG_ERRNO("failed to connect (is 'foot --server' running?)");
+                 goto err;
+--- a/config.c
++++ b/config.c
+@@ -393,7 +393,7 @@
+ 
+     xdg_config_dirs_copy = xdg_config_dirs != NULL && xdg_config_dirs[0] != '\0'
+         ? strdup(xdg_config_dirs)
+-        : strdup("/etc/xdg");
++        : strdup("@TERMUX_PREFIX@/etc/xdg");
+ 
+     if (xdg_config_dirs_copy == NULL || xdg_config_dirs_copy[0] == '\0')
+         goto done;
+@@ -2961,7 +2961,7 @@
+ {
+     const char *xdg_runtime = getenv("XDG_RUNTIME_DIR");
+     if (xdg_runtime == NULL)
+-        return xstrdup("/tmp/foot.sock");
++        return xstrdup("@TERMUX_PREFIX@/tmp/foot.sock");
+ 
+     const char *wayland_display = getenv("WAYLAND_DISPLAY");
+     if (wayland_display == NULL) {
+--- a/notify.c
++++ b/notify.c
+@@ -58,7 +58,7 @@
+     xassert(*filename == NULL);
+     xassert(*symbolic_name == NULL);
+ 
+-    char name[64] = "/tmp/foot-notification-icon-XXXXXX";
++    char name[] = "@TERMUX_PREFIX@/tmp/foot-notification-icon-XXXXXX";
+ 
+     *filename = NULL;
+     *symbolic_name = NULL;
+--- a/pgo/pgo.c
++++ b/pgo/pgo.c
+@@ -370,7 +370,7 @@
+         // memfd_create on FreeBSD 13 is SHM_ANON without sealing support
+         int mem_fd = shm_open(SHM_ANON, O_RDWR | O_CLOEXEC, 0600);
+ #else
+-        char name[] = "/tmp/foot-pgo-ptmx-XXXXXX";
++        char name[] = "@TERMUX_PREFIX@/tmp/foot-pgo-ptmx-XXXXXX";
+         int mem_fd = mkostemp(name, O_CLOEXEC);
+         unlink(name);
+ #endif
+--- a/shm.c
++++ b/shm.c
+@@ -359,7 +359,7 @@
+     // memfd_create on FreeBSD 13 is SHM_ANON without sealing support
+     pool_fd = shm_open(SHM_ANON, O_RDWR | O_CLOEXEC, 0600);
+ #else
+-    char name[] = "/tmp/foot-wayland-shm-buffer-pool-XXXXXX";
++    char name[] = "@TERMUX_PREFIX@/tmp/foot-wayland-shm-buffer-pool-XXXXXX";
+     pool_fd = mkostemp(name, O_CLOEXEC);
+     unlink(name);
+ #endif
