@@ -25,6 +25,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DBUILD_CursesDialog=ON"
 
 termux_pkg_auto_update() {
+	local TERMUX_SETUP_CMAKE="${TERMUX_SCRIPTDIR}/scripts/build/setup/termux_setup_cmake.sh"
+	local TERMUX_CMAKE_VERSION=$(grep "local TERMUX_CMAKE_VERSION=" "${TERMUX_SETUP_CMAKE}" | cut -d"=" -f2)
 	local TERMUX_REPOLOGY_DATA_FILE=$(mktemp)
 	python3 "${TERMUX_SCRIPTDIR}"/scripts/updates/api/dump-repology-data \
 		"${TERMUX_REPOLOGY_DATA_FILE}" "${TERMUX_PKG_NAME}" >/dev/null || \
@@ -33,7 +35,8 @@ termux_pkg_auto_update() {
 	if [[ "${latest_version}" == "null" ]]; then
 		latest_version="${TERMUX_PKG_VERSION}"
 	fi
-	if [[ "${latest_version}" == "${TERMUX_PKG_VERSION}" ]]; then
+	if [[ "${latest_version}" == "${TERMUX_PKG_VERSION}" ]] && \
+		[[ "${latest_version}" == "${TERMUX_CMAKE_VERSION}" ]]; then
 		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
 		rm -f "${TERMUX_REPOLOGY_DATA_FILE}"
 		return
@@ -43,12 +46,12 @@ termux_pkg_auto_update() {
 	local TERMUX_CMAKE_TARNAME="cmake-${latest_version}-linux-x86_64.tar.gz"
 	local TERMUX_CMAKE_URL="https://github.com/Kitware/CMake/releases/download/v${latest_version}/${TERMUX_CMAKE_TARNAME}"
 	local TERMUX_CMAKE_TARFILE=$(mktemp)
-	curl -s "${TERMUX_CMAKE_URL}" -o "${TERMUX_CMAKE_TARFILE}"
+	curl -Ls "${TERMUX_CMAKE_URL}" -o "${TERMUX_CMAKE_TARFILE}"
 	local TERMUX_CMAKE_SHA256=$(sha256sum "${TERMUX_CMAKE_TARFILE}" | cut -d" " -f1)
 	sed \
-		-e "s|local TERMUX_CMAKE_VERSION=.*|local TERMUX_CMAKE_VERSION=${latest_version}" \
-		-e "s|local TERMUX_CMAKE_SHA256=.*|local TERMUX_CMAKE_VERSION=${TERMUX_CMAKE_SHA256}" \
-		-i "${TERMUX_SCRIPTDIR}/scripts/build/setup/termux_setup_cmake.sh"
+		-e "s|local TERMUX_CMAKE_VERSION=.*|local TERMUX_CMAKE_VERSION=${latest_version}|" \
+		-e "s|local TERMUX_CMAKE_SHA256=.*|local TERMUX_CMAKE_SHA256=${TERMUX_CMAKE_SHA256}|" \
+		-i "${TERMUX_SETUP_CMAKE}"
 	rm -f "${TERMUX_CMAKE_TARFILE}"
 
 	termux_pkg_upgrade_version "${latest_version}"
