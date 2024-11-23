@@ -1,0 +1,150 @@
+From 6ca5e0837ec84f789d27a2b296532e1cd8c45f86 Mon Sep 17 00:00:00 2001
+From: funsafe-ptr <funsafe-ptr@proton.me>
+Date: Wed, 13 Nov 2024 23:30:07 +0000
+Subject: [PATCH 1/4] [compiler-rt] Fixed Android 8.1 `getauxval(AT_PAGESZ)`
+ crashes if called from `.preinit_array`. (#113427)
+
+---
+ compiler-rt/lib/sanitizer_common/sanitizer_linux.cpp | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/compiler-rt/lib/sanitizer_common/sanitizer_linux.cpp b/compiler-rt/lib/sanitizer_common/sanitizer_linux.cpp
+index 8b1850f85010cf..3be26e785b9647 100644
+--- a/compiler-rt/lib/sanitizer_common/sanitizer_linux.cpp
++++ b/compiler-rt/lib/sanitizer_common/sanitizer_linux.cpp
+@@ -82,6 +82,11 @@
+ #    include <sys/personality.h>
+ #  endif
+ 
++# if SANITIZER_ANDROID && __ANDROID_API__ < 35
++// The weak strerrorname_np definition allows to check for the API level at runtime.
++extern "C" SANITIZER_WEAK_ATTRIBUTE const char* strerrorname_np(int);
++# endif
++
+ #  if SANITIZER_LINUX && defined(__loongarch__)
+ #    include <sys/sysmacros.h>
+ #  endif
+@@ -1214,6 +1219,12 @@ uptr GetPageSize() {
+   CHECK_EQ(rv, 0);
+   return (uptr)pz;
+ #    elif SANITIZER_USE_GETAUXVAL
++
++#      if SANITIZER_ANDROID && __ANDROID_API__ < 35
++  if (!strerrorname_np)
++    return 4096;
++#      endif
++
+   return getauxval(AT_PAGESZ);
+ #    else
+   return sysconf(_SC_PAGESIZE);  // EXEC_PAGESIZE may not be trustworthy.
+
+From b1af6240851b191c6dea114c3934b1918e2b4c2f Mon Sep 17 00:00:00 2001
+From: funsafe-ptr <funsafe-ptr@proton.me>
+Date: Sat, 23 Nov 2024 00:01:13 +0000
+Subject: [PATCH 2/4] [compiler-rt] Add Android page size comment and
+ formatting.
+
+---
+ compiler-rt/lib/sanitizer_common/sanitizer_linux.cpp | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/compiler-rt/lib/sanitizer_common/sanitizer_linux.cpp b/compiler-rt/lib/sanitizer_common/sanitizer_linux.cpp
+index 3be26e785b9647..cd67328498f3d2 100644
+--- a/compiler-rt/lib/sanitizer_common/sanitizer_linux.cpp
++++ b/compiler-rt/lib/sanitizer_common/sanitizer_linux.cpp
+@@ -83,7 +83,8 @@
+ #  endif
+ 
+ # if SANITIZER_ANDROID && __ANDROID_API__ < 35
+-// The weak strerrorname_np definition allows to check for the API level at runtime.
++// The weak strerrorname_np definition allows to check for the API level at
++// runtime.
+ extern "C" SANITIZER_WEAK_ATTRIBUTE const char* strerrorname_np(int);
+ # endif
+ 
+@@ -1219,8 +1220,9 @@ uptr GetPageSize() {
+   CHECK_EQ(rv, 0);
+   return (uptr)pz;
+ #    elif SANITIZER_USE_GETAUXVAL
+-
+ #      if SANITIZER_ANDROID && __ANDROID_API__ < 35
++  // The 16 KB page size was introduced in Android 15, while earlier versions 
++  // of Android used a 4 KB page size.
+   if (!strerrorname_np)
+     return 4096;
+ #      endif
+
+From 8997cc5134cff9bdb75a9fe99220d12fd200f644 Mon Sep 17 00:00:00 2001
+From: funsafe-ptr <funsafe-ptr@proton.me>
+Date: Sat, 23 Nov 2024 00:23:19 +0000
+Subject: [PATCH 3/4] [compiler-rt] Fix formatting.
+
+Signed-off-by: funsafe-ptr <funsafe-ptr@proton.me>
+---
+ compiler-rt/lib/sanitizer_common/sanitizer_linux.cpp | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/compiler-rt/lib/sanitizer_common/sanitizer_linux.cpp b/compiler-rt/lib/sanitizer_common/sanitizer_linux.cpp
+index cd67328498f3d2..d7fbee297f20a1 100644
+--- a/compiler-rt/lib/sanitizer_common/sanitizer_linux.cpp
++++ b/compiler-rt/lib/sanitizer_common/sanitizer_linux.cpp
+@@ -82,11 +82,11 @@
+ #    include <sys/personality.h>
+ #  endif
+ 
+-# if SANITIZER_ANDROID && __ANDROID_API__ < 35
++#  if SANITIZER_ANDROID && __ANDROID_API__ < 35
+ // The weak strerrorname_np definition allows to check for the API level at
+ // runtime.
+-extern "C" SANITIZER_WEAK_ATTRIBUTE const char* strerrorname_np(int);
+-# endif
++extern "C" SANITIZER_WEAK_ATTRIBUTE const char *strerrorname_np(int);
++#  endif
+ 
+ #  if SANITIZER_LINUX && defined(__loongarch__)
+ #    include <sys/sysmacros.h>
+@@ -1221,7 +1221,7 @@ uptr GetPageSize() {
+   return (uptr)pz;
+ #    elif SANITIZER_USE_GETAUXVAL
+ #      if SANITIZER_ANDROID && __ANDROID_API__ < 35
+-  // The 16 KB page size was introduced in Android 15, while earlier versions 
++  // The 16 KB page size was introduced in Android 15, while earlier versions
+   // of Android used a 4 KB page size.
+   if (!strerrorname_np)
+     return 4096;
+
+From b17a0474f47676ae1281c63175f3b45483a8f0bc Mon Sep 17 00:00:00 2001
+From: funsafe-ptr <funsafe-ptr@proton.me>
+Date: Sat, 23 Nov 2024 03:56:10 +0000
+Subject: [PATCH 4/4] [compiler-rt] Fix comment.
+
+---
+ compiler-rt/lib/sanitizer_common/sanitizer_linux.cpp | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/compiler-rt/lib/sanitizer_common/sanitizer_linux.cpp b/compiler-rt/lib/sanitizer_common/sanitizer_linux.cpp
+index d7fbee297f20a1..9be3faccdf53fa 100644
+--- a/compiler-rt/lib/sanitizer_common/sanitizer_linux.cpp
++++ b/compiler-rt/lib/sanitizer_common/sanitizer_linux.cpp
+@@ -83,8 +83,8 @@
+ #  endif
+ 
+ #  if SANITIZER_ANDROID && __ANDROID_API__ < 35
+-// The weak strerrorname_np definition allows to check for the API level at
+-// runtime.
++// The weak `strerrorname_np` (introduced in API level 35) definition,
++// allows for checking the API level at runtime.
+ extern "C" SANITIZER_WEAK_ATTRIBUTE const char *strerrorname_np(int);
+ #  endif
+ 
+@@ -1221,8 +1221,8 @@ uptr GetPageSize() {
+   return (uptr)pz;
+ #    elif SANITIZER_USE_GETAUXVAL
+ #      if SANITIZER_ANDROID && __ANDROID_API__ < 35
+-  // The 16 KB page size was introduced in Android 15, while earlier versions
+-  // of Android used a 4 KB page size.
++  // The 16 KB page size was introduced in Android 15 (API level 35), while
++  // earlier versions of Android always used a 4 KB page size.
+   if (!strerrorname_np)
+     return 4096;
+ #      endif
