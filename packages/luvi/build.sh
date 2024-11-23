@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://luvit.io
 TERMUX_PKG_DESCRIPTION="A project in-between luv and luvit"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="Komo @mbekkomo"
-TERMUX_PKG_VERSION=2.15.0
+TERMUX_PKG_VERSION=1:2.15.0
 TERMUX_PKG_SRCURL=git+https://github.com/luvit/luvi
 TERMUX_PKG_DEPENDS="libluajit, lua51-lpeg, luv, openssl, pcre2, zlib"
 TERMUX_PKG_SUGGESTS="lit, luvit"
@@ -41,5 +41,5 @@ termux_step_pre_configure() {
 		"${script_checksum}"
 	export LUA_PATH=";;${TERMUX_PKG_CACHEDIR}/?.lua"
 
-	echo "${TERMUX_PKG_VERSION}" > "${TERMUX_PKG_SRCDIR}/VERSION"
+	echo "${TERMUX_PKG_VERSION:2}" > "${TERMUX_PKG_SRCDIR}/VERSION"
 }
