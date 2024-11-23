@@ -12,24 +12,3 @@ diff -uNr sc/configure sc.mod/configure
  	esac
  	shift
  done
-diff -uNr sc/Makefile.in sc.mod/Makefile.in
---- sc/Makefile.in	2022-04-12 17:45:34.738634444 -0700
-+++ sc.mod/Makefile.in	2022-04-12 18:04:04.218706481 -0700
-@@ -20,7 +20,7 @@
- # packaging this with an O/S, for example, you'll probably want to change
- # this to /usr.  Otherwise, /usr/local is probably more appropriate, unless
- # you're replacing the vendor-supplied version.
--prefix=/usr/local
-+prefix=@TERMUX_PREFIX@
- 
- # This is where the install step puts it.
- EXDIR=${prefix}/bin
-@@ -169,7 +169,7 @@
- # Command to use to make temporary copies of some source files.
- #LN=ln -s
- #LN=cp
--LN=ln
-+LN=ln -s
- 
- #### SYSTEM DEFINES ####
- 
