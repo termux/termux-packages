@@ -1,0 +1,53 @@
+diff --git a/ext/webgpu/byow.rs b/ext/webgpu/byow.rs
+index c9e1177b1..dee840119 100644
+--- a/ext/webgpu/byow.rs
++++ b/ext/webgpu/byow.rs
+@@ -5,6 +5,7 @@ use deno_core::OpState;
+ use deno_core::ResourceId;
+ use std::ffi::c_void;
+ #[cfg(any(
++  target_os = "android",
+   target_os = "linux",
+   target_os = "macos",
+   target_os = "freebsd",
+@@ -29,6 +30,7 @@ pub enum ByowError {
+   #[error("Invalid system on macOS")]
+   InvalidSystem,
+   #[cfg(any(
++    target_os = "android",
+     target_os = "linux",
+     target_os = "freebsd",
+     target_os = "openbsd"
+@@ -36,6 +38,7 @@ pub enum ByowError {
+   #[error("Invalid system on Linux/BSD")]
+   InvalidSystem,
+   #[cfg(any(
++    target_os = "android",
+     target_os = "windows",
+     target_os = "linux",
+     target_os = "freebsd",
+@@ -44,6 +47,7 @@ pub enum ByowError {
+   #[error("window is null")]
+   NullWindow,
+   #[cfg(any(
++    target_os = "android",
+     target_os = "linux",
+     target_os = "freebsd",
+     target_os = "openbsd"
+@@ -150,7 +154,7 @@ fn raw_window(
+   Ok((win_handle, display_handle))
+ }
+ 
+-#[cfg(any(target_os = "linux", target_os = "freebsd", target_os = "openbsd"))]
++#[cfg(any(target_os = "android", target_os = "linux", target_os = "freebsd", target_os = "openbsd"))]
+ fn raw_window(
+   system: &str,
+   window: *const c_void,
+@@ -188,6 +192,7 @@ fn raw_window(
+ }
+ 
+ #[cfg(not(any(
++  target_os = "android",
+   target_os = "macos",
+   target_os = "windows",
+   target_os = "linux",
