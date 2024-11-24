@@ -1,11 +1,11 @@
 --- a/src/misc.c
 +++ b/src/misc.c
-@@ -1953,7 +1953,8 @@
+@@ -1971,7 +1971,8 @@
   */
  char *ssh_strerror(int err_num, char *buf, size_t buflen)
  {
--#if defined(__linux__) && defined(__GLIBC__) && defined(_GNU_SOURCE)
-+#if defined(__linux__) && defined(__GLIBC__) && defined(_GNU_SOURCE) \
+-#if ((defined(__linux__) && defined(__GLIBC__)) || defined(__CYGWIN__)) && defined(_GNU_SOURCE)
++#if ((defined(__linux__) && defined(__GLIBC__)) || defined(__CYGWIN__)) && defined(_GNU_SOURCE) \
 +    || defined(__ANDROID__) && defined(__USE_GNU)
      /* GNU extension on Linux */
      return strerror_r(err_num, buf, buflen);
