@@ -1,0 +1,20 @@
+diff --git a/runtime/errors.rs b/runtime/errors.rs
+index 4268fbd50..d09aec325 100644
+--- a/runtime/errors.rs
++++ b/runtime/errors.rs
+@@ -299,6 +299,7 @@ fn get_webgpu_byow_error_class(
+     deno_webgpu::byow::ByowError::CreateSurface(_) => "Error",
+     deno_webgpu::byow::ByowError::InvalidSystem => "TypeError",
+     #[cfg(any(
++      target_os = "android",
+       target_os = "windows",
+       target_os = "linux",
+       target_os = "freebsd",
+@@ -306,6 +307,7 @@ fn get_webgpu_byow_error_class(
+     ))]
+     deno_webgpu::byow::ByowError::NullWindow => "TypeError",
+     #[cfg(any(
++      target_os = "android",
+       target_os = "linux",
+       target_os = "freebsd",
+       target_os = "openbsd"
