@@ -6,4 +6,4 @@
 # https://github.com/android/ndk/issues/201
 #
 # Shim to properly expose LuaJIT runtime symbols to dynamically linked plugin modules
-LD_PRELOAD="$LD_PRELOAD:libluajit.so" exec "$PREFIX/libexec/nvim" "$@"
+LD_PRELOAD="$LD_PRELOAD:$PREFIX/lib/libluajit.so" exec "$PREFIX/libexec/nvim" "$@"
