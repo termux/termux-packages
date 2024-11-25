@@ -1,0 +1,305 @@
++++ ./src/virgl_hw.h
+@@ -587,6 +587,7 @@
+ #define VIRGL_CAP_V2_DRAW_PARAMETERS      (1u << 14)
+ #define VIRGL_CAP_V2_GROUP_VOTE           (1u << 15)
+ #define VIRGL_CAP_V2_MIRROR_CLAMP_TO_EDGE (1u << 16)
++#define VIRGL_CAP_V2_DIRECT_CONNECTION_TO_X_SERVER (1u << 31)
+ 
+ /* virgl bind flags - these are compatible with mesa 10.5 gallium.
+  * but are fixed, no other should be passed to virgl either.
++++ ./vtest/vtest_protocol.h
+@@ -78,6 +78,8 @@
+ #define VCMD_SYNC_WAIT 23
+ #define VCMD_SUBMIT_CMD2 24
+ 
++#define VCMD_DRAW_TO_X_SERVER_DRAWABLE 48
++
+ #define VCMD_RES_CREATE_SIZE 10
+ #define VCMD_RES_CREATE_RES_HANDLE 0 /* must be 0 since protocol version 3 */
+ #define VCMD_RES_CREATE_TARGET 1
+@@ -233,4 +235,6 @@
+ #define VCMD_SUBMIT_CMD2_BATCH_SYNC_COUNT(n)       (1 + 8 * (n) + 4)
+ #define VCMD_SUBMIT_CMD2_BATCH_RING_IDX(n)         (1 + 8 * (n) + 5)
+ 
++#define VCMD_DRAW_TO_X_SERVER_DRAWABLE_SIZE 2
++
+ #endif /* VTEST_PROTOCOL */
++++ ./vtest/vtest.h
+@@ -97,6 +97,8 @@
+ 
+ int vtest_submit_cmd2(uint32_t length_dw);
+ 
++int vtest_draw_to_x_server_drawable(uint32_t length_dw);
++
+ void vtest_set_max_length(uint32_t length);
+ 
+ #endif
++++ ./vtest/vtest_server.c
+@@ -733,6 +733,8 @@
+    [VCMD_SYNC_WRITE]            = { vtest_sync_write,            true },
+    [VCMD_SYNC_WAIT]             = { vtest_sync_wait,             true },
+    [VCMD_SUBMIT_CMD2]           = { vtest_submit_cmd2,           true },
++
++   [VCMD_DRAW_TO_X_SERVER_DRAWABLE]  = { vtest_draw_to_x_server_drawable, true },
+ };
+ 
+ static int vtest_client_dispatch_commands(struct vtest_client *client)
++++ ./vtest/vtest_renderer.c
+@@ -1089,6 +1089,9 @@
+          return report_failed_call("vtest_send_fd", ret);
+       }
+ 
++      if (args->bind & VIRGL_BIND_DISPLAY_TARGET)
++         virgl_renderer_attach_shm_fd(res->res_id, fd);
++
+       /* Closing the file descriptor does not unmap the region. */
+       close(fd);
+ 
+@@ -2135,6 +2138,28 @@
+    return 0;
+ }
+ 
++int vtest_draw_to_x_server_drawable(UNUSED uint32_t length_dw)
++{
++   struct vtest_context *ctx = vtest_get_current_context();
++   uint32_t buf[VCMD_DRAW_TO_X_SERVER_DRAWABLE_SIZE];
++   struct vtest_resource *res = NULL;
++   int ret = -1;
++
++   ret = ctx->input->read(ctx->input, buf, sizeof(buf));
++   if (ret != sizeof(buf)) {
++      return -1;
++   }
++
++   uint32_t handle = buf[0];
++   uint32_t drawable = buf[1];
++
++   res = util_hash_table_get(ctx->resource_table, intptr_to_pointer(handle));
++   if (!res)
++      return report_failed_call("util_hash_table_get", -ESRCH);
++
++   return virgl_renderer_draw_to_x_server_drawable(res->res_id, ctx->ctx_id, drawable);
++}
++
+ void vtest_set_max_length(uint32_t length)
+ {
+    renderer.max_length = length;
++++ ./src/virglrenderer.h
+@@ -306,6 +306,9 @@
+                                                    struct iovec *iovec,
+                                                    unsigned int iovec_cnt);
+ 
++VIRGL_EXPORT int virgl_renderer_attach_shm_fd(uint32_t handle, int fd);
++VIRGL_EXPORT int virgl_renderer_draw_to_x_server_drawable(uint32_t handle, uint32_t ctx_id, uint32_t drawable);
++
+ VIRGL_EXPORT void virgl_renderer_get_cap_set(uint32_t set, uint32_t *max_ver,
+                                              uint32_t *max_size);
+ 
++++ ./src/virglrenderer.c
+@@ -299,6 +299,20 @@
+    return ctx->submit_cmd(ctx, buffer, ndw * sizeof(uint32_t));
+ }
+ 
++VIRGL_EXPORT int virgl_renderer_attach_shm_fd(uint32_t handle, int fd) {
++   TRACE_FUNC();
++
++   struct virgl_resource *res = virgl_resource_lookup(handle);
++   return vrend_renderer_attach_shm_fd(res->pipe_resource, fd);
++}
++
++VIRGL_EXPORT int virgl_renderer_draw_to_x_server_drawable(uint32_t handle, uint32_t ctx_id, uint32_t drawable) {
++   TRACE_FUNC();
++
++   struct virgl_resource *res = virgl_resource_lookup(handle);
++   return vrend_renderer_draw_to_x_server_drawable(res->pipe_resource, virgl_context_lookup(ctx_id), drawable);
++}
++
+ int virgl_renderer_transfer_write_iov(uint32_t handle,
+                                       uint32_t ctx_id,
+                                       int level,
++++ ./src/vrend_decode.c
+@@ -53,6 +53,10 @@
+    struct vrend_context *grctx;
+ };
+
++struct vrend_context* vrend_context_get_from_virgl(struct virgl_context* ctx) {
++   return ctx == NULL ? NULL : ((struct vrend_decode_ctx*) ctx)->grctx;
++}
++
+ static inline uint32_t get_buf_entry(const uint32_t *buf, uint32_t offset)
+ {
+    return buf[offset];
++++ ./src/vrend_renderer.h
+@@ -108,6 +108,7 @@
+    uint32_t blob_id;
+    struct list_head head;
+    bool is_imported;
++   uint32_t shm_seg, pixmap;
+ };
+
+ #define VIRGL_TEXTURE_NEED_SWIZZLE        (1 << 0)
+@@ -634,5 +635,8 @@
+ int
+ vrend_renderer_resource_d3d11_texture2d(struct pipe_resource *res, void **handle);
+ 
+ 
++struct vrend_context* vrend_context_get_from_virgl(struct virgl_context* ctx);
++int vrend_renderer_attach_shm_fd(struct pipe_resource *res, int fd);
++int vrend_renderer_draw_to_x_server_drawable(struct pipe_resource *res, struct virgl_context* ctx, uint32_t drawable);
+ #endif
++++ ./src/vrend_renderer.c	2024-11-25 19:44:35.525876727 +0200
+@@ -65,6 +65,11 @@
+
+ #include "tgsi/tgsi_text.h"
+
++#include <fcntl.h>
++#include <xcb/xcb.h>
++#include <xcb/shm.h>
++#include <xcb/xcb_errors.h>
++
+ #ifdef HAVE_EPOXY_GLX_H
+ #include <epoxy/glx.h>
+ #endif
+@@ -368,6 +373,13 @@
+    int gl_major_ver;
+    int gl_minor_ver;
+
++   struct {
++      xcb_connection_t* conn;
++      xcb_errors_context_t *err_ctx;
++      xcb_window_t root;
++      xcb_gcontext_t gc;
++   } xcb;
++
+    mtx_t fence_mutex;
+    thrd_t sync_thread;
+    virgl_gl_context sync_context;
+@@ -7579,6 +7591,22 @@
+    /* make sure you have the latest version of libepoxy */
+    gles = epoxy_is_desktop_gl() == 0;
+
++   vrend_state.xcb.conn = getenv("DISPLAY") ? xcb_connect(NULL, NULL) : NULL;
++   if (vrend_state.xcb.conn && xcb_connection_has_error(vrend_state.xcb.conn)) {
++      virgl_error("Failed to connect X server:  %d\n", xcb_connection_has_error(vrend_state.xcb.conn));
++      xcb_disconnect(vrend_state.xcb.conn);
++      vrend_state.xcb.conn = NULL;
++   }
++
++   if (vrend_state.xcb.conn) {
++      xcb_errors_context_new(vrend_state.xcb.conn, &vrend_state.xcb.err_ctx);
++      xcb_screen_t *screen = xcb_setup_roots_iterator(xcb_get_setup(vrend_state.xcb.conn)).data;
++      vrend_state.xcb.root = screen->root;
++      vrend_state.xcb.gc = xcb_generate_id(vrend_state.xcb.conn);
++      xcb_create_gc(vrend_state.xcb.conn, vrend_state.xcb.gc, screen->root, XCB_GC_FOREGROUND | XCB_GC_GRAPHICS_EXPOSURES, (const uint32_t[]) {screen->black_pixel, 0});
++      xcb_flush(vrend_state.xcb.conn);
++   }
++
+    vrend_state.gl_major_ver = gl_ver / 10;
+    vrend_state.gl_minor_ver = gl_ver % 10;
+
+@@ -8846,6 +8874,15 @@
+    if (res->d3d_tex2d)
+       res->d3d_tex2d->lpVtbl->Release(res->d3d_tex2d);
+ #endif
++
++   if (vrend_state.xcb.conn) {
++      if (res->pixmap)
++         xcb_free_pixmap(vrend_state.xcb.conn, res->pixmap);
++      if (res->shm_seg)
++         xcb_shm_detach(vrend_state.xcb.conn, res->shm_seg);
++      xcb_flush(vrend_state.xcb.conn);
++   }
++
+    free(res);
+ }
+
+@@ -12696,6 +12733,9 @@
+    if (has_feature(feat_texture_mirror_clamp_to_edge))
+       caps->v2.capability_bits_v2 |= VIRGL_CAP_V2_MIRROR_CLAMP_TO_EDGE;
+
++   if (vrend_state.xcb.conn)
++      caps->v2.capability_bits_v2 |= VIRGL_CAP_V2_DIRECT_CONNECTION_TO_X_SERVER;
++
+ #ifdef ENABLE_VIDEO
+    vrend_video_fill_caps(caps);
+ #else
+@@ -13536,3 +13576,79 @@
+     return ctx->video;
+ }
+ #endif
++
++static void vrend_renderer_handle_xcb_error(xcb_generic_error_t *e) {
++   xcb_errors_context_t *ctx = vrend_state.xcb.err_ctx;
++   const char* ext = NULL;
++   const char* err_name =  xcb_errors_get_name_for_error(ctx, e->error_code, &ext);
++   const char* err_code_name = xcb_errors_get_name_for_minor_code(ctx, e->major_code, e->minor_code);
++   dprintf(2, ""
++   "XCB Error of failed request:               %s::%s\n"
++   "  Major opcode of failed request:          %hhu(%s)\n"
++   "  Minor opcode of failed request:          %hu(%s)\n"
++   "  Serial number of failed request:         %d\n"
++   "  Current serial number in output stream:  %d\n",
++   (ext ? ext : ""), err_name, e->major_code, xcb_errors_get_name_for_major_code(ctx, e->major_code),
++           e->minor_code, (err_code_name ? err_code_name : "Core"),
++           e->sequence, e->full_sequence);
++}
++
++int vrend_renderer_attach_shm_fd(struct pipe_resource *pres, int fd) {
++   struct vrend_resource *res = (struct vrend_resource *)pres;
++   xcb_generic_error_t *error = NULL;
++
++   if (!res)
++      return EINVAL;
++
++   if (vrend_state.xcb.conn == NULL)
++      return 0;
++
++   res->shm_seg = xcb_generate_id(vrend_state.xcb.conn);
++   error = xcb_request_check(vrend_state.xcb.conn, xcb_shm_attach_fd_checked(vrend_state.xcb.conn, res->shm_seg, fcntl(fd, F_DUPFD_CLOEXEC, 0), 0));
++   if (error) {
++      vrend_renderer_handle_xcb_error(error);
++      free(error);
++      res->pixmap = 0;
++      return ENOMEM;
++   }
++
++   res->pixmap = xcb_generate_id(vrend_state.xcb.conn);
++   error = xcb_request_check(vrend_state.xcb.conn, xcb_shm_create_pixmap(vrend_state.xcb.conn, res->pixmap, vrend_state.xcb.root, res->base.width0, res->base.height0, 24, res->shm_seg, 0));
++   if (error) {
++      vrend_renderer_handle_xcb_error(error);
++      free(error);
++      xcb_shm_detach(vrend_state.xcb.conn, res->shm_seg);
++      xcb_flush(vrend_state.xcb.conn);
++      res->shm_seg = res->pixmap = 0;
++      return ENOMEM;
++   }
++   return 0;
++}
++
++int vrend_renderer_draw_to_x_server_drawable(struct pipe_resource *pres, struct virgl_context* ctx, uint32_t drawable) {
++   struct vrend_resource *res = (struct vrend_resource *)pres;
++   struct vrend_transfer_info transfer_info = {0};
++   xcb_generic_error_t *error = NULL;
++   struct pipe_box box = {0};
++   int ret = 0;
++
++   if (!vrend_state.xcb.conn)
++      return ESRCH;
++
++   if (!res)
++      return EINVAL;
++
++   transfer_info.stride = util_format_get_nblocksx(pres->format, pres->width0) * util_format_get_blocksize(pres->format);
++   transfer_info.box = &box;
++   box.width = pres->width0;
++   box.height = pres->height0;
++   box.depth = 1;
++
++   if ((ret = vrend_renderer_transfer_internal(vrend_context_get_from_virgl(ctx), res, &transfer_info, VIRGL_TRANSFER_FROM_HOST)))
++      return ret;
++
++   xcb_copy_area(vrend_state.xcb.conn, res->pixmap, drawable, vrend_state.xcb.gc, 0, 0, 0, 0, pres->width0, pres->height0);
++   xcb_flush(vrend_state.xcb.conn);
++
++   return 0;
++}
