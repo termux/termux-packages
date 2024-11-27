@@ -1,0 +1,43 @@
+diff --git a/src/epoll.c b/src/epoll.c
+index 051da6b65..e96e05860 100644
+--- a/src/epoll.c
++++ b/src/epoll.c
+@@ -10,7 +10,7 @@
+ 
+ #include "defs.h"
+ #include "kernel_fcntl.h"
+-#include <sys/epoll.h>
++#include <linux/eventpoll.h>
+ 
+ SYS_FUNC(epoll_create)
+ {
+@@ -33,20 +33,6 @@ SYS_FUNC(epoll_create1)
+ 
+ #include "xlat/epollevents.h"
+ 
+-static void
+-print_epoll_data(const epoll_data_t data)
+-{
+-	/*
+-	 * We cannot know what format the tracee uses, so
+-	 * print both u32 and u66 which will cover every value.
+-	 */
+-	tprint_struct_begin();
+-	PRINT_FIELD_U(data, u32);
+-	tprint_struct_next();
+-	PRINT_FIELD_U(data, u64);
+-	tprint_struct_end();
+-}
+-
+ static bool
+ print_epoll_event(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
+ {
+@@ -55,7 +41,7 @@ print_epoll_event(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
+ 	tprint_struct_begin();
+ 	PRINT_FIELD_FLAGS(*ev, events, epollevents, "EPOLL???");
+ 	tprint_struct_next();
+-	PRINT_FIELD_OBJ_VAL(*ev, data, print_epoll_data);
++	PRINT_FIELD_X(*ev, data);
+ 	tprint_struct_end();
+ 
+ 	return true;
