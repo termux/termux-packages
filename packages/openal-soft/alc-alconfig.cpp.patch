@@ -1,13 +1,13 @@
 --- a/alc/alconfig.cpp
 +++ b/alc/alconfig.cpp
-@@ -383,13 +383,13 @@
+@@ -384,13 +384,13 @@
  void ReadALConfig()
  {
      namespace fs = std::filesystem;
 -    fs::path path{"/etc/openal/alsoft.conf"};
 +    fs::path path{"@TERMUX_PREFIX@/etc/openal/alsoft.conf"};
  
-     TRACE("Loading config %s...\n", path.u8string().c_str());
+     TRACE("Loading config %s...\n", reinterpret_cast<const char*>(path.u8string().c_str()));
      if(std::ifstream f{path}; f.is_open())
          LoadConfigFromFile(f);
  
