@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@licy183"
 TERMUX_PKG_VERSION="1.0.1"
 _LIBEPOXY_VERSION="1.5.10"
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=(
 	https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/virglrenderer-${TERMUX_PKG_VERSION}/virglrenderer-virglrenderer-${TERMUX_PKG_VERSION}.tar.gz
 	https://github.com/anholt/libepoxy/archive/refs/tags/${_LIBEPOXY_VERSION}.tar.gz
@@ -14,6 +14,7 @@ TERMUX_PKG_SHA256=(
 	a7ced37f4102b745ac86d6a70a9da399cc139ff168ba6b8002b4d8d43c900c15
 )
 TERMUX_PKG_DEPENDS="angle-android"
+TERMUX_PKG_BUILD_DEPENDS="libxau-static, libxcb-static, libxcb-errors-static, libxdmcp-static"
 TERMUX_PKG_HOSTBUILD=true
 
 termux_step_post_get_source() {
@@ -46,9 +47,9 @@ termux_step_host_build() {
 	CXX=$(command -v $CCTERMUX_HOST_PLATFORM-clang++)
 	LD=$(command -v ld.lld)
 	CFLAGS=""
-	CPPFLAGS=""
+	CPPFLAGS="-I$TERMUX_PREFIX/include"
 	CXXFLAGS=""
-	LDFLAGS="-Wl,-rpath=$_INSTALL_PREFIX/lib"
+	LDFLAGS+="-Wl,-rpath=$_INSTALL_PREFIX/lib -L$TERMUX_PREFIX/lib -l:libXdmcp.a -l:libXau.a -l:libxcb.a -l:libxcb-shm.a -l:libxcb-errors.a"
 	STRIP=$(command -v llvm-strip)
 	termux_setup_meson
 
