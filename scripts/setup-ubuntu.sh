@@ -149,6 +149,10 @@ PACKAGES+=" llvm-17-dev"
 PACKAGES+=" llvm-17-tools"
 PACKAGES+=" clang-17"
 
+# Needed by librusty-v8
+PACKAGES+=" libclang-rt-17-dev"
+PACKAGES+=" libclang-rt-17-dev:i386"
+
 # Needed for package smalltalk.
 PACKAGES+=" libsigsegv-dev"
 PACKAGES+=" zip"
