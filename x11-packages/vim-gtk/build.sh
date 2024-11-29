@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
 TERMUX_PKG_BUILD_DEPENDS="libluajit, python"
 TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libcairo, libcanberra, libice, libiconv, libsm, libx11, libxt, ncurses, pango"
 TERMUX_PKG_SUGGESTS="python, libluajit"
-TERMUX_PKG_RECOMMENDS="diffutils"
+TERMUX_PKG_RECOMMENDS="diffutils, xxd"
 TERMUX_PKG_CONFLICTS="vim"
 TERMUX_PKG_REPLACES="vim-python (<= 9.1.0850)"
 TERMUX_PKG_VERSION=9.1.0850
@@ -47,6 +47,12 @@ TERMUX_PKG_RM_AFTER_INSTALL="
 share/vim/vim91/spell/en.ascii*
 share/vim/vim91/print
 share/vim/vim91/tools
+"
+
+# Avoid overlap with the `xxd` subpackage of `vim`
+TERMUX_PKG_RM_AFTER_INSTALL+="
+bin/xxd
+share/man/man1/xxd.1.gz
 "
 
 TERMUX_PKG_CONFFILES="share/vim/vimrc"
