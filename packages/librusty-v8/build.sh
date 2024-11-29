@@ -13,13 +13,13 @@ termux_step_configure() {
 	termux_setup_gn
 
 	export EXTRA_GN_ARGS="
-android32_ndk_api_level=$TERMUX_PKG_API_LEVEL
-android64_ndk_api_level=$TERMUX_PKG_API_LEVEL
-android_ndk_root=\"$NDK\"
-android_ndk_version=\"$TERMUX_NDK_VERSION\"
+android32_ndk_api_level=${TERMUX_PKG_API_LEVEL}
+android64_ndk_api_level=${TERMUX_PKG_API_LEVEL}
+android_ndk_root=\"${NDK}\"
+android_ndk_version=\"${TERMUX_NDK_VERSION}\"
 "
 
-	if [ "$TERMUX_ARCH" = "arm" ]; then
+	if [[ "${TERMUX_ARCH}" == "arm" ]]; then
 		EXTRA_GN_ARGS+=" target_cpu = \"arm\""
 		EXTRA_GN_ARGS+=" v8_target_cpu = \"arm\""
 		EXTRA_GN_ARGS+=" arm_arch = \"armv7-a\""
@@ -30,19 +30,25 @@ android_ndk_version=\"$TERMUX_NDK_VERSION\"
 	export GN="$(command -v gn)"
 
 	# Make build.rs happy
-	ln -sf "$NDK" "$TERMUX_PKG_SRCDIR"/third_party/android_ndk
+	ln -sf "${NDK}" "${TERMUX_PKG_SRCDIR}"/third_party/android_ndk
 
-	BINDGEN_EXTRA_CLANG_ARGS="--target=$CCTERMUX_HOST_PLATFORM"
-	BINDGEN_EXTRA_CLANG_ARGS+=" --sysroot=$TERMUX_PKG_SRCDIR/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot"
+	BINDGEN_EXTRA_CLANG_ARGS="--target=${CCTERMUX_HOST_PLATFORM}"
+	BINDGEN_EXTRA_CLANG_ARGS+=" --sysroot=${TERMUX_PKG_SRCDIR}/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot"
 	export BINDGEN_EXTRA_CLANG_ARGS
-	local env_name=BINDGEN_EXTRA_CLANG_ARGS_${CARGO_TARGET_NAME@U}
-	env_name=${env_name//-/_}
-	export "$env_name"="$BINDGEN_EXTRA_CLANG_ARGS"
+	: "BINDGEN_EXTRA_CLANG_ARGS_${CARGO_TARGET_NAME@U}"
+	: "${_//-/_}"
+	export "$_"="${BINDGEN_EXTRA_CLANG_ARGS}"
 }
 
 termux_step_make() {
 	export V8_FROM_SOURCE=1
-	cargo build -vv --jobs "${TERMUX_PKG_MAKE_PROCESSES}" --target "${CARGO_TARGET_NAME}" --release
+	cargo build --jobs "${TERMUX_PKG_MAKE_PROCESSES}" --target "${CARGO_TARGET_NAME}" --release
+	export PRINT_GN_ARGS="1"
+
+	# patch for i686 and arm
+	if [[ "${TERMUX_ARCH}" =~ i686|arm ]]; then
+		patch "target/${CARGO_TARGET_NAME}/release/gn_out/src_binding.rs" "${TERMUX_PKG_BUILDER_SCRIPT}/fix-size-for-32-bit-archs.diff"
+	fi
 }
 
 termux_step_make_install() {
