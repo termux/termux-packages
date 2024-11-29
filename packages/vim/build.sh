@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
 TERMUX_PKG_BUILD_DEPENDS="libluajit, python"
 TERMUX_PKG_DEPENDS="libiconv, ncurses"
 TERMUX_PKG_SUGGESTS="python, libluajit"
-TERMUX_PKG_RECOMMENDS="diffutils"
+TERMUX_PKG_RECOMMENDS="diffutils, xxd"
 TERMUX_PKG_CONFLICTS="vim-gtk"
 TERMUX_PKG_REPLACES="vim-python (<= 9.1.0850), vim-runtime (<= 9.1.0850)"
 TERMUX_PKG_VERSION=9.1.0850
