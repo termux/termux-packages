@@ -1,5 +1,10 @@
 --- a/waflib/Context.py
 +++ b/waflib/Context.py
+@@ -2,3 +2,3 @@
+ 
+-import os,re,imp,sys
++import os,re,types,sys
+ from waflib import Utils,Errors,Logs
 @@ -106,7 +106,7 @@
  				cache[node]=True
  				self.pre_recurse(node)
@@ -11,7 +16,8 @@
  					self.post_recurse(node)
 @@ -346,7 +346,7 @@
  		pass
- 	module=imp.new_module(WSCRIPT_FILE)
+-	module=imp.new_module(WSCRIPT_FILE)
++	module=types.ModuleType(WSCRIPT_FILE)
  	try:
 -		code=Utils.readf(path,m='rU',encoding=encoding)
 +		code=Utils.readf(path,m='r',encoding=encoding)
