@@ -47,6 +47,7 @@ termux_step_make() {
 	env_name=RUSTY_V8_SRC_BINDING_PATH_${CARGO_TARGET_NAME@U}
 	env_name=${env_name//-/_}
 	export "$env_name"="${TERMUX_PREFIX}/include/librusty_v8/src_binding.rs"
+	export DENO_SKIP_CROSS_BUILD_CHECK=1
 
 	cargo build --jobs "${TERMUX_PKG_MAKE_PROCESSES}" --target "${CARGO_TARGET_NAME}" --release
 }
