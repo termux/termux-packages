@@ -1,0 +1,11 @@
+--- ./networking/ifconfig.c.orig	2024-11-30 16:55:37.222317063 +0800
++++ ./networking/ifconfig.c	2024-11-30 16:57:46.706317014 +0800
+@@ -127,7 +127,7 @@
+ # define IFF_DYNAMIC     0x8000	/* dialup device with changing addresses */
+ #endif
+ 
+-#if ENABLE_FEATURE_IPV6
++#ifdef FORCE_IN6_IFREQ
+ struct in6_ifreq {
+ 	struct in6_addr ifr6_addr;
+ 	uint32_t ifr6_prefixlen;
