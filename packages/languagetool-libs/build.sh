@@ -18,7 +18,10 @@ termux_step_make_install() {
 		"languagetool-http-server org.languagetool.server.HTTPServer" \
 		"languagetool-https-server org.languagetool.server.HTTPSServer"; do
 		read -r bin package <<<"$pair"
-		sed "s|@MAIN@|$package|g" "${TERMUX_PKG_BUILDER_DIR}/languagetool.sh" > "${TERMUX_PREFIX}/bin/$bin"
+		sed \
+			-e "s|@MAIN@|$package|g" \
+			-e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
+			"${TERMUX_PKG_BUILDER_DIR}/languagetool.sh" > "${TERMUX_PREFIX}/bin/$bin"
 		chmod 700 "${TERMUX_PREFIX}/bin/$bin"
 	done
 }
