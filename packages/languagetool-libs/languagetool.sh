@@ -1,4 +1,4 @@
-#!/data/data/com.termux/files/usr/bin/env bash
+#!@TERMUX_PREFIX@/bin/env bash
 
 main="@MAIN@"
 
