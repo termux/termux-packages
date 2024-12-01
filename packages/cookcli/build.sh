@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.8.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/cooklang/cookcli/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=050fcbd7f8f938bd6ffc898a403795101807cfa6d76c787e991c8d90031405c6
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -15,7 +16,8 @@ termux_step_pre_configure() {
 
 	# i686: __atomic_load
 	if [[ "${TERMUX_ARCH}" == "i686" ]]; then
-		RUSTFLAGS+=" -C link-arg=$(${CC} -print-libgcc-file-name)"
+		local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
+		export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C link-arg=$(${CC} -print-libgcc-file-name)"
 	fi
 }
 
