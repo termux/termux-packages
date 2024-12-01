@@ -3,8 +3,8 @@ TERMUX_PKG_DESCRIPTION="An infinite canvas vector-based drawing application for 
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@EDLLT"
 TERMUX_PKG_VERSION="0.11.0"
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL="https://github.com/flxzt/rnote/archive/v${TERMUX_PKG_VERSION}/v${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_REVISION=2
+TERMUX_PKG_SRCURL="https://github.com/flxzt/rnote/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=b133d4331963d3c09d3a7477f60fc4c5072471dcbf459379a593ca1724164af4
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="gdk-pixbuf, gettext, glib, graphene, gtk4, hicolor-icon-theme, libadwaita, libcairo, pipewire, pango, poppler"
@@ -51,11 +51,12 @@ termux_step_pre_configure() {
 
 termux_step_make() {
 	termux_setup_rust
+	local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
+	export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C link-arg=-liconv"
 
 	cd "${TERMUX_PKG_SRCDIR}" || termux_error_exit "Failed to enter source directory, aborting build."
 	local target
 	for target in 'rnote-cli' 'rnote'; do
-		RUSTFLAGS="-C link-arg=-Wl,-rpath=${TERMUX_PREFIX}/lib -C link-arg=-L${TERMUX_PREFIX}/lib -C link-arg=-liconv" \
 		cargo build \
 		--jobs "${TERMUX_PKG_MAKE_PROCESSES}" \
 		--target "${CARGO_TARGET_NAME}" \
