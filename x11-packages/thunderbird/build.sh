@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Unofficial Thunderbird email client"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="128.5.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://archive.mozilla.org/pub/thunderbird/releases/${TERMUX_PKG_VERSION}esr/source/thunderbird-${TERMUX_PKG_VERSION}esr.source.tar.xz"
 TERMUX_PKG_SHA256=035fb708f98cf4c90a193a1b3c8a381613ae4001af8c5a62a876d469c097bb5b
 TERMUX_PKG_DEPENDS="ffmpeg, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libandroid-spawn, libc++, libcairo, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libotr, libpixman, libsm, libvpx, libwebp, libx11, libxcb, libxcomposite, libxdamage, libxext, libxfixes, libxrandr, libxtst, pango, pulseaudio, zlib"
@@ -66,9 +67,8 @@ termux_step_pre_configure() {
 
 	# Out of memory when building gkrust
 	if [ "$TERMUX_DEBUG_BUILD" = false ]; then
-		case "${TERMUX_ARCH}" in
-		aarch64|arm|i686|x86_64) RUSTFLAGS+=" -C debuginfo=1" ;;
-		esac
+		local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
+		export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C debuginfo=1"
 	fi
 
 	cargo install cbindgen
