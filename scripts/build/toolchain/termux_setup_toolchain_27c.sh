@@ -94,7 +94,15 @@ termux_setup_toolchain_27c() {
 	export GO_LDFLAGS="-extldflags=-pie"
 	export CGO_LDFLAGS="${LDFLAGS/ -Wl,-z,relro,-z,now/}"
 	export CGO_CFLAGS="-I$TERMUX_PREFIX/include"
-	export RUSTFLAGS="-C link-arg=-Wl,-rpath=$TERMUX_PREFIX/lib -C link-arg=-Wl,--enable-new-dtags"
+
+	export CARGO_TARGET_NAME="${TERMUX_ARCH}-linux-android"
+	if [[ "${TERMUX_ARCH}" == "arm" ]]; then
+		CARGO_TARGET_NAME="armv7-linux-androideabi"
+	fi
+	local env_host="${CARGO_TARGET_NAME//-/_}"
+	export CARGO_TARGET_${env_host@U}_LINKER="${CC}"
+	export CARGO_TARGET_${env_host@U}_RUSTFLAGS="-L${TERMUX_PREFIX}/lib -C link-arg=-Wl,-rpath=${TERMUX_PREFIX}/lib -C link-arg=-Wl,--enable-new-dtags"
+	export CFLAGS_${env_host}="${CPPFLAGS} ${CFLAGS}"
 
 	export ac_cv_func_getpwent=no
 	export ac_cv_func_endpwent=yes
