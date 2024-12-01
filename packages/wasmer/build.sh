@@ -4,7 +4,8 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="ATTRIBUTIONS, LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="5.0.3"
-TERMUX_PKG_SRCURL=https://github.com/wasmerio/wasmer/archive/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL=https://github.com/wasmerio/wasmer/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=703e7a3efda6119f4992848948108d25770c9d399f5611583a7d350c295dc6dd
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_NO_STATICSPLIT=true
@@ -18,12 +19,15 @@ termux_step_pre_configure() {
 	# https://github.com/rust-lang/rfcs/issues/2629
 	# https://github.com/rust-lang/rust/issues/46651
 	# https://github.com/termux/termux-packages/issues/8029
-	RUSTFLAGS+=" -C link-arg=$(${CC} -print-libgcc-file-name)"
+	local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
+	export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C link-arg=$(${CC} -print-libgcc-file-name)"
 	export WASMER_INSTALL_PREFIX="${TERMUX_PREFIX}"
 	termux_setup_rust
 }
 
 termux_step_make() {
+	local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
+
 	# https://github.com/wasmerio/wasmer/blob/master/Makefile
 	# Makefile only does host builds
 	# Dropping host build due to https://github.com/wasmerio/wasmer/issues/2822
@@ -64,7 +68,7 @@ termux_step_make() {
 		--features "wat,compiler,wasi,middlewares,webc_runner,${capi_compiler_features}"
 
 	echo "make build-wasmer-headless-minimal"
-	RUSTFLAGS="${RUSTFLAGS} -C panic=abort" \
+	export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C panic=abort"
 	cargo build \
 		--jobs "${TERMUX_PKG_MAKE_PROCESSES}" \
 		--target "${CARGO_TARGET_NAME}" \
@@ -75,7 +79,7 @@ termux_step_make() {
 		--bin wasmer-headless
 
 	echo "make build-capi-headless"
-	RUSTFLAGS="${RUSTFLAGS} -C panic=abort -C link-dead-code -C lto -O -C embed-bitcode=yes" \
+	export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C panic=abort -C link-dead-code -C lto -O -C embed-bitcode=yes"
 	cargo build \
 		--jobs "${TERMUX_PKG_MAKE_PROCESSES}" \
 		--target "${CARGO_TARGET_NAME}" \
