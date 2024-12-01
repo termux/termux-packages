@@ -5,9 +5,9 @@ TERMUX_PKG_MAINTAINER="@termux"
 # Packages which should be rebuilt after "minor" bump (e.g. 3.1.x to 3.2.0):
 # - asciidoctor
 # - weechat
-TERMUX_PKG_VERSION=3.3.5
+TERMUX_PKG_VERSION="3.3.6"
 TERMUX_PKG_SRCURL=https://cache.ruby-lang.org/pub/ruby/$(echo $TERMUX_PKG_VERSION | cut -d . -f 1-2)/ruby-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=51aec7ea89b46125a2c9adc6f36766b65023d47952b916b1aed300ddcc042359
+TERMUX_PKG_SHA256=540975969d1af42190d26ff629bc93b1c3f4bffff4ab253e245e125085e66266
 # libbffi is used by the fiddle extension module:
 TERMUX_PKG_DEPENDS="libandroid-execinfo, libandroid-support, libffi, libgmp, readline, openssl, libyaml, zlib"
 TERMUX_PKG_RECOMMENDS="clang, make, pkg-config, resolv-conf"
