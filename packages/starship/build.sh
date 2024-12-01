@@ -3,7 +3,8 @@ TERMUX_PKG_DESCRIPTION="A minimal, blazing fast, and extremely customizable prom
 TERMUX_PKG_LICENSE="ISC"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
 TERMUX_PKG_VERSION="1.21.1"
-TERMUX_PKG_SRCURL=https://github.com/starship/starship/archive/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL=https://github.com/starship/starship/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=f543dfa3229441ca2a55b8a625ce4bad5756a896378b019f4d0f0e00cf34dcc8
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_DEPENDS="zlib"
@@ -30,7 +31,8 @@ termux_step_pre_configure() {
 	local _CARGO_TARGET_LIBDIR="target/${CARGO_TARGET_NAME}/release/deps"
 	mkdir -p "${_CARGO_TARGET_LIBDIR}"
 
-	RUSTFLAGS+=" -C link-arg=$($CC -print-libgcc-file-name)"
+	local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
+	export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C link-arg=$($CC -print-libgcc-file-name)"
 }
 
 termux_step_post_make_install() {
