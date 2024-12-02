@@ -1,0 +1,15 @@
+diff --git a/lib/std/zig/LibCInstallation.zig b/lib/std/zig/LibCInstallation.zig
+index 686471bde..47e1f714c 100644
+--- a/zig/lib/std/zig/LibCInstallation.zig
++++ b/zig/lib/std/zig/LibCInstallation.zig
+@@ -203,6 +203,10 @@ pub fn findNative(args: FindNativeOptions) FindError!LibCInstallation {
+         self.include_dir = try args.allocator.dupeZ(u8, "/usr/include");
+         self.sys_include_dir = try args.allocator.dupeZ(u8, "/usr/include");
+         self.crt_dir = try args.allocator.dupeZ(u8, "/usr/lib/64");
++    } else if (builtin.target.isAndroid()) {
++        self.include_dir = try args.allocator.dupeZ(u8, "@TERMUX_PREFIX@/include");
++        self.sys_include_dir = try args.allocator.dupeZ(u8, "@TERMUX_PREFIX@/include/sys");
++        self.crt_dir = try args.allocator.dupeZ(u8, "@TERMUX_PREFIX@/lib");
+     } else if (std.process.can_spawn) {
+         try self.findNativeIncludeDirPosix(args);
+         switch (builtin.target.os.tag) {
