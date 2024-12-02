@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Systems programming language focused on safety, speed an
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.83.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/rustc-${TERMUX_PKG_VERSION}-src.tar.xz
 TERMUX_PKG_SHA256=7b11d4242dab0921a7d54758ad3fe805153c979c144625fecde11735760f97df
 _LLVM_MAJOR_VERSION=$(. $TERMUX_SCRIPTDIR/packages/libllvm/build.sh; echo $LLVM_MAJOR_VERSION)
@@ -191,6 +192,8 @@ termux_step_configure() {
 	export CC_x86_64_unknown_linux_gnu=gcc
 	export CFLAGS_x86_64_unknown_linux_gnu="-O2"
 	export RUST_BACKTRACE=full
+
+	unset CC CFLAGS CFLAGS_${env_host} CPP CPPFLAGS CXX CXXFLAGS LD LDFLAGS PKG_CONFIG RANLIB
 }
 
 termux_step_make() {
@@ -198,8 +201,6 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	unset CC CFLAGS CPP CPPFLAGS CXX CXXFLAGS LD LDFLAGS PKG_CONFIG RANLIB
-
 	# install causes on device build fail to continue
 	# dist uses a lot of spaces on CI
 	local job="install"
