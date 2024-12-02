@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="An AV1 encoder library focused on speed and safety"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.7.1"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/xiph/rav1e/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=da7ae0df2b608e539de5d443c096e109442cdfa6c5e9b4014361211cf61d030c
 TERMUX_PKG_AUTO_UPDATE=true
@@ -34,6 +34,13 @@ termux_step_pre_configure() {
 	mv ${TERMUX_PREFIX}/lib/libz.so{,.tmp} || :
 
 	export CARGO_BUILD_TARGET=$CARGO_TARGET_NAME
+	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "false" ]]; then
+		export PKG_CONFIG_x86_64_unknown_linux_gnu=/usr/bin/pkg-config
+		export PKG_CONFIG_LIBDIR=/usr/lib/pkgconfig
+	fi
+
+	# clash with rust host build
+	unset CFLAGS
 
 	cargo fetch \
 		--target $CARGO_TARGET_NAME
