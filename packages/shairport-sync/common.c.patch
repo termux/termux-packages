@@ -1,0 +1,54 @@
++++ ./common.c	2024-10-25 03:52:36.792701891 +0300
+@@ -2100,6 +2100,47 @@
+   return result;
+ }
+ 
++#if 1
++// We can not get real MAC addresses so generate one
++int get_device_id(uint8_t *id, int id_length) {
++    int fd = open(MAC_FILE_PATH, O_RDONLY);
++    if (fd >= 0) {
++        if (read(fd, id, id_length) == id_length) {
++            close(fd);
++            return 0;
++        }
++        close(fd);
++    }
++
++    if (system("mkdir -p `dirname " MAC_FILE_PATH "`") != 0) {
++        perror("Failed to create directory");
++        return 1;
++    }
++
++    // File does not exist, generate a new random MAC address
++    srand(time(NULL));
++    id[0] = (rand() & 0xFE) | 0x02;  // Locally administered, unicast
++    for (int i = 1; i < id_length; i++) {
++        id[i] = rand() & 0xFF;
++    }
++
++    // Save the new MAC address to the file
++    fd = open(MAC_FILE_PATH, O_WRONLY | O_CREAT, 0644);
++    if (fd < 0) {
++        perror("Failed to open file for writing");
++        return 1;
++    }
++    
++    if (write(fd, id, id_length) != id_length) {
++        perror("Failed to write MAC address to file");
++        close(fd);
++        return 1;
++    }
++    close(fd);
++
++    return 0;
++}
++#else
+ int get_device_id(uint8_t *id, int int_length) {
+ 
+   uint64_t wait_time = 10000000000L; // wait up to this (ns) long to get a MAC address
+@@ -2163,3 +2204,4 @@
+     warn("Can't create a device ID -- no valid MAC address can be found.");
+   return response;
+ }
++#endif
