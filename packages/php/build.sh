@@ -160,7 +160,7 @@ termux_step_post_make_install() {
 	# Shared extensions for PHP/Apache
 	mkdir -p $TERMUX_PREFIX/lib/php-apache
 	local f
-	for f in opcache ldap pdo_pgsql pgsql sodium; do
+	for f in gd opcache ldap pdo_pgsql pgsql sodium; do
 		local so=$TERMUX_PREFIX/lib/php-apache/${f}.so
 		rm -f ${so}
 		cp -T $TERMUX_PREFIX/lib/php/${f}.so ${so}
