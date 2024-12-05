@@ -2,13 +2,13 @@ TERMUX_PKG_HOMEPAGE=https://alacritty.org/
 TERMUX_PKG_DESCRIPTION="A fast, cross-platform, OpenGL terminal emulator"
 TERMUX_PKG_LICENSE="Apache-2.0, MIT"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
-# Keep in sync with packages/ncurses/build.sh
-TERMUX_PKG_VERSION=0.13.2
+TERMUX_PKG_VERSION=0.14.0
 TERMUX_PKG_SRCURL=https://github.com/alacritty/alacritty/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=e9a54aabc92bbdc25ab1659c2e5a1e9b76f27d101342c8219cc98a730fd46d90
+TERMUX_PKG_SHA256=2919767177c010339502085b4ac5d3f9f15ca27e6befc39aa9d20fefb93ebcdf
 TERMUX_PKG_DEPENDS="fontconfig, freetype, libxi, libxcursor, libxrandr"
 TERMUX_PKG_BUILD_DEPENDS="libxcb, libxkbcommon, ncurses"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_AUTO_UPDATE=true
 
 __cargo_fetch_dep_source_for_rust_windowing() {
 	local _name="$1"
@@ -33,7 +33,7 @@ termux_step_pre_configure() {
 	__cargo_fetch_dep_source_for_rust_windowing "glutin"
 
 	patch="$TERMUX_PKG_BUILDER_DIR/patch-root-Cargo.diff"
-	patch --silent -p1 -d "$TERMUX_PKG_SRCDIR" < "$patch"
+	patch -p1 -d "$TERMUX_PKG_SRCDIR" < "$patch"
 
 	cat "$TERMUX_PKG_BUILDER_DIR"/winit-*.diff | patch -p1 -d "$TERMUX_PKG_SRCDIR/winit-source"
 	cat "$TERMUX_PKG_BUILDER_DIR"/glutin-*.diff | patch -p1 -d "$TERMUX_PKG_SRCDIR/glutin-source"
@@ -62,7 +62,8 @@ termux_step_pre_configure() {
 				rm -rf "$dir"/src/backend/libc/shm/*
 				cp "$dir"/src/backend/linux_raw/shm/* "$dir"/src/backend/libc/shm/
 			fi
-			patch --silent -p1 -d "$dir" < "${patch}"
+			echo "Applying patch for '$crate'"
+			patch -p1 -d "$dir" < "${patch}"
 		done
 	done
 }

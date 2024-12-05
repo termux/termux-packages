@@ -1,0 +1,11 @@
+--- a/utils/alsoft-config/mainwindow.cpp
++++ b/utils/alsoft-config/mainwindow.cpp
+@@ -216,7 +216,7 @@
+ #else
+     QString paths = qgetenv("XDG_DATA_DIRS");
+     if(paths.isEmpty())
+-        paths = "/usr/local/share/:/usr/share/";
++        paths = "@TERMUX_PREFIX@/share/";
+ #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+     list += paths.split(QChar(':'), Qt::SkipEmptyParts);
+ #else

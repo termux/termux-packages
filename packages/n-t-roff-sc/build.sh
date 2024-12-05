@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE="https://github.com/n-t-roff/sc"
 TERMUX_PKG_DESCRIPTION="A vi-like spreadsheet calculator"
 TERMUX_PKG_LICENSE="Public Domain"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="7.16-1.1.2"
+TERMUX_PKG_VERSION="7.16-1.1.3"
 TERMUX_PKG_SRCURL=https://github.com/n-t-roff/sc/archive/refs/tags/$(sed 's/-/_/' <<< $TERMUX_PKG_VERSION).tar.gz
-TERMUX_PKG_SHA256=1802c9d3d60dac85feb783adf967bc0d2fd7e5f592d9d1df15e4e87d83efcf14
+TERMUX_PKG_SHA256=a734a399967f6a74772e9f169614b803d29c856b04fe289f965ab919feb7c625
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_SED_REGEXP='s/_/-/'
 TERMUX_PKG_DEPENDS="ncurses"
@@ -16,4 +16,5 @@ TERMUX_PKG_PROVIDES="sc"
 
 termux_step_post_configure () {
 	CFLAGS+=" -I$TERMUX_PREFIX/include"
+	sed -i "s|prefix=/usr/local|prefix=$TERMUX_PREFIX|g" Makefile
 }

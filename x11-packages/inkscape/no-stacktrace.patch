@@ -1,22 +1,22 @@
-+++ a/src/inkscape.cpp
-@@ -17,8 +17,6 @@
+--- a/src/inkscape.cpp
++++ b/src/inkscape.cpp
+@@ -19,7 +19,6 @@
  
- #include <unistd.h>
- 
--#include <boost/stacktrace.hpp>
--
+ #include <fstream>
  #include <map>
- 
+-#include <boost/stacktrace.hpp>
  #include <glibmm/regex.h>
-@@ -550,17 +548,17 @@
+ #include <glibmm/i18n.h>
+ #include <glibmm/miscutils.h>
+@@ -531,17 +530,17 @@ Application::crash_handler (int /*signum*/)
          try {
              auto builder = UI::create_builder("dialog-crash.glade");
              UI::get_widget<Gtk::Label>(builder, "message").set_label(b);
 -            UI::get_object<Gtk::TextBuffer>(builder, "stacktrace")->set_text("<pre>\n" + boost::stacktrace::to_string(boost::stacktrace::stacktrace()) + "</pre>\n<details><summary>System info</summary>\n" + debug_info() + "\n</details>");
 +            UI::get_object<Gtk::TextBuffer>(builder, "stacktrace")->set_text("<pre>\nNo stacktrace available.</pre>\n<details><summary>System info</summary>\n" + debug_info() + "\n</details>");
              Gtk::MessageDialog &m = UI::get_widget<Gtk::MessageDialog>(builder, "crash_dialog");
-             sp_transientize(GTK_WIDGET(m.gobj()));
-             m.run();
+             sp_transientize(m.Gtk::Widget::gobj());
+             UI::dialog_run(m);
          } catch (const Glib::Error &ex) {
              g_message("Glade file loading failed for crash handler... Anyway, error was: %s", b);
 -            std::cerr << boost::stacktrace::stacktrace();
@@ -29,8 +29,9 @@
      }
      g_free (b);
  
-+++ a/CMakeScripts/DefineDependsandFlags.cmake
-@@ -311,7 +311,7 @@
+--- a/CMakeScripts/DefineDependsandFlags.cmake
++++ b/CMakeScripts/DefineDependsandFlags.cmake
+@@ -311,7 +311,7 @@ else()
          list(APPEND INKSCAPE_LIBS "-lbacktrace")
          add_definitions("-DBOOST_STACKTRACE_USE_BACKTRACE")
      else() # fall back to stacktrace_basic

@@ -106,10 +106,10 @@
  [Install]
 --- a/python/recoll/recoll/rclconfig.py
 +++ b/python/recoll/recoll/rclconfig.py
-@@ -84,14 +84,14 @@
+@@ -93,14 +93,14 @@
                      # On ux platforms, the datadir value is set by "configure" in the C code.
                      # Try to guess
-                     #msg("Trying to guess datadir")
+                     # msg("Trying to guess datadir")
 -                    dirs = ("/opt/local", "/opt", "/usr", "/usr/local", "/usr/pkg")
 +                    dirs = ("@TERMUX_PREFIX@/opt/local", "@TERMUX_PREFIX@/opt", "@TERMUX_PREFIX@", "@TERMUX_PREFIX@/local", "@TERMUX_PREFIX@/pkg")
                      for dir in dirs:
@@ -117,10 +117,10 @@
                          if os.path.exists(dd):
                              self.datadir = dd
          if self.datadir is None:
-             #msg("DATADIR could not be computed. Trying /usr/share/recoll as last resort")
+             # msg("DATADIR could not be computed. Trying /usr/share/recoll as last resort")
 -            self.datadir = "/usr/share/recoll"
 +            self.datadir = "@TERMUX_PREFIX@/share/recoll"
-         #msg(f"DATADIR: [{self.datadir}]")
+         # msg(f"DATADIR: [{self.datadir}]")
          baseconfdir = os.path.join(self.datadir, "examples")
          f = None
 --- a/sampleconf/mimemap
@@ -179,13 +179,13 @@
  # <var name="mhmboxquirks" type="string">
 --- a/utils/appformime.cpp
 +++ b/utils/appformime.cpp
-@@ -25,7 +25,7 @@
+@@ -24,7 +24,7 @@
+ #include "pathut.h"
  #include "smallut.h"
- #include "appformime.h"
  
--static const string topappsdir("/usr/share/applications");
-+static const string topappsdir("@TERMUX_PREFIX@/share/applications");
- static const string desktopext("desktop");
+-static const std::string topappsdir("/usr/share/applications");
++static const std::string topappsdir("@TERMUX_PREFIX@/share/applications");
+ static const std::string desktopext("desktop");
  
  static DesktopDb *theDb;
 --- a/utils/rclutil.cpp

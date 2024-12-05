@@ -2,10 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://grafana.com/
 TERMUX_PKG_DESCRIPTION="The open-source platform for monitoring and observability"
 TERMUX_PKG_LICENSE="AGPL-V3"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1:11.2.1"
-TERMUX_PKG_REVISION=1
-# Until https://github.com/grafana/grafana/pull/92055 is released:
-TERMUX_PKG_GO_USE_OLDER=true
+TERMUX_PKG_VERSION="1:11.3.2"
 TERMUX_PKG_SRCURL=git+https://github.com/grafana/grafana
 TERMUX_PKG_BUILD_DEPENDS="yarn"
 TERMUX_PKG_BUILD_IN_SRC=true

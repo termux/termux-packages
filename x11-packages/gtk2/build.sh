@@ -4,11 +4,11 @@ TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 _MAJOR_VERSION=2.24
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.33
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/gtk+/${_MAJOR_VERSION}/gtk+-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=ac2ac757f5942d318a311a54b0c80b5ef295f299c2a73c632f6bfb1ff49cc6da
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_DEPENDS="adwaita-icon-theme, atk, coreutils, desktop-file-utils, fontconfig, freetype, glib, glib-bin, gtk-update-icon-cache, harfbuzz, libandroid-shmem, libcairo, librsvg, libx11, libxcomposite, libxcursor, libxdamage, libxext, libxfixes, libxinerama, libxrandr, libxrender, pango, shared-mime-info, ttf-dejavu"
+TERMUX_PKG_DEPENDS="adwaita-icon-theme, atk, coreutils, desktop-file-utils, fontconfig, freetype, glib, glib-bin, gtk-update-icon-cache, harfbuzz, libandroid-shmem, libcairo, librsvg, libx11, libxcomposite, libxcursor, libxdamage, libxext, libxfixes, libxi, libxinerama, libxrandr, libxrender, pango, shared-mime-info, ttf-dejavu"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner"
 TERMUX_PKG_CONFLICTS="libgtk2"
 TERMUX_PKG_REPLACES="libgtk2"
@@ -20,6 +20,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-glibtest
 --disable-cups
 --disable-papi
+--with-xinput=yes
 --enable-introspection=yes
 "
 

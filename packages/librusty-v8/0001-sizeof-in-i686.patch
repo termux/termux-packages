@@ -1,0 +1,28 @@
+--- a/src/binding.cc
++++ b/src/binding.cc
+@@ -54,6 +54,7 @@
+ 
+ static_assert(sizeof(v8::Locker) == sizeof(size_t) * 2, "Locker size mismatch");
+ 
++#if !(defined(__ANDROID__) && defined(__i386__))
+ static_assert(sizeof(v8::ScriptCompiler::CompilationDetails) ==
+                   sizeof(int64_t) * 3,
+               "CompilationDetails size mismatch");
+@@ -66,6 +67,17 @@
+                          align_to<int64_t>(sizeof(size_t)) +
+                          sizeof(v8::ScriptCompiler::CompilationDetails)),
+     "Source size mismatch");
++#else
++static_assert(sizeof(v8::ScriptCompiler::CompilationDetails) ==
++                  sizeof(int64_t) * 2 + sizeof(uint32_t) /* enum class */,
++              "CompilationDetails size mismatch");
++
++static_assert(
++    sizeof(v8::ScriptCompiler::Source) ==
++        align_to<size_t>(sizeof(size_t) * 8 + sizeof(int) * 3 +
++                         sizeof(v8::ScriptCompiler::CompilationDetails)),
++    "Source size mismatch");
++#endif
+ 
+ static_assert(sizeof(v8::FunctionCallbackInfo<v8::Value>) == sizeof(size_t) * 3,
+               "FunctionCallbackInfo size mismatch");

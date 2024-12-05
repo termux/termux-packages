@@ -12,8 +12,10 @@ version=0.1.0
 
 set -e
 
-TERMUX_SCRIPTDIR=$(realpath "$(dirname "$0")/../")
-. $(dirname "$(realpath "$0")")/properties.sh
+export TERMUX_SCRIPTDIR=$(realpath "$(dirname "$(realpath "$0")")/../")
+: "${TERMUX_TOPDIR:="$HOME/.termux-build"}"
+. "${TERMUX_SCRIPTDIR}"/scripts/properties.sh
+. "${TERMUX_SCRIPTDIR}"/scripts/build/termux_step_handle_buildarch.sh
 
 BOOTSTRAP_TMPDIR=$(mktemp -d "${TMPDIR:-/tmp}/bootstrap-tmp.XXXXXXXX")
 
@@ -58,10 +60,10 @@ done
 
 # Build deb files for package and its dependencies deb from source for arch
 build_package() {
-	
+
 	local return_value
 
-	local package_arch="$1"
+	local TERMUX_ARCH="$1"
 	local package_name="$2"
 
 	local build_output
@@ -71,12 +73,12 @@ build_package() {
 	cd "$TERMUX_PACKAGES_DIRECTORY"
 	echo $'\n\n\n'"[*] Building '$package_name'..."
 	exec 99>&1
-	build_output="$("$TERMUX_PACKAGES_DIRECTORY"/build-package.sh "${BUILD_PACKAGE_OPTIONS[@]}" -a "$package_arch" "$package_name" 2>&1 | tee >(cat - >&99); exit ${PIPESTATUS[0]})";
+	build_output="$("$TERMUX_PACKAGES_DIRECTORY"/build-package.sh "${BUILD_PACKAGE_OPTIONS[@]}" -a "$TERMUX_ARCH" "$package_name" 2>&1 | tee >(cat - >&99); exit ${PIPESTATUS[0]})";
 	return_value=$?
 	echo "[*] Building '$package_name' exited with exit code $return_value"
 	exec 99>&-
 	if [ $return_value -ne 0 ]; then
-		echo "Failed to build package '$package_name' for arch '$package_arch'" 1>&2
+		echo "Failed to build package '$package_name' for arch '$TERMUX_ARCH'" 1>&2
 
 		# Dependency packages may not have a build.sh, so we ignore the error.
 		# A better way should be implemented to validate if its actually a dependency
@@ -94,6 +96,7 @@ build_package() {
 # Extract *.deb files to the bootstrap root.
 extract_debs() {
 
+	local package_arch="$1"
 	local current_package_name
 	local data_archive
 	local control_archive
@@ -116,7 +119,14 @@ extract_debs() {
 	for deb in *.deb; do
 
 		current_package_name="$(echo "$deb" | sed -E 's/^([^_]+).*/\1/' )"
+		current_package_arch="$(echo "$deb" | sed -E 's/.*_(aarch64|all|arm|i686|x86_64).deb$/\1/' )"
 		echo "current_package_name: '$current_package_name'"
+		echo "current_package_arch: '$current_package_arch'"
+
+		if [[ "$current_package_arch" != "$package_arch" ]] && [[ "$current_package_arch" != "all" ]]; then
+			echo "[*] Skipping incompatible package '$deb' for target '$package_arch'..."
+			continue
+		fi
 
 		if [[ "$current_package_name" == *"-static" ]]; then
 			echo "[*] Skipping static package '$deb'..."
@@ -201,14 +211,14 @@ add_termux_bootstrap_second_stage_files() {
 		-e "s|@TERMUX_BOOTSTRAP_CONFIG_DIR_PATH@|${TERMUX_BOOTSTRAP_CONFIG_DIR_PATH}|g" \
 		-e "s|@TERMUX_PACKAGE_MANAGER@|${TERMUX_PACKAGE_MANAGER}|g" \
 		-e "s|@TERMUX_PACKAGE_ARCH@|${package_arch}|g" \
-		"$(dirname "$(realpath "$0")")/bootstrap/termux-bootstrap-second-stage.sh" \
+		"$TERMUX_SCRIPTDIR/scripts/bootstrap/termux-bootstrap-second-stage.sh" \
 		> "${BOOTSTRAP_ROOTFS}/${TERMUX_BOOTSTRAP_CONFIG_DIR_PATH}/termux-bootstrap-second-stage.sh"
 	chmod 700 "${BOOTSTRAP_ROOTFS}/${TERMUX_BOOTSTRAP_CONFIG_DIR_PATH}/termux-bootstrap-second-stage.sh"
 
 	# TODO: Remove it when Termux app supports `pacman` bootstraps installation.
 	sed -e "s|@TERMUX_PROFILE_D_PREFIX_DIR_PATH@|${TERMUX_PROFILE_D_PREFIX_DIR_PATH}|g" \
 		-e "s|@TERMUX_BOOTSTRAP_CONFIG_DIR_PATH@|${TERMUX_BOOTSTRAP_CONFIG_DIR_PATH}|g" \
-		"$(dirname "$(realpath "$0")")/bootstrap/01-termux-bootstrap-second-stage-fallback.sh" \
+		"$TERMUX_SCRIPTDIR/scripts/bootstrap/01-termux-bootstrap-second-stage-fallback.sh" \
 		> "${BOOTSTRAP_ROOTFS}/${TERMUX_PROFILE_D_PREFIX_DIR_PATH}/01-termux-bootstrap-second-stage-fallback.sh"
 	chmod 600 "${BOOTSTRAP_ROOTFS}/${TERMUX_PROFILE_D_PREFIX_DIR_PATH}/01-termux-bootstrap-second-stage-fallback.sh"
 
@@ -370,38 +380,24 @@ main() {
 
 	set_build_bootstrap_traps
 
-	for package_arch in "${TERMUX_ARCHITECTURES[@]}"; do
-		if [[ " ${TERMUX_DEFAULT_ARCHITECTURES[*]} " != *" $package_arch "* ]]; then
-			echo "Unsupported architecture '$package_arch' for in architectures list: '${TERMUX_ARCHITECTURES[*]}'" 1>&2
+	for TERMUX_ARCH in "${TERMUX_ARCHITECTURES[@]}"; do
+		if [[ " ${TERMUX_DEFAULT_ARCHITECTURES[*]} " != *" $TERMUX_ARCH "* ]]; then
+			echo "Unsupported architecture '$TERMUX_ARCH' for in architectures list: '${TERMUX_ARCHITECTURES[*]}'" 1>&2
 			echo "Supported architectures: '${TERMUX_DEFAULT_ARCHITECTURES[*]}'" 1>&2
 			return 1
 		fi
 	done
 
-	for package_arch in "${TERMUX_ARCHITECTURES[@]}"; do
-
-		# The termux_step_finish_build stores package version in .built-packages directory, but
-		# its not arch independent. So instead we create an arch specific one and symlink it
-		# to the .built-packages directory so that users can easily switch arches without having
-		# to rebuild packages
-		TERMUX_BUILT_PACKAGES_DIRECTORY_FOR_ARCH="$TERMUX_BUILT_PACKAGES_DIRECTORY-$package_arch"
-		mkdir -p "$TERMUX_BUILT_PACKAGES_DIRECTORY_FOR_ARCH"
-
-		if [ -f "$TERMUX_BUILT_PACKAGES_DIRECTORY" ] || [ -d "$TERMUX_BUILT_PACKAGES_DIRECTORY" ]; then
-			rm -rf "$TERMUX_BUILT_PACKAGES_DIRECTORY"
-		fi
-
-		ln -sf "$TERMUX_BUILT_PACKAGES_DIRECTORY_FOR_ARCH" "$TERMUX_BUILT_PACKAGES_DIRECTORY"
+	for TERMUX_ARCH in "${TERMUX_ARCHITECTURES[@]}"; do
+		termux_step_handle_buildarch
 
 		if [[ $FORCE_BUILD_PACKAGES == "1" ]]; then
 			rm -f "$TERMUX_BUILT_PACKAGES_DIRECTORY_FOR_ARCH"/*
 			rm -f "$TERMUX_BUILT_DEBS_DIRECTORY"/*
 		fi
 
-
-
-		BOOTSTRAP_ROOTFS="$BOOTSTRAP_TMPDIR/rootfs-${package_arch}"
-		BOOTSTRAP_PKGDIR="$BOOTSTRAP_TMPDIR/packages-${package_arch}"
+		BOOTSTRAP_ROOTFS="$BOOTSTRAP_TMPDIR/rootfs-${TERMUX_ARCH}"
+		BOOTSTRAP_PKGDIR="$BOOTSTRAP_TMPDIR/packages-${TERMUX_ARCH}"
 
 		# Create initial directories for $TERMUX_PREFIX
 		if ! ${BOOTSTRAP_ANDROID10_COMPATIBLE}; then
@@ -435,7 +431,6 @@ main() {
 			PACKAGES+=("proot")
 		fi
 		PACKAGES+=("coreutils")
-		PACKAGES+=("curl")
 		PACKAGES+=("dash")
 		PACKAGES+=("diffutils")
 		PACKAGES+=("findutils")
@@ -451,7 +446,6 @@ main() {
 		PACKAGES+=("termux-keyring")
 		PACKAGES+=("termux-tools")
 		PACKAGES+=("util-linux")
-		PACKAGES+=("xz-utils")
 
 		# Additional.
 		PACKAGES+=("ed")
@@ -475,18 +469,18 @@ main() {
 		# Build packages.
 		for package_name in "${PACKAGES[@]}"; do
 			set +e
-			build_package "$package_arch" "$package_name" || return $?
+			build_package "$TERMUX_ARCH" "$package_name" || return $?
 			set -e
 		done
 
 		# Extract all debs.
-		extract_debs || return $?
+		extract_debs "$TERMUX_ARCH" || return $?
 
 		# Add termux bootstrap second stage files
 		add_termux_bootstrap_second_stage_files "$package_arch"
 
 		# Create bootstrap archive.
-		create_bootstrap_archive "$package_arch" || return $?
+		create_bootstrap_archive "$TERMUX_ARCH" || return $?
 
 	done
 

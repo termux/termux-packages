@@ -12,7 +12,7 @@
  	{ "new_float", cmd_new_float },
 --- a/sway/meson.build
 +++ b/sway/meson.build
-@@ -75,7 +75,6 @@
+@@ -76,7 +76,6 @@
  	'commands/max_render_time.c',
  	'commands/opacity.c',
  	'commands/include.c',
@@ -20,11 +20,12 @@
  	'commands/layout.c',
  	'commands/mode.c',
  	'commands/mouse_warping.c',
-@@ -151,6 +150,35 @@
+@@ -153,6 +152,37 @@
  	'commands/bar/workspace_min_width.c',
  	'commands/bar/wrap_scroll.c',
  
 +	'commands/output/adaptive_sync.c',
++	'commands/output/allow_tearing.c',
 +	'commands/output/background.c',
 +	'commands/output/disable.c',
 +	'commands/output/dpms.c',
@@ -40,6 +41,7 @@
 +	'commands/output/toggle.c',
 +	'commands/output/transform.c',
 +	'commands/output/unplug.c',
++	'commands/output/color_profile.c',
 +
 +	'tree/arrange.c',
 +	'tree/container.c',
@@ -56,12 +58,13 @@
  	'commands/input/accel_profile.c',
  	'commands/input/calibration_matrix.c',
  	'commands/input/click_method.c',
-@@ -183,31 +211,6 @@
+@@ -188,33 +218,6 @@
  	'commands/input/xkb_rules.c',
  	'commands/input/xkb_switch_layout.c',
  	'commands/input/xkb_variant.c',
 -
 -	'commands/output/adaptive_sync.c',
+-	'commands/output/allow_tearing.c',
 -	'commands/output/background.c',
 -	'commands/output/disable.c',
 -	'commands/output/dpms.c',
@@ -77,6 +80,7 @@
 -	'commands/output/toggle.c',
 -	'commands/output/transform.c',
 -	'commands/output/unplug.c',
+-	'commands/output/color_profile.c',
 -
 -	'tree/arrange.c',
 -	'tree/container.c',
@@ -88,7 +92,7 @@
  )
  
  sway_deps = [
-@@ -236,6 +239,7 @@
+@@ -242,6 +245,7 @@
  
  if wlroots_features['libinput_backend']
  	sway_sources += 'input/libinput.c'

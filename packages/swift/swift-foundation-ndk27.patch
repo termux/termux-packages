@@ -1,0 +1,459 @@
+diff --git a/swift-corelibs-foundation/CMakeLists.txt b/swift-corelibs-foundation/CMakeLists.txt
+index 7f290d16..95366592 100644
+--- a/swift-corelibs-foundation/CMakeLists.txt
++++ b/swift-corelibs-foundation/CMakeLists.txt
+@@ -51,6 +51,7 @@ if(NOT CMAKE_SYSTEM_NAME STREQUAL Windows)
+     endif()
+ endif()
+ 
++set(CMAKE_SHARED_LINKER_FLAGS "")
+ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+diff --git a/swift-corelibs-foundation/Sources/CoreFoundation/include/ForSwiftFoundationOnly.h b/swift-corelibs-foundation/Sources/CoreFoundation/include/ForSwiftFoundationOnly.h
+index a2ba56cd..91a312dc 100644
+--- a/swift-corelibs-foundation/Sources/CoreFoundation/include/ForSwiftFoundationOnly.h
++++ b/swift-corelibs-foundation/Sources/CoreFoundation/include/ForSwiftFoundationOnly.h
+@@ -69,6 +69,13 @@
+ #include <sys/stat.h>
+ #include <sys/syscall.h>
+ #include <termios.h>
++#include <linux/fcntl.h>
++#ifdef __swift__
++// The linux/stat header is private in the Android modulemap.
++#pragma clang module import posix_filesystem.linux_stat
++#else
++#include <linux/stat.h>
++#endif
+ #elif TARGET_OS_WASI
+ #include <fcntl.h>
+ #include <sys/stat.h>
+diff --git a/swift-corelibs-foundation/Sources/Foundation/CGFloat.swift b/swift-corelibs-foundation/Sources/Foundation/CGFloat.swift
+index ffe3a6c6..c59977f8 100644
+--- a/swift-corelibs-foundation/Sources/Foundation/CGFloat.swift
++++ b/swift-corelibs-foundation/Sources/Foundation/CGFloat.swift
+@@ -7,6 +7,10 @@
+ // See http://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
+ //
+ 
++#if canImport(Android)
++import Android
++#endif
++
+ @frozen
+ public struct CGFloat: Sendable {
+ #if arch(i386) || arch(arm) || arch(wasm32)
+diff --git a/swift-corelibs-foundation/Sources/Foundation/FileHandle.swift b/swift-corelibs-foundation/Sources/Foundation/FileHandle.swift
+index b07c49ac..b540e284 100644
+--- a/swift-corelibs-foundation/Sources/Foundation/FileHandle.swift
++++ b/swift-corelibs-foundation/Sources/Foundation/FileHandle.swift
+@@ -34,6 +34,11 @@ import WASILibc
+ fileprivate let _read = WASILibc.read(_:_:_:)
+ fileprivate let _write = WASILibc.write(_:_:_:)
+ fileprivate let _close = WASILibc.close(_:)
++#elseif canImport(Android)
++import Android
++fileprivate let _read = Android.read(_:_:_:)
++fileprivate let _write = Android.write(_:_:_:)
++fileprivate let _close = Android.close(_:)
+ #endif
+ 
+ #if canImport(WinSDK)
+@@ -321,10 +326,15 @@ open class FileHandle : NSObject, @unchecked Sendable {
+             if options.contains(.alwaysMapped) {
+                 // Filesizes are often 64bit even on 32bit systems
+                 let mapSize = min(length, Int(clamping: statbuf.st_size))
++              #if canImport(Android)
++                // Bionic mmap() now returns _Nonnull, so the force unwrap below isn't needed.
+                 let data = mmap(nil, mapSize, PROT_READ, MAP_PRIVATE, _fd, 0)
++              #else
++                let data = mmap(nil, mapSize, PROT_READ, MAP_PRIVATE, _fd, 0)!
++              #endif
+                 // Swift does not currently expose MAP_FAILURE
+                 if data != UnsafeMutableRawPointer(bitPattern: -1) {
+-                    return NSData.NSDataReadResult(bytes: data!, length: mapSize) { buffer, length in
++                    return NSData.NSDataReadResult(bytes: data, length: mapSize) { buffer, length in
+                         munmap(buffer, length)
+                     }
+                 }
+diff --git a/swift-corelibs-foundation/Sources/Foundation/FileManager+POSIX.swift b/swift-corelibs-foundation/Sources/Foundation/FileManager+POSIX.swift
+index e89b3bf6..a82fe1c2 100644
+--- a/swift-corelibs-foundation/Sources/Foundation/FileManager+POSIX.swift
++++ b/swift-corelibs-foundation/Sources/Foundation/FileManager+POSIX.swift
+@@ -7,6 +7,10 @@
+ //
+ #if !os(Windows)
+ 
++#if canImport(Android)
++import Android
++#endif
++
+ #if os(Android) && (arch(i386) || arch(arm)) // struct stat.st_mode is UInt32
+ internal func &(left: UInt32, right: mode_t) -> mode_t {
+     return mode_t(left) & right
+@@ -398,13 +402,13 @@ extension FileManager {
+ 
+                 _current = fts_read(stream)
+                 while let current = _current {
+-                    let filename = FileManager.default.string(withFileSystemRepresentation: current.pointee.fts_path, length: Int(current.pointee.fts_pathlen))
++                    let filename = FileManager.default.string(withFileSystemRepresentation: current.pointee.fts_path!, length: Int(current.pointee.fts_pathlen))
+ 
+                     switch Int32(current.pointee.fts_info) {
+                         case FTS_D:
+                             let (showFile, skipDescendants) = match(filename: filename, to: _options, isDir: true)
+                             if skipDescendants {
+-                                fts_set(_stream, _current, FTS_SKIP)
++                                fts_set(stream, current, FTS_SKIP)
+                             }
+                             if showFile {
+                                  return URL(fileURLWithPath: filename, isDirectory: true)
+@@ -578,7 +582,7 @@ extension FileManager {
+             let finalErrno = originalItemURL.withUnsafeFileSystemRepresentation { (originalFS) -> Int32? in
+                 return newItemURL.withUnsafeFileSystemRepresentation { (newItemFS) -> Int32? in
+                     // This is an atomic operation in many OSes, but is not guaranteed to be atomic by the standard.
+-                    if rename(newItemFS, originalFS) == 0 {
++                    if rename(newItemFS!, originalFS!) == 0 {
+                         return nil
+                     } else {
+                         return errno
+diff --git a/swift-corelibs-foundation/Sources/Foundation/FileManager.swift b/swift-corelibs-foundation/Sources/Foundation/FileManager.swift
+index a5d75820..a19464d7 100644
+--- a/swift-corelibs-foundation/Sources/Foundation/FileManager.swift
++++ b/swift-corelibs-foundation/Sources/Foundation/FileManager.swift
+@@ -21,6 +21,8 @@ import WinSDK
+ 
+ #if os(WASI)
+ import WASILibc
++#elseif canImport(Bionic)
++import Bionic
+ #endif
+ 
+ #if os(Windows)
+diff --git a/swift-corelibs-foundation/Sources/Foundation/Host.swift b/swift-corelibs-foundation/Sources/Foundation/Host.swift
+index 6c4f5291..fb130631 100644
+--- a/swift-corelibs-foundation/Sources/Foundation/Host.swift
++++ b/swift-corelibs-foundation/Sources/Foundation/Host.swift
+@@ -12,8 +12,9 @@
+ import WinSDK
+ #endif
+ 
+-#if os(Android)
+-    // Android Glibc differs a little with respect to the Linux Glibc.
++#if canImport(Android)
++    import Android
++    // Android Bionic differs a little with respect to the Linux Glibc.
+ 
+     // IFF_LOOPBACK is part of the enumeration net_device_flags, which needs to
+     // convert to UInt32.
+@@ -24,8 +25,8 @@ import WinSDK
+     }
+ 
+     // getnameinfo uses size_t for its 4th and 6th arguments.
+-    private func getnameinfo(_ addr: UnsafePointer<sockaddr>?, _ addrlen: socklen_t, _ host: UnsafeMutablePointer<Int8>?, _ hostlen: socklen_t, _ serv: UnsafeMutablePointer<Int8>?, _ servlen: socklen_t, _ flags: Int32) -> Int32 {
+-        return Glibc.getnameinfo(addr, addrlen, host, Int(hostlen), serv, Int(servlen), flags)
++    private func getnameinfo(_ addr: UnsafePointer<sockaddr>, _ addrlen: socklen_t, _ host: UnsafeMutablePointer<Int8>?, _ hostlen: socklen_t, _ serv: UnsafeMutablePointer<Int8>?, _ servlen: socklen_t, _ flags: Int32) -> Int32 {
++        return Android.getnameinfo(addr, addrlen, host, Int(hostlen), serv, Int(servlen), flags)
+     }
+ 
+     // getifaddrs and freeifaddrs are not available in Android 6.0 or earlier, so call these functions dynamically.
+diff --git a/swift-corelibs-foundation/Sources/Foundation/NSData.swift b/swift-corelibs-foundation/Sources/Foundation/NSData.swift
+index ae54f971..65eb0d93 100644
+--- a/swift-corelibs-foundation/Sources/Foundation/NSData.swift
++++ b/swift-corelibs-foundation/Sources/Foundation/NSData.swift
+@@ -11,6 +11,9 @@
+ #if !os(WASI)
+ import Dispatch
+ #endif
++#if canImport(Android)
++import Android
++#endif
+ 
+ extension NSData {
+     public typealias ReadingOptions = Data.ReadingOptions
+@@ -469,6 +472,8 @@ open class NSData : NSObject, NSCopying, NSMutableCopying, NSSecureCoding {
+             let createMode = Int(Musl.S_IRUSR) | Int(Musl.S_IWUSR) | Int(Musl.S_IRGRP) | Int(Musl.S_IWGRP) | Int(Musl.S_IROTH) | Int(Musl.S_IWOTH)
+ #elseif canImport(WASILibc)
+             let createMode = Int(WASILibc.S_IRUSR) | Int(WASILibc.S_IWUSR) | Int(WASILibc.S_IRGRP) | Int(WASILibc.S_IWGRP) | Int(WASILibc.S_IROTH) | Int(WASILibc.S_IWOTH)
++#elseif canImport(Android)
++            let createMode = Int(Android.S_IRUSR) | Int(Android.S_IWUSR) | Int(Android.S_IRGRP) | Int(Android.S_IWGRP) | Int(Android.S_IROTH) | Int(Android.S_IWOTH)
+ #endif
+             guard let fh = FileHandle(path: path, flags: flags, createMode: createMode) else {
+                 throw _NSErrorWithErrno(errno, reading: false, path: path)
+diff --git a/swift-corelibs-foundation/Sources/Foundation/NSError.swift b/swift-corelibs-foundation/Sources/Foundation/NSError.swift
+index 6f21d3a0..dcd6f3f1 100644
+--- a/swift-corelibs-foundation/Sources/Foundation/NSError.swift
++++ b/swift-corelibs-foundation/Sources/Foundation/NSError.swift
+@@ -16,6 +16,8 @@ import Darwin
+ import Glibc
+ #elseif canImport(CRT)
+ import CRT
++#elseif canImport(Android)
++import Android
+ #endif
+ 
+ @_implementationOnly import CoreFoundation
+diff --git a/swift-corelibs-foundation/Sources/Foundation/NSLock.swift b/swift-corelibs-foundation/Sources/Foundation/NSLock.swift
+index fe1d08b7..9d0fadc9 100644
+--- a/swift-corelibs-foundation/Sources/Foundation/NSLock.swift
++++ b/swift-corelibs-foundation/Sources/Foundation/NSLock.swift
+@@ -11,6 +11,8 @@
+ 
+ #if canImport(Glibc)
+ import Glibc
++#elseif canImport(Bionic)
++import Bionic
+ #endif
+ 
+ #if os(Windows)
+diff --git a/swift-corelibs-foundation/Sources/Foundation/NSPlatform.swift b/swift-corelibs-foundation/Sources/Foundation/NSPlatform.swift
+index a1809026..5424f5bb 100644
+--- a/swift-corelibs-foundation/Sources/Foundation/NSPlatform.swift
++++ b/swift-corelibs-foundation/Sources/Foundation/NSPlatform.swift
+@@ -10,6 +10,9 @@
+ #if os(macOS) || os(iOS)
+ fileprivate let _NSPageSize = Int(vm_page_size)
+ #elseif os(Linux) || os(Android) || os(OpenBSD)
++#if canImport(Android)
++import Android
++#endif
+ fileprivate let _NSPageSize = Int(getpagesize())
+ #elseif os(Windows)
+ import WinSDK
+diff --git a/swift-corelibs-foundation/Sources/Foundation/NSSwiftRuntime.swift b/swift-corelibs-foundation/Sources/Foundation/NSSwiftRuntime.swift
+index 03176c17..1509c31d 100644
+--- a/swift-corelibs-foundation/Sources/Foundation/NSSwiftRuntime.swift
++++ b/swift-corelibs-foundation/Sources/Foundation/NSSwiftRuntime.swift
+@@ -19,6 +19,8 @@ internal import Synchronization
+ @_exported import Glibc
+ #elseif canImport(Musl)
+ @_exported import Musl
++#elseif canImport(Bionic)
++@_exported import Bionic
+ #elseif os(WASI)
+ @_exported import WASILibc
+ #elseif os(Windows)
+diff --git a/swift-corelibs-foundation/Sources/Foundation/NSURL.swift b/swift-corelibs-foundation/Sources/Foundation/NSURL.swift
+index 6af73f16..9e6f20d0 100644
+--- a/swift-corelibs-foundation/Sources/Foundation/NSURL.swift
++++ b/swift-corelibs-foundation/Sources/Foundation/NSURL.swift
+@@ -22,6 +22,8 @@ import Darwin
+ import Glibc
+ #elseif canImport(Musl)
+ import Musl
++#elseif canImport(Bionic)
++import Bionic
+ #endif
+ 
+ // NOTE: this represents PLATFORM_PATH_STYLE
+diff --git a/swift-corelibs-foundation/Sources/Foundation/Port.swift b/swift-corelibs-foundation/Sources/Foundation/Port.swift
+index c4ed8282..e71f591b 100644
+--- a/swift-corelibs-foundation/Sources/Foundation/Port.swift
++++ b/swift-corelibs-foundation/Sources/Foundation/Port.swift
+@@ -107,7 +107,7 @@ fileprivate let FOUNDATION_SOCK_STREAM = SOCK_STREAM
+ fileprivate let FOUNDATION_IPPROTO_TCP = IPPROTO_TCP
+ #endif
+ 
+-#if canImport(Glibc) && !os(Android) && !os(OpenBSD)
++#if canImport(Glibc) && !os(OpenBSD)
+ import Glibc
+ fileprivate let FOUNDATION_SOCK_STREAM = Int32(SOCK_STREAM.rawValue)
+ fileprivate let FOUNDATION_IPPROTO_TCP = Int32(IPPROTO_TCP)
+@@ -119,14 +119,19 @@ fileprivate let FOUNDATION_SOCK_STREAM = Int32(SOCK_STREAM)
+ fileprivate let FOUNDATION_IPPROTO_TCP = Int32(IPPROTO_TCP)
+ #endif
+ 
+-#if canImport(Glibc) && os(Android) || os(OpenBSD)
++#if canImport(Glibc) && os(OpenBSD)
+ import Glibc
+ fileprivate let FOUNDATION_SOCK_STREAM = Int32(SOCK_STREAM)
+ fileprivate let FOUNDATION_IPPROTO_TCP = Int32(IPPROTO_TCP)
+ fileprivate let INADDR_ANY: in_addr_t = 0
+-#if os(OpenBSD)
+ fileprivate let INADDR_LOOPBACK = 0x7f000001
+ #endif
++
++#if canImport(Android)
++import Android
++fileprivate let FOUNDATION_SOCK_STREAM = Int32(Android.SOCK_STREAM)
++fileprivate let FOUNDATION_IPPROTO_TCP = Int32(Android.IPPROTO_TCP)
++fileprivate let INADDR_ANY: in_addr_t = 0
+ #endif
+ 
+ 
+diff --git a/swift-corelibs-foundation/Sources/Foundation/Process.swift b/swift-corelibs-foundation/Sources/Foundation/Process.swift
+index ee35c23a..5e8cfbaa 100644
+--- a/swift-corelibs-foundation/Sources/Foundation/Process.swift
++++ b/swift-corelibs-foundation/Sources/Foundation/Process.swift
+@@ -18,6 +18,8 @@ import struct WinSDK.HANDLE
+ 
+ #if canImport(Darwin)
+ import Darwin
++#elseif canImport(Android)
++import Android
+ #endif
+ 
+ internal import Synchronization
+diff --git a/swift-corelibs-foundation/Sources/Foundation/Thread.swift b/swift-corelibs-foundation/Sources/Foundation/Thread.swift
+index 5e79579c..0985a482 100644
+--- a/swift-corelibs-foundation/Sources/Foundation/Thread.swift
++++ b/swift-corelibs-foundation/Sources/Foundation/Thread.swift
+@@ -17,6 +17,8 @@ import WinSDK
+ import Glibc
+ #elseif canImport(Musl)
+ import Musl
++#elseif canImport(Bionic)
++import Bionic
+ #endif
+ 
+ // WORKAROUND_SR9811
+diff --git a/swift-corelibs-foundation/Sources/FoundationNetworking/HTTPCookie.swift b/swift-corelibs-foundation/Sources/FoundationNetworking/HTTPCookie.swift
+index e0d1cbbd..237c1daf 100644
+--- a/swift-corelibs-foundation/Sources/FoundationNetworking/HTTPCookie.swift
++++ b/swift-corelibs-foundation/Sources/FoundationNetworking/HTTPCookie.swift
+@@ -15,6 +15,8 @@ import Foundation
+ 
+ #if os(Windows)
+ import WinSDK
++#elseif canImport(Android)
++import Android
+ #endif
+ 
+ public struct HTTPCookiePropertyKey : RawRepresentable, Equatable, Hashable, Sendable {
+diff --git a/swift-corelibs-foundation/Sources/plutil/main.swift b/swift-corelibs-foundation/Sources/plutil/main.swift
+index 29316d16..29584596 100644
+--- a/swift-corelibs-foundation/Sources/plutil/main.swift
++++ b/swift-corelibs-foundation/Sources/plutil/main.swift
+@@ -15,6 +15,9 @@ import Glibc
+ #elseif canImport(Musl)
+ import Foundation
+ import Musl
++#elseif canImport(Bionic)
++import Foundation
++import Bionic
+ #elseif canImport(CRT)
+ import Foundation
+ import CRT
+diff --git a/swift-corelibs-foundation/Sources/xdgTestHelper/main.swift b/swift-corelibs-foundation/Sources/xdgTestHelper/main.swift
+index d515a63f..fb037e24 100644
+--- a/swift-corelibs-foundation/Sources/xdgTestHelper/main.swift
++++ b/swift-corelibs-foundation/Sources/xdgTestHelper/main.swift
+@@ -19,6 +19,8 @@ import FoundationNetworking
+ #endif
+ #if os(Windows)
+ import WinSDK
++#elseif canImport(Android)
++import Android
+ #endif
+ 
+ enum HelperCheckStatus : Int32 {
+diff --git a/swift-corelibs-foundation/Package.swift b/swift-corelibs-foundation/Package.swift
+--- a/swift-corelibs-foundation/Package.swift
++++ b/swift-corelibs-foundation/Package.swift
+@@ -176,7 +176,8 @@
+                 "BlockRuntime",
+                 "CMakeLists.txt"
+             ],
+-            cSettings: coreFoundationBuildSettings
++            cSettings: coreFoundationBuildSettings,
++            linkerSettings: [.linkedLibrary("log", .when(platforms: [.android]))]
+         ),
+         .target(
+             name: "_CFXMLInterface",
+diff --git a/swift-corelibs-foundation/Sources/Foundation/FileManager+POSIX.swift b/swift-corelibs-foundation/Sources/Foundation/FileManager+POSIX.swift
+index e89b3bf6..a82fe1c2 100644
+--- a/swift-corelibs-foundation/Sources/Foundation/FileManager+POSIX.swift
++++ b/swift-corelibs-foundation/Sources/Foundation/FileManager+POSIX.swift
+@@ -347,10 +351,17 @@
+             do {
+                 guard fm.fileExists(atPath: _url.path) else { throw _NSErrorWithErrno(ENOENT, reading: true, url: url) }
+                 _stream = try FileManager.default._fileSystemRepresentation(withPath: _url.path) { fsRep in
++#if canImport(Android)
++                    let ps = UnsafeMutablePointer<UnsafeMutablePointer<Int8>>.allocate(capacity: 2)
++                    defer { ps.deallocate() }
++                    ps.initialize(to: UnsafeMutablePointer(mutating: fsRep))
++                    ps.advanced(by: 1).initialize(to: unsafeBitCast(0, to: UnsafeMutablePointer<Int8>.self))
++#else
+                     let ps = UnsafeMutablePointer<UnsafeMutablePointer<Int8>?>.allocate(capacity: 2)
+                     defer { ps.deallocate() }
+                     ps.initialize(to: UnsafeMutablePointer(mutating: fsRep))
+                     ps.advanced(by: 1).initialize(to: nil)
++#endif
+                     return fts_open(ps, FTS_PHYSICAL | FTS_XDEV | FTS_NOCHDIR | FTS_NOSTAT, nil)
+                 }
+                 if _stream == nil {
+diff --git a/swift-corelibs-foundation/Sources/Foundation/NSPathUtilities.swift b/swift-corelibs-foundation/Sources/Foundation/NSPathUtilities.swift
+--- a/swift-corelibs-foundation/Sources/Foundation/NSPathUtilities.swift
++++ b/swift-corelibs-foundation/Sources/Foundation/NSPathUtilities.swift
+@@ -19,6 +19,8 @@
+     get { WASILibc.errno }
+     set { WASILibc.errno = newValue }
+ }
++#elseif os(Android)
++import Android
+ #endif
+ 
+ #if os(Windows)
+diff --git a/swift-corelibs-foundation/Sources/Foundation/Process.swift b/swift-corelibs-foundation/Sources/Foundation/Process.swift
+index 758dd1df..02970992 100644
+--- a/swift-corelibs-foundation/Sources/Foundation/Process.swift
++++ b/swift-corelibs-foundation/Sources/Foundation/Process.swift
+@@ -927,8 +927,8 @@ open class Process: NSObject, @unchecked Sendable {
+         }
+         let useFallbackChdir: Bool
+         if let dir = currentDirectoryURL?.path {
+-            let chdirResult = _CFPosixSpawnFileActionsChdir(fileActions, dir)
+-            useFallbackChdir = chdirResult == ENOSYS
++            // let chdirResult = _CFPosixSpawnFileActionsChdir(fileActions, dir)
++            useFallbackChdir = true ; let chdirResult = ENOSYS
+             if !useFallbackChdir {
+                 try _throwIfPosixError(chdirResult)
+             }
+diff --git a/swift-foundation/Sources/FoundationEssentials/FileManager/FileOperations+Enumeration.swift b/swift-foundation/Sources/FoundationEssentials/FileManager/FileOperations+Enumeration.swift
+--- a/swift-foundation/Sources/FoundationEssentials/FileManager/FileOperations+Enumeration.swift
++++ b/swift-foundation/Sources/FoundationEssentials/FileManager/FileOperations+Enumeration.swift
+@@ -169,7 +169,7 @@
+                 return
+             }
+ 
+-            state = [UnsafeMutablePointer(mutating: path), nil].withUnsafeBufferPointer { dirList in
++            state = [UnsafeMutablePointer(mutating: path), unsafeBitCast(0, to: UnsafeMutablePointer<CChar>.self)].withUnsafeBufferPointer { dirList in
+                 guard let stream = fts_open(dirList.baseAddress!, opts, nil) else {
+                     return .error(errno, String(cString: path))
+                 }
+diff --git a/swift-foundation/Sources/FoundationEssentials/String/String+Path.swift b/swift-foundation/Sources/FoundationEssentials/String/String+Path.swift
+index f1cb26d..44600dd 100644
+--- a/swift-foundation/Sources/FoundationEssentials/String/String+Path.swift
++++ b/swift-foundation/Sources/FoundationEssentials/String/String+Path.swift
+@@ -465,6 +465,7 @@ extension String {
+             return envVar.standardizingPath
+         }
+         
++        #if !canImport(Android)
+         // Next, attempt to find the home directory via getpwnam/getpwuid
+         var pass: UnsafeMutablePointer<passwd>?
+         if let user {
+@@ -478,9 +479,10 @@ extension String {
+         if let dir = pass?.pointee.pw_dir {
+             return String(cString: dir).standardizingPath
+         }
++        #endif
+         
+         // Fallback to HOME for the current user if possible
+-        if user == nil, let home = getenv("HOME") {
++        if let home = getenv("HOME") {
+             return String(cString: home).standardizingPath
+         }
+         
+diff --git a/swift-foundation-icu/icuSources/CMakeLists.txt b/swift-foundation-icu/icuSources/CMakeLists.txt
+index fde8755..343f3b4 100644
+--- a/swift-foundation-icu/icuSources/CMakeLists.txt
++++ b/swift-foundation-icu/icuSources/CMakeLists.txt
+@@ -20,7 +20,7 @@ target_include_directories(_FoundationICU
+ 
+ target_compile_options(_FoundationICU INTERFACE
+   "$<$<COMPILE_LANGUAGE:Swift>:SHELL:-Xcc -fmodule-map-file=${CMAKE_CURRENT_SOURCE_DIR}/include/_foundation_unicode/module.modulemap>")
+-
++target_link_options(_FoundationICU PRIVATE "SHELL:--target=$ENV{CCTERMUX_HOST_PLATFORM} -Xlinker -rpath=@TERMUX_PREFIX@/lib")
+ add_subdirectory(common)
+ add_subdirectory(i18n)
+ add_subdirectory(io)

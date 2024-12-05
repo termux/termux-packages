@@ -11,6 +11,7 @@ TERMUX_PKG_CONFLICTS="libgtk3"
 TERMUX_PKG_REPLACES="libgtk3"
 # Prevent updating to unstable branch or gtk4
 TERMUX_PKG_AUTO_UPDATE=false
+TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dbroadway_backend=true
@@ -26,21 +27,9 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 
 termux_step_pre_configure() {
 	termux_setup_cmake
-	TERMUX_PKG_VERSION=. termux_setup_gir
+	termux_setup_gir
 	termux_setup_ninja
-
-	local _WRAPPER_BIN="${TERMUX_PKG_BUILDDIR}/_wrapper/bin"
-	mkdir -p "${_WRAPPER_BIN}"
-	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "false" ]]; then
-		sed \
-			-e "s|^export PKG_CONFIG_LIBDIR=|export PKG_CONFIG_LIBDIR=${TERMUX_PREFIX}/opt/glib/cross/lib/x86_64-linux-gnu/pkgconfig:|" \
-			-e "s|^export PKG_CONFIG_LIBDIR=|export PKG_CONFIG_LIBDIR=${TERMUX_PREFIX}/opt/libwayland/cross/lib/x86_64-linux-gnu/pkgconfig:|" \
-			"${TERMUX_STANDALONE_TOOLCHAIN}/bin/pkg-config" \
-			> "${_WRAPPER_BIN}/pkg-config"
-		chmod +x "${_WRAPPER_BIN}/pkg-config"
-		export PKG_CONFIG="${_WRAPPER_BIN}/pkg-config"
-	fi
-	export PATH="${_WRAPPER_BIN}:${PATH}"
+	termux_setup_pkg_config_wrapper "${TERMUX_PREFIX}/opt/glib/cross/lib/x86_64-linux-gnu/pkgconfig:${TERMUX_PREFIX}/opt/libwayland/cross/lib/x86_64-linux-gnu/pkgconfig"
 }
 
 termux_step_create_debscripts() {

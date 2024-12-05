@@ -59,7 +59,8 @@ termux_step_setup_cgct_environment() {
 					fi
 				elif [ "$TERMUX_REPO_PKG_FORMAT" = "pacman" ]; then
 					tar -xJf "${PKG}-${DEP_VERSION_PAC}-${DEP_ARCH}.pkg.tar.xz" \
-						--force-local --no-overwrite-dir -C / data
+						--anchored --exclude=.{BUILDINFO,PKGINFO,MTREE,INSTALL} \
+						--force-local --no-overwrite-dir -C /
 				fi
 			)
 			mkdir -p $TERMUX_BUILT_PACKAGES_DIRECTORY

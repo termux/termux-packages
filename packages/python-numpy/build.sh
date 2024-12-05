@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://numpy.org/
 TERMUX_PKG_DESCRIPTION="The fundamental package for scientific computing with Python"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.26.5"
+TERMUX_PKG_VERSION="2.1.3"
 TERMUX_PKG_SRCURL=git+https://github.com/numpy/numpy
 TERMUX_PKG_DEPENDS="libc++, libopenblas, python"
 TERMUX_PKG_AUTO_UPDATE=true
@@ -32,7 +32,7 @@ termux_step_configure() {
 	cp -f $TERMUX_MESON_CROSSFILE $TERMUX_MESON_WHEEL_CROSSFILE
 	sed -i 's|^\(\[binaries\]\)$|\1\npython = '\'$(command -v python)\''|g' \
 		$TERMUX_MESON_WHEEL_CROSSFILE
-	sed -i 's|^\(\[properties\]\)$|\1\nnumpy-include-dir = '\'$PYTHON_SITE_PKG/numpy/core/include\''|g' \
+	sed -i 's|^\(\[properties\]\)$|\1\nnumpy-include-dir = '\'$PYTHON_SITE_PKG/numpy/_core/include\''|g' \
 		$TERMUX_MESON_WHEEL_CROSSFILE
 
 	local _longdouble_format=""

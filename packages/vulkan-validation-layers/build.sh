@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/KhronosGroup/Vulkan-ValidationLayers
 TERMUX_PKG_DESCRIPTION="Vulkan Validation Layers"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.3.290"
+TERMUX_PKG_VERSION="1.3.297"
 TERMUX_PKG_SRCURL=https://github.com/KhronosGroup/Vulkan-ValidationLayers/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=37fd611f1c5c5879a68c6f63b09e600a3858f519aa147a2535961fa3d8e889ae
+TERMUX_PKG_SHA256=11220ccc139f5517b3a3aa2e2ef0d680da314940c9bb98c7f3857a871bdb2205
 TERMUX_PKG_DEPENDS="libc++, vulkan-loader"
 TERMUX_PKG_BUILD_DEPENDS="libwayland, libx11, libxcb, libxrandr, spirv-headers, spirv-tools, vulkan-headers (=${TERMUX_PKG_VERSION}), vulkan-utility-libraries (=${TERMUX_PKG_VERSION})"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="vulkan-loader"

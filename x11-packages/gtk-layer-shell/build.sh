@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL=git+https://github.com/wmww/gtk-layer-shell
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="glib, gtk3, libwayland"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, libwayland-cross-scanner, libwayland-protocols"
+TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Ddocs=false
@@ -16,7 +17,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure() {
-	TERMUX_PKG_VERSION=. termux_setup_gir
+	termux_setup_gir
 
 	export PATH="$TERMUX_PREFIX/opt/libwayland/cross/bin:$PATH"
 }

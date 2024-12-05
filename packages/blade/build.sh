@@ -3,17 +3,19 @@ TERMUX_PKG_DESCRIPTION="A simple, fast, clean and dynamic language"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.0.85"
+TERMUX_PKG_VERSION="0.0.86"
 TERMUX_PKG_SRCURL=https://github.com/blade-lang/blade/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=039a9fe0c06a3a096362447b1172cf7eea23b5d414ea6cc25365d0d0147482ae
+TERMUX_PKG_SHA256=abbf411abd64e5fc66411f37bcd4efec1ec71ba8b000d7f9d3249c1c726f468e
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_BUILD_DEPENDS="libcurl, openssl"
+TERMUX_PKG_BUILD_DEPENDS="libgd, libcurl, openssl"
 TERMUX_PKG_HOSTBUILD=true
 
 termux_step_host_build() {
+	sed -i '/add_subdirectory(imagine)/d' $TERMUX_PKG_SRCDIR/packages/CMakeLists.txt
 	termux_setup_cmake
 	cmake $TERMUX_PKG_SRCDIR
 	make -j $TERMUX_PKG_MAKE_PROCESSES
+	echo "add_subdirectory(imagine)" >> $TERMUX_PKG_SRCDIR/packages/CMakeLists.txt
 }
 
 termux_step_pre_configure() {

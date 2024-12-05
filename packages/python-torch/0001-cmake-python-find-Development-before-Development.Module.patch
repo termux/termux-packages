@@ -1,0 +1,12 @@
+Seems a bug of cmake. Finding `Development` before other components fixes this.
+
+--- a/cmake/Dependencies.cmake
++++ b/cmake/Dependencies.cmake
+@@ -854,6 +854,7 @@
+   if(USE_NUMPY)
+     list(APPEND PYTHON_COMPONENTS NumPy)
+   endif()
++  find_package(Python COMPONENTS Development)
+   find_package(Python COMPONENTS Interpreter OPTIONAL_COMPONENTS ${PYTHON_COMPONENTS})
+ else()
+   find_package(Python COMPONENTS Interpreter)

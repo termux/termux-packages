@@ -80,6 +80,10 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_setup_cgct_environment.sh"
 # shellcheck source=scripts/build/setup/termux_setup_cargo_c.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_cargo_c.sh"
 
+# Utility function for setting up pkg-config wrapper.
+# shellcheck source=scripts/build/setup/termux_setup_pkg_config_wrapper.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_pkg_config_wrapper.sh"
+
 # Utility function for setting up Crystal toolchain.
 # shellcheck source=scripts/build/setup/termux_setup_crystal.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_crystal.sh"
@@ -237,8 +241,8 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_handle_host_build.sh"
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_host_build.sh"
 
 # Setup a standalone Android NDK toolchain. Called from termux_step_setup_toolchain.
-# shellcheck source=scripts/build/toolchain/termux_setup_toolchain_27b.sh
-source "$TERMUX_SCRIPTDIR/scripts/build/toolchain/termux_setup_toolchain_27b.sh"
+# shellcheck source=scripts/build/toolchain/termux_setup_toolchain_27c.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/toolchain/termux_setup_toolchain_27c.sh"
 
 # Setup a standalone Android NDK 23c toolchain. Called from termux_step_setup_toolchain.
 # shellcheck source=scripts/build/toolchain/termux_setup_toolchain_23c.sh

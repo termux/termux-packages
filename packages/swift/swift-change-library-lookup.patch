@@ -17,9 +17,9 @@ index 0a57134a410..71b7f36a634 100644
 --- a/swift/lib/Frontend/CompilerInvocation.cpp
 +++ b/swift/lib/Frontend/CompilerInvocation.cpp
 @@ -169,7 +169,7 @@ static void updateRuntimeLibraryPaths(SearchPathOptions &SearchPathOpts,
+ #endif
  
    llvm::sys::path::append(LibPath, LibSubDir);
-   SearchPathOpts.RuntimeLibraryPaths.clear();
 -  SearchPathOpts.RuntimeLibraryPaths.push_back(std::string(LibPath.str()));
 +  SearchPathOpts.RuntimeLibraryPaths.push_back("@TERMUX_PREFIX@/lib");
    if (Triple.isOSDarwin())

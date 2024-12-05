@@ -5,6 +5,7 @@
 
 set -e
 
+export TERMUX_SCRIPTDIR=$(realpath "$(dirname "$(realpath "$0")")/../")
 . $(dirname "$(realpath "$0")")/properties.sh
 BOOTSTRAP_TMPDIR=$(mktemp -d "${TMPDIR:-/tmp}/bootstrap-tmp.XXXXXXXX")
 trap 'rm -rf $BOOTSTRAP_TMPDIR' EXIT
@@ -110,7 +111,7 @@ print_desc_package_pac() {
 	echo -e "%${1}%\n${2}\n"
 }
 
-# Download specified package, its depenencies and then extract *.deb or *.pkg.tar.xz files to
+# Download specified package, its dependencies and then extract *.deb or *.pkg.tar.xz files to
 # the bootstrap root.
 pull_package() {
 	local package_name=$1
@@ -256,7 +257,7 @@ add_termux_bootstrap_second_stage_files() {
 		-e "s|@TERMUX_BOOTSTRAP_CONFIG_DIR_PATH@|${TERMUX_BOOTSTRAP_CONFIG_DIR_PATH}|g" \
 		-e "s|@TERMUX_PACKAGE_MANAGER@|${TERMUX_PACKAGE_MANAGER}|g" \
 		-e "s|@TERMUX_PACKAGE_ARCH@|${package_arch}|g" \
-		"$(dirname "$(realpath "$0")")/bootstrap/termux-bootstrap-second-stage.sh" \
+		"$TERMUX_SCRIPTDIR/scripts/bootstrap/termux-bootstrap-second-stage.sh" \
 		> "${BOOTSTRAP_ROOTFS}/${TERMUX_BOOTSTRAP_CONFIG_DIR_PATH}/termux-bootstrap-second-stage.sh"
 	chmod 700 "${BOOTSTRAP_ROOTFS}/${TERMUX_BOOTSTRAP_CONFIG_DIR_PATH}/termux-bootstrap-second-stage.sh"
 
@@ -264,7 +265,7 @@ add_termux_bootstrap_second_stage_files() {
 	sed -e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
 		-e "s|@TERMUX_PROFILE_D_PREFIX_DIR_PATH@|${TERMUX_PROFILE_D_PREFIX_DIR_PATH}|g" \
 		-e "s|@TERMUX_BOOTSTRAP_CONFIG_DIR_PATH@|${TERMUX_BOOTSTRAP_CONFIG_DIR_PATH}|g" \
-		"$(dirname "$(realpath "$0")")/bootstrap/01-termux-bootstrap-second-stage-fallback.sh" \
+		"$TERMUX_SCRIPTDIR/scripts/bootstrap/01-termux-bootstrap-second-stage-fallback.sh" \
 		> "${BOOTSTRAP_ROOTFS}/${TERMUX_PROFILE_D_PREFIX_DIR_PATH}/01-termux-bootstrap-second-stage-fallback.sh"
 	chmod 600 "${BOOTSTRAP_ROOTFS}/${TERMUX_PROFILE_D_PREFIX_DIR_PATH}/01-termux-bootstrap-second-stage-fallback.sh"
 

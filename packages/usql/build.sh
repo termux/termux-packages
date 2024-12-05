@@ -2,20 +2,42 @@ TERMUX_PKG_HOMEPAGE=https://github.com/xo/usql
 TERMUX_PKG_DESCRIPTION="A universal command-line interface for SQL databases"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@flipee"
-TERMUX_PKG_VERSION="0.19.3"
+TERMUX_PKG_VERSION="0.19.12"
 TERMUX_PKG_SRCURL=https://github.com/xo/usql/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=3955e13c7108cb4a3ebb968dafa501db72d4f4fa0ddf6fb128cceb84e5a3d4c4
+TERMUX_PKG_SHA256=9ee88b713132cd83436a24ae6a76af43b04b1cb55ebf782ed99bf957bfdd491c
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
+termux_step_post_get_source() {
+	termux_setup_golang
+	go mod tidy
+	go mod vendor
+}
+
 termux_step_make() {
 	termux_setup_golang
-	export GOPATH=$TERMUX_PKG_BUILDDIR
 
-	cd $TERMUX_PKG_SRCDIR
+	# Build and replace resvg
+	local _resvg_go_url="$(cat go.mod | grep resvg | awk '{print $1}')"
+	local _resvg_go_srcdir="$TERMUX_PKG_SRCDIR"/vendor/$_resvg_go_url/
+	(
+		local _resvg_version="$(cat "$_resvg_go_srcdir"/version.txt)"
+		git clone https://github.com/RazrFalcon/resvg.git -b $_resvg_version --depth=1
+		cd resvg/crates/c-api
+		termux_setup_rust
+		cargo build --release \
+			--jobs "$TERMUX_PKG_MAKE_PROCESSES" \
+			--target "$CARGO_TARGET_NAME" \
+			--locked
+		patch -p1 -d "$_resvg_go_srcdir"/ < "$TERMUX_PKG_BUILDER_DIR"/resvg-i686.diff
+		mkdir -p "$_resvg_go_srcdir"/libresvg/linux_$GOARCH
+		cp ../../crates/c-api/resvg.h \
+			"$_resvg_go_srcdir"/libresvg/resvg.h
+		cp ../../target/$CARGO_TARGET_NAME/release/libresvg.a \
+			"$_resvg_go_srcdir"/libresvg/linux_$GOARCH/libresvg.a
+	)
 
 	local tags="most no_adodb no_duckdb"
-
 	if [ "${TERMUX_ARCH}" = "arm" ] || [ "${TERMUX_ARCH}" = "i686" ]; then
 		tags="$tags no_netezza no_chai"
 	fi

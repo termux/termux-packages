@@ -8,6 +8,7 @@ TERMUX_PKG_SHA256=c3ee8728e4364b0397f435fa20f92f901ab139d2b264f4e059d67b3c0f43cd
 TERMUX_PKG_DEPENDS="glib, libgcrypt, p11-kit"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, glib-cross, gnupg, valac"
 TERMUX_PKG_RECOMMENDS="gnupg"
+TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dintrospection=true
@@ -19,7 +20,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure() {
-	TERMUX_PKG_VERSION=. termux_setup_gir
+	termux_setup_gir
 
 	local bin_dir=$TERMUX_PKG_BUILDDIR/_dummy/bin
 	mkdir -p $bin_dir
@@ -34,17 +35,7 @@ termux_step_pre_configure() {
 	done
 	popd
 	export PATH+=":$bin_dir"
-
-	local _WRAPPER_BIN="${TERMUX_PKG_BUILDDIR}/_wrapper/bin"
-	mkdir -p "${_WRAPPER_BIN}"
-	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "false" ]]; then
-		sed "s|^export PKG_CONFIG_LIBDIR=|export PKG_CONFIG_LIBDIR=${TERMUX_PREFIX}/opt/glib/cross/lib/x86_64-linux-gnu/pkgconfig:|" \
-			"${TERMUX_STANDALONE_TOOLCHAIN}/bin/pkg-config" \
-			> "${_WRAPPER_BIN}/pkg-config"
-		chmod +x "${_WRAPPER_BIN}/pkg-config"
-		export PKG_CONFIG="${_WRAPPER_BIN}/pkg-config"
-	fi
-	export PATH="${_WRAPPER_BIN}:${PATH}"
+	termux_setup_glib_cross_pkg_config_wrapper
 }
 
 termux_step_post_massage() {

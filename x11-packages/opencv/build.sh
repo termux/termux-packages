@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Open Source Computer Vision Library"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.10.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=(
 	https://github.com/opencv/opencv/archive/${TERMUX_PKG_VERSION}/opencv-${TERMUX_PKG_VERSION}.tar.gz
 	https://github.com/opencv/opencv_contrib/archive/${TERMUX_PKG_VERSION}/opencv_contrib-${TERMUX_PKG_VERSION}.tar.gz
@@ -13,7 +13,7 @@ TERMUX_PKG_SHA256=(
 	65597f8fb8dc2b876c1b45b928bbcc5f772ddbaf97539bf1b737623d0604cba1
 )
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="abseil-cpp, ffmpeg, libc++, libjpeg-turbo, libopenblas, libpng, libtiff, libwebp, openjpeg, openjpeg-tools, qt5-qtbase, zlib"
+TERMUX_PKG_DEPENDS="abseil-cpp, ffmpeg, libc++, libjpeg-turbo, libopenblas, libpng, libtiff, libwebp, openjpeg, openjpeg-tools, qt6-qtbase, qt6-qt5compat, zlib"
 # For static libprotobuf see
 # https://github.com/termux/termux-packages/issues/16979
 TERMUX_PKG_BUILD_DEPENDS="libutf8-range, protobuf-static, python-numpy-static"
@@ -22,7 +22,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DANDROID_NO_TERMUX=OFF
 -DWITH_GSTREAMER=OFF
 -DWITH_OPENEXR=OFF
--DWITH_QT=ON
+-DWITH_QT=6
 -DBUILD_PERF_TESTS=OFF
 -DBUILD_PROTOBUF=OFF
 -DBUILD_TESTS=OFF
@@ -51,7 +51,7 @@ termux_step_pre_configure() {
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
 		-DPYTHON_DEFAULT_EXECUTABLE=python
 		-DPYTHON3_INCLUDE_PATH=$TERMUX_PREFIX/include/python${TERMUX_PYTHON_VERSION}
-		-DPYTHON3_NUMPY_INCLUDE_DIRS=$TERMUX_PYTHON_HOME/site-packages/numpy/core/include
+		-DPYTHON3_NUMPY_INCLUDE_DIRS=$TERMUX_PYTHON_HOME/site-packages/numpy/_core/include
 		"
 
 	mv $TERMUX_PREFIX/lib/libprotobuf.so{,.tmp}

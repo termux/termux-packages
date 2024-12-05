@@ -6,8 +6,10 @@ TERMUX_PKG_MAINTAINER="@termux"
 # 1.7.7 we get the following error:
 # $ sudo docker run -it ubuntu bash
 # docker: Error response from daemon: failed to create task for container: failed to start shim: start failed: io.containerd.runc.v2: create new shim socket: listen unix /data/data/com.termux/files/usr/var/run/containerd/s/3f71828f1d6c1ead43fded842abc9c3cf5857c74c3e0704cd83ab177e17cfe6c: bind: invalid argument: exit status 1: unknown.
+#
+# Above error is fixed by too_long_path.patch
 TERMUX_PKG_VERSION=1.6.21
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=git+https://github.com/containerd/containerd
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="runc"

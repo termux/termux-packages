@@ -1,16 +1,21 @@
+
 diff -uNr parallel/src/parallel parallel.mod/src/parallel
 --- parallel/src/parallel	2023-09-28 21:55:48.803300511 +0800
 +++ parallel.mod/src/parallel	2023-09-28 21:58:17.203300520 +0800
-@@ -2241,7 +2241,7 @@
+@@ -2335,10 +2335,10 @@
      ## Shell
      #
-     $Global::shell = $ENV{'PARALLEL_SHELL'} || parent_shell($$)
--	|| $ENV{'SHELL'} || "/bin/sh";
-+	|| $ENV{'SHELL'} || "@TERMUX_PREFIX@/bin/sh";
+     if($opt::fast) {
+-	$Global::shell = $ENV{'PARALLEL_SHELL'} || which("dash") || "/bin/sh";
++	$Global::shell = $ENV{'PARALLEL_SHELL'} || which("dash") || "@TERMUX_PREFIX@/bin/sh";
+     } else {
+ 	$Global::shell = $ENV{'PARALLEL_SHELL'} || parent_shell($$)
+-	    || $ENV{'SHELL'} || "/bin/sh";
++	    || $ENV{'SHELL'} || "@TERMUX_PREFIX@/bin/sh";
+     }
      if(not -x $Global::shell and not which($Global::shell)) {
  	::error("Shell '$Global::shell' not found.");
- 	wait_and_exit(255);
-@@ -2917,14 +2917,14 @@
+@@ -3009,14 +3009,14 @@
      $Global::trim = 'n';
      $Global::max_jobs_running = 0;
      $Global::job_already_run = '';
@@ -29,7 +34,7 @@ diff -uNr parallel/src/parallel parallel.mod/src/parallel
      }
      # no warnings to allow for undefined $XDG_*
      no warnings 'uninitialized';
-@@ -4972,7 +4972,7 @@
+@@ -5152,7 +5152,7 @@
      unlink $stderrname;
  
      my $pid = ::open3($stdin_fh,$stdout_fh,$stderr_fh,
@@ -38,7 +43,7 @@ diff -uNr parallel/src/parallel parallel.mod/src/parallel
      if(my $writerpid = fork()) {
  	close $stdin_fh;
  	@stdout = <$stdout_fh>;
-@@ -8632,7 +8632,9 @@
+@@ -8949,7 +8949,9 @@
      #	  'threads' => #threads
      #	  'active' => #taskset_threads }
      # Use GNU/Linux

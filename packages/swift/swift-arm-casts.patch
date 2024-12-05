@@ -1,0 +1,26 @@
+diff --git a/swift/include/swift/AST/Attr.h b/swift/include/swift/AST/Attr.h
+index 0255b38af1b..3949e62e750 100644
+--- a/swift/include/swift/AST/Attr.h
++++ b/swift/include/swift/AST/Attr.h
+@@ -2661,7 +2661,7 @@ public:
+ 
+   ArrayRef<Identifier> getSuppressedFeatures() const {
+     return {getTrailingObjects<Identifier>(),
+-            Bits.AllowFeatureSuppressionAttr.NumFeatures};
++            static_cast<size_t>(Bits.AllowFeatureSuppressionAttr.NumFeatures)};
+   }
+ 
+   static bool classof(const DeclAttribute *DA) {
+diff --git a/swift/lib/ExternalGenericMetadataBuilder/ExternalGenericMetadataBuilder.cpp b/swift/lib/ExternalGenericMetadataBuilder/ExternalGenericMetadataBuilder.cpp
+index 7617abe7ee7..a0016e575c7 100644
+--- a/swift/lib/ExternalGenericMetadataBuilder/ExternalGenericMetadataBuilder.cpp
++++ b/swift/lib/ExternalGenericMetadataBuilder/ExternalGenericMetadataBuilder.cpp
+@@ -1488,7 +1488,7 @@ template <typename Runtime>
+ llvm::Error ExternalGenericMetadataBuilderContext<Runtime>::addImageInMemory(
+     const void *start, uint64_t length, const std::string &path) {
+   LOG(LogLevel::Info, "Adding %s in memory", path.c_str());
+-  llvm::StringRef stringRef{reinterpret_cast<const char *>(start), length};
++  llvm::StringRef stringRef{reinterpret_cast<const char *>(start), static_cast<size_t>(length)};
+   llvm::MemoryBufferRef bufferRef{stringRef, {}};
+   auto binary = llvm::object::createBinary(bufferRef);
+   if (!binary)

@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL=https://download.gnome.org/sources/goffice/${TERMUX_PKG_VERSIO
 TERMUX_PKG_SHA256=66bfd7e31d2f6756d5a62c3670383cbba02b3cb4c1042950192a801b72a3c9ab
 TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libcairo, libgsf, librsvg, libspectre, libxml2, libxslt, pango, zlib"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner"
+TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-introspection=yes
@@ -15,7 +16,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure() {
-	TERMUX_PKG_VERSION=. termux_setup_gir
+	termux_setup_gir
 
 	CPPFLAGS+=" -D__USE_GNU"
 }

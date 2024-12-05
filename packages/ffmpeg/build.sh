@@ -4,9 +4,10 @@ TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Please align version with `ffplay` package.
 TERMUX_PKG_VERSION="6.1.2"
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://www.ffmpeg.org/releases/ffmpeg-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=3b624649725ecdc565c903ca6643d41f33bd49239922e45c9b1442c63dca4e38
-TERMUX_PKG_DEPENDS="fontconfig, freetype, fribidi, game-music-emu, harfbuzz, libaom, libandroid-glob, libass, libbluray, libbz2, libdav1d, libgnutls, libiconv, liblzma, libmp3lame, libopencore-amr, libopenmpt, libopus, librav1e, libsoxr, libsrt, libssh, libtheora, libv4l, libvidstab, libvmaf, libvo-amrwbenc, libvorbis, libvpx, libwebp, libx264, libx265, libxml2, libzimg, littlecms, ocl-icd, svt-av1, xvidcore, zlib"
+TERMUX_PKG_DEPENDS="fontconfig, freetype, fribidi, game-music-emu, harfbuzz, libaom, libandroid-glob, libass, libbluray, libbz2, libdav1d, libgnutls, libiconv, liblzma, libmp3lame, libopencore-amr, libopenmpt, libopus, librav1e, libsoxr, libsrt, libssh, libtheora, libv4l, libvidstab, libvmaf, libvo-amrwbenc, libvorbis, libvpx, libwebp, libx264, libx265, libxml2, libzimg, littlecms, ocl-icd, rubberband, svt-av1, xvidcore, zlib"
 TERMUX_PKG_BUILD_DEPENDS="opencl-headers"
 TERMUX_PKG_CONFLICTS="libav"
 TERMUX_PKG_BREAKS="ffmpeg-dev"
@@ -57,6 +58,8 @@ termux_step_configure() {
 		--cc="$CC" \
 		--cxx="$CXX" \
 		--nm="$NM" \
+		--ar="$AR" \
+		--ranlib="llvm-ranlib" \
 		--pkg-config="$PKG_CONFIG" \
 		--strip="$STRIP" \
 		--cross-prefix="${TERMUX_HOST_PLATFORM}-" \
@@ -86,6 +89,7 @@ termux_step_configure() {
 		--enable-libopenmpt \
 		--enable-libopus \
 		--enable-librav1e \
+		--enable-librubberband \
 		--enable-libsoxr \
 		--enable-libsrt \
 		--enable-libssh \

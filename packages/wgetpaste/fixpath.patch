@@ -1,6 +1,6 @@
 --- a/wgetpaste
 +++ b/wgetpaste
-@@ -334,7 +334,7 @@
+@@ -351,7 +351,7 @@
  noxclip() {
  	cat <<EOF >&2
  Could not find xclip on your system. In order to use --x$1 you must either
@@ -9,7 +9,7 @@
  per user in ~/.wgetpaste.conf to use another program (such as e.g. xcut or
  klipper) to $2 your clipboard.
  
-@@ -532,11 +532,11 @@
+@@ -567,11 +567,11 @@
          --debug                   be *very* verbose (implies -v)
  
      -h, --help                    show this help
@@ -23,7 +23,7 @@
  per user in any of ~/.wgetpaste.conf or ~/.wgetpaste.d/*.conf.
  
  An additional http header can be passed by setting HEADER_\${SERVICE} in any of the
-@@ -823,7 +823,7 @@
+@@ -728,7 +728,7 @@
  	if [[ ! $IGNORECONFIGS ]]; then
  		# compatibility code
  		local f deprecated=
@@ -32,7 +32,7 @@
  			if [[ -f $f ]]; then
  				if [[ -z $deprecated ]]; then
  					echo "The config files for wgetpaste have changed to *.conf.$N" >&2
-@@ -835,7 +835,7 @@
+@@ -740,7 +740,7 @@
  		done
  		[[ -n $deprecated ]] && echo >&2
  		# new locations override old ones in case they collide
@@ -41,20 +41,20 @@
  			if [[ -f $f ]]; then
  				source "$f" || die "Failed to source $f"
  			fi
-@@ -922,7 +922,7 @@
+@@ -974,7 +974,7 @@
  
  # create tmpfile for use with tee
  if [[ $TEE ]]; then
--	TMPF=$(mktemp /tmp/wgetpaste.XXXXXX)
+-	TMPF=$(mktemp -q --tmpdir wgetpaste.XXXXXX)
 +	TMPF=$(mktemp @TERMUX_PREFIX@/tmp/wgetpaste.XXXXXX)
  	[[ -f $TMPF ]] || die "Could not create a temporary file for use with tee."
  fi
  
-@@ -1026,7 +1026,7 @@
+@@ -1078,7 +1078,7 @@
  else
  	# create temp file (wget is much more reliable reading
  	# large input via --post-file rather than --post-data)
--	[[ -f $TMPF ]] || TMPF=$(mktemp /tmp/wgetpaste.XXXXXX)
+-	[[ -f $TMPF ]] || TMPF=$(mktemp -q --tmpdir wgetpaste.XXXXXX)
 +	[[ -f $TMPF ]] || TMPF=$(mktemp @TERMUX_PREFIX@/tmp/wgetpaste.XXXXXX)
  	if [[ -f $TMPF ]]; then
  		postdata > "$TMPF" || die "Failed to write to temporary file: \"$TMPF\"."

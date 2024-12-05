@@ -2,14 +2,16 @@ TERMUX_PKG_HOMEPAGE=https://github.com/XmacsLabs/mogan
 TERMUX_PKG_DESCRIPTION="A structure editor forked from GNU TeXmacs"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.2.5.5"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="1.2.9.6"
 TERMUX_PKG_SRCURL=https://github.com/XmacsLabs/mogan/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=f97e138837e04cc7d6840e3b0ccb1bce42684608b63e69826a1e5cc5acf74a03
-TERMUX_PKG_DEPENDS="freetype, ghostscript, libandroid-complex-math, libandroid-spawn, libandroid-wordexp, libc++, libcurl, libgit2, libiconv, libjpeg-turbo, libpng, qt5-qtbase, qt5-qtsvg, zlib"
-TERMUX_PKG_BUILD_DEPENDS="qt5-qtbase-cross-tools"
+TERMUX_PKG_SHA256=2abe0b07baed1950119e95163a451e5eb0478839da5fcb864c38c83d473ed9aa
+TERMUX_PKG_DEPENDS="freetype, ghostscript, libandroid-complex-math, libandroid-execinfo, libandroid-spawn, libandroid-wordexp, libc++, libcurl, libgit2, libiconv, libjpeg-turbo, libpng, qt6-qtbase, qt6-qtsvg, zlib"
+TERMUX_PKG_BUILD_DEPENDS="qt6-qtbase-cross-tools"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_RM_AFTER_INSTALL="
+lib/libcurl.so
+"
 
 termux_pkg_auto_update() {
 	local api_url="https://api.github.com/repos/XmacsLabs/mogan/git/refs/tags"
@@ -18,7 +20,7 @@ termux_pkg_auto_update() {
 		echo "WARN: Unable to get latest refs tags from upstream. Try again later." >&2
 		return
 	fi
-	local latest_version=$(echo "${latest_refs_tags}" | grep "^1.2.5." | sort -V | tail -n1)
+	local latest_version=$(echo "${latest_refs_tags}" | grep "^1.2.9." | sort -V | tail -n1)
 
 	termux_pkg_upgrade_version "${latest_version}"
 }
@@ -43,10 +45,9 @@ termux_step_pre_configure() {
 	LD="${CXX}"
 
 	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "false" ]]; then
-		install -Dm755 "${TERMUX_PKG_BUILDER_DIR}/qmake.sh" "${TERMUX_PKG_BUILDDIR}/bin/qmake"
-		sed -e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" -i "${TERMUX_PKG_BUILDDIR}/bin/qmake"
-		export PATH="${TERMUX_PKG_BUILDDIR}/bin:${TERMUX_PREFIX}/opt/qt/cross/bin:${PATH}"
-		export QMAKESPEC="${TERMUX_PREFIX}/lib/qt/mkspecs/termux-cross"
+		install -Dm755 "${TERMUX_PKG_BUILDER_DIR}/qmake.sh" "${TERMUX_PKG_TMPDIR}/qmake"
+		sed -e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" -i "${TERMUX_PKG_TMPDIR}/qmake"
+		export PATH="${TERMUX_PKG_TMPDIR}:${TERMUX_PREFIX}/opt/qt6/cross/bin:${PATH}"
 	fi
 
 	command -v qmake
@@ -70,8 +71,8 @@ termux_step_make() {
 		-m releasedbg \
 		--sdk="${TERMUX_STANDALONE_TOOLCHAIN}" \
 		--cross="${host_platform}-" \
-		--cflags="${CFLAGS}" \
-		--cxxflags="${CXXFLAGS}" \
+		--cflags="${CPPFLAGS} ${CFLAGS}" \
+		--cxxflags="${CPPFLAGS} ${CXXFLAGS}" \
 		--ldflags="${LDFLAGS}"
 
 	echo "xmake build"

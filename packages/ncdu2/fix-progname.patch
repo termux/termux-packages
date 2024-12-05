@@ -1,0 +1,44 @@
+diff --git a/src/main.zig b/src/main.zig
+index 7575c1b..ccf0a2f 100644
+--- a/src/main.zig
++++ b/src/main.zig
+@@ -38,7 +38,7 @@ test "imports" {
+ }
+ 
+ // "Custom" allocator that wraps the libc allocator and calls ui.oom() on error.
+-// This allocator never returns an error, it either succeeds or causes ncdu to quit.
++// This allocator never returns an error, it either succeeds or causes ncdu2 to quit.
+ // (Which means you'll find a lot of "catch unreachable" sprinkled through the code,
+ // they look scarier than they are)
+ fn wrapAlloc(_: *anyopaque, len: usize, ptr_alignment: u8, return_address: usize) ?[*]u8 {
+@@ -354,14 +354,14 @@ fn tryReadArgsFile(path: [:0]const u8) void {
+ 
+ fn version() noreturn {
+     const stdout = std.io.getStdOut();
+-    stdout.writeAll("ncdu " ++ program_version ++ "\n") catch {};
++    stdout.writeAll("ncdu2 " ++ program_version ++ "\n") catch {};
+     std.process.exit(0);
+ }
+ 
+ fn help() noreturn {
+     const stdout = std.io.getStdOut();
+     stdout.writeAll(
+-    \\ncdu <options> <directory>
++    \\ncdu2 <options> <directory>
+     \\
+     \\Options:
+     \\  -h,--help                  This help message
+@@ -380,11 +380,11 @@ fn help() noreturn {
+     \\  -L, --follow-symlinks      Follow symbolic links (excluding directories)
+     \\  --exclude-caches           Exclude directories containing CACHEDIR.TAG
+     \\  --exclude-kernfs           Exclude Linux pseudo filesystems (procfs,sysfs,cgroup,...)
+-    \\  --confirm-quit             Confirm quitting ncdu
++    \\  --confirm-quit             Confirm quitting ncdu2
+     \\  --color SCHEME             Set color scheme (off/dark/dark-bg)
+     \\  --ignore-config            Don't load config files
+     \\
+-    \\Refer to `man ncdu` for the full list of options.
++    \\Refer to `man ncdu2` for the full list of options.
+     \\
+     ) catch {};
+     std.process.exit(0);

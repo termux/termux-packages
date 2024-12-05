@@ -2,14 +2,14 @@ TERMUX_PKG_HOMEPAGE=https://www.v2fly.org/
 TERMUX_PKG_DESCRIPTION="A platform for building proxies to bypass network restrictions"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="5.19.0"
+TERMUX_PKG_VERSION="5.22.0"
 TERMUX_PKG_SRCURL=git+https://github.com/v2fly/v2ray-core
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
 
 _RELEASE_URL=https://github.com/v2fly/v2ray-core/releases/download/v$TERMUX_PKG_VERSION/v2ray-linux-64.zip
-_RELEASE_SHA256=a87efc3b766130843c2e6cb7ca7b6a5b16196c8b1acd81bc4b3919ec96425c85
+_RELEASE_SHA256=ab181a2f70ea4c5536e98660c3462f5f2b3775e6268ee27dec91c8c80b0da946
 
 termux_pkg_auto_update() {
 	local latest_tag
@@ -52,6 +52,13 @@ termux_step_post_get_source() {
 		$_RELEASE_SHA256
 	mkdir -p $TERMUX_PKG_SRCDIR/v2ray-linux-64
 	unzip -d $TERMUX_PKG_SRCDIR/v2ray-linux-64 $TERMUX_PKG_CACHEDIR/v2ray-linux-64-$TERMUX_PKG_VERSION.zip
+
+	local d
+	for d in go/pkg/mod/github.com/adrg/xdg*/; do
+		sed 's|@TERMUX_PREFIX@|'"${TERMUX_PREFIX}"'|g' \
+			$TERMUX_PKG_BUILDER_DIR/0001-fix-config-paths.diff \
+			| patch -p1 -d ${d}
+	done
 }
 
 termux_step_make() {

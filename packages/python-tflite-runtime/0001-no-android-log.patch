@@ -1,0 +1,50 @@
+--- a/tensorflow/lite/CMakeLists.txt
++++ b/tensorflow/lite/CMakeLists.txt
+@@ -233,7 +233,7 @@
+     list(APPEND TFLITE_TARGET_PRIVATE_OPTIONS "-Wa,-mbig-obj")
+   endif()
+ endif()
+-if(CMAKE_SYSTEM_NAME MATCHES "Android")
++if(FALSE)
+   find_library(ANDROID_LOG_LIB log)
+   list(APPEND TFLITE_TARGET_DEPENDENCIES
+     log
+@@ -263,7 +263,7 @@
+ 
+ # Handle TFLite logging source.
+ list(FILTER TFLITE_SRCS EXCLUDE REGEX ".*minimal_logging_.*\\.cc$")
+-if("${CMAKE_SYSTEM_NAME}" STREQUAL "Android")
++if(FALSE)
+   list(APPEND TFLITE_SRCS ${TFLITE_SOURCE_DIR}/minimal_logging_android.cc)
+ elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "iOS")
+   list(APPEND TFLITE_SRCS ${TFLITE_SOURCE_DIR}/minimal_logging_ios.cc)
+--- a/tensorflow/lite/tools/benchmark/CMakeLists.txt
++++ b/tensorflow/lite/tools/benchmark/CMakeLists.txt
+@@ -78,7 +78,6 @@
+     )
+   endif()  # _TFLITE_ENABLE_NNAPI
+   list(APPEND TFLITE_BENCHMARK_LIBS
+-    ${ANDROID_LOG_LIB}
+     absl::strings
+   )
+ endif()  # Android
+--- a/tensorflow/lite/tools/logging.h
++++ b/tensorflow/lite/tools/logging.h
+@@ -27,7 +27,7 @@
+ #undef ERROR
+ #endif
+ 
+-#ifdef __ANDROID__
++#if 0
+ #include <android/log.h>
+ #endif
+ 
+@@ -53,7 +53,7 @@
+     if (should_log_) {
+       // Also print log to logcat for android, as stderr will be hidden
+       // in the app use case.
+-#ifdef __ANDROID__
++#if 0
+       switch (severity_) {
+         case LogSeverity::INFO:
+           __android_log_print(ANDROID_LOG_INFO, "tflite", "%s",

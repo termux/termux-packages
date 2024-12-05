@@ -3,14 +3,13 @@ TERMUX_PKG_DESCRIPTION="Python bindings for Apache Arrow"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Align the version with `libarrow-cpp` package.
-TERMUX_PKG_VERSION="17.0.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="18.1.0"
 TERMUX_PKG_SRCURL=https://github.com/apache/arrow/archive/refs/tags/apache-arrow-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=8379554d89f19f2c8db63620721cabade62541f47a4e706dfb0a401f05a713ef
+TERMUX_PKG_SHA256=026ecabd74f7b075f6c74e5448132ba40f35688a29d07616bcc1bd976676706c
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_METHOD=repology
 TERMUX_PKG_DEPENDS="abseil-cpp, libarrow-cpp (>= ${TERMUX_PKG_VERSION}), libc++, python, python-numpy"
-TERMUX_PKG_PYTHON_COMMON_DEPS="build, Cython, numpy, 'setuptools==65.7.0', setuptools-scm, wheel"
+TERMUX_PKG_PYTHON_COMMON_DEPS="build, Cython, numpy, setuptools, setuptools-scm, wheel"
 TERMUX_PKG_PROVIDES="libarrow-python"
 
 termux_step_pre_configure() {
@@ -19,7 +18,7 @@ termux_step_pre_configure() {
 
 	export PYARROW_CMAKE_OPTIONS="
 		-DCMAKE_PREFIX_PATH=$TERMUX_PREFIX/lib/cmake
-		-DNUMPY_INCLUDE_DIRS=$TERMUX_PYTHON_HOME/site-packages/numpy/core/include
+		-DNUMPY_INCLUDE_DIRS=$TERMUX_PYTHON_HOME/site-packages/numpy/_core/include
 		"
 	export PYARROW_WITH_DATASET=1
 	export PYARROW_WITH_HDFS=1

@@ -1,0 +1,11 @@
+--- ./sdk/sdk/lib/_internal/vm/bin/process_patch.dart
++++ ./sdk/sdk/lib/_internal/vm/bin/process_patch.dart
+@@ -313,7 +313,7 @@ base class _ProcessImpl extends _ProcessImplNativeWrapper implements _Process {
+     if (Platform.isWindows) {
+       return 'cmd.exe';
+     }
+-    return '/bin/sh';
++    return '@TERMUX_PREFIX@/bin/sh';
+   }
+ 
+   static List<String> _getShellArguments(

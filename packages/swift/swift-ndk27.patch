@@ -1,0 +1,62 @@
+From c88b9401da550ed2958a0e92e6936120216784e2
+Date: Sat, 14 Sep 2024 01:27:49 +0530
+Subject: [PATCH] [android] Update to LTS NDK 27c
+
+Add a new bits/ header to the Android overlay, add runtime libraries that are
+auto-extracted and listed many times to the list of libraries to be de-duplicated,
+and update the doc with new libraries that need to be available to run a simple
+executable.
+---
+ lib/DriverTool/autolink_extract_main.cpp  |  3 +++
+ stdlib/cmake/modules/AddSwiftStdlib.cmake |  2 +-
+ stdlib/public/Platform/android.modulemap  |  8 ++++++++
+ 4 files changed, 23 insertions(+), 10 deletions(-)
+
+diff --git a/swift/lib/DriverTool/autolink_extract_main.cpp b/swift/lib/DriverTool/autolink_extract_main.cpp
+index 332778d581d95..79d63e6ea5d74 100644
+--- a/swift/lib/DriverTool/autolink_extract_main.cpp
++++ b/swift/lib/DriverTool/autolink_extract_main.cpp
+@@ -231,8 +231,11 @@ int autolink_extract_main(ArrayRef<const char *> Args, const char *Argv0,
+       "-lswiftRegexBuilder",
+       "-lswift_RegexParser",
+       "-lswift_Backtracing",
++      "-lswift_Builtin_float",
++      "-lswift_math",
+       "-lswiftSynchronization",
+       "-lswiftGlibc",
++      "-lswiftAndroid",
+       "-lBlocksRuntime",
+       // Dispatch-specific Swift runtime libs
+       "-ldispatch",
+diff --git a/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake b/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake
+index 3784880bc63ed..a3912568f95a7 100644
+--- a/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake
++++ b/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake
+@@ -557,7 +557,7 @@ function(_add_target_variant_link_flags)
+     # We need to add the math library, which is linked implicitly by libc++
+     list(APPEND result "-lm")
+     if(NOT "${SWIFT_ANDROID_NDK_PATH}" STREQUAL "")
+-      if("${SWIFT_ANDROID_NDK_PATH}" MATCHES "r26")
++      if("${SWIFT_ANDROID_NDK_PATH}" MATCHES "r26|r27")
+         file(GLOB RESOURCE_DIR ${SWIFT_SDK_ANDROID_ARCH_${LFLAGS_ARCH}_PATH}/../lib/clang/*)
+       else()
+         file(GLOB RESOURCE_DIR ${SWIFT_SDK_ANDROID_ARCH_${LFLAGS_ARCH}_PATH}/../lib64/clang/*)
+diff --git a/swift/stdlib/public/Platform/android.modulemap b/swift/stdlib/public/Platform/android.modulemap
+index a1a9010c4a042..76da5f6bd5e59 100644
+--- a/swift/stdlib/public/Platform/android.modulemap
++++ b/swift/stdlib/public/Platform/android.modulemap
+@@ -556,6 +556,14 @@ module _bits_sa_family_t [system] {
+   header "bits/sa_family_t.h"
+   export *
+ }
++
++module _bits_sockaddr_storage [system] {
++  // Note: this module is not part of 'sys_socket'
++  // to prevent a circular modular dependency
++     header "bits/sockaddr_storage.h"
++     export *
++}
++
+ module _bits_stdatomic [system] {
+   // Note: this module is not part of 'stdatomic'
+   // as it depends on libc++ and forcing it to

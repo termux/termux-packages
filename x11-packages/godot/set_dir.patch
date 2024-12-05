@@ -2,22 +2,17 @@ diff --git a/modules/gltf/editor/editor_scene_importer_blend.cpp b/modules/gltf/
 index 7dcdc8e..13e872c 100644
 --- a/modules/gltf/editor/editor_scene_importer_blend.cpp
 +++ b/modules/gltf/editor/editor_scene_importer_blend.cpp
-@@ -502,12 +502,12 @@ bool EditorFileSystemImportFormatSupportQueryBlend::query() {
- 		}
+@@ -450,9 +450,7 @@
  
  #elif defined(UNIX_ENABLED)
--		if (_autodetect_path("/usr/bin")) {
-+		if (_autodetect_path("@TERMUX_PREFIX@/bin")) {
- 			// Good.
--		} else if (_autodetect_path("/usr/local/bin")) {
-+		} else if (_autodetect_path("@TERMUX_PREFIX@/local/bin")) {
- 			// Good
- 		} else {
--			_autodetect_path("/opt/blender/bin");
-+			_autodetect_path("@TERMUX_PREFIX@/opt/blender/bin");
- 		}
+ 	Vector<String> find_paths = {
+-		"/usr/bin/blender",
+-		"/usr/local/bin/blender",
+-		"/opt/blender/bin/blender",
++		"@TERMUX_PREFIX@/bin/blender",
+ 	};
  #endif
- 		if (auto_detected_path != "") {
+ 
 diff --git a/modules/mono/editor/GodotTools/GodotTools/Build/DotNetFinder.cs b/modules/mono/editor/GodotTools/GodotTools/Build/DotNetFinder.cs
 index b437c7e..882b22c 100644
 --- a/modules/mono/editor/GodotTools/GodotTools/Build/DotNetFinder.cs

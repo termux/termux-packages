@@ -65,9 +65,11 @@ jobs:
         touch ./debs/.placeholder
 
         if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+          # GitHub sometimes add merge commits at the end
+          # To prevent user confusion, filter them with --no-merges
           # Process tag '%ci:no-build' that may be added as line to commit message.
           # Forces CI to cancel current build with status 'passed'
-          if grep -qiP '^\s*%ci:no-build\s*$' <(git log --format="%B" -n 1 "HEAD"); then
+          if grep -qiP '^\s*%ci:no-build\s*$' <(git log --format="%B" -n 1 --no-merges "HEAD"); then
             tar cf artifacts/debs-${{ matrix.target_arch }}.tar debs
             echo "[!] Force exiting as tag '%ci:no-build' was applied to HEAD commit message."
             exit 0
@@ -266,7 +268,7 @@ jobs:
     concurrency: ${{ github.workflow }}
     permissions:
       contents: read
-    if: github.event_name != 'pull_request' && github.ref != 'refs/heads/dev' && !startsWith(github.ref, 'refs/heads/dev/')
+    if: github.repository == 'termux/termux-packages'
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -289,6 +291,44 @@ jobs:
         for archive in debs-*/debs-{aarch64,arm,i686,x86_64}-${{ github.sha }}.tar; do
           tar xf "$archive"
         done
+
+        error=0
+        for repo in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
+          name=$(jq --raw-output '.["'${repo}'"].name' repo.json)
+          distribution=$(jq --raw-output '.["'${repo}'"].distribution' repo.json)
+          component=$(jq --raw-output '.["'${repo}'"].component' repo.json)
+          url=$(jq --raw-output '.["'${repo}'"].url' repo.json)
+
+          if [ ! -f debs/built_${name}_packages.txt ]; then
+            continue
+          fi
+          if [ -z "$(cat debs/built_${name}_packages.txt)" ]; then
+            continue
+          fi
+
+          for arch in aarch64 arm i686 x86_64; do
+            if [ ! -f "Packages-${repo}-${arch}" ]; then
+              echo "[*] Downloading ${url}/dists/${distribution}/${component}/binary-${arch}/Packages.bz2"
+              curl -s \
+                --user-agent 'Termux-Packages/1.0\ (https://github.com/termux/termux-packages)' \
+                "${url}/dists/${distribution}/${component}/binary-${arch}/Packages.bz2" \
+                -o "Packages-${repo}-${arch}.bz2"
+              7z x "Packages-${repo}-${arch}.bz2" > /dev/null
+            fi
+            result=$(find debs -maxdepth 1 -type f | cut -d"/" -f2 | xargs -P$(nproc) -i{} grep "^Filename:.*/{}$" -nH "Packages-${repo}-${arch}" || true)
+            if [ -n "$result" ]; then
+              echo "[!] Found local files same name with server files! Please revbump package or tag commit with '%ci:no-build'"
+              echo "$result" | grep -E "${arch}|all" || true
+              error=1
+            fi
+          done
+        done
+        if [ "$error" != 0 ]; then exit 1; fi
+
+        if [ "${{ github.ref }}" != "refs/heads/master" ]; then
+          echo "[!] Not on master branch. Cancelling upload."
+          exit 0
+        fi
 
         for repo in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
           export REPOSITORY_NAME=$(jq --raw-output '.["'$repo'"].name' repo.json)

@@ -1,0 +1,47 @@
+diff --git a/swift-syntax/Sources/SwiftLibraryPluginProvider/LibraryPluginProvider.swift b/swift-syntax/Sources/SwiftLibraryPluginProvider/LibraryPluginProvider.swift
+index 44be07e2..4450c8e3 100644
+--- a/swift-syntax/Sources/SwiftLibraryPluginProvider/LibraryPluginProvider.swift
++++ b/swift-syntax/Sources/SwiftLibraryPluginProvider/LibraryPluginProvider.swift
+@@ -10,7 +10,7 @@
+ //
+ //===----------------------------------------------------------------------===//
+ 
+-#if swift(>=6.0)
++#if compiler(>=6.0)
+ public import SwiftSyntaxMacros
+ @_spi(PluginMessage) public import SwiftCompilerPluginMessageHandling
+ private import _SwiftLibraryPluginProviderCShims
+diff --git a/swift-syntax/Sources/SwiftSyntax/SyntaxText.swift b/swift-syntax/Sources/SwiftSyntax/SyntaxText.swift
+index 4d877962..9e12e3a9 100644
+--- a/swift-syntax/Sources/SwiftSyntax/SyntaxText.swift
++++ b/swift-syntax/Sources/SwiftSyntax/SyntaxText.swift
+@@ -10,7 +10,7 @@
+ //
+ //===----------------------------------------------------------------------===//
+ 
+-#if swift(>=6.0)
++#if compiler(>=6.0)
+ #if canImport(Darwin)
+ private import Darwin
+ #elseif canImport(Glibc)
+diff --git a/swift-syntax/cmake/modules/AddSwiftHostLibrary.cmake b/swift-syntax/cmake/modules/AddSwiftHostLibrary.cmake
+index 2a16fa5e..b7fedd87 100644
+--- a/swift-syntax/cmake/modules/AddSwiftHostLibrary.cmake
++++ b/swift-syntax/cmake/modules/AddSwiftHostLibrary.cmake
+@@ -97,6 +97,16 @@ function(add_swift_syntax_library name)
+     $<$<COMPILE_LANGUAGE:Swift>:-color-diagnostics>
+   )
+ 
++  if(BOOTSTRAPPING_MODE STREQUAL "CROSSCOMPILE")
++    target_compile_options(${name} PRIVATE
++      $<$<COMPILE_LANGUAGE:Swift>:-sdk;${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_ARCH_${SWIFT_HOST_VARIANT_ARCH}_PATH};>
++      $<$<COMPILE_LANGUAGE:Swift>:-resource-dir;${SWIFTLIB_DIR};>)
++    if(SWIFT_HOST_VARIANT_SDK STREQUAL "ANDROID" AND NOT "${SWIFT_ANDROID_NDK_PATH}" STREQUAL "")
++      swift_android_tools_path(${SWIFT_HOST_VARIANT_ARCH} tools_path)
++      target_compile_options(${name} PRIVATE $<$<COMPILE_LANGUAGE:Swift>:-tools-directory;${tools_path};>)
++    endif()
++  endif()
++
+   if(LLVM_USE_LINKER)
+     target_link_options(${name} PRIVATE
+       "-use-ld=${LLVM_USE_LINKER}"

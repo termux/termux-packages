@@ -10,6 +10,7 @@ TERMUX_PKG_DEPENDS="glib, libiconv, libidn2, zlib"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, valac"
 TERMUX_PKG_BREAKS="libgmime-dev"
 TERMUX_PKG_REPLACES="libgmime-dev"
+TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_have_iconv_detect_h=yes
@@ -19,7 +20,7 @@ ac_cv_have_iconv_detect_h=yes
 "
 
 termux_step_pre_configure() {
-	TERMUX_PKG_VERSION=. termux_setup_gir
+	termux_setup_gir
 
 	NOCONFIGURE=1 ./autogen.sh
 

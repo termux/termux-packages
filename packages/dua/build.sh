@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/Byron/dua-cli
 TERMUX_PKG_DESCRIPTION="View disk space usage and delete unwanted data, fast"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.29.2"
+TERMUX_PKG_VERSION="2.29.4"
 TERMUX_PKG_SRCURL=https://github.com/Byron/dua-cli/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=76ebd07c4a4379ef0d45232fa7a9b0bcbff1bd54fad6930ec1a2823806473f5d
+TERMUX_PKG_SHA256=b63c4cd9cf7ffa369f621cf798944374cef59b6cdb0fc8d608e2192bc9085951
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 

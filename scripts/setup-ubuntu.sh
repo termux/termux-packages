@@ -65,11 +65,9 @@ PACKAGES+=" xmlto"
 PACKAGES+=" xmltoman"
 
 # Needed by python modules (e.g. asciinema) and some build systems.
-PACKAGES+=" python3.11"
 PACKAGES+=" python3-pip"
 PACKAGES+=" python3-setuptools"
 PACKAGES+=" python-wheel-common"
-PACKAGES+=" python3.11-venv"
 PACKAGES+=" python3.12-venv"
 
 # Needed by package bc.
@@ -147,9 +145,13 @@ PACKAGES+=" composer"
 
 # Needed by package rust.
 PACKAGES+=" libssl-dev" # Needed to build Rust
-PACKAGES+=" llvm-17-dev"
-PACKAGES+=" llvm-17-tools"
-PACKAGES+=" clang-17"
+PACKAGES+=" llvm-18-dev"
+PACKAGES+=" llvm-18-tools"
+PACKAGES+=" clang-18"
+
+# Needed by librusty-v8
+PACKAGES+=" libclang-rt-17-dev"
+PACKAGES+=" libclang-rt-17-dev:i386"
 
 # Needed for package smalltalk.
 PACKAGES+=" libsigsegv-dev"
@@ -265,9 +267,6 @@ PACKAGES+=" libxft-dev"
 PACKAGES+=" libxt-dev"
 PACKAGES+=" xbitmaps"
 
-# Needed by proxmark3/proxmark3-git
-PACKAGES+=" gcc-arm-none-eabi"
-
 # Needed by pypy
 PACKAGES+=" qemu-user-static"
 
@@ -310,6 +309,9 @@ PACKAGES+=" swig"
 # Needed by binutils-cross
 PACKAGES+=" libzstd-dev"
 
+# Needed by tree-sitter-c
+PACKAGES+=" tree-sitter-cli"
+
 # Do not require sudo if already running as root.
 SUDO="sudo"
 if [ "$(id -u)" = "0" ]; then
@@ -323,11 +325,8 @@ $SUDO dpkg --add-architecture i386
 $SUDO cp $(dirname "$(realpath "$0")")/llvm-snapshot.gpg.key /etc/apt/trusted.gpg.d/apt.llvm.org.asc
 $SUDO chmod a+r /etc/apt/trusted.gpg.d/apt.llvm.org.asc
 {
-	echo "deb [arch=amd64] http://apt.llvm.org/noble/ llvm-toolchain-noble-17 main"
+	echo "deb [arch=amd64] http://apt.llvm.org/noble/ llvm-toolchain-noble-18 main"
 } | $SUDO tee /etc/apt/sources.list.d/apt-llvm-org.list > /dev/null
-
-# Add deadsnakes PPA to enable installing python 3.11:
-$SUDO add-apt-repository -y 'ppa:deadsnakes/ppa'
 
 $SUDO apt-get -yq update
 
@@ -341,3 +340,26 @@ echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US:en"\n' | $SUDO tee -a /etc/default/
 $SUDO mkdir -p $TERMUX_PREFIX
 $SUDO chown -R $(whoami) /data
 $SUDO ln -sf /data/data/com.termux/files/usr/opt/bionic-host /system
+
+# Install newer pkg-config then what ubuntu provides, as the stock
+# ubuntu version has performance problems with at least protobuf:
+PKGCONF_VERSION=2.3.0
+HOST_TRIPLET=$(gcc -dumpmachine)
+PKG_CONFIG_DIRS=$(grep DefaultSearchPaths: /usr/share/pkgconfig/personality.d/${HOST_TRIPLET}.personality | cut -d ' ' -f 2)
+SYSTEM_LIBDIRS=$(grep SystemLibraryPaths: /usr/share/pkgconfig/personality.d/${HOST_TRIPLET}.personality | cut -d ' ' -f 2)
+mkdir -p /tmp/pkgconf-build
+cd /tmp/pkgconf-build
+curl -O https://distfiles.ariadne.space/pkgconf/pkgconf-${PKGCONF_VERSION}.tar.xz
+tar xf pkgconf-${PKGCONF_VERSION}.tar.xz
+cd pkgconf-${PKGCONF_VERSION}
+echo "SYSTEM_LIBDIRS: $SYSTEM_LIBDIRS"
+echo "PKG_CONFIG_DIRS: $PKG_CONFIG_DIRS"
+./configure --prefix=/usr \
+	--with-system-libdir=${SYSTEM_LIBDIRS} \
+	--with-pkg-config-dir=${PKG_CONFIG_DIRS}
+make
+$SUDO make install
+cd -
+rm -Rf /tmp/pkgconf-build
+# Prevent package from being upgraded and overwriting our manual installation:
+$SUDO apt-mark hold pkgconf

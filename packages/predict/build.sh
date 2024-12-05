@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A Satellite Tracking/Orbital Prediction Program"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.3.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.qsl.net/kd2bd/predict-${TERMUX_PKG_VERSION}-termux.tar.gz
 TERMUX_PKG_SHA256=6eecccb21117e6ae57941659ac5d1d5f8cf99103ec8448e4fd8c076620bbd77b
 TERMUX_PKG_DEPENDS="ncurses, ncurses-ui-libs,play-audio,wget"

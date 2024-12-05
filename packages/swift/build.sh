@@ -2,17 +2,23 @@ TERMUX_PKG_HOMEPAGE=https://swift.org/
 TERMUX_PKG_DESCRIPTION="Swift is a high-performance system programming language"
 TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_MAINTAINER="@finagolfin"
-TERMUX_PKG_VERSION=5.10.1
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=6.0.2
 SWIFT_RELEASE="RELEASE"
-TERMUX_PKG_SRCURL=https://github.com/apple/swift/archive/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE.tar.gz
-TERMUX_PKG_SHA256=087c59a1b79c46dd23f8e6cb4fe12a27935a5b6581282f48db952827bb3fdf57
+TERMUX_PKG_SRCURL=https://github.com/swiftlang/swift/archive/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE.tar.gz
+TERMUX_PKG_SHA256=1489681860e92cee5ddd869a06531d7a1746b2f4ea105a2ff3b631ebcbcffd34
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_HOSTBUILD=true
-TERMUX_PKG_DEPENDS="clang, libandroid-glob, libandroid-posix-semaphore, libandroid-spawn, libcurl, libicu, libicu-static, libsqlite, libuuid, libxml2, libdispatch, llbuild, pkg-config, swift-sdk-${TERMUX_ARCH/_/-}"
+TERMUX_PKG_DEPENDS="clang, libandroid-execinfo, libandroid-glob, libandroid-posix-semaphore, libandroid-shmem, libandroid-spawn, libandroid-spawn-static, libandroid-sysv-semaphore, libcurl, libsqlite, libuuid, libxml2, libdispatch, llbuild, pkg-config, swift-sdk-${TERMUX_ARCH/_/-}"
 TERMUX_PKG_BUILD_DEPENDS="rsync"
 TERMUX_PKG_BLACKLISTED_ARCHES="i686"
 TERMUX_PKG_NO_STATICSPLIT=true
+# Temporary hack only needed for x86_64
+TERMUX_PKG_UNDEF_SYMBOLS_FILES="
+./opt/ndk-multilib/arm-linux-androideabi/lib/libFoundation.so
+./opt/ndk-multilib/arm-linux-androideabi/lib/libFoundationNetworking.so
+./opt/ndk-multilib/x86_64-linux-android/lib/libFoundation.so
+./opt/ndk-multilib/x86_64-linux-android/lib/libFoundationNetworking.so
+"
 # Building swift uses CMake, but the standard
 # termux_step_configure_cmake function is not used. Instead, we set
 # TERMUX_PKG_FORCE_CMAKE to make the build system aware that CMake is
@@ -36,26 +42,28 @@ termux_step_post_get_source() {
 	mv .temp swift
 
 	declare -A library_checksums
-	library_checksums[swift-cmark]=6d209b8bf81fe0d67ae6d55913e7750ec752bc7fc29fc0ef5da2fdf8a6057406
-	library_checksums[llvm-project]=fad2de34c6c005b7bc63ce7b4f20d6cdf0e1d60109a7a589ffd782180c23102b
-	library_checksums[swift-experimental-string-processing]=7e6ea60653b580abaf0801d697971610e7e22b4eb427edcee486b741b14d2724
-	library_checksums[swift-syntax]=500ff2c6d9435311fa42ad2e87927a3025b6c3682c18ecb9710c522c0be52a53
-	library_checksums[swift-corelibs-libdispatch]=affa3544b0fdb60f8f175bc0d2846177436d5848ef8ca73e3e560d23986f38b3
-	library_checksums[swift-corelibs-foundation]=94dadc18f527f25cf1ce486d0ddce7de00f725063bc43526bdb73e534c8d97c3
-	library_checksums[swift-corelibs-xctest]=cec269b435a9f32edcf90958abec16fcf50febcb99e389ed56e9e692c3270e27
-	library_checksums[swift-llbuild]=64d135c1aaf96636b0ff6a2682e605474fe9e33f740a8ba2a3c469e2c8ae9f38
+	library_checksums[swift-cmark]=2bfeab8747f4bcfea6aa70ed0494fe2185ec2532f1c9b7a0e17214cd401e9f31
+	library_checksums[llvm-project]=991e9d63548a5ae8ce4fdda4052e98cb2bf2b193cafac8bbeea8f830f8cede96
+	library_checksums[swift-experimental-string-processing]=e0380895e1cf5dc49aef321256f8192986185a6fa6ea83c143f171b643450fc0
+	library_checksums[swift-syntax]=82cb7640775a23cf7483197f0cd6a6342a29a61d4bb75239905490bf47a64a75
+	library_checksums[swift-corelibs-libdispatch]=3df429b22d9294c0ca5291c86e83a35f6326600a1c271933107bba199b919008
+	library_checksums[swift-corelibs-foundation]=8af719f14a05cee2d32625cf455261fc74d13eeef3ba9e5b9547316743d5cde9
+	library_checksums[swift-foundation]=a677ad3a712fb4d8330bccd28904aaa1b10749264d57ad9370215a89156ba1d3
+	library_checksums[swift-foundation-icu]=a48f0d6f998ba6db710f89f0e987c4cf00f3845338afae116ab3e29c04dad127
+	library_checksums[swift-corelibs-xctest]=a671062f178c68dd1fb0fdcf6a7c00589b343a63009a59b522206e03c9850d97
+	library_checksums[swift-llbuild]=40ada0511f0218fb3ca0478c8fff1b4d0958478056a0cc5408677753e8c8f7a7
 	library_checksums[swift-argument-parser]=4a10bbef290a2167c5cc340b39f1f7ff6a8cf4e1b5433b68548bf5f1e542e908
-	library_checksums[Yams]=ec1ad699c30f0db45520006c63a88cc1c946a7d7b36dff32a96460388c0a4af2
-	library_checksums[swift-collections]=d0f584b197860db26fd939175c9d1a7badfe7b89949b4bd52d4f626089776e0a
+	library_checksums[Yams]=a81c6b93f5d26bae1b619b7f8babbfe7c8abacf95b85916961d488888df886fb
+	library_checksums[swift-collections]=cd30d2f93c72424df48d182006417abdeebe74d250cb99d1cda78daf40aca569
 	library_checksums[swift-crypto]=5c860c0306d0393ff06268f361aaf958656e1288353a0e23c3ad20de04319154
-	library_checksums[swift-system]=865b8c380455eef27e73109835142920c60ae4c4f4178a3d12ad04acc83f1371
+	library_checksums[swift-system]=02e13a7f77887c387f5aa1de05f4d4b8b158c35145450e1d9557d6c42b06cd1f
 	library_checksums[swift-asn1]=e0da995ae53e6fcf8251887f44d4030f6600e2f8f8451d9c92fcaf52b41b6c35
 	library_checksums[swift-certificates]=fcaca458aab45ee69b0f678b72c2194b15664cc5f6f5e48d0e3f62bc5d1202ca
-	library_checksums[swift-driver]=75530eab66f4dffb9cecf422d0c5e582f08f84c8289ce245d48010e73ad1fc71
-	library_checksums[swift-tools-support-core]=fbc2d5dcf4eb27e7e786a19559e4ab5af6469238e3e89b910511145874bdfc52
-	library_checksums[swift-package-manager]=3d35e35b6e7a061042d3cd4913030525462faa357901a91a2d2f037d12e5987c
-	library_checksums[indexstore-db]=8be52307236e21e942972417fd3c8182a7865757f7890eec167851c75d156996
-	library_checksums[sourcekit-lsp]=f83aabe6e66adc2d3ffb7e948ddfd805f7f58fd43c6b33d48bb4a50186ce0abb
+	library_checksums[swift-driver]=c6db9d058c8d5122f8e368087e397d59cf17ce5be686d4713025269658f0467e
+	library_checksums[swift-tools-support-core]=2f88a0790e9fe6fc0efa6a1fc1382d71c010126f871a6516ba56fb05dd1d23a0
+	library_checksums[swift-package-manager]=00e40c3bce9b63fdd24d783909af003c7f86431898ee6b8bf44174d023d08402
+	library_checksums[indexstore-db]=61f6d010edc11f31b5e01efb3628958501a1883b07ee4c741bbebc8c7d43d03d
+	library_checksums[sourcekit-lsp]=26175c4774f9817ad32c62c004ca76e9f09d8b77a253fca0e4eafdb33f33b2d2
 
 	for library in "${!library_checksums[@]}"; do \
 		GH_ORG="apple"
@@ -69,19 +77,20 @@ termux_step_post_get_source() {
 			SRC_VERSION="1.0.1"
 			TAR_NAME=$SRC_VERSION
 		elif [ "$library" = "swift-collections" ]; then
-			SRC_VERSION="1.0.5"
+			SRC_VERSION="1.1.2"
 			TAR_NAME=$SRC_VERSION
 		elif [ "$library" = "swift-crypto" ]; then
 			SRC_VERSION="3.0.0"
 			TAR_NAME=$SRC_VERSION
 		elif [ "$library" = "swift-system" ]; then
-			SRC_VERSION="1.1.1"
+			SRC_VERSION="1.3.0"
 			TAR_NAME=$SRC_VERSION
 		elif [ "$library" = "Yams" ]; then
 			GH_ORG="jpsim"
-			SRC_VERSION="5.0.1"
+			SRC_VERSION="5.0.6"
 			TAR_NAME=$SRC_VERSION
 		else
+			GH_ORG="swiftlang"
 			SRC_VERSION=$SWIFT_RELEASE
 			TAR_NAME=swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE
 		fi
@@ -127,6 +136,9 @@ termux_step_make() {
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 		termux_setup_swift
 		ln -sf $TERMUX_PKG_HOSTBUILD_DIR/llvm-linux-x86_64 $TERMUX_PKG_BUILDDIR/llvm-linux-x86_64
+		for header in execinfo.h glob.h iconv.h spawn.h sys/sem.h sys/shm.h; do
+			ln -sf $TERMUX_PREFIX/include/$header $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/include/$header
+		done
 
 		SWIFT_BUILD_FLAGS="$SWIFT_BUILD_FLAGS --android
 		--android-ndk $TERMUX_STANDALONE_TOOLCHAIN --android-arch $SWIFT_ARCH
@@ -144,17 +156,20 @@ termux_step_make() {
 	--swift-install-components=$SWIFT_COMPONENTS --llvm-install-components=IndexStore \
 	--install-llvm --install-swift --install-libdispatch --install-foundation \
 	--install-xctest --install-llbuild --install-swiftpm --install-swift-driver --install-sourcekit-lsp
+
+	rm $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/include/{execinfo.h,glob.h,iconv.h,spawn.h,sys/sem.h,sys/shm.h}
 }
 
 termux_step_make_install() {
+	rm -rf $TERMUX_PREFIX/lib/swift{,_static}/{Block,os}
+	rm $TERMUX_PREFIX/lib/swift{,_static}/dispatch/*.h
 	rm $TERMUX_PREFIX/lib/swift/android/lib{dispatch,BlocksRuntime}.so
 	mv $TERMUX_PREFIX/lib/swift/android/lib[^_]*.so $TERMUX_PREFIX/opt/ndk-multilib/$TERMUX_ARCH-linux-android*/lib
+	mv $TERMUX_PREFIX/lib/swift/android/lib_FoundationICU.so $TERMUX_PREFIX/opt/ndk-multilib/$TERMUX_ARCH-linux-android*/lib
 	mv $TERMUX_PREFIX/lib/swift/android/lib*.a $TERMUX_PREFIX/lib/swift/android/$SWIFT_ARCH
 	mv $TERMUX_PREFIX/lib/swift_static/android/lib*.a $TERMUX_PREFIX/lib/swift_static/android/$SWIFT_ARCH
 
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 		rm $TERMUX_PREFIX/swiftpm-android-$SWIFT_ARCH.json
-		mv $TERMUX_PREFIX/glibc-native.modulemap \
-			$TERMUX_PREFIX/lib/swift/android/$SWIFT_ARCH/glibc.modulemap
 	fi
 }

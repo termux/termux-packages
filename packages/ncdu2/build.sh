@@ -2,34 +2,64 @@ TERMUX_PKG_HOMEPAGE=https://dev.yorhel.nl/ncdu
 TERMUX_PKG_DESCRIPTION="Disk usage analyzer"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="LICENSES/MIT.txt"
-TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.4"
+TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
+TERMUX_PKG_VERSION="2.7"
 TERMUX_PKG_SRCURL=https://dev.yorhel.nl/download/ncdu-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=4a3d0002309cf6a7cea791938dac9becdece4d529d0d6dc8d91b73b4e6855509
+TERMUX_PKG_SHA256=b218cc14a2bb9852cf951db4e21aec8980e7a8c3aca097e3aa3417f20eb93000
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP='2\.\d+(\.\d+)?'
+
+termux_pkg_auto_update() {
+	local latest_release
+	latest_release="$(git ls-remote --tags https://code.blicky.net/yorhel/ncdu.git \
+	| grep -oP "refs/tags/v\K${TERMUX_PKG_UPDATE_VERSION_REGEXP}$" \
+	| sort -V \
+	| tail -n1)"
+
+	if [[ "${latest_release}" == "${TERMUX_PKG_VERSION}" ]]; then
+		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
+		return
+	fi
+
+	termux_pkg_upgrade_version "${latest_release}"
+}
 
 termux_step_post_get_source() {
 	# TODO drop all this once figure out how zig can work with bionic libc
-	local NCURSES_SRCURL=$(. "${TERMUX_SCRIPTDIR}"/packages/ncurses/build.sh; echo ${TERMUX_PKG_SRCURL[0]})
-	local NCURSES_SHA256=$(. "${TERMUX_SCRIPTDIR}"/packages/ncurses/build.sh; echo ${TERMUX_PKG_SHA256[0]})
+	local -a deps=( 'ncurses' 'zstd' )
+	for dep in "${deps[@]}"; do
+		local DEP_SRCURL='' DEP_SHA256=''
+		read -r DEP_SRCURL DEP_SHA256 < <(
+			# This gets shellcheck to shut up about the non-constant source
+			# shellcheck source=/dev/null
+			source "${TERMUX_SCRIPTDIR}/packages/${dep}/build.sh"
 
-	rm -fr ncurses-* ncurses
-	termux_download "${NCURSES_SRCURL}" "${TERMUX_PKG_CACHEDIR}/ncurses.tar.gz" "${NCURSES_SHA256}"
-	tar -xf "${TERMUX_PKG_CACHEDIR}/ncurses.tar.gz"
-	mv -v ncurses-* ncurses
+			# ${var@a} outputs the declaration attributes of a varaible e.g. 'a' for arrays
+			if [[ "${TERMUX_PKG_SRCURL@a}" == 'a' ]]; then
+				echo "${TERMUX_PKG_SRCURL[0]}" "${TERMUX_PKG_SHA256[0]}"
+			else
+				echo "${TERMUX_PKG_SRCURL}" "${TERMUX_PKG_SHA256}"
+			fi
+		)
 
-	echo "INFO: Applying patches from packages/ncurses"
-	for p in "${TERMUX_SCRIPTDIR}"/packages/ncurses/*.patch; do
-	patch -p1 -i "${p}" -d ncurses
+		rm -rf "${dep}"-* "${dep}"
+		termux_download "${DEP_SRCURL}" "${TERMUX_PKG_CACHEDIR}/${dep}.tar.gz" "${DEP_SHA256}"
+		tar -xf "${TERMUX_PKG_CACHEDIR}/${dep}.tar.gz"
+		mv -v "${dep}"-* "${dep}"
+
+		echo "INFO: Applying patches from $dep"
+		local p
+		for p in "${TERMUX_SCRIPTDIR}/packages/$dep/"*.patch; do
+			patch -p1 -i "${p}" -d "${dep}"
+		done
 	done
 
-	local f=$(sed -nE "s|.*SPDX-FileCopyrightText.*: (.*)|\1|p" ChangeLog)
+	local f
+	f=$(sed -nE "s|.*SPDX-FileCopyrightText.*: (.*)|\1|p" ChangeLog)
 	sed \
 		-e "s|<year> <copyright holders>|${f}|" \
 		-i LICENSES/MIT.txt
-	sed \
-		-e "s|--with-default-terminfo-dir=/usr|--with-default-terminfo-dir=${TERMUX_PREFIX}|" \
-		-i Makefile
 }
 
 termux_step_pre_configure() {
@@ -38,12 +68,12 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
-	make -j "${TERMUX_PKG_MAKE_PROCESSES}" static-${ZIG_TARGET_NAME}.tar.gz
+	make -j "${TERMUX_PKG_MAKE_PROCESSES}" "static-${ZIG_TARGET_NAME}.tar.gz"
 }
 
 termux_step_make_install() {
 	# allow ncdu2 to co-exist with ncdu
-	tar -xf static-${ZIG_TARGET_NAME}.tar.gz
+	tar -xf "static-${ZIG_TARGET_NAME}.tar.gz"
 	mv -v ncdu ncdu2
 	mv -v ncdu.1 ncdu2.1
 	install -Dm755 -t "${TERMUX_PREFIX}/bin" ncdu2

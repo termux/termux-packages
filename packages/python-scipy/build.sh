@@ -2,7 +2,8 @@ TERMUX_PKG_HOMEPAGE=https://scipy.org/
 TERMUX_PKG_DESCRIPTION="Fundamental algorithms for scientific computing in Python"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.14.0"
+TERMUX_PKG_VERSION="1.14.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/scipy/scipy
 TERMUX_PKG_DEPENDS="libc++, libopenblas, python, python-numpy"
 TERMUX_PKG_BUILD_DEPENDS="python-numpy-static"
@@ -50,7 +51,7 @@ termux_step_configure() {
 	cp -f $TERMUX_MESON_CROSSFILE $TERMUX_MESON_WHEEL_CROSSFILE
 	sed -i 's|^\(\[binaries\]\)$|\1\npython = '\'$(command -v python)\''|g' \
 		$TERMUX_MESON_WHEEL_CROSSFILE
-	sed -i 's|^\(\[properties\]\)$|\1\nnumpy-include-dir = '\'$PYTHON_SITE_PKG/numpy/core/include\''|g' \
+	sed -i 's|^\(\[properties\]\)$|\1\nnumpy-include-dir = '\'$PYTHON_SITE_PKG/numpy/_core/include\''|g' \
 		$TERMUX_MESON_WHEEL_CROSSFILE
 
 	(unset PYTHONPATH && termux_step_configure_meson)

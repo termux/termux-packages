@@ -359,7 +359,7 @@ _gh_create_new_issue() {
 
 	if [[ "${CREATE_ISSUE}" != "true" ]]; then
 		echo "INFO: CREATE_ISSUE set to '${CREATE_ISSUE}'. Not creating new issue."
-		return
+		return 1
 	fi
 	if _gh_check_issue_exists "${pkg_name}"; then
 		echo "INFO: An existing update issue for '${pkg_name}' hasn't been resolved yet."

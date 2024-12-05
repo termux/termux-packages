@@ -8,6 +8,7 @@ TERMUX_PKG_SHA256=c56cc69056f6947b2c60b165ec1e4c2b0acf26a778da5f86c89ffce24d5ebd
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="dbus, libxfce4util"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner"
+TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-introspection=yes
@@ -15,5 +16,5 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure() {
-	TERMUX_PKG_VERSION=. termux_setup_gir
+	termux_setup_gir
 }
