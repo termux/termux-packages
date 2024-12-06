@@ -12,8 +12,8 @@ TERMUX_PKG_BUILD_IN_SRC=true
 termux_step_pre_configure() {
 	LDFLAGS+=" -landroid-glob"
 
-	# ${str^^} returns upper case string
-	local _ARCH=${TERMUX_ARCH^^}
+	# ${str@U} returns upper case string
+	local _ARCH=${TERMUX_ARCH@U}
 	if [[ ${_ARCH} == "ARM" ]]; then
 		_ARCH="ARMV7L"
 	fi

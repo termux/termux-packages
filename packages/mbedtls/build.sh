@@ -25,7 +25,7 @@ termux_step_post_get_source() {
 
 	local f
 	for f in crypto tls x509; do
-		local v="$(sed -n 's/^SOEXT_'${f^^}'?=so\.//p' library/Makefile)"
+		local v="$(sed -n 's/^SOEXT_'${f@U}'?=so\.//p' library/Makefile)"
 		if [ "$(eval echo \$_SOVER_${f})" != "${v}" ]; then
 			termux_error_exit "Error: SOVERSION guard check failed for libmbed${f}.so."
 		fi
