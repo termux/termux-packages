@@ -27,41 +27,28 @@ termux_step_configure() {
 	patch --silent -p1 \
 		-d "$TERMUX_PKG_SRCDIR" \
 		< "$TERMUX_PKG_BUILDER_DIR"/patch-root-Cargo.diff
-
-	local _CARGO_TARGET_LIBDIR="target/${CARGO_TARGET_NAME}/release/deps"
-	mkdir -p $_CARGO_TARGET_LIBDIR
-
-	mv $TERMUX_PREFIX/lib/libz.so.1{,.tmp}
-	mv $TERMUX_PREFIX/lib/libz.so{,.tmp}
-
-	ln -sfT $(readlink -f $TERMUX_PREFIX/lib/libz.so.1.tmp) \
-		$_CARGO_TARGET_LIBDIR/libz.so.1
-	ln -sfT $(readlink -f $TERMUX_PREFIX/lib/libz.so.tmp) \
-		$_CARGO_TARGET_LIBDIR/libz.so
 }
 
 termux_step_make() {
-	local env_name=RUSTY_V8_ARCHIVE_${CARGO_TARGET_NAME@U}
+	local env_name=${CARGO_TARGET_NAME@U}
 	env_name=${env_name//-/_}
-	export "$env_name"="${TERMUX_PREFIX}/lib/librusty_v8.a"
-	env_name=RUSTY_V8_SRC_BINDING_PATH_${CARGO_TARGET_NAME@U}
-	env_name=${env_name//-/_}
-	export "$env_name"="${TERMUX_PREFIX}/include/librusty_v8/src_binding.rs"
+	export RUSTY_V8_ARCHIVE_${env_name}="${TERMUX_PREFIX}/lib/librusty_v8.a"
+	export RUSTY_V8_SRC_BINDING_PATH_${env_name}="${TERMUX_PREFIX}/include/librusty_v8/src_binding.rs"
 	export DENO_SKIP_CROSS_BUILD_CHECK=1
+
+	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "false" ]]; then
+		export PKG_CONFIG_x86_64_unknown_linux_gnu=/usr/bin/pkg-config
+		export PKG_CONFIG_LIBDIR=/usr/lib/pkgconfig
+	fi
+
+	# ld.lld: error: undefined symbol: __clear_cache
+	if [[ "${TERMUX_ARCH}" == "aarch64" ]]; then
+		export CARGO_TARGET_${env_name}_RUSTFLAGS+=" -C link-arg=$($CC -print-libgcc-file-name)"
+	fi
 
 	cargo build --jobs "${TERMUX_PKG_MAKE_PROCESSES}" --target "${CARGO_TARGET_NAME}" --release
 }
 
 termux_step_make_install() {
 	install -Dm700 -t "${TERMUX_PREFIX}/bin" "target/${CARGO_TARGET_NAME}/release/deno"
-}
-
-termux_step_post_make_install() {
-	mv $TERMUX_PREFIX/lib/libz.so.1{.tmp,}
-	mv $TERMUX_PREFIX/lib/libz.so{.tmp,}
-}
-
-termux_step_post_massage() {
-	rm -f lib/libz.so.1
-	rm -f lib/libz.so
 }
