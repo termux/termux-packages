@@ -40,6 +40,8 @@ jobs:
         persist-credentials: false
     - name: Gather build summary
       id: build-info
+      env:
+        MANUAL_INPUT_PACKAGES: ${{ github.event.inputs.packages }}
       run: |
         if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
           BASE_COMMIT=$(jq --raw-output .pull_request.base.sha "$GITHUB_EVENT_PATH")
@@ -111,7 +113,10 @@ jobs:
             done<<<${CHANGED_FILES}
           done
         else
-          for pkg in ${{ github.event.inputs.packages }}; do
+          # Ensure MANUAL_INPUT_PACKAGES is newline free, and put it
+          # into an array
+          read -a PACKAGES <<< "${MANUAL_INPUT_PACKAGES//$'\n'/ }"
+          for pkg in "${PACKAGES[@]}"; do
             repo_paths=$(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json)
             found=false
             for repo_path in $repo_paths; do
@@ -190,6 +195,8 @@ jobs:
         fi
 
     - name: Free additional disk space (if needed)
+      env:
+        DOCKER_BUILD: ${{ steps.build-info.outputs.docker-build }}
       run: |
         declare -a packages
         for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
@@ -199,7 +206,7 @@ jobs:
           fi
         done
 
-        if [ ${{ steps.build-info.outputs.docker-build }} == 'false' ]; then
+        if [ "$DOCKER_BUILD" == 'false' ]; then
           ./scripts/setup-ubuntu.sh
           sudo apt install ninja-build
           sudo apt purge -yq $(dpkg -l | grep '^ii' | awk '{ print $2 }' | grep -P '(aspnetcore|cabal-|dotnet-|ghc-|libmono|mongodb-|mysql-|php)') \
@@ -210,6 +217,8 @@ jobs:
         fi
 
     - name: Build packages
+      env:
+        DOCKER_BUILD: ${{ steps.build-info.outputs.docker-build }}
       run: |
         declare -a packages
         for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
@@ -219,7 +228,7 @@ jobs:
           fi
         done
 
-        if [ ${{ steps.build-info.outputs.docker-build }} == 'false' ]; then
+        if [ "$DOCKER_BUILD" == 'false' ]; then
           NDK=$ANDROID_NDK ANDROID_HOME=$ANDROID_SDK_ROOT ./build-package.sh -I -a ${{ matrix.target_arch }} $packages
         elif [ -n "$packages" ]; then
           ./scripts/run-docker.sh ./build-package.sh -I -a ${{ matrix.target_arch }} $packages

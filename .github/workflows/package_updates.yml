@@ -153,12 +153,16 @@ jobs:
           CREATE_ISSUE: "true"
           GIT_COMMIT_PACKAGES: "true"
           GIT_PUSH_PACKAGES: "true"
+          MANUAL_INPUT_PACKAGES: ${{ github.event.inputs.packages }}
         run: |
           git config --global user.name "Termux Github Actions"
           git config --global user.email "contact@termux.dev"
 
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            ./scripts/bin/update-packages ${{ github.event.inputs.packages }}
+            # Ensure MANUAL_INPUT_PACKAGES is newline free, and put it
+            # into an array
+            read -a PACKAGES <<< "${MANUAL_INPUT_PACKAGES//$'\n'/ }"
+            ./scripts/bin/update-packages "${PACKAGES[@]}"
           else
             ./scripts/bin/update-packages "@all"
           fi
