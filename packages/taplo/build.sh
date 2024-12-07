@@ -8,31 +8,21 @@ TERMUX_PKG_SHA256=5744a06a1e93128f5cb5409d5bf5e553915703ec0491df9f4c7ab31dbe4302
 TERMUX_PKG_BUILD_DEPENDS='openssl'
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_VERSION_REGEXP='release-taplo-cli-\([0-9]*\.[0-9]*\.[0-9]*\)'
+TERMUX_PKG_UPDATE_VERSION_REGEXP='\d\.\d\.\d'
 
 termux_pkg_auto_update() {
-	# Get latest release tag:
-	local api_url="https://api.github.com/repos/tamasfe/taplo/git/refs/tags"
-	local latest_refs_tags
-	latest_refs_tags=$(curl -s "${api_url}" | jq '.[].ref' | sed -ne "s|.*${TERMUX_PKG_UPDATE_VERSION_REGEXP}\"|\1|p")
-	if [[ -z "${latest_refs_tags}" ]]; then
-		echo "WARN: Unable to get latest refs tags from upstream. Try again later." >&2
-		return
-	fi
+	local latest_release
+	latest_release="$(git ls-remote --tags https://github.com/tamasfe/taplo.git \
+	| grep -oP "refs/tags/release-taplo-cli-\K${TERMUX_PKG_UPDATE_VERSION_REGEXP}$" \
+	| sort -V \
+	| tail -n1)"
 
-	local latest_version
-	latest_version=$(tail -n1 <<< "$latest_refs_tags")
-	if [[ "${latest_version}" == "${TERMUX_PKG_VERSION}" ]]; then
+	if [[ "${latest_release}" == "${TERMUX_PKG_VERSION}" ]]; then
 		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
 		return
 	fi
 
-	# We want to avoid re-filtering the version.
-	# It's already cleaned up, so unset the regexp.
-	# See: https://github.com/termux/termux-packages/issues/20836
-	unset TERMUX_PKG_UPDATE_VERSION_REGEXP
-
-	termux_pkg_upgrade_version "${latest_version}"
+	termux_pkg_upgrade_version "${latest_release}"
 }
 
 termux_step_pre_configure() {
