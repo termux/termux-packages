@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Systems programming language focused on safety, speed an
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.83.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/rustc-${TERMUX_PKG_VERSION}-src.tar.xz
 TERMUX_PKG_SHA256=7b11d4242dab0921a7d54758ad3fe805153c979c144625fecde11735760f97df
 _LLVM_MAJOR_VERSION=$(. $TERMUX_SCRIPTDIR/packages/libllvm/build.sh; echo $LLVM_MAJOR_VERSION)
@@ -185,6 +185,8 @@ termux_step_configure() {
 	"${AR}" rcu "${RUST_LIBDIR}/libsyncfs.a" syncfs.o
 	export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C link-arg=-l:libsyncfs.a"
 
+	export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C link-arg=-Wl,-rpath=${TERMUX_PREFIX}/lib -C link-arg=-Wl,--enable-new-dtags"
+
 	export X86_64_UNKNOWN_LINUX_GNU_OPENSSL_LIB_DIR=/usr/lib/x86_64-linux-gnu
 	export X86_64_UNKNOWN_LINUX_GNU_OPENSSL_INCLUDE_DIR=/usr/include
 	export PKG_CONFIG_ALLOW_CROSS=1
@@ -286,4 +288,14 @@ termux_step_make_install() {
 
 	export _INCLUDED=$(echo -e "${_included}\n${_included_rlib}\n${_included_so}")
 	echo -e "INFO: _INCLUDED:\n${_INCLUDED}"
+
+	# check runpath entry
+	local cargo_readelf=$(${READELF} -d ${TERMUX_PREFIX}/bin/cargo)
+	local cargo_runpath=$(echo "${cargo_readelf}" | sed -ne "s|.*RUNPATH.*\[\(.*\)\].*|\1|p")
+	if [[ "${cargo_runpath}" != "${TERMUX_PREFIX}/lib" ]]; then
+		termux_error_exit "
+		Mismatch RUNPATH found. Check readelf output below:
+		${cargo_readelf}
+		"
+	fi
 }
