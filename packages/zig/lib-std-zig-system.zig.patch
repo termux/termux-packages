@@ -1,0 +1,16 @@
+diff --git a/lib/std/zig/system.zig b/lib/std/zig/system.zig
+index 83c798c34..6668f4bcd 100644
+--- a/zig/lib/std/zig/system.zig
++++ b/zig/lib/std/zig/system.zig
+@@ -996,6 +996,11 @@ fn detectAbiAndDynamicLinker(
+             .haiku => "/bin/env",
+         };
+ 
++        if (builtin.target.isAndroid()) {
++            // Consider using /system/bin/env instead
++            file_name = "@TERMUX_PREFIX@/bin/env";
++        }
++
+         // According to `man 2 execve`:
+         //
+         // The kernel imposes a maximum length on the text
