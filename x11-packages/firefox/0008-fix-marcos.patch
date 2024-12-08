@@ -77,12 +77,12 @@
    pthread_getattr_np(pthread_self(), &sattr);
 --- a/nsprpub/pr/src/pthreads/ptsynch.c
 +++ b/nsprpub/pr/src/pthreads/ptsynch.c
-@@ -953,7 +953,7 @@
- #if (defined(__GNU_LIBRARY__) && !defined(_SEM_SEMUN_UNDEFINED)) \
-     || (defined(FREEBSD) && __FreeBSD_version < 1200059) \
-     || defined(OPENBSD) || defined(BSDI) \
--    || defined(DARWIN)
-+    || defined(DARWIN) || defined(__TERMUX__)
+@@ -864,7 +864,7 @@
+  */
+ #    if (defined(__GNU_LIBRARY__) && !defined(_SEM_SEMUN_UNDEFINED)) || \
+         (defined(FREEBSD) && __FreeBSD_version < 1200059) ||            \
+-        defined(OPENBSD) || defined(DARWIN)
++        defined(OPENBSD) || defined(DARWIN) || defined(__TERMUX__)
  /* union semun is defined by including <sys/sem.h> */
- #else
+ #    else
  /* according to X/OPEN we have to define it ourselves */
