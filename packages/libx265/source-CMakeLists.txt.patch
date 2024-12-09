@@ -1,8 +1,8 @@
 diff --git a/source/CMakeLists.txt b/source/CMakeLists.txt
-index a407271b4..6ecfda3ee 100755
+index 5c6dda9..972bca3 100755
 --- a/source/CMakeLists.txt
 +++ b/source/CMakeLists.txt
-@@ -44,7 +44,7 @@ else()
+@@ -46,7 +46,7 @@ else()
      string(TOLOWER "${CMAKE_SYSTEM_PROCESSOR}" SYSPROC)
  endif()
  set(X86_ALIASES x86 i386 i686 x86_64 amd64)
@@ -11,7 +11,7 @@ index a407271b4..6ecfda3ee 100755
  set(ARM64_ALIASES arm64 arm64e aarch64)
  list(FIND X86_ALIASES "${SYSPROC}" X86MATCH)
  list(FIND ARM_ALIASES "${SYSPROC}" ARMMATCH)
-@@ -251,16 +251,12 @@ if(GCC)
+@@ -272,13 +272,9 @@ if(GCC)
          message(STATUS "cross compile arm")
  		set(ARM_ARGS -march=armv6 -mfloat-abi=soft -mfpu=vfp -marm -fPIC)
      elseif(ARM)
@@ -26,9 +26,14 @@ index a407271b4..6ecfda3ee 100755
 +        set(ARM_ARGS @TERMUX_CLANG_TARGET_ARM@ -march=armv7-a -mfpu=neon -mfloat-abi=softfp -mthumb -fPIC)
 +        add_definitions(-DHAVE_NEON)
      endif()
- 	if(ARM64 OR CROSS_COMPILE_ARM64)
--	    set(ARM_ARGS -fPIC -flax-vector-conversions)
-+	    set(ARM_ARGS @TERMUX_CLANG_TARGET_AARCH64@ -fPIC -flax-vector-conversions)
-         find_package(Neon)
-         if(CPU_HAS_NEON)
-             add_definitions(-DHAVE_NEON)
+     if(ARM64)
+         set(CPU_HAS_NEON 1)
+@@ -398,7 +394,7 @@ int main() { return 0; }")
+             message(STATUS "Found SVE2")
+             add_definitions(-DHAVE_SVE2=1)
+         endif()
+-        set(ARM_ARGS -O3)
++        set(ARM_ARGS @TERMUX_CLANG_TARGET_AARCH64@)
+         # Do not allow implicit vector type conversions in Clang builds (this
+         # is already the default in GCC builds).
+         check_cxx_compiler_flag(-flax-vector-conversions=none CC_HAS_FLAX_VEC_CONV_NONE)
