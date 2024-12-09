@@ -1,0 +1,26 @@
+diff --git a/meson.build b/meson.build
+index 6fffb5df..805823ea 100644
+--- a/meson.build
++++ b/meson.build
+@@ -153,7 +153,6 @@ core_src = [
+ 
+ boot_src = [
+   'src/boot/array_test.c',
+-  'src/boot/boot.c',
+   'src/boot/buffer_test.c',
+   'src/boot/number_test.c',
+   'src/boot/system_test.c',
+@@ -165,10 +164,11 @@ mainclient_src = [
+ ]
+ 
+ # Build boot binary
+-janet_boot = executable('janet-boot', core_src, boot_src,
++janet_boot = executable('janet-boot', 'src/boot/boot.c',
++  sources : [boot_src, core_src],
+   include_directories : incdir,
+   c_args : '-DJANET_BOOTSTRAP',
+-  dependencies : [m_dep, dl_dep, thread_dep, android_spawn_dep],
++  dependencies : [m_dep, dl_dep, thread_dep],
+   native : true)
+ 
+ # Build janet.c
