@@ -10,6 +10,7 @@ TERMUX_PKG_CONFLICTS="vim"
 TERMUX_PKG_BREAKS="vim-python (<= 9.1.0850)"
 TERMUX_PKG_REPLACES="vim-python (<= 9.1.0850)"
 TERMUX_PKG_VERSION=9.1.0900
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=30efb714ed82c5d7a1491f3e4aac6487d2c493d33c834d7ef043e6f45176772e
 TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
@@ -52,7 +53,7 @@ share/vim/vim91/tools
 # Avoid overlap with the `xxd` subpackage of `vim`
 TERMUX_PKG_RM_AFTER_INSTALL+="
 bin/xxd
-share/man/man1/xxd.1.gz
+share/man/man1/xxd.1
 "
 
 TERMUX_PKG_CONFFILES="share/vim/vimrc"
