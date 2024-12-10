@@ -1,9 +1,9 @@
-TERMUX_PKG_HOMEPAGE=http://www.ivarch.com/programs/pv.shtml
+TERMUX_PKG_HOMEPAGE=https://www.ivarch.com/programs/pv.shtml
 TERMUX_PKG_DESCRIPTION="Terminal-based tool for monitoring the progress of data through a pipeline"
-TERMUX_PKG_LICENSE="Artistic-License-2.0"
+TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.9.0"
-TERMUX_PKG_SRCURL=http://www.ivarch.com/programs/sources/pv-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=b38d69d7fc0785eb5eb3c57e8b12a7334f862047bf84b18f414365335399469a
+TERMUX_PKG_VERSION="1.9.15"
+TERMUX_PKG_SRCURL=https://www.ivarch.com/programs/sources/pv-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=e2b17564ab9eba1ec2caae285960cbf363b4401dffda191a60a0befe68e17dac
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-ipc"
