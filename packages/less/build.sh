@@ -11,6 +11,30 @@ TERMUX_PKG_DEPENDS="ncurses, pcre2"
 TERMUX_PKG_ESSENTIAL=true
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-regex=pcre2"
+# Official `less` release tags are marked with a `-rel` suffix
+TERMUX_PKG_UPDATE_VERSION_REGEXP='\d{3}-rel'
+
+termux_pkg_auto_update() {
+	local latest_release
+	latest_release="$(git ls-remote --tags https://github.com/gwsw/less.git \
+	| grep -oP "refs/tags/v\K${TERMUX_PKG_UPDATE_VERSION_REGEXP}$" \
+	| sort -V \
+	| tail -n1)"
+
+	# remove `-rel` suffix from version number
+	latest_release="${latest_release%-rel}"
+	if [[ "${latest_release}" == "${TERMUX_PKG_VERSION}" ]]; then
+		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
+		return
+	fi
+
+	# Avoid refiltering the version number
+	# See: https://github.com/termux/termux-packages/issues/20836
+	unset TERMUX_PKG_UPDATE_VERSION_REGEXP
+	termux_pkg_upgrade_version "${latest_release}"
+}
+
+
 
 termux_step_pre_configure() {
 	autoreconf -fi
