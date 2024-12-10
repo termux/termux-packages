@@ -1,9 +1,12 @@
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -85,23 +85,6 @@
+@@ -76,24 +76,7 @@
+ endif()
  
- _set_fancy(LIB_INSTALL_DIR "${EXEC_INSTALL_PREFIX}${CMAKE_INSTALL_PREFIX}/${__LIB}" "libdir")
- 
+ if (NOT DEFINED LIB_INSTALL_DIR)
+-    set(LIB_INSTALL_DIR "${EXEC_INSTALL_PREFIX}${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
+-endif()
+-
 -# libbpf uses reallocarray, which is not available in all versions of glibc
 -# libbpf's include/tools/libc_compat.h provides implementation, but needs
 -# COMPACT_NEED_REALLOCARRAY to be set
@@ -19,8 +22,7 @@
 -" HAVE_REALLOCARRAY_SUPPORT)
 -if (NOT HAVE_REALLOCARRAY_SUPPORT)
 -  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DCOMPAT_NEED_REALLOCARRAY")
--endif()
--
- set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64")
++    set(LIB_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}")
+ endif()
  
- if (NOT LIBBPF_FOUND)
+ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64")
