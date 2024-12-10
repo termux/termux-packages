@@ -1,0 +1,34 @@
+This bug can be seen very clearly with e.g. mplayer -vo aa -monitoraspect 3
+in which case a big part of the picture is missing or there is even completely
+black output.
+
+The reason for this is, when drawing only a part of the picture via aarender()
+the first X coordinate is used for the loop count, but it is not applied to the
+destination and source image index, thus instead of (re)drawing the middle part
+of the image, it draws always the left part.
+
+Actual Results: 
+only the left part of the image is draw (depending on the video, only the left
+black bar might be draw, so you will see nothing at all - if so use a slightly
+smaller value for -monitoraspect).
+
+Expected Results:
+All of the image should be drawn, and -monitoraspect should only squeeze the
+image, not cause part of it to miss.
+
+Gentoo-bug: http://bugs.gentoo.org/id=214142
+Reported-by: Reimar Döffinger
+Fixed-by: Reimar Döffinger
+--- a/src/aarender.c.orig	2008-03-18 23:55:32.000000000 +0100
++++ b/src/aarender.c	2008-03-18 23:55:50.000000000 +0100
+@@ -94,8 +94,8 @@
+ 	gamma = randomval / 2;
+     mval = (c->parameters[c->filltable[255]].p[4]);
+     for (y = y1; y < y2; y++) {
+-	pos = 2 * y * wi;
+-	pos1 = y * aa_scrwidth(c);
++	pos = 2 * (y * wi + x1);
++	pos1 = y * aa_scrwidth(c) + x1;
+ 	esum = 0;
+ 	for (x = x1; x < x2; x++) {
+ 	    i1 = table[((((int) c->imagebuffer[pos])))];
