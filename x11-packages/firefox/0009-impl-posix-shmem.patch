@@ -1,8 +1,8 @@
---- a/ipc/chromium/src/base/shared_memory_posix.cc
-+++ b/ipc/chromium/src/base/shared_memory_posix.cc
+--- a/ipc/glue/SharedMemory_posix.cpp
++++ b/ipc/glue/SharedMemory_posix.cpp
 @@ -40,6 +40,65 @@
- #include "mozilla/UniquePtrExtensions.h"
  #include "prenv.h"
+ #include "nsXULAppAPI.h"  // for XRE_IsParentProcess
  
 +static int shm_unlink(const char *name) {
 +    size_t namelen;
@@ -63,15 +63,15 @@
 +    return fd;
 +}
 +
- namespace base {
+ namespace mozilla::ipc {
  
- void SharedMemory::MappingDeleter::operator()(void* ptr) {
-@@ -153,7 +212,7 @@
+ void SharedMemory::ResetImpl() {
+@@ -101,7 +160,7 @@
  // FreeBSD in version 13.
  
- #  if !defined(HAVE_MEMFD_CREATE) && defined(XP_LINUX) && \
--      defined(SYS_memfd_create)
-+      defined(SYS_memfd_create) && !defined(__TERMUX__)
+ #if !defined(HAVE_MEMFD_CREATE) && defined(XP_LINUX) && \
+-    defined(SYS_memfd_create)
++    defined(SYS_memfd_create) && !defined(__TERMUX__)
  
  // Older libc versions (e.g., glibc before 2.27) don't have the
  // wrapper, but we can supply our own; see `linux_memfd_defs.h`.
