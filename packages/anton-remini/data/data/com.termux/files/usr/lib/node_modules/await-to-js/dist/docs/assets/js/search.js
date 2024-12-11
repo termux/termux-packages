@@ -1,3 +1,0 @@
-﻿var typedoc = typedoc || {};
-            typedoc.search = typedoc.search || {};
-            typedoc.search.data = {"kinds":{"1":"External module","64":"Function"},"rows":[{"id":0,"kind":1,"name":"\"await-to-js\"","url":"modules/_await_to_js_.html","classes":"tsd-kind-external-module"},{"id":1,"kind":64,"name":"to","url":"modules/_await_to_js_.html#to","classes":"tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter","parent":"\"await-to-js\""}]};
