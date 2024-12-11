@@ -8,6 +8,12 @@ TERMUX_PKG_SHA256=3d47e27755d39f40e1ca34bc0ef535fa514e7ed547b2af62311dcadd8bd6d5
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
+termux_step_post_configure() {
+	# clash with rust host build
+	# causes 32bit builds to fail if set
+	unset CFLAGS
+}
+
 termux_step_post_make_install() {
 	mkdir -p "${TERMUX_PREFIX}/share/man/man1"
 	mkdir -p "${TERMUX_PREFIX}/share/zsh/site-functions"
