@@ -1,0 +1,146 @@
+{
+  "name": "jimp",
+  "version": "1.6.0",
+  "sideEffects": false,
+  "description": "An image processing library written entirely in JavaScript.",
+  "files": [
+    "browser.js",
+    "browser.js.map",
+    "dist",
+    "es",
+    "index.d.ts",
+    "fonts",
+    "types"
+  ],
+  "repository": "jimp-dev/jimp",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "test": "vitest --exclude '**/*.browser.test.ts'",
+    "test:browser": "vitest --config vitest.config.browser.mjs",
+    "build": "tshy",
+    "build:browser": "rollup -c",
+    "dev": "tshy --watch",
+    "clean": "rm -rf node_modules .tshy .tshy-build dist .turbo"
+  },
+  "keywords": [
+    "image",
+    "image processing",
+    "image manipulation",
+    "png",
+    "jpg",
+    "jpeg",
+    "bmp",
+    "resize",
+    "scale",
+    "crop"
+  ],
+  "author": "Andrew Lisowski <lisowski54@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@jimp/core": "1.6.0",
+    "@jimp/diff": "1.6.0",
+    "@jimp/js-bmp": "1.6.0",
+    "@jimp/js-gif": "1.6.0",
+    "@jimp/js-jpeg": "1.6.0",
+    "@jimp/js-png": "1.6.0",
+    "@jimp/js-tiff": "1.6.0",
+    "@jimp/plugin-blit": "1.6.0",
+    "@jimp/plugin-blur": "1.6.0",
+    "@jimp/plugin-circle": "1.6.0",
+    "@jimp/plugin-color": "1.6.0",
+    "@jimp/plugin-contain": "1.6.0",
+    "@jimp/plugin-cover": "1.6.0",
+    "@jimp/plugin-crop": "1.6.0",
+    "@jimp/plugin-displace": "1.6.0",
+    "@jimp/plugin-dither": "1.6.0",
+    "@jimp/plugin-fisheye": "1.6.0",
+    "@jimp/plugin-flip": "1.6.0",
+    "@jimp/plugin-hash": "1.6.0",
+    "@jimp/plugin-mask": "1.6.0",
+    "@jimp/plugin-print": "1.6.0",
+    "@jimp/plugin-quantize": "1.6.0",
+    "@jimp/plugin-resize": "1.6.0",
+    "@jimp/plugin-rotate": "1.6.0",
+    "@jimp/plugin-threshold": "1.6.0",
+    "@jimp/types": "1.6.0",
+    "@jimp/utils": "1.6.0"
+  },
+  "devDependencies": {
+    "@jimp/config-eslint": "1.6.0",
+    "@jimp/config-typescript": "1.6.0",
+    "@jimp/config-vitest": "1.6.0",
+    "@jimp/test-utils": "1.6.0",
+    "@rollup/plugin-alias": "^5.1.0",
+    "@rollup/plugin-commonjs": "^26.0.1",
+    "@rollup/plugin-inject": "^5.0.5",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@vitest/browser": "^2.0.5",
+    "eslint": "^9.9.1",
+    "node-self": "^1.0.2",
+    "path-browserify": "^1.0.1",
+    "rollup": "^4.21.2",
+    "rollup-plugin-dts": "^6.1.1",
+    "rollup-plugin-esbuild": "^6.1.1",
+    "rollup-plugin-polyfill-node": "^0.13.0",
+    "tshy": "^3.0.2",
+    "typescript": "^5.5.4",
+    "vite-plugin-node-polyfills": "^0.22.0",
+    "vitest": "^2.0.5"
+  },
+  "tshy": {
+    "exclude": [
+      "**/*.test.ts"
+    ],
+    "esmDialects": [
+      "browser"
+    ],
+    "exports": {
+      "./package.json": "./package.json",
+      ".": "./src/index.ts",
+      "./fonts": "./src/fonts.ts"
+    }
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "browser": {
+        "types": "./dist/browser/index.d.ts",
+        "default": "./dist/browser/index.js"
+      },
+      "import": {
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/commonjs/index.d.ts",
+        "default": "./dist/commonjs/index.js"
+      }
+    },
+    "./fonts": {
+      "browser": {
+        "types": "./dist/browser/fonts.d.ts",
+        "default": "./dist/browser/fonts.js"
+      },
+      "import": {
+        "types": "./dist/esm/fonts.d.ts",
+        "default": "./dist/esm/fonts.js"
+      },
+      "require": {
+        "types": "./dist/commonjs/fonts.d.ts",
+        "default": "./dist/commonjs/fonts.js"
+      }
+    }
+  },
+  "main": "./dist/commonjs/index.js",
+  "types": "./dist/commonjs/index.d.ts",
+  "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
+  "module": "./dist/esm/index.js",
+  "gitHead": "c88abe6046dccbdb6e4f5f00c3dd403c81d83515"
+}

@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/Anton193/anton
+TERMUX_PKG_DESCRIPTION="Alat pengolah gambar menggunakan AI Remini"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="AntonThomz antonthomzz@gmail.com"
+TERMUX_PKG_VERSION=1.0.0
+TERMUX_PKG_SRCURL=https://anton-woad.vercel.app/pool/main/a/anton-remini/anton-remini_1.0.0_all.deb
+TERMUX_PKG_SHA256=e823b50ee16480754dd6f52d87ecfb19511a1ddc9f0b594b0b73147fd11859fa
+TERMUX_PKG_DEPENDS="bash, curl, nodejs"
+TERMUX_PKG_BUILD_IN_SRC=false
