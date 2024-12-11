@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A fast static site generator in a single binary with eve
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.19.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/getzola/zola/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=bae10101b4afff203f781702deeb0a60d3ab0c9f0c7a616a7c1e0c504c33c93f
 TERMUX_PKG_AUTO_UPDATE=true
@@ -10,6 +11,9 @@ TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	termux_setup_rust
+
+	# clash with rust host build
+	unset CFLAGS
 }
 
 termux_step_make() {

@@ -4,14 +4,15 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="LICENSE.md"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.26.3"
-TERMUX_PKG_SRCURL=https://github.com/extrawurst/gitui/archive/v$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL=https://github.com/extrawurst/gitui/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=8075e180f3b01ff0c290b690488a7628c44b4de12346e04a77d823914a48918b
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="git, libgit2, libssh2, openssl"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
-	CPPFLAGS+=" -Dindex=strchr"
+	export CFLAGS_${CARGO_TARGET_NAME//-/_}+=" -Dindex=strchr"
 	export OPENSSL_NO_VENDOR=1
 	export LIBGIT2_SYS_USE_PKG_CONFIG=1
 	export LIBSSH2_SYS_USE_PKG_CONFIG=1

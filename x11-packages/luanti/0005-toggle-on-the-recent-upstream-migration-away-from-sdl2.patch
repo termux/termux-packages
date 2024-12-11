@@ -1,0 +1,15 @@
+This is https://github.com/minetest/minetest/pull/15284
+(Luanti's current choice to use Irrlicht only without SDL2, until a future release)
+In Termux this is necessary to enable EGL support for improved driver compatibility
+and performance, but if Luanti migrates to SDL2 in the future, at that time, it might
+be possible to enable EGL support in SDL2 for Luanti on Termux also.
+--- a/irr/src/CMakeLists.txt
++++ b/irr/src/CMakeLists.txt
+@@ -1,6 +1,6 @@
+ # When enabling SDL2 by default on macOS, don't forget to change
+ # "NSHighResolutionCapable" to true in "Info.plist".
+-if(ANDROID)
++if(THIS_IS_OPTIONAL)
+ 	set(DEFAULT_SDL2 ON)
+ endif()
+ 

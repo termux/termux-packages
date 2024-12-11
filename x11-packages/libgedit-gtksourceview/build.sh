@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://gitlab.gnome.org/World/gedit/libgedit-gtksourceview
 TERMUX_PKG_DESCRIPTION="A source code editing widget"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="299.3.0"
+TERMUX_PKG_VERSION="299.4.0"
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/libgedit-gtksourceview/${TERMUX_PKG_VERSION%%.*}/libgedit-gtksourceview-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=5ab049520010501e78ca4a19df96e2041412756ce90a3dde0a8a1ae6d88af052
+TERMUX_PKG_SHA256=20c17ff89e2031aed5dc1107fe9a93fd50f92b569be2954b119c86f9e2fd85d6
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libcairo, libxml2, pango"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, glib-cross"
@@ -26,7 +26,7 @@ termux_step_pre_configure() {
 termux_step_post_massage() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them
 	# after SOVERSION is changed.
-	local _GUARD_FILE="lib/libgedit-gtksourceview-300.so.2"
+	local _GUARD_FILE="lib/libgedit-gtksourceview-300.so.3"
 	if [ ! -e "${_GUARD_FILE}" ]; then
 		termux_error_exit "Error: file ${_GUARD_FILE} not found."
 	fi

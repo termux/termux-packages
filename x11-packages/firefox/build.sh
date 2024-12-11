@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Mozilla Firefox web browser"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="132.0.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://archive.mozilla.org/pub/firefox/releases/${TERMUX_PKG_VERSION}/source/firefox-${TERMUX_PKG_VERSION}.source.tar.xz
 TERMUX_PKG_SHA256=329e1764f4b4e13f11dcf1fd7b3c6d8f80e512e8b7ed5bf65fbe44749c2610e9
 # ffmpeg and pulseaudio are dependencies through dlopen(3):
@@ -74,9 +75,8 @@ termux_step_pre_configure() {
 	# Out of memory when building gkrust
 	# CI shows (signal: 9, SIGKILL: kill)
 	if [ "$TERMUX_DEBUG_BUILD" = false ]; then
-		case "${TERMUX_ARCH}" in
-		aarch64|arm|i686|x86_64) RUSTFLAGS+=" -C debuginfo=1" ;;
-		esac
+		local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
+		export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C debuginfo=1"
 	fi
 
 	cargo install cbindgen

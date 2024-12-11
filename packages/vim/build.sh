@@ -1,13 +1,19 @@
 TERMUX_PKG_HOMEPAGE=https://www.vim.org
 TERMUX_PKG_DESCRIPTION="Vi IMproved - enhanced vi editor"
 TERMUX_PKG_LICENSE="VIM License"
-TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_DEPENDS="libiconv, ncurses, vim-runtime"
-TERMUX_PKG_RECOMMENDS="diffutils"
-TERMUX_PKG_CONFLICTS="vim-python" # probably also , vim-gtk"
-TERMUX_PKG_VERSION=9.1.0850
+TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
+TERMUX_PKG_BUILD_DEPENDS="libluajit, python"
+TERMUX_PKG_DEPENDS="libiconv, ncurses"
+TERMUX_PKG_SUGGESTS="python, libluajit"
+TERMUX_PKG_RECOMMENDS="diffutils, xxd"
+TERMUX_PKG_CONFLICTS="vim-gtk"
+TERMUX_PKG_BREAKS="vim-python, vim-runtime"
+TERMUX_PKG_REPLACES="vim-python, vim-runtime"
+TERMUX_PKG_VERSION=9.1.0900
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=4bbd7480c2d5c577a77a070fa4a133e057c37f611adf47d9a317e50244d7caa4
+TERMUX_PKG_SHA256=30efb714ed82c5d7a1491f3e4aac6487d2c493d33c834d7ef043e6f45176772e
+TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_CONFFILES="share/vim/vimrc"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -18,12 +24,22 @@ vim_cv_terminfo=yes
 vim_cv_tgetent=zero
 vim_cv_toupper_broken=no
 vim_cv_tty_group=world
---with-compiledby='Termux'
---enable-gui=no
---enable-multibyte
---enable-netbeans=no
 --with-features=huge
 --with-tlib=ncursesw
+--enable-netbeans=no
+--enable-multibyte
+--with-compiledby='Termux'
+--enable-python3interp=dynamic
+--with-python3-config-dir=$TERMUX_PYTHON_HOME/config-${TERMUX_PYTHON_VERSION}/
+vi_cv_path_python3_pfx=$TERMUX_PREFIX
+vi_cv_path_python3_include=${TERMUX_PREFIX}/include/python${TERMUX_PYTHON_VERSION}
+vi_cv_path_python3_platinclude=${TERMUX_PREFIX}/include/python${TERMUX_PYTHON_VERSION}
+vi_cv_var_python3_abiflags=
+vi_cv_var_python3_version=${TERMUX_PYTHON_VERSION}
+--enable-luainterp=dynamic
+--with-lua-prefix=$TERMUX_PREFIX
+--with-luajit
+--enable-gui=no
 --without-x
 "
 
@@ -62,12 +78,6 @@ termux_pkg_auto_update() {
 }
 
 termux_step_pre_configure() {
-	# Certain packages are not safe to build on device because their
-	# build.sh script deletes specific files in $TERMUX_PREFIX.
-	if $TERMUX_ON_DEVICE_BUILD; then
-		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
-	fi
-
 	make distclean
 
 	# Remove eventually existing symlinks from previous builds so that they get re-created
