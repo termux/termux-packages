@@ -71,6 +71,7 @@ jobs:
           # Forces CI to cancel current build with status 'passed'
           if grep -qiP '^\s*%ci:no-build\s*$' <(git log --format="%B" -n 1 --no-merges "HEAD"); then
             tar cf artifacts/debs-${{ matrix.target_arch }}.tar debs
+            echo "docker-build=true" >> $GITHUB_OUTPUT
             echo "[!] Force exiting as tag '%ci:no-build' was applied to HEAD commit message."
             exit 0
           fi
@@ -264,11 +265,10 @@ jobs:
         name: debs-${{ matrix.target_arch }}-${{ github.sha }}
         path: ./artifacts
 
-  upload:
-    concurrency: ${{ github.workflow }}
+  upload-test:
     permissions:
       contents: read
-    if: github.repository == 'termux/termux-packages'
+    if: github.repository == 'termux/termux-packages' && github.ref != 'refs/heads/master'
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -278,15 +278,18 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         path: ./
-    - name: Upload to packages.termux.dev
-      env:
-        REPOSITORY_URL: https://packages.termux.dev/aptly-api
+    - name: Check packages using Packages.bz2
       run: |
-        GITHUB_SHA=${{ github.sha }}
-        APTLY_API_AUTH=${{ secrets.APTLY_API_AUTH }}
-        GPG_PASSPHRASE=${{ secrets.GPG_PASSPHRASE }}
-
-        source scripts/aptly_api.sh
+        if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+          # GitHub sometimes add merge commits at the end
+          # To prevent user confusion, filter them with --no-merges
+          # Process tag '%ci:no-build' that may be added as line to commit message.
+          # Forces CI to cancel current build with status 'passed'
+          if grep -qiP '^\s*%ci:no-build\s*$' <(git log --format="%B" -n 1 --no-merges "HEAD"); then
+            echo "[!] Force exiting as tag '%ci:no-build' was applied to HEAD commit message."
+            exit 0
+          fi
+        fi
 
         for archive in debs-*/debs-{aarch64,arm,i686,x86_64}-${{ github.sha }}.tar; do
           tar xf "$archive"
@@ -317,7 +320,10 @@ jobs:
             fi
             result=$(find debs -maxdepth 1 -type f | cut -d"/" -f2 | xargs -P$(nproc) -i{} grep "^Filename:.*/{}$" -nH "Packages-${repo}-${arch}" || true)
             if [ -n "$result" ]; then
-              echo "[!] Found local files same name with server files! Please revbump package or tag commit with '%ci:no-build'"
+              if [ "$error" = 0 ]; then
+                echo "[!] Found local files same name with server files!"
+                echo "[!] Please revbump package, rebase or tag commit with '%ci:no-build'"
+              fi
               echo "$result" | grep -E "${arch}|all" || true
               error=1
             fi
@@ -325,10 +331,32 @@ jobs:
         done
         if [ "$error" != 0 ]; then exit 1; fi
 
-        if [ "${{ github.ref }}" != "refs/heads/master" ]; then
-          echo "[!] Not on master branch. Cancelling upload."
-          exit 0
-        fi
+  upload:
+    concurrency: ${{ github.workflow }}
+    permissions:
+      contents: read
+    if: github.repository == 'termux/termux-packages' && github.ref == 'refs/heads/master'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v4
+    - name: Get *.deb files
+      uses: actions/download-artifact@v4
+      with:
+        path: ./
+    - name: Upload to packages.termux.dev
+      env:
+        REPOSITORY_URL: https://packages.termux.dev/aptly-api
+        GITHUB_SHA: ${{ github.sha }}
+        APTLY_API_AUTH: ${{ secrets.APTLY_API_AUTH }}
+        GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+      run: |
+        source scripts/aptly_api.sh
+
+        for archive in debs-*/debs-{aarch64,arm,i686,x86_64}-${{ github.sha }}.tar; do
+          tar xf "$archive"
+        done
 
         for repo in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
           export REPOSITORY_NAME=$(jq --raw-output '.["'$repo'"].name' repo.json)

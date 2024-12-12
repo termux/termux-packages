@@ -359,28 +359,6 @@ diff --git a/swift-corelibs-foundation/Package.swift b/swift-corelibs-foundation
          ),
          .target(
              name: "_CFXMLInterface",
-diff --git a/swift-corelibs-foundation/Sources/Foundation/FileManager+POSIX.swift b/swift-corelibs-foundation/Sources/Foundation/FileManager+POSIX.swift
-index e89b3bf6..a82fe1c2 100644
---- a/swift-corelibs-foundation/Sources/Foundation/FileManager+POSIX.swift
-+++ b/swift-corelibs-foundation/Sources/Foundation/FileManager+POSIX.swift
-@@ -347,10 +351,17 @@
-             do {
-                 guard fm.fileExists(atPath: _url.path) else { throw _NSErrorWithErrno(ENOENT, reading: true, url: url) }
-                 _stream = try FileManager.default._fileSystemRepresentation(withPath: _url.path) { fsRep in
-+#if canImport(Android)
-+                    let ps = UnsafeMutablePointer<UnsafeMutablePointer<Int8>>.allocate(capacity: 2)
-+                    defer { ps.deallocate() }
-+                    ps.initialize(to: UnsafeMutablePointer(mutating: fsRep))
-+                    ps.advanced(by: 1).initialize(to: unsafeBitCast(0, to: UnsafeMutablePointer<Int8>.self))
-+#else
-                     let ps = UnsafeMutablePointer<UnsafeMutablePointer<Int8>?>.allocate(capacity: 2)
-                     defer { ps.deallocate() }
-                     ps.initialize(to: UnsafeMutablePointer(mutating: fsRep))
-                     ps.advanced(by: 1).initialize(to: nil)
-+#endif
-                     return fts_open(ps, FTS_PHYSICAL | FTS_XDEV | FTS_NOCHDIR | FTS_NOSTAT, nil)
-                 }
-                 if _stream == nil {
 diff --git a/swift-corelibs-foundation/Sources/Foundation/NSPathUtilities.swift b/swift-corelibs-foundation/Sources/Foundation/NSPathUtilities.swift
 --- a/swift-corelibs-foundation/Sources/Foundation/NSPathUtilities.swift
 +++ b/swift-corelibs-foundation/Sources/Foundation/NSPathUtilities.swift
@@ -408,36 +386,22 @@ index 758dd1df..02970992 100644
              if !useFallbackChdir {
                  try _throwIfPosixError(chdirResult)
              }
-diff --git a/swift-foundation/Sources/FoundationEssentials/FileManager/FileOperations+Enumeration.swift b/swift-foundation/Sources/FoundationEssentials/FileManager/FileOperations+Enumeration.swift
---- a/swift-foundation/Sources/FoundationEssentials/FileManager/FileOperations+Enumeration.swift
-+++ b/swift-foundation/Sources/FoundationEssentials/FileManager/FileOperations+Enumeration.swift
-@@ -169,7 +169,7 @@
-                 return
-             }
- 
--            state = [UnsafeMutablePointer(mutating: path), nil].withUnsafeBufferPointer { dirList in
-+            state = [UnsafeMutablePointer(mutating: path), unsafeBitCast(0, to: UnsafeMutablePointer<CChar>.self)].withUnsafeBufferPointer { dirList in
-                 guard let stream = fts_open(dirList.baseAddress!, opts, nil) else {
-                     return .error(errno, String(cString: path))
-                 }
 diff --git a/swift-foundation/Sources/FoundationEssentials/String/String+Path.swift b/swift-foundation/Sources/FoundationEssentials/String/String+Path.swift
 index f1cb26d..44600dd 100644
 --- a/swift-foundation/Sources/FoundationEssentials/String/String+Path.swift
 +++ b/swift-foundation/Sources/FoundationEssentials/String/String+Path.swift
-@@ -465,6 +465,7 @@ extension String {
+@@ -511,7 +511,7 @@ extension String {
              return envVar.standardizingPath
          }
          
-+        #if !canImport(Android)
+-        #if !os(WASI) // WASI does not have user concept
++        #if !os(WASI) && !canImport(Android) // WASI does not have user concept
          // Next, attempt to find the home directory via getpwnam/getpwuid
          var pass: UnsafeMutablePointer<passwd>?
          if let user {
-@@ -478,9 +479,10 @@ extension String {
-         if let dir = pass?.pointee.pw_dir {
-             return String(cString: dir).standardizingPath
-         }
-+        #endif
-         
+@@ -528,7 +528,7 @@ extension String {
+         #endif // !os(WASI)
+ 
          // Fallback to HOME for the current user if possible
 -        if user == nil, let home = getenv("HOME") {
 +        if let home = getenv("HOME") {

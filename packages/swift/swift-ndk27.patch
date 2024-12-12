@@ -33,14 +33,14 @@ index 3784880bc63ed..a3912568f95a7 100644
 --- a/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake
 +++ b/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake
 @@ -557,7 +557,7 @@ function(_add_target_variant_link_flags)
-     # We need to add the math library, which is linked implicitly by libc++
-     list(APPEND result "-lm")
-     if(NOT "${SWIFT_ANDROID_NDK_PATH}" STREQUAL "")
--      if("${SWIFT_ANDROID_NDK_PATH}" MATCHES "r26")
-+      if("${SWIFT_ANDROID_NDK_PATH}" MATCHES "r26|r27")
-         file(GLOB RESOURCE_DIR ${SWIFT_SDK_ANDROID_ARCH_${LFLAGS_ARCH}_PATH}/../lib/clang/*)
-       else()
-         file(GLOB RESOURCE_DIR ${SWIFT_SDK_ANDROID_ARCH_${LFLAGS_ARCH}_PATH}/../lib64/clang/*)
+     if(NOT CMAKE_HOST_SYSTEM MATCHES Windows)
+       # The Android resource dir is specified from build.ps1 on windows.
+       if(NOT "${SWIFT_ANDROID_NDK_PATH}" STREQUAL "")
+-        if("${SWIFT_ANDROID_NDK_PATH}" MATCHES "r26")
++        if("${SWIFT_ANDROID_NDK_PATH}" MATCHES "r26|r27")
+           file(GLOB RESOURCE_DIR ${SWIFT_SDK_ANDROID_ARCH_${LFLAGS_ARCH}_PATH}/../lib/clang/*)
+         else()
+           file(GLOB RESOURCE_DIR ${SWIFT_SDK_ANDROID_ARCH_${LFLAGS_ARCH}_PATH}/../lib64/clang/*)
 diff --git a/swift/stdlib/public/Platform/android.modulemap b/swift/stdlib/public/Platform/android.modulemap
 index a1a9010c4a042..76da5f6bd5e59 100644
 --- a/swift/stdlib/public/Platform/android.modulemap
