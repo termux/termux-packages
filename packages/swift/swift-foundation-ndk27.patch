@@ -421,3 +421,91 @@ index fde8755..343f3b4 100644
  add_subdirectory(common)
  add_subdirectory(i18n)
  add_subdirectory(io)
+From ab001004196b249af359d6152e5c2d06c11bee56
+From: Alex Lorenz <arphaman@gmail.com>
+Date: Tue, 29 Oct 2024 13:00:11 -0700
+Subject: [PATCH] [android] fix the android build (#999)
+
+Platform.swift regressed after 71eefee7fca08ecbeacc89098b74ab80319baa6b
+---
+
+diff --git a/swift-foundation/Sources/FoundationEssentials/Platform.swift b/swift-foundation/Sources/FoundationEssentials/Platform.swift
+index d8b8fe6f..15a1362f 100644
+--- a/swift-foundation/Sources/FoundationEssentials/Platform.swift
++++ b/swift-foundation/Sources/FoundationEssentials/Platform.swift
+@@ -29,8 +29,7 @@ fileprivate let _pageSize: Int = {
+ // WebAssembly defines a fixed page size
+ fileprivate let _pageSize: Int = 65_536
+ #elseif canImport(Android)
+-import Bionic
+-import unistd
++import Android
+ fileprivate let _pageSize: Int = Int(getpagesize())
+ #elseif canImport(Glibc)
+ import Glibc
+@@ -142,7 +141,7 @@ extension Platform {
+     typealias Operation<Input, Output> = (Input, UnsafeMutablePointer<Output>, UnsafeMutablePointer<CChar>, Int, UnsafeMutablePointer<UnsafeMutablePointer<Output>?>) -> Int32
+     #endif
+     
+-    private static func withUserGroupBuffer<Input, Output, R>(_ input: Input, _ output: Output, sizeProperty: Int32, operation: Operation<Input, Output>, block: (Output) throws -> R) rethrows -> R? {
++    private static func withUserGroupBuffer<Input, Output, R>(_ input: Input, _ output: Output, sizeProperty: Int32, operation: Operation<Input, Output>, block: (Output) throws -> R?) rethrows -> R? {
+         var bufferLen = sysconf(sizeProperty)
+         if bufferLen == -1 {
+             bufferLen = 4096 // Generous default size estimate
+@@ -172,31 +171,51 @@ extension Platform {
+     
+     static func name(forUID uid: uid_t) -> String? {
+         withUserGroupBuffer(uid, passwd(), sizeProperty: Int32(_SC_GETPW_R_SIZE_MAX), operation: getpwuid_r) {
+-            String(cString: $0.pw_name)
++            // Android's pw_name `char *`` is nullable when it should be non-null.
++            // FIXME: avoid the coerce cast workaround once https://github.com/android/ndk/issues/2098 is fixed.
++            let pw_name: UnsafeMutablePointer<CChar>? = $0.pw_name
++            return pw_name.flatMap { String(cString: $0) }
+         }
+     }
+     
+     static func fullName(forUID uid: uid_t) -> String? {
+         withUserGroupBuffer(uid, passwd(), sizeProperty: Int32(_SC_GETPW_R_SIZE_MAX), operation: getpwuid_r) {
+-            String(cString: $0.pw_gecos)
++#if os(Android) && _pointerBitWidth(_32)
++            // pw_gecos isn't available on 32-bit Android.
++            let pw_gecos: UnsafeMutablePointer<CChar>? = nil
++#else
++            // Android's pw_gecos `char *`` is nullable, so always coerce to a nullable pointer
++            // in order to be compatible with Android.
++            let pw_gecos: UnsafeMutablePointer<CChar>? = $0.pw_gecos
++#endif
++            return pw_gecos.flatMap { String(cString: $0) }
+         }
+     }
+     
+     static func name(forGID gid: gid_t) -> String? {
+         withUserGroupBuffer(gid, group(), sizeProperty: Int32(_SC_GETGR_R_SIZE_MAX), operation: getgrgid_r) {
+-            String(cString: $0.gr_name)
++            // Android's gr_name `char *`` is nullable when it should be non-null.
++            // FIXME: avoid the coerce cast workaround once https://github.com/android/ndk/issues/2098 is fixed.
++            let gr_name: UnsafeMutablePointer<CChar>? = $0.gr_name
++            return gr_name.flatMap { String(cString: $0) }
+         }
+     }
+     
+     static func homeDirectory(forUserName userName: String) -> String? {
+         withUserGroupBuffer(userName, passwd(), sizeProperty: Int32(_SC_GETPW_R_SIZE_MAX), operation: getpwnam_r) {
+-            String(cString: $0.pw_dir)
++            // Android's pw_dir `char *`` is nullable when it should be non-null.
++            // FIXME: avoid the coerce cast workaround once https://github.com/android/ndk/issues/2098 is fixed.
++            let pw_dir: UnsafeMutablePointer<CChar>? = $0.pw_dir
++            return pw_dir.flatMap { String(cString: $0) }
+         }
+     }
+     
+     static func homeDirectory(forUID uid: uid_t) -> String? {
+         withUserGroupBuffer(uid, passwd(), sizeProperty: Int32(_SC_GETPW_R_SIZE_MAX), operation: getpwuid_r) {
+-            String(cString: $0.pw_dir)
++            // Android's pw_dir `char *`` is nullable when it should be non-null.
++            // FIXME: avoid the coerce cast workaround once https://github.com/android/ndk/issues/2098 is fixed.
++            let pw_dir: UnsafeMutablePointer<CChar>? = $0.pw_dir
++            return pw_dir.flatMap { String(cString: $0) }
+         }
+     }
+ }
