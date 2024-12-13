@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A library for playback of various streamed audio formats
 TERMUX_PKG_LICENSE="ISC"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1951"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/vgmstream/vgmstream/archive/refs/tags/r${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=d70df729a6a6c5b75a648374fac78c2a27ec6858716da80543f71958d2500065
 TERMUX_PKG_AUTO_UPDATE=true

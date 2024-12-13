@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="GStreamer Libav plug-in contains one plugin with a set o
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.24.10"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://gstreamer.freedesktop.org/src/gst-libav/gst-libav-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=4cf2e2d8204e54ba8af9519a8b9b7ffa6e951a7087afa0dfe83c125d49bbb5fb
 TERMUX_PKG_AUTO_UPDATE=true
