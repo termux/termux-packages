@@ -1,16 +1,15 @@
-diff -uNr php-8.0.0.orig/sapi/apache2handler/config.m4 php-8.0.0/sapi/apache2handler/config.m4
---- php-8.0.0.orig/sapi/apache2handler/config.m4	2020-11-24 22:34:03.000000000 +0530
-+++ php-8.0.0/sapi/apache2handler/config.m4	2020-12-06 22:10:55.658675537 +0530
-@@ -64,18 +64,9 @@
-   fi
+--- ./sapi/apache2handler/config.m4.orig	2024-11-28 01:42:03.021591885 +0700
++++ ./sapi/apache2handler/config.m4	2024-11-28 03:33:05.000000000 +0700
+@@ -69,18 +69,9 @@
+     [AC_MSG_ERROR([Please note that Apache version >= 2.4 is required])])
  
-   APXS_LIBEXECDIR='$(INSTALL_ROOT)'`$APXS -q LIBEXECDIR`
--  if test -z `$APXS -q SYSCONFDIR`; then
+   APXS_LIBEXECDIR='$(INSTALL_ROOT)'$($APXS -q LIBEXECDIR)
+-  if test -z $($APXS -q SYSCONFDIR); then
      INSTALL_IT="\$(mkinstalldirs) '$APXS_LIBEXECDIR' && \
                   $APXS -S LIBEXECDIR='$APXS_LIBEXECDIR' \
                         -i -n php"
 -  else
--    APXS_SYSCONFDIR='$(INSTALL_ROOT)'`$APXS -q SYSCONFDIR`
+-    APXS_SYSCONFDIR='$(INSTALL_ROOT)'$($APXS -q SYSCONFDIR)
 -    INSTALL_IT="\$(mkinstalldirs) '$APXS_LIBEXECDIR' && \
 -                \$(mkinstalldirs) '$APXS_SYSCONFDIR' && \
 -                 $APXS -S LIBEXECDIR='$APXS_LIBEXECDIR' \
@@ -19,13 +18,14 @@ diff -uNr php-8.0.0.orig/sapi/apache2handler/config.m4 php-8.0.0/sapi/apache2han
 -  fi
  
    LIBPHP_CFLAGS="-shared"
-   PHP_SUBST(LIBPHP_CFLAGS)
-@@ -103,6 +94,8 @@
-     INSTALL_IT="$INSTALL_IT $SAPI_SHARED"
-     ;;
-   *)
+   PHP_SUBST([LIBPHP_CFLAGS])
+@@ -108,7 +99,8 @@
+       INSTALL_IT="$INSTALL_IT $SAPI_SHARED"
+     ],
+     [INSTALL_IT="$INSTALL_IT $SAPI_LIBTOOL"])
+-
 +    EXTRA_LDFLAGS="`$APR_CONFIG --ldflags --link-ld --libs`"&
 +    EXTRA_LDFLAGS="`$APU_CONFIG --ldflags --link-ld --libs` $EXTRA_LDFLAGS"
-     PHP_SELECT_SAPI(apache2handler, shared, mod_php.c sapi_apache2.c apache_config.c php_functions.c, $APACHE_CFLAGS)
-     INSTALL_IT="$INSTALL_IT $SAPI_LIBTOOL"
-     ;;
+   PHP_SELECT_SAPI([apache2handler],
+     [$php_sapi_apache2handler_type],
+     [mod_php.c sapi_apache2.c apache_config.c php_functions.c],
