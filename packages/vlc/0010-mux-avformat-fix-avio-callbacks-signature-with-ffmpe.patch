@@ -1,0 +1,78 @@
+Copied from https://salsa.debian.org/multimedia-team/vlc/-/commit/f0ead348a0d2739c6e097938e7fd20db39c6fc59
+
+From: =?utf-8?q?Fran=C3=A7ois_Cartegnie?= <fcvlcdev@free.fr>
+Date: Thu, 15 Aug 2024 12:09:56 +0200
+Subject: mux: avformat: fix avio callbacks signature with ffmpeg 6.1
+
+API signature changes introduced depending on a positive define,
+then removed later, making it break prior or post removal...
+---
+ modules/codec/avcodec/avcommon_compat.h |  3 +++
+ modules/demux/avformat/mux.c            | 19 +++++++++++++++++--
+ 2 files changed, 20 insertions(+), 2 deletions(-)
+
+diff --git a/modules/codec/avcodec/avcommon_compat.h b/modules/codec/avcodec/avcommon_compat.h
+index 9d16b3d..561ad83 100644
+--- a/modules/codec/avcodec/avcommon_compat.h
++++ b/modules/codec/avcodec/avcommon_compat.h
+@@ -77,6 +77,9 @@
+ #ifndef  FF_MAX_B_FRAMES
+ # define  FF_MAX_B_FRAMES 16 // FIXME: remove this
+ #endif
++#ifndef FF_API_AVIO_WRITE_NONCONST // removed in ffmpeg 7
++# define FF_API_AVIO_WRITE_NONCONST (LIBAVFORMAT_VERSION_MAJOR < 61)
++#endif
+ 
+ #endif /* HAVE_LIBAVCODEC_AVCODEC_H */
+ 
+diff --git a/modules/demux/avformat/mux.c b/modules/demux/avformat/mux.c
+index 8bf8735..4994647 100644
+--- a/modules/demux/avformat/mux.c
++++ b/modules/demux/avformat/mux.c
+@@ -74,12 +74,18 @@ static int AddStream( sout_mux_t *, sout_input_t * );
+ static void DelStream( sout_mux_t *, sout_input_t * );
+ static int Mux      ( sout_mux_t * );
+ 
++#if FF_API_AVIO_WRITE_NONCONST
+ static int IOWrite( void *opaque, uint8_t *buf, int buf_size );
+-static int64_t IOSeek( void *opaque, int64_t offset, int whence );
+ #if LIBAVFORMAT_VERSION_CHECK( 57, 7, 0, 40, 100 )
+ static int IOWriteTyped(void *opaque, uint8_t *buf, int buf_size,
+-                              enum AVIODataMarkerType type, int64_t time);
++                        enum AVIODataMarkerType type, int64_t time);
++#endif
++#else
++static int IOWrite( void *opaque, const uint8_t *buf, int buf_size );
++int IOWriteTyped(void *opaque, const uint8_t *buf, int buf_size,
++                 enum AVIODataMarkerType type, int64_t time);
+ #endif
++static int64_t IOSeek( void *opaque, int64_t offset, int whence );
+ 
+ /*****************************************************************************
+  * Open
+@@ -411,8 +417,13 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
+ }
+ 
+ #if LIBAVFORMAT_VERSION_CHECK( 57, 7, 0, 40, 100 )
++#if FF_API_AVIO_WRITE_NONCONST
+ int IOWriteTyped(void *opaque, uint8_t *buf, int buf_size,
+                               enum AVIODataMarkerType type, int64_t time)
++#else
++int IOWriteTyped(void *opaque, const uint8_t *buf, int buf_size,
++                 enum AVIODataMarkerType type, int64_t time)
++#endif
+ {
+     VLC_UNUSED(time);
+ 
+@@ -512,7 +523,11 @@ static int Control( sout_mux_t *p_mux, int i_query, va_list args )
+ /*****************************************************************************
+  * I/O wrappers for libavformat
+  *****************************************************************************/
++#if FF_API_AVIO_WRITE_NONCONST
+ static int IOWrite( void *opaque, uint8_t *buf, int buf_size )
++#else
++static int IOWrite( void *opaque, const uint8_t *buf, int buf_size )
++#endif
+ {
+     sout_mux_t *p_mux = opaque;
+     sout_mux_sys_t *p_sys = p_mux->p_sys;
