@@ -1,0 +1,128 @@
+This is https://github.com/HandBrake/HandBrake/commit/6f2cd466ef0e029d9e5a51ac8640c3ab64e212f6 and
+https://github.com/HandBrake/HandBrake/commit/09e99ce641c840686b1b5f860263e89ad7d6651d reverted
+in order to avoid requiring this downstream patch to ffmpeg that is in the upstream handbrake contrib/ffmpeg folder:
+https://github.com/HandBrake/HandBrake/blob/master/contrib/ffmpeg/A15-Expose-the-unmodified-Dolby-Vision-RPU-T35-buffers.patch
+
+--- a/libhb/common.c
++++ b/libhb/common.c
+@@ -4351,8 +4351,6 @@ void hb_title_close( hb_title_t ** _t )
+     hb_subtitle_t * subtitle;
+     hb_attachment_t * attachment;
+ 
+-    hb_data_close(&t->initial_rpu);
+-
+     while( ( chapter = hb_list_item( t->list_chapter, 0 ) ) )
+     {
+         hb_list_rem( t->list_chapter, chapter );
+--- a/libhb/decavcodec.c
++++ b/libhb/decavcodec.c
+@@ -1352,28 +1352,6 @@ static hb_buffer_t *copy_frame( hb_work_private_t *pv )
+             pv->title->coll.max_fall = coll->MaxFALL;
+         }
+ 
+-        // Check for Dolby Vision and store the first RPU found
+-        // eventually to attach to the the initial black buffer
+-        if (pv->title->initial_rpu == NULL)
+-        {
+-            int type = AV_FRAME_DATA_DOVI_RPU_BUFFER;
+-            sd = av_frame_get_side_data(pv->frame, type);
+-
+-            if (sd == NULL)
+-            {
+-                type = AV_FRAME_DATA_DOVI_RPU_BUFFER_T35;
+-                sd = av_frame_get_side_data(pv->frame, type);
+-            }
+-
+-            if (sd != NULL && sd->size > 0)
+-            {
+-                hb_data_t *rpu = hb_data_init(sd->size);
+-                memcpy(rpu->bytes, sd->data, sd->size);
+-                pv->title->initial_rpu = rpu;
+-                pv->title->initial_rpu_type = type;
+-            }
+-        }
+-
+         // Check for HDR Plus dynamic metadata
+         sd = av_frame_get_side_data(pv->frame, AV_FRAME_DATA_DYNAMIC_HDR_PLUS);
+         if (sd != NULL && sd->size > 0)
+--- a/libhb/handbrake/common.h
++++ b/libhb/handbrake/common.h
+@@ -1227,11 +1227,7 @@ struct hb_title_s
+     hb_mastering_display_metadata_t mastering;
+     hb_content_light_metadata_t     coll;
+     hb_ambient_viewing_environment_metadata_t ambient;
+-
+     hb_dovi_conf_t  dovi;
+-    hb_data_t      *initial_rpu;
+-    int             initial_rpu_type;
+-
+     int             hdr_10_plus;
+ 
+     hb_rational_t   vrate;
+--- a/libhb/sync.c
++++ b/libhb/sync.c
+@@ -389,24 +389,6 @@ static hb_buffer_t * CreateBlackBuf( sync_stream_t * stream,
+             buf->f.color_matrix = stream->common->job->title->color_matrix;
+             buf->f.color_range = stream->common->job->color_range;
+             buf->f.chroma_location = stream->common->job->chroma_location;
+-
+-            // Dolby Vision requires a RPU on every buffer, attach the first
+-            // found during scan in the absence of something better
+-            if (stream->common->job->title->initial_rpu)
+-            {
+-                hb_data_t *rpu = stream->common->job->title->initial_rpu;
+-                AVBufferRef *ref = av_buffer_alloc(rpu->size);
+-                memcpy(ref->data, rpu->bytes, rpu->size);
+-
+-                AVFrameSideData *sd_dst = NULL;
+-                sd_dst = hb_buffer_new_side_data_from_buf(buf, stream->common->job->title->initial_rpu_type, ref);
+-
+-                if (!sd_dst)
+-                {
+-                    av_buffer_unref(&ref);
+-                }
+-            }
+-
+ #if HB_PROJECT_FEATURE_QSV
+             if (hb_qsv_get_memory_type(stream->common->job) == MFX_IOPATTERN_OUT_VIDEO_MEMORY)
+             {
+--- a/libhb/encsvtav1.c
++++ b/libhb/encsvtav1.c
+@@ -502,7 +502,7 @@ static int send(hb_work_object_t *w, hb_buffer_t *in)
+                 av_freep(&payload);
+             }
+             else if (job->passthru_dynamic_hdr_metadata & DOVI &&
+-                     side_data->type == AV_FRAME_DATA_DOVI_RPU_BUFFER_T35)
++                     side_data->type == AV_FRAME_DATA_DOVI_RPU_BUFFER)
+             {
+                 svt_add_metadata(headerPtr, EB_AV1_METADATA_TYPE_ITUT_T35, side_data->data, side_data->size);
+             }
+--- a/libhb/rpu.c
++++ b/libhb/rpu.c
+@@ -212,7 +212,7 @@ static int rpu_work(hb_filter_object_t *filter,
+             {
+                 rpu_in = dovi_parse_unspec62_nalu(side_data->data, side_data->size);
+             }
+-            else if (side_data->type == AV_FRAME_DATA_DOVI_RPU_BUFFER_T35)
++            else
+             {
+                 rpu_in = dovi_parse_itu_t35_dovi_metadata_obu(side_data->data, side_data->size);
+             }
+@@ -313,16 +313,7 @@ static int rpu_work(hb_filter_object_t *filter,
+ 
+                     AVBufferRef *ref = av_buffer_alloc(rpu_data->len - offset);
+                     memcpy(ref->data, rpu_data->data + offset, rpu_data->len - offset);
+-                    AVFrameSideData *sd_dst = NULL;
+-
+-                    if (pv->mode & RPU_MODE_EMIT_UNSPECT_62_NAL)
+-                    {
+-                        sd_dst = hb_buffer_new_side_data_from_buf(in, AV_FRAME_DATA_DOVI_RPU_BUFFER, ref);
+-                    }
+-                    else if (pv->mode & RPU_MODE_EMIT_T35_OBU)
+-                    {
+-                        sd_dst = hb_buffer_new_side_data_from_buf(in, AV_FRAME_DATA_DOVI_RPU_BUFFER_T35, ref);
+-                    }
++                    AVFrameSideData *sd_dst = hb_buffer_new_side_data_from_buf(in, AV_FRAME_DATA_DOVI_RPU_BUFFER, ref);
+ 
+                     if (!sd_dst)
+                     {

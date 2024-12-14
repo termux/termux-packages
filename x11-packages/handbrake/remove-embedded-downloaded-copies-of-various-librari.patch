@@ -1,0 +1,130 @@
+Copied from here https://salsa.debian.org/multimedia-team/handbrake/-/tree/abf6561af02cff11bce1f28900165716e57fa41a
+
+From: Christian Marillat <marillat@debian.org>
+Date: Tue, 17 Apr 2018 21:11:53 +0200
+Subject: Remove embedded/downloaded copies of various libraries
+
+Once this is acceptable, this should be forwarded upstream so that the
+use of system libraries is an option, instead of downloading libraries
+and programs at build time.
+---
+ gtk/meson.build        |  2 ++
+ libhb/module.defs      |  8 ++------
+ make/include/main.defs | 29 -----------------------------
+ test/module.defs       |  6 ++++++
+ 4 files changed, 10 insertions(+), 35 deletions(-)
+
+diff --git a/gtk/meson.build b/gtk/meson.build
+index 83233ce..96ba523 100644
+--- a/gtk/meson.build
++++ b/gtk/meson.build
+@@ -63,6 +63,8 @@ endif
+ 
+ if get_option('qsv').enabled()
+   ghb_deps += dependency('vpl')
++  ghb_deps += dependency('libva')
++  ghb_deps += dependency('libva-drm')
+ endif
+ 
+ if get_option('x265').enabled()
+diff --git a/libhb/module.defs b/libhb/module.defs
+index 177ddef..9362b40 100644
+--- a/libhb/module.defs
++++ b/libhb/module.defs
+@@ -1,7 +1,7 @@
+ __deps__ := BZIP2 LIBVPX SVT-AV1 FFMPEG FREETYPE LAME LIBASS \
+     LIBDVDREAD LIBDVDNAV LIBICONV LIBTHEORA LIBVORBIS LIBOGG \
+     X264 X265 ZLIB LIBBLURAY FDKAAC LIBVPL LIBGNURX JANSSON \
+-    HARFBUZZ LIBOPUS LIBSPEEX LIBDAV1D LIBJPEGTURBO LIBDOVI
++    HARFBUZZ LIBOPUS LIBSPEEX LIBDOVI
+ 
+ ifeq (,$(filter $(HOST.system),darwin cygwin mingw))
+     __deps__ += FONTCONFIG
+@@ -118,7 +118,7 @@ LIBHB.lib = $(LIBHB.build/)hb.lib
+ LIBHB.dll.libs = $(foreach n, \
+         ass avformat avfilter avcodec avutil swresample dvdnav dvdread \
+         freetype mp3lame swscale vpx theora vorbis vorbisenc ogg x264 \
+-        bluray jansson harfbuzz opus speex dav1d turbojpeg zimg SvtAv1Enc, \
++        bluray jansson harfbuzz opus speex SvtAv1Enc, \
+         $(CONTRIB.build/)lib/lib$(n).a )
+ 
+ ifeq (1,$(FEATURE.fdk_aac))
+@@ -130,10 +130,6 @@ LIBHB.GCC.D += ONEVPL_EXPERIMENTAL
+ LIBHB.dll.libs += $(CONTRIB.build/)lib/libvpl.a
+ endif
+ 
+-ifeq (1,$(FEATURE.x265))
+-LIBHB.dll.libs += $(CONTRIB.build/)lib/libx265.a
+-endif
+-
+ ifeq (1,$(FEATURE.libdovi))
+ LIBHB.dll.libs += $(CONTRIB.build/)lib/libdovi.a
+ endif
+diff --git a/make/include/main.defs b/make/include/main.defs
+index e073a22..5b53474 100644
+--- a/make/include/main.defs
++++ b/make/include/main.defs
+@@ -41,35 +41,10 @@ ifeq (1,$(FEATURE.fdk_aac))
+     MODULES += contrib/fdk-aac
+ endif
+ 
+-ifeq (1,$(FEATURE.x265))
+-    MODULES += contrib/x265
+-    MODULES += contrib/x265_8bit
+-    MODULES += contrib/x265_10bit
+-    MODULES += contrib/x265_12bit
+-endif
+-
+-MODULES += contrib/libdav1d
+-MODULES += contrib/svt-av1
+-MODULES += contrib/zimg
+-MODULES += contrib/ffmpeg
+-MODULES += contrib/libdvdread
+-MODULES += contrib/libdvdnav
+-MODULES += contrib/libbluray
+-
+-ifeq (1,$(FEATURE.qsv))
+-ifeq (,$(filter $(HOST.system),freebsd))
+-    MODULES += contrib/libvpl
+-endif
+-endif
+-
+ ifeq (1,$(FEATURE.vce))
+     MODULES += contrib/amf
+ endif
+ 
+-ifeq (1,$(FEATURE.nvenc))
+-    MODULES += contrib/nvenc
+-endif
+-
+ ifeq (1,$(FEATURE.libdovi))
+     MODULES += contrib/libdovi
+ endif
+@@ -79,10 +54,6 @@ ifneq (,$(filter $(HOST.system),darwin))
+     MODULES += contrib/bin2c
+ endif
+ 
+-ifneq (,$(filter $(HOST.machine),arm64 aarch64))
+-    MODULES += contrib/sse2neon
+-endif
+-
+ ifneq (,$(filter $(HOST.system),cygwin mingw))
+ ifneq ($(HAS.iconv),1)
+     MODULES += contrib/libiconv
+diff --git a/test/module.defs b/test/module.defs
+index 9f803c4..97ac6c0 100644
+--- a/test/module.defs
++++ b/test/module.defs
+@@ -25,6 +25,12 @@ TEST.pkgconfig_libs += $(foreach m,$(MODULES.NAMES),$($m.OSL.libs))
+ ifeq (1,$(FEATURE.flatpak))
+     TEST.pkgconfig_libs += glib-2.0
+ endif
++ifeq (1,$(FEATURE.x265))
++    TEST.pkgconfig_libs += x265
++endif
++ifeq (1,$(FEATURE.qsv))
++  TEST.pkgconfig_libs += libva libva-drm vpl
++endif
+ 
+ TEST.GCC.pkgconfig = $(shell $(TEST.PKGCONFIG.exe) --libs $(TEST.pkgconfig_libs))
+ 
