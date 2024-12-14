@@ -1,0 +1,32 @@
+https://github.com/termux/termux-packages/issues/22542
+
+--- a/cube/cube.c
++++ b/cube/cube.c
+@@ -3931,7 +3931,11 @@ static void demo_init_vk(struct demo *demo) {
+ #endif
+ #if defined(VK_USE_PLATFORM_DISPLAY_KHR)
+             if (!strcmp(VK_KHR_DISPLAY_EXTENSION_NAME, instance_extensions[i].extensionName) &&
++#ifdef __TERMUX__
++                (demo->wsi_platform == WSI_PLATFORM_DISPLAY)) {
++#else
+                 (demo->wsi_platform == WSI_PLATFORM_AUTO || demo->wsi_platform == WSI_PLATFORM_DISPLAY)) {
++#endif
+                 platformSurfaceExtFound = true;
+                 demo->extension_names[demo->enabled_extension_count++] = VK_KHR_DISPLAY_EXTENSION_NAME;
+             }
+diff --git a/cube/cube.cpp b/cube/cube.cpp
+index 6c4f9b05..e488f2ef 100644
+--- a/cube/cube.cpp
++++ b/cube/cube.cpp
+@@ -1534,7 +1534,11 @@ void Demo::init_vk() {
+ #endif
+ #if defined(VK_USE_PLATFORM_DISPLAY_KHR)
+         else if (!strcmp(VK_KHR_DISPLAY_EXTENSION_NAME, extension.extensionName) &&
++#ifdef __TERMUX__
++                 (wsi_platform == WsiPlatform::display)) {
++#else
+                  (wsi_platform == WsiPlatform::auto_ || wsi_platform == WsiPlatform::display)) {
++#endif
+             platformSurfaceExtFound = 1;
+             enabled_instance_extensions.push_back(VK_KHR_DISPLAY_EXTENSION_NAME);
+         }
