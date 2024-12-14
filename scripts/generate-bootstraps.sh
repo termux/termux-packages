@@ -258,6 +258,7 @@ add_termux_bootstrap_second_stage_files() {
 		-e "s|@TERMUX_PACKAGE_MANAGER@|${TERMUX_PACKAGE_MANAGER}|g" \
 		-e "s|@TERMUX_PACKAGE_ARCH@|${package_arch}|g" \
 		-e "s|@TERMUX_APP__NAME@|${TERMUX_APP__NAME}|g" \
+		-e "s|@TERMUX_ENV__S_TERMUX@|${TERMUX_ENV__S_TERMUX}|g" \
 		"$TERMUX_SCRIPTDIR/scripts/bootstrap/termux-bootstrap-second-stage.sh" \
 		> "${BOOTSTRAP_ROOTFS}/${TERMUX_BOOTSTRAPS__BOOTSTRAP_CONFIG_DIR}/termux-bootstrap-second-stage.sh"
 	chmod 700 "${BOOTSTRAP_ROOTFS}/${TERMUX_BOOTSTRAPS__BOOTSTRAP_CONFIG_DIR}/termux-bootstrap-second-stage.sh"
