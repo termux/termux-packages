@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="ZLIB, GPL-2.0, LGPL-2.1, BSD 3-Clause, MIT"
 TERMUX_PKG_LICENSE_FILE="COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.9.6"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/deadbeef/deadbeef-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=9d77b3d8afdeab5027d24bd18e9cfc04ce7d6ab3ddc043cc8e84c82b41b79c04
 TERMUX_PKG_AUTO_UPDATE=true
@@ -17,6 +17,21 @@ ax_cv_c_flags__msse2=no
 "
 
 termux_step_pre_configure() {
+	declare -a _commits=(
+	d4cca560
+	)
+	declare -a _checksums=(
+	1a2a984af011fe393b6fc4c11a73e9035f23ab070bf6937b28948f130b6a73c8
+	)
+	for i in "${!_commits[@]}"; do
+		PATCHFILE="${TERMUX_PKG_CACHEDIR}/deadbeef_patch_${_commits[i]}.patch"
+		termux_download \
+			"https://github.com/DeaDBeeF-Player/deadbeef/commit/${_commits[i]}.patch" \
+			"$PATCHFILE" \
+			"${_checksums[i]}"
+		patch -p1 -i "$PATCHFILE"
+	done
+
 	autoreconf -fi
 
 	CPPFLAGS+=" -Wno-implicit-function-declaration -D_FILE_OFFSET_BITS=64"
