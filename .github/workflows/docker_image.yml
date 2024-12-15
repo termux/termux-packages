@@ -24,8 +24,6 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v4
-      with:
-        persist-credentials: false
     - name: Build
       run: |
         cd ./scripts
@@ -46,7 +44,6 @@ jobs:
       with:
         username: grimler
         password: ${{ secrets.DOCKER_TOKEN }}
-        persist-credentials: false
     - name: Push
       if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request' && github.repository == 'termux/termux-packages'
       run: |

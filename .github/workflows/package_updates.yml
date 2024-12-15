@@ -37,7 +37,6 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
-          persist-credentials: false
       - name: Gather build summary
         run: |
           BASE_COMMIT=$(jq --raw-output .pull_request.base.sha "$GITHUB_EVENT_PATH")
@@ -138,7 +137,6 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.TERMUXBOT2_TOKEN }}
-          persist-credentials: false
       - name: Free additional disk space
         run: |
           sudo apt purge -yq $(dpkg -l | grep '^ii' | awk '{ print $2 }' | grep -P '(aspnetcore|cabal-|dotnet-|ghc-|libmono|mongodb-|mysql-|php)') \
