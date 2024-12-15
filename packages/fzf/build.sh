@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://junegunn.github.io/fzf/
 TERMUX_PKG_DESCRIPTION="Command-line fuzzy finder"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.56.3"
+TERMUX_PKG_VERSION="0.57.0"
 TERMUX_PKG_SRCURL=https://github.com/junegunn/fzf/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=fc7bf3fcfdc3c9562237d1e82196618201a39b3fd6bf3364149516b288f5a24a
+TERMUX_PKG_SHA256=d4e8e25fad2d3f75943b403c40b61326db74b705bf629c279978fdd0ceb1f97c
 TERMUX_PKG_AUTO_UPDATE=true
 
 # Depend on findutils as fzf uses the -fstype option, which busybox
@@ -49,13 +49,13 @@ termux_step_make_install() {
 	# Install the rest of the shell scripts:
 	mkdir -p $TERMUX_PREFIX/share/fzf
 	cp $TERMUX_PKG_SRCDIR/shell/* $TERMUX_PREFIX/share/fzf/
-	
+
 	# Symlink shell completions.
 	mkdir -p $TERMUX_PREFIX/share/bash-completion/completions/
 	ln -sfr $TERMUX_PREFIX/share/fzf/completion.bash $TERMUX_PREFIX/share/bash-completion/completions/fzf
 	mkdir -p $TERMUX_PREFIX/share/zsh/site-functions
 	ln -sfr $TERMUX_PREFIX/share/fzf/completion.zsh $TERMUX_PREFIX/share/zsh/site-functions/_fzf
-	
+
 	# Fish keybindings.
 	mkdir -p $TERMUX_PREFIX/share/fish/vendor_functions.d
 	ln -sfr $TERMUX_PREFIX/share/fzf/key-bindings.fish $TERMUX_PREFIX/share/fish/vendor_functions.d/fzf_key_bindings.fish
