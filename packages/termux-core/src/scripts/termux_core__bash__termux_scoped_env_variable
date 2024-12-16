@@ -452,7 +452,8 @@ converted to a command array cannot contain a newline '\n' character:" 1>&2
                 # on `libalteran-sh` `bash___shell__set_is_xargs_command_args_parsing_valid()`
                 # function, check it for explanation.
                 return_value=0
-                xargs_command_output="$(printf "%s" "'' 'arg' '' 'arg with space' 'arg surround by single quote' \"arg surround by double quote\" 'arg with '\'' single quote' 'arg with \" double quote' 'arg with \" double quote surround by single quote' \"arg with ' single quote surround by double quote\" arg\ with\ escaped\ space 'arg with backslash \\ and forward slash / surround by single quote' \"arg with backslash \\ and forward slash / surround by double quote\" \\/ \\\\ ''" | \
+                xargs_command_output="$(termux_core__bash__trim_env_for_xargs && \
+                    printf "%s" "'' 'arg' '' 'arg with space' 'arg surround by single quote' \"arg surround by double quote\" 'arg with '\'' single quote' 'arg with \" double quote' 'arg with \" double quote surround by single quote' \"arg with ' single quote surround by double quote\" arg\ with\ escaped\ space 'arg with backslash \\ and forward slash / surround by single quote' \"arg with backslash \\ and forward slash / surround by double quote\" \\/ \\\\ ''" | \
                     xargs -r -n1 -- printf "%s\n" && echo -n x)" || return_value=$?
                 if [ $return_value -ne 0 ]; then
                     echo "Failed to check if xargs command args parsing is valid." 1>&2
@@ -477,8 +478,9 @@ shell special characters and 'xargs' command args parsing is not valid:" 1>&2
             return_value=0
             while IFS= read -r command_arg; return_value=$?; [[ $return_value -eq 0 ]]; do
                 command_args_array+=("$command_arg")
-            done < <(printf "%s\n" "$command_args_string" | \
-                xargs -r -n1 -- printf "%s\n" || echo -n "CMD_ERROR")
+            done < <({ termux_core__bash__trim_env_for_xargs && \
+                printf "%s\n" "$command_args_string" | \
+                xargs -r -n1 -- printf "%s\n"; } || echo -n "CMD_ERROR")
             if [[ -n "${command_arg:-}" ]] || [ $return_value -ne 1 ]; then
                 echo "Failed to create command array for \
 command arguments string \`$command_args_string\`." 1>&2
@@ -510,6 +512,47 @@ command arguments string \`$command_args_string\`." 1>&2
     unset -n  command_args_array || return $?
 
     return 0
+
+}
+
+##
+# Trim exported environment variables before running `xargs` to
+# prevent `environment is too large for exec` error on Android `< 6`.
+#
+# On Android `5`, `getconf ARG_MAX` equals `4096` and `xargs` always
+# fails to run.
+#
+# Only `PATH`, `$LD_LIBRARY_PATH` and `$LD_PRELOAD` variables are kept.
+#
+# - https://www.gnu.org/software/findutils/manual/html_node/find_html/Error-Messages-From-xargs.html
+##
+termux_core__bash__trim_env_for_xargs() {
+
+    # Find android sdk/os version.
+    # Termux app exports ANDROID__BUILD_VERSION_SDK for `>= v0.119.0`.
+    if [[ ! "$ANDROID__BUILD_VERSION_SDK" =~ ^[0-9]+$ ]]; then
+        local return_value
+        ANDROID__BUILD_VERSION_SDK="$(unset LD_LIBRARY_PATH; unset LD_PRELOAD; getprop "ro.build.version.sdk")"
+        return_value=$?
+        if [ $return_value -ne 0 ] || [[ ! "$ANDROID__BUILD_VERSION_SDK" =~ ^[0-9]+$ ]]; then
+            echo "Failure while finding 'ro.build.version.sdk' property" 1>&2
+            echo "ANDROID__BUILD_VERSION_SDK='$ANDROID__BUILD_VERSION_SDK'" 1>&2
+            if [ $return_value -eq 0 ]; then
+                return_value=1
+            fi
+            return $return_value
+        fi
+    fi
+
+    # If on Android `< 6`
+    if [ "$ANDROID__BUILD_VERSION_SDK" -lt 25 ]; then
+        local env_variables
+        env_variables="$(compgen -e | grep -v -E "^PATH|LD_LIBRARY_PATH|LD_PRELOAD$")" || return $?
+        if [ -n "$env_variables" ]; then
+            # shellcheck disable=SC2086
+            unset $env_variables
+        fi
+    fi
 
 }
 
