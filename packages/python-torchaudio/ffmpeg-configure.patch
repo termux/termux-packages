@@ -1,0 +1,51 @@
++++ ./ffmpeg-6.1.2/configure
+@@ -5336,13 +5336,9 @@
+         striptype=""
+         ;;
+     android)
+-        disable symver
+         enable section_data_rel_ro
+         add_cflags -fPIE
+         add_ldexeflags -fPIE -pie
+-        SLIB_INSTALL_NAME='$(SLIBNAME)'
+-        SLIB_INSTALL_LINKS=
+-        SHFLAGS='-shared -Wl,-soname,$(SLIBNAME)'
+         ;;
+     haiku)
+         prefix_default="/boot/common"
++++ ./ffmpeg-6.1.2/libavcodec/allcodecs.c
+@@ -154,7 +154,6 @@
+ extern const FFCodec ff_h264_crystalhd_decoder;
+ extern const FFCodec ff_h264_v4l2m2m_decoder;
+ extern const FFCodec ff_h264_mediacodec_decoder;
+-extern const FFCodec ff_h264_mediacodec_encoder;
+ extern const FFCodec ff_h264_mmal_decoder;
+ extern const FFCodec ff_h264_qsv_decoder;
+ extern const FFCodec ff_h264_rkmpp_decoder;
+@@ -850,6 +849,7 @@
+ extern const FFCodec ff_libopenh264_decoder;
+ extern const FFCodec ff_h264_amf_encoder;
+ extern const FFCodec ff_h264_cuvid_decoder;
++extern const FFCodec ff_h264_mediacodec_encoder;
+ extern const FFCodec ff_h264_mf_encoder;
+ extern const FFCodec ff_h264_nvenc_encoder;
+ extern const FFCodec ff_h264_omx_encoder;
++++ ./ffmpeg-6.1.2/libavutil/file_open.c
+@@ -119,7 +119,7 @@
+ #undef free
+     free(ptr);
+ #else
+-    size_t len = strlen(prefix) + 12; /* room for "/tmp/" and "XXXXXX\0" */
++    size_t len = strlen(prefix) + strlen("@TERMUX_PREFIX@/tmp/") + 7; /* room for "@TERMUX_PREFIX@/tmp/" and "XXXXXX\0" */
+     *filename  = av_malloc(len);
+ #endif
+     /* -----common section-----*/
+@@ -136,7 +136,7 @@
+ #   endif
+     fd = open(*filename, O_RDWR | O_BINARY | O_CREAT | O_EXCL, 0600);
+ #else
+-    snprintf(*filename, len, "/tmp/%sXXXXXX", prefix);
++    snprintf(*filename, len, "@TERMUX_PREFIX@/tmp/%sXXXXXX", prefix);
+     fd = mkstemp(*filename);
+ #if defined(_WIN32) || defined (__ANDROID__)
+     if (fd < 0) {
