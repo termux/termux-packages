@@ -9,10 +9,10 @@
 +#include <unistd.h>
 +#endif
 +
- #include <libxfce4util/libxfce4util.h>
+ #include <gdk/gdkx.h>
  #include <libxfce4ui/libxfce4ui.h>
- 
-@@ -182,10 +187,113 @@
+ #include <libxfce4util/libxfce4util.h>
+@@ -180,10 +185,113 @@
    return remove_duplicate_whitespace (pretty);
  }
  
@@ -102,7 +102,7 @@
 +  result_str = guess_cpu_info_from_proc_cpuinfo(info->ncpu);
 +  if (result_str != NULL)
 +    return result_str;
-+
+ 
 +  // Guess from glibtop
 +  result_str = guess_cpu_info_from_glibtop(info);
 +  if (result_str != NULL)
@@ -112,7 +112,7 @@
 +  result_str = guess_cpu_info_from_prop(info->ncpu);
 +  if (result_str != NULL)
 +    return result_str;
- 
++
 +  return cpu_info_from_compiler(info->ncpu);
 +}
 +#endif
@@ -124,9 +124,9 @@
  get_cpu_info (const glibtop_sysinfo *info)
 +#endif
  {
-   g_autoptr(GHashTable) counts = NULL;
-   g_autoptr(GString) cpu = NULL;
-@@ -236,7 +344,13 @@
+   g_autoptr (GHashTable) counts = NULL;
+   g_autoptr (GString) cpu = NULL;
+@@ -234,7 +342,13 @@
          g_string_append_printf (cpu, "%s ", cleanedup);
      }
  
