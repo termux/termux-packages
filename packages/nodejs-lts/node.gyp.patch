@@ -1,7 +1,6 @@
-diff -uNr node-v20.17.0/node.gyp node-v20.17.0.mod/node.gyp
---- node-v20.17.0/node.gyp	2024-08-21 15:35:29.000000000 +0300
-+++ node-v20.17.0.mod/node.gyp	2024-09-08 02:14:28.718416719 +0300
-@@ -529,7 +529,8 @@
+--- ./node.gyp.orig	2024-12-02 16:39:38.000000000 +0530
++++ ./node.gyp	2024-12-17 18:14:55.840513355 +0530
+@@ -558,7 +558,8 @@
        ],
  
        'sources': [
@@ -11,7 +10,7 @@ diff -uNr node-v20.17.0/node.gyp node-v20.17.0.mod/node.gyp
        ],
  
        'dependencies': [
-@@ -1008,296 +1009,6 @@
+@@ -1041,298 +1042,6 @@
          },
        ],
      }, # node_lib_target_name
@@ -21,8 +20,8 @@ diff -uNr node-v20.17.0/node.gyp node-v20.17.0.mod/node.gyp
 -      'dependencies': [
 -        '<(node_lib_target_name)',
 -        'deps/histogram/histogram.gyp:histogram',
--        'deps/uvwasi/uvwasi.gyp:uvwasi',
 -      ],
+-
 -      'includes': [
 -        'node.gypi'
 -      ],
@@ -32,9 +31,9 @@ diff -uNr node-v20.17.0/node.gyp node-v20.17.0.mod/node.gyp
 -        'deps/v8/include',
 -        'deps/cares/include',
 -        'deps/uv/include',
--        'deps/uvwasi/include',
 -        'test/cctest',
 -      ],
+-
 -      'defines': [
 -        'NODE_ARCH="<(target_arch)"',
 -        'NODE_PLATFORM="<(OS)"',
@@ -110,6 +109,7 @@ diff -uNr node-v20.17.0/node.gyp node-v20.17.0.mod/node.gyp
 -        'deps/histogram/histogram.gyp:histogram',
 -        'deps/uvwasi/uvwasi.gyp:uvwasi',
 -        'deps/ada/ada.gyp:ada',
+-        'deps/nbytes/nbytes.gyp:nbytes',
 -      ],
 -      'includes': [
 -        'node.gypi'
@@ -152,13 +152,13 @@ diff -uNr node-v20.17.0/node.gyp node-v20.17.0.mod/node.gyp
 -
 -      'dependencies': [
 -        '<(node_lib_target_name)',
--        'deps/base64/base64.gyp:base64',
 -        'deps/googletest/googletest.gyp:gtest',
 -        'deps/googletest/googletest.gyp:gtest_main',
 -        'deps/histogram/histogram.gyp:histogram',
--        'deps/uvwasi/uvwasi.gyp:uvwasi',
+-        'deps/simdjson/simdjson.gyp:simdjson',
 -        'deps/simdutf/simdutf.gyp:simdutf',
 -        'deps/ada/ada.gyp:ada',
+-        'deps/nbytes/nbytes.gyp:nbytes',
 -      ],
 -
 -      'includes': [
@@ -171,7 +171,6 @@ diff -uNr node-v20.17.0/node.gyp node-v20.17.0.mod/node.gyp
 -        'deps/v8/include',
 -        'deps/cares/include',
 -        'deps/uv/include',
--        'deps/uvwasi/include',
 -        'test/cctest',
 -      ],
 -
@@ -187,6 +186,9 @@ diff -uNr node-v20.17.0/node.gyp node-v20.17.0.mod/node.gyp
 -        [ 'node_use_openssl=="true"', {
 -          'defines': [
 -            'HAVE_OPENSSL=1',
+-          ],
+-          'dependencies': [
+-            'deps/ncrypto/ncrypto.gyp:ncrypto',
 -          ],
 -          'sources': [ '<@(node_cctest_openssl_sources)' ],
 -        }],
@@ -233,8 +235,8 @@ diff -uNr node-v20.17.0/node.gyp node-v20.17.0.mod/node.gyp
 -      'dependencies': [
 -        '<(node_lib_target_name)',
 -        'deps/histogram/histogram.gyp:histogram',
--        'deps/uvwasi/uvwasi.gyp:uvwasi',
 -        'deps/ada/ada.gyp:ada',
+-        'deps/nbytes/nbytes.gyp:nbytes',
 -      ],
 -
 -      'includes': [
@@ -248,7 +250,6 @@ diff -uNr node-v20.17.0/node.gyp node-v20.17.0.mod/node.gyp
 -        'deps/v8/include',
 -        'deps/cares/include',
 -        'deps/uv/include',
--        'deps/uvwasi/include',
 -        'test/embedding',
 -      ],
 -
@@ -308,7 +309,7 @@ diff -uNr node-v20.17.0/node.gyp node-v20.17.0.mod/node.gyp
      {
        'target_name': 'node_js2c',
        'type': 'executable',
-@@ -1334,69 +1045,7 @@
+@@ -1369,73 +1078,6 @@
          }],
        ]
      },
@@ -319,8 +320,10 @@ diff -uNr node-v20.17.0/node.gyp node-v20.17.0.mod/node.gyp
 -      'dependencies': [
 -        '<(node_lib_target_name)',
 -        'deps/histogram/histogram.gyp:histogram',
--        'deps/uvwasi/uvwasi.gyp:uvwasi',
 -        'deps/ada/ada.gyp:ada',
+-        'deps/nbytes/nbytes.gyp:nbytes',
+-        'deps/simdjson/simdjson.gyp:simdjson',
+-        'deps/simdutf/simdutf.gyp:simdutf',
 -      ],
 -
 -      'includes': [
@@ -333,11 +336,10 @@ diff -uNr node-v20.17.0/node.gyp node-v20.17.0.mod/node.gyp
 -        'deps/v8/include',
 -        'deps/cares/include',
 -        'deps/uv/include',
--        'deps/uvwasi/include',
 -      ],
 -
 -      'defines': [ 'NODE_WANT_INTERNALS=1' ],
- 
+-
 -      'sources': [
 -        'src/node_snapshot_stub.cc',
 -        'tools/snapshot/node_mksnapshot.cc',
@@ -348,6 +350,9 @@ diff -uNr node-v20.17.0/node.gyp node-v20.17.0.mod/node.gyp
 -          'defines': [ 'NODE_MKSNAPSHOT_USE_ARRAY_LITERALS=1' ],
 -        }],
 -        [ 'node_use_openssl=="true"', {
+-          'dependencies': [
+-            'deps/ncrypto/ncrypto.gyp:ncrypto',
+-          ],
 -          'defines': [
 -            'HAVE_OPENSSL=1',
 -          ],
