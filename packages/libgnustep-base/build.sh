@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://www.gnustep.org
+TERMUX_PKG_HOMEPAGE=https://www.gnustep.org
 TERMUX_PKG_DESCRIPTION="A library of general-purpose, non-graphical Objective C objects"
 TERMUX_PKG_LICENSE="GPL-2.0, LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"

@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://x3270.bgp.nu/
+TERMUX_PKG_HOMEPAGE=https://x3270.bgp.nu/
 TERMUX_PKG_DESCRIPTION="A family of IBM 3270 terminal emulators and related tools"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_LICENSE_FILE="include/copyright.h"

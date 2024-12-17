@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://www.gnustep.org
+TERMUX_PKG_HOMEPAGE=https://www.gnustep.org
 TERMUX_PKG_DESCRIPTION="The GNUstep makefile package"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"

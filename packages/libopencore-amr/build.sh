@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://sourceforge.net/projects/opencore-amr
+TERMUX_PKG_HOMEPAGE=https://sourceforge.net/projects/opencore-amr/
 TERMUX_PKG_DESCRIPTION="Open source implementation of the Adaptive Multi Rate (AMR) speech codec"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE"

@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://sourceforge.net/projects/socks-relay
+TERMUX_PKG_HOMEPAGE=https://sourceforge.net/projects/socks-relay/
 TERMUX_PKG_DESCRIPTION="A Free SOCKS proxy server"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="@termux"

@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE="https://sourceforge.net/projects/tinyxml"
+TERMUX_PKG_HOMEPAGE="https://sourceforge.net/projects/tinyxml/"
 TERMUX_PKG_DESCRIPTION="A simple, small, C++ XML parser"
 TERMUX_PKG_LICENSE="ZLIB"
 TERMUX_PKG_LICENSE_FILE="readme.txt"

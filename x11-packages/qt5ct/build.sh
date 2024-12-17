@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://sourceforge.net/projects/qt5ct
+TERMUX_PKG_HOMEPAGE=https://sourceforge.net/projects/qt5ct/
 TERMUX_PKG_DESCRIPTION="Qt5 Configuration Tool"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
