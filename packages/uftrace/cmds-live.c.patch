@@ -1,20 +1,14 @@
 --- a/cmds/live.c
 +++ b/cmds/live.c
-@@ -237,7 +237,7 @@
- int command_live(int argc, char *argv[], struct uftrace_opts *opts)
- {
+@@ -14,9 +14,9 @@
+ #include "utils/utils.h"
+ 
  #define LIVE_NAME "uftrace-live-XXXXXX"
--	char template[32] = "/tmp/" LIVE_NAME;
-+	char template[strlen("@TERMUX_PREFIX@") + 32] = "@TERMUX_PREFIX@/tmp/" LIVE_NAME;
- 	int fd;
- 	struct sigaction sa = {
- 		.sa_flags = SA_RESETHAND,
-@@ -253,7 +253,7 @@
- 			strcpy(template, LIVE_NAME);
+-#define TMP_LIVE_NAME "/tmp/" LIVE_NAME
++#define TMP_LIVE_NAME "@TERMUX_PREFIX@/tmp/" LIVE_NAME
  
- 			if (errno != EPERM && errno != ENOENT)
--				pr_err("cannot access to /tmp");
-+				pr_err("cannot access to @TERMUX_PREFIX@/tmp");
+-#define TMP_DIR_NAME_SIZE 32
++#define TMP_DIR_NAME_SIZE (strlen("@TERMUX_PREFIX@") + 32)
  
- 			fd = mkstemp(template);
- 
+ static char tmp_dirname[TMP_DIR_NAME_SIZE];
+ static void cleanup_tempdir(void)
