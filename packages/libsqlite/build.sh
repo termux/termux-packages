@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Library implementing a self-contained and transactional 
 TERMUX_PKG_LICENSE="Public Domain"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.47.2"
+TERMUX_PKG_REVISION=1
 _SQLITE_YEAR=2024
 TERMUX_PKG_SRCURL=https://www.sqlite.org/${_SQLITE_YEAR}/sqlite-autoconf-$(sed 's/\./''/; s/\./0/' <<< "$TERMUX_PKG_VERSION")00.tar.gz
 TERMUX_PKG_SHA256=f1b2ee412c28d7472bc95ba996368d6f0cdcf00362affdadb27ed286c179540b
@@ -14,6 +15,7 @@ TERMUX_PKG_REPLACES="libsqlite-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-readline
 --enable-fts3
+--enable-session
 "
 
 termux_step_pre_configure() {
