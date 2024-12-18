@@ -15,9 +15,15 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-vendor-info=Termux
 --disable-debug
 --enable-introspection=yes
+--enable-epoxy
 --enable-vala=no
 --enable-gladeui2=no
+--enable-glibtop
 --enable-gtk-doc-html=no
+--enable-libsm
+--enable-startup-notification
+--enable-x11
+--enable-wayland
 "
 
 termux_step_pre_configure() {
