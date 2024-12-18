@@ -17,6 +17,22 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS='
 -DSTACKTRACE=OFF
 '
 
+# ncdu-style auto update function
+termux_pkg_auto_update() {
+	local latest_release
+	latest_release="$(git ls-remote --tags https://github.com/qbittorrent/qBittorrent.git \
+	| grep -oP "refs/tags/release-\K${TERMUX_PKG_UPDATE_VERSION_REGEXP}$" \
+	| sort -V \
+	| tail -n1)"
+
+	if [[ "${latest_release}" == "${TERMUX_PKG_VERSION}" ]]; then
+		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
+		return
+	fi
+
+	termux_pkg_upgrade_version "${latest_release}"
+}
+
 # based on the secondary `-shared` build in `libncnn`
 termux_step_post_make_install() {
 	echo -e "termux - building qbittorrent-nox for arch ${TERMUX_ARCH}..."
