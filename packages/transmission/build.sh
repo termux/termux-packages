@@ -8,6 +8,7 @@ TERMUX_PKG_VERSION="4.0.6"
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/transmission/transmission
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
 TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
 TERMUX_PKG_DEPENDS="libc++, libcurl, libevent, libpsl, miniupnpc, natpmpc, openssl"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
