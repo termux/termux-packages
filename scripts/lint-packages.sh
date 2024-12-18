@@ -202,7 +202,7 @@ lint_package() {
 
 	echo -n "Trailing whitespace check: "
 	local trailing_whitespace
-	trailing_whitespace=$(grep -Hn ' $' "$package_script")
+	trailing_whitespace=$(grep -Hn '[[:blank:]]$' "$package_script")
 	if (( ${#trailing_whitespace} )); then
 		echo -e "FAILED\n\n${trailing_whitespace}\n"
 		return 1
