@@ -1,11 +1,48 @@
---- a/shairport.c
-+++ b/shairport.c
-@@ -945,7 +945,7 @@
- #ifdef USE_CUSTOM_PID_DIR
-   char *use_this_pid_dir = PIDDIR;
- #else
--  char *use_this_pid_dir = "/var/run/shairport-sync";
-+  char *use_this_pid_dir = "@TERMUX_PREFIX@/var/run/shairport-sync";
++++ ./shairport.c
+@@ -301,7 +301,7 @@
+     printf("                            The \"soxr\" option is only available if built with soxr support.\n");
+     printf("    -B, --on-start=PROGRAM  Run PROGRAM when playback is about to begin.\n");
+     printf("    -E, --on-stop=PROGRAM   Run PROGRAM when playback has ended.\n");
+-    printf("                            For -B and -E options, specify the full path to the program and arguments, e.g. \"/usr/bin/logger\".\n");
++    printf("                            For -B and -E options, specify the full path to the program and arguments, e.g. \"@TERMUX_PREFIX@/bin/logger\".\n");
+     printf("                            Executable scripts work, but the file must be marked executable have the appropriate shebang (#!/bin/sh) on the first line.\n");
+     printf("    -w, --wait-cmd          Wait until the -B or -E programs finish before continuing.\n");
+     printf("    -o, --output=BACKEND    Select audio backend. They are listed at the end of this text. The first one is the default.\n");
+@@ -319,8 +319,8 @@
  #endif
-   // debug(1,"config.piddir \"%s\".",config.piddir);
-   if (config.piddir)
+ #ifdef CONFIG_METADATA
+     printf("    -M, --metadata-enable   Ask for metadata from the source and process it. Much more flexibility with configuration file settings.\n");
+-    printf("    --metadata-pipename=PIPE send metadata to PIPE, e.g. --metadata-pipename=/tmp/%s-metadata.\n", config.appName);
+-    printf("                            The default is /tmp/%s-metadata.\n", config.appName);
++    printf("    --metadata-pipename=PIPE send metadata to PIPE, e.g. --metadata-pipename=@TERMUX_PREFIX@/tmp/%s-metadata.\n", config.appName);
++    printf("                            The default is @TERMUX_PREFIX@/tmp/%s-metadata.\n", config.appName);
+     printf("    -g, --get-coverart      Include cover art in the metadata to be gathered and sent.\n");
+ #endif
+     printf("    --log-to-syslog         Send debug and statistics information through syslog\n");
+@@ -512,7 +512,7 @@
+   config.loudness_reference_volume_db = -20;
+ 
+ #ifdef CONFIG_METADATA_HUB
+-  config.cover_art_cache_dir = "/tmp/shairport-sync/.cache/coverart";
++  config.cover_art_cache_dir = "@TERMUX_PREFIX@/tmp/shairport-sync/.cache/coverart";
+   config.scan_interval_when_active =
+       1; // number of seconds between DACP server scans when playing something
+   config.scan_interval_when_inactive =
+@@ -1463,7 +1463,7 @@
+ #ifdef CONFIG_METADATA
+   if ((config.metadata_enabled == 1) && (config.metadata_pipename == NULL)) {
+     char temp_metadata_pipe_name[4096];
+-    strcpy(temp_metadata_pipe_name, "/tmp/");
++    strcpy(temp_metadata_pipe_name, "@TERMUX_PREFIX@/tmp/");
+     strcat(temp_metadata_pipe_name, config.appName);
+     strcat(temp_metadata_pipe_name, "-metadata");
+     config.metadata_pipename = strdup(temp_metadata_pipe_name);
+@@ -1779,7 +1779,7 @@
+     }
+   }
+ 
+-  fp = popen("(cat /etc/os-release | grep PRETTY_NAME | sed 's/PRETTY_NAME=//' | sed 's/\"//g') "
++  fp = popen("(echo Termux) "
+              "2>/dev/null",
+              "r");
+   if (fp != NULL) {
