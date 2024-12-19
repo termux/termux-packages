@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://emersion.pages.freedesktop.org/libdisplay-info/
+TERMUX_PKG_DESCRIPTION="EDID and DisplayID library"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="0.2.0"
+TERMUX_PKG_SRCURL=https://gitlab.freedesktop.org/emersion/libdisplay-info/-/releases/${TERMUX_PKG_VERSION}/downloads/libdisplay-info-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=5a2f002a16f42dd3540c8846f80a90b8f4bdcd067a94b9d2087bc2feae974176
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_BUILD_DEPENDS="hwdata"
