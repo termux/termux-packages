@@ -1,31 +1,20 @@
---- xfce4-session-4.12.1/xfce4-session/xfsm-shutdown-fallback.c	2014-12-07 13:18:40.000000000 +0530
-+++ xfce4-session/xfce4-session/xfsm-shutdown-fallback.c	2019-02-04 11:10:01.104865553 +0530
-@@ -172,27 +172,7 @@
+--- a/xfce4-session/xfsm-shutdown-fallback.c
++++ b/xfce4-session/xfsm-shutdown-fallback.c
+@@ -172,6 +172,7 @@
  static gboolean
  linux_supports_sleep_state (const gchar *state)
  {
--  gboolean ret = FALSE;
--  gchar *command;
--  GError *error = NULL;
--  gint exit_status;
--
--  /* run script from pm-utils */
--  command = g_strdup_printf ("/usr/bin/pm-is-supported --%s", state);
--
--  ret = g_spawn_command_line_sync (command, NULL, NULL, &exit_status, &error);
--  if (!ret)
--    {
--      g_warning ("failed to run script: %s", error->message);
--      g_error_free (error);
--      goto out;
--    }
--  ret = (WIFEXITED(exit_status) && (WEXITSTATUS(exit_status) == EXIT_SUCCESS));
--
--out:
--  g_free (command);
--
--  return ret;
++#ifndef __ANDROID__
+   gboolean ret = FALSE;
+   gchar *command;
+   GError *error = NULL;
+@@ -193,6 +194,9 @@ out:
+   g_free (command);
+ 
+   return ret;
++#else
 +  return FALSE;
++#endif
  }
  #endif /* BACKEND_TYPE_LINUX */
  
