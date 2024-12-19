@@ -1,0 +1,127 @@
+diff --git a/Makefile b/Makefile
+index f43c9dbc..6d8e4fff 100644
+--- a/Makefile
++++ b/Makefile
+@@ -31,6 +31,7 @@ LIBDIR?=$(PREFIX)/lib
+ JANET_BUILD?="\"$(shell git log --pretty=format:'%h' -n 1 2> /dev/null || echo local)\""
+ CLIBS=-lm -lpthread
+ JANET_TARGET=build/janet
++JANET_HOST_TARGET=build/janet_host
+ JANET_BOOT=build/janet_boot
+ JANET_IMPORT_LIB=build/janet.lib
+ JANET_LIBRARY_IMPORT_LIB=build/libjanet.lib
+@@ -42,6 +43,7 @@ JANET_PKG_CONFIG_PATH?=$(LIBDIR)/pkgconfig
+ JANET_DIST_DIR?=janet-dist
+ JANET_BOOT_FLAGS:=. JANET_PATH '$(JANET_PATH)'
+ JANET_TARGET_OBJECTS=build/janet.o build/shell.o
++JANET_HOST_TARGET_OBJECTS=build/janet_host.o build/shell_host.o
+ JPM_TAG?=master
+ SPORK_TAG?=master
+ HAS_SHARED?=1
+@@ -54,7 +56,7 @@ HOSTAR?=$(AR)
+ # Symbols are (optionally) removed later, keep -g as default!
+ CFLAGS?=-O2 -g
+ LDFLAGS?=-rdynamic
+-LIBJANET_LDFLAGS?=$(LD_FLAGS)
++LIBJANET_LDFLAGS?=$(LDFLAGS)
+ RUN:=$(RUN)
+ 
+ COMMON_CFLAGS:=-std=c99 -Wall -Wextra -Isrc/include -Isrc/conf -fvisibility=hidden -fPIC
+@@ -184,10 +186,10 @@ JANET_BOOT_OBJECTS=$(patsubst src/%.c,build/%.boot.o,$(JANET_CORE_SOURCES) $(JAN
+ $(JANET_BOOT_OBJECTS): $(JANET_BOOT_HEADERS)
+ 
+ build/%.boot.o: src/%.c $(JANET_HEADERS) $(JANET_LOCAL_HEADERS) Makefile
+-	$(CC) $(BOOT_CFLAGS) -o $@ -c $<
++	$(HOSTCC) $(BOOT_CFLAGS) -o $@ -c $<
+ 
+ $(JANET_BOOT): $(JANET_BOOT_OBJECTS)
+-	$(CC) $(BOOT_CFLAGS) -o $@ $(JANET_BOOT_OBJECTS) $(CLIBS)
++	$(HOSTCC) $(BOOT_CFLAGS) -o $@ $(JANET_BOOT_OBJECTS) $(CLIBS)
+ 
+ # Now the reason we bootstrap in the first place
+ build/c/janet.c: $(JANET_BOOT) src/boot/boot.janet
+@@ -199,7 +201,7 @@ build/c/janet.c: $(JANET_BOOT) src/boot/boot.janet
+ ##################
+ 
+ build/%.bin.o: src/%.c $(JANET_HEADERS) $(JANET_LOCAL_HEADERS) Makefile
+-	$(HOSTCC) $(BUILD_CFLAGS) -o $@ -c $<
++	$(CC) $(BUILD_CFLAGS) -o $@ -c $<
+ 
+ ########################
+ ##### Amalgamation #####
+@@ -211,29 +213,38 @@ else
+ SONAME=libjanet.so.1.37
+ endif
+ 
++build/janet_host.o: build/c/janet.c $(JANETCONF_HEADER) src/include/janet.h
++	$(HOSTCC) $(BUILD_CFLAGS) -c $< -o $@
++
++build/shell_host.o: build/c/shell.c $(JANETCONF_HEADER) src/include/janet.h
++	$(HOSTCC) $(BUILD_CFLAGS) -c $< -o $@
++
++$(JANET_HOST_TARGET): $(JANET_HOST_TARGET_OBJECTS)
++	$(HOSTCC) $(LDFLAGS) $(BUILD_CFLAGS) -o $@ $^ $(CLIBS)
++
+ build/c/shell.c: src/mainclient/shell.c
+ 	cp $< $@
+ 
+-build/janet.h: $(JANET_TARGET) src/include/janet.h $(JANETCONF_HEADER)
+-	$(RUN) ./$(JANET_TARGET) tools/patch-header.janet src/include/janet.h $(JANETCONF_HEADER) $@
++build/janet.h: $(JANET_HOST_TARGET) src/include/janet.h $(JANETCONF_HEADER)
++	$(RUN) ./$(JANET_HOST_TARGET) tools/patch-header.janet src/include/janet.h $(JANETCONF_HEADER) $@
+ 
+ build/janetconf.h: $(JANETCONF_HEADER)
+ 	cp $< $@
+ 
+ build/janet.o: build/c/janet.c $(JANETCONF_HEADER) src/include/janet.h
+-	$(HOSTCC) $(BUILD_CFLAGS) -c $< -o $@
++	$(CC) $(BUILD_CFLAGS) -c $< -o $@
+ 
+ build/shell.o: build/c/shell.c $(JANETCONF_HEADER) src/include/janet.h
+-	$(HOSTCC) $(BUILD_CFLAGS) -c $< -o $@
++	$(CC) $(BUILD_CFLAGS) -c $< -o $@
+ 
+ $(JANET_TARGET): $(JANET_TARGET_OBJECTS)
+-	$(HOSTCC) $(LDFLAGS) $(BUILD_CFLAGS) -o $@ $^ $(CLIBS)
++	$(CC) $(LDFLAGS) $(BUILD_CFLAGS) -o $@ $^ $(CLIBS)
+ 
+ $(JANET_LIBRARY): $(JANET_TARGET_OBJECTS)
+-	$(HOSTCC) $(LIBJANET_LDFLAGS) $(BUILD_CFLAGS) $(SONAME_SETTER)$(SONAME) -shared -o $@ $^ $(CLIBS)
++	$(CC) $(LIBJANET_LDFLAGS) $(BUILD_CFLAGS) $(SONAME_SETTER)$(SONAME) -shared -o $@ $^ $(CLIBS)
+ 
+ $(JANET_STATIC_LIBRARY): $(JANET_TARGET_OBJECTS)
+-	$(HOSTAR) rcs $@ $^
++	$(AR) rcs $@ $^
+ 
+ ###################
+ ##### Testing #####
+@@ -307,7 +318,7 @@ build/doc.html: $(JANET_TARGET) tools/gendoc.janet
+ ########################
+ 
+ .INTERMEDIATE: build/janet.pc
+-build/janet.pc: $(JANET_TARGET)
++build/janet.pc: $(JANET_HOST_TARGET)
+ 	echo 'prefix=$(PREFIX)' > $@
+ 	echo 'exec_prefix=$${prefix}' >> $@
+ 	echo 'includedir=$(INCLUDEDIR)/janet' >> $@
+@@ -316,7 +327,7 @@ build/janet.pc: $(JANET_TARGET)
+ 	echo "Name: janet" >> $@
+ 	echo "Url: https://janet-lang.org" >> $@
+ 	echo "Description: Library for the Janet programming language." >> $@
+-	$(RUN) $(JANET_TARGET) -e '(print "Version: " janet/version)' >> $@
++	$(RUN) $(JANET_HOST_TARGET) -e '(print "Version: " janet/version)' >> $@
+ 	echo 'Cflags: -I$${includedir}' >> $@
+ 	echo 'Libs: -L$${libdir} -ljanet' >> $@
+ 	echo 'Libs.private: $(CLIBS)' >> $@
+@@ -335,9 +346,9 @@ install: $(JANET_TARGET) $(JANET_LIBRARY) $(JANET_STATIC_LIBRARY) build/janet.pc
+ 		ln -sf $(SONAME) '$(DESTDIR)$(LIBDIR)/libjanet.dylib' ; \
+ 		ln -sf libjanet.$(shell $(JANET_TARGET) -e '(print janet/version)').dylib $(DESTDIR)$(LIBDIR)/$(SONAME) ; \
+ 	else \
+-		cp $(JANET_LIBRARY) '$(DESTDIR)$(LIBDIR)/libjanet.so.$(shell $(JANET_TARGET) -e '(print janet/version)')' ; \
++		cp $(JANET_LIBRARY) '$(DESTDIR)$(LIBDIR)/libjanet.so.$(shell $(JANET_HOST_TARGET) -e '(print janet/version)')' ; \
+ 		ln -sf $(SONAME) '$(DESTDIR)$(LIBDIR)/libjanet.so' ; \
+-		ln -sf libjanet.so.$(shell $(JANET_TARGET) -e '(print janet/version)') $(DESTDIR)$(LIBDIR)/$(SONAME) ; \
++		ln -sf libjanet.so.$(shell $(JANET_HOST_TARGET) -e '(print janet/version)') $(DESTDIR)$(LIBDIR)/$(SONAME) ; \
+ 	fi
+ 	cp $(JANET_STATIC_LIBRARY) '$(DESTDIR)$(LIBDIR)/libjanet.a'
+ 	mkdir -p '$(DESTDIR)$(JANET_MANPATH)'
