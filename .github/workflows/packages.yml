@@ -197,14 +197,6 @@ jobs:
       env:
         DOCKER_BUILD: ${{ steps.build-info.outputs.docker-build }}
       run: |
-        declare -a packages
-        for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
-          repo=$(jq --raw-output '.["'${repo_path}'"].name' repo.json)
-          if [ -f ./built_${repo}_packages.txt ]; then
-            packages="$packages $(cat ./built_${repo}_packages.txt | tr '\n' ' ')"
-          fi
-        done
-
         if [ "$DOCKER_BUILD" == 'false' ]; then
           ./scripts/setup-ubuntu.sh
           sudo apt install ninja-build
