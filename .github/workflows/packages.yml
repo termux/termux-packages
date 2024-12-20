@@ -248,10 +248,12 @@ jobs:
 
           # Move only debs from built_packages into debs/ folder before
           # creating an archive.
-          while read -r pkg; do
-            # Match both $pkg.deb and $pkg-static.deb.
-            find output \( -name "$pkg_*.deb" -o -name "$pkg-static_*.deb" \) -type f -print0 | xargs -0r mv -t debs/
-          done < <(cat ./debs/built_${repo}_packages.txt)
+          if [ -f "./debs/built_${repo}_packages.txt" ] && [ -d "output" ]; then
+            while read -r pkg; do
+              # Match both $pkg.deb and $pkg-static.deb.
+              find output \( -name "$pkg_*.deb" -o -name "$pkg-static_*.deb" \) -type f -print0 | xargs -0r mv -t debs/
+            done < <(cat "./debs/built_${repo}_packages.txt")
+          fi
         done
 
         # Files containing certain symbols (e.g. ":") will cause failure in actions/upload-artifact.
