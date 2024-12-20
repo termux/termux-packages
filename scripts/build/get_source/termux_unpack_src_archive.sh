@@ -13,6 +13,8 @@ termux_extract_src_archive() {
 			rm -Rf $folder
 			unzip -q "$file"
 			mv $folder "$TERMUX_PKG_SRCDIR"
+		elif [ "${file##*.}" = patch ] || [ "${file##*.}" = diff ]; then
+			continue
 		else
 			test "$i" -gt 0 && STRIP=0
 			mkdir -p "$TERMUX_PKG_SRCDIR"
