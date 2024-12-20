@@ -1,0 +1,235 @@
+Revert https://github.com/dotnet/runtime/commit/da5bd2bc91c78a457c4bf28c09759f368e0f3238
+Workaround https://github.com/dotnet/runtime/issues/111071
+
+--- a/src/runtime/docs/design/features/host-runtime-information.md
++++ b/src/runtime/docs/design/features/host-runtime-information.md
+@@ -84,16 +84,10 @@ List of directory paths corresponding to shared store paths and additional probi
+ 
+ Hex string representation of a function pointer. It is set when running a single-file application. The function is called by the runtime to look for assemblies bundled into the application. The expected signature is defined as `BundleProbeFn` in [`coreclrhost.h`](/src/coreclr/hosts/inc/coreclrhost.h)
+ 
+-**.NET 9 and above** This property is no longer set by the host. `host_runtime_contract.bundle_probe` is set when running a single-file application.
+-
+ `HOSTPOLICY_EMBEDDED`
+ 
+ Indicates whether or not [`hostpolicy`](./host-components.md#host-policy) is embedded in the host executable. It is set to `true` when running a self-contained single-file application.
+ 
+-**.NET 9 and above**  This property is no longer set by the host or read by the runtime. Self-contained single-file includes both host and runtime components in the executable, so the information is known at build-time.
+-
+ `PINVOKE_OVERRIDE`
+ 
+ Hex string representation of a function pointer. It is set when running a self-contained single-file application. The function is called by the runtime to check for redirected p/invokes. The expected signature is defined as `PInvokeOverrideFn` in [`coreclrhost.h`](/src/coreclr/hosts/inc/coreclrhost.h) and [`mono-private-unstable-types.h`](/src/native/public/mono/metadata/details/mono-private-unstable-types.h).
+-
+-**.NET 9 and above** This property is no longer set by the host. `host_runtime_contract.pinvoke_override` is set when running a self-contained single-file application.
+--- a/src/runtime/src/coreclr/dlls/mscoree/exports.cpp
++++ b/src/runtime/src/coreclr/dlls/mscoree/exports.cpp
+@@ -138,6 +138,7 @@ static void ConvertConfigPropertiesToUnicode(
+     LPCWSTR** propertyValuesWRef,
+     BundleProbeFn** bundleProbe,
+     PInvokeOverrideFn** pinvokeOverride,
++    bool* hostPolicyEmbedded,
+     host_runtime_contract** hostContract)
+ {
+     LPCWSTR* propertyKeysW = new (nothrow) LPCWSTR[propertyCount];
+@@ -169,6 +170,11 @@ static void ConvertConfigPropertiesToUnicode(
+             if (*pinvokeOverride == nullptr)
+                 *pinvokeOverride = (PInvokeOverrideFn*)u16_strtoui64(propertyValuesW[propertyIndex], nullptr, 0);
+         }
++        else if (strcmp(propertyKeys[propertyIndex], HOST_PROPERTY_HOSTPOLICY_EMBEDDED) == 0)
++        {
++            // The HOSTPOLICY_EMBEDDED property indicates if the executable has hostpolicy statically linked in
++            *hostPolicyEmbedded = (u16_strcmp(propertyValuesW[propertyIndex], W("true")) == 0);
++        }
+         else if (strcmp(propertyKeys[propertyIndex], HOST_PROPERTY_RUNTIME_CONTRACT) == 0)
+         {
+             // Host contract is passed in as the value of HOST_RUNTIME_CONTRACT property (encoded as a string).
+@@ -246,6 +252,7 @@ int coreclr_initialize(
+     LPCWSTR* propertyKeysW;
+     LPCWSTR* propertyValuesW;
+     BundleProbeFn* bundleProbe = nullptr;
++    bool hostPolicyEmbedded = false;
+     PInvokeOverrideFn* pinvokeOverride = nullptr;
+     host_runtime_contract* hostContract = nullptr;
+ 
+@@ -261,6 +268,7 @@ int coreclr_initialize(
+         &propertyValuesW,
+         &bundleProbe,
+         &pinvokeOverride,
++        &hostPolicyEmbedded,
+         &hostContract);
+ 
+ #ifdef TARGET_UNIX
+@@ -275,6 +283,8 @@ int coreclr_initialize(
+     }
+ #endif
+ 
++    g_hostpolicy_embedded = hostPolicyEmbedded;
++
+     if (hostContract != nullptr)
+     {
+         HostInformation::SetContract(hostContract);
+--- a/src/runtime/src/coreclr/vm/ceemain.cpp
++++ b/src/runtime/src/coreclr/vm/ceemain.cpp
+@@ -229,12 +229,13 @@ extern "C" HRESULT __cdecl CorDBGetInterface(DebugInterface** rcInterface);
+ 
+ // g_coreclr_embedded indicates that coreclr is linked directly into the program
+ // g_hostpolicy_embedded indicates that the hostpolicy library is linked directly into the executable
++// Note: that it can happen that the hostpolicy is embedded but coreclr isn't (on Windows singlefilehost is built that way)
+ #ifdef CORECLR_EMBEDDED
+ bool g_coreclr_embedded = true;
+ bool g_hostpolicy_embedded = true; // We always embed hostpolicy if coreclr is also embedded
+ #else
+ bool g_coreclr_embedded = false;
+-bool g_hostpolicy_embedded = false;
++bool g_hostpolicy_embedded = false; // In this case the value may come from a runtime property and may change
+ #endif
+ 
+ // Remember how the last startup of EE went.
+--- a/src/runtime/src/mono/mono/mini/monovm.c
++++ b/src/runtime/src/mono/mono/mini/monovm.c
+@@ -15,8 +15,6 @@
+ 
+ #include <mono/metadata/components.h>
+ 
+-#include <corehost/host_runtime_contract.h>
+-
+ static MonoCoreTrustedPlatformAssemblies *trusted_platform_assemblies;
+ static MonoCoreLookupPaths *native_lib_paths;
+ static MonoCoreLookupPaths *app_paths;
+@@ -189,28 +187,19 @@ parse_properties (int propertyCount, const char **propertyKeys, const char **pro
+ 	// A partial list of relevant properties is at:
+ 	// https://learn.microsoft.com/dotnet/core/tutorials/netcore-hosting#step-3---prepare-runtime-properties
+ 
+-	PInvokeOverrideFn override_fn = NULL;
+ 	for (int i = 0; i < propertyCount; ++i) {
+ 		size_t prop_len = strlen (propertyKeys [i]);
+-		if (prop_len == 27 && !strncmp (propertyKeys [i], HOST_PROPERTY_TRUSTED_PLATFORM_ASSEMBLIES, 27)) {
++		if (prop_len == 27 && !strncmp (propertyKeys [i], "TRUSTED_PLATFORM_ASSEMBLIES", 27)) {
+ 			parse_trusted_platform_assemblies (propertyValues[i]);
+-		} else if (prop_len == 9 && !strncmp (propertyKeys [i], HOST_PROPERTY_APP_PATHS, 9)) {
++		} else if (prop_len == 9 && !strncmp (propertyKeys [i], "APP_PATHS", 9)) {
+ 			app_paths = parse_lookup_paths (propertyValues [i]);
+-		} else if (prop_len == 23 && !strncmp (propertyKeys [i], HOST_PROPERTY_PLATFORM_RESOURCE_ROOTS, 23)) {
++		} else if (prop_len == 23 && !strncmp (propertyKeys [i], "PLATFORM_RESOURCE_ROOTS", 23)) {
+ 			platform_resource_roots = parse_lookup_paths (propertyValues [i]);
+-		} else if (prop_len == 29 && !strncmp (propertyKeys [i], HOST_PROPERTY_NATIVE_DLL_SEARCH_DIRECTORIES, 29)) {
++		} else if (prop_len == 29 && !strncmp (propertyKeys [i], "NATIVE_DLL_SEARCH_DIRECTORIES", 29)) {
+ 			native_lib_paths = parse_lookup_paths (propertyValues [i]);
+-		} else if (prop_len == 16 && !strncmp (propertyKeys [i], HOST_PROPERTY_PINVOKE_OVERRIDE, 16)) {
+-			if (override_fn == NULL) {
+-				override_fn = (PInvokeOverrideFn)(uintptr_t)strtoull (propertyValues [i], NULL, 0);
+-			}
+-		} else if (prop_len == STRING_LENGTH(HOST_PROPERTY_RUNTIME_CONTRACT) && !strncmp (propertyKeys [i], HOST_PROPERTY_RUNTIME_CONTRACT, STRING_LENGTH(HOST_PROPERTY_RUNTIME_CONTRACT))) {
+-			// Functions in HOST_RUNTIME_CONTRACT have priority over the individual properties
+-			// for callbacks, so we set them as long as the contract has a non-null function.
+-			struct host_runtime_contract* contract = (struct host_runtime_contract*)(uintptr_t)strtoull (propertyValues [i], NULL, 0);
+-			if (contract->pinvoke_override != NULL) {
+-				override_fn = (PInvokeOverrideFn)contract->pinvoke_override;
+-			}
++		} else if (prop_len == 16 && !strncmp (propertyKeys [i], "PINVOKE_OVERRIDE", 16)) {
++			PInvokeOverrideFn override_fn = (PInvokeOverrideFn)(uintptr_t)strtoull (propertyValues [i], NULL, 0);
++			mono_loader_install_pinvoke_override (override_fn);
+ 		} else {
+ #if 0
+ 			// can't use mono logger, it's not initialized yet.
+@@ -218,10 +207,6 @@ parse_properties (int propertyCount, const char **propertyKeys, const char **pro
+ #endif
+ 		}
+ 	}
+-
+-	if (override_fn != NULL)
+-		mono_loader_install_pinvoke_override (override_fn);
+-
+ 	return TRUE;
+ }
+ 
+--- a/src/runtime/src/native/corehost/apphost/static/CMakeLists.txt
++++ b/src/runtime/src/native/corehost/apphost/static/CMakeLists.txt
+@@ -46,6 +46,7 @@ set(HEADERS
+     ../../fxr_resolver.h
+ )
+ 
++add_compile_definitions(HOSTPOLICY_EMBEDDED)
+ add_compile_definitions(NATIVE_LIBS_EMBEDDED)
+ 
+ include(../../fxr/files.cmake)
+--- a/src/runtime/src/native/corehost/host_runtime_contract.h
++++ b/src/runtime/src/native/corehost/host_runtime_contract.h
+@@ -18,6 +18,7 @@
+ #define HOST_PROPERTY_APP_PATHS "APP_PATHS"
+ #define HOST_PROPERTY_BUNDLE_PROBE "BUNDLE_PROBE"
+ #define HOST_PROPERTY_ENTRY_ASSEMBLY_NAME "ENTRY_ASSEMBLY_NAME"
++#define HOST_PROPERTY_HOSTPOLICY_EMBEDDED "HOSTPOLICY_EMBEDDED"
+ #define HOST_PROPERTY_NATIVE_DLL_SEARCH_DIRECTORIES "NATIVE_DLL_SEARCH_DIRECTORIES"
+ #define HOST_PROPERTY_PINVOKE_OVERRIDE "PINVOKE_OVERRIDE"
+ #define HOST_PROPERTY_PLATFORM_RESOURCE_ROOTS "PLATFORM_RESOURCE_ROOTS"
+--- a/src/runtime/src/native/corehost/hostpolicy/coreclr.cpp
++++ b/src/runtime/src/native/corehost/hostpolicy/coreclr.cpp
+@@ -165,6 +165,9 @@ namespace
+         _X("STARTUP_HOOKS"),
+         _X("APP_PATHS"),
+         _X("RUNTIME_IDENTIFIER"),
++        _X("BUNDLE_PROBE"),
++        _X("HOSTPOLICY_EMBEDDED"),
++        _X("PINVOKE_OVERRIDE")
+     };
+ 
+     static_assert((sizeof(PropertyNameMapping) / sizeof(*PropertyNameMapping)) == static_cast<size_t>(common_property::Last), "Invalid property count");
+--- a/src/runtime/src/native/corehost/hostpolicy/coreclr.h
++++ b/src/runtime/src/native/corehost/hostpolicy/coreclr.h
+@@ -64,6 +64,9 @@ enum class common_property
+     StartUpHooks,
+     AppPaths,
+     RuntimeIdentifier,
++    BundleProbe,
++    HostPolicyEmbedded,
++    PInvokeOverride,
+     // Sentinel value - new values should be defined above
+     Last
+ };
+--- a/src/runtime/src/native/corehost/hostpolicy/hostpolicy_context.cpp
++++ b/src/runtime/src/native/corehost/hostpolicy/hostpolicy_context.cpp
+@@ -329,6 +329,44 @@ int hostpolicy_context_t::initialize(const hostpolicy_init_t &hostpolicy_init, c
+         coreclr_properties.add(common_property::StartUpHooks, startup_hooks.c_str());
+     }
+ 
++    // Single-File Bundle Probe
++    if (bundle::info_t::is_single_file_bundle())
++    {
++        // Encode the bundle_probe function pointer as a string, and pass it to the runtime.
++        pal::stringstream_t ptr_stream;
++        ptr_stream << "0x" << std::hex << (size_t)(&bundle_probe);
++
++        if (!coreclr_properties.add(common_property::BundleProbe, ptr_stream.str().c_str()))
++        {
++            log_duplicate_property_error(coreclr_property_bag_t::common_property_to_string(common_property::BundleProbe));
++            return StatusCode::LibHostDuplicateProperty;
++        }
++    }
++
++#if defined(NATIVE_LIBS_EMBEDDED)
++    // PInvoke Override
++    if (bundle::info_t::is_single_file_bundle())
++    {
++        // Encode the pinvoke_override function pointer as a string, and pass it to the runtime.
++        pal::stringstream_t ptr_stream;
++        ptr_stream << "0x" << std::hex << (size_t)(&pinvoke_override);
++
++        if (!coreclr_properties.add(common_property::PInvokeOverride, ptr_stream.str().c_str()))
++        {
++            log_duplicate_property_error(coreclr_property_bag_t::common_property_to_string(common_property::PInvokeOverride));
++            return StatusCode::LibHostDuplicateProperty;
++        }
++    }
++#endif
++
++#if defined(HOSTPOLICY_EMBEDDED)
++    if (!coreclr_properties.add(common_property::HostPolicyEmbedded, _X("true")))
++    {
++        log_duplicate_property_error(coreclr_property_bag_t::common_property_to_string(common_property::HostPolicyEmbedded));
++        return StatusCode::LibHostDuplicateProperty;
++    }
++#endif
++
+     {
+         host_contract = { sizeof(host_runtime_contract), this };
+         if (bundle::info_t::is_single_file_bundle())
