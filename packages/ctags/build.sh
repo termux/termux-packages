@@ -16,8 +16,15 @@ termux_step_post_get_source() {
 	./autogen.sh
 }
 
+termux_step_host_build() {
+	local _PREFIX_FOR_BUILD=${TERMUX_PREFIX}/opt/$TERMUX_PKG_NAME
+	cd $TERMUX_PKG_SRCDIR
+	./configure $TERMUX_PKG_EXTRA_CONFIGURE_ARGS --prefix=$_PREFIX_FOR_BUILD
+	make -j $TERMUX_PKG_MAKE_PROCESSES
+	make install
+	make clean
+}
+
 termux_step_pre_configure() {
 	./autogen.sh
-	cp $TERMUX_PKG_HOSTBUILD_DIR/packcc $TERMUX_PKG_BUILDDIR/
-	touch -d "next hour" $TERMUX_PKG_BUILDDIR/packcc
 }
