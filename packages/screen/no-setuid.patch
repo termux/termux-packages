@@ -1,25 +1,21 @@
-diff -uNr screen-4.7.0/Makefile.in screen-4.7.0.mod/Makefile.in
---- screen-4.7.0/Makefile.in	2019-10-02 01:07:59.000000000 +0300
-+++ screen-4.7.0.mod/Makefile.in	2019-10-14 02:12:59.469022341 +0300
-@@ -65,13 +65,13 @@
- 	termcap.c input.c attacher.c pty.c process.c display.c comm.c \
- 	kmapdef.c acls.c braille.c braille_tsi.c logfile.c layer.c \
- 	sched.c teln.c nethack.c encoding.c canvas.c layout.c viewport.c \
--	list_display.c list_generic.c list_window.c
-+	list_display.c list_generic.c list_window.c setuid.c
- OFILES=	screen.o ansi.o fileio.o mark.o misc.o resize.o socket.o \
- 	search.o tty.o term.o window.o utmp.o loadav.o putenv.o help.o \
- 	termcap.o input.o attacher.o pty.o process.o display.o comm.o \
- 	kmapdef.o acls.o braille.o braille_tsi.o logfile.o layer.o \
- 	list_generic.o list_display.o list_window.o \
--	sched.o teln.o nethack.o encoding.o canvas.o layout.o viewport.o
-+	sched.o teln.o nethack.o encoding.o canvas.o layout.o viewport.o setuid.o
+diff --git a/src/Makefile.in b/src/Makefile.in
+index 92f434a..8612ac6 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -54,7 +54,7 @@ CFILES=	screen.c \
+ 	layout.c list_display.c list_generic.c list_license.o list_window.c logfile.c mark.c \
+ 	misc.c process.c pty.c resize.c sched.c search.c socket.c telnet.c \
+ 	term.c termcap.c tty.c utmp.c viewport.c window.c winmsg.c \
+-	winmsgbuf.c winmsgcond.c
++	winmsgbuf.c winmsgcond.c setuid.c
+ OFILES=$(CFILES:c=o)
  
- all:	screen
- 
-diff -uNr screen-4.7.0/setuid.c screen-4.7.0.mod/setuid.c
---- screen-4.7.0/setuid.c	1970-01-01 03:00:00.000000000 +0300
-+++ screen-4.7.0.mod/setuid.c	2019-10-14 02:14:35.810387228 +0300
+ TESTCFILES := $(wildcard tests/test-*.c)
+diff --git a/src/setuid.c b/src/setuid.c
+new file mode 100644
+index 0000000..73438d5
+--- /dev/null
++++ b/setuid.c
 @@ -0,0 +1,25 @@
 +#include <pwd.h>
 +

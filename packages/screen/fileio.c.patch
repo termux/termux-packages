@@ -1,12 +1,14 @@
+diff --git a/src/fileio.c b/src/fileio.c
+index 75db976..6110b2d 100644
 --- a/fileio.c
 +++ b/fileio.c
-@@ -731,8 +731,8 @@
+@@ -582,8 +582,8 @@ int printpipe(Window *p, char *cmd)
  #ifdef SIGPIPE
- 		signal(SIGPIPE, SIG_DFL);
+ 		xsignal(SIGPIPE, SIG_DFL);
  #endif
--		execl("/bin/sh", "sh", "-c", cmd, (char *)0);
+-		execl("/bin/sh", "sh", "-c", cmd, NULL);
 -		Panic(errno, "/bin/sh");
-+		execl("@TERMUX_PREFIX@/bin/sh", "sh", "-c", cmd, (char *)0);
++		execl("@TERMUX_PREFIX@/bin/sh", "sh", "-c", cmd, NULL);
 +		Panic(errno, "@TERMUX_PREFIX@/bin/sh");
  	default:
  		break;

@@ -1,30 +1,13 @@
---- ../cache/screen-4.4.0/os.h	2016-06-19 19:41:03.000000000 +0000
-+++ ./os.h	2016-12-20 02:03:49.513365234 +0000
-@@ -129,15 +129,17 @@
- #ifdef SYSV
- # define index strchr
- # define rindex strrchr
-+#ifndef __ANDROID__
- # define bzero(poi,len) memset(poi,0,len)
-+#endif 
- # define bcmp memcmp
- # define killpg(pgrp,sig) kill( -(pgrp), sig)
- #endif
--
- #ifndef HAVE_GETCWD
- # define getcwd(b,l) getwd(b)
- #endif
- 
-+#ifndef __ANDROID__
- #ifndef USEBCOPY
- # ifdef USEMEMMOVE
- #  define bcopy(s,d,len) memmove(d,s,len)
-@@ -150,6 +152,8 @@
+diff --git a/src/os.h b/src/os.h
+index b350e43..26b075d 100644
+--- a/os.h
++++ b/os.h
+@@ -92,7 +92,7 @@ typedef char* slot_t;	/* used internally in utmp.c */
+ #   ifdef _PATH_UTMPX
+ #    define UTMPXFILE	_PATH_UTMPX
+ #   else
+-#    define UTMPXFILE	"/etc/utmpx"
++#    define UTMPXFILE	"@TERMUX_PREFIX@/etc/utmpx"
+ #   endif /* _PATH_UTMPX */
  #  endif
  # endif
- #endif
-+#endif
-+
- 
- #if defined(HAVE_SETRESUID) && !defined(HAVE_SETREUID)
- # define setreuid(ruid, euid) setresuid(ruid, euid, -1)
