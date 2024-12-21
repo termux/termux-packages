@@ -1,0 +1,13 @@
+--- a/libportal/notification.c
++++ b/libportal/notification.c
+@@ -26,6 +26,10 @@
+ 
+ #define _GNU_SOURCE
+ #include <sys/mman.h>
++#if defined __ANDROID__ && __ANDROID_API__ < 30
++#include <syscall.h>
++#define memfd_create(name,flags) syscall(SYS_memfd_create,name,flags)
++#endif
+ #include <fcntl.h>
+ 
+ #include <glib/gstdio.h>

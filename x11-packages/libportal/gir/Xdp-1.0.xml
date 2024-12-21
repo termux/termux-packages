@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <dump>
   <class name="XdpPortal" get-type="xdp_portal_get_type" parents="GObject">
+    <implements name="GInitable"/>
     <signal name="spawn-exited" return="void" when="first">
       <param type="guint"/>
       <param type="guint"/>
@@ -72,7 +73,13 @@
     <member name="XDP_LOGIN_SESSION_ENDING" nick="ending" value="3"/>
   </enum>  <enum name="XdpSessionMonitorFlags" get-type="xdp_session_monitor_flags_get_type">
     <member name="XDP_SESSION_MONITOR_FLAG_NONE" nick="none" value="0"/>
-  </enum>  <enum name="XdpLocationAccuracy" get-type="xdp_location_accuracy_get_type">
+  </enum>  <flags name="XdpInputCapability" get-type="xdp_input_capability_get_type">
+    <member name="XDP_INPUT_CAPABILITY_NONE" nick="none" value="0"/>
+    <member name="XDP_INPUT_CAPABILITY_KEYBOARD" nick="keyboard" value="1"/>
+    <member name="XDP_INPUT_CAPABILITY_POINTER" nick="pointer" value="2"/>
+    <member name="XDP_INPUT_CAPABILITY_TOUCHSCREEN" nick="touchscreen" value="4"/>
+  </flags>
+  <enum name="XdpLocationAccuracy" get-type="xdp_location_accuracy_get_type">
     <member name="XDP_LOCATION_ACCURACY_NONE" nick="none" value="0"/>
     <member name="XDP_LOCATION_ACCURACY_COUNTRY" nick="country" value="1"/>
     <member name="XDP_LOCATION_ACCURACY_CITY" nick="city" value="2"/>
@@ -90,7 +97,12 @@
   </flags>
   <enum name="XdpPrintFlags" get-type="xdp_print_flags_get_type">
     <member name="XDP_PRINT_FLAG_NONE" nick="none" value="0"/>
+  </enum>  <enum name="XdpSessionState" get-type="xdp_session_state_get_type">
+    <member name="XDP_SESSION_INITIAL" nick="initial" value="0"/>
+    <member name="XDP_SESSION_ACTIVE" nick="active" value="1"/>
+    <member name="XDP_SESSION_CLOSED" nick="closed" value="2"/>
   </enum>  <flags name="XdpOutputType" get-type="xdp_output_type_get_type">
+    <member name="XDP_OUTPUT_NONE" nick="none" value="0"/>
     <member name="XDP_OUTPUT_MONITOR" nick="monitor" value="1"/>
     <member name="XDP_OUTPUT_WINDOW" nick="window" value="2"/>
     <member name="XDP_OUTPUT_VIRTUAL" nick="virtual" value="4"/>
@@ -101,14 +113,7 @@
     <member name="XDP_DEVICE_POINTER" nick="pointer" value="2"/>
     <member name="XDP_DEVICE_TOUCHSCREEN" nick="touchscreen" value="4"/>
   </flags>
-  <enum name="XdpSessionType" get-type="xdp_session_type_get_type">
-    <member name="XDP_SESSION_SCREENCAST" nick="screencast" value="0"/>
-    <member name="XDP_SESSION_REMOTE_DESKTOP" nick="remote-desktop" value="1"/>
-  </enum>  <enum name="XdpSessionState" get-type="xdp_session_state_get_type">
-    <member name="XDP_SESSION_INITIAL" nick="initial" value="0"/>
-    <member name="XDP_SESSION_ACTIVE" nick="active" value="1"/>
-    <member name="XDP_SESSION_CLOSED" nick="closed" value="2"/>
-  </enum>  <flags name="XdpScreencastFlags" get-type="xdp_screencast_flags_get_type">
+  <flags name="XdpScreencastFlags" get-type="xdp_screencast_flags_get_type">
     <member name="XDP_SCREENCAST_FLAG_NONE" nick="none" value="0"/>
     <member name="XDP_SCREENCAST_FLAG_MULTIPLE" nick="multiple" value="1"/>
   </flags>
@@ -138,7 +143,11 @@
     <member name="XDP_SCREENSHOT_FLAG_NONE" nick="none" value="0"/>
     <member name="XDP_SCREENSHOT_FLAG_INTERACTIVE" nick="interactive" value="1"/>
   </flags>
-  <flags name="XdpSpawnFlags" get-type="xdp_spawn_flags_get_type">
+  <enum name="XdpSessionType" get-type="xdp_session_type_get_type">
+    <member name="XDP_SESSION_SCREENCAST" nick="screencast" value="0"/>
+    <member name="XDP_SESSION_REMOTE_DESKTOP" nick="remote-desktop" value="1"/>
+    <member name="XDP_SESSION_INPUT_CAPTURE" nick="input-capture" value="2"/>
+  </enum>  <flags name="XdpSpawnFlags" get-type="xdp_spawn_flags_get_type">
     <member name="XDP_SPAWN_FLAG_NONE" nick="none" value="0"/>
     <member name="XDP_SPAWN_FLAG_CLEARENV" nick="clearenv" value="1"/>
     <member name="XDP_SPAWN_FLAG_LATEST" nick="latest" value="2"/>
@@ -161,9 +170,48 @@
     <member name="XDP_WALLPAPER_FLAG_LOCKSCREEN" nick="lockscreen" value="2"/>
     <member name="XDP_WALLPAPER_FLAG_PREVIEW" nick="preview" value="4"/>
   </flags>
-  <boxed name="XdpParent" get-type="xdp_parent_get_type"/>
   <class name="XdpSession" get-type="xdp_session_get_type" parents="GObject">
     <signal name="closed" return="void" when="cleanup" no-recurse="1" no-hooks="1">
+    </signal>
+  </class>
+  <class name="XdpInputCaptureZone" get-type="xdp_input_capture_zone_get_type" parents="GObject">
+    <property name="width" type="guint" flags="11" default-value="0"/>
+    <property name="height" type="guint" flags="11" default-value="0"/>
+    <property name="x" type="gint" flags="11" default-value="0"/>
+    <property name="y" type="gint" flags="11" default-value="0"/>
+    <property name="zone-set" type="guint" flags="11" default-value="0"/>
+    <property name="is-valid" type="gboolean" flags="3" default-value="TRUE"/>
+  </class>
+  <class name="XdpInputCapturePointerBarrier" get-type="xdp_input_capture_pointer_barrier_get_type" parents="GObject">
+    <property name="x1" type="gint" flags="11" default-value="0"/>
+    <property name="x2" type="gint" flags="11" default-value="0"/>
+    <property name="y1" type="gint" flags="11" default-value="0"/>
+    <property name="y2" type="gint" flags="11" default-value="0"/>
+    <property name="id" type="guint" flags="11" default-value="0"/>
+    <property name="is-active" type="gboolean" flags="1" default-value="FALSE"/>
+  </class>
+  <class name="XdpInputCaptureSession" get-type="xdp_input_capture_session_get_type" parents="GObject">
+    <signal name="zones-changed" return="void" when="cleanup" no-recurse="1" no-hooks="1">
+      <param type="GVariant"/>
+    </signal>
+    <signal name="activated" return="void" when="cleanup" no-recurse="1" no-hooks="1">
+      <param type="guint"/>
+      <param type="GVariant"/>
+    </signal>
+    <signal name="deactivated" return="void" when="cleanup" no-recurse="1" no-hooks="1">
+      <param type="guint"/>
+      <param type="GVariant"/>
+    </signal>
+    <signal name="disabled" return="void" when="cleanup" no-recurse="1" no-hooks="1">
+      <param type="GVariant"/>
+    </signal>
+  </class>
+  <boxed name="XdpParent" get-type="xdp_parent_get_type"/>
+  <class name="XdpSettings" get-type="xdp_settings_get_type" parents="GObject">
+    <signal name="changed" return="void" when="first">
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+      <param type="GVariant"/>
     </signal>
   </class>
 </dump>
