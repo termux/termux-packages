@@ -2,8 +2,6 @@ termux_step_setup_variables() {
 	: "${TERMUX_MAKE_PROCESSES:="$(nproc)"}"
 	: "${TERMUX_TOPDIR:="$HOME/.termux-build"}"
 	: "${TERMUX_ARCH:="aarch64"}" # arm, aarch64, i686 or x86_64.
-	: "${TERMUX_PREFIX:="/data/data/com.termux/files/usr"}"
-	: "${TERMUX_ANDROID_HOME:="/data/data/com.termux/files/home"}"
 	: "${TERMUX_DEBUG:="false"}"
 	: "${TERMUX_PKG_API_LEVEL:="21"}"
 	: "${TERMUX_NO_CLEAN:="false"}"
@@ -21,8 +19,6 @@ termux_step_setup_variables() {
 
 		# These variables should not be configurable for on-device builds.
 		# TERMUX_ARCH already set in build-package.sh
-		TERMUX_PREFIX="/data/data/com.termux/files/usr"
-		TERMUX_ANDROID_HOME="/data/data/com.termux/files/home"
 		TERMUX_NO_CLEAN="true"
 
 		# On device builds are considered as unofficial.
