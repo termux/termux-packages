@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Libc for WebAssembly programs built on top of WASI syste
 TERMUX_PKG_LICENSE="Apache-2.0, BSD 2-Clause, MIT"
 TERMUX_PKG_LICENSE_FILE="LICENSE, src/wasi-libc/LICENSE-MIT, src/wasi-libc/libc-bottom-half/cloudlibc/LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="24"
+TERMUX_PKG_VERSION="25"
 TERMUX_PKG_SRCURL=git+https://github.com/WebAssembly/wasi-sdk
 TERMUX_PKG_GIT_BRANCH=wasi-sdk-${TERMUX_PKG_VERSION}
 TERMUX_PKG_RECOMMENDS="wasm-component-ld"
@@ -54,12 +54,6 @@ termux_step_host_build() {
 		-C ${TERMUX_PKG_HOSTBUILD_DIR}/sysroot \
 		-j ${TERMUX_PKG_MAKE_PROCESSES} \
 		install
-
-	mkdir -p "${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}"
-	mv -v "${TERMUX_PREFIX}/VERSION" "${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}"
-	echo "INFO: ${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}/VERSION"
-	cat "${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}/VERSION"
-	echo
 
 	mv -v "${TERMUX_PKG_HOSTBUILD_DIR}/install/share/cmake" "${TERMUX_PREFIX}/share"
 
