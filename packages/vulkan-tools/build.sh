@@ -20,16 +20,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DBUILD_WSI_XCB_SUPPORT=ON
 -DBUILD_WSI_XLIB_SUPPORT=ON
 -DVULKAN_HEADERS_INSTALL_DIR=${TERMUX_PREFIX}
---trace
 "
 
 termux_step_pre_configure() {
 	termux_setup_wayland_cross_pkg_config_wrapper
-
-	# https://github.com/termux/termux-packages/issues/21865
-	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "false" ]]; then
-		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
-		-DPython3_EXECUTABLE=/usr/bin/python3
-		"
-	fi
 }
