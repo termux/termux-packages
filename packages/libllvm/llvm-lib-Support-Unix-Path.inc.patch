@@ -6,7 +6,7 @@ diff -u -r ../orig-src/llvm/lib/Support/Unix/Path.inc ./llvm/lib/Support/Unix/Pa
    if (getprogpath(exe_path, argv0) != NULL)
      return exe_path;
 +#elif defined(__ANDROID__) // termux-exec linker wrapping does not work with /proc/self/exe
-+  const char *termux_self_exe = std::getenv("TERMUX_EXEC__PROC_SELF_EXE");
++  const char *termux_self_exe = std::getenv("@TERMUX_ENV__S_TERMUX_EXEC@PROC_SELF_EXE");
 +  if (termux_self_exe != NULL) return std::string(termux_self_exe);
 +  if (char *real_path = realpath("/proc/self/exe", nullptr)) {
 +    std::string ret = std::string(real_path);

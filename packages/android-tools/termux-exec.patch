@@ -5,7 +5,7 @@
  #if defined(__linux__)
    std::string path;
 -  android::base::Readlink("/proc/self/exe", &path);
-+  if (const char *tmp = std::getenv("TERMUX_EXEC__PROC_SELF_EXE"))
++  if (const char *tmp = std::getenv("@TERMUX_ENV__S_TERMUX_EXEC@PROC_SELF_EXE"))
 +    path.assign(tmp);
 +  else
 +    android::base::Readlink("/proc/self/exe", &path);
@@ -35,7 +35,7 @@
 -        ssize_t exPathLen = readlink("/proc/self/exe", exPath, sizeof(exPath));
 +        ssize_t exPathLen;
 +        const char *tmp;
-+        if (tmp = getenv("TERMUX_EXEC__PROC_SELF_EXE")) {
++        if (tmp = getenv("@TERMUX_ENV__S_TERMUX_EXEC@PROC_SELF_EXE")) {
 +            strncpy(exPath, tmp, sizeof(exPath));
 +            exPathLen = strlen(exPath)
 +        } else {
@@ -51,7 +51,7 @@
  bool RunAs::Prepare() {
    // run-as can't run /data/local/tmp/simpleperf directly. So copy simpleperf binary if needed.
 -  if (!android::base::Readlink("/proc/self/exe", &simpleperf_path_)) {
-+  if (const char *tmp = std::getenv("TERMUX_EXEC__PROC_SELF_EXE"))
++  if (const char *tmp = std::getenv("@TERMUX_ENV__S_TERMUX_EXEC@PROC_SELF_EXE"))
 +    simpleperf_path_.assign(tmp);
 +  else if (!android::base::Readlink("/proc/self/exe", &simpleperf_path_)) {
      PLOG(ERROR) << "ReadLink failed";

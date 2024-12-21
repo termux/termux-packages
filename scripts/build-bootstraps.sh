@@ -206,21 +206,23 @@ add_termux_bootstrap_second_stage_files() {
 
 	echo $'\n\n\n'"[*] Adding termux bootstrap second stage files..."
 
-	mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_BOOTSTRAP_CONFIG_DIR_PATH}"
+	mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_BOOTSTRAPS__BOOTSTRAP_CONFIG_DIR}"
 	sed -e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
-		-e "s|@TERMUX_BOOTSTRAP_CONFIG_DIR_PATH@|${TERMUX_BOOTSTRAP_CONFIG_DIR_PATH}|g" \
+		-e "s|@TERMUX_BOOTSTRAPS__BOOTSTRAP_CONFIG_DIR@|${TERMUX_BOOTSTRAPS__BOOTSTRAP_CONFIG_DIR}|g" \
 		-e "s|@TERMUX_PACKAGE_MANAGER@|${TERMUX_PACKAGE_MANAGER}|g" \
 		-e "s|@TERMUX_PACKAGE_ARCH@|${package_arch}|g" \
+		-e "s|@TERMUX_APP__NAME@|${TERMUX_APP__NAME}|g" \
+		-e "s|@TERMUX_ENV__S_TERMUX@|${TERMUX_ENV__S_TERMUX}|g" \
 		"$TERMUX_SCRIPTDIR/scripts/bootstrap/termux-bootstrap-second-stage.sh" \
-		> "${BOOTSTRAP_ROOTFS}/${TERMUX_BOOTSTRAP_CONFIG_DIR_PATH}/termux-bootstrap-second-stage.sh"
-	chmod 700 "${BOOTSTRAP_ROOTFS}/${TERMUX_BOOTSTRAP_CONFIG_DIR_PATH}/termux-bootstrap-second-stage.sh"
+		> "${BOOTSTRAP_ROOTFS}/${TERMUX_BOOTSTRAPS__BOOTSTRAP_CONFIG_DIR}/termux-bootstrap-second-stage.sh"
+	chmod 700 "${BOOTSTRAP_ROOTFS}/${TERMUX_BOOTSTRAPS__BOOTSTRAP_CONFIG_DIR}/termux-bootstrap-second-stage.sh"
 
 	# TODO: Remove it when Termux app supports `pacman` bootstraps installation.
-	sed -e "s|@TERMUX_PROFILE_D_PREFIX_DIR_PATH@|${TERMUX_PROFILE_D_PREFIX_DIR_PATH}|g" \
-		-e "s|@TERMUX_BOOTSTRAP_CONFIG_DIR_PATH@|${TERMUX_BOOTSTRAP_CONFIG_DIR_PATH}|g" \
+	sed -e "s|@TERMUX__PREFIX__PROFILE_D_DIR@|${TERMUX__PREFIX__PROFILE_D_DIR}|g" \
+		-e "s|@TERMUX_BOOTSTRAPS__BOOTSTRAP_CONFIG_DIR@|${TERMUX_BOOTSTRAPS__BOOTSTRAP_CONFIG_DIR}|g" \
 		"$TERMUX_SCRIPTDIR/scripts/bootstrap/01-termux-bootstrap-second-stage-fallback.sh" \
-		> "${BOOTSTRAP_ROOTFS}/${TERMUX_PROFILE_D_PREFIX_DIR_PATH}/01-termux-bootstrap-second-stage-fallback.sh"
-	chmod 600 "${BOOTSTRAP_ROOTFS}/${TERMUX_PROFILE_D_PREFIX_DIR_PATH}/01-termux-bootstrap-second-stage-fallback.sh"
+		> "${BOOTSTRAP_ROOTFS}/${TERMUX__PREFIX__PROFILE_D_DIR}/01-termux-bootstrap-second-stage-fallback.sh"
+	chmod 600 "${BOOTSTRAP_ROOTFS}/${TERMUX__PREFIX__PROFILE_D_DIR}/01-termux-bootstrap-second-stage-fallback.sh"
 
 }
 
@@ -442,6 +444,7 @@ main() {
 		PACKAGES+=("psmisc")
 		PACKAGES+=("sed")
 		PACKAGES+=("tar")
+		PACKAGES+=("termux-core")
 		PACKAGES+=("termux-exec")
 		PACKAGES+=("termux-keyring")
 		PACKAGES+=("termux-tools")
