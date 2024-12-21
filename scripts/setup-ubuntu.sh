@@ -344,8 +344,14 @@ $SUDO locale-gen --purge en_US.UTF-8
 echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US:en"\n' | $SUDO tee -a /etc/default/locale
 
 . $(dirname "$(realpath "$0")")/properties.sh
-$SUDO mkdir -p $TERMUX_PREFIX
-$SUDO chown -R $(whoami) /data
+
+# Ownership of `TERMUX__PREFIX` must be fixed before `TERMUX_APP__DATA_DIR`
+# if its under it, otherwise `TERMUX__ROOTFS` will not have its ownership fixed.
+$SUDO mkdir -p "$TERMUX__PREFIX"
+$SUDO chown -R "$(whoami)" "$TERMUX__PREFIX"
+$SUDO mkdir -p "$TERMUX_APP__DATA_DIR"
+$SUDO chown -R "$(whoami)" "${TERMUX_APP__DATA_DIR%"${TERMUX_APP__DATA_DIR#/*/}"}" # Get `/path/` from `/path/to/app__data_dir`.
+
 $SUDO ln -sf /data/data/com.termux/files/usr/opt/aosp /system
 
 # Install newer pkg-config then what ubuntu provides, as the stock
