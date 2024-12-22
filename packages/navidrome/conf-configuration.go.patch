@@ -1,12 +1,11 @@
-diff -uNr navidrome-0.50.1/conf/configuration.go navidrome-0.50.1.mod/conf/configuration.go
---- navidrome-0.50.1/conf/configuration.go	2023-11-22 10:34:03.000000000 +0800
-+++ navidrome-0.50.1.mod/conf/configuration.go	2023-12-02 18:33:33.705904933 +0800
-@@ -171,9 +171,11 @@
+--- a/conf/configuration.go
++++ b/conf/configuration.go
+@@ -199,9 +199,11 @@
  	}
  	err = os.MkdirAll(Server.CacheFolder, os.ModePerm)
  	if err != nil {
 +		if os.IsExist(err) == false {
- 		_, _ = fmt.Fprintln(os.Stderr, "FATAL: Error creating cache path:", "path", Server.CacheFolder, err)
+ 		_, _ = fmt.Fprintln(os.Stderr, "FATAL: Error creating cache path:", err)
  		os.Exit(1)
  	}
 +	}
