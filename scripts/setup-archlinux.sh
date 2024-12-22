@@ -52,7 +52,13 @@ fi
 
 $SUDO pacman -Syq --noconfirm $PACKAGES
 
-$SUDO mkdir -p /data/data/com.termux/files/usr
-$SUDO chown -R $(whoami) /data
+. $(dirname "$(realpath "$0")")/properties.sh
+
+# Ownership of `TERMUX__PREFIX` must be fixed before `TERMUX_APP__DATA_DIR`
+# if its under it, otherwise `TERMUX__ROOTFS` will not have its ownership fixed.
+$SUDO mkdir -p "$TERMUX__PREFIX"
+$SUDO chown -R "$(whoami)" "$TERMUX__PREFIX"
+$SUDO mkdir -p "$TERMUX_APP__DATA_DIR"
+$SUDO chown -R "$(whoami)" "${TERMUX_APP__DATA_DIR%"${TERMUX_APP__DATA_DIR#/*/}"}" # Get `/path/` from `/path/to/app__data_dir`.
 
 echo "Please also install ncurses5-compat-libs and makedepend packages from the AUR before continuing"
