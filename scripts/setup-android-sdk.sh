@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 set -e -u
 
 # Install desired parts of the Android SDK:

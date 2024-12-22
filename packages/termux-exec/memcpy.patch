@@ -1,0 +1,23 @@
+Fix `implicit declaration of function 'mempcpy' is invalid in C99`
+---
+
+diff -uNr a/src/exec/exec_variants.c b/src/exec/exec_variants.c
+--- a/src/exec/exec_variants.c
++++ b/src/exec/exec_variants.c
+@@ -43,6 +43,16 @@
+ 
+ static const char* LOG_TAG = "exec";
+ 
++#ifdef __ANDROID__
++# ifndef ANDROID_MEMPCPY
++# define ANDROID_MEMPCPY 1
++static __inline__ void* mempcpy(void* dest, void const* src, size_t n)
++{
++      return memcpy(dest, src, n) + n;
++}
++# endif
++#endif
++
+ int execl_hook(bool hook, int variant, const char *name, const char *argv0, va_list ap) {
+     if (hook) {
+         logErrorDebug(LOG_TAG, "<----- %s() hooked ----->", EXEC_VARIANTS_STR[variant]);
