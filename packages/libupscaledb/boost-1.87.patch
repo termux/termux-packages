@@ -1,0 +1,76 @@
+diff '--color=auto' -uNr src.orig/src/2worker/worker.h src/src/2worker/worker.h
+--- src.orig/src/2worker/worker.h	2024-12-23 07:49:28.825179030 +0000
++++ src/src/2worker/worker.h	2024-12-23 07:49:35.408483875 +0000
+@@ -78,9 +78,9 @@
+   // keep track of the threads so we can join them
+   std::vector<boost::thread *> workers;
+    
+-  // the io_service we are wrapping
+-  boost::asio::io_service service;
+-  boost::asio::io_service::work working;
++  // the io_context we are wrapping
++  boost::asio::io_context service;
++  boost::asio::io_context::work working;
+ #if BOOST_VERSION < 106600
+   boost::asio::strand strand;
+ #else
+diff '--color=auto' -uNr src.orig/src/5server/upsserver.h src/src/5server/upsserver.h
+--- src.orig/src/5server/upsserver.h	2024-12-23 07:49:28.828512348 +0000
++++ src/src/5server/upsserver.h	2024-12-23 07:49:35.408483875 +0000
+@@ -133,8 +133,8 @@
+ };
+ 
+ struct Session {
+-  Session(Server *server_, boost::asio::io_service &io_service)
+-    : server(server_), socket(io_service), buffer_in(1024),
++  Session(Server *server_, boost::asio::io_context &io_context)
++    : server(server_), socket(io_context), buffer_in(1024),
+       current_position(0) {
+   }
+ 
+@@ -171,30 +171,30 @@
+ 
+ struct Server {
+   Server(short port)
+-    : acceptor(io_service, boost::asio::ip::tcp::endpoint(
++    : acceptor(io_context, boost::asio::ip::tcp::endpoint(
+                             boost::asio::ip::tcp::v4(), port)) {
+     start_accept();
+   }
+ 
+   Server(std::string bind_url, short port)
+-    : acceptor(io_service, boost::asio::ip::tcp::endpoint(
++    : acceptor(io_context, boost::asio::ip::tcp::endpoint(
+                             boost::asio::ip::address::from_string(bind_url),
+                             port)) {
+     start_accept();
+   }
+ 
+   ~Server() {
+-    io_service.stop();
++    io_context.stop();
+     thread->join();
+   }
+ 
+   void run() {
+-    thread.reset(new boost::thread(boost::bind(&boost::asio::io_service::run,
+-                                    &io_service)));
++    thread.reset(new boost::thread(boost::bind(&boost::asio::io_context::run,
++                                    &io_context)));
+   }
+ 
+   void start_accept() {
+-    Session *new_session = new Session(this, io_service);
++    Session *new_session = new Session(this, io_context);
+     acceptor.async_accept(new_session->socket,
+                     boost::bind(&Server::handle_accept, this, new_session,
+                             boost::asio::placeholders::error));
+@@ -219,7 +219,7 @@
+     return Handle<Db>(0, 0, true);
+   }
+ 
+-  boost::asio::io_service io_service;
++  boost::asio::io_context io_context;
+   boost::asio::ip::tcp::acceptor acceptor;
+   ScopedPtr<boost::thread> thread;
+ 

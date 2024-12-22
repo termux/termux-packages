@@ -1,0 +1,14 @@
+--- ./src/utils.h.orig	2024-12-22 11:07:43.853461769 +0000
++++ ./src/utils.h	2024-12-22 11:31:05.161673812 +0000
+@@ -627,9 +627,9 @@
+ 
+   sha.process_bytes(str.c_str(), str.length());
+ 
+-  unsigned int message_digest[5];
++  unsigned char message_digest[20];
+   sha.get_digest(message_digest);
+-  return to_hex(message_digest, 5);
++  return to_hex((unsigned int*)message_digest, 5);
+ }
+ 
+ extern const string version;

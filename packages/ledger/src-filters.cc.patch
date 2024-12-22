@@ -1,0 +1,29 @@
+--- ./src/filters.cc.orig	2024-12-22 11:32:04.494785452 +0000
++++ ./src/filters.cc	2024-12-22 11:32:58.807916062 +0000
+@@ -238,7 +238,7 @@
+ void anonymize_posts::operator()(post_t& post)
+ {
+ 	boost::uuids::detail::sha1  sha;
+-  unsigned int message_digest[5];
++  unsigned char message_digest[20];
+   bool         copy_xact_details = false;
+ 
+   if (last_xact != post.xact) {
+@@ -260,7 +260,7 @@
+     sha.process_bytes(buf.str().c_str(), buf.str().length());
+     sha.get_digest(message_digest);
+ 
+-    xact.payee = to_hex(message_digest);
++    xact.payee = to_hex((unsigned int*)message_digest);
+     xact.note  = none;
+   } else {
+     xact.journal = post.xact->journal;
+@@ -278,7 +278,7 @@
+     sha.process_bytes(buf.str().c_str(), buf.str().length());
+     sha.get_digest(message_digest);
+ 
+-    account_names.push_front(to_hex(message_digest));
++    account_names.push_front(to_hex((unsigned int*)message_digest));
+   }
+ 
+   account_t * new_account =

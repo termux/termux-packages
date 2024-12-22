@@ -1,0 +1,29 @@
+--- ./src/executable_path.cpp.orig	2024-12-22 13:22:59.055393380 +0000
++++ ./src/executable_path.cpp	2024-12-22 13:24:46.601801274 +0000
+@@ -42,7 +42,7 @@
+     }
+     boost::filesystem::path full_path(
+         boost::filesystem::system_complete(
+-            boost::filesystem::path(buf).normalize()));
++            boost::filesystem::path(buf).lexically_normal()));
+     return full_path.string();
+ }
+ 
+@@ -76,7 +76,7 @@
+     std::string path(buf, size);
+     boost::filesystem::path full_path(
+         boost::filesystem::system_complete(
+-            boost::filesystem::path(path).normalize()));
++            boost::filesystem::path(path).lexically_normal()));
+     return full_path.string();
+ }
+ 
+@@ -95,7 +95,7 @@
+     std::string path(buf, size);
+     boost::filesystem::path full_path(
+         boost::filesystem::system_complete(
+-            boost::filesystem::path(path).normalize()));
++            boost::filesystem::path(path).lexically_normal()));
+     return full_path.string();
+ }
+ 

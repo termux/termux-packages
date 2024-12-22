@@ -1,0 +1,11 @@
+--- ./src/node.cc.orig	2024-12-22 12:39:00.843694144 +0000
++++ ./src/node.cc	2024-12-22 12:39:14.910311432 +0000
+@@ -104,7 +104,7 @@
+ 
+ void AbstractNode::progress_prepare()
+ {
+-	std::for_each(this->children.begin(), this->children.end(), std::mem_fun(&AbstractNode::progress_prepare));
++	std::for_each(this->children.begin(), this->children.end(), std::mem_fn(&AbstractNode::progress_prepare));
+ 	this->progress_mark = ++progress_report_count;
+ }
+ 

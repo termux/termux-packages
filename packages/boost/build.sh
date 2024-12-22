@@ -4,12 +4,11 @@ TERMUX_PKG_LICENSE="BSL-1.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Never forget to always bump revision of reverse dependencies and rebuild them
 # when bumping version.
-TERMUX_PKG_VERSION="1.83.0"
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION="1.87.0"
 TERMUX_PKG_SRCURL=https://boostorg.jfrog.io/artifactory/main/release/$TERMUX_PKG_VERSION/source/boost_${TERMUX_PKG_VERSION//./_}.tar.bz2
-TERMUX_PKG_SHA256=6478edfe2f3305127cffe8caf73ea0176c53769f4bf1585be237eb30798c3b8e
+TERMUX_PKG_SHA256=af57be25cb4c4f4b413ed692fe378affb4352ea50fbe294a11ef548f4d527d89
 TERMUX_PKG_AUTO_UPDATE=false
-TERMUX_PKG_DEPENDS="libc++, libbz2, libiconv, liblzma, zlib"
+TERMUX_PKG_DEPENDS="libc++, libbz2, libiconv, liblzma, libandroid-wordexp, zlib"
 TERMUX_PKG_BUILD_DEPENDS="python"
 TERMUX_PKG_BREAKS="libboost-python (<= 1.65.1-2), boost-dev"
 TERMUX_PKG_REPLACES="libboost-python (<= 1.65.1-2), boost-dev"
@@ -25,6 +24,19 @@ termux_step_pre_configure() {
 
 termux_step_make_install() {
 	CXXFLAGS+=" -std=c++14"
+	# https://www.boost.org/doc/libs/1_87_0/libs/unordered/doc/html/unordered.html#debuggability_gdb_pretty_printers
+	# Disable this as it causes inline assembly errors on arm:
+	# <inline asm>:1:41: error: expected '%<type>' or "<type>"
+	#     1 | .pushsection ".debug_gdb_scripts", "MS",@progbits,1
+	#       |                                         ^
+	# <inline asm>:318:12: error: .popsection without corresponding .pushsection
+	#   318 | .popsection
+	#       |            ^
+	# 2 errors generated.
+	sed -i -e 's|#ifndef BOOST_ALL_NO_EMBEDDED_GDB_SCRIPTS|#if 0|g' \
+		./boost/interprocess/interprocess_printers.hpp \
+		./boost/unordered/unordered_printers.hpp \
+		./boost/json/detail/config.hpp
 
 	rm $TERMUX_PREFIX/lib/libboost* -f
 	rm $TERMUX_PREFIX/include/boost -rf
