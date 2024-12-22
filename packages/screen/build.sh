@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="5.0.0"
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/screen/screen-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=f04a39d00a0e5c7c86a55338808903082ad5df4d73df1a2fd3425976aed94971
-TERMUX_PKG_DEPENDS="ncurses, libcrypt"
+TERMUX_PKG_DEPENDS="ncurses, termux-auth"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -17,8 +17,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_pre_configure() {
 	# Run autoreconf since we have patched configure.ac
 	autoreconf -fi
-	CFLAGS+=" -DGETUTENT"
-	export LIBS="-lcrypt"
+	CFLAGS+=" -DGETUTENT -Dindex=strchr -Drindex=strrchr"
+	export LIBS="-ltermux-auth"
 }
 
 termux_step_post_configure() {
