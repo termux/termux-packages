@@ -315,6 +315,9 @@ PACKAGES+=" tree-sitter-cli"
 # Needed by wlroots
 PACKAGES+=" glslang-tools"
 
+# Needed by lesspipe for completions
+PACKAGES+=" zsh"
+
 # Do not require sudo if already running as root.
 SUDO="sudo"
 if [ "$(id -u)" = "0" ]; then
