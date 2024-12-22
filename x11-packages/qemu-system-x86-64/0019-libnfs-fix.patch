@@ -1,21 +1,22 @@
 diff -uNr qemu-8.2.6/block/nfs.c qemu-8.2.6.mod/block/nfs.c
 --- qemu-8.2.6/block/nfs.c	2024-07-16 23:23:46.000000000 +0300
-+++ qemu-8.2.6.mod/block/nfs.c	2024-12-22 04:04:31.484038274 +0200
-@@ -272,9 +272,11 @@
-     nfs_co_init_task(bs, &task);
-     task.iov = iov;
++++ qemu-8.2.6.mod/block/nfs.c	2024-12-22 14:30:32.265373660 +0200
+@@ -270,11 +270,11 @@
+     NFSRPC task;
  
-+    char *buf = g_try_malloc(bytes);
-+    if (!buf) return -ENOMEM;
-+
+     nfs_co_init_task(bs, &task);
+-    task.iov = iov;
+ 
      WITH_QEMU_LOCK_GUARD(&client->mutex) {
 -        if (nfs_pread_async(client->context, client->fh,
 -                            offset, bytes, nfs_co_generic_cb, &task) != 0) {
-+        if (nfs_pread_async(client->context, client->fh, buf, bytes, offset, nfs_co_generic_cb, &task) != 0) {
++        if (nfs_pread_async(client->context, client->fh, iov->iov[0].iov_base,
++                            bytes > iov->iov[0].iov_len ? iov->iov[0].iov_len : bytes,
++                            offset, nfs_co_generic_cb, &task) != 0) {
              return -ENOMEM;
          }
  
-@@ -320,7 +322,7 @@
+@@ -320,7 +320,7 @@
  
      WITH_QEMU_LOCK_GUARD(&client->mutex) {
          if (nfs_pwrite_async(client->context, client->fh,
