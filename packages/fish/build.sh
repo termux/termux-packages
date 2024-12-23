@@ -19,8 +19,33 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 
 termux_step_pre_configure() {
 	termux_setup_cmake
+	termux_setup_ninja
 	termux_setup_rust
 
+	# FindRust.cmake auto pick thumbv7neon-linux-androideabi
+	[[ "${TERMUX_ARCH}" == "arm" ]] && TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCMAKE_ANDROID_ARM_MODE=ON"
+
+	# older than Android 8 dont have ctermid
+	"${CC}" ${CPPFLAGS} ${CFLAGS} -c ${TERMUX_PKG_BUILDER_DIR}/ctermid.c
+	"${AR}" cru libctermid.a ctermid.o
+
+	# cmake invoke rustc directly leaving CARGO_TARGET_*_RUSTFLAGS unused
+	local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
+	export RUSTFLAGS=$(env | grep CARGO_TARGET_${env_host}_RUSTFLAGS | cut -d'=' -f2-)
+	RUSTFLAGS+=" -C link-arg=-landroid-spawn"
+	RUSTFLAGS+=" -L${TERMUX_PKG_BUILDDIR} -C link-arg=-l:libctermid.a"
+
+	: "${CARGO_HOME:=${HOME}/.cargo}"
+	export CARGO_HOME
+
+	cargo fetch --target "${CARGO_TARGET_NAME}"
+
+	local libc p
+	for libc in ${CARGO_HOME}/registry/src/*/libc-*; do
+		for p in ${TERMUX_PKG_BUILDER_DIR}/libc-*.diff; do
+			test -f "${p}" && patch -p1 -d "${libc}" -i "${p}" || :
+		done
+	done
 }
 
 termux_step_post_make_install() {
