@@ -1,0 +1,59 @@
+--- a/src/xfdesktop-backdrop-manager.c
++++ b/src/xfdesktop-backdrop-manager.c
+@@ -408,7 +408,7 @@
+ G_GNUC_END_IGNORE_DEPRECATIONS
+     return g_strdup_printf("/backdrop/screen%d/monitor%s/",
+                            screen_num,
+-                           monitor_get_identifier(monitor));
++                           xfdesktop_remove_whitspaces(monitor_get_identifier(monitor)));
+ }
+ 
+ static gchar *
+@@ -442,7 +442,7 @@
+ 
+     gchar *span_monitor_property_prefix = g_strdup_printf("/backdrop/screen%d/monitor%s/workspace%d",
+                                                           screen_num,
+-                                                          monitor_get_identifier(first_monitor),
++                                                          xfdesktop_remove_whitspaces(monitor_get_identifier(first_monitor)),
+                                                           workspace_num);
+     gchar *first_image_style_prop = g_strconcat(span_monitor_property_prefix, "/image-style", NULL);
+     XfceBackdropImageStyle first_image_style = xfconf_channel_get_int(manager->channel,
+@@ -467,7 +467,7 @@
+         }
+         return g_strdup_printf("/backdrop/screen%d/monitor%s/workspace%d",
+                                screen_num,
+-                               monitor_get_identifier(the_monitor),
++                               xfdesktop_remove_whitspaces(monitor_get_identifier(the_monitor)),
+                                workspace_num);
+     }
+ }
+
+--- a/common/xfdesktop-common.c
++++ b/common/xfdesktop-common.c
+@@ -538,7 +538,7 @@
+                     for (gint i = 0; i < n_workspaces; ++i) {
+                         gchar *new_name = g_strdup_printf("/backdrop/screen%d/monitor%s/workspace%d/%s",
+                                                           screen_num,
+-                                                          monitor_name,
++                                                          xfdesktop_remove_whitspaces(monitor_name),
+                                                           i,
+                                                           new_setting_name);
+                         if (!xfconf_channel_has_property(channel, new_name)) {
+@@ -582,7 +582,7 @@
+             for (gint i = 0; i < n_workspaces; ++i) {
+                 gchar *new_name = g_strdup_printf("/backdrop/screen%d/monitor%s/workspace%d/image-style",
+                                                   screen_num,
+-                                                  monitor_name,
++                                                  xfdesktop_remove_whitspaces(monitor_name),
+                                                   i);
+                 if (!xfconf_channel_has_property(channel, new_name)) {
+                     xfconf_channel_set_int(channel, new_name, XFCE_BACKDROP_IMAGE_NONE);
+@@ -671,7 +671,7 @@
+                             for (gint i = 0; i < n_workspaces; ++i) {
+                                 gchar *new_name = g_strdup_printf("/backdrop/screen%d/monitor%s/workspace%d/%s",
+                                                                   screen_num,
+-                                                                  monitor_name,
++                                                                  xfdesktop_remove_whitspaces(monitor_name),
+                                                                   i,
+                                                                   setting_name);
+                                 if (!xfconf_channel_has_property(channel, new_name)) {
