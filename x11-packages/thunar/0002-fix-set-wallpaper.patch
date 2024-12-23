@@ -1,0 +1,42 @@
+--- a/plugins/thunar-wallpaper/twp-provider.c
++++ b/plugins/thunar-wallpaper/twp-provider.c
+@@ -163,6 +163,28 @@
+   return items;
+ }
+ 
++/* from xfdesktop/common/xfdesktop-common.c */
++static gchar*
++remove_whitespaces(gchar* str)
++{
++    gchar* dest;
++    guint offs, curr;
++
++    g_return_val_if_fail(str, NULL);
++
++    offs = 0;
++    dest = str;
++    for(curr=0; curr<=strlen(str); curr++) {
++        if(*dest == ' ' || *dest == '\t')
++            offs++;
++        else if(0 != offs)
++            *(dest-offs) = *dest;
++        dest++;
++    }
++
++    return str;
++}
++
+ static void
+ twp_action_set_wallpaper (ThunarxMenuItem *item,
+                           gpointer         user_data)
+@@ -268,8 +290,8 @@
+        * that it works as the user expects. */
+       if (monitor_name)
+         {
+-          image_path_prop = g_strdup_printf ("/backdrop/screen%d/monitor%s/workspace%d/last-image", screen_nr, monitor_name, workspace);
+-          image_style_prop = g_strdup_printf ("/backdrop/screen%d/monitor%s/workspace%d/image-style", screen_nr, monitor_name, workspace);
++          image_path_prop = g_strdup_printf ("/backdrop/screen%d/monitor%s/workspace%d/last-image", screen_nr, remove_whitespaces(monitor_name), workspace);
++          image_style_prop = g_strdup_printf ("/backdrop/screen%d/monitor%s/workspace%d/image-style", screen_nr, remove_whitespaces(monitor_name), workspace);
+         }
+       else
+         {
