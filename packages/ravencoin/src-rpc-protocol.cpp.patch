@@ -1,0 +1,11 @@
+--- ./src/rpc/protocol.cpp.orig	2024-12-22 13:09:05.524284387 +0000
++++ ./src/rpc/protocol.cpp	2024-12-22 13:09:14.987587692 +0000
+@@ -75,7 +75,7 @@
+         arg += ".tmp";
+     }
+     fs::path path(arg);
+-    if (!path.is_complete()) path = GetDataDir() / path;
++    if (!path.is_absolute()) path = GetDataDir() / path;
+     return path;
+ }
+ 

@@ -1,0 +1,19 @@
+--- ./src/FreetypeRenderer.h.orig	2024-12-22 12:42:09.206366331 +0000
++++ ./src/FreetypeRenderer.h	2024-12-22 12:43:02.166180482 +0000
+@@ -25,6 +25,7 @@
+  */
+ #pragma once
+ 
++#include <functional>
+ #include <string>
+ #include <vector>
+ #include <ostream>
+@@ -124,7 +125,7 @@
+         hb_glyph_position_t *glyph_pos;
+     };
+ 
+-    struct done_glyph : public std::unary_function<const GlyphData *, void> {
++    struct done_glyph : public std::function<void(const GlyphData *)> {
+         void operator() (const GlyphData *glyph_data) {
+             FT_Done_Glyph(glyph_data->get_glyph());
+             delete glyph_data;
