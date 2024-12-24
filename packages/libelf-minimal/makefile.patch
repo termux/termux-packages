@@ -1,0 +1,19 @@
+diff --git a/Makefile b/Makefile
+index 2e6bbe5..0e00aea 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,9 +1,12 @@
+ INCDIR = $(PREFIX)/include
+ LIBDIR = $(PREFIX)/lib
++PKG_CONFIG = pkg-config
+ 
+-CFLAGS = -O2 -Wall
++CFLAGS = -O2 -Wall $(shell $(PKG_CONFIG) --cflags zlib) \
++  $(shell $(PKG_CONFIG) --cflags libzstd)
+ LDFLAGS =
+-LDLIBS = -lz -lzstd
++LDLIBS = $(shell $(PKG_CONFIG) --libs zlib) \
++  $(shell $(PKG_CONFIG) --libs libzstd)
+ 
+ MAJOR = 1
+ MINOR = 0.192

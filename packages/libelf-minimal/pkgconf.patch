@@ -1,0 +1,64 @@
+diff --git a/Makefile b/Makefile
+index 0e00aea..4bb6a39 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,5 +1,7 @@
++PREFIX ?= /usr/local
+ INCDIR = $(PREFIX)/include
+ LIBDIR = $(PREFIX)/lib
++DATADIR = $(PREFIX)/share
+ PKG_CONFIG = pkg-config
+ 
+ CFLAGS = -O2 -Wall $(shell $(PKG_CONFIG) --cflags zlib) \
+@@ -18,7 +20,7 @@ PICOBJS = $(patsubst %.c,%.os,$(SOURCES))
+ 
+ override CFLAGS += -DHAVE_CONFIG_H -Iinclude -Isrc
+ 
+-all: libelf.a libelf.so
++all: libelf.a libelf.so libelf.pc
+ 
+ clean:
+ 	rm -f src/*.o src/*.os libelf.a libelf.so
+@@ -36,12 +38,24 @@ libelf.so: $(PICOBJS) Makefile
+ %.os:: %.c $(HEADERS) Makefile
+ 	$(CC) $(CFLAGS) -fPIC -c -o $@ $<
+ 
+-install: install-headers install-static install-shared
++libelf.pc: libelf.pc.in Makefile
++	sed \
++		-e 's!@prefix[@]!$(PREFIX)!g' \
++		-e 's!@libdir[@]!$(LIBDIR)!g' \
++		-e 's!@includedir[@]!$(INCDIR)!g' \
++		-e 's!@VERSION[@]!$(MINOR)!g' \
++		$< >$@
++
++install: install-headers install-static install-shared install-pc
+ 
+ install-headers: include/*.h
+ 	mkdir -p $(DESTDIR)$(INCDIR)
+ 	install -m 0644 include/*.h $(DESTDIR)$(INCDIR)
+ 
++install-pc: libelf.pc
++	mkdir -p $(DESTDIR)$(DATADIR)/pkgconfig
++	install -m 0644 $^ $(DESTDIR)$(DATADIR)/pkgconfig
++
+ install-static: libelf.a install-headers
+ 	mkdir -p $(DESTDIR)$(LIBDIR)
+ 	install -m 0644 $< $(DESTDIR)$(LIBDIR)
+diff --git a/libelf.pc.in b/libelf.pc.in
+new file mode 100644
+index 0000000..8212491
+--- /dev/null
++++ b/libelf.pc.in
+@@ -0,0 +1,11 @@
++prefix=@prefix@
++libdir=@libdir@
++includedir=@includedir@
++
++Name: libelf
++Description: elfutils libelf library to read and write ELF files
++Version: @VERSION@
++URL: https://github.com/arachsys/libelf/
++
++Libs: -L${libdir} -lelf
++Cflags: -I${includedir}
