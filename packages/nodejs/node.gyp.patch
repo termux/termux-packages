@@ -1,5 +1,5 @@
---- ./node.gyp.orig	2024-12-10 16:14:44.000000000 +0530
-+++ ./node.gyp	2024-12-17 09:52:32.069275444 +0530
+--- ./node.gyp.orig	2024-12-24 22:24:44.092575716 +0530
++++ ./node.gyp	2024-12-24 22:29:08.229247343 +0530
 @@ -551,7 +551,8 @@
        ],
  
@@ -10,7 +10,7 @@
        ],
  
        'dependencies': [
-@@ -1030,293 +1031,7 @@
+@@ -1030,313 +1031,7 @@
          },
        ],
      }, # node_lib_target_name
@@ -21,7 +21,7 @@
 -        '<(node_lib_target_name)',
 -        'deps/histogram/histogram.gyp:histogram',
 -      ],
--
+ 
 -      'includes': [
 -        'node.gypi'
 -      ],
@@ -252,7 +252,7 @@
 -        'src/node_snapshot_stub.cc',
 -        'test/embedding/embedtest.cc',
 -      ],
- 
+-
 -      'conditions': [
 -        ['OS=="solaris"', {
 -          'ldflags': [ '-I<(SHARED_INTERMEDIATE_DIR)' ]
@@ -281,6 +281,26 @@
 -    }, # embedtest
 -
 -    {
+-      'target_name': 'sqlite_extension',
+-      'type': 'shared_library',
+-      'sources': [
+-        'test/sqlite/extension.c'
+-      ],
+-
+-      'include_dirs': [
+-        'test/sqlite',
+-        'deps/sqlite',
+-      ],
+-
+-      'cflags': [
+-        '-fPIC',
+-        '-Wall',
+-        '-Wextra',
+-        '-O3',
+-      ],
+-    }, # sqlitetest
+-
+-    {
 -      'target_name': 'overlapped-checker',
 -      'type': 'executable',
 -
@@ -304,7 +324,7 @@
      {
        'target_name': 'node_js2c',
        'type': 'executable',
-@@ -1353,76 +1068,6 @@
+@@ -1373,76 +1068,6 @@
          }],
        ]
      },
