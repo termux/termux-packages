@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Termux X11 add-on."
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Twaik Yont @twaik"
 TERMUX_PKG_VERSION=1.03.01
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/termux/termux-x11/archive/b0d07afa02a92699a267b2d30c24113fddce07ea.tar.gz
 TERMUX_PKG_SHA256=bd9d4580d83d4f1430be4e2ef4b18922dca7d3f4679cb3dbb05e337f3fc3f366
 TERMUX_PKG_AUTO_UPDATE=false
@@ -31,4 +31,8 @@ termux_step_create_debscripts() {
 		#!${TERMUX_PREFIX}/bin/sh
 		chmod -w $TERMUX_PREFIX/libexec/termux-x11/loader.apk
 	EOF
+
+	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ]; then
+		echo "post_install" > postupg
+	fi
 }
