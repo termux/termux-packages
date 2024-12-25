@@ -34,12 +34,12 @@
  
  		Display* display = XOpenDisplay(nullptr);
  
-@@ -162,7 +180,11 @@
+@@ -170,7 +170,11 @@
  				pthread_create(&mThread, nullptr, threadedXIKeyListenner, nullptr);
  			else if (mThread)
  			{
 +#ifndef __ANDROID__
- 				pthread_cancel(mThread); //also close the XDisplay in the thread
+ 				pthread_cancel(mThread); // also close the XDisplay in the thread
 +#else
 +				pthread_kill(mThread, SIGUSR2);
 +#endif
