@@ -1,0 +1,13 @@
+Fix `implicit declaration of function 'basename' is invalid in C99`
+---
+
+diff -uNr a/src/file/file_utils.c b/src/file/file_utils.c
+--- a/src/file/file_utils.c
++++ b/src/file/file_utils.c
+@@ -1,5 +1,6 @@
+ #define _GNU_SOURCE
+ #include <errno.h>
++#include <libgen.h> /* for basename(3) */
+ #include <limits.h>
+ #include <regex.h>
+ #include <stdio.h>

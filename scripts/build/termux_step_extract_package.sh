@@ -19,7 +19,7 @@ termux_step_extract_package() {
 		local file="$TERMUX_PKG_CACHEDIR/$filename"
 		# Allow TERMUX_PKG_SHA256 to be empty:
 		set +u
-		termux_download "${PKG_SRCURL[$i]}" "$file" "${PKG_SHA256[$i]}"
+		termux_download "${PKG_SRCURL[$i]}" "$file" "${PKG_SHA256[$i]:-}"
 		set -u
 
 		local folder
