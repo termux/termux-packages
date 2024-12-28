@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/cabinpkg/cabin
 TERMUX_PKG_DESCRIPTION="A package manager and build system for C++"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.10.1"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="0.11.0"
 TERMUX_PKG_SRCURL="https://github.com/cabinpkg/cabin/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=ba6a4b2df33ab9bb4eb5923e550bfe81725658fa6a647be5b0b4508ebfe7acc8
+TERMUX_PKG_SHA256=0ffefbfa8aa26a55c9acb058943a35a4d316ad13f588fee0c66ee5e16673e657
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_CONFLICTS="poac"
@@ -20,5 +19,5 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm755 -t $TERMUX_PREFIX/bin build-out/poac
+	install -Dm755 -t $TERMUX_PREFIX/bin build/cabin
 }
