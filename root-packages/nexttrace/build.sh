@@ -23,7 +23,7 @@ termux_step_make() {
 	go build -trimpath -o nexttrace \
 	-ldflags "-X 'github.com/nxtrace/NTrace-core/config.Version=${TERMUX_PKG_VERSION}' \
 	-X 'github.com/nxtrace/NTrace-core/config.BuildDate=${_BUILD_DATE}' \
-	-X 'github.com/nxtrace/NTrace-core/config.CommitID=${_COMMIT_SHA1}' -w -s"	
+	-X 'github.com/nxtrace/NTrace-core/config.CommitID=${_COMMIT_SHA1}' -w -s"
 }
 
 termux_step_make_install() {
