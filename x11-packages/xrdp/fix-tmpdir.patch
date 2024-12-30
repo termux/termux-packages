@@ -1,3 +1,28 @@
+diff --git a/sesman/sesman.c b/sesman/sesman.c
+index 6aafbc9..6d92560 100644
+--- a/sesman/sesman.c
++++ b/sesman/sesman.c
+@@ -925,15 +925,15 @@ main(int argc, char **argv)
+     LOG(LOG_LEVEL_INFO,
+         "starting xrdp-sesman with pid %d", g_pid);
+ 
+-    /* make sure the /tmp/.X11-unix directory exists */
+-    if (!g_directory_exist("/tmp/.X11-unix"))
++    /* make sure the @TERMUX_PREFIX@/tmp/.X11-unix directory exists */
++    if (!g_directory_exist("@TERMUX_PREFIX@/tmp/.X11-unix"))
+     {
+-        if (!g_create_dir("/tmp/.X11-unix"))
++        if (!g_create_dir("@TERMUX_PREFIX@/tmp/.X11-unix"))
+         {
+             LOG(LOG_LEVEL_ERROR,
+-                "sesman.c: error creating dir /tmp/.X11-unix");
++                "sesman.c: error creating dir @TERMUX_PREFIX@/tmp/.X11-unix");
+         }
+-        g_chmod_hex("/tmp/.X11-unix", 0x1777);
++        g_chmod_hex("@TERMUX_PREFIX@/tmp/.X11-unix", 0x1777);
+     }
+ 
+     if ((error = pre_session_list_init(MAX_PRE_SESSION_ITEMS)) == 0 &&
 diff --git a/sesman/session_list.c b/sesman/session_list.c
 index c4fd9d3..20771a7 100644
 --- a/sesman/session_list.c
