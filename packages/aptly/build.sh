@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.aptly.info
 TERMUX_PKG_DESCRIPTION="A Swiss Army knife for Debian repository management"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.5.0
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION="1.6.0"
 TERMUX_PKG_SRCURL=https://github.com/aptly-dev/aptly/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=07e18ce606feb8c86a1f79f7f5dd724079ac27196faa61a2cefa5b599bbb5bb1
+TERMUX_PKG_SHA256=4748d722f66859f24096f21c750f5d0961b906f81524ca3542dd1f206698f120
 TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make() {
@@ -18,12 +17,13 @@ termux_step_make() {
 
 	go mod tidy
 	go mod vendor
-	make install VERSION=$TERMUX_PKG_VERSION
+	go generate
+	go build -ldflags "-s -w" -trimpath -o build/aptly
 }
 
 termux_step_make_install() {
 	install -Dm700 \
-		"$GOPATH"/bin/${GOOS}_${GOARCH}/aptly \
+		"$GOPATH"/src/github.com/aptly-dev/aptly/build/aptly \
 		"$TERMUX_PREFIX"/bin/aptly
 
 	install -Dm600 \
