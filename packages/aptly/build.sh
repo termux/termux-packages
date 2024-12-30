@@ -29,4 +29,12 @@ termux_step_make_install() {
 	install -Dm600 \
 		"$TERMUX_PKG_SRCDIR"/man/aptly.1 \
 		"$TERMUX_PREFIX"/share/man/man1/aptly.1
+
+	install -Dm600 \
+		"$TERMUX_PKG_SRCDIR"/completion.d/aptly \
+		"$TERMUX_PREFIX"/share/bash-completion/completions/aptly
+
+	install -Dm600 \
+		"$TERMUX_PKG_SRCDIR"/completion.d/_aptly \
+		"$TERMUX_PREFIX"/share/zsh/site-functions/_aptly
 }
