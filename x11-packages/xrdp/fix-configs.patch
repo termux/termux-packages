@@ -1,23 +1,6 @@
-diff -uNr xrdp-0.9.16/sesman/sesman.ini xrdp-0.9.16.mod/sesman/sesman.ini
---- xrdp-0.9.16/sesman/sesman.ini	2021-04-30 12:26:36.000000000 +0000
-+++ xrdp-0.9.16.mod/sesman/sesman.ini	2021-05-05 22:52:27.069387793 +0000
-@@ -4,11 +4,14 @@
- ListenAddress=127.0.0.1
- ListenPort=3350
- EnableUserWindowManager=true
-+
- ; Give in relative path to user's home directory
- UserWindowManager=startwm.sh
--; Give in full path or relative path to /etc/xrdp
-+
-+; Give in full path or relative path to @TERMUX_PREFIX@/etc/xrdp
- DefaultWindowManager=startwm.sh
--; Give in full path or relative path to /etc/xrdp
-+
-+; Give in full path or relative path to @TERMUX_PREFIX@/etc/xrdp
- ReconnectScript=reconnectwm.sh
- 
- [Security]
+diff -uNr xrdp-0.9.16/sesman/sesman.ini.in xrdp-0.9.16.mod/sesman/sesman.ini
+--- xrdp-0.9.16/sesman/sesman.ini.in	2021-04-30 12:26:36.000000000 +0000
++++ xrdp-0.9.16.mod/sesman/sesman.ini.in	2021-05-05 22:52:27.069387793 +0000
 @@ -16,6 +19,7 @@
  MaxLoginRetry=4
  TerminalServerUsers=tsusers
@@ -35,12 +18,6 @@ diff -uNr xrdp-0.9.16/sesman/sesman.ini xrdp-0.9.16.mod/sesman/sesman.ini
  #SyslogLevel=INFO
  #EnableConsole=false
  #ConsoleLevel=INFO
-@@ -144,4 +148,4 @@
- #main()=INFO
- 
- [SessionVariables]
--PULSE_SCRIPT=/etc/xrdp/pulse/default.pa
-+PULSE_SCRIPT=@TERMUX_PREFIX@/etc/xrdp/pulse/default.pa
 diff -uNr xrdp-0.9.16/sesman/startwm.sh xrdp-0.9.16.mod/sesman/startwm.sh
 --- xrdp-0.9.16/sesman/startwm.sh	2020-12-28 14:03:43.000000000 +0000
 +++ xrdp-0.9.16.mod/sesman/startwm.sh	2021-05-05 22:52:27.069387793 +0000
@@ -91,9 +68,9 @@ diff -uNr xrdp-0.9.16/sesman/startwm.sh xrdp-0.9.16.mod/sesman/startwm.sh
  wm_start
  
  exit 1
-diff -uNr xrdp-0.9.16/xrdp/xrdp.ini xrdp-0.9.16.mod/xrdp/xrdp.ini
---- xrdp-0.9.16/xrdp/xrdp.ini	2021-04-30 12:26:36.000000000 +0000
-+++ xrdp-0.9.16.mod/xrdp/xrdp.ini	2021-05-05 22:54:03.485386615 +0000
+diff -uNr xrdp-0.9.16/xrdp/xrdp.ini.in xrdp-0.9.16.mod/xrdp/xrdp.ini
+--- xrdp-0.9.16/xrdp/xrdp.ini.in	2021-04-30 12:26:36.000000000 +0000
++++ xrdp-0.9.16.mod/xrdp/xrdp.ini.in	2021-05-05 22:54:03.485386615 +0000
 @@ -12,7 +12,7 @@ fork=true
  ;
  ; Examples:
@@ -112,7 +89,7 @@ diff -uNr xrdp-0.9.16/xrdp/xrdp.ini xrdp-0.9.16.mod/xrdp/xrdp.ini
  #SyslogLevel=INFO
  #EnableConsole=false
  #ConsoleLevel=INFO
-@@ -224,28 +224,17 @@ rail=true
+@@ -231,32 +231,17 @@ rail=true
  xrdpvr=true
  
  ; for debugging xrdp, in section xrdp1, change port=-1 to this:
@@ -129,31 +106,35 @@ diff -uNr xrdp-0.9.16/xrdp/xrdp.ini xrdp-0.9.16.mod/xrdp/xrdp.ini
 -; in sesman.ini. See and configure also sesman.ini.
 -[Xorg]
 -name=Xorg
--lib=libxup.so
+-lib=libxup.@lib_extension@
 -username=ask
 -password=ask
 -port=-1
 -code=20
+-; Frame capture interval (milliseconds)
+-h264_frame_interval=16
+-rfx_frame_interval=32
+-normal_frame_interval=40
 -
  [Xvnc]
  name=Xvnc
- lib=libvnc.so
+ lib=libvnc.@lib_extension@
 -username=ask
 +username=na
  password=ask
  ip=127.0.0.1
  port=-1
-@@ -258,73 +247,3 @@ port=-1
- ; (e.g. as part of an x11vnc console session). Replace '0' with the
- ; display number of the session
- #chansrvport=DISPLAY(0)
+@@ -265,82 +250,3 @@ port=-1
+ ; Disable requested encodings to support buggy VNC servers
+ ; (1 = ExtendedDesktopSize)
+ #disabled_encodings_mask=0
 -
 -; Generic VNC Proxy
 -; Tailor this to specific hosts and VNC instances by specifying an ip
 -; and port and setting a suitable name.
 -[vnc-any]
 -name=vnc-any
--lib=libvnc.so
+-lib=libvnc.@lib_extension@
 -ip=ask
 -port=ask5900
 -username=na
@@ -161,6 +142,15 @@ diff -uNr xrdp-0.9.16/xrdp/xrdp.ini xrdp-0.9.16.mod/xrdp/xrdp.ini
 -#pamusername=asksame
 -#pampassword=asksame
 -#delay_ms=2000
+-; Use one of these to connect to a chansrv instance created outside of sesman
+-; (e.g. as part of an x11vnc console session). Replace 'n' with the
+-; display number of the session, and (if applicable) 'u' with the numeric
+-; UID of the session.
+-;
+-; If 'username' or 'pamusername' is set, you probably don't need to use
+-; the two parameter variant with 'u'.
+-#chansrvport=DISPLAY(n)
+-#chansrvport=DISPLAY(n,u)
 -
 -; Generic RDP proxy using NeutrinoRDP
 -; Tailor this to specific hosts by specifying an ip and port and setting
@@ -169,7 +159,7 @@ diff -uNr xrdp-0.9.16/xrdp/xrdp.ini xrdp-0.9.16.mod/xrdp/xrdp.ini
 -name=neutrinordp-any
 -; To use this section, you should build xrdp with configure option
 -; --enable-neutrinordp.
--lib=libxrdpneutrinordp.so
+-lib=libxrdpneutrinordp.@lib_extension@
 -ip=ask
 -port=ask3389
 -username=ask
