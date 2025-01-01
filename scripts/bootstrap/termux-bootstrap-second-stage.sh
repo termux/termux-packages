@@ -5,6 +5,9 @@ export TERMUX_PREFIX="@TERMUX_PREFIX@"
 export TERMUX_PACKAGE_MANAGER="@TERMUX_PACKAGE_MANAGER@"
 export TERMUX_PACKAGE_ARCH="@TERMUX_PACKAGE_ARCH@"
 
+TERMUX__USER_ID___N="@TERMUX_ENV__S_TERMUX@USER_ID"
+TERMUX__USER_ID="${!TERMUX__USER_ID___N:-}"
+
 function log() { echo "[*]" "$@"; }
 function log_error() { echo "[*]" "$@" 1>&2; }
 
@@ -63,7 +66,7 @@ previous failure and it must be re-run again for testing, then delete
 the lock file manually and run `termux-bootstrap-second-stage.sh`
 again.
 
-**See Also:**
+**See also:**
 - https://github.com/termux/termux-packages/wiki/For-maintainers#bootstraps
 HELP_EOF
 
@@ -92,15 +95,32 @@ run_bootstrap_second_stage() {
 
 	local return_value
 
-	if ! ln -s "termux-bootstrap-second-stage.sh" \
-		"@TERMUX_BOOTSTRAP_CONFIG_DIR_PATH@/termux-bootstrap-second-stage.sh.lock" 2>/dev/null; then
-		log "The termux bootstrap second stage has already been run before and cannot be run again."
-		log "If you still want to force run it again (not recommended), \
+	local output
+
+
+	ensure_running_with_termux_uid || return $?
+
+
+	output="$(ln -s "termux-bootstrap-second-stage.sh" \
+		"@TERMUX_BOOTSTRAPS__BOOTSTRAP_CONFIG_DIR@/termux-bootstrap-second-stage.sh.lock" 2>&1)"
+	return_value=$?
+	if [ $return_value -ne 0 ]; then
+		if [ $return_value -eq 1 ] && [[ "$output" == *"File exists"* ]]; then
+			log "The termux bootstrap second stage has already been run before and cannot be run again."
+			log "If you still want to force run it again (not recommended), \
 like in case of previous failure and it must be re-run again for testing, \
-then delete the '@TERMUX_BOOTSTRAP_CONFIG_DIR_PATH@/termux-bootstrap-second-stage.sh.lock' \
+then delete the '@TERMUX_BOOTSTRAPS__BOOTSTRAP_CONFIG_DIR@/termux-bootstrap-second-stage.sh.lock' \
 file manually and run 'termux-bootstrap-second-stage.sh' again."
-		return 0
+			return 0
+		else
+			log_error "$output"
+			log_error "Failed to create lock file for termux bootstrap second stage at \
+'@TERMUX_BOOTSTRAPS__BOOTSTRAP_CONFIG_DIR@/termux-bootstrap-second-stage.sh.lock'"
+			warn_if_process_killed "$return_value" "ln"
+			return $return_value
+		fi
 	fi
+
 
 	log "Running termux bootstrap second stage"
 	run_bootstrap_second_stage_inner
@@ -111,6 +131,7 @@ file manually and run 'termux-bootstrap-second-stage.sh' again."
 	fi
 
 	log "The termux bootstrap second stage completed successfully"
+
 
 	return 0
 
@@ -359,6 +380,74 @@ run_package_postinst_maintainer_scripts() {
 	return 0
 
 }
+
+
+
+
+
+ensure_running_with_termux_uid() {
+
+	local return_value
+
+	local uid
+
+	# Find current effective uid
+	uid="$(id -u 2>&1)"
+	return_value=$?
+	if [ $return_value -ne 0 ]; then
+		log_error "$uid"
+		log_error "Failed to get uid of the user running the termux-bootstrap-second-stage.sh script"
+		warn_if_process_killed "$return_value" "uid"
+		# This gets triggered if `adb install -r --abi arm64-v8a termux-app_v*_universal.apk`
+		# is used to install Termux on a `x86_64` Android AVD where `getprop ro.product.cpu.abilist`
+		# returns `x86_64,arm64-v8a`, but only `x86_64` bootstrap zip should have been extracted
+		# to APK native lib directory and installed to rootfs.
+		# Commands do work if full path is executed in the shell, but some will fail with following
+		# error if only the `basename` of commands is used to rely on `$PATH`.
+		if [[ "$uid" == *"Unable to get realpath of id"* ]]; then
+			log_error "You have likely installed the wrong ABI/architecture variant \
+of the @TERMUX_APP__NAME@ app APK that is not compatible with the device."
+			log_error "Uninstall and reinstall the correct APK variant of the @TERMUX_APP__NAME@ app."
+			log_error "Install 'universal' variant if you do not know the correct \
+ABI/architecture of the device."
+		fi
+		return $return_value
+	fi
+
+	if [[ ! "$uid" =~ ^[0-9]+$ ]]; then
+		log_error "The uid '$uid' returned by 'id -u' command is not valid."
+		return 1
+	fi
+
+	if [[ -n "$TERMUX__UID" ]] && [[ "$uid" != "$TERMUX__UID" ]]; then
+		log_error "termux-bootstrap-second-stage.sh cannot be run as the uid '$uid' and \
+it must be run as the TERMUX__UID '$TERMUX__UID' exported by the @TERMUX_APP__NAME@ app."
+		return 1
+	fi
+
+	return 0
+
+}
+
+warn_if_process_killed() {
+
+	local return_value="${1:-}"
+	local command="${2:-}"
+
+	if [[ "$return_value" == "137" ]]; then
+		log_error "The '$command' command was apparently killed with SIGKILL (signal 9). \
+This may have been due to the security policies of the Android OS installed on your device.
+Check https://github.com/termux/termux-app/issues/4219 for more info."
+		return 0
+	fi
+
+	return 1
+
+}
+
+
+
+
 
 # If running in bash, run script logic, otherwise exit with usage error
 if [ -n "${BASH_VERSION:-}" ]; then
