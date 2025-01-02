@@ -18,3 +18,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DWITH_LIBSIXEL=on
 -DWITH_RSVG=on
 "
+
+termux_step_pre_configure() {
+	# error: non-constant-expression cannot be narrowed from type 'int64_t' to 'time_t' in initializer list [-Wc++11-narrowing]
+	CXXFLAGS+=" -Wno-c++11-narrowing"
+}
