@@ -1,11 +1,11 @@
 --- a/setup.py
 +++ b/setup.py
-@@ -32,7 +32,7 @@
-     include_dirs=[incdir],
+@@ -37,7 +37,7 @@
+     include_dirs=[incdir] if incdir else [],
      libraries=['libmp3lame'] if sys.platform == 'win32' else [],
      extra_objects=
--        [] if sys.platform == 'win32' else [os.path.join(libdir, 'libmp3lame.a')],
-+        [] if sys.platform == 'win32' else [os.path.join(libdir, 'libmp3lame.so')],
-     library_dirs=[libdir] if sys.platform == 'win32' else [],
+-        [] if sys.platform == 'win32' or not libdir else [os.path.join(libdir, 'libmp3lame.a')],
++        [] if sys.platform == 'win32' or not libdir else [os.path.join(libdir, 'libmp3lame.so')],
+     library_dirs=[libdir] if sys.platform == 'win32' and libdir else [],
      sources=['lameenc.c']
  )
