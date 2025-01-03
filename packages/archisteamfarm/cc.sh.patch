@@ -1,0 +1,11 @@
+--- a/cc.sh
++++ b/cc.sh
+@@ -111,7 +111,7 @@ if [ "$ASF_UI" -eq 1 ]; then
+ fi
+ 
+ DOTNET_FLAGS="-c $CONFIGURATION -p:ContinuousIntegrationBuild=true -p:UseAppHost=false --nologo"
+-PUBLISH_FLAGS="-r ${os_type}-${cpu_architecture} --no-self-contained"
++PUBLISH_FLAGS="-r ${DOTNET_TARGET_NAME} --no-self-contained"
+ 
+ if [ "$ANALYSIS" -eq 0 ]; then
+ 	DOTNET_FLAGS="$DOTNET_FLAGS -p:AnalysisMode=AllDisabledByDefault"
