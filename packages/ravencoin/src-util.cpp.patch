@@ -1,0 +1,20 @@
+--- ./src/util.cpp.orig	2024-12-22 13:04:31.751819668 +0000
++++ ./src/util.cpp	2024-12-22 13:08:15.774442234 +0000
+@@ -620,7 +620,7 @@
+ fs::path GetConfigFile(const std::string &confPath)
+ {
+     fs::path pathConfigFile(confPath);
+-    if (!pathConfigFile.is_complete())
++    if (!pathConfigFile.is_absolute())
+         pathConfigFile = GetDataDir(false) / pathConfigFile;
+ 
+     return pathConfigFile;
+@@ -657,7 +657,7 @@
+ fs::path GetPidFile()
+ {
+     fs::path pathPidFile(gArgs.GetArg("-pid", RAVEN_PID_FILENAME));
+-    if (!pathPidFile.is_complete()) pathPidFile = GetDataDir() / pathPidFile;
++    if (!pathPidFile.is_absolute()) pathPidFile = GetDataDir() / pathPidFile;
+     return pathPidFile;
+ }
+ 

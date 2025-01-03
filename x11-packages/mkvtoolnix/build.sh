@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Set of tools to create, edit and inspect Matroska files"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="89.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://gitlab.com/mbunkus/mkvtoolnix
 TERMUX_PKG_GIT_BRANCH=release-$TERMUX_PKG_VERSION
 TERMUX_PKG_AUTO_UPDATE=true

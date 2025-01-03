@@ -1,0 +1,13 @@
+--- ./src/hugin_base/hugin_utils/filesystem.h.orig	2024-12-22 05:20:03.344973414 +0000
++++ ./src/hugin_base/hugin_utils/filesystem.h	2024-12-22 05:31:41.111080628 +0000
+@@ -41,8 +41,8 @@
+         #define OVERWRITE_EXISTING std::tr2::sys::copy_options::overwrite_existing
+     #else
+         // MSVC 2017 is using experimental namespace
+-        namespace fs = std::experimental::filesystem;
+-        #define OVERWRITE_EXISTING std::experimental::filesystem::copy_options::overwrite_existing
++        namespace fs = std::filesystem;
++        #define OVERWRITE_EXISTING std::filesystem::copy_options::overwrite_existing
+     #endif
+ #else
+     // use Boost::Filesystem as fallback
