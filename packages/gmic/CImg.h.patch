@@ -1,9 +1,20 @@
-diff -uNr gmic-2.6.7/src/CImg.h gmic-2.6.7.mod/src/CImg.h
---- gmic-2.6.7/src/CImg.h	2019-06-28 09:56:12.000000000 +0300
-+++ gmic-2.6.7.mod/src/CImg.h	2019-06-29 18:45:02.595895578 +0300
-@@ -9838,8 +9838,10 @@
+--- gmic-3.5.0/src/CImg.h	2024-12-31 19:11:35.000000000 +0800
++++ gmic-3.5.0.mod/src/CImg.h	2025-01-04 03:25:46.407412118 +0800
+@@ -3274,7 +3274,11 @@
+ 
+       ~X11_attr() {
+         if (events_thread) {
++#ifndef __ANDROID__
+           pthread_cancel(*events_thread);
++#else
++          pthread_kill(*events_thread, SIGUSR1);
++#endif
+           delete events_thread;
+         }
+         pthread_cond_destroy(&wait_event);
+@@ -9897,8 +9901,10 @@
      static void* _events_thread(void *arg) { // Thread to manage events for all opened display windows
-       Display *const dpy = cimg::X11_attr().display;
+       Display *const dpy = cimg::X11_attr::ref().display;
        XEvent event;
 +#ifndef __ANDROID__
        pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED,0);
@@ -12,9 +23,9 @@ diff -uNr gmic-2.6.7/src/CImg.h gmic-2.6.7.mod/src/CImg.h
        if (!arg) for ( ; ; ) {
          cimg_lock_display();
          bool event_flag = XCheckTypedEvent(dpy,ClientMessage,&event);
-@@ -9852,7 +9854,9 @@
-             if (!cimg::X11_attr().wins[i]->_is_closed && event.xany.window==cimg::X11_attr().wins[i]->_window)
-               cimg::X11_attr().wins[i]->_handle_events(&event);
+@@ -9911,7 +9917,9 @@
+             if (!cimg::X11_attr::ref().wins[i]->_is_closed && event.xany.window==cimg::X11_attr::ref().wins[i]->_window)
+               cimg::X11_attr::ref().wins[i]->_handle_events(&event);
          cimg_unlock_display();
 +#ifndef __ANDROID__
          pthread_testcancel();
@@ -22,7 +33,7 @@ diff -uNr gmic-2.6.7/src/CImg.h gmic-2.6.7.mod/src/CImg.h
          cimg::sleep(8);
        }
        return 0;
-@@ -60774,8 +60774,8 @@
+@@ -68269,8 +68277,8 @@
          _cimg_test_temporary_path("D:\\Temp");
          _cimg_test_temporary_path("D:");
  #else
