@@ -4,10 +4,10 @@ TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Please align version with `ffplay` package.
 TERMUX_PKG_VERSION="7.1"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://www.ffmpeg.org/releases/ffmpeg-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=40973d44970dbc83ef302b0609f2e74982be2d85916dd2ee7472d30678a7abe6
-TERMUX_PKG_DEPENDS="fontconfig, freetype, fribidi, game-music-emu, harfbuzz, libaom, libandroid-glob, libass, libbluray, libbz2, libdav1d, libgnutls, libiconv, liblzma, libmp3lame, libopencore-amr, libopenmpt, libopus, librav1e, libsoxr, libsrt, libssh, libtheora, libv4l, libvidstab, libvmaf, libvo-amrwbenc, libvorbis, libvpx, libwebp, libx264, libx265, libxml2, libzimg, littlecms, ocl-icd, rubberband, svt-av1, xvidcore, zlib"
+TERMUX_PKG_DEPENDS="fontconfig, freetype, fribidi, game-music-emu, harfbuzz, libandroid-glob, libaom, libass, libbluray, libbz2, libdav1d, libgnutls, libiconv, liblzma, libmp3lame, libopencore-amr, libopenmpt, libopus, librav1e, libsoxr, libsrt, libssh, libtheora, libv4l, libvidstab, libvmaf, libvo-amrwbenc, libvorbis, libvpx, libwebp, libx264, libx265, libxcb, libxml2, libzimg, littlecms, ocl-icd, rubberband, svt-av1, xvidcore, zlib"
 TERMUX_PKG_BUILD_DEPENDS="opencl-headers"
 TERMUX_PKG_CONFLICTS="libav"
 TERMUX_PKG_BREAKS="ffmpeg-dev"
@@ -51,26 +51,25 @@ termux_step_pre_configure() {
 termux_step_configure() {
 	cd $TERMUX_PKG_BUILDDIR
 
-	local _EXTRA_CONFIGURE_FLAGS=""
-	if [ $TERMUX_ARCH = "arm" ]; then
+	local _ARCH_CONFIGURE_FLAGS=""
+	case "$TERMUX_ARCH" in
+		"aarch64") _ARCH_CONFIGURE_FLAGS="--enable-neon";;
+		"arm")
 		_ARCH="armeabi-v7a"
-		_EXTRA_CONFIGURE_FLAGS="--enable-neon"
-	elif [ $TERMUX_ARCH = "i686" ]; then
+		_ARCH_CONFIGURE_FLAGS="--enable-neon"
+		;;
+		"i686")
 		_ARCH="x86"
 		# Specify --disable-asm to prevent text relocations on i686,
 		# see https://trac.ffmpeg.org/ticket/4928
-		_EXTRA_CONFIGURE_FLAGS="--disable-asm"
-	elif [ $TERMUX_ARCH = "x86_64" ]; then
-		_ARCH="x86_64"
-	elif [ $TERMUX_ARCH = "aarch64" ]; then
-		_ARCH=$TERMUX_ARCH
-		_EXTRA_CONFIGURE_FLAGS="--enable-neon"
-	else
-		termux_error_exit "Unsupported arch: $TERMUX_ARCH"
-	fi
+		_ARCH_CONFIGURE_FLAGS="--disable-asm"
+		;;
+	"x86_64") ;;
+		*) termux_error_exit "Unsupported arch: $TERMUX_ARCH";;
+	esac
 
-	$TERMUX_PKG_SRCDIR/configure \
-		--arch="${_ARCH}" \
+	"$TERMUX_PKG_SRCDIR"/configure \
+		--arch="${_ARCH:-"$TERMUX_ARCH"}" \
 		--as="$AS" \
 		--cc="$CC" \
 		--cxx="$CXX" \
@@ -121,6 +120,7 @@ termux_step_configure() {
 		--enable-libwebp \
 		--enable-libx264 \
 		--enable-libx265 \
+		--enable-libxcb \
 		--enable-libxml2 \
 		--enable-libxvid \
 		--enable-libzimg \
@@ -131,7 +131,7 @@ termux_step_configure() {
 		--target-os=android \
 		--extra-libs="-landroid-glob" \
 		--disable-vulkan \
-		$_EXTRA_CONFIGURE_FLAGS \
+		$_ARCH_CONFIGURE_FLAGS \
 		--disable-libfdk-aac
 	# GPLed FFmpeg binaries linked against fdk-aac are not redistributable.
 }
