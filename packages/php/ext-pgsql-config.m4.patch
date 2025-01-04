@@ -1,0 +1,14 @@
+Link with pcre2 library explicitly. Otherwise, the following error is shown at runtime.
+dlopen failed: cannot locate symbol "pcre2_match_8" referenced by "$PREFIX/lib/php/pgsql.so"
+
+--- a/ext/pgsql/config.m4
++++ b/ext/pgsql/config.m4
+@@ -7,6 +7,8 @@
+     the libpq paths.])])
+ 
+ if test "$PHP_PGSQL" != "no"; then
++  PGSQL_SHARED_LIBADD=-lpcre2-8
++  PHP_SUBST(PGSQL_SHARED_LIBADD)
+   PHP_SETUP_PGSQL([PGSQL_SHARED_LIBADD],,, [$PHP_PGSQL])
+   PHP_SUBST([PGSQL_SHARED_LIBADD])
+ 
