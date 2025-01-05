@@ -15,7 +15,6 @@ termux_step_pre_configure() {
 	CFLAGS=${CFLAGS/-fstack-protector-strong/}
 
 	if [ "$TERMUX_ARCH" == "aarch64" ]; then
-		cp $TERMUX_PKG_BUILDER_DIR/aarch64-setjmp.S $TERMUX_PKG_SRCDIR
 		patch --silent -p1 < $TERMUX_PKG_BUILDER_DIR/coregrindmake.am.diff
 		patch --silent -p1 < $TERMUX_PKG_BUILDER_DIR/memcheckmake.am.diff
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-only64bit"
