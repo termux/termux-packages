@@ -10,7 +10,10 @@ FROM ubuntu:19.04
 ENV LANG C.UTF-8
 
 # Needed for setup:
-COPY ./setup-ubuntu.sh ./setup-android-sdk.sh ./properties.sh /tmp/
+RUN rm -rf /tmp/termux-packages
+RUN mkdir -p /tmp/termux-packages
+RUN mkdir -p /tmp/termux-packages/scripts
+COPY ./properties.sh ./setup-android-sdk.sh ./setup-ubuntu.sh /tmp/termux-packages/scripts/
 
 # Setup needed packages and the Android SDK and NDK:
 RUN apt-get update && \
@@ -19,8 +22,9 @@ RUN apt-get update && \
 	adduser --disabled-password --shell /bin/bash --gecos "" builder && \
 	echo "builder ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/builder && \
 	chmod 0440 /etc/sudoers.d/builder && \
-	su - builder -c /tmp/setup-ubuntu.sh && \
-	su - builder -c /tmp/setup-android-sdk.sh && \
+	chmod a+rx /tmp/termux-packages/scripts/*.sh && \
+	su - builder -c "/tmp/termux-packages/scripts/setup-ubuntu.sh" && \
+	su - builder -c "/tmp/termux-packages/scripts/setup-android-sdk.sh" && \
 	# Removed unused parts to make a smaller Docker image:
 	apt-get clean && \
 	rm -rf /var/lib/apt/lists/* && \

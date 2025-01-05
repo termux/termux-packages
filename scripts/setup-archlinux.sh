@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -e -u
 
 PACKAGES=""
@@ -43,9 +43,22 @@ PACKAGES+=" lua" # Needed to build luarocks package.
 PACKAGES+=" python-recommonmark" # Needed for LLVM-8 documentation.
 PACKAGES+=" jre8-openjdk-headless"
 
-sudo pacman -Syq --noconfirm $PACKAGES
+# Do not require sudo if already running as root.
+if [ "$(id -u)" = "0" ]; then
+	SUDO=""
+else
+	SUDO="sudo"
+fi
 
-sudo mkdir -p /data/data/com.termux/files/usr
-sudo chown -R $(whoami) /data
+$SUDO pacman -Syq --noconfirm $PACKAGES
+
+. $(dirname "$(realpath "$0")")/properties.sh
+
+# Ownership of `TERMUX__PREFIX` must be fixed before `TERMUX_APP__DATA_DIR`
+# if its under it, otherwise `TERMUX__ROOTFS` will not have its ownership fixed.
+$SUDO mkdir -p "$TERMUX__PREFIX"
+$SUDO chown -R "$(whoami)" "$TERMUX__PREFIX"
+$SUDO mkdir -p "$TERMUX_APP__DATA_DIR"
+$SUDO chown -R "$(whoami)" "${TERMUX_APP__DATA_DIR%"${TERMUX_APP__DATA_DIR#/*/}"}" # Get `/path/` from `/path/to/app__data_dir`.
 
 echo "Please also install ncurses5-compat-libs and makedepend packages from the AUR before continuing"
