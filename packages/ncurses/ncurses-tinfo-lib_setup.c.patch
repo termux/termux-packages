@@ -1,7 +1,7 @@
-diff -u -r ../ncurses-snapshots-a480458efb0662531287f0c75116c0e91fe235cb/ncurses/tinfo/lib_setup.c ./ncurses/tinfo/lib_setup.c
---- ../ncurses-snapshots-a480458efb0662531287f0c75116c0e91fe235cb/ncurses/tinfo/lib_setup.c	2024-08-31 22:38:42.000000000 +0000
-+++ ./ncurses/tinfo/lib_setup.c	2024-09-08 13:16:55.592141493 +0000
-@@ -561,21 +561,6 @@
+diff -u -r ../orig-src/ncurses/tinfo/lib_setup.c ./ncurses/tinfo/lib_setup.c
+--- ../orig-src/ncurses/tinfo/lib_setup.c	2023-10-02 11:56:17.150192340 +0000
++++ ./ncurses/tinfo/lib_setup.c	2023-10-02 11:56:49.157968195 +0000
+@@ -513,21 +513,6 @@
  		}
  	    }
  
@@ -12,14 +12,14 @@ diff -u -r ../ncurses-snapshots-a480458efb0662531287f0c75116c0e91fe235cb/ncurses
 -	     * variable.
 -	     */
 -	    if ((value = _nc_getenv_num("LINES")) > 0) {
--		*linep = Min(value, MAX_ENV_LINES);
+-		*linep = value;
 -		T(("screen size: environment LINES = %d", *linep));
 -	    }
 -	    if ((value = _nc_getenv_num("COLUMNS")) > 0) {
--		*colp = Min(value, MAX_ENV_COLUMNS);
+-		*colp = value;
 -		T(("screen size: environment COLUMNS = %d", *colp));
 -	    }
 -
  	    _nc_default_screensize(termp, linep, colp);
  	} else {
- 	    _nc_check_screensize(sp, termp, linep, colp);
+ 	    _nc_check_screensize(termp, linep, colp);

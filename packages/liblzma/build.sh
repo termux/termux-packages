@@ -1,11 +1,11 @@
-TERMUX_PKG_HOMEPAGE=https://tukaani.org/xz/
+TERMUX_PKG_HOMEPAGE=https://xz.tukaani.org/xz-utils/
 TERMUX_PKG_DESCRIPTION="XZ-format compression library"
 TERMUX_PKG_LICENSE="LGPL-2.1, GPL-2.0, GPL-3.0"
 TERMUX_PKG_LICENSE_FILE="COPYING, COPYING.GPLv2, COPYING.GPLv3, COPYING.LGPLv2.1"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="5.6.3"
-TERMUX_PKG_SRCURL=https://github.com/tukaani-project/xz/releases/download/v$TERMUX_PKG_VERSION/xz-$TERMUX_PKG_VERSION.tar.xz
-TERMUX_PKG_SHA256=db0590629b6f0fa36e74aea5f9731dc6f8df068ce7b7bafa45301832a5eebc3a
+TERMUX_PKG_VERSION="5.6.1+really5.4.5"
+TERMUX_PKG_SRCURL=http://ftp.debian.org/debian/pool/main/x/xz-utils/xz-utils_$TERMUX_PKG_VERSION.orig.tar.xz
+TERMUX_PKG_SHA256=da9dec6c12cf2ecf269c31ab65b5de18e8e52b96f35d5bcd08c12b43e6878803
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BREAKS="liblzma-dev"
 TERMUX_PKG_REPLACES="liblzma-dev"

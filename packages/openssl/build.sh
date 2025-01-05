@@ -2,9 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://www.openssl.org/
 TERMUX_PKG_DESCRIPTION="Library implementing the SSL and TLS protocols as well as general purpose cryptography functions"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1:3.3.2
-TERMUX_PKG_SRCURL=https://github.com/openssl/openssl/releases/download/openssl-${TERMUX_PKG_VERSION:2}/openssl-${TERMUX_PKG_VERSION:2}.tar.gz
-TERMUX_PKG_SHA256=2e8a40b01979afe8be0bbfb3de5dc1c6709fedb46d6c89c10da114ab5fc3d281
+TERMUX_PKG_VERSION=1:3.2.1
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL=https://www.openssl.org/source/openssl-${TERMUX_PKG_VERSION:2}.tar.gz
+TERMUX_PKG_SHA256=83c7329fe52c850677d75e5d0b0ca245309b97e8ecbcfdc1dfdc4ab9fac35b39
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="ca-certificates, zlib"
 TERMUX_PKG_CONFFILES="etc/tls/openssl.cnf"
@@ -13,6 +14,8 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_CONFLICTS="libcurl (<< 7.61.0-1)"
 TERMUX_PKG_BREAKS="openssl-tool (<< 1.1.1b-1), openssl-dev"
 TERMUX_PKG_REPLACES="openssl-tool (<< 1.1.1b-1), openssl-dev"
+
+: "${TERMUX_MAKE_PROCESSES:=$(nproc)}"
 
 termux_step_configure() {
 	# Certain packages are not safe to build on device because their
@@ -43,7 +46,7 @@ termux_step_configure() {
 
 termux_step_make() {
 	make depend
-	make -j $TERMUX_PKG_MAKE_PROCESSES all
+	make -j $TERMUX_MAKE_PROCESSES all
 }
 
 termux_step_make_install() {

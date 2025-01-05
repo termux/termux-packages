@@ -31,7 +31,7 @@ termux_step_make() {
 	if $TERMUX_ON_DEVICE_BUILD && [ -z "$(command -v make)" ]; then
 		./build.sh
 	else
-		make -j $TERMUX_PKG_MAKE_PROCESSES
+		make -j $TERMUX_MAKE_PROCESSES
 	fi
 }
 

@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/binutils/
 TERMUX_PKG_DESCRIPTION="GNU Binutils libraries"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.43.1"
-TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/binutils/binutils-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=13f74202a3c4c51118b797a39ea4200d3f6cfbe224da6d1d95bb938480132dfd
+TERMUX_PKG_VERSION=2.42
+TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/binutils/binutils-${TERMUX_PKG_VERSION}.tar.bz2
+TERMUX_PKG_SHA256=aa54850ebda5064c72cd4ec2d9b056c294252991486350d9a97ab2a6dfdfaf12
 TERMUX_PKG_DEPENDS="zlib, zstd"
 TERMUX_PKG_BREAKS="binutils (<< 2.39), binutils-dev"
 TERMUX_PKG_REPLACES="binutils (<< 2.39), binutils-dev"
@@ -23,8 +23,6 @@ TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_GROUPS="base-devel"
 
 # For binutils-cross:
-# Since NDK r27, debug sections of libraries from the bundled sysroot are
-# compressed with zstd. It is necessary to enable the zstd support for ld.bfd.
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="
 --prefix=$TERMUX_PREFIX/opt/binutils/cross
@@ -33,19 +31,12 @@ TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="
 --disable-static
 --disable-nls
 --with-system-zlib
---with-zstd
 --disable-gprofng
-ZSTD_LIBS=-l:libzstd.a
 "
-
-termux_step_post_get_source() {
-	# Remove this marker all the time, as binutils is architecture-specific.
-	rm -rf $TERMUX_HOSTBUILD_MARKER
-}
 
 termux_step_host_build() {
 	$TERMUX_PKG_SRCDIR/configure $TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS
-	make -j $TERMUX_PKG_MAKE_PROCESSES
+	make -j $TERMUX_MAKE_PROCESSES
 	make install
 	make install-strip
 }
@@ -54,6 +45,9 @@ termux_step_host_build() {
 export LEXLIB=
 
 termux_step_pre_configure() {
+	# Remove this marker all the time, as binutils is architecture-specific.
+	rm -rf $TERMUX_HOSTBUILD_MARKER
+
 	export CPPFLAGS="$CPPFLAGS -Wno-c++11-narrowing"
 	# llvm upgraded a warning to an error, which caused this build (and some
 	# others, including the rust toolchain) to fail like so:

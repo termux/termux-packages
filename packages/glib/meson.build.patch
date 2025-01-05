@@ -1,5 +1,6 @@
-+++ ./meson.build
-@@ -569,7 +569,6 @@
+--- a/meson.build
++++ b/meson.build
+@@ -522,7 +522,6 @@
      '-Wno-format-zero-length',
      # We explicitly require variadic macros
      '-Wno-variadic-macros',
@@ -7,7 +8,7 @@
      '-Werror=init-self',
      '-Werror=missing-include-dirs',
      '-Werror=pointer-arith',
-@@ -695,7 +694,6 @@
+@@ -638,7 +637,6 @@
    'getresuid',
    'getvfsstat',
    'gmtime_r',
@@ -15,7 +16,7 @@
    'inotify_init1',
    'issetugid',
    'kevent',
-@@ -1001,7 +999,7 @@
+@@ -944,7 +942,7 @@
                 int main (int argc, char ** argv) {
                   syscall (__NR_futex, NULL, FUTEX_WAKE, FUTEX_WAIT);
                   return 0;
@@ -24,16 +25,16 @@
    glib_conf.set('HAVE_FUTEX', 1)
  endif
  if cc.compiles('''#include <linux/futex.h>
-@@ -1010,7 +1008,7 @@
+@@ -953,7 +951,7 @@
                 int main (int argc, char ** argv) {
                   syscall (__NR_futex_time64, NULL, FUTEX_WAKE, FUTEX_WAIT);
                   return 0;
--               }''', name : 'futex_time64(2) system call')
-+               }''', name : 'futex_time64(2) system call') and host_system != 'android'
+-               }''', name : 'futex(2) system call')
++               }''', name : 'futex(2) system call') and host_system != 'android'
    glib_conf.set('HAVE_FUTEX_TIME64', 1)
  endif
  
-@@ -1047,7 +1045,7 @@
+@@ -977,7 +975,7 @@
                   syscall (SYS_pidfd_open, 0, 0);
                   waitid (P_PIDFD, 0, &child_info, WEXITED | WNOHANG);
                   return 0;
@@ -42,7 +43,7 @@
    glib_conf.set('HAVE_PIDFD', 1)
  endif
  
-@@ -2264,7 +2262,7 @@
+@@ -2137,7 +2135,7 @@
  libintl_deps = []
  libintl_prefix = '#include <libintl.h>'
  libintl = dependency('intl', required: false)
@@ -51,25 +52,23 @@
    # libintl supports different threading APIs, which may not
    # require additional flags, but it defaults to using pthreads if
    # found. Meson's "threads" dependency does not allow you to
-@@ -2291,15 +2289,8 @@
+@@ -2164,13 +2162,10 @@
    endif
  endif
  
 -if libintl.found() and libintl.type_name() != 'internal'
--  have_bind_textdomain_codeset = cc.has_function('bind_textdomain_codeset', dependencies: libintl_deps, prefix: libintl_prefix)
--else
++if false
+   have_bind_textdomain_codeset = cc.has_function('bind_textdomain_codeset', dependencies: libintl_deps, prefix: libintl_prefix)
+ else
 -  # using proxy-libintl fallback
 -  libintl = dependency('intl', allow_fallback: true)
 -  assert(libintl.type_name() == 'internal')
 -  libintl_deps = [libintl]
--  have_bind_textdomain_codeset = true  # proxy-libintl supports it
--endif
-+libintl_deps = []
-+have_bind_textdomain_codeset = true  # proxy-libintl supports it
++  libintl_deps = []
+   have_bind_textdomain_codeset = true  # proxy-libintl supports it
+ endif
  
- glib_conf.set('HAVE_BIND_TEXTDOMAIN_CODESET', have_bind_textdomain_codeset)
- 
-@@ -2601,11 +2592,7 @@
+@@ -2551,11 +2546,7 @@
  
  # introspection
  gir_scanner = find_program('g-ir-scanner', required: get_option('introspection'))

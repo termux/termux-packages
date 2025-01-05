@@ -1,0 +1,15 @@
+We use libandroid-support when building Python, but Python does not
+use LDFLAGS when building modules (and not much point in this case).
+
+diff -u -r ../Python-3.4.1/Modules/_cursesmodule.c ./Modules/_cursesmodule.c
+--- ../Python-3.4.1/Modules/_cursesmodule.c	2014-05-19 07:19:39.000000000 +0200
++++ ./Modules/_cursesmodule.c	2014-06-04 08:56:50.441097925 +0200
+@@ -121,7 +121,7 @@
+ #include <term.h>
+ #endif
+ 
+-#ifdef HAVE_LANGINFO_H
++#if defined(HAVE_LANGINFO_H) && !defined(__ANDROID__)
+ #include <langinfo.h>
+ #endif
+ 

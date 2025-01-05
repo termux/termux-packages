@@ -2,14 +2,14 @@ TERMUX_PKG_HOMEPAGE=https://developer.gnome.org/glib/
 TERMUX_PKG_DESCRIPTION="Library providing core building blocks for libraries and applications written in C"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.82.4"
+TERMUX_PKG_VERSION="2.80.2"
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/glib/${TERMUX_PKG_VERSION%.*}/glib-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=37dd0877fe964cd15e9a2710b044a1830fb1bd93652a6d0cb6b8b2dff187c709
+TERMUX_PKG_SHA256=b9cfb6f7a5bd5b31238fd5d56df226b2dda5ea37611475bf89f6a0f9400fe8bd
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libandroid-support, libffi, libiconv, pcre2, resolv-conf, zlib"
+TERMUX_PKG_BUILD_DEPENDS="gobject-introspection"
 TERMUX_PKG_BREAKS="glib-dev"
 TERMUX_PKG_REPLACES="glib-dev"
-TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dintrospection=enabled
@@ -53,7 +53,7 @@ termux_step_host_build() {
 
 	${TERMUX_MESON} setup ${TERMUX_PKG_SRCDIR} . \
 		${TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS}
-	ninja -j "${TERMUX_PKG_MAKE_PROCESSES}" install
+	ninja -j "${TERMUX_MAKE_PROCESSES}" install
 
 	# termux_step_massage strip does not cover opt dir
 	find "${TERMUX_PREFIX}/opt" \
@@ -66,68 +66,11 @@ termux_step_host_build() {
 termux_step_pre_configure() {
 	# glib checks for __BIONIC__ instead of __ANDROID__:
 	CFLAGS+=" -D__BIONIC__=1"
-	_PREFIX="$TERMUX_PKG_TMPDIR/prefix"
-	local _WRAPPER_BIN="${TERMUX_PKG_BUILDDIR}/_wrapper/bin"
-	rm -rf "$_PREFIX" "$_WRAPPER_BIN"
-	mkdir -p "$_PREFIX" "$_WRAPPER_BIN"
 
-	sed '/^export PKG_CONFIG_LIBDIR=/s|$|:'${_PREFIX}'/lib/pkgconfig|' \
-		"${TERMUX_STANDALONE_TOOLCHAIN}/bin/pkg-config" \
-		> "${_WRAPPER_BIN}/pkg-config"
-	chmod +x "${_WRAPPER_BIN}/pkg-config"
-	export PKG_CONFIG="${_WRAPPER_BIN}/pkg-config"
-	export PATH="${_WRAPPER_BIN}:${PATH}"
+	TERMUX_PKG_VERSION=. termux_setup_gir
 
-	# Magic happens here.
-	# I borrowed nested building method from https://github.com/termux/termux-packages/blob/1244c75380beefc7f7da9744d55aa88df1640acb/x11-packages/qbittorrent/build.sh#L21-L28
-	# and modified termux_step_configure_meson in runtime to make it use another prefix
-	# Also I used advice from here https://github.com/termux/termux-packages/issues/20447#issuecomment-2156066062
-
-	# Running a subshell to not mess with variables
-	(
-		# Building `glib` with `-Dintrospection=disabled` and installing it to temporary directory
-		TERMUX_PKG_BUILDDIR="$TERMUX_PKG_TMPDIR/glib-build"
-		mkdir -p "$TERMUX_PKG_BUILDDIR"
-		TERMUX_PKG_EXTRA_CONFIGURE_ARGS="${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/"-Dintrospection=enabled"/"-Dintrospection=disabled"}"
-		termux_setup_gir
-		
-		cd "$TERMUX_PKG_BUILDDIR"
-		TERMUX_PREFIX="$_PREFIX" termux_step_configure
-		cd "$TERMUX_PKG_BUILDDIR"
-		termux_step_make
-		cd "$TERMUX_PKG_BUILDDIR"
-		termux_step_make_install
-	)
-
-	# Running a subshell to not mess with variables
-	(
-		# Building `gobject-introspection` and installing it to temporary directory
-		TERMUX_PKG_BUILDER_DIR="$TERMUX_SCRIPTDIR/packages/gobject-introspection"
-		TERMUX_PKG_BUILDDIR="$TERMUX_PKG_TMPDIR/gobject-introspection-build"
-		TERMUX_PKG_SRCDIR="$TERMUX_PKG_TMPDIR/gobject-introspection-src"
-		mkdir -p "$TERMUX_PKG_BUILDDIR" "$TERMUX_PKG_SRCDIR"
-		# Sourcing another build script for nested build
-		. "$TERMUX_PKG_BUILDER_DIR/build.sh"
-		cd "$TERMUX_PKG_CACHEDIR"
-
-		termux_step_get_source
-		termux_step_get_dependencies_python
-		termux_step_patch_package
-
-		termux_step_pre_configure
-
-		cd "$TERMUX_PKG_BUILDDIR"
-		TERMUX_PREFIX="$_PREFIX" termux_step_configure
-		cd "$TERMUX_PKG_BUILDDIR"
-		termux_step_make
-		cd "$TERMUX_PKG_BUILDDIR"
-		termux_step_make_install
-	)
-	
-	# Place the GIR files inside the root of the GIR directory (gir/.) of the package
-	termux_setup_gir
-
-	# The package will be built with using gobject-introspection we built before...
+	# Workaround: Remove cyclic dependency between gir and glib
+	sed -i "/Requires:/d" "${TERMUX_PREFIX}/lib/pkgconfig/gobject-introspection-1.0.pc"
 }
 
 termux_step_post_make_install() {
@@ -138,6 +81,13 @@ termux_step_post_make_install() {
 			"${TERMUX_PREFIX}/lib/pkgconfig/${pc}" \
 			> "${TERMUX_PREFIX}/opt/glib/cross/lib/x86_64-linux-gnu/pkgconfig/${pc}"
 	done
+
+	# Workaround: Restore deleted line in pre-configure step
+	echo "Requires: glib-2.0 gobject-2.0" >> "${TERMUX_PREFIX}/lib/pkgconfig/gobject-introspection-1.0.pc"
+}
+
+termux_step_post_massage() {
+	rm -v lib/pkgconfig/gobject-introspection-1.0.pc
 }
 
 termux_step_create_debscripts() {

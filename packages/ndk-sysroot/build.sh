@@ -4,9 +4,10 @@ TERMUX_PKG_LICENSE="NCSA"
 TERMUX_PKG_MAINTAINER="@termux"
 # Version should be equal to TERMUX_NDK_{VERSION_NUM,REVISION} in
 # scripts/properties.sh
-TERMUX_PKG_VERSION=27c
+TERMUX_PKG_VERSION=26b
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://dl.google.com/android/repository/android-ndk-r${TERMUX_PKG_VERSION}-linux.zip
-TERMUX_PKG_SHA256=59c2f6dc96743b5daf5d1626684640b20a6bd2b1d85b13156b90333741bad5cc
+TERMUX_PKG_SHA256=ad73c0370f0b0a87d1671ed2fd5a9ac9acfd1eb5c43a7fbfbd330f85d19dd632
 TERMUX_PKG_AUTO_UPDATE=false
 # This package has taken over <pty.h> from the previous libutil-dev
 # and iconv.h from libandroid-support-dev:
@@ -28,27 +29,10 @@ include/sys/capability.h
 include/sys/sem.h
 include/sys/shm.h
 include/unicode
-include/vk_video
 include/vulkan
 include/zconf.h
 include/zlib.h
 "
-
-termux_step_get_source() {
-	mkdir -p "$TERMUX_PKG_SRCDIR"
-	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
-		termux_download_src_archive
-		cd $TERMUX_PKG_TMPDIR
-		termux_extract_src_archive
-	else
-		local lib_path="toolchains/llvm/prebuilt/linux-x86_64/sysroot"
-		mkdir -p "$TERMUX_PKG_SRCDIR"/"$lib_path"
-		cp -fr "$NDK"/"$lib_path"/* "$TERMUX_PKG_SRCDIR"/"$lib_path"/
-		lib_path="toolchains/llvm/prebuilt/linux-x86_64/lib"
-		mkdir -p "$TERMUX_PKG_SRCDIR"/"$lib_path"
-		cp -fr "$NDK"/"$lib_path"/* "$TERMUX_PKG_SRCDIR"/"$lib_path"/
-	fi
-}
 
 termux_step_post_get_source() {
 	pushd toolchains/llvm/prebuilt/linux-x86_64/sysroot/
@@ -90,9 +74,9 @@ termux_step_make_install() {
 	test $NDK_ARCH == 'i686' && NDK_ARCH='i386'
 
 	# clang 13 requires libunwind on Android.
-	cp toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/lib/linux/$NDK_ARCH/libatomic.a \
+	cp toolchains/llvm/prebuilt/linux-x86_64/lib/clang/17/lib/linux/$NDK_ARCH/libatomic.a \
 		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib
-	cp toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/lib/linux/$NDK_ARCH/libunwind.a \
+	cp toolchains/llvm/prebuilt/linux-x86_64/lib/clang/17/lib/linux/$NDK_ARCH/libunwind.a \
 		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib
 
 	# librt and libpthread are built into libc on android, so setup them as symlinks
