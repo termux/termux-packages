@@ -25,7 +25,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Degl-native-platform=x11
 -Dgles1=disabled
 -Dgles2=enabled
--Ddri3=enabled
 -Dglx=dri
 -Dllvm=enabled
 -Dshared-llvm=enabled
