@@ -1,6 +1,6 @@
---- a/src/waypipe.c
-+++ b/src/waypipe.c
-@@ -79,8 +79,8 @@
+--- a/waypipe-c/waypipe.c
++++ b/waypipe-c/waypipe.c
+@@ -80,8 +80,8 @@
  		"  -n, --no-gpu         disable protocols which would use GPU resources\n"
  		"  -o, --oneshot        only permit one connected application\n"
  		"  -s, --socket S       set the socket path to either create or connect to:\n"
@@ -9,9 +9,18 @@
 +		"                         server default: @TERMUX_PREFIX@/tmp/waypipe-server.sock\n"
 +		"                         client default: @TERMUX_PREFIX@/tmp/waypipe-client.sock\n"
  		"                         ssh: sets the prefix for the socket path\n"
+ 		"                         vsock: [[s]CID:]port\n"
  		"      --version        print waypipe version and exit\n"
- 		"      --allow-tiled    allow gpu buffers (DMABUFs) with format modifiers\n"
-@@ -757,7 +757,7 @@
+@@ -863,7 +863,7 @@
+ 		/* Create a new socket, send it to the compositor to attach
+ 		 * a security context and write it to WAYLAND_DISPLAY */
+ 		char secctx_sock_path[108];
+-		sprintf(secctx_sock_path, "/tmp/waypipe-secctx-%d", getpid());
++		sprintf(secctx_sock_path, "@TERMUX_PREFIX@/tmp/waypipe-secctx-%d", getpid());
+ 		unlink(secctx_sock_path);
+ 		char instance_id[21];
+ 		sprintf(instance_id, "%d", getpid());
+@@ -898,7 +898,7 @@
  		} else {
  			struct socket_path client_sock_path;
  			client_sock_path.folder =
@@ -20,7 +29,7 @@
  			client_sock_path.filename = &sockaddr;
  			if (!socketpath) {
  				sockaddr.sun_family = AF_UNIX;
-@@ -799,7 +799,7 @@
+@@ -954,7 +954,7 @@
  		} else {
  			struct socket_path server_sock_path;
  			server_sock_path.folder =
@@ -29,7 +38,7 @@
  			server_sock_path.filename = &sockaddr;
  			if (!socketpath) {
  				sockaddr.sun_family = AF_UNIX;
-@@ -830,8 +830,8 @@
+@@ -985,8 +985,8 @@
  		} else {
  			clientsock.sun_family = AF_UNIX;
  			strcpy(clientsock.sun_path, "waypipe");
