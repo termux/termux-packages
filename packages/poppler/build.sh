@@ -3,17 +3,19 @@ TERMUX_PKG_DESCRIPTION="PDF rendering library"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Please align the version with `poppler-qt` package.
-TERMUX_PKG_VERSION=22.11.0
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="24.05.0"
 # Do not forget to bump revision of reverse dependencies and rebuild them
 # when SOVERSION is changed.
-_POPPLER_SOVERSION=125
+_POPPLER_SOVERSION=137
 TERMUX_PKG_SRCURL=https://poppler.freedesktop.org/poppler-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=093ba9844ed774285517361c15e21a31ba4df278a499263d4403cca74f2da828
-TERMUX_PKG_DEPENDS="fontconfig, freetype, glib, libc++, libcairo, libcurl, libiconv, libjpeg-turbo, libpng, libtiff, littlecms, openjpeg, zlib"
+TERMUX_PKG_SHA256=d8c5eb30b50285ad9f0af8c6335cc2d3b9597fca475cbc2598a5479fa379f779
+# The package must be updated at the same time as poppler, auto updater script does not support that.
+TERMUX_PKG_AUTO_UPDATE=false
+TERMUX_PKG_DEPENDS="fontconfig, freetype, glib, gpgme, gpgmepp, libc++, libcairo, libcurl, libiconv, libjpeg-turbo, libnspr, libnss, libpng, libtiff, littlecms, openjpeg, zlib"
 TERMUX_PKG_BUILD_DEPENDS="boost, boost-headers, g-ir-scanner, openjpeg-tools"
 TERMUX_PKG_BREAKS="poppler-dev, poppler-qt (<< ${TERMUX_PKG_VERSION})"
 TERMUX_PKG_REPLACES="poppler-dev, poppler-qt (<< 22.04.0-3)"
+TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_DISABLE_GIR=false
 #texlive needs the xpdf headers
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -21,6 +23,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DENABLE_GOBJECT_INTROSPECTION=ON
 -DENABLE_UNSTABLE_API_ABI_HEADERS=ON
 -DENABLE_QT5=OFF
+-DENABLE_QT6=OFF
 -DFONT_CONFIGURATION=fontconfig
 "
 
@@ -32,7 +35,7 @@ termux_step_pre_configure() {
 	if [ "${sover_x11}" != "${_POPPLER_SOVERSION}" ]; then
 		termux_error_exit "SOVERSION mismatch with \"poppler-qt\" package."
 	fi
-	local sover_cmake=$(sed -En 's/^.*set_target_properties\(poppler PROPERTIES .* SOVERSION ([0-9]+).*$/\1/p' CMakeLists.txt)
+	local sover_cmake=$(sed -En 's/^set\(POPPLER_SOVERSION_NUMBER "([0-9]+)"\)$/\1/p' CMakeLists.txt)
 	if [ "${sover_cmake}" != "${_POPPLER_SOVERSION}" ]; then
 		termux_error_exit "SOVERSION guard check failed (CMakeLists.txt: \"${sover_cmake}\")."
 	fi

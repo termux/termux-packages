@@ -1,17 +1,11 @@
-diff -uNr gtk-3.24.8/modules/input/Makefile.am gtk-3.24.8.mod/modules/input/Makefile.am
---- gtk-3.24.8/modules/input/Makefile.am	2019-04-11 00:12:29.000000000 +0300
-+++ gtk-3.24.8.mod/modules/input/Makefile.am	2019-05-26 21:56:54.467063059 +0300
-@@ -13,10 +13,12 @@
- 	$(INCLUDED_IMMODULE_DEFINE)
- 
- DEPS = \
--	$(top_builddir)/gtk/libgtk-3.la
-+	$(top_builddir)/gtk/libgtk-3.la \
-+	$(top_builddir)/gdk/libgdk-3.la
- 
- LDADDS = \
- 	$(top_builddir)/gtk/libgtk-3.la	\
-+	$(top_builddir)/gdk/libgdk-3.la	\
- 	$(GTK_DEP_LIBS)
- 
- moduledir = $(libdir)/gtk-3.0/$(GTK_BINARY_VERSION)/immodules
+--- a/modules/input/meson.build
++++ b/modules/input/meson.build
+@@ -14,7 +14,7 @@
+     shared_module('im-@0@'.format(name),
+                   immod_sources,
+                   c_args: common_cflags + cflags,
+-                  dependencies: [ libgtk_dep ],
++                  dependencies: [ libgtk_dep, libgdk_dep ],
+                   install_dir: immodules_install_dir,
+                   include_directories: [confinc, gtkinc],
+                   install : true,

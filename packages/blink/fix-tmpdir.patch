@@ -1,0 +1,33 @@
+--- a/blink/logcpu.c
++++ b/blink/logcpu.c
+@@ -26,7 +26,7 @@
+ // use cosmopolitan/tool/build/fastdiff.c
+ void LogCpu(struct Machine *m) {
+   static FILE *f;
+-  if (!f) f = fopen("/tmp/cpu.log", "w");
++  if (!f) f = fopen("@TERMUX_PREFIX@/tmp/cpu.log", "w");
+   fprintf(f,
+           "\n"
+           "IP %" PRIx64 "\n"
+--- a/blink/map.c
++++ b/blink/map.c
+@@ -64,7 +64,7 @@
+   _Static_assert(!(MAP_ANONYMOUS_ & MAP_SHARED), "");
+   _Static_assert(!(MAP_ANONYMOUS_ & MAP_PRIVATE), "");
+   int tfd;
+-  char path[] = "/tmp/blink.dat.XXXXXX";
++  char path[] = "@TERMUX_PREFIX@/tmp/blink.dat.XXXXXX";
+   if (~flags & MAP_ANONYMOUS_) {
+     res = VfsMmap(addr, length, prot, flags, fd, offset);
+   } else if ((tfd = mkstemp(path)) != -1) {
+--- a/blink/path.c
++++ b/blink/path.c
+@@ -154,7 +154,7 @@
+   m->system->dis = &g_dis;
+   LoadDebugSymbols(m->system);
+   DisLoadElf(&g_dis, &m->system->elf);
+-  g_cod = VfsOpen(AT_FDCWD_LINUX, "/tmp/blink.s",
++  g_cod = VfsOpen(AT_FDCWD_LINUX, "@TERMUX_PREFIX@/tmp/blink.s",
+                   O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0644);
+   g_cod = VfsFcntl(g_cod, F_DUPFD_CLOEXEC, kMinBlinkFd);
+ #endif

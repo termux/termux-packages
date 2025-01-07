@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://libcddb.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://libcddb.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="A C library to access data on a CDDB server"
 TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

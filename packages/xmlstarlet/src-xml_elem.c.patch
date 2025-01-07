@@ -1,0 +1,20 @@
+--- a/src/xml_elem.c
++++ b/src/xml_elem.c
+@@ -178,7 +178,7 @@
+ }
+ 
+ typedef struct {
+-    xmlChar **array;
++    const xmlChar **array;
+     int offset;
+ } ArrayDest;
+ 
+@@ -186,7 +186,7 @@
+  * put @name into @data->array[@data->offset]
+  */
+ static void
+-hash_key_put(void *payload, void *data, xmlChar *name)
++hash_key_put(void *payload, void *data, const xmlChar *name)
+ {
+     ArrayDest *dest = data;
+     dest->array[dest->offset++] = name;

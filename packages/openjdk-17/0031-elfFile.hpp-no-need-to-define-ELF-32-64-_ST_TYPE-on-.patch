@@ -1,0 +1,35 @@
+From 01b6f110577b2fff0b8d9649abd1f49fdac26e6a Mon Sep 17 00:00:00 2001
+From: Henrik Grimler <grimler@termux.dev>
+Date: Sat, 4 Feb 2023 22:45:13 +0100
+Subject: [PATCH] elfFile.hpp: no need to define ELF{32,64}_ST_TYPE on android
+
+As the elf.h header already provides defintions.
+---
+ src/hotspot/share/utilities/elfFile.hpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/hotspot/share/utilities/elfFile.hpp b/src/hotspot/share/utilities/elfFile.hpp
+index 0db847238456..96307e112dd8 100644
+--- a/src/hotspot/share/utilities/elfFile.hpp
++++ b/src/hotspot/share/utilities/elfFile.hpp
+@@ -46,7 +46,7 @@ typedef Elf64_Shdr      Elf_Shdr;
+ typedef Elf64_Phdr      Elf_Phdr;
+ typedef Elf64_Sym       Elf_Sym;
+ 
+-#if !defined(_ALLBSD_SOURCE) || defined(__APPLE__)
++#if (!defined(_ALLBSD_SOURCE) || defined(__APPLE__)) && !defined(__ANDROID__)
+ #define ELF_ST_TYPE ELF64_ST_TYPE
+ #endif
+ 
+@@ -62,7 +62,7 @@ typedef Elf32_Shdr      Elf_Shdr;
+ typedef Elf32_Phdr      Elf_Phdr;
+ typedef Elf32_Sym       Elf_Sym;
+ 
+-#if !defined(_ALLBSD_SOURCE) || defined(__APPLE__)
++#if (!defined(_ALLBSD_SOURCE) || defined(__APPLE__)) && !defined(__ANDROID__)
+ #define ELF_ST_TYPE ELF32_ST_TYPE
+ #endif
+ #endif
+-- 
+2.44.0
+

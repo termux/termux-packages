@@ -1,25 +1,26 @@
-diff '--color=auto' -uNr node-v16.14.2.orig/tools/v8_gypfiles/v8.gyp node-v16.14.2/tools/v8_gypfiles/v8.gyp
---- node-v16.14.2.orig/tools/v8_gypfiles/v8.gyp	2022-03-18 15:06:28.221091186 +0530
-+++ node-v16.14.2/tools/v8_gypfiles/v8.gyp	2022-03-18 15:09:00.361091128 +0530
-@@ -1121,6 +1121,7 @@
+When building for x64 or arm64 target, the host build of nodejs is done for x64. But when building for ia32 (x86) or arm (32-bit arm), the host build of nodejs is done for ia32. The cross compilation support of nodejs is really janky, this configuration should not need to have been patched by us, but unfortunately we have to
+--- ./tools/v8_gypfiles/v8.gyp.orig	2024-12-10 16:14:45.000000000 +0530
++++ ./tools/v8_gypfiles/v8.gyp	2024-12-17 10:14:00.499085823 +0530
+@@ -1414,6 +1414,7 @@
              '<(V8_ROOT)/src/base/platform/platform-posix.h',
              '<(V8_ROOT)/src/base/platform/platform-posix-time.cc',
              '<(V8_ROOT)/src/base/platform/platform-posix-time.h',
-+	    '<(V8_ROOT)/src/base/platform/platform-linux.h',
++            '<(V8_ROOT)/src/base/platform/platform-linux.h',
            ],
            'link_settings': {
              'target_conditions': [
-@@ -1628,7 +1629,12 @@
-           }],
-           ['clang or OS!="win"', {
+@@ -1936,12 +1937,12 @@
+             ],
+           }, { # 'OS!="win"'
              'conditions': [
 -              ['_toolset == "host" and host_arch == "x64" or _toolset == "target" and target_arch=="x64"', {
-+              ['_toolset == "host" and host_arch == "x64" and (target_arch == "arm" or target_arch == "ia32")', {
-+                'sources': [
-+                  '<(V8_ROOT)/src/heap/base/asm/ia32/push_registers_asm.cc',
-+                ],
-+              }],
 +              ['_toolset == "host" and host_arch == "x64" and (target_arch == "x64" or target_arch == "arm64") or (_toolset == "target" and target_arch == "x64")', {
                  'sources': [
                    '<(V8_ROOT)/src/heap/base/asm/x64/push_registers_asm.cc',
+                 ],
+               }],
+-              ['_toolset == "host" and host_arch == "ia32" or _toolset == "target" and target_arch=="ia32"', {
++              ['_toolset == "host" and host_arch == "x64" and (target_arch == "arm" or target_arch == "ia32") or (_toolset == "target" and target_arch == "ia32")', {
+                 'sources': [
+                   '<(V8_ROOT)/src/heap/base/asm/ia32/push_registers_asm.cc',
                  ],

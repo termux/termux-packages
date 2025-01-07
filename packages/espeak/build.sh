@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Compact software speech synthesizer"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Use eSpeak NG as the original eSpeak project is dead.
-TERMUX_PKG_VERSION="1.51"
+TERMUX_PKG_VERSION="1.52.0"
 TERMUX_PKG_SRCURL="https://github.com/espeak-ng/espeak-ng/archive/${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=f0e028f695a8241c4fa90df7a8c8c5d68dcadbdbc91e758a97e594bbb0a3bdbf
+TERMUX_PKG_SHA256=bb4338102ff3b49a81423da8a1a158b420124b055b60fa76cfb4b18677130a23
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libc++, pcaudiolib"
 TERMUX_PKG_BREAKS="espeak-dev"
@@ -19,6 +19,16 @@ termux_step_post_get_source() {
 	# build.sh script deletes specific files in $TERMUX_PREFIX.
 	if ${TERMUX_ON_DEVICE_BUILD}; then
 		termux_error_exit "Package '${TERMUX_PKG_NAME}' is not safe for on-device builds."
+	fi
+
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=1
+
+	local e=$(sed -En 's/^SHARED_VERSION="?([0-9]+):([0-9]+):([0-9]+).*/\1-\3/p' \
+				Makefile.am)
+	if [ ! "${e}" ] || [ "${_SOVERSION}" != "$(( "${e}" ))" ]; then
+		termux_error_exit "SOVERSION guard check failed."
 	fi
 
 	./autogen.sh
@@ -39,7 +49,13 @@ termux_step_make() {
 
 termux_step_pre_configure() {
 	# Oz flag causes problems. See https://github.com/termux/termux-packages/issues/1680:
-	CFLAGS=${CFLAGS/Oz/Os}
+	CFLAGS=${CFLAGS/-Oz/-Os}
+
+	# ld.lld: error: non-exported symbol '__umoddi3' in arm and i686
+	local _libgcc_file="$($CC -print-libgcc-file-name)"
+	local _libgcc_path="$(dirname $_libgcc_file)"
+	local _libgcc_name="$(basename $_libgcc_file)"
+	LDFLAGS+=" -L$_libgcc_path -l:$_libgcc_name"
 }
 
 termux_step_make_install() {

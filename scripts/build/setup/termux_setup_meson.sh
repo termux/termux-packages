@@ -1,6 +1,6 @@
 termux_setup_meson() {
 	termux_setup_ninja
-	local MESON_VERSION=0.61.2
+	local MESON_VERSION=1.5.2
 	local MESON_FOLDER
 
 	if [ "${TERMUX_PACKAGES_OFFLINE-false}" = "true" ]; then
@@ -16,16 +16,8 @@ termux_setup_meson() {
 		termux_download \
 			"https://github.com/mesonbuild/meson/releases/download/$MESON_VERSION/meson-$MESON_VERSION.tar.gz" \
 			"$MESON_TAR_FILE" \
-			0233a7f8d959079318f6052b0939c27f68a5de86ba601f25c9ee6869fb5f5889
+			f955e09ab0d71ef180ae85df65991d58ed8430323de7d77a37e11c9ea630910b
 		tar xf "$MESON_TAR_FILE" -C "$TERMUX_PKG_TMPDIR"
-		if [ "$MESON_VERSION" = "0.61.2" ]; then
-			local MESON_0_61_2_GTKDOC_PATCH_FILE=$TERMUX_PKG_TMPDIR/meson-0.61.2-gtkdoc.patch
-			termux_download \
-				"https://github.com/mesonbuild/meson/commit/266e8acb5807b38a550cb5145cea0e19545a21d7.patch" \
-				"$MESON_0_61_2_GTKDOC_PATCH_FILE" \
-				79ecf0e16f613396f43621a928df6c17e6260aa190c320e5c01adad94abd07ad
-			patch --silent -p1 -d "$MESON_TMP_FOLDER" < "$MESON_0_61_2_GTKDOC_PATCH_FILE"
-		fi
 		shopt -s nullglob
 		local f
 		for f in "$TERMUX_SCRIPTDIR"/scripts/build/setup/meson-*.patch; do
@@ -61,12 +53,14 @@ termux_setup_meson() {
 	echo "cmake = 'cmake'" >> $TERMUX_MESON_CROSSFILE
 	echo "cpp = '$CXX'" >> $TERMUX_MESON_CROSSFILE
 	echo "ld = '$LD'" >> $TERMUX_MESON_CROSSFILE
-	echo "pkgconfig = '$PKG_CONFIG'" >> $TERMUX_MESON_CROSSFILE
+	echo "pkg-config = '$PKG_CONFIG'" >> $TERMUX_MESON_CROSSFILE
 	echo "strip = '$STRIP'" >> $TERMUX_MESON_CROSSFILE
 
-	echo '' >> $TERMUX_MESON_CROSSFILE
-	echo "[properties]" >> $TERMUX_MESON_CROSSFILE
-	echo "needs_exe_wrapper = true" >> $TERMUX_MESON_CROSSFILE
+	if [ "$TERMUX_PACKAGE_LIBRARY" = "bionic" ]; then
+		echo '' >> $TERMUX_MESON_CROSSFILE
+		echo "[properties]" >> $TERMUX_MESON_CROSSFILE
+		echo "needs_exe_wrapper = true" >> $TERMUX_MESON_CROSSFILE
+  	fi
 
 	echo '' >> $TERMUX_MESON_CROSSFILE
 	echo "[built-in options]" >> $TERMUX_MESON_CROSSFILE
@@ -96,7 +90,7 @@ termux_setup_meson() {
 	echo ']' >> $TERMUX_MESON_CROSSFILE
 
 	local property
-	for property in c_link_args cpp_link_args; do
+	for property in c_link_args cpp_link_args fortran_link_args; do
 		echo -n "$property = [" >> $TERMUX_MESON_CROSSFILE
 		first=true
 		for word in $LDFLAGS; do
@@ -115,5 +109,9 @@ termux_setup_meson() {
 	echo "cpu_family = '$MESON_CPU_FAMILY'" >> $TERMUX_MESON_CROSSFILE
 	echo "cpu = '$MESON_CPU'" >> $TERMUX_MESON_CROSSFILE
 	echo "endian = 'little'" >> $TERMUX_MESON_CROSSFILE
-	echo "system = 'android'" >> $TERMUX_MESON_CROSSFILE
+ 	if [ "$TERMUX_PACKAGE_LIBRARY" = "bionic" ]; then
+		echo "system = 'android'" >> $TERMUX_MESON_CROSSFILE
+  	elif [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
+		echo "system = 'linux'" >> $TERMUX_MESON_CROSSFILE
+     	fi
 }

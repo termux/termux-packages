@@ -1,0 +1,20 @@
+--- a/build.rs
++++ b/build.rs
+@@ -259,11 +259,17 @@
+       "x64"
+     } else if target_arch == "aarch64" {
+       "arm64"
++    } else if target_arch == "arm" {
++      "arm"
++    } else if target_triple.starts_with("i686-") {
++      "x86"
+     } else {
+       "unknown"
+     };
+     if target_arch == "x86_64" {
+       maybe_install_sysroot("amd64");
++    } else if target_triple.starts_with("i686-") {
++      maybe_install_sysroot("i386");
+     }
+     gn_args.push(format!(r#"v8_target_cpu="{}""#, arch).to_string());
+     gn_args.push(format!(r#"target_cpu="{}""#, arch).to_string());

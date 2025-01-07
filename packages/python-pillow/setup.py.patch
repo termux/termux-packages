@@ -1,27 +1,27 @@
-diff -uNr Pillow-9.2.0/setup.py Pillow-9.2.0.mod/setup.py
---- Pillow-9.2.0/setup.py	2022-07-01 22:19:51.000000000 +0900
-+++ Pillow-9.2.0.mod/setup.py	2022-10-13 23:03:54.800557858 +0900
-@@ -497,8 +497,8 @@
+diff -u -r ../Pillow-10.3.0/setup.py ./setup.py
+--- ../Pillow-10.3.0/setup.py	2024-04-01 09:22:36.000000000 +0000
++++ ./setup.py	2024-05-21 21:57:30.822979186 +0000
+@@ -515,8 +515,8 @@
                  for d in os.environ[k].split(os.path.pathsep):
                      _add_directory(library_dirs, d)
  
 -        _add_directory(library_dirs, os.path.join(sys.prefix, "lib"))
 -        _add_directory(include_dirs, os.path.join(sys.prefix, "include"))
-+        _add_directory(library_dirs, os.path.join("%TERMUX_PREFIX%", "lib"))
-+        _add_directory(include_dirs, os.path.join("%TERMUX_PREFIX%", "include"))
++        _add_directory(library_dirs, os.path.join("@TERMUX_PREFIX@", "lib"))
++        _add_directory(include_dirs, os.path.join("@TERMUX_PREFIX@", "include"))
  
          #
          # add platform directories
-@@ -567,7 +567,7 @@
+@@ -589,7 +589,7 @@
              or sys.platform.startswith("gnu")
              or sys.platform.startswith("freebsd")
          ):
 -            for dirname in _find_library_dirs_ldconfig():
 +            for dirname in []:
                  _add_directory(library_dirs, dirname)
-             if sys.platform.startswith("linux") and os.environ.get(
-                 "ANDROID_ROOT", None
-@@ -595,7 +595,7 @@
+             if sys.platform.startswith("linux") and os.environ.get("ANDROID_ROOT"):
+                 # termux support for android.
+@@ -615,7 +615,7 @@
          # FIXME: check /opt/stuff directories here?
  
          # standard locations
@@ -29,4 +29,20 @@ diff -uNr Pillow-9.2.0/setup.py Pillow-9.2.0.mod/setup.py
 +        if False:
              _add_directory(library_dirs, "/usr/local/lib")
              _add_directory(include_dirs, "/usr/local/include")
+ 
+@@ -990,12 +990,12 @@
+ for src_file in _LIB_IMAGING:
+     files.append(os.path.join("src/libImaging", src_file + ".c"))
+ ext_modules = [
+-    Extension("PIL._imaging", files),
++    Extension("PIL._imaging", files, extra_link_args=["-lm"]),
+-    Extension("PIL._imagingft", ["src/_imagingft.c"]),
++    Extension("PIL._imagingft", ["src/_imagingft.c"], extra_link_args=["-lm"]),
+     Extension("PIL._imagingcms", ["src/_imagingcms.c"]),
+     Extension("PIL._webp", ["src/_webp.c"]),
+     Extension("PIL._imagingtk", ["src/_imagingtk.c", "src/Tk/tkImaging.c"]),
+-    Extension("PIL._imagingmath", ["src/_imagingmath.c"]),
++    Extension("PIL._imagingmath", ["src/_imagingmath.c"], extra_link_args=["-lm"]),
+     Extension("PIL._imagingmorph", ["src/_imagingmorph.c"]),
+ ]
  

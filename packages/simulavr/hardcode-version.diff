@@ -1,0 +1,17 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -12,10 +12,11 @@ include(FindPythonModule)
+ include(GetGitInfo)
+ 
+ # get git info
+-get_git_info()
+-set(PACKAGE_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
++# get_git_info()
++set(PACKAGE_VERSION "@VERSION_MAJOR@.@VERSION_MINOR@.@VERSION_PATCH@")
++
++message(STATUS "version major @VERSION_MAJOR@ / minor @VERSION_MINOR@ / patch @VERSION_PATCH@")
+ 
+-message(STATUS "version major ${VERSION_MAJOR} / minor ${VERSION_MINOR} / patch ${VERSION_PATCH}")
+ 
+ # build options
+ option(BUILD_TCL "build TCL SWIG module" OFF)

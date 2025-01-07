@@ -1,0 +1,63 @@
+https://github.com/kidanger/rust-weechat/commit/87ad8487b13dddd4941d4c8b04b4173ccef9f307
+
+--- a/src/buffer/mod.rs
++++ b/src/buffer/mod.rs
+@@ -771,15 +771,16 @@
+     /// Display a message on the buffer.
+     pub fn print(&self, message: &str) {
+         let weechat = self.weechat();
+-        let printf_date_tags = weechat.get().printf_date_tags.unwrap();
++        let printf_datetime_tags = weechat.get().printf_datetime_tags.unwrap();
+
+         let fmt_str = LossyCString::new("%s");
+         let c_message = LossyCString::new(message);
+
+         unsafe {
+-            printf_date_tags(
++            printf_datetime_tags(
+                 self.ptr(),
+                 0,
++                0,
+                 ptr::null(),
+                 fmt_str.as_ptr(),
+                 c_message.as_ptr(),
+@@ -799,7 +800,7 @@
+     /// * `message` - The message that will be displayed.
+     pub fn print_date_tags(&self, date: i64, tags: &[&str], message: &str) {
+         let weechat = self.weechat();
+-        let printf_date_tags = weechat.get().printf_date_tags.unwrap();
++        let printf_datetime_tags = weechat.get().printf_datetime_tags.unwrap();
+
+         let fmt_str = LossyCString::new("%s");
+         let tags = tags.join(",");
+@@ -807,9 +808,10 @@
+         let message = LossyCString::new(message);
+
+         unsafe {
+-            printf_date_tags(
++            printf_datetime_tags(
+                 self.ptr(),
+                 date,
++                0,
+                 tags.as_ptr(),
+                 fmt_str.as_ptr(),
+                 message.as_ptr(),
+index ce61f4f..e339338 100644
+--- a/src/weechat.rs
++++ b/src/weechat.rs
+@@ -274,13 +274,13 @@ impl Weechat {
+         Weechat::check_thread();
+         let weechat = unsafe { Weechat::weechat() };
+ 
+-        let printf_date_tags = weechat.get().printf_date_tags.unwrap();
++        let printf_datetime_tags = weechat.get().printf_datetime_tags.unwrap();
+ 
+         let fmt = LossyCString::new("%s");
+         let msg = LossyCString::new(msg);
+ 
+         unsafe {
+-            printf_date_tags(ptr::null_mut(), 0, ptr::null(), fmt.as_ptr(), msg.as_ptr());
++            printf_datetime_tags(ptr::null_mut(), 0, 0, ptr::null(), fmt.as_ptr(), msg.as_ptr());
+         }
+     }
+ 

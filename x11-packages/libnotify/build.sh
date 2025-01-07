@@ -2,12 +2,14 @@ TERMUX_PKG_HOMEPAGE=https://developer.gnome.org/notification-spec/
 TERMUX_PKG_DESCRIPTION="Library for sending desktop notifications"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
-_MAJOR_VERSION=0.8
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}.1
-TERMUX_PKG_SRCURL=https://ftp.gnome.org/pub/GNOME/sources/libnotify/${_MAJOR_VERSION}/libnotify-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=d033e6d4d6ccbf46a436c31628a4b661b36dca1f5d4174fe0173e274f4e62557
+TERMUX_PKG_VERSION="0.8.3"
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL=https://download.gnome.org/sources/libnotify/${TERMUX_PKG_VERSION%.*}/libnotify-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=ee8f3ef946156ad3406fdf45feedbdcd932dbd211ab4f16f75eba4f36fb2f6c0
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="gdk-pixbuf, glib"
-TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner"
+TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, glib-cross"
+TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dtests=false
@@ -16,4 +18,10 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 
 termux_step_pre_configure() {
 	termux_setup_gir
+	termux_setup_glib_cross_pkg_config_wrapper
+
+	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
+		# Pre-installed headers affect GIR generation:
+		rm -rf "$TERMUX_PREFIX/include/libnotify"
+	fi
 }

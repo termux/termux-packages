@@ -32,6 +32,8 @@
 #include "../src/namespace.h"
 #include <complex.h>
 
+long double complex catanl(long double complex);
+
 long double complex
 catanhl(long double complex z)
 {

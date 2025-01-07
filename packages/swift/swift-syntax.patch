@@ -1,0 +1,77 @@
+commit 031e9eddc214ac4b4b34e88013dc8fe2e6c150c2
+Date:   Tue Aug 6 13:52:27 2024 +0530
+
+    [Android] Use the new overlay and Bionic module from Swift 6
+    
+    The new overlay was merged into Swift 6 in swiftlang/swift#74758.
+
+diff --git a/swift-syntax/Sources/SwiftLibraryPluginProvider/LibraryPluginProvider.swift b/swift-syntax/Sources/SwiftLibraryPluginProvider/LibraryPluginProvider.swift
+index eb06cca2..44be07e2 100644
+--- a/swift-syntax/Sources/SwiftLibraryPluginProvider/LibraryPluginProvider.swift
++++ b/swift-syntax/Sources/SwiftLibraryPluginProvider/LibraryPluginProvider.swift
+@@ -22,6 +22,8 @@ private import Darwin
+ private import Glibc
+ #elseif canImport(Musl)
+ private import Musl
++#elseif canImport(Android)
++private import Android
+ #endif
+ #else
+ import SwiftSyntaxMacros
+@@ -137,7 +139,7 @@ private func _loadLibrary(_ path: String) throws -> UnsafeMutableRawPointer {
+ #else
+ private func _loadLibrary(_ path: String) throws -> UnsafeMutableRawPointer {
+   guard let dlHandle = dlopen(path, RTLD_LAZY | RTLD_LOCAL) else {
+-    throw LibraryPluginError(message: "loader error: \(String(cString: dlerror()))")
++    throw LibraryPluginError(message: "loader error: \(String(cString: dlerror()!))")
+   }
+   return dlHandle
+ }
+diff --git a/swift-syntax/Sources/SwiftSyntax/SyntaxText.swift b/swift-syntax/Sources/SwiftSyntax/SyntaxText.swift
+index 574a67fc..4d877962 100644
+--- a/swift-syntax/Sources/SwiftSyntax/SyntaxText.swift
++++ b/swift-syntax/Sources/SwiftSyntax/SyntaxText.swift
+@@ -15,6 +15,8 @@
+ private import Darwin
+ #elseif canImport(Glibc)
+ private import Glibc
++#elseif canImport(Bionic)
++private import Bionic
+ #elseif canImport(Musl)
+ private import Musl
+ #endif
+@@ -281,6 +283,8 @@ private func compareMemory(
+   return Darwin.memcmp(s1, s2, count) == 0
+   #elseif canImport(Glibc)
+   return Glibc.memcmp(s1, s2, count) == 0
++  #elseif canImport(Bionic)
++  return Bionic.memcmp(s1, s2, count) == 0
+   #else
+   return UnsafeBufferPointer(start: s1, count: count)
+     .elementsEqual(UnsafeBufferPointer(start: s2, count: count))
+diff --git a/swift-syntax/SwiftParserCLI/Sources/swift-parser-cli/TerminalUtils.swift b/swift-syntax/SwiftParserCLI/Sources/swift-parser-cli/TerminalUtils.swift
+index cb905a27..841e529b 100644
+--- a/swift-syntax/SwiftParserCLI/Sources/swift-parser-cli/TerminalUtils.swift
++++ b/swift-syntax/SwiftParserCLI/Sources/swift-parser-cli/TerminalUtils.swift
+@@ -14,6 +14,8 @@
+ import Glibc
+ #elseif canImport(Musl)
+ import Musl
++#elseif canImport(Android)
++import Android
+ #elseif os(Windows)
+ import CRT
+ #else
+diff --git a/swift-syntax/SwiftSyntaxDevUtils/Sources/swift-syntax-dev-utils/common/ProcessRunner.swift b/swift-syntax/SwiftSyntaxDevUtils/Sources/swift-syntax-dev-utils/common/ProcessRunner.swift
+index 526f4a2f..e88611cb 100644
+--- a/swift-syntax/SwiftSyntaxDevUtils/Sources/swift-syntax-dev-utils/common/ProcessRunner.swift
++++ b/swift-syntax/SwiftSyntaxDevUtils/Sources/swift-syntax-dev-utils/common/ProcessRunner.swift
+@@ -24,7 +24,7 @@ class SigIntListener {
+   /// Registers a `SIGINT` signal handler that forwards `SIGINT` to all
+   /// subprocesses that are registered in `runningSubprocesses`
+   static func registerSigIntSubprocessTerminationHandler() {
+-    #if canImport(Darwin) || canImport(Glibc)
++    #if canImport(Darwin) || canImport(Glibc) || canImport(Bionic)
+     signal(SIGINT) { _ in
+       SigIntListener.hasReceivedSigInt = true
+       for process in SigIntListener.runningSubprocesses {

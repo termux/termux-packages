@@ -1,0 +1,26 @@
+I don't think that the upstream developer should copy and paste this patch
+directly into their code if they see it. I think they should move around some
+of their code blocks in a different way in order to make future release archives
+not have this problem, but writing the patch for the current version of this
+package with only 2 lines of changes keeps the patch file small.
+
+--- a/predict.c
++++ b/predict.c
+@@ -38,7 +38,7 @@
+ #include "predict.h"
+ 
+ #if defined __has_include
+-  #if __has_include(<alsa/asoundlib.h>)
++  #if __has_include(<alsa/asoundlib.h>) && !defined(__ANDROID__)
+ 	#include <alsa/asoundlib.h>
+   #elif defined (__ANDROID__)
+ 	char wavestring[1024];
+@@ -269,7 +269,7 @@ tle_t tle;
+ /* "Vocalizer" functions for Linux/Unix */
+ 
+ #if defined __has_include
+-  #if __has_include(<alsa/asoundlib.h>)
++  #if __has_include(<alsa/asoundlib.h>) && !defined(__ANDROID__)
+ 
+ unsigned long buffer2long(int indx)
+ {

@@ -1,21 +1,21 @@
 TERMUX_PKG_HOMEPAGE=https://gogs.io
 TERMUX_PKG_DESCRIPTION="A painless self-hosted Git service"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Injamul Mohammad Mollah <mrinjamul@gmail.com>"
-TERMUX_PKG_VERSION="0.12.10"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="0.13.2"
 TERMUX_PKG_SRCURL=https://github.com/gogs/gogs/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=8eae97b4e87895886f4b125679374214c59c32ac12c4ca6d71d715c9fc685053
+TERMUX_PKG_SHA256=e49050dbabf7496b6f50ed1a92b5df3437190a45fc031b3a612218151f4db55d
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="dash, git"
 TERMUX_PKG_CONFFILES="etc/gogs/app.ini"
 TERMUX_PKG_HOSTBUILD=true
 
-termux_step_handle_hostbuild() {
+termux_step_host_build() {
 	termux_setup_golang
 	export GOPATH=$TERMUX_PKG_HOSTBUILD_DIR
 	mkdir -p $TERMUX_PKG_HOSTBUILD_DIR
 	cd $TERMUX_PKG_HOSTBUILD_DIR
-	go install github.com/kevinburke/go-bindata/go-bindata@latest
+	go install github.com/kevinburke/go-bindata/go-bindata@v3.24.0
 }
 
 termux_step_make() {
@@ -31,7 +31,7 @@ termux_step_make() {
 	LDFLAGS+=" -X gogs.io/gogs/internal/conf.AppWorkPath=$TERMUX_PREFIX/var/lib/gogs"
 	LDFLAGS+=" -X gogs.io/gogs/internal/conf.CustomPath=$TERMUX_PREFIX/var/lib/gogs"
 
-	PATH=$PATH:$TERMUX_PKG_HOSTBUILD_DIR/bin GOGS_VERSION=v"$TERMUX_PKG_VERSION" TAGS="bindata sqlite" make all
+	PATH=$PATH:$TERMUX_PKG_HOSTBUILD_DIR/bin go build -ldflags "${LDFLAGS}" -tags "bindata sqlite" -trimpath -o gogs
 }
 
 termux_step_make_install() {

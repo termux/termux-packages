@@ -12,12 +12,12 @@
 --- a/cmds/report.c	2022-04-15 17:55:05.277817916 +0000
 +++ b/cmds/report.c	2022-04-15 20:31:47.514057989 +0000
 @@ -1,5 +1,6 @@
- #include <stdio.h>
  #include <inttypes.h>
+ #include <stdio.h>
 +#include <errno.h>
  
  #include "uftrace.h"
- #include "utils/utils.h"
+ #include "utils/field.h"
 @@ -441,7 +442,7 @@
  	report_calc_avg(&base_tree);
  
@@ -39,13 +39,13 @@
 --- a/cmds/dump.c	2022-04-15 17:55:05.276817917 +0000
 +++ b/cmds/dump.c	2022-04-15 20:33:03.603946364 +0000
 @@ -4,6 +4,7 @@
- #include <inttypes.h>
- #include <time.h>
+ #include <stdio.h>
  #include <sys/stat.h>
+ #include <time.h>
 +#include <errno.h>
  
- #include "uftrace.h"
- #include "version.h"
+ #include "libtraceevent/event-parse.h"
+ #include "libtraceevent/kbuffer.h"
 @@ -1644,7 +1645,7 @@
  
  	ret = open_data_file(opts, &handle);
@@ -58,13 +58,13 @@
 --- a/cmds/replay.c	2022-04-15 17:55:05.277817916 +0000
 +++ b/cmds/replay.c	2022-04-15 20:33:53.498873171 +0000
 @@ -3,6 +3,7 @@
- #include <signal.h>
- #include <inttypes.h>
+ #include <stdio.h>
  #include <stdio_ext.h>
+ #include <stdlib.h>
 +#include <errno.h>
  
  #include "uftrace.h"
- #include "utils/utils.h"
+ #include "utils/event.h"
 @@ -1221,7 +1222,7 @@
  
  	ret = open_data_file(opts, &handle);

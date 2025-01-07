@@ -1,0 +1,13 @@
+--- ./test/parallel/test-child-process-uid-gid.js.orig	2023-04-29 17:23:04.494870309 +0530
++++ ./test/parallel/test-child-process-uid-gid.js	2023-04-29 17:42:33.075531699 +0530
+@@ -4,6 +4,10 @@
+ const spawn = require('child_process').spawn;
+ const expectedError = common.isWindows ? /\bENOTSUP\b/ : /\bEPERM\b/;
+ 
++if (process.platform === 'android') {
++  common.skip('We are patching node to not use setuid/setgid with child_process.spawn in anyway');
++}
++
+ if (common.isIBMi)
+   common.skip('IBMi has a different behavior');
+ 

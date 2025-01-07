@@ -1,4 +1,5 @@
 #!/bin/bash
+
 termux_pkg_is_update_needed() {
 	# USAGE: termux_pkg_is_update_needed <current-version> <latest-version>
 	if [[ -z "$1" ]] || [[ -z "$2" ]]; then
@@ -10,21 +11,14 @@ termux_pkg_is_update_needed() {
 
 	# Compare versions.
 	# shellcheck disable=SC2091
-	if $(
-		cat <<-EOF | python3 -
-			import sys
-
-			from pkg_resources import parse_version
-
-			if parse_version("${CURRENT_VERSION}") < parse_version("${LATEST_VERSION}"):
-			    sys.exit(0)
-			else:
-			    sys.exit(1)
-		EOF
-	); then
+	dpkg --compare-versions "${CURRENT_VERSION}" lt "${LATEST_VERSION}"
+	DPKG_EXIT_CODE=$?
+	if [ "$DPKG_EXIT_CODE" = 0 ]; then
 		return 0 # true. Update needed.
+	elif [ "$DPKG_EXIT_CODE" = 1 ]; then
+		return 1 # false. Update not needed.
 	fi
-	return 1 # false. Update not needed.
+	termux_error_exit "Bad 'dpkg --compare-versions' exit code: $DPKG_EXIT_CODE - bad version numbers?"
 }
 
 # Make it also usable as command line tool. `scripts/bin/apt-compare-versions` is symlinked to this file.
@@ -58,8 +52,10 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
 	else
 		if termux_pkg_is_update_needed "${first_version}" "${second_version}"; then
 			echo "${first_version} < ${second_version}"
-		else
+		elif termux_pkg_is_update_needed "${second_version}" "${first_version}"; then
 			echo "${first_version} > ${second_version}"
+		else
+			echo "${first_version} = ${second_version}"
 		fi
 	fi
 fi

@@ -2,16 +2,26 @@ TERMUX_PKG_HOMEPAGE=https://luajit.org/
 TERMUX_PKG_DESCRIPTION="Just-In-Time Compiler for Lua"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1:2.1.0-beta3
-TERMUX_PKG_REVISION=3
-_COMMIT="787736990ac3b7d5ceaba2697c7d0f58f77bb782"
-TERMUX_PKG_SRCURL=https://github.com/LuaJIT/LuaJIT/archive/${_COMMIT}.tar.gz
-TERMUX_PKG_SHA256=2e3f74bc279f46cc463abfc67b36e69faaf0366237004771f4cac4bf2a9f5efb
+TERMUX_PKG_VERSION="1:2.1.1731601260"
+TERMUX_PKG_SRCURL=git+https://github.com/LuaJIT/LuaJIT.git
+TERMUX_PKG_GIT_BRANCH=v${TERMUX_PKG_VERSION:2:3}
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_METHOD=repology
 TERMUX_PKG_BREAKS="libluajit-dev"
 TERMUX_PKG_REPLACES="libluajit-dev"
 TERMUX_PKG_EXTRA_MAKE_ARGS="amalg PREFIX=$TERMUX_PREFIX"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_LUAJIT_JIT_FOLDER_RELATIVE=share/luajit-${TERMUX_PKG_VERSION:2:3}/jit
+
+termux_step_post_get_source() {
+	# Do the same as e.g. arch linux is doing:
+	# The patch version is the timestamp of the above git commit, obtain via `git show -s --format=%ct`
+	local commit_ts=${TERMUX_PKG_VERSION:6}
+
+	# Find the commit made at the exact timestamp specified in the version:
+	local commit_hash=$(git log --date=unix --before=$commit_ts --after=$commit_ts --pretty=format:"%H")
+	git checkout $commit_hash
+}
 
 termux_step_pre_configure() {
 	# luajit wants same pointer size for host and target build

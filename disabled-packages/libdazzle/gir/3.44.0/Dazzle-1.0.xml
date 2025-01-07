@@ -1,0 +1,968 @@
+<?xml version="1.0"?>
+<dump>
+  <enum name="DzlTitlebarAnimation" get-type="dzl_titlebar_animation_get_type">
+    <member name="DZL_TITLEBAR_ANIMATION_HIDDEN" nick="hidden" value="0"/>
+    <member name="DZL_TITLEBAR_ANIMATION_SHOWING" nick="showing" value="1"/>
+    <member name="DZL_TITLEBAR_ANIMATION_SHOWN" nick="shown" value="2"/>
+    <member name="DZL_TITLEBAR_ANIMATION_HIDING" nick="hiding" value="3"/>
+  </enum>  <flags name="DzlFileTransferFlags" get-type="dzl_file_transfer_flags_get_type">
+    <member name="DZL_FILE_TRANSFER_FLAGS_NONE" nick="none" value="0"/>
+    <member name="DZL_FILE_TRANSFER_FLAGS_MOVE" nick="move" value="1"/>
+  </flags>
+  <enum name="DzlTreeDropPosition" get-type="dzl_tree_drop_position_get_type">
+    <member name="DZL_TREE_DROP_INTO" nick="into" value="0"/>
+    <member name="DZL_TREE_DROP_BEFORE" nick="before" value="1"/>
+    <member name="DZL_TREE_DROP_AFTER" nick="after" value="2"/>
+  </enum>  <class name="DzlChildPropertyAction" get-type="dzl_child_property_action_get_type" parents="GObject">
+    <implements name="GAction"/>
+    <property name="child" type="GtkWidget" flags="225"/>
+    <property name="child-property-name" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="container" type="GtkContainer" flags="225"/>
+  </class>
+  <class name="DzlPropertiesGroup" get-type="dzl_properties_group_get_type" parents="GObject">
+    <implements name="GActionGroup"/>
+    <property name="object" type="GObject" flags="227"/>
+    <property name="object-type" type="GType" flags="235"/>
+  </class>
+  <class name="DzlSettingsFlagAction" get-type="dzl_settings_flag_action_get_type" parents="GObject">
+    <implements name="GAction"/>
+    <property name="schema-id" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="schema-key" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="flag-nick" type="gchararray" flags="235" default-value="NULL"/>
+  </class>
+  <class name="DzlWidgetActionGroup" get-type="dzl_widget_action_group_get_type" parents="GObject">
+    <implements name="GActionGroup"/>
+    <property name="widget" type="GtkWidget" flags="235"/>
+  </class>
+  <class name="DzlAnimation" get-type="dzl_animation_get_type" parents="GInitiallyUnowned,GObject">
+    <property name="duration" type="guint" flags="234" default-value="250"/>
+    <property name="frame-clock" type="GdkFrameClock" flags="234"/>
+    <property name="mode" type="DzlAnimationMode" flags="234" default-value="DZL_ANIMATION_LINEAR"/>
+    <property name="target" type="GObject" flags="234"/>
+    <signal name="tick" return="void" when="first">
+    </signal>
+  </class>
+  <enum name="DzlAnimationMode" get-type="dzl_animation_mode_get_type">
+    <member name="DZL_ANIMATION_LINEAR" nick="linear" value="0"/>
+    <member name="DZL_ANIMATION_EASE_IN_QUAD" nick="ease-in-quad" value="1"/>
+    <member name="DZL_ANIMATION_EASE_IN_OUT_QUAD" nick="ease-in-out-quad" value="3"/>
+    <member name="DZL_ANIMATION_EASE_OUT_QUAD" nick="ease-out-quad" value="2"/>
+    <member name="DZL_ANIMATION_EASE_IN_CUBIC" nick="ease-in-cubic" value="4"/>
+    <member name="DZL_ANIMATION_EASE_OUT_CUBIC" nick="ease-out-cubic" value="5"/>
+    <member name="DZL_ANIMATION_EASE_IN_OUT_CUBIC" nick="ease-in-out-cubic" value="6"/>
+  </enum>  <class name="DzlBoxTheatric" get-type="dzl_box_theatric_get_type" parents="GObject">
+    <property name="alpha" type="gdouble" flags="227" default-value="1.000000"/>
+    <property name="background" type="gchararray" flags="227" default-value="#000000"/>
+    <property name="height" type="gint" flags="227" default-value="0"/>
+    <property name="icon" type="GIcon" flags="227"/>
+    <property name="target" type="GtkWidget" flags="235"/>
+    <property name="width" type="gint" flags="227" default-value="0"/>
+    <property name="x" type="gint" flags="227" default-value="0"/>
+    <property name="y" type="gint" flags="227" default-value="0"/>
+    <property name="surface" type="gpointer" flags="234"/>
+  </class>
+  <class name="DzlMenuManager" get-type="dzl_menu_manager_get_type" parents="GObject">
+  </class>
+  <flags name="DzlShortcutPhase" get-type="dzl_shortcut_phase_get_type">
+    <member name="DZL_SHORTCUT_PHASE_DISPATCH" nick="dispatch" value="0"/>
+    <member name="DZL_SHORTCUT_PHASE_CAPTURE" nick="capture" value="1"/>
+    <member name="DZL_SHORTCUT_PHASE_BUBBLE" nick="bubble" value="2"/>
+    <member name="DZL_SHORTCUT_PHASE_GLOBAL" nick="global" value="4"/>
+  </flags>
+  <boxed name="DzlShortcutChord" get-type="dzl_shortcut_chord_get_type"/>
+  <enum name="DzlShortcutMatch" get-type="dzl_shortcut_match_get_type">
+    <member name="DZL_SHORTCUT_MATCH_NONE" nick="none" value="0"/>
+    <member name="DZL_SHORTCUT_MATCH_EQUAL" nick="equal" value="1"/>
+    <member name="DZL_SHORTCUT_MATCH_PARTIAL" nick="partial" value="2"/>
+  </enum>  <class name="DzlShortcutContext" get-type="dzl_shortcut_context_get_type" parents="GObject">
+    <property name="name" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="use-binding-sets" type="gboolean" flags="227" default-value="TRUE"/>
+  </class>
+  <class name="DzlShortcutTheme" get-type="dzl_shortcut_theme_get_type" parents="GObject">
+    <property name="name" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="parent-name" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="subtitle" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="title" type="gchararray" flags="227" default-value="NULL"/>
+  </class>
+  <class name="DzlShortcutsWindow" get-type="dzl_shortcuts_window_get_type" parents="GtkWindow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="section-name" type="gchararray" flags="227" default-value="internal-search"/>
+    <property name="view-name" type="gchararray" flags="227" default-value="NULL"/>
+    <signal name="close" return="void" when="last" action="1">
+    </signal>
+    <signal name="search" return="void" when="last" action="1">
+    </signal>
+  </class>
+  <class name="DzlShortcutManager" get-type="dzl_shortcut_manager_get_type" parents="GObject">
+    <implements name="GInitable"/>
+    <implements name="GListModel"/>
+    <property name="theme" type="DzlShortcutTheme" flags="1073742051"/>
+    <property name="theme-name" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="user-dir" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <signal name="changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="DzlThemeManager" get-type="dzl_theme_manager_get_type" parents="GObject">
+  </class>
+  <class name="DzlApplication" get-type="dzl_application_get_type" parents="GtkApplication,GApplication,GObject">
+    <implements name="GActionGroup"/>
+    <implements name="GActionMap"/>
+    <property name="menu-manager" type="DzlMenuManager" flags="225"/>
+    <property name="shortcut-manager" type="DzlShortcutManager" flags="225"/>
+    <property name="theme-manager" type="DzlThemeManager" flags="225"/>
+  </class>
+  <class name="DzlApplicationWindow" get-type="dzl_application_window_get_type" parents="GtkApplicationWindow,GtkWindow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GActionGroup"/>
+    <implements name="GActionMap"/>
+    <property name="fullscreen" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="titlebar-animation" type="DzlTitlebarAnimation" flags="225" default-value="DZL_TITLEBAR_ANIMATION_SHOWN"/>
+  </class>
+  <class name="DzlBindingGroup" get-type="dzl_binding_group_get_type" parents="GObject">
+    <property name="source" type="GObject" flags="227"/>
+  </class>
+  <class name="DzlSignalGroup" get-type="dzl_signal_group_get_type" parents="GObject">
+    <property name="target" type="GObject" flags="1073742051"/>
+    <property name="target-type" type="GType" flags="235"/>
+    <signal name="bind" return="void" when="last">
+      <param type="GObject"/>
+    </signal>
+    <signal name="unbind" return="void" when="last">
+    </signal>
+  </class>
+  <class name="DzlTaskCache" get-type="dzl_task_cache_get_type" parents="GObject">
+    <property name="key-copy-func" type="gpointer" flags="234"/>
+    <property name="key-destroy-func" type="gpointer" flags="234"/>
+    <property name="key-equal-func" type="gpointer" flags="234"/>
+    <property name="key-hash-func" type="gpointer" flags="234"/>
+    <property name="populate-callback" type="gpointer" flags="234"/>
+    <property name="populate-callback-data" type="gpointer" flags="234"/>
+    <property name="populate-callback-data-destroy" type="gpointer" flags="234"/>
+    <property name="time-to-live" type="gint64" flags="234" default-value="30000"/>
+    <property name="value-copy-func" type="gpointer" flags="234"/>
+    <property name="value-destroy-func" type="gpointer" flags="234"/>
+  </class>
+  <class name="DzlDirectoryModel" get-type="dzl_directory_model_get_type" parents="GObject">
+    <implements name="GListModel"/>
+    <property name="directory" type="GFile" flags="227"/>
+  </class>
+  <class name="DzlDirectoryReaper" get-type="dzl_directory_reaper_get_type" parents="GObject">
+    <signal name="remove-file" return="void" when="last">
+      <param type="GFile"/>
+    </signal>
+  </class>
+  <class name="DzlFileTransfer" get-type="dzl_file_transfer_get_type" parents="GObject">
+    <property name="flags" type="DzlFileTransferFlags" flags="1073742051" default-value="DZL_FILE_TRANSFER_FLAGS_NONE"/>
+    <property name="progress" type="gdouble" flags="225" default-value="0.000000"/>
+  </class>
+  <class name="DzlRecursiveFileMonitor" get-type="dzl_recursive_file_monitor_get_type" parents="GObject">
+    <property name="root" type="GFile" flags="235"/>
+    <signal name="changed" return="void" when="last">
+      <param type="GFile"/>
+      <param type="GFile"/>
+      <param type="GFileMonitorEvent"/>
+    </signal>
+  </class>
+  <class name="DzlGraphColumn" get-type="dzl_graph_view_column_get_type" parents="GObject">
+    <property name="name" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="value-type" type="GType" flags="235"/>
+  </class>
+  <class name="DzlGraphModel" get-type="dzl_graph_view_model_get_type" parents="GObject">
+    <property name="max-samples" type="guint" flags="231" default-value="120"/>
+    <property name="timespan" type="gint64" flags="231" default-value="60000000"/>
+    <property name="value-max" type="gdouble" flags="227" default-value="100.000000"/>
+    <property name="value-min" type="gdouble" flags="227" default-value="100.000000"/>
+    <signal name="changed" return="void" when="last">
+    </signal>
+  </class>
+  <interface name="DzlGraphRenderer" get-type="dzl_graph_view_renderer_get_type">
+  </interface>
+  <class name="DzlGraphView" get-type="dzl_graph_view_get_type" parents="GtkDrawingArea,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="model" type="DzlGraphModel" flags="1073742051"/>
+  </class>
+  <class name="DzlCpuGraph" get-type="dzl_cpu_graph_get_type" parents="DzlGraphView,GtkDrawingArea,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="max-samples" type="guint" flags="235" default-value="120"/>
+    <property name="timespan" type="gint64" flags="235" default-value="60000000"/>
+  </class>
+  <class name="DzlCpuModel" get-type="dzl_cpu_model_get_type" parents="DzlGraphModel,GObject">
+  </class>
+  <class name="DzlGraphLineRenderer" get-type="dzl_graph_view_line_renderer_get_type" parents="GObject">
+    <implements name="DzlGraphRenderer"/>
+    <property name="column" type="guint" flags="227" default-value="0"/>
+    <property name="line-width" type="gdouble" flags="227" default-value="1.000000"/>
+    <property name="stroke-color" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="stroke-color-rgba" type="GdkRGBA" flags="227"/>
+  </class>
+  <class name="DzlJoinedMenu" get-type="dzl_joined_menu_get_type" parents="GMenuModel,GObject">
+  </class>
+  <class name="DzlMenuButton" get-type="dzl_menu_button_get_type" parents="GtkMenuButton,GtkToggleButton,GtkButton,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkActionable"/>
+    <implements name="GtkActivatable"/>
+    <property name="model" type="GMenuModel" flags="227"/>
+    <property name="menu-id" type="gchararray" flags="226" default-value="NULL"/>
+    <property name="icon-name" type="gchararray" flags="226" default-value="NULL"/>
+    <property name="show-accels" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="show-arrow" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="show-icons" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="transitions-enabled" type="gboolean" flags="227" default-value="TRUE"/>
+  </class>
+  <class name="DzlBin" get-type="dzl_bin_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+  </class>
+  <class name="DzlMultiPaned" get-type="dzl_multi_paned_get_type" parents="GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="orientation" type="GtkOrientation" flags="227" default-value="GTK_ORIENTATION_VERTICAL"/>
+    <signal name="resize-drag-begin" return="void" when="last">
+      <param type="GtkWidget"/>
+    </signal>
+    <signal name="resize-drag-end" return="void" when="last">
+      <param type="GtkWidget"/>
+    </signal>
+  </class>
+  <class name="DzlDockRevealer" get-type="dzl_dock_revealer_get_type" parents="DzlBin,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="child-revealed" type="gboolean" flags="225" default-value="TRUE"/>
+    <property name="position" type="gint" flags="1073742051" default-value="0"/>
+    <property name="position-set" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="reveal-child" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="transition-duration" type="guint" flags="1073742051" default-value="0"/>
+    <property name="transition-type" type="DzlDockRevealerTransitionType" flags="1073742051" default-value="DZL_DOCK_REVEALER_TRANSITION_TYPE_NONE"/>
+  </class>
+  <enum name="DzlDockRevealerTransitionType" get-type="dzl_dock_revealer_transition_type_get_type">
+    <member name="DZL_DOCK_REVEALER_TRANSITION_TYPE_NONE" nick="none" value="0"/>
+    <member name="DZL_DOCK_REVEALER_TRANSITION_TYPE_SLIDE_RIGHT" nick="slide-right" value="1"/>
+    <member name="DZL_DOCK_REVEALER_TRANSITION_TYPE_SLIDE_LEFT" nick="slide-left" value="2"/>
+    <member name="DZL_DOCK_REVEALER_TRANSITION_TYPE_SLIDE_UP" nick="slide-up" value="3"/>
+    <member name="DZL_DOCK_REVEALER_TRANSITION_TYPE_SLIDE_DOWN" nick="slide-down" value="4"/>
+  </enum>  <class name="DzlDockBin" get-type="dzl_dock_bin_get_type" parents="GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="DzlDockItem"/>
+    <implements name="DzlDock"/>
+    <property name="left-visible" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="right-visible" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="top-visible" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="bottom-visible" type="gboolean" flags="227" default-value="FALSE"/>
+  </class>
+  <class name="DzlDockBinEdge" get-type="dzl_dock_bin_edge_get_type" parents="DzlDockRevealer,DzlBin,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="DzlDockItem"/>
+    <property name="edge" type="GtkPositionType" flags="227" default-value="GTK_POS_LEFT"/>
+    <signal name="move-to-bin-child" return="void" when="last" action="1">
+    </signal>
+  </class>
+  <class name="DzlDockManager" get-type="dzl_dock_manager_get_type" parents="GObject">
+    <signal name="register-dock" return="void" when="last">
+      <param type="DzlDock"/>
+    </signal>
+    <signal name="unregister-dock" return="void" when="last">
+      <param type="DzlDock"/>
+    </signal>
+  </class>
+  <class name="DzlDockOverlay" get-type="dzl_dock_overlay_get_type" parents="GtkEventBox,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="DzlDockItem"/>
+    <implements name="DzlDock"/>
+    <signal name="hide-edges" return="void" when="last" action="1">
+    </signal>
+  </class>
+  <class name="DzlDockPaned" get-type="dzl_dock_paned_get_type" parents="DzlMultiPaned,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <implements name="DzlDockItem"/>
+  </class>
+  <class name="DzlDockStack" get-type="dzl_dock_stack_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <implements name="DzlDockItem"/>
+    <property name="edge" type="GtkPositionType" flags="1073742051" default-value="GTK_POS_TOP"/>
+    <property name="show-pinned-button" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="style" type="DzlTabStyle" flags="1073742051" default-value="DZL_TAB_ICONS | DZL_TAB_TEXT"/>
+  </class>
+  <class name="DzlDockWidget" get-type="dzl_dock_widget_get_type" parents="DzlBin,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="DzlDockItem"/>
+    <property name="can-close" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="gicon" type="GIcon" flags="1073742051"/>
+    <property name="icon-name" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="manager" type="DzlDockManager" flags="1073742051"/>
+    <property name="title" type="gchararray" flags="1073742051" default-value="NULL"/>
+  </class>
+  <class name="DzlDockWindow" get-type="dzl_dock_window_get_type" parents="GtkWindow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="DzlDockItem"/>
+    <implements name="DzlDock"/>
+  </class>
+  <class name="DzlTabStrip" get-type="dzl_tab_strip_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="edge" type="GtkPositionType" flags="1073742051" default-value="GTK_POS_TOP"/>
+    <property name="stack" type="GtkStack" flags="227"/>
+    <property name="style" type="DzlTabStyle" flags="1073742051" default-value="DZL_TAB_ICONS | DZL_TAB_TEXT"/>
+  </class>
+  <class name="DzlTab" get-type="dzl_tab_get_type" parents="DzlBin,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkActionable"/>
+    <property name="active" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="can-close" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="edge" type="GtkPositionType" flags="1073742051" default-value="GTK_POS_TOP"/>
+    <property name="style" type="DzlTabStyle" flags="1073742051" default-value="DZL_TAB_ICONS | DZL_TAB_TEXT"/>
+    <property name="title" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="widget" type="GtkWidget" flags="1073742051"/>
+    <signal name="clicked" return="void" when="last">
+    </signal>
+  </class>
+  <class name="DzlDockOverlayEdge" get-type="dzl_dock_overlay_edge_get_type" parents="DzlBin,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="DzlDockItem"/>
+    <property name="edge" type="GtkPositionType" flags="1073742051" default-value="GTK_POS_LEFT"/>
+    <property name="position" type="gint" flags="1073742051" default-value="0"/>
+  </class>
+  <interface name="DzlDock" get-type="dzl_dock_get_type">
+    <prerequisite name="GtkContainer"/>
+    <property name="manager" type="DzlDockManager" flags="227"/>
+  </interface>
+  <interface name="DzlDockItem" get-type="dzl_dock_item_get_type">
+    <prerequisite name="GtkWidget"/>
+    <signal name="manager-set" return="void" when="last">
+      <param type="DzlDockManager"/>
+    </signal>
+    <signal name="needs-attention" return="void" when="last">
+    </signal>
+    <signal name="presented" return="void" when="last">
+    </signal>
+  </interface>
+  <flags name="DzlTabStyle" get-type="dzl_tab_style_get_type">
+    <member name="DZL_TAB_ICONS" nick="icons" value="2"/>
+    <member name="DZL_TAB_TEXT" nick="text" value="1"/>
+    <member name="DZL_TAB_BOTH" nick="both" value="3"/>
+  </flags>
+  <class name="DzlDockTransientGrab" get-type="dzl_dock_transient_grab_get_type" parents="GObject">
+    <property name="timeout" type="guint" flags="1073742051" default-value="0"/>
+  </class>
+  <class name="DzlPathElement" get-type="dzl_path_element_get_type" parents="GObject">
+    <property name="icon-name" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="id" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="title" type="gchararray" flags="235" default-value="NULL"/>
+  </class>
+  <class name="DzlPath" get-type="dzl_path_get_type" parents="GObject">
+  </class>
+  <class name="DzlPathBar" get-type="dzl_path_bar_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="path" type="DzlPath" flags="1073742051"/>
+    <signal name="element-selected" return="void" when="last">
+      <param type="DzlPath"/>
+      <param type="DzlPathElement"/>
+    </signal>
+    <signal name="populate-menu" return="void" when="last">
+      <param type="DzlPath"/>
+      <param type="DzlPathElement"/>
+      <param type="GMenu"/>
+    </signal>
+  </class>
+  <boxed name="DzlPatternSpec" get-type="dzl_pattern_spec_get_type"/>
+  <class name="DzlPreferencesBin" get-type="dzl_preferences_bin_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="keywords" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="priority" type="gint" flags="235" default-value="0"/>
+    <property name="schema-id" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="path" type="gchararray" flags="235" default-value="NULL"/>
+    <signal name="preference-activated" return="void" when="last">
+    </signal>
+  </class>
+  <class name="DzlPreferencesEntry" get-type="dzl_preferences_entry_get_type" parents="DzlPreferencesBin,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="title" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="text" type="gchararray" flags="227" default-value="NULL"/>
+    <signal name="changed" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="activate" return="void" when="last">
+    </signal>
+  </class>
+  <class name="DzlPreferencesFileChooserButton" get-type="dzl_preferences_file_chooser_button_get_type" parents="DzlPreferencesBin,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="action" type="GtkFileChooserAction" flags="235" default-value="GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER"/>
+    <property name="key" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="subtitle" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="title" type="gchararray" flags="235" default-value="NULL"/>
+  </class>
+  <class name="DzlColumnLayout" get-type="dzl_column_layout_get_type" parents="GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="column-width" type="gint" flags="227" default-value="500"/>
+    <property name="column-spacing" type="gint" flags="227" default-value="24"/>
+    <property name="max-columns" type="guint" flags="227" default-value="0"/>
+    <property name="row-spacing" type="gint" flags="227" default-value="24"/>
+  </class>
+  <class name="DzlPreferencesFlowBox" get-type="dzl_preferences_flow_box_get_type" parents="DzlColumnLayout,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+  </class>
+  <class name="DzlPreferencesFontButton" get-type="dzl_preferences_font_button_get_type" parents="DzlPreferencesBin,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="key" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="title" type="gchararray" flags="235" default-value="NULL"/>
+    <signal name="activate" return="void" when="last">
+    </signal>
+  </class>
+  <class name="DzlPreferencesGroup" get-type="dzl_preferences_group_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="is-list" type="gboolean" flags="235" default-value="FALSE"/>
+    <property name="mode" type="GtkSelectionMode" flags="227" default-value="GTK_SELECTION_NONE"/>
+    <property name="priority" type="gint" flags="235" default-value="0"/>
+    <property name="title" type="gchararray" flags="235" default-value="NULL"/>
+  </class>
+  <class name="DzlPreferencesPage" get-type="dzl_preferences_page_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="priority" type="gint" flags="227" default-value="0"/>
+  </class>
+  <class name="DzlPreferencesSpinButton" get-type="dzl_preferences_spin_button_get_type" parents="DzlPreferencesBin,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="key" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="subtitle" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="title" type="gchararray" flags="235" default-value="NULL"/>
+    <signal name="activate" return="void" when="last">
+    </signal>
+  </class>
+  <class name="DzlPreferencesSwitch" get-type="dzl_preferences_switch_get_type" parents="DzlPreferencesBin,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="is-radio" type="gboolean" flags="235" default-value="FALSE"/>
+    <property name="key" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="subtitle" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="target" type="GVariant" flags="235"/>
+    <property name="title" type="gchararray" flags="227" default-value="NULL"/>
+    <signal name="activated" return="void" when="last">
+    </signal>
+  </class>
+  <interface name="DzlPreferences" get-type="dzl_preferences_get_type">
+  </interface>
+  <class name="DzlPreferencesView" get-type="dzl_preferences_view_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="DzlPreferences"/>
+    <property name="use-sidebar" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="show-search-entry" type="gboolean" flags="1073742051" default-value="FALSE"/>
+  </class>
+  <class name="DzlFuzzyIndexBuilder" get-type="dzl_fuzzy_index_builder_get_type" parents="GObject">
+    <property name="case-sensitive" type="gboolean" flags="227" default-value="FALSE"/>
+  </class>
+  <class name="DzlFuzzyIndex" get-type="dzl_fuzzy_index_get_type" parents="GObject">
+  </class>
+  <class name="DzlFuzzyIndexCursor" get-type="dzl_fuzzy_index_cursor_get_type" parents="GObject">
+    <implements name="GAsyncInitable"/>
+    <implements name="GListModel"/>
+    <property name="case-sensitive" type="gboolean" flags="235" default-value="FALSE"/>
+    <property name="index" type="DzlFuzzyIndex" flags="234"/>
+    <property name="tables" type="GVariantDict" flags="234"/>
+    <property name="max-matches" type="guint" flags="235" default-value="0"/>
+    <property name="query" type="gchararray" flags="235" default-value="NULL"/>
+  </class>
+  <class name="DzlFuzzyIndexMatch" get-type="dzl_fuzzy_index_match_get_type" parents="GObject">
+    <property name="document" type="GVariant" flags="235"/>
+    <property name="key" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="score" type="gfloat" flags="235" default-value="0.000000"/>
+    <property name="priority" type="guint" flags="235" default-value="0"/>
+  </class>
+  <boxed name="DzlFuzzyMutableIndex" get-type="dzl_fuzzy_mutable_index_get_type"/>
+  <boxed name="DzlTrie" get-type="dzl_trie_get_type"/>
+  <class name="DzlSettingsSandwich" get-type="dzl_settings_sandwich_get_type" parents="GObject">
+    <property name="path" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="schema-id" type="gchararray" flags="235" default-value="NULL"/>
+  </class>
+  <class name="DzlShortcutAccelDialog" get-type="dzl_shortcut_accel_dialog_get_type" parents="GtkDialog,GtkWindow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="accelerator" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="shortcut-title" type="gchararray" flags="1073742051" default-value="NULL"/>
+  </class>
+  <class name="DzlShortcutController" get-type="dzl_shortcut_controller_get_type" parents="GObject">
+    <property name="context" type="DzlShortcutContext" flags="225"/>
+    <property name="current-chord" type="DzlShortcutChord" flags="225"/>
+    <property name="manager" type="DzlShortcutManager" flags="1073742051"/>
+    <property name="widget" type="GtkWidget" flags="235"/>
+    <signal name="reset" return="void" when="last" action="1">
+    </signal>
+    <signal name="set-context-named" return="void" when="last" action="1">
+      <param type="gchararray"/>
+    </signal>
+  </class>
+  <class name="DzlShortcutLabel" get-type="dzl_shortcut_label_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="accelerator" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="chord" type="DzlShortcutChord" flags="1073742051"/>
+  </class>
+  <class name="DzlShortcutModel" get-type="dzl_shortcut_model_get_type" parents="GtkTreeStore,GObject">
+    <implements name="GtkTreeModel"/>
+    <implements name="GtkTreeDragSource"/>
+    <implements name="GtkTreeDragDest"/>
+    <implements name="GtkTreeSortable"/>
+    <implements name="GtkBuildable"/>
+    <property name="manager" type="DzlShortcutManager" flags="1073742051"/>
+    <property name="theme" type="DzlShortcutTheme" flags="1073742051"/>
+  </class>
+  <class name="DzlShortcutSimpleLabel" get-type="dzl_shortcut_simple_label_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="accel" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="action" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="command" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="show-accel" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="title" type="gchararray" flags="1073742051" default-value="NULL"/>
+  </class>
+  <class name="DzlShortcutThemeEditor" get-type="dzl_shortcut_theme_editor_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="theme" type="DzlShortcutTheme" flags="1073742051"/>
+    <signal name="changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="DzlShortcutTooltip" get-type="dzl_shortcut_tooltip_get_type" parents="GObject">
+    <property name="accel" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="command-id" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="title" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="widget" type="GtkWidget" flags="1073742051"/>
+  </class>
+  <class name="DzlShortcutsGroup" get-type="dzl_shortcuts_group_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="title" type="gchararray" flags="227" default-value=""/>
+    <property name="view" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="accel-size-group" type="GtkSizeGroup" flags="226"/>
+    <property name="title-size-group" type="GtkSizeGroup" flags="226"/>
+    <property name="height" type="guint" flags="225" default-value="1"/>
+  </class>
+  <class name="DzlShortcutsSection" get-type="dzl_shortcuts_section_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="title" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="section-name" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="view-name" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="max-height" type="guint" flags="1073742051" default-value="15"/>
+    <signal name="change-current-page" return="gboolean" when="last" action="1">
+      <param type="gint"/>
+    </signal>
+  </class>
+  <class name="DzlShortcutsShortcut" get-type="dzl_shortcuts_shortcut_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="accelerator" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="icon" type="GIcon" flags="227"/>
+    <property name="icon-set" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="title" type="gchararray" flags="227" default-value=""/>
+    <property name="subtitle" type="gchararray" flags="227" default-value=""/>
+    <property name="subtitle-set" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="accel-size-group" type="GtkSizeGroup" flags="226"/>
+    <property name="title-size-group" type="GtkSizeGroup" flags="226"/>
+    <property name="direction" type="GtkTextDirection" flags="1073742051" default-value="GTK_TEXT_DIR_NONE"/>
+    <property name="shortcut-type" type="GtkShortcutType" flags="1073742051" default-value="GTK_SHORTCUT_ACCELERATOR"/>
+    <property name="action-name" type="gchararray" flags="1073742051" default-value="NULL"/>
+  </class>
+  <class name="DzlStateMachine" get-type="dzl_state_machine_get_type" parents="GObject">
+    <implements name="GtkBuildable"/>
+    <property name="state" type="gchararray" flags="227" default-value="NULL"/>
+  </class>
+  <class name="DzlSuggestion" get-type="dzl_suggestion_get_type" parents="GObject">
+    <property name="icon-name" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="icon" type="GIcon" flags="1073742049"/>
+    <property name="secondary-icon-name" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="secondary-icon" type="GIcon" flags="1073742049"/>
+    <property name="id" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="subtitle" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="title" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <signal name="replace-typed-text" return="gchararray" when="last">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="suggest-suffix" return="gchararray" when="last">
+      <param type="gchararray"/>
+    </signal>
+  </class>
+  <class name="DzlSuggestionEntry" get-type="dzl_suggestion_entry_get_type" parents="GtkEntry,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkEditable"/>
+    <implements name="GtkCellEditable"/>
+    <property name="activate-on-single-click" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="compact" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="model" type="GListModel" flags="1073742051"/>
+    <property name="typed-text" type="gchararray" flags="1073742049" default-value="NULL"/>
+    <property name="suggestion" type="DzlSuggestion" flags="1073742051"/>
+    <signal name="action" return="void" when="last" action="1">
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="hide-suggestions" return="void" when="last" action="1">
+    </signal>
+    <signal name="move-suggestion" return="void" when="last" action="1">
+      <param type="gint"/>
+    </signal>
+    <signal name="show-suggestions" return="void" when="last" action="1">
+    </signal>
+    <signal name="suggestion-activated" return="void" when="last">
+      <param type="DzlSuggestion"/>
+    </signal>
+    <signal name="suggestion-selected" return="void" when="last">
+      <param type="DzlSuggestion"/>
+    </signal>
+    <signal name="activate-suggestion" return="void" when="last" action="1">
+    </signal>
+  </class>
+  <class name="DzlSuggestionButton" get-type="dzl_suggestion_button_get_type" parents="GtkStack,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="button" type="GtkButton" flags="225"/>
+    <property name="entry" type="DzlSuggestionEntry" flags="225"/>
+  </class>
+  <class name="DzlSuggestionEntryBuffer" get-type="dzl_suggestion_entry_buffer_get_type" parents="GtkEntryBuffer,GObject">
+    <property name="suggestion" type="DzlSuggestion" flags="1073742051"/>
+  </class>
+  <class name="DzlSuggestionPopover" get-type="dzl_suggestion_popover_get_type" parents="GtkWindow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="model" type="DzlSuggestion" flags="1073742051"/>
+    <property name="relative-to" type="GtkWidget" flags="1073742051"/>
+    <property name="selected" type="DzlSuggestion" flags="227"/>
+    <property name="subtitle-ellipsize" type="PangoEllipsizeMode" flags="227" default-value="PANGO_ELLIPSIZE_END"/>
+    <property name="title-ellipsize" type="PangoEllipsizeMode" flags="227" default-value="PANGO_ELLIPSIZE_END"/>
+    <signal name="suggestion-activated" return="void" when="last">
+      <param type="DzlSuggestion"/>
+    </signal>
+  </class>
+  <class name="DzlListBoxRow" get-type="dzl_list_box_row_get_type" parents="GtkListBoxRow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject" abstract="1">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkActionable"/>
+  </class>
+  <class name="DzlSuggestionRow" get-type="dzl_suggestion_row_get_type" parents="DzlListBoxRow,GtkListBoxRow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkActionable"/>
+    <implements name="GtkOrientable"/>
+    <property name="suggestion" type="DzlSuggestion" flags="1073742051"/>
+    <property name="orientation" type="GtkOrientation" flags="227" default-value="GTK_ORIENTATION_VERTICAL"/>
+  </class>
+  <class name="DzlCssProvider" get-type="dzl_css_provider_get_type" parents="GtkCssProvider,GObject">
+    <implements name="GtkStyleProvider"/>
+    <implements name="GtkStyleProviderPrivate"/>
+    <property name="base-path" type="gchararray" flags="235" default-value="NULL"/>
+  </class>
+  <class name="DzlTree" get-type="dzl_tree_get_type" parents="GtkTreeView,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkScrollable"/>
+    <property name="always-expand" type="gboolean" flags="235" default-value="FALSE"/>
+    <property name="context-menu" type="GMenuModel" flags="227"/>
+    <property name="root" type="DzlTreeNode" flags="227"/>
+    <property name="selection" type="DzlTreeNode" flags="227"/>
+    <property name="show-icons" type="gboolean" flags="227" default-value="FALSE"/>
+    <signal name="action" return="void" when="last" action="1">
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="populate-popup" return="void" when="last">
+      <param type="GtkWidget"/>
+    </signal>
+  </class>
+  <class name="DzlTreeBuilder" get-type="dzl_tree_builder_get_type" parents="GInitiallyUnowned,GObject">
+    <property name="tree" type="DzlTree" flags="225"/>
+    <signal name="drag-data-get" return="gboolean" when="last">
+      <param type="DzlTreeNode"/>
+      <param type="GtkSelectionData"/>
+    </signal>
+    <signal name="drag-data-received" return="gboolean" when="last">
+      <param type="DzlTreeNode"/>
+      <param type="DzlTreeDropPosition"/>
+      <param type="GdkDragAction"/>
+      <param type="GtkSelectionData"/>
+    </signal>
+    <signal name="added" return="void" when="last">
+      <param type="DzlTree"/>
+    </signal>
+    <signal name="build-node" return="void" when="last">
+      <param type="DzlTreeNode"/>
+    </signal>
+    <signal name="build-children" return="void" when="last">
+      <param type="DzlTreeNode"/>
+    </signal>
+    <signal name="drag-node-received" return="gboolean" when="last">
+      <param type="DzlTreeNode"/>
+      <param type="DzlTreeNode"/>
+      <param type="DzlTreeDropPosition"/>
+      <param type="GdkDragAction"/>
+      <param type="GtkSelectionData"/>
+    </signal>
+    <signal name="drag-node-delete" return="gboolean" when="last">
+      <param type="DzlTreeNode"/>
+    </signal>
+    <signal name="node-activated" return="gboolean" when="last">
+      <param type="DzlTreeNode"/>
+    </signal>
+    <signal name="node-draggable" return="gboolean" when="last">
+      <param type="DzlTreeNode"/>
+    </signal>
+    <signal name="node-droppable" return="gboolean" when="last">
+      <param type="DzlTreeNode"/>
+      <param type="GtkSelectionData"/>
+    </signal>
+    <signal name="node-collapsed" return="void" when="last">
+      <param type="DzlTreeNode"/>
+    </signal>
+    <signal name="node-expanded" return="void" when="last">
+      <param type="DzlTreeNode"/>
+    </signal>
+    <signal name="node-popup" return="void" when="last">
+      <param type="DzlTreeNode"/>
+      <param type="GMenu"/>
+    </signal>
+    <signal name="node-selected" return="void" when="last">
+      <param type="DzlTreeNode"/>
+    </signal>
+    <signal name="node-unselected" return="void" when="last">
+      <param type="DzlTreeNode"/>
+    </signal>
+    <signal name="removed" return="void" when="last">
+      <param type="DzlTree"/>
+    </signal>
+  </class>
+  <class name="DzlTreeNode" get-type="dzl_tree_node_get_type" parents="GInitiallyUnowned,GObject">
+    <property name="children-possible" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="expanded-icon-name" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="icon-name" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="gicon" type="GIcon" flags="1073742051"/>
+    <property name="item" type="GObject" flags="1073742051"/>
+    <property name="parent" type="DzlTreeNode" flags="225"/>
+    <property name="reset-on-collapse" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="text" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="tree" type="DzlTree" flags="227"/>
+    <property name="use-dim-label" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="use-markup" type="gboolean" flags="1073742051" default-value="FALSE"/>
+  </class>
+  <class name="DzlListStoreAdapter" get-type="dzl_list_store_adapter_get_type" parents="GObject">
+    <implements name="GtkTreeModel"/>
+    <property name="model" type="GListModel" flags="1073742051"/>
+  </class>
+  <boxed name="DzlHeap" get-type="dzl_heap_get_type"/>
+  <class name="DzlListModelFilter" get-type="dzl_list_model_filter_get_type" parents="GObject">
+    <implements name="GListModel"/>
+    <property name="child-model" type="GListModel" flags="225"/>
+  </class>
+  <class name="DzlReadOnlyListModel" get-type="dzl_read_only_list_model_get_type" parents="GObject">
+    <implements name="GListModel"/>
+    <property name="base-model" type="GListModel" flags="234"/>
+  </class>
+  <boxed name="DzlRing" get-type="dzl_ring_get_type"/>
+  <boxed name="DzlCounterArena" get-type="dzl_counter_arena_get_type"/>
+  <class name="DzlBoldingLabel" get-type="dzl_bolding_label_get_type" parents="GtkLabel,GtkMisc,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="bold" type="gboolean" flags="226" default-value="FALSE"/>
+  </class>
+  <class name="DzlBox" get-type="dzl_box_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="max-width-request" type="gint" flags="227" default-value="-1"/>
+  </class>
+  <class name="DzlCenteringBin" get-type="dzl_centering_bin_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="max-width-request" type="gint" flags="227" default-value="-1"/>
+  </class>
+  <class name="DzlElasticBin" get-type="dzl_elastic_bin_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+  </class>
+  <class name="DzlEmptyState" get-type="dzl_empty_state_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="icon-name" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="pixel-size" type="gint" flags="227" default-value="128"/>
+    <property name="resource" type="gchararray" flags="226" default-value="NULL"/>
+    <property name="subtitle" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="title" type="gchararray" flags="1073742051" default-value="NULL"/>
+  </class>
+  <class name="DzlEntryBox" get-type="dzl_entry_box_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="max-width-chars" type="gint" flags="227" default-value="-1"/>
+  </class>
+  <class name="DzlFileChooserEntry" get-type="dzl_file_chooser_entry_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="action" type="GtkFileChooserAction" flags="227" default-value="GTK_FILE_CHOOSER_ACTION_OPEN"/>
+    <property name="create-folders" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="do-overwrite-confirmation" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="file" type="GFile" flags="227"/>
+    <property name="filter" type="GtkFileFilter" flags="227"/>
+    <property name="local-only" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="show-hidden" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="max-width-chars" type="gint" flags="227" default-value="-1"/>
+    <property name="title" type="gchararray" flags="227" default-value="NULL"/>
+  </class>
+  <class name="DzlListBox" get-type="dzl_list_box_get_type" parents="GtkListBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="property-name" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="row-type" type="GType" flags="235"/>
+    <property name="row-type-name" type="gchararray" flags="234" default-value="NULL"/>
+  </class>
+  <class name="DzlPillBox" get-type="dzl_pill_box_get_type" parents="GtkEventBox,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="label" type="gchararray" flags="227" default-value="NULL"/>
+  </class>
+  <class name="DzlPriorityBox" get-type="dzl_priority_box_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+  </class>
+  <class name="DzlProgressButton" get-type="dzl_progress_button_get_type" parents="GtkButton,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkActionable"/>
+    <implements name="GtkActivatable"/>
+    <property name="progress" type="guint" flags="227" default-value="0"/>
+    <property name="show-progress" type="gboolean" flags="227" default-value="FALSE"/>
+  </class>
+  <class name="DzlProgressMenuButton" get-type="dzl_progress_menu_button_get_type" parents="GtkMenuButton,GtkToggleButton,GtkButton,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkActionable"/>
+    <implements name="GtkActivatable"/>
+    <property name="progress" type="gdouble" flags="1073742051" default-value="0.000000"/>
+    <property name="show-progress" type="gboolean" flags="1073742051" default-value="TRUE"/>
+    <property name="show-theatric" type="gboolean" flags="1073742051" default-value="TRUE"/>
+    <property name="theatric-icon-name" type="gchararray" flags="227" default-value="folder-download-symbolic"/>
+    <property name="transition-duration" type="guint" flags="227" default-value="750"/>
+  </class>
+  <class name="DzlProgressIcon" get-type="dzl_progress_icon_get_type" parents="GtkDrawingArea,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="progress" type="gdouble" flags="227" default-value="0.000000"/>
+  </class>
+  <class name="DzlRadioBox" get-type="dzl_radio_box_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="active-id" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="has-more" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="show-more" type="gboolean" flags="227" default-value="FALSE"/>
+    <signal name="changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="DzlScrolledWindow" get-type="dzl_scrolled_window_get_type" parents="GtkScrolledWindow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+  </class>
+  <class name="DzlSearchBar" get-type="dzl_search_bar_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="show-close-button" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="search-mode-enabled" type="gboolean" flags="227" default-value="FALSE"/>
+    <signal name="activate" return="void" when="last" action="1">
+    </signal>
+    <signal name="reveal" return="void" when="last" action="1">
+    </signal>
+  </class>
+  <class name="DzlSimpleLabel" get-type="dzl_simple_label_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="label" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="width-chars" type="gint" flags="227" default-value="-1"/>
+    <property name="xalign" type="gfloat" flags="227" default-value="0.500000"/>
+  </class>
+  <class name="DzlSimplePopover" get-type="dzl_simple_popover_get_type" parents="GtkPopover,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="button-text" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="message" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="ready" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="text" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="title" type="gchararray" flags="227" default-value="NULL"/>
+    <signal name="changed" return="void" when="last">
+    </signal>
+    <signal name="activate" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="insert-text" return="gboolean" when="last">
+      <param type="guint"/>
+      <param type="gchararray"/>
+      <param type="guint"/>
+    </signal>
+  </class>
+  <class name="DzlSlider" get-type="dzl_slider_get_type" parents="GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="position" type="DzlSliderPosition" flags="227" default-value="DZL_SLIDER_NONE"/>
+  </class>
+  <enum name="DzlSliderPosition" get-type="dzl_slider_position_get_type">
+    <member name="DZL_SLIDER_NONE" nick="none" value="0"/>
+    <member name="DZL_SLIDER_TOP" nick="top" value="1"/>
+    <member name="DZL_SLIDER_RIGHT" nick="right" value="2"/>
+    <member name="DZL_SLIDER_BOTTOM" nick="bottom" value="3"/>
+    <member name="DZL_SLIDER_LEFT" nick="left" value="4"/>
+  </enum>  <class name="DzlStackList" get-type="dzl_stack_list_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="model" type="GListModel" flags="225"/>
+    <signal name="row-activated" return="void" when="last">
+      <param type="GtkListBoxRow"/>
+    </signal>
+    <signal name="header-activated" return="void" when="last">
+      <param type="GtkListBoxRow"/>
+    </signal>
+  </class>
+  <class name="DzlThreeGrid" get-type="dzl_three_grid_get_type" parents="GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="column-spacing" type="guint" flags="227" default-value="0"/>
+    <property name="row-spacing" type="guint" flags="227" default-value="0"/>
+  </class>
+  <enum name="DzlThreeGridColumn" get-type="dzl_three_grid_column_get_type">
+    <member name="DZL_THREE_GRID_COLUMN_LEFT" nick="left" value="0"/>
+    <member name="DZL_THREE_GRID_COLUMN_CENTER" nick="center" value="1"/>
+    <member name="DZL_THREE_GRID_COLUMN_RIGHT" nick="right" value="2"/>
+  </enum>  <class name="DzlCountersWindow" get-type="dzl_counters_window_get_type" parents="GtkWindow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+  </class>
+</dump>

@@ -1,0 +1,54 @@
+diff --git a/Makefile b/Makefile
+index 452ee94c..6ffd06d7 100644
+--- a/Makefile
++++ b/Makefile
+@@ -19,28 +19,12 @@ LDFLAGS_COMMON := -X main.gitCommit=$(COMMIT) -X main.version=$(VERSION)
+ GOARCH := $(shell $(GO) env GOARCH)
+ 
+ GO_BUILDMODE :=
+-# Enable dynamic PIE executables on supported platforms.
+-ifneq (,$(filter $(GOARCH),386 amd64 arm arm64 ppc64le riscv64 s390x))
+-	ifeq (,$(findstring -race,$(EXTRA_FLAGS)))
+-		GO_BUILDMODE := "-buildmode=pie"
+-	endif
+-endif
+ GO_BUILD := $(GO) build -trimpath $(GO_BUILDMODE) \
+ 	$(EXTRA_FLAGS) -tags "$(BUILDTAGS)" \
+ 	-ldflags "$(LDFLAGS_COMMON) $(EXTRA_LDFLAGS)"
+ 
+ GO_BUILDMODE_STATIC :=
+ LDFLAGS_STATIC := -extldflags -static
+-# Enable static PIE executables on supported platforms.
+-# This (among the other things) requires libc support (rcrt1.o), which seems
+-# to be available only for arm64 and amd64 (Debian Bullseye).
+-ifneq (,$(filter $(GOARCH),arm64 amd64))
+-	ifeq (,$(findstring -race,$(EXTRA_FLAGS)))
+-		GO_BUILDMODE_STATIC := -buildmode=pie
+-		LDFLAGS_STATIC := -linkmode external -extldflags --static-pie
+-	endif
+-endif
+-# Enable static PIE binaries on supported platforms.
+ GO_BUILD_STATIC := $(GO) build -trimpath $(GO_BUILDMODE_STATIC) \
+ 	$(EXTRA_FLAGS) -tags "$(BUILDTAGS) netgo osusergo" \
+ 	-ldflags "$(LDFLAGS_COMMON) $(LDFLAGS_STATIC) $(EXTRA_LDFLAGS)"
+diff --git a/libcontainer/nsenter/cloned_binary.c b/libcontainer/nsenter/cloned_binary.c
+index d1b2d4c5..c10347c3 100644
+--- a/libcontainer/nsenter/cloned_binary.c
++++ b/libcontainer/nsenter/cloned_binary.c
+@@ -91,6 +91,8 @@
+ #  define MFD_ALLOW_SEALING 0x0002U
+ #endif
+ 
++int memfd_create(const char *name, unsigned int flags);
++#ifndef __ANDROID__
+ int memfd_create(const char *name, unsigned int flags)
+ {
+ #ifdef SYS_memfd_create
+@@ -100,6 +102,7 @@ int memfd_create(const char *name, unsigned int flags)
+ 	return -1;
+ #endif
+ }
++#endif
+ 
+ /* This comes directly from <linux/fcntl.h>. */
+ #ifndef F_LINUX_SPECIFIC_BASE

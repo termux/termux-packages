@@ -1,17 +1,6 @@
-diff --git a/data/data/com.termux/files/usr/tmp/docker-build/containerd-1.4.3/Makefile b/Makefile
-index c0fecb9..e724e52 100644
---- a/data/data/com.termux/files/usr/tmp/docker-build/containerd-1.4.3/Makefile
-+++ b/Makefile
-@@ -33,7 +33,7 @@
- VERSION ?= $(shell git describe --match 'v[0-9]*' --dirty='.m' --always)
- REVISION=$(shell git rev-parse HEAD)$(shell if ! git diff --no-ext-diff --quiet --exit-code; then echo .m; fi)
- PACKAGE=github.com/containerd/containerd
--SHIM_CGO_ENABLED ?= 0
-+SHIM_CGO_ENABLED ?= 1
- 
- ifneq "$(strip $(shell command -v $(GO) 2>/dev/null))" ""
- 	GOOS ?= $(shell $(GO) env GOOS)
-@@ -69,7 +69,7 @@ RELEASE=containerd-$(VERSION:v%=%).${GOOS}-${GOARCH}
+--- ../cache/tmp-checkout/Makefile	2023-10-23 19:42:08.826348963 +0000
++++ ./Makefile	2023-10-23 19:48:19.356921771 +0000
+@@ -81,7 +81,7 @@
  PKG=github.com/containerd/containerd
  
  # Project binaries.
@@ -29,7 +18,7 @@ index c0fecb9..e724e52 100644
  
  # Project packages.
  PACKAGES=$(shell $(GO) list ${GO_TAGS} ./... | grep -v /vendor/ | grep -v /integration)
-@@ -274,15 +274,18 @@ genman: man/containerd.8 man/ctr.8
+@@ -274,11 +274,13 @@
  
  man/containerd.8: FORCE
  	@echo "$(WHALE) $@"
@@ -45,9 +34,3 @@ index c0fecb9..e724e52 100644
  
  man/%: docs/man/%.md FORCE
  	@echo "$(WHALE) $@"
--	go-md2man -in "$<" -out "$@"
-+	CC=gcc CFLAGS= LDFLAGS= GOOS= GOARCH= $(GO) build -o "bin/go-md2man" ./vendor/github.com/cpuguy83/go-md2man/v2
-+	bin/go-md2man -in "$<" -out "$@"
- 
- define installmanpage
- $(INSTALL) -d $(DESTDIR)$(MANDIR)/man$(2);

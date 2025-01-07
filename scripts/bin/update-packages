@@ -5,16 +5,19 @@ set -u
 # Following variables should be set in environment outside of this script.
 # Build updated packages.
 : "${BUILD_PACKAGES:=false}"
+# Github Action create issue for failed updates.
+: "${CREATE_ISSUE:=false}"
 # Commit changes to Git.
 : "${GIT_COMMIT_PACKAGES:=false}"
 # Push changes to remote.
 : "${GIT_PUSH_PACKAGES:=false}"
 
-export TERMUX_PKG_UPDATE_METHOD=""         # Which method to use for updating? (repology, github or gitlab)
-export TERMUX_PKG_UPDATE_TAG_TYPE=""       # Whether to use latest-release-tag or newest-tag.
-export TERMUX_GITLAB_API_HOST="gitlab.com" # Default host for gitlab-ci.
-export TERMUX_PKG_AUTO_UPDATE=false        # Whether to auto-update or not. Disabled by default.
-export TERMUX_PKG_UPDATE_VERSION_REGEXP="" # Regexp to extract version.
+export TERMUX_PKG_UPDATE_METHOD=""             # Which method to use for updating? (repology, github or gitlab)
+export TERMUX_PKG_UPDATE_TAG_TYPE=""           # Whether to use latest-release-tag or newest-tag.
+export TERMUX_GITLAB_API_HOST="gitlab.com"     # Default host for gitlab-ci.
+export TERMUX_PKG_AUTO_UPDATE=false            # Whether to auto-update or not. Disabled by default.
+export TERMUX_PKG_UPDATE_VERSION_REGEXP=""     # Regexp to extract version with `grep -oP`.
+export TERMUX_PKG_UPDATE_VERSION_SED_REGEXP="" # Regexp to extract version with `sed`.
 export TERMUX_REPOLOGY_DATA_FILE
 TERMUX_REPOLOGY_DATA_FILE="$(mktemp -t termux-repology.XXXXXX)" # File to store repology data.
 
@@ -22,7 +25,7 @@ export TERMUX_SCRIPTDIR
 TERMUX_SCRIPTDIR=$(realpath "$(dirname "$0")/../..") # Root of repository.
 
 export TERMUX_PACKAGES_DIRECTORIES
-TERMUX_PACKAGES_DIRECTORIES=$(jq --raw-output 'keys | .[]' "${TERMUX_SCRIPTDIR}"/repo.json)
+TERMUX_PACKAGES_DIRECTORIES=$(jq --raw-output 'del(.pkg_format) | keys | .[]' "${TERMUX_SCRIPTDIR}"/repo.json)
 
 # Define few more variables used by scripts.
 # shellcheck source=scripts/properties.sh
@@ -74,6 +77,23 @@ TERMUX_PACKAGES_DIRECTORIES=$(jq --raw-output 'keys | .[]' "${TERMUX_SCRIPTDIR}"
 # shellcheck source=scripts/updates/termux_pkg_auto_update.sh
 . "${TERMUX_SCRIPTDIR}"/scripts/updates/termux_pkg_auto_update.sh
 
+# Converts milliseconds to human-readable format. 
+# Example: `ms_to_human_readable 123456789` => 34h 17m 36s 789ms
+ms_to_human_readable() {
+	echo "$(($1/3600000))h $(($1%3600000/60000))m $(($1%60000/1000))s $(($1%1000))ms" | sed 's/0h //;s/0m //;s/0s //'
+}
+
+# Runs a command without displaying its output in the case if trace is disabled and displays output in the case if it is enabled.
+# Needed only for debugging
+quiet() {
+	if [[ "$-" =~ x ]]; then
+		"$@"
+	else
+		&>/dev/null "$@"
+	fi
+	return $?
+}
+
 _update() {
 	export TERMUX_PKG_NAME
 	TERMUX_PKG_NAME="$(basename "$1")"
@@ -102,11 +122,105 @@ _update() {
 	termux_pkg_auto_update
 }
 
+declare -A _LATEST_TAGS=()
 declare -A _FAILED_UPDATES=()
 declare -a _ALREADY_SEEN=() # Array of packages successfully updated or skipped.
 
+# _fetch_and_cache_tags fetches all possible tags using termux_pkg_auto_update, but using Ninja build system. 
+# The key difference is that we make the process concurrent, allowing us to fetch tags simultaneously rather than one at a time. 
+# Once all tags are cached, the termux_pkg_auto_update function will operate much more quickly. 
+# We avoid packages with overwritten termux_pkg_auto_update to prevent unexpected modifications to the package`s build.sh.
+_fetch_and_cache_tags() {
+	if [ "$(uname -o)" = "Android" ] || [ -e "/system/bin/app_process" ]; then
+		if ! command -v ninja &> /dev/null; then
+			echo "INFO: Skipping fetching and caching tags. Package 'ninja' is not installed."
+			return 0
+		fi
+	fi
+	
+	if ! command -v ninja &> /dev/null; then
+		echo "INFO: Fetching ninja build system"
+		. "${TERMUX_SCRIPTDIR}"/scripts/build/termux_download.sh
+		. "${TERMUX_SCRIPTDIR}"/scripts/build/setup/termux_setup_ninja.sh
+		TERMUX_ON_DEVICE_BUILD=false TERMUX_COMMON_CACHEDIR=/tmp TERMUX_PKG_TMPDIR=/tmp termux_setup_ninja
+	fi
+
+	echo "INFO: Fetching and caching tags"
+
+	# First invocation of termux_repology_api_get_latest_version fetches and caches repology metadata.
+	quiet termux_repology_api_get_latest_version ' '
+
+    local __PACKAGES=()
+	for repo_dir in $(jq --raw-output 'del(.pkg_format) | keys | .[]' "${TERMUX_SCRIPTDIR}/repo.json"); do
+		for pkg_dir in "${repo_dir}"/*; do
+			! quiet _should_update "${pkg_dir}" && continue # Skip if not needed.
+			grep -q '^termux_pkg_auto_update' "${pkg_dir}/build.sh" && continue # Skip if package has custom auto-update
+			__PACKAGES+=("${pkg_dir}")
+		done
+	done
+
+	__main__() {
+		cd ${TERMUX_SCRIPTDIR}
+		export TERMUX_PKG_NAME="${1##*/}" TERMUX_PKG_BUILDER_DIR=${1}
+		set +eu;
+		for i in scripts/updates/{**/,}*.sh "${1}/build.sh"; do source ${i}; done
+		set -eu
+		termux_pkg_upgrade_version() {
+			[[ -n "$1" ]] && echo "PKG|$TERMUX_PKG_NAME|${1#*:}"
+			exit 0
+		}
+		termux_repology_auto_update() {
+			echo "PKG|$TERMUX_PKG_NAME|$(termux_repology_api_get_latest_version "${TERMUX_PKG_NAME}" | sed "s/^null$/${TERMUX_PKG_VERSION#*:}/")"
+			exit 0
+		}
+		termux_pkg_auto_update
+	}
+
+	__generate__() {
+		echo "rule update"
+		echo " command = bash -c \"\$\$F\" -- \$pkg_dir ||:"
+		sed 's/[^ ]\+/\nbuild &: update\n pkg_dir=&/g' <<< "${__PACKAGES[@]}"
+		echo "build run_all: phony ${__PACKAGES[@]}"
+		echo "default run_all"
+	}
+	
+	local LATEST_TAGS="$(\
+		F="$(declare -p TERMUX_SCRIPTDIR GITHUB_TOKEN TERMUX_REPOLOGY_DATA_FILE); $(declare -f __main__ | sed 's/__main__ ()//')" \
+		env --chdir=/tmp  ninja -f /dev/stdin <<< "$(__generate__)" |& grep "^PKG|"
+	)"
+	
+	unset -f __main__  __generate__
+	while IFS='|' read -r _ pkg version; do
+		_LATEST_TAGS["${pkg:-_}"]="$version"
+	done <<< "$LATEST_TAGS"
+	quiet declare -p _LATEST_TAGS
+}
+
+_check_updated() {
+	if [[ -n "${_LATEST_TAGS[${1##*/}]:-}" ]]; then
+		(
+			set +eu
+			quiet source "${1}/build.sh"
+			set -eu
+			export TERMUX_PKG_UPGRADE_VERSION_DRY_RUN=1
+			if quiet termux_pkg_upgrade_version "${_LATEST_TAGS[${1##*/}]}"; then
+				echo "INFO: Skipping ${1##*/}: already at version ${TERMUX_PKG_VERSION#*:}"
+				return 0
+			fi
+			return 1
+		)
+		local _ANSWER=$?
+		if (( _ANSWER == 0 )) ; then
+			_ALREADY_SEEN+=("$(basename "${1}")")
+		fi
+		return $_ANSWER
+	fi
+	return 1
+}
+
 _run_update() {
 	local pkg_dir="$1"
+	[[ -n "${_LATEST_TAGS[${pkg_dir##*/}]:-}" ]] && export __CACHED_TAG="${_LATEST_TAGS[${pkg_dir##*/}]}"
 	# Run each package update in separate process since we include their environment variables.
 	local output=""
 	{
@@ -122,6 +236,7 @@ _run_update() {
 	else
 		_ALREADY_SEEN+=("$(basename "${pkg_dir}")")
 	fi
+	unset __CACHED_TAG
 }
 
 declare -a _CACHED_ISSUE_TITLES=()
@@ -133,10 +248,11 @@ _gh_check_issue_exists() {
 			_CACHED_ISSUE_TITLES+=("'${title}'") # An extra quote ('') is added to avoid false positive matches.
 		done <<<"$(
 			gh issue list \
+				--limit 10000 \
 				--label "auto update failing" --label "bot" \
 				--state open \
 				--search "Auto update failing for in:title type:issue" \
-				--json title | jq -r '.[] | .title'
+				--json title | jq -r '.[] | .title' | sort | uniq
 		)"
 	fi
 	# shellcheck disable=SC2076 # We want literal match here, not regex based.
@@ -154,12 +270,16 @@ _should_update() {
 		termux_error_exit "ERROR: directory '${pkg_dir}' is not a package."
 	fi
 
-	# shellcheck disable=SC2076
-	if ! grep -q '^TERMUX_PKG_AUTO_UPDATE=true$' "${pkg_dir}/build.sh" ||
-		[[ " ${_ALREADY_SEEN[*]} ${!_FAILED_UPDATES[*]} " =~ " $(basename "${pkg_dir}") " ]]; then
+	if { [[ "${PACKAGES_OPT_OUT:-}" == "true" ]] && grep -q '^TERMUX_PKG_AUTO_UPDATE=false$' "${pkg_dir}/build.sh"; } || \
+			{ [[ "${PACKAGES_OPT_OUT:-}" != "true" ]] && ! grep -q '^TERMUX_PKG_AUTO_UPDATE=true$' "${pkg_dir}/build.sh"; }; then
 		return 1 # Skip.
 	fi
-	if [[ "${GITHUB_ACTIONS:-}" == "true" ]] && _gh_check_issue_exists "$(basename "${pkg_dir}")"; then
+
+	# shellcheck disable=SC2076
+	if [[ " ${_ALREADY_SEEN[*]} ${!_FAILED_UPDATES[*]} " =~ " $(basename "${pkg_dir}") " ]]; then
+		return 1 # Skip.
+	fi
+	if [[ "${BUILD_PACKAGES}" == "true" ]] && [[ "${GITHUB_ACTIONS:-}" == "true" ]] && _gh_check_issue_exists "$(basename "${pkg_dir}")"; then
 		echo "INFO: Skipping '$(basename "${pkg_dir}")', an update issue for it hasn't been resolved yet."
 		return 1
 	fi
@@ -182,16 +302,19 @@ _update_dependencies() {
 		elif [[ "${dep}" == "ERROR" ]]; then
 			termux_error_exit "ERROR: Obtaining update order failed for $(basename "${pkg_dir}")"
 		fi
-		_should_update "${dep_dir}" && _run_update "${dep_dir}"
+		_should_update "${dep_dir}"  && ! _check_updated "${dep_dir}" && _run_update "${dep_dir}"
 	done <<<"$("${TERMUX_SCRIPTDIR}"/scripts/buildorder.py "${pkg_dir}" $TERMUX_PACKAGES_DIRECTORIES || echo "ERROR")"
 }
 
 echo "INFO: Running update for: $*"
 
 if [[ "$1" == "@all" ]]; then
-	for repo_dir in $(jq --raw-output 'keys | .[]' "${TERMUX_SCRIPTDIR}/repo.json"); do
+	_fetch_and_cache_tags
+	for repo_dir in $(jq --raw-output 'del(.pkg_format) | keys | .[]' "${TERMUX_SCRIPTDIR}/repo.json"); do
 		for pkg_dir in "${repo_dir}"/*; do
+			_unix_millis=$(date +%s%N | cut -b1-13)
 			! _should_update "${pkg_dir}" && continue # Skip if not needed.
+			_check_updated "${pkg_dir}" && continue # Skip if already up-to-date.
 			# Update all its dependencies first.
 			_update_dependencies "${pkg_dir}"
 			# NOTE: I am not cheacking whether dependencies were updated successfully or not.
@@ -201,12 +324,13 @@ if [[ "$1" == "@all" ]]; then
 			# and not care about anything else in between. If something fails to update,
 			# it will be reported by failure handling code, so no worries.
 			_run_update "${pkg_dir}"
+			echo "termux - took $(ms_to_human_readable $(( $(date +%s%N | cut -b1-13) - _unix_millis )))"
 		done
 	done
 else
 	for pkg in "$@"; do
 		if [ ! -d "${pkg}" ]; then # If only package name is given, try to find it's directory.
-			for repo_dir in $(jq --raw-output 'keys | .[]' "${TERMUX_SCRIPTDIR}/repo.json"); do
+			for repo_dir in $(jq --raw-output 'del(.pkg_format) | keys | .[]' "${TERMUX_SCRIPTDIR}/repo.json"); do
 				if [ -d "${repo_dir}/${pkg}" ]; then
 					pkg="${repo_dir}/${pkg}"
 					break
@@ -224,15 +348,26 @@ fi
 
 _gh_create_new_issue() {
 	local pkg_name="$1"
-
 	local max_body_length=65536 # Max length of the body for one request.
-	local assignee="${GITHUB_ACTOR:-}"
 	local issue_number
 	local body
-
+	local link
+	local assignee="${GITHUB_ACTOR:-}"
 	if [[ "${assignee:-termuxbot2}" == "termuxbot2" ]]; then
 		assignee="MrAdityaAlok" # Assign myself if termuxbot2 is the actor.
 	fi
+
+	if [[ "${CREATE_ISSUE}" != "true" ]]; then
+		echo "INFO: CREATE_ISSUE set to '${CREATE_ISSUE}'. Not creating new issue."
+		return 1
+	fi
+	if _gh_check_issue_exists "${pkg_name}"; then
+		echo "INFO: An existing update issue for '${pkg_name}' hasn't been resolved yet."
+		return
+	fi
+
+	# Extract origin URL, commit hash and builder directory and put everything together
+	link="$(git config --get remote.origin.url |sed -E 's|\.git$||; s|git@([^:]+):(.+)|https://\1/\2|')/blob/$(git rev-parse HEAD)/$(echo */$1)"
 
 	body="$(
 		cat <<-EOF
@@ -240,12 +375,12 @@ _gh_create_new_issue() {
 
 			I'm here to help you update your Termux packages.
 
-			I've tried to update the ${pkg_name} package, but it failed.
+			I've tried to update the [${pkg_name}](${link}) package, but it failed.
 
 			Here's the output of the update script:
 			<details>
 				<summary>Show log</summary>
-				<pre lang="bash">${_FAILED_UPDATES["${pkg_name}"]}</pre>
+				<pre lang="console">${_FAILED_UPDATES["${pkg_name}"]}</pre>
 			</details>
 
 			<hr>

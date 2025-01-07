@@ -1,0 +1,31 @@
+--- a/src/address.rs
++++ b/src/address.rs
+@@ -410,7 +410,7 @@
+             Ok(val) => Self::from_str(&val),
+             _ => {
+                 #[cfg(all(unix, not(target_os = "macos")))]
+-                return Self::from_str("unix:path=/var/run/dbus/system_bus_socket");
++                return Self::from_str("unix:path=@TERMUX_PREFIX@/var/run/dbus/system_bus_socket");
+ 
+                 #[cfg(windows)]
+                 return Self::from_str("autolaunch:");
+--- a/src/fdo.rs
++++ b/src/fdo.rs
+@@ -358,14 +358,14 @@
+     fn ping(&self) {}
+ 
+     fn get_machine_id(&self) -> Result<String> {
+-        let mut id = match std::fs::read_to_string("/var/lib/dbus/machine-id") {
++        let mut id = match std::fs::read_to_string("@TERMUX_PREFIX@/var/lib/dbus/machine-id") {
+             Ok(id) => id,
+             Err(e) => {
+-                if let Ok(id) = std::fs::read_to_string("/etc/machine-id") {
++                if let Ok(id) = std::fs::read_to_string("@TERMUX_PREFIX@/etc/machine-id") {
+                     id
+                 } else {
+                     return Err(Error::IOError(format!(
+-                        "Failed to read from /var/lib/dbus/machine-id or /etc/machine-id: {e}"
++                        "Failed to read from @TERMUX_PREFIX@/var/lib/dbus/machine-id or @TERMUX_PREFIX@/etc/machine-id: {e}"
+                     )));
+                 }
+             }

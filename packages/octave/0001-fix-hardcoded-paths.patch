@@ -1,0 +1,44 @@
+--- a/libinterp/corefcn/sysdep.cc
++++ b/libinterp/corefcn/sysdep.cc
+@@ -796,7 +796,7 @@
+ 
+ #else
+ 
+-  return "/tmp";
++  return "@TERMUX_PREFIX@/tmp";
+ 
+ #endif
+ }
+--- a/liboctave/system/oct-env.cc
++++ b/liboctave/system/oct-env.cc
+@@ -237,7 +237,7 @@
+     tempd = P_tmpdir;
+ #else
+   if (tempd.empty ())
+-    tempd = "/tmp";
++    tempd = "@TERMUX_PREFIX@/tmp";
+ #endif
+ 
+ #endif
+--- a/src/mkoctfile.in.cc
++++ b/src/mkoctfile.in.cc
+@@ -639,7 +639,7 @@
+     tempd = P_tmpdir;
+ #else
+   if (tempd.empty ())
+-    tempd = "/tmp";
++    tempd = "@TERMUX_PREFIX@/tmp";
+ #endif
+ 
+ #endif
+--- a/run-octave.in
++++ b/run-octave.in
+@@ -127,7 +127,7 @@
+     ## Is there a better way to do this so that we don't fill /tmp
+     ## with junk files?  Using /dev/null won't work because asan
+     ## appends the process ID to the file name.
+-    ASAN_OPTIONS="leak_check_at_exit=0:log_path=/tmp/oct-asan-log:verbosity=0"
++    ASAN_OPTIONS="leak_check_at_exit=0:log_path=@TERMUX_PREFIX@/tmp/oct-asan-log:verbosity=0"
+   else
+     ASAN_OPTIONS="$ADDRESS_SANITIZER_OPTIONS"
+   fi

@@ -4,11 +4,13 @@ TERMUX_PKG_DESCRIPTION="Fast and light imlib2-based image viewer"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.9.1
+TERMUX_PKG_VERSION="3.10.3"
 TERMUX_PKG_SRCURL=https://feh.finalrewind.org/feh-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=455c92711b588af149b945edc5c145f3e9aa137ed9689dabed49d5e4acac75fa
-TERMUX_PKG_DEPENDS="imlib2, libcurl, libexif, libjpeg-turbo, libpng, libx11, libxinerama"
+TERMUX_PKG_SHA256=5426e2799770217af1e01c2e8c182d9ca8687d84613321d8ab4a66fe4041e9c8
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="imlib2, libcurl, libexif, libpng, libx11, libxinerama"
 TERMUX_PKG_BUILD_DEPENDS="libxt"
+TERMUX_PKG_RECOMMENDS="libjpeg-turbo-progs"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_MAKE_ARGS="exif=1 help=1 verscmp=0"
 

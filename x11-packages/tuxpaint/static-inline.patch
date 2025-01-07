@@ -1,157 +1,52 @@
 --- a/magic/src/confetti.c
 +++ b/magic/src/confetti.c
-@@ -31,8 +31,8 @@
- void confetti_release(magic_api * api, int which,
-                       SDL_Surface * canvas, SDL_Surface * snapshot, int x, int y, SDL_Rect * update_rect);
- void confetti_shutdown(magic_api * api);
--inline char confetti_get_greater(const char what1, const char what2);
--inline char confetti_get_lesser(const char what1, const char what2);
-+static inline char confetti_get_greater(const char what1, const char what2);
-+static inline char confetti_get_lesser(const char what1, const char what2);
- Uint32 confetti_get_new_color(void *ptr, SDL_Surface * canvas);
- void confetti_click(magic_api * api, int which, int mode,
-                     SDL_Surface * canvas, SDL_Surface * last, int x, int y, SDL_Rect * update_rect);
-@@ -116,7 +116,7 @@
+@@ -11,8 +11,8 @@
+ #define CONFETTI_BRUSH_SIZE 8   //radius of each confetti circle
+ #define CONFETTI_QUANTITY 3     //how many circles will be created every click?
  
- //private functions
+-#ifdef __ANDROID__
+-#define inline static
++#ifdef __TERMUX__
++#define inline static inline
+ #endif
  
--inline char confetti_get_greater(const char what1, const char what2)
-+static inline char confetti_get_greater(const char what1, const char what2)
- {
-   if (what1 > what2)
-     return what1;
-@@ -124,7 +124,7 @@
-     return what2;
- }
- 
--inline char confetti_get_lesser(const char what1, const char what2)
-+static inline char confetti_get_lesser(const char what1, const char what2)
- {
-   if (what1 < what2)
-     return what1;
+ struct confetti_rgb
 --- a/magic/src/fold.c
 +++ b/magic/src/fold.c
-@@ -60,7 +60,7 @@
- void fold_drag(magic_api * api, int which, SDL_Surface * canvas,
-                SDL_Surface * snapshot, int ox, int oy, int x, int y, SDL_Rect * update_rect);
- void fold_switchin(magic_api * api, int which, int mode, SDL_Surface * canvas);
--inline Uint8 fold_what_corner(int x, int y, SDL_Surface * canvas);
-+static inline Uint8 fold_what_corner(int x, int y, SDL_Surface * canvas);
- void fold_switchout(magic_api * api, int which, int mode, SDL_Surface * canvas);
+@@ -16,8 +16,8 @@
  
- Uint32 fold_api_version(void)
-@@ -388,7 +388,7 @@
+ #define FOLD_LEN 80
  
- // Interactivity functions
+-#ifdef __ANDROID__
+-#define inline static
++#ifdef __TERMUX__
++#define inline static inline
+ #endif
  
--inline Uint8 fold_what_corner(int x, int y, SDL_Surface * canvas)
-+static inline Uint8 fold_what_corner(int x, int y, SDL_Surface * canvas)
- {
-   if (x >= canvas->w / 2)
-     {
+ int right_arm_x, right_arm_y, left_arm_x, left_arm_y;
 --- a/magic/src/fretwork.c
 +++ b/magic/src/fretwork.c
-@@ -31,7 +31,7 @@
+@@ -28,8 +28,8 @@
+ #define SEG_RIGHT_TOP_BOTTOM (SEG_RIGHT | SEG_TOP | SEG_BOTTOM)
+ #define SEG_LEFT_RIGHT_TOP_BOTTOM (SEG_LEFT | SEG_RIGHT | SEG_TOP | SEG_BOTTOM)
+ 
+-#ifdef __ANDROID__
+-#define inline static
++#ifdef __TERMUX__
++#define inline static inline
+ #endif
+ 
  Mix_Chunk *fretwork_snd;
- unsigned int img_w, img_h;
- unsigned int fretwork_segments_x, fretwork_segments_y;  //how many segments do we have?
--inline int fretwork_math_ceil(int x, int y);    //ceil() in cstdlib returns float and is relative slow, so we'll use our one
-+static inline int fretwork_math_ceil(int x, int y);    //ceil() in cstdlib returns float and is relative slow, so we'll use our one
- static Uint8 *fretwork_status_of_segments;      //a place to store an info about bitmap used for selected segment
- static char **fretwork_images;  //the pathes to all the images needed
- static unsigned int fretwork_segment_modified;  //which segment was modified this time?
-@@ -66,7 +66,7 @@
- void fretwork_switchin(magic_api * api, int which, int mode, SDL_Surface * canvas, SDL_Surface * snapshot);
- void fretwork_switchout(magic_api * api, int which, int mode, SDL_Surface * canvas, SDL_Surface * snapshot);
- #define POINT_TYPE typeof(((SDL_Rect *)NULL)->x)
--inline void fretwork_extract_coords_from_segment(unsigned int segment, POINT_TYPE * x, POINT_TYPE * y);
-+static inline void fretwork_extract_coords_from_segment(unsigned int segment, POINT_TYPE * x, POINT_TYPE * y);
- void fretwork_click(magic_api * api, int which, int mode,
-                     SDL_Surface * canvas, SDL_Surface * snapshot, int x, int y, SDL_Rect * update_rect);
- 
-@@ -75,7 +75,7 @@
- void fretwork_drag(magic_api * api, int which, SDL_Surface * canvas,
-                    SDL_Surface * snapshot, int ox, int oy, int x, int y, SDL_Rect * update_rect);
- static void fretwork_draw_wrapper(void *ptr, int which, SDL_Surface * canvas, SDL_Surface * last, int x, int y);
--inline unsigned int fretwork_get_segment(int x, int y);
-+static inline unsigned int fretwork_get_segment(int x, int y);
- 
- 
- SDL_Surface *fretwork_one, *fretwork_three, *fretwork_four, *fretwork_corner;
-@@ -251,7 +251,7 @@
- // Interactivity functions
- 
- 
--inline int fretwork_math_ceil(int x, int y)
-+static inline int fretwork_math_ceil(int x, int y)
- {
-   int temp;
- 
-@@ -262,7 +262,7 @@
-     return temp;
- }
- 
--inline unsigned int fretwork_get_segment(int x, int y)
-+static inline unsigned int fretwork_get_segment(int x, int y)
- {
-   int xx;                       //segments are numerated just like pixels
-   int yy;                       //in computer graphics: left upper (=1), ... ,right upper,
-@@ -274,7 +274,7 @@
-   return (yy - 1) * fretwork_segments_x + xx;
- }
- 
--inline void fretwork_extract_coords_from_segment(unsigned int segment, POINT_TYPE * x, POINT_TYPE * y)
-+static inline void fretwork_extract_coords_from_segment(unsigned int segment, POINT_TYPE * x, POINT_TYPE * y)
- {
-   *x = ((segment % fretwork_segments_x) - 1) * img_w;   //useful to set update_rect as small as possible
-   *y = (int)(segment / fretwork_segments_x) * img_h;
 --- a/magic/src/rails.c
 +++ b/magic/src/rails.c
-@@ -25,7 +25,7 @@
+@@ -28,8 +28,8 @@
+ #define SEG_RIGHT_TOP_BOTTOM (SEG_RIGHT | SEG_TOP | SEG_BOTTOM)
+ #define SEG_LEFT_RIGHT_TOP_BOTTOM (SEG_LEFT | SEG_RIGHT | SEG_TOP | SEG_BOTTOM)
+ 
+-#ifdef __ANDROID__
+-#define inline static
++#ifdef __TERMUX__
++#define inline static inline
+ #endif
+ 
  Mix_Chunk *rails_snd;
- unsigned int img_w, img_h;
- unsigned int rails_segments_x, rails_segments_y;        //how many segments do we have?
--inline int rails_math_ceil(int x, int y);       //ceil() in cstdlib returns float and is relative slow, so we'll use our one
-+static inline int rails_math_ceil(int x, int y);       //ceil() in cstdlib returns float and is relative slow, so we'll use our one
- static Uint8 *rails_status_of_segments; //a place to store an info about bitmap used for selected segment
- static char **rails_images;     //the pathes to all the images needed
- static unsigned int rails_segment_modified;     //which segment was modified this time?
-@@ -53,9 +53,9 @@
- void rails_shutdown(magic_api * api);
- void rails_switchin(magic_api * api, int which, int mode, SDL_Surface * canvas);
- void rails_switchout(magic_api * api, int which, int mode, SDL_Surface * canvas);
--inline unsigned int rails_get_segment(int x, int y);
-+static inline unsigned int rails_get_segment(int x, int y);
- #define POINT_TYPE typeof(((SDL_Rect *)NULL)->x)
--inline void rails_extract_coords_from_segment(unsigned int segment, POINT_TYPE * x, POINT_TYPE * y);
-+static inline void rails_extract_coords_from_segment(unsigned int segment, POINT_TYPE * x, POINT_TYPE * y);
- static void rails_flip(void *ptr, SDL_Surface * dest, SDL_Surface * src);
- static void rails_flip_flop(void *ptr, SDL_Surface * dest, SDL_Surface * src);
- static void rails_rotate(void *ptr, SDL_Surface * dest, SDL_Surface * src, unsigned int direction);
-@@ -199,7 +199,7 @@
- 
- // Interactivity functions
- 
--inline int rails_math_ceil(int x, int y)
-+static inline int rails_math_ceil(int x, int y)
- {
-   int temp;
- 
-@@ -211,7 +211,7 @@
-     return temp;
- }
- 
--inline unsigned int rails_get_segment(int x, int y)
-+static inline unsigned int rails_get_segment(int x, int y)
- {
-   int xx;                       //segments are numerated just like pixels
-   int yy;                       //in computer graphics: left upper (=1), ... ,right upper,
-@@ -224,7 +224,7 @@
- 
- }
- 
--inline void rails_extract_coords_from_segment(unsigned int segment, POINT_TYPE * x, POINT_TYPE * y)
-+static inline void rails_extract_coords_from_segment(unsigned int segment, POINT_TYPE * x, POINT_TYPE * y)
- {                               //extracts the coords of the beginning and the segment
-   *x = ((segment % rails_segments_x) - 1) * img_w;      //useful to set update_rect as small as possible
-   *y = (int)(segment / rails_segments_x) * img_h;

@@ -1,0 +1,20 @@
+Fix seccomp crash with setuid(0)
+
+--- a/src/ngircd/ngircd.c
++++ b/src/ngircd/ngircd.c
+@@ -737,7 +737,6 @@ NGIRCd_Init(bool NGIRCd_NoDaemon)
+ 		    "Can't drop supplementary group IDs: setgroups(3) missing!");
+ #endif
+ 	}
+-#endif
+ 
+ 	/* Change user ID */
+ 	if (getuid() != Conf_UID) {
+@@ -751,6 +750,7 @@ NGIRCd_Init(bool NGIRCd_NoDaemon)
+ 				goto out;
+ 		}
+ 	}
++#endif
+ 
+ 	initialized = true;
+ 

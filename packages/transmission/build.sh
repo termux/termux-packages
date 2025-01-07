@@ -1,13 +1,22 @@
 TERMUX_PKG_HOMEPAGE=https://transmissionbt.com/
 TERMUX_PKG_DESCRIPTION="Easy, lean and powerful BitTorrent client"
-TERMUX_PKG_LICENSE="MIT"
+# with OpenSSL linking exception:
+TERMUX_PKG_LICENSE="GPL-2.0, GPL-3.0"
+TERMUX_PKG_LICENSE_FILE="COPYING, licenses/gpl-2.0.txt, licenses/gpl-3.0.txt"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.00
-TERMUX_PKG_REVISION=9
-TERMUX_PKG_SRCURL=https://github.com/transmission/transmission.git
+TERMUX_PKG_VERSION="4.0.6"
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL=git+https://github.com/transmission/transmission
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
 TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
-TERMUX_PKG_DEPENDS="libcurl, libevent, miniupnpc, openssl"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-gtk --enable-lightweight --cache-file=termux_configure.cache"
+TERMUX_PKG_DEPENDS="libc++, libcurl, libevent, libpsl, miniupnpc, natpmpc, openssl"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DENABLE_GTK=OFF
+-DENABLE_QT=OFF
+-DENABLE_TESTS=OFF
+-DENABLE_NLS=OFF
+"
 # transmission already puts timestamps in the info printed to stdout so no need for svlogd -tt,
 # therefore we override the transmission/log run script
 TERMUX_PKG_SERVICE_SCRIPT=(
@@ -16,10 +25,5 @@ TERMUX_PKG_SERVICE_SCRIPT=(
 )
 
 termux_step_pre_configure() {
-	CFLAGS+=" -D_POSIX_C_SOURCE=200809L"
-	./autogen.sh
-
-	echo "ac_cv_func_getmntent=no" >> termux_configure.cache
-	echo "ac_cv_search_getmntent=false" >> termux_configure.cache
-	chmod a-w termux_configure.cache
+	LDFLAGS+=" -llog"
 }

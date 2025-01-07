@@ -1,0 +1,60 @@
+From 5e5592026e96de8dfcab9ffad09bdf571343fe62 Mon Sep 17 00:00:00 2001
+From: Henrik Grimler <grimler@termux.dev>
+Date: Sun, 5 Feb 2023 11:47:24 +0100
+Subject: [PATCH] libjava: change return type of strerror_r
+
+Later versions of android uses the GNU style and returns a char
+pointer.  Adjust jni function to match this.
+---
+ src/java.base/share/native/libjava/jni_util.h      | 2 +-
+ src/java.base/unix/native/libjava/ProcessImpl_md.c | 7 +++----
+ src/java.base/unix/native/libjava/jni_util_md.c    | 2 +-
+ 3 files changed, 5 insertions(+), 6 deletions(-)
+
+diff --git a/src/java.base/share/native/libjava/jni_util.h b/src/java.base/share/native/libjava/jni_util.h
+index bd815e6f1b90..86c542f4cc1d 100644
+--- a/src/java.base/share/native/libjava/jni_util.h
++++ b/src/java.base/share/native/libjava/jni_util.h
+@@ -339,7 +339,7 @@ void buildJniFunctionName(const char *sym, const char *cname,
+ JNIEXPORT size_t JNICALL
+ getLastErrorString(char *buf, size_t len);
+ 
+-JNIEXPORT int JNICALL
++JNIEXPORT char * JNICALL
+ getErrorString(int err, char *buf, size_t len);
+ 
+ #ifdef STATIC_BUILD
+diff --git a/src/java.base/unix/native/libjava/ProcessImpl_md.c b/src/java.base/unix/native/libjava/ProcessImpl_md.c
+index 8d9cc64e178b..949b3f2aef09 100644
+--- a/src/java.base/unix/native/libjava/ProcessImpl_md.c
++++ b/src/java.base/unix/native/libjava/ProcessImpl_md.c
+@@ -325,10 +325,9 @@ throwIOException(JNIEnv *env, int errnum, const char *defaultDetail)
+     char tmpbuf[1024];
+     jstring s;
+ 
+-    if (errnum != 0) {
+-        int ret = getErrorString(errnum, tmpbuf, sizeof(tmpbuf));
+-        if (ret != EINVAL)
+-            detail = tmpbuf;
++    if (errnum != EINVAL) {
++        getErrorString(errnum, tmpbuf, sizeof(tmpbuf));
++        detail = tmpbuf;
+     }
+     /* ASCII Decimal representation uses 2.4 times as many bits as binary. */
+     fmtsize = sizeof(IOE_FORMAT) + strlen(detail) + 3 * sizeof(errnum);
+diff --git a/src/java.base/unix/native/libjava/jni_util_md.c b/src/java.base/unix/native/libjava/jni_util_md.c
+index 335637b0a115..8f4a76d3b975 100644
+--- a/src/java.base/unix/native/libjava/jni_util_md.c
++++ b/src/java.base/unix/native/libjava/jni_util_md.c
+@@ -61,7 +61,7 @@ getLastErrorString(char *buf, size_t len)
+     return strlen(buf);
+ }
+ 
+-JNIEXPORT int JNICALL
++JNIEXPORT char * JNICALL
+ getErrorString(int err, char *buf, size_t len)
+ {
+     if (err == 0 || len < 1) return 0;
+-- 
+2.44.0
+

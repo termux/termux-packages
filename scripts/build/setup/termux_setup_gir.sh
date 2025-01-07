@@ -6,6 +6,7 @@ termux_setup_gir() {
 		args="${args// --enable-introspection=yes / --enable-introspection=no }"
 		args="${args// --enable-vala / --disable-vala }"
 		args="${args// --enable-vala=yes / --enable-vala=no }"
+		args="${args// -DENABLE_GIR=ON / -DENABLE_GIR=OFF }"
 		args="${args// -DENABLE_GOBJECT_INTROSPECTION=ON / -DENABLE_GOBJECT_INTROSPECTION=OFF }"
 		args="${args// -DENABLE_INTROSPECTION=ON / -DENABLE_INTROSPECTION=OFF }"
 		args="${args// -Dbuild_introspection_data=true / -Dbuild_introspection_data=false }"
@@ -22,9 +23,22 @@ termux_setup_gir() {
 		args="${args// -Dwith_vapi=true / -Dwith_vapi=false }"
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS="$args"
 	fi
+	
+	if [ "${TERMUX_PKG_VERSIONED_GIR-true}" = "false" ]; then
+		local TERMUX_PKG_VERSION=.
+	fi
 
 	# Used by gi-cross-launcher:
 	export TERMUX_PKG_GIR_PRE_GENERATED_DUMP_DIR="$TERMUX_PKG_BUILDER_DIR/gir/${TERMUX_PKG_VERSION##*:}"
+
+        ## Generating dumps is pretty easy.
+        ### 1. Install all package dependencies to your linux PC.
+        ### 2. `export GI_SCANNER_DEBUG=save-temps`.
+        ### 3. Compile package (configure+make, meson+ninja, cmake+ninja, etc.)
+        ### 4. Go to build folder. There will be folder/s like `tmp-introspectedXXXXXXXX` 
+        ###    where every X is random letter or number. These folder contain a '.c' file and 'dump.xml'.
+        ### 5. You should take 'dump.xml' and rename it to the same name as '.c' file but keep '.xml' extension.
+        ### 6. Put this xml to "$TERMUX_PKG_BUILDER_DIR/gir/${TERMUX_PKG_VERSION##*:}" folder of the package.
 
 	local _GIR_CROSS_FOLDER="$TERMUX_COMMON_CACHEDIR/gir-cross"
 	local bin="$_GIR_CROSS_FOLDER/bin"
@@ -34,6 +48,7 @@ termux_setup_gir() {
 		if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
 			unset TERMUX_G_IR_COMPILER
 
+			mkdir -p "$bin"
 			sed -e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
 				"$TERMUX_SCRIPTDIR/packages/gobject-introspection/gi-cross-launcher-on-device.in" \
 				> "$GI_CROSS_LAUNCHER"
@@ -80,6 +95,7 @@ termux_setup_gir() {
 				unset LD_LIBRARY_PATH
 			EOF
 			sed 1d "$TERMUX_SCRIPTDIR/packages/ldd/ldd.in" >> "$ldd"
+			sed -i 's|@READELF@|'"$(command -v readelf)"'|g' "$ldd"
 			chmod 0700 "$ldd"
 		fi
 	fi

@@ -1,0 +1,12 @@
+diff -u -r src/examples/loadables/fdflags.c src-upstream/examples/loadables/fdflags.c
+--- src/examples/loadables/fdflags.c	2024-04-30 10:05:36.575401671 +0000
++++ src-upstream/examples/loadables/fdflags.c	2024-04-30 10:04:40.138338675 +0000
+@@ -267,7 +267,7 @@
+     return maxfd;
+ #endif
+
+-  maxfd = getdtablesize ();
++  maxfd = sysconf(_SC_OPEN_MAX);
+   if (maxfd <= 0)
+     maxfd = HIGH_FD_MAX;
+   for (maxfd--; maxfd > 0; maxfd--)

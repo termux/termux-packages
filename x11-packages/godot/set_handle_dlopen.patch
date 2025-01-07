@@ -1,0 +1,201 @@
+diff --git a/drivers/alsa/asound-so_wrap.c b/drivers/alsa/asound-so_wrap.c
+index ffe24d4..503d811 100644
+--- a/drivers/alsa/asound-so_wrap.c
++++ b/drivers/alsa/asound-so_wrap.c
+@@ -3824,7 +3824,7 @@ long (*snd_midi_event_decode_dylibloader_wrapper_asound)( snd_midi_event_t*, uns
+ int initialize_asound(int verbose) {
+   void *handle;
+   char *error;
+-  handle = dlopen("libasound.so.2", RTLD_LAZY);
++  handle = dlopen("libasound.so", RTLD_LAZY);
+   if (!handle) {
+     if (verbose) {
+       fprintf(stderr, "%s\n", dlerror());
+diff --git a/drivers/pulseaudio/pulse-so_wrap.c b/drivers/pulseaudio/pulse-so_wrap.c
+index 8f47774..bd10c21 100644
+--- a/drivers/pulseaudio/pulse-so_wrap.c
++++ b/drivers/pulseaudio/pulse-so_wrap.c
+@@ -1064,7 +1064,7 @@ pa_usec_t (*pa_rtclock_now_dylibloader_wrapper_pulse)( void);
+ int initialize_pulse(int verbose) {
+   void *handle;
+   char *error;
+-  handle = dlopen("libpulse.so.0", RTLD_LAZY);
++  handle = dlopen("libpulse.so", RTLD_LAZY);
+   if (!handle) {
+     if (verbose) {
+       fprintf(stderr, "%s\n", dlerror());
+diff --git a/platform/linuxbsd/dbus-so_wrap.c b/platform/linuxbsd/dbus-so_wrap.c
+index 4aec9dc..562afbf 100644
+--- a/platform/linuxbsd/dbus-so_wrap.c
++++ b/platform/linuxbsd/dbus-so_wrap.c
+@@ -725,7 +725,7 @@ dbus_bool_t (*dbus_threads_init_default_dylibloader_wrapper_dbus)( void);
+ int initialize_dbus(int verbose) {
+   void *handle;
+   char *error;
+-  handle = dlopen("libdbus-1.so.3", RTLD_LAZY);
++  handle = dlopen("libdbus-1.so", RTLD_LAZY);
+   if (!handle) {
+     if (verbose) {
+       fprintf(stderr, "%s\n", dlerror());
+diff --git a/platform/linuxbsd/fontconfig-so_wrap.c b/platform/linuxbsd/fontconfig-so_wrap.c
+index 86aacbc..2fc009e 100644
+--- a/platform/linuxbsd/fontconfig-so_wrap.c
++++ b/platform/linuxbsd/fontconfig-so_wrap.c
+@@ -626,7 +626,7 @@ FcBool (*FcConfigParseAndLoadFromMemory_dylibloader_wrapper_fontconfig)( FcConfi
+ int initialize_fontconfig(int verbose) {
+   void *handle;
+   char *error;
+-  handle = dlopen("libfontconfig.so.1", RTLD_LAZY);
++  handle = dlopen("libfontconfig.so", RTLD_LAZY);
+   if (!handle) {
+     if (verbose) {
+       fprintf(stderr, "%s\n", dlerror());
+diff --git a/platform/linuxbsd/libudev-so_wrap.c b/platform/linuxbsd/libudev-so_wrap.c
+index 5455c1a..cc4c942 100644
+--- a/platform/linuxbsd/libudev-so_wrap.c
++++ b/platform/linuxbsd/libudev-so_wrap.c
+@@ -281,7 +281,7 @@ int (*udev_util_encode_string_dylibloader_wrapper_libudev)(const char*, char*, s
+ int initialize_libudev(int verbose) {
+   void *handle;
+   char *error;
+-  handle = dlopen("libudev.so.1", RTLD_LAZY);
++  handle = dlopen("libudev.so", RTLD_LAZY);
+   if (!handle) {
+     if (verbose) {
+       fprintf(stderr, "%s\n", dlerror());
+diff --git a/platform/linuxbsd/speechd-so_wrap.c b/platform/linuxbsd/speechd-so_wrap.c
+index 1dc5f08..15d878a 100644
+--- a/platform/linuxbsd/speechd-so_wrap.c
++++ b/platform/linuxbsd/speechd-so_wrap.c
+@@ -236,7 +236,7 @@ char* (*spd_send_data_wo_mutex_dylibloader_wrapper_speechd)( SPDConnection*,cons
+ int initialize_speechd(int verbose) {
+   void *handle;
+   char *error;
+-  handle = dlopen("libspeechd.so.2", RTLD_LAZY);
++  handle = dlopen("libspeechd.so", RTLD_LAZY);
+   if (!handle) {
+     if (verbose) {
+       fprintf(stderr, "%s\n", dlerror());
+diff --git a/platform/linuxbsd/x11/display_server_x11.cpp b/platform/linuxbsd/x11/display_server_x11.cpp
+index dff2f53..15ee872 100644
+--- a/platform/linuxbsd/x11/display_server_x11.cpp
++++ b/platform/linuxbsd/x11/display_server_x11.cpp
+@@ -5355,12 +5355,12 @@ DisplayServerX11::DisplayServerX11(const String &p_rendering_driver, WindowMode
+ 	int xrandr_minor = 0;
+ 	int event_base, error_base;
+ 	xrandr_ext_ok = XRRQueryExtension(x11_display, &event_base, &error_base);
+-	xrandr_handle = dlopen("libXrandr.so.2", RTLD_LAZY);
++	xrandr_handle = dlopen("libXrandr.so", RTLD_LAZY);
+ 	if (!xrandr_handle) {
+ 		err = dlerror();
+ 		// For some arcane reason, NetBSD now ships libXrandr.so.3 while the rest of the world has libXrandr.so.2...
+ 		// In case this happens for other X11 platforms in the future, let's give it a try too before failing.
+-		xrandr_handle = dlopen("libXrandr.so.3", RTLD_LAZY);
++		xrandr_handle = dlopen("libXrandr.so", RTLD_LAZY);
+ 		if (!xrandr_handle) {
+ 			fprintf(stderr, "could not load libXrandr.so.2, Error: %s\n", err);
+ 		}
+diff --git a/platform/linuxbsd/x11/dynwrappers/xcursor-so_wrap.c b/platform/linuxbsd/x11/dynwrappers/xcursor-so_wrap.c
+index bba21b9..58199b2 100644
+--- a/platform/linuxbsd/x11/dynwrappers/xcursor-so_wrap.c
++++ b/platform/linuxbsd/x11/dynwrappers/xcursor-so_wrap.c
+@@ -192,7 +192,7 @@ XcursorBool (*XcursorSetThemeCore_dylibloader_wrapper_xcursor)( Display*, Xcurso
+ int initialize_xcursor(int verbose) {
+   void *handle;
+   char *error;
+-  handle = dlopen("libXcursor.so.1", RTLD_LAZY);
++  handle = dlopen("libXcursor.so", RTLD_LAZY);
+   if (!handle) {
+     if (verbose) {
+       fprintf(stderr, "%s\n", dlerror());
+diff --git a/platform/linuxbsd/x11/dynwrappers/xext-so_wrap.c b/platform/linuxbsd/x11/dynwrappers/xext-so_wrap.c
+index 4e3349c..e3de106 100644
+--- a/platform/linuxbsd/x11/dynwrappers/xext-so_wrap.c
++++ b/platform/linuxbsd/x11/dynwrappers/xext-so_wrap.c
+@@ -54,7 +54,7 @@ XRectangle* (*XShapeGetRectangles_dylibloader_wrapper_xext)( Display*, Window, i
+ int initialize_xext(int verbose) {
+   void *handle;
+   char *error;
+-  handle = dlopen("libXext.so.6", RTLD_LAZY);
++  handle = dlopen("libXext.so", RTLD_LAZY);
+   if (!handle) {
+     if (verbose) {
+       fprintf(stderr, "%s\n", dlerror());
+diff --git a/platform/linuxbsd/x11/dynwrappers/xinerama-so_wrap.c b/platform/linuxbsd/x11/dynwrappers/xinerama-so_wrap.c
+index 850ed1f..018117d 100644
+--- a/platform/linuxbsd/x11/dynwrappers/xinerama-so_wrap.c
++++ b/platform/linuxbsd/x11/dynwrappers/xinerama-so_wrap.c
+@@ -27,7 +27,7 @@ XineramaScreenInfo* (*XineramaQueryScreens_dylibloader_wrapper_xinerama)( Displa
+ int initialize_xinerama(int verbose) {
+   void *handle;
+   char *error;
+-  handle = dlopen("libXinerama.so.1", RTLD_LAZY);
++  handle = dlopen("libXinerama.so", RTLD_LAZY);
+   if (!handle) {
+     if (verbose) {
+       fprintf(stderr, "%s\n", dlerror());
+diff --git a/platform/linuxbsd/x11/dynwrappers/xinput2-so_wrap.c b/platform/linuxbsd/x11/dynwrappers/xinput2-so_wrap.c
+index fc08b97..59063d5 100644
+--- a/platform/linuxbsd/x11/dynwrappers/xinput2-so_wrap.c
++++ b/platform/linuxbsd/x11/dynwrappers/xinput2-so_wrap.c
+@@ -117,7 +117,7 @@ void (*XIFreeDeviceInfo_dylibloader_wrapper_xinput2)( XIDeviceInfo*);
+ int initialize_xinput2(int verbose) {
+   void *handle;
+   char *error;
+-  handle = dlopen("libXi.so.6", RTLD_LAZY);
++  handle = dlopen("libXi.so", RTLD_LAZY);
+   if (!handle) {
+     if (verbose) {
+       fprintf(stderr, "%s\n", dlerror());
+diff --git a/platform/linuxbsd/x11/dynwrappers/xlib-so_wrap.c b/platform/linuxbsd/x11/dynwrappers/xlib-so_wrap.c
+index d283856..611a334 100644
+--- a/platform/linuxbsd/x11/dynwrappers/xlib-so_wrap.c
++++ b/platform/linuxbsd/x11/dynwrappers/xlib-so_wrap.c
+@@ -1828,7 +1828,7 @@ void (*XkbUpdateKeyTypeVirtualMods_dylibloader_wrapper_xlib)( XkbDescPtr, XkbKey
+ int initialize_xlib(int verbose) {
+   void *handle;
+   char *error;
+-  handle = dlopen("libX11.so.6", RTLD_LAZY);
++  handle = dlopen("libX11.so", RTLD_LAZY);
+   if (!handle) {
+     if (verbose) {
+       fprintf(stderr, "%s\n", dlerror());
+diff --git a/platform/linuxbsd/x11/dynwrappers/xrandr-so_wrap.c b/platform/linuxbsd/x11/dynwrappers/xrandr-so_wrap.c
+index 05f98d2..51b4dfa 100644
+--- a/platform/linuxbsd/x11/dynwrappers/xrandr-so_wrap.c
++++ b/platform/linuxbsd/x11/dynwrappers/xrandr-so_wrap.c
+@@ -225,7 +225,7 @@ void (*XRRFreeMonitors_dylibloader_wrapper_xrandr)( XRRMonitorInfo*);
+ int initialize_xrandr(int verbose) {
+   void *handle;
+   char *error;
+-  handle = dlopen("libXrandr.so.2", RTLD_LAZY);
++  handle = dlopen("libXrandr.so", RTLD_LAZY);
+   if (!handle) {
+     if (verbose) {
+       fprintf(stderr, "%s\n", dlerror());
+diff --git a/platform/linuxbsd/x11/dynwrappers/xrender-so_wrap.c b/platform/linuxbsd/x11/dynwrappers/xrender-so_wrap.c
+index 7421f94..ffbc423 100644
+--- a/platform/linuxbsd/x11/dynwrappers/xrender-so_wrap.c
++++ b/platform/linuxbsd/x11/dynwrappers/xrender-so_wrap.c
+@@ -147,7 +147,7 @@ Picture (*XRenderCreateConicalGradient_dylibloader_wrapper_xrender)( Display*,co
+ int initialize_xrender(int verbose) {
+   void *handle;
+   char *error;
+-  handle = dlopen("libXrender.so.1", RTLD_LAZY);
++  handle = dlopen("libXrender.so", RTLD_LAZY);
+   if (!handle) {
+     if (verbose) {
+       fprintf(stderr, "%s\n", dlerror());
+diff --git a/platform/linuxbsd/xkbcommon-so_wrap.c b/platform/linuxbsd/xkbcommon-so_wrap.c
+index 3382e2e..08e58d5 100644
+--- a/platform/linuxbsd/xkbcommon-so_wrap.c
++++ b/platform/linuxbsd/xkbcommon-so_wrap.c
+@@ -283,7 +283,7 @@ xkb_keysym_t (*xkb_compose_state_get_one_sym_dylibloader_wrapper_xkbcommon)(stru
+ int initialize_xkbcommon(int verbose) {
+   void *handle;
+   char *error;
+-  handle = dlopen("libxkbcommon.so.0", RTLD_LAZY);
++  handle = dlopen("libxkbcommon.so", RTLD_LAZY);
+   if (!handle) {
+     if (verbose) {
+       fprintf(stderr, "%s\n", dlerror());

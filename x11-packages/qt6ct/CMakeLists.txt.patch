@@ -1,0 +1,13 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -50,8 +50,10 @@
+     endif()
+ endif()
+ 
++if(NOT CMAKE_CROSSCOMPILING)
+ #execute_process(COMMAND ${QT_QTPATHS_EXECUTABLE} -query QT_INSTALL_PLUGINS OUTPUT_VARIABLE PLUGINDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+ execute_process(COMMAND ${QT_QTPATHS_EXECUTABLE} --plugin-dir OUTPUT_VARIABLE PLUGINDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
++endif()
+ 
+ if(PLUGINDIR)
+    message(STATUS "Plugin path: ${PLUGINDIR}")

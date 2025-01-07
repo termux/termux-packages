@@ -5,6 +5,7 @@ bin/llc
 bin/lli
 bin/llvm!(-jitlink-executor|-PerfectShuffle)
 bin/opt
+bin/reduce-chunk-list
 bin/sancov
 bin/sanstats
 bin/split-file

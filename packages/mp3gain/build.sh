@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://mp3gain.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://mp3gain.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="Analyzes and adjusts mp3 files so that they have the same volume"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"

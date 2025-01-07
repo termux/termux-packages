@@ -1,0 +1,9 @@
+--- a/src/3rdparty/chromium/third_party/ffmpeg/ffmpeg_options.gni
++++ b/src/3rdparty/chromium/third_party/ffmpeg/ffmpeg_options.gni
+@@ -70,4 +70,6 @@
+   os_config = "linux"
+ } else if (is_win && !is_clang) {
+   os_config = "win-msvc"
++} else if (is_linux && (current_cpu == "x86")) {
++  os_config = "linux-noasm"
+ }

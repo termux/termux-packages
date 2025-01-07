@@ -1,27 +1,22 @@
-diff -uNr pacman-6.0.2/etc/pacman.conf.in pacman-6.0.2/etc/pacman.conf.in.patch
---- pacman-6.0.2/etc/pacman.conf.in	2022-12-06 15:13:37.554915686 +0300
-+++ pacman-6.0.2/etc/pacman.conf.in.patch	2022-12-06 15:15:58.210915585 +0300
-@@ -9,15 +9,15 @@
- [options]
- # The following paths are commented out with their default values listed.
- # If you wish to use different paths, uncomment and update the paths.
--#RootDir     = @ROOTDIR@
-+#RootDir     = /
- #DBPath      = @localstatedir@/lib/pacman/
- #CacheDir    = @localstatedir@/cache/pacman/pkg/
+--- pacman-7.0.0/etc/pacman.conf.in	2024-07-14 12:11:18.000000000 +0300
++++ pacman-7.0.0/etc/pacman.conf.in.patch	2024-09-15 13:49:59.248174976 +0300
+@@ -15,11 +15,11 @@
  #LogFile     = @localstatedir@/log/pacman.log
  #GPGDir      = @sysconfdir@/pacman.d/gnupg/
  #HookDir     = @sysconfdir@/pacman.d/hooks/
 -HoldPkg     = pacman glibc
 -#XferCommand = /usr/bin/curl -L -C - -f -o %o %u
 -#XferCommand = /usr/bin/wget --passive-ftp -c -O %o %u
++HoldPkg      = pacman
 +#XferCommand = @TERMUX_PREFIX@/bin/curl -L -C - -f -o %o %u
 +#XferCommand = @TERMUX_PREFIX@/bin/wget --passive-ftp -c -O %o %u
-+HoldPkg      = pacman
  #CleanMethod = KeepInstalled
- Architecture = auto
+-Architecture = auto
++Architecture = @TERMUX_ARCH@
  
-@@ -30,16 +30,17 @@
+ # Pacman won't upgrade packages listed in IgnorePkg and members of IgnoreGroup
+ #IgnorePkg   =
+@@ -30,7 +30,7 @@
  
  # Misc options
  #UseSyslog
@@ -30,7 +25,9 @@ diff -uNr pacman-6.0.2/etc/pacman.conf.in pacman-6.0.2/etc/pacman.conf.in.patch
  #NoProgressBar
  CheckSpace
  #VerbosePkgLists
- ParallelDownloads = 5
+@@ -38,10 +38,11 @@
+ #DownloadUser = alpm
+ #DisableSandbox
  
 -# PGP signature checking
 -#SigLevel = Optional
@@ -44,7 +41,7 @@ diff -uNr pacman-6.0.2/etc/pacman.conf.in pacman-6.0.2/etc/pacman.conf.in.patch
  
  #
  # REPOSITORIES
-@@ -60,18 +61,17 @@
+@@ -62,18 +63,23 @@
  # uncommented to enable the repo.
  #
  
@@ -62,18 +59,24 @@ diff -uNr pacman-6.0.2/etc/pacman.conf.in pacman-6.0.2/etc/pacman.conf.in.patch
 -# tips on creating your own repositories.
 -#[custom]
 -#SigLevel = Optional TrustAll
--#Server = file:///home/custompkgs
+-#Server = file:///home/packages
 +[main]
-+Server = https://s3.amazonaws.com/termux-pacman.us/main/$arch
++Include = @TERMUX_PREFIX@/etc/pacman.d/serverlist
 +
 +[x11]
-+Server = https://s3.amazonaws.com/termux-pacman.us/x11/$arch
++Include = @TERMUX_PREFIX@/etc/pacman.d/serverlist
 +
 +[root]
-+Server = https://s3.amazonaws.com/termux-pacman.us/root/$arch
++Include = @TERMUX_PREFIX@/etc/pacman.d/serverlist
 +
 +[tur]
-+Server = https://s3.amazonaws.com/termux-pacman.us/tur/$arch
++Include = @TERMUX_PREFIX@/etc/pacman.d/serverlist
 +
 +[tur-continuous]
-+Server = https://s3.amazonaws.com/termux-pacman.us/tur-continuous/$arch
++Include = @TERMUX_PREFIX@/etc/pacman.d/serverlist
++
++[tur-multilib]
++Include = @TERMUX_PREFIX@/etc/pacman.d/serverlist
++
++[gpkg]
++Include = @TERMUX_PREFIX@/etc/pacman.d/serverlist

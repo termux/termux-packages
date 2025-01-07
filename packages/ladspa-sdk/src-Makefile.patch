@@ -3,18 +3,18 @@
 @@ -4,9 +4,9 @@
  #
  # Change these if you want to install somewhere else.
- 
+
 -INSTALL_PLUGINS_DIR	=	/usr/lib/ladspa/
 -INSTALL_INCLUDE_DIR	=	/usr/include/
 -INSTALL_BINARY_DIR	=	/usr/bin/
 +INSTALL_PLUGINS_DIR	=	@TERMUX_PREFIX@/lib/ladspa/
 +INSTALL_INCLUDE_DIR	=	@TERMUX_PREFIX@/include/
 +INSTALL_BINARY_DIR	=	@TERMUX_PREFIX@/bin/
- 
+
  ###############################################################################
  #
 @@ -15,10 +15,11 @@
- 
+
  INCLUDES	=	-I.
  LIBRARIES	=	-ldl -lm -lsndfile
 -CFLAGS		=	$(INCLUDES) -Wall -Werror -O2 -fPIC 		\
@@ -35,12 +35,20 @@
 -CPP		=	c++
 +CC		?=	cc
 +CXX		?=	c++
- 
+
  ###############################################################################
  #
+@@ -39,6 +40,7 @@
+ 	$(CC) $(CFLAGS) -o plugins/$*.o -c plugins/$*.c
+ 	$(CC)	-o ../plugins/$*.so					\
+ 		plugins/$*.o						\
++		-lm							\
+ 		-shared							\
+ 		$(CFLAGS)						\
+ 		-fvisibility=hidden					\
 @@ -47,11 +48,11 @@
- 		-Wl,--version-script=gcc_exports.map			
- 
+ 		-Wl,--version-script=gcc_exports.map
+
  ../plugins/%.so:	plugins/%.cpp ladspa.h gcc_exports.map
 -	$(CPP) $(CXXFLAGS) -o plugins/$*.o -c plugins/$*.cpp
 -	$(CPP)	-o ../plugins/$*.so					\
@@ -59,20 +67,20 @@
  		applyplugin.o load.o default.o				\
 -		$(LIBRARIES)
 +		$(LDFLAGS) $(LIBRARIES)
- 
+
  ../bin/analyseplugin:	analyseplugin.o load.o default.o
  	$(CC) $(CFLAGS) $(BINFLAGS)					\
  		-o ../bin/analyseplugin 				\
  		analyseplugin.o load.o default.o			\
 -		$(LIBRARIES)
 +		$(LDFLAGS) $(LIBRARIES)
- 
+
  ../bin/listplugins:	listplugins.o search.o
  	$(CC) $(CFLAGS) $(BINFLAGS)					\
  		-o ../bin/listplugins	 				\
  		listplugins.o search.o					\
 -		$(LIBRARIES)
 +		$(LDFLAGS) $(LIBRARIES)
- 
+
  ###############################################################################
  #

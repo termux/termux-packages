@@ -4,11 +4,11 @@ TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # This specific package is for libsoup-2.4.
 # libsoup-3.0 is packaged as libsoup3.
-_MAJOR_VERSION=2.74
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}.3
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://download.gnome.org/sources/libsoup/${_MAJOR_VERSION}/libsoup-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_VERSION=2.74.3
+TERMUX_PKG_REVISION=3
+TERMUX_PKG_SRCURL=https://download.gnome.org/sources/libsoup/${TERMUX_PKG_VERSION%.*}/libsoup-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=e4b77c41cfc4c8c5a035fcdc320c7bc6cfb75ef7c5a034153df1413fa1d92f13
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="brotli, glib, libpsl, libsqlite, libxml2, zlib"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner"
 TERMUX_PKG_RECOMMENDS="glib-networking"
@@ -25,6 +25,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 
 termux_step_pre_configure() {
 	termux_setup_gir
+	termux_setup_glib_cross_pkg_config_wrapper
 }
 
 termux_step_post_massage() {

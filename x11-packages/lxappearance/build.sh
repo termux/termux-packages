@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.lxde.org/
 TERMUX_PKG_DESCRIPTION="LXDE GTK+ theme switcher"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Yisus7u7 <dev.yisus@hotmail.com>"
+TERMUX_PKG_MAINTAINER="@Yisus7u7"
 TERMUX_PKG_VERSION=0.6.3
 TERMUX_PKG_REVISION=7
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/lxde/lxappearance-${TERMUX_PKG_VERSION}.tar.xz

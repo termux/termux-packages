@@ -1,0 +1,30 @@
+From 335a23c80620e0f885ea4760dd8335d03a734c74 Mon Sep 17 00:00:00 2001
+From: Duy Tran Khanh <40482367+khanhduytran0@users.noreply.github.com>
+Date: Thu, 10 Jun 2021 09:36:26 +0700
+Subject: [PATCH] Use Android's strerror_r()
+
+---
+ src/java.base/unix/native/libjava/jni_util_md.c | 7 -------
+ 1 file changed, 7 deletions(-)
+
+diff --git a/src/java.base/unix/native/libjava/jni_util_md.c b/src/java.base/unix/native/libjava/jni_util_md.c
+index 460503cd794c..335637b0a115 100644
+--- a/src/java.base/unix/native/libjava/jni_util_md.c
++++ b/src/java.base/unix/native/libjava/jni_util_md.c
+@@ -31,13 +31,6 @@
+ #include "jni_util.h"
+ #include "dlfcn.h"
+ 
+-#if defined(LINUX) && (defined(_GNU_SOURCE) || \
+-         (defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE < 200112L \
+-             && defined(_XOPEN_SOURCE) && _XOPEN_SOURCE < 600))
+-extern int __xpg_strerror_r(int, char *, size_t);
+-#define strerror_r(a, b, c) __xpg_strerror_r((a), (b), (c))
+-#endif
+-
+ void* getProcessHandle() {
+     static void *procHandle = NULL;
+     if (procHandle != NULL) {
+-- 
+2.44.0
+

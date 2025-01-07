@@ -5,6 +5,7 @@
 
 set -e
 
+export TERMUX_SCRIPTDIR=$(realpath "$(dirname "$(realpath "$0")")/../")
 . $(dirname "$(realpath "$0")")/properties.sh
 BOOTSTRAP_TMPDIR=$(mktemp -d "${TMPDIR:-/tmp}/bootstrap-tmp.XXXXXXXX")
 trap 'rm -rf $BOOTSTRAP_TMPDIR' EXIT
@@ -24,7 +25,7 @@ TERMUX_PACKAGE_MANAGERS=("apt" "pacman")
 # The repository base urls mapping for package managers.
 declare -A REPO_BASE_URLS=(
 	["apt"]="https://packages-cf.termux.dev/apt/termux-main"
-	["pacman"]="https://s3.amazonaws.com/termux-pacman.us/main"
+	["pacman"]="https://service.termux-pacman.dev/main"
 )
 
 # The package manager that will be installed in bootstrap.
@@ -41,7 +42,7 @@ declare -a ADDITIONAL_PACKAGES
 
 # Check for some important utilities that may not be available for
 # some reason.
-for cmd in ar awk curl grep gzip find sed tar xargs xz zip; do
+for cmd in ar awk curl grep gzip find sed tar xargs xz zip jq; do
 	if [ -z "$(command -v $cmd)" ]; then
 		echo "[!] Utility '$cmd' is not available in PATH."
 		exit 1
@@ -93,25 +94,24 @@ read_package_list_deb() {
 	done
 }
 
-read_package_list_pac() {
-	if [ ! -e "${BOOTSTRAP_TMPDIR}/main_${1}.db" ]; then
-		echo "[*] Downloading package list for architecture '${1}'..."
+download_db_packages_pac() {
+	if [ ! -e "${PATH_DB_PACKAGES}" ]; then
+		echo "[*] Downloading package list for architecture '${package_arch}'..."
 		curl --fail --location \
-			--output "${BOOTSTRAP_TMPDIR}/main_${1}.db" \
-			"${REPO_BASE_URL}/${1}/main.db"
+			--output "${PATH_DB_PACKAGES}" \
+			"${REPO_BASE_URL}/${package_arch}/main.json"
 	fi
-
-	echo "[*] Reading package list for '${1}'..."
-	mkdir -p "${BOOTSTRAP_TMPDIR}/packages"
-	tar -xf "${BOOTSTRAP_TMPDIR}/main_${1}.db" -C "${BOOTSTRAP_TMPDIR}/packages"
-	local packages_name=($(grep -h -A 1 "%NAME%" "${BOOTSTRAP_TMPDIR}"/packages/*/desc | sed 's/%NAME%//g; s/--//g'))
-	local packages_filename=($(grep -h -A 1 "%FILENAME%" "${BOOTSTRAP_TMPDIR}"/packages/*/desc | sed 's/%FILENAME%//g; s/--//g'))
-	for i in $(seq 0 $((${#packages_name[@]}-1))); do
-		PACKAGE_METADATA["${packages_name[$i]}"]="${1}/${packages_filename[$i]}"
-	done
 }
 
-# Download specified package, its depenencies and then extract *.deb or *.pkg.tar.xz files to
+read_db_packages_pac() {
+	jq -r '."'${package_name}'"."'${1}'" | if type == "array" then .[] else . end' "${PATH_DB_PACKAGES}"
+}
+
+print_desc_package_pac() {
+	echo -e "%${1}%\n${2}\n"
+}
+
+# Download specified package, its dependencies and then extract *.deb or *.pkg.tar.xz files to
 # the bootstrap root.
 pull_package() {
 	local package_name=$1
@@ -201,17 +201,9 @@ pull_package() {
 			)
 		fi
 	else
-		local package_desc=$(grep -l $(echo ${PACKAGE_METADATA[${package_name}]} | awk -F "/" '{printf $2}') "${BOOTSTRAP_TMPDIR}"/packages/${package_name}*/desc | head -1)
-		local package_dependencies
-		local i=0
-		package_dependencies=$(
-			while [[ -n $(grep -A ${i} %DEPENDS% ${package_desc} | tail -1) ]]; do
-				i=$((${i}+1))
-				echo $(grep -A ${i} %DEPENDS% ${package_desc} | tail -1 | sed 's/</ /g; s/>/ /g; s/=/ /g' | awk '{printf $1}')
-			done
-		)
+		local package_dependencies=$(read_db_packages_pac "DEPENDS" | sed 's/<.*$//g; s/>.*$//g; s/=.*$//g')
 
-		if [ -n "$package_dependencies" ]; then
+		if [ "$package_dependencies" != "null" ]; then
 			local dep
 			for dep in $package_dependencies; do
 				if [ ! -e "${BOOTSTRAP_PKGDIR}/${dep}" ]; then
@@ -223,39 +215,60 @@ pull_package() {
 
 		if [ ! -e "$package_tmpdir/package.pkg.tar.xz" ]; then
 			echo "[*] Downloading '$package_name'..."
-			curl --fail --location --output "$package_tmpdir/package.pkg.tar.xz" "${REPO_BASE_URL}/${PACKAGE_METADATA[${package_name}]}"
+			local package_filename=$(read_db_packages_pac "FILENAME")
+			curl --fail --location --output "$package_tmpdir/package.pkg.tar.xz" "${REPO_BASE_URL}/${package_arch}/${package_filename}"
 
 			echo "[*] Extracting '$package_name'..."
 			(cd "$package_tmpdir"
-				tar xJf package.pkg.tar.xz
-				if [ -d ./data ]; then
-					cp -r ./data "$BOOTSTRAP_ROOTFS"
-				fi
-				local metadata_package_sp=(${PACKAGE_METADATA[${package_name}]//// })
-				if [ $(echo "${metadata_package_sp[1]}" | grep "any.") ]; then
-					local local_dir_sp=(${metadata_package_sp[1]//-any/ })
-				else
-					local local_dir_sp=(${metadata_package_sp[1]//-${metadata_package_sp[0]}/ })
-				fi
-				if [ $(echo "${package_name}" | grep "+") ]; then
-					local package_name_in_host="${package_name//+/0}"
-					local_dir_sp[0]="${local_dir_sp[0]//${package_name_in_host}/${package_name}}"
-				fi
-				mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/pacman/local/${local_dir_sp[0]}"
-				cp -r .MTREE "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/pacman/local/${local_dir_sp[0]}/mtree"
-				cp -r "${package_desc}" "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/pacman/local/${local_dir_sp[0]}/desc"
-				if [ -f .INSTALL ]; then
-					cp -r .INSTALL "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/pacman/local/${local_dir_sp[0]}/install"
-				fi
+				local package_desc="${package_name}-$(read_db_packages_pac VERSION)"
+				mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/pacman/local/${package_desc}"
 				{
 					echo "%FILES%"
-					if [ -d ./data ]; then
-						find data
-					fi
-				} >> "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/pacman/local/${local_dir_sp[0]}/files"
+					tar xvf package.pkg.tar.xz -C "$BOOTSTRAP_ROOTFS" .INSTALL .MTREE data 2> /dev/null | grep '^data/' || true
+				} >> "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/pacman/local/${package_desc}/files"
+				mv "${BOOTSTRAP_ROOTFS}/.MTREE" "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/pacman/local/${package_desc}/mtree"
+				if [ -f "${BOOTSTRAP_ROOTFS}/.INSTALL" ]; then
+					mv "${BOOTSTRAP_ROOTFS}/.INSTALL" "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/pacman/local/${package_desc}/install"
+				fi
+				{
+					local keys_desc="VERSION BASE DESC URL ARCH BUILDDATE PACKAGER ISIZE GROUPS LICENSE REPLACES DEPENDS OPTDEPENDS CONFLICTS PROVIDES"
+					for i in "NAME ${package_name}" \
+						"INSTALLDATE $(date +%s)" \
+						"VALIDATION $(test $(read_db_packages_pac PGPSIG) != 'null' && echo 'pgp' || echo 'sha256')"; do
+						print_desc_package_pac ${i}
+					done
+					jq -r -j '."'${package_name}'" | to_entries | .[] | select(.key | contains('$(sed 's/^/"/; s/ /","/g; s/$/"/' <<< ${keys_desc})')) | "%",(if .key == "ISIZE" then "SIZE" else .key end),"%\n",.value,"\n\n" | if type == "array" then (.| join("\n")) else . end' \
+						"${PATH_DB_PACKAGES}"
+				} >> "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/pacman/local/${package_desc}/desc"
 			)
 		fi
 	fi
+}
+
+# Add termux bootstrap second stage files
+add_termux_bootstrap_second_stage_files() {
+
+	local package_arch="$1"
+
+	echo "[*] Adding termux bootstrap second stage files..."
+
+	mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_BOOTSTRAP_CONFIG_DIR_PATH}"
+	sed -e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
+		-e "s|@TERMUX_BOOTSTRAP_CONFIG_DIR_PATH@|${TERMUX_BOOTSTRAP_CONFIG_DIR_PATH}|g" \
+		-e "s|@TERMUX_PACKAGE_MANAGER@|${TERMUX_PACKAGE_MANAGER}|g" \
+		-e "s|@TERMUX_PACKAGE_ARCH@|${package_arch}|g" \
+		"$TERMUX_SCRIPTDIR/scripts/bootstrap/termux-bootstrap-second-stage.sh" \
+		> "${BOOTSTRAP_ROOTFS}/${TERMUX_BOOTSTRAP_CONFIG_DIR_PATH}/termux-bootstrap-second-stage.sh"
+	chmod 700 "${BOOTSTRAP_ROOTFS}/${TERMUX_BOOTSTRAP_CONFIG_DIR_PATH}/termux-bootstrap-second-stage.sh"
+
+	# TODO: Remove it when Termux app supports `pacman` bootstraps installation.
+	sed -e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
+		-e "s|@TERMUX_PROFILE_D_PREFIX_DIR_PATH@|${TERMUX_PROFILE_D_PREFIX_DIR_PATH}|g" \
+		-e "s|@TERMUX_BOOTSTRAP_CONFIG_DIR_PATH@|${TERMUX_BOOTSTRAP_CONFIG_DIR_PATH}|g" \
+		"$TERMUX_SCRIPTDIR/scripts/bootstrap/01-termux-bootstrap-second-stage-fallback.sh" \
+		> "${BOOTSTRAP_ROOTFS}/${TERMUX_PROFILE_D_PREFIX_DIR_PATH}/01-termux-bootstrap-second-stage-fallback.sh"
+	chmod 600 "${BOOTSTRAP_ROOTFS}/${TERMUX_PROFILE_D_PREFIX_DIR_PATH}/01-termux-bootstrap-second-stage-fallback.sh"
+
 }
 
 # Final stage: generate bootstrap archive and place it to current
@@ -393,6 +406,7 @@ if [ -z "$REPO_BASE_URL" ]; then
 fi
 
 for package_arch in "${TERMUX_ARCHITECTURES[@]}"; do
+	PATH_DB_PACKAGES="$BOOTSTRAP_TMPDIR/main_${package_arch}.json"
 	BOOTSTRAP_ROOTFS="$BOOTSTRAP_TMPDIR/rootfs-${package_arch}"
 	BOOTSTRAP_PKGDIR="$BOOTSTRAP_TMPDIR/packages-${package_arch}"
 
@@ -423,7 +437,7 @@ for package_arch in "${TERMUX_ARCHITECTURES[@]}"; do
 	if [ ${TERMUX_PACKAGE_MANAGER} = "apt" ]; then
 		read_package_list_deb "$package_arch"
 	else
-		read_package_list_pac "$package_arch"
+		download_db_packages_pac
 	fi
 
 	# Package manager.
@@ -432,7 +446,7 @@ for package_arch in "${TERMUX_ARCHITECTURES[@]}"; do
 	fi
 
 	# Core utilities.
-	pull_package bash
+	pull_package bash # Used by `termux-bootstrap-second-stage.sh`
 	pull_package bzip2
 	if ! ${BOOTSTRAP_ANDROID10_COMPATIBLE}; then
 		pull_package command-not-found
@@ -476,6 +490,9 @@ for package_arch in "${TERMUX_ARCHITECTURES[@]}"; do
 		pull_package "$add_pkg"
 	done
 	unset add_pkg
+
+	# Add termux bootstrap second stage files
+	add_termux_bootstrap_second_stage_files "$package_arch"
 
 	# Create bootstrap archive.
 	create_bootstrap_archive "$package_arch"

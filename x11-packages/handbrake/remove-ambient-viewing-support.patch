@@ -1,0 +1,30 @@
+Copied from here https://salsa.debian.org/multimedia-team/handbrake/-/tree/abf6561af02cff11bce1f28900165716e57fa41a
+
+From: Sebastian Ramacher <sramacher@debian.org>
+Date: Fri, 1 Dec 2023 23:02:49 +0100
+Subject: Remove ambient viewing support
+
+Support in x265 is added via contrib patches.
+---
+ libhb/encx265.c | 8 --------
+ 1 file changed, 8 deletions(-)
+
+diff --git a/libhb/encx265.c b/libhb/encx265.c
+index 5be461b..c5518db 100644
+--- a/libhb/encx265.c
++++ b/libhb/encx265.c
+@@ -269,14 +269,6 @@ int encx265Init(hb_work_object_t *w, hb_job_t *job)
+         }
+     }
+ 
+-    if (job->ambient.ambient_illuminance.num && job->ambient.ambient_illuminance.den)
+-    {
+-        param->ambientIlluminance = hb_rescale_rational(job->ambient.ambient_illuminance, 10000);
+-        param->ambientLightX = hb_rescale_rational(job->ambient.ambient_light_x, 50000);
+-        param->ambientLightY = hb_rescale_rational(job->ambient.ambient_light_y, 50000);
+-        param->bEmitAmbientViewingEnvironment = 1;
+-    }
+-
+     if (job->chroma_location != AVCHROMA_LOC_UNSPECIFIED)
+     {
+         char chromaLocation[256];

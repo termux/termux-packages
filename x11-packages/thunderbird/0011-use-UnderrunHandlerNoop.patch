@@ -1,0 +1,23 @@
+UnderrunHandlerLinux not working due to SELinux rules
+
+--- a/dom/media/UnderrunHandlerLinux.cpp
++++ b/dom/media/UnderrunHandlerLinux.cpp
+@@ -12,6 +12,8 @@
+ #include "audio_thread_priority.h"
+ #include "nsDebug.h"
+ 
++#ifndef __TERMUX__
++
+ namespace mozilla {
+ 
+ Atomic<bool, MemoryOrdering::ReleaseAcquire> gRealtimeLimitReached;
+@@ -76,3 +78,9 @@
+ }
+ 
+ }  // namespace mozilla
++
++#else
++
++#include "UnderrunHandlerNoop.cpp"
++
++#endif

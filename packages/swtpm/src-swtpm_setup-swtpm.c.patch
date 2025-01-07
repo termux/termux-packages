@@ -1,11 +1,11 @@
 --- a/src/swtpm_setup/swtpm.c
 +++ b/src/swtpm_setup/swtpm.c
-@@ -70,7 +70,7 @@
-     unsigned ctr;
+@@ -92,7 +92,7 @@
      int pidfile_fd;
      int ret = 1;
+     gchar *tmp;
 -    char pidfile[] = "/tmp/.swtpm_setup.pidfile.XXXXXX";
 +    char pidfile[] = "@TERMUX_PREFIX@/tmp/.swtpm_setup.pidfile.XXXXXX";
  
-     pidfile_fd = mkstemp(pidfile);
+     pidfile_fd = g_mkstemp_full(pidfile, O_EXCL|O_CREAT, 0600);
      if (pidfile_fd < 0) {

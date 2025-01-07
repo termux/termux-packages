@@ -1,0 +1,22 @@
+From e7570675c4db70ea7314ae342def2445b0eea3c8 Mon Sep 17 00:00:00 2001
+From: Chongyun Lee <45286352+licy183@users.noreply.github.com>
+Date: Tue, 3 Sep 2024 12:34:31 +0800
+Subject: [PATCH] Fix: hardcoded paths in jdk.attach
+
+---
+ .../linux/classes/sun/tools/attach/VirtualMachineImpl.java      | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/jdk.attach/linux/classes/sun/tools/attach/VirtualMachineImpl.java b/src/jdk.attach/linux/classes/sun/tools/attach/VirtualMachineImpl.java
+index a5d743a2635..3d32c514f54 100644
+--- a/src/jdk.attach/linux/classes/sun/tools/attach/VirtualMachineImpl.java
++++ b/src/jdk.attach/linux/classes/sun/tools/attach/VirtualMachineImpl.java
+@@ -46,7 +46,7 @@ public class VirtualMachineImpl extends HotSpotVirtualMachine {
+     // location is the same for all processes, otherwise the tools
+     // will not be able to find all Hotspot processes.
+     // Any changes to this needs to be synchronized with HotSpot.
+-    private static final String tmpdir = "/tmp";
++    private static final String tmpdir = "@TERMUX_PREFIX@/tmp";
+     String socket_path;
+     /**
+      * Attaches to the target VM

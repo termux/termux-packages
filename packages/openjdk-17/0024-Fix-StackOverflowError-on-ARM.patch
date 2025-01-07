@@ -1,0 +1,31 @@
+From 6af54e5c11b0d9d24f24a453ea0f3be1ff9eab30 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?=E6=BA=AF=E6=B4=84?= <1840686745@qq.com>
+Date: Thu, 26 Aug 2021 03:53:25 +0800
+Subject: [PATCH] Fix StackOverflowError on ARM
+
+---
+ src/hotspot/os_cpu/linux_arm/os_linux_arm.cpp | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/src/hotspot/os_cpu/linux_arm/os_linux_arm.cpp b/src/hotspot/os_cpu/linux_arm/os_linux_arm.cpp
+index 3296ad867666..f53b57a4795e 100644
+--- a/src/hotspot/os_cpu/linux_arm/os_linux_arm.cpp
++++ b/src/hotspot/os_cpu/linux_arm/os_linux_arm.cpp
+@@ -83,8 +83,14 @@
+ #endif
+ 
+ address os::current_stack_pointer() {
++#if defined(__clang__) || defined(__llvm__)
++  void *sp;
++  __asm__("mov %0, " SPELL_REG_SP : "=r"(sp));
++  return (address) sp;
++#else
+   register address sp __asm__ (SPELL_REG_SP);
+   return sp;
++#endif
+ }
+ 
+ char* os::non_memory_address_word() {
+-- 
+2.44.0
+

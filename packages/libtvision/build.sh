@@ -3,9 +3,11 @@ TERMUX_PKG_DESCRIPTION="A modern port of Turbo Vision 2.0 with Unicode support"
 TERMUX_PKG_LICENSE="Public Domain, MIT"
 TERMUX_PKG_LICENSE_FILE="COPYRIGHT"
 TERMUX_PKG_MAINTAINER="@termux"
-_COMMIT=0decd5baf3700df39fecef5d3c450c92dda3b216
-TERMUX_PKG_VERSION=2022.11.17
-TERMUX_PKG_SRCURL=https://github.com/magiblot/tvision.git
+_COMMIT=115924552b4ab8030543ce14e64475f44c758457
+TERMUX_PKG_VERSION=2023.01.29
+TERMUX_PKG_SRCURL=git+https://github.com/magiblot/tvision
+TERMUX_PKG_SHA256=4e80413e75820962c42da49e22aad97b949f8b729a28d4562d4e3148f5b072f5
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_DEPENDS="libc++, ncurses"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -23,5 +25,10 @@ termux_step_post_get_source() {
 		echo -n "ERROR: The specified version \"$TERMUX_PKG_VERSION\""
 		echo " is different from what is expected to be: \"$version\""
 		return 1
+	fi
+
+	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum)
+	if [[ "${s}" != "${TERMUX_PKG_SHA256}  "* ]]; then
+		termux_error_exit "Checksum mismatch for source files."
 	fi
 }

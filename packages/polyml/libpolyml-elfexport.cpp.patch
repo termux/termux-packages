@@ -1,0 +1,25 @@
+--- a/libpolyml/elfexport.cpp
++++ b/libpolyml/elfexport.cpp
+@@ -98,6 +98,22 @@
+ #include <asm/elf.h>
+ #endif
+ 
++// Android remove them from NDK r27
++#ifdef __ANDROID__
++#ifndef R_AARCH64_ADR_PREL_PG_HI21
++#define R_AARCH64_ADR_PREL_PG_HI21   275
++#endif
++#ifndef R_AARCH64_ADD_ABS_LO12_NC
++#define R_AARCH64_ADD_ABS_LO12_NC    277
++#endif
++#ifndef R_AARCH64_LDST32_ABS_LO12_NC
++#define R_AARCH64_LDST32_ABS_LO12_NC 285
++#endif
++#ifndef R_AARCH64_LDST64_ABS_LO12_NC
++#define R_AARCH64_LDST64_ABS_LO12_NC 286
++#endif
++#endif
++
+ // NetBSD relocation symbols
+ #ifdef HAVE_I386_ELF_MACHDEP_H
+ #include <i386/elf_machdep.h>

@@ -98,9 +98,9 @@ met these conditions:
   Software which is either closed-source, contain binary-only components or
   is distributed under End User License Agreement is not accepted.
 
-- **Not installable through cpan, gem, npm, or pip**
+- **Not installable through cpan, gem, npm, pip or cargo**
 
-  These packages should be installed through `cpan`, `gem`, `npm`, `pip` and
+  These packages should be installed through `cpan`, `gem`, `npm`, `pip`, `cargo` and
   so on.
 
   Packaging modules for Perl, Ruby, Node.js, is problematic, especially
@@ -132,6 +132,11 @@ met these conditions:
   purposes, including but not limited to pentesting, phishing, bruteforce,
   sms/call bombing, DDoS attaks, OSINT.
 
+**Important**: standalone library packages are of interest mostly for developers
+and we will not package them unless required as dependency for another package.
+This is not a strong rule, but needed to ensure that repository is clean and
+provides content useful for average Termux user.
+
 Packages that require root permission to get working or rely on features that
 are available only with SELinux permissive mode or require custom firmware
 are handled in a dedicated
@@ -140,6 +145,9 @@ recipes you can find in [root-packages directory](/root-packages).
 Remember that Termux is designed primarily for non-root use and we may
 remove functionality requiring root from packages if it interfere with
 non-root usage or cause build time issues.
+
+Packages that do not comply with this policy may be requested in User Repository:
+https://github.com/termux-user-repository/tur
 
 ## Submitting pull requests
 
@@ -330,7 +338,7 @@ Any line in the commit **should not exceed 80 characters**. In case it does, con
     Commit summary should include a short description of the package. Optional extended commit message may include usage instructions for the package and/or reasons for inclusion.
   - `bump(<repo>/<package>)`: One or more package(s) was/were updated.
     Commit summary should include the newer version/tag to which the package was updated to. Optional extended commit message may include new list of features in the new version, and detailed list of changes in build scripts and/or patches
-  - `fix(<repo>/<package>): Fix a Termux specific bug in a package
+  - `fix(<repo>/<package>)`: Fix a Termux specific bug in a package
     Commit summary should contain a summary of old incorrect behaviour of the package. Extended commit message may contain a deeper analysis of the bug.
   - `dwnpkg(<repo>/<package>)`: One or more package(s) was/were downgraded due to build issues or potential bugs
     Commit summary should justify the downgrading of the package(s). If the summary can't completely describe the reason for downgrade, extended commit message should contain full reason for downgrade.

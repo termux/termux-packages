@@ -1,24 +1,7 @@
---- a/CMakeLists.txt
-+++ b/CMakeLists.txt
-@@ -85,7 +85,7 @@
-     cmake/modules/QtLinkage.cmake cmake/modules/QtWebViewProviderConfig.cmake cmake/modules/QtJsProviderConfig.cmake)
- set(CMAKE_TEMPLATE_FILES cmake/templates/qtconfig.h.in cmake/templates/webviewdefs.h.in cmake/templates/webviewincludes.h.in
-                          cmake/templates/jsdefs.h.in cmake/templates/jsincludes.h.in)
--if (ANDROID)
-+if (FALSE)
-     list(APPEND CMAKE_MODULE_FILES)
-     list(APPEND CMAKE_TEMPLATE_FILES cmake/templates/android-deployment.json.in)
- endif ()
-@@ -120,7 +120,7 @@
- if (WIN32
-     OR (UNIX
-         AND NOT APPLE
--        AND NOT ANDROID))
-+        AND NOT FALSE))
-     set(ENABLE_CAPSLOCK_DETECTION_BY_DEFAULT ON)
- else ()
-     set(ENABLE_CAPSLOCK_DETECTION_BY_DEFAULT OFF)
-@@ -150,7 +150,7 @@
+diff -uNr qtutilities-6.13.2/CMakeLists.txt qtutilities-6.13.2.mod/CMakeLists.txt
+--- qtutilities-6.13.2/CMakeLists.txt	2023-10-30 04:23:28.000000000 +0800
++++ qtutilities-6.13.2.mod/CMakeLists.txt	2023-11-11 11:01:41.418106816 +0800
+@@ -157,7 +157,7 @@
  # configure support for D-Bus notifications
  if (UNIX
      AND NOT APPLE
@@ -27,9 +10,10 @@
      set(ENABLE_DBUS_NOTIFICATIONS_BY_DEFAULT ON)
  else ()
      set(ENABLE_DBUS_NOTIFICATIONS_BY_DEFAULT OFF)
---- a/cmake/modules/QtGuiConfig.cmake
-+++ b/cmake/modules/QtGuiConfig.cmake
-@@ -81,6 +81,6 @@
+diff -uNr qtutilities-6.13.2/cmake/modules/QtGuiConfig.cmake qtutilities-6.13.2.mod/cmake/modules/QtGuiConfig.cmake
+--- qtutilities-6.13.2/cmake/modules/QtGuiConfig.cmake	2023-10-30 04:23:28.000000000 +0800
++++ qtutilities-6.13.2.mod/cmake/modules/QtGuiConfig.cmake	2023-11-11 11:02:40.761263814 +0800
+@@ -83,6 +83,6 @@
      CACHE STRING "specifies the image format plugins to link against (only relevant when using static Qt)")
  
  # always enable the Svg module under Android
@@ -37,9 +21,10 @@
 +if (FALSE)
      list(APPEND ADDITIONAL_QT_MODULES Svg)
  endif ()
---- a/cmake/modules/QtLinkage.cmake
-+++ b/cmake/modules/QtLinkage.cmake
-@@ -24,7 +24,7 @@
+diff -uNr qtutilities-6.13.2/cmake/modules/QtLinkage.cmake qtutilities-6.13.2.mod/cmake/modules/QtLinkage.cmake
+--- qtutilities-6.13.2/cmake/modules/QtLinkage.cmake	2023-10-30 04:23:28.000000000 +0800
++++ qtutilities-6.13.2.mod/cmake/modules/QtLinkage.cmake	2023-11-11 11:03:17.549914527 +0800
+@@ -32,7 +32,7 @@
  
  # avoid "add_custom_target cannot create target "apk" because another target…" errors produced by Qt's Android support module
  # (which can not cope with Qt CMake modules already pulled in by a dependency)

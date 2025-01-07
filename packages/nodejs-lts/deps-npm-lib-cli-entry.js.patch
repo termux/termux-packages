@@ -1,0 +1,17 @@
+diff -u -r ../node-v20.14.0/deps/npm/lib/cli/entry.js ./deps/npm/lib/cli/entry.js
+--- ../node-v20.14.0/deps/npm/lib/cli/entry.js	2024-05-28 04:57:54.000000000 +0000
++++ ./deps/npm/lib/cli/entry.js	2024-05-30 19:57:14.804332523 +0000
+@@ -64,13 +64,6 @@
+ 
+     const execPromise = npm.exec(command, args)
+ 
+-    // this is async but we dont await it, since its ok if it doesnt
+-    // finish before the command finishes running. it uses command and argv
+-    // so it must be initiated here, after the command name is set
+-    const updateNotifier = require('./update-notifier.js')
+-    // eslint-disable-next-line promise/catch-or-return
+-    updateNotifier(npm).then((msg) => (npm.updateNotification = msg))
+-
+     await execPromise
+     return exitHandler()
+   } catch (err) {

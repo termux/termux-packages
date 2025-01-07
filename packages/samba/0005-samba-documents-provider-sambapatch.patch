@@ -378,17 +378,17 @@ index 3f6b138..1c24ddb 100644
 --- a/lib/replace/replace.h
 +++ b/lib/replace/replace.h
 @@ -958,6 +958,11 @@ const char *rep_getprogname(void);
- # endif /* HAVE_FALLTHROUGH_ATTRIBUTE */
- #endif /* FALL_THROUGH */
+ void rep_setproctitle_init(int argc, char *argv[], char *envp[]);
+ #endif
  
 +#ifndef HAVE_SWAB
 +#define swab rep_swab
 +void rep_swab(const void *from, void *to, ssize_t n);
 +#endif
 +
- bool nss_wrapper_enabled(void);
- bool nss_wrapper_hosts_enabled(void);
- bool socket_wrapper_enabled(void);
+ #ifndef HAVE_MEMSET_S
+ #define memset_s rep_memset_s
+ int rep_memset_s(void *dest, size_t destsz, int ch, size_t count);
 diff --git a/lib/socket/interfaces.c b/lib/socket/interfaces.c
 index ac26b97..f5698f6 100644
 --- a/lib/socket/interfaces.c

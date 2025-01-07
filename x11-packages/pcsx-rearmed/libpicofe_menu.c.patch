@@ -1,0 +1,21 @@
+--- a/frontend/libpicofe/menu.c	2023-01-14 18:47:37.198748509 -0300
++++ b/frontend/libpicofe/menu.c	2024-07-24 12:03:41.259401811 -0300
+@@ -258,7 +258,8 @@
+ 
+ void menu_init_base(void)
+ {
+-	int i, c, l, pos;
++	int i, c, l;
++	size_t pos;
+ 	unsigned char *fd, *fds;
+ 	char buff[256];
+ 	FILE *f;
+@@ -313,7 +314,7 @@
+ 	}
+ 
+ 	// load custom font and selector (stored as 1st symbol in font table)
+-	pos = plat_get_skin_dir(buff, sizeof(buff));
++	pos = plat_get_skin_dir(buff);
+ 	strcpy(buff + pos, "font.png");
+ 	readpng(menu_font_data, buff, READPNG_FONT,
+ 		MENU_X2 ? 256 : 128, MENU_X2 ? 320 : 160);

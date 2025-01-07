@@ -1,0 +1,37 @@
+diff --git a/Makefile b/Makefile
+index b248131..3903512 100644
+--- a/Makefile
++++ b/Makefile
+@@ -70,8 +70,8 @@ static-%.tar.gz:
+ 	cd static-$*/nc && ../../ncurses/configure --prefix="`pwd`/../inst"\
+ 		--without-cxx --without-cxx-binding --without-ada --without-manpages --without-progs\
+ 		--without-tests --disable-pc-files --without-pkg-config --without-shared --without-debug\
+-		--without-gpm --without-sysmouse --enable-widec --with-default-terminfo-dir=/usr/share/terminfo\
+-		--with-terminfo-dirs=/usr/share/terminfo:/lib/terminfo:/usr/local/share/terminfo\
++		--without-gpm --without-sysmouse --enable-widec --with-default-terminfo-dir=@TERMUX_PREFIX@/share/terminfo\
++		--with-terminfo-dirs=@TERMUX_PREFIX@/share/terminfo:@TERMUX_PREFIX@/lib/terminfo\
+ 		--with-fallbacks="screen linux vt100 xterm xterm-256color" --host=$*\
+ 		CC="${ZIG} cc --target=$*"\
+ 		LD="${ZIG} cc --target=$*"\
+diff --git a/src/main.zig b/src/main.zig
+index 7575c1b..6169b3e 100644
+--- a/src/main.zig
++++ b/src/main.zig
+@@ -504,14 +504,14 @@ pub fn main() void {
+     };
+ 
+     if (loadConf) {
+-        tryReadArgsFile("/etc/ncdu.conf");
++        tryReadArgsFile("@TERMUX_PREFIX@/etc/ncdu2.conf");
+ 
+         if (std.posix.getenvZ("XDG_CONFIG_HOME")) |p| {
+-            const path = std.fs.path.joinZ(allocator, &.{p, "ncdu", "config"}) catch unreachable;
++            const path = std.fs.path.joinZ(allocator, &.{p, "ncdu2", "config"}) catch unreachable;
+             defer allocator.free(path);
+             tryReadArgsFile(path);
+         } else if (std.posix.getenvZ("HOME")) |p| {
+-            const path = std.fs.path.joinZ(allocator, &.{p, ".config", "ncdu", "config"}) catch unreachable;
++            const path = std.fs.path.joinZ(allocator, &.{p, ".config", "ncdu2", "config"}) catch unreachable;
+             defer allocator.free(path);
+             tryReadArgsFile(path);
+         }

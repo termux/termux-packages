@@ -5,9 +5,9 @@
   <boxed name="ClutterGstOverlay" get-type="clutter_gst_overlay_get_type"/>
   <boxed name="ClutterGstOverlays" get-type="clutter_gst_overlays_get_type"/>
   <class name="ClutterGstCameraDevice" get-type="clutter_gst_camera_device_get_type" parents="GObject">
-    <property name="element-factory" type="GstElementFactory" flags="235"/>
-    <property name="node" type="gchararray" flags="235"/>
-    <property name="name" type="gchararray" flags="235"/>
+    <property name="element-factory" type="GstElementFactory" flags="235" default-value="NULL"/>
+    <property name="node" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="name" type="gchararray" flags="235" default-value="NULL"/>
     <signal name="capture-resolution-changed" return="void" when="last">
       <param type="gint"/>
       <param type="gint"/>
@@ -37,20 +37,20 @@
   </class>
   <class name="ClutterGstPlayback" get-type="clutter_gst_playback_get_type" parents="GObject">
     <implements name="ClutterGstPlayer"/>
-    <property name="uri" type="gchararray" flags="227"/>
-    <property name="progress" type="gdouble" flags="227"/>
-    <property name="subtitle-uri" type="gchararray" flags="227"/>
-    <property name="subtitle-font-name" type="gchararray" flags="227"/>
-    <property name="can-seek" type="gboolean" flags="225"/>
-    <property name="buffer-fill" type="gdouble" flags="225"/>
-    <property name="duration" type="gdouble" flags="225"/>
-    <property name="user-agent" type="gchararray" flags="227"/>
-    <property name="seek-flags" type="ClutterGstSeekFlags" flags="227"/>
+    <property name="uri" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="progress" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="subtitle-uri" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="subtitle-font-name" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="can-seek" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="buffer-fill" type="gdouble" flags="225" default-value="0.000000"/>
+    <property name="duration" type="gdouble" flags="225" default-value="0.000000"/>
+    <property name="user-agent" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="seek-flags" type="ClutterGstSeekFlags" flags="227" default-value="CLUTTER_GST_SEEK_FLAG_NONE"/>
     <property name="audio-streams" type="gpointer" flags="225"/>
-    <property name="audio-stream" type="gint" flags="227"/>
+    <property name="audio-stream" type="gint" flags="227" default-value="-1"/>
     <property name="subtitle-tracks" type="gpointer" flags="225"/>
-    <property name="subtitle-track" type="gint" flags="227"/>
-    <property name="in-seek" type="gboolean" flags="225"/>
+    <property name="subtitle-track" type="gint" flags="227" default-value="-1"/>
+    <property name="in-seek" type="gboolean" flags="225" default-value="FALSE"/>
     <signal name="should-buffer" return="gboolean" when="last">
       <param type="GstQuery"/>
     </signal>
@@ -58,7 +58,7 @@
   <class name="ClutterGstVideoSink" get-type="clutter_gst_video_sink_get_type" parents="GstVideoSink,GstBaseSink,GstElement,GstObject,GInitiallyUnowned,GObject">
     <implements name="GstColorBalance"/>
     <implements name="GstNavigation"/>
-    <property name="update-priority" type="gint" flags="227"/>
+    <property name="update-priority" type="gint" flags="227" default-value="150"/>
     <signal name="new-frame" return="void" when="last">
     </signal>
     <signal name="pipeline-ready" return="void" when="last">
@@ -67,9 +67,9 @@
     </signal>
   </class>
   <interface name="ClutterGstPlayer" get-type="clutter_gst_player_get_type">
-    <property name="audio-volume" type="gdouble" flags="227"/>
-    <property name="idle" type="gboolean" flags="225"/>
-    <property name="playing" type="gboolean" flags="227"/>
+    <property name="audio-volume" type="gdouble" flags="227" default-value="0.500000"/>
+    <property name="idle" type="gboolean" flags="225" default-value="TRUE"/>
+    <property name="playing" type="gboolean" flags="227" default-value="FALSE"/>
     <signal name="ready" return="void" when="last">
     </signal>
     <signal name="eos" return="void" when="last">
@@ -88,10 +88,10 @@
   <class name="ClutterGstContent" get-type="clutter_gst_content_get_type" parents="GObject">
     <implements name="ClutterContent"/>
     <property name="frame" type="ClutterGstFrame" flags="227"/>
-    <property name="sink" type="ClutterGstVideoSink" flags="227"/>
+    <property name="sink" type="ClutterGstVideoSink" flags="227" default-value="NULL"/>
     <property name="player" type="GObject" flags="227"/>
-    <property name="paint-frame" type="gboolean" flags="227"/>
-    <property name="paint-overlays" type="gboolean" flags="227"/>
+    <property name="paint-frame" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="paint-overlays" type="gboolean" flags="227" default-value="TRUE"/>
     <signal name="size-change" return="void" when="last">
       <param type="gint"/>
       <param type="gint"/>
@@ -99,13 +99,13 @@
   </class>
   <class name="ClutterGstAspectratio" get-type="clutter_gst_aspectratio_get_type" parents="ClutterGstContent,GObject">
     <implements name="ClutterContent"/>
-    <property name="paint-borders" type="gboolean" flags="227"/>
-    <property name="fill-allocation" type="gboolean" flags="227"/>
+    <property name="paint-borders" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="fill-allocation" type="gboolean" flags="227" default-value="FALSE"/>
   </class>
   <class name="ClutterGstCrop" get-type="clutter_gst_crop_get_type" parents="ClutterGstContent,GObject">
     <implements name="ClutterContent"/>
-    <property name="paint-borders" type="gboolean" flags="227"/>
-    <property name="cull-backface" type="gboolean" flags="227"/>
+    <property name="paint-borders" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="cull-backface" type="gboolean" flags="227" default-value="FALSE"/>
     <property name="input-region" type="ClutterGstBox" flags="227"/>
     <property name="output-region" type="ClutterGstBox" flags="227"/>
   </class>

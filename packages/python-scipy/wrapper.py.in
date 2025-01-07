@@ -1,0 +1,51 @@
+#!/usr/bin/python3
+import os
+import subprocess
+import sys
+import typing
+
+"""
+This wrapper is used to ignore or replace some unsupported flags for flang-new.
+
+It will operate as follows:
+
+1. Ignore `-Minform=inform` and `-fdiagnostics-color`.
+  They are added by meson automatically, but are not supported by flang-new yet.
+2. Remove `-lflang` and `-lpgmath`.
+  It exists in classic-flang but doesn't exist in flang-new.
+3. Replace `-Oz` to `-O2`.
+  `-Oz` is not supported by flang-new.
+4. Replace `-module` to `-J`.
+  See https://github.com/llvm/llvm-project/issues/66969
+5. Ignore `-MD`, `-MQ file` and `-MF file`.
+  They generates files used by GNU make but we're using ninja.
+6. Ignore `-fvisibility=hidden`.
+  It is not supported by flang-new, and ignoring it will not break the functionality,
+  as scipy also uses version script for shared libraries.
+"""
+
+COMPLIER_PATH = "@COMPILER@"
+
+def main(argv: typing.List[str]):
+  cwd = os.getcwd()
+  argv_new = []
+  i = 0
+  while i < len(argv):
+    arg = argv[i]
+    if arg in ["-Minform=inform", "-lflang", "-lpgmath", "-MD", "-fvisibility=hidden"] \
+        or arg.startswith("-fdiagnostics-color"):
+      pass
+    elif arg == "-Oz":
+      argv_new.append("-O2")
+    elif arg == "-module":
+      argv_new.append("-J")
+    elif arg in ["-MQ", "-MF"]:
+      i += 1
+    else:
+      argv_new.append(arg)
+    i += 1
+  args = [COMPLIER_PATH] + argv_new
+  subprocess.check_call(args, env=os.environ, cwd=cwd, text=True)
+
+if __name__ == '__main__':
+  main(sys.argv[1:])

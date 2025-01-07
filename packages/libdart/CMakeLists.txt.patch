@@ -1,31 +1,24 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 100bfb8b59b..39170ea1187 100644
+index a3389d89fc62..7c1952f5d584 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -302,14 +302,6 @@ if(TARGET dart)
+@@ -334,15 +334,6 @@ if(TARGET dart)
      add_subdirectory(unittests EXCLUDE_FROM_ALL)
    endif()
  
 -  # Add example subdirectories and an "examples" target.
 -  if(MSVC)
--    # add_subdirectory(examples)
+-    add_subdirectory(examples)
 -  else()
 -    add_subdirectory(examples EXCLUDE_FROM_ALL)
 -    get_property(examples GLOBAL PROPERTY DART_EXAMPLES)
 -    add_custom_target(examples DEPENDS ${examples})
 -  endif()
- 
+-
    if(DART_VERBOSE)
      message(STATUS "")
-@@ -344,7 +336,6 @@ if(TARGET dart)
- 
- endif()
- 
--add_subdirectory(python)
- 
- if(DART_BUILD_EXTRAS)
-   add_subdirectory(extras)
-@@ -424,7 +424,7 @@
+     message(STATUS "[ Examples ]")
+@@ -456,7 +447,7 @@ install(
  # Generate the DART pkg-config
  set(PC_CONFIG_IN ${DART_SOURCE_DIR}/cmake/dart.pc.in)
  set(PC_CONFIG_OUT ${DART_BINARY_DIR}/cmake/dart.pc)

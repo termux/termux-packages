@@ -1,0 +1,47 @@
+From acda1bc8b7e6c37db76575a43e5b08db5f118378 Mon Sep 17 00:00:00 2001
+From: Duy Tran Khanh <40482367+khanhduytran0@users.noreply.github.com>
+Date: Thu, 10 Jun 2021 18:36:56 +0700
+Subject: [PATCH] Fixed Java_sun_nio_fs_UnixNativeDispatcher_futimes
+
+---
+ .../unix/native/libnio/fs/UnixNativeDispatcher.c      | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/src/java.base/unix/native/libnio/fs/UnixNativeDispatcher.c b/src/java.base/unix/native/libnio/fs/UnixNativeDispatcher.c
+index 3b886283778b..a53b64bb81f0 100644
+--- a/src/java.base/unix/native/libnio/fs/UnixNativeDispatcher.c
++++ b/src/java.base/unix/native/libnio/fs/UnixNativeDispatcher.c
+@@ -694,16 +694,17 @@ Java_sun_nio_fs_UnixNativeDispatcher_futimes(JNIEnv* env, jclass this, jint file
+     jlong accessTime, jlong modificationTime)
+ {
+     struct timeval times[2];
++    struct timespec times2[2];
+     int err = 0;
+ 
+-    times[0].tv_sec = accessTime / 1000000;
++    times[0].tv_sec = times2[0].tv_sec = accessTime / 1000000;
+     times[0].tv_usec = accessTime % 1000000;
+ 
+-    times[1].tv_sec = modificationTime / 1000000;
++    times[1].tv_sec = times2[1].tv_sec = modificationTime / 1000000;
+     times[1].tv_usec = modificationTime % 1000000;
+ 
+-    times[0].tv_nsec = (accessTime % 1000000) * 1000;
+-    times[1].tv_nsec = (modificationTime % 1000000) * 1000;
++    times2[0].tv_nsec = times[0].tv_usec * 1000;
++    times2[1].tv_nsec = times[1].tv_usec * 1000;
+ 
+ #ifdef _ALLBSD_SOURCE
+     RESTARTABLE(futimes(filedes, &times[0]), err);
+@@ -715,7 +716,7 @@ Java_sun_nio_fs_UnixNativeDispatcher_futimes(JNIEnv* env, jclass this, jint file
+     if (my_futimesat_func != NULL) {
+         RESTARTABLE((*my_futimesat_func)(filedes, NULL, &times[0]), err);
+     } else {
+-        RESTARTABLE((*my_utimensat_func)(filedes, NULL, &times[0], 0), err);
++        RESTARTABLE((*my_utimensat_func)(filedes, NULL, &times2[0], 0), err);
+     }
+ #endif
+     if (err == -1) {
+-- 
+2.44.0
+

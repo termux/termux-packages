@@ -20,7 +20,10 @@ Add or increment TERMUX_PKG_REVISION of all the packages that have <package> in 
 """
 
 REPO_PATH = os.path.join("/".join(os.path.realpath(sys.argv[0]).split("/")[:-3]), "repo.json")
-FOLDERS = [os.path.join("/".join(os.path.realpath(sys.argv[0]).split("/")[:-3]),folder) for folder in list(json.load(open(REPO_PATH)).keys())]
+FOLDERS = []
+for folder in list(json.load(open(REPO_PATH)).keys()):
+    if folder != "pkg_format":
+        FOLDERS.append(folder)
 
 
 def is_dep(DEP: str, line: str) -> bool:
@@ -42,7 +45,7 @@ def get_build_dependent_files(folders: list, DEP: str) -> list:
     """
     Gets all the packages that depend on some package
     """
-    build_files = []
+    build_files = set()
     for d in folders:
         for folder in os.listdir(d):
             if os.path.exists(os.path.join(d, folder, "build.sh")):
@@ -52,8 +55,14 @@ def get_build_dependent_files(folders: list, DEP: str) -> list:
                             "TERMUX_PKG_BUILD_DEPENDS"
                         ):
                             if is_dep(DEP, line):
-                                build_files.append(os.path.join(d, folder, "build.sh"))
-                    file.close()
+                                build_files.add(os.path.join(d, folder, "build.sh"))
+                for subfile_name in os.listdir(os.path.join(d, folder)):
+                    if subfile_name.endswith(".subpackage.sh"):
+                        with open(os.path.join(d, folder, subfile_name)) as file:
+                            for line in file.read().split("\n"):
+                                if line.startswith("TERMUX_SUBPKG_DEPENDS"):
+                                    if is_dep(DEP, line):
+                                        build_files.add(os.path.join(d, folder, "build.sh"))
     return build_files
 
 

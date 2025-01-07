@@ -2,17 +2,21 @@ TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/gdb/
 TERMUX_PKG_DESCRIPTION="The standard GNU Debugger that runs on many Unix-like systems and works for many programming languages"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=12.1
-TERMUX_PKG_REVISION=1
+# This package depends on libpython${TERMUX_PYTHON_VERSION}.so.
+# Please revbump and rebuild when bumping TERMUX_PYTHON_VERSION.
+TERMUX_PKG_VERSION="15.2"
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/gdb/gdb-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=0e1793bf8f2b54d53f46dea84ccfd446f48f81b297b28c4f7fc017b818d69fed
-TERMUX_PKG_DEPENDS="libc++, liblzma, libexpat, readline, ncurses, libmpfr, python, zlib, libthread-db"
+TERMUX_PKG_SHA256=83350ccd35b5b5a0cba6b334c41294ea968158c573940904f00b92f76345314d
+TERMUX_PKG_DEPENDS="guile, libc++, libexpat, libgmp, libiconv, liblzma, libmpfr, libthread-db, ncurses, python, readline, zlib, zstd"
 TERMUX_PKG_BREAKS="gdb-dev"
 TERMUX_PKG_REPLACES="gdb-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--disable-shared
 --disable-werror
 --with-system-readline
+--with-system-zlib
 --with-curses
+--with-guile
 --with-python=$TERMUX_PREFIX/bin/python
 ac_cv_func_getpwent=no
 ac_cv_func_getpwnam=no
@@ -21,6 +25,10 @@ TERMUX_PKG_RM_AFTER_INSTALL="share/gdb/syscalls share/gdb/system-gdbinit"
 TERMUX_PKG_MAKE_INSTALL_TARGET="-C gdb install"
 
 termux_step_pre_configure() {
+	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
+		export ac_cv_guild_program_name=/usr/bin/guild-3.0
+	fi
+
 	# Fix "undefined reference to 'rpl_gettimeofday'" when building:
 	export gl_cv_func_gettimeofday_clobber=no
 	export gl_cv_func_gettimeofday_posix_signature=yes
@@ -34,4 +42,8 @@ termux_step_pre_configure() {
 	export gl_cv_func_getcwd_path_max=yes
 
 	LDFLAGS+=" $($CC -print-libgcc-file-name)"
+}
+
+termux_step_post_make_install() {
+	install -Dm700 -t $TERMUX_PREFIX/bin gdbserver/gdbserver
 }

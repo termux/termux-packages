@@ -4,8 +4,8 @@
  from ipaddress import IPv4Address, IPv6Address
  
  ROOTKEY="none"
--cauldron = ( "/var/lib/unbound/root.anchor", "/var/lib/unbound/root.key", "/etc/unbound/root.key" )
-+cauldron = ( "@TERMUX_PREFIX@/var/lib/unbound/root.anchor", "@TERMUX_PREFIX@/var/lib/unbound/root.key", "@TERMUX_PREFIX@/etc/unbound/root.key" )
+-cauldron = ( "/var/lib/unbound/root.anchor", "/var/lib/unbound/root.key", "/etc/unbound/root.key", "/usr/share/dns/root.key" )
++cauldron = ( "@TERMUX_PREFIX@/var/lib/unbound/root.anchor", "@TERMUX_PREFIX@/var/lib/unbound/root.key", "@TERMUX_PREFIX@/etc/unbound/root.key", "@TERMUX_PREFIX@/share/dns/root.key" )
  for root in cauldron:
  	if os.path.isfile(root):
  		ROOTKEY=root

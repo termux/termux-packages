@@ -4,10 +4,10 @@ TERMUX_PKG_LICENSE="AGPL-V3"
 TERMUX_PKG_MAINTAINER="@termux"
 _POVRAY_VERSION_BASE=3.8
 TERMUX_PKG_VERSION=${_POVRAY_VERSION_BASE}.0-beta.2
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_REVISION=11
 TERMUX_PKG_SRCURL=https://github.com/POV-Ray/povray/releases/download/v${TERMUX_PKG_VERSION}/povunix-v${TERMUX_PKG_VERSION}-src.tar.gz
 TERMUX_PKG_SHA256=4717c9bed114deec47cf04a8175cc4060dafc159f26e7896480a60f4411ca5ad
-TERMUX_PKG_DEPENDS="boost, libc++, libjpeg-turbo, libpng, libtiff, openexr, povray-data, zlib"
+TERMUX_PKG_DEPENDS="boost, imath, libc++, libjpeg-turbo, libpng, libtiff, openexr, povray-data, zlib"
 TERMUX_PKG_BUILD_DEPENDS="boost-headers"
 TERMUX_PKG_RM_AFTER_INSTALL="
 share/doc/povray-*/html
@@ -33,7 +33,8 @@ COMPILED_BY=Termux
 termux_step_pre_configure() {
 	# Fast is justice.
 	CFLAGS+=" -Ofast"
-	CXXFLAGS+=" -Ofast"
+	# Code uses std::auto_ptr removed in c++17:
+	CXXFLAGS+=" -Ofast -std=c++11"
 }
 
 termux_step_create_debscripts() {

@@ -1,34 +1,30 @@
 TERMUX_PKG_HOMEPAGE=https://www.borgbackup.org/
 TERMUX_PKG_DESCRIPTION="Deduplicating and compressing backup program"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
-TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.1.17
-TERMUX_PKG_REVISION=9
+TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
+TERMUX_PKG_VERSION="1.4.0"
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/borgbackup/borg/releases/download/${TERMUX_PKG_VERSION}/borgbackup-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=7ab924fc017b24929bedceba0dcce16d56f9868bf9b5050d2aae2eb080671674
-# Cannot be updated to 1.2.0 (or newer) as it requires external python package
-#TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_SHA256=c54c45155643fa66fed7f9ff2d134ea0a58d0ac197c18781ddc2fb236bf6ed29
 TERMUX_PKG_DEPENDS="libacl, liblz4, openssl, python, xxhash, zstd"
-TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_PYTHON_COMMON_DEPS="build, Cython, pkgconfig, setuptools, setuptools-scm, wheel"
+TERMUX_PKG_PYTHON_TARGET_DEPS="'msgpack==1.0.8', packaging"
+TERMUX_PKG_AUTO_UPDATE=true
 
-_PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
-
-termux_step_pre_configure() {
-	termux_setup_python_crossenv
-	pushd $TERMUX_PYTHON_CROSSENV_SRCDIR
-	_CROSSENV_PREFIX=$TERMUX_PKG_BUILDDIR/python-crossenv-prefix
-	python${_PYTHON_VERSION} -m crossenv \
-		$TERMUX_PREFIX/bin/python${_PYTHON_VERSION} \
-		${_CROSSENV_PREFIX}
-	popd
-	. ${_CROSSENV_PREFIX}/bin/activate
-
-	build-pip install Cython wheel
-
-	LDFLAGS+=" -lpython${_PYTHON_VERSION}"
+termux_step_make() {
+	PYTHONPATH='' python -m build -w -n -x "$TERMUX_PKG_SRCDIR"
 }
 
 termux_step_make_install() {
-	export PYTHONPATH=$TERMUX_PREFIX/lib/python${_PYTHON_VERSION}/site-packages
-	pip install --no-deps . --prefix $TERMUX_PREFIX
+	local _pyver="${TERMUX_PYTHON_VERSION//./}"
+	local _wheel="borgbackup-${TERMUX_PKG_VERSION}-cp${_pyver}-cp${_pyver}-linux_${TERMUX_ARCH}.whl"
+	pip install --no-deps --prefix="$TERMUX_PREFIX" "$TERMUX_PKG_SRCDIR/dist/${_wheel}"
+}
+
+termux_step_create_debscripts() {
+	cat <<- EOF > ./postinst
+	#!$TERMUX_PREFIX/bin/sh
+	echo "Installing dependencies through pip..."
+	pip3 install $TERMUX_PKG_PYTHON_TARGET_DEPS
+	EOF
 }

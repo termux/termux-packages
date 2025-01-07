@@ -1,0 +1,153 @@
+diff -uNr a/third_party/swiftshader/src/Vulkan/VkGetProcAddress.cpp b/third_party/swiftshader/src/Vulkan/VkGetProcAddress.cpp
+--- a/src/Vulkan/VkGetProcAddress.cpp	2022-11-09 09:30:26.242905400 +0800
++++ b/src/Vulkan/VkGetProcAddress.cpp	2022-11-11 20:35:03.121029060 +0800
+@@ -19,7 +19,7 @@
+ #include <unordered_map>
+ #include <vector>
+ 
+-#ifdef __ANDROID__
++#if (defined(__ANDROID__) && !defined(__TERMUX__))
+ #	include <hardware/hwvulkan.h>
+ #	include <vulkan/vk_android_native_buffer.h>
+ #	include <cerrno>
+@@ -105,7 +105,7 @@
+ 	MAKE_VULKAN_INSTANCE_ENTRY(vkSubmitDebugUtilsMessageEXT),
+ 	// VK_EXT_tooling_info
+ 	MAKE_VULKAN_INSTANCE_ENTRY(vkGetPhysicalDeviceToolProperties),
+-#ifndef __ANDROID__
++#if !(defined(__ANDROID__) && !defined(__TERMUX__))
+ 	// VK_KHR_surface
+ 	MAKE_VULKAN_INSTANCE_ENTRY(vkDestroySurfaceKHR),
+ 	MAKE_VULKAN_INSTANCE_ENTRY(vkGetPhysicalDeviceSurfaceSupportKHR),
+@@ -310,7 +310,7 @@
+ 	MAKE_VULKAN_DEVICE_ENTRY(vkQueueInsertDebugUtilsLabelEXT),
+ 	MAKE_VULKAN_DEVICE_ENTRY(vkSetDebugUtilsObjectNameEXT),
+ 	MAKE_VULKAN_DEVICE_ENTRY(vkSetDebugUtilsObjectTagEXT),
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ 	MAKE_VULKAN_DEVICE_ENTRY(vkGetSwapchainGrallocUsageANDROID),
+ 	MAKE_VULKAN_DEVICE_ENTRY(vkGetSwapchainGrallocUsage2ANDROID),
+ 	MAKE_VULKAN_DEVICE_ENTRY(vkAcquireImageANDROID),
+@@ -535,7 +535,7 @@
+ 	        MAKE_VULKAN_DEVICE_ENTRY(vkCmdWriteTimestamp2KHR),
+ 	        MAKE_VULKAN_DEVICE_ENTRY(vkQueueSubmit2KHR),
+ 	    } },
+-#ifndef __ANDROID__
++#if !(defined(__ANDROID__) && !defined(__TERMUX__))
+ 	// VK_KHR_swapchain
+ 	{
+ 	    VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+@@ -680,7 +680,7 @@
+ 
+ }  // namespace vk
+ 
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ 
+ extern "C" hwvulkan_module_t HAL_MODULE_INFO_SYM;
+ 
+diff -uNr a/third_party/swiftshader/src/Vulkan/VkImage.hpp b/third_party/swiftshader/src/Vulkan/VkImage.hpp
+--- a/src/Vulkan/VkImage.hpp	2022-11-09 09:30:26.242905400 +0800
++++ b/src/Vulkan/VkImage.hpp	2022-11-11 20:35:31.971028682 +0800
+@@ -20,7 +20,7 @@
+ 
+ #include "marl/mutex.h"
+ 
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ #	include <vulkan/vk_android_native_buffer.h>  // For VkSwapchainImageUsageFlagsANDROID and buffer_handle_t
+ #endif
+ 
+@@ -33,7 +33,7 @@
+ class DeviceMemory;
+ class ImageView;
+ 
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ struct BackingMemory
+ {
+ 	int stride = 0;
+@@ -49,7 +49,7 @@
+ 	Image(const VkImageCreateInfo *pCreateInfo, void *mem, Device *device);
+ 	void destroy(const VkAllocationCallbacks *pAllocator);
+ 
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ 	VkResult prepareForExternalUseANDROID() const;
+ #endif
+ 
+@@ -107,7 +107,7 @@
+ 	void contentsChanged(const VkImageSubresourceRange &subresourceRange, ContentsChangedContext contentsChangedContext = DIRECT_MEMORY_ACCESS);
+ 	const Image *getSampledImage(const vk::Format &imageViewFormat) const;
+ 
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ 	void setBackingMemory(BackingMemory &bm)
+ 	{
+ 		backingMemory = bm;
+@@ -153,7 +153,7 @@
+ 	VkImageTiling tiling = VK_IMAGE_TILING_OPTIMAL;
+ 	VkImageUsageFlags usage = (VkImageUsageFlags)0;
+ 	Image *decompressedImage = nullptr;
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ 	BackingMemory backingMemory = {};
+ #endif
+ 
+diff -uNr a/third_party/swiftshader/src/Vulkan/VkPhysicalDevice.cpp b/third_party/swiftshader/src/Vulkan/VkPhysicalDevice.cpp
+--- a/src/Vulkan/VkPhysicalDevice.cpp	2022-11-09 09:30:26.242905400 +0800
++++ b/src/Vulkan/VkPhysicalDevice.cpp	2022-11-11 20:35:42.081028550 +0800
+@@ -22,7 +22,7 @@
+ #include <cstring>
+ #include <limits>
+ 
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ #	include <android/hardware_buffer.h>
+ #endif
+ 
+@@ -971,7 +971,7 @@
+ 	properties->combinedImageSamplerDescriptorCount = 1;  // Need only one descriptor for YCbCr sampling.
+ }
+ 
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ void PhysicalDevice::getProperties(VkPhysicalDevicePresentationPropertiesANDROID *properties) const
+ {
+ 	properties->sharedImage = VK_FALSE;
+diff -uNr a/third_party/swiftshader/src/Vulkan/VkPhysicalDevice.hpp b/third_party/swiftshader/src/Vulkan/VkPhysicalDevice.hpp
+--- a/src/Vulkan/VkPhysicalDevice.hpp	2022-11-09 09:30:26.242905400 +0800
++++ b/src/Vulkan/VkPhysicalDevice.hpp	2022-11-11 20:35:45.861028500 +0800
+@@ -69,7 +69,7 @@
+ 	void getProperties(const VkExternalMemoryHandleTypeFlagBits *handleType, VkExternalImageFormatProperties *properties) const;
+ 	void getProperties(const VkExternalMemoryHandleTypeFlagBits *handleType, VkExternalBufferProperties *properties) const;
+ 	void getProperties(VkSamplerYcbcrConversionImageFormatProperties *properties) const;
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ 	void getProperties(VkPhysicalDevicePresentationPropertiesANDROID *properties) const;
+ 	void getProperties(const VkPhysicalDeviceImageFormatInfo2 *pImageFormatInfo, VkAndroidHardwareBufferUsageANDROID *properties) const;
+ #endif
+diff -uNr a/third_party/swiftshader/src/Vulkan/VkQueue.cpp b/third_party/swiftshader/src/Vulkan/VkQueue.cpp
+--- a/src/Vulkan/VkQueue.cpp	2022-11-09 09:30:26.242905400 +0800
++++ b/src/Vulkan/VkQueue.cpp	2022-11-11 20:35:52.181028418 +0800
+@@ -189,7 +189,7 @@
+ 	}
+ }
+ 
+-#ifndef __ANDROID__
++#if !(defined(__ANDROID__) && !defined(__TERMUX__))
+ VkResult Queue::present(const VkPresentInfoKHR *presentInfo)
+ {
+ 	// This is a hack to deal with screen tearing for now.
+diff -uNr a/third_party/swiftshader/src/Vulkan/VkQueue.hpp b/third_party/swiftshader/src/Vulkan/VkQueue.hpp
+--- a/src/Vulkan/VkQueue.hpp	2022-11-09 09:30:26.242905400 +0800
++++ b/src/Vulkan/VkQueue.hpp	2022-11-11 21:03:39.721006571 +0800
+@@ -53,7 +53,7 @@
+ 
+ 	VkResult submit(uint32_t submitCount, SubmitInfo *pSubmits, Fence *fence);
+ 	VkResult waitIdle();
+-#ifndef __ANDROID__
++#if !(defined(__ANDROID__) && !defined(__TERMUX__))
+ 	VkResult present(const VkPresentInfoKHR *presentInfo);
+ #endif
+ 

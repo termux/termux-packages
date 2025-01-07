@@ -1,0 +1,13 @@
+diff --git a/cmake/Dependencies.cmake b/cmake/Dependencies.cmake
+index c4661e3..0e0150d 100644
+--- a/cmake/Dependencies.cmake
++++ b/cmake/Dependencies.cmake
+@@ -873,7 +873,7 @@ if(BUILD_PYTHON)
+   if(Python_Development.Module_FOUND)
+     if(USE_NUMPY)
+       if(NOT Python_NumPy_FOUND)
+-        message(WARNING "NumPy could not be found. Not building with NumPy. Suppress this warning with -DUSE_NUMPY=OFF")
++        message(FATAL_ERROR "NumPy could not be found. Not building with NumPy. Suppress this warning with -DUSE_NUMPY=OFF")
+         caffe2_update_option(USE_NUMPY OFF)
+       else()
+         caffe2_update_option(USE_NUMPY ON)

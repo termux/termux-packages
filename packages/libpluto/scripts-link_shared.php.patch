@@ -1,0 +1,13 @@
+diff --git a/scripts/link_shared.php b/scripts/link_shared.php
+index 09311c0..d69b8c9 100644
+--- a/scripts/link_shared.php
++++ b/scripts/link_shared.php
+@@ -9,7 +9,7 @@ if (PHP_OS_FAMILY == "Darwin")
+ }
+ else
+ {
+-	$cmd = $compiler." -shared -o src/libpluto.so";
++	$cmd = $compiler." -shared -Wl,-soname,libpluto.so -o src/libpluto.so";
+ }
+ 
+ for_each_obj(function($file)

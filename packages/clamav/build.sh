@@ -2,9 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://www.clamav.net/
 TERMUX_PKG_DESCRIPTION="Anti-virus toolkit for Unix"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.105.1
+TERMUX_PKG_VERSION="1.4.1"
 TERMUX_PKG_SRCURL=https://www.clamav.net/downloads/production/clamav-$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=d2bc16374db889a6e5a6ac40f8c6e700254a039acaa536885a09eeea4b8529f6
+TERMUX_PKG_SHA256=a318e780ac39a6b3d6c46971382f96edde97ce48b8e361eb80e63415ed416ad8
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="json-c, libandroid-support, libbz2, libc++, libcurl, libiconv, libxml2, ncurses, openssl, pcre2, zlib"
 TERMUX_PKG_BREAKS="clamav-dev"
 TERMUX_PKG_REPLACES="clamav-dev"
@@ -28,6 +29,17 @@ etc/clamav/clamd.conf
 etc/clamav/freshclam.conf"
 
 termux_step_pre_configure() {
+	local _lib="$TERMUX_PKG_BUILDDIR/_syncfs/lib"
+	rm -rf "${_lib}"
+	mkdir -p "${_lib}"
+	pushd "${_lib}"/..
+	$CC $CFLAGS $CPPFLAGS "$TERMUX_PKG_BUILDER_DIR/syncfs.c" \
+		-fvisibility=hidden -c -o ./syncfs.o
+	$AR cru "${_lib}"/libsyncfs.a ./syncfs.o
+	popd
+
+	LDFLAGS+=" -L${_lib} -l:libsyncfs.a"
+
 	termux_setup_rust
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DRUST_COMPILER_TARGET=$CARGO_TARGET_NAME"
 }

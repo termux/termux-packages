@@ -1,0 +1,271 @@
+--- a/zig/lib/libc/musl/src/ipc/semtimedop.c
++++ b/zig/lib/libc/musl/src/ipc/semtimedop.c
+@@ -16,7 +16,7 @@
+ 
+ int semtimedop(int id, struct sembuf *buf, size_t n, const struct timespec *ts)
+ {
+-#ifdef SYS_semtimedop_time64
++#if defined(SYS_semtimedop_time64) && !defined(__ILP32__)
+ 	time_t s = ts ? ts->tv_sec : 0;
+ 	long ns = ts ? ts->tv_nsec : 0;
+ 	int r = -ENOSYS;
+--- a/zig/lib/libc/musl/src/linux/clock_adjtime.c
++++ b/zig/lib/libc/musl/src/linux/clock_adjtime.c
+@@ -37,7 +37,7 @@
+ int clock_adjtime (clockid_t clock_id, struct timex *utx)
+ {
+ 	int r = -ENOSYS;
+-#ifdef SYS_clock_adjtime64
++#if defined(SYS_clock_adjtime64) && !defined(__ILP32__)
+ 	struct ktimex64 ktx = {
+ 		.modes = utx->modes,
+ 		.offset = utx->offset,
+--- a/zig/lib/libc/musl/src/linux/ppoll.c
++++ b/zig/lib/libc/musl/src/linux/ppoll.c
+@@ -11,7 +11,7 @@
+ {
+ 	time_t s = to ? to->tv_sec : 0;
+ 	long ns = to ? to->tv_nsec : 0;
+-#ifdef SYS_ppoll_time64
++#if defined(SYS_ppoll_time64) && !defined(__ILP32__)
+ 	int r = -ENOSYS;
+ 	if (SYS_ppoll == SYS_ppoll_time64 || !IS32BIT(s))
+ 		r = __syscall_cp(SYS_ppoll_time64, fds, n,
+--- a/zig/lib/libc/musl/src/linux/timerfd.c
++++ b/zig/lib/libc/musl/src/linux/timerfd.c
+@@ -11,7 +11,7 @@
+ 
+ int timerfd_settime(int fd, int flags, const struct itimerspec *new, struct itimerspec *old)
+ {
+-#ifdef SYS_timerfd_settime64
++#if defined(SYS_timerfd_settime64) && !defined(__ILP32__)
+ 	time_t is = new->it_interval.tv_sec, vs = new->it_value.tv_sec;
+ 	long ins = new->it_interval.tv_nsec, vns = new->it_value.tv_nsec;
+ 	int r = -ENOSYS;
+@@ -39,7 +39,7 @@
+ 
+ int timerfd_gettime(int fd, struct itimerspec *cur)
+ {
+-#ifdef SYS_timerfd_gettime64
++#if defined(SYS_timerfd_gettime64) && !defined(__ILP32__)
+ 	int r = -ENOSYS;
+ 	if (sizeof(time_t) > 4)
+ 		r = __syscall(SYS_timerfd_gettime64, fd, cur);
+--- a/zig/lib/libc/musl/src/linux/wait4.c
++++ b/zig/lib/libc/musl/src/linux/wait4.c
+@@ -8,7 +8,7 @@
+ pid_t wait4(pid_t pid, int *status, int options, struct rusage *ru)
+ {
+ 	int r;
+-#ifdef SYS_wait4_time64
++#if defined(SYS_wait4_time64) && !defined(__ILP32__)
+ 	if (ru) {
+ 		long long kru64[18];
+ 		r = __syscall(SYS_wait4_time64, pid, status, options, kru64);
+--- a/zig/lib/libc/musl/src/misc/getrusage.c
++++ b/zig/lib/libc/musl/src/misc/getrusage.c
+@@ -6,7 +6,7 @@
+ int getrusage(int who, struct rusage *ru)
+ {
+ 	int r;
+-#ifdef SYS_getrusage_time64
++#if defined(SYS_getrusage_time64) && !defined(__ILP32__)
+ 	long long kru64[18];
+ 	r = __syscall(SYS_getrusage_time64, who, kru64);
+ 	if (!r) {
+--- a/zig/lib/libc/musl/src/mq/mq_timedsend.c
++++ b/zig/lib/libc/musl/src/mq/mq_timedsend.c
+@@ -7,7 +7,7 @@
+ 
+ int mq_timedsend(mqd_t mqd, const char *msg, size_t len, unsigned prio, const struct timespec *at)
+ {
+-#ifdef SYS_mq_timedsend_time64
++#if defined(SYS_mq_timedsend_time64) && !defined(__ILP32__)
+ 	time_t s = at ? at->tv_sec : 0;
+ 	long ns = at ? at->tv_nsec : 0;
+ 	long r = -ENOSYS;
+--- a/zig/lib/libc/musl/src/network/recvmmsg.c
++++ b/zig/lib/libc/musl/src/network/recvmmsg.c
+@@ -18,7 +18,7 @@
+ 	for (i = vlen; i; i--, mh++)
+ 		mh->msg_hdr.__pad1 = mh->msg_hdr.__pad2 = 0;
+ #endif
+-#ifdef SYS_recvmmsg_time64
++#if defined(SYS_recvmmsg_time64) && !defined(__ILP32__)
+ 	time_t s = timeout ? timeout->tv_sec : 0;
+ 	long ns = timeout ? timeout->tv_nsec : 0;
+ 	int r = __syscall_cp(SYS_recvmmsg_time64, fd, msgvec, vlen, flags,
+--- a/zig/lib/libc/musl/src/select/pselect.c
++++ b/zig/lib/libc/musl/src/select/pselect.c
+@@ -12,7 +12,7 @@
+ 	syscall_arg_t data[2] = { (uintptr_t)mask, _NSIG/8 };
+ 	time_t s = ts ? ts->tv_sec : 0;
+ 	long ns = ts ? ts->tv_nsec : 0;
+-#ifdef SYS_pselect6_time64
++#if defined(SYS_pselect6_time64) && !defined(__ILP32__)
+ 	int r = -ENOSYS;
+ 	if (SYS_pselect6 == SYS_pselect6_time64 || !IS32BIT(s))
+ 		r = __syscall_cp(SYS_pselect6_time64, n, rfds, wfds, efds,
+--- a/zig/lib/libc/musl/src/select/select.c
++++ b/zig/lib/libc/musl/src/select/select.c
+@@ -25,7 +25,7 @@
+ 		ns = us*1000;
+ 	}
+ 
+-#ifdef SYS_pselect6_time64
++#if defined(SYS_pselect6_time64) && !defined(__ILP32__)
+ 	int r = -ENOSYS;
+ 	if (SYS_pselect6 == SYS_pselect6_time64 || !IS32BIT(s))
+ 		r = __syscall_cp(SYS_pselect6_time64, n, rfds, wfds, efds,
+--- a/zig/lib/libc/musl/src/signal/sigtimedwait.c
++++ b/zig/lib/libc/musl/src/signal/sigtimedwait.c
+@@ -7,7 +7,7 @@
+ 
+ static int do_sigtimedwait(const sigset_t *restrict mask, siginfo_t *restrict si, const struct timespec *restrict ts)
+ {
+-#ifdef SYS_rt_sigtimedwait_time64
++#if defined(SYS_rt_sigtimedwait_time64) && !defined(__ILP32__)
+ 	time_t s = ts ? ts->tv_sec : 0;
+ 	long ns = ts ? ts->tv_nsec : 0;
+ 	int r = -ENOSYS;
+--- a/zig/lib/libc/musl/src/stat/fstatat.c
++++ b/zig/lib/libc/musl/src/stat/fstatat.c
+@@ -7,6 +7,9 @@
+ #include <sys/sysmacros.h>
+ #include "syscall.h"
+ 
++#undef SYS_lstat
++#undef SYS_stat
++
+ struct statx {
+ 	uint32_t stx_mask;
+ 	uint32_t stx_blksize;
+@@ -139,14 +142,18 @@
+ {
+ 	int ret;
+ #ifdef SYS_fstatat
++#if 0
+ 	if (sizeof((struct kstat){0}.st_atime_sec) < sizeof(time_t)) {
+ 		ret = fstatat_statx(fd, path, st, flag);
+ 		if (ret!=-ENOSYS) return __syscall_ret(ret);
+ 	}
++#endif
+ 	ret = fstatat_kstat(fd, path, st, flag);
+ #else
++#if 0
+ 	ret = fstatat_statx(fd, path, st, flag);
+ #endif
++#endif
+ 	return __syscall_ret(ret);
+ }
+ 
+--- a/zig/lib/libc/musl/src/stat/utimensat.c
++++ b/zig/lib/libc/musl/src/stat/utimensat.c
+@@ -12,7 +12,7 @@
+ 	int r;
+ 	if (times && times[0].tv_nsec==UTIME_NOW && times[1].tv_nsec==UTIME_NOW)
+ 		times = 0;
+-#ifdef SYS_utimensat_time64
++#if defined(SYS_utimensat_time64) && !defined(__ILP32__)
+ 	r = -ENOSYS;
+ 	time_t s0=0, s1=0;
+ 	long ns0=0, ns1=0;
+--- a/zig/lib/libc/musl/src/thread/__timedwait.c
++++ b/zig/lib/libc/musl/src/thread/__timedwait.c
+@@ -11,7 +11,7 @@
+ static int __futex4_cp(volatile void *addr, int op, int val, const struct timespec *to)
+ {
+ 	int r;
+-#ifdef SYS_futex_time64
++#if defined(SYS_futex_time64) && !defined(__ILP32__)
+ 	time_t s = to ? to->tv_sec : 0;
+ 	long ns = to ? to->tv_nsec : 0;
+ 	r = -ENOSYS;
+--- a/zig/lib/libc/musl/src/thread/pthread_mutex_timedlock.c
++++ b/zig/lib/libc/musl/src/thread/pthread_mutex_timedlock.c
+@@ -5,7 +5,7 @@
+ 
+ static int __futex4(volatile void *addr, int op, int val, const struct timespec *to)
+ {
+-#ifdef SYS_futex_time64
++#if defined(SYS_futex_time64) && !defined(__ILP32__)
+ 	time_t s = to ? to->tv_sec : 0;
+ 	long ns = to ? to->tv_nsec : 0;
+ 	int r = -ENOSYS;
+--- a/zig/lib/libc/musl/src/time/clock_gettime.c
++++ b/zig/lib/libc/musl/src/time/clock_gettime.c
+@@ -75,7 +75,7 @@
+ 	}
+ #endif
+ 
+-#ifdef SYS_clock_gettime64
++#if defined(SYS_clock_gettime64) && !defined(__ILP32__)
+ 	r = -ENOSYS;
+ 	if (sizeof(time_t) > 4)
+ 		r = __syscall(SYS_clock_gettime64, clk, ts);
+--- a/zig/lib/libc/musl/src/time/clock_nanosleep.c
++++ b/zig/lib/libc/musl/src/time/clock_nanosleep.c
+@@ -8,7 +8,7 @@
+ int __clock_nanosleep(clockid_t clk, int flags, const struct timespec *req, struct timespec *rem)
+ {
+ 	if (clk == CLOCK_THREAD_CPUTIME_ID) return EINVAL;
+-#ifdef SYS_clock_nanosleep_time64
++#if defined(SYS_clock_nanosleep_time64) && !defined(__ILP32__)
+ 	time_t s = req->tv_sec;
+ 	long ns = req->tv_nsec;
+ 	int r = -ENOSYS;
+--- a/zig/lib/libc/musl/src/time/clock_settime.c
++++ b/zig/lib/libc/musl/src/time/clock_settime.c
+@@ -6,7 +6,7 @@
+ 
+ int clock_settime(clockid_t clk, const struct timespec *ts)
+ {
+-#ifdef SYS_clock_settime64
++#if defined(SYS_clock_settime64) && !defined(__ILP32__)
+ 	time_t s = ts->tv_sec;
+ 	long ns = ts->tv_nsec;
+ 	int r = -ENOSYS;
+--- a/zig/lib/libc/musl/src/time/timer_gettime.c
++++ b/zig/lib/libc/musl/src/time/timer_gettime.c
+@@ -8,7 +8,7 @@
+ 		pthread_t td = (void *)((uintptr_t)t << 1);
+ 		t = (void *)(uintptr_t)(td->timer_id & INT_MAX);
+ 	}
+-#ifdef SYS_timer_gettime64
++#if defined(SYS_timer_gettime64) && !defined(__ILP32__)
+ 	int r = -ENOSYS;
+ 	if (sizeof(time_t) > 4)
+ 		r = __syscall(SYS_timer_gettime64, t, val);
+--- a/zig/lib/libc/musl/src/time/timer_settime.c
++++ b/zig/lib/libc/musl/src/time/timer_settime.c
+@@ -10,7 +10,7 @@
+ 		pthread_t td = (void *)((uintptr_t)t << 1);
+ 		t = (void *)(uintptr_t)(td->timer_id & INT_MAX);
+ 	}
+-#ifdef SYS_timer_settime64
++#if defined(SYS_timer_settime64) && !defined(__ILP32__)
+ 	time_t is = val->it_interval.tv_sec, vs = val->it_value.tv_sec;
+ 	long ins = val->it_interval.tv_nsec, vns = val->it_value.tv_nsec;
+ 	int r = -ENOSYS;
+--- a/zig/lib/libc/musl/src/unistd/access.c
++++ b/zig/lib/libc/musl/src/unistd/access.c
+@@ -4,7 +4,7 @@
+ 
+ int access(const char *filename, int amode)
+ {
+-#ifdef SYS_access
++#if defined(SYS_access) && !defined(__LP64__)
+ 	return syscall(SYS_access, filename, amode);
+ #else
+ 	return syscall(SYS_faccessat, AT_FDCWD, filename, amode, 0);
+--- a/zig/lib/libc/musl/src/unistd/pipe.c
++++ b/zig/lib/libc/musl/src/unistd/pipe.c
+@@ -3,7 +3,7 @@
+ 
+ int pipe(int fd[2])
+ {
+-#ifdef SYS_pipe
++#if defined(SYS_pipe) && !defined(__LP64__)
+ 	return syscall(SYS_pipe, fd);
+ #else
+ 	return syscall(SYS_pipe2, fd, 0);

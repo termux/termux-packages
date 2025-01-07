@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 show_help () {
 echo "usage: llvm-config <OPTION>... [<COMPONENT>...]
 
@@ -11,11 +11,11 @@ LLVM.  Typically called from 'configure' scripts.  Examples:
 Options:
   --version         Print LLVM version.
   --prefix          Print the installation prefix.
-  --src-root        Print the source root LLVM was built from.
   --obj-root        Print the object root used to build LLVM.
   --bindir          Directory containing LLVM executables.
   --includedir      Directory containing LLVM headers.
   --libdir          Directory containing LLVM libraries.
+  --cmakedir        Directory containing LLVM CMake modules.
   --cppflags        C preprocessor flags for files that include LLVM headers.
   --cflags          C compiler flags for files that include LLVM headers.
   --cxxflags        C++ compiler flags for files that include LLVM headers.
@@ -44,75 +44,83 @@ prefix=@TERMUX_PREFIX@
 has_rtti=NO
 CPPFLAGS="-I${prefix}/include -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS"
 CFLAGS="${CPPFLAGS} ${CFLAGS}"
-CXXFLAGS="${CFLAGS} -std=c++14 -fno-exceptions"
+CXXFLAGS="${CFLAGS} -std=c++17 -fno-exceptions -funwind-tables"
 if [ "$has_rtti" != "YES" ]; then CXXFLAGS="$CXXFLAGS -fno-rtti"; fi
 LDFLAGS="-L${prefix}/lib"
-LIBFILE="${prefix}/lib/libLLVM-$version.so"
-components="aarch64 aarch64asmparser aarch64codegen aarch64desc \
-aarch64disassembler aarch64info aarch64utils aggressiveinstcombine all all-targets amdgpu \
-amdgpuasmparser amdgpucodegen amdgpudesc amdgpudisassembler amdgpuinfo amdgputargetmca amdgpuutils \
-analysis arc arccodegen arcdesc arcdissembler arcinfo arm armasmparser armcodegen armdesc \
-armdisassembler arminfo armutils asmparser asmprinter avr avrasmparser avrcodegen avrdesc \
-avrdisassembler avrinfo binaryformat bitreader bitstreamreader bitwriter bpf bpfasmparser \
-bpfcodegen bpfdesc bpfdisassembler bpfinfo csky cskyasmparser cskycodegen cskydesc cskyinfo \
-cfguard codegen core coroutines coverage debuginfocodeview debuginfodwarf \
-debuginfogsym debuginfomsf debuginfopdb demangle dlltooldriver dwarflinker dwp engine \
-executionengine extensions filecheck frontendopenacc frontendopenmp \
-fuzzmutate globalisel hexagon hexagonasmparser hexagoncodegen hexagondesc \
-hexagondisassembler hexagoninfo instcombine instrumentation interfacestub \
-interpreter ipo irreader jitlink lanai lanaiasmparser lanaicodegen lanaidesc \
-lanaidisassembler lanaiinfo libdriver lineeditor linker lto m68k m68kasmparser m68kcodegen \
-m68kdesc m68kdisassembler m68kinfo mc mca mcdisassembler mcjit mcparser mips mipsasmparser mipscodegen \
-mipsdesc mipsdisassembler mipsinfo mirparser msp430 msp430asmparser msp430codegen \
-msp430desc msp430disassembler msp430info native nativecodegen nvptx nvptxcodegen \
-nvptxdesc nvptxinfo objcarcopts object objectyaml option orcjit orcshared orctargetprocess passes powerpc \
-powerpcasmparser powerpccodegen powerpcdesc powerpcdisassembler powerpcinfo \
-profiledata remarks riscv riscvasmparser riscvcodegen riscvdesc riscvdisassembler riscvinfo \
-runtimedyld scalaropts selectiondag sparc sparcasmparser sparccodegen sparcdesc \
+LIBFILE="${prefix}/lib/libLLVM-${version/.*/}.so"
+components="aarch64 aarch64asmparser aarch64codegen aarch64desc aarch64disassembler \
+aarch64info aarch64utils aggressiveinstcombine all all-targets amdgpu amdgpuasmparser \
+amdgpucodegen amdgpudesc amdgpudisassembler amdgpuinfo amdgputargetmca amdgpuutils \
+analysis arc arccodegen arcdesc arcdisassembler arcinfo arm armasmparser armcodegen \
+armdesc armdisassembler arminfo armutils asmparser asmprinter avr avrasmparser \
+avrcodegen avrdesc avrdisassembler avrinfo binaryformat bitreader bitstreamreader \
+bitwriter bpf bpfasmparser bpfcodegen bpfdesc bpfdisassembler bpfinfo cfguard codegen codegendata \
+codegentypes core coroutines coverage csky cskyasmparser cskycodegen cskydesc cskydisassembler \
+cskyinfo debuginfobtf debuginfocodeview debuginfodwarf debuginfogsym debuginfologicalview \
+debuginfomsf debuginfopdb demangle dlltooldriver dwarflinker dwarflinkerclassic dwarflinkerparallel \
+dwp engine executionengine extensions filecheck frontenddriver frontendhlsl frontendoffloading \
+frontendopenacc frontendopenmp fuzzercli fuzzmutate globalisel hexagon hexagonasmparser hexagoncodegen \
+hexagondesc hexagondisassembler hexagoninfo hipstdpar instcombine instrumentation interfacestub \
+interpreter ipo irprinter irreader jitlink lanai lanaiasmparser lanaicodegen lanaidesc \
+lanaidisassembler lanaiinfo libdriver lineeditor linker loongarch loongarchasmparser \
+loongarchcodegen loongarchdesc loongarchdisassembler loongarchinfo lto m68k m68kasmparser \
+m68kcodegen m68kdesc m68kdisassembler m68kinfo mc mca mcdisassembler mcjit mcparser \
+mips mipsasmparser mipscodegen mipsdesc mipsdisassembler mipsinfo mirparser msp430 \
+msp430asmparser msp430codegen msp430desc msp430disassembler msp430info native \
+nativecodegen nvptx nvptxcodegen nvptxdesc nvptxinfo objcarcopts objcopy object \
+objectyaml option orcdebugging orcjit orcshared orctargetprocess passes powerpc powerpcasmparser \
+powerpccodegen powerpcdesc powerpcdisassembler powerpcinfo profiledata remarks \
+riscv riscvasmparser riscvcodegen riscvdesc riscvdisassembler riscvinfo riscvtargetmca \
+runtimedyld sandboxir scalaropts selectiondag sparc sparcasmparser sparccodegen sparcdesc \
 sparcdisassembler sparcinfo support symbolize systemz systemzasmparser systemzcodegen \
-systemzdesc systemzdisassembler systemzinfo tablegen target textapi transformutils ve veasmparser \
-vecodegen vedesc vedisassembler veinfo vectorize webassembly \
-webassemblyasmparser webassemblycodegen webassemblydesc webassemblydisassembler \
-webassemblyinfo webassemblyutils windowsmanifest x86 x86asmparser x86codegen x86desc x86disassembler x86info \
-x86targetmca xcore xcorecodegen xcoredesc xcoredisassembler xcoreinfo xray"
-static_libs="-lLLVMObjectYAML -lLLVMDlltoolDriver -lLLVMLineEditor -lLLVMFuzzMutate \
--lLLVMCoroutines -lLLVMLTO -lLLVMPasses -lLLVMObjCARCOpts -lLLVMTextAPI -lLLVMCoverage \
--lLLVMXRay -lLLVMInterpreter -lLLVMRemarks -lLLVMMIRParser -lLLVMDWP -lLLVMSymbolize -lLLVMDebugInfoPDB \
--lLLVMDebugInfoDWARF -lLLVMARCCodeGen -lLLVMARCDesc -lLLVMARCDisassembler -lLLVMARCInfo -lLLVMCSKYAsmParser \
--lLLVMCSKYCodeGen -lLLVMCSKYDesc -lLLVMCSKYInfo -lLLVMM68kAsmParser -lLLVMM68kCodeGen -lLLVMM68kDesc \
--lLLVMM68kDisassembler -lLLVMM68kInfo -lLLVMVEAsmParser -lLLVMVECodeGen -lLLVMVEDesc -lLLVMVEDisassembler \
--lLLVMVEInfo -lLLVMAVRAsmParser -lLLVMInterfaceStub -lLLVMFileCheck -lLLVMAVRCodeGen -lLLVMAVRDesc \
--lLLVMAVRDisassembler -lLLVMAVRInfo -lLLVMRISCVDisassembler -lLLVMRISCVCodeGen -lLLVMRISCVAsmParser \
--lLLVMRISCVDesc -lLLVMRISCVInfo -lLLVMXCoreDisassembler -lLLVMXCoreCodeGen \
--lLLVMXCoreDesc -lLLVMXCoreInfo -lLLVMX86Disassembler -lLLVMX86CodeGen -lLLVMX86AsmParser \
--lLLVMX86Desc -lLLVMX86Info -lLLVMX86TargetMCA -lLLVMWebAssemblyDisassembler \
--lLLVMWebAssemblyCodeGen -lLLVMWebAssemblyDesc -lLLVMWebAssemblyAsmParser \
--lLLVMWebAssemblyUtils -lLLVMWebAssemblyInfo -lLLVMSystemZDisassembler -lLLVMSystemZCodeGen \
--lLLVMSystemZAsmParser -lLLVMSystemZDesc -lLLVMSystemZInfo -lLLVMSparcDisassembler \
--lLLVMSparcCodeGen -lLLVMSparcAsmParser -lLLVMSparcDesc -lLLVMSparcInfo \
--lLLVMPowerPCDisassembler -lLLVMPowerPCCodeGen -lLLVMPowerPCAsmParser -lLLVMPowerPCDesc \
--lLLVMPowerPCInfo -lLLVMNVPTXCodeGen -lLLVMNVPTXDesc -lLLVMNVPTXInfo -lLLVMMSP430Disassembler \
--lLLVMMSP430CodeGen -lLLVMMSP430AsmParser -lLLVMMSP430Desc -lLLVMMSP430Info \
--lLLVMMipsDisassembler -lLLVMMipsCodeGen -lLLVMMipsAsmParser -lLLVMMipsDesc \
--lLLVMMipsInfo -lLLVMLanaiDisassembler -lLLVMLanaiCodeGen -lLLVMLanaiAsmParser \
--lLLVMLanaiDesc -lLLVMLanaiInfo -lLLVMHexagonDisassembler -lLLVMHexagonCodeGen \
--lLLVMHexagonAsmParser -lLLVMHexagonDesc -lLLVMHexagonInfo -lLLVMBPFDisassembler \
--lLLVMBPFCodeGen -lLLVMBPFAsmParser -lLLVMBPFDesc -lLLVMBPFInfo -lLLVMARMDisassembler \
--lLLVMARMCodeGen -lLLVMARMAsmParser -lLLVMARMDesc -lLLVMARMInfo -lLLVMARMUtils \
--lLLVMAMDGPUDisassembler -lLLVMAMDGPUCodeGen -lLLVMipo -lLLVMInstrumentation \
--lLLVMVectorize -lLLVMLinker -lLLVMIRReader -lLLVMAsmParser -lLLVMAMDGPUAsmParser \
--lLLVMAMDGPUDesc -lLLVMAMDGPUInfo -lLLVMAMDGPUTargetMCA -lLLVMAMDGPUUtils -lLLVMLibDriver -lLLVMOption \
--lLLVMWindowsManifest -lLLVMAArch64Disassembler -lLLVMMCDisassembler \
--lLLVMAArch64AsmParser -lLLVMMCJIT -lLLVMTableGen -lLLVMOrcJIT -lLLVMOrcTargetProcess -lLLVMOrcShared -lLLVMExecutionEngine \
--lLLVMRuntimeDyld -lLLVMBitstreamReader -lLLVMCFGuard -lLLVMFrontendOpenACC -lLLVMExtensions -lLLVMDWARFLinker \
--lLLVMDebugInfoGSYM -lLLVMFrontendOpenMP -lLLVMMCA -lLLVMAArch64CodeGen -lLLVMGlobalISel \
--lLLVMSelectionDAG -lLLVMAsmPrinter -lLLVMJITLink -lLLVMCodeGen \
--lLLVMTarget -lLLVMScalarOpts -lLLVMInstCombine -lLLVMAggressiveInstCombine \
--lLLVMTransformUtils -lLLVMBitWriter -lLLVMAnalysis -lLLVMProfileData -lLLVMObject \
--lLLVMMCParser -lLLVMBitReader -lLLVMCore -lLLVMAArch64Desc -lLLVMAArch64Info \
--lLLVMMC -lLLVMDebugInfoCodeView -lLLVMDebugInfoMSF -lLLVMBinaryFormat -lLLVMAArch64Utils \
--lLLVMSupport -lLLVMDemangle"
-shared_libs="-lLLVM-$version"
+systemzdesc systemzdisassembler systemzinfo tablegen target targetparser textapi textapibinaryreader \
+transformutils ve veasmparser vecodegen vectorize vedesc vedisassembler veinfo \
+webassembly webassemblyasmparser webassemblycodegen webassemblydesc webassemblydisassembler \
+webassemblyinfo webassemblyutils windowsdriver windowsmanifest x86 x86asmparser \
+x86codegen x86desc x86disassembler x86info x86targetmca xcore xcorecodegen xcoredesc \
+xcoredisassembler xcoreinfo xray"
+static_libs="-lLLVMWindowsManifest -lLLVMXRay -lLLVMLibDriver -lLLVMDlltoolDriver \
+-lLLVMCoverage -lLLVMLineEditor -lLLVMM68kDisassembler -lLLVMM68kAsmParser -lLLVMM68kCodeGen \
+-lLLVMM68kDesc -lLLVMM68kInfo -lLLVMCSKYDisassembler -lLLVMCSKYAsmParser -lLLVMCSKYCodeGen \
+-lLLVMCSKYDesc -lLLVMCSKYInfo -lLLVMARCDisassembler -lLLVMARCCodeGen -lLLVMARCDesc \
+-lLLVMARCInfo -lLLVMXCoreDisassembler -lLLVMXCoreCodeGen -lLLVMXCoreDesc -lLLVMXCoreInfo \
+-lLLVMX86TargetMCA -lLLVMX86Disassembler -lLLVMX86AsmParser -lLLVMX86CodeGen -lLLVMX86Desc \
+-lLLVMX86Info -lLLVMWebAssemblyDisassembler -lLLVMWebAssemblyAsmParser -lLLVMWebAssemblyCodeGen \
+-lLLVMWebAssemblyDesc -lLLVMWebAssemblyUtils -lLLVMWebAssemblyInfo -lLLVMVEDisassembler \
+-lLLVMVEAsmParser -lLLVMVECodeGen -lLLVMVEDesc -lLLVMVEInfo -lLLVMSystemZDisassembler \
+-lLLVMSystemZAsmParser -lLLVMSystemZCodeGen -lLLVMSystemZDesc -lLLVMSystemZInfo \
+-lLLVMSparcDisassembler -lLLVMSparcAsmParser -lLLVMSparcCodeGen -lLLVMSparcDesc \
+-lLLVMSparcInfo -lLLVMRISCVTargetMCA -lLLVMRISCVDisassembler -lLLVMRISCVAsmParser \
+-lLLVMRISCVCodeGen -lLLVMRISCVDesc -lLLVMRISCVInfo -lLLVMPowerPCDisassembler -lLLVMPowerPCAsmParser \
+-lLLVMPowerPCCodeGen -lLLVMPowerPCDesc -lLLVMPowerPCInfo -lLLVMNVPTXCodeGen -lLLVMNVPTXDesc \
+-lLLVMNVPTXInfo -lLLVMMSP430Disassembler -lLLVMMSP430AsmParser -lLLVMMSP430CodeGen \
+-lLLVMMSP430Desc -lLLVMMSP430Info -lLLVMMipsDisassembler -lLLVMMipsAsmParser -lLLVMMipsCodeGen \
+-lLLVMMipsDesc -lLLVMMipsInfo -lLLVMLoongArchDisassembler -lLLVMLoongArchAsmParser \
+-lLLVMLoongArchCodeGen -lLLVMLoongArchDesc -lLLVMLoongArchInfo -lLLVMLanaiDisassembler \
+-lLLVMLanaiCodeGen -lLLVMLanaiAsmParser -lLLVMLanaiDesc -lLLVMLanaiInfo -lLLVMHexagonDisassembler \
+-lLLVMHexagonCodeGen -lLLVMHexagonAsmParser -lLLVMHexagonDesc -lLLVMHexagonInfo -lLLVMHipStdPar \
+-lLLVMBPFDisassembler -lLLVMBPFAsmParser -lLLVMBPFCodeGen -lLLVMBPFDesc -lLLVMBPFInfo \
+-lLLVMAVRDisassembler -lLLVMAVRAsmParser -lLLVMAVRCodeGen -lLLVMAVRDesc -lLLVMAVRInfo \
+-lLLVMARMDisassembler -lLLVMARMAsmParser -lLLVMARMCodeGen -lLLVMARMDesc -lLLVMARMUtils \
+-lLLVMARMInfo -lLLVMAMDGPUTargetMCA -lLLVMAMDGPUDisassembler -lLLVMAMDGPUAsmParser \
+-lLLVMAMDGPUCodeGen -lLLVMAMDGPUDesc -lLLVMAMDGPUUtils -lLLVMAMDGPUInfo -lLLVMAArch64Disassembler \
+-lLLVMAArch64AsmParser -lLLVMAArch64CodeGen -lLLVMAArch64Desc -lLLVMAArch64Utils \
+-lLLVMAArch64Info -lLLVMOrcDebugging -lLLVMOrcJIT -lLLVMWindowsDriver -lLLVMMCJIT -lLLVMJITLink -lLLVMInterpreter \
+-lLLVMExecutionEngine -lLLVMRuntimeDyld -lLLVMOrcTargetProcess -lLLVMOrcShared -lLLVMDWP \
+-lLLVMDebugInfoLogicalView -lLLVMDebugInfoGSYM -lLLVMOption -lLLVMObjectYAML -lLLVMObjCopy \
+-lLLVMMCA -lLLVMMCDisassembler -lLLVMLTO -lLLVMCFGuard -lLLVMFrontendDriver -lLLVMFrontendOffloading \
+-lLLVMFrontendOpenACC -lLLVMFrontendHLSL -lLLVMExtensions -lPolly -lPollyISL -lLLVMPasses \
+-lLLVMCoroutines -lLLVMipo -lLLVMInstrumentation -lLLVMVectorize -lLLVMLinker \
+-lLLVMFrontendOpenMP -lLLVMDWARFLinkerClassic -lLLVMDWARFLinkerParallel -lLLVMDWARFLinker \
+-lLLVMGlobalISel -lLLVMMIRParser -lLLVMAsmPrinter -lLLVMSelectionDAG -lLLVMCodeGen -lLLVMCodeGenData -lLLVMCodeGenTypes \
+-lLLVMObjCARCOpts -lLLVMIRPrinter -lLLVMInterfaceStub -lLLVMFileCheck -lLLVMFuzzMutate \
+-lLLVMTarget -lLLVMSandboxIR -lLLVMScalarOpts -lLLVMInstCombine -lLLVMAggressiveInstCombine -lLLVMTransformUtils \
+-lLLVMBitWriter -lLLVMAnalysis -lLLVMProfileData -lLLVMSymbolize -lLLVMDebugInfoBTF -lLLVMDebugInfoPDB \
+-lLLVMDebugInfoMSF -lLLVMDebugInfoDWARF -lLLVMObject -lLLVMTextAPI -lLLVMTextAPIBinaryReader -lLLVMMCParser \
+-lLLVMIRReader -lLLVMAsmParser -lLLVMMC -lLLVMDebugInfoCodeView -lLLVMBitReader \
+-lLLVMFuzzerCLI -lLLVMCore -lLLVMRemarks -lLLVMBitstreamReader -lLLVMBinaryFormat \
+-lLLVMTargetParser -lLLVMTableGen -lLLVMSupport -lLLVMDemangle"
+shared_libs="-lLLVM-${version/.*/}"
 libs=$shared_libs
 handle_args () {
 	case "${1##--}" in
@@ -120,7 +128,6 @@ handle_args () {
 		link-static) libs=$static_libs ;;
 		version) echo "$version";;
 		prefix) echo "$prefix";;
-		src-root) echo "@TERMUX_PKG_SRCDIR@";;
 		obj-root) echo "$prefix";;
 		bindir) echo "$prefix/bin";;
 		includedir) echo "$prefix/include";;
@@ -129,12 +136,12 @@ handle_args () {
 		cflags) echo "$CFLAGS";;
 		cxxflags) echo "$CXXFLAGS";;
 		ldflags) echo "$LDFLAGS";;
-		system-libs) echo "-lc -ldl -lcurses -lz -lm";;
+		system-libs) echo "-lc -ldl -lz -lm -lzstd -ltinfo -lxml2";;
 		libs) echo "$libs";;
-		libnames) echo "libLLVM-$version.so";;
+		libnames) echo "libLLVM-${version/.*/}.so";;
 		libfiles) echo "$LIBFILE";;
 		components) echo "$components";;
-		targets-built) echo "AArch64 AMDGPU ARM AVR BPF Hexagon Lanai Mips MSP430 NVPTX PowerPC RISCV Sparc SystemZ WebAssembly X86 XCore";;
+		targets-built) echo "AArch64 AMDGPU ARM AVR BPF Hexagon Lanai LoongArch Mips MSP430 NVPTX PowerPC RISCV Sparc SystemZ VE WebAssembly X86 XCore ARC CSKY M68k";;
 		host-target) echo "@LLVM_DEFAULT_TARGET_TRIPLE@";;
 		build-mode) echo "Release";;
 		assertion-mode) echo "OFF";;

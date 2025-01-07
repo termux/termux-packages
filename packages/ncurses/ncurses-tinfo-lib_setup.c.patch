@@ -1,11 +1,10 @@
-diff -u -r ../src-patched/ncurses/tinfo/lib_setup.c ./ncurses/tinfo/lib_setup.c
---- ../src-patched/ncurses/tinfo/lib_setup.c	2015-07-11 10:03:50.340357853 -0400
-+++ ./ncurses/tinfo/lib_setup.c	2015-07-11 14:42:01.049867165 -0400
-@@ -352,21 +352,6 @@
- 		    _nc_setenv_num("COLUMNS", *colp);
+diff -u -r ../ncurses-snapshots-a480458efb0662531287f0c75116c0e91fe235cb/ncurses/tinfo/lib_setup.c ./ncurses/tinfo/lib_setup.c
+--- ../ncurses-snapshots-a480458efb0662531287f0c75116c0e91fe235cb/ncurses/tinfo/lib_setup.c	2024-08-31 22:38:42.000000000 +0000
++++ ./ncurses/tinfo/lib_setup.c	2024-09-08 13:16:55.592141493 +0000
+@@ -561,21 +561,6 @@
  		}
  	    }
--
+ 
 -	    /*
 -	     * Finally, look for environment variables.
 -	     *
@@ -13,13 +12,14 @@ diff -u -r ../src-patched/ncurses/tinfo/lib_setup.c ./ncurses/tinfo/lib_setup.c
 -	     * variable.
 -	     */
 -	    if ((value = _nc_getenv_num("LINES")) > 0) {
--		*linep = value;
+-		*linep = Min(value, MAX_ENV_LINES);
 -		T(("screen size: environment LINES = %d", *linep));
 -	    }
 -	    if ((value = _nc_getenv_num("COLUMNS")) > 0) {
--		*colp = value;
+-		*colp = Min(value, MAX_ENV_COLUMNS);
 -		T(("screen size: environment COLUMNS = %d", *colp));
 -	    }
- 	}
- 
- 	/* if we can't get dynamic info about the size, use static */
+-
+ 	    _nc_default_screensize(termp, linep, colp);
+ 	} else {
+ 	    _nc_check_screensize(sp, termp, linep, colp);

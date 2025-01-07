@@ -3,22 +3,36 @@ TERMUX_PKG_DESCRIPTION="General purpose cryptographic library based on the code 
 TERMUX_PKG_LICENSE="GPL-2.0, LGPL-2.1, BSD 3-Clause, MIT, Public Domain"
 TERMUX_PKG_LICENSE_FILE="COPYING, COPYING.LIB, LICENSES"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.10.1
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="1.11.0"
 TERMUX_PKG_SRCURL=https://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=ef14ae546b0084cd84259f61a55e07a38c3b53afc0f546bffcef2f01baffe9de
+TERMUX_PKG_SHA256=09120c9867ce7f2081d6aaa1775386b98c2f2f246135761aae47d81f58685b9c
 TERMUX_PKG_DEPENDS="libgpg-error"
-TERMUX_PKG_BUILD_DEPENDS="binutils-cross"
 TERMUX_PKG_BREAKS="libgcrypt-dev"
 TERMUX_PKG_REPLACES="libgcrypt-dev"
-# configure tries to detect pthreads by linking with -lpthread, which does not exist on Android:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
-ac_cv_lib_pthread_pthread_create=yes
 --disable-jent-support
 "
 
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=20
+
+	local a
+	for a in LT_CURRENT LT_AGE; do
+		local _${a}=$(sed -En 's/^LIBGCRYPT_'"${a}"'=([0-9]+).*/\1/p' \
+				configure.ac)
+	done
+
+	local v=$(( _LT_CURRENT - _LT_AGE ))
+	if [ ! "${_LT_CURRENT}" ] || [ "${v}" != "${_SOVERSION}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
+
 termux_step_pre_configure() {
-	termux_setup_no_integrated_as
+	autoreconf -fi
+
 	if [ "$TERMUX_ARCH" = arm ]; then
 		# See http://marc.info/?l=gnupg-devel&m=139136972631909&w=3
 		CFLAGS+=" -mno-unaligned-access"
@@ -28,4 +42,9 @@ termux_step_pre_configure() {
 		# Fix i686 android build, also in https://bugzilla.gnome.org/show_bug.cgi?id=724050
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --disable-asm"
 	fi
+
+	# Fix build with lld 17, for more information, see the following links:
+	# https://github.com/termux/termux-packages/issues/18761#issuecomment-1868896237
+	# https://github.com/termux/termux-packages/issues/18810
+	LDFLAGS+=" -Wl,--undefined-version"
 }

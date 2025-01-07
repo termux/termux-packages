@@ -1,46 +1,29 @@
 # Patch meson to copy mu4e source files even if emacs was not found.
 --- ./meson.build.orig	2022-07-06 09:38:17.491018593 +0530
 +++ ./meson.build	2022-07-06 09:39:41.161018561 +0530
-@@ -189,9 +182,7 @@
- subdir('mu')
- subdir('man')
-
+@@ -274,9 +274,7 @@
+ # emacs -- needed for mu4e compilation
+ emacs_name=get_option('emacs')
+ emacs_min_version='26.3'
+-emacs=find_program([emacs_name], version: '>='+emacs_min_version, required:false)
 -if emacs.found()
--   subdir('mu4e')
--endif
-+subdir('mu4e')
-
- if not get_option('guile').disabled() and guile_dep.found()
-   config_h_data.set('BUILD_GUILE', 1)
-
-# Do not compile .el files to .elc.
-# We will do it during installation, on device.
+-  subdir('man')
++if true
+   subdir('mu4e')
+ else
+   message('emacs not found; not pre-compiling mu4e / generating manpages')
 --- ./mu4e/meson.build.orig	2022-07-06 09:21:53.456610752 +0530
 +++ ./mu4e/meson.build	2022-07-06 09:36:08.601018642 +0530
-@@ -68,27 +68,6 @@
-   configure_file(input: src, output:'@BASENAME@.el', copy:true)
- endforeach
-
--foreach src : mu4e_srcs
--  target_name= '@BASENAME@.elc'
--  target_path = join_paths(meson.current_build_dir(), target_name)
--  target_func = '(setq byte-compile-dest-file-function(lambda(_) "' + target_path + '"))'
--
--  custom_target(src.underscorify() + '_el',
--                build_by_default: true,
--                input: src,
--                output: target_name,
--                install_dir: mu4e_lispdir,
--                install: true,
--                command: [emacs,
--                          '--no-init-file',
--                          '--batch',
--                          '--eval', '(setq load-prefer-newer t)',
--                          '--eval', target_func,
--                          '--directory', meson.current_build_dir(),
--                          '--directory', meson.current_source_dir(),
--                          '--funcall', 'batch-byte-compile', '@INPUT@'])
--endforeach
--
- # also install the sources and the config
- install_data(mu4e_srcs, install_dir: mu4e_lispdir)
+@@ -75,6 +75,7 @@ mu4e_srcs=[
+ #
+ #... so let's not do that!
+ 
++if false
+ foreach src : mu4e_srcs
+   target_name= '@BASENAME@.elc'
+   target_path = join_paths(meson.current_build_dir(), target_name)
+@@ -117,6 +118,7 @@ mu4e_autoloads = configure_file(
+             '--load', 'package',
+             '--eval', '(package-generate-autoloads "mu4e" "' +
+                       meson.current_build_dir() + '" )'])
++endif

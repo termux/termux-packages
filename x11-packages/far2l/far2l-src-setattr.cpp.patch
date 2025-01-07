@@ -1,0 +1,16 @@
+diff --git a/far2l/src/setattr.cpp b/far2l/src/setattr.cpp
+index 2ec23c1..c522454 100644
+--- a/far2l/src/setattr.cpp
++++ b/far2l/src/setattr.cpp
+@@ -60,6 +60,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ #include "execute.hpp"
+ #include "FSFileFlags.h"
+ 
++#if defined __ANDROID__ && __ANDROID_API__ < 26
++#define getpwent() (NULL)
++#define setpwent() ((void)0)
++#endif
++
+ enum SETATTRDLG
+ {
+ 	SA_DOUBLEBOX,

@@ -1,0 +1,12 @@
+diff -uNr time-1.9/src/resuse.c time-1.9.mod/src/resuse.c
+--- time-1.9/src/resuse.c	2018-01-04 00:19:52.000000000 +0000
++++ time-1.9.mod/src/resuse.c	2023-04-16 17:28:47.636490778 +0100
+@@ -83,7 +83,7 @@
+ 
+   /* Ignore signals, but don't ignore the children.  When wait3
+      returns the child process, set the time the command finished. */
+-  while ((caught = wait3 (&status, 0, &resp->ru)) != pid)
++  while ((caught = wait4 (-1, &status, 0, &resp->ru)) != pid)
+     {
+       if (caught == -1)
+ 	return 0;

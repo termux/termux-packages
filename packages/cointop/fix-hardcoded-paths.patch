@@ -1,0 +1,33 @@
+--- a/cointop/debug.go
++++ b/cointop/debug.go
+@@ -9,7 +9,7 @@
+ )
+ 
+ func (ct *Cointop) initlog() {
+-	filename := "/tmp/cointop.log"
++	filename := "@TERMUX_PREFIX@/tmp/cointop.log"
+ 	debugFile := os.Getenv("DEBUG_FILE")
+ 	if debugFile != "" {
+ 		filename = pathutil.NormalizePath(debugFile)
+--- a/pkg/pathutil/pathutil_test.go
++++ b/pkg/pathutil/pathutil_test.go
+@@ -8,7 +8,7 @@
+ 
+ // TestNormalizePath checks that NormalizePath returns the correct directory
+ func TestNormalizePath(t *testing.T) {
+-	os.Setenv("XDG_CONFIG_HOME", "/tmp/.config")
++	os.Setenv("XDG_CONFIG_HOME", "@TERMUX_PREFIX@/tmp/.config")
+ 
+ 	home, _ := os.UserHomeDir()
+ 	configDir, _ := os.UserConfigDir()
+--- a/pkg/ssh/server.go
++++ b/pkg/ssh/server.go
+@@ -142,7 +142,7 @@
+ 			}
+ 
+ 			if configDirKey != "" {
+-				configDir = fmt.Sprintf("/tmp/cointop_config/%s", configDirKey)
++				configDir = fmt.Sprintf("@TERMUX_PREFIX@/tmp/cointop_config/%s", configDirKey)
+ 				err := os.MkdirAll(configDir, 0700)
+ 				if err != nil {
+ 					fmt.Println(err)

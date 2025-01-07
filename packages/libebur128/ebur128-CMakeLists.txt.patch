@@ -1,0 +1,21 @@
+diff -u -r ../libebur128-1.2.6/ebur128/CMakeLists.txt ./ebur128/CMakeLists.txt
+--- ../libebur128-1.2.6/ebur128/CMakeLists.txt	2021-02-14 14:31:05.000000000 +0000
++++ ./ebur128/CMakeLists.txt	2024-05-14 09:21:03.212349904 +0000
+@@ -47,9 +47,14 @@
+ endif()
+ 
+ # Link with Math library if available
+-find_library(MATH_LIBRARY m)
+-if(MATH_LIBRARY)
+-  target_link_libraries(ebur128 ${MATH_LIBRARY})
++if(ANDROID)
++  # find_library(MATH_LIBRARY m) does not work on Android
++  target_link_libraries(ebur128 m)
++else()
++  find_library(MATH_LIBRARY m)
++  if(MATH_LIBRARY)
++    target_link_libraries(ebur128 ${MATH_LIBRARY})
++  endif()
+ endif()
+ 
+ if(ENABLE_FUZZER)

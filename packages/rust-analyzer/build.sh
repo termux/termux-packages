@@ -1,19 +1,64 @@
-TERMUX_PKG_HOMEPAGE=https://github.com/rust-analyzer/rust-analyzer
+TERMUX_PKG_HOMEPAGE=https://rust-analyzer.github.io/
 TERMUX_PKG_DESCRIPTION="A Rust compiler front-end for IDEs"
-TERMUX_PKG_LICENSE="MIT, Apache-2.0"
-TERMUX_PKG_LICENSE_FILE="LICENSE-MIT, LICENSE-APACHE"
+TERMUX_PKG_LICENSE="Apache-2.0, MIT"
+TERMUX_PKG_LICENSE_FILE="LICENSE-APACHE, LICENSE-MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-_VERSION=2022-11-14
-TERMUX_PKG_VERSION=${_VERSION//-/}
-TERMUX_PKG_SRCURL=https://github.com/rust-analyzer/rust-analyzer/archive/refs/tags/${_VERSION}.tar.gz
-TERMUX_PKG_SHA256=4e6e723e6d70391f1557c7a89cb991791f4fd46fde82d76b95482c393a1341c1
+TERMUX_PKG_VERSION="20250107"
+_VERSION=${TERMUX_PKG_VERSION:0:4}-${TERMUX_PKG_VERSION:4:2}-${TERMUX_PKG_VERSION:6:2}
+TERMUX_PKG_SRCURL=https://github.com/rust-lang/rust-analyzer/archive/refs/tags/${_VERSION}.tar.gz
+TERMUX_PKG_SHA256=7a8f2621a51a7d92fc2ce33ae5b0c82085f0d6b350fcfff1e512bf5d4b60a398
+TERMUX_PKG_DEPENDS="rust-src"
+TERMUX_PKG_ANTI_BUILD_DEPENDS="rust-src"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_AUTO_UPDATE=true
+
+termux_pkg_auto_update() {
+	local e=0
+	local api_url="https://api.github.com/repos/rust-lang/rust-analyzer/tags"
+	local api_url_r=$(curl -s "${api_url}")
+	local r1=$(echo "${api_url_r}" | jq .[].name | sed -e 's|\"||g')
+	local latest_tag=$(echo "${r1}" | sed -nE 's/^([0-9]*-)/\1/p' | sort -V | tail -n1)
+	# https://github.com/termux/termux-packages/issues/18667
+	local latest_version=${latest_tag:0:4}${latest_tag:5:2}${latest_tag:8:2}
+	if [[ "${latest_version}" == "${TERMUX_PKG_VERSION}" ]]; then
+		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
+		return
+	fi
+	[[ -z "${api_url_r}" ]] && e=1
+	[[ -z "${r1}" ]] && e=1
+	[[ -z "${latest_tag}" ]] && e=1
+	[[ -z "${latest_version}" ]] && e=1
+
+	if [[ "${e}" != 0 ]]; then
+		cat <<- EOL >&2
+		WARN: Auto update failure!
+		api_url_r=${api_url_r}
+		r1=${r1}
+		latest_tag=${latest_tag}
+		latest_version=${latest_version}
+		EOL
+		return
+	fi
+
+	if ! dpkg --compare-versions "${latest_version}" gt "${TERMUX_PKG_VERSION}"; then
+		termux_error_exit "
+		ERROR: Resulting latest version is not counted as an update!
+		Latest version  = ${latest_version}
+		Current version = ${TERMUX_PKG_VERSION}
+		"
+	fi
+
+	termux_pkg_upgrade_version "${latest_version}" --skip-version-check
+}
+
+termux_step_pre_configure() {
+	termux_setup_rust
+}
 
 termux_step_make() {
-	termux_setup_rust
-	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
+	cargo build --jobs "${TERMUX_PKG_MAKE_PROCESSES}" --target "${CARGO_TARGET_NAME}" --release
 }
 
 termux_step_make_install() {
-	install -Dm755 -t $TERMUX_PREFIX/bin target/${CARGO_TARGET_NAME}/release/rust-analyzer
+	install -Dm755 -t "${TERMUX_PREFIX}/bin" "target/${CARGO_TARGET_NAME}/release/rust-analyzer"
 }

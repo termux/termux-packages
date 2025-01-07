@@ -18,6 +18,18 @@ TERMUX_PKG_GROUPS="base-devel"
 # under ubuntu 17.10:
 TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="CFLAGS=-D_GNU_SOURCE=1"
 
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=2
+
+	local e=$(sed -En 's/^SHARED_VERSION_INFO="?([0-9]+):([0-9]+):([0-9]+).*/\1-\3/p' \
+			configure.ac)
+	if [ ! "${e}" ] || [ "${_SOVERSION}" != "$(( "${e}" ))" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
+
 termux_step_pre_configure() {
 	mkdir -p $TERMUX_PKG_BUILDDIR/src/
 	cp $TERMUX_PKG_HOSTBUILD_DIR/src/stage1flex $TERMUX_PKG_BUILDDIR/src/stage1flex

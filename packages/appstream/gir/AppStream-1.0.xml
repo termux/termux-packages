@@ -1,0 +1,446 @@
+<?xml version="1.0"?>
+<dump>
+  <class name="AsContext" get-type="as_context_get_type" parents="GObject">
+  </class>
+  <enum name="AsAgreementKind" get-type="as_agreement_kind_get_type">
+    <member name="AS_AGREEMENT_KIND_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_AGREEMENT_KIND_GENERIC" nick="generic" value="1"/>
+    <member name="AS_AGREEMENT_KIND_EULA" nick="eula" value="2"/>
+    <member name="AS_AGREEMENT_KIND_PRIVACY" nick="privacy" value="3"/>
+  </enum>  <enum name="AsSizeKind" get-type="as_size_kind_get_type">
+    <member name="AS_SIZE_KIND_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_SIZE_KIND_DOWNLOAD" nick="download" value="1"/>
+    <member name="AS_SIZE_KIND_INSTALLED" nick="installed" value="2"/>
+  </enum>  <enum name="AsArtifactKind" get-type="as_artifact_kind_get_type">
+    <member name="AS_ARTIFACT_KIND_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_ARTIFACT_KIND_SOURCE" nick="source" value="1"/>
+    <member name="AS_ARTIFACT_KIND_BINARY" nick="binary" value="2"/>
+  </enum>  <enum name="AsColorKind" get-type="as_color_kind_get_type">
+    <member name="AS_COLOR_KIND_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_COLOR_KIND_PRIMARY" nick="primary" value="1"/>
+  </enum>  <enum name="AsColorSchemeKind" get-type="as_color_scheme_kind_get_type">
+    <member name="AS_COLOR_SCHEME_KIND_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_COLOR_SCHEME_KIND_LIGHT" nick="light" value="1"/>
+    <member name="AS_COLOR_SCHEME_KIND_DARK" nick="dark" value="2"/>
+  </enum>  <enum name="AsBundleKind" get-type="as_bundle_kind_get_type">
+    <member name="AS_BUNDLE_KIND_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_BUNDLE_KIND_PACKAGE" nick="package" value="1"/>
+    <member name="AS_BUNDLE_KIND_LIMBA" nick="limba" value="2"/>
+    <member name="AS_BUNDLE_KIND_FLATPAK" nick="flatpak" value="3"/>
+    <member name="AS_BUNDLE_KIND_APPIMAGE" nick="appimage" value="4"/>
+    <member name="AS_BUNDLE_KIND_SNAP" nick="snap" value="5"/>
+    <member name="AS_BUNDLE_KIND_TARBALL" nick="tarball" value="6"/>
+    <member name="AS_BUNDLE_KIND_CABINET" nick="cabinet" value="7"/>
+    <member name="AS_BUNDLE_KIND_LINGLONG" nick="linglong" value="8"/>
+  </enum>  <enum name="AsChecksumKind" get-type="as_checksum_kind_get_type">
+    <member name="AS_CHECKSUM_KIND_NONE" nick="none" value="0"/>
+    <member name="AS_CHECKSUM_KIND_SHA1" nick="sha1" value="1"/>
+    <member name="AS_CHECKSUM_KIND_SHA256" nick="sha256" value="2"/>
+    <member name="AS_CHECKSUM_KIND_SHA512" nick="sha512" value="3"/>
+    <member name="AS_CHECKSUM_KIND_BLAKE2B" nick="blake2b" value="4"/>
+    <member name="AS_CHECKSUM_KIND_BLAKE3" nick="blake3" value="5"/>
+  </enum>  <flags name="AsComponentBoxFlags" get-type="as_component_box_flags_get_type">
+    <member name="AS_COMPONENT_BOX_FLAG_NONE" nick="none" value="0"/>
+    <member name="AS_COMPONENT_BOX_FLAG_NO_CHECKS" nick="no-checks" value="1"/>
+  </flags>
+  <enum name="AsComponentKind" get-type="as_component_kind_get_type">
+    <member name="AS_COMPONENT_KIND_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_COMPONENT_KIND_GENERIC" nick="generic" value="1"/>
+    <member name="AS_COMPONENT_KIND_DESKTOP_APP" nick="desktop-app" value="2"/>
+    <member name="AS_COMPONENT_KIND_CONSOLE_APP" nick="console-app" value="3"/>
+    <member name="AS_COMPONENT_KIND_WEB_APP" nick="web-app" value="4"/>
+    <member name="AS_COMPONENT_KIND_SERVICE" nick="service" value="5"/>
+    <member name="AS_COMPONENT_KIND_ADDON" nick="addon" value="6"/>
+    <member name="AS_COMPONENT_KIND_RUNTIME" nick="runtime" value="7"/>
+    <member name="AS_COMPONENT_KIND_FONT" nick="font" value="8"/>
+    <member name="AS_COMPONENT_KIND_CODEC" nick="codec" value="9"/>
+    <member name="AS_COMPONENT_KIND_INPUT_METHOD" nick="input-method" value="10"/>
+    <member name="AS_COMPONENT_KIND_OPERATING_SYSTEM" nick="operating-system" value="11"/>
+    <member name="AS_COMPONENT_KIND_FIRMWARE" nick="firmware" value="12"/>
+    <member name="AS_COMPONENT_KIND_DRIVER" nick="driver" value="13"/>
+    <member name="AS_COMPONENT_KIND_LOCALIZATION" nick="localization" value="14"/>
+    <member name="AS_COMPONENT_KIND_REPOSITORY" nick="repository" value="15"/>
+    <member name="AS_COMPONENT_KIND_ICON_THEME" nick="icon-theme" value="16"/>
+  </enum>  <enum name="AsMergeKind" get-type="as_merge_kind_get_type">
+    <member name="AS_MERGE_KIND_NONE" nick="none" value="0"/>
+    <member name="AS_MERGE_KIND_REPLACE" nick="replace" value="1"/>
+    <member name="AS_MERGE_KIND_APPEND" nick="append" value="2"/>
+    <member name="AS_MERGE_KIND_REMOVE_COMPONENT" nick="remove-component" value="3"/>
+  </enum>  <enum name="AsComponentScope" get-type="as_component_scope_get_type">
+    <member name="AS_COMPONENT_SCOPE_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_COMPONENT_SCOPE_SYSTEM" nick="system" value="1"/>
+    <member name="AS_COMPONENT_SCOPE_USER" nick="user" value="2"/>
+  </enum>  <enum name="AsUrlKind" get-type="as_url_kind_get_type">
+    <member name="AS_URL_KIND_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_URL_KIND_HOMEPAGE" nick="homepage" value="1"/>
+    <member name="AS_URL_KIND_BUGTRACKER" nick="bugtracker" value="2"/>
+    <member name="AS_URL_KIND_FAQ" nick="faq" value="3"/>
+    <member name="AS_URL_KIND_HELP" nick="help" value="4"/>
+    <member name="AS_URL_KIND_DONATION" nick="donation" value="5"/>
+    <member name="AS_URL_KIND_TRANSLATE" nick="translate" value="6"/>
+    <member name="AS_URL_KIND_CONTACT" nick="contact" value="7"/>
+    <member name="AS_URL_KIND_VCS_BROWSER" nick="vcs-browser" value="8"/>
+    <member name="AS_URL_KIND_CONTRIBUTE" nick="contribute" value="9"/>
+  </enum>  <enum name="AsContentRatingSystem" get-type="as_content_rating_system_get_type">
+    <member name="AS_CONTENT_RATING_SYSTEM_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_CONTENT_RATING_SYSTEM_INCAA" nick="incaa" value="1"/>
+    <member name="AS_CONTENT_RATING_SYSTEM_ACB" nick="acb" value="2"/>
+    <member name="AS_CONTENT_RATING_SYSTEM_DJCTQ" nick="djctq" value="3"/>
+    <member name="AS_CONTENT_RATING_SYSTEM_GSRR" nick="gsrr" value="4"/>
+    <member name="AS_CONTENT_RATING_SYSTEM_PEGI" nick="pegi" value="5"/>
+    <member name="AS_CONTENT_RATING_SYSTEM_KAVI" nick="kavi" value="6"/>
+    <member name="AS_CONTENT_RATING_SYSTEM_USK" nick="usk" value="7"/>
+    <member name="AS_CONTENT_RATING_SYSTEM_ESRA" nick="esra" value="8"/>
+    <member name="AS_CONTENT_RATING_SYSTEM_CERO" nick="cero" value="9"/>
+    <member name="AS_CONTENT_RATING_SYSTEM_OFLCNZ" nick="oflcnz" value="10"/>
+    <member name="AS_CONTENT_RATING_SYSTEM_RUSSIA" nick="russia" value="11"/>
+    <member name="AS_CONTENT_RATING_SYSTEM_MDA" nick="mda" value="12"/>
+    <member name="AS_CONTENT_RATING_SYSTEM_GRAC" nick="grac" value="13"/>
+    <member name="AS_CONTENT_RATING_SYSTEM_ESRB" nick="esrb" value="14"/>
+    <member name="AS_CONTENT_RATING_SYSTEM_IARC" nick="iarc" value="15"/>
+  </enum>  <enum name="AsContentRatingValue" get-type="as_content_rating_value_get_type">
+    <member name="AS_CONTENT_RATING_VALUE_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_CONTENT_RATING_VALUE_NONE" nick="none" value="1"/>
+    <member name="AS_CONTENT_RATING_VALUE_MILD" nick="mild" value="2"/>
+    <member name="AS_CONTENT_RATING_VALUE_MODERATE" nick="moderate" value="3"/>
+    <member name="AS_CONTENT_RATING_VALUE_INTENSE" nick="intense" value="4"/>
+  </enum>  <enum name="AsFormatVersion" get-type="as_format_version_get_type">
+    <member name="AS_FORMAT_VERSION_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_FORMAT_VERSION_V1_0" nick="v1-0" value="1"/>
+  </enum>  <enum name="AsFormatStyle" get-type="as_format_style_get_type">
+    <member name="AS_FORMAT_STYLE_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_FORMAT_STYLE_METAINFO" nick="metainfo" value="1"/>
+    <member name="AS_FORMAT_STYLE_CATALOG" nick="catalog" value="2"/>
+  </enum>  <enum name="AsFormatKind" get-type="as_format_kind_get_type">
+    <member name="AS_FORMAT_KIND_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_FORMAT_KIND_XML" nick="xml" value="1"/>
+    <member name="AS_FORMAT_KIND_YAML" nick="yaml" value="2"/>
+    <member name="AS_FORMAT_KIND_DESKTOP_ENTRY" nick="desktop-entry" value="3"/>
+  </enum>  <flags name="AsValueFlags" get-type="as_value_flags_get_type">
+    <member name="AS_VALUE_FLAG_NONE" nick="none" value="0"/>
+    <member name="AS_VALUE_FLAG_DUPLICATE_CHECK" nick="duplicate-check" value="1"/>
+    <member name="AS_VALUE_FLAG_NO_TRANSLATION_FALLBACK" nick="no-translation-fallback" value="2"/>
+  </flags>
+  <enum name="AsIconKind" get-type="as_icon_kind_get_type">
+    <member name="AS_ICON_KIND_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_ICON_KIND_STOCK" nick="stock" value="1"/>
+    <member name="AS_ICON_KIND_CACHED" nick="cached" value="2"/>
+    <member name="AS_ICON_KIND_LOCAL" nick="local" value="3"/>
+    <member name="AS_ICON_KIND_REMOTE" nick="remote" value="4"/>
+  </enum>  <enum name="AsImageKind" get-type="as_image_kind_get_type">
+    <member name="AS_IMAGE_KIND_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_IMAGE_KIND_SOURCE" nick="source" value="1"/>
+    <member name="AS_IMAGE_KIND_THUMBNAIL" nick="thumbnail" value="2"/>
+  </enum>  <enum name="AsIssueKind" get-type="as_issue_kind_get_type">
+    <member name="AS_ISSUE_KIND_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_ISSUE_KIND_GENERIC" nick="generic" value="1"/>
+    <member name="AS_ISSUE_KIND_CVE" nick="cve" value="2"/>
+  </enum>  <enum name="AsLaunchableKind" get-type="as_launchable_kind_get_type">
+    <member name="AS_LAUNCHABLE_KIND_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_LAUNCHABLE_KIND_DESKTOP_ID" nick="desktop-id" value="1"/>
+    <member name="AS_LAUNCHABLE_KIND_SERVICE" nick="service" value="2"/>
+    <member name="AS_LAUNCHABLE_KIND_COCKPIT_MANIFEST" nick="cockpit-manifest" value="3"/>
+    <member name="AS_LAUNCHABLE_KIND_URL" nick="url" value="4"/>
+  </enum>  <flags name="AsParseFlags" get-type="as_parse_flags_get_type">
+    <member name="AS_PARSE_FLAG_NONE" nick="none" value="0"/>
+    <member name="AS_PARSE_FLAG_IGNORE_MEDIABASEURL" nick="ignore-mediabaseurl" value="1"/>
+  </flags>
+  <enum name="AsMetadataError" get-type="as_metadata_error_get_type">
+    <member name="AS_METADATA_ERROR_FAILED" nick="failed" value="0"/>
+    <member name="AS_METADATA_ERROR_PARSE" nick="parse" value="1"/>
+    <member name="AS_METADATA_ERROR_FORMAT_UNEXPECTED" nick="format-unexpected" value="2"/>
+    <member name="AS_METADATA_ERROR_NO_COMPONENT" nick="no-component" value="3"/>
+    <member name="AS_METADATA_ERROR_VALUE_MISSING" nick="value-missing" value="4"/>
+  </enum>  <flags name="AsPoolFlags" get-type="as_pool_flags_get_type">
+    <member name="AS_POOL_FLAG_NONE" nick="none" value="0"/>
+    <member name="AS_POOL_FLAG_LOAD_OS_CATALOG" nick="load-os-catalog" value="1"/>
+    <member name="AS_POOL_FLAG_LOAD_OS_METAINFO" nick="load-os-metainfo" value="2"/>
+    <member name="AS_POOL_FLAG_LOAD_OS_DESKTOP_FILES" nick="load-os-desktop-files" value="4"/>
+    <member name="AS_POOL_FLAG_LOAD_FLATPAK" nick="load-flatpak" value="8"/>
+    <member name="AS_POOL_FLAG_IGNORE_CACHE_AGE" nick="ignore-cache-age" value="16"/>
+    <member name="AS_POOL_FLAG_RESOLVE_ADDONS" nick="resolve-addons" value="32"/>
+    <member name="AS_POOL_FLAG_PREFER_OS_METAINFO" nick="prefer-os-metainfo" value="64"/>
+    <member name="AS_POOL_FLAG_MONITOR" nick="monitor" value="128"/>
+  </flags>
+  <flags name="AsCacheFlags" get-type="as_cache_flags_get_type">
+    <member name="AS_CACHE_FLAG_NONE" nick="none" value="0"/>
+    <member name="AS_CACHE_FLAG_USE_USER" nick="use-user" value="1"/>
+    <member name="AS_CACHE_FLAG_USE_SYSTEM" nick="use-system" value="2"/>
+    <member name="AS_CACHE_FLAG_NO_CLEAR" nick="no-clear" value="4"/>
+    <member name="AS_CACHE_FLAG_REFRESH_SYSTEM" nick="refresh-system" value="8"/>
+  </flags>
+  <enum name="AsPoolError" get-type="as_pool_error_get_type">
+    <member name="AS_POOL_ERROR_FAILED" nick="failed" value="0"/>
+    <member name="AS_POOL_ERROR_INCOMPLETE" nick="incomplete" value="1"/>
+    <member name="AS_POOL_ERROR_COLLISION" nick="collision" value="2"/>
+    <member name="AS_POOL_ERROR_CACHE_WRITE_FAILED" nick="cache-write-failed" value="3"/>
+    <member name="AS_POOL_ERROR_CACHE_DAMAGED" nick="cache-damaged" value="4"/>
+  </enum>  <enum name="AsProvidedKind" get-type="as_provided_kind_get_type">
+    <member name="AS_PROVIDED_KIND_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_PROVIDED_KIND_LIBRARY" nick="library" value="1"/>
+    <member name="AS_PROVIDED_KIND_BINARY" nick="binary" value="2"/>
+    <member name="AS_PROVIDED_KIND_MEDIATYPE" nick="mediatype" value="3"/>
+    <member name="AS_PROVIDED_KIND_FONT" nick="font" value="4"/>
+    <member name="AS_PROVIDED_KIND_MODALIAS" nick="modalias" value="5"/>
+    <member name="AS_PROVIDED_KIND_PYTHON" nick="python" value="6"/>
+    <member name="AS_PROVIDED_KIND_DBUS_SYSTEM" nick="dbus-system" value="7"/>
+    <member name="AS_PROVIDED_KIND_DBUS_USER" nick="dbus-user" value="8"/>
+    <member name="AS_PROVIDED_KIND_FIRMWARE_RUNTIME" nick="firmware-runtime" value="9"/>
+    <member name="AS_PROVIDED_KIND_FIRMWARE_FLASHED" nick="firmware-flashed" value="10"/>
+    <member name="AS_PROVIDED_KIND_ID" nick="id" value="11"/>
+  </enum>  <enum name="AsReferenceKind" get-type="as_reference_kind_get_type">
+    <member name="AS_REFERENCE_KIND_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_REFERENCE_KIND_DOI" nick="doi" value="1"/>
+    <member name="AS_REFERENCE_KIND_CITATION_CFF" nick="citation-cff" value="2"/>
+    <member name="AS_REFERENCE_KIND_REGISTRY" nick="registry" value="3"/>
+  </enum>  <enum name="AsRelationStatus" get-type="as_relation_status_get_type">
+    <member name="AS_RELATION_STATUS_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_RELATION_STATUS_ERROR" nick="error" value="1"/>
+    <member name="AS_RELATION_STATUS_NOT_SATISFIED" nick="not-satisfied" value="2"/>
+    <member name="AS_RELATION_STATUS_SATISFIED" nick="satisfied" value="3"/>
+  </enum>  <enum name="AsRelationKind" get-type="as_relation_kind_get_type">
+    <member name="AS_RELATION_KIND_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_RELATION_KIND_REQUIRES" nick="requires" value="1"/>
+    <member name="AS_RELATION_KIND_RECOMMENDS" nick="recommends" value="2"/>
+    <member name="AS_RELATION_KIND_SUPPORTS" nick="supports" value="3"/>
+  </enum>  <enum name="AsRelationItemKind" get-type="as_relation_item_kind_get_type">
+    <member name="AS_RELATION_ITEM_KIND_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_RELATION_ITEM_KIND_ID" nick="id" value="1"/>
+    <member name="AS_RELATION_ITEM_KIND_MODALIAS" nick="modalias" value="2"/>
+    <member name="AS_RELATION_ITEM_KIND_KERNEL" nick="kernel" value="3"/>
+    <member name="AS_RELATION_ITEM_KIND_MEMORY" nick="memory" value="4"/>
+    <member name="AS_RELATION_ITEM_KIND_FIRMWARE" nick="firmware" value="5"/>
+    <member name="AS_RELATION_ITEM_KIND_CONTROL" nick="control" value="6"/>
+    <member name="AS_RELATION_ITEM_KIND_DISPLAY_LENGTH" nick="display-length" value="7"/>
+    <member name="AS_RELATION_ITEM_KIND_HARDWARE" nick="hardware" value="8"/>
+    <member name="AS_RELATION_ITEM_KIND_INTERNET" nick="internet" value="9"/>
+  </enum>  <enum name="AsRelationCompare" get-type="as_relation_compare_get_type">
+    <member name="AS_RELATION_COMPARE_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_RELATION_COMPARE_EQ" nick="eq" value="1"/>
+    <member name="AS_RELATION_COMPARE_NE" nick="ne" value="2"/>
+    <member name="AS_RELATION_COMPARE_LT" nick="lt" value="3"/>
+    <member name="AS_RELATION_COMPARE_GT" nick="gt" value="4"/>
+    <member name="AS_RELATION_COMPARE_LE" nick="le" value="5"/>
+    <member name="AS_RELATION_COMPARE_GE" nick="ge" value="6"/>
+  </enum>  <enum name="AsControlKind" get-type="as_control_kind_get_type">
+    <member name="AS_CONTROL_KIND_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_CONTROL_KIND_POINTING" nick="pointing" value="1"/>
+    <member name="AS_CONTROL_KIND_KEYBOARD" nick="keyboard" value="2"/>
+    <member name="AS_CONTROL_KIND_CONSOLE" nick="console" value="3"/>
+    <member name="AS_CONTROL_KIND_TOUCH" nick="touch" value="4"/>
+    <member name="AS_CONTROL_KIND_GAMEPAD" nick="gamepad" value="5"/>
+    <member name="AS_CONTROL_KIND_VOICE" nick="voice" value="6"/>
+    <member name="AS_CONTROL_KIND_VISION" nick="vision" value="7"/>
+    <member name="AS_CONTROL_KIND_TV_REMOTE" nick="tv-remote" value="8"/>
+    <member name="AS_CONTROL_KIND_TABLET" nick="tablet" value="9"/>
+  </enum>  <enum name="AsDisplaySideKind" get-type="as_display_side_kind_get_type">
+    <member name="AS_DISPLAY_SIDE_KIND_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_DISPLAY_SIDE_KIND_SHORTEST" nick="shortest" value="1"/>
+    <member name="AS_DISPLAY_SIDE_KIND_LONGEST" nick="longest" value="2"/>
+  </enum>  <enum name="AsInternetKind" get-type="as_internet_kind_get_type">
+    <member name="AS_INTERNET_KIND_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_INTERNET_KIND_ALWAYS" nick="always" value="1"/>
+    <member name="AS_INTERNET_KIND_OFFLINE_ONLY" nick="offline-only" value="2"/>
+    <member name="AS_INTERNET_KIND_FIRST_RUN" nick="first-run" value="3"/>
+  </enum>  <enum name="AsRelationError" get-type="as_relation_error_get_type">
+    <member name="AS_RELATION_ERROR_FAILED" nick="failed" value="0"/>
+    <member name="AS_RELATION_ERROR_BAD_VALUE" nick="bad-value" value="1"/>
+    <member name="AS_RELATION_ERROR_NOT_IMPLEMENTED" nick="not-implemented" value="2"/>
+  </enum>  <enum name="AsReleaseListKind" get-type="as_release_list_kind_get_type">
+    <member name="AS_RELEASE_LIST_KIND_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_RELEASE_LIST_KIND_EMBEDDED" nick="embedded" value="1"/>
+    <member name="AS_RELEASE_LIST_KIND_EXTERNAL" nick="external" value="2"/>
+  </enum>  <enum name="AsReleaseKind" get-type="as_release_kind_get_type">
+    <member name="AS_RELEASE_KIND_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_RELEASE_KIND_STABLE" nick="stable" value="1"/>
+    <member name="AS_RELEASE_KIND_DEVELOPMENT" nick="development" value="2"/>
+    <member name="AS_RELEASE_KIND_SNAPSHOT" nick="snapshot" value="3"/>
+  </enum>  <enum name="AsUrgencyKind" get-type="as_urgency_kind_get_type">
+    <member name="AS_URGENCY_KIND_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_URGENCY_KIND_LOW" nick="low" value="1"/>
+    <member name="AS_URGENCY_KIND_MEDIUM" nick="medium" value="2"/>
+    <member name="AS_URGENCY_KIND_HIGH" nick="high" value="3"/>
+    <member name="AS_URGENCY_KIND_CRITICAL" nick="critical" value="4"/>
+  </enum>  <enum name="AsReleaseUrlKind" get-type="as_release_url_kind_get_type">
+    <member name="AS_RELEASE_URL_KIND_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_RELEASE_URL_KIND_DETAILS" nick="details" value="1"/>
+  </enum>  <flags name="AsReviewFlags" get-type="as_review_flags_get_type">
+    <member name="AS_REVIEW_FLAG_NONE" nick="none" value="0"/>
+    <member name="AS_REVIEW_FLAG_SELF" nick="self" value="1"/>
+    <member name="AS_REVIEW_FLAG_VOTED" nick="voted" value="2"/>
+  </flags>
+  <enum name="AsScreenshotKind" get-type="as_screenshot_kind_get_type">
+    <member name="AS_SCREENSHOT_KIND_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_SCREENSHOT_KIND_DEFAULT" nick="default" value="1"/>
+    <member name="AS_SCREENSHOT_KIND_EXTRA" nick="extra" value="2"/>
+  </enum>  <enum name="AsScreenshotMediaKind" get-type="as_screenshot_media_kind_get_type">
+    <member name="AS_SCREENSHOT_MEDIA_KIND_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_SCREENSHOT_MEDIA_KIND_IMAGE" nick="image" value="1"/>
+    <member name="AS_SCREENSHOT_MEDIA_KIND_VIDEO" nick="video" value="2"/>
+  </enum>  <enum name="AsSuggestedKind" get-type="as_suggested_kind_get_type">
+    <member name="AS_SUGGESTED_KIND_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_SUGGESTED_KIND_UPSTREAM" nick="upstream" value="1"/>
+    <member name="AS_SUGGESTED_KIND_HEURISTIC" nick="heuristic" value="2"/>
+  </enum>  <enum name="AsCheckResult" get-type="as_check_result_get_type">
+    <member name="AS_CHECK_RESULT_ERROR" nick="error" value="0"/>
+    <member name="AS_CHECK_RESULT_UNKNOWN" nick="unknown" value="1"/>
+    <member name="AS_CHECK_RESULT_FALSE" nick="false" value="2"/>
+    <member name="AS_CHECK_RESULT_TRUE" nick="true" value="3"/>
+  </enum>  <enum name="AsChassisKind" get-type="as_chassis_kind_get_type">
+    <member name="AS_CHASSIS_KIND_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_CHASSIS_KIND_DESKTOP" nick="desktop" value="1"/>
+    <member name="AS_CHASSIS_KIND_LAPTOP" nick="laptop" value="2"/>
+    <member name="AS_CHASSIS_KIND_SERVER" nick="server" value="3"/>
+    <member name="AS_CHASSIS_KIND_TABLET" nick="tablet" value="4"/>
+    <member name="AS_CHASSIS_KIND_HANDSET" nick="handset" value="5"/>
+  </enum>  <enum name="AsSystemInfoError" get-type="as_system_info_error_get_type">
+    <member name="AS_SYSTEM_INFO_ERROR_FAILED" nick="failed" value="0"/>
+    <member name="AS_SYSTEM_INFO_ERROR_NOT_FOUND" nick="not-found" value="1"/>
+  </enum>  <enum name="AsTranslationKind" get-type="as_translation_kind_get_type">
+    <member name="AS_TRANSLATION_KIND_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_TRANSLATION_KIND_GETTEXT" nick="gettext" value="1"/>
+    <member name="AS_TRANSLATION_KIND_QT" nick="qt" value="2"/>
+  </enum>  <enum name="AsUtilsError" get-type="as_utils_error_get_type">
+    <member name="AS_UTILS_ERROR_FAILED" nick="failed" value="0"/>
+  </enum>  <flags name="AsDataIdMatchFlags" get-type="as_data_id_match_flags_get_type">
+    <member name="AS_DATA_ID_MATCH_FLAG_NONE" nick="none" value="0"/>
+    <member name="AS_DATA_ID_MATCH_FLAG_SCOPE" nick="scope" value="1"/>
+    <member name="AS_DATA_ID_MATCH_FLAG_BUNDLE_KIND" nick="bundle-kind" value="2"/>
+    <member name="AS_DATA_ID_MATCH_FLAG_ORIGIN" nick="origin" value="4"/>
+    <member name="AS_DATA_ID_MATCH_FLAG_ID" nick="id" value="8"/>
+    <member name="AS_DATA_ID_MATCH_FLAG_BRANCH" nick="branch" value="16"/>
+  </flags>
+  <enum name="AsMetadataLocation" get-type="as_metadata_location_get_type">
+    <member name="AS_METADATA_LOCATION_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_METADATA_LOCATION_SHARED" nick="shared" value="1"/>
+    <member name="AS_METADATA_LOCATION_STATE" nick="state" value="2"/>
+    <member name="AS_METADATA_LOCATION_CACHE" nick="cache" value="3"/>
+    <member name="AS_METADATA_LOCATION_USER" nick="user" value="4"/>
+  </enum>  <enum name="AsMarkupKind" get-type="as_markup_kind_get_type">
+    <member name="AS_MARKUP_KIND_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_MARKUP_KIND_XML" nick="xml" value="1"/>
+    <member name="AS_MARKUP_KIND_TEXT" nick="text" value="2"/>
+    <member name="AS_MARKUP_KIND_MARKDOWN" nick="markdown" value="3"/>
+  </enum>  <enum name="AsIssueSeverity" get-type="as_issue_severity_get_type">
+    <member name="AS_ISSUE_SEVERITY_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_ISSUE_SEVERITY_PEDANTIC" nick="pedantic" value="1"/>
+    <member name="AS_ISSUE_SEVERITY_INFO" nick="info" value="2"/>
+    <member name="AS_ISSUE_SEVERITY_WARNING" nick="warning" value="3"/>
+    <member name="AS_ISSUE_SEVERITY_ERROR" nick="error" value="4"/>
+  </enum>  <enum name="AsValidatorError" get-type="as_validator_error_get_type">
+    <member name="AS_VALIDATOR_ERROR_FAILED" nick="failed" value="0"/>
+    <member name="AS_VALIDATOR_ERROR_INVALID_OVERRIDE" nick="invalid-override" value="1"/>
+    <member name="AS_VALIDATOR_ERROR_INVALID_FILENAME" nick="invalid-filename" value="2"/>
+  </enum>  <flags name="AsVercmpFlags" get-type="as_vercmp_flags_get_type">
+    <member name="AS_VERCMP_FLAG_NONE" nick="none" value="0"/>
+    <member name="AS_VERCMP_FLAG_IGNORE_EPOCH" nick="ignore-epoch" value="1"/>
+  </flags>
+  <enum name="AsVideoCodecKind" get-type="as_video_codec_kind_get_type">
+    <member name="AS_VIDEO_CODEC_KIND_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_VIDEO_CODEC_KIND_VP9" nick="vp9" value="1"/>
+    <member name="AS_VIDEO_CODEC_KIND_AV1" nick="av1" value="2"/>
+  </enum>  <enum name="AsVideoContainerKind" get-type="as_video_container_kind_get_type">
+    <member name="AS_VIDEO_CONTAINER_KIND_UNKNOWN" nick="unknown" value="0"/>
+    <member name="AS_VIDEO_CONTAINER_KIND_MKV" nick="mkv" value="1"/>
+    <member name="AS_VIDEO_CONTAINER_KIND_WEBM" nick="webm" value="2"/>
+  </enum>  <class name="AsProvided" get-type="as_provided_get_type" parents="GObject">
+  </class>
+  <class name="AsIcon" get-type="as_icon_get_type" parents="GObject">
+  </class>
+  <class name="AsImage" get-type="as_image_get_type" parents="GObject">
+  </class>
+  <class name="AsVideo" get-type="as_video_get_type" parents="GObject">
+  </class>
+  <class name="AsScreenshot" get-type="as_screenshot_get_type" parents="GObject">
+  </class>
+  <class name="AsChecksum" get-type="as_checksum_get_type" parents="GObject">
+  </class>
+  <class name="AsBundle" get-type="as_bundle_get_type" parents="GObject">
+  </class>
+  <class name="AsArtifact" get-type="as_artifact_get_type" parents="GObject">
+  </class>
+  <class name="AsIssue" get-type="as_issue_get_type" parents="GObject">
+  </class>
+  <class name="AsRelease" get-type="as_release_get_type" parents="GObject">
+  </class>
+  <class name="AsReleaseList" get-type="as_release_list_get_type" parents="GObject">
+  </class>
+  <class name="AsDeveloper" get-type="as_developer_get_type" parents="GObject">
+  </class>
+  <class name="AsTranslation" get-type="as_translation_get_type" parents="GObject">
+  </class>
+  <class name="AsSuggested" get-type="as_suggested_get_type" parents="GObject">
+  </class>
+  <class name="AsCategory" get-type="as_category_get_type" parents="GObject">
+    <property name="id" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="name" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="summary" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="icon" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="children" type="gpointer" flags="225"/>
+  </class>
+  <class name="AsContentRating" get-type="as_content_rating_get_type" parents="GObject">
+  </class>
+  <class name="AsLaunchable" get-type="as_launchable_get_type" parents="GObject">
+  </class>
+  <class name="AsRelation" get-type="as_relation_get_type" parents="GObject">
+  </class>
+  <class name="AsAgreementSection" get-type="as_agreement_section_get_type" parents="GObject">
+  </class>
+  <class name="AsAgreement" get-type="as_agreement_get_type" parents="GObject">
+  </class>
+  <class name="AsBranding" get-type="as_branding_get_type" parents="GObject">
+  </class>
+  <class name="AsReview" get-type="as_review_get_type" parents="GObject">
+    <property name="id" type="gchararray" flags="1073742055" default-value="NULL"/>
+    <property name="summary" type="gchararray" flags="1073742055" default-value="NULL"/>
+    <property name="description" type="gchararray" flags="1073742055" default-value="NULL"/>
+    <property name="locale" type="gchararray" flags="1073742055" default-value="NULL"/>
+    <property name="priority" type="gint" flags="1073742055" default-value="0"/>
+    <property name="rating" type="gint" flags="1073742055" default-value="0"/>
+    <property name="version" type="gchararray" flags="1073742055" default-value="NULL"/>
+    <property name="reviewer-id" type="gchararray" flags="1073742055" default-value="NULL"/>
+    <property name="reviewer-name" type="gchararray" flags="1073742055" default-value="NULL"/>
+    <property name="date" type="AsReview" flags="1073742055"/>
+    <property name="flags" type="guint64" flags="1073742055" default-value="0"/>
+  </class>
+  <class name="AsReference" get-type="as_reference_get_type" parents="GObject">
+  </class>
+  <class name="AsComponent" get-type="as_component_get_type" parents="GObject">
+    <property name="kind" type="AsComponentKind" flags="227" default-value="AS_COMPONENT_KIND_UNKNOWN"/>
+    <property name="pkgnames" type="GStrv" flags="227"/>
+    <property name="id" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="name" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="summary" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="description" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="keywords" type="GStrv" flags="227"/>
+    <property name="icons" type="gpointer" flags="225"/>
+    <property name="urls" type="GHashTable" flags="225"/>
+    <property name="categories" type="GPtrArray" flags="225"/>
+    <property name="project-license" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="project-group" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="screenshots" type="GPtrArray" flags="225"/>
+  </class>
+  <class name="AsComponentBox" get-type="as_component_box_get_type" parents="GObject">
+    <property name="flags" type="guint" flags="11" default-value="0"/>
+  </class>
+  <class name="AsMetadata" get-type="as_metadata_get_type" parents="GObject">
+  </class>
+  <class name="AsPool" get-type="as_pool_get_type" parents="GObject">
+    <signal name="changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="AsRelationCheckResult" get-type="as_relation_check_result_get_type" parents="GObject">
+  </class>
+  <class name="AsValidatorIssue" get-type="as_validator_issue_get_type" parents="GObject">
+  </class>
+  <class name="AsValidator" get-type="as_validator_get_type" parents="GObject">
+  </class>
+  <class name="AsSystemInfo" get-type="as_system_info_get_type" parents="GObject">
+  </class>
+  <error-quark function="as_relation_error_quark" domain="as-relation-error-quark"/>
+  <error-quark function="as_metadata_error_quark" domain="AsMetadataError"/>
+  <error-quark function="as_pool_error_quark" domain="AsPool"/>
+  <error-quark function="as_validator_error_quark" domain="as-validator-error-quark"/>
+  <error-quark function="as_utils_error_quark" domain="as-utils-error-quark"/>
+  <error-quark function="as_system_info_error_quark" domain="as-system-info-error-quark"/>
+</dump>

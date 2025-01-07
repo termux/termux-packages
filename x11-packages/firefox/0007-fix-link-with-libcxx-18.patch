@@ -1,0 +1,14 @@
+https://bugzilla.mozilla.org/show_bug.cgi?id=1874059
+https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=276746
+
+--- a/build/moz.configure/toolchain.configure
++++ b/build/moz.configure/toolchain.configure
+@@ -2344,7 +2344,7 @@
+ @depends(target, build_environment)
+ def visibility_flags(target, env):
+     if target.os != "WINNT":
+-        if target.kernel == "Darwin":
++        if True:
+             return ("-fvisibility=hidden", "-fvisibility-inlines-hidden")
+         return (
+             "-I%s/system_wrappers" % os.path.join(env.dist),

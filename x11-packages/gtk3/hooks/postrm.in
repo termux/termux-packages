@@ -1,5 +1,9 @@
 #!@TERMUX_PREFIX@/bin/sh
 
+if [ "$1" = "triggered" ]; then
+    exit 0
+fi
+
 if [ -d "@TERMUX_PREFIX@/lib/gtk-3.0/3.0.0" ]; then
     rm -f "@TERMUX_PREFIX@/lib/gtk-3.0/3.0.0/immodules.cache"
     rmdir -p --ignore-fail-on-non-empty "@TERMUX_PREFIX@/lib/gtk-3.0/3.0.0"

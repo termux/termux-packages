@@ -1,7 +1,19 @@
 # Default to temporary folder for runtime_dir.
 
---- module-protocol-native.c.orig	2022-05-25 11:10:34.812429150 +0530
-+++ ./src/modules/module-protocol-native.c	2022-05-25 11:22:50.862428869 +0530
+--- a/src/daemon/pipewire-aes67.conf.in
++++ b/src/daemon/pipewire-aes67.conf.in
+@@ -72,7 +72,7 @@ context.modules = [
+             net.loop = false
+             # If you use another PTPv2 daemon supporting management
+             # messages over a UNIX socket, specify its path here
+-            ptp.management-socket = "/var/run/ptp4lro"
++            ptp.management-socket = "@TERMUX_PREFIX@/var/run/ptp4lro"
+
+             stream.rules = [
+                 {
+
+--- a/src/modules/module-protocol-native.c
++++ b/src/modules/module-protocol-native.c
 @@ -660,5 +661,8 @@
  		runtime_dir = getenv("XDG_RUNTIME_DIR");
  	if (runtime_dir == NULL)
@@ -12,8 +24,20 @@
  	return runtime_dir;
  }
 
---- pipewire-0.3.55/src/modules/module-protocol-pulse/utils.c
-+++ pipewire-0.3.55.mod/src/modules/module-protocol-pulse/utils.c
+--- a/src/modules/module-protocol-pulse/snap-policy.c
++++ b/src/modules/module-protocol-pulse/snap-policy.c
+@@ -119,7 +119,7 @@ pw_sandbox_access_t pw_snap_get_audio_permissions(struct client *client, int fd,
+ 		// give to it full access.
+ 		if (check_is_same_snap(aacon, aa_label))
+ 			return PW_SANDBOX_ACCESS_ALL;
+-		snapd_client_set_socket_path(snapdclient, "/run/snapd-snap.socket");
++		snapd_client_set_socket_path(snapdclient, "@TERMUX_PREFIX@/var/run/snapd-snap.socket");
+
+ 		/* Take context from the environment if available */
+ 		const char *context = g_getenv("SNAP_COOKIE");
+
+--- a/src/modules/module-protocol-pulse/utils.c
++++ b/src/modules/module-protocol-pulse/utils.c
 @@ -62,6 +62,9 @@
  		dir = "pulse";
  	}
@@ -25,9 +49,18 @@
  				"$PULSE_RUNTIME_PATH and $XDG_RUNTIME_DIR");
  		return -ENOENT;
 
---- local-socket.c.orig	2022-05-25 11:10:47.232429145 +0530
-+++ ./src/modules/module-protocol-native/local-socket.c	2022-05-25 11:19:02.752428956 +0530
-@@ -70,5 +71,8 @@
+--- a/src/modules/module-protocol-native/local-socket.c
++++ b/src/modules/module-protocol-native/local-socket.c
+@@ -23,7 +23,7 @@
+ #include <pipewire/pipewire.h>
+ #include <spa/utils/json.h>
+
+-#define DEFAULT_SYSTEM_RUNTIME_DIR "/run/pipewire"
++#define DEFAULT_SYSTEM_RUNTIME_DIR "@TERMUX_PREFIX@/var/run/pipewire"
+
+ PW_LOG_TOPIC_EXTERN(mod_topic);
+ #define PW_LOG_TOPIC_DEFAULT mod_topic
+@@ -51,6 +51,9 @@ get_runtime_dir(void)
  		runtime_dir = getenv("XDG_RUNTIME_DIR");
  	if (runtime_dir == NULL)
  		runtime_dir = getenv("USERPROFILE");
@@ -36,3 +69,29 @@
 +	}
  	return runtime_dir;
  }
+
+--- a/src/modules/module-pipe-tunnel.c
++++ b/src/modules/module-pipe-tunnel.c
+@@ -116,8 +116,8 @@
+
+ #define NAME "pipe-tunnel"
+
+-#define DEFAULT_CAPTURE_FILENAME	"/tmp/fifo_input"
+-#define DEFAULT_PLAYBACK_FILENAME	"/tmp/fifo_output"
++#define DEFAULT_CAPTURE_FILENAME	"@TERMUX_PREFIX@/tmp/fifo_input"
++#define DEFAULT_PLAYBACK_FILENAME	"@TERMUX_PREFIX@/tmp/fifo_output"
+
+ #define DEFAULT_FORMAT "S16"
+ #define DEFAULT_RATE 48000
+
+--- a/src/tools/pw-container.c
++++ b/src/tools/pw-container.c
+@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
+ 	};
+ 	struct spa_error_location loc;
+ 	int c, res, listen_fd, close_fd[2];
+-	char temp[PATH_MAX] = "/tmp/pipewire-XXXXXX";
++	char temp[PATH_MAX] = "@TERMUX_PREFIX@/tmp/pipewire-XXXXXX";
+ 	struct sockaddr_un sockaddr = {0};
+
+ 	data.props = pw_properties_new(

@@ -9,6 +9,7 @@ TERMUX_PKG_REVISION=4
 _COMMIT=831e300e3d75a9618963bbefbaad49bf37e2cf3c
 TERMUX_PKG_SRCURL=https://github.com/termux/tergent/archive/${_COMMIT}.tar.gz
 TERMUX_PKG_SHA256=8979504a0e705fca35a6ae81ba1665c5bafebe218008ee50b6dc4f8a8d611cec
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="termux-api"
 TERMUX_PKG_BUILD_IN_SRC=true
 
@@ -22,7 +23,7 @@ termux_step_make() {
 		BUILD_TYPE=--release
 	fi
 
-	cargo build --jobs $TERMUX_MAKE_PROCESSES \
+	cargo build --jobs $TERMUX_PKG_MAKE_PROCESSES \
 		--target $CARGO_TARGET_NAME ${BUILD_TYPE}
 }
 

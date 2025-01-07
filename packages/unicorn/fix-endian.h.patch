@@ -5,11 +5,11 @@ diff -uNr unicorn-2.0.1/tests/unit/endian.h unicorn-2.0.1.mod/tests/unit/endian.
  // GNU libc offers the helpful header <endian.h> which defines
  // __BYTE_ORDER
  
--#if defined (__GLIBC__)
-+#if defined (__GLIBC__) || defined(ANDROID)
- # include <endian.h>
- # if (__BYTE_ORDER == __LITTLE_ENDIAN)
- #  define BOOST_LITTLE_ENDIAN
+-#if defined(__GLIBC__)
++#if defined(__GLIBC__) || defined(__ANDROID__)
+ #include <endian.h>
+ #if (__BYTE_ORDER == __LITTLE_ENDIAN)
+ #define BOOST_LITTLE_ENDIAN
 diff -uNr unicorn-2.0.1/tests/unit/unicorn_test.h unicorn-2.0.1.mod/tests/unit/unicorn_test.h
 --- unicorn-2.0.1/tests/unit/unicorn_test.h	2022-11-01 23:36:54.000000000 +0800
 +++ unicorn-2.0.1.mod/tests/unit/unicorn_test.h	2022-11-02 12:34:28.160365996 +0800

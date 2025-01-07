@@ -8,12 +8,12 @@
    QUIET_RM = @ echo "    RM $@" ;
    QUIET_TAGS = @ echo "    TAGS $@" ;
    QUIET_WINDRES = @ echo "    WINDRES $@" ;
-@@ -61,6 +62,7 @@
+@@ -74,6 +74,7 @@
    RANLIB_CMD = $(QUIET_RANLIB) $(RANLIB) $@
  endif
  LINK_CMD = $(QUIET_LINK) $(MKTGTDIR) ; $(CC) $(LDFLAGS) -o $@ $^ $(LIBS)
 +LINK_FOR_BUILD_CMD = $(QUIET_LINK_FOR_BUILD) $(MKTGTDIR) ; $(CC_FOR_BUILD) -o $@ $^
- TAGS_CMD = $(QUIET_TAGS) ctags -R --c-kinds=+p --exclude=platform/python --exclude=platform/c++
+ TAGS_CMD = $(QUIET_TAGS) ctags
  WINDRES_CMD = $(QUIET_WINDRES) $(MKTGTDIR) ; $(WINDRES) $< $@
  OBJCOPY_CMD = $(QUIET_OBJCOPY) $(MKTGTDIR) ; $(LD) -r -b binary -z noexecstack -o $@ $<
 @@ -82,7 +84,7 @@
@@ -25,15 +25,6 @@
  
  $(OUT)/%.$(SO):
  	$(LINK_CMD) $(LIB_LDFLAGS) $(THIRD_LIBS) $(LIBCRYPTO_LIBS)
-@@ -362,7 +364,7 @@
- $(OUT)/example: docs/examples/example.c $(MUPDF_LIB) $(THIRD_LIB)
- 	$(LINK_CMD) $(CFLAGS) $(THIRD_LIBS)
- $(OUT)/multi-threaded: docs/examples/multi-threaded.c $(MUPDF_LIB) $(THIRD_LIB)
--	$(LINK_CMD) $(CFLAGS) $(THIRD_LIBS) -lpthread
-+	$(LINK_CMD) $(CFLAGS) $(THIRD_LIBS)
- $(OUT)/storytest: docs/examples/storytest.c $(MUPDF_LIB) $(THIRD_LIB)
- 	$(LINK_CMD) $(CFLAGS) $(THIRD_LIBS)
- 
 @@ -413,9 +415,9 @@
  	install -m 644 $(LIBS_TO_INSTALL_IN_LIB) $(DESTDIR)$(libdir)
  endif

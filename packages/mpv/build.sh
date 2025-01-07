@@ -1,12 +1,14 @@
 TERMUX_PKG_HOMEPAGE=https://mpv.io/
 TERMUX_PKG_DESCRIPTION="Command-line media player"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.35.0
+TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
+# Update both mpv and mpv-x to the same version in one PR.
+TERMUX_PKG_VERSION="0.39.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/mpv-player/mpv/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=dc411c899a64548250c142bf1fa1aa7528f1b4398a24c86b816093999049ec00
-TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="ffmpeg, libandroid-glob, libandroid-support, libarchive, libass, libcaca, libiconv, liblua52, libsixel, libuchardet, openal-soft, pulseaudio, rubberband, zlib"
+TERMUX_PKG_SHA256=2ca92437affb62c2b559b4419ea4785c70d023590500e8a52e95ea3ab4554683
+TERMUX_PKG_AUTO_UPDATE=false
+TERMUX_PKG_DEPENDS="alsa-lib, ffmpeg, jack, libandroid-glob, libandroid-support, libarchive, libass, libcaca, libiconv, liblua52, libsixel, libuchardet, openal-soft, pulseaudio, rubberband, zlib, libplacebo"
 TERMUX_PKG_RM_AFTER_INSTALL="share/icons share/applications"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dlibmpv=true
@@ -30,8 +32,18 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dandroid-media-ndk=disabled
 "
 
+termux_step_post_get_source() {
+	# Version guard
+	local ver_m=${TERMUX_PKG_VERSION#*:}
+	local ver_x=$(. $TERMUX_SCRIPTDIR/x11-packages/mpv-x/build.sh; echo ${TERMUX_PKG_VERSION#*:})
+	if [ "${ver_m}" != "${ver_x}" ]; then
+		termux_error_exit "Version mismatch between mpv and mpv-x."
+	fi
+}
+
 termux_step_pre_configure() {
 	LDFLAGS+=" -landroid-glob"
+	sed -i "s/host_machine.system() == 'android'/false/" ${TERMUX_PKG_SRCDIR}/meson.build
 }
 
 termux_step_post_make_install() {

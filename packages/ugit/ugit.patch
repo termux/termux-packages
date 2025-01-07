@@ -1,20 +1,26 @@
 diff --git a/ugit b/ugit
-index ae0b8a2..4ff660f 100755
+index c116180..c9cce1a 100755
 --- a/ugit
 +++ b/ugit
-@@ -328,7 +328,6 @@ Available options:
- 
- -h, --help      Print this help and exit
- -v, --version   Print current ugit version
---u, --update    Update ugit
- -g, --guide     Open ugit undo text guide
- EOF
- printf "\n%s\n" "Contact 📬️: $(tput bold)varshneybhupesh@gmail.com${RESET} for assistance"
-@@ -344,25 +343,6 @@ get_changelog() {
-     echo -e "${CHANGELOG#* }"
+@@ -429,7 +429,6 @@ print_help() {
+     printf "Available options:\n"
+     printf "  -h, --help      Print this help and exit\n"
+     printf "  -v, --version   Print current ugit version\n"
+-    printf "  -u, --update    Update ugit\n"
+     printf "  -g, --guide     Open the ugit undo text guide\n\n"
+     printf "Contact 📬️: %s for assistance\n" "$(tput bold)varshneybhupesh@gmail.com${RESET}"
+     printf "Read the guide: %s\n" "https://til.bhupesh.me/git/how-to-undo-anything-in-git"
+@@ -443,31 +442,6 @@ get_changelog() {
+     printf "Read Full Changelog: %s\n" "${BOLD}${CHANGELOG}${RESET}"
  }
  
 -ugit_update() {
+-    if [ -n "${UGIT_RUNNING_IN_DOCKER-}" ] && [ "$UGIT_RUNNING_IN_DOCKER" = true ]; then
+-        printf "%s\n\n" "You are running version ${VERSION} of ugit via Docker. Please pull the latest docker image to update."
+-        printf "\t%s\n" "${BOLD_ORG_FG}docker pull bhupeshimself/ugit${RESET}"
+-        return
+-    fi
+-
 -    printf "%s\n" "Checking for updates ..."
 -    curl -s -L "$SCRIPT_URL" > "$TMP_FILE"
 -    NEW_VER=$(grep "^VERSION" "$TMP_FILE" | awk -F'[="]' '{print $3}')
@@ -34,9 +40,9 @@ index ae0b8a2..4ff660f 100755
 -}
 -
  open_guide() {
-     GUIDE="https://bhupesh.gitbook.io/notes/git/how-to-undo-anything-in-git"
- 
-@@ -407,8 +387,6 @@ main() {
+     GUIDE="https://til.bhupesh.me/git/how-to-undo-anything-in-git"
+     
+@@ -517,8 +491,6 @@ main() {
          case "$key" in
              --version|-v)
                  show_version;;

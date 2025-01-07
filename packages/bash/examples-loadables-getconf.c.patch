@@ -12,3 +12,26 @@ diff -uNr bash-5.2/examples/loadables/getconf.c bash-5.2.mod/examples/loadables/
  
      /* LFS */
  #ifdef _CS_LFS_CFLAGS
+@@ -1072,6 +1074,7 @@
+ 	printf ("%ld\n", value);
+       return (EXECUTION_SUCCESS);
+ 
++#ifndef __ANDROID__
+     case CONFSTR:
+       errno = 0;
+       clen = confstr (cn, (char *) NULL, 0);
+@@ -1092,10 +1095,14 @@
+ 	printf ("%.*s\n", (int) clen, cvalue);
+       free (cvalue);
+       return (EXECUTION_SUCCESS);
++#endif
+ 
+     case CONSTANT:
+       return (getconf_internal (c, all));
+ 
++#ifdef __ANDROID__
++    case CONFSTR:
++#endif
+     case UNDEFINED:
+       builtin_error ("%s: undefined", c->name);
+       return (EXECUTION_FAILURE);

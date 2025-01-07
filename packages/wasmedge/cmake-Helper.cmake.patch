@@ -1,11 +1,18 @@
-diff -uNr WasmEdge/cmake/Helper.cmake WasmEdge.mod/cmake/Helper.cmake
---- WasmEdge/cmake/Helper.cmake	2022-07-28 18:56:12.000000000 +0800
-+++ WasmEdge.mod/cmake/Helper.cmake	2022-08-15 01:48:53.030855482 +0800
-@@ -19,7 +19,6 @@
- list(APPEND WASMEDGE_CFLAGS
-   -Wall
-   -Wextra
--  -Werror
-   -Wno-error=pedantic
- )
- if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+diff --git a/cmake/Helper.cmake b/cmake/Helper.cmake
+index 992e469..4075621 100644
+--- a/cmake/Helper.cmake
++++ b/cmake/Helper.cmake
+@@ -37,13 +37,6 @@ else()
+     -Wextra
+   )
+ 
+-  if(NOT WASMEDGE_PLUGIN_WASI_NN_GGML_LLAMA_CUBLAS)
+-    list(APPEND WASMEDGE_CFLAGS
+-      -Werror
+-      -Wno-error=pedantic
+-    )
+-  endif()
+-
+   if(WASMEDGE_ENABLE_UB_SANITIZER)
+     list(APPEND WASMEDGE_CFLAGS -fsanitize=undefined)
+   endif()

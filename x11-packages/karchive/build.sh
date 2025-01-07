@@ -1,9 +1,0 @@
-TERMUX_PKG_HOMEPAGE=https://www.kde.org/
-TERMUX_PKG_DESCRIPTION="Qt 5 addon providing access to numerous types of archives (KDE)"
-TERMUX_PKG_LICENSE="LGPL-2.1"
-TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
-TERMUX_PKG_VERSION=5.101.0
-TERMUX_PKG_SRCURL="https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/karchive-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=58bcb6c61bc4a3fe48a0cbeaf392d42b6b8d33e1bc4c51faf24db0912ecfa9b0
-TERMUX_PKG_DEPENDS="libbz2, libc++, liblzma, qt5-qtbase, zlib, zstd"
-TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules, qt5-qtbase-cross-tools, qt5-qttools-cross-tools"

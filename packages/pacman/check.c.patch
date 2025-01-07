@@ -1,0 +1,90 @@
+--- pacman-6.1.0/src/pacman/check.c	2024-03-04 06:07:58.000000000 +0300
++++ pacman-6.1.0/src/pacman/check.c.patch	2024-05-18 18:48:05.299055786 +0300
+@@ -70,13 +70,12 @@
+ }
+ 
+ static int check_file_permissions(const char *pkgname, const char *filepath,
+-		struct stat *st, struct archive_entry *entry)
++		struct stat *st)
+ {
+ 	int errors = 0;
+-	mode_t fsmode;
+ 
+ 	/* uid */
+-	if(st->st_uid != archive_entry_uid(entry)) {
++	if(st->st_uid != getuid()) {
+ 		errors++;
+ 		if(!config->quiet) {
+ 			pm_printf(ALPM_LOG_WARNING, _("%s: %s (UID mismatch)\n"),
+@@ -85,7 +84,7 @@
+ 	}
+ 
+ 	/* gid */
+-	if(st->st_gid != archive_entry_gid(entry)) {
++	if(st->st_gid != getgid()) {
+ 		errors++;
+ 		if(!config->quiet) {
+ 			pm_printf(ALPM_LOG_WARNING, _("%s: %s (GID mismatch)\n"),
+@@ -93,16 +92,6 @@
+ 		}
+ 	}
+ 
+-	/* mode */
+-	fsmode = st->st_mode & (S_ISUID | S_ISGID | S_ISVTX | S_IRWXU | S_IRWXG | S_IRWXO);
+-	if(fsmode != (~AE_IFMT & archive_entry_mode(entry))) {
+-		errors++;
+-		if(!config->quiet) {
+-			pm_printf(ALPM_LOG_WARNING, _("%s: %s (Permissions mismatch)\n"),
+-					pkgname, filepath);
+-		}
+-	}
+-
+ 	return (errors != 0 ? 1 : 0);
+ }
+ 
+@@ -130,17 +119,11 @@
+ }
+ 
+ static int check_file_link(const char *pkgname, const char *filepath,
+-		struct stat *st, struct archive_entry *entry)
++		struct archive_entry *entry)
+ {
+-	size_t length = st->st_size + 1;
+-	char link[length];
+-
+-	if(readlink(filepath, link, length) != st->st_size) {
+-		/* this should not happen */
+-		pm_printf(ALPM_LOG_ERROR, _("unable to read symlink contents: %s\n"), filepath);
+-		return 1;
+-	}
+-	link[length - 1] = '\0';
++	char link[PATH_MAX];
++	size_t length = readlink(filepath, link, sizeof(link)-1);
++	link[length] = '\0';
+ 
+ 	if(strcmp(link, archive_entry_symlink(entry)) != 0) {
+ 		if(!config->quiet) {
+@@ -367,6 +350,10 @@
+ 
+ 		file_count++;
+ 
++		// On Android there is no point in checking these directories
++		if (strcmp(filepath, "/data") == 0 || strcmp(filepath, "/data/data") == 0)
++			continue;
++
+ 		exists = check_file_exists(pkgname, filepath, rootlen, &st);
+ 		if(exists == 1) {
+ 			errors++;
+@@ -388,10 +375,10 @@
+ 			continue;
+ 		}
+ 
+-		file_errors += check_file_permissions(pkgname, filepath, &st, entry);
++		file_errors += check_file_permissions(pkgname, filepath, &st);
+ 
+ 		if(type == AE_IFLNK) {
+-			file_errors += check_file_link(pkgname, filepath, &st, entry);
++			file_errors += check_file_link(pkgname, filepath, entry);
+ 		}
+ 
+ 		/* the following checks are expected to fail if a backup file has been

@@ -1,0 +1,99 @@
+--- a/src/3rdparty/chromium/net/dns/dns_config_service_posix.cc
++++ b/src/3rdparty/chromium/net/dns/dns_config_service_posix.cc
+@@ -54,7 +54,7 @@
+     FILE_PATH_LITERAL("/system/etc/hosts");
+ #else
+ const base::FilePath::CharType kFilePathHosts[] =
+-    FILE_PATH_LITERAL("/etc/hosts");
++    FILE_PATH_LITERAL("@TERMUX_PREFIX@/etc/hosts");
+ #endif
+ 
+ #if defined(OS_IOS)
+@@ -103,7 +103,7 @@
+ #else  // !defined(OS_IOS) && !defined(OS_ANDROID) && !defined(OS_MAC)
+ 
+ #ifndef _PATH_RESCONF  // Normally defined in <resolv.h>
+-#define _PATH_RESCONF "/etc/resolv.conf"
++#define _PATH_RESCONF "@TERMUX_PREFIX@/etc/resolv.conf"
+ #endif
+ 
+ const base::FilePath::CharType kFilePathConfig[] =
+@@ -148,7 +148,7 @@
+   base::ScopedBlockingCall scoped_blocking_call(FROM_HERE,
+                                                 base::BlockingType::MAY_BLOCK);
+   dns_config->unhandled_options = false;
+-#if !defined(OS_ANDROID)
++#if !defined(OS_ANDROID) && !defined(__TERMUX__)
+   ConfigParsePosixResult result;
+ // TODO(fuchsia): Use res_ninit() when it's implemented on Fuchsia.
+ #if defined(OS_OPENBSD) || defined(OS_FUCHSIA)
+@@ -192,6 +192,16 @@
+   // Override timeout value to match default setting on Windows.
+   dns_config->timeout = kDnsDefaultTimeout;
+   return result;
++#elif defined(__TERMUX__)
++  dns_config->nameservers.clear();
++  IPAddress termux_dns_address;
++  bool parsed_termux = termux_dns_address.AssignFromIPLiteral("8.8.8.8");
++  if (parsed_termux) {
++    IPEndPoint termux_dns(termux_dns_address, dns_protocol::kDefaultPort);
++    dns_config->nameservers.push_back(termux_dns);
++  }
++  dns_config->timeout = kDnsDefaultTimeout;
++  return CONFIG_PARSE_POSIX_OK;
+ #else  // defined(OS_ANDROID)
+   dns_config->nameservers.clear();
+ 
+@@ -468,7 +478,7 @@
+   hosts_reader_ = base::MakeRefCounted<HostsReader>(this);
+ }
+ 
+-#if !defined(OS_ANDROID)
++#if !defined(OS_ANDROID) && !defined(__TERMUX__)
+ ConfigParsePosixResult ConvertResStateToDnsConfig(const struct __res_state& res,
+                                                   DnsConfig* dns_config) {
+   DCHECK(dns_config);
+--- a/src/3rdparty/chromium/net/dns/dns_reloader.cc
++++ b/src/3rdparty/chromium/net/dns/dns_reloader.cc
+@@ -5,7 +5,7 @@
+ #include "net/dns/dns_reloader.h"
+ 
+ #if defined(OS_POSIX) && !defined(OS_APPLE) && !defined(OS_OPENBSD) && \
+-    !defined(OS_ANDROID) && !defined(OS_FUCHSIA)
++    !defined(OS_ANDROID) && !defined(OS_FUCHSIA) && !defined(__TERMUX__)
+ 
+ #include <resolv.h>
+ 
+--- a/src/3rdparty/chromium/net/dns/dns_reloader.h
++++ b/src/3rdparty/chromium/net/dns/dns_reloader.h
+@@ -7,7 +7,7 @@
+ 
+ #include "build/build_config.h"
+ 
+-#if defined(OS_POSIX) && !defined(OS_APPLE) && !defined(OS_OPENBSD)
++#if defined(OS_POSIX) && !defined(OS_APPLE) && !defined(OS_OPENBSD) && !defined(__TERMUX__)
+ namespace net {
+ 
+ // Call on the network thread before calling DnsReloaderMaybeReload() anywhere.
+--- a/src/3rdparty/chromium/net/dns/host_resolver_proc.cc
++++ b/src/3rdparty/chromium/net/dns/host_resolver_proc.cc
+@@ -160,7 +160,7 @@
+                                                 base::BlockingType::WILL_BLOCK);
+ 
+ #if defined(OS_POSIX) && !defined(OS_APPLE) && !defined(OS_OPENBSD) && \
+-    !defined(OS_ANDROID) && !defined(OS_FUCHSIA)
++    !defined(OS_ANDROID) && !defined(OS_FUCHSIA) && !defined(__TERMUX__)
+   DnsReloaderMaybeReload();
+ #endif
+   base::Optional<AddressInfo> ai;
+--- a/src/3rdparty/chromium/net/dns/host_resolver_manager.cc
++++ b/src/3rdparty/chromium/net/dns/host_resolver_manager.cc
+@@ -2779,7 +2779,7 @@
+   if (system_dns_config_notifier_)
+     system_dns_config_notifier_->AddObserver(this);
+ #if defined(OS_POSIX) && !defined(OS_APPLE) && !defined(OS_OPENBSD) && \
+-    !defined(OS_ANDROID)
++    !defined(OS_ANDROID) && !defined(__TERMUX__)
+   EnsureDnsReloaderInit();
+ #endif
+ 

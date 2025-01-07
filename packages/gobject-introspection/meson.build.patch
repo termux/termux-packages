@@ -1,7 +1,7 @@
 --- a/meson.build
 +++ b/meson.build
-@@ -151,7 +152,7 @@
-   fallback : ['libffi', 'ffi_dep'])
+@@ -155,7 +155,7 @@
+ libffi_dep = dependency('libffi')
  
  if not (host_system == 'darwin' and host_arch == 'aarch64' or
 -        host_system == 'linux' and libffi_dep.version().version_compare('>= 3.4'))
@@ -9,10 +9,10 @@
    config.set('LEGACY_GIRFFI_FREE', 1)
  endif
  
-@@ -251,9 +249,9 @@
+@@ -265,9 +265,9 @@
+ endif
+ 
  pkgconfig_variables = [
-   'datadir=' + '${prefix}' / get_option('datadir'),
-   'bindir=' + '${prefix}' / get_option('bindir'),
 -  'g_ir_scanner=${bindir}/g-ir-scanner',
 -  'g_ir_compiler=${bindir}/g-ir-compiler@0@'.format(exe_ext),
 -  'g_ir_generate=${bindir}/g-ir-generate@0@'.format(exe_ext),

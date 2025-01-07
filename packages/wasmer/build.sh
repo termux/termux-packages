@@ -1,158 +1,147 @@
-TERMUX_PKG_HOMEPAGE=https://github.com/wasmerio/wasmer
+TERMUX_PKG_HOMEPAGE=https://wasmer.io/
 TERMUX_PKG_DESCRIPTION="A fast and secure WebAssembly runtime"
 TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_LICENSE_FILE="ATTRIBUTIONS, LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.1.0
-TERMUX_PKG_SRCURL=https://github.com/wasmerio/wasmer/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=d3a27e5fd834573a226374e0c5ed8891af9fab41749efa2aecbd3d22c3f950a2
+TERMUX_PKG_VERSION="5.0.4"
+TERMUX_PKG_SRCURL=https://github.com/wasmerio/wasmer/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=e6f0df11dd4647fa3d9177ed298a6e3afd2b5be6ea4494c00c2074c90681ad27
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_NO_STATICSPLIT=true
+TERMUX_PKG_AUTO_UPDATE=true
 
-# missing support in wasmer-emscripten
+# missing support in wasmer-emscripten, wasmer-vm
 TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
 
 termux_step_pre_configure() {
-	export WASMER_INSTALL_PREFIX="$TERMUX_PREFIX"
-
 	# https://github.com/rust-lang/compiler-builtins#unimplemented-functions
 	# https://github.com/rust-lang/rfcs/issues/2629
-	# Android NDK r23 removed libgcc and replaced with libcompiler-rt
-	# Rust libcompiler-rt support does not fully cover all libgcc functions
-	# due to missing types f128 and f80 in Rust
-	# This workaround likely will break something in rusqlite in wapm
-	export CFLAGS+=" -DLONGDOUBLE_TYPE=double"
-
+	# https://github.com/rust-lang/rust/issues/46651
+	# https://github.com/termux/termux-packages/issues/8029
+	local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
+	export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C link-arg=$(${CC} -print-libgcc-file-name)"
+	export WASMER_INSTALL_PREFIX="${TERMUX_PREFIX}"
 	termux_setup_rust
 }
 
 termux_step_make() {
+	local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
+
 	# https://github.com/wasmerio/wasmer/blob/master/Makefile
 	# Makefile only does host builds
 	# Dropping host build due to https://github.com/wasmerio/wasmer/issues/2822
 
-	# singlepass only for x86_64
+	local compilers="cranelift"
 
-	# make build-wasmer
+	# TODO llvm-sys.rs crate has issues with libLLVM*.so as static archive
+	#compilers+=",llvm"
+	#export LLVM_VERSION=$(${TERMUX_PREFIX}/bin/llvm-config --version)
+	#export LLVM_SYS_140_PREFIX=$(${TERMUX_PREFIX}/bin/llvm-config --prefix)
+
+	case "${TERMUX_ARCH}" in
+	aarch64) compilers+=",singlepass" ;;
+	x86_64) compilers+=",singlepass" ;;
+	esac
+
+	local compiler_features="${compilers},wasmer-artifact-create,static-artifact-create,wasmer-artifact-load,static-artifact-load"
+	local capi_compiler_features="${compilers/,llvm/},wasmer-artifact-create,static-artifact-create,wasmer-artifact-load,static-artifact-load"
+
+	echo "make build-wasmer"
 	# https://github.com/wasmerio/wasmer/blob/master/lib/cli/Cargo.toml
-	if [ "$TERMUX_ARCH" = "x86_64" ]; then
-		cargo build \
-			--jobs "$TERMUX_MAKE_PROCESSES" \
-			--target "$CARGO_TARGET_NAME" \
-			--release \
-			--manifest-path lib/cli/Cargo.toml \
-			--bin wasmer \
-			--no-default-features \
-			--features wat,wast,cache,wasi,emscripten,cranelift,singlepass
-	else
-		cargo build \
-			--jobs "$TERMUX_MAKE_PROCESSES" \
-			--target "$CARGO_TARGET_NAME" \
-			--release \
-			--manifest-path lib/cli/Cargo.toml \
-			--bin wasmer \
-			--no-default-features \
-			--features wat,wast,cache,wasi,emscripten,cranelift
-	fi
-
-	# make build-capi
-	if [ "$TERMUX_ARCH" = "x86_64" ]; then
-		cargo build \
-			--jobs "$TERMUX_MAKE_PROCESSES" \
-			--target "$CARGO_TARGET_NAME" \
-			--release \
-			--manifest-path lib/c-api/Cargo.toml \
-			--no-default-features \
-			--features wat,wasi,middlewares,cranelift,singlepass
-	else
-		cargo build \
-			--jobs "$TERMUX_MAKE_PROCESSES" \
-			--target "$CARGO_TARGET_NAME" \
-			--release \
-			--manifest-path lib/c-api/Cargo.toml \
-			--no-default-features \
-			--features wat,wasi,middlewares,cranelift
-	fi
-
-	# make build-wapm
-	wapm_version="$(grep "WAPM_VERSION = " "$TERMUX_PKG_SRCDIR/Makefile" | sed -e "s/.* = //")"
-	[ -d "wapm-cli" ] || git clone --branch "${wapm_version}" "https://github.com/wasmerio/wapm-cli.git"
 	cargo build \
-		--jobs "$TERMUX_MAKE_PROCESSES" \
-		--target "$CARGO_TARGET_NAME" \
+		--jobs "${TERMUX_PKG_MAKE_PROCESSES}" \
+		--target "${CARGO_TARGET_NAME}" \
 		--release \
-		--manifest-path wapm-cli/Cargo.toml \
-		--features telemetry,update-notifications
+		--manifest-path lib/cli/Cargo.toml \
+		--no-default-features \
+		--features "wat,wast,${compiler_features}" \
+		--bin wasmer
+
+	echo "make build-capi"
+	cargo build \
+		--jobs "${TERMUX_PKG_MAKE_PROCESSES}" \
+		--target "${CARGO_TARGET_NAME}" \
+		--release \
+		--manifest-path lib/c-api/Cargo.toml \
+		--no-default-features \
+		--features "wat,compiler,wasi,middlewares,webc_runner,${capi_compiler_features}"
+
+	echo "make build-wasmer-headless-minimal"
+	export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C panic=abort"
+	cargo build \
+		--jobs "${TERMUX_PKG_MAKE_PROCESSES}" \
+		--target "${CARGO_TARGET_NAME}" \
+		--release \
+		--manifest-path=lib/cli/Cargo.toml \
+		--no-default-features \
+		--features sys,headless-minimal \
+		--bin wasmer-headless
+
+	echo "make build-capi-headless"
+	export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C panic=abort -C link-dead-code -C lto -O -C embed-bitcode=yes"
+	cargo build \
+		--jobs "${TERMUX_PKG_MAKE_PROCESSES}" \
+		--target "${CARGO_TARGET_NAME}" \
+		--release \
+		--manifest-path lib/c-api/Cargo.toml \
+		--no-default-features \
+		--features compiler-headless,wasi,webc_runner \
+		--target-dir target/headless
 }
 
 termux_step_make_install() {
-	# make install-wasmer
-	install -Dm755 -t "$TERMUX_PREFIX/bin" "target/$CARGO_TARGET_NAME/release/wasmer"
+	install -Dm755 -t "${TERMUX_PREFIX}/bin" "target/${CARGO_TARGET_NAME}/release/wasmer"
+	install -Dm755 -t "${TERMUX_PREFIX}/bin" "target/${CARGO_TARGET_NAME}/release/wasmer-headless"
 
-	# make install-capi-headers
-	for header in lib/c-api/*.h; do
-		install -Dm644 "$header" "$TERMUX_PREFIX/include/$(basename $header)"
+	for h in lib/c-api/*.h; do
+		install -Dm644 "${h}" "${TERMUX_PREFIX}"/include/$(basename "${h}")
 	done
-	install -Dm644 "lib/c-api/README.md" "$TERMUX_PREFIX/include/wasmer-README.md"
+	# copy to share/doc/wasmer instead of include
+	install -Dm644 "lib/c-api/README.md" "${TERMUX_PREFIX}/share/doc/wasmer/wasmer-README.md"
 
-	# make install-capi-lib
-	shortver="${TERMUX_PKG_VERSION%.*}"
-	majorver="${shortver%.*}"
-	install -Dm755 "target/$CARGO_TARGET_NAME/release/libwasmer.so" "$TERMUX_PREFIX/lib/libwasmer.so.$TERMUX_PKG_VERSION"
-	ln -sf "libwasmer.so.$TERMUX_PKG_VERSION" "$TERMUX_PREFIX/lib/libwasmer.so.$shortver"
-	ln -sf "libwasmer.so.$TERMUX_PKG_VERSION" "$TERMUX_PREFIX/lib/libwasmer.so.$majorver"
-	ln -sf "libwasmer.so.$TERMUX_PKG_VERSION" "$TERMUX_PREFIX/lib/libwasmer.so"
+	local shortver="${TERMUX_PKG_VERSION%.*}"
+	local majorver="${shortver%.*}"
+	install -Dm644 "target/${CARGO_TARGET_NAME}/release/libwasmer.so" "${TERMUX_PREFIX}/lib/libwasmer.so.${TERMUX_PKG_VERSION}"
+	ln -sf "libwasmer.so.${TERMUX_PKG_VERSION}" "${TERMUX_PREFIX}/lib/libwasmer.so.${shortver}"
+	ln -sf "libwasmer.so.${TERMUX_PKG_VERSION}" "${TERMUX_PREFIX}/lib/libwasmer.so.${majorver}"
+	ln -sf "libwasmer.so.${TERMUX_PKG_VERSION}" "${TERMUX_PREFIX}/lib/libwasmer.so"
+	install -Dm644 "target/${CARGO_TARGET_NAME}/release/libwasmer.a" "${TERMUX_PREFIX}/lib/libwasmer.a"
 
-	# make install-capi-staticlib
-	install -Dm644 "target/$CARGO_TARGET_NAME/release/libwasmer.a" "$TERMUX_PREFIX/lib/libwasmer.a"
+	install -Dm644 "target/headless/${CARGO_TARGET_NAME}/release/libwasmer.so" "${TERMUX_PREFIX}/lib/libwasmer-headless.so"
+	install -Dm644 "target/headless/${CARGO_TARGET_NAME}/release/libwasmer.a" "${TERMUX_PREFIX}/lib/libwasmer-headless.a"
 
-	# make install-pkg-config
 	# https://github.com/wasmerio/wasmer/blob/master/lib/cli/src/commands/config.rs
-	mkdir -p "$TERMUX_PREFIX/lib/pkgconfig"
-	cat <<- EOF > "$TERMUX_PREFIX/lib/pkgconfig/wasmer.pc"
-	prefix=$TERMUX_PREFIX
-	exec_prefix=$TERMUX_PREFIX/bin
-	includedir=$TERMUX_PREFIX/include
-	libdir=$TERMUX_PREFIX/lib
+	install -Dm644 /dev/null "${TERMUX_PREFIX}/lib/pkgconfig/wasmer.pc"
+	cat <<- EOF > "${TERMUX_PREFIX}/lib/pkgconfig/wasmer.pc"
+	prefix=${TERMUX_PREFIX}
+	exec_prefix=${TERMUX_PREFIX}/bin
+	includedir=${TERMUX_PREFIX}/include
+	libdir=${TERMUX_PREFIX}/lib
 
 	Name: wasmer
 	Description: The Wasmer library for running WebAssembly
-	Version: $TERMUX_PKG_VERSION
-	Cflags: -I$TERMUX_PREFIX/include
-	Libs: -L$TERMUX_PREFIX/lib -lwasmer
+	Version: ${TERMUX_PKG_VERSION}
+	Cflags: -I${TERMUX_PREFIX}/include
+	Libs: -L${TERMUX_PREFIX}/lib -lwasmer
 	EOF
 
-	# make install-wapm (non-existant)
-	install -Dm755 "wapm-cli/target/$CARGO_TARGET_NAME/release/wapm" "$TERMUX_PREFIX/bin/wapm"
+	cp docs/ATTRIBUTIONS.md ATTRIBUTIONS
 
-	cat <<- EOF > "$TERMUX_PKG_TMPDIR/wasmer.sh"
-	#!$TERMUX_PREFIX/bin/sh
-	export PATH=\$PATH:\$HOME/.wasmer/globals/wapm_packages/.bin
-	EOF
-	install -Dm644 "$TERMUX_PKG_TMPDIR/wasmer.sh" "$TERMUX_PREFIX/etc/profile.d/wasmer.sh"
-
-	unset WASMER_INSTALL_PREFIX
+	unset LLVM_SYS_140_PREFIX LLVM_VERSION WASMER_INSTALL_PREFIX
 }
 
 termux_step_create_debscripts() {
-	cat <<- EOF > postinst
-	#!$TERMUX_PREFIX/bin/sh
-	echo "Creating directory \$HOME/.wasmer ..."
-	mkdir -p "\$HOME/.wasmer"
-	echo '
-	====================
-	Post-install notice:
-	If this is the first time installing Wasmer,
-	please start a new session to take effect.
+	cat <<- EOL > postinst
+	#1${TERMUX_PREFIX}/bin/sh
+	if [ -n "\$(command -v wapm)" ]; then
+	echo "
+	===== Post-install notice =====
 
-	===================='
-	EOF
+	Upstream has deprecated 'wapm' package.
+	You may want to remove 'wapm' package.
 
-	cat <<- EOF > postrm
-	#!$TERMUX_PREFIX/bin/sh
-	case "\$1" in
-	purge|remove)
-	echo "Removing directory \$HOME/.wasmer ..."
-	rm -fr "\$HOME/.wasmer"
-	esac
-	EOF
+	===== Post-install notice =====
+	"
+	fi
+	EOL
 }

@@ -23,12 +23,12 @@
      "\n"
      "#\n"
      "################################################</pre>"
-@@ -241,7 +241,7 @@
+@@ -282,7 +282,7 @@
  
      if (settings_.doc_root.empty())
      {
--        std::string default_page = "/usr/share/snapserver/index.html";
-+        std::string default_page = "@TERMUX_PREFIX@/share/snapserver/index.html";
-         struct stat buffer;
-         if (stat(default_page.c_str(), &buffer) == 0)
+-        static constexpr auto default_page = "/usr/share/snapserver/index.html";
++        static constexpr auto default_page = "@TERMUX_PREFIX@/share/snapserver/index.html";
+         if (utils::file::exists(default_page))
              path = default_page;
+         else

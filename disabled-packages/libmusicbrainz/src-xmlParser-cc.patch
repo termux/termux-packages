@@ -1,0 +1,21 @@
+diff -u -r ../libmusicbrainz-5.1.0/src/xmlParser.cc ./src/xmlParser.cc
+--- ../libmusicbrainz-5.1.0/src/xmlParser.cc	2014-11-13 13:12:24.000000000 +0000
++++ ./src/xmlParser.cc	2024-05-16 18:14:46.942518237 +0000
+@@ -56,7 +56,7 @@
+ 
+     doc = xmlParseFile(filename.c_str());
+     if ((doc == NULL) && (results != NULL)) {
+-        xmlErrorPtr error = xmlGetLastError();
++        const xmlError * error = xmlGetLastError();
+         results->message = error->message;
+         results->line = error->line;
+         results->code = error->code;
+@@ -71,7 +71,7 @@
+ 
+     doc = xmlParseMemory(xml.c_str(), xml.length());
+     if ((doc == NULL) && (results != NULL)) {
+-        xmlErrorPtr error = xmlGetLastError();
++        const xmlError * error = xmlGetLastError();
+         results->message = error->message;
+         results->line = error->line;
+         results->code = error->code;

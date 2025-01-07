@@ -1,6 +1,19 @@
 name: Package updates
 
 on:
+  push:
+    branches:
+    - '**'
+    - '!master'
+    paths:
+    - 'packages/**'
+    - 'root-packages/**'
+    - 'x11-packages/**'
+  pull_request:
+    paths:
+    - 'packages/**'
+    - 'root-packages/**'
+    - 'x11-packages/**'
   schedule:
     - cron: "0 */6 * * *"
   workflow_dispatch:
@@ -9,34 +22,145 @@ on:
         description: "A space-seperated list of packages to update. Defaults to all packages"
         default: "@all"
         required: false
-        
+
 permissions: {} # none
 
 jobs:
+  update-packages-dry-run:
+    permissions:
+      contents: read
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Gather build summary
+        run: |
+          BASE_COMMIT=$(jq --raw-output .pull_request.base.sha "$GITHUB_EVENT_PATH")
+          OLD_COMMIT=$(jq --raw-output .commits[0].id "$GITHUB_EVENT_PATH")
+          HEAD_COMMIT=$(jq --raw-output .commits[-1].id "$GITHUB_EVENT_PATH")
+          if [ "$BASE_COMMIT" = "null" ]; then
+            if [ "$OLD_COMMIT" = "$HEAD_COMMIT" ]; then
+              # Single-commit push.
+              echo "Processing commit: ${HEAD_COMMIT}"
+              CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${HEAD_COMMIT}")
+            else
+              # Multi-commit push.
+              OLD_COMMIT="${OLD_COMMIT}~1"
+              echo "Processing commit range: ${OLD_COMMIT}..${HEAD_COMMIT}"
+              CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${OLD_COMMIT}" "${HEAD_COMMIT}")
+            fi
+          else
+            # Pull requests.
+            echo "Processing pull request #$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH"): ${BASE_COMMIT}..HEAD"
+            CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${BASE_COMMIT}" "HEAD")
+          fi
+          for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
+            repo=$(jq --raw-output '.["'${repo_path}'"].name' repo.json)
+            # Parse changed files and identify new packages and deleted packages.
+            # Create lists of those packages that will be passed to upload job for
+            # further processing.
+            while read -r file; do
+              if ! [[ $file == ${repo_path}/* ]]; then
+                # This file does not belong to a package, so ignore it
+                continue
+              fi
+              if [[ $file =~ ^${repo_path}/([.a-z0-9+-]*)/([.a-z0-9+-]*).subpackage.sh$ ]]; then
+                # A subpackage was modified, check if it was deleted or just updated
+                pkg=${BASH_REMATCH[1]}
+                subpkg=${BASH_REMATCH[2]}
+                if [ ! -f "${repo_path}/${pkg}/${subpkg}.subpackage.sh" ]; then
+                  echo "$subpkg" >> ./deleted_${repo}_packages.txt
+                fi
+              elif [[ $file =~ ^${repo_path}/([.a-z0-9+-]*)/.*$ ]]; then
+                # package, check if it was deleted or updated
+                pkg=${BASH_REMATCH[1]}
+                if [ -d "${repo_path}/${pkg}" ]; then
+                  echo "$pkg" >> ./built_${repo}_packages.txt
+                  # If there are subpackages we want to create a list of those
+                  # as well
+                  for file in $(find "${repo_path}/${pkg}/" -maxdepth 1 -type f -name \*.subpackage.sh | sort); do
+                    echo "$(basename "${file%%.subpackage.sh}")" >> ./built_${repo}_subpackages.txt
+                  done
+                else
+                  echo "$pkg" >> ./deleted_${repo}_packages
+                fi
+              fi
+            done<<<${CHANGED_FILES}
+          done
+          for repo in $(jq --raw-output 'del(.pkg_format) | .[].name' repo.json); do
+            # Fix so that lists do not contain duplicates
+            if [ -f ./built_${repo}_packages.txt ]; then
+              sort ./built_${repo}_packages.txt | uniq > ./built_${repo}_packages.txt.tmp
+              mv ./built_${repo}_packages.txt.tmp ./built_${repo}_packages.txt
+            fi
+            if [ -f ./built_${repo}_subpackages.txt ]; then
+              sort ./built_${repo}_subpackages.txt | uniq > ./built_${repo}_subpackages.txt.tmp
+              mv ./built_${repo}_subpackages.txt.tmp ./built_${repo}_subpackages.txt
+            fi
+            if [ -f ./deleted_${repo}_packages.txt ]; then
+              sort ./deleted_${repo}_packages.txt | uniq > ./deleted_${repo}_packages.txt.tmp
+              mv ./deleted_${repo}_packages.txt.tmp ./deleted_${repo}_packages.txt
+            fi
+          done
+      - name: Process package updates
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BUILD_PACKAGES: "false"
+          CREATE_ISSUE: "false"
+          GIT_COMMIT_PACKAGES: "false"
+          GIT_PUSH_PACKAGES: "false"
+        run: |
+          declare -a packages
+          for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
+            repo=$(jq --raw-output '.["'${repo_path}'"].name' repo.json)
+            if [ -f ./built_${repo}_packages.txt ]; then
+              packages="$packages $(cat ./built_${repo}_packages.txt | tr '\n' ' ')"
+            fi
+          done
+          if [ -n "$packages" ]; then
+            ./scripts/bin/update-packages $packages
+          fi
+
   update-packages:
     permissions:
       issues: write
       contents: write
-    if: github.repository == 'termux/termux-packages'
+    if: github.event_name != 'pull_request' && github.event_name != 'push' && github.repository == 'termux/termux-packages'
     runs-on: ubuntu-latest
     steps:
       - name: Clone repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GH_API_KEY }}
+          token: ${{ secrets.TERMUXBOT2_TOKEN }}
+      - name: Free additional disk space
+        run: |
+          sudo apt purge -yq $(dpkg -l | grep '^ii' | awk '{ print $2 }' | grep -P '(aspnetcore|cabal-|dotnet-|ghc-|libmono|mongodb-|mysql-|php)') \
+            firefox google-chrome-stable microsoft-edge-stable mono-devel mono-runtime-common monodoc-manual ruby
+          sudo apt autoremove -yq
+          sudo apt clean
+          sudo rm -fr /opt/ghc /opt/hostedtoolcache /usr/lib/node_modules /usr/local/share/boost /usr/share/dotnet /usr/share/swift
       - name: Process package updates
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.TERMUXBOT2_TOKEN }}
           BUILD_PACKAGES: "true"
+          CREATE_ISSUE: "true"
           GIT_COMMIT_PACKAGES: "true"
           GIT_PUSH_PACKAGES: "true"
+          MANUAL_INPUT_PACKAGES: ${{ github.event.inputs.packages }}
         run: |
           git config --global user.name "Termux Github Actions"
           git config --global user.email "contact@termux.dev"
 
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            ./scripts/bin/update-packages ${{ github.event.inputs.packages }}
+            # Ensure MANUAL_INPUT_PACKAGES is newline free, and put it
+            # into an array
+            read -a PACKAGES <<< "${MANUAL_INPUT_PACKAGES//$'\n'/ }"
+            ./scripts/bin/update-packages "${PACKAGES[@]}"
           else
             ./scripts/bin/update-packages "@all"
           fi

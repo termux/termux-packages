@@ -1,0 +1,102 @@
+--- a/src/plugins/clangformat/clangformatbaseindenter.cpp
++++ b/src/plugins/clangformat/clangformatbaseindenter.cpp
+@@ -42,12 +42,24 @@
+                                    ReplacementsToKeep replacementsToKeep)
+ {
+     style.MaxEmptyLinesToKeep = 100;
++#if LLVM_VERSION_MAJOR >= 13
++    style.SortIncludes = clang::format::FormatStyle::SI_Never;
++#else
+     style.SortIncludes = false;
++#endif
++#if LLVM_VERSION_MAJOR >= 16
++    style.SortUsingDeclarations = clang::format::FormatStyle::SUD_Never;
++#else
+     style.SortUsingDeclarations = false;
++#endif
+ 
+     // This is a separate pass, don't do it unless it's the full formatting.
+     style.FixNamespaceComments = false;
++#if LLVM_VERSION_MAJOR >= 16
++    style.AlignTrailingComments = {clang::format::FormatStyle::TCAS_Never, 0};
++#else
+     style.AlignTrailingComments = false;
++#endif
+ 
+     if (replacementsToKeep == ReplacementsToKeep::IndentAndBefore)
+         return;
+--- a/src/plugins/clangformat/clangformatutils.cpp
++++ b/src/plugins/clangformat/clangformatutils.cpp
+@@ -51,7 +51,10 @@
+     style.Language = FormatStyle::LK_Cpp;
+     style.AccessModifierOffset = -4;
+     style.AlignAfterOpenBracket = FormatStyle::BAS_Align;
+-#if LLVM_VERSION_MAJOR >= 12
++#if LLVM_VERSION_MAJOR >= 15
++    style.AlignConsecutiveAssignments = {false, false, false, false, false};
++    style.AlignConsecutiveDeclarations = {false, false, false, false, false};
++#elif LLVM_VERSION_MAJOR >= 12
+     style.AlignConsecutiveAssignments = FormatStyle::ACS_None;
+     style.AlignConsecutiveDeclarations = FormatStyle::ACS_None;
+ #else
+@@ -64,7 +67,11 @@
+ #else
+     style.AlignOperands = true;
+ #endif
++#if LLVM_VERSION_MAJOR >= 16
++    style.AlignTrailingComments = {FormatStyle::TCAS_Always, 0};
++#else
+     style.AlignTrailingComments = true;
++#endif
+     style.AllowAllParametersOfDeclarationOnNextLine = true;
+ #if LLVM_VERSION_MAJOR >= 10
+     style.AllowShortBlocksOnASingleLine = FormatStyle::SBS_Never;
+@@ -111,7 +118,11 @@
+     style.ColumnLimit = 100;
+     style.CommentPragmas = "^ IWYU pragma:";
+     style.CompactNamespaces = false;
++#if LLVM_VERSION_MAJOR >= 15
++    style.PackConstructorInitializers = FormatStyle::PCIS_BinPack;
++#else
+     style.ConstructorInitializerAllOnOneLineOrOnePerLine = false;
++#endif
+     style.ConstructorInitializerIndentWidth = 4;
+     style.ContinuationIndentWidth = 4;
+     style.Cpp11BracedListStyle = true;
+@@ -145,18 +156,36 @@
+     style.PenaltyReturnTypeOnItsOwnLine = 300;
+     style.PointerAlignment = FormatStyle::PAS_Right;
+     style.ReflowComments = false;
++#if LLVM_VERSION_MAJOR >= 13
++    style.SortIncludes = FormatStyle::SI_CaseSensitive;
++#else
+     style.SortIncludes = true;
++#endif
++#if LLVM_VERSION_MAJOR >= 16
++    style.SortUsingDeclarations = FormatStyle::SUD_Lexicographic;
++#else
+     style.SortUsingDeclarations = true;
++#endif
+     style.SpaceAfterCStyleCast = true;
+     style.SpaceAfterTemplateKeyword = false;
+     style.SpaceBeforeAssignmentOperators = true;
+     style.SpaceBeforeParens = FormatStyle::SBPO_ControlStatements;
++#if LLVM_VERSION_MAJOR < 17
+     style.SpaceInEmptyParentheses = false;
++#endif
+     style.SpacesBeforeTrailingComments = 1;
++#if LLVM_VERSION_MAJOR >= 13
++    style.SpacesInAngles = FormatStyle::SIAS_Never;
++#else
+     style.SpacesInAngles = false;
++#endif
+     style.SpacesInContainerLiterals = false;
++#if LLVM_VERSION_MAJOR >= 17
++    style.SpacesInParens = FormatStyle::SIPO_Never;
++#else
+     style.SpacesInCStyleCastParentheses = false;
+     style.SpacesInParentheses = false;
++#endif
+     style.SpacesInSquareBrackets = false;
+     style.Standard = FormatStyle::LS_Cpp11;
+     style.TabWidth = 4;

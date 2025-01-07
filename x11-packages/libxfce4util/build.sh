@@ -1,17 +1,19 @@
-TERMUX_PKG_HOMEPAGE=https://www.xfce.org/
+TERMUX_PKG_HOMEPAGE=https://docs.xfce.org/xfce/libxfce4util/start
 TERMUX_PKG_DESCRIPTION="Basic utility non-GUI functions for XFCE"
-TERMUX_PKG_LICENSE="LGPL-2.0"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-_MAJOR_VERSION=4.18
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}.0
-TERMUX_PKG_SRCURL=https://archive.xfce.org/src/xfce/libxfce4util/${_MAJOR_VERSION}/libxfce4util-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=1157ca717fd3dd1da7724a6432a4fb24af9cd922f738e971fd1fd36dfaeac3c9
+TERMUX_PKG_VERSION="4.20.0"
+TERMUX_PKG_SRCURL=https://archive.xfce.org/src/xfce/libxfce4util/${TERMUX_PKG_VERSION%.*}/libxfce4util-${TERMUX_PKG_VERSION}.tar.bz2
+TERMUX_PKG_SHA256=21493f9c9995a282823db93839f6b9f06ae31edb094191ba9acf04d932a2b592
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="glib"
-TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner"
+TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, valac, xfce4-dev-tools"
+TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_DISABLE_GIR=false
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--disable-debug
 --enable-introspection=yes
---enable-vala=no
+--enable-vala=yes
 --enable-gtk-doc-html=no
 "
 

@@ -1,0 +1,45 @@
+--- a/gdk/broadway/gdkbroadway-server.c.org	2022-12-12 14:29:27.452591178 +0000
++++ b/gdk/broadway/gdkbroadway-server.c	2022-12-12 14:30:43.176824600 +0000
+@@ -533,9 +533,6 @@
+   void *ptr;
+   int res;
+
+-  fd = shm_open(name, O_RDWR|O_CREAT|O_EXCL, 0600);
+-  if (fd == -1)
+-    {
+       if (errno == EEXIST)
+ 	return NULL;
+
+@@ -551,9 +548,6 @@
+ 	}
+       else
+ 	*is_shm = FALSE;
+-    }
+-  else
+-    *is_shm = TRUE;
+
+   res = ftruncate (fd, size);
+   g_assert (res != -1);
+@@ -564,8 +558,6 @@
+     {
+       if (filename)
+ 	unlink (filename);
+-      else
+-	shm_unlink (name);
+       g_error ("Not enough shared memory for window surface");
+     }
+ #endif
+@@ -680,14 +672,9 @@
+ #ifdef G_OS_UNIX
+
+   munmap (data->data, data->data_size);
+-  if (data->is_shm)
+-    shm_unlink (data->name);
+-  else
+-    {
+       char *filename = g_build_filename (g_get_tmp_dir (), data->name, NULL);
+       unlink (filename);
+       g_free (filename);
+-    }
+
+ #elif defined(G_OS_WIN32)

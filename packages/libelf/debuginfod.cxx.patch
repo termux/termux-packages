@@ -1,14 +1,7 @@
---- elfutils-0.185/debuginfod/debuginfod.cxx	2021-05-22 23:55:24.000000000 +0530
-+++ elfutils-0.185-patch/debuginfod/debuginfod.cxx	2021-08-28 23:44:30.087999769 +0530
-@@ -58,7 +58,6 @@
- #include <fcntl.h>
- #include <netdb.h>
- 
--
- /* If fts.h is included before config.h, its indirect inclusions may not
-    give us the right LFS aliases of these functions, so map them manually.  */
- #ifdef BAD_FTS
-@@ -93,6 +92,7 @@
+diff -u -r elfutils-0.191/debuginfod/debuginfod.cxx src/debuginfod/debuginfod.cxx
+--- elfutils-0.191/debuginfod/debuginfod.cxx	2024-03-01 20:12:17.000000000 +0000
++++ src/debuginfod/debuginfod.cxx	2024-05-05 21:55:02.817312341 +0000
+@@ -109,6 +109,7 @@
  #include <libdwelf.h>
  
  #include <microhttpd.h>
@@ -16,23 +9,11 @@
  
  #if MHD_VERSION >= 0x00097002
  // libmicrohttpd 0.9.71 broke API
-@@ -116,6 +116,19 @@
- #define tid() pthread_self()
- #endif
+@@ -1445,7 +1446,6 @@
  
-+static int futimes(int fd, const struct timeval tv[2]) {
-+  if (tv == NULL)
-+    return syscall(__NR_utimensat, fd, NULL, NULL, 0);
-+  if (tv[0].tv_usec < 0 || tv[0].tv_usec >= 1000000 || tv[1].tv_usec < 0 ||
-+      tv[1].tv_usec >= 1000000) {
-+    return -1;
-+  }
-+  // Convert timeval to timespec.
-+  struct timespec ts[2];
-+  TIMEVAL_TO_TIMESPEC(tv, ts);
-+
-+  return syscall(__NR_utimensat, fd, NULL, ts, 0);
-+}
+   map<key,fdcache_entry> entries; // optimized for lookup
+   time_t last_cleaning;
+-  long max_fds;
+   long max_mbs;
  
- inline bool
- string_endswith(const string& haystack, const string& needle)
+ public:

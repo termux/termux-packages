@@ -1,0 +1,14 @@
+--- a/lib/procinfo_unix.cpp
++++ b/lib/procinfo_unix.cpp
+@@ -268,6 +268,11 @@
+ // see https://www.baeldung.com/linux/get-cpu-usage
+ //
+ double total_cpu_time() {
++#ifdef __ANDROID__
++// /proc/stat is inaccessible under modern Android
++// so always return 0 instead of spamming error
++    return 0;
++#endif
+     char buf[1024];
+     static FILE *f=NULL;
+     static double scale;

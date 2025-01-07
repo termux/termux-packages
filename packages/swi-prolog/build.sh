@@ -2,14 +2,13 @@ TERMUX_PKG_HOMEPAGE=https://swi-prolog.org/
 TERMUX_PKG_DESCRIPTION="Most popular and complete prolog implementation"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-# Use "development" versions.
-TERMUX_PKG_VERSION=9.1.0
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="9.3.18"
 TERMUX_PKG_SRCURL=https://www.swi-prolog.org/download/devel/src/swipl-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=4718c426c58d09e76bd84c109ae59f47b8cc261213a47796296b3733f455a195
-TERMUX_PKG_DEPENDS="libarchive, libcrypt, libgmp, libyaml, ncurses, openssl, ossp-uuid, readline, zlib, pcre2"
+TERMUX_PKG_SHA256=8302de3a9e204bccd8e1c1211737572a67c511d1713d13abf7a726abfb181ac3
+TERMUX_PKG_DEPENDS="libandroid-execinfo, libarchive, libcrypt, libgmp, libyaml, ncurses, openssl, ossp-uuid, readline, zlib, pcre2"
 TERMUX_PKG_FORCE_CMAKE=true
 TERMUX_PKG_HOSTBUILD=true
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DHAVE_WEAK_ATTRIBUTE_EXITCODE=0
 -DHAVE_WEAK_ATTRIBUTE_EXITCODE__TRYRUN_OUTPUT=
@@ -27,6 +26,13 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DBUILD_TESTING=OFF
 -DSYSTEM_CACERT_FILENAME=${TERMUX_PREFIX}/etc/tls/cert.pem"
 
+termux_pkg_auto_update() {
+	# upstream website recommendes this to get the latest devel version
+	local latest_devel='https://www.swi-prolog.org/download/devel/src/swipl-latest.tar.gz'
+	local version="$(curl -s "$latest_devel" | grep location | sed -n 's/.*swipl-\([0-9\.]*\).tar.gz.*/\1/p')"
+	termux_pkg_upgrade_version "$version"
+}
+
 # We do this to produce:
 # a native host build to produce
 # boot<nn>.prc, INDEX.pl, ssl cetificate tests,
@@ -40,7 +46,7 @@ termux_step_host_build() {
 	if [ $TERMUX_ARCH_BITS = 32 ]; then
 		export LDFLAGS=-m32
 		export CFLAGS=-m32
-		export CXXFLAGS=-m32
+		export CXXFLAGS='-m32 -funwind-tables'
 		CMAKE_EXTRA_DEFS="-DCMAKE_LIBRARY_PATH=/usr/lib/i386-linux-gnu"
 	else
 		CMAKE_EXTRA_DEFS=""
@@ -63,6 +69,10 @@ termux_step_host_build() {
 	unset LDFLAGS
 	unset CFLAGS
 	unset CXXFLAGS
+}
+
+termux_step_pre_configure() {
+	LDFLAGS+=" -landroid-execinfo $($CC -print-libgcc-file-name)"
 }
 
 termux_step_post_make_install() {

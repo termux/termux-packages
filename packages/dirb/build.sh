@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://dirb.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://dirb.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="Web Directory Fuzzer"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

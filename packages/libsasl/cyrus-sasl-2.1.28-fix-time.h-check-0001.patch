@@ -1,0 +1,60 @@
+https://github.com/termux/termux-packages/issues/15852
+https://github.com/cyrusimap/cyrus-sasl/commit/266f0acf7f5e029afbb3e263437039e50cd6c262
+
+From 266f0acf7f5e029afbb3e263437039e50cd6c262 Mon Sep 17 00:00:00 2001
+From: Sam James <sam@gentoo.org>
+Date: Wed, 23 Feb 2022 00:45:15 +0000
+Subject: [PATCH] Fix <time.h> check
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+We're conditionally including based on HAVE_TIME_H in a bunch of places,
+but we're not actually checking for time.h, so that's never going to be defined.
+
+While at it, add in a missing include in the cram plugin.
+
+This fixes a bunch of implicit declaration warnings:
+```
+ * cyrus-sasl-2.1.28/lib/saslutil.c:280:3: warning: implicit declaration of function ‘time’ [-Wimplicit-function-declaration]
+ * cyrus-sasl-2.1.28/lib/saslutil.c:364:41: warning: implicit declaration of function ‘clock’ [-Wimplicit-function-declaration]
+ * cyrus-sasl-2.1.28/plugins/cram.c:132:7: warning: implicit declaration of function ‘time’ [-Wimplicit-function-declaration]
+ * cyrus-sasl-2.1.28/lib/saslutil.c:280:3: warning: implicit declaration of function ‘time’ [-Wimplicit-function-declaration]
+ * cyrus-sasl-2.1.28/lib/saslutil.c:364:41: warning: implicit declaration of function ‘clock’ [-Wimplicit-function-declaration]
+ * cyrus-sasl-2.1.28/plugins/cram.c:132:7: warning: implicit declaration of function ‘time’ [-Wimplicit-function-declaration]
+```
+
+Signed-off-by: Sam James <sam@gentoo.org>
+---
+ configure.ac   | 2 +-
+ plugins/cram.c | 4 ++++
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index e1bf53b6..ad781830 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1290,7 +1290,7 @@ AC_CHECK_HEADERS_ONCE([sys/time.h])
+ 
+ AC_HEADER_DIRENT
+ AC_HEADER_SYS_WAIT
+-AC_CHECK_HEADERS(crypt.h des.h dlfcn.h fcntl.h limits.h malloc.h paths.h strings.h sys/file.h sys/time.h syslog.h unistd.h inttypes.h sys/uio.h sys/param.h sysexits.h stdarg.h varargs.h krb5.h)
++AC_CHECK_HEADERS(crypt.h des.h dlfcn.h fcntl.h limits.h malloc.h paths.h strings.h sys/file.h sys/time.h syslog.h time.h unistd.h inttypes.h sys/uio.h sys/param.h sysexits.h stdarg.h varargs.h krb5.h)
+ 
+ IPv6_CHECK_SS_FAMILY()
+ IPv6_CHECK_SA_LEN()
+diff --git a/plugins/cram.c b/plugins/cram.c
+index d02e9baa..695aaa91 100644
+--- a/plugins/cram.c
++++ b/plugins/cram.c
+@@ -53,6 +53,10 @@
+ #endif
+ #include <fcntl.h>
+ 
++#ifdef HAVE_TIME_H
++#include <time.h>
++#endif
++
+ #include <sasl.h>
+ #include <saslplug.h>
+ #include <saslutil.h>

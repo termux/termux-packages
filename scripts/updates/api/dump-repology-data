@@ -2,7 +2,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2022 Aditya Alok (aka. @MrAdityaAlok) <alok@termux.org>
+# Copyright (c) 2022 Aditya Alok <alok@termux.dev>
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -24,23 +24,35 @@
 
 
 from requests import get as requests_get
+from time import sleep as sleep
 
 
-def get_repology_data(last_project):
-    repology_data = requests_get(
-        f"https://repology.org/api/v1/projects/{last_project}?inrepo=termux&outdated=True&families_newest=2-"
-    ).json()  # NOTE: We are using 2- so that api will return a package as outdated if it is so in 2 or more
+def get_repology_data(last_project, project):
+    url = f"https://repology.org/api/v1"
+    if project != "":
+        url = f"{url}/projects/{project}/?inrepo=termux&outdated=1"
+    else:
+        url = f"{url}/projects/{last_project}{'/' if last_project != '' else ''}?inrepo=termux&outdated=1&families_newest=2-"
+
+    repology_data = requests_get(url, timeout=60, headers={'User-Agent': 'Termux update checker 1.0 (github.com/termux/termux-packages)'}).json()
+    # NOTE: We are using `families_newest=2-` so that api will return a
+    # package as outdated if it is so in 2 or more
     # repo family. This helps us avoid false positives.
+    # However this does not work for all cases so an alternative lesser
+    # restriction query option is provided.
 
     return repology_data
 
 
-def get_outdated_packages():
+def get_outdated_packages(project):
     termux_outdated_packages = {}
     last_project = ""
 
     while True:
-        repology_data = get_repology_data(last_project)
+        # sleep to ensure we do not flood repology with requests
+        sleep(1)
+        repology_data = get_repology_data(last_project, project)
+        project = "" # clear to not loop again
         last_project = sorted(repology_data.keys())[
             -1
         ]  # This used to query repology for next set of packages.
@@ -54,6 +66,10 @@ def get_outdated_packages():
             break
 
         for package_name, package_data in repology_data.items():
+            for repo_data in package_data:
+                if repo_data["repo"] == "termux":
+                    package_name = repo_data["visiblename"]
+                    break
             if package_name in termux_outdated_packages:
                 # Skip if package is already in the dict.
                 continue
@@ -88,5 +104,10 @@ if __name__ == "__main__":
     except IndexError:
         sys.exit("Please provide an output file")
 
+    try:
+        project = sys.argv[2]
+    except IndexError:
+        project = ""
+
     with open(output_file, "w") as f:
-        json.dump(get_outdated_packages(), f)
+        json.dump(get_outdated_packages(project), f)

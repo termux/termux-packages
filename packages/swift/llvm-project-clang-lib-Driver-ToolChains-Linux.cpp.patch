@@ -1,0 +1,41 @@
+diff --git a/llvm-project/clang/lib/Driver/ToolChains/Linux.cpp b/llvm-project/clang/lib/Driver/ToolChains/Linux.cpp
+index 0836903a0..e556e56fd 100644
+--- a/llvm-project/clang/lib/Driver/ToolChains/Linux.cpp
++++ b/llvm-project/clang/lib/Driver/ToolChains/Linux.cpp
+@@ -162,8 +162,8 @@ static StringRef getOSLibDir(const llvm::Triple &Triple, const ArgList &Args) {
+   // FIXME: This is a bit of a hack. We should really unify this code for
+   // reasoning about oslibdir spellings with the lib dir spellings in the
+   // GCCInstallationDetector, but that is a more significant refactoring.
+-  if (Triple.getArch() == llvm::Triple::x86 || Triple.isPPC32() ||
+-      Triple.getArch() == llvm::Triple::sparc)
++  if (!Triple.isAndroid() && (Triple.getArch() == llvm::Triple::x86 || Triple.isPPC32() ||
++      Triple.getArch() == llvm::Triple::sparc))
+     return "lib32";
+ 
+   if (Triple.getArch() == llvm::Triple::x86_64 && Triple.isX32())
+@@ -287,7 +287,7 @@ Linux::Linux(const Driver &D, const llvm::Triple &Triple, const ArgList &Args)
+   if (Triple.getVendor() == llvm::Triple::OpenEmbedded &&
+       Triple.isArch64Bit())
+     addPathIfExists(D, concat(SysRoot, "/usr", OSLibDir), Paths);
+-  else
++  else if (!IsAndroid)
+     addPathIfExists(D, concat(SysRoot, "/usr/lib/..", OSLibDir), Paths);
+   if (IsRISCV) {
+     StringRef ABIName = tools::riscv::getRISCVABI(Args, Triple);
+@@ -311,7 +311,15 @@ Linux::Linux(const Driver &D, const llvm::Triple &Triple, const ArgList &Args)
+   }
+ 
+   addPathIfExists(D, concat(SysRoot, "/lib"), Paths);
+-  addPathIfExists(D, concat(SysRoot, "/usr/lib"), Paths);
++  bool nativeBuild = MultiarchTriple == getMultiarchTriple(D, llvm::Triple(llvm::sys::getDefaultTargetTriple()), SysRoot);
++  if (nativeBuild || !IsAndroid)
++    addPathIfExists(D, concat(SysRoot, "/usr/lib"), Paths);
++
++  if (IsAndroid) {
++    addPathIfExists(D, concat(SysRoot, "/usr/", MultiarchTriple, "/lib"), Paths);
++    addPathIfExists(D, concat("/system/", OSLibDir), Paths);
++    ExtraOpts.push_back("-rpath=" + SysRoot + "/usr/lib");
++  }
+ }
+ 
+ ToolChain::RuntimeLibType Linux::GetDefaultRuntimeLibType() const {

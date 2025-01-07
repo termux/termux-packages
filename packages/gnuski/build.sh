@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://sourceforge.net/projects/gnuski
+TERMUX_PKG_HOMEPAGE=https://sourceforge.net/projects/gnuski/
 TERMUX_PKG_DESCRIPTION="Open source clone of Skifree, the old Windows game"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"

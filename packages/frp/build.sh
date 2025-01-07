@@ -1,12 +1,12 @@
-TERMUX_PKG_HOMEPAGE=https://gofrp.org/doc
+TERMUX_PKG_HOMEPAGE=https://github.com/fatedier/frp
 TERMUX_PKG_DESCRIPTION="A fast reverse proxy to expose a local server behind a NAT or firewall to the internet"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="2096779623 <admin@utermux.dev>"
-TERMUX_PKG_VERSION="0.46.0"
+TERMUX_PKG_VERSION="0.61.1"
 TERMUX_PKG_SRCURL=https://github.com/fatedier/frp/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=bf617b7c5b3f9a34b4edbac73ca2b7b6781c4f09f33666a7d331d9fe8302679e
-# Depend on its subpackages.
-TERMUX_PKG_DEPENDS="frpc, frps"
+TERMUX_PKG_SHA256=95c567188d5635a7ac8897a6f93ae0568d0ac4892581a96c89874a992dd6a73c
+TERMUX_PKG_REPLACES="frpc, frps"
+TERMUX_PKG_BREAKS="frpc, frps"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 

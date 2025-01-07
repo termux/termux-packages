@@ -1,0 +1,13 @@
+error: use of non-static data member 'graph' of 'generic_problem_resolver' from nested type 'do_process_promotion'
+
+--- a/src/generic/problemresolver/problemresolver.h
++++ b/src/generic/problemresolver/problemresolver.h
+@@ -1722,7 +1722,7 @@
+ 
+     void active(int step_num) const
+     {
+-      step &s = graph.get_step(step_num);
++      step &s = resolver.graph.get_step(step_num);
+       resolver.increase_effective_step_cost(s, p);
+       resolver.graph.schedule_promotion_propagation(step_num, p);
+     }

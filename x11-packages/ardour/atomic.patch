@@ -1,24 +1,27 @@
 --- a/libs/vst3/pluginterfaces/base/funknown.cpp
 +++ b/libs/vst3/pluginterfaces/base/funknown.cpp
-@@ -44,7 +44,9 @@
- #endif
- 
- #if SMTG_OS_LINUX
+@@ -48,9 +48,11 @@
+ #if defined (_LIBCPP_VERSION)
+ #define SMTG_USE_ATOMIC 1
+ #else
 +#ifndef __ANDROID__
  #include <ext/atomicity.h>
+ #endif
+ #endif
 +#endif
  /* UUID */
  #include <string>
  #include <boost/uuid/uuid.hpp>
-@@ -77,14 +79,18 @@
+@@ -87,7 +89,7 @@
  //------------------------------------------------------------------------
  namespace FUnknownPrivate {
  //------------------------------------------------------------------------
 -int32 PLUGIN_API atomicAdd (int32& var, int32 d)
 +int32 PLUGIN_API atomicAdd (_Steinberg_int32_atomic_t& var, int32 d)
  {
- #if SMTG_OS_WINDOWS
- 	return InterlockedExchangeAdd ((volatile long int*)&var, d) + d;
+ #if SMTG_USE_ATOMIC
+ 	return atomic_fetch_add (reinterpret_cast<std::atomic_int_least32_t*> (&var), d) +d;
+@@ -96,7 +98,11 @@
  #elif SMTG_OS_MACOS
  	return OSAtomicAdd32Barrier (d, (int32_t*)&var);
  #elif SMTG_OS_LINUX

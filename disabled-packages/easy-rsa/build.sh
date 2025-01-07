@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://openvpn.net/easyrsa.html
 TERMUX_PKG_DESCRIPTION="Simple shell based CA utility"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER='Vishal Biswas @vishalbiswas'
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.0.1
 TERMUX_PKG_DEPENDS="openssl-tool"
 TERMUX_PKG_SRCURL=https://github.com/OpenVPN/easy-rsa/releases/download/$TERMUX_PKG_VERSION/EasyRSA-$TERMUX_PKG_VERSION.tgz

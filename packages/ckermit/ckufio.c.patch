@@ -1,5 +1,16 @@
 --- a/ckufio.c
 +++ b/ckufio.c
+@@ -34,6 +34,10 @@
+ */
+ /* Include Files */
+ 
++#ifdef __ANDROID__
++#include <crypt.h>
++#endif
++
+ #ifdef MINIX2
+ #define _MINIX
+ #endif /* MINIX2 */
 @@ -990,7 +990,7 @@
  int ckxpriv = 1;			/* Priv'd login ok */
  

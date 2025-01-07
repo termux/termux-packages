@@ -1,0 +1,21 @@
+--- a/src/3rdparty/chromium/third_party/ffmpeg/chromium/scripts/build_ffmpeg.py
++++ b/src/3rdparty/chromium/third_party/ffmpeg/chromium/scripts/build_ffmpeg.py
+@@ -37,7 +37,7 @@
+     'android': ['ia32', 'x64', 'arm-neon', 'arm64'],
+     'linux': [
+         'ia32', 'x64', 'mipsel', 'mips64el', 'noasm-x64', 'arm', 'arm-neon',
+-        'arm64'
++        'arm64', 'noasm-ia32'
+     ],
+     'mac': ['x64', 'arm64'],
+     'win': ['ia32', 'x64', 'arm64'],
+@@ -580,6 +580,9 @@
+   if target_os == 'linux' and target_arch == 'noasm-x64':
+     target_os = 'linux-noasm'
+     target_arch = 'x64'
++  if target_os == 'linux' and target_arch == 'noasm-ia32':
++    target_os = 'linux-noasm'
++    target_arch = 'ia32'
+ 
+   configure_flags = collections.defaultdict(list)
+ 

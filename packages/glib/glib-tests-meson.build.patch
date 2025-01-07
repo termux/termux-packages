@@ -1,11 +1,11 @@
 --- a/glib/tests/meson.build
 +++ b/glib/tests/meson.build
-@@ -204,7 +204,7 @@
+@@ -232,7 +232,7 @@
      'include' : {},
      'unix' : {},
    }
--  if have_rtld_next and get_option('default_library') != 'static'
+-  if have_rtld_next and glib_build_shared
 +  if false
-     glib_tests += {
-       'gutils-user-database' : {
-         'depends' : [
+     getpwuid_preload = shared_library('getpwuid-preload',
+                                       'getpwuid-preload.c',
+                                       name_prefix : '',

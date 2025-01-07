@@ -1,32 +1,32 @@
 --- a/src/lib/fcitx-utils/standardpath.cpp
 +++ b/src/lib/fcitx-utils/standardpath.cpp
-@@ -78,7 +78,7 @@
-         configHome_ = defaultPath("XDG_CONFIG_HOME", ".config");
-         pkgconfigHome_ = defaultPath(
-             "FCITX_CONFIG_HOME", constructPath(configHome_, "fcitx5").c_str());
--        configDirs_ = defaultPaths("XDG_CONFIG_DIRS", "/etc/xdg", nullptr);
-+        configDirs_ = defaultPaths("XDG_CONFIG_DIRS", "@TERMUX_PREFIX@/etc/xdg", nullptr);
+@@ -87,7 +87,7 @@
+         pkgconfigHome_ =
+             defaultPath((isFcitx ? "FCITX_CONFIG_HOME" : nullptr),
+                         constructPath(configHome_, packageName).c_str());
+-        configDirs_ = defaultPaths("XDG_CONFIG_DIRS", "/etc/xdg",
++        configDirs_ = defaultPaths("XDG_CONFIG_DIRS", "@TERMUX_PREFIX@/etc/xdg",
+                                    builtInPathMap, nullptr);
          auto pkgconfigDirFallback = configDirs_;
          for (auto &path : pkgconfigDirFallback) {
-             path = constructPath(path, "fcitx5");
-@@ -90,7 +90,7 @@
-         dataHome_ = defaultPath("XDG_DATA_HOME", ".local/share");
-         pkgdataHome_ = defaultPath("FCITX_DATA_HOME",
-                                    constructPath(dataHome_, "fcitx5").c_str());
+@@ -102,7 +102,7 @@
+         pkgdataHome_ =
+             defaultPath((isFcitx ? "FCITX_DATA_HOME" : nullptr),
+                         constructPath(dataHome_, packageName).c_str());
 -        dataDirs_ = defaultPaths("XDG_DATA_DIRS", "/usr/local/share:/usr/share",
 +        dataDirs_ = defaultPaths("XDG_DATA_DIRS", "@TERMUX_PREFIX@/local/share:@TERMUX_PREFIX@/share",
-                                  skipFcitxPath ? nullptr : "datadir");
+                                  builtInPathMap,
+                                  skipBuiltInPath_ ? nullptr : "datadir");
          auto pkgdataDirFallback = dataDirs_;
-         for (auto &path : pkgdataDirFallback) {
-@@ -103,7 +103,7 @@
+@@ -116,7 +116,7 @@
          cacheHome_ = defaultPath("XDG_CACHE_HOME", ".cache");
          const char *tmpdir = getenv("TMPDIR");
          runtimeDir_ = defaultPath("XDG_RUNTIME_DIR",
 -                                  !tmpdir || !tmpdir[0] ? "/tmp" : tmpdir);
 +                                  !tmpdir || !tmpdir[0] ? "@TERMUX_PREFIX@/tmp" : tmpdir);
-         addonDirs_ =
-             defaultPaths("FCITX_ADDON_DIRS", FCITX_INSTALL_ADDONDIR, nullptr);
-     }
+         // Though theoratically, this is also fcitxPath, we just simply don't
+         // use it here.
+         addonDirs_ = defaultPaths("FCITX_ADDON_DIRS", FCITX_INSTALL_ADDONDIR,
 --- a/src/lib/fcitx/icontheme.cpp
 +++ b/src/lib/fcitx/icontheme.cpp
 @@ -751,7 +751,7 @@

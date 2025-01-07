@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Small, free, embeddable, source level Java interpreter w
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.1.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/beanshell/beanshell/releases/download/$TERMUX_PKG_VERSION/bsh-$TERMUX_PKG_VERSION.jar
 TERMUX_PKG_SHA256=71192cbbe49e7a269cfcba05dc5cb959c33b9b26dafcd6266ca3288b461f86a3
 TERMUX_PKG_AUTO_UPDATE=true
@@ -38,6 +39,7 @@ termux_step_make_install() {
 termux_step_create_debscripts() {
 	cat <<- EOF > ./postinst
 	#!${TERMUX_PREFIX}/bin/bash
+	chmod -w $TERMUX_PREFIX/share/dex/beanshell.jar
 	rm -f $TERMUX_PREFIX/share/dex/oat/*/beanshell.{art,oat,odex,vdex} >/dev/null 2>&1
 	exit 0
 	EOF

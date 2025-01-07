@@ -1,0 +1,19 @@
+diff -uNr openssh-portable-V_9_5_P1/openbsd-compat/xcrypt.c openssh-portable-V_9_5_P1.mod/openbsd-compat/xcrypt.c
+--- openssh-portable-V_9_5_P1/openbsd-compat/xcrypt.c	2023-10-04 07:34:10.000000000 +0300
++++ openssh-portable-V_9_5_P1.mod/openbsd-compat/xcrypt.c	2023-11-23 16:29:34.267876057 +0200
+@@ -78,6 +78,7 @@
+ 	if (salt[0] != '\0')
+ 		return salt;
+ 	strlcpy(salt, "xx", sizeof(salt));
++#ifndef __ANDROID__
+ 	setpwent();
+ 	while ((pw = getpwent()) != NULL) {
+ 		if ((passwd = shadow_pw(pw)) == NULL)
+@@ -91,6 +92,7 @@
+ 	}
+  out:
+ 	endpwent();
++#endif
+ 	return salt;
+ }
+ 

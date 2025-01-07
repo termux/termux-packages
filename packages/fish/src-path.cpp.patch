@@ -20,12 +20,12 @@ index d5a649e0e..ad4e84278 100644
  #include "wutil.h"  // IWYU pragma: keep
  
  // PREFIX is defined at build time.
--const wcstring_list_t kDefaultPath({L"/bin", L"/usr/bin", PREFIX L"/bin"});
-+const wcstring_list_t kDefaultPath({PREFIX L"/bin"});
+-static const wcstring_list_t kDefaultPath({L"/bin", L"/usr/bin", PREFIX L"/bin"});
++static const wcstring_list_t kDefaultPath({PREFIX L"/bin"});
  
- static get_path_result_t path_get_path_core(const wcstring &cmd, const wcstring_list_t &pathsv,
-                                             const environment_t &vars) {
-@@ -53,10 +53,18 @@ static get_path_result_t path_get_path_core(const wcstring &cmd, const wcstring_
+ static get_path_result_t path_get_path_core(const wcstring &cmd, const wcstring_list_t &pathsv) {
+     const get_path_result_t noent_res{ENOENT, wcstring{}};
+@@ -52,11 +52,19 @@ static get_path_result_t path_get_path_c
          return noent_res;
      }
  
@@ -40,12 +40,14 @@ index d5a649e0e..ad4e84278 100644
      // If the command has a slash, it must be an absolute or relative path and thus we don't bother
      // looking for a matching command.
 -    if (cmd.find(L'/') != wcstring::npos) {
--        wcstring abs_cmd = path_apply_working_directory(cmd, vars.get_pwd_slash());
+-        int merr = test_path(cmd);
+-        return get_path_result_t{merr, cmd};
 +    if (_cmd.find(L'/') != wcstring::npos) {
-+        wcstring abs_cmd = path_apply_working_directory(_cmd, vars.get_pwd_slash());
-         int merr = test_path(abs_cmd);
-         return get_path_result_t{merr, std::move(abs_cmd)};
++        int merr = test_path(_cmd);
++        return get_path_result_t{merr, _cmd};
      }
+ 
+     get_path_result_t best = noent_res;
 @@ -66,7 +74,7 @@ static get_path_result_t path_get_path_core(const wcstring &cmd, const wcstring_
      for (const auto &next_path : pathsv) {
          if (next_path.empty()) continue;

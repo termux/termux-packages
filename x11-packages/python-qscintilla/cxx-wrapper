@@ -1,0 +1,44 @@
+#!/bin/bash
+
+cfgtest=
+name=
+shared=
+o=
+for f in "$@"; do
+	case "${f}" in
+		Qsci )
+			test "${o}" && name="${f}"
+			o=
+			;;
+		cfgtest_${name}.o )
+			test "${name}" && cfgtest=true
+			o=
+			;;
+		-shared )
+			shared=true
+			o=
+			;;
+		-o )
+			o=true
+			;;
+		* )
+			o=
+			;;
+	esac
+done
+
+cfgtest_Qsci="@CFGTEST_QSCI@"
+
+if test "${cfgtest}"; then
+	cat <<-EOF > "${name}"
+		#!/bin/sh
+		test "\$#" -ge 1 || exit 1
+		echo $(eval echo \$$(echo cfgtest_${name})) | tr ' ' '\n' > \$1
+	EOF
+	chmod 0755 "${name}"
+	exit 0
+fi
+
+libs=
+test "${shared}" && libs="-L@TERMUX_PREFIX@/lib -lpython@PYTHON_VERSION@"
+exec @CXX@ "$@" ${libs}

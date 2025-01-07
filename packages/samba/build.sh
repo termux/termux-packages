@@ -2,9 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://www.samba.org/
 TERMUX_PKG_DESCRIPTION="SMB/CIFS fileserver"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=4.15.13
+TERMUX_PKG_VERSION="4.16.11"
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://download.samba.org/pub/samba/samba-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=c412e3536a5265d04e52983e643bae9e047bcc3eac08683a945b1057ecdf4968
+TERMUX_PKG_SHA256=5218878cdcc01aa8e83d2c84ad16c5f37a01ea5e1a93f640f9ee282053c46e12
 TERMUX_PKG_DEPENDS="krb5, libandroid-execinfo, libandroid-spawn, libbsd, libcap, libcrypt, libgnutls, libiconv, libicu, libpopt, libtalloc, libtasn1, libtirpc, ncurses, openssl, readline, tdb-tools, zlib"
 TERMUX_PKG_BUILD_DEPENDS="e2fsprogs"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -92,7 +93,7 @@ EOF
 	USING_SYSTEM_COMPILE_ET=1 COMPILE_ET=/usr/bin/compile_et \
 	CFLAGS="$CFLAGS" LINKFLAGS="$CFLAGS $LDFLAGS" \
 	./buildtools/bin/waf configure \
-		--jobs="$TERMUX_MAKE_PROCESSES" \
+		--jobs="$TERMUX_PKG_MAKE_PROCESSES" \
 		--bundled-libraries='!asn1_compile,!compile_et' \
 		--cross-compile \
 		--cross-answers=cross-answers.txt \
@@ -143,11 +144,11 @@ EOF
 
 
 termux_step_make() {
-	./buildtools/bin/waf build --jobs="$TERMUX_MAKE_PROCESSES"
+	./buildtools/bin/waf build --jobs="$TERMUX_PKG_MAKE_PROCESSES"
 }
 
 termux_step_make_install() {
-	./buildtools/bin/waf install --jobs="$TERMUX_MAKE_PROCESSES"
+	./buildtools/bin/waf install --jobs="$TERMUX_PKG_MAKE_PROCESSES"
 }
 
 termux_step_post_make_install() {
@@ -161,10 +162,10 @@ termux_step_post_make_install() {
 
 termux_step_post_massage() {
 	# keep empty dirs which were deleted in massage
-	mkdir -p "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/var/lib/samba/bind-dns" "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/var/lib/samba/private"
+	mkdir -p "var/lib/samba/bind-dns" "var/lib/samba/private"
 	for dir in cache lock log run; do
-		mkdir -p "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/var/$dir/samba"
+		mkdir -p "var/$dir/samba"
 	done
 	# 755 - as opposed to 700 - because testparm throws up a warning otherwise
-	chmod 755 "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/var/lock/samba" "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/var/lib/samba" "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/var/cache/samba"
+	chmod 755 "var/lock/samba" "var/lib/samba" "var/cache/samba"
 }

@@ -12,9 +12,9 @@ TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
 termux_step_configure() {
 	cat > $TERMUX_PKG_SRCDIR/Makefile <<- EOF
-	ASPELL = `command -v aspell`
-	ASPELL_FLAGS = 
-	PREZIP = `command -v prezip`
+	ASPELL = $(command -v aspell)
+	ASPELL_FLAGS =
+	PREZIP = $(command -v prezip)
 	DESTDIR =
 	dictdir = $TERMUX_PREFIX/lib/aspell-0.60
 	datadir = $TERMUX_PREFIX/lib/aspell-0.60

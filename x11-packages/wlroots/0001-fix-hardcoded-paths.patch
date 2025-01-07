@@ -1,0 +1,50 @@
+--- a/xwayland/sockets.c
++++ b/xwayland/sockets.c
+@@ -14,11 +14,11 @@
+ #include <wlr/util/log.h>
+ #include "sockets.h"
+ 
+-static const char lock_fmt[] = "/tmp/.X%d-lock";
+-static const char socket_dir[] = "/tmp/.X11-unix";
+-static const char socket_fmt[] = "/tmp/.X11-unix/X%d";
++static const char lock_fmt[] = "@TERMUX_PREFIX@/tmp/.X%d-lock";
++static const char socket_dir[] = "@TERMUX_PREFIX@/tmp/.X11-unix";
++static const char socket_fmt[] = "@TERMUX_PREFIX@/tmp/.X11-unix/X%d";
+ #ifndef __linux__
+-static const char socket_fmt2[] = "/tmp/.X11-unix/X%d_";
++static const char socket_fmt2[] = "@TERMUX_PREFIX@/tmp/.X11-unix/X%d_";
+ #endif
+ 
+ bool set_cloexec(int fd, bool cloexec) {
+--- a/xwayland/server.c
++++ b/xwayland/server.c
+@@ -18,6 +18,13 @@
+ #include "sockets.h"
+ #include "xwayland/config.h"
+ 
++#ifdef __TERMUX__
++#ifdef XWAYLAND_PATH
++#undef XWAYLAND_PATH
++#endif
++#define XWAYLAND_PATH "@TERMUX_PREFIX@/bin/Xwayland"
++#endif
++
+ static void safe_close(int fd) {
+ 	if (fd >= 0) {
+ 		close(fd);
+--- a/xcursor/xcursor.c
++++ b/xcursor/xcursor.c
+@@ -486,11 +486,11 @@
+  */
+ 
+ #ifndef ICONDIR
+-#define ICONDIR "/usr/X11R6/lib/X11/icons"
++#define ICONDIR "@TERMUX_PREFIX@/X11R6/lib/X11/icons"
+ #endif
+ 
+ #ifndef XCURSORPATH
+-#define XCURSORPATH "~/.icons:/usr/share/icons:/usr/share/pixmaps:~/.cursors:/usr/share/cursors/xorg-x11:"ICONDIR
++#define XCURSORPATH "~/.icons:@TERMUX_PREFIX@/share/icons:@TERMUX_PREFIX@/share/pixmaps:~/.cursors:@TERMUX_PREFIX@/share/cursors/xorg-x11:"ICONDIR
+ #endif
+ 
+ #define XDG_DATA_HOME_FALLBACK "~/.local/share"

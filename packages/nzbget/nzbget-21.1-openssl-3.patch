@@ -1,0 +1,30 @@
+https://github.com/nzbget/nzbget/pull/793
+
+From f76e8555504e3af4cf8dd4a8c8e374b3ca025099 Mon Sep 17 00:00:00 2001
+From: Simon Chopin <simon.chopin@canonical.com>
+Date: Tue, 7 Dec 2021 13:23:21 +0100
+Subject: [PATCH] daemon:connect: don't use FIPS_mode_set with OpenSSL 3
+
+This function has been removed in OpenSSL 3, replaced by
+EVP_default_properties_enable_fips. See
+https://www.openssl.org/docs/man3.0/man7/migration_guide.html
+---
+ daemon/connect/TlsSocket.cpp | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/daemon/connect/TlsSocket.cpp b/daemon/connect/TlsSocket.cpp
+index 544bf6850..831da0dc0 100644
+--- a/daemon/connect/TlsSocket.cpp
++++ b/daemon/connect/TlsSocket.cpp
+@@ -189,7 +189,11 @@ void TlsSocket::Final()
+ 
+ #ifdef HAVE_OPENSSL
+ #ifndef LIBRESSL_VERSION_NUMBER
++#if OPENSSL_VERSION_NUMBER < 0x30000000L
+ 	FIPS_mode_set(0);
++#else
++	EVP_default_properties_enable_fips(NULL, 0);
++#endif
+ #endif
+ #ifdef NEED_CRYPTO_LOCKING
+ 	CRYPTO_set_locking_callback(nullptr);

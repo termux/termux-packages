@@ -1,0 +1,59 @@
+From e89d39d41e2f7094178aa856d57e5ea1b779d790 Mon Sep 17 00:00:00 2001
+From: Tee KOBAYASHI <xtkoba@gmail.com>
+Date: Fri, 3 Feb 2023 11:32:40 +0100
+Subject: [PATCH] Add workaround for tagged pointers on Android 12
+
+Co-authored-by: dev-bz <32380878+dev-bz@users.noreply.github.com>
+---
+ src/java.base/share/native/libjli/java.c | 28 ++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
+
+diff --git a/src/java.base/share/native/libjli/java.c b/src/java.base/share/native/libjli/java.c
+index e519686cb78b..095afa1159bb 100644
+--- a/src/java.base/share/native/libjli/java.c
++++ b/src/java.base/share/native/libjli/java.c
+@@ -54,6 +54,32 @@
+ #include "java.h"
+ #include "jni.h"
+ 
++#ifdef __TERMUX__
++#include <stdbool.h>
++#include <dlfcn.h>
++static void android_disable_tags() {
++    void *lib_handle = dlopen("libc.so", RTLD_LAZY);
++    if (lib_handle) {
++        if (android_get_device_api_level() >= 31) {
++            int (*mallopt_func)(int, int) = dlsym(lib_handle, "mallopt");
++            if (mallopt_func) {
++                mallopt_func(M_BIONIC_SET_HEAP_TAGGING_LEVEL, 0);
++            }
++            return;
++        }
++        /* android_get_device_api_level() < 31 */
++        bool (*android_mallopt)(int opcode, void* arg, size_t arg_size) = dlsym(lib_handle, "android_mallopt");
++        if (android_mallopt) {
++            int android_malloc_tag_level = 0;
++            android_mallopt(8, &android_malloc_tag_level, sizeof(android_malloc_tag_level));
++        }
++        dlclose(lib_handle);
++    }
++}
++#else
++static void android_disable_tags(){}
++#endif
++
+ /*
+  * A NOTE TO DEVELOPERS: For performance reasons it is important that
+  * the program image remain relatively small until after SelectVersion
+@@ -252,6 +278,8 @@ JLI_Launch(int argc, char ** argv,              /* main argc, argv */
+     _is_java_args = javaargs;
+     _wc_enabled = cpwildcard;
+ 
++    android_disable_tags();
++
+     InitLauncher(javaw);
+     DumpState();
+     if (JLI_IsTraceLauncher()) {
+-- 
+2.44.0
+

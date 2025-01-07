@@ -1,13 +1,11 @@
---- ./Makefile.orig	2020-01-11 09:55:44.939872951 +0100
-+++ ./Makefile	2020-01-11 09:56:29.246687538 +0100
++++ ./Makefile
 @@ -18,17 +18,17 @@
  
  # Variables you may well want to override.
  
 -PREFIX        = /usr/local
--BINDIR        = $(PREFIX)/sbin
-+PREFIX        ?= /usr/local
-+BINDIR        = $(PREFIX)/bin
++PREFIX        = @TERMUX_PREFIX@
+ BINDIR        = $(PREFIX)/sbin
  MANDIR        = $(PREFIX)/share/man
  LOCALEDIR     = $(PREFIX)/share/locale
  BUILDDIR      = $(SRC)
@@ -20,6 +18,6 @@
  RPM_OPT_FLAGS = 
 -LIBS          = 
 +LIBS          = -llog
+ LUA           = lua
  
  #################################################################
- 

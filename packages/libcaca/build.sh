@@ -31,7 +31,7 @@ termux_step_host_build() {
 	cd autoconf
 	tar xf $AUTOCONF_TARFILE --strip-components=1
 	./configure --prefix=$_PREFIX_FOR_BUILD
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j $TERMUX_PKG_MAKE_PROCESSES
 	make install
 }
 

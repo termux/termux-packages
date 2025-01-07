@@ -1,6 +1,6 @@
 --- strace-5.11/src/sigreturn.c     2021-02-16 08:00:00.000000000 +0000
 +++ strace-5.11.mod/src/sigreturn.c 2021-02-24 13:57:17.100000000 +0000
-@@ -14,15 +14,17 @@
+@@ -15,6 +15,7 @@
  # include <asm/sigcontext.h>
  #endif
  
@@ -8,10 +8,8 @@
  /* The following function might be unused, hence the inline qualifier.  */
  static inline void
  print_sigmask_addr_size(const void *const addr, const unsigned int size)
- {
- 	tprint_struct_begin();
- 	tprints_field_name("mask");
- 	tprints(sprintsigmask_n("", addr, size));
+@@ -24,6 +25,7 @@
+ 	tprints_string(sprintsigmask_n("", addr, size));
  	tprint_struct_end();
  }
 +#endif

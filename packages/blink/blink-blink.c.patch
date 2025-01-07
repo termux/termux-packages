@@ -1,0 +1,46 @@
+--- a/blink/blink.c
++++ b/blink/blink.c
+@@ -90,7 +90,7 @@
+ Revision: #" BLINK_COMMITS " " BLINK_GITSHA "\n\
+ Config: ./configure MODE=" BUILD_MODE " " CONFIG_ARGUMENTS "\n"
+ 
+-#define OPTS "hvjemZs0L:C:"
++#define OPTS "hvjemZs0L:C:E:U:"
+ 
+ _Alignas(1) static const char USAGE[] =
+     " [-" OPTS "] PROG [ARGS...]\n"
+@@ -115,9 +115,12 @@
+ #if !defined(DISABLE_OVERLAYS) || !defined(DISABLE_VFS)
+     "  -C PATH              sets chroot dir or overlay spec [default \":o\"]\n"
+ #endif
++    "  -E                   ignored\n"
++    "  -U                   ignored\n"
+ #if !defined(DISABLE_OVERLAYS) || !defined(NDEBUG)
+     "Environment:\n"
+ #endif
++    "  $BLINK_NO_LINEAR     enable memory safety (same as -m flag)\n"
+ #ifndef DISABLE_OVERLAYS
+     "  $BLINK_OVERLAYS      file system roots [default \":o\"]\n"
+ #endif
+@@ -265,7 +268,10 @@
+ 
+ static void GetOpts(int argc, char *argv[]) {
+   int opt;
++  char *ENV_nolinear = getenv("BLINK_NO_LINEAR");
+   FLAG_nolinear = !CanHaveLinearMemory();
++  if (ENV_nolinear && strcmp(ENV_nolinear, "0") == 0) FLAG_nolinear = false;
++  if (ENV_nolinear && strcmp(ENV_nolinear, "1") == 0) FLAG_nolinear = true;
+ #ifndef DISABLE_OVERLAYS
+   FLAG_overlays = getenv("BLINK_OVERLAYS");
+   if (!FLAG_overlays) FLAG_overlays = DEFAULT_OVERLAYS;
+@@ -319,6 +325,10 @@
+         PrintVersion();
+       case 'h':
+         PrintUsage(argc, argv, 0, 1);
++      case 'E':
++        break;
++      case 'U':
++        break;
+       default:
+         PrintUsage(argc, argv, 48, 2);
+     }

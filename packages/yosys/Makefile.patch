@@ -1,6 +1,6 @@
 --- a/Makefile
 +++ b/Makefile
-@@ -11,7 +11,7 @@
+@@ -10,7 +10,7 @@
  
  # features (the more the better)
  ENABLE_TCL := 1
@@ -9,23 +9,12 @@
  ENABLE_GLOB := 1
  ENABLE_PLUGINS := 1
  ENABLE_READLINE := 1
-@@ -138,7 +138,6 @@
- else
- LDFLAGS += -rdynamic
- ifneq ($(OS), OpenBSD)
--LDLIBS += -lrt
- endif
- endif
- 
-@@ -216,9 +215,8 @@
- endif
+@@ -222,7 +222,7 @@
  
  ifeq ($(CONFIG),clang)
--CXX = clang
--LD = clang++
--CXXFLAGS += -std=$(CXXSTD) -Os
-+LD = $(CXX)
+ CXX = clang++
+-CXXFLAGS += -std=$(CXXSTD) $(OPT_LEVEL)
 +CXXFLAGS += -std=$(CXXSTD)
- ABCMKARGS += ARCHFLAGS="-DABC_USE_STDINT_H -Wno-c++11-narrowing $(ABC_ARCHFLAGS)"
- 
- ifneq ($(SANITIZER),)
+ ifeq ($(ENABLE_LTO),1)
+ LINKFLAGS += -fuse-ld=lld
+ endif

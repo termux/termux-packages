@@ -4,7 +4,10 @@ TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=3c408621ad9b5693323acd7d1b455f78444e0c5f
 TERMUX_PKG_VERSION=2021.12.26
-TERMUX_PKG_SRCURL=https://github.com/ericchiang/xpup.git
+TERMUX_PKG_REVISION=3
+TERMUX_PKG_SRCURL=git+https://github.com/ericchiang/xpup
+TERMUX_PKG_SHA256=080e5bba8556f488dfecfbfcc39b1c8e476cb1a2128f09d3f29f0aa7e7f52278
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_BUILD_IN_SRC=true
 
@@ -17,6 +20,11 @@ termux_step_post_get_source() {
 		echo -n "ERROR: The specified version \"$TERMUX_PKG_VERSION\""
 		echo " is different from what is expected to be: \"$version\""
 		return 1
+	fi
+
+	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum)
+	if [[ "${s}" != "${TERMUX_PKG_SHA256}  "* ]]; then
+		termux_error_exit "Checksum mismatch for source files."
 	fi
 }
 

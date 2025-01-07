@@ -3,23 +3,39 @@ TERMUX_PKG_DESCRIPTION="Lightweight Ethereum Client"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.3.5"
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://github.com/openethereum/openethereum/archive/v${TERMUX_PKG_VERSION}.zip
-TERMUX_PKG_SHA256=fb4a3c9ac1e5ba2803098b3ba1c114a2a9a5397fed3cd65c4c966525cb6b075d
+TERMUX_PKG_REVISION=3
+TERMUX_PKG_SRCURL=https://github.com/openethereum/openethereum/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=e0e08f61b1c060d34c6a4dcec1eda3d4dae194fc9748e8051efbf12d1c884e14
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_configure() {
 	termux_setup_cmake
+	termux_setup_rust
+	cargo clean
+	export NDK_HOME=$NDK
+	local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
+	export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C link-arg=-lc++_shared"
+
+	: "${CARGO_HOME:=$HOME/.cargo}"
+	export CARGO_HOME
 
 	CXXFLAGS+=" --target=$CCTERMUX_HOST_PLATFORM"
 	CFLAGS+=" --target=$CCTERMUX_HOST_PLATFORM"
+	CMAKE_SYSTEM_PROCESSOR="$TERMUX_ARCH"
+
 	if [ $TERMUX_ARCH = "arm" ]; then
 		CFLAGS="${CFLAGS/-mthumb/}"
+		export CFLAGS_${CARGO_TARGET_NAME//-/_}="${CFLAGS}"
 		CMAKE_SYSTEM_PROCESSOR="armv7-a"
-	else
-		CMAKE_SYSTEM_PROCESSOR=$TERMUX_ARCH
+	elif [ "$TERMUX_ARCH" = "x86_64" ]; then
+		local libdir=target/$CARGO_TARGET_NAME/release/deps
+		mkdir -p $libdir
+		pushd $libdir
+		export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C link-arg=$($CC -print-libgcc-file-name)"
+		echo "INPUT(-l:libunwind.a)" > libgcc.so
+		popd
 	fi
 
 	cat <<- EOF > $TERMUX_COMMON_CACHEDIR/defaultcache.cmake
@@ -48,32 +64,24 @@ termux_step_configure() {
 
 	export CMAKE=$TERMUX_PKG_BUILDER_DIR/cmake_mod.sh
 	export TERMUX_COMMON_CACHEDIR
-
-	termux_setup_rust
-	cargo clean
-	export NDK_HOME=$NDK
-	RUSTFLAGS+=" -C link-args=-lc++"
-	: "${CARGO_HOME:=$HOME/.cargo}"
-	export CARGO_HOME
-
-	if [ "$TERMUX_ARCH" = "x86_64" ]; then
-		local libdir=target/$CARGO_TARGET_NAME/release/deps
-		mkdir -p $libdir
-		pushd $libdir
-		local libgcc="$($CC -print-libgcc-file-name)"
-		echo "INPUT($libgcc -l:libunwind.a)" > libgcc.so
-		popd
-	fi
 }
 
 termux_step_make() {
+	rm -rf $CARGO_HOME/registry/src/*/parity-rocksdb-sys-*
+	rm -rf $CARGO_HOME/registry/src/*/rustc-serialize-*
 	cargo fetch --target $CARGO_TARGET_NAME
 	patch --silent -p1 \
-		-d $CARGO_HOME/registry/src/github.com-*/parity-rocksdb-sys-0.5.6/rocksdb \
+		-d $CARGO_HOME/registry/src/*/parity-rocksdb-sys-0.5.6/rocksdb \
 		< $TERMUX_PKG_BUILDER_DIR/parity-rocksdb-sys-0.5.6-mutex.diff
-	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release --features final
+	patch --silent -p1 \
+		-d $CARGO_HOME/registry/src/*/parity-rocksdb-sys-0.5.6/rocksdb \
+		< $TERMUX_PKG_BUILDER_DIR/parity-rocksdb-sys-0.5.6-iterator.diff
+	patch --silent -p1 \
+		-d $CARGO_HOME/registry/src/*/rustc-serialize-0.3.24 \
+		< $TERMUX_PKG_BUILDER_DIR/rustc-serialize-0.3.24.diff
+	cargo build --jobs $TERMUX_PKG_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release --features final
 	for applet in evmbin ethstore-cli ethkey-cli; do
-		cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release -p $applet
+		cargo build --jobs $TERMUX_PKG_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release -p $applet
 	done
 }
 
@@ -81,4 +89,9 @@ termux_step_make_install() {
 	for applet in openethereum openethereum-evm ethstore ethkey; do
 		install -Dm755 -t $TERMUX_PREFIX/bin target/${CARGO_TARGET_NAME}/release/$applet
 	done
+}
+
+termux_step_post_massage() {
+	rm -rf $CARGO_HOME/registry/src/*/parity-rocksdb-sys-*
+	rm -rf $CARGO_HOME/registry/src/*/rustc-serialize-*
 }

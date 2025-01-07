@@ -1,9 +1,9 @@
 --- a/src/xls.c
-+++ b/src/xls.c
++++ b/src/formats/xls.c
 @@ -71,6 +71,11 @@
+  *
   * \return -1 on error
   */
- 
 +#ifdef USELOCALE
 +#include <locale.h>
 +#include <langinfo.h>
@@ -11,7 +11,7 @@
 +
  int open_xls(char * fname, char * encoding) {
  #ifdef XLS
- 
+     struct roman * roman = session->cur_doc;
 @@ -78,8 +83,6 @@
      char fmt[15] = "%d/%m/%Y";
  

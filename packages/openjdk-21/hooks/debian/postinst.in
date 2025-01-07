@@ -1,0 +1,18 @@
+#!@TERMUX_PREFIX@/bin/sh
+
+if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ]; then
+	if [ -x "@TERMUX_PREFIX@/bin/update-alternatives" ]; then
+		update-alternatives --install @TERMUX_PREFIX@/etc/profile.d/java.sh java-profile @TERMUX_PREFIX@/lib/jvm/java-21-openjdk/etc/profile.d/java.sh 40
+		for tool in @binaries@; do
+			update-alternatives --install \
+				@TERMUX_PREFIX@/bin/$tool $tool \
+				@TERMUX_PREFIX@/lib/jvm/java-21-openjdk/bin/$tool 40
+		done
+
+		for manpage in @manpages@; do
+			update-alternatives --install \
+				@TERMUX_PREFIX@/share/man/man1/$manpage $manpage \
+				@TERMUX_PREFIX@/lib/jvm/java-21-openjdk/man/man1/$manpage 60
+		done
+	fi
+fi

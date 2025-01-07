@@ -196,11 +196,10 @@ $default_opts{auth} = $xauthorityFile;
 $default_opts{geometry} = $geometry if ($geometry);
 $default_opts{depth} = $depth if ($depth);
 $default_opts{pixelformat} = $pixelformat if ($pixelformat);
-$default_opts{rfbwait} = 30000;
 $default_opts{rfbauth} = "$vncUserDir/passwd";
 $default_opts{rfbport} = $vncPort;
 $default_opts{fp} = $fontPath if ($fontPath);
-$default_opts{pn} = "";
+$default_opts{pn} = undef;
 
 # Load user-overrideable system defaults
 LoadConfig($vncSystemConfigDefaultsFile);
@@ -308,12 +307,12 @@ close(XAUTH);
 $cmd = $exedir."Xvnc :$displayNumber";
 
 foreach my $k (sort keys %config) {
-  $cmd .= " -$k $config{$k}";
+  $cmd .= " -$k $config{$k}" if defined($config{$k});
   delete $default_opts{$k}; # file options take precedence
 }
 
 foreach my $k (sort keys %default_opts) {
-  $cmd .= " -$k $default_opts{$k}";
+  $cmd .= " -$k $default_opts{$k}" if defined($default_opts{$k});
 }
 
 # Add color database stuff here, e.g.:
@@ -454,7 +453,7 @@ sub LoadConfig {
           # current config file being loaded defined the logical opposite setting
           # (NeverShared vs. AlwaysShared, etc etc).
           $toggle = lc($1); # must normalize key case
-          $config{$toggle} = $k;
+          $config{$toggle} = undef;
         }
       }
       close(IN);

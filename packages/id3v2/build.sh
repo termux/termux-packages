@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://id3v2.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://id3v2.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="A command line id3v2 tag editor"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"

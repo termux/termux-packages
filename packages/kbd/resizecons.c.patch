@@ -1,0 +1,14 @@
+diff --git a/src/resizecons.c b/src/resizecons.c
+index 618ce8b..f613951 100644
+--- a/src/resizecons.c
++++ b/src/resizecons.c
+@@ -78,7 +78,8 @@
+ #include <stdio.h>
+ #include <errno.h>
+ #include <signal.h>
+-#include <sys/io.h>
++#include <sys/syscall.h>
++#define iopl(level) ((int)syscall(SYS_iopl, level))
+ #include <sys/ioctl.h>
+ #include <linux/vt.h>
+ 

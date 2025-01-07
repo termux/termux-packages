@@ -1,14 +1,13 @@
-TERMUX_PKG_HOMEPAGE=https://github.com/mawww/kakoune
+TERMUX_PKG_HOMEPAGE=https://kakoune.org/
 TERMUX_PKG_DESCRIPTION="Code editor heavily inspired by Vim"
 TERMUX_PKG_LICENSE="Unlicense"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2022.10.31"
+TERMUX_PKG_VERSION="2024.05.18"
 TERMUX_PKG_SRCURL=https://github.com/mawww/kakoune/releases/download/v$TERMUX_PKG_VERSION/kakoune-$TERMUX_PKG_VERSION.tar.bz2
-TERMUX_PKG_SHA256=fb317b62c9048ddc7567fe83dfc409c252ef85778b24bd2863be2762d4e4e58b
+TERMUX_PKG_SHA256=dae8ac2e61d21d9bcd10145aa70b421234309a7b0bc57fad91bc34dbae0cb9fa
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_EXTRA_MAKE_ARGS=" -C src debug=no "
 
 termux_step_create_debscripts() {
 	cat <<- EOF > ./postinst

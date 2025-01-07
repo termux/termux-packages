@@ -1,0 +1,36 @@
+#!@TERMUX_PREFIX@/bin/env bash
+
+TERMUX_PREFIX="@TERMUX_PREFIX@"
+
+generate_module_files() {
+    local _modules=(
+    "__fortran_builtins"
+    "__fortran_type_info"
+    "__fortran_ieee_exceptions"
+    "__ppc_types"
+    "__cuda_builtins"
+    "ieee_arithmetic"
+    "ieee_exceptions"
+    "ieee_features"
+    "iso_c_binding"
+    "iso_fortran_env_impl"
+    "iso_fortran_env"
+    )
+
+    local file
+    for file in ${_modules[@]}; do
+        echo "Generating ${file}.mod..."
+        cd "$TERMUX_PREFIX"/include/flang
+        flang-new -cpp -fsyntax-only -module-dir "$TERMUX_PREFIX"/include/flang "$TERMUX_PREFIX"/opt/flang/module/"$file".f90
+        cp "$file".mod "$file".f18.mod
+    done
+
+    for file in "__ppc_intrinsics" "mma"; do
+        echo "Generating ${file}.mod..."
+        cd "$TERMUX_PREFIX"/include/flang
+        flang-new -cpp -fsyntax-only --target=ppc64le -module-dir "$TERMUX_PREFIX"/include/flang "$TERMUX_PREFIX"/opt/flang/module/"$file".f90
+        cp "$file".mod "$file".f18.mod
+    done
+}
+
+generate_module_files

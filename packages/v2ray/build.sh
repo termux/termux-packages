@@ -2,26 +2,63 @@ TERMUX_PKG_HOMEPAGE=https://www.v2fly.org/
 TERMUX_PKG_DESCRIPTION="A platform for building proxies to bypass network restrictions"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=5.1.0
-TERMUX_PKG_SRCURL=https://github.com/v2fly/v2ray-core.git
+TERMUX_PKG_VERSION="5.22.0"
+TERMUX_PKG_SRCURL=git+https://github.com/v2fly/v2ray-core
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
+
+_RELEASE_URL=https://github.com/v2fly/v2ray-core/releases/download/v$TERMUX_PKG_VERSION/v2ray-linux-64.zip
+_RELEASE_SHA256=ab181a2f70ea4c5536e98660c3462f5f2b3775e6268ee27dec91c8c80b0da946
+
+termux_pkg_auto_update() {
+	local latest_tag
+	latest_tag="$(termux_github_api_get_tag "https://github.com/v2fly/v2ray-core" "${TERMUX_PKG_UPDATE_TAG_TYPE}")"
+	(( ${#latest_tag} )) || {
+		printf '%s\n' \
+		'WARN: Auto update failure!' \
+		"latest_tag=${latest_tag}"
+	return
+	} >&2
+
+	if [[ "${latest_tag}" == "${TERMUX_PKG_VERSION}" ]]; then
+		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'."
+		return
+	fi
+
+	local tmpdir
+	tmpdir="$(mktemp -d)"
+	curl -sLo "${tmpdir}/tmpfile" "https://github.com/v2fly/v2ray-core/releases/download/v$latest_tag/v2ray-linux-64.zip"
+	local sha="$(sha256sum "${tmpdir}/tmpfile" | cut -d ' ' -f 1)"
+	
+	sed \
+		-e "s|^_RELEASE_SHA256=.*|_RELEASE_SHA256=${sha}|" \
+		-i "${TERMUX_PKG_BUILDER_DIR}/build.sh"
+
+	rm -fr "${tmpdir}"
+
+	printf '%s\n' 'INFO: Generated checksums:' "${sha}"
+	termux_pkg_upgrade_version "${latest_tag}"
+}
 
 termux_step_post_get_source() {
 	termux_setup_golang
 	export GOPATH=$TERMUX_PKG_SRCDIR/go
 	go get
 	chmod +w $GOPATH -R
-	rm -rf $TERMUX_PREFIX/share/v2ray/
-	mkdir -p $TERMUX_PREFIX/share/v2ray/
-	termux_download https://raw.githubusercontent.com/v2fly/geoip/release/geoip.dat \
-		$TERMUX_PREFIX/share/v2ray/geoip.dat \
-		20f6ceaa1e39a9de5473d94979855fe3eb93a5ba4a272862a58d59c7bd4ae908
-	termux_download https://raw.githubusercontent.com/v2fly/domain-list-community/release/dlc.dat \
-		$TERMUX_PREFIX/share/v2ray/geosite.dat \
-		fcf9f44b34c159fdf3180c53814f028e78f312f7bf89d4f115d8c2914a3339fd
-	termux_download https://raw.githubusercontent.com/v2fly/geoip/release/geoip-only-cn-private.dat \
-		$TERMUX_PREFIX/share/v2ray/geoip-only-cn-private.dat \
-		7f7c0c011a80148b8070ce7dde40db20e222b309ff5ab5c8008e696196830c22
+
+	termux_download $_RELEASE_URL \
+		$TERMUX_PKG_CACHEDIR/v2ray-linux-64-$TERMUX_PKG_VERSION.zip \
+		$_RELEASE_SHA256
+	mkdir -p $TERMUX_PKG_SRCDIR/v2ray-linux-64
+	unzip -d $TERMUX_PKG_SRCDIR/v2ray-linux-64 $TERMUX_PKG_CACHEDIR/v2ray-linux-64-$TERMUX_PKG_VERSION.zip
+
+	local d
+	for d in go/pkg/mod/github.com/adrg/xdg*/; do
+		sed 's|@TERMUX_PREFIX@|'"${TERMUX_PREFIX}"'|g' \
+			$TERMUX_PKG_BUILDER_DIR/0001-fix-config-paths.diff \
+			| patch -p1 -d ${d}
+	done
 }
 
 termux_step_make() {
@@ -32,4 +69,7 @@ termux_step_make() {
 termux_step_make_install() {
 	install -Dm700 -t $TERMUX_PREFIX/bin v2ray
 	install -Dm600 -t $TERMUX_PREFIX/share/v2ray release/config/*.json
+	install -Dm600 -t $TERMUX_PREFIX/share/v2ray $TERMUX_PKG_SRCDIR/v2ray-linux-64/geoip.dat
+	install -Dm600 -t $TERMUX_PREFIX/share/v2ray $TERMUX_PKG_SRCDIR/v2ray-linux-64/geosite.dat
+	install -Dm600 -t $TERMUX_PREFIX/share/v2ray $TERMUX_PKG_SRCDIR/v2ray-linux-64/geoip-only-cn-private.dat
 }

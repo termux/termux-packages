@@ -1,7 +1,7 @@
-diff -u -r ../openssh-7.2p2/sftp-server.c ./sftp-server.c
---- ../openssh-7.2p2/sftp-server.c	2016-03-09 13:04:48.000000000 -0500
-+++ ./sftp-server.c	2016-06-06 18:13:28.141236751 -0400
-@@ -1190,7 +1190,9 @@
+diff -uNr openssh-portable-V_9_5_P1/sftp-server.c openssh-portable-V_9_5_P1.mod/sftp-server.c
+--- openssh-portable-V_9_5_P1/sftp-server.c	2023-10-04 07:34:10.000000000 +0300
++++ openssh-portable-V_9_5_P1.mod/sftp-server.c	2023-11-23 16:29:34.271209449 +0200
+@@ -1281,7 +1281,9 @@
  	if (lstat(oldpath, &sb) == -1)
  		status = errno_to_portable(errno);
  	else if (S_ISREG(sb.st_mode)) {
@@ -11,7 +11,7 @@ diff -u -r ../openssh-7.2p2/sftp-server.c ./sftp-server.c
  		if (link(oldpath, newpath) == -1) {
  			if (errno == EOPNOTSUPP || errno == ENOSYS
  #ifdef EXDEV
-@@ -1200,6 +1202,7 @@
+@@ -1291,6 +1293,7 @@
  			    || errno == LINK_OPNOTSUPP_ERRNO
  #endif
  			    ) {
@@ -19,7 +19,7 @@ diff -u -r ../openssh-7.2p2/sftp-server.c ./sftp-server.c
  				struct stat st;
  
  				/*
-@@ -1213,6 +1216,7 @@
+@@ -1304,6 +1307,7 @@
  					else
  						status = SSH2_FX_OK;
  				}
@@ -27,7 +27,7 @@ diff -u -r ../openssh-7.2p2/sftp-server.c ./sftp-server.c
  			} else {
  				status = errno_to_portable(errno);
  			}
-@@ -1222,6 +1226,7 @@
+@@ -1313,6 +1317,7 @@
  			unlink(newpath);
  		} else
  			status = SSH2_FX_OK;

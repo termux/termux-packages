@@ -1,69 +1,12 @@
 diff -uNr xorg-server-1.20.1/hw/xfree86/parser/write.c xorg-server-1.20.1.mod/hw/xfree86/parser/write.c
 --- xorg-server-1.20.1/hw/xfree86/parser/write.c	2018-08-07 19:31:03.000000000 +0300
 +++ xorg-server-1.20.1.mod/hw/xfree86/parser/write.c	2018-10-08 21:07:16.817587230 +0300
-@@ -129,64 +129,5 @@
+@@ -129,7 +129,7 @@
  int
  xf86writeConfigFile(const char *filename, XF86ConfigPtr cptr)
  {
 -#ifndef HAS_NO_UIDS
--    int ret;
--
--    if (getuid() != geteuid()) {
--
--#if !defined(HAS_SAVED_IDS_AND_SETEUID)
--        int pid, p;
--        int status;
--        void (*csig) (int);
--
--        /* Need to fork to change ruid without loosing euid */
--        csig = OsSignal(SIGCHLD, SIG_DFL);
--        switch ((pid = fork())) {
--        case -1:
--            ErrorF("xf86writeConfigFile(): fork failed (%s)\n",
--                   strerror(errno));
--            return 0;
--        case 0:                /* child */
--            if (setuid(getuid()) == -1)
--                FatalError("xf86writeConfigFile(): "
--                           "setuid failed(%s)\n", strerror(errno));
--            ret = doWriteConfigFile(filename, cptr);
--            exit(ret);
--            break;
--        default:               /* parent */
--            do {
--                p = waitpid(pid, &status, 0);
--            } while (p == -1 && errno == EINTR);
--        }
--        OsSignal(SIGCHLD, csig);
--        if (p != -1 && WIFEXITED(status) && WEXITSTATUS(status) == 0)
--            return 1;           /* success */
--        else
--            return 0;
--
--#else                           /* HAS_SAVED_IDS_AND_SETEUID */
--        int ruid, euid;
--
--        ruid = getuid();
--        euid = geteuid();
--
--        if (seteuid(ruid) == -1) {
--            ErrorF("xf86writeConfigFile(): seteuid(%d) failed (%s)\n",
--                   ruid, strerror(errno));
--            return 0;
--        }
--        ret = doWriteConfigFile(filename, cptr);
--
--        if (seteuid(euid) == -1) {
--            ErrorF("xf86writeConfigFile(): seteuid(%d) failed (%s)\n",
--                   euid, strerror(errno));
--        }
--        return ret;
--
--#endif                          /* HAS_SAVED_IDS_AND_SETEUID */
--
--    }
--    else
--#endif                          /* !HAS_NO_UIDS */
--        return doWriteConfigFile(filename, cptr);
-+    return doWriteConfigFile(filename, cptr);
- }
++#if !defined(HAS_NO_UIDS) && !defined(__ANDROID__)
+     int ret;
+ 
+     if (getuid() != geteuid()) {

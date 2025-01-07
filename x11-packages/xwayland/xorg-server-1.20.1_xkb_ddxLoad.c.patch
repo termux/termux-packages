@@ -2,13 +2,13 @@ diff -uNr xorg-server-1.20.1/xkb/ddxLoad.c xorg-server-1.20.1.mod/xkb/ddxLoad.c
 --- xorg-server-1.20.1/xkb/ddxLoad.c	2018-08-07 19:31:06.000000000 +0300
 +++ xorg-server-1.20.1.mod/xkb/ddxLoad.c	2018-10-08 21:07:16.844266287 +0300
 @@ -76,8 +76,8 @@
-     }
-     else
- #endif
--    if (strlen("/tmp/") < size) {
--        (void) strcpy(outdir, "/tmp/");
-+    if (strlen("@TERMUX_PREFIX@/tmp/") < size) {
-+        (void) strcpy(outdir, "@TERMUX_PREFIX@/tmp/");
+     if (directory)
+         r = snprintf(outdir, size, "%s%s", directory, pathsep);
+     if (r < 0 || r >= size) {
+-        assert(strlen("/tmp/") < size);
+-        strcpy(outdir, "/tmp/");
++        assert(strlen("@TERMUX_PREFIX@/tmp/") < size);
++        strcpy(outdir, "@TERMUX_PREFIX@/tmp/");
      }
  }
  

@@ -13,28 +13,7 @@
  func getHomeDir() string {
  	if homeDir == "" {
 -		homeDir = homedir.Get()
-+		homeDir = "@TERMUX_HOME@/.docker"
++		homeDir = "@TERMUX_HOME@"
  	}
  	return homeDir
  }
-@@ -53,10 +52,7 @@
- 	if configDir != "" {
- 		return
- 	}
--	configDir = os.Getenv("DOCKER_CONFIG")
--	if configDir == "" {
--		configDir = filepath.Join(getHomeDir(), configFileDir)
--	}
-+	configDir = "@TERMUX_HOME@/.docker"
- }
- 
- // Dir returns the directory the configuration file is stored in
-@@ -131,7 +131,7 @@
- 	}
- 
- 	// Can't find latest config file so check for the old one
--	filename = filepath.Join(getHomeDir(), oldConfigfile)
-+	filename = filepath.Join("@TERMUX_HOME@/.docker", oldConfigfile)
- 	if file, err := os.Open(filename); err == nil {
- 		printLegacyFileWarning = true
- 		defer file.Close()

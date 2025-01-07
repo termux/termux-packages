@@ -1,13 +1,15 @@
 TERMUX_PKG_HOMEPAGE=https://lxqt.github.io
-TERMUX_PKG_DESCRIPTION="Qt 5 implementation of freedesktop.org XDG specifications"
+TERMUX_PKG_DESCRIPTION="Qt implementation of freedesktop.org XDG specifications"
 TERMUX_PKG_LICENSE="LGPL-2.1"
-TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
-TERMUX_PKG_VERSION="3.10.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="4.1.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/lxqt/libqtxdg/releases/download/${TERMUX_PKG_VERSION}/libqtxdg-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=3b3557bd4e37f7f63b6861f6aab6489b9236c82dcfd9fee6e4ca7ccb7a1dbfa2
-TERMUX_PKG_DEPENDS="libc++, qt5-qtbase, qt5-qtsvg, glib"
-TERMUX_PKG_BUILD_DEPENDS="lxqt-build-tools, qt5-qttools-cross-tools"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
--DGLIB_GIO_UNIX_INCLUDE_DIR=$TERMUX_PREFIX/include/gio-unix-2.0
-"
+TERMUX_PKG_SHA256=0604d397d9561a6a6148930a2b131f2bdee86cec6cca304f7513a8ec7b8e8809
+TERMUX_PKG_DEPENDS="libc++, qt6-qtbase, qt6-qtsvg, glib"
+TERMUX_PKG_BUILD_DEPENDS="lxqt-build-tools, qt6-qttools"
 TERMUX_PKG_AUTO_UPDATE=true
+# See plugin path in libqtxdg/src/xdgiconloader/plugin/CMakeLists.txt
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DQTXDGX_ICONENGINEPLUGIN_INSTALL_PATH=${TERMUX_PREFIX}/lib/qt6/plugins/iconengines
+"

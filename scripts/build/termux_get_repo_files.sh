@@ -7,37 +7,46 @@ termux_get_repo_files() {
 
 	for idx in $(seq ${#TERMUX_REPO_URL[@]}); do
 		local TERMUX_REPO_NAME=$(echo ${TERMUX_REPO_URL[$idx-1]} | sed -e 's%https://%%g' -e 's%http://%%g' -e 's%/%-%g')
-		local RELEASE_FILE=${TERMUX_COMMON_CACHEDIR}/${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-Release
-		local repo_base="${TERMUX_REPO_URL[$idx-1]}/dists/${TERMUX_REPO_DISTRIBUTION[$idx-1]}"
-		local dl_prefix="${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-${TERMUX_REPO_COMPONENT[$idx-1]}"
+		if [ "$TERMUX_REPO_PKG_FORMAT" = "debian" ]; then
+			local RELEASE_FILE=${TERMUX_COMMON_CACHEDIR}/${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-Release
+			local repo_base="${TERMUX_REPO_URL[$idx-1]}/dists/${TERMUX_REPO_DISTRIBUTION[$idx-1]}"
+			local dl_prefix="${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-${TERMUX_REPO_COMPONENT[$idx-1]}"
+		elif [ "$TERMUX_REPO_PKG_FORMAT" = "pacman" ]; then
+			local JSON_FILE="${TERMUX_COMMON_CACHEDIR}-${TERMUX_ARCH}/${TERMUX_REPO_NAME}-json"
+			local repo_base="${TERMUX_REPO_URL[$idx-1]}/${TERMUX_ARCH}"
+		fi
 
 		local download_attempts=6
 		while ((download_attempts > 0)); do
-			if termux_download "${repo_base}/Release" \
-				"$RELEASE_FILE" SKIP_CHECKSUM && \
-				termux_download "${repo_base}/Release.gpg" \
-				"${RELEASE_FILE}.gpg" SKIP_CHECKSUM; then
+			if [ "$TERMUX_REPO_PKG_FORMAT" = "debian" ]; then
+				if termux_download "${repo_base}/Release" "$RELEASE_FILE" SKIP_CHECKSUM && \
+					termux_download "${repo_base}/Release.gpg" "${RELEASE_FILE}.gpg" SKIP_CHECKSUM && \
+					gpg --verify "${RELEASE_FILE}.gpg" "$RELEASE_FILE"; then
 
-				if ! gpg --verify "${RELEASE_FILE}.gpg" "$RELEASE_FILE"; then
-					termux_error_exit "failed to verify gpg signature of $RELEASE_FILE"
-				fi
+					local failed=false
+					for arch in all $TERMUX_ARCH; do
+						local PACKAGES_HASH=$(./scripts/get_hash_from_file.py ${RELEASE_FILE} $arch ${TERMUX_REPO_COMPONENT[$idx-1]})
 
-				local failed=false
-				for arch in all $TERMUX_ARCH; do
-					local PACKAGES_HASH=$(./scripts/get_hash_from_file.py ${RELEASE_FILE} $arch ${TERMUX_REPO_COMPONENT[$idx-1]})
-
-					# If packages_hash = "" then the repo probably doesn't contain debs for $arch
-					if [ -n "$PACKAGES_HASH" ]; then
-						if ! termux_download "${repo_base}/${TERMUX_REPO_COMPONENT[$idx-1]}/binary-$arch/Packages" \
-							"${TERMUX_COMMON_CACHEDIR}-$arch/${dl_prefix}-Packages" \
-							$PACKAGES_HASH; then
-							failed=true
-							break
+						# If packages_hash = "" then the repo probably doesn't contain debs for $arch
+						if [ -n "$PACKAGES_HASH" ]; then
+							if ! termux_download "${repo_base}/${TERMUX_REPO_COMPONENT[$idx-1]}/binary-$arch/Packages" \
+								"${TERMUX_COMMON_CACHEDIR}-$arch/${dl_prefix}-Packages" \
+								$PACKAGES_HASH; then
+								failed=true
+								break
+							fi
 						fi
-					fi
-				done
+					done
 
-				if ! $failed; then
+					if ! $failed; then
+						break
+					fi
+				fi
+			elif [ "$TERMUX_REPO_PKG_FORMAT" = "pacman" ]; then
+				if termux_download "${repo_base}/${TERMUX_REPO_DISTRIBUTION[$idx-1]}.json" "$JSON_FILE" SKIP_CHECKSUM && \
+					termux_download "${repo_base}/${TERMUX_REPO_DISTRIBUTION[$idx-1]}.json.sig" "${JSON_FILE}.sig" SKIP_CHECKSUM && \
+					gpg --verify "${JSON_FILE}.sig" "$JSON_FILE"; then
+
 					break
 				fi
 			fi

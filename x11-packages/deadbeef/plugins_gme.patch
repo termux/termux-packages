@@ -1,0 +1,29 @@
+diff --git a/plugins/gme/cgme.c b/plugins/gme/cgme.c
+index 6e200745a..db097bb93 100644
+--- a/plugins/gme/cgme.c
++++ b/plugins/gme/cgme.c
+@@ -294,11 +294,13 @@ cgme_read (DB_fileinfo_t *_info, char *bytes, int size) {
+ 
+     // FIXME: it makes more sense to call gme_set_fade on init and configchanged
+     if (playForever && info->fade_set) {
+-        gme_set_fade(info->emu, -1, 0);
++        // PATCH: Changed in gme 0.6.4
++        gme_set_fade(info->emu, 0);
+         info->fade_set = 0;
+     }
+     else if (!playForever && !info->fade_set && conf_fadeout > 0 && info->duration >= conf_fadeout && _info->readpos >= info->duration - conf_fadeout) {
+-        gme_set_fade(info->emu, (int)(_info->readpos * 1000), conf_fadeout * 1000);
++        // PATCH: Changed in gme 0.6.4
++        gme_set_fade(info->emu, conf_fadeout * 1000);
+         info->fade_set = 1;
+     }
+ 
+@@ -562,7 +564,7 @@ static DB_decoder_t plugin = {
+     .plugin.id = "stdgme",
+     .plugin.name = "Game-Music-Emu player",
+     .plugin.descr = "chiptune/game music player based on GME library",
+-    .plugin.copyright = 
++    .plugin.copyright =
+         "Game_Music_Emu plugin for DeaDBeeF\n"
+         "Copyright (C) 2009-2015 Oleksiy Yakovenko <waker@users.sourceforge.net>\n"
+         "\n"

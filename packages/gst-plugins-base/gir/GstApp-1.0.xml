@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<dump>
+  <enum name="GstAppStreamType" get-type="gst_app_stream_type_get_type">
+    <member name="GST_APP_STREAM_TYPE_STREAM" nick="stream" value="0"/>
+    <member name="GST_APP_STREAM_TYPE_SEEKABLE" nick="seekable" value="1"/>
+    <member name="GST_APP_STREAM_TYPE_RANDOM_ACCESS" nick="random-access" value="2"/>
+  </enum>  <enum name="GstAppLeakyType" get-type="gst_app_leaky_type_get_type">
+    <member name="GST_APP_LEAKY_TYPE_NONE" nick="none" value="0"/>
+    <member name="GST_APP_LEAKY_TYPE_UPSTREAM" nick="upstream" value="1"/>
+    <member name="GST_APP_LEAKY_TYPE_DOWNSTREAM" nick="downstream" value="2"/>
+  </enum>  <class name="GstAppSrc" get-type="gst_app_src_get_type" parents="GstBaseSrc,GstElement,GstObject,GInitiallyUnowned,GObject">
+    <implements name="GstURIHandler"/>
+    <property name="caps" type="GstCaps" flags="227"/>
+    <property name="size" type="gint64" flags="227" default-value="-1"/>
+    <property name="stream-type" type="GstAppStreamType" flags="227" default-value="GST_APP_STREAM_TYPE_STREAM"/>
+    <property name="max-bytes" type="guint64" flags="227" default-value="200000"/>
+    <property name="max-buffers" type="guint64" flags="227" default-value="0"/>
+    <property name="max-time" type="guint64" flags="227" default-value="0"/>
+    <property name="format" type="GstFormat" flags="227" default-value="GST_FORMAT_BYTES"/>
+    <property name="block" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="is-live" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="min-latency" type="gint64" flags="227" default-value="-1"/>
+    <property name="max-latency" type="gint64" flags="227" default-value="-1"/>
+    <property name="emit-signals" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="min-percent" type="guint" flags="227" default-value="0"/>
+    <property name="current-level-bytes" type="guint64" flags="225" default-value="0"/>
+    <property name="current-level-buffers" type="guint64" flags="225" default-value="0"/>
+    <property name="current-level-time" type="guint64" flags="225" default-value="0"/>
+    <property name="duration" type="guint64" flags="227" default-value="18446744073709551615"/>
+    <property name="handle-segment-change" type="gboolean" flags="1251" default-value="FALSE"/>
+    <property name="leaky-type" type="GstAppLeakyType" flags="1251" default-value="GST_APP_LEAKY_TYPE_NONE"/>
+    <signal name="need-data" return="void" when="last">
+      <param type="guint"/>
+    </signal>
+    <signal name="enough-data" return="void" when="last">
+    </signal>
+    <signal name="seek-data" return="gboolean" when="last">
+      <param type="guint64"/>
+    </signal>
+    <signal name="push-buffer" return="GstFlowReturn" when="last" action="1">
+      <param type="GstBuffer"/>
+    </signal>
+    <signal name="push-buffer-list" return="GstFlowReturn" when="last" action="1">
+      <param type="GstBufferList"/>
+    </signal>
+    <signal name="push-sample" return="GstFlowReturn" when="last" action="1">
+      <param type="GstSample"/>
+    </signal>
+    <signal name="end-of-stream" return="GstFlowReturn" when="last" action="1">
+    </signal>
+  </class>
+  <class name="GstAppSink" get-type="gst_app_sink_get_type" parents="GstBaseSink,GstElement,GstObject,GInitiallyUnowned,GObject">
+    <implements name="GstURIHandler"/>
+    <property name="caps" type="GstCaps" flags="227"/>
+    <property name="eos" type="gboolean" flags="225" default-value="TRUE"/>
+    <property name="emit-signals" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="max-buffers" type="guint" flags="227" default-value="0"/>
+    <property name="drop" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="wait-on-eos" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="buffer-list" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="max-time" type="guint64" flags="227" default-value="0"/>
+    <property name="max-bytes" type="guint64" flags="227" default-value="0"/>
+    <signal name="eos" return="void" when="last">
+    </signal>
+    <signal name="new-preroll" return="GstFlowReturn" when="last">
+    </signal>
+    <signal name="new-sample" return="GstFlowReturn" when="last">
+    </signal>
+    <signal name="propose-allocation" return="gboolean" when="last">
+      <param type="GstQuery"/>
+    </signal>
+    <signal name="new-serialized-event" return="gboolean" when="last">
+    </signal>
+    <signal name="pull-preroll" return="GstSample" when="last" action="1">
+    </signal>
+    <signal name="pull-sample" return="GstSample" when="last" action="1">
+    </signal>
+    <signal name="try-pull-preroll" return="GstSample" when="last" action="1">
+      <param type="guint64"/>
+    </signal>
+    <signal name="try-pull-sample" return="GstSample" when="last" action="1">
+      <param type="guint64"/>
+    </signal>
+    <signal name="try-pull-object" return="GstMiniObject" when="last" action="1">
+      <param type="guint64"/>
+    </signal>
+  </class>
+</dump>

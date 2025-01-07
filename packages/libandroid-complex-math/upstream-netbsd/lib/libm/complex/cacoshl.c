@@ -31,6 +31,8 @@
 
 #include <complex.h>
 
+long double complex clogl(long double complex);
+
 long double complex
 cacoshl(long double complex z)
 {

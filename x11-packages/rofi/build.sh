@@ -1,12 +1,12 @@
-TERMUX_PKG_HOMEPAGE=https://github.com/DaveDavenport/rofi
+TERMUX_PKG_HOMEPAGE=https://davatorium.github.io/rofi/
 TERMUX_PKG_DESCRIPTION="A window switcher, application launcher and dmenu replacement"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Tristan Ross <spaceboyross@yandex.com>"
-TERMUX_PKG_VERSION=1.7.5
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL="https://github.com/DaveDavenport/rofi/releases/download/$TERMUX_PKG_VERSION/rofi-$TERMUX_PKG_VERSION.tar.xz"
-TERMUX_PKG_SHA256=caffcf66d165cb32b748c1db7f229d6d75da58c1685eb17455f65c60e8220c8d
-TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, libandroid-glob, libcairo, libxcb, libxkbcommon, pango, startup-notification, xcb-util, xcb-util-cursor, xcb-util-wm"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="1.7.7"
+TERMUX_PKG_SRCURL="https://github.com/davatorium/rofi/releases/download/$TERMUX_PKG_VERSION/rofi-$TERMUX_PKG_VERSION.tar.xz"
+TERMUX_PKG_SHA256=ce29264f7c4266ecff43abc7d0fe938e5506ae5c2c48b334e242e89c94b51607
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, libandroid-glob, libcairo, libxcb, libxkbcommon, pango, startup-notification, xcb-util, xcb-util-cursor, xcb-util-keysyms, xcb-util-wm"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-check"
 

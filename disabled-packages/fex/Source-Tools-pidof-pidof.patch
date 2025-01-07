@@ -1,0 +1,13 @@
+diff --git a/Source/Tools/pidof/pidof.cpp b/Source/Tools/pidof/pidof.cpp
+index 568c84c..86dee1f 100644
+--- a/Source/Tools/pidof/pidof.cpp
++++ b/Source/Tools/pidof/pidof.cpp
+@@ -52,7 +52,7 @@ void LoadOptions(int argc, char **argv) {
+   Separator = Options["d"];
+ 
+   for (const auto &Omit: Options.all("o")) {
+-    std::istringstream ss{Omit};
++    std::istringstream ss{Omit.c_str()};
+     std::string sub;
+     while (std::getline(ss, sub, ',')) {
+       int64_t pid;

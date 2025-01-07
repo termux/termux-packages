@@ -1,0 +1,11 @@
+--- ./sdk/pkg/_fe_analyzer_shared/lib/src/util/colors.dart
++++ ./sdk/pkg/_fe_analyzer_shared/lib/src/util/colors.dart
+@@ -141,7 +141,7 @@ bool _computeEnableColors() {
+   // The `-S` option of `tput` allows us to query multiple capabilities at
+   // once.
+   ProcessResult result = Process.runSync(
+-      "/bin/sh", ["-c", "printf '%s' '$TERMINAL_CAPABILITIES' | tput -S"]);
++      "@TERMUX_PREFIX@/bin/sh", ["-c", "printf '%s' '$TERMINAL_CAPABILITIES' | tput -S"]);
+ 
+   if (result.exitCode != 0) {
+     printEnableColorsReason("Not enabling colors, running tput failed.");

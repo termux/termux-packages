@@ -1,0 +1,163 @@
+--- libusb-1.0.27/libusb/os/linux_usbfs.c
++++ libusb-1.0.27.mod/libusb/os/linux_usbfs.c
+@@ -26,6 +26,7 @@
+ #include "linux_usbfs.h"
+ 
+ #include <alloca.h>
++#include <bits/fcntl.h>
+ #include <ctype.h>
+ #include <dirent.h>
+ #include <errno.h>
+@@ -74,6 +75,7 @@
+ 
+ #define USBDEV_PATH		"/dev"
+ #define USB_DEVTMPFS_PATH	"/dev/bus/usb"
++#define TERMUX_USB_ENV		"TERMUX_USB_FD"
+ 
+ /* use usbdev*.* device names in /dev instead of the usbfs bus directories */
+ static int usbdev_names = 0;
+@@ -105,6 +107,8 @@
+ static int linux_default_scan_devices(struct libusb_context *ctx);
+ #endif
+ 
++static int linux_termux_scan_devices(struct libusb_context *ctx);
++
+ struct kernel_version {
+ 	int major;
+ 	int minor;
+@@ -127,6 +131,7 @@
+ 	size_t descriptors_len;
+ 	struct config_descriptor *config_descriptors;
+ 	int active_config; /* cache val for !sysfs_available  */
++	int termux_fd;
+ };
+ 
+ struct linux_device_handle_priv {
+@@ -188,6 +193,24 @@
+ 	char path[24];
+ 	int fd;
+ 
++	struct linux_device_priv *priv = usbi_get_device_priv(dev);
++
++	if ((fd = priv->termux_fd) != -1) {
++		/* The returned fd (from this function) might gets closed at some
++		 * point in the future when the user close the handle
++		 * Avoid touching the fd given by Android since we might want to close
++		 * and reopen the device again */
++		if ((fd = dup(priv->termux_fd)) == -1) {
++			usbi_err(ctx, "unable to duplicate termux usb fd: %s", strerror(errno));
++			return LIBUSB_ERROR_IO;
++		}
++		/* Android gives fd with O_RDWR by default, and changing the mode
++		 * of an fd is not possible at the moment */
++		usbi_info(ctx, "setting fd mode for termux supplied usb device is unsupported, the fd will have mode O_RDWR instead");
++
++		return fd;
++	}
++
+ 	if (usbdev_names)
+ 		snprintf(path, sizeof(path), USBDEV_PATH "/usbdev%u.%u",
+ 			dev->bus_number, dev->device_address);
+@@ -458,12 +481,18 @@
+ 
+ 	usbi_mutex_static_lock(&linux_hotplug_lock);
+ 
++	if (getenv(TERMUX_USB_ENV)) {
++		ret = linux_termux_scan_devices(ctx);
++		goto out;
++	}
++
+ #if defined(HAVE_LIBUDEV)
+ 	ret = linux_udev_scan_devices(ctx);
+ #else
+ 	ret = linux_default_scan_devices(ctx);
+ #endif
+ 
++out:
+ 	usbi_mutex_static_unlock(&linux_hotplug_lock);
+ 
+ 	return ret;
+@@ -916,6 +945,8 @@
+ 	int fd, speed, r;
+ 	ssize_t nb;
+ 
++	priv->termux_fd = -1;
++
+ 	dev->bus_number = busnum;
+ 	dev->device_address = devaddr;
+ 
+@@ -1328,6 +1359,74 @@
+ }
+ #endif
+ 
++static int linux_termux_get_devinfo(int fd, uint8_t *busnum, uint8_t *devaddr)
++{
++	char proc_path[PATH_MAX], usbfs_path[PATH_MAX];
++
++	snprintf(proc_path, PATH_MAX, "/proc/self/fd/%u", fd);
++	if (readlink(proc_path, usbfs_path, PATH_MAX) < 0 ||
++		strncmp("/dev/bus/usb/", usbfs_path, 12)) {
++		return LIBUSB_ERROR_IO;
++	}
++
++	if (sscanf(usbfs_path, "/dev/bus/usb/%hhu/%hhu", busnum, devaddr) != 2)
++		return LIBUSB_ERROR_IO;
++
++	return LIBUSB_SUCCESS;
++}
++
++static int linux_termux_scan_devices(struct libusb_context *ctx)
++{
++	struct libusb_device *dev;
++	struct linux_device_priv *priv;
++	uint8_t busnum, devaddr;
++	unsigned long session_id;
++	char *envval, *envval_end;
++	int fd, r;
++
++	envval = getenv(TERMUX_USB_ENV);
++
++	assert(envval);
++
++	errno = 0;
++	fd = strtol(envval, &envval_end, 10);
++	if (*envval == '\0' || *envval_end != '\0' || errno || fd < 0) {
++		usbi_err(ctx, "invalid usb fd in TERMUX_USB_FD");
++		return LIBUSB_ERROR_NO_DEVICE;
++	}
++
++	r = linux_termux_get_devinfo(fd, &busnum, &devaddr);
++	if (r < 0) {
++		usbi_err(ctx, "unable to get device info from fd %d", fd);
++		return r;
++	}
++
++	session_id = busnum << 8 | devaddr;
++	usbi_dbg(ctx, "allocating new device for %u/%u (session %lu)",
++		 busnum, devaddr, session_id);
++	dev = usbi_alloc_device(ctx, session_id);
++	if (!dev)
++		return LIBUSB_ERROR_NO_MEM;
++
++	r = initialize_device(dev, busnum, devaddr, NULL, fd);
++	if (r < 0)
++		goto out;
++	r = usbi_sanitize_device(dev);
++	if (r < 0)
++		goto out;
++
++	priv = usbi_get_device_priv(dev);
++	priv->termux_fd = fd;
++
++out:
++	if (r < 0)
++		libusb_unref_device(dev);
++	else
++		usbi_connect_device(dev);
++
++	return r;
++}
++
+ static int initialize_handle(struct libusb_device_handle *handle, int fd)
+ {
+ 	struct linux_device_handle_priv *hpriv = usbi_get_device_handle_priv(handle);

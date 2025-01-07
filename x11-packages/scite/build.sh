@@ -1,21 +1,19 @@
 TERMUX_PKG_HOMEPAGE=https://www.scintilla.org/SciTE.html
 TERMUX_PKG_DESCRIPTION="A free source code editor"
-# License: HPND
-TERMUX_PKG_LICENSE="custom"
+TERMUX_PKG_LICENSE="HPND"
 TERMUX_PKG_LICENSE_FILE="scite/License.txt"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=5.3.2
+TERMUX_PKG_VERSION="5.5.4"
 TERMUX_PKG_SRCURL=https://www.scintilla.org/scite${TERMUX_PKG_VERSION//./}.tgz
-TERMUX_PKG_SHA256=5ce3e9a51292083ce4c881db791f39d1beda77871a1c339196b3a90df1746b0f
-TERMUX_PKG_DEPENDS="atk, gdk-pixbuf, glib, gtk3, libc++, libcairo, pango"
+TERMUX_PKG_SHA256=439d033c452bb30bf7952e30390991a6abd022a031e8e74b25717f9e46ae90a8
+TERMUX_PKG_DEPENDS="at-spi2-core, gdk-pixbuf, glib, gtk3, libc++, libcairo, pango"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_EXTRA_MAKE_ARGS="
 CLANG=1
 GTK3=1
 NO_LUA=1
 "
-
-TERMUX_PKG_AUTO_UPDATE=true
 
 termux_extract_src_archive() {
 	local file="$TERMUX_PKG_CACHEDIR/$(basename "${TERMUX_PKG_SRCURL}")"
@@ -23,15 +21,20 @@ termux_extract_src_archive() {
 	tar xf "$file" -C "$TERMUX_PKG_SRCDIR" --strip-components=0
 }
 
+termux_step_pre_configure() {
+	# https://github.com/termux/termux-packages/issues/18810
+	LDFLAGS+=" -Wl,--undefined-version"
+}
+
 termux_step_make() {
 	local d
 	for d in lexilla/src scintilla/gtk scite/gtk; do
-		make -j ${TERMUX_MAKE_PROCESSES} -C ${d} \
+		make -j ${TERMUX_PKG_MAKE_PROCESSES} -C ${d} \
 			${TERMUX_PKG_EXTRA_MAKE_ARGS}
 	done
 }
 
 termux_step_make_install() {
-	make -j ${TERMUX_MAKE_PROCESSES} -C scite/gtk install \
+	make -j ${TERMUX_PKG_MAKE_PROCESSES} -C scite/gtk install \
 		${TERMUX_PKG_EXTRA_MAKE_ARGS}
 }

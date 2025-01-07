@@ -2,52 +2,64 @@ TERMUX_PKG_HOMEPAGE=https://www.libsdl.org
 TERMUX_PKG_DESCRIPTION="A library for portable low-level access to a video framebuffer, audio output, mouse, and keyboard (version 2)"
 TERMUX_PKG_LICENSE="ZLIB"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.26.0"
+TERMUX_PKG_VERSION="2.30.11"
 TERMUX_PKG_SRCURL=https://www.libsdl.org/release/SDL2-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=8000d7169febce93c84b6bdf376631f8179132fd69f7015d4dadb8b9c2bdb295
-TERMUX_PKG_DEPENDS="libx11, libxcursor, libxext, libxfixes, libxi, libxrandr, libxss, pulseaudio"
-TERMUX_PKG_BUILD_DEPENDS="mesa"
-TERMUX_PKG_RECOMMENDS="mesa"
+TERMUX_PKG_SHA256=8b8d4aef2038533da814965220f88f77d60dfa0f32685f80ead65e501337da7f
+TERMUX_PKG_DEPENDS="libdecor, libwayland, libx11, libxcursor, libxext, libxfixes, libxi, libxkbcommon, libxrandr, libxss, pulseaudio"
+TERMUX_PKG_BUILD_DEPENDS="libwayland-cross-scanner, libwayland-protocols, opengl"
+TERMUX_PKG_RECOMMENDS="opengl"
 TERMUX_PKG_CONFLICTS="libsdl2"
 TERMUX_PKG_REPLACES="libsdl2"
-
 TERMUX_PKG_AUTO_UPDATE=true
-
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
---x-includes=${TERMUX_PREFIX}/include
---x-libraries=${TERMUX_PREFIX}/lib
---disable-assembly
---disable-mmx
 --disable-3dnow
---disable-oss
 --disable-alsa
+--disable-assembly
+--disable-dbus
+--disable-directx
 --disable-esd
---disable-video-wayland
+--disable-fcitx
+--disable-ibus
+--disable-ime
+--disable-libudev
+--disable-mmx
+--disable-oss
+--disable-pthread-sem
+--disable-render-d3d
+--disable-render-metal
+--disable-video-cocoa
+--disable-video-kmsdrm
 --disable-video-rpi
+--disable-video-vivante
+--enable-libdecor
+--enable-pthreads
+--enable-video-opengl
+--enable-video-opengles
+--enable-video-opengles1
+--enable-video-opengles2
+--enable-video-vulkan
+--enable-video-wayland
+--enable-video-x11-scrnsaver
 --enable-video-x11-xcursor
---enable-video-x11-xinerama
+--enable-video-x11-xdbe
+--enable-video-x11-xfixes
 --enable-video-x11-xinput
 --enable-video-x11-xrandr
---enable-video-x11-scrnsaver
 --enable-video-x11-xshape
---enable-video-x11-vm
---disable-video-vivante
---disable-video-cocoa
---disable-render-metal
---enable-video-opengl
---disable-video-opengles
---disable-video-opengles2
---disable-video-vulkan
---disable-libudev
---disable-dbus
---disable-ime
---disable-ibus
---disable-fcitx
---enable-pthreads
---disable-pthread-sem
---disable-directx
---disable-render-d3d
+--x-includes=${TERMUX_PREFIX}/include
+--x-libraries=${TERMUX_PREFIX}/lib
 "
+
+termux_step_post_get_source() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=0
+
+	local v=$(sed -En 's/^LT_MAJOR=([0-9]+).*/\1/p' configure.ac)
+	if [ "${v}" != "${_SOVERSION}" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+}
 
 termux_step_pre_configure() {
 	rm -rf "$TERMUX_PKG_SRCDIR"/Xcode-iOS
@@ -55,6 +67,8 @@ termux_step_pre_configure() {
 		xargs -n 1 sed -i \
 		-e 's/\([^A-Za-z0-9_]__ANDROID\)\(__[^A-Za-z0-9_]\)/\1_NO_TERMUX\2/g' \
 		-e 's/\([^A-Za-z0-9_]__ANDROID\)__$/\1_NO_TERMUX__/g'
+
+	termux_setup_wayland_cross_pkg_config_wrapper
 }
 
 termux_step_post_massage() {

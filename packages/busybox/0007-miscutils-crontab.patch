@@ -10,8 +10,8 @@ diff -uNr busybox-1.33.1/miscutils/crontab.c busybox-1.33.1.mod/miscutils/cronta
  	/* initgroups, setgid, setuid */
  	change_identity(pas);
  	setup_environment(pas->pw_shell,
- 			SETUP_ENV_CHANGEENV | SETUP_ENV_TO_TMP,
- 			pas);
+ 		SETUP_ENV_CHANGEENV | SETUP_ENV_TO_TMP | SETUP_ENV_CHDIR,
+ 		pas);
 +#endif
  	ptr = getenv("VISUAL");
  	if (!ptr) {

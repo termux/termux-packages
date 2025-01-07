@@ -1,0 +1,18 @@
+--- a/support/nfs/svc_socket.c
++++ b/support/nfs/svc_socket.c
+@@ -56,6 +56,7 @@
+ 	rpcp = getrpcbynumber(number);
+ #endif
+ 
++#ifndef __ANDROID__
+ 	if (ret == 0 && rpcp != NULL) {
+ 		/* First try name.  */
+ 		ret = getservbyname_r(rpcp->r_name, proto, &servbuf, servdata,
+@@ -72,6 +73,7 @@
+ 			}
+ 		}
+ 	}
++#endif
+ 
+ 	if (ret == 0 && servp != NULL)
+ 		return ntohs(servp->s_port);

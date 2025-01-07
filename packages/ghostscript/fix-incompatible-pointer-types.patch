@@ -1,0 +1,26 @@
+From 90cabe08422afdd16bac5dd9217602679d943045 Mon Sep 17 00:00:00 2001
+From: Ken Sharp <Ken.Sharp@artifex.com>
+Date: Fri, 8 Mar 2024 09:19:05 +0000
+Subject: [PATCH] Bug #707649 - fix apply_sasl in error cases.
+
+Forgot to dereference the pointers before assigning the values, if we
+get non-fatal errors returned from stringprep.
+---
+ pdf/pdf_sec.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/pdf/pdf_sec.c b/pdf/pdf_sec.c
+index 565ae80ca..7e8f6719d 100644
+--- a/pdf/pdf_sec.c
++++ b/pdf/pdf_sec.c
+@@ -183,8 +183,8 @@ static int apply_sasl(pdf_context *ctx, char *Password, int Len, char **NewPassw
+          * this easy: the errors we want to ignore are the ones with
+          * codes less than 100. */
+         if ((int)err < 100) {
+-            NewPassword = Password;
+-            NewLen = Len;
++            *NewPassword = Password;
++            *NewLen = Len;
+             return 0;
+         }
+ 

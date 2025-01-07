@@ -1,0 +1,20 @@
+--- a/meson.build
++++ b/meson.build
+@@ -36,7 +36,7 @@
+ gdk_pixbuf = dependency('gdk-pixbuf-2.0', required: get_option('gdk-pixbuf'))
+ 
+ git = find_program('git', required: false, native: true)
+-scdoc = find_program('scdoc', required: get_option('man-pages'), native: true)
++scdoc = find_program('scdoc', required: get_option('man-pages'))
+ 
+ version = '"@0@"'.format(meson.project_version())
+ if git.found()
+@@ -54,7 +54,7 @@
+ 
+ wl_protocol_dir = wayland_protos.get_variable('pkgdatadir')
+ 
+-wayland_scanner_prog = find_program(wayland_scanner.get_variable('wayland_scanner'), native: true)
++wayland_scanner_prog = find_program('wayland-scanner')
+ 
+ wayland_scanner_code = generator(
+ 	wayland_scanner_prog,

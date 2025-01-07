@@ -2,23 +2,33 @@ TERMUX_PKG_HOMEPAGE=https://www.sqlite.org
 TERMUX_PKG_DESCRIPTION="Library implementing a self-contained and transactional SQL database engine"
 TERMUX_PKG_LICENSE="Public Domain"
 TERMUX_PKG_MAINTAINER="@termux"
-# Note: Updating this version requires bumping libsqlite-tcl package as well.
-_SQLITE_MAJOR=3
-_SQLITE_MINOR=40
-_SQLITE_PATCH=0
-_SQLITE_YEAR=2022
-TERMUX_PKG_VERSION=${_SQLITE_MAJOR}.${_SQLITE_MINOR}.${_SQLITE_PATCH}
-TERMUX_PKG_SRCURL=https://www.sqlite.org/${_SQLITE_YEAR}/sqlite-autoconf-${_SQLITE_MAJOR}${_SQLITE_MINOR}0${_SQLITE_PATCH}00.tar.gz
-TERMUX_PKG_SHA256=0333552076d2700c75352256e91c78bf5cd62491589ba0c69aed0a81868980e7
+TERMUX_PKG_VERSION="3.47.2"
+TERMUX_PKG_REVISION=1
+_SQLITE_YEAR=2024
+TERMUX_PKG_SRCURL=https://www.sqlite.org/${_SQLITE_YEAR}/sqlite-autoconf-$(sed 's/\./''/; s/\./0/' <<< "$TERMUX_PKG_VERSION")00.tar.gz
+TERMUX_PKG_SHA256=f1b2ee412c28d7472bc95ba996368d6f0cdcf00362affdadb27ed286c179540b
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="zlib"
+TERMUX_PKG_BUILD_DEPENDS="tcl"
 TERMUX_PKG_BREAKS="libsqlite-dev"
 TERMUX_PKG_REPLACES="libsqlite-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-readline
 --enable-fts3
+--enable-session
 "
 
 termux_step_pre_configure() {
 	CPPFLAGS+=" -Werror -DSQLITE_ENABLE_DBSTAT_VTAB=1 -DSQLITE_ENABLE_COLUMN_METADATA=1 -DSQLITE_ENABLE_UPDATE_DELETE_LIMIT=1"
 	LDFLAGS+=" -lm"
+}
+
+termux_step_post_make_install() {
+	echo -e "termux - building libsqlite-tcl for arch ${TERMUX_ARCH}..."
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS=" --with-tcl=${TERMUX_PREFIX}/lib --with-system-sqlite"
+	TERMUX_PKG_SRCDIR+="/tea"
+	rm -rf "$TERMUX_PKG_TMPDIR/config-scripts"
+	termux_step_configure
+	termux_step_make
+	termux_step_make_install
 }

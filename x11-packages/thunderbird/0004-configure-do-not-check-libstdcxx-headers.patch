@@ -1,0 +1,21 @@
+--- a/build/moz.configure/toolchain.configure
++++ b/build/moz.configure/toolchain.configure
+@@ -1981,17 +1981,7 @@
+ 
+ @depends(cxx_compiler, target)
+ def needs_libstdcxx_newness_check(cxx_compiler, target):
+-    # We only have to care about this on Linux and MinGW.
+-    if cxx_compiler.type == "clang-cl":
+-        return
+-
+-    if target.kernel not in ("Linux", "WINNT"):
+-        return
+-
+-    if target.os == "Android":
+-        return
+-
+-    return True
++    return
+ 
+ 
+ def die_on_old_libstdcxx():

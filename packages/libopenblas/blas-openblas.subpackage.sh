@@ -1,0 +1,19 @@
+TERMUX_SUBPKG_DESCRIPTION="OpenBLAS symlinks for BLAS/CBLAS/LAPACK/LAPACKE"
+TERMUX_SUBPKG_INCLUDE="
+lib/libblas.a
+lib/libcblas.a
+lib/liblapack.a
+lib/liblapacke.a
+lib/libblas.so
+lib/libblas.so.3
+lib/libcblas.so
+lib/libcblas.so.3
+lib/liblapack.so
+lib/liblapack.so.3
+lib/liblapacke.so
+lib/liblapacke.so.3
+lib/pkgconfig/blas.pc
+lib/pkgconfig/cblas.pc
+lib/pkgconfig/lapack.pc
+lib/pkgconfig/lapacke.pc
+"

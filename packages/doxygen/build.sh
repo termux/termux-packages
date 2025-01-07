@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=http://www.doxygen.org
 TERMUX_PKG_DESCRIPTION="A documentation system for C++, C, Java, IDL and PHP"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.9.5
+TERMUX_PKG_VERSION="1.13.1"
 TERMUX_PKG_SRCURL=https://github.com/doxygen/doxygen/archive/Release_${TERMUX_PKG_VERSION//./_}.tar.gz
-TERMUX_PKG_SHA256=1c5c9cd4445f694e43f089c17529caae6fe889b732fb0b145211025a1fcda1bb
+TERMUX_PKG_SHA256=16632b5052e0e5f8acbcfc80aaf37f0e445e777ca68aab0df136a68fa855d91c
 TERMUX_PKG_DEPENDS="libc++, libiconv"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DBISON_EXECUTABLE=$(command -v bison)
@@ -15,6 +15,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dbuild_xmlparser=yes
 "
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+_\d+_\d+"
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 
 termux_step_post_make_install() {

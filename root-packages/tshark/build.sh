@@ -2,11 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://www.wireshark.org/
 TERMUX_PKG_DESCRIPTION="Network protocol analyzer and sniffer"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.4.8
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION="4.4.2"
 TERMUX_PKG_SRCURL=https://www.wireshark.org/download/src/all-versions/wireshark-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=58a7fa8dfe2010a8c8b7dcf66438c653e6493d47eb936ba48ef49d4aa4dbd725
-TERMUX_PKG_DEPENDS="glib, libgpg-error, libgcrypt, libnl, libpcap, libgnutls, openssl, libiconv, libcap, c-ares"
+TERMUX_PKG_SHA256=6053d97499c83feb87ce1d7f732d9c889c6c18bb334de67e65dca11483b0514e
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="brotli, c-ares, glib, libandroid-support, libcap, libgcrypt, libgmp, libgnutls, libgpg-error, libiconv, libidn2, liblz4, liblzma, libminizip, libnettle, libnghttp2, libnl, libopus, libpcap, libsnappy, libssh, libunistring, libxml2, openssl, pcre2, speexdsp, zlib, zstd"
 TERMUX_PKG_BREAKS="tshark-dev"
 TERMUX_PKG_REPLACES="tshark-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -22,4 +22,6 @@ termux_step_host_build() {
 
 termux_step_pre_configure() {
 	export PATH=$TERMUX_PKG_HOSTBUILD_DIR:$PATH
+	LDFLAGS+=" -lm -landroid-support"
+	sed -i "s#-T/usr/share/lemon/lempar.c#-T$TERMUX_PKG_SRCDIR/tools/lemon/lempar.c#" $TERMUX_PKG_SRCDIR/cmake/modules/UseLemon.cmake
 }

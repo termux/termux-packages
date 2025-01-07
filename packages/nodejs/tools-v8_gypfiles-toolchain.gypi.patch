@@ -1,6 +1,5 @@
-diff '--color=auto' -uNr node-v18.0.0.orig/tools/v8_gypfiles/toolchain.gypi node-v18.0.0/tools/v8_gypfiles/toolchain.gypi
---- node-v18.0.0.orig/tools/v8_gypfiles/toolchain.gypi	2022-04-21 15:15:48.771869783 +0530
-+++ node-v18.0.0/tools/v8_gypfiles/toolchain.gypi	2022-04-21 15:48:50.497175047 +0530
+--- ./tools/v8_gypfiles/toolchain.gypi.orig	2024-02-16 19:22:17.174789664 +0530
++++ ./tools/v8_gypfiles/toolchain.gypi	2024-02-16 19:25:03.257070768 +0530
 @@ -62,7 +62,7 @@
      'mips_use_msa%': 0,
  
@@ -10,3 +9,15 @@ diff '--color=auto' -uNr node-v18.0.0.orig/tools/v8_gypfiles/toolchain.gypi node
  
      'v8_enable_backtrace%': 0,
  
+@@ -277,11 +277,6 @@
+         'defines': [
+           'V8_TARGET_ARCH_ARM64',
+         ],
+-        'conditions': [
+-          ['v8_control_flow_integrity==1', {
+-            'cflags': [ '-mbranch-protection=standard' ],
+-          }],
+-        ],
+       }],
+       ['v8_target_arch=="riscv64"', {
+         'defines': [

@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://lazyread.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://lazyread.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="An auto-scroller, pager, and e-book reader all in one"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

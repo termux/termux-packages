@@ -3,15 +3,17 @@ TERMUX_PKG_DESCRIPTION="A simple C language RPC framework (mainly for seafile)"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1:3.2.0
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=https://github.com/haiwen/libsearpc/archive/v${TERMUX_PKG_VERSION:2}.tar.gz
 TERMUX_PKG_SHA256=cd00197fcc40b45b1d5e892b2d08dfa5947f737e0d80f3ef26419334e75b0bff
 TERMUX_PKG_DEPENDS="glib, libjansson, python"
 TERMUX_PKG_BREAKS="libsearpc-dev"
 TERMUX_PKG_REPLACES="libsearpc-dev"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--enable-compile-demo=no
+"
 
 termux_step_post_get_source() {
 	./autogen.sh
-	local _PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
-	export PYTHON="python${_PYTHON_VERSION}"
+	export PYTHON="python${TERMUX_PYTHON_VERSION}"
 }

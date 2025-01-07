@@ -1,19 +1,26 @@
 TERMUX_PKG_HOMEPAGE=https://python.org/
 TERMUX_PKG_DESCRIPTION="Python 3 programming language intended to enable clear programs"
-TERMUX_PKG_LICENSE="PythonPL"
+# License: PSF-2.0
+TERMUX_PKG_LICENSE="custom"
+TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-_MAJOR_VERSION=3.11
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}.1
+TERMUX_PKG_VERSION=3.12.8
 TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=85879192f2cffd56cb16c092905949ebf3e5e394b7f764723529637901dfb58f
+TERMUX_PKG_SHA256=c909157bb25ec114e5869124cc2a9c4a4d4c1e957ca4ff553f1edc692101154e
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="gdbm, libandroid-posix-semaphore, libandroid-support, libbz2, libcrypt, libexpat, libffi, liblzma, libsqlite, ncurses, ncurses-ui-libs, openssl, readline, zlib"
-TERMUX_PKG_RECOMMENDS="clang, make, pkg-config"
+TERMUX_PKG_BUILD_DEPENDS="tk"
+TERMUX_PKG_RECOMMENDS="python-ensurepip-wheels, python-pip"
 TERMUX_PKG_SUGGESTS="python-tkinter"
-# For python-pip, see https://github.com/termux/termux-packages/pull/13611.
-TERMUX_PKG_BREAKS="python2 (<= 2.7.15), python-dev, python-pip"
+TERMUX_PKG_BREAKS="python2 (<= 2.7.15), python-dev"
 TERMUX_PKG_REPLACES="python-dev"
 # Let "python3" will be alias to this package.
 TERMUX_PKG_PROVIDES="python3"
+
+# https://github.com/termux/termux-packages/issues/15908
+TERMUX_PKG_MAKE_PROCESSES=1
+
+_MAJOR_VERSION="${TERMUX_PKG_VERSION%.*}"
 
 # Set ac_cv_func_wcsftime=no to avoid errors such as "character U+ca0025 is not in range [U+0000; U+10ffff]"
 # when executing e.g. "from time import time, strftime, localtime; print(strftime(str('%Y-%m-%d %H:%M'), localtime()))"
@@ -39,6 +46,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_sem_unlink=yes"
 # Force enable posix shared memory.
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_shm_open=yes"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_shm_unlink=yes"
+# Assume tzset() works
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_working_tzset=yes"
 
 TERMUX_PKG_RM_AFTER_INSTALL="
 lib/python${_MAJOR_VERSION}/test
@@ -67,16 +76,21 @@ termux_step_pre_configure() {
 	else
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-build-python=python$_MAJOR_VERSION"
 	fi
+
+	# For multiprocessing libs
+	export LDFLAGS+=" -landroid-posix-semaphore"
+
+	export LIBCRYPT_LIBS="-lcrypt"
 }
 
 termux_step_post_make_install() {
 	(cd $TERMUX_PREFIX/bin
-	 ln -sf idle${_MAJOR_VERSION} idle
-	 ln -sf python${_MAJOR_VERSION} python
-	 ln -sf python${_MAJOR_VERSION}-config python-config
-	 ln -sf pydoc${_MAJOR_VERSION} pydoc)
+	ln -sf idle${_MAJOR_VERSION} idle
+	ln -sf python${_MAJOR_VERSION} python
+	ln -sf python${_MAJOR_VERSION}-config python-config
+	ln -sf pydoc${_MAJOR_VERSION} pydoc)
 	(cd $TERMUX_PREFIX/share/man/man1
-	 ln -sf python${_MAJOR_VERSION}.1 python.1)
+	ln -sf python${_MAJOR_VERSION}.1 python.1)
 }
 
 termux_step_post_massage() {
@@ -89,48 +103,41 @@ termux_step_post_massage() {
 }
 
 termux_step_create_debscripts() {
-	# Post-installation script for setting up pip.
+	# This is a temporary script and will therefore be removed when python is updated to 3.12
 	cat <<- POSTINST_EOF > ./postinst
-	#!$TERMUX_PREFIX/bin/sh
+	#!$TERMUX_PREFIX/bin/bash
 
-	echo "Setting up pip..."
-
-	# Fix historical mistake which removed bin/pip but left site-packages/pip-*.dist-info,
-	# which causes ensurepip to avoid installing pip due to already existing pip install:
-	if [ ! -f "$TERMUX_PREFIX/bin/pip" ]; then
-	    rm -Rf ${TERMUX_PREFIX}/lib/python${_MAJOR_VERSION}/site-packages/pip-*.dist-info
+	if [[ -f "$TERMUX_PREFIX/bin/pip" && \
+	 ! (("$TERMUX_PACKAGE_FORMAT" = "debian" && -f $TERMUX_PREFIX/var/lib/dpkg/info/python-pip.list) || \
+	    ("$TERMUX_PACKAGE_FORMAT" = "pacman" && \$(ls $TERMUX_PREFIX/var/lib/pacman/local/python-pip-* 2>/dev/null))) ]]; then
+		echo "Removing pip..."
+		rm -f $TERMUX_PREFIX/bin/pip $TERMUX_PREFIX/bin/pip3* $TERMUX_PREFIX/bin/easy_install $TERMUX_PREFIX/bin/easy_install-3*
+		rm -Rf $TERMUX_PREFIX/lib/python${_MAJOR_VERSION}/site-packages/pip
+		rm -Rf ${TERMUX_PREFIX}/lib/python${_MAJOR_VERSION}/site-packages/pip-*.dist-info
 	fi
 
-	cd ${TERMUX_PREFIX}
-	${TERMUX_PREFIX}/bin/python3 -m ensurepip --upgrade --default-pip
+	if [ ! -f "$TERMUX_PREFIX/bin/pip" ]; then
+		echo
+		echo "== Note: pip is now separate from python =="
+		echo "To install, enter the following command:"
+		echo "   pkg install python-pip"
+		echo
+	fi
+
+	if [ -d $TERMUX_PREFIX/lib/python3.11/site-packages ]; then
+		echo
+		echo "NOTE: The system python package has been updated to 3.12."
+		echo "NOTE: Run 'pkg upgrade' to update system python packages."
+		echo "NOTE: Packages installed using pip needs to be re-installed."
+		echo
+	fi
 
 	exit 0
 	POSTINST_EOF
 
-	# For pacman users have to completely reinstall python
-        # (first uninstall and then install) to set up pip.
-	# In order not to do this, need to run an action that runs after installation.
+	chmod 0755 postinst
+
 	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ]; then
 		echo "post_install" > postupg
 	fi
-
-	# Pre-rm script to cleanup runtime-generated files.
-	cat <<- PRERM_EOF > ./prerm
-	#!$TERMUX_PREFIX/bin/sh
-
-	if [ "$TERMUX_PACKAGE_FORMAT" != "pacman" ] && [ "\$1" != "remove" ]; then
-	    exit 0
-	fi
-
-	echo "Uninstalling python modules..."
-	pip3 freeze 2>/dev/null | xargs pip3 uninstall -y >/dev/null 2>/dev/null
-	rm -f $TERMUX_PREFIX/bin/pip $TERMUX_PREFIX/bin/pip3* $TERMUX_PREFIX/bin/easy_install $TERMUX_PREFIX/bin/easy_install-3*
-
-	echo "Deleting remaining files from site-packages..."
-	rm -Rf $TERMUX_PREFIX/lib/python${_MAJOR_VERSION}/site-packages/*
-
-	exit 0
-	PRERM_EOF
-
-	chmod 0755 postinst prerm
 }

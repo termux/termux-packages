@@ -2,10 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://www.graphviz.org/
 TERMUX_PKG_DESCRIPTION="Rich set of graph drawing tools"
 TERMUX_PKG_LICENSE="EPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=7.0.4
+TERMUX_PKG_VERSION="12.2.1"
 TERMUX_PKG_SRCURL=https://gitlab.com/graphviz/graphviz/-/archive/$TERMUX_PKG_VERSION/graphviz-$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=85b74fa020984b7439c0373c88590a43a4a28934e54643afe8f18d32ae4bf438
-TERMUX_PKG_DEPENDS="fontconfig, freetype, gdk-pixbuf, glib, harfbuzz, libandroid-glob, libc++, libcairo, libexpat, libgd, libltdl, librsvg, libwebp, pango, zlib"
+TERMUX_PKG_SHA256=91d444b4dabdaf5bfa7c6fcc3a1ee5d41e588af6079ebc030f0acb79e48a56ea
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="fontconfig, freetype, gdk-pixbuf, glib, harfbuzz, libandroid-glob, libc++, libcairo, libexpat, libgd, libgts, libltdl, librsvg, libwebp, pango, zlib"
 TERMUX_PKG_BREAKS="graphviz-dev"
 TERMUX_PKG_REPLACES="graphviz-dev"
 TERMUX_PKG_BUILD_DEPENDS="libtool"
@@ -22,6 +23,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-sharp=no
 --enable-swig=no
 --enable-tcl=no
+--with-ann=no
 --with-expatlibdir=$TERMUX_PREFIX/lib
 --with-ltdl-include=$TERMUX_PREFIX/include
 --with-ltdl-lib=$TERMUX_PREFIX/lib
@@ -37,8 +39,13 @@ termux_step_pre_configure() {
 	./autogen.sh NOCONFIG
 	export HOSTCC="gcc"
 
+	# ERROR: ./lib/graphviz/libgvplugin_neato_layout.so contains undefined symbols: __extendsftf2
+	local _libgcc_file="$($CC -print-libgcc-file-name)"
+	local _libgcc_path="$(dirname $_libgcc_file)"
+	local _libgcc_name="$(basename $_libgcc_file)"
+	LDFLAGS+=" -L$_libgcc_path -l:$_libgcc_name"
+
 	LDFLAGS+=" -lm -landroid-glob"
-	LDFLAGS+=" $($CC -print-libgcc-file-name)"
 	LDFLAGS+=" -Wl,-rpath=$TERMUX_PREFIX/lib/graphviz"
 }
 

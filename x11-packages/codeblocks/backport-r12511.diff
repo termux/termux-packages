@@ -1,0 +1,24 @@
+------------------------------------------------------------------------
+r12511 | fuscated | 2021-08-15 20:51:11 +0900 (Sun, 15 Aug 2021) | 7 lines
+
+* SDK: Fix a regex in the MacroManager to work with the PCRE2 regex engine used by wx3.1.6 (ticket #1120)
+
+> This regex is totally bonkers. I don't know what its purpose is, but it
+  is mighty strange. There is a group at the beginning which tries to match
+  non-$ or start of the string. At the end there is code to match ' ', '/'
+  or '\'. The braces could be mismatched - ${var) works perfectly fine.
+> The fix is - we want to match '\', so we need to escape it.
+------------------------------------------------------------------------
+Index: src/sdk/macrosmanager.cpp
+===================================================================
+--- src/sdk/macrosmanager.cpp	(revision 12510)
++++ src/sdk/macrosmanager.cpp	(revision 12511)
+@@ -80,7 +80,7 @@
+     m_Plugins  = UnixFilename(ConfigManager::GetPluginsFolder());
+     m_DataPath = UnixFilename(ConfigManager::GetDataFolder());
+     ClearProjectKeys();
+-    m_RE_Unix.Compile(_T("([^$]|^)(\\$[({]?(#?[A-Za-z_0-9.]+)[)} /\\]?)"),               wxRE_EXTENDED | wxRE_NEWLINE);
++    m_RE_Unix.Compile(_T("([^$]|^)(\\$[({]?(#?[A-Za-z_0-9.]+)[\\)} /\\\\]?)"),           wxRE_EXTENDED | wxRE_NEWLINE);
+     m_RE_DOS.Compile(_T("([^%]|^)(%(#?[A-Za-z_0-9.]+)%)"),                               wxRE_EXTENDED | wxRE_NEWLINE);
+     m_RE_IfSp.Compile(_T("(([^=!<>]+)[ ]*(=|==|!=|>|<|>=|<=)[ ]*([^=!<>]+))"),           wxRE_EXTENDED | wxRE_NEWLINE);
+     m_RE_Script.Compile(_T("(\\[\\[(.*)\\]\\])"),                                        wxRE_EXTENDED | wxRE_NEWLINE);

@@ -1,0 +1,68 @@
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -48,6 +48,7 @@
+     target_compile_definitions(VulkanCompilerConfiguration INTERFACE VK_USE_PLATFORM_WIN32_KHR)
+ elseif(ANDROID)
+     target_compile_definitions(VulkanCompilerConfiguration INTERFACE VK_USE_PLATFORM_ANDROID_KHR)
++    message(FATAL_ERROR "TEST")
+ elseif(APPLE)
+     target_compile_definitions(VulkanCompilerConfiguration INTERFACE VK_USE_PLATFORM_METAL_EXT)
+     if (IOS)
+--- a/src/layer/layer_settings_manager.cpp
++++ b/src/layer/layer_settings_manager.cpp
+@@ -20,7 +20,7 @@
+ #define GetCurrentDir getcwd
+ #endif
+ 
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ #include <sys/system_properties.h>
+ #endif
+ 
+@@ -32,7 +32,7 @@
+ #include <array>
+ #include <algorithm>
+ 
+-#if defined(__ANDROID__)
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ /*
+  * Use the __system_property_read_callback API that appeared in
+  * Android API level 26. If not avaible use the old __system_property_get function.
+@@ -68,7 +68,7 @@
+ #endif
+ 
+ static std::string GetEnvironment(const char *variable) {
+-#if defined(__ANDROID__)
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+     std::string result = GetAndroidProperty(variable);
+     // Workaround for screenshot layer backward compatibility
+     if (result.empty() && std::string(variable) == "debug.vulkan.screenshot.frames") {
+@@ -214,7 +214,7 @@
+     }
+ #endif
+ 
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+     std::string env_path = GetEnvironment("debug.vulkan.khronos_profiles.settings_path");
+ #else
+     // Look for an environment variable override for the settings file location
+--- a/src/layer/layer_settings_util.cpp
++++ b/src/layer/layer_settings_util.cpp
+@@ -48,7 +48,7 @@
+ }
+ 
+ static const char *GetDefaultPrefix() {
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+     return "vulkan";
+ #else
+     return "";
+@@ -59,7 +59,7 @@
+     std::stringstream result;
+     const std::string prefix = (requested_prefix == nullptr || trim_mode != TRIM_NAMESPACE) ? GetDefaultPrefix() : requested_prefix;
+ 
+-#if defined(__ANDROID__)
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+     const std::string full_prefix = std::string("debug.") + prefix + ".";
+     switch (trim_mode) {
+         default:

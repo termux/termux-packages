@@ -1,0 +1,260 @@
+diff --git a/test.sh b/test.sh
+index f70ad89..1d5298b 100755
+--- a/test.sh
++++ b/test.sh
+@@ -2977,19 +2977,21 @@ echo "$da" |$CMD2 >>"$tf" 2>>"${te}2"
+ rc2=$?
+ kill $pid1 2>/dev/null; wait
+ if [ $rc2 -ne 0 ]; then
+-   $PRINTF "$FAILED: $TRACE $SOCAT:\n"
++   $PRINTF "$FAILED (rc2=$rc2)\n"
+    echo "$CMD1 &"
++   cat "${te}1" >&2
+    echo "$CMD2"
+-   cat "${te}1" "${te}2"
++   cat "${te}2" >&2
+    numFAIL=$((numFAIL+1))
+    listFAIL="$listFAIL $N"
+ elif ! echo "$da" |diff - "$tf" >"$tdiff"; then
+-   $PRINTF "$FAILED\n"
++   $PRINTF "$FAILED (diff)\n"
+    echo "$CMD1 &"
+-   cat "${te}1"
++   cat "${te}1" >&2
+    echo "$CMD2"
+-   cat "${te}2"
+-   cat "$tdiff"
++   cat "${te}2" >&2
++   echo "// diff:" >&2
++   cat "$tdiff" >&2
+    numFAIL=$((numFAIL+1))
+    listFAIL="$listFAIL $N"
+ else
+@@ -3028,15 +3030,21 @@ echo "$da" |$CMD2 >>"$tf" 2>>"${te}2"
+ rc2=$?
+ kill $pid1 2>/dev/null; wait
+ if [ $rc2 -ne 0 ]; then
+-   $PRINTF "$FAILED: $TRACE $SOCAT:\n"
++   $PRINTF "$FAILED (rc2=$rc2)\n"
+    echo "$CMD1 &"
++   cat "${te}1" >&2
+    echo "$CMD2"
+-   cat "${te}1" "${te}2"
++   cat "${te}2" >&2
+    numFAIL=$((numFAIL+1))
+    listFAIL="$listFAIL $N"
+ elif ! echo "$da" |diff - "$tf" >"$tdiff"; then
+-   $PRINTF "$FAILED\n"
+-   cat "$tdiff"
++   $PRINTF "$FAILED (diff)\n"
++   echo "$CMD1 &"
++   cat "${te}1" >&2
++   echo "$CMD2"
++   cat "${te}2" >&2
++   echo "// diff:" >&2
++   cat "$tdiff" >&2
+    numFAIL=$((numFAIL+1))
+    listFAIL="$listFAIL $N"
+ else
+@@ -19154,6 +19162,76 @@ esac
+ N=$((N+1))
+ 
+ 
++# Test UDP-LISTEN with bind to IPv4 address; this failed with Socat version
++# 1.8.0.0
++NAME=UDP_LISTEN_BIND4
++case "$TESTS" in
++*%$N%*|*%functions%*|*%bugs%*|*%socket%*|*%ip4%*|*%udp%*|*%udp4%*|*%listen%*|*%$NAME%*)
++TEST="$NAME: Test UDP-LISTEN with bind to IPv4 addr"
++# Start a listener with UDP-LISTEN and bind to 127.0.0.1; when it starts
++# without error and even processes data the test succeeded
++if ! eval $NUMCOND; then :
++# Remove unneeded checks, adapt lists of the remaining ones
++elif ! cond=$(checkconds \
++		  "" \
++		  "" \
++		  "" \
++		  "IP4 UDP LISTEN STDIO PIPE" \
++		  "UDP-LISTEN PIPE STDIO UDP" \
++		  "bind" \
++		  "udp4" ); then
++    $PRINTF "test $F_n $TEST... ${YELLOW}$cond${NORMAL}\n" $N
++    numCANT=$((numCANT+1))
++    listCANT="$listCANT $N"
++    namesCANT="$namesCANT $NAME"
++else
++    tf="$td/test$N.stdout"
++    te="$td/test$N.stderr"
++    tdiff="$td/test$N.diff"
++    da="test$N $(date) $RANDOM"
++    newport udp4
++    CMD0="$TRACE $SOCAT $opts UDP-LISTEN:$PORT,bind=$LOCALHOST4 PIPE"
++    CMD1="$TRACE $SOCAT $opts - UDP-CONNECT:$LOCALHOST4:$PORT"
++    printf "test $F_n $TEST... " $N
++    $CMD0 >/dev/null 2>"${te}0" &
++    pid0=$!
++    waitudp4port $PORT 1
++    echo "$da" |$CMD1 >"${tf}1" 2>"${te}1"
++    rc1=$?
++    kill $pid0 2>/dev/null; wait
++    if [ "$rc1" -ne 0 ]; then
++	$PRINTF "$FAILED (rc1=$rc1)\n"
++	echo "$CMD0 &"
++	cat "${te}0" >&2
++	echo "$CMD1"
++	cat "${te}1" >&2
++	numFAIL=$((numFAIL+1))
++	listFAIL="$listFAIL $N"
++	namesFAIL="$namesFAIL $NAME"
++    elif ! echo "$da" |diff - "${tf}1" >$tdiff; then
++	$PRINTF "$FAILED (diff)\n"
++	echo "$CMD0 &"
++	cat "${te}0" >&2
++	echo "$CMD1"
++	cat "${te}1" >&2
++	echo "// diff:" >&2
++	cat "$tdiff" >&2
++	numFAIL=$((numFAIL+1))
++	listFAIL="$listFAIL $N"
++	namesFAIL="$namesFAIL $NAME"
++    else
++	$PRINTF "$OK\n"
++	if [ "$VERBOSE" ]; then echo "$CMD0 &"; fi
++	if [ "$DEBUG" ];   then cat "${te}0" >&2; fi
++	if [ "$VERBOSE" ]; then echo "$CMD1"; fi
++	if [ "$DEBUG" ];   then cat "${te}1" >&2; fi
++	numOK=$((numOK+1))
++    fi
++fi # NUMCOND
++ ;;
++esac
++N=$((N+1))
++
+ # end of common tests
+ 
+ ##################################################################################
+diff --git a/xio-socket.c b/xio-socket.c
+index c869b6d..ed10a99 100644
+--- a/xio-socket.c
++++ b/xio-socket.c
+@@ -262,7 +262,7 @@ static int xioopen_socket_connect(
+    sfd->dtype = XIOREAD_STREAM|XIOWRITE_STREAM;
+ 
+    socket_init(0, &us);
+-   if (retropt_bind(opts, 0 /*pf*/, socktype, proto, (struct sockaddr *)&us, &uslen, 3,
++   if (retropt_bind(opts, pf, socktype, proto, (struct sockaddr *)&us, &uslen, 0,
+ 		    sfd->para.socket.ip.ai_flags)
+        != STAT_NOACTION) {
+       needbind = true;
+diff --git a/xio-udp.c b/xio-udp.c
+index b624281..d511122 100644
+--- a/xio-udp.c
++++ b/xio-udp.c
+@@ -277,8 +277,10 @@ int xioopen_ipdgram_listen(
+    int pf = addrdesc->arg1;
+    int ipproto = addrdesc->arg2;
+    union sockaddr_union us;
++   int bind_rc;
+    int socktype = SOCK_DGRAM;
+    socklen_t uslen;
++   int result;
+ 
+    if (argc != 2) {
+       xio_syntax(argv[0], 1, argc-1, addrdesc->syntax);
+@@ -308,12 +310,31 @@ int xioopen_ipdgram_listen(
+    applyopts(sfd, -1, opts, PH_INIT);
+ 
+    uslen = socket_init(pf, &us);
+-   retropt_bind(opts, pf, socktype, ipproto,
++   bind_rc = retropt_bind(opts, pf, socktype, ipproto,
+ 		(struct sockaddr *)&us, &uslen, 1,
+ 		xfd->stream.para.socket.ip.ai_flags);
++   if (bind_rc == STAT_NORETRY)
++      return STAT_NORETRY;
++   if (pf == PF_UNSPEC && bind_rc == STAT_OK)
++      pf = us.soa.sa_family;
+ 
+    if (false) {
+       ;
++#if WITH_IP4 || WITH_IP6
++   } else if (pf == PF_UNSPEC && bind_rc == STAT_NOACTION) {
++      int ai_flags[2];
++      ai_flags[0] = sfd->para.socket.ip.ai_flags[0];
++      ai_flags[1] = sfd->para.socket.ip.ai_flags[1];
++      if (!(ai_flags[1] & AI_PASSIVE))
++	 ai_flags[0] |= AI_PASSIVE;
++      result =
++	 xioresolve(NULL, portname, pf, socktype, ipproto, &us, &uslen, ai_flags);
++      if (result != STAT_OK) {
++	 Error("error resolving bind option");
++	 return STAT_NORETRY;
++      }
++      pf = us.soa.sa_family;
++#endif /* WITH_IP4 || WITH_IP6*/
+ #if WITH_IP4
+    } else if (pf == PF_INET) {
+       us.ip4.sin_port = parseport(portname, ipproto);
+@@ -323,7 +344,9 @@ int xioopen_ipdgram_listen(
+       us.ip6.sin6_port = parseport(portname, ipproto);
+ #endif
+    } else {
++#if 1
+       Error1("xioopen_ipdgram_listen(): unknown address family %d", pf);
++#endif
+    }
+ 
+    return _xioopen_ipdgram_listen(&xfd->stream, xioflags, &us, uslen,
+diff --git a/xioopts.c b/xioopts.c
+index 4b651aa..abf4ffe 100644
+--- a/xioopts.c
++++ b/xioopts.c
+@@ -3252,6 +3252,7 @@ int retropt_bind(struct opt *opts,
+ 				   UNIX (or'd): 1..tight
+ 						2..abstract
+ 						4..templatename
++				   0..generic addr spec
+ 				*/
+ 		 const int ai_flags[2])
+ {
+@@ -3271,10 +3272,13 @@ int retropt_bind(struct opt *opts,
+    }
+    bindp = bindname;
+ 
+-   switch (af) {
++#if WITH_IP4 && WITH_IP6
++   /* Try to derive address family from string */
++   if (af == AF_UNSPEC && bindname[0] == '[')
++      af = AF_INET6;
++#endif /* WITH_IP4 && WITH_IP6 */
+ 
+-   case AF_UNSPEC:
+-      {
++   if (feats == 0) {
+ 	 size_t p = 0;
+ 	 dalan(bindname, (uint8_t *)sa->sa_data, &p, *salen-sizeof(sa->sa_family), 'i');
+ 	 *salen = p + sizeof(sa->sa_family);
+@@ -3286,10 +3290,13 @@ int retropt_bind(struct opt *opts,
+ #if HAVE_STRUCT_SOCKADDR_SALEN
+ 	 sa->sa_len = *salen;
+ #endif
+-      }
+-      break;
++	 return STAT_OK;
++   }
++
++   switch (af) {
+ 
+ #if WITH_IP4 || WITH_IP6 || WITH_VSOCK
++   case AF_UNSPEC:
+ #if WITH_VSOCK
+    case AF_VSOCK:
+ #endif
+@@ -3324,7 +3331,7 @@ int retropt_bind(struct opt *opts,
+       ai_flags2[0] = ai_flags[0];
+       ai_flags2[1] = ai_flags[1];
+       if (!(ai_flags2[1] & AI_PASSIVE))
+-      ai_flags2[0] |= AI_PASSIVE;
++	 ai_flags2[0] |= AI_PASSIVE;
+ 
+       if ((result =
+ 	   xioresolve(hostname[0]!='\0'?hostname:NULL, portp,

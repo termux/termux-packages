@@ -1,0 +1,11 @@
+TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/
+TERMUX_PKG_DESCRIPTION="X.org dummy video driver"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="0.4.1"
+TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/driver/xf86-video-dummy-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=146a56649ace85b307910263bcaeebfd1da7258e6706c5f72c3b509779a81f40
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="xorg-server"
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_NO_STATICSPLIT=true

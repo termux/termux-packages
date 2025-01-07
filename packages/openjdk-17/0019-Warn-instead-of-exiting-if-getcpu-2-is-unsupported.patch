@@ -1,0 +1,26 @@
+From 524a68b41998d6657218c1be15c1d64dbd9f4596 Mon Sep 17 00:00:00 2001
+From: Duy Tran Khanh <40482367+khanhduytran0@users.noreply.github.com>
+Date: Mon, 28 Jun 2021 17:47:31 +0700
+Subject: [PATCH] Warn instead of exiting if getcpu(2) is unsupported
+
+---
+ src/hotspot/os/linux/os_linux.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/hotspot/os/linux/os_linux.cpp b/src/hotspot/os/linux/os_linux.cpp
+index ba62344d3263..5e9b44598acd 100644
+--- a/src/hotspot/os/linux/os_linux.cpp
++++ b/src/hotspot/os/linux/os_linux.cpp
+@@ -2983,7 +2983,8 @@ void os::Linux::sched_getcpu_init() {
+   }
+ 
+   if (sched_getcpu() == -1) {
+-    vm_exit_during_initialization("getcpu(2) system call not supported by kernel");
++    // vm_exit_during_initialization
++    warning("getcpu(2) system call not supported by kernel");
+   }
+ }
+ 
+-- 
+2.44.0
+

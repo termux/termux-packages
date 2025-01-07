@@ -1,0 +1,10 @@
++++ ./cmake-proxies/cmake-modules/AudacityFunctions.cmake
+@@ -586,7 +586,7 @@
+       add_custom_command(
+          TARGET "${TARGET}"
+          POST_BUILD
+-         COMMAND "$<IF:$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>,${nostrip}>,echo,strip>" -x $<TARGET_FILE:${TARGET}>
++         COMMAND "$<IF:$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>,${nostrip}>,echo,llvm-strip>" -x $<TARGET_FILE:${TARGET}>
+       )
+    endif()
+ 

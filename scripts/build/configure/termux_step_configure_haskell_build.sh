@@ -1,54 +1,34 @@
-# shellcheck shell=bash
 termux_step_configure_haskell_build() {
-	termux_setup_jailbreak_cabal
-	printf "%s" "Jailbreaking Cabal file..."
-	if jailbreak-cabal "${TERMUX_PKG_SRCDIR}"/*.cabal; then
-		echo "done."
-	else
-		termux_error_exit "failed."
-	fi
-
-	ENABLE_SHARED="--enable-shared"
-	if [[ "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS}" != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--disable-shared/}" ]]; then
-		ENABLE_SHARED=""
-	fi
-
-	DYNAMIC_EXECUTABLE="
-	--ghc-options=-dynamic
-	--enable-executable-dynamic
-	--disable-library-vanilla
-	"
-	if [[ "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS}" != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--disable-executable-dynamic/}" ]]; then
-		DYNAMIC_EXECUTABLE=""
-	fi
+	termux_setup_ghc_cross_compiler
+	termux_setup_cabal
 
 	HOST_FLAG="--host=${TERMUX_HOST_PLATFORM}"
-	if [[ "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS}" != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--host=/}" ]]; then
+	if [[ ${TERMUX_PKG_EXTRA_CONFIGURE_ARGS} != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--host=/}" ]]; then
 		HOST_FLAG=""
 	fi
 
 	LIBEXEC_FLAG="--libexecdir=${TERMUX_PREFIX}/libexec"
-	if [[ "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS}" != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--libexecdir=/}" ]]; then
+	if [[ ${TERMUX_PKG_EXTRA_CONFIGURE_ARGS} != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--libexecdir=/}" ]]; then
 		LIBEXEC_FLAG=""
 	fi
 
 	QUIET_BUILD=
-	if [[ "${TERMUX_QUIET_BUILD}" = true ]]; then
+	if [[ ${TERMUX_QUIET_BUILD} == true ]]; then
 		QUIET_BUILD="-v0"
 	fi
 
 	LIB_STRIPPING="--enable-library-stripping"
-	if [[ "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS}" != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--disable-library-stripping=/}" ]] || [[ "${TERMUX_DEBUG_BUILD}" = true ]]; then
+	if [[ ${TERMUX_PKG_EXTRA_CONFIGURE_ARGS} != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--disable-library-stripping=/}" ]] || [[ ${TERMUX_DEBUG_BUILD} == true ]]; then
 		LIB_STRIPPING=""
 	fi
 
 	EXECUTABLE_STRIPPING="--enable-executable-stripping"
-	if [[ "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS}" != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--disable-executable-stripping=/}" ]] || [[ "${TERMUX_DEBUG_BUILD}" = true ]]; then
+	if [[ ${TERMUX_PKG_EXTRA_CONFIGURE_ARGS} != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--disable-executable-stripping=/}" ]] || [[ ${TERMUX_DEBUG_BUILD} == true ]]; then
 		EXECUTABLE_STRIPPING=""
 	fi
 
 	SPLIT_SECTIONS="--enable-split-sections"
-	if [[ "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS}" != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--disable-split-sections=/}" ]]; then
+	if [[ ${TERMUX_PKG_EXTRA_CONFIGURE_ARGS} != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--disable-split-sections=/}" ]]; then
 		SPLIT_SECTIONS=""
 	fi
 
@@ -111,34 +91,28 @@ termux_step_configure_haskell_build() {
 	# NOTE: We do not want to quote AVOID_GNULIB as we want word expansion.
 	# shellcheck disable=SC2086
 	# shellcheck disable=SC2250,SC2154,SC2248,SC2312
-	env $AVOID_GNULIB termux-ghc-setup configure \
+	env $AVOID_GNULIB cabal configure \
 		$TERMUX_HASKELL_OPTIMISATION \
-		--prefix=$TERMUX_PREFIX \
-		--configure-option=--disable-rpath \
-		--configure-option=--disable-rpath-hack \
-		--configure-option=--host=$HOST_FLAG \
-		--ghc-option=-optl-Wl,-rpath=$TERMUX_PREFIX/lib \
-		--ghc-option=-optl-Wl,--enable-new-dtags \
-		--with-compiler="$(command -v termux-ghc)" \
-		--with-ghc-pkg="$(command -v termux-ghc-pkg)" \
-		--with-hsc2hs="$(command -v termux-hsc2hs)" \
+		--prefix="$TERMUX_PREFIX" \
+		--configure-option="$HOST_FLAG" \
+		--ghc-options="-optl-Wl,-rpath,$TERMUX_PREFIX/lib -optl-Wl,--enable-new-dtags" \
+		--with-compiler="$(command -v ghc)" \
+		--with-ghc-pkg="$(command -v ghc-pkg)" \
+		--with-hsc2hs="$(command -v hsc2hs)" \
 		--hsc2hs-option=--cross-compile \
-		--with-ld=$LD \
-		--with-strip=$STRIP \
-		--with-ar=$AR \
-		--with-pkg-config=$PKG_CONFIG \
+		--extra-lib-dirs="$TERMUX_PREFIX/lib" \
+		--extra-include-dirs="$TERMUX_PREFIX/include" \
+		--with-ld="$LD" \
+		--with-strip="$STRIP" \
+		--with-ar="$AR" \
+		--with-pkg-config="$PKG_CONFIG" \
 		--with-happy="$(command -v happy)" \
 		--with-alex="$(command -v alex)" \
-		--extra-include-dirs=$TERMUX_PREFIX/include \
-		--extra-lib-dirs=$TERMUX_PREFIX/lib \
 		--disable-tests \
-		$TERMUX_HASKELL_LLVM_BACKEND \
 		$SPLIT_SECTIONS \
 		$EXECUTABLE_STRIPPING \
 		$LIB_STRIPPING \
-		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS \
-		$ENABLE_SHARED \
 		$QUIET_BUILD \
 		$LIBEXEC_FLAG \
-		$DYNAMIC_EXECUTABLE
+		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
 }

@@ -1,0 +1,18 @@
+diff --git a/Cargo.toml b/Cargo.toml
+index 6a6aa16..7043460 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -94,11 +94,11 @@ piet-cairo = { git = "https://github.com/linebender/piet", rev = "02eb5f0152e893
+
+ [profile.dev]
+ debug = true
+-opt-level = 2
++opt-level = 0 # We want proper gdb debugging for dev builds
+
+ [profile.release]
+ codegen-units = 1
+ lto = "fat"
+ opt-level = 3
+ # We want to be able to debug in the release build as well
+-debug = true
++#debug = true # Performance and size matters for termux's packaging

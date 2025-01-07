@@ -1,0 +1,25 @@
+From ac7ca9573e061e5a3d89e8f502c86dd350125919 Mon Sep 17 00:00:00 2001
+From: Duy Tran Khanh <40482367+khanhduytran0@users.noreply.github.com>
+Date: Sat, 5 Jun 2021 17:25:37 +0700
+Subject: [PATCH] JvmMapfile.gmk: filter same symbols for linux and android
+
+---
+ make/hotspot/lib/JvmMapfile.gmk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/make/hotspot/lib/JvmMapfile.gmk b/make/hotspot/lib/JvmMapfile.gmk
+index 5cba93178c74..181e0db5c0eb 100644
+--- a/make/hotspot/lib/JvmMapfile.gmk
++++ b/make/hotspot/lib/JvmMapfile.gmk
+@@ -52,7 +52,7 @@ endif
+ # Create a dynamic list of symbols from the built object files. This is highly
+ # platform dependent.
+ 
+-ifeq ($(call isTargetOs, linux), true)
++ifeq ($(call isTargetOs, android linux), true)
+   DUMP_SYMBOLS_CMD := $(NM) --defined-only *.o
+   ifneq ($(FILTER_SYMBOLS_PATTERN), )
+     FILTER_SYMBOLS_PATTERN := $(FILTER_SYMBOLS_PATTERN)|
+-- 
+2.44.0
+

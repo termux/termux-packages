@@ -19,3 +19,18 @@ diff -uNr netcat-openbsd-debian-1.218-5/debian/patches/port-to-linux-with-libbsd
  +# define IPTOS_LOWDELAY 0x10
  +# define IPTOS_THROUGHPUT 0x08
  +# define IPTOS_RELIABILITY 0x04
+@@ -355,12 +355,13 @@
+ index 7c7448c..8db10d4 100644
+ --- a/socks.c
+ +++ b/socks.c
+-@@ -38,7 +38,7 @@
++@@ -38,7 +38,8 @@
+  #include <string.h>
+  #include <unistd.h>
+  #include <resolv.h>
+ -#include <readpassphrase.h>
+ +#include <bsd/readpassphrase.h>
+++#include <bsd/string.h>
+  #include "atomicio.h"
+  
+  #define SOCKS_PORT	"1080"

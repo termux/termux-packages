@@ -1,13 +1,22 @@
-diff -uNr fzf-0.24.2/bin/fzf-tmux fzf-0.24.2.mod/bin/fzf-tmux
---- fzf-0.24.2/bin/fzf-tmux	2020-11-03 16:32:24.000000000 +0200
-+++ fzf-0.24.2.mod/bin/fzf-tmux	2020-11-09 01:13:40.879724746 +0200
+diff -uNr fzf-0.43.0/bin/fzf-tmux fzf-0.43.0.mod/bin/fzf-tmux
+--- fzf-0.43.0/bin/fzf-tmux	2023-10-15 00:56:05.000000000 +0800
++++ fzf-0.43.0.mod/bin/fzf-tmux	2023-10-15 09:53:24.427996936 +0800
 @@ -1,4 +1,4 @@
 -#!/usr/bin/env bash
 +#!/usr/bin/bash
  # fzf-tmux: starts fzf in a tmux pane
  # usage: fzf-tmux [LAYOUT OPTIONS] [--] [FZF OPTIONS]
  
-@@ -150,10 +150,10 @@
+@@ -7,7 +7,7 @@
+   exit 2
+ }
+ 
+-fzf="$(command which fzf)" || fzf="$(dirname "$0")/fzf"
++fzf="$(command -v fzf)" || fzf="$(dirname "$0")/fzf"
+ [[ -x "$fzf" ]] || fail 'fzf executable not found'
+ 
+ args=()
+@@ -160,10 +160,10 @@
  
  # Clean up named pipes on exit
  id=$RANDOM
@@ -19,6 +28,6 @@ diff -uNr fzf-0.24.2/bin/fzf-tmux fzf-0.24.2.mod/bin/fzf-tmux
 +fifo1="${TMPDIR:-@TERMUX_PREFIX@/tmp}/fzf-fifo1-$id"
 +fifo2="${TMPDIR:-@TERMUX_PREFIX@/tmp}/fzf-fifo2-$id"
 +fifo3="${TMPDIR:-@TERMUX_PREFIX@/tmp}/fzf-fifo3-$id"
- tmux_win_opts=( $(tmux show-window-options remain-on-exit \; show-window-options synchronize-panes | sed '/ off/d; s/^/set-window-option /; s/$/ \\;/') )
- cleanup() {
-   \rm -f $argsf $fifo1 $fifo2 $fifo3
+ if tmux_win_opts=$(tmux show-options -p remain-on-exit \; show-options -p synchronize-panes 2> /dev/null); then
+   tmux_win_opts=( $(sed '/ off/d; s/synchronize-panes/set-option -p synchronize-panes/; s/remain-on-exit/set-option -p remain-on-exit/; s/$/ \\;/' <<< "$tmux_win_opts") )
+   tmux_off_opts='; set-option -p synchronize-panes off ; set-option -p remain-on-exit off'

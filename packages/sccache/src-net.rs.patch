@@ -1,0 +1,16 @@
+diff --git a/src/net.rs b/src/net.rs
+index 79d350f..79cd7be 100644
+--- a/src/net.rs
++++ b/src/net.rs
+@@ -13,8 +13,10 @@
+ //! The module is used to provide abstraction over TCP socket and UDS.
+ 
+ use std::fmt;
+-#[cfg(any(target_os = "linux", target_os = "android"))]
++#[cfg(target_os = "linux")]
+ use std::os::linux::net::SocketAddrExt;
++#[cfg(target_os = "android")]
++use std::os::android::net::SocketAddrExt;
+ 
+ use futures::{Future, TryFutureExt};
+ use tokio::io::{AsyncRead, AsyncWrite};

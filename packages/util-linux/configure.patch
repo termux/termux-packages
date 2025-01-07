@@ -1,0 +1,58 @@
+col is by default only built when using glibc, but we keep
+it in Termux by patching away the configure check.
+
+See https://github.com/termux/termux-packages/issues/21537
+
+diff -u -r ../util-linux-2.40.2/configure ./configure
+--- ../util-linux-2.40.2/configure	2024-07-04 08:01:06.791975965 +0000
++++ ./configure	2024-09-22 10:43:46.010626256 +0000
+@@ -39078,49 +39078,6 @@
+ 
+ 
+ 
+-  if test "x$build_col" != xno; then
+-
+-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking building for glibc" >&5
+-printf %s "checking building for glibc... " >&6; }
+-    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+-/* end confdefs.h.  */
+-#include <limits.h>
+-int
+-main (void)
+-{
+-__GLIBC__
+-  ;
+-  return 0;
+-}
+-_ACEOF
+-if ac_fn_c_try_compile "$LINENO"
+-then :
+-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+-printf "%s\n" "yes" >&6; }
+-	 ul_haveprogram_col=yes
+-else $as_nop
+-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+-printf "%s\n" "no" >&6; }
+-	 ul_haveprogram_col=no
+-fi
+-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+-
+-    case $enable_col:$ul_haveprogram_col in #(
+-    no:*)
+-      build_col=no ;;
+-    yes:yes)
+-      build_col=yes ;;
+-    yes:*)
+-      as_fn_error $? "col selected, but required building for glibc not available" "$LINENO" 5;;
+-    check:yes)
+-      build_col=yes ;;
+-    check:*)
+-      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: building for glibc not found; not building col" >&5
+-printf "%s\n" "$as_me: WARNING: building for glibc not found; not building col" >&2;}
+-      build_col=no ;;
+-    esac
+-  fi
+-
+  if test "x$build_col" = xyes; then
+   BUILD_COL_TRUE=
+   BUILD_COL_FALSE='#'

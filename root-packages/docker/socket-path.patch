@@ -1,0 +1,93 @@
+--- ./cli/vendor/github.com/docker/docker/client/client_unix.go.orig	2023-10-15 10:28:55.768620438 +0000
++++ ./cli/vendor/github.com/docker/docker/client/client_unix.go	2023-10-15 10:36:24.483486649 +0000
+@@ -5,4 +5,4 @@
+ 
+ // DefaultDockerHost defines OS-specific default host if the DOCKER_HOST
+ // (EnvOverrideHost) environment variable is unset or empty.
+-const DefaultDockerHost = "unix:///var/run/docker.sock"
++const DefaultDockerHost = "unix://@TERMUX_PREFIX@/var/run/docker.sock"
+
+diff -u -r ./cli/man.orig/docker.1.md ./cli/man/docker.1.md
+--- ./cli/man.orig/docker.1.md	2023-10-13 08:18:41.760376085 +0000
++++ ./cli/man/docker.1.md	2023-10-13 11:38:56.880518798 +0000
+@@ -26,7 +26,7 @@
+ **-D**, **--debug**=*true*|*false*
+   Enable debug mode. Default is false.
+ 
+-**-H**, **--host**=[*unix:///var/run/docker.sock*]: tcp://[host]:[port][path] to bind or
++**-H**, **--host**=[*unix://@TERMUX_PREFIX@/var/run/docker.sock*]: tcp://[host]:[port][path] to bind or
+ unix://[/path/to/socket] to use.
+   The socket(s) to bind to in daemon mode specified using one or more
+   tcp://host:port/path, unix:///path/to/socket, fd://* or fd://socketfd.
+diff -u -r ./cli/man.orig/dockerd.8.md ./cli/man/dockerd.8.md
+--- ./cli/man.orig/dockerd.8.md	2023-10-13 08:18:41.760376085 +0000
++++ ./cli/man/dockerd.8.md	2023-10-13 11:38:56.880518798 +0000
+@@ -238,7 +238,7 @@
+   Group to assign the unix socket specified by -H when running in daemon mode.
+   use '' (the empty string) to disable setting of a group. Default is `docker`.
+ 
+-**-H**, **--host**=[*unix:///var/run/docker.sock*]: tcp://[host:port] to bind or
++**-H**, **--host**=[*unix://@TERMUX_PREFIX@/var/run/docker.sock*]: tcp://[host:port] to bind or
+ unix://[/path/to/socket] to use.
+   The socket(s) to bind to in daemon mode specified using one or more
+   tcp://host:port, unix:///path/to/socket, fd://* or fd://socketfd.
+diff -ur ../src.orig/moby/testutil/daemon/daemon.go ./moby/testutil/daemon/daemon.go
+--- ../src.orig/moby/testutil/daemon/daemon.go	2023-10-15 12:18:23.322765813 +0000
++++ ./moby/testutil/daemon/daemon.go	2023-10-15 12:21:46.126792210 +0000
+@@ -39,9 +39,9 @@
+ 
+ const (
+ 	defaultDockerdBinary         = "dockerd"
+-	defaultContainerdSocket      = "/var/run/docker/containerd/containerd.sock"
++	defaultContainerdSocket      = "@TERMUX_PREFIX@/var/run/docker/containerd/containerd.sock"
+ 	defaultDockerdRootlessBinary = "dockerd-rootless.sh"
+-	defaultUnixSocket            = "/var/run/docker.sock"
++	defaultUnixSocket            = "@TERMUX_PREFIX@/var/run/docker.sock"
+ 	defaultTLSHost               = "localhost:2376"
+ )
+ 
+diff -ur ../src.orig/cli/opts/hosts.go ./cli/opts/hosts.go
+--- ../src.orig/cli/opts/hosts.go	2023-08-31 17:24:32.000000000 +0000
++++ ./cli/opts/hosts.go	2023-10-15 12:22:24.030253354 +0000
+@@ -17,7 +17,7 @@
+ 	defaultTLSHTTPPort = "2376" // Default TLS encrypted HTTP Port
+ 	// defaultUnixSocket Path for the unix socket.
+ 	// Docker daemon by default always listens on the default unix socket
+-	defaultUnixSocket = "/var/run/docker.sock"
++	defaultUnixSocket = "@TERMUX_PREFIX@/var/run/docker.sock"
+ 	// defaultTCPHost constant defines the default host string used by docker on Windows
+ 	defaultTCPHost = "tcp://" + defaultHTTPHost + ":" + defaultHTTPPort
+ 	// DefaultTLSHost constant defines the default host string used by docker for TLS sockets
+diff -ur ../src.orig/moby/client/client_unix.go ./moby/client/client_unix.go
+--- ../src.orig/moby/client/client_unix.go	2023-08-29 19:14:17.000000000 +0000
++++ ./moby/client/client_unix.go	2023-10-15 12:22:43.953653701 +0000
+@@ -5,4 +5,4 @@
+ 
+ // DefaultDockerHost defines OS-specific default host if the DOCKER_HOST
+ // (EnvOverrideHost) environment variable is unset or empty.
+-const DefaultDockerHost = "unix:///var/run/docker.sock"
++const DefaultDockerHost = "unix://@TERMUX_PREFIX@/var/run/docker.sock"
+diff -ur ../src.orig/moby/opts/hosts.go ./moby/opts/hosts.go
+--- ../src.orig/moby/opts/hosts.go	2023-08-29 19:14:17.000000000 +0000
++++ ./moby/opts/hosts.go	2023-10-15 12:26:16.311028161 +0000
+@@ -20,7 +20,7 @@
+ 	DefaultTLSHTTPPort = 2376 // Default TLS encrypted HTTP Port
+ 	// DefaultUnixSocket Path for the unix socket.
+ 	// Docker daemon by default always listens on the default unix socket
+-	DefaultUnixSocket = "/var/run/docker.sock"
++	DefaultUnixSocket = "@TERMUX_PREFIX@/var/run/docker.sock"
+ 	// DefaultTCPHost constant defines the default host string used by docker on Windows
+ 	DefaultTCPHost = "tcp://" + DefaultHTTPHost + ":2375"
+ 	// DefaultTLSHost constant defines the default host string used by docker for TLS sockets
+diff -u ../src.orig/libnetwork/go/src/github.com/docker/libnetwork/cmd/dnet/dnet.go ./libnetwork/go/src/github.com/docker/libnetwork/cmd/dnet/dnet.go
+--- ../src.orig/libnetwork/cmd/dnet/dnet.go	2023-07-24 09:20:29.000000000 +0000
++++ ./libnetwork/cmd/dnet/dnet.go	2023-10-15 15:32:32.410365782 +0000
+@@ -432,7 +432,7 @@
+ }
+ 
+ const (
+-	defaultUnixSocket = "unix:///var/run/docker.sock"
++	defaultUnixSocket = "unix://@TERMUX_PREFIX@/var/run/docker.sock"
+ 	defaultTCPHost    = "tcp://localhost:2375"
+ )
+ 

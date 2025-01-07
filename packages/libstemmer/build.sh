@@ -6,6 +6,8 @@ TERMUX_PKG_VERSION=2.2.0
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/snowballstem/snowball/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=425cdb5fba13a01db59a1713780f0662e984204f402d3dae1525bda9e6d30f1a
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {

@@ -1,0 +1,14 @@
+diff -up aalib-1.4.0/src/aacurses.c.opaque-ncurses-fix aalib-1.4.0/src/aacurses.c
+--- aalib-1.4.0/src/aacurses.c.opaque-ncurses-fix	2024-02-10 06:32:32.008267145 -0500
++++ aalib-1.4.0/src/aacurses.c	2024-02-10 06:33:38.648245270 -0500
+@@ -71,8 +71,8 @@ static void curses_getsize(aa_context *
+ {
+     if (__resized_curses)
+ 	curses_uninit(c), curses_init(&c->params, NULL,&c->driverparams, NULL), __resized_curses = 0;
+-    *width = stdscr->_maxx + 1;
+-    *height = stdscr->_maxy + 1;
++    *width = getmaxx(stdscr);
++    *height = getmaxy(stdscr);
+ #ifdef GPM_MOUSEDRIVER
+     gpm_mx = *width;
+     gpm_my = *height;

@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://www.multiprecision.org/
+TERMUX_PKG_HOMEPAGE=https://www.multiprecision.org/
 TERMUX_PKG_DESCRIPTION="Library for the arithmetic of complex numbers with arbitrarily high precision"
 TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"

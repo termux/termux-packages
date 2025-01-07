@@ -1,0 +1,114 @@
+<?xml version="1.0"?>
+<dump>
+  <class name="GucharmapCodepointList" get-type="gucharmap_codepoint_list_get_type" parents="GObject" abstract="1">
+  </class>
+  <class name="GucharmapChaptersModel" get-type="gucharmap_chapters_model_get_type" parents="GtkListStore,GObject">
+    <implements name="GtkTreeModel"/>
+    <implements name="GtkTreeDragSource"/>
+    <implements name="GtkTreeDragDest"/>
+    <implements name="GtkTreeSortable"/>
+    <implements name="GtkBuildable"/>
+  </class>
+  <class name="GucharmapChaptersView" get-type="gucharmap_chapters_view_get_type" parents="GtkTreeView,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkScrollable"/>
+  </class>
+  <class name="GucharmapChartable" get-type="gucharmap_chartable_get_type" parents="GtkDrawingArea,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkScrollable"/>
+    <property name="active-character" type="guint" flags="227" default-value="0"/>
+    <property name="codepoint-list" type="GucharmapCodepointList" flags="227"/>
+    <property name="font-desc" type="PangoFontDescription" flags="227"/>
+    <property name="font-fallback" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="snap-power-2" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="zoom-enabled" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="zoom-showing" type="gboolean" flags="225" default-value="FALSE"/>
+    <signal name="move-cursor" return="gboolean" when="last" action="1">
+      <param type="GtkMovementStep"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="activate" return="void" when="last" action="1">
+    </signal>
+    <signal name="status-message" return="void" when="first">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="copy-clipboard" return="void" when="last" action="1">
+    </signal>
+    <signal name="paste-clipboard" return="void" when="last" action="1">
+    </signal>
+  </class>
+  <class name="GucharmapCharmap" get-type="gucharmap_charmap_get_type" parents="GtkPaned,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="chapters-model" type="GucharmapChaptersModel" flags="230"/>
+    <property name="active-chapter" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="active-character" type="guint" flags="227" default-value="0"/>
+    <property name="active-codepoint-list" type="GucharmapCodepointList" flags="225"/>
+    <property name="active-page" type="guint" flags="227" default-value="0"/>
+    <property name="snap-power-2" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="font-desc" type="PangoFontDescription" flags="227"/>
+    <property name="font-fallback" type="gboolean" flags="227" default-value="TRUE"/>
+    <signal name="status-message" return="void" when="first">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="link-clicked" return="void" when="first">
+      <param type="guint"/>
+      <param type="guint"/>
+    </signal>
+  </class>
+  <class name="GucharmapBlockChaptersModel" get-type="gucharmap_block_chapters_model_get_type" parents="GucharmapChaptersModel,GtkListStore,GObject">
+    <implements name="GtkTreeModel"/>
+    <implements name="GtkTreeDragSource"/>
+    <implements name="GtkTreeDragDest"/>
+    <implements name="GtkTreeSortable"/>
+    <implements name="GtkBuildable"/>
+  </class>
+  <class name="GucharmapBlockCodepointList" get-type="gucharmap_block_codepoint_list_get_type" parents="GucharmapCodepointList,GObject">
+    <property name="first-codepoint" type="guint" flags="235" default-value="0"/>
+    <property name="last-codepoint" type="guint" flags="235" default-value="0"/>
+  </class>
+  <class name="GucharmapScriptChaptersModel" get-type="gucharmap_script_chapters_model_get_type" parents="GucharmapChaptersModel,GtkListStore,GObject">
+    <implements name="GtkTreeModel"/>
+    <implements name="GtkTreeDragSource"/>
+    <implements name="GtkTreeDragDest"/>
+    <implements name="GtkTreeSortable"/>
+    <implements name="GtkBuildable"/>
+  </class>
+  <class name="GucharmapScriptCodepointList" get-type="gucharmap_script_codepoint_list_get_type" parents="GucharmapCodepointList,GObject">
+  </class>
+  <enum name="GucharmapCharmapPageType" get-type="gucharmap_charmap_page_type_get_type">
+    <member name="GUCHARMAP_CHARMAP_PAGE_CHARTABLE" nick="chartable" value="0"/>
+    <member name="GUCHARMAP_CHARMAP_PAGE_DETAILS" nick="details" value="1"/>
+  </enum>  <enum name="GucharmapUnicodeVersion" get-type="gucharmap_unicode_version_get_type">
+    <member name="GUCHARMAP_UNICODE_VERSION_UNASSIGNED" nick="unassigned" value="0"/>
+    <member name="GUCHARMAP_UNICODE_VERSION_1_1" nick="1-1" value="1"/>
+    <member name="GUCHARMAP_UNICODE_VERSION_2_0" nick="2-0" value="2"/>
+    <member name="GUCHARMAP_UNICODE_VERSION_2_1" nick="2-1" value="3"/>
+    <member name="GUCHARMAP_UNICODE_VERSION_3_0" nick="3-0" value="4"/>
+    <member name="GUCHARMAP_UNICODE_VERSION_3_1" nick="3-1" value="5"/>
+    <member name="GUCHARMAP_UNICODE_VERSION_3_2" nick="3-2" value="6"/>
+    <member name="GUCHARMAP_UNICODE_VERSION_4_0" nick="4-0" value="7"/>
+    <member name="GUCHARMAP_UNICODE_VERSION_4_1" nick="4-1" value="8"/>
+    <member name="GUCHARMAP_UNICODE_VERSION_5_0" nick="5-0" value="9"/>
+    <member name="GUCHARMAP_UNICODE_VERSION_5_1" nick="5-1" value="10"/>
+    <member name="GUCHARMAP_UNICODE_VERSION_5_2" nick="5-2" value="11"/>
+    <member name="GUCHARMAP_UNICODE_VERSION_6_0" nick="6-0" value="12"/>
+    <member name="GUCHARMAP_UNICODE_VERSION_6_1" nick="6-1" value="13"/>
+    <member name="GUCHARMAP_UNICODE_VERSION_6_2" nick="6-2" value="14"/>
+    <member name="GUCHARMAP_UNICODE_VERSION_6_3" nick="6-3" value="15"/>
+    <member name="GUCHARMAP_UNICODE_VERSION_7_0" nick="7-0" value="16"/>
+    <member name="GUCHARMAP_UNICODE_VERSION_8_0" nick="8-0" value="17"/>
+    <member name="GUCHARMAP_UNICODE_VERSION_9_0" nick="9-0" value="18"/>
+    <member name="GUCHARMAP_UNICODE_VERSION_10_0" nick="10-0" value="19"/>
+    <member name="GUCHARMAP_UNICODE_VERSION_11_0" nick="11-0" value="20"/>
+    <member name="GUCHARMAP_UNICODE_VERSION_12_0" nick="12-0" value="21"/>
+    <member name="GUCHARMAP_UNICODE_VERSION_12_1" nick="12-1" value="22"/>
+    <member name="GUCHARMAP_UNICODE_VERSION_13_0" nick="13-0" value="23"/>
+    <member name="GUCHARMAP_UNICODE_VERSION_14_0" nick="14-0" value="24"/>
+    <member name="GUCHARMAP_UNICODE_VERSION_15_0" nick="15-0" value="25"/>
+    <member name="GUCHARMAP_UNICODE_VERSION_15_1" nick="15-1" value="26"/>
+    <member name="GUCHARMAP_UNICODE_VERSION_LATEST" nick="latest" value="26"/>
+  </enum></dump>

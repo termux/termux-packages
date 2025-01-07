@@ -1,0 +1,22 @@
+--- a/sway/ipc-server.c
++++ b/sway/ipc-server.c
+@@ -137,7 +137,7 @@
+ 	// Env var typically set by logind, e.g. "/run/user/<user-id>"
+ 	const char *dir = getenv("XDG_RUNTIME_DIR");
+ 	if (!dir) {
+-		dir = "/tmp";
++		dir = "@TERMUX_PREFIX@/tmp";
+ 	}
+ 	if (path_size <= snprintf(ipc_sockaddr->sun_path, path_size,
+ 			"%s/sway-ipc.%u.%i.sock", dir, getuid(), getpid())) {
+--- a/swaynag/swaynag.c
++++ b/swaynag/swaynag.c
+@@ -18,7 +18,7 @@
+ }
+ 
+ static bool terminal_execute(char *terminal, char *command) {
+-	char fname[] = "/tmp/swaynagXXXXXX";
++	char fname[] = "@TERMUX_PREFIX@/tmp/swaynagXXXXXX";
+ 	FILE *tmp= fdopen(mkstemp(fname), "w");
+ 	if (!tmp) {
+ 		sway_log(SWAY_ERROR, "Failed to create temp script");

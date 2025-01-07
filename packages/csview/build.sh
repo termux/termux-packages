@@ -3,16 +3,16 @@ TERMUX_PKG_DESCRIPTION="Pretty-printing CSV/TSV/xSV on terminal"
 TERMUX_PKG_LICENSE="MIT, Apache-2.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE-MIT"
 TERMUX_PKG_MAINTAINER="@flosnvjx"
-TERMUX_PKG_VERSION="1.2.2"
+TERMUX_PKG_VERSION="1.3.4"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_SRCURL="$TERMUX_PKG_HOMEPAGE/archive/v$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=c8c4d1207b225e4257f301af6333d28cfee611781cfa51bf8227b742b043105a
+TERMUX_PKG_SHA256=91fadcddef511265f4bf39897ce4a65c457ac89ffd8dd742dc209d30bf04d6aa
 
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
 	termux_setup_rust
-	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release --locked
+	cargo build --jobs $TERMUX_PKG_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release --locked
 }
 
 termux_step_make_install() {

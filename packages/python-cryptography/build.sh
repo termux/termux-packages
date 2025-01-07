@@ -1,51 +1,29 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/pyca/cryptography
 TERMUX_PKG_DESCRIPTION="Provides cryptographic recipes and primitives to Python developers"
-# Licenses: Apache-2.0, BSD 3-Clause, PSFL
-TERMUX_PKG_LICENSE="custom"
-TERMUX_PKG_LICENSE_FILE="LICENSE, LICENSE.APACHE, LICENSE.BSD, LICENSE.PSF"
+TERMUX_PKG_LICENSE="Apache-2.0, BSD 3-Clause"
+TERMUX_PKG_LICENSE_FILE="LICENSE, LICENSE.APACHE, LICENSE.BSD"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="38.0.4"
+TERMUX_PKG_VERSION="42.0.8"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/pyca/cryptography/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=a0db13e363bff69ddbc3a833b53c75c313846c0dc7271543984e6c991020638f
-TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="openssl, python"
+TERMUX_PKG_SHA256=38ee4ce0804e4003e3093db8342cd7e6ee65614c8bbf70c98f1716e0f33709ed
+TERMUX_PKG_AUTO_UPDATE=false
+TERMUX_PKG_DEPENDS="openssl, python, python-pip"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
+TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, cffi, setuptools-rust"
+TERMUX_PKG_PYTHON_TARGET_DEPS="'cffi>=1.12'"
 
-_PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
-
-termux_step_post_get_source() {
-	echo "Applying openssl-libs.diff"
-	sed "s%@PYTHON_VERSION@%$_PYTHON_VERSION%g" \
-		$TERMUX_PKG_BUILDER_DIR/openssl-libs.diff | patch --silent -p1
-}
-
-termux_step_pre_configure() {
+termux_step_configure() {
 	termux_setup_rust
-
-	termux_setup_python_crossenv
-	pushd $TERMUX_PYTHON_CROSSENV_SRCDIR
-	_CROSSENV_PREFIX=$TERMUX_PKG_BUILDDIR/python-crossenv-prefix
-	python${_PYTHON_VERSION} -m crossenv \
-		$TERMUX_PREFIX/bin/python${_PYTHON_VERSION} \
-		${_CROSSENV_PREFIX}
-	popd
-	. ${_CROSSENV_PREFIX}/bin/activate
-
-	build-pip install wheel cffi setuptools-rust
-}
-
-termux_step_make_install() {
 	export CARGO_BUILD_TARGET=${CARGO_TARGET_NAME}
 	export PYO3_CROSS_LIB_DIR=$TERMUX_PREFIX/lib
-	export PYTHONPATH=$TERMUX_PREFIX/lib/python${_PYTHON_VERSION}/site-packages
-	pip install --no-deps . --prefix $TERMUX_PREFIX
 }
 
 termux_step_create_debscripts() {
 	cat <<- EOF > ./postinst
 	#!$TERMUX_PREFIX/bin/sh
 	echo "Installing dependencies through pip..."
-	pip3 install --no-binary cffi 'cffi>=1.12'
+	pip3 install $TERMUX_PKG_PYTHON_TARGET_DEPS
 	EOF
 }

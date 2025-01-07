@@ -5,8 +5,8 @@ termux_setup_toolchain_23c() {
 
 	export AS=$TERMUX_HOST_PLATFORM-clang
 	export CC=$TERMUX_HOST_PLATFORM-clang
-	export CXX=$TERMUX_HOST_PLATFORM-clang++
 	export CPP=$TERMUX_HOST_PLATFORM-cpp
+	export CXX=$TERMUX_HOST_PLATFORM-clang++
 	export LD=ld.lld
 	export AR=llvm-ar
 	export OBJCOPY=llvm-objcopy
@@ -15,11 +15,7 @@ termux_setup_toolchain_23c() {
 	export READELF=llvm-readelf
 	export STRIP=llvm-strip
 	export NM=llvm-nm
-
-	export TERMUX_HASKELL_LLVM_BACKEND="-fllvm --ghc-option=-fllvm"
-	if [ "${TERMUX_ARCH}" = "i686" ]; then
-		TERMUX_HASKELL_LLVM_BACKEND=""
-	fi
+	export CXXFILT=llvm-cxxfilt
 
 	export TERMUX_HASKELL_OPTIMISATION="-O"
 	if [ "${TERMUX_DEBUG_BUILD}" = true ]; then
@@ -68,11 +64,6 @@ termux_setup_toolchain_23c() {
 		termux_error_exit "Invalid arch '$TERMUX_ARCH' - support arches are 'arm', 'i686', 'aarch64', 'x86_64'"
 	fi
 
-	# -static-openmp requires -fopenmp in LDFLAGS to work; hopefully this won't be problematic
-	# even when we don't have -fopenmp in CFLAGS / when we don't want to enable OpenMP
-	# We might also want to consider shipping libomp.so instead; since r21
-	LDFLAGS+=" -fopenmp -static-openmp"
-
 	# Android 7 started to support DT_RUNPATH (but not DT_RPATH).
 	LDFLAGS+=" -Wl,--enable-new-dtags"
 
@@ -101,10 +92,16 @@ termux_setup_toolchain_23c() {
 	export GOOS=android
 	export CGO_ENABLED=1
 	export GO_LDFLAGS="-extldflags=-pie"
-	export CGO_LDFLAGS="${LDFLAGS/-Wl,-z,relro,-z,now/}"
-	CGO_LDFLAGS="${LDFLAGS/-static-openmp/}"
 	export CGO_CFLAGS="-I$TERMUX_PREFIX/include"
-	export RUSTFLAGS="-C link-arg=-Wl,-rpath=$TERMUX_PREFIX/lib -C link-arg=-Wl,--enable-new-dtags"
+
+	export CARGO_TARGET_NAME="${TERMUX_ARCH}-linux-android"
+	if [[ "${TERMUX_ARCH}" == "arm" ]]; then
+		CARGO_TARGET_NAME="armv7-linux-androideabi"
+	fi
+	local env_host="${CARGO_TARGET_NAME//-/_}"
+	export CARGO_TARGET_${env_host@U}_LINKER="${CC}"
+	export CARGO_TARGET_${env_host@U}_RUSTFLAGS="-L${TERMUX_PREFIX}/lib -C link-arg=-Wl,-rpath=${TERMUX_PREFIX}/lib -C link-arg=-Wl,--enable-new-dtags"
+	export CFLAGS_${env_host}="${CPPFLAGS} ${CFLAGS}"
 
 	export ac_cv_func_getpwent=no
 	export ac_cv_func_endpwent=yes
@@ -113,14 +110,11 @@ termux_setup_toolchain_23c() {
 	export ac_cv_func_sigsetmask=no
 	export ac_cv_c_bigendian=no
 
-	# On Android 7, libutil functionality is provided by libc.
-	# But many programs still may search for libutil.
-	if [ ! -f $TERMUX_PREFIX/lib/libutil.so ]; then
-		mkdir -p "$TERMUX_PREFIX/lib"
-		echo 'INPUT(-lc)' > $TERMUX_PREFIX/lib/libutil.so
+	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
+		return
 	fi
 
-	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ] || [ -d $TERMUX_STANDALONE_TOOLCHAIN ]; then
+	if [ -d $TERMUX_STANDALONE_TOOLCHAIN ]; then
 		return
 	fi
 
@@ -164,6 +158,11 @@ termux_setup_toolchain_23c() {
 	cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/armv7a-linux-androideabi-cpp \
 		$_TERMUX_TOOLCHAIN_TMPDIR/bin/arm-linux-androideabi-cpp
 
+	# rust 1.75.0+ expects this directory to be present
+	rm -fr "${_TERMUX_TOOLCHAIN_TMPDIR}"/toolchains
+	mkdir -p "${_TERMUX_TOOLCHAIN_TMPDIR}"/toolchains/llvm/prebuilt
+	ln -fs ../../.. "${_TERMUX_TOOLCHAIN_TMPDIR}"/toolchains/llvm/prebuilt/linux-x86_64
+
 	# Create a pkg-config wrapper. We use path to host pkg-config to
 	# avoid picking up a cross-compiled pkg-config later on.
 	local _HOST_PKGCONFIG
@@ -196,11 +195,13 @@ termux_setup_toolchain_23c() {
 	# Remove <spawn.h> as it's only for future (later than android-27).
 	# Remove <zlib.h> and <zconf.h> as we build our own zlib.
 	# Remove unicode headers provided by libicu.
-	# Remove KRH/khrplatform.h provided by mesa.
+	# Remove KHR/khrplatform.h provided by mesa.
+	# Remove EGL, GLES, GLES2, and GLES3 provided by mesa.
 	# Remove NDK vulkan headers.
 	rm usr/include/{sys/{capability,shm,sem},{glob,iconv,spawn,zlib,zconf},KHR/khrplatform}.h
 	rm usr/include/unicode/{char16ptr,platform,ptypes,putil,stringoptions,ubidi,ubrk,uchar,uconfig,ucpmap,udisplaycontext,uenum,uldnames,ulocdata,uloc,umachine,unorm2,urename,uscript,ustring,utext,utf16,utf8,utf,utf_old,utypes,uvernum,uversion}.h
 	rm -Rf usr/include/vulkan
+	rm -Rf usr/include/{EGL,GLES{,2,3}}
 
 	sed -i "s/define __ANDROID_API__ __ANDROID_API_FUTURE__/define __ANDROID_API__ $TERMUX_PKG_API_LEVEL/" \
 		usr/include/android/api-level.h

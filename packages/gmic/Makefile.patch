@@ -1,46 +1,56 @@
-diff -uNr gmic-2.9.7/src/Makefile gmic-2.9.7.mod/src/Makefile
---- gmic-2.9.7/src/Makefile	2021-04-07 14:55:16.000000000 +0000
-+++ gmic-2.9.7.mod/src/Makefile	2021-05-04 16:08:14.407443228 +0000
-@@ -207,7 +207,7 @@
- # Enable multi-threading support.
- PARALLEL_CFLAGS = -Dgmic_is_parallel
- ifneq ($(OS),Windows)
--PARALLEL_LIBS = -lpthread
-+#PARALLEL_LIBS = -lpthread
+diff -u -r ../gmic-3.4.3/src/Makefile ./src/Makefile
+--- ../gmic-3.4.3/src/Makefile	2024-10-11 15:23:57.000000000 +0000
++++ ./src/Makefile	2024-10-12 11:00:29.832806811 +0000
+@@ -189,7 +189,7 @@
+ ifndef NO_SRIPDLIB
+ MANDATORY_CFLAGS += -std=c++11 -pedantic
  endif
- 
- # Enable parallelization in CImg, using OpenMP.
-@@ -352,8 +352,8 @@
- GMIC_CLI_CFLAGS = $(MANDATORY_CFLAGS) $(ABORT_CFLAGS) $(PARALLEL_CFLAGS) $(FFTW_CFLAGS) $(CURL_CFLAGS) $(PNG_CFLAGS) $(JPEG_CFLAGS) $(TIFF_CFLAGS)
- GMIC_CLI_LIBS = $(MANDATORY_LIBS) $(PARALLEL_LIBS) $(FFTW_LIBS) $(CURL_LIBS) $(PNG_LIBS) $(JPEG_LIBS) $(TIFF_LIBS)
+-MANDATORY_LIBS += -L. -L$(PREFIX)/$(LIB) -Wl,-rpath,.
++MANDATORY_LIBS += -L. -L$(PREFIX)/$(LIB)
+ ifdef IS_GCC
+ MANDATORY_CFLAGS += -Wall -Wextra -Wfatal-errors -Werror=unknown-pragmas -Werror=unused-label
+ GCC_VER_GTEQ5 = $(shell expr `$(CXX) -dumpversion | cut -f1 -d.` \>= 5)
+@@ -355,8 +355,8 @@
+ GMIC_STD_CFLAGS = -Dgmic_community $(MANDATORY_CFLAGS) $(ABORT_CFLAGS) $(PARALLEL_CFLAGS) $(FFTW_CFLAGS) $(CURL_CFLAGS) $(PNG_CFLAGS) $(JPEG_CFLAGS) $(TIFF_CFLAGS)
+ GMIC_STD_LIBS = $(MANDATORY_LIBS) $(PARALLEL_LIBS) $(FFTW_LIBS) $(CURL_LIBS) $(PNG_LIBS) $(JPEG_LIBS) $(TIFF_LIBS)
  ifeq ($(OS),Unix) # Unix
--GMIC_CLI_CFLAGS += $(OPENMP_CFLAGS) $(X11_CFLAGS) $(OPENEXR_CFLAGS) # $(OPENCV_CFLAGS) # $(XSHM_CFLAGS) # $(MAGICK_CFLAGS)
--GMIC_CLI_LIBS += $(OPENMP_LIBS) $(X11_LIBS) $(OPENEXR_LIBS) # $(OPENCV_LIBS) # $(XSHM_LIBS) # $(MAGICK_LIBS)
-+#GMIC_CLI_CFLAGS += $(OPENMP_CFLAGS) $(X11_CFLAGS) $(OPENEXR_CFLAGS) # $(OPENCV_CFLAGS) # $(XSHM_CFLAGS) # $(MAGICK_CFLAGS)
-+#GMIC_CLI_LIBS += $(OPENMP_LIBS) $(X11_LIBS) $(OPENEXR_LIBS) # $(OPENCV_LIBS) # $(XSHM_LIBS) # $(MAGICK_LIBS)
+-GMIC_STD_CFLAGS += $(OPENMP_CFLAGS) $(X11_CFLAGS) $(OPENEXR_CFLAGS) $(WEBP_CFLAGS)
+-GMIC_STD_LIBS += $(OPENMP_LIBS) $(X11_LIBS) $(OPENEXR_LIBS) $(WEBP_LIBS)
++GMIC_STD_CFLAGS += $(X11_CFLAGS) $(OPENEXR_CFLAGS) $(WEBP_CFLAGS)
++GMIC_STD_LIBS += $(X11_LIBS) $(OPENEXR_LIBS) $(WEBP_LIBS)
  else
  ifeq ($(OS),Darwin) # MacOSX
- GMIC_CLI_CFLAGS += $(X11_CFLAGS) $(OPENEXR_CFLAGS) # $(OPENCV_CFLAGS)
-@@ -366,7 +366,7 @@
+ GMIC_STD_CFLAGS += $(X11_CFLAGS) $(OPENEXR_CFLAGS)
+@@ -421,6 +421,10 @@
+ 	$(MAKE) "CFLAGS+=$(GMIC_STD_CFLAGS) $(OPT_CFLAGS)" "LIBS+=gmic.o $(GMIC_STD_LIBS) $(OPT_LIBS)" gmic.o _cli
+ 	$(STRIP) gmic$(EXE)
  
- cli:
- 	$(MAKE) "CFLAGS+=$(GMIC_CLI_CFLAGS) $(OPT_CLI_CFLAGS)" "LIBS+=$(GMIC_CLI_LIBS) $(OPT_LIBS)" _cli
--	$(STRIP) gmic$(EXE)
-+	$(STRIP) gmic$(EXE) gmic-gm$(EXE)
- 
- debug:
- 	$(MAKE) "CFLAGS+=$(GMIC_CLI_CFLAGS) $(DEBUG_CFLAGS)" "LIBS+=$(GMIC_CLI_LIBS)" _cli
-@@ -381,8 +381,12 @@
- 	$(MAKE) "CFLAGS+=$(MANDATORY_CFLAGS) $(ABORT_CFLAGS) $(PARALLEL_CFLAGS) $(OPENMP_CFLAGS) $(X11_CFLAGS) $(OPENEXR_CFLAGS) -Dcimg_use_half -I/usr/include/OpenEXR -Dgmic_pixel_type=half" \
- 	        "LIBS+=$(MANDATORY_LIBS) $(PARALLEL_LIBS) $(OPENMP_LIBS) $(X11_LIBS) $(OPENEXR_LIBS)" _cli
- 
--_cli: gmic_cli.o gmic.cpp gmic.h gmic_stdlib.h CImg.h
-+_cli: gmic_cli_gm.o gmic_cli.o gmic.cpp gmic.h gmic_stdlib.h CImg.h
- 	$(CXX) -o gmic gmic_cli.cpp gmic_cli.o $(CFLAGS) $(LIBS)
-+	$(CXX) -o gmic-gm gmic_cli.cpp gmic_cli_gm.o $(CFLAGS) $(MAGICK_CFLAGS) $(LIBS) $(MAGICK_LIBS)
++cli_gm:
++	$(MAKE) "CFLAGS+=$(GMIC_STD_CFLAGS) $(OPT_CFLAGS)" "LIBS+=gmic_gm.o $(GMIC_STD_LIBS) $(OPT_LIBS)" gmic_gm.o _cli_gm
++	$(STRIP) gmic-gm$(EXE)
 +
-+gmic_cli_gm.o: gmic.cpp gmic.h gmic_stdlib.h CImg.h
-+	$(CXX) -o gmic_cli_gm.o -c gmic.cpp $(CFLAGS) $(MAGICK_CFLAGS)
+ dev:
+ 	$(MAKE) "CFLAGS+=$(GMIC_STD_CFLAGS)" "LIBS+=gmic.o $(GMIC_STD_LIBS)" gmic.o _cli
  
- gmic_cli.o: gmic.cpp gmic.h gmic_stdlib.h CImg.h
- 	$(CXX) -o gmic_cli.o -c gmic.cpp $(CFLAGS)
+@@ -439,13 +443,20 @@
+ 	        "LIBS+=gmic.o $(MANDATORY_LIBS) $(PARALLEL_LIBS) $(OPENMP_LIBS) $(X11_LIBS) $(OPENEXR_LIBS)" gmic.o _cli
+ 
+ _cli: gmic$(EXE)
++_cli_gm: gmic-gm$(EXE)
+ 
+ gmic$(EXE): gmic_cli.cpp gmic.o
+-	$(CXX) -o gmic$(EXE) gmic_cli.cpp $(CFLAGS) $(LIBS)
++	$(CXX) $(LDFLAGS) -o gmic$(EXE) gmic_cli.cpp $(CFLAGS) $(LIBS)
++
++gmic-gm$(EXE): gmic_cli.cpp gmic_gm.o
++	$(CXX) $(LDFLAGS) -o gmic-gm$(EXE) gmic_cli.cpp $(CFLAGS) $(MAGICK_CFLAGS) $(LIBS) $(MAGICK_LIBS)
+ 
+ gmic.o: gmic.cpp gmic.h gmic_stdlib_community.h CImg.h
+ 	$(CXX) -o gmic.o -c gmic.cpp -Dgmic_core $(CFLAGS)
+ 
++gmic_gm.o: gmic.cpp gmic.h gmic_stdlib_community.h CImg.h
++	$(CXX) -o gmic_gm.o -c gmic.cpp -Dgmic_core $(CFLAGS) $(MAGICK_CFLAGS)
++
+ # CLI (shared).
+ #--------------
+ cli_shared:

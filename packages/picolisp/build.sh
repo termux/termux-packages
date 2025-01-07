@@ -1,17 +1,20 @@
-TERMUX_PKG_HOMEPAGE=https://picolisp.com/wiki/?home
+TERMUX_PKG_HOMEPAGE="https://picolisp.com/wiki/?home"
 TERMUX_PKG_DESCRIPTION="Lisp interpreter and application server framework"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=22.9
-TERMUX_PKG_SRCURL=https://deb.debian.org/debian/pool/main/p/picolisp/picolisp_${TERMUX_PKG_VERSION}.orig.tar.gz
-TERMUX_PKG_SHA256=2cf0ed9e176c9df76a2c5cffc87c48d838b7560fb678a16a45569521102da1e8
+TERMUX_PKG_VERSION="24.12"
+TERMUX_PKG_SRCURL=https://software-lab.de/picoLisp-${TERMUX_PKG_VERSION}.tgz
+TERMUX_PKG_SHA256=99fe187996e323ced5b9a6f3df789263fb0992abcb96dc0e06fa5ea81f4d3fd4
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libcrypt, libffi, openssl, readline"
 TERMUX_PKG_BUILD_IN_SRC=true
 # For 32-bit archs we nees to build minipicolisp
 TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
 
 termux_step_make() {
+	sed -i "s|/usr/lib/picolisp/lib.l|${TERMUX_PREFIX}/lib/picolisp/lib.l|" $TERMUX_PKG_SRCDIR/bin/pil
+	sed -i "s|/usr/lib/picolisp/lib.l|${TERMUX_PREFIX}/lib/picolisp/lib.l|" $TERMUX_PKG_SRCDIR/bin/vip
 	cd $TERMUX_PKG_SRCDIR/src
 	$CC -O3 -c -emit-llvm base.ll
 	$CC -O3 -w -c -D_OS="\"Android\"" -D_CPU="\"$TERMUX_ARCH\"" `$PKGCONFIG --cflags libffi` -emit-llvm lib.c
@@ -41,29 +44,27 @@ termux_step_make() {
 
 termux_step_make_install() {
 	cd $TERMUX_PKG_SRCDIR/src
-	install ../bin/{picolisp,pil} -t $TERMUX_PREFIX/bin
 
-	install -d -m755 $TERMUX_PREFIX/lib/picolisp/bin
-	install ../bin/{balance,httpGate,psh,ssl,sysdefs-gen,vip,watchdog} -t $TERMUX_PREFIX/lib/picolisp
-	
-	install ../{ext.l,lib.css,lib.l} -t $TERMUX_PREFIX/lib/picolisp
+	install -Dm755 -t $TERMUX_PREFIX/bin ../bin/{picolisp,pil}
+	install -Dm755 -t $TERMUX_PREFIX/lib/picolisp/bin ../bin/{balance,httpGate,psh,ssl,sysdefs-gen,vip,watchdog}
+	install -Dm644 -t $TERMUX_PREFIX/lib/picolisp ../{ext.l,lib.css,lib.l}
+	install -Dm644 -t $TERMUX_PREFIX/share/man/man1 ../man/man1/*.1
+
 	install -d -m755 $TERMUX_PREFIX/lib/picolisp/lib
+	cp -r ../lib $TERMUX_PREFIX/lib/picolisp
+	cp -r ../loc $TERMUX_PREFIX/lib/picolisp
+	cp -r ../src $TERMUX_PREFIX/lib/picolisp
+	cp -r ../test $TERMUX_PREFIX/lib/picolisp
+	cp -r ../doc $TERMUX_PREFIX/lib/picolisp
+	cp -r ../img $TERMUX_PREFIX/lib/picolisp
 
-	cp ../lib $TERMUX_PREFIX/lib/picolisp -r
-	cp ../loc $TERMUX_PREFIX/lib/picolisp -r
-	cp ../src $TERMUX_PREFIX/lib/picolisp -r
-	cp ../test $TERMUX_PREFIX/lib/picolisp -r
-	cp ../doc $TERMUX_PREFIX/lib/picolisp -r
-	cp ../img $TERMUX_PREFIX/lib/picolisp -r
-
-	install -d -m755 $TERMUX_PREFIX/share/man/man1
-	install ../man/man1/*.1 -t $TERMUX_PREFIX/share/man/man1
+	install -Dm644 ../lib/bash_completion $TERMUX_PREFIX/share/bash-completion/completions/pil
 }
 
 termux_step_create_debscripts() {
 	cat <<- EOF > ./postinst
 	#!$TERMUX_PREFIX/bin/sh
-	$TERMUX_PREFIX/lib/picolisp/sysdefs-gen > $TERMUX_PREFIX/lib/picolisp/lib/sysdefs
+	$TERMUX_PREFIX/lib/picolisp/bin/sysdefs-gen > $TERMUX_PREFIX/lib/picolisp/lib/sysdefs
 	EOF
 
 	cat <<- EOF > ./prerm

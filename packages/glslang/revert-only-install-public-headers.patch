@@ -1,0 +1,51 @@
+diff -uNr glslang-15.0.0/SPIRV/CMakeLists.txt glslang-15.0.0.mod/SPIRV/CMakeLists.txt
+--- glslang-15.0.0/SPIRV/CMakeLists.txt	2024-09-26 07:10:44.000000000 +0800
++++ glslang-15.0.0.mod/SPIRV/CMakeLists.txt	2024-10-02 09:09:13.806580988 +0800
+@@ -73,14 +73,6 @@
+     SPVRemapper.h
+     doc.h)
+ 
+-set(PUBLIC_HEADERS
+-    GlslangToSpv.h
+-    disassemble.h
+-    Logger.h
+-    spirv.hpp
+-    SPVRemapper.h
+-    SpvTools.h)
+-
+ add_library(SPIRV ${LIB_TYPE} ${CMAKE_CURRENT_SOURCE_DIR}/../glslang/stub.cpp)
+ add_library(glslang::SPIRV ALIAS SPIRV)
+ set_target_properties(SPIRV PROPERTIES
+@@ -130,5 +122,5 @@
+ 
+     install(TARGETS SPIRV EXPORT glslang-targets)
+ 
+-    install(FILES ${PUBLIC_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/glslang/SPIRV/)
++    install(FILES ${HEADERS} ${SPVREMAP_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/glslang/SPIRV/)
+ endif()
+diff -uNr glslang-15.0.0/glslang/CMakeLists.txt glslang-15.0.0.mod/glslang/CMakeLists.txt
+--- glslang-15.0.0/glslang/CMakeLists.txt	2024-09-26 07:10:44.000000000 +0800
++++ glslang-15.0.0.mod/glslang/CMakeLists.txt	2024-10-02 09:13:07.818580898 +0800
+@@ -256,17 +256,12 @@
+         install(TARGETS GenericCodeGen EXPORT glslang-targets)
+     endif()
+ 
+-    set(PUBLIC_HEADERS
+-        Public/ResourceLimits.h
+-        Public/ShaderLang.h
+-        Public/resource_limits_c.h
+-        Include/glslang_c_interface.h
+-        Include/glslang_c_shader_types.h
+-        Include/ResourceLimits.h
+-        Include/visibility.h
+-        MachineIndependent/Versions.h)
++    set(ALL_HEADERS
++        ${GLSLANG_HEADERS}
++        ${MACHINEINDEPENDENT_HEADERS}
++        ${RESOURCELIMITS_HEADERS})
+ 
+-    foreach(file ${PUBLIC_HEADERS})
++    foreach(file ${ALL_HEADERS})
+         get_filename_component(dir ${file} DIRECTORY)
+         install(FILES ${file} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/glslang/${dir})
+     endforeach()

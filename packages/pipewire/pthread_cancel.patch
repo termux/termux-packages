@@ -1,6 +1,8 @@
---- ./data-loop.c.orig	2022-05-23 23:10:06.894402311 +0530
-+++ ./src/pipewire/data-loop.c	2022-05-23 23:13:31.814402233 +0530
-@@ -230,8 +230,8 @@
+diff --git a/src/pipewire/data-loop.c b/src/pipewire/data-loop.c
+index 3cee8a2..e2ea8f5 100644
+--- a/src/pipewire/data-loop.c
++++ b/src/pipewire/data-loop.c
+@@ -276,8 +276,8 @@ int pw_data_loop_stop(struct pw_data_loop *loop)
  	if (loop->running) {
  		struct spa_thread_utils *utils;
  		if (loop->cancel) {
@@ -11,12 +13,21 @@
  		} else {
  			pw_log_debug("%p signal", loop);
  			pw_loop_invoke(loop->loop, do_stop, 1, NULL, 0, false, loop);
+diff --git a/src/pipewire/thread.c b/src/pipewire/thread.c
+index cf656fb..ba5193f 100644
 --- a/src/pipewire/thread.c
 +++ b/src/pipewire/thread.c
-@@ -73,6 +73,37 @@
- #endif
- #endif
- 
+@@ -79,9 +79,44 @@ static int thread_setaffinity(pthread_t thread, const char *affinity)
+ {
+ 	cpu_set_t set;
+ 	parse_affinity(affinity, &set);
++#ifdef __ANDROID__
++	return -sched_setaffinity(pthread_gettid_np(thread), sizeof(set), &set);
++#else
+ 	return -pthread_setaffinity_np(thread, sizeof(set), &set);
++#endif
++}
++
 +#ifdef __ANDROID__
 +typedef struct wrapped_thread_start {
 +	void *(*start)(void *);
@@ -26,8 +37,8 @@
 +static void thread_signal_handler(int signum)
 +{
 +	pthread_exit(0);
-+}
-+
+ }
+ 
 +static void *pthread_create_wrapper(void *wrapped_arg)
 +{
 +	wrapped_thread_start_t *wrapped_start = (wrapped_thread_start_t *)wrapped_arg;
@@ -51,7 +62,7 @@
  static struct spa_thread *impl_create(void *object,
  			const struct spa_dict *props,
  			void *(*start)(void*), void *arg)
-@@ -84,7 +115,16 @@
+@@ -93,7 +128,16 @@ static struct spa_thread *impl_create(void *object,
  
  	attr = pw_thread_fill_attr(props, &attributes);
  

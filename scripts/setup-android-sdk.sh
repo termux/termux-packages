@@ -10,9 +10,9 @@ set -e -u
 
 ANDROID_SDK_FILE=commandlinetools-linux-${TERMUX_SDK_REVISION}_latest.zip
 ANDROID_SDK_SHA256=0bebf59339eaa534f4217f8aa0972d14dc49e7207be225511073c661ae01da0a
-if [ "$TERMUX_NDK_VERSION" = 25b ]; then
+if [ "$TERMUX_NDK_VERSION" = "27c" ]; then
 	ANDROID_NDK_FILE=android-ndk-r${TERMUX_NDK_VERSION}-linux.zip
-	ANDROID_NDK_SHA256=403ac3e3020dd0db63a848dcaba6ceb2603bf64de90949d5c4361f848e44b005
+	ANDROID_NDK_SHA256=59c2f6dc96743b5daf5d1626684640b20a6bd2b1d85b13156b90333741bad5cc
 elif [ "$TERMUX_NDK_VERSION" = 23c ]; then
 	ANDROID_NDK_FILE=android-ndk-r${TERMUX_NDK_VERSION}-linux.zip
 	ANDROID_NDK_SHA256=6ce94604b77d28113ecd588d425363624a5228d9662450c48d2e4053f8039242
@@ -72,6 +72,6 @@ yes | $SDK_MANAGER --sdk_root="$ANDROID_HOME" --licenses
 yes | $SDK_MANAGER --sdk_root="$ANDROID_HOME" \
 		"platform-tools" \
 		"build-tools;${TERMUX_ANDROID_BUILD_TOOLS_VERSION}" \
-		"platforms;android-33" \
+		"platforms;android-35" \
 		"platforms;android-28" \
 		"platforms;android-24"

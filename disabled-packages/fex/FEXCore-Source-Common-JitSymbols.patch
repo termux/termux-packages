@@ -1,0 +1,16 @@
+diff --git a/FEXCore/Source/Common/JitSymbols.cpp b/FEXCore/Source/Common/JitSymbols.cpp
+index 662215c..7329773 100644
+--- a/FEXCore/Source/Common/JitSymbols.cpp
++++ b/FEXCore/Source/Common/JitSymbols.cpp
+@@ -20,9 +20,9 @@ namespace FEXCore {
+     // We can't use FILE here since we must be robust against forking processes closing our FD from under us.
+ #ifdef __ANDROID__
+     // Android simpleperf looks in /data/local/tmp instead of /tmp
+-    const auto PerfMap = fextl::fmt::format("/data/local/tmp/perf-{}.map", getpid());
++    const auto PerfMap = fextl::fmt::format("@TERMUX_PREFIX@/tmp/perf-{}.map", getpid());
+ #else
+-    const auto PerfMap = fextl::fmt::format("/tmp/perf-{}.map", getpid());
++    const auto PerfMap = fextl::fmt::format("@TERMUX_PREFIX@/tmp/perf-{}.map", getpid());
+ #endif
+     fd = open(PerfMap.c_str(), O_CREAT | O_TRUNC | O_WRONLY | O_APPEND, 0644);
+   }

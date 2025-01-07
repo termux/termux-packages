@@ -1,0 +1,31 @@
+https://github.com/LibrePDF/OpenPDF/commit/537b3141d4866932d1485b62af077e460aa9fd14
+
+--- a/java/com/gitlab/pdftk_java/com/lowagie/text/pdf/PdfPKCS7.java
++++ b/java/com/gitlab/pdftk_java/com/lowagie/text/pdf/PdfPKCS7.java
+@@ -225,7 +225,7 @@
+         ASN1ObjectIdentifier objId = (ASN1ObjectIdentifier)signedData.getObjectAt(0);
+         if (!objId.getId().equals(ID_PKCS7_SIGNED_DATA))
+             throw new SecurityException("Not a valid PKCS#7 object - not signed data");
+-        ASN1Sequence content = (ASN1Sequence)((DERTaggedObject)signedData.getObjectAt(1)).getObject();
++        ASN1Sequence content = (ASN1Sequence)((DERTaggedObject)signedData.getObjectAt(1)).getBaseObject();
+         // the positions that we care are:
+         //     0 - version
+         //     1 - digestAlgorithms
+@@ -258,7 +258,7 @@
+         // the possible ID_PKCS7_DATA
+         ASN1Sequence rsaData = (ASN1Sequence)content.getObjectAt(2);
+         if (rsaData.size() > 1) {
+-            DEROctetString rsaDataContent = (DEROctetString)((DERTaggedObject)rsaData.getObjectAt(1)).getObject();
++            DEROctetString rsaDataContent = (DEROctetString)((DERTaggedObject)rsaData.getObjectAt(1)).getBaseObject();
+             RSAdata = rsaDataContent.getOctets();
+         }
+         
+@@ -294,7 +294,7 @@
+         next = 3;
+         if (signerInfo.getObjectAt(next) instanceof ASN1TaggedObject) {
+             ASN1TaggedObject tagsig = (ASN1TaggedObject)signerInfo.getObjectAt(next);
+-            ASN1Sequence sseq = (ASN1Sequence)tagsig.getObject();
++            ASN1Sequence sseq = (ASN1Sequence)tagsig.getBaseObject();
+             ByteArrayOutputStream bOut = new ByteArrayOutputStream();            
+             ASN1OutputStream dout = ASN1OutputStream.create(bOut);
+             try {

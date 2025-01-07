@@ -2,36 +2,39 @@ TERMUX_PKG_HOMEPAGE=https://gitlab.com/volian/nala
 TERMUX_PKG_DESCRIPTION="Commandline frontend for the apt package manager"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.11.1
+TERMUX_PKG_VERSION="0.15.4"
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://gitlab.com/volian/nala/-/archive/v${TERMUX_PKG_VERSION}/nala-v${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=4ce87d75e785e45b1638817077797a3fcd4a15059615455fc1af0127c70cf5cd
-TERMUX_PKG_DEPENDS="python-apt"
+TERMUX_PKG_SHA256=a49ecfaf8fa73262807bb3f963ce280856d3cbefd11684da747899d21a4485fe
+TERMUX_PKG_DEPENDS="python-apt, python-pip"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
+TERMUX_PKG_PYTHON_COMMON_DEPS="poetry"
+TERMUX_PKG_PYTHON_TARGET_DEPS="anyio, httpx, jsbeautifier, pexpect, python-debian, rich, tomli, typer, typing-extensions"
 
 termux_step_pre_configure() {
-	_PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
-
-	TERMUX_PKG_RM_AFTER_INSTALL="
-	lib/python${_PYTHON_VERSION}/site-packages/nala/__pycache__
-	"
-
-	termux_setup_python_crossenv
-	pushd $TERMUX_PYTHON_CROSSENV_SRCDIR
-	_CROSSENV_PREFIX=$TERMUX_PKG_BUILDDIR/python-crossenv-prefix
-	python${_PYTHON_VERSION} -m crossenv \
-		$TERMUX_PREFIX/bin/python${_PYTHON_VERSION} \
-		${_CROSSENV_PREFIX}
-	popd
-	. ${_CROSSENV_PREFIX}/bin/activate
-
-	build-pip install poetry
+	rm -rf nala/__init__.py.orig
 }
 
-termux_step_make_install() {
-	python${_PYTHON_VERSION} -m pip install . --no-deps --prefix $TERMUX_PREFIX
+termux_step_post_make_install() {
+	# from nala_build.py
+	for file in docs/*.rst; do
+		pandoc "${file}" --output="${file%.*}" --standalone \
+			--variable=header:"Nala User Manual" \
+			--variable=footer:"${TERMUX_PKG_VERSION}" \
+			--variable=date:"$(date -d @${SOURCE_DATE_EPOCH})" \
+			--variable=section:8 \
+			--from rst --to man
+
+		install -Dm600 -t "$TERMUX_PREFIX"/share/man/man8/ "${file%.*}"
+	done
+
 	install -Dm600 -t $TERMUX_PREFIX/etc/nala debian/nala.conf
+	install -Dm600 debian/nala.fish "$TERMUX_PREFIX"/share/fish/vendor_completions.d/nala.fish
+	install -Dm600 debian/bash-completion "$TERMUX_PREFIX"/share/bash-completion/completions/nala
+	install -Dm600 debian/_nala "$TERMUX_PREFIX"/share/zsh/site-functions/_nala
 }
 
 termux_step_create_debscripts() {
@@ -41,6 +44,6 @@ termux_step_create_debscripts() {
 	mkdir -p $TERMUX_PREFIX/var/log/nala
 	mkdir -p $TERMUX_PREFIX/var/lock
 	echo "Installing dependencies through pip..."
-	pip3 install anyio httpx jsbeautifier pexpect python-debian rich tomli typer typing-extensions
+	pip3 install ${TERMUX_PKG_PYTHON_TARGET_DEPS//, / }
 	EOF
 }

@@ -1,0 +1,13 @@
+diff --git a/lib/libpaper.c.in.in b/lib/libpaper.c.in.in
+index 9294f3f..d6e9f77 100644
+--- a/lib/libpaper.c.in.in
++++ b/lib/libpaper.c.in.in
+@@ -316,7 +316,7 @@ _GL_ATTRIBUTE_PURE const struct paper *paperwithsize(double pswidth, double pshe
+ 
+ /* Get locale default paper size. */
+ static const char *localepapername(void) {
+-#if defined LC_PAPER && defined _GNU_SOURCE
++#if defined LC_PAPER && defined _GNU_SOURCE && !defined(__ANDROID__)
+     if (setlocale(LC_PAPER, "") != NULL) {
+ #define NL_PAPER_GET(x)                                                 \
+         ((union { char *string; unsigned word; })nl_langinfo(x)).word

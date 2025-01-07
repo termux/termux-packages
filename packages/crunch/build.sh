@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://sourceforge.net/projects/crunch-wordlist
+TERMUX_PKG_HOMEPAGE=https://sourceforge.net/projects/crunch-wordlist/
 TERMUX_PKG_DESCRIPTION="Highly customizable wordlist generator"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

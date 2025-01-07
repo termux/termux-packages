@@ -1,0 +1,78 @@
+--- ./frida-core/src/meson.build.orig	2023-07-08 18:52:38.331205357 +0000
++++ ./frida-core/src/meson.build	2023-07-08 19:06:13.169997295 +0000
+@@ -50,7 +50,7 @@
+       'frida-data-darwin-blob.S',
+     ],
+     command: [
+-      resource_compiler,
++      'frida-resource-compiler',
+       '--toolchain=apple',
+       '-c', '@INPUT0@',
+       '-o', join_paths(meson.current_build_dir(), 'frida-data-darwin'),
+@@ -160,7 +160,7 @@
+         helper_legacy,
+         meson.current_build_dir(),
+         host_os,
+-        resource_compiler,
++        'frida-resource-compiler',
+         '@INPUT0@',
+         lipo,
+       ],
+@@ -198,7 +198,7 @@
+         'frida-data-android-blob.S',
+       ],
+       command: [
+-        resource_compiler,
++        'frida-resource-compiler',
+         '--toolchain=gnu',
+         '-c', '@INPUT0@',
+         '-o', join_paths(meson.current_build_dir(), 'frida-data-android'),
+@@ -242,7 +242,7 @@
+       'frida-data-helper-backend-blob.S',
+     ],
+     command: [
+-      resource_compiler,
++      'frida-resource-compiler',
+       '--toolchain=gnu',
+       '-c', '@INPUT0@',
+       '-o', join_paths(meson.current_build_dir(), 'frida-data-helper-backend'),
+@@ -322,7 +322,7 @@
+         helper_legacy,
+         meson.current_build_dir(),
+         host_os,
+-        resource_compiler,
++        'frida-resource-compiler',
+         '@INPUT@',
+         lipo,
+       ],
+@@ -381,7 +381,7 @@
+       get_option('agent_emulated_legacy'),
+       meson.current_build_dir(),
+       host_os,
+-      resource_compiler,
++      'frida-resource-compiler',
+       '@INPUT0@',
+       lipo,
+     ],
+--- ./frida-core/src/compiler/meson.build.orig	2023-07-08 18:26:27.876229170 +0000
++++ ./frida-core/src/compiler/meson.build	2023-07-08 18:27:58.369131825 +0000
+@@ -47,7 +47,7 @@
+     'frida-data-compiler-blob.S',
+   ],
+   command: [
+-    resource_compiler,
++    'frida-resource-compiler',
+     '--toolchain=' + host_toolchain,
+     '-c', '@INPUT0@',
+     '-o', join_paths(meson.current_build_dir(), 'frida-data-compiler'),
+--- ./frida-core/src/barebone/meson.build.orig	2023-07-08 19:11:24.044787115 +0000
++++ ./frida-core/src/barebone/meson.build	2023-07-08 19:11:34.556886099 +0000
+@@ -49,7 +49,7 @@
+       'frida-data-barebone-blob.S',
+     ],
+     command: [
+-      resource_compiler,
++      'frida-resource-compiler',
+       '--toolchain=' + host_toolchain,
+       '-c', '@INPUT0@',
+       '-o', join_paths(meson.current_build_dir(), 'frida-data-barebone'),

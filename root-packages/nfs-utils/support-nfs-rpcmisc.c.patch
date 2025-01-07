@@ -1,0 +1,11 @@
+--- a/support/nfs/rpcmisc.c
++++ b/support/nfs/rpcmisc.c
+@@ -56,7 +56,7 @@
+ 			exit(0);
+ 
+ 		if (size == 0)
+-			size = getdtablesize();
++			size = sysconf(_SC_OPEN_MAX);
+ 
+ 		for (i = 0, openfd = 0; i < size && openfd < 2; i++)
+ 			if (FD_ISSET(i, &svc_fdset))

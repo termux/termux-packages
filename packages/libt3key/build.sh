@@ -2,9 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://os.ghalkes.nl/t3/libt3key.html
 TERMUX_PKG_DESCRIPTION="A library and database with escape sequence to key symbol mappings"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.2.10
+TERMUX_PKG_VERSION="0.2.11"
 TERMUX_PKG_SRCURL=https://os.ghalkes.nl/dist/libt3key-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=b3f63c8a5bdf4efc10a293e5124a4a1095af6149af96b0a10b3ce7da7400f8c1
+TERMUX_PKG_SHA256=e4dfdef50be52e365f68745df6177e819df5a7600e61716063d5480f7db3c06c
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libt3config, ncurses"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-gettext"
@@ -28,7 +29,7 @@ termux_step_host_build() {
 	pushd libt3config
 	tar xf $LIBT3CONFIG_TARFILE --strip-components=1
 	./configure --prefix=$_PREFIX_FOR_BUILD --without-gettext
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j $TERMUX_PKG_MAKE_PROCESSES
 	make install
 	popd
 
@@ -37,7 +38,7 @@ termux_step_host_build() {
 	find $TERMUX_PKG_SRCDIR -mindepth 1 -maxdepth 1 -exec cp -a \{\} ./ \;
 	./configure --prefix=$_PREFIX_FOR_BUILD --without-gettext \
 		LDFLAGS="-Wl,-rpath=$_PREFIX_FOR_BUILD/lib"
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j $TERMUX_PKG_MAKE_PROCESSES
 	make install
 	popd
 

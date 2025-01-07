@@ -1,0 +1,549 @@
+------------------------------------------------------------------------
+r12579 | wh11204 | 2021-12-14 18:27:57 +0900 (Tue, 14 Dec 2021) | 16 lines
+
+- Remove code for wxWidgets < 3.0.0 (part II).
+Includes:
+  src/sdk/cbeditor.cpp
+  src/sdk/compiler.cpp
+  src/sdk/configmanager.cpp
+  src/sdk/globals.cpp
+  src/sdk/incremental_select_helper.cpp
+  src/sdk/newfromtemplatedlg.cpp
+  src/sdk/pluginsconfigurationdlg.cpp
+  src/sdk/printing_types.cpp
+  src/sdk/scripting/bindings/sc_globals.cpp
+  src/sdk/toolsmanager.cpp
+  src/sdk/uservarmanager.cpp
+  src/sdk/xtra_res.cpp
+  src/src/app.cpp
+
+------------------------------------------------------------------------
+Index: src/sdk/incremental_select_helper.cpp
+===================================================================
+--- src/sdk/incremental_select_helper.cpp	(revision 12578)
++++ src/sdk/incremental_select_helper.cpp	(revision 12579)
+@@ -195,10 +195,6 @@
+     FilterItemsFinalize(*m_list, *m_iterator);
+ }
+ 
+-#if !wxCHECK_VERSION(3, 0, 0)
+-    typedef int wxStandardID;
+-#endif
+-
+ static wxStandardID KeyDownAction(wxKeyEvent& event, int &selected, int selectedMax)
+ {
+     // now, adjust position from key input
+Index: src/sdk/printing_types.cpp
+===================================================================
+--- src/sdk/printing_types.cpp	(revision 12578)
++++ src/sdk/printing_types.cpp	(revision 12579)
+@@ -28,21 +28,13 @@
+     {
+         g_printer = new wxPrinter;
+         int paperid = Manager::Get()->GetConfigManager(_T("app"))->ReadInt(_T("/printerdialog/paperid"), wxPAPER_A4 );
+-        #if wxCHECK_VERSION(3, 0, 0)
+         wxPrintOrientation paperorientation  = static_cast<wxPrintOrientation>( Manager::Get()->GetConfigManager(_T("app"))->ReadInt(_T("/printerdialog/paperorientation"), wxPORTRAIT ) );
+-        #else
+-        int paperorientation  = Manager::Get()->GetConfigManager(_T("app"))->ReadInt(_T("/printerdialog/paperorientation"), wxPORTRAIT );
+-        #endif
+         wxPrintData* ppd = &(g_printer->GetPrintDialogData().GetPrintData());
+         ppd->SetPaperId((wxPaperSize)paperid);
+-        #if wxCHECK_VERSION(3, 0, 0)
+         if (paperorientation == wxPORTRAIT)
+             ppd->SetOrientation(wxPORTRAIT);
+         else
+             ppd->SetOrientation(wxLANDSCAPE);
+-        #else
+-        ppd->SetOrientation(paperorientation);
+-        #endif
+     }
+ 
+ //    if (!g_pageSetupData)
+Index: src/sdk/scripting/bindings/sc_globals.cpp
+===================================================================
+--- src/sdk/scripting/bindings/sc_globals.cpp	(revision 12578)
++++ src/sdk/scripting/bindings/sc_globals.cpp	(revision 12579)
+@@ -303,15 +303,7 @@
+                     if (id != wxNOT_FOUND)
+                     {
+                         wxCommandEvent evt(wxEVT_COMMAND_MENU_SELECTED, id);
+-                        #if wxCHECK_VERSION(3, 0, 0)
+                         mbar->GetEventHandler()->ProcessEvent(evt);
+-                        #else
+-                        if ( !mbar->ProcessEvent(evt) )
+-                        {
+-                            wxString msg; msg.Printf(_("Calling the menu '%s' with ID %d failed."), menuPath.wx_str(), id);
+-                            cbMessageBox(msg, _("Script error"), wxICON_WARNING);
+-                        }
+-                        #endif
+                         // done
+                     }
+                     break;
+Index: src/sdk/cbeditor.cpp
+===================================================================
+--- src/sdk/cbeditor.cpp	(revision 12578)
++++ src/sdk/cbeditor.cpp	(revision 12579)
+@@ -1223,13 +1223,13 @@
+     m_pControl2->SetDocPointer(m_pControl->GetDocPointer());
+ 
+     // on wxGTK > 2.9 we need to thaw before reparent and refreeze the editor here or the whole app stays frozen
+-    #if defined ( __WXGTK__ ) && wxCHECK_VERSION(3, 0, 0)
++    #if defined ( __WXGTK__ )
+     Thaw();
+     #endif
+     // parent both controls under the splitter
+     m_pControl->Reparent(m_pSplitter);
+     m_pControl2->Reparent(m_pSplitter);
+-    #if defined ( __WXGTK__ ) && wxCHECK_VERSION(3, 0, 0)
++    #if defined ( __WXGTK__ )
+     Freeze();
+     #endif
+ 
+@@ -1289,12 +1289,12 @@
+     m_pSizer->Detach(m_pSplitter);
+ 
+     // on wxGTK > 2.9 we need to thaw before reparent and refreeze the editor here or the whole app stays frozen
+-    #if defined ( __WXGTK__ ) && wxCHECK_VERSION(3, 0, 0)
++    #if defined ( __WXGTK__ )
+     Thaw();
+     #endif
+     // parent the left control under this
+     m_pControl->Reparent(this);
+-    #if defined ( __WXGTK__ ) && wxCHECK_VERSION(3, 0, 0)
++    #if defined ( __WXGTK__ )
+     Freeze();
+     #endif
+     // add it in the sizer
+Index: src/sdk/compiler.cpp
+===================================================================
+--- src/sdk/compiler.cpp	(revision 12578)
++++ src/sdk/compiler.cpp	(revision 12579)
+@@ -1537,11 +1537,7 @@
+     // Loads the wxArrayString with the task output (returned in a wxInputStream)
+     wxInputStream *inputStream = process.GetInputStream();
+     wxTextInputStream text(*inputStream);
+-#if wxCHECK_VERSION(3, 0, 0)
+     while (!text.GetInputStream().Eof())
+-#else
+-    while (!inputStream->Eof())
+-#endif
+     {
+         output.Add(text.ReadLine());
+     }
+@@ -1556,13 +1552,9 @@
+ {
+     wxLogNull logNo; // do not warn if execution fails
+     int flags = wxEXEC_SYNC;
+-    #if wxCHECK_VERSION(3, 0, 0)
+-        // Stop event-loop while wxExecute runs, to avoid a deadlock on startup,
+-        // that occurs from time to time on wx3
+-        flags |= wxEXEC_NOEVENTS;
+-    #else
+-        flags |= wxEXEC_NODISABLE;
+-    #endif
++    // Stop event-loop while wxExecute runs, to avoid a deadlock on startup,
++    // that occurs from time to time on wx3
++    flags |= wxEXEC_NOEVENTS;
+     return wxExecute(cmd, output, flags);
+ }
+ #endif // __WXMSW__
+Index: src/sdk/configmanager.cpp
+===================================================================
+--- src/sdk/configmanager.cpp	(revision 12578)
++++ src/sdk/configmanager.cpp	(revision 12579)
+@@ -39,11 +39,7 @@
+ #endif
+ 
+ #ifdef __WXMAC__
+-#if wxCHECK_VERSION(3, 0, 0)
+ #include "wx/osx/core/cfstring.h"
+-#else
+-#include "wx/mac/corefoundation/cfstring.h"
+-#endif
+ #include "wx/intl.h"
+ 
+ #include <CoreFoundation/CFBundle.h>
+@@ -124,11 +120,7 @@
+             CFRelease(resourcesURL);
+             CFStringRef cfStrPath = CFURLCopyFileSystemPath(absoluteURL,kCFURLPOSIXPathStyle);
+             CFRelease(absoluteURL);
+-            #if wxCHECK_VERSION(3, 0, 0)
+-              wxString str = wxCFStringRef(cfStrPath).AsString(wxLocale::GetSystemEncoding());
+-            #else
+-              wxString str = wxMacCFStringHolder(cfStrPath).AsString(wxLocale::GetSystemEncoding());
+-            #endif
++            wxString str = wxCFStringRef(cfStrPath).AsString(wxLocale::GetSystemEncoding());
+             if (!str.Contains(wxString(_T("/Resources"))))
+                return ::DetermineExecutablePath() + _T("/.."); // not a bundle, use relative path
+             return str;
+@@ -239,9 +231,7 @@
+     wxMessageDialog dlg(Manager::Get()->GetAppWindow(),
+                         message + _("\n\nDiscard old config file?"), _("Config file read error"),
+                         wxSTAY_ON_TOP|wxCENTRE|wxYES|wxNO|wxNO_DEFAULT|wxICON_ERROR);
+-#if wxCHECK_VERSION(3, 0, 0)
+     dlg.SetYesNoLabels(_("&Discard"), _("&Close"));
+-#endif
+     if (dlg.ShowModal() != wxID_YES)
+         cbThrow(message);
+ 
+@@ -337,15 +327,8 @@
+         {
+             size_t size = is->GetSize();
+             wxString str;
+-            #if wxCHECK_VERSION(3, 0, 0)
+             wxChar* c = wxStringBuffer(str, size);
+-            #else
+-            wxChar* c = str.GetWriteBuf(size);
+-            #endif
+             is->Read(c, size);
+-            #if !wxCHECK_VERSION(3, 0, 0)
+-            str.UngetWriteBuf(size);
+-            #endif
+ 
+             doc = new TiXmlDocument();
+ 
+@@ -493,13 +476,8 @@
+ */
+ inline void to_upper(wxString& s)
+ {
+-    #if wxCHECK_VERSION(3, 0, 0)
+     wxStringCharType *p = const_cast<wxStringCharType*>(s.wx_str());
+     wxStringCharType q;
+-    #else
+-    wxChar *p = (wxChar*) s.c_str();
+-    wxChar q;
+-    #endif
+     size_t len = s.length()+1;
+     for (;--len;++p)
+     {
+@@ -511,13 +489,8 @@
+ 
+ inline void to_lower(wxString& s)
+ {
+-    #if wxCHECK_VERSION(3, 0, 0)
+     wxStringCharType *p = const_cast<wxStringCharType*>(s.wx_str());
+     wxStringCharType q;
+-    #else
+-    wxChar *p = (wxChar*) s.c_str();
+-    wxChar q;
+-    #endif
+     size_t len = s.length()+1;
+     for (;--len;++p)
+     {
+@@ -1239,11 +1212,7 @@
+     {
+         while (e->IterateChildren(curr) && (curr = e->IterateChildren(curr)->ToElement()))
+         {
+-            #if wxCHECK_VERSION(3, 0, 0)
+             wxUniChar c = cbC2U(curr->Value())[0];
+-            #else
+-            wxChar c = *(cbC2U(curr->Value()));
+-            #endif
+             if (c < _T('A') || c > _T('Z')) // first char must be a letter, uppercase letters are key names
+                 ret.Add(cbC2U(curr->Value()));
+         }
+@@ -1325,11 +1294,7 @@
+     {
+         while (e->IterateChildren(curr) && (curr = e->IterateChildren(curr)->ToElement()))
+         {
+-            #if wxCHECK_VERSION(3, 0, 0)
+             wxUniChar c = cbC2U(curr->Value())[0];
+-            #else
+-            wxChar c = *(cbC2U(curr->Value()));
+-            #endif
+             if (c >= _T('A') && c <= _T('Z')) // opposite of the above
+                 ret.Add(cbC2U(curr->Value()));
+         }
+Index: src/sdk/globals.cpp
+===================================================================
+--- src/sdk/globals.cpp	(revision 12578)
++++ src/sdk/globals.cpp	(revision 12579)
+@@ -1186,11 +1186,7 @@
+ 
+ double cbGetContentScaleFactor(const wxWindow &window)
+ {
+-#if wxCHECK_VERSION(3, 0, 0)
+     return window.GetContentScaleFactor();
+-#else
+-    return 1.0;
+-#endif // wxCHECK_VERSION(3, 0, 0)
+ }
+ 
+ #ifdef __WXGTK__
+@@ -1200,7 +1196,6 @@
+ // For other platforms the value returned by GetContentScalingFactor seems adequate.
+ double cbGetActualContentScaleFactor(cb_unused const wxWindow &window)
+ {
+-#if wxCHECK_VERSION(3, 0, 0)
+     // It is possible to use the window to find a display, but unfortunately this doesn't work well,
+     // because we call this function mostly on windows which haven't been shown. This leads to
+     // warnings in the log about ClientToScreen failures.
+@@ -1207,24 +1202,6 @@
+     // If there are problems on multi-monitor setups we should think about some other solution. :(
+     const wxSize ppi = wxGetDisplayPPI();
+     return ppi.y / 96.0;
+-#else // wxCHECK_VERSION(3, 0, 0)
+-    // This code is the simplest version which works in the most common case.
+-    // If people complain that multi-monitor setups behave strangely, this should be revised with
+-    // direct calls to GTK/GDK functions.
+-
+-    // This function might return bad results for multi screen setups.
+-    const wxSize mm = wxGetDisplaySizeMM();
+-    if (mm.x == 0 || mm.y == 0)
+-        return 1.0;
+-    const wxSize pixels = wxGetDisplaySize();
+-
+-    const double ppiX = wxRound((pixels.x * inches2mm) / mm.x);
+-    const double ppiY = wxRound((pixels.y * inches2mm) / mm.y);
+-
+-    // My guess is that smaller scaling factor would look better. Probably it has effect only in
+-    // multi monitor setups where there are monitors with different dpi.
+-    return std::min(ppiX / 96.0, ppiY /96.0);
+-#endif // wxCHECK_VERSION(3, 0, 0)
+ }
+ #else // __WXGTK__
+ double cbGetActualContentScaleFactor(const wxWindow &window)
+@@ -1323,11 +1300,7 @@
+     long flags = lc->GetWindowStyleFlag();
+     switch (style)
+     {
+-#if wxCHECK_VERSION(3, 0, 0)
+         case sisNoIcons: flags = (flags & ~wxLC_MASK_TYPE) | wxLC_LIST; break;
+-#else
+-        case sisNoIcons: flags = (flags & ~wxLC_MASK_TYPE) | wxLC_SMALL_ICON; break;
+-#endif
+         default: flags = (flags & ~wxLC_MASK_TYPE) | wxLC_ICON; break;
+     }
+     lc->SetWindowStyleFlag(flags);
+@@ -1713,11 +1686,7 @@
+         return wxArrayInt();
+ }
+ 
+-#if wxCHECK_VERSION(3, 0, 0)
+ const char* cbGetTextFromUserPromptStr = wxGetTextFromUserPromptStr;
+-#else
+-const wxChar* cbGetTextFromUserPromptStr = wxGetTextFromUserPromptStr;
+-#endif // wxCHECK_VERSION
+ 
+ wxString cbGetTextFromUser(const wxString& message, const wxString& caption, const wxString& defaultValue,
+                            wxWindow *parent, wxCoord x, wxCoord y, bool centre)
+Index: src/sdk/newfromtemplatedlg.cpp
+===================================================================
+--- src/sdk/newfromtemplatedlg.cpp	(revision 12578)
++++ src/sdk/newfromtemplatedlg.cpp	(revision 12579)
+@@ -195,11 +195,7 @@
+     cat->SetSelection(0);
+ }
+ 
+-#if wxCHECK_VERSION(3, 0, 0)
+ inline int wxCALLBACK SortTemplates(wxIntPtr item1, wxIntPtr item2, cb_unused wxIntPtr sortData)
+-#else
+-inline int wxCALLBACK SortTemplates(long item1, long item2, cb_unused long sortData)
+-#endif
+ {
+     ListItemData* data1 = reinterpret_cast<ListItemData*>(item1);
+     ListItemData* data2 = reinterpret_cast<ListItemData*>(item2);
+Index: src/sdk/pluginsconfigurationdlg.cpp
+===================================================================
+--- src/sdk/pluginsconfigurationdlg.cpp	(revision 12578)
++++ src/sdk/pluginsconfigurationdlg.cpp	(revision 12579)
+@@ -65,11 +65,7 @@
+     return initialInfo;
+ }
+ 
+-#if wxCHECK_VERSION(3, 0, 0)
+ inline int wxCALLBACK sortByTitle(wxIntPtr item1, wxIntPtr item2, cb_unused wxIntPtr sortData)
+-#else
+-inline int wxCALLBACK sortByTitle(long item1, long item2, cb_unused long sortData)
+-#endif
+ {
+     const PluginElement* elem1 = (const PluginElement*)item1;
+     const PluginElement* elem2 = (const PluginElement*)item2;
+Index: src/sdk/toolsmanager.cpp
+===================================================================
+--- src/sdk/toolsmanager.cpp	(revision 12578)
++++ src/sdk/toolsmanager.cpp	(revision 12579)
+@@ -129,11 +129,7 @@
+ 
+     // log info so user can troubleshoot
+     dir = wxGetCwd(); // read in the actual working dir
+-    #if wxCHECK_VERSION(3, 0, 0)
+     Manager::Get()->GetLogManager()->Log(F(_("Launching tool '%s': %s (in %s)"), tool->GetName().wx_str(), cmdline.wx_str(), dir.wx_str()));
+-    #else
+-    Manager::Get()->GetLogManager()->Log(F(_("Launching tool '%s': %s (in %s)"), tool->GetName().c_str(), cmdline.c_str(), dir.c_str()));
+-    #endif
+ 
+     bool pipe = true;
+     int flags = wxEXEC_ASYNC;
+Index: src/sdk/uservarmanager.cpp
+===================================================================
+--- src/sdk/uservarmanager.cpp	(revision 12578)
++++ src/sdk/uservarmanager.cpp	(revision 12579)
+@@ -32,9 +32,7 @@
+ 
+ #include "annoyingdialog.h"
+ 
+-#if wxCHECK_VERSION(3, 0, 0)
+ #include <wx/unichar.h>
+-#endif
+ 
+ #include <ctype.h>
+ 
+@@ -637,11 +635,7 @@
+     }
+ 
+     for (unsigned int i = 0; i < s.length(); ++i)
+-#if wxCHECK_VERSION(3, 0, 0)
+         s[i] = wxIsalnum(s.GetChar(i)) ? s.GetChar(i) : wxUniChar('_');
+-#else
+-        s[i] = wxIsalnum(s.GetChar(i)) ? s.GetChar(i) : _T('_');
+-#endif
+ 
+     if (s.GetChar(0) == _T('_'))
+         s.Prepend(_T("set"));
+Index: src/sdk/xtra_res.cpp
+===================================================================
+--- src/sdk/xtra_res.cpp	(revision 12578)
++++ src/sdk/xtra_res.cpp	(revision 12579)
+@@ -100,11 +100,7 @@
+             return stockArt;
+     }
+ 
+-#if wxCHECK_VERSION(3, 0, 0)
+     const wxString name = GetParamValue(paramNode);
+-#else
+-    const wxString name = GetParamValue(param);
+-#endif
+     if (name.empty())
+         return wxArtProvider::GetBitmap(wxT("sdk/missing_icon"), wxART_TOOLBAR, size * scaleFactor);
+ 
+@@ -186,19 +182,10 @@
+         if (GetPosition() != wxDefaultPosition)
+         {
+             m_toolbar->AddTool(GetID(),
+-            #if wxCHECK_VERSION(3, 0, 0)
+                                wxEmptyString,
+-            #endif
+                                GetCenteredBitmap(_T("bitmap"), bitmapSize, scaleFactor),
+                                GetCenteredBitmap(_T("bitmap2"), bitmapSize, scaleFactor),
+-            #if !wxCHECK_VERSION(3, 0, 0)
+-                               GetBool(_T("toggle")),
+-                               GetPosition().x,
+-                               GetPosition().y,
+-                               NULL,
+-            #else
+                                wxITEM_NORMAL,
+-            #endif
+                                GetText(_T("tooltip")),
+                                GetText(_T("longhelp")));
+         }
+@@ -332,15 +319,9 @@
+ //
+ // Don't ask me why... >:-|
+ 
+-    #if wxCHECK_VERSION(3, 0, 0)
+     bool istbar = node->GetAttribute(wxT("class"), wxEmptyString).Matches(_T("wxToolBarAddOn"));
+     bool istool = node->GetAttribute(wxT("class"), wxEmptyString).Matches(_T("tool"));
+     bool issep = node->GetAttribute(wxT("class"), wxEmptyString).Matches(_T("separator"));
+-    #else
+-    bool istbar = node->GetPropVal(wxT("class"), wxEmptyString).Matches(_T("wxToolBarAddOn"));
+-    bool istool = node->GetPropVal(wxT("class"), wxEmptyString).Matches(_T("tool"));
+-    bool issep = node->GetPropVal(wxT("class"), wxEmptyString).Matches(_T("separator"));
+-    #endif
+ 
+     return ((!m_isInside && istbar) ||
+             (m_isInside && istool) ||
+Index: src/src/app.cpp
+===================================================================
+--- src/src/app.cpp	(revision 12578)
++++ src/src/app.cpp	(revision 12579)
+@@ -94,12 +94,8 @@
+ {
+     public:
+         DDEConnection(MainFrame* frame) : m_Frame(frame) { ; }
+-#if wxCHECK_VERSION(3, 0, 0)
+         bool OnExecute(const wxString& topic, const void *data, size_t size,
+                        wxIPCFormat format) override;
+-#else
+-        bool OnExecute(const wxString& topic, wxChar *data, int size, wxIPCFormat format) override;
+-#endif
+         bool OnDisconnect() override;
+     private:
+         MainFrame* m_Frame;
+@@ -110,17 +106,10 @@
+     return topic == DDE_TOPIC ? new DDEConnection(m_Frame) : nullptr;
+ }
+ 
+-#if wxCHECK_VERSION(3, 0, 0)
+ bool DDEConnection::OnExecute(cb_unused const wxString& topic, const void *data, size_t size,
+                               wxIPCFormat format)
+ {
+     const wxString strData = wxConnection::GetTextFromData(data, size, format);
+-#else
+-bool DDEConnection::OnExecute(cb_unused const wxString& topic, wxChar *data, int size,
+-                              wxIPCFormat format)
+-{
+-    const wxString strData((wxChar*)data);
+-#endif
+ 
+     if (strData.StartsWith(_T("[IfExec_Open(\"")))
+         return false; // let Shell Open handle the request as we *know* that we have registered the Shell Open command, too
+@@ -220,11 +209,7 @@
+ };
+ 
+ #if wxUSE_CMDLINE_PARSER
+-#if wxCHECK_VERSION(3, 0, 0)
+ #define CMD_ENTRY(X) X
+-#else
+-#define CMD_ENTRY(X) _T(X)
+-#endif
+ const wxCmdLineEntryDesc cmdLineDesc[] =
+ {
+     { wxCMD_LINE_SWITCH, CMD_ENTRY("h"),  CMD_ENTRY("help"),                  CMD_ENTRY("show this help message"),
+@@ -330,21 +315,10 @@
+ {
+ public:
+ 
+-#if wxCHECK_VERSION(3, 0, 0)
+     virtual void Output(const wxString &str) override;
+-#else
+-    #ifdef WX_ATTRIBUTE_PRINTF
+-    virtual void Printf(const wxChar* format, ...)  WX_ATTRIBUTE_PRINTF_2;
+-    #else
+-    void Printf(const wxChar* format, ...) override  ATTRIBUTE_PRINTF_2;
+-    #endif
+-#endif // wxCHECK_VERSION
+ };
+-#if wxCHECK_VERSION(3, 0, 0)
++
+ void cbMessageOutputNull::Output(cb_unused const wxString &str){}
+-#else
+-void cbMessageOutputNull::Printf(cb_unused const wxChar* format, ...){}
+-#endif
+ } // namespace
+ 
+ IMPLEMENT_APP(CodeBlocksApp) // TODO: This gives a "redundant declaration" warning, though I think it's false. Dig through macro and check.
+@@ -355,11 +329,7 @@
+ END_EVENT_TABLE()
+ 
+ #ifdef __WXMAC__
+-#if wxCHECK_VERSION(3, 0, 0)
+ #include "wx/osx/core/cfstring.h"
+-#else
+-#include "wx/mac/corefoundation/cfstring.h"
+-#endif
+ #include "wx/intl.h"
+ 
+ #include <CoreFoundation/CFBundle.h>
+@@ -374,11 +344,7 @@
+     CFRelease(resourcesURL);
+     CFStringRef cfStrPath = CFURLCopyFileSystemPath(absoluteURL,kCFURLPOSIXPathStyle);
+     CFRelease(absoluteURL);
+-    #if wxCHECK_VERSION(3, 0, 0)
+       return wxCFStringRef(cfStrPath).AsString(wxLocale::GetSystemEncoding());
+-    #else
+-      return wxMacCFStringHolder(cfStrPath).AsString(wxLocale::GetSystemEncoding());
+-    #endif
+ }
+ #endif
+ 

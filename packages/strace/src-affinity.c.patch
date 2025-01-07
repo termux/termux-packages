@@ -1,0 +1,15 @@
+https://github.com/termux/termux-packages/issues/18389
+
+--- a/src/affinity.c
++++ b/src/affinity.c
+@@ -30,7 +30,10 @@
+ 		 */
+ 		cpuset_size = 128;
+ 		while (cpuset_size &&
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wnonnull"
+ 		       sched_getaffinity(0, cpuset_size, NULL) == -1 &&
++#pragma GCC diagnostic pop
+ 		       EINVAL == errno) {
+ 			cpuset_size <<= 1;
+ 		}

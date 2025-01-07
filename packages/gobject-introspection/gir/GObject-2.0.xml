@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<dump>
+  <boxed name="GClosure" get-type="g_closure_get_type"/>
+  <boxed name="GValue" get-type="g_value_get_type"/>
+  <class name="GInitiallyUnowned" get-type="g_initially_unowned_get_type" parents="GObject">
+  </class>
+  <class name="GObject" get-type="g_object_get_type">
+    <signal name="notify" return="void" when="first" no-recurse="1" detailed="1" action="1" no-hooks="1">
+      <param type="GParam"/>
+    </signal>
+  </class>
+  <flags name="GBindingFlags" get-type="g_binding_flags_get_type">
+    <member name="G_BINDING_DEFAULT" nick="default" value="0"/>
+    <member name="G_BINDING_BIDIRECTIONAL" nick="bidirectional" value="1"/>
+    <member name="G_BINDING_SYNC_CREATE" nick="sync-create" value="2"/>
+    <member name="G_BINDING_INVERT_BOOLEAN" nick="invert-boolean" value="4"/>
+  </flags>
+  <class name="GBinding" get-type="g_binding_get_type" parents="GObject">
+    <property name="source" type="GObject" flags="235"/>
+    <property name="target" type="GObject" flags="235"/>
+    <property name="source-property" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="target-property" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="flags" type="GBindingFlags" flags="235" default-value="G_BINDING_DEFAULT"/>
+  </class>
+  <class name="GBindingGroup" get-type="g_binding_group_get_type" parents="GObject">
+    <property name="source" type="GObject" flags="1073742051"/>
+  </class>
+  <class name="GSignalGroup" get-type="g_signal_group_get_type" parents="GObject">
+    <property name="target" type="GObject" flags="1073742051"/>
+    <property name="target-type" type="GType" flags="235"/>
+    <signal name="bind" return="void" when="last">
+      <param type="GObject"/>
+    </signal>
+    <signal name="unbind" return="void" when="last">
+    </signal>
+  </class>
+  <class name="GTypeModule" get-type="g_type_module_get_type" parents="GObject" abstract="1">
+    <implements name="GTypePlugin"/>
+  </class>
+  <interface name="GTypePlugin" get-type="g_type_plugin_get_type">
+  </interface>
+  <boxed name="GValueArray" get-type="g_value_array_get_type"/>
+</dump>

@@ -2,10 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://acoustid.org/chromaprint
 TERMUX_PKG_DESCRIPTION="C library for generating audio fingerprints used by AcoustID"
 TERMUX_PKG_LICENSE="LGPL-2.1, MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-_COMMIT=b6d5f131e0c693ea877cbf49e0174be9fb0f9856
-_COMMIT_DATE=20221105
+_COMMIT=aa67c95b9e486884a6d3ee8b0c91207d8c2b0551
+_COMMIT_DATE=20221217
 TERMUX_PKG_VERSION=1.5.1-p${_COMMIT_DATE}
-TERMUX_PKG_SRCURL=https://github.com/acoustid/chromaprint.git
+TERMUX_PKG_REVISION=2
+TERMUX_PKG_SRCURL=git+https://github.com/acoustid/chromaprint
+TERMUX_PKG_SHA256=5a880f6e976fdbbfbc1d5487d27cf59fba7398c675c6cb5069aaf3d3cff716a7
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_DEPENDS="ffmpeg, libc++"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -25,5 +27,10 @@ termux_step_post_get_source() {
 		echo -n " different from what is expected to be; should end"
 		echo " with \"${pdate}\"."
 		return 1
+	fi
+
+	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum)
+	if [[ "${s}" != "${TERMUX_PKG_SHA256}  "* ]]; then
+		termux_error_exit "Checksum mismatch for source files."
 	fi
 }

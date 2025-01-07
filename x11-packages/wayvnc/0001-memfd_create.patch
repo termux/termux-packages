@@ -1,0 +1,11 @@
+--- a/meson.build
++++ b/meson.build
+@@ -143,7 +143,7 @@
+ if cc.has_function('memfd_create')
+ 	config.set('HAVE_MEMFD', true)
+ 	config.set('HAVE_MEMFD_CREATE', true)
+-elif cc.has_function('SYS_memfd_create', prefix : '#include <sys/syscall.h>')
++elif cc.has_header_symbol('sys/syscall.h', 'SYS_memfd_create')
+ 	config.set('HAVE_MEMFD', true)
+ endif
+ 

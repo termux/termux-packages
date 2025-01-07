@@ -1,0 +1,34 @@
+diff --git a/Source/Common/Config.cpp b/Source/Common/Config.cpp
+index 1430479..67ca3e7 100644
+--- a/Source/Common/Config.cpp
++++ b/Source/Common/Config.cpp
+@@ -392,6 +392,7 @@ namespace JSON {
+     FEXCore::Config::Load();
+ 
+     auto Args = FEX::ArgLoader::Get();
++    size_t i = 0;
+ 
+     if (LoadProgramConfig) {
+       if (Args.empty()) {
+@@ -399,8 +400,19 @@ namespace JSON {
+         return {};
+       }
+ 
+-      Args[0] = RecoverGuestProgramFilename(std::move(Args[0]), ExecFDInterp, ProgramFDFromEnv);
+-      fextl::string& Program = Args[0];
++      // really bad workaround for Termux Proot
++      for (size_t j=0; j<Args.size(); j++) {
++        if (Args[j] == "-U") continue;
++        if (Args[j] == "LD_LIBRARY_PATH") continue;
++        if (Args[j] == "-E") continue;
++        if (Args[j] == "LD_PRELOAD=") continue;
++        if (Args[j] == "-0") continue;
++        i=j;
++        break;
++      }
++
++      Args[i] = RecoverGuestProgramFilename(std::move(Args[i]), ExecFDInterp, ProgramFDFromEnv);
++      fextl::string& Program = Args[i];
+ 
+       bool Wine = false;
+       fextl::string ProgramName;

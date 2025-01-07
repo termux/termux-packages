@@ -29,5 +29,5 @@ termux_step_make_install() {
 	chmod u+w termkey.h
 	install -Dm600 termkey.h $TERMUX_PREFIX/include/
 	LIBDIR=$TERMUX_PREFIX/lib INCDIR=$TERMUX_PREFIX/include VERSION=$TERMUX_PKG_VERSION sh termkey.pc.sh > \
-	        $PKG_CONFIG_LIBDIR/termkey.pc
+			$PKG_CONFIG_LIBDIR/termkey.pc
 }

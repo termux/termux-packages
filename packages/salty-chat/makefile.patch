@@ -1,6 +1,17 @@
---- saltyim/Makefile	2022-05-13 15:01:00.000000000 +0000
-+++ saltyim.mod/Makefile	2022-09-16 05:05:35.309990907 +0000
-@@ -8,7 +8,7 @@
+--- a/Makefile
++++ b/Makefile
+@@ -1,14 +1,14 @@
+ -include environ.inc
+ .PHONY: help deps dev build install image release test clean clean-all
+ 
+-export CGO_ENABLED=0
+-VERSION=$(shell git describe --abbrev=0 --tags 2>/dev/null || echo "0.0.0")
+-COMMIT=$(shell git rev-parse --short HEAD || echo "HEAD")
+-BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
++export CGO_ENABLED=1
++VERSION=$(echo "0.0.0")
++COMMIT=$(echo "HEAD")
++BRANCH="master"
  GOCMD=go
  GOVER=$(shell go version | grep -o -E 'go1\.17\.[0-9]+')
  

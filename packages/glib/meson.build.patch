@@ -1,6 +1,5 @@
---- a/meson.build
-+++ b/meson.build
-@@ -464,7 +464,6 @@
++++ ./meson.build
+@@ -569,7 +569,6 @@
      '-Wno-format-zero-length',
      # We explicitly require variadic macros
      '-Wno-variadic-macros',
@@ -8,7 +7,7 @@
      '-Werror=init-self',
      '-Werror=missing-include-dirs',
      '-Werror=pointer-arith',
-@@ -545,7 +544,6 @@
+@@ -695,7 +694,6 @@
    'getresuid',
    'getvfsstat',
    'gmtime_r',
@@ -16,7 +15,25 @@
    'inotify_init1',
    'issetugid',
    'kevent',
-@@ -907,7 +905,7 @@
+@@ -1001,7 +999,7 @@
+                int main (int argc, char ** argv) {
+                  syscall (__NR_futex, NULL, FUTEX_WAKE, FUTEX_WAIT);
+                  return 0;
+-               }''', name : 'futex(2) system call')
++               }''', name : 'futex(2) system call') and host_system != 'android'
+   glib_conf.set('HAVE_FUTEX', 1)
+ endif
+ if cc.compiles('''#include <linux/futex.h>
+@@ -1010,7 +1008,7 @@
+                int main (int argc, char ** argv) {
+                  syscall (__NR_futex_time64, NULL, FUTEX_WAKE, FUTEX_WAIT);
+                  return 0;
+-               }''', name : 'futex_time64(2) system call')
++               }''', name : 'futex_time64(2) system call') and host_system != 'android'
+   glib_conf.set('HAVE_FUTEX_TIME64', 1)
+ endif
+ 
+@@ -1047,7 +1045,7 @@
                   syscall (SYS_pidfd_open, 0, 0);
                   waitid (P_PIDFD, 0, &child_info, WEXITED | WNOHANG);
                   return 0;
@@ -25,21 +42,43 @@
    glib_conf.set('HAVE_PIDFD', 1)
  endif
  
-@@ -2092,7 +2090,7 @@
- # implementations. This could be extended if issues are found in some platforms.
+@@ -2264,7 +2262,7 @@
  libintl_deps = []
+ libintl_prefix = '#include <libintl.h>'
  libintl = dependency('intl', required: false)
--if libintl.found()
+-if libintl.found() and libintl.type_name() != 'internal'
 +if false
    # libintl supports different threading APIs, which may not
    # require additional flags, but it defaults to using pthreads if
    # found. Meson's "threads" dependency does not allow you to
-@@ -2114,7 +2112,7 @@
+@@ -2291,15 +2289,8 @@
    endif
  endif
  
--if libintl.found()
-+if true
-   have_bind_textdomain_codeset = cc.has_function('bind_textdomain_codeset', dependencies: libintl_deps)
- else
-   libintl = subproject('proxy-libintl').get_variable('intl_dep')
+-if libintl.found() and libintl.type_name() != 'internal'
+-  have_bind_textdomain_codeset = cc.has_function('bind_textdomain_codeset', dependencies: libintl_deps, prefix: libintl_prefix)
+-else
+-  # using proxy-libintl fallback
+-  libintl = dependency('intl', allow_fallback: true)
+-  assert(libintl.type_name() == 'internal')
+-  libintl_deps = [libintl]
+-  have_bind_textdomain_codeset = true  # proxy-libintl supports it
+-endif
++libintl_deps = []
++have_bind_textdomain_codeset = true  # proxy-libintl supports it
+ 
+ glib_conf.set('HAVE_BIND_TEXTDOMAIN_CODESET', have_bind_textdomain_codeset)
+ 
+@@ -2601,11 +2592,7 @@
+ 
+ # introspection
+ gir_scanner = find_program('g-ir-scanner', required: get_option('introspection'))
+-enable_gir = get_option('introspection').allowed() and gir_scanner.found() and meson.can_run_host_binaries()
+-
+-if get_option('introspection').enabled() and not meson.can_run_host_binaries()
+-  error('Running binaries on the build host needs to be supported to build with -Dintrospection=enabled')
+-endif
++enable_gir = get_option('introspection').allowed() and gir_scanner.found()
+ 
+ gir_args = [
+   '--quiet',

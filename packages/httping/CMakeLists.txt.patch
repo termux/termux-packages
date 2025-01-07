@@ -1,0 +1,21 @@
++++ ./CMakeLists.txt
+@@ -6,7 +6,7 @@
+ file (STRINGS "version" VERSION)
+ add_definitions(-DVERSION=\"${VERSION}\")
+ 
+-add_definitions(-DLOCALEDIR=\"/usr/share/locale\")
++add_definitions(-DLOCALEDIR=\"@TERMUX_PREFIX@/share/locale\")
+ 
+ add_executable(
+ 	httping
+@@ -63,3 +63,10 @@
+ 
+ configure_file(config.h.in config.h)
+ target_include_directories(httping PUBLIC "${PROJECT_BINARY_DIR}")
++
++include(GNUInstallDirs)
++install(TARGETS httping DESTINATION bin)
++install(FILES README.md LICENSE plot-json.py DESTINATION ${CMAKE_INSTALL_DOCDIR})
++install(FILES httping.1 DESTINATION ${CMAKE_INSTALL_MANDIR})
++install(FILES ${CMAKE_CURRENT_BINARY_DIR}/nl.mo DESTINATION ${CMAKE_INSTALL_LOCALEDIR})
++install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ru.mo DESTINATION ${CMAKE_INSTALL_LOCALEDIR})

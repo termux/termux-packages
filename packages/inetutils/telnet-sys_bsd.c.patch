@@ -1,0 +1,15 @@
+https://github.com/termux/termux-packages/issues/15852
+
+--- a/telnet/sys_bsd.c
++++ b/telnet/sys_bsd.c
+@@ -63,6 +63,10 @@
+ #include <sys/select.h>
+ #include <attribute.h>
+ 
++#ifdef __ANDROID__
++#include <termios.h>
++#endif
++
+ #include "ring.h"
+ 
+ #include "defines.h"

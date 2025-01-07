@@ -1,0 +1,29 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -34,7 +34,7 @@
+ 
+ if(WIN32)
+     add_compile_definitions(VK_USE_PLATFORM_WIN32_KHR)
+-elseif(ANDROID)
++elseif(0 AND ANDROID)
+     add_compile_definitions(VK_USE_PLATFORM_ANDROID_KHR)
+ elseif(!APPLE)
+     option(BUILD_WSI_XCB_SUPPORT "Build XCB WSI support" ON)
+--- a/layers/CMakeLists.txt
++++ b/layers/CMakeLists.txt
+@@ -70,13 +70,13 @@
+     elseif(APPLE)
+         message(DEBUG "Functions are exported via VEL_EXPORT")
+         set_target_properties(${extension_layer} PROPERTIES SUFFIX ".dylib")
+-    elseif(ANDROID)
++    elseif(0 AND ANDROID)
+         target_link_options(${extension_layer} PRIVATE LINKER:--version-script=${CMAKE_CURRENT_SOURCE_DIR}/lib${extension_layer}.map)
+     else()
+         target_link_options(${extension_layer} PRIVATE LINKER:--version-script=${CMAKE_CURRENT_SOURCE_DIR}/lib${extension_layer}.map,-Bsymbolic,--exclude-libs,ALL)
+     endif()
+ 
+-    if (ANDROID)
++    if (0 AND ANDROID)
+         install(TARGETS ${extension_layer} DESTINATION ${CMAKE_INSTALL_LIBDIR})
+         continue()
+     endif()

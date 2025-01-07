@@ -1,10 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://lxqt.github.io
 TERMUX_PKG_DESCRIPTION="A library to query system information"
 TERMUX_PKG_LICENSE="LGPL-2.1"
-TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
-TERMUX_PKG_VERSION="0.4.6"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="1.1.0"
 TERMUX_PKG_SRCURL="https://github.com/lxqt/libsysstat/releases/download/${TERMUX_PKG_VERSION}/libsysstat-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=e6c6383d6d6e0e67791be812329cb245035eed35e201e01088515e3ffefb13be
-TERMUX_PKG_DEPENDS="libc++, qt5-qtbase"
-TERMUX_PKG_BUILD_DEPENDS="lxqt-build-tools, qt5-qtbase-cross-tools"
+TERMUX_PKG_SHA256=996e5e8c43b1364a81a660b56956948c628e919f1d73554df6be152bbec8d430
+TERMUX_PKG_DEPENDS="libc++, qt6-qtbase"
+TERMUX_PKG_BUILD_DEPENDS="lxqt-build-tools"
 TERMUX_PKG_AUTO_UPDATE=true

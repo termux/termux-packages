@@ -1,0 +1,22 @@
+--- a/src/interp.c
++++ b/src/interp.c
+@@ -1540,6 +1540,10 @@
+     return;
+ }
+ 
++#ifdef USELOCALE
++#include <locale.h>
++#include <langinfo.h>
++#endif
+ 
+ /**
+  * \brief slet()
+@@ -1609,8 +1613,6 @@
+             // reconvert numeric value based on locale's D_FMT format instead of current format
+             char * f = &v->format[1];
+             #ifdef USELOCALE
+-            #include <locale.h>
+-            #include <langinfo.h>
+             char * loc = NULL;
+             f = NULL;
+             loc = setlocale(LC_TIME, "");

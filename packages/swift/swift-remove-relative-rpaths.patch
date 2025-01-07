@@ -1,0 +1,82 @@
+diff --git a/sourcekit-lsp/Utilities/build-script-helper.py b/sourcekit-lsp/Utilities/build-script-helper.py
+index bd31bec..737c8c3 100755
+--- a/sourcekit-lsp/Utilities/build-script-helper.py
++++ b/sourcekit-lsp/Utilities/build-script-helper.py
+@@ -124,7 +124,7 @@ def get_swiftpm_options(swift_exec: str, args: argparse.Namespace) -> List[str]:
+             'android-', args.cross_compile_host)):
+         swiftpm_args += [
+             '-Xlinker', '-landroid-spawn',
+-            '-Xlinker', '-rpath', '-Xlinker', '$ORIGIN/../lib/swift/android',
++            #'-Xlinker', '-rpath', '-Xlinker', '$ORIGIN/../lib/swift/android',
+             # SwiftPM will otherwise try to compile against GNU strerror_r on
+             # Android and fail.
+             '-Xswiftc', '-Xcc', '-Xswiftc', '-U_GNU_SOURCE',
+diff --git a/swift/cmake/modules/AddPureSwift.cmake b/swift/cmake/modules/AddPureSwift.cmake
+index ee668f96903..61397d3910e 100644
+--- a/swift/cmake/modules/AddPureSwift.cmake
++++ b/swift/cmake/modules/AddPureSwift.cmake
+@@ -65,7 +71,7 @@ function(_set_pure_swift_link_flags name relpath_to_lib_dir)
+       APPEND PROPERTY INSTALL_RPATH
+         # At runtime, use swiftCore in the current just-built toolchain.
+         # NOTE: This relies on the ABI being the same as the builder.
+-        "$ORIGIN/${relpath_to_lib_dir}swift/${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_LIB_SUBDIR}"
++        "$ORIGIN/${relpath_to_lib_dir}"
+     )
+     # NOTE: At this point we don't have any pure swift executables/shared
+     # libraries required for building runtime/stdlib. So we don't need to add
+diff --git a/swift/lib/SwiftSyntax/CMakeLists.txt b/swift/lib/SwiftSyntax/CMakeLists.txt
+index b39061073c9..a295f397d72 100644
+--- a/swift/lib/SwiftSyntax/CMakeLists.txt
++++ b/swift/lib/SwiftSyntax/CMakeLists.txt
+@@ -13,7 +13,7 @@ set(BUILD_SHARED_LIBS ON)
+ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${SWIFT_HOST_LIBRARIES_DEST_DIR}")
+ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${SWIFT_HOST_LIBRARIES_DEST_DIR}")
+ if(SWIFT_HOST_VARIANT_SDK MATCHES "LINUX|ANDROID|OPENBSD|FREEBSD")
+-  set(SWIFT_HOST_LIBRARIES_RPATH "$ORIGIN;$ORIGIN/../${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_LIB_SUBDIR}")
++  set(SWIFT_HOST_LIBRARIES_RPATH "$ORIGIN;$ORIGIN/../..")
+ endif()
+ # Add unique ABI prefix to swift-syntax libraries so that compiler libraries (e.g. sourcekitdInProc)
+ # can be used from tools that has its own swift-syntax libraries as SwiftPM dependencies.
+diff --git a/swift-corelibs-foundation/Sources/plutil/CMakeLists.txt b/swift-corelibs-foundation/Sources/plutil/CMakeLists.txt
+index b1c84350..35413f0b 100644
+--- a/swift-corelibs-foundation/Sources/plutil/CMakeLists.txt
++++ b/swift-corelibs-foundation/Sources/plutil/CMakeLists.txt
+@@ -27,9 +27,9 @@ if(NOT CMAKE_SYSTEM_NAME MATCHES "Darwin|Windows")
+ target_link_libraries(plutil PRIVATE
+ 	Foundation)
+ 
+-set_target_properties(plutil PROPERTIES
+-	INSTALL_RPATH "$ORIGIN/../lib/swift/${SWIFT_SYSTEM_NAME}"
+-    INSTALL_REMOVE_ENVIRONMENT_RPATH ON)
++# set_target_properties(plutil PROPERTIES
++#	INSTALL_RPATH "$ORIGIN/../lib/swift/${SWIFT_SYSTEM_NAME}"
++#    INSTALL_REMOVE_ENVIRONMENT_RPATH ON)
+ 
+ set_property(GLOBAL APPEND PROPERTY Foundation_EXPORTS plutil)
+ install(TARGETS plutil
+diff --git a/swift-driver/Utilities/build-script-helper.py b/swift-driver/Utilities/build-script-helper.py
+index ce6523d5..e8d63bdd 100755
+--- a/swift-driver/Utilities/build-script-helper.py
++++ b/swift-driver/Utilities/build-script-helper.py
+@@ -101,7 +101,7 @@ def get_swiftpm_options(args):
+     if '-android' in args.build_target:
+       swiftpm_args += [
+         '-Xlinker', '-landroid-spawn',
+-        '-Xlinker', '-rpath', '-Xlinker', '$ORIGIN/../lib/swift/android',
++        #'-Xlinker', '-rpath', '-Xlinker', '$ORIGIN/../lib/swift/android',
+         # SwiftPM will otherwise try to compile against GNU strerror_r on
+         # Android and fail.
+         '-Xswiftc', '-Xcc', '-Xswiftc', '-U_GNU_SOURCE',
+diff --git a/swiftpm/Utilities/bootstrap b/swiftpm/Utilities/bootstrap
+index 92c368a86..e9d43b599 100755
+--- a/swiftpm/Utilities/bootstrap
++++ b/swiftpm/Utilities/bootstrap
+@@ -746,7 +746,7 @@ def get_swiftpm_env_cmd(args):
+     env_cmd.append("SWIFTCI_USE_LOCAL_DEPS=1")
+     env_cmd.append("SWIFTPM_MACOS_DEPLOYMENT_TARGET=%s" % g_macos_deployment_target)
+ 
+-    if not '-macosx' in args.build_target and args.command == 'install':
++    if not '-android' in args.build_target and args.command == 'install':
+         env_cmd.append("SWIFTCI_INSTALL_RPATH_OS=%s" % args.platform_path.group(2))
+ 
+     if args.bootstrap:

@@ -2,10 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://gitlab.com/opennota/findimagedupes
 TERMUX_PKG_DESCRIPTION="Find visually similar or duplicate images"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-_COMMIT=47ca1d51be2bc1d437261d82157b84fe977ec934
-TERMUX_PKG_VERSION=2022.07.22
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SRCURL=https://gitlab.com/opennota/findimagedupes.git
+_COMMIT=07fc58e1a09128274170fa21c3ed322b54c29cad
+TERMUX_PKG_VERSION=2023.01.29
+TERMUX_PKG_REVISION=3
+TERMUX_PKG_SRCURL=git+https://gitlab.com/opennota/findimagedupes
+TERMUX_PKG_SHA256=4454e3d7be0148ef8c1cdfc5b57ad8805802cad15a55f4cbdf327405d0f29537
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_DEPENDS="file, libc++, libheif, libjpeg-turbo, libpng, libtiff"
 TERMUX_PKG_CONFLICTS="findimagedupes"
@@ -20,6 +22,11 @@ termux_step_post_get_source() {
 		echo -n "ERROR: The specified version \"$TERMUX_PKG_VERSION\""
 		echo " is different from what is expected to be: \"$version\""
 		return 1
+	fi
+
+	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum)
+	if [[ "${s}" != "${TERMUX_PKG_SHA256}  "* ]]; then
+		termux_error_exit "Checksum mismatch for source files."
 	fi
 }
 

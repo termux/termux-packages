@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.lua.org/
 TERMUX_PKG_DESCRIPTION="Shared library for the Lua interpreter"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=5.4.4
+TERMUX_PKG_VERSION=5.4.7
 TERMUX_PKG_SRCURL=https://www.lua.org/ftp/lua-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=164c7849653b80ae67bec4b7473b884bf5cc8d2dca05653475ec2ed27b9ebf61
+TERMUX_PKG_SHA256=9fbf5e28ef86c69858f6d3d34eccc32e911c1a28b4120ff3e84aaa70cfbf1e30
 TERMUX_PKG_EXTRA_MAKE_ARGS=linux-readline
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_BREAKS="liblua-dev"
@@ -20,7 +20,7 @@ termux_step_configure() {
 termux_step_pre_configure() {
 	OLDAR="$AR"
 	AR+=" rcu"
-	CFLAGS+=" -fPIC -DLUA_COMPAT_5_2 -DLUA_COMPAT_UNPACK"
+	CFLAGS+=" -fPIC -DLUA_COMPAT_5_3"
 	export MYLDFLAGS=$LDFLAGS
 }
 

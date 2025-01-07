@@ -1,0 +1,15 @@
+https://github.com/termux/termux-packages/issues/15852
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -221,8 +221,8 @@
+ # catch -Werror and similar options when running configure
+ AC_TRY_COMPILE([#include <stdio.h>],
+ [int i; int *p; char *c;
+-  switch (*p = p = *c) { case 0: printf("%Q", c, p); }
+-  *c = &i; c = p;
++  switch (*p = (int)(p = (int *)*c)) { case 0: printf("%Q", c, p); }
++  *c = (char)&i; c = p;
+   while (1 || (unsigned int)3 >= 0 || ((int)-1) == ((unsigned int)1));
+ ], , AC_MSG_ERROR("
+ configure is not able to compile programs with warnings.  Please

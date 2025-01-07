@@ -2,35 +2,34 @@ TERMUX_PKG_HOMEPAGE=https://cooklang.org
 TERMUX_PKG_DESCRIPTION="A suite of tools to create shopping lists and maintain food recipes"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
-TERMUX_PKG_MAINTAINER="@buttaface"
-TERMUX_PKG_VERSION=0.1.6
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SRCURL=https://github.com/CookLang/CookCLI/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=0ad919c950dad9375adaceb79a1cfc407a3ac776a8190de2a82fef30a02a5504
-TERMUX_PKG_DEPENDS="swift"
-TERMUX_PKG_BUILD_DEPENDS="swift"
-TERMUX_PKG_BLACKLISTED_ARCHES="i686"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="0.8.0"
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL=https://github.com/cooklang/cookcli/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=050fcbd7f8f938bd6ffc898a403795101807cfa6d76c787e991c8d90031405c6
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
-termux_step_make() {
-	termux_setup_swift
+termux_step_pre_configure() {
+	termux_setup_nodejs
+	termux_setup_rust
 
-	# This will check out the package dependencies, so one can be patched.
-	$SWIFT_BINDIR/swift package update
-
-	patch -p1 < $TERMUX_PKG_BUILDER_DIR/cook-dependencies.diff
-
-	local SWIFT_FLAGS=""
-	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
-		SWIFT_FLAGS="--destination $SWIFT_CROSSCOMPILE_CONFIG "
-		SWIFT_FLAGS+="-Xlinker -rpath -Xlinker \$ORIGIN/../lib:\$ORIGIN/../lib/swift/android"
-		export PKG_CONFIG_PATH=$PKG_CONFIG_LIBDIR
+	# i686: __atomic_load
+	if [[ "${TERMUX_ARCH}" == "i686" ]]; then
+		local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
+		export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C link-arg=$(${CC} -print-libgcc-file-name)"
 	fi
-	$SWIFT_BINDIR/swift build -c release -j $TERMUX_MAKE_PROCESSES $SWIFT_FLAGS
 }
+
+termux_step_make() {
+	pushd ui
+	npm install
+	npm run build
+	popd
+
+	cargo build --jobs "${TERMUX_PKG_MAKE_PROCESSES}" --target "${CARGO_TARGET_NAME}" --release
+}
+
 termux_step_make_install() {
-	install -Dm700 \
-		$TERMUX_PKG_SRCDIR/.build/$SWIFT_TARGET_TRIPLE/release/cook \
-		$TERMUX_PREFIX/bin
+	install -Dm755 -t "${TERMUX_PREFIX}/bin" "target/${CARGO_TARGET_NAME}/release/cook"
 }

@@ -12,6 +12,8 @@ TERMUX_PKG_REPLACES="expect-dev"
 
 termux_step_pre_configure() {
 	autoconf
+
+	CPPFLAGS+=" -DHAVE_SYS_WAIT_H"
 }
 
 termux_step_post_make_install() {

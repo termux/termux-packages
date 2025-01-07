@@ -1,5 +1,15 @@
---- ./w.c.orig	2021-02-09 10:11:25.000000000 +0000
-+++ ./w.c	2021-05-07 05:42:59.852135096 +0000
+--- a/w.c
++++ b/w.c
+@@ -57,6 +57,9 @@
+ #include <unistd.h>
+ #ifdef HAVE_UTMPX_H
+ #	include <utmpx.h>
++#ifdef __ANDROID__
++#	include <utmp.h>
++#endif
+ #else
+ #	include <utmp.h>
+ #endif
 @@ -207,13 +207,6 @@
  
  	if (ip_addresses) { /* -i switch used */

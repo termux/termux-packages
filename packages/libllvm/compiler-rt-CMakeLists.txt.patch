@@ -19,6 +19,17 @@
  set_property(CACHE SANITIZER_CXX_ABI PROPERTY STRINGS ;${CXXABIS})
  handle_default_cxx_lib(SANITIZER_CXX_ABI)
  
+@@ -532,6 +532,10 @@
+ 
+ if (COMPILER_RT_USE_BUILTINS_LIBRARY)
+   string(REPLACE "-Wl,-z,defs" "" CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}")
++  # https://github.com/termux/termux-packages/issues/15950
++  if (ANDROID)
++    list(APPEND SANITIZER_COMMON_LINK_FLAGS -l:libunwind.a)
++  endif()
+ else()
+   if (ANDROID)
+     append_list_if(COMPILER_RT_HAS_GCC_LIB gcc SANITIZER_COMMON_LINK_LIBS)
 @@ -438,6 +441,8 @@
    list(APPEND SANITIZER_CXX_ABI_LIBRARIES "c++abi")
  elseif (SANITIZER_CXX_ABI_LIBNAME STREQUAL "libstdc++")

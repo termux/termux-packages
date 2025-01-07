@@ -1,0 +1,16 @@
+diff --git a/src/server.rs b/src/server.rs
+index c61e524..af86f5b 100644
+--- a/src/server.rs
++++ b/src/server.rs
+@@ -46,8 +46,10 @@ use std::io::{self, Write};
+ use std::marker::Unpin;
+ #[cfg(feature = "dist-client")]
+ use std::mem;
+-#[cfg(any(target_os = "linux", target_os = "android"))]
++#[cfg(target_os = "linux")]
+ use std::os::linux::net::SocketAddrExt;
++#[cfg(target_os = "android")]
++use std::os::android::net::SocketAddrExt;
+ use std::path::PathBuf;
+ use std::pin::Pin;
+ use std::process::{ExitStatus, Output};

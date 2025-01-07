@@ -1,0 +1,23 @@
+--- src/thirdparty/embree/common/sys/thread.cpp	2023-12-26 12:19:13.350998846 +0300
++++ src/thirdparty/embree/common/sys/thread.cpp.patch	2023-12-26 12:20:30.020998817 +0300
+@@ -163,6 +163,20 @@
+ 
+ #if defined(__LINUX__) && !defined(__ANDROID__)
+ 
++#if defined(__BIONIC__)
++static inline int pthread_setaffinity_np(pthread_t thread, size_t cpusetsize,
++                                         cpu_set_t *cpuset) {
++  assert(pthread_equal(pthread_self(), thread));
++  return sched_setaffinity(0, cpusetsize, cpuset);
++}
++
++static inline int pthread_getaffinity_np(pthread_t thread, size_t cpusetsize,
++                                         cpu_set_t *cpuset) {
++  assert(pthread_equal(pthread_self(), thread));
++  return sched_getaffinity(0, cpusetsize, cpuset);
++}
++#endif
++
+ #include <fstream>
+ #include <sstream>
+ #include <algorithm>

@@ -168,14 +168,14 @@ diff -uNr util-linux-2.36.1/libblkid/src/topology/dm.c util-linux-2.36.1.mod/lib
 @@ -30,9 +30,8 @@
  		const struct blkid_idmag *mag __attribute__((__unused__)))
  {
- 	const char *paths[] = {
+ 	const char * const paths[] = {
 -		"/usr/local/sbin/dmsetup",
 -		"/usr/sbin/dmsetup",
 -		"/sbin/dmsetup"
 +		"@TERMUX_PREFIX@/bin/dmsetup",
 +		"@TERMUX_PREFIX@/sbin/dmsetup"
  	};
- 	int dmpipe[] = { -1, -1 }, stripes, stripesize;
+ 	int dmpipe[] = { -1, -1 }, stripes = 0, stripesize = 0;
  	const char *cmd = NULL;
 diff -uNr util-linux-2.36.1/libblkid/src/topology/lvm.c util-linux-2.36.1.mod/libblkid/src/topology/lvm.c
 --- util-linux-2.36.1/libblkid/src/topology/lvm.c	2017-09-18 09:48:03.563891490 +0000
@@ -183,7 +183,7 @@ diff -uNr util-linux-2.36.1/libblkid/src/topology/lvm.c util-linux-2.36.1.mod/li
 @@ -36,9 +36,8 @@
  		const struct blkid_idmag *mag __attribute__((__unused__)))
  {
- 	const char *paths[] = {
+ 	const char * const paths[] = {
 -		"/usr/local/sbin/lvdisplay",
 -		"/usr/sbin/lvdisplay",
 -		"/sbin/lvdisplay"
@@ -204,9 +204,8 @@ diff -uNr util-linux-2.36.1/libmount/src/cache.c util-linux-2.36.1.mod/libmount/
  		struct loopdev_cxt lc;
  
  		if (loopcxt_init(&lc, 0) || loopcxt_set_device(&lc, pretty))
-diff -uNr util-linux-2.36.1/libmount/src/context_loopdev.c util-linux-2.36.1.mod/libmount/src/context_loopdev.c
---- util-linux-2.36.1/libmount/src/context_loopdev.c	2020-03-03 10:16:39.603294025 +0000
-+++ util-linux-2.36.1.mod/libmount/src/context_loopdev.c	2020-11-22 21:23:17.002470086 +0000
+--- a/libmount/src/hook_loopdev.c
++++ b/libmount/src/hook_loopdev.c
 @@ -129,7 +129,7 @@
  
  		rc = 0;
@@ -215,7 +214,7 @@ diff -uNr util-linux-2.36.1/libmount/src/context_loopdev.c util-linux-2.36.1.mod
 +		if (strncmp(src, "/dev/block/loop", 15) == 0) {
  			rc = loopdev_is_used((char *) src, bf, offset, 0, LOOPDEV_FL_OFFSET);
  
- 		} else if (opts && (cxt->user_mountflags & MNT_MS_LOOP) &&
+ 		} else if (opts && (flags & MNT_MS_LOOP) &&
 diff -uNr util-linux-2.36.1/libmount/src/tab.c util-linux-2.36.1.mod/libmount/src/tab.c
 --- util-linux-2.36.1/libmount/src/tab.c	2020-11-10 09:25:56.568810004 +0000
 +++ util-linux-2.36.1.mod/libmount/src/tab.c	2020-11-22 21:23:17.002470086 +0000
@@ -228,18 +227,6 @@ diff -uNr util-linux-2.36.1/libmount/src/tab.c util-linux-2.36.1.mod/libmount/sr
  				continue;	/* does not look like loopdev */
  
  			if (mnt_fs_get_option(fstab_fs, "offset", &val, &len) == 0) {
-diff -uNr util-linux-2.36.1/libuuid/src/uuidP.h util-linux-2.36.1.mod/libuuid/src/uuidP.h
---- util-linux-2.36.1/libuuid/src/uuidP.h	2020-07-01 10:35:59.983754261 +0000
-+++ util-linux-2.36.1.mod/libuuid/src/uuidP.h	2020-11-22 21:23:17.003470085 +0000
-@@ -39,7 +39,7 @@
- 
- #include "uuid.h"
- 
--#define LIBUUID_CLOCK_FILE	"/var/lib/libuuid/clock.txt"
-+#define LIBUUID_CLOCK_FILE	"@TERMUX_PREFIX@/var/lib/libuuid/clock.txt"
- 
- /*
-  * Offset between 15-Oct-1582 and 1-Jan-70
 diff -uNr util-linux-2.36.1/libuuid/src/uuidd.h util-linux-2.36.1.mod/libuuid/src/uuidd.h
 --- util-linux-2.36.1/libuuid/src/uuidd.h	2020-11-16 10:41:16.342846207 +0000
 +++ util-linux-2.36.1.mod/libuuid/src/uuidd.h	2020-11-22 21:23:17.003470085 +0000

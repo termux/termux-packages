@@ -1,0 +1,126 @@
+<?xml version="1.0"?>
+<dump>
+  <class name="GeditMenuExtension" get-type="gedit_menu_extension_get_type" parents="GObject">
+    <property name="menu" type="GMenu" flags="235"/>
+  </class>
+  <interface name="GeditAppActivatable" get-type="gedit_app_activatable_get_type">
+    <property name="app" type="GeditApp" flags="235"/>
+  </interface>
+  <class name="GeditDocument" get-type="gedit_document_get_type" parents="TeplBuffer,GtkSourceBuffer,GtkTextBuffer,GObject">
+    <property name="content-type" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="mime-type" type="gchararray" flags="225" default-value="text/plain"/>
+    <property name="empty-search" type="gboolean" flags="225" default-value="TRUE"/>
+    <signal name="load" return="void" when="last">
+    </signal>
+    <signal name="loaded" return="void" when="first">
+    </signal>
+    <signal name="save" return="void" when="last">
+    </signal>
+    <signal name="saved" return="void" when="first">
+    </signal>
+  </class>
+  <class name="GeditView" get-type="gedit_view_get_type" parents="TeplView,GtkSourceView,GtkTextView,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkScrollable"/>
+    <signal name="drop-uris" return="void" when="last" action="1">
+      <param type="GStrv"/>
+    </signal>
+  </class>
+  <class name="GeditTab" get-type="gedit_tab_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="name" type="gchararray" flags="-2147483423" default-value="NULL"/>
+    <property name="state" type="GeditTabState" flags="225" default-value="GEDIT_TAB_STATE_NORMAL"/>
+    <property name="autosave" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="autosave-interval" type="gint" flags="227" default-value="0"/>
+    <property name="can-close" type="gboolean" flags="225" default-value="TRUE"/>
+  </class>
+  <class name="GeditMessage" get-type="gedit_message_get_type" parents="GObject">
+    <property name="object-path" type="gchararray" flags="231" default-value="NULL"/>
+    <property name="method" type="gchararray" flags="231" default-value="NULL"/>
+  </class>
+  <class name="GeditMessageBus" get-type="gedit_message_bus_get_type" parents="GObject">
+    <signal name="dispatch" return="void" when="last">
+      <param type="GeditMessage"/>
+    </signal>
+    <signal name="registered" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="unregistered" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+  </class>
+  <class name="GeditWindow" get-type="gedit_window_get_type" parents="GtkApplicationWindow,GtkWindow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GActionGroup"/>
+    <implements name="GActionMap"/>
+    <property name="state" type="GeditWindowState" flags="225" default-value="GEDIT_WINDOW_STATE_NORMAL"/>
+    <signal name="tab-added" return="void" when="first">
+      <param type="GeditTab"/>
+    </signal>
+    <signal name="tab-removed" return="void" when="first">
+      <param type="GeditTab"/>
+    </signal>
+    <signal name="active-tab-changed" return="void" when="first">
+    </signal>
+  </class>
+  <class name="GeditApp" get-type="gedit_app_get_type" parents="GtkApplication,GApplication,GObject">
+    <implements name="GActionGroup"/>
+    <implements name="GActionMap"/>
+  </class>
+  <class name="GeditEncodingsComboBox" get-type="gedit_encodings_combo_box_get_type" parents="GtkComboBox,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkCellLayout"/>
+    <implements name="GtkCellEditable"/>
+    <property name="save-mode" type="gboolean" flags="231" default-value="FALSE"/>
+  </class>
+  <class name="GeditStatusbar" get-type="gedit_statusbar_get_type" parents="GtkStatusbar,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+  </class>
+  <interface name="GeditViewActivatable" get-type="gedit_view_activatable_get_type">
+    <property name="view" type="GeditView" flags="235"/>
+  </interface>
+  <interface name="GeditWindowActivatable" get-type="gedit_window_activatable_get_type">
+    <property name="window" type="GeditWindow" flags="235"/>
+  </interface>
+  <flags name="GeditDebugSection" get-type="gedit_debug_section_get_type">
+    <member name="GEDIT_NO_DEBUG" nick="no-debug" value="0"/>
+    <member name="GEDIT_DEBUG_PREFS" nick="debug-prefs" value="1"/>
+    <member name="GEDIT_DEBUG_WINDOW" nick="debug-window" value="2"/>
+    <member name="GEDIT_DEBUG_PANEL" nick="debug-panel" value="4"/>
+    <member name="GEDIT_DEBUG_PLUGINS" nick="debug-plugins" value="8"/>
+    <member name="GEDIT_DEBUG_TAB" nick="debug-tab" value="16"/>
+    <member name="GEDIT_DEBUG_DOCUMENT" nick="debug-document" value="32"/>
+    <member name="GEDIT_DEBUG_COMMANDS" nick="debug-commands" value="64"/>
+    <member name="GEDIT_DEBUG_APP" nick="debug-app" value="128"/>
+    <member name="GEDIT_DEBUG_UTILS" nick="debug-utils" value="256"/>
+  </flags>
+  <enum name="GeditTabState" get-type="gedit_tab_state_get_type">
+    <member name="GEDIT_TAB_STATE_NORMAL" nick="normal" value="0"/>
+    <member name="GEDIT_TAB_STATE_LOADING" nick="loading" value="1"/>
+    <member name="GEDIT_TAB_STATE_REVERTING" nick="reverting" value="2"/>
+    <member name="GEDIT_TAB_STATE_SAVING" nick="saving" value="3"/>
+    <member name="GEDIT_TAB_STATE_PRINTING" nick="printing" value="4"/>
+    <member name="GEDIT_TAB_STATE_SHOWING_PRINT_PREVIEW" nick="showing-print-preview" value="5"/>
+    <member name="GEDIT_TAB_STATE_LOADING_ERROR" nick="loading-error" value="6"/>
+    <member name="GEDIT_TAB_STATE_REVERTING_ERROR" nick="reverting-error" value="7"/>
+    <member name="GEDIT_TAB_STATE_SAVING_ERROR" nick="saving-error" value="8"/>
+    <member name="GEDIT_TAB_STATE_GENERIC_ERROR" nick="generic-error" value="9"/>
+    <member name="GEDIT_TAB_STATE_CLOSING" nick="closing" value="10"/>
+    <member name="GEDIT_TAB_STATE_EXTERNALLY_MODIFIED_NOTIFICATION" nick="externally-modified-notification" value="11"/>
+  </enum>  <flags name="GeditWindowState" get-type="gedit_window_state_get_type">
+    <member name="GEDIT_WINDOW_STATE_NORMAL" nick="normal" value="0"/>
+    <member name="GEDIT_WINDOW_STATE_SAVING" nick="saving" value="2"/>
+    <member name="GEDIT_WINDOW_STATE_PRINTING" nick="printing" value="4"/>
+    <member name="GEDIT_WINDOW_STATE_LOADING" nick="loading" value="8"/>
+    <member name="GEDIT_WINDOW_STATE_ERROR" nick="error" value="16"/>
+  </flags>
+</dump>

@@ -5,6 +5,8 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.7.2
 TERMUX_PKG_SRCURL=https://github.com/carlobaldassi/gimp-lqr-plugin/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=a01ffdfc04e97167413b4bb11516d3bad28dadb84bbfacb5e6ed21959483ebe1
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 TERMUX_PKG_DEPENDS="gdk-pixbuf, gimp, glib, gtk2, liblqr"
 
 termux_step_pre_configure() {

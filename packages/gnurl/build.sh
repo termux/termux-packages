@@ -5,9 +5,10 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=7.72.0
 TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/gnunet/gnurl-$TERMUX_PKG_VERSION.tar.Z
 TERMUX_PKG_SHA256=45b4e3cc1f052b2d56d076c276f65358e6f643b217d72b9a35e7a945f8601668
-TERMUX_PKG_DEPENDS="libgnutls, libnghttp2"
+TERMUX_PKG_DEPENDS="brotli, libgnutls, libidn2, libnettle, zlib, zstd"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+ac_cv_func_getpwuid=yes
 --disable-dict \
 --disable-file \
 --disable-ftp \

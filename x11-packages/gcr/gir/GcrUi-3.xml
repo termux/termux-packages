@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+<dump>
+  <interface name="GcrViewer" get-type="gcr_viewer_get_type">
+    <prerequisite name="GtkWidget"/>
+  </interface>
+  <interface name="GcrRenderer" get-type="gcr_renderer_get_type">
+    <property name="attributes" type="GckAttributes" flags="227"/>
+    <property name="label" type="gchararray" flags="227" default-value=""/>
+    <signal name="data-changed" return="void" when="last">
+    </signal>
+  </interface>
+  <class name="GcrCertificateRenderer" get-type="gcr_certificate_renderer_get_type" parents="GObject">
+    <implements name="GcrRenderer"/>
+    <implements name="GcrComparable"/>
+    <implements name="GcrCertificate"/>
+    <property name="certificate" type="GcrCertificate" flags="227"/>
+    <property name="label" type="gchararray" flags="227" default-value=""/>
+    <property name="attributes" type="GckAttributes" flags="227"/>
+  </class>
+  <class name="GcrCertificateWidget" get-type="gcr_certificate_widget_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="certificate" type="GcrCertificate" flags="227"/>
+    <property name="attributes" type="GckAttributes" flags="227"/>
+  </class>
+  <class name="GcrCollectionModel" get-type="gcr_collection_model_get_type" parents="GObject">
+    <implements name="GtkTreeModel"/>
+    <implements name="GtkTreeSortable"/>
+    <property name="collection" type="GcrCollection" flags="227"/>
+    <property name="columns" type="gpointer" flags="235"/>
+    <property name="mode" type="GcrCollectionModelMode" flags="235" default-value="GCR_COLLECTION_MODEL_TREE"/>
+  </class>
+  <class name="GcrComboSelector" get-type="gcr_combo_selector_get_type" parents="GtkComboBox,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkCellLayout"/>
+    <implements name="GtkCellEditable"/>
+    <property name="collection" type="GcrCollection" flags="235"/>
+  </class>
+  <class name="GcrKeyRenderer" get-type="gcr_key_renderer_get_type" parents="GObject">
+    <implements name="GcrRenderer"/>
+    <property name="object" type="GckObject" flags="227"/>
+  </class>
+  <class name="GcrKeyWidget" get-type="gcr_key_widget_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="attributes" type="GckAttributes" flags="227"/>
+  </class>
+  <class name="GcrFailureRenderer" get-type="gcr_failure_renderer_get_type" parents="GObject">
+    <implements name="GcrRenderer"/>
+    <property name="label" type="gchararray" flags="227" default-value=""/>
+    <property name="attributes" type="GckAttributes" flags="227"/>
+  </class>
+  <class name="GcrImportButton" get-type="gcr_import_button_get_type" parents="GtkButton,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkActionable"/>
+    <implements name="GtkActivatable"/>
+    <signal name="importing" return="void" when="last">
+      <param type="GObject"/>
+    </signal>
+    <signal name="imported" return="void" when="last">
+      <param type="GObject"/>
+      <param type="GError"/>
+    </signal>
+  </class>
+  <class name="GcrListSelector" get-type="gcr_list_selector_get_type" parents="GtkTreeView,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkScrollable"/>
+    <property name="collection" type="GcrCollection" flags="235"/>
+  </class>
+  <class name="GcrPromptDialog" get-type="gcr_prompt_dialog_get_type" parents="GtkDialog,GtkWindow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GcrPrompt"/>
+    <property name="password-visible" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="confirm-visible" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="warning-visible" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="choice-visible" type="gboolean" flags="225" default-value="FALSE"/>
+  </class>
+  <class name="GcrSecureEntryBuffer" get-type="gcr_secure_entry_buffer_get_type" parents="GtkEntryBuffer,GObject">
+  </class>
+  <class name="GcrTreeSelector" get-type="gcr_tree_selector_get_type" parents="GtkTreeView,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkScrollable"/>
+    <property name="collection" type="GcrCollection" flags="235"/>
+    <property name="columns" type="gpointer" flags="235"/>
+  </class>
+  <class name="GcrUnlockOptionsWidget" get-type="gcr_unlock_options_widget_get_type" parents="GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <property name="choice" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="ttl" type="guint" flags="227" default-value="0"/>
+  </class>
+  <class name="GcrViewerWidget" get-type="gcr_viewer_widget_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="parser" type="GcrParser" flags="225"/>
+    <property name="display-name" type="gchararray" flags="227" default-value="NULL"/>
+    <signal name="added" return="void" when="last">
+      <param type="GObject"/>
+      <param type="GcrParsed"/>
+    </signal>
+  </class>
+</dump>

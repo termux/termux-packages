@@ -1,0 +1,31 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -41,7 +41,7 @@
+ 
+     # Allow usage of unsafe CRT functions and minimize what Windows.h leaks
+     add_compile_definitions(_CRT_SECURE_NO_WARNINGS NOMINMAX WIN32_LEAN_AND_MEAN)
+-elseif(ANDROID)
++elseif(0 AND ANDROID)
+     add_compile_definitions(VK_USE_PLATFORM_ANDROID_KHR)
+ elseif(APPLE)
+     add_compile_definitions(VK_USE_PLATFORM_METAL_EXT)
+--- a/layers/CMakeLists.txt
++++ b/layers/CMakeLists.txt
+@@ -350,7 +350,7 @@
+ endif()
+     # Both Apple and IOS
+     target_link_options(vvl PRIVATE -exported_symbols_list ${CMAKE_CURRENT_SOURCE_DIR}/${LAYER_NAME}.exp)
+-elseif(ANDROID)
++elseif(0 AND ANDROID)
+     target_link_options(vvl PRIVATE LINKER:--version-script=${CMAKE_CURRENT_SOURCE_DIR}/${LAYER_NAME}-android.map)
+ else()
+     target_link_options(vvl PRIVATE LINKER:--version-script=${CMAKE_CURRENT_SOURCE_DIR}/${LAYER_NAME}.map)
+@@ -384,7 +384,7 @@
+ 
+ target_include_directories(vvl SYSTEM PRIVATE external)
+ 
+-if (ANDROID)
++if (0 AND ANDROID)
+     # https://gitlab.kitware.com/cmake/cmake/issues/18787
+     # https://github.com/android-ndk/ndk/issues/463
+     # "Users should be able to reliably use the toolchain provided by the NDK r23 or later when using CMake 3.21 or later" - Professional CMake

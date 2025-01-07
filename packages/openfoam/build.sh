@@ -2,12 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://www.openfoam.com
 TERMUX_PKG_DESCRIPTION="OpenFOAM is a CFD software written in C++"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_VERSION=2206
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://develop.openfoam.com/Development/openfoam/-/archive/OpenFOAM-v${TERMUX_PKG_VERSION}/openfoam-OpenFOAM-v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=a6e86053bee3ae5f1c83f1c74414512849e813b4cde917c37b2f3066b30665fb
-TERMUX_PKG_DEPENDS="openmpi, flex, boost, cgal, fftw, readline, libc++, libandroid-execinfo"
-TERMUX_PKG_BUILD_DEPENDS="boost-headers"
+TERMUX_PKG_VERSION=2406
+TERMUX_PKG_SRCURL=https://develop.openfoam.com/Development/openfoam/-/archive/OpenFOAM-v${TERMUX_PKG_VERSION}/openfoam-OpenFOAM-v${TERMUX_PKG_VERSION}.tar.bz2
+TERMUX_PKG_SHA256=f2cfe4af8d0e06aded6130850a21ba911fa1dbe3a008d8c2b6713b77e5c8dc53
+TERMUX_PKG_DEPENDS="boost, libc++, libgmp, libmpfr, openmpi, readline, zlib"
+TERMUX_PKG_BUILD_DEPENDS="boost-headers, cgal, flex, libandroid-execinfo"
 TERMUX_PKG_GROUPS="science"
 TERMUX_PKG_RM_AFTER_INSTALL="opt/OpenFOAM-v${TERMUX_PKG_VERSION}/build"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -78,10 +77,10 @@ termux_step_make() {
 	source "$TERMUX_PKG_SRCDIR"/etc/bashrc || true
 	set -u
 	unset LD_LIBRARY_PATH
-	./Allwmake
+	./Allwmake -j
 	cd wmake/src
 	make clean
-	make
+	make -j $TERMUX_PKG_MAKE_PROCESSES
 }
 
 termux_step_make_install() {

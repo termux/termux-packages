@@ -3,15 +3,15 @@ TERMUX_PKG_DESCRIPTION="Simple, fast and user-friendly alternative to find"
 TERMUX_PKG_LICENSE="Apache-2.0,MIT"
 TERMUX_PKG_LICENSE_FILE="LICENSE-APACHE,LICENSE-MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="8.6.0"
+TERMUX_PKG_VERSION="10.2.0"
 TERMUX_PKG_SRCURL=https://github.com/sharkdp/fd/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=e71a139f9ca20f63bab3700d5f8810bc12ef2c4fc6e1dd680f5c96fa9d1d2834
+TERMUX_PKG_SHA256=73329fe24c53f0ca47cd0939256ca5c4644742cb7c14cf4114c8c9871336d342
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
 	termux_setup_rust
-	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
+	cargo build --jobs $TERMUX_PKG_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
 }
 
 termux_step_make_install() {

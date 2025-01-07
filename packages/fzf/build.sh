@@ -1,16 +1,16 @@
-TERMUX_PKG_HOMEPAGE=https://github.com/junegunn/fzf
+TERMUX_PKG_HOMEPAGE=https://junegunn.github.io/fzf/
 TERMUX_PKG_DESCRIPTION="Command-line fuzzy finder"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.35.1"
-TERMUX_PKG_SRCURL=https://github.com/junegunn/fzf/archive/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=d59ec6f2b6e95dad53bb81f758471e066c657be1b696f2fe569e1a9265dda8fe
-TERMUX_PKG_DEPENDS="ncurses-utils,tmux"
+TERMUX_PKG_VERSION="0.57.0"
+TERMUX_PKG_SRCURL=https://github.com/junegunn/fzf/archive/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=d4e8e25fad2d3f75943b403c40b61326db74b705bf629c279978fdd0ceb1f97c
 TERMUX_PKG_AUTO_UPDATE=true
 
 # Depend on findutils as fzf uses the -fstype option, which busybox
 # find does not support, when invoking find:
-TERMUX_PKG_DEPENDS="bash, findutils"
+TERMUX_PKG_DEPENDS="bash, findutils, ncurses-utils"
+TERMUX_PKG_SUGGESTS="tmux"
 
 termux_step_pre_configure() {
 	# Certain packages are not safe to build on device because their
@@ -49,13 +49,13 @@ termux_step_make_install() {
 	# Install the rest of the shell scripts:
 	mkdir -p $TERMUX_PREFIX/share/fzf
 	cp $TERMUX_PKG_SRCDIR/shell/* $TERMUX_PREFIX/share/fzf/
-	
+
 	# Symlink shell completions.
 	mkdir -p $TERMUX_PREFIX/share/bash-completion/completions/
 	ln -sfr $TERMUX_PREFIX/share/fzf/completion.bash $TERMUX_PREFIX/share/bash-completion/completions/fzf
 	mkdir -p $TERMUX_PREFIX/share/zsh/site-functions
 	ln -sfr $TERMUX_PREFIX/share/fzf/completion.zsh $TERMUX_PREFIX/share/zsh/site-functions/_fzf
-	
+
 	# Fish keybindings.
 	mkdir -p $TERMUX_PREFIX/share/fish/vendor_functions.d
 	ln -sfr $TERMUX_PREFIX/share/fzf/key-bindings.fish $TERMUX_PREFIX/share/fish/vendor_functions.d/fzf_key_bindings.fish

@@ -1,0 +1,20 @@
+They are conflict with libcxx headers.
+
+--- a/Source/WTF/wtf/StdLibExtras.h
++++ b/Source/WTF/wtf/StdLibExtras.h
+@@ -291,6 +291,7 @@
+ 
+ // This adds various C++14 features for versions of the STL that may not yet have them.
+ namespace std {
++#if __cplusplus < 201300
+ // MSVC 2013 supports std::make_unique already.
+ #if !defined(_MSC_VER) || _MSC_VER < 1800
+ template<class T> struct _Unique_if {
+@@ -371,6 +372,7 @@
+ }
+ }
+ #endif
++#endif
+ 
+ template<WTF::CheckMoveParameterTag, typename T>
+ ALWAYS_INLINE constexpr typename remove_reference<T>::type&& move(T&& value)

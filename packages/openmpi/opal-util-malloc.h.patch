@@ -1,0 +1,20 @@
+https://github.com/termux/termux-packages/issues/15852
+
+--- a/opal/util/malloc.h
++++ b/opal/util/malloc.h
+@@ -18,6 +18,9 @@
+ 
+ /** @file */
+ 
++#include_next <malloc.h>
++#ifdef BEGIN_C_DECLS
++
+ #ifndef OPAL_MALLOC_H
+ #define OPAL_MALLOC_H
+ 
+@@ -143,3 +146,5 @@
+ END_C_DECLS
+ 
+ #endif /* OPAL_MALLOC_H */
++
++#endif

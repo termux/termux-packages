@@ -15,6 +15,11 @@ termux_step_start_build() {
 		exit 0
 	fi
 
+	if [ -n "$TERMUX_PKG_PYTHON_COMMON_DEPS" ] || [[ "$TERMUX_ON_DEVICE_BUILD" = "false" && -n "$TERMUX_PKG_PYTHON_BUILD_DEPS" ]] || [[ "$TERMUX_ON_DEVICE_BUILD" = "true" && -n "$TERMUX_PKG_PYTHON_TARGET_DEPS" ]]; then
+		# Enable python setting
+		TERMUX_PKG_SETUP_PYTHON=true
+	fi
+
 	TERMUX_PKG_FULLVERSION=$TERMUX_PKG_VERSION
 	if [ "$TERMUX_PKG_REVISION" != "0" ] || [ "$TERMUX_PKG_FULLVERSION" != "${TERMUX_PKG_FULLVERSION/-/}" ]; then
 		# "0" is the default revision, so only include it if the upstream versions contains "-" itself
@@ -78,19 +83,36 @@ termux_step_start_build() {
 		# a continued build
 		return
 	fi
-	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
-		case "$TERMUX_APP_PACKAGE_MANAGER" in
-			"apt") apt install -y termux-elf-cleaner;;
-			"pacman") pacman -S termux-elf-cleaner --needed --noconfirm;;
-		esac
-		TERMUX_ELF_CLEANER="$(command -v termux-elf-cleaner)"
-	else
-		local TERMUX_ELF_CLEANER_VERSION
-		TERMUX_ELF_CLEANER_VERSION=$(bash -c ". $TERMUX_SCRIPTDIR/packages/termux-elf-cleaner/build.sh; echo \$TERMUX_PKG_VERSION")
-		termux_download \
-			"https://github.com/termux/termux-elf-cleaner/releases/download/v${TERMUX_ELF_CLEANER_VERSION}/termux-elf-cleaner" \
-			"$TERMUX_ELF_CLEANER" \
-			7c29143b9cffb3a9a580f39a7966b2bb36c5fc099da6f4c98dcdedacb14f08a2
-		chmod u+x "$TERMUX_ELF_CLEANER"
+
+	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ] && [ "$TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED" = "true" ]; then
+		termux_error_exit "Package '$TERMUX_PKG_NAME' is not available for on-device builds."
+	fi
+
+	if [ "$TERMUX_PACKAGE_LIBRARY" = "bionic" ]; then
+		if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
+			case "$TERMUX_APP_PACKAGE_MANAGER" in
+				"apt") apt install -y termux-elf-cleaner;;
+				"pacman") pacman -S termux-elf-cleaner --needed --noconfirm;;
+			esac
+			TERMUX_ELF_CLEANER="$(command -v termux-elf-cleaner)"
+		else
+			local TERMUX_ELF_CLEANER_VERSION
+			TERMUX_ELF_CLEANER_VERSION=$(bash -c ". $TERMUX_SCRIPTDIR/packages/termux-elf-cleaner/build.sh; echo \$TERMUX_PKG_VERSION")
+			termux_download \
+				"https://github.com/termux/termux-elf-cleaner/releases/download/v${TERMUX_ELF_CLEANER_VERSION}/termux-elf-cleaner" \
+				"$TERMUX_ELF_CLEANER" \
+				2c57aa961e25dfe44feb87030da3b0e54d314c110b8be6ffede39806ac356cd6
+			chmod u+x "$TERMUX_ELF_CLEANER"
+		fi
+
+		# Some packages search for libutil, libpthread and librt even
+		# though this functionality is provided by libc.  Provide
+		# library stubs so that such configure checks succeed.
+		mkdir -p "$TERMUX_PREFIX/lib"
+		for lib in libutil.so libpthread.so librt.so; do
+			if [ ! -f $TERMUX_PREFIX/lib/$lib ]; then
+				echo 'INPUT(-lc)' > $TERMUX_PREFIX/lib/$lib
+			fi
+		done
 	fi
 }

@@ -1,0 +1,12 @@
+diff '--color=auto' -uNr gomp/config/config.go gomp.mod/config/config.go
+--- gomp/config/config.go	2022-12-31 13:10:30.535490729 +0530
++++ gomp.mod/config/config.go	2022-12-31 13:11:37.414400547 +0530
+@@ -113,7 +113,7 @@
+ 
+ func ParseMPDConfig() {
+ 	uwconf := ConfigDir + "/mpd/mpd.conf"
+-	swconf := "/etc/mpd.conf"
++	swconf := "@TERMUX_PREFIX@/etc/mpd.conf"
+ 	set_defaults := func(path string) {
+ 		m := conf.GenerateMap(path)
+ 		if val, ok := m["music_directory"]; ok {

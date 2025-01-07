@@ -2,13 +2,13 @@ TERMUX_PKG_HOMEPAGE=https://www.imagemagick.org/
 TERMUX_PKG_DESCRIPTION="Suite to create, edit, compose, or convert images in a variety of formats"
 TERMUX_PKG_LICENSE="ImageMagick"
 TERMUX_PKG_MAINTAINER="@termux"
-_VERSION=7.1.0-55
-TERMUX_PKG_VERSION=${_VERSION//-/.}
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="7.1.1.43"
+_VERSION="${TERMUX_PKG_VERSION%.*}-${TERMUX_PKG_VERSION##*.}"
 #TERMUX_PKG_SRCURL=https://github.com/ImageMagick/ImageMagick/archive/refs/tags/${_VERSION}.tar.gz
 TERMUX_PKG_SRCURL=https://imagemagick.org/archive/releases/ImageMagick-${_VERSION}.tar.xz
-TERMUX_PKG_SHA256=ee06d385bb5c92a57aefb1c64abe5107728b8f8448195843e6d8cf142a5b3191
-TERMUX_PKG_DEPENDS="fftw, fontconfig, freetype, gdk-pixbuf, glib, harfbuzz, libandroid-support, libbz2, libc++, libcairo, libheif, libjpeg-turbo, libjxl, liblzma, libpng, librsvg, libtiff, libwebp, libx11, libxext, libxml2, littlecms, openexr, openjpeg, pango, zlib"
+TERMUX_PKG_SHA256=fa79401342b409b9b7f7d3146bd6595787373811e72be1669c39b58d1489da4f
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="fftw, fontconfig, freetype, gdk-pixbuf, glib, harfbuzz, imath, libandroid-support, libbz2, libc++, libcairo, libheif, libjpeg-turbo, libjxl, liblzma, libpng, libraw, librsvg, libtiff, libwebp, libx11, libxext, libxml2, littlecms, openexr, openjpeg, pango, zlib"
 TERMUX_PKG_BREAKS="imagemagick-dev, imagemagick-x"
 TERMUX_PKG_REPLACES="imagemagick-dev, imagemagick-x"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -31,7 +31,11 @@ share/ImageMagick-7/francais.xml
 "
 
 termux_step_pre_configure() {
-	export LDFLAGS+=" $($CC -print-libgcc-file-name)"
+	# ERROR: ./lib/libMagick++-7.Q16HDRI.so contains undefined symbols: __aeabi_idiv (arm)
+	local _libgcc_file="$($CC -print-libgcc-file-name)"
+	local _libgcc_path="$(dirname $_libgcc_file)"
+	local _libgcc_name="$(basename $_libgcc_file)"
+	LDFLAGS+=" -L$_libgcc_path -l:$_libgcc_name"
 
 	# Value of PKG_CONFIG becomes hardcoded in bin/*-config
 	export PKG_CONFIG=pkg-config

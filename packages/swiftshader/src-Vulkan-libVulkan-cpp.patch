@@ -1,0 +1,165 @@
+diff -u -r ../swiftshader-da334852e70510d259bfa8cbaa7c5412966b2f41/src/Vulkan/libVulkan.cpp ./src/Vulkan/libVulkan.cpp
+--- ../swiftshader-da334852e70510d259bfa8cbaa7c5412966b2f41/src/Vulkan/libVulkan.cpp	2024-05-08 17:29:21.000000000 +0000
++++ ./src/Vulkan/libVulkan.cpp	2024-05-16 08:57:16.566350607 +0000
+@@ -81,7 +81,7 @@
+ #include "marl/thread.h"
+ #include "marl/tsa.h"
+ 
+-#ifdef __ANDROID__
++#if (defined(__ANDROID__) && !defined(__TERMUX__))
+ #	include <unistd.h>
+ 
+ #	include "commit.h"
+@@ -105,7 +105,7 @@
+ namespace {
+ 
+ // Enable commit_id.py and #include commit.h for other platforms.
+-#if defined(__ANDROID__) && defined(ENABLE_BUILD_VERSION_OUTPUT)
++#if defined(__ANDROID__) && !defined(__TERMUX__) && defined(ENABLE_BUILD_VERSION_OUTPUT)
+ void logBuildVersionInformation()
+ {
+ 	// TODO(b/144093703): Don't call __android_log_print() directly
+@@ -140,7 +140,7 @@
+ void initializeLibrary()
+ {
+ 	static bool doOnce = [] {
+-#if defined(__ANDROID__) && defined(ENABLE_BUILD_VERSION_OUTPUT)
++#if defined(__ANDROID__) && !defined(__TERMUX__) && defined(ENABLE_BUILD_VERSION_OUTPUT)
+ 		logBuildVersionInformation();
+ #endif  // __ANDROID__ && ENABLE_BUILD_VERSION_OUTPUT
+ 		return true;
+@@ -322,7 +322,7 @@
+ 	{ { VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME, VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_SPEC_VERSION } },
+ 	{ { VK_EXT_DEBUG_UTILS_EXTENSION_NAME, VK_EXT_DEBUG_UTILS_SPEC_VERSION } },
+ 	{ { VK_EXT_HEADLESS_SURFACE_EXTENSION_NAME, VK_EXT_HEADLESS_SURFACE_SPEC_VERSION } },
+-#ifndef __ANDROID__
++#if !(defined(__ANDROID__) && !defined(__TERMUX__))
+ 	{ { VK_KHR_SURFACE_EXTENSION_NAME, VK_KHR_SURFACE_SPEC_VERSION } },
+ 	{ { VK_EXT_SURFACE_MAINTENANCE_1_EXTENSION_NAME, VK_EXT_SURFACE_MAINTENANCE_1_SPEC_VERSION } },
+ 	{ { VK_KHR_GET_SURFACE_CAPABILITIES_2_EXTENSION_NAME, VK_KHR_GET_SURFACE_CAPABILITIES_2_SPEC_VERSION } },
+@@ -376,7 +376,7 @@
+ 	// Only 1.1 core version of this is supported. The extension has additional requirements
+ 	//{{ VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME, VK_KHR_VARIABLE_POINTERS_SPEC_VERSION }},
+ 	{ { VK_EXT_QUEUE_FAMILY_FOREIGN_EXTENSION_NAME, VK_EXT_QUEUE_FAMILY_FOREIGN_SPEC_VERSION } },
+-#ifndef __ANDROID__
++#if !(defined(__ANDROID__) && !defined(__TERMUX__))
+ 	// We fully support the KHR_swapchain v70 additions, so just track the spec version.
+ 	{ { VK_KHR_SWAPCHAIN_EXTENSION_NAME, VK_KHR_SWAPCHAIN_SPEC_VERSION } },
+ #else
+@@ -449,7 +449,7 @@
+ 	{ { VK_KHR_SAMPLER_MIRROR_CLAMP_TO_EDGE_EXTENSION_NAME, VK_KHR_SAMPLER_MIRROR_CLAMP_TO_EDGE_SPEC_VERSION } },
+ 	{ { VK_KHR_SWAPCHAIN_MUTABLE_FORMAT_EXTENSION_NAME, VK_KHR_SWAPCHAIN_MUTABLE_FORMAT_SPEC_VERSION } },
+ 	{ { VK_KHR_PIPELINE_LIBRARY_EXTENSION_NAME, VK_KHR_PIPELINE_LIBRARY_SPEC_VERSION } },
+-#ifndef __ANDROID__
++#if !(defined(__ANDROID__) && !defined(__TERMUX__))
+ 	{ { VK_EXT_SWAPCHAIN_MAINTENANCE_1_EXTENSION_NAME, VK_EXT_SWAPCHAIN_MAINTENANCE_1_SPEC_VERSION } },
+ #endif
+ 	{ { VK_EXT_GRAPHICS_PIPELINE_LIBRARY_EXTENSION_NAME, VK_EXT_GRAPHICS_PIPELINE_LIBRARY_SPEC_VERSION } },
+@@ -2029,7 +2029,7 @@
+ 
+ 	const VkBaseInStructure *extensionCreateInfo = reinterpret_cast<const VkBaseInStructure *>(pCreateInfo->pNext);
+ 
+-#ifdef __ANDROID__
++#if (defined(__ANDROID__) && !defined(__TERMUX__))
+ 	vk::BackingMemory backmem;
+ 	bool swapchainImage = false;
+ #endif
+@@ -2040,7 +2040,7 @@
+ 		// VK_STRUCTURE_TYPE_NATIVE_BUFFER_ANDROID, are not enumerated in the official Vulkan headers.
+ 		switch((int)(extensionCreateInfo->sType))
+ 		{
+-#ifdef __ANDROID__
++#if (defined(__ANDROID__) && !defined(__TERMUX__))
+ 		case VK_STRUCTURE_TYPE_SWAPCHAIN_IMAGE_CREATE_INFO_ANDROID:
+ 			{
+ 				const VkSwapchainImageCreateInfoANDROID *swapImageCreateInfo = reinterpret_cast<const VkSwapchainImageCreateInfoANDROID *>(extensionCreateInfo);
+@@ -2100,7 +2100,7 @@
+ 
+ 	VkResult result = vk::Image::Create(pAllocator, pCreateInfo, pImage, vk::Cast(device));
+ 
+-#ifdef __ANDROID__
++#if (defined(__ANDROID__) && !defined(__TERMUX__))
+ 	if(swapchainImage)
+ 	{
+ 		if(result != VK_SUCCESS)
+@@ -2138,7 +2138,7 @@
+ 	TRACE("(VkDevice device = %p, VkImage image = %p, const VkAllocationCallbacks* pAllocator = %p)",
+ 	      device, static_cast<void *>(image), pAllocator);
+ 
+-#ifdef __ANDROID__
++#if (defined(__ANDROID__) && !defined(__TERMUX__))
+ 	vk::Image *img = vk::Cast(image);
+ 	if(img && img->hasExternalMemory())
+ 	{
+@@ -3551,7 +3551,7 @@
+ 				/* Do nothing */
+ 				break;
+ 
+-#ifndef __ANDROID__
++#if !(defined(__ANDROID__) && !defined(__TERMUX__))
+ 			case VK_STRUCTURE_TYPE_BIND_IMAGE_MEMORY_SWAPCHAIN_INFO_KHR:
+ 				{
+ 					const auto *swapchainInfo = reinterpret_cast<const VkBindImageMemorySwapchainInfoKHR *>(extInfo);
+@@ -3761,7 +3761,7 @@
+ 				vk::Cast(physicalDevice)->getProperties(properties);
+ 			}
+ 			break;
+-#ifdef __ANDROID__
++#if (defined(__ANDROID__) && !defined(__TERMUX__))
+ 		case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRESENTATION_PROPERTIES_ANDROID:
+ 			{
+ 				auto *properties = reinterpret_cast<VkPhysicalDevicePresentationPropertiesANDROID *>(extensionProperties);
+@@ -3980,7 +3980,7 @@
+ 
+ 	VkBaseOutStructure *extensionProperties = reinterpret_cast<VkBaseOutStructure *>(pImageFormatProperties->pNext);
+ 
+-#ifdef __ANDROID__
++#if !(defined(__ANDROID__) && !defined(__TERMUX__))
+ 	bool hasAHBUsage = false;
+ #endif
+ 
+@@ -4014,7 +4014,7 @@
+ 				properties->identicalMemoryLayout = VK_TRUE;
+ 			}
+ 			break;
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ 		case VK_STRUCTURE_TYPE_ANDROID_HARDWARE_BUFFER_USAGE_ANDROID:
+ 			{
+ 				auto *properties = reinterpret_cast<VkAndroidHardwareBufferUsageANDROID *>(extensionProperties);
+@@ -4044,7 +4044,7 @@
+ 
+ 	vk::Cast(physicalDevice)->getImageFormatProperties(format, type, tiling, usage, flags, &pImageFormatProperties->imageFormatProperties);
+ 
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ 	if(hasAHBUsage)
+ 	{
+ 		// AHardwareBuffer_lock may only be called with a single layer.
+@@ -4167,7 +4167,7 @@
+ 	{
+ 		switch(extInfo->sType)
+ 		{
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ 		case VK_STRUCTURE_TYPE_EXTERNAL_FORMAT_ANDROID:
+ 			break;
+ #endif
+@@ -4681,7 +4681,7 @@
+ 	return vk::HeadlessSurfaceKHR::Create(pAllocator, pCreateInfo, pSurface);
+ }
+ 
+-#ifndef __ANDROID__
++#if !(defined(__ANDROID__) && !defined(__TERMUX__))
+ VKAPI_ATTR void VKAPI_CALL vkDestroySurfaceKHR(VkInstance instance, VkSurfaceKHR surface, const VkAllocationCallbacks *pAllocator)
+ {
+ 	TRACE("(VkInstance instance = %p, VkSurfaceKHR surface = %p, const VkAllocationCallbacks* pAllocator = %p)",
+@@ -4899,7 +4899,7 @@
+ 
+ #endif  // ! __ANDROID__
+ 
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ 
+ VKAPI_ATTR VkResult VKAPI_CALL vkGetSwapchainGrallocUsage2ANDROID(VkDevice device, VkFormat format, VkImageUsageFlags imageUsage, VkSwapchainImageUsageFlagsANDROID swapchainUsage, uint64_t *grallocConsumerUsage, uint64_t *grallocProducerUsage)
+ {

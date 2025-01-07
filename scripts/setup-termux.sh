@@ -18,7 +18,8 @@ PACKAGES+=" asciidoctor"
 PACKAGES+=" autoconf"
 PACKAGES+=" automake"
 PACKAGES+=" bc"
-PACKAGES+=" bison"
+PACKAGES+=" byacc"
+PACKAGES+=" bsdtar"                     # Needed to create pacman packages
 PACKAGES+=" cmake"
 PACKAGES+=" ed"
 PACKAGES+=" flex"
@@ -28,8 +29,10 @@ PACKAGES+=" golang"
 PACKAGES+=" gperf"
 PACKAGES+=" help2man"
 PACKAGES+=" libtool"
+PACKAGES+=" llvm-tools"		# Needed to build rust
 PACKAGES+=" m4"
 PACKAGES+=" make"			# Used for all Makefile-based projects.
+PACKAGES+=" ndk-multilib"		# Needed to build rust
 PACKAGES+=" ninja"			# Used by default to build all CMake projects.
 PACKAGES+=" perl"
 PACKAGES+=" pkg-config"
@@ -37,10 +40,25 @@ PACKAGES+=" protobuf"
 PACKAGES+=" python2"
 PACKAGES+=" re2c"                       # Needed by kphp-timelib
 PACKAGES+=" rust"
+PACKAGES+=" scdoc"
 PACKAGES+=" texinfo"
+PACKAGES+=" uuid-utils"
 PACKAGES+=" valac"
 PACKAGES+=" xmlto"                      # Needed by git's manpage generation
+PACKAGES+=" zip"
 
-apt update
-apt dist-upgrade -y
-apt install -y $PACKAGES
+# Definition of a package manager
+export TERMUX_SCRIPTDIR=$(dirname "$(realpath "$0")")/../
+. $(dirname "$(realpath "$0")")/properties.sh
+source "$TERMUX_PREFIX/bin/termux-setup-package-manager" || true
+
+if [ "$TERMUX_APP_PACKAGE_MANAGER" = "apt" ]; then
+	apt update
+	yes | apt dist-upgrade
+	yes | apt install $PACKAGES
+elif [ "$TERMUX_APP_PACKAGE_MANAGER" = "pacman" ]; then
+	pacman -Syu $PACKAGES --needed --noconfirm
+else
+	echo "Error: no package manager defined"
+	exit 1
+fi

@@ -1,9 +1,10 @@
-diff -u -r ../screen-4.7.0/window.c ./window.c
---- ../screen-4.7.0/window.c	2019-10-01 22:08:00.000000000 +0000
-+++ ./window.c	2019-10-02 19:42:56.044224400 +0000
-@@ -112,9 +112,9 @@
+diff --git a/src/window.c b/src/window.c
+index 042d152..8e1cd87 100644
+--- a/window.c
++++ b/window.c
+@@ -80,9 +80,9 @@ static int zmodem_parse(Window *, char *, size_t);
  
- int VerboseCreate = 0;		/* XXX move this to user.h */
+ bool VerboseCreate = false;		/* XXX move this to user.h */
  
 -char DefaultShell[] = "/bin/sh";
 +char DefaultShell[] = "@TERMUX_PREFIX@/bin/login";
@@ -12,4 +13,4 @@ diff -u -r ../screen-4.7.0/window.c ./window.c
 +static char DefaultPath[] = ":@TERMUX_PREFIX@/bin";
  #endif
  
- /* keep this in sync with the structure definition in window.h */
+ struct NewWindow nwin_undef = {

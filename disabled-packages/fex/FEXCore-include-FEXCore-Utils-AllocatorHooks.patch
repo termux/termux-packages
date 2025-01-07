@@ -1,0 +1,42 @@
+diff --git a/FEXCore/include/FEXCore/Utils/AllocatorHooks.h b/FEXCore/include/FEXCore/Utils/AllocatorHooks.h
+index 85d2d91..9997d03 100644
+--- a/FEXCore/include/FEXCore/Utils/AllocatorHooks.h
++++ b/FEXCore/include/FEXCore/Utils/AllocatorHooks.h
+@@ -117,16 +117,37 @@ namespace FEXCore::Allocator {
+   inline void *valloc(size_t size)
+   {
+ #ifdef __ANDROID__
++#if __ANDROID_API__ < 28
++    // https://github.com/llvm/llvm-project/blob/main/libcxx/include/__memory/aligned_alloc.h
++    // https://android.googlesource.com/platform/bionic/+/main/libc/platform/bionic/page.h
++    // alignment = 1 segfault in Android, 4096 is the minimum
++    void* __result = nullptr;
++    (void)::posix_memalign(&__result, 4096, size);
++    return __result;
++#else
+     return ::aligned_alloc(4096, size);
++#endif
+ #else
+     return ::valloc(size);
+ #endif
+   }
++#ifdef __ANDROID__
++  inline int posix_memalign(void** r, size_t a, size_t s) { return ::posix_memalign(r, 4096, s); }
++#else
+   inline int posix_memalign(void** r, size_t a, size_t s) { return ::posix_memalign(r, a, s); }
++#endif
+   inline void *realloc(void* ptr, size_t size) { return ::realloc(ptr, size); }
+   inline void free(void* ptr) { return ::free(ptr); }
+   inline size_t malloc_usable_size(void *ptr) { return ::malloc_usable_size(ptr); }
++#if defined(__ANDROID__) && __ANDROID_API__ < 28
++  inline void *aligned_alloc(size_t a, size_t s) {
++    void* __result = nullptr;
++    (void)::posix_memalign(&__result, 4096, s);
++    return __result;
++  }
++#else
+   inline void *aligned_alloc(size_t a, size_t s) { return ::aligned_alloc(a, s); }
++#endif
+   inline void aligned_free(void* ptr) { return ::free(ptr); }
+ #endif
+ 

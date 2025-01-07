@@ -5,7 +5,10 @@ TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=b848fce5e3759f3cbeda55e3cd8dcd7321525a44
 TERMUX_PKG_VERSION=2022.11.07
-TERMUX_PKG_SRCURL=https://github.com/yrp604/rappel.git
+TERMUX_PKG_SRCURL=git+https://github.com/yrp604/rappel
+TERMUX_PKG_SHA256=e3dfe84e88b7711918555e40cb88f723ee99f197795193cd5620367b29f4a56e
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_METHOD=repology
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_DEPENDS="binutils-is-llvm | binutils, libedit"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -22,6 +25,11 @@ termux_step_post_get_source() {
 		echo -n "ERROR: The specified version \"$TERMUX_PKG_VERSION\""
 		echo " is different from what is expected to be: \"$version\""
 		return 1
+	fi
+
+	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum)
+	if [[ "${s}" != "${TERMUX_PKG_SHA256}  "* ]]; then
+		termux_error_exit "Checksum mismatch for source files."
 	fi
 }
 
@@ -40,7 +48,7 @@ termux_step_make() {
 		_ARCH=$TERMUX_ARCH
 	fi
 
-	make ARCH=$_ARCH CC="$CC $CPPFLAGS $CFLAGS" LDFLAGS="$LDFLAGS" -j $TERMUX_MAKE_PROCESSES
+	make ARCH=$_ARCH CC="$CC $CPPFLAGS $CFLAGS" LDFLAGS="$LDFLAGS" -j $TERMUX_PKG_MAKE_PROCESSES
 }
 
 termux_step_make_install() {

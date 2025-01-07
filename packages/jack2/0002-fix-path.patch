@@ -1,0 +1,54 @@
+diff --git a/common/JackTools.cpp b/common/JackTools.cpp
+index 94e7034..5214a42 100644
+--- a/common/JackTools.cpp
++++ b/common/JackTools.cpp
+@@ -54,7 +54,7 @@ namespace Jack {
+ #endif
+     }
+ 
+-#define DEFAULT_TMP_DIR "/tmp"
++#define DEFAULT_TMP_DIR "@TERMUX_PREFIX@/tmp"
+     char* jack_tmpdir = (char*)DEFAULT_TMP_DIR;
+ 
+     int JackTools::GetPID()
+diff --git a/linux/JackPlatformPlug_os.h b/linux/JackPlatformPlug_os.h
+index cd0803a..e3400a6 100644
+--- a/linux/JackPlatformPlug_os.h
++++ b/linux/JackPlatformPlug_os.h
+@@ -20,8 +20,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ #ifndef __JackPlatformPlug_linux__
+ #define __JackPlatformPlug_linux__
+ 
+-#define jack_server_dir "/dev/shm"
+-#define jack_client_dir "/dev/shm"
++#define jack_server_dir "@TERMUX_PREFIX@/tmp"
++#define jack_client_dir "@TERMUX_PREFIX@/tmp"
+ #define JACK_DEFAULT_DRIVER "alsa"
+ 
+ namespace Jack
+diff --git a/posix/JackPosixSemaphore.cpp b/posix/JackPosixSemaphore.cpp
+index 4901231..ba2d1a9 100644
+--- a/posix/JackPosixSemaphore.cpp
++++ b/posix/JackPosixSemaphore.cpp
+@@ -160,7 +160,7 @@ bool JackPosixSemaphore::Allocate(const char* name, const char* server_name, int
+ #ifdef __linux__
+         if (fPromiscuous) {
+             char sempath[SYNC_MAX_NAME_SIZE+13];
+-            snprintf(sempath, sizeof(sempath), "/dev/shm/sem.%s", fName);
++            snprintf(sempath, sizeof(sempath), "@TERMUX_PREFIX@/tmp/sem.%s", fName);
+             if (jack_promiscuous_perms(-1, sempath, fPromiscuousGid) < 0)
+                 return false;
+         }
+diff --git a/tests/testThread.cpp b/tests/testThread.cpp
+index de012f7..5dfe479 100644
+--- a/tests/testThread.cpp
++++ b/tests/testThread.cpp
+@@ -56,7 +56,7 @@ int main(int argc, char * const argv[])
+ 	printf("Thread test\n");
+ 	std::set_terminate(__gnu_cxx::__verbose_terminate_handler);
+ 
+-	sprintf(fName, "/tmp/fifo");
++	sprintf(fName, "@TERMUX_PREFIX@/tmp/fifo");
+ 
+ 	if (stat(fName, &statbuf)) {
+ 		if (errno == ENOENT) {

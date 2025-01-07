@@ -1,25 +1,11 @@
---- a/main.c
-+++ b/main.c
-@@ -123,19 +123,19 @@
-  * Make sure umask allows lsof to define its own file permissions.
-  */
+--- a/src/main.c
++++ b/src/main.c
+@@ -118,7 +118,7 @@
+      * Make sure umask allows lsof to define its own file permissions.
+      */
  
--	if ((MaxFd = (int) GET_MAX_FD()) < 53)
-+	if ((MaxFd = (int) sysconf(_SC_OPEN_MAX)) < 53)
- 	    MaxFd = 53;
+-    if ((MaxFd = (int)GET_MAX_FD()) < 53)
++    if ((MaxFd = (int)sysconf(_SC_OPEN_MAX)) < 53)
+         MaxFd = 53;
  
- #if	defined(HAS_CLOSEFROM)
- 	(void) closefrom(3);
- #else	/* !defined(HAS_CLOSEFROM) */
--#if	defined(SYS_close_range)
-+#if	defined(SYS_close_range) && !defined(__ANDROID__)
- 	if (MaxFd > 3 && syscall(SYS_close_range, 3, MaxFd - 1, 0) == 0)
- 	    goto closed;
- #endif
- 	for (i = 3; i < MaxFd; i++)
- 	    (void) close(i);
--#if	defined(SYS_close_range)
-+#if	defined(SYS_close_range) && !defined(__ANDROID__)
-   closed:
- #endif
- #endif	/* !defined(HAS_CLOSEFROM) */
+     closefrom_shim(ctx, 3);

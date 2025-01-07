@@ -1,6 +1,7 @@
---- LuaJIT-old/src/Makefile	2021-03-11 01:19:04.000000000 +0600
-+++ LuaJIT-new/src/Makefile	2021-07-05 09:46:42.681252928 +0600
-@@ -27,7 +27,7 @@
+diff -u -r ../LuaJIT/src/Makefile ./src/Makefile
+--- ../LuaJIT/src/Makefile	2024-06-01 20:36:31.761902429 +0000
++++ ./src/Makefile	2024-06-01 20:38:32.396582115 +0000
+@@ -26,7 +26,7 @@
  DEFAULT_CC = gcc
  #
  # LuaJIT builds as a native 32 or 64 bit binary by default.
@@ -9,7 +10,7 @@
  #
  # Use this if you want to force a 32 bit build on a 64 bit multilib OS.
  #CC= $(DEFAULT_CC) -m32
-@@ -192,7 +192,7 @@
+@@ -191,7 +191,7 @@
  CCOPTIONS= $(CCDEBUG) $(ASOPTIONS)
  LDOPTIONS= $(CCDEBUG) $(LDFLAGS)
  
@@ -18,7 +19,7 @@
  HOST_RM?= rm -f
  # If left blank, minilua is built and used. You can supply an installed
  # copy of (plain) Lua 5.1 or 5.2, plus Lua BitOp. E.g. with: HOST_LUA=lua
-@@ -205,17 +205,17 @@
+@@ -204,17 +204,17 @@
  HOST_ALDFLAGS= $(LDOPTIONS) $(HOST_XLDFLAGS) $(HOST_LDFLAGS)
  HOST_ALIBS= $(HOST_XLIBS) $(LIBS) $(HOST_LIBS)
  
@@ -30,7 +31,7 @@
  TARGET_STCC= $(STATIC_CC)
  TARGET_DYNCC= $(DYNAMIC_CC)
 -TARGET_LD= $(CROSS)$(CC)
--TARGET_AR= $(CROSS)ar rcus 2>/dev/null
+-TARGET_AR= $(CROSS)ar rcus
 -TARGET_STRIP= $(CROSS)strip
 +TARGET_LD= $(CC)
 +TARGET_AR= $(AR) rcus 2>/dev/null
@@ -42,7 +43,7 @@
  TARGET_DYLIBNAME= libluajit-$(ABIVER).$(MAJVER).dylib
  TARGET_DYLIBPATH= $(TARGET_LIBPATH)/$(TARGET_DYLIBNAME)
  TARGET_DLLNAME= lua$(NODOTABIVER).dll
-@@ -589,7 +589,7 @@
+@@ -608,7 +608,7 @@
  endif
  endif
  

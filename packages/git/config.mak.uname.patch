@@ -1,5 +1,5 @@
 Set uname_S to Linux instead of detecting build machine.
-Android does not support -lrt.
+Android before API 26 does not support sync_file_range.
 
 diff -uNr ../git-2.36.0/config.mak.uname ./config.mak.uname
 --- ../git-2.36.0/config.mak.uname	2022-04-18 02:52:38.000000000 -0300
@@ -13,12 +13,10 @@ diff -uNr ../git-2.36.0/config.mak.uname ./config.mak.uname
  uname_M := $(shell sh -c 'uname -m 2>/dev/null || echo not')
  uname_O := $(shell sh -c 'uname -o 2>/dev/null || echo not')
  uname_R := $(shell sh -c 'uname -r 2>/dev/null || echo not')
-@@ -55,9 +55,6 @@
- 	HAVE_DEV_TTY = YesPlease
- 	HAVE_CLOCK_GETTIME = YesPlease
+@@ -57,7 +57,6 @@
  	HAVE_CLOCK_MONOTONIC = YesPlease
--	# -lrt is needed for clock_gettime on glibc <= 2.16
--	NEEDS_LIBRT = YesPlease
+ 	# -lrt is needed for clock_gettime on glibc <= 2.16
+ 	NEEDS_LIBRT = YesPlease
 -	HAVE_SYNC_FILE_RANGE = YesPlease
  	HAVE_GETDELIM = YesPlease
  	FREAD_READS_DIRECTORIES = UnfortunatelyYes

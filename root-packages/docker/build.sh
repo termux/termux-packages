@@ -2,17 +2,19 @@ TERMUX_PKG_HOMEPAGE=https://docker.com
 TERMUX_PKG_DESCRIPTION="Set of products that use OS-level virtualization to deliver software in packages called containers."
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=20.10.22
-LIBNETWORK_COMMIT=dcdf8f176d1e13ad719e913e796fb698d846de98
-DOCKER_GITCOMMIT=3a2c30b
-TERMUX_PKG_SRCURL=(https://github.com/moby/moby/archive/v${TERMUX_PKG_VERSION}.tar.gz
-                   https://github.com/docker/cli/archive/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_VERSION=1:24.0.6
+TERMUX_PKG_REVISION=3
+LIBNETWORK_COMMIT=67e0588f1ddfaf2faf4c8cae8b7ea2876434d91c
+DOCKER_GITCOMMIT=ed223bc
+TERMUX_PKG_SRCURL=(https://github.com/moby/moby/archive/v${TERMUX_PKG_VERSION:2}.tar.gz
+                   https://github.com/docker/cli/archive/v${TERMUX_PKG_VERSION:2}.tar.gz
                    https://github.com/moby/libnetwork/archive/${LIBNETWORK_COMMIT}.tar.gz)
-TERMUX_PKG_SHA256=(ee0e2168e27ec87f1b0650e86af5d3e167a07fd2ff8c1ce3bb588f0b4f9a4658
-                   84d71ac2b508b54e8df9f3ea425aa33e254fd3645fe9bad5619b98eaffb33408
-                   dbe30210e00fd4fcc63ade49ab3b00ba8fa5a1e90d34b92c1ecc25f8b78149ba)
-TERMUX_PKG_DEPENDS="containerd, libdevmapper"
+TERMUX_PKG_DEPENDS="containerd, libdevmapper, resolv-conf"
+TERMUX_PKG_SHA256=(29a8ee54e9ea008b40eebca42dec8b67ab257eb8ac175f67e79c110e4187d7d2
+                   c1a4a580ced3633e489c5c9869a20198415da44df7023fdc200d425cdf5fa652
+                   4ab6f6c97db834c2eedc053d06c4d32d268f33051b8148098b4a0e8eee51e97b)
 TERMUX_PKG_CONFFILES="etc/docker/daemon.json"
+TERMUX_PKG_SERVICE_SCRIPT=("dockerd" "exec su -c \"PATH=\$PATH $TERMUX_PREFIX/bin/dockerd 2>&1\"")
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 
@@ -28,8 +30,8 @@ termux_step_get_source() {
 	mkdir -p "$TERMUX_PKG_CACHEDIR"
 	mkdir -p "$TERMUX_PKG_SRCDIR"
 	for i in $(seq 0 $(( ${#PKG_SRCURL[@]} - 1 ))); do
-		local file="${TERMUX_PKG_CACHEDIR}/$(basename ${PKG_SRCURL[$i]})"
-		rm -rf "$file"
+		# Archives from moby/moby and docker/cli have same name, so cache them as {moby,cli}-v...
+		local file="${TERMUX_PKG_CACHEDIR}/$(echo ${PKG_SRCURL[$i]}|cut -d"/" -f 5)-$(basename ${PKG_SRCURL[$i]})"
 		termux_download "${PKG_SRCURL[$i]}" "$file" "${PKG_SHA256[$i]}"
 		tar xf "$file" -C "$TERMUX_PKG_SRCDIR"
 	done
@@ -44,32 +46,23 @@ termux_step_get_source() {
 	done
 }
 
-termux_step_make() {
+termux_step_pre_configure() {
 	# setup go build environment
 	termux_setup_golang
 	export GO111MODULE=auto
+}
 
+termux_step_make() {
 	# BUILD DOCKERD DAEMON
 	echo -n "Building dockerd daemon..."
 	(
 	set -e
 	cd moby
 
-	# apply some patches in a batch
-	xargs sed -i "s_\(/etc/docker\)_${TERMUX_PREFIX}\1_g" < <(grep -R /etc/docker | cut -d':' -f1 | sort | uniq)
-	xargs sed -i 's_\(/run/docker/plugins\)_/data/docker\1_g' < <(grep -R '/run/docker/plugins' | cut -d':' -f1 | sort | uniq)
-	xargs sed -i 's/[a-zA-Z0-9]*\.GOOS/"linux"/g' < <(grep -R '[a-zA-Z0-9]*\.GOOS' | cut -d':' -f1 | sort | uniq)
-
 	# issue the build command
 	export DOCKER_GITCOMMIT
 	export DOCKER_BUILDTAGS='exclude_graphdriver_btrfs exclude_graphdriver_devicemapper exclude_graphdriver_quota selinux exclude_graphdriver_aufs'
-	# horrible, but effective way to apply patches on the fly while compiling
-	while ! IFS='' files=$(AUTO_GOPATH=1 PREFIX='' hack/make.sh dynbinary 2>&1 1>/dev/null); do
-		if ! xargs sed -i 's/\("runtime"\)/_ \1/' < <(echo $files | grep runtime | cut -d':' -f1 | cut -c38-); then
-			echo $files;
-			exit 1
-		fi
-	done
+	AUTO_GOPATH=1 PREFIX='' hack/make.sh dynbinary
 	)
 	echo " Done!"
 
@@ -104,16 +97,13 @@ termux_step_make() {
 	export GOPATH="${PWD}/cli/go"
 	cd "${GOPATH}/src/github.com/docker/cli"
 
-	# apply some patches in a batch
-	xargs sed -i 's_/var/\(run/docker\.sock\)_/data/docker/\1_g' < <(grep -R /var/run/docker\.sock | cut -d':' -f1 | sort | uniq)
-
 	# issue the build command
 	export VERSION=v${TERMUX_PKG_VERSION}-ce
 	export DISABLE_WARN_OUTSIDE_CONTAINER=1
 	export LDFLAGS="-L ${TERMUX_PREFIX}/lib -r ${TERMUX_PREFIX}/lib"
-	make -j ${TERMUX_MAKE_PROCESSES} dynbinary
+	make -j ${TERMUX_PKG_MAKE_PROCESSES} dynbinary
 	unset GOOS GOARCH CGO_LDFLAGS CC CXX CFLAGS CXXFLAGS LDFLAGS
-	make -j ${TERMUX_MAKE_PROCESSES} manpages
+	make -j ${TERMUX_PKG_MAKE_PROCESSES} manpages
 	)
 	echo " Done!"
 }
@@ -125,10 +115,25 @@ termux_step_make_install() {
 	install -Dm 600 -t ${TERMUX_PREFIX}/share/man/man1 cli/go/src/github.com/docker/cli/man/man1/*
 	install -Dm 600 -t ${TERMUX_PREFIX}/share/man/man5 cli/go/src/github.com/docker/cli/man/man5/*
 	install -Dm 600 -t ${TERMUX_PREFIX}/share/man/man8 cli/go/src/github.com/docker/cli/man/man8/*
-	install -Dm 600 ${TERMUX_PKG_BUILDER_DIR}/daemon.json ${TERMUX_PREFIX}/etc/docker/daemon.json
+	mkdir -p "${TERMUX_PREFIX}"/etc/docker
 	sed -e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
-	       "${TERMUX_PKG_BUILDER_DIR}/dockerd.sh" > "${TERMUX_PREFIX}/bin/dockerd"
+		"${TERMUX_PKG_BUILDER_DIR}"/daemon.json > "${TERMUX_PREFIX}"/etc/docker/daemon.json
+	chmod 600 "${TERMUX_PREFIX}"/etc/docker/daemon.json
+	sed -e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
+		"${TERMUX_PKG_BUILDER_DIR}/dockerd.sh" > "${TERMUX_PREFIX}/bin/dockerd"
 	chmod 700 "${TERMUX_PREFIX}/bin/dockerd"
+}
+
+termux_step_post_make_install() {
+	# Running sv down dockerd kills just the "su" process but
+	# leaves dockerd running (even though it is running in the
+	# foreground). This finish script works around that.
+	mkdir -p $TERMUX_PREFIX/var/service/dockerd/
+	{
+		echo "#!$TERMUX_PREFIX/bin/sh"
+		echo "su -c pkill dockerd"
+	} > $TERMUX_PREFIX/var/service/dockerd/finish
+	chmod u+x $TERMUX_PREFIX/var/service/dockerd/finish
 }
 
 termux_step_create_debscripts() {

@@ -2,28 +2,14 @@ TERMUX_PKG_HOMEPAGE=https://github.com/svenstaro/miniserve
 TERMUX_PKG_DESCRIPTION="Tool to serve files and dirs over HTTP"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.22.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="0.28.0"
 TERMUX_PKG_SRCURL=https://github.com/svenstaro/miniserve/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=325f6cde391c468000b1bdcc8455ec2c6950b3c930029187671c536507b185ba
+TERMUX_PKG_SHA256=c4c5e12796bdae2892eff3832b66c4c04364738b62cf1429259428b03363d1f1
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS=libbz2
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	termux_setup_rust
-
-	export CFLAGS="${TARGET_CFLAGS}"
-
-	: "${CARGO_HOME:=$HOME/.cargo}"
-	export CARGO_HOME
-
-	rm -rf $CARGO_HOME/registry/src/github.com-*/rustix-*
-	cargo fetch --target "${CARGO_TARGET_NAME}"
-
-	for d in $CARGO_HOME/registry/src/github.com-*/rustix-*; do
-		patch --silent -p1 -d ${d} < $TERMUX_PKG_BUILDER_DIR/0001-upstream-fix-libc-removing-unsafe-on-makedev.diff || :
-	done
 
 	rm -f Makefile
 }

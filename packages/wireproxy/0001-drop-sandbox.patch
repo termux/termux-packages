@@ -1,0 +1,32 @@
+--- a/cmd/wireproxy/main.go
++++ b/cmd/wireproxy/main.go
+@@ -10,6 +10,7 @@
+ 	"os"
+ 	"os/exec"
+ 	"os/signal"
++	"runtime"
+ 	"strconv"
+ 	"syscall"
+ 
+@@ -52,6 +53,10 @@
+ }
+ 
+ func lock(stage string) {
++	// Do not use sandbox-related operations on Android
++	if runtime.GOOS == "android" {
++		return
++	}
+ 	switch stage {
+ 	case "boot":
+ 		exePath := executablePath()
+@@ -115,6 +120,10 @@
+ }
+ 
+ func lockNetwork(sections []wireproxy.RoutineSpawner, infoAddr *string) {
++	// Do not use sandbox-related operations on Android
++	if runtime.GOOS == "android" {
++		return
++	}
+ 	var rules []landlock.Rule
+ 	if infoAddr != nil && *infoAddr != "" {
+ 		rules = append(rules, landlock.BindTCP(extractPort(*infoAddr)))

@@ -3,10 +3,12 @@ TERMUX_PKG_DESCRIPTION="A framework you can use to make 2D games in Lua"
 TERMUX_PKG_LICENSE="ZLIB"
 TERMUX_PKG_LICENSE_FILE="license.txt"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=11.4
+TERMUX_PKG_VERSION="11.5"
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://github.com/love2d/love/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=eed6e388a0c3b14150d26c6c7f64288595f4c722ee9eda0d6797ea83f2c65d23
-TERMUX_PKG_DEPENDS="freetype, game-music-emu, libandroid-spawn, libc++, libluajit, libmodplug, libogg, libtheora, libvorbis, mesa, mpg123, openal-soft, sdl2, zlib"
+TERMUX_PKG_SHA256=6f55c265be5e03696c4770150c4388f5cffbdb3727606724cf88332baab429f7
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="freetype, game-music-emu, libandroid-spawn, libc++, libluajit, libmodplug, libogg, libtheora, libvorbis, mpg123, openal-soft, opengl, sdl2, zlib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-gme
 "

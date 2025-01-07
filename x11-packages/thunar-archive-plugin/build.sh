@@ -1,10 +1,11 @@
 TERMUX_PKG_HOMEPAGE=https://docs.xfce.org/xfce/thunar/archive
 TERMUX_PKG_DESCRIPTION="This plugin allows one to extract and create archive from inside the Thunar file manager."
 TERMUX_PKG_LICENSE="LGPL-2.0"
-TERMUX_PKG_MAINTAINER="Yisus7u7 <dev.yisus@hotmail.com>"
-TERMUX_PKG_VERSION=0.5.0
-TERMUX_PKG_SRCURL=http://deb.debian.org/debian/pool/main/t/thunar-archive-plugin/thunar-archive-plugin_${TERMUX_PKG_VERSION}.orig.tar.bz2
-TERMUX_PKG_SHA256=8eca88a358282a5acdea72984db0d930efdf658b4bc5b82ef7bcd06224366ffa
-TERMUX_PKG_DEPENDS="atk, exo, gdk-pixbuf, glib, gtk3, harfbuzz, libcairo, libxfce4util, pango, thunar"
+TERMUX_PKG_MAINTAINER="@Yisus7u7"
+TERMUX_PKG_VERSION="0.5.3"
+TERMUX_PKG_SRCURL=https://archive.xfce.org/src/thunar-plugins/thunar-archive-plugin/${TERMUX_PKG_VERSION%.*}/thunar-archive-plugin-${TERMUX_PKG_VERSION}.tar.bz2
+TERMUX_PKG_SHA256=cc0ffc86dc48e72edc6f6a61ad4345f99018526d5d854360960759ce1ec2ca22
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="atk, exo, gdk-pixbuf, glib, gtk3, harfbuzz, libcairo, libxfce4util, pango, thunar, zlib"
 TERMUX_PKG_RECOMMENDS="file-roller"
 TERMUX_PKG_BUILD_IN_SRC=true

@@ -1,0 +1,71 @@
+--- a/src/net/conf.go	2024-02-02 23:39:55.000000000 +0530
++++ b/src/net/conf.go	2024-02-18 22:34:10.016000996 +0530
+@@ -2,6 +2,8 @@
+ // Use of this source code is governed by a BSD-style
+ // license that can be found in the LICENSE file.
+ 
++//go:build !android
++
+ package net
+ 
+ import (
+--- a/src/net/conf_android.go	2024-02-18 22:31:59.680000988 +0530
++++ b/src/net/conf_android.go	2024-02-18 22:41:52.060001024 +0530
+@@ -2,6 +2,8 @@
+ // Use of this source code is governed by a BSD-style
+ // license that can be found in the LICENSE file.
+ 
++//go:build android
++
+ package net
+ 
+ import (
+@@ -414,7 +416,7 @@
+ 				var haveMDNSAllow bool
+ 				switch c.mdnsTest {
+ 				case mdnsFromSystem:
+-					_, err := os.Stat("/etc/mdns.allow")
++					_, err := os.Stat("@TERMUX_PREFIX@/etc/mdns.allow")
+ 					if err != nil && !errors.Is(err, fs.ErrNotExist) {
+ 						// Let libc figure out what is going on.
+ 						return hostLookupCgo, dnsConf
+--- a/src/net/dnsclient_unix.go	2024-02-02 23:39:55.000000000 +0530
++++ b/src/net/dnsclient_unix.go	2024-02-18 22:36:17.948001004 +0530
+@@ -2,6 +2,8 @@
+ // Use of this source code is governed by a BSD-style
+ // license that can be found in the LICENSE file.
+ 
++//go:build !android
++
+ // DNS client: see RFC 1035.
+ // Has to be linked into package net for Dial.
+ 
+--- a/src/net/dnsclient_android.go	2024-02-18 22:32:31.136000990 +0530
++++ b/src/net/dnsclient_android.go	2024-02-18 22:43:13.612001028 +0530
+@@ -2,6 +2,8 @@
+ // Use of this source code is governed by a BSD-style
+ // license that can be found in the LICENSE file.
+ 
++//go:build android
++
+ // DNS client: see RFC 1035.
+ // Has to be linked into package net for Dial.
+ 
+@@ -367,7 +369,7 @@
+ var resolvConf resolverConfig
+ 
+ func getSystemDNSConfig() *dnsConfig {
+-	resolvConf.tryUpdate("/etc/resolv.conf")
++	resolvConf.tryUpdate("@TERMUX_PREFIX@/etc/resolv.conf")
+ 	return resolvConf.dnsConfig.Load()
+ }
+ 
+@@ -375,7 +377,7 @@
+ func (conf *resolverConfig) init() {
+ 	// Set dnsConfig and lastChecked so we don't parse
+ 	// resolv.conf twice the first time.
+-	conf.dnsConfig.Store(dnsReadConfig("/etc/resolv.conf"))
++	conf.dnsConfig.Store(dnsReadConfig("@TERMUX_PREFIX@/etc/resolv.conf"))
+ 	conf.lastChecked = time.Now()
+ 
+ 	// Prepare ch so that only one update of resolverConfig may

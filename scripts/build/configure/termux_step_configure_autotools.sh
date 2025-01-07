@@ -114,5 +114,9 @@ termux_step_configure_autotools() {
 		$ENABLE_STATIC \
 		$LIBEXEC_FLAG \
 		$QUIET_BUILD \
-		|| (cat config.log && false)
+		|| (termux_step_configure_autotools_failure_hook && false)
+}
+
+termux_step_configure_autotools_failure_hook() {
+	false
 }

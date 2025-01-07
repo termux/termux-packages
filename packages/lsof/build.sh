@@ -1,24 +1,19 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/lsof-org/lsof
 TERMUX_PKG_DESCRIPTION="Lists open files for running Unix processes"
 TERMUX_PKG_LICENSE="custom"
+TERMUX_PKG_LICENSE_FILE="COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="4.96.4"
+TERMUX_PKG_VERSION="4.99.4"
 TERMUX_PKG_SRCURL=https://github.com/lsof-org/lsof/archive/${TERMUX_PKG_VERSION}/lsof-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=b5a052cac8d6b2726bbb1de2b98c6d9204c7619263fb63e9b6b1bd6bbb37bf14
+TERMUX_PKG_SHA256=90d02ae35cd14341bfb04ce80e0030767476b0fc414a0acb115d49e79b13d56c
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libandroid-support, libtirpc"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--with-libtirpc
+--with-selinux=no
+"
 
-termux_step_configure() {
-	LSOF_CC="$CC" ./Configure -n linux
-}
-
-termux_step_make_install() {
-	install -Dm700 -t $TERMUX_PREFIX/bin/ lsof
-	install -Dm600 Lsof.8 $TERMUX_PREFIX/share/man/man8/lsof.8
-}
-
-termux_step_install_license() {
-	install -Dm600 -t $TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME \
-		$TERMUX_PKG_BUILDER_DIR/license.txt
+termux_step_pre_configure() {
+	autoreconf -fiv
 }

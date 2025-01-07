@@ -1,6 +1,6 @@
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -71,7 +71,6 @@
+@@ -67,7 +67,6 @@
  # cmake modules
  include(CheckCCompilerFlag)
  include(CheckCSourceCompiles)
@@ -8,30 +8,39 @@
  include(GNUInstallDirs)
  
  # custom cmake modules
-@@ -123,7 +122,6 @@
+@@ -126,7 +125,6 @@
  # required dependencies
  find_package(Threads REQUIRED)
  find_package(PCRE2 REQUIRED)
 -find_library(MATH_LIB m REQUIRED)
+ find_package(OpenSSL REQUIRED)
  
- # optional dependencies
- if(MYMPD_ENABLE_SSL)
-@@ -227,7 +225,7 @@
- configure_file(contrib/initscripts/mympd.sysVinit.in contrib/initscripts/mympd.sysVinit @ONLY)
- configure_file(contrib/initscripts/mympd.openrc.in contrib/initscripts/mympd.openrc @ONLY)
- 
--if(CMAKE_BUILD_TYPE MATCHES "(Release|Debug)")
-+if(FALSE)
-   # set strict global compile flags
-   add_compile_options(
-     "-fdata-sections"
-@@ -317,8 +315,7 @@
+ # check dependencies versions
+@@ -163,6 +161,8 @@
+   endif()
+   message("Searching for lua")
+   find_package(Lua)
++  set(LUA_LIBRARIES lua5.4)
++  set(LUA_FOUND TRUE)
+   if(LUA_FOUND)
+     if(NOT LUA_VERSION_STRING VERSION_GREATER_EQUAL "5.3.0")
+       message("Lua is disabled because a version lower than 5.3.0 was found")
+@@ -260,7 +260,7 @@
+     "-fstack-protector-strong"
+     "-pedantic"
+     "-Wall"
+-    "-Werror"
++    "-Wno-unused-command-line-argument"
+     "-Wextra"
+     "-Wformat"
+     "-Wformat-security"
+@@ -349,8 +349,7 @@
      add_compile_options("-g")
    endif()
    # IPO/LTO support
 -  check_ipo_supported()
 -  set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
 +  set(CMAKE_INTERPROCEDURAL_OPTIMIZATION FALSE)
- elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
-   add_compile_options(
-     "-ggdb"
+ else()
+   # if CMAKE_BUILD_TYPE is not Debug, Release, RelWithDebInfo or MinSizeRel
+   # do not alter compile options

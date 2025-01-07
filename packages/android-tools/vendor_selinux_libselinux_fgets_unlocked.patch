@@ -1,0 +1,28 @@
+diff --git a/libselinux/src/label_internal.h b/libselinux/src/label_internal.h
+index d09847c8..253ddbef 100644
+--- a/vendor/selinux/libselinux/src/label_internal.h
++++ b/vendor/selinux/libselinux/src/label_internal.h
+@@ -15,7 +15,7 @@
+ #include <selinux/label.h>
+ #include "sha1.h"
+
+-#if defined(ANDROID) || defined(__APPLE__)
++#if defined(__ANDROID__) || defined(__APPLE__)
+ // Android and Mac do not have fgets_unlocked()
+ #define fgets_unlocked(buf, size, fp) fgets(buf, size, fp)
+ #endif
+diff --git a/libselinux/src/selinux_internal.h b/libselinux/src/selinux_internal.h
+index 27e9ac53..be28fa04 100644
+--- a/vendor/selinux/libselinux/src/selinux_internal.h
++++ b/vendor/selinux/libselinux/src/selinux_internal.h
+@@ -1,6 +1,10 @@
+ #include <selinux/selinux.h>
+ #include <pthread.h>
+
++#if defined(__ANDROID__)
++// Android do not have fgets_unlocked()
++#define fgets_unlocked(buf, size, fp) fgets(buf, size, fp)
++#endif
+
+ extern int require_seusers ;
+ extern int selinux_page_size ;

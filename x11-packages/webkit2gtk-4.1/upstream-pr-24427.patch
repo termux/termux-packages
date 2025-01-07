@@ -1,0 +1,263 @@
+https://github.com/WebKit/WebKit/commit/910ab18a82d45d05c146999c32b0c517bf78b56a
+https://github.com/WebKit/WebKit/commit/3a1c08120188470f531a1a3a4837b496cc900bd7
+
+diff --git a/Source/WebKit/PlatformGTK.cmake b/Source/WebKit/PlatformGTK.cmake
+index c782b8e2c8af..6b4dd14806a8 100644
+--- a/Source/WebKit/PlatformGTK.cmake
++++ b/Source/WebKit/PlatformGTK.cmake
+@@ -369,6 +369,12 @@ if (ENABLE_MEDIA_STREAM)
+     )
+ endif ()
+ 
++if ("${GI_VERSION}" VERSION_GREATER_EQUAL 1.79.2)
++    set(USE_GI_FINISH_FUNC_ANNOTATION 1)
++else ()
++    set(USE_GI_FINISH_FUNC_ANNOTATION 0)
++endif ()
++
+ GENERATE_GLIB_API_HEADERS(WebKit WebKitGTK_HEADER_TEMPLATES
+     ${WebKitGTK_DERIVED_SOURCES_DIR}/webkit
+     WebKitGTK_INSTALLED_HEADERS
+@@ -376,7 +382,9 @@ GENERATE_GLIB_API_HEADERS(WebKit WebKitGTK_HEADER_TEMPLATES
+     "-DWTF_PLATFORM_WPE=0"
+     "-DUSE_GTK4=$<BOOL:${USE_GTK4}>"
+     "-DENABLE_2022_GLIB_API=$<BOOL:${ENABLE_2022_GLIB_API}>"
++    "-DUSE_GI_FINISH_FUNC_ANNOTATION=${USE_GI_FINISH_FUNC_ANNOTATION}"
+ )
++unset(USE_GI_FINISH_FUNC_ANNOTATION)
+ 
+ GENERATE_GLIB_API_HEADERS(WebKit WebKitWebProcessExtension_HEADER_TEMPLATES
+     ${WebKitGTK_DERIVED_SOURCES_DIR}/webkit
+diff --git a/Source/WebKit/UIProcess/API/glib/WebKitWebView.cpp b/Source/WebKit/UIProcess/API/glib/WebKitWebView.cpp
+index 989bea31f5a0..b309ffff12b1 100644
+--- a/Source/WebKit/UIProcess/API/glib/WebKitWebView.cpp
++++ b/Source/WebKit/UIProcess/API/glib/WebKitWebView.cpp
+@@ -4489,75 +4489,6 @@ void webkit_web_view_run_javascript_in_world(WebKitWebView* webView, const gchar
+     webkitWebViewEvaluateJavascriptInternal(webView, script, -1, worldName, nullptr, RunJavascriptReturnType::WebKitJavascriptResult, cancellable, callback, userData);
+ }
+ 
+-/**
+- * webkit_web_view_run_async_javascript_function_in_world:
+- * @web_view: a #WebKitWebView
+- * @body: the JavaScript function body
+- * @arguments: a #GVariant with format `{&sv}` storing the function arguments. Function argument values must be one of the following types, or contain only the following GVariant types: number, string, array, and dictionary.
+- * @world_name (nullable): the name of a #WebKitScriptWorld, if no name (i.e. %NULL) is provided, the default world is used. Any value that is not %NULL is a distinct world.
+- * @cancellable: (allow-none): a #GCancellable or %NULL to ignore
+- * @callback: (scope async): a #GAsyncReadyCallback to call when the script finished
+- * @user_data: the data to pass to callback function
+- *
+- * Asynchronously run @body in the script world with name @world_name of the current page context in
+- * @web_view. If WebKitSettings:enable-javascript is FALSE, this method will do nothing. This API
+- * differs from webkit_web_view_run_javascript_in_world() in that the JavaScript function can return a
+- * Promise and its result will be properly passed to the callback.
+- *
+- * When the operation is finished, @callback will be called. You can then call
+- * webkit_web_view_run_javascript_in_world_finish() to get the result of the operation.
+- *
+- * For instance here is a dummy example that shows how to pass arguments to a JS function that
+- * returns a Promise that resolves with the passed argument:
+- *
+- * ```c
+- * static void
+- * web_view_javascript_finished (GObject      *object,
+- *                               GAsyncResult *result,
+- *                               gpointer      user_data)
+- * {
+- *     WebKitJavascriptResult *js_result;
+- *     JSCValue               *value;
+- *     GError                 *error = NULL;
+- *
+- *     js_result = webkit_web_view_run_javascript_finish (WEBKIT_WEB_VIEW (object), result, &error);
+- *     if (!js_result) {
+- *         g_warning ("Error running javascript: %s", error->message);
+- *         g_error_free (error);
+- *         return;
+- *     }
+- *
+- *     value = webkit_javascript_result_get_js_value (js_result);
+- *     if (jsc_value_is_number (value)) {
+- *         gint32        int_value = jsc_value_to_string (value);
+- *         JSCException *exception = jsc_context_get_exception (jsc_value_get_context (value));
+- *         if (exception)
+- *             g_warning ("Error running javascript: %s", jsc_exception_get_message (exception));
+- *         else
+- *             g_print ("Script result: %d\n", int_value);
+- *         g_free (str_value);
+- *     } else {
+- *         g_warning ("Error running javascript: unexpected return value");
+- *     }
+- *     webkit_javascript_result_unref (js_result);
+- * }
+- *
+- * static void
+- * web_view_evaluate_promise (WebKitWebView *web_view)
+- * {
+- *     GVariantDict dict;
+- *     g_variant_dict_init (&dict, NULL);
+- *     g_variant_dict_insert (&dict, "count", "u", 42);
+- *     GVariant *args = g_variant_dict_end (&dict);
+- *     const gchar *body = "return new Promise((resolve) => { resolve(count); });";
+- *     webkit_web_view_run_async_javascript_function_in_world (web_view, body, arguments, NULL, NULL, web_view_javascript_finished, NULL);
+- * }
+- * ```
+- *
+- * Since: 2.38
+- *
+- * Deprecated: 2.40: Use webkit_web_view_call_async_javascript_function() instead.
+- */
+ void webkit_web_view_run_async_javascript_function_in_world(WebKitWebView* webView, const gchar* body, GVariant* arguments, const char* worldName, GCancellable* cancellable, GAsyncReadyCallback callback, gpointer userData)
+ {
+     webkitWebViewCallAsyncJavascriptFunctionInternal(webView, body, -1, arguments, worldName, nullptr, RunJavascriptReturnType::WebKitJavascriptResult, cancellable, callback, userData);
+diff --git a/Source/WebKit/UIProcess/API/glib/WebKitWebView.h.in b/Source/WebKit/UIProcess/API/glib/WebKitWebView.h.in
+index 959dd985c166..f385fd67b107 100644
+--- a/Source/WebKit/UIProcess/API/glib/WebKitWebView.h.in
++++ b/Source/WebKit/UIProcess/API/glib/WebKitWebView.h.in
+@@ -905,6 +905,148 @@ webkit_web_view_get_web_extension_mode               (WebKitWebView
+ WEBKIT_API const gchar*
+ webkit_web_view_get_default_content_security_policy  (WebKitWebView             *web_view);
+ 
++#if USE(GI_FINISH_FUNC_ANNOTATION)
++/**
++ * webkit_web_view_run_async_javascript_function_in_world: (finish-func webkit_web_view_run_javascript_in_world_finish)
++ * @web_view: a #WebKitWebView
++ * @body: the JavaScript function body
++ * @arguments: a #GVariant with format `{&sv}` storing the function arguments. Function argument values must be one of the following types, or contain only the following GVariant types: number, string, array, and dictionary.
++ * @world_name: (nullable): the name of a #WebKitScriptWorld, if no name (i.e. %NULL) is provided, the default world is used. Any value that is not %NULL is a distinct world.
++ * @cancellable: (allow-none): a #GCancellable or %NULL to ignore
++ * @callback: (scope async): a #GAsyncReadyCallback to call when the script finished
++ * @user_data: the data to pass to callback function
++ *
++ * Asynchronously run @body in the script world with name @world_name of the current page context in
++ * @web_view. If WebKitSettings:enable-javascript is FALSE, this method will do nothing. This API
++ * differs from webkit_web_view_run_javascript_in_world() in that the JavaScript function can return a
++ * Promise and its result will be properly passed to the callback.
++ *
++ * When the operation is finished, @callback will be called. You can then call
++ * webkit_web_view_run_javascript_in_world_finish() to get the result of the operation.
++ *
++ * For instance here is a dummy example that shows how to pass arguments to a JS function that
++ * returns a Promise that resolves with the passed argument:
++ *
++ * ```c
++ * static void
++ * web_view_javascript_finished (GObject      *object,
++ *                               GAsyncResult *result,
++ *                               gpointer      user_data)
++ * {
++ *     WebKitJavascriptResult *js_result;
++ *     JSCValue               *value;
++ *     GError                 *error = NULL;
++ *
++ *     js_result = webkit_web_view_run_javascript_finish (WEBKIT_WEB_VIEW (object), result, &error);
++ *     if (!js_result) {
++ *         g_warning ("Error running javascript: %s", error->message);
++ *         g_error_free (error);
++ *         return;
++ *     }
++ *
++ *     value = webkit_javascript_result_get_js_value (js_result);
++ *     if (jsc_value_is_number (value)) {
++ *         gint32        int_value = jsc_value_to_string (value);
++ *         JSCException *exception = jsc_context_get_exception (jsc_value_get_context (value));
++ *         if (exception)
++ *             g_warning ("Error running javascript: %s", jsc_exception_get_message (exception));
++ *         else
++ *             g_print ("Script result: %d\n", int_value);
++ *         g_free (str_value);
++ *     } else {
++ *         g_warning ("Error running javascript: unexpected return value");
++ *     }
++ *     webkit_javascript_result_unref (js_result);
++ * }
++ *
++ * static void
++ * web_view_evaluate_promise (WebKitWebView *web_view)
++ * {
++ *     GVariantDict dict;
++ *     g_variant_dict_init (&dict, NULL);
++ *     g_variant_dict_insert (&dict, "count", "u", 42);
++ *     GVariant *args = g_variant_dict_end (&dict);
++ *     const gchar *body = "return new Promise((resolve) => { resolve(count); });";
++ *     webkit_web_view_run_async_javascript_function_in_world (web_view, body, arguments, NULL, NULL, web_view_javascript_finished, NULL);
++ * }
++ * ```
++ *
++ * Since: 2.38
++ *
++ * Deprecated: 2.40: Use webkit_web_view_call_async_javascript_function() instead.
++ */
++#else
++/**
++ * webkit_web_view_run_async_javascript_function_in_world:
++ * @web_view: a #WebKitWebView
++ * @body: the JavaScript function body
++ * @arguments: a #GVariant with format `{&sv}` storing the function arguments. Function argument values must be one of the following types, or contain only the following GVariant types: number, string, array, and dictionary.
++ * @world_name: (nullable): the name of a #WebKitScriptWorld, if no name (i.e. %NULL) is provided, the default world is used. Any value that is not %NULL is a distinct world.
++ * @cancellable: (allow-none): a #GCancellable or %NULL to ignore
++ * @callback: (scope async): a #GAsyncReadyCallback to call when the script finished
++ * @user_data: the data to pass to callback function
++ *
++ * Asynchronously run @body in the script world with name @world_name of the current page context in
++ * @web_view. If WebKitSettings:enable-javascript is FALSE, this method will do nothing. This API
++ * differs from webkit_web_view_run_javascript_in_world() in that the JavaScript function can return a
++ * Promise and its result will be properly passed to the callback.
++ *
++ * When the operation is finished, @callback will be called. You can then call
++ * webkit_web_view_run_javascript_in_world_finish() to get the result of the operation.
++ *
++ * For instance here is a dummy example that shows how to pass arguments to a JS function that
++ * returns a Promise that resolves with the passed argument:
++ *
++ * ```c
++ * static void
++ * web_view_javascript_finished (GObject      *object,
++ *                               GAsyncResult *result,
++ *                               gpointer      user_data)
++ * {
++ *     WebKitJavascriptResult *js_result;
++ *     JSCValue               *value;
++ *     GError                 *error = NULL;
++ *
++ *     js_result = webkit_web_view_run_javascript_finish (WEBKIT_WEB_VIEW (object), result, &error);
++ *     if (!js_result) {
++ *         g_warning ("Error running javascript: %s", error->message);
++ *         g_error_free (error);
++ *         return;
++ *     }
++ *
++ *     value = webkit_javascript_result_get_js_value (js_result);
++ *     if (jsc_value_is_number (value)) {
++ *         gint32        int_value = jsc_value_to_string (value);
++ *         JSCException *exception = jsc_context_get_exception (jsc_value_get_context (value));
++ *         if (exception)
++ *             g_warning ("Error running javascript: %s", jsc_exception_get_message (exception));
++ *         else
++ *             g_print ("Script result: %d\n", int_value);
++ *         g_free (str_value);
++ *     } else {
++ *         g_warning ("Error running javascript: unexpected return value");
++ *     }
++ *     webkit_javascript_result_unref (js_result);
++ * }
++ *
++ * static void
++ * web_view_evaluate_promise (WebKitWebView *web_view)
++ * {
++ *     GVariantDict dict;
++ *     g_variant_dict_init (&dict, NULL);
++ *     g_variant_dict_insert (&dict, "count", "u", 42);
++ *     GVariant *args = g_variant_dict_end (&dict);
++ *     const gchar *body = "return new Promise((resolve) => { resolve(count); });";
++ *     webkit_web_view_run_async_javascript_function_in_world (web_view, body, arguments, NULL, NULL, web_view_javascript_finished, NULL);
++ * }
++ * ```
++ *
++ * Since: 2.38
++ *
++ * Deprecated: 2.40: Use webkit_web_view_call_async_javascript_function() instead.
++ */
++#endif
++
+ G_END_DECLS
+ 
+ #endif

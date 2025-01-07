@@ -1,12 +1,12 @@
-diff -uNr qemu-6.1.0/meson.build qemu-6.1.0.mod/meson.build
---- qemu-6.1.0/meson.build	2021-08-24 20:35:41.000000000 +0300
-+++ qemu-6.1.0.mod/meson.build	2021-08-25 16:17:56.185294702 +0300
-@@ -1508,7 +1508,7 @@
-   }
- endif
+diff -uNr qemu-8.2.5/meson.build qemu-8.2.5.mod/meson.build
+--- qemu-8.2.5/meson.build	2024-06-10 20:19:05.000000000 +0300
++++ qemu-8.2.5.mod/meson.build	2024-06-12 22:53:15.131884081 +0300
+@@ -2883,7 +2883,7 @@
+   'loongarch' : ['CONFIG_LOONGARCH_DIS'],
+ }
  
 -have_ivshmem = config_host_data.get('CONFIG_EVENTFD')
 +have_ivshmem = false
  host_kconfig = \
-   ('CONFIG_TPM' in config_host ? ['CONFIG_TPM=y'] : []) + \
-   ('CONFIG_SPICE' in config_host ? ['CONFIG_SPICE=y'] : []) + \
+   (get_option('fuzzing') ? ['CONFIG_FUZZ=y'] : []) + \
+   (have_tpm ? ['CONFIG_TPM=y'] : []) + \

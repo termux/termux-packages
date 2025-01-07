@@ -1,0 +1,37 @@
+--- a/Makefile	2023-01-09 17:18:03.884999487 -0300
++++ b/Makefile	2023-01-09 23:50:00.261732945 -0300
+@@ -24,7 +24,7 @@
+ LIBEXECDIRTSH?=	$(PREFIX)/libexec/$(ETSH_VERSION)/tsh
+ DOCDIR?=	$(PREFIX)/share/doc/etsh
+ EXPDIR?=	$(PREFIX)/share/examples/etsh
+-MANDIR?=	$(PREFIX)/man/man1
++MANDIR?=	$(PREFIX)/share/man/man1
+ SYSCONFDIR?=	$(PREFIX)/etc
+ #BINGRP=		-g bin
+ BINMODE=	-m 0555
+@@ -221,19 +221,19 @@
+ install-utils: install-ubin install-uman
+ 
+ install-etsh: $(ETSH) $(ETSHMAN) install-dest install-destlibexecetsh
+-	$(INSTALL) -c -s $(BINGRP) $(BINMODE) etsh       $(DESTBINDIR)/$(EBN)
++	$(INSTALL) -c $(BINGRP) $(BINMODE) etsh       $(DESTBINDIR)/$(EBN)
+ 	$(INSTALL) -c    $(MANGRP) $(MANMODE) etsh.1.out $(DESTMANDIR)/$(EBN).1
+ 
+ install-tsh: $(TSH) $(TSHMAN) install-dest install-destlibexectsh
+-	$(INSTALL) -c -s $(BINGRP) $(BINMODE) tsh        $(DESTBINDIR)/$(TBN)
++	$(INSTALL) -c $(BINGRP) $(BINMODE) tsh        $(DESTBINDIR)/$(TBN)
+ 	$(INSTALL) -c    $(MANGRP) $(MANMODE) tsh.1.out  $(DESTMANDIR)/$(TBN).1
+-	$(INSTALL) -c -s $(BINGRP) $(BINMODE) glob       $(DESTLIBEXECDIRTSH)
++	$(INSTALL) -c $(BINGRP) $(BINMODE) glob       $(DESTLIBEXECDIRTSH)
+ 	$(INSTALL) -c    $(MANGRP) $(MANMODE) glob.1.out $(DESTMANDIR)/glob.1
+ 
+ install-ubin: $(UBIN) install-dest install-destlibexec
+-	$(INSTALL) -c -s $(BINGRP) $(BINMODE) fd2        $(DESTLIBEXECDIRTSH)
+-	$(INSTALL) -c -s $(BINGRP) $(BINMODE) goto       $(DESTLIBEXECDIRTSH)
+-	$(INSTALL) -c -s $(BINGRP) $(BINMODE) if         $(DESTLIBEXECDIRTSH)
++	$(INSTALL) -c $(BINGRP) $(BINMODE) fd2        $(DESTLIBEXECDIRTSH)
++	$(INSTALL) -c $(BINGRP) $(BINMODE) goto       $(DESTLIBEXECDIRTSH)
++	$(INSTALL) -c $(BINGRP) $(BINMODE) if         $(DESTLIBEXECDIRTSH)
+ 
+ install-uman: $(UMAN) install-dest
+ 	$(INSTALL) -c    $(MANGRP) $(MANMODE) fd2.1.out  $(DESTMANDIR)/fd2.1

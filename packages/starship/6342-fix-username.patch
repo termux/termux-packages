@@ -1,0 +1,32 @@
+From abad5e3de2d680f905d4b95349b1d6926cea36c2 Mon Sep 17 00:00:00 2001
+From: David Knaack <davidkna@users.noreply.github.com>
+Date: Mon, 21 Oct 2024 19:10:17 +0200
+Subject: [PATCH] fix(username): avoid using `whoami` on android
+
+Closes #6340
+
+Co-Authored-By: AminurAlam <64137875+aminuralam@users.noreply.github.com>
+---
+ src/modules/username.rs | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/modules/username.rs b/src/modules/username.rs
+index 8ba3509e44b9..59d6f8330f51 100644
+--- a/src/modules/username.rs
++++ b/src/modules/username.rs
+@@ -19,13 +19,13 @@ const USERNAME_ENV_VAR: &str = "USERNAME";
+ /// Does not display the username:
+ ///     - If the option `username.detect_env_vars` is set with a negated environment variable [A]
+ pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
+-    #[cfg(not(test))]
++    #[cfg(not(any(test, target_os = "android")))]
+     let mut username = whoami::fallible::username()
+         .inspect_err(|e| log::debug!("Failed to get username {e:?}"))
+         .ok()
+         .or_else(|| context.get_env(USERNAME_ENV_VAR))?;
+ 
+-    #[cfg(test)]
++    #[cfg(any(test, target_os = "android"))]
+     let mut username = context.get_env(USERNAME_ENV_VAR)?;
+ 
+     let mut module = context.new_module("username");

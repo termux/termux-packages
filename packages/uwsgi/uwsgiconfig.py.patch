@@ -1,15 +1,7 @@
---- a/uwsgiconfig.py
-+++ b/uwsgiconfig.py
-@@ -670,7 +670,7 @@
-             'core/setup_utils', 'core/clock', 'core/init', 'core/buffer', 'core/reader', 'core/writer', 'core/alarm', 'core/cron', 'core/hooks',
-             'core/plugins', 'core/lock', 'core/cache', 'core/daemons', 'core/errors', 'core/hash', 'core/master_events', 'core/chunked',
-             'core/queue', 'core/event', 'core/signal', 'core/strings', 'core/progress', 'core/timebomb', 'core/ini', 'core/fsmon', 'core/mount',
--            'core/metrics', 'core/plugins_builder', 'core/sharedarea',
-+            'core/metrics', 'core/plugins_builder', 'core/sharedarea', 'core/sys_time',
-             'core/rpc', 'core/gateway', 'core/loop', 'core/cookie', 'core/querystring', 'core/rb_timers', 'core/transformations', 'core/uwsgi']
-         # add protocols
-         self.gcc_list.append('proto/base')
-@@ -725,7 +725,7 @@
+diff -uNr uwsgi-2.0.25.1/uwsgiconfig.py uwsgi-2.0.25.1.mod/uwsgiconfig.py
+--- uwsgi-2.0.25.1/uwsgiconfig.py	2024-04-15 22:43:55.000000000 +0300
++++ uwsgi-2.0.25.1.mod/uwsgiconfig.py	2024-04-17 14:08:43.743475152 +0300
+@@ -730,7 +730,7 @@
              if not self.include_path:
                  raise 
          except:
@@ -18,44 +10,25 @@
  
          additional_include_paths = self.get('additional_include_paths')
          if additional_include_paths:
-@@ -762,7 +762,7 @@
-             self.cflags.append('-Wno-format -Wno-format-security')
+@@ -1085,13 +1085,13 @@
  
-         self.ldflags = os.environ.get("LDFLAGS", "").split()
--        self.libs = ['-lpthread', '-lm', '-rdynamic']
-+        self.libs = ['-lm', '-rdynamic']
-         if uwsgi_os in ('Linux', 'GNU', 'GNU/kFreeBSD'):
-             self.libs.append('-ldl')
-         if uwsgi_os == 'GNU/kFreeBSD':
-@@ -1079,23 +1079,23 @@
-         # re-enable after pcre fix
-         if self.get('pcre'):
-             if self.get('pcre') == 'auto':
--                pcreconf = spcall('pcre-config --libs')
-+                pcreconf = spcall('sh @TERMUX_PREFIX@/bin/pcre-config --libs')
-                 if pcreconf:
-                     self.libs.append(pcreconf)
--                    pcreconf = spcall("pcre-config --cflags")
-+                    pcreconf = spcall("sh @TERMUX_PREFIX@/bin/pcre-config --cflags")
-                     self.cflags.append(pcreconf)
-                     self.gcc_list.append('core/regexp')
-                     self.cflags.append("-DUWSGI_PCRE")
-                     has_pcre = True
- 
+         required_pcre = self.get('pcre')
+         if required_pcre:
+-            pcre_libs = spcall('pcre2-config --libs8')
++            pcre_libs = spcall('sh @TERMUX_PREFIX@/bin/pcre2-config --libs8')
+             if pcre_libs:
+-                pcre_cflags = spcall("pcre2-config --cflags")
++                pcre_cflags = spcall("sh @TERMUX_PREFIX@/bin/pcre2-config --cflags")
+                 pcre_define = "-DUWSGI_PCRE2"
              else:
--                pcreconf = spcall('pcre-config --libs')
-+                pcreconf = spcall('sh @TERMUX_PREFIX@/bin/pcre-config --libs')
-                 if pcreconf is None:
-                     print("*** libpcre headers unavailable. uWSGI build is interrupted. You have to install pcre development package or disable pcre")
-                     sys.exit(1)
-                 else:
-                     self.libs.append(pcreconf)
--                    pcreconf = spcall("pcre-config --cflags")
-+                    pcreconf = spcall("sh @TERMUX_PREFIX@/bin/pcre-config --cflags")
-                     self.cflags.append(pcreconf)
-                     self.gcc_list.append('core/regexp')
-                     self.cflags.append("-DUWSGI_PCRE")
-@@ -1123,7 +1123,7 @@
+-                pcre_libs = spcall('pcre-config --libs')
+-                pcre_cflags = spcall("pcre-config --cflags")
++                pcre_libs = spcall('sh @TERMUX_PREFIX@/bin/pcre-config --libs')
++                pcre_cflags = spcall("sh @TERMUX_PREFIX@/bin/pcre-config --cflags")
+                 pcre_define = "-DUWSGI_PCRE"
+         else:
+             pcre_libs = None
+@@ -1130,7 +1130,7 @@
  
          if self.has_include('uuid/uuid.h'):
              self.cflags.append("-DUWSGI_UUID")
@@ -64,7 +37,7 @@
                  self.libs.append('-luuid')
  
          if self.get('append_version'):
-@@ -1310,10 +1310,10 @@
+@@ -1315,10 +1315,10 @@
  
          if self.get('xml'):
              if self.get('xml') == 'auto':
@@ -77,7 +50,7 @@
                      self.cflags.append(xmlconf)
                      self.cflags.append("-DUWSGI_XML -DUWSGI_XML_LIBXML2")
                      self.gcc_list.append('core/xmlconf')
-@@ -1324,7 +1324,7 @@
+@@ -1329,13 +1329,13 @@
                      self.gcc_list.append('core/xmlconf')
                      report['xml'] = 'expat'
              elif self.get('xml') == 'libxml2':
@@ -86,3 +59,10 @@
                  if xmlconf is None:
                      print("*** libxml2 headers unavailable. uWSGI build is interrupted. You have to install libxml2 development package or use libexpat or disable XML")
                      sys.exit(1)
+                 else:
+                     self.libs.append(xmlconf)
+-                    xmlconf = spcall("xml2-config --cflags")
++                    xmlconf = spcall("sh @TERMUX_PREFIX@/bin/xml2-config --cflags")
+                     if xmlconf is None:
+                         print("*** libxml2 headers unavailable. uWSGI build is interrupted. You have to install libxml2 development package or use libexpat or disable XML")
+                         sys.exit(1)

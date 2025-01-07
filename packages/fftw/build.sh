@@ -22,6 +22,6 @@ termux_step_post_make_install() {
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS="$COMMON_ARGS --enable-$feature"
 		rm -Rf $TERMUX_PKG_TMPDIR/config-scripts
 		termux_step_configure
-		make -j $TERMUX_MAKE_PROCESSES install
+		make -j $TERMUX_PKG_MAKE_PROCESSES install
 	done
 }

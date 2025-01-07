@@ -1,0 +1,11 @@
+--- a/cmake/Modules/ECMGeneratePriFile.cmake
++++ b/cmake/Modules/ECMGeneratePriFile.cmake
+@@ -92,7 +92,7 @@ Since pre-1.0.0.
+ set(_should_query_qt OFF)
+ if(NOT DEFINED KDE_INSTALL_USE_QT_SYS_PATHS)
+     include(ECMQueryQt)
+-    ecm_query_qt(qt_install_prefix_dir QT_INSTALL_PREFIX TRY)
++    set(qt_install_prefix_dir "@TERMUX_PREFIX@")
+     if(qt_install_prefix_dir STREQUAL "${CMAKE_INSTALL_PREFIX}")
+         set(_should_query_qt ON)
+     endif()

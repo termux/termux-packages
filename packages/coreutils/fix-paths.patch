@@ -1,29 +1,17 @@
-diff -uNr coreutils-8.32/lib/getusershell.c coreutils-8.32.mod/lib/getusershell.c
---- coreutils-8.32/lib/getusershell.c	2020-01-01 16:14:23.000000000 +0200
-+++ coreutils-8.32.mod/lib/getusershell.c	2020-05-05 14:13:10.980279936 +0300
-@@ -56,7 +56,7 @@
- static char const* const default_shells[] =
- {
-   ADDITIONAL_DEFAULT_SHELLS
--  "/bin/sh", "/bin/csh", "/usr/bin/sh", "/usr/bin/csh", NULL
-+  "@TERMUX_PREFIX@/bin/sh", "@TERMUX_PREFIX@/bin/bash", "@TERMUX_PREFIX@/bin/ash", "@TERMUX_PREFIX@/bin/csh", NULL
- };
- 
- /* Index of the next shell in 'default_shells' to return.
-diff -uNr coreutils-8.32/lib/tempname.c coreutils-8.32.mod/lib/tempname.c
---- coreutils-8.32/lib/tempname.c	2020-01-01 16:19:26.000000000 +0200
-+++ coreutils-8.32.mod/lib/tempname.c	2020-05-05 14:13:10.984279966 +0300
-@@ -33,7 +33,7 @@
- 
- #include <stdio.h>
- #ifndef P_tmpdir
--# define P_tmpdir "/tmp"
-+# define P_tmpdir "@TERMUX_PREFIX@/tmp"
+diff -uNr coreutils-9.2/lib/tmpdir.c coreutils-9.2.mod/lib/tmpdir.c
+--- coreutils-9.2/lib/tmpdir.c	2023-03-13 18:12:12.000000000 +0000
++++ coreutils-9.2.mod/lib/tmpdir.c	2023-03-23 06:56:30.519517214 +0000
+@@ -35,7 +35,7 @@
+ # ifdef _P_tmpdir /* native Windows */
+ #  define P_tmpdir _P_tmpdir
+ # else
+-#  define P_tmpdir "/tmp"
++#  define P_tmpdir "@TERMUX_PREFIX@/tmp"
+ # endif
  #endif
- #ifndef TMP_MAX
- # define TMP_MAX 238328
-@@ -149,8 +149,8 @@
-     {
+ 
+@@ -135,8 +135,8 @@
+ #endif
        if (direxists (P_tmpdir))
          dir = P_tmpdir;
 -      else if (strcmp (P_tmpdir, "/tmp") != 0 && direxists ("/tmp"))
@@ -68,29 +56,15 @@ diff -uNr coreutils-8.32/src/sort.c coreutils-8.32.mod/src/sort.c
  
  /* Maximum number of lines to merge every time a NODE is taken from
     the merge queue.  Node is at LEVEL in the binary merge tree,
-diff -uNr coreutils-8.32/src/split.c coreutils-8.32.mod/src/split.c
---- coreutils-8.32/src/split.c	2020-01-01 16:13:12.000000000 +0200
-+++ coreutils-8.32.mod/src/split.c	2020-05-05 14:13:10.984279966 +0300
-@@ -482,7 +482,7 @@
+diff -uNr coreutils-9.4/src/split.c coreutils-9.4.mod/src/split.c
+--- coreutils-9.4/src/split.c	2023-08-29 12:39:27.000000000 +0100
++++ coreutils-9.4.mod/src/split.c	2023-09-12 17:50:37.186340314 +0100
+@@ -503,7 +503,7 @@
        pid_t child_pid;
        char const *shell_prog = getenv ("SHELL");
-       if (shell_prog == NULL)
+       if (shell_prog == nullptr)
 -        shell_prog = "/bin/sh";
 +        shell_prog = "@TERMUX_PREFIX@/bin/sh";
        if (setenv ("FILE", name, 1) != 0)
-         die (EXIT_FAILURE, errno,
-              _("failed to set FILE environment variable"));
-diff -uNr coreutils-8.32/src/tac.c coreutils-8.32.mod/src/tac.c
---- coreutils-8.32/src/tac.c	2020-01-01 16:13:12.000000000 +0200
-+++ coreutils-8.32.mod/src/tac.c	2020-05-05 14:14:18.384798638 +0300
-@@ -66,9 +66,7 @@
- #endif
- 
- 
--#ifndef DEFAULT_TMPDIR
--# define DEFAULT_TMPDIR "/tmp"
--#endif
-+#define DEFAULT_TMPDIR "@TERMUX_PREFIX@/tmp"
- 
- /* The number of bytes per atomic read. */
- #define INITIAL_READSIZE 8192
+         error (EXIT_FAILURE, errno,
+                _("failed to set FILE environment variable"));

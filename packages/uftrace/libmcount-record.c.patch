@@ -1,7 +1,7 @@
 +++ ./libmcount/record.c	2019-08-26 14:43:15.836981805 +0300
 @@ -23,6 +23,44 @@
  
- #define ARG_STR_MAX	98
+ #define ARG_STR_MAX 98
  
 +static int shm_open(const char *name, int oflag, mode_t mode) {
 +    size_t namelen;
@@ -41,6 +41,6 @@
 +    return fd;
 +}
 +
- static struct mcount_shmem_buffer *allocate_shmem_buffer(char *sess_id, size_t size,
- 							 int tid, int idx)
+ static struct mcount_shmem_buffer *allocate_shmem_buffer(char *sess_id, size_t size, int tid,
+ 							 int idx)
  {

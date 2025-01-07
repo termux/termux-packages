@@ -63,9 +63,8 @@
  if [ -n $USE_TCL ]
  then
 -	LIBPOSTFIX=`ls -1 /usr/local/lib/ /usr/lib | grep 'libtcl[0-9]' | grep so | sed -e 's/\.so.*//g' -e 's/libtcl//g' | sort -r | head -1`
--	TCL_LIB="-ltcl${LIBPOSTFIX} -lm -lpthread"
 +	LIBPOSTFIX=`ls -1 @TERMUX_PREFIX@/lib | grep 'libtcl[0-9]' | grep so | sed -e 's/\.so.*//g' -e 's/libtcl//g' | sort -r | head -1`
-+	TCL_LIB="-ltcl${LIBPOSTFIX} -lm"
+ 	TCL_LIB="-ltcl${LIBPOSTFIX} -lm -lpthread"
  fi
 +TCL_INC="-I@TERMUX_PREFIX@/include"
  

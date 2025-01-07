@@ -1,7 +1,15 @@
-diff -uNr cairo-dock-core-6c569e67a2a366e7634224a0133ede51755629cb/src/gldit/CMakeLists.txt cairo-dock-core-6c569e67a2a366e7634224a0133ede51755629cb.mod/src/gldit/CMakeLists.txt
---- cairo-dock-core-6c569e67a2a366e7634224a0133ede51755629cb/src/gldit/CMakeLists.txt	2021-03-27 06:23:53.000000000 +0200
-+++ cairo-dock-core-6c569e67a2a366e7634224a0133ede51755629cb.mod/src/gldit/CMakeLists.txt	2021-12-05 11:40:06.757366142 +0200
-@@ -122,8 +122,6 @@
+diff -u -r ../cairo-dock-core-3.5.1/src/gldit/CMakeLists.txt ./src/gldit/CMakeLists.txt
+--- ../cairo-dock-core-3.5.1/src/gldit/CMakeLists.txt	2024-09-21 17:48:58.000000000 +0000
++++ ./src/gldit/CMakeLists.txt	2025-01-06 12:27:25.206975976 +0000
+@@ -108,6 +108,7 @@
+ 
+ # Link the result to the librairies.
+ target_link_libraries("gldi"
++	"m"
+ 	${PACKAGE_LIBRARIES}
+ 	${GTK_LIBRARIES}
+ 	${EGL_LIBRARIES}
+@@ -122,8 +123,6 @@
  configure_file (${CMAKE_CURRENT_SOURCE_DIR}/gldi.pc.in ${CMAKE_CURRENT_BINARY_DIR}/gldi.pc)
  install (FILES  ${CMAKE_CURRENT_BINARY_DIR}/gldi.pc DESTINATION ${install-pc-path})
  install (FILES  ${CMAKE_CURRENT_BINARY_DIR}/libgldi.so DESTINATION ${libdir})

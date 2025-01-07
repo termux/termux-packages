@@ -1,0 +1,17 @@
+--- a/Modules/Platform/Android-GNU.cmake
++++ b/Modules/Platform/Android-GNU.cmake
+@@ -24,6 +24,14 @@
+   return()
+ endif()
+ 
++# Natively compiling on an Android host doesn't use the NDK cross-compilation
++# tools.
++if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Android")
++  macro(__android_compiler_gnu lang)
++  endmacro()
++  return()
++endif()
++
+ include(Platform/Android-Common)
+ 
+ include(Platform/Android/abi-${CMAKE_ANDROID_ARCH_ABI}-GNU)

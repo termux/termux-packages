@@ -1,0 +1,61 @@
+diff -u -r ../cache/tmp-checkout/setup.py ./setup.py
+--- ../cache/tmp-checkout/setup.py	2024-10-03 18:27:11.540911181 +0000
++++ ./setup.py	2024-10-04 12:09:20.737925352 +0000
+@@ -8,10 +8,9 @@
+ import warnings
+ from pathlib import Path
+ 
+-import torch
+ from pkg_resources import DistributionNotFound, get_distribution, parse_version
+ from setuptools import find_packages, setup
+-from torch.utils.cpp_extension import BuildExtension, CppExtension, CUDA_HOME, CUDAExtension, ROCM_HOME
++from setuptools import Extension as CppExtension
+ 
+ FORCE_CUDA = os.getenv("FORCE_CUDA", "0") == "1"
+ FORCE_MPS = os.getenv("FORCE_MPS", "0") == "1"
+@@ -39,8 +38,8 @@
+ 
+ ROOT_DIR = Path(__file__).absolute().parent
+ CSRS_DIR = ROOT_DIR / "torchvision/csrc"
+-IS_ROCM = (torch.version.hip is not None) and (ROCM_HOME is not None)
+-BUILD_CUDA_SOURCES = (torch.cuda.is_available() and ((CUDA_HOME is not None) or IS_ROCM)) or FORCE_CUDA
++IS_ROCM = False
++BUILD_CUDA_SOURCES = False
+ 
+ PACKAGE_NAME = "torchvision"
+ 
+@@ -146,7 +145,7 @@
+     else:
+         extra_compile_args["cxx"].append("-g0")
+ 
+-    return define_macros, extra_compile_args
++    return define_macros, extra_compile_args["cxx"]
+ 
+ 
+ def make_C_extension():
+@@ -183,7 +182,7 @@
+         sources += cuda_sources
+     else:
+         Extension = CppExtension
+-        if torch.backends.mps.is_available() or FORCE_MPS:
++        if False or FORCE_MPS:
+             sources += mps_sources
+ 
+     define_macros, extra_compile_args = get_macros_and_flags()
+@@ -366,7 +365,7 @@
+         else:
+             warnings.warn("Building torchvision without AVIF support")
+ 
+-    if USE_NVJPEG and (torch.cuda.is_available() or FORCE_CUDA):
++    if USE_NVJPEG and (False or FORCE_CUDA):
+         nvjpeg_found = CUDA_HOME is not None and (Path(CUDA_HOME) / "include/nvjpeg.h").exists()
+ 
+         if nvjpeg_found:
+@@ -593,7 +592,6 @@
+         ext_modules=extensions,
+         python_requires=">=3.8",
+         cmdclass={
+-            "build_ext": BuildExtension.with_options(no_python_abi_suffix=True),
+             "clean": clean,
+         },
+     )

@@ -1,0 +1,28 @@
+By default mpv chooses wrong video backend
+```
+Error opening/initializing the selected video_out (--vo) device.
+Video: no video
+```
+This patch forces it to choose X11 by default.
++++ ./video/out/vo.c
+@@ -69,8 +69,8 @@
+ 
+ static const struct vo_driver *const video_out_drivers[] =
+ {
+-#if HAVE_ANDROID
+-    &video_out_mediacodec_embed,
++#if HAVE_X11
++    &video_out_x11,
+ #endif
+     &video_out_gpu,
+     &video_out_gpu_next,
+@@ -95,9 +95,6 @@
+ #if HAVE_VAAPI_X11 && HAVE_GPL
+     &video_out_vaapi,
+ #endif
+-#if HAVE_X11
+-    &video_out_x11,
+-#endif
+     &video_out_libmpv,
+     &video_out_null,
+     // should not be auto-selected

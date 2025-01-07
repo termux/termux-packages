@@ -6,7 +6,7 @@ and there is no intention to disrespect the aforementioned commit at all.
 
 --- a/lib/stdlib.in.h
 +++ b/lib/stdlib.in.h
-@@ -1117,3 +1117,8 @@
+@@ -1117,3 +1117,9 @@
  #endif /* _@GUARD_PREFIX@_STDLIB_H */
  #endif /* _@GUARD_PREFIX@_STDLIB_H */
  #endif
@@ -14,6 +14,7 @@ and there is no intention to disrespect the aforementioned commit at all.
 +#if defined __ANDROID__ && defined __TERMUX__
 +# undef MB_CUR_MAX
 +# define MB_CUR_MAX __ctype_get_mb_cur_max()
++size_t __ctype_get_mb_cur_max(void);
 +#endif
 --- a/sed/sed.c
 +++ b/sed/sed.c
