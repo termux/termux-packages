@@ -1,0 +1,24 @@
+--- a/scripts/make-config.sh
++++ b/scripts/make-config.sh
+@@ -144,9 +144,9 @@ debug "NOEXTLIBS='$NOEXTLIBS'"
+ #-----------------------------------------------------------------------------
+ 
+ # Enforce English locale by default in all commands for predictible output.
+-LANGUAGE=en_US.UTF-8
+-LC_ALL=en_US.UTF-8
+-LANG=en_US.UTF-8
++LANGUAGE=C.UTF-8
++LC_ALL=C.UTF-8
++LANG=C.UTF-8
+ 
+ [[ -z $LOCAL_OS ]] && LOCAL_OS=$(uname -s | tr A-Z a-z)
+ [[ -z $LOCAL_ARCH ]] && LOCAL_ARCH=$(uname -m)
+@@ -332,7 +332,7 @@ else
+         BINDIR="$BINROOT/debug-${MAIN_ARCH}${hpart}${BINDIR_SUFFIX}"
+     else
+         # Default BINDIR for release mode.
+-        BINDIR="$BINROOT/release-${MAIN_ARCH}${hpart}${BINDIR_SUFFIX}"
++        BINDIR="$BINROOT/release"
+     fi
+ fi
+ 
