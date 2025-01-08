@@ -1,13 +1,13 @@
---- a/src/modules/module-rtp-sink.c
-+++ b/src/modules/module-rtp-sink.c
-@@ -668,6 +668,10 @@ static int make_socket(struct sockaddr_s
+--- pipewire-1.2.7/src/modules/module-rtp-sink.c	2024-11-26 14:37:54.000000000 +0530
++++ pipewire-1.2.7.mod/src/modules/module-rtp-sink.c	2025-01-08 16:46:26.537354237 +0530
+@@ -258,6 +258,10 @@
  		pw_log_warn("setsockopt(SO_PRIORITY) failed: %m");
  #endif
  	if (dscp > 0) {
-+#ifdef __ANDROID__
-+#define IPTOS_DSCP_MASK 0xfc
-+#define IPTOS_DSCP(x) ((x) & IPTOS_DSCP_MASK)
-+#endif
++		#ifdef __ANDROID__
++		#define IPTOS_DSCP_MASK 0xfc
++		#define IPTOS_DSCP(x) ((x) & IPTOS_DSCP_MASK)
++		#endif
  		val = IPTOS_DSCP(dscp << 2);
  		if (setsockopt(fd, IPPROTO_IP, IP_TOS, &val, sizeof(val)) < 0)
  			pw_log_warn("setsockopt(IP_TOS) failed: %m");

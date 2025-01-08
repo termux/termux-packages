@@ -12,35 +12,35 @@ index 3cee8a2..e2ea8f5 100644
 +			pthread_kill(loop->thread, SIGUSR2);
  		} else {
  			pw_log_debug("%p signal", loop);
- 			pw_loop_invoke(loop->loop, do_stop, 1, NULL, 0, false, loop);
-diff --git a/src/pipewire/thread.c b/src/pipewire/thread.c
-index cf656fb..ba5193f 100644
---- a/src/pipewire/thread.c
-+++ b/src/pipewire/thread.c
-@@ -79,9 +79,44 @@ static int thread_setaffinity(pthread_t thread, const char *affinity)
+ 			pw_loop_invoke(loo
+
+--- pipewire-1.2.7/src/pipewire/thread.c	2024-11-26 14:37:54.000000000 +0530
++++ pipewire-1.2.7.mod/src/pipewire/thread.c	2025-01-08 18:24:30.620004636 +0530
+@@ -80,11 +80,44 @@
+ 
+ static int thread_setaffinity(pthread_t thread, const char *affinity)
  {
- 	cpu_set_t set;
+-	cpu_set_t set;
++	cpu_set_t set;
  	parse_affinity(affinity, &set);
 +#ifdef __ANDROID__
 +	return -sched_setaffinity(pthread_gettid_np(thread), sizeof(set), &set);
 +#else
  	return -pthread_setaffinity_np(thread, sizeof(set), &set);
 +#endif
-+}
-+
+ }
+ 
 +#ifdef __ANDROID__
 +typedef struct wrapped_thread_start {
 +	void *(*start)(void *);
 +	void *arg;
 +} wrapped_thread_start_t;
 +
-+static void thread_signal_handler(int signum)
-+{
++static void thread_signal_handler(int signum) {
 +	pthread_exit(0);
- }
- 
-+static void *pthread_create_wrapper(void *wrapped_arg)
-+{
++}
++ 
++static void *pthread_create_wrapper(void *wrapped_arg) {
 +	wrapped_thread_start_t *wrapped_start = (wrapped_thread_start_t *)wrapped_arg;
 +
 +	struct sigaction actions;
@@ -62,19 +62,24 @@ index cf656fb..ba5193f 100644
  static struct spa_thread *impl_create(void *object,
  			const struct spa_dict *props,
  			void *(*start)(void*), void *arg)
-@@ -93,7 +128,16 @@ static struct spa_thread *impl_create(void *object,
+@@ -102,7 +135,21 @@
+ 	   sscanf(str, "pointer:%p", &create_func) != 1)
+ 		create_func = pthread_create;
  
- 	attr = pw_thread_fill_attr(props, &attributes);
- 
-+#ifndef __ANDROID__
- 	err = pthread_create(&pt, attr, start, arg);
++#ifdef __ANDROID__
++	if(create_func == pthread_create) {
++		wrapped_thread_start_t *wrapped_start = malloc(sizeof(wrapped_thread_start_t));
++		if (wrapped_start == NULL)
++			return NULL;
++		wrapped_start->start = start;
++		wrapped_start->arg = arg;
++		err = pthread_create(&pt, attr, pthread_create_wrapper, wrapped_start);
++	}
++	else {
++		err = create_func(&pt, attr, start, arg);
++	}
 +#else
-+	wrapped_thread_start_t *wrapped_start = malloc(sizeof(wrapped_thread_start_t));
-+	if (wrapped_start == NULL)
-+		return NULL;
-+	wrapped_start->start = start;
-+	wrapped_start->arg = arg;
-+	err = pthread_create(&pt, attr, pthread_create_wrapper, wrapped_start);
+ 	err = create_func(&pt, attr, start, arg);
 +#endif
  
  	if (attr)
