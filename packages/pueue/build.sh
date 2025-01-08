@@ -1,11 +1,12 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/Nukesor/pueue
 TERMUX_PKG_DESCRIPTION="A command-line task management tool for sequential and parallel execution of long-running tasks"
-TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_LICENSE="MIT, Apache-2.0"
+TERMUX_PKG_LICENSE_FILE="LICENSE.MIT, LICENSE.APACHE"
 TERMUX_PKG_MAINTAINER="@stevenxxiu"
-TERMUX_PKG_VERSION=3.4.1
+TERMUX_PKG_VERSION="4.0.0-rc.1"
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/Nukesor/pueue/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=868710de128db49e0a0c4ddee127dfc0e19b20cbdfd4a9d53d5ed792c5538244
+TERMUX_PKG_SHA256=4005cdb038b0fe84cf25b46551920b14cedcbea265b6dac068b5ea4261ab4e2d
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_SERVICE_SCRIPT=("pueued" 'exec pueued 2>&1')
