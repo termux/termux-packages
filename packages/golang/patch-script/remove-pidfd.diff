@@ -15,13 +15,13 @@ diff --git a/src/os/export_linux_test.go b/src/os/export_linux_test.go
 index 12434cb..da527f9 100644
 --- a/src/os/export_linux_test.go
 +++ b/src/os/export_linux_test.go
-@@ -8,7 +8,6 @@
+@@ -8,7 +8,6 @@ var (
  	PollCopyFileRangeP  = &pollCopyFileRange
  	PollSpliceFile      = &pollSplice
  	GetPollFDAndNetwork = getPollFDAndNetwork
 -	CheckPidfdOnce      = checkPidfdOnce
  )
-
+ 
  const StatusDone = statusDone
 diff --git a/src/os/export_pidfd_test.go b/src/os/export_pidfd_test.go
 new file mode 100644
@@ -39,10 +39,10 @@ index 0000000..7705ddb
 +
 +var CheckPidfdOnce = checkPidfdOnce
 diff --git a/src/os/pidfd_linux.go b/src/os/pidfd_linux.go
-index 0404c4f..4bdc289 100644
+index 0bfef77..e3c6674 100644
 --- a/src/os/pidfd_linux.go
 +++ b/src/os/pidfd_linux.go
-@@ -2,12 +2,17 @@
+@@ -2,6 +2,8 @@
  // Use of this source code is governed by a BSD-style
  // license that can be found in the LICENSE file.
  
@@ -51,9 +51,10 @@ index 0404c4f..4bdc289 100644
  // Support for pidfd was added during the course of a few Linux releases:
  //  v5.1: pidfd_send_signal syscall;
  //  v5.2: CLONE_PIDFD flag for clone syscall;
- //  v5.3: pidfd_open syscall, clone3 syscall;
- //  v5.4: P_PIDFD idtype support for waitid syscall;
- //  v5.6: pidfd_getfd syscall.
+@@ -12,6 +14,9 @@
+ // N.B. Alternative Linux implementations may not follow this ordering. e.g.,
+ // QEMU user mode 7.2 added pidfd_open, but CLONE_PIDFD was not added until
+ // 8.0.
 +//
 +// On Android systems the pidfd_open call reportedly triggers a SIGSYS signal,
 +// (issue #69065), so don't use pidfd on Android.
@@ -61,7 +62,7 @@ index 0404c4f..4bdc289 100644
  package os
  
 diff --git a/src/os/pidfd_linux_test.go b/src/os/pidfd_linux_test.go
-index 8375937..47b3dad 100644
+index c1f41d0..f49ac81 100644
 --- a/src/os/pidfd_linux_test.go
 +++ b/src/os/pidfd_linux_test.go
 @@ -2,6 +2,8 @@
@@ -74,7 +75,7 @@ index 8375937..47b3dad 100644
  
  import (
 diff --git a/src/os/pidfd_other.go b/src/os/pidfd_other.go
-index 5780432..fcb0d3c 100644
+index ba9cbcb..78e09fb 100644
 --- a/src/os/pidfd_other.go
 +++ b/src/os/pidfd_other.go
 @@ -2,7 +2,7 @@
@@ -85,3 +86,4 @@ index 5780432..fcb0d3c 100644
 +//go:build (unix && (android || !linux)) || (js && wasm) || wasip1 || windows
  
  package os
+ 
