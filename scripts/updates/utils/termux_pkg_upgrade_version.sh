@@ -130,6 +130,7 @@ termux_pkg_upgrade_version() {
 			git commit -m "bump(${repo}/${TERMUX_PKG_NAME}): ${LATEST_VERSION}" \
 				-m "This commit has been automatically submitted by Github Actions." 2>&1 >/dev/null
 		)" || {
+			git reset HEAD --hard
 			termux_error_exit <<-EndOfError
 			ERROR: git commit failed. See below for details.
 			${stderr}
@@ -140,6 +141,10 @@ termux_pkg_upgrade_version() {
 	if [[ "${GIT_PUSH_PACKAGES}" == "true" ]]; then
 		echo "INFO: Pushing package."
 		stderr="$(
+			# Fetch and pull before attempting to push to avoid a situation
+			# where a long running auto update fails because a later faster
+			# autoupdate got committed first and now the git history is out of date.
+			git fetch 2>&1 >/dev/null
 			git pull --rebase 2>&1 >/dev/null
 			git push 2>&1 >/dev/null
 		)" || {
