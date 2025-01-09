@@ -1,0 +1,38 @@
+From bbf73ee62988b16d629a0f5e76faa7be14a4c490 Mon Sep 17 00:00:00 2001
+From: elfmz <fenix1905@tut.by>
+Date: Sat, 14 Dec 2024 11:15:40 +0300
+Subject: [PATCH] fixing build with recent libnfs
+
+---
+ NetRocks/src/Protocol/NFS/ProtocolNFS.cpp | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/NetRocks/src/Protocol/NFS/ProtocolNFS.cpp b/NetRocks/src/Protocol/NFS/ProtocolNFS.cpp
+index a3c3e764e..4d8412f4e 100644
+--- a/NetRocks/src/Protocol/NFS/ProtocolNFS.cpp
++++ b/NetRocks/src/Protocol/NFS/ProtocolNFS.cpp
+@@ -507,7 +507,11 @@ class NFSFileIO : public IFileReader, public IFileWriter
+ 
+ 	virtual size_t Read(void *buf, size_t len)
+ 	{
++#ifdef LIBNFS_API_V2
++		const auto rc = nfs_read(_nfs->ctx, _file, (char *)buf, len);
++#else
+ 		const auto rc = nfs_read(_nfs->ctx, _file, len, (char *)buf);
++#endif
+ 		if (rc < 0)
+ 			throw ProtocolError("Read file error", errno);
+ 		// uncomment to simulate connection stuck if ( (rand()%100) == 0) sleep(60);
+@@ -518,7 +522,11 @@ class NFSFileIO : public IFileReader, public IFileWriter
+ 	virtual void Write(const void *buf, size_t len)
+ 	{
+ 		if (len > 0) for (;;) {
+-			const auto rc = nfs_write(_nfs->ctx, _file, len, (char *)buf);
++#ifdef LIBNFS_API_V2
++			const auto rc = nfs_write(_nfs->ctx, _file, (const char *)buf, len);
++#else
++			const auto rc = nfs_write(_nfs->ctx, _file, len, (const char *)buf);
++#endif
+ 			if (rc <= 0)
+ 				throw ProtocolError("Write file error", errno);
+ 			if ((size_t)rc >= len)
