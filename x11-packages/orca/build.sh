@@ -2,20 +2,17 @@ TERMUX_PKG_HOMEPAGE=https://orca.gnome.org/
 TERMUX_PKG_DESCRIPTION="A free, open source, flexible, and extensible screen reader"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="44.1"
+TERMUX_PKG_VERSION="47.3"
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/orca/${TERMUX_PKG_VERSION%.*}/orca-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=f5ed6551d72f897b21248d433085a7b817accbb0296a84c3e851d91fb2eee4de
+TERMUX_PKG_SHA256=1b0b145bb685cd74eca3e28cb7b7097f98d13ee1cc58b71edeed3a8f9045231b
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="at-spi2-core, glib, gst-python, gstreamer, gtk3, libwnck, pango, pyatspi, pygobject, python, python-pip, speechd"
 TERMUX_PKG_SETUP_PYTHON=true
 TERMUX_PKG_PYTHON_TARGET_DEPS="setproctitle"
+TERMUX_MESON_WHEEL_CROSSFILE="$TERMUX_PKG_TMPDIR/wheel-cross-file.txt"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
-py_cv_mod_gi_=yes
-py_cv_mod_json_=yes
-py_cv_mod_speechd_=yes
-py_cv_mod_brlapi_=no
-py_cv_mod_louis_=no
+--cross-file $TERMUX_MESON_WHEEL_CROSSFILE
 "
 
 termux_step_pre_configure() {
@@ -31,6 +28,18 @@ termux_step_pre_configure() {
 		EOF
 		chmod 0700 "$ITSTOOL"
 	fi
+}
+
+termux_step_configure() {
+	termux_setup_meson
+
+	cp -f $TERMUX_MESON_CROSSFILE $TERMUX_MESON_WHEEL_CROSSFILE
+	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
+		sed -i 's|^\(\[binaries\]\)$|\1\nitstool = '\'$ITSTOOL\''|g' \
+			$TERMUX_MESON_WHEEL_CROSSFILE
+	fi
+
+	termux_step_configure_meson
 }
 
 termux_step_create_debscripts() {
