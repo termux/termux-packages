@@ -1,12 +1,11 @@
-TERMUX_PKG_HOMEPAGE=https://wiki.gnome.org/Projects/Orca
+TERMUX_PKG_HOMEPAGE=https://orca.gnome.org/
 TERMUX_PKG_DESCRIPTION="A free, open source, flexible, and extensible screen reader"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
-_MAJOR_VERSION=44
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}.1
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://download.gnome.org/sources/orca/${_MAJOR_VERSION}/orca-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_VERSION="44.1"
+TERMUX_PKG_SRCURL=https://download.gnome.org/sources/orca/${TERMUX_PKG_VERSION%.*}/orca-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=f5ed6551d72f897b21248d433085a7b817accbb0296a84c3e851d91fb2eee4de
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="at-spi2-core, glib, gst-python, gstreamer, gtk3, libwnck, pango, pyatspi, pygobject, python, python-pip, speechd"
 TERMUX_PKG_SETUP_PYTHON=true
 TERMUX_PKG_PYTHON_TARGET_DEPS="setproctitle"
