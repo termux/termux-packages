@@ -1,0 +1,13 @@
+Prevent running pygobject scripts from termux prefix
+
+--- a/meson.build
++++ b/meson.build
+@@ -31,7 +31,7 @@
+ gtk_test = run_command(python3, '-c', gtk_command, check: false)
+ description = f'GTK @gtk_major_version@.@gtk_minor_version@'
+ version = gtk_test.stdout().strip()
+-if gtk_test.returncode() != 0
++if meson.can_run_host_binaries() and gtk_test.returncode() != 0
+   error(f'@description@ failed (found @version@)')
+ endif
+ 
