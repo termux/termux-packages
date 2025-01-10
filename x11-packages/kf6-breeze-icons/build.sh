@@ -39,7 +39,7 @@ termux_step_host_build() {
 	install(TARGETS qrcAlias DESTINATION bin)
 	install(TARGETS generate-symbolic-dark DESTINATION bin)
 	EOF
-	
+
 	mkdir -p build
 	cmake -B build \
 		-DCMAKE_BUILD_TYPE=MinSizeRel \
