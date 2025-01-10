@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE='https://community.kde.org/Frameworks'
 TERMUX_PKG_DESCRIPTION='Breeze icon theme'
 TERMUX_PKG_LICENSE="GPL-3.0, LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.9.0"
+TERMUX_PKG_VERSION="6.10.0"
 TERMUX_PKG_SRCURL=https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/breeze-icons-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=618f633bafb0a5aabaa93eaa6733dfebd6e79303ef1d0a93dcf249181896bed9
+TERMUX_PKG_SHA256=fe458eb957be655ea801d41f1dd3c4cfa829e7ba6040b38d69d09f6b69c31e2a
 TERMUX_PKG_DEPENDS="qt6-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules (>= ${TERMUX_PKG_VERSION}), python-lxml, qt6-qtbase-cross-tools"
 TERMUX_PKG_AUTO_UPDATE=true
