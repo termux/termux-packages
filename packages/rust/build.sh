@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.rust-lang.org/
 TERMUX_PKG_DESCRIPTION="Systems programming language focused on safety, speed and concurrency"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.84.0"
+TERMUX_PKG_VERSION="1.84.1"
 TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/rustc-${TERMUX_PKG_VERSION}-src.tar.xz
-TERMUX_PKG_SHA256=bc2c1639f26814c7b17a323992f1e08c3b01fe88cdff9a27d951987d886e00b3
+TERMUX_PKG_SHA256=e23ec747a06ffd3e94155046f40b6664ac152c9ee3c2adfd90353a7ccff24226
 _LLVM_MAJOR_VERSION=$(. $TERMUX_SCRIPTDIR/packages/libllvm/build.sh; echo $LLVM_MAJOR_VERSION)
 _LLVM_MAJOR_VERSION_NEXT=$((_LLVM_MAJOR_VERSION + 1))
 _LZMA_VERSION=$(. $TERMUX_SCRIPTDIR/packages/liblzma/build.sh; echo $TERMUX_PKG_VERSION)
@@ -95,10 +95,6 @@ termux_step_pre_configure() {
 	ln -vfst "${RUST_LIBDIR}" \
 		${TERMUX_PREFIX}/lib/libLLVM-${_LLVM_MAJOR_VERSION}.so
 
-	# rust tries to find static library 'c++_shared'
-	ln -vfs $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/libc++_static.a \
-		$RUST_LIBDIR/libc++_shared.a
-
 	# https://github.com/termux/termux-packages/issues/18379
 	# NDK r26 multiple ld.lld: error: undefined symbol: __cxa_*
 	ln -vfst "${RUST_LIBDIR}" "${TERMUX_PREFIX}"/lib/libc++_shared.so
@@ -112,17 +108,6 @@ termux_step_pre_configure() {
 	#		$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/lib{c,dl}.so
 	# but written in a future-proof manner.
 	ln -vfst $RUST_LIBDIR $(echo | $CC -x c - -Wl,-t -shared | grep '\.so$')
-
-	# rust checks libs in PREFIX/lib. It then can't find libc.so and libdl.so because rust program doesn't
-	# know where those are. Putting them temporarly in $PREFIX/lib prevents that failure
-	# https://github.com/termux/termux-packages/issues/11427
-	[[ "${TERMUX_ON_DEVICE_BUILD}" == "true" ]] && return
-	mv $TERMUX_PREFIX/lib/liblzma.a{,.tmp} || :
-	mv $TERMUX_PREFIX/lib/liblzma.so{,.tmp} || :
-	mv $TERMUX_PREFIX/lib/liblzma.so.${_LZMA_VERSION}{,.tmp} || :
-	mv $TERMUX_PREFIX/lib/libtinfo.so.6{,.tmp} || :
-	mv $TERMUX_PREFIX/lib/libz.so.1{,.tmp} || :
-	mv $TERMUX_PREFIX/lib/libz.so{,.tmp} || :
 }
 
 termux_step_configure() {
@@ -133,7 +118,7 @@ termux_step_configure() {
 	# like 30 to 40 + minutes ... so lets get it right
 
 	# upstream tests build using versions N and N-1
-	local BOOTSTRAP_VERSION=1.83.0
+	local BOOTSTRAP_VERSION=1.84.0
 	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "false" ]]; then
 		if ! rustup install "${BOOTSTRAP_VERSION}"; then
 			echo "WARN: ${BOOTSTRAP_VERSION} is unavailable, fallback to stable version!"
@@ -187,14 +172,6 @@ termux_step_configure() {
 
 	export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C link-arg=-Wl,-rpath=${TERMUX_PREFIX}/lib -C link-arg=-Wl,--enable-new-dtags"
 
-	export X86_64_UNKNOWN_LINUX_GNU_OPENSSL_LIB_DIR=/usr/lib/x86_64-linux-gnu
-	export X86_64_UNKNOWN_LINUX_GNU_OPENSSL_INCLUDE_DIR=/usr/include
-	export PKG_CONFIG_ALLOW_CROSS=1
-	# for backtrace-sys
-	export CC_x86_64_unknown_linux_gnu=gcc
-	export CFLAGS_x86_64_unknown_linux_gnu="-O2"
-	export RUST_BACKTRACE=full
-
 	unset CC CFLAGS CFLAGS_${env_host} CPP CPPFLAGS CXX CXXFLAGS LD LDFLAGS PKG_CONFIG RANLIB
 }
 
@@ -236,13 +213,7 @@ termux_step_make_install() {
 	done
 
 	cd "$TERMUX_PREFIX/lib"
-	rm -f libc.so libdl.so
-	mv liblzma.a{.tmp,} || :
-	mv liblzma.so{.tmp,} || :
-	mv liblzma.so.${_LZMA_VERSION}{.tmp,} || :
-	mv libtinfo.so.6{.tmp,} || :
-	mv libz.so.1{.tmp,} || :
-	mv libz.so{.tmp,} || :
+	rm -fv libc.so libdl.so
 
 	ln -vfs rustlib/${CARGO_TARGET_NAME}/lib/*.so .
 	ln -vfs lld ${TERMUX_PREFIX}/bin/rust-lld
