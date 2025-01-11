@@ -2,12 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://www.abisource.com/
 TERMUX_PKG_DESCRIPTION="A free word processing program"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.0.5
-TERMUX_PKG_REVISION=6
-TERMUX_PKG_SRCURL=https://dev.alpinelinux.org/archive/abiword/abiword-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_VERSION="3.0.6"
+TERMUX_PKG_SRCURL=https://gitlab.gnome.org/World/AbiWord/-/archive/release-${TERMUX_PKG_VERSION}/AbiWord-release-${TERMUX_PKG_VERSION}.tar.gz
+#TERMUX_PKG_SRCURL=https://dev.alpinelinux.org/archive/abiword/abiword-${TERMUX_PKG_VERSION}.tar.gz
 #TERMUX_PKG_SRCURL=https://ftp-osl.osuosl.org/pub/gentoo/distfiles/abiword-${TERMUX_PKG_VERSION}.tar.gz
 #TERMUX_PKG_SRCURL=http://www.abisource.com/downloads/abiword/${TERMUX_PKG_VERSION}/source/abiword-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=1257247e9970508d6d1456d3e330cd1909c4b42b25e0f0a1bc32526d6f3a21b4
+TERMUX_PKG_SHA256=571b8db0f7aac6f2a607b489eedd71260b449cc733d704cf4d9551e6df35d1a4
 TERMUX_PKG_DEPENDS="atk, enchant, fontconfig, fribidi, gdk-pixbuf, glib, goffice, gtk3, libc++, libcairo, libgsf, libical, libjpeg-turbo, libpng, librsvg, libwv, libx11, libxml2, libxslt, pango, readline, zlib"
 TERMUX_PKG_BUILD_DEPENDS="boost, boost-headers, g-ir-scanner"
 TERMUX_PKG_DISABLE_GIR=false
@@ -38,6 +38,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_pre_configure() {
 	termux_setup_gir
 
+	./autogen-common.sh
 	autoreconf -fi
 
 	LDFLAGS+=" $($CC -print-libgcc-file-name) -lm"
