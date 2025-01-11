@@ -1,0 +1,15 @@
+#!/bin/sh
+# Randomise buildorder.py test on packages directory
+
+export TERMUX_SCRIPTDIR
+TERMUX_SCRIPTDIR=$(realpath "$(dirname "$0")/../..") # Root of repository.
+
+cd "${TERMUX_SCRIPTDIR}" || exit 1
+
+no_of_packages=0
+packages=$(find packages -maxdepth 1 -type d | sort)
+[ -n "$packages" ] && no_of_packages=$(echo "${packages}" | wc -l)
+random_package_no=$(shuf -i 1-"${no_of_packages}" -n 1)
+random_package=$(echo "${packages}" | head -n"${random_package_no}" | tail -n1)
+echo "INFO: random_package = ${random_package}"
+./scripts/buildorder.py "${random_package}"
