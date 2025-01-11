@@ -160,6 +160,7 @@ termux_step_setup_variables() {
 	TERMUX_PKG_MASSAGEDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/massage
 	TERMUX_PKG_METAPACKAGE=false
 	TERMUX_PKG_NO_ELF_CLEANER=false # set this to true to disable running of termux-elf-cleaner on built binaries
+	TERMUX_PKG_NO_REPLACE_GUESS_SCRIPTS=false # if true, find and replace config.guess and config.sub in source directory
 	TERMUX_PKG_NO_SHEBANG_FIX=false # if true, skip fixing shebang accordingly to TERMUX_PREFIX
 	TERMUX_PKG_NO_SHEBANG_FIX_FILES="" # files to be excluded from fixing shebang
 	TERMUX_PKG_NO_STRIP=false # set this to true to disable stripping binaries
