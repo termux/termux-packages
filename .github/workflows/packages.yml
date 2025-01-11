@@ -274,6 +274,16 @@ jobs:
         name: debs-${{ matrix.target_arch }}-${{ github.sha }}
         path: ./artifacts
 
+  test-buildorder-random:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v4
+    - name: Randomise buildorder.py test
+      run: ./scripts/bin/test-buildorder-random
+
   upload-test:
     permissions:
       contents: read
@@ -329,16 +339,16 @@ jobs:
             fi
             result=$(find debs -maxdepth 1 -type f | cut -d"/" -f2 | xargs -P$(nproc) -i{} grep "^Filename:.*/{}$" -nH "Packages-${repo}-${arch}" || true)
             if [ -n "$result" ]; then
-              if [ "$error" = 0 ]; then
-                echo "[!] Found local files same name with server files!"
-                echo "[!] Please revbump package, rebase or tag commit with '%ci:no-build'"
-              fi
               echo "$result" | grep -E "${arch}|all" || true
               error=1
             fi
           done
         done
-        if [ "$error" != 0 ]; then exit 1; fi
+        if [ "$error" != 0 ]; then
+          echo "[!] Found local files same name with server files!"
+          echo "[!] Please revbump package, rebase or tag commit with '%ci:no-build'"
+          exit 1
+        fi
 
   upload:
     concurrency: ${{ github.workflow }}
