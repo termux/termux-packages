@@ -102,6 +102,11 @@ termux_setup_toolchain_23c() {
 	export CARGO_TARGET_${env_host@U}_LINKER="${CC}"
 	export CARGO_TARGET_${env_host@U}_RUSTFLAGS="-L${TERMUX_PREFIX}/lib -C link-arg=-Wl,-rpath=${TERMUX_PREFIX}/lib -C link-arg=-Wl,--enable-new-dtags"
 	export CFLAGS_${env_host}="${CPPFLAGS} ${CFLAGS}"
+	export CC_x86_64_unknown_linux_gnu="gcc"
+	export CFLAGS_x86_64_unknown_linux_gnu="-O2"
+	export PKG_CONFIG_x86_64_unknown_linux_gnu="/usr/bin/pkg-config"
+	export PKG_CONFIG_LIBDIR_x86_64_unknown_linux_gnu="/usr/lib/pkgconfig"
+	export RUST_BACKTRACE="full"
 
 	export ac_cv_func_getpwent=no
 	export ac_cv_func_endpwent=yes
