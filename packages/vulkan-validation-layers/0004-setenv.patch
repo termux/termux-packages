@@ -1,0 +1,11 @@
+--- a/layers/vk_layer_config.cpp
++++ b/layers/vk_layer_config.cpp
+@@ -90,7 +90,7 @@
+ }
+ 
+ void SetEnvironment(const char *variable, const char *value) {
+-#if !defined(__ANDROID__) && !defined(_WIN32)
++#if !defined(__ANDROID__) && !defined(_WIN32) || defined(__TERMUX__)
+     setenv(variable, value, 1);
+ #elif defined(_WIN32)
+     SetEnvironmentVariable(variable, value);
