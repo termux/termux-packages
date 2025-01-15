@@ -1,0 +1,178 @@
+support libnfs 6.0.0, upstream commit ref, https://github.com/MusicPlayerDaemon/MPD/commit/31e583e9f8d14b9e67eab2581be8e21cd5712b47
+
+By homebrew:
+https://github.com/Homebrew/homebrew-core/blob/master/Formula/m/mpd.rb
+
+diff --git a/src/lib/nfs/Connection.cxx b/src/lib/nfs/Connection.cxx
+index fd73338..bfd675d 100644
+--- a/src/lib/nfs/Connection.cxx
++++ b/src/lib/nfs/Connection.cxx
+@@ -103,14 +103,28 @@ NfsConnection::CancellableCallback::Stat(nfs_context *ctx,
+ 
+ inline void
+ NfsConnection::CancellableCallback::Read(nfs_context *ctx, struct nfsfh *fh,
+-					 uint64_t offset, size_t size)
++					 uint64_t offset,
++#ifdef LIBNFS_API_2
++					 std::span<std::byte> dest
++#else
++					 std::size_t size
++#endif
++	)
+ {
+-	assert(connection.GetEventLoop().IsInside());
++    assert(connection.GetEventLoop().IsInside());
+ 
+-	int result = nfs_pread_async(ctx, fh, offset, size, Callback, this);
+-	if (result < 0)
+-		throw FormatRuntimeError("nfs_pread_async() failed: %s",
+-					 nfs_get_error(ctx));
++	int result = nfs_pread_async(ctx, fh,
++#ifdef LIBNFS_API_2
++				     dest.data(), dest.size(),
++#endif
++				     offset,
++#ifndef LIBNFS_API_2
++				     size,
++#endif
++				     Callback, this);
++
++    if (result < 0)
++        throw NfsClientError(ctx, "nfs_pread_async() failed");
+ }
+ 
+ inline void
+@@ -329,7 +343,12 @@ NfsConnection::Stat(struct nfsfh *fh, NfsCallback &callback)
+ }
+ 
+ void
+-NfsConnection::Read(struct nfsfh *fh, uint64_t offset, size_t size,
++NfsConnection::Read(struct nfsfh *fh, uint64_t offset,
++#ifdef LIBNFS_API_2
++		    std::span<std::byte> dest,
++#else
++		    std::size_t size,
++#endif
+ 		    NfsCallback &callback)
+ {
+ 	assert(GetEventLoop().IsInside());
+@@ -337,7 +356,13 @@ NfsConnection::Read(struct nfsfh *fh, uint64_t offset, size_t size,
+ 
+ 	auto &c = callbacks.Add(callback, *this, false);
+ 	try {
+-		c.Read(context, fh, offset, size);
++		c.Read(context, fh, offset,
++#ifdef LIBNFS_API_2
++		       dest
++#else
++		       size
++#endif
++			);
+ 	} catch (...) {
+ 		callbacks.Remove(c);
+ 		throw;
+diff --git a/src/lib/nfs/Connection.hxx b/src/lib/nfs/Connection.hxx
+index 49987e2..a5d7fa0 100644
+--- a/src/lib/nfs/Connection.hxx
++++ b/src/lib/nfs/Connection.hxx
+@@ -29,6 +29,7 @@
+ #include <list>
+ #include <forward_list>
+ #include <exception>
++#include <span>
+ 
+ struct nfs_context;
+ struct nfsdir;
+@@ -71,7 +72,13 @@ class NfsConnection {
+ 		void Open(nfs_context *context, const char *path, int flags);
+ 		void Stat(nfs_context *context, struct nfsfh *fh);
+ 		void Read(nfs_context *context, struct nfsfh *fh,
+-			  uint64_t offset, size_t size);
++			  uint64_t offset,
++#ifdef LIBNFS_API_2
++			  std::span<std::byte> dest
++#else
++			  std::size_t size
++#endif
++			);
+ 
+ 		/**
+ 		 * Cancel the operation and schedule a call to
+@@ -193,7 +200,12 @@ public:
+ 	/**
+ 	 * Throws std::runtime_error on error.
+ 	 */
+-	void Read(struct nfsfh *fh, uint64_t offset, size_t size,
++	void Read(struct nfsfh *fh, uint64_t offset,
++#ifdef LIBNFS_API_2
++		  std::span<std::byte> dest,
++#else
++		  std::size_t size,
++#endif
+ 		  NfsCallback &callback);
+ 
+ 	void Cancel(NfsCallback &callback) noexcept;
+diff --git a/src/lib/nfs/FileReader.cxx b/src/lib/nfs/FileReader.cxx
+index 6e9457d..8de9801 100644
+--- a/src/lib/nfs/FileReader.cxx
++++ b/src/lib/nfs/FileReader.cxx
+@@ -129,7 +129,15 @@ NfsFileReader::Read(uint64_t offset, size_t size)
+ {
+ 	assert(state == State::IDLE);
+ 
++#ifdef LIBNFS_API_2
++	assert(!read_buffer);
++	// TOOD read into caller-provided buffer
++	read_buffer = std::make_unique<std::byte[]>(size);
++	connection->Read(fh, offset, {read_buffer.get(), size}, *this);
++#else
+ 	connection->Read(fh, offset, size, *this);
++#endif
++
+ 	state = State::READ;
+ }
+ 
+diff --git a/src/lib/nfs/FileReader.hxx b/src/lib/nfs/FileReader.hxx
+index 8d257ef..939d53d 100644
+--- a/src/lib/nfs/FileReader.hxx
++++ b/src/lib/nfs/FileReader.hxx
+@@ -30,6 +30,10 @@
+ #include <exception>
+ #include <string>
+ 
++#ifdef LIBNFS_API_2
++#include <memory>
++#endif
++
+ #include <sys/stat.h>
+ 
+ struct nfsfh;
+@@ -68,6 +72,10 @@ class NfsFileReader : NfsLease, NfsCallback {
+ 	 */
+ 	InjectEvent defer_open;
+ 
++#ifdef LIBNFS_API_2
++	std::unique_ptr<std::byte[]> read_buffer;
++#endif
++
+ public:
+ 	NfsFileReader() noexcept;
+ 	~NfsFileReader() noexcept;
+diff --git a/src/lib/nfs/meson.build b/src/lib/nfs/meson.build
+index 467da59..74d82cd 100644
+--- a/src/lib/nfs/meson.build
++++ b/src/lib/nfs/meson.build
+@@ -4,6 +4,13 @@ if not nfs_dep.found()
+   subdir_done()
+ endif
+ 
++if nfs_dep.version().version_compare('>=6')
++  # libnfs has no version macro therefore we must detect the API
++  # version 2 at configure time
++  nfs_dep = declare_dependency(compile_args: '-DLIBNFS_API_2',
++                               dependencies: nfs_dep)
++endif
++
+ nfs = static_library(
+   'nfs',
+   'Connection.cxx',

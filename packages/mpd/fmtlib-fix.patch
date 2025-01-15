@@ -1,0 +1,928 @@
+From 9db7144d0fa4512335070a984690f3f5034210a5 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Sat, 11 Jan 2025 21:33:04 +0000
+Subject: [PATCH] lib/fmt: drop use of FMT_STRING
+
+When compiling with libfmt-11.1.0 and newer the following compile errors occur:
+
+In file included from ../src/decoder/DecoderPrint.cxx:23:
+../src/client/Response.hxx: In instantiation of 'bool Response::Fmt(const S&, Args&& ...) [with S = decoder_plugin_print(Response&, const DecoderPlugin&)::<lambda()>::FMT_COMPILE_STRING; Args = {const char* const&}]':
+../src/decoder/DecoderPrint.cxx:38:7:   required from here
+   38 |         r.Fmt(FMT_STRING("plugin: {}\n"), plugin.name);
+      |         ~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../src/client/Response.hxx:86:28: error: cannot convert 'const decoder_plugin_print(Response&, const DecoderPlugin&)::<lambda()>::FMT_COMPILE_STRING' to 'fmt::v11::string_view' {aka 'fmt::v11::basic_string_view<char>'}
+   86 |                 return VFmt(format_str,
+      |                        ~~~~^~~~~~~~~~~~
+   87 |                             fmt::make_format_args(args...));
+      |                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../src/client/Response.hxx:81:36: note: initializing argument 1 of 'bool Response::VFmt(fmt::v11::string_view, fmt::v11::format_args)'
+   81 |         bool VFmt(fmt::string_view format_str, fmt::format_args args) noexcept;
+      |                   ~~~~~~~~~~~~~~~~~^~~~~~~~~~
+../src/client/Response.hxx: In instantiation of 'bool Response::Fmt(const S&, Args&& ...) [with S = decoder_plugin_print(Response&, const DecoderPlugin&)::<lambda()>::FMT_COMPILE_STRING; Args = {const char* const&}]':
+
+The error is due to the use of FMT_STRING. The libfmt team shared the following:
+
+    The correct way of using FMT_STRING is to wrap a format string when passing to a
+    function with compile-time checks (i.e. that takes format_string) as documented
+    in https://fmt.dev/11.1/api/#legacy-compile-time-checks.
+
+    Noting that FMT_STRING is a legacy API and has been superseded by consteval-based
+    API starting from version 8: https://github.com/fmtlib/fmt/releases/tag/8.0.0. It
+    looks like MPD is trying to emulate {fmt}'s old way of implementing compile-time
+    checks which was never properly documented because it was basically a hack. So the
+    correct fix is to switch to format_string and, possibly, remove usage of FMT_STRING.
+
+    The old way of doing compile-time checks (fmt::make_args_checked) was documented
+    in https://fmt.dev/7.1/api.html#argument-lists but it looks like MPD is not using
+    that API so the problematic uses of FMT_STRING have no effect and can just be removed.
+
+The FMT_STRING has been removed in this change based on the fmt-7.1 API and now MPD is
+successfully compile against the current libfmt-11.1.0 which highlighted the issue that
+had been present in the codebase as it is now triggering the error, is legacy and was
+not using the API for which FMT_STRING was aligned with.
+---
+ src/SongPrint.cxx                 | 20 ++++++-------
+ src/Stats.cxx                     | 14 ++++-----
+ src/TagPrint.cxx                  | 10 +++----
+ src/TimePrint.cxx                 |  2 +-
+ src/client/Idle.cxx               |  2 +-
+ src/client/Response.cxx           |  4 +--
+ src/command/AllCommands.cxx       | 14 ++++-----
+ src/command/DatabaseCommands.cxx  |  8 ++---
+ src/command/FileCommands.cxx      | 14 ++++-----
+ src/command/MessageCommands.cxx   |  4 +--
+ src/command/OtherCommands.cxx     | 12 ++++----
+ src/command/PartitionCommands.cxx |  2 +-
+ src/command/PlayerCommands.cxx    | 50 +++++++++++++++----------------
+ src/command/PlaylistCommands.cxx  |  2 +-
+ src/command/QueueCommands.cxx     |  2 +-
+ src/command/StorageCommands.cxx   | 10 +++----
+ src/command/TagCommands.cxx       |  4 +--
+ src/db/Count.cxx                  |  4 +--
+ src/db/DatabasePrint.cxx          | 12 ++++----
+ src/decoder/DecoderPrint.cxx      |  6 ++--
+ src/decoder/plugins/meson.build   |  2 +-
+ src/ls.cxx                        |  2 +-
+ src/output/Print.cxx              | 10 +++----
+ src/queue/QueuePrint.cxx          |  8 ++---
+ src/sticker/Print.cxx             |  2 +-
+ 25 files changed, 110 insertions(+), 110 deletions(-)
+
+diff --git a/src/SongPrint.cxx b/src/SongPrint.cxx
+index 939ed8f1c7..7ebd44fc10 100644
+--- a/src/SongPrint.cxx
++++ b/src/SongPrint.cxx
+@@ -46,14 +46,14 @@ song_print_uri(Response &r, const char *uri, bool base) noexcept
+ 			uri = allocated.c_str();
+ 	}
+ 
+-	r.Fmt(FMT_STRING(SONG_FILE "{}\n"), uri);
++	r.Fmt(SONG_FILE "{}\n", uri);
+ }
+ 
+ void
+ song_print_uri(Response &r, const LightSong &song, bool base) noexcept
+ {
+ 	if (!base && song.directory != nullptr)
+-		r.Fmt(FMT_STRING(SONG_FILE "{}/{}\n"),
++		r.Fmt(SONG_FILE "{}/{}\n",
+ 		      song.directory, song.uri);
+ 	else
+ 		song_print_uri(r, song.uri, base);
+@@ -72,13 +72,13 @@ PrintRange(Response &r, SongTime start_time, SongTime end_time) noexcept
+ 	const unsigned end_ms = end_time.ToMS();
+ 
+ 	if (end_ms > 0)
+-		r.Fmt(FMT_STRING("Range: {}.{:03}-{}.{:03}\n"),
++		r.Fmt("Range: {}.{:03}-{}.{:03}\n",
+ 		      start_ms / 1000,
+ 		      start_ms % 1000,
+ 		      end_ms / 1000,
+ 		      end_ms % 1000);
+ 	else if (start_ms > 0)
+-		r.Fmt(FMT_STRING("Range: {}.{:03}-\n"),
++		r.Fmt("Range: {}.{:03}-\n",
+ 		      start_ms / 1000,
+ 		      start_ms % 1000);
+ }
+@@ -94,14 +94,14 @@ song_print_info(Response &r, const LightSong &song, bool base) noexcept
+ 		time_print(r, "Last-Modified", song.mtime);
+ 
+ 	if (song.audio_format.IsDefined())
+-		r.Fmt(FMT_STRING("Format: {}\n"), song.audio_format);
++		r.Fmt("Format: {}\n", song.audio_format);
+ 
+ 	tag_print_values(r, song.tag);
+ 
+ 	const auto duration = song.GetDuration();
+ 	if (!duration.IsNegative())
+-		r.Fmt(FMT_STRING("Time: {}\n"
+-				 "duration: {:1.3f}\n"),
++		r.Fmt("Time: {}\n"
++		      "duration: {:1.3f}\n",
+ 		      duration.RoundS(),
+ 		      duration.ToDoubleS());
+ }
+@@ -117,14 +117,14 @@ song_print_info(Response &r, const DetachedSong &song, bool base) noexcept
+ 		time_print(r, "Last-Modified", song.GetLastModified());
+ 
+ 	if (const auto &f = song.GetAudioFormat(); f.IsDefined())
+-		r.Fmt(FMT_STRING("Format: {}\n"), f);
++		r.Fmt("Format: {}\n", f);
+ 
+ 	tag_print_values(r, song.GetTag());
+ 
+ 	const auto duration = song.GetDuration();
+ 	if (!duration.IsNegative())
+-		r.Fmt(FMT_STRING("Time: {}\n"
+-				 "duration: {:1.3f}\n"),
++		r.Fmt("Time: {}\n"
++		      "duration: {:1.3f}\n",
+ 		      duration.RoundS(),
+ 		      duration.ToDoubleS());
+ }
+diff --git a/src/Stats.cxx b/src/Stats.cxx
+index 077c6b49d8..bb7ec0fea5 100644
+--- a/src/Stats.cxx
++++ b/src/Stats.cxx
+@@ -99,10 +99,10 @@ db_stats_print(Response &r, const Database &db)
+ 	unsigned total_duration_s =
+ 		std::chrono::duration_cast<std::chrono::seconds>(stats.total_duration).count();
+ 
+-	r.Fmt(FMT_STRING("artists: {}\n"
+-			 "albums: {}\n"
+-			 "songs: {}\n"
+-			 "db_playtime: {}\n"),
++	r.Fmt("artists: {}\n"
++	      "albums: {}\n"
++	      "songs: {}\n"
++	      "db_playtime: {}\n",
+ 	      stats.artist_count,
+ 	      stats.album_count,
+ 	      stats.song_count,
+@@ -110,7 +110,7 @@ db_stats_print(Response &r, const Database &db)
+ 
+ 	const auto update_stamp = db.GetUpdateStamp();
+ 	if (!IsNegative(update_stamp))
+-		r.Fmt(FMT_STRING("db_update: {}\n"),
++		r.Fmt("db_update: {}\n",
+ 		      std::chrono::system_clock::to_time_t(update_stamp));
+ }
+ 
+@@ -125,8 +125,8 @@ stats_print(Response &r, const Partition &partition)
+ 	const auto uptime = std::chrono::steady_clock::now() - start_time;
+ #endif
+ 
+-	r.Fmt(FMT_STRING("uptime: {}\n"
+-			 "playtime: {}\n"),
++	r.Fmt("uptime: {}\n"
++	      "playtime: {}\n",
+ 	      std::chrono::duration_cast<std::chrono::seconds>(uptime).count(),
+ 	      lround(partition.pc.GetTotalPlayTime().count()));
+ 
+diff --git a/src/TagPrint.cxx b/src/TagPrint.cxx
+index e5ecb4b35a..e5d2b2f892 100644
+--- a/src/TagPrint.cxx
++++ b/src/TagPrint.cxx
+@@ -31,20 +31,20 @@ tag_print_types(Response &r) noexcept
+ 	const auto tag_mask = global_tag_mask & r.GetTagMask();
+ 	for (unsigned i = 0; i < TAG_NUM_OF_ITEM_TYPES; i++)
+ 		if (tag_mask.Test(TagType(i)))
+-			r.Fmt(FMT_STRING("tagtype: {}\n"), tag_item_names[i]);
++			r.Fmt("tagtype: {}\n", tag_item_names[i]);
+ }
+ 
+ void
+ tag_print(Response &r, TagType type, StringView _value) noexcept
+ {
+ 	const std::string_view value{_value};
+-	r.Fmt(FMT_STRING("{}: {}\n"), tag_item_names[type], value);
++	r.Fmt("{}: {}\n", tag_item_names[type], value);
+ }
+ 
+ void
+ tag_print(Response &r, TagType type, const char *value) noexcept
+ {
+-	r.Fmt(FMT_STRING("{}: {}\n"), tag_item_names[type], value);
++	r.Fmt("{}: {}\n", tag_item_names[type], value);
+ }
+ 
+ void
+@@ -60,8 +60,8 @@ void
+ tag_print(Response &r, const Tag &tag) noexcept
+ {
+ 	if (!tag.duration.IsNegative())
+-		r.Fmt(FMT_STRING("Time: {}\n"
+-				 "duration: {:1.3f}\n"),
++		r.Fmt("Time: {}\n"
++		      "duration: {:1.3f}\n",
+ 		      tag.duration.RoundS(),
+ 		      tag.duration.ToDoubleS());
+ 
+diff --git a/src/TimePrint.cxx b/src/TimePrint.cxx
+index 44f895e698..ebdc28f794 100644
+--- a/src/TimePrint.cxx
++++ b/src/TimePrint.cxx
+@@ -36,5 +36,5 @@ time_print(Response &r, const char *name,
+ 		return;
+ 	}
+ 
+-	r.Fmt(FMT_STRING("{}: {}\n"), name, s.c_str());
++	r.Fmt("{}: {}\n", name, s.c_str());
+ }
+diff --git a/src/client/Idle.cxx b/src/client/Idle.cxx
+index 3f54e583fb..d74a8c09ba 100644
+--- a/src/client/Idle.cxx
++++ b/src/client/Idle.cxx
+@@ -32,7 +32,7 @@ WriteIdleResponse(Response &r, unsigned flags) noexcept
+ 	const char *const*idle_names = idle_get_names();
+ 	for (unsigned i = 0; idle_names[i]; ++i) {
+ 		if (flags & (1 << i))
+-			r.Fmt(FMT_STRING("changed: {}\n"), idle_names[i]);
++			r.Fmt("changed: {}\n", idle_names[i]);
+ 	}
+ 
+ 	r.Write("OK\n");
+diff --git a/src/client/Response.cxx b/src/client/Response.cxx
+index e427f30f48..94664f5a58 100644
+--- a/src/client/Response.cxx
++++ b/src/client/Response.cxx
+@@ -66,7 +66,7 @@ Response::WriteBinary(ConstBuffer<void> payload) noexcept
+ void
+ Response::Error(enum ack code, const char *msg) noexcept
+ {
+-	Fmt(FMT_STRING("ACK [{}@{}] {{{}}} "),
++	Fmt("ACK [{}@{}] {{{}}} ",
+ 	    (int)code, list_index, command);
+ 
+ 	Write(msg);
+@@ -77,7 +77,7 @@ void
+ Response::VFmtError(enum ack code,
+ 		    fmt::string_view format_str, fmt::format_args args) noexcept
+ {
+-	Fmt(FMT_STRING("ACK [{}@{}] {{{}}} "),
++	Fmt("ACK [{}@{}] {{{}}} ",
+ 	    (int)code, list_index, command);
+ 
+ 	VFmt(format_str, args);
+diff --git a/src/command/AllCommands.cxx b/src/command/AllCommands.cxx
+index 643a950c15..9d6c8fbd84 100644
+--- a/src/command/AllCommands.cxx
++++ b/src/command/AllCommands.cxx
+@@ -255,7 +255,7 @@ PrintAvailableCommands(Response &r, const Partition &partition,
+ 
+ 		if (cmd->permission == (permission & cmd->permission) &&
+ 		    command_available(partition, cmd))
+-			r.Fmt(FMT_STRING("command: {}\n"), cmd->cmd);
++			r.Fmt("command: {}\n", cmd->cmd);
+ 	}
+ 
+ 	return CommandResult::OK;
+@@ -268,7 +268,7 @@ PrintUnavailableCommands(Response &r, unsigned permission) noexcept
+ 		const struct command *cmd = &i;
+ 
+ 		if (cmd->permission != (permission & cmd->permission))
+-			r.Fmt(FMT_STRING("command: {}\n"), cmd->cmd);
++			r.Fmt("command: {}\n", cmd->cmd);
+ 	}
+ 
+ 	return CommandResult::OK;
+@@ -326,7 +326,7 @@ command_check_request(const struct command *cmd, Response &r,
+ {
+ 	if (cmd->permission != (permission & cmd->permission)) {
+ 		r.FmtError(ACK_ERROR_PERMISSION,
+-			   FMT_STRING("you don't have permission for \"{}\""),
++			   "you don't have permission for \"{}\"",
+ 			   cmd->cmd);
+ 		return false;
+ 	}
+@@ -339,17 +339,17 @@ command_check_request(const struct command *cmd, Response &r,
+ 
+ 	if (min == max && unsigned(max) != args.size) {
+ 		r.FmtError(ACK_ERROR_ARG,
+-			   FMT_STRING("wrong number of arguments for \"{}\""),
++			   "wrong number of arguments for \"{}\"",
+ 			   cmd->cmd);
+ 		return false;
+ 	} else if (args.size < unsigned(min)) {
+ 		r.FmtError(ACK_ERROR_ARG,
+-			   FMT_STRING("too few arguments for \"{}\""),
++			   "too few arguments for \"{}\"",
+ 			   cmd->cmd);
+ 		return false;
+ 	} else if (max >= 0 && args.size > unsigned(max)) {
+ 		r.FmtError(ACK_ERROR_ARG,
+-			   FMT_STRING("too many arguments for \"{}\""),
++			   "too many arguments for \"{}\"",
+ 			   cmd->cmd);
+ 		return false;
+ 	} else
+@@ -363,7 +363,7 @@ command_checked_lookup(Response &r, unsigned permission,
+ 	const struct command *cmd = command_lookup(cmd_name);
+ 	if (cmd == nullptr) {
+ 		r.FmtError(ACK_ERROR_UNKNOWN,
+-			   FMT_STRING("unknown command \"{}\""), cmd_name);
++			   "unknown command \"{}\"", cmd_name);
+ 		return nullptr;
+ 	}
+ 
+diff --git a/src/command/DatabaseCommands.cxx b/src/command/DatabaseCommands.cxx
+index 160b7e4e6e..aaba2a22a3 100644
+--- a/src/command/DatabaseCommands.cxx
++++ b/src/command/DatabaseCommands.cxx
+@@ -243,7 +243,7 @@ handle_count(Client &client, Request args, Response &r)
+ 		group = tag_name_parse_i(s);
+ 		if (group == TAG_NUM_OF_ITEM_TYPES) {
+ 			r.FmtError(ACK_ERROR_ARG,
+-				   FMT_STRING("Unknown tag type: {}"), s);
++				   "Unknown tag type: {}", s);
+ 			return CommandResult::ERROR;
+ 		}
+ 
+@@ -312,7 +312,7 @@ handle_list(Client &client, Request args, Response &r)
+ 	const auto tagType = tag_name_parse_i(tag_name);
+ 	if (tagType == TAG_NUM_OF_ITEM_TYPES) {
+ 		r.FmtError(ACK_ERROR_ARG,
+-			   FMT_STRING("Unknown tag type: {}"), tag_name);
++			   "Unknown tag type: {}", tag_name);
+ 		return CommandResult::ERROR;
+ 	}
+ 
+@@ -326,7 +326,7 @@ handle_list(Client &client, Request args, Response &r)
+ 		/* for compatibility with < 0.12.0 */
+ 		if (tagType != TAG_ALBUM) {
+ 			r.FmtError(ACK_ERROR_ARG,
+-				   FMT_STRING("should be \"{}\" for 3 arguments"),
++				   "should be \"{}\" for 3 arguments",
+ 				   tag_item_names[TAG_ALBUM]);
+ 			return CommandResult::ERROR;
+ 		}
+@@ -341,7 +341,7 @@ handle_list(Client &client, Request args, Response &r)
+ 		const auto group = tag_name_parse_i(s);
+ 		if (group == TAG_NUM_OF_ITEM_TYPES) {
+ 			r.FmtError(ACK_ERROR_ARG,
+-				   FMT_STRING("Unknown tag type: {}"), s);
++				   "Unknown tag type: {}", s);
+ 			return CommandResult::ERROR;
+ 		}
+ 
+diff --git a/src/command/FileCommands.cxx b/src/command/FileCommands.cxx
+index 3b9a6339e9..e28cc2eb50 100644
+--- a/src/command/FileCommands.cxx
++++ b/src/command/FileCommands.cxx
+@@ -85,12 +85,12 @@ handle_listfiles_local(Response &r, Path path_fs)
+ 			continue;
+ 
+ 		if (fi.IsRegular())
+-			r.Fmt(FMT_STRING("file: {}\n"
+-					 "size: {}\n"),
++			r.Fmt("file: {}\n"
++			      "size: {}\n",
+ 			      name_utf8,
+ 			      fi.GetSize());
+ 		else if (fi.IsDirectory())
+-			r.Fmt(FMT_STRING("directory: {}\n"), name_utf8);
++			r.Fmt("directory: {}\n", name_utf8);
+ 		else
+ 			continue;
+ 
+@@ -129,7 +129,7 @@ class PrintCommentHandler final : public NullTagHandler {
+ 	void OnPair(StringView _key, StringView _value) noexcept override {
+ 		const std::string_view key{_key}, value{_value};
+ 		if (IsValidName(key) && IsValidValue(value))
+-			response.Fmt(FMT_STRING("{}: {}\n"), key, value);
++			response.Fmt("{}: {}\n", key, value);
+ 	}
+ };
+ 
+@@ -218,7 +218,7 @@ read_stream_art(Response &r, const std::string_view art_directory,
+ 		read_size = is->Read(lock, buffer.get(), buffer_size);
+ 	}
+ 
+-	r.Fmt(FMT_STRING("size: {}\n"), art_file_size);
++	r.Fmt("size: {}\n", art_file_size);
+ 
+ 	r.WriteBinary({buffer.get(), read_size});
+ 
+@@ -348,10 +348,10 @@ class PrintPictureHandler final : public NullTagHandler {
+ 			return;
+ 		}
+ 
+-		response.Fmt(FMT_STRING("size: {}\n"), buffer.size);
++		response.Fmt("size: {}\n", buffer.size);
+ 
+ 		if (mime_type != nullptr)
+-			response.Fmt(FMT_STRING("type: {}\n"), mime_type);
++			response.Fmt("type: {}\n", mime_type);
+ 
+ 		buffer.size -= offset;
+ 
+diff --git a/src/command/MessageCommands.cxx b/src/command/MessageCommands.cxx
+index 0bbd0e12cb..1a87dde150 100644
+--- a/src/command/MessageCommands.cxx
++++ b/src/command/MessageCommands.cxx
+@@ -87,7 +87,7 @@ handle_channels(Client &client, [[maybe_unused]] Request args, Response &r)
+ 	}
+ 
+ 	for (const auto &channel : channels)
+-		r.Fmt(FMT_STRING("channel: {}\n"), channel);
++		r.Fmt("channel: {}\n", channel);
+ 
+ 	return CommandResult::OK;
+ }
+@@ -99,7 +99,7 @@ handle_read_messages(Client &client,
+ 	assert(args.empty());
+ 
+ 	client.ConsumeMessages([&r](const auto &msg){
+-		r.Fmt(FMT_STRING("channel: {}\nmessage: {}\n"),
++		r.Fmt("channel: {}\nmessage: {}\n",
+ 		      msg.GetChannel(), msg.GetMessage());
+ 	});
+ 
+diff --git a/src/command/OtherCommands.cxx b/src/command/OtherCommands.cxx
+index 7f68cf83f1..6db1b96cfc 100644
+--- a/src/command/OtherCommands.cxx
++++ b/src/command/OtherCommands.cxx
+@@ -62,7 +62,7 @@ static void
+ print_spl_list(Response &r, const PlaylistVector &list)
+ {
+ 	for (const auto &i : list) {
+-		r.Fmt(FMT_STRING("playlist: {}\n"), i.name);
++		r.Fmt("playlist: {}\n", i.name);
+ 
+ 		if (!IsNegative(i.mtime))
+ 			time_print(r, "Last-Modified", i.mtime);
+@@ -249,7 +249,7 @@ handle_update(Response &r, UpdateService &update,
+ 	      const char *uri_utf8, bool discard)
+ {
+ 	unsigned ret = update.Enqueue(uri_utf8, discard);
+-	r.Fmt(FMT_STRING("updating_db: {}\n"), ret);
++	r.Fmt("updating_db: {}\n", ret);
+ 	return CommandResult::OK;
+ }
+ 
+@@ -259,7 +259,7 @@ handle_update(Response &r, Database &db,
+ {
+ 	unsigned id = db.Update(uri_utf8, discard);
+ 	if (id > 0) {
+-		r.Fmt(FMT_STRING("updating_db: {}\n"), id);
++		r.Fmt("updating_db: {}\n", id);
+ 		return CommandResult::OK;
+ 	} else {
+ 		/* Database::Update() has returned 0 without setting
+@@ -326,7 +326,7 @@ handle_getvol(Client &client, Request, Response &r)
+ 
+ 	const auto volume = partition.mixer_memento.GetVolume(partition.outputs);
+ 	if (volume >= 0)
+-		r.Fmt(FMT_STRING("volume: {}\n"), volume);
++		r.Fmt("volume: {}\n", volume);
+ 
+ 	return CommandResult::OK;
+ }
+@@ -391,7 +391,7 @@ handle_config(Client &client, [[maybe_unused]] Request args, Response &r)
+ 	const Storage *storage = client.GetStorage();
+ 	if (storage != nullptr) {
+ 		const auto path = storage->MapUTF8("");
+-		r.Fmt(FMT_STRING("music_directory: {}\n"), path);
++		r.Fmt("music_directory: {}\n", path);
+ 	}
+ #endif
+ 
+@@ -406,7 +406,7 @@ handle_idle(Client &client, Request args, Response &r)
+ 		unsigned event = idle_parse_name(i);
+ 		if (event == 0) {
+ 			r.FmtError(ACK_ERROR_ARG,
+-				   FMT_STRING("Unrecognized idle event: {}"),
++				   "Unrecognized idle event: {}",
+ 				   i);
+ 			return CommandResult::ERROR;
+ 		}
+diff --git a/src/command/PartitionCommands.cxx b/src/command/PartitionCommands.cxx
+index 10426a2b2f..c5a1f3b96c 100644
+--- a/src/command/PartitionCommands.cxx
++++ b/src/command/PartitionCommands.cxx
+@@ -48,7 +48,7 @@ CommandResult
+ handle_listpartitions(Client &client, Request, Response &r)
+ {
+ 	for (const auto &partition : client.GetInstance().partitions) {
+-		r.Fmt(FMT_STRING("partition: {}\n"), partition.name);
++		r.Fmt("partition: {}\n", partition.name);
+ 	}
+ 
+ 	return CommandResult::OK;
+diff --git a/src/command/PlayerCommands.cxx b/src/command/PlayerCommands.cxx
+index 838ef818f8..f689607098 100644
+--- a/src/command/PlayerCommands.cxx
++++ b/src/command/PlayerCommands.cxx
+@@ -133,17 +133,17 @@ handle_status(Client &client, [[maybe_unused]] Request args, Response &r)
+ 
+ 	const auto volume = partition.mixer_memento.GetVolume(partition.outputs);
+ 	if (volume >= 0)
+-		r.Fmt(FMT_STRING("volume: {}\n"), volume);
+-
+-	r.Fmt(FMT_STRING(COMMAND_STATUS_REPEAT ": {}\n"
+-			 COMMAND_STATUS_RANDOM ": {}\n"
+-			 COMMAND_STATUS_SINGLE ": {}\n"
+-			 COMMAND_STATUS_CONSUME ": {}\n"
+-			 "partition: {}\n"
+-			 COMMAND_STATUS_PLAYLIST ": {}\n"
+-			 COMMAND_STATUS_PLAYLIST_LENGTH ": {}\n"
+-			 COMMAND_STATUS_MIXRAMPDB ": {}\n"
+-			 COMMAND_STATUS_STATE ": {}\n"),
++		r.Fmt("volume: {}\n", volume);
++
++	r.Fmt(COMMAND_STATUS_REPEAT ": {}\n"
++	      COMMAND_STATUS_RANDOM ": {}\n"
++	      COMMAND_STATUS_SINGLE ": {}\n"
++	      COMMAND_STATUS_CONSUME ": {}\n"
++	      "partition: {}\n"
++	      COMMAND_STATUS_PLAYLIST ": {}\n"
++	      COMMAND_STATUS_PLAYLIST_LENGTH ": {}\n"
++	      COMMAND_STATUS_MIXRAMPDB ": {}\n"
++	      COMMAND_STATUS_STATE ": {}\n",
+ 	      (unsigned)playlist.GetRepeat(),
+ 	      (unsigned)playlist.GetRandom(),
+ 	      SingleToString(playlist.GetSingle()),
+@@ -155,24 +155,24 @@ handle_status(Client &client, [[maybe_unused]] Request args, Response &r)
+ 	      state);
+ 
+ 	if (pc.GetCrossFade() > FloatDuration::zero())
+-		r.Fmt(FMT_STRING(COMMAND_STATUS_CROSSFADE ": {}\n"),
++		r.Fmt(COMMAND_STATUS_CROSSFADE ": {}\n",
+ 		      lround(pc.GetCrossFade().count()));
+ 
+ 	if (pc.GetMixRampDelay() > FloatDuration::zero())
+-		r.Fmt(FMT_STRING(COMMAND_STATUS_MIXRAMPDELAY ": {}\n"),
++		r.Fmt(COMMAND_STATUS_MIXRAMPDELAY ": {}\n",
+ 		      pc.GetMixRampDelay().count());
+ 
+ 	song = playlist.GetCurrentPosition();
+ 	if (song >= 0) {
+-		r.Fmt(FMT_STRING(COMMAND_STATUS_SONG ": {}\n"
+-				 COMMAND_STATUS_SONGID ": {}\n"),
++		r.Fmt(COMMAND_STATUS_SONG ": {}\n"
++		      COMMAND_STATUS_SONGID ": {}\n",
+ 		      song, playlist.PositionToId(song));
+ 	}
+ 
+ 	if (player_status.state != PlayerState::STOP) {
+-		r.Fmt(FMT_STRING(COMMAND_STATUS_TIME ": {}:{}\n"
+-				 "elapsed: {:1.3f}\n"
+-				 COMMAND_STATUS_BITRATE ": {}\n"),
++		r.Fmt(COMMAND_STATUS_TIME ": {}:{}\n"
++		      "elapsed: {:1.3f}\n"
++		      COMMAND_STATUS_BITRATE ": {}\n",
+ 		      player_status.elapsed_time.RoundS(),
+ 		      player_status.total_time.IsNegative()
+ 		      ? 0U
+@@ -181,11 +181,11 @@ handle_status(Client &client, [[maybe_unused]] Request args, Response &r)
+ 		      player_status.bit_rate);
+ 
+ 		if (!player_status.total_time.IsNegative())
+-			r.Fmt(FMT_STRING("duration: {:1.3f}\n"),
++			r.Fmt("duration: {:1.3f}\n",
+ 				 player_status.total_time.ToDoubleS());
+ 
+ 		if (player_status.audio_format.IsDefined())
+-			r.Fmt(FMT_STRING(COMMAND_STATUS_AUDIO ": {}\n"),
++			r.Fmt(COMMAND_STATUS_AUDIO ": {}\n",
+ 			      player_status.audio_format);
+ 	}
+ 
+@@ -195,7 +195,7 @@ handle_status(Client &client, [[maybe_unused]] Request args, Response &r)
+ 		? update_service->GetId()
+ 		: 0;
+ 	if (updateJobId != 0) {
+-		r.Fmt(FMT_STRING(COMMAND_STATUS_UPDATING_DB ": {}\n"),
++		r.Fmt(COMMAND_STATUS_UPDATING_DB ": {}\n",
+ 		      updateJobId);
+ 	}
+ #endif
+@@ -203,14 +203,14 @@ handle_status(Client &client, [[maybe_unused]] Request args, Response &r)
+ 	try {
+ 		pc.LockCheckRethrowError();
+ 	} catch (...) {
+-		r.Fmt(FMT_STRING(COMMAND_STATUS_ERROR ": {}\n"),
++		r.Fmt(COMMAND_STATUS_ERROR ": {}\n",
+ 		      GetFullMessage(std::current_exception()));
+ 	}
+ 
+ 	song = playlist.GetNextPosition();
+ 	if (song >= 0)
+-		r.Fmt(FMT_STRING(COMMAND_STATUS_NEXTSONG ": {}\n"
+-				 COMMAND_STATUS_NEXTSONGID ": {}\n"),
++		r.Fmt(COMMAND_STATUS_NEXTSONG ": {}\n"
++		      COMMAND_STATUS_NEXTSONGID ": {}\n",
+ 		      song, playlist.PositionToId(song));
+ 
+ 	return CommandResult::OK;
+@@ -353,7 +353,7 @@ CommandResult
+ handle_replay_gain_status(Client &client, [[maybe_unused]] Request args,
+ 			  Response &r)
+ {
+-	r.Fmt(FMT_STRING("replay_gain_mode: {}\n"),
++	r.Fmt("replay_gain_mode: {}\n",
+ 	      ToString(client.GetPartition().replay_gain_mode));
+ 	return CommandResult::OK;
+ }
+diff --git a/src/command/PlaylistCommands.cxx b/src/command/PlaylistCommands.cxx
+index af9a75caa5..8a4b329f5f 100644
+--- a/src/command/PlaylistCommands.cxx
++++ b/src/command/PlaylistCommands.cxx
+@@ -57,7 +57,7 @@ static void
+ print_spl_list(Response &r, const PlaylistVector &list)
+ {
+ 	for (const auto &i : list) {
+-		r.Fmt(FMT_STRING("playlist: {}\n"), i.name);
++		r.Fmt("playlist: {}\n", i.name);
+ 
+ 		if (!IsNegative(i.mtime))
+ 			time_print(r, "Last-Modified", i.mtime);
+diff --git a/src/command/QueueCommands.cxx b/src/command/QueueCommands.cxx
+index 2d70e208e3..0fe127249a 100644
+--- a/src/command/QueueCommands.cxx
++++ b/src/command/QueueCommands.cxx
+@@ -155,7 +155,7 @@ handle_addid(Client &client, Request args, Response &r)
+ 
+ 	partition.instance.LookupRemoteTag(uri);
+ 
+-	r.Fmt(FMT_STRING("Id: {}\n"), added_id);
++	r.Fmt("Id: {}\n", added_id);
+ 	return CommandResult::OK;
+ }
+ 
+diff --git a/src/command/StorageCommands.cxx b/src/command/StorageCommands.cxx
+index 461c0e342b..86c09350a1 100644
+--- a/src/command/StorageCommands.cxx
++++ b/src/command/StorageCommands.cxx
+@@ -67,14 +67,14 @@ handle_listfiles_storage(Response &r, StorageDirectoryReader &reader)
+ 			continue;
+ 
+ 		case StorageFileInfo::Type::REGULAR:
+-			r.Fmt(FMT_STRING("file: {}\n"
+-					 "size: {}\n"),
++			r.Fmt("file: {}\n"
++			      "size: {}\n",
+ 			      name_utf8,
+ 			      info.size);
+ 			break;
+ 
+ 		case StorageFileInfo::Type::DIRECTORY:
+-			r.Fmt(FMT_STRING("directory: {}\n"), name_utf8);
++			r.Fmt("directory: {}\n", name_utf8);
+ 			break;
+ 		}
+ 
+@@ -127,7 +127,7 @@ print_storage_uri(Client &client, Response &r, const Storage &storage)
+ 			uri = std::move(allocated);
+ 	}
+ 
+-	r.Fmt(FMT_STRING("storage: {}\n"), uri);
++	r.Fmt("storage: {}\n", uri);
+ }
+ 
+ CommandResult
+@@ -143,7 +143,7 @@ handle_listmounts(Client &client, [[maybe_unused]] Request args, Response &r)
+ 
+ 	const auto visitor = [&client, &r](const char *mount_uri,
+ 					   const Storage &storage){
+-		r.Fmt(FMT_STRING("mount: {}\n"), mount_uri);
++		r.Fmt("mount: {}\n", mount_uri);
+ 		print_storage_uri(client, r, storage);
+ 	};
+ 
+diff --git a/src/command/TagCommands.cxx b/src/command/TagCommands.cxx
+index 68d7228c28..23931c0be3 100644
+--- a/src/command/TagCommands.cxx
++++ b/src/command/TagCommands.cxx
+@@ -35,7 +35,7 @@ handle_addtagid(Client &client, Request args, Response &r)
+ 	const char *const tag_name = args[1];
+ 	const TagType tag_type = tag_name_parse_i(tag_name);
+ 	if (tag_type == TAG_NUM_OF_ITEM_TYPES) {
+-		r.FmtError(ACK_ERROR_ARG, FMT_STRING("Unknown tag type: {}"),
++		r.FmtError(ACK_ERROR_ARG, "Unknown tag type: {}",
+ 			   tag_name);
+ 		return CommandResult::ERROR;
+ 	}
+@@ -57,7 +57,7 @@ handle_cleartagid(Client &client, Request args, Response &r)
+ 		tag_type = tag_name_parse_i(tag_name);
+ 		if (tag_type == TAG_NUM_OF_ITEM_TYPES) {
+ 			r.FmtError(ACK_ERROR_ARG,
+-				   FMT_STRING("Unknown tag type: {}"),
++				   "Unknown tag type: {}",
+ 				   tag_name);
+ 			return CommandResult::ERROR;
+ 		}
+diff --git a/src/db/Count.cxx b/src/db/Count.cxx
+index 1b34f4f60e..f300ee5f14 100644
+--- a/src/db/Count.cxx
++++ b/src/db/Count.cxx
+@@ -49,8 +49,8 @@ PrintSearchStats(Response &r, const SearchStats &stats) noexcept
+ 	unsigned total_duration_s =
+ 		std::chrono::duration_cast<std::chrono::seconds>(stats.total_duration).count();
+ 
+-	r.Fmt(FMT_STRING("songs: {}\n"
+-			 "playtime: {}\n"),
++	r.Fmt("songs: {}\n"
++	      "playtime: {}\n",
+ 	      stats.n_songs, total_duration_s);
+ }
+ 
+diff --git a/src/db/DatabasePrint.cxx b/src/db/DatabasePrint.cxx
+index 516a92f546..a15eaee0dc 100644
+--- a/src/db/DatabasePrint.cxx
++++ b/src/db/DatabasePrint.cxx
+@@ -49,7 +49,7 @@ static void
+ PrintDirectoryURI(Response &r, bool base,
+ 		  const LightDirectory &directory) noexcept
+ {
+-	r.Fmt(FMT_STRING("directory: {}\n"),
++	r.Fmt("directory: {}\n",
+ 	      ApplyBaseFlag(directory.GetPath(), base));
+ }
+ 
+@@ -79,10 +79,10 @@ print_playlist_in_directory(Response &r, bool base,
+ 			    const char *name_utf8) noexcept
+ {
+ 	if (base || directory == nullptr)
+-		r.Fmt(FMT_STRING("playlist: {}\n"),
++		r.Fmt("playlist: {}\n",
+ 		      ApplyBaseFlag(name_utf8, base));
+ 	else
+-		r.Fmt(FMT_STRING("playlist: {}/{}\n"),
++		r.Fmt("playlist: {}/{}\n",
+ 		      directory, name_utf8);
+ }
+ 
+@@ -92,9 +92,9 @@ print_playlist_in_directory(Response &r, bool base,
+ 			    const char *name_utf8) noexcept
+ {
+ 	if (base || directory == nullptr || directory->IsRoot())
+-		r.Fmt(FMT_STRING("playlist: {}\n"), name_utf8);
++		r.Fmt("playlist: {}\n", name_utf8);
+ 	else
+-		r.Fmt(FMT_STRING("playlist: {}/{}\n"),
++		r.Fmt("playlist: {}/{}\n",
+ 		      directory->GetPath(), name_utf8);
+ }
+ 
+@@ -198,7 +198,7 @@ PrintUniqueTags(Response &r, ConstBuffer<TagType> tag_types,
+ 	tag_types.pop_front();
+ 
+ 	for (const auto &[key, tag] : map) {
+-		r.Fmt(FMT_STRING("{}: {}\n"), name, key);
++		r.Fmt("{}: {}\n", name, key);
+ 
+ 		if (!tag_types.empty())
+ 			PrintUniqueTags(r, tag_types, tag);
+diff --git a/src/decoder/DecoderPrint.cxx b/src/decoder/DecoderPrint.cxx
+index 61bc9cd45d..ad4d9b33a4 100644
+--- a/src/decoder/DecoderPrint.cxx
++++ b/src/decoder/DecoderPrint.cxx
+@@ -35,15 +35,15 @@ decoder_plugin_print(Response &r,
+ 
+ 	assert(plugin.name != nullptr);
+ 
+-	r.Fmt(FMT_STRING("plugin: {}\n"), plugin.name);
++	r.Fmt("plugin: {}\n", plugin.name);
+ 
+ 	if (plugin.suffixes != nullptr)
+ 		for (p = plugin.suffixes; *p != nullptr; ++p)
+-			r.Fmt(FMT_STRING("suffix: {}\n"), *p);
++			r.Fmt("suffix: {}\n", *p);
+ 
+ 	if (plugin.mime_types != nullptr)
+ 		for (p = plugin.mime_types; *p != nullptr; ++p)
+-			r.Fmt(FMT_STRING("mime_type: {}\n"), *p);
++			r.Fmt("mime_type: {}\n", *p);
+ }
+ 
+ void
+diff --git a/src/decoder/plugins/meson.build b/src/decoder/plugins/meson.build
+index cd67404941..b804493117 100644
+--- a/src/decoder/plugins/meson.build
++++ b/src/decoder/plugins/meson.build
+@@ -108,7 +108,7 @@ if libmodplug_dep.found()
+   ]
+ endif
+ 
+-libopenmpt_dep = dependency('libopenmpt', required: get_option('openmpt'))
++libopenmpt_dep = dependency('libopenmpt', required: get_option('openmpt'), static: true)
+ decoder_features.set('ENABLE_OPENMPT', libopenmpt_dep.found())
+ decoder_features.set('HAVE_LIBOPENMPT_VERSION_0_5', libopenmpt_dep.version().version_compare('>= 0.5'))
+ if libopenmpt_dep.found()
+diff --git a/src/ls.cxx b/src/ls.cxx
+index ce34b24ba0..5ee5e5d9f2 100644
+--- a/src/ls.cxx
++++ b/src/ls.cxx
+@@ -68,7 +68,7 @@ print_supported_uri_schemes(Response &r)
+ 	});
+ 
+ 	for (const auto& protocol : protocols) {
+-		r.Fmt(FMT_STRING("handler: {}\n"), protocol);
++		r.Fmt("handler: {}\n", protocol);
+ 	}
+ }
+ 
+diff --git a/src/output/Print.cxx b/src/output/Print.cxx
+index d495b49686..10d418cbe8 100644
+--- a/src/output/Print.cxx
++++ b/src/output/Print.cxx
+@@ -34,16 +34,16 @@ printAudioDevices(Response &r, const MultipleOutputs &outputs)
+ 	for (unsigned i = 0, n = outputs.Size(); i != n; ++i) {
+ 		const auto &ao = outputs.Get(i);
+ 
+-		r.Fmt(FMT_STRING("outputid: {}\n"
+-				 "outputname: {}\n"
+-				 "plugin: {}\n"
+-				 "outputenabled: {}\n"),
++		r.Fmt("outputid: {}\n"
++		       "outputname: {}\n"
++		       "plugin: {}\n"
++		       "outputenabled: {}\n",
+ 		      i,
+ 		      ao.GetName(), ao.GetPluginName(),
+ 		      (unsigned)ao.IsEnabled());
+ 
+ 		for (const auto &[attribute, value] : ao.GetAttributes())
+-			r.Fmt(FMT_STRING("attribute: {}={}\n"),
++			r.Fmt("attribute: {}={}\n",
+ 			      attribute, value);
+ 	}
+ }
+diff --git a/src/queue/QueuePrint.cxx b/src/queue/QueuePrint.cxx
+index f11d4b8d80..0ed6d1313f 100644
+--- a/src/queue/QueuePrint.cxx
++++ b/src/queue/QueuePrint.cxx
+@@ -40,12 +40,12 @@ queue_print_song_info(Response &r, const Queue &queue,
+ 		      unsigned position)
+ {
+ 	song_print_info(r, queue.Get(position));
+-	r.Fmt(FMT_STRING("Pos: {}\nId: {}\n"),
++	r.Fmt("Pos: {}\nId: {}\n",
+ 	      position, queue.PositionToId(position));
+ 
+ 	uint8_t priority = queue.GetPriorityAtPosition(position);
+ 	if (priority != 0)
+-		r.Fmt(FMT_STRING("Prio: {}\n"), priority);
++		r.Fmt("Prio: {}\n", priority);
+ }
+ 
+ void
+@@ -67,7 +67,7 @@ queue_print_uris(Response &r, const Queue &queue,
+ 	assert(end <= queue.GetLength());
+ 
+ 	for (unsigned i = start; i < end; ++i) {
+-		r.Fmt(FMT_STRING("{}:"), i);
++		r.Fmt("{}:", i);
+ 		song_print_uri(r, queue.Get(i));
+ 	}
+ }
+@@ -95,7 +95,7 @@ queue_print_changes_position(Response &r, const Queue &queue,
+ 
+ 	for (unsigned i = start; i < end; i++)
+ 		if (queue.IsNewerAtPosition(i, version))
+-			r.Fmt(FMT_STRING("cpos: {}\nId: {}\n"),
++			r.Fmt("cpos: {}\nId: {}\n",
+ 			      i, queue.PositionToId(i));
+ }
+ 
+diff --git a/src/sticker/Print.cxx b/src/sticker/Print.cxx
+index fc9c3fee16..345c83943f 100644
+--- a/src/sticker/Print.cxx
++++ b/src/sticker/Print.cxx
+@@ -27,7 +27,7 @@ void
+ sticker_print_value(Response &r,
+ 		    const char *name, const char *value)
+ {
+-	r.Fmt(FMT_STRING("sticker: {}={}\n"), name, value);
++	r.Fmt("sticker: {}={}\n", name, value);
+ }
+ 
+ void
+diff -u -r ../MPD-0.23.16/src/command/FingerprintCommands.cxx ./src/command/FingerprintCommands.cxx
+--- ../MPD-0.23.16/src/command/FingerprintCommands.cxx	2024-12-03 11:56:57.000000000 +0000
++++ ./src/command/FingerprintCommands.cxx	2025-01-15 15:46:56.223178706 +0000
+@@ -62,7 +62,7 @@
+ 	void Run() override;
+ 
+ 	void SendResponse(Response &r) noexcept override {
+-		r.Fmt(FMT_STRING("chromaprint: {}\n"),
++		r.Fmt("chromaprint: {}\n",
+ 		      GetFingerprint());
+ 	}
+ 
+diff -u -r ../MPD-0.23.16/src/command/NeighborCommands.cxx ./src/command/NeighborCommands.cxx
+--- ../MPD-0.23.16/src/command/NeighborCommands.cxx	2024-12-03 11:56:57.000000000 +0000
++++ ./src/command/NeighborCommands.cxx	2025-01-15 15:43:35.934828346 +0000
+@@ -46,8 +46,8 @@
+ 	}
+ 
+ 	for (const auto &i : neighbors->GetList())
+-		r.Fmt(FMT_STRING("neighbor: {}\n"
+-				 "name: {}\n"),
++		r.Fmt("neighbor: {}\n"
++				 "name: {}\n",
+ 		      i.uri,
+ 		      i.display_name);
+ 	return CommandResult::OK;
