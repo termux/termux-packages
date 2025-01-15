@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Music player daemon"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.23.16"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/MusicPlayerDaemon/MPD/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=a3ba8a4ef53c681ae5d415a79fbd1409d61cb3d03389a51595af24b330ecbb61
 TERMUX_PKG_AUTO_UPDATE=true
@@ -33,7 +33,7 @@ termux_step_pre_configure() {
 		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
 	fi
 
-	CXXFLAGS+=" -DTERMUX -UANDROID"
+	CXXFLAGS+=" -DTERMUX -UANDROID -std=c++20"
 	LDFLAGS+=" -lOpenSLES"
 	rm -f $TERMUX_PREFIX/etc/mpd.conf
 
