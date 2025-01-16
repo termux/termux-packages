@@ -9,6 +9,22 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BREAKS="capstone-dev"
 TERMUX_PKG_REPLACES="capstone-dev"
 
+termux_pkg_auto_update() {
+	local latest_version
+	latest_version="$(termux_github_api_get_tag "$TERMUX_PKG_SRCURL")"
+
+	if [[ -z "$latest_version" ]]; then
+		termux_error_exit "ERROR: Failed to get latest version."
+	fi
+
+	if [[ "$latest_version" =~ ^[0-9]+(\.[0-9]+)+$ ]]; then
+		termux_pkg_upgrade_version "$latest_version"
+	else
+		echo "WARN: Found non-stable version ($latest_version) marked as latest release. Skipping..."
+		return
+	fi
+}
+
 termux_step_post_get_source() {
 	termux_setup_cmake
 
