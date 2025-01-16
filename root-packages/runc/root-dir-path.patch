@@ -10,15 +10,16 @@ diff -uNr runc-1.0.0-rc91/list.go runc-1.0.0-rc91.mod/list.go
  
  EXAMPLE 1:
  To list containers created via the default "--root":
-diff -uNr runc-1.0.0-rc91/main.go runc-1.0.0-rc91.mod/main.go
---- runc-1.0.0-rc91/main.go	2020-06-30 18:24:30.000000000 +0300
-+++ runc-1.0.0-rc91.mod/main.go	2020-07-19 16:39:37.309287649 +0300
-@@ -65,7 +65,7 @@
+
+--- runc-1.2.4/main.go	2025-01-07 04:50:22.000000000 +0530
++++ runc-1.2.4.mod/main.go	2025-01-17 02:30:00.522004934 +0530
+@@ -73,7 +73,7 @@
+ 	}
  	app.Version = strings.Join(v, "\n")
  
- 	xdgRuntimeDir := ""
 -	root := "/run/runc"
 +	root := "@TERMUX_PREFIX@/tmp/runc"
- 	if shouldHonorXDGRuntimeDir() {
- 		if runtimeDir := os.Getenv("XDG_RUNTIME_DIR"); runtimeDir != "" {
- 			root = runtimeDir + "/runc"
+ 	xdgDirUsed := false
+ 	xdgRuntimeDir := os.Getenv("XDG_RUNTIME_DIR")
+ 	if xdgRuntimeDir != "" && shouldHonorXDGRuntimeDir() {
+"
