@@ -1,0 +1,39 @@
+diff --git a/squashfs-tools/mksquashfs.c b/squashfs-tools/mksquashfs.c
+index ba28d65..1e9011e 100644
+--- a/squashfs-tools/mksquashfs.c
++++ b/squashfs-tools/mksquashfs.c
+@@ -31,6 +31,7 @@
+ #include <grp.h>
+ #include <time.h>
+ #include <unistd.h>
++#include <stdatomic.h>
+ #include <stdio.h>
+ #include <stddef.h>
+ #include <sys/types.h>
+@@ -76,6 +77,8 @@
+ #include "tar.h"
+ #include "merge_sort.h"
+ 
++static atomic_flag event_thread_cancel;
++
+ /* Compression options */
+ int noF = FALSE;
+ int noI = FALSE;
+@@ -7592,7 +7595,7 @@ print_sqfstar_compressor_options:
+ 	pthread_mutex_lock(&fragment_mutex);
+ 	while(fragments_outstanding) {
+ 		pthread_mutex_unlock(&fragment_mutex);
+-		pthread_testcancel();
++		if (!atomic_flag_test_and_set(&event_thread_cancel)) pthread_exit(NULL);
+ 		sched_yield();
+ 		pthread_mutex_lock(&fragment_mutex);
+ 	}
+@@ -8865,7 +8868,7 @@ print_compressor_options:
+ 	pthread_mutex_lock(&fragment_mutex);
+ 	while(fragments_outstanding) {
+ 		pthread_mutex_unlock(&fragment_mutex);
+-		pthread_testcancel();
++		if (!atomic_flag_test_and_set(&event_thread_cancel)) pthread_exit(NULL);
+ 		sched_yield();
+ 		pthread_mutex_lock(&fragment_mutex);
+ 	}

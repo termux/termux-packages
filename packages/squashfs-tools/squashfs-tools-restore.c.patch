@@ -1,0 +1,114 @@
+diff --git a/squashfs-tools/restore.c b/squashfs-tools/restore.c
+index cec5ce9..3ea007f 100644
+--- a/squashfs-tools/restore.c
++++ b/squashfs-tools/restore.c
+@@ -57,8 +57,25 @@ extern int reproducible;
+ static int interrupted = 0;
+ static pthread_t restore_thread;
+ 
++#ifdef __ANDROID__
++#include <string.h>
++static void threadSignalHandler(int signum)
++{
++	pthread_exit(0);
++}
++#endif
++
+ void *restore_thrd(void *arg)
+ {
++#ifdef __ANDROID__
++	struct sigaction actions;
++	memset(&actions, 0, sizeof(actions));
++	sigemptyset(&actions.sa_mask);
++	actions.sa_flags = 0;
++	actions.sa_handler = threadSignalHandler;
++	sigaction(SIGUSR2, &actions, NULL);
++#endif
++
+ 	sigset_t sigmask, old_mask;
+ 	int i, sig;
+ 
+@@ -84,7 +101,11 @@ void *restore_thrd(void *arg)
+ 		disable_info();
+ 
+ 		/* first kill the reader thread */
++#ifdef __ANDROID__
++		pthread_kill(reader_thread, SIGUSR2);
++#else
+ 		pthread_cancel(reader_thread);
++#endif
+ 		pthread_join(reader_thread, NULL);
+ 
+ 		/*
+@@ -95,7 +116,11 @@ void *restore_thrd(void *arg)
+ 
+ 		/* now kill the deflator thread(s) */
+ 		for(i = 0; i < processors; i++)
++#ifdef __ANDROID__
++			pthread_kill(deflator_thread[i], SIGUSR2);
++#else
+ 			pthread_cancel(deflator_thread[i]);
++#endif
+ 		for(i = 0; i < processors; i++)
+ 			pthread_join(deflator_thread[i], NULL);
+ 
+@@ -107,7 +132,11 @@ void *restore_thrd(void *arg)
+ 
+ 		/* now kill the process fragment thread(s) */
+ 		for(i = 0; i < processors; i++)
++#ifdef __ANDROID__
++			pthread_kill(frag_thread[i], SIGUSR2);
++#else
+ 			pthread_cancel(frag_thread[i]);
++#endif
+ 		for(i = 0; i < processors; i++)
+ 			pthread_join(frag_thread[i], NULL);
+ 
+@@ -118,7 +147,11 @@ void *restore_thrd(void *arg)
+ 		seq_queue_flush(to_main);
+ 
+ 		/* now kill the main thread */
++#ifdef __ANDROID__
++		pthread_kill(main_thread, SIGUSR2);
++#else
+ 		pthread_cancel(main_thread);
++#endif
+ 		pthread_join(main_thread, NULL);
+ 
+ 		/* then flush the main thread to fragment deflator thread(s)
+@@ -128,7 +161,11 @@ void *restore_thrd(void *arg)
+ 
+ 		/* now kill the fragment deflator thread(s) */
+ 		for(i = 0; i < processors; i++)
++#ifdef __ANDROID__
++			pthread_kill(frag_deflator_thread[i], SIGUSR2);
++#else
+ 			pthread_cancel(frag_deflator_thread[i]);
++#endif
+ 		for(i = 0; i < processors; i++)
+ 			pthread_join(frag_deflator_thread[i], NULL);
+ 
+@@ -140,7 +177,11 @@ void *restore_thrd(void *arg)
+ 			seq_queue_flush(to_order);
+ 
+ 			/* now kill the frag orderer thread */
++#ifdef __ANDROID__
++			pthread_kill(order_thread, SIGUSR2);
++#else
+ 			pthread_cancel(order_thread);
++#endif
+ 			pthread_join(order_thread, NULL);
+ 		}
+ 
+@@ -151,7 +192,11 @@ void *restore_thrd(void *arg)
+ 		queue_flush(to_writer);
+ 
+ 		/* now kill the writer thread */
++#ifdef __ANDROID__
++		pthread_kill(writer_thread, SIGUSR2);
++#else
+ 		pthread_cancel(writer_thread);
++#endif
+ 		pthread_join(writer_thread, NULL);
+ 
+ 		TRACE("All threads cancelled\n");
