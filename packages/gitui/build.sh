@@ -4,11 +4,11 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="LICENSE.md"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.27.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/extrawurst/gitui/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=55a85f4a3ce97712b618575aa80f3c15ea4004d554e8899669910d7fb4ff6e4b
 TERMUX_PKG_AUTO_UPDATE=true
-# TODO: use system libgit2 1.9.0 after update
-TERMUX_PKG_DEPENDS="git, libssh2, openssl, zlib"
+TERMUX_PKG_DEPENDS="libgit2, libssh2, openssl, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
