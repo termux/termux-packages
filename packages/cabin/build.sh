@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A package manager and build system for C++"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.11.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/cabinpkg/cabin/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=3c9bd2898e6fe692eb988dc71f22214ff938255ef2282d5d7d9c6bdf149d173f
 TERMUX_PKG_AUTO_UPDATE=true
