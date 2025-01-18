@@ -1,0 +1,16 @@
+--- a/cmd/cloudflared/linux_service.go
++++ b/cmd/cloudflared/linux_service.go
+@@ -1,4 +1,4 @@
+-//go:build linux
++//go:build linux && !android
+ 
+ package main
+ 
+--- a/cmd/cloudflared/generic_service.go
++++ b/cmd/cloudflared/generic_service.go
+@@ -1,4 +1,4 @@
+-//go:build !windows && !darwin && !linux
++//go:build !windows && !darwin && (android || !linux)
+ 
+ package main
+ 
