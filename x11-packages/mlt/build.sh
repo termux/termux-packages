@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Multimedia Framework. Author, manage, and run multitrack
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_VERSION="7.30.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/mltframework/mlt/releases/download/v${TERMUX_PKG_VERSION}/mlt-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=c802a5fdc16324f6c69273d0bb9718d30c2f635422e171ee01c0e7745e0e793c
 TERMUX_PKG_DEPENDS="alsa-lib, ffmpeg, fftw, fontconfig, frei0r-plugins, gdk-pixbuf, glib, jack, movit, libebur128, libepoxy, libexif, libsamplerate, libvidstab, libvorbis, libx11, libxml2, qt6-qt5compat, qt6-qtbase, qt6-qtsvg, opengl, pango, python, rubberband, sdl, sdl2, sox, zlib"
@@ -20,8 +21,4 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_pre_configure() {
 	# Fix linker script error
 	LDFLAGS+=" -Wl,--undefined-version"
-
-	if [ $TERMUX_ARCH_BITS = 32 ]; then
-		patch --silent -p1 -d "$TERMUX_PKG_SRCDIR" < "$TERMUX_PKG_BUILDER_DIR/32-bit-symbol.diff"
-	fi
 }
