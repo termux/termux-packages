@@ -1,0 +1,85 @@
+From: Anton Khirnov <anton@khirnov.net>
+Date: Sat, 12 Oct 2024 19:08:55 +0200
+Subject: fftools/ffmpeg_filter: treat apad filter as a source
+
+Ideally lavfi should have a dedicated API for detecting this.
+
+Fixes #11168 and #11061
+
+(cherry picked from commit 9e2a231236428c4682c77858c6aabfd74f459b17)
+Signed-off-by: Anton Khirnov <anton@khirnov.net>
+---
+ fftools/ffmpeg_filter.c | 21 ++++++++++++---------
+ 1 file changed, 12 insertions(+), 9 deletions(-)
+
+diff --git a/fftools/ffmpeg_filter.c b/fftools/ffmpeg_filter.c
+index 4e3a47e..38c7676 100644
+--- a/fftools/ffmpeg_filter.c
++++ b/fftools/ffmpeg_filter.c
+@@ -1101,8 +1101,9 @@ int fg_create(FilterGraph **pfg, char *graph_desc, Scheduler *sch)
+ 
+     for (unsigned i = 0; i < graph->nb_filters; i++) {
+         const AVFilter *f = graph->filters[i]->filter;
+-        if (!avfilter_filter_pad_count(f, 0) &&
+-            !(f->flags & AVFILTER_FLAG_DYNAMIC_INPUTS)) {
++        if ((!avfilter_filter_pad_count(f, 0) &&
++             !(f->flags & AVFILTER_FLAG_DYNAMIC_INPUTS)) ||
++            !strcmp(f->name, "apad")) {
+             fgp->have_sources = 1;
+             break;
+         }
+@@ -1497,7 +1498,7 @@ static int insert_filter(AVFilterContext **last_filter, int *pad_idx,
+     return 0;
+ }
+ 
+-static int configure_output_video_filter(FilterGraph *fg, AVFilterGraph *graph,
++static int configure_output_video_filter(FilterGraphPriv *fgp, AVFilterGraph *graph,
+                                          OutputFilter *ofilter, AVFilterInOut *out)
+ {
+     OutputFilterPriv *ofp = ofp_from_ofilter(ofilter);
+@@ -1576,7 +1577,7 @@ static int configure_output_video_filter(FilterGraph *fg, AVFilterGraph *graph,
+     return 0;
+ }
+ 
+-static int configure_output_audio_filter(FilterGraph *fg, AVFilterGraph *graph,
++static int configure_output_audio_filter(FilterGraphPriv *fgp, AVFilterGraph *graph,
+                                          OutputFilter *ofilter, AVFilterInOut *out)
+ {
+     OutputFilterPriv *ofp = ofp_from_ofilter(ofilter);
+@@ -1641,8 +1642,10 @@ static int configure_output_audio_filter(FilterGraph *fg, AVFilterGraph *graph,
+         pad_idx = 0;
+     }
+ 
+-    if (ofilter->apad)
++    if (ofilter->apad) {
+         AUTO_INSERT_FILTER("-apad", "apad", ofilter->apad);
++        fgp->have_sources = 1;
++    }
+ 
+     snprintf(name, sizeof(name), "trim for output %s", ofp->name);
+     ret = insert_trim(ofp->trim_start_us, ofp->trim_duration_us,
+@@ -1658,12 +1661,12 @@ fail:
+     return ret;
+ }
+ 
+-static int configure_output_filter(FilterGraph *fg, AVFilterGraph *graph,
++static int configure_output_filter(FilterGraphPriv *fgp, AVFilterGraph *graph,
+                                    OutputFilter *ofilter, AVFilterInOut *out)
+ {
+     switch (ofilter->type) {
+-    case AVMEDIA_TYPE_VIDEO: return configure_output_video_filter(fg, graph, ofilter, out);
+-    case AVMEDIA_TYPE_AUDIO: return configure_output_audio_filter(fg, graph, ofilter, out);
++    case AVMEDIA_TYPE_VIDEO: return configure_output_video_filter(fgp, graph, ofilter, out);
++    case AVMEDIA_TYPE_AUDIO: return configure_output_audio_filter(fgp, graph, ofilter, out);
+     default: av_assert0(0); return 0;
+     }
+ }
+@@ -1940,7 +1943,7 @@ static int configure_filtergraph(FilterGraph *fg, FilterGraphThread *fgt)
+     avfilter_inout_free(&inputs);
+ 
+     for (cur = outputs, i = 0; cur; cur = cur->next, i++) {
+-        ret = configure_output_filter(fg, fgt->graph, fg->outputs[i], cur);
++        ret = configure_output_filter(fgp, fgt->graph, fg->outputs[i], cur);
+         if (ret < 0) {
+             avfilter_inout_free(&outputs);
+             goto fail;

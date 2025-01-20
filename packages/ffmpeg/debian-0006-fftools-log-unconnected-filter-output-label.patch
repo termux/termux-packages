@@ -1,0 +1,24 @@
+From: Marvin Scholz <epirat07@gmail.com>
+Date: Tue, 1 Oct 2024 03:20:04 +0200
+Subject: fftools: log unconnected filter output label
+
+(cherry picked from commit f25c9cc213c7e3eb585d3339eb775b16921c4d98)
+---
+ fftools/ffmpeg_filter.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/fftools/ffmpeg_filter.c b/fftools/ffmpeg_filter.c
+index 2f2b297..4e3a47e 100644
+--- a/fftools/ffmpeg_filter.c
++++ b/fftools/ffmpeg_filter.c
+@@ -1409,7 +1409,9 @@ int fg_finalise_bindings(void)
+             OutputFilter *output = fg->outputs[j];
+             if (!output->bound) {
+                 av_log(fg, AV_LOG_FATAL,
+-                       "Filter %s has an unconnected output\n", output->name);
++                       "Filter '%s' has output %d (%s) unconnected\n",
++                       output->name, j,
++                       output->linklabel ? (const char *)output->linklabel : "unlabeled");
+                 return AVERROR(EINVAL);
+             }
+         }

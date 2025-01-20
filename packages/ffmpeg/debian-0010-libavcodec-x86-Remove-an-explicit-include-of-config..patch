@@ -1,0 +1,28 @@
+From: =?utf-8?q?Martin_Storsj=C3=B6?= <martin@martin.st>
+Date: Tue, 1 Oct 2024 23:59:41 +0300
+Subject: libavcodec: x86: Remove an explicit include of config.asm
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+
+This file is never included explicitly anywhere else, it's only
+included implicitly by passing -Pconfig.asm on the command line.
+
+Signed-off-by: Martin Storsjö <martin@martin.st>
+(cherry picked from commit 5c4ede6b4ff6fa8818f0ca3f686aa54c1c2092b8)
+---
+ libavcodec/x86/celt_pvq_search.asm | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/libavcodec/x86/celt_pvq_search.asm b/libavcodec/x86/celt_pvq_search.asm
+index e9bff02..3c6974d 100644
+--- a/libavcodec/x86/celt_pvq_search.asm
++++ b/libavcodec/x86/celt_pvq_search.asm
+@@ -20,7 +20,6 @@
+ ;* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ ;******************************************************************************
+ 
+-%include "config.asm"
+ %include "libavutil/x86/x86util.asm"
+ 
+ %ifdef __NASM_VER__

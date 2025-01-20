@@ -1,0 +1,62 @@
+From: Anton Khirnov <anton@khirnov.net>
+Date: Sun, 13 Oct 2024 14:11:39 +0200
+Subject: lavc/avcodec: fix global/private option precendence
+
+Broken after 7753a9d62725d5bd8313e2d249acbe1c8af79ab1. Apply only the
+whitelist early, and the rest with a single call to av_opt_set_dict2()
+with AV_OPT_SEARCH_CHILDREN, which should be equivalent to the original
+behaviour.
+
+Reported-by: Cameron Gutman <aicommander@gmail.com>
+(cherry picked from commit 9ce63e65d65b303813d4ae677228226d7cd232b9)
+Signed-off-by: Anton Khirnov <anton@khirnov.net>
+---
+ libavcodec/avcodec.c | 17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
+
+diff --git a/libavcodec/avcodec.c b/libavcodec/avcodec.c
+index d1daf47..1fa8704 100644
+--- a/libavcodec/avcodec.c
++++ b/libavcodec/avcodec.c
+@@ -145,6 +145,7 @@ int attribute_align_arg avcodec_open2(AVCodecContext *avctx, const AVCodec *code
+     int ret = 0;
+     AVCodecInternal *avci;
+     const FFCodec *codec2;
++    const AVDictionaryEntry *e;
+ 
+     if (avcodec_is_open(avctx))
+         return 0;
+@@ -175,8 +176,14 @@ int attribute_align_arg avcodec_open2(AVCodecContext *avctx, const AVCodec *code
+     if (avctx->extradata_size < 0 || avctx->extradata_size >= FF_MAX_EXTRADATA_SIZE)
+         return AVERROR(EINVAL);
+ 
+-    if ((ret = av_opt_set_dict(avctx, options)) < 0)
+-        return ret;
++    // set the whitelist from provided options dict,
++    // so we can check it immediately
++    e = options ? av_dict_get(*options, "codec_whitelist", NULL, 0) : NULL;
++    if (e) {
++        ret = av_opt_set(avctx, e->key, e->value, 0);
++        if (ret < 0)
++            return ret;
++    }
+ 
+     if (avctx->codec_whitelist && av_match_list(codec->name, avctx->codec_whitelist, ',') <= 0) {
+         av_log(avctx, AV_LOG_ERROR, "Codec (%s) not on whitelist \'%s\'\n", codec->name, avctx->codec_whitelist);
+@@ -211,12 +218,14 @@ int attribute_align_arg avcodec_open2(AVCodecContext *avctx, const AVCodec *code
+                 av_opt_set_defaults(avctx->priv_data);
+             }
+         }
+-        if (codec->priv_class && (ret = av_opt_set_dict(avctx->priv_data, options)) < 0)
+-            goto free_and_end;
+     } else {
+         avctx->priv_data = NULL;
+     }
+ 
++    ret = av_opt_set_dict2(avctx, options, AV_OPT_SEARCH_CHILDREN);
++    if (ret < 0)
++        goto free_and_end;
++
+     // only call ff_set_dimensions() for non H.264/VP6F/DXV codecs so as not to overwrite previously setup dimensions
+     if (!(avctx->coded_width && avctx->coded_height && avctx->width && avctx->height &&
+           (avctx->codec_id == AV_CODEC_ID_H264 || avctx->codec_id == AV_CODEC_ID_VP6F || avctx->codec_id == AV_CODEC_ID_DXV))) {
