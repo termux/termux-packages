@@ -1,0 +1,28 @@
+From: Marvin Scholz <epirat07@gmail.com>
+Date: Tue, 1 Oct 2024 02:57:11 +0200
+Subject: fftools: do not access out of bounds filtergraph
+
+The log message was logged for `filtergraphs[j]` which would cause a
+heap buffer overflow in certain circumstances.
+
+Correctly it should be logged for the current filtergraph, so just
+use `fg` here.
+
+(cherry picked from commit 5beeb3a1f97d8f6d4076fe83aaf5e2e5871f945e)
+---
+ fftools/ffmpeg_filter.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/fftools/ffmpeg_filter.c b/fftools/ffmpeg_filter.c
+index 7ec328e..2f2b297 100644
+--- a/fftools/ffmpeg_filter.c
++++ b/fftools/ffmpeg_filter.c
+@@ -1408,7 +1408,7 @@ int fg_finalise_bindings(void)
+         for (int j = 0; j < fg->nb_outputs; j++) {
+             OutputFilter *output = fg->outputs[j];
+             if (!output->bound) {
+-                av_log(filtergraphs[j], AV_LOG_FATAL,
++                av_log(fg, AV_LOG_FATAL,
+                        "Filter %s has an unconnected output\n", output->name);
+                 return AVERROR(EINVAL);
+             }

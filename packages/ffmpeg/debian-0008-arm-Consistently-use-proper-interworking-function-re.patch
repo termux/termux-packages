@@ -1,0 +1,101 @@
+From: =?utf-8?q?Martin_Storsj=C3=B6?= <martin@martin.st>
+Date: Fri, 4 Oct 2024 00:30:24 +0300
+Subject: arm: Consistently use proper interworking function returns
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+
+Use "bx lr", or "pop {lr}", which do proper mode switching
+between thumb and arm modes. A plain "mov pc, lr" does not switch
+from thumb mode to arm mode (while in arm mode, it does switch
+mode for a thumb caller).
+
+This is normally not an issue, as CONFIG_THUMB only is enabled if
+the C compiler defaults to thumb; but stick to patterns that can
+do mode switching if needed, for consistency.
+
+Signed-off-by: Martin Storsjö <martin@martin.st>
+(cherry picked from commit 77e6293735262b20a86b5047b77991a86cf4e9e1)
+---
+ libswresample/arm/resample.S  | 8 ++++----
+ libswscale/arm/hscale.S       | 3 +--
+ libswscale/arm/output.S       | 3 +--
+ libswscale/arm/yuv2rgb_neon.S | 3 +--
+ 4 files changed, 7 insertions(+), 10 deletions(-)
+
+diff --git a/libswresample/arm/resample.S b/libswresample/arm/resample.S
+index 3ce7623..791f4cc 100644
+--- a/libswresample/arm/resample.S
++++ b/libswresample/arm/resample.S
+@@ -30,7 +30,7 @@ function ff_resample_common_apply_filter_x4_float_neon, export=1
+     vpadd.f32           d0, d0, d1                                     @ pair adding of the 4x32-bit accumulated values
+     vpadd.f32           d0, d0, d0                                     @ pair adding of the 4x32-bit accumulator values
+     vst1.32             {d0[0]}, [r0]                                  @ write accumulator
+-    mov pc, lr
++    bx                  lr
+ endfunc
+ 
+ function ff_resample_common_apply_filter_x8_float_neon, export=1
+@@ -46,7 +46,7 @@ function ff_resample_common_apply_filter_x8_float_neon, export=1
+     vpadd.f32           d0, d0, d1                                     @ pair adding of the 4x32-bit accumulated values
+     vpadd.f32           d0, d0, d0                                     @ pair adding of the 4x32-bit accumulator values
+     vst1.32             {d0[0]}, [r0]                                  @ write accumulator
+-    mov pc, lr
++    bx                  lr
+ endfunc
+ 
+ function ff_resample_common_apply_filter_x4_s16_neon, export=1
+@@ -59,7 +59,7 @@ function ff_resample_common_apply_filter_x4_s16_neon, export=1
+     vpadd.s32           d0, d0, d1                                     @ pair adding of the 4x32-bit accumulated values
+     vpadd.s32           d0, d0, d0                                     @ pair adding of the 4x32-bit accumulator values
+     vst1.32             {d0[0]}, [r0]                                  @ write accumulator
+-    mov pc, lr
++    bx                  lr
+ endfunc
+ 
+ function ff_resample_common_apply_filter_x8_s16_neon, export=1
+@@ -73,5 +73,5 @@ function ff_resample_common_apply_filter_x8_s16_neon, export=1
+     vpadd.s32           d0, d0, d1                                     @ pair adding of the 4x32-bit accumulated values
+     vpadd.s32           d0, d0, d0                                     @ pair adding of the 4x32-bit accumulator values
+     vst1.32             {d0[0]}, [r0]                                  @ write accumulator
+-    mov pc, lr
++    bx                  lr
+ endfunc
+diff --git a/libswscale/arm/hscale.S b/libswscale/arm/hscale.S
+index dd4d453..5c3551a 100644
+--- a/libswscale/arm/hscale.S
++++ b/libswscale/arm/hscale.S
+@@ -65,6 +65,5 @@ function ff_hscale_8_to_15_neon, export=1
+     subs                r2, #2                                         @ dstW -= 2
+     bgt                 1b                                             @ loop until end of line
+     vpop                {q4-q7}
+-    pop                 {r4-r12, lr}
+-    mov pc, lr
++    pop                 {r4-r12, pc}
+ endfunc
+diff --git a/libswscale/arm/output.S b/libswscale/arm/output.S
+index 70846de..5f10585 100644
+--- a/libswscale/arm/output.S
++++ b/libswscale/arm/output.S
+@@ -73,6 +73,5 @@ function ff_yuv2planeX_8_neon, export=1
+     subs                r4, r4, #8                                     @ dstW -= 8
+     bgt                 2b                                             @ loop until width is consumed
+     vpop                {q4-q7}
+-    pop                 {r4-r12, lr}
+-    mov                 pc, lr
++    pop                 {r4-r12, pc}
+ endfunc
+diff --git a/libswscale/arm/yuv2rgb_neon.S b/libswscale/arm/yuv2rgb_neon.S
+index 4744654..6777d62 100644
+--- a/libswscale/arm/yuv2rgb_neon.S
++++ b/libswscale/arm/yuv2rgb_neon.S
+@@ -262,8 +262,7 @@ function ff_\ifmt\()_to_\ofmt\()_neon, export=1
+     increment_and_test_\ifmt
+     bgt                 1b
+     vpop                {q4-q7}
+-    pop                 {r4-r12, lr}
+-    mov                 pc, lr
++    pop                 {r4-r12, pc}
+ endfunc
+ .endm
+ 

@@ -1,0 +1,84 @@
+From: Zhao Zhili <zhilizhao@tencent.com>
+Date: Mon, 23 Sep 2024 23:14:19 +0800
+Subject: avformat/internal: Add ff_get_frame_filename
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+
+It's similar to av_get_frame_filename2 but with int64_t number
+support. Make av_get_frame_filename* a wrapper over
+ff_get_frame_filename.
+
+Co-authored-by: Filip Mašić <shoutplenty@gmail.com>
+Signed-off-by: Zhao Zhili <zhilizhao@tencent.com>
+(cherry picked from commit a2d9663241908d6f558b8e6b24bd42f2aaebc144)
+---
+ libavformat/internal.h | 16 ++++++++++++++++
+ libavformat/utils.c    | 11 ++++++++---
+ 2 files changed, 24 insertions(+), 3 deletions(-)
+
+diff --git a/libavformat/internal.h b/libavformat/internal.h
+index 8e8971b..6c026f0 100644
+--- a/libavformat/internal.h
++++ b/libavformat/internal.h
+@@ -745,6 +745,22 @@ void ff_format_set_url(AVFormatContext *s, char *url);
+  */
+ int ff_match_url_ext(const char *url, const char *extensions);
+ 
++/**
++ * Return in 'buf' the path with '%d' replaced by a number.
++ *
++ * Also handles the '%0nd' format where 'n' is the total number
++ * of digits and '%%'.
++ *
++ * @param buf destination buffer
++ * @param buf_size destination buffer size
++ * @param path path with substitution template
++ * @param number the number to substitute
++ * @param flags AV_FRAME_FILENAME_FLAGS_*
++ * @return 0 if OK, -1 on format error
++ */
++int ff_get_frame_filename(char *buf, int buf_size, const char *path,
++                          int64_t number, int flags);
++
+ struct FFOutputFormat;
+ struct FFInputFormat;
+ void avpriv_register_devices(const struct FFOutputFormat * const o[],
+diff --git a/libavformat/utils.c b/libavformat/utils.c
+index e9ded62..e892e8b 100644
+--- a/libavformat/utils.c
++++ b/libavformat/utils.c
+@@ -280,7 +280,7 @@ uint64_t ff_parse_ntp_time(uint64_t ntp_ts)
+     return (sec * 1000000) + usec;
+ }
+ 
+-int av_get_frame_filename2(char *buf, int buf_size, const char *path, int number, int flags)
++int ff_get_frame_filename(char *buf, int buf_size, const char *path, int64_t number, int flags)
+ {
+     const char *p;
+     char *q, buf1[20], c;
+@@ -313,7 +313,7 @@ int av_get_frame_filename2(char *buf, int buf_size, const char *path, int number
+                 percentd_found = 1;
+                 if (number < 0)
+                     nd += 1;
+-                snprintf(buf1, sizeof(buf1), "%0*d", nd, number);
++                snprintf(buf1, sizeof(buf1), "%0*" PRId64, nd, number);
+                 len = strlen(buf1);
+                 if ((q - buf + len) > buf_size - 1)
+                     goto fail;
+@@ -338,9 +338,14 @@ fail:
+     return -1;
+ }
+ 
++int av_get_frame_filename2(char *buf, int buf_size, const char *path, int number, int flags)
++{
++    return ff_get_frame_filename(buf, buf_size, path, number, flags);
++}
++
+ int av_get_frame_filename(char *buf, int buf_size, const char *path, int number)
+ {
+-    return av_get_frame_filename2(buf, buf_size, path, number, 0);
++    return ff_get_frame_filename(buf, buf_size, path, number, 0);
+ }
+ 
+ void av_url_split(char *proto, int proto_size,

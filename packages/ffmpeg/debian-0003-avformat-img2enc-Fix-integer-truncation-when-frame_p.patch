@@ -1,0 +1,34 @@
+From: Zhao Zhili <zhilizhao@tencent.com>
+Date: Tue, 24 Sep 2024 00:16:13 +0800
+Subject: avformat/img2enc: Fix integer truncation when frame_pts is enabled
+
+Fix #11194
+
+Signed-off-by: Zhao Zhili <zhilizhao@tencent.com>
+(cherry picked from commit f56a54387b9cea884ca139e9cb993ff6989b8def)
+---
+ libavformat/img2enc.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/libavformat/img2enc.c b/libavformat/img2enc.c
+index 526a11e..41638d9 100644
+--- a/libavformat/img2enc.c
++++ b/libavformat/img2enc.c
+@@ -160,13 +160,13 @@ static int write_packet(AVFormatContext *s, AVPacket *pkt)
+             return AVERROR(EINVAL);
+         }
+     } else if (img->frame_pts) {
+-        if (av_get_frame_filename2(filename, sizeof(filename), s->url, pkt->pts, AV_FRAME_FILENAME_FLAGS_MULTIPLE) < 0) {
++        if (ff_get_frame_filename(filename, sizeof(filename), s->url, pkt->pts, AV_FRAME_FILENAME_FLAGS_MULTIPLE) < 0) {
+             av_log(s, AV_LOG_ERROR, "Cannot write filename by pts of the frames.");
+             return AVERROR(EINVAL);
+         }
+-    } else if (av_get_frame_filename2(filename, sizeof(filename), s->url,
+-                                      img->img_number,
+-                                      AV_FRAME_FILENAME_FLAGS_MULTIPLE) < 0) {
++    } else if (ff_get_frame_filename(filename, sizeof(filename), s->url,
++                                     img->img_number,
++                                     AV_FRAME_FILENAME_FLAGS_MULTIPLE) < 0) {
+         if (img->img_number == img->start_img_number) {
+             av_log(s, AV_LOG_WARNING, "The specified filename '%s' does not contain an image sequence pattern or a pattern is invalid.\n", s->url);
+             av_log(s, AV_LOG_WARNING,

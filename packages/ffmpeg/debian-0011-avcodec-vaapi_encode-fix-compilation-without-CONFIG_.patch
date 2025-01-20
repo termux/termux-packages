@@ -1,0 +1,30 @@
+From: =?utf-8?q?Ingo_Br=C3=BCckl?= <ib@oddnet.de>
+Date: Wed, 9 Oct 2024 04:43:01 +0200
+Subject: avcodec/vaapi_encode: fix compilation without CONFIG_VAAPI_1
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+
+This adds VAAPIEncodeContext *ctx that has been removed
+in aa82340b0ccdde4955fba41b8de5e45348ecd11d.
+
+Signed-off-by: Ingo Brückl <ib@oddnet.de>
+(cherry picked from commit 5557c673ea783a48e8b97c2b740b22eeeca6399b)
+---
+ libavcodec/vaapi_encode_h264.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/libavcodec/vaapi_encode_h264.c b/libavcodec/vaapi_encode_h264.c
+index fb87b68..ed20b9c 100644
+--- a/libavcodec/vaapi_encode_h264.c
++++ b/libavcodec/vaapi_encode_h264.c
+@@ -406,6 +406,9 @@ static int vaapi_encode_h264_init_picture_params(AVCodecContext *avctx,
+                                                  FFHWBaseEncodePicture *pic)
+ {
+     FFHWBaseEncodeContext       *base_ctx = avctx->priv_data;
++#if !CONFIG_VAAPI_1
++    VAAPIEncodeContext               *ctx = avctx->priv_data;
++#endif
+     VAAPIEncodeH264Context          *priv = avctx->priv_data;
+     VAAPIEncodePicture         *vaapi_pic = pic->priv;
+     VAAPIEncodeH264Picture          *hpic = pic->codec_priv;

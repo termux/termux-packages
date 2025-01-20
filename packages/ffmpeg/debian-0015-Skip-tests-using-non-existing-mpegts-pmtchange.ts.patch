@@ -1,0 +1,73 @@
+From: Sebastian Ramacher <sramacher@debian.org>
+Date: Sun, 20 Oct 2024 14:48:06 +0200
+Subject: Skip tests using non-existing mpegts/pmtchange.ts
+
+---
+ tests/fate/ffmpeg.mak   | 4 ----
+ tests/fate/matroska.mak | 5 -----
+ tests/fate/mov.mak      | 7 -------
+ tests/fate/mpegts.mak   | 5 -----
+ 4 files changed, 21 deletions(-)
+
+diff --git a/tests/fate/ffmpeg.mak b/tests/fate/ffmpeg.mak
+index 869376d..3ffaaeb 100644
+--- a/tests/fate/ffmpeg.mak
++++ b/tests/fate/ffmpeg.mak
+@@ -263,7 +263,3 @@ fate-ffmpeg-loopback-decoding: CMD = transcode \
+     "rawvideo -s 352x288 -pix_fmt yuv420p" $(TARGET_PATH)/tests/data/vsynth1.yuv nut \
+     "-map 0:v:0 -c:v mpeg2video -f null - -flags +bitexact -idct simple -threads $$threads -dec 0:0 -filter_complex '[0:v][dec:0]hstack[stack]' -map '[stack]' -c:v ffv1" ""
+ FATE_FFMPEG-$(call ENCDEC2, MPEG2VIDEO, FFV1, NUT, HSTACK_FILTER PIPE_PROTOCOL FRAMECRC_MUXER) += fate-ffmpeg-loopback-decoding
+-
+-# test matching by stream disposition
+-fate-ffmpeg-spec-disposition: CMD = framecrc -i $(TARGET_SAMPLES)/mpegts/pmtchange.ts -map '0:disp:visual_impaired+descriptions:1' -c copy
+-FATE_FFMPEG-$(call FRAMECRC, MPEGTS,,) += fate-ffmpeg-spec-disposition
+diff --git a/tests/fate/matroska.mak b/tests/fate/matroska.mak
+index 563d756..1a705bc 100644
+--- a/tests/fate/matroska.mak
++++ b/tests/fate/matroska.mak
+@@ -180,11 +180,6 @@ FATE_MATROSKA_FFMPEG_FFPROBE-$(call REMUX, MATROSKA, VP8_PARSER)  \
+                                += fate-matroska-vp8-alpha-remux
+ fate-matroska-vp8-alpha-remux: CMD = transcode matroska $(TARGET_SAMPLES)/vp8_alpha/vp8_video_with_alpha.webm matroska "-c copy -disposition +hearing_impaired -cluster_size_limit 100000" "-c copy -t 0.2" "-show_entries stream_disposition:stream_side_data_list"
+ 
+-# The audio stream to be remuxed here has AV_DISPOSITION_VISUAL_IMPAIRED.
+-FATE_MATROSKA_FFMPEG_FFPROBE-$(call REMUX, MATROSKA, MPEGTS_DEMUXER AC3_DECODER) \
+-                               += fate-matroska-mpegts-remux
+-fate-matroska-mpegts-remux: CMD = transcode mpegts $(TARGET_SAMPLES)/mpegts/pmtchange.ts matroska "-map 0:2 -map 0:2 -c copy -disposition:a:1 -visual_impaired+hearing_impaired -default_mode infer" "-map 0 -c copy" "-show_entries stream_disposition:stream=index"
+-
+ # Tests maintaining codec delay while remuxing from Matroska.
+ # For some reason, ffmpeg shifts the timestamps of the input file
+ # to make them zero before reaching the muxer while it does not
+diff --git a/tests/fate/mov.mak b/tests/fate/mov.mak
+index 1200c77..053c87a 100644
+--- a/tests/fate/mov.mak
++++ b/tests/fate/mov.mak
+@@ -182,13 +182,6 @@ FATE_MOV_FFMPEG_FFPROBE_SAMPLES-$(call DEMMUX, MOV, FRAMECRC, HEVC_DECODER HEVC_
+ fate-mov-heic-demux-still-image-iovl-2: CMD = stream_demux mov $(TARGET_SAMPLES)/heif-conformance/C021.heic "" "-c:v copy -map 0:g:0" \
+   "-show_entries stream_group=index,id,nb_streams,type:stream_group_components:stream_group_disposition:stream_group_tags:stream_group_stream=index,id:stream_group_stream_disposition"
+ 
+-# Resulting remux should have:
+-# 1. first audio stream with AV_DISPOSITION_HEARING_IMPAIRED
+-# 2. second audio stream with AV_DISPOSITION_VISUAL_IMPAIRED | DESCRIPTIONS
+-FATE_MOV_FFMPEG_FFPROBE_SAMPLES-$(call REMUX, MP4 MOV, MPEGTS_DEMUXER AC3_DECODER) \
+-                          += fate-mov-mp4-disposition-mpegts-remux
+-fate-mov-mp4-disposition-mpegts-remux: CMD = transcode mpegts $(TARGET_SAMPLES)/mpegts/pmtchange.ts mp4 "-map 0:1 -map 0:2 -c copy -disposition:a:0 +hearing_impaired" "-map 0 -c copy" "-of json -show_entries stream_disposition:stream=index"
+-
+ FATE_MOV_FFMPEG_FFPROBE_SAMPLES-$(call REMUX, MP4 MOV) \
+                           += fate-mov-write-amve
+ fate-mov-write-amve: CMD = transcode mov $(TARGET_SAMPLES)/mov/amve.mov mp4 "-c:v copy" "-c:v copy -t 0.5" "-show_entries stream_side_data_list"
+diff --git a/tests/fate/mpegts.mak b/tests/fate/mpegts.mak
+index eaca8ec..49b2f79 100644
+--- a/tests/fate/mpegts.mak
++++ b/tests/fate/mpegts.mak
+@@ -15,11 +15,6 @@ fate-mpegts-probe-program: SRC = $(TARGET_SAMPLES)/mpegts/loewe.ts
+ fate-mpegts-probe-program: CMD = run $(PROBE_CODEC_NAME_COMMAND) -select_streams p:769:v:0 -i "$(SRC)"
+ 
+ 
+-FATE_MPEGTS_PROBE-$(call DEMDEC, MPEGTS) += fate-mpegts-probe-pmt-merge
+-fate-mpegts-probe-pmt-merge: SRC = $(TARGET_SAMPLES)/mpegts/pmtchange.ts
+-fate-mpegts-probe-pmt-merge: CMD = run $(PROBE_CODEC_NAME_COMMAND) -merge_pmt_versions 1 -i "$(SRC)"
+-
+-
+ FATE_SAMPLES_FFPROBE += $(FATE_MPEGTS_PROBE-yes)
+ 
+ fate-mpegts: $(FATE_MPEGTS_PROBE-yes)

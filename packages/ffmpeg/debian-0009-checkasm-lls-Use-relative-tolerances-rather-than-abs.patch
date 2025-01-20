@@ -1,0 +1,62 @@
+From: =?utf-8?q?Martin_Storsj=C3=B6?= <martin@martin.st>
+Date: Fri, 4 Oct 2024 10:22:57 +0300
+Subject: checkasm: lls: Use relative tolerances rather than absolute ones
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+
+Depending on the magnitude of the output values, the potential
+errors can be larger.
+
+This fixes errors in the lls tests on x86_32 for some seeds,
+observed with GCC 11 (on Ubuntu 22.04, with the distro compiler,
+with -m32).
+
+Signed-off-by: Martin Storsjö <martin@martin.st>
+(cherry picked from commit 6668268e16b6d1a6992840dccb12effece2e7202)
+---
+ tests/checkasm/lls.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/tests/checkasm/lls.c b/tests/checkasm/lls.c
+index 1e0b569..4251032 100644
+--- a/tests/checkasm/lls.c
++++ b/tests/checkasm/lls.c
+@@ -46,28 +46,32 @@ static void test_update(LLSModel *lls, const double *var)
+     call_new(lls, var);
+ 
+     for (size_t i = 0; i < lls->indep_count; i++)
+-        for (size_t j = i; j < lls->indep_count; j++)
++        for (size_t j = i; j < lls->indep_count; j++) {
++            double eps = FFMAX(2 * DBL_EPSILON * fabs(refcovar[i][j]),
++                               8 * DBL_EPSILON);
+             if (!double_near_abs_eps(refcovar[i][j], lls->covariance[i][j],
+-                                     8 * DBL_EPSILON)) {
++                                     eps)) {
+                 fprintf(stderr, "%zu, %zu: %- .12f - %- .12f = % .12g\n", i, j,
+                         refcovar[i][j], lls->covariance[i][j],
+                         refcovar[i][j] - lls->covariance[i][j]);
+                 fail();
+             }
++        }
+ 
+     bench_new(lls, var);
+ }
+ 
+-#define EPS 0.2
+ static void test_evaluate(LLSModel *lls, const double *param, int order)
+ {
+-    double refprod, newprod;
++    double refprod, newprod, eps;
+     declare_func_float(double, LLSModel *, const double *, int);
+ 
+     refprod = call_ref(lls, param, order);
+     newprod = call_new(lls, param, order);
+ 
+-    if (!double_near_abs_eps(refprod, newprod, EPS)) {
++    eps = FFMAX(2 * DBL_EPSILON * fabs(refprod), 0.2);
++
++    if (!double_near_abs_eps(refprod, newprod, eps)) {
+         fprintf(stderr, "%- .12f - %- .12f = % .12g\n",
+                 refprod, newprod, refprod - newprod);
+         fail();

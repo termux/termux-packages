@@ -1,0 +1,38 @@
+From: James Almer <jamrial@gmail.com>
+Date: Mon, 30 Sep 2024 10:59:02 -0300
+Subject: avformat/mov: don't return the latest stream when an item stream is
+ expected
+
+Otherwise, things like ICC profiles as read from the colr box meant for an item
+with no stream (like a grid) may end up being added to the wrong stream.
+
+Signed-off-by: James Almer <jamrial@gmail.com>
+(cherry picked from commit 04182b55494b44152146e6a6bcd5eb9403f00625)
+---
+ libavformat/mov.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/libavformat/mov.c b/libavformat/mov.c
+index a2333ac..5b0b23f 100644
+--- a/libavformat/mov.c
++++ b/libavformat/mov.c
+@@ -188,6 +188,10 @@ static int mov_read_mac_string(MOVContext *c, AVIOContext *pb, int len,
+     return p - dst;
+ }
+ 
++/**
++ * Get the current stream in the parsing process. This can either be the
++ * latest stream added to the context, or the stream referenced by an item.
++ */
+ static AVStream *get_curr_st(MOVContext *c)
+ {
+     AVStream *st = NULL;
+@@ -206,7 +210,7 @@ static AVStream *get_curr_st(MOVContext *c)
+         st = item->st;
+         break;
+     }
+-    if (!st)
++    if (!st && c->cur_item_id == -1)
+         st = c->fc->streams[c->fc->nb_streams-1];
+ 
+     return st;
