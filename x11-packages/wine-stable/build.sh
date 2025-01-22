@@ -123,7 +123,7 @@ termux_step_pre_configure() {
 	LDFLAGS="${LDFLAGS/-Wl,-z,relro,-z,now/}"
 
 	LDFLAGS+=" -landroid-spawn"
-	
+
 	if [ "$TERMUX_ARCH" = "x86_64" ]; then
 		mkdir -p "$TERMUX_PKG_TMPDIR/bin"
 		cat <<- EOF > "$TERMUX_PKG_TMPDIR/bin/x86_64-linux-android-clang"
