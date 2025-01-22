@@ -1,11 +1,11 @@
 TERMUX_PKG_HOMEPAGE=https://www.phpmyadmin.net
-TERMUX_PKG_DESCRIPTION="A PHP tool for administering MySQL databases"
+TERMUX_PKG_DESCRIPTION="A PHP tool for administering MySQL and MariaDB databases"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=5.2.1
+TERMUX_PKG_VERSION=5.2.2
 TERMUX_PKG_SRCURL=https://files.phpmyadmin.net/phpMyAdmin/$TERMUX_PKG_VERSION/phpMyAdmin-$TERMUX_PKG_VERSION-all-languages.tar.xz
-TERMUX_PKG_SHA256=373f9599dfbd96d6fe75316d5dad189e68c305f297edf42377db9dd6b41b2557
-TERMUX_PKG_DEPENDS="apache2, php"
+TERMUX_PKG_SHA256=f881819a3b11e653b0212afaf0cc105db85c767715cb3f5852670f7fc36c9669
+TERMUX_PKG_DEPENDS="apache2, php, php-apache"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_CONFFILES="etc/phpmyadmin/config.inc.php"
 
