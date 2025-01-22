@@ -2,7 +2,25 @@ Fallback to `@TERMUX_PREFIX@/tmp` if env `XDG_RUNTIME_DIR` is not set.
 
 --- a/src/util/anon_file.c
 +++ b/src/util/anon_file.c
-@@ -136,6 +136,11 @@
+@@ -70,7 +70,7 @@
+ }
+ #endif
+ 
+-#if !(defined(__FreeBSD__) || defined(HAVE_MEMFD_CREATE) || DETECT_OS_ANDROID)
++#if !(defined(__FreeBSD__) || defined(HAVE_MEMFD_CREATE) || DETECT_OS_ANDROID) || defined(__TERMUX__)
+ static int
+ create_tmpfile_cloexec(char *tmpname)
+ {
+@@ -117,7 +117,7 @@
+ os_create_anonymous_file(int64_t size, const char *debug_name)
+ {
+    int fd, ret;
+-#if defined(HAVE_MEMFD_CREATE)
++#if defined(HAVE_MEMFD_CREATE) && !defined(__TERMUX__)
+    if (!debug_name)
+       debug_name = "mesa-shared";
+    fd = memfd_create(debug_name, MFD_CLOEXEC | MFD_ALLOW_SEALING);
+@@ -137,6 +137,11 @@
     char *name;
  
     path = getenv("XDG_RUNTIME_DIR");

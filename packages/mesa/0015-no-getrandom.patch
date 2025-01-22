@@ -1,0 +1,11 @@
+--- a/src/util/rand_xor.c
++++ b/src/util/rand_xor.c
+@@ -68,7 +68,7 @@
+ #if !DETECT_OS_WINDOWS
+    size_t seed_size = sizeof(uint64_t) * 2;
+ 
+-#if defined(HAVE_GETRANDOM)
++#if defined(HAVE_GETRANDOM) && !defined(__TERMUX__)
+    ssize_t ret = getrandom(seed, seed_size, GRND_NONBLOCK);
+    if (ret == seed_size)
+       return;
