@@ -1,0 +1,19 @@
+--- ./configure.orig	2025-01-22 07:22:22.309483203 +0000
++++ ./configure	2025-01-22 07:24:11.825224432 +0000
+@@ -48,12 +48,12 @@
+ my @bad = ();
+ my $shell = check_shell_vers();
+ if ( ! $opt_nomake ) {
+-	my $no_bash = (grep {/bash/} @bad and ! $opt_all_completions);
+-	my $no_zsh = (grep {/zsh/} @bad and ! $opt_all_completions);
++	my $no_bash = ($opt_all_completions or ! grep {/bash/} @bad);
++	my $no_zsh = ($opt_all_completions or ! grep {/zsh/} @bad);
+ 	open OUT, ">Makefile";
+ 	while (<DATA>) {
+-		next if /bash_complete_dir/ and $no_bash;
+-		next if /zsh\/site-functions/ and $no_zsh;
++		next if $no_bash and /bash_complete_dir/;
++		next if $no_zsh and /zsh\/site-functions/;
+ 		s/opt_prefix/$prefix/;
+ 		if ($bash_complete_dir and ! $opt_prefix) {
+ 			s/mkdir.*bash-completion.*/mkdir -p $bash_complete_dir/;
