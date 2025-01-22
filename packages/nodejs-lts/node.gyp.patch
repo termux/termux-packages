@@ -1,6 +1,6 @@
---- ./node.gyp.orig	2024-12-02 16:39:38.000000000 +0530
-+++ ./node.gyp	2024-12-17 18:14:55.840513355 +0530
-@@ -558,7 +558,8 @@
+--- ./node.gyp.orig	2025-01-21 06:34:59.000000000 +0530
++++ ./node.gyp	2025-01-22 06:30:39.883038068 +0530
+@@ -559,7 +559,8 @@
        ],
  
        'sources': [
@@ -10,7 +10,7 @@
        ],
  
        'dependencies': [
-@@ -1041,298 +1042,6 @@
+@@ -1039,313 +1040,7 @@
          },
        ],
      }, # node_lib_target_name
@@ -108,7 +108,6 @@
 -        'deps/googletest/googletest.gyp:gtest_prod',
 -        'deps/histogram/histogram.gyp:histogram',
 -        'deps/uvwasi/uvwasi.gyp:uvwasi',
--        'deps/ada/ada.gyp:ada',
 -        'deps/nbytes/nbytes.gyp:nbytes',
 -      ],
 -      'includes': [
@@ -155,9 +154,6 @@
 -        'deps/googletest/googletest.gyp:gtest',
 -        'deps/googletest/googletest.gyp:gtest_main',
 -        'deps/histogram/histogram.gyp:histogram',
--        'deps/simdjson/simdjson.gyp:simdjson',
--        'deps/simdutf/simdutf.gyp:simdutf',
--        'deps/ada/ada.gyp:ada',
 -        'deps/nbytes/nbytes.gyp:nbytes',
 -      ],
 -
@@ -235,7 +231,6 @@
 -      'dependencies': [
 -        '<(node_lib_target_name)',
 -        'deps/histogram/histogram.gyp:histogram',
--        'deps/ada/ada.gyp:ada',
 -        'deps/nbytes/nbytes.gyp:nbytes',
 -      ],
 -
@@ -286,9 +281,29 @@
 -    }, # embedtest
 -
 -    {
+-      'target_name': 'sqlite_extension',
+-      'type': 'shared_library',
+-      'sources': [
+-        'test/sqlite/extension.c'
+-      ],
+-
+-      'include_dirs': [
+-        'test/sqlite',
+-        'deps/sqlite',
+-      ],
+-
+-      'cflags': [
+-        '-fPIC',
+-        '-Wall',
+-        '-Wextra',
+-        '-O3',
+-      ],
+-    }, # sqlitetest
+-
+-    {
 -      'target_name': 'overlapped-checker',
 -      'type': 'executable',
--
+ 
 -      'conditions': [
 -        ['OS=="win"', {
 -          'sources': [
@@ -309,7 +324,7 @@
      {
        'target_name': 'node_js2c',
        'type': 'executable',
-@@ -1369,73 +1078,6 @@
+@@ -1382,70 +1077,6 @@
          }],
        ]
      },
@@ -320,10 +335,7 @@
 -      'dependencies': [
 -        '<(node_lib_target_name)',
 -        'deps/histogram/histogram.gyp:histogram',
--        'deps/ada/ada.gyp:ada',
 -        'deps/nbytes/nbytes.gyp:nbytes',
--        'deps/simdjson/simdjson.gyp:simdjson',
--        'deps/simdutf/simdutf.gyp:simdutf',
 -      ],
 -
 -      'includes': [
