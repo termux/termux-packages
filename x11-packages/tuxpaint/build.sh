@@ -37,7 +37,7 @@ termux_step_pre_configure() {
 	local _PREFIX_FOR_BUILD="$TERMUX_PKG_HOSTBUILD_DIR/prefix"
 	export PATH="$_PREFIX_FOR_BUILD/bin:$PATH"
 	export XDG_DATA_HOME="$TERMUX_PREFIX/share" XDG_DATA_DIRS="$TERMUX_PREFIX" XDG_CURRENT_DESKTOP="X-Generic"
-	
+
 	# Disabling gtk-update-icon-cache
 	ln -s /usr/bin/true "$_PREFIX_FOR_BUILD/bin/update-desktop-database" ||:
 	ln -s /usr/bin/true "$_PREFIX_FOR_BUILD/bin/gtk-update-icon-cache" ||:

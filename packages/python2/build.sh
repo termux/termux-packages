@@ -59,7 +59,7 @@ termux_step_pre_configure() {
 	# Put the host-built python in path:
 	export TERMUX_ORIG_PATH=$PATH
 	export PATH=$TERMUX_PKG_HOSTBUILD_DIR:$PATH
-	
+
 	if [ $TERMUX_ARCH = i686 ] || [ $TERMUX_ARCH = arm ]; then LDFLAGS+=" -lm"; fi
 
 	# Needed when building with clang, as setup.py only probes
