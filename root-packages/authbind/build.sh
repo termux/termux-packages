@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.chiark.greenend.org.uk/ucgi/~ian/git/authbind.gi
 TERMUX_PKG_DESCRIPTION="Bind sockets to privileged ports without root"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.1.3
+TERMUX_PKG_VERSION=2.2.0
 TERMUX_PKG_SRCURL=https://deb.debian.org/debian/pool/main/a/authbind/authbind_${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=0f5c70aa5e3b09497fa2f93992aef33872f5a4d50d68040534f7a9751cc579b7
+TERMUX_PKG_SHA256=8d265ee08e66fbda2e6c2b348624cd4552ff2c8fe72247d8904b06500c476adf
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_MAKE_INSTALL_TARGET="install install_man"
 

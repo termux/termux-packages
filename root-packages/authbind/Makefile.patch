@@ -1,9 +1,9 @@
---- a/Makefile
-+++ b/Makefile
-@@ -16,28 +16,28 @@
- # along with this program; if not, write to the Free Software Foundation,
+--- work/Makefile	2024-11-11 05:34:16.000000000 +0530
++++ work.mod/Makefile	2025-01-22 21:07:53.919440191 +0530
+@@ -17,28 +17,28 @@
  # Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. 
  
+ DESTDIR ?=
 -prefix=/usr/local
 +prefix=@TERMUX_PREFIX@
  
@@ -25,7 +25,7 @@
 -INSTALL_PROGRAM ?= install -o root -g root -m 755 -s
 -INSTALL_DIR	?= install -o root -g root -m 755 -d
 +INSTALL_FILE	?= install -m 644 
-+INSTALL_PROGRAM ?= install -m 755
++INSTALL_PROGRAM ?= install -m 755 -s --strip-program=$(STRIP)
 +INSTALL_DIR	?= install -m 755 -d
  STRIP		?= strip
  
@@ -34,26 +34,26 @@
 +LDFLAGS?=	-g
  LIBS=		-ldl -lc
 -CFLAGS=		-g $(OPTIMISE) \
-+CFLAGS+=	\
++CFLAGS=		\
  		-Wall -Wwrite-strings -Wpointer-arith -Wimplicit \
  		-Wnested-externs -Wmissing-prototypes -Wstrict-prototypes
  CPPFLAGS=	-DMAJOR_VER='"$(MAJOR)"' -DMINOR_VER='"$(MINOR)"' \
-@@ -59,13 +59,11 @@
+@@ -60,13 +60,11 @@
  all:			$(TARGETS)
  
  install:		$(TARGETS)
--		$(INSTALL_DIR) $(lib_dir) $(man1_dir) $(man8_dir)
-+		$(INSTALL_DIR) $(lib_dir) $(libexec_dir) $(man1_dir) $(man8_dir)
- 		$(INSTALL_PROGRAM) $(BINTARGETS) $(bin_dir)/.
- 		$(INSTALL_FILE) $(LIBTARGET) $(lib_dir)/.
--		$(STRIP) --strip-unneeded $(lib_dir)/$(LIBTARGET)
- 		ln -sf $(LIBTARGET) $(lib_dir)/$(LIBCANON)
- 		$(INSTALL_PROGRAM) $(HELPER) $(libexec_dir)/.
--		chmod u+s $(libexec_dir)/$(HELPER)
- 		$(INSTALL_DIR) $(etc_dir) \
- 			$(etc_dir)/byport $(etc_dir)/byaddr $(etc_dir)/byuid
+-		$(INSTALL_DIR) $(DESTDIR)$(bin_dir) $(DESTDIR)$(lib_dir)
++		$(INSTALL_DIR) $(DESTDIR)$(bin_dir) $(DESTDIR)$(lib_dir) $(DESTDIR)$(libexec_dir)
+ 		$(INSTALL_PROGRAM) $(BINTARGETS) $(DESTDIR)$(bin_dir)/.
+ 		$(INSTALL_FILE) $(LIBTARGET) $(DESTDIR)$(lib_dir)/.
+-		$(STRIP) --strip-unneeded $(DESTDIR)$(lib_dir)/$(LIBTARGET)
+ 		ln -sf $(LIBTARGET) $(DESTDIR)$(lib_dir)/$(LIBCANON)
+ 		$(INSTALL_PROGRAM) $(HELPER) $(DESTDIR)$(libexec_dir)/.
+-		chmod u+s $(DESTDIR)$(libexec_dir)/$(HELPER)
+ 		$(INSTALL_DIR) $(DESTDIR)$(etc_dir) \
+ 			$(DESTDIR)$(etc_dir)/byport $(DESTDIR)$(etc_dir)/byaddr $(DESTDIR)$(etc_dir)/byuid
  
-@@ -82,7 +80,7 @@
+@@ -84,7 +82,7 @@
  helper.o authbind.o:	authbind.h
  
  $(LIBTARGET):		libauthbind.o
