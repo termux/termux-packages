@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="A syntax-highlighter for git and diff output"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
 TERMUX_PKG_VERSION="0.18.2"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/dandavison/delta/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=64717c3b3335b44a252b8e99713e080cbf7944308b96252bc175317b10004f02
 TERMUX_PKG_AUTO_UPDATE=true
@@ -13,7 +13,6 @@ TERMUX_PKG_BUILD_IN_SRC=true
 termux_step_pre_configure() {
 	export LIBGIT2_SYS_USE_PKG_CONFIG=1
 	export RUSTONIG_SYSTEM_LIBONIG=1
-	export PKG_CONFIG_ALLOW_CROSS=1
 
 	rm -f Makefile release.Makefile
 	export CC_x86_64_unknown_linux_gnu=gcc
