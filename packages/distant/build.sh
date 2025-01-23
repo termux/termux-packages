@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Library and tooling that supports remote filesystem and 
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1:0.20.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/chipsenkbeil/distant/archive/refs/tags/v${TERMUX_PKG_VERSION#*:}.tar.gz
 TERMUX_PKG_SHA256=28044639adb3a7984a1c2e721debbaa472e6d826795c5d2f7c434c563e261007
 TERMUX_PKG_AUTO_UPDATE=true
@@ -15,7 +15,6 @@ termux_step_pre_configure() {
 	export OPENSSL_INCLUDE_DIR=$TERMUX_PREFIX/include
 	export OPENSSL_LIB_DIR=$TERMUX_PREFIX/lib
 	export LIBSSH2_SYS_USE_PKG_CONFIG=1
-	export PKG_CONFIG_ALLOW_CROSS=1
 
 	sed -i "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" ${TERMUX_PKG_SRCDIR}/src/constants.rs
 
