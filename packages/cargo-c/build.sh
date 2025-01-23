@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Cargo C-ABI helpers"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.10.9"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/lu-zero/cargo-c/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=4542e39aa67bf8712c60f21701cc8e8b5153d0344afe1b618f121f696b578a7f
 TERMUX_PKG_AUTO_UPDATE=true
@@ -22,7 +23,6 @@ termux_pkg_auto_update() {
 termux_step_pre_configure() {
 	export LIBGIT2_SYS_USE_PKG_CONFIG=1
 	export LIBSSH2_SYS_USE_PKG_CONFIG=1
-	export PKG_CONFIG_ALLOW_CROSS=1
 
 	termux_setup_rust
 
