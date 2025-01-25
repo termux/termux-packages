@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A library-based package manager with dependency support"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@Maxython <mixython@gmail.com>"
 TERMUX_PKG_VERSION=7.0.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://gitlab.archlinux.org/pacman/pacman/-/releases/v${TERMUX_PKG_VERSION}/downloads/pacman-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=61cbd445d1381b4b184bc7c4e2791f07a79f0f2807b7c600399d0d08e8cd28cf
 TERMUX_PKG_DEPENDS="bash, curl, gpgme, libandroid-glob, libarchive, libcurl, openssl, termux-licenses, termux-keyring"
