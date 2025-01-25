@@ -1,0 +1,11 @@
+--- pacman-7.0.0/scripts/libmakepkg/source/git.sh.in	2024-07-14 12:11:18.000000000 +0300
++++ pacman-7.0.0/scripts/libmakepkg/source/git.sh.in.patch	2025-01-25 16:31:49.781499938 +0300
+@@ -49,7 +49,7 @@
+ 
+ 	if [[ ! -d "$dir" ]] || dir_is_empty "$dir" ; then
+ 		msg2 "$(gettext "Cloning %s %s repo...")" "${repo}" "git"
+-		if ! git clone --origin=origin ---mirror "$url" "$dir"; then
++		if ! git clone --origin=origin --mirror "$url" "$dir"; then
+ 			error "$(gettext "Failure while downloading %s %s repo")" "${repo}" "git"
+ 			plainerr "$(gettext "Aborting...")"
+ 			exit 1
