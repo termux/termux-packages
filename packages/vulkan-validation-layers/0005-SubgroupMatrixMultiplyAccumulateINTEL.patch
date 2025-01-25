@@ -1,0 +1,75 @@
+They are not introduced in SPIRV-Headers 1.4.304.0
+
+--- a/layers/vulkan/generated/spirv_validation_helper.cpp
++++ b/layers/vulkan/generated/spirv_validation_helper.cpp
+@@ -754,6 +754,7 @@
+             return "ArithmeticFenceEXT";
+         case spv::CapabilitySubgroupBufferPrefetchINTEL:
+             return "SubgroupBufferPrefetchINTEL";
++#if 0
+         case spv::CapabilitySubgroup2DBlockIOINTEL:
+             return "Subgroup2DBlockIOINTEL";
+         case spv::CapabilitySubgroup2DBlockTransformINTEL:
+@@ -762,6 +763,7 @@
+             return "Subgroup2DBlockTransposeINTEL";
+         case spv::CapabilitySubgroupMatrixMultiplyAccumulateINTEL:
+             return "SubgroupMatrixMultiplyAccumulateINTEL";
++#endif
+         case spv::CapabilityGroupUniformArithmeticKHR:
+             return "GroupUniformArithmeticKHR";
+         default:
+--- a/layers/vulkan/generated/spirv_grammar_helper.h
++++ b/layers/vulkan/generated/spirv_grammar_helper.h
+@@ -396,7 +396,9 @@
+         case spv::OpRayQueryGetIntersectionWorldToObjectKHR:
+         case spv::OpAtomicFAddEXT:
+         case spv::OpArithmeticFenceEXT:
++#if 0
+         case spv::OpSubgroupMatrixMultiplyAccumulateINTEL:
++#endif
+         case spv::OpGroupIMulKHR:
+         case spv::OpGroupFMulKHR:
+         case spv::OpGroupBitwiseAndKHR:
+@@ -805,7 +807,9 @@
+         case spv::OpRayQueryGetIntersectionWorldToObjectKHR:
+         case spv::OpAtomicFAddEXT:
+         case spv::OpArithmeticFenceEXT:
++#if 0
+         case spv::OpSubgroupMatrixMultiplyAccumulateINTEL:
++#endif
+         case spv::OpGroupIMulKHR:
+         case spv::OpGroupFMulKHR:
+         case spv::OpGroupBitwiseAndKHR:
+--- a/layers/vulkan/generated/spirv_grammar_helper.cpp
++++ b/layers/vulkan/generated/spirv_grammar_helper.cpp
+@@ -957,6 +957,7 @@
+             return "OpArithmeticFenceEXT";
+         case spv::OpSubgroupBlockPrefetchINTEL:
+             return "OpSubgroupBlockPrefetchINTEL";
++#if 0
+         case spv::OpSubgroup2DBlockLoadINTEL:
+             return "OpSubgroup2DBlockLoadINTEL";
+         case spv::OpSubgroup2DBlockLoadTransformINTEL:
+@@ -969,6 +970,7 @@
+             return "OpSubgroup2DBlockStoreINTEL";
+         case spv::OpSubgroupMatrixMultiplyAccumulateINTEL:
+             return "OpSubgroupMatrixMultiplyAccumulateINTEL";
++#endif
+         case spv::OpGroupIMulKHR:
+             return "OpGroupIMulKHR";
+         case spv::OpGroupFMulKHR:
+@@ -2391,12 +2393,14 @@
+         {spv::OpAtomicFAddEXT, {{OperandKind::Id, OperandKind::Id, OperandKind::Id, OperandKind::Id}}},
+         {spv::OpArithmeticFenceEXT, {{OperandKind::Id}}},
+         {spv::OpSubgroupBlockPrefetchINTEL, {{OperandKind::Id, OperandKind::Id, OperandKind::BitEnum}}},
++#if 0
+         {spv::OpSubgroup2DBlockLoadINTEL, {{OperandKind::Id, OperandKind::Id, OperandKind::Id, OperandKind::Id, OperandKind::Id, OperandKind::Id, OperandKind::Id, OperandKind::Id, OperandKind::Id, OperandKind::Id}}},
+         {spv::OpSubgroup2DBlockLoadTransformINTEL, {{OperandKind::Id, OperandKind::Id, OperandKind::Id, OperandKind::Id, OperandKind::Id, OperandKind::Id, OperandKind::Id, OperandKind::Id, OperandKind::Id, OperandKind::Id}}},
+         {spv::OpSubgroup2DBlockLoadTransposeINTEL, {{OperandKind::Id, OperandKind::Id, OperandKind::Id, OperandKind::Id, OperandKind::Id, OperandKind::Id, OperandKind::Id, OperandKind::Id, OperandKind::Id, OperandKind::Id}}},
+         {spv::OpSubgroup2DBlockPrefetchINTEL, {{OperandKind::Id, OperandKind::Id, OperandKind::Id, OperandKind::Id, OperandKind::Id, OperandKind::Id, OperandKind::Id, OperandKind::Id, OperandKind::Id}}},
+         {spv::OpSubgroup2DBlockStoreINTEL, {{OperandKind::Id, OperandKind::Id, OperandKind::Id, OperandKind::Id, OperandKind::Id, OperandKind::Id, OperandKind::Id, OperandKind::Id, OperandKind::Id, OperandKind::Id}}},
+         {spv::OpSubgroupMatrixMultiplyAccumulateINTEL, {{OperandKind::Id, OperandKind::Id, OperandKind::Id, OperandKind::Id, OperandKind::BitEnum}}},
++#endif
+         {spv::OpGroupIMulKHR, {{OperandKind::Id, OperandKind::ValueEnum, OperandKind::Id}}},
+         {spv::OpGroupFMulKHR, {{OperandKind::Id, OperandKind::ValueEnum, OperandKind::Id}}},
+         {spv::OpGroupBitwiseAndKHR, {{OperandKind::Id, OperandKind::ValueEnum, OperandKind::Id}}},
