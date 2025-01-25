@@ -9,15 +9,10 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 TERMUX_PKG_DEPENDS="fcitx5, libc++, libx11, libxcb, libxkbcommon, qt6-qtbase"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DCMAKE_INSTALL_QT6PLUGINDIR=lib/qt6/plugins
 -DENABLE_TEST=OFF
 -DENABLE_QT4=OFF
 -DENABLE_QT5=OFF
 -DENABLE_QT6=ON
 -DENABLE_QT6_WAYLAND_WORKAROUND=OFF
 "
-
-termux_step_post_make_install() {
-	local _QT6_PLATFORM_INPUT_CONTEXTS_DIR=$TERMUX_PREFIX/lib/qt6/plugins/platforminputcontexts
-	mkdir -p "$_QT6_PLATFORM_INPUT_CONTEXTS_DIR"
-	mv $TERMUX_PREFIX/opt/qt6/cross/lib/qt6/plugins/platforminputcontexts/libfcitx5platforminputcontextplugin.so $_QT6_PLATFORM_INPUT_CONTEXTS_DIR
-}
