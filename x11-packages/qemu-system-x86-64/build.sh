@@ -3,14 +3,13 @@ TERMUX_PKG_DESCRIPTION="A generic and open source machine emulator and virtualiz
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1:8.2.6
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://download.qemu.org/qemu-${TERMUX_PKG_VERSION:2}.tar.xz
 TERMUX_PKG_SHA256=8cadb1e6b039954e672d4a7cc3a5f30738b4cb99bc92c2640b15cc89f8f91fa2
-TERMUX_PKG_DEPENDS="dtc, gdk-pixbuf, glib, gtk3, libbz2, libcairo, libcurl, libepoxy, libgmp, libgnutls, libiconv, libjpeg-turbo, liblzo, libnettle, libnfs, libpixman, libpng, libslirp, libspice-server, libssh, libusb, libusbredir, libx11, mesa, ncurses, pulseaudio, qemu-common, resolv-conf, sdl2, sdl2-image, virglrenderer, zlib, zstd"
-
+TERMUX_PKG_DEPENDS="dtc, gdk-pixbuf, glib, gtk3, libbz2, libcairo, libcurl, libepoxy, libgmp, libgnutls, libiconv, libjpeg-turbo, liblzo, libnettle, libnfs, libpixman, libpng, libslirp, libspice-server, libssh, libusb, libusbredir, libx11, mesa, ncurses, pulseaudio, qemu-common, resolv-conf, sdl2 | sdl2-compat, sdl2-image, virglrenderer, zlib, zstd"
 # Required by configuration script, but I can't find any binary that uses it.
 TERMUX_PKG_BUILD_DEPENDS="libtasn1"
-
+TERMUX_PKG_ANTI_BUILD_DEPENDS="sdl2-compat"
 # Remove files already present in qemu-utils and qemu-common.
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/elf2dmp
