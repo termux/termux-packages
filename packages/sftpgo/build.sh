@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Full-featured and highly configurable SFTP, HTTP/S, FTP/
 TERMUX_PKG_LICENSE="AGPL-V3"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.6.4"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/drakkan/sftpgo/releases/download/v$TERMUX_PKG_VERSION/sftpgo_v${TERMUX_PKG_VERSION}_src_with_deps.tar.xz
 TERMUX_PKG_SHA256=5903360dd6da0dba07c778e2886e437d1c54a625894b7443e3b3b155f5ed3a73
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -58,4 +59,8 @@ termux_step_make_install() {
 
 	mkdir -p "$TERMUX_PREFIX"/share/sftpgo/man/man1
 	"$TERMUX_PKG_HOSTBUILD_DIR"/sftpgo gen man -d "$TERMUX_PREFIX"/share/sftpgo/man/man1
+
+	# for sftpgo.db
+	mkdir -p "$TERMUX_PREFIX"/var/lib/sftpgo
+	touch "$TERMUX_PREFIX"/var/lib/sftpgo/.placeholder
 }
