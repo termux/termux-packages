@@ -1,0 +1,9 @@
+#!@TERMUX_PREFIX@/bin/sh
+
+# Run `sv-enable ssh-agent` and add the following to your bashrc (or
+# equivalent) to use ssh-agent:
+#   export SSH_AUTH_SOCK="$PREFIX"/var/run/ssh-agent.socket
+# After that you can add your key to the agent with `ssh-add`, and
+# then make use of the credentials across all terminal sessions
+
+exec ssh-agent -D -a "$PREFIX"/var/run/ssh-agent.socket 2>&1

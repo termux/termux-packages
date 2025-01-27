@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Secure shell for logging into a remote machine"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
 TERMUX_PKG_VERSION="9.9p1"
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://github.com/openssh/openssh-portable/archive/refs/tags/V_$(sed 's/\./_/g; s/p/_P/g' <<< $TERMUX_PKG_VERSION).tar.gz
 TERMUX_PKG_SHA256=e8858153f188754d0bbf109477690eba226132879b6840cf08b51afb38151040
 TERMUX_PKG_AUTO_UPDATE=true
@@ -50,7 +50,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="PATH_PASSWD_PROG=${TERMUX_PREFIX}/bin/passwd"
 TERMUX_PKG_MAKE_INSTALL_TARGET="install-nokeys"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/slogin share/man/man1/slogin.1"
 TERMUX_PKG_CONFFILES="etc/ssh/ssh_config etc/ssh/sshd_config"
-TERMUX_PKG_SERVICE_SCRIPT=("sshd" 'exec sshd -D -e 2>&1')
 
 termux_step_pre_configure() {
 	# Certain packages are not safe to build on device because their
@@ -90,6 +89,19 @@ termux_step_post_make_install() {
 
 	mkdir -p $TERMUX_PREFIX/etc/ssh/
 	cp $TERMUX_PKG_SRCDIR/moduli $TERMUX_PREFIX/etc/ssh/moduli
+
+	# Setup termux-services scripts
+	mkdir -p $TERMUX_PREFIX/var/service/sshd/log
+	ln -sf $TERMUX_PREFIX/share/termux-services/svlogger $TERMUX_PREFIX/var/service/sshd/log/run
+	sed "s%@TERMUX_PREFIX@%$TERMUX_PREFIX%g" $TERMUX_PKG_BUILDER_DIR/sv/sshd.run.in > $TERMUX_PREFIX/var/service/sshd/run
+	chmod 700 $TERMUX_PREFIX/var/service/sshd/run
+	touch $TERMUX_PREFIX/var/service/sshd/down
+
+	mkdir -p $TERMUX_PREFIX/var/service/ssh-agent/log
+	ln -sf $TERMUX_PREFIX/share/termux-services/svlogger $TERMUX_PREFIX/var/service/ssh-agent/log/run
+	sed "s%@TERMUX_PREFIX@%$TERMUX_PREFIX%g" $TERMUX_PKG_BUILDER_DIR/sv/ssh-agent.run.in > $TERMUX_PREFIX/var/service/ssh-agent/run
+	chmod 700 $TERMUX_PREFIX/var/service/ssh-agent/run
+	touch $TERMUX_PREFIX/var/service/ssh-agent/down
 }
 
 termux_step_post_massage() {
