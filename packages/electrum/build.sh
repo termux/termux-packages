@@ -14,6 +14,7 @@ TERMUX_PKG_PLATFORM_INDEPENDENT=true
 # asciinema previously contained some files that python packages have in common
 TERMUX_PKG_CONFLICTS="asciinema (<< 1.4.0-1)"
 TERMUX_PKG_PYTHON_COMMON_DEPS="wheel"
+TERMUX_PKG_SERVICE_SCRIPT=("electrum" 'exec electrum daemon 2>&1')
 
 termux_step_create_debscripts() {
 	cat <<- EOF > ./postinst
