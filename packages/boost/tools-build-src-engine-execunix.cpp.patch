@@ -1,0 +1,11 @@
+--- boost_1_87_0/tools/build/src/engine/execunix.cpp	2024-12-05 06:23:38.000000000 +0530
++++ boost_1_87_0.mod/tools/build/src/engine/execunix.cpp	2025-01-27 17:57:57.835203955 +0530
+@@ -192,7 +192,7 @@
+     static LIST * default_shell;
+     if ( !default_shell )
+         default_shell = list_push_back( list_new(
+-            object_new( "/bin/sh" ) ),
++            object_new( "@TERMUX_PREFIX@/bin/sh" ) ),
+             object_new( "-c" ) );
+ 
+     if ( list_empty( shell ) )
