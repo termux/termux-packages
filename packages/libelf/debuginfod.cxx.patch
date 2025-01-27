@@ -1,19 +1,11 @@
-diff -u -r elfutils-0.191/debuginfod/debuginfod.cxx src/debuginfod/debuginfod.cxx
---- elfutils-0.191/debuginfod/debuginfod.cxx	2024-03-01 20:12:17.000000000 +0000
-+++ src/debuginfod/debuginfod.cxx	2024-05-05 21:55:02.817312341 +0000
-@@ -109,6 +109,7 @@
+--- elfutils-0.192/debuginfod/debuginfod.cxx	2024-10-19 00:33:43.000000000 +0530
++++ elfutils-0.192.mod/debuginfod/debuginfod.cxx	2025-01-27 22:59:47.088863980 +0530
+@@ -119,7 +119,7 @@
  #include <libdwelf.h>
  
  #include <microhttpd.h>
+-
 +#include <netinet/in.h>
- 
  #if MHD_VERSION >= 0x00097002
  // libmicrohttpd 0.9.71 broke API
-@@ -1445,7 +1446,6 @@
- 
-   map<key,fdcache_entry> entries; // optimized for lookup
-   time_t last_cleaning;
--  long max_fds;
-   long max_mbs;
- 
- public:
+ #define MHD_RESULT enum MHD_Result
