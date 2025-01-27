@@ -4,12 +4,12 @@ TERMUX_PKG_LICENSE="BSL-1.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Never forget to always bump revision of reverse dependencies and rebuild them
 # when bumping version.
-TERMUX_PKG_VERSION="1.87.0"
+TERMUX_PKG_VERSION="1.84.0"
 TERMUX_PKG_SRCURL="https://archives.boost.io/release/${TERMUX_PKG_VERSION}/source/boost_${TERMUX_PKG_VERSION//./_}.tar.bz2"
-TERMUX_PKG_SHA256=af57be25cb4c4f4b413ed692fe378affb4352ea50fbe294a11ef548f4d527d89
+TERMUX_PKG_SHA256=cc4b893acf645c9d4b698e9a0f08ca8846aa5d6c68275c14c3e7949c24109454
 TERMUX_PKG_AUTO_UPDATE=false
-TERMUX_PKG_DEPENDS="libc++, libbz2, libiconv, liblzma, zlib, libandroid-wordexp"
-TERMUX_PKG_BUILD_DEPENDS="python, binutils-cross"
+TERMUX_PKG_DEPENDS="libc++, libbz2, libiconv, liblzma, zlib"
+TERMUX_PKG_BUILD_DEPENDS="python"
 TERMUX_PKG_BREAKS="libboost-python (<= 1.65.1-2), boost-dev"
 TERMUX_PKG_REPLACES="libboost-python (<= 1.65.1-2), boost-dev"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -44,15 +44,6 @@ termux_step_make_install() {
 		BOOSTAM=64
 	elif [ "$TERMUX_ARCH" = i686 ] || [ "$TERMUX_ARCH" = arm ]; then
 		BOOSTAM=32
-	fi
-
-	if [ "$TERMUX_ARCH" = arm ]; then
-		#```
-		# <inline asm>:1:41: error: expected '%<type>' or "<type>"
-		# .pushsection ".debug_gdb_scripts", "MS",@progbits,1
-		# ```
-		# See also https://github.com/llvm/llvm-project/issues/24438.
-		termux_setup_no_integrated_as
 	fi
 
 	./b2 target-os=android -j${TERMUX_PKG_MAKE_PROCESSES} \

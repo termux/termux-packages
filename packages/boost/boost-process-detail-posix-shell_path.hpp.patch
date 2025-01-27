@@ -1,0 +1,19 @@
+diff --color -uNr boost_1_80_0/boost/process/detail/posix/shell_path.hpp boost_1_80_0.mod/boost/process/detail/posix/shell_path.hpp
+--- boost_1_80_0/boost/process/detail/posix/shell_path.hpp	2022-08-03 23:47:11.000000000 -0300
++++ boost_1_80_0.mod/boost/process/detail/posix/shell_path.hpp	2022-11-04 00:06:29.634809985 -0300
+@@ -18,13 +18,13 @@
+ 
+ inline boost::process::filesystem::path shell_path()
+ {
+-    return "/bin/sh";
++    return "@TERMUX_PREFIX@/bin/sh";
+ }
+ 
+ inline boost::process::filesystem::path shell_path(std::error_code &ec)
+ {
+     ec.clear();
+-    return "/bin/sh";
++    return "@TERMUX_PREFIX@/bin/sh";
+ }
+ 
+ }}}}
