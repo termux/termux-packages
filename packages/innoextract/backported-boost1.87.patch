@@ -1,0 +1,24 @@
+From 264c2fe6b84f90f6290c670e5f676660ec7b2387 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Bernhard=20Rosenkr=C3=A4nzer?= <bero@lindev.ch>
+Date: Thu, 28 Mar 2024 15:11:40 +0100
+Subject: [PATCH] Fix build with boost 1.85
+
+As of boost 1.85-beta1, boost/filesystem/directory.hpp is no longer
+implicitly included by boost/filesystem/operations.hpp. Include it
+explicitly.
+---
+ src/stream/slice.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/stream/slice.cpp b/src/stream/slice.cpp
+index 12468a38..f7ebe0e5 100644
+--- a/src/stream/slice.cpp
++++ b/src/stream/slice.cpp
+@@ -27,6 +27,7 @@
+ #include <boost/cstdint.hpp>
+ #include <boost/algorithm/string/predicate.hpp>
+ #include <boost/filesystem/operations.hpp>
++#include <boost/filesystem/directory.hpp>
+ #include <boost/range/size.hpp>
+ 
+ #include "util/console.hpp"
