@@ -1,36 +1,62 @@
-diff -u -r ../mc-4.8.17/lib/shell.c ./lib/shell.c
---- ../mc-4.8.17/lib/shell.c	2016-05-07 11:42:52.000000000 -0400
-+++ ./lib/shell.c	2016-05-21 17:00:02.116441571 -0400
-@@ -64,20 +64,14 @@
+diff -u -r ../mc-4.8.33/lib/shell.c ./lib/shell.c
+--- ../mc-4.8.33/lib/shell.c	2025-01-15 16:52:17.000000000 +0000
++++ ./lib/shell.c	2025-01-28 00:48:01.888138231 +0000
+@@ -66,38 +66,38 @@
      mc_shell = g_new0 (mc_shell_t, 1);
  
      /* 3rd choice: look for existing shells supported as MC subshells.  */
 -    if (access ("/bin/bash", X_OK) == 0)
 -        mc_shell->path = g_strdup ("/bin/bash");
+-    else if (access ("/bin/zsh", X_OK) == 0)
+-        mc_shell->path = g_strdup ("/bin/zsh");
+-    else if (access ("/bin/oksh", X_OK) == 0)
+-        mc_shell->path = g_strdup ("/bin/oksh");
+-    else if (access ("/bin/ksh", X_OK) == 0)
+-        mc_shell->path = g_strdup ("/bin/ksh");
+-    else if (access ("/bin/ksh93", X_OK) == 0)
+-        mc_shell->path = g_strdup ("/bin/ksh93");
 -    else if (access ("/bin/ash", X_OK) == 0)
 -        mc_shell->path = g_strdup ("/bin/ash");
 -    else if (access ("/bin/dash", X_OK) == 0)
 -        mc_shell->path = g_strdup ("/bin/dash");
 -    else if (access ("/bin/busybox", X_OK) == 0)
 -        mc_shell->path = g_strdup ("/bin/busybox");
--    else if (access ("/bin/zsh", X_OK) == 0)
--        mc_shell->path = g_strdup ("/bin/zsh");
 -    else if (access ("/bin/tcsh", X_OK) == 0)
 -        mc_shell->path = g_strdup ("/bin/tcsh");
 -    else if (access ("/bin/csh", X_OK) == 0)
 -        mc_shell->path = g_strdup ("/bin/csh");
+-    else if (access ("/bin/mksh", X_OK) == 0)
+-        mc_shell->path = g_strdup ("/bin/mksh");
 +    if (access ("@TERMUX_PREFIX@/bin/bash", X_OK) == 0)
 +        mc_shell->path = g_strdup ("@TERMUX_PREFIX@/bin/bash");
++    else if (access ("@TERMUX_PREFIX@/bin/zsh", X_OK) == 0)
++        mc_shell->path = g_strdup ("@TERMUX_PREFIX@/bin/zsh");
++    else if (access ("@TERMUX_PREFIX@/bin/oksh", X_OK) == 0)
++        mc_shell->path = g_strdup ("@TERMUX_PREFIX@/bin/oksh");
++    else if (access ("@TERMUX_PREFIX@/bin/ksh", X_OK) == 0)
++        mc_shell->path = g_strdup ("@TERMUX_PREFIX@/bin/ksh");
++    else if (access ("@TERMUX_PREFIX@/bin/ksh93", X_OK) == 0)
++        mc_shell->path = g_strdup ("@TERMUX_PREFIX@/bin/ksh93");
 +    else if (access ("@TERMUX_PREFIX@/bin/ash", X_OK) == 0)
 +        mc_shell->path = g_strdup ("@TERMUX_PREFIX@/bin/ash");
 +    else if (access ("@TERMUX_PREFIX@/bin/dash", X_OK) == 0)
 +        mc_shell->path = g_strdup ("@TERMUX_PREFIX@/bin/dash");
-+    else if (access ("@TERMUX_PREFIX@/bin/zsh", X_OK) == 0)
-+        mc_shell->path = g_strdup ("@TERMUX_PREFIX@/bin/zsh");
++    else if (access ("@TERMUX_PREFIX@/bin/busybox", X_OK) == 0)
++        mc_shell->path = g_strdup ("@TERMUX_PREFIX@/bin/busybox");
++    else if (access ("@TERMUX_PREFIX@/bin/tcsh", X_OK) == 0)
++        mc_shell->path = g_strdup ("@TERMUX_PREFIX@/bin/tcsh");
++    else if (access ("@TERMUX_PREFIX@/bin/csh", X_OK) == 0)
++        mc_shell->path = g_strdup ("@TERMUX_PREFIX@/bin/csh");
++    else if (access ("@TERMUX_PREFIX@/bin/mksh", X_OK) == 0)
++        mc_shell->path = g_strdup ("@TERMUX_PREFIX@/bin/mksh");
      /* No fish as fallback because it is so much different from other shells and
       * in a way exotic (even though user-friendly by name) that we should not
       * present it as a subshell without the user's explicit intention. We rather
-@@ -87,7 +81,7 @@
+      * will not use a subshell but just a command line.
+-     * else if (access("/bin/fish", X_OK) == 0)
+-     *     mc_global.tty.shell = g_strdup ("/bin/fish");
++     * else if (access("@TERMUX_PREFIX@/bin/fish", X_OK) == 0)
++     *     mc_global.tty.shell = g_strdup ("@TERMUX_PREFIX@/bin/fish");
       */
      else
          /* Fallback and last resort: system default shell */
