@@ -70,6 +70,9 @@ TERMUX_PACKAGES_DIRECTORIES=$(jq --raw-output 'del(.pkg_format) | keys | .[]' "$
 # shellcheck source=scripts/updates/internal/termux_repology_auto_update.sh
 . "${TERMUX_SCRIPTDIR}"/scripts/updates/internal/termux_repology_auto_update.sh
 
+# shellcheck source=scripts/updates/internal/termux_github_graphql.sh
+. "${TERMUX_SCRIPTDIR}"/scripts/updates/internal/termux_github_graphql.sh
+
 # Main script to:
 # - by default, decide which update method to use,
 # - but can be overridden by build.sh to use custom update method.
@@ -77,7 +80,7 @@ TERMUX_PACKAGES_DIRECTORIES=$(jq --raw-output 'del(.pkg_format) | keys | .[]' "$
 # shellcheck source=scripts/updates/termux_pkg_auto_update.sh
 . "${TERMUX_SCRIPTDIR}"/scripts/updates/termux_pkg_auto_update.sh
 
-# Converts milliseconds to human-readable format. 
+# Converts milliseconds to human-readable format.
 # Example: `ms_to_human_readable 123456789` => 34h 17m 36s 789ms
 ms_to_human_readable() {
 	echo "$(($1/3600000))h $(($1%3600000/60000))m $(($1%60000/1000))s $(($1%1000))ms" | sed 's/0h //;s/0m //;s/0s //'
@@ -151,12 +154,50 @@ _fetch_and_cache_tags() {
 	quiet termux_repology_api_get_latest_version ' '
 
 	local __PACKAGES=()
+	local __GITHUB_PACKAGES=()
 	for repo_dir in $(jq --raw-output 'del(.pkg_format) | keys | .[]' "${TERMUX_SCRIPTDIR}/repo.json"); do
 		for pkg_dir in "${repo_dir}"/*; do
 			quiet _should_update "${pkg_dir}" || continue # Skip if not needed.
 			grep -q '^termux_pkg_auto_update' "${pkg_dir}/build.sh" && continue # Skip if package has custom auto-update
-			__PACKAGES+=("${pkg_dir}")
+			if grep '^TERMUX_PKG_SRCURL=' "${pkg_dir}/build.sh" | grep -q 'github.com'; then
+				__GITHUB_PACKAGES+=("${pkg_dir}")
+			else
+				__PACKAGES+=("${pkg_dir}")
+			fi
 		done
+	done
+
+	echo "INFO: Building GraphQL queries"
+
+	local GITHUB_GRAPHQL_QUERIES=() COUNTER=0
+	declare -A __GITHUB_GRAPHQL_PACKAGES=()
+	# Ignore non-constant sources
+	# shellcheck disable=SC1091
+	for pkg_dir in "${__GITHUB_PACKAGES[@]}"; do
+		local PKG_SRCURL TAG_TYPE OWNER REPO
+		read -r PKG_SRCURL TAG_TYPE < <(
+			set +u
+			source "${pkg_dir}/build.sh"
+			echo "${TERMUX_PKG_SRCURL} ${TERMUX_PKG_UPDATE_TAG_TYPE}"
+		)
+
+		read -r OWNER REPO < <(sed -E 's|^(git\+)?https?://github.com/([^/]+)/([^/]+).*|\2 \3|' <<< "$PKG_SRCURL")
+
+		if [[ -z "${TAG_TYPE}" ]]; then # If not set, then decide on the basis of url.
+			if [[ "${PKG_SRCURL:0:4}" == "git+" ]]; then
+				# Get newest tag.
+				TAG_TYPE="newest-tag"
+			else
+				# Get the latest release tag.
+				TAG_TYPE="latest-release-tag"
+			fi
+		fi
+
+		# We prepare the query snippets for `termux_github_graphql` here
+		# since we already have the needed information available.
+		GITHUB_GRAPHQL_QUERIES+=( "_$((COUNTER++)): repository(owner: \\\"${OWNER}\\\", name: \\\"${REPO}\\\") { ..._${TAG_TYPE//-/_} }" )
+
+		unset PKG_SRCURL TAG_TYPE OWNER REPO
 	done
 
 	# This is called indirectly in the ninja file
@@ -165,7 +206,7 @@ _fetch_and_cache_tags() {
 	__main__() {
 		cd "${TERMUX_SCRIPTDIR}"
 		export TERMUX_PKG_NAME="${1##*/}" TERMUX_PKG_BUILDER_DIR=${1}
-		set +eu;
+		set +eu
 		for i in scripts/updates/{**/,}*.sh "${1}/build.sh"; do
 			# shellcheck disable=SC1090
 			source "${i}"
@@ -183,6 +224,8 @@ _fetch_and_cache_tags() {
 	}
 
 	# This function generates a ninja file for all packages in the ${__PACKAGES[@]}
+	# So shut up shellcheck nagging us about using `sed`
+	# shellcheck disable=SC2001
 	__generate__() {
 		echo "rule update"
 		echo " command = bash -c \"\$\$F\" -- \$pkg_dir || :"
@@ -191,16 +234,22 @@ _fetch_and_cache_tags() {
 		echo "default run_all"
 	}
 
-	local LATEST_TAGS
-	LATEST_TAGS="$(
-		F="$(declare -p TERMUX_SCRIPTDIR GITHUB_TOKEN TERMUX_REPOLOGY_DATA_FILE); $(declare -f __main__ | sed 's/__main__ ()//')" \
-		env --chdir=/tmp ninja -f /dev/stdin < <(__generate__ |& grep "^PKG|")
+	echo "INFO: Fetching GitHub packages via GraphQL API"
+	LATEST_TAGS_GITHUB="$(
+		termux_github_graphql "${GITHUB_GRAPHQL_QUERIES[@]}"
 	)"
 
+	echo "INFO: Fetching non-GitHub packages"
+	local LATEST_TAGS='' LATEST_TAGS_GITHUB=''
+	LATEST_TAGS="$(
+		F="$(declare -p TERMUX_SCRIPTDIR GITHUB_TOKEN TERMUX_REPOLOGY_DATA_FILE); $(declare -f __main__ | sed 's/__main__ ()//')" \
+		env --chdir=/tmp ninja -f /dev/stdin < <(__generate__) |& grep "^PKG|"
+	)"
 	unset -f __main__ __generate__
+
 	while IFS='|' read -r _ pkg version; do
 		_LATEST_TAGS["${pkg:-_}"]="$version"
-	done <<< "$LATEST_TAGS"
+	done < <(printf '%s\n' "$LATEST_TAGS" "$LATEST_TAGS_GITHUB")
 	quiet declare -p _LATEST_TAGS
 }
 
