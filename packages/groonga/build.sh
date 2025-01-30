@@ -23,5 +23,10 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure() {
+	# llama.cpp fails to build for 32 bit targets
+	if [ "$TERMUX_ARCH" = i686 ] || [ "$TERMUX_ARCH" = arm ]; then
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DGRN_WITH_LLAMA_CPP=no"
+	fi
+
 	LDFLAGS+=" -fopenmp -static-openmp"
 }
