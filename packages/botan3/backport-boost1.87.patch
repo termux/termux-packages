@@ -1,0 +1,238 @@
+# Fix for boost 1.87
+# NOTE: Remove after version 3.7.0 release in February.
+# See https://github.com/randombit/botan/issues/4505
+
+From 2a406beab449a2cb310fa543451a7087ca7b4b1a Mon Sep 17 00:00:00 2001
+From: q66 <q66@chimera-linux.org>
+Date: Sun, 15 Dec 2024 02:42:02 +0100
+Subject: [PATCH] Remove usage of deprecated asio API
+
+These were all finally dropped with boost 1.87, so this fixes
+build with boost 1.87.
+---
+ src/cli/tls_proxy.cpp               | 24 ++++++++++++------------
+ src/lib/utils/socket/socket.cpp     | 17 ++++++++---------
+ src/lib/utils/socket/socket_udp.cpp | 17 ++++++++---------
+ 3 files changed, 28 insertions(+), 30 deletions(-)
+
+diff --git a/src/cli/tls_proxy.cpp b/src/cli/tls_proxy.cpp
+index 8dcc5f0b5f4..cd0cb95ce6c 100644
+--- a/src/cli/tls_proxy.cpp
++++ b/src/cli/tls_proxy.cpp
+@@ -106,11 +106,11 @@ class tls_proxy_session final : public std::enable_shared_from_this<tls_proxy_se
+ 
+       typedef std::shared_ptr<tls_proxy_session> pointer;
+ 
+-      static pointer create(boost::asio::io_service& io,
++      static pointer create(boost::asio::io_context& io,
+                             const std::shared_ptr<Botan::TLS::Session_Manager>& session_manager,
+                             const std::shared_ptr<Botan::Credentials_Manager>& credentials,
+                             const std::shared_ptr<Botan::TLS::Policy>& policy,
+-                            const tcp::resolver::iterator& endpoints) {
++                            const tcp::resolver::results_type& endpoints) {
+          auto session = std::make_shared<tls_proxy_session>(io, endpoints);
+ 
+          // Defer the setup of the TLS server to make use of
+@@ -144,7 +144,7 @@ class tls_proxy_session final : public std::enable_shared_from_this<tls_proxy_se
+          }
+       }
+ 
+-      tls_proxy_session(boost::asio::io_service& io, tcp::resolver::iterator endpoints) :
++      tls_proxy_session(boost::asio::io_context& io, tcp::resolver::results_type endpoints) :
+             m_strand(io),
+             m_server_endpoints(std::move(endpoints)),
+             m_client_socket(io),
+@@ -287,7 +287,7 @@ class tls_proxy_session final : public std::enable_shared_from_this<tls_proxy_se
+ 
+       void tls_session_activated() override {
+          auto onConnect = [self = weak_from_this()](boost::system::error_code ec,
+-                                                    const tcp::resolver::iterator& /*endpoint*/) {
++                                                    tcp::resolver::results_type::iterator /*endpoint*/) {
+             if(ec) {
+                log_error("Server connection", ec);
+                return;
+@@ -301,7 +301,7 @@ class tls_proxy_session final : public std::enable_shared_from_this<tls_proxy_se
+                return;
+             }
+          };
+-         async_connect(m_server_socket, m_server_endpoints, onConnect);
++         async_connect(m_server_socket, m_server_endpoints.begin(), m_server_endpoints.end(), onConnect);
+       }
+ 
+       void tls_session_established(const Botan::TLS::Session_Summary& session) override {
+@@ -315,9 +315,9 @@ class tls_proxy_session final : public std::enable_shared_from_this<tls_proxy_se
+          }
+       }
+ 
+-      boost::asio::io_service::strand m_strand;
++      boost::asio::io_context::strand m_strand;
+ 
+-      tcp::resolver::iterator m_server_endpoints;
++      tcp::resolver::results_type m_server_endpoints;
+ 
+       tcp::socket m_client_socket;
+       tcp::socket m_server_socket;
+@@ -341,9 +341,9 @@ class tls_proxy_server final {
+    public:
+       typedef tls_proxy_session session;
+ 
+-      tls_proxy_server(boost::asio::io_service& io,
++      tls_proxy_server(boost::asio::io_context& io,
+                        unsigned short port,
+-                       tcp::resolver::iterator endpoints,
++                       tcp::resolver::results_type endpoints,
+                        std::shared_ptr<Botan::Credentials_Manager> creds,
+                        std::shared_ptr<Botan::TLS::Policy> policy,
+                        std::shared_ptr<Botan::TLS::Session_Manager> session_mgr,
+@@ -383,7 +383,7 @@ class tls_proxy_server final {
+       }
+ 
+       tcp::acceptor m_acceptor;
+-      tcp::resolver::iterator m_server_endpoints;
++      tcp::resolver::results_type m_server_endpoints;
+ 
+       std::shared_ptr<Botan::Credentials_Manager> m_creds;
+       std::shared_ptr<Botan::TLS::Policy> m_policy;
+@@ -429,10 +429,10 @@ class TLS_Proxy final : public Command {
+ 
+          auto policy = load_tls_policy(get_arg("policy"));
+ 
+-         boost::asio::io_service io;
++         boost::asio::io_context io;
+ 
+          tcp::resolver resolver(io);
+-         auto server_endpoint_iterator = resolver.resolve({target, target_port});
++         auto server_endpoint_iterator = resolver.resolve(target, target_port);
+ 
+          std::shared_ptr<Botan::TLS::Session_Manager> session_mgr;
+ 
+diff --git a/src/lib/utils/socket/socket.cpp b/src/lib/utils/socket/socket.cpp
+index 2a5e9c4db1c..b23b89ba587 100644
+--- a/src/lib/utils/socket/socket.cpp
++++ b/src/lib/utils/socket/socket.cpp
+@@ -46,20 +46,19 @@ class Asio_Socket final : public OS::Socket {
+    public:
+       Asio_Socket(std::string_view hostname, std::string_view service, std::chrono::milliseconds timeout) :
+             m_timeout(timeout), m_timer(m_io), m_tcp(m_io) {
+-         m_timer.expires_from_now(m_timeout);
++         m_timer.expires_after(m_timeout);
+          check_timeout();
+ 
+          boost::asio::ip::tcp::resolver resolver(m_io);
+-         boost::asio::ip::tcp::resolver::query query(std::string{hostname}, std::string{service});
+-         boost::asio::ip::tcp::resolver::iterator dns_iter = resolver.resolve(query);
++         boost::asio::ip::tcp::resolver::results_type dns_iter = resolver.resolve(std::string{hostname}, std::string{service});
+ 
+          boost::system::error_code ec = boost::asio::error::would_block;
+ 
+-         auto connect_cb = [&ec](const boost::system::error_code& e, const boost::asio::ip::tcp::resolver::iterator&) {
++         auto connect_cb = [&ec](const boost::system::error_code& e, boost::asio::ip::tcp::resolver::results_type::iterator) {
+             ec = e;
+          };
+ 
+-         boost::asio::async_connect(m_tcp, dns_iter, connect_cb);
++         boost::asio::async_connect(m_tcp, dns_iter.begin(), dns_iter.end(), connect_cb);
+ 
+          while(ec == boost::asio::error::would_block) {
+             m_io.run_one();
+@@ -74,7 +73,7 @@ class Asio_Socket final : public OS::Socket {
+       }
+ 
+       void write(const uint8_t buf[], size_t len) override {
+-         m_timer.expires_from_now(m_timeout);
++         m_timer.expires_after(m_timeout);
+ 
+          boost::system::error_code ec = boost::asio::error::would_block;
+ 
+@@ -90,7 +89,7 @@ class Asio_Socket final : public OS::Socket {
+       }
+ 
+       size_t read(uint8_t buf[], size_t len) override {
+-         m_timer.expires_from_now(m_timeout);
++         m_timer.expires_after(m_timeout);
+ 
+          boost::system::error_code ec = boost::asio::error::would_block;
+          size_t got = 0;
+@@ -116,7 +115,7 @@ class Asio_Socket final : public OS::Socket {
+ 
+    private:
+       void check_timeout() {
+-         if(m_tcp.is_open() && m_timer.expires_at() < std::chrono::system_clock::now()) {
++         if(m_tcp.is_open() && m_timer.expiry() < std::chrono::system_clock::now()) {
+             boost::system::error_code err;
+ 
+             // NOLINTNEXTLINE(bugprone-unused-return-value,cert-err33-c)
+@@ -127,7 +126,7 @@ class Asio_Socket final : public OS::Socket {
+       }
+ 
+       const std::chrono::milliseconds m_timeout;
+-      boost::asio::io_service m_io;
++      boost::asio::io_context m_io;
+       boost::asio::system_timer m_timer;
+       boost::asio::ip::tcp::socket m_tcp;
+ };
+diff --git a/src/lib/utils/socket/socket_udp.cpp b/src/lib/utils/socket/socket_udp.cpp
+index 5dbb534cbbb..a33a4017a73 100644
+--- a/src/lib/utils/socket/socket_udp.cpp
++++ b/src/lib/utils/socket/socket_udp.cpp
+@@ -46,20 +46,19 @@ class Asio_SocketUDP final : public OS::SocketUDP {
+    public:
+       Asio_SocketUDP(std::string_view hostname, std::string_view service, std::chrono::microseconds timeout) :
+             m_timeout(timeout), m_timer(m_io), m_udp(m_io) {
+-         m_timer.expires_from_now(m_timeout);
++         m_timer.expires_after(m_timeout);
+          check_timeout();
+ 
+          boost::asio::ip::udp::resolver resolver(m_io);
+-         boost::asio::ip::udp::resolver::query query(std::string{hostname}, std::string{service});
+-         boost::asio::ip::udp::resolver::iterator dns_iter = resolver.resolve(query);
++         boost::asio::ip::udp::resolver::results_type dns_iter = resolver.resolve(std::string{hostname}, std::string{service});
+ 
+          boost::system::error_code ec = boost::asio::error::would_block;
+ 
+-         auto connect_cb = [&ec](const boost::system::error_code& e, const boost::asio::ip::udp::resolver::iterator&) {
++         auto connect_cb = [&ec](const boost::system::error_code& e, boost::asio::ip::udp::resolver::results_type::iterator) {
+             ec = e;
+          };
+ 
+-         boost::asio::async_connect(m_udp, dns_iter, connect_cb);
++         boost::asio::async_connect(m_udp, dns_iter.begin(), dns_iter.end(), connect_cb);
+ 
+          while(ec == boost::asio::error::would_block) {
+             m_io.run_one();
+@@ -74,7 +73,7 @@ class Asio_SocketUDP final : public OS::SocketUDP {
+       }
+ 
+       void write(const uint8_t buf[], size_t len) override {
+-         m_timer.expires_from_now(m_timeout);
++         m_timer.expires_after(m_timeout);
+ 
+          boost::system::error_code ec = boost::asio::error::would_block;
+ 
+@@ -90,7 +89,7 @@ class Asio_SocketUDP final : public OS::SocketUDP {
+       }
+ 
+       size_t read(uint8_t buf[], size_t len) override {
+-         m_timer.expires_from_now(m_timeout);
++         m_timer.expires_after(m_timeout);
+ 
+          boost::system::error_code ec = boost::asio::error::would_block;
+          size_t got = 0;
+@@ -116,7 +115,7 @@ class Asio_SocketUDP final : public OS::SocketUDP {
+ 
+    private:
+       void check_timeout() {
+-         if(m_udp.is_open() && m_timer.expires_at() < std::chrono::system_clock::now()) {
++         if(m_udp.is_open() && m_timer.expiry() < std::chrono::system_clock::now()) {
+             boost::system::error_code err;
+ 
+             // NOLINTNEXTLINE(bugprone-unused-return-value,cert-err33-c)
+@@ -127,7 +126,7 @@ class Asio_SocketUDP final : public OS::SocketUDP {
+       }
+ 
+       const std::chrono::microseconds m_timeout;
+-      boost::asio::io_service m_io;
++      boost::asio::io_context m_io;
+       boost::asio::system_timer m_timer;
+       boost::asio::ip::udp::socket m_udp;
+ };
