@@ -1,0 +1,20 @@
+--- a/chromium/patches/chromium/0011-Rename-carbonyl-Renderer-to-carbonyl-Bridge.patch
++++ b/chromium/patches/chromium/0011-Rename-carbonyl-Renderer-to-carbonyl-Bridge.patch
+@@ -17,14 +17,14 @@
+ --- a/headless/app/headless_shell.cc
+ +++ b/headless/app/headless_shell.cc
+ @@ -12,6 +12,7 @@
+- #include "base/bind.h"
+  #include "base/command_line.h"
+  #include "base/files/file_util.h"
++ #include "base/functional/bind.h"
+ +#include "base/functional/callback.h"
+  #include "base/i18n/rtl.h"
++ #include "base/logging.h"
+  #include "base/task/thread_pool.h"
+- #include "build/branding_buildflags.h"
+-@@ -92,7 +93,9 @@ void HeadlessShell::OnBrowserStart(HeadlessBrowser* browser) {
++@@ -105,7 +106,9 @@
+    HeadlessBrowserContext::Builder context_builder =
+        browser_->CreateBrowserContextBuilder();
+  

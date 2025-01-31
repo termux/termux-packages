@@ -1,0 +1,28 @@
+--- a/components/os_crypt/keyring_util_linux.cc
++++ b/components/os_crypt/keyring_util_linux.cc
+@@ -68,7 +68,11 @@
+   if (keyring_loaded)
+     return true;
+ 
++#ifdef __TERMUX__
++  void* handle = dlopen("libgnome-keyring.so", RTLD_NOW | RTLD_GLOBAL);
++#else
+   void* handle = dlopen("libgnome-keyring.so.0", RTLD_NOW | RTLD_GLOBAL);
++#endif
+   if (!handle) {
+     // We wanted to use GNOME Keyring, but we couldn't load it. Warn, because
+     // either the user asked for this, or we autodetected it incorrectly. (Or
+--- a/components/os_crypt/libsecret_util_linux.cc
++++ b/components/os_crypt/libsecret_util_linux.cc
+@@ -102,7 +102,11 @@
+   if (libsecret_loaded_)
+     return true;
+ 
++#ifdef __TERMUX__
++  static void* handle = dlopen("libsecret-1.so", RTLD_NOW | RTLD_GLOBAL);
++#else
+   static void* handle = dlopen("libsecret-1.so.0", RTLD_NOW | RTLD_GLOBAL);
++#endif
+   if (!handle) {
+     // We wanted to use libsecret, but we couldn't load it. Warn, because
+     // either the user asked for this, or we autodetected it incorrectly. (Or

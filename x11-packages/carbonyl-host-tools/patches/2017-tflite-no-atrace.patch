@@ -1,0 +1,20 @@
+--- a/third_party/tflite/src/tensorflow/lite/profiling/platform_profiler.cc
++++ b/third_party/tflite/src/tensorflow/lite/profiling/platform_profiler.cc
+@@ -18,7 +18,7 @@
+ 
+ #include "tensorflow/lite/core/api/profiler.h"
+ 
+-#if defined(__ANDROID__)
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ #include "tensorflow/lite/profiling/atrace_profiler.h"
+ #elif defined(__APPLE__)
+ #include "TargetConditionals.h"
+@@ -34,7 +34,7 @@
+ namespace profiling {
+ 
+ std::unique_ptr<tflite::Profiler> MaybeCreatePlatformProfiler() {
+-#if defined(__ANDROID__)
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+   return MaybeCreateATraceProfiler();
+ #elif defined(SIGNPOST_PLATFORM_PROFILER)
+   return MaybeCreateSignpostProfiler();

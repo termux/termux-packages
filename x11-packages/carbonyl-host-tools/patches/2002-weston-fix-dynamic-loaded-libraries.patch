@@ -1,0 +1,14 @@
+--- a/third_party/weston/src/libweston/backend-drm/drm-gbm.c
++++ b/third_party/weston/src/libweston/backend-drm/drm-gbm.c
+@@ -61,7 +61,11 @@
+ 	 * only the gl-renderer module links to it, the call above won't make
+ 	 * these symbols globally available, and loading the DRI driver fails.
+ 	 * Workaround this by dlopen()'ing libglapi with RTLD_GLOBAL. */
++#ifdef __TERMUX__
++	dlopen("libglapi.so", RTLD_LAZY | RTLD_GLOBAL);
++#else
+ 	dlopen("libglapi.so.0", RTLD_LAZY | RTLD_GLOBAL);
++#endif
+ 
+ 	gbm = gbm_create_device(fd);
+ 

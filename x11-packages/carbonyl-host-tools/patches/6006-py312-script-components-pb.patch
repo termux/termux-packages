@@ -1,0 +1,50 @@
+From 9e0c89a3b5638ba2b9b107fea34a01c774aa7805 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jacobo=20Aragunde=20P=C3=A9rez?= <jaragunde@igalia.com>
+Date: Wed, 25 Oct 2023 06:20:54 +0000
+Subject: [PATCH] Replace imp.load_source with importlib equivalent.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The imp module has been deprecated for years and the function
+load_source was even removed from the documentation long ago.
+
+It will be removed in Python 3.12, which will be part of Fedora
+version 39, due in late October 2023.
+
+Bug: 1487454
+Change-Id: If06a2f139225b62c7bdc70c3eaef6e5acb8972d2
+Reviewed-on: https://chromium-review.googlesource.com/c/chromium/src/+/4894238
+Reviewed-by: Mustafa Emre Acer <meacer@chromium.org>
+Commit-Queue: Jacobo Aragunde Pérez <jaragunde@igalia.com>
+Cr-Commit-Position: refs/heads/main@{#1214660}
+---
+ components/resources/protobufs/binary_proto_generator.py | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/components/resources/protobufs/binary_proto_generator.py b/components/resources/protobufs/binary_proto_generator.py
+index 2a1802dccdc1e1..8b9de65ed0b78d 100755
+--- a/components/resources/protobufs/binary_proto_generator.py
++++ b/components/resources/protobufs/binary_proto_generator.py
+@@ -9,7 +9,7 @@
+ """
+ from __future__ import print_function
+ import abc
+-import imp
++from importlib import util as imp_util
+ import optparse
+ import os
+ import re
+@@ -68,7 +68,11 @@ def load_module(self, fullname):
+       raise ImportError(fullname)
+ 
+     filepath = self._fullname_to_filepath(fullname)
+-    return imp.load_source(fullname, filepath)
++    spec = imp_util.spec_from_file_location(fullname, filepath)
++    loaded = imp_util.module_from_spec(spec)
++    spec.loader.exec_module(loaded)
++
++    return loaded
+ 
+ class BinaryProtoGenerator:
+ 

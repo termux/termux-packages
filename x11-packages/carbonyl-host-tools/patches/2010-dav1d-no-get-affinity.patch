@@ -1,0 +1,11 @@
+--- a/third_party/dav1d/libdav1d/src/cpu.c
++++ b/third_party/dav1d/libdav1d/src/cpu.c
+@@ -87,7 +87,7 @@
+     GetNativeSystemInfo(&system_info);
+     return system_info.dwNumberOfProcessors;
+ #endif
+-#elif defined(HAVE_PTHREAD_GETAFFINITY_NP) && defined(CPU_COUNT)
++#elif defined(HAVE_PTHREAD_GETAFFINITY_NP) && defined(CPU_COUNT) && !defined(__ANDROID__)
+     cpu_set_t affinity;
+     if (!pthread_getaffinity_np(pthread_self(), sizeof(affinity), &affinity))
+         return CPU_COUNT(&affinity);

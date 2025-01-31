@@ -1,0 +1,37 @@
+From da189353b60611dd7089aa2a14441893460ebcdb Mon Sep 17 00:00:00 2001
+From: Andrew Williams <awillia@chromium.org>
+Date: Mon, 22 Apr 2024 22:18:50 +0000
+Subject: [PATCH] Replace std::is_pod usage
+
+Replacing std::is_pod usage as per the following compilation error:
+```
+../../util/misc/uuid.cc:44:20: error: 'is_pod<crashpad::UUID>' is deprecated: use 'is_standard_layout && is_trivial' instead [-Werror,-Wdeprecated-declarations]
+static_assert(std::is_pod<UUID>::value, "UUID must be POD");
+                   ^
+/usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/type_traits:818:5: note: 'is_pod<crashpad::UUID>' has been explicitly marked deprecated here
+    _GLIBCXX20_DEPRECATED_SUGGEST("is_standard_layout && is_trivial")
+
+```
+
+Bug: None
+Change-Id: I1d61ee12261877f7f1f84f0ea15d262d22959766
+Reviewed-on: https://chromium-review.googlesource.com/c/crashpad/crashpad/+/5472885
+Commit-Queue: Andrew Williams <awillia@chromium.org>
+Reviewed-by: Mark Mentovai <mark@chromium.org>
+---
+
+diff --git a/third_party/crashpad/crashpad/util/misc/uuid.cc b/third_party/crashpad/crashpad/util/misc/uuid.cc
+index 3013d7b..af33df5 100644
+--- a/third_party/crashpad/crashpad/util/misc/uuid.cc
++++ b/third_party/crashpad/crashpad/util/misc/uuid.cc
+@@ -41,7 +41,9 @@
+ namespace crashpad {
+ 
+ static_assert(sizeof(UUID) == 16, "UUID must be 16 bytes");
+-static_assert(std::is_pod<UUID>::value, "UUID must be POD");
++static_assert(std::is_standard_layout<UUID>::value,
++              "UUID must be a standard-layout type");
++static_assert(std::is_trivial<UUID>::value, "UUID must be a trivial type");
+ 
+ bool UUID::operator==(const UUID& that) const {
+   return memcmp(this, &that, sizeof(*this)) == 0;

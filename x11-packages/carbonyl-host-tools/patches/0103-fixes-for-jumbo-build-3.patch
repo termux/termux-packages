@@ -1,0 +1,271 @@
+From edf64ae7d8a49b9ff1aad0e8a4e2ab60f13cfeb5 Mon Sep 17 00:00:00 2001
+From: Chongyun Lee <licy183@termux.dev>
+Date: Thu, 30 Jan 2025 15:57:52 +0800
+Subject: [PATCH] Fixes for jumbo build 3
+
+To fix the following errors
+
+[2/427] CXX host/obj/third_party/blink/renderer/modules/webaudio/webaudio/webaudio_jumbo_2.o
+  In file included from host/gen/third_party/blink/renderer/modules/webaudio/webaudio_jumbo_2.cc:40:
+  ./../../../src/chromium/src/third_party/blink/renderer/modules/webaudio/delay_handler.cc:17:20: error: redefinition of 'kNumberOfChannels'
+    17 | constexpr unsigned kNumberOfChannels = 1;
+        |                    ^
+  ./../../../src/chromium/src/third_party/blink/renderer/modules/webaudio/biquad_filter_handler.cc:22:20: note: previous definition is here
+    22 | constexpr uint32_t kNumberOfChannels = 1;
+        |                    ^
+  In file included from host/gen/third_party/blink/renderer/modules/webaudio/webaudio_jumbo_2.cc:45:
+  ./../../../src/chromium/src/third_party/blink/renderer/modules/webaudio/gain_handler.cc:16:20: error: redefinition of 'kNumberOfOutputChannels'
+    16 | constexpr unsigned kNumberOfOutputChannels = 1;
+        |                    ^
+  ./../../../src/chromium/src/third_party/blink/renderer/modules/webaudio/channel_splitter_handler.cc:16:20: note: previous definition is here
+    16 | constexpr unsigned kNumberOfOutputChannels = 1;
+        |                    ^
+  In file included from host/gen/third_party/blink/renderer/modules/webaudio/webaudio_jumbo_2.cc:46:
+  ./../../../src/chromium/src/third_party/blink/renderer/modules/webaudio/gain_node.cc:36:18: error: redefinition of 'kDefaultGainValue'
+    36 | constexpr double kDefaultGainValue = 1.0;
+        |                  ^
+  ./../../../src/chromium/src/third_party/blink/renderer/modules/webaudio/biquad_filter_node.cc:44:18: note: previous definition is here
+    44 | constexpr double kDefaultGainValue = 0.0;
+        |                  ^
+  In file included from host/gen/third_party/blink/renderer/modules/webaudio/webaudio_jumbo_2.cc:65:
+  ./../../../src/chromium/src/third_party/blink/renderer/modules/webaudio/oscillator_node.cc:47:18: error: redefinition of 'kDefaultFrequencyValue'
+    47 | constexpr double kDefaultFrequencyValue = 440.0;
+        |                  ^
+  ./../../../src/chromium/src/third_party/blink/renderer/modules/webaudio/biquad_filter_node.cc:41:18: note: previous definition is here
+    41 | constexpr double kDefaultFrequencyValue = 350.0;
+        |                  ^
+  In file included from host/gen/third_party/blink/renderer/modules/webaudio/webaudio_jumbo_2.cc:70:
+  ./../../../src/chromium/src/third_party/blink/renderer/modules/webaudio/realtime_audio_destination_handler.cc:28:20: error: redefinition of 'kDefaultNumberOfInputChannels'
+    28 | constexpr unsigned kDefaultNumberOfInputChannels = 2;
+        |                    ^
+  ./../../../src/chromium/src/third_party/blink/renderer/modules/webaudio/convolver_handler.cc:33:20: note: previous definition is here
+    33 | constexpr unsigned kDefaultNumberOfInputChannels = 2;
+        |                    ^
+  5 errors generated.
+
+---
+ .../renderer/modules/webaudio/biquad_filter_handler.cc    | 4 ++--
+ .../blink/renderer/modules/webaudio/biquad_filter_node.cc | 8 ++++----
+ .../renderer/modules/webaudio/channel_splitter_handler.cc | 4 ++--
+ .../blink/renderer/modules/webaudio/convolver_handler.cc  | 4 ++--
+ .../blink/renderer/modules/webaudio/delay_handler.cc      | 4 ++--
+ .../blink/renderer/modules/webaudio/gain_handler.cc       | 4 ++--
+ third_party/blink/renderer/modules/webaudio/gain_node.cc  | 4 ++--
+ .../blink/renderer/modules/webaudio/oscillator_node.cc    | 4 ++--
+ .../webaudio/realtime_audio_destination_handler.cc        | 4 ++--
+ 9 files changed, 20 insertions(+), 20 deletions(-)
+
+diff --git a/third_party/blink/renderer/modules/webaudio/biquad_filter_handler.cc b/third_party/blink/renderer/modules/webaudio/biquad_filter_handler.cc
+index 075eb4d79..974f6a3b0 100644
+--- a/third_party/blink/renderer/modules/webaudio/biquad_filter_handler.cc
++++ b/third_party/blink/renderer/modules/webaudio/biquad_filter_handler.cc
+@@ -19,7 +19,7 @@ namespace blink {
+ 
+ namespace {
+ 
+-constexpr uint32_t kNumberOfChannels = 1;
++constexpr uint32_t kNumberOfChannels_BFH = 1;
+ 
+ }  // namespace
+ 
+@@ -35,7 +35,7 @@ BiquadFilterHandler::BiquadFilterHandler(AudioNode& node,
+           sample_rate,
+           std::make_unique<BiquadProcessor>(
+               sample_rate,
+-              kNumberOfChannels,
++              kNumberOfChannels_BFH,
+               node.context()->GetDeferredTaskHandler().RenderQuantumFrames(),
+               frequency,
+               q,
+diff --git a/third_party/blink/renderer/modules/webaudio/biquad_filter_node.cc b/third_party/blink/renderer/modules/webaudio/biquad_filter_node.cc
+index 11dedaaf7..ff6ea6b20 100644
+--- a/third_party/blink/renderer/modules/webaudio/biquad_filter_node.cc
++++ b/third_party/blink/renderer/modules/webaudio/biquad_filter_node.cc
+@@ -38,10 +38,10 @@ namespace blink {
+ 
+ namespace {
+ 
+-constexpr double kDefaultFrequencyValue = 350.0;
++constexpr double kDefaultFrequencyValue_BFN = 350.0;
+ constexpr float kMinFrequencyValue = 0.0f;
+ constexpr double kDefaultQValue = 1.0;
+-constexpr double kDefaultGainValue = 0.0;
++constexpr double kDefaultGainValue_BFN = 0.0;
+ constexpr float kMinGainValue = std::numeric_limits<float>::lowest();
+ constexpr double kDefaultDetuneValueBFN = 0.0;
+ 
+@@ -53,7 +53,7 @@ BiquadFilterNode::BiquadFilterNode(BaseAudioContext& context)
+           AudioParam::Create(context,
+                              Uuid(),
+                              AudioParamHandler::kParamTypeBiquadFilterFrequency,
+-                             kDefaultFrequencyValue,
++                             kDefaultFrequencyValue_BFN,
+                              AudioParamHandler::AutomationRate::kAudio,
+                              AudioParamHandler::AutomationRateMode::kVariable,
+                              kMinFrequencyValue,
+@@ -68,7 +68,7 @@ BiquadFilterNode::BiquadFilterNode(BaseAudioContext& context)
+           context,
+           Uuid(),
+           AudioParamHandler::kParamTypeBiquadFilterGain,
+-          kDefaultGainValue,
++          kDefaultGainValue_BFN,
+           AudioParamHandler::AutomationRate::kAudio,
+           AudioParamHandler::AutomationRateMode::kVariable,
+           kMinGainValue,
+diff --git a/third_party/blink/renderer/modules/webaudio/channel_splitter_handler.cc b/third_party/blink/renderer/modules/webaudio/channel_splitter_handler.cc
+index c39602210..3dc85800b 100644
+--- a/third_party/blink/renderer/modules/webaudio/channel_splitter_handler.cc
++++ b/third_party/blink/renderer/modules/webaudio/channel_splitter_handler.cc
+@@ -13,7 +13,7 @@ namespace blink {
+ 
+ namespace {
+ 
+-constexpr unsigned kNumberOfOutputChannels = 1;
++constexpr unsigned kNumberOfOutputChannels_CSH = 1;
+ 
+ }  // namespace
+ 
+@@ -30,7 +30,7 @@ ChannelSplitterHandler::ChannelSplitterHandler(AudioNode& node,
+   // Create a fixed number of outputs (able to handle the maximum number of
+   // channels fed to an input).
+   for (unsigned i = 0; i < number_of_outputs; ++i) {
+-    AddOutput(kNumberOfOutputChannels);
++    AddOutput(kNumberOfOutputChannels_CSH);
+   }
+ 
+   Initialize();
+diff --git a/third_party/blink/renderer/modules/webaudio/convolver_handler.cc b/third_party/blink/renderer/modules/webaudio/convolver_handler.cc
+index 78468d18a..5a214778f 100644
+--- a/third_party/blink/renderer/modules/webaudio/convolver_handler.cc
++++ b/third_party/blink/renderer/modules/webaudio/convolver_handler.cc
+@@ -30,7 +30,7 @@ namespace {
+ // worse phase errors. Given these constraints 32768 is a good compromise.
+ constexpr unsigned kMaxFftSize = 32768;
+ 
+-constexpr unsigned kDefaultNumberOfInputChannels = 2;
++constexpr unsigned kDefaultNumberOfInputChannels_CH = 2;
+ constexpr unsigned kDefaultNumberOfOutputChannelsCH = 1;
+ 
+ }  // namespace
+@@ -41,7 +41,7 @@ ConvolverHandler::ConvolverHandler(AudioNode& node, float sample_rate)
+   AddOutput(kDefaultNumberOfOutputChannelsCH);
+ 
+   // Node-specific default mixing rules.
+-  channel_count_ = kDefaultNumberOfInputChannels;
++  channel_count_ = kDefaultNumberOfInputChannels_CH;
+   SetInternalChannelCountMode(kClampedMax);
+   SetInternalChannelInterpretation(AudioBus::kSpeakers);
+ 
+diff --git a/third_party/blink/renderer/modules/webaudio/delay_handler.cc b/third_party/blink/renderer/modules/webaudio/delay_handler.cc
+index 8c9263833..7b4e47066 100644
+--- a/third_party/blink/renderer/modules/webaudio/delay_handler.cc
++++ b/third_party/blink/renderer/modules/webaudio/delay_handler.cc
+@@ -14,7 +14,7 @@ namespace blink {
+ 
+ namespace {
+ 
+-constexpr unsigned kNumberOfChannels = 1;
++constexpr unsigned kNumberOfChannels_DH = 1;
+ 
+ }  // namespace
+ 
+@@ -28,7 +28,7 @@ DelayHandler::DelayHandler(AudioNode& node,
+           sample_rate,
+           std::make_unique<DelayProcessor>(
+               sample_rate,
+-              kNumberOfChannels,
++              kNumberOfChannels_DH,
+               node.context()->GetDeferredTaskHandler().RenderQuantumFrames(),
+               delay_time,
+               max_delay_time)) {
+diff --git a/third_party/blink/renderer/modules/webaudio/gain_handler.cc b/third_party/blink/renderer/modules/webaudio/gain_handler.cc
+index e1d023096..09701f3dc 100644
+--- a/third_party/blink/renderer/modules/webaudio/gain_handler.cc
++++ b/third_party/blink/renderer/modules/webaudio/gain_handler.cc
+@@ -13,7 +13,7 @@ namespace blink {
+ 
+ namespace {
+ 
+-constexpr unsigned kNumberOfOutputChannels = 1;
++constexpr unsigned kNumberOfOutputChannels_GH = 1;
+ 
+ }  // namespace
+ 
+@@ -25,7 +25,7 @@ GainHandler::GainHandler(AudioNode& node,
+       sample_accurate_gain_values_(
+           GetDeferredTaskHandler().RenderQuantumFrames()) {
+   AddInput();
+-  AddOutput(kNumberOfOutputChannels);
++  AddOutput(kNumberOfOutputChannels_GH);
+ 
+   Initialize();
+ }
+diff --git a/third_party/blink/renderer/modules/webaudio/gain_node.cc b/third_party/blink/renderer/modules/webaudio/gain_node.cc
+index 5e697cc6a..0f3bd73b0 100644
+--- a/third_party/blink/renderer/modules/webaudio/gain_node.cc
++++ b/third_party/blink/renderer/modules/webaudio/gain_node.cc
+@@ -33,7 +33,7 @@ namespace blink {
+ 
+ namespace {
+ 
+-constexpr double kDefaultGainValue = 1.0;
++constexpr double kDefaultGainValue_GN = 1.0;
+ 
+ }  // namespace
+ 
+@@ -43,7 +43,7 @@ GainNode::GainNode(BaseAudioContext& context)
+           context,
+           Uuid(),
+           AudioParamHandler::kParamTypeGainGain,
+-          kDefaultGainValue,
++          kDefaultGainValue_GN,
+           AudioParamHandler::AutomationRate::kAudio,
+           AudioParamHandler::AutomationRateMode::kVariable)) {
+   SetHandler(
+diff --git a/third_party/blink/renderer/modules/webaudio/oscillator_node.cc b/third_party/blink/renderer/modules/webaudio/oscillator_node.cc
+index 11ed26b4a..8a4df6ad3 100644
+--- a/third_party/blink/renderer/modules/webaudio/oscillator_node.cc
++++ b/third_party/blink/renderer/modules/webaudio/oscillator_node.cc
+@@ -44,7 +44,7 @@ namespace blink {
+ 
+ namespace {
+ 
+-constexpr double kDefaultFrequencyValue = 440.0;
++constexpr double kDefaultFrequencyValue_ON = 440.0;
+ constexpr double kDefaultDetuneValue = 0.0;
+ 
+ }  // namespace
+@@ -58,7 +58,7 @@ OscillatorNode::OscillatorNode(BaseAudioContext& context,
+           AudioParam::Create(context,
+                              Uuid(),
+                              AudioParamHandler::kParamTypeOscillatorFrequency,
+-                             kDefaultFrequencyValue,
++                             kDefaultFrequencyValue_ON,
+                              AudioParamHandler::AutomationRate::kAudio,
+                              AudioParamHandler::AutomationRateMode::kVariable,
+                              /*min_value=*/-context.sampleRate() / 2,
+diff --git a/third_party/blink/renderer/modules/webaudio/realtime_audio_destination_handler.cc b/third_party/blink/renderer/modules/webaudio/realtime_audio_destination_handler.cc
+index 12b6b5ae1..d13600c7d 100644
+--- a/third_party/blink/renderer/modules/webaudio/realtime_audio_destination_handler.cc
++++ b/third_party/blink/renderer/modules/webaudio/realtime_audio_destination_handler.cc
+@@ -25,7 +25,7 @@ namespace blink {
+ 
+ namespace {
+ 
+-constexpr unsigned kDefaultNumberOfInputChannels = 2;
++constexpr unsigned kDefaultNumberOfInputChannels_RADH = 2;
+ 
+ }  // namespace
+ 
+@@ -53,7 +53,7 @@ RealtimeAudioDestinationHandler::RealtimeAudioDestinationHandler(
+       task_runner_(Context()->GetExecutionContext()->GetTaskRunner(
+           TaskType::kInternalMediaRealTime)) {
+   // Node-specific default channel count and mixing rules.
+-  channel_count_ = kDefaultNumberOfInputChannels;
++  channel_count_ = kDefaultNumberOfInputChannels_RADH;
+   SetInternalChannelCountMode(kExplicit);
+   SetInternalChannelInterpretation(AudioBus::kSpeakers);
+ }
+-- 
+2.43.0
+
