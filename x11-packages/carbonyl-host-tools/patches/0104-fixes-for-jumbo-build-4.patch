@@ -1,0 +1,324 @@
+From edaf98260d3e284d4501e2656bec4ea028ce97b3 Mon Sep 17 00:00:00 2001
+From: Chongyun Lee <licy183@termux.dev>
+Date: Thu, 30 Jan 2025 19:16:52 +0800
+Subject: [PATCH] Fixes for jumbo build 4
+
+To fix the following errors
+
+[1/436] CXX obj/content/browser/browser/browser_jumbo_12.o
+  In file included from gen/content/browser/browser_jumbo_12.cc:73:
+  ./../../../src/chromium/src/content/browser/renderer_host/browsing_context_state.cc:70:11: error: no member named 'BrowsingContextStateImplementationType' in namespace 'content::features'; did you mean '::features::BrowsingContextStateImplementationType'?
+    70 |           features::BrowsingContextStateImplementationType::
+        |           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        |           ::features::BrowsingContextStateImplementationType
+  ../../../src/chromium/src/content/browser/renderer_host/browsing_context_state.h:26:12: note: '::features::BrowsingContextStateImplementationType' declared here
+    26 | enum class BrowsingContextStateImplementationType {
+        |            ^
+  In file included from gen/content/browser/browser_jumbo_12.cc:73:
+  ./../../../src/chromium/src/content/browser/renderer_host/browsing_context_state.cc:69:7: error: no member named 'GetBrowsingContextMode' in namespace 'content::features'; did you mean '::features::GetBrowsingContextMode'?
+    69 |   if (features::GetBrowsingContextMode() ==
+        |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        |       ::features::GetBrowsingContextMode
+  ./../../../src/chromium/src/content/browser/renderer_host/browsing_context_state.cc:21:40: note: '::features::GetBrowsingContextMode' declared here
+    21 | BrowsingContextStateImplementationType GetBrowsingContextMode() {
+        |                                        ^
+  ./../../../src/chromium/src/content/browser/renderer_host/browsing_context_state.cc:102:11: error: no member named 'BrowsingContextStateImplementationType' in namespace 'content::features'; did you mean '::features::BrowsingContextStateImplementationType'?
+    102 |           features::BrowsingContextStateImplementationType::
+        |           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        |           ::features::BrowsingContextStateImplementationType
+  ../../../src/chromium/src/content/browser/renderer_host/browsing_context_state.h:26:12: note: '::features::BrowsingContextStateImplementationType' declared here
+    26 | enum class BrowsingContextStateImplementationType {
+        |            ^
+  In file included from gen/content/browser/browser_jumbo_12.cc:73:
+  ./../../../src/chromium/src/content/browser/renderer_host/browsing_context_state.cc:101:7: error: no member named 'GetBrowsingContextMode' in namespace 'content::features'; did you mean '::features::GetBrowsingContextMode'?
+    101 |   if (features::GetBrowsingContextMode() ==
+        |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        |       ::features::GetBrowsingContextMode
+  ./../../../src/chromium/src/content/browser/renderer_host/browsing_context_state.cc:21:40: note: '::features::GetBrowsingContextMode' declared here
+    21 | BrowsingContextStateImplementationType GetBrowsingContextMode() {
+        |                                        ^
+  ./../../../src/chromium/src/content/browser/renderer_host/browsing_context_state.cc:130:7: error: no member named 'BrowsingContextStateImplementationType' in namespace 'content::features'; did you mean '::features::BrowsingContextStateImplementationType'?
+    130 |       features::BrowsingContextStateImplementationType::
+        |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        |       ::features::BrowsingContextStateImplementationType
+  ../../../src/chromium/src/content/browser/renderer_host/browsing_context_state.h:26:12: note: '::features::BrowsingContextStateImplementationType' declared here
+    26 | enum class BrowsingContextStateImplementationType {
+        |            ^
+  In file included from gen/content/browser/browser_jumbo_12.cc:73:
+  ./../../../src/chromium/src/content/browser/renderer_host/browsing_context_state.cc:129:7: error: no member named 'GetBrowsingContextMode' in namespace 'content::features'; did you mean '::features::GetBrowsingContextMode'?
+    129 |   if (features::GetBrowsingContextMode() ==
+        |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        |       ::features::GetBrowsingContextMode
+  ./../../../src/chromium/src/content/browser/renderer_host/browsing_context_state.cc:21:40: note: '::features::GetBrowsingContextMode' declared here
+    21 | BrowsingContextStateImplementationType GetBrowsingContextMode() {
+        |                                        ^
+  ./../../../src/chromium/src/content/browser/renderer_host/browsing_context_state.cc:137:11: error: no member named 'BrowsingContextStateImplementationType' in namespace 'content::features'; did you mean '::features::BrowsingContextStateImplementationType'?
+    137 |           features::BrowsingContextStateImplementationType::
+        |           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        |           ::features::BrowsingContextStateImplementationType
+  ../../../src/chromium/src/content/browser/renderer_host/browsing_context_state.h:26:12: note: '::features::BrowsingContextStateImplementationType' declared here
+    26 | enum class BrowsingContextStateImplementationType {
+        |            ^
+  In file included from gen/content/browser/browser_jumbo_12.cc:73:
+  ./../../../src/chromium/src/content/browser/renderer_host/browsing_context_state.cc:136:7: error: no member named 'GetBrowsingContextMode' in namespace 'content::features'; did you mean '::features::GetBrowsingContextMode'?
+    136 |   if (features::GetBrowsingContextMode() ==
+        |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        |       ::features::GetBrowsingContextMode
+  ./../../../src/chromium/src/content/browser/renderer_host/browsing_context_state.cc:21:40: note: '::features::GetBrowsingContextMode' declared here
+    21 | BrowsingContextStateImplementationType GetBrowsingContextMode() {
+        |                                        ^
+  8 errors generated.
+
+---
+ .../renderer_host/ancestor_throttle.cc        |  4 +--
+ ...forward_cache_can_store_document_result.cc |  2 +-
+ .../renderer_host/back_forward_cache_impl.cc  | 34 +++++++++----------
+ .../blocked_scheme_navigation_throttle.cc     |  2 +-
+ .../renderer_host/browsing_context_state.cc   | 16 ++++-----
+ 5 files changed, 29 insertions(+), 29 deletions(-)
+
+diff --git a/content/browser/renderer_host/ancestor_throttle.cc b/content/browser/renderer_host/ancestor_throttle.cc
+index 2f17a736a..705ce7567 100644
+--- a/content/browser/renderer_host/ancestor_throttle.cc
++++ b/content/browser/renderer_host/ancestor_throttle.cc
+@@ -169,7 +169,7 @@ void AncestorThrottle::ParseXFrameOptionsError(
+ }
+ 
+ void AncestorThrottle::ConsoleErrorEmbeddingRequiresOptIn() {
+-  DCHECK(base::FeatureList::IsEnabled(features::kEmbeddingRequiresOptIn));
++  DCHECK(base::FeatureList::IsEnabled(::features::kEmbeddingRequiresOptIn));
+   std::string message = base::StringPrintf(
+       "Refused to display '%s' in a frame: It did not opt-into cross-origin "
+       "embedding by setting either an 'X-Frame-Options' header, or a "
+@@ -291,7 +291,7 @@ AncestorThrottle::CheckResult AncestorThrottle::EvaluateEmbeddingOptIn(
+             parent, blink::mojom::WebFeature::
+                         kEmbeddedCrossOriginFrameWithoutFrameAncestorsOrXFO);
+ 
+-        if (!base::FeatureList::IsEnabled(features::kEmbeddingRequiresOptIn))
++        if (!base::FeatureList::IsEnabled(::features::kEmbeddingRequiresOptIn))
+           return CheckResult::PROCEED;
+ 
+         if (logging == LoggingDisposition::LOG_TO_CONSOLE)
+diff --git a/content/browser/renderer_host/back_forward_cache_can_store_document_result.cc b/content/browser/renderer_host/back_forward_cache_can_store_document_result.cc
+index cd2e8d2a6..6dcdd3c70 100644
+--- a/content/browser/renderer_host/back_forward_cache_can_store_document_result.cc
++++ b/content/browser/renderer_host/back_forward_cache_can_store_document_result.cc
+@@ -593,7 +593,7 @@ void BackForwardCacheCanStoreDocumentResult::NoDueToDisallowActivation(
+ 
+ void BackForwardCacheCanStoreDocumentResult::NoDueToAXEvents(
+     const std::vector<ui::AXEvent>& events) {
+-  DCHECK(base::FeatureList::IsEnabled(features::kEvictOnAXEvents));
++  DCHECK(base::FeatureList::IsEnabled(::features::kEvictOnAXEvents));
+   for (auto& event : events) {
+     ax_events_.insert(event.event_type);
+   }
+diff --git a/content/browser/renderer_host/back_forward_cache_impl.cc b/content/browser/renderer_host/back_forward_cache_impl.cc
+index 4b9902548..6c9e49034 100644
+--- a/content/browser/renderer_host/back_forward_cache_impl.cc
++++ b/content/browser/renderer_host/back_forward_cache_impl.cc
+@@ -96,7 +96,7 @@ bool IsProcessBindingEnabled() {
+   if (!IsBackForwardCacheEnabled())
+     return false;
+   const std::string process_binding_param =
+-      base::GetFieldTrialParamValueByFeature(features::kBackForwardCache,
++      base::GetFieldTrialParamValueByFeature(::features::kBackForwardCache,
+                                              "process_binding_strength");
+   return process_binding_param.empty() || process_binding_param == "DISABLE";
+ }
+@@ -114,7 +114,7 @@ const base::FeatureParam<ChildProcessImportance>::Option
+ // background tabs so that the OS will hopefully kill the foreground tab last.
+ // The default importance is set to MODERATE.
+ const base::FeatureParam<ChildProcessImportance> kChildProcessImportanceParam{
+-    &features::kBackForwardCache, "process_binding_strength",
++    &::features::kBackForwardCache, "process_binding_strength",
+     ChildProcessImportance::MODERATE, &child_process_importance_options};
+ #endif
+ 
+@@ -122,7 +122,7 @@ bool IsContentInjectionSupported() {
+   if (!IsBackForwardCacheEnabled())
+     return false;
+   static constexpr base::FeatureParam<bool> content_injection_supported(
+-      &features::kBackForwardCache, "content_injection_supported", true);
++      &::features::kBackForwardCache, "content_injection_supported", true);
+   return content_injection_supported.Get();
+ }
+ 
+@@ -132,7 +132,7 @@ WebSchedulerTrackedFeatures SupportedFeaturesImpl() {
+     return features;
+ 
+   static constexpr base::FeatureParam<std::string> supported_features(
+-      &features::kBackForwardCache, "supported_features", "");
++      &::features::kBackForwardCache, "supported_features", "");
+   std::vector<std::string> tokens =
+       base::SplitString(supported_features.Get(), ",", base::TRIM_WHITESPACE,
+                         base::SPLIT_WANT_NONEMPTY);
+@@ -159,7 +159,7 @@ bool IgnoresOutstandingNetworkRequestForTesting() {
+     return false;
+   static constexpr base::FeatureParam<bool>
+       outstanding_network_request_supported(
+-          &features::kBackForwardCache,
++          &::features::kBackForwardCache,
+           "ignore_outstanding_network_request_for_testing", false);
+   return outstanding_network_request_supported.Get();
+ }
+@@ -171,7 +171,7 @@ bool ShouldIgnoreBlocklists() {
+   if (!IsBackForwardCacheEnabled())
+     return false;
+   static constexpr base::FeatureParam<bool> should_ignore_blocklists(
+-      &features::kBackForwardCache, "should_ignore_blocklists", false);
++      &::features::kBackForwardCache, "should_ignore_blocklists", false);
+   return should_ignore_blocklists.Get();
+ }
+ 
+@@ -253,7 +253,7 @@ std::string GetAllowedURLList() {
+     return "";
+   }
+ 
+-  return base::GetFieldTrialParamValueByFeature(features::kBackForwardCache,
++  return base::GetFieldTrialParamValueByFeature(::features::kBackForwardCache,
+                                                 "allowed_websites");
+ }
+ 
+@@ -261,7 +261,7 @@ std::string GetAllowedURLList() {
+ std::string GetBlockedURLList() {
+   return IsBackForwardCacheEnabled()
+              ? base::GetFieldTrialParamValueByFeature(
+-                   features::kBackForwardCache, "blocked_websites")
++                   ::features::kBackForwardCache, "blocked_websites")
+              : "";
+ }
+ 
+@@ -269,7 +269,7 @@ std::string GetBlockedURLList() {
+ std::string GetBlockedCgiParams() {
+   return IsBackForwardCacheEnabled()
+              ? base::GetFieldTrialParamValueByFeature(
+-                   features::kBackForwardCache, "blocked_cgi_params")
++                   ::features::kBackForwardCache, "blocked_cgi_params")
+              : "";
+ }
+ 
+@@ -466,7 +466,7 @@ BackForwardCacheImpl::GetChannelAssociatedMessageHandlingPolicy() {
+ 
+   static constexpr char kFieldTrialParam[] = "message_handling_when_cached";
+   auto param = base::GetFieldTrialParamValueByFeature(
+-      features::kBackForwardCache, kFieldTrialParam);
++      ::features::kBackForwardCache, kFieldTrialParam);
+   if (param.empty() || param == "log") {
+     return kMessagePolicyLog;
+   } else if (param == "none") {
+@@ -477,7 +477,7 @@ BackForwardCacheImpl::GetChannelAssociatedMessageHandlingPolicy() {
+     DLOG(WARNING) << "Failed to parse field trial param " << kFieldTrialParam
+                   << " with string value " << param
+                   << " under feature kBackForwardCache"
+-                  << features::kBackForwardCache.name;
++                  << ::features::kBackForwardCache.name;
+     return kMessagePolicyLog;
+   }
+ }
+@@ -563,9 +563,9 @@ base::TimeDelta BackForwardCacheImpl::GetTimeToLiveInBackForwardCache() {
+   // - Default value otherwise, kDefaultTimeToLiveInBackForwardCacheInSeconds.
+ 
+   if (base::FeatureList::IsEnabled(
+-          features::kBackForwardCacheTimeToLiveControl)) {
++          ::features::kBackForwardCacheTimeToLiveControl)) {
+     absl::optional<int> time_to_live = GetFieldTrialParamByFeatureAsOptionalInt(
+-        features::kBackForwardCacheTimeToLiveControl, "time_to_live_seconds");
++        ::features::kBackForwardCacheTimeToLiveControl, "time_to_live_seconds");
+     if (time_to_live.has_value()) {
+       return base::Seconds(time_to_live.value());
+     }
+@@ -586,7 +586,7 @@ size_t BackForwardCacheImpl::GetCacheSize() {
+     return kBackForwardCacheSizeCacheSize.Get();
+   }
+   return base::GetFieldTrialParamByFeatureAsInt(
+-      features::kBackForwardCache, "cache_size", kDefaultBackForwardCacheSize);
++      ::features::kBackForwardCache, "cache_size", kDefaultBackForwardCacheSize);
+ }
+ 
+ // static
+@@ -597,7 +597,7 @@ size_t BackForwardCacheImpl::GetForegroundedEntriesCacheSize() {
+     return kBackForwardCacheSizeForegroundCacheSize.Get();
+   }
+   return base::GetFieldTrialParamByFeatureAsInt(
+-      features::kBackForwardCache, "foreground_cache_size",
++      ::features::kBackForwardCache, "foreground_cache_size",
+       kDefaultForegroundBackForwardCacheSize);
+ }
+ 
+@@ -1443,12 +1443,12 @@ bool BackForwardCacheImpl::IsProxyInBackForwardCacheForDebugging(
+ 
+ bool BackForwardCacheImpl::IsMediaSessionServiceAllowed() {
+   return base::FeatureList::IsEnabled(
+-      features::kBackForwardCacheMediaSessionService);
++      ::features::kBackForwardCacheMediaSessionService);
+ }
+ 
+ bool BackForwardCacheImpl::IsScreenReaderAllowed() {
+   return base::FeatureList::IsEnabled(
+-      features::kEnableBackForwardCacheForScreenReader);
++      ::features::kEnableBackForwardCacheForScreenReader);
+ }
+ 
+ // static
+diff --git a/content/browser/renderer_host/blocked_scheme_navigation_throttle.cc b/content/browser/renderer_host/blocked_scheme_navigation_throttle.cc
+index 7111c0795..6ca2a8918 100644
+--- a/content/browser/renderer_host/blocked_scheme_navigation_throttle.cc
++++ b/content/browser/renderer_host/blocked_scheme_navigation_throttle.cc
+@@ -96,7 +96,7 @@ BlockedSchemeNavigationThrottle::CreateThrottleForNavigation(
+       (request->GetURL().SchemeIs(url::kDataScheme) ||
+        request->GetURL().SchemeIs(url::kFileSystemScheme)) &&
+       !base::FeatureList::IsEnabled(
+-          features::kAllowContentInitiatedDataUrlNavigations)) {
++          ::features::kAllowContentInitiatedDataUrlNavigations)) {
+     return std::make_unique<BlockedSchemeNavigationThrottle>(request);
+   }
+   // Block all renderer initiated navigations to filesystem: URLs except for
+diff --git a/content/browser/renderer_host/browsing_context_state.cc b/content/browser/renderer_host/browsing_context_state.cc
+index 46a2cc2cc..bd983816a 100644
+--- a/content/browser/renderer_host/browsing_context_state.cc
++++ b/content/browser/renderer_host/browsing_context_state.cc
+@@ -66,8 +66,8 @@ RenderFrameProxyHost* BrowsingContextState::GetRenderFrameProxyHost(
+ RenderFrameProxyHost* BrowsingContextState::GetRenderFrameProxyHostImpl(
+     SiteInstanceGroup* site_instance_group,
+     ProxyAccessMode proxy_access_mode) const {
+-  if (features::GetBrowsingContextMode() ==
+-          features::BrowsingContextStateImplementationType::
++  if (::features::GetBrowsingContextMode() ==
++          ::features::BrowsingContextStateImplementationType::
+               kSwapForCrossBrowsingInstanceNavigations &&
+       proxy_access_mode == ProxyAccessMode::kRegular) {
+     // CHECK to verify that the proxy is being accessed from the correct
+@@ -98,8 +98,8 @@ RenderFrameProxyHost* BrowsingContextState::GetRenderFrameProxyHostImpl(
+ void BrowsingContextState::DeleteRenderFrameProxyHost(
+     SiteInstanceGroup* site_instance_group,
+     ProxyAccessMode proxy_access_mode) {
+-  if (features::GetBrowsingContextMode() ==
+-          features::BrowsingContextStateImplementationType::
++  if (::features::GetBrowsingContextMode() ==
++          ::features::BrowsingContextStateImplementationType::
+               kSwapForCrossBrowsingInstanceNavigations &&
+       proxy_access_mode == ProxyAccessMode::kRegular) {
+     // See comments in GetRenderFrameProxyHost for why this check is needed.
+@@ -126,15 +126,15 @@ RenderFrameProxyHost* BrowsingContextState::CreateRenderFrameProxyHost(
+       ChromeTrackEvent::kRenderViewHost, rvh ? rvh.get() : nullptr,
+       ChromeTrackEvent::kFrameTreeNodeInfo, frame_tree_node);
+ 
+-  if (features::GetBrowsingContextMode() ==
+-      features::BrowsingContextStateImplementationType::
++  if (::features::GetBrowsingContextMode() ==
++      ::features::BrowsingContextStateImplementationType::
+           kLegacyOneToOneWithFrameTreeNode) {
+     DCHECK_EQ(this,
+               frame_tree_node->current_frame_host()->browsing_context_state());
+   }
+ 
+-  if (features::GetBrowsingContextMode() ==
+-          features::BrowsingContextStateImplementationType::
++  if (::features::GetBrowsingContextMode() ==
++          ::features::BrowsingContextStateImplementationType::
+               kSwapForCrossBrowsingInstanceNavigations &&
+       proxy_access_mode == ProxyAccessMode::kRegular) {
+     // See comments in GetRenderFrameProxyHost for why this check is needed.
+-- 
+2.43.0
+

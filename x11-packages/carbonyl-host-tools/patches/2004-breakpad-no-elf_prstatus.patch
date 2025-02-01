@@ -1,0 +1,18 @@
+--- a/third_party/breakpad/breakpad/src/client/linux/minidump_writer/linux_core_dumper.cc
++++ b/third_party/breakpad/breakpad/src/client/linux/minidump_writer/linux_core_dumper.cc
+@@ -194,6 +194,7 @@
+     //
+     // The following code only works if notes are ordered as expected.
+     switch (type) {
++#if !defined(__ANDROID__)
+       case NT_PRSTATUS: {
+         if (description.length() != sizeof(elf_prstatus)) {
+           fprintf(stderr, "Found NT_PRSTATUS descriptor of unexpected size\n");
+@@ -231,6 +232,7 @@
+         thread_infos_.push_back(info);
+         break;
+       }
++#endif
+       case NT_SIGINFO: {
+         if (description.length() != sizeof(siginfo_t)) {
+           fprintf(stderr, "Found NT_SIGINFO descriptor of unexpected size\n");

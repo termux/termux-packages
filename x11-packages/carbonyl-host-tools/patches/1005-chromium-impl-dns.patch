@@ -1,0 +1,114 @@
+diff -uNr a/net/dns/dns_config_service_linux.cc b/net/dns/dns_config_service_linux.cc
+--- a/net/dns/dns_config_service_linux.cc	2022-11-12 14:25:14.461410400 +0800
++++ b/net/dns/dns_config_service_linux.cc	2022-11-12 14:26:52.521409106 +0800
+@@ -38,6 +38,8 @@
+ #include "net/dns/serial_worker.h"
+ #include "third_party/abseil-cpp/absl/types/optional.h"
+ 
++#ifndef __TERMUX__
++
+ namespace net {
+ 
+ namespace internal {
+@@ -535,3 +537,8 @@
+ }
+ 
+ }  // namespace net
++
++#else
++// XXX: Actually, Termux has no DNS config, fallback to use the stub of fushsia.
++#include "./dns_config_service_fuchsia.cc"
++#endif // __TERMUX__
+diff -uNr a/net/dns/dns_reloader.cc b/net/dns/dns_reloader.cc
+--- a/net/dns/dns_reloader.cc	2022-11-09 09:28:47.021899000 +0800
++++ b/net/dns/dns_reloader.cc	2022-11-13 00:51:15.528054804 +0800
+@@ -7,7 +7,7 @@
+ #include "build/build_config.h"
+ 
+ #if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_OPENBSD) && \
+-    !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_FUCHSIA)
++    !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_FUCHSIA) && !defined(__TERMUX__)
+ 
+ #include <resolv.h>
+ 
+diff -uNr a/net/dns/dns_reloader.h b/net/dns/dns_reloader.h
+--- a/net/dns/dns_reloader.h	2022-11-09 09:28:47.021899000 +0800
++++ b/net/dns/dns_reloader.h	2022-11-13 00:52:05.818055468 +0800
+@@ -7,7 +7,7 @@
+ 
+ #include "build/build_config.h"
+ 
+-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_OPENBSD)
++#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_OPENBSD) && !defined(__TERMUX__)
+ namespace net {
+ 
+ // Call on the network thread before calling DnsReloaderMaybeReload() anywhere.
+--- a/net/dns/host_resolver_system_task.cc	2022-12-14 01:28:26.229861500 +0000
++++ b/net/dns/host_resolver_system_task.cc	2022-12-30 16:55:04.659958063 +0000
+@@ -311,7 +311,7 @@
+ 
+ void EnsureSystemHostResolverCallReady() {
+ #if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_OPENBSD) && \
+-    !BUILDFLAG(IS_ANDROID)
++    !BUILDFLAG(IS_ANDROID) && !defined(__TERMUX__)
+   EnsureDnsReloaderInit();
+ #elif BUILDFLAG(IS_WIN)
+   EnsureWinsockInit();
+@@ -397,7 +397,7 @@
+                                                 base::BlockingType::WILL_BLOCK);
+ 
+ #if BUILDFLAG(IS_POSIX) && \
+-    !(BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_OPENBSD) || BUILDFLAG(IS_ANDROID))
++    !(BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_OPENBSD) || BUILDFLAG(IS_ANDROID) || defined(__TERMUX__))
+   DnsReloaderMaybeReload();
+ #endif
+   auto [ai, err, os_error] = AddressInfo::Get(host, hints, nullptr, network);
+diff -uNr a/net/dns/public/resolv_reader.cc b/net/dns/public/resolv_reader.cc
+--- a/net/dns/public/resolv_reader.cc	2022-11-09 09:28:47.037900400 +0800
++++ b/net/dns/public/resolv_reader.cc	2022-11-12 14:30:45.431406055 +0800
+@@ -32,6 +32,8 @@
+     const struct __res_state& res) {
+   std::vector<IPEndPoint> nameservers;
+ 
++#ifndef __TERMUX__
++
+   if (!(res.options & RES_INIT))
+     return absl::nullopt;
+ 
+@@ -88,6 +90,12 @@
+   }
+ #endif
+ 
++#else // __TERMUX__
++  // From Android 8, getprop of net.dns%d has been invalid. So just
++  // assume the nameserver is 8.8.8.8.
++  nameservers.push_back(IPEndPoint(IPAddress(8, 8, 8, 8), 53));
++#endif
++
+   return nameservers;
+ }
+ 
+diff -uNr a/net/dns/public/scoped_res_state.h b/net/dns/public/scoped_res_state.h
+--- a/net/dns/public/scoped_res_state.h	2022-11-09 09:28:47.037900400 +0800
++++ b/net/dns/public/scoped_res_state.h	2022-11-13 00:50:25.928054149 +0800
+@@ -11,6 +11,20 @@
+ #include "net/base/net_export.h"
+ #include "third_party/abseil-cpp/absl/types/optional.h"
+ 
++#ifdef __TERMUX__
++// On Android NDK without JNI, there is no valid way to get nameservers.
++// So just provide a dummy struct and functions.
++struct __res_state {
++  int _dummy_state;
++};
++static int res_ninit(struct __res_state*) {
++  return 0;
++}
++static void res_nclose(struct __res_state*) {
++  return;
++}
++#endif
++
+ namespace net {
+ 
+ // Helper class to open, read and close a __res_state.
