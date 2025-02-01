@@ -15,6 +15,8 @@ TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 # Chromium doesn't support i686 on Linux.
 # Carbonyl donesn't support arm.
 TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
+# Host tools, no need to run elf-cleaner
+TERMUX_PKG_NO_ELF_CLEANER=true
 
 SYSTEM_LIBRARIES="    libdrm  fontconfig"
 # TERMUX_PKG_DEPENDS="libdrm, fontconfig"
