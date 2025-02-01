@@ -1,0 +1,36 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -129,6 +129,8 @@
+   add_library(libgfortran SHARED IMPORTED)
+   set_target_properties(libgfortran PROPERTIES IMPORTED_LOCATION ${copied_libgfortran})
+   target_link_libraries(codonrt PRIVATE libgfortran)
++elseif(ANDROID)
++  # Do nothing
+ else()
+   message(FATAL_ERROR "Set 'CODON_SYSTEM_LIBRARIES' to the directory containing system libraries.")
+ endif()
+@@ -471,13 +473,7 @@
+   COMMAND
+     ${CMAKE_COMMAND} -E copy
+     "${CMAKE_BINARY_DIR}/libomp${CMAKE_SHARED_LIBRARY_SUFFIX}"
+-    "${CMAKE_BINARY_DIR}/lib/codon"
+-  COMMAND
+-    ${CMAKE_COMMAND} -E copy ${copied_libgfortran} "${CMAKE_BINARY_DIR}/lib/codon"
+-  COMMAND
+-    ${CMAKE_COMMAND} -E copy ${copied_libquadmath} "${CMAKE_BINARY_DIR}/lib/codon"
+-  COMMAND
+-    ${CMAKE_COMMAND} -E copy ${copied_libgcc} "${CMAKE_BINARY_DIR}/lib/codon")
++    "${CMAKE_BINARY_DIR}/lib/codon")
+ add_dependencies(libs codonrt codonc)
+ 
+ # Codon command-line tool
+@@ -520,9 +516,6 @@
+ 
+ install(TARGETS codonrt codonc codon_jupyter DESTINATION lib/codon)
+ install(FILES ${CMAKE_BINARY_DIR}/libomp${CMAKE_SHARED_LIBRARY_SUFFIX} DESTINATION lib/codon)
+-install(FILES ${copied_libgfortran} DESTINATION lib/codon)
+-install(FILES ${copied_libquadmath} DESTINATION lib/codon)
+-install(FILES ${copied_libgcc} DESTINATION lib/codon)
+ install(TARGETS codon DESTINATION bin)
+ install(DIRECTORY ${CMAKE_BINARY_DIR}/include/codon DESTINATION include)
+ install(DIRECTORY ${CMAKE_SOURCE_DIR}/stdlib DESTINATION lib/codon)

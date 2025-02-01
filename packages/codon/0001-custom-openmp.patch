@@ -1,0 +1,16 @@
+--- a/cmake/deps.cmake
++++ b/cmake/deps.cmake
+@@ -1,4 +1,4 @@
+-set(CPM_DOWNLOAD_VERSION 0.32.3)
++set(CPM_DOWNLOAD_VERSION 0.40.0)
+ set(CPM_DOWNLOAD_LOCATION "${CMAKE_BINARY_DIR}/cmake/CPM_${CPM_DOWNLOAD_VERSION}.cmake")
+ if(NOT (EXISTS ${CPM_DOWNLOAD_LOCATION}))
+     message(STATUS "Downloading CPM.cmake...")
+@@ -96,6 +96,7 @@
+     GITHUB_REPOSITORY "exaloop/openmp"
+     GIT_TAG 11daa2021c590dc74a0e734b4783570b619d88c9
+     EXCLUDE_FROM_ALL YES
++    PATCHES "${CMAKE_SOURCE_DIR}/patches/openmp.diff"
+     OPTIONS "CMAKE_BUILD_TYPE Release"
+             "OPENMP_ENABLE_LIBOMPTARGET OFF"
+             "OPENMP_STANDALONE_BUILD ON")

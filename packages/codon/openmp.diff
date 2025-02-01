@@ -1,0 +1,173 @@
+From ebad2fda32132b4f0eaf9f7dea0f4dc1edd55647 Mon Sep 17 00:00:00 2001
+From: Chongyun Lee <45286352+licy183@users.noreply.github.com>
+Date: Thu, 7 Sep 2023 17:52:22 +0800
+Subject: [PATCH] android: Add stubs and headers for nl_types APIs
+
+---
+ runtime/src/CMakeLists.txt            |  6 ++++
+ runtime/src/android/nl_types.h        | 45 +++++++++++++++++++++++++
+ runtime/src/android/nltypes_stubs.cpp | 48 +++++++++++++++++++++++++++
+ 3 files changed, 99 insertions(+)
+ create mode 100644 runtime/src/android/nl_types.h
+ create mode 100644 runtime/src/android/nltypes_stubs.cpp
+
+diff --git a/runtime/src/CMakeLists.txt b/runtime/src/CMakeLists.txt
+index 60f97bd..46a920c 100644
+--- a/runtime/src/CMakeLists.txt
++++ b/runtime/src/CMakeLists.txt
+@@ -49,6 +49,9 @@ include_directories(
+ if(${LIBOMP_USE_HWLOC})
+   include_directories(${LIBOMP_HWLOC_INSTALL_DIR}/include)
+ endif()
++if(ANDROID)
++  include_directories(${LIBOMP_SRC_DIR}/android)
++endif()
+ 
+ # Building with time profiling support requires LLVM directory includes.
+ if(LIBOMP_PROFILING_SUPPORT)
+@@ -102,6 +105,9 @@ else()
+     libomp_append(LIBOMP_CXXFILES kmp_gsupport.cpp)
+     libomp_append(LIBOMP_ASMFILES z_Linux_asm.S) # Unix assembly file
+   endif()
++  if(ANDROID)
++    libomp_append(LIBOMP_CXXFILES android/nltypes_stubs.cpp)
++  endif()
+   libomp_append(LIBOMP_CXXFILES thirdparty/ittnotify/ittnotify_static.cpp LIBOMP_USE_ITT_NOTIFY)
+   libomp_append(LIBOMP_CXXFILES kmp_debugger.cpp LIBOMP_USE_DEBUGGER)
+   libomp_append(LIBOMP_CXXFILES kmp_stats.cpp LIBOMP_STATS)
+diff --git a/runtime/src/android/nl_types.h b/runtime/src/android/nl_types.h
+new file mode 100644
+index 0000000..cc27e93
+--- /dev/null
++++ b/runtime/src/android/nl_types.h
+@@ -0,0 +1,45 @@
++/*
++ * Copyright (C) 2019 The Android Open Source Project
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ *  * Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ *  * Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in
++ *    the documentation and/or other materials provided with the
++ *    distribution.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
++ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
++ * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
++ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
++ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
++ * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
++ * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
++ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
++ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++ * SUCH DAMAGE.
++ */
++#ifndef ANDROID_NLTYPES_H
++#define ANDROID_NLTYPES_H
++
++#include_next <nl_types.h>
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++nl_catd  catopen(const char*, int);
++char*    catgets(nl_catd, int, int, const char*);
++int      catclose(nl_catd);
++
++#ifdef __cplusplus
++}  // extern "C"
++#endif
++
++#endif  /* ANDROID_NLTYPES_H */
+diff --git a/runtime/src/android/nltypes_stubs.cpp b/runtime/src/android/nltypes_stubs.cpp
+new file mode 100644
+index 0000000..2882910
+--- /dev/null
++++ b/runtime/src/android/nltypes_stubs.cpp
+@@ -0,0 +1,48 @@
++/*
++ * Copyright (C) 2019 The Android Open Source Project
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ *  * Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ *  * Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in
++ *    the documentation and/or other materials provided with the
++ *    distribution.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
++ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
++ * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
++ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
++ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
++ * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
++ * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
++ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
++ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++ * SUCH DAMAGE.
++ */
++
++#include <nl_types.h>
++
++#include <errno.h>
++
++__attribute__((weak,visibility("hidden")))
++nl_catd catopen(const char*, int) {
++  return reinterpret_cast<nl_catd>(-1);
++}
++
++__attribute__((weak,visibility("hidden")))
++char* catgets(nl_catd, int, int, const char* message) {
++  return const_cast<char*>(message);
++}
++
++__attribute__((weak,visibility("hidden")))
++int catclose(nl_catd) {
++  // Since we didn't hand out a valid nl_catd, you can't be returning one to us.
++  errno = EBADF;
++  return -1;
++}
+
+From 5c3a853f5a5ebffe92f222c77f27c6512c062d8e Mon Sep 17 00:00:00 2001
+From: Jonathan Peyton <jonathan.l.peyton@intel.com>
+Date: Thu, 2 Feb 2023 11:18:36 -0600
+Subject: [PATCH] Fix CMake version symbol testing
+
+Do not check for version symbol support if the necessary linker flag is
+not supported.
+
+Differential Revision: https://reviews.llvm.org/D143200
+---
+ runtime/cmake/config-ix.cmake | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/runtime/cmake/config-ix.cmake b/runtime/cmake/config-ix.cmake
+index 0fe1266..2ff211f 100644
+--- a/runtime/cmake/config-ix.cmake
++++ b/runtime/cmake/config-ix.cmake
+@@ -242,7 +242,11 @@ endif()
+ 
+ # Checking features
+ # Check if version symbol assembler directives are supported
+-libomp_check_version_symbols(LIBOMP_HAVE_VERSION_SYMBOLS)
++if (LIBOMP_HAVE_VERSION_SCRIPT_FLAG)
++  libomp_check_version_symbols(LIBOMP_HAVE_VERSION_SYMBOLS)
++else()
++  set(LIBOMP_HAVE_VERSION_SYMBOLS FALSE)
++endif()
+ 
+ # Check if quad precision types are available
+ if(CMAKE_C_COMPILER_ID STREQUAL "GNU")

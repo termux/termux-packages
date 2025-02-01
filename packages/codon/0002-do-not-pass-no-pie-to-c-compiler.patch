@@ -1,0 +1,29 @@
+--- a/codon/cir/llvm/llvisitor.cpp
++++ b/codon/cir/llvm/llvisitor.cpp
+@@ -563,10 +563,12 @@
+       command.push_back(uflag.str());
+   }
+ 
++#ifndef __ANDROID__
+   // Avoid "relocation R_X86_64_32 against `.bss' can not be used when making a PIE
+   // object" complaints by gcc when it is built with --enable-default-pie
+   if (!library)
+     command.push_back("-no-pie");
++#endif
+ 
+   executeCommand(command);
+ 
+--- a/codon/cir/llvm/optimize.cpp
++++ b/codon/cir/llvm/optimize.cpp
+@@ -25,7 +25,11 @@
+ 
+   return std::unique_ptr<llvm::TargetMachine>(target->createTargetMachine(
+       triple.getTriple(), cpuStr, featuresStr, options,
++#ifndef __ANDROID__
+       pic ? llvm::Reloc::Model::PIC_ : llvm::codegen::getExplicitRelocModel(),
++#else
++      llvm::Reloc::Model::PIC_,
++#endif
+       llvm::codegen::getExplicitCodeModel(), llvm::CodeGenOpt::Aggressive));
+ }
+ 
