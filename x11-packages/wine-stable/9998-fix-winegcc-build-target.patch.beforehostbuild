@@ -1,20 +1,20 @@
---- a/tools/winegcc/winegcc.c.orig
+--- a/tools/winegcc/winegcc.c
 +++ b/tools/winegcc/winegcc.c
-@@ -325,8 +325,17 @@
-     {
-         if (opts->target_alias)
+@@ -297,7 +297,17 @@
+         if (target)
          {
-+            if (strstr(opts->target_alias, "android")) {
-+                if (strstr(opts->target_alias, "arm")) {
+             strarray_add( &ret, "-target" );
+-            strarray_add( &ret, target );
++            if (strstr(target, "android")) {
++                if (strstr(target, "arm")) {
 +                    str = strmake( "%s24", "armv7a-linux-androideabi" );
 +                } else {
-+                    str = strmake( "%s24", opts->target_alias );
++                    str = strmake( "%s24", target );
 +                }
 +            } else {
-+                str = strmake( "%s", opts->target_alias );
++                str = strmake( "%s", target );
 +            }
-             strarray_add( &ret, "-target" );
--            strarray_add( &ret, opts->target_alias );
++            strarray_add( &ret, "-target" );
 +            strarray_add( &ret, str );
          }
          strarray_add( &ret, "-Wno-unused-command-line-argument" );

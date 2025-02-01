@@ -24,19 +24,18 @@ diff -uNr a/dlls/dbghelp/macho_module.c b/dlls/dbghelp/macho_module.c
 diff -uNr a/dlls/dbghelp/module.c b/dlls/dbghelp/module.c
 --- a/dlls/dbghelp/module.c
 +++ b/dlls/dbghelp/module.c
-@@ -671,10 +671,10 @@
-     fmap_link = HeapAlloc(GetProcessHeap(), 0, sizeof(*fmap_link));
-     if (!fmap_link) return NULL;
+@@ -709,9 +709,9 @@
  
--    p = malloc(sizeof(L"/usr/lib/debug/.build-id/") +
-+    p = malloc(sizeof(L"@TERMUX_PREFIX@//lib/debug/.build-id/") +
-                (idlen * 2 + 1) * sizeof(WCHAR) + sizeof(L".debug"));
-     if (!p) goto fail;
--    wcscpy(p, L"/usr/lib/debug/.build-id/");
-+    wcscpy(p, L"@TERMUX_PREFIX@//lib/debug/.build-id/");
-     z = p + wcslen(p);
-     if (idlen)
-     {
+     if (!(fmap_link = HeapAlloc(GetProcessHeap(), 0, sizeof(*fmap_link))))
+         return NULL;
+-    if (image_locate_build_id_target_in_dir(fmap_link, id, idlen, L"/usr/lib/debug/.build-id/"))
++    if (image_locate_build_id_target_in_dir(fmap_link, id, idlen, L"@TERMUX_PREFIX@/lib/debug/.build-id/"))
+         return fmap_link;
+-    if (image_locate_build_id_target_in_dir(fmap_link, id, idlen, L"/usr/lib/.build-id/"))
++    if (image_locate_build_id_target_in_dir(fmap_link, id, idlen, L"@TERMUX_PREFIX@/lib/.build-id/"))
+         return fmap_link;
+ 
+     sz = GetEnvironmentVariableW(L"WINEHOMEDIR", NULL, 0);
 @@ -778,7 +778,7 @@
                  if (!ret)
                  {
@@ -71,16 +70,16 @@ diff -uNr a/dlls/msvcrt/tests/environ.c b/dlls/msvcrt/tests/environ.c
 diff -uNr a/dlls/ntdll/unix/server.c b/dlls/ntdll/unix/server.c
 --- a/dlls/ntdll/unix/server.c
 +++ b/dlls/ntdll/unix/server.c
-@@ -1257,10 +1257,10 @@
-     else
-         snprintf( tmp + p, sizeof(tmp) - p, "%lx", (unsigned long)ino );
+@@ -1237,10 +1237,10 @@
+ {
+     char *dir = NULL;
  
 -#ifdef __ANDROID__  /* there's no /tmp dir on Android */
-+#if defined(__ANDROID__) && ! defined(__TERMUX__)  /* there's no /tmp dir on Android */
-     asprintf( &dir, "%s/.wineserver/server-%s", config_dir, tmp );
++#if defined(__ANDROID__) && !defined(__TERMUX__)  /* there's no /tmp dir on Android */
+     asprintf( &dir, "%s/.wineserver/server-%llx-%llx", config_dir, (unsigned long long)dev, (unsigned long long)ino );
  #else
--    asprintf( &dir, "/tmp/.wine-%u/server-%s", getuid(), tmp );
-+    asprintf( &dir, "@TERMUX_PREFIX@/tmp/.wine-%u/server-%s", getuid(), tmp );
+-    asprintf( &dir, "/tmp/.wine-%u/server-%llx-%llx", getuid(), (unsigned long long)dev, (unsigned long long)ino );
++    asprintf( &dir, "@TERMUX_PREFIX@/tmp/.wine-%u/server-%llx-%llx", getuid(), (unsigned long long)dev, (unsigned long long)ino );
  #endif
      return dir;
  }
@@ -120,22 +119,17 @@ diff -uNr a/programs/winemenubuilder/winemenubuilder.c b/programs/winemenubuilde
 diff -uNr a/server/request.c b/server/request.c
 --- a/server/request.c
 +++ b/server/request.c
-@@ -657,15 +657,15 @@
+@@ -639,11 +639,11 @@
  
      /* create the base directory if needed */
  
 -#ifdef __ANDROID__  /* there's no /tmp dir on Android */
-+#if defined(__ANDROID__) && ! defined(__TERMUX__)  /* there's no /tmp dir on Android */
-     len += strlen( config_dir ) + sizeof("/.wineserver");
-     if (!(server_dir = malloc( len ))) fatal_error( "out of memory\n" );
-     strcpy( server_dir, config_dir );
-     strcat( server_dir, "/.wineserver" );
++#if defined(__ANDROID__) && !defined(__TERMUX__)  /* there's no /tmp dir on Android */
+     if (asprintf( &base_dir, "%s/.wineserver", config_dir ) == -1)
+         fatal_error( "out of memory\n" );
  #else
--    len += sizeof("/tmp/.wine-") + 12;
-+    len += sizeof("@TERMUX_PREFIX@/tmp/.wine-") + 12;
-     if (!(server_dir = malloc( len ))) fatal_error( "out of memory\n" );
--    sprintf( server_dir, "/tmp/.wine-%u", getuid() );
-+    sprintf( server_dir, "@TERMUX_PREFIX@/tmp/.wine-%u", getuid() );
+-    if (asprintf( &base_dir, "/tmp/.wine-%u", getuid() ) == -1)
++    if (asprintf( &base_dir, "@TERMUX_PREFIX@/tmp/.wine-%u", getuid() ) == -1)
+         fatal_error( "out of memory\n" );
  #endif
-     create_dir( server_dir, &st2 );
- 
+     create_dir( base_dir, &st2 );
