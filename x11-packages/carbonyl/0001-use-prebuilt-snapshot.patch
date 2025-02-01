@@ -1,0 +1,32 @@
+--- a/chromium/src/tools/v8_context_snapshot/BUILD.gn
++++ b/chromium/src/tools/v8_context_snapshot/BUILD.gn
+@@ -35,7 +35,7 @@
+   ]
+ }
+ 
+-if (use_v8_context_snapshot) {
++if (use_v8_context_snapshot && false) {
+   if (v8_snapshot_toolchain == current_toolchain) {
+     action("generate_v8_context_snapshot") {
+       script = "//build/gn_run_binary.py"
+@@ -113,3 +113,20 @@
+     }
+   }
+ }
++
++if (use_v8_context_snapshot) {
++  if (v8_snapshot_toolchain == current_toolchain) {
++    action("generate_v8_context_snapshot") {
++      script = "//v8/tools/run.py"
++      output_file = "$root_build_dir/$v8_context_snapshot_filename"
++      output_path = rebase_path(output_file, root_build_dir)
++      args = [
++        "bash", "-c", 
++        "cp -f" + " " +
++        "@TERMUX_PREFIX@/opt/carbonyl-host-tools/$output_path" + " " +
++        "$output_path",
++      ]
++      outputs = [ output_file ]
++    }
++  }
++}
