@@ -1,0 +1,183 @@
+--- a/codon/runtime/numpy/loops.cpp
++++ b/codon/runtime/numpy/loops.cpp
+@@ -10,6 +10,8 @@
+ #include "hwy/contrib/math/math-inl.h"
+ // clang-format on
+ 
++#pragma clang diagnostic ignored "-Wvla-cxx-extension"
++
+ #include <cmath>
+ #include <cstring>
+ #include <limits>
+@@ -20,6 +22,7 @@
+ namespace HWY_NAMESPACE {
+ 
+ namespace hn = hwy::HWY_NAMESPACE;
++using namespace hn;
+ 
+ struct AcosFunctor {
+   template <typename T, typename V>
+@@ -38,7 +41,7 @@
+     const auto nan = Set(d, std::numeric_limits<T>::quiet_NaN());
+     const auto pinf = Set(d, std::numeric_limits<T>::infinity());
+     const auto pone = Set(d, static_cast<T>(1.0));
+-    return IfThenElse(v == pinf, pinf, IfThenElse(v < pone, nan, Acosh(d, v)));
++    return IfThenElse(Eq(v, pinf), pinf, IfThenElse(Lt(v, pone), nan, Acosh(d, v)));
+   }
+ 
+   static inline double scalar(const double x) { return acosh(x); }
+@@ -78,7 +81,7 @@
+     const auto npi2 = Set(d, static_cast<T>(-3.14159265358979323846264 / 2));
+     const auto pinf = Set(d, std::numeric_limits<T>::infinity());
+     const auto ninf = Set(d, -std::numeric_limits<T>::infinity());
+-    return IfThenElse(v == pinf, ppi2, IfThenElse(v == ninf, npi2, Atan(d, v)));
++    return IfThenElse(Eq(v, pinf), ppi2, IfThenElse(Eq(v, ninf), npi2, Atan(d, v)));
+   }
+ 
+   static inline double scalar(const double x) { return atan(x); }
+@@ -96,8 +99,8 @@
+     const auto none = Set(d, static_cast<T>(-1.0));
+     const auto nzero = Set(d, static_cast<T>(0.0));
+     return IfThenElse(
+-        v == pone, pinf,
+-        IfThenElse(v == none, ninf, IfThenElse(Abs(v) > pone, nan, Atanh(d, v))));
++        Eq(v, pone), pinf,
++        IfThenElse(Eq(v, none), ninf, IfThenElse(Gt(Abs(v), pone), nan, Atanh(d, v))));
+   }
+ 
+   static inline double scalar(const double x) { return atanh(x); }
+@@ -117,8 +120,8 @@
+     auto nzero = Set(di, kIsF32 ? static_cast<TI>(0x80000000L)
+                                 : static_cast<TI>(0x8000000000000000LL));
+ 
+-    auto negneg = And(BitCast(di, v1) == nzero, BitCast(di, v2) == nzero);
+-    auto posneg = And(BitCast(di, v1) == pzero, BitCast(di, v2) == nzero);
++    auto negneg = And(Eq(BitCast(di, v1), nzero), Eq(BitCast(di, v2), nzero));
++    auto posneg = And(Eq(BitCast(di, v1), pzero), Eq(BitCast(di, v2), nzero));
+ 
+     const auto ppi = Set(d, static_cast<T>(+3.14159265358979323846264));
+     const auto npi = Set(d, static_cast<T>(-3.14159265358979323846264));
+@@ -148,7 +151,7 @@
+   static inline auto vector(const hn::ScalableTag<T> d, const V &v) {
+     // Values outside of [-LIMIT, LIMIT] are not valid for SIMD version.
+     const T LIMIT = limit<T>();
+-    constexpr size_t L = hn::Lanes(d);
++    const size_t L = hn::Lanes(d);
+     T tmp[L];
+     Store(v, d, tmp);
+ 
+@@ -185,7 +188,7 @@
+   static inline auto vector(const hn::ScalableTag<T> d, const V &v) {
+     const auto lim = Set(d, limit<T>());
+     const auto pinf = Set(d, std::numeric_limits<T>::infinity());
+-    return IfThenElse(IsNaN(v), v, IfThenElse(v >= lim, pinf, Exp(d, v)));
++    return IfThenElse(IsNaN(v), v, IfThenElse(Ge(v, lim), pinf, Exp(d, v)));
+   }
+ 
+   static inline double scalar(const double x) { return exp(x); }
+@@ -208,7 +211,7 @@
+   static inline auto vector(const hn::ScalableTag<T> d, const V &v) {
+     const auto lim = Set(d, limit<T>());
+     const auto pinf = Set(d, std::numeric_limits<T>::infinity());
+-    return IfThenElse(IsNaN(v), v, IfThenElse(v >= lim, pinf, Exp2(d, v)));
++    return IfThenElse(IsNaN(v), v, IfThenElse(Ge(v, lim), pinf, Exp2(d, v)));
+   }
+ 
+   static inline double scalar(const double x) { return exp2(x); }
+@@ -231,7 +234,7 @@
+   static inline auto vector(const hn::ScalableTag<T> d, const V &v) {
+     const auto lim = Set(d, limit<T>());
+     const auto pinf = Set(d, std::numeric_limits<T>::infinity());
+-    return IfThenElse(IsNaN(v), v, IfThenElse(v >= lim, pinf, Expm1(d, v)));
++    return IfThenElse(IsNaN(v), v, IfThenElse(Ge(v, lim), pinf, Expm1(d, v)));
+   }
+ 
+   static inline double scalar(const double x) { return expm1(x); }
+@@ -247,9 +250,9 @@
+     const auto ninf = Set(d, -std::numeric_limits<T>::infinity());
+     const auto zero = Set(d, static_cast<T>(0.0));
+     return IfThenElse(
+-        v == zero, ninf,
+-        IfThenElse(v < zero, nan,
+-                   IfThenElse(v == pinf, pinf, IfThenElse(IsNaN(v), v, Log(d, v)))));
++        Eq(v, zero), ninf,
++        IfThenElse(Lt(v, zero), nan,
++                   IfThenElse(Eq(v, pinf), pinf, IfThenElse(IsNaN(v), v, Log(d, v)))));
+   }
+ 
+   static inline double scalar(const double x) { return log(x); }
+@@ -265,9 +268,9 @@
+     const auto ninf = Set(d, -std::numeric_limits<T>::infinity());
+     const auto zero = Set(d, static_cast<T>(0.0));
+     return IfThenElse(
+-        v == zero, ninf,
+-        IfThenElse(v < zero, nan,
+-                   IfThenElse(v == pinf, pinf, IfThenElse(IsNaN(v), v, Log10(d, v)))));
++        Eq(v, zero), ninf,
++        IfThenElse(Lt(v, zero), nan,
++                   IfThenElse(Eq(v, pinf), pinf, IfThenElse(IsNaN(v), v, Log10(d, v)))));
+   }
+ 
+   static inline double scalar(const double x) { return log10(x); }
+@@ -283,9 +286,9 @@
+     const auto ninf = Set(d, -std::numeric_limits<T>::infinity());
+     const auto none = Set(d, static_cast<T>(-1.0));
+     return IfThenElse(
+-        v == none, ninf,
+-        IfThenElse(v < none, nan,
+-                   IfThenElse(v == pinf, pinf, IfThenElse(IsNaN(v), v, Log1p(d, v)))));
++        Eq(v, none), ninf,
++        IfThenElse(Lt(v, none), nan,
++                   IfThenElse(Eq(v, pinf), pinf, IfThenElse(IsNaN(v), v, Log1p(d, v)))));
+   }
+ 
+   static inline double scalar(const double x) { return log1p(x); }
+@@ -301,9 +304,9 @@
+     const auto ninf = Set(d, -std::numeric_limits<T>::infinity());
+     const auto zero = Set(d, static_cast<T>(0.0));
+     return IfThenElse(
+-        v == zero, ninf,
+-        IfThenElse(v < zero, nan,
+-                   IfThenElse(v == pinf, pinf, IfThenElse(IsNaN(v), v, Log2(d, v)))));
++        Eq(v, zero), ninf,
++        IfThenElse(Lt(v, zero), nan,
++                   IfThenElse(Eq(v, pinf), pinf, IfThenElse(IsNaN(v), v, Log2(d, v)))));
+   }
+ 
+   static inline double scalar(const double x) { return log2(x); }
+@@ -326,7 +329,7 @@
+   static inline auto vector(const hn::ScalableTag<T> d, const V &v) {
+     // Values outside of [-LIMIT, LIMIT] are not valid for SIMD version.
+     const T LIMIT = limit<T>();
+-    constexpr size_t L = hn::Lanes(d);
++    const size_t L = hn::Lanes(d);
+     T tmp[L];
+     Store(v, d, tmp);
+ 
+@@ -363,7 +366,7 @@
+   static inline auto vector(const hn::ScalableTag<T> d, const V &v) {
+     // Values outside of [-LIMIT, LIMIT] are not valid for SIMD version.
+     const T LIMIT = limit<T>();
+-    constexpr size_t L = hn::Lanes(d);
++    const size_t L = hn::Lanes(d);
+     T tmp[L];
+     Store(v, d, tmp);
+ 
+@@ -410,7 +413,7 @@
+ template <typename T, typename F>
+ void UnaryLoop(const T *in, size_t is, T *out, size_t os, size_t n) {
+   const hn::ScalableTag<T> d;
+-  constexpr size_t L = Lanes(d);
++  const size_t L = Lanes(d);
+   T tmp[L];
+   size_t i;
+ 
+@@ -445,7 +448,7 @@
+ void BinaryLoop(const T *in1, size_t is1, const T *in2, size_t is2, T *out, size_t os,
+                 size_t n) {
+   const hn::ScalableTag<T> d;
+-  constexpr size_t L = Lanes(d);
++  const size_t L = Lanes(d);
+   T tmp1[L];
+   T tmp2[L];
+   size_t i;
