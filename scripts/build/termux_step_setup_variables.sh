@@ -54,7 +54,8 @@ termux_step_setup_variables() {
 		if [ "$TERMUX_PACKAGE_LIBRARY" = "bionic" ]; then
 			# On-device builds without termux-exec are unsupported.
 			if ! grep -q "${TERMUX_PREFIX}/lib/libtermux-exec.so" <<< "${LD_PRELOAD-x}"; then
-				termux_error_exit "On-device builds without termux-exec are not supported."
+				# termux_error_exit "On-device builds without termux-exec are not supported."
+				echo "warning LD_PRELOAD is unset nested scripts might fail "
 			fi
 		fi
 	else
