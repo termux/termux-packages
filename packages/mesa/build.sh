@@ -18,6 +18,7 @@ TERMUX_PKG_REPLACES="libmesa"
 # FIXME: Set `shared-llvm` to disabled if possible
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --cmake-prefix-path $TERMUX_PREFIX
+-Dvulkan-icd-dir=$TERMUX_PREFIX/share/vulkan/icd.d
 -Dcpp_rtti=false
 -Dgbm=enabled
 -Dopengl=true
@@ -30,6 +31,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dshared-llvm=enabled
 -Dplatforms=x11,wayland
 -Dgallium-drivers=swrast,virgl,zink
+-Dvulkan-drivers=virtio
 -Dosmesa=true
 -Dglvnd=enabled
 -Dxmlconfig=disabled
