@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.qt.io/
 TERMUX_PKG_DESCRIPTION="Qt Development Tools (Linguist, Assistant, Designer, etc.)"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.8.1"
+TERMUX_PKG_VERSION="6.8.2"
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/${TERMUX_PKG_VERSION%.*}/${TERMUX_PKG_VERSION}/submodules/qttools-everywhere-src-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=9d43d409be08b8681a0155a9c65114b69c9a3fc11aef6487bb7fdc5b283c432d
+TERMUX_PKG_SHA256=326381b7d43f07913612f291abc298ae79bd95382e2233abce982cff2b53d2c0
 TERMUX_PKG_DEPENDS="libc++, qt6-qtbase (>= ${TERMUX_PKG_VERSION}), zstd"
 TERMUX_PKG_BUILD_DEPENDS="qt6-qtdeclarative (>= ${TERMUX_PKG_VERSION})"
 TERMUX_PKG_RECOMMENDS="qt6-qtdeclarative"
