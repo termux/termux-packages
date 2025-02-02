@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.qt.io/
 TERMUX_PKG_DESCRIPTION="Provides a set of easy to use chart components"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.8.1"
+TERMUX_PKG_VERSION="6.8.2"
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/${TERMUX_PKG_VERSION%.*}/${TERMUX_PKG_VERSION}/submodules/qtcharts-everywhere-src-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=2edea3f16e248ef508d99332798645b7f5ab6edbbf2e3d7d78fb674156f07d29
+TERMUX_PKG_SHA256=ec7c84da1a5d7b2f8cea610df6f993fa3c48990dc9f6bec995c69c5bfb34c55f
 TERMUX_PKG_DEPENDS="libc++, qt6-qtbase (>= ${TERMUX_PKG_VERSION}), qt6-qtdeclarative (>= ${TERMUX_PKG_VERSION})"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_NO_STATICSPLIT=true
