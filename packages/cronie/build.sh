@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="ISC, BSD 2-Clause, BSD 3-Clause, GPL-2.0, LGPL-2.1"
 TERMUX_PKG_LICENSE_FILE="COPYING, COPYING.obstack"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.7.2"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/cronie-crond/cronie/releases/download/cronie-${TERMUX_PKG_VERSION}/cronie-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=f1da374a15ba7605cf378347f96bc8b678d3d7c0765269c8242cfe5b0789c571
 TERMUX_PKG_AUTO_UPDATE=true
@@ -40,5 +40,6 @@ termux_step_create_debscripts() {
 	mkdir -p $TERMUX_PREFIX/var/run
 	mkdir -p $TERMUX_PREFIX/var/spool/cron
 	mkdir -p $TERMUX_PREFIX/etc/cron.d
+	mkdir -p $TERMUX_ANDROID_HOME/.cache
 	EOF
 }
