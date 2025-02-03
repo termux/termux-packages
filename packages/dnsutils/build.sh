@@ -24,7 +24,7 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_configure() {
-	# Android linker is unable to driectly reslove versoined libraries.
-	# This will create a symlink to versoined library via `libname.so`.
+	# Android linker is unable to directly resolve versioned libraries.
+	# This will create a symlink to versioned library via `libname.so`.
 	sed -i 's|library_names_spec=.*|library_names_spec="\\\$libname\\\$release\\\$shared_ext \\\$libname\\\$shared_ext"|g' ./libtool
 }
