@@ -21,6 +21,15 @@ termux_step_post_get_source() {
 }
 
 termux_step_host_build() {
+if $TERMUX_ON_DEVICE_BUILD; then
+	local _INSTALL_PREFIX=$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/opt/$TERMUX_PKG_NAME
+	CC=clang
+	CXX=c++
+	CROSS=
+	# need android 30+
+	# vim $PREFIX/include/sys/mman.h -c /memfd_create
+	export CFLAGS="--target=aarch64-linux-android30 -w " 
+else
 	# This package should use the Android NDK toolchain to compile, not
 	# our custom toolchain, so I'd like to compile it in the hostbuild step.
 	export PATH="$NDK/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH"
@@ -28,8 +37,12 @@ termux_step_host_build() {
 	if [ $TERMUX_ARCH = arm ]; then
 		CCTERMUX_HOST_PLATFORM=armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL
 	fi
-
 	local _INSTALL_PREFIX=$TERMUX_PREFIX/opt/$TERMUX_PKG_NAME
+	CC=$(command -v $CCTERMUX_HOST_PLATFORM-clang)
+	CXX=$(command -v $CCTERMUX_HOST_PLATFORM-clang++)
+	CROSS=--cross-file $TERMUX_MESON_CROSSFILE
+	CFLAGS=
+fi
 
 	PKG_CONFIG="$TERMUX_PKG_TMPDIR/host-build-pkg-config"
 	local _HOST_PKGCONFIG=$(command -v pkg-config)
@@ -42,20 +55,17 @@ termux_step_host_build() {
 	chmod +x $PKG_CONFIG
 
 	AR=$(command -v llvm-ar)
-	CC=$(command -v $CCTERMUX_HOST_PLATFORM-clang)
-	CXX=$(command -v $CCTERMUX_HOST_PLATFORM-clang++)
 	LD=$(command -v ld.lld)
-	CFLAGS=""
 	CPPFLAGS=""
 	CXXFLAGS=""
-	LDFLAGS="-Wl,-rpath=$_INSTALL_PREFIX/lib"
+	export LDFLAGS="-Wl,-rpath=$_INSTALL_PREFIX/lib"
 	STRIP=$(command -v llvm-strip)
 	termux_setup_meson
 
 	# Compile libepoxy
 	mkdir -p libepoxy-build
 	$TERMUX_MESON $TERMUX_PKG_SRCDIR/libepoxy libepoxy-build \
-		--cross-file $TERMUX_MESON_CROSSFILE \
+		$CROSS \
 		--prefix=$_INSTALL_PREFIX \
 		--libdir lib \
 		-Degl=yes -Dglx=no -Dx11=false
@@ -64,14 +74,19 @@ termux_step_host_build() {
 	# Compile virglrenderer
 	mkdir -p virglrenderer-build
 	$TERMUX_MESON $TERMUX_PKG_SRCDIR virglrenderer-build \
-		--cross-file $TERMUX_MESON_CROSSFILE \
+		$CROSS \
 		--prefix=$_INSTALL_PREFIX \
 		--libdir lib \
-		-Dplatforms=egl
+		-Dplatforms=egl \
+		-Dvenus=true
 	ninja -C virglrenderer-build install -j $TERMUX_PKG_MAKE_PROCESSES
 
+	# i have to say everything twice as usual 
+	patchelf --set-rpath $_INSTALL_PREFIX/lib $_INSTALL_PREFIX/bin/virgl_test_server
+
 	# Move our virglrenderer binary to regular bin directory.
-	mv $_INSTALL_PREFIX/bin/virgl_test_server $TERMUX_PREFIX/bin/virgl_test_server_android
+	mkdir $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin
+	mv $_INSTALL_PREFIX/bin/virgl_test_server $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/virgl-angle
 
 	# Cleanup.
 	rm -rf $_INSTALL_PREFIX/{bin,include,lib/pkgconfig}
