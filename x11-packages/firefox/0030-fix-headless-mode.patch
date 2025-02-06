@@ -1,0 +1,31 @@
+Fixes a crash in the command "firefox -headless" when run with no X11 server present
+in all distros when firefox was built with the edge case intersection of:
+with MOZ_HAS_REMOTE, with MOZ_X11, without MOZ_ENABLE_DBUS and without MOZ_WAYLAND
+
+as described here https://github.com/termux/termux-packages/issues/22286
+and here https://bugzilla.mozilla.org/show_bug.cgi?id=1946405
+
+--- a/toolkit/components/remote/nsGTKRemoteServer.cpp
++++ b/toolkit/components/remote/nsGTKRemoteServer.cpp
+@@ -18,9 +18,7 @@
+ 
+ #include "nsGTKToolkit.h"
+ 
+-#ifdef MOZ_WAYLAND
+-#  include "mozilla/WidgetUtilsGtk.h"
+-#endif
++#include "mozilla/WidgetUtilsGtk.h"
+ 
+ nsresult nsGTKRemoteServer::Startup(const char* aAppName,
+                                     const char* aProfileName) {
+@@ -36,6 +34,10 @@ nsresult nsGTKRemoteServer::Startup(const char* aAppName,
+   }
+ #endif
+ 
++  if (!mozilla::widget::GdkIsX11Display()) {
++    return NS_ERROR_FAILURE;
++  }
++
+   XRemoteBaseStartup(aAppName, aProfileName);
+ 
+   mServerWindow = gtk_invisible_new();
