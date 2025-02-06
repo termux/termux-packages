@@ -2,12 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://fselect.rocks/
 TERMUX_PKG_DESCRIPTION="Find files with SQL-like queries"
 TERMUX_PKG_LICENSE="Apache-2.0, MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.8.8"
+TERMUX_PKG_VERSION="0.8.9"
 TERMUX_PKG_SRCURL=https://github.com/jhspetersson/fselect/archive/$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=0f586c3870a66d4a3ab7b92409dcf0f68a23bd8031ec0cc3f1622efebe190c9e
+TERMUX_PKG_SHA256=08a903e2bd7d68dff004a6552dc5823989c74ce20a96416601ce7002f6b51a7b
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_DEPENDS="openssl"
+TERMUX_PKG_DEPENDS="zlib"
 
 termux_step_pre_configure() {
 	termux_setup_cmake
