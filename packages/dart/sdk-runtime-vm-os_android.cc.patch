@@ -1,6 +1,6 @@
 --- ./sdk/runtime/vm/os_android.cc
 +++ ./sdk/runtime/vm/os_android.cc
-@@ -52,7 +52,7 @@ class PerfCodeObserver : public CodeObserver {
+@@ -53,7 +53,7 @@ class PerfCodeObserver : public CodeObserver {
        return;
      }
      intptr_t pid = getpid();
@@ -8,36 +8,4 @@
 +    char* filename = OS::SCreate(nullptr, "@TERMUX_PREFIX@/tmp/perf-%" Pd ".map", pid);
      out_file_ = (*file_open)(filename, true);
      free(filename);
-   }
-@@ -240,12 +240,12 @@ DART_NOINLINE uintptr_t OS::GetProgramCounter() {
- void OS::Print(const char* format, ...) {
-   va_list args;
-   va_start(args, format);
--  if (FLAG_android_log_to_stderr) {
-+  // if (FLAG_android_log_to_stderr) {
-     vfprintf(stderr, format, args);
--  } else {
-+  // } else {
-     // Forward to the Android log for remote access.
-     __android_log_vprint(ANDROID_LOG_INFO, "DartVM", format, args);
--  }
-+  // }
-   va_end(args);
- }
- 
-@@ -321,12 +321,12 @@ void OS::RegisterCodeObservers() {
- void OS::PrintErr(const char* format, ...) {
-   va_list args;
-   va_start(args, format);
--  if (FLAG_android_log_to_stderr) {
-+  // if (FLAG_android_log_to_stderr) {
-     vfprintf(stderr, format, args);
--  } else {
-+  // } else {
-     // Forward to the Android log for remote access.
-     __android_log_vprint(ANDROID_LOG_ERROR, "DartVM", format, args);
--  }
-+  // }
-   va_end(args);
- }
- 
+   } 
