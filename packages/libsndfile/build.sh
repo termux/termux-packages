@@ -3,16 +3,16 @@ TERMUX_PKG_DESCRIPTION="Library for reading/writing audio files"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.2.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/libsndfile/libsndfile/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=ffe12ef8add3eaca876f04087734e6e8e029350082f3251f565fa9da55b52121
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="libflac, libogg, libopus, libvorbis"
+TERMUX_PKG_DEPENDS="libflac, libmp3lame, libogg, libopus, libvorbis"
 TERMUX_PKG_BREAKS="libsndfile-dev"
 TERMUX_PKG_REPLACES="libsndfile-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-sqlite
 --disable-alsa
---disable-mpeg
 "
 TERMUX_PKG_RM_AFTER_INSTALL="bin/ share/man/man1/"
 
