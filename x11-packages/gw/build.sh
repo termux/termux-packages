@@ -3,7 +3,6 @@ TERMUX_PKG_DESCRIPTION="A browser for genomic sequencing data (.bam/.cram format
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="clealk@cardiff.ac.uk"
 TERMUX_PKG_VERSION="1.1.4"
-TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/kcleal/gw/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=ceb439bdd699810d2b2b0e265c10956045a758de4e96c3a47149f83fc451b1cd
 TERMUX_PKG_DEPENDS="glfw, htslib, libc++, libjpeg-turbo, opengl, libcurl"
