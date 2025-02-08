@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="AT and batch delayed command scheduling utility and daem
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.2.5
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_SRCURL=https://deb.debian.org/debian/pool/main/a/at/at_${TERMUX_PKG_VERSION}.orig.tar.gz
 TERMUX_PKG_SHA256=bb066b389d7c9bb9d84a35738032b85c30cba7d949f758192adc72c9477fd3b8
@@ -27,7 +28,7 @@ TERMUX_PKG_RM_AFTER_INSTALL="
 share/man/man5
 "
 
-TERMUX_PKG_SERVICE_SCRIPT=("atd" "mkdir -p $TERMUX_PREFIX/var/run && exec atd")
+TERMUX_PKG_SERVICE_SCRIPT=("atd" "mkdir -p $TERMUX_PREFIX/var/run && exec atd -f")
 
 termux_step_create_debscripts() {
 	cat <<- EOF > ./postinst
