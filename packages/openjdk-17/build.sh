@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Java development kit and runtime"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=17.0
-TERMUX_PKG_REVISION=37
+TERMUX_PKG_REVISION=38
 _COMMIT=82234f890786d49c49cf4ecbcb09c47bd9bea7ed
 TERMUX_PKG_SRCURL=https://github.com/openjdk/mobile/archive/$_COMMIT.tar.gz
 TERMUX_PKG_SHA256=5b298148a26e754120c6dfe699056d0609fc6ed92bfc858dc2ba4909ef6e791b
@@ -50,12 +50,12 @@ termux_step_configure() {
 		OBJDUMP="$OBJDUMP" \
 		STRIP="$STRIP" \
 		CXXFILT="llvm-cxxfilt" \
-		BUILD_CC="/usr/bin/clang-17" \
-		BUILD_CXX="/usr/bin/clang++-17" \
-		BUILD_NM="/usr/bin/llvm-nm-17" \
-		BUILD_AR="/usr/bin/llvm-ar-17" \
-		BUILD_OBJCOPY="/usr/bin/llvm-objcopy-17" \
-		BUILD_STRIP="/usr/bin/llvm-strip-17"
+		BUILD_CC="/usr/bin/clang-18" \
+		BUILD_CXX="/usr/bin/clang++-18" \
+		BUILD_NM="/usr/bin/llvm-nm-18" \
+		BUILD_AR="/usr/bin/llvm-ar-18" \
+		BUILD_OBJCOPY="/usr/bin/llvm-objcopy-18" \
+		BUILD_STRIP="/usr/bin/llvm-strip-18"
 }
 
 termux_step_make() {
