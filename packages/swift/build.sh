@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Swift is a high-performance system programming language"
 TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_MAINTAINER="@finagolfin"
 TERMUX_PKG_VERSION=6.0.3
+TERMUX_PKG_REVISION=1
 SWIFT_RELEASE="RELEASE"
 TERMUX_PKG_SRCURL=https://github.com/swiftlang/swift/archive/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE.tar.gz
 TERMUX_PKG_SHA256=eef9f312d00540cfabc35cb1da9221dd15d3aaca546497a14f29a641ee6484e3
@@ -12,6 +13,8 @@ TERMUX_PKG_DEPENDS="clang, libandroid-execinfo, libandroid-glob, libandroid-posi
 TERMUX_PKG_BUILD_DEPENDS="rsync"
 TERMUX_PKG_BLACKLISTED_ARCHES="i686"
 TERMUX_PKG_NO_STATICSPLIT=true
+# avoids ld.lld: error: unable to find library -lswiftCore when building locally
+TERMUX_PKG_MAKE_PROCESSES=4
 # Temporary hack only needed for x86_64
 TERMUX_PKG_UNDEF_SYMBOLS_FILES="
 ./opt/ndk-multilib/arm-linux-androideabi/lib/libFoundation.so
@@ -120,8 +123,8 @@ termux_step_host_build() {
 		# The Ubuntu CI may not have clang/clang++ in its path so explicitly set it
 		# to clang-17 instead.
 		if [ -z "$CLANG" ]; then
-			CLANG=$(command -v clang-17)
-			CLANGXX=$(command -v clang++-17)
+			CLANG=$(command -v clang-18)
+			CLANGXX=$(command -v clang++-18)
 		fi
 
 		# Natively compile llvm-tblgen and some other files needed later.
