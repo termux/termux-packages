@@ -3,12 +3,11 @@ TERMUX_PKG_DESCRIPTION="Qt 5 Web Engine Library"
 TERMUX_PKG_LICENSE="LGPL-3.0, GPL-2.0, GPL-3.0, BSD 3-Clause"
 TERMUX_PKG_LICENSE_FILE="LICENSE.LGPL3, LICENSE.GPL2, LICENSE.GPL3, LICENSE.Chromium"
 TERMUX_PKG_MAINTAINER="@licy183"
-TERMUX_PKG_VERSION="5.15.17"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="5.15.18"
 TERMUX_PKG_SRCURL=git+https://github.com/qt/qtwebengine
 TERMUX_PKG_GIT_BRANCH=v$TERMUX_PKG_VERSION-lts
 TERMUX_PKG_AUTO_UPDATE=false
-TERMUX_PKG_DEPENDS="dbus, fontconfig, libc++, libexpat, libjpeg-turbo, libminizip, libnspr, libnss, libpng, libsnappy, libvpx, libwebp, libx11, libxkbfile, qt5-qtbase, qt5-qtdeclarative, zlib"
+TERMUX_PKG_DEPENDS="dbus, fontconfig, libc++, libexpat, libjpeg-turbo, libminizip, libnspr, libnss, libopus, libpng, libsnappy, libvpx, libwebp, libx11, libxkbfile, qt5-qtbase, qt5-qtdeclarative, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libdrm, qt5-qtbase-cross-tools, qt5-qtdeclarative-cross-tools"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_HOSTBUILD=true
@@ -16,8 +15,8 @@ TERMUX_PKG_HOSTBUILD=true
 termux_step_host_build() {
 	# Generate ffmpeg headers for i686
 	mkdir -p fake-bin
-	ln -s $(command -v clang-17) fake-bin/clang
-	ln -s $(command -v clang++-17) fake-bin/clang++
+	ln -s $(command -v clang-18) fake-bin/clang
+	ln -s $(command -v clang++-18) fake-bin/clang++
 
 	# Remove python3 compatibility file preventing using newer python3 versions:
 	rm $TERMUX_PKG_SRCDIR/src/3rdparty/chromium/third_party/ffmpeg/chromium/scripts/enum.py
