@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Swift is a high-performance system programming language"
 TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_MAINTAINER="@finagolfin"
 TERMUX_PKG_VERSION=6.0.3
+TERMUX_PKG_REVISION=1
 SWIFT_RELEASE="RELEASE"
 TERMUX_PKG_SRCURL=https://github.com/swiftlang/swift/archive/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE.tar.gz
 TERMUX_PKG_SHA256=eef9f312d00540cfabc35cb1da9221dd15d3aaca546497a14f29a641ee6484e3
@@ -117,11 +118,12 @@ termux_step_host_build() {
 		local CLANG=$(command -v clang)
 		local CLANGXX=$(command -v clang++)
 
-		# The Ubuntu CI may not have clang/clang++ in its path so explicitly set it
-		# to clang-17 instead.
+		# The Ubuntu Docker image (sometimes used by CI but sometimes not)
+		# might not have clang/clang++ in its path, so explicitly set it
+		# to clang-18 if necessary.
 		if [ -z "$CLANG" ]; then
-			CLANG=$(command -v clang-17)
-			CLANGXX=$(command -v clang++-17)
+			CLANG=$(command -v clang-18)
+			CLANGXX=$(command -v clang++-18)
 		fi
 
 		# Natively compile llvm-tblgen and some other files needed later.
@@ -133,6 +135,9 @@ termux_step_host_build() {
 }
 
 termux_step_make() {
+	echo "WARNING: if you experience errors like 'ld.lld: error: unable to find library -lswiftCore',"
+	echo "then you should try setting TERMUX_PKG_MAKE_PROCESSES=4 or a lower value."
+
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 		termux_setup_swift
 		ln -sf $TERMUX_PKG_HOSTBUILD_DIR/llvm-linux-x86_64 $TERMUX_PKG_BUILDDIR/llvm-linux-x86_64
