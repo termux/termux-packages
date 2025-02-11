@@ -20,6 +20,7 @@ termux_step_pre_configure() {
 	cp -r $TERMUX_PKG_HOSTBUILD_DIR/teldrive-ui/dist $TERMUX_PKG_SRCDIR/ui/
 	termux_setup_golang
 	go install github.com/ogen-go/ogen/cmd/ogen@latest
+	sed -i 's|go run github.com/ogen-go/ogen/cmd/ogen|ogen|g' gen.go
 	go generate ./...
 }
 
