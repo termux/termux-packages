@@ -14,7 +14,7 @@ termux_step_host_build() {
 	git clone https://github.com/tgdrive/teldrive-ui && cd teldrive-ui
 	npm install
 	npm run build
-	mv dist ui/dist
+	mv dist $TERMUX_PKG_SRCDIR/ui
 }
 
 termux_step_pre_configure() {
