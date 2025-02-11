@@ -22,11 +22,12 @@ termux_step_host_build() {
 
 termux_step_pre_configure() {
 	cp -r $TERMUX_PKG_HOSTBUILD_DIR/teldrive-ui/dist $TERMUX_PKG_SRCDIR/ui/
+	rm -rf $TERMUX_PKG_HOSTBUILD_DIR/teldrive-ui/dist
 	termux_setup_golang
 }
 
 termux_step_make() {
-	go build -o teldrive -trimpath -ldflags="-checklinkname=0 -s -w -X github.com/tgdrive/teldrive/internal/version.Version=${TERMUX_PKG_VERSION} -X github.com/tgdrive/teldrive/internal/version.CommitSHA={{ .ShortCommit }}"
+	go build -o teldrive -trimpath -ldflags="-checklinkname=0 -s -w"
 }
 
 termux_step_make_install() {
