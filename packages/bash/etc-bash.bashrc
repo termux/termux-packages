@@ -12,7 +12,8 @@ export HISTCONTROL=ignoreboth
 
 # Default command line prompt.
 PROMPT_DIRTRIM=2
-PS1='\[\e[0;32m\]\w\[\e[0m\] \[\e[0;97m\]\$\[\e[0m\] '
+# Allow users to override $PS1 by passing it to the invocation of bash as an environment variable
+[[ -v PS1 ]] || PS1='\[\e[0;32m\]\w\[\e[0m\] \[\e[0;97m\]\$\[\e[0m\] '
 
 # Handles nonexistent commands.
 # If user has entered command which invokes non-available
