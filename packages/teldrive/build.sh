@@ -27,7 +27,7 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
-	go build -o teldrive -trimpath -ldflags="-checklinkname=0 -s -w"
+	go build -o teldrive -trimpath -ldflags="-s -w"
 }
 
 termux_step_make_install() {
