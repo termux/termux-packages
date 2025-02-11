@@ -11,7 +11,7 @@ TERMUX_PKG_HOSTBUILD=true
 
 termux_step_host_build() {
 	termux_setup_nodejs
-	git clone https://github.com/tgdrive/teldrive-ui && cd telrive-ui
+	git clone https://github.com/tgdrive/teldrive-ui && cd teldrive-ui
 	npm install
 	npm run build
 	mv dist ui/dist
