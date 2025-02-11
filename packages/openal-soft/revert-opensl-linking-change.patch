@@ -1,0 +1,25 @@
+Reverts the smallest required portion of https://github.com/kcat/openal-soft/commit/8767fdd42874149b011a4ec12e555bc00fd92507
+because that commit causes the sound to stop working in x11/luanti
+(both 5.10 and 5.11) (but not in any other currently known reverse dependency of openal-soft)
+
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1176,7 +1176,7 @@ if(ALSOFT_BACKEND_OPENSL)
+         set(HAVE_OPENSL 1)
+         set(ALC_OBJS  ${ALC_OBJS} alc/backends/opensl.cpp alc/backends/opensl.h)
+         set(BACKENDS  "${BACKENDS} OpenSL${IS_LINKED},")
+-        add_backend_libs(${OPENSL_LIBRARIES})
++        set(EXTRA_LIBS ${OPENSL_LIBRARIES} ${EXTRA_LIBS})
+         set(INC_PATHS ${INC_PATHS} ${OPENSL_INCLUDE_DIRS})
+     endif()
+ endif()
+--- a/alc/backends/opensl.cpp
++++ b/alc/backends/opensl.cpp
+@@ -49,6 +49,7 @@
+ #include <SLES/OpenSLES_Android.h>
+ #include <SLES/OpenSLES_AndroidConfiguration.h>
+ 
++#define HAVE_DYNLOAD 0
+ 
+ namespace {
+ 
