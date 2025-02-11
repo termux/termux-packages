@@ -9,9 +9,9 @@ TERMUX_PKG_RECOMMENDS="diffutils, xxd"
 TERMUX_PKG_CONFLICTS="vim"
 TERMUX_PKG_BREAKS="vim-python"
 TERMUX_PKG_REPLACES="vim-python"
-TERMUX_PKG_VERSION="9.1.1050"
+TERMUX_PKG_VERSION="9.1.1100"
 TERMUX_PKG_SRCURL="https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=4a76cc51a236582421e5cd35adf4f9973272624a4e3511ff8725403040026689
+TERMUX_PKG_SHA256=68606662a74e8c18560a0752f634c68477b2d63d469b3af38fd69c5e6ed5dbd6
 TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_CONFFILES="share/vim/vimrc"
@@ -58,9 +58,9 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP='\d+\.\d+\.\d{2}(5|0)0'
 
 termux_pkg_auto_update() {
-	# This auto_update function is shared by `vim`, `vim-python` and `vim-gtk`
+	# This auto_update function is shared by `vim` and `vim-gtk`
 	# If you make changes to one of them,
-	# remember to apply that change to the other two as well.
+	# remember to apply that change to the other as well.
 	local release
 	release="$(git ls-remote --tags https://github.com/vim/vim.git \
 	| grep -oP "refs/tags/v\K${TERMUX_PKG_UPDATE_VERSION_REGEXP}$" \
