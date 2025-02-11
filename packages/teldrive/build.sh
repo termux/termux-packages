@@ -14,6 +14,10 @@ termux_step_host_build() {
 	git clone https://github.com/tgdrive/teldrive-ui && cd teldrive-ui
 	npm install
 	npm run build
+	termux_setup_golang
+	pushd "${TERMUX_PKG_SRCDIR}"
+	go generate ./...
+	popd
 }
 
 termux_step_pre_configure() {
@@ -22,7 +26,6 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
-	go generate ./...
 	go build -o teldrive -trimpath -ldflags="-checklinkname=0 -s -w -X github.com/tgdrive/teldrive/internal/version.Version=${TERMUX_PKG_VERSION} -X github.com/tgdrive/teldrive/internal/version.CommitSHA=$(git rev-parse --short HEAD)"
 }
 
