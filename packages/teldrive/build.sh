@@ -19,13 +19,10 @@ termux_step_host_build() {
 termux_step_pre_configure() {
 	cp -r $TERMUX_PKG_HOSTBUILD_DIR/teldrive-ui/dist $TERMUX_PKG_SRCDIR/ui/
 	termux_setup_golang
-	go install github.com/ogen-go/ogen/cmd/ogen@latest
-	sed -i 's|go run github.com/ogen-go/ogen/cmd/ogen|ogen|g' gen.go
-	export PATH=$PATH:$(go env GOPATH)/bin
-	go generate ./...
 }
 
 termux_step_make() {
+	go generate ./...
 	go build -o teldrive -trimpath -ldflags="-checklinkname=0 -s -w -X github.com/tgdrive/teldrive/internal/version.Version=${TERMUX_PKG_VERSION} -X github.com/tgdrive/teldrive/internal/version.CommitSHA=$(git rev-parse --short HEAD)"
 }
 
