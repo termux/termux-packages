@@ -22,7 +22,7 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
-	go build -o teldrive -trimpath -ldflags="-checklinkname=0 -s -w -X github.com/tgdrive/teldrive/internal/version.Version=${TERMUX_PKG_VERSION} -X github.com/tgdrive/teldrive/internal/version.CommitSHA=$(git rev-parse --short HEAD)"
+	go build -o teldrive -trimpath -ldflags="-checklinkname=0 -s -w"
 }
 
 termux_step_make_install() {
