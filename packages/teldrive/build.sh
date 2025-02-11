@@ -19,6 +19,7 @@ termux_step_host_build() {
 termux_step_pre_configure() {
 	cp -r $TERMUX_PKG_HOSTBUILD_DIR/teldrive-ui/dist $TERMUX_PKG_SRCDIR/ui/
 	termux_setup_golang
+	go generate ./...
 }
 
 termux_step_make() {
