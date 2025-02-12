@@ -1,0 +1,11 @@
+--- a/mono/utils/mono-proclib.c
++++ b/mono/utils/mono-proclib.c
+@@ -1009,7 +1009,7 @@
+ int
+ mono_atexit (void (*func)(void))
+ {
+-#if defined(HOST_ANDROID) || !defined(HAVE_ATEXIT)
++#if !defined(HAVE_ATEXIT)
+ 	/* Some versions of android libc doesn't define atexit () */
+ 	return 0;
+ #else
