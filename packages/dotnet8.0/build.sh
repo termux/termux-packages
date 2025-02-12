@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://dotnet.microsoft.com/en-us/
 TERMUX_PKG_DESCRIPTION=".NET 8.0"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@truboxl"
-TERMUX_PKG_VERSION="8.0.12"
+TERMUX_PKG_VERSION="8.0.13"
 TERMUX_PKG_SRCURL=git+https://github.com/dotnet/dotnet
 TERMUX_PKG_GIT_BRANCH="v${TERMUX_PKG_VERSION}"
 TERMUX_PKG_BUILD_DEPENDS="krb5, libicu, openssl, zlib"
@@ -146,6 +146,8 @@ termux_step_make() {
 		-- \
 		/p:Configuration=${CONFIG} \
 		/p:OverrideTargetRid=linux-bionic-${arch}
+
+	"${TERMUX_PKG_BUILDDIR}/.dotnet/dotnet" build-server shutdown
 }
 
 termux_step_make_install() {
