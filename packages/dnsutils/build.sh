@@ -1,11 +1,11 @@
-TERMUX_PKG_HOMEPAGE=https://www.isc.org/downloads/bind/
+TERMUX_PKG_HOMEPAGE=https://www.isc.org/bind/
 TERMUX_PKG_DESCRIPTION="Clients provided with BIND"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=9.20.4
-TERMUX_PKG_SRCURL="https://ftp.isc.org/isc/bind9/${TERMUX_PKG_VERSION}/bind-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=3a8e1a05e00e3e9bc02bdffded7862faf7726ba76ba997f42ab487777bd8210b
-TERMUX_PKG_DEPENDS="openssl, readline, resolv-conf, zlib, libuv, liburcu, libcap, libandroid-glob, libnghttp2"
+TERMUX_PKG_VERSION="9.20.5"
+TERMUX_PKG_SRCURL="https://downloads.isc.org/isc/bind9/${TERMUX_PKG_VERSION}/bind-${TERMUX_PKG_VERSION}.tar.xz"
+TERMUX_PKG_SHA256=19274fd739c023772b4212a0b6c201cf4364855fa7e6a7d3db49693f55db1ab8
+TERMUX_PKG_DEPENDS="json-c, libandroid-glob, libcap, libnghttp2, liburcu, libuv, libxml2, openssl, readline, resolv-conf, zlib"
 TERMUX_PKG_BREAKS="dnsutils-dev"
 TERMUX_PKG_REPLACES="dnsutils-dev"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -15,6 +15,8 @@ ax_cv_have_func_attribute_constructor=yes
 ax_cv_have_func_attribute_destructor=yes
 lt_cv_prog_compiler_pic_works=yes
 --disable-static
+--with-json-c
+--with-libxml2
 "
 
 termux_step_pre_configure() {
