@@ -1,12 +1,15 @@
 --- a/xmake/beamer.lua
 +++ b/xmake/beamer.lua
-@@ -105,6 +105,9 @@
+@@ -105,6 +105,12 @@
      add_packages("s7")
      add_packages("pdfhummus")
      add_packages("libgit2")
 +    add_packages("tree-sitter")
 +    add_packages("tree-sitter-cpp")
 +    add_packages("tree-sitter-scheme")
++    if not is_plat("wasm") then
++        add_packages("cpptrace")
++    end
      if not is_plat("macosx") then
          add_packages("libiconv")
      end

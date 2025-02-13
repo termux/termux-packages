@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/XmacsLabs/mogan
 TERMUX_PKG_DESCRIPTION="A structure editor forked from GNU TeXmacs"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.2.9.6"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="1.2.9.8"
 TERMUX_PKG_SRCURL=https://github.com/XmacsLabs/mogan/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=2abe0b07baed1950119e95163a451e5eb0478839da5fcb864c38c83d473ed9aa
+TERMUX_PKG_SHA256=70af74dad16816a8097b877dc4cd94202f35517468ab54f6ae6f84ede32746fb
 TERMUX_PKG_DEPENDS="freetype, ghostscript, libandroid-complex-math, libandroid-execinfo, libandroid-spawn, libandroid-wordexp, libc++, libcurl, libgit2, libiconv, libjpeg-turbo, libpng, qt6-qtbase, qt6-qtsvg, zlib"
 TERMUX_PKG_BUILD_DEPENDS="qt6-qtbase-cross-tools"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -81,8 +80,7 @@ termux_step_make() {
 		--yes \
 		--verbose \
 		--diagnosis \
-		--jobs="${TERMUX_PKG_MAKE_PROCESSES}" \
-		--all
+		--jobs="${TERMUX_PKG_MAKE_PROCESSES}"
 }
 
 termux_step_make_install() {

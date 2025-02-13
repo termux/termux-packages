@@ -1,16 +1,15 @@
 --- a/s7.c
 +++ b/s7.c
-@@ -404,6 +404,13 @@
-     #endif
-   #endif
+@@ -393,6 +393,12 @@
+ #endif
  
-+  #ifndef clog
-+  double complex clog(double complex);
-+  #endif
-+  #ifndef cpow
-+  double complex cpow(double complex, double complex);
-+  #endif
-+
-   #ifndef CMPLX
-     #if (!(defined(__cplusplus))) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 7)) && !defined(__INTEL_COMPILER)
-       #define CMPLX(x, y) __builtin_complex ((double) (x), (double) (y))
+ #include "s7.h"
++#ifndef clog
++double complex clog(double complex);
++#endif
++#ifndef cpow
++double complex cpow(double complex, double complex);
++#endif
+ 
+ /* there is also apparently __STDC_NO_COMPLEX__ */
+ #if HAVE_COMPLEX_NUMBERS

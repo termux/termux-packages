@@ -1,12 +1,15 @@
 --- a/xmake/draw.lua
 +++ b/xmake/draw.lua
-@@ -39,6 +39,9 @@
+@@ -39,6 +39,12 @@
      add_packages("moebius")
      add_packages("freetype")
      add_packages("s7")
 +    add_packages("tree-sitter")
 +    add_packages("tree-sitter-cpp")
 +    add_packages("tree-sitter-scheme")
++    if not is_plat("wasm") then
++        add_packages("cpptrace")
++    end
      if is_plat("wasm") then
          add_rules("qt.widgetapp_static")
      else
