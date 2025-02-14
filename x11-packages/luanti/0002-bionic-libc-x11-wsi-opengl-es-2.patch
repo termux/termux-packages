@@ -17,6 +17,22 @@ including:
 - Reduced default graphics settings
 - Preexisting Bionic-libc porting code like threading using calls to pthread_kill() in place of pthread_cancel()
 - there might be other things not listed
+
+For maintainers - how to bump this patch checklist, for avoiding bitrot:
+
+- open the source code of the current Luanti release, and count the number of instances of the string 'ANDROID' in all-caps
+- open the source code of the next Luanti release side-by-side, and count the number of instances of the string 'ANDROID' there
+- match up all ~120 instances of the string 'ANDROID' that are untouched between the releases, and ignore them
+- if any instances of the string have been added, removed, or heavily modified, consider each change one by one and decide whether
+    to leave it enabled, or disable it
+- use git blame (commit history) of the luanti repository to learn important context including commit messages and bug reports
+    written by the Luanti upstream developers
+- remember, in particular, that Termux:X11 usually behaves similarly to the way Xorg does on a Touchscreen Linux Laptop,
+    and therefore, it is unlikely to trigger application bugs specific to SurfaceFlinger (ANativeWindow) or Wayland,
+	but is likely to instead trigger application bugs that upstream tracks as specific to Xorg
+- test the results by trying to activate gameplay codepaths that enter the blocks of code surrounding the areas where the new instances
+    of 'ANDROID' strings were found
+
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -90,7 +90,7 @@ set(ENABLE_UPDATE_CHECKER (NOT ${DEVELOPMENT_BUILD}) CACHE BOOL
@@ -30,16 +46,16 @@ including:
  endif()
 --- a/irr/src/CIrrDeviceSDL.cpp
 +++ b/irr/src/CIrrDeviceSDL.cpp
-@@ -305,7 +305,7 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters &param) :
- #endif
- 
+@@ -254,7 +254,7 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters &param) :
+ 		IsInBackground(false)
+ {
  	if (++SDLDeviceInstances == 1) {
 -#ifdef __ANDROID__
 +#ifdef DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK
  		// Blocking on pause causes problems with multiplayer.
- 		// See https://github.com/minetest/minetest/issues/10842.
+ 		// see <https://github.com/luanti-org/luanti/issues/10842>
  		SDL_SetHint(SDL_HINT_ANDROID_BLOCK_ON_PAUSE, "0");
-@@ -794,7 +794,7 @@ bool CIrrDeviceSDL::run()
+@@ -743,7 +743,7 @@ bool CIrrDeviceSDL::run()
  #endif
  
  			auto button = SDL_event.button.button;
@@ -50,7 +66,7 @@ including:
  			// vendor/device-specific.
 --- a/irr/src/CIrrDeviceSDL.h
 +++ b/irr/src/CIrrDeviceSDL.h
-@@ -161,7 +161,7 @@ class CIrrDeviceSDL : public CIrrDeviceStub
+@@ -164,7 +164,7 @@ class CIrrDeviceSDL : public CIrrDeviceStub
  		//! Sets the new position of the cursor.
  		void setPosition(s32 x, s32 y) override
  		{
@@ -61,16 +77,16 @@ including:
  			SDL_WarpMouseInWindow(Device->Window,
 --- a/irr/src/CMakeLists.txt
 +++ b/irr/src/CMakeLists.txt
-@@ -61,7 +61,7 @@ if(WIN32)
+@@ -59,7 +59,7 @@ if(WIN32)
  elseif(APPLE)
- 	add_definitions(-D_IRR_OSX_PLATFORM_)
+ 	add_compile_definitions(_IRR_OSX_PLATFORM_)
  	set(DEVICE "OSX")
 -elseif(ANDROID)
 +elseif(DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK)
- 	add_definitions(-D_IRR_ANDROID_PLATFORM_)
+ 	add_compile_definitions(_IRR_ANDROID_PLATFORM_)
  	if(NOT USE_SDL2)
  		message(FATAL_ERROR "The Android build requires SDL2")
-@@ -216,7 +216,7 @@ if(ENABLE_OPENGL)
+@@ -220,7 +220,7 @@ if(ENABLE_OPENGL)
  	find_package(OpenGL REQUIRED)
  endif()
  if(USE_SDL2)
@@ -79,7 +95,7 @@ including:
  		find_package(SDL2 REQUIRED)
  	else()
  		# provided by AndroidLibs.cmake
-@@ -263,7 +263,7 @@ endif()
+@@ -267,7 +267,7 @@ endif()
  
  # Platform-specific libs
  
@@ -88,7 +104,7 @@ including:
  	enable_language(C)
  elseif(APPLE)
  	find_library(COCOA_LIB Cocoa REQUIRED)
-@@ -498,7 +498,6 @@ target_link_libraries(IrrlichtMt PRIVATE
+@@ -502,7 +502,6 @@ target_link_libraries(IrrlichtMt PRIVATE
  	${EGL_LIBRARY}
  
  	# incl. transitive SDL2 dependencies for static linking
@@ -96,7 +112,7 @@ including:
  	${COCOA_LIB}
  	${IOKIT_LIB}
  	"$<$<PLATFORM_ID:Windows>:gdi32>"
-@@ -513,6 +512,6 @@ endif()
+@@ -517,6 +516,6 @@ endif()
  if(CMAKE_BUILD_TYPE STREQUAL "Debug")
  	target_compile_definitions(IrrlichtMt INTERFACE _DEBUG) # same
  endif()
@@ -117,25 +133,25 @@ including:
  
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -329,7 +329,7 @@ else()
- 		set(PLATFORM_LIBS ${PLATFORM_LIBS} network)
+@@ -345,7 +345,7 @@ else()
+ 		list(APPEND PLATFORM_LIBS network)
  	endif()
  
 -	if (ANDROID)
 +	if (DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK)
- 		set(PLATFORM_LIBS ${PLATFORM_LIBS} android log)
+ 		list(APPEND PLATFORM_LIBS android log)
  	endif()
  endif()
-@@ -467,7 +467,7 @@ set(common_SRCS
+@@ -482,7 +482,7 @@ set(common_SRCS
  	${server_network_SRCS}
  )
  
 -if(ANDROID)
 +if(DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK)
- 	set(common_SRCS ${common_SRCS} porting_android.cpp)
+ 	list(APPEND common_SRCS porting_android.cpp)
  endif()
  
-@@ -558,7 +558,6 @@ include_directories(SYSTEM
+@@ -572,7 +572,6 @@ include_directories(SYSTEM
  	${LUA_BIT_INCLUDE_DIR}
  	# on Android, Luanti depends on SDL2 directly
  	# on other platforms, only IrrlichtMt depends on SDL2
@@ -143,7 +159,7 @@ including:
  )
  
  if(USE_GETTEXT)
-@@ -608,7 +607,7 @@ endif()
+@@ -625,7 +624,7 @@ endif()
  
  if(BUILD_CLIENT)
  	# client target
@@ -152,7 +168,7 @@ including:
  		add_library(${PROJECT_NAME} SHARED)
  	else()
  		add_executable(${PROJECT_NAME})
-@@ -1042,7 +1041,7 @@ macro(CreateLegacyAlias _cmake_target _old_path _new_name)
+@@ -1065,7 +1064,7 @@ macro(CreateLegacyAlias _cmake_target _old_path _new_name)
  	install(PROGRAMS "${_old_path}" DESTINATION ${BINDIR})
  endmacro()
  
@@ -161,7 +177,7 @@ including:
  	install(TARGETS ${PROJECT_NAME}
  		RUNTIME DESTINATION ${BINDIR}
  		LIBRARY DESTINATION ${BINDIR}
-@@ -1080,7 +1079,7 @@ if(BUILD_SERVER)
+@@ -1103,7 +1102,7 @@ if(BUILD_SERVER)
  	endif()
  endif()
  
@@ -172,16 +188,7 @@ including:
  elseif (USE_GETTEXT)
 --- a/src/client/game.cpp
 +++ b/src/client/game.cpp
-@@ -151,7 +151,7 @@ struct LocalFormspecHandler : public TextDest
- 
- 			if (fields.find("btn_exit_os") != fields.end()) {
- 				g_gamecallback->exitToOS();
--#ifndef __ANDROID__
-+#ifndef DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK
- 				RenderingEngine::get_raw_device()->closeDevice();
- #endif
- 				return;
-@@ -800,7 +800,7 @@ class Game {
+@@ -631,7 +631,7 @@ class Game {
  		return input->wasKeyReleased(k);
  	}
  
@@ -190,7 +197,7 @@ including:
  	void handleAndroidChatInput();
  #endif
  
-@@ -944,7 +944,7 @@ class Game {
+@@ -774,7 +774,7 @@ class Game {
  	inline bool isTouchCrosshairDisabled() {
  		return !m_touch_use_crosshair && camera->getCameraMode() == CAMERA_MODE_FIRST;
  	}
@@ -199,25 +206,34 @@ including:
  	bool m_android_chat_open;
  #endif
  
-@@ -2032,7 +2032,7 @@ void Game::processUserInput(f32 dtime)
+@@ -902,7 +902,7 @@ bool Game::startup(bool *kill,
+ 	// In principle we could always enable relative mouse mode, but it causes weird
+ 	// bugs on some setups (e.g. #14932), so we enable it only when it's required.
+ 	// That is: on Wayland or Android, because it does not support mouse repositioning
+-#ifdef __ANDROID__
++#ifdef DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK
+ 	m_enable_relative_mode = true;
+ #else
+ 	m_enable_relative_mode = device->isUsingWayland();
+@@ -1827,7 +1827,7 @@ void Game::processUserInput(f32 dtime)
  	// Input handler step() (used by the random input generator)
  	input->step(dtime);
  
 -#ifdef __ANDROID__
 +#ifdef DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK
- 	auto formspec = m_game_ui->getFormspecGUI();
- 	if (formspec)
- 		formspec->getAndroidUIInput();
-@@ -2063,7 +2063,7 @@ void Game::processKeyInput()
+ 	if (!m_game_formspec.handleAndroidUIInput())
+ 		handleAndroidChatInput();
+ #endif
+@@ -1855,7 +1855,7 @@ void Game::processKeyInput()
  	} else if (wasKeyDown(KeyType::INVENTORY)) {
- 		openInventory();
+ 		m_game_formspec.showPlayerInventory();
  	} else if (input->cancelPressed()) {
 -#ifdef __ANDROID__
 +#ifdef DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK
  		m_android_chat_open = false;
  #endif
  		if (!gui_chat_console->isOpenInhibited()) {
-@@ -2278,7 +2278,7 @@ void Game::openConsole(float scale, const wchar_t *line)
+@@ -2019,7 +2019,7 @@ void Game::openConsole(float scale, const wchar_t *line)
  {
  	assert(scale > 0.0f && scale <= 1.0f);
  
@@ -226,7 +242,7 @@ including:
  	if (!porting::hasPhysicalKeyboardAndroid()) {
  		porting::showTextInputDialog("", "", 2);
  		m_android_chat_open = true;
-@@ -2291,12 +2291,12 @@ void Game::openConsole(float scale, const wchar_t *line)
+@@ -2032,12 +2032,12 @@ void Game::openConsole(float scale, const wchar_t *line)
  		gui_chat_console->setCloseOnEnter(true);
  		gui_chat_console->replaceAndAddToHistory(line);
  	}
@@ -241,18 +257,49 @@ including:
  void Game::handleAndroidChatInput()
  {
  	// It has to be a text input
-@@ -4504,7 +4504,7 @@ void Game::showPauseMenu()
- 		os << "field[4.95,0;5,1.5;;" << strgettext("Game paused") << ";]";
- 	}
+--- a/src/client/game_formspec.cpp
++++ b/src/client/game_formspec.cpp
+@@ -113,7 +113,7 @@ struct HardcodedPauseFormspecHandler : public TextDest
+ 
+ 		if (fields.find("btn_exit_os") != fields.end()) {
+ 			g_gamecallback->exitToOS();
+-#ifndef __ANDROID__
++#ifndef DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK
+ 			RenderingEngine::get_raw_device()->closeDevice();
+ #endif
+ 			return;
+@@ -385,7 +385,7 @@ void GameFormSpec::showPauseMenu()
+ 	os	<< "button_exit[4," << (ypos++) << ";3,0.5;btn_settings;"
+ 		<< strgettext("Settings") << "]";
  
 -#ifndef __ANDROID__
 +#ifndef DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK
  #if USE_SOUND
- 	if (g_settings->getBool("enable_sound")) {
- 		os << "button_exit[4," << (ypos++) << ";3,0.5;btn_sound;"
+ 	os << "button_exit[4," << (ypos++) << ";3,0.5;btn_sound;"
+ 		<< strgettext("Sound Volume") << "]";
+@@ -563,7 +563,7 @@ bool GameFormSpec::handleCallbacks()
+ 	return true;
+ }
+ 
+-#ifdef __ANDROID__
++#ifdef DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK
+ bool GameFormSpec::handleAndroidUIInput()
+ {
+ 	if (m_formspec) {
+--- a/src/client/game_formspec.h
++++ b/src/client/game_formspec.h
+@@ -44,7 +44,7 @@ struct GameFormSpec
+ 
+ 	bool handleCallbacks();
+ 
+-#ifdef __ANDROID__
++#ifdef DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK
+ 	// Returns false if no formspec open
+ 	bool handleAndroidUIInput();
+ #endif
 --- a/src/client/hud.cpp
 +++ b/src/client/hud.cpp
-@@ -393,7 +393,7 @@ void Hud::drawLuaElements(const v3s16 &camera_offset)
+@@ -385,7 +385,7 @@ void Hud::drawLuaElements(const v3s16 &camera_offset)
  				if (e->size.X > 0)
  					font_size *= e->size.X;
  
@@ -263,7 +310,7 @@ including:
  				if (font_size > 3 && e->offset.X < -20)
 --- a/src/client/renderingengine.cpp
 +++ b/src/client/renderingengine.cpp
-@@ -163,7 +163,7 @@ RenderingEngine::RenderingEngine(MyEventReceiver *receiver)
+@@ -162,7 +162,7 @@ RenderingEngine::RenderingEngine(MyEventReceiver *receiver)
  
  	// Resolution selection
  	bool fullscreen = g_settings->getBool("fullscreen");
@@ -272,7 +319,7 @@ including:
  	u16 screen_w = 0, screen_h = 0;
  	bool window_maximized = false;
  #else
-@@ -328,7 +328,7 @@ void RenderingEngine::draw_load_screen(const std::wstring &text,
+@@ -330,7 +330,7 @@ void RenderingEngine::draw_load_screen(const std::wstring &text,
  				tsrc->getTexture("progress_bar_bg.png");
  
  		if (progress_img && progress_img_bg) {
@@ -281,7 +328,7 @@ including:
  			const core::dimension2d<u32> &img_size =
  					progress_img_bg->getSize();
  			float density = g_settings->getFloat("gui_scaling", 0.5f, 20.0f) *
-@@ -419,14 +419,14 @@ const VideoDriverInfo &RenderingEngine::getVideoDriverInfo(irr::video::E_DRIVER_
+@@ -421,7 +421,7 @@ const VideoDriverInfo &RenderingEngine::getVideoDriverInfo(irr::video::E_DRIVER_
  float RenderingEngine::getDisplayDensity()
  {
  	float user_factor = g_settings->getFloat("display_density_factor", 0.5f, 5.0f);
@@ -290,18 +337,9 @@ including:
  	float dpi = get_raw_device()->getDisplayDensity();
  	if (dpi == 0.0f)
  		dpi = 96.0f;
- 	return std::max(dpi / 96.0f * user_factor, 0.5f);
--#else // __ANDROID__
-+#else // DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK
- 	return porting::getDisplayDensity() * user_factor;
--#endif // __ANDROID__
-+#endif // DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK
- }
- 
- void RenderingEngine::autosaveScreensizeAndCo(
 --- a/src/defaultsettings.cpp
 +++ b/src/defaultsettings.cpp
-@@ -401,7 +401,7 @@ void set_default_settings()
+@@ -397,7 +397,7 @@ void set_default_settings()
  	settings->setDefault("contentdb_enable_updates_indicator", "true");
  	settings->setDefault("contentdb_max_concurrent_downloads", "3");
  
@@ -310,7 +348,7 @@ including:
  	settings->setDefault("contentdb_flag_blacklist", "nonfree, android_default");
  #else
  	settings->setDefault("contentdb_flag_blacklist", "nonfree, desktop_default");
-@@ -553,9 +553,6 @@ void set_default_settings()
+@@ -548,9 +548,6 @@ void set_default_settings()
  	settings->setDefault("touch_punch_gesture", "short_tap");
  	settings->setDefault("clickable_chat_weblinks", "true");
  	// Altered settings for Android
@@ -320,9 +358,9 @@ including:
  	settings->setDefault("performance_tradeoffs", "true");
  	settings->setDefault("max_simultaneous_block_sends_per_client", "10");
  	settings->setDefault("emergequeue_limit_diskonly", "16");
-@@ -570,6 +567,9 @@ void set_default_settings()
- 	settings->setDefault("enable_post_processing", "false");
+@@ -569,6 +566,9 @@ void set_default_settings()
  	settings->setDefault("debanding", "false");
+ 	settings->setDefault("post_processing_texture_bits", "8");
  	settings->setDefault("curl_verify_cert", "false");
 +#ifdef DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK
 +	settings->setDefault("screen_w", "0");
@@ -343,7 +381,7 @@ including:
  	return DIR_DELIM "tmp";
 --- a/src/gui/guiEngine.cpp
 +++ b/src/gui/guiEngine.cpp
-@@ -375,7 +375,7 @@ void GUIEngine::run()
+@@ -376,7 +376,7 @@ void GUIEngine::run()
  		sound_volume_control(m_sound_manager.get(), device->isWindowActive());
  		m_sound_manager->step(dtime);
  
@@ -407,7 +445,7 @@ including:
  	porting::AndroidDialogState dialogState = getAndroidUIInputState();
 --- a/src/gui/guiPasswordChange.h
 +++ b/src/gui/guiPasswordChange.h
-@@ -44,7 +44,7 @@ class GUIPasswordChange : public GUIModalMenu
+@@ -43,7 +43,7 @@ class GUIPasswordChange : public GUIModalMenu
  	bool processInput();
  
  	bool OnEvent(const SEvent &event);
@@ -447,16 +485,16 @@ including:
  	// No dialog is shown
 --- a/src/gui/modalMenu.h
 +++ b/src/gui/modalMenu.h
-@@ -7,7 +7,7 @@
- #include "irrlichttypes_extrabloated.h"
+@@ -9,7 +9,7 @@
  #include "irr_ptr.h"
+ 
  #include "util/string.h"
 -#ifdef __ANDROID__
 +#ifdef DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK
  	#include <porting_android.h>
  #endif
  
-@@ -49,7 +49,7 @@ class GUIModalMenu : public gui::IGUIElement
+@@ -51,7 +51,7 @@ class GUIModalMenu : public gui::IGUIElement
  	virtual bool preprocessEvent(const SEvent &event);
  	virtual bool OnEvent(const SEvent &event) { return false; };
  	virtual bool pausesGame() { return false; } // Used for pause menu
@@ -465,7 +503,7 @@ including:
  	virtual void getAndroidUIInput() {};
  	porting::AndroidDialogState getAndroidUIInputState();
  #endif
-@@ -66,7 +66,7 @@ class GUIModalMenu : public gui::IGUIElement
+@@ -68,7 +68,7 @@ class GUIModalMenu : public gui::IGUIElement
  
  	v2u32 m_screensize_old;
  	float m_gui_scale;
@@ -524,7 +562,7 @@ including:
  #else
 --- a/src/main.cpp
 +++ b/src/main.cpp
-@@ -543,7 +543,7 @@ static bool create_userdata_path()
+@@ -544,7 +544,7 @@ static bool create_userdata_path()
  {
  	bool success;
  
@@ -533,7 +571,7 @@ including:
  	if (!fs::PathExists(porting::path_user)) {
  		success = fs::CreateDir(porting::path_user);
  	} else {
-@@ -596,7 +596,7 @@ namespace {
+@@ -597,7 +597,7 @@ namespace {
  
  static bool use_debugger(int argc, char *argv[])
  {
@@ -589,7 +627,7 @@ including:
  	sanity_check(!path_cache.empty());
  #  elif defined(_WIN32)
  	path_cache = path_user + DIR_DELIM + "cache";
-@@ -761,7 +761,7 @@ bool secure_rand_fill_buf(void *buf, size_t len)
+@@ -765,7 +765,7 @@ bool secure_rand_fill_buf(void *buf, size_t len)
  
  #endif
  
@@ -598,7 +636,7 @@ including:
  
  void osSpecificInit()
  {
-@@ -860,7 +860,7 @@ int mt_snprintf(char *buf, const size_t buf_size, const char *fmt, ...)
+@@ -864,7 +864,7 @@ int mt_snprintf(char *buf, const size_t buf_size, const char *fmt, ...)
  	return c;
  }
  
@@ -607,7 +645,7 @@ including:
  // defined in porting_android.cpp
  extern void openURIAndroid(const char *url);
  #endif
-@@ -874,7 +874,7 @@ static bool open_uri(const std::string &uri)
+@@ -878,7 +878,7 @@ static bool open_uri(const std::string &uri)
  
  #if defined(_WIN32)
  	return (intptr_t)ShellExecuteA(NULL, NULL, uri.c_str(), NULL, NULL, SW_SHOWNORMAL) > 32;
@@ -618,7 +656,7 @@ including:
  #elif defined(__APPLE__)
 --- a/src/porting.h
 +++ b/src/porting.h
-@@ -326,6 +326,6 @@ bool open_directory(const std::string &path);
+@@ -344,6 +344,6 @@ bool open_directory(const std::string &path);
  
  } // namespace porting
  
@@ -650,23 +688,23 @@ including:
  
 --- a/src/script/lua_api/l_mainmenu.cpp
 +++ b/src/script/lua_api/l_mainmenu.cpp
-@@ -1076,7 +1076,7 @@ int ModApiMainMenu::l_open_dir(lua_State *L)
- /******************************************************************************/
- int ModApiMainMenu::l_share_file(lua_State *L)
- {
+@@ -1004,7 +1004,7 @@ int ModApiMainMenu::l_share_file(lua_State *L)
+ 
+ 	CHECK_SECURE_PATH(L, path, false)
+ 
 -#ifdef __ANDROID__
 +#ifdef DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK
- 	std::string path = luaL_checkstring(L, 1);
  	porting::shareFileAndroid(path);
  	lua_pushboolean(L, true);
+ #else
 --- a/src/server.cpp
 +++ b/src/server.cpp
-@@ -3100,7 +3100,7 @@ std::wstring Server::handleChat(const std::string &name,
+@@ -3114,7 +3114,7 @@ std::wstring Server::handleChat(const std::string &name,
  			Workaround for fixing chat on Android. Lua doesn't handle
  			the Cyrillic alphabet and some characters on older Android devices
  		*/
 -#ifdef __ANDROID__
-+#ifdef DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK
++#ifdef DISABLING_THIS_BECAUSE_IT_IS_FOR_ANDROID_4
  		line += L"<" + utf8_to_wide(name) + L"> " + wmessage;
  #else
  		line += utf8_to_wide(m_script->formatChatMessage(name, message));
