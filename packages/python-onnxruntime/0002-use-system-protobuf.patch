@@ -10,18 +10,17 @@
 -  URL ${DEP_URL_protobuf}
 -  URL_HASH SHA1=${DEP_SHA1_protobuf}
 -  PATCH_COMMAND ${ONNXRUNTIME_PROTOBUF_PATCH_COMMAND}
--  FIND_PACKAGE_ARGS 3.21.12 NAMES Protobuf
+-  FIND_PACKAGE_ARGS NAMES Protobuf protobuf
 -)
 +find_package(Protobuf REQUIRED)
  
  set(protobuf_BUILD_TESTS OFF CACHE BOOL "Build protobuf tests" FORCE)
  #TODO: we'd better to turn the following option off. However, it will cause
-@@ -397,7 +390,7 @@
- # protobuf's cmake/utf8_range.cmake has the following line
- include_directories(${utf8_range_SOURCE_DIR})
+@@ -239,7 +232,6 @@
+ include(protobuf_function)
+ #protobuf end
  
--onnxruntime_fetchcontent_makeavailable(Protobuf nlohmann_json mp11 re2 GSL flatbuffers ${ONNXRUNTIME_CPUINFO_PROJ} ${ONNXRUNTIME_CLOG_PROJ})
-+onnxruntime_fetchcontent_makeavailable(nlohmann_json mp11 re2 GSL flatbuffers ${ONNXRUNTIME_CPUINFO_PROJ} ${ONNXRUNTIME_CLOG_PROJ})
- if(NOT flatbuffers_FOUND)
-   if(NOT TARGET flatbuffers::flatbuffers)
-     add_library(flatbuffers::flatbuffers ALIAS flatbuffers)
+-onnxruntime_fetchcontent_makeavailable(Protobuf)
+ if(Protobuf_FOUND)
+   message(STATUS "Protobuf version: ${Protobuf_VERSION}")
+ else()

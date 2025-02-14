@@ -2,6 +2,15 @@ This reverts f70215d4e6af2a1b5a0cc232460e2f86125b055d
 
 --- a/cmake/external/abseil-cpp.cmake
 +++ b/cmake/external/abseil-cpp.cmake
+@@ -27,7 +27,7 @@
+     URL ${DEP_URL_abseil_cpp}
+     URL_HASH SHA1=${DEP_SHA1_abseil_cpp}
+     PATCH_COMMAND ${ABSL_PATCH_COMMAND}
+-    FIND_PACKAGE_ARGS 20240722 NAMES absl
++    FIND_PACKAGE_ARGS NAMES absl
+ )
+ 
+ onnxruntime_fetchcontent_makeavailable(abseil_cpp)
 @@ -50,96 +50,46 @@
  # TODO: since multiple ORT's dependencies depend on Abseil, the list below would vary from version to version.
  # We'd better to not manually manage the list.
@@ -129,6 +138,5 @@ This reverts f70215d4e6af2a1b5a0cc232460e2f86125b055d
 -absl::charset
 -absl::endian
 -absl::config)
-\ No newline at end of file
 +absl::time
 +absl::time_zone)
