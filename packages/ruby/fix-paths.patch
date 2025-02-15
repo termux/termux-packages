@@ -75,44 +75,6 @@ diff -uNr ruby-3.0.0/hash.c ruby-3.0.0.mod/hash.c
                      if ((fp = fopen(fname, "w")) == NULL) rb_bug("fopen");
                  }
  
-diff -uNr ruby-3.0.0/lib/drb/gw.rb ruby-3.0.0.mod/lib/drb/gw.rb
---- ruby-3.0.0/lib/drb/gw.rb	2020-12-25 05:33:01.000000000 +0200
-+++ ruby-3.0.0.mod/lib/drb/gw.rb	2021-02-09 17:35:46.039359196 +0200
-@@ -99,8 +99,8 @@
- 
- front = DRb::GW.new
- 
--s1 = DRb::DRbServer.new('drbunix:/tmp/gw_b_a', front)
--s2 = DRb::DRbServer.new('drbunix:/tmp/gw_b_c', front)
-+s1 = DRb::DRbServer.new('drbunix:@TERMUX_PREFIX@/tmp/gw_b_a', front)
-+s2 = DRb::DRbServer.new('drbunix:@TERMUX_PREFIX@/tmp/gw_b_c', front)
- 
- s1.thread.join
- s2.thread.join
-@@ -131,9 +131,9 @@
- require 'foo'
- 
- obj = Foo.new('a')
--DRb.start_service("drbunix:/tmp/gw_a", obj)
-+DRb.start_service("drbunix:@TERMUX_PREFIX@/tmp/gw_a", obj)
- 
--robj = DRbObject.new_with_uri('drbunix:/tmp/gw_b_a')
-+robj = DRbObject.new_with_uri('drbunix:@TERMUX_PREFIX@/tmp/gw_b_a')
- robj[:a] = obj
- 
- DRb.thread.join
-@@ -146,9 +146,9 @@
- 
- foo = Foo.new('c', nil)
- 
--DRb.start_service("drbunix:/tmp/gw_c", nil)
-+DRb.start_service("drbunix:@TERMUX_PREFIX@/tmp/gw_c", nil)
- 
--robj = DRbObject.new_with_uri("drbunix:/tmp/gw_b_c")
-+robj = DRbObject.new_with_uri("drbunix:@TERMUX_PREFIX@/tmp/gw_b_c")
- 
- puts "c->b"
- a = robj[:a]
 diff -uNr ruby-3.0.0/lib/mkmf.rb ruby-3.0.0.mod/lib/mkmf.rb
 --- ruby-3.0.0/lib/mkmf.rb	2020-12-25 05:33:01.000000000 +0200
 +++ ruby-3.0.0.mod/lib/mkmf.rb	2021-02-09 17:35:46.039359196 +0200
@@ -234,15 +196,3 @@ diff -uNr ruby-3.0.0/st.c ruby-3.0.0.mod/st.c
      if (f == NULL)
          return;
      fprintf(f, "collision: %d / %d (%6.2f)\n", collision.all, collision.total,
-diff -uNr ruby-3.0.0/tool/lib/webrick/config.rb ruby-3.0.0.mod/tool/lib/webrick/config.rb
---- ruby-3.0.0/tool/lib/webrick/config.rb	2020-12-25 05:33:01.000000000 +0200
-+++ ruby-3.0.0.mod/tool/lib/webrick/config.rb	2021-02-09 17:35:46.043359300 +0200
-@@ -35,7 +35,7 @@
-       :Logger         => nil,   # default: WEBrick::Log.new
-       :ServerSoftware => "WEBrick/#{WEBrick::VERSION} " +
-                          "(Ruby/#{RUBY_VERSION}/#{RUBY_RELEASE_DATE})",
--      :TempDir        => ENV['TMPDIR']||ENV['TMP']||ENV['TEMP']||'/tmp',
-+      :TempDir        => ENV['TMPDIR']||ENV['TMP']||ENV['TEMP']||'@TERMUX_PREFIX@/tmp',
-       :DoNotListen    => false,
-       :StartCallback  => nil,
-       :StopCallback   => nil,

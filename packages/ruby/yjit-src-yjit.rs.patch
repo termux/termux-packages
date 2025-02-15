@@ -1,10 +1,10 @@
-diff -u -r ../ruby-3.3.2/yjit/src/yjit.rs ./yjit/src/yjit.rs
---- ../ruby-3.3.2/yjit/src/yjit.rs	2024-05-30 00:23:11.000000000 +0000
-+++ ./yjit/src/yjit.rs	2024-06-10 02:07:42.975768949 +0000
-@@ -66,7 +66,7 @@
+diff -u -r ../ruby-3.4.1/yjit/src/yjit.rs ./yjit/src/yjit.rs
+--- ../ruby-3.4.1/yjit/src/yjit.rs	2024-12-25 07:43:20.000000000 +0000
++++ ./yjit/src/yjit.rs	2025-02-04 23:00:22.788803376 +0000
+@@ -76,7 +76,7 @@
  
      // Make sure --yjit-perf doesn't append symbols to an old file
-     if get_option!(perf_map) {
+     if get_option!(perf_map).is_some() {
 -        let perf_map = format!("/tmp/perf-{}.map", std::process::id());
 +        let perf_map = format!("@TERMUX_PREFIX@/tmp/perf-{}.map", std::process::id());
          let _ = std::fs::remove_file(&perf_map);

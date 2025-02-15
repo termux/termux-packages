@@ -1,10 +1,10 @@
-diff -u -r ../ruby-3.3.2/yjit/src/codegen.rs ./yjit/src/codegen.rs
---- ../ruby-3.3.2/yjit/src/codegen.rs	2024-05-30 00:23:11.000000000 +0000
-+++ ./yjit/src/codegen.rs	2024-06-10 02:06:30.788015891 +0000
-@@ -261,7 +261,7 @@
- 
+diff -u -r ../ruby-3.4.1/yjit/src/codegen.rs ./yjit/src/codegen.rs
+--- ../ruby-3.4.1/yjit/src/codegen.rs	2024-12-25 07:43:20.000000000 +0000
++++ ./yjit/src/codegen.rs	2025-02-04 22:59:32.167032348 +0000
+@@ -437,7 +437,7 @@
      /// Flush addresses and symbols to /tmp/perf-{pid}.map
      fn flush_perf_symbols(&self, cb: &CodeBlock) {
+         assert_eq!(0, self.perf_stack.len());
 -        let path = format!("/tmp/perf-{}.map", std::process::id());
 +        let path = format!("@TERMUX_PREFIX@/tmp/perf-{}.map", std::process::id());
          let mut f = std::fs::File::options().create(true).append(true).open(path).unwrap();
