@@ -1,12 +1,15 @@
 --- a/xmake/code.lua
 +++ b/xmake/code.lua
-@@ -84,6 +84,9 @@
+@@ -84,6 +84,12 @@
      add_packages("moebius")
      add_packages("freetype")
      add_packages("s7")
 +    add_packages("tree-sitter")
 +    add_packages("tree-sitter-cpp")
 +    add_packages("tree-sitter-scheme")
++    if not is_plat("wasm") then
++        add_packages("cpptrace")
++    end
      add_packages("libgit2")
      if not is_plat("macosx") then
          add_packages("libiconv")

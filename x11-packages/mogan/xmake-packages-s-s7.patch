@@ -1,20 +1,10 @@
---- a/xmake/packages/s/s7/port/xmake.lua
-+++ b/xmake/packages/s/s7/port/xmake.lua
-@@ -61,6 +61,6 @@
-         add_ldflags("-static", "-static-libgcc", {force = true})
-     end
-     if is_plat("linux") then
--        add_syslinks("pthread", "dl", "m")
-+        add_syslinks("dl", "m")
-     end
- end
 --- a/xmake/packages/s/s7/xmake.lua
 +++ b/xmake/packages/s/s7/xmake.lua
 @@ -27,6 +27,7 @@
-     add_urls("https://gitee.com/XmacsLabs/s7.git")
+     add_urls("https://github.com/XmacsLabs/s7.git")
  
-     add_versions("20240816", "20240816")
-+    add_patches("20240816", "s7.diff", "fdfcc9aaaf8a3785d4a6bb9e374c525882f80d1df52b1a8b7f9fad503fb0097c")
+     add_versions("20241122", "20241122")
++    add_patches("20241122", "s7.diff", "4852e322970c0b22c8f32e68bb89c74520e7731c0a5623111d942fa68e77eb33")
  
      add_configs("gmp", {description = "enable gmp support", default = false, type = "boolean"})
  
@@ -27,12 +17,3 @@
      end
  
      on_install("bsd", "cross", "cygwin", "linux", "macosx", "mingw", "msys", "wasm", "windows", function (package)
-@@ -51,7 +52,7 @@
-     end)
- 
-     on_test(function(package)
--        if not package:is_cross() then
-+        if false and not package:is_cross() then
-             local file = os.tmpfile() .. ".scm"
-             io.writefile(file, [[
-                 (display "Hello World!")
