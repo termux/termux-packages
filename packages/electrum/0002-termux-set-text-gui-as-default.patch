@@ -1,6 +1,20 @@
+From c35fa0f1cbbf6ef3cb52b6192a3ee83741439a48 Mon Sep 17 00:00:00 2001
+From: Henrik Grimler <henrik@grimler.se>
+Date: Sun, 16 Feb 2025 21:08:03 +0100
+Subject: [PATCH] termux: set text gui as default
+
+It is possible to run the other guis as well, with termux-x11 or vnc,
+but default should be text gui in our terminal emulator.
+---
+ electrum/daemon.py        | 2 +-
+ electrum/simple_config.py | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/electrum/daemon.py b/electrum/daemon.py
+index ad7a81430271..6d8740307eb0 100644
 --- a/electrum/daemon.py
 +++ b/electrum/daemon.py
-@@ -606,7 +606,7 @@
+@@ -612,7 +612,7 @@ class Daemon(Logger):
          threading.current_thread().name = 'GUI'
          gui_name = self.config.GUI_NAME
          if gui_name in ['lite', 'classic']:
@@ -9,9 +23,11 @@
          self._plugins = Plugins(self.config, gui_name)  # init plugins
          self.logger.info(f'launching GUI: {gui_name}')
          try:
+diff --git a/electrum/simple_config.py b/electrum/simple_config.py
+index 762fb447355d..d34e1ac21679 100644
 --- a/electrum/simple_config.py
 +++ b/electrum/simple_config.py
-@@ -1061,7 +1061,7 @@
+@@ -1080,7 +1080,7 @@ Warning: setting this to too low will result in lots of payment failures."""),
      RPC_SOCKET_TYPE = ConfigVar('rpcsock', default='auto', type_=str)
      RPC_SOCKET_FILEPATH = ConfigVar('rpcsockpath', default=None, type_=str)
  
@@ -20,3 +36,6 @@
      GUI_LAST_WALLET = ConfigVar('gui_last_wallet', default=None, type_=str)
  
      GUI_QT_COLOR_THEME = ConfigVar(
+-- 
+2.48.1
+

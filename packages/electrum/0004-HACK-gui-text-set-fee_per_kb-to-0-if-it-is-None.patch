@@ -1,0 +1,45 @@
+From 22fe19fa3e2a08146937b5d23bd742665c61cc71 Mon Sep 17 00:00:00 2001
+From: Henrik Grimler <grimler@termux.dev>
+Date: Sat, 15 Feb 2025 23:51:47 +0100
+Subject: [PATCH] HACK: gui: text: set fee_per_kb to 0 if it is None
+
+To fix crash when settings tab is opened in text gui:
+
+  2.25 | E | daemon.Daemon | GUI raised exception: TypeError('conversion from NoneType to Decimal is not supported'). shutting down.
+  2.59 | E | __main__ | daemon.run_gui errored
+Traceback (most recent call last):
+  File "/usr/bin/electrum", line 466, in handle_cmd
+    d.run_gui()
+  File "/usr/lib/python3.12/site-packages/electrum/daemon.py", line 598, in run_gui
+    self.gui_object.main()
+  File "/usr/lib/python3.12/site-packages/electrum/gui/text.py", line 537, in main
+    self.run_tab(0, self.print_history,       self.run_history_tab)
+  File "/usr/lib/python3.12/site-packages/electrum/gui/text.py", line 473, in run_tab
+    c = self.main_command()
+        ^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/site-packages/electrum/gui/text.py", line 464, in main_command
+    self.settings_dialog()
+  File "/usr/lib/python3.12/site-packages/electrum/gui/text.py", line 763, in settings_dialog
+    fee = str(Decimal(self.config.fee_per_kb()) / COIN)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: conversion from NoneType to Decimal is not supported
+---
+ electrum/gui/text.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/electrum/gui/text.py b/electrum/gui/text.py
+index 73e374319ba0..cffc4230ebf2 100644
+--- a/electrum/gui/text.py
++++ b/electrum/gui/text.py
+@@ -761,7 +761,7 @@ class ElectrumGui(BaseElectrumGui, EventListener):
+                 self.network.run_from_another_thread(self.network.set_parameters(net_params))
+ 
+     def settings_dialog(self):
+-        fee = str(Decimal(self.config.fee_per_kb()) / COIN)
++        fee = str(Decimal(self.config.fee_per_kb() if self.config.fee_per_kb() else 0) / COIN)
+         out = self.run_dialog('Settings', [
+             {'label':'Default fee', 'type':'satoshis', 'value': fee}
+             ], buttons = 1)
+-- 
+2.48.1
+

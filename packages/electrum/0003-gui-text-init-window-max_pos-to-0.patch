@@ -1,0 +1,45 @@
+From 90981e03ca14cb73aec0d5a1dc234d1f0551bca0 Mon Sep 17 00:00:00 2001
+From: Henrik Grimler <grimler@termux.dev>
+Date: Sat, 15 Feb 2025 23:48:30 +0100
+Subject: [PATCH] gui: text: init window max_pos to 0
+
+Otherwise running the text gui and directly pressing up or down
+results in an error like:
+
+  2.45 | E | daemon.Daemon | GUI raised exception: AttributeError("'ElectrumGui' object has no attribute 'max_pos'"). shutting down.
+  2.61 | E | __main__ | daemon.run_gui errored
+Traceback (most recent call last):
+  File "/usr/bin/electrum", line 466, in handle_cmd
+    d.run_gui()
+  File "/usr/lib/python3.12/site-packages/electrum/daemon.py", line 598, in run_gui
+    self.gui_object.main()
+  File "/usr/lib/python3.12/site-packages/electrum/gui/text.py", line 537, in main
+    self.run_tab(0, self.print_history,       self.run_history_tab)
+  File "/usr/lib/python3.12/site-packages/electrum/gui/text.py", line 473, in run_tab
+    c = self.main_command()
+        ^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/site-packages/electrum/gui/text.py", line 458, in main_command
+    self.increase_cursor(-1)
+  File "/usr/lib/python3.12/site-packages/electrum/gui/text.py", line 436, in increase_cursor
+    self.pos = min(self.pos, self.max_pos - 1)
+                             ^^^^^^^^^^^^
+AttributeError: 'ElectrumGui' object has no attribute 'max_pos'
+---
+ electrum/gui/text.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/electrum/gui/text.py b/electrum/gui/text.py
+index c5280f7a466b..73e374319ba0 100644
+--- a/electrum/gui/text.py
++++ b/electrum/gui/text.py
+@@ -95,6 +95,7 @@ class ElectrumGui(BaseElectrumGui, EventListener):
+         self.lightning_invoice = None
+         self.tab = 0
+         self.pos = 0
++        self.max_pos = 0
+         self.popup_pos = 0
+ 
+         self.str_recipient = ""
+-- 
+2.48.1
+

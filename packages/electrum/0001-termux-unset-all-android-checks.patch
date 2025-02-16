@@ -1,17 +1,23 @@
---- a/electrum/electrum
-+++ b/electrum/electrum
-@@ -42,7 +42,7 @@
- 
- script_dir = os.path.dirname(os.path.realpath(__file__))
- is_pyinstaller = getattr(sys, 'frozen', False)
--is_android = 'ANDROID_DATA' in os.environ
-+is_android = False
- is_appimage = 'APPIMAGE' in os.environ
- # is_local: unpacked tar.gz but not pip installed, or git clone
- is_local = (not is_pyinstaller and not is_android and not is_appimage
+From 03192e4805515d9d90469e11a151cc2088db55b0 Mon Sep 17 00:00:00 2001
+From: Henrik Grimler <henrik@grimler.se>
+Date: Sun, 16 Feb 2025 20:48:02 +0100
+Subject: [PATCH] termux: unset all android checks
+
+Electrum expects android builds to be a "standard" java app. This will
+not work in termux, as termux is more similar to a full linux
+environment, so let's unset all the android checks.
+---
+ electrum/logging.py       | 2 +-
+ electrum/simple_config.py | 2 +-
+ electrum/util.py          | 8 ++++----
+ run_electrum              | 2 +-
+ 4 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/electrum/logging.py b/electrum/logging.py
+index efe01f6c25cd..bf06d551f734 100644
 --- a/electrum/logging.py
 +++ b/electrum/logging.py
-@@ -354,7 +354,7 @@
+@@ -359,7 +359,7 @@ def get_logfile_path() -> Optional[pathlib.Path]:
  
  
  def describe_os_version() -> str:
@@ -20,21 +26,25 @@
          import jnius
          bv = jnius.autoclass('android.os.Build$VERSION')
          b = jnius.autoclass('android.os.Build')
+diff --git a/electrum/simple_config.py b/electrum/simple_config.py
+index 40ee656a5946..762fb447355d 100644
 --- a/electrum/simple_config.py
 +++ b/electrum/simple_config.py
-@@ -280,7 +280,7 @@
-     def get_backup_dir(self):
+@@ -436,7 +436,7 @@ class SimpleConfig(Logger):
+     def get_backup_dir(self) -> Optional[str]:
          # this is used to save wallet file backups (without active lightning channels)
          # on Android, the export backup button uses android_backup_dir()
 -        if 'ANDROID_DATA' in os.environ:
 +        if False:
              return None
          else:
-             return self.get('backup_dir')
+             return self.WALLET_BACKUP_DIRECTORY
+diff --git a/electrum/util.py b/electrum/util.py
+index a62abd86acac..597c061550b7 100644
 --- a/electrum/util.py
 +++ b/electrum/util.py
-@@ -386,7 +386,7 @@
-             self.running = False
+@@ -420,7 +420,7 @@ class DaemonThread(threading.Thread, Logger):
+             self.wake_up_event.clear()
  
      def on_stop(self):
 -        if 'ANDROID_DATA' in os.environ:
@@ -42,7 +52,7 @@
              import jnius
              jnius.detach()
              self.logger.info("jnius detach")
-@@ -519,7 +519,7 @@
+@@ -563,7 +563,7 @@ def get_new_wallet_name(wallet_folder: str) -> str:
  
  
  def is_android_debug_apk() -> bool:
@@ -51,7 +61,7 @@
      if not is_android:
          return False
      from jnius import autoclass
-@@ -529,7 +529,7 @@
+@@ -573,7 +573,7 @@ def is_android_debug_apk() -> bool:
  
  
  def get_android_package_name() -> str:
@@ -60,7 +70,7 @@
      assert is_android
      from jnius import autoclass
      from android.config import ACTIVITY_CLASS_NAME
-@@ -604,7 +604,7 @@
+@@ -637,7 +637,7 @@ def xor_bytes(a: bytes, b: bytes) -> bytes:
  def user_dir():
      if "ELECTRUMDIR" in os.environ:
          return os.environ["ELECTRUMDIR"]
@@ -69,14 +79,19 @@
          return android_data_dir()
      elif os.name == 'posix':
          return os.path.join(os.environ["HOME"], ".electrum")
+diff --git a/run_electrum b/run_electrum
+index dc997981c2f8..6d60af24bf00 100755
 --- a/run_electrum
 +++ b/run_electrum
-@@ -42,7 +42,7 @@
+@@ -42,7 +42,7 @@ from typing import TYPE_CHECKING, Optional
  
  script_dir = os.path.dirname(os.path.realpath(__file__))
  is_pyinstaller = getattr(sys, 'frozen', False)
 -is_android = 'ANDROID_DATA' in os.environ
 +is_android = False
  is_appimage = 'APPIMAGE' in os.environ
+ is_binary_distributable = is_pyinstaller or is_android or is_appimage
  # is_local: unpacked tar.gz but not pip installed, or git clone
- is_local = (not is_pyinstaller and not is_android and not is_appimage
+-- 
+2.48.1
+
