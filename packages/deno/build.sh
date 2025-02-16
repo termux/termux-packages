@@ -37,7 +37,7 @@ termux_step_pre_configure() {
 	local _SHA256SUM	
 	if [ "$TERMUX_ARCH" = "aarch64" ]; then
 		_SHA256SUM="bf4b49ea164280f81b8bd2a25a994ae95b68bf440de26e2e2fa5dbb3b2de323d"
-	else if [ "$TERMUX_ARCH" = "x86_64" ]; then
+	elif [ "$TERMUX_ARCH" = "x86_64" ]; then
 		_SHA256SUM="7d7c744396865ee0fcbf2d09a23c265a4a378d418f965eeafff659fb2dd2ae3a"
 	else
 		termux_error_exit "Invalid arch: $TERMUX_ARCH"
