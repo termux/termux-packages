@@ -10,6 +10,8 @@ TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="xkeyboard-config"
+# We provide a termux-x11-xfce4 service script, so let's suggest xfce4
+TERMUX_PKG_SUGGESTS="xfce4"
 TERMUX_PKG_BREAKS="termux-x11"
 TERMUX_PKG_REPLACES="termux-x11"
 TERMUX_PKG_PROVIDES="termux-x11"
@@ -35,6 +37,13 @@ termux_step_post_make_install() {
 		$TERMUX_PKG_BUILDER_DIR/sv/tx11.run.in > $TERMUX_PREFIX/var/service/tx11/run
 	chmod 700 $TERMUX_PREFIX/var/service/tx11/run
 	touch $TERMUX_PREFIX/var/service/tx11/down
+
+	mkdir -p $TERMUX_PREFIX/var/service/tx11-xfce4/log
+	ln -sf $TERMUX_PREFIX/share/termux-services/svlogger $TERMUX_PREFIX/var/service/tx11-xfce4/log/run
+	sed "s%@TERMUX_PREFIX@%$TERMUX_PREFIX%g" \
+		$TERMUX_PKG_BUILDER_DIR/sv/tx11-xfce4.run.in > $TERMUX_PREFIX/var/service/tx11-xfce4/run
+	chmod 700 $TERMUX_PREFIX/var/service/tx11-xfce4/run
+	touch $TERMUX_PREFIX/var/service/tx11-xfce4/down
 }
 
 termux_step_create_debscripts() {
