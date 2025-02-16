@@ -1,0 +1,13 @@
+Using semaphores causes runtime error when translating sources
+
+--- a/rpython/translator/c/src/thread_pthread.h
++++ b/rpython/translator/c/src/thread_pthread.h
+@@ -24,7 +24,7 @@
+ /* Whether or not to use semaphores directly rather than emulating them with
+  * mutexes and condition variables:
+  */
+-#if defined(_POSIX_SEMAPHORES) && !defined(HAVE_BROKEN_POSIX_SEMAPHORES)
++#if 0
+ #  define USE_SEMAPHORES
+ #else
+ #  undef USE_SEMAPHORES

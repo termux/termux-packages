@@ -10,22 +10,14 @@ if PROOT_TARGET == None:
 
 PROOT_TARGET_ARGS = PROOT_TARGET.split()
 
-def _update_target_rootfs_path(flag):
-    if ("-I@TERMUX_PREFIX@" in flag) or ("-L@TERMUX_PREFIX@" in flag):
-        return flag.replace("@TERMUX_PREFIX@", "/target-termux-rootfs/@TERMUX_PREFIX@")
-    return flag
-
 def _update_cflags_for_termux(cflags):
     assert isinstance(cflags, tuple)
-    target_cflags = os.getenv("TARGET_CFLAGS").split()
-    cflags += tuple(map(_update_target_rootfs_path, target_cflags))
+    cflags += tuple(os.getenv("TARGET_CFLAGS").split())
     return cflags
 
 def _update_link_flags_for_termux(ldflags):
     assert isinstance(ldflags, tuple)
-    target_ldflags = tuple(os.getenv("TARGET_LDFLAGS").split())
-    ldflags += tuple(map(_update_target_rootfs_path, target_ldflags))
-    ldflags += ("-fno-termux-rpath",)
+    ldflags += tuple(os.getenv("TARGET_LDFLAGS").split())
     return ldflags
 
 def _update_rpath_flags(rpath_flags):
@@ -60,10 +52,6 @@ class BaseTermux(Linux):
         self._handle_error(returncode, bytes(stdout), bytes(stderr), outname)
 
     def execute(self, executable, args=[], env=None, compilation_info=None):
-        if self._is_same_platform_type():
-            log.execute('Exec (' + self.name + '): ' +
-                        str(executable) + ' ' + ' '.join(args))
-            return super(BaseTermux, self).execute(executable, args, env, compilation_info)
         if isinstance(args, str):
             args = ' ' + str(executable) + ' ' + args
             log.execute('Cross Exec (' + self.name + '): ' + args)
@@ -72,6 +60,12 @@ class BaseTermux(Linux):
             log.execute('Cross Exec (' + self.name + '): ' + ' '.join(args))
         proot_exec = PROOT_TARGET_ARGS[0]
         args = PROOT_TARGET_ARGS[1:] + args
+        if env is not None and env.get("LD_PRELOAD", None) is not None:
+            del env["LD_PRELOAD"]
+        else:
+            env = {
+                "PATH": os.environ["PATH"]
+            }
         returncode, stdout, stderr = _run_subprocess(proot_exec, args, env)
         stdout = "" if stdout == None else stdout
         stderr = "" if stderr == None else stderr
@@ -96,16 +90,7 @@ class BaseTermux(Linux):
         raise NotImplementedError("Needs to be overwritten")
 
     def _get_cross_compiler(self):
-        return "clang" if self._is_same_platform_type() else ("clang --target=" + self.get_multiarch())
-
-    def _get_build_platform_type(self):
-        return "x86"
-
-    def _get_target_platform_type(self):
-        raise NotImplementedError("Needs to be overwritten")
-
-    def _is_same_platform_type(self):
-        return self._get_build_platform_type() == self._get_target_platform_type()
+        return os.getenv("TARGET_CC")
 
 
 class Termux_AArch64(BaseTermux):
@@ -114,9 +99,6 @@ class Termux_AArch64(BaseTermux):
     def get_multiarch(self):
         return "aarch64-linux-android"
 
-    def _get_target_platform_type(self):
-        return "arm"
-
 
 class Termux_ARM(BaseTermux):
     name = "termux-arm"
@@ -124,8 +106,6 @@ class Termux_ARM(BaseTermux):
     def get_multiarch(self):
         return "arm-linux-androideabi"
 
-    def _get_target_platform_type(self):
-        return "arm"
 
 class Termux_AMD64(BaseTermux):
     name = "termux-x86_64"
@@ -133,14 +113,9 @@ class Termux_AMD64(BaseTermux):
     def get_multiarch(self):
         return "x86_64-linux-android"
 
-    def _get_target_platform_type(self):
-        return "x86"
 
 class Termux_IA32(BaseTermux):
     name = "termux-i686"
 
     def get_multiarch(self):
         return "i686-linux-android"
-
-    def _get_target_platform_type(self):
-        return "x86"
