@@ -1,4 +1,4 @@
-From 03192e4805515d9d90469e11a151cc2088db55b0 Mon Sep 17 00:00:00 2001
+From f63d200b667ac3438816479e82a69b5825201e4c Mon Sep 17 00:00:00 2001
 From: Henrik Grimler <henrik@grimler.se>
 Date: Sun, 16 Feb 2025 20:48:02 +0100
 Subject: [PATCH] termux: unset all android checks
@@ -7,12 +7,110 @@ Electrum expects android builds to be a "standard" java app. This will
 not work in termux, as termux is more similar to a full linux
 environment, so let's unset all the android checks.
 ---
- electrum/logging.py       | 2 +-
- electrum/simple_config.py | 2 +-
- electrum/util.py          | 8 ++++----
- run_electrum              | 2 +-
- 4 files changed, 7 insertions(+), 7 deletions(-)
+ electrum/ecc_fast.py            | 2 +-
+ electrum/electrum               | 2 +-
+ electrum/gui/default_lang.py    | 2 +-
+ electrum/gui/qml/qeapp.py       | 4 ++--
+ electrum/gui/qml/qeqrscanner.py | 6 +++---
+ electrum/logging.py             | 2 +-
+ electrum/qrreader/zbar.py       | 2 +-
+ electrum/simple_config.py       | 2 +-
+ electrum/util.py                | 8 ++++----
+ run_electrum                    | 2 +-
+ 10 files changed, 16 insertions(+), 16 deletions(-)
 
+diff --git a/electrum/ecc_fast.py b/electrum/ecc_fast.py
+index a27e2114961f..b88d9acf7dc2 100644
+--- a/electrum/ecc_fast.py
++++ b/electrum/ecc_fast.py
+@@ -47,7 +47,7 @@ def load_library():
+     elif sys.platform in ('windows', 'win32'):
+         for v in tested_libversions:
+             libnames.append(f"libsecp256k1-{v}.dll")
+-    elif 'ANDROID_DATA' in os.environ:
++    elif False:
+         libnames = ['libsecp256k1.so', ]  # don't care about version number. we built w/e is available.
+     else:  # desktop Linux and similar
+         for v in tested_libversions:
+diff --git a/electrum/electrum b/electrum/electrum
+index dc997981c2f8..6d60af24bf00 100755
+--- a/electrum/electrum
++++ b/electrum/electrum
+@@ -42,7 +42,7 @@ from typing import TYPE_CHECKING, Optional
+ 
+ script_dir = os.path.dirname(os.path.realpath(__file__))
+ is_pyinstaller = getattr(sys, 'frozen', False)
+-is_android = 'ANDROID_DATA' in os.environ
++is_android = False
+ is_appimage = 'APPIMAGE' in os.environ
+ is_binary_distributable = is_pyinstaller or is_android or is_appimage
+ # is_local: unpacked tar.gz but not pip installed, or git clone
+diff --git a/electrum/gui/default_lang.py b/electrum/gui/default_lang.py
+index aacf8112f05e..c8c1d07afb74 100644
+--- a/electrum/gui/default_lang.py
++++ b/electrum/gui/default_lang.py
+@@ -13,7 +13,7 @@ from electrum.i18n import languages
+ 
+ 
+ jLocale = None
+-if "ANDROID_DATA" in os.environ:
++if False:
+     from jnius import autoclass, cast
+     jLocale = autoclass("java.util.Locale")
+ 
+diff --git a/electrum/gui/qml/qeapp.py b/electrum/gui/qml/qeapp.py
+index 87f5ad7a6e17..4df3dee1faa2 100644
+--- a/electrum/gui/qml/qeapp.py
++++ b/electrum/gui/qml/qeapp.py
+@@ -49,7 +49,7 @@ if TYPE_CHECKING:
+     from electrum.daemon import Daemon
+     from electrum.plugin import Plugins
+ 
+-if 'ANDROID_DATA' in os.environ:
++if False:
+     from jnius import autoclass, cast
+     from android import activity
+ 
+@@ -281,7 +281,7 @@ class QEAppController(BaseCrashReporter, QObject):
+ 
+     @pyqtSlot(result=bool)
+     def isAndroid(self):
+-        return 'ANDROID_DATA' in os.environ
++        return False
+ 
+     @pyqtSlot(result='QVariantMap')
+     def crashData(self):
+diff --git a/electrum/gui/qml/qeqrscanner.py b/electrum/gui/qml/qeqrscanner.py
+index a301cdaa93f5..712d5dadec88 100644
+--- a/electrum/gui/qml/qeqrscanner.py
++++ b/electrum/gui/qml/qeqrscanner.py
+@@ -9,7 +9,7 @@ from electrum.logging import get_logger
+ from electrum.i18n import _
+ 
+ 
+-if 'ANDROID_DATA' in os.environ:
++if False:
+     from jnius import autoclass
+     from android import activity
+ 
+@@ -54,7 +54,7 @@ class QEQRScanner(QObject):
+ 
+     @pyqtSlot()
+     def open(self):
+-        if 'ANDROID_DATA' not in os.environ:
++        if True:
+             self._scan_qr_non_android()
+             return
+         jSimpleScannerActivity = autoclass("org.electrum.qr.SimpleScannerActivity")
+@@ -77,7 +77,7 @@ class QEQRScanner(QObject):
+ 
+     @pyqtSlot()
+     def _unbind(self):
+-        if 'ANDROID_DATA' in os.environ:
++        if False:
+             activity.unbind(on_activity_result=self.on_qr_activity_result)
+ 
+     def _scan_qr_non_android(self):
 diff --git a/electrum/logging.py b/electrum/logging.py
 index efe01f6c25cd..bf06d551f734 100644
 --- a/electrum/logging.py
@@ -26,6 +124,19 @@ index efe01f6c25cd..bf06d551f734 100644
          import jnius
          bv = jnius.autoclass('android.os.Build$VERSION')
          b = jnius.autoclass('android.os.Build')
+diff --git a/electrum/qrreader/zbar.py b/electrum/qrreader/zbar.py
+index 8a3ef54dfdf8..73144caf2366 100644
+--- a/electrum/qrreader/zbar.py
++++ b/electrum/qrreader/zbar.py
+@@ -37,7 +37,7 @@ from .abstract_base import AbstractQrCodeReader, QrCodeResult
+ 
+ _logger = get_logger(__name__)
+ 
+-if 'ANDROID_DATA' in os.environ:
++if False:
+     LIBNAME = 'libzbar.so'
+ elif sys.platform == 'darwin':
+     LIBNAME = 'libzbar.0.dylib'
 diff --git a/electrum/simple_config.py b/electrum/simple_config.py
 index 40ee656a5946..762fb447355d 100644
 --- a/electrum/simple_config.py
@@ -93,5 +204,5 @@ index dc997981c2f8..6d60af24bf00 100755
  is_binary_distributable = is_pyinstaller or is_android or is_appimage
  # is_local: unpacked tar.gz but not pip installed, or git clone
 -- 
-2.48.1
+2.49.0
 

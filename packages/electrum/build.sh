@@ -11,7 +11,8 @@ TERMUX_PKG_SHA256=dd8595a138132dee87cee76ce760a1d622fc2fd65d3b6ac7df7e53b7fb6ea7
 # update (or at least every major update).  Disable auto updates for
 # now.
 TERMUX_PKG_AUTO_UPDATE=false
-TERMUX_PKG_DEPENDS="python, libsecp256k1, python-pip, python-cryptography"
+TERMUX_PKG_DEPENDS="libsecp256k1, python, python-cryptography, python-pip"
+TERMUX_PKG_SUGGESTS="python-btchip, python-hidapi"
 TERMUX_PKG_PYTHON_TARGET_DEPS="'qrcode', 'protobuf<4,>=3.20', 'qdarkstyle>=2.7', 'aiorpcx<0.24,>=0.22.0', 'aiohttp<4.0.0,>=3.3.0', 'aiohttp_socks>=0.8.4', 'certifi', 'attrs>=20.1.0', 'jsonpatch', 'dnspython>=2.0'"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
