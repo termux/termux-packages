@@ -34,7 +34,7 @@ termux_step_pre_configure() {
 	echo "v8 = { path = \"./vendor/v8\" }" >> Cargo.toml
 
 	# Download and extract the prebuilt snapshots
-	local _SHA256SUM	
+	local _SHA256SUM
 	if [ "$TERMUX_ARCH" = "aarch64" ]; then
 		_SHA256SUM="bf4b49ea164280f81b8bd2a25a994ae95b68bf440de26e2e2fa5dbb3b2de323d"
 	elif [ "$TERMUX_ARCH" = "x86_64" ]; then
