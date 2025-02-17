@@ -1,0 +1,67 @@
+https://github.com/unicorn-engine/unicorn/commit/d03c0922e6c86741001ff8f40140be37c99eb83a
+
+From d03c0922e6c86741001ff8f40140be37c99eb83a Mon Sep 17 00:00:00 2001
+From: Disconnect3d <dominik.b.czarnota@gmail.com>
+Date: Fri, 14 Feb 2025 18:04:30 +0100
+Subject: [PATCH] Fix #2103: qemu/target/ppc/mem_helper.c remove redundant
+ return statements (#2104)
+
+---
+ qemu/target/ppc/mem_helper.c | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/qemu/target/ppc/mem_helper.c b/qemu/target/ppc/mem_helper.c
+index 83db185..a8ccb9e 100644
+--- a/qemu/target/ppc/mem_helper.c
++++ b/qemu/target/ppc/mem_helper.c
+@@ -387,7 +387,6 @@ uint64_t helper_lq_le_parallel(CPUPPCState *env, target_ulong addr,
+     return int128_getlo(ret);
+ #else
+     g_assert_not_reached();
+-    return 0;
+ #endif
+ }
+ 
+@@ -404,7 +403,6 @@ uint64_t helper_lq_be_parallel(CPUPPCState *env, target_ulong addr,
+     return int128_getlo(ret);
+ #else
+     g_assert_not_reached();
+-    return 0;
+ #endif
+ }
+ 
+@@ -420,7 +418,6 @@ void helper_stq_le_parallel(CPUPPCState *env, target_ulong addr,
+     helper_atomic_sto_le_mmu(env, addr, val, opidx, GETPC());
+ #else
+     g_assert_not_reached();
+-    return 0;
+ #endif
+ }
+ 
+@@ -436,7 +433,6 @@ void helper_stq_be_parallel(CPUPPCState *env, target_ulong addr,
+     helper_atomic_sto_be_mmu(env, addr, val, opidx, GETPC());
+ #else
+     g_assert_not_reached();
+-    return 0;
+ #endif
+ }
+ #endif
+@@ -465,7 +461,6 @@ uint32_t helper_stqcx_le_parallel(CPUPPCState *env, target_ulong addr,
+     return env->so + success * CRF_EQ_BIT;
+ #else
+     g_assert_not_reached();
+-    return 0;
+ #endif
+ }
+ 
+@@ -492,7 +487,6 @@ uint32_t helper_stqcx_be_parallel(CPUPPCState *env, target_ulong addr,
+     return env->so + success * CRF_EQ_BIT;
+ #else
+     g_assert_not_reached();
+-    return 0;
+ #endif
+ }
+ 
+-- 
+2.48.1
+
