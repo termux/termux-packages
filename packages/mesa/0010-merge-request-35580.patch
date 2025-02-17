@@ -1,0 +1,51 @@
+https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/33580
+
+From 969c946025186d15b5b66006bd393a3782ce47ce Mon Sep 17 00:00:00 2001
+From: Danylo Piliaiev <dpiliaiev@igalia.com>
+Date: Mon, 17 Feb 2025 14:52:34 +0100
+Subject: [PATCH] tu/a6xx: Emit VSC addresses for each bin to restore after
+ preemption
+
+KGSL unconditionally supports preemption so we cannot ignore it.
+
+On a6xx, we have to emit VSC addresses per-bin or make the amble include
+these registers, because CP_SET_BIN_DATA5_OFFSET will use the
+register instead of the pseudo register and its value won't survive
+across preemptions. The blob seems to take the second approach and
+emits the preamble lazily. We chose the per-bin approach but blob's
+should be a better one.
+
+Closes: https://gitlab.freedesktop.org/mesa/mesa/-/issues/12627
+
+Signed-off-by: Danylo Piliaiev <dpiliaiev@igalia.com>
+---
+ src/freedreno/vulkan/tu_cmd_buffer.cc | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/src/freedreno/vulkan/tu_cmd_buffer.cc b/src/freedreno/vulkan/tu_cmd_buffer.cc
+index 7f3bc5dbc30aa..ef120c9d44fdb 100644
+--- a/src/freedreno/vulkan/tu_cmd_buffer.cc
++++ b/src/freedreno/vulkan/tu_cmd_buffer.cc
+@@ -1093,6 +1093,10 @@ tu6_emit_tile_select(struct tu_cmd_buffer *cmd,
+    tu_cs_emit(cs, A6XX_CP_SET_MARKER_0_MODE(RM6_BIN_RENDER_START) |
+                   A6XX_CP_SET_MARKER_0_USES_GMEM);
+ 
++   if (CHIP == A6XX && cmd->device->physical_device->has_preemption) {
++      tu_emit_vsc<CHIP>(cmd, &cmd->cs);
++   }
++
+    tu6_emit_bin_size<CHIP>(
+       cs, tiling->tile0.width, tiling->tile0.height,
+       {
+@@ -2183,7 +2187,8 @@ tu6_tile_render_begin(struct tu_cmd_buffer *cmd, struct tu_cs *cs,
+        * these registers, because CP_SET_BIN_DATA5_OFFSET will use the
+        * register instead of the pseudo register and its value won't survive
+        * across preemptions. The blob seems to take the second approach and
+-       * emits the preamble lazily.
++       * emits the preamble lazily. We chose the per-bin approach but blob's
++       * should be a better one.
+        */
+       tu_emit_vsc<CHIP>(cmd, cs);
+ 
+-- 
+GitLab
