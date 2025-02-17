@@ -1,0 +1,31 @@
+#!$TERMUX_PREFIX/bin/sh
+
+# shellcheck disable=SC3043
+check_command() {
+	local command="$1"
+
+	local errors
+	if ! errors="$("$@" 2>&1 1>/dev/null)"; then
+		echo "$errors"
+		echo "Failed to run the '$command' command."
+		case "$errors" in
+			# - https://github.com/termux/termux-packages/wiki/Termux-execution-environment#system-libraries-are-missing
+			*"CANNOT LINK EXECUTABLE"*)
+				printf '%s\n' \
+					"To fix the '$command' command, manually upgrade all packages by running: \`pkg upgrade\`" \
+					"If upgrading packages does not fix it, then you may be able to fix the error by running: \`pkg install libandroid-stub\`" \
+					"See also: https://github.com/termux/termux-packages/wiki/Termux-execution-environment#dynamic-library-linking-errors"
+			;;
+			# - https://github.com/termux/termux-packages/issues/23189#issuecomment-2663464359
+			# - https://cs.android.com/android/platform/superproject/+/android15-qpr1-release:external/boringssl/src/crypto/fipsmodule/bcm.c;l=141
+			*"FIPS module doesn't span expected symbol"*)
+				printf '%s\n' \
+					"You should be able to fix the error by running: \`pkg install libandroid-stub\`" \
+					"See also: https://github.com/termux/termux-packages/wiki/Termux-execution-environment#dynamic-library-linking-errors"
+			;;
+		esac
+		return 1
+	fi
+} 1>&2
+
+check_command ffmpeg -version
