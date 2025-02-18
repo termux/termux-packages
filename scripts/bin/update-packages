@@ -55,29 +55,29 @@ TERMUX_PACKAGES_DIRECTORIES=$(jq --raw-output 'del(.pkg_format) | keys | .[]' "$
 # shellcheck source=scripts/updates/api/termux_repology_api_get_latest_version.sh
 . "${TERMUX_SCRIPTDIR}"/scripts/updates/api/termux_repology_api_get_latest_version.sh
 
-# Default auto update script for packages hosted on github.com. Should not be overrided by build.sh.
+# Default auto update script for packages hosted on github.com. Should not be overridden by build.sh.
 # To use custom algorithm, one should override termux_pkg_auto_update().
 # shellcheck source=scripts/updates/internal/termux_github_auto_update.sh
 . "${TERMUX_SCRIPTDIR}"/scripts/updates/internal/termux_github_auto_update.sh
 
-# Default auto update script for packages hosted on hosts using gitlab-ci. Should not be overrided by build.sh.
+# Default auto update script for packages hosted on hosts using gitlab-ci. Should not be overridden by build.sh.
 # To use custom algorithm, one should override termux_pkg_auto_update().
 # shellcheck source=scripts/updates/internal/termux_gitlab_auto_update.sh
 . "${TERMUX_SCRIPTDIR}"/scripts/updates/internal/termux_gitlab_auto_update.sh
 
-# Default auto update script for rest packages. Should not be overrided by build.sh.
+# Default auto update script for rest packages. Should not be overridden by build.sh.
 # To use custom algorithm, one should override termux_pkg_auto_update().
 # shellcheck source=scripts/updates/internal/termux_repology_auto_update.sh
 . "${TERMUX_SCRIPTDIR}"/scripts/updates/internal/termux_repology_auto_update.sh
 
 # Main script to:
 # - by default, decide which update method to use,
-# - but can be overrided by build.sh to use custom update method.
-# - For example: see neovim-nightly's build.sh.
+# - but can be overridden by build.sh to use custom update method.
+# - For example: see cmake's build.sh.
 # shellcheck source=scripts/updates/termux_pkg_auto_update.sh
 . "${TERMUX_SCRIPTDIR}"/scripts/updates/termux_pkg_auto_update.sh
 
-# Converts milliseconds to human-readable format. 
+# Converts milliseconds to human-readable format.
 # Example: `ms_to_human_readable 123456789` => 34h 17m 36s 789ms
 ms_to_human_readable() {
 	echo "$(($1/3600000))h $(($1%3600000/60000))m $(($1%60000/1000))s $(($1%1000))ms" | sed 's/0h //;s/0m //;s/0s //'
@@ -126,9 +126,9 @@ declare -A _LATEST_TAGS=()
 declare -A _FAILED_UPDATES=()
 declare -a _ALREADY_SEEN=() # Array of packages successfully updated or skipped.
 
-# _fetch_and_cache_tags fetches all possible tags using termux_pkg_auto_update, but using Ninja build system. 
-# The key difference is that we make the process concurrent, allowing us to fetch tags simultaneously rather than one at a time. 
-# Once all tags are cached, the termux_pkg_auto_update function will operate much more quickly. 
+# _fetch_and_cache_tags fetches all possible tags using termux_pkg_auto_update, but using Ninja build system.
+# The key difference is that we make the process concurrent, allowing us to fetch tags simultaneously rather than one at a time.
+# Once all tags are cached, the termux_pkg_auto_update function will operate much more quickly.
 # We avoid packages with overwritten termux_pkg_auto_update to prevent unexpected modifications to the package`s build.sh.
 _fetch_and_cache_tags() {
 	if [ "$(uname -o)" = "Android" ] || [ -e "/system/bin/app_process" ]; then
@@ -137,7 +137,7 @@ _fetch_and_cache_tags() {
 			return 0
 		fi
 	fi
-	
+
 	if ! command -v ninja &> /dev/null; then
 		echo "INFO: Fetching ninja build system"
 		. "${TERMUX_SCRIPTDIR}"/scripts/build/termux_download.sh
@@ -153,17 +153,20 @@ _fetch_and_cache_tags() {
     local __PACKAGES=()
 	for repo_dir in $(jq --raw-output 'del(.pkg_format) | keys | .[]' "${TERMUX_SCRIPTDIR}/repo.json"); do
 		for pkg_dir in "${repo_dir}"/*; do
-			! quiet _should_update "${pkg_dir}" && continue # Skip if not needed.
+			quiet _should_update "${pkg_dir}" || continue # Skip if not needed.
 			grep -q '^termux_pkg_auto_update' "${pkg_dir}/build.sh" && continue # Skip if package has custom auto-update
 			__PACKAGES+=("${pkg_dir}")
 		done
 	done
 
 	__main__() {
-		cd ${TERMUX_SCRIPTDIR}
+		cd "${TERMUX_SCRIPTDIR}"
 		export TERMUX_PKG_NAME="${1##*/}" TERMUX_PKG_BUILDER_DIR=${1}
-		set +eu;
-		for i in scripts/updates/{**/,}*.sh "${1}/build.sh"; do source ${i}; done
+		set +eu
+		for i in scripts/updates/{**/,}*.sh "${1}/build.sh"; do
+			# shellcheck disable=SC1090
+			source "${i}"
+		done
 		set -eu
 		termux_pkg_upgrade_version() {
 			[[ -n "$1" ]] && echo "PKG|$TERMUX_PKG_NAME|${1#*:}"
@@ -367,7 +370,7 @@ _gh_create_new_issue() {
 	fi
 
 	# Extract origin URL, commit hash and builder directory and put everything together
-	link="$(git config --get remote.origin.url |sed -E 's|\.git$||; s|git@([^:]+):(.+)|https://\1/\2|')/blob/$(git rev-parse HEAD)/$(echo */$1)"
+	link="$(git config --get remote.origin.url |sed -E 's|\.git$||; s|git@([^:]+):(.+)|https://\1/\2|')/blob/$(git rev-parse HEAD)/$(echo */"$1")"
 
 	body="$(
 		cat <<-EOF
