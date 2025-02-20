@@ -1,0 +1,89 @@
+From fc32dd49cb70c4b113353c7a060a875f30b9af04 Mon Sep 17 00:00:00 2001
+From: Matthew Maurer <mmaurer@google.com>
+Date: Tue, 7 Jan 2025 00:53:42 +0000
+Subject: [PATCH] llvm: Ignore error value that is always false
+
+See llvm/llvm-project#121851
+
+For LLVM 20+, this function (`renameModuleForThinLTO`) has no return
+value. For prior versions of LLVM, this never failed, but had a
+signature which allowed an error value people were handling.
+---
+ compiler/rustc_codegen_gcc/src/back/lto.rs       |  4 +---
+ compiler/rustc_codegen_llvm/src/back/lto.rs      |  6 +-----
+ compiler/rustc_codegen_llvm/src/llvm/ffi.rs      |  2 +-
+ compiler/rustc_llvm/llvm-wrapper/PassWrapper.cpp | 10 ++--------
+ 4 files changed, 5 insertions(+), 17 deletions(-)
+
+diff --git a/compiler/rustc_codegen_gcc/src/back/lto.rs b/compiler/rustc_codegen_gcc/src/back/lto.rs
+index ed92f9c52412c..f7173d4d2ffce 100644
+--- a/compiler/rustc_codegen_gcc/src/back/lto.rs
++++ b/compiler/rustc_codegen_gcc/src/back/lto.rs
+@@ -660,9 +660,7 @@ pub unsafe fn optimize_thin_module(
+         {
+             let _timer =
+                 cgcx.prof.generic_activity_with_arg("LLVM_thin_lto_rename", thin_module.name());
+-            if !llvm::LLVMRustPrepareThinLTORename(thin_module.shared.data.0, llmod, target) {
+-                return Err(write::llvm_err(&dcx, LlvmError::PrepareThinLtoModule));
+-            }
++            unsafe { llvm::LLVMRustPrepareThinLTORename(thin_module.shared.data.0, llmod, target) };
+             save_temp_bitcode(cgcx, &module, "thin-lto-after-rename");
+         }
+ 
+diff --git a/compiler/rustc_codegen_llvm/src/back/lto.rs b/compiler/rustc_codegen_llvm/src/back/lto.rs
+index 4adf99e91d08d..08b774f8d6ec0 100644
+--- a/compiler/rustc_codegen_llvm/src/back/lto.rs
++++ b/compiler/rustc_codegen_llvm/src/back/lto.rs
+@@ -737,11 +737,7 @@ pub(crate) unsafe fn optimize_thin_module(
+         {
+             let _timer =
+                 cgcx.prof.generic_activity_with_arg("LLVM_thin_lto_rename", thin_module.name());
+-            if unsafe {
+-                !llvm::LLVMRustPrepareThinLTORename(thin_module.shared.data.0, llmod, target)
+-            } {
+-                return Err(write::llvm_err(dcx, LlvmError::PrepareThinLtoModule));
+-            }
++            unsafe { llvm::LLVMRustPrepareThinLTORename(thin_module.shared.data.0, llmod, target) };
+             save_temp_bitcode(cgcx, &module, "thin-lto-after-rename");
+         }
+ 
+diff --git a/compiler/rustc_codegen_llvm/src/llvm/ffi.rs b/compiler/rustc_codegen_llvm/src/llvm/ffi.rs
+index bb324ee682cdb..cb4a8c9a5f21c 100644
+--- a/compiler/rustc_codegen_llvm/src/llvm/ffi.rs
++++ b/compiler/rustc_codegen_llvm/src/llvm/ffi.rs
+@@ -2374,7 +2374,7 @@ unsafe extern "C" {
+         Data: &ThinLTOData,
+         Module: &Module,
+         Target: &TargetMachine,
+-    ) -> bool;
++    );
+     pub fn LLVMRustPrepareThinLTOResolveWeak(Data: &ThinLTOData, Module: &Module) -> bool;
+     pub fn LLVMRustPrepareThinLTOInternalize(Data: &ThinLTOData, Module: &Module) -> bool;
+     pub fn LLVMRustPrepareThinLTOImport(
+diff --git a/compiler/rustc_llvm/llvm-wrapper/PassWrapper.cpp b/compiler/rustc_llvm/llvm-wrapper/PassWrapper.cpp
+index de14c6d188365..6447a9362b3ab 100644
+--- a/compiler/rustc_llvm/llvm-wrapper/PassWrapper.cpp
++++ b/compiler/rustc_llvm/llvm-wrapper/PassWrapper.cpp
+@@ -1389,20 +1389,14 @@ static bool clearDSOLocalOnDeclarations(Module &Mod, TargetMachine &TM) {
+   return ClearDSOLocalOnDeclarations;
+ }
+ 
+-extern "C" bool LLVMRustPrepareThinLTORename(const LLVMRustThinLTOData *Data,
++extern "C" void LLVMRustPrepareThinLTORename(const LLVMRustThinLTOData *Data,
+                                              LLVMModuleRef M,
+                                              LLVMTargetMachineRef TM) {
+   Module &Mod = *unwrap(M);
+   TargetMachine &Target = *unwrap(TM);
+ 
+   bool ClearDSOLocal = clearDSOLocalOnDeclarations(Mod, Target);
+-  bool error = renameModuleForThinLTO(Mod, Data->Index, ClearDSOLocal);
+-
+-  if (error) {
+-    LLVMRustSetLastError("renameModuleForThinLTO failed");
+-    return false;
+-  }
+-  return true;
++  renameModuleForThinLTO(Mod, Data->Index, ClearDSOLocal);
+ }
+ 
+ extern "C" bool
