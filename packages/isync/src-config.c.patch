@@ -26,3 +26,16 @@
  		struct stat st;
  		int ex = !lstat( path, &st );
  		int ex2 = !lstat( path2, &st );
+@@ -466,7 +480,12 @@
+ 	} else {
+ 		const char *sl = strrchr( where, '/' );
+ 		if (!sl) {
++#ifndef __ANDROID__
+ 			nfsnprintf( path, sizeof(path), "./%n%s", &cfile.path_len, where );
++#else
++			nfsnprintf( path, sizeof(path), "./%s", where );
++			cfile.path_len = strlen("./");
++#endif
+ 			cfile.file = path;
+ 		} else {
+ 			cfile.path_len = sl - where + 1;
