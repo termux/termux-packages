@@ -44,8 +44,8 @@ termux_step_post_get_source() {
 termux_step_pre_configure() {
 	termux_setup_cmake
 
-	CPPFLAGS+=" -D__USE_GNU"
-	LDFLAGS+=" -landroid-shmem" && LDFLAGS+=" -Wl,--undefined-version" && LDFLAGS+=" -Wl,--undefined-symbol"
+	CPPFLAGS+=" -D__USE_GNU" && CPPFLAGS+=" --target=aarch64-unknown-linux-android28" && CFLAGS+=" --target=aarch64-unknown-linux-android28"
+	LDFLAGS+=" -landroid-shmem" && LDFLAGS+=" -Wl,--undefined-version"
 
 	_WRAPPER_BIN=$TERMUX_PKG_BUILDDIR/_wrapper/bin
 	mkdir -p $_WRAPPER_BIN
