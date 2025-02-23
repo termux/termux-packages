@@ -90,7 +90,7 @@ termux_step_pre_configure() {
 		mkdir -p "$TERMUX_PKG_BUILDDIR"
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS="${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/"-Dintrospection=enabled"/"-Dintrospection=disabled"}"
 		termux_setup_gir
-		
+
 		cd "$TERMUX_PKG_BUILDDIR"
 		TERMUX_PREFIX="$_PREFIX" termux_step_configure
 		cd "$TERMUX_PKG_BUILDDIR"
@@ -123,7 +123,7 @@ termux_step_pre_configure() {
 		cd "$TERMUX_PKG_BUILDDIR"
 		termux_step_make_install
 	)
-	
+
 	# Place the GIR files inside the root of the GIR directory (gir/.) of the package
 	termux_setup_gir
 
