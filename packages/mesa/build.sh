@@ -3,12 +3,12 @@ TERMUX_PKG_DESCRIPTION="An open-source implementation of the OpenGL specificatio
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="docs/license.rst"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="25.0.0"
+TERMUX_PKG_VERSION="24.3.4"
 TERMUX_PKG_REVISION=1
 _LLVM_MAJOR_VERSION=$(. $TERMUX_SCRIPTDIR/packages/libllvm/build.sh; echo $LLVM_MAJOR_VERSION)
 _LLVM_MAJOR_VERSION_NEXT=$((_LLVM_MAJOR_VERSION + 1))
 TERMUX_PKG_SRCURL=https://archive.mesa3d.org/mesa-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=96a53501fd59679654273258c6c6a1055a20e352ee1429f0b123516c7190e5b0
+TERMUX_PKG_SHA256=e641ae27191d387599219694560d221b7feaa91c900bcec46bf444218ed66025
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libandroid-shmem, libc++, libdrm, libglvnd, libllvm (<< ${_LLVM_MAJOR_VERSION_NEXT}), libwayland, libx11, libxext, libxfixes, libxshmfence, libxxf86vm, ncurses, vulkan-loader, zlib, zstd"
 TERMUX_PKG_SUGGESTS="mesa-dev"
@@ -44,8 +44,8 @@ termux_step_post_get_source() {
 termux_step_pre_configure() {
 	termux_setup_cmake
 
-	CPPFLAGS+=" -D__USE_GNU" && CPPFLAGS+=" --target=aarch64-unknown-linux-android28" && CFLAGS+=" --target=aarch64-unknown-linux-android28"
-	LDFLAGS+=" -landroid-shmem" && LDFLAGS+=" -Wl,--undefined-version"
+	CPPFLAGS+=" -D__USE_GNU"
+	LDFLAGS+=" -landroid-shmem"
 
 	_WRAPPER_BIN=$TERMUX_PKG_BUILDDIR/_wrapper/bin
 	mkdir -p $_WRAPPER_BIN
@@ -60,8 +60,8 @@ termux_step_pre_configure() {
 	export PATH="$_WRAPPER_BIN:$PATH"
 
 	if [ $TERMUX_ARCH = "arm" ] || [ $TERMUX_ARCH = "aarch64" ]; then
-		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -Dvulkan-drivers=swrast"
-		# TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -Dfreedreno-kmds=msm,kgsl"
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -Dvulkan-drivers=swrast,freedreno"
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -Dfreedreno-kmds=msm,kgsl"
 	elif [ $TERMUX_ARCH = "i686" ] || [ $TERMUX_ARCH = "x86_64" ]; then
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -Dvulkan-drivers=swrast"
 	else
