@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="An incremental parsing system for programming tools"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
 TERMUX_PKG_VERSION="0.25.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/tree-sitter/tree-sitter/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=26791f69182192fef179cd58501c3226011158823557a86fe42682cb4a138523
 TERMUX_PKG_BREAKS="libtreesitter"
@@ -10,12 +11,12 @@ TERMUX_PKG_REPLACES="libtreesitter"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
-termux_step_pre_get_source() {
+termux_step_post_get_source() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them
 	# after SOVERSION is changed.
 	local _SOVERSION=0.25
 
-	# New SO version is the major version of the package
+	# This blocks auto-updates to an incompatible SO version.
 	if [[ "$TERMUX_PKG_VERSION" != "${_SOVERSION}".* ]]; then
 		termux_error_exit "SOVERSION guard check failed."
 	fi
