@@ -2,14 +2,14 @@ TERMUX_PKG_HOMEPAGE=https://www.v2fly.org/
 TERMUX_PKG_DESCRIPTION="A platform for building proxies to bypass network restrictions"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="5.24.0"
+TERMUX_PKG_VERSION="5.28.0"
 TERMUX_PKG_SRCURL=git+https://github.com/v2fly/v2ray-core
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
 
 _RELEASE_URL=https://github.com/v2fly/v2ray-core/releases/download/v$TERMUX_PKG_VERSION/v2ray-linux-64.zip
-_RELEASE_SHA256=2556dd39ac7c8dbc9de0fa2a539539e82ac864096d5eaa4191d97c22e1ee9a89
+_RELEASE_SHA256=bafdd09efabf566328d9c12922d2d2c1dc9094aa994cb812f456192567fe61d0
 
 termux_pkg_auto_update() {
 	local latest_tag
