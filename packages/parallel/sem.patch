@@ -2,7 +2,7 @@ diff --git a/sem b/sem
 index 873f294..4fa24cb 100644
 --- a/src/sem
 +++ b/src/sem
-@@ -2335,10 +2335,10 @@
+@@ -2392,10 +2392,10 @@
      ## Shell
      #
      if($opt::fast) {
@@ -15,7 +15,7 @@ index 873f294..4fa24cb 100644
      }
      if(not -x $Global::shell and not which($Global::shell)) {
  	::error("Shell '$Global::shell' not found.");
-@@ -3009,14 +3009,14 @@
+@@ -3080,15 +3080,15 @@
      $Global::trim = 'n';
      $Global::max_jobs_running = 0;
      $Global::job_already_run = '';
@@ -25,6 +25,7 @@ index 873f294..4fa24cb 100644
 +    $ENV{'PARALLEL_REMOTE_TMPDIR'} ||= "@TERMUX_PREFIX@/tmp";
      # bug #55398: set $OLDPWD when using --wd
      $ENV{'OLDPWD'} = $ENV{'PWD'};
+     test_safe_env_vars();
      if(not $ENV{HOME}) {
  	# $ENV{HOME} is sometimes not set if called from PHP
 -	::warning("\$HOME not set. Using /tmp.");
@@ -34,7 +35,7 @@ index 873f294..4fa24cb 100644
      }
      # no warnings to allow for undefined $XDG_*
      no warnings 'uninitialized';
-@@ -5152,7 +5152,7 @@
+@@ -5224,7 +5224,7 @@
      unlink $stderrname;
  
      my $pid = ::open3($stdin_fh,$stdout_fh,$stderr_fh,
