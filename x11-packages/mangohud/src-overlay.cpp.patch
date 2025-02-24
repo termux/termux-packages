@@ -2,11 +2,12 @@ Workaround [error] [file_utils.cpp:50] Error opening directory '/sys/class/hwmon
 
 --- a/src/overlay.cpp
 +++ b/src/overlay.cpp
-@@ -114,7 +114,6 @@
+@@ -112,8 +112,6 @@
  
  void update_hw_info(const struct overlay_params& params, uint32_t vendorID)
  {
--   update_fan();
+-   if (params.enabled[OVERLAY_PARAM_ENABLED_fan])
+-      update_fan();
     if (params.enabled[OVERLAY_PARAM_ENABLED_cpu_stats] || logger->is_active()) {
        cpuStats.UpdateCPUData();
  
