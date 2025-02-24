@@ -96,6 +96,9 @@ termux_pkg_upgrade_version() {
 		fi
 	done
 
+	# Get available space (df outputs sizes in 1024-byte blocks)
+	local space_available="$(df -P "/var/lib/docker" | awk 'NR==2 {print $4}'
+
 	local big_package=false
 	while IFS= read -r p; do
 		if [[ "${p}" == "${TERMUX_PKG_NAME}" ]]; then
@@ -116,7 +119,7 @@ termux_pkg_upgrade_version() {
 		termux_error_exit "ERROR: failed to build."
 	fi
 
-	if [[ "${big_package}" == "true" ]]; then
+	if [[ "${big_package}" == "true" ]] || (( space_available <= 2 * 1024 ** 2 )); then
 		"${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" ./clean.sh
 	fi
 
