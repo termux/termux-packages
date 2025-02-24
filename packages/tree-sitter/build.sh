@@ -13,7 +13,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 termux_step_pre_get_source() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them
 	# after SOVERSION is changed.
-	local _SOVERSION=0.24
+	local _SOVERSION=0.25
 
 	# New SO version is the major version of the package
 	if [[ "$TERMUX_PKG_VERSION" != "${_SOVERSION}".* ]]; then
