@@ -97,7 +97,7 @@ termux_pkg_upgrade_version() {
 	done
 
 	# Get available space (df outputs sizes in 1024-byte blocks)
-	local space_available="$(df -P "/var/lib/docker" | awk 'NR==2 {print $4}'
+	local space_available="$(df -P "/var/lib/docker" | awk 'NR==2 {print $4}')"
 
 	local big_package=false
 	while IFS= read -r p; do
