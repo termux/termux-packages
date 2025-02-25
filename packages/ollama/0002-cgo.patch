@@ -1,0 +1,11 @@
+--- a/llama/llama.go
++++ b/llama/llama.go
+@@ -22,7 +22,7 @@
+ extern void llamaLog(int level, char* text, void* user_data);
+ 
+ typedef enum {COMP_UNKNOWN,COMP_GCC,COMP_CLANG} COMPILER;
+-COMPILER inline get_compiler() {
++static inline COMPILER get_compiler() {
+ #if defined(__clang__)
+ 	return COMP_CLANG;
+ #elif defined(__GNUC__)
