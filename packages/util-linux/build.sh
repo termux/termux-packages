@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://en.wikipedia.org/wiki/Util-linux
 TERMUX_PKG_DESCRIPTION="Miscellaneous system utilities"
-TERMUX_PKG_LICENSE="GPL-3.0, GPL-2.0, LGPL-2.1, BSD 3-Clause, BSD, ISC"
+TERMUX_PKG_LICENSE="GPL-3.0-or-later, GPL-2.0-or-later, LGPL-2.1-or-later, BSD 3-Clause, BSD, ISC"
 TERMUX_PKG_LICENSE_FILE="\
 Documentation/licenses/COPYING.GPL-3.0-or-later
 Documentation/licenses/COPYING.GPL-2.0-or-later
@@ -10,7 +10,7 @@ Documentation/licenses/COPYING.BSD-4-Clause-UC
 Documentation/licenses/COPYING.ISC"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.40.2"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://www.kernel.org/pub/linux/utils/util-linux/v${TERMUX_PKG_VERSION:0:4}/util-linux-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=d78b37a66f5922d70edf3bdfb01a6b33d34ed3c3cafd6628203b2a2b67c8e8b3
 # libcrypt is required for only newgrp and sulogin, which are not built anyways
