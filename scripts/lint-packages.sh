@@ -16,25 +16,28 @@ check_package_license() {
 		license=$(sed -r 's/^\s*(\S+(\s+\S+)*)\s*$/\1/' <<< "$license")
 
 		case "$license" in
-			AFL-2.1|AFL-3.0|AGPL-V3|APL-1.0|APSL-2.0|Apache-1.0|Apache-1.1);;
-			Apache-2.0|Artistic-License-2.0|Attribution|BSD|"BSD 2-Clause");;
-			"BSD 3-Clause"|"BSD New"|"BSD Simplified"|BSL-1.0|Bouncy-Castle);;
-			CA-TOSL-1.1|CC0-1.0|CDDL-1.0|CDDL-1.1|CPAL-1.0|CPL-1.0|CPOL);;
-			CPOL-1.02|CUAOFFICE-1.0|CeCILL-1|CeCILL-2|CeCILL-2.1|CeCILL-B);;
-			CeCILL-C|Codehaus|Copyfree|curl|Day|Day-Addendum|ECL2|EPL-1.0|EPL-2.0);;
-			EUDATAGRID|EUPL-1.1|EUPL-1.2|Eiffel-2.0|Entessa-1.0);;
-			Facebook-Platform|Fair|Frameworx-1.0|GPL-2.0|GPL-3.0|GPL-3.0-only);;
-			GPL-3.0-or-later|Go|HSQLDB|Historical|HPND|IBMPL-1.0|IJG|IPAFont-1.0);;
-			ISC|IU-Extreme-1.1.1|ImageMagick|JA-SIG|JSON|JTidy|LGPL-2.0);;
-			LGPL-2.1|LGPL-3.0|LPPL-1.0|Libpng|Lucent-1.02|MIT|MPL-2.0|MS-PL);;
-			MS-RL|MirOS|Motosoto-0.9.1|Mozilla-1.1|Multics|NASA-1.3|NAUMEN);;
-			NCSA|NOSL-3.0|NTP|NUnit-2.6.3|NUnit-Test-Adapter-2.6.3|Nethack);;
-			Nokia-1.0a|OCLC-2.0|OSL-3.0|OpenLDAP|OpenSSL|Openfont-1.1);;
-			Opengroup|PHP-3.0|PHP-3.01|PostgreSQL|"Public Domain"|"Public Domain - SUN");;
-			PythonPL|PythonSoftFoundation|QTPL-1.0|RPL-1.5|Real-1.0|RicohPL);;
-			SUNPublic-1.0|Scala|SimPL-2.0|Sleepycat|Sybase-1.0|TMate|UPL-1.0);;
-			Unicode-DFS-2015|Unlicense|UoI-NCSA|"VIM License"|VovidaPL-1.0|W3C);;
-			WTFPL|Xnet|ZLIB|ZPL-2.0|wxWindows|X11);;
+			AFL-2.1|AFL-3.0|AGPL-V3|APL-1.0|APSL-2.0);;
+			Apache-1.0|Apache-1.1|Apache-2.0|Artistic-License-2.0|Attribution);;
+			BSD|"BSD 2-Clause"|"BSD 3-Clause"|"BSD New"|"BSD Simplified");;
+			BSL-1.0|Bouncy-Castle|CA-TOSL-1.1|CC0-1.0|CDDL-1.0|CDDL-1.1|CPAL-1.0|CPL-1.0);;
+			CPOL|CPOL-1.02|CUAOFFICE-1.0|CeCILL-1|CeCILL-2|CeCILL-2.1|CeCILL-B|CeCILL-C);;
+			Codehaus|Copyfree|curl|Day|Day-Addendum|ECL2|EPL-1.0|EPL-2.0|EUDATAGRID);;
+			EUPL-1.1|EUPL-1.2|Eiffel-2.0|Entessa-1.0|Facebook-Platform|Fair|Frameworx-1.0);;
+			GPL-2.0|GPL-2.0-only|GPL-2.0-or-later);;
+			GPL-3.0|GPL-3.0-only|GPL-3.0-or-later);;
+			Go|HSQLDB|Historical|HPND|IBMPL-1.0|IJG|IPAFont-1.0|ISC|IU-Extreme-1.1.1);;
+			ImageMagick|JA-SIG|JSON|JTidy);;
+			LGPL-2.0|LGPL-2.0-only|LGPL-2.0-or-later);;
+			LGPL-2.1|LGPL-2.1-only|LGPL-2.1-or-later);;
+			LGPL-3.0|LGPL-3.0-only|LGPL-3.0-or-later);;
+			LPPL-1.0|Libpng|Lucent-1.02|MIT|MPL-2.0|MS-PL|MS-RL|MirOS|Motosoto-0.9.1);;
+			Mozilla-1.1|Multics|NASA-1.3|NAUMEN|NCSA|NOSL-3.0|NTP|NUnit-2.6.3);;
+			NUnit-Test-Adapter-2.6.3|Nethack|Nokia-1.0a|OCLC-2.0|OSL-3.0|OpenLDAP);;
+			OpenSSL|Openfont-1.1|Opengroup|PHP-3.0|PHP-3.01|PostgreSQL);;
+			"Public Domain"|"Public Domain - SUN"|PythonPL|PythonSoftFoundation);;
+			QTPL-1.0|RPL-1.5|Real-1.0|RicohPL|SUNPublic-1.0|Scala|SimPL-2.0|Sleepycat);;
+			Sybase-1.0|TMate|UPL-1.0|Unicode-DFS-2015|Unlicense|UoI-NCSA|"VIM License");;
+			VovidaPL-1.0|W3C|WTFPL|Xnet|ZLIB|ZPL-2.0|wxWindows|X11);;
 
 			*)
 				license_ok=false
