@@ -77,7 +77,7 @@ termux_pkg_upgrade_version() {
 	if [[ "${TERMUX_PKG_SHA256[*]}" != "SKIP_CHECKSUM" ]] && [[ "${TERMUX_PKG_SRCURL:0:4}" != "git+" ]]; then
 		echo n | "${TERMUX_SCRIPTDIR}/scripts/bin/update-checksum" "${TERMUX_PKG_NAME}" || {
 			git checkout -- "${TERMUX_PKG_BUILDER_DIR}"
-			git pull --rebase
+			git pull --rebase --autostash
 			termux_error_exit "ERROR: failed to update checksum."
 		}
 	fi
@@ -145,7 +145,7 @@ termux_pkg_upgrade_version() {
 			# where a long running auto update fails because a later faster
 			# autoupdate got committed first and now the git history is out of date.
 			git fetch 2>&1 >/dev/null
-			git pull --rebase 2>&1 >/dev/null
+			git pull --rebase --autostash 2>&1 >/dev/null
 			git push 2>&1 >/dev/null
 		)" || {
 			termux_error_exit <<-EndOfError
