@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/walles/moar
 TERMUX_PKG_DESCRIPTION="A pager designed to just do the right thing without any configuration"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.31.3"
+TERMUX_PKG_VERSION="1.31.4"
 TERMUX_PKG_SRCURL=https://github.com/walles/moar/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=8fd565853844ce3a5da173d885406fb1cab7d894fc8617617dc4f6a4cfe08cec
+TERMUX_PKG_SHA256=055d18ec7fca693dc99d69c0a2dc43e4b897dceddcf58c03959b0ad0f3c3faf7
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
