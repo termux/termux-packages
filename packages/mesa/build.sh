@@ -5,47 +5,83 @@ TERMUX_PKG_LICENSE_FILE="docs/license.rst"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="24.3.4"
 TERMUX_PKG_REVISION=1
+TERMUX_PKG_API_LEVEL=26
 _LLVM_MAJOR_VERSION=$(. $TERMUX_SCRIPTDIR/packages/libllvm/build.sh; echo $LLVM_MAJOR_VERSION)
 _LLVM_MAJOR_VERSION_NEXT=$((_LLVM_MAJOR_VERSION + 1))
-TERMUX_PKG_SRCURL=https://archive.mesa3d.org/mesa-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_NO_CLEAN=true
+# TERMUX_PKG_SRCURL=https://archive.mesa3d.org/mesa-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SRCURL=git+https://github.com/john-peterson/mesa
+TERMUX_PKG_GIT_BRANCH=android
+TERMUX_PKG_SRCURL2=(
+									 https://android.googlesource.com/platform/frameworks/native
+									 https://android.googlesource.com/platform/hardware/libhardware
+                   https://android.googlesource.com/platform/system/core
+								 )
+TERMUX_PKG_GIT_BRANCH2="android-8.0.0_r51"
 TERMUX_PKG_SHA256=e641ae27191d387599219694560d221b7feaa91c900bcec46bf444218ed66025
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="libandroid-shmem, libc++, libdrm, libglvnd, libllvm (<< ${_LLVM_MAJOR_VERSION_NEXT}), libwayland, libx11, libxext, libxfixes, libxshmfence, libxxf86vm, ncurses, spirv-llvm-translator, vulkan-loader, zlib, zstd"
+TERMUX_PKG_DEPENDS="libandroid-spawn, libandroid-shmem, libc++, libdrm, libglvnd, libllvm (<< ${_LLVM_MAJOR_VERSION_NEXT}), libwayland, libx11, libxext, libxfixes, libxshmfence, libxxf86vm, ncurses, spirv-llvm-translator, vulkan-loader, zlib, zstd"
 TERMUX_PKG_SUGGESTS="mesa-dev"
-TERMUX_PKG_BUILD_DEPENDS="libwayland-protocols, libxrandr, llvm, llvm-tools, mlir, xorgproto"
+TERMUX_PKG_BUILD_DEPENDS="libwayland-protocols, bionic-host, libxrandr, llvm, llvm-tools, mlir, xorgproto"
 TERMUX_PKG_CONFLICTS="libmesa, ndk-sysroot (<= 25b)"
 TERMUX_PKG_REPLACES="libmesa"
 
 # FIXME: Set `shared-llvm` to disabled if possible
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--reconfigure
 --cmake-prefix-path $TERMUX_PREFIX
+-Dplatform-sdk-version=$TERMUX_PKG_API_LEVEL
 -Dcpp_rtti=false
 -Dgbm=enabled
 -Dopengl=true
 -Degl=enabled
--Degl-native-platform=x11
+-Degl-native-platform=android
 -Dgles1=disabled
 -Dgles2=enabled
 -Dglx=dri
 -Dllvm=enabled
 -Dshared-llvm=enabled
--Dplatforms=x11,wayland
+-Dplatforms=x11,android
 -Dgallium-drivers=panfrost,swrast,virgl,zink
 -Dosmesa=true
 -Dglvnd=enabled
 -Dxmlconfig=disabled
+-Dandroid-libbacktrace=disabled
+-Dandroid-stub=true
+-Dbuild-tests=false
 "
 
 termux_step_post_get_source() {
+	# /src
+	set +e
+	cd ../cache
 	# Do not use meson wrap projects
 	rm -rf subprojects
+	for i in $(seq 0 $(( ${#TERMUX_PKG_SRCURL2[@]}-1 ))); do
+		git clone --depth 1 --single-branch 	--branch $TERMUX_PKG_GIT_BRANCH2		${TERMUX_PKG_SRCURL2[$i]}
+	done
 }
 
+termux_step_patch_package() { :; }
+
 termux_step_pre_configure() {
+	# /src
 	termux_setup_cmake
 
-	CPPFLAGS+=" -D__USE_GNU"
-	LDFLAGS+=" -landroid-shmem"
+	cp $TERMUX_PKG_BUILDER_DIR/*.pc .
+	sed -i s,@TERMUX_PKG_CACHEDIR@,$TERMUX_PKG_CACHEDIR,g *.pc
+	sed -i s,@TERMUX_PREFIX@,$TERMUX_PREFIX,g *.pc
+
+	include=$TERMUX_PKG_CACHEDIR/core/liblog/include:$TERMUX_PKG_CACHEDIR/core/libcutils/include:$TERMUX_PKG_CACHEDIR/core/libsystem/include:$TERMUX_PKG_CACHEDIR/native/vulkan/include:$TERMUX_PKG_CACHEDIR/libs/nativewindow/include
+	include2="-I$TERMUX_PKG_CACHEDIR/core/libcutils/include -I$TERMUX_PKG_CACHEDIR/core/libsystem/include -I$TERMUX_PKG_CACHEDIR/native/vulkan/include -I$TERMUX_PKG_CACHEDIR/native/libs/nativewindow/include -I$TERMUX_PKG_CACHEDIR/native/libs/nativewindow/include"
+	CPPFLAGS+=" -D__USE_GNU $include2"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --includedir=$include"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS2="-Dc_cpp_args=$include2"
+	LDFLAGS+=" -landroid-spawn -landroid-shmem"
+	# LDFLAGS+=" -llog -lcutils -lsync -lhardware -lnativewindow -landroid-spawn -landroid-shmem"
+	export PKG_CONFIG_PATH=../src
+	export C_INCLUDE_PATH=$include
+	export LIBRARY_PATH=/lib:/data/data/com.termux/files/usr/opt/bionic-host/lib64/
 
 	_WRAPPER_BIN=$TERMUX_PKG_BUILDDIR/_wrapper/bin
 	mkdir -p $_WRAPPER_BIN

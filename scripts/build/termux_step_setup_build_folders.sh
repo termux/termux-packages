@@ -16,6 +16,7 @@ termux_step_setup_build_folders() {
 	fi
 
 	# Cleanup old build state:
+	[ "$TERMUX_NO_CLEAN" = false ] && \
 	rm -Rf "$TERMUX_PKG_BUILDDIR" \
 		"$TERMUX_PKG_SRCDIR"
 

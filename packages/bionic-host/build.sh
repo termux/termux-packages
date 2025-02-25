@@ -7,6 +7,7 @@ TERMUX_PKG_REVISION=5
 TERMUX_PKG_SHA256=6b42a86fc2ec58f86862a8f09a5465af0758ce24f2ca8c3cabb3bb6a81d96525
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_NO_CLEAN=true
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 # Should be handled by AOSP build system so I am disable it here.
 TERMUX_PKG_UNDEF_SYMBOLS_FILES="all"
@@ -56,6 +57,7 @@ termux_step_get_source() {
 
 	local URL DEB_NAME
 	for i in libtinfo5 libncurses5 openssh-client; do
+	[ -f "${TERMUX_PKG_CACHEDIR}/${i}"*.deb ] && continue 
 		URL="$(obtain_deb_url "$i")"
 		DEB_NAME="${URL##*/}"
 		termux_download "$URL" "${TERMUX_PKG_CACHEDIR}/${DEB_NAME}" SKIP_CHECKSUM
@@ -68,11 +70,14 @@ termux_step_get_source() {
 	termux_download https://storage.googleapis.com/git-repo-downloads/repo "${TERMUX_PKG_CACHEDIR}/repo" SKIP_CHECKSUM
 	chmod +x "${TERMUX_PKG_CACHEDIR}/repo"
 
+	test -d .repo && return
+
 	# Repo requires us to have a Git user name and email set.
 	# The GitHub workflow does this, but the local build container doesn't
 	[[ "$(git config --get user.name)" != '' ]] || git config --global user.name "Termux Github Actions"
 	[[ "$(git config --get user.email)" != '' ]] || git config --global user.email "contact@termux.dev"
 	"${TERMUX_PKG_CACHEDIR}"/repo init \
+		--depth=5 \
 		-u https://android.googlesource.com/platform/manifest \
 		-b main -m "${TERMUX_PKG_BUILDER_DIR}/default.xml" <<< 'n'
 	"${TERMUX_PKG_CACHEDIR}"/repo sync -c -j32
@@ -94,7 +99,7 @@ termux_step_make() {
 		cd ${TERMUX_PKG_SRCDIR}
 		source build/envsetup.sh;
 		lunch aosp_${_ARCH}-eng;
-		make JAVA_NOT_REQUIRED=true linker libc libm libdl libicuuc debuggerd crash_dump
+		make JAVA_NOT_REQUIRED=true linker libc libm libdl libhardware libicuuc libnativewindow libsync debuggerd crash_dump
 	"
 }
 

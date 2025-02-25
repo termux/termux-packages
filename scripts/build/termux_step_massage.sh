@@ -176,12 +176,12 @@ termux_step_massage() {
 	# Check so that package is not affected by
 	# https://github.com/android/ndk/issues/1614, or
 	# https://github.com/termux/termux-packages/issues/9944
-	if [[ "${TERMUX_PACKAGE_LIBRARY}" == "bionic" ]]; then
+	if [[ "${TERMUX_PACKAGE_LIBRARY}" == "bionic" ]] && ! $TERMUX_PKG_PLATFORM_INDEPENDENT; then
 		echo "INFO: READELF=${READELF} ... $(command -v ${READELF})"
 		export pattern_file_undef=$(mktemp)
 		echo "INFO: Generating undefined symbols regex to ${pattern_file_undef}"
 		local t0=$(get_epoch)
-		local SYMBOLS=$(${READELF} -s $(${TERMUX_HOST_PLATFORM}-clang -print-libgcc-file-name) | grep -E "FUNC[[:space:]]+GLOBAL[[:space:]]+HIDDEN" | awk '{ print $8 }')
+		local SYMBOLS=$(${READELF} -s $(${CC} -print-libgcc-file-name) | grep -E "FUNC[[:space:]]+GLOBAL[[:space:]]+HIDDEN" | awk '{ print $8 }')
 		SYMBOLS+=" $(echo libandroid_{sem_{open,close,unlink},shm{ctl,get,at,dt}})"
 		SYMBOLS+=" $(grep "^    [_a-zA-Z0-9]*;" ${TERMUX_SCRIPTDIR}/scripts/lib{c,dl,m}.map.txt | cut -d":" -f2 | sed -e "s/^    //" -e "s/;.*//")"
 		SYMBOLS+=" ${TERMUX_PKG_EXTRA_UNDEF_SYMBOLS_TO_CHECK}"

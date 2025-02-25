@@ -18,6 +18,7 @@ termux_step_configure_meson() {
 		--buildtype ${_meson_buildtype} \
 		${_meson_stripflag} \
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS \
+		"$TERMUX_PKG_EXTRA_CONFIGURE_ARGS2" \
 		|| (termux_step_configure_meson_failure_hook && false)
 }
 
