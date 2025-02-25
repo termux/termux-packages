@@ -2,13 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://www.gnustep.org
 TERMUX_PKG_DESCRIPTION="A library of general-purpose, non-graphical Objective C objects"
 TERMUX_PKG_LICENSE="GPL-2.0, LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.30.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="1.31.0"
 TERMUX_PKG_SRCURL=https://github.com/gnustep/libs-base/releases/download/base-${TERMUX_PKG_VERSION//./_}/gnustep-base-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=00b5bc4179045b581f9f9dc3751b800c07a5d204682e3e0eddd8b5e5dee51faa
+TERMUX_PKG_SHA256=d493ed2ba2a32f559f94e2ae5e339c440ae77d481dff1eb0d51eeac4d9127e33
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP='(?<=-).+'
-TERMUX_PKG_DEPENDS="gnustep-make, libc++, libffi, libgmp, libgnutls, libiconv, libicu, libxml2, libxslt, zlib"
+TERMUX_PKG_DEPENDS="gnustep-make, libcurl, libc++, libffi, libgmp, libgnutls, libiconv, libicu, libxml2, libxslt, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-default-config=$TERMUX_PREFIX/etc/GNUstep/GNUstep.conf
