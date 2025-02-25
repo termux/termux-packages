@@ -45,7 +45,7 @@
  	pthread_cond_destroy(&U->cond);
 --- a/spipe/main.c
 +++ b/spipe/main.c
-@@ -71,7 +71,11 @@ callback_graceful_shutdown(void * cookie
+@@ -72,7 +72,11 @@
  
  	/* Cancel the threads. */
  	for (i = 0; i < 2; i++) {
@@ -57,10 +57,10 @@
  			/*
  			 * According to the POSIX standard, a Thread ID should
  			 * still be valid after pthread_exit has been invoked
-@@ -310,12 +314,20 @@ main(int argc, char * argv[])
+@@ -328,12 +332,20 @@
  	exit(0);
  
- err6:
+ err7:
 +#ifndef __ANDROID__
  	if ((rc = pthread_cancel(ET.threads[0])) != 0)
 +#else
@@ -69,7 +69,7 @@
  		warn0("pthread_cancel: %s", strerror(rc));
  	if ((rc = pthread_join(ET.threads[0], NULL)) != 0)
  		warn0("pthread_join: %s", strerror(rc));
- err5:
+ err6:
 +#ifndef __ANDROID__
  	if ((rc = pthread_cancel(ET.threads[1])) != 0)
 +#else
