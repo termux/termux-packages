@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A high-performance database kernel for query-intensive a
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="11.51.7"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.monetdb.org/downloads/sources/archive/MonetDB-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=98fd6512858911b0e6e3a0f62432f4ac7acb34ca8b6adc882db6e3315fc297c6
 TERMUX_PKG_AUTO_UPDATE=true
