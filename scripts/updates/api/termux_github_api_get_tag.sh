@@ -48,6 +48,9 @@ termux_github_api_get_tag() {
 	)
 
 	if [[ "${TAG_TYPE}" == "newest-tag" ]]; then
+		# We use graphql intensively so we should slowdown our requests to avoid hitting github ratelimits.
+		sleep 1
+
 		api_url="${api_url}/graphql"
 		jq_filter='.data.repository.refs.edges[0].node.name'
 		curl_opts+=(-X POST)
@@ -86,6 +89,7 @@ termux_github_api_get_tag() {
 			Allowed values: 'newest-tag', 'latest-release-tag'.
 		EndOfError
 	fi
+
 
 	local response
 	response="$(curl "${curl_opts[@]}" "${api_url}")"

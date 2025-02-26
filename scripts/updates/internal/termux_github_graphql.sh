@@ -43,6 +43,9 @@ termux_github_graphql() {
 		# echo "// Batch: $BATCH" >> /tmp/query-12345 # Uncomment for debugging GraphQL queries
 		# printf '%s' "${QUERY}"  >> /tmp/query-12345 # Uncomment for debugging GraphQL queries
 
+		# We use graphql intensively so we should slowdown our requests to avoid hitting github ratelimits.
+		sleep 1
+
 		local response
 		response="$(printf '{ "query": "%s" }' "${QUERY//$'\n'/ }" | curl -fL \
 			--no-progress-meter \
