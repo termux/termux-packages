@@ -1,13 +1,25 @@
 TERMUX_PKG_HOMEPAGE=https://inkscape.org/
 TERMUX_PKG_DESCRIPTION="Free and open source vector graphics editor"
-TERMUX_PKG_LICENSE="GPL-3.0-or-later"
+TERMUX_PKG_LICENSE="GPL-2.0, GPL-2.0-or-later, GPL-3.0, GPL-3.0-or-later, LGPL-2.1, LGPL-2.1-or-later, LGPL-3.0, LGPL-3.0-or-later, Mozilla-1.1, Openfont-1.1"
+TERMUX_PKG_LICENSE_FILE="
+LICENSES/GPL-2.0.txt,
+LICENSES/GPL-2.0-or-later.txt,
+LICENSES/GPL-3.0.txt,
+LICENSES/GPL-3.0-or-later.txt,
+LICENSES/LGPL-2.1.txt,
+LICENSES/LGPL-2.1-or-later.txt,
+LICENSES/LGPL-3.0.txt,
+LICENSES/LGPL-3.0-or-later.txt,
+LICENSES/MPL-1.1.txt,
+LICENSES/OFL-1.1.txt
+"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.4"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://media.inkscape.org/dl/resources/file/inkscape-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=c59a85453b699addebcd51c1dc07684dd96a10c8aec716b19551db50562e13f5
-TERMUX_PKG_DEPENDS="boost, double-conversion, fontconfig, freetype, gdk-pixbuf, graphicsmagick, glib, gsl, gspell, gtk3, gtkmm3, gtksourceview4, harfbuzz, libatkmm-1.6, libc++, libcairo, libcairomm-1.0, libgc, libglibmm-2.4, libiconv, libjpeg-turbo, libpangomm-1.4, libpng, libsigc++-2.0, libsoup, libx11, libxml2, libxslt, littlecms, pango, poppler, potrace, readline, zlib"
-TERMUX_PKG_BUILD_DEPENDS="boost-headers"
+TERMUX_PKG_DEPENDS="boost, double-conversion, fontconfig, freetype, gdk-pixbuf, glib, gsl, gspell, gtk3, gtkmm3, gtksourceview4, harfbuzz, libatkmm-1.6, libc++, libcairo, libcairomm-1.0, libgc, libglibmm-2.4, libiconv, libjpeg-turbo, libpangomm-1.4, libpng, libsigc++-2.0, libsoup, libx11, libxml2, libxslt, littlecms, pango, poppler, potrace, readline, zlib"
+TERMUX_PKG_BUILD_DEPENDS="boost-headers, graphicsmagick-static"
 TERMUX_PKG_RECOMMENDS="inkscape-extensions, inkscape-tutorials"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DWITH_IMAGE_MAGICK=OFF
@@ -19,14 +31,4 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_pre_configure() {
 	CPPFLAGS+=" -DCMS_NO_REGISTER_KEYWORD -I${TERMUX_PREFIX}/include/libxml2 -include libxml/xmlmemory.h"
 	LDFLAGS+=" -fopenmp -static-openmp -Wl,-rpath=$TERMUX_PREFIX/lib/inkscape"
-}
-
-termux_step_install_license() {
-	local license_file="$TERMUX_PREFIX/share/inkscape/doc/COPYING"
-	if [ ! -e "$license_file" ]; then
-		termux_error_exit "License file $license_file not found."
-	fi
-	local doc_dir="$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME"
-	mkdir -p "$doc_dir"
-	ln -sf "$license_file" "$doc_dir"/
 }
