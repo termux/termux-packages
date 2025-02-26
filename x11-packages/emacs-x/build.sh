@@ -3,14 +3,13 @@ TERMUX_PKG_DESCRIPTION="Extensible, customizable text editor-and more"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Update both emacs and emacs-x to the same version in one PR.
-TERMUX_PKG_VERSION=29.4
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION=30.1
 TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/emacs/emacs-${TERMUX_PKG_VERSION}.tar.xz
 if [[ $TERMUX_PKG_VERSION == *-rc* ]]; then
 	TERMUX_PKG_SRCURL=https://alpha.gnu.org/gnu/emacs/pretest/emacs-${TERMUX_PKG_VERSION#*:}.tar.xz
 fi
-TERMUX_PKG_SHA256=ba897946f94c36600a7e7bb3501d27aa4112d791bfe1445c61ed28550daca235
-TERMUX_PKG_DEPENDS="fontconfig, freetype, gdk-pixbuf, giflib, glib, harfbuzz, libgmp, libgnutls, libice, libjansson, libjpeg-turbo, libpng, librsvg, libsm, libsqlite, libtiff, libx11, libxaw, libxcb, libxext, libxfixes, libxft, libxinerama, libxml2, libxmu, libxpm, libxrandr, libxrender, libxt, littlecms, ncurses, tree-sitter, zlib"
+TERMUX_PKG_SHA256=6ccac1ae76e6af93c6de1df175e8eb406767c23da3dd2a16aa67e3124a6f138f
+TERMUX_PKG_DEPENDS="fontconfig, freetype, gdk-pixbuf, giflib, glib, harfbuzz, libgmp, libgnutls, libice, libjpeg-turbo, libpng, librsvg, libsm, libsqlite, libtiff, libx11, libxaw, libxcb, libxext, libxfixes, libxft, libxinerama, libxml2, libxmu, libxpm, libxrandr, libxrender, libxt, littlecms, ncurses, tree-sitter, zlib"
 TERMUX_PKG_CONFLICTS="emacs"
 TERMUX_PKG_REPLACES="emacs"
 TERMUX_PKG_PROVIDES="emacs"
@@ -31,7 +30,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-modules
 --with-pdumper=yes
 --with-dumping=none
---with-json
 --with-tree-sitter
 "
 
