@@ -82,7 +82,7 @@ termux_setup_toolchain_27c() {
 	fi
 
 	export CXXFLAGS="$CFLAGS"
-	export CPPFLAGS+=" -I${TERMUX_PREFIX}/include"
+	export CPPFLAGS+=" -isystem${TERMUX_PREFIX}/include"
 
 	# If libandroid-support is declared as a dependency, link to it explicitly:
 	if [ "$TERMUX_PKG_DEPENDS" != "${TERMUX_PKG_DEPENDS/libandroid-support/}" ]; then
@@ -93,7 +93,7 @@ termux_setup_toolchain_27c() {
 	export CGO_ENABLED=1
 	export GO_LDFLAGS="-extldflags=-pie"
 	export CGO_LDFLAGS="${LDFLAGS/ -Wl,-z,relro,-z,now/}"
-	export CGO_CFLAGS="-I$TERMUX_PREFIX/include"
+	export CGO_CFLAGS="-isystem$TERMUX_PREFIX/include"
 
 	export CARGO_TARGET_NAME="${TERMUX_ARCH}-linux-android"
 	if [[ "${TERMUX_ARCH}" == "arm" ]]; then
