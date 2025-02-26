@@ -18,10 +18,13 @@ fi
 # To reset, use "restorecon -Fr ."
 # To check, use "ls -Z ."
 if [ -n "$(command -v getenforce)" ] && [ "$(getenforce)" = Enforcing ]; then
-	VOLUME=$REPOROOT:$CONTAINER_HOME_DIR/termux-packages:z
+	VOLUME_PACKAGES=$REPOROOT:$CONTAINER_HOME_DIR/termux-packages:z
 else
-	VOLUME=$REPOROOT:$CONTAINER_HOME_DIR/termux-packages
+	VOLUME_PACKAGES=$REPOROOT:$CONTAINER_HOME_DIR/termux-packages
 fi
+VOLUME_TERMUX_BUILD=$REPOROOT/termux-build:$CONTAINER_HOME_DIR/.termux-build
+VOLUME_DATA=$REPOROOT/data:/data
+VOLUME_CCACHE=$REPOROOT/ccache:$CONTAINER_HOME_DIR/.cache/ccache
 
 : ${TERMUX_BUILDER_IMAGE_NAME:=ghcr.io/termux/package-builder}
 : ${CONTAINER_NAME:=termux-package-builder}
@@ -49,7 +52,10 @@ $SUDO docker start $CONTAINER_NAME >/dev/null 2>&1 || {
 		--detach \
 		--init \
 		--name $CONTAINER_NAME \
-		--volume $VOLUME \
+		--volume $VOLUME_PACKAGES \
+		--volume $VOLUME_TERMUX_BUILD \
+		--volume $VOLUME_DATA \
+		--volume $VOLUME_CCACHE \
 		$SEC_OPT \
 		--tty \
 		$TERMUX_BUILDER_IMAGE_NAME
@@ -64,7 +70,7 @@ $SUDO docker start $CONTAINER_NAME >/dev/null 2>&1 || {
 	fi
 }
 
-# Set traps to ensure that the process started with docker exec and all its children are killed. 
+# Set traps to ensure that the process started with docker exec and all its children are killed.
 . "$TERMUX_SCRIPTDIR/scripts/utils/docker/docker.sh"; docker__setup_docker_exec_traps
 
 if [ "$#" -eq "0" ]; then

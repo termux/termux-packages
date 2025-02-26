@@ -16,6 +16,7 @@ termux_setup_cmake() {
 		local TERMUX_CMAKE_NAME="cmake-glibc"
 	fi
 
+	export CMAKE_DISABLE_PRECOMPILE_HEADERS=1
 	export CMAKE_INSTALL_ALWAYS=1
 
 	if [ "${TERMUX_ON_DEVICE_BUILD}" = "true" ]; then
