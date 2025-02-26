@@ -543,6 +543,24 @@ TERMUX__APPS_APP_UID___MAX_LEN=9
 
 
 ##
+# Termux apps info environment subfile path under an app directory of
+# `TERMUX__APPS_DIR_BY_IDENTIFIER`.
+#
+# Default value: `termux-apps-info.env`
+##
+TERMUX_CORE__APPS_INFO_ENV_SUBFILE="$TERMUX__INTERNAL_NAME-apps-info.env"
+
+##
+# Termux apps info json subfile path under an app directory of
+# `TERMUX__APPS_DIR_BY_IDENTIFIER`.
+#
+# Default value: `termux-apps-info.json`
+##
+TERMUX_CORE__APPS_INFO_JSON_SUBFILE="$TERMUX__INTERNAL_NAME-apps-info.json"
+
+
+
+##
 # `termux-am-socket` server subfile path under an app directory of
 # `TERMUX__APPS_DIR_BY_IDENTIFIER`.
 #
@@ -818,6 +836,7 @@ TERMUX__PREFIX__BIN_DIR___MAX_LEN="$((TERMUX__PREFIX_DIR___MAX_LEN + 1 + 3))" # 
 #
 # **See Also:**
 # - https://github.com/termux/termux-packages/wiki/Termux-file-system-layout#file-path-limits
+# - https://github.com/termux/termux-core-package/blob/master/lib/termux-core_nos_c_tre/include/termux/termux_core__nos__c/v1/termux/file/TermuxFile.h
 #
 # Constant value: `127`
 ##
@@ -1122,6 +1141,16 @@ TERMUX__UNIX_PATH_MAX=108
 # The `TERMUX_ENV__S_APP` environment variable will be exported at
 # runtime for the scope of the current Termux app running the shell.
 #
+# Termux packages and external programs can use the
+# `termux-scoped-env-variable` util from the `termux-core`
+# package to get variable names and values for Termux. It uses the
+# root scope from the `$TERMUX_ENV__S_ROOT` environment variable
+# exported by the Termux app to dynamically generate the Termux
+# variable names and/or get their values, with support for fallback
+# to the build values defined here if `$TERMUX_ENV__S_ROOT` variable
+# is not exported.**
+# - https://github.com/termux/termux-core-package/blob/master/site/pages/en/projects/docs/usage/utils/termux/shell/command/environment/termux-scoped-env-variable.md
+#
 # The value of this variable `TERMUX_ENV__S_ROOT` may be modified,
 # although not advisable since external programs would be using
 # hardcoded `TERMUX_` value for reading Termux environment variables,
@@ -1267,6 +1296,52 @@ TERMUX_ENV__S_TERMUX_ROOTFS="${TERMUX_ENV__S_ROOT}${TERMUX_ENV__SS_TERMUX_ROOTFS
 
 
 ##
+# Termux environment variables `termux-core` sub scope.
+#
+# **Do not modify this!** This is considered a constant `termux-core`
+# sub scope for Termux execution environment that's used by external
+# programs that do not use the termux packages building infrastructure
+# and rely on `$TERMUX_ENV__S_ROOT` environment variable exported by
+# Termux app containing the root scope to generate the value for
+# `$TERMUX_ENV__S_TERMUX_CORE` and variable names under it.**
+#
+# Default value: `CORE__`
+##
+TERMUX_ENV__SS_TERMUX_CORE="CORE__"
+
+##
+# Termux environment variables `termux-core` scope.
+#
+# **Do not modify this!**
+#
+# Default value: `TERMUX_CORE__`
+##
+TERMUX_ENV__S_TERMUX_CORE="${TERMUX_ENV__S_ROOT}${TERMUX_ENV__SS_TERMUX_CORE}"
+
+
+##
+# Termux environment variables `termux-core-tests` sub scope.
+#
+# **Do not modify this!** This is considered a constant
+# `termux-core-tests` sub scope for Termux execution environment
+#  that's used by `termux-core` package to generate the value for
+# `$TERMUX_ENV__S_TERMUX_CORE__TESTS` and variable names under it.**
+#
+# Default value: `TERMUX_CORE__TESTS__`
+##
+TERMUX_ENV__SS_TERMUX_CORE__TESTS="CORE__TESTS__"
+
+##
+# Termux environment variables `termux-core-tests` scope.
+#
+# **Do not modify this!**
+#
+# Default value: `TERMUX_CORE__TESTS__`
+##
+TERMUX_ENV__S_TERMUX_CORE__TESTS="${TERMUX_ENV__S_ROOT}${TERMUX_ENV__SS_TERMUX_CORE__TESTS}"
+
+
+
 # Termux environment variables `termux-am-socket` sub scope.
 #
 # **Do not modify this!** This is considered a constant `termux-am-socket`
@@ -1472,6 +1547,22 @@ TERMUX_APP__DATA_SENDER_BROADCASTRECEIVER__COMPONENT_NAME="$TERMUX_APP__PACKAGE_
 
 
 ##
+# Termux apps info environment file path for the Termux app under `TERMUX_APP__APPS_DIR`.
+#
+# Default value: `/data/data/com.termux/termux/apps/i/termux/termux-apps-info.env`
+##
+TERMUX_APP__CORE__APPS_INFO_ENV_FILE="$TERMUX_APP__APPS_DIR/$TERMUX_CORE__APPS_INFO_ENV_SUBFILE"
+__termux_build_props__add_variables_validator_actions "TERMUX_APP__CORE__APPS_INFO_ENV_FILE" "safe_absolute_path"
+
+##
+# Termux apps info json file path for the Termux app under `TERMUX_APP__APPS_DIR`.
+#
+# Default value: `/data/data/com.termux/termux/apps/i/termux/termux-apps-info.json`
+##
+TERMUX_APP__CORE__APPS_INFO_JSON_FILE="$TERMUX_APP__APPS_DIR/$TERMUX_CORE__APPS_INFO_JSON_SUBFILE"
+__termux_build_props__add_variables_validator_actions "TERMUX_APP__CORE__APPS_INFO_JSON_FILE" "safe_absolute_path"
+
+##
 # `termux-am-socket` server file path for the Termux app under `TERMUX_APP__APPS_DIR`.
 #
 # Default value: `/data/data/com.termux/termux/apps/i/termux/termux-am`
@@ -1607,6 +1698,35 @@ TERMUX_API_PKG__REPO_NAME="termux-api-package"
 # Default value: `https://github.com/termux/termux-api-package`
 ##
 TERMUX_API_PKG__REPO_URL="$TERMUX__REPOS_HOST_ORG_URL/$TERMUX_API_PKG__REPO_NAME"
+
+
+
+
+
+
+
+
+
+
+####
+# Variables for the `termux-core` package.
+#
+# - https://github.com/termux/termux-core-package
+####
+
+##
+# The `termux-core` package repo name.
+#
+# Default value: `termux-core-package`
+##
+TERMUX_CORE_PKG__REPO_NAME="termux-core-package"
+
+##
+# The `termux-core` package repo url.
+#
+# Default value: `https://github.com/termux/termux-core-package`
+##
+TERMUX_CORE_PKG__REPO_URL="$TERMUX__REPOS_HOST_ORG_URL/$TERMUX_CORE_PKG__REPO_NAME"
 
 
 
