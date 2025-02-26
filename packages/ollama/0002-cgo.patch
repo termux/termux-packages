@@ -9,3 +9,14 @@
  #if defined(__clang__)
  	return COMP_CLANG;
  #elif defined(__GNUC__)
+--- a/ml/backend/ggml/ggml.go
++++ b/ml/backend/ggml/ggml.go
+@@ -11,7 +11,7 @@
+ static struct ggml_backend_feature * getNextBackendFeatures(struct ggml_backend_feature * feature) { return &feature[1];}
+ 
+ typedef enum {COMP_UNKNOWN,COMP_GCC,COMP_CLANG} COMPILER;
+-COMPILER inline get_compiler() {
++static inline COMPILER get_compiler() {
+ #if defined(__clang__)
+ 	return COMP_CLANG;
+ #elif defined(__GNUC__)
