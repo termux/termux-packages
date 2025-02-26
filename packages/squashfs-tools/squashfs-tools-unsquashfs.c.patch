@@ -1,0 +1,23 @@
+diff --git a/squashfs-tools/unsquashfs.c b/squashfs-tools/unsquashfs.c
+index 0ac6356..2b548be 100644
+--- a/squashfs-tools/unsquashfs.c
++++ b/squashfs-tools/unsquashfs.c
+@@ -1040,6 +1040,18 @@ void queue_dir(char *pathname, struct dir *dir)
+ 	queue_put(to_writer, file);
+ }
+ 
++// https://git.musl-libc.org/cgit/musl/tree/src/legacy/lutimes.c
++int lutimes(const char *filename, const struct timeval tv[2])
++{
++	struct timespec times[2];
++	if (tv) {
++		times[0].tv_sec  = tv[0].tv_sec;
++		times[0].tv_nsec = tv[0].tv_usec * 1000;
++		times[1].tv_sec  = tv[1].tv_sec;
++		times[1].tv_nsec = tv[1].tv_usec * 1000;
++	}
++	return utimensat(AT_FDCWD, filename, tv ? times : 0, AT_SYMLINK_NOFOLLOW);
++}
+ 
+ int write_file(struct inode *inode, char *pathname)
+ {
