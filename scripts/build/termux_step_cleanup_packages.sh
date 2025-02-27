@@ -1,11 +1,15 @@
 termux_step_cleanup_packages() {
+	[[ "${TERMUX_CLEANUP_BUILT_PACKAGES_ON_LOW_DISK_SPACE:=false}" == "true" ]] || return 0
 	[[ -d "$TERMUX_TOPDIR" ]] || return 0
 
-	# Extract available disk space in GB
-	local AVAILABLE=`df -B $((1024**3)) --output=avail "$TERMUX_TOPDIR" | tail -1`
+	# How much space is considered to be enough
+	local CLEANUP_THRESHOLD="$(( 5 * 1024 ** 3 ))" # 5 GiB
 
-	# No need to cleanup if there is enough disk space (more than 5 GB)
-	[ "$AVAILABLE" -lt 5 ] || return 0
+	# Extract available disk space in bytes
+	local AVAILABLE="$(df "$TERMUX_TOPDIR" | awk 'NR==2 {print $4 * 1024}')"
+
+	# No need to cleanup if there is enough disk space
+	(( AVAILABLE <= CLEANUP_THRESHOLD )) || return 0
 
 	local TERMUX_PACKAGES_DIRECTORIES="$(jq --raw-output 'del(.pkg_format) | keys | .[]' "${TERMUX_SCRIPTDIR}"/repo.json)"
 
