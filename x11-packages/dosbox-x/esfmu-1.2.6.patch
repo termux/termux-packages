@@ -1,0 +1,397 @@
++++ ./src/hardware/esfmu/esfm_registers.c
+@@ -453,21 +453,24 @@
+ 		{
+ 		case TIMER1_REG:
+ 			chip->timer_reload[0] = data;
++			chip->timer_counter[0] = data;
+ 			break;
+ 		case TIMER2_REG:
+ 			chip->timer_reload[1] = data;
++			chip->timer_counter[1] = data;
+ 			break;
+ 		case TIMER_SETUP_REG:
+ 			if (data & 0x80)
+ 			{
++				chip->irq_bit = 0;
+ 				chip->timer_overflow[0] = 0;
+ 				chip->timer_overflow[1] = 0;
+-				chip->irq_bit = 0;
++				break;
+ 			}
+ 			chip->timer_enable[0] = (data & 0x01) != 0;
+ 			chip->timer_enable[1] = (data & 0x02) != 0;
+-			chip->timer_mask[0] = (data & 0x20) != 0;
+-			chip->timer_mask[1] = (data & 0x40) != 0;
++			chip->timer_mask[1] = (data & 0x20) != 0;
++			chip->timer_mask[0] = (data & 0x40) != 0;
+ 			break;
+ 		case CONFIG_REG:
+ 			chip->keyscale_mode = (data & 0x40) != 0;
+@@ -485,10 +488,14 @@
+ 			}
+ 			break;
+ 		case TEST_REG:
+-			chip->test_bit_eg_halt = (data & 0x01) | ((data & 0x20) != 0);
+-			chip->test_bit_distort = (data & 0x02) != 0;
+-			chip->test_bit_attenuate = (data & 0x10) != 0;
+-			chip->test_bit_phase_stop_reset = (data & 0x40) != 0;
++			chip->test_bit_w0_r5_eg_halt = (data & 0x01) | ((data & 0x20) != 0);
++			chip->test_bit_1_distort = (data & 0x02) != 0;
++			chip->test_bit_2 = (data & 0x04) != 0;
++			chip->test_bit_3 = (data & 0x08) != 0;
++			chip->test_bit_4_attenuate = (data & 0x10) != 0;
++			chip->test_bit_w5_r0 = (data & 0x20) != 0;
++			chip->test_bit_6_phase_stop_reset = (data & 0x40) != 0;
++			chip->test_bit_7 = (data & 0x80) != 0;
+ 			break;
+ 		}
+ 	}
+@@ -543,16 +550,16 @@
+ 		switch (address & 0x5ff)
+ 		{
+ 		case TIMER1_REG:
+-			data = chip->timer_reload[0];
++			data = chip->timer_counter[0];
+ 			break;
+ 		case TIMER2_REG:
+-			data = chip->timer_reload[1];
++			data = chip->timer_counter[1];
+ 			break;
+ 		case TIMER_SETUP_REG:
+ 			data |= chip->timer_enable[0] != 0;
+ 			data |= (chip->timer_enable[1] != 0) << 1;
+-			data |= (chip->timer_mask[0] != 0) << 5;
+-			data |= (chip->timer_mask[1] != 0) << 6;
++			data |= (chip->timer_mask[1] != 0) << 5;
++			data |= (chip->timer_mask[0] != 0) << 6;
+ 			break;
+ 		case CONFIG_REG:
+ 			data |= (chip->keyscale_mode != 0) << 6;
+@@ -563,11 +570,14 @@
+ 			data |= chip->emu_tremolo_deep << 7;
+ 			break;
+ 		case TEST_REG:
+-			data |= chip->test_bit_eg_halt != 0;
+-			data |= (chip->test_bit_distort != 0) << 1;
+-			data |= (chip->test_bit_attenuate != 0) << 4;
+-			data |= (chip->test_bit_eg_halt != 0) << 5;
+-			data |= (chip->test_bit_phase_stop_reset != 0) << 6;
++			data |= chip->test_bit_w5_r0 != 0;
++			data |= (chip->test_bit_1_distort != 0) << 1;
++			data |= (chip->test_bit_2 != 0) << 2;
++			data |= (chip->test_bit_3 != 0) << 3;
++			data |= (chip->test_bit_4_attenuate != 0) << 4;
++			data |= (chip->test_bit_w0_r5_eg_halt != 0) << 5;
++			data |= (chip->test_bit_6_phase_stop_reset != 0) << 6;
++			data |= (chip->test_bit_7 != 0) << 7;
+ 			break;
+ 		case FOUROP_CONN_REG:
+ 			for (i = 0; i < 3; i++)
+@@ -577,6 +587,7 @@
+ 			}
+ 			break;
+ 		case NATIVE_MODE_REG:
++			data |= (chip->emu_newmode != 0);
+ 			data |= (chip->native_mode != 0) << 7;
+ 			break;
+ 		}
+@@ -639,9 +650,11 @@
+ 				break;
+ 			case 0x02:
+ 				chip->timer_reload[0] = data;
++				chip->timer_counter[0] = data;
+ 				break;
+ 			case 0x03:
+ 				chip->timer_reload[1] = data;
++				chip->timer_counter[1] = data;
+ 				break;
+ 			case 0x04:
+ 				for (i = 0; i < 3; i++)
+@@ -677,19 +690,24 @@
+ 				break;
+ 			case 0x02:
+ 				chip->timer_reload[0] = data;
++				chip->timer_counter[0] = data;
+ 				break;
+ 			case 0x03:
+ 				chip->timer_reload[1] = data;
++				chip->timer_counter[1] = data;
+ 				break;
+ 			case 0x04:
+-				chip->timer_enable[0] = data & 0x01;
+-				chip->timer_enable[1] = (data & 0x02) != 0;
+-				chip->timer_mask[0] = (data & 0x20) != 0;
+-				chip->timer_mask[1] = (data & 0x40) != 0;
+ 				if (data & 0x80)
+ 				{
+ 					chip->irq_bit = 0;
++					chip->timer_overflow[0] = 0;
++					chip->timer_overflow[1] = 0;
++					break;
+ 				}
++				chip->timer_enable[0] = data & 0x01;
++				chip->timer_enable[1] = (data & 0x02) != 0;
++				chip->timer_mask[1] = (data & 0x20) != 0;
++				chip->timer_mask[0] = (data & 0x40) != 0;
+ 				break;
+ 			case 0x08:
+ 				chip->keyscale_mode = (data & 0x40) != 0;
+@@ -850,6 +868,7 @@
+ 		case 0:
+ 			chip->native_mode = 0;
+ 			ESFM_native_to_emu_switch(chip);
++			// TODO: verify if the address write goes through
+ 			chip->addr_latch = data;
+ 			break;
+ 		case 1:
+@@ -886,43 +905,30 @@
+ ESFM_read_port (esfm_chip *chip, uint8_t offset)
+ {
+ 	uint8_t data = 0;
+-	if (chip->native_mode)
++
++	switch(offset)
+ 	{
+-		switch(offset)
++	case 0:
++		data |= (chip->irq_bit != 0) << 7;
++		data |= (chip->timer_overflow[0] != 0) << 6;
++		data |= (chip->timer_overflow[1] != 0) << 5;
++		break;
++	case 1:
++		if (chip->native_mode)
+ 		{
+-		case 0:
+-			// TODO: actually implement timer count, trigger and reset
+-			data |= (chip->irq_bit != 0) << 7;
+-			data |= (chip->timer_overflow[0] != 0) << 6;
+-			data |= (chip->timer_overflow[1] != 0) << 5;
+-			break;
+-		case 1:
+ 			data = ESFM_readback_reg_native(chip, chip->addr_latch);
+-			break;
+-		// TODO: verify what the ESFM chip actually returns when reading
+-		// from the other address ports
+ 		}
+-	}
+-	else
+-	{
+-		switch(offset)
++		else
+ 		{
+-		case 0:
+-			data |= (chip->irq_bit != 0) << 7;
+-			data |= (chip->timer_overflow[0] != 0) << 6;
+-			data |= (chip->timer_overflow[1] != 0) << 5;
+-			break;
+-		case 1:
+ 			data = 0;
+-			break;
+-		case 2: case 3:
+-			// This matches OPL3 behavior.
+-			// TODO: verify what the ESFM chip actually returns when reading
+-			// from address ports in emulation mode
+-			data = 0xff;
+-			break;
+ 		}
++		break;
++	case 2: case 3:
++		// This matches OPL3 behavior.
++		data = 0xff;
++		break;
+ 	}
++
+ 	return data;
+ }
+ 
++++ ./src/hardware/esfmu/esfm.c
+@@ -1741,6 +1741,10 @@
+ }
+ 
+ /* ------------------------------------------------------------------------- */
++#pragma GCC diagnostic ignored "-Wunused-variable"
++#pragma GCC diagnostic ignored "-Wunknown-pragmas"
++#pragma clang diagnostic ignored "-Wunused-variable"
++#pragma clang diagnostic ignored "-Wunknown-pragmas"
+ static void
+ ESFM_process_feedback(esfm_chip *chip)
+ {
+@@ -1752,11 +1756,12 @@
+ 		uint32 basefreq, phase_offset;
+ 		uint3 block;
+ 		uint10 f_num;
+-		int32_t wave_out;
++		int32_t wave_out, wave_last;
+ 		int32_t phase_feedback;
++		uint32_t iter_counter;
+ 		uint3 waveform;
+ 		uint3 mod_in_shift;
+-		uint32_t phase_acc;
++		uint32_t phase, phase_acc;
+ 		uint10 eg_output;
+ 
+ 		if (slot->mod_in_level && (chip->native_mode || (slot->in.mod_input == &slot->in.feedback_buf)))
+@@ -1778,7 +1783,7 @@
+ 			eg_output = slot->in.eg_output;
+ 
+ 			// ASM optimizaions!
+-#if defined(__GNUC__) && defined(__x86_64__)
++#if defined(__GNUC__) && defined(__x86_64__) && !defined(_ESFMU_DISABLE_ASM_OPTIMIZATIONS)
+ 			asm (
+ 				"movzbq  %[wave], %%r8               \n\t"
+ 				"shll    $11, %%r8d                  \n\t"
+@@ -1843,13 +1848,14 @@
+ 				  [exprom] "m"   (exprom)
+ 				: "cc", "ax", "bx", "cx", "dx", "r8", "r9", "r10", "r11"
+ 			);
+-#elif defined(__GNUC__) && defined(__i386__)
+-			uint32_t iter_counter;
+-			int32_t wave_last;
++#elif defined(__GNUC__) && defined(__i386__) && !defined(_ESFMU_DISABLE_ASM_OPTIMIZATIONS)
++			size_t logsinrom_addr = (size_t)logsinrom;
++			size_t exprom_addr = (size_t)exprom;
++
+ 			asm (
+ 				"movzbl  %b[wave], %%eax             \n\t"
+ 				"shll    $11, %%eax                  \n\t"
+-				"leal    %[sinrom], %%edi            \n\t"
++				"movl    %[sinrom], %%edi            \n\t"
+ 				"addl    %%eax, %%edi                \n\t"
+ 				"shlw    $3, %[eg_out]               \n\t"
+ 				"xorl    %[out], %[out]              \n\t"
+@@ -1884,7 +1890,7 @@
+ 				// wave_out = exprom[level & 0xff] >> (level >> 8);
+ 				"movb    %%ah, %%cl                  \n\t"
+ 				"movzbl  %%al, %%eax                 \n\t"
+-				"leal    %[exprom], %[out]           \n\t"
++				"movl    %[exprom], %[out]           \n\t"
+ 				"movzwl  (%[out], %%eax, 2), %[out]  \n\t"
+ 				"shrl    %%cl, %[out]                \n\t"
+ 				// if (lookup & 0x8000) wave_out = -wave_out;
+@@ -1906,12 +1912,12 @@
+ 				: [p_off]  "m"   (phase_offset),
+ 				  [mod_in] "m"   (mod_in_shift),
+ 				  [wave]   "m"   (waveform),
+-				  [sinrom] "m"   (logsinrom),
+-				  [exprom] "m"   (exprom),
++				  [sinrom] "m"   (logsinrom_addr),
++				  [exprom] "m"   (exprom_addr),
+ 				  [i]      "m"   (iter_counter)
+ 				: "cc", "ax", "bx", "cx", "di"
+ 			);
+-#elif defined(__GNUC__) && defined(__arm__)
++#elif defined(__GNUC__) && defined(__arm__) && !defined(_ESFMU_DISABLE_ASM_OPTIMIZATIONS)
+ 			asm (
+ 				"movs    r3, #0                     \n\t"
+ 				"movs    %[out], #0                 \n\t"
+@@ -1966,12 +1972,12 @@
+ 			);
+ #else
+ 			wave_out = 0;
+-			int32_t wave_last = 0;
+-			for (uint32_t iter_counter = 0; iter_counter < 29; iter_counter++)
++			wave_last = 0;
++			for (iter_counter = 0; iter_counter < 29; iter_counter++)
+ 			{
+ 				phase_feedback = (wave_out + wave_last) >> 2;
+ 				wave_last = wave_out;
+-				uint32_t phase = phase_feedback >> mod_in_shift;
++				phase = phase_feedback >> mod_in_shift;
+ 				phase += phase_acc >> 9;
+ 				wave_out = ESFM_envelope_wavegen(waveform, phase, eg_output);
+ 				phase_acc += phase_offset;
+@@ -2055,10 +2061,13 @@
+ 	return (int16_t)sample;
+ }
+ 
++#define TIMER1_CONST (0.2517482517482517)
++#define TIMER2_CONST (0.06293706293706293)
+ /* ------------------------------------------------------------------------- */
+ static void
+ ESFM_update_timers(esfm_chip *chip)
+-{
++{	
++	int i;
+ 	// Tremolo
+ 	if ((chip->global_timer & 0x3f) == 0x3f)
+ 	{
+@@ -2111,6 +2120,28 @@
+ 		}
+ 	}
+ 
++	for (i = 0; i < 2; i++)
++	{
++		if (chip->timer_enable[i])
++		{
++			chip->timer_accumulator[i] += (i == 0) ? TIMER1_CONST : TIMER2_CONST;
++			if (chip->timer_accumulator[i] > 1.0)
++			{
++				chip->timer_accumulator[i] -= 1.0;
++				chip->timer_counter[i]++;
++				if (chip->timer_counter[i] == 0)
++				{
++					if (chip->timer_mask[i] == 0)
++					{
++						chip->irq_bit = true;
++						chip->timer_overflow[i] = true;
++					}
++					chip->timer_counter[i] = chip->timer_reload[i];
++				}
++			}
++		}
++	}
++
+ 	chip->eg_tick ^= 1;
+ }
+ 
++++ ./src/hardware/esfmu/esfm.h
+@@ -215,7 +215,7 @@
+ {
+ 	esfm_channel channels[18];
+ 	int32 output_accm[2];
+-	uint_fast16_t addr_latch;
++	uint16 addr_latch;
+ 
+ 	flag emu_wavesel_enable;
+ 	flag emu_newmode;
+@@ -248,6 +248,7 @@
+ 	flag emu_vibrato_deep;
+ 	flag emu_tremolo_deep;
+ 
++	double timer_accumulator[2];
+ 	uint8 timer_reload[2];
+ 	uint8 timer_counter[2];
+ 	flag timer_enable[2];
+@@ -255,18 +256,27 @@
+ 	flag timer_overflow[2];
+ 	flag irq_bit;
+ 
+-	// Halts the envelope generators from advancing.
+-	flag test_bit_eg_halt;
++	// -- Test bits (NOT IMPLEMENTED) --
++	// Halts the envelope generators from advancing. Written on bit 0, read back from bit 5.
++	flag test_bit_w0_r5_eg_halt;
+ 	/*
+ 	 * Activates some sort of waveform test mode that amplifies the output volume greatly
+ 	 * and continuously shifts the waveform table downwards, possibly also outputting the
+ 	 * waveform's derivative? (it's so weird!)
+ 	 */
+-	flag test_bit_distort;
++	flag test_bit_1_distort;
++	// Seems to do nothing.
++	flag test_bit_2;
++	// Seems to do nothing.
++	flag test_bit_3;
+ 	// Appears to attenuate the output by about 3 dB.
+-	flag test_bit_attenuate;
++	flag test_bit_4_attenuate;
++	// Written on bit 5, read back from bit 0. Seems to do nothing.
++	flag test_bit_w5_r0;
+ 	// Resets all phase generators and holds them in the reset state while this bit is set.
+-	flag test_bit_phase_stop_reset;
++	flag test_bit_6_phase_stop_reset;
++	// Seems to do nothing.
++	flag test_bit_7;
+ 
+ 	esfm_write_buf write_buf[ESFM_WRITEBUF_SIZE];
+ 	size_t write_buf_start;
