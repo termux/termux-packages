@@ -1,132 +1,85 @@
 TERMUX_PKG_HOMEPAGE=https://www.haskell.org/ghc/
 TERMUX_PKG_DESCRIPTION="The Glasgow Haskell Compiler libraries"
-TERMUX_PKG_LICENSE="BSD 2-Clause, BSD 3-Clause, LGPL-2.1"
-TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.org>"
-TERMUX_PKG_VERSION=9.2.5
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL="https://downloads.haskell.org/~ghc/${TERMUX_PKG_VERSION}/ghc-${TERMUX_PKG_VERSION}-src.tar.xz"
-TERMUX_PKG_SHA256=0606797d1b38e2d88ee2243f38ec6b9a1aa93e9b578e95f0de9a9c0a4144021c
-TERMUX_PKG_DEPENDS="libiconv, libffi, ncurses, libgmp, libandroid-posix-semaphore"
+TERMUX_PKG_LICENSE="custom"
+TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.dev>"
+TERMUX_PKG_VERSION=9.12.1
+TERMUX_PKG_SRCURL="https://downloads.haskell.org/~ghc/$TERMUX_PKG_VERSION/ghc-$TERMUX_PKG_VERSION-src.tar.xz"
+TERMUX_PKG_SHA256=4a7410bdeec70f75717087b8f94bf5a6598fd61b3a0e1f8501d8f10be1492754
+TERMUX_PKG_DEPENDS="libiconv, libffi, libgmp, libandroid-posix-semaphore, ncurses"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
---disable-ld-override
---build=x86_64-unknown-linux
---host=x86_64-unknown-linux
+--host=$TERMUX_BUILD_TUPLE
 --with-system-libffi
---with-ffi-includes=${TERMUX_PREFIX}/include
---with-ffi-libraries=${TERMUX_PREFIX}/lib
---with-gmp-includes=${TERMUX_PREFIX}/include
---with-gmp-libraries=${TERMUX_PREFIX}/lib
---with-iconv-includes=${TERMUX_PREFIX}/include
---with-iconv-libraries=${TERMUX_PREFIX}/lib
---with-curses-libraries=${TERMUX_PREFIX}/lib
---with-curses-includes=${TERMUX_PREFIX}/include
-"
+--disable-ld-override"
+TERMUX_PKG_REPLACES="ghc-libs-static, ghc-libs"
+TERMUX_PKG_PROVIDES="ghc-libs, ghc-libs-static"
 TERMUX_PKG_NO_STATICSPLIT=true
-TERMUX_PKG_REPLACES="ghc-libs-static"
-
-# 'network' is used by 'libiserv'. This will enable over the network support in 'iserv-proxy' which is
-# used to cross-compile haskell-template.
-termux_step_post_get_source() {
-	mkdir -p "$TERMUX_PKG_SRCDIR"/libraries/network
-	local tar_file="$TERMUX_PKG_CACHEDIR/network.tar"
-	termux_download \
-		https://hackage.haskell.org/package/network-2.8.0.1/network-2.8.0.1.tar.gz \
-		"$tar_file" \
-		61f55dbfed0f0af721a8ea36079e9309fcc5a1be20783b44ae500d9e4399a846
-	tar xf "$tar_file" -C "$TERMUX_PKG_SRCDIR"/libraries/network --strip-components=1
-	# Alllow newer versions of 'bytestring':
-	sed -ri 's|(bytestring) == .*|\1|' "$TERMUX_PKG_SRCDIR"/libraries/network/network.cabal
-	# XXX: Please verify above command works when updating.
-}
+TERMUX_PKG_LICENSE_FILE="LICENSE"
 
 termux_step_pre_configure() {
-	termux_setup_ghc
+	termux_setup_ghc && termux_setup_cabal
 
-	local host_platform="${TERMUX_HOST_PLATFORM}"
-	[ "${TERMUX_ARCH}" = "arm" ] && host_platform="armv7a-linux-androideabi"
-	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --target=${host_platform}"
+	export CONF_CC_OPTS_STAGE1="$CFLAGS $CPPFLAGS"
+	export CONF_GCC_LINKER_OPTS_STAGE1="$LDFLAGS"
+	export CONF_CXX_OPTS_STAGE1="$CXXFLAGS"
 
-	local extra_flags="-O -optl-Wl,-rpath=${TERMUX_PREFIX}/lib -optl-Wl,--enable-new-dtags"
-	[ "${TERMUX_ARCH}" != "i686" ] && extra_flags+=" -fllvm"
+	export CONF_CC_OPTS_STAGE2="$CFLAGS $CPPFLAGS"
+	export CONF_GCC_LINKER_OPTS_STAGE2="$LDFLAGS"
+	export CONF_CXX_OPTS_STAGE2="$CXXFLAGS"
 
-	# Suppress warnings for LLVM 13
-	sed -i 's/LlvmMaxVersion=13/LlvmMaxVersion=15/' configure.ac
+	export target="$TERMUX_HOST_PLATFORM"
+	[[ "$TERMUX_ARCH" == "arm" ]] && target="armv7a-linux-androideabi"
 
-	export LIBTOOL && LIBTOOL="$(command -v libtool)"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS="$TERMUX_PKG_EXTRA_CONFIGURE_ARGS --target=$target"
+}
 
-	cp mk/build.mk.sample mk/build.mk
-	cat >>mk/build.mk <<-EOF
-		SRC_HC_OPTS        = -O -H64m
-		GhcStage1HcOpts    = -O
-		GhcStage2HcOpts    = ${extra_flags}
-		GhcLibHcOpts       = ${extra_flags} -optl-landroid-posix-semaphore
-		BuildFlavour       = quick-cross
-		GhcLibWays         = v dyn
-		BUILD_PROF_LIBS    = NO
-		HADDOCK_DOCS       = NO
-		BUILD_SPHINX_HTML  = NO
-		BUILD_SPHINX_PDF   = NO
-		BUILD_MAN          = NO
-		WITH_TERMINFO      = YES
-		DYNAMIC_GHC_PROGRAMS = YES
-		SplitSections      = YES
-		StripLibraries     = YES
-		libraries/libiserv_CONFIGURE_OPTS += --flags=+network
-	EOF
+termux_step_make() {
+	(
+		unset CFLAGS CPPFLAGS LDFLAGS # For stage0 compilation.
 
-	patch -p1 <<-EOF
-		--- ghc.orig/rules/build-package-data.mk 2022-11-07 01:10:29.000000000 +0530
-		+++ ghc.mod/rules/build-package-data.mk  2022-11-11 13:08:01.992488180 +0530
-		@@ -68,6 +68,12 @@
-		 \$1_\$2_CONFIGURE_LDFLAGS = \$\$(SRC_LD_OPTS) \$\$(\$1_LD_OPTS) \$\$(\$1_\$2_LD_OPTS)
-		 \$1_\$2_CONFIGURE_CPPFLAGS = \$\$(SRC_CPP_OPTS) \$\$(CONF_CPP_OPTS_STAGE\$3) \$\$(\$1_CPP_OPTS) \$\$(\$1_\$2_CPP_OPTS)
-
-		+ifneq "\$3" "0"
-		+ \$1_\$2_CONFIGURE_LDFLAGS += ${LDFLAGS}
-		+ \$1_\$2_CONFIGURE_CPPFLAGS += ${CPPFLAGS}
-		+ \$1_\$2_CONFIGURE_CFLAGS += ${CFLAGS}
-		+endif
-		+
-		 \$1_\$2_CONFIGURE_OPTS += --configure-option=CFLAGS="\$\$(\$1_\$2_CONFIGURE_CFLAGS)"
-		 \$1_\$2_CONFIGURE_OPTS += --configure-option=LDFLAGS="\$\$(\$1_\$2_CONFIGURE_LDFLAGS)"
-		 \$1_\$2_CONFIGURE_OPTS += --configure-option=CPPFLAGS="\$\$(\$1_\$2_CONFIGURE_CPPFLAGS)"
-		@@ -104,9 +110,12 @@
-		 \$1_\$2_CONFIGURE_OPTS += --configure-option=--with-gmp
-		 endif
-
-		-
-		 ifneq "\$\$(CURSES_LIB_DIRS)" ""
-		-\$1_\$2_CONFIGURE_OPTS += --configure-option=--with-curses-libraries="\$\$(CURSES_LIB_DIRS)"
-		+ ifeq "\$3" "0"
-		+  \$1_\$2_CONFIGURE_OPTS += --configure-option=--with-curses-libraries="/usr/lib"
-		+ else
-		+  \$1_\$2_CONFIGURE_OPTS += --configure-option=--with-curses-libraries="\$\$(CURSES_LIB_DIRS)"
-		+ endif
-		 endif
-
-		 \$1_\$2_CONFIGURE_OPTS += --configure-option=--host=\$(TargetPlatformFull)
-	EOF
-
-	./boot
+		# NOTE: We do not build profiled libs. It exceeds the 6 hours usage limit of github CI.
+		./hadrian/build binary-dist-dir \
+			-j"$TERMUX_PKG_MAKE_PROCESSES" \
+			--flavour="perf+split_sections+no_profiled_libs" \
+			--docs=none \
+			"stage1.unix.ghc.link.opts += -optl-landroid-posix-semaphore" \
+			"stage2.unix.ghc.link.opts += -optl-landroid-posix-semaphore"
+	)
 }
 
 termux_step_make_install() {
-	make install-strip INSTALL="$(command -v install) --strip-program=${STRIP}"
+	cd _build/bindist/ghc-"$TERMUX_PKG_VERSION"-"$target" || exit 1
+
+	# Remove unnecessary flags. They would get written to settings file otherwise:
+	unset CONF_CC_OPTS_STAGE2 CONF_GCC_LINKER_OPTS_STAGE2 CONF_CXX_OPTS_STAGE2
+
+	# We need to re-run configure:
+	# See: https://gitlab.haskell.org/ghc/ghc/-/issues/22058
+	./configure \
+		--prefix="$TERMUX_PREFIX" \
+		--with-system-libffi \
+		--host="$target"
+
+	HOST_GHC_PKG="$(realpath ../../stage1/bin/ghc-pkg)" make install
 }
 
-termux_step_post_make_install() {
-	# We may build GHC with `llc-9` etc., but only `llc` is present in Termux
-	sed -i 's/"LLVM llc command", "llc.*"/"LLVM llc command", "llc"/' \
-		"${TERMUX_PREFIX}/lib/ghc-${TERMUX_PKG_VERSION}/settings"
-	sed -i 's/"LLVM opt command", "opt.*"/"LLVM opt command", "opt"/' \
-		"${TERMUX_PREFIX}/lib/ghc-${TERMUX_PKG_VERSION}/settings"
+termux_step_post_massage() {
+	local ghclibs_dir="lib/ghc-$TERMUX_PKG_VERSION"
 
-	sed -i 's|"/usr/bin/libtool"|"libtool"|' \
-		"${TERMUX_PREFIX}/lib/ghc-${TERMUX_PKG_VERSION}/settings"
-}
+	if ! [[ -d "$ghclibs_dir" ]]; then
+		echo "ERROR: GHC lib directory is not at expected place. Please verify before continuing."
+		exit 1
+	fi
 
-termux_step_install_license() {
-	install -Dm600 -t "${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}" \
-		"${TERMUX_PKG_SRCDIR}/LICENSE"
+	# Remove version suffix from `llc` and `opt`:
+	sed -i -E 's|("LLVM llc command",) "llc.*"|\1 "llc"|' "$ghclibs_dir"/lib/settings
+	sed -i -E 's|("LLVM opt command",) "opt.*"|\1 "opt"|' "$ghclibs_dir"/lib/settings
+
+	# Remove cross-prefix from tools:
+	sed -i "s|$CC|${CC/${target}-/}|g" "$ghclibs_dir"/lib/settings
+	sed -i "s|$CXX|${CXX/${target}-/}|g" "$ghclibs_dir"/lib/settings
+
+	# Strip unneeded symbols:
+	find . -type f \( -name "*.so" -o -name "*.a" \) -exec "$STRIP" --strip-unneeded {} \;
+	find "$ghclibs_dir"/bin -type f -exec "$STRIP" {} \;
 }
