@@ -31,7 +31,7 @@ termux_setup_ghc() {
 			cd "$TERMUX_GHC_TEMP_FOLDER"
 			./configure --prefix="$TERMUX_GHC_RUNTIME_FOLDER"
 			make install
-		)
+		) &>/dev/null
 
 		rm -Rf "$TERMUX_GHC_TEMP_FOLDER" "$TERMUX_GHC_TAR"
 	else
