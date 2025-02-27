@@ -2,7 +2,7 @@ termux_step_cleanup_packages() {
 	[[ -d "$TERMUX_TOPDIR" ]] || return 0
 
 	# Extract available disk space in GB
-	local AVAILABLE=`df -B $((1024**3)) --output=avail . | tail -1`
+	local AVAILABLE=`df -B $((1024**3)) --output=avail "$TERMUX_TOPDIR" | tail -1`
 
 	# No need to cleanup if there is enough disk space (more than 5 GB)
 	[ "$AVAILABLE" -lt 5 ] || return 0
