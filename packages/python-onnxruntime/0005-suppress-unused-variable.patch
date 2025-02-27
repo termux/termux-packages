@@ -1,0 +1,10 @@
++++ ./cmake/CMakeLists.txt
+@@ -1864,3 +1864,8 @@
+   set(ARM64X_TARGETS onnxruntime)
+   include("${CMAKE_CURRENT_SOURCE_DIR}/arm64x.cmake")
+ endif()
++
++target_compile_options(onnx PRIVATE "-Wno-unused-variable")
++target_compile_options(onnxruntime_providers PRIVATE "-Wno-unused-variable")
++target_compile_options(onnxruntime_providers_xnnpack PRIVATE -Wno-unused-variable)
++target_compile_options(onnxruntime_providers_nnapi PRIVATE "-Wno-unused-variable")
