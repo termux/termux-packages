@@ -1,0 +1,107 @@
+diff --git a/zig/lib/std/zig/LibCInstallation.zig b/zig/lib/std/zig/LibCInstallation.zig
+index 686471bd..4142c72d 100644
+--- a/zig/lib/std/zig/LibCInstallation.zig
++++ b/zig/lib/std/zig/LibCInstallation.zig
+@@ -167,52 +167,56 @@ pub const FindNativeOptions = struct {
+ pub fn findNative(args: FindNativeOptions) FindError!LibCInstallation {
+     var self: LibCInstallation = .{};
+ 
+-    if (is_darwin and args.target.isDarwin()) {
+-        if (!std.zig.system.darwin.isSdkInstalled(args.allocator))
+-            return error.DarwinSdkNotFound;
+-        const sdk = std.zig.system.darwin.getSdk(args.allocator, args.target) orelse
+-            return error.DarwinSdkNotFound;
+-        defer args.allocator.free(sdk);
+-
+-        self.include_dir = try fs.path.join(args.allocator, &.{
+-            sdk, "usr/include",
+-        });
+-        self.sys_include_dir = try fs.path.join(args.allocator, &.{
+-            sdk, "usr/include",
+-        });
+-        return self;
+-    } else if (is_windows) {
+-        const sdk = std.zig.WindowsSdk.find(args.allocator) catch |err| switch (err) {
+-            error.NotFound => return error.WindowsSdkNotFound,
+-            error.PathTooLong => return error.WindowsSdkNotFound,
+-            error.OutOfMemory => return error.OutOfMemory,
+-        };
+-        defer sdk.free(args.allocator);
+-
+-        try self.findNativeMsvcIncludeDir(args, sdk);
+-        try self.findNativeMsvcLibDir(args, sdk);
+-        try self.findNativeKernel32LibDir(args, sdk);
+-        try self.findNativeIncludeDirWindows(args, sdk);
+-        try self.findNativeCrtDirWindows(args, sdk);
+-    } else if (is_haiku) {
+-        try self.findNativeIncludeDirPosix(args);
+-        try self.findNativeGccDirHaiku(args);
+-        self.crt_dir = try args.allocator.dupeZ(u8, "/system/develop/lib");
+-    } else if (builtin.target.os.tag.isSolarish()) {
+-        // There is only one libc, and its headers/libraries are always in the same spot.
+-        self.include_dir = try args.allocator.dupeZ(u8, "/usr/include");
+-        self.sys_include_dir = try args.allocator.dupeZ(u8, "/usr/include");
+-        self.crt_dir = try args.allocator.dupeZ(u8, "/usr/lib/64");
+-    } else if (std.process.can_spawn) {
+-        try self.findNativeIncludeDirPosix(args);
+-        switch (builtin.target.os.tag) {
+-            .freebsd, .netbsd, .openbsd, .dragonfly => self.crt_dir = try args.allocator.dupeZ(u8, "/usr/lib"),
+-            .linux => try self.findNativeCrtDirPosix(args),
+-            else => {},
+-        }
+-    } else {
+-        return error.LibCRuntimeNotFound;
+-    }
++    // if (is_darwin and args.target.isDarwin()) {
++    //     if (!std.zig.system.darwin.isSdkInstalled(args.allocator))
++    //         return error.DarwinSdkNotFound;
++    //     const sdk = std.zig.system.darwin.getSdk(args.allocator, args.target) orelse
++    //         return error.DarwinSdkNotFound;
++    //     defer args.allocator.free(sdk);
++
++    //     self.include_dir = try fs.path.join(args.allocator, &.{
++    //         sdk, "usr/include",
++    //     });
++    //     self.sys_include_dir = try fs.path.join(args.allocator, &.{
++    //         sdk, "usr/include",
++    //     });
++    //     return self;
++    // } else if (is_windows) {
++    //     const sdk = std.zig.WindowsSdk.find(args.allocator) catch |err| switch (err) {
++    //         error.NotFound => return error.WindowsSdkNotFound,
++    //         error.PathTooLong => return error.WindowsSdkNotFound,
++    //         error.OutOfMemory => return error.OutOfMemory,
++    //     };
++    //     defer sdk.free(args.allocator);
++
++    //     try self.findNativeMsvcIncludeDir(args, sdk);
++    //     try self.findNativeMsvcLibDir(args, sdk);
++    //     try self.findNativeKernel32LibDir(args, sdk);
++    //     try self.findNativeIncludeDirWindows(args, sdk);
++    //     try self.findNativeCrtDirWindows(args, sdk);
++    // } else if (is_haiku) {
++    //     try self.findNativeIncludeDirPosix(args);
++    //     try self.findNativeGccDirHaiku(args);
++    //     self.crt_dir = try args.allocator.dupeZ(u8, "/system/develop/lib");
++    // } else if (builtin.target.os.tag.isSolarish()) {
++    //     // There is only one libc, and its headers/libraries are always in the same spot.
++    //     self.include_dir = try args.allocator.dupeZ(u8, "/usr/include");
++    //     self.sys_include_dir = try args.allocator.dupeZ(u8, "/usr/include");
++    //     self.crt_dir = try args.allocator.dupeZ(u8, "/usr/lib/64");
++    // } else if (std.process.can_spawn) {
++    //     try self.findNativeIncludeDirPosix(args);
++    //     switch (builtin.target.os.tag) {
++    //         .freebsd, .netbsd, .openbsd, .dragonfly => self.crt_dir = try args.allocator.dupeZ(u8, "/usr/lib"),
++    //         .linux => try self.findNativeCrtDirPosix(args),
++    //         else => {},
++    //     }
++    // } else {
++    //     return error.LibCRuntimeNotFound;
++    // }
++
++    self.include_dir = try args.allocator.dupeZ(u8, "@TERMUX_PREFIX@/include");
++    self.sys_include_dir = try args.allocator.dupeZ(u8, "@TERMUX_PREFIX@/sys_include");
++    self.crt_dir = try args.allocator.dupeZ(u8, "@TERMUX_PREFIX@/lib");
+     return self;
+ }
+ 
