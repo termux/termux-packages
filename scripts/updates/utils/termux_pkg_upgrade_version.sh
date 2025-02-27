@@ -97,13 +97,13 @@ termux_pkg_upgrade_version() {
 	done
 
 	local force_cleanup="false"
+	local space_available
 
 	if [[ -d "/var/lib/docker" ]]; then
 		# Get available space in bytes
-		local space_available="$(df "/var/lib/docker" | awk 'NR==2 { print $4 * 1024 }')"
-		local cleanup_threshold="$(( 5 * 1024 ** 3 ))" # 3 GiB
+		space_available="$(df "/var/lib/docker" | awk 'NR==2 { print $4 * 1024 }')"
 
-		if (( space_available <= cleanup_threshold )); then
+		if (( space_available <= TERMUX_CLEANUP_BUILT_PACKAGES_THRESHOLD )); then
 			force_cleanup="true"
 		fi
 	fi
