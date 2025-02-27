@@ -1,0 +1,18 @@
+This excludes minizip include directory to prevent conflict with libzip.
+Otherwise, zip_stat and other symbols are not found in minizip/zip.h.
+Those are present in libzip/zip.h.
+
+https://github.com/jmcnamara/libxlsxwriter/commit/3a975c6b897e4913b088170a20027055df53d532
+commit added the minizip in xlsxwriter.pc pkgconfig file.
+
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -126,7 +126,7 @@ ifneq (, $(shell which pkg-config))
+ 
+   # NOTE: libxlsxwriter is required for xlsx file export support
+   ifneq ($(shell pkg-config --exists xlsxwriter || echo 'no'),no)
+-    CFLAGS += -DXLSX_EXPORT $(shell pkg-config --cflags xlsxwriter)
++    CFLAGS += -DXLSX_EXPORT $(shell pkg-config --cflags-only-other xlsxwriter)
+     LDLIBS += $(shell pkg-config --libs xlsxwriter)
+   endif
+ 
