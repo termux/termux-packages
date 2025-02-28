@@ -1,0 +1,27 @@
+--- ghc-9.12.1/compiler/GHC/Driver/DynFlags.hs	2024-12-16 00:59:45.000000000 +0530
++++ ghc-9.12.1.mod/compiler/GHC/Driver/DynFlags.hs	2025-01-04 19:52:30.600705081 +0530
+@@ -1311,6 +1311,8 @@
+     (OSDarwin,  ArchAArch64) -> [Opt_PIC]
+     (OSLinux,   ArchAArch64) -> [Opt_PIC, Opt_ExternalDynamicRefs]
+     (OSLinux,   ArchARM {})  -> [Opt_PIC, Opt_ExternalDynamicRefs]
++    (OSLinux,   ArchX86_64)  -> [Opt_PIC, Opt_ExternalDynamicRefs]
++    (OSLinux,   ArchX86)     -> [Opt_PIC, Opt_ExternalDynamicRefs]
+     (OSLinux,   ArchRISCV64 {}) -> [Opt_PIC, Opt_ExternalDynamicRefs]
+     (OSOpenBSD, ArchX86_64)  -> [Opt_PIC] -- Due to PIE support in
+                                          -- OpenBSD since 5.3 release
+
+# This is just complimentry patch. Can be ignored too.
+--- ghc-9.12.1/rts/include/rts/Flags.h	2025-02-24 22:46:43.321454543 +0530
++++ ghc-9.12.1.mod/rts/include/rts/Flags.h	2025-02-25 23:26:26.013368811 +0530
+@@ -228,11 +228,7 @@
+  * Note that there is no 32bit darwin system we can realistically expect to
+  * run on or compile for.
+  */
+-#if defined(darwin_HOST_OS) || defined(aarch64_HOST_ARCH) || defined(arm_HOST_ARCH)
+ #define DEFAULT_LINKER_ALWAYS_PIC true
+-#else
+-#define DEFAULT_LINKER_ALWAYS_PIC false
+-#endif
+ 
+ /* Which I/O Manager to use in the target program. */
+ typedef enum _IO_MANAGER_FLAG {

@@ -1,0 +1,65 @@
+# Enable stage2 build:
+
+--- ghc-9.12.1/hadrian/src/Rules/Program.hs	2024-12-16 00:59:46.000000000 +0530
++++ ghc-9.12.1.mod/hadrian/src/Rules/Program.hs	2025-01-08 14:17:07.763051325 +0530
+@@ -102,7 +102,7 @@
+   cross <- flag CrossCompiling
+   -- For cross compiler, copy @stage0/bin/<pgm>@ to @stage1/bin/@.
+   case (cross, stage) of
+-    (True, s) | s > stage0InTree -> do
++    (True, s) | s > stage0InTree && s < Stage2 -> do
+         srcDir <- buildRoot <&> (-/- (stageString stage0InTree -/- "bin"))
+         copyFile (srcDir -/- takeFileName bin) bin
+     _ -> buildBinary rs bin ctx
+
+--- ghc-9.12.1/hadrian/src/Rules/BinaryDist.hs	2025-02-24 22:46:43.666788988 +0530
++++ ghc-9.12.1.mod/hadrian/src/Rules/BinaryDist.hs	2025-02-25 16:47:47.405270654 +0530
+@@ -144,15 +144,15 @@
+     phony "binary-dist-dir" $ do
+         version        <- setting ProjectVersion
+         targetPlatform <- setting TargetPlatformFull
+-        distDir        <- Context.distDir (vanillaContext Stage1 rts)
++        distDir        <- Context.distDir (vanillaContext Stage2 rts)
+ 
+-        let ghcBuildDir      = root -/- stageString Stage1
++        let ghcBuildDir      = root -/- stageString Stage2
+             bindistFilesDir  = root -/- "bindist" -/- ghcVersionPretty
+             ghcVersionPretty = "ghc-" ++ version ++ "-" ++ targetPlatform
+             rtsIncludeDir    = distDir -/- "include"
+ 
+         -- We 'need' all binaries and libraries
+-        all_pkgs <- stagePackages Stage1
++        all_pkgs <- stagePackages Stage2
+         (lib_targets, bin_targets) <- partitionEithers <$> mapM pkgTarget all_pkgs
+         cross <- flag CrossCompiling
+         iserv_targets <- if cross then pure [] else iservBins
+@@ -335,7 +335,7 @@
+         copyFile (ghcRoot -/- "aclocal.m4") (ghcRoot -/- "distrib" -/- "aclocal.m4")
+         copyDirectory (ghcRoot -/- "m4") (ghcRoot -/- "distrib")
+         buildWithCmdOptions [] $
+-            target (vanillaContext Stage1 ghc) (Autoreconf $ ghcRoot -/- "distrib") [] []
++            target (vanillaContext Stage2 ghc) (Autoreconf $ ghcRoot -/- "distrib") [] []
+         -- We clean after ourselves, moving the configure script we generated in
+         -- our bindist dir
+         removeFile (ghcRoot -/- "distrib" -/- "aclocal.m4")
+@@ -368,7 +368,7 @@
+ generateBuildMk :: Action String
+ generateBuildMk = do
+   dynamicGhc <- askDynGhcPrograms
+-  rtsWays <- unwords . map show . Set.toList <$> interpretInContext (vanillaContext Stage1 rts) getRtsWays
++  rtsWays <- unwords . map show . Set.toList <$> interpretInContext (vanillaContext Stage2 rts) getRtsWays
+   return $ unlines [ "GhcRTSWays" =. rtsWays
+                    , "DYNAMIC_GHC_PROGRAMS" =. yesNo dynamicGhc ]
+ 
+@@ -408,9 +408,9 @@
+ -- database. For programs, it returns the path to the compiled executable.
+ pkgTarget :: Package -> Action (Either FilePath (Package, FilePath))
+ pkgTarget pkg
+-    | isLibrary pkg = Left <$> pkgConfFile (vanillaContext Stage1 pkg)
++    | isLibrary pkg = Left <$> pkgConfFile (vanillaContext Stage2 pkg)
+     | otherwise     = do
+-        path <- programPath =<< programContext Stage1 pkg
++        path <- programPath =<< programContext Stage2 pkg
+         return (Right (pkg, path))
+ 
+ useGhcPrefix :: Package -> Bool
