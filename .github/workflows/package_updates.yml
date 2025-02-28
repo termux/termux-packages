@@ -137,6 +137,8 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.TERMUXBOT2_TOKEN }}
+      - name: Set process id limit for 32-bit builds depending on aosp-libs
+        run: echo 65535 | sudo tee /proc/sys/kernel/pid_max
       - name: Free additional disk space
         run: |
           sudo apt purge -yq $(dpkg -l | grep '^ii' | awk '{ print $2 }' | grep -P '(aspnetcore|cabal-|dotnet-|ghc-|libmono|mongodb-|mysql-|php)') \
