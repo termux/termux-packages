@@ -24,3 +24,11 @@ termux_step_setup_toolchain() {
 		termux_setup_toolchain_gnu
 	fi
 }
+
+termux_step_setup_build32_environment() {
+	termux_set_crosses_arch
+	TERMUX_LIB_PATH="$TERMUX_LIB32_PATH"
+	termux_step_setup_arch_variables
+	termux_step_setup_toolchain
+	cd $TERMUX_PKG_BUILD32DIR
+}

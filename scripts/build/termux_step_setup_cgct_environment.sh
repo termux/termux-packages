@@ -3,68 +3,108 @@
 termux_step_setup_cgct_environment() {
 	[ "$TERMUX_ON_DEVICE_BUILD" = "true" ] && return
 
-	if [ "$TERMUX_REPO_PACKAGE" != "$TERMUX_APP_PACKAGE" ]; then
-		echo "WARNING: It is not possible to install glibc core packages from the repo for operation of CGCT, you must install glibc packages for your application with the prefix '$TERMUX_PREFIX' yourself (core packages: glibc and linux-api-headers-glibc)."
-		return
+	termux_install_temporary_glibc
+	termux_set_links_to_libgcc_of_cgct
+
+	if [ "$TERMUX_PKG_BUILD32" = "true" ]; then
+		(
+			termux_set_crosses_arch
+			TERMUX_LIB_PATH="$TERMUX_LIB32_PATH"
+			termux_install_temporary_glibc
+			termux_set_links_to_libgcc_of_cgct
+		)
+	fi
+}
+
+# The temporary glibc is a glibc used only during compilation of simple packages
+# or a full glibc that will be customized for the system and replace the temporary glibc
+termux_install_temporary_glibc() {
+	local PKG="glibc"
+	local cross_glibc=false
+	if [ "$TERMUX_ARCH" != "$TERMUX_REAL_ARCH" ]; then
+		cross_glibc=true
+		PKG+="32"
 	fi
 
-	for PKG in gcc-libs-glibc glibc linux-api-headers-glibc; do
-		local PKG_DIR=$(ls ${TERMUX_SCRIPTDIR}/*/${PKG}/build.sh 2> /dev/null || \
-			ls ${TERMUX_SCRIPTDIR}/*/${PKG/-glibc/}/build.sh 2> /dev/null)
-		if [ -z "$PKG_DIR" ]; then
-			termux_error_exit "Could not find build.sh file for package '${PKG}'"
+	# Checking if temporary glibc needs to be installed
+	if [ -f "$TERMUX_BUILT_PACKAGES_DIRECTORY/$PKG-temporary-for-cgct" ]; then
+		return
+	fi
+	local PKG_DIR=$(ls ${TERMUX_SCRIPTDIR}/*/${PKG}/build.sh 2> /dev/null || \
+		ls ${TERMUX_SCRIPTDIR}/*/${PKG}/build.sh 2> /dev/null)
+	if [ -n "$PKG_DIR" ]; then
+		read DEP_ARCH DEP_VERSION DEP_VERSION_PAC <<< $(termux_extract_dep_info $PKG "${PKG_DIR/'/build.sh'/}")
+		if termux_package__is_package_version_built "$PKG" "$DEP_VERSION"; then
+			return
 		fi
-		local PKG_DIR_SPLIT=(${PKG_DIR//// })
+	fi
 
-		local REPO_NAME=""
-		local LIST_PACKAGES_DIRECTORIES=(${TERMUX_PACKAGES_DIRECTORIES})
-		for idx in ${!LIST_PACKAGES_DIRECTORIES[@]}; do
-			if [ "${LIST_PACKAGES_DIRECTORIES[$idx]}" = "${PKG_DIR_SPLIT[-3]}" ]; then
-				REPO_NAME=$(echo "${TERMUX_REPO_URL[$idx]}" | sed -e 's%https://%%g' -e 's%http://%%g' -e 's%/%-%g')
-				if [ "$TERMUX_REPO_PKG_FORMAT" = "debian" ]; then
-					REPO_NAME+="-${TERMUX_REPO_DISTRIBUTION[$idx]}-Release"
-				elif [ "$TERMUX_REPO_PKG_FORMAT" = "pacman" ]; then
-					REPO_NAME+="-json"
-				fi
-				break
+	[ ! "$TERMUX_QUIET_BUILD" = "true" ] && echo "Installing temporary '${PKG}' for the CGCT tool environment."
+
+	local PREFIX_TMP_GLIBC="data/data/com.termux/files/usr/glibc"
+	local PATH_TMP_GLIBC="$TERMUX_COMMON_CACHEDIR/temporary_glibc_for_cgct"
+	mkdir -p "$PATH_TMP_GLIBC"
+
+	local GPKG_LINK="https://service.termux-pacman.dev/gpkg/$TERMUX_ARCH"
+	local GPKG_JSON="$PATH_TMP_GLIBC/gpkg-$TERMUX_ARCH.json"
+	termux_download "$GPKG_LINK/gpkg.json" \
+		"$GPKG_JSON" \
+		SKIP_CHECKSUM
+
+	# Installing temporary glibc
+	local GLIBC_PKG=$(jq -r '."glibc"."FILENAME"' "$GPKG_JSON")
+	if [ ! -f "$PATH_TMP_GLIBC/$GLIBC_PKG" ]; then
+		termux_download "$GPKG_LINK/$GLIBC_PKG" \
+			"$PATH_TMP_GLIBC/$GLIBC_PKG" \
+			$(jq -r '."glibc"."SHA256SUM"' "$GPKG_JSON")
+	fi
+
+	[ ! "$TERMUX_QUIET_BUILD" = true ] && echo "extracting temporary $PKG..."
+
+	# Unpacking temporary glibc
+	tar -xJf "$PATH_TMP_GLIBC/$GLIBC_PKG" -C "$PATH_TMP_GLIBC" data
+	if [ "$cross_glibc" = "true" ]; then
+		# Installing lib32
+		mkdir -p "$TERMUX_LIB_PATH"
+		cp -r $PATH_TMP_GLIBC/$PREFIX_TMP_GLIBC/lib/* "$TERMUX_LIB_PATH"
+		# Installing include32
+		mkdir -p "$TERMUX_PREFIX/include32"
+		local hpath
+		for hpath in $(find "$PATH_TMP_GLIBC/$PREFIX_TMP_GLIBC/include" -type f); do
+			local h=$(sed "s|$PATH_TMP_GLIBC/$PREFIX_TMP_GLIBC/include/||g" <<< "$hpath")
+			if [ -f "$TERMUX_PREFIX/include/$h" ] && \
+				[ $(md5sum "$hpath" | awk '{printf $1}') = $(md5sum "$TERMUX_PREFIX/include/$h" | awk '{printf $1}') ]; then
+				rm "$hpath"
 			fi
 		done
-		if [ -z "$REPO_NAME" ]; then
-			termux_error_exit "Could not find '${PKG_DIR_SPLIT[-3]}' repo"
-		fi
+		find "$PATH_TMP_GLIBC/$PREFIX_TMP_GLIBC/include" -type d -empty -delete
+		cp -r $PATH_TMP_GLIBC/$PREFIX_TMP_GLIBC/include/* $TERMUX_PREFIX/include32
+		# Installing dynamic linker in lib
+		mkdir -p "$TERMUX_LIB64_PATH"
+		local ld_path=$(ls $TERMUX_LIB_PATH/ld-*)
+		ln -sr "${ld_path}" "$TERMUX_LIB64_PATH/$(basename ${ld_path})"
+	else
+		# Complete installation of glibc components
+		cp -r $PATH_TMP_GLIBC/$PREFIX_TMP_GLIBC/* "$TERMUX_PREFIX"
+	fi
+	# It is necessary to reconfigure the paths in libc.so
+	# for correct work of cross-compilation and compilation in forked projects
+	sed -i "s|/$PREFIX_TMP_GLIBC/lib/|$TERMUX_LIB_PATH/|g" "$TERMUX_LIB_PATH/libc.so"
 
-		read DEP_ARCH DEP_VERSION DEP_VERSION_PAC <<< $(termux_extract_dep_info $PKG "${PKG_DIR/'/build.sh'/}")
+	# Marking the installation of temporary glibc
+	rm -fr "$PATH_TMP_GLIBC/data"
+	mkdir -p "$TERMUX_BUILT_PACKAGES_DIRECTORY"
+	touch "$TERMUX_BUILT_PACKAGES_DIRECTORY/$PKG-temporary-for-cgct"
+}
 
-		if ! termux_package__is_package_version_built "$PKG" "$DEP_VERSION" && [ ! -f "$TERMUX_BUILT_PACKAGES_DIRECTORY/$PKG-for-cgct" ]; then
-			[ ! "$TERMUX_QUIET_BUILD" = "true" ] && echo "Installing '${PKG}' for the CGCT tool environment."
-
-			if [ ! -f "${TERMUX_COMMON_CACHEDIR}-${DEP_ARCH}/${REPO_NAME}" ]; then
-				TERMUX_INSTALL_DEPS=true termux_get_repo_files
-			fi
-
-			if ! TERMUX_WITHOUT_DEPVERSION_BINDING=true termux_download_deb_pac $PKG $DEP_ARCH $DEP_VERSION $DEP_VERSION_PAC; then
-				termux_error_exit "Failed to download package '${PKG}'"
-			fi
-
-			[ ! "$TERMUX_QUIET_BUILD" = true ] && echo "extracting $PKG to $TERMUX_COMMON_CACHEDIR-$DEP_ARCH..."
-			(
-				cd $TERMUX_COMMON_CACHEDIR-$DEP_ARCH
-				if [ "$TERMUX_REPO_PKG_FORMAT" = "debian" ]; then
-					ar x ${PKG}_${DEP_VERSION}_${DEP_ARCH}.deb data.tar.xz
-					if tar -tf data.tar.xz|grep "^./$">/dev/null; then
-						tar -xf data.tar.xz --strip-components=1 \
-							--no-overwrite-dir -C /
-					else
-						tar -xf data.tar.xz --no-overwrite-dir -C /
-					fi
-				elif [ "$TERMUX_REPO_PKG_FORMAT" = "pacman" ]; then
-					tar -xJf "${PKG}-${DEP_VERSION_PAC}-${DEP_ARCH}.pkg.tar.xz" \
-						--anchored --exclude=.{BUILDINFO,PKGINFO,MTREE,INSTALL} \
-						--force-local --no-overwrite-dir -C /
-				fi
-			)
-			mkdir -p $TERMUX_BUILT_PACKAGES_DIRECTORY
-			echo "" > "$TERMUX_BUILT_PACKAGES_DIRECTORY/$PKG-for-cgct"
+# Sets up symbolic links to libgcc* libraries (from cgct) in the application environment
+# to allow cgct to work properly, if necessary
+termux_set_links_to_libgcc_of_cgct() {
+	local libgcc_cgct
+	for libgcc_cgct in $(find "$CGCT_DIR/$TERMUX_ARCH/lib" -maxdepth 1 -type f -name 'libgcc*'); do
+		if [ ! -e "$TERMUX_LIB_PATH/$(basename $libgcc_cgct)" ]; then
+			ln -s "$libgcc_cgct" "$TERMUX_LIB_PATH"
 		fi
 	done
 }
+
