@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@licy183"
 _MAJOR_VERSION=2.7
 TERMUX_PKG_VERSION="7.3.19"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(
 	https://downloads.python.org/pypy/pypy$_MAJOR_VERSION-v$TERMUX_PKG_VERSION-src.tar.bz2
 	https://downloads.python.org/pypy/pypy2.7-v$TERMUX_PKG_VERSION-linux64.tar.bz2
@@ -16,7 +17,7 @@ TERMUX_PKG_SHA256=(
 )
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="gdbm, libandroid-posix-semaphore, libandroid-support, libbz2, libcrypt, libexpat, libffi, liblzma, libsqlite, ncurses, ncurses-ui-libs, openssl, zlib"
-TERMUX_PKG_BUILD_DEPENDS="bionic-host, tk, xorgproto"
+TERMUX_PKG_BUILD_DEPENDS="aosp-libs, tk, xorgproto"
 TERMUX_PKG_RECOMMENDS="clang, make, pkg-config"
 TERMUX_PKG_SUGGESTS="pypy-tkinter"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -92,7 +93,6 @@ termux_step_make() {
 -b $HOME
 -b $TERMUX_PKG_TMPDIR
 -b /proc -b /dev -b /sys
--b $TERMUX_PREFIX/opt/bionic-host:/system
 -w $TERMUX_PKG_TMPDIR
 -r /
 "
