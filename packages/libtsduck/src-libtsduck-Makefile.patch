@@ -1,10 +1,10 @@
 --- a/src/libtsduck/Makefile
 +++ b/src/libtsduck/Makefile
-@@ -191,7 +191,6 @@ install-tools: $(SHARED_LIBTSDUCK)
- PRECONFIG = $(SYSROOT)$(SYSPREFIX)/include/tsduck/tsPreConfiguration.h
+@@ -133,7 +133,6 @@
+ 	+@$(call RECURSE,config $(if $(NOPYTHON),,python) $(if $(NOJAVA),,java))
  
  install-devel: $(if $(NOSTATIC),,$(STATIC_LIBTSDUCK)) $(TSDUCK_H)
 -	rm -rf $(SYSROOT)$(SYSPREFIX)/include/tsduck
  	install -d -m 755 $(SYSROOT)$(USRLIBDIR) $(SYSROOT)$(SYSPREFIX)/include/tsduck
  	$(if $(NOSTATIC),,install -m 644 $(STATIC_LIBTSDUCK) $(SYSROOT)$(USRLIBDIR))
- 	install -m 644 $(addsuffix /*.h,$(PUBLIC_INCLUDES)) $(TSDUCK_H) $(SYSROOT)$(SYSPREFIX)/include/tsduck
+ 	install -m 644 $(addsuffix /*.h,$(LIBTSDUCK_INCLUDES)) $(TSDUCK_H) $(SYSROOT)$(SYSPREFIX)/include/tsduck
