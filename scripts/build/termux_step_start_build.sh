@@ -62,6 +62,16 @@ termux_step_start_build() {
 		fi
 	fi
 
+	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ] || [ "$TERMUX_ARCH" = "arm" ] || [ "$TERMUX_ARCH" = "i686" ]; then
+		TERMUX_PKG_BUILD32=false
+	fi
+	if [ "$TERMUX_PKG_BUILD_IN_SRC" = "true" ] && [ "$TERMUX_PKG_BUILD32" = "true" ]; then
+		termux_error_exit "It is not possible to build 32-bit and 64-bit versions of a package in one place, the build location must be separate."
+	fi
+	if [ "$TERMUX_PKG_BUILD32" = "true" ]; then
+		mkdir -p "$TERMUX_PKG_BUILD32DIR"
+	fi
+
 	echo "termux - building $TERMUX_PKG_NAME for arch $TERMUX_ARCH..."
 	test -t 1 && printf "\033]0;%s...\007" "$TERMUX_PKG_NAME"
 

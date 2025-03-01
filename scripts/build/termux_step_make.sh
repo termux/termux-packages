@@ -18,3 +18,7 @@ termux_step_make() {
 		fi
 	fi
 }
+
+termux_step_make32() {
+	termux_step_make
+}

@@ -20,8 +20,11 @@ termux_setup_toolchain_gnu() {
 		export CXXFILT=$TERMUX_HOST_PLATFORM-c++filt
 	fi
 
-	if [ ! -d "$TERMUX_PREFIX/lib/" ]; then
-		termux_error_exit "glibc library directory was not found ('$TERMUX_PREFIX/lib/')"
+	if [ ! -d "$TERMUX_LIB_PATH/" ]; then
+		termux_error_exit "glibc library directory was not found ('$TERMUX_LIB_PATH/')"
+	fi
+	if [ ! -f "$TERMUX_LIB_PATH/libgcc_s.so" ] && [ ! -f "$TERMUX_LIB_PATH/libgcc_s.so.1" ]; then
+		termux_error_exit "libgcc not found, there is a risk of incorrect compiler operation"
 	fi
 	if [ ! -d "$TERMUX_PREFIX/include/" ]; then
 		termux_error_exit "glibc header directory was not found ('$TERMUX_PREFIX/include/')"
@@ -40,7 +43,7 @@ termux_setup_toolchain_gnu() {
 		CFLAGS+=" -march=i686"
 		export DYNAMIC_LINKER="ld-linux.so.2"
 	fi
-	export PATH_DYNAMIC_LINKER="$TERMUX_PREFIX/lib/$DYNAMIC_LINKER"
+	export PATH_DYNAMIC_LINKER="$TERMUX_LIB64_PATH/$DYNAMIC_LINKER"
 
 	if [ ! -f "$PATH_DYNAMIC_LINKER" ]; then
 		termux_error_exit "glibc dynamic linker was not found ('$PATH_DYNAMIC_LINKER')"

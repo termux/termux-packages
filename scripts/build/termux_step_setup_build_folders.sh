@@ -3,6 +3,7 @@ termux_step_setup_build_folders() {
 	# permissions which makes them undeletable. We need to fix
 	# that.
 	[ -d "$TERMUX_PKG_BUILDDIR" ] && chmod +w -R "$TERMUX_PKG_BUILDDIR" || true
+	[ -d "$TERMUX_PKG_BUILD32DIR" ] && chmod +w -R "$TERMUX_PKG_BUILD32DIR" || true
 	[ -d "$TERMUX_PKG_SRCDIR" ] && chmod +w -R "$TERMUX_PKG_SRCDIR" || true
 	if [ "$TERMUX_SKIP_DEPCHECK" = false ] && \
 		   [ "$TERMUX_INSTALL_DEPS" = true ] && \
@@ -17,6 +18,7 @@ termux_step_setup_build_folders() {
 
 	# Cleanup old build state:
 	rm -Rf "$TERMUX_PKG_BUILDDIR" \
+		"$TERMUX_PKG_BUILD32DIR" \
 		"$TERMUX_PKG_SRCDIR"
 
 	# Cleanup old packaging state:
