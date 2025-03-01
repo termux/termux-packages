@@ -1,0 +1,29 @@
+diff --git a/cli/tools/upgrade.rs b/cli/tools/upgrade.rs
+index cb85859f7..891ebb0e2 100644
+--- a/cli/tools/upgrade.rs
++++ b/cli/tools/upgrade.rs
+@@ -480,6 +480,7 @@ async fn fetch_and_store_latest_version<
+   env.write_check_file(&version_file.serialize());
+ }
+ 
++#[cfg(not(target_os = "android"))]
+ pub async fn upgrade(
+   flags: Arc<Flags>,
+   upgrade_flags: UpgradeFlags,
+@@ -612,6 +613,16 @@ pub async fn upgrade(
+   Ok(())
+ }
+ 
++#[cfg(target_os = "android")]
++pub async fn upgrade(
++  flags: Arc<Flags>,
++  upgrade_flags: UpgradeFlags,
++) -> Result<(), AnyError> {
++  log::error!("You are currently using Deno packaged by the Termux repo. Upgrading Deno via CLI will cause an issue to installed Deno. Wait for an update on Deno package in the Termux repo to upgrade.");
++  deno_runtime::exit(1);
++}
++
++
+ #[derive(Debug, PartialEq)]
+ enum RequestedVersion {
+   Latest(ReleaseChannel),
