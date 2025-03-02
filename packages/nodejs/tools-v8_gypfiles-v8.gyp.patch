@@ -1,7 +1,15 @@
-When building for x64 or arm64 target, the host build of nodejs is done for x64. But when building for ia32 (x86) or arm (32-bit arm), the host build of nodejs is done for ia32. The cross compilation support of nodejs is really janky, this configuration should not need to have been patched by us, but unfortunately we have to
---- ./tools/v8_gypfiles/v8.gyp.orig	2024-12-10 16:14:45.000000000 +0530
-+++ ./tools/v8_gypfiles/v8.gyp	2024-12-17 10:14:00.499085823 +0530
-@@ -1414,6 +1414,7 @@
+--- ./tools/v8_gypfiles/v8.gyp.orig	2025-02-13 17:23:55.000000000 +0530
++++ ./tools/v8_gypfiles/v8.gyp	2025-03-01 22:23:08.640009780 +0530
+@@ -1351,7 +1351,7 @@
+         }],
+         # Platforms that don't have Compare-And-Swap (CAS) support need to link atomic library
+         # to implement atomic memory access
+-        ['v8_current_cpu in ["mips64", "mips64el", "ppc", "arm", "riscv64", "loong64"]', {
++        ['((OS=="linux" or OS=="android") and clang==1) or (v8_current_cpu in ["mips64", "mips64el", "ppc", "arm", "riscv64", "loong64"])', {
+           'link_settings': {
+             'libraries': ['-latomic', ],
+           },
+@@ -1495,6 +1495,7 @@
              '<(V8_ROOT)/src/base/platform/platform-posix.h',
              '<(V8_ROOT)/src/base/platform/platform-posix-time.cc',
              '<(V8_ROOT)/src/base/platform/platform-posix-time.h',
@@ -9,7 +17,7 @@ When building for x64 or arm64 target, the host build of nodejs is done for x64.
            ],
            'link_settings': {
              'target_conditions': [
-@@ -1936,12 +1937,12 @@
+@@ -2017,12 +2018,12 @@
              ],
            }, { # 'OS!="win"'
              'conditions': [

@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://nodejs.org/
 TERMUX_PKG_DESCRIPTION="Open Source, cross-platform JavaScript runtime environment"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Yaksh Bariya <thunder-coding@termux.dev>"
-TERMUX_PKG_VERSION=23.6.1
+TERMUX_PKG_VERSION=23.8.0
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=fefa49dede8733018ada4e30f885808cc4e22167b8ae3233c6d6a23737aff76f
+TERMUX_PKG_SHA256=6ec5d54d0e8423fc5986f6efa4f661e8370659818b14f458cdc9d1b9f75d3b88
 # thunder-coding: don't try to autoupdate nodejs, that thing takes 2 whole hours to build for a single arch, and requires a lot of patch updates everytime. Also I run tests everytime I update it to ensure least bugs
 TERMUX_PKG_AUTO_UPDATE=false
 # Note that we do not use a shared libuv to avoid an issue with the Android
@@ -28,6 +28,9 @@ termux_step_host_build() {
 	local ICU_VERSION=76.1
 	local ICU_TAR=icu4c-${ICU_VERSION//./_}-src.tgz
 	local ICU_DOWNLOAD=https://github.com/unicode-org/icu/releases/download/release-${ICU_VERSION//./-}/$ICU_TAR
+	export CC=/usr/bin/clang-18
+	export CXX=/usr/bin/clang++-18
+	export LD=/usr/bin/clang++-18
 	termux_download \
 		$ICU_DOWNLOAD\
 		$TERMUX_PKG_CACHEDIR/$ICU_TAR \
@@ -66,11 +69,15 @@ termux_step_configure() {
 	fi
 
 	export GYP_DEFINES="host_os=linux"
-	export CC_host=gcc
-	export CXX_host=g++
-	export LINK_host=g++
+	export CC_host=/usr/bin/clang-18
+	export CXX_host=/usr/bin/clang++-18
+	export LINK_host=/usr/bin/clang++-18
 
 	LDFLAGS+=" -ldl"
+	echo "
+print("")
+print(output['variables']['clang'])
+" >> ./configure.py
 	# See note above TERMUX_PKG_DEPENDS why we do not use a shared libuv.
 	# When building with ninja, build.ninja is generated for both Debug and Release builds.
 	./configure \
@@ -96,6 +103,7 @@ termux_step_configure() {
 	sed -i \
 		-e "s|\-I$TERMUX_PREFIX/include|-I$TERMUX_PKG_HOSTBUILD_DIR/icu-installed/include|g" \
 		-e "s|\-L$TERMUX_PREFIX/lib|-L$TERMUX_PKG_HOSTBUILD_DIR/icu-installed/lib|g" \
+		-e "s|\-L$TERMUX_PREFIX$TERMUX_PREFIX/lib||g" \
 		$(find $TERMUX_PKG_SRCDIR/out/{Release,Debug}/obj.host -name '*.ninja')
 }
 
