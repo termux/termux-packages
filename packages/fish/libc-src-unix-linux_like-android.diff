@@ -1,0 +1,188 @@
+From e8733f1768f2ea112e640dbfdfaf697f5af3ccff Mon Sep 17 00:00:00 2001
+From: Yaksh Bariya <yakshbari4@gmail.com>
+Date: Fri, 20 Dec 2024 19:59:52 +0530
+Subject: [PATCH 1/2] android: use proper types for dirent.d_ino, dirent.d_off,
+ stat.st_mode and stat64.st_mode
+
+This bug was noticed in https://github.com/termux/termux-packages/pull/22609
+---
+ src/unix/linux_like/android/b32/mod.rs         | 4 ++--
+ src/unix/linux_like/android/b64/aarch64/mod.rs | 4 ++--
+ src/unix/linux_like/android/b64/riscv64/mod.rs | 4 ++--
+ src/unix/linux_like/android/b64/x86_64/mod.rs  | 4 ++--
+ src/unix/linux_like/android/mod.rs             | 8 ++++----
+ 5 files changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/src/unix/linux_like/android/b32/mod.rs b/src/unix/linux_like/android/b32/mod.rs
+index 3e3485757ce9..d132cbaa2590 100644
+--- a/src/unix/linux_like/android/b32/mod.rs
++++ b/src/unix/linux_like/android/b32/mod.rs
+@@ -30,7 +30,7 @@ s! {
+         pub st_dev: c_ulonglong,
+         __pad0: [c_uchar; 4],
+         __st_ino: crate::ino_t,
+-        pub st_mode: c_uint,
++        pub st_mode: crate::mode_t,
+         pub st_nlink: crate::nlink_t,
+         pub st_uid: crate::uid_t,
+         pub st_gid: crate::gid_t,
+@@ -52,7 +52,7 @@ s! {
+         pub st_dev: c_ulonglong,
+         __pad0: [c_uchar; 4],
+         __st_ino: crate::ino_t,
+-        pub st_mode: c_uint,
++        pub st_mode: crate::mode_t,
+         pub st_nlink: crate::nlink_t,
+         pub st_uid: crate::uid_t,
+         pub st_gid: crate::gid_t,
+diff --git a/src/unix/linux_like/android/b64/aarch64/mod.rs b/src/unix/linux_like/android/b64/aarch64/mod.rs
+index b678eb8da6aa..5bf8edcdba63 100644
+--- a/src/unix/linux_like/android/b64/aarch64/mod.rs
++++ b/src/unix/linux_like/android/b64/aarch64/mod.rs
+@@ -9,7 +9,7 @@ s! {
+     pub struct stat {
+         pub st_dev: crate::dev_t,
+         pub st_ino: crate::ino_t,
+-        pub st_mode: c_uint,
++        pub st_mode: crate::mode_t,
+         pub st_nlink: crate::nlink_t,
+         pub st_uid: crate::uid_t,
+         pub st_gid: crate::gid_t,
+@@ -32,7 +32,7 @@ s! {
+     pub struct stat64 {
+         pub st_dev: crate::dev_t,
+         pub st_ino: crate::ino_t,
+-        pub st_mode: c_uint,
++        pub st_mode: crate::mode_t,
+         pub st_nlink: crate::nlink_t,
+         pub st_uid: crate::uid_t,
+         pub st_gid: crate::gid_t,
+diff --git a/src/unix/linux_like/android/b64/riscv64/mod.rs b/src/unix/linux_like/android/b64/riscv64/mod.rs
+index c4dc98e010ae..cb0a281cc465 100644
+--- a/src/unix/linux_like/android/b64/riscv64/mod.rs
++++ b/src/unix/linux_like/android/b64/riscv64/mod.rs
+@@ -10,7 +10,7 @@ s! {
+     pub struct stat {
+         pub st_dev: crate::dev_t,
+         pub st_ino: crate::ino_t,
+-        pub st_mode: c_uint,
++        pub st_mode: crate::mode_t,
+         pub st_nlink: c_uint,
+         pub st_uid: crate::uid_t,
+         pub st_gid: crate::gid_t,
+@@ -33,7 +33,7 @@ s! {
+     pub struct stat64 {
+         pub st_dev: crate::dev_t,
+         pub st_ino: crate::ino_t,
+-        pub st_mode: c_uint,
++        pub st_mode: crate::mode_t,
+         pub st_nlink: c_uint,
+         pub st_uid: crate::uid_t,
+         pub st_gid: crate::gid_t,
+diff --git a/src/unix/linux_like/android/b64/x86_64/mod.rs b/src/unix/linux_like/android/b64/x86_64/mod.rs
+index ad878462c8c1..30369ce70cd7 100644
+--- a/src/unix/linux_like/android/b64/x86_64/mod.rs
++++ b/src/unix/linux_like/android/b64/x86_64/mod.rs
+@@ -11,7 +11,7 @@ s! {
+         pub st_dev: crate::dev_t,
+         pub st_ino: crate::ino_t,
+         pub st_nlink: c_ulong,
+-        pub st_mode: c_uint,
++        pub st_mode: crate::mode_t,
+         pub st_uid: crate::uid_t,
+         pub st_gid: crate::gid_t,
+         pub st_rdev: crate::dev_t,
+@@ -31,7 +31,7 @@ s! {
+         pub st_dev: crate::dev_t,
+         pub st_ino: crate::ino_t,
+         pub st_nlink: c_ulong,
+-        pub st_mode: c_uint,
++        pub st_mode: crate::mode_t,
+         pub st_uid: crate::uid_t,
+         pub st_gid: crate::gid_t,
+         pub st_rdev: crate::dev_t,
+diff --git a/src/unix/linux_like/android/mod.rs b/src/unix/linux_like/android/mod.rs
+index 053f0bbbfdf4..188493897847 100644
+--- a/src/unix/linux_like/android/mod.rs
++++ b/src/unix/linux_like/android/mod.rs
+@@ -528,16 +528,16 @@ s_no_extra_traits! {
+     }
+ 
+     pub struct dirent {
+-        pub d_ino: u64,
+-        pub d_off: i64,
++        pub d_ino: crate::ino_t,
++        pub d_off: crate::off_t,
+         pub d_reclen: c_ushort,
+         pub d_type: c_uchar,
+         pub d_name: [c_char; 256],
+     }
+ 
+     pub struct dirent64 {
+-        pub d_ino: u64,
+-        pub d_off: i64,
++        pub d_ino: crate::ino64_t,
++        pub d_off: crate::off_t,
+         pub d_reclen: c_ushort,
+         pub d_type: c_uchar,
+         pub d_name: [c_char; 256],
+
+From e6ae4c7b14b38a599a64192a07153dddd53648b2 Mon Sep 17 00:00:00 2001
+From: Yaksh Bariya <yakshbari4@gmail.com>
+Date: Sat, 21 Dec 2024 15:59:42 +0530
+Subject: [PATCH 2/2] fix more incompatible integer types
+
+---
+ src/unix/linux_like/android/b32/mod.rs | 4 +++-
+ src/unix/linux_like/android/b64/mod.rs | 2 ++
+ src/unix/linux_like/android/mod.rs     | 2 --
+ 3 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/src/unix/linux_like/android/b32/mod.rs b/src/unix/linux_like/android/b32/mod.rs
+index d132cbaa2590..f7534c241cb5 100644
+--- a/src/unix/linux_like/android/b32/mod.rs
++++ b/src/unix/linux_like/android/b32/mod.rs
+@@ -5,7 +5,9 @@ use crate::prelude::*;
+ 
+ pub type c_long = i32;
+ pub type c_ulong = u32;
+-pub type mode_t = u16;
++pub type mode_t = c_ushort;
++pub type ino_t = u64;
++pub type off_t = i32;
+ pub type off64_t = c_longlong;
+ pub type sigset_t = c_ulong;
+ pub type socklen_t = i32;
+diff --git a/src/unix/linux_like/android/b64/mod.rs b/src/unix/linux_like/android/b64/mod.rs
+index ffa79ead870e..c315646d50e7 100644
+--- a/src/unix/linux_like/android/b64/mod.rs
++++ b/src/unix/linux_like/android/b64/mod.rs
+@@ -6,6 +6,8 @@ use crate::prelude::*;
+ pub type c_long = i64;
+ pub type c_ulong = u64;
+ pub type mode_t = u32;
++pub type ino_t = c_ulong;
++pub type off_t = i64;
+ pub type off64_t = i64;
+ pub type socklen_t = u32;
+ 
+diff --git a/src/unix/linux_like/android/mod.rs b/src/unix/linux_like/android/mod.rs
+index 188493897847..becae64c3264 100644
+--- a/src/unix/linux_like/android/mod.rs
++++ b/src/unix/linux_like/android/mod.rs
+@@ -5,7 +5,6 @@ use crate::prelude::*;
+ pub type clock_t = c_long;
+ pub type time_t = c_long;
+ pub type suseconds_t = c_long;
+-pub type off_t = c_long;
+ pub type blkcnt_t = c_ulong;
+ pub type blksize_t = c_ulong;
+ pub type nlink_t = u32;
+@@ -21,7 +20,6 @@ pub type fsblkcnt_t = c_ulong;
+ pub type nfds_t = c_uint;
+ pub type rlim_t = c_ulong;
+ pub type dev_t = c_ulong;
+-pub type ino_t = c_ulong;
+ pub type ino64_t = u64;
+ pub type __CPU_BITTYPE = c_ulong;
+ pub type idtype_t = c_int;
