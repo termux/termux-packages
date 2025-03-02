@@ -15,7 +15,7 @@ termux_step_configure_cmake() {
 			CXXFLAGS+=" --target=$CCTERMUX_HOST_PLATFORM"
 			CFLAGS+=" --target=$CCTERMUX_HOST_PLATFORM"
 			LDFLAGS+=" --target=$CCTERMUX_HOST_PLATFORM"
-   		fi
+		fi
 
 		CMAKE_ADDITIONAL_ARGS+=("-DCMAKE_CROSSCOMPILING=$(test \"${TERMUX_PKG_CMAKE_CROSSCOMPILING}\" = \"true\" && echo True || echo False)")
 		CMAKE_ADDITIONAL_ARGS+=("-DCMAKE_LINKER=$TERMUX_STANDALONE_TOOLCHAIN/bin/$LD $LDFLAGS")
@@ -33,6 +33,8 @@ termux_step_configure_cmake() {
 
 	# XXX: CMAKE_{AR,RANLIB} needed for at least jsoncpp build to not
 	# pick up cross compiled binutils tool in $TERMUX_PREFIX/bin:
+	echo $PATH
+	read
 	cmake -G "$TERMUX_CMAKE_BUILD" "$TERMUX_PKG_SRCDIR" \
 		-DCMAKE_AR="$(command -v $AR)" \
 		-DCMAKE_UNAME="$(command -v uname)" \

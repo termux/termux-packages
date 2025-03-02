@@ -4,6 +4,7 @@ termux_step_get_source() {
 	if [ "${TERMUX_PKG_SRCURL:0:4}" == "git+" ]; then
 		termux_git_clone_src
 	else
+		[ -d "$TERMUX_PKG_SRCDIR" ] && [ "$TERMUX_NO_CLEAN" = true ] && return
 		if [ -z "${TERMUX_PKG_SRCURL}" ] || [ "${TERMUX_PKG_SKIP_SRC_EXTRACT-false}" = "true" ] || [ "$TERMUX_PKG_METAPACKAGE" = "true" ]; then
 			mkdir -p "$TERMUX_PKG_SRCDIR"
 			return
