@@ -11,7 +11,7 @@ if PROOT_TARGET == None:
 PROOT_TARGET_ARGS = PROOT_TARGET.split()
 
 def _update_target_rootfs_path(flag):
-    if ("-I@TERMUX_PREFIX@" in flag) or ("-L@TERMUX_PREFIX@" in flag):
+    if ("-isystem@TERMUX_PREFIX@" in flag) or ("-L@TERMUX_PREFIX@" in flag):
         return flag.replace("@TERMUX_PREFIX@", "/target-termux-rootfs/@TERMUX_PREFIX@")
     return flag
 
