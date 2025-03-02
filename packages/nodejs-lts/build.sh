@@ -67,9 +67,9 @@ termux_step_configure() {
 	fi
 
 	export GYP_DEFINES="host_os=linux"
-	export CC_host=/usr/bin/clang
-	export CXX_host=/usr/bin/clang++
-	export LINK_host=/usr/bin/clang++
+	export CC_host=/usr/bin/clang-18
+	export CXX_host=/usr/bin/clang++-18
+	export LINK_host=/usr/bin/clang++-18
 
 	# See note above TERMUX_PKG_DEPENDS why we do not use a shared libuv
 	# When building with ninja, build.ninja is geenrated for both Debug and Release builds.
