@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://www.sqlite.org
 TERMUX_PKG_DESCRIPTION="Library implementing a self-contained and transactional SQL database engine"
 TERMUX_PKG_LICENSE="Public Domain"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.48.0"
+TERMUX_PKG_VERSION="3.49.1"
 _SQLITE_YEAR=2025
 TERMUX_PKG_SRCURL=https://www.sqlite.org/${_SQLITE_YEAR}/sqlite-autoconf-$(sed 's/\./''/; s/\./0/' <<< "$TERMUX_PKG_VERSION")00.tar.gz
-TERMUX_PKG_SHA256=ac992f7fca3989de7ed1fe99c16363f848794c8c32a158dafd4eb927a2e02fd5
+TERMUX_PKG_SHA256=106642d8ccb36c5f7323b64e4152e9b719f7c0215acf5bfeac3d5e7f97b59254
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="zlib"
 TERMUX_PKG_BUILD_DEPENDS="tcl"
@@ -22,12 +22,23 @@ termux_step_pre_configure() {
 	LDFLAGS+=" -lm"
 }
 
+# See: https://github.com/termux/termux-packages/issues/23268#issuecomment-2685308408
+termux_step_configure() {
+	"$TERMUX_PKG_SRCDIR"/configure \
+		--prefix="$TERMUX_PREFIX" \
+		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
+}
+
+termux_step_make_install() {
+	make install INSTALL.strip=/usr/bin/install
+}
+
 termux_step_post_make_install() {
 	echo -e "termux - building libsqlite-tcl for arch ${TERMUX_ARCH}..."
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS=" --with-tcl=${TERMUX_PREFIX}/lib --with-system-sqlite"
 	TERMUX_PKG_SRCDIR+="/tea"
 	rm -rf "$TERMUX_PKG_TMPDIR/config-scripts"
-	termux_step_configure
+	termux_step_configure_autotools
 	termux_step_make
 	termux_step_make_install
 }
