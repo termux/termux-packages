@@ -88,6 +88,9 @@ termux_step_configure_haskell_build() {
 	AVOID_GNULIB+=" gl_cv_header_working_fcntl_h=yes"
 	AVOID_GNULIB+=" gl_cv_C_locale_sans_EILSEQ=yes"
 
+	local host_platform="$TERMUX_HOST_PLATFORM"
+	[[ "$TERMUX_ARCH" == "arm" ]] && host_platform="armv7a-linux-androideabi"
+
 	# NOTE: We do not want to quote AVOID_GNULIB as we want word expansion.
 	# shellcheck disable=SC2086
 	# shellcheck disable=SC2250,SC2154,SC2248,SC2312
@@ -95,13 +98,10 @@ termux_step_configure_haskell_build() {
 		$TERMUX_HASKELL_OPTIMISATION \
 		--prefix="$TERMUX_PREFIX" \
 		--configure-option="$HOST_FLAG" \
-		--ghc-options="-optl-Wl,-rpath,$TERMUX_PREFIX/lib -optl-Wl,--enable-new-dtags" \
-		--with-compiler="$(command -v ghc)" \
-		--with-ghc-pkg="$(command -v ghc-pkg)" \
-		--with-hsc2hs="$(command -v hsc2hs)" \
+		--with-compiler="$(command -v "${host_platform}-ghc")" \
+		--with-ghc-pkg="$(command -v "${host_platform}-ghc-pkg")" \
+		--with-hsc2hs="$(command -v "${host_platform}-hsc2hs")" \
 		--hsc2hs-option=--cross-compile \
-		--extra-lib-dirs="$TERMUX_PREFIX/lib" \
-		--extra-include-dirs="$TERMUX_PREFIX/include" \
 		--with-ld="$LD" \
 		--with-strip="$STRIP" \
 		--with-ar="$AR" \
