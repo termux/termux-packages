@@ -10,17 +10,17 @@ diff -uNr pkgfile-22/meson.build pkgfile-22.mod/meson.build
  
  cpp = meson.get_compiler('cpp')
  
-@@ -28,15 +28,15 @@
- libpcre = dependency('libpcre', version : '>= 8.30')
- libarchive = dependency('libarchive', version : '>= 3.2.0')
+@@ -31,15 +31,15 @@
+ libpcre = dependency('libpcre', version: '>= 8.30')
+ libarchive = dependency('libarchive', version: '>= 3.2.0')
  libcurl = dependency('libcurl')
 -libsystemd = dependency('libsystemd')
 +libsystemd = dependency('libsystemd', required: false)
  pthreads = dependency('threads')
 -stdcppfs = cpp.find_library('stdc++fs')
 +stdcppfs = cpp.find_library('stdc++fs', required: false)
- gtest = dependency('gtest', required : false)
- gmock = dependency('gmock', required : false)
+ gtest = dependency('gtest', required: false)
+ gmock = dependency('gmock', required: false)
  
  pod2man = find_program('pod2man')
  pkgconfig = find_program('pkg-config')
@@ -28,18 +28,19 @@ diff -uNr pkgfile-22/meson.build pkgfile-22.mod/meson.build
 +mkdir_p = 'mkdir -p @TERMUX_PREFIX@/@0@'
  
  libcommon = static_library(
-   'pkgfile',
-@@ -67,13 +67,6 @@
-   link_with : [libcommon],
-   install : true)
+     'pkgfile',
+@@ -78,14 +78,6 @@
+     install: true,
+ )
  
 -executable(
--  'pkgfiled',
--  'src/pkgfiled.cc',
--  link_with : [libcommon],
--  dependencies : [libsystemd, stdcppfs],
--  install : true)
+-    'pkgfiled',
+-    'src/pkgfiled.cc',
+-    link_with: [libcommon],
+-    dependencies: [libsystemd, stdcppfs],
+-    install: true,
+-)
 -
  custom_target(
      'pkgfile.1',
-     output : 'pkgfile.1',
+     output: 'pkgfile.1',
