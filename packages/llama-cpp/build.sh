@@ -1,18 +1,23 @@
-TERMUX_PKG_HOMEPAGE=https://github.com/ggerganov/llama.cpp
-TERMUX_PKG_DESCRIPTION="Port of Facebook's LLaMA model in C/C++"
-TERMUX_PKG_LICENSE=GPL-3.0
+TERMUX_PKG_HOMEPAGE=https://github.com/ggml-org/llama.cpp
+TERMUX_PKG_DESCRIPTION="LLM inference in C/C++"
+TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER=@termux
-TERMUX_PKG_VERSION=0.0.0-b1094
-TERMUX_PKG_SRCURL=https://github.com/ggerganov/llama.cpp/archive/refs/tags/${TERMUX_PKG_VERSION#*-}.tar.gz
-TERMUX_PKG_SHA256=315071e1034846e8ed448008cda35da481f056d6495696cb862ef8b94aaae0f6
+TERMUX_PKG_VERSION=0.0.0-b4793
+TERMUX_PKG_SRCURL=https://github.com/ggml-org/llama.cpp/archive/refs/tags/${TERMUX_PKG_VERSION#*-}.tar.gz
+TERMUX_PKG_SHA256=478a776c531da8b83850f2c2cbb1532ca7e9cc0a8071d0fd0c86baa91c558908
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="libc++, libopenblas, openmpi"
-TERMUX_PKG_RECOMMENDS="python-numpy, python-sentencepiece"
+TERMUX_PKG_DEPENDS="libc++, libcurl"
+TERMUX_PKG_BUILD_DEPENDS="vulkan-headers, opencl-headers, ocl-icd"
+TERMUX_PKG_SUGGESTS="llama-cpp-backend-vulkan, llama-cpp-backend-opencl"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
--DLLAMA_MPI=ON
 -DBUILD_SHARED_LIBS=ON
--DLLAMA_BLAS=ON
--DLLAMA_BLAS_VENDOR=OpenBLAS
+-DLLAMA_BUILD_TESTS=OFF
+-DLLAMA_CURL=ON
+-DGGML_BACKEND_DL=ON
+-DGGML_OPENMP=OFF
+-DGGML_VULKAN=ON
+-DGGML_VULKAN_SHADERS_GEN_TOOLCHAIN=$TERMUX_PKG_BUILDER_DIR/host-toolchain.cmake
+-DGGML_OPENCL=ON
 "
 
 # XXX: llama.cpp uses `int64_t`, but on 32-bit Android `size_t` is `int32_t`.
@@ -31,8 +36,19 @@ termux_pkg_auto_update() {
 	termux_pkg_upgrade_version "0.0.0-${latest_tag}"
 }
 
+termux_step_pre_configure() {
+	export PATH="$NDK/shader-tools/linux-x86_64:$PATH"
+
+	local _libvulkan=vulkan
+	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "false" && "${TERMUX_PKG_API_LEVEL}" -lt 28 ]]; then
+		_libvulkan="${TERMUX_STANDALONE_TOOLCHAIN}/sysroot/usr/lib/${TERMUX_HOST_PLATFORM}/28/libvulkan.so"
+	fi
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DVulkan_LIBRARY=${_libvulkan}"
+}
+
 termux_step_post_make_install() {
-	cd "$TERMUX_PREFIX/bin" || exit 1
-	mv main llama
-	mv server llama-server
+	mkdir -p "$TERMUX_PREFIX"/lib
+	cp -f "$TERMUX_PKG_BUILDDIR"/bin/libggml-cpu.so "$TERMUX_PREFIX"/lib/
+	cp -f "$TERMUX_PKG_BUILDDIR"/bin/libggml-opencl.so "$TERMUX_PREFIX"/lib/
+	cp -f "$TERMUX_PKG_BUILDDIR"/bin/libggml-vulkan.so "$TERMUX_PREFIX"/lib/
 }
