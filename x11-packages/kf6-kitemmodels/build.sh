@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Set of item models extending the Qt model-view framework
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.11.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/kitemmodels-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=398dc4e3c5c44461350a20ac234055bafc2b184284ddea91563134ef62f5d6a6
 TERMUX_PKG_AUTO_UPDATE=true
