@@ -74,10 +74,6 @@ termux_step_configure() {
 	export LINK_host=/usr/bin/clang++-18
 
 	LDFLAGS+=" -ldl"
-	echo "
-print("")
-print(output['variables']['clang'])
-" >> ./configure.py
 	# See note above TERMUX_PKG_DEPENDS why we do not use a shared libuv.
 	# When building with ninja, build.ninja is generated for both Debug and Release builds.
 	./configure \
