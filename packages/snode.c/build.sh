@@ -4,5 +4,6 @@ TERMUX_PKG_LICENSE="MIT, LGPL-3.0-or-later"
 TERMUX_PKG_MAINTAINER="VolkerChristian"
 TERMUX_PKG_VERSION=1.0
 TERMUX_PKG_SRCURL="https://github.com/SNodeC/snode.c/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=b5503d973e3d049f6094aa69cfee8ee66503f9d4556a4bcb4e97dbbd8d47b9f9
 TERMUX_PKG_DEPENDS="file, openssl"
 TERMUX_PKG_BUILD_DEPENDS="easyloggingpp, nlohmann-json"
