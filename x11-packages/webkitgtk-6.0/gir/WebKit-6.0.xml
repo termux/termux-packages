@@ -106,6 +106,11 @@
     <member name="WEBKIT_JAVASCRIPT_ERROR_INVALID_RESULT" nick="invalid-result" value="601"/>
   </enum>  <enum name="WebKitSnapshotError" get-type="webkit_snapshot_error_get_type">
     <member name="WEBKIT_SNAPSHOT_ERROR_FAILED_TO_CREATE" nick="create" value="799"/>
+  </enum>  <enum name="WebKitWebExtensionMatchPatternError" get-type="webkit_web_extension_match_pattern_error_get_type">
+    <member name="WEBKIT_WEB_EXTENSION_MATCH_PATTERN_ERROR_UNKNOWN" nick="unknown" value="899"/>
+    <member name="WEBKIT_WEB_EXTENSION_MATCH_PATTERN_ERROR_INVALID_SCHEME" nick="invalid-scheme" value="808"/>
+    <member name="WEBKIT_WEB_EXTENSION_MATCH_PATTERN_ERROR_INVALID_HOST" nick="invalid-host" value="809"/>
+    <member name="WEBKIT_WEB_EXTENSION_MATCH_PATTERN_ERROR_INVALID_PATH" nick="invalid-path" value="810"/>
   </enum>  <enum name="WebKitUserContentFilterError" get-type="webkit_user_content_filter_error_get_type">
     <member name="WEBKIT_USER_CONTENT_FILTER_ERROR_INVALID_SOURCE" nick="invalid-source" value="0"/>
     <member name="WEBKIT_USER_CONTENT_FILTER_ERROR_NOT_FOUND" nick="not-found" value="1"/>
@@ -199,7 +204,13 @@
     <member name="WEBKIT_CACHE_MODEL_DOCUMENT_VIEWER" nick="document-viewer" value="0"/>
     <member name="WEBKIT_CACHE_MODEL_WEB_BROWSER" nick="web-browser" value="1"/>
     <member name="WEBKIT_CACHE_MODEL_DOCUMENT_BROWSER" nick="document-browser" value="2"/>
-  </enum>  <enum name="WebKitPolicyDecisionType" get-type="webkit_policy_decision_type_get_type">
+  </enum>  <flags name="WebKitWebExtensionMatchPatternOptions" get-type="webkit_web_extension_match_pattern_options_get_type">
+    <member name="WEBKIT_WEB_EXTENSION_MATCH_PATTERN_OPTIONS_NONE" nick="none" value="1"/>
+    <member name="WEBKIT_WEB_EXTENSION_MATCH_PATTERN_OPTIONS_IGNORE_SCHEMES" nick="ignore-schemes" value="2"/>
+    <member name="WEBKIT_WEB_EXTENSION_MATCH_PATTERN_OPTIONS_IGNORE_PATHS" nick="ignore-paths" value="4"/>
+    <member name="WEBKIT_WEB_EXTENSION_MATCH_PATTERN_OPTIONS_MATCH_BIDIRECTIONALLY" nick="match-bidirectionally" value="8"/>
+  </flags>
+  <enum name="WebKitPolicyDecisionType" get-type="webkit_policy_decision_type_get_type">
     <member name="WEBKIT_POLICY_DECISION_TYPE_NAVIGATION_ACTION" nick="navigation-action" value="0"/>
     <member name="WEBKIT_POLICY_DECISION_TYPE_NEW_WINDOW_ACTION" nick="new-window-action" value="1"/>
     <member name="WEBKIT_POLICY_DECISION_TYPE_RESPONSE" nick="response" value="2"/>
@@ -269,6 +280,8 @@
     <property name="id" type="gchararray" flags="235" default-value="NULL"/>
     <signal name="create-web-view" return="WebKitWebView" when="last" detailed="1">
     </signal>
+    <signal name="will-close" return="void" when="last">
+    </signal>
   </class>
   <class name="WebKitBackForwardListItem" get-type="webkit_back_forward_list_item_get_type" parents="GInitiallyUnowned,GObject" final="1">
   </class>
@@ -325,6 +338,8 @@
   </class>
   <class name="WebKitEditorState" get-type="webkit_editor_state_get_type" parents="GObject" final="1">
     <property name="typing-attributes" type="guint" flags="225" default-value="0"/>
+    <signal name="changed" return="void" when="last">
+    </signal>
   </class>
   <class name="WebKitFaviconDatabase" get-type="webkit_favicon_database_get_type" parents="GObject" final="1">
     <signal name="favicon-changed" return="void" when="last">
@@ -439,7 +454,7 @@
     <property name="enable-javascript" type="gboolean" flags="231" default-value="TRUE"/>
     <property name="auto-load-images" type="gboolean" flags="231" default-value="TRUE"/>
     <property name="load-icons-ignoring-image-load-setting" type="gboolean" flags="-2147483417" default-value="FALSE"/>
-    <property name="enable-offline-web-application-cache" type="gboolean" flags="231" default-value="TRUE"/>
+    <property name="enable-offline-web-application-cache" type="gboolean" flags="-2147483417" default-value="FALSE"/>
     <property name="enable-html5-local-storage" type="gboolean" flags="231" default-value="TRUE"/>
     <property name="enable-html5-database" type="gboolean" flags="231" default-value="TRUE"/>
     <property name="javascript-can-open-windows-automatically" type="gboolean" flags="231" default-value="FALSE"/>
@@ -458,7 +473,7 @@
     <property name="enable-developer-extras" type="gboolean" flags="231" default-value="FALSE"/>
     <property name="enable-resizable-text-areas" type="gboolean" flags="231" default-value="TRUE"/>
     <property name="enable-tabs-to-links" type="gboolean" flags="231" default-value="TRUE"/>
-    <property name="enable-dns-prefetching" type="gboolean" flags="231" default-value="FALSE"/>
+    <property name="enable-dns-prefetching" type="gboolean" flags="-2147483417" default-value="FALSE"/>
     <property name="enable-caret-browsing" type="gboolean" flags="231" default-value="FALSE"/>
     <property name="enable-fullscreen" type="gboolean" flags="231" default-value="TRUE"/>
     <property name="print-backgrounds" type="gboolean" flags="231" default-value="TRUE"/>
@@ -474,8 +489,9 @@
     <property name="enable-page-cache" type="gboolean" flags="231" default-value="TRUE"/>
     <property name="user-agent" type="gchararray" flags="231" default-value="NULL"/>
     <property name="enable-smooth-scrolling" type="gboolean" flags="231" default-value="TRUE"/>
+    <property name="enable-2d-canvas-acceleration" type="gboolean" flags="231" default-value="TRUE"/>
     <property name="enable-write-console-messages-to-stdout" type="gboolean" flags="231" default-value="FALSE"/>
-    <property name="enable-media-stream" type="gboolean" flags="231" default-value="FALSE"/>
+    <property name="enable-media-stream" type="gboolean" flags="231" default-value="TRUE"/>
     <property name="enable-mock-capture-devices" type="gboolean" flags="231" default-value="FALSE"/>
     <property name="enable-spatial-navigation" type="gboolean" flags="231" default-value="FALSE"/>
     <property name="enable-mediasource" type="gboolean" flags="231" default-value="TRUE"/>
@@ -491,6 +507,7 @@
     <property name="media-content-types-requiring-hardware-support" type="gchararray" flags="231" default-value="NULL"/>
     <property name="enable-webrtc" type="gboolean" flags="231" default-value="FALSE"/>
     <property name="disable-web-security" type="gboolean" flags="231" default-value="FALSE"/>
+    <property name="webrtc-udp-ports-range" type="gchararray" flags="231" default-value="NULL"/>
   </class>
   <class name="WebKitURISchemeResponse" get-type="webkit_uri_scheme_response_get_type" parents="GObject" final="1">
     <property name="stream" type="GInputStream" flags="234"/>
@@ -556,6 +573,7 @@
       <param type="WebKitUserMessage"/>
     </signal>
   </class>
+  <boxed name="WebKitWebExtensionMatchPattern" get-type="webkit_web_extension_match_pattern_get_type"/>
   <class name="WebKitWebResource" get-type="webkit_web_resource_get_type" parents="GObject" final="1">
     <property name="uri" type="gchararray" flags="225" default-value="NULL"/>
     <property name="response" type="WebKitURIResponse" flags="225"/>
@@ -744,6 +762,7 @@
   <error-quark function="webkit_print_error_quark" domain="WebKitPrintError"/>
   <error-quark function="webkit_javascript_error_quark" domain="WebKitJavascriptError"/>
   <error-quark function="webkit_snapshot_error_quark" domain="WebKitSnapshotError"/>
+  <error-quark function="webkit_web_extension_match_pattern_error_quark" domain="WebKitWebExtensionMatchPatternError"/>
   <error-quark function="webkit_user_content_filter_error_quark" domain="WebKitUserContentFilterError"/>
   <error-quark function="webkit_media_error_quark" domain="WebKitMediaError"/>
   <error-quark function="webkit_favicon_database_error_quark" domain="WebKitFaviconDatabaseError"/>

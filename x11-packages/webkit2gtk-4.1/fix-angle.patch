@@ -1,0 +1,10 @@
++++ ./Source/ThirdParty/ANGLE/src/libANGLE/renderer/gl/egl/android/DisplayAndroid.cpp
+@@ -23,7 +23,7 @@
+ 
+ bool DisplayAndroid::isValidNativeWindow(EGLNativeWindowType window) const
+ {
+-    return ANativeWindow_getFormat(window) >= 0;
++    return ANativeWindow_getFormat((ANativeWindow*) window) >= 0;
+ }
+ 
+ egl::Error DisplayAndroid::validateImageClientBuffer(const gl::Context *context,
