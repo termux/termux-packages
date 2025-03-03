@@ -5,7 +5,6 @@ termux_step_make() {
 	if [ "$TERMUX_QUIET_BUILD" = true ]; then
 		QUIET_BUILD="-s"
 	fi
-
 	if test -f build.ninja; then
 		ninja -j $TERMUX_PKG_MAKE_PROCESSES
 	elif ls ./*.cabal &>/dev/null; then
