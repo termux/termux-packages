@@ -5,4 +5,3 @@ TERMUX_PKG_MAINTAINER="VolkerChristian"
 TERMUX_PKG_VERSION=9.97.1
 TERMUX_PKG_SRCURL="git+https://github.com/abumq/easyloggingpp.git"
 TERMUX_PKG_FORCE_CMAKE=true
-
