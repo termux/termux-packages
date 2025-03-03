@@ -175,6 +175,14 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_create_subpackages.sh"
 # shellcheck source=scripts/build/termux_step_massage.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_massage.sh"
 
+# Function to run strip symbols during termux_step_massage
+# shellcheck source=scripts/build/termux_step_strip_elf_symbols.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_strip_elf_symbols.sh"
+
+# Function to run termux-elf-cleaner during termux_step_massage
+# shellcheck source=scripts/build/termux_step_elf_cleaner.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_elf_cleaner.sh"
+
 # Hook for packages after massage step
 termux_step_post_massage() {
 	return

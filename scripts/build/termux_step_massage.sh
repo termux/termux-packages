@@ -20,15 +20,21 @@ termux_step_massage() {
 
 	if [ "$TERMUX_DEBUG" = "false" ]; then
 		# Strip binaries. file(1) may fail for certain unusual files, so disable pipefail.
-		set +e +o pipefail
-		find . \( -path "./bin/*" -o -path "./lib/*" -o -path "./libexec/*" \) -type f | \
-			xargs -r file | grep -E "ELF .+ (executable|shared object)" | cut -f 1 -d : | \
-				xargs -r "$STRIP" --strip-unneeded --preserve-dates
-		set -e -o pipefail
+		#set +e +o pipefail
+		#find . \( -path "./bin/*" -o -path "./lib/*" -o -path "./libexec/*" \) -type f | \
+		#	xargs -r file | grep -E "ELF .+ (executable|shared object)" | cut -f 1 -d : | \
+		#		xargs -r "$STRIP" --strip-unneeded --preserve-dates
+		#set -e -o pipefail
+		:
 	fi
 
-	# Remove entries unsupported by Android's linker:
-	find . \( -path "./bin/*" -o -path "./lib/*" -o -path "./libexec/*" \) -type f -print0 | xargs -r -0 "$TERMUX_ELF_CLEANER"
+	if [ "$TERMUX_PKG_NO_STRIP" != "true" ] && [ "$TERMUX_DEBUG" = "false" ]; then
+		termux_step_strip_elf_symbols
+	fi
+
+	if [ "$TERMUX_PKG_NO_ELF_CLEANER" != "true" ]; then
+		termux_step_elf_cleaner
+	fi
 
 	# Fix shebang paths:
 	while IFS= read -r -d '' file

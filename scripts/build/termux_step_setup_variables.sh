@@ -127,6 +127,8 @@ termux_step_setup_variables() {
 	TERMUX_CMAKE_BUILD=Ninja # Which cmake generator to use
 	TERMUX_PKG_HAS_DEBUG=true # set to false if debug build doesn't exist or doesn't work, for example for python based packages
 	TERMUX_PKG_METAPACKAGE=false
+	TERMUX_PKG_NO_ELF_CLEANER=false # set this to true to disable running of termux-elf-cleaner on built binaries
+	TERMUX_PKG_NO_STRIP=false # set this to true to disable stripping binaries
 
 	unset CFLAGS CPPFLAGS LDFLAGS CXXFLAGS
 }
