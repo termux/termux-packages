@@ -3,13 +3,15 @@ TERMUX_PKG_DESCRIPTION="Suite of VNC servers. Based on the VNC 4 branch of Tight
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=(1.14.1
-                    21.1.8)
+# Align the version with `xorg-server` package.
+                    21.1.16)
 TERMUX_PKG_SRCURL=(https://github.com/TigerVNC/tigervnc/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
                    https://xorg.freedesktop.org/releases/individual/xserver/xorg-server-${TERMUX_PKG_VERSION[1]}.tar.xz)
 TERMUX_PKG_SHA256=(579d0d04eb5b806d240e99a3c756b38936859e6f7db2f4af0d5656cc9a989d7c
-                   38aadb735650c8024ee25211c190bf8aad844c5f59632761ab1ef4c4d5aeb152)
+                   b14a116d2d805debc5b5b2aac505a279e69b217dae2fae2dfcb62400471a9970)
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_DEPENDS="libandroid-shmem, libc++, libgmp, libgnutls, libjpeg-turbo, libnettle, libpixman, libx11, libxau, libxdamage, libxdmcp, libxext, libxfixes, libxfont2, libxrandr, libxshmfence, libxtst, opengl, openssl, perl, xkeyboard-config, xorg-xauth, xorg-xkbcomp, zlib"
-TERMUX_PKG_BUILD_DEPENDS="xorg-font-util, xorg-server-xvfb, xorg-util-macros, xorgproto, xtrans"
+TERMUX_PKG_BUILD_DEPENDS="xorg-font-util, xorg-server, xorg-util-macros, xorgproto, xtrans"
 TERMUX_PKG_SUGGESTS="aterm, xorg-twm"
 
 TERMUX_PKG_FOLDERNAME=tigervnc-${TERMUX_PKG_VERSION}
@@ -22,7 +24,7 @@ termux_step_post_get_source() {
 	cp -r xorg-server-${TERMUX_PKG_VERSION[1]}/* unix/xserver/
 
 	cd ${TERMUX_PKG_BUILDDIR}/unix/xserver
-	for p in "$TERMUX_SCRIPTDIR/x11-packages/xorg-server-xvfb"/*.patch; do
+	for p in "$TERMUX_SCRIPTDIR/x11-packages/xorg-server"/*.patch; do
 		echo "Applying $(basename "${p}")"
 		sed -e "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" \
 			-e "s%\@TERMUX_HOME\@%${TERMUX_ANDROID_HOME}%g" "$p" \
@@ -45,14 +47,15 @@ termux_step_pre_configure() {
 	local _libgcc_name="$(basename $_libgcc_file)"
 	LDFLAGS="${LDFLAGS} -llog -L$_libgcc_path -l:$_libgcc_name"
 
-	local xorg_server_xvfb_configure_args="$(. $TERMUX_SCRIPTDIR/x11-packages/xorg-server-xvfb/build.sh; echo $TERMUX_PKG_EXTRA_CONFIGURE_ARGS)"
+	local xorg_server_configure_args="$(. $TERMUX_SCRIPTDIR/x11-packages/xorg-server/build.sh; echo $TERMUX_PKG_EXTRA_CONFIGURE_ARGS)"
+	xorg_server_configure_args+=" --disable-xorg --disable-xephyr --disable-kdrive"
 	./configure \
 		--host="${TERMUX_HOST_PLATFORM}" \
 		--prefix="${TERMUX_PREFIX}" \
 		--disable-static \
 		--disable-nls \
 		--enable-debug \
-		${xorg_server_xvfb_configure_args}
+		${xorg_server_configure_args}
 
 	LDFLAGS="${LDFLAGS} -landroid-shmem"
 }
