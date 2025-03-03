@@ -1,0 +1,12 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/lxqt/lxqt-wayland-session
+TERMUX_PKG_DESCRIPTION="Files needed for the LXQt Wayland Session"
+TERMUX_PKG_LICENSE="BSD 3-Clause, GPL-2.0, GPL-3.0, LGPL-2.1, MIT"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="0.1.1"
+TERMUX_PKG_SRCURL=https://github.com/lxqt/lxqt-wayland-session/releases/download/${TERMUX_PKG_VERSION}/lxqt-wayland-session-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=34e9441a7d4bdf243e4a380a10d00e746e4ef43a1a6ccda1c8e6c6bc3c513fbc
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_PLATFORM_INDEPENDENT=true
+TERMUX_PKG_DEPENDS="layer-shell-qt, lxqt-session, qtxdg-tools"
+TERMUX_PKG_BUILD_DEPENDS="lxqt-build-tools, qt6-qttools"
+TERMUX_PKG_SUGGESTS="labwc, sway"
