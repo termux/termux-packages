@@ -1,9 +1,9 @@
-diff --git a/Source/WebKit/Platform/unix/SharedMemoryUnix.cpp b/Source/WebKit/Platform/unix/SharedMemoryUnix.cpp
+diff --git a/Source/WebCore/platform/unix/SharedMemoryUnix.cpp b/Source/WebCore/platform/unix/SharedMemoryUnix.cpp
 index aff7b0d18d..7d22cb5f5c 100644
---- a/Source/WebKit/Platform/unix/SharedMemoryUnix.cpp
-+++ b/Source/WebKit/Platform/unix/SharedMemoryUnix.cpp
-@@ -54,6 +54,65 @@
- #include "ArgumentCoders.h"
+--- a/Source/WebCore/platform/unix/SharedMemoryUnix.cpp
++++ b/Source/WebCore/platform/unix/SharedMemoryUnix.cpp
+@@ -50,6 +50,65 @@
+ #include <sys/syscall.h>
  #endif
  
 +static int shm_unlink(const char *name) {
@@ -65,6 +65,6 @@ index aff7b0d18d..7d22cb5f5c 100644
 +    return fd;
 +}
 +
- namespace WebKit {
+ namespace WebCore {
  
- SharedMemory::Handle::Handle()
+ SharedMemoryHandle::SharedMemoryHandle(const SharedMemoryHandle& handle)

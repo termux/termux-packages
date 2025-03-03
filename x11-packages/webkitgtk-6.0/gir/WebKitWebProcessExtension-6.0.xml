@@ -1,5 +1,18 @@
 <?xml version="1.0"?>
 <dump>
+  <enum name="WebKitConsoleMessageSource" get-type="webkit_console_message_source_get_type">
+    <member name="WEBKIT_CONSOLE_MESSAGE_SOURCE_JAVASCRIPT" nick="javascript" value="0"/>
+    <member name="WEBKIT_CONSOLE_MESSAGE_SOURCE_NETWORK" nick="network" value="1"/>
+    <member name="WEBKIT_CONSOLE_MESSAGE_SOURCE_CONSOLE_API" nick="console-api" value="2"/>
+    <member name="WEBKIT_CONSOLE_MESSAGE_SOURCE_SECURITY" nick="security" value="3"/>
+    <member name="WEBKIT_CONSOLE_MESSAGE_SOURCE_OTHER" nick="other" value="4"/>
+  </enum>  <enum name="WebKitConsoleMessageLevel" get-type="webkit_console_message_level_get_type">
+    <member name="WEBKIT_CONSOLE_MESSAGE_LEVEL_INFO" nick="info" value="0"/>
+    <member name="WEBKIT_CONSOLE_MESSAGE_LEVEL_LOG" nick="log" value="1"/>
+    <member name="WEBKIT_CONSOLE_MESSAGE_LEVEL_WARNING" nick="warning" value="2"/>
+    <member name="WEBKIT_CONSOLE_MESSAGE_LEVEL_ERROR" nick="error" value="3"/>
+    <member name="WEBKIT_CONSOLE_MESSAGE_LEVEL_DEBUG" nick="debug" value="4"/>
+  </enum>  <boxed name="WebKitConsoleMessage" get-type="webkit_console_message_get_type"/>
   <class name="WebKitScriptWorld" get-type="webkit_script_world_get_type" parents="GObject" final="1">
     <signal name="window-object-cleared" return="void" when="last">
       <param type="WebKitWebPage"/>
@@ -40,6 +53,9 @@
     <signal name="context-menu" return="gboolean" when="last">
       <param type="WebKitContextMenu"/>
       <param type="WebKitWebHitTestResult"/>
+    </signal>
+    <signal name="console-message-sent" return="void" when="last">
+      <param type="WebKitConsoleMessage"/>
     </signal>
     <signal name="user-message-received" return="gboolean" when="last">
       <param type="WebKitUserMessage"/>
