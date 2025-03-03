@@ -8,4 +8,3 @@ TERMUX_PKG_SRCURL="git+https://github.com/SNodeC/snode.c.git"
 TERMUX_PKG_DEPENDS="file,openssl"
 TERMUX_PKG_BUILD_DEPENDS="easyloggingpp,nlohmann-json"
 TERMUX_PKG_FORCE_CMAKE=true
-
