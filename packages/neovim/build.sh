@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="Apache-2.0, VIM License"
 TERMUX_PKG_LICENSE_FILE="LICENSE.txt"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
 TERMUX_PKG_VERSION="0.10.4"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/neovim/neovim/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=10413265a915133f8a853dc757571334ada6e4f0aa15f4c4cc8cc48341186ca2
 TERMUX_PKG_AUTO_UPDATE=true
@@ -88,7 +88,10 @@ termux_step_post_make_install() {
 	# and replace it with our LD_PRELOAD shim.
 	# See: packages/neovim/nvim-shim.sh for details.
 	mv "${TERMUX_PREFIX}"/bin/nvim "${TERMUX_PREFIX}"/libexec/nvim
-	install -m755 "$TERMUX_PKG_BUILDER_DIR/nvim-shim.sh" "${TERMUX_PREFIX}/bin/nvim"
+	sed -e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
+		"$TERMUX_PKG_BUILDER_DIR/nvim-shim.sh" \
+		> "${TERMUX_PREFIX}/bin/nvim"
+	chmod 755 "${TERMUX_PREFIX}/bin/nvim"
 }
 
 termux_step_create_debscripts() {
