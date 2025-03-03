@@ -7,4 +7,3 @@ TERMUX_PKG_VERSION=1.0
 TERMUX_PKG_SRCURL="git+https://github.com/SNodeC/mqttsuite.git"
 TERMUX_PKG_DEPENDS="fmt,snode.c"
 TERMUX_PKG_FORCE_CMAKE=true
-
