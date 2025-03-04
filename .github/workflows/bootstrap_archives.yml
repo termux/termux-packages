@@ -15,11 +15,11 @@ jobs:
           - x86_64
     steps:
       - name: Git clone
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Create bootstrap archive
         run: ./scripts/generate-bootstraps.sh --architectures ${{ matrix.arch }}
       - name: Store artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: bootstrap-archives-${{ github.sha }}
           path: "*.zip"
@@ -28,11 +28,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Git clone
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Fetch bootstrap archives
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: bootstrap-archives-${{ github.sha }}
           path: ./
@@ -59,7 +59,7 @@ jobs:
           git push --tags
           echo "::set-output name=tag_name::$new_tag"
       - name: Publish GitHub release
-        uses: termux/upload-release-action@v3.0.3
+        uses: termux/upload-release-action@v4.2.0
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: "*.zip"
