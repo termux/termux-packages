@@ -192,10 +192,9 @@ termux_step_post_massage() {
 # shellcheck source=scripts/build/termux_step_create_datatar.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_create_datatar.sh"
 
-# Hook function to create {pre,post}install, {pre,post}rm-scripts and similar
-termux_step_create_debscripts() {
-	return
-}
+# Function to create {pre,post}install, {pre,post}rm-scripts and similar
+# shellcheck source=scripts/build/termux_step_create_debscripts.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_create_debscripts.sh"
 
 # Create the build deb file. Not to be overridden by package scripts.
 # shellcheck source=scripts/build/termux_step_create_debfile.sh
