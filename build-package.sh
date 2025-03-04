@@ -356,10 +356,9 @@ termux_step_post_massage() {
 	return
 }
 
-# Hook function to create {pre,post}install, {pre,post}rm-scripts and similar
-termux_step_create_debscripts() {
-	return
-}
+# Function to create {pre,post}install, {pre,post}rm-scripts and similar
+# shellcheck source=scripts/build/termux_step_create_debscripts.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_create_debscripts.sh"
 
 # Convert Debian maintainer scripts into pacman-compatible installation hooks.
 # This is used only when creating pacman packages.
