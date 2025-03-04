@@ -1,13 +1,19 @@
---- a/configure.ac
-+++ b/configure.ac
-@@ -727,8 +727,8 @@
++++ ./meson.build
+@@ -424,16 +424,7 @@
+     }
+   '''
  
- OLD_LIBS=$LIBS
- LIBS="$LIBS $LIBCURL"
--AC_RUN_IFELSE(
--     [AC_LANG_PROGRAM([[#include <curl/curl.h>]],
-+AC_COMPILE_IFELSE(
-+     [AC_LANG_PROGRAM([[#error]],
-                       [[return (CURLSSLSET_OK != curl_global_sslset(CURLSSLBACKEND_GNUTLS, NULL, NULL));]])],
-                     [curl_gnutls=1],
-                     [AC_MSG_WARN([cURL does not have GnuTLS backend])
+-result = cc.run(curl_ssl_check, name : 'cURL gnutls check',
+-  dependencies: curl_dep)
+-cdata.set('curl_gnutls', 0)
+-if result.returncode() == 0
+-  cdata.set('curl_gnutls', 1)
+-endif
+-
+-if cc.has_function('getloadavg') == false
+-  error('getloadadv missing')
+-endif
++cdata.set('curl_gnutls', 1)
+ 
+ syscalls = [
+   'memset_s', 'explicit_bzero', 'atoll', 'stat64',

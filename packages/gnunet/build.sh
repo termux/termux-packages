@@ -3,13 +3,10 @@ TERMUX_PKG_DESCRIPTION="A framework for secure peer-to-peer networking"
 TERMUX_PKG_LICENSE="AGPL-V3"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_SRCURL=git+https://git.gnunet.org/git/gnunet
-TERMUX_PKG_VERSION=0.19.4
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SHA256=e631013cb0672d245d5ad535729339d47d482984fa2a29edf8ade1ef46640464
-TERMUX_PKG_AUTO_UPDATE=false
+TERMUX_PKG_VERSION="0.23.1"
+TERMUX_PKG_SHA256=ee1f4f834223c78912267d29d2952f028f76b5b123220d3db127a53748f66010
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libcurl, libgcrypt, libgnutls, libgpg-error, libidn2, libjansson, libltdl, libmicrohttpd, libsodium, libsqlite, libunistring, zlib"
-TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_have_decl_struct_in6_ifreq=yes"
 
 # `termux_step_get_source` does not work by default:
 #
@@ -38,11 +35,12 @@ termux_step_get_source() {
 termux_step_post_get_source() {
 	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum)
 	if [[ "${s}" != "${TERMUX_PKG_SHA256}  "* ]]; then
-		termux_error_exit "Checksum mismatch for source files."
+		termux_error_exit "Checksum mismatch for source files.\nExpected: ${TERMUX_PKG_SHA256}\nActual:   ${s%% *}"
 	fi
 }
 
 termux_step_pre_configure() {
 	CPPFLAGS+=" -D_LINUX_IN6_H"
-	./bootstrap
+	./bootstrap meson
+	rm -f $TERMUX_PKG_SRCDIR/configure
 }
