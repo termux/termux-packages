@@ -1,0 +1,12 @@
+diff '--color=auto' -uNr a/process.c b/process.c
+--- a/process.c	2024-12-25 15:43:20.000000000 +0800
++++ b/process.c	2025-03-05 20:41:27.714753952 +0800
+@@ -4241,7 +4241,7 @@
+ 
+         disable_child_handler_fork_parent(&old); /* yes, bad name */
+         if (
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD__) || defined(__ANDROID__)
+             pid != 0 &&
+ #endif
+             true) {
