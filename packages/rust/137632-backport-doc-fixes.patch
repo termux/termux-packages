@@ -1,0 +1,119 @@
+diff --git a/compiler/rustc_codegen_ssa/src/target_features.rs b/compiler/rustc_codegen_ssa/src/target_features.rs
+index 7e80d014ea2..488fe093456 100644
+--- a/compiler/rustc_codegen_ssa/src/target_features.rs
++++ b/compiler/rustc_codegen_ssa/src/target_features.rs
+@@ -10,7 +10,7 @@
+ use rustc_middle::ty::TyCtxt;
+ use rustc_session::parse::feature_err;
+ use rustc_span::{Span, Symbol, sym};
+-use rustc_target::target_features;
++use rustc_target::target_features::{self, Stability};
+ 
+ use crate::errors;
+ 
+@@ -80,6 +80,27 @@ pub(crate) fn from_target_feature_attr(
+                     format!("the target feature `{feature}` is currently unstable"),
+                 )
+                 .emit();
++            } else {
++                // Add this and the implied features.
++                let feature_sym = Symbol::intern(feature);
++                for &name in tcx.implied_target_features(feature_sym) {
++                    // But ensure the ABI does not forbid enabling this.
++                    // Here we do assume that LLVM doesn't add even more implied features
++                    // we don't know about, at least no features that would have ABI effects!
++                    // We skip this logic in rustdoc, where we want to allow all target features of
++                    // all targets, so we can't check their ABI compatibility and anyway we are not
++                    // generating code so "it's fine".
++                    if !tcx.sess.opts.actually_rustdoc {
++                        if abi_feature_constraints.incompatible.contains(&name.as_str()) {
++                            tcx.dcx().emit_err(errors::ForbiddenTargetFeatureAttr {
++                                span: item.span(),
++                                feature: name.as_str(),
++                                reason: "this feature is incompatible with the target ABI",
++                            });
++                        }
++                    }
++                    target_features.push(TargetFeature { name, implied: name != feature_sym })
++                }
+             }
+             Some(Symbol::intern(feature))
+         }));
+@@ -149,11 +170,38 @@ pub(crate) fn provide(providers: &mut Providers) {
+             assert_eq!(cnum, LOCAL_CRATE);
+             let target = &tcx.sess.target;
+             if tcx.sess.opts.actually_rustdoc {
+-                // rustdoc needs to be able to document functions that use all the features, so
+-                // whitelist them all
+-                rustc_target::target_features::all_rust_features()
+-                    .map(|(a, b)| (a.to_string(), b.compute_toggleability(target)))
+-                    .collect()
++                // HACK: rustdoc would like to pretend that we have all the target features, so we
++                // have to merge all the lists into one. To ensure an unstable target never prevents
++                // a stable one from working, we merge the stability info of all instances of the
++                // same target feature name, with the "most stable" taking precedence. And then we
++                // hope that this doesn't cause issues anywhere else in the compiler...
++                let mut result: UnordMap<String, Stability> = Default::default();
++                for (name, stability) in rustc_target::target_features::all_rust_features() {
++                    use std::collections::hash_map::Entry;
++                    match result.entry(name.to_owned()) {
++                        Entry::Vacant(vacant_entry) => {
++                            vacant_entry.insert(stability);
++                        }
++                        Entry::Occupied(mut occupied_entry) => {
++                            // Merge the two stabilities, "more stable" taking precedence.
++                            match (occupied_entry.get(), stability) {
++                                (Stability::Stable, _)
++                                | (
++                                    Stability::Unstable { .. },
++                                    Stability::Unstable { .. } | Stability::Forbidden { .. },
++                                )
++                                | (Stability::Forbidden { .. }, Stability::Forbidden { .. }) => {
++                                    // The stability in the entry is at least as good as the new one, just keep it.
++                                }
++                                _ => {
++                                    // Overwrite stabilite.
++                                    occupied_entry.insert(stability);
++                                }
++                            }
++                        }
++                    }
++                }
++                result
+             } else {
+                 tcx.sess
+                     .target
+diff --git a/tests/rustdoc-ui/target-feature-stability.rs b/tests/rustdoc-ui/target-feature-stability.rs
+new file mode 100644
+index 00000000000..17fa3ccfe3e
+--- /dev/null
++++ b/tests/rustdoc-ui/target-feature-stability.rs
+@@ -0,0 +1,28 @@
++//! This is a regression test for <https://github.com/rust-lang/rust/issues/137366>, ensuring
++//! that we can use the `neon` target feature on ARM32 targets in rustdoc despite there
++//! being a "forbidden" feature of the same name for aarch64, and rustdoc merging the
++//! target features of all targets.
++//@ check-pass
++//@ revisions: arm aarch64
++//@[arm] compile-flags: --target armv7-unknown-linux-gnueabihf
++//@[arm] needs-llvm-components: arm
++//@[aarch64] compile-flags: --target aarch64-unknown-none-softfloat
++//@[aarch64] needs-llvm-components: aarch64
++
++#![crate_type = "lib"]
++#![feature(no_core, lang_items)]
++#![feature(arm_target_feature)]
++#![no_core]
++
++#[lang = "sized"]
++pub trait Sized {}
++
++// `fp-armv8` is "forbidden" on aarch64 as we tie it to `neon`.
++#[target_feature(enable = "fp-armv8")]
++pub fn fun1() {}
++
++// This would usually be rejected as it changes the ABI.
++// But we disable that check in rustdoc since we are building "for all targets" and the
++// check can't really handle that.
++#[target_feature(enable = "soft-float")]
++pub fn fun2() {}

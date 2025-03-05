@@ -1,11 +1,13 @@
+diff --git a/library/std/src/sys/pal/unix/os.rs b/library/std/src/sys/pal/unix/os.rs
+index b83772e34c1..ba88880c173 100644
 --- a/library/std/src/sys/pal/unix/os.rs
 +++ b/library/std/src/sys/pal/unix/os.rs
-@@ -680,7 +680,7 @@
- pub fn temp_dir() -> PathBuf {
-     crate::env::var_os("TMPDIR").map(PathBuf::from).unwrap_or_else(|| {
-         if cfg!(target_os = "android") {
--            PathBuf::from("/data/local/tmp")
-+            PathBuf::from("@TERMUX_PREFIX@/tmp")
-         } else {
-             PathBuf::from("/tmp")
-         }
+@@ -771,7 +771,7 @@ pub fn temp_dir() -> PathBuf {
+             if #[cfg(all(target_vendor = "apple", not(miri)))] {
+                 darwin_temp_dir()
+             } else if #[cfg(target_os = "android")] {
+-                PathBuf::from("/data/local/tmp")
++                PathBuf::from("@TERMUX_PREFIX@/tmp")
+             } else {
+                 PathBuf::from("/tmp")
+             }
