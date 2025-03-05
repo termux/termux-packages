@@ -2,11 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://www.freerdp.com/
 TERMUX_PKG_DESCRIPTION="A free remote desktop protocol library and clients"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.11.7"
-TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_VERSION="3.12.0"
 TERMUX_PKG_SRCURL=https://github.com/FreeRDP/FreeRDP/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=22dbeeaad065e93f152d70e04ec8eeab08aa32c406a96be64f252526623625a4
-TERMUX_PKG_DEPENDS="libandroid-shmem, libcairo, libjpeg-turbo, libusb, libwayland, libx11, libxcursor, libxdamage, libxext, libxfixes, libxi, libxinerama, libxkbcommon, libxkbfile, libxrandr, libxrender, libxv, openssl, pulseaudio, zlib"
+TERMUX_PKG_SHA256=837d91574b2f095fea2b7cf5951d9256ec06dc760034bfbf97cc1e85a5610878
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="libandroid-shmem, libcairo, libicu, libjpeg-turbo, libusb, libwayland, libx11, libxcursor, libxdamage, libxext, libxfixes, libxi, libxinerama, libxkbcommon, libxkbfile, libxrandr, libxrender, libxv, openssl, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libwayland-cross-scanner, libwayland-protocols"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DANDROID_NO_TERMUX=OFF
@@ -21,13 +21,11 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DWITH_JPEG=ON
 -DWITH_OPENSSL=ON
 -DWITH_SERVER=ON
+-DWITH_OPUS=OFF
+-DWITH_SWSCALE=OFF
+-DWITH_FUSE=OFF
+-DWITH_KRB5=OFF
 "
-
-termux_pkg_auto_update() {
-	local latest_tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL}" latest-regex "^2\.")"
-	[[ -z "${latest_tag}" ]] && termux_error_exit "ERROR: Unable to get tag from ${TERMUX_PKG_SRCURL}"
-	termux_pkg_upgrade_version "${latest_tag}"
-}
 
 termux_step_post_get_source() {
 	find "$TERMUX_PKG_SRCDIR" -name CMakeLists.txt -o -name '*.cmake' | \
@@ -39,6 +37,14 @@ termux_step_post_get_source() {
 termux_step_pre_configure() {
 	export PATH="$TERMUX_PREFIX/opt/libwayland/cross/bin:$PATH"
 
+	CFLAGS+=" -Wno-incompatible-function-pointer-types"
 	CPPFLAGS+=" -D__USE_BSD"
 	LDFLAGS+=" -landroid-shmem"
+}
+
+termux_step_post_configure() {
+	mkdir -p "${TERMUX_PKG_TMPDIR}/bin"
+	clang "${TERMUX_PKG_SRCDIR}/client/common/man/generate_argument_manpage.c" -o "${TERMUX_PKG_TMPDIR}/bin/generate_argument_manpage" -fno-sanitize=all \
+		-I"${TERMUX_PKG_BUILDDIR}/include" -I"${TERMUX_PKG_BUILDDIR}/winpr/include" -I"${TERMUX_PKG_SRCDIR}/winpr/include"
+	PATH+=":${TERMUX_PKG_TMPDIR}/bin"
 }
