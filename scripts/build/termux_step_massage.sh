@@ -175,7 +175,8 @@ termux_step_massage() {
 
 	# Check so that package is not affected by
 	# https://github.com/android/ndk/issues/1614, or
-	# https://github.com/termux/termux-packages/issues/9944
+	# https://github.com/termux/termux-packages/issues/9944, or
+	# https://github.com/termux/termux-packages/issues/23598
 	if [[ "${TERMUX_PACKAGE_LIBRARY}" == "bionic" ]]; then
 		echo "INFO: READELF=${READELF} ... $(command -v ${READELF})"
 		export pattern_file_undef=$(mktemp)
@@ -227,6 +228,7 @@ termux_step_massage() {
 		local undef=$(echo "${valid}" | xargs -P"${nproc}" -i sh -c '${READELF} -s "{}" | grep -Ef "${pattern_file_undef}"')
 		local openmp=$(echo "${valid}" | xargs -P"${nproc}" -i sh -c '${READELF} -s "{}" | grep -Ef "${pattern_file_openmp}"')
 		local depend_libomp_so=$(echo "${valid}" | xargs -P$(nproc) -n1 ${READELF} -d 2>/dev/null | sed -ne "s|.*NEEDED.*\[\(.*\)\].*|\1|p" | grep libomp.so)
+		local non_pie=$(echo "${valid}" | xargs -P$(nproc) -n1 ${READELF} -h 2>/dev/null | grep 'Type:[[:space:]]*EXEC')
 		local t1=$(get_epoch)
 		echo "INFO: Done ... $((t1-t0))s"
 
@@ -325,12 +327,28 @@ termux_step_massage() {
 				done < <(echo "${valid_s}")
 			} | grep libomp.so >&2
 			local t1=$(get_epoch)
-			echo "ERROR: Done ... $((t1-t0))s" >&2
+			echo "INFO: Done ... $((t1-t0))s" >&2
 			termux_error_exit "Refer above"
 		fi
 
 		rm -f "${pattern_file_undef}" "${pattern_file_openmp}"
 		unset pattern_file_undef pattern_file_openmp
+
+		if [[ -n "${non_pie}" ]]; then
+			echo "INFO: Found non-position-independent executables" >&2
+			echo "INFO: Showing result" >&2
+			local t0=$(get_epoch)
+			local valid_s=$(echo "${valid}" | sort)
+			local f
+			while IFS= read -r f; do
+				if ${READELF} -h "${f}" 2>/dev/null | grep -q 'Type:[[:space:]]*EXEC'; then
+					echo "ERROR: ${f} is a non-position-independent executable"
+				fi
+			done < <(echo "${valid_s}")
+			local t1=$(get_epoch)
+			echo "INFO: Done ... $((t1-t0))s" >&2
+			termux_error_exit "Refer above"
+		fi
 	fi
 
 	if [ "$TERMUX_PACKAGE_FORMAT" = "debian" ]; then
