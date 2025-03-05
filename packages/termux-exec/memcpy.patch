@@ -1,0 +1,23 @@
+Fix `implicit declaration of function 'mempcpy' is invalid in C99`
+---
+
+diff -uNr a/lib/termux-exec_c/src/termux/api/termux_exec/exec/ExecVariantsIntercept.c b/lib/termux-exec_c/src/termux/api/termux_exec/exec/ExecVariantsIntercept.c
+--- a/lib/termux-exec_c/src/termux/api/termux_exec/exec/ExecVariantsIntercept.c
++++ b/lib/termux-exec_c/src/termux/api/termux_exec/exec/ExecVariantsIntercept.c
+@@ -44,6 +44,16 @@
+ 
+ static const char* LOG_TAG = "exec";
+ 
++#ifdef __ANDROID__
++# ifndef ANDROID_MEMPCPY
++# define ANDROID_MEMPCPY 1
++static __inline__ void* mempcpy(void* dest, void const* src, size_t n)
++{
++      return memcpy(dest, src, n) + n;
++}
++# endif
++#endif
++
+ int execlIntercept(bool wasIntercepted, int variant, const char *name, const char *argv0, va_list ap) {
+     if (wasIntercepted) {
+         logErrorDebug(LOG_TAG, "<----- %s() intercepted ----->", EXEC_VARIANTS_STR[variant]);

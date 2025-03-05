@@ -1,0 +1,14 @@
+Fix `implicit declaration of function 'basename' is invalid in C99`
+---
+
+diff -uNr a/lib/termux-core_c/src/file/FileUtils.c b/lib/termux-core_c/src/file/FileUtils.c
+--- a/lib/termux-core_c/src/file/FileUtils.c
++++ b/lib/termux-core_c/src/file/FileUtils.c
+@@ -1,6 +1,7 @@
+ #define _GNU_SOURCE
+ #include <errno.h>
+ #include <fcntl.h>
++#include <libgen.h> /* for basename(3) */
+ #include <limits.h>
+ #include <regex.h>
+ #include <stdio.h>
