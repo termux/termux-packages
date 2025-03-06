@@ -3,10 +3,9 @@ TERMUX_PKG_DESCRIPTION="Protocol buffers C++ library (static)"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 # Please align the version with `libprotobuf` package.
-TERMUX_PKG_VERSION=25.1
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_VERSION=30.0
 TERMUX_PKG_SRCURL=https://github.com/protocolbuffers/protobuf/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=9bd87b8280ef720d3240514f884e56a712f2218f0d693b48050c836028940a42
+TERMUX_PKG_SHA256=9df0e9e8ebe39f4fbbb9cf7db3d811287fe3616b2f191eb2bf5eaa12539c881f
 v_proto_version_shared=$(. $TERMUX_SCRIPTDIR/packages/libprotobuf/build.sh; echo ${TERMUX_PKG_VERSION})
 v_proto_version_revision=$(TERMUX_PKG_REVISION=0; . $TERMUX_SCRIPTDIR/packages/libprotobuf/build.sh; echo ${TERMUX_PKG_REVISION})
 v_proto_extract_version="${v_proto_version_shared}-${v_proto_version_revision}"
@@ -26,6 +25,15 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DBUILD_SHARED_LIBS=OFF
 -DCMAKE_INSTALL_LIBDIR=lib
 "
+
+termux_step_post_get_source() {
+	# Version guard
+	local ver_e=${TERMUX_PKG_VERSION#*:}
+	local ver_x=$(. $TERMUX_SCRIPTDIR/packages/libprotobuf/build.sh; echo ${TERMUX_PKG_VERSION#*:})
+	if [ "${ver_e}" != "${ver_x}" ]; then
+		termux_error_exit "Version mismatch between libprotobuf and protobuf-static."
+	fi
+}
 
 termux_step_pre_configure() {
 	# Version guard

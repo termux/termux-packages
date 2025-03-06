@@ -8,10 +8,9 @@ TERMUX_PKG_MAINTAINER="@termux"
 # - update SHA256 checksum for $_PROTOBUF_ZIP in
 #     $TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_protobuf.sh
 # - ALWAYS bump revision of reverse dependencies and rebuild them.
-TERMUX_PKG_VERSION=2:25.1
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_VERSION="2:30.0"
 TERMUX_PKG_SRCURL=https://github.com/protocolbuffers/protobuf/archive/v${TERMUX_PKG_VERSION#*:}.tar.gz
-TERMUX_PKG_SHA256=9bd87b8280ef720d3240514f884e56a712f2218f0d693b48050c836028940a42
+TERMUX_PKG_SHA256=9df0e9e8ebe39f4fbbb9cf7db3d811287fe3616b2f191eb2bf5eaa12539c881f
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="abseil-cpp, libc++, zlib"
 TERMUX_PKG_BREAKS="libprotobuf-dev, protobuf-static (<< ${TERMUX_PKG_VERSION#*:})"
@@ -24,6 +23,15 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCMAKE_INSTALL_LIBDIR=lib
 "
 TERMUX_PKG_NO_STATICSPLIT=true
+
+termux_step_post_get_source() {
+	# Version guard
+	local ver_e=${TERMUX_PKG_VERSION#*:}
+	local ver_x=$(. $TERMUX_SCRIPTDIR/packages/protobuf-static/build.sh; echo ${TERMUX_PKG_VERSION#*:})
+	if [ "${ver_e}" != "${ver_x}" ]; then
+		termux_error_exit "Version mismatch between libprotobuf and protobuf-static."
+	fi
+}
 
 termux_step_post_make_install() {
 	install -Dm600 -t $TERMUX_PREFIX/share/doc/libutf8-range \
