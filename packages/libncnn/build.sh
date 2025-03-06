@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=4b97730b0d033b4dc2a790e5c35745e0dbf51569
 TERMUX_PKG_VERSION="20230627"
-TERMUX_PKG_REVISION=7
+TERMUX_PKG_REVISION=8
 TERMUX_PKG_SRCURL=git+https://github.com/Tencent/ncnn
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_SHA256=a81ee5b6df97830919f8ed8554c99a4f223976ed82eee0cc9f214de0ce53dd2a
@@ -66,7 +66,10 @@ termux_step_pre_configure() {
 	LDFLAGS+=" -lutf8_range -lutf8_validity"
 	LDFLAGS+=" -landroid -ljnigraphics -llog"
 
-	mv -v "${TERMUX_PREFIX}"/lib/libprotobuf.so{,.tmp}
+	# restoring file in termux_step_post_make_install
+	# will not be performed in the case of build errors
+	trap 'mv -f $TERMUX_PREFIX/lib/libprotobuf.so{.tmp,} || :' EXIT
+	mv $TERMUX_PREFIX/lib/libprotobuf.so{,.tmp}
 }
 
 termux_step_post_make_install() {
@@ -83,8 +86,6 @@ termux_step_post_make_install() {
 	pushd python
 	pip install --no-deps . --prefix "${TERMUX_PREFIX}"
 	popd
-
-	mv -v "${TERMUX_PREFIX}"/lib/libprotobuf.so{.tmp,}
 
 	return
 
