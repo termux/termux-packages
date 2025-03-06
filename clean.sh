@@ -3,12 +3,36 @@
 set -e -u
 
 TERMUX_SCRIPTDIR=$(cd "$(realpath "$(dirname "$0")")"; pwd)
+CLEANUP_MESSAGE="Cleaning up build artifacts."
 
 # Store pid of current process in a file for docker__run_docker_exec_trap
 . "$TERMUX_SCRIPTDIR/scripts/utils/docker/docker.sh"; docker__create_docker_exec_pid_file
 
 # Get variable CGCT_DIR
 . "$TERMUX_SCRIPTDIR/scripts/properties.sh"
+
+while (($# >= 1)); do
+	case "$1" in
+		-m)
+			if [ $# -ge 2 ]; then
+				shift 1
+				if [ -z "$1" ]; then
+					echo "./clean.sh: Argument to '-m' should not be empty."
+					exit 1
+				fi
+				CLEANUP_MESSAGE="$1"
+			else
+				echo "./clean.sh: option '-m' requires an argument"
+				exit 1
+			fi
+			;;
+		-*)
+			echo "./clean.sh: illegal option '$1'"
+			exit 1
+			;;
+	esac
+	shift 1
+done
 
 # Checking if script is running on Android with 2 different methods.
 # Needed for safety to prevent execution of potentially dangerous
@@ -29,6 +53,9 @@ test -f "$HOME/.termuxrc" && . "$HOME/.termuxrc"
 : "${TERMUX_TOPDIR:="$HOME/.termux-build"}"
 : "${TMPDIR:=/tmp}"
 export TMPDIR
+
+
+echo "INFO: $CLEANUP_MESSAGE"
 
 # Lock file. Same as used in build-package.sh.
 TERMUX_BUILD_LOCK_FILE="${TMPDIR}/.termux-build.lck"
