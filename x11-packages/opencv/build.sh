@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Open Source Computer Vision Library"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.11.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=(
 	https://github.com/opencv/opencv/archive/${TERMUX_PKG_VERSION}/opencv-${TERMUX_PKG_VERSION}.tar.gz
 	https://github.com/opencv/opencv_contrib/archive/${TERMUX_PKG_VERSION}/opencv_contrib-${TERMUX_PKG_VERSION}.tar.gz
@@ -34,6 +34,12 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 
 termux_step_pre_configure() {
 	termux_setup_protobuf
+
+	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
+		# By default cmake will pick $TERMUX_PREFIX/bin/protoc, we should avoid it on CI
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -Dprotobuf_generate_PROTOC_EXE=$(command -v protoc)"
+	fi
+
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DProtobuf_PROTOC_EXECUTABLE=$(command -v protoc)"
 	sed -i 's/COMMAND\sprotobuf::protoc/COMMAND ${Protobuf_PROTOC_EXECUTABLE}/g' $TERMUX_PREFIX/lib/cmake/protobuf/protobuf-generate.cmake
 
@@ -54,11 +60,10 @@ termux_step_pre_configure() {
 		-DPYTHON3_NUMPY_INCLUDE_DIRS=$TERMUX_PYTHON_HOME/site-packages/numpy/_core/include
 		"
 
+	# restoring file in termux_step_post_make_install
+	# will not be performed in the case of build errors
+	trap 'mv -f $TERMUX_PREFIX/lib/libprotobuf.so{.tmp,}  || :' EXIT
 	mv $TERMUX_PREFIX/lib/libprotobuf.so{,.tmp}
-}
-
-termux_step_post_make_install() {
-	mv $TERMUX_PREFIX/lib/libprotobuf.so{.tmp,}
 }
 
 termux_step_post_massage() {
