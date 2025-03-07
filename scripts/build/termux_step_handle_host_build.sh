@@ -3,7 +3,8 @@ termux_step_handle_host_build() {
 	[ "$TERMUX_PKG_HOSTBUILD" = "false" ] && return
 
 	cd "$TERMUX_PKG_SRCDIR"
-	for patch in $TERMUX_PKG_BUILDER_DIR/*.patch.beforehostbuild; do
+	local HOST_BUILD_PATCHES=$(find $TERMUX_PKG_BUILDER_DIR -mindepth 1 -maxdepth 1 -name \*.patch.hostbuild | sort)
+	for patch in $HOST_BUILD_PATCHES; do
 		echo "Applying patch: $(basename $patch)"
 		test -f "$patch" && sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" "$patch" | patch --silent -p1
 	done
