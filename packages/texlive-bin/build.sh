@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.tug.org/texlive/
 TERMUX_PKG_DESCRIPTION="TeX Live is a distribution of the TeX typesetting system. This package contains architecture dependent binaries."
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
-TERMUX_PKG_VERSION=20240310
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SRCURL=https://github.com/TeX-Live/texlive-source/archive/refs/heads/tags/texlive-${TERMUX_PKG_VERSION:0:4}.0.tar.gz
-TERMUX_PKG_SHA256=26f756e5491a0619c183c91d007a91939c32c184c7ab718d4102a8b81575bc4d
+TERMUX_PKG_VERSION=20250308
+TERMUX_PKG_SRCURL=https://github.com/TeX-Live/texlive-source/archive/refs/tags/svn74504.tar.gz
+TERMUX_PKG_SHA256=8ea33fa12f2d3b8632c535761394c0b7f93717d4fc41e2a6914c0fee4f93aa14
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="freetype, harfbuzz, harfbuzz-icu, libc++, libcairo, libgd, libgmp, libgraphite, libiconv, libicu, liblua52, libmpfr, libpaper, libpixman, libpng, teckit, zlib, zziplib"
 # libpcre, glib, fontconfig are dependencies of libcairo. pkg-config gives an error if they are missing
