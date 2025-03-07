@@ -82,7 +82,9 @@ termux_setup_toolchain_27c() {
 	fi
 
 	export CXXFLAGS="$CFLAGS"
-	export CPPFLAGS+=" -isystem${TERMUX_PREFIX}/include"
+	# set the proper header include order - first package includes, then prefix includes
+	# -isystem${TERMUX_PREFIX}/include/c++/v1 is needed here for on-device building to work correctly
+	export CPPFLAGS+=" -isystem${TERMUX_PREFIX}/include/c++/v1 -isystem${TERMUX_PREFIX}/include"
 
 	# If libandroid-support is declared as a dependency, link to it explicitly:
 	if [ "$TERMUX_PKG_DEPENDS" != "${TERMUX_PKG_DEPENDS/libandroid-support/}" ]; then
