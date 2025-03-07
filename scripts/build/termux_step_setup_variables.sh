@@ -95,12 +95,8 @@ termux_step_setup_variables() {
 			if [ -n "${LD_PRELOAD-}" ]; then
 				unset LD_PRELOAD
 			fi
-			if ! $(echo "$PATH" | grep -q "^$TERMUX_PREFIX/bin"); then
-				if [ -d "${TERMUX_PREFIX}/bin" ]; then
-					export PATH="${TERMUX_PREFIX}/bin:${PATH}"
-				else
-					termux_error_exit "Glibc components are not installed, run './scripts/setup-termux-glibc.sh'"
-				fi
+			if [ ! -d "${TERMUX_PREFIX}/bin" ]; then
+				termux_error_exit "Glibc components are not installed, run './scripts/setup-termux-glibc.sh'"
 			fi
 		else
 			if [ ! -d "${CGCT_DIR}/${TERMUX_ARCH}/bin" ]; then

@@ -26,8 +26,11 @@ termux_step_massage() {
 	# Remove cache file created by gtk-update-icon-cache:
 	rm -f share/icons/hicolor/icon-theme.cache
 
-	# Remove locale files we're not interested in::
+	# Remove locale files we're not interested in:
 	rm -Rf share/locale
+
+	# Remove ldconfig cache:
+	rm -f glibc/etc/ld.so.cache
 
 	# `update-mime-database` updates NOT ONLY "$PREFIX/share/mime/mime.cache".
 	# Simply removing this specific file does not solve the issue.
