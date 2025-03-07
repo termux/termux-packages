@@ -1,0 +1,10 @@
+--- a/ggml/src/ggml-backend-reg.cpp
++++ b/ggml/src/ggml-backend-reg.cpp
+@@ -493,6 +493,7 @@
+     if (user_search_path == nullptr) {
+         search_paths.push_back(L"." + path_separator());
+         search_paths.push_back(get_executable_path());
++        search_paths.push_back(get_executable_path() + + L".." + path_separator() + L"lib" + path_separator());
+     } else {
+         search_paths.push_back(utf8_to_utf16(user_search_path) + path_separator());
+     }
