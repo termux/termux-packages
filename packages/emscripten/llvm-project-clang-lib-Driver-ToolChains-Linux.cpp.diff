@@ -1,6 +1,6 @@
 --- a/clang/lib/Driver/ToolChains/Linux.cpp
 +++ b/clang/lib/Driver/ToolChains/Linux.cpp
-@@ -200,8 +200,8 @@
+@@ -197,8 +197,8 @@
    // FIXME: This is a bit of a hack. We should really unify this code for
    // reasoning about oslibdir spellings with the lib dir spellings in the
    // GCCInstallationDetector, but that is a more significant refactoring.
@@ -11,16 +11,17 @@
      return "lib32";
  
    if (Triple.getArch() == llvm::Triple::x86_64 && Triple.isX32())
-@@ -333,7 +333,7 @@
-   if (Triple.getVendor() == llvm::Triple::OpenEmbedded &&
-       Triple.isArch64Bit())
-     addPathIfExists(D, concat(SysRoot, "/usr", OSLibDir), Paths);
--  else
-+  else if (!IsAndroid)
-     addPathIfExists(D, concat(SysRoot, "/usr/lib/..", OSLibDir), Paths);
+@@ -343,7 +343,8 @@
+   }
+ 
+   addPathIfExists(D, concat(SysRoot, "/usr/lib", MultiarchTriple), Paths);
+-  addPathIfExists(D, concat(SysRoot, "/usr", OSLibDir), Paths);
++  if (!IsAndroid)
++    addPathIfExists(D, concat(SysRoot, "/usr", OSLibDir), Paths);
    if (IsRISCV) {
      StringRef ABIName = tools::riscv::getRISCVABI(Args, Triple);
-@@ -344,7 +344,15 @@
+     addPathIfExists(D, concat(SysRoot, "/", OSLibDir, ABIName), Paths);
+@@ -353,7 +354,15 @@
    Generic_GCC::AddMultiarchPaths(D, SysRoot, OSLibDir, Paths);
  
    addPathIfExists(D, concat(SysRoot, "/lib"), Paths);
