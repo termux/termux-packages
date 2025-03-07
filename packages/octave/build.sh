@@ -3,9 +3,10 @@ TERMUX_PKG_DESCRIPTION="GNU Octave is a high-level language, primarily intended 
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="9.4.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://ftpmirror.gnu.org/octave/octave-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=fff911909ef79f95ba244dab5b8c1cb8c693a6c447d31deabb53994f17cb7b3d
-TERMUX_PKG_DEPENDS="libandroid-complex-math, arpack-ng, bzip2, fftw, fontconfig, freetype, glpk, graphicsmagick, libcurl, libhdf5, libiconv, libopenblas, libsndfile, openssl, pcre2, portaudio, qhull, qrupdate-ng, rapidjson, readline, suitesparse, sundials, zlib"
+TERMUX_PKG_DEPENDS="libandroid-complex-math, arpack-ng, clang, bzip2, fftw, fontconfig, freetype, glpk, graphicsmagick, libcurl, libhdf5, libiconv, libopenblas, libsndfile, make, openssl, pcre2, portaudio, qhull, qrupdate-ng, rapidjson, readline, suitesparse, sundials, zlib"
 TERMUX_PKG_BUILD_DEPENDS="gnuplot, less"
 TERMUX_PKG_RECOMMENDS="gnuplot, less"
 TERMUX_PKG_CONFLICTS="octave-x"
@@ -52,9 +53,15 @@ termux_step_pre_configure() {
 	local flang_libs_dir="$flang_toolchain_dir/sysroot/usr/lib/$TERMUX_HOST_PLATFORM"
 
 	export F77="$FC"
-	export ac_cv_f77_libs=" $flang_libs_dir/libFortranRuntime.a $flang_libs_dir/libFortranDecimal.a"
+	mkdir -p $TERMUX_PKG_TMPDIR/_deps
+	ln -sf $flang_libs_dir/libFortranRuntime.a $TERMUX_PKG_TMPDIR/_deps/
+	ln -sf $flang_libs_dir/libFortranDecimal.a $TERMUX_PKG_TMPDIR/_deps/
+	export ac_cv_f77_libs="-L$TERMUX_PKG_TMPDIR/_deps -l:libFortranRuntime.a -l:libFortranDecimal.a"
 
 	LDFLAGS+=" -Wl,-rpath,$TERMUX_PREFIX/lib/octave/$TERMUX_PKG_VERSION"
-	LDFLAGS+=" $($CC -print-libgcc-file-name)"
-	export LIBS="-landroid-complex-math"
+	local _libgcc_file="$($CC -print-libgcc-file-name)"
+	local _libgcc_path="$(dirname $_libgcc_file)"
+	local _libgcc_name="$(basename $_libgcc_file)"
+	# put -l:$_libgcc_name only in $LIBS instead of $LDFLAGS
+	export LIBS="-landroid-complex-math -L$_libgcc_path -l:$_libgcc_name"
 }
