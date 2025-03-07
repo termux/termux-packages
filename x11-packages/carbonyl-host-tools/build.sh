@@ -5,6 +5,7 @@ TERMUX_PKG_LICENSE_FILE="license.md"
 TERMUX_PKG_MAINTAINER="@licy183"
 _CHROMIUM_VERSION=111.0.5563.146
 TERMUX_PKG_VERSION=0.0.3
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(https://github.com/fathyb/carbonyl/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz
 					https://commondatastorage.googleapis.com/chromium-browser-official/chromium-$_CHROMIUM_VERSION.tar.xz)
 TERMUX_PKG_SHA256=(bf421b9498a084a7cf2238a574d37d31b498d3e271fdb3dcf466e7ed6c80013d
