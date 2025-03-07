@@ -1,6 +1,6 @@
---- ./tlpkg/TeXLive/TLUtils.pm.orig	2022-05-01 21:50:15.993394677 +0200
-+++ ./tlpkg/TeXLive/TLUtils.pm	2022-05-01 21:50:48.037394654 +0200
-@@ -1802,7 +1802,7 @@
+--- ./tlpkg/TeXLive/TLUtils.pm.orig	2025-03-09 17:32:05.186972766 +0100
++++ ./tlpkg/TeXLive/TLUtils.pm	2025-03-07 09:43:36.840306694 +0100
+@@ -2040,7 +2040,7 @@
    }
    my $cmd = $keyval{'cmd'};
  
@@ -9,8 +9,8 @@
    chomp($texdir);
    my $texdir_bsl = conv_to_w32_path($texdir);
    $cmd =~ s!^("?)TEXDIR/!$1$texdir/!g;
-@@ -1877,7 +1877,7 @@
-   if (win32() && defined($keyval{'filew32'})) {
+@@ -2115,7 +2115,7 @@
+   if (wndws() && defined($keyval{'filew32'})) {
      $file = $keyval{'filew32'};
    }
 -  my $texdir = `kpsewhich -var-value=TEXMFROOT`;
@@ -18,7 +18,7 @@
    chomp($texdir);
    my @syscmd;
    if ($file =~ m/\.pl$/i) {
-@@ -1952,7 +1952,7 @@
+@@ -2190,7 +2190,7 @@
  
    &log("postaction $how shortcut for " . $tlpobj->name . "\n");
    if ($how eq "install") {
