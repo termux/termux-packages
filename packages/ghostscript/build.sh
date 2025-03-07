@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Interpreter for the PostScript language and for PDF"
 TERMUX_PKG_LICENSE="AGPL-V3"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="10.03.1"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs${TERMUX_PKG_VERSION//.}/ghostpdl-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=8ea9dd8768b64576bc4ee2d79611450c9e1edeb686f7824f3bf94b92457b882a
 TERMUX_PKG_AUTO_UPDATE=false
@@ -29,7 +29,10 @@ termux_step_post_get_source() {
 }
 
 termux_step_pre_configure() {
-	CPPFLAGS+=" -I${TERMUX_STANDALONE_TOOLCHAIN}/sysroot/usr/include/c++/v1"
+	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
+		export PKGCONFIG="$PKG_CONFIG"
+		export LDFLAGS+=" -liconv"
+	fi
 
 	if [[ "${TERMUX_ARCH}" == "aarch64" ]]; then
 		# https://github.com/llvm/llvm-project/issues/74361
