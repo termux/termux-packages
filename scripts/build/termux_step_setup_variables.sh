@@ -44,6 +44,9 @@ termux_step_setup_variables() {
 			TERMUX_PKG_NAME="$(termux_package__add_prefix_glibc_to_package_name "${TERMUX_PKG_NAME}")"
 		fi
 	fi
+	TERMUX_LIB64_PATH="$TERMUX_PREFIX/lib"
+	TERMUX_LIB32_PATH="$TERMUX_PREFIX/lib32"
+	TERMUX_LIB_PATH="$TERMUX_LIB64_PATH"
 
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
 		# For on-device builds cross-compiling is not supported so we can
@@ -53,7 +56,7 @@ termux_step_setup_variables() {
 
 		if [ "$TERMUX_PACKAGE_LIBRARY" = "bionic" ]; then
 			# On-device builds without termux-exec are unsupported.
-			if ! grep -q "${TERMUX_PREFIX}/lib/libtermux-exec.so" <<< "${LD_PRELOAD-x}"; then
+			if ! grep -q "${TERMUX_LIB_PATH}/libtermux-exec.so" <<< "${LD_PRELOAD-x}"; then
 				termux_error_exit "On-device builds without termux-exec are not supported."
 			fi
 		fi
@@ -64,23 +67,9 @@ termux_step_setup_variables() {
 	# TERMUX_PKG_MAINTAINER should be explicitly set in build.sh of the package.
 	: "${TERMUX_PKG_MAINTAINER:="default"}"
 
-	if [ "x86_64" = "$TERMUX_ARCH" ] || [ "aarch64" = "$TERMUX_ARCH" ]; then
-		TERMUX_ARCH_BITS=64
-	else
-		TERMUX_ARCH_BITS=32
-	fi
-
-	if [ "$TERMUX_PACKAGE_LIBRARY" = "bionic" ]; then
-		TERMUX_HOST_PLATFORM="${TERMUX_ARCH}-linux-android"
-	else
-		TERMUX_HOST_PLATFORM="${TERMUX_ARCH}-linux-gnu"
-	fi
-	if [ "$TERMUX_ARCH" = "arm" ]; then
-		TERMUX_HOST_PLATFORM="${TERMUX_HOST_PLATFORM}eabi"
-		if [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
-			TERMUX_HOST_PLATFORM="${TERMUX_HOST_PLATFORM}hf"
-		fi
-	fi
+	termux_step_setup_arch_variables
+	TERMUX_REAL_ARCH="$TERMUX_ARCH"
+	TERMUX_REAL_HOST_PLATFORM="$TERMUX_HOST_PLATFORM"
 
 	if [ "$TERMUX_PACKAGE_LIBRARY" = "bionic" ]; then
 		if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ] && [ ! -d "$NDK" ]; then
@@ -139,6 +128,8 @@ termux_step_setup_variables() {
 	TERMUX_PKG_BUILDDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/build
 	TERMUX_PKG_BUILD_DEPENDS=""
 	TERMUX_PKG_BUILD_IN_SRC=false
+	TERMUX_PKG_BUILD32=false
+	TERMUX_PKG_BUILD32DIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/build32
 	TERMUX_PKG_CONFFILES=""
 	TERMUX_PKG_CONFLICTS="" # https://www.debian.org/doc/debian-policy/ch-relationships.html#s-conflicts
 	TERMUX_PKG_DEPENDS=""
@@ -189,10 +180,30 @@ termux_step_setup_variables() {
 	TERMUX_PKG_PYTHON_BUILD_DEPS="" # python modules to be installed via build-pip
 	TERMUX_PKG_PYTHON_COMMON_DEPS="" # python modules to be installed via pip3 or build-pip
 	TERMUX_PYTHON_CROSSENV_PREFIX="$TERMUX_TOPDIR/python${TERMUX_PYTHON_VERSION}-crossenv-prefix-$TERMUX_PACKAGE_LIBRARY-$TERMUX_ARCH" # python modules dependency location (only used in non-devices)
-	TERMUX_PYTHON_HOME=$TERMUX_PREFIX/lib/python${TERMUX_PYTHON_VERSION} # location of python libraries
+	TERMUX_PYTHON_HOME=$TERMUX_LIB_PATH/python${TERMUX_PYTHON_VERSION} # location of python libraries
 	TERMUX_PKG_MESON_NATIVE=false
 	TERMUX_PKG_CMAKE_CROSSCOMPILING=true
 
 	unset CFLAGS CPPFLAGS LDFLAGS CXXFLAGS
 	unset TERMUX_MESON_ENABLE_SOVERSION # setenv to enable SOVERSION suffix for shared libs built with Meson
+}
+
+termux_step_setup_arch_variables() {
+	if [ "x86_64" = "$TERMUX_ARCH" ] || [ "aarch64" = "$TERMUX_ARCH" ]; then
+		TERMUX_ARCH_BITS=64
+	else
+		TERMUX_ARCH_BITS=32
+	fi
+
+	if [ "$TERMUX_PACKAGE_LIBRARY" = "bionic" ]; then
+		TERMUX_HOST_PLATFORM="${TERMUX_ARCH}-linux-android"
+	else
+		TERMUX_HOST_PLATFORM="${TERMUX_ARCH}-linux-gnu"
+	fi
+	if [ "$TERMUX_ARCH" = "arm" ]; then
+		TERMUX_HOST_PLATFORM="${TERMUX_HOST_PLATFORM}eabi"
+		if [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
+			TERMUX_HOST_PLATFORM="${TERMUX_HOST_PLATFORM}hf"
+		fi
+	fi
 }

@@ -34,3 +34,7 @@ termux_step_make_install() {
 			$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
 	fi
 }
+
+termux_step_make_install32() {
+	termux_step_make_install
+}
