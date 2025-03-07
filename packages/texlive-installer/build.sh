@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.tug.org/texlive/
 TERMUX_PKG_DESCRIPTION="Wrapper around texlive's install-tl script"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
-TERMUX_PKG_VERSION=20240310
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=20250308
 TERMUX_PKG_SRCURL=https://ftp.math.utah.edu/pub/tex/historic/systems/texlive/${TERMUX_PKG_VERSION:0:4}/install-tl-unx.tar.gz
-TERMUX_PKG_SHA256=fa845fbbd8d5b78c93fb5e9f97e5d908b42fb50c1ae164f7d9aa31c8ad8c31c7
+TERMUX_PKG_SHA256=9938f192af75f792e84282580cce6eedac32969e0e07b33cb39ca1b699e948b6
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_DEPENDS="perl, texlive-bin (>= 20240310), gnupg, curl, lz4, xz-utils"
 TERMUX_PKG_REPLACES="texlive"
@@ -75,8 +74,8 @@ termux_step_create_debscripts() {
 		echo "echo ''"
 		echo "echo '    It forwards extra arguments to the install-tl script.'"
 		echo "echo ''"
-		echo "echo '    NOTE: texlive-${TERMUX_PKG_VERSION:0:4} is installed into \$PREFIX/share/texlive/${TERMUX_PKG_VERSION:0:4} instead of \$PREFIX/share/texlive'"
-		echo "echo '          If you have an old version installed you can rm -rf \$PREFIX/share/texlive/texmf-dist to'"
+		echo "echo '    NOTE: texlive-${TERMUX_PKG_VERSION:0:4} is installed into \$PREFIX/share/texlive/${TERMUX_PKG_VERSION:0:4}'"
+		echo "echo '          If you have an old version installed you can rm -rf \$PREFIX/share/texlive/202X to'"
 		echo "echo '          delete (most of) old version and free up space.'"
 	} > ./postinst
 }
