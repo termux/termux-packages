@@ -1,6 +1,5 @@
 termux_step_configure_haskell_build() {
-	termux_setup_ghc_cross_compiler
-	termux_setup_cabal
+	termux_setup_ghc_cross_compiler && termux_setup_cabal
 
 	local host_platform="$TERMUX_HOST_PLATFORM"
 	[[ "$TERMUX_ARCH" == "arm" ]] && host_platform="armv7a-linux-androideabi"
