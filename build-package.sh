@@ -104,6 +104,10 @@ source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_ghc.sh"
 # shellcheck source=scripts/build/setup/termux_setup_ghc_cross_compiler.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_ghc_cross_compiler.sh"
 
+# Utility function to setup GHC iserv to cross compile haskell-template.
+# shellcheck source=scripts/build/setup/termux_setup_ghc_iserv.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_ghc_iserv.sh"
+
 # Utility function to setup cabal-install (may be used by ghc toolchain).
 # shellcheck source=scripts/build/setup/termux_setup_cabal.sh.
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_cabal.sh"
