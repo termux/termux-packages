@@ -101,7 +101,7 @@ termux_step_configure_haskell_build() {
 		--with-compiler="$(command -v "${host_platform}-ghc")" \
 		--with-ghc-pkg="$(command -v "${host_platform}-ghc-pkg")" \
 		--with-hsc2hs="$(command -v "${host_platform}-hsc2hs")" \
-		--hsc2hs-option=--cross-compile \
+		"$([[ "$TERMUX_ON_DEVICE_BUILD" == false ]] && echo "--hsc2hs-option=--cross-compile")" \
 		--with-ld="$(command -v "$LD")" \
 		--with-strip="$(command -v "$STRIP")" \
 		--with-ar="$(command -v "$AR")" \
