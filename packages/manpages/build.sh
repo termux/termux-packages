@@ -2,8 +2,8 @@ TERMUX_PKG_HOMEPAGE=https://www.kernel.org/doc/man-pages/
 TERMUX_PKG_DESCRIPTION="Man pages for linux kernel and C library interfaces"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSES/Linux-man-pages-copyleft.txt, _man-pages-posix/POSIX-COPYRIGHT"
-TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=(6.13
+TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
+TERMUX_PKG_VERSION=(6.12
                     2017)
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=(
@@ -19,6 +19,10 @@ TERMUX_PKG_PROVIDES="linux-man-pages"
 TERMUX_PKG_EXTRA_MAKE_ARGS="-R prefix=$TERMUX_PREFIX VERSION=$TERMUX_PKG_VERSION"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_AUTO_UPDATE=true
+# Man pages are only usually updated for new Kernel releases, not patch releases.
+TERMUX_PKG_UPDATE_VERSION_REGEXP='\d+\.\d+'
+
 
 # Do not remove an entire section; intro should always be included.
 # Bionic libc does not provide <aio.h>, <monetary.h> or pthread_cancel.
@@ -42,8 +46,30 @@ share/man/man7/man.7
 share/man/man7/mdoc.7
 "
 
+termux_pkg_auto_update() {
+	local latest_kernel_major
+	latest_kernel_major="$(git ls-remote --tags https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git \
+	| grep -oP "refs/tags/v\K${TERMUX_PKG_UPDATE_VERSION_REGEXP}$" \
+	| sort -V \
+	| tail -n1)"
+
+	# No new major release.
+	if [[ "${latest_kernel_major}" == "${TERMUX_PKG_VERSION[0]}" ]]; then
+		echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION[0]}'."
+		return
+	fi
+
+	# Verify that this major updated the man pages
+	curl -fsSL "https://www.kernel.org/pub/linux/docs/man-pages/man-pages-${latest_kernel_major}.tar.sign" &> /dev/null || {
+		echo "Info: Not updating. Linux ${latest_kernel_major} doesn't seem to have updates the man pages."
+	}
+
+	termux_pkg_upgrade_version "${latest_kernel_major}"
+}
+
+
 termux_step_post_get_source() {
-	mv man-pages-posix-${TERMUX_PKG_VERSION[1]} _man-pages-posix
+	mv "man-pages-posix-${TERMUX_PKG_VERSION[1]}" _man-pages-posix
 }
 
 termux_step_make() {
