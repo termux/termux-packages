@@ -1,0 +1,322 @@
+From d4188925aa23cd25d9b46225a9d74f960e34febf Mon Sep 17 00:00:00 2001
+From: Henrik Grimler <grimler@termux.dev>
+Date: Wed, 5 Mar 2025 07:07:09 +0100
+Subject: [PATCH] libusb: replace some functions with termux_usb variants
+
+On Android we cannot use libusb_get_device_list and libusb_open
+directly. Instead we need to enumerate and open devices through the
+Android API. In Termux we have termux-api for handling this
+communication, so we can replace the libusb_.. functions with
+termux_usb_.. variants.
+
+Also set LIBUSB_OPTION_NO_DEVICE_DISCOVERY, it is required on android
+as libusb otherwise errors early when trying to scan for devices.
+---
+ libusb/CMakeLists.txt |   2 +
+ libusb/hid.c          | 205 +++++++++++++++++++++++-------------------
+ 2 files changed, 113 insertions(+), 94 deletions(-)
+
+diff --git a/libusb/CMakeLists.txt b/libusb/CMakeLists.txt
+index beba0a3fdb33..7888de064e4e 100644
+--- a/libusb/CMakeLists.txt
++++ b/libusb/CMakeLists.txt
+@@ -8,6 +8,8 @@ add_library(hidapi_libusb
+ )
+ target_link_libraries(hidapi_libusb PUBLIC hidapi_include)
+ 
++target_link_libraries(hidapi_libusb PRIVATE protobuf-c termux-usb)
++
+ if(TARGET usb-1.0)
+     target_link_libraries(hidapi_libusb PRIVATE usb-1.0)
+ else()
+diff --git a/libusb/hid.c b/libusb/hid.c
+index d3861f772673..8e866f32de41 100644
+--- a/libusb/hid.c
++++ b/libusb/hid.c
+@@ -50,6 +50,7 @@
+ #endif
+ 
+ #include "hidapi_libusb.h"
++#include "termux-usb.h"
+ 
+ #if defined(__ANDROID__) && __ANDROID_API__ < __ANDROID_API_N__
+ 
+@@ -541,6 +542,8 @@ int HID_API_EXPORT hid_init(void)
+ 	if (!usb_context) {
+ 		const char *locale;
+ 
++		libusb_set_option(usb_context, LIBUSB_OPTION_NO_DEVICE_DISCOVERY, NULL);
++
+ 		/* Init Libusb */
+ 		if (libusb_init(&usb_context))
+ 			return -1;
+@@ -741,8 +744,8 @@ static uint16_t get_report_descriptor_size_from_interface_descriptors(const stru
+ 
+ struct hid_device_info  HID_API_EXPORT *hid_enumerate(unsigned short vendor_id, unsigned short product_id)
+ {
+-	libusb_device **devs;
+-	libusb_device *dev;
++	struct termux_usb_device **devices;
++	struct termux_usb_device *device;
+ 	libusb_device_handle *handle = NULL;
+ 	ssize_t num_devs;
+ 	int i = 0;
+@@ -752,99 +755,102 @@ struct hid_device_info  HID_API_EXPORT *hid_enumerate(unsigned short vendor_id,
+ 
+ 	if(hid_init() < 0)
+ 		return NULL;
+-
+-	num_devs = libusb_get_device_list(usb_context, &devs);
++	num_devs = termux_usb_get_device_list(&devices);
+ 	if (num_devs < 0)
+ 		return NULL;
+-	while ((dev = devs[i++]) != NULL) {
++	while ((device = devices[i++]) != NULL) {
+ 		struct libusb_device_descriptor desc;
+-		struct libusb_config_descriptor *conf_desc = NULL;
+-		int j, k;
++		struct termux_usb_config_descriptor *conf_desc = NULL;
++		int j;
+ 
+-		int res = libusb_get_device_descriptor(dev, &desc);
+-		unsigned short dev_vid = desc.idVendor;
+-		unsigned short dev_pid = desc.idProduct;
++		unsigned short dev_vid = device->device_descriptor->idVendor;
++		unsigned short dev_pid = device->device_descriptor->idProduct;
+ 
+ 		if ((vendor_id != 0x0 && vendor_id != dev_vid) ||
+ 		    (product_id != 0x0 && product_id != dev_pid)) {
+ 			continue;
+ 		}
+ 
+-		res = libusb_get_active_config_descriptor(dev, &conf_desc);
+-		if (res < 0)
+-			libusb_get_config_descriptor(dev, 0, &conf_desc);
++		termux_usb_get_config_descriptor(device, 0, &conf_desc);
+ 		if (conf_desc) {
+ 			for (j = 0; j < conf_desc->bNumInterfaces; j++) {
+-				const struct libusb_interface *intf = &conf_desc->interface[j];
+-				for (k = 0; k < intf->num_altsetting; k++) {
+-					const struct libusb_interface_descriptor *intf_desc;
+-					intf_desc = &intf->altsetting[k];
+-					if (intf_desc->bInterfaceClass == LIBUSB_CLASS_HID) {
+-						struct hid_device_info *tmp;
++				const struct termux_usb_interface_descriptor *intf_desc = &conf_desc->interface[j];
++				if (intf_desc->bInterfaceClass == LIBUSB_CLASS_HID) {
++					struct hid_device_info *tmp;
+ 
+-						res = libusb_open(dev, &handle);
++					intptr_t fd = termux_usb_open(device);
++					if (fd <= 0) {
++						LOG("Failed to open device\n");
++						continue;
++					}
++					int res = libusb_wrap_sys_device(usb_context, fd, &handle);
++					if (res != 0) {
++						LOG("Failed to wrap sys device: %d\n", res);
++						continue;
++					}
++					libusb_device *dev = libusb_get_device(handle);
+ 
+ #ifdef __ANDROID__
+-						if (handle) {
+-							/* There is (a potential) libusb Android backend, in which
+-							   device descriptor is not accurate up until the device is opened.
+-							   https://github.com/libusb/libusb/pull/874#discussion_r632801373
+-							   A workaround is to re-read the descriptor again.
+-							   Even if it is not going to be accepted into libusb master,
+-							   having it here won't do any harm, since reading the device descriptor
+-							   is as cheap as copy 18 bytes of data. */
+-							libusb_get_device_descriptor(dev, &desc);
+-						}
++					if (handle) {
++						/* There is (a potential) libusb Android backend, in which
++						   device descriptor is not accurate up until the device is opened.
++						   https://github.com/libusb/libusb/pull/874#discussion_r632801373
++						   A workaround is to re-read the descriptor again.
++						   Even if it is not going to be accepted into libusb master,
++						   having it here won't do any harm, since reading the device descriptor
++						   is as cheap as copy 18 bytes of data. */
++						libusb_get_device_descriptor(dev, &desc);
++					}
+ #endif
+ 
+-						tmp = create_device_info_for_device(dev, handle, &desc, conf_desc->bConfigurationValue, intf_desc->bInterfaceNumber);
+-						if (tmp) {
++					tmp = create_device_info_for_device(dev, handle, &desc, conf_desc->bConfigurationValue, intf_desc->bInterfaceNumber);
++					if (tmp) {
+ #ifdef INVASIVE_GET_USAGE
+-							/* TODO: have a runtime check for this section. */
+-
+-							/*
+-							This section is removed because it is too
+-							invasive on the system. Getting a Usage Page
+-							and Usage requires parsing the HID Report
+-							descriptor. Getting a HID Report descriptor
+-							involves claiming the interface. Claiming the
+-							interface involves detaching the kernel driver.
+-							Detaching the kernel driver is hard on the system
+-							because it will unclaim interfaces (if another
+-							app has them claimed) and the re-attachment of
+-							the driver will sometimes change /dev entry names.
+-							It is for these reasons that this section is
+-							optional. For composite devices, use the interface
+-							field in the hid_device_info struct to distinguish
+-							between interfaces. */
+-							if (handle) {
+-								uint16_t report_descriptor_size = get_report_descriptor_size_from_interface_descriptors(intf_desc);
+-
+-								invasive_fill_device_info_usage(tmp, handle, intf_desc->bInterfaceNumber, report_descriptor_size);
+-							}
+-#endif /* INVASIVE_GET_USAGE */
++						/* TODO: have a runtime check for this section. */
++
++						/*
++						This section is removed because it is too
++						invasive on the system. Getting a Usage Page
++						and Usage requires parsing the HID Report
++						descriptor. Getting a HID Report descriptor
++						involves claiming the interface. Claiming the
++						interface involves detaching the kernel driver.
++						Detaching the kernel driver is hard on the system
++						because it will unclaim interfaces (if another
++						app has them claimed) and the re-attachment of
++						the driver will sometimes change /dev entry names.
++						It is for these reasons that this section is
++						optional. For composite devices, use the interface
++						field in the hid_device_info struct to distinguish
++						between interfaces. */
++						if (handle) {
++							uint16_t report_descriptor_size = get_report_descriptor_size_from_interface_descriptors(intf_desc);
+ 
+-							if (cur_dev) {
+-								cur_dev->next = tmp;
+-							}
+-							else {
+-								root = tmp;
+-							}
+-							cur_dev = tmp;
++							invasive_fill_device_info_usage(tmp, handle, intf_desc->bInterfaceNumber, report_descriptor_size);
+ 						}
++#endif /* INVASIVE_GET_USAGE */
+ 
+-						if (res >= 0) {
+-							libusb_close(handle);
+-							handle = NULL;
++						if (cur_dev) {
++							cur_dev->next = tmp;
+ 						}
++						else {
++							root = tmp;
++						}
++						cur_dev = tmp;
+ 					}
+-				} /* altsettings */
++
++					if (res >= 0) {
++						libusb_close(handle);
++						handle = NULL;
++					}
++					break;
++				}
+ 			} /* interfaces */
+-			libusb_free_config_descriptor(conf_desc);
++			termux_usb_free_config_descriptor(conf_desc);
+ 		}
+ 	}
+ 
+-	libusb_free_device_list(devs, 1);
++	termux_usb_free_device_list(devices);
+ 
+ 	return root;
+ }
+@@ -1140,8 +1146,8 @@ hid_device * HID_API_EXPORT hid_open_path(const char *path)
+ {
+ 	hid_device *dev = NULL;
+ 
+-	libusb_device **devs = NULL;
+-	libusb_device *usb_dev = NULL;
++	struct termux_usb_device **devs = NULL;
++	struct termux_usb_device *usb_dev = NULL;
+ 	int res = 0;
+ 	int d = 0;
+ 	int good_open = 0;
+@@ -1151,40 +1157,51 @@ hid_device * HID_API_EXPORT hid_open_path(const char *path)
+ 
+ 	dev = new_hid_device();
+ 
+-	libusb_get_device_list(usb_context, &devs);
++	termux_usb_get_device_list(&devs);
+ 	while ((usb_dev = devs[d++]) != NULL && !good_open) {
+-		struct libusb_config_descriptor *conf_desc = NULL;
+-		int j,k;
++		struct termux_usb_config_descriptor *conf_desc = NULL;
++		int j, k, i;
+ 
+-		if (libusb_get_active_config_descriptor(usb_dev, &conf_desc) < 0)
+-			continue;
++		termux_usb_get_config_descriptor(usb_dev, 0, &conf_desc);
+ 		for (j = 0; j < conf_desc->bNumInterfaces && !good_open; j++) {
+-			const struct libusb_interface *intf = &conf_desc->interface[j];
+-			for (k = 0; k < intf->num_altsetting && !good_open; k++) {
+-				const struct libusb_interface_descriptor *intf_desc = &intf->altsetting[k];
+-				if (intf_desc->bInterfaceClass == LIBUSB_CLASS_HID) {
+-					char dev_path[64];
+-					get_path(&dev_path, usb_dev, conf_desc->bConfigurationValue, intf_desc->bInterfaceNumber);
+-					if (!strcmp(dev_path, path)) {
+-						/* Matched Paths. Open this device */
+-
+-						/* OPEN HERE */
+-						res = libusb_open(usb_dev, &dev->device_handle);
+-						if (res < 0) {
+-							LOG("can't open device\n");
+-							break;
++			const struct termux_usb_interface_descriptor *intf = &conf_desc->interface[j];
++			if (intf->bInterfaceClass == LIBUSB_CLASS_HID) {
++				if (!strcmp(usb_dev->device_address, path)) {
++					/* Matched Paths. Open this device */
++
++					/* OPEN HERE */
++					intptr_t fd = termux_usb_open(usb_dev);
++					if (fd <= 0) {
++						LOG("Failed to open device\n");
++						continue;
++					}
++					int res = libusb_wrap_sys_device(usb_context, fd, &dev->device_handle);
++					if (res != 0) {
++						LOG("Failed to wrap sys device: %d\n", res);
++						continue;
++					}
++					libusb_device *device = libusb_get_device(dev->device_handle);
++
++					/* Now we can check actually get conf_desc and check altsetting */
++					struct libusb_config_descriptor *libusb_conf_desc = NULL;
++					libusb_get_active_config_descriptor(device, &libusb_conf_desc);
++					for (k = 0; k < libusb_conf_desc->bNumInterfaces && !good_open; k++) {
++						const struct libusb_interface *libusb_intf = &libusb_conf_desc->interface[k];
++						for (i = 0; i < libusb_intf->num_altsetting && !good_open; i++) {
++							const struct libusb_interface_descriptor *libusb_intf_desc = &libusb_intf->altsetting[k];
++							if (libusb_intf_desc->bInterfaceClass == LIBUSB_CLASS_HID) {
++								good_open = hidapi_initialize_device(dev, libusb_conf_desc->bConfigurationValue, libusb_intf_desc);
++							}
+ 						}
+-						good_open = hidapi_initialize_device(dev, conf_desc->bConfigurationValue, intf_desc);
+-						if (!good_open)
+-							libusb_close(dev->device_handle);
+ 					}
++					libusb_free_config_descriptor(libusb_conf_desc);
+ 				}
+ 			}
+ 		}
+-		libusb_free_config_descriptor(conf_desc);
++		termux_usb_free_config_descriptor(conf_desc);
+ 	}
+ 
+-	libusb_free_device_list(devs, 1);
++	termux_usb_free_device_list(devs);
+ 
+ 	/* If we have a good handle, return it. */
+ 	if (good_open) {
+-- 
+2.49.0
+
