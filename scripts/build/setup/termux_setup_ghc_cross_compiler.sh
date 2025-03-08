@@ -1,10 +1,13 @@
 # shellcheck shell=bash
 # Utility function to setup a GHC cross-compiler toolchain targeting Android.
 termux_setup_ghc_cross_compiler() {
-	local TERMUX_GHC_VERSION=9.2.5
+	local TERMUX_GHC_VERSION=9.12.1
 	local GHC_PREFIX="ghc-cross-${TERMUX_GHC_VERSION}-${TERMUX_ARCH}"
+	local TERMUX_GHC_TEMP_FOLDER="$TERMUX_COMMON_CACHEDIR/$GHC_PREFIX"
+	local TERMUX_GHC_TAR="$TERMUX_GHC_TEMP_FOLDER.tar.xz"
+	local TERMUX_GHC_RUNTIME_FOLDER
+
 	if [[ "${TERMUX_ON_DEVICE_BUILD}" == false ]]; then
-		local TERMUX_GHC_RUNTIME_FOLDER
 
 		if [[ "${TERMUX_PACKAGES_OFFLINE-false}" == true ]]; then
 			TERMUX_GHC_RUNTIME_FOLDER="${TERMUX_SCRIPTDIR}/build-tools/${GHC_PREFIX}-runtime"
@@ -12,45 +15,42 @@ termux_setup_ghc_cross_compiler() {
 			TERMUX_GHC_RUNTIME_FOLDER="${TERMUX_COMMON_CACHEDIR}/${GHC_PREFIX}-runtime"
 		fi
 
-		local TERMUX_GHC_TAR="${TERMUX_COMMON_CACHEDIR}/${GHC_PREFIX}.tar.xz"
-
 		export PATH="${TERMUX_GHC_RUNTIME_FOLDER}/bin:${PATH}"
-
-		test -d "${TERMUX_PREFIX}/lib/ghc-${TERMUX_GHC_VERSION}" ||
-			termux_error_exit "Package 'ghc-libs' is not installed. It is required by GHC cross-compiler." \
-				"You should specify it in 'TERMUX_PKG_BUILD_DEPENDS'."
 
 		[[ -d "${TERMUX_GHC_RUNTIME_FOLDER}" ]] && return
 
 		local CHECKSUMS
 		CHECKSUMS="$(
 			cat <<-EOF
-				aarch64:47893a77abd35ce5f884bf9c67f8f0437dbcb297d5939e17a3ce7aa74c7d34b8
-				arm:dca3aa7a523054e5b472793afb0d750162052ffa762122c1200e5d832187bb86
-				i686:428c26a4c2a26737a9c031dbe7545c6514d9042cb28d926ffa8702c2930326c5
-				x86_64:1b27fa3dfa02cc9959b43a82b2881b55a1def397da7e7f7ff64406c666763f50
+				aarch64:566b069f26854e6a93d1a57569ea9749f71185fb017e2477d35157a80c418edb
+				arm:309ff35898983f3ae9c5f3ef07d30b13ed1446a92619740b2e0d1757ec6eef0d
+				i686:fbf81b7bf83929bad98861478dc2f112873fd3f29bfcb54265163baff82c103c
+				x86_64:39d4781ddcc99b4046fcff3d9e2799a0d6c40c8cbe46d87ff2cc502227285764
 			EOF
 		)"
 
-		termux_download "https://github.com/MrAdityaAlok/ghc-cross-tools/releases/download/ghc-v${TERMUX_GHC_VERSION}/ghc-cross-bin-${TERMUX_GHC_VERSION}-${TERMUX_ARCH}.tar.xz" \
+		termux_download "https://github.com/termux/ghc-cross-tools/releases/download/ghc-v${TERMUX_GHC_VERSION}/ghc-${TERMUX_GHC_VERSION}-${TERMUX_HOST_PLATFORM/arm/armv7a}.tar.xz" \
 			"${TERMUX_GHC_TAR}" \
 			"$(echo "${CHECKSUMS}" | grep -w "${TERMUX_ARCH}" | cut -d ':' -f 2)"
 
-		mkdir -p "${TERMUX_GHC_RUNTIME_FOLDER}"
-		tar -xf "${TERMUX_GHC_TAR}" -C "${TERMUX_GHC_RUNTIME_FOLDER}"
-		rm "${TERMUX_GHC_TAR}"
+		mkdir -p "${TERMUX_GHC_RUNTIME_FOLDER}" "${TERMUX_GHC_TEMP_FOLDER}"
+		tar -xf "${TERMUX_GHC_TAR}" -C "${TERMUX_GHC_TEMP_FOLDER}" --strip-components=1
 
-		# Replace ghc settings with settings of the cross compiler.
-		# NOTE: This edits file in $TERMUX_PREFIX after timestamp creation. Remove it in massage step.
-		sed "s|\$topdir/bin/unlit|${TERMUX_GHC_RUNTIME_FOLDER}/lib/ghc-${TERMUX_GHC_VERSION}/bin/unlit|g" \
-			"${TERMUX_GHC_RUNTIME_FOLDER}/lib/ghc-${TERMUX_GHC_VERSION}/settings" > \
-			"${TERMUX_PREFIX}/lib/ghc-${TERMUX_GHC_VERSION}/settings"
+		(
+			set -e
+			cd "$TERMUX_GHC_TEMP_FOLDER"
 
-		for tool in ghc ghc-pkg hsc2hs hp2ps; do
-			sed -i "s|\$executablename|${TERMUX_GHC_RUNTIME_FOLDER}/lib/ghc-${TERMUX_GHC_VERSION}/bin/${tool}|g" \
-				"${TERMUX_GHC_RUNTIME_FOLDER}/bin/${tool}"
-		done
+			export CONF_CC_OPTS_STAGE2="$CFLAGS $CPPFLAGS"
+			export CONF_GCC_LINKER_OPTS_STAGE2="$LDFLAGS"
+			export CONF_CXX_OPTS_STAGE2="$CXXFLAGS"
 
+			./configure \
+				--prefix="$TERMUX_GHC_RUNTIME_FOLDER" \
+				--host="${TERMUX_HOST_PLATFORM/arm/armv7a}"
+			make install
+		) &>/dev/null
+
+		rm -rf "${TERMUX_GHC_TAR}" "$TERMUX_GHC_TEMP_FOLDER"
 	else
 		if [[ "${TERMUX_APP_PACKAGE_MANAGER}" == "apt" ]] && "$(dpkg-query -W -f '${db:Status-Status}\n' ghc 2>/dev/null)" != "installed" ||
 			[[ "${TERMUX_APP_PACKAGE_MANAGER}" == "pacman" ]] && ! "$(pacman -Q ghc 2>/dev/null)"; then
