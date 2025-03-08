@@ -108,4 +108,13 @@ termux_step_configure_haskell_build() {
 		$LIB_STRIPPING \
 		$QUIET_BUILD \
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
+
+	if [[ "$TERMUX_ON_DEVICE_BUILD" == false ]] && # We do not need iserv for on device builds.
+		[[ "$TERMUX_PKG_USES_HASKELL_TEMPLATE" == true ]]; then
+		termux_setup_ghc_iserv
+		cat <<-EOF >>cabal.project.local
+			package *
+			  ghc-options: -fexternal-interpreter -pgmi=$(command -v ghc-iserv-"$TERMUX_ARCH")
+		EOF
+	fi
 }
