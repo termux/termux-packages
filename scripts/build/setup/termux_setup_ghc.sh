@@ -2,7 +2,7 @@
 # Utility function to setup a GHC toolchain.
 termux_setup_ghc() {
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
-		local TERMUX_GHC_VERSION=8.10.7
+		local TERMUX_GHC_VERSION=9.10.1
 		local TERMUX_GHC_TEMP_FOLDER="${TERMUX_COMMON_CACHEDIR}/ghc-${TERMUX_GHC_VERSION}"
 		local TERMUX_GHC_TAR="${TERMUX_GHC_TEMP_FOLDER}.tar.xz"
 		local TERMUX_GHC_RUNTIME_FOLDER
@@ -17,12 +17,12 @@ termux_setup_ghc() {
 
 		[ -d "$TERMUX_GHC_RUNTIME_FOLDER" ] && return
 
-		termux_download "https://downloads.haskell.org/~ghc/${TERMUX_GHC_VERSION}/ghc-${TERMUX_GHC_VERSION}-x86_64-deb10-linux.tar.xz" \
+		termux_download "https://downloads.haskell.org/~ghc/${TERMUX_GHC_VERSION}/ghc-${TERMUX_GHC_VERSION}-x86_64-ubuntu20_04-linux.tar.xz" \
 			"$TERMUX_GHC_TAR" \
-			a13719bca87a0d3ac0c7d4157a4e60887009a7f1a8dbe95c4759ec413e086d30
+			ae3be406fdb73bd2b0c22baada77a8ff2f8cde6220dd591dc24541cfe9d895eb
 
-		rm -Rf "$TERMUX_GHC_TEMP_FOLDER"
-		tar xf "$TERMUX_GHC_TAR" -C "$TERMUX_COMMON_CACHEDIR"
+		mkdir -p "$TERMUX_GHC_TEMP_FOLDER"
+		tar xf "$TERMUX_GHC_TAR" --strip-components=1 -C "$TERMUX_GHC_TEMP_FOLDER"
 
 		(
 			set -e
@@ -33,30 +33,6 @@ termux_setup_ghc() {
 			make install
 		)
 
-		# Cabal passes a host string to the libraries' configure scripts that isn't valid.
-		# After this patch we need to always pass --configure-option=--host=${TERMUX_HOST_PLATFORM}
-		# to Setup.hs configure.
-		(
-			CABAL_VERSION="3.6.2.0"
-			CABAL_TEMP_FOLDER="$(mktemp -d -t cabal-"${CABAL_VERSION}".XXXXXX)"
-			CABAL_TAR="${CABAL_TEMP_FOLDER}/cabal-${CABAL_VERSION}.tar.gz"
-
-			termux_download \
-				https://hackage.haskell.org/package/Cabal-"${CABAL_VERSION}"/Cabal-"${CABAL_VERSION}".tar.gz \
-				"${CABAL_TAR}" \
-				9e903d06a7fb0893c6f303199e737a7d555fbb5e309be8bcc782b4eb2717bc42
-
-			tar xf "${CABAL_TAR}" -C "${CABAL_TEMP_FOLDER}" --strip-components=1
-
-			cd "${CABAL_TEMP_FOLDER}"
-
-			sed -i 's/maybeHostFlag = i/maybeHostFlag = [] -- i/' src/Distribution/Simple.hs
-
-			runhaskell Setup configure --prefix="${TERMUX_GHC_RUNTIME_FOLDER}"
-			runhaskell Setup build
-			runhaskell Setup install
-			ghc-pkg recache
-		)
 		rm -Rf "$TERMUX_GHC_TEMP_FOLDER" "$TERMUX_GHC_TAR"
 	else
 		if [[ "$TERMUX_APP_PACKAGE_MANAGER" = "apt" && "$(dpkg-query -W -f '${db:Status-Status}\n' ghc 2>/dev/null)" != "installed" ]] ||
