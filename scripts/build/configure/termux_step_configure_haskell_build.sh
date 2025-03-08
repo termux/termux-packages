@@ -5,11 +5,6 @@ termux_step_configure_haskell_build() {
 	local host_platform="$TERMUX_HOST_PLATFORM"
 	[[ "$TERMUX_ARCH" == "arm" ]] && host_platform="armv7a-linux-androideabi"
 
-	LIBEXEC_FLAG="--libexecdir=${TERMUX_PREFIX}/libexec"
-	if [[ ${TERMUX_PKG_EXTRA_CONFIGURE_ARGS} != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--libexecdir=/}" ]]; then
-		LIBEXEC_FLAG=""
-	fi
-
 	HOST_FLAG="--host=${host_platform}"
 	if [[ ${TERMUX_PKG_EXTRA_CONFIGURE_ARGS} != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--target=/}" ]]; then
 		HOST_FLAG=""
@@ -113,6 +108,5 @@ termux_step_configure_haskell_build() {
 		$EXECUTABLE_STRIPPING \
 		$LIB_STRIPPING \
 		$QUIET_BUILD \
-		$LIBEXEC_FLAG \
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
 }
