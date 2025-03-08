@@ -12,3 +12,13 @@ TERMUX_PKG_DEPENDS="libffi, libiconv, libgmp, zlib, libandroid-posix-semaphore"
 TERMUX_PKG_BUILD_DEPENDS="aosp-libs"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-f-native-dns --ghc-options=-optl-landroid-posix-semaphore"
 TERMUX_PKG_USES_HASKELL_TEMPLATE=true
+# Its dependency `aromic-counter-0.1.2.3` has some problem with llvm optimiser:
+# ```
+# opt-18: /tmp/ghc104640_tmp_0/ghc_tmp_4.ll:161:14: error: '%ln18' defined with type 'i32' but expected 'i64'
+#  store i64  %ln18, i32*  %lch
+# `opt-18' failed in phase `LLVM Optimiser'. (Exit code: 1)
+# ```
+# Disabling for now.
+TERMUX_PKG_BLACKLISTED_ARCHES="arm"
+
+# TODO: Fix arm build.
