@@ -2,23 +2,23 @@
 +++ b/core/libutils/Threads.cpp
 @@ -36,7 +36,7 @@
  
- #include <utils/Log.h>
+ #include <log/log.h>
  
 -#if defined(__ANDROID__)
 +#if defined(__ANDROID__) && !defined(__TERMUX__)
- #include <processgroup/processgroup.h>
- #include <processgroup/sched_policy.h>
- #endif
-@@ -67,7 +67,7 @@
+ # define __android_unused
+ #else
+ # define __android_unused __attribute__((__unused__))
+@@ -62,7 +62,7 @@ using namespace android;
  
- typedef void* (*android_pthread_entry)(void*);
+ typedef int (*android_pthread_entry)(void*);
  
 -#if defined(__ANDROID__)
 +#if defined(__ANDROID__) && !defined(__TERMUX__)
  struct thread_data_t {
      thread_func_t   entryFunction;
      void*           userData;
-@@ -133,7 +133,7 @@
+@@ -134,7 +134,7 @@ int androidCreateRawThreadEtc(android_thread_func_t entryFunction,
      pthread_attr_init(&attr);
      pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
  
@@ -27,7 +27,7 @@
      if (threadPriority != PRIORITY_DEFAULT || threadName != NULL) {
          // Now that the pthread_t has a method to find the associated
          // android_thread_id_t (pid) from pthread_t, it would be possible to avoid
-@@ -177,7 +177,7 @@
+@@ -183,7 +183,7 @@ int androidCreateRawThreadEtc(android_thread_func_t entryFunction,
      return 1;
  }
  
@@ -36,7 +36,7 @@
  static pthread_t android_thread_id_t_to_pthread(android_thread_id_t thread)
  {
      return (pthread_t) thread;
-@@ -303,7 +303,7 @@
+@@ -309,7 +309,7 @@ void androidSetCreateThreadFunc(android_create_thread_fn func)
      gCreateThreadFn = func;
  }
  
@@ -45,7 +45,25 @@
  int androidSetThreadPriority(pid_t tid, int pri)
  {
      int rc = 0;
-@@ -845,7 +845,7 @@
+@@ -648,7 +648,7 @@ Thread::Thread(bool canCallJava)
+       mStatus(OK),
+       mExitPending(false),
+       mRunning(false)
+-#if defined(__ANDROID__)
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+       ,
+       mTid(-1)
+ #endif
+@@ -721,7 +721,7 @@ int Thread::_threadLoop(void* user)
+     wp<Thread> weak(strong);
+     self->mHoldSelf.clear();
+ 
+-#if defined(__ANDROID__)
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+     // this is very useful for debugging with gdb
+     self->mTid = gettid();
+ #endif
+@@ -832,7 +832,7 @@ bool Thread::isRunning() const {
      return mRunning;
  }
  
