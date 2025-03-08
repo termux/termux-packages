@@ -2,14 +2,17 @@ termux_step_configure_haskell_build() {
 	termux_setup_ghc_cross_compiler
 	termux_setup_cabal
 
-	HOST_FLAG="--host=${TERMUX_HOST_PLATFORM}"
-	if [[ ${TERMUX_PKG_EXTRA_CONFIGURE_ARGS} != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--host=/}" ]]; then
-		HOST_FLAG=""
-	fi
+	local host_platform="$TERMUX_HOST_PLATFORM"
+	[[ "$TERMUX_ARCH" == "arm" ]] && host_platform="armv7a-linux-androideabi"
 
 	LIBEXEC_FLAG="--libexecdir=${TERMUX_PREFIX}/libexec"
 	if [[ ${TERMUX_PKG_EXTRA_CONFIGURE_ARGS} != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--libexecdir=/}" ]]; then
 		LIBEXEC_FLAG=""
+	fi
+
+	HOST_FLAG="--host=${host_platform}"
+	if [[ ${TERMUX_PKG_EXTRA_CONFIGURE_ARGS} != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--target=/}" ]]; then
+		HOST_FLAG=""
 	fi
 
 	QUIET_BUILD=
@@ -95,10 +98,9 @@ termux_step_configure_haskell_build() {
 		$TERMUX_HASKELL_OPTIMISATION \
 		--prefix="$TERMUX_PREFIX" \
 		--configure-option="$HOST_FLAG" \
-		--ghc-options="-optl-Wl,-rpath,$TERMUX_PREFIX/lib -optl-Wl,--enable-new-dtags" \
-		--with-compiler="$(command -v ghc)" \
-		--with-ghc-pkg="$(command -v ghc-pkg)" \
-		--with-hsc2hs="$(command -v hsc2hs)" \
+		--with-compiler="$(command -v "${host_platform}-ghc")" \
+		--with-ghc-pkg="$(command -v "${host_platform}-ghc-pkg")" \
+		--with-hsc2hs="$(command -v "${host_platform}-hsc2hs")" \
 		--hsc2hs-option=--cross-compile \
 		--extra-lib-dirs="$TERMUX_PREFIX/lib" \
 		--extra-include-dirs="$TERMUX_PREFIX/include" \
