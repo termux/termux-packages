@@ -102,12 +102,10 @@ termux_step_configure_haskell_build() {
 		--with-ghc-pkg="$(command -v "${host_platform}-ghc-pkg")" \
 		--with-hsc2hs="$(command -v "${host_platform}-hsc2hs")" \
 		--hsc2hs-option=--cross-compile \
-		--extra-lib-dirs="$TERMUX_PREFIX/lib" \
-		--extra-include-dirs="$TERMUX_PREFIX/include" \
-		--with-ld="$LD" \
-		--with-strip="$STRIP" \
-		--with-ar="$AR" \
-		--with-pkg-config="$PKG_CONFIG" \
+		--with-ld="$(command -v "$LD")" \
+		--with-strip="$(command -v "$STRIP")" \
+		--with-ar="$(command -v "$AR")" \
+		--with-pkg-config="$(command -v "$PKG_CONFIG")" \
 		--with-happy="$(command -v happy)" \
 		--with-alex="$(command -v alex)" \
 		--disable-tests \
