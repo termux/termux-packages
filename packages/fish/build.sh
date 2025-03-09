@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="The user-friendly command line shell"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.0.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/fish-shell/fish-shell/releases/download/$TERMUX_PKG_VERSION/fish-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=2fda5bd970357064d8d4c896e08285ba59965ca2a8c4829ca8a82bf3b89c69f3
 TERMUX_PKG_AUTO_UPDATE=true
@@ -57,7 +57,7 @@ termux_step_post_make_install() {
 	end
 
 	# TODO: remove when https://github.com/termux/termux-app/pull/4417 gets released
-	set -Ua fish_features no-keyboard-protocols
+	status test-feature keyboard-protocols && set -U fish_features no-keyboard-protocols
 	EOF
 }
 
