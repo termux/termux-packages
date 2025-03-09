@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=4b97730b0d033b4dc2a790e5c35745e0dbf51569
 TERMUX_PKG_VERSION="20230627"
-TERMUX_PKG_REVISION=8
+TERMUX_PKG_REVISION=9
 TERMUX_PKG_SRCURL=git+https://github.com/Tencent/ncnn
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_SHA256=a81ee5b6df97830919f8ed8554c99a4f223976ed82eee0cc9f214de0ce53dd2a
@@ -66,10 +66,14 @@ termux_step_pre_configure() {
 	LDFLAGS+=" -lutf8_range -lutf8_validity"
 	LDFLAGS+=" -landroid -ljnigraphics -llog"
 
-	# restoring file in termux_step_post_make_install
-	# will not be performed in the case of build errors
-	trap 'mv -f $TERMUX_PREFIX/lib/libprotobuf.so{.tmp,} || :' EXIT
-	mv $TERMUX_PREFIX/lib/libprotobuf.so{,.tmp}
+	mkdir -p "$TERMUX_PKG_TMPDIR/bin"
+	cat <<- EOF > "$TERMUX_PKG_TMPDIR/bin/$(basename ${CC})"
+		#!/bin/bash
+		set -- "\${@/-lprotobuf/-l:libprotobuf.a}"
+		exec $TERMUX_STANDALONE_TOOLCHAIN/bin/$(basename ${CC}) "\$@"
+	EOF
+	chmod +x "$TERMUX_PKG_TMPDIR/bin/$(basename ${CC})"
+	export PATH="$TERMUX_PKG_TMPDIR/bin:$PATH"
 }
 
 termux_step_post_make_install() {
@@ -133,8 +137,4 @@ termux_step_post_make_install() {
 			*) install -v -Dm755 "${test}" -t "${tools_dir}/tests" ;;
 		esac
 	done
-}
-
-termux_step_post_massage() {
-	rm -f lib/libprotobuf.so
 }

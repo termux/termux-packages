@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Open Source Computer Vision Library"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.11.0"
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=(
 	https://github.com/opencv/opencv/archive/${TERMUX_PKG_VERSION}/opencv-${TERMUX_PKG_VERSION}.tar.gz
 	https://github.com/opencv/opencv_contrib/archive/${TERMUX_PKG_VERSION}/opencv_contrib-${TERMUX_PKG_VERSION}.tar.gz
@@ -59,12 +59,12 @@ termux_step_pre_configure() {
 		-DPYTHON3_NUMPY_INCLUDE_DIRS=$TERMUX_PYTHON_HOME/site-packages/numpy/_core/include
 		"
 
-	# restoring file in termux_step_post_make_install
-	# will not be performed in the case of build errors
-	trap 'mv -f $TERMUX_PREFIX/lib/libprotobuf.so{.tmp,}  || :' EXIT
-	mv $TERMUX_PREFIX/lib/libprotobuf.so{,.tmp}
-}
-
-termux_step_post_massage() {
-	rm -rf lib/libprotobuf.so lib/cmake/protobuf/
+	mkdir -p "$TERMUX_PKG_TMPDIR/bin"
+	cat <<- EOF > "$TERMUX_PKG_TMPDIR/bin/$(basename ${CC})"
+		#!/bin/bash
+		set -- "\${@/-lprotobuf/-l:libprotobuf.a}"
+		exec $TERMUX_STANDALONE_TOOLCHAIN/bin/$(basename ${CC}) "\$@"
+	EOF
+	chmod +x "$TERMUX_PKG_TMPDIR/bin/$(basename ${CC})"
+	export PATH="$TERMUX_PKG_TMPDIR/bin:$PATH"
 }
