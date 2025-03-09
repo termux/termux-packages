@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Open Source Computer Vision Library"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.11.0"
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=(
 	https://github.com/opencv/opencv/archive/${TERMUX_PKG_VERSION}/opencv-${TERMUX_PKG_VERSION}.tar.gz
 	https://github.com/opencv/opencv_contrib/archive/${TERMUX_PKG_VERSION}/opencv_contrib-${TERMUX_PKG_VERSION}.tar.gz
@@ -61,8 +61,11 @@ termux_step_pre_configure() {
 
 	# restoring file in termux_step_post_make_install
 	# will not be performed in the case of build errors
-	trap 'mv -f $TERMUX_PREFIX/lib/libprotobuf.so{.tmp,}  || :' EXIT
 	mv $TERMUX_PREFIX/lib/libprotobuf.so{,.tmp}
+}
+
+termux_step_post_make_install() {
+	mv $TERMUX_PREFIX/lib/libprotobuf.so{.tmp,}
 }
 
 termux_step_post_massage() {
