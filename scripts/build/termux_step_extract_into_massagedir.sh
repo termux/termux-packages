@@ -5,6 +5,7 @@ termux_step_extract_into_massagedir() {
 	cd $TERMUX_PREFIX_CLASSICAL
 	tar -N "$TERMUX_BUILD_TS_FILE" \
 		--exclude='tmp' \
+		--exclude='__pycache__' \
 		-czf "$TARBALL_ORIG" .
 
 	# Extract tar in order to massage it
