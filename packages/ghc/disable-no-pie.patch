@@ -1,0 +1,19 @@
+--- ghc-9.12.1/configure	2025-02-24 22:46:43.330799712 +0530
++++ ghc-9.12.1.mod/configure	2025-03-07 01:39:57.633897921 +0530
+@@ -12911,19 +12911,9 @@
+ 
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether CC supports -no-pie" >&5
+ printf %s "checking whether CC supports -no-pie... " >&6; }
+-   echo 'int main() { return 0; }' > conftest.c
+-   "$CC" $CONF_GCC_CC_OPTS_STAGE2 -c conftest.c
+-   # Some GCC versions only warn when passed an unrecognized flag.
+-   if "$CC" $CONF_GCC_LINKER_OPTS_STAGE2 -no-pie -Werror conftest.o -o conftest > conftest.txt 2>&1 && ! grep -i unrecognized conftest.txt > /dev/null 2>&1; then
+-       CONF_GCC_SUPPORTS_NO_PIE=YES
+-       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+-printf "%s\n" "yes" >&6; }
+-   else
+        CONF_GCC_SUPPORTS_NO_PIE=NO
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+ printf "%s\n" "no" >&6; }
+-   fi
+-   rm -f conftest.c conftest.o conftest
