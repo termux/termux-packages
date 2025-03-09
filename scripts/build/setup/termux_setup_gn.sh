@@ -25,6 +25,7 @@ termux_setup_gn() {
 			cd $GN_FOLDER
 			(
 				unset CC CXX CFLAGS CXXFLAGS LD LDFLAGS AR AS CPP OBJCOPY OBJDUMP RANLIB READELF STRIP
+				export PATH="/usr/bin"
 				./build/gen.py \
 					--no-last-commit-position
 				cat <<-EOF >./out/last_commit_position.h

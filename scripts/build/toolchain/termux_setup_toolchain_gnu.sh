@@ -57,13 +57,11 @@ termux_setup_toolchain_gnu() {
 	export PKGCONFIG=$PKG_CONFIG
  	export PKG_CONFIG_LIBDIR="$TERMUX_PKG_CONFIG_LIBDIR"
 
-	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
-		if ! $(echo "$PATH" | grep -q "^$TERMUX_STANDALONE_TOOLCHAIN/bin:"); then
-			export PATH="$TERMUX_STANDALONE_TOOLCHAIN/bin:$PATH"
-		fi
-  		if ! $(echo "$PATH" | grep -q ":$TERMUX_PREFIX/bin"); then
-			export PATH="$PATH:$TERMUX_PREFIX/bin"
-		fi
+	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ] && ! tr ':' '\n' <<< "$PATH" | grep -q "^$TERMUX_PREFIX/bin$"; then
+		export PATH="$TERMUX_PREFIX/bin:$PATH"
+	fi
+	if ! tr ':' '\n' <<< "$PATH" | grep -q "^$TERMUX_STANDALONE_TOOLCHAIN/bin$"; then
+		export PATH="$TERMUX_STANDALONE_TOOLCHAIN/bin:$PATH"
 	fi
 
 	export CXXFLAGS="$CFLAGS -Wp,-D_GLIBCXX_ASSERTIONS"
