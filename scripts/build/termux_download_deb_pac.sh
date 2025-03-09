@@ -19,8 +19,8 @@ termux_download_deb_pac() {
 	# The data.tar.xz extraction by termux_step_get_dependencies would
 	# extract files to different prefix than TERMUX_PREFIX and builds
 	# would fail when looking for -I$TERMUX_PREFIX/include files.
-	if [ "$TERMUX_REPO_PACKAGE" != "$TERMUX_APP_PACKAGE" ]; then
-		echo "Ignoring download of $PKG_FILE since repo package name ($TERMUX_REPO_PACKAGE) does not equal app package name ($TERMUX_APP_PACKAGE)"
+	if [ "$TERMUX_REPO_APP__PACKAGE_NAME" != "$TERMUX_APP_PACKAGE" ]; then
+		echo "Ignoring download of $PKG_FILE since repo package name ($TERMUX_REPO_APP__PACKAGE_NAME) does not equal app package name ($TERMUX_APP_PACKAGE)"
 		return 1
 	fi
 
