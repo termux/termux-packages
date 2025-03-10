@@ -52,18 +52,11 @@ termux_step_massage() {
 
 	if [ "$TERMUX_PACKAGE_LIBRARY" = "bionic" ]; then
 		if [ "$TERMUX_PKG_NO_STRIP" != "true" ] && [ "$TERMUX_DEBUG_BUILD" = "false" ]; then
-			# Strip binaries. file(1) may fail for certain unusual files, so disable pipefail.
-			set +e +o pipefail
-			find . \( -path "./bin/*" -o -path "./lib/*" -o -path "./libexec/*" \) -type f |
-				xargs -r file | grep -E "ELF .+ (executable|shared object)" | cut -f 1 -d : |
-				xargs -r "$STRIP" --strip-unneeded --preserve-dates
-			set -e -o pipefail
+			termux_step_strip_elf_symbols
 		fi
 
 		if [ "$TERMUX_PKG_NO_ELF_CLEANER" != "true" ]; then
-			# Remove entries unsupported by Android's linker:
-			find . \( -path "./bin/*" -o -path "./lib/*" -o -path "./libexec/*" -o -path "./opt/*" \) -type f -print0 | xargs -r -0 \
-				"$TERMUX_ELF_CLEANER" --api-level $TERMUX_PKG_API_LEVEL
+			termux_step_elf_cleaner
 		fi
 	fi
 
