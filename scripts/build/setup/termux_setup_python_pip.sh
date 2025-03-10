@@ -67,5 +67,7 @@ termux_setup_python_pip() {
 		fi
 
 		export PATH="${TERMUX_PYTHON_CROSSENV_PREFIX}/build/bin:${PATH}"
+		local _CROSS_PATH="${TERMUX_PYTHON_CROSSENV_PREFIX}/cross/bin"
+		export PATH="${_CROSS_PATH}:$(echo -n $(tr ':' '\n' <<< "${PATH}" | grep -v "^${_CROSS_PATH}$") | tr ' ' ':')"
 	fi
 }
