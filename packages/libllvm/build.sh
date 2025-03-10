@@ -4,9 +4,9 @@ TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_LICENSE_FILE="llvm/LICENSE.TXT"
 TERMUX_PKG_MAINTAINER="@finagolfin"
 # Keep flang version and revision in sync when updating (enforced by check in termux_step_pre_configure).
-LLVM_MAJOR_VERSION=19
-TERMUX_PKG_VERSION=${LLVM_MAJOR_VERSION}.1.7
-TERMUX_PKG_SHA256=82401fea7b79d0078043f7598b835284d6650a75b93e64b6f761ea7b63097501
+LLVM_MAJOR_VERSION=20
+TERMUX_PKG_VERSION=${LLVM_MAJOR_VERSION}.1.0
+TERMUX_PKG_SHA256=4579051e3c255fb4bb795d54324f5a7f3ef79bd9181e44293d7ee9a7f62aad9a
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_SRCURL=https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/llvm-project-${TERMUX_PKG_VERSION}.src.tar.xz
 TERMUX_PKG_HOSTBUILD=true
@@ -76,8 +76,8 @@ termux_step_host_build() {
 
 	cmake -G Ninja -DCMAKE_BUILD_TYPE=Release \
 		-DLLVM_ENABLE_PROJECTS='clang;clang-tools-extra;lldb;mlir' $TERMUX_PKG_SRCDIR/llvm
-	ninja -j $TERMUX_PKG_MAKE_PROCESSES clang-tblgen clang-pseudo-gen \
-		clang-tidy-confusable-chars-gen lldb-tblgen llvm-tblgen mlir-tblgen mlir-linalg-ods-yaml-gen
+	ninja -j $TERMUX_PKG_MAKE_PROCESSES clang-tblgen clang-tidy-confusable-chars-gen \
+		lldb-tblgen llvm-tblgen mlir-tblgen mlir-linalg-ods-yaml-gen
 }
 
 termux_step_pre_configure() {
