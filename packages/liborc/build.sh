@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Library of Optimized Inner Loops Runtime Compiler"
 TERMUX_PKG_LICENSE="BSD 2-Clause, BSD 3-Clause"
 TERMUX_PKG_LICENSE_FILE="COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.4.40"
-TERMUX_PKG_SRCURL=https://github.com/GStreamer/orc/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=272aea9badb58d9b01a5d882405e0832a884a1e9bc7f51fad1e77bd7d5205cce
+TERMUX_PKG_VERSION="0.4.41"
+TERMUX_PKG_SRCURL=https://gitlab.freedesktop.org/gstreamer/orc/-/archive/${TERMUX_PKG_VERSION}/orc-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=5ae39f7d715a0b358e54c94ac7a4adceca31f9f3ea199a059a53b9219611fe66
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 
