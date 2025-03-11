@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/inetutils/
 TERMUX_PKG_DESCRIPTION="Collection of common network programs"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.5"
+TERMUX_PKG_VERSION="2.6"
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/inetutils/inetutils-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=87697d60a31e10b5cb86a9f0651e1ec7bee98320d048c0739431aac3d5764fb6
+TERMUX_PKG_SHA256=68bedbfeaf73f7d86be2a7d99bcfbd4093d829f52770893919ae174c0b2357ca
 TERMUX_PKG_DEPENDS="readline"
 TERMUX_PKG_BUILD_DEPENDS="libandroid-glob"
 TERMUX_PKG_SUGGESTS="whois"
@@ -32,7 +32,7 @@ gl_cv_have_weak=no
 termux_step_host_build() {
 	# help2man fails to get mans from our binaries
 	# let's build binaries it can launch for generating mans
-	
+
 	cp -r "$TERMUX_PKG_SRCDIR"/* .
 	aclocal --force
 	autoreconf -fi
