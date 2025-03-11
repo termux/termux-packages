@@ -11,12 +11,21 @@
  		f = *v;
 --- a/support/export/v4root.c
 +++ b/support/export/v4root.c
-@@ -135,7 +135,7 @@
+@@ -66,7 +66,7 @@
+ 
+ 		if (!flav->fnum)
+ 			continue;
+-		if (flav->need_krb5 && access("/etc/krb5.keytab", F_OK) != 0)
++		if (flav->need_krb5 && access("@TERMUX_PREFIX@/etc/krb5.keytab", F_OK) != 0)
+ 			continue;
+ 
+ 		i = secinfo_addflavor(flav, pseudo);
+@@ -137,7 +137,7 @@
  	if (!warned) {
  		xlog(L_WARNING, "Kernel does not have pseudo root support.");
  		xlog(L_WARNING, "NFS v4 mounts will be disabled unless fsid=0");
--		xlog(L_WARNING, "is specfied in /etc/exports file.");
-+		xlog(L_WARNING, "is specfied in @TERMUX_PREFIX@/etc/exports file.");
+-		xlog(L_WARNING, "is specified in /etc/exports file.");
++		xlog(L_WARNING, "is specified in @TERMUX_PREFIX@/etc/exports file.");
  		warned++;
  	}
  	return 0;
@@ -273,22 +282,22 @@ diff -u -r ../nfs-utils-2.6.4/utils/statd/start-statd ./utils/statd/start-statd
  
  # Use flock to serialize the running of this script
 -exec 9> /run/rpc.statd.lock
-+exec 9> @TERMUX_PREFIX@/var/run/rpc.statd.lock
- flock -e 9
++exec 9> @TERMUX_PREFIX@/run/rpc.statd.lock
+ flock -x 9
  
 -if [ -s /run/rpc.statd.pid ] &&
 -       [ "1$(cat /run/rpc.statd.pid)" -gt 1 ] &&
 -       kill -0 "$(cat /run/rpc.statd.pid)" > /dev/null 2>&1
-+if [ -s @TERMUX_PREFIX@/var/run/rpc.statd.pid ] &&
-+       [ "1$(cat @TERMUX_PREFIX@/var/run/rpc.statd.pid)" -gt 1 ] &&
-+       kill -0 "$(cat @TERMUX_PREFIX@/var/run/rpc.statd.pid)" > /dev/null 2>&1
++if [ -s @TERMUX_PREFIX@/run/rpc.statd.pid ] &&
++       [ "1$(cat @TERMUX_PREFIX@/run/rpc.statd.pid)" -gt 1 ] &&
++       kill -0 "$(cat @TERMUX_PREFIX@/run/rpc.statd.pid)" > /dev/null 2>&1
  then
      # statd already running - must have been slow to respond.
      exit 0
  fi
  # First try systemd if it's installed.
 -if [ -d /run/systemd/system ]; then
-+if [ -d @TERMUX_PREFIX@/var/run/systemd/system ]; then
++if [ -d @TERMUX_PREFIX@/run/systemd/system ]; then
      # Quit only if the call worked.
      if systemctl start rpc-statd.service; then
          # Ensure systemd knows not to stop rpc.statd or its dependencies
