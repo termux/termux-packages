@@ -2,9 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://matt.ucc.asn.au/dropbear/dropbear.html
 TERMUX_PKG_DESCRIPTION="Small SSH server and client"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2024.86"
+TERMUX_PKG_VERSION="2025.87"
 TERMUX_PKG_SRCURL=https://matt.ucc.asn.au/dropbear/releases/dropbear-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=e78936dffc395f2e0db099321d6be659190966b99712b55c530dd0a1822e0a5e
+TERMUX_PKG_SHA256=738b7f358547f0c64c3e1a56bbc5ef98d34d9ec6adf9ccdf01dc0bf2caa2bc8d
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="termux-auth, zlib"
 TERMUX_PKG_SUGGESTS="openssh-sftp-server"
 TERMUX_PKG_CONFLICTS="openssh"
@@ -13,6 +14,8 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-syslog --disable-utmp --disable-utmpx --disable-wtmp --disable-static"
 # Avoid linking to libcrypt for server password authentication:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_lib_crypt_crypt=no"
+# BIonic is special case, as usuas.
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_htole64=yes"
 # build a multi-call binary & enable progress info in 'scp'
 TERMUX_PKG_EXTRA_MAKE_ARGS="MULTI=1 SCPPROGRESS=1"
 
