@@ -689,6 +689,10 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 		termux_step_massage
 		cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX_CLASSICAL"
 		termux_step_post_massage
+		# At the final stage (when the package is archiving) it is better to use commands from the system
+		if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
+			export PATH="/usr/bin:$PATH"
+		fi
 		cd "$TERMUX_PKG_MASSAGEDIR"
 		if [ "$TERMUX_PACKAGE_FORMAT" = "debian" ]; then
 			termux_step_create_debian_package
