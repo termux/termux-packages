@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.sfml-dev.org/
 TERMUX_PKG_DESCRIPTION="A simple, fast, cross-platform and object-oriented multimedia API"
 TERMUX_PKG_LICENSE="ZLIB"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.6.2"
+TERMUX_PKG_VERSION="3.0.0"
 TERMUX_PKG_SRCURL=https://github.com/SFML/SFML/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=15ff4d608a018f287c6a885db0a2da86ea389e516d2323629e4d4407a7ce047f
+TERMUX_PKG_SHA256=37506fafbd618b1f8e153bbca8811e62203a70b32a1183279fb9612fd0501d2b
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="freetype, libc++, libflac, libogg, libvorbis, libx11, libxcursor, libxrandr, openal-soft, opengl"
 
