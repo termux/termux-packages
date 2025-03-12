@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Linux NFS userland utilities"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.8.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/nfs/nfs-utils-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=46b7648f3fcae4f140bf9a2f5d0731248f55cd96c3dda7c8c89383d83d18d418
 TERMUX_PKG_DEPENDS="keyutils, libblkid, libcap, libdevmapper, libevent, libmount, libnl, libsqlite, libtirpc, libuuid, openldap"
