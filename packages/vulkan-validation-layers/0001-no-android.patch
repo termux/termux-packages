@@ -11,7 +11,7 @@
      add_compile_definitions(VK_USE_PLATFORM_METAL_EXT)
 --- a/layers/CMakeLists.txt
 +++ b/layers/CMakeLists.txt
-@@ -350,7 +350,7 @@
+@@ -420,7 +420,7 @@
  endif()
      # Both Apple and IOS
      target_link_options(vvl PRIVATE -exported_symbols_list ${CMAKE_CURRENT_SOURCE_DIR}/${LAYER_NAME}.exp)
@@ -20,12 +20,12 @@
      target_link_options(vvl PRIVATE LINKER:--version-script=${CMAKE_CURRENT_SOURCE_DIR}/${LAYER_NAME}-android.map)
  else()
      target_link_options(vvl PRIVATE LINKER:--version-script=${CMAKE_CURRENT_SOURCE_DIR}/${LAYER_NAME}.map)
-@@ -384,7 +384,7 @@
+@@ -474,7 +474,7 @@
  
  target_include_directories(vvl SYSTEM PRIVATE external)
  
 -if (ANDROID)
 +if (0 AND ANDROID)
-     # https://gitlab.kitware.com/cmake/cmake/issues/18787
-     # https://github.com/android-ndk/ndk/issues/463
-     # "Users should be able to reliably use the toolchain provided by the NDK r23 or later when using CMake 3.21 or later" - Professional CMake
+     # Required for __android_log_print. Marking as PUBLIC since the tests use __android_log_print as well.
+     target_link_libraries(VkLayer_utils PUBLIC log)
+ 
