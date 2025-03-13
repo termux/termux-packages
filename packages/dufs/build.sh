@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="Apache-2.0,MIT"
 TERMUX_PKG_LICENSE_FILE="LICENSE-APACHE,LICENSE-MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.43.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/sigoden/dufs/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=4ba3b90486336efc4e592bcf15f14d4e3b6ac7b3b1bf8770815b8c43975d8b01
 TERMUX_PKG_AUTO_UPDATE=true
@@ -16,6 +17,7 @@ termux_step_pre_configure() {
 
 termux_step_post_make_install() {
 	install -Dm755 -t $TERMUX_PREFIX/bin target/${CARGO_TARGET_NAME}/release/dufs
+	install -Dm644 -t $TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME README*
 
 	install -Dm644 /dev/null "$TERMUX_PREFIX"/share/bash-completion/completions/dufs
 	install -Dm644 /dev/null "$TERMUX_PREFIX"/share/zsh/site-functions/_dufs
