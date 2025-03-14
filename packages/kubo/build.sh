@@ -4,11 +4,15 @@ TERMUX_PKG_LICENSE="MIT, Apache-2.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE, LICENSE-APACHE, LICENSE-MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.33.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/ipfs/kubo/releases/download/v${TERMUX_PKG_VERSION}/kubo-source.tar.gz
 TERMUX_PKG_SHA256=3d25d7d662ed79e2e96aaef83e759e0f2f84e84dee556af5739f854cc04a7398
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_SUGGESTS="termux-services"
 TERMUX_PKG_SERVICE_SCRIPT=("ipfs" "[ ! -d \"${TERMUX_ANDROID_HOME}/.ipfs\" ] && ipfs init --empty-repo 2>&1 && ipfs config --json Swarm.EnableRelayHop false 2>&1 && ipfs config --json Swarm.EnableAutoRelay true 2>&1; exec ipfs daemon --enable-namesys-pubsub 2>&1")
+TERMUX_PKG_CONFLICTS="ipfs"
+TERMUX_PKG_REPLACES="ipfs"
+TERMUX_PKG_PROVIDES="ipfs"
 
 termux_step_make() {
 	termux_setup_golang
