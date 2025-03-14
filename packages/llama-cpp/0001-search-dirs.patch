@@ -1,10 +1,10 @@
 --- a/ggml/src/ggml-backend-reg.cpp
 +++ b/ggml/src/ggml-backend-reg.cpp
-@@ -493,6 +493,7 @@
-     if (user_search_path == nullptr) {
-         search_paths.push_back(L"." + path_separator());
+@@ -496,6 +496,7 @@
+         // default search paths: executable directory, current directory
          search_paths.push_back(get_executable_path());
-+        search_paths.push_back(get_executable_path() + + L".." + path_separator() + L"lib" + path_separator());
+         search_paths.push_back(fs::current_path());
++        search_paths.push_back(get_executable_path() / ".." / "lib");
      } else {
-         search_paths.push_back(utf8_to_utf16(user_search_path) + path_separator());
+         search_paths.push_back(fs::u8path(user_search_path));
      }
