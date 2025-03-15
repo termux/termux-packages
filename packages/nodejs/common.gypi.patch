@@ -1,7 +1,6 @@
-diff -u -r ../node-v22.2.0/common.gypi ./common.gypi
---- ../node-v22.2.0/common.gypi	2024-05-15 12:34:59.000000000 +0000
-+++ ./common.gypi	2024-05-30 20:14:10.892850620 +0000
-@@ -239,10 +239,6 @@
+--- ./common.gypi.orig	2025-03-15 03:13:01.141885662 +0530
++++ ./common.gypi	2025-03-15 03:18:27.085594028 +0530
+@@ -242,10 +242,6 @@
                },],
              ],
            },],
@@ -12,3 +11,17 @@ diff -u -r ../node-v22.2.0/common.gypi ./common.gypi
            ['clang==1', {
              'msbuild_toolset': 'ClangCL',
            }],
+@@ -520,11 +516,11 @@
+           }],
+           ['_toolset=="host"', {
+             'conditions': [
+-              [ 'host_arch=="ia32"', {
++              [ 'host_arch=="ia32" or (target_arch=="ia32" or target_arch=="arm")', {
+                 'cflags': [ '-m32' ],
+                 'ldflags': [ '-m32' ],
+               }],
+-              [ 'host_arch=="x64"', {
++              [ 'host_arch=="x64" and (target_arch=="x64" or target_arch=="arm64")', {
+                 'cflags': [ '-m64' ],
+                 'ldflags': [ '-m64' ],
+               }],
