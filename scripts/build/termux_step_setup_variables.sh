@@ -189,6 +189,8 @@ termux_step_setup_variables() {
 	TERMUX_PKG_MESON_NATIVE=false
 	TERMUX_PKG_CMAKE_CROSSCOMPILING=true
 
+	export PYTHONPYCACHEPREFIX=$TERMUX_COMMON_CACHEDIR-$TERMUX_ARCH
+
 	unset CFLAGS CPPFLAGS LDFLAGS CXXFLAGS
 	unset TERMUX_MESON_ENABLE_SOVERSION # setenv to enable SOVERSION suffix for shared libs built with Meson
 }
