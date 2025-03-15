@@ -1,0 +1,25 @@
+diff --git a/base/file_utils.cc b/base/file_utils.cc
+index e4f37228..14ae277a 100644
+--- a/base/file_utils.cc
++++ b/base/file_utils.cc
+@@ -10,6 +10,7 @@
+ #include <fcntl.h>
+ #include <unistd.h>
+ #include <string.h>
++#include <cstdlib>
+ 
+ //----------------------------------------------------------------
+ 
+@@ -150,9 +151,9 @@ file_utils::zero_superblock(std::string const &path)
+ 	unsigned const SUPERBLOCK_SIZE = 4096;
+ 	file_descriptor fd = open_block_file(path, SUPERBLOCK_SIZE, true, true);
+ 
+-	buffer = reinterpret_cast<char *>(aligned_alloc(SUPERBLOCK_SIZE, SUPERBLOCK_SIZE));
+-	if (!buffer)
+-        	throw runtime_error("out of memory");
++	if (posix_memalign(reinterpret_cast<void**>(&buffer), SUPERBLOCK_SIZE, SUPERBLOCK_SIZE) != 0) {
++		throw runtime_error("out of memory");
++	}
+ 
+ 	memset(buffer, 0, SUPERBLOCK_SIZE);
+ 	if (::write(fd.fd_, buffer, SUPERBLOCK_SIZE) != SUPERBLOCK_SIZE)
