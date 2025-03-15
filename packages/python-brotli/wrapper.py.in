@@ -1,0 +1,30 @@
+#!/usr/bin/python3
+import os
+import subprocess
+import sys
+import typing
+
+COMPLIER_PATH = "@COMPILER@"
+TERMUX_PREFIX = "@TERMUX_PREFIX@"
+
+def main(argv: typing.List[str]):
+    cwd = os.getcwd()
+    # Move `-I@TERMUX_PREFIX@/include` to the last include param
+    argv_new = []
+    argv_last = []
+    for arg in argv[1:]:
+        if arg.startswith("-I@TERMUX_PREFIX@"):
+            argv_last.append(arg)
+        else:
+            argv_new.append(arg)
+    ind = -1
+    for i, arg in enumerate(argv_new):
+        if arg.startswith("-I"):
+            ind = i
+    if ind != -1:
+        argv_new = argv_new[:ind + 1] + argv_last + argv_new[ind + 1:]
+    args = [COMPLIER_PATH] + argv_new
+    subprocess.check_call(args, env=os.environ, cwd=cwd, text=True)
+
+if __name__ == '__main__':
+    main(sys.argv)
