@@ -1,15 +1,12 @@
 termux_step_configure_haskell_build() {
-	termux_setup_ghc_cross_compiler
-	termux_setup_cabal
+	termux_setup_ghc_cross_compiler && termux_setup_cabal
 
-	HOST_FLAG="--host=${TERMUX_HOST_PLATFORM}"
-	if [[ ${TERMUX_PKG_EXTRA_CONFIGURE_ARGS} != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--host=/}" ]]; then
+	local host_platform="$TERMUX_HOST_PLATFORM"
+	[[ "$TERMUX_ARCH" == "arm" ]] && host_platform="armv7a-linux-androideabi"
+
+	HOST_FLAG="--host=${host_platform}"
+	if [[ ${TERMUX_PKG_EXTRA_CONFIGURE_ARGS} != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--target=/}" ]]; then
 		HOST_FLAG=""
-	fi
-
-	LIBEXEC_FLAG="--libexecdir=${TERMUX_PREFIX}/libexec"
-	if [[ ${TERMUX_PKG_EXTRA_CONFIGURE_ARGS} != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--libexecdir=/}" ]]; then
-		LIBEXEC_FLAG=""
 	fi
 
 	QUIET_BUILD=
@@ -95,17 +92,14 @@ termux_step_configure_haskell_build() {
 		$TERMUX_HASKELL_OPTIMISATION \
 		--prefix="$TERMUX_PREFIX" \
 		--configure-option="$HOST_FLAG" \
-		--ghc-options="-optl-Wl,-rpath,$TERMUX_PREFIX/lib -optl-Wl,--enable-new-dtags" \
-		--with-compiler="$(command -v ghc)" \
-		--with-ghc-pkg="$(command -v ghc-pkg)" \
-		--with-hsc2hs="$(command -v hsc2hs)" \
-		--hsc2hs-option=--cross-compile \
-		--extra-lib-dirs="$TERMUX_PREFIX/lib" \
-		--extra-include-dirs="$TERMUX_PREFIX/include" \
-		--with-ld="$LD" \
-		--with-strip="$STRIP" \
-		--with-ar="$AR" \
-		--with-pkg-config="$PKG_CONFIG" \
+		--with-compiler="$(command -v "${host_platform}-ghc")" \
+		--with-ghc-pkg="$(command -v "${host_platform}-ghc-pkg")" \
+		--with-hsc2hs="$(command -v "${host_platform}-hsc2hs")" \
+		"$([[ "$TERMUX_ON_DEVICE_BUILD" == false ]] && echo "--hsc2hs-option=--cross-compile")" \
+		--with-ld="$(command -v "$LD")" \
+		--with-strip="$(command -v "$STRIP")" \
+		--with-ar="$(command -v "$AR")" \
+		--with-pkg-config="$(command -v "$PKG_CONFIG")" \
 		--with-happy="$(command -v happy)" \
 		--with-alex="$(command -v alex)" \
 		--disable-tests \
@@ -113,6 +107,14 @@ termux_step_configure_haskell_build() {
 		$EXECUTABLE_STRIPPING \
 		$LIB_STRIPPING \
 		$QUIET_BUILD \
-		$LIBEXEC_FLAG \
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
+
+	if [[ "$TERMUX_ON_DEVICE_BUILD" == false ]] && # We do not need iserv for on device builds.
+		[[ "$TERMUX_PKG_USES_HASKELL_TEMPLATE" == true ]]; then
+		termux_setup_ghc_iserv
+		cat <<-EOF >>cabal.project.local
+			package *
+			  ghc-options: -fexternal-interpreter -pgmi=$(command -v ghc-iserv-"$TERMUX_ARCH")
+		EOF
+	fi
 }
