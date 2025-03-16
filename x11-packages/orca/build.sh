@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A free, open source, flexible, and extensible screen rea
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="48.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/orca/${TERMUX_PKG_VERSION%.*}/orca-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=b5080b74f4519017b1c75369e28d7d40d9fd59dd1fab723a6062e3657074030a
 TERMUX_PKG_AUTO_UPDATE=true
@@ -40,12 +41,4 @@ termux_step_configure() {
 	fi
 
 	termux_step_configure_meson
-}
-
-termux_step_create_debscripts() {
-	cat <<- EOF > ./postinst
-	#!$TERMUX_PREFIX/bin/sh
-	echo "Installing dependencies through pip..."
-	pip3 install $TERMUX_PKG_PYTHON_TARGET_DEPS
-	EOF
 }
