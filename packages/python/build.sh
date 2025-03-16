@@ -5,8 +5,16 @@ TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.12.10
-TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=07ab697474595e06f06647417d3c7fa97ded07afc1a7e4454c5639919b46eaea
+TERMUX_PKG_REVISION=1
+_DEBPYTHON_COMMIT=5348f704668c0b6c360b6c6fb10153b9c2898af5
+TERMUX_PKG_SRCURL=(
+	https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
+	https://salsa.debian.org/cpython-team/python3-defaults/-/archive/${_DEBPYTHON_COMMIT}/python3-defaults-${_DEBPYTHON_COMMIT}.tar.gz
+)
+TERMUX_PKG_SHA256=(
+	07ab697474595e06f06647417d3c7fa97ded07afc1a7e4454c5639919b46eaea
+	d54ee8a27d53750a2fc13aa3c4ddc105138bcbd9b2fe77c5858a3c49e3843b66
+)
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="gdbm, libandroid-posix-semaphore, libandroid-support, libbz2, libcrypt, libexpat, libffi, liblzma, libsqlite, ncurses, ncurses-ui-libs, openssl, readline, zlib"
 TERMUX_PKG_BUILD_DEPENDS="tk"
@@ -91,6 +99,27 @@ termux_step_post_make_install() {
 	ln -sf pydoc${_MAJOR_VERSION} pydoc)
 	(cd $TERMUX_PREFIX/share/man/man1
 	ln -sf python${_MAJOR_VERSION}.1 python.1)
+
+
+	# patch and install debpython
+
+	patch="$TERMUX_PKG_BUILDER_DIR/debpython.diff"
+	debpython_srcdir="$TERMUX_PKG_SRCDIR/python3-defaults-$_DEBPYTHON_COMMIT"
+
+	echo "Applying patch: $(basename $patch)"
+	test -f "$patch" && sed \
+		-e "s%\@TERMUX_DEBPYTHON_DEVELV\@%${TERMUX_PKG_VERSION}-${TERMUX_PKG_REVISION}%g" \
+		-e "s%\@TERMUX_PYTHON_VERSION\@%${_MAJOR_VERSION}%g" \
+		-e "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" \
+		"$patch" | patch -d "$debpython_srcdir" --silent -p1
+
+	install -m 755 -d "$TERMUX_PREFIX/lib/python$_MAJOR_VERSION/debpython"
+	install -m 644 "$debpython_srcdir/debpython/"* \
+		"$TERMUX_PREFIX/lib/python$_MAJOR_VERSION/debpython/"
+
+	for prog in py3compile py3clean; do
+		install -m 755 "$debpython_srcdir/$prog" "$TERMUX_PREFIX/bin/"
+	done
 }
 
 termux_step_post_massage() {

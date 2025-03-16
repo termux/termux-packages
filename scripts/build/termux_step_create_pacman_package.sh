@@ -122,6 +122,7 @@ termux_step_create_pacman_package() {
 
 	# Write installation hooks.
 	termux_step_create_debscripts
+	termux_step_create_python_debscripts
 	termux_step_create_pacman_install_hook
 
 	# ensure all elements of the package have the same mtime
