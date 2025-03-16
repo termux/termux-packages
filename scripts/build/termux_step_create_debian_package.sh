@@ -51,6 +51,7 @@ termux_step_create_debian_package() {
 	# XXX: Should be done in a better way without a function?
 	cd DEBIAN
 	termux_step_create_debscripts
+	termux_step_create_python_debscripts
 
 	# Create control.tar.xz
 	tar --sort=name \
