@@ -3,9 +3,11 @@ TERMUX_PKG_DESCRIPTION="Midnight Commander - a powerful file manager"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.8.33"
-TERMUX_PKG_SRCURL=https://ftp.osuosl.org/pub/midnightcommander/mc-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=cae149d42f844e5185d8c81d7db3913a8fa214c65f852200a9d896b468af164c
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL=https://github.com/MidnightCommander/mc/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=092e440930fda43574739e45a8b41af384b974e6720184b6707d127b84082c51
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 TERMUX_PKG_DEPENDS="glib, libandroid-support, libssh2, ncurses, which"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_lib_util_openpty=no
@@ -19,3 +21,7 @@ ac_cv_path_ZIP=$TERMUX_PREFIX/bin/zip
 --with-ncurses-libs=$TERMUX_PREFIX/lib
 --with-screen=ncurses
 "
+
+termux_step_pre_configure() {
+	./autogen.sh
+}
