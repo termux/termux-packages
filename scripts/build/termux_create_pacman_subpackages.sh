@@ -35,6 +35,7 @@ termux_create_pacman_subpackages() {
 		local TERMUX_SUBPKG_DEPEND_ON_PARENT=""
 		local TERMUX_SUBPKG_EXCLUDED_ARCHES=""
 		local TERMUX_SUBPKG_GROUPS=""
+		local TERMUX_SUBPKG_PYTHON_RUNTIME_DEPS=""
 		local SUB_PKG_MASSAGE_DIR=$SUB_PKG_DIR/massage/$TERMUX_PREFIX_CLASSICAL
 		local SUB_PKG_PACKAGE_DIR=$SUB_PKG_DIR/package
 		mkdir -p "$SUB_PKG_MASSAGE_DIR" "$SUB_PKG_PACKAGE_DIR"
@@ -167,6 +168,7 @@ termux_create_pacman_subpackages() {
 
 		# Write package installation hooks.
 		termux_step_create_subpkg_debscripts
+		termux_step_create_python_debscripts
 		termux_step_create_pacman_install_hook
 
 		# Configuring the selection of a copress for a batch.
