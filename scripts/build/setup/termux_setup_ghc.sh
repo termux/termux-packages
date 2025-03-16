@@ -27,7 +27,7 @@ termux_setup_ghc() {
 		(
 			set -e
 			unset CC CXX CFLAGS CXXFLAGS CPPFLAGS LDFLAGS AR AS CPP LD RANLIB READELF STRIP
-			export PATH="/usr/bin"
+			export PATH="/usr/bin:$(echo -n $(tr ':' '\n' <<< "$PATH" | grep -v "^$TERMUX_PREFIX/bin$") | tr ' ' ':')"
 			cd "$TERMUX_GHC_TEMP_FOLDER"
 			./configure --prefix="$TERMUX_GHC_RUNTIME_FOLDER"
 			make install
