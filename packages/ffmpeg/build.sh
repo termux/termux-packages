@@ -7,7 +7,7 @@ TERMUX_PKG_VERSION="7.1.1"
 TERMUX_PKG_SRCURL=https://www.ffmpeg.org/releases/ffmpeg-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=733984395e0dbbe5c046abda2dc49a5544e7e0e1e2366bba849222ae9e3a03b1
 TERMUX_PKG_DEPENDS="fontconfig, freetype, fribidi, game-music-emu, harfbuzz, libaom, libandroid-glob, libass, libbluray, libbz2, libdav1d, libgnutls, libiconv, liblzma, libmp3lame, libopencore-amr, libopenmpt, libopus, librav1e, libsoxr, libsrt, libssh, libtheora, libv4l, libvidstab, libvmaf, libvo-amrwbenc, libvorbis, libvpx, libwebp, libx264, libx265, libxml2, libzimg, littlecms, ocl-icd, rubberband, svt-av1, xvidcore, zlib"
-TERMUX_PKG_BUILD_DEPENDS="opencl-headers"
+TERMUX_PKG_BUILD_DEPENDS="opencl-headers, texinfo, vulkan-headers"
 TERMUX_PKG_CONFLICTS="libav"
 TERMUX_PKG_BREAKS="ffmpeg-dev"
 TERMUX_PKG_REPLACES="ffmpeg-dev"
@@ -51,10 +51,12 @@ termux_step_configure() {
 		termux_error_exit "Unsupported arch: $TERMUX_ARCH"
 	fi
 
+		# --toolchain=clang-asan \
 	$TERMUX_PKG_SRCDIR/configure \
 		--arch="${_ARCH}" \
 		--as="$AS" \
 		--cc="$CC" \
+		--host-cc="$CC" \
 		--cxx="$CXX" \
 		--nm="$NM" \
 		--ar="$AR" \
@@ -112,7 +114,7 @@ termux_step_configure() {
 		--prefix="$TERMUX_PREFIX" \
 		--target-os=android \
 		--extra-libs="-landroid-glob" \
-		--disable-vulkan \
+		--enable-vulkan \
 		$_EXTRA_CONFIGURE_FLAGS \
 		--disable-libfdk-aac
 	# GPLed FFmpeg binaries linked against fdk-aac are not redistributable.
