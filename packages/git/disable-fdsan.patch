@@ -1,9 +1,10 @@
-diff -uNr git-2.36.1/common-main.c git-2.36.1.mod/common-main.c
---- git-2.36.1/common-main.c      2022-06-24 14:42:50.227057300 +0800
-+++ git-2.36.1.mod/common-main.c  2022-06-24 14:37:29.198791200 +0800
-@@ -2,6 +2,9 @@
- #include "exec-cmd.h"
- #include "attr.h"
+diff --git a/common-init.c b/common-init.c
+index 5cc73f058c..778837a0bb 100644
+--- a/common-init.c
++++ b/common-init.c
+@@ -10,6 +10,9 @@
+ #include "strbuf.h"
+ #include "trace2.h"
  
 +#include <android/fdsan.h>
 +#include <dlfcn.h>
@@ -11,7 +12,7 @@ diff -uNr git-2.36.1/common-main.c git-2.36.1.mod/common-main.c
  /*
   * Many parts of Git have subprograms communicate via pipe, expect the
   * upstream of a pipe to die with SIGPIPE when the downstream of a
-@@ -23,11 +26,25 @@
+@@ -31,10 +34,24 @@ static void restore_sigpipe_to_default(void)
  	signal(SIGPIPE, SIG_DFL);
  }
  
@@ -27,9 +28,8 @@ diff -uNr git-2.36.1/common-main.c git-2.36.1.mod/common-main.c
 +	}
 +}
 +
- int main(int argc, const char **argv)
+ void init_git(const char **argv)
  {
- 	int result;
  	struct strbuf tmp = STRBUF_INIT;
  
 +	termux_disable_fdsan();
