@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0, GPL-3.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE.txt, GPL2.txt, GPL3.txt"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.5.5"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/sabnzbd/sabnzbd/releases/download/${TERMUX_PKG_VERSION}/SABnzbd-${TERMUX_PKG_VERSION}-src.tar.gz
 TERMUX_PKG_SHA256=7f93d714287293f519f244b92d8eb727aa504448c5961dab8420e2093f92e3b7
 TERMUX_PKG_AUTO_UPDATE=true
@@ -37,12 +38,4 @@ termux_step_make_install() {
 	find "${sabnzbd}" -type f -exec chmod 600 {} \;
 	install -Dm700 SABnzbd.py "${TERMUX_PREFIX}/bin/sabnzbd"
 	install -Dm600 linux/sabnzbd.bash-completion "${TERMUX_PREFIX}/share/bash-completion/completions/sabnzbd"
-}
-
-termux_step_create_debscripts() {
-	cat <<- EOF > ./postinst
-	#!$TERMUX_PREFIX/bin/sh
-	echo "Installing dependencies through pip..."
-	pip3 install ${TERMUX_PKG_PYTHON_TARGET_DEPS//, / }
-	EOF
 }
