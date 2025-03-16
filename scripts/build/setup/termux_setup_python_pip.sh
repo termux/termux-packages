@@ -68,5 +68,9 @@ termux_setup_python_pip() {
 		export PATH="${TERMUX_PYTHON_CROSSENV_PREFIX}/build/bin:${PATH}"
 		local _CROSS_PATH="${TERMUX_PYTHON_CROSSENV_PREFIX}/cross/bin"
 		export PATH="${_CROSS_PATH}:$(echo -n $(tr ':' '\n' <<< "${PATH}" | grep -v "^${_CROSS_PATH}$") | tr ' ' ':')"
+
+		local sysconfig_module=$(${TERMUX_PYTHON_CROSSENV_PREFIX}/build/bin/python -c "import sysconfig; print(sysconfig.__file__)")
+		cp -r "${sysconfig_module}" "${TERMUX_PYTHON_CROSSENV_BUILDHOME}"
+		sed -i "s|os.path.normpath(sys.*prefix)|\"${TERMUX_PREFIX}\"|g" "${TERMUX_PYTHON_CROSSENV_BUILDHOME}/${sysconfig_module##*/}"
 	fi
 }
