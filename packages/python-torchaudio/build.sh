@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Data manipulation and transformation for audio signal pr
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.9.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/pytorch/audio/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=e59e7bc53709b41a7c9d3f18f2bdeb8b2aaaffcc498b0b9c0b49b20425f121ac
 TERMUX_PKG_DEPENDS="libc++, python, python-torch, python-torchcodec"
