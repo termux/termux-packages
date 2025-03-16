@@ -1,0 +1,13 @@
+Fixes ld.lld: error: undefined symbol: _glfwInitJoysticksLinux
+
+--- a/deps/vera/deps/CMakeLists.txt
++++ b/deps/vera/deps/CMakeLists.txt
+@@ -5,7 +5,7 @@ if (NOT NO_X11 AND NOT FORCE_GBM AND NOT EMSCRIPTEN)
+     set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "")
+     set(GLFW_BUILD_TESTS OFF CACHE BOOL "")
+     set(GLFW_INSTALL OFF CACHE BOOL "")
+-    add_subdirectory(glfw)
++    find_package(glfw3 3.3 REQUIRED)
+ 
+     if(APPLE)
+     target_compile_options(glfw PRIVATE "-Wno-deprecated-declarations")
