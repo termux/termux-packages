@@ -135,6 +135,7 @@ termux_create_debian_subpackages() {
 
 		# Allow packages to create arbitrary control files.
 		termux_step_create_subpkg_debscripts
+		termux_step_create_python_debscripts
 
 		# Create control.tar.xz
 		tar --sort=name \
