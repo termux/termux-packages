@@ -1,5 +1,6 @@
 termux_step_configure() {
 	[ "$TERMUX_PKG_METAPACKAGE" = "true" ] && return
+	[ -f "$TERMUX_PKG_CONFIGURE_MARKER" ] && ! $TERMUX_FORCE_BUILD && echo packet already configured run with -f to reconfigure && return
 
 	# This check should be above autotools check as haskell package too makes use of configure scripts which
 	# should be executed by its own build system.
@@ -31,4 +32,5 @@ termux_step_configure() {
 		fi
 		termux_step_configure_meson
 	fi
+	touch $TERMUX_PKG_CONFIGURE_MARKER
 }
