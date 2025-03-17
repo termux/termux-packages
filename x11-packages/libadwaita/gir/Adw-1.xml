@@ -19,6 +19,9 @@
     <member name="ADW_ANIMATION_PAUSED" nick="paused" value="1"/>
     <member name="ADW_ANIMATION_PLAYING" nick="playing" value="2"/>
     <member name="ADW_ANIMATION_FINISHED" nick="finished" value="3"/>
+  </enum>  <enum name="AdwBannerButtonStyle" get-type="adw_banner_button_style_get_type">
+    <member name="ADW_BANNER_BUTTON_DEFAULT" nick="default" value="0"/>
+    <member name="ADW_BANNER_BUTTON_SUGGESTED" nick="suggested" value="1"/>
   </enum>  <enum name="AdwBreakpointConditionLengthType" get-type="adw_breakpoint_condition_length_type_get_type">
     <member name="ADW_BREAKPOINT_CONDITION_MIN_WIDTH" nick="min-width" value="0"/>
     <member name="ADW_BREAKPOINT_CONDITION_MAX_WIDTH" nick="max-width" value="1"/>
@@ -63,6 +66,10 @@
     <member name="ADW_EASE_IN_BOUNCE" nick="ease-in-bounce" value="28"/>
     <member name="ADW_EASE_OUT_BOUNCE" nick="ease-out-bounce" value="29"/>
     <member name="ADW_EASE_IN_OUT_BOUNCE" nick="ease-in-out-bounce" value="30"/>
+    <member name="ADW_EASE" nick="ease" value="31"/>
+    <member name="ADW_EASE_IN" nick="ease-in" value="32"/>
+    <member name="ADW_EASE_OUT" nick="ease-out" value="33"/>
+    <member name="ADW_EASE_IN_OUT" nick="ease-in-out" value="34"/>
   </enum>  <enum name="AdwFlapFoldPolicy" get-type="adw_flap_fold_policy_get_type">
     <member name="ADW_FLAP_FOLD_POLICY_NEVER" nick="never" value="0"/>
     <member name="ADW_FLAP_FOLD_POLICY_ALWAYS" nick="always" value="1"/>
@@ -77,6 +84,10 @@
   </enum>  <enum name="AdwCenteringPolicy" get-type="adw_centering_policy_get_type">
     <member name="ADW_CENTERING_POLICY_LOOSE" nick="loose" value="0"/>
     <member name="ADW_CENTERING_POLICY_STRICT" nick="strict" value="1"/>
+  </enum>  <enum name="AdwInlineViewSwitcherDisplayMode" get-type="adw_inline_view_switcher_display_mode_get_type">
+    <member name="ADW_INLINE_VIEW_SWITCHER_LABELS" nick="labels" value="0"/>
+    <member name="ADW_INLINE_VIEW_SWITCHER_ICONS" nick="icons" value="1"/>
+    <member name="ADW_INLINE_VIEW_SWITCHER_BOTH" nick="both" value="2"/>
   </enum>  <enum name="AdwLeafletTransitionType" get-type="adw_leaflet_transition_type_get_type">
     <member name="ADW_LEAFLET_TRANSITION_TYPE_OVER" nick="over" value="0"/>
     <member name="ADW_LEAFLET_TRANSITION_TYPE_UNDER" nick="under" value="1"/>
@@ -123,6 +134,16 @@
   </enum>  <enum name="AdwViewSwitcherPolicy" get-type="adw_view_switcher_policy_get_type">
     <member name="ADW_VIEW_SWITCHER_POLICY_NARROW" nick="narrow" value="0"/>
     <member name="ADW_VIEW_SWITCHER_POLICY_WIDE" nick="wide" value="1"/>
+  </enum>  <enum name="AdwJustifyMode" get-type="adw_justify_mode_get_type">
+    <member name="ADW_JUSTIFY_NONE" nick="none" value="0"/>
+    <member name="ADW_JUSTIFY_FILL" nick="fill" value="1"/>
+    <member name="ADW_JUSTIFY_SPREAD" nick="spread" value="2"/>
+  </enum>  <enum name="AdwPackDirection" get-type="adw_pack_direction_get_type">
+    <member name="ADW_PACK_START_TO_END" nick="start-to-end" value="0"/>
+    <member name="ADW_PACK_END_TO_START" nick="end-to-start" value="1"/>
+  </enum>  <enum name="AdwWrapPolicy" get-type="adw_wrap_policy_get_type">
+    <member name="ADW_WRAP_MINIMUM" nick="minimum" value="0"/>
+    <member name="ADW_WRAP_NATURAL" nick="natural" value="1"/>
   </enum>  <boxed name="AdwBreakpointCondition" get-type="adw_breakpoint_condition_get_type"/>
   <class name="AdwBreakpoint" get-type="adw_breakpoint_get_type" parents="GObject" final="1">
     <implements name="GtkBuildable"/>
@@ -136,6 +157,7 @@
     <implements name="GtkAccessible"/>
     <implements name="GtkBuildable"/>
     <implements name="GtkConstraintTarget"/>
+    <implements name="GtkShortcutManager"/>
     <property name="child" type="GtkWidget" flags="1073742051"/>
     <property name="title" type="gchararray" flags="1073742051" default-value=""/>
     <property name="can-close" type="gboolean" flags="1073742051" default-value="TRUE"/>
@@ -155,6 +177,7 @@
     <implements name="GtkAccessible"/>
     <implements name="GtkBuildable"/>
     <implements name="GtkConstraintTarget"/>
+    <implements name="GtkShortcutManager"/>
     <property name="application-icon" type="gchararray" flags="1073742051" default-value=""/>
     <property name="application-name" type="gchararray" flags="1073742051" default-value=""/>
     <property name="developer-name" type="gchararray" flags="1073742051" default-value=""/>
@@ -190,6 +213,7 @@
     <property name="current-breakpoint" type="AdwBreakpoint" flags="225"/>
     <property name="dialogs" type="GListModel" flags="225"/>
     <property name="visible-dialog" type="AdwDialog" flags="225"/>
+    <property name="adaptive-preview" type="gboolean" flags="1073742051" default-value="FALSE"/>
   </class>
   <class name="AdwAboutWindow" get-type="adw_about_window_get_type" parents="AdwWindow,GtkWindow,GtkWidget,GInitiallyUnowned,GObject" final="1">
     <implements name="GtkAccessible"/>
@@ -250,6 +274,7 @@
     <implements name="GtkAccessible"/>
     <implements name="GtkBuildable"/>
     <implements name="GtkConstraintTarget"/>
+    <implements name="GtkShortcutManager"/>
     <property name="heading" type="gchararray" flags="1073742051" default-value=""/>
     <property name="heading-use-markup" type="gboolean" flags="1073742051" default-value="FALSE"/>
     <property name="body" type="gchararray" flags="1073742051" default-value=""/>
@@ -288,6 +313,8 @@
     <property name="system-supports-accent-colors" type="gboolean" flags="225" default-value="FALSE"/>
     <property name="accent-color" type="AdwAccentColor" flags="225" default-value="ADW_ACCENT_COLOR_BLUE"/>
     <property name="accent-color-rgba" type="GdkRGBA" flags="225"/>
+    <property name="document-font-name" type="gchararray" flags="225" default-value="Sans 10"/>
+    <property name="monospace-font-name" type="gchararray" flags="225" default-value="Monospace 10"/>
   </class>
   <class name="AdwApplication" get-type="adw_application_get_type" parents="GtkApplication,GApplication,GObject">
     <implements name="GActionGroup"/>
@@ -307,6 +334,7 @@
     <property name="current-breakpoint" type="AdwBreakpoint" flags="225"/>
     <property name="dialogs" type="GListModel" flags="225"/>
     <property name="visible-dialog" type="AdwDialog" flags="225"/>
+    <property name="adaptive-preview" type="gboolean" flags="1073742051" default-value="FALSE"/>
   </class>
   <class name="AdwAvatar" get-type="adw_avatar_get_type" parents="GtkWidget,GInitiallyUnowned,GObject" final="1">
     <implements name="GtkAccessible"/>
@@ -327,6 +355,7 @@
     <property name="button-label" type="gchararray" flags="1073742051" default-value=""/>
     <property name="revealed" type="gboolean" flags="1073742051" default-value="FALSE"/>
     <property name="use-markup" type="gboolean" flags="1073742051" default-value="TRUE"/>
+    <property name="button-style" type="AdwBannerButtonStyle" flags="1073742051" default-value="ADW_BANNER_BUTTON_DEFAULT"/>
     <signal name="button-clicked" return="void" when="last">
     </signal>
   </class>
@@ -353,6 +382,7 @@
     <property name="can-close" type="gboolean" flags="1073742051" default-value="TRUE"/>
     <property name="sheet-height" type="gint" flags="225" default-value="0"/>
     <property name="bottom-bar-height" type="gint" flags="225" default-value="0"/>
+    <property name="reveal-bottom-bar" type="gboolean" flags="1073742051" default-value="TRUE"/>
     <signal name="close-attempt" return="void" when="last">
     </signal>
   </class>
@@ -535,6 +565,45 @@
     <property name="centering-policy" type="AdwCenteringPolicy" flags="1073742051" default-value="ADW_CENTERING_POLICY_LOOSE"/>
     <property name="show-title" type="gboolean" flags="1073742051" default-value="TRUE"/>
   </class>
+  <class name="AdwViewStackPage" get-type="adw_view_stack_page_get_type" parents="GObject" final="1">
+    <implements name="GtkAccessible"/>
+    <property name="child" type="GtkWidget" flags="235"/>
+    <property name="name" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="title" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="use-underline" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="icon-name" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="needs-attention" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="badge-number" type="guint" flags="1073742051" default-value="0"/>
+    <property name="visible" type="gboolean" flags="1073742051" default-value="TRUE"/>
+  </class>
+  <class name="AdwViewStack" get-type="adw_view_stack_get_type" parents="GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <property name="hhomogeneous" type="gboolean" flags="1073742051" default-value="TRUE"/>
+    <property name="vhomogeneous" type="gboolean" flags="1073742051" default-value="TRUE"/>
+    <property name="visible-child" type="GtkWidget" flags="1073742051"/>
+    <property name="visible-child-name" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="enable-transitions" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="transition-duration" type="guint" flags="1073742051" default-value="200"/>
+    <property name="transition-running" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="pages" type="GtkSelectionModel" flags="225"/>
+  </class>
+  <class name="AdwViewStackPages" get-type="adw_view_stack_pages_get_type" parents="GObject" final="1">
+    <implements name="GListModel"/>
+    <implements name="GtkSelectionModel"/>
+    <property name="selected-page" type="AdwViewStackPage" flags="1073742051"/>
+  </class>
+  <class name="AdwInlineViewSwitcher" get-type="adw_inline_view_switcher_get_type" parents="GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkOrientable"/>
+    <property name="stack" type="AdwViewStack" flags="1073742051"/>
+    <property name="display-mode" type="AdwInlineViewSwitcherDisplayMode" flags="1073742051" default-value="ADW_INLINE_VIEW_SWITCHER_LABELS"/>
+    <property name="homogeneous" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="can-shrink" type="gboolean" flags="1073742051" default-value="FALSE"/>
+  </class>
   <class name="AdwLayout" get-type="adw_layout_get_type" parents="GObject" final="1">
     <implements name="GtkBuildable"/>
     <property name="content" type="GtkWidget" flags="235"/>
@@ -619,6 +688,9 @@
     <implements name="GtkConstraintTarget"/>
     <implements name="AdwSwipeable"/>
     <property name="visible-page" type="AdwNavigationPage" flags="225"/>
+    <property name="visible-page-tag" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="hhomogeneous" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="vhomogeneous" type="gboolean" flags="1073742051" default-value="FALSE"/>
     <property name="animate-transitions" type="gboolean" flags="1073742051" default-value="TRUE"/>
     <property name="pop-on-escape" type="gboolean" flags="1073742051" default-value="TRUE"/>
     <property name="navigation-stack" type="GListModel" flags="225"/>
@@ -638,6 +710,7 @@
     <implements name="GtkConstraintTarget"/>
     <property name="sidebar" type="AdwNavigationPage" flags="1073742051"/>
     <property name="content" type="AdwNavigationPage" flags="1073742051"/>
+    <property name="sidebar-position" type="GtkPackType" flags="1073742051" default-value="GTK_PACK_START"/>
     <property name="collapsed" type="gboolean" flags="1073742051" default-value="FALSE"/>
     <property name="show-content" type="gboolean" flags="1073742051" default-value="FALSE"/>
     <property name="min-sidebar-width" type="gdouble" flags="1073742051" default-value="180.000000"/>
@@ -689,6 +762,7 @@
     <property name="name" type="gchararray" flags="1073742051" default-value="NULL"/>
     <property name="use-underline" type="gboolean" flags="1073742051" default-value="FALSE"/>
     <property name="description-centered" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="banner" type="AdwBanner" flags="1073742051"/>
   </class>
   <class name="AdwToast" get-type="adw_toast_get_type" parents="GObject" final="1">
     <property name="title" type="gchararray" flags="1073742051" default-value=""/>
@@ -708,6 +782,7 @@
     <implements name="GtkAccessible"/>
     <implements name="GtkBuildable"/>
     <implements name="GtkConstraintTarget"/>
+    <implements name="GtkShortcutManager"/>
     <property name="visible-page" type="GtkWidget" flags="1073742051"/>
     <property name="visible-page-name" type="gchararray" flags="1073742051" default-value="NULL"/>
     <property name="search-enabled" type="gboolean" flags="1073742051" default-value="FALSE"/>
@@ -980,6 +1055,27 @@
     <implements name="GtkConstraintTarget"/>
     <property name="child" type="GtkWidget" flags="1073742051"/>
   </class>
+  <class name="AdwToggle" get-type="adw_toggle_get_type" parents="GObject" final="1">
+    <property name="name" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="label" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="use-underline" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="icon-name" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="tooltip" type="gchararray" flags="1073742051" default-value=""/>
+    <property name="child" type="GtkWidget" flags="1073742051"/>
+    <property name="enabled" type="gboolean" flags="1073742051" default-value="TRUE"/>
+  </class>
+  <class name="AdwToggleGroup" get-type="adw_toggle_group_get_type" parents="GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkOrientable"/>
+    <property name="n-toggles" type="guint" flags="225" default-value="0"/>
+    <property name="active" type="guint" flags="1073742051" default-value="4294967295"/>
+    <property name="active-name" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="homogeneous" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="can-shrink" type="gboolean" flags="1073742051" default-value="TRUE"/>
+    <property name="toggles" type="GtkSelectionModel" flags="225"/>
+  </class>
   <class name="AdwToolbarView" get-type="adw_toolbar_view_get_type" parents="GtkWidget,GInitiallyUnowned,GObject" final="1">
     <implements name="GtkAccessible"/>
     <implements name="GtkBuildable"/>
@@ -993,32 +1089,6 @@
     <property name="extend-content-to-bottom-edge" type="gboolean" flags="1073742051" default-value="FALSE"/>
     <property name="top-bar-height" type="gint" flags="225" default-value="0"/>
     <property name="bottom-bar-height" type="gint" flags="225" default-value="0"/>
-  </class>
-  <class name="AdwViewStackPage" get-type="adw_view_stack_page_get_type" parents="GObject" final="1">
-    <implements name="GtkAccessible"/>
-    <property name="child" type="GtkWidget" flags="235"/>
-    <property name="name" type="gchararray" flags="1073742051" default-value="NULL"/>
-    <property name="title" type="gchararray" flags="1073742051" default-value="NULL"/>
-    <property name="use-underline" type="gboolean" flags="1073742051" default-value="FALSE"/>
-    <property name="icon-name" type="gchararray" flags="1073742051" default-value="NULL"/>
-    <property name="needs-attention" type="gboolean" flags="1073742051" default-value="FALSE"/>
-    <property name="badge-number" type="guint" flags="1073742051" default-value="0"/>
-    <property name="visible" type="gboolean" flags="1073742051" default-value="TRUE"/>
-  </class>
-  <class name="AdwViewStack" get-type="adw_view_stack_get_type" parents="GtkWidget,GInitiallyUnowned,GObject" final="1">
-    <implements name="GtkAccessible"/>
-    <implements name="GtkBuildable"/>
-    <implements name="GtkConstraintTarget"/>
-    <property name="hhomogeneous" type="gboolean" flags="1073742051" default-value="TRUE"/>
-    <property name="vhomogeneous" type="gboolean" flags="1073742051" default-value="TRUE"/>
-    <property name="visible-child" type="GtkWidget" flags="1073742051"/>
-    <property name="visible-child-name" type="gchararray" flags="1073742051" default-value="NULL"/>
-    <property name="pages" type="GtkSelectionModel" flags="225"/>
-  </class>
-  <class name="AdwViewStackPages" get-type="adw_view_stack_pages_get_type" parents="GObject" final="1">
-    <implements name="GListModel"/>
-    <implements name="GtkSelectionModel"/>
-    <property name="selected-page" type="AdwViewStackPage" flags="1073742051"/>
   </class>
   <class name="AdwViewSwitcher" get-type="adw_view_switcher_get_type" parents="GtkWidget,GInitiallyUnowned,GObject" final="1">
     <implements name="GtkAccessible"/>
@@ -1050,5 +1120,40 @@
     <implements name="GtkConstraintTarget"/>
     <property name="title" type="gchararray" flags="1073742051" default-value=""/>
     <property name="subtitle" type="gchararray" flags="1073742051" default-value=""/>
+  </class>
+  <class name="AdwWrapLayout" get-type="adw_wrap_layout_get_type" parents="GtkLayoutManager,GObject">
+    <implements name="GtkOrientable"/>
+    <property name="child-spacing" type="gint" flags="1073742051" default-value="0"/>
+    <property name="child-spacing-unit" type="AdwLengthUnit" flags="1073742051" default-value="ADW_LENGTH_UNIT_PX"/>
+    <property name="pack-direction" type="AdwPackDirection" flags="1073742051" default-value="ADW_PACK_START_TO_END"/>
+    <property name="align" type="gfloat" flags="1073742051" default-value="0.000000"/>
+    <property name="justify" type="AdwJustifyMode" flags="1073742051" default-value="ADW_JUSTIFY_NONE"/>
+    <property name="justify-last-line" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="line-spacing" type="gint" flags="1073742051" default-value="0"/>
+    <property name="line-spacing-unit" type="AdwLengthUnit" flags="1073742051" default-value="ADW_LENGTH_UNIT_PX"/>
+    <property name="line-homogeneous" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="natural-line-length" type="gint" flags="1073742051" default-value="-1"/>
+    <property name="natural-line-length-unit" type="AdwLengthUnit" flags="1073742051" default-value="ADW_LENGTH_UNIT_PX"/>
+    <property name="wrap-reverse" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="wrap-policy" type="AdwWrapPolicy" flags="1073742051" default-value="ADW_WRAP_NATURAL"/>
+  </class>
+  <class name="AdwWrapBox" get-type="adw_wrap_box_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkOrientable"/>
+    <property name="child-spacing" type="gint" flags="1073742051" default-value="0"/>
+    <property name="child-spacing-unit" type="AdwLengthUnit" flags="1073742051" default-value="ADW_LENGTH_UNIT_PX"/>
+    <property name="pack-direction" type="AdwPackDirection" flags="1073742051" default-value="ADW_PACK_START_TO_END"/>
+    <property name="align" type="gfloat" flags="1073742051" default-value="0.000000"/>
+    <property name="justify" type="AdwJustifyMode" flags="1073742051" default-value="ADW_JUSTIFY_NONE"/>
+    <property name="justify-last-line" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="line-spacing" type="gint" flags="1073742051" default-value="0"/>
+    <property name="line-spacing-unit" type="AdwLengthUnit" flags="1073742051" default-value="ADW_LENGTH_UNIT_PX"/>
+    <property name="line-homogeneous" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="natural-line-length" type="gint" flags="1073742051" default-value="-1"/>
+    <property name="natural-line-length-unit" type="AdwLengthUnit" flags="1073742051" default-value="ADW_LENGTH_UNIT_PX"/>
+    <property name="wrap-reverse" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="wrap-policy" type="AdwWrapPolicy" flags="1073742051" default-value="ADW_WRAP_NATURAL"/>
   </class>
 </dump>
