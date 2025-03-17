@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/pytorch/vision
 TERMUX_PKG_DESCRIPTION="Datasets, Transforms and Models specific to Computer Vision"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.20.0
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=0.21.0
 TERMUX_PKG_SRCURL=https://github.com/pytorch/vision/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=b59d9896c5c957c6db0018754bbd17d079c5102b82b9be0b438553b40a7b6029
+TERMUX_PKG_SHA256=0a4a967bbb7f9810f792cd0289a07fb98c8fb5d1303fae8b63e3a6b05d720058
 TERMUX_PKG_DEPENDS="libc++, ffmpeg, python, python-numpy, python-pillow, python-pip, python-torch, libjpeg-turbo, libpng, libwebp, zlib"
 TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, setuptools"
 

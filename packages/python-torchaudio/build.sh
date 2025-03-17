@@ -2,8 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://github.com/pytorch/audio
 TERMUX_PKG_DESCRIPTION="Data manipulation and transformation for audio signal processing, powered by PyTorch"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.5.0
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=2.6.0
 # FFmpeg 7 is not yet supported. The subpackage should be removed when FFmpeg 7
 # is supported by an upstream release.
 # https://github.com/pytorch/audio/issues/3857
@@ -16,7 +15,7 @@ opt/torchaudio/share
 "
 TERMUX_PKG_SRCURL=(https://github.com/pytorch/audio/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
                    $_FFMPEG_SRCURL)
-TERMUX_PKG_SHA256=(fca49590d36966879f37cef29dcc83507e97e7cad68035a851734d93066c018e
+TERMUX_PKG_SHA256=(3335d8fcf58c26acf3c628d751103b59226e01c91847ce56efb2a4e7ae8351ef
                    3b624649725ecdc565c903ca6643d41f33bd49239922e45c9b1442c63dca4e38)
 TERMUX_PKG_DEPENDS="libc++, python, python-pip, python-torch, torchaudio-ffmpeg"
 TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, setuptools"
