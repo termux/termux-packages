@@ -2,18 +2,18 @@ TERMUX_PKG_HOMEPAGE=https://www.vim.org
 TERMUX_PKG_DESCRIPTION="Vi IMproved - enhanced vi editor"
 TERMUX_PKG_LICENSE="VIM License"
 TERMUX_PKG_MAINTAINER="Joshua Kahn @TomJo2000"
-TERMUX_PKG_BUILD_DEPENDS="libluajit, python"
+TERMUX_PKG_BUILD_DEPENDS="libluajit, perl, python, ruby, tcl"
 TERMUX_PKG_DEPENDS="libiconv, ncurses"
-TERMUX_PKG_SUGGESTS="python, libluajit"
+TERMUX_PKG_SUGGESTS="libluajit, perl, python, ruby, tcl"
 TERMUX_PKG_RECOMMENDS="diffutils, xxd"
 TERMUX_PKG_CONFLICTS="vim-gtk"
 TERMUX_PKG_BREAKS="vim-python, vim-runtime"
 TERMUX_PKG_REPLACES="vim-python, vim-runtime"
 TERMUX_PKG_PROVIDES="vim-python"
 TERMUX_PKG_VERSION="9.1.1200"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=eeba446b1f196f1019773c6f07e8b9929bcfc498a6c444f94dffc81a85bf1a73
-TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_CONFFILES="share/vim/vimrc"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -29,7 +29,7 @@ ac_cv_small_wchar_t=no
 --enable-netbeans=no
 --with-tlib=ncursesw
 --enable-multibyte
---with-compiledby='Termux'
+--with-compiledby=Termux
 --enable-python3interp=dynamic
 --with-python3-config-dir=$TERMUX_PYTHON_HOME/config-${TERMUX_PYTHON_VERSION}/
 vi_cv_path_python3_pfx=$TERMUX_PREFIX
@@ -40,6 +40,10 @@ vi_cv_var_python3_version=${TERMUX_PYTHON_VERSION}
 --enable-luainterp=dynamic
 --with-lua-prefix=$TERMUX_PREFIX
 --with-luajit
+--enable-perlinterp=dynamic
+--with-xsubpp=$TERMUX_PREFIX/bin/xsubpp
+--enable-rubyinterp=dynamic
+--enable-tclinterp=dynamic
 --enable-gui=no
 --without-x
 "
@@ -86,6 +90,24 @@ termux_step_pre_configure() {
 		rm -f "${TERMUX_PREFIX}/bin/${sym}"
 		rm -f "$TERMUX_PREFIX/share/man/man1/${sym}.1"*
 	done
+
+	# Vim doesn't support cross-compilation for Perl, Ruby and Tcl
+	# out of the box, so we need to patch the configure script to make it work.
+	local perl_version ruby_major_version tcl_major_version
+	perl_version="$(. "$TERMUX_SCRIPTDIR/packages/perl/build.sh"; echo "${TERMUX_PKG_VERSION[0]}")"
+	ruby_major_version="$(. "$TERMUX_SCRIPTDIR/packages/ruby/build.sh"; echo "${TERMUX_PKG_VERSION%\.*}")"
+	tcl_major_version="$(. "$TERMUX_SCRIPTDIR/packages/tcl/build.sh"; echo "${TERMUX_PKG_VERSION%\.*}")"
+
+	patch="$TERMUX_PKG_BUILDER_DIR/configure-perl-ruby-tcl-cross-compiling.diff"
+	echo "Applying patch: $(basename "$patch")"
+	test -f "$patch" && sed \
+		-e "s%\@PERL_VERSION\@%${perl_version}%g" \
+		-e "s%\@RUBY_MAJOR_VERSION\@%${ruby_major_version}%g" \
+		-e "s%\@TCL_MAJOR_VERSION\@%${tcl_major_version}%g" \
+		-e "s%\@PERL_PLATFORM\@%${TERMUX_ARCH}-android%g" \
+		-e "s%\@RUBY_PLATFORM\@%${TERMUX_HOST_PLATFORM}%g" \
+		-e "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" \
+		"$patch" | patch --silent -p1
 }
 
 termux_step_post_make_install() {
