@@ -64,6 +64,10 @@ lib/python${_MAJOR_VERSION}/*/tests
 lib/python${_MAJOR_VERSION}/site-packages/*/
 "
 
+termux_step_post_get_source() {
+	mv "$TERMUX_PKG_SRCDIR/python3-defaults-$_DEBPYTHON_COMMIT" "$TERMUX_PKG_SRCDIR/debpython"
+}
+
 termux_step_pre_configure() {
 	# -O3 gains some additional performance on at least aarch64.
 	CFLAGS="${CFLAGS/-Oz/-O3}"
@@ -89,6 +93,10 @@ termux_step_pre_configure() {
 	export LDFLAGS+=" -landroid-posix-semaphore"
 
 	export LIBCRYPT_LIBS="-lcrypt"
+
+	sed -i -e "s|@TERMUX_PYTHON_VERSION@|${_MAJOR_VERSION}|g" \
+		-e "s|@TERMUX_PKG_FULLVERSION@|$(test ${TERMUX_PACKAGE_FORMAT} = pacman && echo ${TERMUX_PKG_FULLVERSION_FOR_PACMAN} || echo ${TERMUX_PKG_FULLVERSION})|g" \
+		$(find "$TERMUX_PKG_SRCDIR/debpython" -type f)
 }
 
 termux_step_post_make_install() {
@@ -100,25 +108,12 @@ termux_step_post_make_install() {
 	(cd $TERMUX_PREFIX/share/man/man1
 	ln -sf python${_MAJOR_VERSION}.1 python.1)
 
-
-	# patch and install debpython
-
-	patch="$TERMUX_PKG_BUILDER_DIR/debpython.diff"
-	debpython_srcdir="$TERMUX_PKG_SRCDIR/python3-defaults-$_DEBPYTHON_COMMIT"
-
-	echo "Applying patch: $(basename $patch)"
-	test -f "$patch" && sed \
-		-e "s%\@TERMUX_DEBPYTHON_DEVELV\@%${TERMUX_PKG_VERSION}-${TERMUX_PKG_REVISION}%g" \
-		-e "s%\@TERMUX_PYTHON_VERSION\@%${_MAJOR_VERSION}%g" \
-		-e "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" \
-		"$patch" | patch -d "$debpython_srcdir" --silent -p1
-
 	install -m 755 -d "$TERMUX_PREFIX/lib/python$_MAJOR_VERSION/debpython"
-	install -m 644 "$debpython_srcdir/debpython/"* \
+	install -m 644 "$TERMUX_PKG_SRCDIR/debpython/debpython/"* \
 		"$TERMUX_PREFIX/lib/python$_MAJOR_VERSION/debpython/"
 
 	for prog in py3compile py3clean; do
-		install -m 755 "$debpython_srcdir/$prog" "$TERMUX_PREFIX/bin/"
+		install -m 755 "$TERMUX_PKG_SRCDIR/debpython/$prog" "$TERMUX_PREFIX/bin/"
 	done
 }
 
