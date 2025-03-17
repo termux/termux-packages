@@ -92,7 +92,7 @@
  static void
 --- a/gtk/inspector/general.c
 +++ b/gtk/inspector/general.c
-@@ -40,8 +40,10 @@
+@@ -49,8 +49,10 @@
  #ifdef GDK_WINDOWING_X11
  #include "x11/gdkx.h"
  #include <epoxy/glx.h>
@@ -103,35 +103,19 @@
  
  #ifdef GDK_WINDOWING_WIN32
  #include "win32/gdkwin32.h"
-@@ -289,6 +291,7 @@
- }
- #endif
- 
-+#ifndef __ANDROID__
- #if defined(GDK_WINDOWING_WAYLAND) || defined (GDK_WINDOWING_X11) || (defined (GDK_WINDOWING_WIN32) && defined(GDK_WIN32_ENABLE_EGL))
- static void
- append_egl_extension_row (GtkInspectorGeneral *gen,
-@@ -319,6 +322,7 @@
-    return NULL;
- }
- #endif
-+#endif /* __ANDROID__ */
- 
- static void
- init_gl (GtkInspectorGeneral *gen)
-@@ -341,6 +345,7 @@
-       return;
+@@ -601,6 +604,7 @@
+       gtk_string_list_append (GTK_STRING_LIST (gen->gl_extensions_list), gl_ext);
      }
  
 +#ifndef __ANDROID__
  #if defined(GDK_WINDOWING_X11) || defined(GDK_WINDOWING_WAYLAND) || (defined(GDK_WINDOWING_WIN32) && defined(GDK_WIN32_ENABLE_EGL))
    EGLDisplay egl_display = get_egl_display (gen->display);
    if (egl_display)
-@@ -360,6 +365,7 @@
+@@ -618,6 +622,7 @@
      }
    else
  #endif
 +#endif /* __ANDROID__ */
  #ifdef GDK_WINDOWING_X11
-   if (GDK_IS_X11_DISPLAY (gen->display))
-     {
+ 
+ G_GNUC_BEGIN_IGNORE_DEPRECATIONS

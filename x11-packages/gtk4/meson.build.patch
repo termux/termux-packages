@@ -1,8 +1,17 @@
 --- a/meson.build
 +++ b/meson.build
-@@ -634,7 +634,7 @@
- libdrm_dep = libdrm_dep.partial_dependency(includes: true, compile_args: true)
- cdata.set('HAVE_DRM_FOURCC_H', libdrm_dep.found())
+@@ -154,7 +154,7 @@
+ elif host_machine.system() == 'windows'
+   os_win32 = true
+ elif host_machine.system() == 'android'
+-  os_android = true
++  os_linux = true
+ elif host_machine.system() == 'linux'
+   os_linux = true
+ endif
+@@ -690,7 +690,7 @@
+   cdata.set('HAVE_DRM_DRM_FOURCC_H', have_drm_fourcc)
+ endif
  
 -cdata.set('HAVE_DMABUF', cc.has_header('linux/dma-buf.h'))
 +cdata.set('HAVE_DMABUF', false)
