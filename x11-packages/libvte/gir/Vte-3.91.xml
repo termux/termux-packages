@@ -6,11 +6,13 @@
     <property name="fd" type="gint" flags="1073742059" default-value="-1"/>
   </class>
   <boxed name="VteRegex" get-type="vte_regex_get_type"/>
+  <boxed name="VteUuid" get-type="vte_uuid_get_type"/>
   <class name="VteTerminal" get-type="vte_terminal_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
     <implements name="GtkAccessible"/>
     <implements name="GtkBuildable"/>
     <implements name="GtkConstraintTarget"/>
     <implements name="GtkScrollable"/>
+    <implements name="GtkAccessibleText"/>
     <property name="allow-bold" type="gboolean" flags="1073742051" default-value="TRUE"/>
     <property name="allow-hyperlink" type="gboolean" flags="1073742051" default-value="FALSE"/>
     <property name="audible-bell" type="gboolean" flags="1073742051" default-value="TRUE"/>
@@ -23,11 +25,13 @@
     <property name="context-menu" type="GtkPopover" flags="1073742051"/>
     <property name="cursor-blink-mode" type="VteCursorBlinkMode" flags="1073742051" default-value="VTE_CURSOR_BLINK_SYSTEM"/>
     <property name="cursor-shape" type="VteCursorShape" flags="1073742051" default-value="VTE_CURSOR_SHAPE_BLOCK"/>
-    <property name="current-directory-uri" type="gchararray" flags="1073742049" default-value="NULL"/>
-    <property name="current-file-uri" type="gchararray" flags="1073742049" default-value="NULL"/>
+    <property name="current-directory-uri" type="gchararray" flags="-1073741599" default-value="NULL"/>
+    <property name="current-file-uri" type="gchararray" flags="-1073741599" default-value="NULL"/>
     <property name="delete-binding" type="VteEraseBinding" flags="1073742051" default-value="VTE_ERASE_AUTO"/>
+    <property name="enable-a11y" type="gboolean" flags="1073742051" default-value="FALSE"/>
     <property name="enable-bidi" type="gboolean" flags="1073742051" default-value="TRUE"/>
     <property name="enable-fallback-scrolling" type="gboolean" flags="1073742051" default-value="TRUE"/>
+    <property name="enable-legacy-osc777" type="gboolean" flags="1073742051" default-value="FALSE"/>
     <property name="enable-shaping" type="gboolean" flags="1073742051" default-value="TRUE"/>
     <property name="enable-sixel" type="gboolean" flags="1073742051" default-value="FALSE"/>
     <property name="encoding" type="gchararray" flags="1073742051" default-value="NULL"/>
@@ -46,7 +50,7 @@
     <property name="scroll-on-output" type="gboolean" flags="1073742051" default-value="TRUE"/>
     <property name="scroll-unit-is-pixels" type="gboolean" flags="1073742051" default-value="FALSE"/>
     <property name="text-blink-mode" type="VteTextBlinkMode" flags="1073742051" default-value="VTE_TEXT_BLINK_ALWAYS"/>
-    <property name="window-title" type="gchararray" flags="1073742049" default-value="NULL"/>
+    <property name="window-title" type="gchararray" flags="-1073741599" default-value="NULL"/>
     <property name="word-char-exceptions" type="gchararray" flags="1073742049" default-value="NULL"/>
     <property name="xalign" type="VteAlign" flags="1073742051" default-value="VTE_ALIGN_START"/>
     <property name="yalign" type="VteAlign" flags="1073742051" default-value="VTE_ALIGN_START"/>
@@ -115,6 +119,13 @@
     </signal>
     <signal name="paste-clipboard" return="void" when="last" action="1">
     </signal>
+    <signal name="termprop-changed" return="void" when="last" detailed="1">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="termprops-changed" return="gboolean" when="last">
+      <param type="gpointer"/>
+      <param type="gint"/>
+    </signal>
     <signal name="bell" return="void" when="last">
     </signal>
     <signal name="setup-context-menu" return="void" when="last">
@@ -165,6 +176,49 @@
     <member name="VTE_ALIGN_START" nick="start" value="0"/>
     <member name="VTE_ALIGN_CENTER" nick="center" value="1"/>
     <member name="VTE_ALIGN_END" nick="end" value="2"/>
+  </enum>  <flags name="VteUuidFormat" get-type="vte_uuid_format_get_type">
+    <member name="VTE_UUID_FORMAT_SIMPLE" nick="simple" value="1"/>
+    <member name="VTE_UUID_FORMAT_BRACED" nick="braced" value="2"/>
+    <member name="VTE_UUID_FORMAT_URN" nick="urn" value="4"/>
+    <member name="VTE_UUID_FORMAT_ANY" nick="any" value="7"/>
+  </flags>
+  <flags name="VtePropertyFlags" get-type="vte_property_flags_get_type">
+    <member name="VTE_PROPERTY_FLAG_NONE" nick="none" value="0"/>
+    <member name="VTE_PROPERTY_FLAG_EPHEMERAL" nick="ephemeral" value="1"/>
+  </flags>
+  <enum name="VtePropertyType" get-type="vte_property_type_get_type">
+    <member name="VTE_PROPERTY_VALUELESS" nick="valueless" value="0"/>
+    <member name="VTE_PROPERTY_BOOL" nick="bool" value="1"/>
+    <member name="VTE_PROPERTY_INT" nick="int" value="2"/>
+    <member name="VTE_PROPERTY_UINT" nick="uint" value="3"/>
+    <member name="VTE_PROPERTY_DOUBLE" nick="double" value="4"/>
+    <member name="VTE_PROPERTY_RGB" nick="rgb" value="5"/>
+    <member name="VTE_PROPERTY_RGBA" nick="rgba" value="6"/>
+    <member name="VTE_PROPERTY_STRING" nick="string" value="7"/>
+    <member name="VTE_PROPERTY_DATA" nick="data" value="8"/>
+    <member name="VTE_PROPERTY_UUID" nick="uuid" value="9"/>
+    <member name="VTE_PROPERTY_URI" nick="uri" value="10"/>
+    <member name="VTE_PROPERTY_IMAGE" nick="image" value="11"/>
+  </enum>  <enum name="VtePropertyId" get-type="vte_property_id_get_type">
+    <member name="VTE_PROPERTY_ID_CURRENT_DIRECTORY_URI" nick="current-directory-uri" value="0"/>
+    <member name="VTE_PROPERTY_ID_CURRENT_FILE_URI" nick="current-file-uri" value="1"/>
+    <member name="VTE_PROPERTY_ID_XTERM_TITLE" nick="xterm-title" value="2"/>
+    <member name="VTE_PROPERTY_ID_CONTAINER_NAME" nick="container-name" value="3"/>
+    <member name="VTE_PROPERTY_ID_CONTAINER_RUNTIME" nick="container-runtime" value="4"/>
+    <member name="VTE_PROPERTY_ID_CONTAINER_UID" nick="container-uid" value="5"/>
+    <member name="VTE_PROPERTY_ID_SHELL_PRECMD" nick="shell-precmd" value="6"/>
+    <member name="VTE_PROPERTY_ID_SHELL_PREEXEC" nick="shell-preexec" value="7"/>
+    <member name="VTE_PROPERTY_ID_SHELL_POSTEXEC" nick="shell-postexec" value="8"/>
+    <member name="VTE_PROPERTY_ID_PROGRESS_HINT" nick="progress-hint" value="9"/>
+    <member name="VTE_PROPERTY_ID_PROGRESS_VALUE" nick="progress-value" value="10"/>
+    <member name="VTE_PROPERTY_ID_ICON_COLOR" nick="icon-color" value="11"/>
+    <member name="VTE_PROPERTY_ID_ICON_IMAGE" nick="icon-image" value="12"/>
+  </enum>  <enum name="VteProgressHint" get-type="vte_progress_hint_get_type">
+    <member name="VTE_PROGRESS_HINT_INACTIVE" nick="inactive" value="0"/>
+    <member name="VTE_PROGRESS_HINT_ACTIVE" nick="active" value="1"/>
+    <member name="VTE_PROGRESS_HINT_ERROR" nick="error" value="2"/>
+    <member name="VTE_PROGRESS_HINT_INDETERMINATE" nick="indeterminate" value="3"/>
+    <member name="VTE_PROGRESS_HINT_PAUSED" nick="paused" value="4"/>
   </enum>  <error-quark function="vte_pty_error_quark" domain="vte-pty-error"/>
   <error-quark function="vte_regex_error_quark" domain="vte-regex-error"/>
 </dump>
