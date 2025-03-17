@@ -3,10 +3,10 @@ TERMUX_PKG_DESCRIPTION="Clients provided with BIND"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="9.20.6"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL="https://downloads.isc.org/isc/bind9/${TERMUX_PKG_VERSION}/bind-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=ed7f54b44f84a7201a2fa7a949f3021ea568529bfad90fca664fd55c05104134
-TERMUX_PKG_DEPENDS="json-c, libandroid-execinfo, libandroid-glob, libcap, libnghttp2, liburcu, libuv, libxml2, openssl, readline, resolv-conf, zlib"
+TERMUX_PKG_DEPENDS="cmocka, json-c, libandroid-execinfo, libandroid-glob, libcap, libnghttp2, liburcu, libuv, libxml2, openssl, readline, resolv-conf, zlib"
 TERMUX_PKG_BREAKS="dnsutils-dev"
 TERMUX_PKG_REPLACES="dnsutils-dev"
 TERMUX_PKG_AUTO_UPDATE=true
@@ -19,6 +19,8 @@ lt_cv_prog_compiler_pic_works=yes
 --disable-static
 --with-json-c
 --with-libxml2
+--with-liburcu=qsbr
+--enable-developer
 "
 
 termux_step_pre_configure() {
