@@ -39,7 +39,7 @@ def parse_build_file_dependencies_with_vars(path, vars):
     with open(path, encoding="utf-8") as build_script:
         for line in build_script:
             if line.startswith(vars):
-                dependencies_string = line.split('DEPENDS=')[1]
+                dependencies_string = line.split('DEPS=' if 'DEPS=' in line else 'DEPENDS=')[1]
                 for char in "\"'\n":
                     dependencies_string = dependencies_string.replace(char, '')
 
@@ -111,6 +111,8 @@ class TermuxPackage(object):
             raise Exception("build.sh not found for package '" + self.name + "'")
 
         self.deps = parse_build_file_dependencies(build_sh_path)
+        if len(parse_build_file_dependencies_with_vars(build_sh_path, "TERMUX_PKG_PYTHON_TARGET_DEPS")) > 0:
+            self.deps.add(f"python-pip{'-glibc' if termux_pkg_library == 'glibc' else ''}")
         self.antideps = parse_build_file_antidependencies(build_sh_path)
         self.excluded_arches = parse_build_file_excluded_arches(build_sh_path)
         self.only_installing = parse_build_file_variable_bool(build_sh_path, 'TERMUX_PKG_ONLY_INSTALLING')
