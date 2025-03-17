@@ -1,10 +1,10 @@
 termux_step_create_python_debscripts() {
 	if [ -n "${SUB_PKG_NAME-}" ]; then
 		local _package_name="$SUB_PKG_NAME"
-		local _package_massagedir="$SUB_PKG_MASSAGE_DIR"
+		local _package_massagedir="$SUB_PKG_DIR/massage/$TERMUX_PREFIX"
 	else
 		local _package_name="$TERMUX_PKG_NAME"
-		local _package_massagedir="$TERMUX_PKG_MASSAGEDIR$TERMUX_PREFIX_CLASSICAL"
+		local _package_massagedir="$TERMUX_PKG_MASSAGEDIR$TERMUX_PREFIX"
 	fi
 
 	# if the package does not contain any .py files in
@@ -36,7 +36,7 @@ termux_step_create_python_debscripts() {
 	# as its last line, remove that line so that it does not
 	# prevent execution of the additional commands
 	if [ ! -f postinst ]; then
-		echo "#!$TERMUX_PREFIX/bin/sh" > postinst
+		echo "#!${TERMUX_PREFIX_CLASSICAL}/bin/sh" > postinst
 		chmod 0755 postinst
 	elif tail -n1 postinst | grep -q 'exit 0'; then
 		sed -i '$d' postinst
@@ -58,7 +58,7 @@ termux_step_create_python_debscripts() {
 	if [ -z "${SUB_PKG_NAME-}" ] && [ -n "${TERMUX_PKG_PYTHON_TARGET_DEPS}" ]; then
 		cat <<- POSTINST_EOF >> postinst
 		echo "Installing dependencies through pip..."
-		pip3 install --upgrade ${TERMUX_PKG_PYTHON_TARGET_DEPS//,/}
+		LD_PRELOAD='' "${TERMUX_PREFIX}/bin/pip3" install --upgrade ${TERMUX_PKG_PYTHON_TARGET_DEPS//,/}
 		POSTINST_EOF
 	fi
 
@@ -71,8 +71,8 @@ termux_step_create_python_debscripts() {
 
 	# post-inst script to generate *.pyc files
 	cat <<- POSTINST_EOF >> postinst
-	if command -v py3compile >/dev/null 2>&1; then
-		py3compile -p "$_package_name" "${TERMUX_PREFIX}/lib/python${TERMUX_PYTHON_VERSION}/"
+	if [ -f "${TERMUX_PREFIX}/bin/py3compile" ]; then
+		LD_PRELOAD='' "${TERMUX_PREFIX}/bin/py3compile" -p "$_package_name" "${TERMUX_PREFIX}/lib/python${TERMUX_PYTHON_VERSION}/"
 	fi
 	POSTINST_EOF
 
@@ -81,7 +81,7 @@ termux_step_create_python_debscripts() {
 	# as its last line, remove that line so that it does not
 	# prevent execution of the additional commands
 	if [ ! -f prerm ]; then
-		echo "#!$TERMUX_PREFIX/bin/sh" > prerm
+		echo "#!${TERMUX_PREFIX_CLASSICAL}/bin/sh" > prerm
 		chmod 0755 prerm
 	elif tail -n1 prerm | grep -q 'exit 0'; then
 		sed -i '$d' prerm
@@ -97,8 +97,8 @@ termux_step_create_python_debscripts() {
 
 	# pre-rm script to cleanup runtime-generated files.
 	cat <<- PRERM_EOF >> prerm
-	if command -v py3clean >/dev/null 2>&1; then
-		py3clean -p "$_package_name"
+	if [ -f "${TERMUX_PREFIX}/bin/py3clean" ]; then
+		LD_PRELOAD='' "${TERMUX_PREFIX}/bin/py3clean" -p "$_package_name"
 	fi
 	PRERM_EOF
 }
