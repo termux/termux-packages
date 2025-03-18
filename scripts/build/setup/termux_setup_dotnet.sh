@@ -1,5 +1,9 @@
 # shellcheck shell=bash disable=SC1091 disable=SC2086 disable=SC2155
 termux_setup_dotnet() {
+	# Microsoft distribution of dotnet enables telemetry
+	# This has no effect on Termux dotnet (telemetry is already disabled)
+	export DOTNET_CLI_TELEMETRY_OPTOUT=1
+
 	export DOTNET_TARGET_NAME="linux-bionic"
 	case "${TERMUX_ARCH}" in
 	aarch64) DOTNET_TARGET_NAME+="-arm64" ;;
