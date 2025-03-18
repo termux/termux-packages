@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION=".NET 8.0"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@truboxl"
 TERMUX_PKG_VERSION="8.0.14"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/dotnet/dotnet
 TERMUX_PKG_GIT_BRANCH="v${TERMUX_PKG_VERSION}"
 TERMUX_PKG_BUILD_DEPENDS="krb5, libicu, openssl, zlib"
@@ -144,6 +145,7 @@ termux_step_make() {
 		--use-mono-runtime \
 		--online \
 		-- \
+		-m:${TERMUX_PKG_MAKE_PROCESSES} \
 		/p:Configuration=${CONFIG} \
 		/p:OverrideTargetRid=linux-bionic-${arch}
 
