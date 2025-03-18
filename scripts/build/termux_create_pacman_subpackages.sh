@@ -128,7 +128,7 @@ termux_create_pacman_subpackages() {
 			fi
 
 			if [ -n "$TERMUX_SUBPKG_PROVIDES" ]; then
-				tr ',' '\n' <<< "$TERMUX_SUBPKG_REPLACES" | sed 's|(||g; s|)||g; s| ||g; s|>>|>|g; s|<<|<|g' | awk '{ printf "provides = " $1; if ( ($1 ~ /</ || $1 ~ />/ || $1 ~ /=/) && $1 !~ /-/ ) printf "-0"; printf "\n" }'
+				tr ',' '\n' <<< "$TERMUX_SUBPKG_PROVIDES" | sed 's|(||g; s|)||g; s| ||g; s|>>|>|g; s|<<|<|g' | awk '{ printf "provides = " $1; if ( ($1 ~ /</ || $1 ~ />/ || $1 ~ /=/) && $1 !~ /-/ ) printf "-0"; printf "\n" }'
 			fi
 
 			if [ -n "$TERMUX_SUBPKG_DEPENDS" ]; then
