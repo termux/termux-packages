@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Unofficial Thunderbird email client"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="128.8.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://archive.mozilla.org/pub/thunderbird/releases/${TERMUX_PKG_VERSION}esr/source/thunderbird-${TERMUX_PKG_VERSION}esr.source.tar.xz"
 TERMUX_PKG_SHA256=dac8bb727e7fed445d3977093d51832a9d116de078f86cc07081abd8e42b6f43
 TERMUX_PKG_DEPENDS="ffmpeg, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libandroid-spawn, libc++, libcairo, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libotr, libpixman, libsm, libvpx, libwebp, libx11, libxcb, libxcomposite, libxdamage, libxext, libxfixes, libxrandr, libxtst, pango, pulseaudio, zlib"
@@ -112,7 +113,7 @@ END
 termux_step_make() {
 	# XXX: Try max 10 times
 	for t in $(seq 1 10); do
-		if ./mach build --keep-going; then
+		if ./mach build --keep-going -j "$TERMUX_PKG_MAKE_PROCESSES"; then
 			break
 		else
 			if [ "$t" = "10" ]; then
