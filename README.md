@@ -20,12 +20,8 @@ Quick how-to about Termux package management is available at [Package Management
 
 Read [CONTRIBUTING.md](/CONTRIBUTING.md) and [Developer's Wiki](https://github.com/termux/termux-packages/wiki) for more details.
 
-## Contacts
+## Community
 
-General mailing list: https://groups.io/g/termux
+The Termux Community docs are available [here](https://github.com/termux/termux-community/blob/site/site/pages/en/index.md).
 
-Developer mailing list: https://groups.io/g/termux-dev
-
-General chat: https://gitter.im/termux/termux or #termux on IRC/libera.chat.
-
-Developer chat: https://gitter.im/termux/dev.
+**All our community members must follow the rules that are defined [here](https://github.com/termux/termux-community/blob/site/site/pages/en/rules/index.md) and any [Content Not Allowed](https://github.com/termux/termux-community/blob/site/site/pages/en/rules/index.md#8-content-not-allowed) must not be posted.**
