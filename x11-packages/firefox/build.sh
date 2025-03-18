@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Mozilla Firefox web browser"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="134.0.2"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://archive.mozilla.org/pub/firefox/releases/${TERMUX_PKG_VERSION}/source/firefox-${TERMUX_PKG_VERSION}.source.tar.xz
 TERMUX_PKG_SHA256=6c6eb7ff13fa689c5cace23a28533361d1ca29158329b6f1c2f2d1c91c53dd27
 # ffmpeg and pulseaudio are dependencies through dlopen(3):
@@ -122,7 +122,7 @@ END
 }
 
 termux_step_make() {
-	./mach build
+	./mach build -j "$TERMUX_PKG_MAKE_PROCESSES"
 	./mach buildsymbols
 }
 
