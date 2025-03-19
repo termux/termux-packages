@@ -52,6 +52,7 @@ termux_step_configure_cmake() {
 		-DCMAKE_USE_SYSTEM_LIBRARIES=True \
 		-DDOXYGEN_EXECUTABLE= \
 		-DBUILD_TESTING=OFF \
+		-DBUILD_SHARED_LIBS=ON \
 		"${CMAKE_ADDITIONAL_ARGS[@]}" \
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS \
 		|| (termux_step_configure_cmake_failure_hook && false)
