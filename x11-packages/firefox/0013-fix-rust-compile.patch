@@ -1,37 +1,37 @@
 --- a/toolkit/components/extensions/storage/moz.build
 +++ b/toolkit/components/extensions/storage/moz.build
-@@ -17,7 +17,7 @@
+@@ -11,7 +11,7 @@
  # a delegate for consumers to use instead. Android Components can then provide
  # an implementation of the delegate that's backed by the Rust component. For
  # details, please see bug 1626506, comment 4.
 -if CONFIG["MOZ_WIDGET_TOOLKIT"] != "android":
 +if False:
-     EXPORTS.mozilla.extensions.storage += [
-         "ExtensionStorageComponents.h",
+     EXTRA_JS_MODULES += [
+         "ExtensionStorageComponents.sys.mjs",
      ]
 --- a/toolkit/library/rust/shared/Cargo.toml
 +++ b/toolkit/library/rust/shared/Cargo.toml
-@@ -106,7 +106,6 @@
- 
- libz-rs-sys = { git = "https://github.com/memorysafety/zlib-rs", rev = "4aa430ccb77537d0d60dab8db993ca51bb1194c5", features = ["custom-prefix"], optional = true }
+@@ -112,7 +112,6 @@
+ [target.'cfg(any(target_os = "macos",target_os = "ios", all(target_os = "windows", not(target_arch = "aarch64"))))'.dependencies]
+ osclientcerts = { path = "../../../../security/manager/ssl/osclientcerts" }
  
 -[target.'cfg(not(target_os = "android"))'.dependencies]
- gkrust-uniffi-components = { path = "../../../components/uniffi-bindgen-gecko-js/components/" }
- gkrust-uniffi-fixtures = { path = "../../../components/uniffi-bindgen-gecko-js/fixtures/", optional = true }
+ gkrust-uniffi-components = { path = "../../../components/uniffi-bindgen-gecko-js/components/", features = ["xpcom"] }
+ gkrust-uniffi-fixtures = { path = "../../../components/uniffi-bindgen-gecko-js/fixtures/", features = ["xpcom"], optional = true }
  viaduct = "0.1"
 --- a/toolkit/library/rust/shared/lib.rs
 +++ b/toolkit/library/rust/shared/lib.rs
-@@ -54,7 +54,6 @@
+@@ -55,7 +55,6 @@
  
  extern crate audio_thread_priority;
  
 -#[cfg(not(target_os = "android"))]
- extern crate webext_storage_bridge;
+ extern crate webext_storage;
  
  #[cfg(feature = "webrtc")]
-@@ -84,13 +83,11 @@
- extern crate l10nregistry_ffi;
- extern crate localization_ffi;
+@@ -91,13 +90,11 @@
+     all(target_os = "windows", not(target_arch = "aarch64"))))]
+ extern crate osclientcerts;
  
 -#[cfg(not(target_os = "android"))]
  extern crate gkrust_uniffi_components;

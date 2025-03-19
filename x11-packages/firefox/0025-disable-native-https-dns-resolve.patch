@@ -2,7 +2,7 @@ It uses `android_res_nquery`, but this function only got added in API level 29
 
 --- a/netwerk/dns/nsHostResolver.cpp
 +++ b/netwerk/dns/nsHostResolver.cpp
-@@ -237,6 +237,8 @@
+@@ -210,6 +210,8 @@
    // native HTTPS records on Win 11 for now.
    sNativeHTTPSSupported = StaticPrefs::network_dns_native_https_query_win10() ||
                            mozilla::IsWin11OrLater();
@@ -13,15 +13,17 @@ It uses `android_res_nquery`, but this function only got added in API level 29
    sNativeHTTPSSupported = jni::GetAPIVersion() >= 29;
 --- a/netwerk/dns/moz.build
 +++ b/netwerk/dns/moz.build
-@@ -59,15 +59,7 @@
+@@ -53,17 +53,7 @@
      "nsEffectiveTLDService.cpp",  # Excluded from UNIFIED_SOURCES due to special build flags.
  ]
  
 -if CONFIG["MOZ_WIDGET_TOOLKIT"] == "windows":
 -    SOURCES += ["PlatformDNSWin.cpp"]
--elif CONFIG["OS_TARGET"] == "Linux" or CONFIG["MOZ_WIDGET_TOOLKIT"] == "cocoa":
+-elif CONFIG["OS_TARGET"] == "Linux":
 -    SOURCES += ["PlatformDNSUnix.cpp"]
 -    OS_LIBS += ["resolv"]
+-elif CONFIG["MOZ_WIDGET_TOOLKIT"] == "cocoa":
+-    SOURCES += ["PlatformDNSMac.cpp"]
 -elif CONFIG["MOZ_WIDGET_TOOLKIT"] == "android":
 -    SOURCES += ["PlatformDNSAndroid.cpp"]
 -else:
