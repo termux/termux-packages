@@ -107,7 +107,7 @@ termux_step_massage() {
 		find ./${ADDING_PREFIX}share/man -mindepth 1 -maxdepth 1 -type d ! -name man\* | xargs -r rm -rf
 
 		# Compress man pages with gzip:
-		find ./${ADDING_PREFIX}share/man -type f ! -iname \*.gz -print0 | xargs -r -0 gzip -9 -n
+		find ./${ADDING_PREFIX}share/man -type f ! -iname \*.gz -print0 | xargs -r -0 gzip -9 -n || $TERMUX_CONTINUE_BUILD
 
 		# Update man page symlinks, e.g. unzstd.1 -> zstd.1:
 		while IFS= read -r -d '' file; do
@@ -179,7 +179,7 @@ termux_step_massage() {
 	# Check so that package is not affected by
 	# https://github.com/android/ndk/issues/1614, or
 	# https://github.com/termux/termux-packages/issues/9944
-	if [[ "${TERMUX_PACKAGE_LIBRARY}" == "bionic" ]]; then
+	if [[ "${TERMUX_PACKAGE_LIBRARY}" == "bionic" ]] && ! $TERMUX_ON_DEVICE_BUILD; then
 		echo "INFO: READELF=${READELF} ... $(command -v ${READELF})"
 		export pattern_file_undef=$(mktemp)
 		echo "INFO: Generating undefined symbols regex to ${pattern_file_undef}"

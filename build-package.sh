@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env bash
 # shellcheck disable=SC1117
 
 # Setting the TMPDIR variable
@@ -370,6 +370,10 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_create_pacman_package.sh"
 # shellcheck source=scripts/build/termux_step_finish_build.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_finish_build.sh"
 
+termux_step_post_finish_build() {
+	return
+}
+
 ################################################################################
 
 # shellcheck source=scripts/properties.sh
@@ -663,9 +667,11 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 			termux_step_get_dependencies_python
 			termux_step_patch_package
 			termux_step_replace_guess_scripts
+		fi
+
+			$TERMUX_CONTINUE_BUILD && echo try to not reset the build just set the version variables without touching any build files
 			cd "$TERMUX_PKG_SRCDIR"
 			termux_step_pre_configure
-		fi
 
 		# Even on continued build we might need to setup paths
 		# to tools so need to run part of configure step
@@ -708,6 +714,7 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 		termux_add_package_to_built_packages_list "$TERMUX_PKG_NAME"
 		termux_step_finish_build
 	) 5< "$TERMUX_BUILD_LOCK_FILE"
+		termux_step_post_finish_build
 done
 
 # Removing a file to store a list of compiled packages

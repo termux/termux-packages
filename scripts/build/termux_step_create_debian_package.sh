@@ -3,6 +3,7 @@ termux_step_create_debian_package() {
 		# Metapackage doesn't have data inside.
 		rm -rf data
 	fi
+	$TERMUX_CONTINUE_BUILD && rm -rf DEBIAN
 	tar --sort=name \
 		--mtime="@${SOURCE_DATE_EPOCH}" \
 		--owner=0 --group=0 --numeric-owner \

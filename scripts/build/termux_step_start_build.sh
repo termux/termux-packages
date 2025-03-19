@@ -88,7 +88,7 @@ termux_step_start_build() {
 		termux_error_exit "Package '$TERMUX_PKG_NAME' is not available for on-device builds."
 	fi
 
-	if [ "$TERMUX_PACKAGE_LIBRARY" = "bionic" ]; then
+	if [ "$TERMUX_PACKAGE_LIBRARY" = "bionic" ] && ! $TERMUX_PKG_NO_ELF_CLEANER; then
 		if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
 			case "$TERMUX_APP_PACKAGE_MANAGER" in
 				"apt") apt install -y termux-elf-cleaner;;
