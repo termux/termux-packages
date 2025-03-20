@@ -39,6 +39,10 @@ jobs:
         fetch-depth: 1000
     - name: Set process id limit for 32-bit builds depending on aosp-libs
       run: echo 65535 | sudo tee /proc/sys/kernel/pid_max
+    - name: Test
+      run: |
+        cat "$GITHUB_EVENT_PATH"
+        exit 1
     - name: Gather build summary
       id: build-info
       env:
