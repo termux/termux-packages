@@ -46,8 +46,18 @@ jobs:
       run: |
         if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
           BASE_COMMIT=$(jq --raw-output .pull_request.base.sha "$GITHUB_EVENT_PATH")
-          OLD_COMMIT=$(jq --raw-output .commits[0].id "$GITHUB_EVENT_PATH")
-          HEAD_COMMIT=$(jq --raw-output .commits[-1].id "$GITHUB_EVENT_PATH")
+          # We are intentionally not using .commits[0].id and .commits[-1].id as github seems to
+          # only send 20 commits in the payload for github action runs instead of the 2048 documented
+          # limit. Perhaps 2048 is the limit just for webhooks, where they haven't documented
+          # properly that the limit for github actions is only 20:
+          #
+          # https://docs.github.com/en/webhooks/webhook-events-and-payloads#push
+          OLD_COMMIT=$(jq --raw-output .before "$GITHUB_EVENT_PATH")
+          HEAD_COMMIT=$(jq --raw-output .after "$GITHUB_EVENT_PATH")
+          if ! git log "$OLD_COMMIT" 2> /dev/null; then
+            echo "Force push detected on main branch. Unable to proceed."
+            exit 1
+          fi
           if [ "$BASE_COMMIT" = "null" ]; then
             if [ "$OLD_COMMIT" = "$HEAD_COMMIT" ]; then
               # Single-commit push.
@@ -55,7 +65,6 @@ jobs:
               CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${HEAD_COMMIT}")
             else
               # Multi-commit push.
-              OLD_COMMIT="${OLD_COMMIT}~1"
               echo "Processing commit range: ${OLD_COMMIT}..${HEAD_COMMIT}"
               CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${OLD_COMMIT}" "${HEAD_COMMIT}")
             fi
