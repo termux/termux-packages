@@ -55,7 +55,7 @@ jobs:
           OLD_COMMIT=$(jq --raw-output .before "$GITHUB_EVENT_PATH")
           HEAD_COMMIT=$(jq --raw-output .after "$GITHUB_EVENT_PATH")
           if [ "$BASE_COMMIT" = "null" ]; then
-            if ! git log "$OLD_COMMIT" 2> /dev/null
+            if ! git log "$OLD_COMMIT" 2> /dev/null; then
               if [ "$(git branch --show-current)" = "master" ]; then
                 echo "Force push detected on master branch. Unable to proceed."
                 exit 1
@@ -65,15 +65,8 @@ jobs:
                 echo "::warning:: OLD_COMMIT is set to $OLD_COMMIT which may not be correct if you have pushed more than 20 commits."
               fi
             fi
-            if [ "$OLD_COMMIT" = "$HEAD_COMMIT" ]; then
-              # Single-commit push.
-              echo "Processing commit: ${HEAD_COMMIT}"
-              CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${HEAD_COMMIT}")
-            else
-              # Multi-commit push.
-              echo "Processing commit range: ${OLD_COMMIT}..${HEAD_COMMIT}"
-              CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${OLD_COMMIT}" "${HEAD_COMMIT}")
-            fi
+            echo "Processing commit range: ${OLD_COMMIT}..${HEAD_COMMIT}"
+            CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${OLD_COMMIT}" "${HEAD_COMMIT}")
           else
             # Pull requests.
             echo "Processing pull request #$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH"): ${BASE_COMMIT}..HEAD"
