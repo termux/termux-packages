@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # Never forget to always bump revision of reverse dependencies and rebuild them
 # when bumping version.
 TERMUX_PKG_VERSION="1:1.87.0"
+TERMUX_PKG_REVISION=1
 _VERSION="${TERMUX_PKG_VERSION:2}"
 TERMUX_PKG_SRCURL="https://archives.boost.io/release/${_VERSION}/source/boost_${_VERSION//./_}.tar.bz2"
 TERMUX_PKG_SHA256=af57be25cb4c4f4b413ed692fe378affb4352ea50fbe294a11ef548f4d527d89
