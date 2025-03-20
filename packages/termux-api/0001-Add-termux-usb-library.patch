@@ -1,0 +1,558 @@
+From 69db489ee69908afd7d52fe0f48b2f518cd43148 Mon Sep 17 00:00:00 2001
+From: Henrik Grimler <grimler@termux.dev>
+Date: Sun, 16 Mar 2025 09:53:35 +0100
+Subject: [PATCH] Add termux-usb library
+
+It contains the following functions:
+
+* termux_usb_get_device_list
+* termux_usb_free_device_list
+* termux_usb_open
+* termux_usb_get_config_descriptor
+* termux_usb_free_config_descriptor
+
+These functions are replacements for the corresponding libusb_*
+functions, kind of. The termux variants uses structs like struct
+termux_usb_device and struct termux_usb_config_descriptor that are
+similar, but not identical, to libusb_device and
+libusb_config_descriptor. They work by calling termux-api and get back
+information about devices and configs as a protobuf stream.
+
+The free functions also frees all array elements, whereas the libusb
+variants only frees elements that have a reference count of 1 or
+less. For the termux variants where do not keep track of the reference
+count, so information that should be kept around should be memcpy'ed
+or similar before termux_usb_free_* is called.
+
+termux_usb_open requires user interaction. It calls termux-api which
+opens the device through the android API, which shows a prompt to the
+user to accept or deny opening the device.
+---
+ CMakeLists.txt         |   2 +
+ usb/CMakeLists.txt     |  33 ++++++
+ usb/proto/UsbAPI.proto |  57 +++++++++
+ usb/termux-usb.c       | 259 +++++++++++++++++++++++++++++++++++++++++
+ usb/termux-usb.h       | 128 ++++++++++++++++++++
+ 5 files changed, 479 insertions(+)
+ create mode 100644 usb/CMakeLists.txt
+ create mode 100644 usb/proto/UsbAPI.proto
+ create mode 100644 usb/termux-usb.c
+ create mode 100644 usb/termux-usb.h
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index c8b1f9e5995d..00f18a567e64 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -11,6 +11,8 @@ set_target_properties(termux-api-static PROPERTIES OUTPUT_NAME termux-api)
+ add_executable(termux-api-broadcast termux-api-broadcast.c)
+ target_link_libraries(termux-api-broadcast termux-api-static)
+ 
++add_subdirectory(usb)
++
+ # TODO: get list through regex or similar
+ set(script_files
+   scripts/termux-api-start
+diff --git a/usb/CMakeLists.txt b/usb/CMakeLists.txt
+new file mode 100644
+index 000000000000..d9d61419e7ea
+--- /dev/null
++++ b/usb/CMakeLists.txt
+@@ -0,0 +1,33 @@
++cmake_minimum_required(VERSION 3.10.0)
++project(termux-usb)
++
++find_package(PkgConfig REQUIRED)
++pkg_check_modules(libusb REQUIRED libusb-1.0)
++# For test building on Linux below needs to be changed to
++# find_package(Protobuf REQUIRED CONFIG) for some reason..
++find_package(Protobuf REQUIRED)
++protobuf_generate(
++    LANGUAGE C
++    GENERATE_EXTENSIONS .pb-c.c
++    OUT_VAR PROTO_SRCS
++    PROTOS proto/UsbAPI.proto
++)
++add_library(termux-usb SHARED termux-usb.c termux-usb.h ${PROTO_SRCS} ${PROTO_HDRS})
++
++target_include_directories(
++  termux-usb
++  PUBLIC ${Protobuf_INCLUDE_DIRS} ${libusb_INCLUDE_DIRS}
++  PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/proto ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}
++)
++target_link_libraries(termux-usb PUBLIC ${Protobuf_LIBRARIES} ${CMAKE_BINARY_DIR}/libtermux-api.so -lprotobuf-c ${libusb_LIBRARIES})
++
++install(
++  FILES
++    ${CMAKE_CURRENT_BINARY_DIR}/libtermux-usb.so
++  TYPE LIB
++)
++
++install(
++  FILES ${CMAKE_CURRENT_SOURCE_DIR}/termux-usb.h
++  TYPE INCLUDE
++)
+diff --git a/usb/proto/UsbAPI.proto b/usb/proto/UsbAPI.proto
+new file mode 100644
+index 000000000000..5a1d89c5cb6a
+--- /dev/null
++++ b/usb/proto/UsbAPI.proto
+@@ -0,0 +1,57 @@
++syntax = "proto3";
++
++package usbapi;
++
++option java_package = "com.termux.api";
++option java_outer_classname = "UsbAPIProto";
++
++/* Modelled after libusb's struct libusb_endpoint_descriptor */
++message termuxUsbEndpointDescriptor {
++  int32 endpointAddress = 1;
++  int32 attributes      = 2;
++  int32 maxPacketSize   = 3;
++  int32 interval        = 4;
++}
++
++/* Modelled after libusb's struct libusb_interface_descriptor */
++message termuxUsbInterfaceDescriptor {
++  int32  alternateSetting                       = 1;
++  int32  interfaceClass                         = 2;
++  int32  interfaceSubclass                      = 3;
++  int32  interfaceProtocol                      = 4;
++  string interface                              = 5;
++  repeated termuxUsbEndpointDescriptor endpoint = 6;
++}
++
++/* Modelled after libusb's struct libusb_config_descriptor */
++message termuxUsbConfigDescriptor {
++  int32  configurationValue                       = 1;
++  int32  maxPower                                 = 2;
++  string configuration                            = 3;
++  repeated termuxUsbInterfaceDescriptor interface = 4;
++}
++
++/* Modelled after libusb's struct libusb_device_descriptor */
++message termuxUsbDeviceDescriptor {
++  int32  configurationCount = 1;
++  int32  deviceClass        = 2;
++  int32  deviceProtocol     = 3;
++  int32  deviceSubclass     = 4;
++  int32  productId          = 5;
++  int32  vendorId           = 6;
++  string manufacturerName   = 7;
++  string productName        = 8;
++  string serialNumber       = 9;
++}
++
++/* Loosely modelled after libusb's internal struct libusb_device */
++message termuxUsbDevice {
++  int32  busNumber                           = 1;
++  int32  portNumber                          = 2;
++  string deviceAddress                       = 3;
++  termuxUsbDeviceDescriptor device           = 4;
++}
++
++message termuxUsb {
++  repeated termuxUsbDevice device = 1;
++}
+diff --git a/usb/termux-usb.c b/usb/termux-usb.c
+new file mode 100644
+index 000000000000..4c55e2ae5032
+--- /dev/null
++++ b/usb/termux-usb.c
+@@ -0,0 +1,259 @@
++#include <libusb.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++
++#include "termux-api.h"
++#include "termux-usb.h"
++#include "UsbAPI.pb-c.h"
++
++#define BUF_SIZE 1024
++#define TERMUX_PREFIX "/data/data/com.termux/files/usr"
++
++static size_t read_buffer (unsigned int buf_size, uint8_t *out, FILE *fp)
++{
++	size_t cur_len = 0;
++	size_t nread;
++	while ((nread = fread(out + cur_len, 1, buf_size - cur_len, fp)) != 0)
++	{
++		cur_len += nread;
++		if (cur_len >= buf_size)
++		{
++			fprintf(stderr, "max message length exceeded\n");
++			exit(EXIT_FAILURE);
++		}
++	}
++	return cur_len;
++}
++
++ssize_t termux_usb_get_device_list(struct termux_usb_device ***list)
++{
++	Usbapi__TermuxUsb *container;
++	struct termux_usb_device **ret;
++	uint8_t buf[BUF_SIZE];
++	FILE *fp;
++	unsigned int num_devices;
++
++	fp = popen(TERMUX_PREFIX "/libexec/termux-api Usb -a getDevices", "r");
++	if (fp == NULL) {
++		perror("popen");
++		exit(EXIT_FAILURE);
++	}
++
++	size_t msg_len = read_buffer(BUF_SIZE, buf, fp);
++	if (pclose(fp)) {
++		fprintf(stderr, "Error closing protobuf stream\n");
++		return -1;
++	}
++
++	container = usbapi__termux_usb__unpack(NULL, msg_len, buf);
++	if (container == NULL)
++	{
++		fprintf(stderr, "Error unpacking incoming message\n");
++		return -1;
++	}
++
++	ret = (struct termux_usb_device **) calloc(container->n_device + 1, sizeof(struct termux_usb_device *));
++	if (!ret) {
++		fprintf(stderr, "Failed to allocate memory\n");
++		usbapi__termux_usb__free_unpacked(container, NULL);
++		return -1;
++	}
++
++	ret[container->n_device] = NULL;
++	for (size_t i = 0; i < container->n_device; i++) {
++		Usbapi__TermuxUsbDevice *msg = container->device[i];
++		Usbapi__TermuxUsbDeviceDescriptor *desc = msg->device;
++		struct termux_usb_device *dev = (struct termux_usb_device *) malloc(sizeof(struct termux_usb_device));
++		struct termux_usb_device_descriptor *dev_desc = (struct termux_usb_device_descriptor *) malloc(sizeof(struct termux_usb_device_descriptor));
++
++		dev->bus_number = msg->busnumber;
++		dev->port_number = msg->portnumber;
++
++		dev->device_address = (char *) malloc(strlen(msg->deviceaddress)+1);
++		strcpy(dev->device_address, msg->deviceaddress);
++
++		dev_desc->bDeviceClass = desc->deviceclass;
++		dev_desc->bDeviceSubClass = desc->devicesubclass;
++		dev_desc->bDeviceProtocol = desc->deviceprotocol;
++		dev_desc->idVendor = desc->vendorid;
++		dev_desc->idProduct = desc->productid;
++
++		dev_desc->manufacturer = (char *) malloc(strlen(desc->manufacturername)+1);
++		strcpy(dev_desc->manufacturer, desc->manufacturername);
++
++		dev_desc->product = (char *) malloc(strlen(desc->productname)+1);
++		strcpy(dev_desc->product, desc->productname);
++
++		dev_desc->serialNumber = (char *) malloc(strlen(desc->serialnumber)+1);
++		strcpy(dev_desc->serialNumber, desc->serialnumber);
++
++		dev_desc->bNumConfigurations = desc->configurationcount;
++
++		dev->device_descriptor = dev_desc;
++		ret[i] = dev;
++	}
++	*list = ret;
++
++	num_devices = container->n_device;
++	usbapi__termux_usb__free_unpacked(container, NULL);
++	return num_devices;
++}
++
++void termux_usb_free_device_list(struct termux_usb_device **list)
++{
++	int i = 0;
++	struct termux_usb_device *dev;
++	while ((dev = list[i++]) != NULL) {
++		free(dev->device_descriptor->manufacturer);
++		free(dev->device_descriptor->product);
++		free(dev->device_descriptor->serialNumber);
++		free(dev->device_descriptor);
++		free(dev->device_address);
++		free(dev);
++	}
++	free(list);
++}
++
++intptr_t termux_usb_open_address(char *address)
++{
++	int argc = 10;
++	char *argv[argc];
++	argv[0] = "termux-usb";
++	argv[1] = "Usb";
++	argv[2] = "-a";
++	argv[3] = "open";
++	argv[4] = "--ez";
++	argv[5] = "request";
++	argv[6] = "true";
++	argv[7] = "--es";
++	argv[8] = "device";
++	argv[9] = address;
++
++	int fd = run_api_command(argc, argv);
++
++	return (intptr_t) fd;
++}
++
++intptr_t termux_usb_open(struct termux_usb_device *dev)
++{
++	return termux_usb_open_address(dev->device_address);
++}
++
++int termux_usb_get_config_descriptor(struct termux_usb_device *dev, int config_index,
++				     struct termux_usb_config_descriptor **conf_desc)
++{
++	Usbapi__TermuxUsbConfigDescriptor *confDesc;
++	uint8_t buf[BUF_SIZE];
++	FILE *fp;
++
++	char cmd[256];
++	char *base_cmd = TERMUX_PREFIX "/libexec/termux-api Usb -a getConfigDescriptor --es device %s --ei config %d";
++	snprintf(cmd, sizeof(cmd)-1, base_cmd, dev->device_address, config_index);
++	fp = popen(cmd, "r");
++	if (fp == NULL) {
++		perror("popen");
++		return 1;
++	}
++
++	size_t msg_len = read_buffer(BUF_SIZE, buf, fp);
++	if (pclose(fp)) {
++		fprintf(stderr, "Error closing protobuf stream\n");
++		return -1;
++	}
++
++	confDesc = usbapi__termux_usb_config_descriptor__unpack(NULL, msg_len, buf);
++	if (confDesc == NULL) {
++		fprintf(stderr, "Error unpacking incoming config descriptor message\n");
++		return -1;
++	}
++
++	struct termux_usb_config_descriptor *conf;
++        conf = (struct termux_usb_config_descriptor *) malloc(sizeof(struct termux_usb_config_descriptor));
++	if (conf == NULL) {
++		fprintf(stderr, "Memory allocation failed\n");
++		usbapi__termux_usb_config_descriptor__free_unpacked(confDesc, NULL);
++		return -1;
++	}
++
++	conf->bConfigurationValue = confDesc->configurationvalue;
++	conf->configuration = (char *) malloc(strlen(confDesc->configuration)+1);
++	if (conf->configuration == NULL) {
++		fprintf(stderr, "Memory allocation failed\n");
++		free(conf);
++		usbapi__termux_usb_config_descriptor__free_unpacked(confDesc, NULL);
++		return -1;
++	}
++	strcpy(conf->configuration, confDesc->configuration);
++	conf->MaxPower = confDesc->maxpower;
++	conf->bNumInterfaces = confDesc->n_interface;
++
++	conf->interface = (struct termux_usb_interface_descriptor *) calloc(confDesc->n_interface, sizeof(struct termux_usb_interface_descriptor));
++	if (conf->interface == NULL) {
++		fprintf(stderr, "Memory allocation failed\n");
++		free(conf->configuration);
++		free(conf);
++		usbapi__termux_usb_config_descriptor__free_unpacked(confDesc, NULL);
++		return -1;
++	}
++
++	for (size_t i = 0; i < confDesc->n_interface; i++) {
++		Usbapi__TermuxUsbInterfaceDescriptor *intfDesc = confDesc->interface[i];
++
++		conf->interface[i].bAlternateSetting = intfDesc->alternatesetting;
++		conf->interface[i].bNumEndpoints = intfDesc->n_endpoint;
++		conf->interface[i].bInterfaceClass = intfDesc->interfaceclass;
++		conf->interface[i].bInterfaceSubClass = intfDesc->interfacesubclass;
++		conf->interface[i].bInterfaceProtocol = intfDesc->interfaceprotocol;
++		conf->interface[i].interface = (char *) malloc(strlen(intfDesc->interface)+1);
++		if (conf->interface[i].interface == NULL) {
++			fprintf(stderr, "Memory allocation failed\n");
++			for (size_t j = 0; j < i; i++) {
++				free(conf->interface[i].endpoint);
++				free(conf->interface[i].interface);
++			}
++			free(conf->interface);
++			free(conf->configuration);
++			free(conf);
++			usbapi__termux_usb_config_descriptor__free_unpacked(confDesc, NULL);
++			return -1;
++		}
++		strcpy(conf->interface[i].interface, intfDesc->interface);
++
++		conf->interface[i].endpoint = (struct termux_usb_endpoint_descriptor *) calloc(intfDesc->n_endpoint, sizeof(struct termux_usb_endpoint_descriptor));
++		if (conf->interface[i].endpoint == NULL) {
++			fprintf(stderr, "Memory allocation failed\n");
++			for (size_t j = 0; j < i; i++) {
++				free(conf->interface[i].endpoint);
++				free(conf->interface[i].interface);
++			}
++			free(conf->interface);
++			free(conf->configuration);
++			free(conf);
++			usbapi__termux_usb_config_descriptor__free_unpacked(confDesc, NULL);
++		}
++
++		for (size_t j = 0; j < intfDesc->n_endpoint; j++) {
++			Usbapi__TermuxUsbEndpointDescriptor *endpointDesc = intfDesc->endpoint[j];
++			conf->interface[i].endpoint[j].bEndpointAddress = endpointDesc->endpointaddress;
++			conf->interface[i].endpoint[j].bmAttributes = endpointDesc->attributes;
++			conf->interface[i].endpoint[j].wMaxPacketSize = endpointDesc->maxpacketsize;
++			conf->interface[i].endpoint[j].bInterval = endpointDesc->interval;
++		}
++	}
++	*conf_desc = conf;
++
++	usbapi__termux_usb_config_descriptor__free_unpacked(confDesc, NULL);
++	return 0;
++}
++
++void termux_usb_free_config_descriptor(struct termux_usb_config_descriptor *conf_desc)
++{
++	for (int i = 0; i < conf_desc->bNumInterfaces; i++) {
++		free(conf_desc->interface[i].endpoint);
++		free(conf_desc->interface[i].interface);
++	}
++	free(conf_desc->interface);
++	free(conf_desc->configuration);
++	free(conf_desc);
++}
+diff --git a/usb/termux-usb.h b/usb/termux-usb.h
+new file mode 100644
+index 000000000000..a59821dd4bcf
+--- /dev/null
++++ b/usb/termux-usb.h
+@@ -0,0 +1,128 @@
++#include <libusb.h>
++
++#if defined(__cplusplus)
++extern "C" {
++#endif
++
++struct termux_usb_device_descriptor {
++	/** USB-IF class code for the device. See \ref libusb_class_code. */
++	uint8_t  bDeviceClass;
++
++	/** USB-IF subclass code for the device, qualified by the bDeviceClass
++	 * value */
++	uint8_t  bDeviceSubClass;
++
++	/** USB-IF protocol code for the device, qualified by the bDeviceClass and
++	 * bDeviceSubClass values */
++	uint8_t  bDeviceProtocol;
++
++	/** USB-IF vendor ID */
++	uint16_t idVendor;
++
++	/** USB-IF product ID */
++	uint16_t idProduct;
++
++	/** String describing manufacturer */
++	char     *manufacturer;
++
++	/** String describing product */
++	char     *product;
++
++	/** String containing device serial number */
++        char     *serialNumber;
++
++	/** Number of possible configurations */
++	uint8_t  bNumConfigurations;
++};
++
++
++struct termux_usb_device {
++	uint8_t bus_number;
++	uint8_t port_number;
++	char *device_address;
++
++	struct termux_usb_device_descriptor *device_descriptor;
++};
++
++struct termux_usb_endpoint_descriptor {
++	/** The address of the endpoint described by this descriptor. Bits 0:3 are
++	 * the endpoint number. Bits 4:6 are reserved. Bit 7 indicates direction,
++	 * see \ref libusb_endpoint_direction. */
++	uint8_t  bEndpointAddress;
++
++	/** Attributes which apply to the endpoint when it is configured using
++	 * the bConfigurationValue. Bits 0:1 determine the transfer type and
++	 * correspond to \ref libusb_endpoint_transfer_type. Bits 2:3 are only used
++	 * for isochronous endpoints and correspond to \ref libusb_iso_sync_type.
++	 * Bits 4:5 are also only used for isochronous endpoints and correspond to
++	 * \ref libusb_iso_usage_type. Bits 6:7 are reserved. */
++	uint8_t  bmAttributes;
++
++	/** Maximum packet size this endpoint is capable of sending/receiving. */
++	uint16_t wMaxPacketSize;
++
++	/** Interval for polling endpoint for data transfers. */
++	uint8_t  bInterval;
++};
++
++struct termux_usb_interface_descriptor {
++	/** Number of this interface */
++	uint8_t  bInterfaceNumber;
++
++	/** Value used to select this alternate setting for this interface */
++	uint8_t  bAlternateSetting;
++
++	/** Number of endpoints used by this interface (excluding the control
++	 * endpoint). */
++	uint8_t  bNumEndpoints;
++
++	/** USB-IF class code for this interface. See \ref libusb_class_code. */
++	uint8_t  bInterfaceClass;
++
++	/** USB-IF subclass code for this interface, qualified by the
++	 * bInterfaceClass value */
++	uint8_t  bInterfaceSubClass;
++
++	/** USB-IF protocol code for this interface, qualified by the
++	 * bInterfaceClass and bInterfaceSubClass values */
++	uint8_t  bInterfaceProtocol;
++
++	/** String describing this interface */
++	char     *interface;
++
++	/** Array of endpoint descriptors. This length of this array is determined
++	 * by the bNumEndpoints field. */
++        struct termux_usb_endpoint_descriptor *endpoint;
++};
++
++struct termux_usb_config_descriptor {
++	/** Number of interfaces supported by this configuration */
++	uint8_t  bNumInterfaces;
++
++	/** Identifier value for this configuration */
++	uint8_t  bConfigurationValue;
++
++	/** String describing this configuration */
++	char     *configuration;
++
++	/** Maximum power consumption of the USB device from this bus in this
++	 * configuration when the device is fully operation. Expressed in units
++	 * of 2 mA when the device is operating in high-speed mode and in units
++	 * of 8 mA when the device is operating in super-speed mode. */
++	uint8_t  MaxPower;
++
++	/** Array of interfaces supported by this configuration. The length of
++	 * this array is determined by the bNumInterfaces field. */
++	struct termux_usb_interface_descriptor *interface;
++};
++
++ssize_t termux_usb_get_device_list(struct termux_usb_device ***);
++void termux_usb_free_device_list(struct termux_usb_device **);
++intptr_t termux_usb_open_address(char *);
++intptr_t termux_usb_open(struct termux_usb_device *);
++int termux_usb_get_config_descriptor(struct termux_usb_device *, int,
++				     struct termux_usb_config_descriptor **);
++void termux_usb_free_config_descriptor(struct termux_usb_config_descriptor *);
++#if defined(__cplusplus)
++}
++#endif
+-- 
+2.49.0
+
