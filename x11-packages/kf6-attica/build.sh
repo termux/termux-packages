@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION='Qt library that implements the Open Collaboration Servic
 TERMUX_PKG_LICENSE="LGPL-2.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.12.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/attica-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=52757ffb1ea01e3beb742532f67d1ccbde9a562e3affd621443bf13d937ceb82
 TERMUX_PKG_DEPENDS="libc++, qt6-qtbase"
