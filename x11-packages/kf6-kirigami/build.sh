@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION='A QtQuick based components set'
 TERMUX_PKG_LICENSE="LGPL-2.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.12.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/kirigami-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=d177eae18aad36e6f41d307104e45a8fcc68db147dbb333f6ddb178a28464e7c
 TERMUX_PKG_DEPENDS="libc++, qt6-qtbase, qt6-qtdeclarative"
