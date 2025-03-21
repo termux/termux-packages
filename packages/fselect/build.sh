@@ -31,6 +31,12 @@ termux_step_pre_configure() {
 	for d in $CARGO_HOME/registry/src/*/libmimalloc-sys-*; do
 		patch --silent -p1 -d ${d} < "${TERMUX_PKG_BUILDER_DIR}/${p}"
 	done
+
+	# ld.lld: error: undefined symbol: __atomic_load_8
+	if [[ "${TERMUX_ARCH}" == "i686" ]]; then
+		local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
+		export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C link-arg=$(${CC} -print-libgcc-file-name)"
+	fi
 }
 
 termux_step_post_make_install() {
