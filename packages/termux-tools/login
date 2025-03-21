@@ -18,8 +18,17 @@ else
 	done
 fi
 
-if [ -f @TERMUX_PREFIX@/lib/libtermux-exec.so ]; then
-	export LD_PRELOAD=@TERMUX_PREFIX@/lib/libtermux-exec.so
+# Export `libtermux-exec-ld-preload.so` for `termux-exec`
+# package version `>= 2.0.0`.
+# Some devices may not support setting `$LD_PRELOAD`.
+# - https://github.com/termux/termux-packages/issues/2066
+# - https://github.com/termux/termux-packages/commit/1ec6c042
+# - https://github.com/termux/termux-packages/commit/6fb2bb2f
+if [ -f "@TERMUX_PREFIX@/lib/libtermux-exec-ld-preload.so" ]; then
+	export LD_PRELOAD="@TERMUX_PREFIX@/lib/libtermux-exec-ld-preload.so"
+	$SHELL -c "busybox true" > /dev/null 2>&1 || unset LD_PRELOAD
+elif [ -f "@TERMUX_PREFIX@/lib/libtermux-exec.so" ]; then
+	export LD_PRELOAD="@TERMUX_PREFIX@/lib/libtermux-exec.so"
 	$SHELL -c "busybox true" > /dev/null 2>&1 || unset LD_PRELOAD
 fi
 
