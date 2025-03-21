@@ -136,6 +136,7 @@ termux_step_setup_variables() {
 	TERMUX_PKG_BUILD_DEPENDS=""
 	TERMUX_PKG_BUILD_IN_SRC=false
 	TERMUX_PKG_CONFFILES=""
+	TERMUX_PKG_CONFIGURE_MARKER=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/.configured
 	TERMUX_PKG_CONFLICTS="" # https://www.debian.org/doc/debian-policy/ch-relationships.html#s-conflicts
 	TERMUX_PKG_DEPENDS=""
 	TERMUX_PKG_DESCRIPTION="FIXME:Add description"

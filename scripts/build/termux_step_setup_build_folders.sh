@@ -1,4 +1,5 @@
 termux_step_setup_build_folders() {
+	[ -f "$TERMUX_PKG_CONFIGURE_MARKER" ] && ! $TERMUX_FORCE_BUILD && echo previous build detected use -f start over && return
 	# Following directories may contain files with read-only
 	# permissions which makes them undeletable. We need to fix
 	# that.
