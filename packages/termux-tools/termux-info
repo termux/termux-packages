@@ -1,9 +1,24 @@
 #!/bin/bash
 
-if [ "$#" != "0" ]; then
-	echo 'usage: termux-info'
+NO_SET_CLIPBOARD=0
+
+show_usage () {
+	echo 'usage: termux-info [--no-set-clipboard]'
 	echo 'Provides information about Termux, and the current system. Helpful for debugging.'
-	exit
+	exit 0
+
+}
+
+while [ $# -ge 1 ]; do
+	case "$1" in
+		--no-set-clipboard) NO_SET_CLIPBOARD="1"; shift;;
+		-h | --help) show_usage;;
+		*) break;;
+	esac
+done
+
+if [ "$#" != "0" ]; then
+	show_usage
 fi
 
 updates() {
@@ -48,7 +63,23 @@ repo_subscriptions() {
 	done < <(find "@TERMUX_PREFIX@/etc/apt/sources.list.d" -maxdepth 1 ! -type d)
 }
 
-output="Packages CPU architecture:
+case "${TERMUX__USER_ID:-}" in ''|*[!0-9]*|0[0-9]*) TERMUX__USER_ID=0;; esac
+export TERMUX__USER_ID
+
+output=""
+
+if [ -n "${TERMUX_VERSION:-}" ]; then
+# Application version is exported in Termux v0.107 or higher only.
+output+="Termux Variables:
+$(compgen -e TERMUX_ | while read v; do echo "${v}=${!v}"; done)
+"
+else
+output+="Termux Variables:
+unsupported
+"
+fi
+
+output+="Packages CPU architecture:
 $(dpkg --print-architecture)
 Subscribed repositories:
 $(repo_subscriptions)
@@ -61,10 +92,23 @@ $(uname -a)
 Device manufacturer:
 $(getprop ro.product.manufacturer)
 Device model:
-$(getprop ro.product.model)"
+$(getprop ro.product.model)
+Supported ABIs:
+SUPPORTED_ABIS: $(getprop ro.product.cpu.abilist)
+SUPPORTED_32_BIT_ABIS: $(getprop ro.product.cpu.abilist32)
+SUPPORTED_64_BIT_ABIS: $(getprop ro.product.cpu.abilist64)
+LD Variables:
+LD_LIBRARY_PATH=$LD_LIBRARY_PATH
+LD_PRELOAD=$LD_PRELOAD"
+# Escape '\$[](){}|^.?+*' with backslashes for regex
+escaped_package_name="$(echo -n "@TERMUX_APP_PACKAGE@" | sed -zE -e 's/[][\.|$(){}?+*^]/\\&/g')"
+TERMUX_PLUGINS="$(pm list packages --user "$TERMUX__USER_ID" 2>&1 </dev/null | grep -E "^package:$escaped_package_name\.[a-zA-Z]" | cut -d ":" -f 2- | grep -vE "^$escaped_package_name\.tapm\.[a-zA-Z]")"
+if [ -n "${TERMUX_PLUGINS:-}" ]; then
+	        output+="$(printf "\nInstalled termux plugins:\n${TERMUX_PLUGINS}\n")"
+fi
 echo "$output"
 
-if [ -n "$(command -v termux-clipboard-set)" ]; then
+if [ "$NO_SET_CLIPBOARD" != "1" ] && [ -n "$(command -v termux-clipboard-set)" ]; then
 	# Copy to clipboard (requires termux-api)
 	# use timeout in case termux-api is installed but the termux:api app is missing
 	echo "$output" | timeout 3 termux-clipboard-set 2>/dev/null

@@ -37,6 +37,7 @@ termux_step_make_install() {
 		termux-upgrade-repo termux-wake-lock termux-wake-unlock; do
 			install -Dm700 $TERMUX_PKG_BUILDER_DIR/$script $TERMUX_PREFIX/bin/$script
 			perl -p -i -e "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" $TERMUX_PREFIX/bin/$script
+			perl -p -i -e "s%\@TERMUX_APP_PACKAGE\@%${TERMUX_APP_PACKAGE}%g" $TERMUX_PREFIX/bin/$script
 	done
 
 	install -Dm600 $TERMUX_PKG_BUILDER_DIR/motd $TERMUX_PREFIX/etc/motd
