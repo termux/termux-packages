@@ -63,7 +63,7 @@ previous failure and it must be re-run again for testing, then delete
 the lock file manually and run `termux-bootstrap-second-stage.sh`
 again.
 
-**See Also:**
+**See also:**
 - https://github.com/termux/termux-packages/wiki/For-maintainers#bootstraps
 HELP_EOF
 
@@ -93,11 +93,11 @@ run_bootstrap_second_stage() {
 	local return_value
 
 	if ! ln -s "termux-bootstrap-second-stage.sh" \
-		"@TERMUX_BOOTSTRAP_CONFIG_DIR_PATH@/termux-bootstrap-second-stage.sh.lock" 2>/dev/null; then
+		"@TERMUX_BOOTSTRAPS__BOOTSTRAP_CONFIG_DIR@/termux-bootstrap-second-stage.sh.lock" 2>/dev/null; then
 		log "The termux bootstrap second stage has already been run before and cannot be run again."
 		log "If you still want to force run it again (not recommended), \
 like in case of previous failure and it must be re-run again for testing, \
-then delete the '@TERMUX_BOOTSTRAP_CONFIG_DIR_PATH@/termux-bootstrap-second-stage.sh.lock' \
+then delete the '@TERMUX_BOOTSTRAPS__BOOTSTRAP_CONFIG_DIR@/termux-bootstrap-second-stage.sh.lock' \
 file manually and run 'termux-bootstrap-second-stage.sh' again."
 		return 0
 	fi
