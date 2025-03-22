@@ -1,11 +1,11 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/ProtonMail/proton-bridge
 TERMUX_PKG_DESCRIPTION="ProtonMail Bridge application"
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_VERSION="3.16.0"
+TERMUX_PKG_VERSION="3.18.0"
 TERMUX_PKG_SRCURL=git+https://github.com/ProtonMail/proton-bridge
 TERMUX_PKG_GIT_BRANCH=v${TERMUX_PKG_VERSION}
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_DEPENDS=libsecret
+TERMUX_PKG_DEPENDS="glib, libsecret"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE=latest-release-tag
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"

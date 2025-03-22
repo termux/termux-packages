@@ -12,7 +12,7 @@
  import (
 --- /dev/null
 +++ b/internal/updater/updater_android.go
-@@ -0,0 +1,76 @@
+@@ -0,0 +1,86 @@
 +// Copyright (c) 2023 Proton AG
 +//
 +// This file is part of Proton Mail Bridge.
@@ -46,9 +46,11 @@
 +)
 +
 +var (
-+	ErrDownloadVerify         = errors.New("failed to download or verify the update")
-+	ErrInstall                = errors.New("failed to install the update")
-+	ErrUpdateAlreadyInstalled = errors.New("update is already installed")
++	ErrDownloadVerify              = errors.New("failed to download or verify the update")
++	ErrInstall                     = errors.New("failed to install the update")
++	ErrUpdateAlreadyInstalled      = errors.New("update is already installed")
++	ErrVersionFileDownloadOrVerify = errors.New("failed to download or verify the version file")
++	ErrReleaseUpdatePackageMissing = errors.New("release update package is missing")
 +)
 +
 +type Downloader interface {
@@ -78,11 +80,19 @@
 +	}
 +}
 +
-+func (u *Updater) GetVersionInfo(ctx context.Context, downloader Downloader, channel Channel) (VersionInfo, error) {
++func (u *Updater) GetVersionInfoLegacy(ctx context.Context, downloader Downloader, channel Channel) (VersionInfoLegacy, error) {
++	return VersionInfoLegacy{}, errors.New("no updates available for this channel")
++}
++
++func (u *Updater) GetVersionInfo(ctx context.Context, downloader Downloader) (VersionInfo, error) {
 +	return VersionInfo{}, errors.New("no updates available for this channel")
 +}
 +
-+func (u *Updater) InstallUpdate(ctx context.Context, downloader Downloader, update VersionInfo) error {
++func (u *Updater) InstallUpdateLegacy(ctx context.Context, downloader Downloader, update VersionInfoLegacy) error {
++	return nil
++}
++
++func (u *Updater) InstallUpdate(ctx context.Context, downloader Downloader, release Release) error {
 +	return nil
 +}
 +
