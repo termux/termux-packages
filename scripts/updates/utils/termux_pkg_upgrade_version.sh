@@ -117,19 +117,19 @@ termux_pkg_upgrade_version() {
 		fi
 	done < "${TERMUX_SCRIPTDIR}/scripts/big-pkgs.list"
 
-	if [[ "${big_package}" == "true" ]]; then
-		"${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" ./clean.sh
+	if [[ "${big_package}" == "true" || "${force_cleanup}" == "true" ]]; then
+		"${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" ./clean.sh -m "Running clean.sh to recover disk space"
 	fi
 
 	if ! "${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" ./build-package.sh -C -a "${TERMUX_ARCH}" -i "${TERMUX_PKG_NAME}"; then
 		if [[ "${big_package}" == "true" ]]; then
-			"${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" ./clean.sh
+			"${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" ./clean.sh -m "Running clean.sh to recover disk space"
 		fi
 		git checkout -- "${TERMUX_PKG_BUILDER_DIR}"
 		termux_error_exit "ERROR: failed to build."
 	fi
 
-	if [[ "${big_package}" == "true" ]] || [[ "${force_cleanup}" == "true" ]]; then
+	if [[ "${big_package}" == "true" ]]; then
 		"${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" ./clean.sh
 	fi
 
