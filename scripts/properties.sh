@@ -812,6 +812,7 @@ TERMUX__PREFIX__BIN_DIR___MAX_LEN="$((TERMUX__PREFIX_DIR___MAX_LEN + 1 + 3))" # 
 # **See Also:**
 # - https://github.com/termux/termux-packages/wiki/Termux-file-system-layout#file-path-limits
 # - https://github.com/termux/termux-core-package/blob/master/lib/termux-core_nos_c_tre/include/termux/termux_core__nos__c/v1/termux/file/TermuxFile.h
+# - https://github.com/termux/termux-exec-package/blob/master/lib/termux-exec_nos_c_tre/include/termux/termux_exec__nos__c/v1/termux/api/termux_exec/ld_preload/direct/exec/ExecIntercept.h
 #
 # Constant value: `127`
 ##
@@ -819,6 +820,9 @@ TERMUX__PREFIX__BIN_FILE___SAFE_MAX_LEN="$((TERMUX__PREFIX__BIN_DIR___MAX_LEN + 
 
 ##
 # The max length for entire shebang line for `termux-exec`.
+#
+# **See Also:**
+# - https://github.com/termux/termux-exec-package/blob/master/lib/termux-exec_nos_c_tre/include/termux/termux_exec__nos__c/v1/termux/api/termux_exec/exec/ExecIntercept.h
 #
 # Default value: `340`
 ##
@@ -1314,6 +1318,57 @@ TERMUX_ENV__SS_TERMUX_CORE__TESTS="CORE__TESTS__"
 # Default value: `TERMUX_CORE__TESTS__`
 ##
 TERMUX_ENV__S_TERMUX_CORE__TESTS="${TERMUX_ENV__S_ROOT}${TERMUX_ENV__SS_TERMUX_CORE__TESTS}"
+
+
+
+##
+# Termux environment variables `termux-exec` sub scope.
+#
+# **Do not modify this!** This is considered a constant `termux-exec`
+# sub scope for Termux execution environment that's used by external
+# programs that do not use the termux packages building infrastructure
+# and rely on `$TERMUX_ENV__S_ROOT` environment variable exported by
+# Termux app containing the root scope to generate the value for
+# `$TERMUX_ENV__S_TERMUX_EXEC` and variable names under it.**
+#
+# Default value: `EXEC__`
+##
+TERMUX_ENV__SS_TERMUX_EXEC="EXEC__"
+
+##
+# Termux environment variables `termux-exec` scope.
+#
+# **Do not modify this!**
+#
+# Default value: `TERMUX_EXEC__`
+##
+TERMUX_ENV__S_TERMUX_EXEC="${TERMUX_ENV__S_ROOT}${TERMUX_ENV__SS_TERMUX_EXEC}"
+
+
+##
+# Termux environment variables `termux-exec-tests` sub scope.
+#
+# **Do not modify this!** This is considered a constant
+# `termux-exec-tests` sub scope for Termux execution environment
+#  that's used by `termux-exec` package to generate the value for
+# `$TERMUX_ENV__S_TERMUX_EXEC__TESTS` and variable names under it.**
+#
+# Default value: `TERMUX_EXEC__TESTS__`
+##
+TERMUX_ENV__SS_TERMUX_EXEC__TESTS="EXEC__TESTS__"
+
+##
+# Termux environment variables `termux-exec-tests` scope.
+#
+# **Do not modify this!**
+#
+# Default value: `TERMUX_EXEC__TESTS__`
+##
+TERMUX_ENV__S_TERMUX_EXEC__TESTS="${TERMUX_ENV__S_ROOT}${TERMUX_ENV__SS_TERMUX_EXEC__TESTS}"
+
+
+
+##
 # Termux environment variables `termux-am-socket` sub scope.
 #
 # **Do not modify this!** This is considered a constant `termux-am-socket`
