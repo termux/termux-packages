@@ -4,8 +4,8 @@
  
  #include "mozilla/mozalloc.h"
  
--#if defined(XP_LINUX)
-+#if defined(XP_LINUX) && !defined(__TERMUX__)
+-#if defined(XP_LINUX) && !defined(ANDROID)
++#if defined(XP_LINUX) && !defined(_LIBCPP_VERSION)
  
  #define malloc moz_xmalloc
  #define calloc moz_xcalloc
