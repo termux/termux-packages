@@ -3,10 +3,10 @@ TERMUX_PKG_DESCRIPTION="Go compiler for microcontrollers, WASM, CLI tools"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.35.0
+TERMUX_PKG_VERSION="0.37.0"
 TERMUX_PKG_SRCURL=git+https://github.com/tinygo-org/tinygo
 TERMUX_PKG_GIT_BRANCH="v${TERMUX_PKG_VERSION}"
-TERMUX_PKG_SHA256=60400525403770180f638372f79d52bc4ca76cff50fb9afd65ccabf5c4d086d3
+TERMUX_PKG_SHA256=e02512eb592b62072385fac8abb35978d43cca03397871a1f75d1de40867f7c7
 TERMUX_PKG_DEPENDS="binaryen, golang, libc++"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="binaryen, golang"
 TERMUX_PKG_NO_STATICSPLIT=true
@@ -20,6 +20,7 @@ _LLVM_OPTION="
 -DCLANG_TABLEGEN=${TERMUX_PKG_HOSTBUILD_DIR}/bin/clang-tblgen
 "
 _LLVM_EXTRA_BUILD_TARGETS="
+lib/libLLVMCodeGenData.a
 lib/libLLVMDWARFLinker.a
 lib/libLLVMDWARFLinkerClassic.a
 lib/libLLVMDWARFLinkerParallel.a
@@ -39,6 +40,7 @@ lib/libLLVMObjectYAML.a
 lib/libLLVMOrcDebugging.a
 lib/libLLVMOrcJIT.a
 lib/libLLVMTextAPIBinaryReader.a
+lib/libLLVMSandboxIR.a
 lib/libLLVMXRay.a
 "
 
