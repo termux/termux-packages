@@ -1,19 +1,22 @@
 +++ ./meson.build
-@@ -424,16 +424,7 @@
+@@ -472,19 +472,7 @@
      }
    '''
  
--result = cc.run(curl_ssl_check, name : 'cURL gnutls check',
--  dependencies: curl_dep)
--cdata.set('curl_gnutls', 0)
+-result = cc.run(
+-    curl_ssl_check,
+-    name: 'cURL gnutls check',
+-    dependencies: curl_dep,
+-)
+-private_config.set('curl_gnutls', 0)
 -if result.returncode() == 0
--  cdata.set('curl_gnutls', 1)
+-    private_config.set('curl_gnutls', 1)
 -endif
 -
 -if cc.has_function('getloadavg') == false
--  error('getloadadv missing')
+-    error('getloadadv missing')
 -endif
-+cdata.set('curl_gnutls', 1)
++private_config.set('curl_gnutls', 1)
  
- syscalls = [
-   'memset_s', 'explicit_bzero', 'atoll', 'stat64',
+ check_syscalls = [
+     ['atoll', '#include<stdlib.h>'],
