@@ -1,0 +1,70 @@
+From adf1aa346d99d29ad2c5c945c3e4de5e0e3e12cb Mon Sep 17 00:00:00 2001
+From: Alexandros Frantzis <alexandros.frantzis@collabora.com>
+Date: Thu, 27 Feb 2025 14:33:49 +0200
+Subject: [PATCH] display: Properly handle Vulkan errors during probing
+
+The vk::createInstance() function throws an exception on error,
+so handle it instead of checking for a null return value.
+---
+ src/ws/display_window_system_plugin.cpp | 39 ++++++++++++-------------
+ 1 file changed, 19 insertions(+), 20 deletions(-)
+
+diff --git a/src/ws/display_window_system_plugin.cpp b/src/ws/display_window_system_plugin.cpp
+index 523092b..fcbd949 100644
+--- a/src/ws/display_window_system_plugin.cpp
++++ b/src/ws/display_window_system_plugin.cpp
+@@ -72,24 +72,22 @@ int vkmark_window_system_probe(Options const& options)
+         .setPApplicationInfo(&app_info)
+         .setEnabledExtensionCount(exts.size())
+         .setPpEnabledExtensionNames(exts.data());
+-    auto vk_instance = ManagedResource<vk::Instance>{
+-        vk::createInstance(create_info),
+-        [] (auto& i) { i.destroy(); }};
+-    if (!vk_instance.raw)
+-        return VKMARK_WINDOW_SYSTEM_PROBE_BAD;
+-
+-    auto physical_devices = vk_instance.raw.enumeratePhysicalDevices();
+-    auto physical_device = options.use_device_with_uuid ?
+-        std::find_if(
+-            physical_devices.begin(), physical_devices.end(),
+-            [&options] (auto pd) {
+-                return static_cast<DeviceUUID>(pd.getProperties().pipelineCacheUUID) ==
+-                    options.use_device_with_uuid; }) :
+-        physical_devices.begin();
+-
+-    if (physical_device != physical_devices.end())
++
++    try
+     {
+-        try
++        auto vk_instance = ManagedResource<vk::Instance>{
++            vk::createInstance(create_info),
++            [] (auto& i) { i.destroy(); }};
++        auto physical_devices = vk_instance.raw.enumeratePhysicalDevices();
++        auto physical_device = options.use_device_with_uuid ?
++            std::find_if(
++                physical_devices.begin(), physical_devices.end(),
++                [&options] (auto pd) {
++                    return static_cast<DeviceUUID>(pd.getProperties().pipelineCacheUUID) ==
++                        options.use_device_with_uuid; }) :
++            physical_devices.begin();
++
++        if (physical_device != physical_devices.end())
+         {
+             auto display_index = std::stoi(get_display_index_option(options));
+             if (display_index < 0)
+@@ -97,10 +95,11 @@ int vkmark_window_system_probe(Options const& options)
+             DisplayNativeSystem::get_display_surface_create_info(*physical_device, display_index);
+             return VKMARK_WINDOW_SYSTEM_PROBE_OK + VKMARK_DISPLAY_WINDOW_SYSTEM_PRIORITY;
+         }
+-        catch (...)
+-        {
+-        }
+     }
++    catch (...)
++    {
++    }
++
+ 
+     return VKMARK_WINDOW_SYSTEM_PROBE_BAD;
+ }
