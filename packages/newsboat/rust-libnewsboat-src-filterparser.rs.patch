@@ -4,9 +4,9 @@
  //! Parses filter expressions.
  
 -use gettextrs::gettext;
+ use nom::AsChar;
  use nom::{
      branch::alt,
-     bytes::complete::{escaped, is_not, tag, take, take_while, take_while1},
 @@ -126,11 +125,11 @@
  /// indicating the thing thah was expected.
  fn translate_expected(expected: Expected) -> String {
