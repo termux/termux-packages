@@ -64,6 +64,10 @@ export TERMUX_REPO_PKG_FORMAT=$(jq --raw-output '.pkg_format // "debian"' ${TERM
 # lock file.
 : "${TERMUX_BUILD_IGNORE_LOCK:=false}"
 
+# Utility code to track errors in buildsystem.
+# shellcheck source=scripts/build/termux_setup_self_debug.shh
+source "$TERMUX_SCRIPTDIR/scripts/build/termux_setup_self_debug.sh"
+
 # Utility function to log an error message and exit with an error code.
 # shellcheck source=scripts/build/termux_error_exit.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_error_exit.sh"
