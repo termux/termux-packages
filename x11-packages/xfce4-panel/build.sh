@@ -29,4 +29,7 @@ termux_step_pre_configure() {
 	termux_setup_glib_cross_pkg_config_wrapper
 
 	autoreconf -fiv
+
+	# ERROR: ./lib/xfce4/panel/plugins/libsystray.so contains undefined symbols: ceil
+	LDFLAGS+=" -lm"
 }
