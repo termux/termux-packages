@@ -54,7 +54,7 @@ termux_step_setup_variables() {
 
 		if [ "$TERMUX_PACKAGE_LIBRARY" = "bionic" ]; then
 			# On-device builds without termux-exec are unsupported.
-			if ! grep -q "${TERMUX_PREFIX}/lib/libtermux-exec.so" <<< "${LD_PRELOAD-x}"; then
+			if [[ ":${LD_PRELOAD:-}:" != ":${TERMUX_PREFIX}/lib/libtermux-exec"*".so:" ]]; then
 				termux_error_exit "On-device builds without termux-exec are not supported."
 			fi
 		fi
