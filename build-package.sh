@@ -72,6 +72,10 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_error_exit.sh"
 # shellcheck source=scripts/build/termux_download.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_download.sh"
 
+# Utility function to run binaries under termux environment via proot.
+# shellcheck source=scripts/build/setup/termux_setup_proot.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_proot.sh"
+
 # Installing packages if necessary for the full operation of CGCT.
 # shellcheck source=scripts/build/termux_step_setup_cgct_environment.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_setup_cgct_environment.sh"
