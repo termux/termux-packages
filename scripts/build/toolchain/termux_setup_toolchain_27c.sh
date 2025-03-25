@@ -17,9 +17,9 @@ termux_setup_toolchain_27c() {
 	export NM=llvm-nm
 	export CXXFILT=llvm-cxxfilt
 
-	export TERMUX_HASKELL_OPTIMISATION="-O"
+	export TERMUX_GHC_OPTIMISATION="-O"
 	if [ "${TERMUX_DEBUG_BUILD}" = true ]; then
-		TERMUX_HASKELL_OPTIMISATION="-O0"
+		TERMUX_GHC_OPTIMISATION="-O0"
 	fi
 
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
