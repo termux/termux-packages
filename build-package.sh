@@ -100,10 +100,6 @@ source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_dotnet.sh"
 # shellcheck source=scripts/build/setup/termux_setup_flang.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_flang.sh"
 
-# Utility function for setting up GHC toolchain.
-# shellcheck source=scripts/build/setup/termux_setup_ghc.sh
-source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_ghc.sh"
-
 # Utility function to setup a GHC cross-compiler toolchain targeting Android.
 # shellcheck source=scripts/build/setup/termux_setup_ghc_cross_compiler.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_ghc_cross_compiler.sh"
