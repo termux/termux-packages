@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://www.haskell.org/ghc/
-TERMUX_PKG_DESCRIPTION="The Glasgow Haskell Compiler libraries"
+TERMUX_PKG_DESCRIPTION="The Glasgow Haskell Compiler"
 TERMUX_PKG_LICENSE="BSD 2-Clause, BSD 3-Clause, LGPL-2.1"
 TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.org>"
 TERMUX_PKG_VERSION=9.2.5
@@ -23,7 +23,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-curses-includes=${TERMUX_PREFIX}/include
 "
 TERMUX_PKG_NO_STATICSPLIT=true
-TERMUX_PKG_REPLACES="ghc-libs-static"
+TERMUX_PKG_REPLACES="ghc-libs-static, ghc-libs"
+TERMUX_PKG_PROVIDES="ghc-libs, ghc-libs-static"
 
 # 'network' is used by 'libiserv'. This will enable over the network support in 'iserv-proxy' which is
 # used to cross-compile haskell-template.
