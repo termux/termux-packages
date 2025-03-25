@@ -75,7 +75,7 @@ termux_step_configure_cabal() {
 	# shellcheck disable=SC2086
 	# shellcheck disable=SC2250,SC2154,SC2248,SC2312
 	env $AVOID_GNULIB cabal configure \
-		$TERMUX_HASKELL_OPTIMISATION \
+		$TERMUX_GHC_OPTIMISATION \
 		--prefix="$TERMUX_PREFIX" \
 		--configure-option="$TARGET_FLAG" \
 		--with-compiler="$(command -v ghc)" \
