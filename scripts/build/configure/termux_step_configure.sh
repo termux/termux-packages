@@ -5,7 +5,7 @@ termux_step_configure() {
 	# should be executed by its own build system.
 	if ls "${TERMUX_PKG_SRCDIR}"/*.cabal &>/dev/null; then
 		[ "$TERMUX_CONTINUE_BUILD" == "true" ] && return
-		termux_step_configure_haskell_build
+		termux_step_configure_cabal
 	elif [ "$TERMUX_PKG_FORCE_CMAKE" = "false" ] && [ -f "$TERMUX_PKG_SRCDIR/configure" ]; then
 		if [ "$TERMUX_CONTINUE_BUILD" == "true" ]; then
 			return
