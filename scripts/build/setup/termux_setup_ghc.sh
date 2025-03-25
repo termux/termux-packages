@@ -1,6 +1,6 @@
 # shellcheck shell=bash
 # Utility function to setup a GHC cross-compiler toolchain targeting Android.
-termux_setup_ghc_cross_compiler() {
+termux_setup_ghc() {
 	local TERMUX_GHC_VERSION=9.2.5
 	local GHC_PREFIX="ghc-cross-${TERMUX_GHC_VERSION}-${TERMUX_ARCH}"
 	if [[ "${TERMUX_ON_DEVICE_BUILD}" == false ]]; then
