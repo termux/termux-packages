@@ -1,0 +1,132 @@
+From fdd0c67a38ef8435b9aa46c0d3c9d4460191cdcf Mon Sep 17 00:00:00 2001
+From: Robert Kirkman <rkirkman@termux.dev>
+Date: Fri, 28 Mar 2025 16:53:16 -0500
+Subject: [PATCH] rts: reattempt heap reservation recursively before unmapping
+ addresses below the 8GB mark
+
+This patch works around Android's mmap() occasionally repeatedly mapping the exact
+same block of memory at an address below the 8GB mark that was just
+unmapped, which would cause the 'ghc --help' command to fall into an infinite loop while
+osTryReserveHeapMemory() repeatedly returned the same unwanted address. This
+moves the heap reservation attempt logic into a recursive function that
+runs osTryReserveHeapMemory() multiple times without unmapping the
+undesired addresses, to force the mapping of new, unique addresses
+until an address above the 8GB mark is obtained,
+after which each recursive call unmaps its undesired address before
+returning the desired address, in order from last mapped to first mapped.
+
+First discussed here: https://github.com/termux/termux-packages/pull/22991
+---
+ rts/posix/OSMem.c | 88 +++++++++++++++++++++++++----------------------
+ 1 file changed, 46 insertions(+), 42 deletions(-)
+
+diff --git a/rts/posix/OSMem.c b/rts/posix/OSMem.c
+index 94c60f441ac9..2f1638bb5123 100644
+--- a/rts/posix/OSMem.c
++++ b/rts/posix/OSMem.c
+@@ -493,11 +493,53 @@ osTryReserveHeapMemory (W_ len, void *hint)
+     return start;
+ }
+ 
+-void *osReserveHeapMemory(void *startAddressPtr, W_ *len)
++static void *
++osTryReserveHeapMemoryRecursive(W_ minimumAddress, W_ startAddress, int attempt, W_ *len)
+ {
+-    int attempt;
+-    void *at;
++    *len &= ~MBLOCK_MASK;
++
++    if (*len < MBLOCK_SIZE) {
++        // Give up if the system won't even give us 16 blocks worth of heap
++        barf("osReserveHeapMemory: Failed to allocate heap storage");
++    }
++
++    void *hint = (void*)(startAddress + attempt * BLOCK_SIZE);
++    void *at = osTryReserveHeapMemory(*len, hint);
++    attempt++;
++
++    if (at == NULL) {
++        // This means that mmap failed which we take to mean that we asked
++        // for too much memory. This can happen due to POSIX resource
++        // limits. In this case we reduce our allocation request by a
++        // fraction of the current size and try again.
++        //
++        // Note that the previously would instead decrease the request size
++        // by a factor of two; however, this meant that significant amounts
++        // of memory will be wasted (e.g. imagine a machine with 512GB of
++        // physical memory but a 511GB ulimit). See #14492.
++        *len -= *len / 8;
++        // debugBelch("Limit hit, reduced len: %zu\n", *len);
++        return osTryReserveHeapMemoryRecursive(minimumAddress, startAddress, attempt, len);
++    } else if ((W_)at >= minimumAddress) {
++        // Success! We were given a block of memory starting above the 8 GB
++        // mark, which is what we were looking for.
++
++        return at;
++    } else {
++        // We got addressing space but it wasn't above the 8GB mark.
++        // Try again recursively first, unmap after, because on aarch64 Android,
++        // sometimes mmap() will continuously map the same address regardless of
++        // the hint changing, if that address has already been unmapped.
++        void *next_at = osTryReserveHeapMemoryRecursive(minimumAddress, startAddress, attempt, len);
++        if (munmap(at, *len) < 0) {
++            sysErrorBelch("unable to release reserved heap");
++        }
++        return next_at;
++    }
++}
+ 
++void *osReserveHeapMemory(void *startAddressPtr, W_ *len)
++{
+     /* We want to ensure the heap starts at least 8 GB inside the address space,
+        since we want to reserve the address space below that address for code.
+        Specifically, we need to make sure that any dynamically loaded code will
+@@ -585,45 +627,7 @@ void *osReserveHeapMemory(void *startAddressPtr, W_ *len)
+     }
+ #endif
+ 
+-    attempt = 0;
+-    while (1) {
+-        *len &= ~MBLOCK_MASK;
+-
+-        if (*len < MBLOCK_SIZE) {
+-            // Give up if the system won't even give us 16 blocks worth of heap
+-            barf("osReserveHeapMemory: Failed to allocate heap storage");
+-        }
+-
+-        void *hint = (void*)(startAddress + attempt * BLOCK_SIZE);
+-        at = osTryReserveHeapMemory(*len, hint);
+-        if (at == NULL) {
+-            // This means that mmap failed which we take to mean that we asked
+-            // for too much memory. This can happen due to POSIX resource
+-            // limits. In this case we reduce our allocation request by a
+-            // fraction of the current size and try again.
+-            //
+-            // Note that the previously would instead decrease the request size
+-            // by a factor of two; however, this meant that significant amounts
+-            // of memory will be wasted (e.g. imagine a machine with 512GB of
+-            // physical memory but a 511GB ulimit). See #14492.
+-            *len -= *len / 8;
+-            // debugBelch("Limit hit, reduced len: %zu\n", *len);
+-        } else if ((W_)at >= minimumAddress) {
+-            // Success! We were given a block of memory starting above the 8 GB
+-            // mark, which is what we were looking for.
+-
+-            break;
+-        } else {
+-            // We got addressing space but it wasn't above the 8GB mark.
+-            // Try again.
+-            if (munmap(at, *len) < 0) {
+-                sysErrorBelch("unable to release reserved heap");
+-            }
+-        }
+-        attempt++;
+-    }
+-
+-    return at;
++    return osTryReserveHeapMemoryRecursive(minimumAddress, startAddress, 0, len);
+ }
+ 
+ void osCommitMemory(void *at, W_ size)
+-- 
+GitLab
