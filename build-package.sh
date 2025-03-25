@@ -101,8 +101,8 @@ source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_dotnet.sh"
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_flang.sh"
 
 # Utility function to setup a GHC cross-compiler toolchain targeting Android.
-# shellcheck source=scripts/build/setup/termux_setup_ghc_cross_compiler.sh
-source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_ghc_cross_compiler.sh"
+# shellcheck source=scripts/build/setup/termux_setup_ghc.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_ghc.sh"
 
 # Utility function to setup cabal-install (may be used by ghc toolchain).
 # shellcheck source=scripts/build/setup/termux_setup_cabal.sh.
