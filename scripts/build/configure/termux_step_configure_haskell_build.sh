@@ -1,5 +1,5 @@
 termux_step_configure_haskell_build() {
-	termux_setup_ghc_cross_compiler
+	termux_setup_ghc
 	termux_setup_cabal
 
 	HOST_FLAG="--host=${TERMUX_HOST_PLATFORM}"
