@@ -293,9 +293,9 @@ source "$TERMUX_SCRIPTDIR/scripts/build/configure/termux_step_configure_cmake.sh
 # shellcheck source=scripts/build/configure/termux_step_configure_meson.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/configure/termux_step_configure_meson.sh"
 
-# Setup configure args and run haskell build system. This function is called from termux_step_configure.
-# shellcheck source=scripts/build/configure/termux_step_configure_haskell_build.sh
-source "$TERMUX_SCRIPTDIR/scripts/build/configure/termux_step_configure_haskell_build.sh"
+# Setup configure args and run cabal. This function is called from termux_step_configure
+# shellcheck source=scripts/build/configure/termux_step_configure_cabal.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/configure/termux_step_configure_cabal.sh"
 
 # Configure the package
 # shellcheck source=scripts/build/configure/termux_step_configure.sh
