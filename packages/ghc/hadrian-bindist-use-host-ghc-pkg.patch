@@ -1,0 +1,22 @@
+--- ghc-9.12.1/hadrian/src/Rules/BinaryDist.hs	2025-02-24 22:46:43.666788988 +0530
++++ ghc-9.12.1.mod/hadrian/src/Rules/BinaryDist.hs	2025-02-25 16:56:59.718827035 +0530
+@@ -231,6 +231,6 @@
+         --
+         -- N.B. the ghc-pkg executable may be prefixed with a target triple
+         -- (c.f. #20267).
+-        ghcPkgName <- programName (vanillaContext Stage1 ghcPkg)
+-        cmd_ (bindistFilesDir -/- "bin" -/- ghcPkgName) ["recache"]
++        stage0ghcPkgPath <- programPath =<< programContext (Stage0 InTreeLibs) ghcPkg
++        cmd_ stage0ghcPkgPath ["recache"]
+
+--- ghc-9.12.1/hadrian/bindist/Makefile	2025-02-24 22:46:43.665077469 +0530
++++ ghc-9.12.1.mod/hadrian/bindist/Makefile	2025-02-24 22:46:44.140454443 +0530
+@@ -253,7 +253,7 @@
+ 	@echo "Updating the package DB"
+ 	$(foreach p, $(PKG_CONFS),\
+ 		$(call patchpackageconf,$(shell echo $(notdir $p) | sed 's/-[0-9.]*-[0-9a-zA-Z]*\.conf//g'),$(shell echo "$p" | sed 's:\0xxx\0:   :g'),$(docdir),$(shell mk/relpath.sh "$(ActualLibsDir)" "$(docdir)"),$(shell echo $(notdir $p) | sed 's/.conf//g')))
+-	'$(DESTDIR)$(ActualBinsDir)/$(CrossCompilePrefix)ghc-pkg' --global-package-db "$(DESTDIR)$(ActualLibsDir)/package.conf.d" recache
++	'$(HOST_GHC_PKG)' --global-package-db "$(DESTDIR)$(ActualLibsDir)/package.conf.d" recache
+ 
+ .PHONY: install_mingw
+ install_mingw:

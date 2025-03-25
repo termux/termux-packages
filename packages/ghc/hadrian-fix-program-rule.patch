@@ -1,0 +1,12 @@
+--- ghc-9.12.2/hadrian/src/Rules/Program.hs	2025-03-29 15:32:47.000000000 +0530
++++ ghc-9.12.2.mod/hadrian/src/Rules/Program.hs	2025-04-07 23:55:57.642949426 +0530
+@@ -102,9 +102,6 @@
+   cross <- flag CrossCompiling
+   -- For cross compiler, copy @stage0/bin/<pgm>@ to @stage1/bin/@.
+   case (cross, stage) of
+-    (True, s) | s > stage0InTree -> do
+-        srcDir <- buildRoot <&> (-/- (stageString stage0InTree -/- "bin"))
+-        copyFile (srcDir -/- takeFileName bin) bin
+     _ -> buildBinary rs bin ctx
+ 
+ buildBinary :: [(Resource, Int)] -> FilePath -> Context -> Action ()

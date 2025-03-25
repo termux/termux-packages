@@ -1,0 +1,18 @@
+--- ghc-9.12.1/m4/fp_gcc_supports_no_pie.m4	2025-02-24 22:46:43.263794157 +0530
++++ ghc-9.12.1.mod/m4/fp_gcc_supports_no_pie.m4	2025-03-25 14:39:14.331731419 +0530
+@@ -6,15 +6,6 @@
+ [
+    AC_REQUIRE([AC_PROG_CC])
+    AC_MSG_CHECKING([whether CC supports -no-pie])
+-   echo 'int main() { return 0; }' > conftest.c
+-   "$CC" $CONF_GCC_CC_OPTS_STAGE2 -c conftest.c
+-   # Some GCC versions only warn when passed an unrecognized flag.
+-   if "$CC" $CONF_GCC_LINKER_OPTS_STAGE2 -no-pie -Werror conftest.o -o conftest > conftest.txt 2>&1 && ! grep -i unrecognized conftest.txt > /dev/null 2>&1; then
+-       CONF_GCC_SUPPORTS_NO_PIE=YES
+-       AC_MSG_RESULT([yes])
+-   else
+        CONF_GCC_SUPPORTS_NO_PIE=NO
+        AC_MSG_RESULT([no])
+-   fi
+-   rm -f conftest.c conftest.o conftest
+ ])

@@ -1,0 +1,14 @@
+--- ghc-9.12.1/rts/linker/ElfTypes.h	2024-12-16 00:59:46.000000000 +0530
++++ ghc-9.12.1.mod/rts/linker/ElfTypes.h	2025-01-04 21:31:55.550538431 +0530
+@@ -8,6 +8,11 @@
+ #include <elf.h>
+ #include "linker/InitFini.h"
+ 
++#define ELF32_ST_VISIBILITY(o) ((o) & 0x03)
++
++/* For ELF64 the definitions are the same.  */
++#define ELF64_ST_VISIBILITY(o) ELF32_ST_VISIBILITY(o)
++
+ /*
+  * Define a set of types which can be used for both ELF32 and ELF64
+  */
