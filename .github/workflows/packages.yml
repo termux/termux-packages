@@ -216,9 +216,9 @@ jobs:
         DOCKER_BUILD: ${{ steps.build-info.outputs.docker-build }}
       run: |
         if [ "$DOCKER_BUILD" == 'false' ]; then
-          ./scripts/free-space.sh
           ./scripts/setup-ubuntu.sh
           sudo apt install ninja-build
+          ./scripts/free-space.sh
         fi
 
     - name: Build packages
