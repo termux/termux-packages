@@ -1,4 +1,4 @@
-termux_step_configure_haskell_build() {
+termux_step_configure_cabal() {
 	termux_setup_ghc
 	termux_setup_cabal
 
