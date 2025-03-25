@@ -1,0 +1,11 @@
+--- ghc-9.12.1/compiler/GHC/Driver/DynFlags.hs	2024-12-16 00:59:45.000000000 +0530
++++ ghc-9.12.1.mod/compiler/GHC/Driver/DynFlags.hs	2025-01-04 19:52:30.600705081 +0530
+@@ -1311,6 +1311,8 @@
+     (OSDarwin,  ArchAArch64) -> [Opt_PIC]
+     (OSLinux,   ArchAArch64) -> [Opt_PIC, Opt_ExternalDynamicRefs]
+     (OSLinux,   ArchARM {})  -> [Opt_PIC, Opt_ExternalDynamicRefs]
++    (OSLinux,   ArchX86_64)  -> [Opt_PIC, Opt_ExternalDynamicRefs]
++    (OSLinux,   ArchX86)     -> [Opt_PIC, Opt_ExternalDynamicRefs]
+     (OSLinux,   ArchRISCV64 {}) -> [Opt_PIC, Opt_ExternalDynamicRefs]
+     (OSOpenBSD, ArchX86_64)  -> [Opt_PIC] -- Due to PIE support in
+                                          -- OpenBSD since 5.3 release
