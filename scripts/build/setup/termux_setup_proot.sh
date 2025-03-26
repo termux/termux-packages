@@ -48,7 +48,7 @@ termux_setup_proot() {
 			TERM=$TERM \
 			TZ=UTC \
 			$TERMUX_PROOT_EXTRA_ENV_VARS \
-			$TERMUX_PROOT_BIN/proot $TERMUX_PROOT_QEMU -R "\$@"
+			$TERMUX_PROOT_BIN/proot $TERMUX_PROOT_QEMU -R / "\$@"
 	EOF
 	chmod +x "$TERMUX_PROOT_BIN/$TERMUX_PROOT_BIN_NAME"
 }
