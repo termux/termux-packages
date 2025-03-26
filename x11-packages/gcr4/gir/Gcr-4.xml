@@ -1,5 +1,15 @@
 <?xml version="1.0"?>
 <dump>
+  <class name="GcrCertificateExtension" get-type="gcr_certificate_extension_get_type" parents="GObject">
+    <property name="oid" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="critical" type="gboolean" flags="235" default-value="FALSE"/>
+    <property name="value" type="GBytes" flags="235"/>
+  </class>
+  <class name="GcrCertificateExtensionList" get-type="gcr_certificate_extension_list_get_type" parents="GObject">
+    <implements name="GListModel"/>
+    <property name="n-items" type="guint" flags="225" default-value="0"/>
+  </class>
+  <boxed name="GcrSubjectPublicKeyInfo" get-type="gcr_subject_public_key_info_get_type"/>
   <interface name="GcrCertificate" get-type="gcr_certificate_get_type">
     <property name="description" type="gchararray" flags="225" default-value=""/>
     <property name="expiry-date" type="GDateTime" flags="225"/>
@@ -10,6 +20,45 @@
   <class name="GcrCertificateChain" get-type="gcr_certificate_chain_get_type" parents="GObject">
     <property name="status" type="GcrCertificateChainStatus" flags="225" default-value="GCR_CERTIFICATE_CHAIN_UNKNOWN"/>
     <property name="length" type="guint" flags="225" default-value="0"/>
+  </class>
+  <class name="GcrGeneralName" get-type="gcr_general_name_get_type" parents="GObject">
+  </class>
+  <class name="GcrGeneralNames" get-type="gcr_general_names_get_type" parents="GObject">
+    <implements name="GListModel"/>
+  </class>
+  <class name="GcrCertificateExtensionBasicConstraints" get-type="gcr_certificate_extension_basic_constraints_get_type" parents="GcrCertificateExtension,GObject">
+  </class>
+  <class name="GcrCertificateExtensionKeyUsage" get-type="gcr_certificate_extension_key_usage_get_type" parents="GcrCertificateExtension,GObject">
+  </class>
+  <class name="GcrCertificateExtensionExtendedKeyUsage" get-type="gcr_certificate_extension_extended_key_usage_get_type" parents="GcrCertificateExtension,GObject">
+  </class>
+  <class name="GcrCertificateExtensionSubjectKeyIdentifier" get-type="gcr_certificate_extension_subject_key_identifier_get_type" parents="GcrCertificateExtension,GObject">
+  </class>
+  <class name="GcrCertificateExtensionAuthorityKeyIdentifier" get-type="gcr_certificate_extension_authority_key_identifier_get_type" parents="GcrCertificateExtension,GObject">
+  </class>
+  <class name="GcrCertificateExtensionSubjectAltName" get-type="gcr_certificate_extension_subject_alt_name_get_type" parents="GcrCertificateExtension,GObject">
+    <implements name="GListModel"/>
+  </class>
+  <class name="GcrCertificatePolicyQualifier" get-type="gcr_certificate_policy_qualifier_get_type" parents="GObject">
+  </class>
+  <class name="GcrCertificatePolicy" get-type="gcr_certificate_policy_get_type" parents="GObject">
+    <implements name="GListModel"/>
+  </class>
+  <class name="GcrCertificateExtensionCertificatePolicies" get-type="gcr_certificate_extension_certificate_policies_get_type" parents="GcrCertificateExtension,GObject">
+    <implements name="GListModel"/>
+    <property name="n-items" type="guint" flags="225" default-value="0"/>
+  </class>
+  <class name="GcrAccessDescription" get-type="gcr_access_description_get_type" parents="GObject">
+  </class>
+  <class name="GcrCertificateExtensionAuthorityInfoAccess" get-type="gcr_certificate_extension_authority_info_access_get_type" parents="GcrCertificateExtension,GObject">
+    <implements name="GListModel"/>
+    <property name="n-items" type="guint" flags="225" default-value="0"/>
+  </class>
+  <class name="GcrDistributionPoint" get-type="gcr_distribution_point_get_type" parents="GObject">
+  </class>
+  <class name="GcrCertificateExtensionCrlDistributionPoints" get-type="gcr_certificate_extension_crl_distribution_points_get_type" parents="GcrCertificateExtension,GObject">
+    <implements name="GListModel"/>
+    <property name="n-items" type="guint" flags="225" default-value="0"/>
   </class>
   <class name="GcrCertificateSection" get-type="gcr_certificate_section_get_type" parents="GObject" final="1">
     <property name="label" type="gchararray" flags="235" default-value="NULL"/>
