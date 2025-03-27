@@ -3,28 +3,29 @@ TERMUX_PKG_DESCRIPTION="A compatibility layer for running Windows programs (Hang
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_LICENSE_FILE="LICENSE, LICENSE.OLD, COPYING.LIB"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=10.2
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=10.4
 _REAL_VERSION="${TERMUX_PKG_VERSION/\~/-}"
 TERMUX_PKG_SRCURL=(
 	https://github.com/AndreRH/wine/archive/refs/tags/hangover-$_REAL_VERSION.tar.gz
 	https://github.com/AndreRH/hangover/releases/download/hangover-$_REAL_VERSION/hangover_${_REAL_VERSION}_ubuntu2004_focal_arm64.tar
 )
 TERMUX_PKG_SHA256=(
-	0633f3fd1991f742761ccfef5ed32814d9aab49a5c49fb5e4a48b58c15669623
-	848f299d35ef73151486841dd2f1dc453027327632f785643ad83adf7ed9219c
+	055a11ad91d27fca74cd80d6cf94b03deb843aa9d07b462e7fb46365203b8b60
+	944c1c8e68bd7d4f61a2e9a89e7460912bf3ed85db66fce64c8f1aaf184dc8ad
 )
 TERMUX_PKG_DEPENDS="fontconfig, freetype, krb5, libandroid-spawn, libc++, libgmp, libgnutls, libxcb, libxcomposite, libxcursor, libxfixes, libxrender, mesa, opengl, pulseaudio, sdl2, vulkan-loader, xorg-xrandr"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="vulkan-loader"
 TERMUX_PKG_BUILD_DEPENDS="libandroid-spawn-static, vulkan-loader-generic"
 TERMUX_PKG_NO_STATICSPLIT=true
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
+TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686, x86_64"
+
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="
 --without-x
 --disable-tests
 "
-
-TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686, x86_64"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 enable_wineandroid_drv=no
@@ -81,13 +82,36 @@ enable_tools=yes
 # TODO: `--enable-archs=arm` doesn't build with option `--with-mingw=clang`, but
 # TODO: `arm64ec` doesn't build with option `--with-mingw` (arm64ec-w64-mingw32-clang)
 
+termux_pkg_auto_update() {
+	local latest_tag
+	latest_tag="$(termux_github_api_get_tag "${TERMUX_PKG_SRCURL[1]}" "${TERMUX_PKG_UPDATE_TAG_TYPE}")"
+	(( ${#latest_tag} )) || {
+		printf '%s\n' \
+		'WARN: Auto update failure!' \
+		"latest_tag=${latest_tag}"
+	return
+	} >&2
+
+	latest_tag="${latest_tag#*-}"
+	if [[ "${latest_tag}" == "${_REAL_VERSION}" ]]; then
+		echo "INFO: No update needed. Already at version '${_REAL_VERSION}'."
+		return
+	fi
+
+	if [ "${latest_tag/-/\~}" != "${latest_tag}" ]; then
+		latest_tag="${latest_tag/-/\~}"
+	fi
+
+	termux_pkg_upgrade_version "${latest_tag}"
+}
+
 _setup_llvm_mingw_toolchain() {
 	# LLVM-mingw's version number must not be the same as the NDK's.
-	local _llvm_mingw_version=19
-	local _version="20240929"
-	local _url="https://github.com/bylaws/llvm-mingw/releases/download/$_version/llvm-mingw-$_version-ucrt-ubuntu-20.04-x86_64.tar.xz"
+	local _llvm_mingw_version=21
+	local _version="20250319"
+	local _url="https://github.com/mstorsjo/llvm-mingw/releases/download/$_version/llvm-mingw-$_version-ucrt-ubuntu-20.04-x86_64.tar.xz"
 	local _path="$TERMUX_PKG_CACHEDIR/$(basename $_url)"
-	local _sha256sum=ce75ad076c87663fd4a77513e947252d97ce799a11926c1f3ac7afed1d6ab85c
+	local _sha256sum=ab2a1489416fa82b3e85e88cb877053ee8a591993408caf076737d8de5ae72ca
 	termux_download $_url $_path $_sha256sum
 	local _extract_path="$TERMUX_PKG_CACHEDIR/llvm-mingw-toolchain-$_llvm_mingw_version"
 	if [ ! -d "$_extract_path" ]; then
