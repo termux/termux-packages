@@ -69,7 +69,7 @@ termux_step_make() {
 		# NOTE: We do not build profiled libs. It exceeds the 6 hours usage limit of github CI.
 		./hadrian/build binary-dist-dir \
 			-j"$TERMUX_PKG_MAKE_PROCESSES" \
-			--flavour="quickest" \
+			--flavour="devel" \
 			--docs=none \
 			"stage1.*.ghc.hs.opts += -g3" \
 			"stage1.*.cabal.configure.opts += --disable-library-stripping --disable-executable-stripping" \
