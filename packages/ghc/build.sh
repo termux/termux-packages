@@ -69,16 +69,13 @@ termux_step_make() {
 		# NOTE: We do not build profiled libs. It exceeds the 6 hours usage limit of github CI.
 		./hadrian/build binary-dist-dir \
 			-j"$TERMUX_PKG_MAKE_PROCESSES" \
-			--flavour="devel" \
+			--flavour="release+debug_info+no_profiled_libs" \
 			--docs=none \
-			"stage1.*.ghc.hs.opts += -g3" \
-			"stage1.*.cabal.configure.opts += --disable-library-stripping --disable-executable-stripping" \
 			"stage1.unix.ghc.link.opts += -optl-landroid-posix-semaphore" \
-			"stage1.rts.ghc.c.opts += -optc-ggdb" \
 			"stage2.unix.ghc.link.opts += -optl-landroid-posix-semaphore" \
-			"stage2.*.ghc.hs.opts += -g3" \
+			"stage2.*.ghc.hs.opts += -g" \
 			"stage2.*.cabal.configure.opts += --disable-library-stripping --disable-executable-stripping" \
-			"stage1.rts.ghc.c.opts += -optc-ggdb"
+			"stage2.rts.ghc.c.opts += -optc-ggdb"
 	)
 }
 
