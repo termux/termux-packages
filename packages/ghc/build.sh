@@ -5,12 +5,13 @@ TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.dev>"
 TERMUX_PKG_VERSION=9.12.2
 TERMUX_PKG_SRCURL="https://downloads.haskell.org/~ghc/$TERMUX_PKG_VERSION/ghc-$TERMUX_PKG_VERSION-src.tar.xz"
 TERMUX_PKG_SHA256=0e49cd5dde43f348c5716e5de9a5d7a0f8d68d945dc41cf75dfdefe65084f933
-TERMUX_PKG_DEPENDS="libiconv, libffi, libgmp, libandroid-posix-semaphore, ncurses"
+TERMUX_PKG_DEPENDS="libiconv, libffi, libgmp, libandroid-posix-semaphore, ncurses, libdw"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --host=$TERMUX_BUILD_TUPLE
 --with-system-libffi
---disable-ld-override"
+--disable-ld-override
+--enable-dwarf-unwind"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_REPLACES="ghc-libs-static, ghc-libs"
