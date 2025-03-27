@@ -15,6 +15,7 @@ TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_REPLACES="ghc-libs-static, ghc-libs"
 TERMUX_PKG_PROVIDES="ghc-libs, ghc-libs-static"
+TERMUX_DEBUG_BUILD=true
 
 __setup_bootstrap_compiler() {
 	local version=9.10.1
@@ -68,10 +69,16 @@ termux_step_make() {
 		# NOTE: We do not build profiled libs. It exceeds the 6 hours usage limit of github CI.
 		./hadrian/build binary-dist-dir \
 			-j"$TERMUX_PKG_MAKE_PROCESSES" \
-			--flavour="perf+no_profiled_libs" \
+			--flavour="quickest" \
 			--docs=none \
+			"stage1.*.ghc.hs.opts += -g3" \
+			"stage1.*.cabal.configure.opts += --disable-library-stripping --disable-executable-stripping" \
 			"stage1.unix.ghc.link.opts += -optl-landroid-posix-semaphore" \
-			"stage2.unix.ghc.link.opts += -optl-landroid-posix-semaphore"
+			"stage1.rts.ghc.c.opts += -optc-ggdb" \
+			"stage2.unix.ghc.link.opts += -optl-landroid-posix-semaphore" \
+			"stage2.*.ghc.hs.opts += -g3" \
+			"stage2.*.cabal.configure.opts += --disable-library-stripping --disable-executable-stripping" \
+			"stage1.rts.ghc.c.opts += -optc-ggdb"
 	)
 }
 
@@ -108,6 +115,6 @@ termux_step_post_massage() {
 	sed -i "s|$CXX|${CXX/${target}-/}|g" "$ghclibs_dir"/lib/settings
 
 	# Strip unneeded symbols:
-	find . -type f \( -name "*.so" -o -name "*.a" \) -exec "$STRIP" --strip-unneeded {} \;
-	find "$ghclibs_dir"/bin -type f -exec "$STRIP" {} \;
+	# find . -type f \( -name "*.so" -o -name "*.a" \) -exec "$STRIP" --strip-unneeded {} \;
+	# find "$ghclibs_dir"/bin -type f -exec "$STRIP" {} \;
 }
