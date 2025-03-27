@@ -1,0 +1,30 @@
+Fix assertion error when running `eglinfo -B`.
+
+--- a/src/egl/drivers/dri2/platform_x11.c
++++ b/src/egl/drivers/dri2/platform_x11.c
+@@ -1859,7 +1859,11 @@
+    if (!dri2_create_screen(disp))
+       goto cleanup;
+ 
++#ifdef __ANDROID__
++   if (!dri2_setup_device(disp, true)) {
++#else
+    if (!dri2_setup_device(disp, disp->Options.ForceSoftware || dri2_dpy->kopper_without_modifiers)) {
++#endif
+       _eglError(EGL_NOT_INITIALIZED, "DRI2: failed to setup EGLDevice");
+       goto cleanup;
+    }
+--- a/src/egl/drivers/dri2/platform_wayland.c
++++ b/src/egl/drivers/dri2/platform_wayland.c
+@@ -3079,7 +3079,11 @@
+    if (!dri2_create_screen(disp))
+       goto cleanup;
+ 
++#ifdef __ANDROID__
++   if (!dri2_setup_device(disp, true)) {
++#else
+    if (!dri2_setup_device(disp, disp->Options.ForceSoftware)) {
++#endif
+       _eglError(EGL_NOT_INITIALIZED, "DRI2: failed to setup EGLDevice");
+       goto cleanup;
+    }
