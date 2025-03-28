@@ -3,11 +3,11 @@ TERMUX_PKG_DESCRIPTION="terminal-based package manager"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.8.13
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=http://deb.debian.org/debian/pool/main/a/aptitude/aptitude_$TERMUX_PKG_VERSION.orig.tar.xz
 TERMUX_PKG_SHA256=0ef50cb5de27215dd30de74dd9b46b318f017bd0ec3f5c4735df7ac0beb40248
-TERMUX_PKG_DEPENDS="apt, boost, libcwidget, libsigc++-2.0, libsqlite, libxapian, ncurses"
-TERMUX_PKG_BUILD_DEPENDS="boost-headers, googletest"
+TERMUX_PKG_DEPENDS="apt, boost, googletest, libcwidget, libsigc++-2.0, libsqlite, libxapian, ncurses"
+TERMUX_PKG_BUILD_DEPENDS="boost-headers"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-tests
 --disable-docs
