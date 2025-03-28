@@ -33,6 +33,8 @@ termux_step_host_build() {
 termux_step_pre_configure() {
 	termux_setup_cmake
 	termux_setup_ninja
+
+	CXXFLAGS+=" -Wno-c++11-narrowing"
 }
 
 termux_step_make_install() {
