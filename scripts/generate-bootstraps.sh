@@ -5,6 +5,7 @@
 
 set -e
 
+export TERMUX_SCRIPTDIR=$(realpath "$(dirname "$(realpath "$0")")/../")
 . $(dirname "$(realpath "$0")")/properties.sh
 : "${TERMUX_PREFIX:="/data/data/com.termux/files/usr"}"
 BOOTSTRAP_TMPDIR=$(mktemp -d "${TMPDIR:-/tmp}/bootstrap-tmp.XXXXXXXX")
@@ -17,6 +18,10 @@ TERMUX_ARCHITECTURES=("aarch64" "arm" "i686" "x86_64")
 
 # Can be changed by using '--repository' option.
 REPO_BASE_URL="https://packages-cf.termux.dev/apt/termux-main-21"
+
+# The package manager that will be installed in bootstrap.
+# The default is 'apt'.
+TERMUX_PACKAGE_MANAGER="apt"
 
 # A list of non-essential packages. By default it is empty, but can
 # be filled with option '--add'.
@@ -164,6 +169,34 @@ pull_package() {
 	fi
 }
 
+# Add termux bootstrap second stage files
+add_termux_bootstrap_second_stage_files() {
+
+	local package_arch="$1"
+
+	echo "[*] Adding termux bootstrap second stage files..."
+
+	mkdir -p "${BOOTSTRAP_ROOTFS}/${TERMUX_BOOTSTRAPS__BOOTSTRAP_CONFIG_DIR}"
+	sed -e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
+		-e "s|@TERMUX_BOOTSTRAPS__BOOTSTRAP_CONFIG_DIR@|${TERMUX_BOOTSTRAPS__BOOTSTRAP_CONFIG_DIR}|g" \
+		-e "s|@TERMUX_PACKAGE_MANAGER@|${TERMUX_PACKAGE_MANAGER}|g" \
+		-e "s|@TERMUX_PACKAGE_ARCH@|${package_arch}|g" \
+		-e "s|@TERMUX_APP__NAME@|${TERMUX_APP__NAME}|g" \
+		-e "s|@TERMUX_ENV__S_TERMUX@|${TERMUX_ENV__S_TERMUX}|g" \
+		"$TERMUX_SCRIPTDIR/scripts/bootstrap/termux-bootstrap-second-stage.sh" \
+		> "${BOOTSTRAP_ROOTFS}/${TERMUX_BOOTSTRAPS__BOOTSTRAP_CONFIG_DIR}/termux-bootstrap-second-stage.sh"
+	chmod 700 "${BOOTSTRAP_ROOTFS}/${TERMUX_BOOTSTRAPS__BOOTSTRAP_CONFIG_DIR}/termux-bootstrap-second-stage.sh"
+
+	# TODO: Remove it when Termux app supports `pacman` bootstraps installation.
+	sed -e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
+		-e "s|@TERMUX__PREFIX__PROFILE_D_DIR@|${TERMUX__PREFIX__PROFILE_D_DIR}|g" \
+		-e "s|@TERMUX_BOOTSTRAPS__BOOTSTRAP_CONFIG_DIR@|${TERMUX_BOOTSTRAPS__BOOTSTRAP_CONFIG_DIR}|g" \
+		"$TERMUX_SCRIPTDIR/scripts/bootstrap/01-termux-bootstrap-second-stage-fallback.sh" \
+		> "${BOOTSTRAP_ROOTFS}/${TERMUX__PREFIX__PROFILE_D_DIR}/01-termux-bootstrap-second-stage-fallback.sh"
+	chmod 600 "${BOOTSTRAP_ROOTFS}/${TERMUX__PREFIX__PROFILE_D_DIR}/01-termux-bootstrap-second-stage-fallback.sh"
+
+}
+
 # Final stage: generate bootstrap archive and place it to current
 # working directory.
 # Information about symlinks is stored in file SYMLINKS.txt.
@@ -293,7 +326,7 @@ for package_arch in "${TERMUX_ARCHITECTURES[@]}"; do
 	pull_package science-repo
 
 	# Core utilities.
-	pull_package bash
+	pull_package bash # Used by `termux-bootstrap-second-stage.sh`
 	pull_package busybox
 	pull_package bzip2
 	pull_package command-not-found
@@ -338,6 +371,9 @@ for package_arch in "${TERMUX_ARCHITECTURES[@]}"; do
 		pull_package "$add_pkg"
 	done
 	unset add_pkg
+
+	# Add termux bootstrap second stage files
+	add_termux_bootstrap_second_stage_files "$package_arch"
 
 	# Create bootstrap archive.
 	create_bootstrap_archive "$package_arch"
