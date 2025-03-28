@@ -1,0 +1,15 @@
+--- ./src/sys_unix.c~	2025-03-26 14:52:29.000000000 +0000
++++ ./src/sys_unix.c	2025-03-28 15:37:25.385774847 +0000
+@@ -170,10 +170,12 @@
+ #ifdef HAVE_SECURE_GETENV
+ 	return secure_getenv(name);
+ #else
++#ifndef __ANDROID__
+ 	/* Otherwise, make sure current process is not tainted by uid or gid
+ 	 * changes */
+ 	if (issetugid())
+ 		return NULL;
++#endif
+ 	return getenv(name);
+ #endif
+ }
