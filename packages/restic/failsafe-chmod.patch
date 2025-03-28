@@ -3,8 +3,8 @@ diff -uNr restic/internal/fs/file_unix.go restic.mod/internal/fs/file_unix.go
 +++ restic.mod/internal/fs/file_unix.go	2020-01-01 17:54:08.797875856 +0200
 @@ -47,12 +47,6 @@
  
- // Chmod changes the mode of the named file to mode.
- func Chmod(name string, mode os.FileMode) error {
+ // chmod changes the mode of the named file to mode.
+ func chmod(name string, mode os.FileMode) error {
 -	err := os.Chmod(fixpath(name), mode)
 -
 -	// ignore the error if the FS does not support setting this mode (e.g. CIFS with gvfs on Linux)
