@@ -6,6 +6,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.3.2
 TERMUX_PKG_SRCURL=https://github.com/LudovicRousseau/PCSC/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=259008b57a86b10869428c5ba003abfec35388adee2ff9bb0380ad2de85f0533
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libusb, python"
 TERMUX_PKG_BREAKS="libpcsclite-dev"
 TERMUX_PKG_REPLACES="libpcsclite-dev"
