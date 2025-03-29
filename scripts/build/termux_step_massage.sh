@@ -335,11 +335,6 @@ termux_step_massage() {
 		termux_create_pacman_subpackages
 	fi
 
-	# Remove unnecessary files in haskell packages:
-	if ! [[ $TERMUX_PKG_NAME =~ ghc|ghc-libs ]]; then
-		test -f ./${ADDING_PREFIX}lib/ghc-*/settings && rm -rf ./${ADDING_PREFIX}lib/ghc-*/settings
-	fi
-
 	# .. remove empty directories (NOTE: keep this last):
 	find . -type d -empty -delete
 }

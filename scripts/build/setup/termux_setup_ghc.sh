@@ -1,66 +1,56 @@
 # shellcheck shell=bash
-# Utility function to setup a GHC toolchain.
+# Utility function to setup a GHC cross-compiler toolchain targeting Android.
 termux_setup_ghc() {
-	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
-		local TERMUX_GHC_VERSION=8.10.7
-		local TERMUX_GHC_TEMP_FOLDER="${TERMUX_COMMON_CACHEDIR}/ghc-${TERMUX_GHC_VERSION}"
-		local TERMUX_GHC_TAR="${TERMUX_GHC_TEMP_FOLDER}.tar.xz"
-		local TERMUX_GHC_RUNTIME_FOLDER
+	local TERMUX_GHC_VERSION=9.12.1
+	local GHC_PREFIX="ghc-cross-$TERMUX_GHC_VERSION-$TERMUX_ARCH"
+	local TERMUX_GHC_TEMP_FOLDER="$TERMUX_COMMON_CACHEDIR/$GHC_PREFIX"
+	local TERMUX_GHC_TAR="$TERMUX_GHC_TEMP_FOLDER.tar.xz"
+	local TERMUX_GHC_RUNTIME_FOLDER
 
-		if [ "${TERMUX_PACKAGES_OFFLINE-false}" = "true" ]; then
-			TERMUX_GHC_RUNTIME_FOLDER="${TERMUX_SCRIPTDIR}/build-tools/ghc-${TERMUX_GHC_VERSION}-runtime"
+	if [[ "$TERMUX_ON_DEVICE_BUILD" == false ]]; then
+
+		if [[ "${TERMUX_PACKAGES_OFFLINE-false}" == true ]]; then
+			TERMUX_GHC_RUNTIME_FOLDER="$TERMUX_SCRIPTDIR/build-tools/$GHC_PREFIX-runtime"
 		else
-			TERMUX_GHC_RUNTIME_FOLDER="${TERMUX_COMMON_CACHEDIR}/ghc-${TERMUX_GHC_VERSION}-runtime"
+			TERMUX_GHC_RUNTIME_FOLDER="$TERMUX_COMMON_CACHEDIR/$GHC_PREFIX-runtime"
 		fi
 
 		export PATH="$TERMUX_GHC_RUNTIME_FOLDER/bin:$PATH"
 
-		[ -d "$TERMUX_GHC_RUNTIME_FOLDER" ] && return
+		[[ -d "$TERMUX_GHC_RUNTIME_FOLDER" ]] && return
 
-		termux_download "https://downloads.haskell.org/~ghc/${TERMUX_GHC_VERSION}/ghc-${TERMUX_GHC_VERSION}-x86_64-deb10-linux.tar.xz" \
+		declare -A checksums=(
+			["aarch64"]="cf4bc1e1e6e67bb1174081ff1ad4657b98432077d9fa0ce9d4d68122bc3028c4"
+			["arm"]="2ea5c8aed4691cb9e7dfa5b4633097c3f93c52d0dcef7055a662e1c488f9fe13"
+			["i686"]="e75eca115b8fdcb4fa7934ea7d460a85f5ac6b9875dda4153e0d2831708ee154"
+			["x86_64"]="9fa293c68a0eb8736d3ce0f742f28c4ff67851fccf96066f443ca849727a0928"
+		)
+
+		termux_download "https://github.com/termux/ghc-cross-tools/releases/download/ghc-v$TERMUX_GHC_VERSION/ghc-$TERMUX_GHC_VERSION-${TERMUX_HOST_PLATFORM/arm/armv7a}.tar.xz" \
 			"$TERMUX_GHC_TAR" \
-			a13719bca87a0d3ac0c7d4157a4e60887009a7f1a8dbe95c4759ec413e086d30
+			"${checksums[$TERMUX_ARCH]}"
 
-		rm -Rf "$TERMUX_GHC_TEMP_FOLDER"
-		tar xf "$TERMUX_GHC_TAR" -C "$TERMUX_COMMON_CACHEDIR"
+		mkdir -p "$TERMUX_GHC_RUNTIME_FOLDER" "$TERMUX_GHC_TEMP_FOLDER"
+		tar -xf "$TERMUX_GHC_TAR" -C "$TERMUX_GHC_TEMP_FOLDER" --strip-components=1
 
 		(
 			set -e
-			unset CC CXX CFLAGS CXXFLAGS CPPFLAGS LDFLAGS AR AS CPP LD RANLIB READELF STRIP
-			export PATH="/usr/bin:$(echo -n $(tr ':' '\n' <<< "$PATH" | grep -v "^$TERMUX_PREFIX/bin$") | tr ' ' ':')"
 			cd "$TERMUX_GHC_TEMP_FOLDER"
-			./configure --prefix="$TERMUX_GHC_RUNTIME_FOLDER"
+
+			export CONF_CC_OPTS_STAGE2="$CFLAGS $CPPFLAGS"
+			export CONF_GCC_LINKER_OPTS_STAGE2="$LDFLAGS"
+			export CONF_CXX_OPTS_STAGE2="$CXXFLAGS"
+
+			./configure \
+				--prefix="$TERMUX_GHC_RUNTIME_FOLDER" \
+				--host="${TERMUX_HOST_PLATFORM/arm/armv7a}"
 			make install
-		)
+		) >/dev/null
 
-		# Cabal passes a host string to the libraries' configure scripts that isn't valid.
-		# After this patch we need to always pass --configure-option=--host=${TERMUX_HOST_PLATFORM}
-		# to Setup.hs configure.
-		(
-			CABAL_VERSION="3.6.2.0"
-			CABAL_TEMP_FOLDER="$(mktemp -d -t cabal-"${CABAL_VERSION}".XXXXXX)"
-			CABAL_TAR="${CABAL_TEMP_FOLDER}/cabal-${CABAL_VERSION}.tar.gz"
-
-			termux_download \
-				https://hackage.haskell.org/package/Cabal-"${CABAL_VERSION}"/Cabal-"${CABAL_VERSION}".tar.gz \
-				"${CABAL_TAR}" \
-				9e903d06a7fb0893c6f303199e737a7d555fbb5e309be8bcc782b4eb2717bc42
-
-			tar xf "${CABAL_TAR}" -C "${CABAL_TEMP_FOLDER}" --strip-components=1
-
-			cd "${CABAL_TEMP_FOLDER}"
-
-			sed -i 's/maybeHostFlag = i/maybeHostFlag = [] -- i/' src/Distribution/Simple.hs
-
-			runhaskell Setup configure --prefix="${TERMUX_GHC_RUNTIME_FOLDER}"
-			runhaskell Setup build
-			runhaskell Setup install
-			ghc-pkg recache
-		)
-		rm -Rf "$TERMUX_GHC_TEMP_FOLDER" "$TERMUX_GHC_TAR"
+		rm -rf "$TERMUX_GHC_TAR" "$TERMUX_GHC_TEMP_FOLDER"
 	else
-		if [[ "$TERMUX_APP_PACKAGE_MANAGER" = "apt" && "$(dpkg-query -W -f '${db:Status-Status}\n' ghc 2>/dev/null)" != "installed" ]] ||
-			[[ "$TERMUX_APP_PACKAGE_MANAGER" = "pacman" && ! "$(pacman -Q ghc 2>/dev/null)" ]]; then
+		if [[ "$TERMUX_APP_PACKAGE_MANAGER" == "apt" ]] && "$(dpkg-query -W -f '${db:Status-Status}\n' ghc 2>/dev/null)" != "installed" ||
+			[[ "$TERMUX_APP_PACKAGE_MANAGER" == "pacman" ]] && ! "$(pacman -Q ghc 2>/dev/null)"; then
 			echo "Package 'ghc' is not installed."
 			exit 1
 		fi

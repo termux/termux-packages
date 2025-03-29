@@ -1,35 +1,18 @@
-termux_step_configure_haskell_build() {
-	termux_setup_ghc_cross_compiler
+termux_step_configure_cabal() {
+	termux_setup_ghc
 	termux_setup_cabal
 
-	HOST_FLAG="--host=${TERMUX_HOST_PLATFORM}"
-	if [[ ${TERMUX_PKG_EXTRA_CONFIGURE_ARGS} != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--host=/}" ]]; then
-		HOST_FLAG=""
-	fi
+	local target="$TERMUX_HOST_PLATFORM"
+	[[ "$TERMUX_ARCH" == "arm" ]] && target="armv7a-linux-androideabi"
 
-	LIBEXEC_FLAG="--libexecdir=${TERMUX_PREFIX}/libexec"
-	if [[ ${TERMUX_PKG_EXTRA_CONFIGURE_ARGS} != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--libexecdir=/}" ]]; then
-		LIBEXEC_FLAG=""
+	TARGET_FLAG="--target=$target"
+	if [[ ${TERMUX_PKG_EXTRA_CONFIGURE_ARGS} != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--target=/}" ]]; then
+		TARGET_FLAG=""
 	fi
 
 	QUIET_BUILD=
 	if [[ ${TERMUX_QUIET_BUILD} == true ]]; then
 		QUIET_BUILD="-v0"
-	fi
-
-	LIB_STRIPPING="--enable-library-stripping"
-	if [[ ${TERMUX_PKG_EXTRA_CONFIGURE_ARGS} != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--disable-library-stripping=/}" ]] || [[ ${TERMUX_DEBUG_BUILD} == true ]]; then
-		LIB_STRIPPING=""
-	fi
-
-	EXECUTABLE_STRIPPING="--enable-executable-stripping"
-	if [[ ${TERMUX_PKG_EXTRA_CONFIGURE_ARGS} != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--disable-executable-stripping=/}" ]] || [[ ${TERMUX_DEBUG_BUILD} == true ]]; then
-		EXECUTABLE_STRIPPING=""
-	fi
-
-	SPLIT_SECTIONS="--enable-split-sections"
-	if [[ ${TERMUX_PKG_EXTRA_CONFIGURE_ARGS} != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--disable-split-sections=/}" ]]; then
-		SPLIT_SECTIONS=""
 	fi
 
 	# Avoid gnulib wrapping of functions when cross compiling. See
@@ -92,27 +75,19 @@ termux_step_configure_haskell_build() {
 	# shellcheck disable=SC2086
 	# shellcheck disable=SC2250,SC2154,SC2248,SC2312
 	env $AVOID_GNULIB cabal configure \
-		$TERMUX_HASKELL_OPTIMISATION \
+		$TERMUX_GHC_OPTIMISATION \
 		--prefix="$TERMUX_PREFIX" \
-		--configure-option="$HOST_FLAG" \
-		--ghc-options="-optl-Wl,-rpath,$TERMUX_PREFIX/lib -optl-Wl,--enable-new-dtags" \
+		--configure-option="$TARGET_FLAG" \
 		--with-compiler="$(command -v ghc)" \
 		--with-ghc-pkg="$(command -v ghc-pkg)" \
 		--with-hsc2hs="$(command -v hsc2hs)" \
-		--hsc2hs-option=--cross-compile \
-		--extra-lib-dirs="$TERMUX_PREFIX/lib" \
-		--extra-include-dirs="$TERMUX_PREFIX/include" \
-		--with-ld="$LD" \
-		--with-strip="$STRIP" \
-		--with-ar="$AR" \
-		--with-pkg-config="$PKG_CONFIG" \
+		"$([[ "$TERMUX_ON_DEVICE_BUILD" == false ]] && echo -n "--hsc2hs-option=--cross-compile")" \
+		--with-ld="$(command -v "$LD")" \
+		--with-ar="$(command -v "$AR")" \
+		--with-pkg-config="$(command -v "$PKG_CONFIG")" \
 		--with-happy="$(command -v happy)" \
 		--with-alex="$(command -v alex)" \
 		--disable-tests \
-		$SPLIT_SECTIONS \
-		$EXECUTABLE_STRIPPING \
-		$LIB_STRIPPING \
 		$QUIET_BUILD \
-		$LIBEXEC_FLAG \
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
 }
