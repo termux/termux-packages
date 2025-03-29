@@ -1,0 +1,10 @@
+--- a/src/libtscore/Makefile
++++ b/src/libtscore/Makefile
+@@ -102,7 +102,6 @@
+ PRECONFIG = $(SYSROOT)$(SYSPREFIX)/include/tscore/tsPreConfiguration.h
+ 
+ install-devel: $(if $(NOSTATIC),,$(STATIC_LIBTSCORE)) $(TSCORE_H)
+-	rm -rf $(SYSROOT)$(SYSPREFIX)/include/tscore
+ 	install -d -m 755 $(SYSROOT)$(USRLIBDIR) $(SYSROOT)$(SYSPREFIX)/include/tscore
+ 	$(if $(NOSTATIC),,install -m 644 $(STATIC_LIBTSCORE) $(SYSROOT)$(USRLIBDIR))
+ 	install -m 644 $(addsuffix /*.h,$(LIBTSCORE_INCLUDES)) $(TSCORE_H) $(SYSROOT)$(SYSPREFIX)/include/tscore
