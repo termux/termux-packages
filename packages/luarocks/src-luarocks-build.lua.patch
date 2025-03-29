@@ -1,0 +1,20 @@
+diff -uNr luarocks-3.11.1/src/luarocks/build.lua luarocks-3.11.1b/src/luarocks/build.lua
+--- luarocks-3.11.1/src/luarocks/build.lua	2024-06-01 01:38:00.000000000 +0800
++++ luarocks-3.11.1b/src/luarocks/build.lua	2024-06-17 10:58:41.264982798 +0800
+@@ -297,10 +297,15 @@
+             local ok, err = fs.make_dir(dest)
+             if not ok then return nil, err end
+          end
+-         local ok = fs.copy(file, dir.path(dest, filename), perms)
++         local copied_file = dir.path(dest, filename)
++         local ok = fs.copy(file, copied_file, perms)
+          if not ok then
+             return nil, "Failed copying "..file
+          end
++         ok = os.execute("termux-elf-cleaner --api-level=@API_LEVEL@ '"..copied_file.."'")
++         if not ok then
++            return nil, "Failed cleaning unused ELF on "..file
++         end
+       end
+       return true
+    end
