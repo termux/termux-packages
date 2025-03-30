@@ -1,0 +1,184 @@
+diff -uNr vlc-3.0.21/modules/meta_engine/taglib.cpp vlc-3.0.21.mod/modules/meta_engine/taglib.cpp
+--- vlc-3.0.21/contrib/src/taglib/SHA512SUMS	2024-06-05 23:56:07.000000000 +0800
++++ vlc-3.0.21.mod/contrib/src/taglib/SHA512SUMS	2025-04-03 15:53:34.164993496 +0800
+@@ -1 +1 @@
+-7e369faa5e3c6c6401052b7a19e35b0cf8c1e5ed9597053ac731a7718791d5d4803d1b18a93e903ec8c3fc6cb92e34d9616daa2ae4d326965d4c4d5624dcdaba  taglib-1.12.tar.gz
++79f333dbe8ed44076010e33803e3418410516df4b70203962bbefea81ce0a6989a54a9791022488e64f1876573580cbe93920da4b2a7277d6a3f48c946e518fc  taglib-2.0.2.tar.gz
+diff -uNr vlc-3.0.21/contrib/src/taglib/rules.mak vlc-3.0.21.mod/contrib/src/taglib/rules.mak
+--- vlc-3.0.21/contrib/src/taglib/rules.mak	2024-06-05 23:56:07.000000000 +0800
++++ vlc-3.0.21.mod/contrib/src/taglib/rules.mak	2025-04-03 15:52:03.612993530 +0800
+@@ -1,6 +1,6 @@
+ # TagLib
+ 
+-TAGLIB_VERSION := 1.12
++TAGLIB_VERSION := 2.0.2
+ TAGLIB_URL := https://taglib.org/releases/taglib-$(TAGLIB_VERSION).tar.gz
+ 
+ PKGS += taglib
+--- vlc-3.0.21/modules/meta_engine/taglib.cpp	2024-06-05 23:56:07.000000000 +0800
++++ vlc-3.0.21.mod/modules/meta_engine/taglib.cpp	2025-04-03 14:33:19.304995333 +0800
+@@ -125,7 +125,11 @@
+ template <class T>
+ File *VLCTagLib::ExtResolver<T>::createFile(FileName fileName, bool, AudioProperties::ReadStyle) const
+ {
++#if defined(_WIN32) && TAGLIB_VERSION >= VERSION_INT(2, 0, 0)
++    std::string filename = fileName.toString().to8Bit(true);
++#else
+     std::string filename = std::string(fileName);
++#endif
+     std::size_t namesize = filename.size();
+ 
+     if (namesize > ext.length())
+@@ -180,12 +184,16 @@
+         return m_stream->psz_location;
+     }
+ 
++#if TAGLIB_VERSION >= VERSION_INT(2, 0, 0)
++    ByteVector readBlock(size_t length)
++#else
+     ByteVector readBlock(ulong length)
++#endif
+     {
+         ByteVector res(length, 0);
+         ssize_t i_read = vlc_stream_Read( m_stream, res.data(), length);
+         if (i_read < 0)
+-            return ByteVector::null;
++            return {};
+         else if ((size_t)i_read != length)
+             res.resize(i_read);
+         return res;
+@@ -196,11 +204,19 @@
+         // Let's stay Read-Only for now
+     }
+ 
++#if TAGLIB_VERSION >= VERSION_INT(2, 0, 0)
++    void insert(const ByteVector&, offset_t, size_t)
++#else
+     void insert(const ByteVector&, ulong, ulong)
++#endif
+     {
+     }
+ 
++#if TAGLIB_VERSION >= VERSION_INT(2, 0, 0)
++    void removeBlock(offset_t, size_t)
++#else
+     void removeBlock(ulong, ulong)
++#endif
+     {
+     }
+ 
+@@ -214,7 +230,11 @@
+         return true;
+     }
+ 
++#if TAGLIB_VERSION >= VERSION_INT(2, 0, 0)
++    void seek(offset_t offset, Position p)
++#else
+     void seek(long offset, Position p)
++#endif
+     {
+         uint64_t pos = 0;
+         switch (p)
+@@ -237,12 +257,20 @@
+         return;
+     }
+ 
++#if TAGLIB_VERSION >= VERSION_INT(2, 0, 0)
++    offset_t tell() const
++#else
+     long tell() const
++#endif
+     {
+         return m_previousPos;
+     }
+ 
++#if TAGLIB_VERSION >= VERSION_INT(2, 0, 0)
++    offset_t length()
++#else
+     long length()
++#endif
+     {
+         uint64_t i_size;
+         if (vlc_stream_GetSize( m_stream, &i_size ) != VLC_SUCCESS)
+@@ -250,7 +278,11 @@
+         return i_size;
+     }
+ 
++#if TAGLIB_VERSION >= VERSION_INT(2, 0, 0)
++    void truncate(offset_t)
++#else
+     void truncate(long)
++#endif
+     {
+     }
+ 
+@@ -465,7 +465,7 @@
+ static void ReadMetaFromBasicTag(const Tag* tag, vlc_meta_t *dest)
+ {
+ #define SET( accessor, meta )                                                  \
+-    if( !tag->accessor().isNull() && !tag->accessor().isEmpty() )              \
++    if( !tag->accessor().isEmpty() )                                              \
+         vlc_meta_Set##meta( dest, tag->accessor().toCString(true) )
+ #define SETINT( accessor, meta )                                               \
+     if( tag->accessor() )        
+@@ -806,36 +806,35 @@
+ {
+     MP4::Item list;
+ #define SET( keyName, metaName )                                                             \
+-    if( tag->itemListMap().contains(keyName) )                                               \
++    if( tag->contains(keyName) )                                                             \
+     {                                                                                        \
+-        list = tag->itemListMap()[keyName];                                                  \
++        list = tag->item(keyName);                                                           \
+         vlc_meta_Set##metaName( p_meta, list.toStringList().front().toCString( true ) );     \
+     }
+ #define SET_EXTRA( keyName, metaName )                                                   \
+-    if( tag->itemListMap().contains(keyName) )                                  \
+-    {                                                                                \
+-        list = tag->itemListMap()[keyName];                                     \
+-        vlc_meta_AddExtra( p_meta, metaName, list.toStringList().front().toCString( true ) ); \
++    if( tag->contains(keyName) )                                                         \
++    {                                                                                    \
++        list = tag->item(keyName);                                                       \
++        vlc_meta_AddExtra( p_meta, metaName, list.toStringList().front().toCString( true ) ); \
+     }
+-
+     SET("----:com.apple.iTunes:MusicBrainz Track Id", TrackID );
+     SET_EXTRA("----:com.apple.iTunes:MusicBrainz Album Id", VLC_META_EXTRA_MB_ALBUMID );
+ 
+ #undef SET
+ #undef SET_EXTRA
+ 
+-    if( tag->itemListMap().contains("covr") )
++    if( tag->contains("covr") )
+     {
+-        MP4::CoverArtList list = tag->itemListMap()["covr"].toCoverArtList();
+-        const char *psz_format = list[0].format() == MP4::CoverArt::PNG ? "image/png" : "image/jpeg";
++        MP4::CoverArtList cover_list = tag->item("covr").toCoverArtList();
++        const char *psz_format = cover_list[0].format() == MP4::CoverArt::PNG ? "image/png" : "image/jpeg";
+ 
+         msg_Dbg( p_demux_meta, "Found embedded art (%s) is %i bytes",
+-                 psz_format, list[0].data().size() );
++                 psz_format, cover_list[0].data().size() );
+ 
+         input_attachment_t *p_attachment =
+                 vlc_input_attachment_New( "cover", psz_format, "cover",
+-                                          list[0].data().data(), list[0].data().size() );
+-        if( p_attachment )
++                                          cover_list[0].data().data(), cover_list[0].data().size() );        
++     if( p_attachment )
+         {
+             TAB_APPEND_CAST( (input_attachment_t**),
+                              p_demux_meta->i_attachments, p_demux_meta->attachments,
+@@ -1337,7 +1369,11 @@
+         if( RIFF::AIFF::File* riff_aiff = dynamic_cast<RIFF::AIFF::File*>(f.file()) )
+             WriteMetaToId3v2( riff_aiff->tag(), p_item );
+         else if( RIFF::WAV::File* riff_wav = dynamic_cast<RIFF::WAV::File*>(f.file()) )
++#if TAGLIB_VERSION >= VERSION_INT(2, 0, 0)
++            WriteMetaToId3v2( riff_wav->ID3v2Tag(), p_item );
++#else
+             WriteMetaToId3v2( riff_wav->tag(), p_item );
++#endif
+     }
+     else if( TrueAudio::File* trueaudio = dynamic_cast<TrueAudio::File*>(f.file()) )
+     {
