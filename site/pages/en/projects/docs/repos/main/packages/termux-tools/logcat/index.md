@@ -43,7 +43,7 @@ The **shell commands** that can be run with plugin apps are not executed by plug
 
 Once log levels have been set, you can run the `logcat` command to get the logs. **Note that by default, an app can only get its own logs and that of any app that has the same [`sharedUserId`](https://developer.android.com/guide/topics/manifest/manifest-element#uid) as it, but it cannot get the full system logs of other apps and the Android system.** Since the Termux app only has the same `sharedUserId` (`com.termux`) as the `Termux:API`, `Termux:Boot`, `Termux:Styling`, `Termux:Tasker` and `Termux:Widget` apps, it can only view the logs of these apps.
 
-**To get full system logs of other apps and the Android system, the `logcat` command needs to be run with `root` or `adb`**, or the app needs to be granted the [`RAED_LOGS`](https://developer.android.com/reference/android/Manifest.permission#READ_LOGS) permission with `root` or `adb`. **This may be necessary for solving specific issues** as some `Exception`s and errors which may affect the Termux apps are only logged by the Android system or by other apps.
+**To get full system logs of other apps and the Android system, the `logcat` command needs to be run with `root` or `adb`**, or the app needs to be granted the [`READ_LOGS`](https://developer.android.com/reference/android/Manifest.permission#READ_LOGS) permission with `root` or `adb`. **This may be necessary for solving specific issues** as some `Exception`s and errors which may affect the Termux apps are only logged by the Android system or by other apps.
 
 #### To get logs of Termux apps
 
