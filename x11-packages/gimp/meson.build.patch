@@ -1,0 +1,80 @@
++++ ./meson.build
+@@ -441,7 +441,7 @@
+ lcms              = dependency('lcms2',              version: '>='+lcms_minver)
+ libmypaint_minver = '1.3.0'
+ libmypaint        = dependency('libmypaint',         version: '>='+libmypaint_minver)
+-mypaint_brushes   = dependency('mypaint-brushes-1.0',version: '>='+libmypaint_minver)
++mypaint_brushes   = dependency('mypaint-brushes-2.0',version: '>='+libmypaint_minver)
+ if not libmypaint.version().version_compare('>=1.4.0')
+   libmypaint_warning='''
+ 
+@@ -778,11 +778,7 @@
+ MIMEtypes += 'image/x-psp'
+ 
+ # Compiler-provided headers can't be found in crossroads environment
+-if not meson.is_cross_build()
+-  bz2 = cc.find_library('bz2')
+-else
+-  bz2 = dependency('bzip2')
+-endif
++bz2 = cc.find_library('bz2')
+ 
+ liblzma_minver = '5.0.0'
+ liblzma = dependency('liblzma', version: '>='+liblzma_minver)
+@@ -1545,28 +1541,7 @@
+ endif
+ 
+ if shmem_choice == 'sysv'
+-  check_ip_rmid_deferred_release = cc.run('''
+-  #include <sys/types.h>
+-  #include <sys/ipc.h>
+-  #include <sys/shm.h>
+-  int main() {
+-    int id = shmget(IPC_PRIVATE, 4, IPC_CREAT | 0600);
+-    if (id == -1)
+-      return 2;
+-
+-    char *shmaddr = shmat(id, 0, 0);
+-    shmctl(id, IPC_RMID, 0);
+-    if ((char*) shmat(id, 0, 0) == (char*) -1) {
+-      shmdt(shmaddr);
+-      return 1;
+-    }
+-    shmdt(shmaddr);
+-    shmdt(shmaddr);
+-    return 0;
+-  }
+-  ''',
+-  name: 'shmctl IPC_RMID allows subsequent attaches').returncode() == 0
+-  conf.set('IPC_RMID_DEFERRED_RELEASE', check_ip_rmid_deferred_release)
++  conf.set('IPC_RMID_DEFERRED_RELEASE', true)
+   conf.set('USE_SYSV_SHM', true)
+ elif shmem_choice == 'posix'
+   conf.set('USE_POSIX_SHM', true)
+@@ -1963,7 +1938,7 @@
+  gimp_run_env.set('GIMP_DEBUG_SELF', '1')
+ endif
+ 
+-if meson.can_run_host_binaries() and have_gobject_introspection
++if have_gobject_introspection
+   if enable_console_bin
+     gimp_real_exe = gimpconsole_exe
+   else
++++ ./gimp-data/images/meson.build
+@@ -1,5 +1,6 @@
+ ## Splash Image and Welcome Dialog ##
+ 
++if not meson.is_cross_build()
+ splash = custom_target('gimp-splash.png',
+                        input : [ 'export-splash.py' ],
+                        output: [ 'gimp-splash.png', ],
+@@ -13,6 +14,9 @@
+                        env: gimp_run_env,
+                        install_dir: gimpdatadir / 'images',
+                        install: true)
++else
++  install_data('gimp-splash.png', install_dir: gimpdatadir / 'images')
++endif
+ 
+ ## Windows Installer's Splash Image and Intro Banner ##
+ 
