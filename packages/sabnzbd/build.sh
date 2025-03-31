@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Fully automated Usenet Binary Downloader"
 TERMUX_PKG_LICENSE="GPL-2.0, GPL-3.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE.txt, GPL2.txt, GPL3.txt"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="4.4.1"
+TERMUX_PKG_VERSION="4.5.0"
 TERMUX_PKG_SRCURL=https://github.com/sabnzbd/sabnzbd/releases/download/${TERMUX_PKG_VERSION}/SABnzbd-${TERMUX_PKG_VERSION}-src.tar.gz
-TERMUX_PKG_SHA256=a9ebf273d77c6d3cc9a13b1bd1640b903f4891e58aee3ef5a25595db3aa4d7fb
+TERMUX_PKG_SHA256=4ca952042d90ca6cda2e846b646f1e7a682f1390b6e359be7c05f104a092b7cb
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="python, python-cryptography, python-sabyenc3, termux-tools, par2, unrar, p7zip, unzip"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
@@ -26,7 +26,7 @@ termux_step_post_get_source() {
 			continue
 		fi
 		TERMUX_PKG_PYTHON_TARGET_DEPS+="'$dep', "
-	done < $TERMUX_PKG_SRCDIR/requirements.txt
+	done < "$TERMUX_PKG_SRCDIR/requirements.txt"
 }
 
 termux_step_make_install() {

@@ -1,5 +1,5 @@
 diff --git a/SABnzbd.py b/SABnzbd.py
-index ffd999892..662358479 100755
+index 90e8350..5888561 100755
 --- a/SABnzbd.py
 +++ b/SABnzbd.py
 @@ -16,6 +16,7 @@
@@ -8,8 +8,8 @@ index ffd999892..662358479 100755
  import sys
 +sys.path.insert(0,"@TERMUX_PREFIX@/share/sabnzbd")
  
- if sys.hexversion < 0x03070000:
-     print("Sorry, requires Python 3.7 or above")
+ # Trick to show a better message on older Python
+ # releases that don't support walrus operator
 @@ -366,19 +367,7 @@ def fix_webname(name):
  
  def get_user_profile_paths():
@@ -19,19 +19,19 @@ index ffd999892..662358479 100755
 -        # just assume that everything defaults to the program dir
 -        sabnzbd.DIR_LCLDATA = sabnzbd.DIR_PROG
 -        sabnzbd.DIR_HOME = sabnzbd.DIR_PROG
--        if sabnzbd.WIN32:
+-        if sabnzbd.WINDOWS:
 -            # Ignore Win32 "logoff" signal
 -            # This should work, but it doesn't
 -            # Instead the signal_handler will ignore the "logoff" signal
 -            # signal.signal(5, signal.SIG_IGN)
 -            pass
 -        return
--    elif sabnzbd.WIN32:
-+    if sabnzbd.WIN32:
+-    elif sabnzbd.WINDOWS:
++    if sabnzbd.WINDOWS:
          try:
              path = shell.SHGetFolderPath(0, shellcon.CSIDL_LOCAL_APPDATA, None, 0)
              sabnzbd.DIR_LCLDATA = os.path.join(path, DEF_WORKDIR)
-@@ -965,7 +954,7 @@ def main():
+@@ -934,7 +923,7 @@ def main():
  
      sabnzbd.MY_FULLNAME = os.path.normpath(os.path.abspath(sabnzbd.MY_FULLNAME))
      sabnzbd.MY_NAME = os.path.basename(sabnzbd.MY_FULLNAME)
