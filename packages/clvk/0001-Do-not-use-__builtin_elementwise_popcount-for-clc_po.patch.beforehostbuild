@@ -1,158 +1,32 @@
-From 2574ad4701a2187d77e0216690e96e23001ab553 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Chongyun Lee <licy183@termux.dev>
-Date: Fri, 28 Feb 2025 23:49:06 +0800
+Date: Tue, 1 Apr 2025 00:01:47 +0800
 Subject: [PATCH] Do not use `__builtin_elementwise_popcount` for
  `clc_popcount`
 
 __builtin_elementwise_popcount is introduced in LLVM 20
 
 ---
- libclc/amdgcn/lib/SOURCES                     |  1 +
- libclc/amdgcn/lib/integer/popcount.cl         |  6 ++++++
- libclc/amdgcn/lib/integer/popcount.inc        | 17 ++++++++++++++++
- libclc/clc/include/clc/integer/clc_popcount.h | 12 -----------
- libclc/clc/lib/clspv/SOURCES                  |  1 -
  libclc/clc/lib/generic/SOURCES                |  1 -
- .../clc/lib/generic/integer/clc_popcount.cl   |  7 -------
- libclc/clc/lib/spirv/SOURCES                  |  1 -
- libclc/generic/include/clc/integer/popcount.h |  6 ++----
  libclc/generic/include/integer/popcount.h     |  3 +++
  .../generic/include/integer/unary_intrin.inc  | 20 +++++++++++++++++++
  libclc/generic/lib/integer/popcount.cl        |  7 ++++---
- 12 files changed, 53 insertions(+), 29 deletions(-)
- create mode 100644 libclc/amdgcn/lib/integer/popcount.cl
- create mode 100644 libclc/amdgcn/lib/integer/popcount.inc
- delete mode 100644 libclc/clc/include/clc/integer/clc_popcount.h
- delete mode 100644 libclc/clc/lib/generic/integer/clc_popcount.cl
+ 4 files changed, 27 insertions(+), 4 deletions(-)
  create mode 100644 libclc/generic/include/integer/popcount.h
  create mode 100644 libclc/generic/include/integer/unary_intrin.inc
 
-diff --git a/external/clspv/third_party/llvm/libclc/amdgcn/lib/SOURCES b/external/clspv/third_party/llvm/libclc/amdgcn/lib/SOURCES
-index 4ea66385f..b235457f9 100644
---- a/external/clspv/third_party/llvm/libclc/amdgcn/lib/SOURCES
-+++ b/external/clspv/third_party/llvm/libclc/amdgcn/lib/SOURCES
-@@ -1,4 +1,5 @@
- cl_khr_int64_extended_atomics/minmax_helpers.ll
-+integer/popcount.cl
- math/fmax.cl
- math/fmin.cl
- math/ldexp.cl
-diff --git a/external/clspv/third_party/llvm/libclc/amdgcn/lib/integer/popcount.cl b/external/clspv/third_party/llvm/libclc/amdgcn/lib/integer/popcount.cl
-new file mode 100644
-index 000000000..3b493fbd1
---- /dev/null
-+++ b/external/clspv/third_party/llvm/libclc/amdgcn/lib/integer/popcount.cl
-@@ -0,0 +1,6 @@
-+#include <clc/clc.h>
-+#include <clc/utils.h>
-+#include <integer/popcount.h>
-+
-+#define __CLC_BODY "popcount.inc"
-+#include <clc/integer/gentype.inc>
-diff --git a/external/clspv/third_party/llvm/libclc/amdgcn/lib/integer/popcount.inc b/external/clspv/third_party/llvm/libclc/amdgcn/lib/integer/popcount.inc
-new file mode 100644
-index 000000000..402ddb768
---- /dev/null
-+++ b/external/clspv/third_party/llvm/libclc/amdgcn/lib/integer/popcount.inc
-@@ -0,0 +1,17 @@
-+_CLC_OVERLOAD _CLC_DEF __CLC_GENTYPE popcount(__CLC_GENTYPE x) {
-+/* LLVM-4+ implements i16 ops for VI+ ASICs. However, ctpop implementation
-+ * is missing until r326535. Therefore we have to convert sub i32 types to uint
-+ * as a workaround. */
-+#if __clang_major__ < 7 && __clang_major__ > 3 && __CLC_GENSIZE < 32
-+	/* Prevent sign extension on uint conversion */
-+	const __CLC_U_GENTYPE y = __CLC_XCONCAT(as_, __CLC_U_GENTYPE)(x);
-+	/* Convert to uintX */
-+	const __CLC_XCONCAT(uint, __CLC_VECSIZE) z = __CLC_XCONCAT(convert_uint, __CLC_VECSIZE)(y);
-+	/* Call popcount on uintX type */
-+	const __CLC_XCONCAT(uint, __CLC_VECSIZE) res = __clc_native_popcount(z);
-+	/* Convert the result back to gentype. */
-+	return __CLC_XCONCAT(convert_, __CLC_GENTYPE)(res);
-+#else
-+	return __clc_native_popcount(x);
-+#endif
-+}
-diff --git a/external/clspv/third_party/llvm/libclc/clc/include/clc/integer/clc_popcount.h b/external/clspv/third_party/llvm/libclc/clc/include/clc/integer/clc_popcount.h
-deleted file mode 100644
-index 50f6d173c..000000000
---- a/external/clspv/third_party/llvm/libclc/clc/include/clc/integer/clc_popcount.h
-+++ /dev/null
-@@ -1,12 +0,0 @@
--#ifndef __CLC_INTEGER_CLC_POPCOUNT_H__
--#define __CLC_INTEGER_CLC_POPCOUNT_H__
--
--#define __CLC_FUNCTION __clc_popcount
--#define __CLC_BODY <clc/shared/unary_decl.inc>
--
--#include <clc/integer/gentype.inc>
--
--#undef __CLC_INTRINSIC
--#undef __CLC_FUNCTION
--
--#endif // __CLC_INTEGER_CLC_POPCOUNT_H__
-diff --git a/external/clspv/third_party/llvm/libclc/clc/lib/clspv/SOURCES b/external/clspv/third_party/llvm/libclc/clc/lib/clspv/SOURCES
-index 2581abe64..df2928a8f 100644
---- a/external/clspv/third_party/llvm/libclc/clc/lib/clspv/SOURCES
-+++ b/external/clspv/third_party/llvm/libclc/clc/lib/clspv/SOURCES
-@@ -4,7 +4,6 @@
- ../generic/integer/clc_mad24.cl
- ../generic/integer/clc_mul24.cl
- ../generic/integer/clc_mul_hi.cl
--../generic/integer/clc_popcount.cl
- ../generic/integer/clc_rhadd.cl
- ../generic/integer/clc_sub_sat.cl
- ../generic/integer/clc_upsample.cl
 diff --git a/external/clspv/third_party/llvm/libclc/clc/lib/generic/SOURCES b/external/clspv/third_party/llvm/libclc/clc/lib/generic/SOURCES
-index 2f4df168f..03b7380b7 100644
+index f7688d044..b2ffcd18a 100644
 --- a/external/clspv/third_party/llvm/libclc/clc/lib/generic/SOURCES
 +++ b/external/clspv/third_party/llvm/libclc/clc/lib/generic/SOURCES
-@@ -10,7 +10,6 @@ integer/clc_hadd.cl
- integer/clc_mad24.cl
+@@ -12,7 +12,6 @@ integer/clc_mad24.cl
+ integer/clc_mad_sat.cl
  integer/clc_mul24.cl
  integer/clc_mul_hi.cl
 -integer/clc_popcount.cl
  integer/clc_rhadd.cl
+ integer/clc_rotate.cl
  integer/clc_sub_sat.cl
- integer/clc_upsample.cl
-diff --git a/external/clspv/third_party/llvm/libclc/clc/lib/generic/integer/clc_popcount.cl b/external/clspv/third_party/llvm/libclc/clc/lib/generic/integer/clc_popcount.cl
-deleted file mode 100644
-index 12e851c15..000000000
---- a/external/clspv/third_party/llvm/libclc/clc/lib/generic/integer/clc_popcount.cl
-+++ /dev/null
-@@ -1,7 +0,0 @@
--#include <clc/internal/clc.h>
--
--#define FUNCTION __clc_popcount
--#define __CLC_FUNCTION(x) __builtin_elementwise_popcount
--#define __CLC_BODY <clc/shared/unary_def.inc>
--
--#include <clc/integer/gentype.inc>
-diff --git a/external/clspv/third_party/llvm/libclc/clc/lib/spirv/SOURCES b/external/clspv/third_party/llvm/libclc/clc/lib/spirv/SOURCES
-index ddc9e4c49..28ccca3f8 100644
---- a/external/clspv/third_party/llvm/libclc/clc/lib/spirv/SOURCES
-+++ b/external/clspv/third_party/llvm/libclc/clc/lib/spirv/SOURCES
-@@ -8,7 +8,6 @@
- ../generic/integer/clc_mad24.cl
- ../generic/integer/clc_mul24.cl
- ../generic/integer/clc_mul_hi.cl
--../generic/integer/clc_popcount.cl
- ../generic/integer/clc_rhadd.cl
- ../generic/integer/clc_sub_sat.cl
- ../generic/integer/clc_upsample.cl
-diff --git a/external/clspv/third_party/llvm/libclc/generic/include/clc/integer/popcount.h b/external/clspv/third_party/llvm/libclc/generic/include/clc/integer/popcount.h
-index a3ce8ebb1..23335f45b 100644
---- a/external/clspv/third_party/llvm/libclc/generic/include/clc/integer/popcount.h
-+++ b/external/clspv/third_party/llvm/libclc/generic/include/clc/integer/popcount.h
-@@ -1,7 +1,5 @@
- #define __CLC_FUNCTION popcount
--#define __CLC_BODY <clc/shared/unary_decl.inc>
--
-+#define __CLC_BODY <clc/integer/unary.inc>
- #include <clc/integer/gentype.inc>
--
--#undef __CLC_BODY
- #undef __CLC_FUNCTION
-+#undef __CLC_BODY
 diff --git a/external/clspv/third_party/llvm/libclc/generic/include/integer/popcount.h b/external/clspv/third_party/llvm/libclc/generic/include/integer/popcount.h
 new file mode 100644
 index 000000000..00c753753
