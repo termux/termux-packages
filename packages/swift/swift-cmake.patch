@@ -48,18 +48,6 @@ diff --git a/swift/CMakeLists.txt b/swift/CMakeLists.txt
 index b7503ecdd6..c643c2c9a5 100644
 --- a/swift/CMakeLists.txt
 +++ b/swift/CMakeLists.txt
-@@ -414,9 +414,9 @@ set(SWIFT_STDLIB_MSVC_RUNTIME_LIBRARY
- 
- 
- if(BRIDGING_MODE STREQUAL "DEFAULT" OR NOT BRIDGING_MODE)
--  if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR "${SWIFT_HOST_VARIANT_SDK}" MATCHES "WINDOWS|ANDROID" OR (CMAKE_Swift_COMPILER AND CMAKE_Swift_COMPILER_VERSION VERSION_LESS 5.8))
-+  if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR "${SWIFT_HOST_VARIANT_SDK}" STREQUAL "WINDOWS" OR (CMAKE_Swift_COMPILER AND CMAKE_Swift_COMPILER_VERSION VERSION_LESS 5.8))
-     # In debug builds, to workaround a problem with LLDB's `po` command (rdar://115770255).
--    # On Windows and Android, to workaround a build problem.
-+    # On Windows, to workaround a build problem.
-     # If the host Swift version is less than 5.8, use pure mode to workaround a C++ interop compiler crash.
-     set(BRIDGING_MODE "PURE")
-   else()
 @@ -463,7 +463,7 @@ set(SWIFT_BUILD_HOST_DISPATCH FALSE)
  if(SWIFT_ENABLE_DISPATCH AND NOT CMAKE_SYSTEM_NAME STREQUAL "Darwin")
    # Only build libdispatch for the host if the host tools are being built and
@@ -69,6 +57,24 @@ index b7503ecdd6..c643c2c9a5 100644
      set(SWIFT_BUILD_HOST_DISPATCH TRUE)
    endif()
  
+@@ -966,7 +966,7 @@ if("${SWIFT_NATIVE_SWIFT_TOOLS_PATH}" STREQUAL "")
+     message(WARNING "BOOTSTRAPPING set to OFF because no Swift compiler is defined")
+     set(BOOTSTRAPPING_MODE "OFF")
+   endif()
+-elseif(BOOTSTRAPPING_MODE MATCHES "BOOTSTRAPPING.*")
++elseif(BOOTSTRAPPING_MODE MATCHES "HOSTTOOLS")
+   # If cross-compiling, we don't have to bootstrap. We can just use the previously
+   # built native swiftc to build the swift compiler modules.
+   message(STATUS "Building swift modules with previously built tools instead of bootstrapping")
+@@ -976,7 +976,7 @@ elseif(BOOTSTRAPPING_MODE MATCHES "BOOTSTRAPPING.*")
+   elseif(BOOTSTRAPPING_MODE STREQUAL "BOOTSTRAPPING")
+     set(BOOTSTRAPPING_MODE "CROSSCOMPILE")
+   else()
+-    set(BOOTSTRAPPING_MODE "HOSTTOOLS")
++    set(BOOTSTRAPPING_MODE "CROSSCOMPILE")
+   endif()
+ elseif(BOOTSTRAPPING_MODE STREQUAL "HOSTTOOLS" OR SWIFT_BUILD_SWIFT_SYNTAX)
+   # We are building using a pre-installed host toolchain but not bootstrapping
 @@ -1279,7 +1280,8 @@ if (LLVM_ENABLE_DOXYGEN)
    message(STATUS "Doxygen: enabled")
  endif()
@@ -79,22 +85,32 @@ index b7503ecdd6..c643c2c9a5 100644
    include(Libdispatch)
  endif()
  
+diff --git a/swift/lib/CompilerSwiftSyntax/CMakeLists.txt b/swift/lib/CompilerSwiftSyntax/CMakeLists.txt
+index 849cf90fee0..f2a08df0e57 100644
+--- a/swift/lib/CompilerSwiftSyntax/CMakeLists.txt
++++ b/swift/lib/CompilerSwiftSyntax/CMakeLists.txt
+@@ -49,6 +49,9 @@ set(compiler_swiftsyntax_libs
+ 
+ foreach(lib ${compiler_swiftsyntax_libs})
+   target_compile_options(${lib} PRIVATE "SHELL:-module-link-name ${lib}")
++  if(BOOTSTRAPPING_MODE STREQUAL "CROSSCOMPILE")
++    add_dependencies(${lib} swift-stdlib-${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_LIB_SUBDIR}-${SWIFT_HOST_VARIANT_ARCH})
++  endif()
+ endforeach()
+ 
+ swift_install_in_component(TARGETS ${compiler_swiftsyntax_libs}
 diff --git a/swift/SwiftCompilerSources/CMakeLists.txt b/swift/SwiftCompilerSources/CMakeLists.txt
-index 79413a711d4..9eca061e1ca 100644
 --- a/swift/SwiftCompilerSources/CMakeLists.txt
 +++ b/swift/SwiftCompilerSources/CMakeLists.txt
-@@ -172,7 +172,11 @@ function(add_swift_compiler_modules_library name)
-   # under `include/swift`. These are either located next to the compiler (in case of open source toolchains) or
-   # in the SDK (in case a Swift compiler from Xcode)
-   get_filename_component(swift_exec_bin_dir ${ALS_SWIFT_EXEC} DIRECTORY)
-+  if(BOOTSTRAPPING_MODE STREQUAL "CROSSCOMPILE")
-+  list(APPEND sdk_option "-I" "${SWIFTLIB_DIR}/../")
-+  else()
-   list(APPEND sdk_option "-I" "${swift_exec_bin_dir}/../lib" "-I" "${sdk_path}/usr/lib")
-+  endif()
+@@ -196,6 +196,8 @@
  
-   set(all_obj_files)
-   set(all_module_targets)
+     # Workaround for https://github.com/swiftlang/llvm-project/issues/7172
+     list(APPEND swift_compile_options "-Xcc" "-Xclang" "-Xcc" "-fmodule-format=raw")
++  elseif(BOOTSTRAPPING_MODE STREQUAL "CROSSCOMPILE")
++    list(APPEND sdk_option "-I" "${SWIFTLIB_DIR}/../")
+   else()
+     list(APPEND sdk_option "-I" "${swift_exec_bin_dir}/../lib" "-I" "${sdk_path}/usr/lib")
+   endif()
 diff --git a/swift/lib/SwiftSyntax/CMakeLists.txt b/swift/lib/SwiftSyntax/CMakeLists.txt
 index 5c7bd65fead..36f3bbc1b91 100644
 --- a/swift/lib/SwiftSyntax/CMakeLists.txt
@@ -159,6 +175,19 @@ index f958d4ce899..ac6d7248606 100644
      TARGET_SDKS "ANDROID"
      INSTALL_IN_COMPONENT sdk-overlay
      DEPENDS android_modulemap)
+diff --git a/swift/stdlib/public/core/CMakeLists.txt b/swift/stdlib/public/core/CMakeLists.txt
+index 27a4b2bbc6e..5469b3457a6 100644
+--- a/swift/stdlib/public/core/CMakeLists.txt
++++ b/swift/stdlib/public/core/CMakeLists.txt
+@@ -404,7 +404,7 @@ if(BOOTSTRAPPING_MODE STREQUAL "BOOTSTRAPPING")
+ endif()
+ 
+ set(tooling_stdlib_deps)
+-if(TARGET libSwiftScan)
++if(NOT BOOTSTRAPPING_MODE STREQUAL "CROSSCOMPILE" AND TARGET libSwiftScan)
+   list(APPEND tooling_stdlib_deps libSwiftScan)
+ endif()
+ 
 diff --git a/swift/tools/SourceKit/cmake/modules/AddSwiftSourceKit.cmake b/swift/tools/SourceKit/cmake/modules/AddSwiftSourceKit.cmake
 index 7a77e125f95..7eddfea2054 100644
 --- a/swift/tools/SourceKit/cmake/modules/AddSwiftSourceKit.cmake
@@ -199,3 +228,83 @@ index 531e7c0..589930f 100644
    endif()
  endif()
  set_target_properties(XCTest PROPERTIES
+diff --git a/swift-foundation/cmake/modules/SwiftFoundationSwiftSupport.cmake b/swift-foundation/cmake/modules/SwiftFoundationSwiftSupport.cmake
+index cbdfc2a..bb4121d 100644
+--- a/swift-foundation/cmake/modules/SwiftFoundationSwiftSupport.cmake
++++ b/swift-foundation/cmake/modules/SwiftFoundationSwiftSupport.cmake
+@@ -37,6 +37,10 @@ function(_swift_foundation_install_target module)
+     set(module_triple_command "${CMAKE_Swift_COMPILER}" -print-target-info)
+     if(CMAKE_Swift_COMPILER_TARGET)
+       list(APPEND module_triple_command -target ${CMAKE_Swift_COMPILER_TARGET})
++    else()
++      set(arg_list ${CMAKE_Swift_FLAGS})
++      separate_arguments(arg_list)
++      list(APPEND module_triple_command ${arg_list})
+     endif()
+     execute_process(COMMAND ${module_triple_command} OUTPUT_VARIABLE target_info_json)
+     string(JSON module_triple GET "${target_info_json}" "target" "moduleTriple")
+diff --git a/swift-testing/CMakeLists.txt b/swift-testing/CMakeLists.txt
+index 1be9a4b..bd7b1bd 100644
+--- a/swift-testing/CMakeLists.txt
++++ b/swift-testing/CMakeLists.txt
+@@ -28,6 +28,7 @@ list(APPEND CMAKE_MODULE_PATH
+   ${PROJECT_SOURCE_DIR}/cmake/modules
+   ${PROJECT_SOURCE_DIR}/cmake/modules/shared)
+ 
++set(CMAKE_SHARED_LINKER_FLAGS "")
+ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+diff --git a/swift-testing/Sources/Testing/CMakeLists.txt b/swift-testing/Sources/Testing/CMakeLists.txt
+index e40cb1b..ff2f920 100644
+--- a/swift-testing/Sources/Testing/CMakeLists.txt
++++ b/swift-testing/Sources/Testing/CMakeLists.txt
+@@ -110,7 +110,8 @@ target_link_libraries(Testing PRIVATE
+ if(NOT APPLE)
+   if(NOT CMAKE_SYSTEM_NAME STREQUAL WASI)
+     target_link_libraries(Testing PUBLIC
+-      dispatch)
++      dispatch android-execinfo)
++    target_link_directories(Testing PUBLIC ${CMAKE_FIND_ROOT_PATH}/usr/lib)
+   endif()
+   target_link_libraries(Testing PUBLIC
+     Foundation)
+diff --git a/swift-testing/cmake/modules/SwiftModuleInstallation.cmake b/swift-testing/cmake/modules/SwiftModuleInstallation.cmake
+index 1553725..d9f9e5b 100644
+--- a/swift-testing/cmake/modules/SwiftModuleInstallation.cmake
++++ b/swift-testing/cmake/modules/SwiftModuleInstallation.cmake
+@@ -51,7 +51,7 @@ function(_swift_testing_install_target module)
+       INSTALL_REMOVE_ENVIRONMENT_RPATH ON)
+   else()
+     set_target_properties(${module} PROPERTIES
+-      INSTALL_RPATH "$ORIGIN"
++      INSTALL_RPATH "@TERMUX_PREFIX@/lib:$ORIGIN"
+       INSTALL_REMOVE_ENVIRONMENT_RPATH ON)
+   endif()
+ 
+@@ -75,6 +75,10 @@ function(_swift_testing_install_target module)
+     set(module_triple_command "${CMAKE_Swift_COMPILER}" -print-target-info)
+     if(CMAKE_Swift_COMPILER_TARGET)
+       list(APPEND module_triple_command -target ${CMAKE_Swift_COMPILER_TARGET})
++    else()
++      set(arg_list ${CMAKE_Swift_FLAGS})
++      separate_arguments(arg_list)
++      list(APPEND module_triple_command ${arg_list})
+     endif()
+     execute_process(COMMAND ${module_triple_command} OUTPUT_VARIABLE target_info_json)
+     string(JSON module_triple GET "${target_info_json}" "target" "moduleTriple")
+diff --git a/swift-testing/cmake/modules/TargetTriple.cmake b/swift-testing/cmake/modules/TargetTriple.cmake
+index e087cc4..02f3a95 100644
+--- a/swift-testing/cmake/modules/TargetTriple.cmake
++++ b/swift-testing/cmake/modules/TargetTriple.cmake
+@@ -10,6 +10,10 @@
+ set(SWT_TARGET_INFO_COMMAND "${CMAKE_Swift_COMPILER}" -print-target-info)
+ if(CMAKE_Swift_COMPILER_TARGET)
+   list(APPEND SWT_TARGET_INFO_COMMAND -target ${CMAKE_Swift_COMPILER_TARGET})
++else()
++      set(arg_list ${CMAKE_Swift_FLAGS})
++      separate_arguments(arg_list)
++      list(APPEND SWT_TARGET_INFO_COMMAND ${arg_list})
+ endif()
+ execute_process(COMMAND ${SWT_TARGET_INFO_COMMAND} OUTPUT_VARIABLE SWT_TARGET_INFO_JSON)
+ string(JSON SWT_TARGET_TRIPLE GET "${SWT_TARGET_INFO_JSON}" "target" "unversionedTriple")
