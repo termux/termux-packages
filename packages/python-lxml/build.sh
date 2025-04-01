@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Python binding for the libxml2 and libxslt libraries"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="5.3.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/lxml/lxml/releases/download/lxml-$TERMUX_PKG_VERSION/lxml-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=773947d0ed809ddad824b7b14467e1a481b8976e87278ac4a730c2f7c7fcddc1
 TERMUX_PKG_DEPENDS="libxml2, libxslt, python, python-pip"
