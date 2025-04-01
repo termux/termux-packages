@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # please sync version and patches with x11-packages/pidgin
 TERMUX_PKG_VERSION="2.14.14"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/pidgin/pidgin-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=0ffc9994def10260f98a55cd132deefa8dc4a9835451cc0e982747bd458e2356
 TERMUX_PKG_DEPENDS="glib, libgnt, libgnutls, libidn, libsasl, libxml2, ncurses"
