@@ -1,0 +1,19 @@
+Fixes this error when building with libxml2 2.14
+src/xml_pyx.c:203:36: error: expected ')'
+  203 | pyxExternalSubsetHandler(void *ctx ATTRIBUTE_UNUSED, const xmlChar *name,
+      |                                    ^
+
+Probably has something to do with this commit in libxml2
+https://github.com/GNOME/libxml2/commit/208f27f9641a59863ce1f7d4992df77f7eb0ea9d
+
+--- a/src/xmlstar.h
++++ b/src/xmlstar.h
+@@ -16,6 +16,8 @@
+ #include <libxml/xpathInternals.h>
+ #include <libxml/xmlreader.h>
+ 
++#define ATTRIBUTE_UNUSED __attribute__((unused))
++
+ typedef enum { /* EXIT_SUCCESS = 0, EXIT_FAILURE = 1, */
+     EXIT_BAD_ARGS = EXIT_FAILURE+1, EXIT_BAD_FILE,
+     EXIT_LIB_ERROR, EXIT_INTERNAL_ERROR } exit_status;
