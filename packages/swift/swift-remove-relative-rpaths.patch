@@ -24,6 +24,19 @@ index ee668f96903..61397d3910e 100644
      )
      # NOTE: At this point we don't have any pure swift executables/shared
      # libraries required for building runtime/stdlib. So we don't need to add
+diff --git a/swift/lib/CompilerSwiftSyntax/CMakeLists.txt b/swift/lib/CompilerSwiftSyntax/CMakeLists.txt
+index 849cf90fee0..b1f8d66be18 100644
+--- a/swift/lib/CompilerSwiftSyntax/CMakeLists.txt
++++ b/swift/lib/CompilerSwiftSyntax/CMakeLists.txt
+@@ -13,7 +13,7 @@ function(includeSwiftSyntax)
+   set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${SWIFT_HOST_LIBRARIES_DEST_DIR}/compiler")
+   set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${SWIFT_HOST_LIBRARIES_DEST_DIR}/compiler")
+   if(SWIFT_HOST_VARIANT_SDK MATCHES "LINUX|ANDROID|OPENBSD|FREEBSD")
+-    set(SWIFT_HOST_LIBRARIES_RPATH "$ORIGIN;$ORIGIN/../../${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_LIB_SUBDIR}")
++    set(SWIFT_HOST_LIBRARIES_RPATH "$ORIGIN;$ORIGIN/../../..")
+   endif()
+ 
+   # Add unique ABI prefix to swift-syntax libraries so that compiler libraries (e.g. sourcekitdInProc)
 diff --git a/swift/lib/SwiftSyntax/CMakeLists.txt b/swift/lib/SwiftSyntax/CMakeLists.txt
 index b39061073c9..a295f397d72 100644
 --- a/swift/lib/SwiftSyntax/CMakeLists.txt
