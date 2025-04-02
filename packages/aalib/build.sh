@@ -16,7 +16,7 @@ termux_step_pre_configure() {
 	local _bin=$TERMUX_PKG_BUILDDIR/_wrapper/bin
 	mkdir -p $_bin
 	local _cc=$(basename $CC)
-	cat <<-EOF > $_bin/$_cc
+	cat <<-EOF >$_bin/$_cc
 		#!$(command -v sh)
 		_shared=
 		for f in "\$@"; do
