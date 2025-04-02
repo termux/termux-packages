@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="An interactive tool to view and record historical system
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.9.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/facebookincubator/below/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=c51c202e9c15aafc1c741f053ba374c302dc0a737aef6a1120b5c7957ab013fe
 TERMUX_PKG_DEPENDS="libelf, zlib"
@@ -30,12 +31,12 @@ termux_step_pre_configure() {
 	for d in $CARGO_HOME/registry/src/*/libbpf-sys-*; do
 		for p in libbpf-sys-0.6.0-1-libbpf-include-linux-{compiler,types}.h.diff; do
 			patch --silent -p1 -d ${d} \
-				< "$TERMUX_PKG_BUILDER_DIR/${p}" || :
+				<"$TERMUX_PKG_BUILDER_DIR/${p}" || :
 		done
 	done
 
 	for d in "$CARGO_HOME"/registry/src/*/nix-*; do
-		patch --silent -p1 -d "$d" <  "$TERMUX_PKG_BUILDER_DIR"/nix-0.20.0-src-net-if_.rs.diff || :
+		patch --silent -p1 -d "$d" <"$TERMUX_PKG_BUILDER_DIR"/nix-0.20.0-src-net-if_.rs.diff || :
 	done
 
 	local _CARGO_TARGET_LIBDIR=target/$CARGO_TARGET_NAME/release/deps
