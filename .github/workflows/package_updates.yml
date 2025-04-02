@@ -140,7 +140,7 @@ jobs:
       - name: Set process id limit for 32-bit builds depending on aosp-libs
         run: echo 65535 | sudo tee /proc/sys/kernel/pid_max
       - name: Free additional disk space
-        run: ./scripts/free-space.sh
+        run: CLEAN_DOCKER_IMAGES=false ./scripts/free-space.sh
       - name: Process package updates
         env:
           GITHUB_TOKEN: ${{ secrets.TERMUXBOT2_TOKEN }}
