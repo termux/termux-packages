@@ -129,6 +129,10 @@ source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_gn.sh"
 # shellcheck source=scripts/build/setup/termux_setup_golang.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_golang.sh"
 
+# Utility function for setting up LDC cross environment.
+# shellcheck source=scripts/build/setup/termux_setup_ldc.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_ldc.sh"
+
 # Utility function for setting up no-integrated (GNU Binutils) as.
 # shellcheck source=scripts/build/setup/termux_setup_no_integrated_as.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_no_integrated_as.sh"
