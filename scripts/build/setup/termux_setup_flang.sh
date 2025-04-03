@@ -32,7 +32,7 @@ d37dc6a58b495807f015c7fec08a57ff95d52ad0d0553cbf573b0215d8a1707c  package-instal
 	while read -r __checksum __file; do
 		if [ "$__checksum" == "" ]; then continue; fi
 		termux_download \
-			https://github.com/licy183/ndk-toolchain-clang-with-flang/releases/download/"$__version"/"$__file" \
+			https://github.com/termux/ndk-toolchain-clang-with-flang/releases/download/"$__version"/"$__file" \
 			"$__cache_dir/$__file" "$__checksum"
 	done <<< "$__sha256sums"
 
@@ -49,7 +49,7 @@ d37dc6a58b495807f015c7fec08a57ff95d52ad0d0553cbf573b0215d8a1707c  package-instal
 		local FLANG_FOLDER_TMP="$FLANG_FOLDER"-tmp
 		rm -rf "$FLANG_FOLDER_TMP"
 		mkdir -p "$FLANG_FOLDER_TMP"
-		cd "$FLANG_FOLDER_TMP"
+		pushd "$FLANG_FOLDER_TMP"
 		tar xf "$__cache_dir"/package-install.tar.bz2 --strip-components=4
 		tar xf "$__cache_dir"/package-flang-host.tar.bz2 --strip-components=1
 		cp -Rf $TERMUX_STANDALONE_TOOLCHAIN/sysroot $FLANG_FOLDER_TMP/
@@ -87,6 +87,7 @@ d37dc6a58b495807f015c7fec08a57ff95d52ad0d0553cbf573b0215d8a1707c  package-instal
 		cp $FLANG_FOLDER_TMP/bin/armv7a-linux-androideabi-flang-new \
 			$FLANG_FOLDER_TMP/bin/arm-linux-androideabi${TERMUX_PKG_API_LEVEL}-flang-new
 
+		popd # "$FLANG_FOLDER_TMP"
 		mv "$FLANG_FOLDER_TMP" "$FLANG_FOLDER"
 	fi
 
