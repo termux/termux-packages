@@ -82,16 +82,18 @@ termux_create_pacman_subpackages() {
 		local SUB_PKG_INSTALLSIZE
 		SUB_PKG_INSTALLSIZE=$(du -bs . | cut -f 1)
 
-		local PKG_DEPS_SPC=" ${TERMUX_PKG_DEPENDS//,/} "
-		if [ -z "$TERMUX_SUBPKG_DEPEND_ON_PARENT" ] && [ "${PKG_DEPS_SPC/ $SUB_PKG_NAME /}" = "$PKG_DEPS_SPC" ] || [ "$TERMUX_SUBPKG_DEPEND_ON_PARENT" = "true" ]; then
-			# Does pacman supports versioned dependencies?
-			#TERMUX_SUBPKG_DEPENDS+=", $TERMUX_PKG_NAME (= $TERMUX_PKG_FULLVERSION)"
-			TERMUX_SUBPKG_DEPENDS+=", $TERMUX_PKG_NAME"
-		elif [ "$TERMUX_SUBPKG_DEPEND_ON_PARENT" = unversioned ]; then
-			TERMUX_SUBPKG_DEPENDS+=", $TERMUX_PKG_NAME"
-		elif [ "$TERMUX_SUBPKG_DEPEND_ON_PARENT" = deps ]; then
-			TERMUX_SUBPKG_DEPENDS+=", $TERMUX_PKG_DEPENDS"
-		fi
+		# If the subpackage is not in the $TERMUX_PKG_DEPENDS for the parent package,
+		# and TERMUX_SUBPKG_DEPEND_ON_PARENT doesn't have a value, the subpackage should depend on its parent
+		[[ " ${TERMUX_PKG_DEPENDS//,/ } " == *" $SUB_PKG_NAME "* ]] && : "${TERMUX_SUBPKG_DEPEND_ON_PARENT:=true}"
+
+		case "$TERMUX_SUBPKG_DEPEND_ON_PARENT" in
+			'unversioned') TERMUX_SUBPKG_DEPENDS+=", $TERMUX_PKG_NAME";;
+			'deps')        TERMUX_SUBPKG_DEPENDS+=", $TERMUX_PKG_DEPENDS";;
+			# TODO: pacman does support versioned dependencies
+			# but we are not currently translating the .DEB notation to pacman's
+			'true')        TERMUX_SUBPKG_DEPENDS+=", $TERMUX_PKG_NAME";;
+			*) ;;
+		esac
 
 		if [ "$TERMUX_GLOBAL_LIBRARY" = "true" ] && [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
 			test ! -z "$TERMUX_SUBPKG_DEPENDS" && TERMUX_SUBPKG_DEPENDS=$(termux_package__add_prefix_glibc_to_package_list "$TERMUX_SUBPKG_DEPENDS")

@@ -101,15 +101,16 @@ termux_create_debian_subpackages() {
 			Homepage: $TERMUX_PKG_HOMEPAGE
 		HERE
 
-		local PKG_DEPS_SPC=" ${TERMUX_PKG_DEPENDS//,/} "
+		# If the subpackage is not in the $TERMUX_PKG_DEPENDS for the parent package,
+		# and TERMUX_SUBPKG_DEPEND_ON_PARENT doesn't have a value, the subpackage should depend on its parent
+		[[ " ${TERMUX_PKG_DEPENDS//,/ } " == *" $SUB_PKG_NAME "* ]] && : "${TERMUX_SUBPKG_DEPEND_ON_PARENT:=true}"
 
-		if [ -z "$TERMUX_SUBPKG_DEPEND_ON_PARENT" ] && [ "${PKG_DEPS_SPC/ $SUB_PKG_NAME /}" = "$PKG_DEPS_SPC" ] || [ "$TERMUX_SUBPKG_DEPEND_ON_PARENT" = "true" ]; then
-			TERMUX_SUBPKG_DEPENDS+=", $TERMUX_PKG_NAME (= $TERMUX_PKG_FULLVERSION)"
-		elif [ "$TERMUX_SUBPKG_DEPEND_ON_PARENT" = unversioned ]; then
-			TERMUX_SUBPKG_DEPENDS+=", $TERMUX_PKG_NAME"
-		elif [ "$TERMUX_SUBPKG_DEPEND_ON_PARENT" = deps ]; then
-			TERMUX_SUBPKG_DEPENDS+=", $TERMUX_PKG_DEPENDS"
-		fi
+		case "$TERMUX_SUBPKG_DEPEND_ON_PARENT" in
+			'unversioned') TERMUX_SUBPKG_DEPENDS+=", $TERMUX_PKG_NAME";;
+			'deps')        TERMUX_SUBPKG_DEPENDS+=", $TERMUX_PKG_DEPENDS";;
+			'true')        TERMUX_SUBPKG_DEPENDS+=", $TERMUX_PKG_NAME (= $TERMUX_PKG_FULLVERSION)";;
+			*) ;;
+		esac
 
 		if [ "$TERMUX_GLOBAL_LIBRARY" = "true" ] && [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
 			test ! -z "$TERMUX_SUBPKG_DEPENDS" && TERMUX_SUBPKG_DEPENDS=$(termux_package__add_prefix_glibc_to_package_list "$TERMUX_SUBPKG_DEPENDS")
