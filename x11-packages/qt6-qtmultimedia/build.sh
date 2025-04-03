@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.qt.io/
 TERMUX_PKG_DESCRIPTION="Qt6 Multimedia Library"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.8.3"
+TERMUX_PKG_VERSION="6.9.0"
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/${TERMUX_PKG_VERSION%.*}/${TERMUX_PKG_VERSION}/submodules/qtmultimedia-everywhere-src-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=32e82307d783172a3b984cc3c47c5e4e8b819cee3cbfc702c7012c47f15f6b01
+TERMUX_PKG_SHA256=995c3b194f3de3e1929280639642f7661d94aa57523c459dbbf2f71dbdcaa18c
 TERMUX_PKG_DEPENDS="glib, gst-plugins-bad, gst-plugins-base, gstreamer, libc++, opengl, pulseaudio, qt6-qtbase (>= ${TERMUX_PKG_VERSION}), qt6-qtdeclarative (>= ${TERMUX_PKG_VERSION})"
 TERMUX_PKG_BUILD_DEPENDS="qt6-shadertools"
 TERMUX_PKG_HOSTBUILD=true
