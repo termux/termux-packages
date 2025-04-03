@@ -1,0 +1,27 @@
+From c6832bcf17376f9d3bac907db7342e8a7c3fff9a Mon Sep 17 00:00:00 2001
+From: Henrik Grimler <grimler@termux.dev>
+Date: Thu, 3 Apr 2025 18:29:51 +0200
+Subject: [PATCH] ecc_fast: look for libsecp256k1.so
+
+Without .1 or .2 version suffix. Termux's libsecp256k1 library is
+called just libsecp256k1.so.
+---
+ electrum/ecc_fast.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/electrum/ecc_fast.py b/electrum/ecc_fast.py
+index b88d9acf7dc2..35b14aa62587 100644
+--- a/electrum/ecc_fast.py
++++ b/electrum/ecc_fast.py
+@@ -47,7 +47,7 @@ def load_library():
+     elif sys.platform in ('windows', 'win32'):
+         for v in tested_libversions:
+             libnames.append(f"libsecp256k1-{v}.dll")
+-    elif False:
++    elif True:
+         libnames = ['libsecp256k1.so', ]  # don't care about version number. we built w/e is available.
+     else:  # desktop Linux and similar
+         for v in tested_libversions:
+-- 
+2.49.0
+
