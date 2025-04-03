@@ -16,5 +16,12 @@ termux_step_make() {
 		else
 			make -j $TERMUX_PKG_MAKE_PROCESSES $QUIET_BUILD ${TERMUX_PKG_EXTRA_MAKE_ARGS}
 		fi
+	elif test -f dub.json; then
+		termux_setup_ldc
+		dub build \
+			-b release \
+			--compiler=ldc2 \
+			--arch "$TERMUX_LDC_TRIPLE"\
+			${TERMUX_PKG_EXTRA_CONFIGURE_ARGS:+ $TERMUX_PKG_EXTRA_CONFIGURE_ARGS}
 	fi
 }
