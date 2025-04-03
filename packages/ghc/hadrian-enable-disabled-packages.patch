@@ -19,14 +19,15 @@
  -- | Packages that are built only for the testsuite.
  testsuitePackages :: Action [Package]
 
-# Extra patch for terminfo:
---- ghc-9.12.1/hadrian/src/Settings/Packages.hs	2025-02-24 22:46:43.668323779 +0530
-+++ ghc-9.12.1.mod/hadrian/src/Settings/Packages.hs	2025-02-26 02:21:11.394039836 +0530
-@@ -86,7 +86,7 @@
+--- ghc-9.12.2/hadrian/src/Settings/Packages.hs	2025-03-29 15:32:47.000000000 +0530
++++ ghc-9.12.2.mod/hadrian/src/Settings/Packages.hs	2025-04-04 02:37:47.725764540 +0530
+@@ -85,8 +85,8 @@
+             -- (#14335) and completely untested in CI for cross
              -- backends at the moment, so we might as well disable it
              -- for cross GHC.
-             [ andM [expr ghcWithInterpreter, notStage0, notCross] `cabalFlag` "internal-interpreter"
+-            [ andM [expr ghcWithInterpreter, notStage0, notCross] `cabalFlag` "internal-interpreter"
 -            , notM cross `cabalFlag` "terminfo"
++            [ andM [expr ghcWithInterpreter, notStage0] `cabalFlag` "internal-interpreter"
 +            , arg "terminfo"
              , arg "-build-tool-depends"
              , flag UseLibzstd `cabalFlag` "with-libzstd"
