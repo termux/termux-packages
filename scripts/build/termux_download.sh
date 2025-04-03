@@ -10,7 +10,7 @@ termux_download() {
 	local CHECKSUM="$3"
 
 	if [[ -f "$DESTINATION" ]]; then
-		[[ "$CHECKSUM" == "SKIP_CHECKSUM" ]] && return
+		[[ "$CHECKSUM" == "SKIP_CHECKSUM" ]] && $TERMUX_CONTINUE_BUILD && return
 		# Keep existing file if checksum matches.
 		local EXISTING_CHECKSUM
 		EXISTING_CHECKSUM=$(sha256sum "$DESTINATION" | cut -d' ' -f1)
