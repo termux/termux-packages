@@ -1,0 +1,23 @@
+--- a/src/core/meta-context-main.c
++++ b/src/core/meta-context-main.c
+@@ -25,7 +25,7 @@
+ #include <glib.h>
+ #include <gio/gio.h>
+ 
+-#ifdef HAVE_WAYLAND
++#ifdef HAVE_LOGIND
+ #include <systemd/sd-login.h>
+ #endif
+ 
+--- a/src/backends/native/meta-backend-native.h
++++ b/src/backends/native/meta-backend-native.h
+@@ -24,7 +24,9 @@
+ 
+ #include "backends/meta-backend-private.h"
+ #include "backends/meta-launcher.h"
++#ifdef HAVE_LIBGUDEV
+ #include "backends/meta-udev.h"
++#endif
+ #include "backends/native/meta-clutter-backend-native.h"
+ #include "backends/native/meta-kms-types.h"
+ 
