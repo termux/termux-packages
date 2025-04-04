@@ -55,7 +55,7 @@ jobs:
           else
             tag_rev=1
           fi
-          new_tag="${new_tag}-r${tag_rev}+apt-android-5"
+          new_tag="${new_tag}-r${tag_rev}+apt.android-5"
           git tag "$new_tag"
           git push --tags
           echo "tag_name=$new_tag" >> $GITHUB_OUTPUT
@@ -65,6 +65,6 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: "*.zip"
           file_glob: true
-          release_name: "Bootstrap archives for Termux application (apt-android-5)"
+          release_name: "Bootstrap archives for Termux application (apt.android-5)"
           tag: ${{ steps.get_tag.outputs.tag_name }}
           checksums: sha256,sha512,md5
