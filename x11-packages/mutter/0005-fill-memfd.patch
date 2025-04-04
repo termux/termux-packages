@@ -1,0 +1,31 @@
+--- a/src/backends/meta-screen-cast-stream-src.c
++++ b/src/backends/meta-screen-cast-stream-src.c
+@@ -56,6 +56,12 @@
+ #include "common/meta-drm-timeline.h"
+ #endif
+ 
++#if defined(__ANDROID__) && __ANDROID_API__ < 30
++#include <linux/memfd.h>
++#include <sys/syscall.h>
++#define memfd_create(name,flags) syscall(SYS_memfd_create,name,flags)
++#endif
++
+ #define PRIVATE_OWNER_FROM_FIELD(TypeName, field_ptr, field_name) \
+         (TypeName *)((guint8 *)(field_ptr) - G_PRIVATE_OFFSET (TypeName, field_name))
+ 
+--- a/src/core/meta-anonymous-file.h
++++ b/src/core/meta-anonymous-file.h
+@@ -22,6 +22,13 @@
+ #include "meta/common.h"
+ #include "core/util-private.h"
+ 
++#if defined(__ANDROID__) && __ANDROID_API__ < 30
++#include <linux/memfd.h>
++#include <sys/syscall.h>
++#define memfd_create(name,flags) syscall(SYS_memfd_create,name,flags)
++#define HAVE_MEMFD_CREATE
++#endif
++
+ typedef struct _MetaAnonymousFile MetaAnonymousFile;
+ 
+ typedef enum _MetaAnonymousFileMapmode
