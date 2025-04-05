@@ -13,7 +13,7 @@ TERMUX_PKG_GIT_BRANCH=main
 TERMUX_PKG_DEPENDS="weechat, openssl"
 TERMUX_PKG_BUILD_IN_SRC=true
 # There are compile errors for 32-bit platforms in weechat-rust dependency
-TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
+TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 
 termux_step_post_get_source() {
 	git fetch --unshallow

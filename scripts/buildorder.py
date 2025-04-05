@@ -72,7 +72,7 @@ def parse_build_file_excluded_arches(path):
 
     with open(path, encoding="utf-8") as build_script:
         for line in build_script:
-            if line.startswith(('TERMUX_PKG_BLACKLISTED_ARCHES', 'TERMUX_SUBPKG_EXCLUDED_ARCHES')):
+            if line.startswith(('TERMUX_PKG_EXCLUDED_ARCHES', 'TERMUX_SUBPKG_EXCLUDED_ARCHES')):
                 arches_string = line.split('ARCHES=')[1]
                 for char in "\"'\n":
                     arches_string = arches_string.replace(char, '')

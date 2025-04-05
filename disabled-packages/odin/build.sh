@@ -12,7 +12,7 @@ TERMUX_PKG_DEPENDS="libiconv, libllvm"
 # #error "gb_rdtsc not supported"
 #  ^
 # ```
-TERMUX_PKG_BLACKLISTED_ARCHES="arm"
+TERMUX_PKG_EXCLUDED_ARCHES="arm"
 
 termux_step_pre_configure() {
 	if [ "$TERMUX_PKG_API_LEVEL" -lt 28 ]; then

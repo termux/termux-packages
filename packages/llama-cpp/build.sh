@@ -22,7 +22,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 
 # XXX: llama.cpp uses `int64_t`, but on 32-bit Android `size_t` is `int32_t`.
 # XXX: I don't think it will work if we simply casting it.
-TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
+TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 
 termux_pkg_auto_update() {
 	local latest_tag

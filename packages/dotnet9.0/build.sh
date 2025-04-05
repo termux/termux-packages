@@ -15,7 +15,7 @@ TERMUX_PKG_FORCE_WAIT_FINISH=true
 # https://github.com/dotnet/runtime/issues/7335
 # linux-x86 is not officially supported but works
 # TODO linux-bionic-arm is broken
-TERMUX_PKG_BLACKLISTED_ARCHES="arm"
+TERMUX_PKG_EXCLUDED_ARCHES="arm"
 
 termux_step_post_get_source() {
 	# set up dotnet cli and override source files

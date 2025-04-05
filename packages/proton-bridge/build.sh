@@ -11,7 +11,7 @@ TERMUX_PKG_UPDATE_TAG_TYPE=latest-release-tag
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
 # The go-rfc5322 module cannot currently be compiled for 32-bit OSes:
 # https://github.com/ProtonMail/proton-bridge/blob/v2.1.1/BUILDS.md#prerequisites
-TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
+TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 
 termux_step_make() {
 	termux_setup_golang

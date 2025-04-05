@@ -17,7 +17,7 @@ TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 # 465 |             match stat.st_mode & libc::S_IFMT {
 #     |                                  ^^^^^^^^^^^^ expected `u32`, found `u16`
 # ```
-TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
+TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 
 termux_step_pre_configure() {
 	termux_setup_rust

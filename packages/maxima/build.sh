@@ -11,7 +11,7 @@ TERMUX_PKG_SRCURL=(https://downloads.sourceforge.net/sourceforge/maxima/Maxima-s
 TERMUX_PKG_SHA256=(9104021b24fd53e8c03a983509cb42e937a925e8c0c85c335d7709a14fd40f7a
                    e4ea65bb1861e0e495386bfa8bc673bd014e96d3cf9d91e9038f91435cbe622b)
 TERMUX_PKG_DEPENDS="ecl"
-TERMUX_PKG_BLACKLISTED_ARCHES="i686, x86_64"
+TERMUX_PKG_EXCLUDED_ARCHES="i686, x86_64"
 TERMUX_PKG_BUILD_IN_SRC="true"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-ecl"
 TERMUX_PKG_HOSTBUILD=true
@@ -47,7 +47,7 @@ termux_step_host_build() {
 
 termux_step_make() {
 	local _PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
-	
+
 	cat > $_PREFIX_FOR_BUILD/bin/gcc <<-EOF
 		#!/bin/sh
 		exec \$CC \$CFLAGS \$CPPFLAGS \$LDFLAGS "\$@" -Wno-unused-command-line-argument

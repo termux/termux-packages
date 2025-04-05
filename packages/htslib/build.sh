@@ -10,7 +10,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="libbz2, liblzma, zlib, libdeflate, libcurl"
 
 # error: assigning to 'uint8x8_t' (vector of 8 'uint8_t' values) from incompatible type 'int'
-TERMUX_PKG_BLACKLISTED_ARCHES="arm"
+TERMUX_PKG_EXCLUDED_ARCHES="arm"
 
 termux_step_pre_configure() {
 	autoreconf -fi

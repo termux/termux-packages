@@ -53,7 +53,7 @@ TERMUX_PKG_NO_OPENMP_CHECK=true
 # On ARM and i686, codon crashes:
 # JIT session error: Unsupported target machine architecture in ELF object codon-jitted-objectbuffer
 # Failure value returned from cantFail wrapped call
-TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
+TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 
 termux_step_post_get_source() {
 	# Check llvm commit

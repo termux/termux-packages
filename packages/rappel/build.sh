@@ -14,7 +14,7 @@ TERMUX_PKG_DEPENDS="binutils-is-llvm | binutils, libedit"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 # Need nasm.
-TERMUX_PKG_BLACKLISTED_ARCHES="i686, x86_64"
+TERMUX_PKG_EXCLUDED_ARCHES="i686, x86_64"
 
 termux_step_post_get_source() {
 	git fetch --unshallow
