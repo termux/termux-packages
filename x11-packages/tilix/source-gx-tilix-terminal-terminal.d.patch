@@ -1,0 +1,20 @@
+--- a/source/gx/tilix/terminal/terminal.d
++++ b/source/gx/tilix/terminal/terminal.d
+@@ -185,6 +185,8 @@ struct SyncInputEvent {
+     string text;
+ }
+ 
++extern (C) int grantpt(int __fd);
++
+ /**
+  * This class is a composite widget that consists of the VTE Terminal
+  * widget and the title bar. From the perspective of a session this is
+@@ -2831,7 +2833,7 @@ private:
+ 
+             int pty_master = pty.getFd();
+ 
+-            import core.sys.posix.stdlib: grantpt, unlockpt, ptsname;
++            import core.sys.posix.stdlib: unlockpt, ptsname;
+             import core.sys.posix.fcntl: open, O_RDWR;
+ 
+             if (grantpt(pty_master) != 0) {
