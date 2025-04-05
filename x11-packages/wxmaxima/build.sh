@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A document based interface for the computer algebra syst
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="25.01.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/wxMaxima-developers/wxmaxima/archive/refs/tags/Version-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=18cce36cc6c41ca012ec128aafe3c96659b1d670f8a8f7d98395eac1a19ade6f
 TERMUX_PKG_AUTO_UPDATE=true

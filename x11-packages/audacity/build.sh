@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="An easy-to-use, multi-track audio editor and recorder"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.7.3"
+TERMUX_PKG_REVISION=1
 _FFMPEG_VERSION=7.1.1
 TERMUX_PKG_SRCURL=(https://github.com/audacity/audacity/archive/Audacity-${TERMUX_PKG_VERSION}.tar.gz
                    https://www.ffmpeg.org/releases/ffmpeg-${_FFMPEG_VERSION}.tar.xz)
@@ -20,7 +21,7 @@ TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+.\d+.\d+"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCMAKE_STRIP=llvm-strip
--Daudacity_conan_enabled=off
+-Daudacity_conan_enabled=Off
 -Daudacity_has_vst3=no
 -Daudacity_has_tests=no
 -Daudacity_has_networking=no
@@ -53,8 +54,8 @@ opt/audacity/share
 # Function to obtain the .deb URL
 obtain_deb_url() {
 	local url="https://packages.ubuntu.com/noble/amd64/$1/download"
-	local retries=5
-	local wait=5
+	local retries=10
+	local wait=10
 	local attempt
 	local deb_url
 
@@ -95,7 +96,14 @@ termux_step_host_build() {
 		# Let's download them from ubuntu repos.
 		# To avoid messing with `apt update` and `apt download` we will get download links directly from ubuntu servers.
 		mkdir "$_PREFIX"
-		for i in libgtk2.0-0t64 libgtk2.0-dev libasound2-dev; do
+
+		# The time I was writing this nightmare conan failed to fetch some files from audacity.org because jfrog was unavailabe.
+		# I am not sure it will be available next time we will rebuild audacity so we should keep it.
+		UBUNTU_PACKAGES="libasound2-dev libasound2-dev libasound2t64 libflac++-dev libflac-dev libgtk2.0-0t64 libgtk2.0-dev "
+		UBUNTU_PACKAGES+="libid3tag0 libid3tag0-dev libmp3lame-dev libmp3lame0 libmpg123-0t64 libmpg123-dev libogg-dev libogg0 "
+		UBUNTU_PACKAGES+="libopus-dev libopus0 libopusfile-dev libopusfile0 libportmidi-dev libportmidi0 libsndfile1 libsndfile1-dev "
+		UBUNTU_PACKAGES+="libvorbis-dev libwavpack-dev libwavpack1 portaudio19-dev rapidjson-dev"
+		for i in $UBUNTU_PACKAGES; do
 			wget "$(obtain_deb_url $i)" -O "$TERMUX_PKG_HOSTBUILD_DIR/tmp.deb"
 			dpkg-deb -R "$TERMUX_PKG_HOSTBUILD_DIR/tmp.deb" "$TERMUX_PKG_HOSTBUILD_DIR/tmp"
 			cp -rf "$TERMUX_PKG_HOSTBUILD_DIR"/tmp/* "$_PREFIX"
@@ -113,7 +121,9 @@ termux_step_host_build() {
 		PKG_CONFIG_LIBDIR+=":$_PREFIX/usr/lib/x86_64-linux-gnu/pkgconfig"
 		export CFLAGS="-I$_PREFIX/usr/include"
 		export LDFLAGS="-Wl,-rpath,$_PREFIX/usr/lib/x86_64-linux-gnu"
-		cmake -GNinja -B "$TERMUX_PKG_HOSTBUILD_DIR" -S "$TERMUX_PKG_SRCDIR" -DCMAKE_BUILD_TYPE=Release
+		env -C "$TERMUX_PKG_SRCDIR" cmake -GNinja -B "$TERMUX_PKG_HOSTBUILD_DIR" -DCMAKE_BUILD_TYPE=Release \
+			-DCMAKE_PREFIX_PATH=$_PREFIX/usr $TERMUX_PKG_EXTRA_CONFIGURE_ARGS
+
 		ninja -C "$TERMUX_PKG_HOSTBUILD_DIR" image-compiler
 	)
 }
