@@ -1,0 +1,52 @@
+--- ghc-9.12.1/hadrian/src/Settings/Default.hs	2025-02-24 22:46:43.668323779 +0530
++++ ghc-9.12.1.mod/hadrian/src/Settings/Default.hs	2025-03-20 22:56:50.679380367 +0530
+@@ -116,7 +116,7 @@
+              -- that confused Hadrian, so we must make those a stage0 package as well.
+              -- Once we drop `Win32`/`unix` it should be possible to drop those too.
+              ]
+-          ++ [ terminfo | not windowsHost, not cross ]
++          ++ [ terminfo | not windowsHost ]
+           ++ [ timeout  | windowsHost                ]
+ 
+ -- | Packages built in 'Stage1' by default. You can change this in "UserSettings".
+@@ -188,7 +188,7 @@
+ 
+ -- | Packages built in 'Stage2' by default. You can change this in "UserSettings".
+ stage2Packages :: Action [Package]
+-stage2Packages = stage1Packages
++stage2Packages = (<> [iserv, runGhc, hpcBin]) <$> stage1Packages
+ 
+ -- | Packages that are built only for the testsuite.
+ testsuitePackages :: Action [Package]
+
+--- ghc-9.12.2/hadrian/src/Settings/Packages.hs	2025-03-29 15:32:47.000000000 +0530
++++ ghc-9.12.2.mod/hadrian/src/Settings/Packages.hs	2025-04-04 02:37:47.725764540 +0530
+@@ -85,8 +85,8 @@
+             -- (#14335) and completely untested in CI for cross
+             -- backends at the moment, so we might as well disable it
+             -- for cross GHC.
+-            [ andM [expr ghcWithInterpreter, notStage0, notCross] `cabalFlag` "internal-interpreter"
+-            , notM cross `cabalFlag` "terminfo"
++            [ andM [expr ghcWithInterpreter, notStage0] `cabalFlag` "internal-interpreter"
++            , arg "terminfo"
+             , arg "-build-tool-depends"
+             , flag UseLibzstd `cabalFlag` "with-libzstd"
+             -- ROMES: While the boot compiler is not updated wrt -this-unit-id
+@@ -121,7 +121,7 @@
+ 
+         -------------------------------- ghcPkg --------------------------------
+         , package ghcPkg ?
+-          builder (Cabal Flags) ? notM cross `cabalFlag` "terminfo"
++          builder (Cabal Flags) ? arg "terminfo"
+ 
+         -------------------------------- ghcPrim -------------------------------
+         , package ghcPrim ? mconcat
+@@ -213,7 +213,7 @@
+         -- dependencies.
+         -- TODO: Perhaps the user should rather be responsible for this?
+         , package haskeline ?
+-          builder (Cabal Flags) ? notM cross `cabalFlag` "terminfo"
++          builder (Cabal Flags) ? arg "terminfo"
+ 
+         -------------------------------- terminfo ------------------------------
+         , package terminfo ?
