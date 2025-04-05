@@ -8,6 +8,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # Never forget to always bump revision of reverse dependencies and rebuild them
 # when bumping "major" version.
 TERMUX_PKG_VERSION="77.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/unicode-org/icu/releases/download/release-${TERMUX_PKG_VERSION//./-}/icu4c-${TERMUX_PKG_VERSION//./_}-src.tgz
 TERMUX_PKG_SHA256=588e431f77327c39031ffbb8843c0e3bc122c211374485fa87dc5f3faff24061
 TERMUX_PKG_AUTO_UPDATE=true

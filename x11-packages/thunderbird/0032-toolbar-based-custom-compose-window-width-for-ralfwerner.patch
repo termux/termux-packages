@@ -1,0 +1,396 @@
+Hardcodes a second formatting toolbar in the HTML mode of the message composer
+and moves some buttons into it in order to provide a workaround for
+minimum text wrapping window width on high-DPI low-resolution devices
+
+This effectively hardcodes the formatting toolbar into a different shape
+that sacrifices some minimum vertical screen space to gain some minimum
+horizontal screen space
+
+Requested by Ralf Werner
+
+Discussion: https://github.com/termux/termux-packages/pull/23911
+
+--- a/comm/mail/components/compose/content/MsgComposeCommands.js
++++ b/comm/mail/components/compose/content/MsgComposeCommands.js
+@@ -1157,7 +1157,8 @@ var defaultController = {
+         return gMsgCompose && gMsgCompose.composeHTML;
+       },
+       doCommand() {
+-        goToggleToolbar("FormatToolbar", "menu_showFormatToolbar");
++        goToggleToolbar("FormatToolbarOne", "menu_showFormatToolbar");
++        goToggleToolbar("FormatToolbarTwo", "menu_showFormatToolbar");
+       },
+     },
+ 
+--- /dev/null
++++ b/comm/mail/components/compose/content/editFormatButtonsOne.inc.xhtml
+@@ -0,0 +1,71 @@
++# This Source Code Form is subject to the terms of the Mozilla Public
++# License, v. 2.0. If a copy of the MPL was not distributed with this
++# file, You can obtain one at http://mozilla.org/MPL/2.0/.
++
++        <!-- Formatting toolbar items. "value" are HTML tagnames, don't translate -->
++        <menulist id="ParagraphSelect"
++                  class="toolbar-focustarget"
++                  oncommand="setParagraphState(event);"
++                  crop="end"
++                  tooltiptext="&ParagraphSelect.tooltip;"
++                  observes="cmd_renderedHTMLEnabler">
++          <menupopup id="ParagraphPopup">
++            <menuitem id="toolbarmenu_bodyText" label="&bodyTextCmd.label;" value=""/>
++            <menuitem id="toolbarmenu_paragraph" label="&paragraphParagraphCmd.label;" value="p"/>
++            <menuitem id="toolbarmenu_h1" label="&heading1Cmd.label;" value="h1"/>
++            <menuitem id="toolbarmenu_h2" label="&heading2Cmd.label;" value="h2"/>
++            <menuitem id="toolbarmenu_h3" label="&heading3Cmd.label;" value="h3"/>
++            <menuitem id="toolbarmenu_h4" label="&heading4Cmd.label;" value="h4"/>
++            <menuitem id="toolbarmenu_h5" label="&heading5Cmd.label;" value="h5"/>
++            <menuitem id="toolbarmenu_h6" label="&heading6Cmd.label;" value="h6"/>
++            <menuitem id="toolbarmenu_address" label="&paragraphAddressCmd.label;" value="address"/>
++            <menuitem id="toolbarmenu_pre" label="&paragraphPreformatCmd.label;" value="pre"/>
++          </menupopup>
++        </menulist>
++
++        <!-- "value" are HTML tagnames, don't translate -->
++        <menulist id="FontFaceSelect"
++                  class="toolbar-focustarget"
++                  oncommand="doStatefulCommand('cmd_fontFace', event.target.value)"
++                  crop="center"
++                  sizetopopup="pref"
++                  tooltiptext="&FontFaceSelect.tooltip;"
++                  observes="cmd_renderedHTMLEnabler">
++          <menupopup id="FontFacePopup">
++            <menuitem id="toolbarmenu_fontVarWidth" label="&fontVarWidth.label;" value=""/>
++            <menuitem id="toolbarmenu_fontFixedWidth" label="&fontFixedWidth.label;" value="monospace"/>
++            <menuseparator id="toolbarmenuAfterGenericFontsSeparator"/>
++            <menuitem id="toolbarmenu_fontHelvetica" label="&fontHelvetica.label;"
++                      value="Helvetica, Arial, sans-serif"
++                      value_parsed="helvetica,arial,sans-serif"/>
++            <menuitem id="toolbarmenu_fontTimes" label="&fontTimes.label;"
++                      value="Times New Roman, Times, serif"
++                      value_parsed="times new roman,times,serif"/>
++            <menuitem id="toolbarmenu_fontCourier" label="&fontCourier.label;"
++                      value="Courier New, Courier, monospace"
++                      value_parsed="courier new,courier,monospace"/>
++            <menuseparator id="toolbarmenuAfterDefaultFontsSeparator"
++                           class="fontFaceMenuAfterDefaultFonts"/>
++            <menuseparator id="toolbarmenuAfterUsedFontsSeparator"
++                           class="fontFaceMenuAfterUsedFonts"
++                           hidden="true"/>
++            <!-- Local font face items added here by initLocalFontFaceMenu() -->
++          </menupopup>
++        </menulist>
++
++        <toolbaritem id="color-buttons-container"
++                     class="formatting-button"
++                     align="center">
++          <stack id="ColorButtons">
++            <box class="color-button" id="BackgroundColorButton"
++                 onclick="if (!this.hasAttribute('disabled') || this.getAttribute('disabled') != 'true') { EditorSelectColor('', event); }"
++                 tooltiptext="&BackgroundColorButton.tooltip;"
++                 observes="cmd_backgroundColor"
++                 oncommand="/* See MsgComposeCommands.js::updateAllItems for why this attribute is needed here. */"/>
++            <box class="color-button" id="TextColorButton"
++                 onclick="if (!this.hasAttribute('disabled') || this.getAttribute('disabled') != 'true') { EditorSelectColor('Text', event); }"
++                 tooltiptext="&TextColorButton.tooltip;"
++                 observes="cmd_fontColor"
++                 oncommand="/* See MsgComposeCommands.js::updateAllItems for why this attribute is needed here. */"/>
++          </stack>
++        </toolbaritem>
+diff --git a/comm/mail/components/compose/content/editFormatButtons.inc.xhtml b/comm/mail/components/compose/content/editFormatButtonsTwo.inc.xhtml
+similarity index 73%
+rename from comm/mail/components/compose/content/editFormatButtons.inc.xhtml
+rename to comm/mail/components/compose/content/editFormatButtonsTwo.inc.xhtml
+index f84b2610..22451b50 100644
+--- a/comm/mail/components/compose/content/editFormatButtons.inc.xhtml
++++ b/comm/mail/components/compose/content/editFormatButtonsTwo.inc.xhtml
+@@ -3,73 +3,6 @@
+ # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ 
+         <!-- Formatting toolbar items. "value" are HTML tagnames, don't translate -->
+-        <menulist id="ParagraphSelect"
+-                  class="toolbar-focustarget"
+-                  oncommand="setParagraphState(event);"
+-                  crop="end"
+-                  tooltiptext="&ParagraphSelect.tooltip;"
+-                  observes="cmd_renderedHTMLEnabler">
+-          <menupopup id="ParagraphPopup">
+-            <menuitem id="toolbarmenu_bodyText" label="&bodyTextCmd.label;" value=""/>
+-            <menuitem id="toolbarmenu_paragraph" label="&paragraphParagraphCmd.label;" value="p"/>
+-            <menuitem id="toolbarmenu_h1" label="&heading1Cmd.label;" value="h1"/>
+-            <menuitem id="toolbarmenu_h2" label="&heading2Cmd.label;" value="h2"/>
+-            <menuitem id="toolbarmenu_h3" label="&heading3Cmd.label;" value="h3"/>
+-            <menuitem id="toolbarmenu_h4" label="&heading4Cmd.label;" value="h4"/>
+-            <menuitem id="toolbarmenu_h5" label="&heading5Cmd.label;" value="h5"/>
+-            <menuitem id="toolbarmenu_h6" label="&heading6Cmd.label;" value="h6"/>
+-            <menuitem id="toolbarmenu_address" label="&paragraphAddressCmd.label;" value="address"/>
+-            <menuitem id="toolbarmenu_pre" label="&paragraphPreformatCmd.label;" value="pre"/>
+-          </menupopup>
+-        </menulist>
+-
+-        <!-- "value" are HTML tagnames, don't translate -->
+-        <menulist id="FontFaceSelect"
+-                  class="toolbar-focustarget"
+-                  oncommand="doStatefulCommand('cmd_fontFace', event.target.value)"
+-                  crop="center"
+-                  sizetopopup="pref"
+-                  tooltiptext="&FontFaceSelect.tooltip;"
+-                  observes="cmd_renderedHTMLEnabler">
+-          <menupopup id="FontFacePopup">
+-            <menuitem id="toolbarmenu_fontVarWidth" label="&fontVarWidth.label;" value=""/>
+-            <menuitem id="toolbarmenu_fontFixedWidth" label="&fontFixedWidth.label;" value="monospace"/>
+-            <menuseparator id="toolbarmenuAfterGenericFontsSeparator"/>
+-            <menuitem id="toolbarmenu_fontHelvetica" label="&fontHelvetica.label;"
+-                      value="Helvetica, Arial, sans-serif"
+-                      value_parsed="helvetica,arial,sans-serif"/>
+-            <menuitem id="toolbarmenu_fontTimes" label="&fontTimes.label;"
+-                      value="Times New Roman, Times, serif"
+-                      value_parsed="times new roman,times,serif"/>
+-            <menuitem id="toolbarmenu_fontCourier" label="&fontCourier.label;"
+-                      value="Courier New, Courier, monospace"
+-                      value_parsed="courier new,courier,monospace"/>
+-            <menuseparator id="toolbarmenuAfterDefaultFontsSeparator"
+-                           class="fontFaceMenuAfterDefaultFonts"/>
+-            <menuseparator id="toolbarmenuAfterUsedFontsSeparator"
+-                           class="fontFaceMenuAfterUsedFonts"
+-                           hidden="true"/>
+-            <!-- Local font face items added here by initLocalFontFaceMenu() -->
+-          </menupopup>
+-        </menulist>
+-
+-        <toolbaritem id="color-buttons-container"
+-                     class="formatting-button"
+-                     align="center">
+-          <stack id="ColorButtons">
+-            <box class="color-button" id="BackgroundColorButton"
+-                 onclick="if (!this.hasAttribute('disabled') || this.getAttribute('disabled') != 'true') { EditorSelectColor('', event); }"
+-                 tooltiptext="&BackgroundColorButton.tooltip;"
+-                 observes="cmd_backgroundColor"
+-                 oncommand="/* See MsgComposeCommands.js::updateAllItems for why this attribute is needed here. */"/>
+-            <box class="color-button" id="TextColorButton"
+-                 onclick="if (!this.hasAttribute('disabled') || this.getAttribute('disabled') != 'true') { EditorSelectColor('Text', event); }"
+-                 tooltiptext="&TextColorButton.tooltip;"
+-                 observes="cmd_fontColor"
+-                 oncommand="/* See MsgComposeCommands.js::updateAllItems for why this attribute is needed here. */"/>
+-          </stack>
+-        </toolbaritem>
+-
+         <toolbarbutton id="AbsoluteFontSizeButton"
+                        class="formatting-button"
+                        tooltiptext="&absoluteFontSizeToolbarCmd.tooltip;"
+--- a/comm/mail/components/compose/content/messengercompose.xhtml
++++ b/comm/mail/components/compose/content/messengercompose.xhtml
+@@ -2416,12 +2416,22 @@
+       </hbox>
+     </toolbar>
+ 
+-    <toolbox id="FormatToolbox" mode="icons">
+-      <toolbar id="FormatToolbar"
++    <toolbox id="FormatToolboxOne" mode="icons">
++      <toolbar id="FormatToolbarOne"
+                class="chromeclass-toolbar themeable-brighttext"
+                persist="collapsed"
+                nowindowdrag="true">
+-#include editFormatButtons.inc.xhtml
++#include editFormatButtonsOne.inc.xhtml
++        <spacer flex="1"/>
++      </toolbar>
++    </toolbox>
++
++    <toolbox id="FormatToolboxTwo" mode="icons">
++      <toolbar id="FormatToolbarTwo"
++               class="chromeclass-toolbar themeable-brighttext"
++               persist="collapsed"
++               nowindowdrag="true">
++#include editFormatButtonsTwo.inc.xhtml
+         <spacer flex="1"/>
+       </toolbar>
+     </toolbox>
+--- a/comm/mail/components/extensions/parent/ext-composeAction.js
++++ b/comm/mail/components/extensions/parent/ext-composeAction.js
+@@ -41,8 +41,8 @@ this.composeAction = class extends ToolbarButtonAPI {
+     ];
+     const isFormatToolbar =
+       extension.manifest.compose_action.default_area == "formattoolbar";
+-    this.toolboxId = isFormatToolbar ? "FormatToolbox" : "compose-toolbox";
+-    this.toolbarId = isFormatToolbar ? "FormatToolbar" : "composeToolbar2";
++    this.toolboxId = isFormatToolbar ? "FormatToolboxOne" : "compose-toolbox";
++    this.toolbarId = isFormatToolbar ? "FormatToolbarOne" : "composeToolbar2";
+   }
+ 
+   static onUninstall(extensionId) {
+@@ -54,7 +54,7 @@ this.composeAction = class extends ToolbarButtonAPI {
+     // Check all possible toolbars and remove the toolbarbutton if found.
+     // Sadly we have to hardcode these values here, as the add-on is already
+     // shutdown when onUninstall is called.
+-    const toolbars = ["composeToolbar2", "FormatToolbar"];
++    const toolbars = ["composeToolbar2", "FormatToolbarOne"];
+     for (const toolbar of toolbars) {
+       for (const setName of ["currentset", "extensionset"]) {
+         const set = Services.xulStore
+@@ -121,7 +121,7 @@ this.composeAction = class extends ToolbarButtonAPI {
+ 
+   makeButton(window) {
+     const button = super.makeButton(window);
+-    if (this.toolbarId == "FormatToolbar") {
++    if (this.toolbarId == "FormatToolbarOne") {
+       button.classList.add("formatting-button");
+       // The format toolbar has no associated context menu. Add one directly to
+       // this button.
+--- a/comm/mail/themes/linux/mail/compose/messengercompose.css
++++ b/comm/mail/themes/linux/mail/compose/messengercompose.css
+@@ -119,7 +119,14 @@
+ 
+ /* ::::: format toolbar ::::: */
+ 
+-#FormatToolbar {
++#FormatToolbarOne {
++  background-color: inherit;
++  color: inherit;
++  margin-inline: 3px;
++  padding-block: 4px;
++}
++
++#FormatToolbarTwo {
+   background-color: inherit;
+   color: inherit;
+   margin-inline: 3px;
+@@ -155,7 +162,12 @@ menu[command="cmd_convertCloud"] .menu-iconic-left {
+     background-image: none;
+   }
+ 
+-  & #FormatToolbar {
++  & #FormatToolbarOne {
++    color: inherit;
++    background-image: none;
++  }
++
++  & #FormatToolbarTwo {
+     color: inherit;
+     background-image: none;
+   }
+--- a/comm/mail/themes/osx/mail/compose/messengercompose.css
++++ b/comm/mail/themes/osx/mail/compose/messengercompose.css
+@@ -171,7 +171,22 @@ toolbar[nowindowdrag="true"] {
+ 
+ /* ::::: format toolbar ::::: */
+ 
+-#FormatToolbar {
++#FormatToolbarOne {
++  padding-block: 4px;
++  margin-inline: 3px;
++  margin-block-end: 3px;
++
++  :root[lwt-tree] & {
++    background-image: none;
++    background-color: transparent !important;
++  }
++
++  & toolbarseparator {
++    background-image: none;
++  }
++}
++
++#FormatToolbarTwo {
+   padding-block: 4px;
+   margin-inline: 3px;
+   margin-block-end: 3px;
+--- a/comm/mail/themes/shared/mail/messengercompose.css
++++ b/comm/mail/themes/shared/mail/messengercompose.css
+@@ -26,7 +26,7 @@
+ /* Styles for the default system dark theme */
+ 
+ :root[lwt-tree] {
+-  & :is(#MsgHeadersToolbar, #FormatToolbox) {
++  & :is(#MsgHeadersToolbar, #FormatToolboxOne, #FormatToolboxTwo) {
+     background-color: var(--toolbar-bgcolor) !important;
+     color: var(--lwt-text-color);
+   }
+@@ -368,7 +368,8 @@
+   padding-inline: 3px;
+   display: grid;
+   grid-template: "contacts contacts-splitter headers" minmax(auto, var(--headersSplitter-height))
+-                 "contacts contacts-splitter format-toolbar" min-content
++                 "contacts contacts-splitter format-toolbar-one" min-content
++                 "contacts contacts-splitter format-toolbar-two" min-content
+                  "contacts contacts-splitter headers-splitter" min-content
+                  "contacts contacts-splitter message" minmax(33%, 1fr)
+                  "contacts contacts-splitter attachment-splitter" min-content
+@@ -479,7 +480,7 @@
+   }
+ }
+ 
+-:is(#MsgHeadersToolbar, #FormatToolbox) {
++:is(#MsgHeadersToolbar, #FormatToolboxOne, #FormatToolboxTwo) {
+   background-color: var(--layout-background-2);
+   color: var(--layout-color-1);
+   color-scheme: light-dark;
+@@ -492,8 +493,12 @@
+   grid-template-columns: auto;
+ }
+ 
+-#FormatToolbox {
+-  grid-area: format-toolbar;
++#FormatToolboxOne {
++  grid-area: format-toolbar-one;
++}
++
++#FormatToolboxTwo {
++  grid-area: format-toolbar-two;
+ }
+ 
+ #headersSplitter {
+@@ -604,7 +609,38 @@
+ 
+ /* :::: Format toolbar :::: */
+ 
+-#FormatToolbar {
++#FormatToolbarOne {
++  &:not([hidden="true"]) {
++    display: flex;
++  }
++
++  & > menulist {
++    margin-block: 1px;
++
++    &:not(:hover) {
++      background: transparent;
++    }
++
++    &::part(label-box) {
++     text-shadow: none;
++    }
++
++    &:not([disabled="true"],[open="true"]):hover {
++      background: var(--toolbarbutton-hover-background);
++    }
++
++    &[open="true"] {
++      background: var(--toolbarbutton-active-background);
++      border-color: var(--toolbarbutton-active-bordercolor);
++    }
++  }
++
++  & > toolbarbutton > .toolbarbutton-text {
++    display: none;
++  }
++}
++
++#FormatToolbarTwo {
+   &:not([hidden="true"]) {
+     display: flex;
+   }
+--- a/comm/mail/themes/windows/mail/compose/messengercompose.css
++++ b/comm/mail/themes/windows/mail/compose/messengercompose.css
+@@ -124,7 +124,11 @@
+ 
+ /* ::::: format toolbar ::::: */
+ 
+-#FormatToolbar {
++#FormatToolbarOne {
++  margin-block-end: 2px;
++}
++
++#FormatToolbarTwo {
+   margin-block-end: 2px;
+ }
+ 

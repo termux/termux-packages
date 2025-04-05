@@ -1,0 +1,16 @@
+--- a/gfx/webrender_bindings/src/bindings.rs
++++ b/gfx/webrender_bindings/src/bindings.rs
+@@ -1689,12 +1689,7 @@
+ 
+     let cached_programs = program_cache.map(|program_cache| Rc::clone(&program_cache.rc_get()));
+ 
+-    let color = if cfg!(target_os = "android") {
+-        // The color is for avoiding black flash before receiving display list.
+-        ColorF::new(1.0, 1.0, 1.0, 1.0)
+-    } else {
+-        ColorF::new(0.0, 0.0, 0.0, 0.0)
+-    };
++    let color = ColorF::new(0.0, 0.0, 0.0, 0.0);
+ 
+     let compositor_config = if software {
+         CompositorConfig::Native {

@@ -2,40 +2,45 @@ TERMUX_PKG_HOMEPAGE=https://www.thunderbird.net
 TERMUX_PKG_DESCRIPTION="Unofficial Thunderbird email client"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="128.8.1"
-TERMUX_PKG_SRCURL="https://archive.mozilla.org/pub/thunderbird/releases/${TERMUX_PKG_VERSION}esr/source/thunderbird-${TERMUX_PKG_VERSION}esr.source.tar.xz"
-TERMUX_PKG_SHA256=bfef101c0fb720e67b5fe0ec9cf8232145e782c1d253395728d47e2bc68d0c13
+TERMUX_PKG_VERSION="137.0.1"
+TERMUX_PKG_SRCURL="https://archive.mozilla.org/pub/thunderbird/releases/${TERMUX_PKG_VERSION}/source/thunderbird-${TERMUX_PKG_VERSION}.source.tar.xz"
+TERMUX_PKG_SHA256=8e59b4fce8d3d74e4599f56ae94d8edf001eaf221e8288d9dafd9d8d0836f7d1
 TERMUX_PKG_DEPENDS="ffmpeg, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libandroid-spawn, libc++, libcairo, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libotr, libpixman, libsm, libvpx, libwebp, libx11, libxcb, libxcomposite, libxdamage, libxext, libxfixes, libxrandr, libxtst, pango, pulseaudio, zlib"
-TERMUX_PKG_BUILD_DEPENDS="binutils-cross, libcpufeatures, libice, libsm"
+TERMUX_PKG_BUILD_DEPENDS="libcpufeatures, libice, libsm"
 TERMUX_PKG_BUILD_IN_SRC=true
-# Mozilla does not provide a simple way to find the latest ESR release
-TERMUX_PKG_UPDATE_VERSION_REGEXP='\d+\.\d+\.\d+(?=esr/)'
 TERMUX_PKG_AUTO_UPDATE=true
 
 termux_pkg_auto_update() {
-	# Adapted from the auto_update function in x11/firefox and packages/ncdu.
-	# Unfortunately there is no 'latest-esr/' directory for Thunderbird.
 	# https://archive.mozilla.org/pub/thunderbird/releases/latest/README.txt
-	local api_url latest_esr
-	api_url="https://archive.mozilla.org/pub/thunderbird/releases/"
-	latest_esr="$(curl -s "$api_url" \
-		| grep -oP "$TERMUX_PKG_UPDATE_VERSION_REGEXP" \
-		| sort -V \
-		| tail -n1)"
+	local e=0
+	local api_url="https://download.mozilla.org/?product=thunderbird-latest&os=linux64&lang=en-US"
+	local api_url_r=$(curl -s "${api_url}")
+	local latest_version=$(echo "${api_url_r}" | sed -nE "s/.*thunderbird-(.*).tar.xz.*/\1/p")
+	[[ -z "${api_url_r}" ]] && e=1
+	[[ -z "${latest_version}" ]] && e=1
 
-	if [[ "${latest_esr}" == "${TERMUX_PKG_VERSION}" ]]; then
-		echo "INFO: No update needed. Already at version '${latest_esr}'."
+	local uptime_now=$(cat /proc/uptime)
+	local uptime_s="${uptime_now//.*}"
+	local uptime_h_limit=2
+	local uptime_s_limit=$((uptime_h_limit*60*60))
+	[[ -z "${uptime_s}" ]] && [[ "$(uname -o)" != "Android" ]] && e=1
+	[[ "${uptime_s}" == 0 ]] && [[ "$(uname -o)" != "Android" ]] && e=1
+	[[ "${uptime_s}" -gt "${uptime_s_limit}" ]] && e=1
+
+	if [[ "${e}" != 0 ]]; then
+		cat <<- EOL >&2
+		WARN: Auto update failure!
+		api_url_r=${api_url_r}
+		latest_version=${latest_version}
+		uptime_now=${uptime_now}
+		uptime_s=${uptime_s}
+		uptime_s_limit=${uptime_s_limit}
+		EOL
 		return
 	fi
 
-	# We want to avoid re-filtering the version.
-	# It's already cleaned up, so unset the regexp.
-	# See: https://github.com/termux/termux-packages/issues/20836
-	# See also: packages/taplo/build.sh
-	unset TERMUX_PKG_UPDATE_VERSION_REGEXP
-	termux_pkg_upgrade_version "${latest_esr}"
+	termux_pkg_upgrade_version "${latest_version}"
 }
-
 
 termux_step_post_get_source() {
 	local f="media/ffvpx/config_unix_aarch64.h"
@@ -92,6 +97,11 @@ termux_step_pre_configure() {
 }
 
 termux_step_configure() {
+	if [ "$TERMUX_CONTINUE_BUILD" == "true" ]; then
+		termux_step_pre_configure
+		cd $TERMUX_PKG_SRCDIR
+	fi
+
 	sed \
 		-e "s|@TERMUX_HOST_PLATFORM@|${TERMUX_HOST_PLATFORM}|" \
 		-e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|" \
@@ -110,17 +120,7 @@ END
 }
 
 termux_step_make() {
-	# XXX: Try max 10 times
-	for t in $(seq 1 10); do
-		if ./mach build --keep-going -j "$TERMUX_PKG_MAKE_PROCESSES"; then
-			break
-		else
-			if [ "$t" = "10" ]; then
-				termux_error_exit "Giving up after 10 attempts"
-			fi
-		fi
-	done
-
+	./mach build -j "$TERMUX_PKG_MAKE_PROCESSES"
 	./mach buildsymbols
 }
 
