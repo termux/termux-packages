@@ -1,0 +1,38 @@
+polyfill copied and pasted from
+https://github.com/GNOME/libxml2/commit/1341deac131af51bdd3b4dd124440c198d361cc9
+since libxml2 2.14 removed xmlShellPrintNode()
+
+--- a/src/rdrview.c
++++ b/src/rdrview.c
+@@ -489,6 +489,31 @@ static void parse_arguments(int argc, char *argv[])
+ 	}
+ }
+ 
++
++/**
++ * xmlShellPrintNode:
++ * @node : a non-null node to print to the output FILE
++ *
++ * Print node to the output FILE
++ */
++
++static void xmlShellPrintNode(xmlNodePtr node)
++{
++	FILE *fp = stdout;
++
++	if (!node)
++		return;
++
++	if (node->type == XML_DOCUMENT_NODE)
++		xmlDocDump(fp, (xmlDocPtr) node);
++	else if (node->type == XML_ATTRIBUTE_NODE)
++		xmlDebugDumpAttrList(fp, (xmlAttrPtr) node, 0);
++	else
++		xmlElemDump(fp, node->doc, node);
++
++	fprintf(fp, "\n");
++}
++
+ /**
+  * Save the HTML for a node to the given file
+  */
